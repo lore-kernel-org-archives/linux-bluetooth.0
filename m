@@ -2,86 +2,63 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 01/14] shared/att: Add bt_att_get_fd
-Date: Wed, 11 Feb 2015 19:17:31 -0800
-Message-Id: <1423711064-7390-2-git-send-email-armansito@chromium.org>
-In-Reply-To: <1423711064-7390-1-git-send-email-armansito@chromium.org>
-References: <1423711064-7390-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 00/14] Rewrite local GATT server using shared/gatt
+Date: Wed, 11 Feb 2015 19:17:30 -0800
+Message-Id: <1423711064-7390-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added the bt_att_get_fd function which returns the underlying file
-descriptor of a bt_att.
----
- src/shared/att.c          | 8 ++++++++
- src/shared/att.h          | 2 ++
- src/shared/gatt-client.c  | 3 ++-
- src/shared/gatt-helpers.c | 3 ++-
- 4 files changed, 14 insertions(+), 2 deletions(-)
+*v1: Addressed comments by jamuraa and vudentz:
+  - Now passing bt_att instead of bdaddr_t in gatt_db callbacks and functions.
+    I have not run the tests on the android side here, so I would appreciate it
+    if you can run them.
+  - Renamed src/gatt-server to src/gatt-database for now. Added TODO item for
+    refactoring this later.
+  - Updated the TODO items for GATT.
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index a98909e..8bf1bab 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -889,6 +889,14 @@ bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close)
- 	return io_set_close_on_destroy(att->io, do_close);
- }
- 
-+int bt_att_get_fd(struct bt_att *att)
-+{
-+	if (!att)
-+		return -1;
-+
-+	return att->fd;
-+}
-+
- bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
- 				void *user_data, bt_att_destroy_func_t destroy)
- {
-diff --git a/src/shared/att.h b/src/shared/att.h
-index cd00a1e..db423fe 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -35,6 +35,8 @@ void bt_att_unref(struct bt_att *att);
- 
- bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close);
- 
-+int bt_att_get_fd(struct bt_att *att);
-+
- typedef void (*bt_att_response_func_t)(uint8_t opcode, const void *pdu,
- 					uint16_t length, void *user_data);
- typedef void (*bt_att_notify_func_t)(uint8_t opcode, const void *pdu,
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index bfb9427..d5a277b 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -21,8 +21,9 @@
-  *
-  */
- 
--#include "src/shared/att.h"
- #include "lib/uuid.h"
-+#include "lib/bluetooth.h"
-+#include "src/shared/att.h"
- #include "src/shared/gatt-helpers.h"
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
-diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index a33f960..b469116 100644
---- a/src/shared/gatt-helpers.c
-+++ b/src/shared/gatt-helpers.c
-@@ -26,9 +26,10 @@
- #include <config.h>
- #endif
- 
-+#include "lib/uuid.h"
-+#include "lib/bluetooth.h"
- #include "src/shared/queue.h"
- #include "src/shared/att.h"
--#include "lib/uuid.h"
- #include "src/shared/gatt-helpers.h"
- #include "src/shared/util.h"
- 
+This patch set includes patches that rewrite the local GATT server using
+shared/gatt. This in effect invalidates the existing src/attrib-server in
+favor of a new src/gatt-server.
+
+Arman Uguray (14):
+  CHROMIUM: shared/att: Add bt_att_get_fd
+  CHROMIUM: shared/gatt: Pass bt_att instead of bdaddr_t
+  CHROMIUM: core: Introduce btd_gatt_database
+  CHROMIUM: core: Attach gatt-server to bt_att
+  CHROMIUM: core: gatt: Add GATT/GAP services to local db
+  CHROMIUM: core: Add GATT UUIDs to Adapter1.UUIDs
+  CHROMIUM: core: Support per-client CCC state
+  CHROMIUM: core: Setup added/removed handlers in GATT database
+  CHROMIUM: core: Add Service Changed characteristic
+  CHROMIUM: core: device: Add getter for GATT server
+  CHROMIUM: core: gatt-server: Send "Service Changed"
+  CHROMIUM: core: adapter: Send UUIDs changed for GATT services
+  CHROMIUM: shared/gatt: Don't incorrectly terminate discovery
+  TODO: Update GATT items.
+
+ Makefile.am               |   1 +
+ TODO                      |  54 ++--
+ android/gatt.c            |  98 ++++--
+ src/adapter.c             |  59 +++-
+ src/device.c              |  52 +++-
+ src/device.h              |   1 +
+ src/gatt-client.c         |   1 +
+ src/gatt-database.c       | 766 ++++++++++++++++++++++++++++++++++++++++++++++
+ src/gatt-database.h       |  29 ++
+ src/main.c                |   3 +
+ src/shared/att.c          |   8 +
+ src/shared/att.h          |   2 +
+ src/shared/gatt-client.c  |   6 +-
+ src/shared/gatt-db.c      |  10 +-
+ src/shared/gatt-db.h      |   8 +-
+ src/shared/gatt-helpers.c |   3 +-
+ src/shared/gatt-server.c  |  32 +-
+ tools/btgatt-server.c     |  18 +-
+ unit/test-gatt.c          |   5 +-
+ 19 files changed, 1052 insertions(+), 104 deletions(-)
+ create mode 100644 src/gatt-database.c
+ create mode 100644 src/gatt-database.h
+
 -- 
 2.2.0.rc0.207.ga3a616c
 
