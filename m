@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 4/8] android/avdtp: Fix SEID generation
-Date: Fri, 13 Feb 2015 11:22:58 +0200
-Message-Id: <1423819382-20018-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 8/8] unit/avdtp: Refactor context destroy
+Date: Fri, 13 Feb 2015 11:23:02 +0200
+Message-Id: <1423819382-20018-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1423819382-20018-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1423819382-20018-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,84 +11,51 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Fixes SEID generation for avdtp. Currently SEIDs were assigned assuming
-that SEID are registered and unregistered in the same order like:
-seid = g_slist_length(seps) + 1
-which makes it possible to reuse similar SEIDs
+destroy_context() function will be used for dummy_tests without
+context_execute()
 ---
- android/Makefile.am |  1 +
- android/avdtp.c     | 21 ++++++++++++++++++++-
- 2 files changed, 21 insertions(+), 1 deletion(-)
+ unit/test-avdtp.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 9e73be4..ebbb28e 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -102,6 +102,7 @@ noinst_PROGRAMS += android/avdtptest
- android_avdtptest_SOURCES = android/avdtptest.c \
- 				src/log.h src/log.c \
- 				btio/btio.h btio/btio.c \
-+				src/shared/util.h src/shared/util.c \
- 				android/avdtp.h android/avdtp.c
- android_avdtptest_CFLAGS = $(AM_CFLAGS)
- android_avdtptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-diff --git a/android/avdtp.c b/android/avdtp.c
-index 853fdf3..728f3fd 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -41,10 +41,12 @@
- 
- #include "lib/bluetooth.h"
- #include "src/log.h"
-+#include "src/shared/util.h"
- #include "avdtp.h"
- #include "../profiles/audio/a2dp-codecs.h"
- 
- #define MAX_SEID 0x3E
-+static uint64_t seids;
- 
- #ifndef MAX
- # define MAX(x, y) ((x) > (y) ? (x) : (y))
-@@ -3342,6 +3344,22 @@ int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
- 							&req, sizeof(req));
+diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+index a76198a..afbe875 100644
+--- a/unit/test-avdtp.c
++++ b/unit/test-avdtp.c
+@@ -260,10 +260,8 @@ static struct context *create_context(uint16_t version, gconstpointer data)
+ 	return context_new(version, 672, 672, data);
  }
  
-+static uint8_t avdtp_get_seid(void)
+-static void execute_context(struct context *context)
++static void destroy_context(struct context *context)
+ {
+-	g_main_loop_run(context->main_loop);
+-
+ 	if (context->source > 0)
+ 		g_source_remove(context->source);
+ 	avdtp_unref(context->session);
+@@ -274,6 +272,13 @@ static void execute_context(struct context *context)
+ 	g_free(context);
+ }
+ 
++static void execute_context(struct context *context)
 +{
-+	uint8_t id = util_get_bitmap64_uid(&seids, MAX_SEID);
++	g_main_loop_run(context->main_loop);
 +
-+	DBG("seids 0x%04lx id %d", seids, id);
-+
-+	return id;
++	destroy_context(context);
 +}
 +
-+static void avdtp_clear_seid(uint8_t seid)
-+{
-+	util_clear_bitmap64(&seids, seid);
+ static gboolean sep_getcap_ind(struct avdtp *session,
+ 					struct avdtp_local_sep *sep,
+ 					GSList **caps, uint8_t *err,
+@@ -600,6 +605,8 @@ static void test_server_seid(gconstpointer data)
+ 	/* Remove all SEPs */
+ 	g_slist_free_full(lseps, unregister_sep);
+ 	lseps = NULL;
 +
-+	DBG("seids 0x%04lx cleared bit %d ", seids, seid);
-+}
-+
- struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
- 						uint8_t codec_type,
- 						gboolean delay_reporting,
-@@ -3357,7 +3375,7 @@ struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
- 	sep = g_new0(struct avdtp_local_sep, 1);
++	destroy_context(context);
+ }
  
- 	sep->state = AVDTP_STATE_IDLE;
--	sep->info.seid = g_slist_length(lseps) + 1;
-+	sep->info.seid = avdtp_get_seid();
- 	sep->info.type = type;
- 	sep->info.media_type = media_type;
- 	sep->codec = codec_type;
-@@ -3393,6 +3411,7 @@ int avdtp_unregister_sep(struct avdtp_local_sep *sep)
- 	DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
- 			sep->info.type, sep->codec, sep->info.seid);
- 
-+	avdtp_clear_seid(sep->info.seid);
- 	g_free(sep);
- 
- 	return 0;
+ static void test_server_seid_duplicate(gconstpointer data)
 -- 
 2.1.0
 
