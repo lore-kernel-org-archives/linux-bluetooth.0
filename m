@@ -1,58 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Feb 2015 11:15:57 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: fix service discovery behaviour for empty
- uuids filter
-Message-ID: <20150213091557.GA30773@t440s.lan>
-References: <1423795883-13182-1-git-send-email-jpawlowski@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1423795883-13182-1-git-send-email-jpawlowski@google.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv1 2/9] unit/avdtp: Add duplicate SEID test
+Date: Fri, 13 Feb 2015 11:06:01 +0200
+Message-Id: <1423818368-15899-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1423818368-15899-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1423818368-15899-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Feb 12, 2015, Jakub Pawlowski wrote:
-> This patch fixes service discovery behaviour, when provided uuid filter
-> is empty and HCI_QUIRK_STRICT_DUPLICATE_FILTER is set. Before this
-> patch, empty uuid filter was unable to trigger scan restart, and that
-> caused inconsistent behaviour in applications.
-> 
-> Example: two DBus clients call BlueZ, one to find all devices with
-> service abcd, second to find all devices with rssi smaller than -90.
-> Sum of those filters, that is passed to mgmt_service_scan is empty
-> filter, with no rssi or uuids set.
-> That caused kernel not to restart scan when quirk was set.
-> That was inconsistent with what happen when there's only one of those
-> two filters set (scan is restarted and reports devices).
-> 
-> To fix that, new variable hdev->discovery.service_discovery was
-> introduced. It can indicate that filtered scan is running, no matter
-> what uuid or rssi filter is set.
-> 
-> Thi patch also closes all code responsible for filtered discovery in
+Add test adding two SEP, then remove first and create another one. With
+the current code new SEP has the same SEID (2!). Following patches
+fixing the bug.
+---
+ unit/test-avdtp.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-Minor typo there: s/Thi/This/
+diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+index c9ff014..b6ab72c 100644
+--- a/unit/test-avdtp.c
++++ b/unit/test-avdtp.c
+@@ -583,6 +583,46 @@ static void test_server_seid(gconstpointer data)
+ 	lseps = NULL;
+ }
+ 
++static void test_server_seid_duplicate(gconstpointer data)
++{
++	struct context *context = create_context(0x0103, data);
++	struct avdtp_local_sep *sep;
++	int i;
++
++	for (i = 0; i < 2; i++) {
++		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
++						AVDTP_MEDIA_TYPE_AUDIO,
++						0x00, TRUE, &sep_ind, NULL,
++						context);
++		g_assert(sep);
++
++		lseps = g_slist_append(lseps, sep);
++	}
++
++	/* Remove 1st element */
++	sep = g_slist_nth_data(lseps, 0);
++	lseps = g_slist_remove(lseps, sep);
++	avdtp_unregister_sep(sep);
++
++	/* Now register new element */
++	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
++						AVDTP_MEDIA_TYPE_AUDIO,
++						0x00, TRUE, &sep_ind, NULL,
++						context);
++	g_assert(sep);
++	lseps = g_slist_append(lseps, sep);
++
++	/* Check SEID ids */
++
++	g_idle_add(send_pdu, context);
++
++	execute_context(context);
++
++	/* Remove all SEPs */
++	g_slist_free_full(lseps, unregister_sep);
++	lseps = NULL;
++}
++
+ static gboolean sep_getcap_ind_frg(struct avdtp *session,
+ 					struct avdtp_local_sep *sep,
+ 					GSList **caps, uint8_t *err,
+@@ -772,6 +812,9 @@ int main(int argc, char *argv[])
+ 	 */
+ 	define_test("/TP/SIG/SMG/BV-06-C-SEID-1", test_server_seid,
+ 			raw_pdu(0x00));
++	define_test("/TP/SIG/SMG/BV-06-C-SEID-2", test_server_seid_duplicate,
++			raw_pdu(0x00, 0x01),
++			raw_pdu(0x02, 0x01, 0x08, 0x08, 0x08, 0x08));
+ 	define_test("/TP/SIG/SMG/BV-05-C", test_client,
+ 			raw_pdu(0x00, 0x01));
+ 	define_test("/TP/SIG/SMG/BV-06-C", test_server,
+-- 
+2.1.0
 
-> one if statement. That makes whole code shorter, much more readable,
-> and easier to backport to older kernels, especially pre 3.10.
-> 
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-> ---
->  include/net/bluetooth/hci_core.h |   2 +
->  net/bluetooth/mgmt.c             | 140 +++++++++++++++------------------------
->  2 files changed, 55 insertions(+), 87 deletions(-)
-
-Would it be possible to provide a mgmt-tester case to catch this issue?
-The fact that this issue wasn't noticed earlier can be seen as an
-indication that the mgmt-tester coverage of this API isn't good enough.
-
-Do you think this is critical enough that we should try to get a fix
-still for 3.20 through bluetooth.git? The fact that the patch looks
-largely as refactoring (as opposed to a clear fix) might make that
-difficult.
-
-Johan
