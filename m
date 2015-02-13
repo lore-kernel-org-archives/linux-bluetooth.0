@@ -1,117 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 05/10] android/gatt: Use g_attrib_send consistently
-Date: Fri, 13 Feb 2015 12:31:11 +0100
-Message-ID: <2715406.EyNz60MSyF@uw000953>
-In-Reply-To: <1423665248-5121-5-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com> <1423665248-5121-5-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+References: <1423226839-23935-1-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1423226839-23935-1-git-send-email-gowtham.ab@samsung.com>
+Subject: RE: [PATCH] gatt-server: Fix mutlpile definition of same func
+Date: Fri, 13 Feb 2015 16:50:33 +0530
+Message-id: <000801d0477f$1a2adde0$4e8099a0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Ping.
 
-On Wednesday 11 of February 2015 15:34:03 Jakub Tyszkowski wrote:
-> 'g_attrib_send' do checks the 'length' parameter so there is no need
-> for us to do this (and in most cases we don't). We can test the
-> returned value in case we want to report error.
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Friday, February 06, 2015 6:17 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
+> Babu
+> Subject: [PATCH] gatt-server: Fix mutlpile definition of same func
+> 
+> Removed 'put_uuid_le' func from gatt-server, which was already defined in
+> gatt-helpers.
 > ---
->  android/gatt.c | 31 +++++++++++--------------------
->  1 file changed, 11 insertions(+), 20 deletions(-)
+>  src/shared/gatt-helpers.c |  2 +-
+>  src/shared/gatt-helpers.h |  2 ++
+>  src/shared/gatt-server.c  | 21 ---------------------
+>  3 files changed, 3 insertions(+), 22 deletions(-)
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 7f95226..81b0283 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -1068,9 +1068,7 @@ static void notify_att_range_change(struct gatt_device *dev,
->  		break;
->  	}
->  
-> -	if (length)
-> -		g_attrib_send(dev->attrib, 0, pdu, length,
-> -						confirmation_cb, NULL, NULL);
-> +	g_attrib_send(dev->attrib, 0, pdu, length, confirmation_cb, NULL, NULL);
+> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c index
+> a33f960..6dfc24f 100644
+> --- a/src/shared/gatt-helpers.c
+> +++ b/src/shared/gatt-helpers.c
+> @@ -567,7 +567,7 @@ bool bt_gatt_exchange_mtu(struct bt_att *att,
+> uint16_t client_rx_mtu,
+>  	return true;
 >  }
->  
->  static struct app_connection *create_connection(struct gatt_device *device,
-> @@ -1480,9 +1478,7 @@ static void ind_handler(const uint8_t *cmd, uint16_t cmd_len,
->  	 */
->  
->  	resp_length = enc_confirmation(opdu, length);
-> -	if (resp_length)
-> -		g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL,
-> -									NULL);
-> +	g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL, NULL);
->  }
->  
->  static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
-> @@ -4157,12 +4153,10 @@ static uint8_t test_read_write(bdaddr_t *bdaddr, bt_uuid_t *uuid, uint16_t op,
->  		return HAL_STATUS_UNSUPPORTED;
->  	}
->  
-> -	if (!length)
-> +	if (!g_attrib_send(dev->attrib, 0, pdu, length, test_command_result,
-> +								NULL, NULL))
->  		return HAL_STATUS_FAILED;
->  
-> -	g_attrib_send(dev->attrib, 0, pdu, length, test_command_result, NULL,
-> -									NULL);
-> -
->  	return HAL_STATUS_SUCCESS;
->  }
->  
-> @@ -5531,12 +5525,11 @@ static void handle_server_send_indication(const void *buf, uint16_t len)
->  						cmd->len, pdu, mtu);
->  	}
->  
-> -	if (length == 0) {
-> -		error("gatt: Failed to encode indication");
-> +	if (!g_attrib_send(conn->device->attrib, 0, pdu, length,
-> +				confirmation_cb, UINT_TO_PTR(conn->id), NULL)) {
-> +		error("gatt: Failed to send indication");
->  		status = HAL_STATUS_FAILED;
->  	} else {
-> -		g_attrib_send(conn->device->attrib, 0, pdu, length,
-> -				confirmation_cb, UINT_TO_PTR(conn->id), NULL);
->  		status = HAL_STATUS_SUCCESS;
->  	}
->  
-> @@ -6143,13 +6136,13 @@ static uint8_t mtu_att_handle(const uint8_t *cmd, uint16_t cmd_len,
->  
->  	rsp = g_attrib_get_buffer(dev->attrib, &length);
->  
-> +		return ATT_ECODE_UNLIKELY;
+> 
+> -static void put_uuid_le(const bt_uuid_t *src, void *dst)
+> +void put_uuid_le(const bt_uuid_t *src, void *dst)
+>  {
+>  	bt_uuid_t uuid;
+> 
+> diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h index
+> 0217e82..7a2076b 100644
+> --- a/src/shared/gatt-helpers.h
+> +++ b/src/shared/gatt-helpers.h
+> @@ -105,3 +105,5 @@ bool bt_gatt_read_by_type(struct bt_att *att,
+> uint16_t start, uint16_t end,
+>  					bt_gatt_discovery_callback_t
+> callback,
+>  					void *user_data,
+>  					bt_gatt_destroy_func_t destroy);
 > +
-
-This looks strange, rebase artifact perhaps?
-
->  	/* Respond with our MTU */
->  	len = enc_mtu_resp(mtu, rsp, length);
-> -	if (!len)
-> +	if (!g_attrib_send(dev->attrib, 0, rsp, len, NULL, NULL, NULL))
->  		return ATT_ECODE_UNLIKELY;
->  
-> -	g_attrib_send(dev->attrib, 0, rsp, len, NULL, NULL, NULL);
-> -
->  	return 0;
+> +void put_uuid_le(const bt_uuid_t *src, void *dst);
+> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c index
+> 8f7b5cd..0652d3d 100644
+> --- a/src/shared/gatt-server.c
+> +++ b/src/shared/gatt-server.c
+> @@ -499,27 +499,6 @@ error:
+>  	queue_destroy(q, NULL);
 >  }
->  
-> @@ -6703,9 +6696,7 @@ done:
->  		resp_length = enc_error_resp(ipdu[0], 0x0000, status, opdu,
->  									length);
->  
-> -	if (resp_length)
-> -		g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL,
-> -									NULL);
-> +	g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL, NULL);
->  }
->  
->  static void connect_confirm(GIOChannel *io, void *user_data)
 > 
+> -static void put_uuid_le(const bt_uuid_t *src, void *dst) -{
+> -	bt_uuid_t uuid;
+> -
+> -	switch (src->type) {
+> -	case BT_UUID16:
+> -		put_le16(src->value.u16, dst);
+> -		break;
+> -	case BT_UUID128:
+> -		bswap_128(&src->value.u128, dst);
+> -		break;
+> -	case BT_UUID32:
+> -		bt_uuid_to_uuid128(src, &uuid);
+> -		bswap_128(&uuid.value.u128, dst);
+> -		break;
+> -	case BT_UUID_UNSPEC:
+> -	default:
+> -		break;
+> -	}
+> -}
+> -
+>  static bool encode_find_info_rsp(struct gatt_db *db, struct queue *q,
+>  						uint16_t mtu,
+>  						uint8_t *pdu, uint16_t *len)
+> --
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
--- 
-Best regards, 
-Szymon Janc
