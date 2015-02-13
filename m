@@ -1,70 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 3/8] shared/utils: Add helpers for bitfield fast uid generation
-Date: Fri, 13 Feb 2015 11:22:57 +0200
-Message-Id: <1423819382-20018-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1423819382-20018-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1423819382-20018-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 13 Feb 2015 11:15:57 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: fix service discovery behaviour for empty
+ uuids filter
+Message-ID: <20150213091557.GA30773@t440s.lan>
+References: <1423795883-13182-1-git-send-email-jpawlowski@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1423795883-13182-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Jakub,
 
-For small unique id generation we may use bitfield since it is very fast
-and memory efficient. If we need to generate id from 1 to 64 helper
-functions are added to utils.
----
- src/shared/util.c | 24 ++++++++++++++++++++++++
- src/shared/util.h |  3 +++
- 2 files changed, 27 insertions(+)
+On Thu, Feb 12, 2015, Jakub Pawlowski wrote:
+> This patch fixes service discovery behaviour, when provided uuid filter
+> is empty and HCI_QUIRK_STRICT_DUPLICATE_FILTER is set. Before this
+> patch, empty uuid filter was unable to trigger scan restart, and that
+> caused inconsistent behaviour in applications.
+> 
+> Example: two DBus clients call BlueZ, one to find all devices with
+> service abcd, second to find all devices with rssi smaller than -90.
+> Sum of those filters, that is passed to mgmt_service_scan is empty
+> filter, with no rssi or uuids set.
+> That caused kernel not to restart scan when quirk was set.
+> That was inconsistent with what happen when there's only one of those
+> two filters set (scan is restarted and reports devices).
+> 
+> To fix that, new variable hdev->discovery.service_discovery was
+> introduced. It can indicate that filtered scan is running, no matter
+> what uuid or rssi filter is set.
+> 
+> Thi patch also closes all code responsible for filtered discovery in
 
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 74ffb08..484031f 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -106,3 +106,27 @@ unsigned char util_get_dt(const char *parent, const char *name)
- 
- 	return DT_UNKNOWN;
- }
-+
-+/* Helpers for bitfield operations */
-+/* Find unique id from 1 to max */
-+uint8_t util_get_bitmap64_uid(uint64_t *bitmap, uint8_t max)
-+{
-+	uint64_t temp = *bitmap;
-+	uint64_t id = 1;
-+
-+	while (temp >>= 1)
-+		id++;
-+
-+	if (id > max)
-+		return 0;
-+
-+	*bitmap |= 0x01l << id;
-+
-+	return id;
-+}
-+
-+/* Clear id bit in bitmap */
-+void util_clear_bitmap64(uint64_t *bitmap, uint8_t id)
-+{
-+	*bitmap &= ~(0x01l << id);
-+}
-diff --git a/src/shared/util.h b/src/shared/util.h
-index 8437662..8f28c24 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -93,6 +93,9 @@ void util_hexdump(const char dir, const unsigned char *buf, size_t len,
- 
- unsigned char util_get_dt(const char *parent, const char *name);
- 
-+uint8_t util_get_bitmap64_uid(uint64_t *bitmap, uint8_t max);
-+void util_clear_bitmap64(uint64_t *bitmap, uint8_t id);
-+
- static inline void bswap_128(const void *src, void *dst)
- {
- 	const uint8_t *s = src;
--- 
-2.1.0
+Minor typo there: s/Thi/This/
 
+> one if statement. That makes whole code shorter, much more readable,
+> and easier to backport to older kernels, especially pre 3.10.
+> 
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> ---
+>  include/net/bluetooth/hci_core.h |   2 +
+>  net/bluetooth/mgmt.c             | 140 +++++++++++++++------------------------
+>  2 files changed, 55 insertions(+), 87 deletions(-)
+
+Would it be possible to provide a mgmt-tester case to catch this issue?
+The fact that this issue wasn't noticed earlier can be seen as an
+indication that the mgmt-tester coverage of this API isn't good enough.
+
+Do you think this is critical enough that we should try to get a fix
+still for 3.20 through bluetooth.git? The fact that the patch looks
+largely as refactoring (as opposed to a clear fix) might make that
+difficult.
+
+Johan
