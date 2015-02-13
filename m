@@ -1,70 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 3/8] shared/utils: Add helpers for bitfield fast uid generation
-Date: Fri, 13 Feb 2015 16:52:44 +0200
-Message-Id: <1423839169-8944-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1423839169-8944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1423839169-8944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <006b01d04789$306a5130$913ef390$@samsung.com>
+References: <1411474757-22719-1-git-send-email-bharat.panda@samsung.com>
+	<006b01d04789$306a5130$913ef390$@samsung.com>
+Date: Fri, 13 Feb 2015 16:49:41 +0200
+Message-ID: <CABBYNZL2+0ddP-fpzaCABHWOrQJHs2KToiavG_LWJNPBDn9QZQ@mail.gmail.com>
+Subject: Re: [PATCH ] attrib: Fix condition check for attr delete
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Bharat,
 
-For small unique id generation we may use bitfield since it is very fast
-and memory efficient. If we need to generate id from 1 to 64 helper
-functions are added to utils.
----
- src/shared/util.c | 24 ++++++++++++++++++++++++
- src/shared/util.h |  3 +++
- 2 files changed, 27 insertions(+)
+On Fri, Feb 13, 2015 at 2:32 PM, Bharat Bhusan Panda
+<bharat.panda@samsung.com> wrote:
+> Ping
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Bharat Panda
+>> Sent: Tuesday, September 23, 2014 5:49 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: cpgs@samsung.com; Bharat Panda
+>> Subject: [PATCH ] attrib: Fix condition check for attr delete
+>>
+>> Checks handle value for non-zero as well as >= 0xffff, to avoid infinite
+> loop
+>> and deletion of unspecified attrib handles.
+>> ---
+>>  attrib/gatt-service.c | 7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c index
+> 874552b..bcf360e
+>> 100644
+>> --- a/attrib/gatt-service.c
+>> +++ b/attrib/gatt-service.c
+>> @@ -295,7 +295,12 @@ static void service_attr_del(struct btd_adapter
+>> *adapter, uint16_t start_handle,  {
+>>       uint16_t handle;
+>>
+>> -     for (handle = start_handle; handle <= end_handle; handle++)
+>> +     /* For a 128-bit category primary service below handle should be
+>> checked
+>> +      * for both non-zero as well as >= 0xffff. As on last iteration the
+>> handle
+>> +      * will turn to 0 from 0xffff and loop will be infinite.
+>> +      */
+>> +
+>> +     for (handle = start_handle; (handle != 0 && handle <= end_handle);
+>> +handle++)
+>>               if (attrib_db_del(adapter, handle) < 0)
+>>                       error("Can't delete handle 0x%04x", handle);  }
+>> --
+>> 1.9.1
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+>> the body of a message to majordomo@vger.kernel.org More majordomo
+>> info at  http://vger.kernel.org/majordomo-info.html
 
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 74ffb08..3ae6b9e 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -106,3 +106,27 @@ unsigned char util_get_dt(const char *parent, const char *name)
- 
- 	return DT_UNKNOWN;
- }
-+
-+/* Helpers for bitfield operations */
-+/* Find unique id from 1 to max */
-+uint8_t util_get_bitmap64_uid(uint64_t *bitmap, uint8_t max)
-+{
-+	uint64_t temp = *bitmap >> 1;
-+	uint64_t id = 1;
-+
-+	for (; temp & 0x01; temp >>= 1)
-+		id++;
-+
-+	if (id > max)
-+		return 0;
-+
-+	*bitmap |= 0x01l << id;
-+
-+	return id;
-+}
-+
-+/* Clear id bit in bitmap */
-+void util_clear_bitmap64(uint64_t *bitmap, uint8_t id)
-+{
-+	*bitmap &= ~(0x01l << id);
-+}
-diff --git a/src/shared/util.h b/src/shared/util.h
-index 8437662..8f28c24 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -93,6 +93,9 @@ void util_hexdump(const char dir, const unsigned char *buf, size_t len,
- 
- unsigned char util_get_dt(const char *parent, const char *name);
- 
-+uint8_t util_get_bitmap64_uid(uint64_t *bitmap, uint8_t max);
-+void util_clear_bitmap64(uint64_t *bitmap, uint8_t id);
-+
- static inline void bswap_128(const void *src, void *dst)
- {
- 	const uint8_t *s = src;
+Applied after fixing the coding style, thanks.
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
