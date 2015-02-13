@@ -1,33 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Feb 2015 13:33:47 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, bharat.panda@samsung.com,
-	cpgs@samsung.com
-Subject: Re: [PATCH] gatt-server: Fix mutlpile definition of same func
-Message-ID: <20150213113347.GA11794@t440s.ger.corp.intel.com>
-References: <1423226839-23935-1-git-send-email-gowtham.ab@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1423226839-23935-1-git-send-email-gowtham.ab@samsung.com>
+In-Reply-To: <1423760408-31020-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1423760408-31020-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Fri, 13 Feb 2015 14:54:26 +0200
+Message-ID: <CABBYNZKSGWog=Su2YZBU0h5LhPutEe28dbmn1vbL3Jw2Bb7EFQ@mail.gmail.com>
+Subject: Re: [PATCH 0/3] shared/att: Add support to set security in LE link
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lukasz,
 
-On Fri, Feb 06, 2015, Gowtham Anandha Babu wrote:
-> --- a/src/shared/gatt-helpers.h
-> +++ b/src/shared/gatt-helpers.h
-> @@ -105,3 +105,5 @@ bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
->  					bt_gatt_discovery_callback_t callback,
->  					void *user_data,
->  					bt_gatt_destroy_func_t destroy);
-> +
-> +void put_uuid_le(const bt_uuid_t *src, void *dst);
+On Thu, Feb 12, 2015 at 7:00 PM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> It shall be possible to set security on the link once there is
+> such a requirement from remote server database.
+>
+> Also as a server we should be able to get security level to determine
+> access to characteristics for remote client.
+>
+> Those patches adds support to set/get security level.
+>
+> Those patches are required in order to make Android code to use
+> shared/gatt-client
+>
+> Note that if io is not L2CAP (e.g. unit test), set security level will always
+> succeed and get will always return BT_SECURITY_LOW for now.
+>
+>
+> Lukasz Rymanowski (3):
+>   shared/att: Add set/get security level
+>   shared/gatt-client: Expose API to set/get security level on att
+>   tools/btgatt-client: Add support for set/get security on the link
+>
+>  src/shared/att.c         | 72 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/att.h         |  3 ++
+>  src/shared/gatt-client.c | 17 ++++++++++++
+>  src/shared/gatt-client.h |  3 ++
+>  tools/btgatt-client.c    | 64 ++++++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 159 insertions(+)
+>
+> --
+> 1.8.4
 
-gatt-helpers.h uses a namespace prefix of "bt_gatt" so you should at the
-very least conform to that. The function name would then become e.g.
-bt_gatt_put_uuid(). Besides that I don't have any objections to the
-patch.
+Applied, thanks.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
