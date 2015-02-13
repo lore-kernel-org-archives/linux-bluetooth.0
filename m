@@ -1,38 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/3] tools/btmgmt: Fix compilation warning on Android
-Date: Fri, 13 Feb 2015 20:16:14 +0100
-Message-Id: <1423854975-16515-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1423854975-16515-1-git-send-email-szymon.janc@tieto.com>
-References: <1423854975-16515-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1423854311-7909-1-git-send-email-alexpl@fedoraproject.org>
+References: <CAM86y2vc-EUswU+D6EeEAeKQWDVuDVGOvpLTgKjB-R4VzxyshA@mail.gmail.com>
+ <1423854311-7909-1-git-send-email-alexpl@fedoraproject.org>
+From: Alexander Ploumistos <alex.ploumistos@gmail.com>
+Date: Fri, 13 Feb 2015 21:08:04 +0200
+Message-ID: <CAM86y2v5hPAvPJi7zfgiWYDoyXKZLiaaLZriTRfkLpUs0GVMqw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: ath3k: Add support for 04f2:aff1 (Atheros
+ AR5B195 combo Mini PCIe card)
+To: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: jwboyer@redhat.com, BlueZ development <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, hanipouspilot@gmail.com,
+	alxpl <alex.ploumistos@gmail.com>, Alexander Ploumistos <alexpl@fedoraproject.org>
+Content-Type: multipart/alternative; boundary=f46d04389175f05a96050efcf58f
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-isspace requires ctype.h include.
+--f46d04389175f05a96050efcf58f
+Content-Type: text/plain; charset=UTF-8
 
-external/bluetooth/bluez/tools/btmgmt.c: In function 'get_input':
-external/bluetooth/bluez/tools/btmgmt.c:834:2: warning: implicit
-   declaration of function 'isspace' [-Wimplicit-function-declaration]
-  while (len && isspace(buf[len - 1]))
-  ^
----
- tools/btmgmt.c | 1 +
- 1 file changed, 1 insertion(+)
+I would like to apologize to everyone for the noise and also thank Dmitry
+again.
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 75f64c2..7cf82e2 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -38,6 +38,7 @@
- #include <getopt.h>
- #include <stdbool.h>
- #include <wordexp.h>
-+#include <ctype.h>
- 
- #include <readline/readline.h>
- #include <readline/history.h>
--- 
-1.9.3
+Going quiet now (unless I've managed to mess things up again).
 
+--f46d04389175f05a96050efcf58f
+Content-Type: text/html; charset=UTF-8
+
+<div dir="ltr"><div>I would like to apologize to everyone for the noise and also thank Dmitry again.<br><br></div>Going quiet now (unless I&#39;ve managed to mess things up again).<br></div>
+
+--f46d04389175f05a96050efcf58f--
