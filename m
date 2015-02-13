@@ -1,36 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, gowtham.ab@samsung.com,
-	Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH  0/6] Add Read Characteristic Descriptors test cases
-Date: Fri, 13 Feb 2015 20:18:14 +0530
-Message-id: <1423838900-18110-1-git-send-email-bharat.panda@samsung.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	'Johan Hedberg' <johan.hedberg@gmail.com>
+Cc: 'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1423226839-23935-1-git-send-email-gowtham.ab@samsung.com>
+ <20150213113347.GA11794@t440s.ger.corp.intel.com>
+ <CABBYNZLwGg6aNRmQXFJ6sX7MRSbBqSEcYg8fmkxtxEJ70sQqaA@mail.gmail.com>
+In-reply-to: <CABBYNZLwGg6aNRmQXFJ6sX7MRSbBqSEcYg8fmkxtxEJ70sQqaA@mail.gmail.com>
+Subject: RE: [PATCH] gatt-server: Fix mutlpile definition of same func
+Date: Fri, 13 Feb 2015 19:55:54 +0530
+Message-id: <000901d04799$07486de0$15d949a0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch-set adds the GATT client unit test cases for,
+Hi Johan & Luiz,
 
-1) Read Characteristic Descriptors by Client
-2) Read Characteristic Descriptors - Read Not Permitted
-3) Read Characteristic Descriptors - Invalid Handle]
-4) Read Characteristic Descriptors - Insufficient Authorization
-5) Read Characteristic Descriptors - Insufficient Authentication
-6) Read Characteristic Descriptors - Insufficient Encryption Key Size
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Friday, February 13, 2015 7:19 PM
+> To: Gowtham Anandha Babu; linux-bluetooth@vger.kernel.org; Bharat
+> Panda; cpgs@samsung.com
+> Subject: Re: [PATCH] gatt-server: Fix mutlpile definition of same func
+> 
+> Hi Johan,
+> 
+> On Fri, Feb 13, 2015 at 1:33 PM, Johan Hedberg <johan.hedberg@gmail.com>
+> wrote:
+> > Hi,
+> >
+> > On Fri, Feb 06, 2015, Gowtham Anandha Babu wrote:
+> >> --- a/src/shared/gatt-helpers.h
+> >> +++ b/src/shared/gatt-helpers.h
+> >> @@ -105,3 +105,5 @@ bool bt_gatt_read_by_type(struct bt_att *att,
+> uint16_t start, uint16_t end,
+> >>                                       bt_gatt_discovery_callback_t callback,
+> >>                                       void *user_data,
+> >>                                       bt_gatt_destroy_func_t
+> >> destroy);
+> >> +
+> >> +void put_uuid_le(const bt_uuid_t *src, void *dst);
+> >
+> > gatt-helpers.h uses a namespace prefix of "bt_gatt" so you should at
+> > the very least conform to that. The function name would then become e.g.
+> > bt_gatt_put_uuid(). Besides that I don't have any objections to the
+> > patch.
+> 
+> You are absolutely right, this function does not belong here, Ive send and
+> patch moving it to lib/uuid.h where bt_uuid is implemented since it is given
+> as parameter here.
+> 
+> @Gowtham, I hope you are paying attention to the outcome of these
+> changes.
+> 
 
-Bharat Panda (3):
-  unit/gatt: Add TP/GAR/CL/BI-25-C test
-  unit/gatt: Add TP/GAR/CL/BI-26-C test
-  unit/gatt: Add TP/GAR/CL/BI-27-C test
+I am about to submit a patch to address Johan comments (to add "bt_uuid" prefix to put_uuid_le func).
+Anyway your patch optimizes the whole thing. Thanks !.
 
-Gowtham Anandha Babu (3):
-  unit/gatt: Add /TP/GAR/CL/BV-06-C test
-  unit/gatt: Add TP/GAR/CL/BI-23-C test
-  unit/gatt: Add TP/GAR/CL/BI-24-C test
+Since I am new to BlueZ, may be it will take some time get an overview of all.
+Please feel free to correct my patches in future, if anything is wrong.
 
- unit/test-gatt.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+Regards,
+Gowtham Anandha Babu
 
--- 
-1.9.1
+> 
+> --
+> Luiz Augusto von Dentz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
