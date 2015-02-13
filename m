@@ -1,70 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] shared/utils: Add helpers for bitfield fast uid generation
-Date: Fri, 13 Feb 2015 16:10:33 +0200
-Message-Id: <1423836633-2913-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1423819382-20018-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1423819382-20018-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20150213113347.GA11794@t440s.ger.corp.intel.com>
+References: <1423226839-23935-1-git-send-email-gowtham.ab@samsung.com>
+	<20150213113347.GA11794@t440s.ger.corp.intel.com>
+Date: Fri, 13 Feb 2015 15:49:09 +0200
+Message-ID: <CABBYNZLwGg6aNRmQXFJ6sX7MRSbBqSEcYg8fmkxtxEJ70sQqaA@mail.gmail.com>
+Subject: Re: [PATCH] gatt-server: Fix mutlpile definition of same func
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-For small unique id generation we may use bitfield since it is very fast
-and memory efficient. If we need to generate id from 1 to 64 helper
-functions are added to utils.
----
- src/shared/util.c | 24 ++++++++++++++++++++++++
- src/shared/util.h |  3 +++
- 2 files changed, 27 insertions(+)
+On Fri, Feb 13, 2015 at 1:33 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Fri, Feb 06, 2015, Gowtham Anandha Babu wrote:
+>> --- a/src/shared/gatt-helpers.h
+>> +++ b/src/shared/gatt-helpers.h
+>> @@ -105,3 +105,5 @@ bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
+>>                                       bt_gatt_discovery_callback_t callback,
+>>                                       void *user_data,
+>>                                       bt_gatt_destroy_func_t destroy);
+>> +
+>> +void put_uuid_le(const bt_uuid_t *src, void *dst);
+>
+> gatt-helpers.h uses a namespace prefix of "bt_gatt" so you should at the
+> very least conform to that. The function name would then become e.g.
+> bt_gatt_put_uuid(). Besides that I don't have any objections to the
+> patch.
 
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 74ffb08..3ae6b9e 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -106,3 +106,27 @@ unsigned char util_get_dt(const char *parent, const char *name)
- 
- 	return DT_UNKNOWN;
- }
-+
-+/* Helpers for bitfield operations */
-+/* Find unique id from 1 to max */
-+uint8_t util_get_bitmap64_uid(uint64_t *bitmap, uint8_t max)
-+{
-+	uint64_t temp = *bitmap >> 1;
-+	uint64_t id = 1;
-+
-+	for (; temp & 0x01; temp >>= 1)
-+		id++;
-+
-+	if (id > max)
-+		return 0;
-+
-+	*bitmap |= 0x01l << id;
-+
-+	return id;
-+}
-+
-+/* Clear id bit in bitmap */
-+void util_clear_bitmap64(uint64_t *bitmap, uint8_t id)
-+{
-+	*bitmap &= ~(0x01l << id);
-+}
-diff --git a/src/shared/util.h b/src/shared/util.h
-index 8437662..8f28c24 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -93,6 +93,9 @@ void util_hexdump(const char dir, const unsigned char *buf, size_t len,
- 
- unsigned char util_get_dt(const char *parent, const char *name);
- 
-+uint8_t util_get_bitmap64_uid(uint64_t *bitmap, uint8_t max);
-+void util_clear_bitmap64(uint64_t *bitmap, uint8_t id);
-+
- static inline void bswap_128(const void *src, void *dst)
- {
- 	const uint8_t *s = src;
+You are absolutely right, this function does not belong here, Ive send
+and patch moving it to lib/uuid.h where bt_uuid is implemented since
+it is given as parameter here.
+
+@Gowtham, I hope you are paying attention to the outcome of these changes.
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
