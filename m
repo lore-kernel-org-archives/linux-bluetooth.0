@@ -1,49 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH BlueZ v2 3/6] core: adapter: Add StartFilteredDiscovery method
-Date: Thu, 12 Feb 2015 19:48:34 -0800
-Message-Id: <1423799317-28457-3-git-send-email-jpawlowski@google.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH BlueZ v2 2/6] android/handsfree: Fix possible invalid memory write
+Date: Thu, 12 Feb 2015 19:48:33 -0800
+Message-Id: <1423799317-28457-2-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1423799317-28457-1-git-send-email-jpawlowski@google.com>
 References: <1423799317-28457-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds StartFilteredDiscovery method, as described in
-doc/adapter-api.txt to DBus interface. Method content wil follow in
-next patches.
----
- src/adapter.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+From: Szymon Janc <szymon.janc@tieto.com>
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 1839286..df0c0b8 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1744,6 +1744,12 @@ static DBusMessage *start_discovery(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
- }
+Copy command to IPC buffer only after checking string size.
+---
+ android/handsfree.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 4af2a89..ba798ee 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -319,13 +319,14 @@ static void at_cmd_unknown(const char *command, void *user_data)
  
-+static DBusMessage *start_filtered_discovery(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	return btd_error_failed(msg, "Not implemented yet");
-+}
+ 	/* copy while string including terminating NULL */
+ 	ev->len = strlen(command) + 1;
+-	memcpy(ev->buf, command, ev->len);
+ 
+ 	if (ev->len > IPC_MTU - sizeof(*ev)) {
+ 		hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
+ 		return;
+ 	}
+ 
++	memcpy(ev->buf, command, ev->len);
 +
- static DBusMessage *stop_discovery(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
-@@ -2278,6 +2284,9 @@ static DBusMessage *remove_device(DBusConnection *conn,
- 
- static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
-+	{ GDBUS_METHOD("StartFilteredDiscovery",
-+		GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
-+		start_filtered_discovery) },
- 	{ GDBUS_METHOD("StopDiscovery", NULL, NULL, stop_discovery) },
- 	{ GDBUS_ASYNC_METHOD("RemoveDevice",
- 			GDBUS_ARGS({ "device", "o" }), NULL, remove_device) },
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+ 			HAL_EV_HANDSFREE_UNKNOWN_AT, sizeof(*ev) + ev->len, ev);
+ }
 -- 
 2.2.0.rc0.207.ga3a616c
 
