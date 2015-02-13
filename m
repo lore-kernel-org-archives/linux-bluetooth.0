@@ -1,129 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC] android/handsfree: Fix no indicators after rejected incoming call
-Date: Fri, 13 Feb 2015 14:19:19 +0100
-Message-Id: <1423833559-18107-1-git-send-email-szymon.janc@tieto.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/2] android/tester: Add test for GATT server app indication confirmation
+Date: Fri, 13 Feb 2015 14:17:40 +0100
+Message-Id: <1423833460-19400-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1423833460-19400-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1423833460-19400-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On KitKat there were some bogus phone_state_change calls after
-incoming call was rejected from the phone:
-    active=0 hold=0 state=idle
-    active=0 hold=0 state=incoming
-    active=0 hold=0 state=idle
-    active=0 hold=0 state=idle
-
-On Lollipop this seems to be fixed and after call is rejected we
-only get single call with state idle:
-    active=0 hold=0 state=idle
-
-So simply reverting workaround commit "Track if incoming call is
-being rejected" would break KK.
-
-Instead, add short timeout after incoming call was rejected. Durring
-that period we ignore any phone state change to 'incoming' state.
-If we get any other state change (ie. outgoing call) timer is cleared.
+This adds checking if sent indication or notification has been confirmed
+over HAL.
 ---
-I know that timer sollution isn't best but I couldn't find any other
-sollution that would fit both L and KK...
+ android/tester-gatt.c |  5 ++++-
+ android/tester-main.c | 17 ++++++++++++++++-
+ android/tester-main.h |  7 +++++++
+ 3 files changed, 27 insertions(+), 2 deletions(-)
 
- android/handsfree.c | 38 ++++++++++++++++++++++++++++++++------
- 1 file changed, 32 insertions(+), 6 deletions(-)
-
-diff --git a/android/handsfree.c b/android/handsfree.c
-index ba798ee..e760d1c 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -127,7 +127,7 @@ struct hf_device {
- 	int num_active;
- 	int num_held;
- 	int setup_state;
--	bool call_hanging_up;
-+	guint call_hanging_up;
+diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+index 38dfe42..1c0397e 100644
+--- a/android/tester-gatt.c
++++ b/android/tester-gatt.c
+@@ -1612,7 +1612,7 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 		step->callback = CB_EMU_VALUE_INDICATION;
  
- 	uint8_t negotiated_codec;
- 	uint8_t proposed_codec;
-@@ -263,6 +263,9 @@ static void device_destroy(struct hf_device *dev)
+ 		schedule_callback_verification(step);
+-		break;
++		goto respond;
+ 	case L2CAP_ATT_HANDLE_VALUE_NOTIFY:
+ 		step = g_new0(struct step, 1);
  
- 	g_free(dev->clip);
- 
-+	if (dev->call_hanging_up)
-+		g_source_remove(dev->call_hanging_up);
-+
- 	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
- 	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED);
- 
-@@ -2251,6 +2254,11 @@ static gboolean ring_cb(gpointer user_data)
- static void phone_state_dialing(struct hf_device *dev, int num_active,
- 								int num_held)
- {
-+	if (dev->call_hanging_up) {
-+		g_source_remove(dev->call_hanging_up);
-+		dev->call_hanging_up = 0;
-+	}
-+
- 	update_indicator(dev, IND_CALLSETUP, 2);
- 
- 	if (num_active == 0 && num_held > 0)
-@@ -2263,6 +2271,11 @@ static void phone_state_dialing(struct hf_device *dev, int num_active,
- static void phone_state_alerting(struct hf_device *dev, int num_active,
- 								int num_held)
- {
-+	if (dev->call_hanging_up) {
-+		g_source_remove(dev->call_hanging_up);
-+		dev->call_hanging_up = 0;
-+	}
-+
- 	update_indicator(dev, IND_CALLSETUP, 3);
- }
- 
-@@ -2337,6 +2350,17 @@ static void phone_state_incoming(struct hf_device *dev, int num_active,
- 	}
- }
- 
-+static gboolean hang_up_cb(gpointer user_data)
-+{
-+	struct hf_device *dev = user_data;
-+
-+	DBG("");
-+
-+	dev->call_hanging_up = 0;
-+
-+	return FALSE;
-+}
-+
- static void phone_state_idle(struct hf_device *dev, int num_active,
- 								int num_held)
- {
-@@ -2364,9 +2388,11 @@ static void phone_state_idle(struct hf_device *dev, int num_active,
- 
- 		update_indicator(dev, IND_CALLSETUP, 0);
- 
--		if (num_active == dev->num_active && num_held == dev->num_held)
--			dev->call_hanging_up = true;
--
-+		if (num_active == 0 && num_held == 0 &&
-+				num_active == dev->num_active &&
-+				num_held == dev->num_held)
-+			dev->call_hanging_up = g_timeout_add(800, hang_up_cb,
-+									dev);
- 		break;
- 	case HAL_HANDSFREE_CALL_STATE_DIALING:
- 	case HAL_HANDSFREE_CALL_STATE_ALERTING:
-@@ -2379,9 +2405,9 @@ static void phone_state_idle(struct hf_device *dev, int num_active,
- 		update_indicator(dev, IND_CALLSETUP, 0);
- 		break;
- 	case HAL_HANDSFREE_CALL_STATE_IDLE:
--
- 		if (dev->call_hanging_up) {
--			dev->call_hanging_up = false;
-+			g_source_remove(dev->call_hanging_up);
-+			dev->call_hanging_up = 0;
- 			return;
+@@ -1649,6 +1649,7 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 			break;
  		}
  
++respond:
+ 		if (memcmp(gatt_pdu->iov_base, data, len)) {
+ 			tester_print("Incoming data mismatch");
+ 			break;
+@@ -3258,6 +3259,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(gatt_server_send_indication_action,
+ 						&send_indication_data_1),
+ 		CALLBACK(CB_EMU_VALUE_INDICATION),
++		CALLBACK_GATTS_NOTIF_CONF(CONN1_ID, GATT_STATUS_SUCCESS),
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
+@@ -3281,6 +3283,7 @@ static struct test_case test_cases[] = {
+ 						CONN1_ID, APP1_ID),
+ 		ACTION_SUCCESS(gatt_server_send_indication_action,
+ 						&send_indication_data_2),
++		CALLBACK_GATTS_NOTIF_CONF(CONN1_ID, GATT_STATUS_SUCCESS),
+ 		CALLBACK(CB_EMU_VALUE_NOTIFICATION),
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+diff --git a/android/tester-main.c b/android/tester-main.c
+index c13f056..2506548 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -121,6 +121,7 @@ static struct {
+ 	DBG_CB(CB_GATTS_REQUEST_WRITE),
+ 	DBG_CB(CB_GATTS_REQUEST_EXEC_WRITE),
+ 	DBG_CB(CB_GATTS_RESPONSE_CONFIRMATION),
++	DBG_CB(CB_GATTS_INDICATION_SEND),
+ 
+ 	/* Map client */
+ 	DBG_CB(CB_MAP_CLIENT_REMOTE_MAS_INSTANCES),
+@@ -2000,6 +2001,18 @@ static void gatts_request_write_cb(int conn_id, int trans_id, bt_bdaddr_t *bda,
+ 	schedule_callback_verification(step);
+ }
+ 
++static void gatts_indication_send_cb(int conn_id, int status)
++{
++	struct step *step = g_new0(struct step, 1);
++
++	step->callback = CB_GATTS_INDICATION_SEND;
++
++	step->callback_result.conn_id = conn_id;
++	step->callback_result.status = status;
++
++	schedule_callback_verification(step);
++}
++
+ static const btgatt_server_callbacks_t btgatt_server_callbacks = {
+ 	.register_server_cb = gatts_register_server_cb,
+ 	.connection_cb = gatts_connection_cb,
+@@ -2013,7 +2026,9 @@ static const btgatt_server_callbacks_t btgatt_server_callbacks = {
+ 	.request_read_cb = gatts_request_read_cb,
+ 	.request_write_cb = gatts_request_write_cb,
+ 	.request_exec_write_cb = NULL,
+-	.response_confirmation_cb = NULL
++	.response_confirmation_cb = NULL,
++	.indication_sent_cb = gatts_indication_send_cb,
++	.congestion_cb = NULL,
+ };
+ 
+ static const btgatt_callbacks_t btgatt_callbacks = {
+diff --git a/android/tester-main.h b/android/tester-main.h
+index 3d97b72..8a7384c 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -253,6 +253,12 @@ struct pdu_set {
+ 		.callback_result.gatt_app_id = cb_server_id, \
+ 	}
+ 
++#define CALLBACK_GATTS_NOTIF_CONF(cb_conn_id, cb_status) { \
++		.callback = CB_GATTS_INDICATION_SEND, \
++		.callback_result.conn_id = cb_conn_id, \
++		.callback_result.status = cb_status, \
++	}
++
+ #define CALLBACK_GATTS_SERVICE_ADDED(cb_res, cb_server_id, cb_service, \
+ 						cb_srvc_handle, \
+ 						cb_store_srvc_handle) { \
+@@ -540,6 +546,7 @@ typedef enum {
+ 	CB_GATTS_REQUEST_WRITE,
+ 	CB_GATTS_REQUEST_EXEC_WRITE,
+ 	CB_GATTS_RESPONSE_CONFIRMATION,
++	CB_GATTS_INDICATION_SEND,
+ 
+ 	/* Map client */
+ 	CB_MAP_CLIENT_REMOTE_MAS_INSTANCES,
 -- 
-1.9.3
+1.9.1
 
