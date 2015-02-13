@@ -3,8 +3,8 @@ From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
 Subject: [PATCH] Bluetooth: fix service discovery behaviour for empty uuids filter
-Date: Thu, 12 Feb 2015 19:24:55 -0800
-Message-Id: <1423797895-21493-1-git-send-email-jpawlowski@google.com>
+Date: Thu, 12 Feb 2015 18:51:23 -0800
+Message-Id: <1423795883-13182-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -28,6 +28,8 @@ what uuid or rssi filter is set.
 Thi patch also closes all code responsible for filtered discovery in
 one if statement. That makes whole code shorter, much more readable,
 and easier to backport to older kernels, especially pre 3.10.
+
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
  include/net/bluetooth/hci_core.h |   2 +
  net/bluetooth/mgmt.c             | 140 +++++++++++++++------------------------
@@ -54,7 +56,7 @@ index 52863c3..0b9315f 100644
  	hdev->discovery.rssi = HCI_RSSI_INVALID;
  	hdev->discovery.uuid_count = 0;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1b528de..f3b2da6 100644
+index 1b528de..92ddc20 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
 @@ -3927,8 +3927,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
@@ -123,7 +125,7 @@ index 1b528de..f3b2da6 100644
 +		if (hdev->discovery.uuid_count != 0 &&
 +		    (eir_len == 0 || !eir_has_uuids(eir, eir_len,
 +				  hdev->discovery.uuid_count,
-+				  hdev->discovery.uuids)) &&
++				  hdev->discovery.uuids)) ||
 +		    (scan_rsp_len == 0 || !eir_has_uuids(scan_rsp, scan_rsp_len,
 +				  hdev->discovery.uuid_count,
 +				  hdev->discovery.uuids)))
