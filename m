@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/8] unit/avdtp: Add duplicate SEID test
-Date: Fri, 13 Feb 2015 11:22:56 +0200
-Message-Id: <1423819382-20018-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 4/8] android/avdtp: Fix SEID generation
+Date: Fri, 13 Feb 2015 11:22:58 +0200
+Message-Id: <1423819382-20018-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1423819382-20018-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1423819382-20018-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,74 +11,84 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add test adding two SEP, then remove first and create another one. With
-the current code new SEP has the same SEID (2!). Following patches
-fixing the bug.
+Fixes SEID generation for avdtp. Currently SEIDs were assigned assuming
+that SEID are registered and unregistered in the same order like:
+seid = g_slist_length(seps) + 1
+which makes it possible to reuse similar SEIDs
 ---
- unit/test-avdtp.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ android/Makefile.am |  1 +
+ android/avdtp.c     | 21 ++++++++++++++++++++-
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index c9ff014..60eea7a 100644
---- a/unit/test-avdtp.c
-+++ b/unit/test-avdtp.c
-@@ -583,6 +583,46 @@ static void test_server_seid(gconstpointer data)
- 	lseps = NULL;
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 9e73be4..ebbb28e 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -102,6 +102,7 @@ noinst_PROGRAMS += android/avdtptest
+ android_avdtptest_SOURCES = android/avdtptest.c \
+ 				src/log.h src/log.c \
+ 				btio/btio.h btio/btio.c \
++				src/shared/util.h src/shared/util.c \
+ 				android/avdtp.h android/avdtp.c
+ android_avdtptest_CFLAGS = $(AM_CFLAGS)
+ android_avdtptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 853fdf3..728f3fd 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -41,10 +41,12 @@
+ 
+ #include "lib/bluetooth.h"
+ #include "src/log.h"
++#include "src/shared/util.h"
+ #include "avdtp.h"
+ #include "../profiles/audio/a2dp-codecs.h"
+ 
+ #define MAX_SEID 0x3E
++static uint64_t seids;
+ 
+ #ifndef MAX
+ # define MAX(x, y) ((x) > (y) ? (x) : (y))
+@@ -3342,6 +3344,22 @@ int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
+ 							&req, sizeof(req));
  }
  
-+static void test_server_seid_duplicate(gconstpointer data)
++static uint8_t avdtp_get_seid(void)
 +{
-+	struct context *context = create_context(0x0103, data);
-+	struct avdtp_local_sep *sep;
-+	int i;
++	uint8_t id = util_get_bitmap64_uid(&seids, MAX_SEID);
 +
-+	for (i = 0; i < 2; i++) {
-+		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						0x00, TRUE, &sep_ind, NULL,
-+						context);
-+		g_assert(sep);
++	DBG("seids 0x%04lx id %d", seids, id);
 +
-+		lseps = g_slist_append(lseps, sep);
-+	}
-+
-+	/* Remove 1st element */
-+	sep = g_slist_nth_data(lseps, 0);
-+	lseps = g_slist_remove(lseps, sep);
-+	avdtp_unregister_sep(sep);
-+
-+	/* Now register new element */
-+	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						0x00, TRUE, &sep_ind, NULL,
-+						context);
-+	g_assert(sep);
-+	lseps = g_slist_append(lseps, sep);
-+
-+	/* Check SEID ids */
-+
-+	g_idle_add(send_pdu, context);
-+
-+	execute_context(context);
-+
-+	/* Remove all SEPs */
-+	g_slist_free_full(lseps, unregister_sep);
-+	lseps = NULL;
++	return id;
 +}
 +
- static gboolean sep_getcap_ind_frg(struct avdtp *session,
- 					struct avdtp_local_sep *sep,
- 					GSList **caps, uint8_t *err,
-@@ -772,6 +812,9 @@ int main(int argc, char *argv[])
- 	 */
- 	define_test("/TP/SIG/SMG/BV-06-C-SEID-1", test_server_seid,
- 			raw_pdu(0x00));
-+	define_test("/TP/SIG/SMG/BV-06-C-SEID-2", test_server_seid_duplicate,
-+			raw_pdu(0x00, 0x01),
-+			raw_pdu(0x02, 0x01, 0x08, 0x08, 0x0c, 0x08));
- 	define_test("/TP/SIG/SMG/BV-05-C", test_client,
- 			raw_pdu(0x00, 0x01));
- 	define_test("/TP/SIG/SMG/BV-06-C", test_server,
++static void avdtp_clear_seid(uint8_t seid)
++{
++	util_clear_bitmap64(&seids, seid);
++
++	DBG("seids 0x%04lx cleared bit %d ", seids, seid);
++}
++
+ struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
+ 						uint8_t codec_type,
+ 						gboolean delay_reporting,
+@@ -3357,7 +3375,7 @@ struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
+ 	sep = g_new0(struct avdtp_local_sep, 1);
+ 
+ 	sep->state = AVDTP_STATE_IDLE;
+-	sep->info.seid = g_slist_length(lseps) + 1;
++	sep->info.seid = avdtp_get_seid();
+ 	sep->info.type = type;
+ 	sep->info.media_type = media_type;
+ 	sep->codec = codec_type;
+@@ -3393,6 +3411,7 @@ int avdtp_unregister_sep(struct avdtp_local_sep *sep)
+ 	DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
+ 			sep->info.type, sep->codec, sep->info.seid);
+ 
++	avdtp_clear_seid(sep->info.seid);
+ 	g_free(sep);
+ 
+ 	return 0;
 -- 
 2.1.0
 
