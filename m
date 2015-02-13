@@ -1,84 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/8] unit/avdtp: Add duplicate SEID test
-Date: Fri, 13 Feb 2015 16:52:43 +0200
-Message-Id: <1423839169-8944-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1423839169-8944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1423839169-8944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 0/8] Deduplication of avdtp
+Date: Fri, 13 Feb 2015 16:52:41 +0200
+Message-Id: <1423839169-8944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add test adding two SEP, then remove first and create another one. With
-the current code new SEP has the same SEID (2!). Following patches
-fixing the bug.
----
- unit/test-avdtp.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+Second iteration of AV deduplication.
 
-diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index c9ff014..3e75c16 100644
---- a/unit/test-avdtp.c
-+++ b/unit/test-avdtp.c
-@@ -583,6 +583,46 @@ static void test_server_seid(gconstpointer data)
- 	lseps = NULL;
- }
- 
-+static void test_server_seid_duplicate(gconstpointer data)
-+{
-+	struct context *context = create_context(0x0103, data);
-+	struct avdtp_local_sep *sep;
-+	int i;
-+
-+	for (i = 0; i < 2; i++) {
-+		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						0x00, TRUE, &sep_ind, NULL,
-+						context);
-+		g_assert(sep);
-+
-+		lseps = g_slist_append(lseps, sep);
-+	}
-+
-+	/* Remove 1st element */
-+	sep = g_slist_nth_data(lseps, 0);
-+	lseps = g_slist_remove(lseps, sep);
-+	avdtp_unregister_sep(sep);
-+
-+	/* Now register new element */
-+	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						0x00, TRUE, &sep_ind, NULL,
-+						context);
-+	g_assert(sep);
-+	lseps = g_slist_append(lseps, sep);
-+
-+	/* Check SEID ids */
-+
-+	g_idle_add(send_pdu, context);
-+
-+	execute_context(context);
-+
-+	/* Remove all SEPs */
-+	g_slist_free_full(lseps, unregister_sep);
-+	lseps = NULL;
-+}
-+
- static gboolean sep_getcap_ind_frg(struct avdtp *session,
- 					struct avdtp_local_sep *sep,
- 					GSList **caps, uint8_t *err,
-@@ -772,6 +812,9 @@ int main(int argc, char *argv[])
- 	 */
- 	define_test("/TP/SIG/SMG/BV-06-C-SEID-1", test_server_seid,
- 			raw_pdu(0x00));
-+	define_test("/TP/SIG/SMG/BV-06-C-SEID-2", test_server_seid_duplicate,
-+			raw_pdu(0x00, 0x01),
-+			raw_pdu(0x02, 0x01, 0x08, 0x08, 0x04, 0x08));
- 	define_test("/TP/SIG/SMG/BV-05-C", test_client,
- 			raw_pdu(0x00, 0x01));
- 	define_test("/TP/SIG/SMG/BV-06-C", test_server,
+Changes:
+	* v3: Convert gslist to queue for lseps, refactor lseps handlings, remove extra DBGs.
+	* v2: Fix fixup patch
+	* v1: Add SEID fixes with unit tests
+	* RFC: initial version
+
+Andrei Emeltchenko (8):
+  unit/avdtp: Add SEP register/unregister tests
+  unit/avdtp: Add duplicate SEID test
+  shared/utils: Add helpers for bitfield fast uid generation
+  android/avdtp: Fix SEID generation
+  unit/avdtp: Add check for too many SEP creation
+  android/avdtp: Fix registering SEP with wrong SEID
+  android/avdtp: Refactor local SEP list handling
+  unit/avdtp: Refactor context destroy
+
+ android/Makefile.am |   2 +
+ android/a2dp.c      |  15 +++--
+ android/avdtp.c     | 102 ++++++++++++++++++++-----------
+ android/avdtp.h     |  10 ++-
+ android/avdtptest.c |  10 ++-
+ src/shared/util.c   |  24 ++++++++
+ src/shared/util.h   |   3 +
+ unit/test-avdtp.c   | 171 ++++++++++++++++++++++++++++++++++++++++++++--------
+ 8 files changed, 270 insertions(+), 67 deletions(-)
+
 -- 
 2.1.0
 
