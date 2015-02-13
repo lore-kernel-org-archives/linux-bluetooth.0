@@ -1,85 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54DDFB4B.1050407@tieto.com>
-Date: Fri, 13 Feb 2015 14:25:31 +0100
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-To: Szymon Janc <szymon.janc@tieto.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 10/10] android/gatt: Avoid copying pointers in matching
- functions
-References: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com> <1423665248-5121-10-git-send-email-jakub.tyszkowski@tieto.com> <5088455.trWqmuhi6p@uw000953>
-In-Reply-To: <5088455.trWqmuhi6p@uw000953>
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC] android/handsfree: Fix no indicators after rejected incoming call
+Date: Fri, 13 Feb 2015 14:19:19 +0100
+Message-Id: <1423833559-18107-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+On KitKat there were some bogus phone_state_change calls after
+incoming call was rejected from the phone:
+    active=0 hold=0 state=idle
+    active=0 hold=0 state=incoming
+    active=0 hold=0 state=idle
+    active=0 hold=0 state=idle
 
-On 13.02.2015 12:48, Szymon Janc wrote:
-> Hi Jakub,
->
-> On Wednesday 11 of February 2015 15:34:08 Jakub Tyszkowski wrote:
->> This removes casting void* to struct pointers when there is no need to
->> do so (pointer comparison).
->> ---
->>   android/gatt.c | 12 ++++--------
->>   1 file changed, 4 insertions(+), 8 deletions(-)
->>
->> diff --git a/android/gatt.c b/android/gatt.c
->> index cd0825a..3076a02 100644
->> --- a/android/gatt.c
->> +++ b/android/gatt.c
->> @@ -350,9 +350,8 @@ static struct gatt_app *find_app_by_id(int32_t id)
->>   static bool match_device_by_bdaddr(const void *data, const void *user_data)
->>   {
->>   	const struct gatt_device *dev = data;
->> -	const bdaddr_t *addr = user_data;
->>
->> -	return !bacmp(&dev->bdaddr, addr);
->> +	return !bacmp(&dev->bdaddr, user_data);
->>   }
->>
->>   static bool match_device_by_state(const void *data, const void *user_data)
->> @@ -408,17 +407,15 @@ static struct app_connection *find_connection_by_id(int32_t conn_id)
->>   static bool match_connection_by_device(const void *data, const void *user_data)
->>   {
->>   	const struct app_connection *conn = data;
->> -	const struct gatt_device *dev = user_data;
->>
->> -	return conn->device == dev;
->> +	return conn->device == user_data;
->>   }
->>
->>   static bool match_connection_by_app(const void *data, const void *user_data)
->>   {
->>   	const struct app_connection *conn = data;
->> -	const struct gatt_app *app = user_data;
->>
->> -	return conn->app == app;
->> +	return conn->app == user_data;
->>   }
->>
->>   static struct gatt_device *find_device_by_addr(const bdaddr_t *addr)
->> @@ -469,9 +466,8 @@ static bool match_srvc_by_bt_uuid(const void *data, const void *user_data)
->>   static bool match_srvc_by_range(const void *data, const void *user_data)
->>   {
->>   	const struct service *srvc = data;
->> -	const struct att_range *range = user_data;
->>
->> -	return !memcmp(&srvc->prim.range, range, sizeof(srvc->prim.range));
->> +	return !memcmp(&srvc->prim.range, user_data, sizeof(srvc->prim.range));
->>   }
->>
->>   static bool match_char_by_higher_inst_id(const void *data,
->
-> I prefer to have those as is so that one can easily see what the userdata
-> is expected to be. And compiler will most likely optimize those assignments
-> anyway.
->
+On Lollipop this seems to be fixed and after call is rejected we
+only get single call with state idle:
+    active=0 hold=0 state=idle
 
-Ok.
+So simply reverting workaround commit "Track if incoming call is
+being rejected" would break KK.
 
-BR,
-Jakub
+Instead, add short timeout after incoming call was rejected. Durring
+that period we ignore any phone state change to 'incoming' state.
+If we get any other state change (ie. outgoing call) timer is cleared.
+---
+I know that timer sollution isn't best but I couldn't find any other
+sollution that would fit both L and KK...
 
+ android/handsfree.c | 38 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
+
+diff --git a/android/handsfree.c b/android/handsfree.c
+index ba798ee..e760d1c 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -127,7 +127,7 @@ struct hf_device {
+ 	int num_active;
+ 	int num_held;
+ 	int setup_state;
+-	bool call_hanging_up;
++	guint call_hanging_up;
+ 
+ 	uint8_t negotiated_codec;
+ 	uint8_t proposed_codec;
+@@ -263,6 +263,9 @@ static void device_destroy(struct hf_device *dev)
+ 
+ 	g_free(dev->clip);
+ 
++	if (dev->call_hanging_up)
++		g_source_remove(dev->call_hanging_up);
++
+ 	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+ 	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED);
+ 
+@@ -2251,6 +2254,11 @@ static gboolean ring_cb(gpointer user_data)
+ static void phone_state_dialing(struct hf_device *dev, int num_active,
+ 								int num_held)
+ {
++	if (dev->call_hanging_up) {
++		g_source_remove(dev->call_hanging_up);
++		dev->call_hanging_up = 0;
++	}
++
+ 	update_indicator(dev, IND_CALLSETUP, 2);
+ 
+ 	if (num_active == 0 && num_held > 0)
+@@ -2263,6 +2271,11 @@ static void phone_state_dialing(struct hf_device *dev, int num_active,
+ static void phone_state_alerting(struct hf_device *dev, int num_active,
+ 								int num_held)
+ {
++	if (dev->call_hanging_up) {
++		g_source_remove(dev->call_hanging_up);
++		dev->call_hanging_up = 0;
++	}
++
+ 	update_indicator(dev, IND_CALLSETUP, 3);
+ }
+ 
+@@ -2337,6 +2350,17 @@ static void phone_state_incoming(struct hf_device *dev, int num_active,
+ 	}
+ }
+ 
++static gboolean hang_up_cb(gpointer user_data)
++{
++	struct hf_device *dev = user_data;
++
++	DBG("");
++
++	dev->call_hanging_up = 0;
++
++	return FALSE;
++}
++
+ static void phone_state_idle(struct hf_device *dev, int num_active,
+ 								int num_held)
+ {
+@@ -2364,9 +2388,11 @@ static void phone_state_idle(struct hf_device *dev, int num_active,
+ 
+ 		update_indicator(dev, IND_CALLSETUP, 0);
+ 
+-		if (num_active == dev->num_active && num_held == dev->num_held)
+-			dev->call_hanging_up = true;
+-
++		if (num_active == 0 && num_held == 0 &&
++				num_active == dev->num_active &&
++				num_held == dev->num_held)
++			dev->call_hanging_up = g_timeout_add(800, hang_up_cb,
++									dev);
+ 		break;
+ 	case HAL_HANDSFREE_CALL_STATE_DIALING:
+ 	case HAL_HANDSFREE_CALL_STATE_ALERTING:
+@@ -2379,9 +2405,9 @@ static void phone_state_idle(struct hf_device *dev, int num_active,
+ 		update_indicator(dev, IND_CALLSETUP, 0);
+ 		break;
+ 	case HAL_HANDSFREE_CALL_STATE_IDLE:
+-
+ 		if (dev->call_hanging_up) {
+-			dev->call_hanging_up = false;
++			g_source_remove(dev->call_hanging_up);
++			dev->call_hanging_up = 0;
+ 			return;
+ 		}
+ 
+-- 
+1.9.3
 
