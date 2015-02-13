@@ -1,52 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1423760408-31020-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1423760408-31020-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Fri, 13 Feb 2015 14:54:26 +0200
-Message-ID: <CABBYNZKSGWog=Su2YZBU0h5LhPutEe28dbmn1vbL3Jw2Bb7EFQ@mail.gmail.com>
-Subject: Re: [PATCH 0/3] shared/att: Add support to set security in LE link
+In-Reply-To: <000801d0477f$1a2adde0$4e8099a0$@samsung.com>
+References: <1423226839-23935-1-git-send-email-gowtham.ab@samsung.com>
+	<000801d0477f$1a2adde0$4e8099a0$@samsung.com>
+Date: Fri, 13 Feb 2015 14:53:54 +0200
+Message-ID: <CABBYNZJDKOSmrJ0iaPm3ZRBYTeJYR=e=RP8+YTZcBc9yA62xCA@mail.gmail.com>
+Subject: Re: [PATCH] gatt-server: Fix mutlpile definition of same func
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Gowtham,
 
-On Thu, Feb 12, 2015 at 7:00 PM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> It shall be possible to set security on the link once there is
-> such a requirement from remote server database.
+On Fri, Feb 13, 2015 at 1:20 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Ping.
 >
-> Also as a server we should be able to get security level to determine
-> access to characteristics for remote client.
->
-> Those patches adds support to set/get security level.
->
-> Those patches are required in order to make Android code to use
-> shared/gatt-client
->
-> Note that if io is not L2CAP (e.g. unit test), set security level will always
-> succeed and get will always return BT_SECURITY_LOW for now.
->
->
-> Lukasz Rymanowski (3):
->   shared/att: Add set/get security level
->   shared/gatt-client: Expose API to set/get security level on att
->   tools/btgatt-client: Add support for set/get security on the link
->
->  src/shared/att.c         | 72 ++++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/att.h         |  3 ++
->  src/shared/gatt-client.c | 17 ++++++++++++
->  src/shared/gatt-client.h |  3 ++
->  tools/btgatt-client.c    | 64 ++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 159 insertions(+)
->
-> --
-> 1.8.4
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+>> Sent: Friday, February 06, 2015 6:17 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
+>> Babu
+>> Subject: [PATCH] gatt-server: Fix mutlpile definition of same func
+>>
+>> Removed 'put_uuid_le' func from gatt-server, which was already defined in
+>> gatt-helpers.
+>> ---
+>>  src/shared/gatt-helpers.c |  2 +-
+>>  src/shared/gatt-helpers.h |  2 ++
+>>  src/shared/gatt-server.c  | 21 ---------------------
+>>  3 files changed, 3 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c index
+>> a33f960..6dfc24f 100644
+>> --- a/src/shared/gatt-helpers.c
+>> +++ b/src/shared/gatt-helpers.c
+>> @@ -567,7 +567,7 @@ bool bt_gatt_exchange_mtu(struct bt_att *att,
+>> uint16_t client_rx_mtu,
+>>       return true;
+>>  }
+>>
+>> -static void put_uuid_le(const bt_uuid_t *src, void *dst)
+>> +void put_uuid_le(const bt_uuid_t *src, void *dst)
+>>  {
+>>       bt_uuid_t uuid;
+>>
+>> diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h index
+>> 0217e82..7a2076b 100644
+>> --- a/src/shared/gatt-helpers.h
+>> +++ b/src/shared/gatt-helpers.h
+>> @@ -105,3 +105,5 @@ bool bt_gatt_read_by_type(struct bt_att *att,
+>> uint16_t start, uint16_t end,
+>>                                       bt_gatt_discovery_callback_t
+>> callback,
+>>                                       void *user_data,
+>>                                       bt_gatt_destroy_func_t destroy);
+>> +
+>> +void put_uuid_le(const bt_uuid_t *src, void *dst);
+>> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c index
+>> 8f7b5cd..0652d3d 100644
+>> --- a/src/shared/gatt-server.c
+>> +++ b/src/shared/gatt-server.c
+>> @@ -499,27 +499,6 @@ error:
+>>       queue_destroy(q, NULL);
+>>  }
+>>
+>> -static void put_uuid_le(const bt_uuid_t *src, void *dst) -{
+>> -     bt_uuid_t uuid;
+>> -
+>> -     switch (src->type) {
+>> -     case BT_UUID16:
+>> -             put_le16(src->value.u16, dst);
+>> -             break;
+>> -     case BT_UUID128:
+>> -             bswap_128(&src->value.u128, dst);
+>> -             break;
+>> -     case BT_UUID32:
+>> -             bt_uuid_to_uuid128(src, &uuid);
+>> -             bswap_128(&uuid.value.u128, dst);
+>> -             break;
+>> -     case BT_UUID_UNSPEC:
+>> -     default:
+>> -             break;
+>> -     }
+>> -}
+>> -
+>>  static bool encode_find_info_rsp(struct gatt_db *db, struct queue *q,
+>>                                               uint16_t mtu,
+>>                                               uint8_t *pdu, uint16_t *len)
+>> --
+>> 1.9.1
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+>> the body of a message to majordomo@vger.kernel.org More majordomo
+>> info at  http://vger.kernel.org/majordomo-info.html
 
-Applied, thanks.
+Pushed, thansl
 
 
 -- 
