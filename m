@@ -1,61 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com
-References: <1411474757-22719-1-git-send-email-bharat.panda@samsung.com>
-In-reply-to: <1411474757-22719-1-git-send-email-bharat.panda@samsung.com>
-Subject: RE: [PATCH ] attrib: Fix condition check for attr delete
-Date: Fri, 13 Feb 2015 18:02:37 +0530
-Message-id: <006b01d04789$306a5130$913ef390$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Update test notes for L2CAP
+Date: Fri, 13 Feb 2015 12:50:36 +0100
+Message-ID: <2736230.pMgGvnRDOI@uw000953>
+In-Reply-To: <1423745562-15295-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1423745562-15295-1-git-send-email-mariusz.skamra@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping
+Hi Mariusz,
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Bharat Panda
-> Sent: Tuesday, September 23, 2014 5:49 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: cpgs@samsung.com; Bharat Panda
-> Subject: [PATCH ] attrib: Fix condition check for attr delete
-> 
-> Checks handle value for non-zero as well as >= 0xffff, to avoid infinite
-loop
-> and deletion of unspecified attrib handles.
+On Thursday 12 of February 2015 13:52:42 Mariusz Skamra wrote:
+> Daemon should be stopped for test purposes.
 > ---
->  attrib/gatt-service.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  android/pts-l2cap.txt | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 > 
-> diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c index
-874552b..bcf360e
-> 100644
-> --- a/attrib/gatt-service.c
-> +++ b/attrib/gatt-service.c
-> @@ -295,7 +295,12 @@ static void service_attr_del(struct btd_adapter
-> *adapter, uint16_t start_handle,  {
->  	uint16_t handle;
-> 
-> -	for (handle = start_handle; handle <= end_handle; handle++)
-> +	/* For a 128-bit category primary service below handle should be
-> checked
-> +	 * for both non-zero as well as >= 0xffff. As on last iteration the
-> handle
-> +	 * will turn to 0 from 0xffff and loop will be infinite.
-> +	 */
-> +
-> +	for (handle = start_handle; (handle != 0 && handle <= end_handle);
-> +handle++)
->  		if (attrib_db_del(adapter, handle) < 0)
->  			error("Can't delete handle 0x%04x", handle);  }
-> --
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+> diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
+> index b5fdb05..b625861 100644
+> --- a/android/pts-l2cap.txt
+> +++ b/android/pts-l2cap.txt
+> @@ -14,6 +14,8 @@ N/A    test is disabled due to PICS setup
+>  -------------------------------------------------------------------------------
+>  Test Name		Result	Notes
+>  -------------------------------------------------------------------------------
+> +				For all tests daemon should be stopped then:
+> +					setprop ctl.start hciattach
+>  TC_COS_CED_BV_01_C	PASS	l2test -n -P 4113 <bdaddr>
+>  TC_COS_CED_BV_03_C	PASS	l2test -y -N 1 -P 4113 <bdaddr>
+>  TC_COS_CED_BV_04_C	PASS	l2test -n -P 4113 <bdaddr>
+> @@ -151,9 +153,6 @@ TC_ECF_BV_05_C		N/A
+>  TC_ECF_BV_06_C		N/A
+>  TC_ECF_BV_07_C		N/A
+>  TC_ECF_BV_08_C		N/A
+> -				NOTE: for LE tests daemon should be stopped
+> -				then:
+> -				setprop ctl.start hciattach
+>  TC_LE_CPU_BV_01_C	PASS	l2test -n -V le_public -J 4
+>  TC_LE_CPU_BV_02_C	PASS	l2test -n -V le_public -J 4 <braddr>
+>  TC_LE_CPU_BI_01_C	PASS	l2test -n -V le_public -J 4 <braddr>
 
+Applied, thanks. 
+
+-- 
+Best regards, 
+Szymon Janc
