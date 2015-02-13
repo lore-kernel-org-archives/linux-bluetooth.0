@@ -2,126 +2,181 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/2] android/tester: Add test for GATT server app indication confirmation
-Date: Fri, 13 Feb 2015 14:17:40 +0100
-Message-Id: <1423833460-19400-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1423833460-19400-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1423833460-19400-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/2] android/tester: Add case for error passing in GATT server responses
+Date: Fri, 13 Feb 2015 14:17:39 +0100
+Message-Id: <1423833460-19400-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds checking if sent indication or notification has been confirmed
-over HAL.
+This is to verify proper error passing from user apps.
 ---
- android/tester-gatt.c |  5 ++++-
- android/tester-main.c | 17 ++++++++++++++++-
- android/tester-main.h |  7 +++++++
- 3 files changed, 27 insertions(+), 2 deletions(-)
+ android/tester-gatt.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/tester-main.c |  8 +++++++
+ android/tester-main.h |  7 ++++++
+ 3 files changed, 80 insertions(+)
 
 diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 38dfe42..1c0397e 100644
+index 15a54fa..38dfe42 100644
 --- a/android/tester-gatt.c
 +++ b/android/tester-gatt.c
-@@ -1612,7 +1612,7 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
- 		step->callback = CB_EMU_VALUE_INDICATION;
+@@ -26,6 +26,7 @@
  
- 		schedule_callback_verification(step);
--		break;
-+		goto respond;
- 	case L2CAP_ATT_HANDLE_VALUE_NOTIFY:
- 		step = g_new0(struct step, 1);
+ #define ATT_HANDLE_SIZE	2
  
-@@ -1649,6 +1649,7 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
- 			break;
- 		}
++#define L2CAP_ATT_ERROR			0x01
+ #define L2CAP_ATT_EXCHANGE_MTU_REQ	0x02
+ #define L2CAP_ATT_EXCHANGE_MTU_RSP	0x03
+ #define L2CAP_ATT_READ_REQ		0x0a
+@@ -39,6 +40,8 @@
+ #define GATT_STATUS_FAILURE	0x00000101
+ #define GATT_STATUS_INS_AUTH	0x08
  
-+respond:
- 		if (memcmp(gatt_pdu->iov_base, data, len)) {
- 			tester_print("Incoming data mismatch");
- 			break;
-@@ -3258,6 +3259,7 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(gatt_server_send_indication_action,
- 						&send_indication_data_1),
- 		CALLBACK(CB_EMU_VALUE_INDICATION),
-+		CALLBACK_GATTS_NOTIF_CONF(CONN1_ID, GATT_STATUS_SUCCESS),
++#define GATT_ERR_INVAL_ATTR_VALUE_LEN	0x0D
++
+ #define GATT_SERVER_DISCONNECTED	0
+ #define GATT_SERVER_CONNECTED		1
+ 
+@@ -851,6 +854,13 @@ static struct send_resp_data send_resp_data_2 = {
+ 	.response = &response_2,
+ };
+ 
++static struct send_resp_data send_resp_data_2_error = {
++	.conn_id = CONN1_ID,
++	.trans_id = TRANS1_ID,
++	.status = GATT_ERR_INVAL_ATTR_VALUE_LEN,
++	.response = &response_2,
++};
++
+ #define SEARCH_SERVICE_SINGLE_SUCCESS_PDUS				\
+ 	raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),		\
+ 	raw_pdu(0x11, 0x06, 0x01, 0x00, 0x10, 0x00, 0x00, 0x18),	\
+@@ -1575,6 +1585,14 @@ static void gatt_cid_hook_cb(const void *data, uint16_t len, void *user_data)
+ 	tester_debug("Received att pdu with opcode 0x%02x", pdu[0]);
+ 
+ 	switch (pdu[0]) {
++	case L2CAP_ATT_ERROR:
++		step = g_new0(struct step, 1);
++
++		step->callback = CB_EMU_ATT_ERROR;
++		step->callback_result.error = pdu[4];
++
++		schedule_callback_verification(step);
++		break;
+ 	case L2CAP_ATT_EXCHANGE_MTU_REQ:
+ 		tester_print("Exchange MTU request received.");
+ 
+@@ -3412,6 +3430,53 @@ static struct test_case test_cases[] = {
  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-@@ -3281,6 +3283,7 @@ static struct test_case test_cases[] = {
- 						CONN1_ID, APP1_ID),
- 		ACTION_SUCCESS(gatt_server_send_indication_action,
- 						&send_indication_data_2),
-+		CALLBACK_GATTS_NOTIF_CONF(CONN1_ID, GATT_STATUS_SUCCESS),
- 		CALLBACK(CB_EMU_VALUE_NOTIFICATION),
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-diff --git a/android/tester-main.c b/android/tester-main.c
-index c13f056..2506548 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -121,6 +121,7 @@ static struct {
- 	DBG_CB(CB_GATTS_REQUEST_WRITE),
- 	DBG_CB(CB_GATTS_REQUEST_EXEC_WRITE),
- 	DBG_CB(CB_GATTS_RESPONSE_CONFIRMATION),
-+	DBG_CB(CB_GATTS_INDICATION_SEND),
- 
- 	/* Map client */
- 	DBG_CB(CB_MAP_CLIENT_REMOTE_MAS_INSTANCES),
-@@ -2000,6 +2001,18 @@ static void gatts_request_write_cb(int conn_id, int trans_id, bt_bdaddr_t *bda,
- 	schedule_callback_verification(step);
- }
- 
-+static void gatts_indication_send_cb(int conn_id, int status)
-+{
-+	struct step *step = g_new0(struct step, 1);
-+
-+	step->callback = CB_GATTS_INDICATION_SEND;
-+
-+	step->callback_result.conn_id = conn_id;
-+	step->callback_result.status = status;
-+
-+	schedule_callback_verification(step);
-+}
-+
- static const btgatt_server_callbacks_t btgatt_server_callbacks = {
- 	.register_server_cb = gatts_register_server_cb,
- 	.connection_cb = gatts_connection_cb,
-@@ -2013,7 +2026,9 @@ static const btgatt_server_callbacks_t btgatt_server_callbacks = {
- 	.request_read_cb = gatts_request_read_cb,
- 	.request_write_cb = gatts_request_write_cb,
- 	.request_exec_write_cb = NULL,
--	.response_confirmation_cb = NULL
-+	.response_confirmation_cb = NULL,
-+	.indication_sent_cb = gatts_indication_send_cb,
-+	.congestion_cb = NULL,
++	TEST_CASE_BREDRLE("Gatt Server - Send error resp to write char request",
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
++		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
++		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
++		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
++		ACTION_SUCCESS(gatt_server_add_service_action,
++							&add_service_data_5),
++		CALLBACK_GATTS_SERVICE_ADDED(GATT_STATUS_SUCCESS, APP1_ID,
++							&service_add_1, NULL,
++							&srvc1_handle),
++		ACTION_SUCCESS(gatt_server_add_char_action, &add_char_data_2),
++		CALLBACK_GATTS_CHARACTERISTIC_ADDED(GATT_STATUS_SUCCESS,
++							APP1_ID, &app1_uuid,
++							&srvc1_handle, NULL,
++							&char1_handle),
++		ACTION_SUCCESS(gatt_server_start_srvc_action,
++							&start_srvc_data_2),
++		CALLBACK_GATTS_SERVICE_STARTED(GATT_STATUS_SUCCESS, APP1_ID,
++								&srvc1_handle),
++		ACTION_SUCCESS(bt_start_discovery_action, NULL),
++		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
++							BT_DISCOVERY_STARTED),
++		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_le_set, 2),
++		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
++		ACTION_SUCCESS(gatt_server_connect_action, &app1_conn_req),
++		CALLBACK_GATTS_CONNECTION(GATT_SERVER_CONNECTED,
++						prop_emu_remotes_default_set,
++						CONN1_ID, APP1_ID),
++		PROCESS_DATA(GATT_STATUS_SUCCESS,
++					gatt_remote_send_raw_pdu_action,
++					&att_write_req_op_v, &char1_handle_v,
++					&att_write_req_value_1_v),
++		CALLBACK_GATTS_REQUEST_WRITE(CONN1_ID, TRANS1_ID,
++						prop_emu_remotes_default_set,
++						&char1_handle, 0,
++						sizeof(att_write_req_value_1),
++						true, false,
++						att_write_req_value_1),
++		ACTION_SUCCESS(gatt_server_send_response_action,
++						&send_resp_data_2_error),
++		CALLBACK_ERROR(CB_EMU_ATT_ERROR, GATT_ERR_INVAL_ATTR_VALUE_LEN),
++		ACTION_SUCCESS(bluetooth_disable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
++		),
  };
  
- static const btgatt_callbacks_t btgatt_callbacks = {
-diff --git a/android/tester-main.h b/android/tester-main.h
-index 3d97b72..8a7384c 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -253,6 +253,12 @@ struct pdu_set {
- 		.callback_result.gatt_app_id = cb_server_id, \
+ struct queue *get_gatt_tests(void)
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 336a9a8..c13f056 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -134,6 +134,7 @@ static struct {
+ 	DBG_CB(CB_EMU_VALUE_NOTIFICATION),
+ 	DBG_CB(CB_EMU_READ_RESPONSE),
+ 	DBG_CB(CB_EMU_WRITE_RESPONSE),
++	DBG_CB(CB_EMU_ATT_ERROR),
+ };
+ 
+ static gboolean check_callbacks_called(gpointer user_data)
+@@ -1036,6 +1037,13 @@ static bool match_data(struct step *step)
+ 		return false;
  	}
  
-+#define CALLBACK_GATTS_NOTIF_CONF(cb_conn_id, cb_status) { \
-+		.callback = CB_GATTS_INDICATION_SEND, \
-+		.callback_result.conn_id = cb_conn_id, \
-+		.callback_result.status = cb_status, \
++	if (exp->callback_result.error != step->callback_result.error) {
++		tester_debug("Err mismatch: %d vs %d",
++				exp->callback_result.error,
++				step->callback_result.error);
++		return false;
 +	}
 +
- #define CALLBACK_GATTS_SERVICE_ADDED(cb_res, cb_server_id, cb_service, \
- 						cb_srvc_handle, \
- 						cb_store_srvc_handle) { \
-@@ -540,6 +546,7 @@ typedef enum {
- 	CB_GATTS_REQUEST_WRITE,
- 	CB_GATTS_REQUEST_EXEC_WRITE,
- 	CB_GATTS_RESPONSE_CONFIRMATION,
-+	CB_GATTS_INDICATION_SEND,
+ 	if (exp->store_srvc_handle)
+ 		memcpy(exp->store_srvc_handle,
+ 					step->callback_result.srvc_handle,
+diff --git a/android/tester-main.h b/android/tester-main.h
+index e35feec..3d97b72 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -106,6 +106,11 @@ struct pdu_set {
+ 		.callback_result.status = cb_res, \
+ 	}
  
- 	/* Map client */
- 	CB_MAP_CLIENT_REMOTE_MAS_INSTANCES,
++#define CALLBACK_ERROR(cb, cb_err) { \
++		.callback = cb, \
++		.callback_result.error = cb_err, \
++	}
++
+ #define CALLBACK_ADAPTER_PROPS(props, prop_cnt) { \
+ 		.callback = CB_BT_ADAPTER_PROPERTIES, \
+ 		.callback_result.properties = props, \
+@@ -548,6 +553,7 @@ typedef enum {
+ 	CB_EMU_VALUE_NOTIFICATION,
+ 	CB_EMU_READ_RESPONSE,
+ 	CB_EMU_WRITE_RESPONSE,
++	CB_EMU_ATT_ERROR,
+ } expected_bt_callback_t;
+ 
+ struct test_data {
+@@ -677,6 +683,7 @@ struct bt_callback_data {
+ 	uint8_t *value;
+ 	bool need_rsp;
+ 	bool is_prep;
++	uint8_t error;
+ 
+ 	btpan_control_state_t ctrl_state;
+ 	btpan_connection_state_t conn_state;
 -- 
 1.9.1
 
