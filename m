@@ -2,70 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH BlueZ v2 3/6] core: device: add device_set_rssi_no_delta
-Date: Thu, 12 Feb 2015 19:50:20 -0800
-Message-Id: <1423799423-28986-3-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1423799423-28986-1-git-send-email-jpawlowski@google.com>
-References: <1423799423-28986-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH BlueZ v2 1/6] core: adapter: Add StartFilteredDiscovery method
+Date: Thu, 12 Feb 2015 19:50:18 -0800
+Message-Id: <1423799423-28986-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds new method that allow to update RSSI value without
-taking delta into account. It will be used by StartFilteredDiscovery
-method, in order to achieve more accurate proximity detection.
+This patch adds StartFilteredDiscovery method, as described in
+doc/adapter-api.txt to DBus interface. Method content wil follow in
+next patches.
 ---
- src/device.c | 10 ++++++++--
- src/device.h |  2 ++
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ src/adapter.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index a28d6fb..6c06c70 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4417,7 +4417,8 @@ void device_set_legacy(struct btd_device *device, bool legacy)
- 					DEVICE_INTERFACE, "LegacyPairing");
+diff --git a/src/adapter.c b/src/adapter.c
+index 1839286..df0c0b8 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1744,6 +1744,12 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
  }
  
--void device_set_rssi(struct btd_device *device, int8_t rssi)
-+void device_set_rssi_no_delta(struct btd_device *device, int8_t rssi,
-+			      bool use_delta)
- {
- 	if (!device)
- 		return;
-@@ -4438,7 +4439,7 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
- 			delta = rssi - device->rssi;
- 
- 		/* only report changes of 8 dBm or more */
--		if (delta < 8)
-+		if (use_delta && delta < 8)
- 			return;
- 
- 		DBG("rssi %d delta %d", rssi, delta);
-@@ -4450,6 +4451,11 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
- 						DEVICE_INTERFACE, "RSSI");
- }
- 
-+void device_set_rssi(struct btd_device *device, int8_t rssi)
++static DBusMessage *start_filtered_discovery(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
 +{
-+	device_set_rssi_no_delta(device, rssi, true);
++	return btd_error_failed(msg, "Not implemented yet");
 +}
 +
- static gboolean start_discovery(gpointer user_data)
+ static DBusMessage *stop_discovery(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
  {
- 	struct btd_device *device = user_data;
-diff --git a/src/device.h b/src/device.h
-index a7fefee..97e6f9e 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -89,6 +89,8 @@ void btd_device_set_temporary(struct btd_device *device, gboolean temporary);
- void btd_device_set_trusted(struct btd_device *device, gboolean trusted);
- void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
- void device_set_legacy(struct btd_device *device, bool legacy);
-+void device_set_rssi_no_delta(struct btd_device *device, int8_t rssi,
-+			      bool use_delta);
- void device_set_rssi(struct btd_device *device, int8_t rssi);
- bool btd_device_is_connected(struct btd_device *dev);
- uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
+@@ -2278,6 +2284,9 @@ static DBusMessage *remove_device(DBusConnection *conn,
+ 
+ static const GDBusMethodTable adapter_methods[] = {
+ 	{ GDBUS_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
++	{ GDBUS_METHOD("StartFilteredDiscovery",
++		GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
++		start_filtered_discovery) },
+ 	{ GDBUS_METHOD("StopDiscovery", NULL, NULL, stop_discovery) },
+ 	{ GDBUS_ASYNC_METHOD("RemoveDevice",
+ 			GDBUS_ARGS({ "device", "o" }), NULL, remove_device) },
 -- 
 2.2.0.rc0.207.ga3a616c
 
