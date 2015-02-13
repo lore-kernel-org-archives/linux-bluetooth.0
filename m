@@ -1,76 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 13 Feb 2015 09:20:52 -0800
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: "An, Tedd" <tedd.an@intel.com>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH v2 2/2] Bluetooth: Add device shutdown routine for Intel
+ Bluetooth device
+Message-ID: <20150213092052.7d392608@tedd-test>
 MIME-Version: 1.0
-In-Reply-To: <20150213091557.GA30773@t440s.lan>
-References: <1423795883-13182-1-git-send-email-jpawlowski@google.com>
-	<20150213091557.GA30773@t440s.lan>
-Date: Fri, 13 Feb 2015 09:25:37 -0800
-Message-ID: <CAD0=r8yV2KQibaSht_aFHhQNQi4Ow_4mLWJrEx7f26FF-rdD3w@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: fix service discovery behaviour for empty
- uuids filter
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Jakub Pawlowski <jpawlowski@google.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-On Fri, Feb 13, 2015 at 1:15 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jakub,
->
-> On Thu, Feb 12, 2015, Jakub Pawlowski wrote:
->> This patch fixes service discovery behaviour, when provided uuid filter
->> is empty and HCI_QUIRK_STRICT_DUPLICATE_FILTER is set. Before this
->> patch, empty uuid filter was unable to trigger scan restart, and that
->> caused inconsistent behaviour in applications.
->>
->> Example: two DBus clients call BlueZ, one to find all devices with
->> service abcd, second to find all devices with rssi smaller than -90.
->> Sum of those filters, that is passed to mgmt_service_scan is empty
->> filter, with no rssi or uuids set.
->> That caused kernel not to restart scan when quirk was set.
->> That was inconsistent with what happen when there's only one of those
->> two filters set (scan is restarted and reports devices).
->>
->> To fix that, new variable hdev->discovery.service_discovery was
->> introduced. It can indicate that filtered scan is running, no matter
->> what uuid or rssi filter is set.
->>
->> Thi patch also closes all code responsible for filtered discovery in
->
-> Minor typo there: s/Thi/This/
->
->> one if statement. That makes whole code shorter, much more readable,
->> and easier to backport to older kernels, especially pre 3.10.
->>
->> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
->> ---
->>  include/net/bluetooth/hci_core.h |   2 +
->>  net/bluetooth/mgmt.c             | 140 +++++++++++++++------------------------
->>  2 files changed, 55 insertions(+), 87 deletions(-)
->
-> Would it be possible to provide a mgmt-tester case to catch this issue?
-> The fact that this issue wasn't noticed earlier can be seen as an
-> indication that the mgmt-tester coverage of this API isn't good enough.
+This patch adds the device shutdown routine for Intel Bluetooth device.
 
-I don't think it's possible to create mgmt-tester test for this issue yet.
-I'll need ability to control quirks, and then to specify that
-controller responded with device advertisement, it'll be pretty
-complicated. I havent seen any example doing such things, and after
-looking at hci_vhci.c and mgmt-tester.c it looks impossible right now.
-I do however have plans to play with mgmt-tester and add some
-functionalities to make this test possible after I add the DBus
-interface code.
+Some platforms have BT LED issue with Intel Bluetooth device that BT LED goes
+off 5 seconds after BT is turned off
 
->
-> Do you think this is critical enough that we should try to get a fix
-> still for 3.20 through bluetooth.git? The fact that the patch looks
-> largely as refactoring (as opposed to a clear fix) might make that
-> difficult.
+For Intel Bluetooth device, the BT LED is turned off when:
+- there is no active connection or radio activity
+- USB is suspend
 
-I don't think it's critical enough.
+So, when the BT is turned off, it takes 5 seconds because USB suspend timeone
+is 5 seconds by default. And if the USB suspend is not enabled, BT LED won't be
+turned off.
 
->
-> Johan
+To fix this issue, recently Intel Bluetooth firmware patch had been submitted
+to turn off the BT LED immediately by the vendor specific command(0xFC3F). And
+this patch sends this command to the device before closing the device.
+
+For backward compatibility of this command  with old firmware, this command was
+supported before, but it behaves same as HCI_RESET internally. So, it won't be
+the problem even if the system doesn't have the latest firmware patch.
+
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btusb.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b876888..b2c099a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2331,6 +2331,27 @@ static int btusb_set_bdaddr_intel(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ 	return 0;
+ }
+ 
++static int btusb_shutdown_intel(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	long ret;
++
++	/* Some platforms have an issue with BT LED when hci interface is down or
++	 * BT radio is turned off, which takes 5 seconds to BT LED goes off.
++	 * This command turns off the BT LED immediately.
++	 */
++	skb = __hci_cmd_sync(hdev, 0xfc3f, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: turning off Intel device LED failed (%ld)",
++		       hdev->name, ret);
++		return ret;
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
++
+ static int btusb_set_bdaddr_marvell(struct hci_dev *hdev,
+ 				    const bdaddr_t *bdaddr)
+ {
+@@ -2708,6 +2729,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	if (id->driver_info & BTUSB_INTEL) {
+ 		hdev->setup = btusb_setup_intel;
++		hdev->shutdown = btusb_shutdown_intel;
+ 		hdev->set_bdaddr = btusb_set_bdaddr_intel;
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 	}
+-- 
+1.9.1
