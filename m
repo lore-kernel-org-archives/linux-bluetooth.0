@@ -1,48 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update test notes for L2CAP
-Date: Fri, 13 Feb 2015 12:50:36 +0100
-Message-ID: <2736230.pMgGvnRDOI@uw000953>
-In-Reply-To: <1423745562-15295-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1423745562-15295-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: Re: [PATCH] android/pts: Update HSP pixits, pics and test results for PTS 6.0
+Date: Fri, 13 Feb 2015 12:50:24 +0100
+Message-ID: <1628729.EBWlrJsnKg@uw000953>
+In-Reply-To: <1423747051-31810-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1423747051-31810-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+Hi Grzegorz,
 
-On Thursday 12 of February 2015 13:52:42 Mariusz Skamra wrote:
-> Daemon should be stopped for test purposes.
+On Thursday 12 of February 2015 14:17:31 Grzegorz Kolodziejczyk wrote:
+> This patch updates test pixits, pics and results for HSP profile against
+> android 5.0
 > ---
->  android/pts-l2cap.txt | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+>  android/pics-hfp.txt  | 8 ++++----
+>  android/pics-hsp.txt  | 6 +++---
+>  android/pixit-hsp.txt | 2 +-
+>  android/pts-hsp.txt   | 4 ++--
+>  4 files changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
-> index b5fdb05..b625861 100644
-> --- a/android/pts-l2cap.txt
-> +++ b/android/pts-l2cap.txt
-> @@ -14,6 +14,8 @@ N/A    test is disabled due to PICS setup
+> diff --git a/android/pics-hfp.txt b/android/pics-hfp.txt
+> index 65f5112..da0eb23 100644
+> --- a/android/pics-hfp.txt
+> +++ b/android/pics-hfp.txt
+> @@ -1,6 +1,6 @@
+>  HFP PICS for the PTS tool.
+>  
+> -PTS version: 5.3
+> +PTS version: 6.0
+>  
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> @@ -40,7 +40,7 @@ TSPC_HFP_2_1a	True (*)	SLC initiation during active ongoing call (O)
+>  TSPC_HFP_2_2	True		Phone Status Information (M)
+>  TSPC_HFP_2_3	True		Audio connection handling (M)
+>  TSPC_HFP_2_3a	False		Audio connection establishment independent of
+> -					call processing (O)
+> +					a call processing (O)
+>  TSPC_HFP_2_3b	True (*)	eSCO support in Audio Connection (C.10)
+>  TSPC_HFP_2_3c	True (*)	Codec negotiation (C.7)
+>  TSPC_HFP_2_4a	False		Accept an incoming voice call
+> @@ -83,7 +83,7 @@ TSPC_HFP_2_21b	False		Enhanced Call Control (C.3)
+>  TSPC_HFP_2_21c	True (*)	Enhanced Call Status with limited network
+>  					notification (C.4)
+>  TSPC_HFP_2_22	False		Support for automatic link loss recovery (O)
+> -TSPC_HFP_2_23	True (*)	Individual Indicator Activation (C.9)
+> +TSPC_HFP_2_23	True		Individual Indicator Activation (C.9)
+>  TSPC_HFP_2_24	True (*)	Wide Band Speech service (C.8)
+>  TSPC_HFP_2_25	False		Support roaming function (O)
+>  TSPC_HFP_2_26	False		HF Indicators (C.11)
+> @@ -169,7 +169,7 @@ TSPC_HFP_3_22	False		Support for automatic link loss recovery (O)
+>  TSPC_HFP_3_23	False		Individual Indicator Activation (C.6)
+>  TSPC_HFP_3_24	False		Wide Band Speech service (C.6)
+>  TSPC_HFP_3_25	False		HF Indicators (C.8)
+> -TSPC_HFP_3_36	False		Support CVSD eSCO S4 setting (C.9)
+> +TSPC_HFP_3_26	False		Support CVSD eSCO S4 setting (C.9)
 >  -------------------------------------------------------------------------------
->  Test Name		Result	Notes
+>  C.1: Mandatory if TSPC_HFP_3_12; otherwise excluded
+>  C.2: Optional if TSPC_HFP_3_12; otherwise excluded
+> diff --git a/android/pics-hsp.txt b/android/pics-hsp.txt
+> index 7e71b14..3818e74 100644
+> --- a/android/pics-hsp.txt
+> +++ b/android/pics-hsp.txt
+> @@ -1,6 +1,6 @@
+>  HSP PICS for the PTS tool.
+>  
+> -PTS version: 5.3
+> +PTS version: 6.0
+>  
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> @@ -82,8 +82,8 @@ TSPC_HSP_3_11	False		Audio volume setting storage by HS (O)
+>  TSPC_HSP_3_12	False		Remote microphone gain control (C.2)
+>  TSPC_HSP_3_13	False		HS informs AG about local changes of microphone
+>                                          gain (O)
+> -TSPC_HSP_3_14	False (*)	Microphone gain setting storage by HS (O)
+> -TSPC_HSP_3_15	False		Connection handling with Detach/Page (M)
+> +TSPC_HSP_3_14	False		Microphone gain setting storage by HS (O)
+> +TSPC_HSP_3_15	False (*)	Connection handling with Detach/Page (M)
+>  TSPC_HSP_3_16	False		Connection handling with Park Mode (C.3)
 >  -------------------------------------------------------------------------------
-> +				For all tests daemon should be stopped then:
-> +					setprop ctl.start hciattach
->  TC_COS_CED_BV_01_C	PASS	l2test -n -P 4113 <bdaddr>
->  TC_COS_CED_BV_03_C	PASS	l2test -y -N 1 -P 4113 <bdaddr>
->  TC_COS_CED_BV_04_C	PASS	l2test -n -P 4113 <bdaddr>
-> @@ -151,9 +153,6 @@ TC_ECF_BV_05_C		N/A
->  TC_ECF_BV_06_C		N/A
->  TC_ECF_BV_07_C		N/A
->  TC_ECF_BV_08_C		N/A
-> -				NOTE: for LE tests daemon should be stopped
-> -				then:
-> -				setprop ctl.start hciattach
->  TC_LE_CPU_BV_01_C	PASS	l2test -n -V le_public -J 4
->  TC_LE_CPU_BV_02_C	PASS	l2test -n -V le_public -J 4 <braddr>
->  TC_LE_CPU_BI_01_C	PASS	l2test -n -V le_public -J 4 <braddr>
+>  C.1: Mandatory if TSPC_HSP_3_10 is supported, otherwise optional
+> diff --git a/android/pixit-hsp.txt b/android/pixit-hsp.txt
+> index 6be4731..d7a8e3c 100644
+> --- a/android/pixit-hsp.txt
+> +++ b/android/pixit-hsp.txt
+> @@ -1,6 +1,6 @@
+>  HSP PIXIT for the PTS tool.
+>  
+> -PTS version: 5.3
+> +PTS version: 6.0
+>  
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-hsp.txt b/android/pts-hsp.txt
+> index 9f03ead..04a6413 100644
+> --- a/android/pts-hsp.txt
+> +++ b/android/pts-hsp.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for HSP
+>  
+> -PTS version: 5.3
+> -Tested: 24-November-2014
+> +PTS version: 6.0
+> +Tested: 12-February-2015
+>  Android version: 5.0
+>  
+>  Results:
 
 Applied, thanks. 
 
