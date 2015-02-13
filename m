@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 07/10] android/gatt: Improve send_dev_complete_response even further
-Date: Fri, 13 Feb 2015 12:35:05 +0100
-Message-ID: <1712631.jR0ON48mpS@uw000953>
-In-Reply-To: <1423665248-5121-7-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com> <1423665248-5121-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH 05/10] android/gatt: Use g_attrib_send consistently
+Date: Fri, 13 Feb 2015 12:31:11 +0100
+Message-ID: <2715406.EyNz60MSyF@uw000953>
+In-Reply-To: <1423665248-5121-5-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com> <1423665248-5121-5-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,176 +14,102 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Jakub,
 
-On Wednesday 11 of February 2015 15:34:05 Jakub Tyszkowski wrote:
-> We can use 'queue_remove_all' for response filtering instead of manually
-> repacking them to yet another queue.
+On Wednesday 11 of February 2015 15:34:03 Jakub Tyszkowski wrote:
+> 'g_attrib_send' do checks the 'length' parameter so there is no need
+> for us to do this (and in most cases we don't). We can test the
+> returned value in case we want to report error.
 > ---
->  android/gatt.c | 104 ++++++++++++++++++++++++---------------------------------
->  1 file changed, 43 insertions(+), 61 deletions(-)
+>  android/gatt.c | 31 +++++++++++--------------------
+>  1 file changed, 11 insertions(+), 20 deletions(-)
 > 
 > diff --git a/android/gatt.c b/android/gatt.c
-> index 19232f7..49bcda2 100644
+> index 7f95226..81b0283 100644
 > --- a/android/gatt.c
 > +++ b/android/gatt.c
-> @@ -4437,6 +4437,22 @@ static bool match_pending_dev_request(const void *data, const void *user_data)
->  	return !pending_request->completed;
+> @@ -1068,9 +1068,7 @@ static void notify_att_range_change(struct gatt_device *dev,
+>  		break;
+>  	}
+>  
+> -	if (length)
+> -		g_attrib_send(dev->attrib, 0, pdu, length,
+> -						confirmation_cb, NULL, NULL);
+> +	g_attrib_send(dev->attrib, 0, pdu, length, confirmation_cb, NULL, NULL);
 >  }
 >  
-> +struct invalid_response_match {
-> +	int length;
-> +	bool *remove;
-
-I'd prefer to avoid such hacks.
-
-> +};
-> +
-> +static bool remove_invalid_requests(const void *data, const void *match_data)
-> +{
-> +	const struct pending_request *val = data;
-> +	const struct invalid_response_match *match = match_data;
-> +
-> +	if (val->length != match->length || val->error)
-> +		*match->remove = true;
-> +
-> +	return *match->remove;
-> +}
-> +
->  static void send_dev_complete_response(struct gatt_device *device,
->  								uint8_t opcode)
->  {
-> @@ -4470,40 +4486,20 @@ static void send_dev_complete_response(struct gatt_device *device,
->  	case ATT_OP_READ_BY_TYPE_REQ: {
->  		struct att_data_list *adl;
->  		int iterator = 0;
-> -		int length;
-> -		struct queue *temp;
-> -
-> -		temp = queue_new();
-> -		if (!temp)
-> -			goto done;
-> -
-> -		val = queue_pop_head(device->pending_requests);
-> -		if (!val) {
-> -			queue_destroy(temp, NULL);
-> -			error = ATT_ECODE_ATTR_NOT_FOUND;
-> -			goto done;
-> -		}
-> -
-> -		if (val->error) {
-> -			queue_destroy(temp, NULL);
-> -			error = val->error;
-> -			destroy_pending_request(val);
-> -			goto done;
-> -		}
-> -
-> -		length = val->length;
-> -
-> -		while (val && val->length == length && val->error == 0) {
-> -			queue_push_tail(temp, val);
-> -			val = queue_pop_head(device->pending_requests);
-> -		}
-> -
-> -		adl = att_data_list_alloc(queue_length(temp),
-> -						sizeof(uint16_t) + length);
-> +		bool remove = false;
-> +		struct invalid_response_match match;
-> +		struct queue *requests = device->pending_requests;
-> +
-> +		/* Remove all after error or value length change. */
-> +		match.remove = &remove;
-> +		match.length = val->length;
-> +		queue_remove_all(requests, remove_invalid_requests, &match,
-> +						destroy_pending_request);
-
-Please check if queue_remove_if() was more suitable here.
-
+>  static struct app_connection *create_connection(struct gatt_device *device,
+> @@ -1480,9 +1478,7 @@ static void ind_handler(const uint8_t *cmd, uint16_t cmd_len,
+>  	 */
 >  
-> -		destroy_pending_request(val);
-> +		adl = att_data_list_alloc(queue_length(requests),
-> +						sizeof(uint16_t) + val->length);
+>  	resp_length = enc_confirmation(opdu, length);
+> -	if (resp_length)
+> -		g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL,
+> -									NULL);
+> +	g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL, NULL);
+>  }
 >  
-> -		val = queue_pop_head(temp);
-> +		val = queue_pop_head(requests);
->  		while (val) {
->  			uint8_t *value = adl->data[iterator++];
->  			uint16_t handle;
-> @@ -4514,14 +4510,12 @@ static void send_dev_complete_response(struct gatt_device *device,
->  			memcpy(&value[2], val->value, val->length);
->  
->  			destroy_pending_request(val);
-> -			val = queue_pop_head(temp);
-> +			val = queue_pop_head(requests);
->  		}
->  
->  		len = enc_read_by_type_resp(adl, rsp, mtu);
->  
->  		att_data_list_free(adl);
-> -		queue_destroy(temp, destroy_pending_request);
-> -
->  		break;
+>  static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+> @@ -4157,12 +4153,10 @@ static uint8_t test_read_write(bdaddr_t *bdaddr, bt_uuid_t *uuid, uint16_t op,
+>  		return HAL_STATUS_UNSUPPORTED;
 >  	}
->  	case ATT_OP_READ_BLOB_REQ:
-> @@ -4534,31 +4528,21 @@ static void send_dev_complete_response(struct gatt_device *device,
->  	case ATT_OP_READ_BY_GROUP_REQ: {
->  		struct att_data_list *adl;
->  		int iterator = 0;
-> -		int length;
-> -		struct queue *temp;
-> -
-> -		temp = queue_new();
-> -		if (!temp)
-> -			goto done;
-> -
-> -		val = queue_pop_head(device->pending_requests);
-> -		if (!val) {
-> -			queue_destroy(temp, NULL);
-> -			error = ATT_ECODE_ATTR_NOT_FOUND;
-> -			goto done;
-> -		}
-> -
-> -		length = val->length;
-> -
-> -		while (val && val->length == length) {
-> -			queue_push_tail(temp, val);
-> -			val = queue_pop_head(device->pending_requests);
-> -		}
-> +		bool remove = false;
-> +		struct invalid_response_match match;
-> +		struct queue *requests = device->pending_requests;
-> +
-> +		/* Remove all after error or value length change. */
-> +		match.remove = &remove;
-> +		match.length = val->length;
-> +		queue_remove_all(requests, remove_invalid_requests, &match,
-> +						destroy_pending_request);
 >  
-> -		adl = att_data_list_alloc(queue_length(temp),
-> -						2 * sizeof(uint16_t) + length);
-> +		adl = att_data_list_alloc(queue_length(requests),
-> +							2 * sizeof(uint16_t) +
-> +							val->length);
+> -	if (!length)
+> +	if (!g_attrib_send(dev->attrib, 0, pdu, length, test_command_result,
+> +								NULL, NULL))
+>  		return HAL_STATUS_FAILED;
 >  
-> -		val = queue_pop_head(temp);
-> +		val = queue_pop_head(requests);
->  		while (val) {
->  			uint8_t *value = adl->data[iterator++];
->  			uint16_t start_handle, end_handle;
-> @@ -4572,14 +4556,12 @@ static void send_dev_complete_response(struct gatt_device *device,
->  			memcpy(&value[4], val->value, val->length);
->  
->  			destroy_pending_request(val);
-> -			val = queue_pop_head(temp);
-> +			val = queue_pop_head(requests);
->  		}
->  
->  		len = enc_read_by_grp_resp(adl, rsp, mtu);
->  
->  		att_data_list_free(adl);
-> -		queue_destroy(temp, destroy_pending_request);
+> -	g_attrib_send(dev->attrib, 0, pdu, length, test_command_result, NULL,
+> -									NULL);
 > -
->  		break;
+>  	return HAL_STATUS_SUCCESS;
+>  }
+>  
+> @@ -5531,12 +5525,11 @@ static void handle_server_send_indication(const void *buf, uint16_t len)
+>  						cmd->len, pdu, mtu);
 >  	}
->  	case ATT_OP_FIND_BY_TYPE_REQ: {
+>  
+> -	if (length == 0) {
+> -		error("gatt: Failed to encode indication");
+> +	if (!g_attrib_send(conn->device->attrib, 0, pdu, length,
+> +				confirmation_cb, UINT_TO_PTR(conn->id), NULL)) {
+> +		error("gatt: Failed to send indication");
+>  		status = HAL_STATUS_FAILED;
+>  	} else {
+> -		g_attrib_send(conn->device->attrib, 0, pdu, length,
+> -				confirmation_cb, UINT_TO_PTR(conn->id), NULL);
+>  		status = HAL_STATUS_SUCCESS;
+>  	}
+>  
+> @@ -6143,13 +6136,13 @@ static uint8_t mtu_att_handle(const uint8_t *cmd, uint16_t cmd_len,
+>  
+>  	rsp = g_attrib_get_buffer(dev->attrib, &length);
+>  
+> +		return ATT_ECODE_UNLIKELY;
+> +
+
+This looks strange, rebase artifact perhaps?
+
+>  	/* Respond with our MTU */
+>  	len = enc_mtu_resp(mtu, rsp, length);
+> -	if (!len)
+> +	if (!g_attrib_send(dev->attrib, 0, rsp, len, NULL, NULL, NULL))
+>  		return ATT_ECODE_UNLIKELY;
+>  
+> -	g_attrib_send(dev->attrib, 0, rsp, len, NULL, NULL, NULL);
+> -
+>  	return 0;
+>  }
+>  
+> @@ -6703,9 +6696,7 @@ done:
+>  		resp_length = enc_error_resp(ipdu[0], 0x0000, status, opdu,
+>  									length);
+>  
+> -	if (resp_length)
+> -		g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL,
+> -									NULL);
+> +	g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL, NULL);
+>  }
+>  
+>  static void connect_confirm(GIOChannel *io, void *user_data)
 > 
 
 -- 
