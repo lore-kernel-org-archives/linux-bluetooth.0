@@ -1,45 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Sagar Nageshmurthy <s.nageshmurt@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 7/9] android/avdtp: Fix registering SEP with wrong SEID
-Date: Fri, 13 Feb 2015 11:06:06 +0200
-Message-Id: <1423818368-15899-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1423818368-15899-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1423818368-15899-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1423461075-13898-1-git-send-email-s.nageshmurt@samsung.com>
+In-reply-to: <1423461075-13898-1-git-send-email-s.nageshmurt@samsung.com>
+Subject: RE: [PATCH 1/1] doc/media-api: Add RegisterTrackList method
+Date: Fri, 13 Feb 2015 10:23:05 +0530
+Message-id: <00dd01d04748$f61b5c30$e2521490$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Luiz,
 
-Add seid check fixing registering too many SEPs
+-----Original Message-----
+From: Sagar Nageshmurthy [mailto:s.nageshmurt@samsung.com] 
+Sent: Monday, February 09, 2015 11:21 AM
+To: linux-bluetooth@vger.kernel.org
+Cc: Sagar Nageshmurthy
+Subject: [PATCH 1/1] doc/media-api: Add RegisterTrackList method
+
+Provides access to a short list of tracks which were recently played or will
+be played shortly.
 ---
- android/avdtp.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ doc/media-api.txt |   15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/android/avdtp.c b/android/avdtp.c
-index 728f3fd..f4b2d45 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -3368,6 +3368,10 @@ struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
- 						void *user_data)
- {
- 	struct avdtp_local_sep *sep;
-+	uint8_t seid = avdtp_get_seid();
+diff --git a/doc/media-api.txt b/doc/media-api.txt index b17a151..9830136
+100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -62,6 +62,21 @@ Methods		void RegisterEndpoint(object
+endpoint, dict properties)
+ 			Possible Errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.NotSupported
+ 
++		void RegisterTrackList(object player, dict properties)
 +
-+	if (!seid)
-+		return NULL;
++			Register a media player object to TrackList
+interface.
++
++			Object must be registered to sender using
++			RegisterPlayer.
++
++			Object must implement
+org.mpris.MediaPlayer2.TrackList
++			as defined in MPRIS 2.2 spec:
++
++
+http://specifications.freedesktop.org/mpris-spec/latest/
++
++			Possible Errors: org.bluez.Error.NotAuthorized
++					 org.bluez.Error.InvalidArguments
++
+ 		void UnregisterPlayer(object player)
  
- 	if (g_slist_length(lseps) > MAX_SEID)
- 		return NULL;
-@@ -3375,7 +3379,7 @@ struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
- 	sep = g_new0(struct avdtp_local_sep, 1);
- 
- 	sep->state = AVDTP_STATE_IDLE;
--	sep->info.seid = avdtp_get_seid();
-+	sep->info.seid = seid;
- 	sep->info.type = type;
- 	sep->info.media_type = media_type;
- 	sep->codec = codec_type;
--- 
-2.1.0
+ 			Unregister sender media player.
+--
+1.7.9.5
+
+If you don't have any comments on this patch I will raise the corresponding
+patch that implements RegisterTrackList method.
+
+Thanks & Regards,
+Sagar N
 
