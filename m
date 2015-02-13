@@ -1,119 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update HSP pixits, pics and test results for PTS 6.0
-Date: Fri, 13 Feb 2015 12:50:24 +0100
-Message-ID: <1628729.EBWlrJsnKg@uw000953>
-In-Reply-To: <1423747051-31810-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1423747051-31810-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH 01/10] android/gatt: Replace request state with boolean
+Date: Fri, 13 Feb 2015 12:49:44 +0100
+Message-ID: <1658969.V8rH4AEXo2@uw000953>
+In-Reply-To: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Jakub,
 
-On Thursday 12 of February 2015 14:17:31 Grzegorz Kolodziejczyk wrote:
-> This patch updates test pixits, pics and results for HSP profile against
-> android 5.0
+On Wednesday 11 of February 2015 15:33:59 Jakub Tyszkowski wrote:
+> As there are two states we can instead use boolean value.
 > ---
->  android/pics-hfp.txt  | 8 ++++----
->  android/pics-hsp.txt  | 6 +++---
->  android/pixit-hsp.txt | 2 +-
->  android/pts-hsp.txt   | 4 ++--
->  4 files changed, 10 insertions(+), 10 deletions(-)
+>  android/gatt.c | 19 +++++++------------
+>  1 file changed, 7 insertions(+), 12 deletions(-)
 > 
-> diff --git a/android/pics-hfp.txt b/android/pics-hfp.txt
-> index 65f5112..da0eb23 100644
-> --- a/android/pics-hfp.txt
-> +++ b/android/pics-hfp.txt
-> @@ -1,6 +1,6 @@
->  HFP PICS for the PTS tool.
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 8e58e41..b0ce1a8 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -690,11 +690,6 @@ static void destroy_gatt_app(void *data)
+>  	free(app);
+>  }
 >  
-> -PTS version: 5.3
-> +PTS version: 6.0
+> -enum pend_req_state {
+> -	REQUEST_PENDING,
+> -	REQUEST_DONE,
+> -};
+> -
+>  struct pending_request {
+>  	struct gatt_db_attribute *attrib;
+>  	int length;
+> @@ -704,7 +699,7 @@ struct pending_request {
+>  	uint8_t *filter_value;
+>  	uint16_t filter_vlen;
 >  
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> @@ -40,7 +40,7 @@ TSPC_HFP_2_1a	True (*)	SLC initiation during active ongoing call (O)
->  TSPC_HFP_2_2	True		Phone Status Information (M)
->  TSPC_HFP_2_3	True		Audio connection handling (M)
->  TSPC_HFP_2_3a	False		Audio connection establishment independent of
-> -					call processing (O)
-> +					a call processing (O)
->  TSPC_HFP_2_3b	True (*)	eSCO support in Audio Connection (C.10)
->  TSPC_HFP_2_3c	True (*)	Codec negotiation (C.7)
->  TSPC_HFP_2_4a	False		Accept an incoming voice call
-> @@ -83,7 +83,7 @@ TSPC_HFP_2_21b	False		Enhanced Call Control (C.3)
->  TSPC_HFP_2_21c	True (*)	Enhanced Call Status with limited network
->  					notification (C.4)
->  TSPC_HFP_2_22	False		Support for automatic link loss recovery (O)
-> -TSPC_HFP_2_23	True (*)	Individual Indicator Activation (C.9)
-> +TSPC_HFP_2_23	True		Individual Indicator Activation (C.9)
->  TSPC_HFP_2_24	True (*)	Wide Band Speech service (C.8)
->  TSPC_HFP_2_25	False		Support roaming function (O)
->  TSPC_HFP_2_26	False		HF Indicators (C.11)
-> @@ -169,7 +169,7 @@ TSPC_HFP_3_22	False		Support for automatic link loss recovery (O)
->  TSPC_HFP_3_23	False		Individual Indicator Activation (C.6)
->  TSPC_HFP_3_24	False		Wide Band Speech service (C.6)
->  TSPC_HFP_3_25	False		HF Indicators (C.8)
-> -TSPC_HFP_3_36	False		Support CVSD eSCO S4 setting (C.9)
-> +TSPC_HFP_3_26	False		Support CVSD eSCO S4 setting (C.9)
->  -------------------------------------------------------------------------------
->  C.1: Mandatory if TSPC_HFP_3_12; otherwise excluded
->  C.2: Optional if TSPC_HFP_3_12; otherwise excluded
-> diff --git a/android/pics-hsp.txt b/android/pics-hsp.txt
-> index 7e71b14..3818e74 100644
-> --- a/android/pics-hsp.txt
-> +++ b/android/pics-hsp.txt
-> @@ -1,6 +1,6 @@
->  HSP PICS for the PTS tool.
+> -	enum pend_req_state state;
+> +	bool completed;
+>  	uint8_t error;
+>  };
 >  
-> -PTS version: 5.3
-> +PTS version: 6.0
+> @@ -4475,7 +4470,7 @@ static bool match_pending_dev_request(const void *data, const void *user_data)
+>  {
+>  	const struct pending_request *pending_request = data;
 >  
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> @@ -82,8 +82,8 @@ TSPC_HSP_3_11	False		Audio volume setting storage by HS (O)
->  TSPC_HSP_3_12	False		Remote microphone gain control (C.2)
->  TSPC_HSP_3_13	False		HS informs AG about local changes of microphone
->                                          gain (O)
-> -TSPC_HSP_3_14	False (*)	Microphone gain setting storage by HS (O)
-> -TSPC_HSP_3_15	False		Connection handling with Detach/Page (M)
-> +TSPC_HSP_3_14	False		Microphone gain setting storage by HS (O)
-> +TSPC_HSP_3_15	False (*)	Connection handling with Detach/Page (M)
->  TSPC_HSP_3_16	False		Connection handling with Park Mode (C.3)
->  -------------------------------------------------------------------------------
->  C.1: Mandatory if TSPC_HSP_3_10 is supported, otherwise optional
-> diff --git a/android/pixit-hsp.txt b/android/pixit-hsp.txt
-> index 6be4731..d7a8e3c 100644
-> --- a/android/pixit-hsp.txt
-> +++ b/android/pixit-hsp.txt
-> @@ -1,6 +1,6 @@
->  HSP PIXIT for the PTS tool.
+> -	return pending_request->state == REQUEST_PENDING;
+> +	return !pending_request->completed;
+>  }
 >  
-> -PTS version: 5.3
-> +PTS version: 6.0
+>  static void send_dev_complete_response(struct gatt_device *device,
+> @@ -4830,7 +4825,7 @@ static void attribute_read_cb(struct gatt_db_attribute *attrib, int err,
+>  	resp_data->length = length;
+>  	resp_data->error = error;
 >  
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-hsp.txt b/android/pts-hsp.txt
-> index 9f03ead..04a6413 100644
-> --- a/android/pts-hsp.txt
-> +++ b/android/pts-hsp.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for HSP
+> -	resp_data->state = REQUEST_DONE;
+> +	resp_data->completed = true;
 >  
-> -PTS version: 5.3
-> -Tested: 24-November-2014
-> +PTS version: 6.0
-> +Tested: 12-February-2015
->  Android version: 5.0
+>  	if (!length)
+>  		return;
+> @@ -4856,7 +4851,7 @@ static void read_requested_attributes(void *data, void *user_data)
+>  	attrib = resp_data->attrib;
+>  	if (!attrib) {
+>  		resp_data->error = ATT_ECODE_ATTR_NOT_FOUND;
+> -		resp_data->state = REQUEST_DONE;
+> +		resp_data->completed = true;
+>  		return;
+>  	}
 >  
->  Results:
+> @@ -4874,7 +4869,7 @@ static void read_requested_attributes(void *data, void *user_data)
+>  							permissions);
+>  	if (error != 0) {
+>  		resp_data->error = error;
+> -		resp_data->state = REQUEST_DONE;
+> +		resp_data->completed = true;
+>  		return;
+>  	}
+>  
+> @@ -5650,7 +5645,7 @@ static void handle_server_send_response(const void *buf, uint16_t len)
+>  
+>  		/* Cast status to uint8_t, due to (byte) cast in java layer. */
+>  		req->error = err_to_att((uint8_t) cmd->status);
+> -		req->state = REQUEST_DONE;
+> +		req->completed = true;
+>  
+>  		/*
+>  		 * FIXME: Handle situation when not all server applications
+> @@ -6493,7 +6488,7 @@ static void attribute_write_cb(struct gatt_db_attribute *attrib, int err,
+>  	data->attrib = attrib;
+>  	data->error = error;
+>  
+> -	data->state = REQUEST_DONE;
+> +	data->completed = true;
+>  }
+>  
+>  static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
 
-Applied, thanks. 
+Patches 1-4, 6, 8 and 9 are now applied. Thanks.
 
 -- 
 Best regards, 
