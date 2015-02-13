@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 01/10] android/gatt: Replace request state with boolean
-Date: Fri, 13 Feb 2015 12:49:44 +0100
-Message-ID: <1658969.V8rH4AEXo2@uw000953>
-In-Reply-To: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH 10/10] android/gatt: Avoid copying pointers in matching functions
+Date: Fri, 13 Feb 2015 12:48:20 +0100
+Message-ID: <5088455.trWqmuhi6p@uw000953>
+In-Reply-To: <1423665248-5121-10-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1423665248-5121-1-git-send-email-jakub.tyszkowski@tieto.com> <1423665248-5121-10-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,93 +14,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Jakub,
 
-On Wednesday 11 of February 2015 15:33:59 Jakub Tyszkowski wrote:
-> As there are two states we can instead use boolean value.
+On Wednesday 11 of February 2015 15:34:08 Jakub Tyszkowski wrote:
+> This removes casting void* to struct pointers when there is no need to
+> do so (pointer comparison).
 > ---
->  android/gatt.c | 19 +++++++------------
->  1 file changed, 7 insertions(+), 12 deletions(-)
+>  android/gatt.c | 12 ++++--------
+>  1 file changed, 4 insertions(+), 8 deletions(-)
 > 
 > diff --git a/android/gatt.c b/android/gatt.c
-> index 8e58e41..b0ce1a8 100644
+> index cd0825a..3076a02 100644
 > --- a/android/gatt.c
 > +++ b/android/gatt.c
-> @@ -690,11 +690,6 @@ static void destroy_gatt_app(void *data)
->  	free(app);
->  }
->  
-> -enum pend_req_state {
-> -	REQUEST_PENDING,
-> -	REQUEST_DONE,
-> -};
-> -
->  struct pending_request {
->  	struct gatt_db_attribute *attrib;
->  	int length;
-> @@ -704,7 +699,7 @@ struct pending_request {
->  	uint8_t *filter_value;
->  	uint16_t filter_vlen;
->  
-> -	enum pend_req_state state;
-> +	bool completed;
->  	uint8_t error;
->  };
->  
-> @@ -4475,7 +4470,7 @@ static bool match_pending_dev_request(const void *data, const void *user_data)
+> @@ -350,9 +350,8 @@ static struct gatt_app *find_app_by_id(int32_t id)
+>  static bool match_device_by_bdaddr(const void *data, const void *user_data)
 >  {
->  	const struct pending_request *pending_request = data;
+>  	const struct gatt_device *dev = data;
+> -	const bdaddr_t *addr = user_data;
 >  
-> -	return pending_request->state == REQUEST_PENDING;
-> +	return !pending_request->completed;
+> -	return !bacmp(&dev->bdaddr, addr);
+> +	return !bacmp(&dev->bdaddr, user_data);
 >  }
 >  
->  static void send_dev_complete_response(struct gatt_device *device,
-> @@ -4830,7 +4825,7 @@ static void attribute_read_cb(struct gatt_db_attribute *attrib, int err,
->  	resp_data->length = length;
->  	resp_data->error = error;
+>  static bool match_device_by_state(const void *data, const void *user_data)
+> @@ -408,17 +407,15 @@ static struct app_connection *find_connection_by_id(int32_t conn_id)
+>  static bool match_connection_by_device(const void *data, const void *user_data)
+>  {
+>  	const struct app_connection *conn = data;
+> -	const struct gatt_device *dev = user_data;
 >  
-> -	resp_data->state = REQUEST_DONE;
-> +	resp_data->completed = true;
->  
->  	if (!length)
->  		return;
-> @@ -4856,7 +4851,7 @@ static void read_requested_attributes(void *data, void *user_data)
->  	attrib = resp_data->attrib;
->  	if (!attrib) {
->  		resp_data->error = ATT_ECODE_ATTR_NOT_FOUND;
-> -		resp_data->state = REQUEST_DONE;
-> +		resp_data->completed = true;
->  		return;
->  	}
->  
-> @@ -4874,7 +4869,7 @@ static void read_requested_attributes(void *data, void *user_data)
->  							permissions);
->  	if (error != 0) {
->  		resp_data->error = error;
-> -		resp_data->state = REQUEST_DONE;
-> +		resp_data->completed = true;
->  		return;
->  	}
->  
-> @@ -5650,7 +5645,7 @@ static void handle_server_send_response(const void *buf, uint16_t len)
->  
->  		/* Cast status to uint8_t, due to (byte) cast in java layer. */
->  		req->error = err_to_att((uint8_t) cmd->status);
-> -		req->state = REQUEST_DONE;
-> +		req->completed = true;
->  
->  		/*
->  		 * FIXME: Handle situation when not all server applications
-> @@ -6493,7 +6488,7 @@ static void attribute_write_cb(struct gatt_db_attribute *attrib, int err,
->  	data->attrib = attrib;
->  	data->error = error;
->  
-> -	data->state = REQUEST_DONE;
-> +	data->completed = true;
+> -	return conn->device == dev;
+> +	return conn->device == user_data;
 >  }
 >  
->  static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
+>  static bool match_connection_by_app(const void *data, const void *user_data)
+>  {
+>  	const struct app_connection *conn = data;
+> -	const struct gatt_app *app = user_data;
+>  
+> -	return conn->app == app;
+> +	return conn->app == user_data;
+>  }
+>  
+>  static struct gatt_device *find_device_by_addr(const bdaddr_t *addr)
+> @@ -469,9 +466,8 @@ static bool match_srvc_by_bt_uuid(const void *data, const void *user_data)
+>  static bool match_srvc_by_range(const void *data, const void *user_data)
+>  {
+>  	const struct service *srvc = data;
+> -	const struct att_range *range = user_data;
+>  
+> -	return !memcmp(&srvc->prim.range, range, sizeof(srvc->prim.range));
+> +	return !memcmp(&srvc->prim.range, user_data, sizeof(srvc->prim.range));
+>  }
+>  
+>  static bool match_char_by_higher_inst_id(const void *data,
 
-Patches 1-4, 6, 8 and 9 are now applied. Thanks.
+I prefer to have those as is so that one can easily see what the userdata
+is expected to be. And compiler will most likely optimize those assignments
+anyway.
 
 -- 
 Best regards, 
