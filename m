@@ -2,186 +2,268 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH BlueZ v2 2/6] core: adapter: Add parameter parsing to StartFilteredDiscovery
-Date: Thu, 12 Feb 2015 19:50:19 -0800
-Message-Id: <1423799423-28986-2-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1423799423-28986-1-git-send-email-jpawlowski@google.com>
-References: <1423799423-28986-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH BlueZ v2 6/6] client: main: add support for StartFilteredDiscovery
+Date: Thu, 12 Feb 2015 19:48:37 -0800
+Message-Id: <1423799317-28457-6-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1423799317-28457-1-git-send-email-jpawlowski@google.com>
+References: <1423799317-28457-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds parameter parsing, and basic internal logic checks to
-StartFilteredDiscovery method.
+This patch adds filtered-scan command to sample DBus client that might
+be used to call StartFilteredDiscovery.
 ---
- src/adapter.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 144 insertions(+)
+ client/main.c | 223 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 223 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index df0c0b8..fa4b7ce 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -82,6 +82,8 @@
- #define TEMP_DEV_TIMEOUT (3 * 60)
- #define BONDING_TIMEOUT (2 * 60)
- 
-+#define	DISTNACE_VAL_INVALID	0x7FFF
-+
- static DBusConnection *dbus_conn = NULL;
- 
- static bool kernel_conn_control = false;
-@@ -1744,10 +1746,152 @@ static DBusMessage *start_discovery(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
+diff --git a/client/main.c b/client/main.c
+index ea80ee7..067b8b1 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -527,6 +527,7 @@ static void cmd_show(const char *arg)
+ 	print_uuids(proxy);
+ 	print_property(proxy, "Modalias");
+ 	print_property(proxy, "Discovering");
++	print_property(proxy, "FilteredDiscovery");
  }
  
-+static bool parse_filtered_discovery_dict(char *key, DBusMessageIter *value,
-+				    GSList **uuids, int16_t *rssi,
-+				    uint16_t *pathloss, uint8_t *discov_type)
+ static void cmd_select(const char *arg)
+@@ -772,6 +773,226 @@ static void cmd_scan(const char *arg)
+ 	}
+ }
+ 
++static void append_variant(DBusMessageIter *iter, int type, void *val)
 +{
-+	uint8_t type;
++	DBusMessageIter value;
++	char sig[2] = { type, '\0' };
 +
-+	if (strcmp("UUIDs", key) == 0) {
-+		DBusMessageIter arriter;
++	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
 +
-+		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_ARRAY)
-+			return false;
-+		dbus_message_iter_recurse(value, &arriter);
-+		while ((type = dbus_message_iter_get_arg_type(&arriter)) !=
-+							DBUS_TYPE_INVALID) {
-+			char *uuid_str;
-+			char *result_uuid;
-+			uuid_t uuid_tmp;
++	dbus_message_iter_append_basic(&value, type, val);
 +
-+			if (dbus_message_iter_get_arg_type(&arriter) !=
-+							DBUS_TYPE_STRING)
-+				return false;
-+
-+			dbus_message_iter_get_basic(&arriter, &uuid_str);
-+			if (bt_string2uuid(&uuid_tmp, uuid_str) < 0)
-+				return false;
-+
-+			result_uuid = bt_uuid2string(&uuid_tmp);
-+
-+			*uuids = g_slist_prepend(*uuids, result_uuid);
-+
-+		dbus_message_iter_next(&arriter);
-+		}
-+	} else if (strcmp("RSSI", key) == 0) {
-+		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_INT16)
-+			return false;
-+		dbus_message_iter_get_basic(value, rssi);
-+		if (*rssi > 0 || *rssi < -127)
-+			return false;
-+	} else if (strcmp("pathloss", key) == 0) {
-+		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT16)
-+			return false;
-+		dbus_message_iter_get_basic(value, pathloss);
-+		if (*pathloss > 127)
-+			return false;
-+	} else if (strcmp("type", key) == 0) {
-+		char *type_str;
-+
-+		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_STRING)
-+			return false;
-+		dbus_message_iter_get_basic(value, &type_str);
-+
-+		if (strcmp(type_str, "bredr") == 0)
-+			*discov_type = 1;
-+		else if (strcmp(type_str, "le") == 0)
-+			*discov_type = 6;
-+		else if (strcmp(type_str, "auto") == 0)
-+			*discov_type = 7;
-+		else
-+			return false;
-+	} else {
-+		DBG("Unknown key parameter: %s!\n", key);
-+		return false;
-+	}
-+
-+	return true;
++	dbus_message_iter_close_container(iter, &value);
 +}
 +
- static DBusMessage *start_filtered_discovery(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
-+	struct btd_adapter *adapter = user_data;
-+	const char *sender = dbus_message_get_sender(msg);
-+	DBusMessageIter iter, subiter, dictiter, variantiter;
-+	uint16_t pathloss = DISTNACE_VAL_INVALID;
-+	int16_t rssi = DISTNACE_VAL_INVALID;
-+	GSList *uuids = NULL, *list;
-+	uint8_t discov_type = 6;
++static void dict_append_entry(DBusMessageIter *dict, const char *key,
++							int type, void *val)
++{
++	DBusMessageIter entry;
 +
-+	DBG("sender %s", sender);
++	if (type == DBUS_TYPE_STRING) {
++		const char *str = *((const char **) val);
 +
-+	if (!(adapter->current_settings & MGMT_SETTING_POWERED))
-+		return btd_error_not_ready(msg);
++		if (str == NULL)
++			return;
++	}
 +
-+	/*
-+	 * Every client can only start one discovery, if the client
-+	 * already started a discovery then return an error.
-+	 */
-+	list = g_slist_find_custom(adapter->discovery_list, sender,
-+						compare_sender);
-+	if (list)
-+		return btd_error_busy(msg);
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++							NULL, &entry);
 +
-+	/* Regular discovery takes precedence over filtered one */
-+	if (adapter->discovering)
-+		return btd_error_busy(msg);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
 +
-+	/* parse parameters */
-+	dbus_message_iter_init(msg, &iter);
++	append_variant(&entry, type, val);
 +
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY ||
-+	    dbus_message_iter_get_element_type(&iter) != DBUS_TYPE_DICT_ENTRY)
-+		return btd_error_invalid_args(msg);
++	dbus_message_iter_close_container(dict, &entry);
++}
 +
-+	dbus_message_iter_recurse(&iter, &subiter);
-+	do {
-+		int type = dbus_message_iter_get_arg_type(&subiter);
++#define	DISTNACE_VAL_INVALID	0x7FFF
 +
-+		if (type == DBUS_TYPE_INVALID)
-+			break;
++struct start_filtered_discovery_args {
++	char *discovery_type;
++	dbus_uint16_t RSSI;
++	dbus_int16_t pathloss;
++	GList *UUIDs;
++};
 +
-+		if (type == DBUS_TYPE_DICT_ENTRY) {
-+			char *key;
++static void start_filtered_discovery_setup(DBusMessageIter *iter,
++					   void *user_data)
++{
++	struct start_filtered_discovery_args *args = user_data;
++	DBusMessageIter dict;
++	char *uuids = g_strdup("UUIDs");
 +
-+			dbus_message_iter_recurse(&subiter, &dictiter);
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++			 DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			 DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			 DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
 +
-+			dbus_message_iter_get_basic(&dictiter, &key);
-+			if (!dbus_message_iter_next(&dictiter))
-+				return btd_error_invalid_args(msg);
++	if (args->UUIDs != NULL) {
++		DBusMessageIter entry, value, arrayIter;
++		GList *list;
 +
-+			if (dbus_message_iter_get_arg_type(&dictiter) !=
-+							DBUS_TYPE_VARIANT)
-+				return btd_error_invalid_args(msg);
++		dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
++								 NULL, &entry);
++		/* dict key */
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++								       &uuids);
 +
-+			dbus_message_iter_recurse(&dictiter, &variantiter);
++		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++								 "as", &value);
 +
-+			if (!parse_filtered_discovery_dict(key, &variantiter,
-+						&uuids, &rssi, &pathloss,
-+						&discov_type))
-+				goto invalid_args;
++		dbus_message_iter_open_container(&value, DBUS_TYPE_ARRAY, "s",
++								   &arrayIter);
++
++		for (list = g_list_first(args->UUIDs); list;
++						    list = g_list_next(list)) {
++			char *uuid = g_strdup(list->data);
++
++			dbus_message_iter_append_basic(&arrayIter,
++						      DBUS_TYPE_STRING, &uuid);
 +		}
 +
-+		dbus_message_iter_next(&subiter);
-+	} while (true);
++		dbus_message_iter_close_container(&value, &arrayIter);
 +
-+	/* only pathlos or rssi can be set, never both*/
-+	if (pathloss != DISTNACE_VAL_INVALID && rssi != DISTNACE_VAL_INVALID)
-+		goto invalid_args;
++		/* close vararg*/
++		dbus_message_iter_close_container(&entry, &value);
 +
-+	DBG("filtered discovery params: type: %d rssi: %d pathloss: %d",
-+						  discov_type, rssi, pathloss);
-+	g_slist_free_full(uuids, g_free);
- 	return btd_error_failed(msg, "Not implemented yet");
++		/* close entry */
++		dbus_message_iter_close_container(&dict, &entry);
++	}
 +
-+invalid_args:
-+	g_slist_free_full(uuids, g_free);
-+	return btd_error_invalid_args(msg);
- }
- 
- static DBusMessage *stop_discovery(DBusConnection *conn,
++	if (args->pathloss != DISTNACE_VAL_INVALID)
++		dict_append_entry(&dict, "pathloss", DBUS_TYPE_UINT16,
++							      &args->pathloss);
++
++	if (args->RSSI != DISTNACE_VAL_INVALID)
++		dict_append_entry(&dict, "RSSI", DBUS_TYPE_INT16, &args->RSSI);
++
++	dbus_message_iter_close_container(iter, &dict);
++}
++
++
++static void start_filtered_discovery_reply(DBusMessage *message,
++							       void *user_data)
++{
++	DBusError error;
++
++	dbus_error_init(&error);
++
++	if (dbus_set_error_from_message(&error, message) == TRUE) {
++		rl_printf("Failed to start filtered discovery: %s\n",
++								   error.name);
++		dbus_error_free(&error);
++		return;
++	}
++}
++
++static gint filtered_scan_rssi, filtered_scan_pathloss;
++static char **filtered_scan_uuids;
++static gboolean filtered_scan_help;
++
++static GOptionEntry filtered_discovery_options[] = {
++	{ "rssi", 'r', 0, G_OPTION_ARG_INT, &filtered_scan_rssi,
++				"RSSI filter" },
++	{ "pathloss", 'p', 0, G_OPTION_ARG_INT, &filtered_scan_pathloss,
++				"pathloss filter" },
++	{ "uuids", 'u', 0, G_OPTION_ARG_STRING_ARRAY, &filtered_scan_uuids,
++				"uuid to filter by" },
++	{ "help", 'h', 0, G_OPTION_ARG_NONE, &filtered_scan_help,
++				"show help" },
++	{ NULL },
++};
++
++static void cmd_filtered_scan(const char *arg)
++{
++	struct start_filtered_discovery_args args;
++	GOptionContext *context;
++	GError *error = NULL;
++	int argc, loop;
++	gchar **argv;
++	gchar **arguments = NULL;
++	gchar *cmdline_arg;
++
++	/* add fake prog name at beginning, g_shell_parse_argv expects that */
++	cmdline_arg = g_strconcat("filtered-scan ", arg, NULL);
++	if (g_shell_parse_argv(cmdline_arg, &argc, &arguments, &error)
++								    == FALSE) {
++		if (error != NULL) {
++			g_printerr("error in g_shell_parse_argv: %s\n",
++							       error->message);
++			g_error_free(error);
++		} else
++			g_printerr("An unknown error occurred\n");
++
++		g_strfreev(arguments);
++		g_free(cmdline_arg);
++		return;
++	}
++	g_free(cmdline_arg);
++
++	argc = g_strv_length(arguments);
++	argv = g_new(gchar *, argc);
++	for (loop = 0; loop < argc; loop++)
++		argv[loop] = arguments[loop];
++
++	context = g_option_context_new(NULL);
++	g_option_context_add_main_entries(context, filtered_discovery_options,
++									 NULL);
++	/* set default values for all options */
++	filtered_scan_rssi = DISTNACE_VAL_INVALID;
++	filtered_scan_pathloss = DISTNACE_VAL_INVALID;
++	filtered_scan_uuids = NULL;
++	filtered_scan_help = FALSE;
++
++	g_option_context_set_help_enabled(context, FALSE);
++	if (g_option_context_parse(context, &argc, &argv, &error) == FALSE) {
++		if (error != NULL) {
++			g_printerr("error in g_option_context_parse: %s\n",
++							       error->message);
++			g_error_free(error);
++		} else
++			g_printerr("An unknown error occurred\n");
++
++		g_strfreev(arguments);
++		g_free(argv);
++		return;
++	}
++
++	if (filtered_scan_help) {
++		rl_printf("Filtered scan. Usage:\n");
++		rl_printf("	filtered-scan [-r rssi | -p pathlos] -u <uuid1> [-u <uuid2> ...]\n");
++		rl_printf("\n");
++		rl_printf("Example: filtered-scan -p 65 -u baba -u 1900 -u cafa\n");
++		rl_printf("Use \"scan off\" to disable filtered scan\n");
++		return;
++	}
++
++	args.UUIDs = NULL;
++	args.pathloss = filtered_scan_pathloss;
++	args.RSSI = filtered_scan_rssi;
++
++	if (filtered_scan_uuids != NULL)
++		for (loop = 0; filtered_scan_uuids[loop] != NULL; loop++)
++			args.UUIDs = g_list_append(args.UUIDs,
++					    strdup(filtered_scan_uuids[loop]));
++
++	g_strfreev(arguments);
++	g_free(argv);
++	g_strfreev(filtered_scan_uuids);
++
++	g_option_context_free(context);
++
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	if (g_dbus_proxy_method_call(default_ctrl, "StartFilteredDiscovery",
++		start_filtered_discovery_setup, start_filtered_discovery_reply,
++		&args, NULL /* TODO: proper freeing method here*/) == FALSE) {
++		rl_printf("Failed to start filtered discovery\n");
++		return;
++	}
++}
++
+ static void cmd_info(const char *arg)
+ {
+ 	GDBusProxy *proxy;
+@@ -1194,6 +1415,8 @@ static const struct {
+ 							capability_generator},
+ 	{ "default-agent",NULL,       cmd_default_agent,
+ 				"Set agent as the default one" },
++	{ "filtered-scan","",         cmd_filtered_scan,
++		"Start filtered scan for devices. filtered-scan -h for help" },
+ 	{ "scan",         "<on/off>", cmd_scan, "Scan for devices" },
+ 	{ "info",         "<dev>",    cmd_info, "Device information",
+ 							dev_generator },
 -- 
 2.2.0.rc0.207.ga3a616c
 
