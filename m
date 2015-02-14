@@ -1,92 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Provide option to enable/disable debugfs information
-Date: Sat, 14 Feb 2015 13:40:06 -0800
-Message-Id: <1423950006-9119-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 3/5] Bluetooth: Make amp_mgr_lookup_by_state function static
+Date: Sat, 14 Feb 2015 13:36:05 -0800
+Message-Id: <1423949767-8669-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Bluetooth controllers can export extensive information about
-internal states via debugfs. This patch provides an option to
-choose if these information are provided or not.
-
-For backwards compatibility with existing kernel configuration,
-this option defaults to yes.
+The amp_mgr_lookup_by_state function does not need to be exported. So
+just move it to a different location and make it static.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/Kconfig       |  8 ++++++++
- net/bluetooth/Makefile      |  3 ++-
- net/bluetooth/hci_debugfs.h | 22 ++++++++++++++++++++++
- 3 files changed, 32 insertions(+), 1 deletion(-)
+ net/bluetooth/a2mp.c | 34 +++++++++++++++++-----------------
+ net/bluetooth/a2mp.h |  1 -
+ 2 files changed, 17 insertions(+), 18 deletions(-)
 
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 7de74635a110..b8c794b87523 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -91,4 +91,12 @@ config BT_SELFTEST_SMP
- 	  Run test cases for SMP cryptographic functionality, including both
- 	  legacy SMP as well as the Secure Connections features.
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index e4f179117ae2..6bba3044dc7f 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -77,6 +77,23 @@ u8 __next_ident(struct amp_mgr *mgr)
+ 	return mgr->ident;
+ }
  
-+config BT_DEBUGFS
-+	bool "Export Bluetooth internals in debugfs"
-+	depends on BT && DEBUG_FS
-+	default y
-+	help
-+	  Provide extensive information about internal Bluetooth states
-+	  in debugfs.
-+
- source "drivers/bluetooth/Kconfig"
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index 8e96e3072266..5d608799717e 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -13,8 +13,9 @@ bluetooth_6lowpan-y := 6lowpan.o
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
--	a2mp.o amp.o ecc.o hci_request.o hci_debugfs.o
-+	a2mp.o amp.o ecc.o hci_request.o
- 
-+bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
- bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
- 
- subdir-ccflags-y += -D__CHECK_ENDIAN__
-diff --git a/net/bluetooth/hci_debugfs.h b/net/bluetooth/hci_debugfs.h
-index fb68efe083c5..4444dc8cedc2 100644
---- a/net/bluetooth/hci_debugfs.h
-+++ b/net/bluetooth/hci_debugfs.h
-@@ -20,7 +20,29 @@
-    SOFTWARE IS DISCLAIMED.
- */
- 
-+#if IS_ENABLED(CONFIG_BT_DEBUGFS)
-+
- void hci_debugfs_create_common(struct hci_dev *hdev);
- void hci_debugfs_create_bredr(struct hci_dev *hdev);
- void hci_debugfs_create_le(struct hci_dev *hdev);
- void hci_debugfs_create_conn(struct hci_conn *conn);
-+
-+#else
-+
-+static inline void hci_debugfs_create_common(struct hci_dev *hdev)
++static struct amp_mgr *amp_mgr_lookup_by_state(u8 state)
 +{
++	struct amp_mgr *mgr;
++
++	mutex_lock(&amp_mgr_list_lock);
++	list_for_each_entry(mgr, &amp_mgr_list, list) {
++		if (test_and_clear_bit(state, &mgr->state)) {
++			amp_mgr_get(mgr);
++			mutex_unlock(&amp_mgr_list_lock);
++			return mgr;
++		}
++	}
++	mutex_unlock(&amp_mgr_list_lock);
++
++	return NULL;
 +}
 +
-+static inline void hci_debugfs_create_bredr(struct hci_dev *hdev)
-+{
-+}
-+
-+static inline void hci_debugfs_create_le(struct hci_dev *hdev)
-+{
-+}
-+
-+static inline void hci_debugfs_create_conn(struct hci_conn *conn)
-+{
-+}
-+
-+#endif
+ /* hci_dev_list shall be locked */
+ static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl)
+ {
+@@ -862,23 +879,6 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+ 	return mgr->a2mp_chan;
+ }
+ 
+-struct amp_mgr *amp_mgr_lookup_by_state(u8 state)
+-{
+-	struct amp_mgr *mgr;
+-
+-	mutex_lock(&amp_mgr_list_lock);
+-	list_for_each_entry(mgr, &amp_mgr_list, list) {
+-		if (test_and_clear_bit(state, &mgr->state)) {
+-			amp_mgr_get(mgr);
+-			mutex_unlock(&amp_mgr_list_lock);
+-			return mgr;
+-		}
+-	}
+-	mutex_unlock(&amp_mgr_list_lock);
+-
+-	return NULL;
+-}
+-
+ void a2mp_send_getinfo_rsp(struct hci_dev *hdev)
+ {
+ 	struct amp_mgr *mgr;
+diff --git a/net/bluetooth/a2mp.h b/net/bluetooth/a2mp.h
+index 883266602cbc..652117ebf2a5 100644
+--- a/net/bluetooth/a2mp.h
++++ b/net/bluetooth/a2mp.h
+@@ -134,7 +134,6 @@ int amp_mgr_put(struct amp_mgr *mgr);
+ u8 __next_ident(struct amp_mgr *mgr);
+ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+ 				       struct sk_buff *skb);
+-struct amp_mgr *amp_mgr_lookup_by_state(u8 state);
+ void a2mp_send(struct amp_mgr *mgr, u8 code, u8 ident, u16 len, void *data);
+ void a2mp_discover_amp(struct l2cap_chan *chan);
+ void a2mp_send_getinfo_rsp(struct hci_dev *hdev);
 -- 
 2.1.0
 
