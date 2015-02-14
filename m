@@ -1,35 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 14 Feb 2015 22:33:22 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	Martin Townsend <mtownsend1973@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Stefan Schmidt <s.schmidt@samsung.com>
-Subject: Re: [PATCHv5 bluetooth-next 0/3] 6lowpan: introduce nhc framework
-Message-ID: <20150214213321.GA4035@omega>
-References: <1420818179-18585-1-git-send-email-alex.aring@gmail.com>
- <20150205090747.GB12279@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20150205090747.GB12279@omega>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH] Bluetooth: btusb: Remove unneeded btusb_wait_on_bit_timeout()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1423899215-31128-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sat, 14 Feb 2015 13:27:01 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <9ED216E1-BBB7-4C5E-91B0-7D7E3EE2715D@holtmann.org>
+References: <1423899215-31128-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Feb 05, 2015 at 10:07:47AM +0100, Alexander Aring wrote:
-> On Fri, Jan 09, 2015 at 04:42:56PM +0100, Alexander Aring wrote:
-> > This patch series introduce the next header compression framework. Currently
-> > we support udp compression/uncompression only. This framework allow to add new
-> > next header compression formats easily.
-> > 
-> > If somebody wants to add a new header compression format and some information
-> > are missing while calling compression and uncompression callbacks. Please
-> > feel free to make framework changes according these callbacks.
-> > 
-> 
-> Marcel, ping?
-> 
+Hi Johan,
 
-ping, again. :-)
+> There's now a proper wait_on_bit_timeout() API in linux/wait.h so we can
+> remove our own copy from btusb.c. Our copy had the task state and
+> timeout variables swapped so the patch also changes their order.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> drivers/bluetooth/btusb.c | 22 ++++++----------------
+> 1 file changed, 6 insertions(+), 16 deletions(-)
 
-- Alex
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
