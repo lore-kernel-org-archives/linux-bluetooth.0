@@ -1,66 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH 1/2] Bluetooth: Add setup callback for chip init on USB path
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <f185108a5a8f4f9fa420a17a35d8225d@nalasexr02e.na.qualcomm.com>
-Date: Sat, 14 Feb 2015 15:34:12 -0800
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <A896D6D4-D811-4CAE-A460-CE0599ABD3B5@holtmann.org>
-References: <f185108a5a8f4f9fa420a17a35d8225d@nalasexr02e.na.qualcomm.com>
-To: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 14 Feb 2015 23:42:43 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	kernel@pengutronix.de,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	Martin Townsend <mtownsend1973@gmail.com>,
+	Stefan Schmidt <s.schmidt@samsung.com>
+Subject: Re: [PATCHv5 bluetooth-next 0/3] 6lowpan: introduce nhc framework
+Message-ID: <20150214224240.GB18210@omega>
+References: <1420818179-18585-1-git-send-email-alex.aring@gmail.com>
+ <E16CAA62-8C4A-4034-A531-A13EF1E26771@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <E16CAA62-8C4A-4034-A531-A13EF1E26771@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ben,
+Hi Marcel,
 
-> This callback is for initialization of BT chipset through USB channel
-> Some of chipset does not allow sending a patch or config files through
-> HCI VS channel at early stage as well as they don't support to send
-> USB patch files to other channel except USB bulk path.
+On Sat, Feb 14, 2015 at 02:10:33PM -0800, Marcel Holtmann wrote:
+...
 > 
-> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-> ---
-> drivers/bluetooth/btusb.c        | 9 +++++++++
-> include/net/bluetooth/hci_core.h | 1 +
-> 2 files changed, 10 insertions(+)
+> all 3 patches have been applied to bluetooth-next tree.
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index b876888..102020d 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -887,6 +887,15 @@ static int btusb_open(struct hci_dev *hdev)
-> 
-> 	BT_DBG("%s", hdev->name);
-> 
-> +	/* Patching USB firmware files prior to starting any URBs of HCI path
-> +	 * It is more safe to use USB bulk channel for downloading USB patch
-> +	 */
-> +	if (hdev->setup_on_usb) {
-> +		err = hdev->setup_on_usb(hdev);
-> +		if (err <0)
-> +			return err;
-> +	}
-> +
 
-this is a blunt layer violation. You should not be calling callbacks from the hci_dev struct. That is none of the drivers business.
+thanks for fixing the format string issue!
 
-> 	err = usb_autopm_get_interface(data->intf);
-> 	if (err < 0)
-> 		return err;
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 52863c3..1938582 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -373,6 +373,7 @@ struct hci_dev {
-> 	int (*close)(struct hci_dev *hdev);
-> 	int (*flush)(struct hci_dev *hdev);
-> 	int (*setup)(struct hci_dev *hdev);
-> +	int (*setup_on_usb)(struct hci_dev *hdev);
-
-We can not do it this way. The core is transport and vendor agnostic. There is no business in the core for dealing with USB or vendor specific details.
-
-Regards
-
-Marcel
-
+- Alex
