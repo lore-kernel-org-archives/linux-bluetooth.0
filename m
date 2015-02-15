@@ -1,149 +1,371 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 1/2] android/pts: Update HOGP PIXIT, PICS for PTS 6.0
-Date: Mon, 16 Feb 2015 09:43:56 +0100
-Message-Id: <1424076237-28349-1-git-send-email-mariusz.skamra@tieto.com>
+From: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v2 2/2] Bluetooth: btusb: Add support for QCA ROME chipset
+ family
+Date: Sun, 15 Feb 2015 23:07:33 +0000
+Message-ID: <403291a4c9b848f6956683e60c7e016f@nalasexr02e.na.qualcomm.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch supports ROME Bluetooth family from Qualcomm Atheros,
+e.g. QCA61x4 or QCA6574.
+
+New chipset have similar firmware downloading sequences to previous
+chipset from Atheros, however, it doesn't support vid/pid switching
+after downloading the patch so that firmware needs to be handled by
+btusb module directly.
+
+ROME chipset can be differentiated from previous version by reading
+ROM version.
+
+T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 16 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e300 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  8 Spd=12   MxCh= 0
+D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e360 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
 ---
- android/pics-hogp.txt  | 75 ++++++++++++++++++++++++++------------------------
- android/pixit-hogp.txt |  3 +-
- 2 files changed, 41 insertions(+), 37 deletions(-)
+ drivers/bluetooth/btusb.c | 254 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 254 insertions(+)
 
-diff --git a/android/pics-hogp.txt b/android/pics-hogp.txt
-index 61cf56a..e656e0c 100644
---- a/android/pics-hogp.txt
-+++ b/android/pics-hogp.txt
-@@ -1,6 +1,6 @@
- HOGP PICS for the PTS tool.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 73e1066..0833054 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -52,6 +52,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_SWAVE		0x1000
+ #define BTUSB_INTEL_NEW		0x2000
+ #define BTUSB_AMP		0x4000
++#define BTUSB_QCA_ROME		0x8000
  
--PTS version: 5.3
-+PTS version: 6.0
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -213,6 +214,10 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe036), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe03c), .driver_info = BTUSB_ATH3012 },
  
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -249,7 +249,7 @@ TSPC_HOGP_11_10	True		Read Report characteristic: Input Report:
- TSPC_HOGP_11_11	True		Report characteristic configuration with 0x0001
- 					(M.1)
- TSPC_HOGP_11_11a True		Report characteristic configuration with 0x0000
--					(M.1)
-+					(O)
- TSPC_HOGP_11_12	True		Read HID Information characteristic (M.1)
- TSPC_HOGP_11_13	False (*)	Suspend State (O)
- TSPC_HOGP_11_14	False (*)	Exit Suspend State (C.1)
-@@ -335,23 +335,26 @@ C.2: Mandatory to support if TSPC_HOGP_10_8 is supported, else excluded.
- -------------------------------------------------------------------------------
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
--TSPC_HOGP_13_1	True		Attribute Protocol supported over LE Transport
--TSPC_HOGP_13_2	True		Generic Attribute Profile Client
--TSPC_HOGP_13_3	True		Discover All Primary Services
--TSPC_HOGP_13_4	False (*)	Discover Primary Services by Service UUID
--TSPC_HOGP_13_5	True		Find Included Services
--TSPC_HOGP_13_6	True		Discover All Characteristics of a Service
--TSPC_HOGP_13_7	False (*)	Discover Characteristics by UUID
--TSPC_HOGP_13_8	True		Discover All Characteristic Descriptors
--TSPC_HOGP_13_9	True		Read Characteristic Value
--TSPC_HOGP_13_10	True		Read using Characteristic UUID
--TSPC_HOGP_13_11	True		Read Long Characteristic Value
--TSPC_HOGP_13_12	True		Read Characteristic Descriptors
--TSPC_HOGP_13_13	True		Write without Response
--TSPC_HOGP_13_14	True		Write Characteristic Value
--TSPC_HOGP_13_15	True		Write Characteristic Descriptors
--TSPC_HOGP_13_16	True		Notifications
--TSPC_HOGP_13_17	True		Exchange MTU
-+TSPC_HOGP_13_1	True		Attribute Protocol supported over LE Transport (M)
-+TSPC_HOGP_13_2	True		Generic Attribute Profile Client (M)
-+TSPC_HOGP_13_3	True		Discover All Primary Services (C.1)
-+TSPC_HOGP_13_4	False (*)	Discover Primary Services by Service UUID (C.1)
-+TSPC_HOGP_13_5	True		Find Included Services (M)
-+TSPC_HOGP_13_6	True		Discover All Characteristics of a Service (C.2)
-+TSPC_HOGP_13_7	False (*)	Discover Characteristics by UUID (C.2)
-+TSPC_HOGP_13_8	True		Discover All Characteristic Descriptors (M)
-+TSPC_HOGP_13_9	True		Read Characteristic Value (M)
-+TSPC_HOGP_13_10	True		Read using Characteristic UUID (O)
-+TSPC_HOGP_13_11	True		Read Long Characteristic Value (M)
-+TSPC_HOGP_13_12	True		Read Characteristic Descriptors (M)
-+TSPC_HOGP_13_13	True		Write without Response (M)
-+TSPC_HOGP_13_14	True		Write Characteristic Value (M)
-+TSPC_HOGP_13_15	True		Write Characteristic Descriptors (M)
-+TSPC_HOGP_13_16	True		Notifications (M)
-+TSPC_HOGP_13_17	True		Exchange MTU (M)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory to support at least one of these features.
-+C.2: Mandatory to support at least one of these features.
- -------------------------------------------------------------------------------
++	/* QCA ROME chipset */
++	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME},
++	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME},
++
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+ 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
+@@ -2638,6 +2643,250 @@ static int btusb_set_bdaddr_ath3012(struct hci_dev *hdev,
+ 	return 0;
+ }
  
++#define QCA_DFU_PACKET_LEN	4096
++
++#define QCA_GET_TARGET_VERSION	0x09
++#define QCA_CHECK_STATUS	0x05
++#define QCA_DFU_DOWNLOAD	0x01
++
++#define QCA_SYSCFG_UPDATED	0x40
++#define QCA_PATCH_UPDATED	0x80
++#define QCA_DFU_TIMEOUT		3000
++
++struct qca_version {
++	__le32	rom_version;
++	__le32	patch_version;
++	__le32	ram_version;
++	__le32	ref_clock;
++	__u8	reserved[4];
++} __packed;
++
++struct qca_rampatch_version {
++	__le16	rom_version;
++	__le16	patch_version;
++} __packed;
++
++struct qca_device_info {
++	__le32	rom_version;
++	__u8	rampatch_hdr;	/* length of header in rampatch */
++	__u8	nvm_hdr;	/* length of header in NVM */
++	__u8	ver_offset;	/* offset of version structure in rampatch */
++};
++
++static const struct qca_device_info qca_devices_table[] = {
++	{ 0x00000100, 20, 4, 10 }, /* Rome 1.0 */
++	{ 0x00000101, 20, 4, 10 }, /* Rome 1.1 */
++	{ 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
++	{ 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
++	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
++};
++
++static int btusb_qca_send_vendor_req(struct hci_dev *hdev, u8 request,
++				     void *data, u16 size)
++{
++	struct btusb_data *btdata = hci_get_drvdata(hdev);
++	struct usb_device *udev = btdata->udev;
++	int pipe, err;
++	u8 *buf;
++
++	buf = kmalloc(size, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	/* Found some of USB hosts have IOT issues with ours so that we should
++	 * not wait until HCI layer is ready.
++	 */
++	pipe = usb_rcvctrlpipe(udev, 0);
++	err = usb_control_msg(udev, pipe, request, USB_TYPE_VENDOR | USB_DIR_IN,
++			      0, 0, buf, size, USB_CTRL_SET_TIMEOUT);
++	if (err < 0) {
++		BT_ERR("%s: Failed to access otp area (%d)", hdev->name, err);
++		goto done;
++	}
++
++	memcpy(data, buf, size);
++
++done:
++	kfree(buf);
++
++	return err;
++}
++
++static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
++				       const struct firmware *firmware,
++				       size_t hdr_size)
++{
++	struct btusb_data *btdata = hci_get_drvdata(hdev);
++	struct usb_device *udev = btdata->udev;
++	size_t count, size, sent = 0;
++	int pipe, len, err;
++	u8 *buf;
++
++	buf = kmalloc(QCA_DFU_PACKET_LEN, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	count = firmware->size;
++
++	size = min_t(size_t, count, hdr_size);
++	memcpy(buf, firmware->data, size);
++
++	/* USB patches should go down to controller through USB path
++	 * because binary format fits to go down through USB channel.
++	 * USB control path is for patching headers and USB bulk is for
++	 * patch body.
++	 */
++	pipe = usb_sndctrlpipe(udev, 0);
++	err = usb_control_msg(udev, pipe, QCA_DFU_DOWNLOAD, USB_TYPE_VENDOR,
++			      0, 0, buf, size, USB_CTRL_SET_TIMEOUT);
++	if (err < 0) {
++		BT_ERR("%s: Failed to send headers (%d)", hdev->name, err);
++		goto done;
++	}
++
++	sent += size;
++	count -= size;
++
++	while (count) {
++		size = min_t(size_t, count, QCA_DFU_PACKET_LEN);
++
++		memcpy(buf, firmware->data + sent, size);
++
++		pipe = usb_sndbulkpipe(udev, 0x02);
++		err = usb_bulk_msg(udev, pipe, buf, size, &len,
++				   QCA_DFU_TIMEOUT);
++		if (err < 0) {
++			BT_ERR("%s: Failed to send body at %zd of %zd (%d)",
++			       hdev->name, sent, firmware->size, err);
++			break;
++		}
++
++		if (size != len) {
++			BT_ERR("%s: Failed to get bulk buffer", hdev->name);
++			err = -EILSEQ;
++			break;
++		}
++
++		sent  += size;
++		count -= size;
++	}
++
++done:
++	kfree(buf);
++	return err;
++}
++
++static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
++					 struct qca_version *ver,
++					 const struct qca_device_info *info)
++{
++	struct qca_rampatch_version *rver;
++	const struct firmware *fw;
++	char fwname[64];
++	int err;
++
++	snprintf(fwname, sizeof(fwname), "qca/rampatch_usb_%08x.bin",
++		 le32_to_cpu(ver->rom_version));
++
++	err = request_firmware(&fw, fwname, &hdev->dev);
++	if (err) {
++		BT_ERR("%s: failed to request rampatch file: %s (%d)",
++		       hdev->name, fwname, err);
++		return err;
++	}
++
++	BT_INFO("%s: using rampatch file: %s", hdev->name, fwname);
++	rver = (struct qca_rampatch_version *)(fw->data + info->ver_offset);
++	BT_INFO("%s: QCA: patch rome 0x%x build 0x%x, firmware rome 0x%x "
++		"build 0x%x", hdev->name, le16_to_cpu(rver->rom_version),
++		le16_to_cpu(rver->patch_version), le32_to_cpu(ver->rom_version),
++		le32_to_cpu(ver->patch_version));
++
++	if (rver->rom_version != ver->rom_version ||
++	    rver->patch_version <= ver->patch_version) {
++		BT_ERR("%s: rampatch file version did not match with firmware",
++		       hdev->name);
++		err = -EINVAL;
++		goto done;
++	}
++
++	err = btusb_setup_qca_download_fw(hdev, fw, info->rampatch_hdr);
++
++done:
++	release_firmware(fw);
++
++	return err;
++}
++
++static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
++				    struct qca_version *ver,
++				    const struct qca_device_info *info)
++{
++	const struct firmware *fw;
++	char fwname[64];
++	int err;
++
++	snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
++		 le32_to_cpu(ver->rom_version));
++
++	err = request_firmware(&fw, fwname, &hdev->dev);
++	if (err) {
++		BT_ERR("%s: failed to request NVM file: %s (%d)",
++		       hdev->name, fwname, err);
++		return err;
++	}
++
++	BT_INFO("%s: using NVM file: %s", hdev->name, fwname);
++
++	err = btusb_setup_qca_download_fw(hdev, fw, info->nvm_hdr);
++
++	release_firmware(fw);
++
++	return err;
++}
++
++static int btusb_setup_qca(struct hci_dev *hdev)
++{
++	const struct qca_device_info *info = NULL;
++	struct qca_version ver;
++	u8 status;
++	int i, err;
++
++	err = btusb_qca_send_vendor_req(hdev, QCA_GET_TARGET_VERSION, &ver,
++				        sizeof(ver));
++	if (err < 0)
++		return err;
++
++	for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
++		if (ver.rom_version == qca_devices_table[i].rom_version)
++			info = &qca_devices_table[i];
++	}
++	if (!info) {
++		BT_ERR("%s: don't support firmware rome 0x%x", hdev->name,
++		       le32_to_cpu(ver.rom_version));
++		return -ENODEV;
++	}
++
++	err = btusb_qca_send_vendor_req(hdev, QCA_CHECK_STATUS, &status,
++					sizeof(status));
++	if (err < 0)
++		return err;
++
++	if (!(status & QCA_PATCH_UPDATED)) {
++		err = btusb_setup_qca_load_rampatch(hdev, &ver, info);
++		if (err < 0)
++			return err;
++	}
++
++	if (!(status & QCA_SYSCFG_UPDATED)) {
++		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
++		if (err < 0)
++			return err;
++	}
++
++	return 0;
++}
++
+ static int btusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
+ {
+@@ -2791,6 +3040,11 @@ static int btusb_probe(struct usb_interface *intf,
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 	}
  
-@@ -359,20 +362,20 @@ TSPC_HOGP_13_17	True		Exchange MTU
- -------------------------------------------------------------------------------
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
--TSPC_HOGP_14_1	False (*)	Attribute Protocol supported over LE Transport
--TSPC_HOGP_14_2	False (*)	Generic Attribute Profile Client
--TSPC_HOGP_14_3	False (*)	Discover All Primary Services
--TSPC_HOGP_14_4	False (*)	Discover Primary Services by Service UUID
--TSPC_HOGP_14_5	False (*)	Discover All Characteristics of a Service
--TSPC_HOGP_14_6	False (*)	Discover Characteristics by UUID
--TSPC_HOGP_14_7	False (*)	Discover All Characteristic Descriptors
--TSPC_HOGP_14_8	False (*)	Read Characteristic Value
--TSPC_HOGP_14_9	False (*)	Read using Characteristic UUID
--TSPC_HOGP_14_10	False (*)	Read Characteristic Descriptors
--TSPC_HOGP_14_11	False (*)	Write without Response
--TSPC_HOGP_14_12	False (*)	Write Characteristic Value
--TSPC_HOGP_14_13	False (*)	Write Characteristic Descriptors
--TSPC_HOGP_14_14	False (*)	Notifications
-+TSPC_HOGP_14_1	False (*)	Attribute Protocol supported over LE Transport (M)
-+TSPC_HOGP_14_2	False (*)	Generic Attribute Profile Client (M)
-+TSPC_HOGP_14_3	False (*)	Discover All Primary Services (C.1)
-+TSPC_HOGP_14_4	False (*)	Discover Primary Services by Service UUID (C.1)
-+TSPC_HOGP_14_5	False (*)	Discover All Characteristics of a Service (O)
-+TSPC_HOGP_14_6	False (*)	Discover Characteristics by UUID (O)
-+TSPC_HOGP_14_7	False (*)	Discover All Characteristic Descriptors (M)
-+TSPC_HOGP_14_8	False (*)	Read Characteristic Value (M)
-+TSPC_HOGP_14_9	False (*)	Read using Characteristic UUID (M)
-+TSPC_HOGP_14_10	False (*)	Read Characteristic Descriptors (M)
-+TSPC_HOGP_14_11	False (*)	Write without Response (M)
-+TSPC_HOGP_14_12	False (*)	Write Characteristic Value (M)
-+TSPC_HOGP_14_13	False (*)	Write Characteristic Descriptors (M)
-+TSPC_HOGP_14_14	False (*)	Notifications (M)
- -------------------------------------------------------------------------------
- 
- 
-@@ -393,9 +396,9 @@ M.2: Mandatory if TSPC_HOGP_1_3 selected
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
- TSPC_HOGP_16_1	True		No Security Requirements (LE Security Level 1,
--					No Security)
-+					No Security) (M)
- TSPC_HOGP_16_2	True		Unauthenticated no MITM protection (LE Security
--					Level 2, Just Works)
-+					Level 2, Just Works) (M)
- TSPC_HOGP_16_3	True		Authenticated MITM protection (LE Security
--					Level 3, Passkey)
-+					Level 3, Passkey) (O)
- -------------------------------------------------------------------------------
-diff --git a/android/pixit-hogp.txt b/android/pixit-hogp.txt
-index d32fe69..e72948e 100644
---- a/android/pixit-hogp.txt
-+++ b/android/pixit-hogp.txt
-@@ -1,6 +1,6 @@
- HOGP PIXIT for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-@@ -25,4 +25,5 @@ TSPX_input_report_data					CDA6F8B3AA
- TSPX_output_report_data					001234567890EF
- TSPX_feature_report_data				872D3F45EA
- TSPX_tester_appearance					03C0
-+TSPX_iut_use_resolvable_random_address	FALSE
- -------------------------------------------------------------------------------
++	if (id->driver_info & BTUSB_QCA_ROME) {
++		data->setup_on_usb = btusb_setup_qca;
++		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
++	}
++
+ 	if (id->driver_info & BTUSB_AMP) {
+ 		/* AMP controllers do not support SCO packets */
+ 		data->isoc = NULL;
 -- 
-1.9.1
-
+1.8.1.5
