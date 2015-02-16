@@ -1,84 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 4/8] android/avdtp: Fix SEID generation
-Date: Mon, 16 Feb 2015 10:49:57 +0200
-Message-Id: <1424076601-22177-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1423528495-13173-1-git-send-email-jpawlowski@google.com>
+References: <1423528495-13173-1-git-send-email-jpawlowski@google.com>
+Date: Mon, 16 Feb 2015 10:46:34 +0200
+Message-ID: <CABBYNZLaFta8897Xr91UQ-sUy-COviXxRP84GKTyYSUQDfDjyg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5] doc/adapter-api.txt: StartFilteredDiscovery method.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Jakub,
 
-Fixes SEID generation for avdtp. Currently SEIDs were assigned assuming
-that SEID are registered and unregistered in the same order like:
-seid = g_slist_length(seps) + 1
-which makes it possible to reuse similar SEIDs
----
- android/Android.mk  | 1 +
- android/Makefile.am | 1 +
- android/avdtp.c     | 5 ++++-
- 3 files changed, 6 insertions(+), 1 deletion(-)
+On Tue, Feb 10, 2015 at 2:34 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> This patch proposes new method, StartFilteredDiscovery to D-Bus Adapter
+> API for desktop bluetoothd. It will allow for rapid discovery of nearby
+> devices that advertise services.
+>
+> It also adds FilteredDiscovery property, that is set to true when any
+> StartFilteredDiscovery session is active.
+>
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 91b9562..1f2095d 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -261,6 +261,7 @@ LOCAL_SRC_FILES := \
- 	bluez/btio/btio.c \
- 	bluez/lib/bluetooth.c \
- 	bluez/lib/hci.c \
-+	bluez/src/shared/util.c \
- 
- LOCAL_C_INCLUDES += \
- 	$(LOCAL_PATH)/bluez \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 4f13c4d..f8c76b3 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -102,6 +102,7 @@ noinst_PROGRAMS += android/avdtptest
- android_avdtptest_SOURCES = android/avdtptest.c \
- 				src/log.h src/log.c \
- 				btio/btio.h btio/btio.c \
-+				src/shared/util.h src/shared/util.c \
- 				android/avdtp.h android/avdtp.c
- android_avdtptest_CFLAGS = $(AM_CFLAGS)
- android_avdtptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-diff --git a/android/avdtp.c b/android/avdtp.c
-index 853fdf3..5bf9269 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -41,10 +41,12 @@
- 
- #include "lib/bluetooth.h"
- #include "src/log.h"
-+#include "src/shared/util.h"
- #include "avdtp.h"
- #include "../profiles/audio/a2dp-codecs.h"
- 
- #define MAX_SEID 0x3E
-+static uint64_t seids;
- 
- #ifndef MAX
- # define MAX(x, y) ((x) > (y) ? (x) : (y))
-@@ -3357,7 +3359,7 @@ struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
- 	sep = g_new0(struct avdtp_local_sep, 1);
- 
- 	sep->state = AVDTP_STATE_IDLE;
--	sep->info.seid = g_slist_length(lseps) + 1;
-+	sep->info.seid = util_get_bitmap64_uid(&seids, MAX_SEID);
- 	sep->info.type = type;
- 	sep->info.media_type = media_type;
- 	sep->codec = codec_type;
-@@ -3393,6 +3395,7 @@ int avdtp_unregister_sep(struct avdtp_local_sep *sep)
- 	DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
- 			sep->info.type, sep->codec, sep->info.seid);
- 
-+	util_clear_bitmap64(&seids, sep->info.seid);
- 	g_free(sep);
- 
- 	return 0;
+We don't use Signed-off-byin userspace, I can fix this myself this
+time but please don't sent patches with it anymore.
+
+> ---
+>  doc/adapter-api.txt | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 49 insertions(+)
+>
+> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+> index 74d235a..b59019d 100644
+> --- a/doc/adapter-api.txt
+> +++ b/doc/adapter-api.txt
+> @@ -22,6 +22,50 @@ Methods              void StartDiscovery()
+>                         Possible errors: org.bluez.Error.NotReady
+>                                          org.bluez.Error.Failed
+>
+> +               void StartFilteredDiscovery(dict filter)
+> +
+> +                       This method starts the device discovery session with
+> +                       filtering by uuids, and rssi or pathloss value. Use
+> +                       StopDiscovery to release the sessions acquired.
+> +
+> +                       Parameters that can be set in filter dictionary include
+> +                       the following:
+> +
+> +                       array{string} UUIDs : filtered service UUIDs (required)
+> +                       int16 RSSI      : RSSI threshold value (optional)
+> +                       uint16 pathloss : Pathloss threshold value (optional)
+> +                       string transport: type of scan to run
+> +
+> +                       When a device is found that advertise any UUID from
+> +                       UUIDs, it will be reported if:
+> +                       - pathloss and RSSI are both empty,
+> +                       - only pathloss param is set, device advertise TX pwer,
+> +                         and computed pathloss is less than pathloss param,
+> +                       - only RSSI param is set, and received RSSI is higher
+> +                         than RSSI param,
+> +
+> +                       transport parameter determines the type of scan:
+> +                               "auto"  - interleaved scan
+> +                               "bredr" - br/edr inquiry
+> +                               "le"    - le only scan, default value
+> +
+> +                       This process will start creating Device objects as new
+> +                       devices matching criteria are discovered. It will also
+> +                       emit PropertiesChanged signal for already existing
+> +                       Device objects, with updated RSSI value.
+> +
+> +                       StartDiscovery (SD) takes precedence over
+> +                       StartFilteredDiscovery (SFD). That means that you should
+> +                       check Discovering property before calling SFD, otherwise
+> +                       it would fail when any SD session is in progress.
+> +                       Calling SD when SFD is in progress pause all SFD
+> +                       sessions, and start them back when all SD sessions are
+> +                       finished. When filtered discovery state is changed,
+> +                       FilteredDiscovery variable is updated accordingly.
+> +
+> +                       Possible errors: org.bluez.Error.NotReady
+> +                                        org.bluez.Error.Failed
+> +
+>                 void StopDiscovery()
+>
+>                         This method will cancel any previous StartDiscovery
+> @@ -144,6 +188,11 @@ Properties string Address [readonly]
+>
+>                         Indicates that a device discovery procedure is active.
+>
+> +               boolean FilteredDiscovery [readonly]
+> +
+> +                       Indicates that a filtered device discovery procedure is
+> +                       active.
+> +
+>                 array{string} UUIDs [readonly]
+>
+>                         List of 128-bit UUIDs that represents the available
+> --
+> 2.2.0.rc0.207.ga3a616c
+
+@Marcel, Johan: Is this API okay for you? We should probably make them
+experimental to begin with.
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
