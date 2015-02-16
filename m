@@ -1,44 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 0/8] AVDTP deduplication
-Date: Mon, 16 Feb 2015 15:02:22 +0200
-Message-Id: <1424091750-29487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 3/3] android/gatt: Fix Find By Type request
+Date: Mon, 16 Feb 2015 13:36:45 +0100
+Message-Id: <1424090205-13432-3-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1424090205-13432-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1424090205-13432-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+With this patch GATT will correctly response with attribute not found if
+there is no attributes matching.
 
-Changes:
-	* v6: Fix uid_get/clear adding id checks
-	* v5: Use POSIX ffs() for bitmap get uid, limiting maximum number of local SEPs to 32.
-	* v4: Fix Android build and clear typos.
-        * v3: Convert gslist to queue for lseps, refactor lseps handlings, remove extra DBGs.
-        * v2: Fix fixup patch
-        * v1: Add SEID fixes with unit tests
-        * RFC: initial version
+Issue found and fix tested on UPF50
+---
+ android/gatt.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Andrei Emeltchenko (8):
-  unit/avdtp: Add SEP register/unregister tests
-  unit/avdtp: Add duplicate SEID test
-  shared/utils: Add helpers for bitfield id generation
-  android/avdtp: Fix SEID generation
-  unit/avdtp: Add check for too many SEP creation
-  android/avdtp: Fix registering SEP with wrong SEID
-  android/avdtp: Refactor local SEP list handling
-  unit/avdtp: Refactor context destroy
-
- android/Android.mk  |   2 +
- android/Makefile.am |   2 +
- android/a2dp.c      |  15 +++--
- android/avdtp.c     | 101 +++++++++++++++++++------------
- android/avdtp.h     |  10 ++-
- android/avdtptest.c |  10 ++-
- src/shared/util.c   |  29 +++++++++
- src/shared/util.h   |   3 +
- unit/test-avdtp.c   | 171 ++++++++++++++++++++++++++++++++++++++++++++--------
- 9 files changed, 273 insertions(+), 70 deletions(-)
-
+diff --git a/android/gatt.c b/android/gatt.c
+index f3a4e89..f8d5d38 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6290,10 +6290,8 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	data.search_value = search_value;
+ 	data.device = device;
+ 
+-	gatt_db_find_by_type(gatt_db, start, end, &uuid,
+-						find_by_type_request_cb, &data);
+-
+-	if (data.error == ATT_ECODE_ATTR_NOT_FOUND) {
++	if (gatt_db_find_by_type(gatt_db, start, end, &uuid,
++					find_by_type_request_cb, &data) == 0) {
+ 		size_t mtu;
+ 		uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
+ 
 -- 
-2.1.0
+1.8.4
 
