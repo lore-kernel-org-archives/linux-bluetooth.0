@@ -1,48 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1423826283-19270-1-git-send-email-gowtham.ab@samsung.com>
-References: <1423826283-19270-1-git-send-email-gowtham.ab@samsung.com>
-Date: Mon, 16 Feb 2015 14:30:28 +0200
-Message-ID: <CABBYNZJPbSQe+rsQDPjuNGZEBB-JKvs7yaWW9WoH0VvTCP_eUQ@mail.gmail.com>
-Subject: Re: [PATCH] monitor/l2cap: Add log msg for read_blob_rsp
+In-Reply-To: <1423838900-18110-1-git-send-email-bharat.panda@samsung.com>
+References: <1423838900-18110-1-git-send-email-bharat.panda@samsung.com>
+Date: Mon, 16 Feb 2015 14:22:43 +0200
+Message-ID: <CABBYNZ+59x_Zz2uG1qDUrO9u7dC2AztJqUCPzFxamTXtRgu3ww@mail.gmail.com>
+Subject: Re: [PATCH 0/6] Add Read Characteristic Descriptors test cases
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: Bharat Panda <bharat.panda@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+	cpgs@samsung.com, Gowtham Anandha Babu <gowtham.ab@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi Bharat,
 
-On Fri, Feb 13, 2015 at 1:18 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
->> ACL Data RX: Handle 71 flags 0x02 dlen 27                                                                                                                                                 [hci0] 79.680052
->       ATT: Read Blob Response (0x0d) len 22
->         Part of Attribute Value:
->         11 22 33 44 55 66 77 88 99 00 12 34 56 78 90 12  ."3DUfw....4Vx..
->         34 56 78 90 12 34                                4Vx..4
-> ---
->  monitor/l2cap.c | 1 +
->  1 file changed, 1 insertion(+)
+On Fri, Feb 13, 2015 at 4:48 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> This patch-set adds the GATT client unit test cases for,
 >
-> diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-> index 0030a4c..d58c14f 100644
-> --- a/monitor/l2cap.c
-> +++ b/monitor/l2cap.c
-> @@ -2198,6 +2198,7 @@ static void att_read_blob_req(const struct l2cap_frame *frame)
+> 1) Read Characteristic Descriptors by Client
+> 2) Read Characteristic Descriptors - Read Not Permitted
+> 3) Read Characteristic Descriptors - Invalid Handle]
+> 4) Read Characteristic Descriptors - Insufficient Authorization
+> 5) Read Characteristic Descriptors - Insufficient Authentication
+> 6) Read Characteristic Descriptors - Insufficient Encryption Key Size
 >
->  static void att_read_blob_rsp(const struct l2cap_frame *frame)
->  {
-> +       print_field("Part of Attribute Value:");
->         packet_hexdump(frame->data, frame->size);
->  }
+> Bharat Panda (3):
+>   unit/gatt: Add TP/GAR/CL/BI-25-C test
+>   unit/gatt: Add TP/GAR/CL/BI-26-C test
+>   unit/gatt: Add TP/GAR/CL/BI-27-C test
+>
+> Gowtham Anandha Babu (3):
+>   unit/gatt: Add /TP/GAR/CL/BV-06-C test
+>   unit/gatt: Add TP/GAR/CL/BI-23-C test
+>   unit/gatt: Add TP/GAR/CL/BI-24-C test
+>
+>  unit/test-gatt.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 68 insertions(+)
 >
 > --
 > 1.9.1
 
-I would use  print_hex_field("Value", frame->data, frame->size); like
-in att_read_rsp if you really want a label.
+Applied, thanks.
 
 
 -- 
