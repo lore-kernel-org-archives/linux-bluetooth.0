@@ -1,33 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v1] monitor/l2cap: Add log msg for read_blob_rsp
-Date: Mon, 16 Feb 2015 19:07:21 +0530
-Message-id: <1424093841-28541-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCHv6 1/8] unit/avdtp: Add SEP register/unregister tests
+Date: Mon, 16 Feb 2015 15:02:23 +0200
+Message-Id: <1424091750-29487-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1424091750-29487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1424091750-29487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-      ATT: Read Blob Response (0x0d) len 22
-        Value: 11223344556677889900123456789012345678901234
----
- monitor/l2cap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 0030a4c..8e93437 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -2198,7 +2198,7 @@ static void att_read_blob_req(const struct l2cap_frame *frame)
+Add register_sep and unregister_sep testing registering maximum amount
+of SEPs.
+---
+ unit/test-avdtp.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+index 8fe5ce3..d20efa5 100644
+--- a/unit/test-avdtp.c
++++ b/unit/test-avdtp.c
+@@ -39,6 +39,10 @@
+ #include "src/log.h"
+ #include "android/avdtp.h"
  
- static void att_read_blob_rsp(const struct l2cap_frame *frame)
- {
--	packet_hexdump(frame->data, frame->size);
-+	print_hex_field("Value", frame->data, frame->size);
++#define MAX_SEID 0x3E
++
++GSList *lseps = NULL;
++
+ struct test_pdu {
+ 	bool valid;
+ 	bool fragmented;
+@@ -551,6 +555,34 @@ static void test_server_0_sep(gconstpointer data)
+ 	execute_context(context);
  }
  
- static void att_read_multiple_req(const struct l2cap_frame *frame)
++static void unregister_sep(void *data)
++{
++	struct avdtp_local_sep *sep = data;
++
++	avdtp_unregister_sep(sep);
++}
++
++static void test_server_seid(gconstpointer data)
++{
++	struct context *context = create_context(0x0103, data);
++	struct avdtp_local_sep *sep;
++	unsigned int i;
++
++	for (i = 0; i < sizeof(int) * 8; i++) {
++		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
++						AVDTP_MEDIA_TYPE_AUDIO,
++						0x00, TRUE, &sep_ind, NULL,
++						context);
++		g_assert(sep);
++
++		lseps = g_slist_append(lseps, sep);
++	}
++
++	/* Remove all SEPs */
++	g_slist_free_full(lseps, unregister_sep);
++	lseps = NULL;
++}
++
+ static gboolean sep_getcap_ind_frg(struct avdtp *session,
+ 					struct avdtp_local_sep *sep,
+ 					GSList **caps, uint8_t *err,
+@@ -738,6 +770,8 @@ int main(int argc, char *argv[])
+ 	 * To verify that the following procedures are implemented according to
+ 	 * their specification in AVDTP.
+ 	 */
++	define_test("/TP/SIG/SMG/BV-06-C-SEID-1", test_server_seid,
++			raw_pdu(0x00));
+ 	define_test("/TP/SIG/SMG/BV-05-C", test_client,
+ 			raw_pdu(0x00, 0x01));
+ 	define_test("/TP/SIG/SMG/BV-06-C", test_server,
 -- 
-1.9.1
+2.1.0
 
