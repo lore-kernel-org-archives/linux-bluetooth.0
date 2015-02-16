@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 5/8] unit/avdtp: Add check for too many SEP creation
-Date: Mon, 16 Feb 2015 10:49:58 +0200
-Message-Id: <1424076601-22177-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 3/8] shared/utils: Add helpers for bitfield fast uid generation
+Date: Mon, 16 Feb 2015 10:49:56 +0200
+Message-Id: <1424076601-22177-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,29 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test checks that maximum numbers of SEPs registered is MAX_SEID.
+For small unique id generation we may use bitfield since it is very fast
+and memory efficient. If we need to generate id from 1 to 64 helper
+functions are added to utils.
 ---
- unit/test-avdtp.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ src/shared/util.c | 24 ++++++++++++++++++++++++
+ src/shared/util.h |  3 +++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index 3e75c16..87c1c3a 100644
---- a/unit/test-avdtp.c
-+++ b/unit/test-avdtp.c
-@@ -578,6 +578,13 @@ static void test_server_seid(gconstpointer data)
- 		lseps = g_slist_append(lseps, sep);
- 	}
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 74ffb08..3ae6b9e 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -106,3 +106,27 @@ unsigned char util_get_dt(const char *parent, const char *name)
  
-+	/* Now add (MAX_SEID + 1) SEP -> it shall fail */
-+	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						0x00, TRUE, &sep_ind, NULL,
-+						context);
-+	g_assert(!sep);
+ 	return DT_UNKNOWN;
+ }
 +
- 	/* Remove all SEPs */
- 	g_slist_free_full(lseps, unregister_sep);
- 	lseps = NULL;
++/* Helpers for bitfield operations */
++/* Find unique id from 1 to max */
++uint8_t util_get_bitmap64_uid(uint64_t *bitmap, uint8_t max)
++{
++	uint64_t temp = *bitmap >> 1;
++	uint64_t id = 1;
++
++	for (; temp & 0x01; temp >>= 1)
++		id++;
++
++	if (id > max)
++		return 0;
++
++	*bitmap |= 0x01l << id;
++
++	return id;
++}
++
++/* Clear id bit in bitmap */
++void util_clear_bitmap64(uint64_t *bitmap, uint8_t id)
++{
++	*bitmap &= ~(0x01l << id);
++}
+diff --git a/src/shared/util.h b/src/shared/util.h
+index 8437662..8f28c24 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -93,6 +93,9 @@ void util_hexdump(const char dir, const unsigned char *buf, size_t len,
+ 
+ unsigned char util_get_dt(const char *parent, const char *name);
+ 
++uint8_t util_get_bitmap64_uid(uint64_t *bitmap, uint8_t max);
++void util_clear_bitmap64(uint64_t *bitmap, uint8_t id);
++
+ static inline void bswap_128(const void *src, void *dst)
+ {
+ 	const uint8_t *s = src;
 -- 
 2.1.0
 
