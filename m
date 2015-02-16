@@ -1,60 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 8/8] unit/avdtp: Refactor context destroy
-Date: Mon, 16 Feb 2015 10:50:01 +0200
-Message-Id: <1424076601-22177-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 0/8] AVDTP deduplication
+Date: Mon, 16 Feb 2015 10:49:53 +0200
+Message-Id: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-destroy_context() function will be used for dummy_tests without
-context_execute()
----
- unit/test-avdtp.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+Changes:
+	* v4: Fix Android build and clear typos.
+        * v3: Convert gslist to queue for lseps, refactor lseps handlings, remove extra DBGs.
+        * v2: Fix fixup patch
+        * v1: Add SEID fixes with unit tests
+        * RFC: initial version
 
-diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index 0f59061..e4d8bb2 100644
---- a/unit/test-avdtp.c
-+++ b/unit/test-avdtp.c
-@@ -259,10 +259,8 @@ static struct context *create_context(uint16_t version, gconstpointer data)
- 	return context_new(version, 672, 672, data);
- }
- 
--static void execute_context(struct context *context)
-+static void destroy_context(struct context *context)
- {
--	g_main_loop_run(context->main_loop);
--
- 	if (context->source > 0)
- 		g_source_remove(context->source);
- 	avdtp_unref(context->session);
-@@ -273,6 +271,13 @@ static void execute_context(struct context *context)
- 	g_free(context);
- }
- 
-+static void execute_context(struct context *context)
-+{
-+	g_main_loop_run(context->main_loop);
-+
-+	destroy_context(context);
-+}
-+
- static gboolean sep_getcap_ind(struct avdtp *session,
- 					struct avdtp_local_sep *sep,
- 					GSList **caps, uint8_t *err,
-@@ -601,6 +606,7 @@ static void test_server_seid(gconstpointer data)
- 
- 	/* Remove all SEPs */
- 	queue_destroy(lseps, unregister_sep);
-+	destroy_context(context);
- }
- 
- static void test_server_seid_duplicate(gconstpointer data)
+Andrei Emeltchenko (8):
+  unit/avdtp: Add SEP register/unregister tests
+  unit/avdtp: Add duplicate SEID test
+  shared/utils: Add helpers for bitfield fast uid generation
+  android/avdtp: Fix SEID generation
+  unit/avdtp: Add check for too many SEP creation
+  android/avdtp: Fix registering SEP with wrong SEID
+  android/avdtp: Refactor local SEP list handling
+  unit/avdtp: Refactor context destroy
+
+ android/Android.mk  |   2 +
+ android/Makefile.am |   2 +
+ android/a2dp.c      |  15 +++--
+ android/avdtp.c     | 101 +++++++++++++++++++------------
+ android/avdtp.h     |  10 ++-
+ android/avdtptest.c |  10 ++-
+ src/shared/util.c   |  24 ++++++++
+ src/shared/util.h   |   3 +
+ unit/test-avdtp.c   | 171 ++++++++++++++++++++++++++++++++++++++++++++--------
+ 9 files changed, 268 insertions(+), 70 deletions(-)
+
 -- 
 2.1.0
 
