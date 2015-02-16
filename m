@@ -1,31 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] tools/btmgmt: Fix illegal memory access
-Date: Mon, 16 Feb 2015 11:03:26 +0200
-Message-Id: <1424077406-22281-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 2/8] unit/avdtp: Add duplicate SEID test
+Date: Mon, 16 Feb 2015 10:49:55 +0200
+Message-Id: <1424076601-22177-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Add test adding two SEP, then remove first and create another one. With
+the current code new SEP has the same SEID (2!). Following patches
+fixing the bug.
 ---
- tools/btmgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ unit/test-avdtp.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 7cf82e2..3ff0724 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -3392,7 +3392,7 @@ static char *cmd_generator(const char *text, int state)
- 			return strdup(cmd);
- 	}
+diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+index c9ff014..3e75c16 100644
+--- a/unit/test-avdtp.c
++++ b/unit/test-avdtp.c
+@@ -583,6 +583,46 @@ static void test_server_seid(gconstpointer data)
+ 	lseps = NULL;
+ }
  
--	while (j++ < NELEM(interactive_cmd)) {
-+	while (j < NELEM(interactive_cmd)) {
- 		cmd = interactive_cmd[j++].cmd;
- 
- 		if (!strncmp(cmd, text, len))
++static void test_server_seid_duplicate(gconstpointer data)
++{
++	struct context *context = create_context(0x0103, data);
++	struct avdtp_local_sep *sep;
++	int i;
++
++	for (i = 0; i < 2; i++) {
++		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
++						AVDTP_MEDIA_TYPE_AUDIO,
++						0x00, TRUE, &sep_ind, NULL,
++						context);
++		g_assert(sep);
++
++		lseps = g_slist_append(lseps, sep);
++	}
++
++	/* Remove 1st element */
++	sep = g_slist_nth_data(lseps, 0);
++	lseps = g_slist_remove(lseps, sep);
++	avdtp_unregister_sep(sep);
++
++	/* Now register new element */
++	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
++						AVDTP_MEDIA_TYPE_AUDIO,
++						0x00, TRUE, &sep_ind, NULL,
++						context);
++	g_assert(sep);
++	lseps = g_slist_append(lseps, sep);
++
++	/* Check SEID ids */
++
++	g_idle_add(send_pdu, context);
++
++	execute_context(context);
++
++	/* Remove all SEPs */
++	g_slist_free_full(lseps, unregister_sep);
++	lseps = NULL;
++}
++
+ static gboolean sep_getcap_ind_frg(struct avdtp *session,
+ 					struct avdtp_local_sep *sep,
+ 					GSList **caps, uint8_t *err,
+@@ -772,6 +812,9 @@ int main(int argc, char *argv[])
+ 	 */
+ 	define_test("/TP/SIG/SMG/BV-06-C-SEID-1", test_server_seid,
+ 			raw_pdu(0x00));
++	define_test("/TP/SIG/SMG/BV-06-C-SEID-2", test_server_seid_duplicate,
++			raw_pdu(0x00, 0x01),
++			raw_pdu(0x02, 0x01, 0x08, 0x08, 0x04, 0x08));
+ 	define_test("/TP/SIG/SMG/BV-05-C", test_client,
+ 			raw_pdu(0x00, 0x01));
+ 	define_test("/TP/SIG/SMG/BV-06-C", test_server,
 -- 
 2.1.0
 
