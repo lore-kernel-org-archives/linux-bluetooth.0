@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 8/8] unit/avdtp: Refactor context destroy
-Date: Mon, 16 Feb 2015 13:08:15 +0200
-Message-Id: <1424084895-20639-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 1/8] unit/avdtp: Add SEP register/unregister tests
+Date: Mon, 16 Feb 2015 13:08:08 +0200
+Message-Id: <1424084895-20639-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1424084895-20639-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1424084895-20639-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,50 +11,71 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-destroy_context() function will be used for dummy_tests without
-context_execute()
+Add register_sep and unregister_sep testing registering maximum amount
+of SEPs.
 ---
- unit/test-avdtp.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ unit/test-avdtp.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index 3974c66..737965d 100644
+index 8fe5ce3..d20efa5 100644
 --- a/unit/test-avdtp.c
 +++ b/unit/test-avdtp.c
-@@ -259,10 +259,8 @@ static struct context *create_context(uint16_t version, gconstpointer data)
- 	return context_new(version, 672, 672, data);
- }
+@@ -39,6 +39,10 @@
+ #include "src/log.h"
+ #include "android/avdtp.h"
  
--static void execute_context(struct context *context)
-+static void destroy_context(struct context *context)
- {
--	g_main_loop_run(context->main_loop);
--
- 	if (context->source > 0)
- 		g_source_remove(context->source);
- 	avdtp_unref(context->session);
-@@ -273,6 +271,13 @@ static void execute_context(struct context *context)
- 	g_free(context);
- }
- 
-+static void execute_context(struct context *context)
-+{
-+	g_main_loop_run(context->main_loop);
++#define MAX_SEID 0x3E
 +
-+	destroy_context(context);
++GSList *lseps = NULL;
++
+ struct test_pdu {
+ 	bool valid;
+ 	bool fragmented;
+@@ -551,6 +555,34 @@ static void test_server_0_sep(gconstpointer data)
+ 	execute_context(context);
+ }
+ 
++static void unregister_sep(void *data)
++{
++	struct avdtp_local_sep *sep = data;
++
++	avdtp_unregister_sep(sep);
 +}
 +
- static gboolean sep_getcap_ind(struct avdtp *session,
++static void test_server_seid(gconstpointer data)
++{
++	struct context *context = create_context(0x0103, data);
++	struct avdtp_local_sep *sep;
++	unsigned int i;
++
++	for (i = 0; i < sizeof(int) * 8; i++) {
++		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
++						AVDTP_MEDIA_TYPE_AUDIO,
++						0x00, TRUE, &sep_ind, NULL,
++						context);
++		g_assert(sep);
++
++		lseps = g_slist_append(lseps, sep);
++	}
++
++	/* Remove all SEPs */
++	g_slist_free_full(lseps, unregister_sep);
++	lseps = NULL;
++}
++
+ static gboolean sep_getcap_ind_frg(struct avdtp *session,
  					struct avdtp_local_sep *sep,
  					GSList **caps, uint8_t *err,
-@@ -601,6 +606,7 @@ static void test_server_seid(gconstpointer data)
- 
- 	/* Remove all SEPs */
- 	queue_destroy(lseps, unregister_sep);
-+	destroy_context(context);
- }
- 
- static void test_server_seid_duplicate(gconstpointer data)
+@@ -738,6 +770,8 @@ int main(int argc, char *argv[])
+ 	 * To verify that the following procedures are implemented according to
+ 	 * their specification in AVDTP.
+ 	 */
++	define_test("/TP/SIG/SMG/BV-06-C-SEID-1", test_server_seid,
++			raw_pdu(0x00));
+ 	define_test("/TP/SIG/SMG/BV-05-C", test_client,
+ 			raw_pdu(0x00, 0x01));
+ 	define_test("/TP/SIG/SMG/BV-06-C", test_server,
 -- 
 2.1.0
 
