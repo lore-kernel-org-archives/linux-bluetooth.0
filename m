@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 1/8] unit/avdtp: Add SEP register/unregister tests
-Date: Mon, 16 Feb 2015 10:49:54 +0200
-Message-Id: <1424076601-22177-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 4/8] android/avdtp: Fix SEID generation
+Date: Mon, 16 Feb 2015 10:49:57 +0200
+Message-Id: <1424076601-22177-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1424076601-22177-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,71 +11,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add register_sep and unregister_sep testing registering maximum amount
-of SEPs.
+Fixes SEID generation for avdtp. Currently SEIDs were assigned assuming
+that SEID are registered and unregistered in the same order like:
+seid = g_slist_length(seps) + 1
+which makes it possible to reuse similar SEIDs
 ---
- unit/test-avdtp.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ android/Android.mk  | 1 +
+ android/Makefile.am | 1 +
+ android/avdtp.c     | 5 ++++-
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index 8fe5ce3..c9ff014 100644
---- a/unit/test-avdtp.c
-+++ b/unit/test-avdtp.c
-@@ -39,6 +39,10 @@
+diff --git a/android/Android.mk b/android/Android.mk
+index 91b9562..1f2095d 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -261,6 +261,7 @@ LOCAL_SRC_FILES := \
+ 	bluez/btio/btio.c \
+ 	bluez/lib/bluetooth.c \
+ 	bluez/lib/hci.c \
++	bluez/src/shared/util.c \
+ 
+ LOCAL_C_INCLUDES += \
+ 	$(LOCAL_PATH)/bluez \
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 4f13c4d..f8c76b3 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -102,6 +102,7 @@ noinst_PROGRAMS += android/avdtptest
+ android_avdtptest_SOURCES = android/avdtptest.c \
+ 				src/log.h src/log.c \
+ 				btio/btio.h btio/btio.c \
++				src/shared/util.h src/shared/util.c \
+ 				android/avdtp.h android/avdtp.c
+ android_avdtptest_CFLAGS = $(AM_CFLAGS)
+ android_avdtptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 853fdf3..5bf9269 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -41,10 +41,12 @@
+ 
+ #include "lib/bluetooth.h"
  #include "src/log.h"
- #include "android/avdtp.h"
++#include "src/shared/util.h"
+ #include "avdtp.h"
+ #include "../profiles/audio/a2dp-codecs.h"
  
-+#define MAX_SEID 0x3E
-+
-+GSList *lseps = NULL;
-+
- struct test_pdu {
- 	bool valid;
- 	bool fragmented;
-@@ -551,6 +555,34 @@ static void test_server_0_sep(gconstpointer data)
- 	execute_context(context);
- }
+ #define MAX_SEID 0x3E
++static uint64_t seids;
  
-+static void unregister_sep(void *data)
-+{
-+	struct avdtp_local_sep *sep = data;
-+
-+	avdtp_unregister_sep(sep);
-+}
-+
-+static void test_server_seid(gconstpointer data)
-+{
-+	struct context *context = create_context(0x0103, data);
-+	struct avdtp_local_sep *sep;
-+	int i;
-+
-+	for (i = 0; i < MAX_SEID; i++) {
-+		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						0x00, TRUE, &sep_ind, NULL,
-+						context);
-+		g_assert(sep);
-+
-+		lseps = g_slist_append(lseps, sep);
-+	}
-+
-+	/* Remove all SEPs */
-+	g_slist_free_full(lseps, unregister_sep);
-+	lseps = NULL;
-+}
-+
- static gboolean sep_getcap_ind_frg(struct avdtp *session,
- 					struct avdtp_local_sep *sep,
- 					GSList **caps, uint8_t *err,
-@@ -738,6 +770,8 @@ int main(int argc, char *argv[])
- 	 * To verify that the following procedures are implemented according to
- 	 * their specification in AVDTP.
- 	 */
-+	define_test("/TP/SIG/SMG/BV-06-C-SEID-1", test_server_seid,
-+			raw_pdu(0x00));
- 	define_test("/TP/SIG/SMG/BV-05-C", test_client,
- 			raw_pdu(0x00, 0x01));
- 	define_test("/TP/SIG/SMG/BV-06-C", test_server,
+ #ifndef MAX
+ # define MAX(x, y) ((x) > (y) ? (x) : (y))
+@@ -3357,7 +3359,7 @@ struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
+ 	sep = g_new0(struct avdtp_local_sep, 1);
+ 
+ 	sep->state = AVDTP_STATE_IDLE;
+-	sep->info.seid = g_slist_length(lseps) + 1;
++	sep->info.seid = util_get_bitmap64_uid(&seids, MAX_SEID);
+ 	sep->info.type = type;
+ 	sep->info.media_type = media_type;
+ 	sep->codec = codec_type;
+@@ -3393,6 +3395,7 @@ int avdtp_unregister_sep(struct avdtp_local_sep *sep)
+ 	DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
+ 			sep->info.type, sep->codec, sep->info.seid);
+ 
++	util_clear_bitmap64(&seids, sep->info.seid);
+ 	g_free(sep);
+ 
+ 	return 0;
 -- 
 2.1.0
 
