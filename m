@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 5/8] unit/avdtp: Add check for too many SEP creation
-Date: Mon, 16 Feb 2015 15:02:27 +0200
-Message-Id: <1424091750-29487-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 8/8] unit/avdtp: Refactor context destroy
+Date: Mon, 16 Feb 2015 15:02:30 +0200
+Message-Id: <1424091750-29487-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1424091750-29487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1424091750-29487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,29 +11,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test checks that maximum numbers of SEPs registered is MAX_SEID.
+destroy_context() function will be used for dummy_tests without
+context_execute()
 ---
- unit/test-avdtp.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ unit/test-avdtp.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index f2ef767..34820d1 100644
+index 3974c66..737965d 100644
 --- a/unit/test-avdtp.c
 +++ b/unit/test-avdtp.c
-@@ -578,6 +578,13 @@ static void test_server_seid(gconstpointer data)
- 		lseps = g_slist_append(lseps, sep);
- 	}
+@@ -259,10 +259,8 @@ static struct context *create_context(uint16_t version, gconstpointer data)
+ 	return context_new(version, 672, 672, data);
+ }
  
-+	/* Now add (MAX_SEID + 1) SEP -> it shall fail */
-+	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						0x00, TRUE, &sep_ind, NULL,
-+						context);
-+	g_assert(!sep);
+-static void execute_context(struct context *context)
++static void destroy_context(struct context *context)
+ {
+-	g_main_loop_run(context->main_loop);
+-
+ 	if (context->source > 0)
+ 		g_source_remove(context->source);
+ 	avdtp_unref(context->session);
+@@ -273,6 +271,13 @@ static void execute_context(struct context *context)
+ 	g_free(context);
+ }
+ 
++static void execute_context(struct context *context)
++{
++	g_main_loop_run(context->main_loop);
 +
++	destroy_context(context);
++}
++
+ static gboolean sep_getcap_ind(struct avdtp *session,
+ 					struct avdtp_local_sep *sep,
+ 					GSList **caps, uint8_t *err,
+@@ -601,6 +606,7 @@ static void test_server_seid(gconstpointer data)
+ 
  	/* Remove all SEPs */
- 	g_slist_free_full(lseps, unregister_sep);
- 	lseps = NULL;
+ 	queue_destroy(lseps, unregister_sep);
++	destroy_context(context);
+ }
+ 
+ static void test_server_seid_duplicate(gconstpointer data)
 -- 
 2.1.0
 
