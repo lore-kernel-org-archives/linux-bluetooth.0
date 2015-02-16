@@ -1,122 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com
-References: <1423755046-7688-1-git-send-email-bharat.panda@samsung.com>
-In-reply-to: <1423755046-7688-1-git-send-email-bharat.panda@samsung.com>
-Subject: RE: [PATCH v2] tools/gatt-client: print read/write error messages
-Date: Tue, 17 Feb 2015 11:10:51 +0530
-Message-id: <009501d04a74$4b599c10$e20cd430$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH] Bluetooth: Fix accepting early data on fixed channels
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1424079731-21609-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 16 Feb 2015 07:50:05 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <8CD4CA63-DE42-47C4-9AC4-36FA960DEC0D@holtmann.org>
+References: <1424079731-21609-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+Hi Johan,
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Bharat Panda
-> Sent: Thursday, February 12, 2015 9:01 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: cpgs@samsung.com; Bharat Panda
-> Subject: [PATCH v2] tools/gatt-client: print read/write error messages
+> On BR/EDR the L2CAP channel instances for fixed channels have so far
+> been marked as ready only once the L2CAP information req/rsp procedure
+> is complete and we have the fixed channel mask. This could however lead
+> to data being dropped if we receive it on the channel before knowing the
+> remote mask.
 > 
-> Convert error codes to error messages for read/write value error
-responses.
+> Since it is valid for a remote to send data this early, simply assume
+> that the channel is supported when we receive data on it. So far this
+> hasn't been noticed much because of limited use of fixed channels on
+> BR/EDR, but e.g. with SMP over BR/EDR this is already now visible with
+> automated tests failing randomly.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  tools/btgatt-client.c | 49
-> ++++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 46 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c index
-> 8bda89b..3dd75b4 100644
-> --- a/tools/btgatt-client.c
-> +++ b/tools/btgatt-client.c
-> @@ -74,6 +74,48 @@ static void print_prompt(void)
->  	fflush(stdout);
->  }
-> 
-> +static const char *ecode_to_string(uint8_t ecode) {
-> +	switch (ecode) {
-> +	case BT_ATT_ERROR_INVALID_HANDLE:
-> +		return "Invalid Handle";
-> +	case BT_ATT_ERROR_READ_NOT_PERMITTED:
-> +		return "Read Not Permitted";
-> +	case BT_ATT_ERROR_WRITE_NOT_PERMITTED:
-> +		return "Write Not Permitted";
-> +	case BT_ATT_ERROR_INVALID_PDU:
-> +		return "Invalid PDU";
-> +	case BT_ATT_ERROR_AUTHENTICATION:
-> +		return "Authentication Required";
-> +	case BT_ATT_ERROR_REQUEST_NOT_SUPPORTED:
-> +		return "Request Not Supported";
-> +	case BT_ATT_ERROR_INVALID_OFFSET:
-> +		return "Invalid Offset";
-> +	case BT_ATT_ERROR_AUTHORIZATION:
-> +		return "Authorization Required";
-> +	case BT_ATT_ERROR_PREPARE_QUEUE_FULL:
-> +		return "Prepare Write Queue Full";
-> +	case BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND:
-> +		return "Attribute Not Found";
-> +	case BT_ATT_ERROR_ATTRIBUTE_NOT_LONG:
-> +		return "Attribute Not Long";
-> +	case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE:
-> +		return "Insuficient Encryption Key Size";
-> +	case BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN:
-> +		return "Invalid Attribute value len";
-> +	case BT_ATT_ERROR_UNLIKELY:
-> +		return "Unlikely Error";
-> +	case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION:
-> +		return "Insufficient Encryption";
-> +	case BT_ATT_ERROR_UNSUPPORTED_GROUP_TYPE:
-> +		return "Group type Not Supported";
-> +	case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
-> +		return "Insufficient Resources";
-> +	default:
-> +		return "Unknown error type";
-> +	}
-> +}
-> +
->  static void att_disconnect_cb(int err, void *user_data)  {
->  	printf("Device disconnected: %s\n", strerror(err)); @@ -489,7 +531,8
-> @@ static void read_cb(bool success, uint8_t att_ecode, const uint8_t
-> *value,
->  	int i;
-> 
->  	if (!success) {
-> -		PRLOG("\nRead request failed: 0x%02x\n", att_ecode);
-> +		PRLOG("\nRead request failed: %s\n",
-> +				ecode_to_string(att_ecode));
->  		return;
->  	}
-> 
-> @@ -596,7 +639,7 @@ static void write_cb(bool success, uint8_t att_ecode,
-> void *user_data)
->  	if (success) {
->  		PRLOG("\nWrite successful\n");
->  	} else {
-> -		PRLOG("\nWrite failed: 0x%02x\n", att_ecode);
-> +		PRLOG("\nWrite failed: %s\n", ecode_to_string(att_ecode));
->  	}
->  }
-> 
-> @@ -726,7 +769,7 @@ static void write_long_cb(bool success, bool
-> reliable_error, uint8_t att_ecode,
->  	} else if (reliable_error) {
->  		PRLOG("Reliable write not verified\n");
->  	} else {
-> -		PRLOG("Write failed: 0x%02x\n", att_ecode);
-> +		PRLOG("\nWrite failed: %s\n", ecode_to_string(att_ecode));
->  	}
->  }
-> 
-> --
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+> net/bluetooth/l2cap_core.c | 14 ++++++++++++++
+> 1 file changed, 14 insertions(+)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
