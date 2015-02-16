@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 8/8] unit/avdtp: Refactor context destroy
-Date: Mon, 16 Feb 2015 15:02:30 +0200
-Message-Id: <1424091750-29487-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 2/8] unit/avdtp: Add duplicate SEID test
+Date: Mon, 16 Feb 2015 15:02:24 +0200
+Message-Id: <1424091750-29487-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1424091750-29487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1424091750-29487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,50 +11,74 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-destroy_context() function will be used for dummy_tests without
-context_execute()
+Add test adding two SEP, then remove first and create another one. With
+the current code new SEP has the same SEID (2!). Following patches
+fixing the bug.
 ---
- unit/test-avdtp.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ unit/test-avdtp.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
 diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index 3974c66..737965d 100644
+index d20efa5..f2ef767 100644
 --- a/unit/test-avdtp.c
 +++ b/unit/test-avdtp.c
-@@ -259,10 +259,8 @@ static struct context *create_context(uint16_t version, gconstpointer data)
- 	return context_new(version, 672, 672, data);
+@@ -583,6 +583,46 @@ static void test_server_seid(gconstpointer data)
+ 	lseps = NULL;
  }
  
--static void execute_context(struct context *context)
-+static void destroy_context(struct context *context)
- {
--	g_main_loop_run(context->main_loop);
--
- 	if (context->source > 0)
- 		g_source_remove(context->source);
- 	avdtp_unref(context->session);
-@@ -273,6 +271,13 @@ static void execute_context(struct context *context)
- 	g_free(context);
- }
- 
-+static void execute_context(struct context *context)
++static void test_server_seid_duplicate(gconstpointer data)
 +{
-+	g_main_loop_run(context->main_loop);
++	struct context *context = create_context(0x0103, data);
++	struct avdtp_local_sep *sep;
++	int i;
 +
-+	destroy_context(context);
++	for (i = 0; i < 2; i++) {
++		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
++						AVDTP_MEDIA_TYPE_AUDIO,
++						0x00, TRUE, &sep_ind, NULL,
++						context);
++		g_assert(sep);
++
++		lseps = g_slist_append(lseps, sep);
++	}
++
++	/* Remove 1st element */
++	sep = g_slist_nth_data(lseps, 0);
++	lseps = g_slist_remove(lseps, sep);
++	avdtp_unregister_sep(sep);
++
++	/* Now register new element */
++	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
++						AVDTP_MEDIA_TYPE_AUDIO,
++						0x00, TRUE, &sep_ind, NULL,
++						context);
++	g_assert(sep);
++	lseps = g_slist_append(lseps, sep);
++
++	/* Check SEID ids */
++
++	g_idle_add(send_pdu, context);
++
++	execute_context(context);
++
++	/* Remove all SEPs */
++	g_slist_free_full(lseps, unregister_sep);
++	lseps = NULL;
 +}
 +
- static gboolean sep_getcap_ind(struct avdtp *session,
+ static gboolean sep_getcap_ind_frg(struct avdtp *session,
  					struct avdtp_local_sep *sep,
  					GSList **caps, uint8_t *err,
-@@ -601,6 +606,7 @@ static void test_server_seid(gconstpointer data)
- 
- 	/* Remove all SEPs */
- 	queue_destroy(lseps, unregister_sep);
-+	destroy_context(context);
- }
- 
- static void test_server_seid_duplicate(gconstpointer data)
+@@ -772,6 +812,9 @@ int main(int argc, char *argv[])
+ 	 */
+ 	define_test("/TP/SIG/SMG/BV-06-C-SEID-1", test_server_seid,
+ 			raw_pdu(0x00));
++	define_test("/TP/SIG/SMG/BV-06-C-SEID-2", test_server_seid_duplicate,
++			raw_pdu(0x00, 0x01),
++			raw_pdu(0x02, 0x01, 0x08, 0x08, 0x04, 0x08));
+ 	define_test("/TP/SIG/SMG/BV-05-C", test_client,
+ 			raw_pdu(0x00, 0x01));
+ 	define_test("/TP/SIG/SMG/BV-06-C", test_server,
 -- 
 2.1.0
 
