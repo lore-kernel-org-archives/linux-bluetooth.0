@@ -1,39 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 5/8] unit/avdtp: Add check for too many SEP creation
-Date: Mon, 16 Feb 2015 13:08:12 +0200
-Message-Id: <1424084895-20639-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1424084895-20639-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1424084895-20639-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 0/8] AVDTP deduplication
+Date: Mon, 16 Feb 2015 13:08:07 +0200
+Message-Id: <1424084895-20639-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test checks that maximum numbers of SEPs registered is MAX_SEID.
----
- unit/test-avdtp.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Changes:
+	* v5: Use POSIX ffs() for bitmap get uid, limiting maximum number of local SEPs to 32.
+	* v4: Fix Android build and clear typos.
+        * v3: Convert gslist to queue for lseps, refactor lseps handlings, remove extra DBGs.
+        * v2: Fix fixup patch
+        * v1: Add SEID fixes with unit tests
+        * RFC: initial version
 
-diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index f2ef767..34820d1 100644
---- a/unit/test-avdtp.c
-+++ b/unit/test-avdtp.c
-@@ -578,6 +578,13 @@ static void test_server_seid(gconstpointer data)
- 		lseps = g_slist_append(lseps, sep);
- 	}
- 
-+	/* Now add (MAX_SEID + 1) SEP -> it shall fail */
-+	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						0x00, TRUE, &sep_ind, NULL,
-+						context);
-+	g_assert(!sep);
-+
- 	/* Remove all SEPs */
- 	g_slist_free_full(lseps, unregister_sep);
- 	lseps = NULL;
+Andrei Emeltchenko (8):
+  unit/avdtp: Add SEP register/unregister tests
+  unit/avdtp: Add duplicate SEID test
+  shared/utils: Add helpers for bitfield fast uid generation
+  android/avdtp: Fix SEID generation
+  unit/avdtp: Add check for too many SEP creation
+  android/avdtp: Fix registering SEP with wrong SEID
+  android/avdtp: Refactor local SEP list handling
+  unit/avdtp: Refactor context destroy
+
+ android/Android.mk  |   2 +
+ android/Makefile.am |   2 +
+ android/a2dp.c      |  15 +++--
+ android/avdtp.c     | 101 +++++++++++++++++++------------
+ android/avdtp.h     |  10 ++-
+ android/avdtptest.c |  10 ++-
+ src/shared/util.c   |  23 +++++++
+ src/shared/util.h   |   3 +
+ unit/test-avdtp.c   | 171 ++++++++++++++++++++++++++++++++++++++++++++--------
+ 9 files changed, 267 insertions(+), 70 deletions(-)
+
 -- 
 2.1.0
 
