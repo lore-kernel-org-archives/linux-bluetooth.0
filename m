@@ -1,96 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 2/3] shared/gatt-db: Extend API for find attribute requests
-Date: Mon, 16 Feb 2015 13:36:44 +0100
-Message-Id: <1424090205-13432-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1424090205-13432-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1424090205-13432-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1423826283-19270-1-git-send-email-gowtham.ab@samsung.com>
+References: <1423826283-19270-1-git-send-email-gowtham.ab@samsung.com>
+Date: Mon, 16 Feb 2015 14:30:28 +0200
+Message-ID: <CABBYNZJPbSQe+rsQDPjuNGZEBB-JKvs7yaWW9WoH0VvTCP_eUQ@mail.gmail.com>
+Subject: Re: [PATCH] monitor/l2cap: Add log msg for read_blob_rsp
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-At the moment if there is no entries matching in data base for
-find_by_type or find_by_type_value, user will not be notified about that
-fact.
+Hi Gowtham,
 
-With this patch gatt_db_find_by_type and gatt_db_find_by_type_value will
-return number of found matching entries
----
- src/shared/gatt-db.c | 11 +++++++++--
- src/shared/gatt-db.h |  5 +++--
- 2 files changed, 12 insertions(+), 4 deletions(-)
+On Fri, Feb 13, 2015 at 1:18 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+>> ACL Data RX: Handle 71 flags 0x02 dlen 27                                                                                                                                                 [hci0] 79.680052
+>       ATT: Read Blob Response (0x0d) len 22
+>         Part of Attribute Value:
+>         11 22 33 44 55 66 77 88 99 00 12 34 56 78 90 12  ."3DUfw....4Vx..
+>         34 56 78 90 12 34                                4Vx..4
+> ---
+>  monitor/l2cap.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+> index 0030a4c..d58c14f 100644
+> --- a/monitor/l2cap.c
+> +++ b/monitor/l2cap.c
+> @@ -2198,6 +2198,7 @@ static void att_read_blob_req(const struct l2cap_frame *frame)
+>
+>  static void att_read_blob_rsp(const struct l2cap_frame *frame)
+>  {
+> +       print_field("Part of Attribute Value:");
+>         packet_hexdump(frame->data, frame->size);
+>  }
+>
+> --
+> 1.9.1
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index f72d58e..d9ea765 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -858,6 +858,7 @@ struct find_by_type_value_data {
- 	void *user_data;
- 	const void *value;
- 	size_t value_len;
-+	unsigned int num_of_res;
- };
- 
- static void find_by_type(void *data, void *user_data)
-@@ -889,11 +890,12 @@ static void find_by_type(void *data, void *user_data)
- 							search_data->value_len))
- 			continue;
- 
-+		search_data->num_of_res++;
- 		search_data->func(attribute, search_data->user_data);
- 	}
- }
- 
--void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
-+unsigned int gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
- 						uint16_t end_handle,
- 						const bt_uuid_t *type,
- 						gatt_db_attribute_cb_t func,
-@@ -910,9 +912,12 @@ void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
- 	data.user_data = user_data;
- 
- 	queue_foreach(db->services, find_by_type, &data);
-+
-+	return data.num_of_res;
- }
- 
--void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
-+unsigned int gatt_db_find_by_type_value(struct gatt_db *db,
-+						uint16_t start_handle,
- 						uint16_t end_handle,
- 						const bt_uuid_t *type,
- 						const void *value,
-@@ -931,6 +936,8 @@ void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
- 	data.value_len = value_len;
- 
- 	queue_foreach(db->services, find_by_type, &data);
-+
-+	return data.num_of_res;
- }
- 
- struct read_by_type_data {
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 37df4d5..e38b37d 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -95,13 +95,14 @@ void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
- 							const bt_uuid_t type,
- 							struct queue *queue);
- 
--void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
-+unsigned int gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
- 						uint16_t end_handle,
- 						const bt_uuid_t *type,
- 						gatt_db_attribute_cb_t func,
- 						void *user_data);
- 
--void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
-+unsigned int gatt_db_find_by_type_value(struct gatt_db *db,
-+						uint16_t start_handle,
- 						uint16_t end_handle,
- 						const bt_uuid_t *type,
- 						const void *value,
+I would use  print_hex_field("Value", frame->data, frame->size); like
+in att_read_rsp if you really want a label.
+
+
 -- 
-1.8.4
-
+Luiz Augusto von Dentz
