@@ -1,170 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1423834901-7139-1-git-send-email-luiz.dentz@gmail.com>
-References: <1423834901-7139-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 16 Feb 2015 11:37:19 +0200
-Message-ID: <CABBYNZJpNC1UjEhZc07anTqiA1t6vby0hg4eA1i5OH7h44jr_A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] uuid: Add bt_uuid_to_le
+In-Reply-To: <CAJLTA8hknDCgcviLk9RVd-uqaK2tVOEfREk2dCUh77xU2ytjQA@mail.gmail.com>
+References: <1423599385-36295-1-git-send-email-jamuraa@chromium.org>
+	<1423599385-36295-10-git-send-email-jamuraa@chromium.org>
+	<CABBYNZJQf3CXJff=UfdTDh6eNU50VWu14BQ=3FTbsXR3jy7RbA@mail.gmail.com>
+	<CABBYNZL-+ZTH9XhWA3vShh=3npJy2_Gx5U+UycB3qu_T-ZUrWg@mail.gmail.com>
+	<CAJLTA8gawvTAU5xG6=_A=2NEDLTPL3_GRALUdUs-aW0DzXgbbQ@mail.gmail.com>
+	<CABBYNZ+ccNzOHpAgj+3dCO6uyS_ZgH6GqGi-dh57vT1r+BpMrA@mail.gmail.com>
+	<CAJLTA8hknDCgcviLk9RVd-uqaK2tVOEfREk2dCUh77xU2ytjQA@mail.gmail.com>
+Date: Mon, 16 Feb 2015 11:16:27 +0200
+Message-ID: <CABBYNZLrdY4T0jkczxZ662=0qkpVVpGf16=R0XGgWHd1+OGM+g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/8] Implement Notification / Indication TS Tests
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Michael,
 
-On Fri, Feb 13, 2015 at 3:41 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Thu, Feb 12, 2015 at 5:00 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+> Hi Luiz,
 >
-> This adds bt_uuid_to_le and replace the use of put_uuid_le.
-> ---
->  lib/uuid.c                | 21 +++++++++++++++++++++
->  lib/uuid.h                |  2 ++
->  src/shared/gatt-helpers.c | 29 ++++-------------------------
->  src/shared/gatt-helpers.h |  2 --
->  src/shared/gatt-server.c  |  2 +-
->  5 files changed, 28 insertions(+), 28 deletions(-)
+> On Thu, Feb 12, 2015 at 5:38 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Michael,
+>>
+>> On Thu, Feb 12, 2015 at 12:20 AM, Michael Janssen <jamuraa@chromium.org> wrote:
+>>> Hi Luiz,
+>>>
+>>> On Wed, Feb 11, 2015 at 5:47 AM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> Hi,
+>>>>
+>>>> On Wed, Feb 11, 2015 at 3:30 PM, Luiz Augusto von Dentz
+>>>> <luiz.dentz@gmail.com> wrote:
+>>>>> Hi Michael,
+>>>>>
+>>>>> On Tue, Feb 10, 2015 at 10:16 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+>>>>>> Implements the four defined tests around the Notification and Indication
+>>>>>> functionality in the unit tests.  Also includes some fixes to discovery when
+>>>>>> no handles could be found (services with no handles).
+>>>>>>
+>>>>>> Also adds some functionality to the unit testing, to support when there is no
+>>>>>> action required by the client and/or the server in a test, and checks for
+>>>>>> post data transmission.
+>>>>>>
+>>>>>> --
+>>>>>
+>>>>> Applied, thanks.
+>>>>
+>>>> I gather the following number from the latest TS:
+>>>>
+>>>> Group                       Client                          Server
+>>>> Configuration             100% (1 / 1)                100% (1 / 1)
+>>>> Discovery                  75% (6 / 8)                  75% (6 / 8)
+>>>> Read                         57.5% (23 / 40)           47.6% (20 / 42)
+>>>> Write                        0% (0 / 40)                  0% (0 / 40)
+>>>> Notification/Indication 50% (1 / 2)                  50% (1 / 2)
+>>>> Services                    0% (0 / 1)                   0% (0 / 1)
+>>>> Timeouts                   0% (0 / 2)                   0% (0 / 1)
+>>>> Attributes                  0% (0 / 10)                  0% (0 / 10)
+>>>> Total                         29.8% (31 / 104)         26.7% 28 / 105
+>>>>
+>>>> *I did not compute any extra tests we are doing, like small vs large
+>>>> databases, still these numbers are quite low.
+>>>>
+>>>> --
+>>>> Luiz Augusto von Dentz
+>>>
+>>> How do you obtain these numbers?  I would like to fix the tests that
+>>> are not showing up.  All four of the Notification / Indication ones
+>>> for example were just committed, so two are not tracking in this
+>>> report.  I believe the read and Discovery ones are low as well.
+>>
+>> Yep, I had not realize the group actually have two different suffixes,
+>> GAN and GAI, anyway that adds just 2 test to the coverage.
+>>
+>>> Also, theoretically all the server tests should be run against as many
+>>> of the 4 databases that are specified in the TS.  I was planning on
+>>> only the small and single large to start, and come back to the other
+>>> two large databases later if possible.
+>>
+>> That are duplicates, Im not taking into account them here since I want
+>> to know how much the TS we are covering not the total number of tests.
 >
-> diff --git a/lib/uuid.c b/lib/uuid.c
-> index e3f31df..97b2d9d 100644
-> --- a/lib/uuid.c
-> +++ b/lib/uuid.c
-> @@ -290,3 +290,24 @@ int bt_uuid_strcmp(const void *a, const void *b)
->  {
->         return strcasecmp(a, b);
->  }
-> +
-> +int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
-> +{
-> +       bt_uuid_t uuid;
-> +
-> +       switch (src->type) {
-> +       case BT_UUID16:
-> +               bt_put_le16(src->value.u16, dst);
-> +               return 0;
-> +       case BT_UUID32:
-> +               bt_uuid_to_uuid128(src, &uuid);
-> +               ntoh128(&uuid.value.u128, dst);
-> +               return 0;
-> +       case BT_UUID128:
-> +               ntoh128(&src->value.u128, dst);
-> +               return 0;
-> +       case BT_UUID_UNSPEC:
-> +       default:
-> +               return -EINVAL;
-> +       }
-> +}
-> diff --git a/lib/uuid.h b/lib/uuid.h
-> index 8303772..142c979 100644
-> --- a/lib/uuid.h
-> +++ b/lib/uuid.h
-> @@ -168,6 +168,8 @@ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
->  int bt_uuid_to_string(const bt_uuid_t *uuid, char *str, size_t n);
->  int bt_string_to_uuid(bt_uuid_t *uuid, const char *string);
->
-> +int bt_uuid_to_le(const bt_uuid_t *uuid, void *dst);
-> +
->  static inline int bt_uuid_len(const bt_uuid_t *uuid)
->  {
->         return uuid->type / 8;
-> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> index 6dfc24f..7f95dbe 100644
-> --- a/src/shared/gatt-helpers.c
-> +++ b/src/shared/gatt-helpers.c
-> @@ -567,27 +567,6 @@ bool bt_gatt_exchange_mtu(struct bt_att *att, uint16_t client_rx_mtu,
->         return true;
->  }
->
-> -void put_uuid_le(const bt_uuid_t *src, void *dst)
-> -{
-> -       bt_uuid_t uuid;
-> -
-> -       switch (src->type) {
-> -       case BT_UUID16:
-> -               put_le16(src->value.u16, dst);
-> -               break;
-> -       case BT_UUID128:
-> -               bswap_128(&src->value.u128, dst);
-> -               break;
-> -       case BT_UUID32:
-> -               bt_uuid_to_uuid128(src, &uuid);
-> -               bswap_128(&uuid.value.u128, dst);
-> -               break;
-> -       case BT_UUID_UNSPEC:
-> -       default:
-> -               break;
-> -       }
-> -}
-> -
->  static inline int get_uuid_len(const bt_uuid_t *uuid)
->  {
->         if (!uuid)
-> @@ -764,7 +743,7 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
->                 put_le16(last_end + 1, pdu);
->                 put_le16(op->end_handle, pdu + 2);
->                 put_le16(op->service_type, pdu + 4);
-> -               put_uuid_le(&op->uuid, pdu + 6);
-> +               bt_uuid_to_le(&op->uuid, pdu + 6);
->
->                 op->id = bt_att_send(op->att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
->                                                         pdu, sizeof(pdu),
-> @@ -836,7 +815,7 @@ static bool discover_services(struct bt_att *att, bt_uuid_t *uuid,
->                 put_le16(start, pdu);
->                 put_le16(end, pdu + 2);
->                 put_le16(op->service_type, pdu + 4);
-> -               put_uuid_le(&op->uuid, pdu + 6);
-> +               bt_uuid_to_le(&op->uuid, pdu + 6);
->
->                 op->id = bt_att_send(att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
->                                                         pdu, sizeof(pdu),
-> @@ -1305,7 +1284,7 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
->
->                 put_le16(last_handle + 1, pdu);
->                 put_le16(op->end_handle, pdu + 2);
-> -               put_uuid_le(&op->uuid, pdu + 4);
-> +               bt_uuid_to_le(&op->uuid, pdu + 4);
->
->                 op->id = bt_att_send(op->att, BT_ATT_OP_READ_BY_TYPE_REQ,
->                                                 pdu, sizeof(pdu),
-> @@ -1350,7 +1329,7 @@ bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
->
->         put_le16(start, pdu);
->         put_le16(end, pdu + 2);
-> -       put_uuid_le(uuid, pdu + 4);
-> +       bt_uuid_to_le(uuid, pdu + 4);
->
->         op->id = bt_att_send(att, BT_ATT_OP_READ_BY_TYPE_REQ, pdu, sizeof(pdu),
->                                         read_by_type_cb, discovery_op_ref(op),
-> diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-> index 7a2076b..0217e82 100644
-> --- a/src/shared/gatt-helpers.h
-> +++ b/src/shared/gatt-helpers.h
-> @@ -105,5 +105,3 @@ bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
->                                         bt_gatt_discovery_callback_t callback,
->                                         void *user_data,
->                                         bt_gatt_destroy_func_t destroy);
-> -
-> -void put_uuid_le(const bt_uuid_t *src, void *dst);
-> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> index 0652d3d..0623fce 100644
-> --- a/src/shared/gatt-server.c
-> +++ b/src/shared/gatt-server.c
-> @@ -543,7 +543,7 @@ static bool encode_find_info_rsp(struct gatt_db *db, struct queue *q,
->                         break;
->
->                 put_le16(handle, pdu + iter);
-> -               put_uuid_le(type, pdu + iter + 2);
-> +               bt_uuid_to_le(type, pdu + iter + 2);
->
->                 iter += uuid_len + 2;
->         }
-> --
-> 2.1.0
->
+> So these are just manually checking for each test that is written?  If
+> that's the case then would it be useful to note why some of the tests
+> are not in, because it's missing functionality sometimes (for
+> encryption / authorization / authentication read tests for example).
 
-Pushed.
-
+Sure, we might want to create items in the TODO list so they get
+properly prioritized.
 
 -- 
 Luiz Augusto von Dentz
