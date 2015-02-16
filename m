@@ -1,63 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix accepting early data on fixed channels
-Date: Mon, 16 Feb 2015 11:42:11 +0200
-Message-Id: <1424079731-21609-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1423834901-7139-1-git-send-email-luiz.dentz@gmail.com>
+References: <1423834901-7139-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 16 Feb 2015 11:37:19 +0200
+Message-ID: <CABBYNZJpNC1UjEhZc07anTqiA1t6vby0hg4eA1i5OH7h44jr_A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] uuid: Add bt_uuid_to_le
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-On BR/EDR the L2CAP channel instances for fixed channels have so far
-been marked as ready only once the L2CAP information req/rsp procedure
-is complete and we have the fixed channel mask. This could however lead
-to data being dropped if we receive it on the channel before knowing the
-remote mask.
+On Fri, Feb 13, 2015 at 3:41 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds bt_uuid_to_le and replace the use of put_uuid_le.
+> ---
+>  lib/uuid.c                | 21 +++++++++++++++++++++
+>  lib/uuid.h                |  2 ++
+>  src/shared/gatt-helpers.c | 29 ++++-------------------------
+>  src/shared/gatt-helpers.h |  2 --
+>  src/shared/gatt-server.c  |  2 +-
+>  5 files changed, 28 insertions(+), 28 deletions(-)
+>
+> diff --git a/lib/uuid.c b/lib/uuid.c
+> index e3f31df..97b2d9d 100644
+> --- a/lib/uuid.c
+> +++ b/lib/uuid.c
+> @@ -290,3 +290,24 @@ int bt_uuid_strcmp(const void *a, const void *b)
+>  {
+>         return strcasecmp(a, b);
+>  }
+> +
+> +int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
+> +{
+> +       bt_uuid_t uuid;
+> +
+> +       switch (src->type) {
+> +       case BT_UUID16:
+> +               bt_put_le16(src->value.u16, dst);
+> +               return 0;
+> +       case BT_UUID32:
+> +               bt_uuid_to_uuid128(src, &uuid);
+> +               ntoh128(&uuid.value.u128, dst);
+> +               return 0;
+> +       case BT_UUID128:
+> +               ntoh128(&src->value.u128, dst);
+> +               return 0;
+> +       case BT_UUID_UNSPEC:
+> +       default:
+> +               return -EINVAL;
+> +       }
+> +}
+> diff --git a/lib/uuid.h b/lib/uuid.h
+> index 8303772..142c979 100644
+> --- a/lib/uuid.h
+> +++ b/lib/uuid.h
+> @@ -168,6 +168,8 @@ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
+>  int bt_uuid_to_string(const bt_uuid_t *uuid, char *str, size_t n);
+>  int bt_string_to_uuid(bt_uuid_t *uuid, const char *string);
+>
+> +int bt_uuid_to_le(const bt_uuid_t *uuid, void *dst);
+> +
+>  static inline int bt_uuid_len(const bt_uuid_t *uuid)
+>  {
+>         return uuid->type / 8;
+> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+> index 6dfc24f..7f95dbe 100644
+> --- a/src/shared/gatt-helpers.c
+> +++ b/src/shared/gatt-helpers.c
+> @@ -567,27 +567,6 @@ bool bt_gatt_exchange_mtu(struct bt_att *att, uint16_t client_rx_mtu,
+>         return true;
+>  }
+>
+> -void put_uuid_le(const bt_uuid_t *src, void *dst)
+> -{
+> -       bt_uuid_t uuid;
+> -
+> -       switch (src->type) {
+> -       case BT_UUID16:
+> -               put_le16(src->value.u16, dst);
+> -               break;
+> -       case BT_UUID128:
+> -               bswap_128(&src->value.u128, dst);
+> -               break;
+> -       case BT_UUID32:
+> -               bt_uuid_to_uuid128(src, &uuid);
+> -               bswap_128(&uuid.value.u128, dst);
+> -               break;
+> -       case BT_UUID_UNSPEC:
+> -       default:
+> -               break;
+> -       }
+> -}
+> -
+>  static inline int get_uuid_len(const bt_uuid_t *uuid)
+>  {
+>         if (!uuid)
+> @@ -764,7 +743,7 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+>                 put_le16(last_end + 1, pdu);
+>                 put_le16(op->end_handle, pdu + 2);
+>                 put_le16(op->service_type, pdu + 4);
+> -               put_uuid_le(&op->uuid, pdu + 6);
+> +               bt_uuid_to_le(&op->uuid, pdu + 6);
+>
+>                 op->id = bt_att_send(op->att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
+>                                                         pdu, sizeof(pdu),
+> @@ -836,7 +815,7 @@ static bool discover_services(struct bt_att *att, bt_uuid_t *uuid,
+>                 put_le16(start, pdu);
+>                 put_le16(end, pdu + 2);
+>                 put_le16(op->service_type, pdu + 4);
+> -               put_uuid_le(&op->uuid, pdu + 6);
+> +               bt_uuid_to_le(&op->uuid, pdu + 6);
+>
+>                 op->id = bt_att_send(att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
+>                                                         pdu, sizeof(pdu),
+> @@ -1305,7 +1284,7 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
+>
+>                 put_le16(last_handle + 1, pdu);
+>                 put_le16(op->end_handle, pdu + 2);
+> -               put_uuid_le(&op->uuid, pdu + 4);
+> +               bt_uuid_to_le(&op->uuid, pdu + 4);
+>
+>                 op->id = bt_att_send(op->att, BT_ATT_OP_READ_BY_TYPE_REQ,
+>                                                 pdu, sizeof(pdu),
+> @@ -1350,7 +1329,7 @@ bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
+>
+>         put_le16(start, pdu);
+>         put_le16(end, pdu + 2);
+> -       put_uuid_le(uuid, pdu + 4);
+> +       bt_uuid_to_le(uuid, pdu + 4);
+>
+>         op->id = bt_att_send(att, BT_ATT_OP_READ_BY_TYPE_REQ, pdu, sizeof(pdu),
+>                                         read_by_type_cb, discovery_op_ref(op),
+> diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
+> index 7a2076b..0217e82 100644
+> --- a/src/shared/gatt-helpers.h
+> +++ b/src/shared/gatt-helpers.h
+> @@ -105,5 +105,3 @@ bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
+>                                         bt_gatt_discovery_callback_t callback,
+>                                         void *user_data,
+>                                         bt_gatt_destroy_func_t destroy);
+> -
+> -void put_uuid_le(const bt_uuid_t *src, void *dst);
+> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+> index 0652d3d..0623fce 100644
+> --- a/src/shared/gatt-server.c
+> +++ b/src/shared/gatt-server.c
+> @@ -543,7 +543,7 @@ static bool encode_find_info_rsp(struct gatt_db *db, struct queue *q,
+>                         break;
+>
+>                 put_le16(handle, pdu + iter);
+> -               put_uuid_le(type, pdu + iter + 2);
+> +               bt_uuid_to_le(type, pdu + iter + 2);
+>
+>                 iter += uuid_len + 2;
+>         }
+> --
+> 2.1.0
+>
 
-Since it is valid for a remote to send data this early, simply assume
-that the channel is supported when we receive data on it. So far this
-hasn't been noticed much because of limited use of fixed channels on
-BR/EDR, but e.g. with SMP over BR/EDR this is already now visible with
-automated tests failing randomly.
+Pushed.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6ba33f9631e8..ec6f78e481dc 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1244,6 +1244,13 @@ static void l2cap_move_done(struct l2cap_chan *chan)
- 
- static void l2cap_chan_ready(struct l2cap_chan *chan)
- {
-+	/* The channel may have already been flagged as connected in
-+	 * case of receiving data before the L2CAP info req/rsp
-+	 * procedure is complete.
-+	 */
-+	if (chan->state == BT_CONNECTED)
-+		return;
-+
- 	/* This clears all conf flags, including CONF_NOT_COMPLETE */
- 	chan->conf_state = 0;
- 	__clear_chan_timer(chan);
-@@ -6785,6 +6792,13 @@ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
- 
- 	BT_DBG("chan %p, len %d", chan, skb->len);
- 
-+	/* If we receive data on a fixed channel before the info req/rsp
-+	 * procdure is done simply assume that the channel is supported
-+	 * and mark it as ready.
-+	 */
-+	if (chan->chan_type == L2CAP_CHAN_FIXED)
-+		l2cap_chan_ready(chan);
-+
- 	if (chan->state != BT_CONNECTED)
- 		goto drop;
- 
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
