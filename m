@@ -1,84 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 2/8] unit/avdtp: Add duplicate SEID test
-Date: Mon, 16 Feb 2015 13:08:09 +0200
-Message-Id: <1424084895-20639-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1424084895-20639-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1424084895-20639-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: Fix accepting early data on fixed channels
+Date: Mon, 16 Feb 2015 11:42:11 +0200
+Message-Id: <1424079731-21609-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Add test adding two SEP, then remove first and create another one. With
-the current code new SEP has the same SEID (2!). Following patches
-fixing the bug.
+On BR/EDR the L2CAP channel instances for fixed channels have so far
+been marked as ready only once the L2CAP information req/rsp procedure
+is complete and we have the fixed channel mask. This could however lead
+to data being dropped if we receive it on the channel before knowing the
+remote mask.
+
+Since it is valid for a remote to send data this early, simply assume
+that the channel is supported when we receive data on it. So far this
+hasn't been noticed much because of limited use of fixed channels on
+BR/EDR, but e.g. with SMP over BR/EDR this is already now visible with
+automated tests failing randomly.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- unit/test-avdtp.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ net/bluetooth/l2cap_core.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index d20efa5..f2ef767 100644
---- a/unit/test-avdtp.c
-+++ b/unit/test-avdtp.c
-@@ -583,6 +583,46 @@ static void test_server_seid(gconstpointer data)
- 	lseps = NULL;
- }
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 6ba33f9631e8..ec6f78e481dc 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1244,6 +1244,13 @@ static void l2cap_move_done(struct l2cap_chan *chan)
  
-+static void test_server_seid_duplicate(gconstpointer data)
-+{
-+	struct context *context = create_context(0x0103, data);
-+	struct avdtp_local_sep *sep;
-+	int i;
+ static void l2cap_chan_ready(struct l2cap_chan *chan)
+ {
++	/* The channel may have already been flagged as connected in
++	 * case of receiving data before the L2CAP info req/rsp
++	 * procedure is complete.
++	 */
++	if (chan->state == BT_CONNECTED)
++		return;
 +
-+	for (i = 0; i < 2; i++) {
-+		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						0x00, TRUE, &sep_ind, NULL,
-+						context);
-+		g_assert(sep);
+ 	/* This clears all conf flags, including CONF_NOT_COMPLETE */
+ 	chan->conf_state = 0;
+ 	__clear_chan_timer(chan);
+@@ -6785,6 +6792,13 @@ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
+ 
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
++	/* If we receive data on a fixed channel before the info req/rsp
++	 * procdure is done simply assume that the channel is supported
++	 * and mark it as ready.
++	 */
++	if (chan->chan_type == L2CAP_CHAN_FIXED)
++		l2cap_chan_ready(chan);
 +
-+		lseps = g_slist_append(lseps, sep);
-+	}
-+
-+	/* Remove 1st element */
-+	sep = g_slist_nth_data(lseps, 0);
-+	lseps = g_slist_remove(lseps, sep);
-+	avdtp_unregister_sep(sep);
-+
-+	/* Now register new element */
-+	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						0x00, TRUE, &sep_ind, NULL,
-+						context);
-+	g_assert(sep);
-+	lseps = g_slist_append(lseps, sep);
-+
-+	/* Check SEID ids */
-+
-+	g_idle_add(send_pdu, context);
-+
-+	execute_context(context);
-+
-+	/* Remove all SEPs */
-+	g_slist_free_full(lseps, unregister_sep);
-+	lseps = NULL;
-+}
-+
- static gboolean sep_getcap_ind_frg(struct avdtp *session,
- 					struct avdtp_local_sep *sep,
- 					GSList **caps, uint8_t *err,
-@@ -772,6 +812,9 @@ int main(int argc, char *argv[])
- 	 */
- 	define_test("/TP/SIG/SMG/BV-06-C-SEID-1", test_server_seid,
- 			raw_pdu(0x00));
-+	define_test("/TP/SIG/SMG/BV-06-C-SEID-2", test_server_seid_duplicate,
-+			raw_pdu(0x00, 0x01),
-+			raw_pdu(0x02, 0x01, 0x08, 0x08, 0x04, 0x08));
- 	define_test("/TP/SIG/SMG/BV-05-C", test_client,
- 			raw_pdu(0x00, 0x01));
- 	define_test("/TP/SIG/SMG/BV-06-C", test_server,
+ 	if (chan->state != BT_CONNECTED)
+ 		goto drop;
+ 
 -- 
 2.1.0
 
