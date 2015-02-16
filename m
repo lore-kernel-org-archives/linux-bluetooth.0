@@ -1,98 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJLTA8hknDCgcviLk9RVd-uqaK2tVOEfREk2dCUh77xU2ytjQA@mail.gmail.com>
-References: <1423599385-36295-1-git-send-email-jamuraa@chromium.org>
-	<1423599385-36295-10-git-send-email-jamuraa@chromium.org>
-	<CABBYNZJQf3CXJff=UfdTDh6eNU50VWu14BQ=3FTbsXR3jy7RbA@mail.gmail.com>
-	<CABBYNZL-+ZTH9XhWA3vShh=3npJy2_Gx5U+UycB3qu_T-ZUrWg@mail.gmail.com>
-	<CAJLTA8gawvTAU5xG6=_A=2NEDLTPL3_GRALUdUs-aW0DzXgbbQ@mail.gmail.com>
-	<CABBYNZ+ccNzOHpAgj+3dCO6uyS_ZgH6GqGi-dh57vT1r+BpMrA@mail.gmail.com>
-	<CAJLTA8hknDCgcviLk9RVd-uqaK2tVOEfREk2dCUh77xU2ytjQA@mail.gmail.com>
-Date: Mon, 16 Feb 2015 11:16:27 +0200
-Message-ID: <CABBYNZLrdY4T0jkczxZ662=0qkpVVpGf16=R0XGgWHd1+OGM+g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/8] Implement Notification / Indication TS Tests
+In-Reply-To: <1423711064-7390-1-git-send-email-armansito@chromium.org>
+References: <1423711064-7390-1-git-send-email-armansito@chromium.org>
+Date: Mon, 16 Feb 2015 11:13:38 +0200
+Message-ID: <CABBYNZLYNq69wxYhSAzbzTtkNC_eQciwkoufptmq3tfchg=CBQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 00/14] Rewrite local GATT server using shared/gatt
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
+To: Arman Uguray <armansito@chromium.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi Arman,
 
-On Thu, Feb 12, 2015 at 5:00 PM, Michael Janssen <jamuraa@chromium.org> wrote:
-> Hi Luiz,
+On Thu, Feb 12, 2015 at 5:17 AM, Arman Uguray <armansito@chromium.org> wrote:
+> *v1: Addressed comments by jamuraa and vudentz:
+>   - Now passing bt_att instead of bdaddr_t in gatt_db callbacks and functions.
+>     I have not run the tests on the android side here, so I would appreciate it
+>     if you can run them.
+>   - Renamed src/gatt-server to src/gatt-database for now. Added TODO item for
+>     refactoring this later.
+>   - Updated the TODO items for GATT.
 >
-> On Thu, Feb 12, 2015 at 5:38 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Michael,
->>
->> On Thu, Feb 12, 2015 at 12:20 AM, Michael Janssen <jamuraa@chromium.org> wrote:
->>> Hi Luiz,
->>>
->>> On Wed, Feb 11, 2015 at 5:47 AM, Luiz Augusto von Dentz
->>> <luiz.dentz@gmail.com> wrote:
->>>> Hi,
->>>>
->>>> On Wed, Feb 11, 2015 at 3:30 PM, Luiz Augusto von Dentz
->>>> <luiz.dentz@gmail.com> wrote:
->>>>> Hi Michael,
->>>>>
->>>>> On Tue, Feb 10, 2015 at 10:16 PM, Michael Janssen <jamuraa@chromium.org> wrote:
->>>>>> Implements the four defined tests around the Notification and Indication
->>>>>> functionality in the unit tests.  Also includes some fixes to discovery when
->>>>>> no handles could be found (services with no handles).
->>>>>>
->>>>>> Also adds some functionality to the unit testing, to support when there is no
->>>>>> action required by the client and/or the server in a test, and checks for
->>>>>> post data transmission.
->>>>>>
->>>>>> --
->>>>>
->>>>> Applied, thanks.
->>>>
->>>> I gather the following number from the latest TS:
->>>>
->>>> Group                       Client                          Server
->>>> Configuration             100% (1 / 1)                100% (1 / 1)
->>>> Discovery                  75% (6 / 8)                  75% (6 / 8)
->>>> Read                         57.5% (23 / 40)           47.6% (20 / 42)
->>>> Write                        0% (0 / 40)                  0% (0 / 40)
->>>> Notification/Indication 50% (1 / 2)                  50% (1 / 2)
->>>> Services                    0% (0 / 1)                   0% (0 / 1)
->>>> Timeouts                   0% (0 / 2)                   0% (0 / 1)
->>>> Attributes                  0% (0 / 10)                  0% (0 / 10)
->>>> Total                         29.8% (31 / 104)         26.7% 28 / 105
->>>>
->>>> *I did not compute any extra tests we are doing, like small vs large
->>>> databases, still these numbers are quite low.
->>>>
->>>> --
->>>> Luiz Augusto von Dentz
->>>
->>> How do you obtain these numbers?  I would like to fix the tests that
->>> are not showing up.  All four of the Notification / Indication ones
->>> for example were just committed, so two are not tracking in this
->>> report.  I believe the read and Discovery ones are low as well.
->>
->> Yep, I had not realize the group actually have two different suffixes,
->> GAN and GAI, anyway that adds just 2 test to the coverage.
->>
->>> Also, theoretically all the server tests should be run against as many
->>> of the 4 databases that are specified in the TS.  I was planning on
->>> only the small and single large to start, and come back to the other
->>> two large databases later if possible.
->>
->> That are duplicates, Im not taking into account them here since I want
->> to know how much the TS we are covering not the total number of tests.
+> This patch set includes patches that rewrite the local GATT server using
+> shared/gatt. This in effect invalidates the existing src/attrib-server in
+> favor of a new src/gatt-server.
 >
-> So these are just manually checking for each test that is written?  If
-> that's the case then would it be useful to note why some of the tests
-> are not in, because it's missing functionality sometimes (for
-> encryption / authorization / authentication read tests for example).
+> Arman Uguray (14):
+>   CHROMIUM: shared/att: Add bt_att_get_fd
+>   CHROMIUM: shared/gatt: Pass bt_att instead of bdaddr_t
+>   CHROMIUM: core: Introduce btd_gatt_database
+>   CHROMIUM: core: Attach gatt-server to bt_att
+>   CHROMIUM: core: gatt: Add GATT/GAP services to local db
+>   CHROMIUM: core: Add GATT UUIDs to Adapter1.UUIDs
+>   CHROMIUM: core: Support per-client CCC state
+>   CHROMIUM: core: Setup added/removed handlers in GATT database
+>   CHROMIUM: core: Add Service Changed characteristic
+>   CHROMIUM: core: device: Add getter for GATT server
+>   CHROMIUM: core: gatt-server: Send "Service Changed"
+>   CHROMIUM: core: adapter: Send UUIDs changed for GATT services
+>   CHROMIUM: shared/gatt: Don't incorrectly terminate discovery
+>   TODO: Update GATT items.
+>
+>  Makefile.am               |   1 +
+>  TODO                      |  54 ++--
+>  android/gatt.c            |  98 ++++--
+>  src/adapter.c             |  59 +++-
+>  src/device.c              |  52 +++-
+>  src/device.h              |   1 +
+>  src/gatt-client.c         |   1 +
+>  src/gatt-database.c       | 766 ++++++++++++++++++++++++++++++++++++++++++++++
+>  src/gatt-database.h       |  29 ++
+>  src/main.c                |   3 +
+>  src/shared/att.c          |   8 +
+>  src/shared/att.h          |   2 +
+>  src/shared/gatt-client.c  |   6 +-
+>  src/shared/gatt-db.c      |  10 +-
+>  src/shared/gatt-db.h      |   8 +-
+>  src/shared/gatt-helpers.c |   3 +-
+>  src/shared/gatt-server.c  |  32 +-
+>  tools/btgatt-server.c     |  18 +-
+>  unit/test-gatt.c          |   5 +-
+>  19 files changed, 1052 insertions(+), 104 deletions(-)
+>  create mode 100644 src/gatt-database.c
+>  create mode 100644 src/gatt-database.h
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
 
-Sure, we might want to create items in the TODO list so they get
-properly prioritized.
+First 2 are now applied, I reworking the btd_gatt_database API.
+
+
 
 -- 
 Luiz Augusto von Dentz
