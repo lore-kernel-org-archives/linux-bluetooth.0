@@ -1,49 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/bluetooth: Fix enabling secure connection
-Date: Tue, 17 Feb 2015 23:56:34 +0100
-Message-Id: <1424213794-3646-1-git-send-email-lukasz.rymanowski@tieto.com>
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [RFC BlueZ v3 0/1] Introduce LE Advertising Data API
+Date: Tue, 17 Feb 2015 14:36:58 -0800
+Message-Id: <1424212619-10062-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Current code works fine for controllers supporting BR/EDR secure
-connections.
+This third apparoach to LE Advertisements, splits the API into a separate
+manager which will be easier to implement and maintain separately.  This
+approach focuses on being able to add objects representing data to a specific
+controller specifying just the properties which are meant to be in the Data.
 
-We want to have LE Secure connection enabled also for controllers which
-does not support BR/EDR secure connections. For this we need to set
-secure connection in the kernel just after LE is enabled (if requested
-on register)
----
- android/bluetooth.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+This update incorporates the feedback from the last two proposed APIs.  I've
+switched the address from being in the path to be a simple flag for whether the
+random address should be used in the packet, and being more specific about
+what will happen when something goes wrong.
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index f39f1e6..c2fb3f9 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -3481,9 +3481,6 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	if (missing_settings & MGMT_SETTING_SSP)
- 		set_mode(MGMT_OP_SET_SSP, 0x01);
- 
--	if (missing_settings & MGMT_SETTING_SECURE_CONN)
--		set_mode(MGMT_OP_SET_SECURE_CONN, 0x01);
--
- 	if (missing_settings & MGMT_SETTING_BONDABLE)
- 		set_mode(MGMT_OP_SET_BONDABLE, 0x01);
- 
-@@ -5386,6 +5383,10 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
- 		goto failed;
- 	}
- 
-+	/* Requested mode is set now, let's enable secure connection */
-+	if (missing_settings & MGMT_SETTING_SECURE_CONN)
-+		set_mode(MGMT_OP_SET_SECURE_CONN, 0x01);
-+
- 	/* Set initial default name */
- 	if (!adapter.name) {
- 		adapter.name = g_strdup(bt_config_get_model());
+Michael Janssen (1):
+  doc: Add LE Advertisement Manager
+
+ doc/advertising-api.txt | 113 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 113 insertions(+)
+ create mode 100644 doc/advertising-api.txt
+
 -- 
-1.8.4
+2.2.0.rc0.207.ga3a616c
 
