@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] doc/gatt-api: Introduce GattProfile1 concept
-Date: Tue, 17 Feb 2015 11:26:21 +0200
-Message-Id: <1424165181-22895-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] doc/gatt-api: Introduce GattProfile1 concept
+Date: Tue, 17 Feb 2015 11:24:15 +0200
+Message-Id: <1424165055-22588-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -22,7 +22,7 @@ the auto-connect list.
  1 file changed, 43 insertions(+)
 
 diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index de7f2d9ae6b3..391d7d900b87 100644
+index de7f2d9ae6b3..a74987b6caf2 100644
 --- a/doc/gatt-api.txt
 +++ b/doc/gatt-api.txt
 @@ -205,6 +205,26 @@ Properties	string UUID [read-only]
@@ -70,7 +70,7 @@ index de7f2d9ae6b3..391d7d900b87 100644
 +			Possible errors: org.bluez.Error.InvalidArguments
 +					 org.bluez.Error.AlreadyExists
 +
-+		void UnregisterProfile(object profile)
++		void UnregisterService(object profile)
 +
 +			This unregisters the profile that has been
 +			previously registered. The object path parameter
