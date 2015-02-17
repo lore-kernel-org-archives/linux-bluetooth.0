@@ -1,144 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <009501d04a74$4b599c10$e20cd430$@samsung.com>
-References: <1423755046-7688-1-git-send-email-bharat.panda@samsung.com>
-	<009501d04a74$4b599c10$e20cd430$@samsung.com>
-Date: Tue, 17 Feb 2015 14:51:32 +0200
-Message-ID: <CABBYNZKmM1EF_gfDCa7CQZBUKanVr-C9CzwQVmvQLYOsLiueHA@mail.gmail.com>
-Subject: Re: [PATCH v2] tools/gatt-client: print read/write error messages
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Bhusan Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/pts: Update PAN PTS 6.0 results for android 5.0
+Date: Tue, 17 Feb 2015 13:29:14 +0100
+Message-Id: <1424176154-4285-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1424176154-4285-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1424176154-4285-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+This patch updates test case list and results for PAN profile against
+android 5.0.
+---
+ android/pts-pan.txt | 121 +++++++++++++++++++++++++++-------------------------
+ 1 file changed, 62 insertions(+), 59 deletions(-)
 
-On Tue, Feb 17, 2015 at 7:40 AM, Bharat Bhusan Panda
-<bharat.panda@samsung.com> wrote:
-> ping
->
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Bharat Panda
->> Sent: Thursday, February 12, 2015 9:01 PM
->> To: linux-bluetooth@vger.kernel.org
->> Cc: cpgs@samsung.com; Bharat Panda
->> Subject: [PATCH v2] tools/gatt-client: print read/write error messages
->>
->> Convert error codes to error messages for read/write value error
-> responses.
-
-Please add the output, 1 or 2 messages should be enough.
-
->> ---
->>  tools/btgatt-client.c | 49
->> ++++++++++++++++++++++++++++++++++++++++++++++---
->>  1 file changed, 46 insertions(+), 3 deletions(-)
->>
->> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c index
->> 8bda89b..3dd75b4 100644
->> --- a/tools/btgatt-client.c
->> +++ b/tools/btgatt-client.c
->> @@ -74,6 +74,48 @@ static void print_prompt(void)
->>       fflush(stdout);
->>  }
->>
->> +static const char *ecode_to_string(uint8_t ecode) {
->> +     switch (ecode) {
->> +     case BT_ATT_ERROR_INVALID_HANDLE:
->> +             return "Invalid Handle";
->> +     case BT_ATT_ERROR_READ_NOT_PERMITTED:
->> +             return "Read Not Permitted";
->> +     case BT_ATT_ERROR_WRITE_NOT_PERMITTED:
->> +             return "Write Not Permitted";
->> +     case BT_ATT_ERROR_INVALID_PDU:
->> +             return "Invalid PDU";
->> +     case BT_ATT_ERROR_AUTHENTICATION:
->> +             return "Authentication Required";
->> +     case BT_ATT_ERROR_REQUEST_NOT_SUPPORTED:
->> +             return "Request Not Supported";
->> +     case BT_ATT_ERROR_INVALID_OFFSET:
->> +             return "Invalid Offset";
->> +     case BT_ATT_ERROR_AUTHORIZATION:
->> +             return "Authorization Required";
->> +     case BT_ATT_ERROR_PREPARE_QUEUE_FULL:
->> +             return "Prepare Write Queue Full";
->> +     case BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND:
->> +             return "Attribute Not Found";
->> +     case BT_ATT_ERROR_ATTRIBUTE_NOT_LONG:
->> +             return "Attribute Not Long";
->> +     case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE:
->> +             return "Insuficient Encryption Key Size";
->> +     case BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN:
->> +             return "Invalid Attribute value len";
->> +     case BT_ATT_ERROR_UNLIKELY:
->> +             return "Unlikely Error";
->> +     case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION:
->> +             return "Insufficient Encryption";
->> +     case BT_ATT_ERROR_UNSUPPORTED_GROUP_TYPE:
->> +             return "Group type Not Supported";
->> +     case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
->> +             return "Insufficient Resources";
->> +     default:
->> +             return "Unknown error type";
-
-Probably it make sense to print the code in case it is unknown, so
-perhaps instead of just %s do %s (%d) when printing the message.
-
->> +     }
->> +}
->> +
->>  static void att_disconnect_cb(int err, void *user_data)  {
->>       printf("Device disconnected: %s\n", strerror(err)); @@ -489,7 +531,8
->> @@ static void read_cb(bool success, uint8_t att_ecode, const uint8_t
->> *value,
->>       int i;
->>
->>       if (!success) {
->> -             PRLOG("\nRead request failed: 0x%02x\n", att_ecode);
->> +             PRLOG("\nRead request failed: %s\n",
->> +                             ecode_to_string(att_ecode));
->>               return;
->>       }
->>
->> @@ -596,7 +639,7 @@ static void write_cb(bool success, uint8_t att_ecode,
->> void *user_data)
->>       if (success) {
->>               PRLOG("\nWrite successful\n");
->>       } else {
->> -             PRLOG("\nWrite failed: 0x%02x\n", att_ecode);
->> +             PRLOG("\nWrite failed: %s\n", ecode_to_string(att_ecode));
->>       }
->>  }
->>
->> @@ -726,7 +769,7 @@ static void write_long_cb(bool success, bool
->> reliable_error, uint8_t att_ecode,
->>       } else if (reliable_error) {
->>               PRLOG("Reliable write not verified\n");
->>       } else {
->> -             PRLOG("Write failed: 0x%02x\n", att_ecode);
->> +             PRLOG("\nWrite failed: %s\n", ecode_to_string(att_ecode));
->>       }
->>  }
->>
->> --
->> 1.9.1
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
->> the body of a message to majordomo@vger.kernel.org More majordomo
->> info at  http://vger.kernel.org/majordomo-info.html
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/android/pts-pan.txt b/android/pts-pan.txt
+index e95a82e..ba4afac 100644
+--- a/android/pts-pan.txt
++++ b/android/pts-pan.txt
+@@ -1,7 +1,7 @@
+ PTS test results for PAN
+ 
+-PTS version: 5.3
+-Tested: 17-November-2014
++PTS version: 6.0
++Tested: 17-February-2015
+ Android version: 5.0
+ 
+ Results:
+@@ -13,61 +13,64 @@ N/A	test is disabled due to PICS setup
+ --------------------------------------------------------------------------------
+ Test Name				Result	Notes
+ --------------------------------------------------------------------------------
+-TC_BNEP_GN_BROADCAST_0_BV_03_C		N/A
+-TC_GN_Ipv4_Autonet_BV_01_I		N/A
+-TC_GN_Ipv6_Autonet_BV_02_I		N/A
+-TC_GN_IP_DHCP_BV_03_I			N/A
+-TC_GN_IP_LLMNR_BV_01_I			N/A
+-TC_GN_IP_LLMNR_BV_02_I			N/A
+-TC_GN_IP_DNS_BV_01_I			N/A
+-TC_GN_IP_APP_BV_01_I			N/A
+-TC_GN_IP_APP_BV_02_I			N/A
+-TC_GN_IP_APP_BV_03_I			N/A
+-TC_GN_IP_APP_BV_04_I			N/A
+-TC_GN_IP_APP_BV_05_I			N/A
+-TC_SDP_GN_BV_02_C			N/A
+-TC_MISC_GN_UUID_BV_01_C			N/A
+-TC_MISC_GN_UUID_BV_02_C			N/A
+-TC_BNEP_NAP_BROADCAST_0_BV_01_C		N/A
+-TC_BNEP_NAP_BROADCAST_0_BV_02_C		N/A
+-TC_BNEP_NAP_FORWARD_UNICAST_BV_05_C	N/A
+-TC_BNEP_NAP_FORWARD_UNICAST_BV_06_C	N/A
+-TC_BNEP_NAP_MULTICAST_0_BV_03_C		N/A
+-TC_BNEP_NAP_MULTICAST_0_BV_04_C		N/A
+-TC_BNEP_BRIDGE_RX_BV_02_I		INC	PTS issue #12464
+-TC_BNEP_BRIDGE_TX_BV_01_I		PASS
+-TC_NAP_Ipv4_Autonet_BV_01_I		N/A
+-TC_NAP_Ipv6_Autonet_BV_02_I		N/A
+-TC_NAP_IP_DHCP_BV_03_I			N/A
+-TC_NAP_IP_LLMNR_BV_01_I			N/A
+-TC_NAP_IP_LLMNR_BV_02_I			N/A
+-TC_NAP_IP_DNS_BV_01_I			N/A
+-TC_NAP_IP_APP_BV_01_I			N/A
+-TC_NAP_IP_APP_BV_02_I			N/A
+-TC_NAP_IP_APP_BV_03_I			N/A
+-TC_NAP_IP_APP_BV_04_I			N/A
+-TC_NAP_IP_APP_BV_05_I			N/A
+-TC_SDP_NAP_BV_01_C			PASS
+-TC_MISC_NAP_UUID_BV_01_C		PASS
+-TC_MISC_NAP_UUID_BV_02_C		PASS
+-TC_BNEP_PANU_BROADCAST_0_BV_04_C	N/A
+-TC_PANU_Ipv4_Autonet_BV_01_I		PASS	After DHCP request fail send
+-						DHCP address request.
+-						From IUT: send address request
+-						dhcpcd -r 169.254.x.x bt-pan
+-TC_PANU_Ipv6_Autonet_BV_02_I		N/A
+-TC_PANU_IP_LLMNR_BV_01_I		N/A	SE #3558, TSE #4382, TCW #448
+-TC_PANU_IP_LLMNR_BV_02_I		N/A
+-TC_PANU_IP_DHCP_BV_03_I			N/A
+-TC_PANU_IP_DNS_BV_01_I			N/A
+-TC_PANU_IP_APP_BV_01_I			N/A
+-TC_PANU_IP_APP_BV_02_I			N/A
+-TC_PANU_IP_APP_BV_03_I			N/A
+-TC_PANU_IP_APP_BV_04_I			N/A
+-TC_PANU_IP_APP_BV_05_I			PASS
+-TC_SDP_PANU_BV_01_C			N/A
+-TC_MISC_PANU_UUID_BV_01_C		N/A
+-TC_MISC_PANU_UUID_BV_02_C		N/A
+-TC_MISC_ROLE_BV_01_C			N/A
+-TC_MISC_ROLE_BV_BV_02_C			N/A
++TC_BNEP_BROADCAST_0_BV_01_C			N/A
++TC_BNEP_BROADCAST_0_BV_02_C			N/A
++TC_BNEP_MULTICAST_0_BV_03_C			N/A
++TC_BNEP_MULTICAST_0_BV_04_C			N/A
++TC_BNEP_FORWARD_UNICAST_BV_05_C			N/A
++TC_BNEP_FORWARD_UNICAST_BV_06_C			N/A
++TC_BNEP_EXTENSION_0_BV_07_C_TESTER_1		N/A
++TC_BNEP_EXTENSION_0_BV_07_C_TESTER_2		N/A
++TC_BNEP_FORWARD_BV_08_C_TESTER_1		N/A
++TC_BNEP_FORWARD_BV_08_C_TESTER_2		N/A
++TC_BNEP_FORWARD_BROADCAST_BV_09_C_TESTER_1	N/A
++TC_BNEP_FORWARD_BROADCAST_BV_09_C_TESTER_2	N/A
++TC_BNEP_FORWARD_BROADCAST_BV_09_C_TESTER_3	N/A
++TC_BNEP_FILTER_BV_10_C_TESTER_1			N/A
++TC_BNEP_FILTER_BV_10_C_TESTER_2			N/A
++TC_BNEP_FILTER_BV_11_C_TESTER_1			N/A
++TC_BNEP_FILTER_BV_11_C_TESTER_2			N/A
++TC_BNEP_FILTER_BV_12_C_TESTER_1			N/A
++TC_BNEP_FILTER_BV_12_C_TESTER_2			N/A
++TC_BNEP_FILTER_BV_13_C_TESTER_1			N/A
++TC_BNEP_FILTER_BV_13_C_TESTER_2			N/A
++TC_BNEP_FILTER_BV_14_C_TESTER_1			N/A
++TC_BNEP_FILTER_BV_14_C_TESTER_2			N/A
++TC_BNEP_FILTER_BV_15_C_TESTER_1			N/A
++TC_BNEP_FILTER_BV_15_C_TESTER_2			N/A
++TC_BRIDGE_TX_BV_01_I				PASS
++TC_BRIDGE_RX_BV_02_I				PASS
++						To initiate general ethernet
++						use for e.g. ping.
++TC_IPv4_AUTONET_BV_01_I				PASS
++						To initiate general ethernet
++						use for e.g. ping.
++TC_IPv6_AUTONET_BV_02_I				N/A
++TC_IP_DHCP_BV_03_I				PASS
++TC_IP_LLMNR_BV_01_I				N/A
++TC_IP_LLMNR_BV_02_I				N/A
++TC_IP_DNS_BV_01_I				N/A
++TC_IP_APP_BV_03_I				ip neighbour add <PTS IP addr>
++							lladdr <PTS HW addr>
++							dev bt-pan
++						ping -c 1 <PTS IP addr>
++						Note: Add ARP record if bt-pan
++							connection is
++							established
++TC_IP_APP_BV_05_I				ip neighbour add <PTS IP addr>
++							lladdr <PTS HW addr>
++							dev bt-pan
++						Note: Add of ARP record should
++							be done immediately
++							after establish of
++							bt-pan, because PTS
++							treat other than ICMP
++							frames as error.
++TC_MISC_ROLE_BV_01_C				N/A
++TC_MISC_ROLE_BV_02_C				N/A
++TC_MISC_UUID_BV_01_C				PASS
++TC_MISC_UUID_BV_02_C				PASS
++TC_SDP_NAP_BV_01_C				PASS
++TC_SDP_GN_BV_01_C				N/A
++TC_SDP_PANU_BV_01_C				PASS
+ --------------------------------------------------------------------------------
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
