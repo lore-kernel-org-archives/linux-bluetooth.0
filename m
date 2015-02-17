@@ -1,84 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] doc/gatt-api: Introduce GattProfile1 concept
-Date: Tue, 17 Feb 2015 11:24:15 +0200
-Message-Id: <1424165055-22588-1-git-send-email-johan.hedberg@gmail.com>
+Cc: cpgs@samsung.com
+References: <1423755046-7688-1-git-send-email-bharat.panda@samsung.com>
+In-reply-to: <1423755046-7688-1-git-send-email-bharat.panda@samsung.com>
+Subject: RE: [PATCH v2] tools/gatt-client: print read/write error messages
+Date: Tue, 17 Feb 2015 11:10:51 +0530
+Message-id: <009501d04a74$4b599c10$e20cd430$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+ping
 
-Until now the GATT D-Bus API doesn't provide any way to register client
-role profiles so that bluetoothd would be able to add matching devices
-to its auto-connect list (managed by the kernel from 3.17 onward). To
-keep the GATT D-Bus interface as capable as the internal plugin API this
-patch adds a new concept of a GattProfile1 D-Bus object. By registering
-such an object and providing a set of mandatory service UUIDs bluetoothd
-will start performing matching against remote devices and add them to
-the auto-connect list.
----
- doc/gatt-api.txt | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
-
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index de7f2d9ae6b3..a74987b6caf2 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -205,6 +205,26 @@ Properties	string UUID [read-only]
- 			which a PropertiesChanged signal will be emitted.
- 
- 
-+Profile hierarcy
-+================
-+
-+Local profile (GATT client) instance. By registering this type of object
-+an application effectively indicates support for a specific GATT profile
-+and requests automatic connections to be established to devices
-+supporting it.
-+
-+Service		<application dependent>
-+Interface	org.bluez.GattProfile1 [Experimental]
-+Object path	<application dependent>
-+
-+Methods		void Release()
-+
-+			This method gets called when the service daemon
-+			unregisters the profile. The profile can use it to
-+			do cleanup tasks. There is no need to unregister the
-+			profile, because when this method gets called it has
-+			already been unregistered.
-+
- 
- GATT Manager hierarchy
- ======================
-@@ -244,3 +264,26 @@ Methods		void RegisterService(object service, dict options)
- 
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.DoesNotExist
-+
-+		void RegisterProfile(object profile, array{string} UUIDs)
-+
-+			Registers a GATT (client role) profile exported
-+			under interface GattProfile1. The array of UUIDs
-+			specifies the mandatory set of remote service
-+			UUIDs that should all be available for the
-+			remote device to match this profile. Matching
-+			devices will be added to the auto-connection
-+			list and connected whenever available.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.AlreadyExists
-+
-+		void UnregisterService(object profile)
-+
-+			This unregisters the profile that has been
-+			previously registered. The object path parameter
-+			must match the same value that has been used
-+			on registration.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.DoesNotExist
--- 
-2.1.0
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Bharat Panda
+> Sent: Thursday, February 12, 2015 9:01 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: cpgs@samsung.com; Bharat Panda
+> Subject: [PATCH v2] tools/gatt-client: print read/write error messages
+> 
+> Convert error codes to error messages for read/write value error
+responses.
+> ---
+>  tools/btgatt-client.c | 49
+> ++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 46 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c index
+> 8bda89b..3dd75b4 100644
+> --- a/tools/btgatt-client.c
+> +++ b/tools/btgatt-client.c
+> @@ -74,6 +74,48 @@ static void print_prompt(void)
+>  	fflush(stdout);
+>  }
+> 
+> +static const char *ecode_to_string(uint8_t ecode) {
+> +	switch (ecode) {
+> +	case BT_ATT_ERROR_INVALID_HANDLE:
+> +		return "Invalid Handle";
+> +	case BT_ATT_ERROR_READ_NOT_PERMITTED:
+> +		return "Read Not Permitted";
+> +	case BT_ATT_ERROR_WRITE_NOT_PERMITTED:
+> +		return "Write Not Permitted";
+> +	case BT_ATT_ERROR_INVALID_PDU:
+> +		return "Invalid PDU";
+> +	case BT_ATT_ERROR_AUTHENTICATION:
+> +		return "Authentication Required";
+> +	case BT_ATT_ERROR_REQUEST_NOT_SUPPORTED:
+> +		return "Request Not Supported";
+> +	case BT_ATT_ERROR_INVALID_OFFSET:
+> +		return "Invalid Offset";
+> +	case BT_ATT_ERROR_AUTHORIZATION:
+> +		return "Authorization Required";
+> +	case BT_ATT_ERROR_PREPARE_QUEUE_FULL:
+> +		return "Prepare Write Queue Full";
+> +	case BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND:
+> +		return "Attribute Not Found";
+> +	case BT_ATT_ERROR_ATTRIBUTE_NOT_LONG:
+> +		return "Attribute Not Long";
+> +	case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE:
+> +		return "Insuficient Encryption Key Size";
+> +	case BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN:
+> +		return "Invalid Attribute value len";
+> +	case BT_ATT_ERROR_UNLIKELY:
+> +		return "Unlikely Error";
+> +	case BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION:
+> +		return "Insufficient Encryption";
+> +	case BT_ATT_ERROR_UNSUPPORTED_GROUP_TYPE:
+> +		return "Group type Not Supported";
+> +	case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
+> +		return "Insufficient Resources";
+> +	default:
+> +		return "Unknown error type";
+> +	}
+> +}
+> +
+>  static void att_disconnect_cb(int err, void *user_data)  {
+>  	printf("Device disconnected: %s\n", strerror(err)); @@ -489,7 +531,8
+> @@ static void read_cb(bool success, uint8_t att_ecode, const uint8_t
+> *value,
+>  	int i;
+> 
+>  	if (!success) {
+> -		PRLOG("\nRead request failed: 0x%02x\n", att_ecode);
+> +		PRLOG("\nRead request failed: %s\n",
+> +				ecode_to_string(att_ecode));
+>  		return;
+>  	}
+> 
+> @@ -596,7 +639,7 @@ static void write_cb(bool success, uint8_t att_ecode,
+> void *user_data)
+>  	if (success) {
+>  		PRLOG("\nWrite successful\n");
+>  	} else {
+> -		PRLOG("\nWrite failed: 0x%02x\n", att_ecode);
+> +		PRLOG("\nWrite failed: %s\n", ecode_to_string(att_ecode));
+>  	}
+>  }
+> 
+> @@ -726,7 +769,7 @@ static void write_long_cb(bool success, bool
+> reliable_error, uint8_t att_ecode,
+>  	} else if (reliable_error) {
+>  		PRLOG("Reliable write not verified\n");
+>  	} else {
+> -		PRLOG("Write failed: 0x%02x\n", att_ecode);
+> +		PRLOG("\nWrite failed: %s\n", ecode_to_string(att_ecode));
+>  	}
+>  }
+> 
+> --
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
