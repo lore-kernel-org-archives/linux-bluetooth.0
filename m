@@ -1,83 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1424247519-21684-1-git-send-email-armansito@chromium.org>
-References: <1424247519-21684-1-git-send-email-armansito@chromium.org>
-Date: Wed, 18 Feb 2015 16:56:04 +0200
-Message-ID: <CABBYNZKq_115dAvyBfKa00orycCT_96v7j8j98bXtQ8+g+-9pw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 0/8] Rewrite local GATT server using shared/gatt
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bharat Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] tools/gatt-client: Define ATT application err code
+Date: Wed, 18 Feb 2015 20:33:40 +0530
+Message-id: <1424271820-19566-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Adds application error codes for ATT response PDUs.
+Prints error messages for respective application error codes.
+1. IO Error
+2. Operation Timedout
+3. Operation Aborted
 
-On Wed, Feb 18, 2015 at 10:18 AM, Arman Uguray <armansito@chromium.org> wrote:
-> *v2: Rebased remaining patches.
->
-> *v1: Addressed comments by jamuraa and vudentz:
->   - Now passing bt_att instead of bdaddr_t in gatt_db callbacks and functions.
->     I have not run the tests on the android side here, so I would appreciate it
->     if you can run them.
->   - Renamed src/gatt-server to src/gatt-database for now. Added TODO item for
->     refactoring this later.
->   - Updated the TODO items for GATT.
->
-> This patch set includes patches that rewrite the local GATT server using
-> shared/gatt. This in effect invalidates the existing src/attrib-server in
-> favor of a new src/gatt-server.
->
->
-> Arman Uguray (8):
->   core: adapter: Initialize GATT database
->   core: Attach gatt-server to bt_att
->   core: Add GATT UUIDs to Adapter1.UUIDs
->   core: device: Add getter for GATT server
->   core: gatt: Send not/ind to devices
->   core: adapter: Send UUIDs changed for GATT services
->   shared/gatt: Don't incorrectly terminate discovery
->   TODO: Update GATT items.
->
->  TODO                     | 54 ++++++++++++++++++---------------
->  src/adapter.c            | 77 +++++++++++++++++++++++++++++++++++++++++-------
->  src/adapter.h            |  2 ++
->  src/device.c             | 55 ++++++++++++++++++++++++----------
->  src/device.h             |  1 +
->  src/gatt-database.c      | 25 ++++++++++++++--
->  src/shared/gatt-client.c |  3 +-
->  7 files changed, 162 insertions(+), 55 deletions(-)
->
-> --
-> 2.2.0.rc0.207.ga3a616c
+e.g.
 
-Applied, note that I did add support for BR/EDR that was missing, but
-now we need to fix the following problems:
+[GATT client]# read-value 0x0015
+[GATT client]#
+Read request failed: IO Error (0x80)
+---
+ src/shared/att-types.h | 5 +++++
+ tools/btgatt-client.c  | 6 ++++++
+ 2 files changed, 11 insertions(+)
 
-
-bluetoothd[28074]: plugins/gatt-example.c:gatt_example_adapter_probe()
-Battery service could not be registered
-bluetoothd[28074]: gatt-example-adapter-driver: Input/output error (5)
-bluetoothd[28074]: Not enough free handles to register service
-bluetoothd[28074]: Error adding Link Loss service
-bluetoothd[28074]: Not enough free handles to register service
-bluetoothd[28074]: Not enough free handles to register service
-bluetoothd[28074]:
-profiles/proximity/reporter.c:reporter_adapter_probe() Proximity
-Reporter for adapter 0x5e86af0
-bluetoothd[28074]: profiles/time/server.c:time_server_init() path
-/org/bluez/hci0
-bluetoothd[28074]: Not enough free handles to register service
-bluetoothd[28074]: Current Time Service could not be registered
-bluetoothd[28074]: gatt-time-server: Input/output error (5)
-bluetoothd[28074]: Not enough free handles to register service
-bluetoothd[28074]: Not enough free handles to register service
-
-I guess it might be possible to leave attrib-server.h API but rewrite
-the internals so that it actually uses bt_gatt_server and gatt_db, or
-we can just rewrite the plugins and remove attrib-server altogether.
-
-
+diff --git a/src/shared/att-types.h b/src/shared/att-types.h
+index aa7f0da..5f95dab 100644
+--- a/src/shared/att-types.h
++++ b/src/shared/att-types.h
+@@ -91,6 +91,11 @@ struct bt_att_pdu_error_rsp {
+ #define BT_ATT_ERROR_UNSUPPORTED_GROUP_TYPE		0x10
+ #define BT_ATT_ERROR_INSUFFICIENT_RESOURCES		0x11
+ 
++/* Application error codes for Error response PDU*/
++#define BT_ATT_ERROR_IO				0x80
++#define BT_ATT_ERROR_TIMEOUT				0x81
++#define BT_ATT_ERROR_ABORTED				0x82
++
+ /*
+  * ATT attribute permission bitfield values. Permissions are grouped as
+  * "Access", "Encryption", "Authentication", and "Authorization". A bitmask of
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index e59d5db..7777211 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -111,6 +111,12 @@ static const char *ecode_to_string(uint8_t ecode)
+ 		return "Group type Not Supported";
+ 	case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
+ 		return "Insufficient Resources";
++	case BT_ATT_ERROR_IO:
++		return "IO Error";
++	case BT_ATT_ERROR_TIMEOUT:
++		return "Operation Timed out";
++	case BT_ATT_ERROR_ABORTED:
++		return "Operation Aborted";
+ 	default:
+ 		return "Unknown error type";
+ 	}
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
