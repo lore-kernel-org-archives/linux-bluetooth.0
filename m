@@ -1,74 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 1/2] audio/avdtp: Use bitfield id generation
-Date: Wed, 18 Feb 2015 12:53:10 +0200
-Message-Id: <1424256791-23531-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1417786152-19742-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1417786152-19742-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 18 Feb 2015 09:53:41 +0100
+Message-ID: <CAN_7+YZ78YgyHFgXXUaKbxZo6CeiNV+Pc=1bNGZ3qcPdWwc0nA@mail.gmail.com>
+Subject: Re: [PATCH] doc/mgmt-api: Add support to add/remove advertising data instance
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-Use bitfield utils for assigning SEP id. This fixes duplicated id
-generation shown in unit/avdtp tests.
----
- profiles/audio/avdtp.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+On Fri, Dec 5, 2014 at 2:29 PM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> Multi advertising is design for embedded devices having multiple GATT
+> application running on it. Since Advertising data are size limited there
+> is a need to have a way to make sure that each application will be
+> advertised and in the same time visible for GATT Client application.
+>
+> It has been noticed that there is many GATT clients doing filtering on
+> Service UUIDs contained in advertising data.
+>
+> Since this command is design for embedded devices, we allow to choose
+> whether given data element shall be in advertising data or scan
+> response.
+>
+> This patch also enhance supported settings with multi advertising bit
+> which indicates to user space that kernel supports that.
+> ---
+>  doc/mgmt-api.txt | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 72 insertions(+)
+>
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index fed41a9..8a947f1 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -267,6 +267,7 @@ Read Controller Information Command
+>                 12      Debug Keys
+>                 13      Privacy
+>                 14      Controller Configuration
+> +               15      Multi Advertising
+>
+>         This command generates a Command Complete event on success or
+>         a Command Status event on failure.
+> @@ -2214,6 +2215,77 @@ Start Service Discovery Command
+>                                 Invalid Index
+>
+>
+> +Add Advertising Data Instance
+> +=============================
+> +
+> +       Command Code:           0x003b
+> +       Controller Index:       <controller id>
+> +       Command Parameters:
+> +                               Flags (4 Octet)
+> +                               Num_Of_Data_Elements (1 Octet)
+> +                               Data_Element_1 {
+> +                                       Flags (4 Octet)
+> +                                       Type (1 Octet)
+> +                                       Value_Length (1 Octet)
+> +                                       Value (Variable)
+> +                               }
+> +                               Data_Element_2 { }
+> +                               ...
+> +
+> +       Return Parameters:      Advertising_Instance_ID (2 Octets)
+> +
+> +       This command allows to set User Advertising Data Instance which are advertised
+> +       in such manner so each element has its own advertising time slice then it
+> +       expires and next item gets its advertising time slice.
+> +
+> +       Note that kernel has own instance which always gets its advertising time
+> +       slice.
+> +
+> +       Note that maximum length of Advertising Data and Scan Response is
+> +       specified to 31 bytes each.
+> +
+> +       Possible values Flags parameter are a bit-wise or of the following bits:
+> +               0       Include Short Name
+> +               1       Include TX Power
+> +
+> +       Possible values for Data Element Flags are a bit-wise or of the following
+> +       bits:
+> +               0       Force include into advertising data
+> +               1       Force include into scan response
+> +
+> +       Possible values for the Type parameter are specified by Bluetooth SIG and can
+> +       be found in Assigned Number section for Generic Access Profile.
+> +
+> +       This command can be used when the controller is not powered and
+> +       all settings will be programmed once powered and advertising is enabled.
+> +
+> +       Provided advertising data instances are persistent over power down/up toggles.
+> +
+> +       Possible errors:        Not Supported
+> +                               Invalid Parameters
+> +                               Invalid Index
+> +
+> +
+> +Remove Advertising Data Instance
+> +================================
+> +
+> +       Command Code:           0x003c
+> +       Controller Index:       <controller id>
+> +       Command Parameters:     Advertising_Instance_ID (1 Octet)
+> +       Return Parameters:
+> +
+> +       This command is use to remove user advertising instance created with
+> +       Add User Advertising Instance
+> +
+> +       This command generates a Command Complete event on success or a
+> +       Command Status event on failure.
+> +
+> +
+> +       Possible errors:        Not Supported
+> +                               Invalid Parameters
+> +                               Invalid Index
+> +
+> +
+>  Command Complete Event
+>  ======================
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index ba5f0e5..825fb79 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -41,6 +41,7 @@
- #include <glib.h>
- 
- #include "src/log.h"
-+#include "src/shared/util.h"
- 
- #include "btio/btio.h"
- #include "lib/uuid.h"
-@@ -54,6 +55,7 @@
- #define AVDTP_PSM 25
- 
- #define MAX_SEID 0x3E
-+static unsigned int seids;
- 
- #ifndef MAX
- # define MAX(x, y) ((x) > (y) ? (x) : (y))
-@@ -3703,6 +3705,10 @@ struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
- {
- 	struct avdtp_server *server;
- 	struct avdtp_local_sep *sep;
-+	uint8_t seid = util_get_uid(&seids, MAX_SEID);
-+
-+	if (!seid)
-+		return NULL;
- 
- 	server = find_server(servers, adapter);
- 	if (!server) {
-@@ -3711,13 +3717,10 @@ struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
- 			return NULL;
- 	}
- 
--	if (g_slist_length(server->seps) > MAX_SEID)
--		return NULL;
--
- 	sep = g_new0(struct avdtp_local_sep, 1);
- 
- 	sep->state = AVDTP_STATE_IDLE;
--	sep->info.seid = g_slist_length(server->seps) + 1;
-+	sep->info.seid = seid;
- 	sep->info.type = type;
- 	sep->info.media_type = media_type;
- 	sep->codec = codec_type;
-@@ -3762,6 +3765,7 @@ int avdtp_unregister_sep(struct avdtp_local_sep *sep)
- 	DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
- 			sep->info.type, sep->codec, sep->info.seid);
- 
-+	util_clear_uid(&seids, sep->info.seid);
- 	g_free(sep);
- 
- 	if (server->seps)
--- 
-2.1.0
+ping
 
+>
+> --
+> 1.8.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
