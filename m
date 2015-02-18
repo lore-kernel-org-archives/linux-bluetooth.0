@@ -2,84 +2,63 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 6/8] core: adapter: Send UUIDs changed for GATT services
-Date: Wed, 18 Feb 2015 00:18:37 -0800
-Message-Id: <1424247519-21684-7-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 5/8] core: gatt: Send not/ind to devices
+Date: Wed, 18 Feb 2015 00:18:36 -0800
+Message-Id: <1424247519-21684-6-git-send-email-armansito@chromium.org>
 In-Reply-To: <1424247519-21684-1-git-send-email-armansito@chromium.org>
 References: <1424247519-21684-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btd_adapter now sends a PropertiesChanged signal for the "UUIDs"
-property when its associated gatt_db is modified.
+This patch adds code that sends out characteristic value
+notification/indication PDUs by obtaining the bt_gatt_server
+from each device that has the associated CCC configured.
 ---
- src/adapter.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ src/gatt-database.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 03e359b..fdf7bc5 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -229,6 +229,8 @@ struct btd_adapter {
- 	unsigned int pair_device_id;
- 	guint pair_device_timeout;
- 
-+	unsigned int db_id;		/* Service event handler for GATT db */
-+
- 	bool is_default;		/* true if adapter is default one */
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 1a77e6b..710f277 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -496,6 +496,11 @@ struct not_data {
+ 	bool indicate;
  };
  
-@@ -4593,6 +4595,7 @@ static struct btd_adapter *btd_adapter_new(uint16_t index)
- static void adapter_remove(struct btd_adapter *adapter)
- {
- 	GSList *l;
-+	struct gatt_db *db;
- 
- 	DBG("Removing adapter %s", adapter->path);
- 
-@@ -4618,6 +4621,11 @@ static void adapter_remove(struct btd_adapter *adapter)
- 	adapter->devices = NULL;
- 
- 	unload_drivers(adapter);
-+
-+	db = btd_gatt_database_get_db(adapter->database);
-+	gatt_db_unregister(db, adapter->db_id);
-+	adapter->db_id = 0;
-+
- 	btd_gatt_database_destroy(adapter->database);
- 
- 	g_slist_free(adapter->pin_callbacks);
-@@ -6627,9 +6635,18 @@ static int set_did(struct btd_adapter *adapter, uint16_t vendor,
- 	return -EIO;
- }
- 
-+static void services_modified(struct gatt_db_attribute *attrib, void *user_data)
++static void conf_cb(void *user_data)
 +{
-+	struct btd_adapter *adapter = user_data;
-+
-+	g_dbus_emit_property_changed(dbus_conn, adapter->path,
-+						ADAPTER_INTERFACE, "UUIDs");
++	DBG("GATT server received confirmation");
 +}
 +
- static int adapter_register(struct btd_adapter *adapter)
+ static void send_notification_to_device(void *data, void *user_data)
  {
- 	struct agent *agent;
-+	struct gatt_db *db;
+ 	struct device_state *device_state = data;
+@@ -517,8 +522,24 @@ static void send_notification_to_device(void *data, void *user_data)
+ 		return;
  
- 	if (powering_down)
- 		return -EBUSY;
-@@ -6664,6 +6681,11 @@ static int adapter_register(struct btd_adapter *adapter)
- 	if (!adapter->database)
- 		error("Failed to create GATT database for adapter");
- 
-+	db = btd_gatt_database_get_db(adapter->database);
-+	adapter->db_id = gatt_db_register(db, services_modified,
-+							services_modified,
-+							adapter, NULL);
+ 	/*
+-	 * TODO: Notify device via bt_gatt_server
++	 * TODO: If the device is not connected but bonded, send the
++	 * notification/indication when it becomes connected.
+ 	 */
++	if (!not_data->indicate) {
++		DBG("GATT server sending notification");
++		bt_gatt_server_send_notification(
++					btd_device_get_gatt_server(device),
++					not_data->handle, not_data->value,
++					not_data->len);
++		return;
++	}
 +
- 	load_config(adapter);
- 	fix_storage(adapter);
- 	load_drivers(adapter);
++	DBG("GATT server sending indication");
++	bt_gatt_server_send_indication(btd_device_get_gatt_server(device),
++							not_data->handle,
++							not_data->value,
++							not_data->len, conf_cb,
++							NULL, NULL);
+ }
+ 
+ static void send_notification_to_devices(struct btd_gatt_database *database,
 -- 
 2.2.0.rc0.207.ga3a616c
 
