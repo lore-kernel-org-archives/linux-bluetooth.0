@@ -1,93 +1,428 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 1/2] android/pts: Update HFP PIXIT, PICS for PTS 6.0
-Date: Wed, 18 Feb 2015 18:45:46 +0100
-Message-Id: <1424281547-4454-1-git-send-email-mariusz.skamra@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <3935781.3YG3puahzJ@athlon>
+References: <CALUN+EfYdOffOSejMQh3vnLGX1PZmBqMXL8UhvL-UHK_2kZqFA@mail.gmail.com>
+	<4717325.0Njt2iLfvL@athlon>
+	<CALUN+EcJ4p4kkFDZDyi01iSAwDMv4M1Q=axAPiCb+YOAQ64CNQ@mail.gmail.com>
+	<3935781.3YG3puahzJ@athlon>
+Date: Wed, 18 Feb 2015 09:01:52 -0700
+Message-ID: <CALUN+EdnyqB_X0sqV78gL_wd1OGaeNudH8DN7UNwNa5hAjdC-w@mail.gmail.com>
+Subject: Re: android-bluez with usb adapter
+From: Keith Conger <keith.conger@gmail.com>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pics-hfp.txt  | 15 ++++++---------
- android/pixit-hfp.txt |  2 +-
- 2 files changed, 7 insertions(+), 10 deletions(-)
+Sorry, about forgetting to reply-all.
 
-diff --git a/android/pics-hfp.txt b/android/pics-hfp.txt
-index da0eb23..ea81289 100644
---- a/android/pics-hfp.txt
-+++ b/android/pics-hfp.txt
-@@ -90,7 +90,7 @@ TSPC_HFP_2_26	False		HF Indicators (C.11)
- TSPC_HFP_2_27	False		Support CVSD eSCO s4 setting (C.12)
- -------------------------------------------------------------------------------
- C.1:  The AG must support one of item TSPC_HFP_2_4a or TSPC_HFP_2_4b
--C.2:  Mandatory if TSPC_HFP_2_12is TRUE; otherwise excluded
-+C.2:  Mandatory if TSPC_HFP_2_12 is TRUE; otherwise excluded
- C.3:  Optional if TSPC_HFP_2_12 is TRUE; otherwise excluded
- C.4:  The AG must support one of item TSPC_HFP_2_21a or TSPC_HFP_2_21c
- C.5:  Mandatory if TSPC_HFP_2_18a or TSPC_HFP_2_18b; otherwise optional
-@@ -98,7 +98,7 @@ C.6:  Optional if TSPC_HFP_2_15 is supported, otherwise excluded
- C.7:  Mandatory if TSPC_HFP_2_24 otherwise excluded
- C.8:  Excluded if TSPC_HFP_0_1 otherwise optional
- C.9:  Excluded if TSPC_HFP_0_1 otherwise mandatory
--C.10: Mandatory if TSPC_HFP_2_24 otherwise optional
-+C.10: Mandatory if TSPC_HFP_2_27 or TSPC_HFP_2_24 otherwise optional
- C.11: Optional IF HFP v1.5 (TSPC_HFP_0_1) OR HFP v1.6 (TSPC_HFP_0_2) is NOT
- 	supported, otherwise Excluded.
- C.12: Excluded IF HFP v1.5 (TSPC_HFP_0_1) OR HFP v1.6 (TSPC_HFP_0_2) is
-@@ -131,7 +131,6 @@ TSPC_HFP_3_4c	False		Accept an incoming voice call (in-band ring
- 					muting) (O)
- TSPC_HFP_3_5	False (*)	Reject an incoming voice call (M)
- TSPC_HFP_3_6	False (*)	Terminate a call (M)
--
- TSPC_HFP_3_7	False (*)	Audio connection transfer during an ongoing
- 					call (M)
- TSPC_HFP_3_7a	False		HF-initiated Audio transfer to AG during
-@@ -166,7 +165,7 @@ TSPC_HFP_3_20	False		Subscriber Number Information (O)
- TSPC_HFP_3_21a	False		Enhanced Call Status (O)
- TSPC_HFP_3_21b	False		Enhanced Call Control (C.2)
- TSPC_HFP_3_22	False		Support for automatic link loss recovery (O)
--TSPC_HFP_3_23	False		Individual Indicator Activation (C.6)
-+TSPC_HFP_3_23	False (*)	Individual Indicator Activation (C.6)
- TSPC_HFP_3_24	False		Wide Band Speech service (C.6)
- TSPC_HFP_3_25	False		HF Indicators (C.8)
- TSPC_HFP_3_26	False		Support CVSD eSCO S4 setting (C.9)
-@@ -174,10 +173,10 @@ TSPC_HFP_3_26	False		Support CVSD eSCO S4 setting (C.9)
- C.1: Mandatory if TSPC_HFP_3_12; otherwise excluded
- C.2: Optional if TSPC_HFP_3_12; otherwise excluded
- C.3: Mandatory if TSPC_HFP_3_18a or TSPC_HFP_3_18b, otherwise optional
--C.4: Mandatory if TSPC_HFP_3_18a, otherwise optional
-+C.4: Mandatory if TSPC_HFP_3_18b, otherwise optional
- C.5: Mandatory if TSPC_HFP_3_24 otherwise excluded
- C.6: Excluded if TSPC_HFP_0_1 otherwise optional
--C.7: Mandatory if TSPC_HFP_3_24 otherwise optional
-+C.7: Mandatory if TSPC_HFP_3_26 or TSPC_HFP_3_24 otherwise optional
- C.8: Optional IF HFP v1.5 (TSPC_HFP_0_1) OR HFP v1.6 (TSPC_HFP_0_2) is NOT
- 	supported, otherwise Excluded.
- C.9: Excluded IF HFP v1.5 (TSPC_HFP_0_1) OR HFP v1.6 (TSPC_HFP_0_2) is
-@@ -196,9 +195,7 @@ TSPC_HFP_4_2	True (*)	CVSD audio coding over eSCO (Accepting) (C.2)
- -------------------------------------------------------------------------------
- C.1: Mandatory if Wide band speech service is supported TSPC_HFP_2_24 or
- 	TSPC_HFP_3_24, otherwise excluded
--C.2: Mandatory IF TPSC_HFP_2_3b (eSCO support in Audio Connection - AG) OR
--	TSPC_HFP_3_3b (eSCO support in Audio Connection - HF); otherwise
--	Excluded.
-+C.2: Mandatory IF TPSC_HFP_2_3b OR TSPC_HFP_3_3b; otherwise	Excluded.
- -------------------------------------------------------------------------------
- 
- 
-diff --git a/android/pixit-hfp.txt b/android/pixit-hfp.txt
-index bf1b7e5..dfae9bf 100644
---- a/android/pixit-hfp.txt
-+++ b/android/pixit-hfp.txt
-@@ -1,6 +1,6 @@
- HFP PIXIT for the PTS tool.
- 
--PTS version: 5.3
-+PTS version: 6.0
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
+I'll give your suggestions a try and report back.
+
+Thanks for the help,
+Keith
+
+On Wed, Feb 18, 2015 at 12:34 AM, Szymon Janc <szymon.janc@gmail.com> wrote:
+> Hi Keith,
+>
+> (lets keep mailing list in CC)
+>
+> On Tuesday 17 February 2015 15:00:02 Keith Conger wrote:
+>> Thanks for getting back to me.  I did skip the hciattach part and I
+>> have verified /system/lib/bluetooth.default.so exists. When enabling
+>> via the UI I just see the following in the log:
+>
+> bluetooth.default.so should be in /system/lib/hw/
+>
+> This lib is loaded via hw_get_module().
+> (I'm not sure why this wasn't installed there - it should if you used our
+> Android.mk)
+>
+>>
+>> E/BluetoothAdapter( 1109): Bluetooth binder is null
+>> E/DeviceListPreferenceFragment( 1109): Bluetooth is not supported on this
+>> device
+>>
+>> I have attached a zip of my init scripts I'm using, I'm I missing anything?
+>
+> I'd make it a bit simpler:
+> - load modules directly from init.rc on boot
+> - remove this init.genericam33x.bt.rc file.
+>   this magic is not needed with btusb, also bluetoothd will power up device on
+>   start and power down on shutdown.
+> - remove init.bt.sh (not needed if you load module on init)
+> - import init.bluetooth.rc directly from you init.fooboard.rc file
+>
+>> Thanks again for your help!
+>> Keith
+>>
+>> On Tue, Feb 17, 2015 at 2:47 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
+>> > Hi Keith,
+>> >
+>> > On Tuesday 17 February 2015 14:16:37 Keith Conger wrote:
+>> >> I'm trying to swap out bluedroid with android-bluez to add bluetooth
+>> >> usb adapter support into KitKat for my Beaglebone Black(ARM). Should
+>> >> this be possible?
+>> >
+>> > Yeap, this is possible.
+>> >
+>> >> I followed this guide,
+>> >> http://forum.xda-developers.com/showthread.php?t=2640723 skipping the
+>> >> CSR parts.
+>> >>
+>> >> Here is a logcat with debugging enabled.  I've googled the errors and
+>> >> have had no luck.  Does anyone have any ideas?
+>> >>
+>> >> I/bluetoothd( 1072): Bluetooth daemon 5.28
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/main.c:set_capabilities() Caps: eff:
+>> >> 0x3400, perm: 0x3400, inh: 0x0
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/bluetooth.c:bt_bluetooth_start()
+>> >> index -1
+>> >>
+>> >> I/bluetoothd( 1072): Starting SDP server
+>> >>
+>> >> D/bluetoothd( 1072): external/bluetooth/bluez/android/main.c:main()
+>> >> Entering main loop
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0xffff] command 0x0001
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 01 00 ff ff 00 00
+>> >>
+>> >>           ..??..
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 ff ff 06 00 01 00 00 01 07 00
+>> >>
+>> >>           ..??........
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0xffff] command 0x0001 complete: 0x00
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/bluetooth.c:read_version_complete()
+>> >>
+>> >> I/bluetoothd( 1072): Bluetooth management interface 1.7 initialized
+>> >>
+>> >> I/bluetoothd( 1072): Kernel connection control will be used
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0xffff] command 0x0003
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 03 00 ff ff 00 00
+>> >>
+>> >>           ..??..
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 ff ff 07 00 03 00 00 01 00 00 00
+>> >>
+>> >>           ..??.........
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0xffff] command 0x0003 complete: 0x00
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/bluetooth.c:read_index_list_complete()
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/bluetooth.c:read_index_list_complete()
+>> >> Number of controllers: 1
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0004
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 04 00 00 00 00 00
+>> >>
+>> >>           ......
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 00 00 1b 01 04 00 00 e9 36 36 e7
+>> >> 18 00 03  .........?66?...
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   0f 00 bf 10 00 00 90 00 00 00 00 00 00
+>> >> 42 43 4d  ..?..........BCM
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   32 30 34 35 42 33 00 00 00 00 00 00 00
+>> >> 00 00 00  2045B3..........
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00
+>> >>
+>> >>           .
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0004 complete: 0x00
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/bluetooth.c:read_info_complete()
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/src/sdpd-service.c:register_device_id()
+>> >> Adding device id record for 0002:1d6b:0247:051c
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/src/sdpd-service.c:add_record_to_server()
+>> >> Adding record with handle 0x10001
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/src/sdpd-service.c:add_record_to_server()
+>> >> Record pattern UUID 00001002-0000-1000-8000-00805f9
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/src/sdpd-service.c:add_record_to_server()
+>> >> Record pattern UUID 0000113a-0000-1000-8000-00805f9
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/src/sdpd-service.c:add_record_to_server()
+>> >> Record pattern UUID 0000113b-0000-1000-8000-00805f9
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/bluetooth.c:load_ltks() ltks 0
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/bluetooth.c:load_irks() irks 0
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/bluetooth.c:load_link_keys() keys 0
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x000e
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 0e 00 00 00 02 00 02 0c
+>> >>
+>> >>           ........
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 00 00 06 00 0e 00 00 00 00 00
+>> >>
+>> >>           ............
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x000e complete: 0x00
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0011
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 11 00 00 00 10 00 00 00 00 00 00 00 00
+>> >> 00 00 00  ................
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 00 00 00
+>> >>
+>> >>           ......
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 00 00 06 00 11 00 00 00 00 00
+>> >>
+>> >>           ............
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0011 complete: 0x00
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0034
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 34 00 00 00 07 00 00 00 00 00 00 00 00
+>> >>
+>> >>           4............
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 00 00 0a 00 34 00 00 00 00 00 00
+>> >> 00 00 00  ......4.........
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0034 complete: 0x00
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0018
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 18 00 00 00 01 00 01
+>> >>
+>> >>           .......
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 00 00 03 00 18 00 00
+>> >>
+>> >>           .........
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0018 complete: 0x00
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0028
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 28 00 00 00 08 00 02 00 6b 1d 47 02 1c
+>> >> 05        (.......k.G...
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 00 00 03 00 28 00 00
+>> >>
+>> >>           ......(..
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0028 complete: 0x00
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0010
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 10 00 00 00 11 00 fb 34 9b 5f 80 00 00
+>> >> 80 00 10  ......?4._......
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 00 12 00 00 00
+>> >>
+>> >>           .......
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 00 00 06 00 10 00 00 00 00 00
+>> >>
+>> >>           ............
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0010 complete: 0x00
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0010
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 10 00 00 00 11 00 fb 34 9b 5f 80 00 00
+>> >> 80 00 10  ......?4._......
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if:   00 00 3b 11 00 00 00
+>> >>
+>> >>           ..;....
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 00 00 06 00 10 00 00 00 00 00
+>> >>
+>> >>           ............
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0010 complete: 0x00
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0013
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 13 00 00 00 02 00 00 00
+>> >>
+>> >>           ........
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 02 00 00 00 03 00 13 00 0c
+>> >>
+>> >>           .........
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x13 status: 0x0c
+>> >>
+>> >> I/bluetoothd( 1072): Failed to load LTKs: Not Supported (0x0c)
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0030
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 30 00 00 00 02 00 00 00
+>> >>
+>> >>           0.......
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 02 00 00 00 03 00 30 00 0c
+>> >>
+>> >>           ......0..
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x30 status: 0x0c
+>> >>
+>> >> I/bluetoothd( 1072): Failed to load IRKs: Not Supported (0x0c)
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0012
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 12 00 00 00 03 00 00 00 00
+>> >>
+>> >>           .........
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 00 00 03 00 12 00 00
+>> >>
+>> >>           .........
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0012 complete: 0x00
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/bluetooth.c:load_link_keys_complete()
+>> >> status 0
+>> >>
+>> >> I/bluetoothd( 1072): Adapter initialized
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/ipc.c:cmd_connect_cb()
+>> >>
+>> >> E/bluetoothd( 1072): IPC: command socket connect failed
+>> >>
+>> >> I/bluetoothd( 1072): Switching controller off
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0005
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: < 05 00 00 00 01 00 00
+>> >>
+>> >>           .......
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: > 01 00 00 00 07 00 05 00 00 90 00 00 00
+>> >>
+>> >>           .............
+>> >>
+>> >> I/bluetoothd( 1072): mgmt_if: [0x0000] command 0x0005 complete: 0x00
+>> >>
+>> >> D/bluetoothd( 1072):
+>> >> external/bluetooth/bluez/android/main.c:cleanup_services()
+>> >>
+>> >> I/bluetoothd( 1072): Stopping SDP server
+>> >>
+>> >> I/bluetoothd( 1072): Exit
+>> >
+>> > This log looks OK. Adapter was found and initialized. Only problem is that
+>> > there was no IPC socket listening for it to connect.
+>> >
+>> > On Android bluetoothd is not suppose to be started 'by hand'. It needs to
+>> > be started as service defined in init.rc (check android/README and
+>> > android/init.bluetooth.rc). This service is started via
+>> > bluetooth.default.so provided by BlueZ (this is implementation ofn
+>> > Android Bluetooth HAL interface). When bluetoothd starts and initializes
+>> > adapter it tries to connect IPC to this library. If lib is not loaded
+>> > (and there is no socket to connect to) bluetoothd shuts down.
+>> >
+>> > This library is loaded by Android Framework and when you enable BT from UI
+>> > lib will be initialized and daemon will be started. Other option for
+>> > testing is our test tool called haltest. This is command line tool that
+>> > will load bt lib and allow you to play with bt stack (this tool doesn't
+>> > use Android Framework).>
+>> > So what you should check:
+>> >  - you have init.bluetooth.rc in /
+>> >  - this file is included from your board init.foo.rc file
+>> >  - daemon and bluetooth.default.so are installed on system (this should be
+>> >
+>> >    handled just fine by Android.mk provided by BlueZ)
+>> >
+>> >  - you don't need hciattach service - this is not needed with btusb
+>> >
+>> > --
+>> > Szymon K. Janc
+>> > szymon.janc@gmail.com
+>
+> --
+> Szymon K. Janc
+> szymon.janc@gmail.com
+
+
+
 -- 
-1.9.1
-
+Keith Conger
+keith DOT conger AT gmail DOT com
+http://thecongers.org
