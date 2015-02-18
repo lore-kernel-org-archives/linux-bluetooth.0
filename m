@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/5] Bluetooth: Convert hci_cb_list_lock to a mutex
-Date: Wed, 18 Feb 2015 14:53:55 +0200
-Message-Id: <1424264038-32153-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/5] Bluetooth: Add new hci_cb entries to the tail rather than the head
+Date: Wed, 18 Feb 2015 14:53:54 +0200
+Message-Id: <1424264038-32153-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1424264038-32153-1-git-send-email-johan.hedberg@gmail.com>
 References: <1424264038-32153-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,126 +11,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We'll soon need to be able to sleep inside the loops that iterate the
-hci_cb list, so neither a spinlock, rwlock or rcu are usable. This patch
-changes the lock to a mutex which permits sleeping while holding the
-lock.
+When processing hci_cb entries we want first registered callbacks to be
+called first and later ones later. This is because eventually the L2CAP
+callbacks that are part of the core will use this list and get
+registered first. To keep the same order of calling L2CAP callbacks
+before e.g. RFCOMM the order of elements needs to be this way.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h | 18 +++++++++---------
- net/bluetooth/hci_core.c         | 10 +++++-----
- 2 files changed, 14 insertions(+), 14 deletions(-)
+ net/bluetooth/hci_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5f1ca3359c1a..137a18226975 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -499,7 +499,7 @@ struct hci_conn_params {
- extern struct list_head hci_dev_list;
- extern struct list_head hci_cb_list;
- extern rwlock_t hci_dev_list_lock;
--extern rwlock_t hci_cb_list_lock;
-+extern struct mutex hci_cb_list_lock;
- 
- /* ----- HCI interface to upper protocols ----- */
- int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
-@@ -1160,12 +1160,12 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
- 
- 	encrypt = test_bit(HCI_CONN_ENCRYPT, &conn->flags) ? 0x01 : 0x00;
- 
--	read_lock(&hci_cb_list_lock);
-+	mutex_lock(&hci_cb_list_lock);
- 	list_for_each_entry(cb, &hci_cb_list, list) {
- 		if (cb->security_cfm)
- 			cb->security_cfm(conn, status, encrypt);
- 	}
--	read_unlock(&hci_cb_list_lock);
-+	mutex_unlock(&hci_cb_list_lock);
- }
- 
- static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
-@@ -1181,24 +1181,24 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status,
- 
- 	hci_proto_encrypt_cfm(conn, status, encrypt);
- 
--	read_lock(&hci_cb_list_lock);
-+	mutex_lock(&hci_cb_list_lock);
- 	list_for_each_entry(cb, &hci_cb_list, list) {
- 		if (cb->security_cfm)
- 			cb->security_cfm(conn, status, encrypt);
- 	}
--	read_unlock(&hci_cb_list_lock);
-+	mutex_unlock(&hci_cb_list_lock);
- }
- 
- static inline void hci_key_change_cfm(struct hci_conn *conn, __u8 status)
- {
- 	struct hci_cb *cb;
- 
--	read_lock(&hci_cb_list_lock);
-+	mutex_lock(&hci_cb_list_lock);
- 	list_for_each_entry(cb, &hci_cb_list, list) {
- 		if (cb->key_change_cfm)
- 			cb->key_change_cfm(conn, status);
- 	}
--	read_unlock(&hci_cb_list_lock);
-+	mutex_unlock(&hci_cb_list_lock);
- }
- 
- static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
-@@ -1206,12 +1206,12 @@ static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
- {
- 	struct hci_cb *cb;
- 
--	read_lock(&hci_cb_list_lock);
-+	mutex_lock(&hci_cb_list_lock);
- 	list_for_each_entry(cb, &hci_cb_list, list) {
- 		if (cb->role_switch_cfm)
- 			cb->role_switch_cfm(conn, status, role);
- 	}
--	read_unlock(&hci_cb_list_lock);
-+	mutex_unlock(&hci_cb_list_lock);
- }
- 
- static inline bool eir_has_data_type(u8 *data, size_t data_len, u8 type)
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 91f557b0318a..dbd26bcb9210 100644
+index 980260846d25..91f557b0318a 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -51,7 +51,7 @@ DEFINE_RWLOCK(hci_dev_list_lock);
- 
- /* HCI callback list */
- LIST_HEAD(hci_cb_list);
--DEFINE_RWLOCK(hci_cb_list_lock);
-+DEFINE_MUTEX(hci_cb_list_lock);
- 
- /* HCI ID Numbering */
- static DEFINE_IDA(hci_index_ida);
-@@ -3464,9 +3464,9 @@ int hci_register_cb(struct hci_cb *cb)
- {
+@@ -3465,7 +3465,7 @@ int hci_register_cb(struct hci_cb *cb)
  	BT_DBG("%p name %s", cb, cb->name);
  
--	write_lock(&hci_cb_list_lock);
-+	mutex_lock(&hci_cb_list_lock);
- 	list_add_tail(&cb->list, &hci_cb_list);
--	write_unlock(&hci_cb_list_lock);
-+	mutex_unlock(&hci_cb_list_lock);
+ 	write_lock(&hci_cb_list_lock);
+-	list_add(&cb->list, &hci_cb_list);
++	list_add_tail(&cb->list, &hci_cb_list);
+ 	write_unlock(&hci_cb_list_lock);
  
  	return 0;
- }
-@@ -3476,9 +3476,9 @@ int hci_unregister_cb(struct hci_cb *cb)
- {
- 	BT_DBG("%p name %s", cb, cb->name);
- 
--	write_lock(&hci_cb_list_lock);
-+	mutex_lock(&hci_cb_list_lock);
- 	list_del(&cb->list);
--	write_unlock(&hci_cb_list_lock);
-+	mutex_unlock(&hci_cb_list_lock);
- 
- 	return 0;
- }
 -- 
 2.1.0
 
