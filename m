@@ -1,55 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 1/2] shared/gatt-db: Don't fail if realloc returns NULL
-Date: Wed, 18 Feb 2015 16:12:33 -0800
-Message-Id: <1424304754-11874-1-git-send-email-armansito@chromium.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] monitor: Fix selecting PSM for L2CAP frame
+Date: Wed, 18 Feb 2015 22:46:32 +0100
+Message-Id: <1424295992-29506-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1424295992-29506-1-git-send-email-szymon.janc@tieto.com>
+References: <1424295992-29506-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-gatt_db_attribute_write returns false if realloc returns NULL in the
-case where there is no callback. If the write is performed with a 0
-length value and 0 offset, realloc will return NULL according to its
-specification (as it will practically act as 'free'). This patch fixes
-the code so that this case isn't treated as an error.
----
- src/shared/gatt-db.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+Current code could fail to pick up right PSM resulting in using PSM 1
+for non-SDP traffic.
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 3d2e690..b331f54 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -1464,7 +1464,7 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
- 	}
+Fix following:
+> ACL Data RX: Handle 3 flags 0x02 dlen 9
+    Channel: 64 len 5 [PSM 1 mode 0] {chan 0}
+      invalid frame size
+> ACL Data RX: Handle 3 flags 0x02 dlen 20
+    Channel: 64 len 16 [PSM 1 mode 0] {chan 0}
+      invalid frame size
+      2b 42 52 53 46 3d 32 35 35 0d e4                 +BRSF=255..
+< ACL Data TX: Handle 3 flags 0x00 dlen 28
+    Channel: 256 len 24 [PSM 3 mode 0] {chan 1}
+    RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+       Address: 0x69 cr 0 dlci 0x1a
+       Control: 0xef poll/final 0
+       Length: 20
+       FCS: 0x3e
+      0d 0a 2b 42 52 53 46 3a 20 38 37 31 0d 0a 0d 0a  ..+BRSF: 871....
+      4f 4b 0d 0a 3e                                   OK..>
+
+instead of:
+> ACL Data RX: Handle 4 flags 0x02 dlen 20
+    Channel: 64 len 16 [PSM 3 mode 0] {chan 1}
+    RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+       Address: 0x6b cr 1 dlci 0x1a
+       Control: 0xef poll/final 0
+       Length: 12
+       FCS: 0xe4
+      41 54 2b 42 52 53 46 3d 32 35 35 0d e4           AT+BRSF=255..
+< ACL Data TX: Handle 4 flags 0x00 dlen 28
+    Channel: 384 len 24 [PSM 3 mode 0] {chan 1}
+    RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
+       Address: 0x69 cr 0 dlci 0x1a
+       Control: 0xef poll/final 0
+       Length: 20
+       FCS: 0x3e
+      0d 0a 2b 42 52 53 46 3a 20 38 37 31 0d 0a 0d 0a  ..+BRSF: 871....
+      4f 4b 0d 0a 3e                                   OK..>
+---
+ monitor/l2cap.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+index 342bd8e..7a6edbe 100644
+--- a/monitor/l2cap.c
++++ b/monitor/l2cap.c
+@@ -232,10 +232,13 @@ static int get_chan_data_index(const struct l2cap_frame *frame)
+ 					chan_list[i].ctrlid == 0)
+ 			continue;
  
- 	/* Guard against invalid access if offset equals to value length */
--	value = offset == attrib->value_len ? NULL : &attrib->value[offset];
-+	value = attrib->value_len - offset ? &attrib->value[offset] : NULL;
+-		if (chan_list[i].handle != frame->handle &&
++		if (chan_list[i].ctrlid != 0 &&
+ 					chan_list[i].ctrlid != frame->index)
+ 			continue;
  
- 	func(attrib, 0, value, attrib->value_len - offset, user_data);
- 
-@@ -1557,15 +1557,14 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
- 		void *buf;
- 
- 		buf = realloc(attrib->value, len + offset);
--		if (!buf)
-+		if (!buf && len + offset > 0)
- 			return false;
- 
--		attrib->value = buf;
--
- 		/* Init data in the first allocation */
--		if (!attrib->value_len)
--			memset(attrib->value, 0, offset);
-+		if (!attrib->value)
-+			memset(buf, 0, offset);
- 
-+		attrib->value = buf;
- 		attrib->value_len = len + offset;
- 	}
- 
++		if (chan_list[i].handle != frame->handle)
++			continue;
++
+ 		if (frame->in) {
+ 			if (chan_list[i].scid == frame->cid)
+ 				return i;
 -- 
-2.2.0.rc0.207.ga3a616c
+1.9.3
 
