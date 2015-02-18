@@ -1,127 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: percy-g2 <gahlotpercy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] [PATCH] Add support for ST-Ericsoon CG2900 chip
-Date: Wed, 18 Feb 2015 12:38:13 +0100
-Message-ID: <2716267.0YHXCkS2lU@uw000953>
-In-Reply-To: <1423564056-30573-1-git-send-email-gahlotpercy@gmail.com>
-References: <1423564056-30573-1-git-send-email-gahlotpercy@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: bharat.panda@samsung.com, cpgs@samsung.com
+Subject: [PATCH 11/11] unit/test-gatt: Add TP/GAR/CL/BI-35-C test
+Date: Wed, 18 Feb 2015 16:40:06 +0530
+Message-id: <1424257806-25815-12-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1424257806-25815-1-git-send-email-gowtham.ab@samsung.com>
+References: <1424257806-25815-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prashat,
+From: Bharat Panda <bharat.panda@samsung.com>
 
-On Tuesday 10 of February 2015 11:27:36 percy-g2 wrote:
-> From: Prashant Gahlot <gahlotpercy@gmail.com>
+Verify Generic Attribute Profile client behavior when an attempt to use
+LE transport to execute the Read Characteristic Value procedure on a
+characteristic contained within a service defined for use only over
+BR/EDR transport.
+---
+ unit/test-gatt.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-There is a typo in commit message: Ericsoon ->Ericsson
-
-Also please prefix commit message with "hciattach: "
-
-> 
-> ---
->  tools/hciattach.c | 21 ++++++++++++++-------
->  tools/hciattach.h |  1 +
->  2 files changed, 15 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tools/hciattach.c b/tools/hciattach.c
-> index 14d3511..e66d2b8 100644
-> --- a/tools/hciattach.c
-> +++ b/tools/hciattach.c
-> @@ -1080,6 +1080,10 @@ struct uart_t uart[] = {
->  	{ "texasalt",   0x0000, 0x0000, HCI_UART_LL,   115200, 115200,
->  				FLOW_CTL, DISABLE_PM, NULL, texasalt, NULL   },
->  
-> +	/* ST-Ericsson CG2900 GPS FM Bluetooth combo controller */
-> +	{ "cg2900",     0x0000, 0x0000, HCI_UART_STE,  115200, 115200,
-> +				FLOW_CTL, DISABLE_PM, NULL, NULL     },
-> +
->  	/* ST Microelectronics minikits based on STLC2410/STLC2415 */
->  	{ "st",         0x0000, 0x0000, HCI_UART_H4,    57600, 115200,
->  				FLOW_CTL, DISABLE_PM,  NULL, st       },
-> @@ -1187,10 +1191,10 @@ static struct uart_t * get_by_type(char *type)
->  }
->  
->  /* Initialize UART driver */
-> -static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
-> +static int init_uart(char *dev, struct uart_t *u, int send_break, int raw, int line_disc)
->  {
->  	struct termios ti;
-> -	int fd, i;
-> +	int fd;
->  	unsigned long flags = 0;
->  
->  	if (raw)
-> @@ -1250,8 +1254,7 @@ static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
->  	}
->  
->  	/* Set TTY to N_HCI line discipline */
-> -	i = N_HCI;
-> -	if (ioctl(fd, TIOCSETD, &i) < 0) {
-> +	if (ioctl(fd, TIOCSETD, &line_disc) < 0) {
->  		perror("Can't set line discipline");
->  		return -1;
->  	}
-> @@ -1276,7 +1279,7 @@ static void usage(void)
->  {
->  	printf("hciattach - HCI UART driver initialization utility\n");
->  	printf("Usage:\n");
-> -	printf("\thciattach [-n] [-p] [-b] [-r] [-t timeout] [-s initial_speed]"
-> +	printf("\thciattach [-n] [-p] [-a line_disc_nr] [-b] [-r] [-t timeout] [-s initial_speed]"
-
-I'd name this [-a line_discipline].
-Also this line is over 80 characters so please split this correctly.
-
->  			" <tty> <type | id> [speed] [flow|noflow]"
->  			" [sleep|nosleep] [bdaddr]\n");
->  	printf("\thciattach -l\n");
-> @@ -1287,6 +1290,7 @@ int main(int argc, char *argv[])
->  	struct uart_t *u = NULL;
->  	int detach, printpid, raw, opt, i, n, ld, err;
->  	int to = 10;
-> +	int line_disc = N_HCI;
->  	int init_speed = 0;
->  	int send_break = 0;
->  	pid_t pid;
-> @@ -1299,8 +1303,11 @@ int main(int argc, char *argv[])
->  	printpid = 0;
->  	raw = 0;
->  
-> -	while ((opt=getopt(argc, argv, "bnpt:s:lr")) != EOF) {
-> +	while ((opt=getopt(argc, argv, "bnpt:s:lra:")) != EOF) {
->  		switch(opt) {
-> +		case 'a':
-> +			line_disc = atoi(optarg);
-> +			break;
->  		case 'b':
->  			send_break = 1;
->  			break;
-> @@ -1416,7 +1423,7 @@ int main(int argc, char *argv[])
->  	alarm(to);
->  	bcsp_max_retries = to;
->  
-> -	n = init_uart(dev, u, send_break, raw);
-> +	n = init_uart(dev, u, send_break, raw, line_disc);
->  	if (n < 0) {
->  		perror("Can't initialize device");
->  		exit(1);
-> diff --git a/tools/hciattach.h b/tools/hciattach.h
-> index 2aaf075..94a4ebf 100644
-> --- a/tools/hciattach.h
-> +++ b/tools/hciattach.h
-> @@ -39,6 +39,7 @@
->  #define HCI_UART_H4DS	3
->  #define HCI_UART_LL	4
->  #define HCI_UART_ATH3K  5
-> +#define HCI_UART_STE 6
->  
->  #define HCI_UART_RAW_DEVICE	0
->  #define HCI_UART_RESET_ON_INIT	1
-> 
-
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 51f2179..2be4c87 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -2873,5 +2873,11 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x0a, 0x03, 0x00),
+ 			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x80));
+ 
++	define_test_client("/TP/GAR/CL/BI-35-C", test_client, service_db_1,
++			&test_read_12,
++			SERVICE_DATA_1_PDUS,
++			raw_pdu(0x0a, 0x03, 0x00),
++			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x80));
++
+ 	return g_test_run();
+ }
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
