@@ -2,161 +2,114 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 2/8] core: Attach gatt-server to bt_att
-Date: Wed, 18 Feb 2015 00:18:33 -0800
-Message-Id: <1424247519-21684-3-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 1/8] core: adapter: Initialize GATT database
+Date: Wed, 18 Feb 2015 00:18:32 -0800
+Message-Id: <1424247519-21684-2-git-send-email-armansito@chromium.org>
 In-Reply-To: <1424247519-21684-1-git-send-email-armansito@chromium.org>
 References: <1424247519-21684-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch, btd_device now creates a bt_gatt_server and attaches
-it to the ATT transport which coexists with a bt_gatt_client.
+This patch adds code that initializes a btd_gatt_database for a
+btd_adapter. Also added is the btd_adapter_get_database getter
+function.
 ---
- src/device.c        | 47 +++++++++++++++++++++++++++++++----------------
- src/gatt-database.c |  2 --
- 2 files changed, 31 insertions(+), 18 deletions(-)
+ src/adapter.c | 26 +++++++++++++++-----------
+ src/adapter.h |  2 ++
+ 2 files changed, 17 insertions(+), 11 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 05a4bd9..678a6ac 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -51,11 +51,13 @@
- #include "src/shared/queue.h"
- #include "src/shared/gatt-db.h"
- #include "src/shared/gatt-client.h"
-+#include "src/shared/gatt-server.h"
- #include "btio/btio.h"
- #include "lib/mgmt.h"
+diff --git a/src/adapter.c b/src/adapter.c
+index 5a6b45e..8886045 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -68,6 +68,7 @@
  #include "attrib/att.h"
- #include "hcid.h"
- #include "adapter.h"
+ #include "attrib/gatt.h"
+ #include "attrib-server.h"
 +#include "gatt-database.h"
- #include "attrib/gattrib.h"
- #include "attio.h"
- #include "device.h"
-@@ -211,7 +213,6 @@ struct btd_device {
- 	GAttrib		*attrib;
- 	GSList		*attios;
- 	GSList		*attios_offline;
--	guint		attachid;		/* Attrib server attach */
+ #include "eir.h"
  
- 	struct bt_att *att;			/* The new ATT transport */
- 	uint16_t att_mtu;			/* The ATT MTU */
-@@ -224,6 +225,7 @@ struct btd_device {
- 	 */
- 	struct gatt_db *db;			/* GATT db cache */
- 	struct bt_gatt_client *client;		/* GATT client instance */
-+	struct bt_gatt_server *server;		/* GATT server instance */
+ #define ADAPTER_INTERFACE	"org.bluez.Adapter1"
+@@ -204,6 +205,8 @@ struct btd_adapter {
+ 	struct btd_device *connect_le;	/* LE device waiting to be connected */
+ 	sdp_list_t *services;		/* Services associated to adapter */
  
- 	struct btd_gatt_client *client_dbus;
- 
-@@ -538,6 +540,15 @@ static void gatt_client_cleanup(struct btd_device *device)
- 		gatt_db_clear(device->db);
- }
- 
-+static void gatt_server_cleanup(struct btd_device *device)
-+{
-+	if (!device->server)
-+		return;
-+
-+	bt_gatt_server_unref(device->server);
-+	device->server = NULL;
-+}
-+
- static void attio_cleanup(struct btd_device *device)
- {
- 	if (device->att_disconn_id)
-@@ -551,6 +562,7 @@ static void attio_cleanup(struct btd_device *device)
- 	}
- 
- 	gatt_client_cleanup(device);
-+	gatt_server_cleanup(device);
- 
- 	if (device->att) {
- 		bt_att_unref(device->att);
-@@ -561,14 +573,6 @@ static void attio_cleanup(struct btd_device *device)
- 		GAttrib *attrib = device->attrib;
- 
- 		device->attrib = NULL;
--
--		if (device->attachid) {
--			guint attachid = device->attachid;
--
--			device->attachid = 0;
--			attrib_channel_detach(attrib, attachid);
--		}
--
- 		g_attrib_cancel_all(attrib);
- 		g_attrib_unref(attrib);
- 	}
-@@ -4123,6 +4127,20 @@ static void gatt_client_init(struct btd_device *device)
- 	}
- }
- 
-+static void gatt_server_init(struct btd_device *device, struct gatt_db *db)
-+{
-+	if (!db) {
-+		error("No local GATT database exists for this adapter");
-+		return;
-+	}
-+
-+	gatt_server_cleanup(device);
-+
-+	device->server = bt_gatt_server_new(db, device->att, device->att_mtu);
-+	if (!device->server)
-+		error("Failed to initialize bt_gatt_server");
-+}
-+
- bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- {
- 	GError *gerr = NULL;
-@@ -4130,6 +4148,7 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 	BtIOSecLevel sec_level;
- 	uint16_t mtu;
- 	uint16_t cid;
 +	struct btd_gatt_database *database;
- 
- 	bt_io_get(io, &gerr, BT_IO_OPT_SEC_LEVEL, &sec_level,
- 						BT_IO_OPT_IMTU, &mtu,
-@@ -4162,13 +4181,6 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 		return false;
- 	}
- 
--	dev->attachid = attrib_channel_attach(attrib);
--	if (dev->attachid == 0) {
--		g_attrib_unref(attrib);
--		error("Attribute server attach failure!");
--		return false;
--	}
--
- 	dev->attrib = attrib;
- 	dev->att = g_attrib_get_att(attrib);
- 
-@@ -4178,7 +4190,10 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 						att_disconnected_cb, dev, NULL);
- 	bt_att_set_close_on_unref(dev->att, true);
- 
-+	database = btd_adapter_get_database(dev->adapter);
 +
- 	gatt_client_init(dev);
-+	gatt_server_init(dev, btd_gatt_database_get_db(database));
+ 	gboolean initialized;
  
- 	/*
- 	 * Remove the device from the connect_list and give the passive
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index c69de15..1a77e6b 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -234,8 +234,6 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 	if (!device)
- 		return;
+ 	GSList *pin_callbacks;
+@@ -279,7 +282,6 @@ static void dev_class_changed_callback(uint16_t index, uint16_t length,
+ {
+ 	struct btd_adapter *adapter = user_data;
+ 	const struct mgmt_cod *rp = param;
+-	uint8_t appearance[3];
+ 	uint32_t dev_class;
  
--	/* TODO: create bt_gatt_server instance */
+ 	if (length < sizeof(*rp)) {
+@@ -298,13 +300,6 @@ static void dev_class_changed_callback(uint16_t index, uint16_t length,
+ 
+ 	g_dbus_emit_property_changed(dbus_conn, adapter->path,
+ 						ADAPTER_INTERFACE, "Class");
 -
- 	device_attach_att(device, io);
+-	appearance[0] = rp->val[0];
+-	appearance[1] = rp->val[1] & 0x1f;	/* removes service class */
+-	appearance[2] = rp->val[2];
+-
+-	/* TODO: Do this through btd_gatt_database instead */
+-	attrib_gap_set(adapter, GATT_CHARAC_APPEARANCE, appearance, 2);
  }
  
+ static void set_dev_class_complete(uint8_t status, uint16_t length,
+@@ -3176,6 +3171,14 @@ bool btd_adapter_get_connectable(struct btd_adapter *adapter)
+ 	return false;
+ }
+ 
++struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter *adapter)
++{
++	if (!adapter)
++		return NULL;
++
++	return adapter->database;
++}
++
+ uint32_t btd_adapter_get_class(struct btd_adapter *adapter)
+ {
+ 	return adapter->dev_class;
+@@ -4586,7 +4589,7 @@ static void adapter_remove(struct btd_adapter *adapter)
+ 	adapter->devices = NULL;
+ 
+ 	unload_drivers(adapter);
+-	btd_adapter_gatt_server_stop(adapter);
++	btd_gatt_database_destroy(adapter->database);
+ 
+ 	g_slist_free(adapter->pin_callbacks);
+ 	adapter->pin_callbacks = NULL;
+@@ -6628,8 +6631,9 @@ static int adapter_register(struct btd_adapter *adapter)
+ 		agent_unref(agent);
+ 	}
+ 
+-	/* TODO: Migrate to use btd_gatt_database */
+-	btd_adapter_gatt_server_start(adapter);
++	adapter->database = btd_gatt_database_new(adapter);
++	if (!adapter->database)
++		error("Failed to create GATT database for adapter");
+ 
+ 	load_config(adapter);
+ 	fix_storage(adapter);
+diff --git a/src/adapter.h b/src/adapter.h
+index 737479f..867f4e3 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -79,6 +79,8 @@ bool btd_adapter_get_pairable(struct btd_adapter *adapter);
+ bool btd_adapter_get_powered(struct btd_adapter *adapter);
+ bool btd_adapter_get_connectable(struct btd_adapter *adapter);
+ 
++struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter *adapter);
++
+ uint32_t btd_adapter_get_class(struct btd_adapter *adapter);
+ const char *btd_adapter_get_name(struct btd_adapter *adapter);
+ void btd_adapter_remove_device(struct btd_adapter *adapter,
 -- 
 2.2.0.rc0.207.ga3a616c
 
