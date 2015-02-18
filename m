@@ -1,65 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ] TODO: Added more GATT related items
-Date: Wed, 18 Feb 2015 10:25:57 -0800
-Message-Id: <1424283957-25931-1-git-send-email-armansito@chromium.org>
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH 2/2] android/hfp: Update HFP test results for PTS 6.0
+Date: Wed, 18 Feb 2015 18:45:47 +0100
+Message-Id: <1424281547-4454-2-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1424281547-4454-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1424281547-4454-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added TODO items for reworking all GATT-based plugins and removing
-src/attrib-server.c.
 ---
- TODO | 31 +++++++++++++++++++++++++++----
- 1 file changed, 27 insertions(+), 4 deletions(-)
+ android/pts-hfp.txt | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/TODO b/TODO
-index db80b95..dce17f3 100644
---- a/TODO
-+++ b/TODO
-@@ -141,14 +141,37 @@ ATT/GATT (new shared stack)
-   Priority: Medium
-   Complexity: C4
+diff --git a/android/pts-hfp.txt b/android/pts-hfp.txt
+index 3fcb645..ed17afe 100644
+--- a/android/pts-hfp.txt
++++ b/android/pts-hfp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for HFP
  
--- Move all daemon plugins and profiles that are GATT based to use
--  shared/gatt-client instead of attrib/*. This is a complicated task that
--  potentially needs a new plugin/profile probing interface and a lot of
--  rewriting that can cause regressions in existing functionality.
-+- Rewrite the core daemon plugins and profiles that are GATT based to use
-+  shared/gatt instead of attrib/*. These are:
-+
-+     gatt-example
-+     deviceinfo
-+     input/hog
-+     scanparam
-+
-+  Priority: Medium
-+  Complexity: C2
-+
-+- Move non-core daemon plugins out of bluetoothd and into external apps, as all
-+  such profiles can be written over the new D-Bus API. These are:
-+
-+     alert
-+     cyclingspeed
-+     heartrate
-+     proximity
-+     thermometer
-+     time
-+
-+  At least for heartrate, provide an example in C and in Python.
+-PTS version: 5.3
+-Tested: 02-December-2014
++PTS version: 6.0
++Tested: 16-February-2015
+ Android version: 5.0
  
-   Priority: Medium
-   Complexity: C4
- 
-+- Remove src/attrib-server, once nothing depends on it.
-+
-+  Priority: Medium
-+  Complexity: C2
-+
- - Introduce a way for shared/gatt-server to check security permissions on the
-   current connection through bt_att.
- 
+ Results:
+@@ -55,7 +55,7 @@ TC_AG_OCM_BV_01_I	PASS
+ TC_AG_OCM_BV_02_I	PASS
+ TC_AG_OCL_BV_01_I	PASS
+ TC_AG_OCL_BV_02_I	PASS
+-TC_AG_TWC_BV_01_I	PASS	JIRA #BA-281
++TC_AG_TWC_BV_01_I	PASS
+ TC_AG_TWC_BV_02_I	PASS
+ TC_AG_TWC_BV_03_I	PASS
+ TC_AG_TWC_BV_04_I	PASS
+@@ -101,10 +101,10 @@ TC_AG_SLC_BV_06_I	PASS
+ TC_AG_SLC_BV_07_I	PASS
+ TC_AG_SLC_BV_09_I	N/A
+ TC_AG_SLC_BV_10_I	N/A
+-TC_AG_ACC_BV_08_I	PASS	PTS issue #12039
++TC_AG_ACC_BV_08_I	PASS
+ TC_AG_ACC_BV_09_I	PASS
+-TC_AG_ACC_BV_10_I	PASS	PTS issue #12039
+-TC_AG_ACC_BV_11_I	PASS	PTS issue #12039
++TC_AG_ACC_BV_10_I	PASS
++TC_AG_ACC_BV_11_I	PASS
+ TC_AG_ACC_BI_12_I	PASS
+ TC_AG_ACC_BI_13_I	PASS
+ TC_AG_ACC_BI_14_I	PASS
 -- 
-2.2.0.rc0.207.ga3a616c
+1.9.1
 
