@@ -1,136 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1417786152-19742-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1417786152-19742-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 18 Feb 2015 09:53:41 +0100
-Message-ID: <CAN_7+YZ78YgyHFgXXUaKbxZo6CeiNV+Pc=1bNGZ3qcPdWwc0nA@mail.gmail.com>
-Subject: Re: [PATCH] doc/mgmt-api: Add support to add/remove advertising data instance
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1424178265-22175-1-git-send-email-luiz.dentz@gmail.com>
+References: <1424178265-22175-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 18 Feb 2015 10:38:12 +0200
+Message-ID: <CABBYNZJsA6AfAeEedK9JqVX7Z2JeYs_HrWgdtVSTU58tD-zmGQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/tester: Return failure if any test failed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Fri, Dec 5, 2014 at 2:29 PM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> Multi advertising is design for embedded devices having multiple GATT
-> application running on it. Since Advertising data are size limited there
-> is a need to have a way to make sure that each application will be
-> advertised and in the same time visible for GATT Client application.
+On Tue, Feb 17, 2015 at 3:04 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> It has been noticed that there is many GATT clients doing filtering on
-> Service UUIDs contained in advertising data.
->
-> Since this command is design for embedded devices, we allow to choose
-> whether given data element shall be in advertising data or scan
-> response.
->
-> This patch also enhance supported settings with multi advertising bit
-> which indicates to user space that kernel supports that.
+> This makes sure tester can be used for unit tests that requires proper
+> return in case of failure.
 > ---
->  doc/mgmt-api.txt | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 72 insertions(+)
+>  src/shared/tester.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 >
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index fed41a9..8a947f1 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -267,6 +267,7 @@ Read Controller Information Command
->                 12      Debug Keys
->                 13      Privacy
->                 14      Controller Configuration
-> +               15      Multi Advertising
+> diff --git a/src/shared/tester.c b/src/shared/tester.c
+> index fb645a0..ffcc2ea 100644
+> --- a/src/shared/tester.c
+> +++ b/src/shared/tester.c
+> @@ -270,7 +270,7 @@ void *tester_get_data(void)
+>         return test->user_data;
+>  }
 >
->         This command generates a Command Complete event on success or
->         a Command Status event on failure.
-> @@ -2214,6 +2215,77 @@ Start Service Discovery Command
->                                 Invalid Index
+> -static void tester_summarize(void)
+> +static int tester_summarize(void)
+>  {
+>         unsigned int not_run = 0, passed = 0, failed = 0;
+>         gdouble execution_time;
+> @@ -321,6 +321,7 @@ static void tester_summarize(void)
+>         execution_time = g_timer_elapsed(test_timer, NULL);
+>         printf("Overall execution time: %.3g seconds\n", execution_time);
 >
+> +       return failed;
+>  }
 >
-> +Add Advertising Data Instance
-> +=============================
-> +
-> +       Command Code:           0x003b
-> +       Controller Index:       <controller id>
-> +       Command Parameters:
-> +                               Flags (4 Octet)
-> +                               Num_Of_Data_Elements (1 Octet)
-> +                               Data_Element_1 {
-> +                                       Flags (4 Octet)
-> +                                       Type (1 Octet)
-> +                                       Value_Length (1 Octet)
-> +                                       Value (Variable)
-> +                               }
-> +                               Data_Element_2 { }
-> +                               ...
-> +
-> +       Return Parameters:      Advertising_Instance_ID (2 Octets)
-> +
-> +       This command allows to set User Advertising Data Instance which are advertised
-> +       in such manner so each element has its own advertising time slice then it
-> +       expires and next item gets its advertising time slice.
-> +
-> +       Note that kernel has own instance which always gets its advertising time
-> +       slice.
-> +
-> +       Note that maximum length of Advertising Data and Scan Response is
-> +       specified to 31 bytes each.
-> +
-> +       Possible values Flags parameter are a bit-wise or of the following bits:
-> +               0       Include Short Name
-> +               1       Include TX Power
-> +
-> +       Possible values for Data Element Flags are a bit-wise or of the following
-> +       bits:
-> +               0       Force include into advertising data
-> +               1       Force include into scan response
-> +
-> +       Possible values for the Type parameter are specified by Bluetooth SIG and can
-> +       be found in Assigned Number section for Generic Access Profile.
-> +
-> +       This command can be used when the controller is not powered and
-> +       all settings will be programmed once powered and advertising is enabled.
-> +
-> +       Provided advertising data instances are persistent over power down/up toggles.
-> +
-> +       Possible errors:        Not Supported
-> +                               Invalid Parameters
-> +                               Invalid Index
-> +
-> +
-> +Remove Advertising Data Instance
-> +================================
-> +
-> +       Command Code:           0x003c
-> +       Controller Index:       <controller id>
-> +       Command Parameters:     Advertising_Instance_ID (1 Octet)
-> +       Return Parameters:
-> +
-> +       This command is use to remove user advertising instance created with
-> +       Add User Advertising Instance
-> +
-> +       This command generates a Command Complete event on success or a
-> +       Command Status event on failure.
-> +
-> +
-> +       Possible errors:        Not Supported
-> +                               Invalid Parameters
-> +                               Invalid Index
-> +
-> +
->  Command Complete Event
->  ======================
-
-ping
-
+>  static gboolean teardown_callback(gpointer user_data)
+> @@ -800,6 +801,7 @@ void tester_init(int *argc, char ***argv)
+>  int tester_run(void)
+>  {
+>         guint signal;
+> +       int ret;
 >
+>         if (!main_loop)
+>                 return EXIT_FAILURE;
+> @@ -818,9 +820,9 @@ int tester_run(void)
+>
+>         g_main_loop_unref(main_loop);
+>
+> -       tester_summarize();
+> +       ret = tester_summarize();
+>
+>         g_list_free_full(test_list, test_destroy);
+>
+> -       return EXIT_SUCCESS;
+> +       return ret == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+>  }
 > --
-> 1.8.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.1.0
+
+Applied.
+
+
+-- 
+Luiz Augusto von Dentz
