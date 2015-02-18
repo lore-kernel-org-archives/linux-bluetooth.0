@@ -2,76 +2,147 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] monitor: Fix selecting PSM for L2CAP frame
-Date: Wed, 18 Feb 2015 22:46:32 +0100
-Message-Id: <1424295992-29506-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1424295992-29506-1-git-send-email-szymon.janc@tieto.com>
-References: <1424295992-29506-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/2] monitor: Factor out channel selection to separate function
+Date: Wed, 18 Feb 2015 22:46:31 +0100
+Message-Id: <1424295992-29506-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Current code could fail to pick up right PSM resulting in using PSM 1
-for non-SDP traffic.
-
-Fix following:
-> ACL Data RX: Handle 3 flags 0x02 dlen 9
-    Channel: 64 len 5 [PSM 1 mode 0] {chan 0}
-      invalid frame size
-> ACL Data RX: Handle 3 flags 0x02 dlen 20
-    Channel: 64 len 16 [PSM 1 mode 0] {chan 0}
-      invalid frame size
-      2b 42 52 53 46 3d 32 35 35 0d e4                 +BRSF=255..
-< ACL Data TX: Handle 3 flags 0x00 dlen 28
-    Channel: 256 len 24 [PSM 3 mode 0] {chan 1}
-    RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
-       Address: 0x69 cr 0 dlci 0x1a
-       Control: 0xef poll/final 0
-       Length: 20
-       FCS: 0x3e
-      0d 0a 2b 42 52 53 46 3a 20 38 37 31 0d 0a 0d 0a  ..+BRSF: 871....
-      4f 4b 0d 0a 3e                                   OK..>
-
-instead of:
-> ACL Data RX: Handle 4 flags 0x02 dlen 20
-    Channel: 64 len 16 [PSM 3 mode 0] {chan 1}
-    RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
-       Address: 0x6b cr 1 dlci 0x1a
-       Control: 0xef poll/final 0
-       Length: 12
-       FCS: 0xe4
-      41 54 2b 42 52 53 46 3d 32 35 35 0d e4           AT+BRSF=255..
-< ACL Data TX: Handle 4 flags 0x00 dlen 28
-    Channel: 384 len 24 [PSM 3 mode 0] {chan 1}
-    RFCOMM: Unnumbered Info with Header Check (UIH)(0xef)
-       Address: 0x69 cr 0 dlci 0x1a
-       Control: 0xef poll/final 0
-       Length: 20
-       FCS: 0x3e
-      0d 0a 2b 42 52 53 46 3a 20 38 37 31 0d 0a 0d 0a  ..+BRSF: 871....
-      4f 4b 0d 0a 3e                                   OK..>
+This allows to have conditions check in single place.
 ---
- monitor/l2cap.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ monitor/l2cap.c | 85 +++++++++++++++++----------------------------------------
+ 1 file changed, 25 insertions(+), 60 deletions(-)
 
 diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 342bd8e..7a6edbe 100644
+index 0030a4c..342bd8e 100644
 --- a/monitor/l2cap.c
 +++ b/monitor/l2cap.c
-@@ -232,10 +232,13 @@ static int get_chan_data_index(const struct l2cap_frame *frame)
- 					chan_list[i].ctrlid == 0)
- 			continue;
+@@ -223,7 +223,7 @@ static void assign_mode(const struct l2cap_frame *frame,
+ 	}
+ }
  
--		if (chan_list[i].handle != frame->handle &&
-+		if (chan_list[i].ctrlid != 0 &&
- 					chan_list[i].ctrlid != frame->index)
- 			continue;
+-static uint16_t get_psm(const struct l2cap_frame *frame)
++static int get_chan_data_index(const struct l2cap_frame *frame)
+ {
+ 	int i;
  
-+		if (chan_list[i].handle != frame->handle)
-+			continue;
-+
+@@ -238,64 +238,44 @@ static uint16_t get_psm(const struct l2cap_frame *frame)
+ 
  		if (frame->in) {
  			if (chan_list[i].scid == frame->cid)
- 				return i;
+-				return chan_list[i].psm;
++				return i;
+ 		} else {
+ 			if (chan_list[i].dcid == frame->cid)
+-				return chan_list[i].psm;
++				return i;
+ 		}
+ 	}
+ 
+-	return 0;
++	return -1;
+ }
+ 
+-static uint8_t get_mode(const struct l2cap_frame *frame)
++static uint16_t get_psm(const struct l2cap_frame *frame)
+ {
+-	int i;
++	int i = get_chan_data_index(frame);
+ 
+-	for (i = 0; i < MAX_CHAN; i++) {
+-		if (chan_list[i].index != frame->index &&
+-					chan_list[i].ctrlid == 0)
+-			continue;
++	if (i < 0)
++		return 0;
+ 
+-		if (chan_list[i].handle != frame->handle &&
+-					chan_list[i].ctrlid != frame->index)
+-			continue;
++	return chan_list[i].psm;
++}
+ 
+-		if (frame->in) {
+-			if (chan_list[i].scid == frame->cid)
+-				return chan_list[i].mode;
+-		} else {
+-			if (chan_list[i].dcid == frame->cid)
+-				return chan_list[i].mode;
+-		}
+-	}
++static uint8_t get_mode(const struct l2cap_frame *frame)
++{
++	int i = get_chan_data_index(frame);
++
++	if (i < 0)
++		return 0;
+ 
+-	return 0;
++	return chan_list[i].mode;
+ }
+ 
+ static uint16_t get_chan(const struct l2cap_frame *frame)
+ {
+-	int i;
+-
+-	for (i = 0; i < MAX_CHAN; i++) {
+-		if (chan_list[i].index != frame->index &&
+-					chan_list[i].ctrlid == 0)
+-			continue;
++	int i = get_chan_data_index(frame);
+ 
+-		if (chan_list[i].handle != frame->handle &&
+-					chan_list[i].ctrlid != frame->index)
+-			continue;
+-
+-		if (frame->in) {
+-			if (chan_list[i].scid == frame->cid)
+-				return i;
+-		} else {
+-			if (chan_list[i].dcid == frame->cid)
+-				return i;
+-		}
+-	}
++	if (i < 0)
++		return 0;
+ 
+-	return 0;
++	return i;
+ }
+ 
+ static void assign_ext_ctrl(const struct l2cap_frame *frame,
+@@ -326,27 +306,12 @@ static void assign_ext_ctrl(const struct l2cap_frame *frame,
+ 
+ static uint8_t get_ext_ctrl(const struct l2cap_frame *frame)
+ {
+-	int i;
++	int i = get_chan_data_index(frame);
+ 
+-	for (i = 0; i < MAX_CHAN; i++) {
+-		if (chan_list[i].index != frame->index &&
+-						chan_list[i].ctrlid == 0)
+-			continue;
+-
+-		if (chan_list[i].handle != frame->handle &&
+-					chan_list[i].ctrlid != frame->index)
+-			continue;
+-
+-		if (frame->in) {
+-			if (chan_list[i].scid == frame->cid)
+-				return chan_list[i].ext_ctrl;
+-		} else {
+-			if (chan_list[i].dcid == frame->cid)
+-				return chan_list[i].ext_ctrl;
+-		}
+-	}
++	if (i < 0)
++		return 0;
+ 
+-	return 0;
++	return chan_list[i].ext_ctrl;
+ }
+ 
+ static char *sar2str(uint8_t sar)
 -- 
 1.9.3
 
