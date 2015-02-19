@@ -1,56 +1,262 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Jiri Slaby <jirislaby@gmail.com>
-Message-ID: <54E5F0A4.9080300@suse.cz>
-Date: Thu, 19 Feb 2015 15:18:12 +0100
-From: Jiri Slaby <jslaby@suse.cz>
-MIME-Version: 1.0
-To: johan.hedberg@gmail.com
-CC: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>
-Subject: Re: [PATCH 1/1] Bluetooth: make hci_test_bit's addr const
-References: <1424354164-11728-1-git-send-email-jslaby@suse.cz>
-In-Reply-To: <1424354164-11728-1-git-send-email-jslaby@suse.cz>
-Content-Type: text/plain; charset=utf-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 6/6] profiles/network: Handle ctrl rsp after conn setup by bnep
+Date: Thu, 19 Feb 2015 15:16:39 +0100
+Message-Id: <1424355399-10015-6-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1424355399-10015-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1424355399-10015-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 02/19/2015, 02:56 PM, Jiri Slaby wrote:
-> gcc5 warns about passing a const array to hci_test_bit which takes a
-> non-const pointer:
-> net/bluetooth/hci_sock.c: In function ‘hci_sock_sendmsg’:
-> net/bluetooth/hci_sock.c:955:8: warning: passing argument 2 of ‘hci_test_bit’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-array-qualifiers]
->         &hci_sec_filter.ocf_mask[ogf])) &&
->         ^
-> net/bluetooth/hci_sock.c:49:19: note: expected ‘void *’ but argument is of type ‘const __u32 (*)[4] {aka const unsigned int (*)[4]}’
->  static inline int hci_test_bit(int nr, void *addr)
->                    ^
-> 
-> So make 'addr' 'const void *'.
-> 
-> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Gustavo Padovan <gustavo@padovan.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> ---
->  net/bluetooth/hci_sock.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 1d65c5be7c82..34a095ff8679 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -46,7 +46,7 @@ struct hci_pinfo {
->  	unsigned short    channel;
->  };
->  
-> -static inline int hci_test_bit(int nr, void *addr)
-> +static inline int hci_test_bit(int nr, const void *addr)
->  {
->  	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
+This patch moves setup control response to bnep and makes it private.
+---
+ android/pan.c             | 14 +++--------
+ profiles/network/bnep.c   | 60 +++++++++++++++++++++++++++++------------------
+ profiles/network/bnep.h   |  2 --
+ profiles/network/server.c | 36 +++++++++-------------------
+ 4 files changed, 51 insertions(+), 61 deletions(-)
 
-quite interestingly, the compiler doesn't complain against the cast...
-Will send a v2.
-
+diff --git a/android/pan.c b/android/pan.c
+index 8bafcd0..08c8134 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -463,7 +463,6 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
+ {
+ 	struct pan_device *dev = user_data;
+ 	uint8_t packet[BNEP_MTU];
+-	uint16_t rsp = BNEP_CONN_NOT_ALLOWED;
+ 	int sk, n, err;
+ 
+ 	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
+@@ -481,23 +480,17 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
+ 	}
+ 
+ 	err = nap_create_bridge();
+-	if (err < 0) {
++	if (err < 0)
+ 		error("pan: Failed to create bridge: %s (%d)", strerror(-err),
+ 									-err);
+-		goto failed;
+-	}
+ 
+-	if (bnep_server_add(sk, BNEP_BRIDGE, dev->iface, &dev->dst,
+-							(void *) packet) < 0) {
++	if (bnep_server_add(sk, (err < 0) ? NULL : BNEP_BRIDGE, dev->iface,
++					&dev->dst, (void *) packet) < 0) {
+ 		nap_remove_bridge();
+ 		error("server_connadd failed");
+-		rsp = BNEP_CONN_NOT_ALLOWED;
+ 		goto failed;
+ 	}
+ 
+-	rsp = BNEP_SUCCESS;
+-	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
+-
+ 	dev->watch = g_io_add_watch(chan, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+ 							nap_watchdog_cb, dev);
+ 	g_io_channel_unref(dev->io);
+@@ -509,7 +502,6 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
+ 	return FALSE;
+ 
+ failed:
+-	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
+ 	pan_device_remove(dev);
+ 
+ 	return FALSE;
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 1b6ebbc..967fd0f 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -549,6 +549,18 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
+ 	return err;
+ }
+ 
++static ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl,
++								uint16_t resp)
++{
++	struct bnep_control_rsp rsp;
++
++	rsp.type = type;
++	rsp.ctrl = ctrl;
++	rsp.resp = htons(resp);
++
++	return send(sk, &rsp, sizeof(rsp), 0);
++}
++
+ static uint16_t bnep_setup_decode(int sk, struct bnep_setup_conn_req *req,
+ 								uint16_t *dst)
+ {
+@@ -603,7 +615,6 @@ static uint16_t bnep_setup_decode(int sk, struct bnep_setup_conn_req *req,
+ 	case BNEP_SVC_GN:
+ 		if (src == BNEP_SVC_PANU)
+ 			return BNEP_SUCCESS;
+-
+ 		return BNEP_CONN_INVALID_SRC;
+ 	case BNEP_SVC_PANU:
+ 		if (src == BNEP_SVC_PANU || src == BNEP_SVC_GN ||
+@@ -620,7 +631,7 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 							void *setup_data)
+ {
+ 	int err;
+-	uint16_t dst = NULL;
++	uint16_t rsp, dst = NULL;
+ 	struct bnep_setup_conn_req *req = setup_data;
+ 
+ 	/* Highest known Control command ID
+@@ -635,26 +646,40 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 	}
+ 
+ 	/* Processing BNEP_SETUP_CONNECTION_REQUEST_MSG */
+-	err = bnep_setup_decode(sk, setup_data, &dst);
+-	if (err < 0) {
+-		error("error while decoding setup connection request: %d", err);
+-		return -EINVAL;
++	rsp = bnep_setup_decode(sk, setup_data, &dst);
++	if (rsp != BNEP_SUCCESS || !dst) {
++		err = -rsp;
++		error("error while decoding setup connection request: %d", rsp);
++		goto reply;
+ 	}
+ 
+-	if (!bridge || !iface || !addr || !dst)
+-		return -EINVAL;
++	if (!dst) {
++		error("cannot decode proper destination service UUID");
++		rsp = BNEP_CONN_INVALID_DST;
++		goto reply;
++	}
+ 
+ 	err = bnep_connadd(sk, dst, iface);
+-	if (err < 0)
+-		return err;
++	if (err < 0) {
++		rsp = BNEP_CONN_NOT_ALLOWED;
++		goto reply;
++	}
+ 
+ 	err = bnep_add_to_bridge(iface, bridge);
+ 	if (err < 0) {
+ 		bnep_conndel(addr);
+-		return err;
++		rsp = BNEP_CONN_NOT_ALLOWED;
++		goto reply;
+ 	}
+ 
+-	return bnep_if_up(iface);
++	err = bnep_if_up(iface);
++	if (err < 0)
++		rsp = BNEP_CONN_NOT_ALLOWED;
++
++reply:
++	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
++
++	return err;
+ }
+ 
+ void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr)
+@@ -666,14 +691,3 @@ void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr)
+ 	bnep_if_down(iface);
+ 	bnep_conndel(addr);
+ }
+-
+-ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp)
+-{
+-	struct bnep_control_rsp rsp;
+-
+-	rsp.type = type;
+-	rsp.ctrl = ctrl;
+-	rsp.resp = htons(resp);
+-
+-	return send(sk, &rsp, sizeof(rsp), 0);
+-}
+diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
+index 7a3efb6..a9d9f98 100644
+--- a/profiles/network/bnep.h
++++ b/profiles/network/bnep.h
+@@ -44,5 +44,3 @@ void bnep_disconnect(struct bnep *session);
+ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 							void *setup_data);
+ void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr);
+-
+-ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp);
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index 061fedf..e5a64af 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -287,9 +287,10 @@ static gboolean bnep_setup(GIOChannel *chan,
+ 	struct network_server *ns;
+ 	uint8_t packet[BNEP_MTU];
+ 	struct bnep_setup_conn_req *req = (void *) packet;
+-	uint16_t dst_role, rsp = BNEP_CONN_NOT_ALLOWED;
++	uint16_t dst_role = 0;
+ 	uint32_t val;
+ 	int n, sk;
++	char *bridge = NULL;
+ 
+ 	if (cond & G_IO_NVAL)
+ 		return FALSE;
+@@ -314,51 +315,36 @@ static gboolean bnep_setup(GIOChannel *chan,
+ 		break;
+ 	case 16:
+ 		if (memcmp(&req->service[4], bt_base, sizeof(bt_base)) != 0)
+-			return FALSE;
++			break;
+ 
+ 		/* Intentional no-brake */
+ 
+ 	case 4:
+ 		val = get_be32(req->service);
+ 		if (val > 0xffff)
+-			return FALSE;
++			break;
+ 
+ 		dst_role = val;
+ 		break;
+ 	default:
+-		return FALSE;
++		break;
+ 	}
+ 
+ 	ns = find_server(na->servers, dst_role);
+-	if (!ns) {
+-		error("Server unavailable: (0x%x)", dst_role);
+-		goto reply;
+-	}
+-
+-	if (!ns->record_id) {
+-		error("Service record not available");
+-		goto reply;
+-	}
++	if (!ns || !ns->record_id || !ns->bridge)
++		error("Server error, bridge not initialized: (0x%x)", dst_role);
+ 
+-	if (!ns->bridge) {
+-		error("Bridge interface not configured");
+-		goto reply;
+-	}
++	bridge = ns->bridge;
+ 
+ 	strncpy(na->setup->dev, BNEP_INTERFACE, 16);
+ 	na->setup->dev[15] = '\0';
+ 
+-	if (bnep_server_add(sk, ns->bridge, na->setup->dev,
+-					&na->setup->dst, (void *) packet) < 0)
+-		goto reply;
++	if (bnep_server_add(sk, bridge, na->setup->dev, &na->setup->dst,
++							(void *) packet) < 0)
++		error("BNEP server cannot be added");
+ 
+ 	na->setup = NULL;
+ 
+-	rsp = BNEP_SUCCESS;
+-
+-reply:
+-	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
+-
+ 	return FALSE;
+ }
+ 
 -- 
-js
-suse labs
+1.9.3
+
