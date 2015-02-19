@@ -1,59 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Arman Uguray <armansito@chromium.org>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v5 0/3] support signed write command
-Date: Fri, 20 Feb 2015 03:33:06 +0000
-Message-ID: <3D02B219753AD44CBDDDE484323B1774113883BC@SHSMSX104.ccr.corp.intel.com>
-References: <1415351073-4362-1-git-send-email-chao.jie.gu@intel.com>
-	<CAHrH25T6BccZaza2SJvWLL70FQWoEXWkAmRcE=5cfE-WGkcUew@mail.gmail.com>
- <CABBYNZKqRwfbZUhE6E0Kv9fA9=XxWqZgcD7KjwabJ7yd+Zu7mw@mail.gmail.com>
-In-Reply-To: <CABBYNZKqRwfbZUhE6E0Kv9fA9=XxWqZgcD7KjwabJ7yd+Zu7mw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <CABBYNZJ39rC+S=OLTvCm+YsgjLkmN9SkKuSUwVHMpdPy5Lw6hw@mail.gmail.com>
+References: <1424304754-11874-1-git-send-email-armansito@chromium.org>
+	<CABBYNZKqWE-Vzpa0ZQvHTi0L0+5yv3e0d9DsrUa10OzC_KgWPg@mail.gmail.com>
+	<CABBYNZJ39rC+S=OLTvCm+YsgjLkmN9SkKuSUwVHMpdPy5Lw6hw@mail.gmail.com>
+Date: Thu, 19 Feb 2015 12:02:55 -0800
+Message-ID: <CAHrH25QTcS46ttwcm1-sV917iVdYHec-hrQA2A1B-qiPQ27aDw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] shared/gatt-db: Don't fail if realloc returns NULL
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCglUaGlzIHBhdGNoIGhhcyBiZWVuIHN1Ym1pdHRlZCBmb3IgYSBsb25nIHRpbWUu
-IFdoZW4gSSB3cml0aW5nIHRoZSBzaWduZWQgd3JpdGUgZm9yIEdBVFQgQ2xpZW50LCB0aGUgR0FU
-VCBTZXJ2ZXIgaXMgbm90IHJlYWR5IHlldC4gU28gdGhpcyBwYXRjaCBpcyBqdXN0IGZvciBHQVRU
-IENsaWVudCBzaWduZWQgY29tbWFuZC4gSSBhbSBub3Qgc3VyZSBBcm1hbiBpbXBsZW1lbnRlZCBT
-aWduZWQgd3JpdGUgY29tbWFuZCBpbiBHQVRUIFNlcnZlciBvciBub3QuDQoNClRoYW5rcw0KQ2hh
-b2ppZQ0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEx1aXogQXVndXN0
-byB2b24gRGVudHogW21haWx0bzpsdWl6LmRlbnR6QGdtYWlsLmNvbV0NCj4gU2VudDogVHVlc2Rh
-eSwgRmVicnVhcnkgMTcsIDIwMTUgOToyNCBQTQ0KPiBUbzogQXJtYW4gVWd1cmF5DQo+IENjOiBH
-dSwgQ2hhbyBKaWU7IEJsdWVaIGRldmVsb3BtZW50DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjUg
-MC8zXSBzdXBwb3J0IHNpZ25lZCB3cml0ZSBjb21tYW5kDQo+IA0KPiBIaSBHdSwNCj4gDQo+IE9u
-IE1vbiwgRGVjIDE1LCAyMDE0IGF0IDY6NDEgUE0sIEFybWFuIFVndXJheSA8YXJtYW5zaXRvQGNo
-cm9taXVtLm9yZz4gd3JvdGU6DQo+ID4gSGkgYWxsLA0KPiA+DQo+ID4+IE9uIEZyaSwgTm92IDcs
-IDIwMTQgYXQgMTowNCBBTSwgR3UgQ2hhb2ppZSA8Y2hhby5qaWUuZ3VAaW50ZWwuY29tPiB3cm90
-ZToNCj4gPj4gKiBUaGlzIHBhdGNoIHNldCBnaXZlIHVzZXIgZGVkaWNhdGVkIGNvbW1hbmQgdG8g
-c2V0IENTUksgb3B0aW9uIGFuZA0KPiA+PiBzZXBlcmF0ZSBmcm9tIHNpZ25lZCB3cml0ZSBjb21t
-YW5kIGltcGxlbWVudGF0aW9uIGluIHRoZSBwcmV2aW91cw0KPiA+PiBwYXRjaA0KPiA+PiAqIFJl
-bW92ZSB0aGUgdmFsaWRfY3NyayBmbGFnLCB1c2Ugc3RydWN0IHNpZ25lZF93cml0ZV9pbmZvIG1h
-a2UNCj4gPj4gaW1wbGVtZW50YXRpb24gbW9yZSBjbGVhciBhbmQgc2ltcGxlDQo+ID4+ICogc2ln
-bmVkX2NvdW50ZXIgd2lsbCBpbml0aWFsaXplIHdoZW4gQ1NSSyBiZSBzZXQsIHJlbW92ZSBzaWdu
-ZWRfY291bnRlcg0KPiBpbml0aWFsaXphdGlvbiBpbiBidF9hdHRfbmV3IHByb2NlZHVyZS4NCj4g
-Pj4NCj4gPj4gR3UgQ2hhb2ppZSAoMyk6DQo+ID4+ICAgc2hhcmVkL2F0dC5jOkFkZCBzaWduZWQg
-Y29tbWFuZCBvdXRnb2luZyBhbmQgQ1NSSyBmdW5jdGlvbg0KPiA+PiAgIHNoYXJlZC9nYXR0LWNs
-aWVudDpBZGQgQ1NSSyBwYXJ0IHRvIHN1cHBvcnQgc2lnbmVkIHdyaXRlDQo+ID4+ICAgdG9vbHMv
-YnRnYXR0LWNsaWVudDpBZGQgc2lnbmVkIHdyaXRlIHdpdGggQ1NSSyBvcHRpb24NCj4gPj4NCj4g
-Pj4gIHNyYy9zaGFyZWQvYXR0LXR5cGVzLmggICB8ICAgMyArDQo+ID4+ICBzcmMvc2hhcmVkL2F0
-dC5jICAgICAgICAgfCAxNDYNCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKy0NCj4gPj4gIHNyYy9zaGFyZWQvYXR0LmggICAgICAgICB8ICAxMiArKysrDQo+
-ID4+ICBzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmMgfCAgMjEgKysrKystLQ0KPiA+PiAgc3JjL3No
-YXJlZC9nYXR0LWNsaWVudC5oIHwgICA0ICsrDQo+ID4+ICB0b29scy9idGdhdHQtY2xpZW50LmMg
-ICAgfCAgNjkgKysrKysrKysrKysrKysrKysrKysrLQ0KPiA+PiAgNiBmaWxlcyBjaGFuZ2VkLCAy
-NDUgaW5zZXJ0aW9ucygrKSwgMTAgZGVsZXRpb25zKC0pDQo+ID4+DQo+ID4+IC0tDQo+ID4+IDEu
-OS4xDQo+ID4+DQo+ID4+IC0tDQo+ID4+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBz
-ZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZQ0KPiA+PiBsaW51eC1ibHVldG9vdGgiIGluIHRoZSBi
-b2R5IG9mIGEgbWVzc2FnZSB0bw0KPiA+PiBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnIE1vcmUg
-bWFqb3Jkb21vIGluZm8gYXQNCj4gPj4gaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8t
-aW5mby5odG1sDQo+ID4NCj4gPiBTZW5kaW5nIGEgZ2VudGxlIHBpbmcgb24gdGhlc2UgcGF0Y2hl
-cywgc2luY2UgdGhleSBoYXZlbid0IHJlY2VpdmVkIGENCj4gPiBsb3Qgb2YgYXR0ZW50aW9uIGZv
-ciBhIGNvdXBsZSBvZiBtb250aHMuIFdoYXQncyB0aGUgc3RhdHVzIG9mIFNpZ25lZA0KPiA+IFdy
-aXRlcyBoZXJlPyBUaGVzZSB3aWxsIGJlIG1vcmUgcmVsZXZhbnQgZm9yIEFuZHJvaWQgbm93IHRo
-YW4gdGhleQ0KPiA+IHdpbGwgaW5pdGlhbGx5IGJlIGZvciBkZXNrdG9wLg0KPiANCj4gRG8geW91
-IGhhdmUgYW55IG5ldyBwYXRjaGVzIGFkZHJlc3NpbmcgdGhlIGNvbW1lbnRzIGZyb20gU3p5bW9u
-Pw0KPiANCj4gDQo+IC0tDQo+IEx1aXogQXVndXN0byB2b24gRGVudHoNCg==
+Hi Luiz,
+
+> On Thu, Feb 19, 2015 at 4:42 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Thu, Feb 19, 2015 at 2:18 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Arman,
+>>
+>> On Thu, Feb 19, 2015 at 2:12 AM, Arman Uguray <armansito@chromium.org> wrote:
+>>> gatt_db_attribute_write returns false if realloc returns NULL in the
+>>> case where there is no callback. If the write is performed with a 0
+>>> length value and 0 offset, realloc will return NULL according to its
+>>> specification (as it will practically act as 'free'). This patch fixes
+>>> the code so that this case isn't treated as an error.
+>>> ---
+>>>  src/shared/gatt-db.c | 11 +++++------
+>>>  1 file changed, 5 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>>> index 3d2e690..b331f54 100644
+>>> --- a/src/shared/gatt-db.c
+>>> +++ b/src/shared/gatt-db.c
+>>> @@ -1464,7 +1464,7 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+>>>         }
+>>>
+>>>         /* Guard against invalid access if offset equals to value length */
+>>> -       value = offset == attrib->value_len ? NULL : &attrib->value[offset];
+>>> +       value = attrib->value_len - offset ? &attrib->value[offset] : NULL;
+>>
+>> Im not following why you are changing read as well here? Btw, all this
+>> does is reverse the check so Im not sure how it would make any
+>> difference.
+>>
+
+Yeah, I guess this one isn't necessary at all, it does the same thing as before.
+
+>>>
+>>>         func(attrib, 0, value, attrib->value_len - offset, user_data);
+>>>
+>>> @@ -1557,15 +1557,14 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+>>>                 void *buf;
+>>>
+>>>                 buf = realloc(attrib->value, len + offset);
+>>> -               if (!buf)
+>>> +               if (!buf && len + offset > 0)
+>>>                         return false;
+>>
+>> We should not reach realloc in this case, Id say we return if len == 0
+>> since it should really be a nop, for clearing there already exists
+>> gatt_db_attribute_reset and I don't think it worth complicating more
+>> the code bellow.
+>>
+
+We reach this code path since we clear the cached value in the writes,
+but I like your approach better.
+
+>>> -               attrib->value = buf;
+>>> -
+>>>                 /* Init data in the first allocation */
+>>> -               if (!attrib->value_len)
+>>> -                       memset(attrib->value, 0, offset);
+>>> +               if (!attrib->value)
+>>> +                       memset(buf, 0, offset);
+>>>
+>>> +               attrib->value = buf;
+>>>                 attrib->value_len = len + offset;
+>>>         }
+>>>
+>>> --
+>>> 2.2.0.rc0.207.ga3a616c
+>
+> I went ahead applied a fix.
+>
+
+Thanks, I tested your patch and fixes the issue.
+
+>
+> --
+> Luiz Augusto von Dentz
+
+Thanks!
+Arman
