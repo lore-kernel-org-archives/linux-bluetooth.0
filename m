@@ -1,32 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH v2 2/2] Bluetooth: Fix checking for pending Set SSP in Set HS handler
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1424360287-2379-2-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 19 Feb 2015 08:08:21 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <AB8274A2-F930-4343-8C09-97DBA1755746@holtmann.org>
-References: <1424360287-2379-1-git-send-email-johan.hedberg@gmail.com> <1424360287-2379-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20150219160213.GB32397@aemeltch-MOBL1>
+References: <CALUN+EfYdOffOSejMQh3vnLGX1PZmBqMXL8UhvL-UHK_2kZqFA@mail.gmail.com>
+	<2179587.DtNQVsuMNH@leonov>
+	<CALUN+EcsmogUt4PU-sSM4peusX4gdnmAF=ou1ouj5y-QPSpq3Q@mail.gmail.com>
+	<2375594.LoByC1Hkos@leonov>
+	<CALUN+EfrG1o8VsTWjMxW7Y4NGe=-E3M_hz_618ToAG4QHwPZKA@mail.gmail.com>
+	<CALUN+EfQkYuwfh5tqes0mKmGopshRhoWU823MNVE_EKwHsf_ZQ@mail.gmail.com>
+	<20150219160213.GB32397@aemeltch-MOBL1>
+Date: Thu, 19 Feb 2015 09:06:01 -0700
+Message-ID: <CALUN+EdMNvfnjRE3ks2EVUxGcHWYoVey+SSx9qPec9r+QCqbOg@mail.gmail.com>
+Subject: Re: android-bluez with usb adapter
+From: Keith Conger <keith.conger@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Keith Conger <keith.conger@gmail.com>,
+	Szymon Janc <szymon.janc@tieto.com>,
+	Szymon Janc <szymon.janc@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Thanks I'll try that, do you know which BoardConfig option triggers
+its build? Eventually I'd like to send my work in getting Bluez in the
+bbbandroid repo to its maintainer.
 
-> Changing the HS setting requires that SSP is enabled, however so far the
-> code only checked for the SSP flag but not a potentially ongoing Set SSP
-> operation. This patch adds a check for a pending Set SSP command in the
-> Set HS handler, and returns a 'busy' error if one is found.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
+Thanks,
+Keith
 
-patch has been applied to bluetooth-next tree.
+On Thu, Feb 19, 2015 at 9:02 AM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Keith,
+>
+> On Thu, Feb 19, 2015 at 08:39:51AM -0700, Keith Conger wrote:
+>> Can't seem to figure out why audio.a2dp.default.so isn't being built.
+>>
+>
+> This depends on your Android board configuration.
+>
+> afaik you can still build it locally with "mm" and copy to target
+>
+> adb sync should be enough
+>
+> Best regards
+> Andrei Emeltchenko
+>
+>
+>> It seems almost like its not even trying to start bluetoothd.  I
+>> wrapped it with strace, and it didn't create a trace log.
+>>
+>> On Wed, Feb 18, 2015 at 3:21 PM, Keith Conger <keith.conger@gmail.com> wrote:
+>> > Ok I added the additional kernel modules.
+>> >
+>> > Here is a logcat from boot to turning on bluetooth in the UI.
+>> >
+>> > For some reason  audio.a2dp.default.so didn't get built, I'm looking into that.
+>> >
+>> > Thanks,
+>> > Keith
+>> >
+>> > On Wed, Feb 18, 2015 at 1:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+>> >> Hi Keith,
+>> >>
+>> >> On Wednesday 18 of February 2015 13:05:16 Keith Conger wrote:
+>> >>> Actually I had tried through the UI first and got the above logcat
+>> >>> messages.  I then tried HAL test.
+>> >>>
+>> >>> Just for some additional background I'm running kernel 3.8.13 and
+>> >>> bluetooth modules from backports-3.18.1-1
+>> >>
+>> >> If haltest is working that means kernel is configured properly.
+>> >>
+>> >>> I have them at the bottom of "on boot" in the init.rc.  I have
+>> >>> attached my kernel config and init.rc.
+>> >>
+>> >> Could you attach full logcat starting from boot?
+>> >>
+>> >> It looks like you are also missing audio.a2dp.default.so (it shouldn't affect
+>> >> BT enable but is needed for music streaming over BT).
+>> >>
+>> >>>
+>> >>> I noticed in the mako example the following additional modules are
+>> >>> loaded, I'm guessing I should add them also?
+>> >>> insmod /system/lib/modules/rfcomm.ko
+>> >>> insmod /system/lib/modules/bnep.ko
+>> >>
+>> >> Yes, rfcomm is needed for OBEX (PBAP, OPP, MAP etc). Bnep is needed for PAN
+>> >> (BT tethering).
+>> >>
+>> >>>
+>> >>> Thanks again for the help.
+>> >>> Keith
+>> >>>
+>> >>
+>> >> --
+>> >> BR
+>> >> Szymon Janc
+>> >
+>> >
+>> >
+>> > --
+>> > Keith Conger
+>> > keith DOT conger AT gmail DOT com
+>> > http://thecongers.org
+>>
+>>
+>>
+>> --
+>> Keith Conger
+>> keith DOT conger AT gmail DOT com
+>> http://thecongers.org
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Regards
 
-Marcel
 
+-- 
+Keith Conger
+keith DOT conger AT gmail DOT com
+http://thecongers.org
