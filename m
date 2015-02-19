@@ -1,160 +1,253 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CALUN+Edm_YPzNd9Lwm+zBJnqO3_0=r+CrQr1TdOUAvd7qZUQDA@mail.gmail.com>
-References: <CALUN+EfYdOffOSejMQh3vnLGX1PZmBqMXL8UhvL-UHK_2kZqFA@mail.gmail.com>
-	<20150219160213.GB32397@aemeltch-MOBL1>
-	<CALUN+EdMNvfnjRE3ks2EVUxGcHWYoVey+SSx9qPec9r+QCqbOg@mail.gmail.com>
-	<2660784.otTN7klW3S@uw000953>
-	<CALUN+Edm_YPzNd9Lwm+zBJnqO3_0=r+CrQr1TdOUAvd7qZUQDA@mail.gmail.com>
-Date: Thu, 19 Feb 2015 10:25:57 -0700
-Message-ID: <CALUN+Ecm_0381JuAQYoM37zj+EZHoVoLgayECSRrzmd2BOvwAg@mail.gmail.com>
-Subject: Re: android-bluez with usb adapter
-From: Keith Conger <keith.conger@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Szymon Janc <szymon.janc@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v3] Bluetooth: fix service discovery behaviour for empty uuids filter
+Date: Thu, 19 Feb 2015 08:58:50 -0800
+Message-Id: <1424365130-26193-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sorry, I see the problem. ro.kernel.qemu is set to 1.
+This patch fixes service discovery behaviour, when provided uuid filter
+is empty and HCI_QUIRK_STRICT_DUPLICATE_FILTER is set. Before this
+patch, empty uuid filter was unable to trigger scan restart, and that
+caused inconsistent behaviour in applications.
 
-I'm commenting out the check. And rebuilding.
+Example: two DBus clients call BlueZ, one to find all devices with
+service abcd, second to find all devices with rssi smaller than -90.
+Sum of those filters, that is passed to mgmt_service_scan is empty
+filter, with no rssi or uuids set.
+That caused kernel not to restart scan when quirk was set.
+That was inconsistent with what happen when there's only one of those
+two filters set (scan is restarted and reports devices).
 
-On Thu, Feb 19, 2015 at 9:31 AM, Keith Conger <keith.conger@gmail.com> wrote:
-> Interesting, do you happen to know what I need to change in the kernel?
->
-> Thanks again!
-> Keith
->
-> On Thu, Feb 19, 2015 at 9:08 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
->> Hi Keith,
->>
->> On Thursday 19 of February 2015 09:06:01 Keith Conger wrote:
->>> Thanks I'll try that, do you know which BoardConfig option triggers
->>> its build? Eventually I'd like to send my work in getting Bluez in the
->>> bbbandroid repo to its maintainer.
->>
->> I think the problem with bt working from haltest but not from java is that this
->> board of your is using kernel for emulator.
->>
->>
->> This is from your logcat:
->> I/SystemServer(  595): No Bluetooh Service (emulator)
->>
->> and check this for reference:
->> http://androidxref.com/5.0.0_r2/xref/frameworks/base/services/java/com/android/server/SystemServer.java#487
->>
->>>
->>> Thanks,
->>> Keith
->>>
->>> On Thu, Feb 19, 2015 at 9:02 AM, Andrei Emeltchenko
->>> <andrei.emeltchenko.news@gmail.com> wrote:
->>> > Hi Keith,
->>> >
->>> > On Thu, Feb 19, 2015 at 08:39:51AM -0700, Keith Conger wrote:
->>> >> Can't seem to figure out why audio.a2dp.default.so isn't being built.
->>> >>
->>> >
->>> > This depends on your Android board configuration.
->>> >
->>> > afaik you can still build it locally with "mm" and copy to target
->>> >
->>> > adb sync should be enough
->>> >
->>> > Best regards
->>> > Andrei Emeltchenko
->>> >
->>> >
->>> >> It seems almost like its not even trying to start bluetoothd.  I
->>> >> wrapped it with strace, and it didn't create a trace log.
->>> >>
->>> >> On Wed, Feb 18, 2015 at 3:21 PM, Keith Conger <keith.conger@gmail.com> wrote:
->>> >> > Ok I added the additional kernel modules.
->>> >> >
->>> >> > Here is a logcat from boot to turning on bluetooth in the UI.
->>> >> >
->>> >> > For some reason  audio.a2dp.default.so didn't get built, I'm looking into that.
->>> >> >
->>> >> > Thanks,
->>> >> > Keith
->>> >> >
->>> >> > On Wed, Feb 18, 2015 at 1:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
->>> >> >> Hi Keith,
->>> >> >>
->>> >> >> On Wednesday 18 of February 2015 13:05:16 Keith Conger wrote:
->>> >> >>> Actually I had tried through the UI first and got the above logcat
->>> >> >>> messages.  I then tried HAL test.
->>> >> >>>
->>> >> >>> Just for some additional background I'm running kernel 3.8.13 and
->>> >> >>> bluetooth modules from backports-3.18.1-1
->>> >> >>
->>> >> >> If haltest is working that means kernel is configured properly.
->>> >> >>
->>> >> >>> I have them at the bottom of "on boot" in the init.rc.  I have
->>> >> >>> attached my kernel config and init.rc.
->>> >> >>
->>> >> >> Could you attach full logcat starting from boot?
->>> >> >>
->>> >> >> It looks like you are also missing audio.a2dp.default.so (it shouldn't affect
->>> >> >> BT enable but is needed for music streaming over BT).
->>> >> >>
->>> >> >>>
->>> >> >>> I noticed in the mako example the following additional modules are
->>> >> >>> loaded, I'm guessing I should add them also?
->>> >> >>> insmod /system/lib/modules/rfcomm.ko
->>> >> >>> insmod /system/lib/modules/bnep.ko
->>> >> >>
->>> >> >> Yes, rfcomm is needed for OBEX (PBAP, OPP, MAP etc). Bnep is needed for PAN
->>> >> >> (BT tethering).
->>> >> >>
->>> >> >>>
->>> >> >>> Thanks again for the help.
->>> >> >>> Keith
->>> >> >>>
->>> >> >>
->>> >> >> --
->>> >> >> BR
->>> >> >> Szymon Janc
->>> >> >
->>> >> >
->>> >> >
->>> >> > --
->>> >> > Keith Conger
->>> >> > keith DOT conger AT gmail DOT com
->>> >> > http://thecongers.org
->>> >>
->>> >>
->>> >>
->>> >> --
->>> >> Keith Conger
->>> >> keith DOT conger AT gmail DOT com
->>> >> http://thecongers.org
->>> >> --
->>> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> >> the body of a message to majordomo@vger.kernel.org
->>> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->>>
->>>
->>>
->>
->> --
->> Best regards,
->> Szymon Janc
->
->
->
-> --
-> Keith Conger
-> keith DOT conger AT gmail DOT com
-> http://thecongers.org
+To fix that, new variable hdev->discovery.service_discovery was
+introduced. It can indicate that filtered scan is running, no matter
+what uuid or rssi filter is set.
 
+This patch also closes all code responsible for filtered discovery in
+one if statement. That makes whole code shorter, much more readable,
+and easier to backport to older kernels, especially pre 3.10.
 
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ include/net/bluetooth/hci_core.h |   2 +
+ net/bluetooth/mgmt.c             | 145 +++++++++++++++------------------------
+ 2 files changed, 57 insertions(+), 90 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7bf773..791bb75 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -76,6 +76,7 @@ struct discovery_state {
+ 	u8			last_adv_data[HCI_MAX_AD_LENGTH];
+ 	u8			last_adv_data_len;
+ 	bool			report_invalid_rssi;
++	bool			service_discovery;
+ 	s8			rssi;
+ 	u16			uuid_count;
+ 	u8			(*uuids)[16];
+@@ -525,6 +526,7 @@ static inline void discovery_init(struct hci_dev *hdev)
+ 
+ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
+ {
++	hdev->discovery.service_discovery = false;
+ 	hdev->discovery.report_invalid_rssi = true;
+ 	hdev->discovery.rssi = HCI_RSSI_INVALID;
+ 	hdev->discovery.uuid_count = 0;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3a1b537..0c5b16a 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3932,8 +3932,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
+ 		 */
+ 		if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
+ 			     &hdev->quirks) &&
+-		    (hdev->discovery.uuid_count > 0 ||
+-		     hdev->discovery.rssi != HCI_RSSI_INVALID)) {
++		    hdev->discovery.service_discovery) {
+ 			hdev->discovery.scan_start = jiffies;
+ 			hdev->discovery.scan_duration = timeout;
+ 		}
+@@ -4086,6 +4085,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	 */
+ 	hci_discovery_filter_clear(hdev);
+ 
++	hdev->discovery.service_discovery = true;
+ 	hdev->discovery.type = cp->type;
+ 	hdev->discovery.rssi = cp->rssi;
+ 	hdev->discovery.uuid_count = uuid_count;
+@@ -7286,7 +7286,6 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	char buf[512];
+ 	struct mgmt_ev_device_found *ev = (void *) buf;
+ 	size_t ev_size;
+-	bool match;
+ 
+ 	/* Don't send events for a non-kernel initiated discovery. With
+ 	 * LE one exception is if we have pend_le_reports > 0 in which
+@@ -7299,21 +7298,57 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			return;
+ 	}
+ 
+-	/* When using service discovery with a RSSI threshold, then check
+-	 * if such a RSSI threshold is specified. If a RSSI threshold has
+-	 * been specified, and HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set,
+-	 * then all results with a RSSI smaller than the RSSI threshold will be
+-	 * dropped. If the quirk is set, let it through for further processing,
+-	 * as we might need to restart the scan.
+-	 *
+-	 * For BR/EDR devices (pre 1.2) providing no RSSI during inquiry,
+-	 * the results are also dropped.
+-	 */
+-	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+-	    (rssi == HCI_RSSI_INVALID ||
+-	    (rssi < hdev->discovery.rssi &&
+-	     !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
+-		return;
++	if (hdev->discovery.service_discovery) {
++		/* We are using service discovery */
++
++		/* If a RSSI threshold has been specified, and
++		 * HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set, then all
++		 * results with a RSSI smaller than the RSSI threshold will be
++		 * dropped. If the quirk is set, let it through for further
++		 * processing, as we might need to restart the scan.
++		 *
++		 * For BR/EDR devices (pre 1.2) providing no RSSI during
++		 * inquiry, the results are also dropped.
++		 */
++		if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
++		    (rssi == HCI_RSSI_INVALID ||
++		    (rssi < hdev->discovery.rssi &&
++		     !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++			       &hdev->quirks))))
++			return;
++
++		/* If a list of UUID is provided, results with no matching UUID
++		 * should be dropped. If list of UUID is not provided, treat
++		 * all devices as matches.
++		 * Empty UUID filter might be a result of merging filters
++		 * somewhere in highter layer, and should behave same as when
++		 * we have UUID match.
++		 */
++		if (hdev->discovery.uuid_count != 0 &&
++		    (eir_len == 0 || !eir_has_uuids(eir, eir_len,
++				  hdev->discovery.uuid_count,
++				  hdev->discovery.uuids)) &&
++		    (scan_rsp_len == 0 || !eir_has_uuids(scan_rsp, scan_rsp_len,
++				  hdev->discovery.uuid_count,
++				  hdev->discovery.uuids)))
++			return;
++
++		/* If duplicate filtering does not report RSSI changes,
++		 * then restart scanning to ensure updated result with
++		 * updated RSSI values.
++		 */
++		if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++			     &hdev->quirks)) {
++			restart_le_scan(hdev);
++
++			/* Validate the reported RSSI value against the
++			 * RSSI threshold once more.
++			 */
++			if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
++			    rssi < hdev->discovery.rssi)
++				return;
++		}
++	}
+ 
+ 	/* Make sure that the buffer is big enough. The 5 extra bytes
+ 	 * are for the potential CoD field.
+@@ -7340,87 +7375,17 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	ev->rssi = rssi;
+ 	ev->flags = cpu_to_le32(flags);
+ 
+-	if (eir_len > 0) {
+-		/* When using service discovery and a list of UUID is
+-		 * provided, results with no matching UUID should be
+-		 * dropped. In case there is a match the result is
+-		 * kept and checking possible scan response data
+-		 * will be skipped.
+-		 */
+-		if (hdev->discovery.uuid_count > 0) {
+-			match = eir_has_uuids(eir, eir_len,
+-					      hdev->discovery.uuid_count,
+-					      hdev->discovery.uuids);
+-			/* If duplicate filtering does not report RSSI changes,
+-			 * then restart scanning to ensure updated result with
+-			 * updated RSSI values.
+-			 */
+-			if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
+-					      &hdev->quirks))
+-				restart_le_scan(hdev);
+-		} else {
+-			match = true;
+-		}
+-
+-		if (!match && !scan_rsp_len)
+-			return;
+-
++	if (eir_len > 0)
+ 		/* Copy EIR or advertising data into event */
+ 		memcpy(ev->eir, eir, eir_len);
+-	} else {
+-		/* When using service discovery and a list of UUID is
+-		 * provided, results with empty EIR or advertising data
+-		 * should be dropped since they do not match any UUID.
+-		 */
+-		if (hdev->discovery.uuid_count > 0 && !scan_rsp_len)
+-			return;
+-
+-		match = false;
+-	}
+ 
+ 	if (dev_class && !eir_has_data_type(ev->eir, eir_len, EIR_CLASS_OF_DEV))
+ 		eir_len = eir_append_data(ev->eir, eir_len, EIR_CLASS_OF_DEV,
+ 					  dev_class, 3);
+ 
+-	if (scan_rsp_len > 0) {
+-		/* When using service discovery and a list of UUID is
+-		 * provided, results with no matching UUID should be
+-		 * dropped if there is no previous match from the
+-		 * advertising data.
+-		 */
+-		if (hdev->discovery.uuid_count > 0) {
+-			if (!match && !eir_has_uuids(scan_rsp, scan_rsp_len,
+-						     hdev->discovery.uuid_count,
+-						     hdev->discovery.uuids))
+-				return;
+-
+-			/* If duplicate filtering does not report RSSI changes,
+-			 * then restart scanning to ensure updated result with
+-			 * updated RSSI values.
+-			 */
+-			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
+-				     &hdev->quirks))
+-				restart_le_scan(hdev);
+-		}
+-
++	if (scan_rsp_len > 0)
+ 		/* Append scan response data to event */
+ 		memcpy(ev->eir + eir_len, scan_rsp, scan_rsp_len);
+-	} else {
+-		/* When using service discovery and a list of UUID is
+-		 * provided, results with empty scan response and no
+-		 * previous matched advertising data should be dropped.
+-		 */
+-		if (hdev->discovery.uuid_count > 0 && !match)
+-			return;
+-	}
+-
+-	/* Validate the reported RSSI value against the RSSI threshold once more
+-	 * incase HCI_QUIRK_STRICT_DUPLICATE_FILTER forced a restart of LE
+-	 * scanning.
+-	 */
+-	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
+-	    rssi < hdev->discovery.rssi)
+-		return;
+ 
+ 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+ 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
 -- 
-Keith Conger
-keith DOT conger AT gmail DOT com
-http://thecongers.org
+2.2.0.rc0.207.ga3a616c
+
