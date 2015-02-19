@@ -1,26 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Feb 2015 10:21:09 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] monitor: Factor out channel selection to separate
- function
-Message-ID: <20150219082109.GA22981@t440s.lan>
-References: <1424295992-29506-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1424295992-29506-1-git-send-email-szymon.janc@tieto.com>
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH 0/5] Bluetooth: Clean up hci_cb usage
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1424264038-32153-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 18 Feb 2015 23:47:36 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <45FCFE70-AA9E-4D00-A04B-6C569CF07806@holtmann.org>
+References: <1424264038-32153-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Johan,
 
-On Wed, Feb 18, 2015, Szymon Janc wrote:
-> This allows to have conditions check in single place.
-> ---
->  monitor/l2cap.c | 85 +++++++++++++++++----------------------------------------
->  1 file changed, 25 insertions(+), 60 deletions(-)
+> This set of patches cleans up the usage of the hci_cb list as well as
+> the couple of unnecesasry layers of abstraction with hci_*_cb() calling
+> hci_proto_*_cb() functions. These patches also pave the way for other
+> modules, such as 6lowpan, to easily track the coming and going of
+> connections, now that connect_cfm & disconn_cfm are accessible through
+> the hci_cb list.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (5):
+>      Bluetooth: Add new hci_cb entries to the tail rather than the head
+>      Bluetooth: Convert hci_cb_list_lock to a mutex
+>      Bluetooth: Convert L2CAP security callback to use hci_cb
+>      Bluetooth: Convert connect_cfm to be triggered through hci_cb
+>      Bluetooth: Convert disconn_cfm to be triggered through hci_cb
+> 
+> include/net/bluetooth/hci_core.h | 140 ++++++++++++------------------------
+> net/bluetooth/hci_conn.c         |   6 +-
+> net/bluetooth/hci_core.c         |  12 ++--
+> net/bluetooth/hci_event.c        |  38 +++++-----
+> net/bluetooth/l2cap_core.c       |  26 +++++--
+> net/bluetooth/sco.c              |  21 +++++-
+> 6 files changed, 113 insertions(+), 130 deletions(-)
 
-Both patches have been applied. Thanks.
+all 5 patches have been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
