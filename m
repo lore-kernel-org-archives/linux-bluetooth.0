@@ -1,47 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH 0/5] Bluetooth: Clean up hci_cb usage
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1424264038-32153-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 18 Feb 2015 23:47:36 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <45FCFE70-AA9E-4D00-A04B-6C569CF07806@holtmann.org>
-References: <1424264038-32153-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ 2/2] core: gatt: Fix incorrect response on CCC read
+Date: Wed, 18 Feb 2015 16:12:34 -0800
+Message-Id: <1424304754-11874-2-git-send-email-armansito@chromium.org>
+In-Reply-To: <1424304754-11874-1-git-send-email-armansito@chromium.org>
+References: <1424304754-11874-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This patch fixes a bug where a CCC read on the local GATT server always
+returned a 0-length value.
+---
+ src/gatt-database.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> This set of patches cleans up the usage of the hci_cb list as well as
-> the couple of unnecesasry layers of abstraction with hci_*_cb() calling
-> hci_proto_*_cb() functions. These patches also pave the way for other
-> modules, such as 6lowpan, to easily track the coming and going of
-> connections, now that connect_cfm & disconn_cfm are accessible through
-> the hci_cb list.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (5):
->      Bluetooth: Add new hci_cb entries to the tail rather than the head
->      Bluetooth: Convert hci_cb_list_lock to a mutex
->      Bluetooth: Convert L2CAP security callback to use hci_cb
->      Bluetooth: Convert connect_cfm to be triggered through hci_cb
->      Bluetooth: Convert disconn_cfm to be triggered through hci_cb
-> 
-> include/net/bluetooth/hci_core.h | 140 ++++++++++++------------------------
-> net/bluetooth/hci_conn.c         |   6 +-
-> net/bluetooth/hci_core.c         |  12 ++--
-> net/bluetooth/hci_event.c        |  38 +++++-----
-> net/bluetooth/l2cap_core.c       |  26 +++++--
-> net/bluetooth/sco.c              |  21 +++++-
-> 6 files changed, 113 insertions(+), 130 deletions(-)
-
-all 5 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 5e83ce1..e876141 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -495,7 +495,7 @@ static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
+ 		goto done;
+ 	}
+ 
+-	len -= offset;
++	len = 2 - offset;
+ 	value = len ? &ccc->value[offset] : NULL;
+ 
+ done:
+@@ -517,7 +517,7 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
+ 
+ 	handle = gatt_db_attribute_get_handle(attrib);
+ 
+-	DBG("CCC read called for handle: 0x%04x", handle);
++	DBG("CCC write called for handle: 0x%04x", handle);
+ 
+ 	if (!value || len != 2) {
+ 		ecode = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
+-- 
+2.2.0.rc0.207.ga3a616c
 
