@@ -2,181 +2,239 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] monitor: Add PSM tracking support for LE CoC
-Date: Thu, 19 Feb 2015 14:40:54 +0100
-Message-Id: <1424353254-28363-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1424353254-28363-1-git-send-email-szymon.janc@tieto.com>
-References: <1424353254-28363-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/2] monitor: Pass identifier to L2CAP signaling command handler
+Date: Thu, 19 Feb 2015 14:40:53 +0100
+Message-Id: <1424353254-28363-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This uses identifier to match simultaneous L2CAP connect requests
-and responses.
-
-< ACL Data TX: Handle 3585 flags 0x00 dlen 18
-    LE L2CAP: LE Connection Request (0x14) ident 2 len 10
-      PSM: 131 (0x0083)
-      Source CID: 65
-      MTU: 672
-      MPS: 672
-      Credits: 10
-> ACL Data RX: Handle 3585 flags 0x02 dlen 18
-    LE L2CAP: LE Connection Response (0x15) ident 2 len 10
-      Destination CID: 65
-      MTU: 23
-      MPS: 23
-      Credits: 5
-      Result: Connection successful (0x0000)
-< ACL Data TX: Handle 3585 flags 0x00 dlen 27
-    Channel: 65 len 23 [PSM 131 mode 0] {chan 1}
-      17 00 00 00 00 00 17 00 7f 7f 7f 7f 7f 7f 7f 7f  ................
-      7f 7f 7f 7f 7f 7f 7f                             .......
-< ACL Data TX: Handle 3585 flags 0x00 dlen 6
-    Channel: 65 len 2 [PSM 131 mode 0] {chan 1}
-      7f 7f                                            ..
+This will be used to correctly match LE Connection Request and
+Response.
 ---
- monitor/l2cap.c | 55 +++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 39 insertions(+), 16 deletions(-)
+ monitor/l2cap.c | 51 ++++++++++++++++++++++++++-------------------------
+ 1 file changed, 26 insertions(+), 25 deletions(-)
 
 diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index c59cb55..3c6006e 100644
+index 7a6edbe..c59cb55 100644
 --- a/monitor/l2cap.c
 +++ b/monitor/l2cap.c
-@@ -91,6 +91,7 @@
- struct chan_data {
- 	uint16_t index;
- 	uint16_t handle;
-+	uint8_t ident;
- 	uint16_t scid;
- 	uint16_t dcid;
- 	uint16_t psm;
-@@ -101,8 +102,8 @@ struct chan_data {
+@@ -937,7 +937,7 @@ static void print_conn_param_result(uint16_t result)
+ 	print_field("Result: %s (0x%4.4x)", str, le16_to_cpu(result));
+ }
  
- static struct chan_data chan_list[MAX_CHAN];
- 
--static void assign_scid(const struct l2cap_frame *frame,
--				uint16_t scid, uint16_t psm, uint8_t ctrlid)
-+static void assign_scid(const struct l2cap_frame *frame, uint16_t scid,
-+				uint16_t psm, uint8_t ctrlid, uint8_t ident)
+-static void sig_cmd_reject(const struct l2cap_frame *frame)
++static void sig_cmd_reject(const struct l2cap_frame *frame, uint8_t ident)
  {
- 	int i, n = -1;
- 
-@@ -135,6 +136,7 @@ static void assign_scid(const struct l2cap_frame *frame,
- 	memset(&chan_list[n], 0, sizeof(chan_list[n]));
- 	chan_list[n].index = frame->index;
- 	chan_list[n].handle = frame->handle;
-+	chan_list[n].ident = ident;
- 
- 	if (frame->in)
- 		chan_list[n].dcid = scid;
-@@ -171,8 +173,8 @@ static void release_scid(const struct l2cap_frame *frame, uint16_t scid)
+ 	const struct bt_l2cap_pdu_cmd_reject *pdu = frame->data;
+ 	const void *data = frame->data;
+@@ -982,7 +982,7 @@ static void sig_cmd_reject(const struct l2cap_frame *frame)
  	}
  }
  
--static void assign_dcid(const struct l2cap_frame *frame,
--					uint16_t dcid, uint16_t scid)
-+static void assign_dcid(const struct l2cap_frame *frame, uint16_t dcid,
-+						uint16_t scid, uint8_t ident)
+-static void sig_conn_req(const struct l2cap_frame *frame)
++static void sig_conn_req(const struct l2cap_frame *frame, uint8_t ident)
  {
- 	int i;
+ 	const struct bt_l2cap_pdu_conn_req *pdu = frame->data;
  
-@@ -183,15 +185,32 @@ static void assign_dcid(const struct l2cap_frame *frame,
- 		if (chan_list[i].handle != frame->handle)
- 			continue;
+@@ -992,7 +992,7 @@ static void sig_conn_req(const struct l2cap_frame *frame)
+ 	assign_scid(frame, le16_to_cpu(pdu->scid), le16_to_cpu(pdu->psm), 0);
+ }
  
-+		if (chan_list[i].ident != ident)
-+			continue;
-+
- 		if (frame->in) {
--			if (chan_list[i].scid == scid) {
--				chan_list[i].dcid = dcid;
--				break;
-+			if (scid) {
-+				if (chan_list[i].scid == scid) {
-+					chan_list[i].dcid = dcid;
-+					break;
-+				}
-+			} else {
-+				if (chan_list[i].scid && !chan_list[i].dcid) {
-+					chan_list[i].dcid = dcid;
-+					break;
-+				}
- 			}
- 		} else {
--			if (chan_list[i].dcid == scid) {
--				chan_list[i].scid = dcid;
--				break;
-+			if (scid) {
-+				if (chan_list[i].dcid == scid) {
-+					chan_list[i].scid = dcid;
-+					break;
-+				}
-+			} else {
-+				if (chan_list[i].dcid && !chan_list[i].scid) {
-+					chan_list[i].scid = dcid;
-+					break;
-+				}
- 			}
- 		}
- 	}
-@@ -989,7 +1008,8 @@ static void sig_conn_req(const struct l2cap_frame *frame, uint8_t ident)
- 	print_psm(pdu->psm);
+-static void sig_conn_rsp(const struct l2cap_frame *frame)
++static void sig_conn_rsp(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_conn_rsp *pdu = frame->data;
+ 
+@@ -1004,7 +1004,7 @@ static void sig_conn_rsp(const struct l2cap_frame *frame)
+ 	assign_dcid(frame, le16_to_cpu(pdu->dcid), le16_to_cpu(pdu->scid));
+ }
+ 
+-static void sig_config_req(const struct l2cap_frame *frame)
++static void sig_config_req(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_config_req *pdu = frame->data;
+ 
+@@ -1013,7 +1013,7 @@ static void sig_config_req(const struct l2cap_frame *frame)
+ 	print_config_options(frame, 4, le16_to_cpu(pdu->dcid), false);
+ }
+ 
+-static void sig_config_rsp(const struct l2cap_frame *frame)
++static void sig_config_rsp(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_config_rsp *pdu = frame->data;
+ 
+@@ -1023,7 +1023,7 @@ static void sig_config_rsp(const struct l2cap_frame *frame)
+ 	print_config_options(frame, 6, le16_to_cpu(pdu->scid), true);
+ }
+ 
+-static void sig_disconn_req(const struct l2cap_frame *frame)
++static void sig_disconn_req(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_disconn_req *pdu = frame->data;
+ 
+@@ -1031,7 +1031,7 @@ static void sig_disconn_req(const struct l2cap_frame *frame)
  	print_cid("Source", pdu->scid);
- 
--	assign_scid(frame, le16_to_cpu(pdu->scid), le16_to_cpu(pdu->psm), 0);
-+	assign_scid(frame, le16_to_cpu(pdu->scid), le16_to_cpu(pdu->psm), 0,
-+									ident);
  }
  
- static void sig_conn_rsp(const struct l2cap_frame *frame, uint8_t ident)
-@@ -1001,7 +1021,8 @@ static void sig_conn_rsp(const struct l2cap_frame *frame, uint8_t ident)
- 	print_conn_result(pdu->result);
- 	print_conn_status(pdu->status);
+-static void sig_disconn_rsp(const struct l2cap_frame *frame)
++static void sig_disconn_rsp(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_disconn_rsp *pdu = frame->data;
  
--	assign_dcid(frame, le16_to_cpu(pdu->dcid), le16_to_cpu(pdu->scid));
-+	assign_dcid(frame, le16_to_cpu(pdu->dcid), le16_to_cpu(pdu->scid),
-+									ident);
+@@ -1041,24 +1041,24 @@ static void sig_disconn_rsp(const struct l2cap_frame *frame)
+ 	release_scid(frame, le16_to_cpu(pdu->scid));
  }
  
- static void sig_config_req(const struct l2cap_frame *frame, uint8_t ident)
-@@ -1118,7 +1139,7 @@ static void sig_create_chan_req(const struct l2cap_frame *frame, uint8_t ident)
+-static void sig_echo_req(const struct l2cap_frame *frame)
++static void sig_echo_req(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	packet_hexdump(frame->data, frame->size);
+ }
+ 
+-static void sig_echo_rsp(const struct l2cap_frame *frame)
++static void sig_echo_rsp(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	packet_hexdump(frame->data, frame->size);
+ }
+ 
+-static void sig_info_req(const struct l2cap_frame *frame)
++static void sig_info_req(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_info_req *pdu = frame->data;
+ 
+ 	print_info_type(pdu->type);
+ }
+ 
+-static void sig_info_rsp(const struct l2cap_frame *frame)
++static void sig_info_rsp(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_info_rsp *pdu = frame->data;
+ 	const void *data = frame->data;
+@@ -1109,7 +1109,7 @@ static void sig_info_rsp(const struct l2cap_frame *frame)
+ 	}
+ }
+ 
+-static void sig_create_chan_req(const struct l2cap_frame *frame)
++static void sig_create_chan_req(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_create_chan_req *pdu = frame->data;
+ 
+@@ -1121,7 +1121,7 @@ static void sig_create_chan_req(const struct l2cap_frame *frame)
+ 								pdu->ctrlid);
+ }
+ 
+-static void sig_create_chan_rsp(const struct l2cap_frame *frame)
++static void sig_create_chan_rsp(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_create_chan_rsp *pdu = frame->data;
+ 
+@@ -1133,7 +1133,7 @@ static void sig_create_chan_rsp(const struct l2cap_frame *frame)
+ 	assign_dcid(frame, le16_to_cpu(pdu->dcid), le16_to_cpu(pdu->scid));
+ }
+ 
+-static void sig_move_chan_req(const struct l2cap_frame *frame)
++static void sig_move_chan_req(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_move_chan_req *pdu = frame->data;
+ 
+@@ -1141,7 +1141,7 @@ static void sig_move_chan_req(const struct l2cap_frame *frame)
  	print_field("Controller ID: %d", pdu->ctrlid);
- 
- 	assign_scid(frame, le16_to_cpu(pdu->scid), le16_to_cpu(pdu->psm),
--								pdu->ctrlid);
-+							pdu->ctrlid, ident);
  }
  
- static void sig_create_chan_rsp(const struct l2cap_frame *frame, uint8_t ident)
-@@ -1130,7 +1151,8 @@ static void sig_create_chan_rsp(const struct l2cap_frame *frame, uint8_t ident)
- 	print_conn_result(pdu->result);
- 	print_conn_status(pdu->status);
+-static void sig_move_chan_rsp(const struct l2cap_frame *frame)
++static void sig_move_chan_rsp(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_move_chan_rsp *pdu = frame->data;
  
--	assign_dcid(frame, le16_to_cpu(pdu->dcid), le16_to_cpu(pdu->scid));
-+	assign_dcid(frame, le16_to_cpu(pdu->dcid), le16_to_cpu(pdu->scid),
-+									ident);
+@@ -1149,7 +1149,7 @@ static void sig_move_chan_rsp(const struct l2cap_frame *frame)
+ 	print_move_result(pdu->result);
  }
  
- static void sig_move_chan_req(const struct l2cap_frame *frame, uint8_t ident)
-@@ -1192,7 +1214,8 @@ static void sig_le_conn_req(const struct l2cap_frame *frame, uint8_t ident)
- 	print_field("MPS: %u", le16_to_cpu(pdu->mps));
- 	print_field("Credits: %u", le16_to_cpu(pdu->credits));
+-static void sig_move_chan_cfm(const struct l2cap_frame *frame)
++static void sig_move_chan_cfm(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_move_chan_cfm *pdu = frame->data;
  
--	assign_scid(frame, le16_to_cpu(pdu->scid), le16_to_cpu(pdu->psm), 0);
-+	assign_scid(frame, le16_to_cpu(pdu->scid), le16_to_cpu(pdu->psm), 0,
-+									ident);
+@@ -1157,14 +1157,15 @@ static void sig_move_chan_cfm(const struct l2cap_frame *frame)
+ 	print_move_cfm_result(pdu->result);
  }
  
- static void sig_le_conn_rsp(const struct l2cap_frame *frame, uint8_t ident)
-@@ -1205,7 +1228,7 @@ static void sig_le_conn_rsp(const struct l2cap_frame *frame, uint8_t ident)
- 	print_field("Credits: %u", le16_to_cpu(pdu->credits));
- 	print_conn_result(pdu->result);
+-static void sig_move_chan_cfm_rsp(const struct l2cap_frame *frame)
++static void sig_move_chan_cfm_rsp(const struct l2cap_frame *frame,
++								uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_move_chan_cfm_rsp *pdu = frame->data;
  
--	/*assign_dcid(frame, le16_to_cpu(pdu->dcid), le16_to_cpu(pdu->scid));*/
-+	assign_dcid(frame, le16_to_cpu(pdu->dcid), 0, ident);
+ 	print_cid("Initiator", pdu->icid);
  }
  
- static void sig_le_flowctl_creds(const struct l2cap_frame *frame, uint8_t ident)
+-static void sig_conn_param_req(const struct l2cap_frame *frame)
++static void sig_conn_param_req(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_conn_param_req *pdu = frame->data;
+ 
+@@ -1174,14 +1175,14 @@ static void sig_conn_param_req(const struct l2cap_frame *frame)
+ 	print_field("Timeout multiplier: %d", le16_to_cpu(pdu->timeout));
+ }
+ 
+-static void sig_conn_param_rsp(const struct l2cap_frame *frame)
++static void sig_conn_param_rsp(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_conn_param_rsp *pdu = frame->data;
+ 
+ 	print_conn_param_result(pdu->result);
+ }
+ 
+-static void sig_le_conn_req(const struct l2cap_frame *frame)
++static void sig_le_conn_req(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_le_conn_req *pdu = frame->data;
+ 
+@@ -1194,7 +1195,7 @@ static void sig_le_conn_req(const struct l2cap_frame *frame)
+ 	assign_scid(frame, le16_to_cpu(pdu->scid), le16_to_cpu(pdu->psm), 0);
+ }
+ 
+-static void sig_le_conn_rsp(const struct l2cap_frame *frame)
++static void sig_le_conn_rsp(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_le_conn_rsp *pdu = frame->data;
+ 
+@@ -1207,7 +1208,7 @@ static void sig_le_conn_rsp(const struct l2cap_frame *frame)
+ 	/*assign_dcid(frame, le16_to_cpu(pdu->dcid), le16_to_cpu(pdu->scid));*/
+ }
+ 
+-static void sig_le_flowctl_creds(const struct l2cap_frame *frame)
++static void sig_le_flowctl_creds(const struct l2cap_frame *frame, uint8_t ident)
+ {
+ 	const struct bt_l2cap_pdu_le_flowctl_creds *pdu = frame->data;
+ 
+@@ -1218,7 +1219,7 @@ static void sig_le_flowctl_creds(const struct l2cap_frame *frame)
+ struct sig_opcode_data {
+ 	uint8_t opcode;
+ 	const char *str;
+-	void (*func) (const struct l2cap_frame *frame);
++	void (*func)(const struct l2cap_frame *frame, uint8_t identifier);
+ 	uint16_t size;
+ 	bool fixed;
+ };
+@@ -1377,7 +1378,7 @@ static void bredr_sig_packet(uint16_t index, bool in, uint16_t handle,
+ 		}
+ 
+ 		l2cap_frame_init(&frame, index, in, handle, cid, data, len);
+-		opcode_data->func(&frame);
++		opcode_data->func(&frame, hdr->ident);
+ 
+ 		data += len;
+ 		size -= len;
+@@ -1458,7 +1459,7 @@ static void le_sig_packet(uint16_t index, bool in, uint16_t handle,
+ 	}
+ 
+ 	l2cap_frame_init(&frame, index, in, handle, cid, data, len);
+-	opcode_data->func(&frame);
++	opcode_data->func(&frame, hdr->ident);
+ }
+ 
+ static void connless_packet(uint16_t index, bool in, uint16_t handle,
 -- 
 1.9.1
 
