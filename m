@@ -1,77 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] profiles/network: Minor style fix
-Date: Thu, 19 Feb 2015 15:16:34 +0100
-Message-Id: <1424355399-10015-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 4/6] profiles/network: Integrate get and check bnep setup services roles
+Date: Thu, 19 Feb 2015 15:16:37 +0100
+Message-Id: <1424355399-10015-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1424355399-10015-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1424355399-10015-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes style issues e.g. line aligns, braces.
+While bnep setup, roles must be determined and checked if the connection
+scanario is possible. Get and check possible service roles routines are
+always performed in serie. So there is no need to split it to separate
+calls.
 ---
- profiles/network/bnep.c   | 10 ++++++----
- profiles/network/server.c | 11 +++++------
- 2 files changed, 11 insertions(+), 10 deletions(-)
+ android/pan.c             |  8 +-------
+ profiles/network/bnep.c   | 37 ++++++++++++++++---------------------
+ profiles/network/bnep.h   |  1 -
+ profiles/network/server.c |  6 +-----
+ 4 files changed, 18 insertions(+), 34 deletions(-)
 
+diff --git a/android/pan.c b/android/pan.c
+index 972af89..0bf5f71 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -497,17 +497,11 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
+ 	}
+ 
+ 	rsp = bnep_setup_decode(req, &dst_role, &src_role);
+-	if (rsp) {
++	if (rsp != BNEP_SUCCESS) {
+ 		error("bnep_setup_decode failed");
+ 		goto failed;
+ 	}
+ 
+-	rsp = bnep_setup_chk(dst_role, src_role);
+-	if (rsp) {
+-		error("benp_setup_chk failed");
+-		goto failed;
+-	}
+-
+ 	err = nap_create_bridge();
+ 	if (err < 0) {
+ 		error("pan: Failed to create bridge: %s (%d)", strerror(-err),
 diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 09d4b65..70d2e56 100644
+index 70d2e56..919d995 100644
 --- a/profiles/network/bnep.c
 +++ b/profiles/network/bnep.c
-@@ -506,10 +506,11 @@ static int bnep_add_to_bridge(const char *devname, const char *bridge)
+@@ -591,26 +591,6 @@ ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp)
+ 	return send(sk, &rsp, sizeof(rsp), 0);
+ }
  
- 	if (ioctl(sk, SIOCBRADDIF, &ifr) < 0) {
- 		err = -errno;
--		error("bnep: Can't add %s to the bridge %s: %s(%d)",
--					devname, bridge, strerror(-err), -err);
--	} else
-+		error("bnep: Can't add %s to the bridge %s: %s(%d)", devname,
-+						bridge, strerror(-err), -err);
-+	} else {
- 		info("bridge %s: interface %s added", bridge, devname);
+-uint16_t bnep_setup_chk(uint16_t dst, uint16_t src)
+-{
+-	/* Allowed PAN Profile scenarios */
+-	switch (dst) {
+-	case BNEP_SVC_NAP:
+-	case BNEP_SVC_GN:
+-		if (src == BNEP_SVC_PANU)
+-			return 0;
+-		return BNEP_CONN_INVALID_SRC;
+-	case BNEP_SVC_PANU:
+-		if (src == BNEP_SVC_PANU ||  src == BNEP_SVC_GN ||
+-							src == BNEP_SVC_NAP)
+-			return 0;
+-
+-		return BNEP_CONN_INVALID_SRC;
+-	}
+-
+-	return BNEP_CONN_INVALID_DST;
+-}
+-
+ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
+ 								uint16_t *src)
+ {
+@@ -655,5 +635,20 @@ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
+ 		return BNEP_CONN_INVALID_SVC;
+ 	}
+ 
+-	return BNEP_SUCCESS;
++	/* Allowed PAN Profile scenarios */
++	switch (*dst) {
++	case BNEP_SVC_NAP:
++	case BNEP_SVC_GN:
++		if (*src == BNEP_SVC_PANU)
++			return BNEP_SUCCESS;
++		return BNEP_CONN_INVALID_SRC;
++	case BNEP_SVC_PANU:
++		if (*src == BNEP_SVC_PANU || *src == BNEP_SVC_GN ||
++							*src == BNEP_SVC_NAP)
++			return BNEP_SUCCESS;
++
++		return BNEP_CONN_INVALID_SRC;
 +	}
++
++	return BNEP_CONN_INVALID_DST;
+ }
+diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
+index bc43d4f..5aedf38 100644
+--- a/profiles/network/bnep.h
++++ b/profiles/network/bnep.h
+@@ -46,6 +46,5 @@ int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
+ void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr);
  
- 	close(sk);
- 
-@@ -539,8 +540,9 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
- 		err = -errno;
- 		error("bnep: Can't delete %s from the bridge %s: %s(%d)",
- 					devname, bridge, strerror(-err), -err);
--	} else
-+	} else {
- 		info("bridge %s: interface %s removed", bridge, devname);
-+	}
- 
- 	close(sk);
- 
+ ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp);
+-uint16_t bnep_setup_chk(uint16_t dst_role, uint16_t src_role);
+ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
+ 								uint16_t *src);
 diff --git a/profiles/network/server.c b/profiles/network/server.c
-index 3fb031f..ebbe056 100644
+index 37bfba4..2091fdd 100644
 --- a/profiles/network/server.c
 +++ b/profiles/network/server.c
-@@ -650,8 +650,7 @@ static struct network_adapter *create_adapter(struct btd_adapter *adapter)
- 	na = g_new0(struct network_adapter, 1);
- 	na->adapter = btd_adapter_ref(adapter);
+@@ -319,11 +319,7 @@ static gboolean bnep_setup(GIOChannel *chan,
+ 		return FALSE;
  
--	na->io = bt_io_listen(NULL, confirm_event, na,
--				NULL, &err,
-+	na->io = bt_io_listen(NULL, confirm_event, na, NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR,
- 				btd_adapter_get_address(adapter),
- 				BT_IO_OPT_PSM, BNEP_PSM,
-@@ -697,10 +696,10 @@ int server_register(struct btd_adapter *adapter, uint16_t id)
- 	if (g_slist_length(na->servers) > 0)
- 		goto done;
+ 	rsp = bnep_setup_decode(req, &dst_role, &src_role);
+-	if (rsp)
+-		goto reply;
+-
+-	rsp = bnep_setup_chk(dst_role, src_role);
+-	if (rsp)
++	if (rsp != BNEP_SUCCESS)
+ 		goto reply;
  
--	if (!g_dbus_register_interface(btd_get_dbus_connection(),
--					path, NETWORK_SERVER_INTERFACE,
--					server_methods, NULL, NULL,
--					na, path_unregister)) {
-+	if (!g_dbus_register_interface(btd_get_dbus_connection(), path,
-+						NETWORK_SERVER_INTERFACE,
-+						server_methods, NULL, NULL, na,
-+						path_unregister)) {
- 		error("D-Bus failed to register %s interface",
- 						NETWORK_SERVER_INTERFACE);
- 		server_free(ns);
+ 	rsp = BNEP_CONN_NOT_ALLOWED;
 -- 
 1.9.3
 
