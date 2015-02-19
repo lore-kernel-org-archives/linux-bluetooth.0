@@ -1,64 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH v2 1/1] Bluetooth: make hci_test_bit's addr const
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1424355643-30660-1-git-send-email-jslaby@suse.cz>
-Date: Thu, 19 Feb 2015 08:10:28 -0800
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>
-Message-Id: <21570C6D-0C2F-40CA-9100-5A5CC7D1CEAB@holtmann.org>
-References: <1424354164-11728-1-git-send-email-jslaby@suse.cz> <1424355643-30660-1-git-send-email-jslaby@suse.cz>
-To: Jiri Slaby <jslaby@suse.cz>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Keith Conger <keith.conger@gmail.com>
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Szymon Janc <szymon.janc@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: android-bluez with usb adapter
+Date: Thu, 19 Feb 2015 17:08:47 +0100
+Message-ID: <2660784.otTN7klW3S@uw000953>
+In-Reply-To: <CALUN+EdMNvfnjRE3ks2EVUxGcHWYoVey+SSx9qPec9r+QCqbOg@mail.gmail.com>
+References: <CALUN+EfYdOffOSejMQh3vnLGX1PZmBqMXL8UhvL-UHK_2kZqFA@mail.gmail.com> <20150219160213.GB32397@aemeltch-MOBL1> <CALUN+EdMNvfnjRE3ks2EVUxGcHWYoVey+SSx9qPec9r+QCqbOg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jiri,
+Hi Keith,
 
-> gcc5 warns about passing a const array to hci_test_bit which takes a
-> non-const pointer:
-> net/bluetooth/hci_sock.c: In function ‘hci_sock_sendmsg’:
-> net/bluetooth/hci_sock.c:955:8: warning: passing argument 2 of ‘hci_test_bit’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-array-qualifiers]
->        &hci_sec_filter.ocf_mask[ogf])) &&
->        ^
-> net/bluetooth/hci_sock.c:49:19: note: expected ‘void *’ but argument is of type ‘const __u32 (*)[4] {aka const unsigned int (*)[4]}’
-> static inline int hci_test_bit(int nr, void *addr)
->                   ^
+On Thursday 19 of February 2015 09:06:01 Keith Conger wrote:
+> Thanks I'll try that, do you know which BoardConfig option triggers
+> its build? Eventually I'd like to send my work in getting Bluez in the
+> bbbandroid repo to its maintainer.
+
+I think the problem with bt working from haltest but not from java is that this
+board of your is using kernel for emulator.
+
+
+This is from your logcat:
+I/SystemServer(  595): No Bluetooh Service (emulator)
+
+and check this for reference:
+http://androidxref.com/5.0.0_r2/xref/frameworks/base/services/java/com/android/server/SystemServer.java#487
+
 > 
-> So make 'addr' 'const void *'.
+> Thanks,
+> Keith
 > 
-> [v2] make the pointer in the cast const too. 
+> On Thu, Feb 19, 2015 at 9:02 AM, Andrei Emeltchenko
+> <andrei.emeltchenko.news@gmail.com> wrote:
+> > Hi Keith,
+> >
+> > On Thu, Feb 19, 2015 at 08:39:51AM -0700, Keith Conger wrote:
+> >> Can't seem to figure out why audio.a2dp.default.so isn't being built.
+> >>
+> >
+> > This depends on your Android board configuration.
+> >
+> > afaik you can still build it locally with "mm" and copy to target
+> >
+> > adb sync should be enough
+> >
+> > Best regards
+> > Andrei Emeltchenko
+> >
+> >
+> >> It seems almost like its not even trying to start bluetoothd.  I
+> >> wrapped it with strace, and it didn't create a trace log.
+> >>
+> >> On Wed, Feb 18, 2015 at 3:21 PM, Keith Conger <keith.conger@gmail.com> wrote:
+> >> > Ok I added the additional kernel modules.
+> >> >
+> >> > Here is a logcat from boot to turning on bluetooth in the UI.
+> >> >
+> >> > For some reason  audio.a2dp.default.so didn't get built, I'm looking into that.
+> >> >
+> >> > Thanks,
+> >> > Keith
+> >> >
+> >> > On Wed, Feb 18, 2015 at 1:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> >> >> Hi Keith,
+> >> >>
+> >> >> On Wednesday 18 of February 2015 13:05:16 Keith Conger wrote:
+> >> >>> Actually I had tried through the UI first and got the above logcat
+> >> >>> messages.  I then tried HAL test.
+> >> >>>
+> >> >>> Just for some additional background I'm running kernel 3.8.13 and
+> >> >>> bluetooth modules from backports-3.18.1-1
+> >> >>
+> >> >> If haltest is working that means kernel is configured properly.
+> >> >>
+> >> >>> I have them at the bottom of "on boot" in the init.rc.  I have
+> >> >>> attached my kernel config and init.rc.
+> >> >>
+> >> >> Could you attach full logcat starting from boot?
+> >> >>
+> >> >> It looks like you are also missing audio.a2dp.default.so (it shouldn't affect
+> >> >> BT enable but is needed for music streaming over BT).
+> >> >>
+> >> >>>
+> >> >>> I noticed in the mako example the following additional modules are
+> >> >>> loaded, I'm guessing I should add them also?
+> >> >>> insmod /system/lib/modules/rfcomm.ko
+> >> >>> insmod /system/lib/modules/bnep.ko
+> >> >>
+> >> >> Yes, rfcomm is needed for OBEX (PBAP, OPP, MAP etc). Bnep is needed for PAN
+> >> >> (BT tethering).
+> >> >>
+> >> >>>
+> >> >>> Thanks again for the help.
+> >> >>> Keith
+> >> >>>
+> >> >>
+> >> >> --
+> >> >> BR
+> >> >> Szymon Janc
+> >> >
+> >> >
+> >> >
+> >> > --
+> >> > Keith Conger
+> >> > keith DOT conger AT gmail DOT com
+> >> > http://thecongers.org
+> >>
+> >>
+> >>
+> >> --
+> >> Keith Conger
+> >> keith DOT conger AT gmail DOT com
+> >> http://thecongers.org
+> >> --
+> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> >> the body of a message to majordomo@vger.kernel.org
+> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
-> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Gustavo Padovan <gustavo@padovan.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> ---
-> net/bluetooth/hci_sock.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 1d65c5be7c82..d1a7d67619d8 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -46,9 +46,9 @@ struct hci_pinfo {
-> 	unsigned short    channel;
-> };
 > 
-> -static inline int hci_test_bit(int nr, void *addr)
-> +static inline int hci_test_bit(int nr, const void *addr)
-> {
-> -	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
-> +	return *((const __u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
-> }
+> 
 
-we had a lengthy discussion about this before. I am reluctant to change any of this until we have a test tool that proofs this does not break userspace API compatibility.
-
-I don't see how just adding const would break anything, but I cautious since this code is pretty much a big mistake that we are carrying around for almost 14 years now.
-
-Regards
-
-Marcel
-
+-- 
+Best regards, 
+Szymon Janc
