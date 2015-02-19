@@ -1,38 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: Remove bogus check for pending mgmt Set HS command
-Date: Thu, 19 Feb 2015 17:38:06 +0200
-Message-Id: <1424360287-2379-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20150218080333.GA28722@aemeltch-MOBL1>
+References: <1424091750-29487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<20150218080333.GA28722@aemeltch-MOBL1>
+Date: Thu, 19 Feb 2015 16:27:06 +0200
+Message-ID: <CABBYNZJbsAnxg0-RzTDVPUOmrAwyHa0CkYj9HdFBqNZVmhohGw@mail.gmail.com>
+Subject: Re: [PATCHv6 0/8] AVDTP deduplication
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andrei,
 
-The command handler for Set HS doesn't use mgmt_pending_add() so we can
-never have a pending Set HS command that mgmt_pending_find() would
-return. This patch removes an unnecessary lookup for it in the set_ssp()
-handler function.
+On Wed, Feb 18, 2015 at 10:03 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> ping
+>
+> On Mon, Feb 16, 2015 at 03:02:22PM +0200, Andrei Emeltchenko wrote:
+>> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>>
+>> Changes:
+>>       * v6: Fix uid_get/clear adding id checks
+>>       * v5: Use POSIX ffs() for bitmap get uid, limiting maximum number of local SEPs to 32.
+>>       * v4: Fix Android build and clear typos.
+>>         * v3: Convert gslist to queue for lseps, refactor lseps handlings, remove extra DBGs.
+>>         * v2: Fix fixup patch
+>>         * v1: Add SEID fixes with unit tests
+>>         * RFC: initial version
+>>
+>> Andrei Emeltchenko (8):
+>>   unit/avdtp: Add SEP register/unregister tests
+>>   unit/avdtp: Add duplicate SEID test
+>>   shared/utils: Add helpers for bitfield id generation
+>>   android/avdtp: Fix SEID generation
+>>   unit/avdtp: Add check for too many SEP creation
+>>   android/avdtp: Fix registering SEP with wrong SEID
+>>   android/avdtp: Refactor local SEP list handling
+>>   unit/avdtp: Refactor context destroy
+>>
+>>  android/Android.mk  |   2 +
+>>  android/Makefile.am |   2 +
+>>  android/a2dp.c      |  15 +++--
+>>  android/avdtp.c     | 101 +++++++++++++++++++------------
+>>  android/avdtp.h     |  10 ++-
+>>  android/avdtptest.c |  10 ++-
+>>  src/shared/util.c   |  29 +++++++++
+>>  src/shared/util.h   |   3 +
+>>  unit/test-avdtp.c   | 171 ++++++++++++++++++++++++++++++++++++++++++++--------
+>>  9 files changed, 273 insertions(+), 70 deletions(-)
+>>
+>> --
+>> 2.1.0
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+1-6 are now applied, please change the last according to what we
+discussed in the irc.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1b528dea9844..cc67d19a7cb8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2116,8 +2116,7 @@ static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 		goto failed;
- 	}
- 
--	if (mgmt_pending_find(MGMT_OP_SET_SSP, hdev) ||
--	    mgmt_pending_find(MGMT_OP_SET_HS, hdev)) {
-+	if (mgmt_pending_find(MGMT_OP_SET_SSP, hdev)) {
- 		err = cmd_status(sk, hdev->id, MGMT_OP_SET_SSP,
- 				 MGMT_STATUS_BUSY);
- 		goto failed;
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
