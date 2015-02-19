@@ -1,253 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20150219112608.GA7616@t440s.lan>
+References: <1423848389-30900-1-git-send-email-jpawlowski@google.com>
+	<20150219112608.GA7616@t440s.lan>
+Date: Thu, 19 Feb 2015 08:58:30 -0800
+Message-ID: <CAD0=r8yzqCdCtfXP5pP72UhU=BEE83=90PsvHSG=9o_1DU-74Q@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: fix service discovery behaviour for empty
+ uuids filter
 From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v3] Bluetooth: fix service discovery behaviour for empty uuids filter
-Date: Thu, 19 Feb 2015 08:58:50 -0800
-Message-Id: <1424365130-26193-1-git-send-email-jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes service discovery behaviour, when provided uuid filter
-is empty and HCI_QUIRK_STRICT_DUPLICATE_FILTER is set. Before this
-patch, empty uuid filter was unable to trigger scan restart, and that
-caused inconsistent behaviour in applications.
+On Thu, Feb 19, 2015 at 3:26 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Fri, Feb 13, 2015, Jakub Pawlowski wrote:
+>> @@ -4081,6 +4080,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+>>        */
+>>       hci_discovery_filter_clear(hdev);
+>>
+>> +     hdev->discovery.service_scan = true;
+>
+> How much have you actually tested this patch considering that it doesn't even
+> compile? The above should be 'service_discovery' rather than 'service_scan'.
 
-Example: two DBus clients call BlueZ, one to find all devices with
-service abcd, second to find all devices with rssi smaller than -90.
-Sum of those filters, that is passed to mgmt_service_scan is empty
-filter, with no rssi or uuids set.
-That caused kernel not to restart scan when quirk was set.
-That was inconsistent with what happen when there's only one of those
-two filters set (scan is restarted and reports devices).
+I'm working on 3.14 chromeos branch with lots of backports, then I
+have another machine with ubuntu with 3.19 where I test again, and
+then I apply my patches to bluetooth-next when it works on both, but
+sometimes some half-done version gets copied and emailed by mistake,
+sorry. I'm uploading fixed version.
 
-To fix that, new variable hdev->discovery.service_discovery was
-introduced. It can indicate that filtered scan is running, no matter
-what uuid or rssi filter is set.
-
-This patch also closes all code responsible for filtered discovery in
-one if statement. That makes whole code shorter, much more readable,
-and easier to backport to older kernels, especially pre 3.10.
-
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
----
- include/net/bluetooth/hci_core.h |   2 +
- net/bluetooth/mgmt.c             | 145 +++++++++++++++------------------------
- 2 files changed, 57 insertions(+), 90 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a7bf773..791bb75 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -76,6 +76,7 @@ struct discovery_state {
- 	u8			last_adv_data[HCI_MAX_AD_LENGTH];
- 	u8			last_adv_data_len;
- 	bool			report_invalid_rssi;
-+	bool			service_discovery;
- 	s8			rssi;
- 	u16			uuid_count;
- 	u8			(*uuids)[16];
-@@ -525,6 +526,7 @@ static inline void discovery_init(struct hci_dev *hdev)
- 
- static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
- {
-+	hdev->discovery.service_discovery = false;
- 	hdev->discovery.report_invalid_rssi = true;
- 	hdev->discovery.rssi = HCI_RSSI_INVALID;
- 	hdev->discovery.uuid_count = 0;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3a1b537..0c5b16a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3932,8 +3932,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
- 		 */
- 		if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
- 			     &hdev->quirks) &&
--		    (hdev->discovery.uuid_count > 0 ||
--		     hdev->discovery.rssi != HCI_RSSI_INVALID)) {
-+		    hdev->discovery.service_discovery) {
- 			hdev->discovery.scan_start = jiffies;
- 			hdev->discovery.scan_duration = timeout;
- 		}
-@@ -4086,6 +4085,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
- 	 */
- 	hci_discovery_filter_clear(hdev);
- 
-+	hdev->discovery.service_discovery = true;
- 	hdev->discovery.type = cp->type;
- 	hdev->discovery.rssi = cp->rssi;
- 	hdev->discovery.uuid_count = uuid_count;
-@@ -7286,7 +7286,6 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	char buf[512];
- 	struct mgmt_ev_device_found *ev = (void *) buf;
- 	size_t ev_size;
--	bool match;
- 
- 	/* Don't send events for a non-kernel initiated discovery. With
- 	 * LE one exception is if we have pend_le_reports > 0 in which
-@@ -7299,21 +7298,57 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			return;
- 	}
- 
--	/* When using service discovery with a RSSI threshold, then check
--	 * if such a RSSI threshold is specified. If a RSSI threshold has
--	 * been specified, and HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set,
--	 * then all results with a RSSI smaller than the RSSI threshold will be
--	 * dropped. If the quirk is set, let it through for further processing,
--	 * as we might need to restart the scan.
--	 *
--	 * For BR/EDR devices (pre 1.2) providing no RSSI during inquiry,
--	 * the results are also dropped.
--	 */
--	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
--	    (rssi == HCI_RSSI_INVALID ||
--	    (rssi < hdev->discovery.rssi &&
--	     !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
--		return;
-+	if (hdev->discovery.service_discovery) {
-+		/* We are using service discovery */
-+
-+		/* If a RSSI threshold has been specified, and
-+		 * HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set, then all
-+		 * results with a RSSI smaller than the RSSI threshold will be
-+		 * dropped. If the quirk is set, let it through for further
-+		 * processing, as we might need to restart the scan.
-+		 *
-+		 * For BR/EDR devices (pre 1.2) providing no RSSI during
-+		 * inquiry, the results are also dropped.
-+		 */
-+		if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
-+		    (rssi == HCI_RSSI_INVALID ||
-+		    (rssi < hdev->discovery.rssi &&
-+		     !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-+			       &hdev->quirks))))
-+			return;
-+
-+		/* If a list of UUID is provided, results with no matching UUID
-+		 * should be dropped. If list of UUID is not provided, treat
-+		 * all devices as matches.
-+		 * Empty UUID filter might be a result of merging filters
-+		 * somewhere in highter layer, and should behave same as when
-+		 * we have UUID match.
-+		 */
-+		if (hdev->discovery.uuid_count != 0 &&
-+		    (eir_len == 0 || !eir_has_uuids(eir, eir_len,
-+				  hdev->discovery.uuid_count,
-+				  hdev->discovery.uuids)) &&
-+		    (scan_rsp_len == 0 || !eir_has_uuids(scan_rsp, scan_rsp_len,
-+				  hdev->discovery.uuid_count,
-+				  hdev->discovery.uuids)))
-+			return;
-+
-+		/* If duplicate filtering does not report RSSI changes,
-+		 * then restart scanning to ensure updated result with
-+		 * updated RSSI values.
-+		 */
-+		if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-+			     &hdev->quirks)) {
-+			restart_le_scan(hdev);
-+
-+			/* Validate the reported RSSI value against the
-+			 * RSSI threshold once more.
-+			 */
-+			if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
-+			    rssi < hdev->discovery.rssi)
-+				return;
-+		}
-+	}
- 
- 	/* Make sure that the buffer is big enough. The 5 extra bytes
- 	 * are for the potential CoD field.
-@@ -7340,87 +7375,17 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	ev->rssi = rssi;
- 	ev->flags = cpu_to_le32(flags);
- 
--	if (eir_len > 0) {
--		/* When using service discovery and a list of UUID is
--		 * provided, results with no matching UUID should be
--		 * dropped. In case there is a match the result is
--		 * kept and checking possible scan response data
--		 * will be skipped.
--		 */
--		if (hdev->discovery.uuid_count > 0) {
--			match = eir_has_uuids(eir, eir_len,
--					      hdev->discovery.uuid_count,
--					      hdev->discovery.uuids);
--			/* If duplicate filtering does not report RSSI changes,
--			 * then restart scanning to ensure updated result with
--			 * updated RSSI values.
--			 */
--			if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
--					      &hdev->quirks))
--				restart_le_scan(hdev);
--		} else {
--			match = true;
--		}
--
--		if (!match && !scan_rsp_len)
--			return;
--
-+	if (eir_len > 0)
- 		/* Copy EIR or advertising data into event */
- 		memcpy(ev->eir, eir, eir_len);
--	} else {
--		/* When using service discovery and a list of UUID is
--		 * provided, results with empty EIR or advertising data
--		 * should be dropped since they do not match any UUID.
--		 */
--		if (hdev->discovery.uuid_count > 0 && !scan_rsp_len)
--			return;
--
--		match = false;
--	}
- 
- 	if (dev_class && !eir_has_data_type(ev->eir, eir_len, EIR_CLASS_OF_DEV))
- 		eir_len = eir_append_data(ev->eir, eir_len, EIR_CLASS_OF_DEV,
- 					  dev_class, 3);
- 
--	if (scan_rsp_len > 0) {
--		/* When using service discovery and a list of UUID is
--		 * provided, results with no matching UUID should be
--		 * dropped if there is no previous match from the
--		 * advertising data.
--		 */
--		if (hdev->discovery.uuid_count > 0) {
--			if (!match && !eir_has_uuids(scan_rsp, scan_rsp_len,
--						     hdev->discovery.uuid_count,
--						     hdev->discovery.uuids))
--				return;
--
--			/* If duplicate filtering does not report RSSI changes,
--			 * then restart scanning to ensure updated result with
--			 * updated RSSI values.
--			 */
--			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
--				     &hdev->quirks))
--				restart_le_scan(hdev);
--		}
--
-+	if (scan_rsp_len > 0)
- 		/* Append scan response data to event */
- 		memcpy(ev->eir + eir_len, scan_rsp, scan_rsp_len);
--	} else {
--		/* When using service discovery and a list of UUID is
--		 * provided, results with empty scan response and no
--		 * previous matched advertising data should be dropped.
--		 */
--		if (hdev->discovery.uuid_count > 0 && !match)
--			return;
--	}
--
--	/* Validate the reported RSSI value against the RSSI threshold once more
--	 * incase HCI_QUIRK_STRICT_DUPLICATE_FILTER forced a restart of LE
--	 * scanning.
--	 */
--	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
--	    rssi < hdev->discovery.rssi)
--		return;
- 
- 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
- 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
--- 
-2.2.0.rc0.207.ga3a616c
-
+>
+> I think there's also some mismatch of {} somewhere since I also get the
+> following compile errors:
+>
+> net/bluetooth/mgmt.c: In function ‘mgmt_device_found’:
+> net/bluetooth/mgmt.c:7391:1: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+>  void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+>  ^
+> net/bluetooth/mgmt.c:7427:13: error: invalid storage class for function ‘adv_enable_complete’
+>  static void adv_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+>              ^
+> net/bluetooth/mgmt.c:7442:1: error: expected declaration or statement at end of input
+>  }
+>  ^
+> net/bluetooth/mgmt.c:7442:1: error: expected declaration or statement at end of input
+> net/bluetooth/mgmt.c:7283:7: warning: unused variable ‘match’ [-Wunused-variable]
+>   bool match;
+>        ^
+>
+> Johan
