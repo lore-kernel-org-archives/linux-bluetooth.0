@@ -1,76 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 4/5] audio/avdtp: Use bitfield id generation
-Date: Thu, 19 Feb 2015 17:46:46 +0200
-Message-Id: <1424360807-14402-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1424360807-14402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1424360807-14402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CALUN+EfrG1o8VsTWjMxW7Y4NGe=-E3M_hz_618ToAG4QHwPZKA@mail.gmail.com>
+References: <CALUN+EfYdOffOSejMQh3vnLGX1PZmBqMXL8UhvL-UHK_2kZqFA@mail.gmail.com>
+	<2179587.DtNQVsuMNH@leonov>
+	<CALUN+EcsmogUt4PU-sSM4peusX4gdnmAF=ou1ouj5y-QPSpq3Q@mail.gmail.com>
+	<2375594.LoByC1Hkos@leonov>
+	<CALUN+EfrG1o8VsTWjMxW7Y4NGe=-E3M_hz_618ToAG4QHwPZKA@mail.gmail.com>
+Date: Thu, 19 Feb 2015 08:39:51 -0700
+Message-ID: <CALUN+EfQkYuwfh5tqes0mKmGopshRhoWU823MNVE_EKwHsf_ZQ@mail.gmail.com>
+Subject: Re: android-bluez with usb adapter
+From: Keith Conger <keith.conger@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Szymon Janc <szymon.janc@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Can't seem to figure out why audio.a2dp.default.so isn't being built.
 
-Use bitfield utils for assigning SEP id. This fixes duplicated id
-generation shown in unit/avdtp tests.
----
- profiles/audio/avdtp.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+It seems almost like its not even trying to start bluetoothd.  I
+wrapped it with strace, and it didn't create a trace log.
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index ba5f0e5..825fb79 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -41,6 +41,7 @@
- #include <glib.h>
- 
- #include "src/log.h"
-+#include "src/shared/util.h"
- 
- #include "btio/btio.h"
- #include "lib/uuid.h"
-@@ -54,6 +55,7 @@
- #define AVDTP_PSM 25
- 
- #define MAX_SEID 0x3E
-+static unsigned int seids;
- 
- #ifndef MAX
- # define MAX(x, y) ((x) > (y) ? (x) : (y))
-@@ -3703,6 +3705,10 @@ struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
- {
- 	struct avdtp_server *server;
- 	struct avdtp_local_sep *sep;
-+	uint8_t seid = util_get_uid(&seids, MAX_SEID);
-+
-+	if (!seid)
-+		return NULL;
- 
- 	server = find_server(servers, adapter);
- 	if (!server) {
-@@ -3711,13 +3717,10 @@ struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
- 			return NULL;
- 	}
- 
--	if (g_slist_length(server->seps) > MAX_SEID)
--		return NULL;
--
- 	sep = g_new0(struct avdtp_local_sep, 1);
- 
- 	sep->state = AVDTP_STATE_IDLE;
--	sep->info.seid = g_slist_length(server->seps) + 1;
-+	sep->info.seid = seid;
- 	sep->info.type = type;
- 	sep->info.media_type = media_type;
- 	sep->codec = codec_type;
-@@ -3762,6 +3765,7 @@ int avdtp_unregister_sep(struct avdtp_local_sep *sep)
- 	DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
- 			sep->info.type, sep->codec, sep->info.seid);
- 
-+	util_clear_uid(&seids, sep->info.seid);
- 	g_free(sep);
- 
- 	if (server->seps)
+On Wed, Feb 18, 2015 at 3:21 PM, Keith Conger <keith.conger@gmail.com> wrote:
+> Ok I added the additional kernel modules.
+>
+> Here is a logcat from boot to turning on bluetooth in the UI.
+>
+> For some reason  audio.a2dp.default.so didn't get built, I'm looking into that.
+>
+> Thanks,
+> Keith
+>
+> On Wed, Feb 18, 2015 at 1:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+>> Hi Keith,
+>>
+>> On Wednesday 18 of February 2015 13:05:16 Keith Conger wrote:
+>>> Actually I had tried through the UI first and got the above logcat
+>>> messages.  I then tried HAL test.
+>>>
+>>> Just for some additional background I'm running kernel 3.8.13 and
+>>> bluetooth modules from backports-3.18.1-1
+>>
+>> If haltest is working that means kernel is configured properly.
+>>
+>>> I have them at the bottom of "on boot" in the init.rc.  I have
+>>> attached my kernel config and init.rc.
+>>
+>> Could you attach full logcat starting from boot?
+>>
+>> It looks like you are also missing audio.a2dp.default.so (it shouldn't affect
+>> BT enable but is needed for music streaming over BT).
+>>
+>>>
+>>> I noticed in the mako example the following additional modules are
+>>> loaded, I'm guessing I should add them also?
+>>> insmod /system/lib/modules/rfcomm.ko
+>>> insmod /system/lib/modules/bnep.ko
+>>
+>> Yes, rfcomm is needed for OBEX (PBAP, OPP, MAP etc). Bnep is needed for PAN
+>> (BT tethering).
+>>
+>>>
+>>> Thanks again for the help.
+>>> Keith
+>>>
+>>
+>> --
+>> BR
+>> Szymon Janc
+>
+>
+>
+> --
+> Keith Conger
+> keith DOT conger AT gmail DOT com
+> http://thecongers.org
+
+
+
 -- 
-2.1.0
-
+Keith Conger
+keith DOT conger AT gmail DOT com
+http://thecongers.org
