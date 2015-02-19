@@ -1,296 +1,305 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update HDP pixits, pics and test results for PTS 6.0
-Date: Thu, 19 Feb 2015 10:58:39 +0100
-Message-ID: <2018017.xqRjNL9QUC@uw000953>
-In-Reply-To: <1424096096-21740-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1424096096-21740-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] unit/test-gatt: Use tester framework
+Date: Thu, 19 Feb 2015 11:41:53 +0200
+Message-Id: <1424338913-30942-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Monday 16 of February 2015 15:14:56 Grzegorz Kolodziejczyk wrote:
-> This patch updates test pixits, pics and results for HDP profile against
-> android 5.0
-> ---
->  android/pics-hdp.txt  |  2 +-
->  android/pixit-hdp.txt |  6 +++---
->  android/pts-hdp.txt   | 51 ++++++++++++++++++++++++++++++++++-----------------
->  3 files changed, 38 insertions(+), 21 deletions(-)
-> 
-> diff --git a/android/pics-hdp.txt b/android/pics-hdp.txt
-> index 48f7ce1..2f29320 100644
-> --- a/android/pics-hdp.txt
-> +++ b/android/pics-hdp.txt
-> @@ -1,6 +1,6 @@
->  HDP PICS for the PTS tool.
->  
-> -PTS version: 5.3
-> +PTS version: 6.0
->  
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> diff --git a/android/pixit-hdp.txt b/android/pixit-hdp.txt
-> index e19b1e4..ccf0cf3 100644
-> --- a/android/pixit-hdp.txt
-> +++ b/android/pixit-hdp.txt
-> @@ -1,6 +1,6 @@
->  HDP PIXIT for the PTS tool.
->  
-> -PTS version: 5.3
-> +PTS version: 6.0
->  
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> @@ -12,8 +12,8 @@ Parameter Name						Value
->  TSPX_security_enabled					TRUE
->  TSPX_delete_link_key					FALSE
->  TSPX_bd_addr_iut					112233445566 (*&)
-> -TSPX_sink_device_class_of_device			00900
-> -TSPX_source_device_class_of_device			00900
-> +TSPX_sink_device_class_of_device			000900
-> +TSPX_source_device_class_of_device			000900
->  TSPX_pin_code						0000
->  TSPX_use_dynamic_pin					FALSE
->  TSPX_use_implicit_send					TRUE
-> diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
-> index 1d25848..f6bf5cc 100644
-> --- a/android/pts-hdp.txt
-> +++ b/android/pts-hdp.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for HDP
->  
-> -PTS version: 5.3
-> -Tested: 07-November-2014
-> +PTS version: 6.0
-> +Tested: 16-February-2015
->  Android version: 5.0
->  
->  Results:
-> @@ -14,12 +14,6 @@ N/A	test is disabled due to PICS setup
->  Test Name		Result	Notes
->  -------------------------------------------------------------------------------
->  TC_SRC_CON_BV_01_I	PASS	haltest:
-> -				bluetooth enable
-> -
-> -				bluetooth set_adapter_property
-> -				BT_PROPERTY_ADAPTER_SCAN_MODE
-> -				BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE
-> -
->  				hl register_application <args>
->  				for instance:
->  				hl register_application health intel heartrate
-> @@ -31,7 +25,8 @@ TC_SRC_CON_BV_01_I	PASS	haltest:
->  				for instance:
->  				bluetooth ssp_reply <bdaddr>
->  				BT_SSP_VARIANT_CONSENT 1
-> -TC_SRC_CON_BV_02_I	PASS
-> +				Note: IUT must be discoverable, connectable
-> +TC_SRC_CON_BV_02_I	PASS	Note: IUT must be in discoverable mode
->  TC_SRC_CON_BV_03_I	PASS	when prompted: bluetooth ssp_reply <args>
->  TC_SRC_CON_BV_04_I	PASS	haltest:
->  				hl connect_channel <app_id> <bd_addr>
-> @@ -39,13 +34,16 @@ TC_SRC_CON_BV_04_I	PASS	haltest:
->  
->  				when prompted: bluetooth ssp_reply <args>
->  TC_SRC_CON_BV_05_I	PASS	when prompted: bluetooth ssp_reply <args>
-> +				Note: IUT must be in connectable mode
->  TC_SRC_CON_BV_06_I	PASS	haltest:
->  				hl connect_channel <app_id> <bd_addr>
->  				<mdep_cfg_index>
->  
->  				when prompted: bluetooth ssp_reply <args>
-> -TC_SRC_CON_BV_07_I	PASS	when prompted: bluetooth start_discovery
-> -TC_SRC_CON_BV_08_I	PASS	when prompted: bluetooth ssp_reply <args>
-> +TC_SRC_CON_BV_07_I	PASS	bluetooth start_discovery
-> +				Note: PTS HDP device must be discovered
-> +TC_SRC_CON_BV_08_I	PASS	bluetooth remove_bond <PTS addr>
-> +				when prompted: bluetooth ssp_reply <args>
->  TC_SRC_CON_BV_09_I	PASS	haltest:
->  				hl connect_channel <app_id> <bd_addr>
->  				<mdep_cfg_index>
-> @@ -58,6 +56,7 @@ TC_SRC_CC_BV_01_C	PASS	haltest:
->  
->  				when prompted: bluetooth ssp_reply <args>
->  TC_SRC_CC_BV_02_C	PASS	when prompted: bluetooth ssp_reply <args>
-> +				Note: IUT must be discoverable, connectable
->  TC_SRC_CC_BV_03_C	PASS    haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
-> @@ -68,12 +67,12 @@ TC_SRC_CC_BV_03_C	PASS    haltest:
->  				<mdep_cfg_index>
->  
->  				when prompted: bluetooth ssp_reply <args>
-> -
->  TC_SRC_CC_BV_05_C	PASS	haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
->  				BTHL_MDEP_ROLE_SOURCE 4100
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> +				Note: IUT must be discoverable, connectable
->  TC_SRC_CC_BV_07_C	PASS    haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 2
-> @@ -99,11 +98,13 @@ TC_SRC_CC_BV_09_C	PASS    haltest:
->  				BTHL_CHANNEL_TYPE_STREAMING pulse-oximeter
->  
->  				when prompted: bluetooth ssp_reply <args>
-> +				Note: IUT must be discoverable, connectable
->  TC_SRC_CC_BI_12_C	PASS	haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
->  				BTHL_MDEP_ROLE_SOURCE 4100
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> +				Note: IUT must be discoverable, connectable
->  TC_SRC_HCT_BV_01_I	PASS    haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
-> @@ -119,6 +120,7 @@ TC_SRC_HCT_BV_02_I	PASS	haltest:
->  				bluez-hdp health-device-profile 1
->  				BTHL_MDEP_ROLE_SOURCE 4100
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> +				Note: IUT must be discoverable, connectable
->  TC_SRC_HCT_BV_03_I	N/A
->  TC_SRC_HCT_BV_04_I	PASS    haltest:
->  				hl register_application bluez-android Bluez
-> @@ -127,6 +129,7 @@ TC_SRC_HCT_BV_04_I	PASS    haltest:
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
->  
->  				when prompted: bluetooth ssp_reply <args>
-> +				Note: IUT must be discoverable, connectable
->  TC_SRC_HCT_BV_05_C	N/A
->  TC_SRC_HCT_BV_06_C	PASS    haltest:
->  				hl register_application bluez-android Bluez
-> @@ -135,6 +138,7 @@ TC_SRC_HCT_BV_06_C	PASS    haltest:
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
->  
->  				when prompted: bluetooth ssp_reply <args>
-> +				Note: IUT must be discoverable, connectable
->  TC_SRC_HCT_BV_07_C	PASS	haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
-> @@ -146,6 +150,7 @@ TC_SRC_DE_BV_02_I	PASS	haltest:
->  				bluez-hdp health-device-profile 1
->  				BTHL_MDEP_ROLE_SOURCE 4100
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> +				Note: IUT must be discoverable, connectable
->  TC_SRC_DEP_BV_01_I	N/A
->  TC_SRC_DEP_BV_02_I	N/A
->  TC_SNK_CON_BV_01_I	PASS	haltest:
-> @@ -160,21 +165,27 @@ TC_SNK_CON_BV_01_I	PASS	haltest:
->  				for instance:
->  				bluetooth ssp_reply <bdaddr>
->  				BT_SSP_VARIANT_CONSENT 1
-> -TC_SNK_CON_BV_02_I	PASS
-> +				Note: IUT must be discoverable, connectable
-> +TC_SNK_CON_BV_02_I	PASS	Note: IUT must be discoverable, connectable
->  TC_SNK_CON_BV_03_I	PASS	when prompted: bluetooth ssp_reply <args>
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_CON_BV_04_I	PASS	haltest:
->  				hl connect_channel <app_id> <bd_addr>
->  				<mdep_cfg_index>
->  
->  				when prompted: bluetooth ssp_reply <args>
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_CON_BV_05_I	PASS	when prompted: bluetooth ssp_reply <args>
->  TC_SNK_CON_BV_06_I	PASS	haltest:
->  				hl connect_channel <app_id> <bd_addr>
->  				<mdep_cfg_index>
->  
->  				when prompted: bluetooth ssp_reply <args>
-> -TC_SNK_CON_BV_07_I	PASS	when prompted: bluetooth start_discovery
-> -TC_SNK_CON_BV_08_I	PASS	when prompted: bluetooth ssp_reply <args>
-> +TC_SNK_CON_BV_07_I	PASS	bluetooth start_discovery
-> +TC_SNK_CON_BV_08_I	PASS	bluetooth remove_bond <PTS addr>
-> +
-> +				when prompted: bluetooth ssp_reply <args>
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_CON_BV_09_I	PASS	haltest:
->  				hl connect_channel <app_id> <bd_addr>
->  				<mdep_cfg_index>
-> @@ -187,6 +198,7 @@ TC_SNK_CC_BV_01_C	PASS	haltest:
->  
->  				when prompted: bluetooth ssp_reply <args>
->  TC_SNK_CC_BV_02_C	PASS	when prompted: bluetooth ssp_reply <args>
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_CC_BV_04_C	PASS    haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
-> @@ -197,7 +209,6 @@ TC_SNK_CC_BV_04_C	PASS    haltest:
->  				<mdep_cfg_index>
->  
->  				when prompted: bluetooth ssp_reply <args>
-> -
->  TC_SNK_CC_BV_06_C	PASS	haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 2
-> @@ -221,7 +232,6 @@ TC_SNK_CC_BV_08_C	PASS    haltest:
->  				when prompted:
->  				hl connect_channel <app_id> <bd_addr>
->  				<mdep_cfg_index>
-> -
->  TC_SNK_CC_BV_10_C	PASS	haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 2
-> @@ -229,11 +239,13 @@ TC_SNK_CC_BV_10_C	PASS	haltest:
->  				pulse-oximeter
->  				BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_STREAMING
->  				pulse-oximeter
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_CC_BI_11_C	PASS	haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
->  				BTHL_MDEP_ROLE_SINK 4100
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_HCT_BV_01_I	PASS    haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
-> @@ -249,6 +261,7 @@ TC_SNK_HCT_BV_02_I	PASS	haltest:
->  				bluez-hdp health-device-profile 1
->  				BTHL_MDEP_ROLE_SINK 4100
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_HCT_BV_03_I	N/A
->  TC_SNK_HCT_BV_04_I	PASS    haltest:
->  				hl register_application bluez-android Bluez
-> @@ -257,23 +270,27 @@ TC_SNK_HCT_BV_04_I	PASS    haltest:
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
->  
->  				when prompted: bluetooth ssp_reply <args>
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_HCT_BV_05_C	N/A
->  TC_SNK_HCT_BV_06_C	PASS	haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
->  				BTHL_MDEP_ROLE_SINK 4100
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_HCT_BV_07_C	PASS	haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
->  				BTHL_MDEP_ROLE_SINK 4100
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_DE_BV_01_I	N/A
->  TC_SNK_DE_BV_02_I	PASS	haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
->  				BTHL_MDEP_ROLE_SINK 4100
->  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> +				Note: IUT must be discoverable, connectable
->  TC_SNK_DEP_BV_03_I	N/A
->  TC_SNK_DEP_BV_04_I	N/A
->  -------------------------------------------------------------------------------
-> 
+Our tester framework actually produces much better output.
+---
+ unit/test-gatt.c | 106 +++++++++++++++++++------------------------------------
+ 1 file changed, 36 insertions(+), 70 deletions(-)
 
-Applied, thanks.
-
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 2be4c87..3ab5340 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -44,6 +44,7 @@
+ #include "src/shared/gatt-db.h"
+ #include "src/shared/gatt-server.h"
+ #include "src/shared/gatt-client.h"
++#include "src/shared/tester.h"
+ 
+ struct test_pdu {
+ 	bool valid;
+@@ -67,7 +68,6 @@ struct test_data {
+ };
+ 
+ struct context {
+-	GMainLoop *main_loop;
+ 	struct bt_gatt_client *client;
+ 	struct bt_gatt_server *server;
+ 	struct bt_att *att;
+@@ -103,7 +103,7 @@ struct context {
+ 		data.source_db = db;					\
+ 		data.pdu_list = g_malloc(sizeof(pdus));			\
+ 		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
+-		g_test_add_data_func(name, &data, function);		\
++		tester_add(name, &data, NULL, function, NULL);		\
+ 	} while (0)
+ 
+ #define define_test_att(name, function, bt_uuid, test_step, args...)	\
+@@ -272,6 +272,23 @@ struct test_step {
+ 	uint16_t length;
+ };
+ 
++static void destroy_context(struct context *context)
++{
++	if (context->source > 0)
++		g_source_remove(context->source);
++
++	bt_gatt_client_unref(context->client);
++	bt_gatt_server_unref(context->server);
++	gatt_db_unref(context->client_db);
++	gatt_db_unref(context->server_db);
++
++	if (context->att)
++		bt_att_unref(context->att);
++
++	test_free(context->data);
++	g_free(context);
++}
++
+ static gboolean context_quit(gpointer user_data)
+ {
+ 	struct context *context = user_data;
+@@ -280,11 +297,13 @@ static gboolean context_quit(gpointer user_data)
+ 	if (context->process > 0)
+ 		g_source_remove(context->process);
+ 
+-	g_main_loop_quit(context->main_loop);
+-
+ 	if (step && step->post_func)
+ 		step->post_func(context);
+ 
++	destroy_context(context);
++
++	tester_test_passed();
++
+ 	return FALSE;
+ }
+ 
+@@ -292,7 +311,7 @@ static void test_debug(const char *str, void *user_data)
+ {
+ 	const char *prefix = user_data;
+ 
+-	g_print("%s%s\n", prefix, str);
++	tester_debug("%s%s", prefix, str);
+ }
+ 
+ static gboolean send_pdu(gpointer user_data)
+@@ -305,8 +324,7 @@ static gboolean send_pdu(gpointer user_data)
+ 
+ 	len = write(context->fd, pdu->data, pdu->size);
+ 
+-	if (g_test_verbose())
+-		util_hexdump('<', pdu->data, len, test_debug, "GATT: ");
++	util_hexdump('<', pdu->data, len, test_debug, "GATT: ");
+ 
+ 	g_assert_cmpint(len, ==, pdu->size);
+ 
+@@ -314,8 +332,7 @@ static gboolean send_pdu(gpointer user_data)
+ 
+ 	pdu = &context->data->pdu_list[context->pdu_offset];
+ 	if (pdu->valid && (pdu->size == 0)) {
+-		if (g_test_verbose())
+-			test_debug("(no action expected)", "GATT: ");
++		test_debug("(no action expected)", "GATT: ");
+ 		context->pdu_offset++;
+ 		return send_pdu(context);
+ 	}
+@@ -358,8 +375,7 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+ 
+ 	g_assert(len > 0);
+ 
+-	if (g_test_verbose())
+-		util_hexdump('>', buf, len, test_debug, "GATT: ");
++	util_hexdump('>', buf, len, test_debug, "GATT: ");
+ 
+ 	g_assert_cmpint(len, ==, pdu->size);
+ 
+@@ -370,9 +386,7 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+ 
+ 	if (pdu->valid && (pdu->size == 0)) {
+ 		context->pdu_offset++;
+-		if (g_test_verbose())
+-			test_debug("triggering server action",
+-							"Empty client pdu: ");
++		test_debug("triggering server action", "Empty client pdu: ");
+ 		g_assert(step && step->func);
+ 		step->func(context);
+ 		return TRUE;
+@@ -387,7 +401,7 @@ static void print_debug(const char *str, void *user_data)
+ {
+ 	const char *prefix = user_data;
+ 
+-	g_print("%s%s\n", prefix, str);
++	tester_debug("%s%s", prefix, str);
+ }
+ 
+ struct db_attribute_test_data {
+@@ -566,9 +580,6 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+ 	int err, sv[2];
+ 	struct bt_att *att;
+ 
+-	context->main_loop = g_main_loop_new(NULL, FALSE);
+-	g_assert(context->main_loop);
+-
+ 	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
+ 	g_assert(err == 0);
+ 
+@@ -579,9 +590,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+ 	case ATT:
+ 		context->att = att;
+ 
+-		if (g_test_verbose())
+-			bt_att_set_debug(context->att, print_debug, "bt_att:",
+-									NULL);
++		bt_att_set_debug(context->att, print_debug, "bt_att:", NULL);
+ 
+ 		bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
+ 		break;
+@@ -593,8 +602,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+ 									mtu);
+ 		g_assert(context->server);
+ 
+-		if (g_test_verbose())
+-			bt_gatt_server_set_debug(context->server, print_debug,
++		bt_gatt_server_set_debug(context->server, print_debug,
+ 						"bt_gatt_server:", NULL);
+ 		bt_att_unref(att);
+ 		break;
+@@ -606,8 +614,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
+ 									mtu);
+ 		g_assert(context->client);
+ 
+-		if (g_test_verbose())
+-			bt_gatt_client_set_debug(context->client, print_debug,
++		bt_gatt_client_set_debug(context->client, print_debug,
+ 						"bt_gatt_client:", NULL);
+ 
+ 		bt_gatt_client_set_ready_handler(context->client,
+@@ -649,32 +656,6 @@ static void generic_search_cb(bool success, uint8_t att_ecode,
+ 	context_quit(context);
+ }
+ 
+-static void destroy_context(struct context *context)
+-{
+-	if (context->source > 0)
+-		g_source_remove(context->source);
+-
+-	bt_gatt_client_unref(context->client);
+-	bt_gatt_server_unref(context->server);
+-	gatt_db_unref(context->client_db);
+-	gatt_db_unref(context->server_db);
+-
+-	if (context->att)
+-		bt_att_unref(context->att);
+-
+-	g_main_loop_unref(context->main_loop);
+-
+-	test_free(context->data);
+-	g_free(context);
+-}
+-
+-static void execute_context(struct context *context)
+-{
+-	g_main_loop_run(context->main_loop);
+-
+-	destroy_context(context);
+-}
+-
+ static void test_read_cb(bool success, uint8_t att_ecode,
+ 					const uint8_t *value, uint16_t length,
+ 					void *user_data)
+@@ -1339,9 +1320,7 @@ static struct gatt_db *make_test_spec_large_db_1(void)
+ 
+ static void test_client(gconstpointer data)
+ {
+-	struct context *context = create_context(512, data);
+-
+-	execute_context(context);
++	create_context(512, data);
+ }
+ 
+ static void test_server(gconstpointer data)
+@@ -1354,10 +1333,7 @@ static void test_server(gconstpointer data)
+ 
+ 	g_assert_cmpint(len, ==, pdu.size);
+ 
+-	if (g_test_verbose())
+-		util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
+-
+-	execute_context(context);
++	util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
+ }
+ 
+ static void test_search_primary(gconstpointer data)
+@@ -1368,8 +1344,6 @@ static void test_search_primary(gconstpointer data)
+ 	bt_gatt_discover_all_primary_services(context->att, test_data->uuid,
+ 							generic_search_cb,
+ 							context, NULL);
+-
+-	execute_context(context);
+ }
+ 
+ static void test_search_included(gconstpointer data)
+@@ -1379,8 +1353,6 @@ static void test_search_included(gconstpointer data)
+ 	bt_gatt_discover_included_services(context->att, 0x0001, 0xffff,
+ 							generic_search_cb,
+ 							context, NULL);
+-
+-	execute_context(context);
+ }
+ 
+ static void test_search_chars(gconstpointer data)
+@@ -1390,8 +1362,6 @@ static void test_search_chars(gconstpointer data)
+ 	g_assert(bt_gatt_discover_characteristics(context->att, 0x0010, 0x0020,
+ 							generic_search_cb,
+ 							context, NULL));
+-
+-	execute_context(context);
+ }
+ 
+ static void test_search_descs(gconstpointer data)
+@@ -1401,8 +1371,6 @@ static void test_search_descs(gconstpointer data)
+ 	g_assert(bt_gatt_discover_descriptors(context->att, 0x0013, 0x0016,
+ 							generic_search_cb,
+ 							context, NULL));
+-
+-	execute_context(context);
+ }
+ 
+ static const struct test_step test_read_by_type_1 = {
+@@ -1552,8 +1520,6 @@ static void test_read_by_type(gconstpointer data)
+ 	g_assert(bt_gatt_read_by_type(context->att, step->handle,
+ 					step->end_handle, test_data->uuid,
+ 					read_by_type_cb, context, NULL));
+-
+-	execute_context(context);
+ }
+ 
+ static void test_long_read(struct context *context)
+@@ -1788,7 +1754,7 @@ int main(int argc, char *argv[])
+ {
+ 	struct gatt_db *service_db_1, *ts_small_db, *ts_large_db_1;
+ 
+-	g_test_init(&argc, &argv, NULL);
++	tester_init(&argc, &argv);
+ 
+ 	service_db_1 = make_service_data_1_db();
+ 	ts_small_db = make_test_spec_small_db();
+@@ -2879,5 +2845,5 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x0a, 0x03, 0x00),
+ 			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x80));
+ 
+-	return g_test_run();
++	return tester_run();
+ }
 -- 
-Best regards, 
-Szymon Janc
+2.1.0
+
