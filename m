@@ -1,305 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] unit/test-gatt: Use tester framework
-Date: Thu, 19 Feb 2015 11:41:53 +0200
-Message-Id: <1424338913-30942-1-git-send-email-luiz.dentz@gmail.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Arman Uguray' <armansito@chromium.org>
+Cc: 'BlueZ development' <linux-bluetooth@vger.kernel.org>,
+	'Bharat Bhusan Panda' <bharat.panda@samsung.com>,
+	cpgs@samsung.com
+References: <1424336266-17437-1-git-send-email-gowtham.ab@samsung.com>
+ <CAHrH25Sx1=r_j5L2GDYjU33JUtb1RepHm3PEPHJkGkQiweyq6w@mail.gmail.com>
+In-reply-to: <CAHrH25Sx1=r_j5L2GDYjU33JUtb1RepHm3PEPHJkGkQiweyq6w@mail.gmail.com>
+Subject: RE: [PATCH] src/gatt-dbus: Add GATT Extended props bit fields
+Date: Thu, 19 Feb 2015 15:12:53 +0530
+Message-id: <000001d04c28$728ab480$57a01d80$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Arman,
 
-Our tester framework actually produces much better output.
----
- unit/test-gatt.c | 106 +++++++++++++++++++------------------------------------
- 1 file changed, 36 insertions(+), 70 deletions(-)
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Arman Uguray
+> Sent: Thursday, February 19, 2015 2:37 PM
+> To: Gowtham Anandha Babu
+> Cc: BlueZ development; Bharat Bhusan Panda; cpgs@samsung.com
+> Subject: Re: [PATCH] src/gatt-dbus: Add GATT Extended props bit fields
+> 
+> Hi Gowtham,
+> 
+> > On Thu, Feb 19, 2015 at 12:57 AM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > Removed the TODO and added the GATT  Characteristic Extended
+> > Properties Bitfield values as per core spec 4.2 - page 2227.
+> 
+> I don't know if there is any point of developing attrib/gatt any further,
+> especially since we can call it deprecated now.
+> 
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 2be4c87..3ab5340 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -44,6 +44,7 @@
- #include "src/shared/gatt-db.h"
- #include "src/shared/gatt-server.h"
- #include "src/shared/gatt-client.h"
-+#include "src/shared/tester.h"
- 
- struct test_pdu {
- 	bool valid;
-@@ -67,7 +68,6 @@ struct test_data {
- };
- 
- struct context {
--	GMainLoop *main_loop;
- 	struct bt_gatt_client *client;
- 	struct bt_gatt_server *server;
- 	struct bt_att *att;
-@@ -103,7 +103,7 @@ struct context {
- 		data.source_db = db;					\
- 		data.pdu_list = g_malloc(sizeof(pdus));			\
- 		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
--		g_test_add_data_func(name, &data, function);		\
-+		tester_add(name, &data, NULL, function, NULL);		\
- 	} while (0)
- 
- #define define_test_att(name, function, bt_uuid, test_step, args...)	\
-@@ -272,6 +272,23 @@ struct test_step {
- 	uint16_t length;
- };
- 
-+static void destroy_context(struct context *context)
-+{
-+	if (context->source > 0)
-+		g_source_remove(context->source);
-+
-+	bt_gatt_client_unref(context->client);
-+	bt_gatt_server_unref(context->server);
-+	gatt_db_unref(context->client_db);
-+	gatt_db_unref(context->server_db);
-+
-+	if (context->att)
-+		bt_att_unref(context->att);
-+
-+	test_free(context->data);
-+	g_free(context);
-+}
-+
- static gboolean context_quit(gpointer user_data)
- {
- 	struct context *context = user_data;
-@@ -280,11 +297,13 @@ static gboolean context_quit(gpointer user_data)
- 	if (context->process > 0)
- 		g_source_remove(context->process);
- 
--	g_main_loop_quit(context->main_loop);
--
- 	if (step && step->post_func)
- 		step->post_func(context);
- 
-+	destroy_context(context);
-+
-+	tester_test_passed();
-+
- 	return FALSE;
- }
- 
-@@ -292,7 +311,7 @@ static void test_debug(const char *str, void *user_data)
- {
- 	const char *prefix = user_data;
- 
--	g_print("%s%s\n", prefix, str);
-+	tester_debug("%s%s", prefix, str);
- }
- 
- static gboolean send_pdu(gpointer user_data)
-@@ -305,8 +324,7 @@ static gboolean send_pdu(gpointer user_data)
- 
- 	len = write(context->fd, pdu->data, pdu->size);
- 
--	if (g_test_verbose())
--		util_hexdump('<', pdu->data, len, test_debug, "GATT: ");
-+	util_hexdump('<', pdu->data, len, test_debug, "GATT: ");
- 
- 	g_assert_cmpint(len, ==, pdu->size);
- 
-@@ -314,8 +332,7 @@ static gboolean send_pdu(gpointer user_data)
- 
- 	pdu = &context->data->pdu_list[context->pdu_offset];
- 	if (pdu->valid && (pdu->size == 0)) {
--		if (g_test_verbose())
--			test_debug("(no action expected)", "GATT: ");
-+		test_debug("(no action expected)", "GATT: ");
- 		context->pdu_offset++;
- 		return send_pdu(context);
- 	}
-@@ -358,8 +375,7 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
- 
- 	g_assert(len > 0);
- 
--	if (g_test_verbose())
--		util_hexdump('>', buf, len, test_debug, "GATT: ");
-+	util_hexdump('>', buf, len, test_debug, "GATT: ");
- 
- 	g_assert_cmpint(len, ==, pdu->size);
- 
-@@ -370,9 +386,7 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
- 
- 	if (pdu->valid && (pdu->size == 0)) {
- 		context->pdu_offset++;
--		if (g_test_verbose())
--			test_debug("triggering server action",
--							"Empty client pdu: ");
-+		test_debug("triggering server action", "Empty client pdu: ");
- 		g_assert(step && step->func);
- 		step->func(context);
- 		return TRUE;
-@@ -387,7 +401,7 @@ static void print_debug(const char *str, void *user_data)
- {
- 	const char *prefix = user_data;
- 
--	g_print("%s%s\n", prefix, str);
-+	tester_debug("%s%s", prefix, str);
- }
- 
- struct db_attribute_test_data {
-@@ -566,9 +580,6 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
- 	int err, sv[2];
- 	struct bt_att *att;
- 
--	context->main_loop = g_main_loop_new(NULL, FALSE);
--	g_assert(context->main_loop);
--
- 	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
- 	g_assert(err == 0);
- 
-@@ -579,9 +590,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
- 	case ATT:
- 		context->att = att;
- 
--		if (g_test_verbose())
--			bt_att_set_debug(context->att, print_debug, "bt_att:",
--									NULL);
-+		bt_att_set_debug(context->att, print_debug, "bt_att:", NULL);
- 
- 		bt_gatt_exchange_mtu(context->att, mtu, NULL, NULL, NULL);
- 		break;
-@@ -593,8 +602,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
- 									mtu);
- 		g_assert(context->server);
- 
--		if (g_test_verbose())
--			bt_gatt_server_set_debug(context->server, print_debug,
-+		bt_gatt_server_set_debug(context->server, print_debug,
- 						"bt_gatt_server:", NULL);
- 		bt_att_unref(att);
- 		break;
-@@ -606,8 +614,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
- 									mtu);
- 		g_assert(context->client);
- 
--		if (g_test_verbose())
--			bt_gatt_client_set_debug(context->client, print_debug,
-+		bt_gatt_client_set_debug(context->client, print_debug,
- 						"bt_gatt_client:", NULL);
- 
- 		bt_gatt_client_set_ready_handler(context->client,
-@@ -649,32 +656,6 @@ static void generic_search_cb(bool success, uint8_t att_ecode,
- 	context_quit(context);
- }
- 
--static void destroy_context(struct context *context)
--{
--	if (context->source > 0)
--		g_source_remove(context->source);
--
--	bt_gatt_client_unref(context->client);
--	bt_gatt_server_unref(context->server);
--	gatt_db_unref(context->client_db);
--	gatt_db_unref(context->server_db);
--
--	if (context->att)
--		bt_att_unref(context->att);
--
--	g_main_loop_unref(context->main_loop);
--
--	test_free(context->data);
--	g_free(context);
--}
--
--static void execute_context(struct context *context)
--{
--	g_main_loop_run(context->main_loop);
--
--	destroy_context(context);
--}
--
- static void test_read_cb(bool success, uint8_t att_ecode,
- 					const uint8_t *value, uint16_t length,
- 					void *user_data)
-@@ -1339,9 +1320,7 @@ static struct gatt_db *make_test_spec_large_db_1(void)
- 
- static void test_client(gconstpointer data)
- {
--	struct context *context = create_context(512, data);
--
--	execute_context(context);
-+	create_context(512, data);
- }
- 
- static void test_server(gconstpointer data)
-@@ -1354,10 +1333,7 @@ static void test_server(gconstpointer data)
- 
- 	g_assert_cmpint(len, ==, pdu.size);
- 
--	if (g_test_verbose())
--		util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
--
--	execute_context(context);
-+	util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
- }
- 
- static void test_search_primary(gconstpointer data)
-@@ -1368,8 +1344,6 @@ static void test_search_primary(gconstpointer data)
- 	bt_gatt_discover_all_primary_services(context->att, test_data->uuid,
- 							generic_search_cb,
- 							context, NULL);
--
--	execute_context(context);
- }
- 
- static void test_search_included(gconstpointer data)
-@@ -1379,8 +1353,6 @@ static void test_search_included(gconstpointer data)
- 	bt_gatt_discover_included_services(context->att, 0x0001, 0xffff,
- 							generic_search_cb,
- 							context, NULL);
--
--	execute_context(context);
- }
- 
- static void test_search_chars(gconstpointer data)
-@@ -1390,8 +1362,6 @@ static void test_search_chars(gconstpointer data)
- 	g_assert(bt_gatt_discover_characteristics(context->att, 0x0010, 0x0020,
- 							generic_search_cb,
- 							context, NULL));
--
--	execute_context(context);
- }
- 
- static void test_search_descs(gconstpointer data)
-@@ -1401,8 +1371,6 @@ static void test_search_descs(gconstpointer data)
- 	g_assert(bt_gatt_discover_descriptors(context->att, 0x0013, 0x0016,
- 							generic_search_cb,
- 							context, NULL));
--
--	execute_context(context);
- }
- 
- static const struct test_step test_read_by_type_1 = {
-@@ -1552,8 +1520,6 @@ static void test_read_by_type(gconstpointer data)
- 	g_assert(bt_gatt_read_by_type(context->att, step->handle,
- 					step->end_handle, test_data->uuid,
- 					read_by_type_cb, context, NULL));
--
--	execute_context(context);
- }
- 
- static void test_long_read(struct context *context)
-@@ -1788,7 +1754,7 @@ int main(int argc, char *argv[])
- {
- 	struct gatt_db *service_db_1, *ts_small_db, *ts_large_db_1;
- 
--	g_test_init(&argc, &argv, NULL);
-+	tester_init(&argc, &argv);
- 
- 	service_db_1 = make_service_data_1_db();
- 	ts_small_db = make_test_spec_small_db();
-@@ -2879,5 +2845,5 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x0a, 0x03, 0x00),
- 			raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x80));
- 
--	return g_test_run();
-+	return tester_run();
- }
--- 
-2.1.0
+Yes, you are right. Even I don’t see any value in updating attrib/gatt, because it's going to be deprecated as you said.
+Still my concern is about src/gatt-dbus.
+
+> Also, I'm in the process of heavily rewriting src/gatt-dbus and I'm planning to
+> upload some patches next week, so would it be OK to hold off on this?
+> 
+
+Yes, fine. I will rebase this on top of your patches and send it again later.
+
+Regards,
+Gowtham Anandha Babu
+
+> > ---
+> >  attrib/gatt.h   | 4 ++++
+> >  src/gatt-dbus.c | 6 ++++--
+> >  2 files changed, 8 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/attrib/gatt.h b/attrib/gatt.h index f6db10f..c26a286
+> > 100644
+> > --- a/attrib/gatt.h
+> > +++ b/attrib/gatt.h
+> > @@ -42,6 +42,10 @@
+> >  #define GATT_CHR_PROP_AUTH                             0x40
+> >  #define GATT_CHR_PROP_EXT_PROP                         0x80
+> >
+> > +/* GATT Characteristic Extended Properties Bitfield values */
+> > +#define GATT_CHRC_EXT_PROP_RELIABLE_WRITE      0x01
+> > +#define GATT_CHRC_EXT_PROP_WRITABLE_AUX        0x02
+> > +
+> >  /* Client Characteristic Configuration bit field */
+> >  #define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT       0x0001
+> >  #define GATT_CLIENT_CHARAC_CFG_IND_BIT         0x0002
+> > diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c index c22e8af..a5a9faf
+> > 100644
+> > --- a/src/gatt-dbus.c
+> > +++ b/src/gatt-dbus.c
+> > @@ -154,11 +154,13 @@ static uint8_t flags_string2int(const char *proper)
+> >                 value = GATT_CHR_PROP_INDICATE;
+> >         else if (!strcmp("authenticated-signed-writes", proper))
+> >                 value = GATT_CHR_PROP_AUTH;
+> > +       else if (!strcmp("reliable-write", proper))
+> > +               value = GATT_CHRC_EXT_PROP_RELIABLE_WRITE;
+> > +       else if (!strcmp("writable-auxiliaries", proper))
+> > +               value = GATT_CHRC_EXT_PROP_WRITABLE_AUX ;
+> >         else
+> >                 value = 0;
+> >
+> > -       /* TODO: Extended properties. Ref core spec 4.1 page 2185  */
+> > -
+> >         return value;
+> >  }
+> >
+> > --
+> > 1.9.1
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> Thanks,
+> Arman
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
