@@ -1,147 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <2660784.otTN7klW3S@uw000953>
-References: <CALUN+EfYdOffOSejMQh3vnLGX1PZmBqMXL8UhvL-UHK_2kZqFA@mail.gmail.com>
-	<20150219160213.GB32397@aemeltch-MOBL1>
-	<CALUN+EdMNvfnjRE3ks2EVUxGcHWYoVey+SSx9qPec9r+QCqbOg@mail.gmail.com>
-	<2660784.otTN7klW3S@uw000953>
-Date: Thu, 19 Feb 2015 09:31:32 -0700
-Message-ID: <CALUN+Edm_YPzNd9Lwm+zBJnqO3_0=r+CrQr1TdOUAvd7qZUQDA@mail.gmail.com>
-Subject: Re: android-bluez with usb adapter
-From: Keith Conger <keith.conger@gmail.com>
+Date: Thu, 19 Feb 2015 18:27:54 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Szymon Janc <szymon.janc@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] monitor: Add PSM tracking support for LE CoC
+Message-ID: <20150219162754.GA5857@t440s.P-661HNU-F1>
+References: <1424362834-12706-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1424362834-12706-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Interesting, do you happen to know what I need to change in the kernel?
+Hi Szymon,
 
-Thanks again!
-Keith
+On Thu, Feb 19, 2015, Szymon Janc wrote:
+> This uses identifier to match simultaneous L2CAP connect requests
+> and responses.
+> 
+> < ACL Data TX: Handle 3585 flags 0x00 dlen 18
+>     LE L2CAP: LE Connection Request (0x14) ident 2 len 10
+>       PSM: 131 (0x0083)
+>       Source CID: 65
+>       MTU: 672
+>       MPS: 672
+>       Credits: 10
+> > ACL Data RX: Handle 3585 flags 0x02 dlen 18
+>     LE L2CAP: LE Connection Response (0x15) ident 2 len 10
+>       Destination CID: 65
+>       MTU: 23
+>       MPS: 23
+>       Credits: 5
+>       Result: Connection successful (0x0000)
+> < ACL Data TX: Handle 3585 flags 0x00 dlen 27
+>     Channel: 65 len 23 [PSM 131 mode 0] {chan 1}
+>       17 00 00 00 00 00 17 00 7f 7f 7f 7f 7f 7f 7f 7f  ................
+>       7f 7f 7f 7f 7f 7f 7f                             .......
+> < ACL Data TX: Handle 3585 flags 0x00 dlen 6
+>     Channel: 65 len 2 [PSM 131 mode 0] {chan 1}
+>       7f 7f                                            ..
+> ---
+> V2: pass ident in struct l2cap_frame as suggested by Johan
+> 
+>  monitor/l2cap.c | 57 +++++++++++++++++++++++++++++++++++++++------------------
+>  monitor/l2cap.h |  2 ++
+>  2 files changed, 41 insertions(+), 18 deletions(-)
 
-On Thu, Feb 19, 2015 at 9:08 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Keith,
->
-> On Thursday 19 of February 2015 09:06:01 Keith Conger wrote:
->> Thanks I'll try that, do you know which BoardConfig option triggers
->> its build? Eventually I'd like to send my work in getting Bluez in the
->> bbbandroid repo to its maintainer.
->
-> I think the problem with bt working from haltest but not from java is that this
-> board of your is using kernel for emulator.
->
->
-> This is from your logcat:
-> I/SystemServer(  595): No Bluetooh Service (emulator)
->
-> and check this for reference:
-> http://androidxref.com/5.0.0_r2/xref/frameworks/base/services/java/com/android/server/SystemServer.java#487
->
->>
->> Thanks,
->> Keith
->>
->> On Thu, Feb 19, 2015 at 9:02 AM, Andrei Emeltchenko
->> <andrei.emeltchenko.news@gmail.com> wrote:
->> > Hi Keith,
->> >
->> > On Thu, Feb 19, 2015 at 08:39:51AM -0700, Keith Conger wrote:
->> >> Can't seem to figure out why audio.a2dp.default.so isn't being built.
->> >>
->> >
->> > This depends on your Android board configuration.
->> >
->> > afaik you can still build it locally with "mm" and copy to target
->> >
->> > adb sync should be enough
->> >
->> > Best regards
->> > Andrei Emeltchenko
->> >
->> >
->> >> It seems almost like its not even trying to start bluetoothd.  I
->> >> wrapped it with strace, and it didn't create a trace log.
->> >>
->> >> On Wed, Feb 18, 2015 at 3:21 PM, Keith Conger <keith.conger@gmail.com> wrote:
->> >> > Ok I added the additional kernel modules.
->> >> >
->> >> > Here is a logcat from boot to turning on bluetooth in the UI.
->> >> >
->> >> > For some reason  audio.a2dp.default.so didn't get built, I'm looking into that.
->> >> >
->> >> > Thanks,
->> >> > Keith
->> >> >
->> >> > On Wed, Feb 18, 2015 at 1:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
->> >> >> Hi Keith,
->> >> >>
->> >> >> On Wednesday 18 of February 2015 13:05:16 Keith Conger wrote:
->> >> >>> Actually I had tried through the UI first and got the above logcat
->> >> >>> messages.  I then tried HAL test.
->> >> >>>
->> >> >>> Just for some additional background I'm running kernel 3.8.13 and
->> >> >>> bluetooth modules from backports-3.18.1-1
->> >> >>
->> >> >> If haltest is working that means kernel is configured properly.
->> >> >>
->> >> >>> I have them at the bottom of "on boot" in the init.rc.  I have
->> >> >>> attached my kernel config and init.rc.
->> >> >>
->> >> >> Could you attach full logcat starting from boot?
->> >> >>
->> >> >> It looks like you are also missing audio.a2dp.default.so (it shouldn't affect
->> >> >> BT enable but is needed for music streaming over BT).
->> >> >>
->> >> >>>
->> >> >>> I noticed in the mako example the following additional modules are
->> >> >>> loaded, I'm guessing I should add them also?
->> >> >>> insmod /system/lib/modules/rfcomm.ko
->> >> >>> insmod /system/lib/modules/bnep.ko
->> >> >>
->> >> >> Yes, rfcomm is needed for OBEX (PBAP, OPP, MAP etc). Bnep is needed for PAN
->> >> >> (BT tethering).
->> >> >>
->> >> >>>
->> >> >>> Thanks again for the help.
->> >> >>> Keith
->> >> >>>
->> >> >>
->> >> >> --
->> >> >> BR
->> >> >> Szymon Janc
->> >> >
->> >> >
->> >> >
->> >> > --
->> >> > Keith Conger
->> >> > keith DOT conger AT gmail DOT com
->> >> > http://thecongers.org
->> >>
->> >>
->> >>
->> >> --
->> >> Keith Conger
->> >> keith DOT conger AT gmail DOT com
->> >> http://thecongers.org
->> >> --
->> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> >> the body of a message to majordomo@vger.kernel.org
->> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->>
->
-> --
-> Best regards,
-> Szymon Janc
+Applied. Thanks.
 
-
-
--- 
-Keith Conger
-keith DOT conger AT gmail DOT com
-http://thecongers.org
+Johan
