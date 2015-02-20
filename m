@@ -1,267 +1,778 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv2 1/5] android/avdtp: Refactor local SEP list handling
+Date: Fri, 20 Feb 2015 12:48:33 +0100
+Message-ID: <2701181.zGCN8Mn32r@uw000953>
+In-Reply-To: <1424360807-14402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1424360807-14402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1424428710-8907-1-git-send-email-luiz.dentz@gmail.com>
-References: <1424428710-8907-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 20 Feb 2015 13:04:10 +0100
-Message-ID: <CAN_7+YYgVvZXsu1X=8xP6Pvj1-G-Gh0OoUR4F5txv2eK2K9jfg@mail.gmail.com>
-Subject: Re: [RFC BlueZ 1/3] shared/att.c: Add signing key support
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Andrei,
 
-On Fri, Feb 20, 2015 at 11:38 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds support for setting local and remote signing keys along with
-> a callback for fetching/updating signing counter.
+On Thursday 19 of February 2015 17:46:43 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> In order to deduplicate similar code in android/ and profiles/ we need
+> to handle local SEP queue outside of avdtp.c. GSList is transformed to
+> queue.
 > ---
->  src/shared/att.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
->  src/shared/att.h |   6 ++++
->  2 files changed, 104 insertions(+), 4 deletions(-)
->
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 152f49c..5363907 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -36,6 +36,7 @@
+>  android/Android.mk  |  1 +
+>  android/Makefile.am |  1 +
+>  android/a2dp.c      | 17 +++++++---
+>  android/avdtp.c     | 90 ++++++++++++++++++++++++++++++--------------------
+>  android/avdtp.h     |  8 +++--
+>  android/avdtptest.c | 10 ++++--
+>  unit/test-avdtp.c   | 95 ++++++++++++++++++++++++++++++-----------------------
+>  7 files changed, 136 insertions(+), 86 deletions(-)
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 1f2095d..065032f 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -262,6 +262,7 @@ LOCAL_SRC_FILES := \
+>  	bluez/lib/bluetooth.c \
+>  	bluez/lib/hci.c \
+>  	bluez/src/shared/util.c \
+> +	bluez/src/shared/queue.c \
+>  
+>  LOCAL_C_INCLUDES += \
+>  	$(LOCAL_PATH)/bluez \
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index f8c76b3..72fec73 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -103,6 +103,7 @@ android_avdtptest_SOURCES = android/avdtptest.c \
+>  				src/log.h src/log.c \
+>  				btio/btio.h btio/btio.c \
+>  				src/shared/util.h src/shared/util.c \
+> +				src/shared/queue.h src/shared/queue.c \
+>  				android/avdtp.h android/avdtp.c
+>  android_avdtptest_CFLAGS = $(AM_CFLAGS)
+>  android_avdtptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+> diff --git a/android/a2dp.c b/android/a2dp.c
+> index 10f5523..021d781 100644
+> --- a/android/a2dp.c
+> +++ b/android/a2dp.c
+> @@ -38,6 +38,7 @@
+>  #include "lib/sdp.h"
+>  #include "lib/sdp_lib.h"
+>  #include "profiles/audio/a2dp-codecs.h"
+> +#include "src/shared/queue.h"
+>  #include "src/log.h"
+>  #include "hal-msg.h"
+>  #include "ipc-common.h"
+> @@ -52,6 +53,7 @@
+>  #define SVC_HINT_CAPTURING 0x08
+>  #define IDLE_TIMEOUT 1
+>  #define AUDIO_RETRY_TIMEOUT 2
+> +#define MAX_SEID 0x3E
+
+I'm reluctant to moving AVDTP logic to A2DP code.
+This should be verified inside avdtp_register_sep().
+lseps queue should be just a context for AVDTP operations.
+
+>  
+>  static GIOChannel *server = NULL;
+>  static GSList *devices = NULL;
+> @@ -65,6 +67,8 @@ static bool audio_retrying = false;
+>  static struct ipc *hal_ipc = NULL;
+>  static struct ipc *audio_ipc = NULL;
+>  
+> +static struct queue *lseps = NULL;
+> +
+>  struct a2dp_preset {
+>  	void *data;
+>  	int8_t len;
+> @@ -115,7 +119,7 @@ static void unregister_endpoint(void *data)
+>  	struct a2dp_endpoint *endpoint = data;
+>  
+>  	if (endpoint->sep)
+> -		avdtp_unregister_sep(endpoint->sep);
+> +		avdtp_unregister_sep(lseps, endpoint->sep);
+>  
+>  	if (endpoint->caps)
+>  		preset_free(endpoint->caps);
+> @@ -620,6 +624,7 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
+>  							gpointer user_data)
+>  {
+>  	struct a2dp_device *dev = user_data;
+> +	struct avdtp *session;
+>  	uint16_t imtu, omtu;
+>  	GError *gerr = NULL;
+>  	int fd;
+> @@ -643,10 +648,12 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
+>  	fd = g_io_channel_unix_get_fd(chan);
+>  
+>  	/* FIXME: Add proper version */
+> -	dev->session = avdtp_new(fd, imtu, omtu, 0x0100);
+> -	if (!dev->session)
+> +	session = avdtp_new(fd, imtu, omtu, 0x0100, lseps);
+> +	if (!session)
+>  		goto failed;
+>  
+> +	dev->session = session;
+> +
+>  	avdtp_add_disconnect_cb(dev->session, disconnect_cb, dev);
+>  
+>  	/* Proceed to stream setup if initiator */
+> @@ -1327,7 +1334,7 @@ static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
+>  	endpoint = g_new0(struct a2dp_endpoint, 1);
+>  	endpoint->id = g_slist_length(endpoints) + 1;
+>  	endpoint->codec = codec;
+> -	endpoint->sep = avdtp_register_sep(AVDTP_SEP_TYPE_SOURCE,
+> +	endpoint->sep = avdtp_register_sep(lseps, AVDTP_SEP_TYPE_SOURCE,
+>  						AVDTP_MEDIA_TYPE_AUDIO,
+>  						codec, FALSE, &sep_ind,
+>  						&sep_cfm, endpoint);
+> @@ -1691,6 +1698,8 @@ bool bt_a2dp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+>  
+>  	bacpy(&adapter_addr, addr);
+>  
+> +	lseps = queue_new();
+> +
+>  	server = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
+>  				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+>  				BT_IO_OPT_PSM, AVDTP_PSM,
+> diff --git a/android/avdtp.c b/android/avdtp.c
+> index b290feb..35bc548 100644
+> --- a/android/avdtp.c
+> +++ b/android/avdtp.c
+> @@ -42,6 +42,7 @@
 >  #include "lib/bluetooth.h"
->  #include "lib/uuid.h"
->  #include "src/shared/att.h"
-> +#include "src/shared/crypto.h"
->
->  #define ATT_MIN_PDU_LEN                        1  /* At least 1 byte for the opcode. */
->  #define ATT_OP_CMD_MASK                        0x40
-> @@ -52,6 +53,9 @@
->  #define BT_ERROR_ALREADY_IN_PROGRESS           0xfe
->  #define BT_ERROR_OUT_OF_RANGE                  0xff
->
-> +/* Length of signature in write signed packet */
-> +#define BT_ATT_SIGNATURE_LEN           12
-> +
->  struct att_send_op;
->
->  struct bt_att {
-> @@ -85,6 +89,17 @@ struct bt_att {
->         bt_att_debug_func_t debug_callback;
->         bt_att_destroy_func_t debug_destroy;
->         void *debug_data;
-> +
-> +       struct bt_crypto *crypto;
-> +
-> +       struct sign_write_info *local_info;
-> +       struct sign_write_info *remote_info;
-> +};
-> +
-> +struct sign_write_info {
-> +       uint8_t key[16];
-> +       bt_att_counter_func_t counter;
-> +       void *user_data;
+>  #include "src/log.h"
+>  #include "src/shared/util.h"
+> +#include "src/shared/queue.h"
+>  #include "avdtp.h"
+>  #include "../profiles/audio/a2dp-codecs.h"
+>  
+> @@ -383,6 +384,7 @@ struct avdtp {
+>  	guint io_id;
+>  
+>  	GSList *seps; /* Elements of type struct avdtp_remote_sep * */
+> +	struct queue *lseps; /* Elements of type struct avdtp_local_sep * */
+>  
+>  	GSList *streams; /* Elements of type struct avdtp_stream * */
+>  
+> @@ -406,8 +408,6 @@ struct avdtp {
+>  	bool shutdown;
 >  };
->
->  enum att_op_type {
-> @@ -184,6 +199,8 @@ struct att_send_op {
->         bt_att_response_func_t callback;
->         bt_att_destroy_func_t destroy;
->         void *user_data;
+>  
+> -static GSList *lseps = NULL;
+> -
+>  static int send_request(struct avdtp *session, gboolean priority,
+>  			struct avdtp_stream *stream, uint8_t signal_id,
+>  			void *buffer, size_t size);
+> @@ -993,6 +993,9 @@ static void avdtp_free(void *data)
+>  	g_slist_free_full(session->seps, sep_free);
+>  	g_slist_free_full(session->disconnect, g_free);
+>  
+> +	/* Free copy of the SEP list */
+> +	session->lseps = NULL;
 > +
-> +       struct bt_att *att;
->  };
->
->  static void destroy_att_send_op(void *data)
-> @@ -266,6 +283,12 @@ static bool encode_pdu(struct att_send_op *op, const void *pdu,
->                                                 uint16_t length, uint16_t mtu)
->  {
->         uint16_t pdu_len = 1;
-> +       struct bt_att *att = op->att;
-> +       struct sign_write_info *info;
-> +       uint32_t sign_cnt;
-> +
-> +       if (op->opcode & ATT_OP_SIGNED_MASK)
-> +               pdu_len += BT_ATT_SIGNATURE_LEN;
->
->         if (length && pdu)
->                 pdu_len += length;
-> @@ -282,17 +305,36 @@ static bool encode_pdu(struct att_send_op *op, const void *pdu,
->         if (pdu_len > 1)
->                 memcpy(op->pdu + 1, pdu, length);
->
-> -       return true;
-> +       if (!(op->opcode & ATT_OP_SIGNED_MASK))
-> +               return true;
-> +
-> +       info = att->local_info;
-> +       if (!info)
-> +               goto fail;
-> +
-> +       if (!info->counter(&sign_cnt, info->user_data))
-> +               goto fail;
-> +
-> +       if ((bt_crypto_sign_att(att->crypto, info->key, op->pdu, 1 + length,
-> +                               sign_cnt, &((uint8_t *) op->pdu)[1 + length])))
-> +               return true;
-> +
-> +fail:
-> +       free(op->pdu);
-> +       return false;
+>  	g_free(session->buf);
+>  
+>  	g_free(session);
+> @@ -1050,18 +1053,18 @@ struct avdtp *avdtp_ref(struct avdtp *session)
+>  	return session;
 >  }
->
-> -static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
-> -                                               uint16_t length, uint16_t mtu,
-> +static struct att_send_op *create_att_send_op(uint8_t opcode,
-> +                                               const void *pdu,
-> +                                               uint16_t length,
-> +                                               struct bt_att *att,
->                                                 bt_att_response_func_t callback,
->                                                 void *user_data,
->                                                 bt_att_destroy_func_t destroy)
+>  
+> -static struct avdtp_local_sep *find_local_sep_by_seid(uint8_t seid)
+> +static bool match_by_seid(const void *data, const void *user_data)
 >  {
->         struct att_send_op *op;
->         enum att_op_type op_type;
-> +       uint16_t mtu = att->mtu;
->
->         if (length && !pdu)
->                 return NULL;
-> @@ -323,6 +365,7 @@ static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
->         op->callback = callback;
->         op->destroy = destroy;
->         op->user_data = user_data;
-> +       op->att = att;
->
->         if (!encode_pdu(op, pdu, length, mtu)) {
->                 free(op);
-> @@ -810,6 +853,7 @@ static void bt_att_free(struct bt_att *att)
->                 destroy_att_send_op(att->pending_ind);
->
->         io_destroy(att->io);
-> +       bt_crypto_unref(att->crypto);
->
->         queue_destroy(att->req_queue, NULL);
->         queue_destroy(att->ind_queue, NULL);
-> @@ -841,6 +885,8 @@ struct bt_att *bt_att_new(int fd)
->
->         att->fd = fd;
->
-> +       att->local_info = NULL;
-> +       att->remote_info = NULL;
->         att->mtu = BT_ATT_DEFAULT_LE_MTU;
->         att->buf = malloc(att->mtu);
->         if (!att->buf)
-> @@ -850,6 +896,10 @@ struct bt_att *bt_att_new(int fd)
->         if (!att->io)
->                 goto fail;
->
-> +       att->crypto = bt_crypto_new();
-> +       if (!att->crypto)
-> +               goto fail;
-> +
->         att->req_queue = queue_new();
->         if (!att->req_queue)
->                 goto fail;
-> @@ -964,6 +1014,16 @@ bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu)
->         if (!buf)
->                 return false;
->
-> +       if (att->local_info) {
-> +               free(att->local_info);
-> +               att->local_info = NULL;
-> +       }
-> +
-> +       if (att->remote_info) {
-> +               free(att->remote_info);
-> +               att->remote_info = NULL;
-> +       }
-> +
-
-Why we want to do it here?
-
-I think we should add it bt_att_free() instead.
-
->         free(att->buf);
->
->         att->mtu = mtu;
-> @@ -1047,7 +1107,7 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
->         if (!att || !att->io)
->                 return 0;
->
-> -       op = create_att_send_op(opcode, pdu, length, att->mtu, callback,
-> +       op = create_att_send_op(opcode, pdu, length, att, callback,
->                                                         user_data, destroy);
-
-This should be probably separate patch.
-
-\Lukasz
-
->         if (!op)
->                 return 0;
-> @@ -1307,3 +1367,37 @@ bool bt_att_set_sec_level(struct bt_att *att, int level)
->
->         return true;
+> -	GSList *l;
+> +	const struct avdtp_local_sep *sep = data;
+> +	uint8_t seid = PTR_TO_UINT(user_data);
+>  
+> -	for (l = lseps; l != NULL; l = g_slist_next(l)) {
+> -		struct avdtp_local_sep *sep = l->data;
+> -
+> -		if (sep->info.seid == seid)
+> -			return sep;
+> -	}
+> +	return sep->info.seid == seid;
+> +}
+>  
+> -	return NULL;
+> +static struct avdtp_local_sep *find_local_sep_by_seid(struct avdtp *session,
+> +								uint8_t seid)
+> +{
+> +	return queue_find(session->lseps, match_by_seid, INT_TO_PTR(seid));
 >  }
-> +
-> +static bool sign_info_set_key(struct sign_write_info **info, uint8_t key[16],
-> +                               bt_att_counter_func_t func, void *user_data)
+>  
+>  struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+> @@ -1161,15 +1164,23 @@ static gboolean avdtp_unknown_cmd(struct avdtp *session, uint8_t transaction,
+>  							signal_id, NULL, 0);
+>  }
+>  
+> +static void copy_seps(void *data, void *user_data)
 > +{
-> +       if (!(*info)) {
-> +               *info = new0(struct sign_write_info, 1);
-> +               if (!(*info))
-> +                       return false;
-> +       }
+> +	struct avdtp_local_sep *sep = data;
+> +	struct seid_info **p = user_data;
 > +
-> +       (*info)->counter = func;
-> +       (*info)->user_data = user_data;
-> +       memcpy((*info)->key, key, 16);
-> +
-> +       return true;
+> +	memcpy(*p, &sep->info, sizeof(struct seid_info));
+> +	*p = *p + 1;
 > +}
 > +
-> +bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
-> +                               bt_att_counter_func_t func, void *user_data)
-> +{
-> +       if (!att)
-> +               return false;
+>  static gboolean avdtp_discover_cmd(struct avdtp *session, uint8_t transaction,
+>  							void *buf, int size)
+>  {
+> -	GSList *l;
+> -	unsigned int rsp_size, sep_count, i;
+> -	struct seid_info *seps;
+> +	unsigned int rsp_size, sep_count;
+> +	struct seid_info *seps, *p;
+>  	gboolean ret;
+>  
+> -	sep_count = g_slist_length(lseps);
+> +	sep_count = queue_length(session->lseps);
+>  
+>  	if (sep_count == 0) {
+>  		uint8_t err = AVDTP_NOT_SUPPORTED_COMMAND;
+> @@ -1180,12 +1191,9 @@ static gboolean avdtp_discover_cmd(struct avdtp *session, uint8_t transaction,
+>  	rsp_size = sep_count * sizeof(struct seid_info);
+>  
+>  	seps = g_new0(struct seid_info, sep_count);
+> +	p = seps;
+>  
+> -	for (l = lseps, i = 0; l != NULL; l = l->next, i++) {
+> -		struct avdtp_local_sep *sep = l->data;
+> -
+> -		memcpy(&seps[i], &sep->info, sizeof(struct seid_info));
+> -	}
+> +	queue_foreach(session->lseps, copy_seps, &p);
+>  
+>  	ret = avdtp_send(session, transaction, AVDTP_MSG_TYPE_ACCEPT,
+>  				AVDTP_DISCOVER, seps, rsp_size);
+> @@ -1211,7 +1219,7 @@ static gboolean avdtp_getcap_cmd(struct avdtp *session, uint8_t transaction,
+>  		goto failed;
+>  	}
+>  
+> -	sep = find_local_sep_by_seid(req->acp_seid);
+> +	sep = find_local_sep_by_seid(session, req->acp_seid);
+>  	if (!sep) {
+>  		err = AVDTP_BAD_ACP_SEID;
+>  		goto failed;
+> @@ -1293,7 +1301,7 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
+>  		return FALSE;
+>  	}
+>  
+> -	sep = find_local_sep_by_seid(req->acp_seid);
+> +	sep = find_local_sep_by_seid(session, req->acp_seid);
+>  	if (!sep) {
+>  		err = AVDTP_BAD_ACP_SEID;
+>  		goto failed;
+> @@ -1381,7 +1389,7 @@ static gboolean avdtp_getconf_cmd(struct avdtp *session, uint8_t transaction,
+>  
+>  	memset(buf, 0, sizeof(buf));
+>  
+> -	sep = find_local_sep_by_seid(req->acp_seid);
+> +	sep = find_local_sep_by_seid(session, req->acp_seid);
+>  	if (!sep) {
+>  		err = AVDTP_BAD_ACP_SEID;
+>  		goto failed;
+> @@ -1497,7 +1505,7 @@ static gboolean avdtp_open_cmd(struct avdtp *session, uint8_t transaction,
+>  		return FALSE;
+>  	}
+>  
+> -	sep = find_local_sep_by_seid(req->acp_seid);
+> +	sep = find_local_sep_by_seid(session, req->acp_seid);
+>  	if (!sep) {
+>  		err = AVDTP_BAD_ACP_SEID;
+>  		goto failed;
+> @@ -1557,7 +1565,7 @@ static gboolean avdtp_start_cmd(struct avdtp *session, uint8_t transaction,
+>  	for (i = 0; i < seid_count; i++, seid++) {
+>  		failed_seid = seid->seid;
+>  
+> -		sep = find_local_sep_by_seid(req->first_seid.seid);
+> +		sep = find_local_sep_by_seid(session, req->first_seid.seid);
+>  		if (!sep || !sep->stream) {
+>  			err = AVDTP_BAD_ACP_SEID;
+>  			goto failed;
+> @@ -1607,7 +1615,7 @@ static gboolean avdtp_close_cmd(struct avdtp *session, uint8_t transaction,
+>  		return FALSE;
+>  	}
+>  
+> -	sep = find_local_sep_by_seid(req->acp_seid);
+> +	sep = find_local_sep_by_seid(session, req->acp_seid);
+>  	if (!sep || !sep->stream) {
+>  		err = AVDTP_BAD_ACP_SEID;
+>  		goto failed;
+> @@ -1668,7 +1676,7 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
+>  	for (i = 0; i < seid_count; i++, seid++) {
+>  		failed_seid = seid->seid;
+>  
+> -		sep = find_local_sep_by_seid(req->first_seid.seid);
+> +		sep = find_local_sep_by_seid(session, req->first_seid.seid);
+>  		if (!sep || !sep->stream) {
+>  			err = AVDTP_BAD_ACP_SEID;
+>  			goto failed;
+> @@ -1715,7 +1723,7 @@ static gboolean avdtp_abort_cmd(struct avdtp *session, uint8_t transaction,
+>  		return FALSE;
+>  	}
+>  
+> -	sep = find_local_sep_by_seid(req->acp_seid);
+> +	sep = find_local_sep_by_seid(session, req->acp_seid);
+>  	if (!sep || !sep->stream)
+>  		return TRUE;
+>  
+> @@ -1753,7 +1761,7 @@ static gboolean avdtp_delayreport_cmd(struct avdtp *session,
+>  		return FALSE;
+>  	}
+>  
+> -	sep = find_local_sep_by_seid(req->acp_seid);
+> +	sep = find_local_sep_by_seid(session, req->acp_seid);
+>  	if (!sep || !sep->stream) {
+>  		err = AVDTP_BAD_ACP_SEID;
+>  		goto failed;
+> @@ -2105,12 +2113,16 @@ static int set_priority(int fd, int priority)
+>  	return err;
+>  }
+>  
+> -struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+> +struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version,
+> +							struct queue *lseps)
+>  {
+>  	struct avdtp *session;
+>  	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+>  	int new_fd;
+>  
+> +	if (!lseps)
+> +		return NULL;
 > +
-> +       return sign_info_set_key(&att->local_info, sign_key, func, user_data);
-> +}
+>  	new_fd = dup(fd);
+>  	if (new_fd < 0) {
+>  		error("dup(): %s (%d)", strerror(errno), errno);
+> @@ -2138,6 +2150,8 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+>  						(GIOFunc) session_cb, session,
+>  						NULL);
+>  
+> +	session->lseps = lseps;
 > +
-> +bool bt_att_set_remote_key(struct bt_att *att, uint8_t sign_key[16],
-> +                               bt_att_counter_func_t func, void *user_data)
-> +{
-> +       if (!att)
-> +               return false;
+>  	return avdtp_ref(session);
+>  }
+>  
+> @@ -3344,7 +3358,8 @@ int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
+>  							&req, sizeof(req));
+>  }
+>  
+> -struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
+> +struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+> +						uint8_t media_type,
+>  						uint8_t codec_type,
+>  						gboolean delay_reporting,
+>  						struct avdtp_sep_ind *ind,
+> @@ -3357,7 +3372,7 @@ struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
+>  	if (!seid)
+>  		return NULL;
+>  
+> -	if (g_slist_length(lseps) > MAX_SEID)
+> +	if (queue_length(lseps) > MAX_SEID)
+>  		return NULL;
+>  
+>  	sep = g_new0(struct avdtp_local_sep, 1);
+> @@ -3374,7 +3389,11 @@ struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
+>  
+>  	DBG("SEP %p registered: type:%d codec:%d seid:%d", sep,
+>  			sep->info.type, sep->codec, sep->info.seid);
+> -	lseps = g_slist_append(lseps, sep);
 > +
-> +       return sign_info_set_key(&att->remote_info, sign_key, func, user_data);
-> +}
-> diff --git a/src/shared/att.h b/src/shared/att.h
-> index 5256ff9..a440aaf 100644
-> --- a/src/shared/att.h
-> +++ b/src/shared/att.h
-> @@ -46,6 +46,7 @@ typedef void (*bt_att_debug_func_t)(const char *str, void *user_data);
->  typedef void (*bt_att_timeout_func_t)(unsigned int id, uint8_t opcode,
->                                                         void *user_data);
->  typedef void (*bt_att_disconnect_func_t)(int err, void *user_data);
-> +typedef bool (*bt_att_counter_func_t)(uint32_t *sign_cnt, void *user_data);
->
->  bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
->                                 void *user_data, bt_att_destroy_func_t destroy);
-> @@ -84,3 +85,8 @@ bool bt_att_unregister_all(struct bt_att *att);
->
->  int bt_att_get_sec_level(struct bt_att *att);
->  bool bt_att_set_sec_level(struct bt_att *att, int level);
+> +	if (!queue_push_tail(lseps, sep)) {
+> +		g_free(sep);
+> +		return NULL;
+> +	}
+>  
+>  	return sep;
+>  }
+> @@ -3386,13 +3405,11 @@ void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
+>  	sep->vndcodec_codec = codec_id;
+>  }
+>  
+> -int avdtp_unregister_sep(struct avdtp_local_sep *sep)
+> +int avdtp_unregister_sep(struct queue *lseps, struct avdtp_local_sep *sep)
+>  {
+>  	if (!sep)
+>  		return -EINVAL;
+>  
+> -	lseps = g_slist_remove(lseps, sep);
+> -
+>  	if (sep->stream)
+>  		release_stream(sep->stream, sep->stream->session);
+>  
+> @@ -3400,6 +3417,7 @@ int avdtp_unregister_sep(struct avdtp_local_sep *sep)
+>  			sep->info.type, sep->codec, sep->info.seid);
+>  
+>  	util_clear_uid(&seids, sep->info.seid);
+> +	queue_remove(lseps, sep);
+>  	g_free(sep);
+>  
+>  	return 0;
+> diff --git a/android/avdtp.h b/android/avdtp.h
+> index d5335e4..07516a8 100644
+> --- a/android/avdtp.h
+> +++ b/android/avdtp.h
+> @@ -205,7 +205,8 @@ typedef void (*avdtp_discover_cb_t) (struct avdtp *session, GSList *seps,
+>  					struct avdtp_error *err, void *user_data);
+>  typedef void (*avdtp_disconnect_cb_t) (void *user_data);
+>  
+> -struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
+> +struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version,
+> +							struct queue *lseps);
+>  
+>  unsigned int avdtp_add_disconnect_cb(struct avdtp *session,
+>  						avdtp_disconnect_cb_t cb,
+> @@ -265,7 +266,8 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream);
+>  int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
+>  							uint16_t delay);
+>  
+> -struct avdtp_local_sep *avdtp_register_sep(uint8_t type, uint8_t media_type,
+> +struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+> +						uint8_t media_type,
+>  						uint8_t codec_type,
+>  						gboolean delay_reporting,
+>  						struct avdtp_sep_ind *ind,
+> @@ -278,7 +280,7 @@ void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
+>  struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+>  						struct avdtp_local_sep *lsep);
+>  
+> -int avdtp_unregister_sep(struct avdtp_local_sep *sep);
+> +int avdtp_unregister_sep(struct queue *lseps, struct avdtp_local_sep *sep);
+>  
+>  avdtp_state_t avdtp_sep_get_state(struct avdtp_local_sep *sep);
+>  
+> diff --git a/android/avdtptest.c b/android/avdtptest.c
+> index ce39519..6529423 100644
+> --- a/android/avdtptest.c
+> +++ b/android/avdtptest.c
+> @@ -40,6 +40,7 @@
+>  
+>  #include "src/shared/util.h"
+>  #include "btio/btio.h"
+> +#include "src/shared/queue.h"
+>  #include "avdtp.h"
+>  
+>  static GMainLoop *mainloop = NULL;
+> @@ -57,6 +58,7 @@ static uint16_t version = 0x0103;
+>  static guint media_player = 0;
+>  static guint media_recorder = 0;
+>  static guint idle_id = 0;
+> +static struct queue *lseps = NULL;
+>  
+>  static bool fragment = false;
+>  
+> @@ -411,7 +413,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+>  		return;
+>  	}
+>  
+> -	avdtp = avdtp_new(fd, imtu, omtu, version);
+> +	avdtp = avdtp_new(fd, imtu, omtu, version, lseps);
+>  	if (!avdtp) {
+>  		printf("Failed to create avdtp instance\n");
+>  		g_main_loop_quit(mainloop);
+> @@ -864,13 +866,15 @@ int main(int argc, char *argv[])
+>  		}
+>  	}
+>  
+> -	local_sep = avdtp_register_sep(dev_role, AVDTP_MEDIA_TYPE_AUDIO,
+> +	local_sep = avdtp_register_sep(lseps, dev_role, AVDTP_MEDIA_TYPE_AUDIO,
+>  					0x00, TRUE, &sep_ind, &sep_cfm, NULL);
+>  	if (!local_sep) {
+>  		printf("Failed to register sep\n");
+>  		exit(0);
+>  	}
+>  
+> +	queue_push_tail(lseps, local_sep);
 > +
-> +bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
-> +                       bt_att_counter_func_t func, void *user_data);
-> +bool bt_att_set_remote_key(struct bt_att *att, uint8_t sign_key[16],
-> +                       bt_att_counter_func_t func, void *user_data);
-> --
-> 2.1.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  	if (!bacmp(&dst, BDADDR_ANY)) {
+>  		printf("Listening...\n");
+>  		io = do_listen(&err);
+> @@ -889,6 +893,8 @@ int main(int argc, char *argv[])
+>  
+>  	printf("Done\n");
+>  
+> +	queue_destroy(lseps, NULL);
+> +
+>  	avdtp_unref(avdtp);
+>  	avdtp = NULL;
+>  
+> diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+> index 34820d1..a293a1d 100644
+> --- a/unit/test-avdtp.c
+> +++ b/unit/test-avdtp.c
+> @@ -36,13 +36,12 @@
+>  #include <glib.h>
+>  
+>  #include "src/shared/util.h"
+> +#include "src/shared/queue.h"
+>  #include "src/log.h"
+>  #include "android/avdtp.h"
+>  
+>  #define MAX_SEID 0x3E
+>  
+> -GSList *lseps = NULL;
+> -
+>  struct test_pdu {
+>  	bool valid;
+>  	bool fragmented;
+> @@ -89,6 +88,7 @@ struct context {
+>  	struct avdtp *session;
+>  	struct avdtp_local_sep *sep;
+>  	struct avdtp_stream *stream;
+> +	struct queue *lseps;
+>  	guint source;
+>  	guint process;
+>  	int fd;
+> @@ -233,7 +233,11 @@ static struct context *context_new(uint16_t version, uint16_t imtu,
+>  	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
+>  	g_assert(err == 0);
+>  
+> -	context->session = avdtp_new(sv[0], imtu, omtu, version);
+> +	context->lseps = queue_new();
+> +	g_assert(context->lseps);
+> +
+> +	context->session = avdtp_new(sv[0], imtu, omtu, version,
+> +								context->lseps);
+>  	g_assert(context->session != NULL);
+>  
+>  	channel = g_io_channel_unix_new(sv[1]);
+> @@ -505,7 +509,8 @@ static void test_server(gconstpointer data)
+>  	struct context *context = create_context(0x0100, data);
+>  	struct avdtp_local_sep *sep;
+>  
+> -	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SOURCE, AVDTP_MEDIA_TYPE_AUDIO,
+> +	sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SOURCE,
+> +					AVDTP_MEDIA_TYPE_AUDIO,
+>  					0x00, FALSE, &sep_ind, &sep_cfm,
+>  					context);
+>  
+> @@ -513,7 +518,8 @@ static void test_server(gconstpointer data)
+>  
+>  	execute_context(context);
+>  
+> -	avdtp_unregister_sep(sep);
+> +	avdtp_unregister_sep(context->lseps, sep);
+> +	queue_destroy(context->lseps, NULL);
+>  }
+>  
+>  static void test_server_1_3(gconstpointer data)
+> @@ -521,14 +527,16 @@ static void test_server_1_3(gconstpointer data)
+>  	struct context *context = create_context(0x0103, data);
+>  	struct avdtp_local_sep *sep;
+>  
+> -	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SOURCE, AVDTP_MEDIA_TYPE_AUDIO,
+> +	sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SOURCE,
+> +					AVDTP_MEDIA_TYPE_AUDIO,
+>  					0x00, TRUE, &sep_ind, NULL, context);
+>  
+>  	g_idle_add(send_pdu, context);
+>  
+>  	execute_context(context);
+>  
+> -	avdtp_unregister_sep(sep);
+> +	avdtp_unregister_sep(context->lseps, sep);
+> +	queue_destroy(context->lseps, NULL);
+>  }
+>  
+>  static void test_server_1_3_sink(gconstpointer data)
+> @@ -536,14 +544,16 @@ static void test_server_1_3_sink(gconstpointer data)
+>  	struct context *context = create_context(0x0103, data);
+>  	struct avdtp_local_sep *sep;
+>  
+> -	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK, AVDTP_MEDIA_TYPE_AUDIO,
+> +	sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SINK,
+> +					AVDTP_MEDIA_TYPE_AUDIO,
+>  					0x00, TRUE, &sep_ind, NULL, context);
+>  
+>  	g_idle_add(send_pdu, context);
+>  
+>  	execute_context(context);
+>  
+> -	avdtp_unregister_sep(sep);
+> +	avdtp_unregister_sep(context->lseps, sep);
+> +	queue_destroy(context->lseps, NULL);
+>  }
+>  
+>  static void test_server_0_sep(gconstpointer data)
+> @@ -559,7 +569,8 @@ static void unregister_sep(void *data)
+>  {
+>  	struct avdtp_local_sep *sep = data;
+>  
+> -	avdtp_unregister_sep(sep);
+> +	/* Removed from the queue by caller */
+> +	avdtp_unregister_sep(NULL, sep);
+>  }
+>  
+>  static void test_server_seid(gconstpointer data)
+> @@ -569,25 +580,22 @@ static void test_server_seid(gconstpointer data)
+>  	unsigned int i;
+>  
+>  	for (i = 0; i < sizeof(int) * 8; i++) {
+> -		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
+> +		sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SINK,
+>  						AVDTP_MEDIA_TYPE_AUDIO,
+>  						0x00, TRUE, &sep_ind, NULL,
+>  						context);
+>  		g_assert(sep);
+> -
+> -		lseps = g_slist_append(lseps, sep);
+>  	}
+>  
+>  	/* Now add (MAX_SEID + 1) SEP -> it shall fail */
+> -	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
+> +	sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SINK,
+>  						AVDTP_MEDIA_TYPE_AUDIO,
+>  						0x00, TRUE, &sep_ind, NULL,
+>  						context);
+>  	g_assert(!sep);
+>  
+>  	/* Remove all SEPs */
+> -	g_slist_free_full(lseps, unregister_sep);
+> -	lseps = NULL;
+> +	queue_destroy(context->lseps, unregister_sep);
+>  }
+>  
+>  static void test_server_seid_duplicate(gconstpointer data)
+> @@ -597,37 +605,34 @@ static void test_server_seid_duplicate(gconstpointer data)
+>  	int i;
+>  
+>  	for (i = 0; i < 2; i++) {
+> -		sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
+> +		sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SINK,
+>  						AVDTP_MEDIA_TYPE_AUDIO,
+>  						0x00, TRUE, &sep_ind, NULL,
+>  						context);
+>  		g_assert(sep);
+> -
+> -		lseps = g_slist_append(lseps, sep);
+>  	}
+>  
+>  	/* Remove 1st element */
+> -	sep = g_slist_nth_data(lseps, 0);
+> -	lseps = g_slist_remove(lseps, sep);
+> -	avdtp_unregister_sep(sep);
+> +	sep = queue_peek_head(context->lseps);
+> +	g_assert(sep);
+> +
+> +	avdtp_unregister_sep(context->lseps, sep);
+>  
+>  	/* Now register new element */
+> -	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK,
+> +	sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SINK,
+>  						AVDTP_MEDIA_TYPE_AUDIO,
+>  						0x00, TRUE, &sep_ind, NULL,
+>  						context);
+>  	g_assert(sep);
+> -	lseps = g_slist_append(lseps, sep);
+>  
+> -	/* Check SEID ids */
+> +	/* Check SEID ids with DISCOVER */
+>  
+>  	g_idle_add(send_pdu, context);
+>  
+>  	execute_context(context);
+>  
+>  	/* Remove all SEPs */
+> -	g_slist_free_full(lseps, unregister_sep);
+> -	lseps = NULL;
+> +	queue_destroy(context->lseps, unregister_sep);
+>  }
+>  
+>  static gboolean sep_getcap_ind_frg(struct avdtp *session,
+> @@ -675,7 +680,8 @@ static void test_server_frg(gconstpointer data)
+>  	struct context *context = context_new(0x0100, 48, 48, data);
+>  	struct avdtp_local_sep *sep;
+>  
+> -	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SOURCE, AVDTP_MEDIA_TYPE_AUDIO,
+> +	sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SOURCE,
+> +						AVDTP_MEDIA_TYPE_AUDIO,
+>  						0x00, TRUE, &sep_ind_frg,
+>  						NULL, context);
+>  
+> @@ -683,7 +689,8 @@ static void test_server_frg(gconstpointer data)
+>  
+>  	execute_context(context);
+>  
+> -	avdtp_unregister_sep(sep);
+> +	avdtp_unregister_sep(context->lseps, sep);
+> +	queue_destroy(context->lseps, NULL);
+>  }
+>  
+>  static void discover_cb(struct avdtp *session, GSList *seps,
+> @@ -758,16 +765,18 @@ static void test_client(gconstpointer data)
+>  	struct context *context = create_context(0x0100, data);
+>  	struct avdtp_local_sep *sep;
+>  
+> -	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK, AVDTP_MEDIA_TYPE_AUDIO,
+> -					0x00, FALSE, NULL, &sep_cfm,
+> -					context);
+> +	sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SINK,
+> +					AVDTP_MEDIA_TYPE_AUDIO,
+> +					0x00, FALSE, NULL, &sep_cfm, context);
+> +
+>  	context->sep = sep;
+>  
+>  	avdtp_discover(context->session, discover_cb, context);
+>  
+>  	execute_context(context);
+>  
+> -	avdtp_unregister_sep(sep);
+> +	avdtp_unregister_sep(context->lseps, sep);
+> +	queue_destroy(context->lseps, NULL);
+>  }
+>  
+>  static void test_client_1_3(gconstpointer data)
+> @@ -775,16 +784,18 @@ static void test_client_1_3(gconstpointer data)
+>  	struct context *context = create_context(0x0103, data);
+>  	struct avdtp_local_sep *sep;
+>  
+> -	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK, AVDTP_MEDIA_TYPE_AUDIO,
+> -					0x00, TRUE, NULL, &sep_cfm,
+> -					context);
+> +	sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SINK,
+> +					AVDTP_MEDIA_TYPE_AUDIO,
+> +					0x00, TRUE, NULL, &sep_cfm, context);
+> +
+>  	context->sep = sep;
+>  
+>  	avdtp_discover(context->session, discover_cb, context);
+>  
+>  	execute_context(context);
+>  
+> -	avdtp_unregister_sep(sep);
+> +	avdtp_unregister_sep(context->lseps, sep);
+> +	queue_destroy(context->lseps, NULL);
+>  }
+>  
+>  static void test_client_frg(gconstpointer data)
+> @@ -792,16 +803,18 @@ static void test_client_frg(gconstpointer data)
+>  	struct context *context = context_new(0x0100, 48, 48, data);
+>  	struct avdtp_local_sep *sep;
+>  
+> -	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK, AVDTP_MEDIA_TYPE_AUDIO,
+> -					0x00, TRUE, NULL, &sep_cfm,
+> -					context);
+> +	sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SINK,
+> +					AVDTP_MEDIA_TYPE_AUDIO,
+> +					0x00, TRUE, NULL, &sep_cfm, context);
+> +
+>  	context->sep = sep;
+>  
+>  	avdtp_discover(context->session, discover_cb, context);
+>  
+>  	execute_context(context);
+>  
+> -	avdtp_unregister_sep(sep);
+> +	avdtp_unregister_sep(context->lseps, sep);
+> +	queue_destroy(context->lseps, NULL);
+>  }
+>  
+>  int main(int argc, char *argv[])
+> 
+
+-- 
+Best regards, 
+Szymon Janc
