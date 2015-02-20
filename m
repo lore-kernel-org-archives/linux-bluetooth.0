@@ -1,91 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 20 Feb 2015 12:55:25 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: Rename hci_send_to_control to hci_send_to_channel
-Date: Fri, 20 Feb 2015 13:26:23 +0200
-Message-Id: <1424431584-29831-1-git-send-email-johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC BlueZ 3/3] tools/btgatt-client: Add signed write support
+Message-ID: <20150220105525.GA25329@t440s.lan>
+References: <1424428710-8907-1-git-send-email-luiz.dentz@gmail.com>
+ <1424428710-8907-3-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1424428710-8907-3-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Luiz,
 
-The hci_send_to_control() can be made more general purpose with a small
-change of passing the desired HCI channel as a parameter to it. This
-allows using it for the monitor channel as well as e.g. 6lowpan in the
-future.
+On Fri, Feb 20, 2015, Luiz Augusto von Dentz wrote:
+> +static bool convert_csrk_key(char *optarg, uint8_t csrk[16])
+> +{
+> +	int i;
+> +	char value[2];
+> +
+> +	if (strlen(optarg) != 32) {
+> +		printf("csrk length is invalid\n");
+> +		return false;
+> +	}
+> +
+> +	for (i = 0; i < 16; i++) {
+> +		strncpy(value, optarg + (i * 2), 2);
+> +		csrk[i] = strtol(value, NULL, 16);
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h | 3 ++-
- net/bluetooth/hci_sock.c         | 9 +++++----
- net/bluetooth/mgmt.c             | 3 ++-
- 3 files changed, 9 insertions(+), 6 deletions(-)
+It doesn't look like you've got enough space in 'value' for this. You'd
+need 2 + 1 to have it nul-terminater. However, I think you can
+completely get away with the need of this temporary variable by using
+sscanf(), i.e. something like:
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a7bf77384464..a831c8ad10f1 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1265,7 +1265,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
- 
- /* ----- HCI Sockets ----- */
- void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
--void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk);
-+void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
-+			 struct sock *skip_sk);
- void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
- 
- void hci_sock_dev_event(struct hci_dev *hdev, int event);
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 1d65c5be7c82..ba5d45f8aac1 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -183,12 +183,13 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
- 	kfree_skb(skb_copy);
- }
- 
--/* Send frame to control socket */
--void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk)
-+/* Send frame to sockets with specific channel */
-+void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
-+			 struct sock *skip_sk)
- {
- 	struct sock *sk;
- 
--	BT_DBG("len %d", skb->len);
-+	BT_DBG("channel %u len %d", channel, skb->len);
- 
- 	read_lock(&hci_sk_list.lock);
- 
-@@ -202,7 +203,7 @@ void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk)
- 		if (sk->sk_state != BT_BOUND)
- 			continue;
- 
--		if (hci_pi(sk)->channel != HCI_CHANNEL_CONTROL)
-+		if (hci_pi(sk)->channel != channel)
- 			continue;
- 
- 		nskb = skb_clone(skb, GFP_ATOMIC);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3a1b537c9aa6..d5d46e7676f1 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -29,6 +29,7 @@
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/hci_sock.h>
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/mgmt.h>
- 
-@@ -242,7 +243,7 @@ static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 data_len,
- 	/* Time stamp */
- 	__net_timestamp(skb);
- 
--	hci_send_to_control(skb, skip_sk);
-+	hci_send_to_channel(HCI_CHANNEL_CONTROL, skb, skip_sk);
- 	kfree_skb(skb);
- 
- 	return 0;
--- 
-2.1.0
+	sscanf(optarg + (i * 2), "%2hhx", &csrk[i]);
 
+Johan
