@@ -1,213 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 1/5] shared/att.c: Add client signing key support
-Date: Fri, 20 Feb 2015 17:03:34 +0200
-Message-Id: <1424444618-12393-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1729969.3pX2YMqAzZ@uw000953>
+References: <CALUN+EfYdOffOSejMQh3vnLGX1PZmBqMXL8UhvL-UHK_2kZqFA@mail.gmail.com>
+	<CALUN+Ecm_0381JuAQYoM37zj+EZHoVoLgayECSRrzmd2BOvwAg@mail.gmail.com>
+	<CALUN+Edeegg+Ra6JzKkMdB8Lzm_LxDQH5PS5rX_yTkk90Wme9A@mail.gmail.com>
+	<1729969.3pX2YMqAzZ@uw000953>
+Date: Fri, 20 Feb 2015 07:59:10 -0700
+Message-ID: <CALUN+Ed-mxOBY4YT27VnaXDGEb6Mot47uMQ9jD7fNWn5DNAUEA@mail.gmail.com>
+Subject: Re: android-bluez with usb adapter
+From: Keith Conger <keith.conger@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Szymon Janc <szymon.janc@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+If I figure it out I'll let you know.  I'm also trying to figure out
+why audio.a2dp.default and audio.sco.default aren't being build
+automatically.
 
-This adds support for setting local signing keys along with a callback
-for loading the counter.
----
- src/shared/att.c | 87 ++++++++++++++++++++++++++++++++++++++++++++++++++------
- src/shared/att.h |  4 +++
- 2 files changed, 82 insertions(+), 9 deletions(-)
+Thanks again,
+Keith
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 152f49c..ebda308 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -36,6 +36,7 @@
- #include "lib/bluetooth.h"
- #include "lib/uuid.h"
- #include "src/shared/att.h"
-+#include "src/shared/crypto.h"
- 
- #define ATT_MIN_PDU_LEN			1  /* At least 1 byte for the opcode. */
- #define ATT_OP_CMD_MASK			0x40
-@@ -52,6 +53,9 @@
- #define BT_ERROR_ALREADY_IN_PROGRESS		0xfe
- #define BT_ERROR_OUT_OF_RANGE			0xff
- 
-+/* Length of signature in write signed packet */
-+#define BT_ATT_SIGNATURE_LEN		12
-+
- struct att_send_op;
- 
- struct bt_att {
-@@ -85,6 +89,16 @@ struct bt_att {
- 	bt_att_debug_func_t debug_callback;
- 	bt_att_destroy_func_t debug_destroy;
- 	void *debug_data;
-+
-+	struct bt_crypto *crypto;
-+
-+	struct sign_write_info *local_info;
-+};
-+
-+struct sign_write_info {
-+	uint8_t key[16];
-+	bt_att_counter_func_t counter;
-+	void *user_data;
- };
- 
- enum att_op_type {
-@@ -262,15 +276,20 @@ static bool match_disconn_id(const void *a, const void *b)
- 	return disconn->id == id;
- }
- 
--static bool encode_pdu(struct att_send_op *op, const void *pdu,
--						uint16_t length, uint16_t mtu)
-+static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
-+					const void *pdu, uint16_t length)
- {
- 	uint16_t pdu_len = 1;
-+	struct sign_write_info *info;
-+	uint32_t sign_cnt;
-+
-+	if (op->opcode & ATT_OP_SIGNED_MASK)
-+		pdu_len += BT_ATT_SIGNATURE_LEN;
- 
- 	if (length && pdu)
- 		pdu_len += length;
- 
--	if (pdu_len > mtu)
-+	if (pdu_len > att->mtu)
- 		return false;
- 
- 	op->len = pdu_len;
-@@ -282,11 +301,29 @@ static bool encode_pdu(struct att_send_op *op, const void *pdu,
- 	if (pdu_len > 1)
- 		memcpy(op->pdu + 1, pdu, length);
- 
--	return true;
-+	if (!(op->opcode & ATT_OP_SIGNED_MASK))
-+		return true;
-+
-+	info = att->local_info;
-+	if (!info)
-+		goto fail;
-+
-+	if (!info->counter(&sign_cnt, info->user_data))
-+		goto fail;
-+
-+	if ((bt_crypto_sign_att(att->crypto, info->key, op->pdu, 1 + length,
-+				sign_cnt, &((uint8_t *) op->pdu)[1 + length])))
-+		return true;
-+
-+fail:
-+	free(op->pdu);
-+	return false;
- }
- 
--static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
--						uint16_t length, uint16_t mtu,
-+static struct att_send_op *create_att_send_op(struct bt_att *att,
-+						uint8_t opcode,
-+						const void *pdu,
-+						uint16_t length,
- 						bt_att_response_func_t callback,
- 						void *user_data,
- 						bt_att_destroy_func_t destroy)
-@@ -324,7 +361,7 @@ static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
- 	op->destroy = destroy;
- 	op->user_data = user_data;
- 
--	if (!encode_pdu(op, pdu, length, mtu)) {
-+	if (!encode_pdu(att, op, pdu, length)) {
- 		free(op);
- 		return NULL;
- 	}
-@@ -810,6 +847,7 @@ static void bt_att_free(struct bt_att *att)
- 		destroy_att_send_op(att->pending_ind);
- 
- 	io_destroy(att->io);
-+	bt_crypto_unref(att->crypto);
- 
- 	queue_destroy(att->req_queue, NULL);
- 	queue_destroy(att->ind_queue, NULL);
-@@ -823,6 +861,8 @@ static void bt_att_free(struct bt_att *att)
- 	if (att->debug_destroy)
- 		att->debug_destroy(att->debug_data);
- 
-+	free(att->local_info);
-+
- 	free(att->buf);
- 
- 	free(att);
-@@ -850,6 +890,10 @@ struct bt_att *bt_att_new(int fd)
- 	if (!att->io)
- 		goto fail;
- 
-+	att->crypto = bt_crypto_new();
-+	if (!att->crypto)
-+		goto fail;
-+
- 	att->req_queue = queue_new();
- 	if (!att->req_queue)
- 		goto fail;
-@@ -1047,8 +1091,8 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 	if (!att || !att->io)
- 		return 0;
- 
--	op = create_att_send_op(opcode, pdu, length, att->mtu, callback,
--							user_data, destroy);
-+	op = create_att_send_op(att, opcode, pdu, length, callback, user_data,
-+								destroy);
- 	if (!op)
- 		return 0;
- 
-@@ -1307,3 +1351,28 @@ bool bt_att_set_sec_level(struct bt_att *att, int level)
- 
- 	return true;
- }
-+
-+static bool sign_info_set_key(struct sign_write_info **info, uint8_t key[16],
-+				bt_att_counter_func_t func, void *user_data)
-+{
-+	if (!(*info)) {
-+		*info = new0(struct sign_write_info, 1);
-+		if (!(*info))
-+			return false;
-+	}
-+
-+	(*info)->counter = func;
-+	(*info)->user_data = user_data;
-+	memcpy((*info)->key, key, 16);
-+
-+	return true;
-+}
-+
-+bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
-+				bt_att_counter_func_t func, void *user_data)
-+{
-+	if (!att)
-+		return false;
-+
-+	return sign_info_set_key(&att->local_info, sign_key, func, user_data);
-+}
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 5256ff9..0cd1a4c 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -46,6 +46,7 @@ typedef void (*bt_att_debug_func_t)(const char *str, void *user_data);
- typedef void (*bt_att_timeout_func_t)(unsigned int id, uint8_t opcode,
- 							void *user_data);
- typedef void (*bt_att_disconnect_func_t)(int err, void *user_data);
-+typedef bool (*bt_att_counter_func_t)(uint32_t *sign_cnt, void *user_data);
- 
- bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
- 				void *user_data, bt_att_destroy_func_t destroy);
-@@ -84,3 +85,6 @@ bool bt_att_unregister_all(struct bt_att *att);
- 
- int bt_att_get_sec_level(struct bt_att *att);
- bool bt_att_set_sec_level(struct bt_att *att, int level);
-+
-+bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
-+			bt_att_counter_func_t func, void *user_data);
+On Fri, Feb 20, 2015 at 3:05 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi Keith,
+>
+> On Thursday 19 of February 2015 11:49:43 Keith Conger wrote:
+>> That did the trick! It appears bluetooth is now working!  Thanks again
+>> for all your help and patience!
+>
+> I'm glad that it works for you, feel free to get back if you would have any problems.
+>
+> As for those libs being installed in /system/lib instead of /system/lib/hw it looks
+> like we have some bug (but it appears only on KitKat, on Lollipop libs are correctly
+> installed in hw). I haven't tracked it why this happen yet.
+>
+>>
+>> Keith
+>>
+>> On Thu, Feb 19, 2015 at 10:25 AM, Keith Conger <keith.conger@gmail.com> wrote:
+>> > Sorry, I see the problem. ro.kernel.qemu is set to 1.
+>> >
+>> > I'm commenting out the check. And rebuilding.
+>> >
+>> > On Thu, Feb 19, 2015 at 9:31 AM, Keith Conger <keith.conger@gmail.com> wrote:
+>> >> Interesting, do you happen to know what I need to change in the kernel?
+>> >>
+>> >> Thanks again!
+>> >> Keith
+>> >>
+>> >> On Thu, Feb 19, 2015 at 9:08 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+>> >>> Hi Keith,
+>> >>>
+>> >>> On Thursday 19 of February 2015 09:06:01 Keith Conger wrote:
+>> >>>> Thanks I'll try that, do you know which BoardConfig option triggers
+>> >>>> its build? Eventually I'd like to send my work in getting Bluez in the
+>> >>>> bbbandroid repo to its maintainer.
+>> >>>
+>> >>> I think the problem with bt working from haltest but not from java is that this
+>> >>> board of your is using kernel for emulator.
+>> >>>
+>> >>>
+>> >>> This is from your logcat:
+>> >>> I/SystemServer(  595): No Bluetooh Service (emulator)
+>> >>>
+>> >>> and check this for reference:
+>> >>> http://androidxref.com/5.0.0_r2/xref/frameworks/base/services/java/com/android/server/SystemServer.java#487
+>> >>>
+>> >>>>
+>> >>>> Thanks,
+>> >>>> Keith
+>
+>>
+>
+> --
+> Best regards,
+> Szymon Janc
+
+
+
 -- 
-2.1.0
-
+Keith Conger
+keith DOT conger AT gmail DOT com
+http://thecongers.org
