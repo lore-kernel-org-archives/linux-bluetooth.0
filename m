@@ -1,49 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 2/3] shared/gatt-client: Add support for signed write
-Date: Fri, 20 Feb 2015 12:38:29 +0200
-Message-Id: <1424428710-8907-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1424428710-8907-1-git-send-email-luiz.dentz@gmail.com>
-References: <1424428710-8907-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: Remove unnecessary queue_monitor_skb() function
+Date: Fri, 20 Feb 2015 12:37:20 +0200
+Message-Id: <1424428640-24697-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1424428640-24697-1-git-send-email-johan.hedberg@gmail.com>
+References: <1424428640-24697-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
+Now that there's the general purpose hci_send_to_channel() API it will
+do the exact same thing as queue_monitor_skb() when passed the monitor
+HCI channel. This patch removes queue_monitor_skb() and replaces any
+users of it with calls to hci_send_to_channel().
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- src/shared/gatt-client.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ net/bluetooth/hci_sock.c | 32 ++------------------------------
+ 1 file changed, 2 insertions(+), 30 deletions(-)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index ac2692f..a966dd0 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -2129,10 +2129,6 @@ unsigned int bt_gatt_client_write_without_response(
- 	if (!client)
- 		return 0;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index c35e4cd1ae48..780e6ba0389d 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -217,34 +217,6 @@ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+ 	read_unlock(&hci_sk_list.lock);
+ }
  
--	/* TODO: Support this once bt_att_send supports signed writes. */
--	if (signed_write)
--		return 0;
+-static void queue_monitor_skb(struct sk_buff *skb)
+-{
+-	struct sock *sk;
 -
- 	req = request_create(client);
- 	if (!req)
- 		return 0;
-@@ -2140,9 +2136,10 @@ unsigned int bt_gatt_client_write_without_response(
- 	put_le16(value_handle, pdu);
- 	memcpy(pdu + 2, value, length);
+-	BT_DBG("len %d", skb->len);
+-
+-	read_lock(&hci_sk_list.lock);
+-
+-	sk_for_each(sk, &hci_sk_list.head) {
+-		struct sk_buff *nskb;
+-
+-		if (sk->sk_state != BT_BOUND)
+-			continue;
+-
+-		if (hci_pi(sk)->channel != HCI_CHANNEL_MONITOR)
+-			continue;
+-
+-		nskb = skb_clone(skb, GFP_ATOMIC);
+-		if (!nskb)
+-			continue;
+-
+-		if (sock_queue_rcv_skb(sk, nskb))
+-			kfree_skb(nskb);
+-	}
+-
+-	read_unlock(&hci_sk_list.lock);
+-}
+-
+ /* Send frame to monitor socket */
+ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+@@ -291,7 +263,7 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hdr->index = cpu_to_le16(hdev->id);
+ 	hdr->len = cpu_to_le16(skb->len);
  
--	req->att_id = bt_att_send(client->att, BT_ATT_OP_WRITE_CMD,
--							pdu, sizeof(pdu),
--							NULL, NULL, NULL);
-+	req->att_id = bt_att_send(client->att,
-+				signed_write ?  BT_ATT_OP_SIGNED_WRITE_CMD :
-+				BT_ATT_OP_WRITE_CMD, pdu, sizeof(pdu),
-+				NULL, NULL, NULL);
- 	if (!req->att_id) {
- 		request_unref(req);
- 		return 0;
+-	queue_monitor_skb(skb_copy);
++	hci_send_to_channel(HCI_CHANNEL_MONITOR, skb_copy, NULL);
+ 	kfree_skb(skb_copy);
+ }
+ 
+@@ -398,7 +370,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 
+ 		skb = create_monitor_event(hdev, event);
+ 		if (skb) {
+-			queue_monitor_skb(skb);
++			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb, NULL);
+ 			kfree_skb(skb);
+ 		}
+ 	}
 -- 
 2.1.0
 
