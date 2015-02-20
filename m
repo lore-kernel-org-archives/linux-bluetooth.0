@@ -1,83 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Remove unnecessary queue_monitor_skb() function
-Date: Fri, 20 Feb 2015 12:37:20 +0200
-Message-Id: <1424428640-24697-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1424428640-24697-1-git-send-email-johan.hedberg@gmail.com>
-References: <1424428640-24697-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Rename hci_send_to_control to hci_send_to_channel
+Date: Fri, 20 Feb 2015 12:37:19 +0200
+Message-Id: <1424428640-24697-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that there's the general purpose hci_send_to_channel() API it will
-do the exact same thing as queue_monitor_skb() when passed the monitor
-HCI channel. This patch removes queue_monitor_skb() and replaces any
-users of it with calls to hci_send_to_channel().
+The hci_send_to_control() can be made more general purpose with a small
+change of passing the desired HCI channel as a parameter to it. This
+allows using it for the monitor channel as well as e.g. 6lowpan in the
+future.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_sock.c | 32 ++------------------------------
- 1 file changed, 2 insertions(+), 30 deletions(-)
+ include/net/bluetooth/hci_core.h | 3 ++-
+ net/bluetooth/hci_sock.c         | 7 ++++---
+ net/bluetooth/mgmt.c             | 3 ++-
+ 3 files changed, 8 insertions(+), 5 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7bf77384464..a831c8ad10f1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1265,7 +1265,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+ 
+ /* ----- HCI Sockets ----- */
+ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
+-void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk);
++void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
++			 struct sock *skip_sk);
+ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
+ 
+ void hci_sock_dev_event(struct hci_dev *hdev, int event);
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index c35e4cd1ae48..780e6ba0389d 100644
+index 1d65c5be7c82..c35e4cd1ae48 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -217,34 +217,6 @@ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
- 	read_unlock(&hci_sk_list.lock);
- }
- 
--static void queue_monitor_skb(struct sk_buff *skb)
--{
--	struct sock *sk;
--
--	BT_DBG("len %d", skb->len);
--
--	read_lock(&hci_sk_list.lock);
--
--	sk_for_each(sk, &hci_sk_list.head) {
--		struct sk_buff *nskb;
--
--		if (sk->sk_state != BT_BOUND)
--			continue;
--
--		if (hci_pi(sk)->channel != HCI_CHANNEL_MONITOR)
--			continue;
--
--		nskb = skb_clone(skb, GFP_ATOMIC);
--		if (!nskb)
--			continue;
--
--		if (sock_queue_rcv_skb(sk, nskb))
--			kfree_skb(nskb);
--	}
--
--	read_unlock(&hci_sk_list.lock);
--}
--
- /* Send frame to monitor socket */
- void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
- {
-@@ -291,7 +263,7 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
- 	hdr->index = cpu_to_le16(hdev->id);
- 	hdr->len = cpu_to_le16(skb->len);
- 
--	queue_monitor_skb(skb_copy);
-+	hci_send_to_channel(HCI_CHANNEL_MONITOR, skb_copy, NULL);
+@@ -183,8 +183,9 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
  	kfree_skb(skb_copy);
  }
  
-@@ -398,7 +370,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+-/* Send frame to control socket */
+-void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk)
++/* Send frame to sockets with specific channel */
++void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
++			 struct sock *skip_sk)
+ {
+ 	struct sock *sk;
  
- 		skb = create_monitor_event(hdev, event);
- 		if (skb) {
--			queue_monitor_skb(skb);
-+			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb, NULL);
- 			kfree_skb(skb);
- 		}
- 	}
+@@ -202,7 +203,7 @@ void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk)
+ 		if (sk->sk_state != BT_BOUND)
+ 			continue;
+ 
+-		if (hci_pi(sk)->channel != HCI_CHANNEL_CONTROL)
++		if (hci_pi(sk)->channel != channel)
+ 			continue;
+ 
+ 		nskb = skb_clone(skb, GFP_ATOMIC);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3a1b537c9aa6..d5d46e7676f1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -29,6 +29,7 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/hci_sock.h>
+ #include <net/bluetooth/l2cap.h>
+ #include <net/bluetooth/mgmt.h>
+ 
+@@ -242,7 +243,7 @@ static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 data_len,
+ 	/* Time stamp */
+ 	__net_timestamp(skb);
+ 
+-	hci_send_to_control(skb, skip_sk);
++	hci_send_to_channel(HCI_CHANNEL_CONTROL, skb, skip_sk);
+ 	kfree_skb(skb);
+ 
+ 	return 0;
 -- 
 2.1.0
 
