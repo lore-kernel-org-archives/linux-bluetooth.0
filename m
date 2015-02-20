@@ -1,50 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 1/2] android/handsfree: Fix not sending proper call hold status
-Date: Fri, 20 Feb 2015 11:26:25 +0100
-Message-Id: <1424427986-31620-1-git-send-email-mariusz.skamra@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Keith Conger <keith.conger@gmail.com>
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Szymon Janc <szymon.janc@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: android-bluez with usb adapter
+Date: Fri, 20 Feb 2015 11:05:10 +0100
+Message-ID: <1729969.3pX2YMqAzZ@uw000953>
+In-Reply-To: <CALUN+Edeegg+Ra6JzKkMdB8Lzm_LxDQH5PS5rX_yTkk90Wme9A@mail.gmail.com>
+References: <CALUN+EfYdOffOSejMQh3vnLGX1PZmBqMXL8UhvL-UHK_2kZqFA@mail.gmail.com> <CALUN+Ecm_0381JuAQYoM37zj+EZHoVoLgayECSRrzmd2BOvwAg@mail.gmail.com> <CALUN+Edeegg+Ra6JzKkMdB8Lzm_LxDQH5PS5rX_yTkk90Wme9A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes not sending callheld=1 +CIEV to HF in lollipop after
-active/held calls swapping.
+Hi Keith,
 
-Fixed TC: TC_AG_ECS_BV_03_I, TC_AG_TWC_BV_03_I, TC_AG_TWC_BV_04_I
----
- android/handsfree.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+On Thursday 19 of February 2015 11:49:43 Keith Conger wrote:
+> That did the trick! It appears bluetooth is now working!  Thanks again
+> for all your help and patience!
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index b7aa1dd..f4d6cf0 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -2304,6 +2304,9 @@ static void phone_state_incoming(struct hf_device *dev, int num_active,
- 	if (dev->setup_state == HAL_HANDSFREE_CALL_STATE_INCOMING) {
- 		if (dev->num_active != num_active ||
- 						dev->num_held != num_held) {
-+			if (dev->num_active == num_held &&
-+						dev->num_held == num_active)
-+				return;
- 			/*
- 			 * calls changed while waiting call ie. due to
- 			 * termination of active call
-@@ -2380,11 +2383,11 @@ static void phone_state_idle(struct hf_device *dev, int num_active,
- 				connect_audio(dev);
- 		}
- 
--		if (num_held > dev->num_held)
--			update_indicator(dev, IND_CALLHELD, 1);
--
- 		update_indicator(dev, IND_CALLSETUP, 0);
- 
-+		if (num_held >= dev->num_held && num_held != 0)
-+			update_indicator(dev, IND_CALLHELD, 1);
-+
- 		if (num_active == 0 && num_held == 0 &&
- 				num_active == dev->num_active &&
- 				num_held == dev->num_held)
+I'm glad that it works for you, feel free to get back if you would have any problems.
+
+As for those libs being installed in /system/lib instead of /system/lib/hw it looks
+like we have some bug (but it appears only on KitKat, on Lollipop libs are correctly
+installed in hw). I haven't tracked it why this happen yet.
+
+> 
+> Keith
+> 
+> On Thu, Feb 19, 2015 at 10:25 AM, Keith Conger <keith.conger@gmail.com> wrote:
+> > Sorry, I see the problem. ro.kernel.qemu is set to 1.
+> >
+> > I'm commenting out the check. And rebuilding.
+> >
+> > On Thu, Feb 19, 2015 at 9:31 AM, Keith Conger <keith.conger@gmail.com> wrote:
+> >> Interesting, do you happen to know what I need to change in the kernel?
+> >>
+> >> Thanks again!
+> >> Keith
+> >>
+> >> On Thu, Feb 19, 2015 at 9:08 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> >>> Hi Keith,
+> >>>
+> >>> On Thursday 19 of February 2015 09:06:01 Keith Conger wrote:
+> >>>> Thanks I'll try that, do you know which BoardConfig option triggers
+> >>>> its build? Eventually I'd like to send my work in getting Bluez in the
+> >>>> bbbandroid repo to its maintainer.
+> >>>
+> >>> I think the problem with bt working from haltest but not from java is that this
+> >>> board of your is using kernel for emulator.
+> >>>
+> >>>
+> >>> This is from your logcat:
+> >>> I/SystemServer(  595): No Bluetooh Service (emulator)
+> >>>
+> >>> and check this for reference:
+> >>> http://androidxref.com/5.0.0_r2/xref/frameworks/base/services/java/com/android/server/SystemServer.java#487
+> >>>
+> >>>>
+> >>>> Thanks,
+> >>>> Keith
+
+> 
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
