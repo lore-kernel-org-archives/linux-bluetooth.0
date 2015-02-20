@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 4/9] audio/avdtp: Use bitfield id generation
-Date: Fri, 20 Feb 2015 14:43:18 +0200
-Message-Id: <1424436203-28935-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 3/9] android/avdtp: Remove extra check
+Date: Fri, 20 Feb 2015 14:43:17 +0200
+Message-Id: <1424436203-28935-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1424436203-28935-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1424436203-28935-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,66 +11,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use bitfield utils for assigning SEP id. This fixes duplicated id
-generation shown in unit/avdtp tests.
 ---
- profiles/audio/avdtp.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ android/avdtp.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 2cea4c8..8be5962 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -41,6 +41,7 @@
- #include <glib.h>
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 35bc548..b8a2147 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -3372,9 +3372,6 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+ 	if (!seid)
+ 		return NULL;
  
- #include "src/log.h"
-+#include "src/shared/util.h"
- 
- #include "btio/btio.h"
- #include "lib/uuid.h"
-@@ -54,6 +55,7 @@
- #define AVDTP_PSM 25
- 
- #define MAX_SEID 0x3E
-+static unsigned int seids;
- 
- #ifndef MAX
- # define MAX(x, y) ((x) > (y) ? (x) : (y))
-@@ -3703,6 +3705,10 @@ struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
- {
- 	struct avdtp_server *server;
- 	struct avdtp_local_sep *sep;
-+	uint8_t seid = util_get_uid(&seids, MAX_SEID);
-+
-+	if (!seid)
-+		return NULL;
- 
- 	server = find_server(servers, adapter);
- 	if (!server) {
-@@ -3711,13 +3717,10 @@ struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
- 			return NULL;
- 	}
- 
--	if (g_slist_length(server->seps) > MAX_SEID)
+-	if (queue_length(lseps) > MAX_SEID)
 -		return NULL;
 -
  	sep = g_new0(struct avdtp_local_sep, 1);
  
  	sep->state = AVDTP_STATE_IDLE;
--	sep->info.seid = g_slist_length(server->seps) + 1;
-+	sep->info.seid = seid;
- 	sep->info.type = type;
- 	sep->info.media_type = media_type;
- 	sep->codec = codec_type;
-@@ -3762,6 +3765,7 @@ int avdtp_unregister_sep(struct avdtp_local_sep *sep)
- 	DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
- 			sep->info.type, sep->codec, sep->info.seid);
- 
-+	util_clear_uid(&seids, sep->info.seid);
- 	g_free(sep);
- 
- 	if (server->seps)
 -- 
 2.1.0
 
