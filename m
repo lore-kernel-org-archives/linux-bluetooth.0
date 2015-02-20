@@ -1,136 +1,180 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] android/handsfree: Fix no indicators after rejected incoming call
-Date: Fri, 20 Feb 2015 16:29:17 +0100
-Message-ID: <1915400.Np9pxlOZl5@uw000953>
-In-Reply-To: <1423833559-18107-1-git-send-email-szymon.janc@tieto.com>
-References: <1423833559-18107-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: [RFC BlueZ 5/5] tools/btgatt-server: Add signed write support
+Date: Fri, 20 Feb 2015 17:03:38 +0200
+Message-Id: <1424444618-12393-5-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1424444618-12393-1-git-send-email-luiz.dentz@gmail.com>
+References: <1424444618-12393-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 13 of February 2015 14:19:19 Szymon Janc wrote:
-> On KitKat there were some bogus phone_state_change calls after
-> incoming call was rejected from the phone:
->     active=0 hold=0 state=idle
->     active=0 hold=0 state=incoming
->     active=0 hold=0 state=idle
->     active=0 hold=0 state=idle
-> 
-> On Lollipop this seems to be fixed and after call is rejected we
-> only get single call with state idle:
->     active=0 hold=0 state=idle
-> 
-> So simply reverting workaround commit "Track if incoming call is
-> being rejected" would break KK.
-> 
-> Instead, add short timeout after incoming call was rejected. Durring
-> that period we ignore any phone state change to 'incoming' state.
-> If we get any other state change (ie. outgoing call) timer is cleared.
-> ---
-> I know that timer sollution isn't best but I couldn't find any other
-> sollution that would fit both L and KK...
-> 
->  android/handsfree.c | 38 ++++++++++++++++++++++++++++++++------
->  1 file changed, 32 insertions(+), 6 deletions(-)
-> 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index ba798ee..e760d1c 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -127,7 +127,7 @@ struct hf_device {
->  	int num_active;
->  	int num_held;
->  	int setup_state;
-> -	bool call_hanging_up;
-> +	guint call_hanging_up;
->  
->  	uint8_t negotiated_codec;
->  	uint8_t proposed_codec;
-> @@ -263,6 +263,9 @@ static void device_destroy(struct hf_device *dev)
->  
->  	g_free(dev->clip);
->  
-> +	if (dev->call_hanging_up)
-> +		g_source_remove(dev->call_hanging_up);
-> +
->  	set_audio_state(dev, HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
->  	set_state(dev, HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED);
->  
-> @@ -2251,6 +2254,11 @@ static gboolean ring_cb(gpointer user_data)
->  static void phone_state_dialing(struct hf_device *dev, int num_active,
->  								int num_held)
->  {
-> +	if (dev->call_hanging_up) {
-> +		g_source_remove(dev->call_hanging_up);
-> +		dev->call_hanging_up = 0;
-> +	}
-> +
->  	update_indicator(dev, IND_CALLSETUP, 2);
->  
->  	if (num_active == 0 && num_held > 0)
-> @@ -2263,6 +2271,11 @@ static void phone_state_dialing(struct hf_device *dev, int num_active,
->  static void phone_state_alerting(struct hf_device *dev, int num_active,
->  								int num_held)
->  {
-> +	if (dev->call_hanging_up) {
-> +		g_source_remove(dev->call_hanging_up);
-> +		dev->call_hanging_up = 0;
-> +	}
-> +
->  	update_indicator(dev, IND_CALLSETUP, 3);
->  }
->  
-> @@ -2337,6 +2350,17 @@ static void phone_state_incoming(struct hf_device *dev, int num_active,
->  	}
->  }
->  
-> +static gboolean hang_up_cb(gpointer user_data)
-> +{
-> +	struct hf_device *dev = user_data;
-> +
-> +	DBG("");
-> +
-> +	dev->call_hanging_up = 0;
-> +
-> +	return FALSE;
-> +}
-> +
->  static void phone_state_idle(struct hf_device *dev, int num_active,
->  								int num_held)
->  {
-> @@ -2364,9 +2388,11 @@ static void phone_state_idle(struct hf_device *dev, int num_active,
->  
->  		update_indicator(dev, IND_CALLSETUP, 0);
->  
-> -		if (num_active == dev->num_active && num_held == dev->num_held)
-> -			dev->call_hanging_up = true;
-> -
-> +		if (num_active == 0 && num_held == 0 &&
-> +				num_active == dev->num_active &&
-> +				num_held == dev->num_held)
-> +			dev->call_hanging_up = g_timeout_add(800, hang_up_cb,
-> +									dev);
->  		break;
->  	case HAL_HANDSFREE_CALL_STATE_DIALING:
->  	case HAL_HANDSFREE_CALL_STATE_ALERTING:
-> @@ -2379,9 +2405,9 @@ static void phone_state_idle(struct hf_device *dev, int num_active,
->  		update_indicator(dev, IND_CALLSETUP, 0);
->  		break;
->  	case HAL_HANDSFREE_CALL_STATE_IDLE:
-> -
->  		if (dev->call_hanging_up) {
-> -			dev->call_hanging_up = false;
-> +			g_source_remove(dev->call_hanging_up);
-> +			dev->call_hanging_up = 0;
->  			return;
->  		}
->  
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Pushed.
+This adds support for signed write which can be used after setting the
+signing key using set-sign-key.
+---
+ tools/btgatt-server.c | 83 +++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 74 insertions(+), 9 deletions(-)
 
+diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+index 4d7ea6c..09a123c 100644
+--- a/tools/btgatt-server.c
++++ b/tools/btgatt-server.c
+@@ -77,6 +77,7 @@ static bool verbose = false;
+ 
+ struct server {
+ 	int fd;
++	struct bt_att *att;
+ 	struct gatt_db *db;
+ 	struct bt_gatt_server *gatt;
+ 
+@@ -539,7 +540,6 @@ static void populate_db(struct server *server)
+ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
+ {
+ 	struct server *server;
+-	struct bt_att *att;
+ 	size_t name_len = strlen(test_device_name);
+ 
+ 	server = new0(struct server, 1);
+@@ -548,18 +548,19 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
+ 		return NULL;
+ 	}
+ 
+-	att = bt_att_new(fd);
+-	if (!att) {
++	server->att = bt_att_new(fd);
++	if (!server->att) {
+ 		fprintf(stderr, "Failed to initialze ATT transport layer\n");
+ 		goto fail;
+ 	}
+ 
+-	if (!bt_att_set_close_on_unref(att, true)) {
++	if (!bt_att_set_close_on_unref(server->att, true)) {
+ 		fprintf(stderr, "Failed to set up ATT transport layer\n");
+ 		goto fail;
+ 	}
+ 
+-	if (!bt_att_register_disconnect(att, att_disconnect_cb, NULL, NULL)) {
++	if (!bt_att_register_disconnect(server->att, att_disconnect_cb, NULL,
++									NULL)) {
+ 		fprintf(stderr, "Failed to set ATT disconnect handler\n");
+ 		goto fail;
+ 	}
+@@ -581,7 +582,7 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
+ 		goto fail;
+ 	}
+ 
+-	server->gatt = bt_gatt_server_new(server->db, att, mtu);
++	server->gatt = bt_gatt_server_new(server->db, server->att, mtu);
+ 	if (!server->gatt) {
+ 		fprintf(stderr, "Failed to create GATT server\n");
+ 		goto fail;
+@@ -590,7 +591,7 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
+ 	server->hr_visible = hr_visible;
+ 
+ 	if (verbose) {
+-		bt_att_set_debug(att, att_debug_cb, "att: ", NULL);
++		bt_att_set_debug(server->att, att_debug_cb, "att: ", NULL);
+ 		bt_gatt_server_set_debug(server->gatt, gatt_debug_cb,
+ 							"server: ", NULL);
+ 	}
+@@ -599,7 +600,6 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
+ 	srand(time(NULL));
+ 
+ 	/* bt_gatt_server already holds a reference */
+-	bt_att_unref(att);
+ 	populate_db(server);
+ 
+ 	return server;
+@@ -607,7 +607,7 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
+ fail:
+ 	gatt_db_unref(server->db);
+ 	free(server->device_name);
+-	bt_att_unref(att);
++	bt_att_unref(server->att);
+ 	free(server);
+ 
+ 	return NULL;
+@@ -972,6 +972,69 @@ static void cmd_services(struct server *server, char *cmd_str)
+ 	gatt_db_foreach_service(server->db, NULL, print_service, server);
+ }
+ 
++static bool convert_sign_key(char *optarg, uint8_t key[16])
++{
++	int i;
++
++	if (strlen(optarg) != 32) {
++		printf("sign-key length is invalid\n");
++		return false;
++	}
++
++	for (i = 0; i < 16; i++) {
++		if (sscanf(optarg + (i * 2), "%2hhx", &key[i]) != 1)
++			return false;
++	}
++
++	return true;
++}
++
++static void set_sign_key_usage(void)
++{
++	printf("Usage: set-sign-key [options]\nOptions:\n"
++		"\t -c, --sign-key <remote csrk>\tRemote CSRK\n"
++		"e.g.:\n"
++		"\tset-sign-key -c D8515948451FEA320DC05A2E88308188\n");
++}
++
++static bool remote_counter(uint32_t *sign_cnt, void *user_data)
++{
++	static uint32_t cnt = 0;
++
++	if (*sign_cnt < cnt)
++		return false;
++
++	cnt++;
++
++	return true;
++}
++
++static void cmd_set_sign_key(struct server *server, char *cmd_str)
++{
++	char *argv[3];
++	int argc = 0;
++	uint8_t key[16];
++
++	memset(key, 0, 16);
++
++	if (!parse_args(cmd_str, 2, argv, &argc)) {
++		set_sign_key_usage();
++		return;
++	}
++
++	if (argc != 2) {
++		set_sign_key_usage();
++		return;
++	}
++
++	if (!strcmp(argv[0], "-c") || !strcmp(argv[0], "--sign-key")) {
++		if (convert_sign_key(argv[1], key))
++			bt_att_set_remote_key(server->att, key, remote_counter,
++									server);
++	} else
++		set_sign_key_usage();
++}
++
+ static void cmd_help(struct server *server, char *cmd_str);
+ 
+ typedef void (*command_func_t)(struct server *server, char *cmd_str);
+@@ -985,6 +1048,8 @@ static struct {
+ 	{ "notify", cmd_notify, "\tSend handle-value notification" },
+ 	{ "heart-rate", cmd_heart_rate, "\tHide/Unhide Heart Rate Service" },
+ 	{ "services", cmd_services, "\tEnumerate all services" },
++	{ "set-sign-key", cmd_set_sign_key,
++			"\tSet remote signing key for signed write command"},
+ 	{ }
+ };
+ 
 -- 
-Best regards, 
-Szymon Janc
+2.1.0
+
