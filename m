@@ -1,48 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20150220105525.GA25329@t440s.lan>
-References: <1424428710-8907-1-git-send-email-luiz.dentz@gmail.com>
-	<1424428710-8907-3-git-send-email-luiz.dentz@gmail.com>
-	<20150220105525.GA25329@t440s.lan>
-Date: Fri, 20 Feb 2015 13:47:49 +0200
-Message-ID: <CABBYNZLJ6Z3mM7OqxnENLF9dsbtoWnicUnxF511B6Z6UGAr3qQ@mail.gmail.com>
-Subject: Re: [RFC BlueZ 3/3] tools/btgatt-client: Add signed write support
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 2/2] Bluetooth: Remove unnecessary queue_monitor_skb() function
+Date: Fri, 20 Feb 2015 13:26:24 +0200
+Message-Id: <1424431584-29831-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1424431584-29831-1-git-send-email-johan.hedberg@gmail.com>
+References: <1424431584-29831-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Fri, Feb 20, 2015 at 12:55 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Luiz,
->
-> On Fri, Feb 20, 2015, Luiz Augusto von Dentz wrote:
->> +static bool convert_csrk_key(char *optarg, uint8_t csrk[16])
->> +{
->> +     int i;
->> +     char value[2];
->> +
->> +     if (strlen(optarg) != 32) {
->> +             printf("csrk length is invalid\n");
->> +             return false;
->> +     }
->> +
->> +     for (i = 0; i < 16; i++) {
->> +             strncpy(value, optarg + (i * 2), 2);
->> +             csrk[i] = strtol(value, NULL, 16);
->
-> It doesn't look like you've got enough space in 'value' for this. You'd
-> need 2 + 1 to have it nul-terminater. However, I think you can
-> completely get away with the need of this temporary variable by using
-> sscanf(), i.e. something like:
->
->         sscanf(optarg + (i * 2), "%2hhx", &csrk[i]);
+Now that there's the general purpose hci_send_to_channel() API it will
+do the exact same thing as queue_monitor_skb() when passed the monitor
+HCI channel. This patch removes queue_monitor_skb() and replaces any
+users of it with calls to hci_send_to_channel().
 
-Yep, this sounds much much better.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_sock.c | 32 ++------------------------------
+ 1 file changed, 2 insertions(+), 30 deletions(-)
 
-
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index ba5d45f8aac1..c73a61ce4893 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -217,34 +217,6 @@ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+ 	read_unlock(&hci_sk_list.lock);
+ }
+ 
+-static void queue_monitor_skb(struct sk_buff *skb)
+-{
+-	struct sock *sk;
+-
+-	BT_DBG("len %d", skb->len);
+-
+-	read_lock(&hci_sk_list.lock);
+-
+-	sk_for_each(sk, &hci_sk_list.head) {
+-		struct sk_buff *nskb;
+-
+-		if (sk->sk_state != BT_BOUND)
+-			continue;
+-
+-		if (hci_pi(sk)->channel != HCI_CHANNEL_MONITOR)
+-			continue;
+-
+-		nskb = skb_clone(skb, GFP_ATOMIC);
+-		if (!nskb)
+-			continue;
+-
+-		if (sock_queue_rcv_skb(sk, nskb))
+-			kfree_skb(nskb);
+-	}
+-
+-	read_unlock(&hci_sk_list.lock);
+-}
+-
+ /* Send frame to monitor socket */
+ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+@@ -291,7 +263,7 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hdr->index = cpu_to_le16(hdev->id);
+ 	hdr->len = cpu_to_le16(skb->len);
+ 
+-	queue_monitor_skb(skb_copy);
++	hci_send_to_channel(HCI_CHANNEL_MONITOR, skb_copy, NULL);
+ 	kfree_skb(skb_copy);
+ }
+ 
+@@ -398,7 +370,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 
+ 		skb = create_monitor_event(hdev, event);
+ 		if (skb) {
+-			queue_monitor_skb(skb);
++			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb, NULL);
+ 			kfree_skb(skb);
+ 		}
+ 	}
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
