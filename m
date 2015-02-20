@@ -1,86 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Rename hci_send_to_control to hci_send_to_channel
-Date: Fri, 20 Feb 2015 12:37:19 +0200
-Message-Id: <1424428640-24697-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH 2/2] android/handsfree: Fix SCO disconnection while dialing
+Date: Fri, 20 Feb 2015 11:26:26 +0100
+Message-Id: <1424427986-31620-2-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1424427986-31620-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1424427986-31620-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-The hci_send_to_control() can be made more general purpose with a small
-change of passing the desired HCI channel as a parameter to it. This
-allows using it for the monitor channel as well as e.g. 6lowpan in the
-future.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+If we decide to hang up while dialing or alerting, SCO needs to be closed.
+Fixes: TC_AG_TCA_BV_04_C
 ---
- include/net/bluetooth/hci_core.h | 3 ++-
- net/bluetooth/hci_sock.c         | 7 ++++---
- net/bluetooth/mgmt.c             | 3 ++-
- 3 files changed, 8 insertions(+), 5 deletions(-)
+ android/handsfree.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a7bf77384464..a831c8ad10f1 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1265,7 +1265,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+diff --git a/android/handsfree.c b/android/handsfree.c
+index f4d6cf0..b0d8058 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -2403,6 +2403,10 @@ static void phone_state_idle(struct hf_device *dev, int num_active,
+ 					num_held ? (num_active ? 1 : 2) : 0);
  
- /* ----- HCI Sockets ----- */
- void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
--void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk);
-+void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
-+			 struct sock *skip_sk);
- void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
- 
- void hci_sock_dev_event(struct hci_dev *hdev, int event);
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 1d65c5be7c82..c35e4cd1ae48 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -183,8 +183,9 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
- 	kfree_skb(skb_copy);
- }
- 
--/* Send frame to control socket */
--void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk)
-+/* Send frame to sockets with specific channel */
-+void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
-+			 struct sock *skip_sk)
- {
- 	struct sock *sk;
- 
-@@ -202,7 +203,7 @@ void hci_send_to_control(struct sk_buff *skb, struct sock *skip_sk)
- 		if (sk->sk_state != BT_BOUND)
- 			continue;
- 
--		if (hci_pi(sk)->channel != HCI_CHANNEL_CONTROL)
-+		if (hci_pi(sk)->channel != channel)
- 			continue;
- 
- 		nskb = skb_clone(skb, GFP_ATOMIC);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3a1b537c9aa6..d5d46e7676f1 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -29,6 +29,7 @@
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/hci_sock.h>
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/mgmt.h>
- 
-@@ -242,7 +243,7 @@ static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 data_len,
- 	/* Time stamp */
- 	__net_timestamp(skb);
- 
--	hci_send_to_control(skb, skip_sk);
-+	hci_send_to_channel(HCI_CHANNEL_CONTROL, skb, skip_sk);
- 	kfree_skb(skb);
- 
- 	return 0;
+ 		update_indicator(dev, IND_CALLSETUP, 0);
++
++		/* disconnect SCO if we hang up while dialing or alerting */
++		if (num_active == 0 && num_held == 0)
++			disconnect_sco(dev);
+ 		break;
+ 	case HAL_HANDSFREE_CALL_STATE_IDLE:
+ 		if (dev->call_hanging_up) {
 -- 
-2.1.0
+1.9.1
 
