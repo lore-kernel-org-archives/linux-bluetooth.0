@@ -1,245 +1,244 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 3/3] tools/btgatt-client: Add signed write support
-Date: Fri, 20 Feb 2015 12:38:30 +0200
-Message-Id: <1424428710-8907-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1424428710-8907-1-git-send-email-luiz.dentz@gmail.com>
-References: <1424428710-8907-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC BlueZ 1/3] shared/att.c: Add signing key support
+Date: Fri, 20 Feb 2015 12:38:28 +0200
+Message-Id: <1424428710-8907-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This adds support for setting local and remote signing keys along with
+a callback for fetching/updating signing counter.
 ---
- tools/btgatt-client.c | 101 ++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 86 insertions(+), 15 deletions(-)
+ src/shared/att.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ src/shared/att.h |   6 ++++
+ 2 files changed, 104 insertions(+), 4 deletions(-)
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index e59d5db..af82991 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -64,6 +64,7 @@ static bool verbose = false;
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 152f49c..5363907 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -36,6 +36,7 @@
+ #include "lib/bluetooth.h"
+ #include "lib/uuid.h"
+ #include "src/shared/att.h"
++#include "src/shared/crypto.h"
  
- struct client {
- 	int fd;
+ #define ATT_MIN_PDU_LEN			1  /* At least 1 byte for the opcode. */
+ #define ATT_OP_CMD_MASK			0x40
+@@ -52,6 +53,9 @@
+ #define BT_ERROR_ALREADY_IN_PROGRESS		0xfe
+ #define BT_ERROR_OUT_OF_RANGE			0xff
+ 
++/* Length of signature in write signed packet */
++#define BT_ATT_SIGNATURE_LEN		12
++
+ struct att_send_op;
+ 
+ struct bt_att {
+@@ -85,6 +89,17 @@ struct bt_att {
+ 	bt_att_debug_func_t debug_callback;
+ 	bt_att_destroy_func_t debug_destroy;
+ 	void *debug_data;
++
++	struct bt_crypto *crypto;
++
++	struct sign_write_info *local_info;
++	struct sign_write_info *remote_info;
++};
++
++struct sign_write_info {
++	uint8_t key[16];
++	bt_att_counter_func_t counter;
++	void *user_data;
+ };
+ 
+ enum att_op_type {
+@@ -184,6 +199,8 @@ struct att_send_op {
+ 	bt_att_response_func_t callback;
+ 	bt_att_destroy_func_t destroy;
+ 	void *user_data;
++
 +	struct bt_att *att;
- 	struct gatt_db *db;
- 	struct bt_gatt_client *gatt;
- };
-@@ -169,7 +170,6 @@ static void service_removed_cb(struct gatt_db_attribute *attr, void *user_data)
- static struct client *client_create(int fd, uint16_t mtu)
- {
- 	struct client *cli;
--	struct bt_att *att;
- 
- 	cli = new0(struct client, 1);
- 	if (!cli) {
-@@ -177,24 +177,25 @@ static struct client *client_create(int fd, uint16_t mtu)
- 		return NULL;
- 	}
- 
--	att = bt_att_new(fd);
--	if (!att) {
-+	cli->att = bt_att_new(fd);
-+	if (!cli->att) {
- 		fprintf(stderr, "Failed to initialze ATT transport layer\n");
--		bt_att_unref(att);
-+		bt_att_unref(cli->att);
- 		free(cli);
- 		return NULL;
- 	}
- 
--	if (!bt_att_set_close_on_unref(att, true)) {
-+	if (!bt_att_set_close_on_unref(cli->att, true)) {
- 		fprintf(stderr, "Failed to set up ATT transport layer\n");
--		bt_att_unref(att);
-+		bt_att_unref(cli->att);
- 		free(cli);
- 		return NULL;
- 	}
- 
--	if (!bt_att_register_disconnect(att, att_disconnect_cb, NULL, NULL)) {
-+	if (!bt_att_register_disconnect(cli->att, att_disconnect_cb, NULL,
-+								NULL)) {
- 		fprintf(stderr, "Failed to set ATT disconnect handler\n");
--		bt_att_unref(att);
-+		bt_att_unref(cli->att);
- 		free(cli);
- 		return NULL;
- 	}
-@@ -203,16 +204,16 @@ static struct client *client_create(int fd, uint16_t mtu)
- 	cli->db = gatt_db_new();
- 	if (!cli->db) {
- 		fprintf(stderr, "Failed to create GATT database\n");
--		bt_att_unref(att);
-+		bt_att_unref(cli->att);
- 		free(cli);
- 		return NULL;
- 	}
- 
--	cli->gatt = bt_gatt_client_new(cli->db, att, mtu);
-+	cli->gatt = bt_gatt_client_new(cli->db, cli->att, mtu);
- 	if (!cli->gatt) {
- 		fprintf(stderr, "Failed to create GATT client\n");
- 		gatt_db_unref(cli->db);
--		bt_att_unref(att);
-+		bt_att_unref(cli->att);
- 		free(cli);
- 		return NULL;
- 	}
-@@ -221,7 +222,7 @@ static struct client *client_create(int fd, uint16_t mtu)
- 								NULL, NULL);
- 
- 	if (verbose) {
--		bt_att_set_debug(att, att_debug_cb, "att: ", NULL);
-+		bt_att_set_debug(cli->att, att_debug_cb, "att: ", NULL);
- 		bt_gatt_client_set_debug(cli->gatt, gatt_debug_cb, "gatt: ",
- 									NULL);
- 	}
-@@ -231,7 +232,6 @@ static struct client *client_create(int fd, uint16_t mtu)
- 									NULL);
- 
- 	/* bt_gatt_client already holds a reference */
--	bt_att_unref(att);
- 	gatt_db_unref(cli->db);
- 
- 	return cli;
-@@ -240,6 +240,8 @@ static struct client *client_create(int fd, uint16_t mtu)
- static void client_destroy(struct client *cli)
- {
- 	bt_gatt_client_unref(cli->gatt);
-+	bt_att_unref(cli->att);
-+	free(cli);
- }
- 
- static void print_uuid(const bt_uuid_t *uuid)
-@@ -625,12 +627,14 @@ static void write_value_usage(void)
- 	printf("Usage: write-value [options] <value_handle> <value>\n"
- 		"Options:\n"
- 		"\t-w, --without-response\tWrite without response\n"
-+		"\t-s, --signed-write\tsigned write command\n"
- 		"e.g.:\n"
- 		"\twrite-value 0x0001 00 01 00\n");
- }
- 
- static struct option write_value_options[] = {
- 	{ "without-response",	0, 0, 'w' },
-+	{ "signed-write",	0, 0, 's' },
- 	{ }
  };
  
-@@ -655,6 +659,7 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
- 	int length;
- 	uint8_t *value = NULL;
- 	bool without_response = false;
-+	bool signed_write = false;
- 
- 	if (!bt_gatt_client_is_ready(cli->gatt)) {
- 		printf("GATT client not initialized\n");
-@@ -669,12 +674,15 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
- 
- 	optind = 0;
- 	argv[0] = "write-value";
--	while ((opt = getopt_long(argc, argv, "+w", write_value_options,
-+	while ((opt = getopt_long(argc, argv, "+ws", write_value_options,
- 								NULL)) != -1) {
- 		switch (opt) {
- 		case 'w':
- 			without_response = true;
- 			break;
-+		case 's':
-+			signed_write = true;
-+			break;
- 		default:
- 			write_value_usage();
- 			return;
-@@ -728,7 +736,7 @@ static void cmd_write_value(struct client *cli, char *cmd_str)
- 
- 	if (without_response) {
- 		if (!bt_gatt_client_write_without_response(cli->gatt, handle,
--							false, value, length)) {
-+						signed_write, value, length)) {
- 			printf("Failed to initiate write without response "
- 								"procedure\n");
- 			goto done;
-@@ -1043,6 +1051,68 @@ static void cmd_get_sec_level(struct client *cli, char *cmd_str)
- 		printf("Security level: %u\n", level);
- }
- 
-+static bool convert_csrk_key(char *optarg, uint8_t csrk[16])
-+{
-+	int i;
-+	char value[2];
+ static void destroy_att_send_op(void *data)
+@@ -266,6 +283,12 @@ static bool encode_pdu(struct att_send_op *op, const void *pdu,
+ 						uint16_t length, uint16_t mtu)
+ {
+ 	uint16_t pdu_len = 1;
++	struct bt_att *att = op->att;
++	struct sign_write_info *info;
++	uint32_t sign_cnt;
 +
-+	if (strlen(optarg) != 32) {
-+		printf("csrk length is invalid\n");
++	if (op->opcode & ATT_OP_SIGNED_MASK)
++		pdu_len += BT_ATT_SIGNATURE_LEN;
+ 
+ 	if (length && pdu)
+ 		pdu_len += length;
+@@ -282,17 +305,36 @@ static bool encode_pdu(struct att_send_op *op, const void *pdu,
+ 	if (pdu_len > 1)
+ 		memcpy(op->pdu + 1, pdu, length);
+ 
+-	return true;
++	if (!(op->opcode & ATT_OP_SIGNED_MASK))
++		return true;
++
++	info = att->local_info;
++	if (!info)
++		goto fail;
++
++	if (!info->counter(&sign_cnt, info->user_data))
++		goto fail;
++
++	if ((bt_crypto_sign_att(att->crypto, info->key, op->pdu, 1 + length,
++				sign_cnt, &((uint8_t *) op->pdu)[1 + length])))
++		return true;
++
++fail:
++	free(op->pdu);
++	return false;
+ }
+ 
+-static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
+-						uint16_t length, uint16_t mtu,
++static struct att_send_op *create_att_send_op(uint8_t opcode,
++						const void *pdu,
++						uint16_t length,
++						struct bt_att *att,
+ 						bt_att_response_func_t callback,
+ 						void *user_data,
+ 						bt_att_destroy_func_t destroy)
+ {
+ 	struct att_send_op *op;
+ 	enum att_op_type op_type;
++	uint16_t mtu = att->mtu;
+ 
+ 	if (length && !pdu)
+ 		return NULL;
+@@ -323,6 +365,7 @@ static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
+ 	op->callback = callback;
+ 	op->destroy = destroy;
+ 	op->user_data = user_data;
++	op->att = att;
+ 
+ 	if (!encode_pdu(op, pdu, length, mtu)) {
+ 		free(op);
+@@ -810,6 +853,7 @@ static void bt_att_free(struct bt_att *att)
+ 		destroy_att_send_op(att->pending_ind);
+ 
+ 	io_destroy(att->io);
++	bt_crypto_unref(att->crypto);
+ 
+ 	queue_destroy(att->req_queue, NULL);
+ 	queue_destroy(att->ind_queue, NULL);
+@@ -841,6 +885,8 @@ struct bt_att *bt_att_new(int fd)
+ 
+ 	att->fd = fd;
+ 
++	att->local_info = NULL;
++	att->remote_info = NULL;
+ 	att->mtu = BT_ATT_DEFAULT_LE_MTU;
+ 	att->buf = malloc(att->mtu);
+ 	if (!att->buf)
+@@ -850,6 +896,10 @@ struct bt_att *bt_att_new(int fd)
+ 	if (!att->io)
+ 		goto fail;
+ 
++	att->crypto = bt_crypto_new();
++	if (!att->crypto)
++		goto fail;
++
+ 	att->req_queue = queue_new();
+ 	if (!att->req_queue)
+ 		goto fail;
+@@ -964,6 +1014,16 @@ bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu)
+ 	if (!buf)
+ 		return false;
+ 
++	if (att->local_info) {
++		free(att->local_info);
++		att->local_info = NULL;
++	}
++
++	if (att->remote_info) {
++		free(att->remote_info);
++		att->remote_info = NULL;
++	}
++
+ 	free(att->buf);
+ 
+ 	att->mtu = mtu;
+@@ -1047,7 +1107,7 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
+ 	if (!att || !att->io)
+ 		return 0;
+ 
+-	op = create_att_send_op(opcode, pdu, length, att->mtu, callback,
++	op = create_att_send_op(opcode, pdu, length, att, callback,
+ 							user_data, destroy);
+ 	if (!op)
+ 		return 0;
+@@ -1307,3 +1367,37 @@ bool bt_att_set_sec_level(struct bt_att *att, int level)
+ 
+ 	return true;
+ }
++
++static bool sign_info_set_key(struct sign_write_info **info, uint8_t key[16],
++				bt_att_counter_func_t func, void *user_data)
++{
++	if (!(*info)) {
++		*info = new0(struct sign_write_info, 1);
++		if (!(*info))
++			return false;
++	}
++
++	(*info)->counter = func;
++	(*info)->user_data = user_data;
++	memcpy((*info)->key, key, 16);
++
++	return true;
++}
++
++bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
++				bt_att_counter_func_t func, void *user_data)
++{
++	if (!att)
 +		return false;
-+	}
 +
-+	for (i = 0; i < 16; i++) {
-+		strncpy(value, optarg + (i * 2), 2);
-+		csrk[i] = strtol(value, NULL, 16);
-+	}
-+
-+	return true;
++	return sign_info_set_key(&att->local_info, sign_key, func, user_data);
 +}
 +
-+static void set_csrk_usage(void)
++bool bt_att_set_remote_key(struct bt_att *att, uint8_t sign_key[16],
++				bt_att_counter_func_t func, void *user_data)
 +{
-+	printf("Usage: set-csrk [options]\nOptions:\n"
-+		"\t -c, --csrk <csrk>\tCSRK\n"
-+		"e.g.:\n"
-+		"\tset-csrk -c D8515948451FEA320DC05A2E88308188\n");
++	if (!att)
++		return false;
++
++	return sign_info_set_key(&att->remote_info, sign_key, func, user_data);
 +}
-+
-+static bool local_counter(uint32_t *sign_cnt, void *user_data)
-+{
-+	static uint32_t cnt = 0;
-+
-+	*sign_cnt = cnt++;
-+
-+	return true;
-+}
-+
-+static void cmd_set_csrk(struct client *cli, char *cmd_str)
-+{
-+	char *argv[3];
-+	int argc = 0;
-+	uint8_t csrk[16];
-+
-+	memset(csrk, 0, 16);
-+
-+	if (!parse_args(cmd_str, 2, argv, &argc)) {
-+		set_csrk_usage();
-+		return;
-+	}
-+
-+	if (argc != 2) {
-+		set_csrk_usage();
-+		return;
-+	}
-+
-+	if (!strcmp(argv[0], "-c") || !strcmp(argv[0], "--csrk")) {
-+		if (convert_csrk_key(argv[1], csrk))
-+			bt_att_set_local_key(cli->att, csrk, local_counter,
-+									cli);
-+
-+	} else
-+		set_csrk_usage();
-+}
-+
- static void cmd_help(struct client *cli, char *cmd_str);
+diff --git a/src/shared/att.h b/src/shared/att.h
+index 5256ff9..a440aaf 100644
+--- a/src/shared/att.h
++++ b/src/shared/att.h
+@@ -46,6 +46,7 @@ typedef void (*bt_att_debug_func_t)(const char *str, void *user_data);
+ typedef void (*bt_att_timeout_func_t)(unsigned int id, uint8_t opcode,
+ 							void *user_data);
+ typedef void (*bt_att_disconnect_func_t)(int err, void *user_data);
++typedef bool (*bt_att_counter_func_t)(uint32_t *sign_cnt, void *user_data);
  
- typedef void (*command_func_t)(struct client *cli, char *cmd_str);
-@@ -1071,6 +1141,7 @@ static struct {
- 					"Set security level on le connection"},
- 	{ "get-sec-level", cmd_get_sec_level,
- 					"Get security level on le connection"},
-+	{ "set-csrk", cmd_set_csrk, "\tSet CSRK for signed write command"},
- 	{ }
- };
+ bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
+ 				void *user_data, bt_att_destroy_func_t destroy);
+@@ -84,3 +85,8 @@ bool bt_att_unregister_all(struct bt_att *att);
  
+ int bt_att_get_sec_level(struct bt_att *att);
+ bool bt_att_set_sec_level(struct bt_att *att, int level);
++
++bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
++			bt_att_counter_func_t func, void *user_data);
++bool bt_att_set_remote_key(struct bt_att *att, uint8_t sign_key[16],
++			bt_att_counter_func_t func, void *user_data);
 -- 
 2.1.0
 
