@@ -2,58 +2,163 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 12/18] core: gatt: Add btd_gatt_database_notify function
-Date: Fri, 20 Feb 2015 17:56:57 -0800
-Message-Id: <1424483824-27374-13-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 11/18] core: gatt: Create CCC for external characteristic
+Date: Fri, 20 Feb 2015 17:56:56 -0800
+Message-Id: <1424483824-27374-12-git-send-email-armansito@chromium.org>
 In-Reply-To: <1424483824-27374-1-git-send-email-armansito@chromium.org>
 References: <1424483824-27374-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add the btd_gatt_database_notify function to database's
-public API. This allows upper layers to send out notifications
-and indications to all connected devices that have configured the
-specified CCC descriptor.
+This patch adds support for adding a CCC descriptor entry for an
+external characteristic, if it has the 'notify' or 'indicate' property.
+When the CCC descriptor is written to, bluetoothd calls the
+'StartNotify' and 'StopNotify' methods on the characteristic in a
+reference counted manner.
 ---
- src/gatt-database.c | 4 ++--
- src/gatt-database.h | 5 +++++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ src/gatt-manager.c | 106 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 100 insertions(+), 6 deletions(-)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index ebfcf2d..d75b971 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -737,7 +737,7 @@ static void send_notification_to_device(void *data, void *user_data)
- 							NULL, NULL);
- }
+diff --git a/src/gatt-manager.c b/src/gatt-manager.c
+index ac9e01b..03f754a 100644
+--- a/src/gatt-manager.c
++++ b/src/gatt-manager.c
+@@ -77,7 +77,9 @@ struct external_chrc {
+ 	uint8_t props;
+ 	uint8_t ext_props;
+ 	struct gatt_db_attribute *attrib;
++	struct gatt_db_attribute *ccc;
+ 	struct queue *pending_ops;
++	unsigned int ntfy_cnt;
+ };
  
--static void send_notification_to_devices(struct btd_gatt_database *database,
-+void btd_gatt_database_notify(struct btd_gatt_database *database,
- 					uint16_t handle, const uint8_t *value,
- 					uint16_t len, uint16_t ccc_handle,
- 					bool indicate)
-@@ -781,7 +781,7 @@ static void send_service_changed(struct btd_gatt_database *database,
- 	put_le16(start, value);
- 	put_le16(end, value + 2);
+ struct pending_dbus_op {
+@@ -377,10 +379,14 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
+ 			return;
+ 		}
  
--	send_notification_to_devices(database, handle, value, sizeof(value),
-+	btd_gatt_database_notify(database, handle, value, sizeof(value),
- 							ccc_handle, true);
- }
- 
-diff --git a/src/gatt-database.h b/src/gatt-database.h
-index 163b601..2a89ad6 100644
---- a/src/gatt-database.h
-+++ b/src/gatt-database.h
-@@ -34,3 +34,8 @@ btd_gatt_database_add_ccc(struct btd_gatt_database *database,
- 				btd_gatt_database_ccc_write_t write_callback,
- 				void *user_data,
- 				btd_gatt_database_destroy_t destroy);
+-		/*
+-		 * TODO: Determine descriptors count to add based on special
+-		 * characteristic properties (e.g. extended properties).
+-		 */
++		if ((chrc->props & BT_GATT_CHRC_PROP_NOTIFY ||
++				chrc->props & BT_GATT_CHRC_PROP_INDICATE) &&
++				!incr_attr_count(service, 1)) {
++			error("Failed to increment attribute count for CCC");
++			service->failed = true;
++			return;
++		}
 +
-+void btd_gatt_database_notify(struct btd_gatt_database *database,
-+					uint16_t handle, const uint8_t *value,
-+					uint16_t len, uint16_t ccc_handle,
-+					bool indicate);
+ 
+ 		queue_push_tail(service->chrcs, chrc);
+ 	} else
+@@ -668,6 +674,87 @@ static uint32_t permissions_from_props(uint8_t props, uint8_t ext_props)
+ 	return perm;
+ }
+ 
++static uint8_t ccc_write_cb(uint16_t value, void *user_data)
++{
++	struct external_chrc *chrc = user_data;
++
++	DBG("External CCC write received with value: 0x%04x", value);
++
++	/* Notifications/indications disabled */
++	if (!value) {
++		if (!chrc->ntfy_cnt)
++			return 0;
++
++		if (__sync_sub_and_fetch(&chrc->ntfy_cnt, 1))
++			return 0;
++
++		/*
++		 * Send request to stop notifying. This is best-effort
++		 * operation, so simply ignore the return the value.
++		 */
++		g_dbus_proxy_method_call(chrc->proxy, "StopNotify", NULL,
++							NULL, NULL, NULL);
++		return 0;
++	}
++
++	/*
++	 * TODO: All of the errors below should fall into the so called
++	 * "Application Error" range. Since there is no well defined error for
++	 * these, we return a generic ATT protocol error for now.
++	 */
++
++	if (chrc->ntfy_cnt == UINT_MAX) {
++		/* Maximum number of per-device CCC descriptors configured */
++		return BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
++	}
++
++	/* Don't support undefined CCC values yet */
++	if (value > 2 ||
++		(value == 1 && !(chrc->props & BT_GATT_CHRC_PROP_NOTIFY)) ||
++		(value == 2 && !(chrc->props & BT_GATT_CHRC_PROP_INDICATE)))
++		return BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
++
++	/*
++	 * Always call StartNotify for an incoming enables and ignore the return
++	 * value for now.
++	 */
++	if (g_dbus_proxy_method_call(chrc->proxy,
++						"StartNotify", NULL, NULL,
++						NULL, NULL) == FALSE)
++		return BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
++
++	__sync_fetch_and_add(&chrc->ntfy_cnt, 1);
++
++	return 0;
++}
++
++static bool create_ccc_entry(struct external_service *service,
++						struct external_chrc *chrc)
++{
++	uint16_t svc_start;
++	struct btd_gatt_database *database;
++
++	if (!gatt_db_attribute_get_service_handles(service->attrib, &svc_start,
++									NULL)) {
++		error("Failed to obtain service handle");
++		return false;
++	}
++
++	database = btd_adapter_get_database(service->manager->adapter);
++	if (!database)
++		return false;
++
++	chrc->ccc = btd_gatt_database_add_ccc(database, svc_start,
++								ccc_write_cb,
++								chrc, NULL);
++	if (!chrc->ccc) {
++		error("Failed to create CCC entry for characteristic");
++		return false;
++	}
++
++	return true;
++}
++
+ static bool create_chrc_entry(struct external_service *service,
+ 						struct external_chrc *chrc)
+ {
+@@ -695,9 +782,16 @@ static bool create_chrc_entry(struct external_service *service,
+ 						chrc->props, chrc_read_cb,
+ 						chrc_write_cb, chrc);
+ 
+-	/* TODO: Create descriptor entries */
++	if (!chrc->attrib) {
++		error("Failed to create characteristic entry in database");
++		return false;
++	}
++
++	if (chrc->props & BT_GATT_CHRC_PROP_NOTIFY ||
++				chrc->props & BT_GATT_CHRC_PROP_INDICATE)
++		return create_ccc_entry(service, chrc);
+ 
+-	return !!chrc->attrib;
++	return true;
+ }
+ 
+ static bool create_service_entry(struct external_service *service)
 -- 
 2.2.0.rc0.207.ga3a616c
 
