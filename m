@@ -1,71 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2 1/2] Bluetooth: btusb: Add setup callback for chip init
- on USB
-Date: Sun, 22 Feb 2015 23:55:32 +0000
-Message-ID: <FD59A293-78F5-422A-9992-31A460F5CDA1@qca.qualcomm.com>
-References: <ed9be4d986c749d7a0b35a335184a932@nalasexr02e.na.qualcomm.com>
-In-Reply-To: <ed9be4d986c749d7a0b35a335184a932@nalasexr02e.na.qualcomm.com>
-Content-Type: text/plain; charset="Windows-1252"
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Fix issue with CSR based Intel Wireless controllers
+Date: Sun, 22 Feb 2015 15:41:18 -0800
+Message-Id: <1424648478-5939-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Older Wireless controllers from Intel used CSR chips to provide support
+for Bluetooth.
 
-On Feb 15, 2015, at 3:06 PM, Kim, Ben Young Tae <ytkim@qca.qualcomm.com> wr=
-ote:
+The commit d0ac9eb72 (Bluetooth: btusb: Ignore unknown Intel devices
+with generic descriptor) disabled these older controllers. To enable
+them again, put them into the blacklist and mark them clearly as CSR
+based controllers.
 
-> Some of chipset does not allow to send a patch or config files through
-> HCI VS channel at early stage as well as they don't support to send
-> USB patch files to other channel except USB bulk path.
->=20
-> New callback added is for initialization of BT controller through USB
->=20
-> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-> ---
-> drivers/bluetooth/btusb.c | 11 +++++++++++
-> 1 file changed, 11 insertions(+)
->=20
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 3ca2e1b..73e1066 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -337,6 +337,8 @@ struct btusb_data {
->=20
-> 	int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
-> 	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
-> +
-> +	int (*setup_on_usb)(struct hci_dev *hdev);
-> };
->=20
-> static inline void btusb_free_frags(struct btusb_data *data)
-> @@ -878,6 +880,15 @@ static int btusb_open(struct hci_dev *hdev)
->=20
-> 	BT_DBG("%s", hdev->name);
->=20
-> +	/* Patching USB firmware files prior to starting any URBs of HCI path
-> +	 * It is more safe to use USB bulk channel for downloading USB patch
-> +	 */
-> +	if (data->setup_on_usb) {
-> +		err =3D data->setup_on_usb(hdev);
-> +		if (err <0)
-> +			return err;
-> +	}
-> +
-> 	err =3D usb_autopm_get_interface(data->intf);
-> 	if (err < 0)
-> 		return err;
-> --=20
-> 1.8.1.5
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=8087 ProdID=07da Rev=78.69
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-PING=85
+Reported-by: Kenneth R. Crudup <kenny@panix.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks
-=97 Ben Kim=
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3ca2e1bf7bfa..8c1bf6190533 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -273,6 +273,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x1286, 0x2046), .driver_info = BTUSB_MARVELL },
+ 
+ 	/* Intel Bluetooth devices */
++	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+ 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
+ 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
+ 	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_NEW },
+-- 
+2.1.0
+
