@@ -1,65 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Fix issue with CSR based Intel Wireless controllers
-Date: Sun, 22 Feb 2015 15:41:18 -0800
-Message-Id: <1424648478-5939-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <A863E4B8-1461-4680-A8CE-40FDDB04858B@holtmann.org>
+References: <1832240.mNuY6LIF5L@moneypit> <A863E4B8-1461-4680-A8CE-40FDDB04858B@holtmann.org>
+From: Greg Turner <gmt@be-evil.net>
+Date: Sun, 22 Feb 2015 14:04:09 -0800
+Message-ID: <CA+VB3NQeeMzdi_n0ZMgQtivBPUMfaOK8J=EFubYKT0+jM2EubA@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth/l2cap: silence framedrop kmsg noise
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Older Wireless controllers from Intel used CSR chips to provide support
-for Bluetooth.
+On Sun, Feb 22, 2015 at 12:53 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> can you send a btmon trace for this
 
-The commit d0ac9eb72 (Bluetooth: btusb: Ignore unknown Intel devices
-with generic descriptor) disabled these older controllers. To enable
-them again, put them into the blacklist and mark them clearly as CSR
-based controllers.
+sure, check your email.
 
-T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=8087 ProdID=07da Rev=78.69
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> and be more specific which devices are these.
 
-Reported-by: Kenneth R. Crudup <kenny@panix.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+It's not pretty.  It's a (usb id) 046d:c709.  They come bundled with
+Logitech keyboards.  They require hid2hci (udev, or somebody, does it
+for me automagically these days).
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3ca2e1bf7bfa..8c1bf6190533 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -273,6 +273,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x1286, 0x2046), .driver_info = BTUSB_MARVELL },
- 
- 	/* Intel Bluetooth devices */
-+	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
- 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
- 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
- 	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_NEW },
--- 
-2.1.0
+I believe the radio is a BCM2045A... or maybe not... it's definitely a
+fairly obscure thing to use as a radio, as Logitech pretty much goes
+out of their way to pretend it's married to the keyboard it comes
+with.
 
+Is there some good way to ask the kernel what board it thinks it's
+talking to?  I have heard some grumbling about Logitech recycling the
+0xc709 product ID although I'm not sure I trust whoever said it :(
+
+The device has a plastic OEM "shell" but the plastic is
+semitransparent.  If I shine my flashlight at it just right, I can see
+an inner plastic(?) enclosure with different markings than Logitech's,
+but it's partially obscured -- all I can read on that inner device is
+the last line: "0541 LF".  I could definitely sacrifice it for
+science, if it became necessary.
+
+I only ever use a2dp, avrcp and hfp (or maybe hsp?, can't keep 'em
+straight in my head); I have a couple different gizmos and they all
+fill my logs with that message.
+
+> There seems to be something really off going on here.
+
+Really?  That's sort-of encouraging... There were so many reports
+online and everyone sounded so resigned to this fate that I just
+assumed that was the expected result.
+
+One odd behavior I have observed (aside from logs full of garbage) --
+if I go too far out of range, the entire connection between my device
+and the dongle just "breaks".  If I come back into range, they are
+never able to find each other and resume their conversation until
+reboot my gizmo (or sometimes it will come back online after a very
+long time).  Yet, the dongle still thinks they're connected.  I've
+learned to just leave them behind before leaving the room :)
+
+Greg Turner
+gmt@be-evil.net
