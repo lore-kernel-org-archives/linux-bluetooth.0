@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/5] shared/gatt-client: Add support for signed write
-Date: Mon, 23 Feb 2015 20:13:59 +0200
-Message-Id: <1424715241-4980-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/5] shared/att.c: Add server signing key support
+Date: Mon, 23 Feb 2015 20:13:58 +0200
+Message-Id: <1424715241-4980-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1424715241-4980-1-git-send-email-luiz.dentz@gmail.com>
 References: <1424715241-4980-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,39 +11,164 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This adds support for setting remote signing keys along with a callback
+for validating the counter.
 ---
- src/shared/gatt-client.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ src/shared/att.c | 92 +++++++++++++++++++++++++++++++++++++++++---------------
+ src/shared/att.h |  2 ++
+ 2 files changed, 70 insertions(+), 24 deletions(-)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index ac2692f..a966dd0 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -2129,10 +2129,6 @@ unsigned int bt_gatt_client_write_without_response(
- 	if (!client)
- 		return 0;
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 4bfae5f..aa06dc6 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -93,6 +93,7 @@ struct bt_att {
+ 	struct bt_crypto *crypto;
  
--	/* TODO: Support this once bt_att_send supports signed writes. */
--	if (signed_write)
--		return 0;
+ 	struct sign_info *local_sign;
++	struct sign_info *remote_sign;
+ };
+ 
+ struct sign_info {
+@@ -686,21 +687,6 @@ static bool opcode_match(uint8_t opcode, uint8_t test_opcode)
+ 	return opcode == test_opcode;
+ }
+ 
+-static void notify_handler(void *data, void *user_data)
+-{
+-	struct att_notify *notify = data;
+-	struct notify_data *not_data = user_data;
 -
- 	req = request_create(client);
- 	if (!req)
- 		return 0;
-@@ -2140,9 +2136,10 @@ unsigned int bt_gatt_client_write_without_response(
- 	put_le16(value_handle, pdu);
- 	memcpy(pdu + 2, value, length);
+-	if (!opcode_match(notify->opcode, not_data->opcode))
+-		return;
+-
+-	not_data->handler_found = true;
+-
+-	if (notify->callback)
+-		notify->callback(not_data->opcode, not_data->pdu,
+-					not_data->pdu_len, notify->user_data);
+-}
+-
+ static void respond_not_supported(struct bt_att *att, uint8_t opcode)
+ {
+ 	uint8_t pdu[4];
+@@ -714,28 +700,76 @@ static void respond_not_supported(struct bt_att *att, uint8_t opcode)
+ 									NULL);
+ }
  
--	req->att_id = bt_att_send(client->att, BT_ATT_OP_WRITE_CMD,
--							pdu, sizeof(pdu),
--							NULL, NULL, NULL);
-+	req->att_id = bt_att_send(client->att,
-+				signed_write ?  BT_ATT_OP_SIGNED_WRITE_CMD :
-+				BT_ATT_OP_WRITE_CMD, pdu, sizeof(pdu),
-+				NULL, NULL, NULL);
- 	if (!req->att_id) {
- 		request_unref(req);
- 		return 0;
++static bool handle_signed(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
++								ssize_t pdu_len)
++{
++	uint8_t *signature;
++	uint32_t sign_cnt;
++	struct sign_info *sign;
++
++	/* Check if there is enough data for a signature */
++	if (pdu_len < 2 + BT_ATT_SIGNATURE_LEN)
++		goto fail;
++
++	sign = att->remote_sign;
++	if (!sign)
++		goto fail;
++
++	signature = pdu + (pdu_len - BT_ATT_SIGNATURE_LEN);
++	sign_cnt = get_le32(signature);
++
++	/* Validate counter */
++	if (!sign->counter(&sign_cnt, sign->user_data))
++		goto fail;
++
++	/* Generate signature and verify it */
++	if (!bt_crypto_sign_att(att->crypto, sign->key, pdu,
++				pdu_len - BT_ATT_SIGNATURE_LEN, sign_cnt,
++				signature))
++		goto fail;
++
++	return true;
++
++fail:
++	util_debug(att->debug_callback, att->debug_data,
++			"ATT failed to verify signature: 0x%02x", opcode);
++
++	return false;
++}
++
+ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 								ssize_t pdu_len)
+ {
+-	struct notify_data data;
++	const struct queue_entry *entry;
++	bool found;
++
++	if (opcode & ATT_OP_SIGNED_MASK) {
++		if (!handle_signed(att, opcode, pdu, pdu_len))
++			return;
++		pdu_len -= BT_ATT_SIGNATURE_LEN;
++	}
+ 
+ 	bt_att_ref(att);
+ 
+-	memset(&data, 0, sizeof(data));
+-	data.opcode = opcode;
++	for (found = false, entry = queue_get_entries(att->notify_list); entry;
++							entry = entry->next) {
++		struct att_notify *notify = entry->data;
+ 
+-	if (pdu_len > 0) {
+-		data.pdu = pdu;
+-		data.pdu_len = pdu_len;
+-	}
++		if (!opcode_match(notify->opcode, opcode))
++			continue;
++
++		found = true;
+ 
+-	queue_foreach(att->notify_list, notify_handler, &data);
++		if (notify->callback)
++			notify->callback(opcode, pdu, pdu_len,
++							notify->user_data);
++	}
+ 
+ 	/*
+ 	 * If this was a request and no handler was registered for it, respond
+ 	 * with "Not Supported"
+ 	 */
+-	if (!data.handler_found && get_op_type(opcode) == ATT_OP_TYPE_REQ)
++	if (!found && get_op_type(opcode) == ATT_OP_TYPE_REQ)
+ 		respond_not_supported(att, opcode);
+ 
+ 	bt_att_unref(att);
+@@ -862,6 +896,7 @@ static void bt_att_free(struct bt_att *att)
+ 		att->debug_destroy(att->debug_data);
+ 
+ 	free(att->local_sign);
++	free(att->remote_sign);
+ 
+ 	free(att->buf);
+ 
+@@ -1376,3 +1411,12 @@ bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
+ 
+ 	return sign_set_key(&att->local_sign, sign_key, func, user_data);
+ }
++
++bool bt_att_set_remote_key(struct bt_att *att, uint8_t sign_key[16],
++				bt_att_counter_func_t func, void *user_data)
++{
++	if (!att)
++		return false;
++
++	return sign_set_key(&att->remote_sign, sign_key, func, user_data);
++}
+diff --git a/src/shared/att.h b/src/shared/att.h
+index 0cd1a4c..a440aaf 100644
+--- a/src/shared/att.h
++++ b/src/shared/att.h
+@@ -88,3 +88,5 @@ bool bt_att_set_sec_level(struct bt_att *att, int level);
+ 
+ bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
+ 			bt_att_counter_func_t func, void *user_data);
++bool bt_att_set_remote_key(struct bt_att *att, uint8_t sign_key[16],
++			bt_att_counter_func_t func, void *user_data);
 -- 
 2.1.0
 
