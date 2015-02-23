@@ -1,72 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Feb 2015 09:45:26 +0200
+Date: Mon, 23 Feb 2015 09:39:21 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth 2015-02-23
-Message-ID: <20150223074526.GA8287@t440s.lan>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btusb: Fix issue with CSR based Intel
+ Wireless controllers
+Message-ID: <20150223073921.GA6437@t440s.lan>
+References: <1424648478-5939-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="jI8keyz6grp/JLjh"
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1424648478-5939-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcel,
 
---jI8keyz6grp/JLjh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Sun, Feb 22, 2015, Marcel Holtmann wrote:
+> Older Wireless controllers from Intel used CSR chips to provide support
+> for Bluetooth.
+> 
+> The commit d0ac9eb72 (Bluetooth: btusb: Ignore unknown Intel devices
+> with generic descriptor) disabled these older controllers. To enable
+> them again, put them into the blacklist and mark them clearly as CSR
+> based controllers.
+> 
+> T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=8087 ProdID=07da Rev=78.69
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> Reported-by: Kenneth R. Crudup <kenny@panix.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btusb.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-Hi Dave,
-
-Here's one important fix for the 4.0-rc series. Refactoring of Intel
-Bluetooth controller detection ended up disabling some older ones which
-are based on CSR hardware. This patch re-introduces the necessary USB id
-and fixes the breakage.
-
-Please let me know if there are any issues pulling. Thanks.
+Applied to bluetooth.git. Thanks.
 
 Johan
-
----
-The following changes since commit 6514890f7aa8dd75fa46e282a1c7a8615e86f363:
-
-  tcp: fix tcp_should_expand_sndbuf() to use tcp_packets_in_flight() (2015-02-22 23:07:11 -0500)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to 407550fe2ccfca3fa0ac4bcdb0a412adeabf84ba:
-
-  Bluetooth: btusb: Fix issue with CSR based Intel Wireless controllers (2015-02-23 09:30:35 +0200)
-
-----------------------------------------------------------------
-Marcel Holtmann (1):
-      Bluetooth: btusb: Fix issue with CSR based Intel Wireless controllers
-
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
-
-
---jI8keyz6grp/JLjh
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJU6tqWAAoJECQj9vv5qNQSFLwP/2kQUHsh3VbXoo2q/jAUWamA
-LJT0mJYAf7fpvDVvaiSaAGm9eFZrmQsCduTY+GZRkILX5B/LqCmtrr1eLoOBjDjR
-e7BzA3PpK29cxsnh9uyRr3VG/GKB4GsZYLpoNGQr47x0PCilehv/m428wIf0y0HI
-NI7VKODFvnhK1Mzj2msYSp1wGEScu/XprGirz3i1oZlf/e9ery6j8y92PiRx+KQ3
-Fd4WKf11Wxow11bIwi2A+0VmG0bL6etTU4b8ijSeVI8FtY+27QVFxVcj7oLC7c4e
-xWhfpclt7IMzsHVO5L9WlNAo8miLAyjQ/rXS1Wt/A/fz/GfKYa4XaWyso/T01XlT
-jNHqrVjXO1XEh2bFbTjgGVbcSu7EQZ1X/hv2CRKs0TvlZt+tS5+E3bzBqedAxFxz
-fzrbca41JrRFYpu6qOIw1Rv21rxzYspkghNiKwzaQFc1ugflrjdUz2I8iu6Q9aBB
-3ueiZVDKY7Fd0msofVzV5M8UG1rLogQwwm65B3luMdKu8UtO8zZH6E8Tdof2lDxk
-Y5ogWT2Et0PCFusQn837cyHdwg4Z6VZXD8M3FqS/wFmdcSS4qTNKRZu9BwkU4eqN
-/bCqI2yDpj41kaKISqBXo6t/InwRLmYclZ5eB9ibSTwRtFSKgasTcWpzjptqso8U
-/Ovt4A7kGGX++5SN67/1
-=n+E9
------END PGP SIGNATURE-----
-
---jI8keyz6grp/JLjh--
