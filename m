@@ -1,61 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Feb 2015 09:39:21 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: btusb: Fix issue with CSR based Intel
- Wireless controllers
-Message-ID: <20150223073921.GA6437@t440s.lan>
-References: <1424648478-5939-1-git-send-email-marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Thangella, Pruthvidhar" <pthangel@qca.qualcomm.com>,
+	"marcin.kraglak@tieto.com" <marcin.kraglak@tieto.com>
+Subject: Re: [PATCH v2 1/2] Bluetooth: btusb: Add setup callback for chip init
+ on USB
+Date: Mon, 23 Feb 2015 02:56:19 +0000
+Message-ID: <F76256A0-F007-4034-83D3-154C12BB5D6E@qca.qualcomm.com>
+References: <ed9be4d986c749d7a0b35a335184a932@nalasexr02e.na.qualcomm.com>,<5F078510-AE2E-4790-99CA-21AC7ECC0FBE@holtmann.org>
+In-Reply-To: <5F078510-AE2E-4790-99CA-21AC7ECC0FBE@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1424648478-5939-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Sun, Feb 22, 2015, Marcel Holtmann wrote:
-> Older Wireless controllers from Intel used CSR chips to provide support
-> for Bluetooth.
-> 
-> The commit d0ac9eb72 (Bluetooth: btusb: Ignore unknown Intel devices
-> with generic descriptor) disabled these older controllers. To enable
-> them again, put them into the blacklist and mark them clearly as CSR
-> based controllers.
-> 
-> T:  Bus=02 Lev=02 Prnt=02 Port=05 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=8087 ProdID=07da Rev=78.69
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> Reported-by: Kenneth R. Crudup <kenny@panix.com>
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/btusb.c | 1 +
->  1 file changed, 1 insertion(+)
+> On Feb 23, 2015, at 11:36 AM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+>=20
+> Hi Ben,
+>=20
+>> Some of chipset does not allow to send a patch or config files through
+>> HCI VS channel at early stage as well as they don't support to send
+>> USB patch files to other channel except USB bulk path.
+>>=20
+>> New callback added is for initialization of BT controller through USB
+>>=20
+>> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+>> ---
+>> drivers/bluetooth/btusb.c | 11 +++++++++++
+>> 1 file changed, 11 insertions(+)
+>>=20
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index 3ca2e1b..73e1066 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -337,6 +337,8 @@ struct btusb_data {
+>>=20
+>>    int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
+>>    int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
+>> +
+>> +    int (*setup_on_usb)(struct hci_dev *hdev);
+>=20
+> I am trying to come up with a better callback name here. _on_usb is kind =
+of a duplicate information. Since it is a USB driver. My problem is that I =
+have not come up with a great name for the callback yet.
+>> };
+>>=20
+>> static inline void btusb_free_frags(struct btusb_data *data)
+>> @@ -878,6 +880,15 @@ static int btusb_open(struct hci_dev *hdev)
+>>=20
+>>    BT_DBG("%s", hdev->name);
+>>=20
+>> +    /* Patching USB firmware files prior to starting any URBs of HCI pa=
+th
+>> +     * It is more safe to use USB bulk channel for downloading USB patc=
+h
+>> +     */
+>=20
+> While you would be using it for firmware patching, it is a bit more gener=
+ic. So the comment should be a bit more generic as well.
+>=20
 
-Applied to bluetooth.git. Thanks.
+I'm okay to change better callback name here and update comments with more =
+general. It would be appreciated let us know once merging changes.
 
-Johan
+>> +    if (data->setup_on_usb) {
+>> +        err =3D data->setup_on_usb(hdev);
+>> +        if (err <0)
+>> +            return err;
+>> +    }
+>> +
+>=20
+> Regards
+>=20
+> Marcel
+>=20
+
+Thanks
+Ben Kim=
