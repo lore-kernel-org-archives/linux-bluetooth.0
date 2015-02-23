@@ -1,213 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/5] shared/att.c: Add client signing key support
-Date: Mon, 23 Feb 2015 20:13:57 +0200
-Message-Id: <1424715241-4980-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <20150223130923.GA28722@t440s.lan>
+References: <1423528495-13173-1-git-send-email-jpawlowski@google.com>
+	<CABBYNZLaFta8897Xr91UQ-sUy-COviXxRP84GKTyYSUQDfDjyg@mail.gmail.com>
+	<20150223130923.GA28722@t440s.lan>
+Date: Mon, 23 Feb 2015 08:41:38 -0800
+Message-ID: <CAD0=r8zStMB6WVf0iGW59rS_x_+c-gmNUmG1OhhdXOatSj_amw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5] doc/adapter-api.txt: StartFilteredDiscovery method.
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Jakub Pawlowski <jpawlowski@google.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan, Luiz
 
-This adds support for setting local signing keys along with a callback
-for loading the counter.
----
- src/shared/att.c | 87 ++++++++++++++++++++++++++++++++++++++++++++++++++------
- src/shared/att.h |  4 +++
- 2 files changed, 82 insertions(+), 9 deletions(-)
+On Mon, Feb 23, 2015 at 5:09 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Mon, Feb 16, 2015, Luiz Augusto von Dentz wrote:
+>> > +               void StartFilteredDiscovery(dict filter)
+>> > +
+>> > +                       This method starts the device discovery session with
+>> > +                       filtering by uuids, and rssi or pathloss value. Use
+>> > +                       StopDiscovery to release the sessions acquired.
+>> > +
+>> > +                       Parameters that can be set in filter dictionary include
+>> > +                       the following:
+>> > +
+>> > +                       array{string} UUIDs : filtered service UUIDs (required)
+>> > +                       int16 RSSI      : RSSI threshold value (optional)
+>> > +                       uint16 pathloss : Pathloss threshold value (optional)
+>> > +                       string transport: type of scan to run
+>> > +
+>> > +                       When a device is found that advertise any UUID from
+>> > +                       UUIDs, it will be reported if:
+>> > +                       - pathloss and RSSI are both empty,
+>> > +                       - only pathloss param is set, device advertise TX pwer,
+>> > +                         and computed pathloss is less than pathloss param,
+>> > +                       - only RSSI param is set, and received RSSI is higher
+>> > +                         than RSSI param,
+>> > +
+>> > +                       transport parameter determines the type of scan:
+>> > +                               "auto"  - interleaved scan
+>> > +                               "bredr" - br/edr inquiry
+>> > +                               "le"    - le only scan, default value
+>> > +
+>> > +                       This process will start creating Device objects as new
+>> > +                       devices matching criteria are discovered. It will also
+>> > +                       emit PropertiesChanged signal for already existing
+>> > +                       Device objects, with updated RSSI value.
+>> > +
+>> > +                       StartDiscovery (SD) takes precedence over
+>> > +                       StartFilteredDiscovery (SFD). That means that you should
+>> > +                       check Discovering property before calling SFD, otherwise
+>> > +                       it would fail when any SD session is in progress.
+>> > +                       Calling SD when SFD is in progress pause all SFD
+>> > +                       sessions, and start them back when all SD sessions are
+>> > +                       finished. When filtered discovery state is changed,
+>> > +                       FilteredDiscovery variable is updated accordingly.
+>> > +
+>> > +                       Possible errors: org.bluez.Error.NotReady
+>> > +                                        org.bluez.Error.Failed
+>> > +
+>> >                 void StopDiscovery()
+>> >
+>> >                         This method will cancel any previous StartDiscovery
+>> > @@ -144,6 +188,11 @@ Properties string Address [readonly]
+>> >
+>> >                         Indicates that a device discovery procedure is active.
+>> >
+>> > +               boolean FilteredDiscovery [readonly]
+>> > +
+>> > +                       Indicates that a filtered device discovery procedure is
+>> > +                       active.
+>> > +
+>> >                 array{string} UUIDs [readonly]
+>> >
+>> >                         List of 128-bit UUIDs that represents the available
+>> > --
+>> > 2.2.0.rc0.207.ga3a616c
+>>
+>> @Marcel, Johan: Is this API okay for you? We should probably make them
+>> experimental to begin with.
+>
+> For the most part I'm fine with this, especially if it's marked as
+> experimental. As for the relationship to StartDiscovery, I'd take a
+> similar approach as we have done with the mgmt API, i.e. StartDiscovery
+> would be just a special kind of filtered discovery without any filters
+> (i.e. reporting all devices).
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 152f49c..4bfae5f 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -36,6 +36,7 @@
- #include "lib/bluetooth.h"
- #include "lib/uuid.h"
- #include "src/shared/att.h"
-+#include "src/shared/crypto.h"
- 
- #define ATT_MIN_PDU_LEN			1  /* At least 1 byte for the opcode. */
- #define ATT_OP_CMD_MASK			0x40
-@@ -52,6 +53,9 @@
- #define BT_ERROR_ALREADY_IN_PROGRESS		0xfe
- #define BT_ERROR_OUT_OF_RANGE			0xff
- 
-+/* Length of signature in write signed packet */
-+#define BT_ATT_SIGNATURE_LEN		12
-+
- struct att_send_op;
- 
- struct bt_att {
-@@ -85,6 +89,16 @@ struct bt_att {
- 	bt_att_debug_func_t debug_callback;
- 	bt_att_destroy_func_t debug_destroy;
- 	void *debug_data;
-+
-+	struct bt_crypto *crypto;
-+
-+	struct sign_info *local_sign;
-+};
-+
-+struct sign_info {
-+	uint8_t key[16];
-+	bt_att_counter_func_t counter;
-+	void *user_data;
- };
- 
- enum att_op_type {
-@@ -262,15 +276,20 @@ static bool match_disconn_id(const void *a, const void *b)
- 	return disconn->id == id;
- }
- 
--static bool encode_pdu(struct att_send_op *op, const void *pdu,
--						uint16_t length, uint16_t mtu)
-+static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
-+					const void *pdu, uint16_t length)
- {
- 	uint16_t pdu_len = 1;
-+	struct sign_info *sign;
-+	uint32_t sign_cnt;
-+
-+	if (op->opcode & ATT_OP_SIGNED_MASK)
-+		pdu_len += BT_ATT_SIGNATURE_LEN;
- 
- 	if (length && pdu)
- 		pdu_len += length;
- 
--	if (pdu_len > mtu)
-+	if (pdu_len > att->mtu)
- 		return false;
- 
- 	op->len = pdu_len;
-@@ -282,11 +301,29 @@ static bool encode_pdu(struct att_send_op *op, const void *pdu,
- 	if (pdu_len > 1)
- 		memcpy(op->pdu + 1, pdu, length);
- 
--	return true;
-+	if (!(op->opcode & ATT_OP_SIGNED_MASK))
-+		return true;
-+
-+	sign = att->local_sign;
-+	if (!sign)
-+		goto fail;
-+
-+	if (!sign->counter(&sign_cnt, sign->user_data))
-+		goto fail;
-+
-+	if ((bt_crypto_sign_att(att->crypto, sign->key, op->pdu, 1 + length,
-+				sign_cnt, &((uint8_t *) op->pdu)[1 + length])))
-+		return true;
-+
-+fail:
-+	free(op->pdu);
-+	return false;
- }
- 
--static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
--						uint16_t length, uint16_t mtu,
-+static struct att_send_op *create_att_send_op(struct bt_att *att,
-+						uint8_t opcode,
-+						const void *pdu,
-+						uint16_t length,
- 						bt_att_response_func_t callback,
- 						void *user_data,
- 						bt_att_destroy_func_t destroy)
-@@ -324,7 +361,7 @@ static struct att_send_op *create_att_send_op(uint8_t opcode, const void *pdu,
- 	op->destroy = destroy;
- 	op->user_data = user_data;
- 
--	if (!encode_pdu(op, pdu, length, mtu)) {
-+	if (!encode_pdu(att, op, pdu, length)) {
- 		free(op);
- 		return NULL;
- 	}
-@@ -810,6 +847,7 @@ static void bt_att_free(struct bt_att *att)
- 		destroy_att_send_op(att->pending_ind);
- 
- 	io_destroy(att->io);
-+	bt_crypto_unref(att->crypto);
- 
- 	queue_destroy(att->req_queue, NULL);
- 	queue_destroy(att->ind_queue, NULL);
-@@ -823,6 +861,8 @@ static void bt_att_free(struct bt_att *att)
- 	if (att->debug_destroy)
- 		att->debug_destroy(att->debug_data);
- 
-+	free(att->local_sign);
-+
- 	free(att->buf);
- 
- 	free(att);
-@@ -850,6 +890,10 @@ struct bt_att *bt_att_new(int fd)
- 	if (!att->io)
- 		goto fail;
- 
-+	att->crypto = bt_crypto_new();
-+	if (!att->crypto)
-+		goto fail;
-+
- 	att->req_queue = queue_new();
- 	if (!att->req_queue)
- 		goto fail;
-@@ -1047,8 +1091,8 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 	if (!att || !att->io)
- 		return 0;
- 
--	op = create_att_send_op(opcode, pdu, length, att->mtu, callback,
--							user_data, destroy);
-+	op = create_att_send_op(att, opcode, pdu, length, callback, user_data,
-+								destroy);
- 	if (!op)
- 		return 0;
- 
-@@ -1307,3 +1351,28 @@ bool bt_att_set_sec_level(struct bt_att *att, int level)
- 
- 	return true;
- }
-+
-+static bool sign_set_key(struct sign_info **sign, uint8_t key[16],
-+				bt_att_counter_func_t func, void *user_data)
-+{
-+	if (!(*sign)) {
-+		*sign = new0(struct sign_info, 1);
-+		if (!(*sign))
-+			return false;
-+	}
-+
-+	(*sign)->counter = func;
-+	(*sign)->user_data = user_data;
-+	memcpy((*sign)->key, key, 16);
-+
-+	return true;
-+}
-+
-+bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
-+				bt_att_counter_func_t func, void *user_data)
-+{
-+	if (!att)
-+		return false;
-+
-+	return sign_set_key(&att->local_sign, sign_key, func, user_data);
-+}
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 5256ff9..0cd1a4c 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -46,6 +46,7 @@ typedef void (*bt_att_debug_func_t)(const char *str, void *user_data);
- typedef void (*bt_att_timeout_func_t)(unsigned int id, uint8_t opcode,
- 							void *user_data);
- typedef void (*bt_att_disconnect_func_t)(int err, void *user_data);
-+typedef bool (*bt_att_counter_func_t)(uint32_t *sign_cnt, void *user_data);
- 
- bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
- 				void *user_data, bt_att_destroy_func_t destroy);
-@@ -84,3 +85,6 @@ bool bt_att_unregister_all(struct bt_att *att);
- 
- int bt_att_get_sec_level(struct bt_att *att);
- bool bt_att_set_sec_level(struct bt_att *att, int level);
-+
-+bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
-+			bt_att_counter_func_t func, void *user_data);
--- 
-2.1.0
+I want StartDiscovery to behave differently than
+StartFilteredDiscovery without any filter:
+1. StartDiscovery is interleaved scan, StartFilteredDiscovery is by
+default doing LE only scan (BR/EDR doesn't make no point here). If
+StartFilteredDiscovery would do interleaved scan, it would waste half
+of time not reporting anything.
+2. StartDiscovery is reporting RSSI changes with delta of 8dB or more,
+StartFilteredDiscovery will report every RSSI change it gets, to allow
+better proximity approximation. If StartDiscovery report every RSSI
+change it would break some use cases (i.e. menus showing list of
+devices would flicker), if StartFilteredDiscovery won't return every
+RSSI change it would kill my use case.
 
+
+>
+> For the case of multiple applications requesting different discoveries
+> at the same time we'd go with the common denominator approach, i.e.
+> applications must be prepared to see devices outside of the range of
+> filters that it has specified (the only way to avoid something like that
+> support is to do unicast D-Bus signals which in turn would break
+> "passive observer" applications). Calling StartDiscovery when there are
+> one or more service discoveries in progress would simply clear out the
+> filters and start reporting all devices.
+
+Yes, applications must be prepared to see devices outside of range.
+When you call StartDiscovery when StartFilteredDiscovery is in
+progress, filtered discoveries should be paused, and properties should
+be changed accordingly ("FilteredDiscovery"=false,
+"Discovering"=true).  This would make sure that we don't cause
+regressions in apps already using StartDiscovery, and new apps that
+use StartFilteredDiscovery might detect this change by looking at
+properties, and try to handle it correctly (if they're fine with less
+frequent RSSI updates, no proximity) or show some message and wait for
+other apps to stop their discovery.
+
+>
+> Considering the above style approach, the new property seems a bit
+> pointless.
+
+As I mentioned it'll be needed for apps that do StartFilteredDiscovery
+to check wether it's currently paused to allow other app to do it's
+StartDiscovery (it takes precedence over StartFilteredDiscovery).
+
+>
+> Since we can't any more track multiple different discoveries within the
+> same application (D-Bus connection) the StopDiscovery behavior is now
+> quite broken. The simplest way around that would be to add a discovery
+> instance return parameter to StartServiceDiscovery and to have a new
+> StopServiceDiscovery D-Bus method that'd take this as an input
+> parameter.
+
+Right now each application can call StartDiscovery only once, I want
+each application to be able to call StartDiscovery OR
+StartFilteredDiscovery only once. This way we are completly fine with
+one StopDiscovery method. If some application needs to change filter,
+it can always stop and restart it's scan.
+
+>
+> Johan
+
+Jakub
