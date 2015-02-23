@@ -1,39 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] audio/a2dp: Fix queue initialization
-Date: Mon, 23 Feb 2015 09:59:43 +0200
-Message-Id: <1424678384-25495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 23 Feb 2015 09:45:26 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth 2015-02-23
+Message-ID: <20150223074526.GA8287@t440s.lan>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="jI8keyz6grp/JLjh"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-After changing GSList to queue initialization was missing.
+--jI8keyz6grp/JLjh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi Dave,
+
+Here's one important fix for the 4.0-rc series. Refactoring of Intel
+Bluetooth controller detection ended up disabling some older ones which
+are based on CSR hardware. This patch re-introduces the necessary USB id
+and fixes the breakage.
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
 ---
- profiles/audio/a2dp.c | 2 ++
- 1 file changed, 2 insertions(+)
+The following changes since commit 6514890f7aa8dd75fa46e282a1c7a8615e86f363:
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index b024742..ad21df3 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1249,6 +1249,7 @@ static void avdtp_server_destroy(struct avdtp_server *server)
- 	g_io_channel_shutdown(server->io, TRUE, NULL);
- 	g_io_channel_unref(server->io);
- 	btd_adapter_unref(server->adapter);
-+	queue_destroy(server->seps, NULL);
- 	g_free(server);
- }
- 
-@@ -1373,6 +1374,7 @@ static struct avdtp_server *avdtp_server_init(struct btd_adapter *adapter)
- 	}
- 
- 	server->adapter = btd_adapter_ref(adapter);
-+	server->seps = queue_new();
- 
- 	avdtp_servers = g_slist_append(avdtp_servers, server);
- 
--- 
-2.1.0
+  tcp: fix tcp_should_expand_sndbuf() to use tcp_packets_in_flight() (2015-02-22 23:07:11 -0500)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to 407550fe2ccfca3fa0ac4bcdb0a412adeabf84ba:
+
+  Bluetooth: btusb: Fix issue with CSR based Intel Wireless controllers (2015-02-23 09:30:35 +0200)
+
+----------------------------------------------------------------
+Marcel Holtmann (1):
+      Bluetooth: btusb: Fix issue with CSR based Intel Wireless controllers
+
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+
+--jI8keyz6grp/JLjh
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJU6tqWAAoJECQj9vv5qNQSFLwP/2kQUHsh3VbXoo2q/jAUWamA
+LJT0mJYAf7fpvDVvaiSaAGm9eFZrmQsCduTY+GZRkILX5B/LqCmtrr1eLoOBjDjR
+e7BzA3PpK29cxsnh9uyRr3VG/GKB4GsZYLpoNGQr47x0PCilehv/m428wIf0y0HI
+NI7VKODFvnhK1Mzj2msYSp1wGEScu/XprGirz3i1oZlf/e9ery6j8y92PiRx+KQ3
+Fd4WKf11Wxow11bIwi2A+0VmG0bL6etTU4b8ijSeVI8FtY+27QVFxVcj7oLC7c4e
+xWhfpclt7IMzsHVO5L9WlNAo8miLAyjQ/rXS1Wt/A/fz/GfKYa4XaWyso/T01XlT
+jNHqrVjXO1XEh2bFbTjgGVbcSu7EQZ1X/hv2CRKs0TvlZt+tS5+E3bzBqedAxFxz
+fzrbca41JrRFYpu6qOIw1Rv21rxzYspkghNiKwzaQFc1ugflrjdUz2I8iu6Q9aBB
+3ueiZVDKY7Fd0msofVzV5M8UG1rLogQwwm65B3luMdKu8UtO8zZH6E8Tdof2lDxk
+Y5ogWT2Et0PCFusQn837cyHdwg4Z6VZXD8M3FqS/wFmdcSS4qTNKRZu9BwkU4eqN
+/bCqI2yDpj41kaKISqBXo6t/InwRLmYclZ5eB9ibSTwRtFSKgasTcWpzjptqso8U
+/Ovt4A7kGGX++5SN67/1
+=n+E9
+-----END PGP SIGNATURE-----
+
+--jI8keyz6grp/JLjh--
