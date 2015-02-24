@@ -1,110 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 24 Feb 2015 08:34:02 -0800 (PST)
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/tester-gatt: Add Find by type test
-Date: Tue, 24 Feb 2015 17:40:59 +0100
-Message-ID: <5074063.xMvgPVL04k@uw000953>
-In-Reply-To: <1424787677-18412-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1424787677-18412-1-git-send-email-lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] android/socket: Add fake service for SDP testing
+Message-ID: <14393645.5V26TuuyMm@leonov>
+In-Reply-To: <1424779561-12403-1-git-send-email-szymon.janc@tieto.com>
+References: <1424779561-12403-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
-
-On Tuesday 24 of February 2015 15:21:17 Lukasz Rymanowski wrote:
-> This patch adds test to check if GATT server response on Find By type
-> request when there is no matching attribute in the range
+On Tuesday 24 of February 2015 13:05:59 Szymon Janc wrote:
+> This adds fake L2CAP based service that adds SDP records required
+> for passing SDP qualification tests.
+> 
+> L2CAP sockets are currently not used in Android so it should be safe
+> to use it.
 > ---
-> This should be sent together with this set: [PATCH v2 1/3] android/gatt: Fix, add return check for queue push
+>  android/socket.c | 118
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed, 117
+> insertions(+), 1 deletion(-)
 > 
->  android/tester-gatt.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
+> diff --git a/android/socket.c b/android/socket.c
+> index ec78dcd..15e1bfc 100644
+> --- a/android/socket.c
+> +++ b/android/socket.c
+> @@ -98,6 +98,10 @@ static GList *connections = NULL;
 > 
-> diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-> index 1c0397e..eb0ca1e 100644
-> --- a/android/tester-gatt.c
-> +++ b/android/tester-gatt.c
-> @@ -29,6 +29,7 @@
->  #define L2CAP_ATT_ERROR			0x01
->  #define L2CAP_ATT_EXCHANGE_MTU_REQ	0x02
->  #define L2CAP_ATT_EXCHANGE_MTU_RSP	0x03
-> +#define L2CAP_ATT_FIND_BY_TYPE_REQ	0x06
->  #define L2CAP_ATT_READ_REQ		0x0a
->  #define L2CAP_ATT_READ_RSP		0x0b
->  #define L2CAP_ATT_WRITE_REQ		0x12
-> @@ -1090,9 +1091,18 @@ static struct iovec send_notification_1[] = {
->  	end_pdu
->  };
->  
-> +static struct iovec search_range_1[] = {
-> +	raw_pdu(0x01, 0xff, 0xff, 0xff),
-> +	end_pdu
-> +};
+>  static struct rfcomm_channel servers[RFCOMM_CHANNEL_MAX + 1];
+> 
+> +static uint32_t test_sdp_record_uuid16 = 0;
+> +static uint32_t test_sdp_record_uuid32 = 0;
+> +static uint32_t test_sdp_record_uuid128 = 0;
 > +
-> +static struct iovec primary_type = raw_pdu(0x00, 0x28);
-> +
->  /* att commands define raw pdus */
->  static struct iovec att_read_req_op_v = raw_pdu(L2CAP_ATT_READ_REQ);
->  static struct iovec att_write_req_op_v = raw_pdu(L2CAP_ATT_WRITE_REQ);
-> +static struct iovec att_find_by_type_req_op_v =
-> +					raw_pdu(L2CAP_ATT_FIND_BY_TYPE_REQ);
->  
->  static struct iovec svc_change_ccc_handle_v = raw_pdu(0x1c, 0x00);
->  static struct iovec svc_change_ccc_value_v = raw_pdu(0x00, 0x01);
-> @@ -3400,6 +3410,46 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(bluetooth_disable_action, NULL),
->  		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
->  	),
-> +	TEST_CASE_BREDRLE("Gatt Server - Find By Type - Attribute not found",
-> +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-> +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-> +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-> +		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-> +		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
-> +		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
-> +		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
-> +		ACTION_SUCCESS(gatt_server_add_service_action,
-> +							&add_service_data_5),
-> +		CALLBACK_GATTS_SERVICE_ADDED(GATT_STATUS_SUCCESS, APP1_ID,
-> +							&service_add_1, NULL,
-> +							&srvc1_handle),
-> +		ACTION_SUCCESS(gatt_server_add_char_action, &add_char_data_2),
-> +		CALLBACK_GATTS_CHARACTERISTIC_ADDED(GATT_STATUS_SUCCESS,
-> +							APP1_ID, &app1_uuid,
-> +							&srvc1_handle, NULL,
-> +							&char1_handle),
-> +		ACTION_SUCCESS(gatt_server_start_srvc_action,
-> +							&start_srvc_data_2),
-> +		CALLBACK_GATTS_SERVICE_STARTED(GATT_STATUS_SUCCESS, APP1_ID,
-> +								&srvc1_handle),
-> +		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-> +		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-> +							BT_DISCOVERY_STARTED),
-> +		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_le_set, 2),
-> +		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-> +		ACTION_SUCCESS(gatt_server_connect_action, &app1_conn_req),
-> +		CALLBACK_GATTS_CONNECTION(GATT_SERVER_CONNECTED,
-> +						prop_emu_remotes_default_set,
-> +						CONN1_ID, APP1_ID),
-> +		PROCESS_DATA(GATT_STATUS_SUCCESS,
-> +						gatt_remote_send_raw_pdu_action,
-> +						&att_find_by_type_req_op_v,
-> +						&search_range_1,
-> +						&primary_type),
-> +		CALLBACK_ERROR(CB_EMU_ATT_ERROR, 0x0a),
-> +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
-> +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-> +	),
->  	/* This tests embeded ccc */
->  	TEST_CASE_BREDRLE("Gatt Server - Srvc change write req. success",
->  		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+>  static int rfsock_set_buffer(struct rfcomm_sock *rfsock)
+>  {
+>  	socklen_t len = sizeof(int);
+> @@ -878,6 +882,113 @@ failed:
+>  	return HAL_STATUS_FAILED;
+>  }
 > 
+> +static uint32_t add_test_record(uuid_t *uuid)
+> +{
+> +	sdp_record_t *record;
+> +	sdp_list_t *svclass_id;
+> +	sdp_list_t *seq, *pbg_seq, *proto_seq, *ap_seq;
+> +	sdp_list_t *proto, *proto1, *aproto;
+> +	uuid_t l2cap_uuid, pbg_uuid, ap_uuid;
+> +
+> +	record = sdp_record_alloc();
+> +	if (!record)
+> +		return 0;
+> +
+> +	record->handle =  sdp_next_handle();
+> +
+> +	svclass_id = sdp_list_append(NULL, uuid);
+> +	sdp_set_service_classes(record, svclass_id);
+> +
+> +	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
+> +	proto = sdp_list_append(NULL, &l2cap_uuid);
+> +	seq = sdp_list_append(NULL, proto);
+> +
+> +	proto_seq = sdp_list_append(NULL, seq);
+> +	sdp_set_access_protos(record, proto_seq);
+> +
+> +	sdp_uuid16_create(&pbg_uuid, PUBLIC_BROWSE_GROUP);
+> +	pbg_seq = sdp_list_append(NULL, &pbg_uuid);
+> +	sdp_set_browse_groups(record, pbg_seq);
+> +
+> +	/* Additional Protocol Descriptor List */
+> +	sdp_uuid16_create(&ap_uuid, L2CAP_UUID);
+> +	proto1 = sdp_list_append(NULL, &ap_uuid);
+> +	ap_seq = sdp_list_append(NULL, proto1);
+> +	aproto = sdp_list_append(NULL, ap_seq);
+> +	sdp_set_add_access_protos(record, aproto);
+> +
+> +	sdp_set_service_id(record, *uuid);
+> +	sdp_set_record_state(record, 0);
+> +	sdp_set_service_ttl(record, 0);
+> +	sdp_set_service_avail(record, 0);
+> +	sdp_set_url_attr(record, "http://www.bluez.org",
+> +				"http://www.bluez.org", "http://www.bluez.org");
+> +
+> +	sdp_list_free(proto, NULL);
+> +	sdp_list_free(seq, NULL);
+> +	sdp_list_free(proto_seq, NULL);
+> +	sdp_list_free(pbg_seq, NULL);
+> +	sdp_list_free(svclass_id, NULL);
+> +
+> +	if (bt_adapter_add_record(record, 0) < 0) {
+> +		sdp_record_free(record);
+> +		return 0;
+> +	}
+> +
+> +	return record->handle;
+> +}
+> +
+> +static void test_sdp_cleanup(void)
+> +{
+> +	if (test_sdp_record_uuid16) {
+> +		bt_adapter_remove_record(test_sdp_record_uuid16);
+> +		test_sdp_record_uuid16 = 0;
+> +	}
+> +
+> +	if (test_sdp_record_uuid32) {
+> +		bt_adapter_remove_record(test_sdp_record_uuid32);
+> +		test_sdp_record_uuid32 = 0;
+> +	}
+> +
+> +	if (test_sdp_record_uuid128) {
+> +		bt_adapter_remove_record(test_sdp_record_uuid128);
+> +		test_sdp_record_uuid128 = 0;
+> +	}
+> +}
+> +
+> +static void test_sdp_init(void)
+> +{
+> +	char uuid128[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+> +				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+> +	uuid_t u;
+> +
+> +	sdp_uuid16_create(&u, 0xffff);
+> +	test_sdp_record_uuid16 = add_test_record(&u);
+> +
+> +	sdp_uuid32_create(&u, 0xffffffff);
+> +	test_sdp_record_uuid32 = add_test_record(&u);
+> +
+> +	sdp_uuid128_create(&u, uuid128);
+> +	test_sdp_record_uuid128 = add_test_record(&u);
+> +}
+> +
+> +static uint8_t l2cap_listen(int chan, const uint8_t *name, const uint8_t
+> *uuid, +						uint8_t flags, int *hal_sock)
+> +{
+> +	/* TODO be more strict here? */
+> +	if (strcmp("BlueZ", (const char *) name)) {
+> +		error("socket: Only SDP test supported on L2CAP");
+> +		return HAL_STATUS_UNSUPPORTED;
+> +	}
+> +
+> +	test_sdp_cleanup();
+> +	test_sdp_init();
+> +
+> +	*hal_sock = -1;
+> +
+> +	return HAL_STATUS_SUCCESS;
+> +}
+> +
+>  static void handle_listen(const void *buf, uint16_t len)
+>  {
+>  	const struct hal_cmd_socket_listen *cmd = buf;
+> @@ -889,8 +1000,11 @@ static void handle_listen(const void *buf, uint16_t
+> len) status = rfcomm_listen(cmd->channel, cmd->name, cmd->uuid,
+>  							cmd->flags, &hal_sock);
+>  		break;
+> -	case HAL_SOCK_SCO:
+>  	case HAL_SOCK_L2CAP:
+> +		status = l2cap_listen(cmd->channel, cmd->name, cmd->uuid,
+> +							cmd->flags, &hal_sock);
+> +		break;
+> +	case HAL_SOCK_SCO:
+>  		status = HAL_STATUS_UNSUPPORTED;
+>  		break;
+>  	default:
+> @@ -1193,6 +1307,8 @@ void bt_socket_unregister(void)
+> 
+>  	DBG("");
+> 
+> +	test_sdp_cleanup();
+> +
+>  	g_list_free_full(connections, cleanup_rfsock);
+> 
+>  	for (ch = 0; ch <= RFCOMM_CHANNEL_MAX; ch++)
 
-Applied, thanks.
+Applied.
 
 -- 
-Best regards, 
+BR
 Szymon Janc
