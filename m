@@ -1,99 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/tester-gatt: Add Find by type test
-Date: Tue, 24 Feb 2015 15:21:17 +0100
-Message-Id: <1424787677-18412-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <000b01d05035$4880be30$d9823a90$@samsung.com>
+References: <1424776660-27719-1-git-send-email-gowtham.ab@samsung.com>
+	<1424776660-27719-2-git-send-email-gowtham.ab@samsung.com>
+	<CABBYNZ+sr67_kGMOHLSNXQ=AyQAgY8Fr+EXKjC==Y9m9gfhXjA@mail.gmail.com>
+	<000b01d05035$4880be30$d9823a90$@samsung.com>
+Date: Tue, 24 Feb 2015 15:27:04 +0200
+Message-ID: <CABBYNZK+whJd2wh89-_+okdR+1-CVLQjYmtQ_69MN+ivxw2sNQ@mail.gmail.com>
+Subject: Re: [PATCH 1/6] unit/test-gatt: Add TP/GAW/CL/BV-03-C test
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds test to check if GATT server response on Find By type
-request when there is no matching attribute in the range
----
-This should be sent together with this set: [PATCH v2 1/3] android/gatt: Fix, add return check for queue push
+Hi Gowtham,
 
- android/tester-gatt.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+On Tue, Feb 24, 2015 at 3:24 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Hi Luiz,
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+>> Sent: Tuesday, February 24, 2015 6:40 PM
+>> To: Gowtham Anandha Babu
+>> Cc: linux-bluetooth@vger.kernel.org; Bharat Panda; cpgs@samsung.com
+>> Subject: Re: [PATCH 1/6] unit/test-gatt: Add TP/GAW/CL/BV-03-C test
+>>
+>> Hi Gowtham,
+>>
+>> On Tue, Feb 24, 2015 at 1:17 PM, Gowtham Anandha Babu
+>> <gowtham.ab@samsung.com> wrote:
+>> > Verify that a Generic Attribute Profile client can write a
+>> > Characteristic Value selected by handle.
+>> > ---
+>> >  unit/test-gatt.c | 38 ++++++++++++++++++++++++++++++++++++--
+>> >  1 file changed, 36 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/unit/test-gatt.c b/unit/test-gatt.c index
+>> > 3ab5340..66b5794 100644
+>> > --- a/unit/test-gatt.c
+>> > +++ b/unit/test-gatt.c
+>> > @@ -141,7 +141,7 @@ struct context {
+>> >                 raw_pdu(0x04, 0x04, 0x00, 0x04, 0x00),                  \
+>> >                 raw_pdu(0x05, 0x01, 0x04, 0x00, 0x01, 0x29),            \
+>> >                 raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x03, 0x28),      \
+>> > -               raw_pdu(0x09, 0x07, 0x06, 0x00, 0x02, 0x07, 0x00, 0x29, \
+>> > +               raw_pdu(0x09, 0x07, 0x06, 0x00, 0x0a, 0x07, 0x00,
+>> > + 0x29, \
+>> >                                 0x2a),                                  \
+>>
+>> Is this a bug or something else that you need to change from 0x02 to 0x0a?
+>
+> This is to change the characteristic properties from 0x02 (BT_GATT_CHRC_PROP_READ)
+> to 0x0a (BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_WRITE), so that we are able to write a value
+> to that characteristic.
+>
+> BT_GATT_CHRC_PROP_READ - 0x02
+> BT_GATT_CHRC_PROP_WRITE - 0x08
+> (BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_WRITE) - 0x0a
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 1c0397e..eb0ca1e 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -29,6 +29,7 @@
- #define L2CAP_ATT_ERROR			0x01
- #define L2CAP_ATT_EXCHANGE_MTU_REQ	0x02
- #define L2CAP_ATT_EXCHANGE_MTU_RSP	0x03
-+#define L2CAP_ATT_FIND_BY_TYPE_REQ	0x06
- #define L2CAP_ATT_READ_REQ		0x0a
- #define L2CAP_ATT_READ_RSP		0x0b
- #define L2CAP_ATT_WRITE_REQ		0x12
-@@ -1090,9 +1091,18 @@ static struct iovec send_notification_1[] = {
- 	end_pdu
- };
- 
-+static struct iovec search_range_1[] = {
-+	raw_pdu(0x01, 0xff, 0xff, 0xff),
-+	end_pdu
-+};
-+
-+static struct iovec primary_type = raw_pdu(0x00, 0x28);
-+
- /* att commands define raw pdus */
- static struct iovec att_read_req_op_v = raw_pdu(L2CAP_ATT_READ_REQ);
- static struct iovec att_write_req_op_v = raw_pdu(L2CAP_ATT_WRITE_REQ);
-+static struct iovec att_find_by_type_req_op_v =
-+					raw_pdu(L2CAP_ATT_FIND_BY_TYPE_REQ);
- 
- static struct iovec svc_change_ccc_handle_v = raw_pdu(0x1c, 0x00);
- static struct iovec svc_change_ccc_value_v = raw_pdu(0x00, 0x01);
-@@ -3400,6 +3410,46 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
- 	),
-+	TEST_CASE_BREDRLE("Gatt Server - Find By Type - Attribute not found",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
-+		ACTION_SUCCESS(gatt_server_register_action, &app1_uuid),
-+		CALLBACK_STATUS(CB_GATTS_REGISTER_SERVER, BT_STATUS_SUCCESS),
-+		ACTION_SUCCESS(gatt_server_add_service_action,
-+							&add_service_data_5),
-+		CALLBACK_GATTS_SERVICE_ADDED(GATT_STATUS_SUCCESS, APP1_ID,
-+							&service_add_1, NULL,
-+							&srvc1_handle),
-+		ACTION_SUCCESS(gatt_server_add_char_action, &add_char_data_2),
-+		CALLBACK_GATTS_CHARACTERISTIC_ADDED(GATT_STATUS_SUCCESS,
-+							APP1_ID, &app1_uuid,
-+							&srvc1_handle, NULL,
-+							&char1_handle),
-+		ACTION_SUCCESS(gatt_server_start_srvc_action,
-+							&start_srvc_data_2),
-+		CALLBACK_GATTS_SERVICE_STARTED(GATT_STATUS_SUCCESS, APP1_ID,
-+								&srvc1_handle),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_le_set, 2),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		ACTION_SUCCESS(gatt_server_connect_action, &app1_conn_req),
-+		CALLBACK_GATTS_CONNECTION(GATT_SERVER_CONNECTED,
-+						prop_emu_remotes_default_set,
-+						CONN1_ID, APP1_ID),
-+		PROCESS_DATA(GATT_STATUS_SUCCESS,
-+						gatt_remote_send_raw_pdu_action,
-+						&att_find_by_type_req_op_v,
-+						&search_range_1,
-+						&primary_type),
-+		CALLBACK_ERROR(CB_EMU_ATT_ERROR, 0x0a),
-+		ACTION_SUCCESS(bluetooth_disable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-+	),
- 	/* This tests embeded ccc */
- 	TEST_CASE_BREDRLE("Gatt Server - Srvc change write req. success",
- 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+Well then it should be fine.
+
+>
+> Regards,
+> Gowtham Anandha Babu
+>
+>>
+>> >                 raw_pdu(0x08, 0x07, 0x00, 0x08, 0x00, 0x03, 0x28),      \
+>> >                 raw_pdu(0x01, 0x08, 0x07, 0x00, 0x0a),                  \
+>> > @@ -759,6 +759,34 @@ static const struct test_step test_read_12 = {
+>> >         .expected_att_ecode = 0x80,
+>> >  };
+>> >
+>> > +static void test_write_cb(bool success, uint8_t att_ecode, void
+>> > +*user_data) {
+>> > +       struct context *context = user_data;
+>> > +       const struct test_step *step = context->data->step;
+>> > +
+>> > +       g_assert(att_ecode == step->expected_att_ecode);
+>> > +
+>> > +       context_quit(context);
+>> > +}
+>> > +
+>> > +static void test_write(struct context *context) {
+>> > +       const struct test_step *step = context->data->step;
+>> > +
+>> > +       g_assert(bt_gatt_client_write_value(context->client, step->handle,
+>> step->value,
+>> > +                               step->length, test_write_cb, context,
+>> > +NULL)); }
+>> > +
+>> > +static const uint8_t write_data_1[] = {0x01, 0x02, 0x03};
+>> > +
+>> > +static const struct test_step test_write_1 = {
+>> > +       .handle = 0x0007,
+>> > +       .func = test_write,
+>> > +       .expected_att_ecode = 0,
+>> > +       .value = write_data_1,
+>> > +       .length = 0x03
+>> > +};
+>> > +
+>> >  static void att_write_cb(struct gatt_db_attribute *att, int err,
+>> >                                                                 void
+>> > *user_data)  { @@ -957,7 +985,7 @@ static struct gatt_db
+>> > *make_service_data_1_db(void)
+>> >                 PRIMARY_SERVICE(0x0005, HEART_RATE_UUID, 4),
+>> >
+>> CHARACTERISTIC_STR(GATT_CHARAC_MANUFACTURER_NAME_STRING,
+>> >                                                 BT_ATT_PERM_READ,
+>> > -                                               BT_GATT_CHRC_PROP_READ, ""),
+>> > +                                               BT_GATT_CHRC_PROP_READ
+>> > + | BT_GATT_CHRC_PROP_WRITE, ""),
+>> >                 DESCRIPTOR_STR(GATT_CHARAC_USER_DESC_UUID,
+>> BT_ATT_PERM_READ,
+>> >                                                         "Manufacturer Name"),
+>> >                 { }
+>> > @@ -2845,5 +2873,11 @@ int main(int argc, char *argv[])
+>> >                         raw_pdu(0x0a, 0x03, 0x00),
+>> >                         raw_pdu(0x01, 0x0a, 0x03, 0x00, 0x80));
+>> >
+>> > +       define_test_client("/TP/GAW/CL/BV-03-C", test_client, service_db_1,
+>> > +                       &test_write_1,
+>> > +                       SERVICE_DATA_1_PDUS,
+>> > +                       raw_pdu(0x12, 0x07, 0x00, 0x01, 0x02, 0x03),
+>> > +                       raw_pdu(0x13));
+>> > +
+>> >         return tester_run();
+>> >  }
+>> > --
+>> > 1.9.1
+>> >
+>> > --
+>> > To unsubscribe from this list: send the line "unsubscribe
+>> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+>> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org More majordomo
+>> info at  http://vger.kernel.org/majordomo-info.html
+>
+
+
+
 -- 
-1.8.4
-
+Luiz Augusto von Dentz
