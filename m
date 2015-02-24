@@ -1,124 +1,266 @@
 Return-Path: <cyrus@holtmann.org>
-From: Daniel Drake <drake@endlessm.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: btusb: Add helper for READ_LOCAL_VERSION command
-Date: Mon, 23 Feb 2015 18:16:47 -0600
-Message-Id: <1424737007-4791-1-git-send-email-drake@endlessm.com>
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25Q96P8-9DqF0m34BZxWNGucb1Q0iX7X06RSsXeFrF4eyQ@mail.gmail.com>
+References: <1423528495-13173-1-git-send-email-jpawlowski@google.com>
+	<CABBYNZLaFta8897Xr91UQ-sUy-COviXxRP84GKTyYSUQDfDjyg@mail.gmail.com>
+	<20150223130923.GA28722@t440s.lan>
+	<CAD0=r8zStMB6WVf0iGW59rS_x_+c-gmNUmG1OhhdXOatSj_amw@mail.gmail.com>
+	<CAD0=r8wRwktX2EBmv2qg-NcbZfFGytjn3gRdjDYGXwrjG5ejDw@mail.gmail.com>
+	<CAHrH25Q4-3EUs2m-XPpY7qpvkWcLmw0a6L938ab_XfRYKidAiQ@mail.gmail.com>
+	<CAD0=r8zamcBm1RqAEpp2Y1VfWuOCY=TrmtQwJ-kF5reZe-c9DQ@mail.gmail.com>
+	<CAHrH25Q96P8-9DqF0m34BZxWNGucb1Q0iX7X06RSsXeFrF4eyQ@mail.gmail.com>
+Date: Mon, 23 Feb 2015 16:01:29 -0800
+Message-ID: <CAD0=r8xD7wSxNpOFv5hiE+oNF40RPdywOdm9j2ZaXpQ=m+FY0Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5] doc/adapter-api.txt: StartFilteredDiscovery method.
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Multiple codepaths duplicate some simple code to read and
-sanity-check local version information. Before I add a couple more
-such codepaths, add a helper to reduce duplication.
+Hi Arman,
 
-Signed-off-by: Daniel Drake <drake@endlessm.com>
----
- drivers/bluetooth/btusb.c | 60 ++++++++++++++++++++++-------------------------
- 1 file changed, 28 insertions(+), 32 deletions(-)
+On Mon, Feb 23, 2015 at 3:07 PM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Jakub,
+>
+>> On Mon, Feb 23, 2015 at 2:44 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>> On Mon, Feb 23, 2015 at 1:43 PM, Arman Uguray <armansito@chromium.org> wrote:
+>>> Hi Jakub, Johan,
+>>>
+>>>> On Mon, Feb 23, 2015 at 10:43 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>>>> On Mon, Feb 23, 2015 at 8:41 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>>>>> Hi Johan, Luiz
+>>>>>
+>>>>> On Mon, Feb 23, 2015 at 5:09 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>>>>>> Hi Luiz,
+>>>>>>
+>>>>>> On Mon, Feb 16, 2015, Luiz Augusto von Dentz wrote:
+>>>>>>> > +               void StartFilteredDiscovery(dict filter)
+>>>>>>> > +
+>>>>>>> > +                       This method starts the device discovery session with
+>>>>>>> > +                       filtering by uuids, and rssi or pathloss value. Use
+>>>>>>> > +                       StopDiscovery to release the sessions acquired.
+>>>>>>> > +
+>>>>>>> > +                       Parameters that can be set in filter dictionary include
+>>>>>>> > +                       the following:
+>>>>>>> > +
+>>>>>>> > +                       array{string} UUIDs : filtered service UUIDs (required)
+>>>>>>> > +                       int16 RSSI      : RSSI threshold value (optional)
+>>>>>>> > +                       uint16 pathloss : Pathloss threshold value (optional)
+>>>>>>> > +                       string transport: type of scan to run
+>>>>>>> > +
+>>>>>>> > +                       When a device is found that advertise any UUID from
+>>>>>>> > +                       UUIDs, it will be reported if:
+>>>>>>> > +                       - pathloss and RSSI are both empty,
+>>>>>>> > +                       - only pathloss param is set, device advertise TX pwer,
+>>>>>>> > +                         and computed pathloss is less than pathloss param,
+>>>>>>> > +                       - only RSSI param is set, and received RSSI is higher
+>>>>>>> > +                         than RSSI param,
+>>>>>>> > +
+>>>>>>> > +                       transport parameter determines the type of scan:
+>>>>>>> > +                               "auto"  - interleaved scan
+>>>>>>> > +                               "bredr" - br/edr inquiry
+>>>>>>> > +                               "le"    - le only scan, default value
+>>>>>>> > +
+>>>>>>> > +                       This process will start creating Device objects as new
+>>>>>>> > +                       devices matching criteria are discovered. It will also
+>>>>>>> > +                       emit PropertiesChanged signal for already existing
+>>>>>>> > +                       Device objects, with updated RSSI value.
+>>>>>>> > +
+>>>>>>> > +                       StartDiscovery (SD) takes precedence over
+>>>>>>> > +                       StartFilteredDiscovery (SFD). That means that you should
+>>>>>>> > +                       check Discovering property before calling SFD, otherwise
+>>>>>>> > +                       it would fail when any SD session is in progress.
+>>>>>>> > +                       Calling SD when SFD is in progress pause all SFD
+>>>>>>> > +                       sessions, and start them back when all SD sessions are
+>>>>>>> > +                       finished. When filtered discovery state is changed,
+>>>>>>> > +                       FilteredDiscovery variable is updated accordingly.
+>>>>>>> > +
+>>>>>>> > +                       Possible errors: org.bluez.Error.NotReady
+>>>>>>> > +                                        org.bluez.Error.Failed
+>>>>>>> > +
+>>>>>>> >                 void StopDiscovery()
+>>>>>>> >
+>>>>>>> >                         This method will cancel any previous StartDiscovery
+>>>>>>> > @@ -144,6 +188,11 @@ Properties string Address [readonly]
+>>>>>>> >
+>>>>>>> >                         Indicates that a device discovery procedure is active.
+>>>>>>> >
+>>>>>>> > +               boolean FilteredDiscovery [readonly]
+>>>>>>> > +
+>>>>>>> > +                       Indicates that a filtered device discovery procedure is
+>>>>>>> > +                       active.
+>>>>>>> > +
+>>>>>>> >                 array{string} UUIDs [readonly]
+>>>>>>> >
+>>>>>>> >                         List of 128-bit UUIDs that represents the available
+>>>>>>> > --
+>>>>>>> > 2.2.0.rc0.207.ga3a616c
+>>>>>>>
+>>>>>>> @Marcel, Johan: Is this API okay for you? We should probably make them
+>>>>>>> experimental to begin with.
+>>>>>>
+>>>>>> For the most part I'm fine with this, especially if it's marked as
+>>>>>> experimental. As for the relationship to StartDiscovery, I'd take a
+>>>>>> similar approach as we have done with the mgmt API, i.e. StartDiscovery
+>>>>>> would be just a special kind of filtered discovery without any filters
+>>>>>> (i.e. reporting all devices).
+>>>>>
+>>>>> I want StartDiscovery to behave differently than
+>>>>> StartFilteredDiscovery without any filter:
+>>>>> 1. StartDiscovery is interleaved scan, StartFilteredDiscovery is by
+>>>>> default doing LE only scan (BR/EDR doesn't make no point here). If
+>>>>> StartFilteredDiscovery would do interleaved scan, it would waste half
+>>>>> of time not reporting anything.
+>>>>> 2. StartDiscovery is reporting RSSI changes with delta of 8dB or more,
+>>>>> StartFilteredDiscovery will report every RSSI change it gets, to allow
+>>>>> better proximity approximation. If StartDiscovery report every RSSI
+>>>>> change it would break some use cases (i.e. menus showing list of
+>>>>> devices would flicker), if StartFilteredDiscovery won't return every
+>>>>> RSSI change it would kill my use case.
+>>>>>
+>>>>>
+>>>>>>
+>>>>>> For the case of multiple applications requesting different discoveries
+>>>>>> at the same time we'd go with the common denominator approach, i.e.
+>>>>>> applications must be prepared to see devices outside of the range of
+>>>>>> filters that it has specified (the only way to avoid something like that
+>>>>>> support is to do unicast D-Bus signals which in turn would break
+>>>>>> "passive observer" applications). Calling StartDiscovery when there are
+>>>>>> one or more service discoveries in progress would simply clear out the
+>>>>>> filters and start reporting all devices.
+>>>>>
+>>>>> Yes, applications must be prepared to see devices outside of range.
+>>>>> When you call StartDiscovery when StartFilteredDiscovery is in
+>>>>> progress, filtered discoveries should be paused, and properties should
+>>>>> be changed accordingly ("FilteredDiscovery"=false,
+>>>>> "Discovering"=true).  This would make sure that we don't cause
+>>>>> regressions in apps already using StartDiscovery, and new apps that
+>>>>> use StartFilteredDiscovery might detect this change by looking at
+>>>>> properties, and try to handle it correctly (if they're fine with less
+>>>>> frequent RSSI updates, no proximity) or show some message and wait for
+>>>>> other apps to stop their discovery.
+>>>>>
+>>>>>>
+>>>>>> Considering the above style approach, the new property seems a bit
+>>>>>> pointless.
+>>>>>
+>>>>> As I mentioned it'll be needed for apps that do StartFilteredDiscovery
+>>>>> to check wether it's currently paused to allow other app to do it's
+>>>>> StartDiscovery (it takes precedence over StartFilteredDiscovery).
+>>>>>
+>>>>>>
+>>>>>> Since we can't any more track multiple different discoveries within the
+>>>>>> same application (D-Bus connection) the StopDiscovery behavior is now
+>>>>>> quite broken. The simplest way around that would be to add a discovery
+>>>>>> instance return parameter to StartServiceDiscovery and to have a new
+>>>>>> StopServiceDiscovery D-Bus method that'd take this as an input
+>>>>>> parameter.
+>>>>>
+>>>>> Right now each application can call StartDiscovery only once, I want
+>>>>> each application to be able to call StartDiscovery OR
+>>>>> StartFilteredDiscovery only once. This way we are completly fine with
+>>>>> one StopDiscovery method. If some application needs to change filter,
+>>>>> it can always stop and restart it's scan.
+>>>>
+>>>> It might be good idea to allow multpile StartFilteredDiscovery calls
+>>>> from one client, each replacing the old filter. It would still require
+>>>> only one StopDiscovery method.
+>>>>
+>>>
+>>> The 8 dB RSSI argument isn't really valid since this is something that
+>>> we can change in the API definition. You're saying that interleaved
+>>> scan is wasteful but that's beside the point here, since the API does
+>>> allow passing "auto" and "bredr" as the argument and "le" just happens
+>>> to be the default option.
+>>>
+>>> From an API stand point, I like Johan's suggestion better. Basically
+>>> we treat all discovery APIs as "filtered" except StartDiscovery is
+>>> just a special case of StartFilteredDiscovery that has 8 dB as the
+>>> "RSSI" argument and "auto" for transport. If an app wants to use a
+>>> lower RSSI threshold then whether or not the UI will flicker should be
+>>> the responsibility of the UI code. Basically we should treat
+>>> StartDiscovery as a legacy API and perhaps mark it as deprecated while
+>>> maintaining support for it for backwards compatibility.
+>>
+>> I think you get the meaning of RSSI parameter wrong. It's not delta,
+>> chow much rssi must change to report device again (I think chromeos
+>> change that internally to something smaller). It's for proximity - if
+>> device reported RSSI is bigger than this RSSI parameter then report
+>> it, and there's no delta - we report every RSSI change we get (around
+>> 3 times/sec).
+>>
+>
+> You're right, it's just delta so I was wrong there. Still, the 8 dBm
+> thing shouldn't dictate how the discovery API should work since it
+> only affects what delta threshold to use when updating the
+> Device1.RSSI property. So, perhaps we can add a global D-Bus property
+> for RSSI delta-threshold or perhaps make that a filter parameter of
+> StartFilteredDiscovery.
+>
 
-v3:
- - rebase on top of latest bluetooth-next
+If we add global property for changing RSSI delta-threshold we would
+have to define api to change and probably also negotiate RSSI when
+multiple apps require different values.
+Putting it into StartFilteredDiscovery parameter seems more
+reasonable, but do we really need that ?
+Can't we just have no RSSI delta for filtered scan, and let apps
+decide on their own in their logic ?
 
-v2:
- - drop log message (let callers do that)
- - avoid long assignment in variable declaration
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3ca2e1b..37fe468 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1253,6 +1253,28 @@ static void btusb_waker(struct work_struct *work)
- 	usb_autopm_put_interface(data->intf);
- }
- 
-+static struct sk_buff *btusb_read_local_version(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return skb;
-+	}
-+
-+	if (skb->len != sizeof(struct hci_rp_read_local_version)) {
-+		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
-+		       hdev->name);
-+		kfree_skb(skb);
-+		return ERR_PTR(-EIO);
-+	}
-+
-+	return skb;
-+}
-+
- static int btusb_setup_bcm92035(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-@@ -1277,12 +1299,9 @@ static int btusb_setup_csr(struct hci_dev *hdev)
- 
- 	BT_DBG("%s", hdev->name);
- 
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
--			     HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("Reading local version failed (%ld)", -PTR_ERR(skb));
-+	skb = btusb_read_local_version(hdev);
-+	if (IS_ERR(skb))
- 		return -PTR_ERR(skb);
--	}
- 
- 	rp = (struct hci_rp_read_local_version *)skb->data;
- 
-@@ -2413,21 +2432,9 @@ static int btusb_setup_bcm_patchram(struct hci_dev *hdev)
- 	kfree_skb(skb);
- 
- 	/* Read Local Version Info */
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
--			     HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		ret = PTR_ERR(skb);
--		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
--		       hdev->name, ret);
--		return ret;
--	}
--
--	if (skb->len != sizeof(*ver)) {
--		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
--		       hdev->name);
--		kfree_skb(skb);
--		return -EIO;
--	}
-+	skb = btusb_read_local_version(hdev);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
- 
- 	ver = (struct hci_rp_read_local_version *)skb->data;
- 	rev = le16_to_cpu(ver->hci_rev);
-@@ -2515,20 +2522,9 @@ reset_fw:
- 	kfree_skb(skb);
- 
- 	/* Read Local Version Info */
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
--			     HCI_INIT_TIMEOUT);
-+	skb = btusb_read_local_version(hdev);
- 	if (IS_ERR(skb)) {
- 		ret = PTR_ERR(skb);
--		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
--		       hdev->name, ret);
--		goto done;
--	}
--
--	if (skb->len != sizeof(*ver)) {
--		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
--		       hdev->name);
--		kfree_skb(skb);
--		ret = -EIO;
- 		goto done;
- 	}
- 
--- 
-2.1.0
+>> When it comes to rest of what you write I completly argree.
+>>
+>>
+>>>
+>>> Within the new framework, many apps can call StartFilteredDiscovery
+>>> with differing filters so the daemon should just adapt the filter
+>>> based on the biggest common denominator. So if I called
+>>> StartFilteredDiscovery with no UUIDs and someone else calls it with a
+>>> UUID, the initial call should win. If the first app calls
+>>> StopDiscovery then we fallback to the second app's filter, etc.
+>>
+>> Yes, version that I have implemented right now can merge filters from
+>> multiple clients into one filter that's send to kernel according to
+>> rules you mentioned.
+>> The question is what should happen when one client call
+>> StartFilteredDiscovery multiple times. For StartDiscovery you'd get
+>> error. Right now for StartFilteredDiscovery I proposed same thing,
+>> However, when I started writing client that uses this new API it's
+>> cumbersome to stop and then restart filtered discovery. It would be
+>> much more convinient, if for one client calling StartFilteredDiscovery
+>> multiple times, it's effective filter is the one from last request
+>> (it'll be still merged with filters from other applications).
+>>
+>
+> I don't see why the same application should need to call
+> StartFilteredDiscovery more than once without stopping discovery in
+> between. Then perhaps we need a different API, for instance instead of
+> having a StartFilteredDiscovery maybe we should stick to
+> StartDiscovery and instead add a "SetDiscoveryFilter" method that
+> manages a per-application discovery filter. So if your application
+> needs to reset its filter it can call this method.
+
+Client would call StartFilteredDiscovery when it needs to start
+filtered discovery, or change it's filter, i.e. add new uuid to it. It
+can do StopDiscovery and then StartFilteredDiscovery with update
+filter, but just for convinience I wanted to be able to call
+StartFilteredDiscovery multiple times. I don't think it's worth
+splitting it to StartDiscovery and SetDiscoveryFilter.
+
+
+>>>>>
+>>>>>>
+>>>>>> Johan
+>>>>>
+>>>>> Jakub
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>> Arman
+>>
+>> Jakub
+>
+> Arman
