@@ -3,41 +3,45 @@ From: "Gregory M. Turner" <gmt@be-evil.net>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org,
 	"Gregory M. Turner" <gmt@be-evil.net>
-Subject: [PATCH v2(sorta) 2/2] bluetooth: l2cap_core: ratelimit continuation frame printk
-Date: Mon, 23 Feb 2015 22:25:41 -0800
-Message-Id: <1424759141-17889-3-git-send-email-gmt@be-evil.net>
+Subject: [PATCH v2(sorta) 1/2] bluetooth: Add BT_{INFO,ERR,DBG}_RATELIMITED
+Date: Mon, 23 Feb 2015 22:25:40 -0800
+Message-Id: <1424759141-17889-2-git-send-email-gmt@be-evil.net>
 In-Reply-To: <1424759141-17889-1-git-send-email-gmt@be-evil.net>
 References: <1424759141-17889-1-git-send-email-gmt@be-evil.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some(1) users with semi-broken dongles (?) get storms of "Unexpected
-continuation frame (len 0)" messages flooding their logs.  So ratelimit
-this printk.
+Add ratelimited versions of the BT_{INFO,ERR,DBG} printk macros.
 
-(1)
-https://bugs.launchpad.net/ubuntu/+source/bluetooth-alsa/+bug/192502
-https://bugzilla.kernel.org/show_bug.cgi?id=11705
-https://bugzilla.redhat.com/show_bug.cgi?id=450490
+The assymetry with the existing _INFO and _ERR macros is because,
+afaics, those are special-cased as an object-file-size optimization.
+Duplicating that for the _RATELIMITED versions would clearly be a
+deoptimization until they got a few more consumers (currently only a
+single consumer is planned).
 
 Signed-off-by: Gregory M. Turner <gmt@be-evil.net>
 ---
- net/bluetooth/l2cap_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/bluetooth/bluetooth.h | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6ba33f9..7090aa0 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7493,7 +7493,7 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 		BT_DBG("Cont: frag len %d (expecting %d)", skb->len, conn->rx_len);
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index e00455a..ec321f9 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -124,9 +124,12 @@ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
+ void bt_err(const char *fmt, ...);
  
- 		if (!conn->rx_len) {
--			BT_ERR("Unexpected continuation frame (len %d)", skb->len);
-+			BT_ERR_RATELIMITED("Unexpected continuation frame (len %d)", skb->len);
- 			l2cap_conn_unreliable(conn, ECOMM);
- 			goto drop;
- 		}
+-#define BT_INFO(fmt, ...)	bt_info(fmt "\n", ##__VA_ARGS__)
+-#define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
+-#define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
++#define BT_INFO(fmt, ...)		bt_info(fmt "\n", ##__VA_ARGS__)
++#define BT_INFO_RATELIMITED(fmt, ...)	pr_info_ratelimited(fmt "\n", ##__VA_ARGS__)
++#define BT_ERR(fmt, ...)		bt_err(fmt "\n", ##__VA_ARGS__)
++#define BT_ERR_RATELIMITED(fmt, ...)	pr_err_ratelimited(fmt "\n", ##__VA_ARGS__)
++#define BT_DBG(fmt, ...)		pr_debug(fmt "\n", ##__VA_ARGS__)
++#define BT_DBG_RATELIMITED(fmt, ...)	pr_debug_ratelimited(fmt "\n", ##__VA_ARGS__)
+ 
+ /* Connection and socket states */
+ enum {
 -- 
 2.3.0
-
