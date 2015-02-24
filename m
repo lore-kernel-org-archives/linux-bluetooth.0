@@ -6,9 +6,9 @@ To: marcel@holtmann.org,
 Cc: linux-bluetooth@vger.kernel.org,
 	larry.finger@lwfinger.net,
 	champion_chen@realsil.com.cn
-Subject: [PATCH v6] Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support
-Date: Mon, 23 Feb 2015 18:31:29 -0600
-Message-Id: <1424737889-5115-1-git-send-email-drake@endlessm.com>
+Subject: [PATCH v5] Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support
+Date: Mon, 23 Feb 2015 18:19:28 -0600
+Message-Id: <1424737168-4857-1-git-send-email-drake@endlessm.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Realtek ship a variety of bluetooth USB devices that identify
@@ -66,15 +66,11 @@ RTL8761A has also been added, but that is untested.
 Signed-off-by: Daniel Drake <drake@endlessm.com>
 Tested-by: Larry Finger <Larry.Finger@lwfinger.net>
 ---
- drivers/bluetooth/btusb.c | 397 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 397 insertions(+)
+ drivers/bluetooth/btusb.c | 395 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 395 insertions(+)
 
 Depends on:
  Bluetooth: btusb: Add helper for READ_LOCAL_VERSION command
-
-v6:
- - Really add firmware log message.
-   Sorry for sending the wrong patch in the last mail.
 
 v5:
  - log firmware filename before loading it
@@ -102,7 +98,7 @@ v2:
  - style fixes
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 37fe468..8578165 100644
+index 37fe468..bb86276 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
 @@ -24,6 +24,7 @@
@@ -150,7 +146,7 @@ index 37fe468..8578165 100644
  	{ }	/* Terminating entry */
  };
  
-@@ -1327,6 +1351,376 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+@@ -1327,6 +1351,374 @@ static int btusb_setup_csr(struct hci_dev *hdev)
  	return ret;
  }
  
@@ -423,7 +419,6 @@ index 37fe468..8578165 100644
 +	const struct firmware *fw;
 +	int ret;
 +
-+	BT_INFO("%s: rtl: loading rtl_bt/rtl8723a_fw.bin", hdev->name);
 +	ret = request_firmware(&fw, "rtl_bt/rtl8723a_fw.bin", &udev->dev);
 +	if (ret < 0) {
 +		BT_ERR("Failed to load rtl_bt/rtl8723a_fw.bin");
@@ -460,7 +455,6 @@ index 37fe468..8578165 100644
 +	const struct firmware *fw;
 +	int ret;
 +
-+	BT_INFO("%s: rtl: loading %s", hdev->name, fw_name);
 +	ret = request_firmware(&fw, fw_name, &udev->dev);
 +	if (ret < 0) {
 +		BT_ERR("Failed to load %s", fw_name);
@@ -527,7 +521,7 @@ index 37fe468..8578165 100644
  struct intel_version {
  	u8 status;
  	u8 hw_platform;
-@@ -2776,6 +3170,9 @@ static int btusb_probe(struct usb_interface *intf,
+@@ -2776,6 +3168,9 @@ static int btusb_probe(struct usb_interface *intf,
  		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
  	}
  
