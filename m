@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 5/6] audio/avdtp: Remove avdtp_server from avdtp code
-Date: Tue, 24 Feb 2015 14:26:48 +0200
-Message-Id: <1424780809-23449-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 2/6] audio/avdtp: Copy SEP list to avdtp session
+Date: Tue, 24 Feb 2015 14:26:45 +0200
+Message-Id: <1424780809-23449-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1424780809-23449-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1424780809-23449-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,224 +11,146 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Finishing removing avdtp_server code from avdtp.c. At the moment code is
-moved to a2dp.c
+Copying SEP list allows to remove server usage from
+find_local_sep_by_seid() and other SEP list code.
 ---
- profiles/audio/a2dp.c  | 22 ++++++++++++++++++----
- profiles/audio/a2dp.h  |  3 +++
- profiles/audio/avdtp.c | 41 ++++++++++++++++++-----------------------
- profiles/audio/avdtp.h |  5 +++--
- 4 files changed, 42 insertions(+), 29 deletions(-)
+ profiles/audio/avdtp.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index e669f43..c96971f 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -120,7 +120,7 @@ struct avdtp_server {
- 	struct btd_adapter *adapter;
- 	GIOChannel *io;
- 	struct queue *seps;
--	GSList *sessions;
-+	struct queue *sessions;
- };
- 
- static GSList *servers = NULL;
-@@ -1222,7 +1222,7 @@ struct avdtp *a2dp_avdtp_get(struct btd_device *device)
- 	if (server == NULL)
- 		return NULL;
- 
--	session = avdtp_new(server, server->sessions, device);
-+	session = avdtp_new(server, server->sessions, device, server->seps);
- 	if (!session)
- 		return NULL;
- 
-@@ -1240,9 +1240,20 @@ static struct a2dp_server *a2dp_server_register(struct btd_adapter *adapter)
- 	return server;
- }
- 
-+void avdtp_server_remove_session(struct avdtp_server *server,
-+							struct avdtp *session)
-+{
-+	queue_remove(server->sessions, session);
-+}
-+
-+struct btd_adapter *avdtp_server_get_adapter(struct avdtp_server *server)
-+{
-+	return server->adapter;
-+}
-+
- static void avdtp_server_destroy(struct avdtp_server *server)
- {
--	g_slist_free_full(server->sessions, avdtp_free);
-+	queue_destroy(server->sessions, avdtp_free);
- 
- 	avdtp_servers = g_slist_remove(avdtp_servers, server);
- 
-@@ -1250,6 +1261,7 @@ static void avdtp_server_destroy(struct avdtp_server *server)
- 	g_io_channel_unref(server->io);
- 	btd_adapter_unref(server->adapter);
- 	queue_destroy(server->seps, NULL);
-+	queue_destroy(server->sessions, NULL);
- 	g_free(server);
- }
- 
-@@ -1328,7 +1340,8 @@ static void avdtp_confirm_cb(GIOChannel *chan, gpointer data)
- 	if (!avdtp_server)
- 		goto drop;
- 
--	session = avdtp_new(avdtp_server, avdtp_server->sessions, device);
-+	session = avdtp_new(avdtp_server, avdtp_server->sessions, device,
-+							avdtp_server->seps);
- 	if (!session)
- 		goto drop;
- 
-@@ -1379,6 +1392,7 @@ static struct avdtp_server *avdtp_server_init(struct btd_adapter *adapter)
- 
- 	server->adapter = btd_adapter_ref(adapter);
- 	server->seps = queue_new();
-+	server->sessions = queue_new();
- 
- 	avdtp_servers = g_slist_append(avdtp_servers, server);
- 
-diff --git a/profiles/audio/a2dp.h b/profiles/audio/a2dp.h
-index 544eea1..fdcc528 100644
---- a/profiles/audio/a2dp.h
-+++ b/profiles/audio/a2dp.h
-@@ -88,3 +88,6 @@ gboolean a2dp_sep_unlock(struct a2dp_sep *sep, struct avdtp *session);
- struct avdtp_stream *a2dp_sep_get_stream(struct a2dp_sep *sep);
- struct btd_device *a2dp_setup_get_device(struct a2dp_setup *setup);
- struct avdtp *a2dp_avdtp_get(struct btd_device *device);
-+void avdtp_server_remove_session(struct avdtp_server *server,
-+							struct avdtp *session);
-+struct btd_adapter *avdtp_server_get_adapter(struct avdtp_server *server);
 diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 0296700..05b3d2c 100644
+index 926f01c..1a16170 100644
 --- a/profiles/audio/avdtp.c
 +++ b/profiles/audio/avdtp.c
-@@ -50,6 +50,7 @@
- #include "src/device.h"
+@@ -402,6 +402,7 @@ struct avdtp {
+ 	guint io_id;
  
- #include "avdtp.h"
-+#include "a2dp.h"
- #include "sink.h"
- #include "source.h"
+ 	GSList *seps; /* Elements of type struct avdtp_remote_sep * */
++	struct queue *lseps; /* Elements of type struct avdtp_local_sep * */
  
-@@ -324,13 +325,6 @@ struct avdtp_remote_sep {
- 	struct avdtp_stream *stream;
- };
+ 	GSList *streams; /* Elements of type struct avdtp_stream * */
  
--struct avdtp_server {
--	struct btd_adapter *adapter;
--	GIOChannel *io;
--	struct queue *seps;
--	GSList *sessions;
--};
--
- struct avdtp_local_sep {
- 	avdtp_state_t state;
- 	struct avdtp_stream *stream;
-@@ -1132,7 +1126,6 @@ void avdtp_free(void *data)
+@@ -1222,10 +1223,10 @@ static bool match_by_seid(const void *data, const void *user_data)
+ 	return sep->info.seid == seid;
+ }
  
- void connection_lost(struct avdtp *session, int err)
+-static struct avdtp_local_sep *find_local_sep_by_seid(struct avdtp_server *server,
++static struct avdtp_local_sep *find_local_sep_by_seid(struct avdtp *session,
+ 								uint8_t seid)
  {
--	struct avdtp_server *server = session->server;
- 	char address[18];
- 
- 	ba2str(device_get_address(session->device), address);
-@@ -1151,7 +1144,7 @@ void connection_lost(struct avdtp *session, int err)
- 	if (session->ref > 0)
- 		return;
- 
--	server->sessions = g_slist_remove(server->sessions, session);
-+	avdtp_server_remove_session(session->server, session);
- 	avdtp_free(session);
+-	return queue_find(server->seps, match_by_seid, INT_TO_PTR(seid));
++	return queue_find(session->lseps, match_by_seid, INT_TO_PTR(seid));
  }
  
-@@ -2262,16 +2255,18 @@ failed:
- 	return FALSE;
- }
+ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+@@ -1329,7 +1330,7 @@ static gboolean avdtp_discover_cmd(struct avdtp *session, uint8_t transaction,
+ 	struct seid_info *seps, *p;
+ 	gboolean ret;
  
--static struct avdtp *find_session(GSList *list, struct btd_device *device)
-+static bool match_by_device(const void *data, const void *user_data)
- {
--	for (; list != NULL; list = g_slist_next(list)) {
--		struct avdtp *s = list->data;
-+	const struct avdtp *session = data;
-+	const struct btd_device *device = user_data;
+-	sep_count = queue_length(session->server->seps);
++	sep_count = queue_length(session->lseps);
  
--		if (s->device == device)
--			return s;
--	}
-+	return session->device == device;
-+}
+ 	if (sep_count == 0) {
+ 		uint8_t err = AVDTP_NOT_SUPPORTED_COMMAND;
+@@ -1342,7 +1343,7 @@ static gboolean avdtp_discover_cmd(struct avdtp *session, uint8_t transaction,
+ 	seps = g_new0(struct seid_info, sep_count);
+ 	p = seps;
  
--	return NULL;
-+static struct avdtp *find_session(struct queue *sessions,
-+						struct btd_device *device)
-+{
-+	return queue_find(sessions, match_by_device, device);
- }
+-	queue_foreach(session->server->seps, copy_seps, &p);
++	queue_foreach(session->lseps, copy_seps, &p);
  
- static uint16_t get_version(struct avdtp *session)
-@@ -2379,8 +2374,9 @@ failed:
- 		connection_lost(session, err_no);
- }
+ 	ret = avdtp_send(session, transaction, AVDTP_MSG_TYPE_ACCEPT,
+ 				AVDTP_DISCOVER, seps, rsp_size);
+@@ -1368,7 +1369,7 @@ static gboolean avdtp_getcap_cmd(struct avdtp *session, uint8_t transaction,
+ 		goto failed;
+ 	}
  
--struct avdtp *avdtp_new(struct avdtp_server *server, GSList *sessions,
--						struct btd_device *device)
-+struct avdtp *avdtp_new(struct avdtp_server *server, struct queue *sessions,
-+						struct btd_device *device,
-+						struct queue *lseps)
- {
- 	struct avdtp *session;
+-	sep = find_local_sep_by_seid(session->server, req->acp_seid);
++	sep = find_local_sep_by_seid(session, req->acp_seid);
+ 	if (!sep) {
+ 		err = AVDTP_BAD_ACP_SEID;
+ 		goto failed;
+@@ -1445,7 +1446,7 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
+ 		return FALSE;
+ 	}
  
-@@ -2397,10 +2393,9 @@ struct avdtp *avdtp_new(struct avdtp_server *server, GSList *sessions,
- 	session->state = AVDTP_SESSION_STATE_DISCONNECTED;
+-	sep = find_local_sep_by_seid(session->server, req->acp_seid);
++	sep = find_local_sep_by_seid(session, req->acp_seid);
+ 	if (!sep) {
+ 		err = AVDTP_BAD_ACP_SEID;
+ 		goto failed;
+@@ -1560,7 +1561,7 @@ static gboolean avdtp_getconf_cmd(struct avdtp *session, uint8_t transaction,
  
- 	session->version = get_version(session);
-+	session->lseps = lseps;
+ 	memset(buf, 0, sizeof(buf));
  
--	server->sessions = g_slist_append(server->sessions, session);
--
--	session->lseps = server->seps;
-+	queue_push_tail(sessions, session);
+-	sep = find_local_sep_by_seid(session->server, req->acp_seid);
++	sep = find_local_sep_by_seid(session, req->acp_seid);
+ 	if (!sep) {
+ 		err = AVDTP_BAD_ACP_SEID;
+ 		goto failed;
+@@ -1676,7 +1677,7 @@ static gboolean avdtp_open_cmd(struct avdtp *session, uint8_t transaction,
+ 		return FALSE;
+ 	}
  
- 	DBG("Created session %p added to server %p", session, server);
+-	sep = find_local_sep_by_seid(session->server, req->acp_seid);
++	sep = find_local_sep_by_seid(session, req->acp_seid);
+ 	if (!sep) {
+ 		err = AVDTP_BAD_ACP_SEID;
+ 		goto failed;
+@@ -1736,8 +1737,7 @@ static gboolean avdtp_start_cmd(struct avdtp *session, uint8_t transaction,
+ 	for (i = 0; i < seid_count; i++, seid++) {
+ 		failed_seid = seid->seid;
  
-@@ -2465,7 +2460,7 @@ static GIOChannel *l2cap_connect(struct avdtp *session)
- 	GIOChannel *io;
- 	const bdaddr_t *src;
+-		sep = find_local_sep_by_seid(session->server,
+-					req->first_seid.seid);
++		sep = find_local_sep_by_seid(session, req->first_seid.seid);
+ 		if (!sep || !sep->stream) {
+ 			err = AVDTP_BAD_ACP_SEID;
+ 			goto failed;
+@@ -1787,7 +1787,7 @@ static gboolean avdtp_close_cmd(struct avdtp *session, uint8_t transaction,
+ 		return FALSE;
+ 	}
  
--	src = btd_adapter_get_address(session->server->adapter);
-+	src = btd_adapter_get_address(avdtp_get_adapter(session));
+-	sep = find_local_sep_by_seid(session->server, req->acp_seid);
++	sep = find_local_sep_by_seid(session, req->acp_seid);
+ 	if (!sep || !sep->stream) {
+ 		err = AVDTP_BAD_ACP_SEID;
+ 		goto failed;
+@@ -1848,8 +1848,7 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
+ 	for (i = 0; i < seid_count; i++, seid++) {
+ 		failed_seid = seid->seid;
  
- 	io = bt_io_connect(avdtp_connect_cb, session,
- 				NULL, &err,
-@@ -3724,7 +3719,7 @@ avdtp_state_t avdtp_sep_get_state(struct avdtp_local_sep *sep)
+-		sep = find_local_sep_by_seid(session->server,
+-					req->first_seid.seid);
++		sep = find_local_sep_by_seid(session, req->first_seid.seid);
+ 		if (!sep || !sep->stream) {
+ 			err = AVDTP_BAD_ACP_SEID;
+ 			goto failed;
+@@ -1896,7 +1895,7 @@ static gboolean avdtp_abort_cmd(struct avdtp *session, uint8_t transaction,
+ 		return FALSE;
+ 	}
  
- struct btd_adapter *avdtp_get_adapter(struct avdtp *session)
- {
--	return session->server->adapter;
-+	return avdtp_server_get_adapter(session->server);
- }
+-	sep = find_local_sep_by_seid(session->server, req->acp_seid);
++	sep = find_local_sep_by_seid(session, req->acp_seid);
+ 	if (!sep || !sep->stream)
+ 		return TRUE;
  
- struct btd_device *avdtp_get_device(struct avdtp *session)
-diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-index 4aa3936..28277cc 100644
---- a/profiles/audio/avdtp.h
-+++ b/profiles/audio/avdtp.h
-@@ -293,8 +293,9 @@ struct btd_adapter *avdtp_get_adapter(struct avdtp *session);
- struct btd_device *avdtp_get_device(struct avdtp *session);
- struct avdtp_server *avdtp_get_server(struct avdtp_local_sep *lsep);
+@@ -1934,7 +1933,7 @@ static gboolean avdtp_delayreport_cmd(struct avdtp *session,
+ 		return FALSE;
+ 	}
  
--struct avdtp *avdtp_new(struct avdtp_server *server, GSList *sessions,
--						struct btd_device *device);
-+struct avdtp *avdtp_new(struct avdtp_server *server, struct queue *sessions,
-+						struct btd_device *device,
-+						struct queue *lseps);
- bool avdtp_transport_connect(struct avdtp *session, GIOChannel *chan);
- void avdtp_free(void *data);
- void connection_lost(struct avdtp *session, int err);
+-	sep = find_local_sep_by_seid(session->server, req->acp_seid);
++	sep = find_local_sep_by_seid(session, req->acp_seid);
+ 	if (!sep || !sep->stream) {
+ 		err = AVDTP_BAD_ACP_SEID;
+ 		goto failed;
+@@ -2396,6 +2395,7 @@ struct avdtp *avdtp_new(struct avdtp_server *server, GSList *sessions,
+ 
+ 	server->sessions = g_slist_append(server->sessions, session);
+ 
++	session->lseps = server->seps;
+ 	if (!chan)
+ 		return session;
+ 
 -- 
 2.1.0
 
