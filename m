@@ -1,28 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 24 Feb 2015 17:54:49 -0800
-Message-ID: <CAD0=r8wZdzJBVq3f9j9iJJOZw2T0JwNiKxto13p9MSR7uL_Ziw@mail.gmail.com>
-Subject: Why is interleaved scan interleaved ? Can I fix that to do LE and
- classic at same time ?
 From: Jakub Pawlowski <jpawlowski@google.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v7] doc/adapter-api.txt: StartFilteredDiscovery method.
+Date: Tue, 24 Feb 2015 16:29:04 -0800
+Message-Id: <1424824144-10711-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When I do interleaved scan on linux, it's doing LE first, for around
-10 seconds, and then Classic scan for another few seconds on kernel
-level.
+This patch proposes new method, StartFilteredDiscovery to D-Bus Adapter
+API for desktop bluetoothd. It will allow for rapid discovery of nearby
+devices that advertise services.
 
-I was playing with Bluetooth on macbook, and noticed that they do both
-LE and Classic scan at once. So I tried modifying kernel, I triggered
-both LE and classic scan at once by queuing both
-HCI_OP_LE_SET_SCAN_ENABLE, and HCI_OP_INQUIRY and it just worked, both
-LE and Classic devices were reported.
+It also adds FilteredDiscovery property, that is set to true when any
+StartFilteredDiscovery session is active.
 
-I tested that with CSR, Broadcom and Atheros chips, and all behaved well.
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ doc/adapter-api.txt | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-Is there any reason why we do interleave instead of both scans at once ?
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 74d235a..4a67bbd 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -22,6 +22,45 @@ Methods		void StartDiscovery()
+ 			Possible errors: org.bluez.Error.NotReady
+ 					 org.bluez.Error.Failed
+ 
++		void StartFilteredDiscovery(dict filter) [Experimental]
++
++			This method starts the device discovery session with
++			filtering by uuids, and rssi or pathloss value. Use
++			StopDiscovery to release the sessions acquired.
++
++			Parameters that can be set in filter dictionary include
++			the following:
++
++			array{string} UUIDs : filtered service UUIDs (required)
++			int16 RSSI	: RSSI threshold value (optional)
++			uint16 pathloss	: Pathloss threshold value (optional)
++			string transport: type of scan to run
++
++			When a device is found that advertise any UUID from
++			UUIDs, it will be reported if:
++			- pathloss and RSSI are both empty,
++			- only pathloss param is set, device advertise TX pwer,
++			  and computed pathloss is less than pathloss param,
++			- only RSSI param is set, and received RSSI is higher
++			  than RSSI param,
++
++			transport parameter determines the type of scan:
++				"auto"	- interleaved scan
++				"bredr"	- br/edr inquiry
++				"le"	- le only scan, default value
++
++			This process will start creating Device objects as new
++			devices matching criteria are discovered. It will also
++			emit PropertiesChanged signal for already existing
++			Device objects, with updated RSSI value. This is
++			different from StartDiscovery behaviour, that keeps
++			imposing the delta-threshold, but as soon as there's
++			one or more StartFilteredDiscovery active this type of
++			filtering is removed.
++
++			Possible errors: org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++
+ 		void StopDiscovery()
+ 
+ 			This method will cancel any previous StartDiscovery
+-- 
+2.2.0.rc0.207.ga3a616c
 
-I would be more than happy to modify 'interleaved' behaviour, to do
-both LE and classic scan at same time.
