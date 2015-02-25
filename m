@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/5] core/device: Update storage if CSRK counter change
-Date: Wed, 25 Feb 2015 15:42:13 +0200
-Message-Id: <1424871733-14610-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/5] core/device: Set Local/Remote CSRK
+Date: Wed, 25 Feb 2015 15:42:12 +0200
+Message-Id: <1424871733-14610-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1424871733-14610-1-git-send-email-luiz.dentz@gmail.com>
 References: <1424871733-14610-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,67 +11,62 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes sure the counter is stored so once the device is loaded again
-it should contain the proper value.
+This set Local/Remote CSRK as keys to bt_att so it can use for signed
+writes.
 ---
- src/device.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ src/device.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/src/device.c b/src/device.c
-index a801bb3..20aaa3e 100644
+index bef1f0c..a801bb3 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -345,6 +345,19 @@ static void update_technologies(GKeyFile *file, struct btd_device *dev)
- 								list, len);
+@@ -4012,6 +4012,30 @@ static void gatt_server_init(struct btd_device *device, struct gatt_db *db)
+ 		error("Failed to initialize bt_gatt_server");
  }
  
-+static void store_csrk(struct csrk_info *csrk, GKeyFile *key_file,
-+							const char *group)
++static bool local_counter(uint32_t *sign_cnt, void *user_data)
 +{
-+	char key[33];
-+	int i;
++	struct btd_device *dev = user_data;
 +
-+	for (i = 0; i < 16; i++)
-+		sprintf(key + (i * 2), "%2.2X", csrk->key[i]);
++	if (!dev->local_csrk)
++		return false;
 +
-+	g_key_file_set_string(key_file, group, "Key", key);
-+	g_key_file_set_integer(key_file, group, "Counter", csrk->counter);
++	*sign_cnt = dev->local_csrk->counter++;
++
++	return true;
 +}
 +
- static gboolean store_device_info_cb(gpointer user_data)
++static bool remote_counter(uint32_t *sign_cnt, void *user_data)
++{
++	struct btd_device *dev = user_data;
++
++	if (!dev->remote_csrk || *sign_cnt < dev->remote_csrk->counter)
++		return false;
++
++	dev->remote_csrk->counter = *sign_cnt;
++
++	return true;
++}
++
+ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
  {
- 	struct btd_device *device = user_data;
-@@ -423,6 +436,12 @@ static gboolean store_device_info_cb(gpointer user_data)
- 		g_key_file_remove_group(key_file, "DeviceID", NULL);
- 	}
+ 	GError *gerr = NULL;
+@@ -4061,6 +4085,14 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
+ 						att_disconnected_cb, dev, NULL);
+ 	bt_att_set_close_on_unref(dev->att, true);
  
-+	if (device->local_csrk)
-+		store_csrk(device->local_csrk, key_file, "LocalSignatureKey");
++	if (dev->local_csrk)
++		bt_att_set_local_key(dev->att, dev->local_csrk->key,
++							local_counter, dev);
 +
-+	if (device->remote_csrk)
-+		store_csrk(device->remote_csrk, key_file, "RemoteSignatureKey");
++	if (dev->remote_csrk)
++		bt_att_set_remote_key(dev->att, dev->remote_csrk->key,
++							remote_counter, dev);
 +
- 	create_file(filename, S_IRUSR | S_IWUSR);
+ 	database = btd_adapter_get_database(dev->adapter);
  
- 	str = g_key_file_to_data(key_file, &length, NULL);
-@@ -4021,6 +4040,8 @@ static bool local_counter(uint32_t *sign_cnt, void *user_data)
- 
- 	*sign_cnt = dev->local_csrk->counter++;
- 
-+	store_device_info(dev);
-+
- 	return true;
- }
- 
-@@ -4033,6 +4054,8 @@ static bool remote_counter(uint32_t *sign_cnt, void *user_data)
- 
- 	dev->remote_csrk->counter = *sign_cnt;
- 
-+	store_device_info(dev);
-+
- 	return true;
- }
- 
+ 	gatt_client_init(dev);
 -- 
 2.1.0
 
