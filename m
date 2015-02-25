@@ -2,69 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCHv4 1/3] android/bas: Read battery level characteristic
-Date: Wed, 25 Feb 2015 13:22:09 +0100
-Message-Id: <1424866931-13334-2-git-send-email-mariusz.skamra@tieto.com>
-In-Reply-To: <1424866931-13334-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1424866931-13334-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: [PATCHv4 0/3] HOGP fixes and update of test results
+Date: Wed, 25 Feb 2015 13:22:08 +0100
+Message-Id: <1424866931-13334-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For TC_HGRF_HH_BV_10_I test purposes, apart from registration for
-notification, read request should be sent to get battery level.
----
- android/bas.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+  I deleted most of the code related to finding include services. This was only used
+in situation when HID service as primary service was not found. However according to
+SPEC HID device shall implement HID service as primary. Further HOG is called
+from hidhost's hog_conn_cb when HID service was found and connection was established using LE.
+Now searching for include services is performed because TC_HGDR_RH_BV_01_I requires that.
+Finding battery services is performed like before, during primary services discovery.
+Compared to v3 I used queue instead of GSList for bas.
 
-diff --git a/android/bas.c b/android/bas.c
-index 3d4bee0..b3fb41f 100644
---- a/android/bas.c
-+++ b/android/bas.c
-@@ -44,6 +44,7 @@
- #include "android/bas.h"
- 
- #define ATT_NOTIFICATION_HEADER_SIZE 3
-+#define ATT_READ_RESPONSE_HEADER_SIZE 1
- 
- struct bt_bas {
- 	int ref_count;
-@@ -226,11 +227,17 @@ static void discover_desc(struct bt_bas *bas, GAttrib *attrib,
- 	free(req);
- }
- 
--static void value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
-+static void notification_cb(const guint8 *pdu, guint16 len, gpointer user_data)
- {
- 	DBG("Battery Level at %u", pdu[ATT_NOTIFICATION_HEADER_SIZE]);
- }
- 
-+static void read_value_cb(guint8 status, const guint8 *pdu, guint16 len,
-+					gpointer user_data)
-+{
-+	DBG("Battery Level at %u", pdu[ATT_READ_RESPONSE_HEADER_SIZE]);
-+}
-+
- static void ccc_written_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
- {
-@@ -248,7 +255,7 @@ static void ccc_written_cb(guint8 status, const guint8 *pdu,
- 	DBG("Battery Level: notification enabled");
- 
- 	bas->id = g_attrib_register(bas->attrib, ATT_OP_HANDLE_NOTIFY,
--					bas->handle, value_cb, bas, NULL);
-+					bas->handle, notification_cb, bas, NULL);
- }
- 
- static void write_ccc(struct bt_bas *bas, GAttrib *attrib, uint16_t handle,
-@@ -319,6 +326,8 @@ static void bas_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- 
- 	DBG("Battery handle: 0x%04x", bas->handle);
- 
-+	read_char(bas, bas->attrib, bas->handle, read_value_cb, bas);
-+
- 	start = chr->value_handle + 1;
- 	end = bas->primary->range.end;
- 
+  Add a queue of battery services because according to HOGP SPEC there could be more
+than one battery services like in TC_HGDC_HH_BV_14_I where there is only one HID service,
+and two battery services. So the first found bas was overwritten by the second one and
+after reconnection only one bas was attached.
+
+  For test purposes requiring read of battery level read_value_cb was added.
+
+Mariusz Skamra (3):
+  android/bas: Read battery level characteristic
+  android/hog: Fix find included battery services
+  android/pts: Update test results for HOGP
+
+ android/bas.c        | 13 ++++++--
+ android/hog.c        | 84 +++++++++++++++++-----------------------------------
+ android/pts-hogp.txt |  6 ++--
+ 3 files changed, 41 insertions(+), 62 deletions(-)
+
 -- 
 1.9.1
 
