@@ -1,58 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25TOMVFwAJ23KQDkrRugpihTK+1ijm9RSzE0gkzjxBA3nA@mail.gmail.com>
+In-Reply-To: <CABBYNZJcAAfKmjA9P3oVbHH5evriwNJBmK=zzNCRBfcXQQDSGg@mail.gmail.com>
 References: <1424927610-26226-1-git-send-email-armansito@chromium.org>
-	<1424927610-26226-4-git-send-email-armansito@chromium.org>
-	<938707CA-DE91-41D5-B611-B89CFF9236C6@holtmann.org>
-	<CAHrH25TOMVFwAJ23KQDkrRugpihTK+1ijm9RSzE0gkzjxBA3nA@mail.gmail.com>
-Date: Fri, 27 Feb 2015 08:47:56 +0200
-Message-ID: <CABBYNZLA-krR1iM-J9szbHDa7osgp9ZPWFYcxyAUc13SqnMZfw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 03/17] gdbus/client: Allow specifying
- ObjectManager path
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+	<1424927610-26226-13-git-send-email-armansito@chromium.org>
+	<CABBYNZJcAAfKmjA9P3oVbHH5evriwNJBmK=zzNCRBfcXQQDSGg@mail.gmail.com>
+Date: Thu, 26 Feb 2015 12:49:45 -0800
+Message-ID: <CAHrH25RoN85p45gv9gg3Kcn+QhK-qfeek3GPaZNMmMXfUVsFwg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 12/17] core/gatt: Add btd_gatt_database_notify function
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Luiz,
 
-On Thu, Feb 26, 2015 at 10:32 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Marcel,
+> On Thu, Feb 26, 2015 at 12:51 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
 >
->> On Thu, Feb 26, 2015 at 7:38 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> Hi Arman,
+> On Thu, Feb 26, 2015 at 7:13 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> This patch add the btd_gatt_database_notify function to database's
+>> public API. This allows upper layers to send out notifications
+>> and indications to all connected devices that have configured the
+>> specified CCC descriptor.
+>> ---
+>>  src/gatt-database.c | 4 ++--
+>>  src/gatt-database.h | 5 +++++
+>>  2 files changed, 7 insertions(+), 2 deletions(-)
 >>
->>> GDBusClient currently hard-codes "/" as the remote ObjectManager path.
->>> This is generally incorrect, as an application can choose to expose an
->>> ObjectManager at any well-known path. This patch fixes this by allowing
->>> the user to pass in the ObjectManager path to g_dbus_client_new.
->>> ---
->>> client/main.c            |  2 +-
->>> gdbus/client.c           | 23 ++++++++++++++++-------
->>> gdbus/gdbus.h            |  5 +++--
->>> plugins/hostname.c       |  2 +-
->>> profiles/iap/main.c      |  2 +-
->>> tools/bluetooth-player.c |  2 +-
->>> tools/gap-tester.c       |  3 ++-
->>> tools/gatt-service.c     |  2 +-
->>> tools/mpris-proxy.c      |  2 +-
->>> tools/obexctl.c          |  2 +-
->>> unit/test-gdbus-client.c | 39 ++++++++++++++++++++++++++-------------
->>> 11 files changed, 54 insertions(+), 30 deletions(-)
+>> diff --git a/src/gatt-database.c b/src/gatt-database.c
+>> index ebfcf2d..d75b971 100644
+>> --- a/src/gatt-database.c
+>> +++ b/src/gatt-database.c
+>> @@ -737,7 +737,7 @@ static void send_notification_to_device(void *data, void *user_data)
+>>                                                         NULL, NULL);
+>>  }
 >>
->> please to not intermix gdbus/ changes with others. Everything in gdbus/ needs to be a separate patch. You are affecting more than one project here.
+>> -static void send_notification_to_devices(struct btd_gatt_database *database,
+>> +void btd_gatt_database_notify(struct btd_gatt_database *database,
+>>                                         uint16_t handle, const uint8_t *value,
+>>                                         uint16_t len, uint16_t ccc_handle,
+>>                                         bool indicate)
+>> @@ -781,7 +781,7 @@ static void send_service_changed(struct btd_gatt_database *database,
+>>         put_le16(start, value);
+>>         put_le16(end, value + 2);
 >>
+>> -       send_notification_to_devices(database, handle, value, sizeof(value),
+>> +       btd_gatt_database_notify(database, handle, value, sizeof(value),
+>>                                                         ccc_handle, true);
+>>  }
+>>
+>> diff --git a/src/gatt-database.h b/src/gatt-database.h
+>> index 163b601..2a89ad6 100644
+>> --- a/src/gatt-database.h
+>> +++ b/src/gatt-database.h
+>> @@ -34,3 +34,8 @@ btd_gatt_database_add_ccc(struct btd_gatt_database *database,
+>>                                 btd_gatt_database_ccc_write_t write_callback,
+>>                                 void *user_data,
+>>                                 btd_gatt_database_destroy_t destroy);
+>> +
+>> +void btd_gatt_database_notify(struct btd_gatt_database *database,
+>> +                                       uint16_t handle, const uint8_t *value,
+>> +                                       uint16_t len, uint16_t ccc_handle,
+>> +                                       bool indicate);
+>> --
+>> 2.2.0.rc0.207.ga3a616c
 >
-> This is a gdbus/ only change but I it changes an API definition so all
-> of these other spots need to be updated otherwise the code won't
-> compile.
+> I think we should make gatt_db notify about database changes directly
+> so anyone interested in attribute value changes can subscribe to it.
+>
 
-I wonder if we really need this change or we should have a different
-function. e.g. g_dbus_client_new_full where we can include the object
-manager path without breaking backward compatibility.
+So, after our discussion on IRC, will you be implementing this or
+should I? If you give me a description of the kind of API you're
+thinking about and how things should fit together, then I can have a
+go at it, unless you've started working on it already.
 
+>
+>
+> --
+> Luiz Augusto von Dentz
 
--- 
-Luiz Augusto von Dentz
+Thanks!
+Arman
