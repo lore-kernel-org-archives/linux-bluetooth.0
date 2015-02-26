@@ -2,41 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 06/16] android/gatt: Check status on get characteristic callback
-Date: Thu, 26 Feb 2015 10:39:33 +0100
-Message-Id: <1424943583-30061-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 04/16] attrib/gatt: Minor refactor in char_discovered_cb
+Date: Thu, 26 Feb 2015 10:39:31 +0100
+Message-Id: <1424943583-30061-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This will be needed by next patch
 ---
- android/gatt.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ attrib/gatt.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 53b1983..0296788 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2725,12 +2725,20 @@ static void discover_char_cb(uint8_t status, GSList *characteristics,
- 	struct discover_char_data *data = user_data;
- 	struct service *srvc = data->service;
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index b8d766c..4bffd64 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -574,10 +574,16 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ {
+ 	struct discover_char *dc = user_data;
+ 	struct att_data_list *list;
+-	unsigned int i, err = ATT_ECODE_ATTR_NOT_FOUND;
++	unsigned int i, err = 0;
+ 	uint16_t last = 0;
+ 	uint8_t type;
  
-+	if (status) {
-+		error("gatt: Failed to get characteristics: %s",
-+							att_ecode2str(status));
-+		convert_send_client_char_notify(NULL, data->conn_id, srvc);
++	/* We have all the characteristic now, lets send it up */
++	if (status == ATT_ECODE_ATTR_NOT_FOUND) {
++		err = dc->characteristics ? 0 : status;
 +		goto done;
 +	}
 +
- 	if (queue_isempty(srvc->chars))
- 		cache_all_srvc_chars(srvc, characteristics);
+ 	if (status) {
+ 		err = status;
+ 		goto done;
+@@ -647,7 +653,6 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 	}
  
- 	convert_send_client_char_notify(queue_peek_head(srvc->chars),
- 							data->conn_id, srvc);
- 
-+done:
- 	free(data);
+ done:
+-	err = (dc->characteristics ? 0 : err);
+ 	dc->cb(err, dc->characteristics, dc->user_data);
  }
  
 -- 
