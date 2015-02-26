@@ -1,33 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] audio/avdtp: Remove start timer on stream_free()
-Date: Thu, 26 Feb 2015 17:20:19 +0200
-Message-Id: <1424964022-8887-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/4] audio/avdtp: Add check for callback before run it
+Date: Thu, 26 Feb 2015 17:20:20 +0200
+Message-Id: <1424964022-8887-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1424964022-8887-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1424964022-8887-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Makes code identical to android/avdtp
 ---
- profiles/audio/avdtp.c | 3 +++
- 1 file changed, 3 insertions(+)
+ profiles/audio/avdtp.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 896f101..15b611f 100644
+index 15b611f..3c4e9b1 100644
 --- a/profiles/audio/avdtp.c
 +++ b/profiles/audio/avdtp.c
-@@ -717,6 +717,9 @@ static void stream_free(void *data)
- 	if (stream->timer)
- 		g_source_remove(stream->timer);
+@@ -1035,15 +1035,17 @@ static void finalize_discovery(struct avdtp *session, int err)
+ 	if (!discover)
+ 		return;
  
-+	if (stream->start_timer > 0)
-+		g_source_remove(stream->start_timer);
++	session->discover = NULL;
 +
- 	if (stream->io)
- 		close_stream(stream);
+ 	avdtp_error_init(&avdtp_err, AVDTP_ERRNO, err);
  
+ 	if (discover->id > 0)
+ 		g_source_remove(discover->id);
+ 
+-	discover->cb(session, session->seps, err ? &avdtp_err : NULL,
++	if (discover->cb)
++		discover->cb(session, session->seps, err ? &avdtp_err : NULL,
+ 							discover->user_data);
+ 	g_free(discover);
+-	session->discover = NULL;
+ }
+ 
+ static void release_stream(struct avdtp_stream *stream, struct avdtp *session)
 -- 
 2.1.0
 
