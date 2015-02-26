@@ -2,415 +2,121 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 06/17] core/gatt: Implement GattManager1.RegisterService
-Date: Wed, 25 Feb 2015 21:13:19 -0800
-Message-Id: <1424927610-26226-7-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 04/17] doc/gatt-api.txt: New ObjectManager requirements
+Date: Wed, 25 Feb 2015 21:13:17 -0800
+Message-Id: <1424927610-26226-5-git-send-email-armansito@chromium.org>
 In-Reply-To: <1424927610-26226-1-git-send-email-armansito@chromium.org>
 References: <1424927610-26226-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the initial implementation of the RegisterService
-method. Currently only one attribute entry is created in the local
-database for the GATT service declaration.
+After some discussion it was decided to require an ObjectManager
+interface implementation on a per-service basis to reduce the
+overhead of heaving to process and cache potentially many non-GATT
+related objects. This patch updates the documentation to reflect this.
 ---
- src/gatt-manager.c | 334 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 333 insertions(+), 1 deletion(-)
+ doc/gatt-api.txt | 74 +++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 62 insertions(+), 12 deletions(-)
 
-diff --git a/src/gatt-manager.c b/src/gatt-manager.c
-index 296eabc..0dc4626 100644
---- a/src/gatt-manager.c
-+++ b/src/gatt-manager.c
-@@ -26,27 +26,341 @@
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 67938d0..088d285 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -8,7 +8,9 @@ application. Remote refers to GATT services exported by the peer.
+ BlueZ acts as a proxy, translating ATT operations to D-Bus method calls and
+ Properties (or the opposite). Support for D-Bus Object Manager is mandatory for
+ external services to allow seamless GATT declarations (Service, Characteristic
+-and Descriptors) discovery.
++and Descriptors) discovery. Each GATT service tree is required to export a D-Bus
++Object Manager at its root that is solely responsible for the objects that
++belong to that service.
  
- #include <dbus/dbus.h>
- #include <gdbus/gdbus.h>
-+#include <glib.h>
+ Releasing a registered GATT service is not defined yet. Any API extension
+ should avoid breaking the defined API, and if possible keep an unified GATT
+@@ -229,12 +231,63 @@ Methods		void Release()
+ GATT Manager hierarchy
+ ======================
  
-+#include "lib/bluetooth.h"
-+#include "lib/uuid.h"
- #include "adapter.h"
- #include "gatt-manager.h"
-+#include "gatt-database.h"
- #include "dbus-common.h"
- #include "log.h"
- #include "error.h"
- #include "src/shared/queue.h"
- #include "src/shared/util.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-db.h"
+-GATT Manager allows external applications to register GATT based
+-services. Services must follow the API for Service and Characteristic
+-described above.
+-
+-Local GATT services, characteristics and characteristic descriptors are
+-discovered automatically using the D-Bus Object Manager interface.
++GATT Manager allows external applications to register GATT services and
++profiles.
++
++Registering a profile allows applications to subscribe to *remote* services.
++These must implement the GattProfile1 interface defined above.
++
++Registering a service allows applications to publish a *local* GATT service,
++which then becomes available to remote devices. A GATT service is represented by
++a D-Bus object hierarchy where the root node corresponds to a service and the
++child nodes represent characteristics and descriptors that belong to that
++service. Each node must implement one of GattService1, GattCharacteristic1,
++or GattDescriptor1 interfaces described above, based on the attribute it
++represents. Each node must also implement the standard D-Bus Properties
++interface to expose their properties. These objects collectively represent a
++GATT service definition.
++
++To make service registration simple, BlueZ requires that all objects that belong
++to a GATT service be grouped under a D-Bus Object Manager that solely manages
++the objects of that service. Hence, the standard DBus.ObjectManager interface
++must be available on the root service path. An example application hierarchy
++containing two separate GATT services may look like this:
++
++-> /com/example
++  |
++  -> /com/example/service0
++  | |   - org.freedesktop.DBus.ObjectManager
++  | |   - org.freedesktop.DBus.Properties
++  | |   - org.bluez.GattService1
++  | |
++  | -> /com/example/service0/char0
++  | |     - org.freedesktop.DBus.Properties
++  | |     - org.bluez.GattCharacteristic1
++  | |
++  | -> /com/example/service0/char1
++  |   |   - org.freedesktop.DBus.Properties
++  |   |   - org.bluez.GattCharacteristic1
++  |   |
++  |   -> /com/example/service0/char1/desc0
++  |       - org.freedesktop.DBus.Properties
++  |       - org.bluez.GattDescriptor1
++  |
++  -> /com/example/service1
++    |   - org.freedesktop.DBus.ObjectManager
++    |   - org.freedesktop.DBus.Properties
++    |   - org.bluez.GattService1
++    |
++    -> /com/example/service1/char0
++        - org.freedesktop.DBus.Properties
++        - org.bluez.GattCharacteristic1
++
++When a service is registered, BlueZ will automatically obtain information about
++all objects using the service's Object Manager. Once a service has been
++registered, the objects of a service should not be removed. If BlueZ receives an
++InterfacesRemoved signal from a service's Object Manager, it will immediately
++unregister the service. Similarly, if the application disconnects from the bus,
++all of its registered services will be automatically unregistered.
++InterfacesAdded signals will be ignored.
  
- #define GATT_MANAGER_IFACE	"org.bluez.GattManager1"
-+#define GATT_SERVICE_IFACE	"org.bluez.GattService1"
-+
-+#define UUID_GAP	0x1800
-+#define UUID_GATT	0x1801
+ Service		org.bluez
+ Interface	org.bluez.GattManager1 [Experimental]
+@@ -242,11 +295,8 @@ Object path	[variable prefix]/{hci0,hci1,...}
  
- struct btd_gatt_manager {
- 	struct btd_adapter *adapter;
-+	struct gatt_db *db;
-+	struct queue *services;
-+};
-+
-+struct external_service {
-+	struct btd_gatt_manager *manager;
-+	char *owner;
-+	char *path;	/* Path to GattService1 */
-+	DBusMessage *reg;
-+	GDBusClient *client;
-+	GDBusProxy *proxy;
-+	struct gatt_db_attribute *attrib;
- };
+ Methods		void RegisterService(object service, dict options)
  
-+static bool match_service_path(const void *a, const void *b)
-+{
-+	const struct external_service *service = a;
-+	const char *path = b;
-+
-+	return g_strcmp0(service->path, path) == 0;
-+}
-+
-+static void service_free(void *data)
-+{
-+	struct external_service *service = data;
-+
-+	gatt_db_remove_service(service->manager->db, service->attrib);
-+
-+	if (service->client) {
-+		g_dbus_client_set_disconnect_watch(service->client, NULL, NULL);
-+		g_dbus_client_set_proxy_handlers(service->client, NULL, NULL,
-+								NULL, NULL);
-+		g_dbus_client_set_ready_watch(service->client, NULL, NULL);
-+		g_dbus_client_unref(service->client);
-+	}
-+
-+	if (service->proxy)
-+		g_dbus_proxy_unref(service->proxy);
-+
-+	if (service->reg)
-+		dbus_message_unref(service->reg);
-+
-+	if (service->owner)
-+		g_free(service->owner);
-+
-+	if (service->path)
-+		g_free(service->path);
-+
-+	free(service);
-+}
-+
-+static gboolean service_free_idle_cb(void *data)
-+{
-+	service_free(data);
-+
-+	return FALSE;
-+}
-+
-+static void service_remove_helper(void *data)
-+{
-+	struct external_service *service = data;
-+
-+	queue_remove(service->manager->services, service);
-+
-+	/*
-+	 * Do not run in the same loop, this may be a disconnect
-+	 * watch call and GDBusClient should not be destroyed.
-+	 */
-+	g_idle_add(service_free_idle_cb, service);
-+}
-+
-+static void client_disconnect_cb(DBusConnection *conn, void *user_data)
-+{
-+	DBG("Client disconnected");
-+
-+	service_remove_helper(user_data);
-+}
-+
-+static void service_remove(void *data)
-+{
-+	struct external_service *service = data;
-+
-+	/*
-+	 * Set callback to NULL to avoid potential race condition
-+	 * when calling remove_service and GDBusClient unref.
-+	 */
-+	g_dbus_client_set_disconnect_watch(service->client, NULL, NULL);
-+
-+	service_remove_helper(service);
-+}
-+
-+static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
-+{
-+	struct external_service *service = user_data;
-+	const char *iface, *path;
-+
-+	iface = g_dbus_proxy_get_interface(proxy);
-+	path = g_dbus_proxy_get_path(proxy);
-+
-+	if (!g_str_has_prefix(path, service->path))
-+		return;
-+
-+	/* TODO: Handle characteristic and descriptors here */
-+
-+	if (g_strcmp0(iface, GATT_SERVICE_IFACE))
-+		return;
-+
-+	DBG("Object added to service - path: %s, iface: %s", path, iface);
-+
-+	service->proxy = g_dbus_proxy_ref(proxy);
-+}
-+
-+static void proxy_removed_cb(GDBusProxy *proxy, void *user_data)
-+{
-+	struct external_service *service = user_data;
-+	const char *path;
-+
-+	path = g_dbus_proxy_get_path(proxy);
-+
-+	if (!g_str_has_prefix(path, service->path))
-+		return;
-+
-+	DBG("Proxy removed - removing service: %s", service->path);
-+
-+	service_remove(service);
-+}
-+
-+static bool parse_uuid(GDBusProxy *proxy, bt_uuid_t *uuid)
-+{
-+	DBusMessageIter iter;
-+	bt_uuid_t tmp;
-+	const char *uuidstr;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
-+		return false;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return false;
-+
-+	dbus_message_iter_get_basic(&iter, &uuidstr);
-+
-+	if (bt_string_to_uuid(uuid, uuidstr) < 0)
-+		return false;
-+
-+	/* GAP & GATT services are created and managed by BlueZ */
-+	bt_uuid16_create(&tmp, UUID_GAP);
-+	if (!bt_uuid_cmp(&tmp, uuid)) {
-+		error("GAP service must be handled by BlueZ");
-+		return false;
-+	}
-+
-+	bt_uuid16_create(&tmp, UUID_GATT);
-+	if (!bt_uuid_cmp(&tmp, uuid)) {
-+		error("GATT service must be handled by BlueZ");
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static bool parse_primary(GDBusProxy *proxy, bool *primary)
-+{
-+	DBusMessageIter iter;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "Primary", &iter))
-+		return false;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BOOLEAN)
-+		return false;
-+
-+	dbus_message_iter_get_basic(&iter, primary);
-+
-+	return true;
-+}
-+
-+static bool create_service_entry(struct external_service *service)
-+{
-+	bt_uuid_t uuid;
-+	bool primary;
-+
-+	if (!parse_uuid(service->proxy, &uuid)) {
-+		error("Failed to read \"UUID\" property of service");
-+		return false;
-+	}
-+
-+	if (!parse_primary(service->proxy, &primary)) {
-+		error("Failed to read \"Primary\" property of service");
-+		return false;
-+	}
-+
-+	/* TODO: Determine the correct attribute count */
-+	service->attrib = gatt_db_add_service(service->manager->db, &uuid,
-+								primary, 1);
-+	if (!service->attrib)
-+		return false;
-+
-+	gatt_db_service_set_active(service->attrib, true);
-+
-+	return true;
-+}
-+
-+static void client_ready_cb(GDBusClient *client, void *user_data)
-+{
-+	struct external_service *service = user_data;
-+	DBusMessage *reply;
-+	bool fail = false;
-+
-+	if (!service->proxy) {
-+		error("No external GATT objects found");
-+		fail = true;
-+		reply = btd_error_failed(service->reg,
-+						"No service object found");
-+		goto reply;
-+	}
-+
-+	if (!create_service_entry(service)) {
-+		error("Failed to create GATT service entry in local database");
-+		fail = true;
-+		reply = btd_error_failed(service->reg,
-+					"Failed to create entry in database");
-+		goto reply;
-+	}
-+
-+	DBG("GATT service registered: %s", service->path);
-+
-+	reply = dbus_message_new_method_return(service->reg);
-+
-+reply:
-+	g_dbus_send_message(btd_get_dbus_connection(), reply);
-+	dbus_message_unref(service->reg);
-+	service->reg = NULL;
-+
-+	if (fail)
-+		service_remove(service);
-+}
-+
-+static struct external_service *service_create(DBusConnection *conn,
-+					DBusMessage *msg, const char *path)
-+{
-+	struct external_service *service;
-+	const char *sender = dbus_message_get_sender(msg);
-+
-+	if (!path || !g_str_has_prefix(path, "/"))
-+		return NULL;
-+
-+	service = new0(struct external_service, 1);
-+	if (!service)
-+		return NULL;
-+
-+	service->client = g_dbus_client_new(conn, sender, path, path);
-+	if (!service->client)
-+		goto fail;
-+
-+	service->owner = g_strdup(sender);
-+	if (!service->owner)
-+		goto fail;
-+
-+	service->path = g_strdup(path);
-+	if (!service->path)
-+		goto fail;
-+
-+	service->reg = dbus_message_ref(msg);
-+
-+	g_dbus_client_set_disconnect_watch(service->client,
-+						client_disconnect_cb, service);
-+	g_dbus_client_set_proxy_handlers(service->client, proxy_added_cb,
-+							proxy_removed_cb, NULL,
-+							service);
-+	g_dbus_client_set_ready_watch(service->client, client_ready_cb,
-+								service);
-+
-+	return service;
-+
-+fail:
-+	service_free(service);
-+	return NULL;
-+}
-+
- static DBusMessage *manager_register_service(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
-+	struct btd_gatt_manager *manager = user_data;
-+	DBusMessageIter args;
-+	const char *path;
-+	struct external_service *service;
-+
- 	DBG("RegisterService");
+-			Registers remote application service exported under
+-			interface GattService1. Characteristic objects must
+-			be hierarchical to their service and must use the
+-			interface GattCharacteristic1. D-Bus Object Manager
+-			is used to fetch the exported objects.
++			Registers a local GATT service hierarchy as described
++			above.
  
--	/* TODO */
-+	if (!dbus_message_iter_init(msg, &args))
-+		return btd_error_invalid_args(msg);
-+
-+	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&args, &path);
-+
-+	if (queue_find(manager->services, match_service_path, path))
-+		return btd_error_already_exists(msg);
-+
-+	dbus_message_iter_next(&args);
-+	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
-+		return btd_error_invalid_args(msg);
-+
-+	service = service_create(conn, msg, path);
-+	if (!service)
-+		return btd_error_failed(msg, "Failed to register service");
-+
-+	DBG("Registering service - path: %s", path);
-+
-+	service->manager = manager;
-+	queue_push_tail(manager->services, service);
-+
- 	return NULL;
- }
- 
-@@ -72,11 +386,24 @@ static const GDBusMethodTable manager_methods[] = {
- static struct btd_gatt_manager *manager_create(struct btd_adapter *adapter)
- {
- 	struct btd_gatt_manager *manager;
-+	struct gatt_db *db;
-+	struct btd_gatt_database *database;
-+
-+	database = btd_adapter_get_database(adapter);
-+	db = btd_gatt_database_get_db(database);
-+	if (!db)
-+		return NULL;
- 
- 	manager = new0(struct btd_gatt_manager, 1);
- 	if (!manager)
- 		return NULL;
- 
-+	manager->services = queue_new();
-+	if (!manager->services) {
-+		free(manager);
-+		return NULL;
-+	}
-+
- 	manager->adapter = adapter;
- 
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
-@@ -85,10 +412,13 @@ static struct btd_gatt_manager *manager_create(struct btd_adapter *adapter)
- 						manager_methods, NULL, NULL,
- 						manager, NULL)) {
- 		error("Failed to register " GATT_MANAGER_IFACE);
-+		queue_destroy(manager->services, NULL);
- 		free(manager);
- 		return NULL;
- 	}
- 
-+	manager->db = gatt_db_ref(db);
-+
- 	return manager;
- }
- 
-@@ -117,5 +447,7 @@ void btd_gatt_manager_destroy(struct btd_gatt_manager *manager)
- 	g_dbus_unregister_interface(btd_get_dbus_connection(),
- 					adapter_get_path(manager->adapter),
- 					GATT_MANAGER_IFACE);
-+	queue_destroy(manager->services, service_free);
-+	gatt_db_unref(manager->db);
- 	free(manager);
- }
+ 			"service" object path together with the D-Bus system
+ 			bus connection ID define the identification of the
 -- 
 2.2.0.rc0.207.ga3a616c
 
