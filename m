@@ -1,45 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] audio/avdtp: Add AVDTP_STATE_OPEN to allowed state
-Date: Thu, 26 Feb 2015 17:20:21 +0200
-Message-Id: <1424964022-8887-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1424964022-8887-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1424964022-8887-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH BlueZ 2/2] shared/att: Emulate security level
+Date: Thu, 26 Feb 2015 16:03:20 +0200
+Message-Id: <1424959400-18701-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1424959400-18701-1-git-send-email-luiz.dentz@gmail.com>
+References: <1424959400-18701-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-In delay report handling add AVDTP_STATE_OPEN to good states.
+Emulate security level with SO_PRIORITY.
 ---
- profiles/audio/avdtp.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ src/shared/att.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 3c4e9b1..1cad010 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -1948,10 +1948,17 @@ static gboolean avdtp_delayreport_cmd(struct avdtp *session,
+diff --git a/src/shared/att.c b/src/shared/att.c
+index aa06dc6..ba17f78 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -1343,6 +1343,20 @@ bool bt_att_unregister_all(struct bt_att *att)
+ 	return true;
+ }
  
- 	stream = sep->stream;
++static int socket_get_sec_level(struct bt_att *att)
++{
++	socklen_t len;
++	uint32_t prio;
++
++	len = sizeof(prio);
++
++	/* Emulate sec level with SO_PRIORITY */
++	if (getsockopt(att->fd, SOL_SOCKET, SO_PRIORITY, &prio, &len) < 0)
++		return -errno;
++
++	return prio;
++}
++
+ int bt_att_get_sec_level(struct bt_att *att)
+ {
+ 	struct bt_security sec;
+@@ -1351,12 +1365,8 @@ int bt_att_get_sec_level(struct bt_att *att)
+ 	if (!att)
+ 		return -EINVAL;
  
--	if (sep->state != AVDTP_STATE_CONFIGURED &&
--					sep->state != AVDTP_STATE_STREAMING) {
-+	switch (sep->state) {
-+	case AVDTP_STATE_IDLE:
-+	case AVDTP_STATE_ABORTING:
-+	case AVDTP_STATE_CLOSING:
- 		err = AVDTP_BAD_STATE;
- 		goto failed;
-+	case AVDTP_STATE_CONFIGURED:
-+	case AVDTP_STATE_OPEN:
-+	case AVDTP_STATE_STREAMING:
-+	default:
-+		break;
- 	}
+-	/*
+-	 * Let's be nice for unit test.
+-	 * TODO: Might be needed to emulate different levels for test purposes
+-	 */
+ 	if (!att->io_on_l2cap)
+-		return BT_SECURITY_LOW;
++		return socket_get_sec_level(att);
  
- 	stream->delay = ntohs(req->delay);
+ 	memset(&sec, 0, sizeof(sec));
+ 	len = sizeof(sec);
+@@ -1366,6 +1376,13 @@ int bt_att_get_sec_level(struct bt_att *att)
+ 	return sec.level;
+ }
+ 
++static bool socket_set_sec_level(struct bt_att *att, uint32_t level)
++{
++	/* Emulate sec level with SO_PRIORITY */
++	return (setsockopt(att->fd, SOL_SOCKET, SO_PRIORITY, &level,
++				sizeof(level)) < 0) ? false : true;
++}
++
+ bool bt_att_set_sec_level(struct bt_att *att, int level)
+ {
+ 	struct bt_security sec;
+@@ -1373,9 +1390,8 @@ bool bt_att_set_sec_level(struct bt_att *att, int level)
+ 	if (!att || level < BT_SECURITY_LOW || level > BT_SECURITY_HIGH)
+ 		return false;
+ 
+-	/* Let's be nice for unit test.*/
+ 	if (!att->io_on_l2cap)
+-		return true;
++		return socket_set_sec_level(att, level);
+ 
+ 	memset(&sec, 0, sizeof(sec));
+ 	sec.level = level;
 -- 
 2.1.0
 
