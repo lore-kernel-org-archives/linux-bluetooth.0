@@ -2,58 +2,90 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 16/16] shared/gatt-helpers: Improve robustness of get descriptors
-Date: Thu, 26 Feb 2015 10:39:43 +0100
-Message-Id: <1424943583-30061-17-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 12/16] shated/gatt-helpers: Improve robustness of search service
+Date: Thu, 26 Feb 2015 10:39:39 +0100
+Message-Id: <1424943583-30061-13-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This patch makes sure that we do get into infinite loop when doing
-get descriptors operation.
+search service request
 
-It could happen if we got bogus find information response
+It could happen if we got bogus read by group or find by type response
 ---
- src/shared/gatt-helpers.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ src/shared/gatt-helpers.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
 diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index 6e5cf30..39ba636 100644
+index 2d07a83..1a60f31 100644
 --- a/src/shared/gatt-helpers.c
 +++ b/src/shared/gatt-helpers.c
-@@ -1460,10 +1460,22 @@ static void discover_descs_cb(uint8_t opcode, const void *pdu,
+@@ -212,6 +212,7 @@ static bool convert_uuid_le(const uint8_t *src, size_t len, uint8_t dst[16])
+ struct discovery_op {
+ 	struct bt_att *att;
+ 	unsigned int id;
++	uint16_t start_handle;
+ 	uint16_t end_handle;
+ 	int ref_count;
+ 	bt_uuid_t uuid;
+@@ -663,10 +664,22 @@ static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
  	}
  
- 	last_handle = get_le16(pdu + length - data_length);
+ 	last_end = get_le16(pdu + length - data_length + 2);
 +
 +	/*
 +	 * If last handle is lower from previous start handle then it is smth
 +	 * wrong. Let's stop search, otherwise we might enter infinite loop.
 +	 */
-+	if (last_handle < op->start_handle) {
++	if (last_end < op->start_handle) {
 +		success = false;
 +		goto done;
 +	}
 +
-+	op->start_handle = last_handle + 1;
++	op->start_handle = last_end + 1;
 +
- 	if (last_handle != op->end_handle) {
- 		uint8_t pdu[4];
+ 	if (last_end < op->end_handle) {
+ 		uint8_t pdu[6];
  
--		put_le16(last_handle + 1, pdu);
+-		put_le16(last_end + 1, pdu);
 +		put_le16(op->start_handle, pdu);
  		put_le16(op->end_handle, pdu + 2);
+ 		put_le16(op->service_type, pdu + 4);
  
- 		op->id = bt_att_send(op->att, BT_ATT_OP_FIND_INFO_REQ,
-@@ -1505,6 +1517,7 @@ bool bt_gatt_discover_descriptors(struct bt_att *att,
- 	op->callback = callback;
- 	op->user_data = user_data;
- 	op->destroy = destroy;
+@@ -738,10 +751,22 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+ 	 * last_end is end handle of last data set
+ 	 */
+ 	last_end = get_le16(pdu + length - 2);
++
++	/*
++	* If last handle is lower from previous start handle then it is smth
++	* wrong. Let's stop search, otherwise we might enter infinite loop.
++	*/
++	if (last_end < op->start_handle) {
++		success = false;
++		goto done;
++	}
++
++	op->start_handle = last_end + 1;
++
+ 	if (last_end < op->end_handle) {
+ 		uint8_t pdu[6 + get_uuid_len(&op->uuid)];
+ 
+-		put_le16(last_end + 1, pdu);
++		put_le16(op->start_handle, pdu);
+ 		put_le16(op->end_handle, pdu + 2);
+ 		put_le16(op->service_type, pdu + 4);
+ 		bt_uuid_to_le(&op->uuid, pdu + 6);
+@@ -782,6 +807,7 @@ static bool discover_services(struct bt_att *att, bt_uuid_t *uuid,
+ 		return false;
+ 
+ 	op->att = att;
 +	op->start_handle = start;
  	op->end_handle = end;
- 
- 	put_le16(start, pdu);
+ 	op->callback = callback;
+ 	op->user_data = user_data;
 -- 
 1.8.4
 
