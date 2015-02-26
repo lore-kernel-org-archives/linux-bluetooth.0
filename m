@@ -2,368 +2,415 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 07/17] core/gatt: Register characteristics
-Date: Wed, 25 Feb 2015 21:13:20 -0800
-Message-Id: <1424927610-26226-8-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v1 06/17] core/gatt: Implement GattManager1.RegisterService
+Date: Wed, 25 Feb 2015 21:13:19 -0800
+Message-Id: <1424927610-26226-7-git-send-email-armansito@chromium.org>
 In-Reply-To: <1424927610-26226-1-git-send-email-armansito@chromium.org>
 References: <1424927610-26226-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for registering characteristic objects. This
-adds internal plumbing for determining the final attribute count for
-a service handle range and creates characteristic entries in the server
-database.
+This patch adds the initial implementation of the RegisterService
+method. Currently only one attribute entry is created in the local
+database for the GATT service declaration.
 ---
- src/gatt-manager.c | 250 ++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 240 insertions(+), 10 deletions(-)
+ src/gatt-manager.c | 334 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 333 insertions(+), 1 deletion(-)
 
 diff --git a/src/gatt-manager.c b/src/gatt-manager.c
-index 0dc4626..cc52cd1 100644
+index 296eabc..0dc4626 100644
 --- a/src/gatt-manager.c
 +++ b/src/gatt-manager.c
-@@ -43,6 +43,7 @@
+@@ -26,27 +26,341 @@
+ 
+ #include <dbus/dbus.h>
+ #include <gdbus/gdbus.h>
++#include <glib.h>
+ 
++#include "lib/bluetooth.h"
++#include "lib/uuid.h"
+ #include "adapter.h"
+ #include "gatt-manager.h"
++#include "gatt-database.h"
+ #include "dbus-common.h"
+ #include "log.h"
+ #include "error.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/util.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-db.h"
  
  #define GATT_MANAGER_IFACE	"org.bluez.GattManager1"
- #define GATT_SERVICE_IFACE	"org.bluez.GattService1"
-+#define GATT_CHRC_IFACE		"org.bluez.GattCharacteristic1"
++#define GATT_SERVICE_IFACE	"org.bluez.GattService1"
++
++#define UUID_GAP	0x1800
++#define UUID_GATT	0x1801
  
- #define UUID_GAP	0x1800
- #define UUID_GATT	0x1801
-@@ -55,11 +56,21 @@ struct btd_gatt_manager {
- 
- struct external_service {
- 	struct btd_gatt_manager *manager;
-+	bool failed;
- 	char *owner;
- 	char *path;	/* Path to GattService1 */
- 	DBusMessage *reg;
- 	GDBusClient *client;
- 	GDBusProxy *proxy;
-+	uint16_t attr_cnt;
-+	struct gatt_db_attribute *attrib;
-+	struct queue *chrcs;
+ struct btd_gatt_manager {
+ 	struct btd_adapter *adapter;
++	struct gatt_db *db;
++	struct queue *services;
 +};
 +
-+struct external_chrc {
++struct external_service {
++	struct btd_gatt_manager *manager;
++	char *owner;
++	char *path;	/* Path to GattService1 */
++	DBusMessage *reg;
++	GDBusClient *client;
 +	GDBusProxy *proxy;
-+	uint8_t props;
-+	uint8_t ext_props;
- 	struct gatt_db_attribute *attrib;
++	struct gatt_db_attribute *attrib;
  };
  
-@@ -71,10 +82,23 @@ static bool match_service_path(const void *a, const void *b)
- 	return g_strcmp0(service->path, path) == 0;
- }
- 
-+static void chrc_free(void *data)
++static bool match_service_path(const void *a, const void *b)
 +{
-+	struct external_chrc *chrc = data;
++	const struct external_service *service = a;
++	const char *path = b;
 +
-+	if (chrc->proxy)
-+		g_dbus_proxy_unref(chrc->proxy);
-+
-+	free(chrc);
++	return g_strcmp0(service->path, path) == 0;
 +}
 +
- static void service_free(void *data)
- {
- 	struct external_service *service = data;
- 
-+	if (service->chrcs)
-+		queue_destroy(service->chrcs, chrc_free);
++static void service_free(void *data)
++{
++	struct external_service *service = data;
 +
- 	gatt_db_remove_service(service->manager->db, service->attrib);
- 
- 	if (service->client) {
-@@ -137,13 +161,114 @@ static void service_remove(void *data)
- 	 */
- 	g_dbus_client_set_disconnect_watch(service->client, NULL, NULL);
- 
-+	/*
-+	 * Set proxy handlers to NULL, so that this gets called only once when
-+	 * the first proxy that belongs to this service gets removed.
-+	 */
-+	g_dbus_client_set_proxy_handlers(service->client, NULL, NULL,
++	gatt_db_remove_service(service->manager->db, service->attrib);
++
++	if (service->client) {
++		g_dbus_client_set_disconnect_watch(service->client, NULL, NULL);
++		g_dbus_client_set_proxy_handlers(service->client, NULL, NULL,
 +								NULL, NULL);
++		g_dbus_client_set_ready_watch(service->client, NULL, NULL);
++		g_dbus_client_unref(service->client);
++	}
 +
- 	service_remove_helper(service);
- }
- 
-+static struct external_chrc *chrc_create(GDBusProxy *proxy)
-+{
-+	struct external_chrc *chrc;
++	if (service->proxy)
++		g_dbus_proxy_unref(service->proxy);
 +
-+	chrc = new0(struct external_chrc, 1);
-+	if (!chrc)
-+		return NULL;
++	if (service->reg)
++		dbus_message_unref(service->reg);
 +
-+	chrc->proxy = g_dbus_proxy_ref(proxy);
++	if (service->owner)
++		g_free(service->owner);
 +
-+	return chrc;
++	if (service->path)
++		g_free(service->path);
++
++	free(service);
 +}
 +
-+static bool incr_attr_count(struct external_service *service, uint16_t incr)
++static gboolean service_free_idle_cb(void *data)
 +{
-+	if (service->attr_cnt > UINT16_MAX - incr)
-+		return false;
++	service_free(data);
 +
-+	service->attr_cnt += incr;
-+
-+	return true;
++	return FALSE;
 +}
 +
-+static bool parse_service(GDBusProxy *proxy, struct external_service *service)
++static void service_remove_helper(void *data)
++{
++	struct external_service *service = data;
++
++	queue_remove(service->manager->services, service);
++
++	/*
++	 * Do not run in the same loop, this may be a disconnect
++	 * watch call and GDBusClient should not be destroyed.
++	 */
++	g_idle_add(service_free_idle_cb, service);
++}
++
++static void client_disconnect_cb(DBusConnection *conn, void *user_data)
++{
++	DBG("Client disconnected");
++
++	service_remove_helper(user_data);
++}
++
++static void service_remove(void *data)
++{
++	struct external_service *service = data;
++
++	/*
++	 * Set callback to NULL to avoid potential race condition
++	 * when calling remove_service and GDBusClient unref.
++	 */
++	g_dbus_client_set_disconnect_watch(service->client, NULL, NULL);
++
++	service_remove_helper(service);
++}
++
++static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
++{
++	struct external_service *service = user_data;
++	const char *iface, *path;
++
++	iface = g_dbus_proxy_get_interface(proxy);
++	path = g_dbus_proxy_get_path(proxy);
++
++	if (!g_str_has_prefix(path, service->path))
++		return;
++
++	/* TODO: Handle characteristic and descriptors here */
++
++	if (g_strcmp0(iface, GATT_SERVICE_IFACE))
++		return;
++
++	DBG("Object added to service - path: %s, iface: %s", path, iface);
++
++	service->proxy = g_dbus_proxy_ref(proxy);
++}
++
++static void proxy_removed_cb(GDBusProxy *proxy, void *user_data)
++{
++	struct external_service *service = user_data;
++	const char *path;
++
++	path = g_dbus_proxy_get_path(proxy);
++
++	if (!g_str_has_prefix(path, service->path))
++		return;
++
++	DBG("Proxy removed - removing service: %s", service->path);
++
++	service_remove(service);
++}
++
++static bool parse_uuid(GDBusProxy *proxy, bt_uuid_t *uuid)
 +{
 +	DBusMessageIter iter;
-+	const char *service_path;
++	bt_uuid_t tmp;
++	const char *uuidstr;
 +
-+	if (!g_dbus_proxy_get_property(proxy, "Service", &iter))
++	if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
 +		return false;
 +
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_OBJECT_PATH)
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
 +		return false;
 +
-+	dbus_message_iter_get_basic(&iter, &service_path);
++	dbus_message_iter_get_basic(&iter, &uuidstr);
 +
-+	return g_strcmp0(service_path, service->path) == 0;
-+}
-+
-+static bool parse_flags(GDBusProxy *proxy, uint8_t *props, uint8_t *ext_props)
-+{
-+	DBusMessageIter iter, array;
-+	const char *flag;
-+
-+	*props = *ext_props = 0;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "Flags", &iter))
++	if (bt_string_to_uuid(uuid, uuidstr) < 0)
 +		return false;
 +
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++	/* GAP & GATT services are created and managed by BlueZ */
++	bt_uuid16_create(&tmp, UUID_GAP);
++	if (!bt_uuid_cmp(&tmp, uuid)) {
++		error("GAP service must be handled by BlueZ");
 +		return false;
++	}
 +
-+	dbus_message_iter_recurse(&iter, &array);
-+
-+	do {
-+		if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_STRING)
-+			return false;
-+
-+		dbus_message_iter_get_basic(&array, &flag);
-+
-+		if (!strcmp("broadcast", flag))
-+			*props |= BT_GATT_CHRC_PROP_BROADCAST;
-+		else if (!strcmp("read", flag))
-+			*props |= BT_GATT_CHRC_PROP_READ;
-+		else if (!strcmp("write-without-response", flag))
-+			*props |= BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP;
-+		else if (!strcmp("write", flag))
-+			*props |= BT_GATT_CHRC_PROP_WRITE;
-+		else if (!strcmp("notify", flag))
-+			*props |= BT_GATT_CHRC_PROP_NOTIFY;
-+		else if (!strcmp("indicate", flag))
-+			*props |= BT_GATT_CHRC_PROP_INDICATE;
-+		else if (!strcmp("authenticated-signed-writes", flag))
-+			*props |= BT_GATT_CHRC_PROP_AUTH;
-+		else if (!strcmp("reliable-write", flag))
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE;
-+		else if (!strcmp("writable-auxiliaries", flag))
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX;
-+		else {
-+			error("Invalid characteristic flag: %s", flag);
-+			return false;
-+		}
-+	} while (dbus_message_iter_next(&array));
-+
-+	if (*ext_props)
-+		*props |= BT_GATT_CHRC_PROP_EXT_PROP;
++	bt_uuid16_create(&tmp, UUID_GATT);
++	if (!bt_uuid_cmp(&tmp, uuid)) {
++		error("GATT service must be handled by BlueZ");
++		return false;
++	}
 +
 +	return true;
 +}
 +
- static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
- {
- 	struct external_service *service = user_data;
- 	const char *iface, *path;
-+	struct external_chrc *chrc;
-+
-+	if (service->failed || service->attrib)
-+		return;
- 
- 	iface = g_dbus_proxy_get_interface(proxy);
- 	path = g_dbus_proxy_get_path(proxy);
-@@ -151,14 +276,74 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
- 	if (!g_str_has_prefix(path, service->path))
- 		return;
- 
--	/* TODO: Handle characteristic and descriptors here */
--
--	if (g_strcmp0(iface, GATT_SERVICE_IFACE))
-+	/* TODO: Handle descriptors here */
-+
-+	if (g_strcmp0(iface, GATT_SERVICE_IFACE) == 0) {
-+		if (service->proxy)
-+			return;
-+
-+		/*
-+		 * TODO: We may want to support adding included services in a
-+		 * single hierarchy.
-+		 */
-+		if (g_strcmp0(path, service->path) != 0) {
-+			error("Multiple services added within hierarchy");
-+			service->failed = true;
-+			return;
-+		}
-+
-+		/* Add 1 for the service declaration */
-+		if (!incr_attr_count(service, 1)) {
-+			error("Failed to increment attribute count");
-+			service->failed = true;
-+			return;
-+		}
-+
-+		service->proxy = g_dbus_proxy_ref(proxy);
-+	} else if (g_strcmp0(iface, GATT_CHRC_IFACE) == 0) {
-+		if (g_strcmp0(path, service->path) == 0) {
-+			error("Characteristic path same as service path");
-+			service->failed = true;
-+			return;
-+		}
-+
-+		chrc = chrc_create(proxy);
-+		if (!chrc) {
-+			service->failed = true;
-+			return;
-+		}
-+
-+		/*
-+		 * Add 2 for the characteristic declaration and the value
-+		 * attribute.
-+		 */
-+		if (!incr_attr_count(service, 2)) {
-+			error("Failed to increment attribute count");
-+			service->failed = true;
-+			return;
-+		}
-+
-+		/*
-+		 * Parse characteristic flags (i.e. properties) here since they
-+		 * are used to determine if any special descriptors should be
-+		 * created.
-+		 */
-+		if (!parse_flags(proxy, &chrc->props, &chrc->ext_props)) {
-+			error("Failed to parse characteristic properties");
-+			service->failed = true;
-+			return;
-+		}
-+
-+		/*
-+		 * TODO: Determine descriptors count to add based on special
-+		 * characteristic properties (e.g. extended properties).
-+		 */
-+
-+		queue_push_tail(service->chrcs, chrc);
-+	} else
- 		return;
- 
- 	DBG("Object added to service - path: %s, iface: %s", path, iface);
--
--	service->proxy = g_dbus_proxy_ref(proxy);
- }
- 
- static void proxy_removed_cb(GDBusProxy *proxy, void *user_data)
-@@ -224,10 +409,37 @@ static bool parse_primary(GDBusProxy *proxy, bool *primary)
- 	return true;
- }
- 
-+static bool create_chrc_entry(struct external_service *service,
-+						struct external_chrc *chrc)
++static bool parse_primary(GDBusProxy *proxy, bool *primary)
 +{
-+	bt_uuid_t uuid;
++	DBusMessageIter iter;
 +
-+	if (!parse_uuid(chrc->proxy, &uuid)) {
-+		error("Failed to read \"UUID\" property of characteristic");
++	if (!g_dbus_proxy_get_property(proxy, "Primary", &iter))
 +		return false;
-+	}
 +
-+	if (!parse_service(chrc->proxy, service)) {
-+		error("Invalid service path for characteristic");
-+		service->failed = true;
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BOOLEAN)
 +		return false;
-+	}
 +
-+	/* TODO: Assign permissions and read/write callbacks */
-+	chrc->attrib = gatt_db_service_add_characteristic(service->attrib,
-+							&uuid, 0, chrc->props,
-+							NULL, NULL, NULL);
++	dbus_message_iter_get_basic(&iter, primary);
 +
-+	/* TODO: Create descriptor entries */
-+
-+	return !!chrc->attrib;
++	return true;
 +}
 +
- static bool create_service_entry(struct external_service *service)
- {
- 	bt_uuid_t uuid;
- 	bool primary;
-+	const struct queue_entry *entry;
- 
- 	if (!parse_uuid(service->proxy, &uuid)) {
- 		error("Failed to read \"UUID\" property of service");
-@@ -239,12 +451,26 @@ static bool create_service_entry(struct external_service *service)
- 		return false;
- 	}
- 
--	/* TODO: Determine the correct attribute count */
- 	service->attrib = gatt_db_add_service(service->manager->db, &uuid,
--								primary, 1);
-+						primary, service->attr_cnt);
- 	if (!service->attrib)
- 		return false;
- 
-+	entry = queue_get_entries(service->chrcs);
-+	while (entry) {
-+		struct external_chrc *chrc = entry->data;
++static bool create_service_entry(struct external_service *service)
++{
++	bt_uuid_t uuid;
++	bool primary;
 +
-+		if (!create_chrc_entry(service, chrc)) {
-+			error("Failed to create characteristic entry");
-+			gatt_db_remove_service(service->manager->db,
-+							service->attrib);
-+			service->attrib = NULL;
-+			return false;
-+		}
-+
-+		entry = entry->next;
++	if (!parse_uuid(service->proxy, &uuid)) {
++		error("Failed to read \"UUID\" property of service");
++		return false;
 +	}
 +
- 	gatt_db_service_set_active(service->attrib, true);
- 
- 	return true;
-@@ -256,11 +482,11 @@ static void client_ready_cb(GDBusClient *client, void *user_data)
- 	DBusMessage *reply;
- 	bool fail = false;
- 
--	if (!service->proxy) {
--		error("No external GATT objects found");
-+	if (!service->proxy || service->failed) {
-+		error("No valid external GATT objects found");
- 		fail = true;
- 		reply = btd_error_failed(service->reg,
--						"No service object found");
-+					"No valid service object found");
- 		goto reply;
- 	}
- 
-@@ -310,6 +536,10 @@ static struct external_service *service_create(DBusConnection *conn,
- 	if (!service->path)
- 		goto fail;
- 
-+	service->chrcs = queue_new();
-+	if (!service->chrcs)
++	if (!parse_primary(service->proxy, &primary)) {
++		error("Failed to read \"Primary\" property of service");
++		return false;
++	}
++
++	/* TODO: Determine the correct attribute count */
++	service->attrib = gatt_db_add_service(service->manager->db, &uuid,
++								primary, 1);
++	if (!service->attrib)
++		return false;
++
++	gatt_db_service_set_active(service->attrib, true);
++
++	return true;
++}
++
++static void client_ready_cb(GDBusClient *client, void *user_data)
++{
++	struct external_service *service = user_data;
++	DBusMessage *reply;
++	bool fail = false;
++
++	if (!service->proxy) {
++		error("No external GATT objects found");
++		fail = true;
++		reply = btd_error_failed(service->reg,
++						"No service object found");
++		goto reply;
++	}
++
++	if (!create_service_entry(service)) {
++		error("Failed to create GATT service entry in local database");
++		fail = true;
++		reply = btd_error_failed(service->reg,
++					"Failed to create entry in database");
++		goto reply;
++	}
++
++	DBG("GATT service registered: %s", service->path);
++
++	reply = dbus_message_new_method_return(service->reg);
++
++reply:
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++	dbus_message_unref(service->reg);
++	service->reg = NULL;
++
++	if (fail)
++		service_remove(service);
++}
++
++static struct external_service *service_create(DBusConnection *conn,
++					DBusMessage *msg, const char *path)
++{
++	struct external_service *service;
++	const char *sender = dbus_message_get_sender(msg);
++
++	if (!path || !g_str_has_prefix(path, "/"))
++		return NULL;
++
++	service = new0(struct external_service, 1);
++	if (!service)
++		return NULL;
++
++	service->client = g_dbus_client_new(conn, sender, path, path);
++	if (!service->client)
 +		goto fail;
 +
- 	service->reg = dbus_message_ref(msg);
++	service->owner = g_strdup(sender);
++	if (!service->owner)
++		goto fail;
++
++	service->path = g_strdup(path);
++	if (!service->path)
++		goto fail;
++
++	service->reg = dbus_message_ref(msg);
++
++	g_dbus_client_set_disconnect_watch(service->client,
++						client_disconnect_cb, service);
++	g_dbus_client_set_proxy_handlers(service->client, proxy_added_cb,
++							proxy_removed_cb, NULL,
++							service);
++	g_dbus_client_set_ready_watch(service->client, client_ready_cb,
++								service);
++
++	return service;
++
++fail:
++	service_free(service);
++	return NULL;
++}
++
+ static DBusMessage *manager_register_service(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
++	struct btd_gatt_manager *manager = user_data;
++	DBusMessageIter args;
++	const char *path;
++	struct external_service *service;
++
+ 	DBG("RegisterService");
  
- 	g_dbus_client_set_disconnect_watch(service->client,
+-	/* TODO */
++	if (!dbus_message_iter_init(msg, &args))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&args, &path);
++
++	if (queue_find(manager->services, match_service_path, path))
++		return btd_error_already_exists(msg);
++
++	dbus_message_iter_next(&args);
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
++		return btd_error_invalid_args(msg);
++
++	service = service_create(conn, msg, path);
++	if (!service)
++		return btd_error_failed(msg, "Failed to register service");
++
++	DBG("Registering service - path: %s", path);
++
++	service->manager = manager;
++	queue_push_tail(manager->services, service);
++
+ 	return NULL;
+ }
+ 
+@@ -72,11 +386,24 @@ static const GDBusMethodTable manager_methods[] = {
+ static struct btd_gatt_manager *manager_create(struct btd_adapter *adapter)
+ {
+ 	struct btd_gatt_manager *manager;
++	struct gatt_db *db;
++	struct btd_gatt_database *database;
++
++	database = btd_adapter_get_database(adapter);
++	db = btd_gatt_database_get_db(database);
++	if (!db)
++		return NULL;
+ 
+ 	manager = new0(struct btd_gatt_manager, 1);
+ 	if (!manager)
+ 		return NULL;
+ 
++	manager->services = queue_new();
++	if (!manager->services) {
++		free(manager);
++		return NULL;
++	}
++
+ 	manager->adapter = adapter;
+ 
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+@@ -85,10 +412,13 @@ static struct btd_gatt_manager *manager_create(struct btd_adapter *adapter)
+ 						manager_methods, NULL, NULL,
+ 						manager, NULL)) {
+ 		error("Failed to register " GATT_MANAGER_IFACE);
++		queue_destroy(manager->services, NULL);
+ 		free(manager);
+ 		return NULL;
+ 	}
+ 
++	manager->db = gatt_db_ref(db);
++
+ 	return manager;
+ }
+ 
+@@ -117,5 +447,7 @@ void btd_gatt_manager_destroy(struct btd_gatt_manager *manager)
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(),
+ 					adapter_get_path(manager->adapter),
+ 					GATT_MANAGER_IFACE);
++	queue_destroy(manager->services, service_free);
++	gatt_db_unref(manager->db);
+ 	free(manager);
+ }
 -- 
 2.2.0.rc0.207.ga3a616c
 
