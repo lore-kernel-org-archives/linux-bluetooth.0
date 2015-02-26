@@ -2,33 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH 3/3] Bluetooth: Set HCI_QUIRK_SIMULTAENOUS_DISCOVERY for BTUSB_ATH3012
-Date: Wed, 25 Feb 2015 18:14:19 -0800
-Message-Id: <1424916859-14473-3-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1424916859-14473-1-git-send-email-jpawlowski@google.com>
-References: <1424916859-14473-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH 1/3] Bluetooth: Introduce HCI_QUIRK_SIMULTAENOUS_DISCOVERY
+Date: Wed, 25 Feb 2015 18:14:17 -0800
+Message-Id: <1424916859-14473-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Atheros controllers can do both LE and classic scan at once.
+Some controllers allow both le and classic scan to run at the same
+time, while others allow only one, le or classic at given time.
+
+Since this is specific to each controller, add a new quirk setting
+that allows drivers to tell the core wether given controller can
+do both le and classic discovery at same time.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/net/bluetooth/hci.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3ca2e1b..119c77c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2777,6 +2777,7 @@ static int btusb_probe(struct usb_interface *intf,
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 8e54f82..d64851a 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -160,6 +160,15 @@ enum {
+ 	 * during the hdev->setup vendor callback.
+ 	 */
+ 	HCI_QUIRK_STRICT_DUPLICATE_FILTER,
++
++	/* When this quirk is set, scanning for both le and classic devices
++	 * is done simoultaenously. If it's not set, the scan is
++	 * interleaved.
++	 *
++	 * This quirk can be set before hci_register_dev is called or
++	 * during the hdev->setup vendor callback.
++	 */
++	HCI_QUIRK_SIMULTAENOUS_DISCOVERY,
+ };
  
- 	if (id->driver_info & BTUSB_ATH3012) {
- 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
-+		set_bit(HCI_QUIRK_SIMULTAENOUS_DISCOVERY, &hdev->quirks);
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
- 	}
- 
+ /* HCI device flags */
 -- 
 2.2.0.rc0.207.ga3a616c
 
