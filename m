@@ -1,132 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 12/12] profiles/network: Move disconn cb setting to bnep connect method
-Date: Thu, 26 Feb 2015 12:53:34 +0100
-Message-Id: <1424951614-8527-12-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 09/12] profiles/network: Make get_service_id connections private method
+Date: Thu, 26 Feb 2015 12:53:31 +0100
+Message-Id: <1424951614-8527-9-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1424951614-8527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1424951614-8527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Disconnect callback can be set while connececting bnep. In previous
-implementation there was seperated method to setting up the disconnect
-callback and it was always called immediately after calling connect -
-this method was redundand.
+get_service_id method is used only within connection code to get id (16
+bit value) of received string format 128bit uuid or service named e.g.
+panu, gn or nap. There is no need to make it public as bnep.c only
+related code.
 ---
- android/pan.c                 |  5 ++---
- profiles/network/bnep.c       | 22 +++++++---------------
- profiles/network/bnep.h       |  6 +++---
- profiles/network/connection.c |  4 +---
- 4 files changed, 13 insertions(+), 24 deletions(-)
+ profiles/network/bnep.c       | 25 -------------------------
+ profiles/network/bnep.h       |  1 -
+ profiles/network/connection.c | 20 ++++++++++++++------
+ 3 files changed, 14 insertions(+), 32 deletions(-)
 
-diff --git a/android/pan.c b/android/pan.c
-index 08c8134..4c4851f 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -324,14 +324,13 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	if (!dev->session)
- 		goto fail;
- 
--	perr = bnep_connect(dev->session, bnep_conn_cb, dev);
-+	perr = bnep_connect(dev->session, bnep_conn_cb, bnep_disconn_cb, dev,
-+									dev);
- 	if (perr < 0) {
- 		error("bnep connect req failed: %s", strerror(-perr));
- 		goto fail;
- 	}
- 
--	bnep_set_disconnect(dev->session, bnep_disconn_cb, dev);
--
- 	if (dev->io) {
- 		g_io_channel_unref(dev->io);
- 		dev->io = NULL;
 diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 7ec166c..2c10572 100644
+index 132dbab..d784427 100644
 --- a/profiles/network/bnep.c
 +++ b/profiles/network/bnep.c
-@@ -369,17 +369,21 @@ void bnep_free(struct bnep *session)
- 	g_free(session);
- }
+@@ -85,31 +85,6 @@ struct bnep {
+ 	void	*disconn_data;
+ };
  
--int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb, void *data)
-+int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb,
-+					bnep_disconnect_cb disconn_cb,
-+					void *conn_data, void *disconn_data)
- {
- 	GError *gerr = NULL;
- 	int err;
- 
--	if (!session || !conn_cb)
-+	if (!session || !conn_cb || !disconn_cb)
- 		return -EINVAL;
- 
- 	session->attempts = 0;
- 	session->conn_cb = conn_cb;
--	session->conn_data = data;
-+	session->disconn_cb = disconn_cb;
-+	session->conn_data = conn_data;
-+	session->disconn_data = disconn_data;
- 
- 	bt_io_get(session->io, &gerr, BT_IO_OPT_DEST_BDADDR, &session->dst_addr,
- 							BT_IO_OPT_INVALID);
-@@ -417,18 +421,6 @@ void bnep_disconnect(struct bnep *session)
- 	bnep_conndel(&session->dst_addr);
- }
- 
--void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
--								void *data)
+-uint16_t bnep_service_id(const char *svc)
 -{
--	if (!session || !disconn_cb)
--		return;
+-	int i;
+-	uint16_t id;
 -
--	if (!session->disconn_cb && !session->disconn_data) {
--		session->disconn_cb = disconn_cb;
--		session->disconn_data = data;
+-	/* Friendly service name */
+-	for (i = 0; __svc[i].name; i++) {
+-		if (!strcasecmp(svc, __svc[i].name))
+-			return __svc[i].id;
 -	}
+-
+-	/* UUID 128 string */
+-	for (i = 0; __svc[i].uuid128; i++) {
+-		if (!strcasecmp(svc, __svc[i].uuid128))
+-			return __svc[i].id;
+-	}
+-
+-	/* Try convert to HEX */
+-	id = strtol(svc, NULL, 16);
+-	if ((id < BNEP_SVC_PANU) || (id > BNEP_SVC_GN))
+-		return 0;
+-
+-	return id;
 -}
 -
- static int bnep_add_to_bridge(const char *devname, const char *bridge)
+ const char *bnep_uuid(uint16_t id)
  {
- 	int ifindex;
+ 	int i;
 diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
-index 31f9b67..b284699 100644
+index 36ad904..0c1669c 100644
 --- a/profiles/network/bnep.h
 +++ b/profiles/network/bnep.h
-@@ -31,10 +31,10 @@ struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
- void bnep_free(struct bnep *session);
+@@ -26,7 +26,6 @@ struct bnep;
+ int bnep_init(void);
+ int bnep_cleanup(void);
  
- typedef void (*bnep_connect_cb) (char *iface, int err, void *data);
--int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb, void *data);
- typedef void (*bnep_disconnect_cb) (void *data);
--void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
--								void *data);
-+int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb,
-+					bnep_disconnect_cb disconn_cb,
-+					void *conn_data, void *disconn_data);
- void bnep_disconnect(struct bnep *session);
+-uint16_t bnep_service_id(const char *svc);
+ const char *bnep_uuid(uint16_t id);
+ const char *bnep_name(uint16_t id);
  
- int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
 diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index 1cd3293..b12da6e 100644
+index 19a0d8d..cbcf39b 100644
 --- a/profiles/network/connection.c
 +++ b/profiles/network/connection.c
-@@ -257,14 +257,12 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	if (!nc->session)
- 		goto failed;
+@@ -46,6 +46,7 @@
+ #include "src/profile.h"
+ #include "src/service.h"
+ #include "src/error.h"
++#include "lib/uuid.h"
  
--	perr = bnep_connect(nc->session, bnep_conn_cb, nc);
-+	perr = bnep_connect(nc->session, bnep_conn_cb, bnep_disconn_cb, nc, nc);
- 	if (perr < 0) {
- 		error("bnep connect(): %s (%d)", strerror(-perr), -perr);
- 		goto failed;
- 	}
+ #include "bnep.h"
+ #include "connection.h"
+@@ -78,9 +79,16 @@ struct network_conn {
  
--	bnep_set_disconnect(nc->session, bnep_disconn_cb, nc);
--
- 	if (nc->io) {
- 		g_io_channel_unref(nc->io);
- 		nc->io = NULL;
+ static GSList *peers = NULL;
+ 
+-static uint16_t get_service_id(struct btd_service *srv)
++static uint16_t get_pan_srv_id(const char *svc)
+ {
+-	return bnep_service_id(btd_service_get_profile(srv)->remote_uuid);
++	if (!strcasecmp(svc, "panu") || !strcasecmp(svc, PANU_UUID))
++		return BNEP_SVC_PANU;
++	if (!strcasecmp(svc, "nap") || !strcasecmp(svc, NAP_UUID))
++		return BNEP_SVC_NAP;
++	if (!strcasecmp(svc, "gn") || !strcasecmp(svc, GN_UUID))
++		return BNEP_SVC_GN;
++
++	return 0;
+ }
+ 
+ static struct network_peer *find_peer(GSList *list, struct btd_device *device)
+@@ -283,7 +291,7 @@ static DBusMessage *local_connect(DBusConnection *conn,
+ 						DBUS_TYPE_INVALID) == FALSE)
+ 		return btd_error_invalid_args(msg);
+ 
+-	id = bnep_service_id(svc);
++	id = get_pan_srv_id(svc);
+ 	uuid = bnep_uuid(id);
+ 
+ 	if (uuid == NULL)
+@@ -312,7 +320,7 @@ int connection_connect(struct btd_service *srv)
+ {
+ 	struct network_conn *nc = btd_service_get_user_data(srv);
+ 	struct network_peer *peer = nc->peer;
+-	uint16_t id = get_service_id(srv);
++	uint16_t id = get_pan_srv_id(btd_service_get_profile(srv)->remote_uuid);
+ 	GError *err = NULL;
+ 	const bdaddr_t *src;
+ 	const bdaddr_t *dst;
+@@ -501,7 +509,7 @@ void connection_unregister(struct btd_service *srv)
+ 	struct btd_device *device = btd_service_get_device(srv);
+ 	struct network_conn *conn = btd_service_get_user_data(srv);
+ 	struct network_peer *peer = conn->peer;
+-	uint16_t id = get_service_id(srv);
++	uint16_t id = get_pan_srv_id(btd_service_get_profile(srv)->remote_uuid);
+ 
+ 	DBG("%s id %u", device_get_path(device), id);
+ 
+@@ -548,7 +556,7 @@ int connection_register(struct btd_service *srv)
+ 	struct btd_device *device = btd_service_get_device(srv);
+ 	struct network_peer *peer;
+ 	struct network_conn *nc;
+-	uint16_t id = get_service_id(srv);
++	uint16_t id = get_pan_srv_id(btd_service_get_profile(srv)->remote_uuid);
+ 
+ 	DBG("%s id %u", device_get_path(device), id);
+ 
 -- 
 2.1.0
 
