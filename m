@@ -1,129 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 03/12] profiles/network: Integrate get and check bnep setup services roles
-Date: Thu, 26 Feb 2015 12:53:25 +0100
-Message-Id: <1424951614-8527-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 06/12] profiles/network: Fix sending command responses
+Date: Thu, 26 Feb 2015 12:53:28 +0100
+Message-Id: <1424951614-8527-6-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1424951614-8527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1424951614-8527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-While bnep setup, roles must be determined and checked if the connection
-scanario is possible. Get and check possible service roles routines are
-always performed in serie. So there is no need to split it to separate
-calls.
+Command response can be three bytes long (in case if command is not
+understood) 1 byte(packet type) + 1 byte(control type) + 1 byte(unknown
+control type). Command response can be also four bytes long if it's
+response for setup connection, filter net type and filter multi addr,
+1 byte(packet type) + 1 byte(control type) + 2 byte(response message).
 ---
- android/pan.c             |  8 +-------
- profiles/network/bnep.c   | 37 ++++++++++++++++---------------------
- profiles/network/bnep.h   |  1 -
- profiles/network/server.c |  6 +-----
- 4 files changed, 18 insertions(+), 34 deletions(-)
+ lib/bnep.h              |  6 +++++
+ profiles/network/bnep.c | 59 +++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 48 insertions(+), 17 deletions(-)
 
-diff --git a/android/pan.c b/android/pan.c
-index 972af89..0bf5f71 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -497,17 +497,11 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
- 	}
+diff --git a/lib/bnep.h b/lib/bnep.h
+index 2bbfb17..aa46852 100644
+--- a/lib/bnep.h
++++ b/lib/bnep.h
+@@ -103,6 +103,12 @@ struct bnep_set_filter_req {
+ 	uint8_t  list[0];
+ } __attribute__((packed));
  
- 	rsp = bnep_setup_decode(req, &dst_role, &src_role);
--	if (rsp) {
-+	if (rsp != BNEP_SUCCESS) {
- 		error("bnep_setup_decode failed");
- 		goto failed;
- 	}
- 
--	rsp = bnep_setup_chk(dst_role, src_role);
--	if (rsp) {
--		error("benp_setup_chk failed");
--		goto failed;
--	}
--
- 	err = nap_create_bridge();
- 	if (err < 0) {
- 		error("pan: Failed to create bridge: %s (%d)", strerror(-err),
++struct bnep_ctrl_cmd_not_understood_cmd {
++	uint8_t type;
++	uint8_t ctrl;
++	uint8_t unkn_ctrl;
++} __attribute__((packed));
++
+ struct bnep_control_rsp {
+ 	uint8_t  type;
+ 	uint8_t  ctrl;
 diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index e3a2b89..fe13a5b 100644
+index bef9b60..132dbab 100644
 --- a/profiles/network/bnep.c
 +++ b/profiles/network/bnep.c
-@@ -591,26 +591,6 @@ ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp)
- 	return send(sk, &rsp, sizeof(rsp), 0);
+@@ -549,16 +549,40 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
+ 	return err;
  }
  
--uint16_t bnep_setup_chk(uint16_t dst, uint16_t src)
--{
--	/* Allowed PAN Profile scenarios */
--	switch (dst) {
--	case BNEP_SVC_NAP:
--	case BNEP_SVC_GN:
--		if (src == BNEP_SVC_PANU)
--			return 0;
--		return BNEP_CONN_INVALID_SRC;
--	case BNEP_SVC_PANU:
--		if (src == BNEP_SVC_PANU ||  src == BNEP_SVC_GN ||
--							src == BNEP_SVC_NAP)
--			return 0;
--
--		return BNEP_CONN_INVALID_SRC;
--	}
--
--	return BNEP_CONN_INVALID_DST;
--}
--
- uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
- 								uint16_t *src)
+-static ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl,
+-								uint16_t resp)
++static ssize_t bnep_send_ctrl_rsp(int sk, uint8_t ctrl, uint16_t resp)
  {
-@@ -655,5 +635,20 @@ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
- 		return BNEP_CONN_INVALID_SVC;
- 	}
+-	struct bnep_control_rsp rsp;
++	ssize_t sent;
  
--	return BNEP_SUCCESS;
-+	/* Allowed PAN Profile scenarios */
-+	switch (*dst) {
-+	case BNEP_SVC_NAP:
-+	case BNEP_SVC_GN:
-+		if (*src == BNEP_SVC_PANU)
-+			return BNEP_SUCCESS;
-+		return BNEP_CONN_INVALID_SRC;
-+	case BNEP_SVC_PANU:
-+		if (*src == BNEP_SVC_PANU || *src == BNEP_SVC_GN ||
-+							*src == BNEP_SVC_NAP)
-+			return BNEP_SUCCESS;
+-	rsp.type = type;
+-	rsp.ctrl = ctrl;
+-	rsp.resp = htons(resp);
++	switch (ctrl) {
++	case BNEP_CMD_NOT_UNDERSTOOD: {
++		struct bnep_ctrl_cmd_not_understood_cmd rsp;
+ 
+-	return send(sk, &rsp, sizeof(rsp), 0);
++		rsp.type = BNEP_CONTROL;
++		rsp.ctrl = ctrl;
++		rsp.unkn_ctrl = (uint8_t) resp;
 +
-+		return BNEP_CONN_INVALID_SRC;
++		sent = send(sk, &rsp, sizeof(rsp), 0);
++		break;
++	}
++	case BNEP_FILTER_MULT_ADDR_RSP:
++	case BNEP_FILTER_NET_TYPE_RSP:
++	case BNEP_SETUP_CONN_RSP: {
++		struct bnep_control_rsp rsp;
++
++		rsp.type = BNEP_CONTROL;
++		rsp.ctrl = ctrl;
++		rsp.resp = htons(resp);
++
++		sent = send(sk, &rsp, sizeof(rsp), 0);
++		break;
++	}
++	default:
++		error("wrong bnep response type");
++		sent = -1;
++		break;
 +	}
 +
-+	return BNEP_CONN_INVALID_DST;
++	return sent;
  }
-diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
-index bc43d4f..5aedf38 100644
---- a/profiles/network/bnep.h
-+++ b/profiles/network/bnep.h
-@@ -46,6 +46,5 @@ int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
- void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr);
  
- ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp);
--uint16_t bnep_setup_chk(uint16_t dst_role, uint16_t src_role);
- uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
- 								uint16_t *src);
-diff --git a/profiles/network/server.c b/profiles/network/server.c
-index 2b252d9..12266c9 100644
---- a/profiles/network/server.c
-+++ b/profiles/network/server.c
-@@ -323,11 +323,7 @@ static gboolean bnep_setup(GIOChannel *chan,
- 		return FALSE;
- 
- 	rsp = bnep_setup_decode(req, &dst_role, &src_role);
--	if (rsp)
--		goto reply;
+ static uint16_t bnep_setup_decode(int sk, struct bnep_setup_conn_req *req,
+@@ -637,16 +661,15 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 	/* Highest known Control command ID
+ 	 * is BNEP_FILTER_MULT_ADDR_RSP = 0x06 */
+ 	if (req->type == BNEP_CONTROL &&
+-				req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
+-		uint8_t pkt[3];
 -
--	rsp = bnep_setup_chk(dst_role, src_role);
--	if (rsp)
-+	if (rsp != BNEP_SUCCESS)
- 		goto reply;
+-		pkt[0] = BNEP_CONTROL;
+-		pkt[1] = BNEP_CMD_NOT_UNDERSTOOD;
+-		pkt[2] = req->ctrl;
++					req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
++		error("cmd not understood");
++		err = bnep_send_ctrl_rsp(sk, BNEP_CMD_NOT_UNDERSTOOD,
++								req->ctrl);
++		if (err < 0)
++			error("send not understood ctrl rsp error: %s (%d)",
++							strerror(errno), errno);
  
- 	rsp = BNEP_CONN_NOT_ALLOWED;
+-		send(sk, pkt, sizeof(pkt), 0);
+-
+-		return -EINVAL;
++		return err;
+ 	}
+ 
+ 	/* Processing BNEP_SETUP_CONNECTION_REQUEST_MSG */
+@@ -681,7 +704,9 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 		rsp = BNEP_CONN_NOT_ALLOWED;
+ 
+ reply:
+-	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
++	err = bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp);
++	if (err < 0)
++		error("send ctrl rsp error: %s (%d)", strerror(errno), errno);
+ 
+ 	return err;
+ }
 -- 
 2.1.0
 
