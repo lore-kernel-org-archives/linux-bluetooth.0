@@ -1,40 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH BlueZ v1 03/17] gdbus/client: Allow specifying ObjectManager path
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1424927610-26226-4-git-send-email-armansito@chromium.org>
-Date: Thu, 26 Feb 2015 07:38:06 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <938707CA-DE91-41D5-B611-B89CFF9236C6@holtmann.org>
-References: <1424927610-26226-1-git-send-email-armansito@chromium.org> <1424927610-26226-4-git-send-email-armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/4] audio/avdtp: Remove start timer on stream_free()
+Date: Thu, 26 Feb 2015 17:20:19 +0200
+Message-Id: <1424964022-8887-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> GDBusClient currently hard-codes "/" as the remote ObjectManager path.
-> This is generally incorrect, as an application can choose to expose an
-> ObjectManager at any well-known path. This patch fixes this by allowing
-> the user to pass in the ObjectManager path to g_dbus_client_new.
-> ---
-> client/main.c            |  2 +-
-> gdbus/client.c           | 23 ++++++++++++++++-------
-> gdbus/gdbus.h            |  5 +++--
-> plugins/hostname.c       |  2 +-
-> profiles/iap/main.c      |  2 +-
-> tools/bluetooth-player.c |  2 +-
-> tools/gap-tester.c       |  3 ++-
-> tools/gatt-service.c     |  2 +-
-> tools/mpris-proxy.c      |  2 +-
-> tools/obexctl.c          |  2 +-
-> unit/test-gdbus-client.c | 39 ++++++++++++++++++++++++++-------------
-> 11 files changed, 54 insertions(+), 30 deletions(-)
+Makes code identical to android/avdtp
+---
+ profiles/audio/avdtp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-please to not intermix gdbus/ changes with others. Everything in gdbus/ needs to be a separate patch. You are affecting more than one project here.
-
-Regards
-
-Marcel
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 896f101..15b611f 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -717,6 +717,9 @@ static void stream_free(void *data)
+ 	if (stream->timer)
+ 		g_source_remove(stream->timer);
+ 
++	if (stream->start_timer > 0)
++		g_source_remove(stream->start_timer);
++
+ 	if (stream->io)
+ 		close_stream(stream);
+ 
+-- 
+2.1.0
 
