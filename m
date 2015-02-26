@@ -1,74 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] doc/mgmt-api: Add security level to new CSRK events
-Date: Thu, 26 Feb 2015 17:59:57 +0200
-Message-Id: <1424966397-24650-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH BlueZ v1 03/17] gdbus/client: Allow specifying ObjectManager path
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1424927610-26226-4-git-send-email-armansito@chromium.org>
+Date: Thu, 26 Feb 2015 07:38:06 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <938707CA-DE91-41D5-B611-B89CFF9236C6@holtmann.org>
+References: <1424927610-26226-1-git-send-email-armansito@chromium.org> <1424927610-26226-4-git-send-email-armansito@chromium.org>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Arman,
 
-In order to distinguish between LE Security Mode 2 levels 1 and 2 we
-need to know whether a CSRK is authenticated or unauthenticated. So far
-this information wasn't available in the New CSRK event from the kernel.
+> GDBusClient currently hard-codes "/" as the remote ObjectManager path.
+> This is generally incorrect, as an application can choose to expose an
+> ObjectManager at any well-known path. This patch fixes this by allowing
+> the user to pass in the ObjectManager path to g_dbus_client_new.
+> ---
+> client/main.c            |  2 +-
+> gdbus/client.c           | 23 ++++++++++++++++-------
+> gdbus/gdbus.h            |  5 +++--
+> plugins/hostname.c       |  2 +-
+> profiles/iap/main.c      |  2 +-
+> tools/bluetooth-player.c |  2 +-
+> tools/gap-tester.c       |  3 ++-
+> tools/gatt-service.c     |  2 +-
+> tools/mpris-proxy.c      |  2 +-
+> tools/obexctl.c          |  2 +-
+> unit/test-gdbus-client.c | 39 ++++++++++++++++++++++++++-------------
+> 11 files changed, 54 insertions(+), 30 deletions(-)
 
-This patch renames the Master parameter of the event to Type and adds
-two new values to it. The two old values 0x00 and 0x01 still have the
-same meaning as before from the local/remote CSRK perspective. Since we
-so far have not known anything about the security level these values
-must be assumed to be unauthenticated.
+please to not intermix gdbus/ changes with others. Everything in gdbus/ needs to be a separate patch. You are affecting more than one project here.
 
-The consequence of this update is that authenticated keys with new
-kernels will simply be ignored by existing code (which only accepts
-values 0x00 and 0x01), however since we haven't really had any code
-doing real signing so far this should be an acceptable compromise.
----
- doc/mgmt-api.txt | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+Regards
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index bef99902a225..c72067c95f44 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2969,7 +2969,7 @@ New Signature Resolving Key Event
- 				Key {
- 					Address (6 Octets)
- 					Address_Type (1 Octet)
--					Master (1 Octet)
-+					Type (1 Octet)
- 					Value (16 Octets)
- 				}
- 
-@@ -2979,17 +2979,20 @@ New Signature Resolving Key Event
- 	The Store_Hint parameter indicates whether the host is expected
- 	to store the key persistently or not.
- 
--	When the Master parameter is set to 0x01, then the signature
--	resolving key from the remote peer device is provided. It is
--	the key that is used for signature verification.
-+	The Type parameter has the following possible values:
-+
-+		0x00	Unauthenticated local CSRK
-+		0x01	Unauthenticated remote CSRK
-+		0x02	Authenticated local CSRK
-+		0x03	Authenticated remote CSRK
- 
--	When the Master parameter is set to 0x00, then it is the local
--	signature resolving key that is used to sign data. The remote
--	peer device will be using it for signature verification.
-+	The local keys are used for signing data to be sent to the
-+	remote device, whereas the remote keys are used to verify
-+	signatures received from the remote device.
- 
- 	The local signature resolving key will be generated with each
--	pairing request. Only after receiving this event with Master
--	parameter set to 0x00 it is possible to use ATT Signed Write
-+	pairing request. Only after receiving this event with the Type
-+	indicating a local key is it possible to use ATT Signed Write
- 	procedures.
- 
- 	Possible values for the Address_Type parameter:
--- 
-2.1.0
+Marcel
 
