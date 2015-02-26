@@ -1,109 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 08/12] profiles/network: Shortening service name argument to srv
-Date: Thu, 26 Feb 2015 12:53:30 +0100
-Message-Id: <1424951614-8527-8-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 11/12] profiles/network: Remove not needed get name by bnep id function
+Date: Thu, 26 Feb 2015 12:53:33 +0100
+Message-Id: <1424951614-8527-11-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1424951614-8527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1424951614-8527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Current argument naming is long and it can be simplified to srv.
+This function and service structure declaration is no longer needed
+since related code was distracted.
 ---
- profiles/network/connection.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ profiles/network/bnep.c | 21 ---------------------
+ profiles/network/bnep.h |  2 --
+ 2 files changed, 23 deletions(-)
 
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index cc73989..19a0d8d 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -78,9 +78,9 @@ struct network_conn {
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 0a73e54..7ec166c 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -54,17 +54,6 @@
  
- static GSList *peers = NULL;
+ static int ctl;
  
--static uint16_t get_service_id(struct btd_service *service)
-+static uint16_t get_service_id(struct btd_service *srv)
- {
--	return bnep_service_id(btd_service_get_profile(service)->remote_uuid);
-+	return bnep_service_id(btd_service_get_profile(srv)->remote_uuid);
- }
- 
- static struct network_peer *find_peer(GSList *list, struct btd_device *device)
-@@ -308,11 +308,11 @@ static DBusMessage *local_connect(DBusConnection *conn,
- }
- 
- /* Connect and initiate BNEP session */
--int connection_connect(struct btd_service *service)
-+int connection_connect(struct btd_service *srv)
- {
--	struct network_conn *nc = btd_service_get_user_data(service);
-+	struct network_conn *nc = btd_service_get_user_data(srv);
- 	struct network_peer *peer = nc->peer;
--	uint16_t id = get_service_id(service);
-+	uint16_t id = get_service_id(srv);
- 	GError *err = NULL;
- 	const bdaddr_t *src;
- 	const bdaddr_t *dst;
-@@ -342,9 +342,9 @@ int connection_connect(struct btd_service *service)
- 	return 0;
- }
- 
--int connection_disconnect(struct btd_service *service)
-+int connection_disconnect(struct btd_service *srv)
- {
--	struct network_conn *nc = btd_service_get_user_data(service);
-+	struct network_conn *nc = btd_service_get_user_data(srv);
- 
- 	if (nc->state == DISCONNECTED)
- 		return 0;
-@@ -496,12 +496,12 @@ static const GDBusPropertyTable connection_properties[] = {
- 	{ }
+-static struct {
+-	const char	*name;		/* Friendly name */
+-	const char	*uuid128;	/* UUID 128 */
+-	uint16_t	id;		/* Service class identifier */
+-} __svc[] = {
+-	{ "panu",	PANU_UUID,	BNEP_SVC_PANU	},
+-	{ "gn",		GN_UUID,	BNEP_SVC_GN	},
+-	{ "nap",	NAP_UUID,	BNEP_SVC_NAP	},
+-	{ NULL }
+-};
+-
+ struct __service_16 {
+ 	uint16_t dst;
+ 	uint16_t src;
+@@ -85,16 +74,6 @@ struct bnep {
+ 	void	*disconn_data;
  };
  
--void connection_unregister(struct btd_service *service)
-+void connection_unregister(struct btd_service *srv)
+-const char *bnep_name(uint16_t id)
+-{
+-	int i;
+-
+-	for (i = 0; __svc[i].name; i++)
+-		if (__svc[i].id == id)
+-			return __svc[i].name;
+-	return NULL;
+-}
+-
+ int bnep_init(void)
  {
--	struct btd_device *device = btd_service_get_device(service);
--	struct network_conn *conn = btd_service_get_user_data(service);
-+	struct btd_device *device = btd_service_get_device(srv);
-+	struct network_conn *conn = btd_service_get_user_data(srv);
- 	struct network_peer *peer = conn->peer;
--	uint16_t id = get_service_id(service);
-+	uint16_t id = get_service_id(srv);
+ 	ctl = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_BNEP);
+diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
+index 21a09f6..31f9b67 100644
+--- a/profiles/network/bnep.h
++++ b/profiles/network/bnep.h
+@@ -26,8 +26,6 @@ struct bnep;
+ int bnep_init(void);
+ int bnep_cleanup(void);
  
- 	DBG("%s id %u", device_get_path(device), id);
- 
-@@ -543,12 +543,12 @@ static struct network_peer *create_peer(struct btd_device *device)
- 	return peer;
- }
- 
--int connection_register(struct btd_service *service)
-+int connection_register(struct btd_service *srv)
- {
--	struct btd_device *device = btd_service_get_device(service);
-+	struct btd_device *device = btd_service_get_device(srv);
- 	struct network_peer *peer;
- 	struct network_conn *nc;
--	uint16_t id = get_service_id(service);
-+	uint16_t id = get_service_id(srv);
- 
- 	DBG("%s id %u", device_get_path(device), id);
- 
-@@ -562,11 +562,11 @@ int connection_register(struct btd_service *service)
- 
- 	nc = g_new0(struct network_conn, 1);
- 	nc->id = id;
--	nc->service = btd_service_ref(service);
-+	nc->service = btd_service_ref(srv);
- 	nc->state = DISCONNECTED;
- 	nc->peer = peer;
- 
--	btd_service_set_user_data(service, nc);
-+	btd_service_set_user_data(srv, nc);
- 
- 	DBG("id %u registered", id);
- 
+-const char *bnep_name(uint16_t id);
+-
+ struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
+ 								char *iface);
+ void bnep_free(struct bnep *session);
 -- 
 2.1.0
 
