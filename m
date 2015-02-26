@@ -1,99 +1,192 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v1 00/17] Implement GATT server D-Bus API
-Date: Wed, 25 Feb 2015 21:13:13 -0800
-Message-Id: <1424927610-26226-1-git-send-email-armansito@chromium.org>
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH 2/3] Bluetooth: Add simultaenous dual mode scan
+Date: Wed, 25 Feb 2015 18:14:18 -0800
+Message-Id: <1424916859-14473-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1424916859-14473-1-git-send-email-jpawlowski@google.com>
+References: <1424916859-14473-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-*v1: - Removed src/gatt.* based on email discussion.
+When doing scan through mgmt api, some controllers can do both le and
+classic scan at same time. They can be distinguished by
+HCI_QUIRK_SIMULTAENOUS_DISCOVERY set.
 
-     - After some discussions on IRC, made ObjectManager mandatory on a
-       per-service-subtree basis to reduce the number of unnecessary
-       object processing and caching. One initial idea was to pass the
-       service subtree directly to RegisterService but one of the
-       concerns was that we should allow applications to use existing
-       tooling for the standard ObjectManager interface.
+This patch enables them to use this feature when doing dual mode scan.
+Instead of doing le, then classic scan, both scans are run at once.
 
-     - Minor fixes based on comments, also fixed things so that
-       descriptors with CCC and CEP UUIDs cannot be registered by
-       external apps.
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ net/bluetooth/hci_core.c  | 26 +++++++++++++++++------
+ net/bluetooth/hci_event.c | 18 ++++++++++++++--
+ net/bluetooth/mgmt.c      | 54 +++++++++++++++++++++++++++++++----------------
+ 3 files changed, 72 insertions(+), 26 deletions(-)
 
-     - Included a fix for recent crashes seen in unit/test-gatt.
-
-This patch set implements the GATT server D-Bus API and provides an
-example application in Python to demonstrate how the API can be used
-to export GATT services of various functionality.
-
-Some of the basics of the code is very similar to what was already in
-src/gatt-dbus.c, especially the bits that use gdbus/client to fetch
-and interact with remote objects. However, src/gatt-dbus had a lot of
-code that used the now-defunct src/gatt (which was going to be the new
-GATT abstraction for bluetoothd before we built shared/gatt), so I
-decided to remove gatt-dbus entirely and start from scratch with
-src/gatt-manager.
-
-Apart from these the code is fairly straight-forward. New additions to
-src/gatt-database have been made to allow upper layers to store CCC
-descriptors and send out notifications. The API automatically creates
-CCC and CEP (Characteristic Extended Properties) descriptors based on
-characteristic properties.
-
-Arman Uguray (17):
-  shared/gatt: Call bt_att_cancel_all in unref
-  gdbus/client: Don't GetManagedObjects w/o handlers
-  gdbus/client: Allow specifying ObjectManager path
-  doc/gatt-api.txt: New ObjectManager requirements
-  core/gatt: Add GattManager1 stubs
-  core/gatt: Implement GattManager1.RegisterService
-  core/gatt: Register characteristics
-  core/gatt: Support ReadValue for characteristics
-  core/gatt: Support WriteValue for characteristics
-  core/gatt: Make CCC addition API public
-  core/gatt: Create CCC for external characteristic
-  core/gatt: Add btd_gatt_database_notify function
-  core/gatt: Send not/ind for D-Bus characteristics
-  core/gatt: Create CEP for external characteristic
-  core/gatt: Register descriptors
-  core/gatt: Support descriptor reads/writes
-  tools: Added a Python example for GATT server API
-
- Makefile.am              |    3 +-
- client/main.c            |    2 +-
- doc/gatt-api.txt         |   74 ++-
- gdbus/client.c           |   26 +-
- gdbus/gdbus.h            |    5 +-
- plugins/hostname.c       |    2 +-
- profiles/iap/main.c      |    2 +-
- src/adapter.c            |   18 +-
- src/gatt-database.c      |  114 +++-
- src/gatt-database.h      |   16 +
- src/gatt-dbus.c          |  658 ----------------------
- src/gatt-dbus.h          |   25 -
- src/gatt-manager.c       | 1383 ++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt-manager.h       |   23 +
- src/gatt.c               |  321 -----------
- src/gatt.h               |  121 ----
- src/main.c               |    5 -
- src/shared/gatt-client.c |    9 +
- tools/bluetooth-player.c |    2 +-
- tools/gap-tester.c       |    3 +-
- tools/gatt-example       |  463 ++++++++++++++++
- tools/gatt-service.c     |    2 +-
- tools/mpris-proxy.c      |    2 +-
- tools/obexctl.c          |    2 +-
- unit/test-gdbus-client.c |   39 +-
- 25 files changed, 2130 insertions(+), 1190 deletions(-)
- delete mode 100644 src/gatt-dbus.c
- delete mode 100644 src/gatt-dbus.h
- create mode 100644 src/gatt-manager.c
- create mode 100644 src/gatt-manager.h
- delete mode 100644 src/gatt.c
- delete mode 100644 src/gatt.h
- create mode 100755 tools/gatt-example
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index dbd26bc..c4f2316 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2866,12 +2866,26 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
+ 
+ 		hci_dev_lock(hdev);
+ 
+-		hci_inquiry_cache_flush(hdev);
+-
+-		err = hci_req_run(&req, inquiry_complete);
+-		if (err) {
+-			BT_ERR("Inquiry request failed: err %d", err);
+-			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++		if (!test_bit(HCI_QUIRK_SIMULTAENOUS_DISCOVERY,
++			      &hdev->quirks)) {
++			hci_inquiry_cache_flush(hdev);
++
++			err = hci_req_run(&req, inquiry_complete);
++			if (err) {
++				BT_ERR("Inquiry request failed: err %d", err);
++				hci_discovery_set_state(hdev,
++							DISCOVERY_STOPPED);
++			}
++		} else {
++			/* If we were running le only scan, change discovery
++			 * state. If we were running both le and classic scans
++			 * simultaenously, and classic is already finished,
++			 * stop discovery, otherwise  classic scan will stop
++			 * discovery when finished.
++			 */
++			if (!test_bit(HCI_INQUIRY, &hdev->flags))
++				hci_discovery_set_state(hdev,
++							DISCOVERY_STOPPED);
+ 		}
+ 
+ 		hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e9b17b5..d69de31 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2127,7 +2127,14 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		goto unlock;
+ 
+ 	if (list_empty(&discov->resolve)) {
+-		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++		/* if we were running classic discovery change discovery state.
++		 * If we were running both le and classic scans simultaenously,
++		 * and le is already finished, change state, otherwise le
++		 * scan will stop discovery when finished.
++		 */
++		if (!test_bit(HCI_LE_SCAN, &hdev->flags) ||
++		    !test_bit(HCI_QUIRK_SIMULTAENOUS_DISCOVERY, &hdev->quirks))
++			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 		goto unlock;
+ 	}
+ 
+@@ -2136,7 +2143,14 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		e->name_state = NAME_PENDING;
+ 		hci_discovery_set_state(hdev, DISCOVERY_RESOLVING);
+ 	} else {
+-		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++		/* if we were running classic discovery change discovery state.
++		 * If we were running both le and classic scans simultaenously,
++		 * and le is already finished, change state, otherwise le
++		 * scan will stop discovery when finished.
++		 */
++		if (!test_bit(HCI_LE_SCAN, &hdev->flags) ||
++		    !test_bit(HCI_QUIRK_SIMULTAENOUS_DISCOVERY, &hdev->quirks))
++			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 	}
+ 
+ unlock:
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d5d46e7..b0df917 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3783,34 +3783,43 @@ done:
+ 	return err;
+ }
+ 
+-static bool trigger_discovery(struct hci_request *req, u8 *status)
++static bool trigger_classic_discovery(struct hci_request *req, u8 *status)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+-	struct hci_cp_le_set_scan_param param_cp;
+-	struct hci_cp_le_set_scan_enable enable_cp;
+ 	struct hci_cp_inquiry inq_cp;
+ 	/* General inquiry access code (GIAC) */
+ 	u8 lap[3] = { 0x33, 0x8b, 0x9e };
++
++	*status = mgmt_bredr_support(hdev);
++	if (*status)
++		return false;
++
++	if (test_bit(HCI_INQUIRY, &hdev->flags)) {
++		*status = MGMT_STATUS_BUSY;
++		return false;
++	}
++
++	hci_inquiry_cache_flush(hdev);
++
++	memset(&inq_cp, 0, sizeof(inq_cp));
++	memcpy(&inq_cp.lap, lap, sizeof(inq_cp.lap));
++	inq_cp.length = DISCOV_BREDR_INQUIRY_LEN;
++	hci_req_add(req, HCI_OP_INQUIRY, sizeof(inq_cp), &inq_cp);
++	return true;
++}
++
++static bool trigger_discovery(struct hci_request *req, u8 *status)
++{
++	struct hci_dev *hdev = req->hdev;
++	struct hci_cp_le_set_scan_param param_cp;
++	struct hci_cp_le_set_scan_enable enable_cp;
+ 	u8 own_addr_type;
+ 	int err;
+ 
+ 	switch (hdev->discovery.type) {
+ 	case DISCOV_TYPE_BREDR:
+-		*status = mgmt_bredr_support(hdev);
+-		if (*status)
+-			return false;
+-
+-		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
+-			*status = MGMT_STATUS_BUSY;
++		if (!trigger_classic_discovery(req, status))
+ 			return false;
+-		}
+-
+-		hci_inquiry_cache_flush(hdev);
+-
+-		memset(&inq_cp, 0, sizeof(inq_cp));
+-		memcpy(&inq_cp.lap, lap, sizeof(inq_cp.lap));
+-		inq_cp.length = DISCOV_BREDR_INQUIRY_LEN;
+-		hci_req_add(req, HCI_OP_INQUIRY, sizeof(inq_cp), &inq_cp);
+ 		break;
+ 
+ 	case DISCOV_TYPE_LE:
+@@ -3870,6 +3879,11 @@ static bool trigger_discovery(struct hci_request *req, u8 *status)
+ 		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
+ 		hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+ 			    &enable_cp);
++
++		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
++		    test_bit(HCI_QUIRK_SIMULTAENOUS_DISCOVERY, &hdev->quirks))
++			if (!trigger_classic_discovery(req, status))
++				return false;
+ 		break;
+ 
+ 	default:
+@@ -3914,7 +3928,11 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
+ 		timeout = msecs_to_jiffies(DISCOV_LE_TIMEOUT);
+ 		break;
+ 	case DISCOV_TYPE_INTERLEAVED:
+-		timeout = msecs_to_jiffies(hdev->discov_interleaved_timeout);
++		if (test_bit(HCI_QUIRK_SIMULTAENOUS_DISCOVERY, &hdev->quirks))
++			timeout = msecs_to_jiffies(DISCOV_LE_TIMEOUT);
++		else
++			timeout = msecs_to_jiffies(
++					     hdev->discov_interleaved_timeout);
+ 		break;
+ 	case DISCOV_TYPE_BREDR:
+ 		timeout = 0;
 -- 
 2.2.0.rc0.207.ga3a616c
 
