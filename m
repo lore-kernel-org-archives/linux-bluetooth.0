@@ -1,48 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 0/3] HOGP fixes and update of test results
-Date: Thu, 26 Feb 2015 12:51:08 +0100
-Message-ID: <2917626.daz8GJBBb1@uw000953>
-In-Reply-To: <1424866931-13334-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1424866931-13334-1-git-send-email-mariusz.skamra@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 14/16] shared/gatt-helpers: Improve robustness of get include services
+Date: Thu, 26 Feb 2015 10:39:41 +0100
+Message-Id: <1424943583-30061-15-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+This patch makes sure that we do get into infinite loop when doing
+search for included services.
 
-On Wednesday 25 of February 2015 13:22:08 Mariusz Skamra wrote:
->   I deleted most of the code related to finding include services. This was only used
-> in situation when HID service as primary service was not found. However according to
-> SPEC HID device shall implement HID service as primary. Further HOG is called
-> from hidhost's hog_conn_cb when HID service was found and connection was established using LE.
-> Now searching for include services is performed because TC_HGDR_RH_BV_01_I requires that.
-> Finding battery services is performed like before, during primary services discovery.
-> Compared to v3 I used queue instead of GSList for bas.
-> 
->   Add a queue of battery services because according to HOGP SPEC there could be more
-> than one battery services like in TC_HGDC_HH_BV_14_I where there is only one HID service,
-> and two battery services. So the first found bas was overwritten by the second one and
-> after reconnection only one bas was attached.
-> 
->   For test purposes requiring read of battery level read_value_cb was added.
-> 
-> Mariusz Skamra (3):
->   android/bas: Read battery level characteristic
->   android/hog: Fix find included battery services
->   android/pts: Update test results for HOGP
-> 
->  android/bas.c        | 13 ++++++--
->  android/hog.c        | 84 +++++++++++++++++-----------------------------------
->  android/pts-hogp.txt |  6 ++--
->  3 files changed, 41 insertions(+), 62 deletions(-)
-> 
+It could happen if we got bogus read by type response
+---
+ src/shared/gatt-helpers.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-All patches applied (after fixing some minor style issues), thanks. 
-
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index cd0ffe2..8858e58 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -1094,10 +1094,21 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+ 	}
+ 
+ 	last_handle = get_le16(pdu + length - data_length);
++
++	/*
++	 * If last handle is lower from previous start handle then it is smth
++	 * wrong. Let's stop search, otherwise we might enter infinite loop.
++	 */
++	if (last_handle < op->start_handle) {
++		success = false;
++		goto failed;
++	}
++
++	op->start_handle = last_handle + 1;
+ 	if (last_handle != op->end_handle) {
+ 		uint8_t pdu[6];
+ 
+-		put_le16(last_handle + 1, pdu);
++		put_le16(op->start_handle, pdu);
+ 		put_le16(op->end_handle, pdu + 2);
+ 		put_le16(GATT_INCLUDE_UUID, pdu + 4);
+ 
+@@ -1140,6 +1151,7 @@ bool bt_gatt_discover_included_services(struct bt_att *att,
+ 	op->callback = callback;
+ 	op->user_data = user_data;
+ 	op->destroy = destroy;
++	op->start_handle = start;
+ 	op->end_handle = end;
+ 
+ 	put_le16(start, pdu);
 -- 
-Best regards, 
-Szymon Janc
+1.8.4
+
