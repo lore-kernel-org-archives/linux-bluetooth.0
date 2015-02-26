@@ -2,50 +2,73 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 08/16] attrib/gatt: Minor refactor in desc_discovered_cb
-Date: Thu, 26 Feb 2015 10:39:35 +0100
-Message-Id: <1424943583-30061-9-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 07/16] android/tester: Add robustness test for get descriptor
+Date: Thu, 26 Feb 2015 10:39:34 +0100
+Message-Id: <1424943583-30061-8-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is needed for next patch
 ---
- attrib/gatt.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ android/tester-gatt.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 2749c46..df4e3a7 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -1008,12 +1008,17 @@ static void desc_discovered_cb(guint8 status, const guint8 *ipdu,
- {
- 	struct discover_desc *dd = user_data;
- 	struct att_data_list *list;
--	unsigned int i, err = ATT_ECODE_ATTR_NOT_FOUND;
-+	unsigned int i, err = 0;
- 	guint8 format;
- 	uint16_t last = 0xffff;
- 	uint8_t type;
- 	gboolean uuid_found = FALSE;
+diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+index 1abfe26..10c09d2 100644
+--- a/android/tester-gatt.c
++++ b/android/tester-gatt.c
+@@ -914,6 +914,14 @@ static struct iovec get_characteristic_2[] = {
+ 	end_pdu
+ };
  
-+	if (status == ATT_ECODE_ATTR_NOT_FOUND) {
-+		err = dd->descriptors ? 0 : status;
-+		goto done;
-+	}
++static struct iovec get_descriptor_0[] = {
++	SEARCH_SERVICE_SINGLE_SUCCESS_PDUS,
++	READ_BY_TYPE_SINGLE_CHARACTERISTIC_PDUS,
++	raw_pdu(0x04, 0x01, 0x00, 0x10, 0x00),
++	raw_pdu(0x05, 0x01, 0x00, 0x00, 0x00, 0x29),
++	end_pdu
++};
 +
- 	if (status) {
- 		err = status;
- 		goto done;
-@@ -1086,7 +1091,6 @@ static void desc_discovered_cb(guint8 status, const guint8 *ipdu,
- 	}
- 
- done:
--	err = (dd->descriptors ? 0 : err);
- 	dd->cb(err, dd->descriptors, dd->user_data);
- }
- 
+ static struct iovec get_descriptor_1[] = {
+ 	SEARCH_SERVICE_SINGLE_SUCCESS_PDUS,
+ 	READ_BY_TYPE_SINGLE_CHARACTERISTIC_PDUS,
+@@ -2247,6 +2255,35 @@ static struct test_case test_cases[] = {
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
++	TEST_CASE_BREDRLE("Gatt Client - Get Descriptor - Incorrect rsp",
++		ACTION_SUCCESS(init_pdus, get_descriptor_0),
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
++		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
++		ACTION_SUCCESS(gatt_client_register_action, &app1_uuid),
++		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
++		ACTION_SUCCESS(gatt_client_start_scan_action, NULL),
++		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
++		ACTION_SUCCESS(gatt_client_stop_scan_action, NULL),
++		ACTION_SUCCESS(gatt_client_connect_action, &app1_conn_req),
++		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
++						prop_emu_remotes_default_set,
++						CONN1_ID, APP1_ID),
++		ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
++		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
++		ACTION_SUCCESS(gatt_client_get_characteristic_action,
++							&get_char_data_1),
++		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_SUCCESS,
++				CONN1_ID, &service_1, &characteristic_1, 4),
++		ACTION_SUCCESS(gatt_client_get_descriptor_action,
++							&get_desc_data_1),
++		CALLBACK_GATTC_GET_DESCRIPTOR(GATT_STATUS_FAILURE, CONN1_ID,
++				&service_1, &characteristic_1, NULL),
++		ACTION_SUCCESS(bluetooth_disable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
++	),
+ 	TEST_CASE_BREDRLE("Gatt Client - Get Descriptor - Single",
+ 		ACTION_SUCCESS(init_pdus, get_descriptor_1),
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 -- 
 1.8.4
 
