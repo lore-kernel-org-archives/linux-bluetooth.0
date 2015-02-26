@@ -1,79 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJugfcRuSodLcPoVSxS7+rTviXrvELCiKJc9r-EaSL5Gg@mail.gmail.com>
+Sender: armansito@google.com
+In-Reply-To: <938707CA-DE91-41D5-B611-B89CFF9236C6@holtmann.org>
 References: <1424927610-26226-1-git-send-email-armansito@chromium.org>
-	<1424927610-26226-2-git-send-email-armansito@chromium.org>
-	<CABBYNZJugfcRuSodLcPoVSxS7+rTviXrvELCiKJc9r-EaSL5Gg@mail.gmail.com>
-Date: Thu, 26 Feb 2015 12:44:17 -0800
-Message-ID: <CAHrH25T-8VRM3-xgOEmKU9D1W--2Fuvus1MRzc8+Ea3kBQ+ACA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 01/17] shared/gatt: Call bt_att_cancel_all in unref
+	<1424927610-26226-4-git-send-email-armansito@chromium.org>
+	<938707CA-DE91-41D5-B611-B89CFF9236C6@holtmann.org>
+Date: Thu, 26 Feb 2015 12:32:45 -0800
+Message-ID: <CAHrH25TOMVFwAJ23KQDkrRugpihTK+1ijm9RSzE0gkzjxBA3nA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 03/17] gdbus/client: Allow specifying
+ ObjectManager path
 From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Marcel,
 
-> On Thu, Feb 26, 2015 at 12:44 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> On Thu, Feb 26, 2015 at 7:38 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
 > Hi Arman,
 >
-> On Thu, Feb 26, 2015 at 7:13 AM, Arman Uguray <armansito@chromium.org> wrote:
->> This patch fixes a potential invalid access that can occur if bt_att
->> outlives bt_gatt_client and if there are pending discovery requests
->> when bt_gatt_client_unref is called.
->>
->> This patch fixes this by canceling all ATT operations that are handled
->> by the bt_att in bt_gatt_client_unref. The proper fix, however, is to
->> make the discovery procedures cancelable and to cancel those instead of
->> canceling everything. A TODO has been added to fix this later.
->
-> Im not sure we should accept patches that are know to have corner
-> cases like this, bt_gatt_client is not the sole user of bt_att so by
-> cancelling all we may break other users so I think we should invest
-> more time in fixing the problem properly.
->
-
-OK, then I'll look at fixing this issue separately and send it to the
-list in its own patch set. So this shouldn't need to block the GATT
-server patches.
-
+>> GDBusClient currently hard-codes "/" as the remote ObjectManager path.
+>> This is generally incorrect, as an application can choose to expose an
+>> ObjectManager at any well-known path. This patch fixes this by allowing
+>> the user to pass in the ObjectManager path to g_dbus_client_new.
 >> ---
->>  src/shared/gatt-client.c | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->>
->> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->> index cc972d6..92e72e2 100644
->> --- a/src/shared/gatt-client.c
->> +++ b/src/shared/gatt-client.c
->> @@ -1529,6 +1529,15 @@ static void bt_gatt_client_free(struct bt_gatt_client *client)
->>                 bt_att_unregister_disconnect(client->att, client->disc_id);
->>                 bt_att_unregister(client->att, client->notify_id);
->>                 bt_att_unregister(client->att, client->ind_id);
->> +
->> +               /*
->> +                * TODO: If we free bt_gatt_client while there is an ongoing
->> +                * discovery procedure, the discovery callback may cause an
->> +                * invalid access. To avoid this, we cancel all ongoing ATT
->> +                * operations but the proper fix here is to make discovery
->> +                * procedures cancelable.
->> +                */
->> +               bt_att_cancel_all(client->att);
->>                 bt_att_unref(client->att);
->>         }
->>
->> --
->> 2.2.0.rc0.207.ga3a616c
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> client/main.c            |  2 +-
+>> gdbus/client.c           | 23 ++++++++++++++++-------
+>> gdbus/gdbus.h            |  5 +++--
+>> plugins/hostname.c       |  2 +-
+>> profiles/iap/main.c      |  2 +-
+>> tools/bluetooth-player.c |  2 +-
+>> tools/gap-tester.c       |  3 ++-
+>> tools/gatt-service.c     |  2 +-
+>> tools/mpris-proxy.c      |  2 +-
+>> tools/obexctl.c          |  2 +-
+>> unit/test-gdbus-client.c | 39 ++++++++++++++++++++++++++-------------
+>> 11 files changed, 54 insertions(+), 30 deletions(-)
 >
+> please to not intermix gdbus/ changes with others. Everything in gdbus/ needs to be a separate patch. You are affecting more than one project here.
 >
+
+This is a gdbus/ only change but I it changes an API definition so all
+of these other spots need to be updated otherwise the code won't
+compile.
+
+> Regards
 >
-> --
-> Luiz Augusto von Dentz
+> Marcel
+>
 
 Arman
