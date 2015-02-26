@@ -1,73 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/12] profiles/network: Minor style fix
-Date: Thu, 26 Feb 2015 12:53:23 +0100
-Message-Id: <1424951614-8527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv4 0/3] HOGP fixes and update of test results
+Date: Thu, 26 Feb 2015 12:51:08 +0100
+Message-ID: <2917626.daz8GJBBb1@uw000953>
+In-Reply-To: <1424866931-13334-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1424866931-13334-1-git-send-email-mariusz.skamra@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes style issues e.g. line aligns, braces.
----
- profiles/network/bnep.c   |  6 ++++--
- profiles/network/server.c | 11 +++++------
- 2 files changed, 9 insertions(+), 8 deletions(-)
+Hi Mariusz,
 
-diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 09d4b65..e3a2b89 100644
---- a/profiles/network/bnep.c
-+++ b/profiles/network/bnep.c
-@@ -508,8 +508,9 @@ static int bnep_add_to_bridge(const char *devname, const char *bridge)
- 		err = -errno;
- 		error("bnep: Can't add %s to the bridge %s: %s(%d)",
- 					devname, bridge, strerror(-err), -err);
--	} else
-+	} else {
- 		info("bridge %s: interface %s added", bridge, devname);
-+	}
- 
- 	close(sk);
- 
-@@ -539,8 +540,9 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
- 		err = -errno;
- 		error("bnep: Can't delete %s from the bridge %s: %s(%d)",
- 					devname, bridge, strerror(-err), -err);
--	} else
-+	} else {
- 		info("bridge %s: interface %s removed", bridge, devname);
-+	}
- 
- 	close(sk);
- 
-diff --git a/profiles/network/server.c b/profiles/network/server.c
-index 3fb031f..ebbe056 100644
---- a/profiles/network/server.c
-+++ b/profiles/network/server.c
-@@ -650,8 +650,7 @@ static struct network_adapter *create_adapter(struct btd_adapter *adapter)
- 	na = g_new0(struct network_adapter, 1);
- 	na->adapter = btd_adapter_ref(adapter);
- 
--	na->io = bt_io_listen(NULL, confirm_event, na,
--				NULL, &err,
-+	na->io = bt_io_listen(NULL, confirm_event, na, NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR,
- 				btd_adapter_get_address(adapter),
- 				BT_IO_OPT_PSM, BNEP_PSM,
-@@ -697,10 +696,10 @@ int server_register(struct btd_adapter *adapter, uint16_t id)
- 	if (g_slist_length(na->servers) > 0)
- 		goto done;
- 
--	if (!g_dbus_register_interface(btd_get_dbus_connection(),
--					path, NETWORK_SERVER_INTERFACE,
--					server_methods, NULL, NULL,
--					na, path_unregister)) {
-+	if (!g_dbus_register_interface(btd_get_dbus_connection(), path,
-+						NETWORK_SERVER_INTERFACE,
-+						server_methods, NULL, NULL, na,
-+						path_unregister)) {
- 		error("D-Bus failed to register %s interface",
- 						NETWORK_SERVER_INTERFACE);
- 		server_free(ns);
+On Wednesday 25 of February 2015 13:22:08 Mariusz Skamra wrote:
+>   I deleted most of the code related to finding include services. This was only used
+> in situation when HID service as primary service was not found. However according to
+> SPEC HID device shall implement HID service as primary. Further HOG is called
+> from hidhost's hog_conn_cb when HID service was found and connection was established using LE.
+> Now searching for include services is performed because TC_HGDR_RH_BV_01_I requires that.
+> Finding battery services is performed like before, during primary services discovery.
+> Compared to v3 I used queue instead of GSList for bas.
+> 
+>   Add a queue of battery services because according to HOGP SPEC there could be more
+> than one battery services like in TC_HGDC_HH_BV_14_I where there is only one HID service,
+> and two battery services. So the first found bas was overwritten by the second one and
+> after reconnection only one bas was attached.
+> 
+>   For test purposes requiring read of battery level read_value_cb was added.
+> 
+> Mariusz Skamra (3):
+>   android/bas: Read battery level characteristic
+>   android/hog: Fix find included battery services
+>   android/pts: Update test results for HOGP
+> 
+>  android/bas.c        | 13 ++++++--
+>  android/hog.c        | 84 +++++++++++++++++-----------------------------------
+>  android/pts-hogp.txt |  6 ++--
+>  3 files changed, 41 insertions(+), 62 deletions(-)
+> 
+
+All patches applied (after fixing some minor style issues), thanks. 
+
 -- 
-2.1.0
-
+Best regards, 
+Szymon Janc
