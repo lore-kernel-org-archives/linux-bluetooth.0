@@ -1,68 +1,150 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] unit/test-gatt: Add /TP/GAW/CL/BV-02-C/seclevel test
-Date: Thu, 26 Feb 2015 16:03:19 +0200
-Message-Id: <1424959400-18701-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 10/12] profiles/network: Remove unneded bnep_uuid function from bnep code
+Date: Thu, 26 Feb 2015 12:53:32 +0100
+Message-Id: <1424951614-8527-10-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1424951614-8527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1424951614-8527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This add a test for signed write but with security level other than low
-so we can verify the code use the write instead of signed write.
+This funcion is no longer needed since connection and server can handle
+this funcionality by itself.
 ---
- unit/test-gatt.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ profiles/network/bnep.c       | 10 ----------
+ profiles/network/bnep.h       |  1 -
+ profiles/network/connection.c | 19 ++++++++++++-------
+ profiles/network/server.c     | 24 +++++++++++++++++++++---
+ 4 files changed, 33 insertions(+), 21 deletions(-)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index eb4ae32..f1dde2e 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -872,6 +872,31 @@ static const struct test_step test_signed_write_1 = {
- 	.length = 0x03
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index d784427..0a73e54 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -85,16 +85,6 @@ struct bnep {
+ 	void	*disconn_data;
  };
  
-+static void test_signed_write_seclevel(struct context *context)
-+{
-+	const struct test_step *step = context->data->step;
-+	uint8_t key[16] = {0xD8, 0x51, 0x59, 0x48, 0x45, 0x1F, 0xEA, 0x32, 0x0D,
-+				0xC0, 0x5A, 0x2E, 0x88, 0x30, 0x81, 0x88 };
-+
-+	g_assert(bt_att_set_local_key(context->att, key, local_counter,
-+								context));
-+
-+	g_assert(bt_att_set_sec_level(context->att, BT_SECURITY_MEDIUM));
-+
-+	g_assert(bt_gatt_client_write_without_response(context->client,
-+							step->handle,
-+							true, step->value,
-+							step->length));
-+}
-+
-+static const struct test_step test_signed_write_seclevel_1 = {
-+	.handle = 0x0007,
-+	.func = test_signed_write_seclevel,
-+	.expected_att_ecode = 0,
-+	.value = write_data_1,
-+	.length = 0x03
-+};
-+
- static void att_write_cb(struct gatt_db_attribute *att, int err,
- 								void *user_data)
+-const char *bnep_uuid(uint16_t id)
+-{
+-	int i;
+-
+-	for (i = 0; __svc[i].uuid128; i++)
+-		if (__svc[i].id == id)
+-			return __svc[i].uuid128;
+-	return NULL;
+-}
+-
+ const char *bnep_name(uint16_t id)
  {
-@@ -2971,6 +2996,11 @@ int main(int argc, char *argv[])
- 				0x00, 0x00, 0x31, 0x1f, 0x0a, 0xcd, 0x1c, 0x3a,
- 				0x5b, 0x0a));
+ 	int i;
+diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
+index 0c1669c..21a09f6 100644
+--- a/profiles/network/bnep.h
++++ b/profiles/network/bnep.h
+@@ -26,7 +26,6 @@ struct bnep;
+ int bnep_init(void);
+ int bnep_cleanup(void);
  
-+	define_test_client("/TP/GAW/CL/BV-02-C/seclevel", test_client,
-+			service_db_1, &test_signed_write_seclevel_1,
-+			SERVICE_DATA_1_PDUS,
-+			raw_pdu(0x52, 0x07, 0x00, 0x01, 0x02, 0x03));
+-const char *bnep_uuid(uint16_t id);
+ const char *bnep_name(uint16_t id);
+ 
+ struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
+diff --git a/profiles/network/connection.c b/profiles/network/connection.c
+index cbcf39b..1cd3293 100644
+--- a/profiles/network/connection.c
++++ b/profiles/network/connection.c
+@@ -283,21 +283,23 @@ static DBusMessage *local_connect(DBusConnection *conn,
+ 	struct btd_service *service;
+ 	struct network_conn *nc;
+ 	const char *svc;
+-	const char *uuid;
+ 	uint16_t id;
+ 	int err;
++	char uuid_str[MAX_LEN_UUID_STR];
++	bt_uuid_t uuid;
+ 
+ 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &svc,
+ 						DBUS_TYPE_INVALID) == FALSE)
+ 		return btd_error_invalid_args(msg);
+ 
+ 	id = get_pan_srv_id(svc);
+-	uuid = bnep_uuid(id);
++	bt_uuid16_create(&uuid, id);
++	bt_uuid_to_uuid128(&uuid, &uuid);
+ 
+-	if (uuid == NULL)
++	if (bt_uuid_to_string(&uuid, uuid_str, MAX_LEN_UUID_STR) < 0)
+ 		return btd_error_invalid_args(msg);
+ 
+-	service = btd_device_get_service(peer->device, uuid);
++	service = btd_device_get_service(peer->device, uuid_str);
+ 	if (service == NULL)
+ 		return btd_error_not_supported(msg);
+ 
+@@ -438,15 +440,18 @@ static gboolean network_property_get_uuid(const GDBusPropertyTable *property,
+ {
+ 	struct network_peer *peer = data;
+ 	struct network_conn *nc;
+-	const char *uuid;
++	char uuid_str[MAX_LEN_UUID_STR];
++	bt_uuid_t uuid;
+ 
+ 	nc = find_connection_by_state(peer->connections, CONNECTED);
+ 	if (nc == NULL)
+ 		return FALSE;
+ 
+-	uuid = bnep_uuid(nc->id);
++	bt_uuid16_create(&uuid, nc->id);
++	bt_uuid_to_uuid128(&uuid, &uuid);
++	bt_uuid_to_string(&uuid, uuid_str, MAX_LEN_UUID_STR);
+ 
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid_str);
+ 
+ 	return TRUE;
+ }
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index 8e9afbc..21eac5d 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -113,14 +113,32 @@ static struct network_server *find_server(GSList *list, uint16_t id)
+ static struct network_server *find_server_by_uuid(GSList *list,
+ 							const char *uuid)
+ {
++	bt_uuid_t srv_uuid, bnep_uuid;
 +
- 	define_test_client("/TP/GAW/CL/BV-03-C", test_client, service_db_1,
- 			&test_write_1,
- 			SERVICE_DATA_1_PDUS,
+ 	for (; list; list = list->next) {
+ 		struct network_server *ns = list->data;
++		bt_uuid16_create(&bnep_uuid, ns->id);
+ 
+-		if (strcasecmp(uuid, bnep_uuid(ns->id)) == 0)
++		/* UUID value compare */
++		if (!bt_string_to_uuid(&srv_uuid, uuid) &&
++					!bt_uuid_cmp(&srv_uuid, &bnep_uuid))
+ 			return ns;
+ 
+-		if (strcasecmp(uuid, bnep_name(ns->id)) == 0)
+-			return ns;
++		/* String value compare */
++		switch (ns->id) {
++		case BNEP_SVC_PANU:
++			if (!strcasecmp(uuid, "panu"))
++				return ns;
++			break;
++		case BNEP_SVC_NAP:
++			if (!strcasecmp(uuid, "nap"))
++				return ns;
++			break;
++		case BNEP_SVC_GN:
++			if (!strcasecmp(uuid, "gn"))
++				return ns;
++			break;
++		}
+ 	}
+ 
+ 	return NULL;
 -- 
 2.1.0
 
