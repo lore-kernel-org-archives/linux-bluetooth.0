@@ -2,70 +2,94 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 03/16] android/tester-gatt: Add robustness test for get characteristic
-Date: Thu, 26 Feb 2015 10:39:30 +0100
-Message-Id: <1424943583-30061-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 02/16] attrib/gatt: Improve robustness on search primary services
+Date: Thu, 26 Feb 2015 10:39:29 +0100
+Message-Id: <1424943583-30061-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test makes sure that BlueZ correctly handles incorrect response
-from remote device on get characteristic.
----
- android/tester-gatt.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+Without this it is possible to put BlueZ into infinite loop when
+doing primary service search on remote device.
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index 6c58bc7..1abfe26 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -907,6 +907,13 @@ static struct iovec get_characteristic_1[] = {
- 	end_pdu
- };
+Issue happens when remote device replies with ending handle which is
+lower than start handle we use for search.
+
+This patch fixes that
+
+Found on robustness session on UPF50
+---
+ attrib/gatt.c | 29 +++++++++++++++++++++++++++--
+ 1 file changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index aafd3f7..b8d766c 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -43,6 +43,7 @@ struct discover_primary {
+ 	GAttrib *attrib;
+ 	unsigned int id;
+ 	bt_uuid_t uuid;
++	uint16_t start;
+ 	GSList *primaries;
+ 	gatt_cb_t cb;
+ 	void *user_data;
+@@ -255,8 +256,19 @@ static void primary_by_uuid_cb(guint8 status, const guint8 *ipdu,
+ 	if (range->end == 0xffff)
+ 		goto done;
  
-+static struct iovec get_characteristic_2[] = {
-+	SEARCH_SERVICE_SINGLE_SUCCESS_PDUS,
-+	raw_pdu(0x08, 0x01, 0x00, 0x10, 0x00, 0x03, 0x28),
-+	raw_pdu(0x09, 0x07, 0x00, 0x00, 0x04, 0x00, 0x00, 0x19, 0x00),
-+	end_pdu
-+};
++	/*
++	 * If last handle is lower from previous start handle then it is smth
++	 * wrong. Let's stop search, otherwise we might enter infinite loop.
++	 */
++	if (range->end < dp->start) {
++		err = ATT_ECODE_UNLIKELY;
++		goto done;
++	}
 +
- static struct iovec get_descriptor_1[] = {
- 	SEARCH_SERVICE_SINGLE_SUCCESS_PDUS,
- 	READ_BY_TYPE_SINGLE_CHARACTERISTIC_PDUS,
-@@ -2189,6 +2196,31 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
- 	),
-+	TEST_CASE_BREDRLE("Gatt Client - Get Characteristic - Incorrect rsp",
-+		ACTION_SUCCESS(init_pdus, get_characteristic_2),
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(emu_set_ssp_mode_action, NULL),
-+		ACTION_SUCCESS(emu_set_connect_cb_action, gatt_conn_cb),
-+		ACTION_SUCCESS(gatt_client_register_action, &app1_uuid),
-+		CALLBACK_STATUS(CB_GATTC_REGISTER_CLIENT, BT_STATUS_SUCCESS),
-+		ACTION_SUCCESS(gatt_client_start_scan_action, NULL),
-+		CLLBACK_GATTC_SCAN_RES(prop_emu_remotes_default_set, 1, TRUE),
-+		ACTION_SUCCESS(gatt_client_stop_scan_action, NULL),
-+		ACTION_SUCCESS(gatt_client_connect_action, &app1_conn_req),
-+		CALLBACK_GATTC_CONNECT(GATT_STATUS_SUCCESS,
-+						prop_emu_remotes_default_set,
-+						CONN1_ID, APP1_ID),
-+		ACTION_SUCCESS(gatt_client_search_services, &search_services_1),
-+		CALLBACK_GATTC_SEARCH_COMPLETE(GATT_STATUS_SUCCESS, CONN1_ID),
-+		ACTION_SUCCESS(gatt_client_get_characteristic_action,
-+							&get_char_data_1),
-+		CALLBACK_GATTC_GET_CHARACTERISTIC_CB(GATT_STATUS_FAILURE,
-+				CONN1_ID, &service_1, NULL, 0),
-+		ACTION_SUCCESS(bluetooth_disable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
-+	),
- 	TEST_CASE_BREDRLE("Gatt Client - Get Characteristic - None",
- 		ACTION_SUCCESS(init_pdus, get_characteristic_1),
- 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++	dp->start = range->end + 1;
++
+ 	buf = g_attrib_get_buffer(dp->attrib, &buflen);
+-	oplen = encode_discover_primary(range->end + 1, 0xffff, &dp->uuid,
++	oplen = encode_discover_primary(dp->start, 0xffff, &dp->uuid,
+ 								buf, buflen);
+ 
+ 	if (oplen == 0)
+@@ -325,12 +337,24 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 	att_data_list_free(list);
+ 	err = 0;
+ 
++	/*
++	 * If last handle is lower from previous start handle then it is smth
++	 * wrong. Let's stop search, otherwise we might enter infinite loop.
++	 */
++	if (end < dp->start) {
++		err = ATT_ECODE_UNLIKELY;
++		goto done;
++	}
++
++	dp->start = end + 1;
++
+ 	if (end != 0xffff) {
+ 		size_t buflen;
+ 		uint8_t *buf = g_attrib_get_buffer(dp->attrib, &buflen);
+-		guint16 oplen = encode_discover_primary(end + 1, 0xffff, NULL,
++		guint16 oplen = encode_discover_primary(dp->start, 0xffff, NULL,
+ 								buf, buflen);
+ 
++
+ 		g_attrib_send(dp->attrib, dp->id, buf, oplen, primary_all_cb,
+ 						discover_primary_ref(dp),
+ 						discover_primary_unref);
+@@ -362,6 +386,7 @@ guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
+ 	dp->attrib = g_attrib_ref(attrib);
+ 	dp->cb = func;
+ 	dp->user_data = user_data;
++	dp->start = 0x0001;
+ 
+ 	if (uuid) {
+ 		dp->uuid = *uuid;
 -- 
 1.8.4
 
