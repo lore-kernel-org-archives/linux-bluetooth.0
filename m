@@ -1,48 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 00/16] android/gatt: Improve robustness in Gatt Client
-Date: Thu, 26 Feb 2015 10:39:27 +0100
-Message-Id: <1424943583-30061-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <2722972.0T73ov4ygU@uw000953>
+References: <1424355399-10015-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<1424355399-10015-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<2722972.0T73ov4ygU@uw000953>
+Date: Thu, 26 Feb 2015 10:39:12 +0100
+Message-ID: <CAMv5GbdhBtTdDGq5o9PM=xBBU6Ki_Xp6p52MP1p13D9RsscP7w@mail.gmail.com>
+Subject: Re: [PATCH 3/6] profiles/network: Use send ctrl rsp to unknown BNEP
+ ctrl cmd
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This set improves robustness on searching services, characteristics,
-descriptors and included services.
+Hi Szymon,
 
-Issue found on UPF50.
+On 26 February 2015 at 10:37, Szymon Janc <szymon.janc@tieto.com> wrote:
+>
+> Hi Grzegorz,
+>
+> On Thursday 19 of February 2015 15:16:36 Grzegorz Kolodziejczyk wrote:
+> > Use dedicated control response function instead of assembling and
+> > sending raw packet over socket.
+> > ---
+> >  profiles/network/server.c | 12 ++++--------
+> >  1 file changed, 4 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/profiles/network/server.c b/profiles/network/server.c
+> > index ebbe056..37bfba4 100644
+> > --- a/profiles/network/server.c
+> > +++ b/profiles/network/server.c
+> > @@ -307,14 +307,10 @@ static gboolean bnep_setup(GIOChannel *chan,
+> >       /* Highest known Control command ID
+> >        * is BNEP_FILTER_MULT_ADDR_RSP = 0x06 */
+> >       if (req->type == BNEP_CONTROL &&
+> > -                             req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
+> > -             uint8_t pkt[3];
+> > -
+> > -             pkt[0] = BNEP_CONTROL;
+> > -             pkt[1] = BNEP_CMD_NOT_UNDERSTOOD;
+> > -             pkt[2] = req->ctrl;
+> > -
+> > -             send(sk, pkt, sizeof(pkt), 0);
+> > +                                     req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
+> > +             error("cmd not understood");
+> > +             bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_CMD_NOT_UNDERSTOOD,
+> > +                                                             req->ctrl);
+> >
+> >               return FALSE;
+> >       }
+>
+> As discussed offline, this is not correct since we need to handle
+> BNEP_CMD_NOT_UNDERSTOOD special case in bnep_send_ctrl_rsp.
+>
+Yes, I've prepared a patch since there is similar issue in pan android
+profile code. Will rebase it.
+>
+> --
+> Best regards,
+> Szymon Janc
 
-There is 4 test showing issue and after each test there is a fix for that.
-
-Last 5 patches is a same fix for shared/gatt-helpers. I did not write special
-test for it as we will test it once we make Android to use it shared code.
-Anyway, this change does not brake gatt unit tests
-
-Lukasz Rymanowski (16):
-  android/tester-gatt: Add robustness test for search services
-  attrib/gatt: Improve robustness on search primary services
-  android/tester-gatt: Add robustness test for get characteristic
-  attrib/gatt: Minor refactor in char_discovered_cb
-  attrib/gatt: Improve robustness when searching for characteristics
-  android/gatt: Check status on get characteristic callback
-  android/tester: Add robustness test for get descriptor
-  attrib/gatt: Minor refactor in desc_discovered_cb
-  attrib/gatt: Improve robustness when searching for descriptors
-  android/tester: Add robustness test for get included services
-  attrib/gatt: Improve robustness when searching for included services
-  shated/gatt-helpers: Improve robustness of search service
-  shared/gatt-helpers: Improve robustness of get characteristics
-  shared/gatt-helpers: Improve robustness of get include services
-  shared/gatt-helpers: Improve robustness read by type request
-  shared/gatt-helpers: Improve robustness of get descriptors
-
- android/gatt.c            |   8 +++
- android/tester-gatt.c     | 128 ++++++++++++++++++++++++++++++++++++++++++++++
- attrib/gatt.c             |  93 +++++++++++++++++++++++++++++----
- src/shared/gatt-helpers.c |  89 +++++++++++++++++++++++++++++---
- 4 files changed, 302 insertions(+), 16 deletions(-)
-
--- 
-1.8.4
-
+Best regards,
+Grzegorz Kołodziejczyk
