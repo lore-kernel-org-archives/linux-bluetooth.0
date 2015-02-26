@@ -1,53 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <938707CA-DE91-41D5-B611-B89CFF9236C6@holtmann.org>
-References: <1424927610-26226-1-git-send-email-armansito@chromium.org>
-	<1424927610-26226-4-git-send-email-armansito@chromium.org>
-	<938707CA-DE91-41D5-B611-B89CFF9236C6@holtmann.org>
-Date: Thu, 26 Feb 2015 12:32:45 -0800
-Message-ID: <CAHrH25TOMVFwAJ23KQDkrRugpihTK+1ijm9RSzE0gkzjxBA3nA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 03/17] gdbus/client: Allow specifying
- ObjectManager path
-From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Eyal Birger <eyal.birger@gmail.com>
+To: davem@davemloft.net
+Cc: willemb@google.com,
+	edumazet@google.com,
+	shmulik.ladkani@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org,
+	netdev@vger.kernel.org,
+	Eyal Birger <eyal.birger@gmail.com>
+Subject: [PATCH net-next v2 7/7] net: move skb->dropcount to skb->cb[]
+Date: Thu, 26 Feb 2015 21:07:04 +0200
+Message-Id: <1424977624-649-8-git-send-email-eyal.birger@gmail.com>
+In-Reply-To: <1424977624-649-1-git-send-email-eyal.birger@gmail.com>
+References: <1424977624-649-1-git-send-email-eyal.birger@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Commit 977750076d98 ("af_packet: add interframe drop cmsg (v6)")
+unionized skb->mark and skb->dropcount in order to allow recording
+of the socket drop count while maintaining struct sk_buff size.
 
-> On Thu, Feb 26, 2015 at 7:38 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Arman,
->
->> GDBusClient currently hard-codes "/" as the remote ObjectManager path.
->> This is generally incorrect, as an application can choose to expose an
->> ObjectManager at any well-known path. This patch fixes this by allowing
->> the user to pass in the ObjectManager path to g_dbus_client_new.
->> ---
->> client/main.c            |  2 +-
->> gdbus/client.c           | 23 ++++++++++++++++-------
->> gdbus/gdbus.h            |  5 +++--
->> plugins/hostname.c       |  2 +-
->> profiles/iap/main.c      |  2 +-
->> tools/bluetooth-player.c |  2 +-
->> tools/gap-tester.c       |  3 ++-
->> tools/gatt-service.c     |  2 +-
->> tools/mpris-proxy.c      |  2 +-
->> tools/obexctl.c          |  2 +-
->> unit/test-gdbus-client.c | 39 ++++++++++++++++++++++++++-------------
->> 11 files changed, 54 insertions(+), 30 deletions(-)
->
-> please to not intermix gdbus/ changes with others. Everything in gdbus/ needs to be a separate patch. You are affecting more than one project here.
->
+skb->dropcount was introduced since there was no available room
+in skb->cb[] in packet sockets. However, its introduction led to
+the inability to export skb->mark, or any other aliased field to
+userspace if so desired.
 
-This is a gdbus/ only change but I it changes an API definition so all
-of these other spots need to be updated otherwise the code won't
-compile.
+Moving the dropcount metric to skb->cb[] eliminates this problem
+at the expense of 4 bytes less in skb->cb[] for protocol families
+using it.
 
-> Regards
->
-> Marcel
->
+Signed-off-by: Eyal Birger <eyal.birger@gmail.com>
+---
+ include/linux/skbuff.h |  2 --
+ include/net/sock.h     | 18 ++++++++++++++++--
+ net/socket.c           |  4 ++--
+ 3 files changed, 18 insertions(+), 6 deletions(-)
 
-Arman
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index d898b32..bba1330 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -492,7 +492,6 @@ static inline u32 skb_mstamp_us_delta(const struct skb_mstamp *t1,
+   *	@napi_id: id of the NAPI struct this skb came from
+  *	@secmark: security marking
+  *	@mark: Generic packet mark
+- *	@dropcount: total number of sk_receive_queue overflows
+  *	@vlan_proto: vlan encapsulation protocol
+  *	@vlan_tci: vlan tag control information
+  *	@inner_protocol: Protocol (encapsulation)
+@@ -641,7 +640,6 @@ struct sk_buff {
+ #endif
+ 	union {
+ 		__u32		mark;
+-		__u32		dropcount;
+ 		__u32		reserved_tailroom;
+ 	};
+ 
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 0996fe4..38369d3 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2078,13 +2078,27 @@ static inline int sock_intr_errno(long timeo)
+ 	return timeo == MAX_SCHEDULE_TIMEOUT ? -ERESTARTSYS : -EINTR;
+ }
+ 
++struct sock_skb_cb {
++	u32 dropcount;
++};
++
++/* Store sock_skb_cb at the end of skb->cb[] so protocol families
++ * using skb->cb[] would keep using it directly and utilize its
++ * alignement guarantee.
++ */
++#define SOCK_SKB_CB_OFFSET ((FIELD_SIZEOF(struct sk_buff, cb) - \
++			    sizeof(struct sock_skb_cb)))
++
++#define SOCK_SKB_CB(__skb) ((struct sock_skb_cb *)((__skb)->cb + \
++			    SOCK_SKB_CB_OFFSET))
++
+ #define sock_skb_cb_check_size(size) \
+-	BUILD_BUG_ON((size) > FIELD_SIZEOF(struct sk_buff, cb))
++	BUILD_BUG_ON((size) > SOCK_SKB_CB_OFFSET)
+ 
+ static inline void
+ sock_skb_set_dropcount(const struct sock *sk, struct sk_buff *skb)
+ {
+-	skb->dropcount = atomic_read(&sk->sk_drops);
++	SOCK_SKB_CB(skb)->dropcount = atomic_read(&sk->sk_drops);
+ }
+ 
+ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
+diff --git a/net/socket.c b/net/socket.c
+index bbedbfc..b78cf60 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -731,9 +731,9 @@ EXPORT_SYMBOL_GPL(__sock_recv_wifi_status);
+ static inline void sock_recv_drops(struct msghdr *msg, struct sock *sk,
+ 				   struct sk_buff *skb)
+ {
+-	if (sock_flag(sk, SOCK_RXQ_OVFL) && skb && skb->dropcount)
++	if (sock_flag(sk, SOCK_RXQ_OVFL) && skb && SOCK_SKB_CB(skb)->dropcount)
+ 		put_cmsg(msg, SOL_SOCKET, SO_RXQ_OVFL,
+-			sizeof(__u32), &skb->dropcount);
++			sizeof(__u32), &SOCK_SKB_CB(skb)->dropcount);
+ }
+ 
+ void __sock_recv_ts_and_drops(struct msghdr *msg, struct sock *sk,
+-- 
+2.1.4
