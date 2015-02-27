@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 19/20] android/avdtp: Refactor avdtp_new()
-Date: Fri, 27 Feb 2015 17:03:07 +0200
-Message-Id: <1425049388-18333-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 12/20] audio/avdtp: Make use of disconnect callback
+Date: Fri, 27 Feb 2015 17:03:00 +0200
+Message-Id: <1425049388-18333-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1425049388-18333-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1425049388-18333-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,148 +11,198 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-avdtp_new() is refactored to two functions avdtp_new() and
-avdtp_set_control() similar to set avdtp_set_transport(). This is needed
-for code which creates avdtp session without fd like inside sink, source
-and transport code.
+disconnect callback will be used for cancelling authorization request.
 ---
- android/a2dp.c      |  4 +++-
- android/avdtp.c     | 27 ++++++++++++++++-----------
- android/avdtp.h     |  4 ++--
- android/avdtptest.c |  3 ++-
- unit/test-avdtp.c   |  5 +++--
- 5 files changed, 26 insertions(+), 17 deletions(-)
+ profiles/audio/a2dp.c  |  8 ++++++
+ profiles/audio/avdtp.c | 74 ++++++++++++++++++++++++++++++++++++++++++--------
+ profiles/audio/avdtp.h |  7 +++++
+ 3 files changed, 77 insertions(+), 12 deletions(-)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index f219042..1a6e062 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -647,10 +647,12 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
- 	fd = g_io_channel_unix_get_fd(chan);
- 
- 	/* FIXME: Add proper version */
--	session = avdtp_new(fd, imtu, omtu, 0x0100, lseps);
-+	session = avdtp_new(0x0100, lseps);
- 	if (!session)
- 		goto failed;
- 
-+	avdtp_set_control(session, fd, imtu, omtu);
-+
- 	dev->session = session;
- 
- 	avdtp_add_disconnect_cb(dev->session, disconnect_cb, dev);
-diff --git a/android/avdtp.c b/android/avdtp.c
-index b8a2147..dd31a0b 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -2113,28 +2113,35 @@ static int set_priority(int fd, int priority)
- 	return err;
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index df2b2b8..ac7e985 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -1448,6 +1448,13 @@ static void auth_cb(DBusError *derr, void *user_data)
+ 	avdtp_accept(session, signaling_connect_cb);
  }
  
--struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version,
--							struct queue *lseps)
-+struct avdtp *avdtp_new(uint16_t version, struct queue *lseps)
- {
- 	struct avdtp *session;
--	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
--	int new_fd;
- 
- 	if (!lseps)
- 		return NULL;
- 
-+	session = g_new0(struct avdtp, 1);
-+	session->version = version;
-+	session->lseps = lseps;
++static void disconnect_cb(void *user_data)
++{
++	struct avdtp *session = user_data;
 +
-+	return avdtp_ref(session);
++	avdtp_cancel_authorization(session);
 +}
 +
-+bool avdtp_set_control(struct avdtp *session, int fd, size_t imtu, size_t omtu)
-+{
-+	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-+	int new_fd;
+ static void avdtp_confirm_cb(GIOChannel *chan, gpointer data)
+ {
+ 	struct avdtp *session;
+@@ -1490,6 +1497,7 @@ static void avdtp_confirm_cb(GIOChannel *chan, gpointer data)
+ 		return;
+ 
+ 	btd_device_add_uuid(device, ADVANCED_AUDIO_UUID);
++	avdtp_add_disconnect_cb(session, disconnect_cb, session);
+ 	avdtp_request_authorization(session, &src, &dst, auth_cb);
+ 
+ 	return;
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index fb860ef..4361e23 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -343,16 +343,22 @@ struct stream_callback {
+ 	unsigned int id;
+ };
+ 
+-struct avdtp_state_callback {
+-	avdtp_session_state_cb cb;
+-	struct btd_device *dev;
++struct discover_callback {
+ 	unsigned int id;
++	avdtp_discover_cb_t cb;
+ 	void *user_data;
+ };
+ 
+-struct discover_callback {
++struct disconnect_callback {
++	unsigned int id;
++	avdtp_disconnect_cb_t cb;
++	void *user_data;
++};
 +
- 	new_fd = dup(fd);
- 	if (new_fd < 0) {
- 		error("dup(): %s (%d)", strerror(errno), errno);
--		return NULL;
-+		return false;
- 	}
++struct avdtp_state_callback {
++	avdtp_session_state_cb cb;
++	struct btd_device *dev;
+ 	unsigned int id;
+-	avdtp_discover_cb_t cb;
+ 	void *user_data;
+ };
  
- 	if (set_priority(new_fd, 6) < 0)
--		return NULL;
-+		return false;
+@@ -415,6 +421,8 @@ struct avdtp {
+ 	struct discover_callback *discover;
+ 	struct pending_req *req;
  
--	session = g_new0(struct avdtp, 1);
- 	session->io = g_io_channel_unix_new(new_fd);
--	session->version = version;
- 	session->imtu = imtu;
- 	session->omtu = omtu;
- 	session->buf = g_malloc0(MAX(session->imtu, session->omtu));
-@@ -2150,9 +2157,7 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version,
- 						(GIOFunc) session_cb, session,
- 						NULL);
++	GSList *disconnect;
++
+ 	guint dc_timer;
  
--	session->lseps = lseps;
--
--	return avdtp_ref(session);
-+	return true;
+ 	/* Attempt stream setup instead of disconnecting */
+@@ -1060,7 +1068,7 @@ static void release_stream(struct avdtp_stream *stream, struct avdtp *session)
+ 	avdtp_sep_set_state(session, sep, AVDTP_STATE_IDLE);
  }
  
- unsigned int avdtp_add_disconnect_cb(struct avdtp *session,
-diff --git a/android/avdtp.h b/android/avdtp.h
-index 07516a8..ce84029 100644
---- a/android/avdtp.h
-+++ b/android/avdtp.h
-@@ -205,8 +205,8 @@ typedef void (*avdtp_discover_cb_t) (struct avdtp *session, GSList *seps,
- 					struct avdtp_error *err, void *user_data);
- typedef void (*avdtp_disconnect_cb_t) (void *user_data);
+-static int avdtp_cancel_authorization(struct avdtp *session)
++int avdtp_cancel_authorization(struct avdtp *session)
+ {
+ 	int err;
  
--struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version,
--							struct queue *lseps);
-+struct avdtp *avdtp_new(uint16_t version, struct queue *lseps);
-+bool avdtp_set_control(struct avdtp *session, int fd, size_t imtu, size_t omtu);
+@@ -1121,6 +1129,7 @@ void avdtp_free(void *data)
+ 	g_slist_free_full(session->req_queue, pending_req_free);
+ 	g_slist_free_full(session->prio_queue, pending_req_free);
+ 	g_slist_free_full(session->seps, sep_free);
++	g_slist_free_full(session->disconnect, g_free);
  
- unsigned int avdtp_add_disconnect_cb(struct avdtp *session,
- 						avdtp_disconnect_cb_t cb,
-diff --git a/android/avdtptest.c b/android/avdtptest.c
-index 6529423..763a6f3 100644
---- a/android/avdtptest.c
-+++ b/android/avdtptest.c
-@@ -413,13 +413,14 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 		return;
- 	}
+ 	g_free(session->buf);
  
--	avdtp = avdtp_new(fd, imtu, omtu, version, lseps);
-+	avdtp = avdtp_new(version, lseps);
- 	if (!avdtp) {
- 		printf("Failed to create avdtp instance\n");
- 		g_main_loop_quit(mainloop);
- 		return;
- 	}
+@@ -1128,21 +1137,27 @@ void avdtp_free(void *data)
+ 	g_free(session);
+ }
  
-+	avdtp_set_control(avdtp, fd, imtu, omtu);
- 	avdtp_add_disconnect_cb(avdtp, disconnect_cb, NULL);
+-void connection_lost(struct avdtp *session, int err)
++static void process_disconnect(void *data)
+ {
+-	char address[18];
++	struct disconnect_callback *callback = data;
  
- 	if (preconf) {
-diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index 805f08d..b91cf97 100644
---- a/unit/test-avdtp.c
-+++ b/unit/test-avdtp.c
-@@ -236,10 +236,11 @@ static struct context *context_new(uint16_t version, uint16_t imtu,
- 	context->lseps = queue_new();
- 	g_assert(context->lseps);
+-	ba2str(device_get_address(session->device), address);
+-	DBG("Disconnected from %s", address);
++	callback->cb(callback->user_data);
  
--	context->session = avdtp_new(sv[0], imtu, omtu, version,
--								context->lseps);
-+	context->session = avdtp_new(version, context->lseps);
- 	g_assert(context->session != NULL);
- 
-+	g_assert(avdtp_set_control(context->session, sv[0], imtu, omtu));
+-	if (err != EACCES)
+-		avdtp_cancel_authorization(session);
++	g_free(callback);
++}
 +
- 	channel = g_io_channel_unix_new(sv[1]);
++void connection_lost(struct avdtp *session, int err)
++{
++	DBG("Disconnected: %s (%d)", strerror(err), err);
  
- 	g_io_channel_set_close_on_unref(channel, TRUE);
+ 	g_slist_foreach(session->streams, (GFunc) release_stream, session);
+ 	session->streams = NULL;
+ 
+ 	finalize_discovery(session, err);
+ 
++	g_slist_free_full(session->disconnect, process_disconnect);
++	session->disconnect = NULL;
++
+ 	avdtp_set_state(session, AVDTP_SESSION_STATE_DISCONNECTED);
+ 
+ 	if (session->ref > 0)
+@@ -2507,6 +2522,41 @@ bool avdtp_request_authorization(struct avdtp *session, const bdaddr_t *src,
+ 	return true;
+ }
+ 
++unsigned int avdtp_add_disconnect_cb(struct avdtp *session,
++						avdtp_disconnect_cb_t cb,
++						void *user_data)
++{
++	struct disconnect_callback *callback;
++	static unsigned int id = 0;
++
++	callback = g_new0(struct disconnect_callback, 1);
++	callback->id = ++id;
++	callback->cb = cb;
++	callback->user_data = user_data;
++	session->disconnect = g_slist_append(session->disconnect, callback);
++
++	return id;
++}
++
++gboolean avdtp_remove_disconnect_cb(struct avdtp *session, unsigned int id)
++{
++	GSList *l;
++
++	for (l = session->disconnect; l; l = g_slist_next(l)) {
++		struct disconnect_callback *callback = l->data;
++
++		if (callback->id != id)
++			continue;
++
++		session->disconnect = g_slist_remove(session->disconnect,
++								callback);
++		g_free(callback);
++		return TRUE;
++	}
++
++	return FALSE;
++}
++
+ static void queue_request(struct avdtp *session, struct pending_req *req,
+ 			gboolean priority)
+ {
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index 88e8cb4..af55f76 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -213,6 +213,12 @@ struct avdtp_sep_ind {
+ 
+ typedef void (*avdtp_discover_cb_t) (struct avdtp *session, GSList *seps,
+ 					struct avdtp_error *err, void *user_data);
++typedef void (*avdtp_disconnect_cb_t) (void *user_data);
++
++unsigned int avdtp_add_disconnect_cb(struct avdtp *session,
++						avdtp_disconnect_cb_t cb,
++						void *user_data);
++gboolean avdtp_remove_disconnect_cb(struct avdtp *session, unsigned int id);
+ 
+ void avdtp_unref(struct avdtp *session);
+ struct avdtp *avdtp_ref(struct avdtp *session);
+@@ -305,6 +311,7 @@ void avdtp_accept(struct avdtp *session, BtIOConnect cb);
+ bool avdtp_request_authorization(struct avdtp *session, const bdaddr_t *src,
+ 							const bdaddr_t *dst,
+ 							service_auth_cb cb);
++int avdtp_cancel_authorization(struct avdtp *session);
+ bool avdtp_set_control(struct avdtp *session, int fd, size_t imtu, size_t omtu);
+ bool avdtp_stream_set_transport(struct avdtp *session, int fd, size_t imtu,
+ 								size_t omtu);
 -- 
 2.1.0
 
