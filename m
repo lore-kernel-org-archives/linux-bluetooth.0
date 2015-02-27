@@ -1,82 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] audio/avctp: Accept incoming connection in case of colission
+Date: Fri, 27 Feb 2015 11:37:08 +0100
+Message-ID: <1432936.7iWJrZ6TN0@uw000953>
+In-Reply-To: <1425024072-6259-2-git-send-email-marcin.kraglak@tieto.com>
+References: <1425024072-6259-1-git-send-email-marcin.kraglak@tieto.com> <1425024072-6259-2-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1424959400-18701-1-git-send-email-luiz.dentz@gmail.com>
-References: <1424959400-18701-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 27 Feb 2015 12:52:58 +0200
-Message-ID: <CABBYNZKr0e9UufoSWGutGBN8CC2iRd7La8rCFPv96krpqGdpsw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] unit/test-gatt: Add /TP/GAW/CL/BV-02-C/seclevel test
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcin,
 
-On Thu, Feb 26, 2015 at 4:03 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This add a test for signed write but with security level other than low
-> so we can verify the code use the write instead of signed write.
+On Friday 27 of February 2015 09:01:12 Marcin Kraglak wrote:
+> Accept incoming connection to Control Channel in case of colission.
+> If accepting connection won't succeed, try reconnect.
+> There is no need to request authorization while user has been connecting
+> to service in meantime.
+> Issue was found during tests with NOKIA BH-505 and Motorola HT-820.
 > ---
->  unit/test-gatt.c | 30 ++++++++++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
->
-> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-> index eb4ae32..f1dde2e 100644
-> --- a/unit/test-gatt.c
-> +++ b/unit/test-gatt.c
-> @@ -872,6 +872,31 @@ static const struct test_step test_signed_write_1 = {
->         .length = 0x03
+>  profiles/audio/avctp.c | 38 ++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 36 insertions(+), 2 deletions(-)
+> 
+> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+> index 57071b5..8d457f4 100644
+> --- a/profiles/audio/avctp.c
+> +++ b/profiles/audio/avctp.c
+> @@ -203,6 +203,7 @@ struct avctp {
+>  	uint8_t key_quirks[256];
+>  	struct key_pressed key;
+>  	bool initiator;
+> +	bool reconnect;
 >  };
->
-> +static void test_signed_write_seclevel(struct context *context)
-> +{
-> +       const struct test_step *step = context->data->step;
-> +       uint8_t key[16] = {0xD8, 0x51, 0x59, 0x48, 0x45, 0x1F, 0xEA, 0x32, 0x0D,
-> +                               0xC0, 0x5A, 0x2E, 0x88, 0x30, 0x81, 0x88 };
+>  
+>  struct avctp_passthrough_handler {
+> @@ -1219,11 +1220,22 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+>  	GError *gerr = NULL;
+>  
+>  	if (err) {
+> +		struct btd_device *device = session->device;
+> +		bool reconnect = session->reconnect;
 > +
-> +       g_assert(bt_att_set_local_key(context->att, key, local_counter,
-> +                                                               context));
+>  		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+>  		error("%s", err->message);
 > +
-> +       g_assert(bt_att_set_sec_level(context->att, BT_SECURITY_MEDIUM));
+> +		if (!reconnect)
+> +			return;
 > +
-> +       g_assert(bt_gatt_client_write_without_response(context->client,
-> +                                                       step->handle,
-> +                                                       true, step->value,
-> +                                                       step->length));
-> +}
+> +		DBG("Control: Attempting to reconnect");
+> +		avctp_connect(device);
+>  		return;
+>  	}
+>  
+> +	session->reconnect = false;
 > +
-> +static const struct test_step test_signed_write_seclevel_1 = {
-> +       .handle = 0x0007,
-> +       .func = test_signed_write_seclevel,
-> +       .expected_att_ecode = 0,
-> +       .value = write_data_1,
-> +       .length = 0x03
-> +};
-> +
->  static void att_write_cb(struct gatt_db_attribute *att, int err,
->                                                                 void *user_data)
+>  	bt_io_get(chan, &gerr,
+>  			BT_IO_OPT_DEST, &address,
+>  			BT_IO_OPT_IMTU, &imtu,
+> @@ -1346,10 +1358,32 @@ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
 >  {
-> @@ -2971,6 +2996,11 @@ int main(int argc, char *argv[])
->                                 0x00, 0x00, 0x31, 0x1f, 0x0a, 0xcd, 0x1c, 0x3a,
->                                 0x5b, 0x0a));
->
-> +       define_test_client("/TP/GAW/CL/BV-02-C/seclevel", test_client,
-> +                       service_db_1, &test_signed_write_seclevel_1,
-> +                       SERVICE_DATA_1_PDUS,
-> +                       raw_pdu(0x52, 0x07, 0x00, 0x01, 0x02, 0x03));
+>  	const bdaddr_t *src;
+>  	const bdaddr_t *dst;
+> +	GError *err = NULL;
+>  
+>  	if (session->control != NULL) {
+> -		error("Control: Refusing unexpected connect");
+> -		g_io_channel_shutdown(chan, TRUE, NULL);
+> +		if (session->state != AVCTP_STATE_CONNECTING) {
+> +			error("Control: Refusing unexpected connect");
+> +			g_io_channel_shutdown(chan, TRUE, NULL);
+> +			return;
+> +		}
 > +
->         define_test_client("/TP/GAW/CL/BV-03-C", test_client, service_db_1,
->                         &test_write_1,
->                         SERVICE_DATA_1_PDUS,
-> --
-> 2.1.0
+> +		/* Cancel outgoing connection and accept incoming */
+> +		DBG("Control: Accepting unexpected connect from remote");
+> +		g_io_channel_shutdown(session->control->io, TRUE, NULL);
+> +		g_io_channel_unref(session->control->io);
+> +		session->control->io = NULL;
+> +
+> +		if (!bt_io_accept(chan, avctp_connect_cb, session, NULL,
+> +									&err)) {
+> +			error("bt_io_accept: %s", err->message);
+> +			g_error_free(err);
+> +			avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+> +			return;
+> +		}
+> +
+> +		session->reconnect = true;
+> +		session->control->io = g_io_channel_ref(chan);
+> +
+>  		return;
+>  	}
 
-Pushed after changing patch 2/2 to use a local variable to emulate
-security level on non-L2CAP transports.
+I think we should go with random timer as required by AVRCP specification
+
+p.4.1.1:
+"If both devices open an AVCTP channel at the same time both channels shall be
+closed and each device shall wait a random time (not more than 1 s and not less
+than 100ms) and then try to open the AVCTP channel again. If it is known which
+device is the master that device can re-try at once."
+
 
 
 -- 
-Luiz Augusto von Dentz
+Best regards, 
+Szymon Janc
