@@ -1,94 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 00/16] Implement GATT server D-Bus API
-Date: Fri, 27 Feb 2015 00:16:23 -0800
-Message-Id: <1425024999-29789-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH] Bluetooth: Update New CSRK event to match latest specification
+Date: Fri, 27 Feb 2015 10:11:13 +0200
+Message-Id: <1425024673-19657-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-*v2: - Introduced g_dbus_client_new_full instead of adding a new argument to
-       g_dbus_client_new.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-     - Removed the crash fix patch. I'll fix this properly in a separate patch
-       set by making discovery procedures cancelable.
+The 'master' parameter of the New CSRK event was recently renamed to
+'type', with the old values kept for backwards compatibility as
+unauthenticated local/remote keys. This patch updates the code to take
+into account the two new (authenticated) values and ensures they get
+used based on the security level of the connection that the respective
+keys get distributed over.
 
-*v1: - Removed src/gatt.* based on email discussion.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  2 +-
+ include/net/bluetooth/mgmt.h     |  7 ++++++-
+ net/bluetooth/mgmt.c             |  2 +-
+ net/bluetooth/smp.c              | 10 ++++++++--
+ 4 files changed, 16 insertions(+), 5 deletions(-)
 
-     - After some discussions on IRC, made ObjectManager mandatory on a
-       per-service-subtree basis to reduce the number of unnecessary
-       object processing and caching. One initial idea was to pass the
-       service subtree directly to RegisterService but one of the
-       concerns was that we should allow applications to use existing
-       tooling for the standard ObjectManager interface.
-
-     - Minor fixes based on comments, also fixed things so that
-       descriptors with CCC and CEP UUIDs cannot be registered by
-       external apps.
-
-     - Included a fix for recent crashes seen in unit/test-gatt.
-
-This patch set implements the GATT server D-Bus API and provides an
-example application in Python to demonstrate how the API can be used
-to export GATT services of various functionality.
-
-Some of the basics of the code is very similar to what was already in
-src/gatt-dbus.c, especially the bits that use gdbus/client to fetch
-and interact with remote objects. However, src/gatt-dbus had a lot of
-code that used the now-defunct src/gatt (which was going to be the new
-GATT abstraction for bluetoothd before we built shared/gatt), so I
-decided to remove gatt-dbus entirely and start from scratch with
-src/gatt-manager.
-
-Apart from these the code is fairly straight-forward. New additions to
-src/gatt-database have been made to allow upper layers to store CCC
-descriptors and send out notifications. The API automatically creates
-CCC and CEP (Characteristic Extended Properties) descriptors based on
-characteristic properties.
-
-Arman Uguray (16):
-  gdbus/client: Don't GetManagedObjects w/o handlers
-  gdbus/client: Allow specifying ObjectManager path
-  doc/gatt-api.txt: New ObjectManager requirements
-  core: gatt: Add GattManager1 stubs
-  core: gatt: Implement GattManager1.RegisterService
-  core: gatt: Register characteristics
-  core: gatt: Support ReadValue for characteristics
-  core: gatt: Support WriteValue for characteristics
-  core: gatt: Make CCC addition API public
-  core: gatt: Create CCC for external characteristic
-  core: gatt: Add btd_gatt_database_notify function
-  core: gatt: Send not/ind for D-Bus characteristics
-  core: gatt: Create CEP for external characteristic
-  core: gatt: Register descriptors
-  core: gatt: Support descriptor reads/writes
-  tools: Added a Python example for GATT server API
-
- Makefile.am         |    3 +-
- doc/gatt-api.txt    |   74 ++-
- gdbus/client.c      |   27 +-
- gdbus/gdbus.h       |    4 +
- src/adapter.c       |   18 +-
- src/gatt-database.c |  114 ++++-
- src/gatt-database.h |   16 +
- src/gatt-dbus.c     |  658 ------------------------
- src/gatt-dbus.h     |   25 -
- src/gatt-manager.c  | 1383 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt-manager.h  |   23 +
- src/gatt.c          |  321 ------------
- src/gatt.h          |  121 -----
- src/main.c          |    5 -
- tools/gatt-example  |  463 +++++++++++++++++
- 15 files changed, 2089 insertions(+), 1166 deletions(-)
- delete mode 100644 src/gatt-dbus.c
- delete mode 100644 src/gatt-dbus.h
- create mode 100644 src/gatt-manager.c
- create mode 100644 src/gatt-manager.h
- delete mode 100644 src/gatt.c
- delete mode 100644 src/gatt.h
- create mode 100755 tools/gatt-example
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 40831d1c9b0c..bc70830cf7d3 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -108,7 +108,7 @@ struct bt_uuid {
+ struct smp_csrk {
+ 	bdaddr_t bdaddr;
+ 	u8 bdaddr_type;
+-	u8 master;
++	u8 type;
+ 	u8 val[16];
+ };
+ 
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index e218a30f2061..fe8eef00e9ca 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -647,9 +647,14 @@ struct mgmt_ev_new_irk {
+ 	struct mgmt_irk_info irk;
+ } __packed;
+ 
++#define MGMT_CSRK_LOCAL_UNAUTHENTICATED		0x00
++#define MGMT_CSRK_REMOTE_UNAUTHENTICATED	0x01
++#define MGMT_CSRK_LOCAL_AUTHENTICATED		0x02
++#define MGMT_CSRK_REMOTE_AUTHENTICATED		0x03
++
+ struct mgmt_csrk_info {
+ 	struct mgmt_addr_info addr;
+-	__u8 master;
++	__u8 type;
+ 	__u8 val[16];
+ } __packed;
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a11d41572887..ccb725de8c39 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6660,7 +6660,7 @@ void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
+ 
+ 	bacpy(&ev.key.addr.bdaddr, &csrk->bdaddr);
+ 	ev.key.addr.type = link_to_bdaddr(LE_LINK, csrk->bdaddr_type);
+-	ev.key.master = csrk->master;
++	ev.key.type = csrk->type;
+ 	memcpy(ev.key.val, csrk->val, sizeof(csrk->val));
+ 
+ 	mgmt_event(MGMT_EV_NEW_CSRK, hdev, &ev, sizeof(ev), NULL);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index b2803bd6e0d8..c91c19bfc0a8 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1252,7 +1252,10 @@ static void smp_distribute_keys(struct smp_chan *smp)
+ 
+ 		csrk = kzalloc(sizeof(*csrk), GFP_KERNEL);
+ 		if (csrk) {
+-			csrk->master = 0x00;
++			if (hcon->sec_level > BT_SECURITY_MEDIUM)
++				csrk->type = MGMT_CSRK_LOCAL_AUTHENTICATED;
++			else
++				csrk->type = MGMT_CSRK_LOCAL_UNAUTHENTICATED;
+ 			memcpy(csrk->val, sign.csrk, sizeof(csrk->val));
+ 		}
+ 		smp->slave_csrk = csrk;
+@@ -2352,7 +2355,10 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	csrk = kzalloc(sizeof(*csrk), GFP_KERNEL);
+ 	if (csrk) {
+-		csrk->master = 0x01;
++		if (conn->hcon->sec_level > BT_SECURITY_MEDIUM)
++			csrk->type = MGMT_CSRK_REMOTE_AUTHENTICATED;
++		else
++			csrk->type = MGMT_CSRK_REMOTE_UNAUTHENTICATED;
+ 		memcpy(csrk->val, rp->csrk, sizeof(csrk->val));
+ 	}
+ 	smp->csrk = csrk;
 -- 
-2.2.0.rc0.207.ga3a616c
+2.1.0
 
