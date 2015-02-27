@@ -1,134 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+Date: Fri, 27 Feb 2015 09:59:43 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Fix collision in AVCTP connection
-Date: Fri, 27 Feb 2015 09:01:11 +0100
-Message-Id: <1425024072-6259-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH] doc/mgmt-api: Add security level to new CSRK events
+Message-ID: <20150227075943.GA15199@t440s.lan>
+References: <1424966397-24650-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1424966397-24650-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some headsets try connect AVCTP during our outgoing AVCTP connection. In effect
-both connections are rejected, and session is closed. Daemon logs:
+Hi,
 
-localhost.localdomain bluetoothd[11189]: Control: Refusing unexpected connect
-localhost.localdomain bluetoothd[11189]: connect error: Connection refused (111)
+On Thu, Feb 26, 2015, Johan Hedberg wrote:
+> In order to distinguish between LE Security Mode 2 levels 1 and 2 we
+> need to know whether a CSRK is authenticated or unauthenticated. So far
+> this information wasn't available in the New CSRK event from the kernel.
+> 
+> This patch renames the Master parameter of the event to Type and adds
+> two new values to it. The two old values 0x00 and 0x01 still have the
+> same meaning as before from the local/remote CSRK perspective. Since we
+> so far have not known anything about the security level these values
+> must be assumed to be unauthenticated.
+> 
+> The consequence of this update is that authenticated keys with new
+> kernels will simply be ignored by existing code (which only accepts
+> values 0x00 and 0x01), however since we haven't really had any code
+> doing real signing so far this should be an acceptable compromise.
+> ---
+>  doc/mgmt-api.txt | 21 ++++++++++++---------
+>  1 file changed, 12 insertions(+), 9 deletions(-)
 
-In BTSNOOP:
+As no-one raised any objections I went ahead and pushed this patch. Next
+I'll work on kernel and user-space patches to implement the changes.
 
-< ACL Data TX: Handle 256 flags 0x00 dlen 12
-      L2CAP: Connection Request (0x02) ident 11 len 4
-        PSM: 23 (0x0017)
-        Source CID: 68
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 16
-      L2CAP: Connection Response (0x03) ident 11 len 8
-        Destination CID: 69
-        Source CID: 68
-        Result: Connection pending (0x0001)
-        Status: Authorization pending (0x0002)
-< ACL Data TX: Handle 256 flags 0x00 dlen 12
-      L2CAP: Disconnection Request (0x06) ident 12 len 4
-        Destination CID: 64
-        Source CID: 64
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 12
-      L2CAP: Disconnection Response (0x07) ident 12 len 4
-        Destination CID: 64
-        Source CID: 64
-> ACL Data RX: Handle 256 flags 0x02 dlen 12
-      L2CAP: Connection Request (0x02) ident 9 len 4
-        PSM: 23 (0x0017)
-        Source CID: 70
-< ACL Data TX: Handle 256 flags 0x00 dlen 16
-      L2CAP: Connection Response (0x03) ident 9 len 8
-        Destination CID: 64
-        Source CID: 70
-        Result: Connection pending (0x0001)
-        Status: Authorization pending (0x0002)
-< ACL Data TX: Handle 256 flags 0x00 dlen 16
-      L2CAP: Connection Response (0x03) ident 9 len 8
-        Destination CID: 64
-        Source CID: 70
-        Result: Connection refused - security block (0x0003)
-        Status: No further information available (0x0000)
-> ACL Data RX: Handle 256 flags 0x02 dlen 16
-      L2CAP: Connection Response (0x03) ident 11 len 8
-        Destination CID: 0
-        Source CID: 68
-        Result: Connection refused - no resources available (0x0004)
-        Status: No further information available (0x0000)
-
-With provided fix, we accept incoming connection and close outgoing connection.
-If accepting won't succeed, we try reconnect as initiator. Btsnoop after fix:
-
-< ACL Data TX: Handle 256 flags 0x00 dlen 12
-      L2CAP: Connection Request (0x02) ident 11 len 4
-        PSM: 23 (0x0017)
-        Source CID: 67
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 16
-      L2CAP: Connection Response (0x03) ident 11 len 8
-        Destination CID: 87
-        Source CID: 67
-        Result: Connection pending (0x0001)
-        Status: Authorization pending (0x0002)
-> ACL Data RX: Handle 256 flags 0x02 dlen 12
-      L2CAP: Connection Request (0x02) ident 5 len 4
-        PSM: 23 (0x0017)
-        Source CID: 88
-< ACL Data TX: Handle 256 flags 0x00 dlen 16
-      L2CAP: Connection Response (0x03) ident 5 len 8
-        Destination CID: 68
-        Source CID: 88
-        Result: Connection pending (0x0001)
-        Status: Authorization pending (0x0002)
-< ACL Data TX: Handle 256 flags 0x00 dlen 16
-      L2CAP: Connection Response (0x03) ident 5 len 8
-        Destination CID: 68
-        Source CID: 88
-        Result: Connection successful (0x0000)
-        Status: No further information available (0x0000)
-< ACL Data TX: Handle 256 flags 0x00 dlen 12
-      L2CAP: Configure Request (0x04) ident 12 len 4
-        Destination CID: 88
-        Flags: 0x0000
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 256
-        Count: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 16
-      L2CAP: Connection Response (0x03) ident 11 len 8
-        Destination CID: 0
-        Source CID: 67
-        Result: Connection refused - no resources available (0x0004)
-        Status: No further information available (0x0000)
-
-Issue reproduced with NOKIA BH-505 and Motorola HT820.
-Comments are welcome.
-
-Marcin Kraglak (1):
-  audio/avctp: Accept incoming connection in case of colission
-
- profiles/audio/avctp.c | 38 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 36 insertions(+), 2 deletions(-)
-
--- 
-2.1.0
-S
+Johan
