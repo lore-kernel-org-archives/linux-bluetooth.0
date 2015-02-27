@@ -1,97 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25RoN85p45gv9gg3Kcn+QhK-qfeek3GPaZNMmMXfUVsFwg@mail.gmail.com>
-References: <1424927610-26226-1-git-send-email-armansito@chromium.org>
-	<1424927610-26226-13-git-send-email-armansito@chromium.org>
-	<CABBYNZJcAAfKmjA9P3oVbHH5evriwNJBmK=zzNCRBfcXQQDSGg@mail.gmail.com>
-	<CAHrH25RoN85p45gv9gg3Kcn+QhK-qfeek3GPaZNMmMXfUVsFwg@mail.gmail.com>
-Date: Fri, 27 Feb 2015 12:54:04 +0200
-Message-ID: <CABBYNZL1pnz742vhVXNV7eHf_8EVymtZHOoJBXS_+tFRdYQX5g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 12/17] core/gatt: Add btd_gatt_database_notify function
+In-Reply-To: <1424959400-18701-1-git-send-email-luiz.dentz@gmail.com>
+References: <1424959400-18701-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 27 Feb 2015 12:52:58 +0200
+Message-ID: <CABBYNZKr0e9UufoSWGutGBN8CC2iRd7La8rCFPv96krpqGdpsw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] unit/test-gatt: Add /TP/GAW/CL/BV-02-C/seclevel test
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi,
 
-On Thu, Feb 26, 2015 at 10:49 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
+On Thu, Feb 26, 2015 at 4:03 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
->> On Thu, Feb 26, 2015 at 12:51 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->> Hi Arman,
->>
->> On Thu, Feb 26, 2015 at 7:13 AM, Arman Uguray <armansito@chromium.org> wrote:
->>> This patch add the btd_gatt_database_notify function to database's
->>> public API. This allows upper layers to send out notifications
->>> and indications to all connected devices that have configured the
->>> specified CCC descriptor.
->>> ---
->>>  src/gatt-database.c | 4 ++--
->>>  src/gatt-database.h | 5 +++++
->>>  2 files changed, 7 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/src/gatt-database.c b/src/gatt-database.c
->>> index ebfcf2d..d75b971 100644
->>> --- a/src/gatt-database.c
->>> +++ b/src/gatt-database.c
->>> @@ -737,7 +737,7 @@ static void send_notification_to_device(void *data, void *user_data)
->>>                                                         NULL, NULL);
->>>  }
->>>
->>> -static void send_notification_to_devices(struct btd_gatt_database *database,
->>> +void btd_gatt_database_notify(struct btd_gatt_database *database,
->>>                                         uint16_t handle, const uint8_t *value,
->>>                                         uint16_t len, uint16_t ccc_handle,
->>>                                         bool indicate)
->>> @@ -781,7 +781,7 @@ static void send_service_changed(struct btd_gatt_database *database,
->>>         put_le16(start, value);
->>>         put_le16(end, value + 2);
->>>
->>> -       send_notification_to_devices(database, handle, value, sizeof(value),
->>> +       btd_gatt_database_notify(database, handle, value, sizeof(value),
->>>                                                         ccc_handle, true);
->>>  }
->>>
->>> diff --git a/src/gatt-database.h b/src/gatt-database.h
->>> index 163b601..2a89ad6 100644
->>> --- a/src/gatt-database.h
->>> +++ b/src/gatt-database.h
->>> @@ -34,3 +34,8 @@ btd_gatt_database_add_ccc(struct btd_gatt_database *database,
->>>                                 btd_gatt_database_ccc_write_t write_callback,
->>>                                 void *user_data,
->>>                                 btd_gatt_database_destroy_t destroy);
->>> +
->>> +void btd_gatt_database_notify(struct btd_gatt_database *database,
->>> +                                       uint16_t handle, const uint8_t *value,
->>> +                                       uint16_t len, uint16_t ccc_handle,
->>> +                                       bool indicate);
->>> --
->>> 2.2.0.rc0.207.ga3a616c
->>
->> I think we should make gatt_db notify about database changes directly
->> so anyone interested in attribute value changes can subscribe to it.
->>
+> This add a test for signed write but with security level other than low
+> so we can verify the code use the write instead of signed write.
+> ---
+>  unit/test-gatt.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
 >
-> So, after our discussion on IRC, will you be implementing this or
-> should I? If you give me a description of the kind of API you're
-> thinking about and how things should fit together, then I can have a
-> go at it, unless you've started working on it already.
+> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+> index eb4ae32..f1dde2e 100644
+> --- a/unit/test-gatt.c
+> +++ b/unit/test-gatt.c
+> @@ -872,6 +872,31 @@ static const struct test_step test_signed_write_1 = {
+>         .length = 0x03
+>  };
+>
+> +static void test_signed_write_seclevel(struct context *context)
+> +{
+> +       const struct test_step *step = context->data->step;
+> +       uint8_t key[16] = {0xD8, 0x51, 0x59, 0x48, 0x45, 0x1F, 0xEA, 0x32, 0x0D,
+> +                               0xC0, 0x5A, 0x2E, 0x88, 0x30, 0x81, 0x88 };
+> +
+> +       g_assert(bt_att_set_local_key(context->att, key, local_counter,
+> +                                                               context));
+> +
+> +       g_assert(bt_att_set_sec_level(context->att, BT_SECURITY_MEDIUM));
+> +
+> +       g_assert(bt_gatt_client_write_without_response(context->client,
+> +                                                       step->handle,
+> +                                                       true, step->value,
+> +                                                       step->length));
+> +}
+> +
+> +static const struct test_step test_signed_write_seclevel_1 = {
+> +       .handle = 0x0007,
+> +       .func = test_signed_write_seclevel,
+> +       .expected_att_ecode = 0,
+> +       .value = write_data_1,
+> +       .length = 0x03
+> +};
+> +
+>  static void att_write_cb(struct gatt_db_attribute *att, int err,
+>                                                                 void *user_data)
+>  {
+> @@ -2971,6 +2996,11 @@ int main(int argc, char *argv[])
+>                                 0x00, 0x00, 0x31, 0x1f, 0x0a, 0xcd, 0x1c, 0x3a,
+>                                 0x5b, 0x0a));
+>
+> +       define_test_client("/TP/GAW/CL/BV-02-C/seclevel", test_client,
+> +                       service_db_1, &test_signed_write_seclevel_1,
+> +                       SERVICE_DATA_1_PDUS,
+> +                       raw_pdu(0x52, 0x07, 0x00, 0x01, 0x02, 0x03));
+> +
+>         define_test_client("/TP/GAW/CL/BV-03-C", test_client, service_db_1,
+>                         &test_write_1,
+>                         SERVICE_DATA_1_PDUS,
+> --
+> 2.1.0
 
-Im planning to continue this today, along with some other modification
-like g_dbus_client_new_full so we don't break the API.
-
->
->>
->>
->> --
->> Luiz Augusto von Dentz
->
-> Thanks!
-> Arman
-
+Pushed after changing patch 2/2 to use a local variable to emulate
+security level on non-L2CAP transports.
 
 
 -- 
