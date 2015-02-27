@@ -1,51 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] shared/att: Fix signed write without transparent signing
-Date: Fri, 27 Feb 2015 23:21:25 +0100
-Message-Id: <1425075685-12571-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH 1/6] android/gatt: Fix client signed write on encrypted link
+Date: Fri, 27 Feb 2015 22:33:18 +0100
+Message-ID: <5319647.NCCsdqgCcL@leonov>
+In-Reply-To: <1425049274-11552-1-git-send-email-szymon.janc@tieto.com>
+References: <1425049274-11552-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If local key wasn't set by bt_att_set_local_key() assume that signing
-is done by bt_att_send() caller ie. gattrib code.
----
- src/shared/att.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+On Friday 27 of February 2015 16:01:09 Szymon Janc wrote:
+> As defined in Core Specification 4.2:
+> "If a connection is already encrypted with LE security mode 1, level 2
+> or level 3 as defined in [Vol 3] Part C, Section 10.2 then, a Write
+> Without Response as defined in Section 4.9.1 shall be used instead of
+> a Signed Write Without Response."
+> ---
+>  android/gatt.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 53b1983..9e348d7 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -3358,14 +3358,14 @@ static void handle_client_write_characteristic(const
+> void *buf, uint16_t len) goto failed;
+>  		}
+> 
+> -		if (get_sec_level(conn->device) != BT_SECURITY_LOW) {
+> -			error("gatt: Cannot write signed on encrypted link");
+> -			status = HAL_STATUS_FAILED;
+> -			goto failed;
+> -		}
+> -
+> -		res = signed_write_cmd(conn->device, ch->ch.value_handle,
+> -							cmd->value, cmd->len);
+> +		if (get_sec_level(conn->device) > BT_SECURITY_LOW)
+> +			res = gatt_write_cmd(conn->device->attrib,
+> +						ch->ch.value_handle, cmd->value,
+> +						cmd->len, NULL, NULL);
+> +		else
+> +			res = signed_write_cmd(conn->device,
+> +						ch->ch.value_handle, cmd->value,
+> +						cmd->len);
+>  		break;
+>  	default:
+>  		error("gatt: Write type %d unsupported", cmd->write_type);
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 9787377..90701b0 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -282,10 +282,10 @@ static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
- 					const void *pdu, uint16_t length)
- {
- 	uint16_t pdu_len = 1;
--	struct sign_info *sign;
-+	struct sign_info *sign = att->local_sign;
- 	uint32_t sign_cnt;
- 
--	if (op->opcode & ATT_OP_SIGNED_MASK)
-+	if (sign && (op->opcode & ATT_OP_SIGNED_MASK))
- 		pdu_len += BT_ATT_SIGNATURE_LEN;
- 
- 	if (length && pdu)
-@@ -303,13 +303,9 @@ static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
- 	if (pdu_len > 1)
- 		memcpy(op->pdu + 1, pdu, length);
- 
--	if (!(op->opcode & ATT_OP_SIGNED_MASK))
-+	if (!sign || !(op->opcode & ATT_OP_SIGNED_MASK))
- 		return true;
- 
--	sign = att->local_sign;
--	if (!sign)
--		goto fail;
--
- 	if (!sign->counter(&sign_cnt, sign->user_data))
- 		goto fail;
- 
+Patches 1-5 are applied.
+
 -- 
-1.9.3
-
+BR
+Szymon Janc
