@@ -1,47 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  1/3] unit/test-gatt: Add TP/GAW/SR/BV-03-C test
-Date: Fri, 27 Feb 2015 14:43:33 +0530
-Message-id: <1425028415-1190-2-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1425028415-1190-1-git-send-email-gowtham.ab@samsung.com>
-References: <1425028415-1190-1-git-send-email-gowtham.ab@samsung.com>
+Subject: Re: [PATCH] android/bluetooth: Fix not marking device as bonded
+Date: Fri, 27 Feb 2015 09:52:08 +0100
+Message-ID: <1588739.ANQ1Y6hM8d@uw000953>
+In-Reply-To: <1424970821-21763-1-git-send-email-szymon.janc@tieto.com>
+References: <1424970821-21763-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile server can support writing
-a Characteristic Value selected by handle.
----
- unit/test-gatt.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+On Thursday 26 of February 2015 18:13:41 Szymon Janc wrote:
+> Any permanently stored key is indication of device being bonded.
+> ---
+>  android/bluetooth.c | 49 ++++++++++++++++++++++++-------------------------
+>  1 file changed, 24 insertions(+), 25 deletions(-)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 45cac5f..b5ff2bf 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -2948,27 +2948,6 @@ static struct device *create_device_from_info(GKeyFile *key_file,
+>  		dev->bredr = g_key_file_get_boolean(key_file, peer, "BREDR",
+>  									NULL);
+>  
+> -	str = g_key_file_get_string(key_file, peer, "LinkKey", NULL);
+> -	if (str) {
+> -		g_free(str);
+> -		dev->bredr_paired = true;
+> -		dev->bredr_bonded = true;
+> -	}
+> -
+> -	str = g_key_file_get_string(key_file, peer, "LongTermKey", NULL);
+> -	if (str) {
+> -		g_free(str);
+> -		dev->le_paired = true;
+> -		dev->le_bonded = true;
+> -	}
+> -
+> -	str = g_key_file_get_string(key_file, peer, "SlaveLongTermKey", NULL);
+> -	if (str) {
+> -		g_free(str);
+> -		dev->le_paired = true;
+> -		dev->le_bonded = true;
+> -	}
+> -
+>  	str = g_key_file_get_string(key_file, peer, "LocalCSRK", NULL);
+>  	if (str) {
+>  		int i;
+> @@ -2997,6 +2976,12 @@ static struct device *create_device_from_info(GKeyFile *key_file,
+>  						"RemoteCSRKSignCounter", NULL);
+>  	}
+>  
+> +	/* If CSRK are present device is bonded */
+> +	if (dev->valid_local_csrk || dev->valid_remote_csrk) {
+> +		dev->le_paired = true;
+> +		dev->le_bonded = true;
+> +	}
+> +
+>  	str = g_key_file_get_string(key_file, peer, "GattCCC", NULL);
+>  	if (str) {
+>  		dev->gatt_ccc = atoi(str);
+> @@ -3221,19 +3206,29 @@ static void load_devices_info(bt_bluetooth_ready cb)
+>  		struct mgmt_ltk_info *slave_ltk_info;
+>  		struct device *dev;
+>  
+> +		dev = create_device_from_info(key_file, devs[i]);
+> +
+>  		key_info = get_key_info(key_file, devs[i]);
+>  		irk_info = get_irk_info(key_file, devs[i]);
+>  		ltk_info = get_ltk_info(key_file, devs[i], true);
+>  		slave_ltk_info = get_ltk_info(key_file, devs[i], false);
+>  
+> -		if (!key_info && !ltk_info && !slave_ltk_info) {
+> +		/*
+> +		 * Skip devices that have no permanent keys
+> +		 * (CSRK are loaded by create_device_from_info())
+> +		 */
+> +		if (!dev->le_bonded && !key_info && !ltk_info &&
+> +						!slave_ltk_info && !irk_info) {
+>  			error("Failed to load keys for %s, skipping", devs[i]);
+> -
+> +			free_device(dev);
+>  			continue;
+>  		}
+>  
+> -		if (key_info)
+> +		if (key_info) {
+>  			keys = g_slist_prepend(keys, key_info);
+> +			dev->bredr_paired = true;
+> +			dev->bredr_bonded = true;
+> +		}
+>  
+>  		if (irk_info)
+>  			irks = g_slist_prepend(irks, irk_info);
+> @@ -3244,7 +3239,11 @@ static void load_devices_info(bt_bluetooth_ready cb)
+>  		if (slave_ltk_info)
+>  			ltks = g_slist_prepend(ltks, slave_ltk_info);
+>  
+> -		dev = create_device_from_info(key_file, devs[i]);
+> +		if (!dev->le_paired &&
+> +				(irk_info || ltk_info || slave_ltk_info)) {
+> +			dev->le_paired = true;
+> +			dev->le_bonded = true;
+> +		}
+>  
+>  		bonded_devices = g_slist_prepend(bonded_devices, dev);
+>  	}
+> 
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index eb4ae32..2b6352d 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -1069,7 +1069,7 @@ static struct gatt_db *make_service_data_1_db(void)
- 								"Device Name"),
- 		PRIMARY_SERVICE(0x0005, HEART_RATE_UUID, 4),
- 		CHARACTERISTIC_STR(GATT_CHARAC_MANUFACTURER_NAME_STRING,
--						BT_ATT_PERM_READ,
-+						BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
- 						BT_GATT_CHRC_PROP_READ |
- 						BT_GATT_CHRC_PROP_WRITE, ""),
- 		DESCRIPTOR_STR(GATT_CHARAC_USER_DESC_UUID, BT_ATT_PERM_READ,
-@@ -3007,5 +3007,11 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x12, 0x07, 0x00, 0x01, 0x02, 0x03),
- 			raw_pdu(0x01, 0x12, 0x07, 0x00, 0x0c));
- 
-+	define_test_server("/TP/GAW/SR/BV-03-C", test_server,
-+			service_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x12, 0x07, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x13));
-+
- 	return tester_run();
- }
+Applied.
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
