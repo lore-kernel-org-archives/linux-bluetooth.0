@@ -1,49 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 27 Feb 2015 17:21:24 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/4] audio/avdtp: Remove start timer on stream_free()
+Message-ID: <20150227152121.GC32203@aemeltch-MOBL1>
+References: <1424964022-8887-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CABBYNZL0WT4izdNB7Wx0Ys32cyq4_G9g+TSS9HDvmjUd8dh41g@mail.gmail.com>
+ <20150227144213.GB32203@aemeltch-MOBL1>
+ <CABBYNZ+6RONqeZM_7EcbJRPT7pOaCn_FeKdJREi=-L4-yu7FuQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJLTA8iTaq00tHsoLz891M7zz-Tt54NZqnxzd-NztAuH9RDqoA@mail.gmail.com>
-References: <1425028415-1190-1-git-send-email-gowtham.ab@samsung.com>
-	<CAJLTA8iTaq00tHsoLz891M7zz-Tt54NZqnxzd-NztAuH9RDqoA@mail.gmail.com>
-Date: Fri, 27 Feb 2015 07:15:37 -0800
-Message-ID: <CAJLTA8hXGHySBUAArio8aXpJXCWkMgSRFkRge1hz+n4+vhuBxg@mail.gmail.com>
-Subject: Fwd: [PATCH 0/3] Add Write Characteristic Value server TC
-From: Michael Janssen <jamuraa@google.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZ+6RONqeZM_7EcbJRPT7pOaCn_FeKdJREi=-L4-yu7FuQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi Luiz,
 
-On Fri, Feb 27, 2015 at 1:13 AM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Adds the below server test cases:
-> 1) Write Characteristic Value - to Server
-> 2) Write Characteristic Value – Invalid Handle Response
-> 3) Write Characteristic Value – Write Not Permitted Response
->
-> Bharat Panda (2):
->   unit/test-gatt: Add TP/GAW/SR/BI-02-C test
->   unit/test-gatt: Add TP/GAW/SR/BI-03-C test
->
-> Gowtham Anandha Babu (1):
->   unit/test-gatt: Add TP/GAW/SR/BV-03-C test
->
->  unit/test-gatt.c | 20 +++++++++++++++++++-
->  1 file changed, 19 insertions(+), 1 deletion(-)
->
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+On Fri, Feb 27, 2015 at 05:05:52PM +0200, Luiz Augusto von Dentz wrote:
+> Hi Andrei,
+> 
+> On Fri, Feb 27, 2015 at 4:42 PM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > Hi Luiz,
+> >
+> > On Fri, Feb 27, 2015 at 04:27:45PM +0200, Luiz Augusto von Dentz wrote:
+> >> Hi Andrei,
+> >>
+> >> On Thu, Feb 26, 2015 at 5:20 PM, Andrei Emeltchenko
+> >> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> >> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >> >
+> >> > Makes code identical to android/avdtp
+> >> > ---
+> >> >  profiles/audio/avdtp.c | 3 +++
+> >> >  1 file changed, 3 insertions(+)
+> >> >
+> >> > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> >> > index 896f101..15b611f 100644
+> >> > --- a/profiles/audio/avdtp.c
+> >> > +++ b/profiles/audio/avdtp.c
+> >> > @@ -717,6 +717,9 @@ static void stream_free(void *data)
+> >> >         if (stream->timer)
+> >> >                 g_source_remove(stream->timer);
+> >> >
+> >> > +       if (stream->start_timer > 0)
+> >> > +               g_source_remove(stream->start_timer);
+> >> > +
+> >> >         if (stream->io)
+> >> >                 close_stream(stream);
+> >> >
+> >> > --
+> >> > 2.1.0
+> >>
+> >> I will take a at this over the weekend, I hope I can make the move
+> >> without having to redo the patches otherwise the git history will be
+> >> lost e.g:
+> >
+> > You are talking about loosing "git blame" stuff since history does not get
+> > lost. In this situation we have to loose either profiles/ or android/ "git
+> > blame" history and I am not sure which one is more important.
+> 
+> git mv should preserve the history, and that what Im going for.
 
-Server tests should be written against all of the databases which are
-in the test suite - the small (make_test_spec_small_db, available in
-the test area as ts_small_db) and first large
-(make_test_spec_large_db_1, ts_large_db_1) should be used for these
-tests.
+This is what I am talking about.
 
---
-Michael Janssen
+I suppose you move android/avdtp.c over profiles/audio/avdtp.c. So you
+loose history for the latter.
+
+Best regards 
+Andrei Emeltchenko 
