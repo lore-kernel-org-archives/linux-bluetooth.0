@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 15/20] audio/avdtp: Add error checks and style fixes
-Date: Fri, 27 Feb 2015 17:03:03 +0200
-Message-Id: <1425049388-18333-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 10/20] audio/avdtp: Fix style issues
+Date: Fri, 27 Feb 2015 17:02:58 +0200
+Message-Id: <1425049388-18333-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1425049388-18333-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1425049388-18333-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,153 +11,148 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The patch adds error checks and fixes several style issues fixed in
-android code base.
+Makes code in profiles/ and android/ identical in style.
 ---
- profiles/audio/avdtp.c | 48 ++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 36 insertions(+), 12 deletions(-)
+ profiles/audio/avdtp.c | 38 ++++++++++++++++++++++++--------------
+ profiles/audio/avdtp.h |  3 ++-
+ 2 files changed, 26 insertions(+), 15 deletions(-)
 
 diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index c396e8f..aa1fec5 100644
+index 434ebc7..9c8185a 100644
 --- a/profiles/audio/avdtp.c
 +++ b/profiles/audio/avdtp.c
-@@ -1134,6 +1134,9 @@ void avdtp_free(void *data)
- 	g_slist_free_full(session->seps, sep_free);
- 	g_slist_free_full(session->disconnect, g_free);
+@@ -1498,11 +1498,15 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
+ 					&stream->codec,
+ 					&stream->delay_reporting);
  
-+	/* Free copy of the SEP list */
-+	session->lseps = NULL;
-+
- 	g_free(session->buf);
+-	/* Verify that the Media Transport capability's length = 0. Reject otherwise */
++	/*
++	 * Verify that the Media Transport capability's length = 0.
++	 * Reject otherwise
++	 */
+ 	for (l = stream->caps; l != NULL; l = g_slist_next(l)) {
+ 		struct avdtp_service_capability *cap = l->data;
  
- 	btd_device_unref(session->device);
-@@ -1228,6 +1231,7 @@ void avdtp_unref(struct avdtp *session)
- struct avdtp *avdtp_ref(struct avdtp *session)
- {
- 	session->ref++;
-+
- 	DBG("%p: ref=%d", session, session->ref);
- 	if (session->dc_timer)
- 		remove_disconnect_timer(session);
-@@ -2166,8 +2170,11 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+-		if (cap->category == AVDTP_MEDIA_TRANSPORT && cap->length != 0) {
++		if (cap->category == AVDTP_MEDIA_TRANSPORT &&
++							cap->length != 0) {
+ 			err = AVDTP_BAD_MEDIA_TRANSPORT_FORMAT;
+ 			goto failed_stream;
+ 		}
+@@ -1574,7 +1578,7 @@ static gboolean avdtp_getconf_cmd(struct avdtp *session, uint8_t transaction,
+ 		goto failed;
+ 	}
  
- 	DBG("");
+-	for (l = sep->stream->caps, rsp_size = 0; l != NULL; l = g_slist_next(l)) {
++	for (l = sep->stream->caps, rsp_size = 0; l; l = g_slist_next(l)) {
+ 		struct avdtp_service_capability *cap = l->data;
  
--	if (cond & G_IO_NVAL)
-+	if (cond & G_IO_NVAL) {
-+		session->io_id = 0;
-+
- 		return FALSE;
-+	}
- 
- 	header = (void *) session->buf;
- 
-@@ -2268,6 +2275,7 @@ next:
- 	return TRUE;
- 
- failed:
-+	session->io_id = 0;
- 	connection_lost(session, EIO);
- 
- 	return FALSE;
-@@ -2747,6 +2755,11 @@ static int send_request(struct avdtp *session, gboolean priority,
- {
- 	struct pending_req *req;
- 
-+	if (size > 0 && !buffer) {
-+		DBG("Invalid buffer %p", buffer);
-+		return -EINVAL;
-+	}
-+
- 	if (stream && stream->abort_int && signal_id != AVDTP_ABORT) {
- 		DBG("Unable to send requests while aborting");
- 		return -EINVAL;
-@@ -2754,11 +2767,14 @@ static int send_request(struct avdtp *session, gboolean priority,
- 
- 	req = g_new0(struct pending_req, 1);
- 	req->signal_id = signal_id;
--	req->data = g_malloc(size);
--	memcpy(req->data, buffer, size);
- 	req->data_size = size;
- 	req->stream = stream;
- 
-+	if (size > 0) {
-+		req->data = g_malloc(size);
-+		memcpy(req->data, buffer, size);
-+	}
-+
- 	return send_req(session, priority, req);
+ 		if (rsp_size + cap->length + 2 > (int) sizeof(buf))
+@@ -2038,7 +2042,8 @@ static enum avdtp_parse_result avdtp_parse_data(struct avdtp *session,
+ 	switch (header->packet_type) {
+ 	case AVDTP_PKT_TYPE_SINGLE:
+ 		if (size < sizeof(*single)) {
+-			error("Received too small single packet (%zu bytes)", size);
++			error("Received too small single packet (%zu bytes)",
++									size);
+ 			return PARSE_ERROR;
+ 		}
+ 		if (session->in.active) {
+@@ -2059,7 +2064,8 @@ static enum avdtp_parse_result avdtp_parse_data(struct avdtp *session,
+ 		break;
+ 	case AVDTP_PKT_TYPE_START:
+ 		if (size < sizeof(*start)) {
+-			error("Received too small start packet (%zu bytes)", size);
++			error("Received too small start packet (%zu bytes)",
++									size);
+ 			return PARSE_ERROR;
+ 		}
+ 		if (session->in.active) {
+@@ -2103,7 +2109,8 @@ static enum avdtp_parse_result avdtp_parse_data(struct avdtp *session,
+ 		break;
+ 	case AVDTP_PKT_TYPE_END:
+ 		if (size < sizeof(struct avdtp_continue_header)) {
+-			error("Received too small end packet (%zu bytes)", size);
++			error("Received too small end packet (%zu bytes)",
++									size);
+ 			return PARSE_ERROR;
+ 		}
+ 		if (!session->in.active) {
+@@ -2616,7 +2623,7 @@ static int cancel_request(struct avdtp *session, int err)
+ 		error("SetConfiguration: %s (%d)", strerror(err), err);
+ 		if (lsep && lsep->cfm && lsep->cfm->set_configuration)
+ 			lsep->cfm->set_configuration(session, lsep, stream,
+-							&averr, lsep->user_data);
++						&averr, lsep->user_data);
+ 		goto failed;
+ 	case AVDTP_DISCOVER:
+ 		error("Discover: %s (%d)", strerror(err), err);
+@@ -2815,9 +2822,9 @@ static gboolean avdtp_get_capabilities_resp(struct avdtp *session,
  }
  
-@@ -2900,14 +2916,14 @@ static gboolean avdtp_start_resp(struct avdtp *session,
+ static gboolean avdtp_set_configuration_resp(struct avdtp *session,
+-						struct avdtp_stream *stream,
+-						struct avdtp_single_header *resp,
+-						int size)
++					struct avdtp_stream *stream,
++					struct avdtp_single_header *resp,
++					int size)
  {
  	struct avdtp_local_sep *sep = stream->lsep;
  
--	if (sep->cfm && sep->cfm->start)
--		sep->cfm->start(session, sep, stream, NULL, sep->user_data);
--
- 	/* We might be in STREAMING already if both sides send START_CMD at the
- 	 * same time and the one in SNK role doesn't reject it as it should */
- 	if (sep->state != AVDTP_STATE_STREAMING)
- 		avdtp_sep_set_state(session, sep, AVDTP_STATE_STREAMING);
+@@ -2832,7 +2839,8 @@ static gboolean avdtp_set_configuration_resp(struct avdtp *session,
  
-+	if (sep->cfm && sep->cfm->start)
-+		sep->cfm->start(session, sep, stream, NULL, sep->user_data);
-+
+ static gboolean avdtp_reconfigure_resp(struct avdtp *session,
+ 					struct avdtp_stream *stream,
+-					struct avdtp_single_header *resp, int size)
++					struct avdtp_single_header *resp,
++					int size)
+ {
  	return TRUE;
  }
+@@ -2918,7 +2926,8 @@ static gboolean avdtp_delay_report_resp(struct avdtp *session,
+ 	struct avdtp_local_sep *sep = stream->lsep;
  
-@@ -3323,13 +3339,19 @@ struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
+ 	if (sep->cfm && sep->cfm->delay_report)
+-		sep->cfm->delay_report(session, sep, stream, NULL, sep->user_data);
++		sep->cfm->delay_report(session, sep, stream, NULL,
++							sep->user_data);
+ 
+ 	return TRUE;
+ }
+@@ -3274,7 +3283,8 @@ struct avdtp_service_capability *avdtp_get_codec(struct avdtp_remote_sep *sep)
+ }
+ 
+ struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
+-							void *data, int length)
++							const void *data,
++							int length)
  {
  	struct avdtp_service_capability *cap;
  
--	if (category < AVDTP_MEDIA_TRANSPORT || category > AVDTP_DELAY_REPORTING)
-+	if (category < AVDTP_MEDIA_TRANSPORT ||
-+					category > AVDTP_DELAY_REPORTING)
-+		return NULL;
-+
-+	if (length > 0 && !data)
- 		return NULL;
+@@ -3746,7 +3756,7 @@ const char *avdtp_strerror(struct avdtp_error *err)
+ 	if (err->category == AVDTP_ERRNO)
+ 		return strerror(err->err.posix_errno);
  
- 	cap = g_malloc(sizeof(struct avdtp_service_capability) + length);
- 	cap->category = category;
- 	cap->length = length;
--	memcpy(cap->data, data, length);
-+
-+	if (length > 0)
-+		memcpy(cap->data, data, length);
+-	switch(err->err.error_code) {
++	switch (err->err.error_code) {
+ 	case AVDTP_BAD_HEADER_FORMAT:
+ 		return "Bad Header Format";
+ 	case AVDTP_BAD_LENGTH:
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index a68dc4d..88e8cb4 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -218,7 +218,8 @@ void avdtp_unref(struct avdtp *session);
+ struct avdtp *avdtp_ref(struct avdtp *session);
  
- 	return cap;
- }
-@@ -3613,14 +3635,15 @@ int avdtp_close(struct avdtp *session, struct avdtp_stream *stream,
- 	if (!g_slist_find(session->streams, stream))
- 		return -EINVAL;
+ struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
+-							void *data, int size);
++							const void *data,
++							int size);
  
--	if (stream->lsep->state < AVDTP_STATE_OPEN)
--		return -EINVAL;
--
- 	if (stream->close_int == TRUE) {
- 		error("avdtp_close: rejecting since close is already initiated");
- 		return -EINVAL;
- 	}
+ struct avdtp_service_capability *avdtp_get_codec(struct avdtp_remote_sep *sep);
  
-+	/* If stream is not yet in the OPEN state, let's use ABORT_CMD */
-+	if (stream->lsep->state < AVDTP_STATE_OPEN)
-+		return avdtp_abort(session, stream);
-+
- 	if (immediate && session->req && stream == session->req->stream)
- 		return avdtp_abort(session, stream);
- 
-@@ -3663,7 +3686,8 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream)
- 	if (stream->lsep->state == AVDTP_STATE_ABORTING)
- 		return -EINVAL;
- 
--	if (session->req && stream == session->req->stream)
-+	if (session->req && session->req->timeout > 0 &&
-+						stream == session->req->stream)
- 		return cancel_request(session, ECANCELED);
- 
- 	memset(&req, 0, sizeof(req));
 -- 
 2.1.0
 
