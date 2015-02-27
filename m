@@ -1,113 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1425024999-29789-1-git-send-email-armansito@chromium.org>
-References: <1425024999-29789-1-git-send-email-armansito@chromium.org>
-Date: Fri, 27 Feb 2015 16:15:22 +0200
-Message-ID: <CABBYNZKD=urtd9P1yo+BDCp1_LrkGHBxozKmjZk-+mcjogO4UQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 00/16] Implement GATT server D-Bus API
+In-Reply-To: <1432936.7iWJrZ6TN0@uw000953>
+References: <1425024072-6259-1-git-send-email-marcin.kraglak@tieto.com>
+	<1425024072-6259-2-git-send-email-marcin.kraglak@tieto.com>
+	<1432936.7iWJrZ6TN0@uw000953>
+Date: Fri, 27 Feb 2015 16:07:11 +0200
+Message-ID: <CABBYNZKwo3iLGhSB7+pEBhR6cWMK_GYmLSqgFb7FcGo1m-XEPA@mail.gmail.com>
+Subject: Re: [RFC] audio/avctp: Accept incoming connection in case of colission
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Szymon,
 
-On Fri, Feb 27, 2015 at 10:16 AM, Arman Uguray <armansito@chromium.org> wrote:
-> *v2: - Introduced g_dbus_client_new_full instead of adding a new argument to
->        g_dbus_client_new.
+On Fri, Feb 27, 2015 at 12:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi Marcin,
 >
->      - Removed the crash fix patch. I'll fix this properly in a separate patch
->        set by making discovery procedures cancelable.
+> On Friday 27 of February 2015 09:01:12 Marcin Kraglak wrote:
+>> Accept incoming connection to Control Channel in case of colission.
+>> If accepting connection won't succeed, try reconnect.
+>> There is no need to request authorization while user has been connecting
+>> to service in meantime.
+>> Issue was found during tests with NOKIA BH-505 and Motorola HT-820.
+>> ---
+>>  profiles/audio/avctp.c | 38 ++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 36 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+>> index 57071b5..8d457f4 100644
+>> --- a/profiles/audio/avctp.c
+>> +++ b/profiles/audio/avctp.c
+>> @@ -203,6 +203,7 @@ struct avctp {
+>>       uint8_t key_quirks[256];
+>>       struct key_pressed key;
+>>       bool initiator;
+>> +     bool reconnect;
+>>  };
+>>
+>>  struct avctp_passthrough_handler {
+>> @@ -1219,11 +1220,22 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+>>       GError *gerr = NULL;
+>>
+>>       if (err) {
+>> +             struct btd_device *device = session->device;
+>> +             bool reconnect = session->reconnect;
+>> +
+>>               avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+>>               error("%s", err->message);
+>> +
+>> +             if (!reconnect)
+>> +                     return;
+>> +
+>> +             DBG("Control: Attempting to reconnect");
+>> +             avctp_connect(device);
+>>               return;
+>>       }
+>>
+>> +     session->reconnect = false;
+>> +
+>>       bt_io_get(chan, &gerr,
+>>                       BT_IO_OPT_DEST, &address,
+>>                       BT_IO_OPT_IMTU, &imtu,
+>> @@ -1346,10 +1358,32 @@ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
+>>  {
+>>       const bdaddr_t *src;
+>>       const bdaddr_t *dst;
+>> +     GError *err = NULL;
+>>
+>>       if (session->control != NULL) {
+>> -             error("Control: Refusing unexpected connect");
+>> -             g_io_channel_shutdown(chan, TRUE, NULL);
+>> +             if (session->state != AVCTP_STATE_CONNECTING) {
+>> +                     error("Control: Refusing unexpected connect");
+>> +                     g_io_channel_shutdown(chan, TRUE, NULL);
+>> +                     return;
+>> +             }
+>> +
+>> +             /* Cancel outgoing connection and accept incoming */
+>> +             DBG("Control: Accepting unexpected connect from remote");
+>> +             g_io_channel_shutdown(session->control->io, TRUE, NULL);
+>> +             g_io_channel_unref(session->control->io);
+>> +             session->control->io = NULL;
+>> +
+>> +             if (!bt_io_accept(chan, avctp_connect_cb, session, NULL,
+>> +                                                                     &err)) {
+>> +                     error("bt_io_accept: %s", err->message);
+>> +                     g_error_free(err);
+>> +                     avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+>> +                     return;
+>> +             }
+>> +
+>> +             session->reconnect = true;
+>> +             session->control->io = g_io_channel_ref(chan);
+>> +
+>>               return;
+>>       }
 >
-> *v1: - Removed src/gatt.* based on email discussion.
+> I think we should go with random timer as required by AVRCP specification
 >
->      - After some discussions on IRC, made ObjectManager mandatory on a
->        per-service-subtree basis to reduce the number of unnecessary
->        object processing and caching. One initial idea was to pass the
->        service subtree directly to RegisterService but one of the
->        concerns was that we should allow applications to use existing
->        tooling for the standard ObjectManager interface.
->
->      - Minor fixes based on comments, also fixed things so that
->        descriptors with CCC and CEP UUIDs cannot be registered by
->        external apps.
->
->      - Included a fix for recent crashes seen in unit/test-gatt.
->
-> This patch set implements the GATT server D-Bus API and provides an
-> example application in Python to demonstrate how the API can be used
-> to export GATT services of various functionality.
->
-> Some of the basics of the code is very similar to what was already in
-> src/gatt-dbus.c, especially the bits that use gdbus/client to fetch
-> and interact with remote objects. However, src/gatt-dbus had a lot of
-> code that used the now-defunct src/gatt (which was going to be the new
-> GATT abstraction for bluetoothd before we built shared/gatt), so I
-> decided to remove gatt-dbus entirely and start from scratch with
-> src/gatt-manager.
->
-> Apart from these the code is fairly straight-forward. New additions to
-> src/gatt-database have been made to allow upper layers to store CCC
-> descriptors and send out notifications. The API automatically creates
-> CCC and CEP (Characteristic Extended Properties) descriptors based on
-> characteristic properties.
->
-> Arman Uguray (16):
->   gdbus/client: Don't GetManagedObjects w/o handlers
->   gdbus/client: Allow specifying ObjectManager path
->   doc/gatt-api.txt: New ObjectManager requirements
->   core: gatt: Add GattManager1 stubs
->   core: gatt: Implement GattManager1.RegisterService
->   core: gatt: Register characteristics
->   core: gatt: Support ReadValue for characteristics
->   core: gatt: Support WriteValue for characteristics
->   core: gatt: Make CCC addition API public
->   core: gatt: Create CCC for external characteristic
->   core: gatt: Add btd_gatt_database_notify function
->   core: gatt: Send not/ind for D-Bus characteristics
->   core: gatt: Create CEP for external characteristic
->   core: gatt: Register descriptors
->   core: gatt: Support descriptor reads/writes
->   tools: Added a Python example for GATT server API
->
->  Makefile.am         |    3 +-
->  doc/gatt-api.txt    |   74 ++-
->  gdbus/client.c      |   27 +-
->  gdbus/gdbus.h       |    4 +
->  src/adapter.c       |   18 +-
->  src/gatt-database.c |  114 ++++-
->  src/gatt-database.h |   16 +
->  src/gatt-dbus.c     |  658 ------------------------
->  src/gatt-dbus.h     |   25 -
->  src/gatt-manager.c  | 1383 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/gatt-manager.h  |   23 +
->  src/gatt.c          |  321 ------------
->  src/gatt.h          |  121 -----
->  src/main.c          |    5 -
->  tools/gatt-example  |  463 +++++++++++++++++
->  15 files changed, 2089 insertions(+), 1166 deletions(-)
->  delete mode 100644 src/gatt-dbus.c
->  delete mode 100644 src/gatt-dbus.h
->  create mode 100644 src/gatt-manager.c
->  create mode 100644 src/gatt-manager.h
->  delete mode 100644 src/gatt.c
->  delete mode 100644 src/gatt.h
->  create mode 100755 tools/gatt-example
->
-> --
-> 2.2.0.rc0.207.ga3a616c
+> p.4.1.1:
+> "If both devices open an AVCTP channel at the same time both channels shall be
+> closed and each device shall wait a random time (not more than 1 s and not less
+> than 100ms) and then try to open the AVCTP channel again. If it is known which
+> device is the master that device can re-try at once."
 
-Ive applied patches 1-3, the reason I stop there is that while review
-the other patches it looks like gatt-manager.c will have too many
-dependencies on gatt-database.c, so many that I would consider have
-this on the same file otherwise we end up with bad API that use
-handles causing extra lookups, while if this code were in the same
-files all the CCC handling becomes quite simple and we don't even need
-another struct since btd_gatt_database could be used directly as
-context instead.
-
+That and it is probably a better idea to leave this to policy to
+re-try as it is already doing for A2DP.
 
 
 -- 
