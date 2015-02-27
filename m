@@ -1,117 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/bluetooth: Fix not marking device as bonded
-Date: Fri, 27 Feb 2015 09:52:08 +0100
-Message-ID: <1588739.ANQ1Y6hM8d@uw000953>
-In-Reply-To: <1424970821-21763-1-git-send-email-szymon.janc@tieto.com>
-References: <1424970821-21763-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: [RFC] android/avdtp: Move bluetooth service code to callback
+Date: Fri, 27 Feb 2015 10:45:29 +0200
+Message-Id: <1425026729-11189-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday 26 of February 2015 18:13:41 Szymon Janc wrote:
-> Any permanently stored key is indication of device being bonded.
-> ---
->  android/bluetooth.c | 49 ++++++++++++++++++++++++-------------------------
->  1 file changed, 24 insertions(+), 25 deletions(-)
-> 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index 45cac5f..b5ff2bf 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -2948,27 +2948,6 @@ static struct device *create_device_from_info(GKeyFile *key_file,
->  		dev->bredr = g_key_file_get_boolean(key_file, peer, "BREDR",
->  									NULL);
->  
-> -	str = g_key_file_get_string(key_file, peer, "LinkKey", NULL);
-> -	if (str) {
-> -		g_free(str);
-> -		dev->bredr_paired = true;
-> -		dev->bredr_bonded = true;
-> -	}
-> -
-> -	str = g_key_file_get_string(key_file, peer, "LongTermKey", NULL);
-> -	if (str) {
-> -		g_free(str);
-> -		dev->le_paired = true;
-> -		dev->le_bonded = true;
-> -	}
-> -
-> -	str = g_key_file_get_string(key_file, peer, "SlaveLongTermKey", NULL);
-> -	if (str) {
-> -		g_free(str);
-> -		dev->le_paired = true;
-> -		dev->le_bonded = true;
-> -	}
-> -
->  	str = g_key_file_get_string(key_file, peer, "LocalCSRK", NULL);
->  	if (str) {
->  		int i;
-> @@ -2997,6 +2976,12 @@ static struct device *create_device_from_info(GKeyFile *key_file,
->  						"RemoteCSRKSignCounter", NULL);
->  	}
->  
-> +	/* If CSRK are present device is bonded */
-> +	if (dev->valid_local_csrk || dev->valid_remote_csrk) {
-> +		dev->le_paired = true;
-> +		dev->le_bonded = true;
-> +	}
-> +
->  	str = g_key_file_get_string(key_file, peer, "GattCCC", NULL);
->  	if (str) {
->  		dev->gatt_ccc = atoi(str);
-> @@ -3221,19 +3206,29 @@ static void load_devices_info(bt_bluetooth_ready cb)
->  		struct mgmt_ltk_info *slave_ltk_info;
->  		struct device *dev;
->  
-> +		dev = create_device_from_info(key_file, devs[i]);
-> +
->  		key_info = get_key_info(key_file, devs[i]);
->  		irk_info = get_irk_info(key_file, devs[i]);
->  		ltk_info = get_ltk_info(key_file, devs[i], true);
->  		slave_ltk_info = get_ltk_info(key_file, devs[i], false);
->  
-> -		if (!key_info && !ltk_info && !slave_ltk_info) {
-> +		/*
-> +		 * Skip devices that have no permanent keys
-> +		 * (CSRK are loaded by create_device_from_info())
-> +		 */
-> +		if (!dev->le_bonded && !key_info && !ltk_info &&
-> +						!slave_ltk_info && !irk_info) {
->  			error("Failed to load keys for %s, skipping", devs[i]);
-> -
-> +			free_device(dev);
->  			continue;
->  		}
->  
-> -		if (key_info)
-> +		if (key_info) {
->  			keys = g_slist_prepend(keys, key_info);
-> +			dev->bredr_paired = true;
-> +			dev->bredr_bonded = true;
-> +		}
->  
->  		if (irk_info)
->  			irks = g_slist_prepend(irks, irk_info);
-> @@ -3244,7 +3239,11 @@ static void load_devices_info(bt_bluetooth_ready cb)
->  		if (slave_ltk_info)
->  			ltks = g_slist_prepend(ltks, slave_ltk_info);
->  
-> -		dev = create_device_from_info(key_file, devs[i]);
-> +		if (!dev->le_paired &&
-> +				(irk_info || ltk_info || slave_ltk_info)) {
-> +			dev->le_paired = true;
-> +			dev->le_bonded = true;
-> +		}
->  
->  		bonded_devices = g_slist_prepend(bonded_devices, dev);
->  	}
-> 
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Applied.
+Move bluetooth device and service code out of avdtp. The code would be
+run from endpoint_setconf_ind() callback.
+---
+ profiles/audio/a2dp.c  | 29 +++++++++++++++++++++++++++++
+ profiles/audio/avdtp.c | 32 --------------------------------
+ 2 files changed, 29 insertions(+), 32 deletions(-)
 
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 03eeaba..ed69c7b 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -452,7 +452,9 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
+ 						avdtp_set_configuration_cb cb,
+ 						void *user_data)
+ {
++	struct btd_device *device = avdtp_get_device(session);
+ 	struct a2dp_sep *a2dp_sep = user_data;
++	struct btd_service *service;
+ 	struct a2dp_setup *setup;
+ 
+ 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SINK)
+@@ -460,6 +462,33 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
+ 	else
+ 		DBG("Source %p: Set_Configuration_Ind", sep);
+ 
++	switch (a2dp_sep->type) {
++	case AVDTP_SEP_TYPE_SOURCE:
++		service = btd_device_get_service(device, A2DP_SINK_UUID);
++		if (service == NULL) {
++			btd_device_add_uuid(device, A2DP_SINK_UUID);
++			service = btd_device_get_service(device,
++							A2DP_SINK_UUID);
++			if (service == NULL) {
++				error("Unable to get a audio sink object");
++				return FALSE;
++			}
++		}
++		break;
++	case AVDTP_SEP_TYPE_SINK:
++		service = btd_device_get_service(device, A2DP_SOURCE_UUID);
++		if (service == NULL) {
++			btd_device_add_uuid(device, A2DP_SOURCE_UUID);
++			service = btd_device_get_service(device,
++							A2DP_SOURCE_UUID);
++			if (service == NULL) {
++				error("Unable to get a audio source object");
++				return FALSE;
++			}
++		}
++		break;
++	}
++
+ 	setup = a2dp_setup_get(session);
+ 	if (!session)
+ 		return FALSE;
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index a8444ed..725a3e1 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -1441,7 +1441,6 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
+ 	struct avdtp_local_sep *sep;
+ 	struct avdtp_stream *stream;
+ 	uint8_t err, category = 0x00;
+-	struct btd_service *service;
+ 	GSList *l;
+ 
+ 	DBG("");
+@@ -1462,37 +1461,6 @@ static gboolean avdtp_setconf_cmd(struct avdtp *session, uint8_t transaction,
+ 		goto failed;
+ 	}
+ 
+-	switch (sep->info.type) {
+-	case AVDTP_SEP_TYPE_SOURCE:
+-		service = btd_device_get_service(session->device,
+-							A2DP_SINK_UUID);
+-		if (service == NULL) {
+-			btd_device_add_uuid(session->device, A2DP_SINK_UUID);
+-			service = btd_device_get_service(session->device,
+-							A2DP_SINK_UUID);
+-			if (service == NULL) {
+-				error("Unable to get a audio sink object");
+-				err = AVDTP_BAD_STATE;
+-				goto failed;
+-			}
+-		}
+-		break;
+-	case AVDTP_SEP_TYPE_SINK:
+-		service = btd_device_get_service(session->device,
+-							A2DP_SOURCE_UUID);
+-		if (service == NULL) {
+-			btd_device_add_uuid(session->device, A2DP_SOURCE_UUID);
+-			service = btd_device_get_service(session->device,
+-							A2DP_SOURCE_UUID);
+-			if (service == NULL) {
+-				error("Unable to get a audio source object");
+-				err = AVDTP_BAD_STATE;
+-				goto failed;
+-			}
+-		}
+-		break;
+-	}
+-
+ 	stream = g_new0(struct avdtp_stream, 1);
+ 	stream->session = session;
+ 	stream->lsep = sep;
 -- 
-Best regards, 
-Szymon Janc
+2.1.0
+
