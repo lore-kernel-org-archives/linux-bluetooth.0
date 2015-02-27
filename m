@@ -1,95 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL1pnz742vhVXNV7eHf_8EVymtZHOoJBXS_+tFRdYQX5g@mail.gmail.com>
-References: <1424927610-26226-1-git-send-email-armansito@chromium.org>
-	<1424927610-26226-13-git-send-email-armansito@chromium.org>
-	<CABBYNZJcAAfKmjA9P3oVbHH5evriwNJBmK=zzNCRBfcXQQDSGg@mail.gmail.com>
-	<CAHrH25RoN85p45gv9gg3Kcn+QhK-qfeek3GPaZNMmMXfUVsFwg@mail.gmail.com>
-	<CABBYNZL1pnz742vhVXNV7eHf_8EVymtZHOoJBXS_+tFRdYQX5g@mail.gmail.com>
-Date: Fri, 27 Feb 2015 16:33:52 +0200
-Message-ID: <CABBYNZJOhneXaaVwx909rOFdFcp3_P=J7O9edv0u-i_0XSpLVg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 12/17] core/gatt: Add btd_gatt_database_notify function
+In-Reply-To: <1424964022-8887-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1424964022-8887-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 27 Feb 2015 16:27:45 +0200
+Message-ID: <CABBYNZL0WT4izdNB7Wx0Ys32cyq4_G9g+TSS9HDvmjUd8dh41g@mail.gmail.com>
+Subject: Re: [PATCH 1/4] audio/avdtp: Remove start timer on stream_free()
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Andrei,
 
-On Fri, Feb 27, 2015 at 12:54 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Arman,
+On Thu, Feb 26, 2015 at 5:20 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> On Thu, Feb 26, 2015 at 10:49 PM, Arman Uguray <armansito@chromium.org> wrote:
->> Hi Luiz,
->>
->>> On Thu, Feb 26, 2015 at 12:51 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>> Hi Arman,
->>>
->>> On Thu, Feb 26, 2015 at 7:13 AM, Arman Uguray <armansito@chromium.org> wrote:
->>>> This patch add the btd_gatt_database_notify function to database's
->>>> public API. This allows upper layers to send out notifications
->>>> and indications to all connected devices that have configured the
->>>> specified CCC descriptor.
->>>> ---
->>>>  src/gatt-database.c | 4 ++--
->>>>  src/gatt-database.h | 5 +++++
->>>>  2 files changed, 7 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/src/gatt-database.c b/src/gatt-database.c
->>>> index ebfcf2d..d75b971 100644
->>>> --- a/src/gatt-database.c
->>>> +++ b/src/gatt-database.c
->>>> @@ -737,7 +737,7 @@ static void send_notification_to_device(void *data, void *user_data)
->>>>                                                         NULL, NULL);
->>>>  }
->>>>
->>>> -static void send_notification_to_devices(struct btd_gatt_database *database,
->>>> +void btd_gatt_database_notify(struct btd_gatt_database *database,
->>>>                                         uint16_t handle, const uint8_t *value,
->>>>                                         uint16_t len, uint16_t ccc_handle,
->>>>                                         bool indicate)
->>>> @@ -781,7 +781,7 @@ static void send_service_changed(struct btd_gatt_database *database,
->>>>         put_le16(start, value);
->>>>         put_le16(end, value + 2);
->>>>
->>>> -       send_notification_to_devices(database, handle, value, sizeof(value),
->>>> +       btd_gatt_database_notify(database, handle, value, sizeof(value),
->>>>                                                         ccc_handle, true);
->>>>  }
->>>>
->>>> diff --git a/src/gatt-database.h b/src/gatt-database.h
->>>> index 163b601..2a89ad6 100644
->>>> --- a/src/gatt-database.h
->>>> +++ b/src/gatt-database.h
->>>> @@ -34,3 +34,8 @@ btd_gatt_database_add_ccc(struct btd_gatt_database *database,
->>>>                                 btd_gatt_database_ccc_write_t write_callback,
->>>>                                 void *user_data,
->>>>                                 btd_gatt_database_destroy_t destroy);
->>>> +
->>>> +void btd_gatt_database_notify(struct btd_gatt_database *database,
->>>> +                                       uint16_t handle, const uint8_t *value,
->>>> +                                       uint16_t len, uint16_t ccc_handle,
->>>> +                                       bool indicate);
->>>> --
->>>> 2.2.0.rc0.207.ga3a616c
->>>
->>> I think we should make gatt_db notify about database changes directly
->>> so anyone interested in attribute value changes can subscribe to it.
->>>
->>
->> So, after our discussion on IRC, will you be implementing this or
->> should I? If you give me a description of the kind of API you're
->> thinking about and how things should fit together, then I can have a
->> go at it, unless you've started working on it already.
+> Makes code identical to android/avdtp
+> ---
+>  profiles/audio/avdtp.c | 3 +++
+>  1 file changed, 3 insertions(+)
 >
-> Im planning to continue this today, along with some other modification
-> like g_dbus_client_new_full so we don't break the API.
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index 896f101..15b611f 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -717,6 +717,9 @@ static void stream_free(void *data)
+>         if (stream->timer)
+>                 g_source_remove(stream->timer);
+>
+> +       if (stream->start_timer > 0)
+> +               g_source_remove(stream->start_timer);
+> +
+>         if (stream->io)
+>                 close_stream(stream);
+>
+> --
+> 2.1.0
 
-I actually drop this since with the interface being in gatt-database.c
-we don't actually need a notification system.
+I will take a at this over the weekend, I hope I can make the move
+without having to redo the patches otherwise the git history will be
+lost e.g:
+
+    android/AVDTP: Fix not removing start_timer source
+
+    It is possible that stream->start_timer can be set on stream_free which
+    should then should take care of remove it properly otherwise it can
+    trigger which would very likely cause a crash.
+
+    Thanks to Hannu Mallat <hannu.mallat@jolla.com> for reporting it.
 
 
 -- 
