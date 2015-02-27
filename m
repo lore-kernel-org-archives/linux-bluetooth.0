@@ -1,49 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/6] android/gatt: Fix client signed write on encrypted link
-Date: Fri, 27 Feb 2015 16:01:09 +0100
-Message-Id: <1425049274-11552-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 27 Feb 2015 16:42:17 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/4] audio/avdtp: Remove start timer on stream_free()
+Message-ID: <20150227144213.GB32203@aemeltch-MOBL1>
+References: <1424964022-8887-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CABBYNZL0WT4izdNB7Wx0Ys32cyq4_G9g+TSS9HDvmjUd8dh41g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZL0WT4izdNB7Wx0Ys32cyq4_G9g+TSS9HDvmjUd8dh41g@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As defined in Core Specification 4.2:
-"If a connection is already encrypted with LE security mode 1, level 2
-or level 3 as defined in [Vol 3] Part C, Section 10.2 then, a Write
-Without Response as defined in Section 4.9.1 shall be used instead of
-a Signed Write Without Response."
----
- android/gatt.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Hi Luiz,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 53b1983..9e348d7 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3358,14 +3358,14 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
- 			goto failed;
- 		}
- 
--		if (get_sec_level(conn->device) != BT_SECURITY_LOW) {
--			error("gatt: Cannot write signed on encrypted link");
--			status = HAL_STATUS_FAILED;
--			goto failed;
--		}
--
--		res = signed_write_cmd(conn->device, ch->ch.value_handle,
--							cmd->value, cmd->len);
-+		if (get_sec_level(conn->device) > BT_SECURITY_LOW)
-+			res = gatt_write_cmd(conn->device->attrib,
-+						ch->ch.value_handle, cmd->value,
-+						cmd->len, NULL, NULL);
-+		else
-+			res = signed_write_cmd(conn->device,
-+						ch->ch.value_handle, cmd->value,
-+						cmd->len);
- 		break;
- 	default:
- 		error("gatt: Write type %d unsupported", cmd->write_type);
--- 
-1.9.3
+On Fri, Feb 27, 2015 at 04:27:45PM +0200, Luiz Augusto von Dentz wrote:
+> Hi Andrei,
+> 
+> On Thu, Feb 26, 2015 at 5:20 PM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> > Makes code identical to android/avdtp
+> > ---
+> >  profiles/audio/avdtp.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> > index 896f101..15b611f 100644
+> > --- a/profiles/audio/avdtp.c
+> > +++ b/profiles/audio/avdtp.c
+> > @@ -717,6 +717,9 @@ static void stream_free(void *data)
+> >         if (stream->timer)
+> >                 g_source_remove(stream->timer);
+> >
+> > +       if (stream->start_timer > 0)
+> > +               g_source_remove(stream->start_timer);
+> > +
+> >         if (stream->io)
+> >                 close_stream(stream);
+> >
+> > --
+> > 2.1.0
+> 
+> I will take a at this over the weekend, I hope I can make the move
+> without having to redo the patches otherwise the git history will be
+> lost e.g:
 
+You are talking about loosing "git blame" stuff since history does not get
+lost. In this situation we have to loose either profiles/ or android/ "git
+blame" history and I am not sure which one is more important.
+
+Best regards 
+Andrei Emeltchenko 
+
+> 
+>     android/AVDTP: Fix not removing start_timer source
+> 
+>     It is possible that stream->start_timer can be set on stream_free which
+>     should then should take care of remove it properly otherwise it can
+>     trigger which would very likely cause a crash.
+> 
+>     Thanks to Hannu Mallat <hannu.mallat@jolla.com> for reporting it.
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
