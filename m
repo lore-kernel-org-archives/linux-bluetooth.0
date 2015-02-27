@@ -1,103 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Update New CSRK event to match latest specification
-Date: Fri, 27 Feb 2015 10:11:13 +0200
-Message-Id: <1425024673-19657-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [RFC] audio/avctp: Accept incoming connection in case of colission
+Date: Fri, 27 Feb 2015 09:01:12 +0100
+Message-Id: <1425024072-6259-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1425024072-6259-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1425024072-6259-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-The 'master' parameter of the New CSRK event was recently renamed to
-'type', with the old values kept for backwards compatibility as
-unauthenticated local/remote keys. This patch updates the code to take
-into account the two new (authenticated) values and ensures they get
-used based on the security level of the connection that the respective
-keys get distributed over.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Accept incoming connection to Control Channel in case of colission.
+If accepting connection won't succeed, try reconnect.
+There is no need to request authorization while user has been connecting
+to service in meantime.
+Issue was found during tests with NOKIA BH-505 and Motorola HT-820.
 ---
- include/net/bluetooth/hci_core.h |  2 +-
- include/net/bluetooth/mgmt.h     |  7 ++++++-
- net/bluetooth/mgmt.c             |  2 +-
- net/bluetooth/smp.c              | 10 ++++++++--
- 4 files changed, 16 insertions(+), 5 deletions(-)
+ profiles/audio/avctp.c | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 40831d1c9b0c..bc70830cf7d3 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -108,7 +108,7 @@ struct bt_uuid {
- struct smp_csrk {
- 	bdaddr_t bdaddr;
- 	u8 bdaddr_type;
--	u8 master;
-+	u8 type;
- 	u8 val[16];
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 57071b5..8d457f4 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -203,6 +203,7 @@ struct avctp {
+ 	uint8_t key_quirks[256];
+ 	struct key_pressed key;
+ 	bool initiator;
++	bool reconnect;
  };
  
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index e218a30f2061..fe8eef00e9ca 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -647,9 +647,14 @@ struct mgmt_ev_new_irk {
- 	struct mgmt_irk_info irk;
- } __packed;
+ struct avctp_passthrough_handler {
+@@ -1219,11 +1220,22 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 	GError *gerr = NULL;
  
-+#define MGMT_CSRK_LOCAL_UNAUTHENTICATED		0x00
-+#define MGMT_CSRK_REMOTE_UNAUTHENTICATED	0x01
-+#define MGMT_CSRK_LOCAL_AUTHENTICATED		0x02
-+#define MGMT_CSRK_REMOTE_AUTHENTICATED		0x03
+ 	if (err) {
++		struct btd_device *device = session->device;
++		bool reconnect = session->reconnect;
 +
- struct mgmt_csrk_info {
- 	struct mgmt_addr_info addr;
--	__u8 master;
-+	__u8 type;
- 	__u8 val[16];
- } __packed;
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a11d41572887..ccb725de8c39 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6660,7 +6660,7 @@ void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
- 
- 	bacpy(&ev.key.addr.bdaddr, &csrk->bdaddr);
- 	ev.key.addr.type = link_to_bdaddr(LE_LINK, csrk->bdaddr_type);
--	ev.key.master = csrk->master;
-+	ev.key.type = csrk->type;
- 	memcpy(ev.key.val, csrk->val, sizeof(csrk->val));
- 
- 	mgmt_event(MGMT_EV_NEW_CSRK, hdev, &ev, sizeof(ev), NULL);
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index b2803bd6e0d8..c91c19bfc0a8 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -1252,7 +1252,10 @@ static void smp_distribute_keys(struct smp_chan *smp)
- 
- 		csrk = kzalloc(sizeof(*csrk), GFP_KERNEL);
- 		if (csrk) {
--			csrk->master = 0x00;
-+			if (hcon->sec_level > BT_SECURITY_MEDIUM)
-+				csrk->type = MGMT_CSRK_LOCAL_AUTHENTICATED;
-+			else
-+				csrk->type = MGMT_CSRK_LOCAL_UNAUTHENTICATED;
- 			memcpy(csrk->val, sign.csrk, sizeof(csrk->val));
- 		}
- 		smp->slave_csrk = csrk;
-@@ -2352,7 +2355,10 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	csrk = kzalloc(sizeof(*csrk), GFP_KERNEL);
- 	if (csrk) {
--		csrk->master = 0x01;
-+		if (conn->hcon->sec_level > BT_SECURITY_MEDIUM)
-+			csrk->type = MGMT_CSRK_REMOTE_AUTHENTICATED;
-+		else
-+			csrk->type = MGMT_CSRK_REMOTE_UNAUTHENTICATED;
- 		memcpy(csrk->val, rp->csrk, sizeof(csrk->val));
+ 		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+ 		error("%s", err->message);
++
++		if (!reconnect)
++			return;
++
++		DBG("Control: Attempting to reconnect");
++		avctp_connect(device);
+ 		return;
  	}
- 	smp->csrk = csrk;
+ 
++	session->reconnect = false;
++
+ 	bt_io_get(chan, &gerr,
+ 			BT_IO_OPT_DEST, &address,
+ 			BT_IO_OPT_IMTU, &imtu,
+@@ -1346,10 +1358,32 @@ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
+ {
+ 	const bdaddr_t *src;
+ 	const bdaddr_t *dst;
++	GError *err = NULL;
+ 
+ 	if (session->control != NULL) {
+-		error("Control: Refusing unexpected connect");
+-		g_io_channel_shutdown(chan, TRUE, NULL);
++		if (session->state != AVCTP_STATE_CONNECTING) {
++			error("Control: Refusing unexpected connect");
++			g_io_channel_shutdown(chan, TRUE, NULL);
++			return;
++		}
++
++		/* Cancel outgoing connection and accept incoming */
++		DBG("Control: Accepting unexpected connect from remote");
++		g_io_channel_shutdown(session->control->io, TRUE, NULL);
++		g_io_channel_unref(session->control->io);
++		session->control->io = NULL;
++
++		if (!bt_io_accept(chan, avctp_connect_cb, session, NULL,
++									&err)) {
++			error("bt_io_accept: %s", err->message);
++			g_error_free(err);
++			avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
++			return;
++		}
++
++		session->reconnect = true;
++		session->control->io = g_io_channel_ref(chan);
++
+ 		return;
+ 	}
+ 
 -- 
 2.1.0
 
