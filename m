@@ -2,115 +2,135 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ v2 13/16] core: gatt: Create CEP for external characteristic
-Date: Fri, 27 Feb 2015 00:16:36 -0800
-Message-Id: <1425024999-29789-14-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ v2 12/16] core: gatt: Send not/ind for D-Bus characteristics
+Date: Fri, 27 Feb 2015 00:16:35 -0800
+Message-Id: <1425024999-29789-13-git-send-email-armansito@chromium.org>
 In-Reply-To: <1425024999-29789-1-git-send-email-armansito@chromium.org>
 References: <1425024999-29789-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds supporting for adding a Characteristic Extended
-Properties descriptor entry for an external characteristic, if
-it has the 'reliable-write' or 'writable-auxiliaries' property.
+This patch adds support for sending out notification/indication packets
+for external characteristics whenever a PropertiesChanged signal is
+received for the "Value" property of an external characteristic that has
+either the 'notify' or the 'indicate' property.
 ---
- src/gatt-manager.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 59 insertions(+), 3 deletions(-)
+ src/gatt-manager.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 56 insertions(+), 3 deletions(-)
 
 diff --git a/src/gatt-manager.c b/src/gatt-manager.c
-index 95cf826..cd88fe7 100644
+index 0d19769..95cf826 100644
 --- a/src/gatt-manager.c
 +++ b/src/gatt-manager.c
-@@ -388,6 +388,11 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
+@@ -72,6 +72,7 @@ struct external_service {
+ };
+ 
+ struct external_chrc {
++	struct external_service *service;
+ 	GDBusProxy *proxy;
+ 	uint8_t props;
+ 	uint8_t ext_props;
+@@ -121,8 +122,10 @@ static void chrc_free(void *data)
+ 
+ 	queue_foreach(chrc->pending_ops, cancel_pending_dbus_op, NULL);
+ 
+-	if (chrc->proxy)
++	if (chrc->proxy) {
++		g_dbus_proxy_set_property_watch(chrc->proxy, NULL, NULL);
+ 		g_dbus_proxy_unref(chrc->proxy);
++	}
+ 
+ 	free(chrc);
+ }
+@@ -206,7 +209,8 @@ static void service_remove(void *data)
+ 	service_remove_helper(service);
+ }
+ 
+-static struct external_chrc *chrc_create(GDBusProxy *proxy)
++static struct external_chrc *chrc_create(struct external_service *service,
++							GDBusProxy *proxy)
+ {
+ 	struct external_chrc *chrc;
+ 
+@@ -220,6 +224,7 @@ static struct external_chrc *chrc_create(GDBusProxy *proxy)
+ 		return NULL;
+ 	}
+ 
++	chrc->service = service;
+ 	chrc->proxy = g_dbus_proxy_ref(proxy);
+ 
+ 	return chrc;
+@@ -348,7 +353,7 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
  			return;
  		}
  
-+		if (chrc->ext_props && !incr_attr_count(service, 1)) {
-+			error("Failed to increment attribute count for CEP");
-+			service->failed = true;
-+			return;
-+		}
- 
- 		queue_push_tail(service->chrcs, chrc);
- 	} else
-@@ -777,6 +782,13 @@ static bool create_ccc_entry(struct external_service *service,
- 	uint16_t svc_start;
- 	struct btd_gatt_database *database;
- 
-+
-+	if (!(chrc->props & BT_GATT_CHRC_PROP_NOTIFY) &&
-+				!(chrc->props & BT_GATT_CHRC_PROP_INDICATE)) {
-+		DBG("No need to create CCC entry for characteristic");
-+		return true;
-+	}
-+
- 	if (!gatt_db_attribute_get_service_handles(service->attrib, &svc_start,
- 									NULL)) {
- 		error("Failed to obtain service handle");
-@@ -804,6 +816,48 @@ static bool create_ccc_entry(struct external_service *service,
- 	return true;
+-		chrc = chrc_create(proxy);
++		chrc = chrc_create(service, proxy);
+ 		if (!chrc) {
+ 			service->failed = true;
+ 			return;
+@@ -724,6 +729,48 @@ static uint8_t ccc_write_cb(uint16_t value, void *user_data)
+ 	return 0;
  }
  
-+static void cep_write_cb(struct gatt_db_attribute *attrib, int err,
-+								void *user_data)
++static void property_changed_cb(GDBusProxy *proxy, const char *name,
++					DBusMessageIter *iter, void *user_data)
 +{
-+	if (err)
-+		DBG("Failed to store CEP value in the database");
-+	else
-+		DBG("Stored CEP value in the database");
++	struct external_chrc *chrc = user_data;
++	struct btd_gatt_database *database;
++	DBusMessageIter array;
++	uint8_t *value = NULL;
++	int len = 0;
++
++	if (strcmp(name, "Value"))
++		return;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY) {
++		DBG("Malformed \"Value\" property received");
++		return;
++	}
++
++	dbus_message_iter_recurse(iter, &array);
++	dbus_message_iter_get_fixed_array(&array, &value, &len);
++
++	if (len < 0) {
++		DBG("Malformed \"Value\" property received");
++		return;
++	}
++
++	/* Truncate the value if it's too large */
++	len = MIN(BT_ATT_MAX_VALUE_LEN, len);
++	value = len ? value : NULL;
++
++	database = btd_adapter_get_database(chrc->service->manager->adapter);
++	if (!database) {
++		error("Failed to obtain GATT database from adapter!");
++		return;
++	}
++
++	btd_gatt_database_notify(database,
++				gatt_db_attribute_get_handle(chrc->attrib),
++				value, len,
++				gatt_db_attribute_get_handle(chrc->ccc),
++				chrc->props & BT_GATT_CHRC_PROP_INDICATE);
 +}
 +
-+static bool create_cep_entry(struct external_service *service,
-+						struct external_chrc *chrc)
-+{
-+	struct gatt_db_attribute *cep;
-+	bt_uuid_t uuid;
-+	uint8_t value[2];
-+
-+	if (!chrc->ext_props) {
-+		DBG("No need to create CEP entry for characteristic");
-+		return true;
-+	}
-+
-+	bt_uuid16_create(&uuid, GATT_CHARAC_EXT_PROPER_UUID);
-+	cep = gatt_db_service_add_descriptor(service->attrib, &uuid,
-+							BT_ATT_PERM_READ,
-+							NULL, NULL, NULL);
-+	if (!cep) {
-+		error("Failed to create CEP entry for characteristic");
-+		return false;
-+	}
-+
-+	memset(value, 0, sizeof(value));
-+	value[0] = chrc->ext_props;
-+
-+	if (!gatt_db_attribute_write(cep, 0, value, sizeof(value), 0, NULL,
-+							cep_write_cb, NULL)) {
-+		DBG("Failed to store CEP value in the database");
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- static bool create_chrc_entry(struct external_service *service,
+ static bool create_ccc_entry(struct external_service *service,
  						struct external_chrc *chrc)
  {
-@@ -836,9 +890,11 @@ static bool create_chrc_entry(struct external_service *service,
+@@ -748,6 +795,12 @@ static bool create_ccc_entry(struct external_service *service,
  		return false;
  	}
  
--	if (chrc->props & BT_GATT_CHRC_PROP_NOTIFY ||
--				chrc->props & BT_GATT_CHRC_PROP_INDICATE)
--		return create_ccc_entry(service, chrc);
-+	if (!create_ccc_entry(service, chrc))
++	if (g_dbus_proxy_set_property_watch(chrc->proxy, property_changed_cb,
++							chrc) == FALSE) {
++		error("Failed to set up property watch for characteristic");
 +		return false;
++	}
 +
-+	if (!create_cep_entry(service, chrc))
-+		return false;
- 
  	return true;
  }
+ 
 -- 
 2.2.0.rc0.207.ga3a616c
 
