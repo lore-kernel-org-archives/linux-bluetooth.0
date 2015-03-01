@@ -1,32 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 01 Mar 2015 00:31:43 -0500 (EST)
-Message-Id: <20150301.003143.1281961486875434872.davem@davemloft.net>
-To: eyal.birger@gmail.com
-Cc: willemb@google.com, edumazet@google.com, shmulik.ladkani@gmail.com,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 4/7] net: packet: use skb->dev as storage
- for skb orig len instead of skb->cb[]
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <CAHsH6Gv8Dh3RQ0V7KURcca9bzZGY0FwiqGj-mP9oKA_Vv72nUA@mail.gmail.com>
-References: <CAHsH6GvvQxHbt4JJrotn3y=BG172Wbw4NrMD+gTUA_R=jbPDTw@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20150228.160047.214686672558902639.davem@davemloft.net>
+References: <CAHsH6Guq33N755dcuNEmzgP06O=PBdy2Tzt5vSr-iRFoj4uGtw@mail.gmail.com>
+	<20150228.150830.1726900309943339124.davem@davemloft.net>
+	<CAHsH6GvvQxHbt4JJrotn3y=BG172Wbw4NrMD+gTUA_R=jbPDTw@mail.gmail.com>
 	<20150228.160047.214686672558902639.davem@davemloft.net>
-	<CAHsH6Gv8Dh3RQ0V7KURcca9bzZGY0FwiqGj-mP9oKA_Vv72nUA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Date: Sun, 1 Mar 2015 07:09:54 +0200
+Message-ID: <CAHsH6Gv8Dh3RQ0V7KURcca9bzZGY0FwiqGj-mP9oKA_Vv72nUA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 4/7] net: packet: use skb->dev as storage for
+ skb orig len instead of skb->cb[]
+From: Eyal Birger <eyal.birger@gmail.com>
+To: David Miller <davem@davemloft.net>
+Cc: Willem de Bruijn <willemb@google.com>, Eric Dumazet <edumazet@google.com>,
+	Shmulik Ladkani <shmulik.ladkani@gmail.com>, linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eyal Birger <eyal.birger@gmail.com>
-Date: Sun, 1 Mar 2015 07:09:54 +0200
+On Sat, Feb 28, 2015 at 11:00 PM, David Miller <davem@davemloft.net> wrote:
+> From: Eyal Birger <eyal.birger@gmail.com>
+> Date: Sat, 28 Feb 2015 22:38:04 +0200
+>
+>> My concern is that any value I pick based on the existing implementations
+>> would need to be adjusted come a protocol with a larger address length.
+>
+> Then we need a method that requires protocols to register their
+> address length in a manner that will allow us to validate that
+> limit at compile time.
+>
 
-> Ok. Another suggestion I received was to delay the preparation of the full
-> sockaddr_ll until it is needed, and store the skb original length in the first
-> two fields (sll_protocol and sll_family) as they can be derived later on from
-> the skb.
-> 
-> IMHO, It would still be somewhat of a hack though.
-> 
-> Would that approach be considered?
+Sorry to reiterate this, but such validation will inherently become the
+actual limit for hardware addresses.
+So, it would be equivalent to changing the in-kernel definition of
+MAX_ADDR_SIZE.
 
-I think it's better than mangling skb->dev
+Is this something to be considered?
+
+> This is not rocket science.
+>
+> Right now we're proposing to do utterly stupid shit like encoding
+> integers in device pointers in the sk_buff, when that is absolutely
+> not necessary at all.
+
+Ok. Another suggestion I received was to delay the preparation of the full
+sockaddr_ll until it is needed, and store the skb original length in the first
+two fields (sll_protocol and sll_family) as they can be derived later on from
+the skb.
+
+IMHO, It would still be somewhat of a hack though.
+
+Would that approach be considered?
+
+Regards,
+Eyal.
