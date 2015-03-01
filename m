@@ -1,63 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1425075685-12571-1-git-send-email-szymon.janc@tieto.com>
-References: <1425075685-12571-1-git-send-email-szymon.janc@tieto.com>
-Date: Sun, 1 Mar 2015 16:49:18 +0200
-Message-ID: <CABBYNZLWFjokCT=kQkOUXGs=9qmthsDyJfoQDvekwRNDh9NcOA@mail.gmail.com>
-Subject: Re: [PATCH v2] shared/att: Fix signed write without transparent signing
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Eyal Birger <eyal.birger@gmail.com>
+To: davem@davemloft.net
+Cc: willemb@google.com,
+	edumazet@google.com,
+	shmulik.ladkani@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org,
+	netdev@vger.kernel.org,
+	Eyal Birger <eyal.birger@gmail.com>
+Subject: [PATCH net-next v3 7/7] net: move skb->dropcount to skb->cb[]
+Date: Sun,  1 Mar 2015 14:58:31 +0200
+Message-Id: <1425214711-9562-8-git-send-email-eyal.birger@gmail.com>
+In-Reply-To: <1425214711-9562-1-git-send-email-eyal.birger@gmail.com>
+References: <1425214711-9562-1-git-send-email-eyal.birger@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Commit 977750076d98 ("af_packet: add interframe drop cmsg (v6)")
+unionized skb->mark and skb->dropcount in order to allow recording
+of the socket drop count while maintaining struct sk_buff size.
 
-On Sat, Feb 28, 2015 at 12:21 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> If local key wasn't set by bt_att_set_local_key() assume that signing
-> is done by bt_att_send() caller ie. gattrib code.
-> ---
->  src/shared/att.c | 10 +++-------
->  1 file changed, 3 insertions(+), 7 deletions(-)
->
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 9787377..90701b0 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -282,10 +282,10 @@ static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
->                                         const void *pdu, uint16_t length)
->  {
->         uint16_t pdu_len = 1;
-> -       struct sign_info *sign;
-> +       struct sign_info *sign = att->local_sign;
->         uint32_t sign_cnt;
->
-> -       if (op->opcode & ATT_OP_SIGNED_MASK)
-> +       if (sign && (op->opcode & ATT_OP_SIGNED_MASK))
->                 pdu_len += BT_ATT_SIGNATURE_LEN;
->
->         if (length && pdu)
-> @@ -303,13 +303,9 @@ static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
->         if (pdu_len > 1)
->                 memcpy(op->pdu + 1, pdu, length);
->
-> -       if (!(op->opcode & ATT_OP_SIGNED_MASK))
-> +       if (!sign || !(op->opcode & ATT_OP_SIGNED_MASK))
->                 return true;
->
-> -       sign = att->local_sign;
-> -       if (!sign)
-> -               goto fail;
-> -
->         if (!sign->counter(&sign_cnt, sign->user_data))
->                 goto fail;
->
-> --
-> 1.9.3
+skb->dropcount was introduced since there was no available room
+in skb->cb[] in packet sockets. However, its introduction led to
+the inability to export skb->mark, or any other aliased field to
+userspace if so desired.
 
-Applied, thanks.
+Moving the dropcount metric to skb->cb[] eliminates this problem
+at the expense of 4 bytes less in skb->cb[] for protocol families
+using it.
 
+Signed-off-by: Eyal Birger <eyal.birger@gmail.com>
+---
+ include/linux/skbuff.h |  2 --
+ include/net/sock.h     | 18 ++++++++++++++++--
+ net/socket.c           |  4 ++--
+ 3 files changed, 18 insertions(+), 6 deletions(-)
 
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index d898b32..bba1330 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -492,7 +492,6 @@ static inline u32 skb_mstamp_us_delta(const struct skb_mstamp *t1,
+   *	@napi_id: id of the NAPI struct this skb came from
+  *	@secmark: security marking
+  *	@mark: Generic packet mark
+- *	@dropcount: total number of sk_receive_queue overflows
+  *	@vlan_proto: vlan encapsulation protocol
+  *	@vlan_tci: vlan tag control information
+  *	@inner_protocol: Protocol (encapsulation)
+@@ -641,7 +640,6 @@ struct sk_buff {
+ #endif
+ 	union {
+ 		__u32		mark;
+-		__u32		dropcount;
+ 		__u32		reserved_tailroom;
+ 	};
+ 
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 0996fe4..38369d3 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2078,13 +2078,27 @@ static inline int sock_intr_errno(long timeo)
+ 	return timeo == MAX_SCHEDULE_TIMEOUT ? -ERESTARTSYS : -EINTR;
+ }
+ 
++struct sock_skb_cb {
++	u32 dropcount;
++};
++
++/* Store sock_skb_cb at the end of skb->cb[] so protocol families
++ * using skb->cb[] would keep using it directly and utilize its
++ * alignement guarantee.
++ */
++#define SOCK_SKB_CB_OFFSET ((FIELD_SIZEOF(struct sk_buff, cb) - \
++			    sizeof(struct sock_skb_cb)))
++
++#define SOCK_SKB_CB(__skb) ((struct sock_skb_cb *)((__skb)->cb + \
++			    SOCK_SKB_CB_OFFSET))
++
+ #define sock_skb_cb_check_size(size) \
+-	BUILD_BUG_ON((size) > FIELD_SIZEOF(struct sk_buff, cb))
++	BUILD_BUG_ON((size) > SOCK_SKB_CB_OFFSET)
+ 
+ static inline void
+ sock_skb_set_dropcount(const struct sock *sk, struct sk_buff *skb)
+ {
+-	skb->dropcount = atomic_read(&sk->sk_drops);
++	SOCK_SKB_CB(skb)->dropcount = atomic_read(&sk->sk_drops);
+ }
+ 
+ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
+diff --git a/net/socket.c b/net/socket.c
+index bbedbfc..b78cf60 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -731,9 +731,9 @@ EXPORT_SYMBOL_GPL(__sock_recv_wifi_status);
+ static inline void sock_recv_drops(struct msghdr *msg, struct sock *sk,
+ 				   struct sk_buff *skb)
+ {
+-	if (sock_flag(sk, SOCK_RXQ_OVFL) && skb && skb->dropcount)
++	if (sock_flag(sk, SOCK_RXQ_OVFL) && skb && SOCK_SKB_CB(skb)->dropcount)
+ 		put_cmsg(msg, SOL_SOCKET, SO_RXQ_OVFL,
+-			sizeof(__u32), &skb->dropcount);
++			sizeof(__u32), &SOCK_SKB_CB(skb)->dropcount);
+ }
+ 
+ void __sock_recv_ts_and_drops(struct msghdr *msg, struct sock *sk,
 -- 
-Luiz Augusto von Dentz
+2.1.4
