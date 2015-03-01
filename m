@@ -1,261 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1424365130-26193-1-git-send-email-jpawlowski@google.com>
-References: <1424365130-26193-1-git-send-email-jpawlowski@google.com>
-Date: Sat, 28 Feb 2015 21:51:51 -0800
-Message-ID: <CAD0=r8wxpGkeKJYX_hz6Cn1KieNvMFTqRsJK4KOPGmoaAvF9yA@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: fix service discovery behaviour for empty
- uuids filter
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: HID fast reconnects broken on Linux 3.19 / BlueZ 5.28
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150228080724.GA11998@t440s.P-661HNU-F1>
+Date: Sat, 28 Feb 2015 21:13:47 -0800
+Cc: Petri Gynther <pgynther@google.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <1D092832-4533-4BC8-BED1-7A6C7B2817EF@holtmann.org>
+References: <CAGXr9JFCzqUQXU7cLwPi0Q3_rinBd+A+kT2F=LxDJ75pPOiO4w@mail.gmail.com> <20150228080724.GA11998@t440s.P-661HNU-F1>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping?
+Hi Johan,
 
-On Thu, Feb 19, 2015 at 8:58 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> This patch fixes service discovery behaviour, when provided uuid filter
-> is empty and HCI_QUIRK_STRICT_DUPLICATE_FILTER is set. Before this
-> patch, empty uuid filter was unable to trigger scan restart, and that
-> caused inconsistent behaviour in applications.
->
-> Example: two DBus clients call BlueZ, one to find all devices with
-> service abcd, second to find all devices with rssi smaller than -90.
-> Sum of those filters, that is passed to mgmt_service_scan is empty
-> filter, with no rssi or uuids set.
-> That caused kernel not to restart scan when quirk was set.
-> That was inconsistent with what happen when there's only one of those
-> two filters set (scan is restarted and reports devices).
->
-> To fix that, new variable hdev->discovery.service_discovery was
-> introduced. It can indicate that filtered scan is running, no matter
-> what uuid or rssi filter is set.
->
-> This patch also closes all code responsible for filtered discovery in
-> one if statement. That makes whole code shorter, much more readable,
-> and easier to backport to older kernels, especially pre 3.10.
->
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-> ---
->  include/net/bluetooth/hci_core.h |   2 +
->  net/bluetooth/mgmt.c             | 145 +++++++++++++++------------------------
->  2 files changed, 57 insertions(+), 90 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index a7bf773..791bb75 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -76,6 +76,7 @@ struct discovery_state {
->         u8                      last_adv_data[HCI_MAX_AD_LENGTH];
->         u8                      last_adv_data_len;
->         bool                    report_invalid_rssi;
-> +       bool                    service_discovery;
->         s8                      rssi;
->         u16                     uuid_count;
->         u8                      (*uuids)[16];
-> @@ -525,6 +526,7 @@ static inline void discovery_init(struct hci_dev *hdev)
->
->  static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
->  {
-> +       hdev->discovery.service_discovery = false;
->         hdev->discovery.report_invalid_rssi = true;
->         hdev->discovery.rssi = HCI_RSSI_INVALID;
->         hdev->discovery.uuid_count = 0;
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 3a1b537..0c5b16a 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3932,8 +3932,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
->                  */
->                 if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
->                              &hdev->quirks) &&
-> -                   (hdev->discovery.uuid_count > 0 ||
-> -                    hdev->discovery.rssi != HCI_RSSI_INVALID)) {
-> +                   hdev->discovery.service_discovery) {
->                         hdev->discovery.scan_start = jiffies;
->                         hdev->discovery.scan_duration = timeout;
->                 }
-> @@ -4086,6 +4085,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
->          */
->         hci_discovery_filter_clear(hdev);
->
-> +       hdev->discovery.service_discovery = true;
->         hdev->discovery.type = cp->type;
->         hdev->discovery.rssi = cp->rssi;
->         hdev->discovery.uuid_count = uuid_count;
-> @@ -7286,7 +7286,6 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->         char buf[512];
->         struct mgmt_ev_device_found *ev = (void *) buf;
->         size_t ev_size;
-> -       bool match;
->
->         /* Don't send events for a non-kernel initiated discovery. With
->          * LE one exception is if we have pend_le_reports > 0 in which
-> @@ -7299,21 +7298,57 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->                         return;
->         }
->
-> -       /* When using service discovery with a RSSI threshold, then check
-> -        * if such a RSSI threshold is specified. If a RSSI threshold has
-> -        * been specified, and HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set,
-> -        * then all results with a RSSI smaller than the RSSI threshold will be
-> -        * dropped. If the quirk is set, let it through for further processing,
-> -        * as we might need to restart the scan.
-> -        *
-> -        * For BR/EDR devices (pre 1.2) providing no RSSI during inquiry,
-> -        * the results are also dropped.
-> -        */
-> -       if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
-> -           (rssi == HCI_RSSI_INVALID ||
-> -           (rssi < hdev->discovery.rssi &&
-> -            !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
-> -               return;
-> +       if (hdev->discovery.service_discovery) {
-> +               /* We are using service discovery */
-> +
-> +               /* If a RSSI threshold has been specified, and
-> +                * HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set, then all
-> +                * results with a RSSI smaller than the RSSI threshold will be
-> +                * dropped. If the quirk is set, let it through for further
-> +                * processing, as we might need to restart the scan.
-> +                *
-> +                * For BR/EDR devices (pre 1.2) providing no RSSI during
-> +                * inquiry, the results are also dropped.
-> +                */
-> +               if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
-> +                   (rssi == HCI_RSSI_INVALID ||
-> +                   (rssi < hdev->discovery.rssi &&
-> +                    !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-> +                              &hdev->quirks))))
-> +                       return;
-> +
-> +               /* If a list of UUID is provided, results with no matching UUID
-> +                * should be dropped. If list of UUID is not provided, treat
-> +                * all devices as matches.
-> +                * Empty UUID filter might be a result of merging filters
-> +                * somewhere in highter layer, and should behave same as when
-> +                * we have UUID match.
-> +                */
-> +               if (hdev->discovery.uuid_count != 0 &&
-> +                   (eir_len == 0 || !eir_has_uuids(eir, eir_len,
-> +                                 hdev->discovery.uuid_count,
-> +                                 hdev->discovery.uuids)) &&
-> +                   (scan_rsp_len == 0 || !eir_has_uuids(scan_rsp, scan_rsp_len,
-> +                                 hdev->discovery.uuid_count,
-> +                                 hdev->discovery.uuids)))
-> +                       return;
-> +
-> +               /* If duplicate filtering does not report RSSI changes,
-> +                * then restart scanning to ensure updated result with
-> +                * updated RSSI values.
-> +                */
-> +               if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-> +                            &hdev->quirks)) {
-> +                       restart_le_scan(hdev);
-> +
-> +                       /* Validate the reported RSSI value against the
-> +                        * RSSI threshold once more.
-> +                        */
-> +                       if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
-> +                           rssi < hdev->discovery.rssi)
-> +                               return;
-> +               }
-> +       }
->
->         /* Make sure that the buffer is big enough. The 5 extra bytes
->          * are for the potential CoD field.
-> @@ -7340,87 +7375,17 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->         ev->rssi = rssi;
->         ev->flags = cpu_to_le32(flags);
->
-> -       if (eir_len > 0) {
-> -               /* When using service discovery and a list of UUID is
-> -                * provided, results with no matching UUID should be
-> -                * dropped. In case there is a match the result is
-> -                * kept and checking possible scan response data
-> -                * will be skipped.
-> -                */
-> -               if (hdev->discovery.uuid_count > 0) {
-> -                       match = eir_has_uuids(eir, eir_len,
-> -                                             hdev->discovery.uuid_count,
-> -                                             hdev->discovery.uuids);
-> -                       /* If duplicate filtering does not report RSSI changes,
-> -                        * then restart scanning to ensure updated result with
-> -                        * updated RSSI values.
-> -                        */
-> -                       if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-> -                                             &hdev->quirks))
-> -                               restart_le_scan(hdev);
-> -               } else {
-> -                       match = true;
-> -               }
-> -
-> -               if (!match && !scan_rsp_len)
-> -                       return;
-> -
-> +       if (eir_len > 0)
->                 /* Copy EIR or advertising data into event */
->                 memcpy(ev->eir, eir, eir_len);
-> -       } else {
-> -               /* When using service discovery and a list of UUID is
-> -                * provided, results with empty EIR or advertising data
-> -                * should be dropped since they do not match any UUID.
-> -                */
-> -               if (hdev->discovery.uuid_count > 0 && !scan_rsp_len)
-> -                       return;
-> -
-> -               match = false;
-> -       }
->
->         if (dev_class && !eir_has_data_type(ev->eir, eir_len, EIR_CLASS_OF_DEV))
->                 eir_len = eir_append_data(ev->eir, eir_len, EIR_CLASS_OF_DEV,
->                                           dev_class, 3);
->
-> -       if (scan_rsp_len > 0) {
-> -               /* When using service discovery and a list of UUID is
-> -                * provided, results with no matching UUID should be
-> -                * dropped if there is no previous match from the
-> -                * advertising data.
-> -                */
-> -               if (hdev->discovery.uuid_count > 0) {
-> -                       if (!match && !eir_has_uuids(scan_rsp, scan_rsp_len,
-> -                                                    hdev->discovery.uuid_count,
-> -                                                    hdev->discovery.uuids))
-> -                               return;
-> -
-> -                       /* If duplicate filtering does not report RSSI changes,
-> -                        * then restart scanning to ensure updated result with
-> -                        * updated RSSI values.
-> -                        */
-> -                       if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-> -                                    &hdev->quirks))
-> -                               restart_le_scan(hdev);
-> -               }
-> -
-> +       if (scan_rsp_len > 0)
->                 /* Append scan response data to event */
->                 memcpy(ev->eir + eir_len, scan_rsp, scan_rsp_len);
-> -       } else {
-> -               /* When using service discovery and a list of UUID is
-> -                * provided, results with empty scan response and no
-> -                * previous matched advertising data should be dropped.
-> -                */
-> -               if (hdev->discovery.uuid_count > 0 && !match)
-> -                       return;
-> -       }
-> -
-> -       /* Validate the reported RSSI value against the RSSI threshold once more
-> -        * incase HCI_QUIRK_STRICT_DUPLICATE_FILTER forced a restart of LE
-> -        * scanning.
-> -        */
-> -       if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
-> -           rssi < hdev->discovery.rssi)
-> -               return;
->
->         ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
->         ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
-> --
-> 2.2.0.rc0.207.ga3a616c
->
+>> We recently updated our platform to use Linux 3.19 and BlueZ 5.28.
+>> 
+>> I immediately noticed that HID remote control reconnects back to BlueZ
+>> host got slower. It would often take 3-5 seconds for the host to see
+>> the first keypress from HID remote.
+>> 
+>> Running "btmgmt info" reveals that hci0 is no longer "connectable" and
+>> "fast-connectable".
+> 
+> We've never had code explicitly enabling fast-connectable, so that's at
+> least not a regression.
+> 
+>> hci0: addr XX:XX:XX:XX:XX:XX version 6 manufacturer 72 class 0x000100
+>> supported settings: powered connectable fast-connectable discoverable
+>> bondable link-security ssp br/edr hs le advertising secure-conn
+>> debug-keys privacy configuration
+>> current settings: powered bondable ssp br/edr le secure-conn
+>> name ...
+>> short name ...
+>> 
+>> Regardless of the above, a previously paired HID remote is still able
+>> to reconnect, so somewhere in BlueZ code the page scan must be turned
+>> on.
+>> 
+>> I think what is missing from the code is that wherever page scan is
+>> turned on, the page scan interval should be configured as well, when
+>> fast reconnects are desired.
+>> 
+>> In order to work around this issue, I had to use the following patch
+>> in src/adapter.c to force "connectable" and "fast-connectable" on at
+>> all times:
+>> 
+>> @@ -7142,6 +7143,11 @@ static void read_info_complete(uint8_t status,
+>> uint16_t length,
+>> 
+>>        if (adapter->current_settings & MGMT_SETTING_POWERED)
+>>                adapter_start(adapter);
+>> +       else
+>> +               set_mode(adapter, MGMT_OP_SET_POWERED, 0x01);
+> 
+> Powered defaulting to false is also not a regression - that's how the
+> policy has been ever since BlueZ 5.0. The expectation is that higher
+> software layers manage this.
+> 
+>> +       set_mode(adapter, MGMT_OP_SET_CONNECTABLE, 0x01);
+>> +       set_mode(adapter, MGMT_OP_SET_FAST_CONNECTABLE, 0x01);
+>> 
+>> Can someone clarify how previously paired BT Classic devices reconnect
+>> back to host when the hci interface is not connectable?
+> 
+> The major change you've discovered is a kernel-side whitelist for
+> devices which can connect to us. Once you set up a device with
+> bluetoothd it gets added to the kernel-side list using the Add Device
+> mgmt command. The __hci_update_page_scan() function in
+> net/bluetooth/hci_request.c decides what the state should be:
+> 
+> 	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags) ||
+> 	    disconnected_whitelist_entries(hdev))
+> 		scan = SCAN_PAGE;
+> 	else
+> 		scan = SCAN_DISABLED;
+> 
+> The following piece of code in net/bluetooth/hci_event.c function
+> hci_conn_request_evt() in turn decides whether to accept incoming
+> connect requests:
+> 
+> 	/* Require HCI_CONNECTABLE or a whitelist entry to accept the
+> 	 * connection. These features are only touched through mgmt so
+> 	 * only do the checks if HCI_MGMT is set.
+> 	 */
+> 	if (test_bit(HCI_MGMT, &hdev->dev_flags) &&
+> 	    !test_bit(HCI_CONNECTABLE, &hdev->dev_flags) &&
+> 	    !hci_bdaddr_list_lookup(&hdev->whitelist, &ev->bdaddr,
+> 				    BDADDR_BREDR)) {
+> 		hci_reject_conn(hdev, &ev->bdaddr);
+> 		return;
+> 	}
+> 
+> The 'connectable' mgmt property (i.e. the HCI_CONNECTABLE flag) only
+> describes general connectable mode, where any (even previously unknown)
+> device is able to connect to us. With a recent kernel and user-space
+> combination this setting is tied to the bondable and discoverable
+> settings, i.e. you'd need to enable the Discoverable D-Bus property to
+> get all these 'general' settings enabled.
+> 
+> This all said, I don't think anyone thought of how the 'fast-connectable'
+> setting should behave in a system where 'connectable' is mostly set to
+> false. My initial feeling is that it should be possible to use it to
+> adjust our page scan settings whenever page scan is enabled, i.e. it
+> shouldn't be strictly tied to 'connectable'. If that's not the case
+> right now it's something that needs fixing.
+
+I wonder if we just allow fast-connectable at all times to make this simple. We did restrict the fast-connectable setting to runtime and when connectable is enabled. We could just lift both of these restrictions.
+
+However I do wonder if we should introduce a fast-connectable option 0x02 that also allows to provide a timeout value. Since always having fast-connectable on is a bit of a power drain. We want the option to keep fast-connectable for a certain amount of time after disconnect and if that timeout passes, then switch back to normal connectable settings.
+
+At least that was the original intend when we actually introduced the fast-connectable setting.
+
+Regards
+
+Marcel
+
