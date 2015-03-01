@@ -1,46 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 02 Mar 2015 00:20:00 -0500 (EST)
-Message-Id: <20150302.002000.2074179681664043670.davem@davemloft.net>
-To: eyal.birger@gmail.com
-Cc: willemb@google.com, edumazet@google.com, shmulik.ladkani@gmail.com,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 0/7] net: move skb->dropcount to skb->cb[]
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <1425214711-9562-1-git-send-email-eyal.birger@gmail.com>
-References: <1425214711-9562-1-git-send-email-eyal.birger@gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+In-Reply-To: <1425075685-12571-1-git-send-email-szymon.janc@tieto.com>
+References: <1425075685-12571-1-git-send-email-szymon.janc@tieto.com>
+Date: Sun, 1 Mar 2015 16:49:18 +0200
+Message-ID: <CABBYNZLWFjokCT=kQkOUXGs=9qmthsDyJfoQDvekwRNDh9NcOA@mail.gmail.com>
+Subject: Re: [PATCH v2] shared/att: Fix signed write without transparent signing
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eyal Birger <eyal.birger@gmail.com>
-Date: Sun,  1 Mar 2015 14:58:24 +0200
+Hi Szymon,
 
-> Commit 977750076d98 ("af_packet: add interframe drop cmsg (v6)")
-> unionized skb->mark and skb->dropcount in order to allow recording
-> of the socket drop count while maintaining struct sk_buff size.
-> 
-> skb->dropcount was introduced since there was no available room
-> in skb->cb[] in packet sockets. However, its introduction led to
-> the inability to export skb->mark to userspace.
-> 
-> It was considered to alias skb->priority instead of skb->mark.
-> However, that would lead to the inabilty to export skb->priority
-> to userspace if desired. Such change may also lead to hard-to-find
-> issues as skb->priority is assumed to be alias free, and, as noted
-> by Shmulik Ladkani, is not 'naturally orthogonal' with other skb
-> fields.
-> 
-> This patch series follows the suggestions made by Eric Dumazet moving
-> the dropcount metric to skb->cb[], eliminating this problem
-> at the expense of 4 bytes less in skb->cb[] for protocol families
-> using it.
-> 
-> The patch series include compactization of bluetooth and packet
-> use of skb->cb[] as well as the infrastructure for placing dropcount
-> in skb->cb[].
+On Sat, Feb 28, 2015 at 12:21 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> If local key wasn't set by bt_att_set_local_key() assume that signing
+> is done by bt_att_send() caller ie. gattrib code.
+> ---
+>  src/shared/att.c | 10 +++-------
+>  1 file changed, 3 insertions(+), 7 deletions(-)
+>
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index 9787377..90701b0 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -282,10 +282,10 @@ static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
+>                                         const void *pdu, uint16_t length)
+>  {
+>         uint16_t pdu_len = 1;
+> -       struct sign_info *sign;
+> +       struct sign_info *sign = att->local_sign;
+>         uint32_t sign_cnt;
+>
+> -       if (op->opcode & ATT_OP_SIGNED_MASK)
+> +       if (sign && (op->opcode & ATT_OP_SIGNED_MASK))
+>                 pdu_len += BT_ATT_SIGNATURE_LEN;
+>
+>         if (length && pdu)
+> @@ -303,13 +303,9 @@ static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
+>         if (pdu_len > 1)
+>                 memcpy(op->pdu + 1, pdu, length);
+>
+> -       if (!(op->opcode & ATT_OP_SIGNED_MASK))
+> +       if (!sign || !(op->opcode & ATT_OP_SIGNED_MASK))
+>                 return true;
+>
+> -       sign = att->local_sign;
+> -       if (!sign)
+> -               goto fail;
+> -
+>         if (!sign->counter(&sign_cnt, sign->user_data))
+>                 goto fail;
+>
+> --
+> 1.9.3
 
-Ok, I think I can live with this.
+Applied, thanks.
 
-Series applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
