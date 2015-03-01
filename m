@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/7] Bluetooth: Move all mgmt command quirks to handler table
-Date: Sun,  1 Mar 2015 09:39:02 +0200
-Message-Id: <1425195546-8647-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 6/7] Bluetooth: Rename pending_cmd to mgmt_pending_cmd
+Date: Sun,  1 Mar 2015 09:39:05 +0200
+Message-Id: <1425195546-8647-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1425195546-8647-1-git-send-email-johan.hedberg@gmail.com>
 References: <1425195546-8647-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,259 +11,746 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-In order to completely generalize the mgmt command handling we need to
-move away command-specific information from mgmt_control() into the
-actual command table. This patch adds a new 'flags' field to the handler
-entries which can now contain the following command specific
-information:
-
- - Command takes variable length parameters
- - Command doesn't target any specific HCI device
- - Command can be sent when the HCI device is unconfigured
-
-After this the mgmt_control() function is completely generic and can
-potentially be reused by new HCI channels.
+This patch renames the pending_cmd struct (used for tracking pending mgmt
+commands) to mgmt_pending_cmd, so that it can be moved to a more generic
+place and be used also by other modules using other HCI channels.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |   6 +-
- net/bluetooth/mgmt.c             | 170 ++++++++++++++++++++-------------------
- 2 files changed, 93 insertions(+), 83 deletions(-)
+ net/bluetooth/mgmt.c | 176 ++++++++++++++++++++++++++-------------------------
+ 1 file changed, 89 insertions(+), 87 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index bc70830cf7d3..586189377bea 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1271,11 +1271,15 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
- 
- void hci_sock_dev_event(struct hci_dev *hdev, int event);
- 
-+#define HCI_MGMT_VAR_LEN	(1 << 0)
-+#define HCI_MGMT_NO_HDEV	(1 << 1)
-+#define HCI_MGMT_UNCONFIGURED	(1 << 2)
-+
- struct hci_mgmt_handler {
- 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
- 		     u16 data_len);
--	bool var_len;
- 	size_t data_len;
-+	unsigned long flags;
- };
- 
- struct hci_mgmt_chan {
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ccb725de8c39..0079cdb94afb 100644
+index 7281edb80e90..54ad6ad91e37 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -6108,64 +6108,77 @@ unlock:
+@@ -135,7 +135,7 @@ static const u16 mgmt_events[] = {
+ #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
+ 		 "\x00\x00\x00\x00\x00\x00\x00\x00"
  
- static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ NULL }, /* 0x0000 (no command) */
--	{ read_version,           false, MGMT_READ_VERSION_SIZE },
--	{ read_commands,          false, MGMT_READ_COMMANDS_SIZE },
--	{ read_index_list,        false, MGMT_READ_INDEX_LIST_SIZE },
--	{ read_controller_info,   false, MGMT_READ_INFO_SIZE },
--	{ set_powered,            false, MGMT_SETTING_SIZE },
--	{ set_discoverable,       false, MGMT_SET_DISCOVERABLE_SIZE },
--	{ set_connectable,        false, MGMT_SETTING_SIZE },
--	{ set_fast_connectable,   false, MGMT_SETTING_SIZE },
--	{ set_bondable,           false, MGMT_SETTING_SIZE },
--	{ set_link_security,      false, MGMT_SETTING_SIZE },
--	{ set_ssp,                false, MGMT_SETTING_SIZE },
--	{ set_hs,                 false, MGMT_SETTING_SIZE },
--	{ set_le,                 false, MGMT_SETTING_SIZE },
--	{ set_dev_class,          false, MGMT_SET_DEV_CLASS_SIZE },
--	{ set_local_name,         false, MGMT_SET_LOCAL_NAME_SIZE },
--	{ add_uuid,               false, MGMT_ADD_UUID_SIZE },
--	{ remove_uuid,            false, MGMT_REMOVE_UUID_SIZE },
--	{ load_link_keys,         true,  MGMT_LOAD_LINK_KEYS_SIZE },
--	{ load_long_term_keys,    true,  MGMT_LOAD_LONG_TERM_KEYS_SIZE },
--	{ disconnect,             false, MGMT_DISCONNECT_SIZE },
--	{ get_connections,        false, MGMT_GET_CONNECTIONS_SIZE },
--	{ pin_code_reply,         false, MGMT_PIN_CODE_REPLY_SIZE },
--	{ pin_code_neg_reply,     false, MGMT_PIN_CODE_NEG_REPLY_SIZE },
--	{ set_io_capability,      false, MGMT_SET_IO_CAPABILITY_SIZE },
--	{ pair_device,            false, MGMT_PAIR_DEVICE_SIZE },
--	{ cancel_pair_device,     false, MGMT_CANCEL_PAIR_DEVICE_SIZE },
--	{ unpair_device,          false, MGMT_UNPAIR_DEVICE_SIZE },
--	{ user_confirm_reply,     false, MGMT_USER_CONFIRM_REPLY_SIZE },
--	{ user_confirm_neg_reply, false, MGMT_USER_CONFIRM_NEG_REPLY_SIZE },
--	{ user_passkey_reply,     false, MGMT_USER_PASSKEY_REPLY_SIZE },
--	{ user_passkey_neg_reply, false, MGMT_USER_PASSKEY_NEG_REPLY_SIZE },
--	{ read_local_oob_data,    false, MGMT_READ_LOCAL_OOB_DATA_SIZE },
--	{ add_remote_oob_data,    true,  MGMT_ADD_REMOTE_OOB_DATA_SIZE },
--	{ remove_remote_oob_data, false, MGMT_REMOVE_REMOTE_OOB_DATA_SIZE },
--	{ start_discovery,        false, MGMT_START_DISCOVERY_SIZE },
--	{ stop_discovery,         false, MGMT_STOP_DISCOVERY_SIZE },
--	{ confirm_name,           false, MGMT_CONFIRM_NAME_SIZE },
--	{ block_device,           false, MGMT_BLOCK_DEVICE_SIZE },
--	{ unblock_device,         false, MGMT_UNBLOCK_DEVICE_SIZE },
--	{ set_device_id,          false, MGMT_SET_DEVICE_ID_SIZE },
--	{ set_advertising,        false, MGMT_SETTING_SIZE },
--	{ set_bredr,              false, MGMT_SETTING_SIZE },
--	{ set_static_address,     false, MGMT_SET_STATIC_ADDRESS_SIZE },
--	{ set_scan_params,        false, MGMT_SET_SCAN_PARAMS_SIZE },
--	{ set_secure_conn,        false, MGMT_SETTING_SIZE },
--	{ set_debug_keys,         false, MGMT_SETTING_SIZE },
--	{ set_privacy,            false, MGMT_SET_PRIVACY_SIZE },
--	{ load_irks,              true,  MGMT_LOAD_IRKS_SIZE },
--	{ get_conn_info,          false, MGMT_GET_CONN_INFO_SIZE },
--	{ get_clock_info,         false, MGMT_GET_CLOCK_INFO_SIZE },
--	{ add_device,             false, MGMT_ADD_DEVICE_SIZE },
--	{ remove_device,          false, MGMT_REMOVE_DEVICE_SIZE },
--	{ load_conn_param,        true,  MGMT_LOAD_CONN_PARAM_SIZE },
--	{ read_unconf_index_list, false, MGMT_READ_UNCONF_INDEX_LIST_SIZE },
--	{ read_config_info,       false, MGMT_READ_CONFIG_INFO_SIZE },
--	{ set_external_config,    false, MGMT_SET_EXTERNAL_CONFIG_SIZE },
--	{ set_public_address,     false, MGMT_SET_PUBLIC_ADDRESS_SIZE },
--	{ start_service_discovery,true,  MGMT_START_SERVICE_DISCOVERY_SIZE },
-+	{ read_version,            MGMT_READ_VERSION_SIZE,
-+						HCI_MGMT_NO_HDEV },
-+	{ read_commands,           MGMT_READ_COMMANDS_SIZE,
-+						HCI_MGMT_NO_HDEV },
-+	{ read_index_list,         MGMT_READ_INDEX_LIST_SIZE,
-+						HCI_MGMT_NO_HDEV },
-+	{ read_controller_info,    MGMT_READ_INFO_SIZE,                 0 },
-+	{ set_powered,             MGMT_SETTING_SIZE,                   0 },
-+	{ set_discoverable,        MGMT_SET_DISCOVERABLE_SIZE,          0 },
-+	{ set_connectable,         MGMT_SETTING_SIZE,                   0 },
-+	{ set_fast_connectable,    MGMT_SETTING_SIZE,                   0 },
-+	{ set_bondable,            MGMT_SETTING_SIZE,                   0 },
-+	{ set_link_security,       MGMT_SETTING_SIZE,                   0 },
-+	{ set_ssp,                 MGMT_SETTING_SIZE,                   0 },
-+	{ set_hs,                  MGMT_SETTING_SIZE,                   0 },
-+	{ set_le,                  MGMT_SETTING_SIZE,                   0 },
-+	{ set_dev_class,           MGMT_SET_DEV_CLASS_SIZE,             0 },
-+	{ set_local_name,          MGMT_SET_LOCAL_NAME_SIZE,            0 },
-+	{ add_uuid,                MGMT_ADD_UUID_SIZE,                  0 },
-+	{ remove_uuid,             MGMT_REMOVE_UUID_SIZE,               0 },
-+	{ load_link_keys,          MGMT_LOAD_LINK_KEYS_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ load_long_term_keys,     MGMT_LOAD_LONG_TERM_KEYS_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ disconnect,              MGMT_DISCONNECT_SIZE,                0 },
-+	{ get_connections,         MGMT_GET_CONNECTIONS_SIZE,           0 },
-+	{ pin_code_reply,          MGMT_PIN_CODE_REPLY_SIZE,            0 },
-+	{ pin_code_neg_reply,      MGMT_PIN_CODE_NEG_REPLY_SIZE,        0 },
-+	{ set_io_capability,       MGMT_SET_IO_CAPABILITY_SIZE,         0 },
-+	{ pair_device,             MGMT_PAIR_DEVICE_SIZE,               0 },
-+	{ cancel_pair_device,      MGMT_CANCEL_PAIR_DEVICE_SIZE,        0 },
-+	{ unpair_device,           MGMT_UNPAIR_DEVICE_SIZE,             0 },
-+	{ user_confirm_reply,      MGMT_USER_CONFIRM_REPLY_SIZE,        0 },
-+	{ user_confirm_neg_reply,  MGMT_USER_CONFIRM_NEG_REPLY_SIZE,    0 },
-+	{ user_passkey_reply,      MGMT_USER_PASSKEY_REPLY_SIZE,        0 },
-+	{ user_passkey_neg_reply,  MGMT_USER_PASSKEY_NEG_REPLY_SIZE,    0 },
-+	{ read_local_oob_data,     MGMT_READ_LOCAL_OOB_DATA_SIZE },
-+	{ add_remote_oob_data,     MGMT_ADD_REMOTE_OOB_DATA_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ remove_remote_oob_data,  MGMT_REMOVE_REMOTE_OOB_DATA_SIZE,    0 },
-+	{ start_discovery,         MGMT_START_DISCOVERY_SIZE,           0 },
-+	{ stop_discovery,          MGMT_STOP_DISCOVERY_SIZE,            0 },
-+	{ confirm_name,            MGMT_CONFIRM_NAME_SIZE,              0 },
-+	{ block_device,            MGMT_BLOCK_DEVICE_SIZE,              0 },
-+	{ unblock_device,          MGMT_UNBLOCK_DEVICE_SIZE,            0 },
-+	{ set_device_id,           MGMT_SET_DEVICE_ID_SIZE,             0 },
-+	{ set_advertising,         MGMT_SETTING_SIZE,                   0 },
-+	{ set_bredr,               MGMT_SETTING_SIZE,                   0 },
-+	{ set_static_address,      MGMT_SET_STATIC_ADDRESS_SIZE,        0 },
-+	{ set_scan_params,         MGMT_SET_SCAN_PARAMS_SIZE,           0 },
-+	{ set_secure_conn,         MGMT_SETTING_SIZE,                   0 },
-+	{ set_debug_keys,          MGMT_SETTING_SIZE,                   0 },
-+	{ set_privacy,             MGMT_SET_PRIVACY_SIZE,               0 },
-+	{ load_irks,               MGMT_LOAD_IRKS_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ get_conn_info,           MGMT_GET_CONN_INFO_SIZE,             0 },
-+	{ get_clock_info,          MGMT_GET_CLOCK_INFO_SIZE,            0 },
-+	{ add_device,              MGMT_ADD_DEVICE_SIZE,                0 },
-+	{ remove_device,           MGMT_REMOVE_DEVICE_SIZE,             0 },
-+	{ load_conn_param,         MGMT_LOAD_CONN_PARAM_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ read_unconf_index_list,  MGMT_READ_UNCONF_INDEX_LIST_SIZE,
-+						HCI_MGMT_NO_HDEV },
-+	{ read_config_info,        MGMT_READ_CONFIG_INFO_SIZE,
-+						HCI_MGMT_UNCONFIGURED },
-+	{ set_external_config,     MGMT_SET_EXTERNAL_CONFIG_SIZE,
-+						HCI_MGMT_UNCONFIGURED },
-+	{ set_public_address,      MGMT_SET_PUBLIC_ADDRESS_SIZE,
-+						HCI_MGMT_UNCONFIGURED },
-+	{ start_service_discovery, MGMT_START_SERVICE_DISCOVERY_SIZE,
-+						HCI_MGMT_VAR_LEN },
+-struct pending_cmd {
++struct mgmt_pending_cmd {
+ 	struct list_head list;
+ 	u16 opcode;
+ 	int index;
+@@ -143,7 +143,7 @@ struct pending_cmd {
+ 	size_t param_len;
+ 	struct sock *sk;
+ 	void *user_data;
+-	int (*cmd_complete)(struct pending_cmd *cmd, u8 status);
++	int (*cmd_complete)(struct mgmt_pending_cmd *cmd, u8 status);
  };
  
- int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
-@@ -6177,6 +6190,7 @@ int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
- 	u16 opcode, index, len;
- 	struct hci_dev *hdev = NULL;
- 	const struct hci_mgmt_handler *handler;
-+	bool var_len, no_hdev;
+ /* HCI to MGMT error code conversion table */
+@@ -751,9 +751,10 @@ static u8 *create_uuid128_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
+ 	return ptr;
+ }
+ 
+-static struct pending_cmd *mgmt_pending_find(u16 opcode, struct hci_dev *hdev)
++static struct mgmt_pending_cmd *mgmt_pending_find(u16 opcode,
++						  struct hci_dev *hdev)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
+ 		if (cmd->opcode == opcode)
+@@ -763,11 +764,11 @@ static struct pending_cmd *mgmt_pending_find(u16 opcode, struct hci_dev *hdev)
+ 	return NULL;
+ }
+ 
+-static struct pending_cmd *mgmt_pending_find_data(u16 opcode,
+-						  struct hci_dev *hdev,
+-						  const void *data)
++static struct mgmt_pending_cmd *mgmt_pending_find_data(u16 opcode,
++						       struct hci_dev *hdev,
++						       const void *data)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
+ 		if (cmd->user_data != data)
+@@ -832,7 +833,7 @@ static void update_scan_rsp_data(struct hci_request *req)
+ 
+ static u8 get_adv_discov_flags(struct hci_dev *hdev)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	/* If there's a pending mgmt command the flags will not yet have
+ 	 * their final values, so check for this first.
+@@ -1040,7 +1041,7 @@ static void update_class(struct hci_request *req)
+ 
+ static bool get_connectable(struct hci_dev *hdev)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	/* If there's a pending mgmt command the flag will not yet have
+ 	 * it's final value, so check for this first.
+@@ -1190,18 +1191,18 @@ static int read_controller_info(struct sock *sk, struct hci_dev *hdev,
+ 				 sizeof(rp));
+ }
+ 
+-static void mgmt_pending_free(struct pending_cmd *cmd)
++static void mgmt_pending_free(struct mgmt_pending_cmd *cmd)
+ {
+ 	sock_put(cmd->sk);
+ 	kfree(cmd->param);
+ 	kfree(cmd);
+ }
+ 
+-static struct pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
+-					    struct hci_dev *hdev, void *data,
+-					    u16 len)
++static struct mgmt_pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
++						 struct hci_dev *hdev,
++						 void *data, u16 len)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	cmd = kzalloc(sizeof(*cmd), GFP_KERNEL);
+ 	if (!cmd)
+@@ -1227,11 +1228,11 @@ static struct pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
+ }
+ 
+ static void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+-				 void (*cb)(struct pending_cmd *cmd,
++				 void (*cb)(struct mgmt_pending_cmd *cmd,
+ 					    void *data),
+ 				 void *data)
+ {
+-	struct pending_cmd *cmd, *tmp;
++	struct mgmt_pending_cmd *cmd, *tmp;
+ 
+ 	list_for_each_entry_safe(cmd, tmp, &hdev->mgmt_pending, list) {
+ 		if (opcode > 0 && cmd->opcode != opcode)
+@@ -1241,7 +1242,7 @@ static void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+ 	}
+ }
+ 
+-static void mgmt_pending_remove(struct pending_cmd *cmd)
++static void mgmt_pending_remove(struct mgmt_pending_cmd *cmd)
+ {
+ 	list_del(&cmd->list);
+ 	mgmt_pending_free(cmd);
+@@ -1370,7 +1371,7 @@ static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		       u16 len)
+ {
+ 	struct mgmt_mode *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
  	int err;
  
- 	BT_DBG("got %zu bytes", msglen);
-@@ -6203,6 +6217,16 @@ int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
- 		goto done;
- 	}
+ 	BT_DBG("request for %s", hdev->name);
+@@ -1452,7 +1453,7 @@ struct cmd_lookup {
+ 	u8 mgmt_status;
+ };
  
-+	if (opcode >= chan->handler_count ||
-+	    chan->handlers[opcode].func == NULL) {
-+		BT_DBG("Unknown op %u", opcode);
-+		err = cmd_status(sk, index, opcode,
-+				 MGMT_STATUS_UNKNOWN_COMMAND);
-+		goto done;
-+	}
-+
-+	handler = &chan->handlers[opcode];
-+
- 	if (index != MGMT_INDEX_NONE) {
- 		hdev = hci_dev_get(index);
- 		if (!hdev) {
-@@ -6220,41 +6244,23 @@ int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
- 		}
+-static void settings_rsp(struct pending_cmd *cmd, void *data)
++static void settings_rsp(struct mgmt_pending_cmd *cmd, void *data)
+ {
+ 	struct cmd_lookup *match = data;
  
- 		if (test_bit(HCI_UNCONFIGURED, &hdev->dev_flags) &&
--		    opcode != MGMT_OP_READ_CONFIG_INFO &&
--		    opcode != MGMT_OP_SET_EXTERNAL_CONFIG &&
--		    opcode != MGMT_OP_SET_PUBLIC_ADDRESS) {
-+		    !(handler->flags & HCI_MGMT_UNCONFIGURED)) {
- 			err = cmd_status(sk, index, opcode,
- 					 MGMT_STATUS_INVALID_INDEX);
- 			goto done;
- 		}
- 	}
+@@ -1468,7 +1469,7 @@ static void settings_rsp(struct pending_cmd *cmd, void *data)
+ 	mgmt_pending_free(cmd);
+ }
  
--	if (opcode >= chan->handler_count ||
--	    chan->handlers[opcode].func == NULL) {
--		BT_DBG("Unknown op %u", opcode);
--		err = cmd_status(sk, index, opcode,
--				 MGMT_STATUS_UNKNOWN_COMMAND);
--		goto done;
--	}
--
--	if (hdev && (opcode <= MGMT_OP_READ_INDEX_LIST ||
--		     opcode == MGMT_OP_READ_UNCONF_INDEX_LIST)) {
--		err = cmd_status(sk, index, opcode,
--				 MGMT_STATUS_INVALID_INDEX);
--		goto done;
--	}
--
--	if (!hdev && (opcode > MGMT_OP_READ_INDEX_LIST &&
--		      opcode != MGMT_OP_READ_UNCONF_INDEX_LIST)) {
-+	no_hdev = (handler->flags & HCI_MGMT_NO_HDEV);
-+	if (no_hdev != !hdev) {
- 		err = cmd_status(sk, index, opcode,
- 				 MGMT_STATUS_INVALID_INDEX);
- 		goto done;
- 	}
+-static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
++static void cmd_status_rsp(struct mgmt_pending_cmd *cmd, void *data)
+ {
+ 	u8 *status = data;
  
--	handler = &chan->handlers[opcode];
--
--	if ((handler->var_len && len < handler->data_len) ||
--	    (!handler->var_len && len != handler->data_len)) {
-+	var_len = (handler->flags & HCI_MGMT_VAR_LEN);
-+	if ((var_len && len < handler->data_len) ||
-+	    (!var_len && len != handler->data_len)) {
- 		err = cmd_status(sk, index, opcode,
- 				 MGMT_STATUS_INVALID_PARAMS);
- 		goto done;
+@@ -1476,7 +1477,7 @@ static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
+ 	mgmt_pending_remove(cmd);
+ }
+ 
+-static void cmd_complete_rsp(struct pending_cmd *cmd, void *data)
++static void cmd_complete_rsp(struct mgmt_pending_cmd *cmd, void *data)
+ {
+ 	if (cmd->cmd_complete) {
+ 		u8 *status = data;
+@@ -1490,13 +1491,13 @@ static void cmd_complete_rsp(struct pending_cmd *cmd, void *data)
+ 	cmd_status_rsp(cmd, data);
+ }
+ 
+-static int generic_cmd_complete(struct pending_cmd *cmd, u8 status)
++static int generic_cmd_complete(struct mgmt_pending_cmd *cmd, u8 status)
+ {
+ 	return mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, status,
+ 				 cmd->param, cmd->param_len);
+ }
+ 
+-static int addr_cmd_complete(struct pending_cmd *cmd, u8 status)
++static int addr_cmd_complete(struct mgmt_pending_cmd *cmd, u8 status)
+ {
+ 	return mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, status,
+ 				 cmd->param, sizeof(struct mgmt_addr_info));
+@@ -1525,7 +1526,7 @@ static u8 mgmt_le_support(struct hci_dev *hdev)
+ static void set_discoverable_complete(struct hci_dev *hdev, u8 status,
+ 				      u16 opcode)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct mgmt_mode *cp;
+ 	struct hci_request req;
+ 	bool changed;
+@@ -1586,7 +1587,7 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			    u16 len)
+ {
+ 	struct mgmt_cp_set_discoverable *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	u16 timeout;
+ 	u8 scan;
+@@ -1785,7 +1786,7 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
+ static void set_connectable_complete(struct hci_dev *hdev, u8 status,
+ 				     u16 opcode)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct mgmt_mode *cp;
+ 	bool conn_changed, discov_changed;
+ 
+@@ -1865,7 +1866,7 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			   u16 len)
+ {
+ 	struct mgmt_mode *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	u8 scan;
+ 	int err;
+@@ -2002,7 +2003,7 @@ static int set_link_security(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			     u16 len)
+ {
+ 	struct mgmt_mode *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	u8 val, status;
+ 	int err;
+ 
+@@ -2071,7 +2072,7 @@ failed:
+ static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ {
+ 	struct mgmt_mode *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	u8 status;
+ 	int err;
+ 
+@@ -2250,7 +2251,7 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ {
+ 	struct mgmt_mode *cp = data;
+ 	struct hci_cp_write_le_host_supported hci_cp;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	int err;
+ 	u8 val, enabled;
+@@ -2343,7 +2344,7 @@ unlock:
+  */
+ static bool pending_eir_or_class(struct hci_dev *hdev)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
+ 		switch (cmd->opcode) {
+@@ -2379,7 +2380,7 @@ static u8 get_uuid_size(const u8 *uuid)
+ 
+ static void mgmt_class_complete(struct hci_dev *hdev, u16 mgmt_op, u8 status)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	hci_dev_lock(hdev);
+ 
+@@ -2406,7 +2407,7 @@ static void add_uuid_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ {
+ 	struct mgmt_cp_add_uuid *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	struct bt_uuid *uuid;
+ 	int err;
+@@ -2486,7 +2487,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		       u16 len)
+ {
+ 	struct mgmt_cp_remove_uuid *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct bt_uuid *match, *tmp;
+ 	u8 bt_uuid_any[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ 	struct hci_request req;
+@@ -2572,7 +2573,7 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			 u16 len)
+ {
+ 	struct mgmt_cp_set_dev_class *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	int err;
+ 
+@@ -2740,7 +2741,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct mgmt_cp_unpair_device *cp = data;
+ 	struct mgmt_rp_unpair_device rp;
+ 	struct hci_cp_disconnect dc;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_conn *conn;
+ 	int err;
+ 
+@@ -2854,7 +2855,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
+ {
+ 	struct mgmt_cp_disconnect *cp = data;
+ 	struct mgmt_rp_disconnect rp;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_conn *conn;
+ 	int err;
+ 
+@@ -2994,7 +2995,7 @@ unlock:
+ static int send_pin_code_neg_reply(struct sock *sk, struct hci_dev *hdev,
+ 				   struct mgmt_cp_pin_code_neg_reply *cp)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	int err;
+ 
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_PIN_CODE_NEG_REPLY, hdev, cp,
+@@ -3016,7 +3017,7 @@ static int pin_code_reply(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct hci_conn *conn;
+ 	struct mgmt_cp_pin_code_reply *cp = data;
+ 	struct hci_cp_pin_code_reply reply;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	int err;
+ 
+ 	BT_DBG("");
+@@ -3096,10 +3097,10 @@ static int set_io_capability(struct sock *sk, struct hci_dev *hdev, void *data,
+ 				 NULL, 0);
+ }
+ 
+-static struct pending_cmd *find_pairing(struct hci_conn *conn)
++static struct mgmt_pending_cmd *find_pairing(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
+ 		if (cmd->opcode != MGMT_OP_PAIR_DEVICE)
+@@ -3114,7 +3115,7 @@ static struct pending_cmd *find_pairing(struct hci_conn *conn)
+ 	return NULL;
+ }
+ 
+-static int pairing_complete(struct pending_cmd *cmd, u8 status)
++static int pairing_complete(struct mgmt_pending_cmd *cmd, u8 status)
+ {
+ 	struct mgmt_rp_pair_device rp;
+ 	struct hci_conn *conn = cmd->user_data;
+@@ -3146,7 +3147,7 @@ static int pairing_complete(struct pending_cmd *cmd, u8 status)
+ void mgmt_smp_complete(struct hci_conn *conn, bool complete)
+ {
+ 	u8 status = complete ? MGMT_STATUS_SUCCESS : MGMT_STATUS_FAILED;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	cmd = find_pairing(conn);
+ 	if (cmd) {
+@@ -3157,7 +3158,7 @@ void mgmt_smp_complete(struct hci_conn *conn, bool complete)
+ 
+ static void pairing_complete_cb(struct hci_conn *conn, u8 status)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	BT_DBG("status %u", status);
+ 
+@@ -3173,7 +3174,7 @@ static void pairing_complete_cb(struct hci_conn *conn, u8 status)
+ 
+ static void le_pairing_complete_cb(struct hci_conn *conn, u8 status)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	BT_DBG("status %u", status);
+ 
+@@ -3195,7 +3196,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ {
+ 	struct mgmt_cp_pair_device *cp = data;
+ 	struct mgmt_rp_pair_device rp;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	u8 sec_level, auth_type;
+ 	struct hci_conn *conn;
+ 	int err;
+@@ -3321,7 +3322,7 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			      u16 len)
+ {
+ 	struct mgmt_addr_info *addr = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_conn *conn;
+ 	int err;
+ 
+@@ -3364,7 +3365,7 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
+ 			     struct mgmt_addr_info *addr, u16 mgmt_op,
+ 			     u16 hci_op, __le32 passkey)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_conn *conn;
+ 	int err;
+ 
+@@ -3507,7 +3508,7 @@ static void update_name(struct hci_request *req)
+ static void set_name_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+ 	struct mgmt_cp_set_local_name *cp;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	BT_DBG("status 0x%02x", status);
+ 
+@@ -3536,7 +3537,7 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			  u16 len)
+ {
+ 	struct mgmt_cp_set_local_name *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	int err;
+ 
+@@ -3604,7 +3605,7 @@ failed:
+ static int read_local_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 			       void *data, u16 data_len)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	int err;
+ 
+ 	BT_DBG("%s", hdev->name);
+@@ -3893,7 +3894,7 @@ static bool trigger_discovery(struct hci_request *req, u8 *status)
+ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
+ 				     u16 opcode)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	unsigned long timeout;
+ 
+ 	BT_DBG("status %d", status);
+@@ -3961,7 +3962,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 			   void *data, u16 len)
+ {
+ 	struct mgmt_cp_start_discovery *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	u8 status;
+ 	int err;
+@@ -4023,7 +4024,8 @@ failed:
+ 	return err;
+ }
+ 
+-static int service_discovery_cmd_complete(struct pending_cmd *cmd, u8 status)
++static int service_discovery_cmd_complete(struct mgmt_pending_cmd *cmd,
++					  u8 status)
+ {
+ 	return mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, status,
+ 				 cmd->param, 1);
+@@ -4033,7 +4035,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 				   void *data, u16 len)
+ {
+ 	struct mgmt_cp_start_service_discovery *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	const u16 max_uuid_count = ((U16_MAX - sizeof(*cp)) / 16);
+ 	u16 uuid_count, expected_len;
+@@ -4139,7 +4141,7 @@ failed:
+ 
+ static void stop_discovery_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	BT_DBG("status %d", status);
+ 
+@@ -4161,7 +4163,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			  u16 len)
+ {
+ 	struct mgmt_cp_stop_discovery *mgmt_cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	int err;
+ 
+@@ -4400,7 +4402,7 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			   u16 len)
+ {
+ 	struct mgmt_mode *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	u8 val, enabled, status;
+ 	int err;
+@@ -4577,7 +4579,7 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
+ static void fast_connectable_complete(struct hci_dev *hdev, u8 status,
+ 				      u16 opcode)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	BT_DBG("status 0x%02x", status);
+ 
+@@ -4612,7 +4614,7 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
+ 				void *data, u16 len)
+ {
+ 	struct mgmt_mode *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	int err;
+ 
+@@ -4675,7 +4677,7 @@ unlock:
+ 
+ static void set_bredr_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	BT_DBG("status 0x%02x", status);
+ 
+@@ -4708,7 +4710,7 @@ unlock:
+ static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ {
+ 	struct mgmt_mode *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	int err;
+ 
+@@ -4819,7 +4821,7 @@ unlock:
+ 
+ static void sc_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct mgmt_mode *cp;
+ 
+ 	BT_DBG("%s status %u", hdev->name, status);
+@@ -4866,7 +4868,7 @@ static int set_secure_conn(struct sock *sk, struct hci_dev *hdev,
+ 			   void *data, u16 len)
+ {
+ 	struct mgmt_mode *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	u8 val;
+ 	int err;
+@@ -5242,7 +5244,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
+ 
+-static int conn_info_cmd_complete(struct pending_cmd *cmd, u8 status)
++static int conn_info_cmd_complete(struct mgmt_pending_cmd *cmd, u8 status)
+ {
+ 	struct hci_conn *conn = cmd->user_data;
+ 	struct mgmt_rp_get_conn_info rp;
+@@ -5273,7 +5275,7 @@ static void conn_info_refresh_complete(struct hci_dev *hdev, u8 hci_status,
+ 				       u16 opcode)
+ {
+ 	struct hci_cp_read_rssi *cp;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_conn *conn;
+ 	u16 handle;
+ 	u8 status;
+@@ -5386,7 +5388,7 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		struct hci_request req;
+ 		struct hci_cp_read_tx_power req_txp_cp;
+ 		struct hci_cp_read_rssi req_rssi_cp;
+-		struct pending_cmd *cmd;
++		struct mgmt_pending_cmd *cmd;
+ 
+ 		hci_req_init(&req, hdev);
+ 		req_rssi_cp.handle = cpu_to_le16(conn->handle);
+@@ -5443,7 +5445,7 @@ unlock:
+ 	return err;
+ }
+ 
+-static int clock_info_cmd_complete(struct pending_cmd *cmd, u8 status)
++static int clock_info_cmd_complete(struct mgmt_pending_cmd *cmd, u8 status)
+ {
+ 	struct hci_conn *conn = cmd->user_data;
+ 	struct mgmt_rp_get_clock_info rp;
+@@ -5482,7 +5484,7 @@ complete:
+ static void get_clock_info_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+ 	struct hci_cp_read_clock *hci_cp;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_conn *conn;
+ 
+ 	BT_DBG("%s status %u", hdev->name, status);
+@@ -5517,7 +5519,7 @@ static int get_clock_info(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct mgmt_cp_get_clock_info *cp = data;
+ 	struct mgmt_rp_get_clock_info rp;
+ 	struct hci_cp_read_clock hci_cp;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	struct hci_conn *conn;
+ 	int err;
+@@ -5660,7 +5662,7 @@ static void device_added(struct sock *sk, struct hci_dev *hdev,
+ 
+ static void add_device_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	BT_DBG("status 0x%02x", status);
+ 
+@@ -5681,7 +5683,7 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 		      void *data, u16 len)
+ {
+ 	struct mgmt_cp_add_device *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	u8 auto_conn, addr_type;
+ 	int err;
+@@ -5783,7 +5785,7 @@ static void device_removed(struct sock *sk, struct hci_dev *hdev,
+ 
+ static void remove_device_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	BT_DBG("status 0x%02x", status);
+ 
+@@ -5804,7 +5806,7 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 			 void *data, u16 len)
+ {
+ 	struct mgmt_cp_remove_device *cp = data;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+ 	int err;
+ 
+@@ -6507,7 +6509,7 @@ new_settings:
+ 
+ void mgmt_set_powered_failed(struct hci_dev *hdev, int err)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	u8 status;
+ 
+ 	cmd = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
+@@ -6758,7 +6760,7 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
+ 		    sizeof(*ev) + eir_len, NULL);
+ }
+ 
+-static void disconnect_rsp(struct pending_cmd *cmd, void *data)
++static void disconnect_rsp(struct mgmt_pending_cmd *cmd, void *data)
+ {
+ 	struct sock **sk = data;
+ 
+@@ -6770,7 +6772,7 @@ static void disconnect_rsp(struct pending_cmd *cmd, void *data)
+ 	mgmt_pending_remove(cmd);
+ }
+ 
+-static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
++static void unpair_device_rsp(struct mgmt_pending_cmd *cmd, void *data)
+ {
+ 	struct hci_dev *hdev = data;
+ 	struct mgmt_cp_unpair_device *cp = cmd->param;
+@@ -6783,7 +6785,7 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
+ 
+ bool mgmt_powering_down(struct hci_dev *hdev)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	struct mgmt_mode *cp;
+ 
+ 	cmd = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
+@@ -6838,7 +6840,7 @@ void mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ {
+ 	u8 bdaddr_type = link_to_bdaddr(link_type, addr_type);
+ 	struct mgmt_cp_disconnect *cp;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	mgmt_pending_foreach(MGMT_OP_UNPAIR_DEVICE, hdev, unpair_device_rsp,
+ 			     hdev);
+@@ -6893,7 +6895,7 @@ void mgmt_pin_code_request(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 secure)
+ void mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 				  u8 status)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	cmd = mgmt_pending_find(MGMT_OP_PIN_CODE_REPLY, hdev);
+ 	if (!cmd)
+@@ -6906,7 +6908,7 @@ void mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ void mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 				      u8 status)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	cmd = mgmt_pending_find(MGMT_OP_PIN_CODE_NEG_REPLY, hdev);
+ 	if (!cmd)
+@@ -6951,7 +6953,7 @@ static int user_pairing_resp_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 				      u8 link_type, u8 addr_type, u8 status,
+ 				      u8 opcode)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	cmd = mgmt_pending_find(opcode, hdev);
+ 	if (!cmd)
+@@ -7012,7 +7014,7 @@ int mgmt_user_passkey_notify(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ void mgmt_auth_failed(struct hci_conn *conn, u8 hci_status)
+ {
+ 	struct mgmt_ev_auth_failed ev;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 	u8 status = mgmt_status(hci_status);
+ 
+ 	bacpy(&ev.addr.bdaddr, &conn->dst);
+@@ -7127,7 +7129,7 @@ void mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status)
+ 	hci_req_run(&req, NULL);
+ }
+ 
+-static void sk_lookup(struct pending_cmd *cmd, void *data)
++static void sk_lookup(struct mgmt_pending_cmd *cmd, void *data)
+ {
+ 	struct cmd_lookup *match = data;
+ 
+@@ -7157,7 +7159,7 @@ void mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
+ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status)
+ {
+ 	struct mgmt_cp_set_local_name ev;
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	if (status)
+ 		return;
+@@ -7185,7 +7187,7 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+ 				       u8 *rand192, u8 *hash256, u8 *rand256,
+ 				       u8 status)
+ {
+-	struct pending_cmd *cmd;
++	struct mgmt_pending_cmd *cmd;
+ 
+ 	BT_DBG("%s status %u", hdev->name, status);
+ 
 -- 
 2.1.0
 
