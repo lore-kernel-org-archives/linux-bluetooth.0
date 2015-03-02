@@ -1,127 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Peter Hurley <peter@hurleysoftware.com>
+Subject: Blocking ops when !TASK_RUNNING in bnep
+Date: Mon, 02 Mar 2015 15:20:49 +0100
+Message-ID: <1491385.CDOh5cxHec@leonov>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKD=urtd9P1yo+BDCp1_LrkGHBxozKmjZk-+mcjogO4UQ@mail.gmail.com>
-References: <1425024999-29789-1-git-send-email-armansito@chromium.org>
-	<CABBYNZKD=urtd9P1yo+BDCp1_LrkGHBxozKmjZk-+mcjogO4UQ@mail.gmail.com>
-Date: Mon, 2 Mar 2015 16:30:24 +0200
-Message-ID: <CABBYNZ+Srd6btfk5BJERsm8AxK=+QzS_=Ysgt6nRfh1moRvW5g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 00/16] Implement GATT server D-Bus API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi,
 
-On Fri, Feb 27, 2015 at 4:15 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Arman,
->
-> On Fri, Feb 27, 2015 at 10:16 AM, Arman Uguray <armansito@chromium.org> wrote:
->> *v2: - Introduced g_dbus_client_new_full instead of adding a new argument to
->>        g_dbus_client_new.
->>
->>      - Removed the crash fix patch. I'll fix this properly in a separate patch
->>        set by making discovery procedures cancelable.
->>
->> *v1: - Removed src/gatt.* based on email discussion.
->>
->>      - After some discussions on IRC, made ObjectManager mandatory on a
->>        per-service-subtree basis to reduce the number of unnecessary
->>        object processing and caching. One initial idea was to pass the
->>        service subtree directly to RegisterService but one of the
->>        concerns was that we should allow applications to use existing
->>        tooling for the standard ObjectManager interface.
->>
->>      - Minor fixes based on comments, also fixed things so that
->>        descriptors with CCC and CEP UUIDs cannot be registered by
->>        external apps.
->>
->>      - Included a fix for recent crashes seen in unit/test-gatt.
->>
->> This patch set implements the GATT server D-Bus API and provides an
->> example application in Python to demonstrate how the API can be used
->> to export GATT services of various functionality.
->>
->> Some of the basics of the code is very similar to what was already in
->> src/gatt-dbus.c, especially the bits that use gdbus/client to fetch
->> and interact with remote objects. However, src/gatt-dbus had a lot of
->> code that used the now-defunct src/gatt (which was going to be the new
->> GATT abstraction for bluetoothd before we built shared/gatt), so I
->> decided to remove gatt-dbus entirely and start from scratch with
->> src/gatt-manager.
->>
->> Apart from these the code is fairly straight-forward. New additions to
->> src/gatt-database have been made to allow upper layers to store CCC
->> descriptors and send out notifications. The API automatically creates
->> CCC and CEP (Characteristic Extended Properties) descriptors based on
->> characteristic properties.
->>
->> Arman Uguray (16):
->>   gdbus/client: Don't GetManagedObjects w/o handlers
->>   gdbus/client: Allow specifying ObjectManager path
->>   doc/gatt-api.txt: New ObjectManager requirements
->>   core: gatt: Add GattManager1 stubs
->>   core: gatt: Implement GattManager1.RegisterService
->>   core: gatt: Register characteristics
->>   core: gatt: Support ReadValue for characteristics
->>   core: gatt: Support WriteValue for characteristics
->>   core: gatt: Make CCC addition API public
->>   core: gatt: Create CCC for external characteristic
->>   core: gatt: Add btd_gatt_database_notify function
->>   core: gatt: Send not/ind for D-Bus characteristics
->>   core: gatt: Create CEP for external characteristic
->>   core: gatt: Register descriptors
->>   core: gatt: Support descriptor reads/writes
->>   tools: Added a Python example for GATT server API
->>
->>  Makefile.am         |    3 +-
->>  doc/gatt-api.txt    |   74 ++-
->>  gdbus/client.c      |   27 +-
->>  gdbus/gdbus.h       |    4 +
->>  src/adapter.c       |   18 +-
->>  src/gatt-database.c |  114 ++++-
->>  src/gatt-database.h |   16 +
->>  src/gatt-dbus.c     |  658 ------------------------
->>  src/gatt-dbus.h     |   25 -
->>  src/gatt-manager.c  | 1383 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>  src/gatt-manager.h  |   23 +
->>  src/gatt.c          |  321 ------------
->>  src/gatt.h          |  121 -----
->>  src/main.c          |    5 -
->>  tools/gatt-example  |  463 +++++++++++++++++
->>  15 files changed, 2089 insertions(+), 1166 deletions(-)
->>  delete mode 100644 src/gatt-dbus.c
->>  delete mode 100644 src/gatt-dbus.h
->>  create mode 100644 src/gatt-manager.c
->>  create mode 100644 src/gatt-manager.h
->>  delete mode 100644 src/gatt.c
->>  delete mode 100644 src/gatt.h
->>  create mode 100755 tools/gatt-example
->>
->> --
->> 2.2.0.rc0.207.ga3a616c
->
-> Ive applied patches 1-3, the reason I stop there is that while review
-> the other patches it looks like gatt-manager.c will have too many
-> dependencies on gatt-database.c, so many that I would consider have
-> this on the same file otherwise we end up with bad API that use
-> handles causing extra lookups, while if this code were in the same
-> files all the CCC handling becomes quite simple and we don't even need
-> another struct since btd_gatt_database could be used directly as
-> context instead.
+While running android-tester on bluetooth-next I've noticed following trace
+when running PAN tests.
 
-I went ahead and did the change to gatt-database.c for patches until
-core: gatt: Support WriteValue for characteristics, note add some
-fixes, lets try to gets the remaining rebased as well.
->
->
-> --
-> Luiz Augusto von Dentz
+I'm not sure how to fix this properly but those seem to be somewhat similar to 
+accept fixes from few weeks back by Peter.
 
 
+[  444.282000] ------------[ cut here ]------------
+[  444.282032] WARNING: CPU: 1 PID: 10389 at kernel/sched/core.c:7354 
+__might_sleep+0x7a/0x90()
+[  444.282039] do not call blocking ops when !TASK_RUNNING; state=1 set at 
+[<ffffffff8187aef8>] bnep_session+0xa8/0x910
+[  444.282041] Modules linked in:
+[  444.282047] CPU: 1 PID: 10389 Comm: kbnepd bt-pan Not tainted 3.19.0+ #21
+[  444.282050] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[  444.282052]  ffffffff81cd56e1 ffff880012863b58 ffffffff81962fa5 
+0000000000000000
+[  444.282058]  ffff880012863ba8 ffff880012863b98 ffffffff8104eff5 
+ffff880012863bd8
+[  444.282062]  ffffffff81d6f747 0000000000000939 0000000000000000 
+ffff88001c220000
+[  444.282067] Call Trace:
+[  444.282071]  [<ffffffff81962fa5>] dump_stack+0x4c/0x65
+[  444.282075]  [<ffffffff8104eff5>] warn_slowpath_common+0x85/0xc0
+[  444.282079]  [<ffffffff8104f071>] warn_slowpath_fmt+0x41/0x50
+[  444.282081]  [<ffffffff8187aef8>] ? bnep_session+0xa8/0x910
+[  444.282084]  [<ffffffff8187aef8>] ? bnep_session+0xa8/0x910
+[  444.282086]  [<ffffffff810729aa>] __might_sleep+0x7a/0x90
+[  444.282089]  [<ffffffff816f8eda>] lock_sock_nested+0x2a/0xb0
+[  444.282093]  [<ffffffff81862191>] l2cap_sock_sendmsg+0x61/0x110
+[  444.282097]  [<ffffffff816f4f9f>] do_sock_sendmsg+0x7f/0xa0
+[  444.282100]  [<ffffffff816f5023>] kernel_sendmsg+0x53/0x70
+[  444.282102]  [<ffffffff8187b39c>] bnep_session+0x54c/0x910
+[  444.282105]  [<ffffffff81072b59>] ? finish_task_switch+0x49/0x100
+[  444.282108]  [<ffffffff8107a260>] ? wake_up_state+0x10/0x10
+[  444.282111]  [<ffffffff8187ae50>] ? bnep_rx_control+0x400/0x400
+[  444.282113]  [<ffffffff8187ae50>] ? bnep_rx_control+0x400/0x400
+[  444.282116]  [<ffffffff8106d3ea>] kthread+0xea/0x100
+[  444.282119]  [<ffffffff8106d300>] ? kthread_create_on_node+0x220/0x220
+[  444.282123]  [<ffffffff8196fcac>] ret_from_fork+0x7c/0xb0
+[  444.282125]  [<ffffffff8106d300>] ? kthread_create_on_node+0x220/0x220
+[  444.282127] ---[ end trace 4a98530915b46f89 ]---
 
 -- 
-Luiz Augusto von Dentz
+BR
+Szymon Janc
