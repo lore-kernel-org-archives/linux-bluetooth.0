@@ -1,106 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] lib/uuid: Fix bt_uuid_to_le for 128 Bits
-Date: Mon,  2 Mar 2015 13:35:46 +0200
-Message-Id: <1425296146-12650-1-git-send-email-luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 06/12] profiles/network: Fix sending command responses
+Date: Mon, 02 Mar 2015 11:12:59 +0100
+Message-ID: <2614031.O79LzPuJtE@uw000953>
+In-Reply-To: <1424951614-8527-6-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1424951614-8527-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1424951614-8527-6-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Grzegorz,
 
-The convention is that 128 Bits are always defined in big endian format
-therefore the bytes always needs to be swapped.
----
- lib/bluetooth.h   | 20 ++++++++++++--------
- lib/uuid.c        |  6 +++---
- src/shared/util.h | 10 ----------
- 3 files changed, 15 insertions(+), 21 deletions(-)
+On Thursday 26 of February 2015 12:53:28 Grzegorz Kolodziejczyk wrote:
+> Command response can be three bytes long (in case if command is not
+> understood) 1 byte(packet type) + 1 byte(control type) + 1 byte(unknown
+> control type). Command response can be also four bytes long if it's
+> response for setup connection, filter net type and filter multi addr,
+> 1 byte(packet type) + 1 byte(control type) + 2 byte(response message).
+> ---
+>  lib/bnep.h              |  6 +++++
+>  profiles/network/bnep.c | 59 +++++++++++++++++++++++++++++++++++--------------
+>  2 files changed, 48 insertions(+), 17 deletions(-)
+> 
+> diff --git a/lib/bnep.h b/lib/bnep.h
+> index 2bbfb17..aa46852 100644
+> --- a/lib/bnep.h
+> +++ b/lib/bnep.h
+> @@ -103,6 +103,12 @@ struct bnep_set_filter_req {
+>  	uint8_t  list[0];
+>  } __attribute__((packed));
+>  
+> +struct bnep_ctrl_cmd_not_understood_cmd {
+> +	uint8_t type;
+> +	uint8_t ctrl;
+> +	uint8_t unkn_ctrl;
+> +} __attribute__((packed));
+> +
+>  struct bnep_control_rsp {
+>  	uint8_t  type;
+>  	uint8_t  ctrl;
+> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+> index bef9b60..132dbab 100644
+> --- a/profiles/network/bnep.c
+> +++ b/profiles/network/bnep.c
+> @@ -549,16 +549,40 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
+>  	return err;
+>  }
+>  
+> -static ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl,
+> -								uint16_t resp)
+> +static ssize_t bnep_send_ctrl_rsp(int sk, uint8_t ctrl, uint16_t resp)
+>  {
+> -	struct bnep_control_rsp rsp;
+> +	ssize_t sent;
+>  
+> -	rsp.type = type;
+> -	rsp.ctrl = ctrl;
+> -	rsp.resp = htons(resp);
+> +	switch (ctrl) {
+> +	case BNEP_CMD_NOT_UNDERSTOOD: {
+> +		struct bnep_ctrl_cmd_not_understood_cmd rsp;
+>  
+> -	return send(sk, &rsp, sizeof(rsp), 0);
+> +		rsp.type = BNEP_CONTROL;
+> +		rsp.ctrl = ctrl;
+> +		rsp.unkn_ctrl = (uint8_t) resp;
+> +
+> +		sent = send(sk, &rsp, sizeof(rsp), 0);
+> +		break;
+> +	}
+> +	case BNEP_FILTER_MULT_ADDR_RSP:
+> +	case BNEP_FILTER_NET_TYPE_RSP:
+> +	case BNEP_SETUP_CONN_RSP: {
+> +		struct bnep_control_rsp rsp;
+> +
+> +		rsp.type = BNEP_CONTROL;
+> +		rsp.ctrl = ctrl;
+> +		rsp.resp = htons(resp);
+> +
+> +		sent = send(sk, &rsp, sizeof(rsp), 0);
+> +		break;
+> +	}
+> +	default:
+> +		error("wrong bnep response type");
+> +		sent = -1;
+> +		break;
+> +	}
+> +
+> +	return sent;
+>  }
+>  
+>  static uint16_t bnep_setup_decode(int sk, struct bnep_setup_conn_req *req,
+> @@ -637,16 +661,15 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+>  	/* Highest known Control command ID
+>  	 * is BNEP_FILTER_MULT_ADDR_RSP = 0x06 */
+>  	if (req->type == BNEP_CONTROL &&
+> -				req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
+> -		uint8_t pkt[3];
+> -
+> -		pkt[0] = BNEP_CONTROL;
+> -		pkt[1] = BNEP_CMD_NOT_UNDERSTOOD;
+> -		pkt[2] = req->ctrl;
+> +					req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
+> +		error("cmd not understood");
 
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index f214d81..6ca64b6 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -343,6 +343,16 @@ typedef struct {
- 	uint8_t data[16];
- } uint128_t;
- 
-+static inline void bswap_128(const void *src, void *dst)
-+{
-+	const uint8_t *s = src;
-+	uint8_t *d = dst;
-+	int i;
-+
-+	for (i = 0; i < 16; i++)
-+		d[15 - i] = s[i];
-+}
-+
- #if __BYTE_ORDER == __BIG_ENDIAN
- 
- #define ntoh64(x) (x)
-@@ -354,10 +364,7 @@ static inline void ntoh128(const uint128_t *src, uint128_t *dst)
- 
- static inline void btoh128(const uint128_t *src, uint128_t *dst)
- {
--	int i;
--
--	for (i = 0; i < 16; i++)
--		dst->data[15 - i] = src->data[i];
-+	bswap_128(src, dst);
- }
- 
- #else
-@@ -375,10 +382,7 @@ static inline uint64_t ntoh64(uint64_t n)
- 
- static inline void ntoh128(const uint128_t *src, uint128_t *dst)
- {
--	int i;
--
--	for (i = 0; i < 16; i++)
--		dst->data[15 - i] = src->data[i];
-+	bswap_128(src, dst);
- }
- 
- static inline void btoh128(const uint128_t *src, uint128_t *dst)
-diff --git a/lib/uuid.c b/lib/uuid.c
-index 3eb7dbe..4f34b17 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -302,10 +302,10 @@ int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
- 		return 0;
- 	case BT_UUID32:
- 		bt_uuid_to_uuid128(src, &uuid);
--		ntoh128(&uuid.value.u128, dst);
--		return 0;
-+		/* Fallthrough */
- 	case BT_UUID128:
--		ntoh128(&src->value.u128, dst);
-+		/* Convert from 128-bit BE to LE */
-+		bswap_128(&src->value.u128, dst);
- 		return 0;
- 	case BT_UUID_UNSPEC:
- 	default:
-diff --git a/src/shared/util.h b/src/shared/util.h
-index 7dba1b3..30b7d92 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -96,16 +96,6 @@ unsigned char util_get_dt(const char *parent, const char *name);
- uint8_t util_get_uid(unsigned int *bitmap, uint8_t max);
- void util_clear_uid(unsigned int *bitmap, uint8_t id);
- 
--static inline void bswap_128(const void *src, void *dst)
--{
--	const uint8_t *s = src;
--	uint8_t *d = dst;
--	int i;
--
--	for (i = 0; i < 16; i++)
--		d[15 - i] = s[i];
--}
--
- static inline uint16_t get_le16(const void *ptr)
- {
- 	return le16_to_cpu(get_unaligned((const uint16_t *) ptr));
+Please prefix error/info with "bnep: "
+
+> +		err = bnep_send_ctrl_rsp(sk, BNEP_CMD_NOT_UNDERSTOOD,
+> +								req->ctrl);
+> +		if (err < 0)
+> +			error("send not understood ctrl rsp error: %s (%d)",
+> +							strerror(errno), errno);
+>  
+> -		send(sk, pkt, sizeof(pkt), 0);
+> -
+> -		return -EINVAL;
+> +		return err;
+>  	}
+>  
+>  	/* Processing BNEP_SETUP_CONNECTION_REQUEST_MSG */
+> @@ -681,7 +704,9 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+>  		rsp = BNEP_CONN_NOT_ALLOWED;
+>  
+>  reply:
+> -	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
+> +	err = bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp);
+> +	if (err < 0)
+> +		error("send ctrl rsp error: %s (%d)", strerror(errno), errno);
+>  
+>  	return err;
+>  }
+> 
+
 -- 
-2.1.0
-
+Best regards, 
+Szymon Janc
