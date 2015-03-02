@@ -1,45 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: bt dongle goes awry after too many connections
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAGxYWpZ8cfgtdO8ZX39cPBOs4OZ=PaO5pOHotjBt0u7HsnVXFA@mail.gmail.com>
-Date: Mon, 2 Mar 2015 16:17:54 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6EDCDCB4-6F4D-4DE6-88DB-88D333FC2CCC@holtmann.org>
-References: <CAGxYWpZ8cfgtdO8ZX39cPBOs4OZ=PaO5pOHotjBt0u7HsnVXFA@mail.gmail.com>
-To: Tim Tisdall <tisdall@gmail.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH] core/gatt: Fix creating database without exprimental interfaces
+Date: Mon,  2 Mar 2015 23:00:05 +0100
+Message-Id: <1425333605-4310-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tim,
+If bluetoothd is started without -E option gatt database should still
+be created (just without experimental D-Bus interfaces).
 
-> I have a "0a5c:21e8 Broadcom Corp.BCM20702A0 Bluetooth 4.0" usb
-> bluetooth dongle I'm using to connect to multiple BLE devices.  It
-> used to be that I could connect to 7 devices with no issues and then
-> when I tried to connect to the 8th device I'd get a
-> CONNECTION_LIMIT_EXCEEDED error.  In my code I would then tag that
-> dongle as having a connection limit of 7 and limit the number of
-> connections.
-> 
-> Recently I was using this code and found that it no longer works.  The
-> dongle seems to "successfully" connect to ~13 devices but things don't
-> work properly.  At least half of the devices no longer respond to GATT
-> commands sent to it.  I issue a GATT command after connecting to each
-> device to read some attributes and most simply do nothing (no error,
-> no response, nothing).
-> 
-> Any way, I'm not really familiar with how things are laid out in the
-> kernel so I'm not really sure where that CONNECTION_LIMIT_EXCEEDED was
-> being created before and why it's no longer working as expected.  I
-> tried looking through the git logs in "btusb" and "bluetooth" modules
-> and didn't really see anything pertinent.
+This fix registering adapters if bluetoothd was started without -E
+option.
+---
+ src/gatt-database.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-have to tried to install the firmware for the Broadcom dongle. It could be well that the firmware update fixes a few of these bugs with the LE connection behavior.
-
-You can grab the firmware file from the Windows driver and use the hex2hcd utility to convert it into a format that the btusb.ko kernel driver understands.
-
-Regards
-
-Marcel
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 65100da..6f081fa 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -73,6 +73,7 @@ struct btd_gatt_database {
+ 	struct gatt_db_attribute *svc_chngd;
+ 	struct gatt_db_attribute *svc_chngd_ccc;
+ 	struct queue *services;
++	bool dbus_registered;
+ };
+ 
+ struct external_service {
+@@ -298,6 +299,7 @@ static void service_free(void *data)
+ static void gatt_database_free(void *data)
+ {
+ 	struct btd_gatt_database *database = data;
++	const char *path = adapter_get_path(database->adapter);
+ 
+ 	if (database->le_io) {
+ 		g_io_channel_shutdown(database->le_io, FALSE, NULL);
+@@ -316,6 +318,10 @@ static void gatt_database_free(void *data)
+ 	if (database->gap_handle)
+ 		adapter_service_remove(database->adapter, database->gap_handle);
+ 
++	if (database->dbus_registered)
++		g_dbus_unregister_interface(btd_get_dbus_connection(), path,
++							GATT_MANAGER_IFACE);
++
+ 	/* TODO: Persistently store CCC states before freeing them */
+ 	queue_destroy(database->device_states, device_state_free);
+ 	queue_destroy(database->services, service_free);
+@@ -1678,11 +1684,11 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
+ 						manager_methods, NULL, NULL,
+ 						database, NULL)) {
+ 		error("Failed to register " GATT_MANAGER_IFACE);
+-		goto fail;
+-	}
+-
+-	DBG("GATT Manager registered for adapter: %s",
++	} else {
++		DBG("GATT Manager registered for adapter: %s",
+ 						adapter_get_path(adapter));
++		database->dbus_registered = true;
++	}
+ 
+ 	register_core_services(database);
+ 
+-- 
+2.1.4
 
