@@ -1,31 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 02 Mar 2015 14:48:13 -0500 (EST)
-Message-Id: <20150302.144813.2240523360918229942.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2015-03-02
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20150302065354.GA3613@t440s.P-661HNU-F1>
-References: <20150302065354.GA3613@t440s.P-661HNU-F1>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1425286928-31479-2-git-send-email-gowtham.ab@samsung.com>
+References: <1425286928-31479-1-git-send-email-gowtham.ab@samsung.com>
+	<1425286928-31479-2-git-send-email-gowtham.ab@samsung.com>
+Date: Mon, 2 Mar 2015 16:39:29 +0200
+Message-ID: <CABBYNZL5SLpWiEtgcODd3r=cdZL2Erp9iQMSR2GGoM6V8oOqOA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] unit/test-gatt: Add TP/GAW/SR/BV-03-C test
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Mon, 2 Mar 2015 08:53:54 +0200
+Hi Gowtham,
 
-> Here's the first bluetooth-next pull request targeting the 4.1 kernel:
-> 
->  - ieee802154/6lowpan cleanups
->  - SCO routing to host interface support for the btmrvl driver
->  - AMP code cleanups
->  - Fixes to AMP HCI init sequence
->  - Refactoring of the HCI callback mechanism
->  - Added shutdown routine for Intel controllers in the btusb driver
->  - New config option to enable/disable Bluetooth debugfs information
->  - Fix for early data reception on L2CAP fixed channels
-> 
-> Please let me know if there are any issues pulling. Thanks.
+On Mon, Mar 2, 2015 at 11:02 AM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Verify that a Generic Attribute Profile server can support writing
+> a Characteristic Value selected by handle.
+>
+> The GATT server test cases are supposed to be tested against
+> ts_small_db and ts_large_db_1. So, Fixed these changes too.
 
-Pulled, thanks.
+I guess you did not understand, I meant that you should send 3
+patches, one for each test with the fixes not just squash the first.
+
+> ---
+>  unit/test-gatt.c | 26 ++++++++++----------------
+>  1 file changed, 10 insertions(+), 16 deletions(-)
+>
+> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+> index 69654f1..104f415 100644
+> --- a/unit/test-gatt.c
+> +++ b/unit/test-gatt.c
+> @@ -1101,8 +1101,7 @@ static struct gatt_db *make_service_data_1_db(void)
+>                                                                 "Device Name"),
+>                 PRIMARY_SERVICE(0x0005, HEART_RATE_UUID, 4),
+>                 CHARACTERISTIC_STR(GATT_CHARAC_MANUFACTURER_NAME_STRING,
+> -                                               BT_ATT_PERM_READ |
+> -                                               BT_ATT_PERM_WRITE,
+> +                                               BT_ATT_PERM_READ,
+>                                                 BT_GATT_CHRC_PROP_READ |
+>                                                 BT_GATT_CHRC_PROP_WRITE, ""),
+>                 DESCRIPTOR_STR(GATT_CHARAC_USER_DESC_UUID, BT_ATT_PERM_READ,
+> @@ -1133,7 +1132,8 @@ static struct gatt_db *make_test_spec_small_db(void)
+>         const struct att_handle_spec specs[] = {
+>                 SECONDARY_SERVICE(0x0001, DEVICE_INFORMATION_UUID, 16),
+>                 CHARACTERISTIC_STR(GATT_CHARAC_MANUFACTURER_NAME_STRING,
+> -                                               BT_ATT_PERM_READ,
+> +                                               BT_ATT_PERM_READ |
+> +                                               BT_ATT_PERM_WRITE,
+>                                                 BT_GATT_CHRC_PROP_READ |
+>                                                 BT_GATT_CHRC_PROP_NOTIFY |
+>                                                 BT_GATT_CHRC_PROP_INDICATE,
+> @@ -3051,23 +3051,17 @@ int main(int argc, char *argv[])
+>                         raw_pdu(0x12, 0x07, 0x00, 0x01, 0x02, 0x03),
+>                         raw_pdu(0x01, 0x12, 0x07, 0x00, 0x0c));
+>
+> -       define_test_server("/TP/GAW/SR/BV-03-C", test_server,
+> -                       service_db_1, NULL,
+> +       define_test_server("/TP/GAW/SR/BV-03-C/small", test_server,
+> +                       ts_small_db, NULL,
+>                         raw_pdu(0x03, 0x00, 0x02),
+> -                       raw_pdu(0x12, 0x07, 0x00, 0x01, 0x02, 0x03),
+> +                       raw_pdu(0x12, 0x03, 0x00, 0x01, 0x02, 0x03),
+>                         raw_pdu(0x13));
+>
+> -       define_test_server("/TP/GAW/SR/BI-02-C", test_server,
+> -                       service_db_1, NULL,
+> -                       raw_pdu(0x03, 0x00, 0x02),
+> -                       raw_pdu(0x12, 0x00, 0x00, 0x01, 0x02, 0x03),
+> -                       raw_pdu(0x01, 0x12, 0x00, 0x00, 0x01));
+> -
+> -       define_test_server("/TP/GAW/SR/BI-03-C", test_server,
+> -                       service_db_1, NULL,
+> +       define_test_server("/TP/GAW/SR/BV-03-C/large-1", test_server,
+> +                       ts_large_db_1, NULL,
+>                         raw_pdu(0x03, 0x00, 0x02),
+> -                       raw_pdu(0x12, 0x03, 0x00, 0x01, 0x02, 0x03),
+> -                       raw_pdu(0x01, 0x12, 0x03, 0x00, 0x03));
+> +                       raw_pdu(0x12, 0x82, 0x00, 0x01, 0x02, 0x03),
+> +                       raw_pdu(0x13));
+>
+>         return tester_run();
+>  }
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
