@@ -1,98 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1425286928-31479-2-git-send-email-gowtham.ab@samsung.com>
-References: <1425286928-31479-1-git-send-email-gowtham.ab@samsung.com>
-	<1425286928-31479-2-git-send-email-gowtham.ab@samsung.com>
-Date: Mon, 2 Mar 2015 16:39:29 +0200
-Message-ID: <CABBYNZL5SLpWiEtgcODd3r=cdZL2Erp9iQMSR2GGoM6V8oOqOA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] unit/test-gatt: Add TP/GAW/SR/BV-03-C test
+In-Reply-To: <CABBYNZKD=urtd9P1yo+BDCp1_LrkGHBxozKmjZk-+mcjogO4UQ@mail.gmail.com>
+References: <1425024999-29789-1-git-send-email-armansito@chromium.org>
+	<CABBYNZKD=urtd9P1yo+BDCp1_LrkGHBxozKmjZk-+mcjogO4UQ@mail.gmail.com>
+Date: Mon, 2 Mar 2015 16:30:24 +0200
+Message-ID: <CABBYNZ+Srd6btfk5BJERsm8AxK=+QzS_=Ysgt6nRfh1moRvW5g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 00/16] Implement GATT server D-Bus API
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi Arman,
 
-On Mon, Mar 2, 2015 at 11:02 AM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Verify that a Generic Attribute Profile server can support writing
-> a Characteristic Value selected by handle.
+On Fri, Feb 27, 2015 at 4:15 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Arman,
 >
-> The GATT server test cases are supposed to be tested against
-> ts_small_db and ts_large_db_1. So, Fixed these changes too.
+> On Fri, Feb 27, 2015 at 10:16 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> *v2: - Introduced g_dbus_client_new_full instead of adding a new argument to
+>>        g_dbus_client_new.
+>>
+>>      - Removed the crash fix patch. I'll fix this properly in a separate patch
+>>        set by making discovery procedures cancelable.
+>>
+>> *v1: - Removed src/gatt.* based on email discussion.
+>>
+>>      - After some discussions on IRC, made ObjectManager mandatory on a
+>>        per-service-subtree basis to reduce the number of unnecessary
+>>        object processing and caching. One initial idea was to pass the
+>>        service subtree directly to RegisterService but one of the
+>>        concerns was that we should allow applications to use existing
+>>        tooling for the standard ObjectManager interface.
+>>
+>>      - Minor fixes based on comments, also fixed things so that
+>>        descriptors with CCC and CEP UUIDs cannot be registered by
+>>        external apps.
+>>
+>>      - Included a fix for recent crashes seen in unit/test-gatt.
+>>
+>> This patch set implements the GATT server D-Bus API and provides an
+>> example application in Python to demonstrate how the API can be used
+>> to export GATT services of various functionality.
+>>
+>> Some of the basics of the code is very similar to what was already in
+>> src/gatt-dbus.c, especially the bits that use gdbus/client to fetch
+>> and interact with remote objects. However, src/gatt-dbus had a lot of
+>> code that used the now-defunct src/gatt (which was going to be the new
+>> GATT abstraction for bluetoothd before we built shared/gatt), so I
+>> decided to remove gatt-dbus entirely and start from scratch with
+>> src/gatt-manager.
+>>
+>> Apart from these the code is fairly straight-forward. New additions to
+>> src/gatt-database have been made to allow upper layers to store CCC
+>> descriptors and send out notifications. The API automatically creates
+>> CCC and CEP (Characteristic Extended Properties) descriptors based on
+>> characteristic properties.
+>>
+>> Arman Uguray (16):
+>>   gdbus/client: Don't GetManagedObjects w/o handlers
+>>   gdbus/client: Allow specifying ObjectManager path
+>>   doc/gatt-api.txt: New ObjectManager requirements
+>>   core: gatt: Add GattManager1 stubs
+>>   core: gatt: Implement GattManager1.RegisterService
+>>   core: gatt: Register characteristics
+>>   core: gatt: Support ReadValue for characteristics
+>>   core: gatt: Support WriteValue for characteristics
+>>   core: gatt: Make CCC addition API public
+>>   core: gatt: Create CCC for external characteristic
+>>   core: gatt: Add btd_gatt_database_notify function
+>>   core: gatt: Send not/ind for D-Bus characteristics
+>>   core: gatt: Create CEP for external characteristic
+>>   core: gatt: Register descriptors
+>>   core: gatt: Support descriptor reads/writes
+>>   tools: Added a Python example for GATT server API
+>>
+>>  Makefile.am         |    3 +-
+>>  doc/gatt-api.txt    |   74 ++-
+>>  gdbus/client.c      |   27 +-
+>>  gdbus/gdbus.h       |    4 +
+>>  src/adapter.c       |   18 +-
+>>  src/gatt-database.c |  114 ++++-
+>>  src/gatt-database.h |   16 +
+>>  src/gatt-dbus.c     |  658 ------------------------
+>>  src/gatt-dbus.h     |   25 -
+>>  src/gatt-manager.c  | 1383 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  src/gatt-manager.h  |   23 +
+>>  src/gatt.c          |  321 ------------
+>>  src/gatt.h          |  121 -----
+>>  src/main.c          |    5 -
+>>  tools/gatt-example  |  463 +++++++++++++++++
+>>  15 files changed, 2089 insertions(+), 1166 deletions(-)
+>>  delete mode 100644 src/gatt-dbus.c
+>>  delete mode 100644 src/gatt-dbus.h
+>>  create mode 100644 src/gatt-manager.c
+>>  create mode 100644 src/gatt-manager.h
+>>  delete mode 100644 src/gatt.c
+>>  delete mode 100644 src/gatt.h
+>>  create mode 100755 tools/gatt-example
+>>
+>> --
+>> 2.2.0.rc0.207.ga3a616c
+>
+> Ive applied patches 1-3, the reason I stop there is that while review
+> the other patches it looks like gatt-manager.c will have too many
+> dependencies on gatt-database.c, so many that I would consider have
+> this on the same file otherwise we end up with bad API that use
+> handles causing extra lookups, while if this code were in the same
+> files all the CCC handling becomes quite simple and we don't even need
+> another struct since btd_gatt_database could be used directly as
+> context instead.
 
-I guess you did not understand, I meant that you should send 3
-patches, one for each test with the fixes not just squash the first.
-
-> ---
->  unit/test-gatt.c | 26 ++++++++++----------------
->  1 file changed, 10 insertions(+), 16 deletions(-)
+I went ahead and did the change to gatt-database.c for patches until
+core: gatt: Support WriteValue for characteristics, note add some
+fixes, lets try to gets the remaining rebased as well.
 >
-> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-> index 69654f1..104f415 100644
-> --- a/unit/test-gatt.c
-> +++ b/unit/test-gatt.c
-> @@ -1101,8 +1101,7 @@ static struct gatt_db *make_service_data_1_db(void)
->                                                                 "Device Name"),
->                 PRIMARY_SERVICE(0x0005, HEART_RATE_UUID, 4),
->                 CHARACTERISTIC_STR(GATT_CHARAC_MANUFACTURER_NAME_STRING,
-> -                                               BT_ATT_PERM_READ |
-> -                                               BT_ATT_PERM_WRITE,
-> +                                               BT_ATT_PERM_READ,
->                                                 BT_GATT_CHRC_PROP_READ |
->                                                 BT_GATT_CHRC_PROP_WRITE, ""),
->                 DESCRIPTOR_STR(GATT_CHARAC_USER_DESC_UUID, BT_ATT_PERM_READ,
-> @@ -1133,7 +1132,8 @@ static struct gatt_db *make_test_spec_small_db(void)
->         const struct att_handle_spec specs[] = {
->                 SECONDARY_SERVICE(0x0001, DEVICE_INFORMATION_UUID, 16),
->                 CHARACTERISTIC_STR(GATT_CHARAC_MANUFACTURER_NAME_STRING,
-> -                                               BT_ATT_PERM_READ,
-> +                                               BT_ATT_PERM_READ |
-> +                                               BT_ATT_PERM_WRITE,
->                                                 BT_GATT_CHRC_PROP_READ |
->                                                 BT_GATT_CHRC_PROP_NOTIFY |
->                                                 BT_GATT_CHRC_PROP_INDICATE,
-> @@ -3051,23 +3051,17 @@ int main(int argc, char *argv[])
->                         raw_pdu(0x12, 0x07, 0x00, 0x01, 0x02, 0x03),
->                         raw_pdu(0x01, 0x12, 0x07, 0x00, 0x0c));
 >
-> -       define_test_server("/TP/GAW/SR/BV-03-C", test_server,
-> -                       service_db_1, NULL,
-> +       define_test_server("/TP/GAW/SR/BV-03-C/small", test_server,
-> +                       ts_small_db, NULL,
->                         raw_pdu(0x03, 0x00, 0x02),
-> -                       raw_pdu(0x12, 0x07, 0x00, 0x01, 0x02, 0x03),
-> +                       raw_pdu(0x12, 0x03, 0x00, 0x01, 0x02, 0x03),
->                         raw_pdu(0x13));
->
-> -       define_test_server("/TP/GAW/SR/BI-02-C", test_server,
-> -                       service_db_1, NULL,
-> -                       raw_pdu(0x03, 0x00, 0x02),
-> -                       raw_pdu(0x12, 0x00, 0x00, 0x01, 0x02, 0x03),
-> -                       raw_pdu(0x01, 0x12, 0x00, 0x00, 0x01));
-> -
-> -       define_test_server("/TP/GAW/SR/BI-03-C", test_server,
-> -                       service_db_1, NULL,
-> +       define_test_server("/TP/GAW/SR/BV-03-C/large-1", test_server,
-> +                       ts_large_db_1, NULL,
->                         raw_pdu(0x03, 0x00, 0x02),
-> -                       raw_pdu(0x12, 0x03, 0x00, 0x01, 0x02, 0x03),
-> -                       raw_pdu(0x01, 0x12, 0x03, 0x00, 0x03));
-> +                       raw_pdu(0x12, 0x82, 0x00, 0x01, 0x02, 0x03),
-> +                       raw_pdu(0x13));
->
->         return tester_run();
->  }
 > --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Luiz Augusto von Dentz
 
 
 
