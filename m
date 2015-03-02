@@ -1,72 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Michael Janssen' <jamuraa@google.com>
-Cc: 'Bharat Bhusan Panda' <bharat.panda@samsung.com>,
-	linux-bluetooth@vger.kernel.org
-References: <1425028415-1190-1-git-send-email-gowtham.ab@samsung.com>
- <CAJLTA8iTaq00tHsoLz891M7zz-Tt54NZqnxzd-NztAuH9RDqoA@mail.gmail.com>
- <CAJLTA8hXGHySBUAArio8aXpJXCWkMgSRFkRge1hz+n4+vhuBxg@mail.gmail.com>
-In-reply-to: <CAJLTA8hXGHySBUAArio8aXpJXCWkMgSRFkRge1hz+n4+vhuBxg@mail.gmail.com>
-Subject: RE: [PATCH 0/3] Add Write Characteristic Value server TC
-Date: Mon, 02 Mar 2015 11:04:27 +0530
-Message-id: <000301d054aa$9133f7e0$b39be7a0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
+Date: Mon, 02 Mar 2015 00:20:00 -0500 (EST)
+Message-Id: <20150302.002000.2074179681664043670.davem@davemloft.net>
+To: eyal.birger@gmail.com
+Cc: willemb@google.com, edumazet@google.com, shmulik.ladkani@gmail.com,
+	linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 0/7] net: move skb->dropcount to skb->cb[]
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1425214711-9562-1-git-send-email-eyal.birger@gmail.com>
+References: <1425214711-9562-1-git-send-email-eyal.birger@gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+From: Eyal Birger <eyal.birger@gmail.com>
+Date: Sun,  1 Mar 2015 14:58:24 +0200
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Michael Janssen
-> Sent: Friday, February 27, 2015 8:46 PM
-> To: linux-bluetooth@vger.kernel.org
-> Subject: Fwd: [PATCH 0/3] Add Write Characteristic Value server TC
+> Commit 977750076d98 ("af_packet: add interframe drop cmsg (v6)")
+> unionized skb->mark and skb->dropcount in order to allow recording
+> of the socket drop count while maintaining struct sk_buff size.
 > 
-> Hi Gowtham,
+> skb->dropcount was introduced since there was no available room
+> in skb->cb[] in packet sockets. However, its introduction led to
+> the inability to export skb->mark to userspace.
 > 
-> On Fri, Feb 27, 2015 at 1:13 AM, Gowtham Anandha Babu
-> <gowtham.ab@samsung.com> wrote:
-> > Adds the below server test cases:
-> > 1) Write Characteristic Value - to Server
-> > 2) Write Characteristic Value – Invalid Handle Response
-> > 3) Write Characteristic Value – Write Not Permitted Response
-> >
-> > Bharat Panda (2):
-> >   unit/test-gatt: Add TP/GAW/SR/BI-02-C test
-> >   unit/test-gatt: Add TP/GAW/SR/BI-03-C test
-> >
-> > Gowtham Anandha Babu (1):
-> >   unit/test-gatt: Add TP/GAW/SR/BV-03-C test
-> >
-> >  unit/test-gatt.c | 20 +++++++++++++++++++-
-> >  1 file changed, 19 insertions(+), 1 deletion(-)
-> >
-> > --
-> > 1.9.1
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe
-> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> It was considered to alias skb->priority instead of skb->mark.
+> However, that would lead to the inabilty to export skb->priority
+> to userspace if desired. Such change may also lead to hard-to-find
+> issues as skb->priority is assumed to be alias free, and, as noted
+> by Shmulik Ladkani, is not 'naturally orthogonal' with other skb
+> fields.
 > 
-> Server tests should be written against all of the databases which are in the
-> test suite - the small (make_test_spec_small_db, available in the test area as
-> ts_small_db) and first large (make_test_spec_large_db_1, ts_large_db_1)
-> should be used for these tests.
+> This patch series follows the suggestions made by Eric Dumazet moving
+> the dropcount metric to skb->cb[], eliminating this problem
+> at the expense of 4 bytes less in skb->cb[] for protocol families
+> using it.
 > 
+> The patch series include compactization of bluetooth and packet
+> use of skb->cb[] as well as the infrastructure for placing dropcount
+> in skb->cb[].
 
-Thanks for pointing it out. I will send the patches to revert this set and 
-test these test cases against ts_small_db and ts_large_db_1 databases and send those patches too.
+Ok, I think I can live with this.
 
-Regards,
-Gowtham Anandha Babu
-
-> --
-> Michael Janssen
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
-
+Series applied, thanks.
