@@ -1,40 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/7] Bluetooth: Refactoring of generic mgmt API
-Date: Mon,  2 Mar 2015 22:13:46 +0200
-Message-Id: <1425327233-4427-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 02 Mar 2015 14:48:13 -0500 (EST)
+Message-Id: <20150302.144813.2240523360918229942.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2015-03-02
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20150302065354.GA3613@t440s.P-661HNU-F1>
+References: <20150302065354.GA3613@t440s.P-661HNU-F1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Mon, 2 Mar 2015 08:53:54 +0200
 
-v2: Fix typo in commit message of patch 5/7
+> Here's the first bluetooth-next pull request targeting the 4.1 kernel:
+> 
+>  - ieee802154/6lowpan cleanups
+>  - SCO routing to host interface support for the btmrvl driver
+>  - AMP code cleanups
+>  - Fixes to AMP HCI init sequence
+>  - Refactoring of the HCI callback mechanism
+>  - Added shutdown routine for Intel controllers in the btusb driver
+>  - New config option to enable/disable Bluetooth debugfs information
+>  - Fix for early data reception on L2CAP fixed channels
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-from original cover letter:
-
-This set of patches tries to do some initial work towards being able to
-have multiple different HCI channels with mgmt-like semantics. For now
-we only have HCI_CHANNEL_CONTROL, but the idea is to have 6lowpan use
-the same styled interface in the future.
-
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (7):
-      Bluetooth: Add mgmt HCI channel registration API
-      Bluetooth: Convert mgmt to use HCI chan registration API
-      Bluetooth: Move all mgmt command quirks to handler table
-      Bluetooth: Rename cmd_status() to mgmt_cmd_status()
-      Bluetooth: Rename cmd_complete() to mgmt_cmd_complete()
-      Bluetooth: Rename pending_cmd to mgmt_pending_cmd
-      Bluetooth: Add mgmt_send_event() helper to send to any HCI channel
-
- include/net/bluetooth/bluetooth.h |    3 +
- include/net/bluetooth/hci_core.h  |   25 +-
- net/bluetooth/af_bluetooth.c      |    9 +
- net/bluetooth/hci_sock.c          |   94 ++-
- net/bluetooth/mgmt.c              | 1288 +++++++++++++++++++-----------------
- 5 files changed, 781 insertions(+), 638 deletions(-)
-
-
+Pulled, thanks.
