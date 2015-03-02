@@ -1,60 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Peter Hurley <peter@hurleysoftware.com>
-Subject: Blocking ops when !TASK_RUNNING in bnep
-Date: Mon, 02 Mar 2015 15:20:49 +0100
-Message-ID: <1491385.CDOh5cxHec@leonov>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1425296146-12650-1-git-send-email-luiz.dentz@gmail.com>
+References: <1425296146-12650-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 2 Mar 2015 14:33:41 +0200
+Message-ID: <CABBYNZ+wYPYcvwKo6bMAkn42o2HHm4g-PE4JM6MqTBz3MScuEw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] lib/uuid: Fix bt_uuid_to_le for 128 Bits
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-While running android-tester on bluetooth-next I've noticed following trace
-when running PAN tests.
+On Mon, Mar 2, 2015 at 1:35 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> The convention is that 128 Bits are always defined in big endian format
+> therefore the bytes always needs to be swapped.
+> ---
+>  lib/bluetooth.h   | 20 ++++++++++++--------
+>  lib/uuid.c        |  6 +++---
+>  src/shared/util.h | 10 ----------
+>  3 files changed, 15 insertions(+), 21 deletions(-)
+>
+> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+> index f214d81..6ca64b6 100644
+> --- a/lib/bluetooth.h
+> +++ b/lib/bluetooth.h
+> @@ -343,6 +343,16 @@ typedef struct {
+>         uint8_t data[16];
+>  } uint128_t;
+>
+> +static inline void bswap_128(const void *src, void *dst)
+> +{
+> +       const uint8_t *s = src;
+> +       uint8_t *d = dst;
+> +       int i;
+> +
+> +       for (i = 0; i < 16; i++)
+> +               d[15 - i] = s[i];
+> +}
+> +
+>  #if __BYTE_ORDER == __BIG_ENDIAN
+>
+>  #define ntoh64(x) (x)
+> @@ -354,10 +364,7 @@ static inline void ntoh128(const uint128_t *src, uint128_t *dst)
+>
+>  static inline void btoh128(const uint128_t *src, uint128_t *dst)
+>  {
+> -       int i;
+> -
+> -       for (i = 0; i < 16; i++)
+> -               dst->data[15 - i] = src->data[i];
+> +       bswap_128(src, dst);
+>  }
+>
+>  #else
+> @@ -375,10 +382,7 @@ static inline uint64_t ntoh64(uint64_t n)
+>
+>  static inline void ntoh128(const uint128_t *src, uint128_t *dst)
+>  {
+> -       int i;
+> -
+> -       for (i = 0; i < 16; i++)
+> -               dst->data[15 - i] = src->data[i];
+> +       bswap_128(src, dst);
+>  }
+>
+>  static inline void btoh128(const uint128_t *src, uint128_t *dst)
+> diff --git a/lib/uuid.c b/lib/uuid.c
+> index 3eb7dbe..4f34b17 100644
+> --- a/lib/uuid.c
+> +++ b/lib/uuid.c
+> @@ -302,10 +302,10 @@ int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
+>                 return 0;
+>         case BT_UUID32:
+>                 bt_uuid_to_uuid128(src, &uuid);
+> -               ntoh128(&uuid.value.u128, dst);
+> -               return 0;
+> +               /* Fallthrough */
+>         case BT_UUID128:
+> -               ntoh128(&src->value.u128, dst);
+> +               /* Convert from 128-bit BE to LE */
+> +               bswap_128(&src->value.u128, dst);
+>                 return 0;
+>         case BT_UUID_UNSPEC:
+>         default:
+> diff --git a/src/shared/util.h b/src/shared/util.h
+> index 7dba1b3..30b7d92 100644
+> --- a/src/shared/util.h
+> +++ b/src/shared/util.h
+> @@ -96,16 +96,6 @@ unsigned char util_get_dt(const char *parent, const char *name);
+>  uint8_t util_get_uid(unsigned int *bitmap, uint8_t max);
+>  void util_clear_uid(unsigned int *bitmap, uint8_t id);
+>
+> -static inline void bswap_128(const void *src, void *dst)
+> -{
+> -       const uint8_t *s = src;
+> -       uint8_t *d = dst;
+> -       int i;
+> -
+> -       for (i = 0; i < 16; i++)
+> -               d[15 - i] = s[i];
+> -}
+> -
+>  static inline uint16_t get_le16(const void *ptr)
+>  {
+>         return le16_to_cpu(get_unaligned((const uint16_t *) ptr));
+> --
+> 2.1.0
 
-I'm not sure how to fix this properly but those seem to be somewhat similar to 
-accept fixes from few weeks back by Peter.
+Applied.
 
-
-[  444.282000] ------------[ cut here ]------------
-[  444.282032] WARNING: CPU: 1 PID: 10389 at kernel/sched/core.c:7354 
-__might_sleep+0x7a/0x90()
-[  444.282039] do not call blocking ops when !TASK_RUNNING; state=1 set at 
-[<ffffffff8187aef8>] bnep_session+0xa8/0x910
-[  444.282041] Modules linked in:
-[  444.282047] CPU: 1 PID: 10389 Comm: kbnepd bt-pan Not tainted 3.19.0+ #21
-[  444.282050] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[  444.282052]  ffffffff81cd56e1 ffff880012863b58 ffffffff81962fa5 
-0000000000000000
-[  444.282058]  ffff880012863ba8 ffff880012863b98 ffffffff8104eff5 
-ffff880012863bd8
-[  444.282062]  ffffffff81d6f747 0000000000000939 0000000000000000 
-ffff88001c220000
-[  444.282067] Call Trace:
-[  444.282071]  [<ffffffff81962fa5>] dump_stack+0x4c/0x65
-[  444.282075]  [<ffffffff8104eff5>] warn_slowpath_common+0x85/0xc0
-[  444.282079]  [<ffffffff8104f071>] warn_slowpath_fmt+0x41/0x50
-[  444.282081]  [<ffffffff8187aef8>] ? bnep_session+0xa8/0x910
-[  444.282084]  [<ffffffff8187aef8>] ? bnep_session+0xa8/0x910
-[  444.282086]  [<ffffffff810729aa>] __might_sleep+0x7a/0x90
-[  444.282089]  [<ffffffff816f8eda>] lock_sock_nested+0x2a/0xb0
-[  444.282093]  [<ffffffff81862191>] l2cap_sock_sendmsg+0x61/0x110
-[  444.282097]  [<ffffffff816f4f9f>] do_sock_sendmsg+0x7f/0xa0
-[  444.282100]  [<ffffffff816f5023>] kernel_sendmsg+0x53/0x70
-[  444.282102]  [<ffffffff8187b39c>] bnep_session+0x54c/0x910
-[  444.282105]  [<ffffffff81072b59>] ? finish_task_switch+0x49/0x100
-[  444.282108]  [<ffffffff8107a260>] ? wake_up_state+0x10/0x10
-[  444.282111]  [<ffffffff8187ae50>] ? bnep_rx_control+0x400/0x400
-[  444.282113]  [<ffffffff8187ae50>] ? bnep_rx_control+0x400/0x400
-[  444.282116]  [<ffffffff8106d3ea>] kthread+0xea/0x100
-[  444.282119]  [<ffffffff8106d300>] ? kthread_create_on_node+0x220/0x220
-[  444.282123]  [<ffffffff8196fcac>] ret_from_fork+0x7c/0xb0
-[  444.282125]  [<ffffffff8106d300>] ? kthread_create_on_node+0x220/0x220
-[  444.282127] ---[ end trace 4a98530915b46f89 ]---
 
 -- 
-BR
-Szymon Janc
+Luiz Augusto von Dentz
