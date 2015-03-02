@@ -1,118 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1425296146-12650-1-git-send-email-luiz.dentz@gmail.com>
-References: <1425296146-12650-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 2 Mar 2015 14:33:41 +0200
-Message-ID: <CABBYNZ+wYPYcvwKo6bMAkn42o2HHm4g-PE4JM6MqTBz3MScuEw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] lib/uuid: Fix bt_uuid_to_le for 128 Bits
+In-Reply-To: <CABD6X-J+Tr7AV6nQW9E_Hu+SZY=SCRj+C0Ftqump-espeS+AuA@mail.gmail.com>
+References: <1425024072-6259-1-git-send-email-marcin.kraglak@tieto.com>
+	<1425024072-6259-2-git-send-email-marcin.kraglak@tieto.com>
+	<1432936.7iWJrZ6TN0@uw000953>
+	<CABBYNZKwo3iLGhSB7+pEBhR6cWMK_GYmLSqgFb7FcGo1m-XEPA@mail.gmail.com>
+	<CABD6X-J+Tr7AV6nQW9E_Hu+SZY=SCRj+C0Ftqump-espeS+AuA@mail.gmail.com>
+Date: Mon, 2 Mar 2015 14:31:18 +0200
+Message-ID: <CABBYNZJCnz8WZ7aHiSr3mao2V6Ad-_BzY=-fvA3DRthOETS8Xw@mail.gmail.com>
+Subject: Re: [RFC] audio/avctp: Accept incoming connection in case of colission
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcin,
 
-On Mon, Mar 2, 2015 at 1:35 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Mon, Mar 2, 2015 at 8:59 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
+> Hi Luiz,
 >
-> The convention is that 128 Bits are always defined in big endian format
-> therefore the bytes always needs to be swapped.
-> ---
->  lib/bluetooth.h   | 20 ++++++++++++--------
->  lib/uuid.c        |  6 +++---
->  src/shared/util.h | 10 ----------
->  3 files changed, 15 insertions(+), 21 deletions(-)
+> Why do you want to move it to policy? As I understand policy is a way
+> we want to improve user-experience, such connecting to default
+> profiles etc., it's about channel establishment.
+
+It is the policy module that takes care of connection logic, it is it
+that does start the connection attempt once A2DP connects, in fact all
+the policy does is connection policy so it can keep track what should
+be connected or not and deal with reconnection logic, etc.
+
+> On 27 February 2015 at 15:07, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Szymon,
+>>
+>> On Fri, Feb 27, 2015 at 12:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+>>> Hi Marcin,
+>>>
+>>> On Friday 27 of February 2015 09:01:12 Marcin Kraglak wrote:
+>>>> Accept incoming connection to Control Channel in case of colission.
+>>>> If accepting connection won't succeed, try reconnect.
+>>>> There is no need to request authorization while user has been connecting
+>>>> to service in meantime.
+>>>> Issue was found during tests with NOKIA BH-505 and Motorola HT-820.
+>>>> ---
+>>>>  profiles/audio/avctp.c | 38 ++++++++++++++++++++++++++++++++++++--
+>>>>  1 file changed, 36 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+>>>> index 57071b5..8d457f4 100644
+>>>> --- a/profiles/audio/avctp.c
+>>>> +++ b/profiles/audio/avctp.c
+>>>> @@ -203,6 +203,7 @@ struct avctp {
+>>>>       uint8_t key_quirks[256];
+>>>>       struct key_pressed key;
+>>>>       bool initiator;
+>>>> +     bool reconnect;
+>>>>  };
+>>>>
+>>>>  struct avctp_passthrough_handler {
+>>>> @@ -1219,11 +1220,22 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+>>>>       GError *gerr = NULL;
+>>>>
+>>>>       if (err) {
+>>>> +             struct btd_device *device = session->device;
+>>>> +             bool reconnect = session->reconnect;
+>>>> +
+>>>>               avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+>>>>               error("%s", err->message);
+>>>> +
+>>>> +             if (!reconnect)
+>>>> +                     return;
+>>>> +
+>>>> +             DBG("Control: Attempting to reconnect");
+>>>> +             avctp_connect(device);
+>>>>               return;
+>>>>       }
+>>>>
+>>>> +     session->reconnect = false;
+>>>> +
+>>>>       bt_io_get(chan, &gerr,
+>>>>                       BT_IO_OPT_DEST, &address,
+>>>>                       BT_IO_OPT_IMTU, &imtu,
+>>>> @@ -1346,10 +1358,32 @@ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
+>>>>  {
+>>>>       const bdaddr_t *src;
+>>>>       const bdaddr_t *dst;
+>>>> +     GError *err = NULL;
+>>>>
+>>>>       if (session->control != NULL) {
+>>>> -             error("Control: Refusing unexpected connect");
+>>>> -             g_io_channel_shutdown(chan, TRUE, NULL);
+>>>> +             if (session->state != AVCTP_STATE_CONNECTING) {
+>>>> +                     error("Control: Refusing unexpected connect");
+>>>> +                     g_io_channel_shutdown(chan, TRUE, NULL);
+>>>> +                     return;
+>>>> +             }
+>>>> +
+>>>> +             /* Cancel outgoing connection and accept incoming */
+>>>> +             DBG("Control: Accepting unexpected connect from remote");
+>>>> +             g_io_channel_shutdown(session->control->io, TRUE, NULL);
+>>>> +             g_io_channel_unref(session->control->io);
+>>>> +             session->control->io = NULL;
+>>>> +
+>>>> +             if (!bt_io_accept(chan, avctp_connect_cb, session, NULL,
+>>>> +                                                                     &err)) {
+>>>> +                     error("bt_io_accept: %s", err->message);
+>>>> +                     g_error_free(err);
+>>>> +                     avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
+>>>> +                     return;
+>>>> +             }
+>>>> +
+>>>> +             session->reconnect = true;
+>>>> +             session->control->io = g_io_channel_ref(chan);
+>>>> +
+>>>>               return;
+>>>>       }
+>>>
+>>> I think we should go with random timer as required by AVRCP specification
+>>>
+>>> p.4.1.1:
+>>> "If both devices open an AVCTP channel at the same time both channels shall be
+>>> closed and each device shall wait a random time (not more than 1 s and not less
+>>> than 100ms) and then try to open the AVCTP channel again. If it is known which
+>>> device is the master that device can re-try at once."
+>>
+>> That and it is probably a better idea to leave this to policy to
+>> re-try as it is already doing for A2DP.
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
 >
-> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-> index f214d81..6ca64b6 100644
-> --- a/lib/bluetooth.h
-> +++ b/lib/bluetooth.h
-> @@ -343,6 +343,16 @@ typedef struct {
->         uint8_t data[16];
->  } uint128_t;
 >
-> +static inline void bswap_128(const void *src, void *dst)
-> +{
-> +       const uint8_t *s = src;
-> +       uint8_t *d = dst;
-> +       int i;
-> +
-> +       for (i = 0; i < 16; i++)
-> +               d[15 - i] = s[i];
-> +}
-> +
->  #if __BYTE_ORDER == __BIG_ENDIAN
 >
->  #define ntoh64(x) (x)
-> @@ -354,10 +364,7 @@ static inline void ntoh128(const uint128_t *src, uint128_t *dst)
->
->  static inline void btoh128(const uint128_t *src, uint128_t *dst)
->  {
-> -       int i;
-> -
-> -       for (i = 0; i < 16; i++)
-> -               dst->data[15 - i] = src->data[i];
-> +       bswap_128(src, dst);
->  }
->
->  #else
-> @@ -375,10 +382,7 @@ static inline uint64_t ntoh64(uint64_t n)
->
->  static inline void ntoh128(const uint128_t *src, uint128_t *dst)
->  {
-> -       int i;
-> -
-> -       for (i = 0; i < 16; i++)
-> -               dst->data[15 - i] = src->data[i];
-> +       bswap_128(src, dst);
->  }
->
->  static inline void btoh128(const uint128_t *src, uint128_t *dst)
-> diff --git a/lib/uuid.c b/lib/uuid.c
-> index 3eb7dbe..4f34b17 100644
-> --- a/lib/uuid.c
-> +++ b/lib/uuid.c
-> @@ -302,10 +302,10 @@ int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
->                 return 0;
->         case BT_UUID32:
->                 bt_uuid_to_uuid128(src, &uuid);
-> -               ntoh128(&uuid.value.u128, dst);
-> -               return 0;
-> +               /* Fallthrough */
->         case BT_UUID128:
-> -               ntoh128(&src->value.u128, dst);
-> +               /* Convert from 128-bit BE to LE */
-> +               bswap_128(&src->value.u128, dst);
->                 return 0;
->         case BT_UUID_UNSPEC:
->         default:
-> diff --git a/src/shared/util.h b/src/shared/util.h
-> index 7dba1b3..30b7d92 100644
-> --- a/src/shared/util.h
-> +++ b/src/shared/util.h
-> @@ -96,16 +96,6 @@ unsigned char util_get_dt(const char *parent, const char *name);
->  uint8_t util_get_uid(unsigned int *bitmap, uint8_t max);
->  void util_clear_uid(unsigned int *bitmap, uint8_t id);
->
-> -static inline void bswap_128(const void *src, void *dst)
-> -{
-> -       const uint8_t *s = src;
-> -       uint8_t *d = dst;
-> -       int i;
-> -
-> -       for (i = 0; i < 16; i++)
-> -               d[15 - i] = s[i];
-> -}
-> -
->  static inline uint16_t get_le16(const void *ptr)
->  {
->         return le16_to_cpu(get_unaligned((const uint16_t *) ptr));
 > --
-> 2.1.0
+> BR
+> Marcin Kraglak
 
-Applied.
 
 
 -- 
