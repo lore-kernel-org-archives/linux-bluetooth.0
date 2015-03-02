@@ -1,131 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <54F40908.1090501@freescale.com>
+Date: Mon, 2 Mar 2015 14:54:00 +0800
+From: Zheng Tao-B46827 <b46827@freescale.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKwo3iLGhSB7+pEBhR6cWMK_GYmLSqgFb7FcGo1m-XEPA@mail.gmail.com>
-References: <1425024072-6259-1-git-send-email-marcin.kraglak@tieto.com>
-	<1425024072-6259-2-git-send-email-marcin.kraglak@tieto.com>
-	<1432936.7iWJrZ6TN0@uw000953>
-	<CABBYNZKwo3iLGhSB7+pEBhR6cWMK_GYmLSqgFb7FcGo1m-XEPA@mail.gmail.com>
-Date: Mon, 2 Mar 2015 07:59:00 +0100
-Message-ID: <CABD6X-J+Tr7AV6nQW9E_Hu+SZY=SCRj+C0Ftqump-espeS+AuA@mail.gmail.com>
-Subject: Re: [RFC] audio/avctp: Accept incoming connection in case of colission
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	<max.tsai@freescale.com>, <xiao-lizhang@freescale.com>
+Subject: Re: BlueZ for Android 4.4.3
+References: <54D96429.8000304@freescale.com>	<CAN_7+Yai0m39=crfcqJdJZfoTOOuh4zxPi_46wn6EXbewHGf8g@mail.gmail.com>	<54DB22D8.1020700@freescale.com>	<CAN_7+YZu0v0zekp0LrQM3dbtkYL=cY_ALT5+exHDeyUmO_0uCQ@mail.gmail.com>	<54DC0E4A.2070709@freescale.com> <CAN_7+YaXZd4VPwk0VnSW8dP21PpmQMphf7T+UrkC9f4V7HcELg@mail.gmail.com>
+In-Reply-To: <CAN_7+YaXZd4VPwk0VnSW8dP21PpmQMphf7T+UrkC9f4V7HcELg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
 
-Why do you want to move it to policy? As I understand policy is a way
-we want to improve user-experience, such connecting to default
-profiles etc., it's about channel establishment.
-
-On 27 February 2015 at 15:07, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Szymon,
+On 2/14/2015 12:02 AM, Lukasz Rymanowski wrote:
+> Hi Tony,
 >
-> On Fri, Feb 27, 2015 at 12:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
->> Hi Marcin,
+> On Thu, Feb 12, 2015 at 3:22 AM, Zheng Tao-B46827 <b46827@freescale.com> wrote:
+>> Hi, Lukasz
 >>
->> On Friday 27 of February 2015 09:01:12 Marcin Kraglak wrote:
->>> Accept incoming connection to Control Channel in case of colission.
->>> If accepting connection won't succeed, try reconnect.
->>> There is no need to request authorization while user has been connecting
->>> to service in meantime.
->>> Issue was found during tests with NOKIA BH-505 and Motorola HT-820.
->>> ---
->>>  profiles/audio/avctp.c | 38 ++++++++++++++++++++++++++++++++++++--
->>>  1 file changed, 36 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
->>> index 57071b5..8d457f4 100644
->>> --- a/profiles/audio/avctp.c
->>> +++ b/profiles/audio/avctp.c
->>> @@ -203,6 +203,7 @@ struct avctp {
->>>       uint8_t key_quirks[256];
->>>       struct key_pressed key;
->>>       bool initiator;
->>> +     bool reconnect;
->>>  };
->>>
->>>  struct avctp_passthrough_handler {
->>> @@ -1219,11 +1220,22 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
->>>       GError *gerr = NULL;
->>>
->>>       if (err) {
->>> +             struct btd_device *device = session->device;
->>> +             bool reconnect = session->reconnect;
->>> +
->>>               avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
->>>               error("%s", err->message);
->>> +
->>> +             if (!reconnect)
->>> +                     return;
->>> +
->>> +             DBG("Control: Attempting to reconnect");
->>> +             avctp_connect(device);
->>>               return;
->>>       }
->>>
->>> +     session->reconnect = false;
->>> +
->>>       bt_io_get(chan, &gerr,
->>>                       BT_IO_OPT_DEST, &address,
->>>                       BT_IO_OPT_IMTU, &imtu,
->>> @@ -1346,10 +1358,32 @@ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
->>>  {
->>>       const bdaddr_t *src;
->>>       const bdaddr_t *dst;
->>> +     GError *err = NULL;
->>>
->>>       if (session->control != NULL) {
->>> -             error("Control: Refusing unexpected connect");
->>> -             g_io_channel_shutdown(chan, TRUE, NULL);
->>> +             if (session->state != AVCTP_STATE_CONNECTING) {
->>> +                     error("Control: Refusing unexpected connect");
->>> +                     g_io_channel_shutdown(chan, TRUE, NULL);
->>> +                     return;
->>> +             }
->>> +
->>> +             /* Cancel outgoing connection and accept incoming */
->>> +             DBG("Control: Accepting unexpected connect from remote");
->>> +             g_io_channel_shutdown(session->control->io, TRUE, NULL);
->>> +             g_io_channel_unref(session->control->io);
->>> +             session->control->io = NULL;
->>> +
->>> +             if (!bt_io_accept(chan, avctp_connect_cb, session, NULL,
->>> +                                                                     &err)) {
->>> +                     error("bt_io_accept: %s", err->message);
->>> +                     g_error_free(err);
->>> +                     avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
->>> +                     return;
->>> +             }
->>> +
->>> +             session->reconnect = true;
->>> +             session->control->io = g_io_channel_ref(chan);
->>> +
->>>               return;
->>>       }
 >>
->> I think we should go with random timer as required by AVRCP specification
+>> On 2/11/2015 7:41 PM, Lukasz Rymanowski wrote:
+>>> Hi,
+>>>
+>>> On Wed, Feb 11, 2015 at 10:37 AM, Zheng Tao-B46827 <b46827@freescale.com>
+>>> wrote:
+>>>> Hi, Lukasz
+>>>> Thanks for your reply. Following you steps, the previous problem has been
+>>>> resolved, but it seems that the connection is not stable. When I execute
+>>>> av
+>>>> connect, I can hear "Connected" from my Bluetooth headset, but it will be
+>>>> disconnected immediately which i can hear "disconnected".  And it will
+>>>> prompt "I/bluetoothd( 1061): bluetoothd[1062]: Unable to find matching
+>>>> endpoint". Is this a bug? can you give some advise?
+>>>>
+>>>>> av connect 24:fd:52:b6:a0:99
+>>>> connection_state: connection_state=BTAV_CONNECTION_STATE_CONNECTING
+>>>> remote_bd_addr=24:fd:52:b6:a0:99
+>>>> if_av->connect: BT_STATUS_SUCCESS
+>>>>> D/BlueZ   ( 1060):
+>>>>> external/bluetooth/bluez/android/hal-a2dp.c:a2dp_connect()
+>>>> acl_state_changed_cb: status=BT_STATUS_SUCCESS
+>>>> remote_bd_addr=24:fd:52:b6:a0:99 state=BT_ACL_STATE_CONNECTED
+>>>>> D/BlueZ   ( 1060):
+>>>>>
+>>>>> external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed()
+>>>>> state 0
+>>>> connection_state: connection_state=BTAV_CONNECTION_STATE_DISCONNECTED
+>>>> remote_bd_addr=24:fd:52:b6:a0:99
+>>>>> I/bluetoothd( 1061): bluetoothd[1062]: Unable to find matching endpoint
+>>> Here is the clue.
+>>>
+>>> Can you provide btmon logs?
+>> I found this log when execute av connect command:
+>> < HCI Command: Disconnect (0x01|0x0006) plen 3 [hci0] 215.582054
+>>          Handle: 71
+>>          Reason: Remote User Terminated Connection (0x13)
+>> I doubt that why "Remote User Terminated Connection", because when I heard
+>> "connected" from Bluetooth headset and I have done nothing with it.  The
+>> full log when execute av connect command is attached. Thanks.
 >>
->> p.4.1.1:
->> "If both devices open an AVCTP channel at the same time both channels shall be
->> closed and each device shall wait a random time (not more than 1 s and not less
->> than 100ms) and then try to open the AVCTP channel again. If it is known which
->> device is the master that device can re-try at once."
+>  From your logs I see that we did discover SEPs on your Jabra device
+> and got capabilities of SBC SNK endpoint.
+> Then we want to connect that SEP to our SRC endpoint but it is
+> actually not there.
 >
-> That and it is probably a better idea to leave this to policy to
-> re-try as it is already doing for A2DP.
+> After that I realized that I told you to do "av connect" before
+> actually "audio init" and that is wrong.
+> "Audio init" does register your SRC endpoints. So you should do that
+> and after that try "av connect"
 >
 >
-> --
-> Luiz Augusto von Dentz
+> BR
+> Lukasz
+Sorry to reply to you so late for Chinese New Year. Do you mean to 
+follow steps like this:
 
+ 1. bluetooth init
+ 2. bluetooth enable
+ 3. bluetooth get_profile_interface a2dp
+ 4. bluetooth start_discovery
+ 5. bluetooth create_bond xxxxxxxx
+ 6. audio init
+ 7. av connect xxxxxxxx
+ 8. audio open_output_stream
 
+But in this way, when I execute "audio init", I will return back the 
+initial problems:
+  "D/BlueZ   ( 1033): 
+external/bluetooth/bluez/android/hal-audio.c:ipc_handler() Waiting for 
+connection ..."
+and when execute "av connect xxxxxxxx", it will prompt "if_av->connect: 
+BT_STATUS_NOT_READY".
+>>>> acl_state_changed_cb: status=BT_STATUS_SUCCESS
+>>>> remote_bd_addr=24:fd:52:b6:a0:99 state=BT_ACL_STATE_DISCONNECTED
+>>>>> D/BlueZ   ( 1060):
+>>>>>
+>>>>> external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed()
+>>>>> state 1
+>>>>
+>>> \Łukasz
+>>>
+>>>> On 2/11/2015 4:16 PM, Lukasz Rymanowski wrote:
+>>>>> Hi Tony,
+>>>>>
+>>>>> On Tue, Feb 10, 2015 at 2:51 AM, Zheng Tao-B46827 <b46827@freescale.com>
+>>>>> wrote:
+>>>>>> Hi, Peers
+>>>>>>
+>>>>>> Thanks for your hard work that let us can experience BlueZ for Android.
+>>>>>> But
+>>>>>> I am faced with a audio/a2dp problems that stick me many weeks.
+>>>>>>
+>>>>>> I’m try to port Bluez to kitkat 4.4.3, and many common profiles, such
+>>>>>> as
+>>>>>> HIDP/FTP/GATT can function successfully. But the A2DP profile failed.
+>>>>>>
+>>>>>> So, I try to debug it using haltest tool as follows(with USB Bluetooth
+>>>>>> Dongle):
+>>>>>>
+>>>>>> 1.bluetooth init
+>>>>>>
+>>>>>> 2.bluetooth enable
+>>>>>>
+>>>>>> 3.bluetooth get_profile_interface a2dp
+>>>>>>
+>>>>>> 4.bluetooth start_discovery
+>>>>>>
+>>>>>> 5.bluetooth create_bond xxxxxxxx
+>>>>>>
+>>>>> Here you should setup A2DP using "av connect <bdaddr>." (don't forget
+>>>>> to do av init before.)  Once you are connected you can open stream.
+>>>>>
+>>>>>
+>>>>>> 6.audio init
+>>>>>>
+>>>>>> 7.audio open_output_stream
+>>>>>>
+>>>>>> Then it will prompts:
+>>>>>>
+>>>>>> D/BlueZ   ( 1106):
+>>>>>> external/bluetooth/bluez/android/hal-audio.c:audio_open_output_stream()
+>>>>>>
+>>>>>> D/BlueZ   ( 1106):
+>>>>>> external/bluetooth/bluez/android/hal-audio.c:ipc_open_stream_cmd()
+>>>>>>
+>>>>>> E/BlueZ   ( 1106): audio: Invalid cmd socket passed to audio_ipc_cmd
+>>>>>>
+>>>>>> E/BlueZ   ( 1106): audio: cannot open output stream
+>>>>>>
+>>>>>> when I debug it , I found that
+>>>>>>
+>>>>>> BlueZ   ( 1106):
+>>>>>> external/bluetooth/bluez/android/hal-audio.c:ipc_handler()
+>>>>>> Waiting for connection ...
+>>>>>>
+>>>>>> And it seems that there is no audio socket to connect it.
+>>>>>>
+>>>>>> I’m not familiar with Bluez stack details, can you give some advice?
+>>>>>> What
+>>>>>> should I do to enable audio/a2dp functionality and execute audio play
+>>>>>> command? Thanks.
+>>>>>
+>>>>> \Lukasz
+>>>>>
+>>>>>> ----------------------------------------------
+>>>>>>
+>>>>>> *Best Regards!*
+>>>>>>
+>>>>>> Tony Zheng
+>>>>>>
+>>>>>> --
+>>>>>> To unsubscribe from this list: send the line "unsubscribe
+>>>>>> linux-bluetooth"
+>>>>>> in
+>>>>>> the body of a message to majordomo@vger.kernel.org
+>>>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>>
 
--- 
-BR
-Marcin Kraglak
