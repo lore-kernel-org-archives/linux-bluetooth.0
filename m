@@ -1,150 +1,191 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 10/15] profiles/network: Remove unneded bnep_uuid function from bnep code
-Date: Tue,  3 Mar 2015 17:59:54 +0100
-Message-Id: <1425401999-21203-10-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 13/15] tools/bneptest: Add initial support for bneptest tool
+Date: Tue,  3 Mar 2015 17:59:57 +0100
+Message-Id: <1425401999-21203-13-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1425401999-21203-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1425401999-21203-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function is no longer needed since connection and server can handle
-this funcionality by itself.
+This tool should be designed to help testing bnep on Bluez.
 ---
- profiles/network/bnep.c       | 10 ----------
- profiles/network/bnep.h       |  1 -
- profiles/network/connection.c | 19 ++++++++++++-------
- profiles/network/server.c     | 24 +++++++++++++++++++++---
- 4 files changed, 33 insertions(+), 21 deletions(-)
+ .gitignore         |  1 +
+ Makefile.tools     | 12 ++++++---
+ android/Android.mk | 35 ++++++++++++++++++++++++++
+ tools/bneptest.c   | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 119 insertions(+), 3 deletions(-)
+ create mode 100644 tools/bneptest.c
 
-diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 3fe63f0..a81a260 100644
---- a/profiles/network/bnep.c
-+++ b/profiles/network/bnep.c
-@@ -85,16 +85,6 @@ struct bnep {
- 	void	*disconn_data;
- };
+diff --git a/.gitignore b/.gitignore
+index a207a0f..a4f06dc 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -82,6 +82,7 @@ tools/gatt-service
+ tools/btgatt-client
+ tools/btgatt-server
+ tools/mcaptest
++tools/bneptest
+ test/sap_client.pyc
+ test/bluezutils.pyc
+ unit/test-ringbuf
+diff --git a/Makefile.tools b/Makefile.tools
+index e28f3cb..1aafb28 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -223,9 +223,9 @@ noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
+ 			tools/hcieventmask tools/hcisecfilter \
+ 			tools/btmgmt tools/btinfo tools/btattach \
+ 			tools/btsnoop tools/btproxy \
+-			tools/btiotest tools/mcaptest tools/cltest \
+-			tools/oobtest tools/seq2bseq tools/ibeacon \
+-			tools/btgatt-client tools/btgatt-server
++			tools/btiotest  tools/bneptest tools/mcaptest \
++			tools/cltest tools/oobtest tools/seq2bseq \
++			tools/ibeacon tools/btgatt-client tools/btgatt-server
  
--const char *bnep_uuid(uint16_t id)
--{
--	int i;
--
--	for (i = 0; __svc[i].uuid128; i++)
--		if (__svc[i].id == id)
--			return __svc[i].uuid128;
--	return NULL;
--}
--
- const char *bnep_name(uint16_t id)
- {
- 	int i;
-diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
-index 31579f9..811ea14 100644
---- a/profiles/network/bnep.h
-+++ b/profiles/network/bnep.h
-@@ -26,7 +26,6 @@ struct bnep;
- int bnep_init(void);
- int bnep_cleanup(void);
+ tools_bdaddr_SOURCES = tools/bdaddr.c src/oui.h src/oui.c
+ tools_bdaddr_LDADD = lib/libbluetooth-internal.la @UDEV_LIBS@
+@@ -267,6 +267,12 @@ tools_mcaptest_SOURCES = tools/mcaptest.c \
+ 				profiles/health/mcap.h profiles/health/mcap.c
+ tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
  
--const char *bnep_uuid(uint16_t id);
- const char *bnep_name(uint16_t id);
- 
- struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index 2b24a0c..538e7ad 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -284,21 +284,23 @@ static DBusMessage *local_connect(DBusConnection *conn,
- 	struct btd_service *service;
- 	struct network_conn *nc;
- 	const char *svc;
--	const char *uuid;
- 	uint16_t id;
- 	int err;
-+	char uuid_str[MAX_LEN_UUID_STR];
-+	bt_uuid_t uuid;
- 
- 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &svc,
- 						DBUS_TYPE_INVALID) == FALSE)
- 		return btd_error_invalid_args(msg);
- 
- 	id = get_pan_srv_id(svc);
--	uuid = bnep_uuid(id);
-+	bt_uuid16_create(&uuid, id);
-+	bt_uuid_to_uuid128(&uuid, &uuid);
- 
--	if (uuid == NULL)
-+	if (bt_uuid_to_string(&uuid, uuid_str, MAX_LEN_UUID_STR) < 0)
- 		return btd_error_invalid_args(msg);
- 
--	service = btd_device_get_service(peer->device, uuid);
-+	service = btd_device_get_service(peer->device, uuid_str);
- 	if (service == NULL)
- 		return btd_error_not_supported(msg);
- 
-@@ -439,15 +441,18 @@ static gboolean network_property_get_uuid(const GDBusPropertyTable *property,
- {
- 	struct network_peer *peer = data;
- 	struct network_conn *nc;
--	const char *uuid;
-+	char uuid_str[MAX_LEN_UUID_STR];
-+	bt_uuid_t uuid;
- 
- 	nc = find_connection_by_state(peer->connections, CONNECTED);
- 	if (nc == NULL)
- 		return FALSE;
- 
--	uuid = bnep_uuid(nc->id);
-+	bt_uuid16_create(&uuid, nc->id);
-+	bt_uuid_to_uuid128(&uuid, &uuid);
-+	bt_uuid_to_string(&uuid, uuid_str, MAX_LEN_UUID_STR);
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid_str);
- 
- 	return TRUE;
- }
-diff --git a/profiles/network/server.c b/profiles/network/server.c
-index 5d2fbcc..ba1dfd4 100644
---- a/profiles/network/server.c
-+++ b/profiles/network/server.c
-@@ -114,14 +114,32 @@ static struct network_server *find_server(GSList *list, uint16_t id)
- static struct network_server *find_server_by_uuid(GSList *list,
- 							const char *uuid)
- {
-+	bt_uuid_t srv_uuid, bnep_uuid;
++tools_bneptest_SOURCES = tools/bneptest.c \
++				btio/btio.h btio/btio.c \
++				src/log.c src/log.h \
++				profiles/network/bnep.h profiles/network/bnep.c
++tools_bneptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
 +
- 	for (; list; list = list->next) {
- 		struct network_server *ns = list->data;
-+		bt_uuid16_create(&bnep_uuid, ns->id);
+ tools_cltest_SOURCES = tools/cltest.c
+ tools_cltest_LDADD = lib/libbluetooth-internal.la src/libshared-mainloop.la
  
--		if (strcasecmp(uuid, bnep_uuid(ns->id)) == 0)
-+		/* UUID value compare */
-+		if (!bt_string_to_uuid(&srv_uuid, uuid) &&
-+					!bt_uuid_cmp(&srv_uuid, &bnep_uuid))
- 			return ns;
+diff --git a/android/Android.mk b/android/Android.mk
+index 6c0eda8..f218805 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -256,6 +256,41 @@ LOCAL_MODULE := mcaptest
+ include $(BUILD_EXECUTABLE)
  
--		if (strcasecmp(uuid, bnep_name(ns->id)) == 0)
--			return ns;
-+		/* String value compare */
-+		switch (ns->id) {
-+		case BNEP_SVC_PANU:
-+			if (!strcasecmp(uuid, "panu"))
-+				return ns;
-+			break;
-+		case BNEP_SVC_NAP:
-+			if (!strcasecmp(uuid, "nap"))
-+				return ns;
-+			break;
-+		case BNEP_SVC_GN:
-+			if (!strcasecmp(uuid, "gn"))
-+				return ns;
-+			break;
+ #
++# bneptest
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := \
++	bluez/src/log.c \
++	bluez/btio/btio.c \
++	bluez/lib/bluetooth.c \
++	bluez/lib/hci.c \
++	bluez/profiles/network/bnep.c \
++	bluez/tools/bneptest.c \
++
++LOCAL_C_INCLUDES := \
++	$(call include-path-for, glib) \
++	$(call include-path-for, glib)/glib \
++
++LOCAL_C_INCLUDES += \
++	$(LOCAL_PATH)/bluez \
++
++LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++
++LOCAL_SHARED_LIBRARIES := \
++	libglib \
++
++LOCAL_STATIC_LIBRARIES := \
++	bluetooth-headers \
++
++LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
++LOCAL_MODULE_TAGS := debug
++LOCAL_MODULE := bneptest
++
++include $(BUILD_EXECUTABLE)
++
++#
+ # avdtptest
+ #
+ 
+diff --git a/tools/bneptest.c b/tools/bneptest.c
+new file mode 100644
+index 0000000..cafeba9
+--- /dev/null
++++ b/tools/bneptest.c
+@@ -0,0 +1,74 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2015 Intel Corporation
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <getopt.h>
++
++#include <glib.h>
++
++#include "src/log.h"
++
++static GMainLoop *mloop;
++
++static void usage(void)
++{
++	printf("bneptest - BNEP testing ver %s\n", VERSION);
++	printf("Usage:\n"
++		"\tbneptest [options]\n");
++}
++
++static struct option main_options[] = {
++	{ "help",		0, 0, 'h' },
++	{ 0, 0, 0, 0 }
++};
++
++int main(int argc, char *argv[])
++{
++	int opt;
++
++	DBG("");
++
++	mloop = g_main_loop_new(NULL, FALSE);
++	if (!mloop) {
++		printf("Cannot create main loop\n");
++
++		exit(1);
++	}
++
++	while ((opt = getopt_long(argc, argv, "h", main_options, NULL))
++								!= EOF) {
++		switch (opt) {
++		case 'h':
++		default:
++			usage();
++			exit(0);
 +		}
- 	}
- 
- 	return NULL;
++	}
++
++	return 0;
++}
 -- 
 2.1.0
 
