@@ -1,163 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2 2/2] Bluetooth: btusb: Add support for QCA ROME chipset
- family
-Date: Tue, 3 Mar 2015 13:57:35 +0000
-Message-ID: <E0D4EC52-706A-4FB9-827B-ABFE1BDB1CA4@qca.qualcomm.com>
-References: <403291a4c9b848f6956683e60c7e016f@nalasexr02e.na.qualcomm.com>
- <782CEA04-7241-4AC6-BD39-F0FEB49AAF2B@holtmann.org>
- <B37A934A-7A6F-4D02-A3A1-081BB5DC5A48@holtmann.org>
-In-Reply-To: <B37A934A-7A6F-4D02-A3A1-081BB5DC5A48@holtmann.org>
-Content-Type: text/plain; charset="Windows-1252"
 MIME-Version: 1.0
+In-Reply-To: <CABBYNZJZ8O2FFrj-ycxjGKZb_C7ew3=A_UdoDry4Jfso0Z_s-w@mail.gmail.com>
+References: <CAPygXWLHcbw_qYA2bk9T9hSCABN-kwPQyPZeH_sedWo+-e50DA@mail.gmail.com>
+ <CABBYNZJZ8O2FFrj-ycxjGKZb_C7ew3=A_UdoDry4Jfso0Z_s-w@mail.gmail.com>
+From: Rich Rath <rath@way.net>
+Date: Mon, 2 Mar 2015 23:44:43 -1000
+Message-ID: <CAPygXWKD4RMmZ-OPT6ZDSPFvwtt0+eB4LXaBmZC3iRDJrSzivA@mail.gmail.com>
+Subject: Re: unable to get bluez to recognize apple magic trackpad by name
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Mon, Mar 2, 2015 at 10:52 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> You can check with bluetoothctl if the name is set, using command info.
+>
 
-On Mar 2, 2015, at 5:17 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+this returned:
+Alias: Apple Touchpad
+Class: 0x002594
+Icon: input-tablet
+Paired: yes
+Trusted: yes
+Blocked: no
+Connected: yes
+LegacyPairing: yes
+UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34fb)
+UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+Modalias: usb:v05ACp030Ed0160
 
-> Hi Ben,
->=20
->>> This patch supports ROME Bluetooth family from Qualcomm Atheros,
->>> e.g. QCA61x4 or QCA6574.
->>>=20
->>> New chipset have similar firmware downloading sequences to previous
->>> chipset from Atheros, however, it doesn't support vid/pid switching
->>> after downloading the patch so that firmware needs to be handled by
->>> btusb module directly.
->>>=20
->>> ROME chipset can be differentiated from previous version by reading
->>> ROM version.
->>>=20
->>> T:  Bus=3D03 Lev=3D01 Prnt=3D01 Port=3D01 Cnt=3D01 Dev#=3D 16 Spd=3D12 =
-  MxCh=3D 0
->>> D:  Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  =
-1
->>> P:  Vendor=3D0cf3 ProdID=3De300 Rev=3D 0.01
->>> C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
->>> I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
->>> E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
->>> E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
->>> I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
->>> I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
->>> I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
->>> I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
->>> I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
->>> I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
->>>=20
->>> T:  Bus=3D03 Lev=3D01 Prnt=3D01 Port=3D01 Cnt=3D01 Dev#=3D  8 Spd=3D12 =
-  MxCh=3D 0
->>> D:  Ver=3D 2.01 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  =
-1
->>> P:  Vendor=3D0cf3 ProdID=3De360 Rev=3D 0.01
->>> C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
->>> I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
->>> E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
->>> E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
->>> I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
->>> I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
->>> I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
->>> I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
->>> I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
->>> I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driv=
-er=3Dbtusb
->>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
->>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
->>>=20
->>> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
->>> ---
->>> drivers/bluetooth/btusb.c | 254 +++++++++++++++++++++++++++++++++++++++=
-+++++++
->>> 1 file changed, 254 insertions(+)
->>=20
->> patch has been applied to bluetooth-next tree.
->=20
-> and now I am regretting having applied this patch. Have you actually run =
-make C=3D2 on this?
->=20
->  CHECK   drivers/bluetooth/btusb.c
-> drivers/bluetooth/btusb.c:2677:11: warning: incorrect type in initializer=
- (different base types)
-> drivers/bluetooth/btusb.c:2677:11:    expected restricted __le32 [usertyp=
-e] rom_version
-> drivers/bluetooth/btusb.c:2677:11:    got int
-> drivers/bluetooth/btusb.c:2678:11: warning: incorrect type in initializer=
- (different base types)
-> drivers/bluetooth/btusb.c:2678:11:    expected restricted __le32 [usertyp=
-e] rom_version
-> drivers/bluetooth/btusb.c:2678:11:    got int
-> drivers/bluetooth/btusb.c:2679:11: warning: incorrect type in initializer=
- (different base types)
-> drivers/bluetooth/btusb.c:2679:11:    expected restricted __le32 [usertyp=
-e] rom_version
-> drivers/bluetooth/btusb.c:2679:11:    got int
-> drivers/bluetooth/btusb.c:2680:11: warning: incorrect type in initializer=
- (different base types)
-> drivers/bluetooth/btusb.c:2680:11:    expected restricted __le32 [usertyp=
-e] rom_version
-> drivers/bluetooth/btusb.c:2680:11:    got int
-> drivers/bluetooth/btusb.c:2681:11: warning: incorrect type in initializer=
- (different base types)
-> drivers/bluetooth/btusb.c:2681:11:    expected restricted __le32 [usertyp=
-e] rom_version
-> drivers/bluetooth/btusb.c:2681:11:    got int
-> drivers/bluetooth/btusb.c:2805:17: warning: restricted __le16 degrades to=
- integer
-> drivers/bluetooth/btusb.c:2805:37: warning: restricted __le32 degrades to=
- integer
-> drivers/bluetooth/btusb.c:2806:17: warning: restricted __le16 degrades to=
- integer
-> drivers/bluetooth/btusb.c:2806:39: warning: restricted __le32 degrades to=
- integer
->=20
-> Please fix this quickly. Getting endian conversion right is important.
->=20
+BUT PLZ NOTE "Apple touchpad" is the alias I supplied via testdevice,
+which would probably go away if I rebooted.  the name in dmesg and
+/proc is  [Apple Wireless Trackpad]
 
-Got same warning messages on latest patch. I=92ll send new patch to address=
- this warning output.
+> Have you tried with anything more recent than 3.14,
+oops, forgot this info.  running fully up-to-date Manjaro stable
+(based on Arch but a week or two behind).  current kernel is
+3.16.7.7-1.  I have access to 3.18.7-1 and 3.19.0-1 but I would have
+to install.  let me know if you want this and which one.
 
-> Regards
->=20
-> Marcel
+> also make sure you
+> have an up to date version of bluetoothd.
 
-Thanks
-=97 Ben Kim=
+doh.
+bluez is version 5.28-1 which I assume will be the version for bluetoothd.
+
+sorry for not providing basic info in the first place.
+
+Rich
