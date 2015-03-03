@@ -1,288 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <52958157-D1FE-4DE9-90CA-2EBC008CD42D@holtmann.org>
-References: <1424365130-26193-1-git-send-email-jpawlowski@google.com>
-	<52958157-D1FE-4DE9-90CA-2EBC008CD42D@holtmann.org>
-Date: Mon, 2 Mar 2015 17:58:57 -0800
-Message-ID: <CAD0=r8yqs67WPd5XaudA++kbey+Siqqrw4iQ8sUZ339uKrYQ2g@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: fix service discovery behaviour for empty
- uuids filter
+In-Reply-To: <CB23EFA5-1D60-4658-BAAE-8C666AE22052@holtmann.org>
+References: <CAD0=r8wZdzJBVq3f9j9iJJOZw2T0JwNiKxto13p9MSR7uL_Ziw@mail.gmail.com>
+	<EE319A64-C3DB-49C5-A87A-BAF245159907@holtmann.org>
+	<CAD0=r8w9MhKKm8isLY0+3SH0kxBd91z3HiOwpPp_j8fQFnirgw@mail.gmail.com>
+	<CB23EFA5-1D60-4658-BAAE-8C666AE22052@holtmann.org>
+Date: Mon, 2 Mar 2015 17:27:35 -0800
+Message-ID: <CAD0=r8xKaDgru1-5TUfE0Fy=dngAt3c0JeL8w2tX_n9Mx6fr5g@mail.gmail.com>
+Subject: Re: Why is interleaved scan interleaved ? Can I fix that to do LE and
+ classic at same time ?
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Mon, Mar 2, 2015 at 4:57 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Mon, Mar 2, 2015 at 4:25 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
 > Hi Jakub,
 >
->> This patch fixes service discovery behaviour, when provided uuid filter
->> is empty and HCI_QUIRK_STRICT_DUPLICATE_FILTER is set. Before this
->> patch, empty uuid filter was unable to trigger scan restart, and that
->> caused inconsistent behaviour in applications.
+>>>> When I do interleaved scan on linux, it's doing LE first, for around
+>>>> 10 seconds, and then Classic scan for another few seconds on kernel
+>>>> level.
+>>>>
+>>>> I was playing with Bluetooth on macbook, and noticed that they do both
+>>>> LE and Classic scan at once. So I tried modifying kernel, I triggered
+>>>> both LE and classic scan at once by queuing both
+>>>> HCI_OP_LE_SET_SCAN_ENABLE, and HCI_OP_INQUIRY and it just worked, both
+>>>> LE and Classic devices were reported.
+>>>>
+>>>> I tested that with CSR, Broadcom and Atheros chips, and all behaved we=
+ll.
+>>>>
+>>>> Is there any reason why we do interleave instead of both scans at once=
+ ?
+>>>
+>>> actually there are chips that do not support BR/EDR inquiry and LE scan=
+ at the same time. So for some chips we need this behavior. I think that al=
+l chips in platforms running Windows 8 will actually support simultaneous B=
+R/EDR inquiry and LE scan since Microsoft mandated it. However in the embed=
+ded SoC world that might not be true actually.
+>>>
+>>> And in the early days of LE, there was almost no chip that was able to =
+handle BR/EDR inquiry and LE scan at the same time. That is why the interle=
+aved behavior exists in the first place.
+>>>
+>>>> I would be more than happy to modify 'interleaved' behaviour, to do
+>>>> both LE and classic scan at same time.
+>>>
+>>> Introduce HCI_QUIRK_SIMULTAENOUS_DISCOVERY and allow for well know good=
+ behaving controller to set it. That way we can slowly move into that direc=
+tion and keep interleaved behavior as a fallback.
+>>>
+>>> Regards
+>>>
+>>> Marcel
+>>>
 >>
->> Example: two DBus clients call BlueZ, one to find all devices with
->> service abcd, second to find all devices with rssi smaller than -90.
->> Sum of those filters, that is passed to mgmt_service_scan is empty
->> filter, with no rssi or uuids set.
->> That caused kernel not to restart scan when quirk was set.
->> That was inconsistent with what happen when there's only one of those
->> two filters set (scan is restarted and reports devices).
->>
->> To fix that, new variable hdev->discovery.service_discovery was
->> introduced. It can indicate that filtered scan is running, no matter
->> what uuid or rssi filter is set.
+>> So I send my patches previous week, and I just uploaded new version.
+>> The old version was just starting both scans at once. It was working
+>> on Atheros, CSR, and Broadcom, but then I find out it doesn't work on
+>> Intel controllers.
 >
-> I think that a name like hdev->discovery.result_filtering would be a bit more descriptive and not duplicate the "discovery" wording.
-Ok, I'll change that
+> I know for certain that there are some older Atheros controllers that did=
+ not support simultaneous service discovery. And I think certain Qualcomm h=
+ardware doesn't do either. That might be all fixed now and it might be supp=
+orted starting certain controller or firmware version, but that is somethin=
+g that should come from the vendor in the end.
 >
->>
->> This patch also closes all code responsible for filtered discovery in
->> one if statement. That makes whole code shorter, much more readable,
->> and easier to backport to older kernels, especially pre 3.10.
->>
->> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
->> ---
->> include/net/bluetooth/hci_core.h |   2 +
->> net/bluetooth/mgmt.c             | 145 +++++++++++++++------------------------
->> 2 files changed, 57 insertions(+), 90 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> index a7bf773..791bb75 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -76,6 +76,7 @@ struct discovery_state {
->>       u8                      last_adv_data[HCI_MAX_AD_LENGTH];
->>       u8                      last_adv_data_len;
->>       bool                    report_invalid_rssi;
->> +     bool                    service_discovery;
->>       s8                      rssi;
->>       u16                     uuid_count;
->>       u8                      (*uuids)[16];
+>> The reason for that was LE scan window equal to LE scan interval. When
+>> I doubled Scan Interval, Intel devices started working. Apparently
+>> other controllers don't really care.
 >
-> I actually wonder if long term (not in this patch), we might want to combine the type and these booleans into a single unsigned long with flags assigned to it.
-Yes, if we get more fields like this we might do that. Isn't compiler
-doing something like that internally, when you have booleans in struct
-one after another ?
+> Can you be more specific which Intel controllers. We have more than one a=
+nd also different firmware patches for them. We might need to test this a b=
+it more.
+>
 
+One was Intel Wilkins Peak 2, I'm not sure about the other, they said
+hello in dmesg like this:
 
->
->> @@ -525,6 +526,7 @@ static inline void discovery_init(struct hci_dev *hdev)
->>
->> static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
->> {
->> +     hdev->discovery.service_discovery = false;
->>       hdev->discovery.report_invalid_rssi = true;
->>       hdev->discovery.rssi = HCI_RSSI_INVALID;
->>       hdev->discovery.uuid_count = 0;
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 3a1b537..0c5b16a 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -3932,8 +3932,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
->>                */
->>               if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
->>                            &hdev->quirks) &&
->> -                 (hdev->discovery.uuid_count > 0 ||
->> -                  hdev->discovery.rssi != HCI_RSSI_INVALID)) {
->> +                 hdev->discovery.service_discovery) {
->
-> Since we have a comment above this statement. Does it need adjustment or is that still fine?
->
->>                       hdev->discovery.scan_start = jiffies;
->>                       hdev->discovery.scan_duration = timeout;
->>               }
->> @@ -4086,6 +4085,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
->>        */
->>       hci_discovery_filter_clear(hdev);
->>
->> +     hdev->discovery.service_discovery = true;
->>       hdev->discovery.type = cp->type;
->>       hdev->discovery.rssi = cp->rssi;
->>       hdev->discovery.uuid_count = uuid_count;
->> @@ -7286,7 +7286,6 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->>       char buf[512];
->>       struct mgmt_ev_device_found *ev = (void *) buf;
->>       size_t ev_size;
->> -     bool match;
->>
->>       /* Don't send events for a non-kernel initiated discovery. With
->>        * LE one exception is if we have pend_le_reports > 0 in which
->> @@ -7299,21 +7298,57 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->>                       return;
->>       }
->>
->> -     /* When using service discovery with a RSSI threshold, then check
->> -      * if such a RSSI threshold is specified. If a RSSI threshold has
->> -      * been specified, and HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set,
->> -      * then all results with a RSSI smaller than the RSSI threshold will be
->> -      * dropped. If the quirk is set, let it through for further processing,
->> -      * as we might need to restart the scan.
->> -      *
->> -      * For BR/EDR devices (pre 1.2) providing no RSSI during inquiry,
->> -      * the results are also dropped.
->> -      */
->> -     if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
->> -         (rssi == HCI_RSSI_INVALID ||
->> -         (rssi < hdev->discovery.rssi &&
->> -          !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
->> -             return;
->> +     if (hdev->discovery.service_discovery) {
->> +             /* We are using service discovery */
->> +
->> +             /* If a RSSI threshold has been specified, and
->> +              * HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set, then all
->> +              * results with a RSSI smaller than the RSSI threshold will be
->> +              * dropped. If the quirk is set, let it through for further
->> +              * processing, as we might need to restart the scan.
->> +              *
->> +              * For BR/EDR devices (pre 1.2) providing no RSSI during
->> +              * inquiry, the results are also dropped.
->> +              */
->> +             if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
->> +                 (rssi == HCI_RSSI_INVALID ||
->> +                 (rssi < hdev->discovery.rssi &&
->> +                  !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
->> +                            &hdev->quirks))))
->> +                     return;
->> +
->> +             /* If a list of UUID is provided, results with no matching UUID
->> +              * should be dropped. If list of UUID is not provided, treat
->> +              * all devices as matches.
->> +              * Empty UUID filter might be a result of merging filters
->> +              * somewhere in highter layer, and should behave same as when
->> +              * we have UUID match.
->> +              */
->> +             if (hdev->discovery.uuid_count != 0 &&
->> +                 (eir_len == 0 || !eir_has_uuids(eir, eir_len,
->> +                               hdev->discovery.uuid_count,
->> +                               hdev->discovery.uuids)) &&
->> +                 (scan_rsp_len == 0 || !eir_has_uuids(scan_rsp, scan_rsp_len,
->> +                               hdev->discovery.uuid_count,
->> +                               hdev->discovery.uuids)))
->> +                     return;
->> +
->> +             /* If duplicate filtering does not report RSSI changes,
->> +              * then restart scanning to ensure updated result with
->> +              * updated RSSI values.
->> +              */
->> +             if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
->> +                          &hdev->quirks)) {
->> +                     restart_le_scan(hdev);
->> +
->> +                     /* Validate the reported RSSI value against the
->> +                      * RSSI threshold once more.
->> +                      */
->> +                     if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
->> +                         rssi < hdev->discovery.rssi)
->> +                             return;
->> +             }
->> +     }
->>
->>       /* Make sure that the buffer is big enough. The 5 extra bytes
->>        * are for the potential CoD field.
->> @@ -7340,87 +7375,17 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->>       ev->rssi = rssi;
->>       ev->flags = cpu_to_le32(flags);
->>
->> -     if (eir_len > 0) {
->> -             /* When using service discovery and a list of UUID is
->> -              * provided, results with no matching UUID should be
->> -              * dropped. In case there is a match the result is
->> -              * kept and checking possible scan response data
->> -              * will be skipped.
->> -              */
->> -             if (hdev->discovery.uuid_count > 0) {
->> -                     match = eir_has_uuids(eir, eir_len,
->> -                                           hdev->discovery.uuid_count,
->> -                                           hdev->discovery.uuids);
->> -                     /* If duplicate filtering does not report RSSI changes,
->> -                      * then restart scanning to ensure updated result with
->> -                      * updated RSSI values.
->> -                      */
->> -                     if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
->> -                                           &hdev->quirks))
->> -                             restart_le_scan(hdev);
->> -             } else {
->> -                     match = true;
->> -             }
->> -
->> -             if (!match && !scan_rsp_len)
->> -                     return;
->> -
->> +     if (eir_len > 0)
->>               /* Copy EIR or advertising data into event */
->>               memcpy(ev->eir, eir, eir_len);
->> -     } else {
->> -             /* When using service discovery and a list of UUID is
->> -              * provided, results with empty EIR or advertising data
->> -              * should be dropped since they do not match any UUID.
->> -              */
->> -             if (hdev->discovery.uuid_count > 0 && !scan_rsp_len)
->> -                     return;
->> -
->> -             match = false;
->> -     }
->>
->>       if (dev_class && !eir_has_data_type(ev->eir, eir_len, EIR_CLASS_OF_DEV))
->>               eir_len = eir_append_data(ev->eir, eir_len, EIR_CLASS_OF_DEV,
->>                                         dev_class, 3);
->>
->> -     if (scan_rsp_len > 0) {
->> -             /* When using service discovery and a list of UUID is
->> -              * provided, results with no matching UUID should be
->> -              * dropped if there is no previous match from the
->> -              * advertising data.
->> -              */
->> -             if (hdev->discovery.uuid_count > 0) {
->> -                     if (!match && !eir_has_uuids(scan_rsp, scan_rsp_len,
->> -                                                  hdev->discovery.uuid_count,
->> -                                                  hdev->discovery.uuids))
->> -                             return;
->> -
->> -                     /* If duplicate filtering does not report RSSI changes,
->> -                      * then restart scanning to ensure updated result with
->> -                      * updated RSSI values.
->> -                      */
->> -                     if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
->> -                                  &hdev->quirks))
->> -                             restart_le_scan(hdev);
->> -             }
->> -
->> +     if (scan_rsp_len > 0)
->>               /* Append scan response data to event */
->>               memcpy(ev->eir + eir_len, scan_rsp, scan_rsp_len);
->> -     } else {
->> -             /* When using service discovery and a list of UUID is
->> -              * provided, results with empty scan response and no
->> -              * previous matched advertising data should be dropped.
->> -              */
->> -             if (hdev->discovery.uuid_count > 0 && !match)
->> -                     return;
->> -     }
->> -
->> -     /* Validate the reported RSSI value against the RSSI threshold once more
->> -      * incase HCI_QUIRK_STRICT_DUPLICATE_FILTER forced a restart of LE
->> -      * scanning.
->> -      */
->> -     if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
->> -         rssi < hdev->discovery.rssi)
->> -             return;
->
-> I have no chance of verifying that this code is correct. Do we actually have mgmt-tester test cases that test this behavior?
+[ 1.373161] Bluetooth: hci0: read Intel version: 3707100180012d0d0d
+[ 1.373170] Bluetooth: hci0: Intel device is already patched. patch num: 0d
 
-There's test that make sure that filtered scan is correctly started
-and stopped, but no test for making sure that packets are processed
-correctly, or that quirk is working right. I'm working on making tests
-for that, but there's currently no way to set quirks in tests for
-vhci.
-Once I get D-Bus code in, I'll have more time to make some tests.
+and
 
+[ 9.521272] Bluetooth: hci0: read Intel version: 370710018002030d00
+[ 9.554952] Bluetooth: hci0: Intel Bluetooth firmware file:
+intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
+[ 9.735771] Bluetooth: hci0: Intel Bluetooth firmware patch completed
+and activated
+
+However those are built-in into chromebooks, and the patch file in
+/lib/firmware/intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq  have different
+size than in i.e. Ubuntu distribution, so there might be somenthing
+specially for chromebooks.
+
+>> So now it works on all controllers I have tested with.
+>>
+>> I have however question about Broadcom:
+>> Simultaenous scan work, when there is firmware patch in /lib/firmware
+>> (ubuntu have it). If the patch is not present it's not working. Can I
+>> somehow make this kind of check in btusb.c to set the quirk ?
 >
-> You are taking a lot of code and replacing it by completely new code. I rather not do that until I can be 100% sure we do not break existing behavior. This is just too much code for single patch. You need to break this down into smaller pieces.
-Ok, I'll split that up.
+> You can set this quirk from within hdev->setup(). However this is dangero=
+us if it is a maybe thing. In these cases it might be better to keep off. O=
+r actually tie it to firmware build numbers that have been tested to work. =
+You can get the firmware build numbers from the HCI revision information. T=
+hat it works on one Broadcom controllers does not mean it works on all of t=
+hem.
+>
+>> I also have question about scan window and interval: right now I just
+>> doubled scan interval. This gives more than 12ms of free time that
+>> BR/EDR scan would use to do inquiry. I fund in spec (Version 4.2 [Vol
+>> 2, Part E] 6.2 and 6.3) that default Inquiry_Scan_Window is 11.25ms,
+>> so this should work good. Do you have any suggestions to tune those
+>> parameters in other way ?
+>
+> Actually inside the kernel we can not just pick new values. They are driv=
+en by the Set Scan Parameters management command. So we need to obey to wha=
+t userspace gave us.
+
+No, the interval value used during discovery is hard coded here:
+
+http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tr=
+ee/include/net/bluetooth/hci_core.h#n1286
+
+and used here:
+
+http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tr=
+ee/net/bluetooth/mgmt.c#n3862
+
+So it looks like values set by Set Scan Parameters are not used, and
+we have to pick new ones. Or is that a bug ?
+
+I will fix the patches that set the quirk for particular controllers.
+But patches no 1 and 2 are still good, can you please take a look at
+them ?
+
 >
 > Regards
 >
