@@ -1,50 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 3 Mar 2015 10:32:24 -0800
-Message-ID: <CALMby5ZjoCqCirOcUPXN38mhAE5KEsVTdh8MMpjvKsL+w59k9g@mail.gmail.com>
-Subject: Patch to bluez/src/shared/att.c
-From: =?UTF-8?B?0JLQvtC70L7QtNC40LzQuNGAINCe0YHRgtCw0L8=?=
-	<volodymyr.ostap@gmail.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001a113366d45a55bf0510668e13
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v4 3/3] Bluetooth: fix service discovery behaviour for empty uuids filter
+Date: Tue,  3 Mar 2015 10:16:53 -0800
+Message-Id: <1425406613-21420-3-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1425406613-21420-1-git-send-email-jpawlowski@google.com>
+References: <1425406613-21420-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a113366d45a55bf0510668e13
-Content-Type: text/plain; charset=UTF-8
+This patch fixes service discovery behaviour, when provided uuid filter
+is empty and HCI_QUIRK_STRICT_DUPLICATE_FILTER is set. Before this
+patch, empty uuid filter was unable to trigger scan restart, and that
+caused inconsistent behaviour in applications.
 
-Hi All,
+Example: two DBus clients call BlueZ, one to find all devices with
+service abcd, second to find all devices with rssi smaller than -90.
+Sum of those filters, that is passed to mgmt_service_scan is empty
+filter, with no rssi or uuids set.
+That caused kernel not to restart scan when quirk was set.
+That was inconsistent with what happen when there's only one of those
+two filters set (scan is restarted and reports devices).
 
-Fix of thread racing in bt_att_send()
+To fix that, new variable hdev->discovery.result_filtering was
+introduced. It can indicate that filtered scan is running, no matter
+what uuid or rssi filter is set.
 
-In case bt_att_send() is called from other thread, internal thread
-could complete
-just added operation before  bt_att_send() returns. So, the function
-return 0 as in error case.
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ include/net/bluetooth/hci_core.h | 2 ++
+ net/bluetooth/mgmt.c             | 7 +++----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
---001a113366d45a55bf0510668e13
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="09-shared-att-fixed-thread-racing.patch"
-Content-Disposition: attachment;
-	filename="09-shared-att-fixed-thread-racing.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_i6tmt8w80
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index acec914..15c761c 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -76,6 +76,7 @@ struct discovery_state {
+ 	u8			last_adv_data[HCI_MAX_AD_LENGTH];
+ 	u8			last_adv_data_len;
+ 	bool			report_invalid_rssi;
++	bool			result_filtering;
+ 	s8			rssi;
+ 	u16			uuid_count;
+ 	u8			(*uuids)[16];
+@@ -525,6 +526,7 @@ static inline void discovery_init(struct hci_dev *hdev)
+ 
+ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
+ {
++	hdev->discovery.result_filtering = false;
+ 	hdev->discovery.report_invalid_rssi = true;
+ 	hdev->discovery.rssi = HCI_RSSI_INVALID;
+ 	hdev->discovery.uuid_count = 0;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 896ace7..0590bfe 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3933,8 +3933,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
+ 		 */
+ 		if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
+ 			     &hdev->quirks) &&
+-		    (hdev->discovery.uuid_count > 0 ||
+-		     hdev->discovery.rssi != HCI_RSSI_INVALID)) {
++		    hdev->discovery.result_filtering) {
+ 			hdev->discovery.scan_start = jiffies;
+ 			hdev->discovery.scan_duration = timeout;
+ 		}
+@@ -4087,6 +4086,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	 */
+ 	hci_discovery_filter_clear(hdev);
+ 
++	hdev->discovery.result_filtering = true;
+ 	hdev->discovery.type = cp->type;
+ 	hdev->discovery.rssi = cp->rssi;
+ 	hdev->discovery.uuid_count = uuid_count;
+@@ -7299,8 +7299,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			return;
+ 	}
+ 
+-	if (hdev->discovery.rssi != HCI_RSSI_INVALID ||
+-	    hdev->discovery.uuid_count > 0) {
++	if (hdev->discovery.result_filtering) {
+ 		/* We are using service discovery */
+ 
+ 		/* If a RSSI threshold has been specified, and
+-- 
+2.2.0.rc0.207.ga3a616c
 
-LS0tIGJsdWV6LTUuMjgub3JnL3NyYy9zaGFyZWQvYXR0LmMJMjAxNS0wMi0wMSAyMDo1NDoxOS4w
-MDAwMDAwMDAgLTA4MDAKKysrIGJsdWV6LTUuMjgvc3JjL3NoYXJlZC9hdHQuYwkyMDE1LTAyLTIz
-IDE4OjMxOjQ4LjY0NTQ2MDIzOCAtMDgwMApAQCAtNzMsNyArNzQsNyBAQAogCXVpbnQ4X3QgKmJ1
-ZjsKIAl1aW50MTZfdCBtdHU7CiAKLQl1bnNpZ25lZCBpbnQgbmV4dF9zZW5kX2lkOwkvKiBJRHMg
-Zm9yICJzZW5kIiBvcHMgKi8KKwl2b2xhdGlsZSB1bnNpZ25lZCBpbnQgbmV4dF9zZW5kX2lkOwkv
-KiBJRHMgZm9yICJzZW5kIiBvcHMgKi8KIAl1bnNpZ25lZCBpbnQgbmV4dF9yZWdfaWQ7CS8qIElE
-cyBmb3IgcmVnaXN0ZXJlZCBjYWxsYmFja3MgKi8KIAogCWJ0X2F0dF90aW1lb3V0X2Z1bmNfdCB0
-aW1lb3V0X2NhbGxiYWNrOwpAQCAtMTAwNiw3ICsxMDA4LDggQEAKIHsKIAlzdHJ1Y3QgYXR0X3Nl
-bmRfb3AgKm9wOwogCWJvb2wgcmVzdWx0OwotCisJdW5zaWduZWQgaW50IGlkOworCQogCWlmICgh
-YXR0IHx8ICFhdHQtPmlvKQogCQlyZXR1cm4gMDsKIApAQCAtMTAxOCw3ICsxMDIxLDcgQEAKIAlp
-ZiAoYXR0LT5uZXh0X3NlbmRfaWQgPCAxKQogCQlhdHQtPm5leHRfc2VuZF9pZCA9IDE7CiAKLQlv
-cC0+aWQgPSBhdHQtPm5leHRfc2VuZF9pZCsrOworCWlkID0gb3AtPmlkID0gYXR0LT5uZXh0X3Nl
-bmRfaWQrKzsKIAogCS8qIEFkZCB0aGUgb3AgdG8gdGhlIGNvcnJlY3QgcXVldWUgYmFzZWQgb24g
-aXRzIHR5cGUgKi8KIAlzd2l0Y2ggKG9wLT50eXBlKSB7CkBAIC0xMDQ2LDcgKzEwNDksNyBAQAog
-CiAJd2FrZXVwX3dyaXRlcihhdHQpOwogCi0JcmV0dXJuIG9wLT5pZDsKKwlyZXR1cm4gaWQ7CiB9
-CiAKIHN0YXRpYyBib29sIG1hdGNoX29wX2lkKGNvbnN0IHZvaWQgKmEsIGNvbnN0IHZvaWQgKmIp
-Cg==
---001a113366d45a55bf0510668e13--
