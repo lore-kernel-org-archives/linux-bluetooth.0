@@ -1,145 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CB23EFA5-1D60-4658-BAAE-8C666AE22052@holtmann.org>
-References: <CAD0=r8wZdzJBVq3f9j9iJJOZw2T0JwNiKxto13p9MSR7uL_Ziw@mail.gmail.com>
-	<EE319A64-C3DB-49C5-A87A-BAF245159907@holtmann.org>
-	<CAD0=r8w9MhKKm8isLY0+3SH0kxBd91z3HiOwpPp_j8fQFnirgw@mail.gmail.com>
-	<CB23EFA5-1D60-4658-BAAE-8C666AE22052@holtmann.org>
-Date: Mon, 2 Mar 2015 17:27:35 -0800
-Message-ID: <CAD0=r8xKaDgru1-5TUfE0Fy=dngAt3c0JeL8w2tX_n9Mx6fr5g@mail.gmail.com>
-Subject: Re: Why is interleaved scan interleaved ? Can I fix that to do LE and
- classic at same time ?
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH v2 2/2] Bluetooth: btusb: Add support for QCA ROME chipset family
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <782CEA04-7241-4AC6-BD39-F0FEB49AAF2B@holtmann.org>
+Date: Mon, 2 Mar 2015 17:17:29 -0800
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <B37A934A-7A6F-4D02-A3A1-081BB5DC5A48@holtmann.org>
+References: <403291a4c9b848f6956683e60c7e016f@nalasexr02e.na.qualcomm.com> <782CEA04-7241-4AC6-BD39-F0FEB49AAF2B@holtmann.org>
+To: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 2, 2015 at 4:25 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
-> Hi Jakub,
->
->>>> When I do interleaved scan on linux, it's doing LE first, for around
->>>> 10 seconds, and then Classic scan for another few seconds on kernel
->>>> level.
->>>>
->>>> I was playing with Bluetooth on macbook, and noticed that they do both
->>>> LE and Classic scan at once. So I tried modifying kernel, I triggered
->>>> both LE and classic scan at once by queuing both
->>>> HCI_OP_LE_SET_SCAN_ENABLE, and HCI_OP_INQUIRY and it just worked, both
->>>> LE and Classic devices were reported.
->>>>
->>>> I tested that with CSR, Broadcom and Atheros chips, and all behaved we=
-ll.
->>>>
->>>> Is there any reason why we do interleave instead of both scans at once=
- ?
->>>
->>> actually there are chips that do not support BR/EDR inquiry and LE scan=
- at the same time. So for some chips we need this behavior. I think that al=
-l chips in platforms running Windows 8 will actually support simultaneous B=
-R/EDR inquiry and LE scan since Microsoft mandated it. However in the embed=
-ded SoC world that might not be true actually.
->>>
->>> And in the early days of LE, there was almost no chip that was able to =
-handle BR/EDR inquiry and LE scan at the same time. That is why the interle=
-aved behavior exists in the first place.
->>>
->>>> I would be more than happy to modify 'interleaved' behaviour, to do
->>>> both LE and classic scan at same time.
->>>
->>> Introduce HCI_QUIRK_SIMULTAENOUS_DISCOVERY and allow for well know good=
- behaving controller to set it. That way we can slowly move into that direc=
-tion and keep interleaved behavior as a fallback.
->>>
->>> Regards
->>>
->>> Marcel
->>>
->>
->> So I send my patches previous week, and I just uploaded new version.
->> The old version was just starting both scans at once. It was working
->> on Atheros, CSR, and Broadcom, but then I find out it doesn't work on
->> Intel controllers.
->
-> I know for certain that there are some older Atheros controllers that did=
- not support simultaneous service discovery. And I think certain Qualcomm h=
-ardware doesn't do either. That might be all fixed now and it might be supp=
-orted starting certain controller or firmware version, but that is somethin=
-g that should come from the vendor in the end.
->
->> The reason for that was LE scan window equal to LE scan interval. When
->> I doubled Scan Interval, Intel devices started working. Apparently
->> other controllers don't really care.
->
-> Can you be more specific which Intel controllers. We have more than one a=
-nd also different firmware patches for them. We might need to test this a b=
-it more.
->
+Hi Ben,
 
-One was Intel Wilkins Peak 2, I'm not sure about the other, they said
-hello in dmesg like this:
+>> This patch supports ROME Bluetooth family from Qualcomm Atheros,
+>> e.g. QCA61x4 or QCA6574.
+>> 
+>> New chipset have similar firmware downloading sequences to previous
+>> chipset from Atheros, however, it doesn't support vid/pid switching
+>> after downloading the patch so that firmware needs to be handled by
+>> btusb module directly.
+>> 
+>> ROME chipset can be differentiated from previous version by reading
+>> ROM version.
+>> 
+>> T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 16 Spd=12   MxCh= 0
+>> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+>> P:  Vendor=0cf3 ProdID=e300 Rev= 0.01
+>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>> 
+>> T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  8 Spd=12   MxCh= 0
+>> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+>> P:  Vendor=0cf3 ProdID=e360 Rev= 0.01
+>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>> 
+>> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+>> ---
+>> drivers/bluetooth/btusb.c | 254 ++++++++++++++++++++++++++++++++++++++++++++++
+>> 1 file changed, 254 insertions(+)
+> 
+> patch has been applied to bluetooth-next tree.
 
-[ 1.373161] Bluetooth: hci0: read Intel version: 3707100180012d0d0d
-[ 1.373170] Bluetooth: hci0: Intel device is already patched. patch num: 0d
+and now I am regretting having applied this patch. Have you actually run make C=2 on this?
 
-and
+  CHECK   drivers/bluetooth/btusb.c
+drivers/bluetooth/btusb.c:2677:11: warning: incorrect type in initializer (different base types)
+drivers/bluetooth/btusb.c:2677:11:    expected restricted __le32 [usertype] rom_version
+drivers/bluetooth/btusb.c:2677:11:    got int
+drivers/bluetooth/btusb.c:2678:11: warning: incorrect type in initializer (different base types)
+drivers/bluetooth/btusb.c:2678:11:    expected restricted __le32 [usertype] rom_version
+drivers/bluetooth/btusb.c:2678:11:    got int
+drivers/bluetooth/btusb.c:2679:11: warning: incorrect type in initializer (different base types)
+drivers/bluetooth/btusb.c:2679:11:    expected restricted __le32 [usertype] rom_version
+drivers/bluetooth/btusb.c:2679:11:    got int
+drivers/bluetooth/btusb.c:2680:11: warning: incorrect type in initializer (different base types)
+drivers/bluetooth/btusb.c:2680:11:    expected restricted __le32 [usertype] rom_version
+drivers/bluetooth/btusb.c:2680:11:    got int
+drivers/bluetooth/btusb.c:2681:11: warning: incorrect type in initializer (different base types)
+drivers/bluetooth/btusb.c:2681:11:    expected restricted __le32 [usertype] rom_version
+drivers/bluetooth/btusb.c:2681:11:    got int
+drivers/bluetooth/btusb.c:2805:17: warning: restricted __le16 degrades to integer
+drivers/bluetooth/btusb.c:2805:37: warning: restricted __le32 degrades to integer
+drivers/bluetooth/btusb.c:2806:17: warning: restricted __le16 degrades to integer
+drivers/bluetooth/btusb.c:2806:39: warning: restricted __le32 degrades to integer
 
-[ 9.521272] Bluetooth: hci0: read Intel version: 370710018002030d00
-[ 9.554952] Bluetooth: hci0: Intel Bluetooth firmware file:
-intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-[ 9.735771] Bluetooth: hci0: Intel Bluetooth firmware patch completed
-and activated
+Please fix this quickly. Getting endian conversion right is important.
 
-However those are built-in into chromebooks, and the patch file in
-/lib/firmware/intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq  have different
-size than in i.e. Ubuntu distribution, so there might be somenthing
-specially for chromebooks.
+Regards
 
->> So now it works on all controllers I have tested with.
->>
->> I have however question about Broadcom:
->> Simultaenous scan work, when there is firmware patch in /lib/firmware
->> (ubuntu have it). If the patch is not present it's not working. Can I
->> somehow make this kind of check in btusb.c to set the quirk ?
->
-> You can set this quirk from within hdev->setup(). However this is dangero=
-us if it is a maybe thing. In these cases it might be better to keep off. O=
-r actually tie it to firmware build numbers that have been tested to work. =
-You can get the firmware build numbers from the HCI revision information. T=
-hat it works on one Broadcom controllers does not mean it works on all of t=
-hem.
->
->> I also have question about scan window and interval: right now I just
->> doubled scan interval. This gives more than 12ms of free time that
->> BR/EDR scan would use to do inquiry. I fund in spec (Version 4.2 [Vol
->> 2, Part E] 6.2 and 6.3) that default Inquiry_Scan_Window is 11.25ms,
->> so this should work good. Do you have any suggestions to tune those
->> parameters in other way ?
->
-> Actually inside the kernel we can not just pick new values. They are driv=
-en by the Set Scan Parameters management command. So we need to obey to wha=
-t userspace gave us.
+Marcel
 
-No, the interval value used during discovery is hard coded here:
-
-http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tr=
-ee/include/net/bluetooth/hci_core.h#n1286
-
-and used here:
-
-http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tr=
-ee/net/bluetooth/mgmt.c#n3862
-
-So it looks like values set by Set Scan Parameters are not used, and
-we have to pick new ones. Or is that a bug ?
-
-I will fix the patches that set the quirk for particular controllers.
-But patches no 1 and 2 are still good, can you please take a look at
-them ?
-
->
-> Regards
->
-> Marcel
->
