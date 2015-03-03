@@ -1,132 +1,262 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 12/15] profiles/network: Move disconn cb setting to bnep connect method
-Date: Tue,  3 Mar 2015 17:59:56 +0100
-Message-Id: <1425401999-21203-12-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 05/15] profiles/network: Handle ctrl rsp after conn setup by bnep
+Date: Tue,  3 Mar 2015 17:59:49 +0100
+Message-Id: <1425401999-21203-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1425401999-21203-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1425401999-21203-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Disconnect callback can be set while connececting bnep. In previous
-implementation there was separated method to setting up the disconnect
-callback and it was always called immediately after calling connect -
-this method was redundand.
+This patch moves setup control response to bnep and makes it private.
 ---
- android/pan.c                 |  5 ++---
- profiles/network/bnep.c       | 22 +++++++---------------
- profiles/network/bnep.h       |  6 +++---
- profiles/network/connection.c |  4 +---
- 4 files changed, 13 insertions(+), 24 deletions(-)
+ android/pan.c             | 14 +++--------
+ profiles/network/bnep.c   | 61 +++++++++++++++++++++++++++++------------------
+ profiles/network/bnep.h   |  2 --
+ profiles/network/server.c | 36 +++++++++-------------------
+ 4 files changed, 52 insertions(+), 61 deletions(-)
 
 diff --git a/android/pan.c b/android/pan.c
-index 72d8a73..87f1bca 100644
+index c4ec349..72d8a73 100644
 --- a/android/pan.c
 +++ b/android/pan.c
-@@ -324,14 +324,13 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	if (!dev->session)
- 		goto fail;
+@@ -463,7 +463,6 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
+ {
+ 	struct pan_device *dev = user_data;
+ 	uint8_t packet[BNEP_MTU];
+-	uint16_t rsp = BNEP_CONN_NOT_ALLOWED;
+ 	int sk, n, err;
  
--	perr = bnep_connect(dev->session, bnep_conn_cb, dev);
-+	perr = bnep_connect(dev->session, bnep_conn_cb, bnep_disconn_cb, dev,
-+									dev);
- 	if (perr < 0) {
- 		error("bnep connect req failed: %s", strerror(-perr));
- 		goto fail;
+ 	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
+@@ -486,22 +485,16 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
  	}
  
--	bnep_set_disconnect(dev->session, bnep_disconn_cb, dev);
+ 	err = nap_create_bridge();
+-	if (err < 0) {
++	if (err < 0)
+ 		error("pan: Failed to create bridge: %s (%d)", strerror(-err),
+ 									-err);
+-		goto failed;
+-	}
+ 
+-	if (bnep_server_add(sk, BNEP_BRIDGE, dev->iface, &dev->dst, packet, n)
+-									< 0) {
++	if (bnep_server_add(sk, (err < 0) ? NULL : BNEP_BRIDGE, dev->iface,
++						&dev->dst, packet, n) < 0) {
+ 		error("pann: server_connadd failed");
+-		rsp = BNEP_CONN_NOT_ALLOWED;
+ 		goto failed;
+ 	}
+ 
+-	rsp = BNEP_SUCCESS;
+-	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
 -
- 	if (dev->io) {
- 		g_io_channel_unref(dev->io);
- 		dev->io = NULL;
+ 	dev->watch = g_io_add_watch(chan, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+ 							nap_watchdog_cb, dev);
+ 	g_io_channel_unref(dev->io);
+@@ -513,7 +506,6 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
+ 	return FALSE;
+ 
+ failed:
+-	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
+ 	pan_device_remove(dev);
+ 
+ 	return FALSE;
 diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index e133dd9..87f50fd 100644
+index 160ad1f..e8f9698 100644
 --- a/profiles/network/bnep.c
 +++ b/profiles/network/bnep.c
-@@ -369,17 +369,21 @@ void bnep_free(struct bnep *session)
- 	g_free(session);
+@@ -549,6 +549,18 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
+ 	return err;
  }
  
--int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb, void *data)
-+int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb,
-+					bnep_disconnect_cb disconn_cb,
-+					void *conn_data, void *disconn_data)
++static ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl,
++								uint16_t resp)
++{
++	struct bnep_control_rsp rsp;
++
++	rsp.type = type;
++	rsp.ctrl = ctrl;
++	rsp.resp = htons(resp);
++
++	return send(sk, &rsp, sizeof(rsp), 0);
++}
++
+ static uint16_t bnep_setup_decode(int sk, struct bnep_setup_conn_req *req,
+ 								uint16_t *dst)
  {
- 	GError *gerr = NULL;
+@@ -603,7 +615,6 @@ static uint16_t bnep_setup_decode(int sk, struct bnep_setup_conn_req *req,
+ 	case BNEP_SVC_GN:
+ 		if (src == BNEP_SVC_PANU)
+ 			return BNEP_SUCCESS;
+-
+ 		return BNEP_CONN_INVALID_SRC;
+ 	case BNEP_SVC_PANU:
+ 		if (src == BNEP_SVC_PANU || src == BNEP_SVC_GN ||
+@@ -620,7 +631,7 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 						uint8_t *setup_data, int len)
+ {
  	int err;
+-	uint16_t dst = NULL;
++	uint16_t rsp, dst = NULL;
+ 	struct bnep_setup_conn_req *req = (void *) setup_data;
  
--	if (!session || !conn_cb)
-+	if (!session || !conn_cb || !disconn_cb)
- 		return -EINVAL;
- 
- 	session->attempts = 0;
- 	session->conn_cb = conn_cb;
--	session->conn_data = data;
-+	session->disconn_cb = disconn_cb;
-+	session->conn_data = conn_data;
-+	session->disconn_data = disconn_data;
- 
- 	bt_io_get(session->io, &gerr, BT_IO_OPT_DEST_BDADDR, &session->dst_addr,
- 							BT_IO_OPT_INVALID);
-@@ -417,18 +421,6 @@ void bnep_disconnect(struct bnep *session)
- 	bnep_conndel(&session->dst_addr);
- }
- 
--void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
--								void *data)
--{
--	if (!session || !disconn_cb)
--		return;
--
--	if (!session->disconn_cb && !session->disconn_data) {
--		session->disconn_cb = disconn_cb;
--		session->disconn_data = data;
--	}
--}
--
- static int bnep_add_to_bridge(const char *devname, const char *bridge)
- {
- 	int ifindex;
-diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
-index da706ac..e9f4c1c 100644
---- a/profiles/network/bnep.h
-+++ b/profiles/network/bnep.h
-@@ -31,10 +31,10 @@ struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
- void bnep_free(struct bnep *session);
- 
- typedef void (*bnep_connect_cb) (char *iface, int err, void *data);
--int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb, void *data);
- typedef void (*bnep_disconnect_cb) (void *data);
--void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
--								void *data);
-+int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb,
-+					bnep_disconnect_cb disconn_cb,
-+					void *conn_data, void *disconn_data);
- void bnep_disconnect(struct bnep *session);
- 
- int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index 538e7ad..46bb999 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -258,14 +258,12 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	if (!nc->session)
- 		goto failed;
- 
--	perr = bnep_connect(nc->session, bnep_conn_cb, nc);
-+	perr = bnep_connect(nc->session, bnep_conn_cb, bnep_disconn_cb, nc, nc);
- 	if (perr < 0) {
- 		error("bnep connect(): %s (%d)", strerror(-perr), -perr);
- 		goto failed;
+ 	/* Highest known Control command ID
+@@ -639,26 +650,41 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
  	}
  
--	bnep_set_disconnect(nc->session, bnep_disconn_cb, nc);
+ 	/* Processing BNEP_SETUP_CONNECTION_REQUEST_MSG */
+-	err = bnep_setup_decode(sk, req, &dst);
+-	if (err < 0) {
+-		error("error while decoding setup connection request: %d", err);
+-		return -EINVAL;
++	rsp = bnep_setup_decode(sk, req, &dst);
++	if (rsp != BNEP_SUCCESS || !dst) {
++		err = -rsp;
++		error("bnep: error while decoding setup connection request: %d",
++									rsp);
++		goto reply;
+ 	}
+ 
+-	if (!bridge || !iface || !addr || !dst)
+-		return -EINVAL;
++	if (!dst) {
++		error("bnep: cannot decode proper destination service UUID");
++		rsp = BNEP_CONN_INVALID_DST;
++		goto reply;
++	}
+ 
+ 	err = bnep_connadd(sk, dst, iface);
+-	if (err < 0)
+-		return err;
++	if (err < 0) {
++		rsp = BNEP_CONN_NOT_ALLOWED;
++		goto reply;
++	}
+ 
+ 	err = bnep_add_to_bridge(iface, bridge);
+ 	if (err < 0) {
+ 		bnep_conndel(addr);
+-		return err;
++		rsp = BNEP_CONN_NOT_ALLOWED;
++		goto reply;
+ 	}
+ 
+-	return bnep_if_up(iface);
++	err = bnep_if_up(iface);
++	if (err < 0)
++		rsp = BNEP_CONN_NOT_ALLOWED;
++
++reply:
++	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
++
++	return err;
+ }
+ 
+ void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr)
+@@ -670,14 +696,3 @@ void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr)
+ 	bnep_if_down(iface);
+ 	bnep_conndel(addr);
+ }
 -
- 	if (nc->io) {
- 		g_io_channel_unref(nc->io);
- 		nc->io = NULL;
+-ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp)
+-{
+-	struct bnep_control_rsp rsp;
+-
+-	rsp.type = type;
+-	rsp.ctrl = ctrl;
+-	rsp.resp = htons(resp);
+-
+-	return send(sk, &rsp, sizeof(rsp), 0);
+-}
+diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
+index aa81dcb..4fe79ed 100644
+--- a/profiles/network/bnep.h
++++ b/profiles/network/bnep.h
+@@ -44,5 +44,3 @@ void bnep_disconnect(struct bnep *session);
+ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 						uint8_t *setup_data, int len);
+ void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr);
+-
+-ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp);
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index 30bb190..5d2fbcc 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -288,9 +288,10 @@ static gboolean bnep_setup(GIOChannel *chan,
+ 	struct network_server *ns;
+ 	uint8_t packet[BNEP_MTU];
+ 	struct bnep_setup_conn_req *req = (void *) packet;
+-	uint16_t dst_role, rsp = BNEP_CONN_NOT_ALLOWED;
++	uint16_t dst_role = 0;
+ 	uint32_t val;
+ 	int n, sk;
++	char *bridge = NULL;
+ 
+ 	if (cond & G_IO_NVAL)
+ 		return FALSE;
+@@ -320,51 +321,36 @@ static gboolean bnep_setup(GIOChannel *chan,
+ 		break;
+ 	case 16:
+ 		if (memcmp(&req->service[4], bt_base, sizeof(bt_base)) != 0)
+-			return FALSE;
++			break;
+ 
+ 		/* Intentional no-brake */
+ 
+ 	case 4:
+ 		val = get_be32(req->service);
+ 		if (val > 0xffff)
+-			return FALSE;
++			break;
+ 
+ 		dst_role = val;
+ 		break;
+ 	default:
+-		return FALSE;
++		break;
+ 	}
+ 
+ 	ns = find_server(na->servers, dst_role);
+-	if (!ns) {
+-		error("Server unavailable: (0x%x)", dst_role);
+-		goto reply;
+-	}
+-
+-	if (!ns->record_id) {
+-		error("Service record not available");
+-		goto reply;
+-	}
++	if (!ns || !ns->record_id || !ns->bridge)
++		error("Server error, bridge not initialized: (0x%x)", dst_role);
+ 
+-	if (!ns->bridge) {
+-		error("Bridge interface not configured");
+-		goto reply;
+-	}
++	bridge = ns->bridge;
+ 
+ 	strncpy(na->setup->dev, BNEP_INTERFACE, 16);
+ 	na->setup->dev[15] = '\0';
+ 
+-	if (bnep_server_add(sk, ns->bridge, na->setup->dev,
+-						&na->setup->dst, packet, n) < 0)
+-		goto reply;
++	if (bnep_server_add(sk, bridge, na->setup->dev, &na->setup->dst,
++							packet, n) < 0)
++		error("BNEP server cannot be added");
+ 
+ 	na->setup = NULL;
+ 
+-	rsp = BNEP_SUCCESS;
+-
+-reply:
+-	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
+-
+ 	return FALSE;
+ }
+ 
 -- 
 2.1.0
 
