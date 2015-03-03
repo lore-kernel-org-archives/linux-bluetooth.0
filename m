@@ -1,231 +1,191 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v4 1/3] Bluetooth: Move Service Discovery logic before refactoring
-Date: Tue,  3 Mar 2015 10:16:51 -0800
-Message-Id: <1425406613-21420-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v2 15/15] android/pts: Add BNEP PTS 6.0 results for android 5.0
+Date: Tue,  3 Mar 2015 17:59:59 +0100
+Message-Id: <1425401999-21203-15-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1425401999-21203-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1425401999-21203-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves whole packet filering logic of service discovery
-into single place. It's done in preparation to simplify this logic.
-
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+This patch adds test case list and results for BNEP profile against
+android 5.0
 ---
- net/bluetooth/mgmt.c | 183 +++++++++++++++++++++++++++------------------------
- 1 file changed, 96 insertions(+), 87 deletions(-)
+ android/pics-bnep.txt  | 26 ++++++++++++++
+ android/pixit-bnep.txt | 30 ++++++++++++++++
+ android/pts-bnep.txt   | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 148 insertions(+)
+ create mode 100644 android/pics-bnep.txt
+ create mode 100644 android/pixit-bnep.txt
+ create mode 100644 android/pts-bnep.txt
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1e4635a..0a7f23e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7300,21 +7300,100 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			return;
- 	}
- 
--	/* When using service discovery with a RSSI threshold, then check
--	 * if such a RSSI threshold is specified. If a RSSI threshold has
--	 * been specified, and HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set,
--	 * then all results with a RSSI smaller than the RSSI threshold will be
--	 * dropped. If the quirk is set, let it through for further processing,
--	 * as we might need to restart the scan.
--	 *
--	 * For BR/EDR devices (pre 1.2) providing no RSSI during inquiry,
--	 * the results are also dropped.
--	 */
--	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
--	    (rssi == HCI_RSSI_INVALID ||
--	    (rssi < hdev->discovery.rssi &&
--	     !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks))))
--		return;
-+	if (hdev->discovery.rssi != HCI_RSSI_INVALID ||
-+	    hdev->discovery.uuid_count > 0) {
-+		/* We are using service discovery */
+diff --git a/android/pics-bnep.txt b/android/pics-bnep.txt
+new file mode 100644
+index 0000000..2279c9a
+--- /dev/null
++++ b/android/pics-bnep.txt
+@@ -0,0 +1,26 @@
++BNEP PICS for the PTS tool.
 +
-+		/* If a RSSI threshold has been specified, and
-+		 * HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set, then all
-+		 * results with a RSSI smaller than the RSSI threshold will be
-+		 * dropped. If the quirk is set, let it through for further
-+		 * processing, as we might need to restart the scan.
-+		 *
-+		 * For BR/EDR devices (pre 1.2) providing no RSSI during
-+		 * inquiry, the results are also dropped.
-+		 */
-+		if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
-+		    (rssi == HCI_RSSI_INVALID ||
-+		    (rssi < hdev->discovery.rssi &&
-+		     !test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-+			       &hdev->quirks))))
-+			return;
++PTS version: 6.0
 +
-+		if (eir_len > 0) {
-+			/* When using service discovery and a list of UUID is
-+			 * provided, results with no matching UUID should be
-+			 * dropped. In case there is a match the result is
-+			 * kept and checking possible scan response data
-+			 * will be skipped.
-+			 */
-+			if (hdev->discovery.uuid_count > 0) {
-+				match = eir_has_uuids(eir, eir_len,
-+						      hdev->discovery.uuid_count,
-+						      hdev->discovery.uuids);
-+				/* If duplicate filtering does not report RSSI
-+				 * changes, then restart scanning to ensure
-+				 * updated result with updated RSSI values.
-+				 */
-+				if (match && test_bit(
-+					      HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-+					      &hdev->quirks))
-+					restart_le_scan(hdev);
-+			} else {
-+				match = true;
-+			}
++* - different than PTS defaults
++# - not yet implemented/supported
 +
-+			if (!match && !scan_rsp_len)
-+				return;
-+		} else {
-+			/* When using service discovery and a list of UUID is
-+			 * provided, results with empty EIR or advertising data
-+			 * should be dropped since they do not match any UUID.
-+			 */
-+			if (hdev->discovery.uuid_count > 0 && !scan_rsp_len)
-+				return;
++M - mandatory if such role selected
++O - optional
 +
-+			match = false;
-+		}
++		Profile Version
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_BNEP_1_1	True		BNEP Connection Setup (M)
++TSPC_BNEP_1_2	False		BNEP Data Packet Reception (M)
++TSPC_BNEP_1_3	False		BNEP Data Packet Transmission (M)
++TSPC_BNEP_1_3a	False		BNEP Compressed Packet Transmission (O)
++TSPC_BNEP_1_3b	False		BNEP Compressed Packet Transmission Source Only
++				(O)
++TSPC_BNEP_1_4	True		BNEP Control Message Processing (M)
++TSPC_BNEP_1_5	True		BNEP Extension Header Processing (M)
++TSPC_BNEP_1_6	True		Network Protocol Filter Message Transmission (O)
++TSPC_BNEP_1_7	True		Multicast Address Filter Message Transmission
++				(O)
++-------------------------------------------------------------------------------
+diff --git a/android/pixit-bnep.txt b/android/pixit-bnep.txt
+new file mode 100644
+index 0000000..9a26cd2
+--- /dev/null
++++ b/android/pixit-bnep.txt
+@@ -0,0 +1,30 @@
++BNEP PIXIT for the PTS tool.
 +
-+		if (scan_rsp_len > 0) {
-+			/* When using service discovery and a list of UUID is
-+			 * provided, results with no matching UUID should be
-+			 * dropped if there is no previous match from the
-+			 * advertising data.
-+			 */
-+			if (hdev->discovery.uuid_count > 0) {
-+				if (!match &&
-+				    !eir_has_uuids(scan_rsp, scan_rsp_len,
-+						   hdev->discovery.uuid_count,
-+						   hdev->discovery.uuids))
-+					return;
++PTS version: 6.0
 +
-+				/* If duplicate filtering does not report RSSI
-+				 * changes, then restart scanning to ensure
-+				 * updated result with updated RSSI values.
-+				 */
-+				if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-+					     &hdev->quirks))
-+					restart_le_scan(hdev);
-+			}
-+		} else {
-+			/* When using service discovery and a list of UUID is
-+			 * provided, results with empty scan response and no
-+			 * previous matched advertising data should be dropped.
-+			 */
-+			if (hdev->discovery.uuid_count > 0 && !match)
-+				return;
-+		}
++* - different than PTS defaults
++& - should be set to IUT Bluetooth address
++# - should be set to PTS's bin/audio folder
 +
-+		/* Validate the reported RSSI value against the RSSI threshold
-+		 * once more incase HCI_QUIRK_STRICT_DUPLICATE_FILTER forced a
-+		 * restart of LE scanning.
-+		 */
-+		if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
-+		    rssi < hdev->discovery.rssi)
-+			return;
-+	}
- 
- 	/* Make sure that the buffer is big enough. The 5 extra bytes
- 	 * are for the potential CoD field.
-@@ -7341,87 +7420,17 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	ev->rssi = rssi;
- 	ev->flags = cpu_to_le32(flags);
- 
--	if (eir_len > 0) {
--		/* When using service discovery and a list of UUID is
--		 * provided, results with no matching UUID should be
--		 * dropped. In case there is a match the result is
--		 * kept and checking possible scan response data
--		 * will be skipped.
--		 */
--		if (hdev->discovery.uuid_count > 0) {
--			match = eir_has_uuids(eir, eir_len,
--					      hdev->discovery.uuid_count,
--					      hdev->discovery.uuids);
--			/* If duplicate filtering does not report RSSI changes,
--			 * then restart scanning to ensure updated result with
--			 * updated RSSI values.
--			 */
--			if (match && test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
--					      &hdev->quirks))
--				restart_le_scan(hdev);
--		} else {
--			match = true;
--		}
--
--		if (!match && !scan_rsp_len)
--			return;
--
-+	if (eir_len > 0)
- 		/* Copy EIR or advertising data into event */
- 		memcpy(ev->eir, eir, eir_len);
--	} else {
--		/* When using service discovery and a list of UUID is
--		 * provided, results with empty EIR or advertising data
--		 * should be dropped since they do not match any UUID.
--		 */
--		if (hdev->discovery.uuid_count > 0 && !scan_rsp_len)
--			return;
--
--		match = false;
--	}
- 
- 	if (dev_class && !eir_has_data_type(ev->eir, eir_len, EIR_CLASS_OF_DEV))
- 		eir_len = eir_append_data(ev->eir, eir_len, EIR_CLASS_OF_DEV,
- 					  dev_class, 3);
- 
--	if (scan_rsp_len > 0) {
--		/* When using service discovery and a list of UUID is
--		 * provided, results with no matching UUID should be
--		 * dropped if there is no previous match from the
--		 * advertising data.
--		 */
--		if (hdev->discovery.uuid_count > 0) {
--			if (!match && !eir_has_uuids(scan_rsp, scan_rsp_len,
--						     hdev->discovery.uuid_count,
--						     hdev->discovery.uuids))
--				return;
--
--			/* If duplicate filtering does not report RSSI changes,
--			 * then restart scanning to ensure updated result with
--			 * updated RSSI values.
--			 */
--			if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER,
--				     &hdev->quirks))
--				restart_le_scan(hdev);
--		}
--
-+	if (scan_rsp_len > 0)
- 		/* Append scan response data to event */
- 		memcpy(ev->eir + eir_len, scan_rsp, scan_rsp_len);
--	} else {
--		/* When using service discovery and a list of UUID is
--		 * provided, results with empty scan response and no
--		 * previous matched advertising data should be dropped.
--		 */
--		if (hdev->discovery.uuid_count > 0 && !match)
--			return;
--	}
--
--	/* Validate the reported RSSI value against the RSSI threshold once more
--	 * incase HCI_QUIRK_STRICT_DUPLICATE_FILTER forced a restart of LE
--	 * scanning.
--	 */
--	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
--	    rssi < hdev->discovery.rssi)
--		return;
- 
- 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
- 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
++Required PIXIT settings
++-------------------------------------------------------------------------------
++Parameter Name			Value
++-------------------------------------------------------------------------------
++TSPX_class_of_device		04041C
++TSPX_security_control_data
++TSPX_content_protection_data
++TSPX_bd_addr_iut		112233445566 (*&)
++TSPX_delete_link_key		FALSE
++TSPX_pin_code			1234
++TSPX_security_enabled		FALSE
++TSPX_time_guard			300000
++TSPX_use_implicit_send		TRUE
++TSPX_auth_password		0000
++TSPX_auth_user_id		PTS
++TSPX_l2cap_psm			000F
++TSPX_rfcomm_channel		8
++TSPX_no_confirmations		FALSE
++TSPX_UUID_dest_address		1116
++TSPX_UUID_source_address	1115
++TSPX_MAC_dest_address		000000000000 (*&)
++TSPX_MAC_source_address		000000000000 (*&)
+diff --git a/android/pts-bnep.txt b/android/pts-bnep.txt
+new file mode 100644
+index 0000000..7945385
+--- /dev/null
++++ b/android/pts-bnep.txt
+@@ -0,0 +1,92 @@
++PTS test results for BNEP
++
++PTS version: 6.0
++Tested: 03-March-2015
++Android version: 5.0
++Kernel version: 3.20
++
++Results:
++PASS	test passed
++FAIL	test failed
++INC	test is inconclusive
++N/A	test is disabled due to PICS setup
++
++--------------------------------------------------------------------------------
++Test Name		Result	Notes
++--------------------------------------------------------------------------------
++TC_CTRL_BV_01_C		PASS	bneptest -s
++TC_CTRL_BV_02_C		PASS	bneptest -c <PTS addr>
++TC_CTRL_BV_03_C		PASS	bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_CTRL_BV_04_C		INC	PTS issue #13169
++				bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_CTRL_BV_05_C		INC	PTS issue #13169
++				bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_CTRL_BV_06_C		INC	PTS issue #13169
++				bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_CTRL_BV_07_C		INC	PTS issue #13170
++				bneptest -c <PTS addr> -t 3 -d 0 -e 1500
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_CTRL_BV_08_C		INC	PTS issue #13169
++				bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_CTRL_BV_09_C		INC	PTS issue #13170
++				bneptest -c 00:1b:dc:06:06:ca -n enp0s29u1u7
++					-t 5 -g 00:00:00:00:00:00
++					-j ff:ff:ff:ff:ff:ff
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_CTRL_BV_10_C		INC	PTS issue #13169
++				bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_CTRL_BV_19_C		INC	PTS issue #13169
++				bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_RX_TYPE_0_BV_11_C	N/A
++TC_RX_C_BV_12_C		N/A
++TC_RX_C_S_BV_13_C	N/A
++TC_RX_C_S_BV_14_C	N/A
++TC_RX_TYPE_0_BV_15_C	INC	PTS issue #13169
++				bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_RX_TYPE_0_BV_16_C	INC	PTS issue #13171
++				bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_RX_TYPE_0_BV_17_C	INC	PTS issue #13169
++				bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_RX_TYPE_0_BV_18_C	INC	PTS issue #13171
++				bneptest -s
++				Note: could be necessary setting approperiate
++					naming of interface using option
++					-n <iface name>, eg. -n enp0s29u1u7
++TC_TX_TYPE_0_BV_20_C	N/A
++TC_TX_C_BV_21_C		N/A
++TC_TX_C_S_BV_22_C	N/A
++TC_TX_C_D_BV_23_C	N/A
 -- 
-2.2.0.rc0.207.ga3a616c
+2.1.0
 
