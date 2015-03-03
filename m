@@ -1,90 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH v2 2/2] Bluetooth: btusb: Add support for QCA ROME chipset family
+Subject: Re: [PATCH v2 1/2] Bluetooth: btusb: Add setup callback for chip init on USB
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <403291a4c9b848f6956683e60c7e016f@nalasexr02e.na.qualcomm.com>
-Date: Mon, 2 Mar 2015 17:10:19 -0800
+In-Reply-To: <ed9be4d986c749d7a0b35a335184a932@nalasexr02e.na.qualcomm.com>
+Date: Mon, 2 Mar 2015 17:10:15 -0800
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <782CEA04-7241-4AC6-BD39-F0FEB49AAF2B@holtmann.org>
-References: <403291a4c9b848f6956683e60c7e016f@nalasexr02e.na.qualcomm.com>
+Message-Id: <432FC4CE-3058-4C15-A8E5-523CE34C170E@holtmann.org>
+References: <ed9be4d986c749d7a0b35a335184a932@nalasexr02e.na.qualcomm.com>
 To: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Ben,
 
-> This patch supports ROME Bluetooth family from Qualcomm Atheros,
-> e.g. QCA61x4 or QCA6574.
+> Some of chipset does not allow to send a patch or config files through
+> HCI VS channel at early stage as well as they don't support to send
+> USB patch files to other channel except USB bulk path.
 > 
-> New chipset have similar firmware downloading sequences to previous
-> chipset from Atheros, however, it doesn't support vid/pid switching
-> after downloading the patch so that firmware needs to be handled by
-> btusb module directly.
-> 
-> ROME chipset can be differentiated from previous version by reading
-> ROM version.
-> 
-> T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 16 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=e300 Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  8 Spd=12   MxCh= 0
-> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=e360 Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> New callback added is for initialization of BT controller through USB
 > 
 > Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
 > ---
-> drivers/bluetooth/btusb.c | 254 ++++++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 254 insertions(+)
+> drivers/bluetooth/btusb.c | 11 +++++++++++
+> 1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 3ca2e1b..73e1066 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -337,6 +337,8 @@ struct btusb_data {
+> 
+> 	int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
+> 	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
+> +
+> +	int (*setup_on_usb)(struct hci_dev *hdev);
+> };
 
-patch has been applied to bluetooth-next tree.
+I am still not really comfortable with the name setup_on_usb, but I also failed to come up with anything better in the last two weeks. So I decided to merge this to give the patch larger exposure. My failure to figure out a better consistent naming should not stand in the way of supporting your devices.
+
+Patch has been applied to bluetooth-next tree.
 
 Regards
 
