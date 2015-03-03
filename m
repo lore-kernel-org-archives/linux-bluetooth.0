@@ -1,55 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 02/15] profiles/network: Add appropriate log prefix
-Date: Tue,  3 Mar 2015 17:59:46 +0100
-Message-Id: <1425401999-21203-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 03/15] profiles/network: Integrate get and check bnep setup services roles
+Date: Tue,  3 Mar 2015 17:59:47 +0100
+Message-Id: <1425401999-21203-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1425401999-21203-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1425401999-21203-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Logs should have appropriate prefixes eg. bnep, pan.
+While bnep setup, roles must be determined and checked if the connection
+scanario is possible. Get and check possible service roles routines are
+always performed in serie. So there is no need to split it to separate
+calls.
 ---
- android/pan.c           | 2 +-
- profiles/network/bnep.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ android/pan.c             |  8 +-------
+ profiles/network/bnep.c   | 37 ++++++++++++++++---------------------
+ profiles/network/bnep.h   |  1 -
+ profiles/network/server.c |  6 +-----
+ 4 files changed, 18 insertions(+), 34 deletions(-)
 
 diff --git a/android/pan.c b/android/pan.c
-index 511f4fd..94f2daf 100644
+index 94f2daf..61b81a4 100644
 --- a/android/pan.c
 +++ b/android/pan.c
-@@ -517,7 +517,7 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
+@@ -497,17 +497,11 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
+ 	}
  
- 	if (bnep_server_add(sk, dst_role, BNEP_BRIDGE, dev->iface,
- 							&dev->dst) < 0) {
--		error("server_connadd failed");
-+		error("pann: server_connadd failed");
- 		rsp = BNEP_CONN_NOT_ALLOWED;
+ 	rsp = bnep_setup_decode(req, &dst_role, &src_role);
+-	if (rsp) {
++	if (rsp != BNEP_SUCCESS) {
+ 		error("bnep_setup_decode failed");
  		goto failed;
  	}
+ 
+-	rsp = bnep_setup_chk(dst_role, src_role);
+-	if (rsp) {
+-		error("benp_setup_chk failed");
+-		goto failed;
+-	}
+-
+ 	err = nap_create_bridge();
+ 	if (err < 0) {
+ 		error("pan: Failed to create bridge: %s (%d)", strerror(-err),
 diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 3986638..b3c6179 100644
+index b3c6179..7d78575 100644
 --- a/profiles/network/bnep.c
 +++ b/profiles/network/bnep.c
-@@ -509,7 +509,7 @@ static int bnep_add_to_bridge(const char *devname, const char *bridge)
- 		error("bnep: Can't add %s to the bridge %s: %s(%d)",
- 					devname, bridge, strerror(-err), -err);
- 	} else {
--		info("bridge %s: interface %s added", bridge, devname);
-+		info("bnep: bridge %s: interface %s added", bridge, devname);
+@@ -591,26 +591,6 @@ ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp)
+ 	return send(sk, &rsp, sizeof(rsp), 0);
+ }
+ 
+-uint16_t bnep_setup_chk(uint16_t dst, uint16_t src)
+-{
+-	/* Allowed PAN Profile scenarios */
+-	switch (dst) {
+-	case BNEP_SVC_NAP:
+-	case BNEP_SVC_GN:
+-		if (src == BNEP_SVC_PANU)
+-			return 0;
+-		return BNEP_CONN_INVALID_SRC;
+-	case BNEP_SVC_PANU:
+-		if (src == BNEP_SVC_PANU ||  src == BNEP_SVC_GN ||
+-							src == BNEP_SVC_NAP)
+-			return 0;
+-
+-		return BNEP_CONN_INVALID_SRC;
+-	}
+-
+-	return BNEP_CONN_INVALID_DST;
+-}
+-
+ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
+ 								uint16_t *src)
+ {
+@@ -655,5 +635,20 @@ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
+ 		return BNEP_CONN_INVALID_SVC;
  	}
  
- 	close(sk);
-@@ -541,7 +541,7 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
- 		error("bnep: Can't delete %s from the bridge %s: %s(%d)",
- 					devname, bridge, strerror(-err), -err);
- 	} else {
--		info("bridge %s: interface %s removed", bridge, devname);
-+		info("bnep: bridge %s: interface %s removed", bridge, devname);
- 	}
+-	return BNEP_SUCCESS;
++	/* Allowed PAN Profile scenarios */
++	switch (*dst) {
++	case BNEP_SVC_NAP:
++	case BNEP_SVC_GN:
++		if (*src == BNEP_SVC_PANU)
++			return BNEP_SUCCESS;
++		return BNEP_CONN_INVALID_SRC;
++	case BNEP_SVC_PANU:
++		if (*src == BNEP_SVC_PANU || *src == BNEP_SVC_GN ||
++							*src == BNEP_SVC_NAP)
++			return BNEP_SUCCESS;
++
++		return BNEP_CONN_INVALID_SRC;
++	}
++
++	return BNEP_CONN_INVALID_DST;
+ }
+diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
+index bc43d4f..5aedf38 100644
+--- a/profiles/network/bnep.h
++++ b/profiles/network/bnep.h
+@@ -46,6 +46,5 @@ int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
+ void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr);
  
- 	close(sk);
+ ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp);
+-uint16_t bnep_setup_chk(uint16_t dst_role, uint16_t src_role);
+ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
+ 								uint16_t *src);
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index 332525e..04f188a 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -324,11 +324,7 @@ static gboolean bnep_setup(GIOChannel *chan,
+ 		return FALSE;
+ 
+ 	rsp = bnep_setup_decode(req, &dst_role, &src_role);
+-	if (rsp)
+-		goto reply;
+-
+-	rsp = bnep_setup_chk(dst_role, src_role);
+-	if (rsp)
++	if (rsp != BNEP_SUCCESS)
+ 		goto reply;
+ 
+ 	rsp = BNEP_CONN_NOT_ALLOWED;
 -- 
 2.1.0
 
