@@ -1,31 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v1 0/3] Add Write Characteristic Value server TC
-Date: Tue, 03 Mar 2015 11:37:23 +0530
-Message-id: <1425362846-16580-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Joe Perches <joe@perches.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH net-next 10/14] bluetooth: Use eth_<foo>_addr instead of memset
+Date: Mon,  2 Mar 2015 19:54:55 -0800
+Message-Id: <3e4a2efa6cbc9bea479bd3d8460ea56dda128faf.1425354528.git.joe@perches.com>
+In-Reply-To: <cover.1425354527.git.joe@perches.com>
+References: <cover.1425354527.git.joe@perches.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds the below server test cases (tested against small and large DB):
-1) Write Characteristic Value - to Server
-2) Write Characteristic Value – Invalid Handle Response
-3) Write Characteristic Value – Write Not Permitted Response
+Use the built-in function instead of memset.
 
-Bharat Panda (2):
-  unit/test-gatt: Add TP/GAW/SR/BI-02-C test
-  unit/test-gatt: Add TP/GAW/SR/BI-03-C test
+Signed-off-by: Joe Perches <joe@perches.com>
+---
+ net/bluetooth/bnep/netdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Gowtham Anandha Babu (1):
-  unit/test-gatt: Add TP/GAW/SR/BV-03-C test
-
- unit/test-gatt.c | 42 ++++++++++++++++++++++++++++++------------
- 1 file changed, 30 insertions(+), 12 deletions(-)
-
+diff --git a/net/bluetooth/bnep/netdev.c b/net/bluetooth/bnep/netdev.c
+index 4b488ec..6ceb5d3 100644
+--- a/net/bluetooth/bnep/netdev.c
++++ b/net/bluetooth/bnep/netdev.c
+@@ -218,7 +218,7 @@ static const struct net_device_ops bnep_netdev_ops = {
+ void bnep_net_setup(struct net_device *dev)
+ {
+ 
+-	memset(dev->broadcast, 0xff, ETH_ALEN);
++	eth_broadcast_addr(dev->broadcast);
+ 	dev->addr_len = ETH_ALEN;
+ 
+ 	ether_setup(dev);
 -- 
-1.9.1
-
+2.1.2
