@@ -1,97 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25RVKCL9RQCeFBJAsUsNV1umOR92VWV1JQgkwy-RNh-GAg@mail.gmail.com>
-References: <54F752D8.1000605@ubnt.com>
-	<CAHrH25RVKCL9RQCeFBJAsUsNV1umOR92VWV1JQgkwy-RNh-GAg@mail.gmail.com>
-Date: Wed, 4 Mar 2015 23:21:01 +0100
-Message-ID: <CAN_7+Yagp-R+H+nhCtmdqWyAJm4jO_VsB5c343A=39zurwqpPw@mail.gmail.com>
-Subject: Re: Non-consecutive handle values in GATT
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: Andrejs Hanins <andrejs.hanins@ubnt.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Marcin Kraglak <marcin.kraglak@tieto.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ 4/4] core/gatt: Add UnregisterService and track sender
+Date: Wed,  4 Mar 2015 13:57:51 -0800
+Message-Id: <1425506271-20775-5-git-send-email-armansito@chromium.org>
+In-Reply-To: <1425506271-20775-1-git-send-email-armansito@chromium.org>
+References: <1425506271-20775-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrejs,
+This patch implements the GattManager1.UnregisterService method. The
+API implementation is slightly changed so that external services are
+tracked on a per path + sender basis and not just based on the object
+path.
+---
+ src/gatt-database.c | 47 ++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 40 insertions(+), 7 deletions(-)
 
-On Wed, Mar 4, 2015 at 10:39 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Andrejs,
->
->> On Wed, Mar 4, 2015 at 10:45 AM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
->> Hello,
->>
->>     I'm experimenting with an LE peripheral device which provides GATT
->> services described by attributes with non-consecutive handle values, i.e.
->> there are "gaps" between handle values. According to the Bluetooth Core
->> specification 4.0 (Volume 3, Part G, "2.5.1 Overview") it is allowed:
->>
->>      Although the Attribute Handle values are in increasing order, following
->> Attribute Handle values may differ by more than one.
->>
->>     Based on my experiments, BlueZ 5.28 and also git-master as of today does
->> not support non-consecutive handle values GATT table. As a result, I can't
->> connect to my device because gatt-client fails to initialize properly. The
->> failing place is in discover_descs():
->>
->>       if (gatt_db_attribute_get_handle(attr) !=
->>                             chrc_data->value_handle)
->>             goto failed;
->>
->>     The value of chrc_data->value_handle is correct and matches GATT table
->> one the device, but the attr->handle has the value of previous attribute
->> (Primary Service UUID in my case) +2. This handle value calculation happens
->> in gatt_db_service_add_characteristic() which has strange code:
->>
->>     /* We set handle of characteristic value, which will be added next */
->>     put_le16(get_handle_at_index(service, i - 1) + 2, &value[1]);
->>
->>     Before trying to fix the problem by myself it would be great to hear
->> some comments about this issue. Does it seem like a bug or I missed
->> something?
->>
->>     As a note, I can successfully connect to my LE peripheral from an iPhone
->> LightBlue app, which does not posses any issues during GATT discovery and
->> can read/write the characteristic on the device.
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index c7b2223..d4dd661 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -978,12 +978,18 @@ static void gatt_db_service_removed(struct gatt_db_attribute *attrib,
+ 								ccc_cb_free);
+ }
+ 
+-static bool match_service_path(const void *a, const void *b)
++struct svc_match_data {
++	const char *path;
++	const char *sender;
++};
++
++static bool match_service(const void *a, const void *b)
+ {
+ 	const struct external_service *service = a;
+-	const char *path = b;
++	const struct svc_match_data *data = b;
+ 
+-	return g_strcmp0(service->path, path) == 0;
++	return g_strcmp0(service->path, data->path) == 0 &&
++				g_strcmp0(service->owner, data->sender) == 0;
+ }
+ 
+ static gboolean service_free_idle_cb(void *data)
+@@ -2064,9 +2070,11 @@ static DBusMessage *manager_register_service(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+ 	struct btd_gatt_database *database = user_data;
++	const char *sender = dbus_message_get_sender(msg);
+ 	DBusMessageIter args;
+ 	const char *path;
+ 	struct external_service *service;
++	struct svc_match_data match_data;
+ 
+ 	if (!dbus_message_iter_init(msg, &args))
+ 		return btd_error_invalid_args(msg);
+@@ -2076,7 +2084,10 @@ static DBusMessage *manager_register_service(DBusConnection *conn,
+ 
+ 	dbus_message_iter_get_basic(&args, &path);
+ 
+-	if (queue_find(database->services, match_service_path, path))
++	match_data.path = path;
++	match_data.sender = sender;
++
++	if (queue_find(database->services, match_service, &match_data))
+ 		return btd_error_already_exists(msg);
+ 
+ 	dbus_message_iter_next(&args);
+@@ -2098,10 +2109,32 @@ static DBusMessage *manager_register_service(DBusConnection *conn,
+ static DBusMessage *manager_unregister_service(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+-	DBG("UnregisterService");
++	struct btd_gatt_database *database = user_data;
++	const char *sender = dbus_message_get_sender(msg);
++	const char *path;
++	DBusMessageIter args;
++	struct external_service *service;
++	struct svc_match_data match_data;
+ 
+-	/* TODO */
+-	return NULL;
++	if (!dbus_message_iter_init(msg, &args))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&args, &path);
++
++	match_data.path = path;
++	match_data.sender = sender;
++
++	service = queue_remove_if(database->services, match_service,
++								&match_data);
++	if (!service)
++		return btd_error_does_not_exist(msg);
++
++	service_free(service);
++
++	return dbus_message_new_method_return(msg);
+ }
+ 
+ static const GDBusMethodTable manager_methods[] = {
+-- 
+2.2.0.rc0.207.ga3a616c
 
-Can you share what device are you using? Is it on the market already?
-I'm just curious as I haven't seen any device doing it on last couple UPFs
-
-But indeed, it looks like this is something we need to fix.
-
-\Lukasz
->>
->
-> This is interesting. The gatt-db was initially designed for the
-> server-role, with the assumption being that the handles of a service
-> will be contiguous. So, it allows gaps between separate service ranges
-> but not between individual attributes between the handles of a
-> service. This assumption is OK for server-role but now that we also
-> use gatt-db for the client role, then maybe this assumption is
-> incorrect in some cases.
->
-> So I guess we need a way to enter individual attributes with arbitrary
-> handles directly into the database, since it currently creates a
-> contiguous array to store the attributes of a service. I remember Luiz
-> was talking about changing the way the gatt-db addition/removal works
-> on IRC so maybe he can provide more input here. Fwiw, we never
-> encountered this issue because in practice I've never seen a database
-> implementation that skips attribute handles within a service.
->
->>
->> BR, Andrey
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->> in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Cheers,
-> Arman
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
