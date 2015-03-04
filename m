@@ -1,430 +1,564 @@
 Return-Path: <cyrus@holtmann.org>
-From: Abhinav Kumar <abhinav.ku91@samsung.com>
+From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Abhinav Kumar <abhinav.ku91@samsung.com>
-Subject: [PATCH ] [BT][LE Data Length Extension]
-Date: Wed, 04 Mar 2015 10:39:09 +0530
-Message-id: <1425445750-3723-1-git-send-email-abhinav.ku91@samsung.com>
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH BlueZ v3 7/7] tools: Added a Python example for GATT server API
+Date: Tue,  3 Mar 2015 20:30:11 -0800
+Message-Id: <1425443411-11958-8-git-send-email-armansito@chromium.org>
+In-Reply-To: <1425443411-11958-1-git-send-email-armansito@chromium.org>
+References: <1425443411-11958-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-1> Added kernel code for for all commands and events which are part of the feature.
-
-Signed-off-by: Abhinav Kumar <abhinav.ku91@samsung.com>
+This patch introduces tools/gatt-example, which demonstrates how an
+external application can use the GattManager1 API to register GATT
+services. This example simulates a fake Heart Rate service and a fake
+Battery service while also providing a test service with a non-SIG UUID
+that exercises various API behavior.
 ---
- include/net/bluetooth/hci_core.h |   13 ++-
- include/net/bluetooth/mgmt.h     |   40 +++++++++
- net/bluetooth/hci_conn.c         |   27 ++++++
- net/bluetooth/hci_event.c        |   35 +++++++-
- net/bluetooth/mgmt.c             |  169 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 280 insertions(+), 4 deletions(-)
+ tools/gatt-example | 533 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 533 insertions(+)
+ create mode 100755 tools/gatt-example
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index acec914..14c2c7e 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1314,6 +1314,13 @@ void mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 				  u8 status);
- void mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 				      u8 status);
-+void mgmt_le_set_data_length_complete(struct hci_dev * hdev,
-+								u8 status, u16 handle);
-+void mgmt_le_write_suggested_default_data_length_complete(
-+		struct hci_dev *hdev, u8 status);
-+void mgmt_le_data_length_changed(
-+		struct hci_dev *hdev, u16 handle, u16 txOctets,
-+		u16 txTime, u16 rxOctets, u16 rxTime);
- int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			      u8 link_type, u8 addr_type, u32 value,
- 			      u8 confirm_hint);
-@@ -1360,7 +1367,11 @@ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
- 		      u16 to_multiplier);
- void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
- 							__u8 ltk[16]);
--
-+void hci_le_set_data_length(
-+	struct hci_dev *hdev, u16 handle,
-+	u16 txOctets, u16 txTime);
-+void hci_le_write_suggested_default_data_length(
-+	struct hci_dev *hdev, u16 txOctets, u16 txTime);
- void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			       u8 *bdaddr_type);
- 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index fe8eef0..e4ad168 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -503,6 +503,37 @@ struct mgmt_cp_start_service_discovery {
- } __packed;
- #define MGMT_START_SERVICE_DISCOVERY_SIZE 4
- 
-+#define MGMT_LE_READ_SUGGESTED_DEFAULT_DATA_LENGTH_SIZE	0
-+#define MGMT_OP_LE_READ_SUGGESTED_DEFAULT_DATA_LENGTH	0x003B
-+struct mgmt_rp_le_read_suggested_default_data_length {
-+	__le16 txOctets;
-+	__le16 txTime;
-+} __packed;
+diff --git a/tools/gatt-example b/tools/gatt-example
+new file mode 100755
+index 0000000..a6f5cbe
+--- /dev/null
++++ b/tools/gatt-example
+@@ -0,0 +1,533 @@
++#!/usr/bin/python
 +
-+#define MGMT_LE_READ_MAXIMUM_DATA_LENGTH_SIZE 0
-+#define MGMT_OP_LE_READ_MAXIMUM_DATA_LENGTH	0x003C
-+struct mgmt_rp_le_read_maximum_data_length {
-+	__le16 txOctets;
-+	__le16 txTime;
-+	__le16 rxOctets;
-+	__le16 rxTime;
-+} __packed;
++import dbus
++import dbus.exceptions
++import dbus.mainloop.glib
++import dbus.service
 +
-+#define MGMT_LE_WRITE_SUGGESTED_DEFAULT_DATA_LENGTH_SIZE 4
-+#define MGMT_OP_LE_WRITE_SUGGESTED_DEFAULT_DATA_LENGTH 0x003D
-+struct mgmt_cp_le_write_suggested_default_data_length {
-+	__le16 txOctets;
-+	__le16 txTime;
-+} __packed;
++import array
++import gobject
 +
-+#define MGMT_LE_SET_DATA_LENGTH_SIZE 10
-+#define MGMT_OP_LE_SET_DATA_LENGTH 0x003E
-+struct mgmt_cp_le_set_data_length {
-+	bdaddr_t bdaddr;
-+	__le16 txOctets;
-+	__le16 txTime;
-+} __packed;
++from random import randint
 +
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-@@ -690,3 +721,12 @@ struct mgmt_ev_new_conn_param {
- #define MGMT_EV_UNCONF_INDEX_REMOVED	0x001e
- 
- #define MGMT_EV_NEW_CONFIG_OPTIONS	0x001f
++mainloop = None
 +
-+#define MGMT_EV_LE_DATA_LENGTH_CHANGE   0x0024
-+struct mgmt_ev_le_data_length_change {
-+	bdaddr_t bdaddr;
-+	__le16 txOctets;
-+	__le16 txTime;
-+	__le16 rxOctets;
-+	__le16 rxTime;
-+} __packed;
-\ No newline at end of file
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 91ebb9c..6fff13e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -275,6 +275,33 @@ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
- 	return 0x00;
- }
- 
-+void hci_le_write_suggested_default_data_length(
-+			struct hci_dev *hdev, u16 txOctets, u16 txTime) {
++BLUEZ_SERVICE_NAME = 'org.bluez'
++GATT_MANAGER_IFACE = 'org.bluez.GattManager1'
++DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
++DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
 +
-+	struct hci_cp_le_write_def_data_len cp;
++GATT_SERVICE_IFACE = 'org.bluez.GattService1'
++GATT_CHRC_IFACE = 'org.bluez.GattCharacteristic1'
++GATT_DESC_IFACE = 'org.bluez.GattDescriptor1'
 +
-+	memset(&cp, 0, sizeof(cp));
++class InvalidArgsException(dbus.exceptions.DBusException):
++    _dbus_error_name = 'org.freedesktop.DBus.Error.InvalidArgs'
 +
-+	cp.tx_len = cpu_to_le16(txOctets);
-+	cp.tx_time = cpu_to_le16(txTime);
++class NotSupportedException(dbus.exceptions.DBusException):
++    _dbus_error_name = 'org.bluez.Error.NotSupported'
 +
-+	hci_send_cmd(hdev,
-+			HCI_OP_LE_WRITE_DEF_DATA_LEN, sizeof(cp), &cp);
-+}
++class NotPermittedException(dbus.exceptions.DBusException):
++    _dbus_error_name = 'org.bluez.Error.NotPermitted'
 +
-+void hci_le_set_data_length(
-+	struct hci_dev *hdev, u16 handle, u16 txOctets, u16 txTime) {
++class InvalidValueLengthException(dbus.exceptions.DBusException):
++    _dbus_error_name = 'org.bluez.Error.InvalidValueLength'
 +
-+	struct hci_cp_le_set_data_len cp;
-+	memset(&cp, 0, sizeof(cp));
++class FailedException(dbus.exceptions.DBusException):
++    _dbus_error_name = 'org.bluez.Error.Failed'
 +
-+	cp.handle = cpu_to_le16(handle);
-+	cp.tx_len = cpu_to_le16(txOctets);
-+	cp.tx_time = cpu_to_le16(txTime);
 +
-+	hci_send_cmd(hdev, HCI_OP_LE_SET_DATA_LEN, sizeof(cp), &cp);
-+}
++class Service(dbus.service.Object):
++    PATH_BASE = '/org/bluez/example/service'
 +
- void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
- 		      __u8 ltk[16])
- {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 39653d4..97af5c3 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1320,6 +1320,16 @@ static void hci_cc_le_read_supported_states(struct hci_dev *hdev,
- 	memcpy(hdev->le_states, rp->le_states, 8);
- }
- 
-+static void hci_cc_le_set_data_len(struct hci_dev *hdev,
-+					 struct sk_buff *skb)
-+{
-+	struct hci_rp_le_set_data_len *rp = (void *) skb->data;
++    def __init__(self, bus, index, uuid, primary):
++        self.path = self.PATH_BASE + str(index)
++        self.bus = bus
++        self.uuid = uuid
++        self.primary = primary
++        self.characteristics = []
++        dbus.service.Object.__init__(self, bus, self.path)
 +
-+	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
++    def get_properties(self):
++        return {
++                GATT_SERVICE_IFACE: {
++                        'UUID': self.uuid,
++                        'Primary': self.primary,
++                        'Characteristics': dbus.Array(
++                                self.get_characteristic_paths(),
++                                signature='o')
++                }
++        }
 +
-+	mgmt_le_set_data_length_complete(hdev, rp->status, rp->handle);
-+}
++    def get_path(self):
++        return dbus.ObjectPath(self.path)
 +
- static void hci_cc_le_read_def_data_len(struct hci_dev *hdev,
- 					struct sk_buff *skb)
- {
-@@ -1342,15 +1352,14 @@ static void hci_cc_le_write_def_data_len(struct hci_dev *hdev,
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
- 
--	if (status)
--		return;
--
- 	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_WRITE_DEF_DATA_LEN);
- 	if (!sent)
- 		return;
- 
- 	hdev->le_def_tx_len = le16_to_cpu(sent->tx_len);
- 	hdev->le_def_tx_time = le16_to_cpu(sent->tx_time);
++    def add_characteristic(self, characteristic):
++        self.characteristics.append(characteristic)
 +
-+    mgmt_le_write_suggested_default_data_length_complete(hdev, status);
- }
- 
- static void hci_cc_le_read_max_data_len(struct hci_dev *hdev,
-@@ -2978,6 +2987,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_le_read_max_data_len(hdev, skb);
- 		break;
- 
-+	case HCI_OP_LE_SET_DATA_LEN:
-+		hci_cc_le_set_data_len(hdev, skb);
-+		break;
++    def get_characteristic_paths(self):
++        result = []
++        for chrc in self.characteristics:
++            result.append(chrc.get_path())
++        return result
 +
- 	case HCI_OP_WRITE_LE_HOST_SUPPORTED:
- 		hci_cc_write_le_host_supported(hdev, skb);
- 		break;
-@@ -4968,6 +4981,19 @@ static void hci_le_direct_adv_report_evt(struct hci_dev *hdev,
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_le_data_length_change_evt(
-+	struct hci_dev *hdev, struct sk_buff *skb) {
++    def get_characteristics(self):
++        return self.characteristics
 +
-+	struct hci_ev_le_data_len_change *ev = (void *) skb->data;
-+	struct hci_conn *conn;
++    @dbus.service.method(DBUS_PROP_IFACE,
++                         in_signature='s',
++                         out_signature='a{sv}')
++    def GetAll(self, interface):
++        if interface != GATT_SERVICE_IFACE:
++            raise InvalidArgsException()
 +
-+	hci_dev_lock(hdev);
++        return self.get_properties[GATT_SERVICE_IFACE]
 +
-+	mgmt_le_data_length_changed(hdev, ev->handle, ev->tx_len,
-+					ev->tx_time, ev->rx_len, ev->rx_time);
-+	hci_dev_unlock(hdev);
-+}
++    @dbus.service.method(DBUS_OM_IFACE, out_signature='a{oa{sa{sv}}}')
++    def GetManagedObjects(self):
++        response = {}
++        print 'GetManagedObjects'
 +
- static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_le_meta *le_ev = (void *) skb->data;
-@@ -4998,6 +5024,9 @@ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	case HCI_EV_LE_DIRECT_ADV_REPORT:
- 		hci_le_direct_adv_report_evt(hdev, skb);
- 		break;
-+	case HCI_EV_LE_DATA_LEN_CHANGE:
-+		hci_le_data_length_change_evt( hdev, skb );
-+		break;
- 
- 	default:
- 		break;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1e4635a..8b6079a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -96,6 +96,10 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_SET_EXTERNAL_CONFIG,
- 	MGMT_OP_SET_PUBLIC_ADDRESS,
- 	MGMT_OP_START_SERVICE_DISCOVERY,
-+	MGMT_OP_LE_READ_SUGGESTED_DEFAULT_DATA_LENGTH,
-+	MGMT_OP_LE_READ_MAXIMUM_DATA_LENGTH,
-+	MGMT_OP_LE_WRITE_SUGGESTED_DEFAULT_DATA_LENGTH,
-+	MGMT_OP_LE_SET_DATA_LENGTH,
- };
- 
- static const u16 mgmt_events[] = {
-@@ -4205,6 +4209,105 @@ unlock:
- 	return err;
- }
- 
-+static int le_set_data_length( struct sock *sk, struct hci_dev *hdev, void *data, u16 len )
-+{
-+	struct mgmt_cp_le_set_data_length *cp = data;
-+	struct pending_cmd *cmd;
-+	struct hci_conn *conn = NULL;
++        response[self.get_path()] = self.get_properties()
++        chrcs = self.get_characteristics()
++        for chrc in chrcs:
++            response[chrc.get_path()] = chrc.get_properties()
++            descs = chrc.get_descriptors()
++            for desc in descs:
++                response[desc.get_path()] = desc.get_properties()
 +
-+	u16 txOctets, txTime, handle;
-+	int err = 0;
++        return response
 +
-+	hci_dev_lock(hdev);
 +
-+	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->bdaddr);
++class Characteristic(dbus.service.Object):
++    def __init__(self, bus, index, uuid, flags, service):
++        self.path = service.path + '/char' + str(index)
++        self.bus = bus
++        self.uuid = uuid
++        self.service = service
++        self.flags = flags
++        self.descriptors = []
++        dbus.service.Object.__init__(self, bus, self.path)
 +
-+	if(!conn) {
-+		err = -ENOMEM;
-+		goto done;
-+	}
++    def get_properties(self):
++        return {
++                GATT_CHRC_IFACE: {
++                        'Service': self.service.get_path(),
++                        'UUID': self.uuid,
++                        'Flags': self.flags,
++                        'Descriptors': dbus.Array(
++                                self.get_descriptor_paths(),
++                                signature='o')
++                }
++        }
 +
-+	handle = conn->handle;
-+	txOctets = __le16_to_cpu( cp->txOctets );
-+	txTime = __le16_to_cpu( cp->txTime );
++    def get_path(self):
++        return dbus.ObjectPath(self.path)
 +
-+	cmd = mgmt_pending_add(sk, MGMT_OP_LE_SET_DATA_LENGTH, hdev, data, len);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto done;
-+	}
++    def add_descriptor(self, descriptor):
++        self.descriptors.append(descriptor)
 +
-+	hci_le_set_data_length(hdev, handle, txOctets, txTime);
-+done:
-+	hci_dev_unlock(hdev);
-+	return err;
-+}
++    def get_descriptor_paths(self):
++        result = []
++        for desc in self.descriptors:
++            result.append(desc.get_path())
++        return result
 +
-+static int le_write_suggested_default_data_length(
-+	struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
-+{
-+	struct mgmt_cp_le_write_suggested_default_data_length *cp = data;
-+	struct pending_cmd *cmd;
-+	u16 txOctets, txTime;
-+	int err = 0;
++    def get_descriptors(self):
++        return self.descriptors
 +
-+	hci_dev_lock(hdev);
++    @dbus.service.method(DBUS_PROP_IFACE,
++                         in_signature='s',
++                         out_signature='a{sv}')
++    def GetAll(self, interface):
++        if interface != GATT_CHRC_IFACE:
++            raise InvalidArgsException()
 +
-+	txOctets = __le16_to_cpu(cp->txOctets);
-+	txTime = __le16_to_cpu(cp->txTime);
++        return self.get_properties[GATT_CHRC_IFACE]
 +
-+	cmd = mgmt_pending_add(sk,
-+			MGMT_OP_LE_WRITE_SUGGESTED_DEFAULT_DATA_LENGTH, hdev, data, len);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto done;
-+	}
++    @dbus.service.method(GATT_CHRC_IFACE, out_signature='ay')
++    def ReadValue(self):
++        print 'Default ReadValue called, returning error'
++        raise NotSupportedException()
 +
-+	hci_le_write_suggested_default_data_length(hdev, txOctets, txTime);
-+done:
-+	hci_dev_unlock(hdev);
-+	return err;
-+}
++    @dbus.service.method(GATT_CHRC_IFACE, in_signature='ay')
++    def WriteValue(self, value):
++        print 'Default WriteValue called, returning error'
++        raise NotSupportedException()
 +
-+static int le_read_suggested_default_data_length(
-+		struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
-+{
-+	int err = 0;
-+	struct mgmt_rp_le_read_suggested_default_data_length rp;
++    @dbus.service.method(GATT_CHRC_IFACE)
++    def StartNotify(self):
++        print 'Default StartNotify called, returning error'
++        raise NotSupportedException()
 +
-+	hci_dev_lock(hdev);
++    @dbus.service.method(GATT_CHRC_IFACE)
++    def StopNotify(self):
++        print 'Default StopNotify called, returning error'
++        raise NotSupportedException()
 +
-+	rp.txOctets = hdev->le_def_tx_len;
-+	rp.txTime = hdev->le_def_tx_time;
++    @dbus.service.signal(DBUS_PROP_IFACE,
++                         signature='sa{sv}as')
++    def PropertiesChanged(self, interface, changed, invalidated):
++        pass
 +
-+	cmd_complete(sk, hdev->id,
-+				MGMT_OP_LE_READ_SUGGESTED_DEFAULT_DATA_LENGTH,
-+				mgmt_status(MGMT_STATUS_SUCCESS), &rp, sizeof(rp));
 +
-+	hci_dev_unlock(hdev);
-+	return err;
-+}
++class Descriptor(dbus.service.Object):
++    def __init__(self, bus, index, uuid, characteristic):
++        self.path = characteristic.path + '/desc' + str(index)
++        self.bus = bus
++        self.uuid = uuid
++        self.chrc = characteristic
++        dbus.service.Object.__init__(self, bus, self.path)
 +
-+static int le_read_maximum_data_length(
-+	struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
-+{
-+	int err = 0;
-+	struct mgmt_rp_le_read_maximum_data_length rp;
++    def get_properties(self):
++        return {
++                GATT_DESC_IFACE: {
++                        'Characteristic': self.chrc.get_path(),
++                        'UUID': self.uuid,
++                }
++        }
 +
-+	hci_dev_lock(hdev);
++    def get_path(self):
++        return dbus.ObjectPath(self.path)
 +
-+	rp.txOctets = hdev->le_max_tx_len;
-+	rp.txTime = hdev->le_max_tx_time;
-+	rp.rxOctets = hdev->le_max_rx_len;
-+	rp.rxTime = hdev->le_max_rx_time;
++    @dbus.service.method(DBUS_PROP_IFACE,
++                         in_signature='s',
++                         out_signature='a{sv}')
++    def GetAll(self, interface):
++        if interface != GATT_DESC_IFACE:
++            raise InvalidArgsException()
 +
-+	cmd_complete(sk, hdev->id,
-+				MGMT_OP_LE_READ_MAXIMUM_DATA_LENGTH,
-+				mgmt_status(0), &rp, sizeof(rp));
-+	hci_dev_unlock(hdev);
-+	return err;
-+}
++        return self.get_properties[GATT_CHRC_IFACE]
 +
- static int confirm_name(struct sock *sk, struct hci_dev *hdev, void *data,
- 			u16 len)
- {
-@@ -6171,6 +6274,13 @@ static const struct mgmt_handler {
- 	{ set_external_config,    false, MGMT_SET_EXTERNAL_CONFIG_SIZE },
- 	{ set_public_address,     false, MGMT_SET_PUBLIC_ADDRESS_SIZE },
- 	{ start_service_discovery,true,  MGMT_START_SERVICE_DISCOVERY_SIZE },
-+	{ le_read_suggested_default_data_length, false,
-+		MGMT_LE_READ_SUGGESTED_DEFAULT_DATA_LENGTH_SIZE },
-+	{ le_read_maximum_data_length, false,
-+		MGMT_LE_READ_MAXIMUM_DATA_LENGTH_SIZE },
-+	{ le_write_suggested_default_data_length, false,
-+		MGMT_LE_WRITE_SUGGESTED_DEFAULT_DATA_LENGTH_SIZE },
-+	{ le_set_data_length, false, MGMT_LE_SET_DATA_LENGTH_SIZE },
- };
- 
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
-@@ -6871,6 +6981,65 @@ void mgmt_pin_code_request(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 secure)
- 	mgmt_event(MGMT_EV_PIN_CODE_REQUEST, hdev, &ev, sizeof(ev), NULL);
- }
- 
-+void mgmt_le_data_length_changed(struct hci_dev *hdev, u16 handle,
-+					u16 txOctets, u16 txTime, u16 rxOctets, u16 rxTime) {
++    @dbus.service.method(GATT_DESC_IFACE, out_signature='ay')
++    def ReadValue(self):
++        print 'Default ReadValue called, returning error'
++        raise NotSupportedException()
 +
-+	struct mgmt_ev_le_data_length_change ev;
-+	struct hci_conn *conn;
++    @dbus.service.method(GATT_DESC_IFACE, in_signature='ay')
++    def WriteValue(self, value):
++        print 'Default WriteValue called, returning error'
++        raise NotSupportedException()
 +
-+	conn = hci_conn_hash_lookup_handle(hdev, handle);
 +
-+	ev.bdaddr = conn->dst;
-+	ev.txOctets = cpu_to_le16(txOctets);
-+	ev.txTime = cpu_to_le16(txTime);
-+	ev.rxOctets = cpu_to_le16(rxOctets);
-+	ev.rxTime = cpu_to_le16(rxTime);
++class HeartRateService(Service):
++    """
++    Fake Heart Rate Service that simulates a fake heart beat and control point
++    behavior.
 +
-+	return mgmt_event(MGMT_EV_LE_DATA_LENGTH_CHANGE,
-+			hdev, &ev, sizeof(ev), NULL);
-+}
++    """
++    HR_UUID = '0000180d-0000-1000-8000-00805f9b34fb'
 +
-+void mgmt_le_write_suggested_default_data_length_complete(
-+		struct hci_dev *hdev, u8 status) {
++    def __init__(self, bus, index):
++        Service.__init__(self, bus, index, self.HR_UUID, True)
++        self.add_characteristic(HeartRateMeasurementChrc(bus, 0, self))
++        self.add_characteristic(BodySensorLocationChrc(bus, 1, self))
++        self.add_characteristic(HeartRateControlPointChrc(bus, 2, self))
++        self.energy_expended = 0
 +
-+	struct pending_cmd *cmd;
-+	cmd = mgmt_pending_find(
-+			MGMT_OP_LE_WRITE_SUGGESTED_DEFAULT_DATA_LENGTH, hdev);
-+	if (!cmd) {
-+		BT_INFO( "could not find command" );
-+		return;
-+	}
 +
-+	cmd_complete(cmd->sk, hdev->id, MGMT_OP_LE_WRITE_SUGGESTED_DEFAULT_DATA_LENGTH,
-+			 mgmt_status(status), NULL, 0);
-+	mgmt_pending_remove(cmd);
-+}
++class HeartRateMeasurementChrc(Characteristic):
++    HR_MSRMT_UUID = '00002a37-0000-1000-8000-00805f9b34fb'
 +
-+void mgmt_le_set_data_length_complete(struct hci_dev *hdev, u8 status, u16 handle) {
++    def __init__(self, bus, index, service):
++        Characteristic.__init__(
++                self, bus, index,
++                self.HR_MSRMT_UUID,
++                ['notify'],
++                service)
++        self.notifying = False
++        self.hr_ee_count = 0
 +
-+	struct pending_cmd *cmd;
-+	struct hci_conn *conn;
-+	void *rp = NULL;
-+	int len = 0;
++    def hr_msrmt_cb(self):
++        value = []
++        value.append(dbus.Byte(0x06))
 +
-+	cmd = mgmt_pending_find(MGMT_OP_LE_SET_DATA_LENGTH, hdev);
-+	if (!cmd) {
-+		BT_INFO( "could not find command" );
-+		return;
-+	}
++        value.append(dbus.Byte(randint(90, 130)))
 +
-+	conn = hci_conn_hash_lookup_handle(hdev, handle);
++        if self.hr_ee_count % 10 == 0:
++            value[0] = dbus.Byte(value[0] | 0x08)
++            value.append(dbus.Byte(self.service.energy_expended & 0xff))
++            value.append(dbus.Byte((self.service.energy_expended >> 8) & 0xff))
 +
-+	if(conn) {
-+		rp = (void *)&(conn->dst);
-+		len = 6;
-+	}
++        self.service.energy_expended = \
++                min(0xffff, self.service.energy_expended + 1)
++        self.hr_ee_count += 1
 +
-+	cmd_complete(cmd->sk, hdev->id, MGMT_OP_LE_SET_DATA_LENGTH,
-+				 mgmt_status(status), rp, len);
-+	mgmt_pending_remove(cmd);
-+}
++        print 'Updating value: ' + repr(value)
 +
- void mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 				  u8 status)
- {
++        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': value }, [])
++
++        return self.notifying
++
++    def _update_hr_msrmt_simulation(self):
++        print 'Update HR Measurement Simulation'
++
++        if not self.notifying:
++            return
++
++        gobject.timeout_add(1000, self.hr_msrmt_cb)
++
++    def StartNotify(self):
++        if self.notifying:
++            print 'Already notifying, nothing to do'
++            return
++
++        self.notifying = True
++        self._update_hr_msrmt_simulation()
++
++    def StopNotify(self):
++        if not self.notifying:
++            print 'Not notifying, nothing to do'
++            return
++
++        self.notifying = False
++        self._update_hr_msrmt_simulation()
++
++
++class BodySensorLocationChrc(Characteristic):
++    BODY_SNSR_LOC_UUID = '00002a38-0000-1000-8000-00805f9b34fb'
++
++    def __init__(self, bus, index, service):
++        Characteristic.__init__(
++                self, bus, index,
++                self.BODY_SNSR_LOC_UUID,
++                ['read'],
++                service)
++
++    def ReadValue(self):
++        # Return 'Chest' as the sensor location.
++        return [ 0x01 ]
++
++class HeartRateControlPointChrc(Characteristic):
++    HR_CTRL_PT_UUID = '00002a39-0000-1000-8000-00805f9b34fb'
++
++    def __init__(self, bus, index, service):
++        Characteristic.__init__(
++                self, bus, index,
++                self.HR_CTRL_PT_UUID,
++                ['write'],
++                service)
++
++    def WriteValue(self, value):
++        print 'Heart Rate Control Point WriteValue called'
++
++        if len(value) != 1:
++            raise InvalidValueLengthException()
++
++        byte = value[0]
++        print 'Control Point value: ' + repr(byte)
++
++        if byte != 1:
++            raise FailedException("0x80")
++
++        print 'Energy Expended field reset!'
++        self.service.energy_expended = 0
++
++
++class BatteryService(Service):
++    """
++    Fake Battery service that emulates a draining battery.
++
++    """
++    BATTERY_UUID = '180f'
++
++    def __init__(self, bus, index):
++        Service.__init__(self, bus, index, self.BATTERY_UUID, True)
++        self.add_characteristic(BatteryLevelCharacteristic(bus, 0, self))
++
++
++class BatteryLevelCharacteristic(Characteristic):
++    """
++    Fake Battery Level characteristic. The battery level is drained by 2 points
++    every 5 seconds.
++
++    """
++    BATTERY_LVL_UUID = '2a19'
++
++    def __init__(self, bus, index, service):
++        Characteristic.__init__(
++                self, bus, index,
++                self.BATTERY_LVL_UUID,
++                ['read', 'notify'],
++                service)
++        self.notifying = False
++        self.battery_lvl = 100
++        gobject.timeout_add(5000, self.drain_battery)
++
++    def notify_battery_level(self):
++        if not self.notifying:
++            return
++        self.PropertiesChanged(
++                GATT_CHRC_IFACE,
++                { 'Value': [dbus.Byte(self.battery_lvl)] }, [])
++
++    def drain_battery(self):
++        if self.battery_lvl > 0:
++            self.battery_lvl -= 2
++            if self.battery_lvl < 0:
++                self.battery_lvl = 0
++        print 'Battery Level drained: ' + repr(self.battery_lvl)
++        self.notify_battery_level()
++        return True
++
++    def ReadValue(self):
++        print 'Battery Level read: ' + repr(self.battery_lvl)
++        return [dbus.Byte(self.battery_lvl)]
++
++    def StartNotify(self):
++        if self.notifying:
++            print 'Already notifying, nothing to do'
++            return
++
++        self.notifying = True
++        self.notify_battery_level()
++
++    def StopNotify(self):
++        if not self.notifying:
++            print 'Not notifying, nothing to do'
++            return
++
++        self.notifying = False
++
++
++class TestService(Service):
++    """
++    Dummy test service that provides characteristics and descriptors that
++    exercise various API functionality.
++
++    """
++    TEST_SVC_UUID = '12345678-1234-5678-1234-56789abcdef0'
++
++    def __init__(self, bus, index):
++        Service.__init__(self, bus, index, self.TEST_SVC_UUID, False)
++        self.add_characteristic(TestCharacteristic(bus, 0, self))
++
++
++class TestCharacteristic(Characteristic):
++    """
++    Dummy test characteristic. Allows writing arbitrary bytes to its value, and
++    contains "extended properties", as well as a test descriptor.
++
++    """
++    TEST_CHRC_UUID = '12345678-1234-5678-1234-56789abcdef1'
++
++    def __init__(self, bus, index, service):
++        Characteristic.__init__(
++                self, bus, index,
++                self.TEST_CHRC_UUID,
++                ['read', 'write', 'writable-auxiliaries'],
++                service)
++        self.value = []
++        self.add_descriptor(TestDescriptor(bus, 0, self))
++        self.add_descriptor(
++                CharacteristicUserDescriptionDescriptor(bus, 1, self))
++
++    def ReadValue(self):
++        print 'TestCharacteristic Read: ' + repr(self.value)
++        return self.value
++
++    def WriteValue(self, value):
++        print 'TestCharacteristic Write: ' + repr(value)
++        self.value = value
++
++
++class TestDescriptor(Descriptor):
++    """
++    Dummy test descriptor. Returns a static value.
++
++    """
++    TEST_DESC_UUID = '12345678-1234-5678-1234-56789abcdef2'
++
++    def __init__(self, bus, index, characteristic):
++        Descriptor.__init__(
++                self, bus, index,
++                self.TEST_DESC_UUID,
++                characteristic)
++
++    def ReadValue(self):
++        return [
++                dbus.Byte('T'), dbus.Byte('e'), dbus.Byte('s'), dbus.Byte('t')
++        ]
++
++
++class CharacteristicUserDescriptionDescriptor(Descriptor):
++    """
++    Writable CUD descriptor.
++
++    """
++    CUD_UUID = '2901'
++
++    def __init__(self, bus, index, characteristic):
++        self.writable = 'writable-auxiliaries' in characteristic.flags
++        self.value = array.array('B', 'This is a characteristic for testing')
++        self.value = self.value.tolist()
++        Descriptor.__init__(
++                self, bus, index,
++                self.CUD_UUID,
++                characteristic)
++
++    def ReadValue(self):
++        return self.value
++
++    def WriteValue(self, value):
++        if not self.writable:
++            raise NotPermittedException()
++        self.value = value
++
++
++def register_service_cb():
++    print 'GATT service registered'
++
++
++def register_service_error_cb(error):
++    print 'Failed to register service: ' + str(error)
++    mainloop.quit()
++
++
++def find_adapter(bus):
++    remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'),
++                               DBUS_OM_IFACE)
++    objects = remote_om.GetManagedObjects()
++
++    for o, props in objects.iteritems():
++        if props.has_key(GATT_MANAGER_IFACE):
++            return o
++
++    return None
++
++def main():
++    global mainloop
++
++    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++
++    bus = dbus.SystemBus()
++
++    adapter = find_adapter(bus)
++    if not adapter:
++        print 'GattManager1 interface not found'
++        return
++
++    service_manager = dbus.Interface(
++            bus.get_object(BLUEZ_SERVICE_NAME, adapter),
++            GATT_MANAGER_IFACE)
++
++    hr_service = HeartRateService(bus, 0)
++    bat_service = BatteryService(bus, 1)
++    test_service = TestService(bus, 2)
++
++    mainloop = gobject.MainLoop()
++
++    service_manager.RegisterService(hr_service.get_path(), {},
++                                    reply_handler=register_service_cb,
++                                    error_handler=register_service_error_cb)
++    service_manager.RegisterService(bat_service.get_path(), {},
++                                    reply_handler=register_service_cb,
++                                    error_handler=register_service_error_cb)
++    service_manager.RegisterService(test_service.get_path(), {},
++                                    reply_handler=register_service_cb,
++                                    error_handler=register_service_error_cb)
++
++    mainloop.run()
++
++if __name__ == '__main__':
++    main()
 -- 
-1.7.9.5
+2.2.0.rc0.207.ga3a616c
 
