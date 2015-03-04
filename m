@@ -1,107 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 08/15] profiles/network: Shortening service name argument to svc
-Date: Wed,  4 Mar 2015 09:48:29 +0100
-Message-Id: <1425458910-24559-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Nitish Wokkadada <nitishw@marvell.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 3 Mar 2015 22:59:49 -0800
+Subject: RE: Query: [BLE][PROFILES]Need Suggestion on Implementing/Using
+ Immediate_Alert Service(Single Instance Service) used by multiple Profiles
+Message-ID: <CBACCFA0AEB13A41977475BCF3E896FC6674695156@SC-VEXCH2.marvell.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Current argument naming is long and it can be simplified to svc.
----
- profiles/network/connection.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+Hi All,
+Can anyone please comment?
 
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index 8f1a65b..ecb8441 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -79,9 +79,9 @@ struct network_conn {
- 
- static GSList *peers = NULL;
- 
--static uint16_t get_service_id(struct btd_service *service)
-+static uint16_t get_service_id(struct btd_service *svc)
- {
--	return bnep_service_id(btd_service_get_profile(service)->remote_uuid);
-+	return bnep_service_id(btd_service_get_profile(svc)->remote_uuid);
- }
- 
- static struct network_peer *find_peer(GSList *list, struct btd_device *device)
-@@ -309,11 +309,11 @@ static DBusMessage *local_connect(DBusConnection *conn,
- }
- 
- /* Connect and initiate BNEP session */
--int connection_connect(struct btd_service *service)
-+int connection_connect(struct btd_service *svc)
- {
--	struct network_conn *nc = btd_service_get_user_data(service);
-+	struct network_conn *nc = btd_service_get_user_data(svc);
- 	struct network_peer *peer = nc->peer;
--	uint16_t id = get_service_id(service);
-+	uint16_t id = get_service_id(svc);
- 	GError *err = NULL;
- 	const bdaddr_t *src;
- 	const bdaddr_t *dst;
-@@ -343,9 +343,9 @@ int connection_connect(struct btd_service *service)
- 	return 0;
- }
- 
--int connection_disconnect(struct btd_service *service)
-+int connection_disconnect(struct btd_service *svc)
- {
--	struct network_conn *nc = btd_service_get_user_data(service);
-+	struct network_conn *nc = btd_service_get_user_data(svc);
- 
- 	if (nc->state == DISCONNECTED)
- 		return 0;
-@@ -497,12 +497,12 @@ static const GDBusPropertyTable connection_properties[] = {
- 	{ }
- };
- 
--void connection_unregister(struct btd_service *service)
-+void connection_unregister(struct btd_service *svc)
- {
--	struct btd_device *device = btd_service_get_device(service);
--	struct network_conn *conn = btd_service_get_user_data(service);
-+	struct btd_device *device = btd_service_get_device(svc);
-+	struct network_conn *conn = btd_service_get_user_data(svc);
- 	struct network_peer *peer = conn->peer;
--	uint16_t id = get_service_id(service);
-+	uint16_t id = get_service_id(svc);
- 
- 	DBG("%s id %u", device_get_path(device), id);
- 
-@@ -544,12 +544,12 @@ static struct network_peer *create_peer(struct btd_device *device)
- 	return peer;
- }
- 
--int connection_register(struct btd_service *service)
-+int connection_register(struct btd_service *svc)
- {
--	struct btd_device *device = btd_service_get_device(service);
-+	struct btd_device *device = btd_service_get_device(svc);
- 	struct network_peer *peer;
- 	struct network_conn *nc;
--	uint16_t id = get_service_id(service);
-+	uint16_t id = get_service_id(svc);
- 
- 	DBG("%s id %u", device_get_path(device), id);
- 
-@@ -563,11 +563,11 @@ int connection_register(struct btd_service *service)
- 
- 	nc = g_new0(struct network_conn, 1);
- 	nc->id = id;
--	nc->service = btd_service_ref(service);
-+	nc->service = btd_service_ref(svc);
- 	nc->state = DISCONNECTED;
- 	nc->peer = peer;
- 
--	btd_service_set_user_data(service, nc);
-+	btd_service_set_user_data(svc, nc);
- 
- 	DBG("id %u registered", id);
- 
--- 
-2.1.0
+Regards,
+Nitish Wokkadada
 
+-----Original Message-----
+From: Nitish Wokkadada 
+Sent: 27 February 2015 18:16
+To: 'linux-bluetooth@vger.kernel.org'
+Subject: Query: [BLE][PROFILES]Need Suggestion on Implementing/Using Immediate_Alert Service(Single Instance Service) used by multiple Profiles
+
+Hello,
+
+Currently in Bluez5.28, I see the immalert.c & immalert.h files under folder profiles/proximity, wherein just Proximity profile uses/adds the Immediate_Alert Service & hence the immalert.c contains the handling with respect to Proximity Profile.
+However Immediate_Alert Service is a common service, and also can be used by FindMe Profile. 
+
+So, if we are implementing the FindMe Profile(FindMeTarget Role/GATT Server Role), then we cannot have another file in profiles/findme/ that adds the immediate_alert service(Considering Device supports both Proximity and FindMe profiles) due to immediate_alert service shall have a Single Instance per Device. 
+Also in Client Role case, we need to have common code for Single Instance Services(similar to Immediate_alert service) that does the discovery, read, write operations by providing apis that can be used by Different Profiles(ex: Proximity and FindMe profiles that uses Immediate_alert service), similar to Device Information service.
+
+Kindly correct me if my understanding is incorrect and suggest me on how to go about on implementing FindMe Profile(Whether to make a common ImmediateAlert file similar to DeviceInfo that can be used by required profiles)
+
+Regards,
+Nitish W
