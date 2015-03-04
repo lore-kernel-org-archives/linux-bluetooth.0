@@ -1,72 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 4 Mar 2015 11:05:03 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Abhinav Kumar <abhinav.ku91@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH ] [BT][LE Data Length Extension]
+Message-ID: <20150304090503.GA18273@t440s.lan>
+References: <1425445750-3723-1-git-send-email-abhinav.ku91@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <CBACCFA0AEB13A41977475BCF3E896FC6674695156@SC-VEXCH2.marvell.com>
-References: <CBACCFA0AEB13A41977475BCF3E896FC6674695156@SC-VEXCH2.marvell.com>
-Date: Wed, 4 Mar 2015 11:36:21 +0200
-Message-ID: <CABBYNZ+MiPy-EnGve37GNiivc2874FvP=fOr2+OJQ9HvH-hyFg@mail.gmail.com>
-Subject: Re: Query: [BLE][PROFILES]Need Suggestion on Implementing/Using
- Immediate_Alert Service(Single Instance Service) used by multiple Profiles
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Nitish Wokkadada <nitishw@marvell.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1425445750-3723-1-git-send-email-abhinav.ku91@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nitish,
+Hi Abhinav,
 
-On Wed, Mar 4, 2015 at 8:59 AM, Nitish Wokkadada <nitishw@marvell.com> wrote:
-> Hi All,
-> Can anyone please comment?
->
-> Regards,
-> Nitish Wokkadada
->
-> -----Original Message-----
-> From: Nitish Wokkadada
-> Sent: 27 February 2015 18:16
-> To: 'linux-bluetooth@vger.kernel.org'
-> Subject: Query: [BLE][PROFILES]Need Suggestion on Implementing/Using Immediate_Alert Service(Single Instance Service) used by multiple Profiles
->
-> Hello,
->
-> Currently in Bluez5.28, I see the immalert.c & immalert.h files under folder profiles/proximity, wherein just Proximity profile uses/adds the Immediate_Alert Service & hence the immalert.c contains the handling with respect to Proximity Profile.
-> However Immediate_Alert Service is a common service, and also can be used by FindMe Profile.
->
-> So, if we are implementing the FindMe Profile(FindMeTarget Role/GATT Server Role), then we cannot have another file in profiles/findme/ that adds the immediate_alert service(Considering Device supports both Proximity and FindMe profiles) due to immediate_alert service shall have a Single Instance per Device.
+On Wed, Mar 04, 2015, Abhinav Kumar wrote:
+> 1> Added kernel code for for all commands and events which are part of the feature.
+> 
+> Signed-off-by: Abhinav Kumar <abhinav.ku91@samsung.com>
+> ---
+>  include/net/bluetooth/hci_core.h |   13 ++-
+>  include/net/bluetooth/mgmt.h     |   40 +++++++++
+>  net/bluetooth/hci_conn.c         |   27 ++++++
+>  net/bluetooth/hci_event.c        |   35 +++++++-
+>  net/bluetooth/mgmt.c             |  169 ++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 280 insertions(+), 4 deletions(-)
 
-I suppose the alert should be a included service to FindME and
-Proximity, in that case it should not be a problem since the you can
-register the alert service in the database  and then include it in the
-other services. Btw, the API for doing this is changing, the plugins
-will probably have to interface with btd_database to do that, also you
-might need to do lookup in the database to discover the alert service
-since it might be implemented in another plugin, the third option is
-to implement this externally with use of D-Bus GATT APIs, but in that
-case it is not really possible to include services not bellowing to
-the same process/bus id.
+A couple of things:
 
-> Also in Client Role case, we need to have common code for Single Instance Services(similar to Immediate_alert service) that does the discovery, read, write operations by providing apis that can be used by Different Profiles(ex: Proximity and FindMe profiles that uses Immediate_alert service), similar to Device Information service.
+1) The very first thing that needs to happen is for a user space
+mgmt-api.txt patch to be submitted and get applied before we do any
+changes. This will require some good justifications for why you need
+this exposed to user space, and why it needs to happen pretty much 1:1
+to the respective HCI commands.
 
-Yep, a simple library in the form we have bt_hog, bt_bas, etc, with
-proper unit test is probably a good idea if we want this to be a
-internal plugin. We haven't yet define what service should be
-implemented as plugin though, usually if we do have as a plugin it
-might need an API for upper layers but we do have that already with
-GattService1, GattCharacteristic and GattDescriptor, so I believe only
-services that require a more tight integration into the system, e.g.
-HoG, needs to be a plugin.
+2) You need to split the kernel changes into multiple smaller patches.
+You can e.g. introduce the HCI definitions in one patch and the
+implementation in another. Same goes for mgmt definitions and
+implementation.
 
-> Kindly correct me if my understanding is incorrect and suggest me on how to go about on implementing FindMe Profile(Whether to make a common ImmediateAlert file similar to DeviceInfo that can be used by required profiles)
->
-> Regards,
-> Nitish W
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+3) Fix your coding style. There are probably multiple things but one
+obvious one I saw was with variable naming: we don't use CamelCase
+anywhere in the kernel (or BlueZ user space for that matter).
 
+4) Use hci_request if you need to have a function in mgmt.c called after
+a HCI command completion, instead of having a hard-coded call from
+hci_event.c into mgmt.c.
 
+5) For all of your patches you need to provide more extensive commit
+messages. It's good to have a short summary of what the patch does, but
+for most patches it's even more important to explain why the patch is
+needed and why the approach it takes is the best one.
 
--- 
-Luiz Augusto von Dentz
+Johan
