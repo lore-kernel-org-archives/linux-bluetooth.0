@@ -1,50 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54F752D8.1000605@ubnt.com>
-Date: Wed, 04 Mar 2015 20:45:44 +0200
-From: Andrejs Hanins <andrejs.hanins@ubnt.com>
 MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	marcin.kraglak@tieto.com, szymon.janc@tieto.com
-Subject: Non-consecutive handle values in GATT
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1425443411-11958-1-git-send-email-armansito@chromium.org>
+References: <1425443411-11958-1-git-send-email-armansito@chromium.org>
+Date: Wed, 4 Mar 2015 19:56:03 +0200
+Message-ID: <CABBYNZKykH1erXSkmFJ+Vj0vGVJ7RGfO8ZB6933Kuba3AwfwTQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 0/7] Implement GATT server D-Bus API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Arman,
 
-     I'm experimenting with an LE peripheral device which provides GATT 
-services described by attributes with non-consecutive handle values, 
-i.e. there are "gaps" between handle values. According to the Bluetooth 
-Core specification 4.0 (Volume 3, Part G, "2.5.1 Overview") it is allowed:
+On Wed, Mar 4, 2015 at 6:30 AM, Arman Uguray <armansito@chromium.org> wrote:
+> *v3: - Rebased remaining patches and built them into src/gatt-database.c instead
+>        of src/gatt-manager.c.
+>
+>      - Eliminated unnecessary lookups in CCC and notification related functions.
+>
+>      - Added a fake Battery Service to tools/gatt-example.
+>
+> Arman Uguray (7):
+>   core/gatt: Make CCC addition API public
+>   core/gatt: Create CCC for external characteristic
+>   core/gatt: Send not/ind for D-Bus characteristics
+>   core/gatt: Create CEP for external characteristic
+>   core/gatt: Register descriptors
+>   core/gatt: Support descriptor reads/writes
+>   tools: Added a Python example for GATT server API
+>
+>  src/gatt-database.c | 718 ++++++++++++++++++++++++++++++++++++++++++++--------
+>  src/gatt-database.h |  11 +
+>  tools/gatt-example  | 533 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 1153 insertions(+), 109 deletions(-)
+>  create mode 100755 tools/gatt-example
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
 
-      Although the Attribute Handle values are in increasing order, 
-following Attribute Handle values may differ by more than one.
-
-     Based on my experiments, BlueZ 5.28 and also git-master as of today 
-does not support non-consecutive handle values GATT table. As a result, 
-I can't connect to my device because gatt-client fails to initialize 
-properly. The failing place is in discover_descs():
-
-       if (gatt_db_attribute_get_handle(attr) !=
-                             chrc_data->value_handle)
-             goto failed;
-
-     The value of chrc_data->value_handle is correct and matches GATT 
-table one the device, but the attr->handle has the value of previous 
-attribute (Primary Service UUID in my case) +2. This handle value 
-calculation happens in gatt_db_service_add_characteristic() which has 
-strange code:
-
-     /* We set handle of characteristic value, which will be added next */
-     put_le16(get_handle_at_index(service, i - 1) + 2, &value[1]);
-
-     Before trying to fix the problem by myself it would be great to 
-hear some comments about this issue. Does it seem like a bug or I missed 
-something?
-
-     As a note, I can successfully connect to my LE peripheral from an 
-iPhone LightBlue app, which does not posses any issues during GATT 
-discovery and can read/write the characteristic on the device.
+Applied, thanks.
 
 
-BR, Andrey
+-- 
+Luiz Augusto von Dentz
