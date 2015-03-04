@@ -2,89 +2,96 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 2/4] core/gatt: Fix crash in gatt-database destructor
-Date: Wed,  4 Mar 2015 13:57:49 -0800
-Message-Id: <1425506271-20775-3-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 1/4] core/adapter: Deduplicate local service UUIDs
+Date: Wed,  4 Mar 2015 13:57:48 -0800
+Message-Id: <1425506271-20775-2-git-send-email-armansito@chromium.org>
 In-Reply-To: <1425506271-20775-1-git-send-email-armansito@chromium.org>
 References: <1425506271-20775-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes an invalid access that occurs during daemon shutdown
-if at least one external GATT service has been registered:
-
-==4764== Invalid read of size 8
-==4764==    at 0x4C8812: queue_foreach (queue.c:241)
-==4764==    by 0x47A29C: send_notification_to_devices (gatt-database.c:904)
-==4764==    by 0x47BAB8: send_service_changed (gatt-database.c:932)
-==4764==    by 0x47BB3D: gatt_db_service_removed (gatt-database.c:972)
-==4764==    by 0x4D5CA1: handle_notify (gatt-db.c:264)
-==4764==    by 0x4C888F: queue_foreach (queue.c:251)
-==4764==    by 0x4D675B: notify_service_changed (gatt-db.c:281)
-==4764==    by 0x4D680C: gatt_db_service_destroy (gatt-db.c:292)
-==4764==    by 0x4D6889: gatt_db_remove_service (gatt-db.c:424)
-==4764==    by 0x47B237: service_free (gatt-database.c:347)
-==4764==    by 0x4C8C4F: queue_remove_all (queue.c:387)
-==4764==    by 0x4C8CB4: queue_destroy (queue.c:76)
-==4764==  Address 0x5e9d0f8 is 8 bytes inside a block of size 32 free'd
-==4764==    at 0x4C2ACE9: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==4764==    by 0x4C8488: queue_unref (queue.c:53)
-==4764==    by 0x4C8CC4: queue_destroy (queue.c:78)
-==4764==    by 0x47C2E5: gatt_database_free (gatt-database.c:394)
-==4764==    by 0x47D21D: btd_gatt_database_destroy (gatt-database.c:2203)
-==4764==    by 0x48809F: adapter_remove (adapter.c:4595)
-==4764==    by 0x495D42: adapter_cleanup (adapter.c:7486)
-==4764==    by 0x40BBDD: main (main.c:666)
-==4764==
-==4764== Invalid read of size 8
-==4764==    at 0x4C8812: queue_foreach (queue.c:241)
-==4764==    by 0x47BB56: gatt_db_service_removed (gatt-database.c:974)
-==4764==    by 0x4D5CA1: handle_notify (gatt-db.c:264)
-==4764==    by 0x4C888F: queue_foreach (queue.c:251)
-==4764==    by 0x4D675B: notify_service_changed (gatt-db.c:281)
-==4764==    by 0x4D680C: gatt_db_service_destroy (gatt-db.c:292)
-==4764==    by 0x4D6889: gatt_db_remove_service (gatt-db.c:424)
-==4764==    by 0x47B237: service_free (gatt-database.c:347)
-==4764==    by 0x4C8C4F: queue_remove_all (queue.c:387)
-==4764==    by 0x4C8CB4: queue_destroy (queue.c:76)
-==4764==    by 0x47C2FB: gatt_database_free (gatt-database.c:395)
-==4764==    by 0x47D21D: btd_gatt_database_destroy (gatt-database.c:2203)
-==4764==  Address 0x5e9d0f8 is 8 bytes inside a block of size 32 free'd
-==4764==    at 0x4C2ACE9: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-==4764==    by 0x4C8488: queue_unref (queue.c:53)
-==4764==    by 0x4C8CC4: queue_destroy (queue.c:78)
-==4764==    by 0x47C2E5: gatt_database_free (gatt-database.c:394)
-==4764==    by 0x47D21D: btd_gatt_database_destroy (gatt-database.c:2203)
-==4764==    by 0x48809F: adapter_remove (adapter.c:4595)
-==4764==    by 0x495D42: adapter_cleanup (adapter.c:7486)
-==4764==    by 0x40BBDD: main (main.c:666)
-==4764==
+An adapter's local GATT database can contain multiple services with the
+same UUID and some of these services may also be present in the SDP
+tables. This patch deduplicates these so that the response returned for
+the "UUIDs" property only contains a single instance of each service
+UUID.
 ---
- src/gatt-database.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ src/adapter.c | 30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index a68bb4f..21c9e95 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -391,14 +391,16 @@ static void gatt_database_free(void *data)
- 		adapter_service_remove(database->adapter, database->gap_handle);
+diff --git a/src/adapter.c b/src/adapter.c
+index c12f557..93de573 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2192,10 +2192,9 @@ static gboolean property_get_discovering(const GDBusPropertyTable *property,
  
- 	/* TODO: Persistently store CCC states before freeing them */
-+	gatt_db_unregister(database->db, database->db_id);
-+
- 	queue_destroy(database->device_states, device_state_free);
- 	queue_destroy(database->services, service_free);
- 	queue_destroy(database->ccc_callbacks, ccc_cb_free);
- 	database->device_states = NULL;
- 	database->ccc_callbacks = NULL;
+ static void add_gatt_uuid(struct gatt_db_attribute *attrib, void *user_data)
+ {
+-	DBusMessageIter *iter = user_data;
++	GHashTable *uuids = user_data;
+ 	bt_uuid_t uuid, u128;
+ 	char uuidstr[MAX_LEN_UUID_STR + 1];
+-	const char *ptr = uuidstr;
  
--	gatt_db_unregister(database->db, database->db_id);
- 	gatt_db_unref(database->db);
+ 	if (!gatt_db_service_get_active(attrib))
+ 		return;
+@@ -2206,7 +2205,15 @@ static void add_gatt_uuid(struct gatt_db_attribute *attrib, void *user_data)
+ 	bt_uuid_to_uuid128(&uuid, &u128);
+ 	bt_uuid_to_string(&u128, uuidstr, sizeof(uuidstr));
+ 
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &ptr);
++	g_hash_table_add(uuids, strdup(uuidstr));
++}
 +
- 	btd_adapter_unref(database->adapter);
- 	free(database);
++static void iter_append_uuid(gpointer key, gpointer value, gpointer user_data)
++{
++	DBusMessageIter *iter = user_data;
++	const char *uuid = key;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
  }
+ 
+ static gboolean property_get_uuids(const GDBusPropertyTable *property,
+@@ -2216,9 +2223,11 @@ static gboolean property_get_uuids(const GDBusPropertyTable *property,
+ 	DBusMessageIter entry;
+ 	sdp_list_t *l;
+ 	struct gatt_db *db;
++	GHashTable *uuids;
+ 
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+-					DBUS_TYPE_STRING_AS_STRING, &entry);
++	uuids = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
++	if (!uuids)
++		return FALSE;
+ 
+ 	/* SDP records */
+ 	for (l = adapter->services; l != NULL; l = l->next) {
+@@ -2229,18 +2238,21 @@ static gboolean property_get_uuids(const GDBusPropertyTable *property,
+ 		if (uuid == NULL)
+ 			continue;
+ 
+-		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+-								&uuid);
+-		free(uuid);
++		g_hash_table_add(uuids, uuid);
+ 	}
+ 
+ 	/* GATT services */
+ 	db = btd_gatt_database_get_db(adapter->database);
+ 	if (db)
+-		gatt_db_foreach_service(db, NULL, add_gatt_uuid, &entry);
++		gatt_db_foreach_service(db, NULL, add_gatt_uuid, uuids);
+ 
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_TYPE_STRING_AS_STRING, &entry);
++	g_hash_table_foreach(uuids, iter_append_uuid, &entry);
+ 	dbus_message_iter_close_container(iter, &entry);
+ 
++	g_hash_table_destroy(uuids);
++
+ 	return TRUE;
+ }
+ 
 -- 
 2.2.0.rc0.207.ga3a616c
 
