@@ -1,45 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Mar 2015 21:58:50 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 2/3] Bluetooth: Refactor service discovery filter logic
-Message-ID: <20150304195850.GA9535@t440s.P-661HNU-F1>
-References: <1425406613-21420-1-git-send-email-jpawlowski@google.com>
- <1425406613-21420-2-git-send-email-jpawlowski@google.com>
+Message-ID: <54F752D8.1000605@ubnt.com>
+Date: Wed, 04 Mar 2015 20:45:44 +0200
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1425406613-21420-2-git-send-email-jpawlowski@google.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	marcin.kraglak@tieto.com, szymon.janc@tieto.com
+Subject: Non-consecutive handle values in GATT
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hello,
 
-On Tue, Mar 03, 2015, Jakub Pawlowski wrote:
-> +		if (hdev->discovery.uuid_count != 0 &&
-> +		    (eir_len == 0 || !eir_has_uuids(eir, eir_len,
-> +				  hdev->discovery.uuid_count,
-> +				  hdev->discovery.uuids)) &&
-> +		    (scan_rsp_len == 0 || !eir_has_uuids(scan_rsp, scan_rsp_len,
-> +				  hdev->discovery.uuid_count,
-> +				  hdev->discovery.uuids)))
-> +			return;
+     I'm experimenting with an LE peripheral device which provides GATT 
+services described by attributes with non-consecutive handle values, 
+i.e. there are "gaps" between handle values. According to the Bluetooth 
+Core specification 4.0 (Volume 3, Part G, "2.5.1 Overview") it is allowed:
 
-This if-statement needs to be simplified somehow, or split up, since
-right now it looks just too complex. You should at least be able to
-remove the '== 0' comparisons since eir_has_uuids() will directly return
-false then.
+      Although the Attribute Handle values are in increasing order, 
+following Attribute Handle values may differ by more than one.
 
-Other than this I haven't found any other major issues with this set.
+     Based on my experiments, BlueZ 5.28 and also git-master as of today 
+does not support non-consecutive handle values GATT table. As a result, 
+I can't connect to my device because gatt-client fails to initialize 
+properly. The failing place is in discover_descs():
 
-One thing you might wanna consider is to do a bit more refactoring of
-this new big if-branch (i.e. move the content of it to separate
-function). This is something that can be done as an additional patch on
-top of this set. I realize the mgmt_device_found() is suffering of being
-quite complex already before your patches, but having the filtered_scan
-case now in a single branch opens the door to factoring it out into a
-separate function. As a bonus you'll also get a bit better readability
-due to having one less tab for indentation, i.e. not as frequent forced
-line breaks.
+       if (gatt_db_attribute_get_handle(attr) !=
+                             chrc_data->value_handle)
+             goto failed;
 
-Johan
+     The value of chrc_data->value_handle is correct and matches GATT 
+table one the device, but the attr->handle has the value of previous 
+attribute (Primary Service UUID in my case) +2. This handle value 
+calculation happens in gatt_db_service_add_characteristic() which has 
+strange code:
+
+     /* We set handle of characteristic value, which will be added next */
+     put_le16(get_handle_at_index(service, i - 1) + 2, &value[1]);
+
+     Before trying to fix the problem by myself it would be great to 
+hear some comments about this issue. Does it seem like a bug or I missed 
+something?
+
+     As a note, I can successfully connect to my LE peripheral from an 
+iPhone LightBlue app, which does not posses any issues during GATT 
+discovery and can read/write the characteristic on the device.
+
+
+BR, Andrey
