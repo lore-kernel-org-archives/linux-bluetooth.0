@@ -1,49 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update GATT test results and notes
-Date: Thu, 05 Mar 2015 17:05:58 +0100
-Message-ID: <4244809.poznKLSOD1@leonov>
-In-Reply-To: <1425543672-4292-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1425543672-4292-1-git-send-email-mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] android/gatt: Add support for direct connect
+Date: Thu, 05 Mar 2015 16:59:30 +0100
+Message-ID: <4194893.WTandXkbt4@leonov>
+In-Reply-To: <1425556666-9868-1-git-send-email-szymon.janc@tieto.com>
+References: <1425556666-9868-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
-
-On Thursday 05 of March 2015 09:21:12 Mariusz Skamra wrote:
+On Thursday 05 of March 2015 12:57:44 Szymon Janc wrote:
+> Don't use kernel auto connect if direct connect is requested by Android
+> Framework. This is required to be able to connect to non-bonded devices
+> that are using RPA.
 > ---
->  android/pts-gatt.txt | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  android/gatt.c | 25 +++++++++++++------------
+>  1 file changed, 13 insertions(+), 12 deletions(-)
 > 
-> diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-> index 145e21f..cbb5cee 100644
-> --- a/android/pts-gatt.txt
-> +++ b/android/pts-gatt.txt
-> @@ -18,7 +18,8 @@ TC_GAC_CL_BV_01_C	PASS	haltest:
->  				gattc search_service
->  				gattc get_characteristic
->  				gattc write_characteristic: type 3
-> -TC_GAC_SR_BV_01_C	FAIL	PTS issue #13073
-> +TC_GAC_SR_BV_01_C	PASS	PTS issue #13073
-> +				TSE #6271
->  				haltest:
->  				gatts add_service
->  				gatts add_chaaracteristic:
-> @@ -992,7 +993,7 @@ TC_GAW_SR_BI_31_C	PASS	haltest:
->  				gatts add_descriptor: <permmisions> 17
->  				gatts start_service
->  				gatts send_response: <status> 12
-> -TC_GAW_SR_BI_32_C	FAIL	PTS issue #12823
-> +TC_GAW_SR_BI_32_C	PASS	PTS issue #12823
->  				haltest:
->  				gatts add_service
->  				gatts add_characteristic:
+> diff --git a/android/gatt.c b/android/gatt.c
+> index e6b0753..638786d 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -1928,7 +1928,7 @@ static int connect_bredr(struct gatt_device *dev)
+>  	return 0;
+>  }
+> 
+> -static bool trigger_connection(struct app_connection *conn)
+> +static bool trigger_connection(struct app_connection *conn, bool direct)
+>  {
+>  	bool ret;
+> 
+> @@ -1942,8 +1942,11 @@ static bool trigger_connection(struct app_connection
+> *conn) BDADDR_BREDR)
+>  			return connect_bredr(conn->device) == 0;
+> 
+> -		/* For LE use auto connect feature */
+> -		ret = auto_connect_le(conn->device);
+> +		if (direct)
+> +			ret = connect_le(conn->device) == 0;
+> +		else
+> +			ret = auto_connect_le(conn->device);
+> +
+>  		if (ret)
+>  			device_set_state(conn->device, DEVICE_CONNECT_INIT);
+>  		break;
+> @@ -2103,7 +2106,7 @@ reply:
+>  					HAL_OP_GATT_CLIENT_UNREGISTER, status);
+>  }
+> 
+> -static uint8_t handle_connect(int32_t app_id, const bdaddr_t *addr)
+> +static uint8_t handle_connect(int32_t app_id, const bdaddr_t *addr, bool
+> direct) {
+>  	struct app_connection conn_match;
+>  	struct app_connection *conn;
+> @@ -2134,7 +2137,7 @@ static uint8_t handle_connect(int32_t app_id, const
+> bdaddr_t *addr) return HAL_STATUS_NOMEM;
+>  	}
+> 
+> -	if (!trigger_connection(conn))
+> +	if (!trigger_connection(conn, direct))
+>  		return HAL_STATUS_FAILED;
+> 
+>  	return HAL_STATUS_SUCCESS;
+> @@ -2146,15 +2149,13 @@ static void handle_client_connect(const void *buf,
+> uint16_t len) uint8_t status;
+>  	bdaddr_t addr;
+> 
+> -	DBG("");
+> +	DBG("is_direct:%u transport:%u", cmd->is_direct, cmd->transport);
+> 
+>  	android2bdaddr(&cmd->bdaddr, &addr);
+> 
+> -	/* TODO handle is_direct flag */
+> -
+>  	/* TODO handle transport flag */
+> 
+> -	status = handle_connect(cmd->client_if, &addr);
+> +	status = handle_connect(cmd->client_if, &addr, cmd->is_direct);
+> 
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_CONNECT,
+>  								status);
+> @@ -4211,7 +4212,7 @@ static void handle_client_test_command(const void
+> *buf, uint16_t len) break;
+>  	case GATT_CLIENT_TEST_CMD_CONNECT:
+>  		/* TODO u1 holds device type, for now assume BLE */
+> -		status = handle_connect(test_client_if, &bdaddr);
+> +		status = handle_connect(test_client_if, &bdaddr, false);
+>  		break;
+>  	case GATT_CLIENT_TEST_CMD_DISCONNECT:
+>  		app = queue_find(gatt_apps, match_app_by_id,
+> @@ -4295,7 +4296,7 @@ static void handle_server_connect(const void *buf,
+> uint16_t len)
+> 
+>  	/* TODO: Handle transport flag */
+> 
+> -	status = handle_connect(cmd->server_if, &addr);
+> +	status = handle_connect(cmd->server_if, &addr, cmd->is_direct);
+> 
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_SERVER_CONNECT,
+>  								status);
+> @@ -7350,7 +7351,7 @@ bool bt_gatt_connect_app(unsigned int id, const
+> bdaddr_t *addr) {
+>  	uint8_t status;
+> 
+> -	status = handle_connect(id, addr);
+> +	status = handle_connect(id, addr, false);
+> 
+>  	return status != HAL_STATUS_FAILED;
+>  }
 
-Applied, thanks.
+Applied.
 
 -- 
 BR
