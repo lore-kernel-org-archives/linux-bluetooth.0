@@ -1,94 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH ] hciattach: Fix memory leak
-Date: Thu, 05 Mar 2015 17:11:36 +0530
-Message-id: <1425555696-8308-1-git-send-email-bharat.panda@samsung.com>
+Cc: bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH  7/7] doc/test-coverage: Update test-gatt count
+Date: Thu, 05 Mar 2015 14:43:38 +0530
+Message-id: <1425546818-23258-8-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1425546818-23258-1-git-send-email-gowtham.ab@samsung.com>
+References: <1425546818-23258-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- tools/hciattach.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+ doc/test-coverage.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tools/hciattach.c b/tools/hciattach.c
-index da154df..4dc5be5 100644
---- a/tools/hciattach.c
-+++ b/tools/hciattach.c
-@@ -1209,7 +1209,7 @@ static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
- 
- 	if (tcgetattr(fd, &ti) < 0) {
- 		perror("Can't get port settings");
--		return -1;
-+		goto fail;
- 	}
- 
- 	cfmakeraw(&ti);
-@@ -1222,13 +1222,13 @@ static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
- 
- 	if (tcsetattr(fd, TCSANOW, &ti) < 0) {
- 		perror("Can't set port settings");
--		return -1;
-+		goto fail;
- 	}
- 
- 	/* Set initial baudrate */
- 	if (set_speed(fd, &ti, u->init_speed) < 0) {
- 		perror("Can't set initial baud rate");
--		return -1;
-+		goto fail;
- 	}
- 
- 	tcflush(fd, TCIOFLUSH);
-@@ -1239,37 +1239,41 @@ static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
- 	}
- 
- 	if (u->init && u->init(fd, u, &ti) < 0)
--		return -1;
-+		goto fail;
- 
- 	tcflush(fd, TCIOFLUSH);
- 
- 	/* Set actual baudrate */
- 	if (set_speed(fd, &ti, u->speed) < 0) {
- 		perror("Can't set baud rate");
--		return -1;
-+		goto fail;
- 	}
- 
- 	/* Set TTY to N_HCI line discipline */
- 	i = N_HCI;
- 	if (ioctl(fd, TIOCSETD, &i) < 0) {
- 		perror("Can't set line discipline");
--		return -1;
-+		goto fail;
- 	}
- 
- 	if (flags && ioctl(fd, HCIUARTSETFLAGS, flags) < 0) {
- 		perror("Can't set UART flags");
--		return -1;
-+		goto fail;
- 	}
- 
- 	if (ioctl(fd, HCIUARTSETPROTO, u->proto) < 0) {
- 		perror("Can't set device");
--		return -1;
-+		goto fail;
- 	}
- 
- 	if (u->post && u->post(fd, u, &ti) < 0)
--		return -1;
-+		goto fail;
- 
- 	return fd;
+diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+index 141bb8e..5696ee3 100644
+--- a/doc/test-coverage.txt
++++ b/doc/test-coverage.txt
+@@ -1,3 +1,4 @@
 +
-+fail:
-+	close(fd);
-+	return -1;
- }
+ BlueZ test coverage
+ *******************
  
- static void usage(void)
+@@ -28,9 +29,9 @@ test-gobex-header	  28	OBEX header handling
+ test-gobex-apparam	  18	OBEX apparam handling
+ test-gobex-transfer	  36	OBEX transfer handling
+ test-gdbus-client	  13	D-Bus client handling
+-test-gatt		 122	GATT qualification test cases
++test-gatt		 131	GATT qualification test cases
+ 			-----
+-			 697
++			 706
+ 
+ 
+ Automated end-to-end testing
 -- 
 1.9.1
 
