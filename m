@@ -1,110 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/3] android/gatt: Add support for direct connect
-Date: Thu,  5 Mar 2015 12:57:44 +0100
-Message-Id: <1425556666-9868-1-git-send-email-szymon.janc@tieto.com>
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] hciattach: Fix memory leak
+Date: Thu, 05 Mar 2015 17:11:36 +0530
+Message-id: <1425555696-8308-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Don't use kernel auto connect if direct connect is requested by Android
-Framework. This is required to be able to connect to non-bonded devices
-that are using RPA.
 ---
- android/gatt.c | 25 +++++++++++++------------
- 1 file changed, 13 insertions(+), 12 deletions(-)
+ tools/hciattach.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index e6b0753..638786d 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1928,7 +1928,7 @@ static int connect_bredr(struct gatt_device *dev)
- 	return 0;
- }
+diff --git a/tools/hciattach.c b/tools/hciattach.c
+index da154df..4dc5be5 100644
+--- a/tools/hciattach.c
++++ b/tools/hciattach.c
+@@ -1209,7 +1209,7 @@ static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
  
--static bool trigger_connection(struct app_connection *conn)
-+static bool trigger_connection(struct app_connection *conn, bool direct)
- {
- 	bool ret;
- 
-@@ -1942,8 +1942,11 @@ static bool trigger_connection(struct app_connection *conn)
- 								BDADDR_BREDR)
- 			return connect_bredr(conn->device) == 0;
- 
--		/* For LE use auto connect feature */
--		ret = auto_connect_le(conn->device);
-+		if (direct)
-+			ret = connect_le(conn->device) == 0;
-+		else
-+			ret = auto_connect_le(conn->device);
-+
- 		if (ret)
- 			device_set_state(conn->device, DEVICE_CONNECT_INIT);
- 		break;
-@@ -2103,7 +2106,7 @@ reply:
- 					HAL_OP_GATT_CLIENT_UNREGISTER, status);
- }
- 
--static uint8_t handle_connect(int32_t app_id, const bdaddr_t *addr)
-+static uint8_t handle_connect(int32_t app_id, const bdaddr_t *addr, bool direct)
- {
- 	struct app_connection conn_match;
- 	struct app_connection *conn;
-@@ -2134,7 +2137,7 @@ static uint8_t handle_connect(int32_t app_id, const bdaddr_t *addr)
- 			return HAL_STATUS_NOMEM;
+ 	if (tcgetattr(fd, &ti) < 0) {
+ 		perror("Can't get port settings");
+-		return -1;
++		goto fail;
  	}
  
--	if (!trigger_connection(conn))
-+	if (!trigger_connection(conn, direct))
- 		return HAL_STATUS_FAILED;
+ 	cfmakeraw(&ti);
+@@ -1222,13 +1222,13 @@ static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
  
- 	return HAL_STATUS_SUCCESS;
-@@ -2146,15 +2149,13 @@ static void handle_client_connect(const void *buf, uint16_t len)
- 	uint8_t status;
- 	bdaddr_t addr;
+ 	if (tcsetattr(fd, TCSANOW, &ti) < 0) {
+ 		perror("Can't set port settings");
+-		return -1;
++		goto fail;
+ 	}
  
--	DBG("");
-+	DBG("is_direct:%u transport:%u", cmd->is_direct, cmd->transport);
+ 	/* Set initial baudrate */
+ 	if (set_speed(fd, &ti, u->init_speed) < 0) {
+ 		perror("Can't set initial baud rate");
+-		return -1;
++		goto fail;
+ 	}
  
- 	android2bdaddr(&cmd->bdaddr, &addr);
+ 	tcflush(fd, TCIOFLUSH);
+@@ -1239,37 +1239,41 @@ static int init_uart(char *dev, struct uart_t *u, int send_break, int raw)
+ 	}
  
--	/* TODO handle is_direct flag */
--
- 	/* TODO handle transport flag */
+ 	if (u->init && u->init(fd, u, &ti) < 0)
+-		return -1;
++		goto fail;
  
--	status = handle_connect(cmd->client_if, &addr);
-+	status = handle_connect(cmd->client_if, &addr, cmd->is_direct);
+ 	tcflush(fd, TCIOFLUSH);
  
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_CONNECT,
- 								status);
-@@ -4211,7 +4212,7 @@ static void handle_client_test_command(const void *buf, uint16_t len)
- 		break;
- 	case GATT_CLIENT_TEST_CMD_CONNECT:
- 		/* TODO u1 holds device type, for now assume BLE */
--		status = handle_connect(test_client_if, &bdaddr);
-+		status = handle_connect(test_client_if, &bdaddr, false);
- 		break;
- 	case GATT_CLIENT_TEST_CMD_DISCONNECT:
- 		app = queue_find(gatt_apps, match_app_by_id,
-@@ -4295,7 +4296,7 @@ static void handle_server_connect(const void *buf, uint16_t len)
+ 	/* Set actual baudrate */
+ 	if (set_speed(fd, &ti, u->speed) < 0) {
+ 		perror("Can't set baud rate");
+-		return -1;
++		goto fail;
+ 	}
  
- 	/* TODO: Handle transport flag */
+ 	/* Set TTY to N_HCI line discipline */
+ 	i = N_HCI;
+ 	if (ioctl(fd, TIOCSETD, &i) < 0) {
+ 		perror("Can't set line discipline");
+-		return -1;
++		goto fail;
+ 	}
  
--	status = handle_connect(cmd->server_if, &addr);
-+	status = handle_connect(cmd->server_if, &addr, cmd->is_direct);
+ 	if (flags && ioctl(fd, HCIUARTSETFLAGS, flags) < 0) {
+ 		perror("Can't set UART flags");
+-		return -1;
++		goto fail;
+ 	}
  
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_SERVER_CONNECT,
- 								status);
-@@ -7350,7 +7351,7 @@ bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr)
- {
- 	uint8_t status;
+ 	if (ioctl(fd, HCIUARTSETPROTO, u->proto) < 0) {
+ 		perror("Can't set device");
+-		return -1;
++		goto fail;
+ 	}
  
--	status = handle_connect(id, addr);
-+	status = handle_connect(id, addr, false);
+ 	if (u->post && u->post(fd, u, &ti) < 0)
+-		return -1;
++		goto fail;
  
- 	return status != HAL_STATUS_FAILED;
+ 	return fd;
++
++fail:
++	close(fd);
++	return -1;
  }
+ 
+ static void usage(void)
 -- 
-1.9.3
+1.9.1
 
