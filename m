@@ -1,63 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <54F8B881.4050506@ubnt.com>
-Date: Thu, 05 Mar 2015 22:11:45 +0200
-From: Andrejs Hanins <andrejs.hanins@ubnt.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: DBus API for LTK OOB keys
-References: <54F8584D.6020301@ubnt.com> <20150305134024.GA20862@t440s> <54F862A3.80400@ubnt.com> <8EB5FD2F-4C46-41F8-95BA-4ACBEF0BCDE4@holtmann.org>
-In-Reply-To: <8EB5FD2F-4C46-41F8-95BA-4ACBEF0BCDE4@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v9] doc/adapter-api.txt: SetDiscoveryFilter method.
+Date: Thu,  5 Mar 2015 11:38:14 -0800
+Message-Id: <1425584294-3721-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+This patch proposes new method, SetDiscoveryFilter to D-Bus Adapter
+API for desktop bluetoothd. It will allow to set per-client discovery
+filter that would limit devices being discovered.
 
-On 2015.03.05. 16:55, Marcel Holtmann wrote:
-> Hi Andrejs,
->
->>>>      There is a MGMT "Load Long Term Keys Command" to feed keys to the Kernel
->>>> which are stored in the BlueZ settings storage file and read during adapter
->>>> init (load_devices->load_ltks). I searched through the code and couldn't
->>>> find any means to feed LTK keys from "the outside", for example through DBus
->>>> API. This is needed for an LE OOB pairing scheme, when key is known in
->>>> advance by both parties and is not derived from pairing procedure. Is there
->>>> a standardized way to add LTK keys "manually" or this is not supported-yet
->>>> feature? According to setting storage rules "Direct access to the storage
->>>> outside from bluetoothd is highly discouraged".
->>> Are the keys provisioned beforehand or is this something that can happen
->>> at any time when bluetoothd is already running? If it's the former then
->>> a custom bluetoothd plugin that gives bluetoothd core an extra set of
->>> keys could be one way to go. If it's the latter, then things get tricky
->>> since the mgmt command wipes all existing keys away before adding new
->>> ones.
->> In my particular scenario, the OOB key is provisioned only once and beforehand and used to connect with multiple LE devices. LE devices get this key via some proprietary mechanism. So it is kind of "global master key". As such, it is not a problem to restart the BlueZ daemon after the key is (re-)provisioned.
-> using the same LTK for multi devices is a really bad idea. This is not how Bluetooth LE security was designed. My advise would be strictly against doing that in any product.
-Beg your pardon, I mixed up OOB and LTK, my bad. The proper question is 
-to how to feed OOB Datafor OOB pairing, which in turn used to generate 
-STK and then unique per-device LTK as you have described below. 
-Actually, I have found a way - btd_adapter_add_remote_oob_data() which 
-is exactly what I need. But, in order for OOB Pairing to be started, the 
-"SMP Pairing Request (0x01)" should indicate the presence of OOB Data. 
-In kernel 3.18.6 it does not happening simply because the macro 
-SMP_OOB_PRESENT is not used at all. In latest kernel 3.19 some changes 
-were made in regard to OOB Data and macro is now used (see 
-build_pairing_cmd) but only if local device and authreq from remote 
-party both support "Secure Connections" which is in turn BT Core 4.2 
-feature. But OOB pairing is supported also in BT Core 4.0, isn't it? So 
-my question boils down to the following (it is all about LE bearers only):
-1. Is LE OOB Pairing not supported before kernel 3.19 ? (see 
-SMP_OOB_PRESENT macro which is not used)
-2. Is LE OOB Pairing is still broken in 3.19, because it works only when 
-both sides support "Secure Connections" thus are 4.2 version devices?
->
->>> If your OOB scheme is this latter "non-pre-provisioned" one I'd wonder
->>> why you're not using the standard OOB mechanism provided by LE SMP,
->>> since for that we do have at least partial support.
->> I'm now confused a bit. Indeed, I want to use OOB mechanism provided by LE SMP, but in order to start OOB pairing, the OOB key itself should be known to both sides (central and peripheral). For the peripheral I have my own ways to do it (proprietary), but the main question it how to give the key value to the central which is BlueZ in this case.
-> When using LE OOB pairing (Legacy Pairing and Secure Connections), then at least you get a sense of key strength that is guaranteed based on how LE security is designed. So doing LE OOB pairing is a good idea. You feed different information into OOB pairing. You share and OOB secret between two devices and based on that they can pair. However they need to be in range to actually use that OOB secret to pair. Pairing requires a connection. The advantage with pairing is that you get a proper key with a proper strength.
->
-> Regards
->
-> Marcel
->
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ doc/adapter-api.txt | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
+
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 74d235a..528f0ba 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -43,6 +43,65 @@ Methods		void StartDiscovery()
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.Failed
+ 
++		void SetDiscoveryFilter(dict filter) [Experimental]
++
++			This method sets the device discovery filter for
++			current discovery session. When this method is called
++			with no filter parameter, filter is removed.
++
++			Parameters that can be set in filter dictionary include
++			the following:
++
++			array{string} UUIDs : filtered service UUIDs (required)
++			int16 RSSI	: RSSI threshold value (optional)
++			uint16 pathloss	: Pathloss threshold value (optional)
++			string transport: type of scan to run
++
++			When a device is found that advertise any UUID from
++			UUIDs, it will be reported if:
++			- pathloss and RSSI are both empty,
++			- only pathloss param is set, device advertise TX pwer,
++			  and computed pathloss is less than pathloss param,
++			- only RSSI param is set, and received RSSI is higher
++			  than RSSI param,
++
++			transport parameter determines the type of scan:
++				"auto"	- interleaved scan
++				"bredr"	- br/edr inquiry
++				"le"	- le only scan, default value
++
++			If "le" or "bredr" transport is requested, and device
++			doesn't support it, org.bluez.Error.Failed error will
++			be returned. If "auto" transport is requested, scan
++			will use LE, BREDR, or both, depending on what's
++			currently enabled on controller.
++
++			When discovery filter is set, Device objects will be
++			created as new devices matching criteria are
++			discovered. It will also emit PropertiesChanged signal
++			for already existing Device objects, with updated RSSI
++			value. This is different from plain StartDiscovery
++			behaviour, that keeps imposing the delta-threshold. As
++			soon as there's one or more filters set, this type of
++			filtering is removed.
++
++			When multiple clients call StartDiscoveryFilter, their
++			filters are internally merged, and notifications about
++			new devices are sent to all clients. Therfore every
++			client must check wether Devices that he was notificed
++			about are matching it's filter.
++
++			When SetDiscoveryFilter is called multiple times, last
++			filter passed will be active for given client.
++
++			SetDiscoveryFilter can be called before StartDiscovery.
++			It is useful when client will create first discovery
++			session, to ensure that proper scan will be started
++			right after call to StartDiscovery.
++
++			Possible errors: org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++
+ Properties	string Address [readonly]
+ 
+ 			The Bluetooth device address.
+-- 
+2.2.0.rc0.207.ga3a616c
+
