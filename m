@@ -1,118 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/gatt: Add support for direct connect
-Date: Thu, 05 Mar 2015 16:59:30 +0100
-Message-ID: <4194893.WTandXkbt4@leonov>
-In-Reply-To: <1425556666-9868-1-git-send-email-szymon.janc@tieto.com>
-References: <1425556666-9868-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: DBus API for LTK OOB keys
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <54F862A3.80400@ubnt.com>
+Date: Thu, 5 Mar 2015 06:55:05 -0800
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <8EB5FD2F-4C46-41F8-95BA-4ACBEF0BCDE4@holtmann.org>
+References: <54F8584D.6020301@ubnt.com> <20150305134024.GA20862@t440s> <54F862A3.80400@ubnt.com>
+To: Andrejs Hanins <andrejs.hanins@ubnt.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday 05 of March 2015 12:57:44 Szymon Janc wrote:
-> Don't use kernel auto connect if direct connect is requested by Android
-> Framework. This is required to be able to connect to non-bonded devices
-> that are using RPA.
-> ---
->  android/gatt.c | 25 +++++++++++++------------
->  1 file changed, 13 insertions(+), 12 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index e6b0753..638786d 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -1928,7 +1928,7 @@ static int connect_bredr(struct gatt_device *dev)
->  	return 0;
->  }
-> 
-> -static bool trigger_connection(struct app_connection *conn)
-> +static bool trigger_connection(struct app_connection *conn, bool direct)
->  {
->  	bool ret;
-> 
-> @@ -1942,8 +1942,11 @@ static bool trigger_connection(struct app_connection
-> *conn) BDADDR_BREDR)
->  			return connect_bredr(conn->device) == 0;
-> 
-> -		/* For LE use auto connect feature */
-> -		ret = auto_connect_le(conn->device);
-> +		if (direct)
-> +			ret = connect_le(conn->device) == 0;
-> +		else
-> +			ret = auto_connect_le(conn->device);
-> +
->  		if (ret)
->  			device_set_state(conn->device, DEVICE_CONNECT_INIT);
->  		break;
-> @@ -2103,7 +2106,7 @@ reply:
->  					HAL_OP_GATT_CLIENT_UNREGISTER, status);
->  }
-> 
-> -static uint8_t handle_connect(int32_t app_id, const bdaddr_t *addr)
-> +static uint8_t handle_connect(int32_t app_id, const bdaddr_t *addr, bool
-> direct) {
->  	struct app_connection conn_match;
->  	struct app_connection *conn;
-> @@ -2134,7 +2137,7 @@ static uint8_t handle_connect(int32_t app_id, const
-> bdaddr_t *addr) return HAL_STATUS_NOMEM;
->  	}
-> 
-> -	if (!trigger_connection(conn))
-> +	if (!trigger_connection(conn, direct))
->  		return HAL_STATUS_FAILED;
-> 
->  	return HAL_STATUS_SUCCESS;
-> @@ -2146,15 +2149,13 @@ static void handle_client_connect(const void *buf,
-> uint16_t len) uint8_t status;
->  	bdaddr_t addr;
-> 
-> -	DBG("");
-> +	DBG("is_direct:%u transport:%u", cmd->is_direct, cmd->transport);
-> 
->  	android2bdaddr(&cmd->bdaddr, &addr);
-> 
-> -	/* TODO handle is_direct flag */
-> -
->  	/* TODO handle transport flag */
-> 
-> -	status = handle_connect(cmd->client_if, &addr);
-> +	status = handle_connect(cmd->client_if, &addr, cmd->is_direct);
-> 
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_CONNECT,
->  								status);
-> @@ -4211,7 +4212,7 @@ static void handle_client_test_command(const void
-> *buf, uint16_t len) break;
->  	case GATT_CLIENT_TEST_CMD_CONNECT:
->  		/* TODO u1 holds device type, for now assume BLE */
-> -		status = handle_connect(test_client_if, &bdaddr);
-> +		status = handle_connect(test_client_if, &bdaddr, false);
->  		break;
->  	case GATT_CLIENT_TEST_CMD_DISCONNECT:
->  		app = queue_find(gatt_apps, match_app_by_id,
-> @@ -4295,7 +4296,7 @@ static void handle_server_connect(const void *buf,
-> uint16_t len)
-> 
->  	/* TODO: Handle transport flag */
-> 
-> -	status = handle_connect(cmd->server_if, &addr);
-> +	status = handle_connect(cmd->server_if, &addr, cmd->is_direct);
-> 
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_SERVER_CONNECT,
->  								status);
-> @@ -7350,7 +7351,7 @@ bool bt_gatt_connect_app(unsigned int id, const
-> bdaddr_t *addr) {
->  	uint8_t status;
-> 
-> -	status = handle_connect(id, addr);
-> +	status = handle_connect(id, addr, false);
-> 
->  	return status != HAL_STATUS_FAILED;
->  }
+Hi Andrejs,
 
-Applied.
+>>>     There is a MGMT "Load Long Term Keys Command" to feed keys to the Kernel
+>>> which are stored in the BlueZ settings storage file and read during adapter
+>>> init (load_devices->load_ltks). I searched through the code and couldn't
+>>> find any means to feed LTK keys from "the outside", for example through DBus
+>>> API. This is needed for an LE OOB pairing scheme, when key is known in
+>>> advance by both parties and is not derived from pairing procedure. Is there
+>>> a standardized way to add LTK keys "manually" or this is not supported-yet
+>>> feature? According to setting storage rules "Direct access to the storage
+>>> outside from bluetoothd is highly discouraged".
+>> Are the keys provisioned beforehand or is this something that can happen
+>> at any time when bluetoothd is already running? If it's the former then
+>> a custom bluetoothd plugin that gives bluetoothd core an extra set of
+>> keys could be one way to go. If it's the latter, then things get tricky
+>> since the mgmt command wipes all existing keys away before adding new
+>> ones.
+> In my particular scenario, the OOB key is provisioned only once and beforehand and used to connect with multiple LE devices. LE devices get this key via some proprietary mechanism. So it is kind of "global master key". As such, it is not a problem to restart the BlueZ daemon after the key is (re-)provisioned.
 
--- 
-BR
-Szymon Janc
+using the same LTK for multi devices is a really bad idea. This is not how Bluetooth LE security was designed. My advise would be strictly against doing that in any product.
+
+>> If your OOB scheme is this latter "non-pre-provisioned" one I'd wonder
+>> why you're not using the standard OOB mechanism provided by LE SMP,
+>> since for that we do have at least partial support.
+> I'm now confused a bit. Indeed, I want to use OOB mechanism provided by LE SMP, but in order to start OOB pairing, the OOB key itself should be known to both sides (central and peripheral). For the peripheral I have my own ways to do it (proprietary), but the main question it how to give the key value to the central which is BlueZ in this case.
+
+When using LE OOB pairing (Legacy Pairing and Secure Connections), then at least you get a sense of key strength that is guaranteed based on how LE security is designed. So doing LE OOB pairing is a good idea. You feed different information into OOB pairing. You share and OOB secret between two devices and based on that they can pair. However they need to be in range to actually use that OOB secret to pair. Pairing requires a connection. The advantage with pairing is that you get a proper key with a proper strength.
+
+Regards
+
+Marcel
+
