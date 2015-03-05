@@ -1,34 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 Mar 2015 09:51:18 +0200
+Date: Thu, 5 Mar 2015 09:38:08 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
+To: Arman Uguray <armansito@chromium.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5 1/3] Bluetooth: Move Service Discovery logic before
- refactoring
-Message-ID: <20150305075118.GA17762@t440s.lan>
-References: <1425515066-28323-1-git-send-email-jpawlowski@google.com>
+Subject: Re: [PATCH BlueZ 0/4] GATT server API fixes
+Message-ID: <20150305073808.GA14922@t440s.lan>
+References: <1425506271-20775-1-git-send-email-armansito@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1425515066-28323-1-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1425506271-20775-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Arman,
 
-On Wed, Mar 04, 2015, Jakub Pawlowski wrote:
-> This patch moves whole packet filering logic of service discovery
-> into new function is_filter_match. It's done because logic inside
-> mgmt_device_found is very complicated and needs some
-> simplification.
+On Wed, Mar 04, 2015, Arman Uguray wrote:
+> This patch set includes some minor bug fixes for the GATT server D-Bus API and
+> adds the missing implementation for the GattManager1.UnregisterService method.
 > 
-> Also having whole logic in one place will allow to simplify it in
-> the future.
+> Arman Uguray (4):
+>   core/adapter: Deduplicate local service UUIDs
+>   core/gatt: Fix crash in gatt-database destructor
+>   core/gatt: Remove spammy log messages
+>   core/gatt: Add UnregisterService and track sender
 > 
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-> ---
->  net/bluetooth/mgmt.c | 141 +++++++++++++++++++++++++++++----------------------
->  1 file changed, 79 insertions(+), 62 deletions(-)
+>  src/adapter.c       | 30 +++++++++++++++++--------
+>  src/gatt-database.c | 63 +++++++++++++++++++++++++++++++++++++++++------------
+>  2 files changed, 70 insertions(+), 23 deletions(-)
 
-All three patches in this set have now been applied. Thanks.
+All patches in this set have been applied. Thanks.
 
 Johan
