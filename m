@@ -1,53 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  1/7] unit/test-gatt: Add TP/GAW/CL/BV-08-C test
-Date: Thu, 05 Mar 2015 14:43:32 +0530
-Message-id: <1425546818-23258-2-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1425546818-23258-1-git-send-email-gowtham.ab@samsung.com>
-References: <1425546818-23258-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH  0/7] Add Write Characteristic Descriptor TCs
+Date: Thu, 05 Mar 2015 14:43:31 +0530
+Message-id: <1425546818-23258-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile client can write a
-characteristic descriptor selected by handle.
----
- unit/test-gatt.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Adds the below client test cases (tested against service db):
+1) Write Characteristic Descriptors – by Client
+2) Write Characteristic Descriptor – Invalid Handle
+3) Write Characteristic Descriptor – Write Not Permitted
+4) Write Characteristic Descriptor – Insufficient Authorization
+5) Write Characteristic Descriptor – Insufficient Authentication
+6) Write Characteristic Descriptor – Insufficient Encryption Key Size
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 06f9193..8aec60b 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -829,6 +829,14 @@ static const struct test_step test_write_6 = {
- 	.length = 0x03
- };
- 
-+static const struct test_step test_write_7 = {
-+	.handle = 0x0008,
-+	.func = test_write,
-+	.expected_att_ecode = 0,
-+	.value = write_data_1,
-+	.length = 0x03
-+};
-+
- static void test_write_without_response(struct context *context)
- {
- 	const struct test_step *step = context->data->step;
-@@ -3087,5 +3095,11 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x12, 0x04, 0x00, 0x01, 0x02, 0x03),
- 			raw_pdu(0x01, 0x12, 0x04, 0x00, 0x03));
- 
-+	define_test_client("/TP/GAW/CL/BV-08-C", test_client, service_db_1,
-+			&test_write_7,
-+			SERVICE_DATA_1_PDUS,
-+			raw_pdu(0x12, 0x08, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x13));
-+
- 	return tester_run();
- }
+and updated the test-gatt count in doc/test-coverage.
+
+Gowtham Anandha Babu (7):
+  unit/test-gatt: Add TP/GAW/CL/BV-08-C test
+  unit/test-gatt: Add TP/GAW/CL/BI-20-C test
+  unit/test-gatt: Add TP/GAW/CL/BI-21-C test
+  unit/test-gatt: Add TP/GAW/CL/BI-22-C test
+  unit/test-gatt: Add TP/GAW/CL/BI-23-C test
+  unit/test-gatt: Add TP/GAW/CL/BI-24-C test
+  doc/test-coverage: Update test-gatt count
+
+ doc/test-coverage.txt |  5 +--
+ unit/test-gatt.c      | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 87 insertions(+), 2 deletions(-)
+
 -- 
 1.9.1
 
