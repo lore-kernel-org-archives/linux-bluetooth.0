@@ -2,247 +2,338 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 7/7] tools/btgatt-client: Add prepare and execute write
-Date: Fri,  6 Mar 2015 17:48:58 +0100
-Message-Id: <1425660538-25884-8-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 4/7] shared/gatt-client: Add write prepare and execute
+Date: Fri,  6 Mar 2015 17:48:55 +0100
+Message-Id: <1425660538-25884-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1425660538-25884-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1425660538-25884-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/btgatt-client.c | 204 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 204 insertions(+)
+For Android we need explicit write prepare and execute commands in GATT
+client. This patch adds that.
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index e2e0d15..6a0eae8 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -67,6 +67,8 @@ struct client {
- 	struct bt_att *att;
- 	struct gatt_db *db;
- 	struct bt_gatt_client *gatt;
-+
-+	unsigned int reliable_session_id;
- };
+Note that till now prepare and execute has been used only in long
+write.
+
+With this patch it is possible to start reliable write session by
+the gatt-client. First write prepare will return session ID which shall
+be used in follow up write prepare request and write execute.
+---
+ src/shared/gatt-client.c | 261 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-client.h |  13 +++
+ 2 files changed, 274 insertions(+)
+
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index acb6200..6154dcf 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -77,6 +77,8 @@ struct bt_gatt_client {
+ 	struct queue *long_write_queue;
+ 	bool in_long_write;
  
- static void print_prompt(void)
-@@ -884,6 +886,204 @@ static void cmd_write_long_value(struct client *cli, char *cmd_str)
- 	free(value);
++	unsigned int reliable_write_session_id;
++
+ 	/* List of registered disconnect/notification/indication callbacks */
+ 	struct queue *notify_list;
+ 	struct queue *notify_chrcs;
+@@ -2211,6 +2213,7 @@ unsigned int bt_gatt_client_write_without_response(
  }
  
-+static void write_prepare_usage(void)
-+{
-+	printf("Usage: write-prepare [options] <value_handle> <offset> "
-+				"<value>\n"
-+				"Options:\n"
-+				"\t-s, --session-id\tSession id\n"
-+				"e.g.:\n"
-+				"\twrite-prepare -s 1 0x0001 00 01 00\n");
-+}
-+
-+static struct option write_prepare_options[] = {
-+	{ "session-id",		1, 0, 's' },
-+	{ }
+ struct write_op {
++	struct bt_gatt_client *client;
+ 	bt_gatt_client_callback_t callback;
+ 	void *user_data;
+ 	bt_gatt_destroy_func_t destroy;
+@@ -2596,6 +2599,264 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+ 	return req->id;
+ }
+ 
++struct prep_write_op {
++	bt_gatt_client_write_long_callback_t callback;
++	void *user_data;
++	bt_gatt_destroy_func_t destroy;
++	uint8_t *pdu;
++	uint16_t pdu_len;
 +};
 +
-+static void cmd_write_prepare(struct client *cli, char *cmd_str)
++static void destroy_prep_write_op(void *data)
 +{
-+	int opt, i;
-+	char *argvbuf[516];
-+	char **argv = argvbuf;
-+	int argc = 0;
-+	unsigned int id = 0;
-+	uint16_t handle;
-+	uint16_t offset;
-+	char *endptr = NULL;
-+	unsigned int length;
-+	uint8_t *value = NULL;
++	struct prep_write_op *op = data;
 +
-+	if (!bt_gatt_client_is_ready(cli->gatt)) {
-+		printf("GATT client not initialized\n");
-+		return;
++	if (op->destroy)
++		op->destroy(op->user_data);
++
++	free(op->pdu);
++	free(op);
++}
++
++static void prep_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
++								void *user_data)
++{
++	struct request *req = user_data;
++	struct prep_write_op *op = req->data;
++	bool success;
++	uint8_t att_ecode;
++	bool reliable_error;
++
++	if (opcode == BT_ATT_OP_ERROR_RSP) {
++		success = false;
++		reliable_error = false;
++		att_ecode = process_error(pdu, length);
++		goto done;
 +	}
 +
-+	if (!parse_args(cmd_str, 514, argv + 1, &argc)) {
-+		printf("Too many arguments\n");
-+		write_value_usage();
-+		return;
++	if (opcode != BT_ATT_OP_PREP_WRITE_RSP) {
++		success = false;
++		reliable_error = false;
++		att_ecode = 0;
++		goto done;
 +	}
 +
-+	/* Add command name for getopt_long */
-+	argc++;
-+	argv[0] = "write-prepare";
-+
-+	optind = 0;
-+	while ((opt = getopt_long(argc, argv , "s:", write_prepare_options,
-+								NULL)) != -1) {
-+		switch (opt) {
-+		case 's':
-+			if (!optarg) {
-+				write_prepare_usage();
-+				return;
-+			}
-+
-+			id = atoi(optarg);
-+
-+			break;
-+		default:
-+			write_prepare_usage();
-+			return;
-+		}
++	if (!pdu || length != op->pdu_len ||
++					memcmp(pdu, op->pdu, op->pdu_len)) {
++		success = false;
++		reliable_error = true;
++		att_ecode = 0;
++		goto done;
 +	}
 +
-+	argc -= optind;
-+	argv += optind;
++	success = true;
++	reliable_error = false;
++	att_ecode = 0;
 +
-+	if (argc < 3) {
-+		write_prepare_usage();
-+		return;
++done:
++	if (op->callback)
++		op->callback(success, reliable_error, att_ecode, op->user_data);
++}
++
++static struct request *get_reliable_request(struct bt_gatt_client *client,
++							unsigned int id)
++{
++	struct request *req;
++	struct prep_write_op *op;
++
++	op = new0(struct prep_write_op, 1);
++	if (!op)
++		return NULL;
++
++	/* Following prepare writes */
++	if (id != 0)
++		req = queue_find(client->pending_requests, match_req_id,
++							UINT_TO_PTR(id));
++	else
++		req = request_create(client);
++
++	if (!req) {
++		free(op);
++		return NULL;
 +	}
 +
-+	if (cli->reliable_session_id != id) {
-+		printf("Session id != Ongoing session id (%u!=%u)\n", id,
-+						cli->reliable_session_id);
-+		return;
++	req->data = op;
++
++	return req;
++}
++
++unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
++				unsigned int id, uint16_t value_handle,
++				uint16_t offset, uint8_t *value,
++				uint16_t length,
++				bt_gatt_client_write_long_callback_t callback,
++				void *user_data,
++				bt_gatt_client_destroy_func_t destroy)
++{
++	struct request *req;
++	struct prep_write_op *op;
++	uint8_t pdu[4 + length];
++
++	if (!client)
++		return 0;
++
++	if (client->in_long_write)
++		return 0;
++
++	/*
++	 * Make sure that client who owns reliable session continues with
++	 * prepare writes or this is brand new reliable session (id == 0)
++	 */
++	if (id != client->reliable_write_session_id) {
++		util_debug(client->debug_callback, client->debug_data,
++			"There is other reliable write session ongoing %u",
++			client->reliable_write_session_id);
++
++		return 0;
 +	}
 +
-+	handle = strtol(argv[0], &endptr, 0);
-+	if (!endptr || *endptr != '\0' || !handle) {
-+		printf("Invalid handle: %s\n", argv[0]);
-+		return;
++	req = get_reliable_request(client, id);
++	if (!req)
++		return 0;
++
++	op = (struct prep_write_op *)req->data;
++
++	op->callback = callback;
++	op->user_data = user_data;
++	op->destroy = destroy;
++
++	req->destroy = destroy_prep_write_op;
++
++	put_le16(value_handle, pdu);
++	put_le16(offset, pdu + 2);
++	memcpy(pdu + 4, value, length);
++
++	/*
++	 * Before sending command we need to remember pdu as we need to validate
++	 * it in the response. Store handle, offset and value. Therefore
++	 * increase length by 4 (handle + offset) as we need it in couple places
++	 * below
++	 */
++	length += 4;
++
++	op->pdu = malloc(length);
++	if (!op->pdu) {
++		op->destroy = NULL;
++		request_unref(req);
++		return 0;
 +	}
 +
-+	endptr = NULL;
-+	offset = strtol(argv[1], &endptr, 0);
-+	if (!endptr || *endptr != '\0' || errno == ERANGE) {
-+		printf("Invalid offset: %s\n", argv[1]);
-+		return;
++	memcpy(op->pdu, pdu, length);
++	op->pdu_len = length;
++
++	/*
++	 * Now we are ready to send command
++	 * Note that request_unref will be done on write execute
++	 */
++	req->att_id = bt_att_send(client->att, BT_ATT_OP_PREP_WRITE_REQ, pdu,
++					sizeof(pdu), prep_write_cb, req,
++					NULL);
++	if (!req->att_id) {
++		op->destroy = NULL;
++		request_unref(req);
++		return 0;
 +	}
 +
 +	/*
-+	 * First two arguments are handle and offset. What remains is the value
-+	 * length
++	 * Store first request id for prepare write and treat it as a session id
++	 * valid until write execute is done
 +	 */
-+	length = argc - 2;
++	if (client->reliable_write_session_id == 0)
++		client->reliable_write_session_id = req->id;
 +
-+	if (length == 0)
++	return client->reliable_write_session_id;
++}
++
++static void exec_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
++								void *user_data)
++{
++	struct request *req = user_data;
++	struct write_op *op = req->data;
++	bool success;
++	uint8_t att_ecode;
++
++	if (opcode == BT_ATT_OP_ERROR_RSP) {
++		success = false;
++		att_ecode = process_error(pdu, length);
 +		goto done;
-+
-+	if (length > UINT16_MAX) {
-+		printf("Write value too long\n");
-+		return;
 +	}
 +
-+	value = malloc(length);
-+	if (!value) {
-+		printf("Failed to allocate memory for value\n");
-+		return;
++	if (opcode != BT_ATT_OP_EXEC_WRITE_RSP || pdu || length) {
++		success = false;
++		att_ecode = 0;
++		goto done;
 +	}
 +
-+	for (i = 2; i < argc; i++) {
-+		if (strlen(argv[i]) != 2) {
-+			printf("Invalid value byte: %s\n", argv[i]);
-+			free(value);
-+			return;
-+		}
-+
-+		value[i-2] = strtol(argv[i], &endptr, 0);
-+		if (endptr == argv[i] || *endptr != '\0' || errno == ERANGE) {
-+			printf("Invalid value byte: %s\n", argv[i]);
-+			free(value);
-+			return;
-+		}
-+	}
++	success = true;
++	att_ecode = 0;
 +
 +done:
-+	cli->reliable_session_id =
-+			bt_gatt_client_prepare_write(cli->gatt, id,
-+							handle, offset,
-+							value, length,
-+							write_long_cb, NULL,
-+							NULL);
-+	if (!cli->reliable_session_id)
-+		printf("Failed to proceed prepare write\n");
-+	else
-+		printf("Prepare write success.\n"
-+				"Session id: %d to be used on next write\n",
-+						cli->reliable_session_id);
++	if (op->callback)
++		op->callback(success, att_ecode, op->user_data);
 +
-+	free(value);
++	op->client->reliable_write_session_id = 0;
++
++	start_next_long_write(op->client);
 +}
 +
-+static void write_execute_usage(void)
++unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
++					bool execute,
++					unsigned int id,
++					bt_gatt_client_callback_t callback,
++					void *user_data,
++					bt_gatt_client_destroy_func_t destroy)
 +{
-+	printf("Usage: write-execute <session_id> <execute>\n"
-+				"e.g.:\n"
-+				"\twrite-execute 1 0\n");
++	struct request *req;
++	struct write_op *op;
++	uint8_t pdu;
++
++	if (!client)
++		return 0;
++
++	if (client->in_long_write)
++		return 0;
++
++	if (client->reliable_write_session_id != id)
++		return 0;
++
++	op = new0(struct write_op, 1);
++	if (!op)
++		return 0;
++
++	req = queue_find(client->pending_requests, match_req_id,
++							UINT_TO_PTR(id));
++	if (!req) {
++		free(op);
++		return 0;
++	}
++
++	op->client = client;
++	op->callback = callback;
++	op->user_data = user_data;
++	op->destroy = destroy;
++
++	pdu = execute ? 0x01 : 0x00;
++
++	req->data = op;
++	req->destroy = destroy_write_op;
++
++	req->att_id = bt_att_send(client->att, BT_ATT_OP_EXEC_WRITE_REQ, &pdu,
++						sizeof(pdu), exec_write_cb,
++						req, request_unref);
++	if (!req->att_id) {
++		op->destroy = NULL;
++		request_unref(req);
++		return 0;
++	}
++
++	return id;
 +}
 +
-+static void cmd_write_execute(struct client *cli, char *cmd_str)
-+{
-+	char *argvbuf[516];
-+	char **argv = argvbuf;
-+	int argc = 0;
-+	char *endptr = NULL;
-+	unsigned int session_id;
-+	bool execute;
-+
-+	if (!bt_gatt_client_is_ready(cli->gatt)) {
-+		printf("GATT client not initialized\n");
-+		return;
-+	}
-+
-+	if (!parse_args(cmd_str, 514, argv, &argc)) {
-+		printf("Too many arguments\n");
-+		write_value_usage();
-+		return;
-+	}
-+
-+	if (argc < 2) {
-+		write_execute_usage();
-+		return;
-+	}
-+
-+	session_id = strtol(argv[0], &endptr, 0);
-+	if (!endptr || *endptr != '\0') {
-+		printf("Invalid session id: %s\n", argv[0]);
-+		return;
-+	}
-+
-+	if (session_id != cli->reliable_session_id) {
-+		printf("Invalid session id: %u != %u\n", session_id,
-+						cli->reliable_session_id);
-+		return;
-+	}
-+
-+	execute = !!strtol(argv[1], &endptr, 0);
-+	if (!endptr || *endptr != '\0') {
-+		printf("Invalid execute: %s\n", argv[1]);
-+		return;
-+	}
-+
-+	if (!bt_gatt_client_write_execute(cli->gatt, session_id, execute,
-+							write_cb, NULL, NULL))
-+		printf("Failed to proceed write execute\n");
-+
-+	cli->reliable_session_id = 0;
-+}
-+
- static void register_notify_usage(void)
+ static bool match_notify_chrc_value_handle(const void *a, const void *b)
  {
- 	printf("Usage: register-notify <chrc value handle>\n");
-@@ -1130,6 +1330,10 @@ static struct {
- 			"\tWrite a characteristic or descriptor value" },
- 	{ "write-long-value", cmd_write_long_value,
- 			"Write long characteristic or descriptor value" },
-+	{ "write-prepare", cmd_write_prepare,
-+			"\tWrite prepare characteristic or descriptor value" },
-+	{ "write-execute", cmd_write_execute,
-+			"\tExecute already prepared write" },
- 	{ "register-notify", cmd_register_notify,
- 			"\tSubscribe to not/ind from a characteristic" },
- 	{ "unregister-notify", cmd_unregister_notify,
+ 	const struct notify_chrc *chrc = a;
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index d4358cf..27cf7cc 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -108,6 +108,19 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+ 				bt_gatt_client_write_long_callback_t callback,
+ 				void *user_data,
+ 				bt_gatt_client_destroy_func_t destroy);
++unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
++				unsigned int id,
++				uint16_t value_handle, uint16_t offset,
++				uint8_t *value, uint16_t length,
++				bt_gatt_client_write_long_callback_t callback,
++				void *user_data,
++				bt_gatt_client_destroy_func_t destroy);
++unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
++					bool execute,
++					unsigned int id,
++					bt_gatt_client_callback_t callback,
++					void *user_data,
++					bt_gatt_client_destroy_func_t destroy);
+ 
+ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ 				uint16_t chrc_value_handle,
 -- 
 1.8.4
 
