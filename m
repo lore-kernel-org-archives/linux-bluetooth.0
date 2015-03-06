@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 3/7] Bluetooth: Move all mgmt command quirks to handler table
-Date: Fri,  6 Mar 2015 14:10:16 +0200
-Message-Id: <1425643820-7644-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 2/7] Bluetooth: Convert mgmt to use HCI chan registration API
+Date: Fri,  6 Mar 2015 14:10:15 +0200
+Message-Id: <1425643820-7644-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1425643820-7644-1-git-send-email-johan.hedberg@gmail.com>
 References: <1425643820-7644-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,259 +11,201 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-In order to completely generalize the mgmt command handling we need to
-move away command-specific information from mgmt_control() into the
-actual command table. This patch adds a new 'flags' field to the handler
-entries which can now contain the following command specific
-information:
-
- - Command takes variable length parameters
- - Command doesn't target any specific HCI device
- - Command can be sent when the HCI device is unconfigured
-
-After this the mgmt_control() function is completely generic and can
-potentially be reused by new HCI channels.
+This patch converts the existing mgmt code to use the newly introduced
+generic API for registering HCI channels with mgmt-like semantics.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |   6 +-
- net/bluetooth/mgmt.c             | 170 ++++++++++++++++++++-------------------
- 2 files changed, 93 insertions(+), 83 deletions(-)
+ include/net/bluetooth/bluetooth.h |  3 +++
+ include/net/bluetooth/hci_core.h  |  4 +++-
+ net/bluetooth/af_bluetooth.c      |  9 +++++++++
+ net/bluetooth/hci_sock.c          | 19 +------------------
+ net/bluetooth/mgmt.c              | 34 +++++++++++++++++++++++-----------
+ 5 files changed, 39 insertions(+), 30 deletions(-)
 
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 6bb97df16d2d..e598ca096ec9 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -354,6 +354,9 @@ void l2cap_exit(void);
+ int sco_init(void);
+ void sco_exit(void);
+ 
++int mgmt_init(void);
++void mgmt_exit(void);
++
+ void bt_sock_reclassify_lock(struct sock *sk, int proto);
+ 
+ #endif /* __BLUETOOTH_H */
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b2a183d201b7..afc641c5e55c 100644
+index 0c84d48e5517..b2a183d201b7 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1273,11 +1273,15 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
+@@ -1309,7 +1309,9 @@ void hci_mgmt_chan_unregister(struct hci_mgmt_chan *c);
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
+ #define DISCOV_LE_RESTART_DELAY		msecs_to_jiffies(200)	/* msec */
  
- void hci_sock_dev_event(struct hci_dev *hdev, int event);
- 
-+#define HCI_MGMT_VAR_LEN	(1 << 0)
-+#define HCI_MGMT_NO_HDEV	(1 << 1)
-+#define HCI_MGMT_UNCONFIGURED	(1 << 2)
+-int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
++int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
++		 struct msghdr *msg, size_t msglen);
 +
- struct hci_mgmt_handler {
- 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
- 		     u16 data_len);
--	bool var_len;
- 	size_t data_len;
-+	unsigned long flags;
- };
+ int mgmt_new_settings(struct hci_dev *hdev);
+ void mgmt_index_added(struct hci_dev *hdev);
+ void mgmt_index_removed(struct hci_dev *hdev);
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 20a4698e2255..70f9d945faf7 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -749,6 +749,13 @@ static int __init bt_init(void)
+ 		goto sock_err;
+ 	}
  
- struct hci_mgmt_chan {
++	err = mgmt_init();
++	if (err < 0) {
++		sco_exit();
++		l2cap_exit();
++		goto sock_err;
++	}
++
+ 	return 0;
+ 
+ sock_err:
+@@ -763,6 +770,8 @@ error:
+ 
+ static void __exit bt_exit(void)
+ {
++	mgmt_exit();
++
+ 	sco_exit();
+ 
+ 	l2cap_exit();
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 0d5ace8922b1..aa9ffcb9481f 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -741,19 +741,6 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 		hci_pi(sk)->hdev = hdev;
+ 		break;
+ 
+-	case HCI_CHANNEL_CONTROL:
+-		if (haddr.hci_dev != HCI_DEV_NONE) {
+-			err = -EINVAL;
+-			goto done;
+-		}
+-
+-		if (!capable(CAP_NET_ADMIN)) {
+-			err = -EPERM;
+-			goto done;
+-		}
+-
+-		break;
+-
+ 	case HCI_CHANNEL_MONITOR:
+ 		if (haddr.hci_dev != HCI_DEV_NONE) {
+ 			err = -EINVAL;
+@@ -900,7 +887,6 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 		hci_sock_cmsg(sk, msg, skb);
+ 		break;
+ 	case HCI_CHANNEL_USER:
+-	case HCI_CHANNEL_CONTROL:
+ 	case HCI_CHANNEL_MONITOR:
+ 		sock_recv_timestamp(msg, sk, skb);
+ 		break;
+@@ -941,9 +927,6 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	case HCI_CHANNEL_RAW:
+ 	case HCI_CHANNEL_USER:
+ 		break;
+-	case HCI_CHANNEL_CONTROL:
+-		err = mgmt_control(sk, msg, len);
+-		goto done;
+ 	case HCI_CHANNEL_MONITOR:
+ 		err = -EOPNOTSUPP;
+ 		goto done;
+@@ -951,7 +934,7 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		mutex_lock(&mgmt_chan_list_lock);
+ 		chan = __hci_mgmt_chan_find(hci_pi(sk)->channel);
+ 		if (chan)
+-			err = -ENOSYS; /* FIXME: call handler */
++			err = mgmt_control(chan, sk, msg, len);
+ 		else
+ 			err = -EINVAL;
+ 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 982b3dcaf6be..77b2165d1faf 100644
+index 967f07fdbbbe..982b3dcaf6be 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -6108,64 +6108,77 @@ unlock:
+@@ -6106,12 +6106,7 @@ unlock:
+ 	return err;
+ }
  
- static const struct hci_mgmt_handler mgmt_handlers[] = {
+-static const struct mgmt_handler {
+-	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+-		     u16 data_len);
+-	bool var_len;
+-	size_t data_len;
+-} mgmt_handlers[] = {
++static const struct hci_mgmt_handler mgmt_handlers[] = {
  	{ NULL }, /* 0x0000 (no command) */
--	{ read_version,           false, MGMT_READ_VERSION_SIZE },
--	{ read_commands,          false, MGMT_READ_COMMANDS_SIZE },
--	{ read_index_list,        false, MGMT_READ_INDEX_LIST_SIZE },
--	{ read_controller_info,   false, MGMT_READ_INFO_SIZE },
--	{ set_powered,            false, MGMT_SETTING_SIZE },
--	{ set_discoverable,       false, MGMT_SET_DISCOVERABLE_SIZE },
--	{ set_connectable,        false, MGMT_SETTING_SIZE },
--	{ set_fast_connectable,   false, MGMT_SETTING_SIZE },
--	{ set_bondable,           false, MGMT_SETTING_SIZE },
--	{ set_link_security,      false, MGMT_SETTING_SIZE },
--	{ set_ssp,                false, MGMT_SETTING_SIZE },
--	{ set_hs,                 false, MGMT_SETTING_SIZE },
--	{ set_le,                 false, MGMT_SETTING_SIZE },
--	{ set_dev_class,          false, MGMT_SET_DEV_CLASS_SIZE },
--	{ set_local_name,         false, MGMT_SET_LOCAL_NAME_SIZE },
--	{ add_uuid,               false, MGMT_ADD_UUID_SIZE },
--	{ remove_uuid,            false, MGMT_REMOVE_UUID_SIZE },
--	{ load_link_keys,         true,  MGMT_LOAD_LINK_KEYS_SIZE },
--	{ load_long_term_keys,    true,  MGMT_LOAD_LONG_TERM_KEYS_SIZE },
--	{ disconnect,             false, MGMT_DISCONNECT_SIZE },
--	{ get_connections,        false, MGMT_GET_CONNECTIONS_SIZE },
--	{ pin_code_reply,         false, MGMT_PIN_CODE_REPLY_SIZE },
--	{ pin_code_neg_reply,     false, MGMT_PIN_CODE_NEG_REPLY_SIZE },
--	{ set_io_capability,      false, MGMT_SET_IO_CAPABILITY_SIZE },
--	{ pair_device,            false, MGMT_PAIR_DEVICE_SIZE },
--	{ cancel_pair_device,     false, MGMT_CANCEL_PAIR_DEVICE_SIZE },
--	{ unpair_device,          false, MGMT_UNPAIR_DEVICE_SIZE },
--	{ user_confirm_reply,     false, MGMT_USER_CONFIRM_REPLY_SIZE },
--	{ user_confirm_neg_reply, false, MGMT_USER_CONFIRM_NEG_REPLY_SIZE },
--	{ user_passkey_reply,     false, MGMT_USER_PASSKEY_REPLY_SIZE },
--	{ user_passkey_neg_reply, false, MGMT_USER_PASSKEY_NEG_REPLY_SIZE },
--	{ read_local_oob_data,    false, MGMT_READ_LOCAL_OOB_DATA_SIZE },
--	{ add_remote_oob_data,    true,  MGMT_ADD_REMOTE_OOB_DATA_SIZE },
--	{ remove_remote_oob_data, false, MGMT_REMOVE_REMOTE_OOB_DATA_SIZE },
--	{ start_discovery,        false, MGMT_START_DISCOVERY_SIZE },
--	{ stop_discovery,         false, MGMT_STOP_DISCOVERY_SIZE },
--	{ confirm_name,           false, MGMT_CONFIRM_NAME_SIZE },
--	{ block_device,           false, MGMT_BLOCK_DEVICE_SIZE },
--	{ unblock_device,         false, MGMT_UNBLOCK_DEVICE_SIZE },
--	{ set_device_id,          false, MGMT_SET_DEVICE_ID_SIZE },
--	{ set_advertising,        false, MGMT_SETTING_SIZE },
--	{ set_bredr,              false, MGMT_SETTING_SIZE },
--	{ set_static_address,     false, MGMT_SET_STATIC_ADDRESS_SIZE },
--	{ set_scan_params,        false, MGMT_SET_SCAN_PARAMS_SIZE },
--	{ set_secure_conn,        false, MGMT_SETTING_SIZE },
--	{ set_debug_keys,         false, MGMT_SETTING_SIZE },
--	{ set_privacy,            false, MGMT_SET_PRIVACY_SIZE },
--	{ load_irks,              true,  MGMT_LOAD_IRKS_SIZE },
--	{ get_conn_info,          false, MGMT_GET_CONN_INFO_SIZE },
--	{ get_clock_info,         false, MGMT_GET_CLOCK_INFO_SIZE },
--	{ add_device,             false, MGMT_ADD_DEVICE_SIZE },
--	{ remove_device,          false, MGMT_REMOVE_DEVICE_SIZE },
--	{ load_conn_param,        true,  MGMT_LOAD_CONN_PARAM_SIZE },
--	{ read_unconf_index_list, false, MGMT_READ_UNCONF_INDEX_LIST_SIZE },
--	{ read_config_info,       false, MGMT_READ_CONFIG_INFO_SIZE },
--	{ set_external_config,    false, MGMT_SET_EXTERNAL_CONFIG_SIZE },
--	{ set_public_address,     false, MGMT_SET_PUBLIC_ADDRESS_SIZE },
--	{ start_service_discovery,true,  MGMT_START_SERVICE_DISCOVERY_SIZE },
-+	{ read_version,            MGMT_READ_VERSION_SIZE,
-+						HCI_MGMT_NO_HDEV },
-+	{ read_commands,           MGMT_READ_COMMANDS_SIZE,
-+						HCI_MGMT_NO_HDEV },
-+	{ read_index_list,         MGMT_READ_INDEX_LIST_SIZE,
-+						HCI_MGMT_NO_HDEV },
-+	{ read_controller_info,    MGMT_READ_INFO_SIZE,                 0 },
-+	{ set_powered,             MGMT_SETTING_SIZE,                   0 },
-+	{ set_discoverable,        MGMT_SET_DISCOVERABLE_SIZE,          0 },
-+	{ set_connectable,         MGMT_SETTING_SIZE,                   0 },
-+	{ set_fast_connectable,    MGMT_SETTING_SIZE,                   0 },
-+	{ set_bondable,            MGMT_SETTING_SIZE,                   0 },
-+	{ set_link_security,       MGMT_SETTING_SIZE,                   0 },
-+	{ set_ssp,                 MGMT_SETTING_SIZE,                   0 },
-+	{ set_hs,                  MGMT_SETTING_SIZE,                   0 },
-+	{ set_le,                  MGMT_SETTING_SIZE,                   0 },
-+	{ set_dev_class,           MGMT_SET_DEV_CLASS_SIZE,             0 },
-+	{ set_local_name,          MGMT_SET_LOCAL_NAME_SIZE,            0 },
-+	{ add_uuid,                MGMT_ADD_UUID_SIZE,                  0 },
-+	{ remove_uuid,             MGMT_REMOVE_UUID_SIZE,               0 },
-+	{ load_link_keys,          MGMT_LOAD_LINK_KEYS_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ load_long_term_keys,     MGMT_LOAD_LONG_TERM_KEYS_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ disconnect,              MGMT_DISCONNECT_SIZE,                0 },
-+	{ get_connections,         MGMT_GET_CONNECTIONS_SIZE,           0 },
-+	{ pin_code_reply,          MGMT_PIN_CODE_REPLY_SIZE,            0 },
-+	{ pin_code_neg_reply,      MGMT_PIN_CODE_NEG_REPLY_SIZE,        0 },
-+	{ set_io_capability,       MGMT_SET_IO_CAPABILITY_SIZE,         0 },
-+	{ pair_device,             MGMT_PAIR_DEVICE_SIZE,               0 },
-+	{ cancel_pair_device,      MGMT_CANCEL_PAIR_DEVICE_SIZE,        0 },
-+	{ unpair_device,           MGMT_UNPAIR_DEVICE_SIZE,             0 },
-+	{ user_confirm_reply,      MGMT_USER_CONFIRM_REPLY_SIZE,        0 },
-+	{ user_confirm_neg_reply,  MGMT_USER_CONFIRM_NEG_REPLY_SIZE,    0 },
-+	{ user_passkey_reply,      MGMT_USER_PASSKEY_REPLY_SIZE,        0 },
-+	{ user_passkey_neg_reply,  MGMT_USER_PASSKEY_NEG_REPLY_SIZE,    0 },
-+	{ read_local_oob_data,     MGMT_READ_LOCAL_OOB_DATA_SIZE },
-+	{ add_remote_oob_data,     MGMT_ADD_REMOTE_OOB_DATA_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ remove_remote_oob_data,  MGMT_REMOVE_REMOTE_OOB_DATA_SIZE,    0 },
-+	{ start_discovery,         MGMT_START_DISCOVERY_SIZE,           0 },
-+	{ stop_discovery,          MGMT_STOP_DISCOVERY_SIZE,            0 },
-+	{ confirm_name,            MGMT_CONFIRM_NAME_SIZE,              0 },
-+	{ block_device,            MGMT_BLOCK_DEVICE_SIZE,              0 },
-+	{ unblock_device,          MGMT_UNBLOCK_DEVICE_SIZE,            0 },
-+	{ set_device_id,           MGMT_SET_DEVICE_ID_SIZE,             0 },
-+	{ set_advertising,         MGMT_SETTING_SIZE,                   0 },
-+	{ set_bredr,               MGMT_SETTING_SIZE,                   0 },
-+	{ set_static_address,      MGMT_SET_STATIC_ADDRESS_SIZE,        0 },
-+	{ set_scan_params,         MGMT_SET_SCAN_PARAMS_SIZE,           0 },
-+	{ set_secure_conn,         MGMT_SETTING_SIZE,                   0 },
-+	{ set_debug_keys,          MGMT_SETTING_SIZE,                   0 },
-+	{ set_privacy,             MGMT_SET_PRIVACY_SIZE,               0 },
-+	{ load_irks,               MGMT_LOAD_IRKS_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ get_conn_info,           MGMT_GET_CONN_INFO_SIZE,             0 },
-+	{ get_clock_info,          MGMT_GET_CLOCK_INFO_SIZE,            0 },
-+	{ add_device,              MGMT_ADD_DEVICE_SIZE,                0 },
-+	{ remove_device,           MGMT_REMOVE_DEVICE_SIZE,             0 },
-+	{ load_conn_param,         MGMT_LOAD_CONN_PARAM_SIZE,
-+						HCI_MGMT_VAR_LEN },
-+	{ read_unconf_index_list,  MGMT_READ_UNCONF_INDEX_LIST_SIZE,
-+						HCI_MGMT_NO_HDEV },
-+	{ read_config_info,        MGMT_READ_CONFIG_INFO_SIZE,
-+						HCI_MGMT_UNCONFIGURED },
-+	{ set_external_config,     MGMT_SET_EXTERNAL_CONFIG_SIZE,
-+						HCI_MGMT_UNCONFIGURED },
-+	{ set_public_address,      MGMT_SET_PUBLIC_ADDRESS_SIZE,
-+						HCI_MGMT_UNCONFIGURED },
-+	{ start_service_discovery, MGMT_START_SERVICE_DISCOVERY_SIZE,
-+						HCI_MGMT_VAR_LEN },
+ 	{ read_version,           false, MGMT_READ_VERSION_SIZE },
+ 	{ read_commands,          false, MGMT_READ_COMMANDS_SIZE },
+@@ -6173,14 +6168,15 @@ static const struct mgmt_handler {
+ 	{ start_service_discovery,true,  MGMT_START_SERVICE_DISCOVERY_SIZE },
  };
  
- int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
-@@ -6177,6 +6190,7 @@ int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
+-int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
++int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
++		 struct msghdr *msg, size_t msglen)
+ {
+ 	void *buf;
+ 	u8 *cp;
+ 	struct mgmt_hdr *hdr;
  	u16 opcode, index, len;
  	struct hci_dev *hdev = NULL;
- 	const struct hci_mgmt_handler *handler;
-+	bool var_len, no_hdev;
+-	const struct mgmt_handler *handler;
++	const struct hci_mgmt_handler *handler;
  	int err;
  
  	BT_DBG("got %zu bytes", msglen);
-@@ -6203,6 +6217,16 @@ int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
- 		goto done;
+@@ -6233,8 +6229,8 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 		}
  	}
  
+-	if (opcode >= ARRAY_SIZE(mgmt_handlers) ||
+-	    mgmt_handlers[opcode].func == NULL) {
 +	if (opcode >= chan->handler_count ||
 +	    chan->handlers[opcode].func == NULL) {
-+		BT_DBG("Unknown op %u", opcode);
-+		err = cmd_status(sk, index, opcode,
-+				 MGMT_STATUS_UNKNOWN_COMMAND);
-+		goto done;
-+	}
-+
+ 		BT_DBG("Unknown op %u", opcode);
+ 		err = cmd_status(sk, index, opcode,
+ 				 MGMT_STATUS_UNKNOWN_COMMAND);
+@@ -6255,7 +6251,7 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 		goto done;
+ 	}
+ 
+-	handler = &mgmt_handlers[opcode];
 +	handler = &chan->handlers[opcode];
+ 
+ 	if ((handler->var_len && len < handler->data_len) ||
+ 	    (!handler->var_len && len != handler->data_len)) {
+@@ -7446,3 +7442,19 @@ void mgmt_reenable_advertising(struct hci_dev *hdev)
+ 	enable_advertising(&req);
+ 	hci_req_run(&req, adv_enable_complete);
+ }
 +
- 	if (index != MGMT_INDEX_NONE) {
- 		hdev = hci_dev_get(index);
- 		if (!hdev) {
-@@ -6220,41 +6244,23 @@ int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
- 		}
- 
- 		if (test_bit(HCI_UNCONFIGURED, &hdev->dev_flags) &&
--		    opcode != MGMT_OP_READ_CONFIG_INFO &&
--		    opcode != MGMT_OP_SET_EXTERNAL_CONFIG &&
--		    opcode != MGMT_OP_SET_PUBLIC_ADDRESS) {
-+		    !(handler->flags & HCI_MGMT_UNCONFIGURED)) {
- 			err = cmd_status(sk, index, opcode,
- 					 MGMT_STATUS_INVALID_INDEX);
- 			goto done;
- 		}
- 	}
- 
--	if (opcode >= chan->handler_count ||
--	    chan->handlers[opcode].func == NULL) {
--		BT_DBG("Unknown op %u", opcode);
--		err = cmd_status(sk, index, opcode,
--				 MGMT_STATUS_UNKNOWN_COMMAND);
--		goto done;
--	}
--
--	if (hdev && (opcode <= MGMT_OP_READ_INDEX_LIST ||
--		     opcode == MGMT_OP_READ_UNCONF_INDEX_LIST)) {
--		err = cmd_status(sk, index, opcode,
--				 MGMT_STATUS_INVALID_INDEX);
--		goto done;
--	}
--
--	if (!hdev && (opcode > MGMT_OP_READ_INDEX_LIST &&
--		      opcode != MGMT_OP_READ_UNCONF_INDEX_LIST)) {
-+	no_hdev = (handler->flags & HCI_MGMT_NO_HDEV);
-+	if (no_hdev != !hdev) {
- 		err = cmd_status(sk, index, opcode,
- 				 MGMT_STATUS_INVALID_INDEX);
- 		goto done;
- 	}
- 
--	handler = &chan->handlers[opcode];
--
--	if ((handler->var_len && len < handler->data_len) ||
--	    (!handler->var_len && len != handler->data_len)) {
-+	var_len = (handler->flags & HCI_MGMT_VAR_LEN);
-+	if ((var_len && len < handler->data_len) ||
-+	    (!var_len && len != handler->data_len)) {
- 		err = cmd_status(sk, index, opcode,
- 				 MGMT_STATUS_INVALID_PARAMS);
- 		goto done;
++static struct hci_mgmt_chan chan = {
++	.channel	= HCI_CHANNEL_CONTROL,
++	.handler_count	= ARRAY_SIZE(mgmt_handlers),
++	.handlers	= mgmt_handlers,
++};
++
++int mgmt_init(void)
++{
++	return hci_mgmt_chan_register(&chan);
++}
++
++void mgmt_exit(void)
++{
++	hci_mgmt_chan_unregister(&chan);
++}
 -- 
 2.1.0
 
