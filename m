@@ -2,78 +2,247 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 6/7] shared/gatt-client: Support cancel of prepare write
-Date: Fri,  6 Mar 2015 17:48:57 +0100
-Message-Id: <1425660538-25884-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 7/7] tools/btgatt-client: Add prepare and execute write
+Date: Fri,  6 Mar 2015 17:48:58 +0100
+Message-Id: <1425660538-25884-8-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1425660538-25884-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1425660538-25884-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add support to cancel prepare write done from gatt client
 ---
- src/shared/gatt-client.c | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ tools/btgatt-client.c | 204 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 204 insertions(+)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index b3af611..b73f7fa 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1795,6 +1795,25 @@ static bool cancel_long_write_req(struct bt_gatt_client *client,
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index e2e0d15..6a0eae8 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -67,6 +67,8 @@ struct client {
+ 	struct bt_att *att;
+ 	struct gatt_db *db;
+ 	struct bt_gatt_client *gatt;
++
++	unsigned int reliable_session_id;
+ };
  
+ static void print_prompt(void)
+@@ -884,6 +886,204 @@ static void cmd_write_long_value(struct client *cli, char *cmd_str)
+ 	free(value);
  }
  
-+static void cancel_prep_write_cb(uint8_t opcode, const void *pdu, uint16_t len,
-+								void *user_data)
++static void write_prepare_usage(void)
 +{
-+	struct bt_gatt_client *client = user_data;
-+
-+	client->reliable_write_session_id = 0;
++	printf("Usage: write-prepare [options] <value_handle> <offset> "
++				"<value>\n"
++				"Options:\n"
++				"\t-s, --session-id\tSession id\n"
++				"e.g.:\n"
++				"\twrite-prepare -s 1 0x0001 00 01 00\n");
 +}
 +
-+static bool cancel_prep_write_session(struct bt_gatt_client *client,
-+							struct request *req)
-+{
-+	uint8_t pdu = 0x00;
++static struct option write_prepare_options[] = {
++	{ "session-id",		1, 0, 's' },
++	{ }
++};
 +
-+	return !!bt_att_send(client->att, BT_ATT_OP_EXEC_WRITE_REQ, &pdu,
-+							sizeof(pdu),
-+							cancel_prep_write_cb,
-+							client, NULL);
++static void cmd_write_prepare(struct client *cli, char *cmd_str)
++{
++	int opt, i;
++	char *argvbuf[516];
++	char **argv = argvbuf;
++	int argc = 0;
++	unsigned int id = 0;
++	uint16_t handle;
++	uint16_t offset;
++	char *endptr = NULL;
++	unsigned int length;
++	uint8_t *value = NULL;
++
++	if (!bt_gatt_client_is_ready(cli->gatt)) {
++		printf("GATT client not initialized\n");
++		return;
++	}
++
++	if (!parse_args(cmd_str, 514, argv + 1, &argc)) {
++		printf("Too many arguments\n");
++		write_value_usage();
++		return;
++	}
++
++	/* Add command name for getopt_long */
++	argc++;
++	argv[0] = "write-prepare";
++
++	optind = 0;
++	while ((opt = getopt_long(argc, argv , "s:", write_prepare_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 's':
++			if (!optarg) {
++				write_prepare_usage();
++				return;
++			}
++
++			id = atoi(optarg);
++
++			break;
++		default:
++			write_prepare_usage();
++			return;
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++
++	if (argc < 3) {
++		write_prepare_usage();
++		return;
++	}
++
++	if (cli->reliable_session_id != id) {
++		printf("Session id != Ongoing session id (%u!=%u)\n", id,
++						cli->reliable_session_id);
++		return;
++	}
++
++	handle = strtol(argv[0], &endptr, 0);
++	if (!endptr || *endptr != '\0' || !handle) {
++		printf("Invalid handle: %s\n", argv[0]);
++		return;
++	}
++
++	endptr = NULL;
++	offset = strtol(argv[1], &endptr, 0);
++	if (!endptr || *endptr != '\0' || errno == ERANGE) {
++		printf("Invalid offset: %s\n", argv[1]);
++		return;
++	}
++
++	/*
++	 * First two arguments are handle and offset. What remains is the value
++	 * length
++	 */
++	length = argc - 2;
++
++	if (length == 0)
++		goto done;
++
++	if (length > UINT16_MAX) {
++		printf("Write value too long\n");
++		return;
++	}
++
++	value = malloc(length);
++	if (!value) {
++		printf("Failed to allocate memory for value\n");
++		return;
++	}
++
++	for (i = 2; i < argc; i++) {
++		if (strlen(argv[i]) != 2) {
++			printf("Invalid value byte: %s\n", argv[i]);
++			free(value);
++			return;
++		}
++
++		value[i-2] = strtol(argv[i], &endptr, 0);
++		if (endptr == argv[i] || *endptr != '\0' || errno == ERANGE) {
++			printf("Invalid value byte: %s\n", argv[i]);
++			free(value);
++			return;
++		}
++	}
++
++done:
++	cli->reliable_session_id =
++			bt_gatt_client_prepare_write(cli->gatt, id,
++							handle, offset,
++							value, length,
++							write_long_cb, NULL,
++							NULL);
++	if (!cli->reliable_session_id)
++		printf("Failed to proceed prepare write\n");
++	else
++		printf("Prepare write success.\n"
++				"Session id: %d to be used on next write\n",
++						cli->reliable_session_id);
++
++	free(value);
 +}
 +
- bool bt_gatt_client_cancel(struct bt_gatt_client *client, unsigned int id)
++static void write_execute_usage(void)
++{
++	printf("Usage: write-execute <session_id> <execute>\n"
++				"e.g.:\n"
++				"\twrite-execute 1 0\n");
++}
++
++static void cmd_write_execute(struct client *cli, char *cmd_str)
++{
++	char *argvbuf[516];
++	char **argv = argvbuf;
++	int argc = 0;
++	char *endptr = NULL;
++	unsigned int session_id;
++	bool execute;
++
++	if (!bt_gatt_client_is_ready(cli->gatt)) {
++		printf("GATT client not initialized\n");
++		return;
++	}
++
++	if (!parse_args(cmd_str, 514, argv, &argc)) {
++		printf("Too many arguments\n");
++		write_value_usage();
++		return;
++	}
++
++	if (argc < 2) {
++		write_execute_usage();
++		return;
++	}
++
++	session_id = strtol(argv[0], &endptr, 0);
++	if (!endptr || *endptr != '\0') {
++		printf("Invalid session id: %s\n", argv[0]);
++		return;
++	}
++
++	if (session_id != cli->reliable_session_id) {
++		printf("Invalid session id: %u != %u\n", session_id,
++						cli->reliable_session_id);
++		return;
++	}
++
++	execute = !!strtol(argv[1], &endptr, 0);
++	if (!endptr || *endptr != '\0') {
++		printf("Invalid execute: %s\n", argv[1]);
++		return;
++	}
++
++	if (!bt_gatt_client_write_execute(cli->gatt, session_id, execute,
++							write_cb, NULL, NULL))
++		printf("Failed to proceed write execute\n");
++
++	cli->reliable_session_id = 0;
++}
++
+ static void register_notify_usage(void)
  {
- 	struct request *req;
-@@ -1809,13 +1828,17 @@ bool bt_gatt_client_cancel(struct bt_gatt_client *client, unsigned int id)
- 
- 	req->removed = true;
- 
--	if (!bt_att_cancel(client->att, req->att_id) && !req->long_write)
-+	if (!bt_att_cancel(client->att, req->att_id) && !req->long_write &&
-+							!req->prep_write)
- 		return false;
- 
- 	/* If this was a long-write, we need to abort all prepared writes */
- 	if (req->long_write)
- 		return cancel_long_write_req(client, req);
- 
-+	if (req->prep_write)
-+		return cancel_prep_write_session(client, req);
-+
- 	return true;
- }
- 
-@@ -1829,6 +1852,9 @@ static void cancel_request(void *data)
- 
- 	if (req->long_write)
- 		cancel_long_write_req(req->client, req);
-+
-+	if (req->prep_write)
-+		cancel_prep_write_session(req->client, req);
- }
- 
- bool bt_gatt_client_cancel_all(struct bt_gatt_client *client)
+ 	printf("Usage: register-notify <chrc value handle>\n");
+@@ -1130,6 +1330,10 @@ static struct {
+ 			"\tWrite a characteristic or descriptor value" },
+ 	{ "write-long-value", cmd_write_long_value,
+ 			"Write long characteristic or descriptor value" },
++	{ "write-prepare", cmd_write_prepare,
++			"\tWrite prepare characteristic or descriptor value" },
++	{ "write-execute", cmd_write_execute,
++			"\tExecute already prepared write" },
+ 	{ "register-notify", cmd_register_notify,
+ 			"\tSubscribe to not/ind from a characteristic" },
+ 	{ "unregister-notify", cmd_unregister_notify,
 -- 
 1.8.4
 
