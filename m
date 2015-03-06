@@ -1,104 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Introduce controller setting information for static address
-Date: Fri,  6 Mar 2015 10:11:21 -0800
-Message-Id: <1425665481-5898-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <54F9E9C3.3060700@ubnt.com>
+Date: Fri, 06 Mar 2015 19:54:11 +0200
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: DBus API for LTK OOB keys
+References: <54F8584D.6020301@ubnt.com> <20150305134024.GA20862@t440s> <54F862A3.80400@ubnt.com> <8EB5FD2F-4C46-41F8-95BA-4ACBEF0BCDE4@holtmann.org> <54F8B881.4050506@ubnt.com> <280B8CCC-6E98-477A-B805-D91966220207@holtmann.org>
+In-Reply-To: <280B8CCC-6E98-477A-B805-D91966220207@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently it is not possible to determine if the static address is used
-by the controller. It is also not possible to determine if using a
-static on a dual-mode controller with disabled BR/EDR is possible or
-not.
+Hi Marcel,
 
-To address this issue, introduce a new setting called static-address. If
-support for this setting is signaled that means that the kernel supports
-using static addresses. And if used on dual-mode controllers with BR/EDR
-disabled it means that a configured static address can be used.
+On 2015.03.06. 00:08, Marcel Holtmann wrote:
+> Hi Andrejs,
+>
+>>>>>>      There is a MGMT "Load Long Term Keys Command" to feed keys to=
+ the Kernel
+>>>>>> which are stored in the BlueZ settings storage file and read durin=
+g adapter
+>>>>>> init (load_devices->load_ltks). I searched through the code and co=
+uldn't
+>>>>>> find any means to feed LTK keys from "the outside", for example th=
+rough DBus
+>>>>>> API. This is needed for an LE OOB pairing scheme, when key is know=
+n in
+>>>>>> advance by both parties and is not derived from pairing procedure.=
+ Is there
+>>>>>> a standardized way to add LTK keys "manually" or this is not suppo=
+rted-yet
+>>>>>> feature? According to setting storage rules "Direct access to the =
+storage
+>>>>>> outside from bluetoothd is highly discouraged".
+>>>>> Are the keys provisioned beforehand or is this something that can h=
+appen
+>>>>> at any time when bluetoothd is already running? If it's the former =
+then
+>>>>> a custom bluetoothd plugin that gives bluetoothd core an extra set =
+of
+>>>>> keys could be one way to go. If it's the latter, then things get tr=
+icky
+>>>>> since the mgmt command wipes all existing keys away before adding n=
+ew
+>>>>> ones.
+>>>> In my particular scenario, the OOB key is provisioned only once and =
+beforehand and used to connect with multiple LE devices. LE devices get t=
+his key via some proprietary mechanism. So it is kind of "global master k=
+ey". As such, it is not a problem to restart the BlueZ daemon after the k=
+ey is (re-)provisioned.
+>>> using the same LTK for multi devices is a really bad idea. This is no=
+t how Bluetooth LE security was designed. My advise would be strictly aga=
+inst doing that in any product.
+>> Beg your pardon, I mixed up OOB and LTK, my bad. The proper question i=
+s to how to feed OOB Datafor OOB pairing, which in turn used to generate =
+STK and then unique per-device LTK as you have described below. Actually,=
+ I have found a way - btd_adapter_add_remote_oob_data() which is exactly =
+what I need. But, in order for OOB Pairing to be started, the "SMP Pairin=
+g Request (0x01)" should indicate the presence of OOB Data. In kernel 3.1=
+8.6 it does not happening simply because the macro SMP_OOB_PRESENT is not=
+ used at all. In latest kernel 3.19 some changes were made in regard to O=
+OB Data and macro is now used (see build_pairing_cmd) but only if local d=
+evice and authreq from remote party both support "Secure Connections" whi=
+ch is in turn BT Core 4.2 feature. But OOB pairing is supported also in B=
+T Core 4.0, isn't it? So my question boils down to the following (it is a=
+ll about LE bearers only):
+>> 1. Is LE OOB Pairing not supported before kernel 3.19 ? (see SMP_OOB_P=
+RESENT macro which is not used)
+>> 2. Is LE OOB Pairing is still broken in 3.19, because it works only wh=
+en both sides support "Secure Connections" thus are 4.2 version devices?
+> we still have a problem with LE OOB pairing in the sense of giving the =
+kernel enough information. That will be fixed hopefully pretty soon. The =
+proposal on how to do that is in mgmt-api.txt. I think Johan is working o=
+n it.
+Thanks a lot for your support, now it is clear. I analyzed kernel=20
+sources and obviously something is missing. I tried to do some quick=20
+hacks here and there to feed OOB data into TK and even managed to start=20
+LE OOB pairing data exchange, but it failed with confirmation mismatch.=20
+Most probably, I got some bad mix of legacy and SC procedures :) So I'd=20
+better wait for the proper implementation of "LE OOB Legacy Pairing" in=20
+upstream. I hope the term is now correct and unambiguous.
+>
+> The main problem is that we can currently only get OOB information for =
+BR/EDR side of things. The missing part is to the get the LE OOB informat=
+ion. And of course there is a difference between LE Legacy Pairing and LE=
+ Secure Connections.
+>
+>>>>> If your OOB scheme is this latter "non-pre-provisioned" one I'd won=
+der
+>>>>> why you're not using the standard OOB mechanism provided by LE SMP,=
 
-In addition utilize the same setting for the list of current active
-settings that indicates if a static address is configured and if that
-address will be actually used.
-
-With this in mind the existing Set Static Address management command
-has been extended to return the current settings. That way the caller
-of that command can easily determine if the programmed address will
-be used or if extra steps are required.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/mgmt.h |  1 +
- net/bluetooth/mgmt.c         | 28 ++++++++++++++++++++++++++--
- 2 files changed, 27 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index fe8eef00e9ca..0c737e4b8f57 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -98,6 +98,7 @@ struct mgmt_rp_read_index_list {
- #define MGMT_SETTING_DEBUG_KEYS		0x00001000
- #define MGMT_SETTING_PRIVACY		0x00002000
- #define MGMT_SETTING_CONFIGURATION	0x00004000
-+#define MGMT_SETTING_STATIC_ADDRESS	0x00008000
- 
- #define MGMT_OP_READ_INFO		0x0004
- #define MGMT_READ_INFO_SIZE		0
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 967f07fdbbbe..d185a9800983 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -583,6 +583,7 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 		settings |= MGMT_SETTING_ADVERTISING;
- 		settings |= MGMT_SETTING_SECURE_CONN;
- 		settings |= MGMT_SETTING_PRIVACY;
-+		settings |= MGMT_SETTING_STATIC_ADDRESS;
- 	}
- 
- 	if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
-@@ -638,6 +639,25 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	if (test_bit(HCI_PRIVACY, &hdev->dev_flags))
- 		settings |= MGMT_SETTING_PRIVACY;
- 
-+	/* The current setting for static address has two purposes. The
-+	 * first is to indicate if the static address will be used and
-+	 * the second is to indicate if it is actually set.
-+	 *
-+	 * This means if the static address is not configured, this flag
-+	 * will never bet set. If the address is configured, then if the
-+	 * address is actually used decides if the flag is set or not.
-+	 *
-+	 * For single mode LE only controllers and dual-mode controllers
-+	 * with BR/EDR disabled, the existence of the static address will
-+	 * be evaluated.
-+	 */
-+	if (test_bit(HCI_FORCE_STATIC_ADDR, &hdev->dbg_flags) ||
-+	    !test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags) ||
-+	    !bacmp(&hdev->bdaddr, BDADDR_ANY)) {
-+		if (bacmp(&hdev->static_addr, BDADDR_ANY))
-+			settings |= MGMT_SETTING_STATIC_ADDRESS;
-+	}
-+
- 	return settings;
- }
- 
-@@ -4498,10 +4518,14 @@ static int set_static_address(struct sock *sk, struct hci_dev *hdev,
- 
- 	bacpy(&hdev->static_addr, &cp->bdaddr);
- 
--	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_STATIC_ADDRESS, 0, NULL, 0);
-+	err = send_settings_rsp(sk, MGMT_OP_SET_STATIC_ADDRESS, hdev);
-+	if (err < 0)
-+		goto unlock;
- 
--	hci_dev_unlock(hdev);
-+	err = new_settings(hdev, sk);
- 
-+unlock:
-+	hci_dev_unlock(hdev);
- 	return err;
- }
- 
--- 
-2.1.0
-
+>>>>> since for that we do have at least partial support.
+>>>> I'm now confused a bit. Indeed, I want to use OOB mechanism provided=
+ by LE SMP, but in order to start OOB pairing, the OOB key itself should =
+be known to both sides (central and peripheral). For the peripheral I hav=
+e my own ways to do it (proprietary), but the main question it how to giv=
+e the key value to the central which is BlueZ in this case.
+>>> When using LE OOB pairing (Legacy Pairing and Secure Connections), th=
+en at least you get a sense of key strength that is guaranteed based on h=
+ow LE security is designed. So doing LE OOB pairing is a good idea. You f=
+eed different information into OOB pairing. You share and OOB secret betw=
+een two devices and based on that they can pair. However they need to be =
+in range to actually use that OOB secret to pair. Pairing requires a conn=
+ection. The advantage with pairing is that you get a proper key with a pr=
+oper strength.
+> So LE Legacy Pairing needs the Security Manager TK value and LE Secure =
+Connections needs the Confirmation and Random values. However right now, =
+we can not get these ones from the kernel.
+>
+> As a side note, I added tools/oobtest utility where you can test this b=
+etween two controllers attached to the same host.
+>
+> Regards
+>
+> Marcel
+>
