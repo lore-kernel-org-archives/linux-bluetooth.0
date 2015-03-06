@@ -1,69 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 6 Mar 2015 10:55:17 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluetooth:btusb:fix incorrect type in initializer
-Message-ID: <20150306085517.GA20795@t440s.lan>
-References: <E72C4779-837E-45DC-8256-AAA4F01DE182@qca.qualcomm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <E72C4779-837E-45DC-8256-AAA4F01DE182@qca.qualcomm.com>
+From: Hsin-Yu Chao <hychao@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: armansito@chromium.org, Hsin-Yu Chao <hychao@chromium.org>
+Subject: [PATCH] audio/media: Fix crash at endpoint handling no reply err
+Date: Fri,  6 Mar 2015 11:58:05 +0800
+Message-Id: <1425614285-8938-1-git-send-email-hychao@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When handling DBUS_ERROR_NO_REPLY error in media endpoint,
+the a2dp_setup gets unref'ed in the associated request callback.
+We need to remove the request from list once it has been
+handled, or in the following clear_endpoint call this
+request callback will be triggered again with NULL session
+and cause crash.
 
-On Tue, Mar 03, 2015, Kim, Ben Young Tae wrote:
-> This fixes the following sparse warning:
-> 
-> drivers/bluetooth/btusb.c:2677:11: warning: incorrect type in initializer (different base types)
-> drivers/bluetooth/btusb.c:2677:11:    expected restricted __le32 [usertype] rom_version
-> drivers/bluetooth/btusb.c:2677:11:    got int
-> drivers/bluetooth/btusb.c:2678:11: warning: incorrect type in initializer (different base types)
-> drivers/bluetooth/btusb.c:2678:11:    expected restricted __le32 [usertype] rom_version
-> drivers/bluetooth/btusb.c:2678:11:    got int
-> drivers/bluetooth/btusb.c:2679:11: warning: incorrect type in initializer (different base types)
-> drivers/bluetooth/btusb.c:2679:11:    expected restricted __le32 [usertype] rom_version
-> drivers/bluetooth/btusb.c:2679:11:    got int
-> drivers/bluetooth/btusb.c:2680:11: warning: incorrect type in initializer (different base types)
-> drivers/bluetooth/btusb.c:2680:11:    expected restricted __le32 [usertype] rom_version
-> drivers/bluetooth/btusb.c:2680:11:    got int
-> drivers/bluetooth/btusb.c:2681:11: warning: incorrect type in initializer (different base types)
-> drivers/bluetooth/btusb.c:2681:11:    expected restricted __le32 [usertype] rom_version
-> drivers/bluetooth/btusb.c:2681:11:    got int
-> drivers/bluetooth/btusb.c:2805:17: warning: restricted __le16 degrades to integer
-> drivers/bluetooth/btusb.c:2805:37: warning: restricted __le32 degrades to integer
-> drivers/bluetooth/btusb.c:2806:17: warning: restricted __le16 degrades to integer
-> drivers/bluetooth/btusb.c:2806:39: warning: restricted __le32 degrades to integer
-> 
-> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-> ---
->  drivers/bluetooth/btusb.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 0833054..f65cd44 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2674,11 +2674,11 @@ struct qca_device_info {
->  };
->  
->  static const struct qca_device_info qca_devices_table[] = {
-> -	{ 0x00000100, 20, 4, 10 }, /* Rome 1.0 */
-> -	{ 0x00000101, 20, 4, 10 }, /* Rome 1.1 */
-> -	{ 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
-> -	{ 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
-> -	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
-> +	{ cpu_to_le32(0x00000100), 20, 4, 10 }, /* Rome 1.0 */
-> +	{ cpu_to_le32(0x00000101), 20, 4, 10 }, /* Rome 1.1 */
-> +	{ cpu_to_le32(0x00000201), 28, 4, 18 }, /* Rome 2.1 */
-> +	{ cpu_to_le32(0x00000300), 28, 4, 18 }, /* Rome 3.0 */
-> +	{ cpu_to_le32(0x00000302), 28, 4, 18 }, /* Rome 3.2 */
->  };
+---
+ profiles/audio/media.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Since "struct qca_device_info" doesn't describe raw protocol data I
-don't think it should contain protocol endianness values, i.e. the
-rom_version member should be u32 instead of __le32.
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 965b32a..0bb82eb 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -273,6 +273,9 @@ static void endpoint_reply(DBusPendingCall *call, void *user_data)
+ 			if (request->cb)
+ 				request->cb(endpoint, NULL, size,
+ 							request->user_data);
++			endpoint->requests = g_slist_remove(endpoint->requests,
++							    request);
++			endpoint_request_free(request);
+ 			clear_endpoint(endpoint);
+ 			dbus_message_unref(reply);
+ 			dbus_error_free(&err);
+-- 
+2.1.2
 
-Johan
