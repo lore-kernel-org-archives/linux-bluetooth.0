@@ -1,115 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 06 Mar 2015 10:35:33 +0000 (GMT)
-From: Abhinav Kumar <abhinav.ku91@samsung.com>
-Subject: Re: Re: [PATCH ] [BT][LE Data Length Extension]
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-to: abhinav.ku91@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <99316588.443261425638133157.JavaMail.weblogic@epmlwas01b>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 6 Mar 2015 11:30:40 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth:btusb:fix incorrect type in initializer
+Message-ID: <20150306093040.GA25948@t440s.lan>
+References: <E72C4779-837E-45DC-8256-AAA4F01DE182@qca.qualcomm.com>
+ <20150306085517.GA20795@t440s.lan>
+ <093F1F09-B7D5-4ED3-B9E2-559CA4AC7710@qca.qualcomm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <093F1F09-B7D5-4ED3-B9E2-559CA4AC7710@qca.qualcomm.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgLA0KDQpUaGlzIGlzIHJlZ2FyZGluZyB0aGUgcGF0Y2ggc3VibWl0dGVkIGluIGJsdWV0b290
-aC1uZXh0LmdpdCByZWdhcmRpbmcgTEUgRGF0YSBMZW5ndGggRXh0ZW5zaW9uIGZlYXR1cmUuIA0K
-VGhpcyBmZWF0dXJlIGJhc2ljYWxseSBhbGxvd3MgZm9yIGEgZ3JlYXRlciBwYWNrZXQgc2l6ZSB0
-byBiZSB1c2VkIGFuZCB0aHVzIGluY3JlYXNlIHRocm91Z2hwdXQgd2hpbGUgdHJhbnNtaXR0aW5n
-IGRhdGEuDQpNeSBxdWVzdGlvbiBpcyBkbyB3ZSBoYXZlIGFueSBhZHZhbnRhZ2Ugb2YgdXNpbmcg
-YSBzbWFsbGVyIGRhdGEgcGFja2V0IHNpemU/IElmIG5vdCB3aHkgY2FudCB3ZSBqdXN0IHNldCB0
-aGUgDQp2YXJpYWJsZSAiY29ubkluaXRpYWxNYXhUeE9jdGV0cyIgdG8gMjU1IGluIHRoZSBjb250
-cm9sbGVyID8gVGhpcyB3YXkgd2Ugd29udCBuZWVkIGFueSBuZXcgSENJIGNvbW1hbmRzL2V2ZW50
-cy4gDQpTZXR0aW5nIHRoZSBkZWZhdWx0IHZhbHVlIHRvIDI1NSBhbHNvIHdvbid0IGNhdXNlIGFu
-eSBwcm9ibGVtcyBpbiBkZWFsaW5nIHdpdGggbGVnYWN5IGhvc3RzLg0KSGVyZSBpcyBhIG1vcmUg
-ZGV0YWlsZWQgZXhwbGFuYXRpb246DQpJZiB3ZSBzZXQgdGhlIHZhcmlhYmxlICJjb25uSW5pdGlh
-bE1heFR4T2N0ZXRzIiB0byAyNTUgdGhlbiB0aGUgdmFyaWFibGUgImNvbm5NYXhUeE9jdGV0cyIg
-d2hpY2ggaXMgc3BlY2lmaWMgdG8gYSBwYXJ0aWN1bGFyIA0KY29ubmVjdGlvbiB3b3VsZCBiZSBz
-ZXQgdG8gMjU1IHdoZW5ldmVyIGEgbmV3IGNvbm5lY3Rpb24gaXMgZXN0YWJsaXNoZWQuIEhvd2V2
-ZXIgdGhlIGRlZmF1bHQgdmFsdWUgb2YgImNvbm5SZW1vdGVNYXhPY3RldHMiIGlzIDI3KGFzIHBl
-ciBzcGVjKS4NClRoZXJlZm9yZSB0aGUgdmFsdWUgb2YgImNvbm5FZmZlY3RpdmVNYXhUeE9jdGV0
-cyIgd291bGQgYmUgMjcgb25seSBhcyBpdCBpcyB0aGUgbWluaW11bSBvZiAiY29ubk1heFR4T2N0
-ZXRzIiBhbmQgImNvbm5SZW1vdGVNYXhPY3RldHMiIC4gDQpUaGVyZWZvcmUgc2V0dGluZyAiY29u
-bkluaXRpYWxNYXhUeE9jdGV0cyIgdG8gMjU1IHdvdWxkIG5vdCBjYXVzZSBwcm9ibGVtcyB3aXRo
-IGEgbGVnYWN5IGhvc3QuIElmIHRoZSBvdGhlciBob3N0IGlzIGEgdjQuMiBkZXZpY2UgdGhlbiB0
-aGUNCiB2YXJpYWJsZSAiY29ublJlbW90ZU1heFR4T2N0ZXRzIiB3b3VsZCBiZSBzZXQgdG8gMjU1
-IGFzICBhIERhdGEgTGVuZ3RoIFVwZGF0ZSBwcm9jZWR1cmUgd291bGQgYmUgaW5pdGlhdGVkIGFz
-IHNvb24gYXMgYSBuZXcgY29ubmVjdGlvbg0KIGlzIGVzdGFibGlzaGVkIFthcyBwZXIgc3BlY2lm
-aWNhdGlvbiBdLiBUaGVyZWZvcmUgd2UgZG9uJ3QgZmFjZSBhbnkgcHJvYmxlbSBpZiB0aGUgZGV2
-aWNlIGlzIGxlZ2FjeSBvciBub3QuDQpIb3dldmVyIG15IHF1ZXN0aW9uIGlzIGRvIHdlIGhhdmUg
-YW55IGFkdmFudGFnZSBvZiBzZXR0aW5nIHRoZSBwYWNrZXQgbGVuZ3RoIHRvIGEgc21hbGxlciB2
-YWx1ZSA/DQpJZiBub3QsIHRoZW4gd2UgY2FuIHNpbXBseSBzZXQgdGhlIGRlZmF1bHQgdmFsdWUg
-b2YgImNvbm5Jbml0aWFsTWF4VHhPY3RldHMiIHRvIDI1NSBhbmQgZG8gd2l0aG91dCBhbnkgSENJ
-IGNvbW1hbmRzL2V2ZW50cy4gDQoNClJlZ2FyZHMsDQpBYmhpbmF2IEt1bWFyDQoNCi0tLS0tLS0g
-T3JpZ2luYWwgTWVzc2FnZSAtLS0tLS0tDQpTZW5kZXIgOiBBYmhpbmF2IEt1bWFyPGFiaGluYXYu
-a3U5MUBzYW1zdW5nLmNvbT4gU2VuaW9yIFNvZnR3YXJlIEVuZ2luZWVyL1NSSS1CYW5nYWxvcmUt
-U1dDL1NhbXN1bmcgRWxlY3Ryb25pY3MNCkRhdGUgOiBNYXIgMDYsIDIwMTUgMTk6MzMgKEdNVCsw
-OTowMCkNClRpdGxlIDogUmU6IFJlOiBbUEFUQ0ggXSBbQlRdW0xFIERhdGEgTGVuZ3RoIEV4dGVu
-c2lvbl0NCg0KSGkgLA0KDQpUaGlzIGlzIHJlZ2FyZGluZyB0aGUgcGF0Y2ggc3VibWl0dGVkIGlu
-IGJsdWV0b290aC1uZXh0LmdpdCByZWdhcmRpbmcgTEUgRGF0YSBMZW5ndGggRXh0ZW5zaW9uIGZl
-YXR1cmUuIA0KVGhpcyBmZWF0dXJlIGJhc2ljYWxseSBhbGxvd3MgZm9yIGEgZ3JlYXRlciBwYWNr
-ZXQgc2l6ZSB0byBiZSB1c2VkIGFuZCB0aHVzIGluY3JlYXNlIHRocm91Z2hwdXQgd2hpbGUgdHJh
-bnNtaXR0aW5nIGRhdGEuDQpNeSBxdWVzdGlvbiBpcyBkbyB3ZSBoYXZlIGFueSBhZHZhbnRhZ2Ug
-b2YgdXNpbmcgYSBzbWFsbGVyIGRhdGEgcGFja2V0IHNpemU/IElmIG5vdCB3aHkgY2FudCB3ZSBq
-dXN0IHNldCB0aGUgDQp2YXJpYWJsZSAiY29ubkluaXRpYWxNYXhUeE9jdGV0cyIgdG8gMjU1IGlu
-IHRoZSBjb250cm9sbGVyID8gVGhpcyB3YXkgd2Ugd29udCBuZWVkIGFueSBuZXcgSENJIGNvbW1h
-bmRzL2V2ZW50cy4gDQpTZXR0aW5nIHRoZSBkZWZhdWx0IHZhbHVlIHRvIDI1NSBhbHNvIHdvbid0
-IGNhdXNlIGFueSBwcm9ibGVtcyBpbiBkZWFsaW5nIHdpdGggbGVnYWN5IGhvc3RzLg0KSGVyZSBp
-cyBhIG1vcmUgZGV0YWlsZWQgZXhwbGFuYXRpb246DQpJZiB3ZSBzZXQgdGhlIHZhcmlhYmxlICJj
-b25uSW5pdGlhbE1heFR4T2N0ZXRzIiB0byAyNTUgdGhlbiB0aGUgdmFyaWFibGUgImNvbm5NYXhU
-eE9jdGV0cyIgd2hpY2ggaXMgc3BlY2lmaWMgdG8gYSBwYXJ0aWN1bGFyIA0KY29ubmVjdGlvbiB3
-b3VsZCBiZSBzZXQgdG8gMjU1IHdoZW5ldmVyIGEgbmV3IGNvbm5lY3Rpb24gaXMgZXN0YWJsaXNo
-ZWQuIEhvd2V2ZXIgdGhlIGRlZmF1bHQgdmFsdWUgb2YgImNvbm5SZW1vdGVNYXhPY3RldHMiIGlz
-IDI3KGFzIHBlciBzcGVjKS4NClRoZXJlZm9yZSB0aGUgdmFsdWUgb2YgImNvbm5FZmZlY3RpdmVN
-YXhUeE9jdGV0cyIgd291bGQgYmUgMjcgb25seSBhcyBpdCBpcyB0aGUgbWluaW11bSBvZiAiY29u
-bk1heFR4T2N0ZXRzIiBhbmQgImNvbm5SZW1vdGVNYXhPY3RldHMiIC4gDQpUaGVyZWZvcmUgc2V0
-dGluZyAiY29ubkluaXRpYWxNYXhUeE9jdGV0cyIgdG8gMjU1IHdvdWxkIG5vdCBjYXVzZSBwcm9i
-bGVtcyB3aXRoIGEgbGVnYWN5IGhvc3QuIElmIHRoZSBvdGhlciBob3N0IGlzIGEgdjQuMiBkZXZp
-Y2UgdGhlbiB0aGUNCiB2YXJpYWJsZSAiY29ublJlbW90ZU1heFR4T2N0ZXRzIiB3b3VsZCBiZSBz
-ZXQgdG8gMjU1IGFzICBhIERhdGEgTGVuZ3RoIFVwZGF0ZSBwcm9jZWR1cmUgd291bGQgYmUgaW5p
-dGlhdGVkIGFzIHNvb24gYXMgYSBuZXcgY29ubmVjdGlvbg0KIGlzIGVzdGFibGlzaGVkIFthcyBw
-ZXIgc3BlY2lmaWNhdGlvbiBdLiBUaGVyZWZvcmUgd2UgZG9uJ3QgZmFjZSBhbnkgcHJvYmxlbSBp
-ZiB0aGUgZGV2aWNlIGlzIGxlZ2FjeSBvciBub3QuDQpIb3dldmVyIG15IHF1ZXN0aW9uIGlzIGRv
-IHdlIGhhdmUgYW55IGFkdmFudGFnZSBvZiBzZXR0aW5nIHRoZSBwYWNrZXQgbGVuZ3RoIHRvIGEg
-c21hbGxlciB2YWx1ZSA/DQpJZiBub3QsIHRoZW4gd2UgY2FuIHNpbXBseSBzZXQgdGhlIGRlZmF1
-bHQgdmFsdWUgb2YgImNvbm5Jbml0aWFsTWF4VHhPY3RldHMiIHRvIDI1NSBhbmQgZG8gd2l0aG91
-dCBhbnkgSENJIGNvbW1hbmRzL2V2ZW50cy4gDQoNClJlZ2FyZHMsDQpBYmhpbmF2IEt1bWFyDQoN
-Ci0tLS0tLS0gT3JpZ2luYWwgTWVzc2FnZSAtLS0tLS0tDQpTZW5kZXIgOiBKb2hhbiBIZWRiZXJn
-PGpvaGFuLmhlZGJlcmdAZ21haWwuY29tPg0KRGF0ZSA6IE1hciAwNCwgMjAxNSAxODowNSAoR01U
-KzA5OjAwKQ0KVGl0bGUgOiBSZTogW1BBVENIIF0gW0JUXVtMRSBEYXRhIExlbmd0aCBFeHRlbnNp
-b25dDQoNCkhpIEFiaGluYXYsDQoNCk9uIFdlZCwgTWFyIDA0LCAyMDE1LCBBYmhpbmF2IEt1bWFy
-IHdyb3RlOg0KPiAxPiBBZGRlZCBrZXJuZWwgY29kZSBmb3IgZm9yIGFsbCBjb21tYW5kcyBhbmQg
-ZXZlbnRzIHdoaWNoIGFyZSBwYXJ0IG9mIHRoZSBmZWF0dXJlLg0KPiANCj4gU2lnbmVkLW9mZi1i
-eTogQWJoaW5hdiBLdW1hciANCj4gLS0tDQo+ICBpbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2Nv
-cmUuaCB8ICAgMTMgKystDQo+ICBpbmNsdWRlL25ldC9ibHVldG9vdGgvbWdtdC5oICAgICB8ICAg
-NDAgKysrKysrKysrDQo+ICBuZXQvYmx1ZXRvb3RoL2hjaV9jb25uLmMgICAgICAgICB8ICAgMjcg
-KysrKysrDQo+ICBuZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jICAgICAgICB8ICAgMzUgKysrKysr
-Ky0NCj4gIG5ldC9ibHVldG9vdGgvbWdtdC5jICAgICAgICAgICAgIHwgIDE2OSArKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiAgNSBmaWxlcyBjaGFuZ2VkLCAyODAgaW5z
-ZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCg0KQSBjb3VwbGUgb2YgdGhpbmdzOg0KDQoxKSBU
-aGUgdmVyeSBmaXJzdCB0aGluZyB0aGF0IG5lZWRzIHRvIGhhcHBlbiBpcyBmb3IgYSB1c2VyIHNw
-YWNlDQptZ210LWFwaS50eHQgcGF0Y2ggdG8gYmUgc3VibWl0dGVkIGFuZCBnZXQgYXBwbGllZCBi
-ZWZvcmUgd2UgZG8gYW55DQpjaGFuZ2VzLiBUaGlzIHdpbGwgcmVxdWlyZSBzb21lIGdvb2QganVz
-dGlmaWNhdGlvbnMgZm9yIHdoeSB5b3UgbmVlZA0KdGhpcyBleHBvc2VkIHRvIHVzZXIgc3BhY2Us
-IGFuZCB3aHkgaXQgbmVlZHMgdG8gaGFwcGVuIHByZXR0eSBtdWNoIDE6MQ0KdG8gdGhlIHJlc3Bl
-Y3RpdmUgSENJIGNvbW1hbmRzLg0KDQoyKSBZb3UgbmVlZCB0byBzcGxpdCB0aGUga2VybmVsIGNo
-YW5nZXMgaW50byBtdWx0aXBsZSBzbWFsbGVyIHBhdGNoZXMuDQpZb3UgY2FuIGUuZy4gaW50cm9k
-dWNlIHRoZSBIQ0kgZGVmaW5pdGlvbnMgaW4gb25lIHBhdGNoIGFuZCB0aGUNCmltcGxlbWVudGF0
-aW9uIGluIGFub3RoZXIuIFNhbWUgZ29lcyBmb3IgbWdtdCBkZWZpbml0aW9ucyBhbmQNCmltcGxl
-bWVudGF0aW9uLg0KDQozKSBGaXggeW91ciBjb2Rpbmcgc3R5bGUuIFRoZXJlIGFyZSBwcm9iYWJs
-eSBtdWx0aXBsZSB0aGluZ3MgYnV0IG9uZQ0Kb2J2aW91cyBvbmUgSSBzYXcgd2FzIHdpdGggdmFy
-aWFibGUgbmFtaW5nOiB3ZSBkb24ndCB1c2UgQ2FtZWxDYXNlDQphbnl3aGVyZSBpbiB0aGUga2Vy
-bmVsIChvciBCbHVlWiB1c2VyIHNwYWNlIGZvciB0aGF0IG1hdHRlcikuDQoNCjQpIFVzZSBoY2lf
-cmVxdWVzdCBpZiB5b3UgbmVlZCB0byBoYXZlIGEgZnVuY3Rpb24gaW4gbWdtdC5jIGNhbGxlZCBh
-ZnRlcg0KYSBIQ0kgY29tbWFuZCBjb21wbGV0aW9uLCBpbnN0ZWFkIG9mIGhhdmluZyBhIGhhcmQt
-Y29kZWQgY2FsbCBmcm9tDQpoY2lfZXZlbnQuYyBpbnRvIG1nbXQuYy4NCg0KNSkgRm9yIGFsbCBv
-ZiB5b3VyIHBhdGNoZXMgeW91IG5lZWQgdG8gcHJvdmlkZSBtb3JlIGV4dGVuc2l2ZSBjb21taXQN
-Cm1lc3NhZ2VzLiBJdCdzIGdvb2QgdG8gaGF2ZSBhIHNob3J0IHN1bW1hcnkgb2Ygd2hhdCB0aGUg
-cGF0Y2ggZG9lcywgYnV0DQpmb3IgbW9zdCBwYXRjaGVzIGl0J3MgZXZlbiBtb3JlIGltcG9ydGFu
-dCB0byBleHBsYWluIHdoeSB0aGUgcGF0Y2ggaXMNCm5lZWRlZCBhbmQgd2h5IHRoZSBhcHByb2Fj
-aCBpdCB0YWtlcyBpcyB0aGUgYmVzdCBvbmUuDQoNCkpvaGFuDQotLQ0KVG8gdW5zdWJzY3JpYmUg
-ZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWJsdWV0b290
-aCIgaW4NCnRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3Jn
-DQpNb3JlIG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9t
-by1pbmZvLmh0bWw=
+Hi,
 
+On Fri, Mar 06, 2015, Kim, Ben Young Tae wrote:
+> >> On Tue, Mar 03, 2015, Kim, Ben Young Tae wrote:
+> >> This fixes the following sparse warning:
+> >> 
+> >> drivers/bluetooth/btusb.c:2677:11: warning: incorrect type in initializer (different base types)
+> >> drivers/bluetooth/btusb.c:2677:11: expected restricted __le32 [usertype] rom_version
+> >> drivers/bluetooth/btusb.c:2677:11: got int
+> >> drivers/bluetooth/btusb.c:2678:11: warning: incorrect type in initializer (different base types)
+> >> drivers/bluetooth/btusb.c:2678:11: expected restricted __le32 [usertype] rom_version
+> >> drivers/bluetooth/btusb.c:2678:11: got int
+> >> drivers/bluetooth/btusb.c:2679:11: warning: incorrect type in initializer (different base types)
+> >> drivers/bluetooth/btusb.c:2679:11: expected restricted __le32 [usertype] rom_version
+> >> drivers/bluetooth/btusb.c:2679:11: got int
+> >> drivers/bluetooth/btusb.c:2680:11: warning: incorrect type in initializer (different base types)
+> >> drivers/bluetooth/btusb.c:2680:11: expected restricted __le32 [usertype] rom_version
+> >> drivers/bluetooth/btusb.c:2680:11: got int
+> >> drivers/bluetooth/btusb.c:2681:11: warning: incorrect type in initializer (different base types)
+> >> drivers/bluetooth/btusb.c:2681:11: expected restricted __le32 [usertype] rom_version
+> >> drivers/bluetooth/btusb.c:2681:11: got int
+> >> drivers/bluetooth/btusb.c:2805:17: warning: restricted __le16 degrades to integer
+> >> drivers/bluetooth/btusb.c:2805:37: warning: restricted __le32 degrades to integer
+> >> drivers/bluetooth/btusb.c:2806:17: warning: restricted __le16 degrades to integer
+> >> drivers/bluetooth/btusb.c:2806:39: warning: restricted __le32 degrades to integer
+> >> 
+> >> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+> >> ---
+> >> drivers/bluetooth/btusb.c | 14 +++++++-------
+> >> 1 file changed, 7 insertions(+), 7 deletions(-)
+> >> 
+> >> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> >> index 0833054..f65cd44 100644
+> >> --- a/drivers/bluetooth/btusb.c
+> >> +++ b/drivers/bluetooth/btusb.c
+> >> @@ -2674,11 +2674,11 @@ struct qca_device_info {
+> >> };
+> >> 
+> >> static const struct qca_device_info qca_devices_table[] = {
+> >> -    { 0x00000100, 20, 4, 10 }, /* Rome 1.0 */
+> >> -    { 0x00000101, 20, 4, 10 }, /* Rome 1.1 */
+> >> -    { 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
+> >> -    { 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
+> >> -    { 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
+> >> +    { cpu_to_le32(0x00000100), 20, 4, 10 }, /* Rome 1.0 */
+> >> +    { cpu_to_le32(0x00000101), 20, 4, 10 }, /* Rome 1.1 */
+> >> +    { cpu_to_le32(0x00000201), 28, 4, 18 }, /* Rome 2.1 */
+> >> +    { cpu_to_le32(0x00000300), 28, 4, 18 }, /* Rome 3.0 */
+> >> +    { cpu_to_le32(0x00000302), 28, 4, 18 }, /* Rome 3.2 */
+> >> };
+> > 
+> > Since "struct qca_device_info" doesn't describe raw protocol data I
+> > don't think it should contain protocol endianness values, i.e. the
+> > rom_version member should be u32 instead of __le32.
+> > 
+> 
+> The rom_version will be coming from chipset when we ask chip version
+> to soc at the first time and we are comparing to this during
+> initialization. I think this should be _le32 type.
 
+Understood, but the general principle we try to follow is that only
+structs that contain raw protocol data are in protocol endianness.
+Anything else should be host endianness. It's also a bit awkward to
+define a const struct with values that need to be evaluated through a
+function call (i.e. cpu_to_le32). I'd assume that the compiler needs to
+do extra tricks in this case to have the resulting data evaluated at
+runtime instead of compile time.
+
+Johan
