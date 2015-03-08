@@ -1,295 +1,228 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Lukasz Rymanowski' <lukasz.rymanowski@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-References: <1425660538-25884-1-git-send-email-lukasz.rymanowski@tieto.com>
- <1425660538-25884-8-git-send-email-lukasz.rymanowski@tieto.com>
-In-reply-to: <1425660538-25884-8-git-send-email-lukasz.rymanowski@tieto.com>
-Subject: RE: [PATCH v3 7/7] tools/btgatt-client: Add prepare and execute write
-Date: Mon, 09 Mar 2015 12:34:16 +0530
-Message-id: <000b01d05a37$464a7410$d2df5c30$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 7/7] Bluetooth: Convert local OOB data reading to use HCI request
+Date: Sun,  8 Mar 2015 22:11:39 +0200
+Message-Id: <1425845499-15597-8-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1425845499-15597-1-git-send-email-johan.hedberg@gmail.com>
+References: <1425845499-15597-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Lukasz Rymanowski
-> Sent: Friday, March 06, 2015 10:19 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Lukasz Rymanowski
-> Subject: [PATCH v3 7/7] tools/btgatt-client: Add prepare and execute write
-> 
-> ---
->  tools/btgatt-client.c | 204
-> ++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 204 insertions(+)
-> 
-> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c index
-> e2e0d15..6a0eae8 100644
-> --- a/tools/btgatt-client.c
-> +++ b/tools/btgatt-client.c
-> @@ -67,6 +67,8 @@ struct client {
->  	struct bt_att *att;
->  	struct gatt_db *db;
->  	struct bt_gatt_client *gatt;
-> +
-> +	unsigned int reliable_session_id;
->  };
-> 
->  static void print_prompt(void)
-> @@ -884,6 +886,204 @@ static void cmd_write_long_value(struct client *cli,
-> char *cmd_str)
->  	free(value);
->  }
-> 
-> +static void write_prepare_usage(void)
-> +{
-> +	printf("Usage: write-prepare [options] <value_handle> <offset> "
-> +				"<value>\n"
-> +				"Options:\n"
-> +				"\t-s, --session-id\tSession id\n"
-> +				"e.g.:\n"
-> +				"\twrite-prepare -s 1 0x0001 00 01 00\n"); }
-> +
-> +static struct option write_prepare_options[] = {
-> +	{ "session-id",		1, 0, 's' },
-> +	{ }
-> +};
-> +
-> +static void cmd_write_prepare(struct client *cli, char *cmd_str) {
-> +	int opt, i;
-> +	char *argvbuf[516];
-> +	char **argv = argvbuf;
-> +	int argc = 0;
-> +	unsigned int id = 0;
-> +	uint16_t handle;
-> +	uint16_t offset;
-> +	char *endptr = NULL;
-> +	unsigned int length;
-> +	uint8_t *value = NULL;
-> +
-> +	if (!bt_gatt_client_is_ready(cli->gatt)) {
-> +		printf("GATT client not initialized\n");
-> +		return;
-> +	}
-> +
-> +	if (!parse_args(cmd_str, 514, argv + 1, &argc)) {
-> +		printf("Too many arguments\n");
-> +		write_value_usage();
-> +		return;
-> +	}
-> +
-> +	/* Add command name for getopt_long */
-> +	argc++;
-> +	argv[0] = "write-prepare";
-> +
-> +	optind = 0;
-> +	while ((opt = getopt_long(argc, argv , "s:", write_prepare_options,
-> +								NULL)) !=
--1) {
-> +		switch (opt) {
-> +		case 's':
-> +			if (!optarg) {
-> +				write_prepare_usage();
-> +				return;
-> +			}
-> +
-> +			id = atoi(optarg);
-> +
-> +			break;
-> +		default:
-> +			write_prepare_usage();
-> +			return;
-> +		}
-> +	}
-> +
-> +	argc -= optind;
-> +	argv += optind;
-> +
-> +	if (argc < 3) {
-> +		write_prepare_usage();
-> +		return;
-> +	}
-> +
-> +	if (cli->reliable_session_id != id) {
-> +		printf("Session id != Ongoing session id (%u!=%u)\n", id,
-> +						cli->reliable_session_id);
-> +		return;
-> +	}
-> +
-> +	handle = strtol(argv[0], &endptr, 0);
-> +	if (!endptr || *endptr != '\0' || !handle) {
-> +		printf("Invalid handle: %s\n", argv[0]);
-> +		return;
-> +	}
-> +
-> +	endptr = NULL;
-> +	offset = strtol(argv[1], &endptr, 0);
-> +	if (!endptr || *endptr != '\0' || errno == ERANGE) {
-> +		printf("Invalid offset: %s\n", argv[1]);
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * First two arguments are handle and offset. What remains is the
-> value
-> +	 * length
-> +	 */
-> +	length = argc - 2;
-> +
-> +	if (length == 0)
-> +		goto done;
-> +
-> +	if (length > UINT16_MAX) {
-> +		printf("Write value too long\n");
-> +		return;
-> +	}
-> +
-> +	value = malloc(length);
-> +	if (!value) {
-> +		printf("Failed to allocate memory for value\n");
-> +		return;
-> +	}
-> +
-> +	for (i = 2; i < argc; i++) {
-> +		if (strlen(argv[i]) != 2) {
-> +			printf("Invalid value byte: %s\n", argv[i]);
-> +			free(value);
-> +			return;
-> +		}
-> +
-> +		value[i-2] = strtol(argv[i], &endptr, 0);
-> +		if (endptr == argv[i] || *endptr != '\0' || errno == ERANGE)
-{
-> +			printf("Invalid value byte: %s\n", argv[i]);
-> +			free(value);
-> +			return;
-> +		}
-> +	}
-> +
-> +done:
-> +	cli->reliable_session_id =
-> +			bt_gatt_client_prepare_write(cli->gatt, id,
-> +							handle, offset,
-> +							value, length,
-> +							write_long_cb, NULL,
-> +							NULL);
-> +	if (!cli->reliable_session_id)
-> +		printf("Failed to proceed prepare write\n");
-> +	else
-> +		printf("Prepare write success.\n"
-> +				"Session id: %d to be used on next write\n",
-> +						cli->reliable_session_id);
-> +
-> +	free(value);
-> +}
-> +
-> +static void write_execute_usage(void)
-> +{
-> +	printf("Usage: write-execute <session_id> <execute>\n"
-> +				"e.g.:\n"
-> +				"\twrite-execute 1 0\n");
-> +}
-> +
-> +static void cmd_write_execute(struct client *cli, char *cmd_str) {
-> +	char *argvbuf[516];
-> +	char **argv = argvbuf;
-> +	int argc = 0;
-> +	char *endptr = NULL;
-> +	unsigned int session_id;
-> +	bool execute;
-> +
-> +	if (!bt_gatt_client_is_ready(cli->gatt)) {
-> +		printf("GATT client not initialized\n");
-> +		return;
-> +	}
-> +
-> +	if (!parse_args(cmd_str, 514, argv, &argc)) {
-> +		printf("Too many arguments\n");
-> +		write_value_usage();
-> +		return;
-> +	}
-> +
-> +	if (argc < 2) {
-> +		write_execute_usage();
-> +		return;
-> +	}
-> +
-> +	session_id = strtol(argv[0], &endptr, 0);
-> +	if (!endptr || *endptr != '\0') {
-> +		printf("Invalid session id: %s\n", argv[0]);
-> +		return;
-> +	}
-> +
-> +	if (session_id != cli->reliable_session_id) {
-> +		printf("Invalid session id: %u != %u\n", session_id,
-> +						cli->reliable_session_id);
-> +		return;
-> +	}
-> +
+Now that there's a HCI request API available where the callback receives
+the resulting skb, we can convert the local OOB data reading to use this
+new API. This patch does the necessary update in mgmt.c (which also
+requires moving the callback higher up since it's now a static function)
+and removes the custom calls from hci_event.c that are no-longer
+necessary.
 
-I applied this patch set internally and tested the prepare write and execute
-functionality using PTS tool.
-Listed below are few fixes which I am able to figure out.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |   3 -
+ net/bluetooth/hci_event.c        |  12 ----
+ net/bluetooth/mgmt.c             | 120 ++++++++++++++++++++++++++-------------
+ 3 files changed, 80 insertions(+), 55 deletions(-)
 
-I think '!!' here is not required, unless there is some specific reason.
-
-> +	execute = !!strtol(argv[1], &endptr, 0);
-> +	if (!endptr || *endptr != '\0') {
-> +		printf("Invalid execute: %s\n", argv[1]);
-> +		return;
-> +	}
-> +
-
-The function defined in src/shared/gatt-client.h.
-
-unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
-                                        bool execute,
-                                        unsigned int id,
-                                        bt_gatt_client_callback_t callback,
-                                        void *user_data,
-                                        bt_gatt_client_destroy_func_t
-destroy);
-
-Function parameters are not matching.
-Other than these, it is passing all reliable write Test Cases.
-
-> +	if (!bt_gatt_client_write_execute(cli->gatt, session_id, execute,
-> +							write_cb, NULL,
-> NULL))
-> +		printf("Failed to proceed write execute\n");
-> +
-> +	cli->reliable_session_id = 0;
-> +}
-> +
->  static void register_notify_usage(void)  {
->  	printf("Usage: register-notify <chrc value handle>\n"); @@ -1130,6
-> +1330,10 @@ static struct {
->  			"\tWrite a characteristic or descriptor value" },
->  	{ "write-long-value", cmd_write_long_value,
->  			"Write long characteristic or descriptor value" },
-> +	{ "write-prepare", cmd_write_prepare,
-> +			"\tWrite prepare characteristic or descriptor value"
-},
-> +	{ "write-execute", cmd_write_execute,
-> +			"\tExecute already prepared write" },
->  	{ "register-notify", cmd_register_notify,
->  			"\tSubscribe to not/ind from a characteristic" },
->  	{ "unregister-notify", cmd_unregister_notify,
-> --
-> 1.8.4
-> 
-
-Regards,
-Gowtham Anandha Babu
-
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 26987c651681..3afb6b3bb331 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1362,9 +1362,6 @@ void mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
+ void mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
+ 				    u8 status);
+ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status);
+-void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+-				       u8 *rand192, u8 *hash256, u8 *rand256,
+-				       u8 status);
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 380e38a1a3c9..0589de772593 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1045,11 +1045,6 @@ static void hci_cc_read_local_oob_data(struct hci_dev *hdev,
+ 	struct hci_rp_read_local_oob_data *rp = (void *) skb->data;
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+-
+-	hci_dev_lock(hdev);
+-	mgmt_read_local_oob_data_complete(hdev, rp->hash, rp->rand, NULL, NULL,
+-					  rp->status);
+-	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_read_local_oob_ext_data(struct hci_dev *hdev,
+@@ -1058,15 +1053,8 @@ static void hci_cc_read_local_oob_ext_data(struct hci_dev *hdev,
+ 	struct hci_rp_read_local_oob_ext_data *rp = (void *) skb->data;
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+-
+-	hci_dev_lock(hdev);
+-	mgmt_read_local_oob_data_complete(hdev, rp->hash192, rp->rand192,
+-					  rp->hash256, rp->rand256,
+-					  rp->status);
+-	hci_dev_unlock(hdev);
+ }
+ 
+-
+ static void hci_cc_le_set_random_addr(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d769b428b630..fdb1a3757bd5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3630,10 +3630,85 @@ failed:
+ 	return err;
+ }
+ 
++static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
++				         u16 opcode, struct sk_buff *skb)
++{
++	struct mgmt_rp_read_local_oob_data mgmt_rp;
++	size_t rp_size = sizeof(mgmt_rp);
++	struct mgmt_pending_cmd *cmd;
++
++	BT_DBG("%s status %u", hdev->name, status);
++
++	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev);
++	if (!cmd)
++		return;
++
++	if (status || !skb) {
++		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
++				status ? mgmt_status(status) : MGMT_STATUS_FAILED);
++		goto remove;
++	}
++
++	/* hci_get_cmd_complete() assumes ownership of the skb (it will
++	 * e.g. free it upon error), so we need to do an skb_get() to
++	 * have our own reference.
++	 */
++	skb = hci_get_cmd_complete(hdev, opcode, 0, skb_get(skb));
++	if (IS_ERR(skb)) {
++		BT_ERR("%s Unable to get local OOB response data (%ld)",
++		       hdev->name, PTR_ERR(skb));
++		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
++				MGMT_STATUS_FAILED);
++		goto remove;
++	}
++
++	memset(&mgmt_rp, 0, sizeof(mgmt_rp));
++
++	if (opcode == HCI_OP_READ_LOCAL_OOB_DATA) {
++		struct hci_rp_read_local_oob_data *rp = (void *) skb->data;
++
++		if (skb->len < sizeof(*rp)) {
++			mgmt_cmd_status(cmd->sk, hdev->id,
++					MGMT_OP_READ_LOCAL_OOB_DATA,
++					MGMT_STATUS_FAILED);
++			goto free_skb;
++		}
++
++		memcpy(mgmt_rp.hash192, rp->hash, sizeof(rp->hash));
++		memcpy(mgmt_rp.rand192, rp->rand, sizeof(rp->rand));
++
++		rp_size -= sizeof(mgmt_rp.hash256) + sizeof(mgmt_rp.rand256);
++	} else {
++		struct hci_rp_read_local_oob_ext_data *rp = (void *) skb->data;
++
++		if (skb->len < sizeof(*rp)) {
++			mgmt_cmd_status(cmd->sk, hdev->id,
++					MGMT_OP_READ_LOCAL_OOB_DATA,
++					MGMT_STATUS_FAILED);
++			goto free_skb;
++		}
++
++		memcpy(mgmt_rp.hash192, rp->hash192, sizeof(rp->hash192));
++		memcpy(mgmt_rp.rand192, rp->rand192, sizeof(rp->rand192));
++
++		memcpy(mgmt_rp.hash256, rp->hash256, sizeof(rp->hash256));
++		memcpy(mgmt_rp.rand256, rp->rand256, sizeof(rp->rand256));
++	}
++
++	mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
++			  MGMT_STATUS_SUCCESS, &mgmt_rp, rp_size);
++
++free_skb:
++	kfree_skb(skb);
++remove:
++	mgmt_pending_remove(cmd);
++}
++
+ static int read_local_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 			       void *data, u16 data_len)
+ {
+ 	struct mgmt_pending_cmd *cmd;
++	struct hci_request req;
+ 	int err;
+ 
+ 	BT_DBG("%s", hdev->name);
+@@ -3664,12 +3739,14 @@ static int read_local_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
++	hci_req_init(&req, hdev);
++
+ 	if (bredr_sc_enabled(hdev))
+-		err = hci_send_cmd(hdev, HCI_OP_READ_LOCAL_OOB_EXT_DATA,
+-				   0, NULL);
++		hci_req_add(&req, HCI_OP_READ_LOCAL_OOB_EXT_DATA, 0, NULL);
+ 	else
+-		err = hci_send_cmd(hdev, HCI_OP_READ_LOCAL_OOB_DATA, 0, NULL);
++		hci_req_add(&req, HCI_OP_READ_LOCAL_OOB_DATA, 0, NULL);
+ 
++	err = hci_req_run_skb(&req, read_local_oob_data_complete);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+ 
+@@ -7214,43 +7291,6 @@ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status)
+ 		   cmd ? cmd->sk : NULL);
+ }
+ 
+-void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+-				       u8 *rand192, u8 *hash256, u8 *rand256,
+-				       u8 status)
+-{
+-	struct mgmt_pending_cmd *cmd;
+-
+-	BT_DBG("%s status %u", hdev->name, status);
+-
+-	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev);
+-	if (!cmd)
+-		return;
+-
+-	if (status) {
+-		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
+-			        mgmt_status(status));
+-	} else {
+-		struct mgmt_rp_read_local_oob_data rp;
+-		size_t rp_size = sizeof(rp);
+-
+-		memcpy(rp.hash192, hash192, sizeof(rp.hash192));
+-		memcpy(rp.rand192, rand192, sizeof(rp.rand192));
+-
+-		if (bredr_sc_enabled(hdev) && hash256 && rand256) {
+-			memcpy(rp.hash256, hash256, sizeof(rp.hash256));
+-			memcpy(rp.rand256, rand256, sizeof(rp.rand256));
+-		} else {
+-			rp_size -= sizeof(rp.hash256) + sizeof(rp.rand256);
+-		}
+-
+-		mgmt_cmd_complete(cmd->sk, hdev->id,
+-				  MGMT_OP_READ_LOCAL_OOB_DATA, 0,
+-				  &rp, rp_size);
+-	}
+-
+-	mgmt_pending_remove(cmd);
+-}
+-
+ static inline bool has_uuid(u8 *uuid, u16 uuid_count, u8 (*uuids)[16])
+ {
+ 	int i;
+-- 
+2.1.0
 
