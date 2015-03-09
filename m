@@ -1,55 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1425919980.1421.18.camel@hadess.net>
-Subject: Re: [RFC 2/2] profiles/input: Add support for SDP fallback for
- DualShock 3 clones
-From: Bastien Nocera <hadess@hadess.net>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Antonio Ospite <ao2@ao2.it>, Szymon Janc <szymon.janc@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Veseli Veseljko <veseljko75@gmail.com>
-Date: Mon, 09 Mar 2015 17:53:00 +0100
-In-Reply-To: <1644418.QPL4BBNlRG@uw000953>
-References: <1425830910-9549-1-git-send-email-szymon.janc@gmail.com>
-	 <1425830910-9549-3-git-send-email-szymon.janc@gmail.com>
-	 <20150309122108.1dac140bf6ecff692e3ca165@ao2.it>
-	 <1644418.QPL4BBNlRG@uw000953>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <54FDCEBC.2050705@ubnt.com>
+Date: Mon, 09 Mar 2015 18:47:56 +0200
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Tim Tisdall <tisdall@gmail.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: bt dongle goes awry after too many connections
+References: <CAGxYWpZ8cfgtdO8ZX39cPBOs4OZ=PaO5pOHotjBt0u7HsnVXFA@mail.gmail.com> <6EDCDCB4-6F4D-4DE6-88DB-88D333FC2CCC@holtmann.org> <CAGxYWpY0afTXOW1=jS1dmY7XBg3nR8a8itXiiiXdofKkhkyjKg@mail.gmail.com> <EC9E947B-7BEA-47D9-B546-F18208D4AE97@holtmann.org> <CAGxYWpaaj=_J801VUe1WphQtdEr-MOMzZ10-w_iFWUdjBPkL5Q@mail.gmail.com> <CAGxYWpZCC1m1Ow-NAXp_f3AV9StE3sBHNJ2_vtY0owJ8SknffA@mail.gmail.com> <54FDBBD2.10608@ubnt.com> <185295B8-ABD9-4EDF-B290-12C430CCA906@holtmann.org>
+In-Reply-To: <185295B8-ABD9-4EDF-B290-12C430CCA906@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2015-03-09 at 14:37 +0100, Szymon Janc wrote:
-> Hi Antonio,
-> 
-> On Monday 09 of March 2015 12:21:08 Antonio Ospite wrote:
-> > On Sun,  8 Mar 2015 17:08:30 +0100
-> > Szymon Janc <szymon.janc@gmail.com> wrote:
-> > 
-> > > Some DualShock 3 clones were reported to not provide any SDP 
-> > > record. In such case provide fallback SDP record (based on 
-> > > genuine DS3 record) and retry setting input device channels 
-> > > before disconnecting.
-> > 
-> > Hi Szymon,
-> > 
-> > I guess this can't be done in the sixaxis plugin, right?
-> 
-> Unfortunately not. There would have to be some sort of callbacks 
-> from input
-> to handle this from plugin. But if you come up with some nice 
-> solution I'd
-> review it gladly :)
-> 
-> Maybe we could modify code to always provide those on USB plug and 
-> then never do
-> reverse SDP when sixaxis device is detected... I'd have to think 
-> about that :)
-
-That's what the original version of the sixaxis patch for BlueZ (the 
-one that shipped only in Fedora for a long while) did.
-
-When you create the BlueZ device setup by plugging in the pad, shove 
-the SDP record in the local cache as well.
-
-In the worst case, people will need to remove the device from the 
-Bluetooth settings, and plug it back in via USB.
+Hi Marcel,
+On 2015.03.09. 18:21, Marcel Holtmann wrote:
+> Hi Andrejs,
+>
+>>>> If you do not need BR/EDR, you can switch that off and it might free the radio resources you need for the many LE connections.
+>>> Would someone please tell me how you do that?  I haven't seen this
+>>> being done before.  Is it an HCI command?  ioctl command to the
+>>> kernel?
+>> ControllerMode = le
+>> in /etc/bluetooth/main.conf
+> which might at least need a 3.13.x kernel to actually work correctly. While the API is there, we have made significant fixes to the LE only mode in later kernels. Using a dual-mode controller in LE only mode actually needed some extra care.
+>
+> As I said, if it is not 3.18.x or 3.19.x kernel, then personally I would not bet on it. We have made sure that bug fixes are put into the -stable kernels for these release. Anything older has no guarantee anymore.
+Sure, I noticed that lots of work has been done lately in regard to LE, 
+so I'm indeed using 5.28 daemon@3.19.x kernel in LE-only mode and so far 
+so good.
+One of the useful things which still seems to be missing is the control 
+over LE advertisements via D-Bus iface. "Discoverable" property change 
+does not affect LE advs. I'm currently using 'hciconfig hci0 leadv' to 
+make it work. But still, LE advs stop and do not re-start after adapter 
+is connected/disconnected to some peripheral.
+>
+> Regards
+>
+> Marcel
+>
