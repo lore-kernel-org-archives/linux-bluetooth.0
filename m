@@ -1,150 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <54FDD6E7.6050501@ubnt.com>
+Date: Mon, 09 Mar 2015 19:22:47 +0200
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
 MIME-Version: 1.0
-In-Reply-To: <1425903978-24536-1-git-send-email-luiz.dentz@gmail.com>
-References: <1425903978-24536-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 9 Mar 2015 10:36:01 -0700
-Message-ID: <CAHrH25Si0fHRUTx9D+i2HYg6B6VzEKV7woekuyywUKEijAa9kQ@mail.gmail.com>
-Subject: Re: [RFC BlueZ] doc: Add LE Advertisement Manager
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Tim Tisdall <tisdall@gmail.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: bt dongle goes awry after too many connections
+References: <CAGxYWpZ8cfgtdO8ZX39cPBOs4OZ=PaO5pOHotjBt0u7HsnVXFA@mail.gmail.com> <6EDCDCB4-6F4D-4DE6-88DB-88D333FC2CCC@holtmann.org> <CAGxYWpY0afTXOW1=jS1dmY7XBg3nR8a8itXiiiXdofKkhkyjKg@mail.gmail.com> <EC9E947B-7BEA-47D9-B546-F18208D4AE97@holtmann.org> <CAGxYWpaaj=_J801VUe1WphQtdEr-MOMzZ10-w_iFWUdjBPkL5Q@mail.gmail.com> <CAGxYWpZCC1m1Ow-NAXp_f3AV9StE3sBHNJ2_vtY0owJ8SknffA@mail.gmail.com> <54FDBBD2.10608@ubnt.com> <185295B8-ABD9-4EDF-B290-12C430CCA906@holtmann.org> <54FDCEBC.2050705@ubnt.com> <14B1E1BA-C93F-42BC-B2DD-0C8DBE6C68AA@holtmann.org>
+In-Reply-To: <14B1E1BA-C93F-42BC-B2DD-0C8DBE6C68AA@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Marcel,
 
-> On Mon, Mar 9, 2015 at 5:26 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On 2015.03.09. 19:10, Marcel Holtmann wrote:
+> Hi Andrejs,
 >
-> Updates the documentation defining a service hierarchy which can be used
-> for defining LE Advertisement data and registering these advertisements
-> to be broadcast.
+>>>>>> If you do not need BR/EDR, you can switch that off and it might free the radio resources you need for the many LE connections.
+>>>>> Would someone please tell me how you do that?  I haven't seen this
+>>>>> being done before.  Is it an HCI command?  ioctl command to the
+>>>>> kernel?
+>>>> ControllerMode = le
+>>>> in /etc/bluetooth/main.conf
+>>> which might at least need a 3.13.x kernel to actually work correctly. While the API is there, we have made significant fixes to the LE only mode in later kernels. Using a dual-mode controller in LE only mode actually needed some extra care.
+>>>
+>>> As I said, if it is not 3.18.x or 3.19.x kernel, then personally I would not bet on it. We have made sure that bug fixes are put into the -stable kernels for these release. Anything older has no guarantee anymore.
+>> Sure, I noticed that lots of work has been done lately in regard to LE, so I'm indeed using 5.28 daemon@3.19.x kernel in LE-only mode and so far so good.
+>> One of the useful things which still seems to be missing is the control over LE advertisements via D-Bus iface. "Discoverable" property change does not affect LE advs. I'm currently using 'hciconfig hci0 leadv' to make it work. But still, LE advs stop and do not re-start after adapter is connected/disconnected to some peripheral.
+> you might want to try "btmgmt advertising on" instead. It will toggle the connectable and discoverable settings accordingly.
 >
-> Note: Ive made some modifications since the last proposal taking away a
-> good number of properties that could conflict if advertisement would be
-> combined, in case we cannot use different random addresses for each AD.
-> Also I include the intention to use the same interface for
-> central/client role so the interface would be exposed in the device
-> path.
-
-This is good, though should Michael maintain authorship of this commit
-since it was his proposal?
-
-> ---
->  doc/advertising-api.txt | 90 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 90 insertions(+)
->  create mode 100644 doc/advertising-api.txt
+> You also really want the kernel take control over advertising. Otherwise you have to keep re-enabling after each connection. The controller will turn it off once a connection has been created. The kernel does take care of that for you if you use the mgmt interface.
+Oh, thank you! It really works now as it should. For some reason, it 
+didn't work for me when I tried it an hour ago :)
 >
-> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-> new file mode 100644
-> index 0000000..3ab4691
-> --- /dev/null
-> +++ b/doc/advertising-api.txt
-> @@ -0,0 +1,90 @@
-> +BlueZ D-Bus LE Advertising API Description
-> +******************************************
-> +
-> +Advertising packets are structured data which is broadcast on the LE Advertising
-> +channels and available for all devices in range.  Because of the limited space
-> +available in LE Advertising packets (32 bytes) , each packet's contents must be
-> +controllable.
-> +
-> +BlueZ acts as a store for the multiple sets of Advertisement Data which is meant
-> +to be sent.  It constructs the correct Advertisement Data from the structured
-> +data and communicates the sets of data to the kernel, where it is
-> +multiplexed.
-> +
-> +Advertisement Data objects are registered freely and then referenced by BlueZ
-> +when constructing the data sent to the kernel.
-> +
-> +LE Advertisement Data hierarchy
-> +===============================
-> +
-> +Specifies the Advertisement Data to be broadcast and some advertising
-> +parameters.  Properties which are not present will not be included in the
-> +data.  Required advertisement data types will always be included.
-> +All UUIDs are 128-bit versions in the API, and 16 or 32-bit
-> +versions of the same UUID will be used in the advertising data as appropriate.
-> +
-> +Service                org.bluez
-> +Interface      org.bluez.LEAdvertisement1
-> +Object path    freely definable or
-> +               /org/bluez/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-> +
-> +Properties     string Type
-> +
-> +                       Determines the type of advertising packet requested.
-> +
-> +                       Possible values: "broadcaster" or "peripheral"
-> +
-> +               array{string} ServiceUUIDs [Optional]
-> +
-> +                       List of UUIDs to include in the "Service UUID" field of
-> +                       the Advertising Data.
-> +
-> +               dict ManufacturerData [Optional]
-> +
-> +                       Array of Manufactuer Specific Data fields to include in
-> +                       the Advertising Data.  Each dictionary entry includes
-> +                       the Manufacturer ID and the raw bytes to include.
-> +
-> +               array{string} SolicitUUIDs [Optional]
-> +
-> +                       Array of UUIDs to include in "Service Solicitation"
-> +                       Advertisement Data.
-> +
-> +               dict ServiceData [Optional]
-> +
-> +                       Array of Service Data to include. The keys are the
-> +                       UUID to associate with the data.
-> +
-> +LE Advertising Manager hierarchy
-> +================================
-> +
-> +The Advertising Manager allows external applications to register Advertisement
-> +Data which should be broadcast to devices.  Advertisement Data elements must
-> +follow the API for LE Advertisement Data described above.
-> +
-> +Service                org.bluez
-> +Interface      org.bluez.LEAdvertisementManager1 [Experimental]
-> +Object path    /org/bluez/{hci0,hci1,...}
-> +
-> +Methods                RegisterAdvertisement(object advertisement, dict options)
-> +
-> +                       Registers an advertisement object to be sent over the LE
-> +                       Advertising channel.  The service must be exported
-> +                       under interface LEAdvertisement1. InvalidArguments
-> +                       indicates that the object has invalid or conflicting
-> +                       properties.  InvalidLength indicates that the data
-> +                       provided generates a data packet which is too long.
-
-Will this also cause the controller to start advertising? Or would we
-want a separate Adapter1 API for this, e.g. StartAdvertising? We need
-a good story for switching between central/scanner and
-peripheral/broadcaster roles in general.
-
-> +
-> +                       Possible errors: org.bluez.Error.InvalidArguments
-> +                                        org.bluez.Error.AlreadyExists
-> +                                        org.bluez.Error.InvalidLength
-> +
-> +               UnregisterAdvertisement(object advertisement)
-> +
-> +                       This unregisters the advertisement that has been
-> +                       prevously registered.  The object path parameter must
-> +                       match the same value that has been used on registration.
-> +
-> +                       Possible errors: org.bluez.Error.InvalidArguments
-> +                                        org.bluez.Error.DoesNotExist
-> +
-> --
-> 2.1.0
+> Regards
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Thanks,
-Arman
+> Marcel
+>
