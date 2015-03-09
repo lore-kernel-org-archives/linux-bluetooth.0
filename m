@@ -1,37 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <54FDCEBC.2050705@ubnt.com>
-References: <CAGxYWpZ8cfgtdO8ZX39cPBOs4OZ=PaO5pOHotjBt0u7HsnVXFA@mail.gmail.com>
-	<6EDCDCB4-6F4D-4DE6-88DB-88D333FC2CCC@holtmann.org>
-	<CAGxYWpY0afTXOW1=jS1dmY7XBg3nR8a8itXiiiXdofKkhkyjKg@mail.gmail.com>
-	<EC9E947B-7BEA-47D9-B546-F18208D4AE97@holtmann.org>
-	<CAGxYWpaaj=_J801VUe1WphQtdEr-MOMzZ10-w_iFWUdjBPkL5Q@mail.gmail.com>
-	<CAGxYWpZCC1m1Ow-NAXp_f3AV9StE3sBHNJ2_vtY0owJ8SknffA@mail.gmail.com>
-	<54FDBBD2.10608@ubnt.com>
-	<185295B8-ABD9-4EDF-B290-12C430CCA906@holtmann.org>
-	<54FDCEBC.2050705@ubnt.com>
-Date: Mon, 9 Mar 2015 12:53:57 -0400
-Message-ID: <CAGxYWpYQGAYpDoa3=G+fwUxcqsA2pNbq81y4=-6ww8QXxeg+jQ@mail.gmail.com>
-Subject: Re: bt dongle goes awry after too many connections
-From: Tim Tisdall <tisdall@gmail.com>
-To: Andrejs Hanins <andrejs.hanins@ubnt.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1425919980.1421.18.camel@hadess.net>
+Subject: Re: [RFC 2/2] profiles/input: Add support for SDP fallback for
+ DualShock 3 clones
+From: Bastien Nocera <hadess@hadess.net>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Antonio Ospite <ao2@ao2.it>, Szymon Janc <szymon.janc@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Veseli Veseljko <veseljko75@gmail.com>
+Date: Mon, 09 Mar 2015 17:53:00 +0100
+In-Reply-To: <1644418.QPL4BBNlRG@uw000953>
+References: <1425830910-9549-1-git-send-email-szymon.janc@gmail.com>
+	 <1425830910-9549-3-git-send-email-szymon.janc@gmail.com>
+	 <20150309122108.1dac140bf6ecff692e3ca165@ao2.it>
+	 <1644418.QPL4BBNlRG@uw000953>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 9, 2015 at 12:47 PM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
-> Sure, I noticed that lots of work has been done lately in regard to LE, so
-> I'm indeed using 5.28 daemon@3.19.x kernel in LE-only mode and so far so
-> good.
-> One of the useful things which still seems to be missing is the control over
-> LE advertisements via D-Bus iface. "Discoverable" property change does not
-> affect LE advs. I'm currently using 'hciconfig hci0 leadv' to make it work.
-> But still, LE advs stop and do not re-start after adapter is
-> connected/disconnected to some peripheral.
+On Mon, 2015-03-09 at 14:37 +0100, Szymon Janc wrote:
+> Hi Antonio,
+> 
+> On Monday 09 of March 2015 12:21:08 Antonio Ospite wrote:
+> > On Sun,  8 Mar 2015 17:08:30 +0100
+> > Szymon Janc <szymon.janc@gmail.com> wrote:
+> > 
+> > > Some DualShock 3 clones were reported to not provide any SDP 
+> > > record. In such case provide fallback SDP record (based on 
+> > > genuine DS3 record) and retry setting input device channels 
+> > > before disconnecting.
+> > 
+> > Hi Szymon,
+> > 
+> > I guess this can't be done in the sixaxis plugin, right?
+> 
+> Unfortunately not. There would have to be some sort of callbacks 
+> from input
+> to handle this from plugin. But if you come up with some nice 
+> solution I'd
+> review it gladly :)
+> 
+> Maybe we could modify code to always provide those on USB plug and 
+> then never do
+> reverse SDP when sixaxis device is detected... I'd have to think 
+> about that :)
 
-It's doing what I'd expect then...  I expect dongles to be reset if
-they're unplugged and then re-attached.  I don't know if there's an
-expectation for devices to be returned to their last state if they're
-disconnected and re-connected when using DBUS, though.  I've pretty
-much avoided the DBUS interface since most of what I'm doing is simply
-not possible through it.
+That's what the original version of the sixaxis patch for BlueZ (the 
+one that shipped only in Fedora for a long while) did.
+
+When you create the BlueZ device setup by plugging in the pad, shove 
+the SDP record in the local cache as well.
+
+In the worst case, people will need to remove the device from the 
+Bluetooth settings, and plug it back in via USB.
