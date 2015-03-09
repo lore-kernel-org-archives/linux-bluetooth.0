@@ -1,132 +1,412 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth:btusb:fix incorrect type in initializer
-Date: Mon, 9 Mar 2015 23:37:21 +0000
-Message-ID: <771A272D-6934-4208-9CDE-09949BA3DE49@qca.qualcomm.com>
-References: <E72C4779-837E-45DC-8256-AAA4F01DE182@qca.qualcomm.com>
- <,<20150306085517.GA20795@t440s.lan> <>>
- <093F1F09-B7D5-4ED3-B9E2-559CA4AC7710@qca.qualcomm.com>
- <22B47A84-0790-430D-A3DA-A3D55C927B45@holtmann.org>
-In-Reply-To: <22B47A84-0790-430D-A3DA-A3D55C927B45@holtmann.org>
-Content-Type: text/plain; charset="Windows-1252"
 MIME-Version: 1.0
+In-Reply-To: <CAN_7+YbMZHKesrqkEcsGu2Q+k+nmFMxY=c2DUmvYt=1gFkNo_g@mail.gmail.com>
+References: <1425889402-9123-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1425889402-9123-5-git-send-email-lukasz.rymanowski@tieto.com>
+	<CABBYNZJr0ROJ-3tsVLLuAK2j9dwEZbwEMfsB3+kKREwt2+ukTQ@mail.gmail.com>
+	<CAN_7+YbMZHKesrqkEcsGu2Q+k+nmFMxY=c2DUmvYt=1gFkNo_g@mail.gmail.com>
+Date: Tue, 10 Mar 2015 01:16:55 +0200
+Message-ID: <CABBYNZKAh9BafKxDgOx=Rg-0UHfCfrCyHtZNb+29w_qUh15dwA@mail.gmail.com>
+Subject: Re: [PATCH v4 4/7] shared/gatt-client: Add write prepare and execute
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel/Johan,
+Hi Lukasz,
 
-On Mar 6, 2015, at 7:49 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Mon, Mar 9, 2015 at 10:44 PM, Lukasz Rymanowski
+<lukasz.rymanowski@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Mon, Mar 9, 2015 at 12:06 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Lukasz,
+>>
+>> On Mon, Mar 9, 2015 at 10:23 AM, Lukasz Rymanowski
+>> <lukasz.rymanowski@tieto.com> wrote:
+>>> For Android we need explicit write prepare and execute commands in GATT
+>>> client. This patch adds that.
+>>>
+>>> Note that till now prepare and execute has been used only in long
+>>> write.
+>>>
+>>> With this patch it is possible to start reliable write session by
+>>> the gatt-client. First write prepare will return session ID which shall
+>>> be used in follow up write prepare request and write execute.
+>>> ---
+>>>  src/shared/gatt-client.c | 261 +++++++++++++++++++++++++++++++++++++++++++++++
+>>>  src/shared/gatt-client.h |  13 +++
+>>>  2 files changed, 274 insertions(+)
+>>>
+>>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+>>> index acb6200..30fa883 100644
+>>> --- a/src/shared/gatt-client.c
+>>> +++ b/src/shared/gatt-client.c
+>>> @@ -77,6 +77,8 @@ struct bt_gatt_client {
+>>>         struct queue *long_write_queue;
+>>>         bool in_long_write;
+>>>
+>>> +       unsigned int reliable_write_session_id;
+>>> +
+>>>         /* List of registered disconnect/notification/indication callbacks */
+>>>         struct queue *notify_list;
+>>>         struct queue *notify_chrcs;
+>>> @@ -2211,6 +2213,7 @@ unsigned int bt_gatt_client_write_without_response(
+>>>  }
+>>>
+>>>  struct write_op {
+>>> +       struct bt_gatt_client *client;
+>>>         bt_gatt_client_callback_t callback;
+>>>         void *user_data;
+>>>         bt_gatt_destroy_func_t destroy;
+>>> @@ -2596,6 +2599,264 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+>>>         return req->id;
+>>>  }
+>>>
+>>> +struct prep_write_op {
+>>> +       bt_gatt_client_write_long_callback_t callback;
+>>> +       void *user_data;
+>>> +       bt_gatt_destroy_func_t destroy;
+>>> +       uint8_t *pdu;
+>>> +       uint16_t pdu_len;
+>>> +};
+>>> +
+>>> +static void destroy_prep_write_op(void *data)
+>>> +{
+>>> +       struct prep_write_op *op = data;
+>>> +
+>>> +       if (op->destroy)
+>>> +               op->destroy(op->user_data);
+>>> +
+>>> +       free(op->pdu);
+>>> +       free(op);
+>>> +}
+>>> +
+>>> +static void prep_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
+>>> +                                                               void *user_data)
+>>> +{
+>>> +       struct request *req = user_data;
+>>> +       struct prep_write_op *op = req->data;
+>>> +       bool success;
+>>> +       uint8_t att_ecode;
+>>> +       bool reliable_error;
+>>> +
+>>> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
+>>> +               success = false;
+>>> +               reliable_error = false;
+>>> +               att_ecode = process_error(pdu, length);
+>>> +               goto done;
+>>> +       }
+>>> +
+>>> +       if (opcode != BT_ATT_OP_PREP_WRITE_RSP) {
+>>> +               success = false;
+>>> +               reliable_error = false;
+>>> +               att_ecode = 0;
+>>> +               goto done;
+>>> +       }
+>>> +
+>>> +       if (!pdu || length != op->pdu_len ||
+>>> +                                       memcmp(pdu, op->pdu, op->pdu_len)) {
+>>> +               success = false;
+>>> +               reliable_error = true;
+>>> +               att_ecode = 0;
+>>> +               goto done;
+>>> +       }
+>>> +
+>>> +       success = true;
+>>> +       reliable_error = false;
+>>> +       att_ecode = 0;
+>>> +
+>>> +done:
+>>> +       if (op->callback)
+>>> +               op->callback(success, reliable_error, att_ecode, op->user_data);
+>>> +}
+>>> +
+>>> +static struct request *get_reliable_request(struct bt_gatt_client *client,
+>>> +                                                       unsigned int id)
+>>> +{
+>>> +       struct request *req;
+>>> +       struct prep_write_op *op;
+>>> +
+>>> +       op = new0(struct prep_write_op, 1);
+>>> +       if (!op)
+>>> +               return NULL;
+>>> +
+>>> +       /* Following prepare writes */
+>>> +       if (id != 0)
+>>> +               req = queue_find(client->pending_requests, match_req_id,
+>>> +                                                       UINT_TO_PTR(id));
+>>> +       else
+>>> +               req = request_create(client);
+>>> +
+>>> +       if (!req) {
+>>> +               free(op);
+>>> +               return NULL;
+>>> +       }
+>>> +
+>>> +       req->data = op;
+>>> +
+>>> +       return req;
+>>> +}
+>>> +
+>>> +unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
+>>> +                               unsigned int id, uint16_t value_handle,
+>>> +                               uint16_t offset, uint8_t *value,
+>>> +                               uint16_t length,
+>>> +                               bt_gatt_client_write_long_callback_t callback,
+>>> +                               void *user_data,
+>>> +                               bt_gatt_client_destroy_func_t destroy)
+>>> +{
+>>> +       struct request *req;
+>>> +       struct prep_write_op *op;
+>>> +       uint8_t pdu[4 + length];
+>>> +
+>>> +       if (!client)
+>>> +               return 0;
+>>> +
+>>> +       if (client->in_long_write)
+>>> +               return 0;
+>>> +
+>>> +       /*
+>>> +        * Make sure that client who owns reliable session continues with
+>>> +        * prepare writes or this is brand new reliable session (id == 0)
+>>> +        */
+>>> +       if (id != client->reliable_write_session_id) {
+>>> +               util_debug(client->debug_callback, client->debug_data,
+>>> +                       "There is other reliable write session ongoing %u",
+>>> +                       client->reliable_write_session_id);
+>>> +
+>>> +               return 0;
+>>> +       }
+>>> +
+>>> +       req = get_reliable_request(client, id);
+>>> +       if (!req)
+>>> +               return 0;
+>>> +
+>>> +       op = (struct prep_write_op *)req->data;
+>>> +
+>>> +       op->callback = callback;
+>>> +       op->user_data = user_data;
+>>> +       op->destroy = destroy;
+>>> +
+>>> +       req->destroy = destroy_prep_write_op;
+>>> +
+>>> +       put_le16(value_handle, pdu);
+>>> +       put_le16(offset, pdu + 2);
+>>> +       memcpy(pdu + 4, value, length);
+>>> +
+>>> +       /*
+>>> +        * Before sending command we need to remember pdu as we need to validate
+>>> +        * it in the response. Store handle, offset and value. Therefore
+>>> +        * increase length by 4 (handle + offset) as we need it in couple places
+>>> +        * below
+>>> +        */
+>>> +       length += 4;
+>>> +
+>>> +       op->pdu = malloc(length);
+>>> +       if (!op->pdu) {
+>>> +               op->destroy = NULL;
+>>> +               request_unref(req);
+>>> +               return 0;
+>>> +       }
+>>> +
+>>> +       memcpy(op->pdu, pdu, length);
+>>> +       op->pdu_len = length;
+>>> +
+>>> +       /*
+>>> +        * Now we are ready to send command
+>>> +        * Note that request_unref will be done on write execute
+>>> +        */
+>>> +       req->att_id = bt_att_send(client->att, BT_ATT_OP_PREP_WRITE_REQ, pdu,
+>>> +                                       sizeof(pdu), prep_write_cb, req,
+>>> +                                       NULL);
+>>> +       if (!req->att_id) {
+>>> +               op->destroy = NULL;
+>>> +               request_unref(req);
+>>> +               return 0;
+>>> +       }
+>>> +
+>>> +       /*
+>>> +        * Store first request id for prepare write and treat it as a session id
+>>> +        * valid until write execute is done
+>>> +        */
+>>> +       if (client->reliable_write_session_id == 0)
+>>> +               client->reliable_write_session_id = req->id;
+>>> +
+>>> +       return client->reliable_write_session_id;
+>>> +}
+>>> +
+>>> +static void exec_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
+>>> +                                                               void *user_data)
+>>> +{
+>>> +       struct request *req = user_data;
+>>> +       struct write_op *op = req->data;
+>>> +       bool success;
+>>> +       uint8_t att_ecode;
+>>> +
+>>> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
+>>> +               success = false;
+>>> +               att_ecode = process_error(pdu, length);
+>>> +               goto done;
+>>> +       }
+>>> +
+>>> +       if (opcode != BT_ATT_OP_EXEC_WRITE_RSP || pdu || length) {
+>>> +               success = false;
+>>> +               att_ecode = 0;
+>>> +               goto done;
+>>> +       }
+>>> +
+>>> +       success = true;
+>>> +       att_ecode = 0;
+>>> +
+>>> +done:
+>>> +       if (op->callback)
+>>> +               op->callback(success, att_ecode, op->user_data);
+>>> +
+>>> +       op->client->reliable_write_session_id = 0;
+>>> +
+>>> +       start_next_long_write(op->client);
+>>> +}
+>>> +
+>>> +unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
+>>> +                                       unsigned int id,
+>>> +                                       bool execute,
+>>> +                                       bt_gatt_client_callback_t callback,
+>>> +                                       void *user_data,
+>>> +                                       bt_gatt_client_destroy_func_t destroy)
+>>> +{
+>>> +       struct request *req;
+>>> +       struct write_op *op;
+>>> +       uint8_t pdu;
+>>> +
+>>> +       if (!client)
+>>> +               return 0;
+>>> +
+>>> +       if (client->in_long_write)
+>>> +               return 0;
+>>> +
+>>> +       if (client->reliable_write_session_id != id)
+>>> +               return 0;
+>>> +
+>>> +       op = new0(struct write_op, 1);
+>>> +       if (!op)
+>>> +               return 0;
+>>> +
+>>> +       req = queue_find(client->pending_requests, match_req_id,
+>>> +                                                       UINT_TO_PTR(id));
+>>> +       if (!req) {
+>>> +               free(op);
+>>> +               return 0;
+>>> +       }
+>>> +
+>>> +       op->client = client;
+>>> +       op->callback = callback;
+>>> +       op->user_data = user_data;
+>>> +       op->destroy = destroy;
+>>> +
+>>> +       pdu = execute ? 0x01 : 0x00;
+>>> +
+>>> +       req->data = op;
+>>> +       req->destroy = destroy_write_op;
+>>> +
+>>> +       req->att_id = bt_att_send(client->att, BT_ATT_OP_EXEC_WRITE_REQ, &pdu,
+>>> +                                               sizeof(pdu), exec_write_cb,
+>>> +                                               req, request_unref);
+>>> +       if (!req->att_id) {
+>>> +               op->destroy = NULL;
+>>> +               request_unref(req);
+>>> +               return 0;
+>>> +       }
+>>> +
+>>> +       return id;
+>>> +}
+>>> +
+>>>  static bool match_notify_chrc_value_handle(const void *a, const void *b)
+>>>  {
+>>>         const struct notify_chrc *chrc = a;
+>>> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+>>> index d4358cf..d7cd2ba 100644
+>>> --- a/src/shared/gatt-client.h
+>>> +++ b/src/shared/gatt-client.h
+>>> @@ -108,6 +108,19 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+>>>                                 bt_gatt_client_write_long_callback_t callback,
+>>>                                 void *user_data,
+>>>                                 bt_gatt_client_destroy_func_t destroy);
+>>> +unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
+>>> +                               unsigned int id,
+>>> +                               uint16_t value_handle, uint16_t offset,
+>>> +                               uint8_t *value, uint16_t length,
+>>> +                               bt_gatt_client_write_long_callback_t callback,
+>>> +                               void *user_data,
+>>> +                               bt_gatt_client_destroy_func_t destroy);
+>>> +unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
+>>> +                                       unsigned int id,
+>>> +                                       bool execute,
+>>> +                                       bt_gatt_client_callback_t callback,
+>>> +                                       void *user_data,
+>>> +                                       bt_gatt_client_destroy_func_t destroy);
+>>
+>> I recall suggesting to remove execute parameter here and use
+>> bt_gatt_client_cancel, that anyway should support cancelling it, note
+>> that if execute 0x00 fails it would probably block any further
+>> operation to use prepare so I wonder if there is actually a case where
+>> cancel can fail, except perhaps if the queue is empty but then we
+>> would need a special error code to identify that and discard the
+>> prepare queue anyway since in that case it would not block further
+>> prepares.
+>>
+>
+> Yes, you did suggest that, and I missed to comment on that in my cover letter.
+> bt_gatt_client_cancel does support canceling of prepare write. I guess
+> it  will  be used  mostly when cancel_all is used.
+>
+> In case of, let say, controlled prepare write session, having callback
+> from execute gives you and idea
+> when gatt client is ready to send another request. It also fits
+> android design as we need to send notification to framework once
+> write is done. We do send this notification in the write_cb.
 
-> Hi Ben,
->=20
->>>> On Tue, Mar 03, 2015, Kim, Ben Young Tae wrote:
->>>> This fixes the following sparse warning:
->>>>=20
->>>> drivers/bluetooth/btusb.c:2677:11: warning: incorrect type in initiali=
-zer (different base types)
->>>> drivers/bluetooth/btusb.c:2677:11: expected restricted __le32 [usertyp=
-e] rom_version
->>>> drivers/bluetooth/btusb.c:2677:11: got int
->>>> drivers/bluetooth/btusb.c:2678:11: warning: incorrect type in initiali=
-zer (different base types)
->>>> drivers/bluetooth/btusb.c:2678:11: expected restricted __le32 [usertyp=
-e] rom_version
->>>> drivers/bluetooth/btusb.c:2678:11: got int
->>>> drivers/bluetooth/btusb.c:2679:11: warning: incorrect type in initiali=
-zer (different base types)
->>>> drivers/bluetooth/btusb.c:2679:11: expected restricted __le32 [usertyp=
-e] rom_version
->>>> drivers/bluetooth/btusb.c:2679:11: got int
->>>> drivers/bluetooth/btusb.c:2680:11: warning: incorrect type in initiali=
-zer (different base types)
->>>> drivers/bluetooth/btusb.c:2680:11: expected restricted __le32 [usertyp=
-e] rom_version
->>>> drivers/bluetooth/btusb.c:2680:11: got int
->>>> drivers/bluetooth/btusb.c:2681:11: warning: incorrect type in initiali=
-zer (different base types)
->>>> drivers/bluetooth/btusb.c:2681:11: expected restricted __le32 [usertyp=
-e] rom_version
->>>> drivers/bluetooth/btusb.c:2681:11: got int
->>>> drivers/bluetooth/btusb.c:2805:17: warning: restricted __le16 degrades=
- to integer
->>>> drivers/bluetooth/btusb.c:2805:37: warning: restricted __le32 degrades=
- to integer
->>>> drivers/bluetooth/btusb.c:2806:17: warning: restricted __le16 degrades=
- to integer
->>>> drivers/bluetooth/btusb.c:2806:39: warning: restricted __le32 degrades=
- to integer
->>>>=20
->>>> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
->>>> ---
->>>> drivers/bluetooth/btusb.c | 14 +++++++-------
->>>> 1 file changed, 7 insertions(+), 7 deletions(-)
->>>>=20
->>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>>> index 0833054..f65cd44 100644
->>>> --- a/drivers/bluetooth/btusb.c
->>>> +++ b/drivers/bluetooth/btusb.c
->>>> @@ -2674,11 +2674,11 @@ struct qca_device_info {
->>>> };
->>>>=20
->>>> static const struct qca_device_info qca_devices_table[] =3D {
->>>> -    { 0x00000100, 20, 4, 10 }, /* Rome 1.0 */
->>>> -    { 0x00000101, 20, 4, 10 }, /* Rome 1.1 */
->>>> -    { 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
->>>> -    { 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
->>>> -    { 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
->>>> +    { cpu_to_le32(0x00000100), 20, 4, 10 }, /* Rome 1.0 */
->>>> +    { cpu_to_le32(0x00000101), 20, 4, 10 }, /* Rome 1.1 */
->>>> +    { cpu_to_le32(0x00000201), 28, 4, 18 }, /* Rome 2.1 */
->>>> +    { cpu_to_le32(0x00000300), 28, 4, 18 }, /* Rome 3.0 */
->>>> +    { cpu_to_le32(0x00000302), 28, 4, 18 }, /* Rome 3.2 */
->>>> };
->>>=20
->>> Since "struct qca_device_info" doesn't describe raw protocol data I
->>> don't think it should contain protocol endianness values, i.e. the
->>> rom_version member should be u32 instead of __le32.
->>>=20
->>=20
->> The rom_version will be coming from chipset when we ask chip version to =
-soc at the first time and we are comparing to this during initialization. I=
- think this should be _le32 type.
->=20
-> I made a mistake in the review actually that I only now realized it. And =
-this means that you really have not tested anything on big-endian architect=
-ures or just got lucky with the current values.
->=20
-> So lets keep qca_device_info in host endian. It is a host data structure.=
- It is not a wire data structure.
->=20
-> This is actually the broken one:
->=20
->        if (rver->rom_version !=3D ver->rom_version ||
->            rver->patch_version <=3D ver->patch_version) {
->=20
-> You are now comparing little-endian values. That works all fine on a litt=
-le-endian system, but on a big-endian system the <=3D comparison might not =
-give you the result you are hoping for. So this all needs to be done with h=
-ost endian values.
->=20
-> Move qca_device_info to host endian and then go through the code and then=
- do the little-endian transformation of data from the the hardware. You can=
- easily check with spares (C=3D2) if you are doing this correctly.
->=20
+You can send the notification right away can't you? att will queue the
+requests anyway, so it is not that this will broken anything actually.
 
-Does host endian mean to use u32/u8 type instead of __le or __be? If yes, I=
-=92ll work on this and send you the patch soon after verifying it with C=3D=
-2 option.
+> Also, having two ways of  doing write execute 0x00 ( with
+> bt_gatt_client_cancel and (imho) more intuitive way
+> bt_gatt_client_execute_write(0x00) )
+> should not be a big problem, especially that this is our internal API.
 
-> Regards
->=20
-> Marcel
->=20
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Thanks
-=97 Ben Kim=
+Well I suspect a newbie could do things like execute 0x00 and then
+cancel which would probably crash given that the request would be
+freed before the response.
+
+> BR
+> Lukasz
+>
+>
+>>>  unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
+>>>                                 uint16_t chrc_value_handle,
+>>> --
+>>> 1.8.4
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
