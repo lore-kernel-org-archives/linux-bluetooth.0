@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 4/7] Bluetooth: Remove unneeded recv_event variable
-Date: Mon,  9 Mar 2015 13:03:38 +0200
-Message-Id: <1425899021-16414-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 3/7] Bluetooth: Convert hci_req_sync family of function to new request API
+Date: Mon,  9 Mar 2015 13:03:37 +0200
+Message-Id: <1425899021-16414-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1425899021-16414-1-git-send-email-johan.hedberg@gmail.com>
 References: <1425899021-16414-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,66 +11,118 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that the synchronous HCI requests use the new API and a new private
-variable the recv_evt member of hci_dev is no-longer needed. This patch
-removes it.
+Now that there's an API in place that allows passing the resulting skb
+to the request callback we can conveniently convert the hci_req_sync and
+related functions to use it. Since we still need to get the skb from the
+async callback into the sleeping _sync() function the patch adds another
+req_skb variable to hci_dev where the sync request state is tracked.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/hci_core.c         |  3 ---
- net/bluetooth/hci_event.c        | 12 ------------
- 3 files changed, 16 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 28 ++++++++++++++--------------
+ 2 files changed, 15 insertions(+), 14 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 65215245c913..e340cc96bc5c 100644
+index afc641c5e55c..65215245c913 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -315,7 +315,6 @@ struct hci_dev {
- 	struct sk_buff_head	raw_q;
- 	struct sk_buff_head	cmd_q;
+@@ -323,6 +323,7 @@ struct hci_dev {
+ 	wait_queue_head_t	req_wait_q;
+ 	__u32			req_status;
+ 	__u32			req_result;
++	struct sk_buff		*req_skb;
  
--	struct sk_buff		*recv_evt;
- 	struct sk_buff		*sent_cmd;
- 	struct sk_buff		*reassembly[NUM_REASSEMBLY];
- 
+ 	void			*smp_data;
+ 	void			*smp_bredr_data;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2619bff1bdfb..f8f1401d5dd7 100644
+index 335014e85bf5..2619bff1bdfb 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1690,9 +1690,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		hdev->sent_cmd = NULL;
+@@ -141,13 +141,16 @@ static const struct file_operations dut_mode_fops = {
+ 
+ /* ---- HCI requests ---- */
+ 
+-static void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode)
++static void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
++				  struct sk_buff *skb)
+ {
+ 	BT_DBG("%s result 0x%2.2x", hdev->name, result);
+ 
+ 	if (hdev->req_status == HCI_REQ_PEND) {
+ 		hdev->req_result = result;
+ 		hdev->req_status = HCI_REQ_DONE;
++		if (skb)
++			hdev->req_skb = skb_get(skb);
+ 		wake_up_interruptible(&hdev->req_wait_q);
  	}
+ }
+@@ -164,18 +167,10 @@ static void hci_req_cancel(struct hci_dev *hdev, int err)
+ }
  
--	kfree_skb(hdev->recv_evt);
--	hdev->recv_evt = NULL;
+ static struct sk_buff *hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
+-					    u8 event)
++					    u8 event, struct sk_buff *skb)
+ {
+ 	struct hci_ev_cmd_complete *ev;
+ 	struct hci_event_hdr *hdr;
+-	struct sk_buff *skb;
 -
- 	/* After this point our queues are empty
- 	 * and no tasks are scheduled. */
- 	hdev->close(hdev);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index dbaf8159c4ad..380e38a1a3c9 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5042,18 +5042,6 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	u8 status = 0, event = hdr->evt;
- 	u16 opcode = HCI_OP_NOP;
- 
 -	hci_dev_lock(hdev);
 -
--	/* Received events are (currently) only needed when a request is
--	 * ongoing so avoid unnecessary memory allocation.
--	 */
--	if (hci_req_pending(hdev)) {
--		kfree_skb(hdev->recv_evt);
--		hdev->recv_evt = skb_clone(skb, GFP_KERNEL);
--	}
+-	skb = hdev->recv_evt;
+-	hdev->recv_evt = NULL;
 -
 -	hci_dev_unlock(hdev);
--
- 	if (hdev->sent_cmd && bt_cb(hdev->sent_cmd)->req_event == event) {
- 		struct hci_command_hdr *cmd_hdr = (void *) hdev->sent_cmd->data;
- 		opcode = __le16_to_cpu(cmd_hdr->opcode);
+ 
+ 	if (!skb)
+ 		return ERR_PTR(-ENODATA);
+@@ -223,6 +218,7 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ {
+ 	DECLARE_WAITQUEUE(wait, current);
+ 	struct hci_request req;
++	struct sk_buff *skb;
+ 	int err = 0;
+ 
+ 	BT_DBG("%s", hdev->name);
+@@ -236,7 +232,7 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 	add_wait_queue(&hdev->req_wait_q, &wait);
+ 	set_current_state(TASK_INTERRUPTIBLE);
+ 
+-	err = hci_req_run(&req, hci_req_sync_complete);
++	err = hci_req_run_skb(&req, hci_req_sync_complete);
+ 	if (err < 0) {
+ 		remove_wait_queue(&hdev->req_wait_q, &wait);
+ 		set_current_state(TASK_RUNNING);
+@@ -265,13 +261,17 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 	}
+ 
+ 	hdev->req_status = hdev->req_result = 0;
++	skb = hdev->req_skb;
++	hdev->req_skb = NULL;
+ 
+ 	BT_DBG("%s end: err %d", hdev->name, err);
+ 
+-	if (err < 0)
++	if (err < 0) {
++		kfree_skb(skb);
+ 		return ERR_PTR(err);
++	}
+ 
+-	return hci_get_cmd_complete(hdev, opcode, event);
++	return hci_get_cmd_complete(hdev, opcode, event, skb);
+ }
+ EXPORT_SYMBOL(__hci_cmd_sync_ev);
+ 
+@@ -303,7 +303,7 @@ static int __hci_req_sync(struct hci_dev *hdev,
+ 	add_wait_queue(&hdev->req_wait_q, &wait);
+ 	set_current_state(TASK_INTERRUPTIBLE);
+ 
+-	err = hci_req_run(&req, hci_req_sync_complete);
++	err = hci_req_run_skb(&req, hci_req_sync_complete);
+ 	if (err < 0) {
+ 		hdev->req_status = 0;
+ 
 -- 
 2.1.0
 
