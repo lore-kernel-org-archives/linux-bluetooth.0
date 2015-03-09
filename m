@@ -1,364 +1,213 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1425889402-9123-5-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1425889402-9123-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1425889402-9123-5-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Mon, 9 Mar 2015 13:06:15 +0200
-Message-ID: <CABBYNZJr0ROJ-3tsVLLuAK2j9dwEZbwEMfsB3+kKREwt2+ukTQ@mail.gmail.com>
-Subject: Re: [PATCH v4 4/7] shared/gatt-client: Add write prepare and execute
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 7/7] Bluetooth: Convert local OOB data reading to use HCI request
+Date: Mon,  9 Mar 2015 13:03:41 +0200
+Message-Id: <1425899021-16414-8-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1425899021-16414-1-git-send-email-johan.hedberg@gmail.com>
+References: <1425899021-16414-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Mon, Mar 9, 2015 at 10:23 AM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> For Android we need explicit write prepare and execute commands in GATT
-> client. This patch adds that.
->
-> Note that till now prepare and execute has been used only in long
-> write.
->
-> With this patch it is possible to start reliable write session by
-> the gatt-client. First write prepare will return session ID which shall
-> be used in follow up write prepare request and write execute.
-> ---
->  src/shared/gatt-client.c | 261 +++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/gatt-client.h |  13 +++
->  2 files changed, 274 insertions(+)
->
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index acb6200..30fa883 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -77,6 +77,8 @@ struct bt_gatt_client {
->         struct queue *long_write_queue;
->         bool in_long_write;
->
-> +       unsigned int reliable_write_session_id;
-> +
->         /* List of registered disconnect/notification/indication callbacks */
->         struct queue *notify_list;
->         struct queue *notify_chrcs;
-> @@ -2211,6 +2213,7 @@ unsigned int bt_gatt_client_write_without_response(
->  }
->
->  struct write_op {
-> +       struct bt_gatt_client *client;
->         bt_gatt_client_callback_t callback;
->         void *user_data;
->         bt_gatt_destroy_func_t destroy;
-> @@ -2596,6 +2599,264 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
->         return req->id;
->  }
->
-> +struct prep_write_op {
-> +       bt_gatt_client_write_long_callback_t callback;
-> +       void *user_data;
-> +       bt_gatt_destroy_func_t destroy;
-> +       uint8_t *pdu;
-> +       uint16_t pdu_len;
-> +};
-> +
-> +static void destroy_prep_write_op(void *data)
-> +{
-> +       struct prep_write_op *op = data;
-> +
-> +       if (op->destroy)
-> +               op->destroy(op->user_data);
-> +
-> +       free(op->pdu);
-> +       free(op);
-> +}
-> +
-> +static void prep_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
-> +                                                               void *user_data)
-> +{
-> +       struct request *req = user_data;
-> +       struct prep_write_op *op = req->data;
-> +       bool success;
-> +       uint8_t att_ecode;
-> +       bool reliable_error;
-> +
-> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
-> +               success = false;
-> +               reliable_error = false;
-> +               att_ecode = process_error(pdu, length);
-> +               goto done;
-> +       }
-> +
-> +       if (opcode != BT_ATT_OP_PREP_WRITE_RSP) {
-> +               success = false;
-> +               reliable_error = false;
-> +               att_ecode = 0;
-> +               goto done;
-> +       }
-> +
-> +       if (!pdu || length != op->pdu_len ||
-> +                                       memcmp(pdu, op->pdu, op->pdu_len)) {
-> +               success = false;
-> +               reliable_error = true;
-> +               att_ecode = 0;
-> +               goto done;
-> +       }
-> +
-> +       success = true;
-> +       reliable_error = false;
-> +       att_ecode = 0;
-> +
-> +done:
-> +       if (op->callback)
-> +               op->callback(success, reliable_error, att_ecode, op->user_data);
-> +}
-> +
-> +static struct request *get_reliable_request(struct bt_gatt_client *client,
-> +                                                       unsigned int id)
-> +{
-> +       struct request *req;
-> +       struct prep_write_op *op;
-> +
-> +       op = new0(struct prep_write_op, 1);
-> +       if (!op)
-> +               return NULL;
-> +
-> +       /* Following prepare writes */
-> +       if (id != 0)
-> +               req = queue_find(client->pending_requests, match_req_id,
-> +                                                       UINT_TO_PTR(id));
-> +       else
-> +               req = request_create(client);
-> +
-> +       if (!req) {
-> +               free(op);
-> +               return NULL;
-> +       }
-> +
-> +       req->data = op;
-> +
-> +       return req;
-> +}
-> +
-> +unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
-> +                               unsigned int id, uint16_t value_handle,
-> +                               uint16_t offset, uint8_t *value,
-> +                               uint16_t length,
-> +                               bt_gatt_client_write_long_callback_t callback,
-> +                               void *user_data,
-> +                               bt_gatt_client_destroy_func_t destroy)
-> +{
-> +       struct request *req;
-> +       struct prep_write_op *op;
-> +       uint8_t pdu[4 + length];
-> +
-> +       if (!client)
-> +               return 0;
-> +
-> +       if (client->in_long_write)
-> +               return 0;
-> +
-> +       /*
-> +        * Make sure that client who owns reliable session continues with
-> +        * prepare writes or this is brand new reliable session (id == 0)
-> +        */
-> +       if (id != client->reliable_write_session_id) {
-> +               util_debug(client->debug_callback, client->debug_data,
-> +                       "There is other reliable write session ongoing %u",
-> +                       client->reliable_write_session_id);
-> +
-> +               return 0;
-> +       }
-> +
-> +       req = get_reliable_request(client, id);
-> +       if (!req)
-> +               return 0;
-> +
-> +       op = (struct prep_write_op *)req->data;
-> +
-> +       op->callback = callback;
-> +       op->user_data = user_data;
-> +       op->destroy = destroy;
-> +
-> +       req->destroy = destroy_prep_write_op;
-> +
-> +       put_le16(value_handle, pdu);
-> +       put_le16(offset, pdu + 2);
-> +       memcpy(pdu + 4, value, length);
-> +
-> +       /*
-> +        * Before sending command we need to remember pdu as we need to validate
-> +        * it in the response. Store handle, offset and value. Therefore
-> +        * increase length by 4 (handle + offset) as we need it in couple places
-> +        * below
-> +        */
-> +       length += 4;
-> +
-> +       op->pdu = malloc(length);
-> +       if (!op->pdu) {
-> +               op->destroy = NULL;
-> +               request_unref(req);
-> +               return 0;
-> +       }
-> +
-> +       memcpy(op->pdu, pdu, length);
-> +       op->pdu_len = length;
-> +
-> +       /*
-> +        * Now we are ready to send command
-> +        * Note that request_unref will be done on write execute
-> +        */
-> +       req->att_id = bt_att_send(client->att, BT_ATT_OP_PREP_WRITE_REQ, pdu,
-> +                                       sizeof(pdu), prep_write_cb, req,
-> +                                       NULL);
-> +       if (!req->att_id) {
-> +               op->destroy = NULL;
-> +               request_unref(req);
-> +               return 0;
-> +       }
-> +
-> +       /*
-> +        * Store first request id for prepare write and treat it as a session id
-> +        * valid until write execute is done
-> +        */
-> +       if (client->reliable_write_session_id == 0)
-> +               client->reliable_write_session_id = req->id;
-> +
-> +       return client->reliable_write_session_id;
-> +}
-> +
-> +static void exec_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
-> +                                                               void *user_data)
-> +{
-> +       struct request *req = user_data;
-> +       struct write_op *op = req->data;
-> +       bool success;
-> +       uint8_t att_ecode;
-> +
-> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
-> +               success = false;
-> +               att_ecode = process_error(pdu, length);
-> +               goto done;
-> +       }
-> +
-> +       if (opcode != BT_ATT_OP_EXEC_WRITE_RSP || pdu || length) {
-> +               success = false;
-> +               att_ecode = 0;
-> +               goto done;
-> +       }
-> +
-> +       success = true;
-> +       att_ecode = 0;
-> +
-> +done:
-> +       if (op->callback)
-> +               op->callback(success, att_ecode, op->user_data);
-> +
-> +       op->client->reliable_write_session_id = 0;
-> +
-> +       start_next_long_write(op->client);
-> +}
-> +
-> +unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
-> +                                       unsigned int id,
-> +                                       bool execute,
-> +                                       bt_gatt_client_callback_t callback,
-> +                                       void *user_data,
-> +                                       bt_gatt_client_destroy_func_t destroy)
-> +{
-> +       struct request *req;
-> +       struct write_op *op;
-> +       uint8_t pdu;
-> +
-> +       if (!client)
-> +               return 0;
-> +
-> +       if (client->in_long_write)
-> +               return 0;
-> +
-> +       if (client->reliable_write_session_id != id)
-> +               return 0;
-> +
-> +       op = new0(struct write_op, 1);
-> +       if (!op)
-> +               return 0;
-> +
-> +       req = queue_find(client->pending_requests, match_req_id,
-> +                                                       UINT_TO_PTR(id));
-> +       if (!req) {
-> +               free(op);
-> +               return 0;
-> +       }
-> +
-> +       op->client = client;
-> +       op->callback = callback;
-> +       op->user_data = user_data;
-> +       op->destroy = destroy;
-> +
-> +       pdu = execute ? 0x01 : 0x00;
-> +
-> +       req->data = op;
-> +       req->destroy = destroy_write_op;
-> +
-> +       req->att_id = bt_att_send(client->att, BT_ATT_OP_EXEC_WRITE_REQ, &pdu,
-> +                                               sizeof(pdu), exec_write_cb,
-> +                                               req, request_unref);
-> +       if (!req->att_id) {
-> +               op->destroy = NULL;
-> +               request_unref(req);
-> +               return 0;
-> +       }
-> +
-> +       return id;
-> +}
-> +
->  static bool match_notify_chrc_value_handle(const void *a, const void *b)
->  {
->         const struct notify_chrc *chrc = a;
-> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-> index d4358cf..d7cd2ba 100644
-> --- a/src/shared/gatt-client.h
-> +++ b/src/shared/gatt-client.h
-> @@ -108,6 +108,19 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
->                                 bt_gatt_client_write_long_callback_t callback,
->                                 void *user_data,
->                                 bt_gatt_client_destroy_func_t destroy);
-> +unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
-> +                               unsigned int id,
-> +                               uint16_t value_handle, uint16_t offset,
-> +                               uint8_t *value, uint16_t length,
-> +                               bt_gatt_client_write_long_callback_t callback,
-> +                               void *user_data,
-> +                               bt_gatt_client_destroy_func_t destroy);
-> +unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
-> +                                       unsigned int id,
-> +                                       bool execute,
-> +                                       bt_gatt_client_callback_t callback,
-> +                                       void *user_data,
-> +                                       bt_gatt_client_destroy_func_t destroy);
+Now that there's a HCI request API available where the callback receives
+the resulting skb, we can convert the local OOB data reading to use this
+new API. This patch does the necessary update in mgmt.c (which also
+requires moving the callback higher up since it's now a static function)
+and removes the custom calls from hci_event.c that are no-longer
+necessary.
 
-I recall suggesting to remove execute parameter here and use
-bt_gatt_client_cancel, that anyway should support cancelling it, note
-that if execute 0x00 fails it would probably block any further
-operation to use prepare so I wonder if there is actually a case where
-cancel can fail, except perhaps if the queue is empty but then we
-would need a special error code to identify that and discard the
-prepare queue anyway since in that case it would not block further
-prepares.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |   3 --
+ net/bluetooth/hci_event.c        |  12 -----
+ net/bluetooth/mgmt.c             | 105 ++++++++++++++++++++++++---------------
+ 3 files changed, 65 insertions(+), 55 deletions(-)
 
->  unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
->                                 uint16_t chrc_value_handle,
-> --
-> 1.8.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 23da0487c0aa..9b99adedfdb0 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1359,9 +1359,6 @@ void mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
+ void mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
+ 				    u8 status);
+ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status);
+-void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+-				       u8 *rand192, u8 *hash256, u8 *rand256,
+-				       u8 status);
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
+ 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ea332c6a5319..6d1e4f4cbba3 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1045,11 +1045,6 @@ static void hci_cc_read_local_oob_data(struct hci_dev *hdev,
+ 	struct hci_rp_read_local_oob_data *rp = (void *) skb->data;
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+-
+-	hci_dev_lock(hdev);
+-	mgmt_read_local_oob_data_complete(hdev, rp->hash, rp->rand, NULL, NULL,
+-					  rp->status);
+-	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_cc_read_local_oob_ext_data(struct hci_dev *hdev,
+@@ -1058,15 +1053,8 @@ static void hci_cc_read_local_oob_ext_data(struct hci_dev *hdev,
+ 	struct hci_rp_read_local_oob_ext_data *rp = (void *) skb->data;
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+-
+-	hci_dev_lock(hdev);
+-	mgmt_read_local_oob_data_complete(hdev, rp->hash192, rp->rand192,
+-					  rp->hash256, rp->rand256,
+-					  rp->status);
+-	hci_dev_unlock(hdev);
+ }
+ 
+-
+ static void hci_cc_le_set_random_addr(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d769b428b630..b851dbcd8029 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3630,10 +3630,70 @@ failed:
+ 	return err;
+ }
+ 
++static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
++				         u16 opcode, struct sk_buff *skb)
++{
++	struct mgmt_rp_read_local_oob_data mgmt_rp;
++	size_t rp_size = sizeof(mgmt_rp);
++	struct mgmt_pending_cmd *cmd;
++
++	BT_DBG("%s status %u", hdev->name, status);
++
++	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev);
++	if (!cmd)
++		return;
++
++	if (status || !skb) {
++		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
++				status ? mgmt_status(status) : MGMT_STATUS_FAILED);
++		goto remove;
++	}
++
++	memset(&mgmt_rp, 0, sizeof(mgmt_rp));
++
++	if (opcode == HCI_OP_READ_LOCAL_OOB_DATA) {
++		struct hci_rp_read_local_oob_data *rp = (void *) skb->data;
++
++		if (skb->len < sizeof(*rp)) {
++			mgmt_cmd_status(cmd->sk, hdev->id,
++					MGMT_OP_READ_LOCAL_OOB_DATA,
++					MGMT_STATUS_FAILED);
++			goto remove;
++		}
++
++		memcpy(mgmt_rp.hash192, rp->hash, sizeof(rp->hash));
++		memcpy(mgmt_rp.rand192, rp->rand, sizeof(rp->rand));
++
++		rp_size -= sizeof(mgmt_rp.hash256) + sizeof(mgmt_rp.rand256);
++	} else {
++		struct hci_rp_read_local_oob_ext_data *rp = (void *) skb->data;
++
++		if (skb->len < sizeof(*rp)) {
++			mgmt_cmd_status(cmd->sk, hdev->id,
++					MGMT_OP_READ_LOCAL_OOB_DATA,
++					MGMT_STATUS_FAILED);
++			goto remove;
++		}
++
++		memcpy(mgmt_rp.hash192, rp->hash192, sizeof(rp->hash192));
++		memcpy(mgmt_rp.rand192, rp->rand192, sizeof(rp->rand192));
++
++		memcpy(mgmt_rp.hash256, rp->hash256, sizeof(rp->hash256));
++		memcpy(mgmt_rp.rand256, rp->rand256, sizeof(rp->rand256));
++	}
++
++	mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
++			  MGMT_STATUS_SUCCESS, &mgmt_rp, rp_size);
++
++remove:
++	mgmt_pending_remove(cmd);
++}
++
+ static int read_local_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 			       void *data, u16 data_len)
+ {
+ 	struct mgmt_pending_cmd *cmd;
++	struct hci_request req;
+ 	int err;
+ 
+ 	BT_DBG("%s", hdev->name);
+@@ -3664,12 +3724,14 @@ static int read_local_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
++	hci_req_init(&req, hdev);
++
+ 	if (bredr_sc_enabled(hdev))
+-		err = hci_send_cmd(hdev, HCI_OP_READ_LOCAL_OOB_EXT_DATA,
+-				   0, NULL);
++		hci_req_add(&req, HCI_OP_READ_LOCAL_OOB_EXT_DATA, 0, NULL);
+ 	else
+-		err = hci_send_cmd(hdev, HCI_OP_READ_LOCAL_OOB_DATA, 0, NULL);
++		hci_req_add(&req, HCI_OP_READ_LOCAL_OOB_DATA, 0, NULL);
+ 
++	err = hci_req_run_skb(&req, read_local_oob_data_complete);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+ 
+@@ -7214,43 +7276,6 @@ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status)
+ 		   cmd ? cmd->sk : NULL);
+ }
+ 
+-void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+-				       u8 *rand192, u8 *hash256, u8 *rand256,
+-				       u8 status)
+-{
+-	struct mgmt_pending_cmd *cmd;
+-
+-	BT_DBG("%s status %u", hdev->name, status);
+-
+-	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev);
+-	if (!cmd)
+-		return;
+-
+-	if (status) {
+-		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
+-			        mgmt_status(status));
+-	} else {
+-		struct mgmt_rp_read_local_oob_data rp;
+-		size_t rp_size = sizeof(rp);
+-
+-		memcpy(rp.hash192, hash192, sizeof(rp.hash192));
+-		memcpy(rp.rand192, rand192, sizeof(rp.rand192));
+-
+-		if (bredr_sc_enabled(hdev) && hash256 && rand256) {
+-			memcpy(rp.hash256, hash256, sizeof(rp.hash256));
+-			memcpy(rp.rand256, rand256, sizeof(rp.rand256));
+-		} else {
+-			rp_size -= sizeof(rp.hash256) + sizeof(rp.rand256);
+-		}
+-
+-		mgmt_cmd_complete(cmd->sk, hdev->id,
+-				  MGMT_OP_READ_LOCAL_OOB_DATA, 0,
+-				  &rp, rp_size);
+-	}
+-
+-	mgmt_pending_remove(cmd);
+-}
+-
+ static inline bool has_uuid(u8 *uuid, u16 uuid_count, u8 (*uuids)[16])
+ {
+ 	int i;
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
