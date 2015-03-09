@@ -2,55 +2,111 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4 5/7] shared/gatt-client: Add coexistence of long write and prepare write
-Date: Mon,  9 Mar 2015 09:23:20 +0100
-Message-Id: <1425889402-9123-6-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 2/7] shared/gatt-client: Add helper to cancel long write request
+Date: Mon,  9 Mar 2015 09:23:17 +0100
+Message-Id: <1425889402-9123-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1425889402-9123-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1425889402-9123-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch makes sure that long write is not proceeded when prepare
-write has been called. Instead long write commands will be queued and
-once write execute command is done, queued long write requests will
-be proceeded.
-
-It does not work in other way. Meaning, when long write is ongoing,
-prepare write will not be proceeded nor queued. This feature can be
-added later on if really needed.
 ---
- src/shared/gatt-client.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ src/shared/gatt-client.c | 61 ++++++++++++++++++++++++------------------------
+ 1 file changed, 30 insertions(+), 31 deletions(-)
 
 diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 30fa883..7b5c232 100644
+index b8c4bd8..af12860 100644
 --- a/src/shared/gatt-client.c
 +++ b/src/shared/gatt-client.c
-@@ -110,6 +110,7 @@ struct bt_gatt_client {
- struct request {
- 	struct bt_gatt_client *client;
- 	bool long_write;
-+	bool prep_write;
- 	bool removed;
- 	int ref_count;
- 	unsigned int id;
-@@ -2566,7 +2567,7 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
- 	req->destroy = long_write_op_free;
- 	req->long_write = true;
+@@ -1769,10 +1769,34 @@ static void cancel_long_write_cb(uint8_t opcode, const void *pdu, uint16_t len,
+ 	/* Do nothing */
+ }
  
--	if (client->in_long_write) {
-+	if (client->in_long_write || client->reliable_write_session_id > 0) {
- 		queue_push_tail(client->long_write_queue, req);
- 		return req->id;
- 	}
-@@ -2726,6 +2727,7 @@ unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
- 	op->destroy = destroy;
++static bool cancel_long_write_req(struct bt_gatt_client *client,
++							struct request *req)
++{
++	uint8_t pdu = 0x00;
++	bool ret;
++
++	/*
++	 * att_id == 0 means that request has been queued and no prepare write
++	 * has been sent so far.Let's just remove if from the queue.
++	 * Otherwise execute write needs to be send.
++	 */
++	if (!req->att_id)
++		ret = queue_remove(client->long_write_queue, req);
++	else
++		ret = !!bt_att_send(client->att, BT_ATT_OP_EXEC_WRITE_REQ, &pdu,
++							sizeof(pdu),
++							cancel_long_write_cb,
++							NULL, NULL);
++
++	if (queue_isempty(client->long_write_queue))
++		client->in_long_write = false;
++
++	return ret;
++}
++
+ bool bt_gatt_client_cancel(struct bt_gatt_client *client, unsigned int id)
+ {
+ 	struct request *req;
+-	uint8_t pdu = 0x00;
  
- 	req->destroy = destroy_prep_write_op;
-+	req->prep_write = true;
+ 	if (!client || !id || !client->att)
+ 		return false;
+@@ -1788,19 +1812,8 @@ bool bt_gatt_client_cancel(struct bt_gatt_client *client, unsigned int id)
+ 		return false;
  
- 	put_le16(value_handle, pdu);
- 	put_le16(offset, pdu + 2);
+ 	/* If this was a long-write, we need to abort all prepared writes */
+-	if (!req->long_write)
+-		return true;
+-
+-	if (!req->att_id)
+-		queue_remove(client->long_write_queue, req);
+-	else
+-		bt_att_send(client->att, BT_ATT_OP_EXEC_WRITE_REQ,
+-							&pdu, sizeof(pdu),
+-							cancel_long_write_cb,
+-							NULL, NULL);
+-
+-	if (queue_isempty(client->long_write_queue))
+-		client->in_long_write = false;
++	if (req->long_write)
++		return cancel_long_write_req(client, req);
+ 
+ 	return true;
+ }
+@@ -1808,27 +1821,13 @@ bool bt_gatt_client_cancel(struct bt_gatt_client *client, unsigned int id)
+ static void cancel_request(void *data)
+ {
+ 	struct request *req = data;
+-	uint8_t pdu = 0x00;
+ 
+ 	req->removed = true;
+ 
+-	if (!req->long_write) {
+-		bt_att_cancel(req->client->att, req->att_id);
+-		return;
+-	}
+-
+-	if (!req->att_id)
+-		queue_remove(req->client->long_write_queue, req);
+-
+-	if (queue_isempty(req->client->long_write_queue))
+-		req->client->in_long_write = false;
+-
+-	bt_att_send(req->client->att, BT_ATT_OP_EXEC_WRITE_REQ,
+-							&pdu, sizeof(pdu),
+-							cancel_long_write_cb,
+-							NULL, NULL);
+-
+ 	bt_att_cancel(req->client->att, req->att_id);
++
++	if (req->long_write)
++		cancel_long_write_req(req->client, req);
+ }
+ 
+ bool bt_gatt_client_cancel_all(struct bt_gatt_client *client)
 -- 
 1.8.4
 
