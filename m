@@ -1,394 +1,175 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJr0ROJ-3tsVLLuAK2j9dwEZbwEMfsB3+kKREwt2+ukTQ@mail.gmail.com>
-References: <1425889402-9123-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1425889402-9123-5-git-send-email-lukasz.rymanowski@tieto.com>
-	<CABBYNZJr0ROJ-3tsVLLuAK2j9dwEZbwEMfsB3+kKREwt2+ukTQ@mail.gmail.com>
-Date: Mon, 9 Mar 2015 21:44:41 +0100
-Message-ID: <CAN_7+YbMZHKesrqkEcsGu2Q+k+nmFMxY=c2DUmvYt=1gFkNo_g@mail.gmail.com>
-Subject: Re: [PATCH v4 4/7] shared/gatt-client: Add write prepare and execute
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+In-Reply-To: <CABBYNZK3u2xdT9tjjYQHi7m3t5W+i1AGOpnaq1r6QKTQLMqxhw@mail.gmail.com>
+References: <1425903978-24536-1-git-send-email-luiz.dentz@gmail.com>
+	<CAHrH25Si0fHRUTx9D+i2HYg6B6VzEKV7woekuyywUKEijAa9kQ@mail.gmail.com>
+	<CABBYNZK3u2xdT9tjjYQHi7m3t5W+i1AGOpnaq1r6QKTQLMqxhw@mail.gmail.com>
+Date: Mon, 9 Mar 2015 10:58:12 -0700
+Message-ID: <CAHrH25T6R-y30D=sHOEBQ6rWqbTHXyRJCjxzxUMHm9vJJ1-zVQ@mail.gmail.com>
+Subject: Re: [RFC BlueZ] doc: Add LE Advertisement Manager
+From: Arman Uguray <armansito@chromium.org>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-On Mon, Mar 9, 2015 at 12:06 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lukasz,
+> On Mon, Mar 9, 2015 at 10:44 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
 >
-> On Mon, Mar 9, 2015 at 10:23 AM, Lukasz Rymanowski
-> <lukasz.rymanowski@tieto.com> wrote:
->> For Android we need explicit write prepare and execute commands in GATT
->> client. This patch adds that.
+> On Mon, Mar 9, 2015 at 7:36 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi Luiz,
 >>
->> Note that till now prepare and execute has been used only in long
->> write.
+>>> On Mon, Mar 9, 2015 at 5:26 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> Updates the documentation defining a service hierarchy which can be used
+>>> for defining LE Advertisement data and registering these advertisements
+>>> to be broadcast.
+>>>
+>>> Note: Ive made some modifications since the last proposal taking away a
+>>> good number of properties that could conflict if advertisement would be
+>>> combined, in case we cannot use different random addresses for each AD.
+>>> Also I include the intention to use the same interface for
+>>> central/client role so the interface would be exposed in the device
+>>> path.
 >>
->> With this patch it is possible to start reliable write session by
->> the gatt-client. First write prepare will return session ID which shall
->> be used in follow up write prepare request and write execute.
->> ---
->>  src/shared/gatt-client.c | 261 +++++++++++++++++++++++++++++++++++++++++++++++
->>  src/shared/gatt-client.h |  13 +++
->>  2 files changed, 274 insertions(+)
->>
->> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->> index acb6200..30fa883 100644
->> --- a/src/shared/gatt-client.c
->> +++ b/src/shared/gatt-client.c
->> @@ -77,6 +77,8 @@ struct bt_gatt_client {
->>         struct queue *long_write_queue;
->>         bool in_long_write;
->>
->> +       unsigned int reliable_write_session_id;
->> +
->>         /* List of registered disconnect/notification/indication callbacks */
->>         struct queue *notify_list;
->>         struct queue *notify_chrcs;
->> @@ -2211,6 +2213,7 @@ unsigned int bt_gatt_client_write_without_response(
->>  }
->>
->>  struct write_op {
->> +       struct bt_gatt_client *client;
->>         bt_gatt_client_callback_t callback;
->>         void *user_data;
->>         bt_gatt_destroy_func_t destroy;
->> @@ -2596,6 +2599,264 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
->>         return req->id;
->>  }
->>
->> +struct prep_write_op {
->> +       bt_gatt_client_write_long_callback_t callback;
->> +       void *user_data;
->> +       bt_gatt_destroy_func_t destroy;
->> +       uint8_t *pdu;
->> +       uint16_t pdu_len;
->> +};
->> +
->> +static void destroy_prep_write_op(void *data)
->> +{
->> +       struct prep_write_op *op = data;
->> +
->> +       if (op->destroy)
->> +               op->destroy(op->user_data);
->> +
->> +       free(op->pdu);
->> +       free(op);
->> +}
->> +
->> +static void prep_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
->> +                                                               void *user_data)
->> +{
->> +       struct request *req = user_data;
->> +       struct prep_write_op *op = req->data;
->> +       bool success;
->> +       uint8_t att_ecode;
->> +       bool reliable_error;
->> +
->> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
->> +               success = false;
->> +               reliable_error = false;
->> +               att_ecode = process_error(pdu, length);
->> +               goto done;
->> +       }
->> +
->> +       if (opcode != BT_ATT_OP_PREP_WRITE_RSP) {
->> +               success = false;
->> +               reliable_error = false;
->> +               att_ecode = 0;
->> +               goto done;
->> +       }
->> +
->> +       if (!pdu || length != op->pdu_len ||
->> +                                       memcmp(pdu, op->pdu, op->pdu_len)) {
->> +               success = false;
->> +               reliable_error = true;
->> +               att_ecode = 0;
->> +               goto done;
->> +       }
->> +
->> +       success = true;
->> +       reliable_error = false;
->> +       att_ecode = 0;
->> +
->> +done:
->> +       if (op->callback)
->> +               op->callback(success, reliable_error, att_ecode, op->user_data);
->> +}
->> +
->> +static struct request *get_reliable_request(struct bt_gatt_client *client,
->> +                                                       unsigned int id)
->> +{
->> +       struct request *req;
->> +       struct prep_write_op *op;
->> +
->> +       op = new0(struct prep_write_op, 1);
->> +       if (!op)
->> +               return NULL;
->> +
->> +       /* Following prepare writes */
->> +       if (id != 0)
->> +               req = queue_find(client->pending_requests, match_req_id,
->> +                                                       UINT_TO_PTR(id));
->> +       else
->> +               req = request_create(client);
->> +
->> +       if (!req) {
->> +               free(op);
->> +               return NULL;
->> +       }
->> +
->> +       req->data = op;
->> +
->> +       return req;
->> +}
->> +
->> +unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
->> +                               unsigned int id, uint16_t value_handle,
->> +                               uint16_t offset, uint8_t *value,
->> +                               uint16_t length,
->> +                               bt_gatt_client_write_long_callback_t callback,
->> +                               void *user_data,
->> +                               bt_gatt_client_destroy_func_t destroy)
->> +{
->> +       struct request *req;
->> +       struct prep_write_op *op;
->> +       uint8_t pdu[4 + length];
->> +
->> +       if (!client)
->> +               return 0;
->> +
->> +       if (client->in_long_write)
->> +               return 0;
->> +
->> +       /*
->> +        * Make sure that client who owns reliable session continues with
->> +        * prepare writes or this is brand new reliable session (id == 0)
->> +        */
->> +       if (id != client->reliable_write_session_id) {
->> +               util_debug(client->debug_callback, client->debug_data,
->> +                       "There is other reliable write session ongoing %u",
->> +                       client->reliable_write_session_id);
->> +
->> +               return 0;
->> +       }
->> +
->> +       req = get_reliable_request(client, id);
->> +       if (!req)
->> +               return 0;
->> +
->> +       op = (struct prep_write_op *)req->data;
->> +
->> +       op->callback = callback;
->> +       op->user_data = user_data;
->> +       op->destroy = destroy;
->> +
->> +       req->destroy = destroy_prep_write_op;
->> +
->> +       put_le16(value_handle, pdu);
->> +       put_le16(offset, pdu + 2);
->> +       memcpy(pdu + 4, value, length);
->> +
->> +       /*
->> +        * Before sending command we need to remember pdu as we need to validate
->> +        * it in the response. Store handle, offset and value. Therefore
->> +        * increase length by 4 (handle + offset) as we need it in couple places
->> +        * below
->> +        */
->> +       length += 4;
->> +
->> +       op->pdu = malloc(length);
->> +       if (!op->pdu) {
->> +               op->destroy = NULL;
->> +               request_unref(req);
->> +               return 0;
->> +       }
->> +
->> +       memcpy(op->pdu, pdu, length);
->> +       op->pdu_len = length;
->> +
->> +       /*
->> +        * Now we are ready to send command
->> +        * Note that request_unref will be done on write execute
->> +        */
->> +       req->att_id = bt_att_send(client->att, BT_ATT_OP_PREP_WRITE_REQ, pdu,
->> +                                       sizeof(pdu), prep_write_cb, req,
->> +                                       NULL);
->> +       if (!req->att_id) {
->> +               op->destroy = NULL;
->> +               request_unref(req);
->> +               return 0;
->> +       }
->> +
->> +       /*
->> +        * Store first request id for prepare write and treat it as a session id
->> +        * valid until write execute is done
->> +        */
->> +       if (client->reliable_write_session_id == 0)
->> +               client->reliable_write_session_id = req->id;
->> +
->> +       return client->reliable_write_session_id;
->> +}
->> +
->> +static void exec_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
->> +                                                               void *user_data)
->> +{
->> +       struct request *req = user_data;
->> +       struct write_op *op = req->data;
->> +       bool success;
->> +       uint8_t att_ecode;
->> +
->> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
->> +               success = false;
->> +               att_ecode = process_error(pdu, length);
->> +               goto done;
->> +       }
->> +
->> +       if (opcode != BT_ATT_OP_EXEC_WRITE_RSP || pdu || length) {
->> +               success = false;
->> +               att_ecode = 0;
->> +               goto done;
->> +       }
->> +
->> +       success = true;
->> +       att_ecode = 0;
->> +
->> +done:
->> +       if (op->callback)
->> +               op->callback(success, att_ecode, op->user_data);
->> +
->> +       op->client->reliable_write_session_id = 0;
->> +
->> +       start_next_long_write(op->client);
->> +}
->> +
->> +unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
->> +                                       unsigned int id,
->> +                                       bool execute,
->> +                                       bt_gatt_client_callback_t callback,
->> +                                       void *user_data,
->> +                                       bt_gatt_client_destroy_func_t destroy)
->> +{
->> +       struct request *req;
->> +       struct write_op *op;
->> +       uint8_t pdu;
->> +
->> +       if (!client)
->> +               return 0;
->> +
->> +       if (client->in_long_write)
->> +               return 0;
->> +
->> +       if (client->reliable_write_session_id != id)
->> +               return 0;
->> +
->> +       op = new0(struct write_op, 1);
->> +       if (!op)
->> +               return 0;
->> +
->> +       req = queue_find(client->pending_requests, match_req_id,
->> +                                                       UINT_TO_PTR(id));
->> +       if (!req) {
->> +               free(op);
->> +               return 0;
->> +       }
->> +
->> +       op->client = client;
->> +       op->callback = callback;
->> +       op->user_data = user_data;
->> +       op->destroy = destroy;
->> +
->> +       pdu = execute ? 0x01 : 0x00;
->> +
->> +       req->data = op;
->> +       req->destroy = destroy_write_op;
->> +
->> +       req->att_id = bt_att_send(client->att, BT_ATT_OP_EXEC_WRITE_REQ, &pdu,
->> +                                               sizeof(pdu), exec_write_cb,
->> +                                               req, request_unref);
->> +       if (!req->att_id) {
->> +               op->destroy = NULL;
->> +               request_unref(req);
->> +               return 0;
->> +       }
->> +
->> +       return id;
->> +}
->> +
->>  static bool match_notify_chrc_value_handle(const void *a, const void *b)
->>  {
->>         const struct notify_chrc *chrc = a;
->> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
->> index d4358cf..d7cd2ba 100644
->> --- a/src/shared/gatt-client.h
->> +++ b/src/shared/gatt-client.h
->> @@ -108,6 +108,19 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
->>                                 bt_gatt_client_write_long_callback_t callback,
->>                                 void *user_data,
->>                                 bt_gatt_client_destroy_func_t destroy);
->> +unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
->> +                               unsigned int id,
->> +                               uint16_t value_handle, uint16_t offset,
->> +                               uint8_t *value, uint16_t length,
->> +                               bt_gatt_client_write_long_callback_t callback,
->> +                               void *user_data,
->> +                               bt_gatt_client_destroy_func_t destroy);
->> +unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
->> +                                       unsigned int id,
->> +                                       bool execute,
->> +                                       bt_gatt_client_callback_t callback,
->> +                                       void *user_data,
->> +                                       bt_gatt_client_destroy_func_t destroy);
+>> This is good, though should Michael maintain authorship of this commit
+>> since it was his proposal?
 >
-> I recall suggesting to remove execute parameter here and use
-> bt_gatt_client_cancel, that anyway should support cancelling it, note
-> that if execute 0x00 fails it would probably block any further
-> operation to use prepare so I wonder if there is actually a case where
-> cancel can fail, except perhaps if the queue is empty but then we
-> would need a special error code to identify that and discard the
-> prepare queue anyway since in that case it would not block further
-> prepares.
+> I have no problem either way.
+>
+>>> ---
+>>>  doc/advertising-api.txt | 90 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 90 insertions(+)
+>>>  create mode 100644 doc/advertising-api.txt
+>>>
+>>> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+>>> new file mode 100644
+>>> index 0000000..3ab4691
+>>> --- /dev/null
+>>> +++ b/doc/advertising-api.txt
+>>> @@ -0,0 +1,90 @@
+>>> +BlueZ D-Bus LE Advertising API Description
+>>> +******************************************
+>>> +
+>>> +Advertising packets are structured data which is broadcast on the LE Advertising
+>>> +channels and available for all devices in range.  Because of the limited space
+>>> +available in LE Advertising packets (32 bytes) , each packet's contents must be
+>>> +controllable.
+>>> +
+>>> +BlueZ acts as a store for the multiple sets of Advertisement Data which is meant
+>>> +to be sent.  It constructs the correct Advertisement Data from the structured
+>>> +data and communicates the sets of data to the kernel, where it is
+>>> +multiplexed.
+>>> +
+>>> +Advertisement Data objects are registered freely and then referenced by BlueZ
+>>> +when constructing the data sent to the kernel.
+>>> +
+>>> +LE Advertisement Data hierarchy
+>>> +===============================
+>>> +
+>>> +Specifies the Advertisement Data to be broadcast and some advertising
+>>> +parameters.  Properties which are not present will not be included in the
+>>> +data.  Required advertisement data types will always be included.
+>>> +All UUIDs are 128-bit versions in the API, and 16 or 32-bit
+>>> +versions of the same UUID will be used in the advertising data as appropriate.
+>>> +
+>>> +Service                org.bluez
+>>> +Interface      org.bluez.LEAdvertisement1
+>>> +Object path    freely definable or
+>>> +               /org/bluez/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+>>> +
+>>> +Properties     string Type
+>>> +
+>>> +                       Determines the type of advertising packet requested.
+>>> +
+>>> +                       Possible values: "broadcaster" or "peripheral"
+>>> +
+>>> +               array{string} ServiceUUIDs [Optional]
+>>> +
+>>> +                       List of UUIDs to include in the "Service UUID" field of
+>>> +                       the Advertising Data.
+>>> +
+>>> +               dict ManufacturerData [Optional]
+>>> +
+>>> +                       Array of Manufactuer Specific Data fields to include in
+>>> +                       the Advertising Data.  Each dictionary entry includes
+>>> +                       the Manufacturer ID and the raw bytes to include.
+>>> +
+>>> +               array{string} SolicitUUIDs [Optional]
+>>> +
+>>> +                       Array of UUIDs to include in "Service Solicitation"
+>>> +                       Advertisement Data.
+>>> +
+>>> +               dict ServiceData [Optional]
+>>> +
+>>> +                       Array of Service Data to include. The keys are the
+>>> +                       UUID to associate with the data.
+>>> +
+>>> +LE Advertising Manager hierarchy
+>>> +================================
+>>> +
+>>> +The Advertising Manager allows external applications to register Advertisement
+>>> +Data which should be broadcast to devices.  Advertisement Data elements must
+>>> +follow the API for LE Advertisement Data described above.
+>>> +
+>>> +Service                org.bluez
+>>> +Interface      org.bluez.LEAdvertisementManager1 [Experimental]
+>>> +Object path    /org/bluez/{hci0,hci1,...}
+>>> +
+>>> +Methods                RegisterAdvertisement(object advertisement, dict options)
+>>> +
+>>> +                       Registers an advertisement object to be sent over the LE
+>>> +                       Advertising channel.  The service must be exported
+>>> +                       under interface LEAdvertisement1. InvalidArguments
+>>> +                       indicates that the object has invalid or conflicting
+>>> +                       properties.  InvalidLength indicates that the data
+>>> +                       provided generates a data packet which is too long.
+>>
+>> Will this also cause the controller to start advertising? Or would we
+>> want a separate Adapter1 API for this, e.g. StartAdvertising? We need
+>> a good story for switching between central/scanner and
+>> peripheral/broadcaster roles in general.
+>
+> I guess we could do that following similar design as discovery, with
+> Advertising property, etc. We then should probably return an error if
+> a discovering session is ongoing and vice versa.
 >
 
-Yes, you did suggest that, and I missed to comment on that in my cover letter.
-bt_gatt_client_cancel does support canceling of prepare write. I guess
-it  will  be used  mostly when cancel_all is used.
+Yes, we would also need to return an error if we're already connected
+to a remote peripheral for example.
 
-In case of, let say, controlled prepare write session, having callback
-from execute gives you and idea
-when gatt client is ready to send another request. It also fits
-android design as we need to send notification to framework once
-write is done. We do send this notification in the write_cb.
-
-Also, having two ways of  doing write execute 0x00 ( with
-bt_gatt_client_cancel and (imho) more intuitive way
-bt_gatt_client_execute_write(0x00) )
-should not be a big problem, especially that this is our internal API.
-
-BR
-Lukasz
-
-
->>  unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
->>                                 uint16_t chrc_value_handle,
->> --
->> 1.8.4
+>>> +
+>>> +                       Possible errors: org.bluez.Error.InvalidArguments
+>>> +                                        org.bluez.Error.AlreadyExists
+>>> +                                        org.bluez.Error.InvalidLength
+>>> +
+>>> +               UnregisterAdvertisement(object advertisement)
+>>> +
+>>> +                       This unregisters the advertisement that has been
+>>> +                       prevously registered.  The object path parameter must
+>>> +                       match the same value that has been used on registration.
+>>> +
+>>> +                       Possible errors: org.bluez.Error.InvalidArguments
+>>> +                                        org.bluez.Error.DoesNotExist
+>>> +
+>>> --
+>>> 2.1.0
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> Thanks,
+>> Arman
 >
 >
 >
 > --
 > Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Arman
