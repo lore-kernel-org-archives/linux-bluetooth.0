@@ -1,191 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 08/10] tools/bneptest: Add initial support for bneptest tool
-Date: Mon,  9 Mar 2015 17:24:53 +0100
-Message-Id: <1425918295-21976-8-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v3 07/10] profiles/network: Move disconn cb setting to bnep connect method
+Date: Mon,  9 Mar 2015 17:24:52 +0100
+Message-Id: <1425918295-21976-7-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1425918295-21976-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1425918295-21976-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This tool should be designed to help testing bnep on Bluez.
+Disconnect callback can be set while connececting bnep. In previous
+implementation there was separated method to setting up the disconnect
+callback and it was always called immediately after calling connect -
+this method was redundand.
 ---
- .gitignore         |  1 +
- Makefile.tools     | 12 ++++++---
- android/Android.mk | 35 ++++++++++++++++++++++++++
- tools/bneptest.c   | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 119 insertions(+), 3 deletions(-)
- create mode 100644 tools/bneptest.c
+ android/pan.c                 |  5 ++---
+ profiles/network/bnep.c       | 22 +++++++---------------
+ profiles/network/bnep.h       |  6 +++---
+ profiles/network/connection.c |  4 +---
+ 4 files changed, 13 insertions(+), 24 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index a207a0f..a4f06dc 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -82,6 +82,7 @@ tools/gatt-service
- tools/btgatt-client
- tools/btgatt-server
- tools/mcaptest
-+tools/bneptest
- test/sap_client.pyc
- test/bluezutils.pyc
- unit/test-ringbuf
-diff --git a/Makefile.tools b/Makefile.tools
-index e28f3cb..1aafb28 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -223,9 +223,9 @@ noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
- 			tools/hcieventmask tools/hcisecfilter \
- 			tools/btmgmt tools/btinfo tools/btattach \
- 			tools/btsnoop tools/btproxy \
--			tools/btiotest tools/mcaptest tools/cltest \
--			tools/oobtest tools/seq2bseq tools/ibeacon \
--			tools/btgatt-client tools/btgatt-server
-+			tools/btiotest  tools/bneptest tools/mcaptest \
-+			tools/cltest tools/oobtest tools/seq2bseq \
-+			tools/ibeacon tools/btgatt-client tools/btgatt-server
+diff --git a/android/pan.c b/android/pan.c
+index a14ed84..6c9815b 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -324,14 +324,13 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 	if (!dev->session)
+ 		goto fail;
  
- tools_bdaddr_SOURCES = tools/bdaddr.c src/oui.h src/oui.c
- tools_bdaddr_LDADD = lib/libbluetooth-internal.la @UDEV_LIBS@
-@@ -267,6 +267,12 @@ tools_mcaptest_SOURCES = tools/mcaptest.c \
- 				profiles/health/mcap.h profiles/health/mcap.c
- tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+-	perr = bnep_connect(dev->session, bnep_conn_cb, dev);
++	perr = bnep_connect(dev->session, bnep_conn_cb, bnep_disconn_cb, dev,
++									dev);
+ 	if (perr < 0) {
+ 		error("bnep connect req failed: %s", strerror(-perr));
+ 		goto fail;
+ 	}
  
-+tools_bneptest_SOURCES = tools/bneptest.c \
-+				btio/btio.h btio/btio.c \
-+				src/log.c src/log.h \
-+				profiles/network/bnep.h profiles/network/bnep.c
-+tools_bneptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-+
- tools_cltest_SOURCES = tools/cltest.c
- tools_cltest_LDADD = lib/libbluetooth-internal.la src/libshared-mainloop.la
+-	bnep_set_disconnect(dev->session, bnep_disconn_cb, dev);
+-
+ 	if (dev->io) {
+ 		g_io_channel_unref(dev->io);
+ 		dev->io = NULL;
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index e133dd9..87f50fd 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -369,17 +369,21 @@ void bnep_free(struct bnep *session)
+ 	g_free(session);
+ }
  
-diff --git a/android/Android.mk b/android/Android.mk
-index 6c0eda8..f218805 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -256,6 +256,41 @@ LOCAL_MODULE := mcaptest
- include $(BUILD_EXECUTABLE)
+-int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb, void *data)
++int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb,
++					bnep_disconnect_cb disconn_cb,
++					void *conn_data, void *disconn_data)
+ {
+ 	GError *gerr = NULL;
+ 	int err;
  
- #
-+# bneptest
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	bluez/src/log.c \
-+	bluez/btio/btio.c \
-+	bluez/lib/bluetooth.c \
-+	bluez/lib/hci.c \
-+	bluez/profiles/network/bnep.c \
-+	bluez/tools/bneptest.c \
-+
-+LOCAL_C_INCLUDES := \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
-+
-+LOCAL_C_INCLUDES += \
-+	$(LOCAL_PATH)/bluez \
-+
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+
-+LOCAL_SHARED_LIBRARIES := \
-+	libglib \
-+
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := debug
-+LOCAL_MODULE := bneptest
-+
-+include $(BUILD_EXECUTABLE)
-+
-+#
- # avdtptest
- #
+-	if (!session || !conn_cb)
++	if (!session || !conn_cb || !disconn_cb)
+ 		return -EINVAL;
  
-diff --git a/tools/bneptest.c b/tools/bneptest.c
-new file mode 100644
-index 0000000..cafeba9
---- /dev/null
-+++ b/tools/bneptest.c
-@@ -0,0 +1,74 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2015 Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <getopt.h>
-+
-+#include <glib.h>
-+
-+#include "src/log.h"
-+
-+static GMainLoop *mloop;
-+
-+static void usage(void)
-+{
-+	printf("bneptest - BNEP testing ver %s\n", VERSION);
-+	printf("Usage:\n"
-+		"\tbneptest [options]\n");
-+}
-+
-+static struct option main_options[] = {
-+	{ "help",		0, 0, 'h' },
-+	{ 0, 0, 0, 0 }
-+};
-+
-+int main(int argc, char *argv[])
-+{
-+	int opt;
-+
-+	DBG("");
-+
-+	mloop = g_main_loop_new(NULL, FALSE);
-+	if (!mloop) {
-+		printf("Cannot create main loop\n");
-+
-+		exit(1);
-+	}
-+
-+	while ((opt = getopt_long(argc, argv, "h", main_options, NULL))
-+								!= EOF) {
-+		switch (opt) {
-+		case 'h':
-+		default:
-+			usage();
-+			exit(0);
-+		}
-+	}
-+
-+	return 0;
-+}
+ 	session->attempts = 0;
+ 	session->conn_cb = conn_cb;
+-	session->conn_data = data;
++	session->disconn_cb = disconn_cb;
++	session->conn_data = conn_data;
++	session->disconn_data = disconn_data;
+ 
+ 	bt_io_get(session->io, &gerr, BT_IO_OPT_DEST_BDADDR, &session->dst_addr,
+ 							BT_IO_OPT_INVALID);
+@@ -417,18 +421,6 @@ void bnep_disconnect(struct bnep *session)
+ 	bnep_conndel(&session->dst_addr);
+ }
+ 
+-void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
+-								void *data)
+-{
+-	if (!session || !disconn_cb)
+-		return;
+-
+-	if (!session->disconn_cb && !session->disconn_data) {
+-		session->disconn_cb = disconn_cb;
+-		session->disconn_data = data;
+-	}
+-}
+-
+ static int bnep_add_to_bridge(const char *devname, const char *bridge)
+ {
+ 	int ifindex;
+diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
+index da706ac..e9f4c1c 100644
+--- a/profiles/network/bnep.h
++++ b/profiles/network/bnep.h
+@@ -31,10 +31,10 @@ struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
+ void bnep_free(struct bnep *session);
+ 
+ typedef void (*bnep_connect_cb) (char *iface, int err, void *data);
+-int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb, void *data);
+ typedef void (*bnep_disconnect_cb) (void *data);
+-void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
+-								void *data);
++int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb,
++					bnep_disconnect_cb disconn_cb,
++					void *conn_data, void *disconn_data);
+ void bnep_disconnect(struct bnep *session);
+ 
+ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+diff --git a/profiles/network/connection.c b/profiles/network/connection.c
+index da8b86e..ff4ebc9 100644
+--- a/profiles/network/connection.c
++++ b/profiles/network/connection.c
+@@ -258,14 +258,12 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 	if (!nc->session)
+ 		goto failed;
+ 
+-	perr = bnep_connect(nc->session, bnep_conn_cb, nc);
++	perr = bnep_connect(nc->session, bnep_conn_cb, bnep_disconn_cb, nc, nc);
+ 	if (perr < 0) {
+ 		error("bnep connect(): %s (%d)", strerror(-perr), -perr);
+ 		goto failed;
+ 	}
+ 
+-	bnep_set_disconnect(nc->session, bnep_disconn_cb, nc);
+-
+ 	if (nc->io) {
+ 		g_io_channel_unref(nc->io);
+ 		nc->io = NULL;
 -- 
 2.1.0
 
