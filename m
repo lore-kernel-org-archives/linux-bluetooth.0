@@ -1,50 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v5 0/7] shared/gatt-client: Add support for prepare/execute write
-Date: Tue, 10 Mar 2015 15:04:08 +0100
-Message-Id: <1425996255-12146-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH BlueZ 4/4] unit/test-gatt: Check if crypto is enabled
+Date: Tue, 10 Mar 2015 15:31:38 +0200
+Message-Id: <1425994298-2883-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
+References: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is v5 of previous [PATCH 1/2] shared/gatt-client: Add write prepare and execute
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-v2 handles comments from Luiz plus some clean ups.
+This checks if crypto is enabled and in case it is not do not run test
+/TP/GAW/CL/BV-02-C.
+---
+ unit/test-gatt.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-Main change is that gatt client can start reliable session by calling write prepare
-with id == 0. In return gatt client will get session id which should be used in
-following write prepare and execute write.
-
-This set also makes sure that on bt_gatt_client_cancel, reliable session will be
-correctly terminated.
-
-Last patch adds means to test this with btgatt-client
-
-v3:
-* Forgoten fixup on last patch now is merged.
-
-v4:
-* Fix parameters order pointed by Gowtham
-
-v5:
-* handles Luiz comments about moving write execute 0x00 to bt_gatt_client_cancel.
-*** BLURB HERE ***
-
-Lukasz Rymanowski (7):
-  tools/btgatt-client: Minor fix of menu alignment
-  shared/gatt-client: Add helper to cancel long write request
-  shared/gatt-client: Make usage of cancel_long_write_cb
-  shared/gatt-client: Add write prepare and execute
-  shared/gatt-client: Add coexistence of long write and prepare write
-  shared/gatt-client: Support cancel of prepare write
-  tools/btgatt-client: Add prepare and execute write
-
- src/shared/gatt-client.c | 350 ++++++++++++++++++++++++++++++++++++++++++-----
- src/shared/gatt-client.h |  12 ++
- tools/btgatt-client.c    | 212 +++++++++++++++++++++++++++-
- 3 files changed, 540 insertions(+), 34 deletions(-)
-
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 2edcacb..7668e93 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -304,9 +304,12 @@ static gboolean context_quit(gpointer user_data)
+ 	if (step && step->post_func)
+ 		step->post_func(context);
+ 
+-	destroy_context(context);
++	if (context->data->pdu_list[context->pdu_offset].valid)
++		tester_test_abort();
++	else
++		tester_test_passed();
+ 
+-	tester_test_passed();
++	destroy_context(context);
+ 
+ 	return FALSE;
+ }
+@@ -910,6 +913,11 @@ static void test_signed_write(struct context *context)
+ 	uint8_t key[16] = {0xD8, 0x51, 0x59, 0x48, 0x45, 0x1F, 0xEA, 0x32, 0x0D,
+ 				0xC0, 0x5A, 0x2E, 0x88, 0x30, 0x81, 0x88 };
+ 
++	if (!bt_att_has_crypto(context->att)) {
++		context_quit(context);
++		return;
++	}
++
+ 	g_assert(bt_att_set_local_key(context->att, key, local_counter,
+ 								context));
+ 
 -- 
-1.8.4
+2.1.0
 
