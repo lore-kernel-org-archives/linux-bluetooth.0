@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] unit/test-gatt: Check if crypto is enabled
-Date: Tue, 10 Mar 2015 15:31:38 +0200
-Message-Id: <1425994298-2883-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] shared/att: Add bt_att_has_crypto
+Date: Tue, 10 Mar 2015 15:31:37 +0200
+Message-Id: <1425994298-2883-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
 References: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,43 +11,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This checks if crypto is enabled and in case it is not do not run test
-/TP/GAW/CL/BV-02-C.
+This adds the possibility to check if bt_att has crypto enabled.
 ---
- unit/test-gatt.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ src/shared/att.c | 8 ++++++++
+ src/shared/att.h | 1 +
+ 2 files changed, 9 insertions(+)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 2edcacb..7668e93 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -304,9 +304,12 @@ static gboolean context_quit(gpointer user_data)
- 	if (step && step->post_func)
- 		step->post_func(context);
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 7671d67..422cc2c 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -1426,3 +1426,11 @@ bool bt_att_set_remote_key(struct bt_att *att, uint8_t sign_key[16],
  
--	destroy_context(context);
-+	if (context->data->pdu_list[context->pdu_offset].valid)
-+		tester_test_abort();
-+	else
-+		tester_test_passed();
- 
--	tester_test_passed();
-+	destroy_context(context);
- 
- 	return FALSE;
+ 	return sign_set_key(&att->remote_sign, sign_key, func, user_data);
  }
-@@ -910,6 +913,11 @@ static void test_signed_write(struct context *context)
- 	uint8_t key[16] = {0xD8, 0x51, 0x59, 0x48, 0x45, 0x1F, 0xEA, 0x32, 0x0D,
- 				0xC0, 0x5A, 0x2E, 0x88, 0x30, 0x81, 0x88 };
- 
-+	if (!bt_att_has_crypto(context->att)) {
-+		context_quit(context);
-+		return;
-+	}
 +
- 	g_assert(bt_att_set_local_key(context->att, key, local_counter,
- 								context));
- 
++bool bt_att_has_crypto(struct bt_att *att)
++{
++	if (!att)
++		return false;
++
++	return att->crypto ? true : false;
++}
+diff --git a/src/shared/att.h b/src/shared/att.h
+index a440aaf..fb6247e 100644
+--- a/src/shared/att.h
++++ b/src/shared/att.h
+@@ -90,3 +90,4 @@ bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
+ 			bt_att_counter_func_t func, void *user_data);
+ bool bt_att_set_remote_key(struct bt_att *att, uint8_t sign_key[16],
+ 			bt_att_counter_func_t func, void *user_data);
++bool bt_att_has_crypto(struct bt_att *att);
 -- 
 2.1.0
 
