@@ -1,74 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1425994298-2883-4-git-send-email-luiz.dentz@gmail.com>
-References: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
-	<1425994298-2883-4-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 10 Mar 2015 11:07:33 -0700
-Message-ID: <CAHrH25QYC1xSrkpZik_Lar_Vg7EatTYQDnBmvzeM03SKC+gw7g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 4/4] unit/test-gatt: Check if crypto is enabled
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1425331850-31906-1-git-send-email-jpawlowski@google.com>
+References: <1425331850-31906-1-git-send-email-jpawlowski@google.com>
+Date: Tue, 10 Mar 2015 10:31:31 -0700
+Message-ID: <CAD0=r8w1dqQZNZ+0cPTAsA-0D0MeA2wRjM=HEHi4yYEQjJhrNA@mail.gmail.com>
+Subject: Re: [PATCH v1 1/5] Bluetooth: Introduce HCI_QUIRK_SIMULTAENOUS_DISCOVERY
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Jakub Pawlowski <jpawlowski@google.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-> On Tue, Mar 10, 2015 at 6:31 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Mon, Mar 2, 2015 at 1:30 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
 >
-> This checks if crypto is enabled and in case it is not do not run test
-> /TP/GAW/CL/BV-02-C.
+> Some controllers allow both le and classic scan to run at the same
+> time, while others allow only one, le or classic at given time.
+>
+> Since this is specific to each controller, add a new quirk setting
+> that allows drivers to tell the core wether given controller can
+> do both le and classic discovery at same time.
+>
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 > ---
->  unit/test-gatt.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+>  include/net/bluetooth/hci.h | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 >
-> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-> index 2edcacb..7668e93 100644
-> --- a/unit/test-gatt.c
-> +++ b/unit/test-gatt.c
-> @@ -304,9 +304,12 @@ static gboolean context_quit(gpointer user_data)
->         if (step && step->post_func)
->                 step->post_func(context);
->
-> -       destroy_context(context);
-> +       if (context->data->pdu_list[context->pdu_offset].valid)
-> +               tester_test_abort();
-> +       else
-> +               tester_test_passed();
->
-> -       tester_test_passed();
-> +       destroy_context(context);
->
->         return FALSE;
->  }
-> @@ -910,6 +913,11 @@ static void test_signed_write(struct context *context)
->         uint8_t key[16] = {0xD8, 0x51, 0x59, 0x48, 0x45, 0x1F, 0xEA, 0x32, 0x0D,
->                                 0xC0, 0x5A, 0x2E, 0x88, 0x30, 0x81, 0x88 };
->
-> +       if (!bt_att_has_crypto(context->att)) {
-
-Should we assert in this case that
-bt_gatt_client_write_without_response, given true for "signed_write"
-returns 0 without crashing? We would at least be validating the
-current behavior, or perhaps we should add a separate test case for
-it.
-
-> +               context_quit(context);
-> +               return;
-> +       }
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 8e54f82..d64851a 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -160,6 +160,15 @@ enum {
+>          * during the hdev->setup vendor callback.
+>          */
+>         HCI_QUIRK_STRICT_DUPLICATE_FILTER,
 > +
->         g_assert(bt_att_set_local_key(context->att, key, local_counter,
->                                                                 context));
+> +       /* When this quirk is set, scanning for both le and classic devices
+> +        * is done simoultaenously. If it's not set, the scan is
+> +        * interleaved.
+> +        *
+> +        * This quirk can be set before hci_register_dev is called or
+> +        * during the hdev->setup vendor callback.
+> +        */
+> +       HCI_QUIRK_SIMULTAENOUS_DISCOVERY,
+>  };
 >
+>  /* HCI device flags */
 > --
-> 2.1.0
+> 2.2.0.rc0.207.ga3a616c
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Thanks,
-Arman
+Ping?
