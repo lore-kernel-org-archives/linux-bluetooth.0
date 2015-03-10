@@ -1,65 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] shared/tester: Fix teardown multiple times
-Date: Tue, 10 Mar 2015 15:31:36 +0200
-Message-Id: <1425994298-2883-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
-References: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: Update Fast Connectable Behavior to match latest mgmt spec
+Date: Tue, 10 Mar 2015 12:57:57 +0200
+Message-Id: <1425985077-6239-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1425985077-6239-1-git-send-email-johan.hedberg@gmail.com>
+References: <1425985077-6239-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-tester_test* can be called multiple times which cause teardown callback
-to be called multiple times as well leading to to crashes or strange
-behavior.
+Now that the page scan state can change based on the BR/EDR whitelist we
+shouldn't require the connectable setting as a pre-requisite. This patch
+removes the HCI_CONNECTABLE check from set_fast_connectable() and
+removes any changes to the page scan parameters from set_connectable()
+(since the parameters are now independent from any connectable setting
+changes).
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- src/shared/tester.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt.c | 13 -------------
+ 1 file changed, 13 deletions(-)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index acd3df7..d05bf08 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -90,6 +90,7 @@ struct test_case {
- 	gdouble end_time;
- 	unsigned int timeout;
- 	unsigned int timeout_id;
-+	unsigned int teardown_id;
- 	tester_destroy_func_t destroy;
- 	void *user_data;
- };
-@@ -113,6 +114,9 @@ static void test_destroy(gpointer data)
- 	if (test->timeout_id > 0)
- 		g_source_remove(test->timeout_id);
- 
-+	if (test->teardown_id > 0)
-+		g_source_remove(test->teardown_id);
-+
- 	if (test->destroy)
- 		test->destroy(test->user_data);
- 
-@@ -328,6 +332,7 @@ static gboolean teardown_callback(gpointer user_data)
- {
- 	struct test_case *test = user_data;
- 
-+	test->teardown_id = 0;
- 	test->stage = TEST_STAGE_TEARDOWN;
- 
- 	print_progress(test->name, COLOR_MAGENTA, "teardown");
-@@ -528,7 +533,10 @@ static void test_result(enum test_result result)
- 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 840c245a5cf4..f032818bc185 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1968,15 +1968,6 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
  	}
  
--	g_idle_add(teardown_callback, test);
-+	if (test->teardown_id > 0)
-+		return;
-+
-+	test->teardown_id = g_idle_add(teardown_callback, test);
- }
+ no_scan_update:
+-	/* If we're going from non-connectable to connectable or
+-	 * vice-versa when fast connectable is enabled ensure that fast
+-	 * connectable gets disabled. write_fast_connectable won't do
+-	 * anything if the page scan parameters are already what they
+-	 * should be.
+-	 */
+-	if (cp->val || test_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags))
+-		write_fast_connectable(&req, false);
+-
+ 	/* Update the advertising parameters if necessary */
+ 	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags))
+ 		enable_advertising(&req);
+@@ -4664,10 +4655,6 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
+ 				       MGMT_STATUS_NOT_POWERED);
  
- void tester_test_passed(void)
+-	if (!test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
+-		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
+-				       MGMT_STATUS_REJECTED);
+-
+ 	hci_dev_lock(hdev);
+ 
+ 	if (mgmt_pending_find(MGMT_OP_SET_FAST_CONNECTABLE, hdev)) {
 -- 
 2.1.0
 
