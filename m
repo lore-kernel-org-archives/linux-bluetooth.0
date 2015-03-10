@@ -1,107 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add 'Already Paired' error for Pair Device command
-Date: Tue, 10 Mar 2015 22:34:40 +0200
-Message-Id: <1426019680-28715-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <60ACC267-F7D2-4B54-955E-EFEAF04E9801@holtmann.org>
+References: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
+	<1425994298-2883-4-git-send-email-luiz.dentz@gmail.com>
+	<CAHrH25QYC1xSrkpZik_Lar_Vg7EatTYQDnBmvzeM03SKC+gw7g@mail.gmail.com>
+	<CABBYNZKo_FAzYpOwsyDjy1Udp8VtU5c1dyFB2HYDHdi4tSwyBg@mail.gmail.com>
+	<60ACC267-F7D2-4B54-955E-EFEAF04E9801@holtmann.org>
+Date: Tue, 10 Mar 2015 21:39:26 +0200
+Message-ID: <CABBYNZLis_M+OL2O=F=BGewzXPPUihC2ZSNx5tMcS_snBKCU_A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/4] unit/test-gatt: Check if crypto is enabled
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Arman Uguray <armansito@chromium.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcel,
 
-To make the behavior predictable when attempting to pair with a device
-for which we already have a Link Key or Long Term Key, this patch adds a
-new 'Already Paired' error which gets sent in such a scenario.
+On Tue, Mar 10, 2015 at 9:23 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>>>> On Tue, Mar 10, 2015 at 6:31 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>
+>>>> This checks if crypto is enabled and in case it is not do not run test
+>>>> /TP/GAW/CL/BV-02-C.
+>>>> ---
+>>>> unit/test-gatt.c | 12 ++++++++++--
+>>>> 1 file changed, 10 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+>>>> index 2edcacb..7668e93 100644
+>>>> --- a/unit/test-gatt.c
+>>>> +++ b/unit/test-gatt.c
+>>>> @@ -304,9 +304,12 @@ static gboolean context_quit(gpointer user_data)
+>>>>        if (step && step->post_func)
+>>>>                step->post_func(context);
+>>>>
+>>>> -       destroy_context(context);
+>>>> +       if (context->data->pdu_list[context->pdu_offset].valid)
+>>>> +               tester_test_abort();
+>>>> +       else
+>>>> +               tester_test_passed();
+>>>>
+>>>> -       tester_test_passed();
+>>>> +       destroy_context(context);
+>>>>
+>>>>        return FALSE;
+>>>> }
+>>>> @@ -910,6 +913,11 @@ static void test_signed_write(struct context *context)
+>>>>        uint8_t key[16] = {0xD8, 0x51, 0x59, 0x48, 0x45, 0x1F, 0xEA, 0x32, 0x0D,
+>>>>                                0xC0, 0x5A, 0x2E, 0x88, 0x30, 0x81, 0x88 };
+>>>>
+>>>> +       if (!bt_att_has_crypto(context->att)) {
+>>>
+>>> Should we assert in this case that
+>>> bt_gatt_client_write_without_response, given true for "signed_write"
+>>> returns 0 without crashing? We would at least be validating the
+>>> current behavior, or perhaps we should add a separate test case for
+>>> it.
+>>
+>> What do you mean, note that this won't affect the test for seclevel
+>> which test the same code except the signature since the transport is
+>> considered secure already, all it does it check if crypto has been
+>> enabled and the make the test no run in such case since it would
+>> obviously fail. We might have to remove the use of assert in future
+>> and leave tester_run return the proper result at the end.
+>
+> the tester.c code is designed to run all test cases no matter what and give you a summary. Using abort is a bad idea in these cases. If you abort, the summary is pointless. It is then either all pass or abort in the middle.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |  2 ++
- include/net/bluetooth/mgmt.h     |  1 +
- net/bluetooth/hci_core.c         | 27 +++++++++++++++++++++++++++
- net/bluetooth/mgmt.c             |  7 +++++++
- 4 files changed, 37 insertions(+)
+Yep, we should proceed run all tests, but I did not bother changing
+this yet since I want to fix the build for platforms without crypto
+first.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index afc641c5e55c..5cc5a192359d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -967,6 +967,8 @@ struct smp_irk *hci_add_irk(struct hci_dev *hdev, bdaddr_t *bdaddr,
- void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type);
- void hci_smp_irks_clear(struct hci_dev *hdev);
- 
-+bool hci_bdaddr_is_paired(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
-+
- void hci_remote_oob_data_clear(struct hci_dev *hdev);
- struct oob_data *hci_find_remote_oob_data(struct hci_dev *hdev,
- 					  bdaddr_t *bdaddr, u8 bdaddr_type);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 0c737e4b8f57..5bf6af9cee78 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -43,6 +43,7 @@
- #define MGMT_STATUS_CANCELLED		0x10
- #define MGMT_STATUS_INVALID_INDEX	0x11
- #define MGMT_STATUS_RFKILLED		0x12
-+#define MGMT_STATUS_ALREADY_PAIRED	0x13
- 
- struct mgmt_hdr {
- 	__le16	opcode;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index bba4c344c6e0..a35d8441187a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2516,6 +2516,33 @@ void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type)
- 	}
- }
- 
-+bool hci_bdaddr_is_paired(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
-+{
-+	struct smp_ltk *k;
-+	u8 addr_type;
-+
-+	if (type == BDADDR_BREDR) {
-+		if (hci_find_link_key(hdev, bdaddr))
-+			return true;
-+		return false;
-+	}
-+
-+	/* Convert to HCI addr type which struct smp_ltk uses */
-+	if (type == BDADDR_LE_PUBLIC)
-+		addr_type = ADDR_LE_DEV_PUBLIC;
-+	else
-+		addr_type = ADDR_LE_DEV_RANDOM;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
-+		if (k->bdaddr_type == addr_type && !bacmp(bdaddr, &k->bdaddr))
-+			return true;
-+	}
-+	rcu_read_unlock();
-+
-+	return false;
-+}
-+
- /* HCI command timer function */
- static void hci_cmd_timeout(struct work_struct *work)
- {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 49b8e09ffe67..600636c00d34 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3245,6 +3245,13 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
- 
-+	if (hci_bdaddr_is_paired(hdev, &cp->addr.bdaddr, cp->addr.type)) {
-+		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_PAIR_DEVICE,
-+					MGMT_STATUS_ALREADY_PAIRED, &rp,
-+					sizeof(rp));
-+		goto unlock;
-+	}
-+
- 	sec_level = BT_SECURITY_MEDIUM;
- 	auth_type = HCI_AT_DEDICATED_BONDING;
- 
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
