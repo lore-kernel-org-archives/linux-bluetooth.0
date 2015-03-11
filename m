@@ -3,14 +3,16 @@ From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
 Subject: [PATCH v12] doc/adapter-api.txt: SetDiscoveryFilter method.
-Date: Wed, 11 Mar 2015 09:19:19 -0700
-Message-Id: <1426090759-642-1-git-send-email-jpawlowski@google.com>
+Date: Wed, 11 Mar 2015 09:17:16 -0700
+Message-Id: <1426090636-380-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This patch proposes new method, SetDiscoveryFilter to D-Bus Adapter
 API for desktop bluetoothd. It will allow to set per-client discovery
 filter that would limit devices being discovered.
+
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
  doc/adapter-api.txt | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 61 insertions(+)
