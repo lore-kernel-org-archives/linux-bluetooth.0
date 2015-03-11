@@ -1,117 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
-References: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 11 Mar 2015 14:04:38 +0200
-Message-ID: <CABBYNZ++7OY+ETMh-KP1LvnvDCwjf2jj4VB4iaV2WcVdM4H4Lg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] shared/tester: Add tester_test_abort
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] audio/avrcp: Always notify about disconnecting service
+Date: Wed, 11 Mar 2015 10:34:22 +0100
+Message-Id: <1426066462-32151-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1426066462-32151-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1426066462-32151-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+If there is a call to avrcp_connect, state of service is changed to
+BTD_SERVICE_STATE_CONNECTING. If connection failed, state didn't change
+to BTD_SERVICE_STATE_DISCONNECTED because controller_destroy() and
+target_destroy() was not called. Set state of services in session_destroy()
+instead.
+---
+ profiles/audio/avrcp.c | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
 
-On Tue, Mar 10, 2015 at 3:31 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This can be used to abort tests and mark them as not run.
-> ---
->  src/shared/tester.c | 47 ++++++++++++++++++++++++++---------------------
->  src/shared/tester.h |  1 +
->  2 files changed, 27 insertions(+), 21 deletions(-)
->
-> diff --git a/src/shared/tester.c b/src/shared/tester.c
-> index ffcc2ea..acd3df7 100644
-> --- a/src/shared/tester.c
-> +++ b/src/shared/tester.c
-> @@ -495,7 +495,7 @@ void tester_setup_failed(void)
->         test->post_teardown_func(test->test_data);
->  }
->
-> -void tester_test_passed(void)
-> +static void test_result(enum test_result result)
->  {
->         struct test_case *test;
->
-> @@ -512,33 +512,38 @@ void tester_test_passed(void)
->                 test->timeout_id = 0;
->         }
->
-> -       test->result = TEST_RESULT_PASSED;
-> -       print_progress(test->name, COLOR_GREEN, "test passed");
-> +       test->result = result;
-> +       switch (result) {
-> +       case TEST_RESULT_PASSED:
-> +               print_progress(test->name, COLOR_GREEN, "test passed");
-> +               break;
-> +       case TEST_RESULT_FAILED:
-> +               print_progress(test->name, COLOR_RED, "test failed");
-> +               break;
-> +       case TEST_RESULT_NOT_RUN:
-> +               print_progress(test->name, COLOR_YELLOW, "test not run");
-> +               break;
-> +       case TEST_RESULT_TIMED_OUT:
-> +               print_progress(test->name, COLOR_RED, "test timed out");
-> +               break;
-> +       }
->
->         g_idle_add(teardown_callback, test);
->  }
->
-> -void tester_test_failed(void)
-> +void tester_test_passed(void)
->  {
-> -       struct test_case *test;
-> -
-> -       if (!test_current)
-> -               return;
-> -
-> -       test = test_current->data;
-> -
-> -       if (test->stage != TEST_STAGE_RUN)
-> -               return;
-> -
-> -       if (test->timeout_id > 0) {
-> -               g_source_remove(test->timeout_id);
-> -               test->timeout_id = 0;
-> -       }
-> +       test_result(TEST_RESULT_PASSED);
-> +}
->
-> -       test->result = TEST_RESULT_FAILED;
-> -       print_progress(test->name, COLOR_RED, "test failed");
-> +void tester_test_failed(void)
-> +{
-> +       test_result(TEST_RESULT_FAILED);
-> +}
->
-> -       g_idle_add(teardown_callback, test);
-> +void tester_test_abort(void)
-> +{
-> +       test_result(TEST_RESULT_NOT_RUN);
->  }
->
->  void tester_teardown_complete(void)
-> diff --git a/src/shared/tester.h b/src/shared/tester.h
-> index 0231f19..83ef5de 100644
-> --- a/src/shared/tester.h
-> +++ b/src/shared/tester.h
-> @@ -63,6 +63,7 @@ void tester_setup_failed(void);
->
->  void tester_test_passed(void);
->  void tester_test_failed(void);
-> +void tester_test_abort(void);
->
->  void tester_teardown_complete(void);
->  void tester_teardown_failed(void);
-> --
-> 2.1.0
-
-Applied.
-
-
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index a57756e..a67b81e 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -3486,19 +3486,11 @@ static void session_init_control(struct avrcp *session)
+ static void controller_destroy(struct avrcp *session)
+ {
+ 	struct avrcp_data *controller = session->controller;
+-	struct btd_service *service;
+ 
+ 	DBG("%p", controller);
+ 
+ 	g_slist_free_full(controller->players, player_destroy);
+ 
+-	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
+-
+-	if (session->control_id == 0)
+-		btd_service_connecting_complete(service, -EIO);
+-	else
+-		btd_service_disconnecting_complete(service, 0);
+-
+ 	g_free(controller);
+ }
+ 
+@@ -3506,31 +3498,40 @@ static void target_destroy(struct avrcp *session)
+ {
+ 	struct avrcp_data *target = session->target;
+ 	struct avrcp_player *player = target->player;
+-	struct btd_service *service;
+ 
+ 	DBG("%p", target);
+ 
+ 	if (player != NULL)
+ 		player->sessions = g_slist_remove(player->sessions, session);
+ 
+-	service = btd_device_get_service(session->dev, AVRCP_REMOTE_UUID);
+-
+-	if (session->control_id == 0)
+-		btd_service_connecting_complete(service, -EIO);
+-	else
+-		btd_service_disconnecting_complete(service, 0);
+-
+ 	g_free(target);
+ }
+ 
+ static void session_destroy(struct avrcp *session)
+ {
+ 	struct avrcp_server *server = session->server;
++	struct btd_service *service;
+ 
+ 	server->sessions = g_slist_remove(server->sessions, session);
+ 
+ 	session_abort_pending_pdu(session);
+ 
++	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
++	if (service != NULL) {
++		if (session->control_id == 0)
++			btd_service_connecting_complete(service, -EIO);
++		else
++			btd_service_disconnecting_complete(service, 0);
++	}
++
++	service = btd_device_get_service(session->dev, AVRCP_REMOTE_UUID);
++	if (service != NULL) {
++		if (session->control_id == 0)
++			btd_service_connecting_complete(service, -EIO);
++		else
++			btd_service_disconnecting_complete(service, 0);
++	}
++
+ 	if (session->browsing_timer > 0)
+ 		g_source_remove(session->browsing_timer);
+ 
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
