@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v12] doc/adapter-api.txt: SetDiscoveryFilter method.
-Date: Wed, 11 Mar 2015 09:03:26 -0700
-Message-Id: <1426089806-30249-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v11] doc/adapter-api.txt: SetDiscoveryFilter method.
+Date: Wed, 11 Mar 2015 09:00:08 -0700
+Message-Id: <1426089608-29735-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -18,7 +18,7 @@ Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
  1 file changed, 61 insertions(+)
 
 diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 74d235a..1332dcc 100644
+index 74d235a..54281a7 100644
 --- a/doc/adapter-api.txt
 +++ b/doc/adapter-api.txt
 @@ -19,6 +19,8 @@ Methods		void StartDiscovery()
@@ -40,7 +40,7 @@ index 74d235a..1332dcc 100644
 +			caller. When this method is called with no filter
 +			parameter, filter is removed.
 +
-+			Parameters that may be set in the filter dictionary
++			Parameters that might be set in the filter dictionary
 +			include the following:
 +
 +			array{string} UUIDs : filtered service UUIDs (required)
