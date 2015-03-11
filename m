@@ -3,8 +3,8 @@ From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
 Subject: [PATCH v11] doc/adapter-api.txt: SetDiscoveryFilter method.
-Date: Wed, 11 Mar 2015 09:00:08 -0700
-Message-Id: <1426089608-29735-1-git-send-email-jpawlowski@google.com>
+Date: Wed, 11 Mar 2015 08:57:22 -0700
+Message-Id: <1426089442-29388-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -18,7 +18,7 @@ Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
  1 file changed, 61 insertions(+)
 
 diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 74d235a..54281a7 100644
+index 74d235a..fdb2b65 100644
 --- a/doc/adapter-api.txt
 +++ b/doc/adapter-api.txt
 @@ -19,6 +19,8 @@ Methods		void StartDiscovery()
@@ -40,28 +40,28 @@ index 74d235a..54281a7 100644
 +			caller. When this method is called with no filter
 +			parameter, filter is removed.
 +
-+			Parameters that might be set in the filter dictionary
++			Parameters that can be set in the filter dictionary
 +			include the following:
 +
 +			array{string} UUIDs : filtered service UUIDs (required)
 +			int16 RSSI	: RSSI threshold value (optional)
-+			uint16 Pathloss	: Pathloss threshold value (optional)
-+			string Transport: type of scan to run
++			uint16 pathloss	: Pathloss threshold value (optional)
++			string transport: type of scan to run
 +
 +			When a remote device is found that advertises any UUID
 +			from UUIDs, it will be reported if:
-+			- Pathloss and RSSI are both empty,
-+			- only Pathloss param is set, device advertise TX pwer,
-+			  and computed pathloss is less than Pathloss param,
++			- pathloss and RSSI are both empty,
++			- only pathloss param is set, device advertise TX pwer,
++			  and computed pathloss is less than pathloss param,
 +			- only RSSI param is set, and received RSSI is higher
 +			  than RSSI param,
 +
-+			Transport parameter determines the type of scan:
-+				"auto"	- interleaved scan, default value
-+				"bredr"	- BR/EDR inquiry
-+				"le"	- LE scan only
++			transport parameter determines the type of scan:
++				"auto"	- interleaved scan
++				"bredr"	- br/edr inquiry
++				"le"	- le only scan, default value
 +
-+			If "le" or "bredr" Transport is requested, and the
++			If "le" or "bredr" transport is requested, and the
 +			controller doesn't support it, org.bluez.Error.Failed
 +			error will be returned. If "auto" transport is
 +			requested, scan will use LE, BREDR, or both, depending
