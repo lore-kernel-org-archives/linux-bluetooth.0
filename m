@@ -1,42 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] audio/avrcp: Remove redundant check
-Date: Wed, 11 Mar 2015 10:34:21 +0100
-Message-Id: <1426066462-32151-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH v2] Bluetooth: Check for matching IRK when looking for paired LE devices
+Date: Wed, 11 Mar 2015 10:52:08 +0200
+Message-Id: <1426063928-13382-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1426063491-11398-1-git-send-email-johan.hedberg@gmail.com>
+References: <1426063491-11398-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no need to check if device has specific services,
-it was checked in session_init_control.
----
- profiles/audio/avrcp.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index b1552b1..a57756e 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -3394,8 +3394,7 @@ static void target_init(struct avrcp *session)
- 	DBG("%p version 0x%04x", target, target->version);
+If we're given an RPA when checking whether we're paired or not, we
+should consult the local RPA storage whether there's a matching IRK.
+This we we ensure that hci_bdaddr_is_paired() gives the right result
+even when trying to pair a second time with the same device with an RPA.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2: Avoid overwriting callers bdaddr
+
+ net/bluetooth/hci_core.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 4eba9d6fc9a5..e3bbdd537b90 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2519,6 +2519,7 @@ void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type)
+ bool hci_bdaddr_is_paired(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
+ {
+ 	struct smp_ltk *k;
++	struct smp_irk *irk;
+ 	u8 addr_type;
  
- 	service = btd_device_get_service(session->dev, AVRCP_REMOTE_UUID);
--	if (service != NULL)
--		btd_service_connecting_complete(service, 0);
-+	btd_service_connecting_complete(service, 0);
+ 	if (type == BDADDR_BREDR) {
+@@ -2533,6 +2534,12 @@ bool hci_bdaddr_is_paired(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
+ 	else
+ 		addr_type = ADDR_LE_DEV_RANDOM;
  
- 	player = g_slist_nth_data(server->players, 0);
- 	if (player != NULL) {
-@@ -3440,8 +3439,7 @@ static void controller_init(struct avrcp *session)
- 		session->supported_events |= (1 << AVRCP_EVENT_VOLUME_CHANGED);
- 
- 	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
--	if (service != NULL)
--		btd_service_connecting_complete(service, 0);
-+	btd_service_connecting_complete(service, 0);
- 
- 	/* Only create player if category 1 is supported */
- 	if (!(controller->features & AVRCP_FEATURE_CATEGORY_1))
++	irk = hci_get_irk(hdev, bdaddr, addr_type);
++	if (irk) {
++		bdaddr = &irk->bdaddr;
++		addr_type = irk->addr_type;
++	}
++
+ 	rcu_read_lock();
+ 	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
+ 		if (k->bdaddr_type == addr_type && !bacmp(bdaddr, &k->bdaddr)) {
 -- 
 2.1.0
 
