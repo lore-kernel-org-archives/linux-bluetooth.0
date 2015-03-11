@@ -1,38 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] audio/avctp: Cancel outgoing connection in case of conflict
-Date: Wed, 11 Mar 2015 19:11:02 +0100
-Message-Id: <1426097463-5288-4-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 2/4] audio/avrcp: Pass error to session_destroy()
+Date: Wed, 11 Mar 2015 19:11:01 +0100
+Message-Id: <1426097463-5288-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1426097463-5288-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1426097463-5288-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to AVRCP Spec 1.5 AVCTP channel should be closed if both
-sides try establish connection at the same time.
+It will allow us to invoke btd_service_connecting_complete() or
+btd_service_disconnecting_complete() with correct error code.
 ---
- profiles/audio/avctp.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ profiles/audio/avrcp.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 14b0266..22bf35b 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1351,6 +1351,13 @@ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
- 	if (session->control != NULL) {
- 		error("Control: Refusing unexpected connect");
- 		g_io_channel_shutdown(chan, TRUE, NULL);
-+
-+		/*
-+		 * Close AVCTP channel if remote tried connect
-+		 * at the same time
-+		 * AVRCP SPEC V1.5 4.1.1 Connection Establishment
-+		 */
-+		avctp_set_state(session, AVCTP_STATE_DISCONNECTED, -EAGAIN);
- 		return;
- 	}
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index dc57770..414ee25 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -3507,7 +3507,7 @@ static void target_destroy(struct avrcp *session)
+ 	g_free(target);
+ }
  
+-static void session_destroy(struct avrcp *session)
++static void session_destroy(struct avrcp *session, int err)
+ {
+ 	struct avrcp_server *server = session->server;
+ 	struct btd_service *service;
+@@ -3519,7 +3519,7 @@ static void session_destroy(struct avrcp *session)
+ 	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
+ 	if (service != NULL) {
+ 		if (session->control_id == 0)
+-			btd_service_connecting_complete(service, -EIO);
++			btd_service_connecting_complete(service, err);
+ 		else
+ 			btd_service_disconnecting_complete(service, 0);
+ 	}
+@@ -3527,7 +3527,7 @@ static void session_destroy(struct avrcp *session)
+ 	service = btd_device_get_service(session->dev, AVRCP_REMOTE_UUID);
+ 	if (service != NULL) {
+ 		if (session->control_id == 0)
+-			btd_service_connecting_complete(service, -EIO);
++			btd_service_connecting_complete(service, err);
+ 		else
+ 			btd_service_disconnecting_complete(service, 0);
+ 	}
+@@ -3586,7 +3586,7 @@ static void state_changed(struct btd_device *device, avctp_state_t old_state,
+ 		if (session == NULL)
+ 			break;
+ 
+-		session_destroy(session);
++		session_destroy(session, err);
+ 
+ 		break;
+ 	case AVCTP_STATE_CONNECTING:
 -- 
 2.1.0
 
