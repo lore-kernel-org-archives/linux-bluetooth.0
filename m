@@ -1,122 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/5] android/gatt: Implement MTU exchange HAL API
-Date: Wed, 11 Mar 2015 15:41:19 +0100
-Message-Id: <1426084883-10291-1-git-send-email-szymon.janc@tieto.com>
+Message-ID: <550052CA.20407@ubnt.com>
+Date: Wed, 11 Mar 2015 16:35:54 +0200
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] core/gatt-database: Fix memory corruption
+References: <550043CD.7080202@ubnt.com> <CABBYNZLW19LcNQerGUa+U0DTn26HR9LpMqi2=RcPHwiFCHbC9g@mail.gmail.com>
+In-Reply-To: <CABBYNZLW19LcNQerGUa+U0DTn26HR9LpMqi2=RcPHwiFCHbC9g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allow application to query for current MTU. MTU is always
-exchanged on connection and notifications are sent to framework.
+Pointer to on-stack variable was returned from pending_write_new.
 
-When client requests MTU exchange we just report current value but
-don't trigger another exchange procedure (since this is against spec).
+#0  0x00007ffff72047b0 in __memmove_ssse3 () from /usr/lib/libc.so.6
+#1  0x00007ffff78ae440 in ?? () from /usr/lib/libdbus-1.so.3
+#2  0x00007ffff78ad7cc in ?? () from /usr/lib/libdbus-1.so.3
+#3  0x00007ffff789ac46 in ?? () from /usr/lib/libdbus-1.so.3
+#4  0x00000000004720e8 in write_setup_cb (iter=0x7fffffffe710,
+user_data=0x76c2a0) at src/gatt-database.c:1516
+#5  0x00000000004b7b4c in g_dbus_proxy_method_call (proxy=0x75ade0,
+method=0x4e1747 "WriteValue", setup=0x472088 <write_setup_cb>,
+    function=0x4720fd <write_reply_cb>, user_data=0x76c2a0,
+destroy=0x471f28 <pending_op_free>) at gdbus/client.c:875
+#6  0x000000000047235f in send_write (attrib=0x764e00, proxy=0x75ade0,
+owner_queue=0x764250, id=1, value=0x767ff3 "\001\377\177", len=1)
+    at src/gatt-database.c:1597
+#7  0x0000000000472bdf in chrc_write_cb (attrib=0x764e00, id=1,
+offset=0, value=0x767ff3 "\001\377\177", len=1, opcode=82 'R',
+att=0x7606d0,
+    user_data=0x7641d0) at src/gatt-database.c:1865
+#8  0x00000000004c96f2 in gatt_db_attribute_write (attrib=0x764e00,
+offset=0, value=0x767ff3 "\001\377\177", len=1, opcode=82 'R',
+att=0x7606d0,
+    func=0x4c53c8 <write_complete_cb>, user_data=0x772320) at
+src/shared/gatt-db.c:1570
+#9  0x00000000004c5609 in write_cb (opcode=82 'R', pdu=0x767ff1,
+length=3, user_data=0x7630e0) at src/shared/gatt-server.c:796
+#10 0x00000000004bdb35 in handle_notify (att=0x7606d0, opcode=82 'R',
+pdu=0x767ff1 "\f", pdu_len=3) at src/shared/att.c:768
+#11 0x00000000004bddc9 in can_read_data (io=0x7607a0,
+user_data=0x7606d0) at src/shared/att.c:849
+#12 0x00000000004c9c44 in watch_callback (channel=0x7607d0,
+cond=G_IO_IN, user_data=0x760940) at src/shared/io-glib.c:170
+#13 0x00007ffff7b1662d in g_main_context_dispatch () from
+/usr/lib/libglib-2.0.so.0
+#14 0x00007ffff7b16a08 in ?? () from /usr/lib/libglib-2.0.so.0
+#15 0x00007ffff7b16d32 in g_main_loop_run () from
+/usr/lib/libglib-2.0.so.0
+#16 0x0000000000466ba1 in main (argc=1, argv=0x7fffffffec38) at
+src/main.c:661
 ---
- android/gatt.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 60 insertions(+), 3 deletions(-)
+ src/gatt-database.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 9c2a280..1a264ba 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -941,6 +941,39 @@ static bool get_local_mtu(struct gatt_device *dev, uint16_t *mtu)
- 	return true;
- }
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 35f8471..ee24618 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -118,7 +118,7 @@ struct pending_op {
+ 	unsigned int id;
+ 	struct gatt_db_attribute *attrib;
+ 	struct queue *owner_queue;
+-	void *setup_data;
++	struct iovec write_data;
+ };
  
-+static void notify_client_mtu_change(struct app_connection *conn, bool success)
-+{
-+	struct hal_ev_gatt_client_configure_mtu ev;
-+	size_t mtu;
-+
-+	g_attrib_get_buffer(conn->device->attrib, &mtu);
-+
-+	ev.conn_id = conn->id;
-+	ev.status = success ? GATT_SUCCESS : GATT_FAILURE;
-+	ev.mtu = mtu;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_EV_GATT_CLIENT_CONFIGURE_MTU, sizeof(ev), &ev);
-+}
-+
-+static void notify_mtu_change(void *data, void *user_data)
-+{
-+	struct gatt_device *device = user_data;
-+	struct app_connection *conn = data;
-+
-+	if (conn->device != device)
-+		return;
-+
-+	switch (conn->app->type) {
-+	case GATT_CLIENT:
-+		notify_client_mtu_change(conn, true);
-+		break;
-+	case GATT_SERVER:
-+	default:
-+		break;
-+	}
-+}
-+
- static bool update_mtu(struct gatt_device *device, uint16_t rmtu)
+ struct device_state {
+@@ -1509,12 +1509,11 @@ error:
+ static void write_setup_cb(DBusMessageIter *iter, void *user_data)
  {
- 	uint16_t mtu, lmtu;
-@@ -965,6 +998,8 @@ static bool update_mtu(struct gatt_device *device, uint16_t rmtu)
- 		return false;
- 	}
+ 	struct pending_op *op = user_data;
+-	struct iovec *iov = op->setup_data;
+ 	DBusMessageIter array;
  
-+	queue_foreach(app_connections, notify_mtu_change, device);
-+
- 	return true;
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
+ 	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
+-						&iov->iov_base, iov->iov_len);
++						&op->write_data.iov_base, op->write_data.iov_len);
+ 	dbus_message_iter_close_container(iter, &array);
  }
  
-@@ -1600,6 +1635,11 @@ reply:
- 	data.status = status;
- 	queue_foreach(app_connections, notify_app_connect_status_by_device,
- 									&data);
-+
-+	/* For BR/EDR notify about MTU since it is not negotiable*/
-+	if (cid != ATT_CID)
-+		queue_foreach(app_connections, notify_mtu_change, dev);
-+
- 	device_unref(dev);
- 
- 	/* Check if we should restart scan */
-@@ -5676,14 +5716,31 @@ static void handle_client_scan_filter_enable(const void *buf, uint16_t len)
- static void handle_client_configure_mtu(const void *buf, uint16_t len)
+@@ -1561,19 +1560,17 @@ static struct pending_op *pending_write_new(struct queue *owner_queue,
+ 					size_t len)
  {
- 	const struct hal_cmd_gatt_client_configure_mtu *cmd = buf;
-+	static struct app_connection *conn;
-+	uint8_t status;
+ 	struct pending_op *op;
+-	struct iovec iov;
  
--	DBG("conn_id %u", cmd->conn_id);
-+	DBG("conn_id %u mtu %d", cmd->conn_id, cmd->mtu);
+ 	op = new0(struct pending_op, 1);
+ 	if (!op)
+ 		return NULL;
  
--	/* TODO */
-+	conn = find_connection_by_id(cmd->conn_id);
-+	if (!conn) {
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
+-	iov.iov_base = (uint8_t *) value;
+-	iov.iov_len = len;
++	op->write_data.iov_base = (uint8_t *) value;
++	op->write_data.iov_len = len;
  
-+	/*
-+	 * currently MTU is always exchanged on connection, just report current
-+	 * value
-+	 *
-+	 * TODO figure out when send failed status
-+	 * TODO should we fail for BR/EDR?
-+	 */
-+	notify_client_mtu_change(conn, false);
-+	status = HAL_STATUS_SUCCESS;
-+
-+failed:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 					HAL_OP_GATT_CLIENT_CONFIGURE_MTU,
--					HAL_STATUS_UNSUPPORTED);
-+					status);
- }
+ 	op->owner_queue = owner_queue;
+ 	op->attrib = attrib;
+ 	op->id = id;
+-	op->setup_data = &iov;
+ 	queue_push_tail(owner_queue, op);
  
- static void handle_client_conn_param_update(const void *buf, uint16_t len)
+ 	return op;
 -- 
-1.9.3
+1.9.1
+
 
