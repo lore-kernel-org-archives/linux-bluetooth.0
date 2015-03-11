@@ -1,29 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  0/3] Add Write Characteristic Descriptors TC
-Date: Wed, 11 Mar 2015 18:26:26 +0530
-Message-id: <1426078589-26354-1-git-send-email-gowtham.ab@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
+References: <1425994298-2883-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 11 Mar 2015 14:04:38 +0200
+Message-ID: <CABBYNZ++7OY+ETMh-KP1LvnvDCwjf2jj4VB4iaV2WcVdM4H4Lg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/4] shared/tester: Add tester_test_abort
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds the below server test cases (tested against small and large DB):
-1) Write Characteristic Descriptors – from Server
-2) Write Characteristic Descriptor – Invalid Handle
-3) Write Characteristic Descriptor – Write Not Permitted
+Hi,
 
-Gowtham Anandha Babu (3):
-  unit/test-gatt: Add TP/GAW/SR/BV-08-C test
-  unit/test-gatt: Add TP/GAW/SR/BI-20-C test
-  unit/test-gatt: Add TP/GAW/SR/BI-21-C test
+On Tue, Mar 10, 2015 at 3:31 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This can be used to abort tests and mark them as not run.
+> ---
+>  src/shared/tester.c | 47 ++++++++++++++++++++++++++---------------------
+>  src/shared/tester.h |  1 +
+>  2 files changed, 27 insertions(+), 21 deletions(-)
+>
+> diff --git a/src/shared/tester.c b/src/shared/tester.c
+> index ffcc2ea..acd3df7 100644
+> --- a/src/shared/tester.c
+> +++ b/src/shared/tester.c
+> @@ -495,7 +495,7 @@ void tester_setup_failed(void)
+>         test->post_teardown_func(test->test_data);
+>  }
+>
+> -void tester_test_passed(void)
+> +static void test_result(enum test_result result)
+>  {
+>         struct test_case *test;
+>
+> @@ -512,33 +512,38 @@ void tester_test_passed(void)
+>                 test->timeout_id = 0;
+>         }
+>
+> -       test->result = TEST_RESULT_PASSED;
+> -       print_progress(test->name, COLOR_GREEN, "test passed");
+> +       test->result = result;
+> +       switch (result) {
+> +       case TEST_RESULT_PASSED:
+> +               print_progress(test->name, COLOR_GREEN, "test passed");
+> +               break;
+> +       case TEST_RESULT_FAILED:
+> +               print_progress(test->name, COLOR_RED, "test failed");
+> +               break;
+> +       case TEST_RESULT_NOT_RUN:
+> +               print_progress(test->name, COLOR_YELLOW, "test not run");
+> +               break;
+> +       case TEST_RESULT_TIMED_OUT:
+> +               print_progress(test->name, COLOR_RED, "test timed out");
+> +               break;
+> +       }
+>
+>         g_idle_add(teardown_callback, test);
+>  }
+>
+> -void tester_test_failed(void)
+> +void tester_test_passed(void)
+>  {
+> -       struct test_case *test;
+> -
+> -       if (!test_current)
+> -               return;
+> -
+> -       test = test_current->data;
+> -
+> -       if (test->stage != TEST_STAGE_RUN)
+> -               return;
+> -
+> -       if (test->timeout_id > 0) {
+> -               g_source_remove(test->timeout_id);
+> -               test->timeout_id = 0;
+> -       }
+> +       test_result(TEST_RESULT_PASSED);
+> +}
+>
+> -       test->result = TEST_RESULT_FAILED;
+> -       print_progress(test->name, COLOR_RED, "test failed");
+> +void tester_test_failed(void)
+> +{
+> +       test_result(TEST_RESULT_FAILED);
+> +}
+>
+> -       g_idle_add(teardown_callback, test);
+> +void tester_test_abort(void)
+> +{
+> +       test_result(TEST_RESULT_NOT_RUN);
+>  }
+>
+>  void tester_teardown_complete(void)
+> diff --git a/src/shared/tester.h b/src/shared/tester.h
+> index 0231f19..83ef5de 100644
+> --- a/src/shared/tester.h
+> +++ b/src/shared/tester.h
+> @@ -63,6 +63,7 @@ void tester_setup_failed(void);
+>
+>  void tester_test_passed(void);
+>  void tester_test_failed(void);
+> +void tester_test_abort(void);
+>
+>  void tester_teardown_complete(void);
+>  void tester_teardown_failed(void);
+> --
+> 2.1.0
 
- unit/test-gatt.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+Applied.
+
 
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
