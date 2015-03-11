@@ -1,78 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <550043CD.7080202@ubnt.com>
-References: <550043CD.7080202@ubnt.com>
-Date: Wed, 11 Mar 2015 16:06:59 +0200
-Message-ID: <CABBYNZLW19LcNQerGUa+U0DTn26HR9LpMqi2=RcPHwiFCHbC9g@mail.gmail.com>
-Subject: Re: [PATCH] core/gatt-database: Fix memory corruption
+In-Reply-To: <1425996255-12146-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1425996255-12146-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 11 Mar 2015 16:03:17 +0200
+Message-ID: <CABBYNZL=OvT7f1E6PfLk9PXaO93FT9z+8o8Nu-G5+jrRxaQ7Sg@mail.gmail.com>
+Subject: Re: [PATCH v5 0/7] shared/gatt-client: Add support for
+ prepare/execute write
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrejs Hanins <andrejs.hanins@ubnt.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrejs,
+Hi Lukasz,
 
-On Wed, Mar 11, 2015 at 3:31 PM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
-> Pointer to on-stack variable was returned from pending_write_new
-> ---
->  src/gatt-database.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
+On Tue, Mar 10, 2015 at 4:04 PM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> This is v5 of previous [PATCH 1/2] shared/gatt-client: Add write prepare and execute
 >
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index 35f8471..c0135b6 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -1461,6 +1461,7 @@ static void pending_op_free(void *data)
->         if (op->owner_queue)
->                 queue_remove(op->owner_queue, op);
+> v2 handles comments from Luiz plus some clean ups.
 >
-> +       free(op->setup_data);
->         free(op);
->  }
+> Main change is that gatt client can start reliable session by calling write prepare
+> with id == 0. In return gatt client will get session id which should be used in
+> following write prepare and execute write.
 >
-> @@ -1561,19 +1562,24 @@ static struct pending_op *pending_write_new(struct queue *owner_queue,
->                                         size_t len)
->  {
->         struct pending_op *op;
-> -       struct iovec iov;
-> +       struct iovec* iov;
+> This set also makes sure that on bt_gatt_client_cancel, reliable session will be
+> correctly terminated.
 >
->         op = new0(struct pending_op, 1);
->         if (!op)
->                 return NULL;
-> +       iov = new0(struct iovec, 1);
-> +       if (!iov) {
-> +               free(op);
-> +               return NULL;
-> +       }
-
-I guess we can eliminate the allocation and have the iov declared as
-part of pending_op as setup_data, btw even though this is pretty
-obvious fix Id include a backtrace whenever possible.
-
-> -       iov.iov_base = (uint8_t *) value;
-> -       iov.iov_len = len;
-> +       iov->iov_base = (uint8_t *) value;
-> +       iov->iov_len = len;
+> Last patch adds means to test this with btgatt-client
 >
->         op->owner_queue = owner_queue;
->         op->attrib = attrib;
->         op->id = id;
-> -       op->setup_data = &iov;
-> +       op->setup_data = iov;
->         queue_push_tail(owner_queue, op);
+> v3:
+> * Forgoten fixup on last patch now is merged.
 >
->         return op;
-> --
-> 1.9.1
+> v4:
+> * Fix parameters order pointed by Gowtham
+>
+> v5:
+> * handles Luiz comments about moving write execute 0x00 to bt_gatt_client_cancel.
+> *** BLURB HERE ***
+>
+> Lukasz Rymanowski (7):
+>   tools/btgatt-client: Minor fix of menu alignment
+>   shared/gatt-client: Add helper to cancel long write request
+>   shared/gatt-client: Make usage of cancel_long_write_cb
+>   shared/gatt-client: Add write prepare and execute
+>   shared/gatt-client: Add coexistence of long write and prepare write
+>   shared/gatt-client: Support cancel of prepare write
+>   tools/btgatt-client: Add prepare and execute write
+>
+>  src/shared/gatt-client.c | 350 ++++++++++++++++++++++++++++++++++++++++++-----
+>  src/shared/gatt-client.h |  12 ++
+>  tools/btgatt-client.c    | 212 +++++++++++++++++++++++++++-
+>  3 files changed, 540 insertions(+), 34 deletions(-)
 >
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.8.4
 
+Applied, thanks.
 
 
 -- 
