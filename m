@@ -3,8 +3,8 @@ From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
 Subject: [PATCH v12] doc/adapter-api.txt: SetDiscoveryFilter method.
-Date: Wed, 11 Mar 2015 09:17:16 -0700
-Message-Id: <1426090636-380-1-git-send-email-jpawlowski@google.com>
+Date: Wed, 11 Mar 2015 09:03:26 -0700
+Message-Id: <1426089806-30249-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
