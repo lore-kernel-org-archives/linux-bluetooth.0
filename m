@@ -1,39 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix missing rcu_read_unlock() in hci_bdaddr_is_paired()
-Date: Wed, 11 Mar 2015 08:55:51 +0200
-Message-Id: <1426056951-3412-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v2 5/5] Bluetooth: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for BTUSB_CSR
+Date: Tue, 10 Mar 2015 22:53:37 -0700
+Message-Id: <1426053217-9011-5-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1426053217-9011-1-git-send-email-jpawlowski@google.com>
+References: <1426053217-9011-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+CSR controllers can do both LE and classic scan at once.
 
-When finding a matching LTK the rcu_read_unlock() function was failing
-to release the RCU read lock. This patch adds the missing call to
-rcu_reaD_unlock().
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- net/bluetooth/hci_core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a35d8441187a..4eba9d6fc9a5 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2535,8 +2535,10 @@ bool hci_bdaddr_is_paired(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
- 
- 	rcu_read_lock();
- 	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
--		if (k->bdaddr_type == addr_type && !bacmp(bdaddr, &k->bdaddr))
-+		if (k->bdaddr_type == addr_type && !bacmp(bdaddr, &k->bdaddr)) {
-+			rcu_read_unlock();
- 			return true;
-+		}
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 36f66a3..0019da5 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3090,6 +3090,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 		/* Fake CSR devices with broken commands */
+ 		if (bcdDevice <= 0x100)
+ 			hdev->setup = btusb_setup_csr;
++
++		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
  	}
- 	rcu_read_unlock();
  
+ 	if (id->driver_info & BTUSB_SNIFFER) {
 -- 
-2.1.0
+2.2.0.rc0.207.ga3a616c
 
