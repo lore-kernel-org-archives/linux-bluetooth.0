@@ -2,15 +2,15 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v2 4/5] Bluetooth: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for BTUSB_INTEL
-Date: Tue, 10 Mar 2015 22:53:36 -0700
-Message-Id: <1426053217-9011-4-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v2 3/5] Bluetooth: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for BTUSB_ATH3012
+Date: Tue, 10 Mar 2015 22:53:35 -0700
+Message-Id: <1426053217-9011-3-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1426053217-9011-1-git-send-email-jpawlowski@google.com>
 References: <1426053217-9011-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Intel controllers can do both LE and classic scan at once.
+Atheros controllers can do both LE and classic scan at once.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
@@ -18,17 +18,17 @@ Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 11bebf5..36f66a3 100644
+index c34a875..11bebf5 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -3022,6 +3022,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->shutdown = btusb_shutdown_intel;
- 		hdev->set_bdaddr = btusb_set_bdaddr_intel;
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+@@ -3045,6 +3045,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	if (id->driver_info & BTUSB_ATH3012) {
+ 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
 +		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
  	}
  
- 	if (id->driver_info & BTUSB_INTEL_NEW) {
 -- 
 2.2.0.rc0.207.ga3a616c
 
