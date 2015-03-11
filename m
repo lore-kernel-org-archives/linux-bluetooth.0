@@ -1,60 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <550043CD.7080202@ubnt.com>
-Date: Wed, 11 Mar 2015 15:31:57 +0200
-From: Andrejs Hanins <andrejs.hanins@ubnt.com>
-MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] core/gatt-database: Fix memory corruption
-Content-Type: text/plain; charset=utf-8
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH  3/3] unit/test-gatt: Add TP/GAW/SR/BI-21-C test
+Date: Wed, 11 Mar 2015 18:26:29 +0530
+Message-id: <1426078589-26354-4-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1426078589-26354-1-git-send-email-gowtham.ab@samsung.com>
+References: <1426078589-26354-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Pointer to on-stack variable was returned from pending_write_new
+Verify that a Generic Attribute Profile server can detect and
+reject a Write Characteristic Descriptor Request to a non-writeable
+characteristic descriptor and issue a Write Not Permitted Response.
 ---
- src/gatt-database.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ unit/test-gatt.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 35f8471..c0135b6 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -1461,6 +1461,7 @@ static void pending_op_free(void *data)
- 	if (op->owner_queue)
- 		queue_remove(op->owner_queue, op);
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 119205a..1babe11 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -3203,5 +3203,17 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x12, 0x0f, 0xf0, 0x01, 0x02, 0x03),
+ 			raw_pdu(0x01, 0x12, 0x0f, 0xf0, 0x01));
  
-+	free(op->setup_data);
- 	free(op);
++	define_test_server("/TP/GAW/SR/BI-21-C/small", test_server,
++			ts_small_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x12, 0x13, 0xf0, 0x01, 0x02, 0x03),
++			raw_pdu(0x01, 0x12, 0x13, 0xf0, 0x03));
++
++	define_test_server("/TP/GAW/SR/BI-21-C/large-1", test_server,
++			ts_large_db_1, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x12, 0x04, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x01, 0x12, 0x04, 0x00, 0x03));
++
+ 	return tester_run();
  }
- 
-@@ -1561,19 +1562,24 @@ static struct pending_op *pending_write_new(struct queue *owner_queue,
- 					size_t len)
- {
- 	struct pending_op *op;
--	struct iovec iov;
-+	struct iovec* iov;
- 
- 	op = new0(struct pending_op, 1);
- 	if (!op)
- 		return NULL;
-+	iov = new0(struct iovec, 1);
-+	if (!iov) {
-+		free(op);
-+		return NULL;
-+	}
- 
--	iov.iov_base = (uint8_t *) value;
--	iov.iov_len = len;
-+	iov->iov_base = (uint8_t *) value;
-+	iov->iov_len = len;
- 
- 	op->owner_queue = owner_queue;
- 	op->attrib = attrib;
- 	op->id = id;
--	op->setup_data = &iov;
-+	op->setup_data = iov;
- 	queue_push_tail(owner_queue, op);
- 
- 	return op;
 -- 
 1.9.1
 
