@@ -1,56 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 1/7] profiles/network: Fix sending error in bnep server add
-Date: Thu, 12 Mar 2015 17:41:17 +0100
-Message-ID: <5150499.1tWFAFZMjX@leonov>
-In-Reply-To: <1426176926-22702-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1426176926-22702-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH] tools/btmgmt: refactor of repeated scan type
+Date: Thu, 12 Mar 2015 09:38:33 -0700
+Message-Id: <1426178313-28011-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+this patch replaces often repeated scan type with defined constants.
+---
+ tools/btmgmt.c | 54 +++++++++++++++++++-----------------------------------
+ 1 file changed, 19 insertions(+), 35 deletions(-)
 
-On Thursday 12 of March 2015 17:15:26 Grzegorz Kolodziejczyk wrote:
-> If bnep server add will not proceed successfully, approperiate error
-> should be returned. Now it returns error if control message send will
-> fail.
-> ---
->  profiles/network/bnep.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-> index adddc33..779c5fb 100644
-> --- a/profiles/network/bnep.c
-> +++ b/profiles/network/bnep.c
-> @@ -650,6 +650,7 @@ int bnep_server_add(int sk, char *bridge, char *iface,
-> const bdaddr_t *addr, /* Processing BNEP_SETUP_CONNECTION_REQUEST_MSG */
->  	rsp = bnep_setup_decode(sk, req, &dst);
->  	if (rsp != BNEP_SUCCESS) {
-> +		err = -rsp;
->  		error("bnep: error while decoding setup connection request: %d",
->  									rsp);
->  		goto reply;
-> @@ -673,10 +674,11 @@ int bnep_server_add(int sk, char *bridge, char *iface,
-> const bdaddr_t *addr, rsp = BNEP_CONN_NOT_ALLOWED;
-> 
->  reply:
-> -	err = bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp);
-> -	if (err < 0)
-> +	if (bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp) < 0) {
-> +		err = -errno;
->  		error("bnep: send ctrl rsp error: %s (%d)", strerror(errno),
->  									errno);
-> +	}
-> 
->  	return err;
->  }
-
-Patch applied, thanks.
-
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index e8f76bb..fe25874 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -58,6 +58,10 @@
+ #include "src/shared/util.h"
+ #include "src/shared/mgmt.h"
+ 
++#define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
++#define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
++#define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
++
+ static struct mgmt *mgmt = NULL;
+ static uint16_t mgmt_index = MGMT_INDEX_NONE;
+ 
+@@ -1739,7 +1743,7 @@ static void cmd_find_service(struct mgmt *mgmt, uint16_t index, int argc,
+ 	uuid_t uuid;
+ 	uint128_t uint128;
+ 	uuid_t uuid128;
+-	uint8_t type;
++	uint8_t type = SCAN_TYPE_DUAL;
+ 	int8_t rssi;
+ 	uint16_t count;
+ 	int opt;
+@@ -1747,10 +1751,6 @@ static void cmd_find_service(struct mgmt *mgmt, uint16_t index, int argc,
+ 	if (index == MGMT_INDEX_NONE)
+ 		index = 0;
+ 
+-	type = 0;
+-	type |= (1 << BDADDR_BREDR);
+-	type |= (1 << BDADDR_LE_PUBLIC);
+-	type |= (1 << BDADDR_LE_RANDOM);
+ 	rssi = 127;
+ 	count = 0;
+ 
+@@ -1763,14 +1763,12 @@ static void cmd_find_service(struct mgmt *mgmt, uint16_t index, int argc,
+ 					find_service_options, NULL)) != -1) {
+ 		switch (opt) {
+ 		case 'l':
+-			type &= ~(1 << BDADDR_BREDR);
+-			type |= (1 << BDADDR_LE_PUBLIC);
+-			type |= (1 << BDADDR_LE_RANDOM);
++			type &= ~SCAN_TYPE_BREDR;
++			type |= SCAN_TYPE_LE;
+ 			break;
+ 		case 'b':
+-			type |= (1 << BDADDR_BREDR);
+-			type &= ~(1 << BDADDR_LE_PUBLIC);
+-			type &= ~(1 << BDADDR_LE_RANDOM);
++			type |= SCAN_TYPE_BREDR;
++			type &= ~SCAN_TYPE_LE;
+ 			break;
+ 		case 'u':
+ 			if (count == MAX_UUIDS) {
+@@ -1850,29 +1848,22 @@ static struct option find_options[] = {
+ static void cmd_find(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
+ {
+ 	struct mgmt_cp_start_discovery cp;
+-	uint8_t type;
++	uint8_t type = SCAN_TYPE_DUAL;
+ 	int opt;
+ 
+ 	if (index == MGMT_INDEX_NONE)
+ 		index = 0;
+ 
+-	type = 0;
+-	type |= (1 << BDADDR_BREDR);
+-	type |= (1 << BDADDR_LE_PUBLIC);
+-	type |= (1 << BDADDR_LE_RANDOM);
+-
+ 	while ((opt = getopt_long(argc, argv, "+lbh", find_options,
+ 								NULL)) != -1) {
+ 		switch (opt) {
+ 		case 'l':
+-			type &= ~(1 << BDADDR_BREDR);
+-			type |= (1 << BDADDR_LE_PUBLIC);
+-			type |= (1 << BDADDR_LE_RANDOM);
++			type &= ~SCAN_TYPE_BREDR;
++			type |= SCAN_TYPE_LE;
+ 			break;
+ 		case 'b':
+-			type |= (1 << BDADDR_BREDR);
+-			type &= ~(1 << BDADDR_LE_PUBLIC);
+-			type &= ~(1 << BDADDR_LE_RANDOM);
++			type |= SCAN_TYPE_BREDR;
++			type &= ~SCAN_TYPE_LE;
+ 			break;
+ 		case 'h':
+ 			find_usage();
+@@ -1930,29 +1921,22 @@ static void cmd_stop_find(struct mgmt *mgmt, uint16_t index, int argc,
+ 			  char **argv)
+ {
+ 	struct mgmt_cp_stop_discovery cp;
+-	uint8_t type;
++	uint8_t type = SCAN_TYPE_DUAL;
+ 	int opt;
+ 
+ 	if (index == MGMT_INDEX_NONE)
+ 		index = 0;
+ 
+-	type = 0;
+-	type |= (1 << BDADDR_BREDR);
+-	type |= (1 << BDADDR_LE_PUBLIC);
+-	type |= (1 << BDADDR_LE_RANDOM);
+-
+ 	while ((opt = getopt_long(argc, argv, "+lbh", stop_find_options,
+ 								NULL)) != -1) {
+ 		switch (opt) {
+ 		case 'l':
+-			type &= ~(1 << BDADDR_BREDR);
+-			type |= (1 << BDADDR_LE_PUBLIC);
+-			type |= (1 << BDADDR_LE_RANDOM);
++			type &= ~SCAN_TYPE_BREDR;
++			type |= SCAN_TYPE_LE;
+ 			break;
+ 		case 'b':
+-			type |= (1 << BDADDR_BREDR);
+-			type &= ~(1 << BDADDR_LE_PUBLIC);
+-			type &= ~(1 << BDADDR_LE_RANDOM);
++			type |= SCAN_TYPE_BREDR;
++			type &= ~SCAN_TYPE_LE;
+ 			break;
+ 		case 'h':
+ 		default:
 -- 
-BR
-Szymon Janc
+2.2.0.rc0.207.ga3a616c
+
