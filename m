@@ -1,173 +1,202 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 10/10] android/pts: Add BNEP PTS 6.0 results for android 5.0
+Date: Thu, 12 Mar 2015 11:04:36 +0100
+Message-ID: <6575527.cKVHveLcYa@uw000953>
+In-Reply-To: <1425918295-21976-10-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1425918295-21976-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1425918295-21976-10-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <2844331.AvQ85qZQJp@uw000953>
-References: <1425918295-21976-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<1425918295-21976-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<2844331.AvQ85qZQJp@uw000953>
-Date: Thu, 12 Mar 2015 11:05:16 +0100
-Message-ID: <CAMv5GbeViy7oun=EvhrwvahnO2EFK8dMPDoxOt29eSjONY8zvw@mail.gmail.com>
-Subject: Re: [PATCH v3 05/10] profiles/network: Remove unneded bnep_uuid
- function from bnep code
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Grzegorz,
 
-On 12 March 2015 at 11:02, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Grzegorz,
->
-> On Monday 09 of March 2015 17:24:50 Grzegorz Kolodziejczyk wrote:
->> This function is no longer needed since connection and server can handle
->> this funcionality by itself.
->> ---
->>  profiles/network/bnep.c       | 10 ----------
->>  profiles/network/bnep.h       |  1 -
->>  profiles/network/connection.c | 19 ++++++++++++-------
->>  profiles/network/server.c     | 24 +++++++++++++++++++++---
->>  4 files changed, 33 insertions(+), 21 deletions(-)
->>
->> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
->> index 3fe63f0..a81a260 100644
->> --- a/profiles/network/bnep.c
->> +++ b/profiles/network/bnep.c
->> @@ -85,16 +85,6 @@ struct bnep {
->>       void    *disconn_data;
->>  };
->>
->> -const char *bnep_uuid(uint16_t id)
->> -{
->> -     int i;
->> -
->> -     for (i = 0; __svc[i].uuid128; i++)
->> -             if (__svc[i].id == id)
->> -                     return __svc[i].uuid128;
->> -     return NULL;
->> -}
->> -
->>  const char *bnep_name(uint16_t id)
->>  {
->>       int i;
->> diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
->> index 31579f9..811ea14 100644
->> --- a/profiles/network/bnep.h
->> +++ b/profiles/network/bnep.h
->> @@ -26,7 +26,6 @@ struct bnep;
->>  int bnep_init(void);
->>  int bnep_cleanup(void);
->>
->> -const char *bnep_uuid(uint16_t id);
->>  const char *bnep_name(uint16_t id);
->>
->>  struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
->> diff --git a/profiles/network/connection.c b/profiles/network/connection.c
->> index 4311cc9..da8b86e 100644
->> --- a/profiles/network/connection.c
->> +++ b/profiles/network/connection.c
->> @@ -284,21 +284,23 @@ static DBusMessage *local_connect(DBusConnection *conn,
->>       struct btd_service *service;
->>       struct network_conn *nc;
->>       const char *svc;
->> -     const char *uuid;
->>       uint16_t id;
->>       int err;
->> +     char uuid_str[MAX_LEN_UUID_STR];
->> +     bt_uuid_t uuid;
->>
->>       if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &svc,
->>                                               DBUS_TYPE_INVALID) == FALSE)
->>               return btd_error_invalid_args(msg);
->>
->>       id = get_pan_srv_id(svc);
->> -     uuid = bnep_uuid(id);
->> +     bt_uuid16_create(&uuid, id);
->> +     bt_uuid_to_uuid128(&uuid, &uuid);
->>
->> -     if (uuid == NULL)
->> +     if (bt_uuid_to_string(&uuid, uuid_str, MAX_LEN_UUID_STR) < 0)
->>               return btd_error_invalid_args(msg);
->>
->> -     service = btd_device_get_service(peer->device, uuid);
->> +     service = btd_device_get_service(peer->device, uuid_str);
->>       if (service == NULL)
->>               return btd_error_not_supported(msg);
->>
->> @@ -439,15 +441,18 @@ static gboolean network_property_get_uuid(const GDBusPropertyTable *property,
->>  {
->>       struct network_peer *peer = data;
->>       struct network_conn *nc;
->> -     const char *uuid;
->> +     char uuid_str[MAX_LEN_UUID_STR];
->> +     bt_uuid_t uuid;
->>
->>       nc = find_connection_by_state(peer->connections, CONNECTED);
->>       if (nc == NULL)
->>               return FALSE;
->>
->> -     uuid = bnep_uuid(nc->id);
->> +     bt_uuid16_create(&uuid, nc->id);
->> +     bt_uuid_to_uuid128(&uuid, &uuid);
->> +     bt_uuid_to_string(&uuid, uuid_str, MAX_LEN_UUID_STR);
->>
->> -     dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
->> +     dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid_str);
->>
->>       return TRUE;
->>  }
->> diff --git a/profiles/network/server.c b/profiles/network/server.c
->> index 9caabb0..e05bc1a 100644
->> --- a/profiles/network/server.c
->> +++ b/profiles/network/server.c
->> @@ -114,14 +114,32 @@ static struct network_server *find_server(GSList *list, uint16_t id)
->>  static struct network_server *find_server_by_uuid(GSList *list,
->>                                                       const char *uuid)
->>  {
->> +     bt_uuid_t srv_uuid, bnep_uuid;
->> +
->>       for (; list; list = list->next) {
->>               struct network_server *ns = list->data;
->> +             bt_uuid16_create(&bnep_uuid, ns->id);
->>
->> -             if (strcasecmp(uuid, bnep_uuid(ns->id)) == 0)
->> +             /* UUID value compare */
->> +             if (!bt_string_to_uuid(&srv_uuid, uuid) &&
->> +                                     !bt_uuid_cmp(&srv_uuid, &bnep_uuid))
->>                       return ns;
->
-> Please call bt_string_to_uuid() before loop and based on its result
-> check if uuid or name compare is needed.
->
-> This should make code a bit faster and easier to read.
->
-Ok, I agree. I'll reorganize this.
->>
->> -             if (strcasecmp(uuid, bnep_name(ns->id)) == 0)
->> -                     return ns;
->> +             /* String value compare */
->> +             switch (ns->id) {
->> +             case BNEP_SVC_PANU:
->> +                     if (!strcasecmp(uuid, "panu"))
->> +                             return ns;
->> +                     break;
->> +             case BNEP_SVC_NAP:
->> +                     if (!strcasecmp(uuid, "nap"))
->> +                             return ns;
->> +                     break;
->> +             case BNEP_SVC_GN:
->> +                     if (!strcasecmp(uuid, "gn"))
->> +                             return ns;
->> +                     break;
->> +             }
->>       }
->>
->>       return NULL;
->>
->
-> --
-> Best regards,
-> Szymon Janc
-Best regards,
-Grzegorz Kolodziejczyk
+On Monday 09 of March 2015 17:24:55 Grzegorz Kolodziejczyk wrote:
+> This patch adds test case list and results for BNEP profile against
+> android 5.0
+> ---
+>  android/pics-bnep.txt  | 26 ++++++++++++++
+>  android/pixit-bnep.txt | 30 ++++++++++++++++
+>  android/pts-bnep.txt   | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 148 insertions(+)
+>  create mode 100644 android/pics-bnep.txt
+>  create mode 100644 android/pixit-bnep.txt
+>  create mode 100644 android/pts-bnep.txt
+> 
+> diff --git a/android/pics-bnep.txt b/android/pics-bnep.txt
+> new file mode 100644
+> index 0000000..2279c9a
+> --- /dev/null
+> +++ b/android/pics-bnep.txt
+> @@ -0,0 +1,26 @@
+> +BNEP PICS for the PTS tool.
+> +
+> +PTS version: 6.0
+> +
+> +* - different than PTS defaults
+> +# - not yet implemented/supported
+> +
+> +M - mandatory if such role selected
+> +O - optional
+> +
+> +		Profile Version
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_BNEP_1_1	True		BNEP Connection Setup (M)
+> +TSPC_BNEP_1_2	False		BNEP Data Packet Reception (M)
+> +TSPC_BNEP_1_3	False		BNEP Data Packet Transmission (M)
+> +TSPC_BNEP_1_3a	False		BNEP Compressed Packet Transmission (O)
+
+1_2 1_3 and 1_3a should be True.
+
+> +TSPC_BNEP_1_3b	False		BNEP Compressed Packet Transmission Source Only
+> +				(O)
+> +TSPC_BNEP_1_4	True		BNEP Control Message Processing (M)
+> +TSPC_BNEP_1_5	True		BNEP Extension Header Processing (M)
+> +TSPC_BNEP_1_6	True		Network Protocol Filter Message Transmission (O)
+> +TSPC_BNEP_1_7	True		Multicast Address Filter Message Transmission
+> +				(O)
+> +-------------------------------------------------------------------------------
+> diff --git a/android/pixit-bnep.txt b/android/pixit-bnep.txt
+> new file mode 100644
+> index 0000000..9a26cd2
+> --- /dev/null
+> +++ b/android/pixit-bnep.txt
+> @@ -0,0 +1,30 @@
+> +BNEP PIXIT for the PTS tool.
+> +
+> +PTS version: 6.0
+> +
+> +* - different than PTS defaults
+> +& - should be set to IUT Bluetooth address
+> +# - should be set to PTS's bin/audio folder
+> +
+> +Required PIXIT settings
+> +-------------------------------------------------------------------------------
+> +Parameter Name			Value
+> +-------------------------------------------------------------------------------
+> +TSPX_class_of_device		04041C
+> +TSPX_security_control_data
+> +TSPX_content_protection_data
+> +TSPX_bd_addr_iut		112233445566 (*&)
+> +TSPX_delete_link_key		FALSE
+> +TSPX_pin_code			1234
+> +TSPX_security_enabled		FALSE
+> +TSPX_time_guard			300000
+> +TSPX_use_implicit_send		TRUE
+> +TSPX_auth_password		0000
+> +TSPX_auth_user_id		PTS
+> +TSPX_l2cap_psm			000F
+> +TSPX_rfcomm_channel		8
+> +TSPX_no_confirmations		FALSE
+> +TSPX_UUID_dest_address		1116
+> +TSPX_UUID_source_address	1115
+> +TSPX_MAC_dest_address		000000000000 (*&)
+> +TSPX_MAC_source_address		000000000000 (*&)
+> diff --git a/android/pts-bnep.txt b/android/pts-bnep.txt
+> new file mode 100644
+> index 0000000..7945385
+> --- /dev/null
+> +++ b/android/pts-bnep.txt
+> @@ -0,0 +1,92 @@
+> +PTS test results for BNEP
+> +
+> +PTS version: 6.0
+> +Tested: 03-March-2015
+> +Android version: 5.0
+> +Kernel version: 3.20
+> +
+> +Results:
+> +PASS	test passed
+> +FAIL	test failed
+> +INC	test is inconclusive
+> +N/A	test is disabled due to PICS setup
+> +
+> +--------------------------------------------------------------------------------
+> +Test Name		Result	Notes
+> +--------------------------------------------------------------------------------
+> +TC_CTRL_BV_01_C		PASS	bneptest -s
+> +TC_CTRL_BV_02_C		PASS	bneptest -c <PTS addr>
+> +TC_CTRL_BV_03_C		PASS	bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_CTRL_BV_04_C		INC	PTS issue #13169
+> +				bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_CTRL_BV_05_C		INC	PTS issue #13169
+> +				bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_CTRL_BV_06_C		INC	PTS issue #13169
+> +				bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_CTRL_BV_07_C		INC	PTS issue #13170
+> +				bneptest -c <PTS addr> -t 3 -d 0 -e 1500
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_CTRL_BV_08_C		INC	PTS issue #13169
+> +				bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_CTRL_BV_09_C		INC	PTS issue #13170
+> +				bneptest -c 00:1b:dc:06:06:ca -n enp0s29u1u7
+> +					-t 5 -g 00:00:00:00:00:00
+> +					-j ff:ff:ff:ff:ff:ff
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_CTRL_BV_10_C		INC	PTS issue #13169
+> +				bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_CTRL_BV_19_C		INC	PTS issue #13169
+> +				bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_RX_TYPE_0_BV_11_C	N/A
+> +TC_RX_C_BV_12_C		N/A
+> +TC_RX_C_S_BV_13_C	N/A
+> +TC_RX_C_S_BV_14_C	N/A
+> +TC_RX_TYPE_0_BV_15_C	INC	PTS issue #13169
+> +				bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_RX_TYPE_0_BV_16_C	INC	PTS issue #13171
+> +				bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_RX_TYPE_0_BV_17_C	INC	PTS issue #13169
+> +				bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_RX_TYPE_0_BV_18_C	INC	PTS issue #13171
+> +				bneptest -s
+> +				Note: could be necessary setting approperiate
+> +					naming of interface using option
+> +					-n <iface name>, eg. -n enp0s29u1u7
+> +TC_TX_TYPE_0_BV_20_C	N/A
+> +TC_TX_C_BV_21_C		N/A
+> +TC_TX_C_S_BV_22_C	N/A
+> +TC_TX_C_D_BV_23_C	N/A
+> 
+
+-- 
+Best regards, 
+Szymon Janc
