@@ -2,90 +2,75 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ 10/12] advertising-manager: Parse ManufacturerSpecificData
-Date: Thu, 12 Mar 2015 10:11:57 -0700
-Message-Id: <1426180319-16509-11-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ 09/12] advertising-manager: Parse SolicitUUIDs
+Date: Thu, 12 Mar 2015 10:11:56 -0700
+Message-Id: <1426180319-16509-10-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1426180319-16509-1-git-send-email-jamuraa@chromium.org>
 References: <1426180319-16509-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the ManufacturerSpecificData property of the LEAdvertisement1
+Parse the SolicitUUIDs property of the LEAdvertisement1 object.
 ---
- src/advertising-manager.c   | 58 +++++++++++++++++++++++++++++++++++++++++++++
- tools/advertisement-example |  1 +
- 2 files changed, 59 insertions(+)
+ src/advertising-manager.c   | 43 +++++++++++++++++++++++++++++++++++++++++++
+ tools/advertisement-example |  5 +++++
+ 2 files changed, 48 insertions(+)
 
 diff --git a/src/advertising-manager.c b/src/advertising-manager.c
-index e7c24c6..cb76482 100644
+index 92e5cad..e7c24c6 100644
 --- a/src/advertising-manager.c
 +++ b/src/advertising-manager.c
-@@ -250,6 +250,58 @@ fail:
+@@ -212,6 +212,44 @@ fail:
  	return false;
  }
  
-+static bool parse_advertising_manufacturer_data(GDBusProxy *proxy,
-+						struct advertising_data *data)
++static bool parse_advertising_solicit_uuids(GDBusProxy *proxy,
++					struct advertising_data *data)
 +{
-+	DBusMessageIter iter, entries;
++	DBusMessageIter iter, ariter;
 +
-+	if (!g_dbus_proxy_get_property(proxy, "ManufacturerSpecificData",
-+									&iter))
++	if (!g_dbus_proxy_get_property(proxy, "SolicitUUIDs", &iter))
 +		return true;
 +
 +	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
 +		return false;
 +
-+	dbus_message_iter_recurse(&iter, &entries);
++	dbus_message_iter_recurse(&iter, &ariter);
 +
-+	advertising_data_clear_manufacturer_data(data);
++	advertising_data_clear_solicit_uuid(data);
 +
-+	while (dbus_message_iter_get_arg_type(&entries)
-+						== DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter value, entry;
-+		uint16_t manuf_id;
-+		uint8_t *manuf_data;
-+		int len;
++	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
++		const char *uuid_str;
++		bt_uuid_t uuid;
 +
-+		dbus_message_iter_recurse(&entries, &entry);
-+		dbus_message_iter_get_basic(&entry, &manuf_id);
++		dbus_message_iter_get_basic(&ariter, &uuid_str);
 +
-+		dbus_message_iter_next(&entry);
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_ARRAY)
++		DBG("Adding SolicitUUID: %s", uuid_str);
++
++		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
 +			goto fail;
 +
-+		dbus_message_iter_recurse(&entry, &value);
++		advertising_data_add_solicit_uuid(data, &uuid);
 +
-+		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_BYTE)
-+			goto fail;
-+
-+		dbus_message_iter_get_fixed_array(&value, &manuf_data, &len);
-+
-+		DBG("Adding ManufactuerSpecificData for %04x", manuf_id);
-+
-+		advertising_data_add_manufacturer_data(data, manuf_id,
-+							manuf_data, len);
-+
-+		dbus_message_iter_next(&entries);
++		dbus_message_iter_next(&ariter);
 +	}
 +
 +	return true;
 +
 +fail:
-+	advertising_data_clear_manufacturer_data(data);
++	advertising_data_clear_solicit_uuid(data);
 +	return false;
 +}
 +
  static void refresh_advertisement(struct advertisement *ad)
  {
  	DBG("Refreshing advertisement: %s", ad->path);
-@@ -275,6 +327,12 @@ static bool parse_advertisement(struct advertisement *ad)
+@@ -232,6 +270,11 @@ static bool parse_advertisement(struct advertisement *ad)
  		return false;
  	}
  
-+	if (!parse_advertising_manufacturer_data(ad->proxy, ad->data)) {
-+		error("Property \"ManufactuerSpecificData\" failed to parse"
-+								" correctly");
++	if (!parse_advertising_solicit_uuids(ad->proxy, ad->data)) {
++		error("Property \"SolicitUUIDs\" failed to parse correctly");
 +		return false;
 +	}
 +
@@ -93,17 +78,21 @@ index e7c24c6..cb76482 100644
  
  	refresh_advertisement(ad);
 diff --git a/tools/advertisement-example b/tools/advertisement-example
-index 2227009..96554dd 100644
+index fb2bdde..2227009 100644
 --- a/tools/advertisement-example
 +++ b/tools/advertisement-example
-@@ -114,6 +114,7 @@ class TestAdvertisement(Advertisement):
-         Advertisement.__init__(self, bus, index, 'broadcast')
-         self.add_service_uuid('0000180D-0000-1000-8000-00805F9B34FB')
-         self.add_service_uuid('0000180F-0000-1000-8000-00805F9B34FB')
-+        self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
+@@ -78,6 +78,11 @@ class Advertisement(dbus.service.Object):
+             self.service_uuids = []
+         self.service_uuids.append(uuid)
  
- 
- def register_ad_cb():
++    def add_solicit_uuid(self, uuid):
++        if not self.solicit_uuids:
++            self.solicit_uuids = []
++        self.solicit_uuids.append(uuid)
++
+     def add_manufacturer_data(self, manuf_code, data):
+         if not self.manufacturer_specific_data:
+             self.manufacturer_specific_data = dict()
 -- 
 2.2.0.rc0.207.ga3a616c
 
