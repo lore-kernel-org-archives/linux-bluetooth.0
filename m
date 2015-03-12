@@ -1,63 +1,248 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
+From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 1/2] unit/test-hog: Add TC/HGRF/RH/BV-08-I test
-Date: Thu, 12 Mar 2015 18:12:55 +0100
-Message-Id: <1426180376-28475-1-git-send-email-mariusz.skamra@tieto.com>
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [BlueZ 02/12] core: advertising: add LEAdvertisingManager stubs
+Date: Thu, 12 Mar 2015 10:11:49 -0700
+Message-Id: <1426180319-16509-3-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1426180319-16509-1-git-send-email-jamuraa@chromium.org>
+References: <1426180319-16509-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that all Report Reference characteristic descriptors for all
-Report characteristics of Report Type: Feature Report can be read
-by a Report Host IUT.
+Introducing src/advertising-manager which will implement the
+org.bluez.LEAdvertisingManager1 D-Bus interface defined in
+doc/advertising-api.txt.  Each LE-capable controller gets
+an instance of the interface.
 ---
- unit/test-hog.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ Makefile.am               |   1 +
+ src/adapter.c             |  19 ++++++++
+ src/advertising-manager.c | 120 ++++++++++++++++++++++++++++++++++++++++++++++
+ src/advertising-manager.h |  25 ++++++++++
+ 4 files changed, 165 insertions(+)
+ create mode 100644 src/advertising-manager.c
+ create mode 100644 src/advertising-manager.h
 
-diff --git a/unit/test-hog.c b/unit/test-hog.c
-index 941e860..29fe37b 100644
---- a/unit/test-hog.c
-+++ b/unit/test-hog.c
-@@ -270,5 +270,38 @@ int main(int argc, char *argv[])
- 				0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
- 				0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13));
+diff --git a/Makefile.am b/Makefile.am
+index d0da411..38f9420 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -175,6 +175,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
+ 			src/uinput.h \
+ 			src/plugin.h src/plugin.c \
+ 			src/storage.h src/storage.c \
++			src/advertising-manager.h src/advertising-manager.c \
+ 			src/agent.h src/agent.c \
+ 			src/error.h src/error.c \
+ 			src/adapter.h src/adapter.c \
+diff --git a/src/adapter.c b/src/adapter.c
+index 329e9b4..d4401ec 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -74,6 +74,7 @@
+ #include "attrib/gatt.h"
+ #include "attrib-server.h"
+ #include "gatt-database.h"
++#include "advertising-manager.h"
+ #include "eir.h"
  
-+	define_test("TP/HGRF/RH/BV-08-I", test_hog,
-+		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
-+		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x05, 0x00, 0x12,
-+			0x18, 0x06, 0x00, 0x0a, 0x00, 0x12, 0x18),
-+		raw_pdu(0x10, 0x0b, 0x00, 0xff, 0xff, 0x00, 0x28),
-+		raw_pdu(0x01, 0x10, 0x0b, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x03, 0x28),
-+		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x0a, 0x04, 0x00,
-+			0x4d, 0x2a),
-+		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x02, 0x28),
-+		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x02, 0x28),
-+		raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x03, 0x28),
-+		raw_pdu(0x09, 0x07, 0x08, 0x00, 0x02, 0x09, 0x00,
-+			0x4d, 0x2a),
-+		raw_pdu(0x08, 0x04, 0x00, 0x05, 0x00, 0x03, 0x28),
-+		raw_pdu(0x01, 0x08, 0x04, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x09, 0x00, 0x0a, 0x00, 0x03, 0x28),
-+		raw_pdu(0x01, 0x08, 0x04, 0x00, 0x0a),
-+		raw_pdu(0x0a, 0x04, 0x00),
-+		raw_pdu(0x0b, 0xee, 0xee, 0xff, 0xff),
-+		raw_pdu(0x04, 0x05, 0x00, 0x05, 0x00),
-+		raw_pdu(0x05, 0x01, 0x05, 0x00, 0x08, 0x29),
-+		raw_pdu(0x0a, 0x09, 0x00),
-+		raw_pdu(0x0b, 0xff, 0xff, 0xee, 0xee),
-+		raw_pdu(0x04, 0x0a, 0x00, 0x0a, 0x00),
-+		raw_pdu(0x05, 0x01, 0x0a, 0x00, 0x08, 0x29),
-+		raw_pdu(0x0a, 0x05, 0x00),
-+		raw_pdu(0x0b, 0x01, 0x03),
-+		raw_pdu(0x0a, 0x0a, 0x00),
-+		raw_pdu(0x0b, 0x02, 0x03));
+ #define ADAPTER_INTERFACE	"org.bluez.Adapter1"
+@@ -210,6 +211,7 @@ struct btd_adapter {
+ 	sdp_list_t *services;		/* Services associated to adapter */
+ 
+ 	struct btd_gatt_database *database;
++	struct btd_advertising_manager *adv_manager;
+ 
+ 	gboolean initialized;
+ 
+@@ -4607,6 +4609,9 @@ static void adapter_remove(struct btd_adapter *adapter)
+ 	btd_gatt_database_destroy(adapter->database);
+ 	adapter->database = NULL;
+ 
++	btd_advertising_manager_destroy(adapter->adv_manager);
++	adapter->adv_manager = NULL;
 +
- 	return tester_run();
- }
+ 	g_slist_free(adapter->pin_callbacks);
+ 	adapter->pin_callbacks = NULL;
+ 
+@@ -6679,6 +6684,20 @@ static int adapter_register(struct btd_adapter *adapter)
+ 		return -EINVAL;
+ 	}
+ 
++	/* Don't start advertising managers on non-LE controllers. */
++	if (adapter->supported_settings && MGMT_SETTING_LE) {
++		adapter->adv_manager = btd_advertising_manager_new(adapter);
++		if (!adapter->adv_manager) {
++			error("Failed to register LEAdvertisingManager1 "
++						"interface for adapter");
++			btd_gatt_database_destroy(adapter->database);
++			adapter->database = NULL;
++			return -EINVAL;
++		}
++	} else {
++		error("Not starting LEAdvertisingManager, LE not supported");
++	}
++
+ 	db = btd_gatt_database_get_db(adapter->database);
+ 	adapter->db_id = gatt_db_register(db, services_modified,
+ 							services_modified,
+diff --git a/src/advertising-manager.c b/src/advertising-manager.c
+new file mode 100644
+index 0000000..754b6ff
+--- /dev/null
++++ b/src/advertising-manager.c
+@@ -0,0 +1,120 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2015  Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ */
++
++#include "advertising-manager.h"
++
++#include <dbus/dbus.h>
++#include <gdbus/gdbus.h>
++
++#include "adapter.h"
++#include "dbus-common.h"
++#include "log.h"
++#include "src/shared/util.h"
++
++#define LE_ADVERTISING_MGR_IFACE "org.bluez.LEAdvertisingManager1"
++
++struct btd_advertising_manager {
++	struct btd_adapter *adapter;
++};
++
++static DBusMessage *register_advertisement(DBusConnection *conn,
++						DBusMessage *msg,
++						void *user_data)
++{
++	DBG("RegisterAdvertisement");
++
++	/* TODO */
++	return NULL;
++}
++
++static DBusMessage *unregister_advertisement(DBusConnection *conn,
++						DBusMessage *msg,
++						void *user_data)
++{
++	DBG("UnregisterAdvertisement");
++
++	/* TODO */
++	return NULL;
++}
++
++static const GDBusMethodTable methods[] = {
++	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterAdvertisement",
++					GDBUS_ARGS({ "advertisement", "o"},
++							{ "options", "a{sv}" }),
++					NULL, register_advertisement) },
++	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("UnregisterAdvertisement",
++						GDBUS_ARGS({"service", "o"}),
++						NULL,
++						unregister_advertisement) },
++	{ }
++};
++
++static struct btd_advertising_manager *
++advertising_manager_create(struct btd_adapter *adapter)
++{
++	struct btd_advertising_manager *manager;
++
++	manager = new0(struct btd_advertising_manager, 1);
++	if (!manager)
++		return NULL;
++
++	manager->adapter = adapter;
++
++	if (!g_dbus_register_interface(btd_get_dbus_connection(),
++						adapter_get_path(adapter),
++						LE_ADVERTISING_MGR_IFACE,
++						methods, NULL, NULL, adapter,
++						NULL)) {
++		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
++		free(manager);
++		return NULL;
++	}
++
++	return manager;
++}
++
++struct btd_advertising_manager *
++btd_advertising_manager_new(struct btd_adapter *adapter)
++{
++	struct btd_advertising_manager *manager;
++
++	if (!adapter)
++		return NULL;
++
++	manager = advertising_manager_create(adapter);
++	if (!manager)
++		return NULL;
++
++	DBG("LE Advertising Manager created for adapter: %s",
++						adapter_get_path(adapter));
++
++	return manager;
++}
++
++void btd_advertising_manager_destroy(struct btd_advertising_manager *manager)
++{
++	if (!manager)
++		return;
++
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++					adapter_get_path(manager->adapter),
++					LE_ADVERTISING_MGR_IFACE);
++
++	free(manager);
++}
+diff --git a/src/advertising-manager.h b/src/advertising-manager.h
+new file mode 100644
+index 0000000..4046013
+--- /dev/null
++++ b/src/advertising-manager.h
+@@ -0,0 +1,25 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2015  Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ */
++
++struct btd_adapter;
++struct btd_advertising_manager;
++
++struct btd_advertising_manager *btd_advertising_manager_new(
++						struct btd_adapter *adapter);
++void btd_advertising_manager_destroy(struct btd_advertising_manager *manager);
 -- 
-1.9.1
+2.2.0.rc0.207.ga3a616c
 
