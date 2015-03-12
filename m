@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 01/10] profiles/network: Move bnep connection setup logic to bnep
-Date: Thu, 12 Mar 2015 11:12:15 +0100
-Message-ID: <3172619.upGm7hUu5J@uw000953>
-In-Reply-To: <1425918295-21976-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1425918295-21976-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH v3 09/10] tools/bneptest: Add generic connect/listen funcionality
+Date: Thu, 12 Mar 2015 11:09:49 +0100
+Message-ID: <2281588.dR79bxzHDs@uw000953>
+In-Reply-To: <1425918295-21976-9-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1425918295-21976-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1425918295-21976-9-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,358 +14,618 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Grzegorz,
 
-On Monday 09 of March 2015 17:24:46 Grzegorz Kolodziejczyk wrote:
-> BNEP connection set up logic which was added before bnep_server_add,
-> can be private method of bnep. Moved logic was almost doubled in two
-> cases: NAP role in PAN, server listening. Now set up and connect
-> scenario check of bnep connection is only handled in bnep part for
-> listen connections.
+On Monday 09 of March 2015 17:24:54 Grzegorz Kolodziejczyk wrote:
+
+There is typo in commit message: funcionality -> functionality
+
+> This patch adds general funcionality of bnep connect and listen.
 > ---
->  android/pan.c             |  27 ++--------
->  profiles/network/bnep.c   | 128 ++++++++++++++++++++++++++++------------------
->  profiles/network/bnep.h   |   6 +--
->  profiles/network/server.c |  53 +++++++++++--------
->  4 files changed, 118 insertions(+), 96 deletions(-)
+>  tools/bneptest.c | 553 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 548 insertions(+), 5 deletions(-)
 > 
-> diff --git a/android/pan.c b/android/pan.c
-> index 2afc92a..a1356eb 100644
-> --- a/android/pan.c
-> +++ b/android/pan.c
-> @@ -463,8 +463,7 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
->  {
->  	struct pan_device *dev = user_data;
->  	uint8_t packet[BNEP_MTU];
-> -	struct bnep_setup_conn_req *req = (void *) packet;
-> -	uint16_t src_role, dst_role, rsp = BNEP_CONN_NOT_ALLOWED;
-> +	uint16_t rsp = BNEP_CONN_NOT_ALLOWED;
->  	int sk, n, err;
+> diff --git a/tools/bneptest.c b/tools/bneptest.c
+> index cafeba9..251b71d 100644
+> --- a/tools/bneptest.c
+> +++ b/tools/bneptest.c
+> @@ -26,43 +26,549 @@
+>  #endif
 >  
->  	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-> @@ -481,24 +480,8 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
->  		goto failed;
->  	}
+>  #include <stdio.h>
+> +#include <signal.h>
+>  #include <stdlib.h>
+>  #include <getopt.h>
+> +#include <stdbool.h>
+> +#include <errno.h>
+> +#include <unistd.h>
+> +#include <sys/ioctl.h>
+> +#include <net/if.h>
+> +#include <linux/sockios.h>
+> +#include <netinet/in.h>
+> +#include <linux/if_bridge.h>
+> +
+> +#include <bluetooth/bluetooth.h>
+> +#include <bluetooth/hci.h>
+> +#include <bluetooth/hci_lib.h>
 >  
-> -	/* Highest known control command id BNEP_FILTER_MULT_ADDR_RSP 0x06 */
-> -	if (req->type == BNEP_CONTROL &&
-> -					req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
-> -		error("cmd not understood");
-> -		bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_CMD_NOT_UNDERSTOOD,
-> -								req->ctrl);
-> -		goto failed;
-> -	}
-> -
-> -	if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ) {
-> -		error("cmd is not BNEP_SETUP_CONN_REQ %02X %02X", req->type,
-> -								req->ctrl);
-> -		goto failed;
-> -	}
-> -
-> -	rsp = bnep_setup_decode(req, &dst_role, &src_role);
-> -	if (rsp != BNEP_SUCCESS) {
-> -		error("bnep_setup_decode failed");
-> +	if (n < 3) {
-> +		error("pan: to few setup connection request data received");
->  		goto failed;
->  	}
+>  #include <glib.h>
 >  
-> @@ -509,8 +492,8 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
->  		goto failed;
->  	}
->  
-> -	if (bnep_server_add(sk, dst_role, BNEP_BRIDGE, dev->iface,
-> -							&dev->dst) < 0) {
-> +	if (bnep_server_add(sk, BNEP_BRIDGE, dev->iface, &dev->dst, packet, n)
-> +									< 0) {
->  		error("pan: server_connadd failed");
->  		rsp = BNEP_CONN_NOT_ALLOWED;
->  		goto failed;
-> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-> index 0493260..0a41d73 100644
-> --- a/profiles/network/bnep.c
-> +++ b/profiles/network/bnep.c
-> @@ -524,63 +524,25 @@ static int bnep_del_from_bridge(const char *devname, const char *bridge)
->  	return err;
->  }
->  
-> -int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
-> -						const bdaddr_t *addr)
-> -{
-> -	int err;
-> -
-> -	if (!bridge || !iface || !addr)
-> -		return -EINVAL;
-> -
-> -	err = bnep_connadd(sk, dst, iface);
-> -	if (err < 0)
-> -		return err;
-> -
-> -	err = bnep_add_to_bridge(iface, bridge);
-> -	if (err < 0) {
-> -		bnep_conndel(addr);
-> -		return err;
-> -	}
-> -
-> -	return bnep_if_up(iface);
-> -}
-> -
-> -void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr)
-> -{
-> -	if (!bridge || !iface || !addr)
-> -		return;
-> -
-> -	bnep_del_from_bridge(iface, bridge);
-> -	bnep_if_down(iface);
-> -	bnep_conndel(addr);
-> -}
-> -
-> -ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp)
-> -{
-> -	struct bnep_control_rsp rsp;
-> -
-> -	rsp.type = type;
-> -	rsp.ctrl = ctrl;
-> -	rsp.resp = htons(resp);
-> -
-> -	return send(sk, &rsp, sizeof(rsp), 0);
-> -}
-> -
-> -uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
-> -								uint16_t *src)
-> +static uint16_t bnep_setup_decode(int sk, struct bnep_setup_conn_req *req,
-> +								uint16_t *dst)
->  {
->  	const uint8_t bt_base[] = { 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
->  					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB };
-> +	uint16_t src;
->  	uint8_t *dest, *source;
->  	uint32_t val;
->  
-> +	if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ)
-> +		return BNEP_CONN_NOT_ALLOWED;
-> +
->  	dest = req->service;
->  	source = req->service + req->uuid_size;
->  
->  	switch (req->uuid_size) {
->  	case 2: /* UUID16 */
->  		*dst = get_be16(dest);
-> -		*src = get_be16(source);
-> +		src = get_be16(source);
->  		break;
->  	case 16: /* UUID128 */
->  		/* Check that the bytes in the UUID, except the service ID
-> @@ -604,7 +566,7 @@ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
->  		if (val > 0xffff)
->  			return BNEP_CONN_INVALID_SRC;
->  
-> -		*src = val;
-> +		src = val;
->  		break;
->  	default:
->  		return BNEP_CONN_INVALID_SVC;
-> @@ -614,12 +576,13 @@ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
->  	switch (*dst) {
->  	case BNEP_SVC_NAP:
->  	case BNEP_SVC_GN:
-> -		if (*src == BNEP_SVC_PANU)
-> +		if (src == BNEP_SVC_PANU)
->  			return BNEP_SUCCESS;
-> +
->  		return BNEP_CONN_INVALID_SRC;
->  	case BNEP_SVC_PANU:
-> -		if (*src == BNEP_SVC_PANU || *src == BNEP_SVC_GN ||
-> -							*src == BNEP_SVC_NAP)
-> +		if (src == BNEP_SVC_PANU || src == BNEP_SVC_GN ||
-> +							src == BNEP_SVC_NAP)
->  			return BNEP_SUCCESS;
->  
->  		return BNEP_CONN_INVALID_SRC;
-> @@ -627,3 +590,70 @@ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
->  
->  	return BNEP_CONN_INVALID_DST;
->  }
-> +
-> +int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
-> +						uint8_t *setup_data, int len)
-> +{
-> +	int err;
-> +	uint16_t dst = NULL;
-> +	struct bnep_setup_conn_req *req = (void *) setup_data;
-> +
-> +	/* Highest known Control command ID
-> +	 * is BNEP_FILTER_MULT_ADDR_RSP = 0x06 */
-> +	if (req->type == BNEP_CONTROL &&
-> +				req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
-> +		uint8_t pkt[3];
-> +
-> +		pkt[0] = BNEP_CONTROL;
-> +		pkt[1] = BNEP_CMD_NOT_UNDERSTOOD;
-> +		pkt[2] = req->ctrl;
-> +
-> +		send(sk, pkt, sizeof(pkt), 0);
-> +
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Processing BNEP_SETUP_CONNECTION_REQUEST_MSG */
-> +	err = bnep_setup_decode(sk, req, &dst);
-> +	if (err < 0) {
-> +		error("bnep: error while decoding setup connection request: %d",
-> +									err);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!bridge || !iface || !addr || !dst)
-> +		return -EINVAL;
-> +
-> +	err = bnep_connadd(sk, dst, iface);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	err = bnep_add_to_bridge(iface, bridge);
-> +	if (err < 0) {
-> +		bnep_conndel(addr);
-> +		return err;
-> +	}
-> +
-> +	return bnep_if_up(iface);
-> +}
-> +
-> +void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr)
-> +{
-> +	if (!bridge || !iface || !addr)
-> +		return;
-> +
-> +	bnep_del_from_bridge(iface, bridge);
-> +	bnep_if_down(iface);
-> +	bnep_conndel(addr);
-> +}
-> +
-> +ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp)
-> +{
-> +	struct bnep_control_rsp rsp;
-> +
-> +	rsp.type = type;
-> +	rsp.ctrl = ctrl;
-> +	rsp.resp = htons(resp);
-> +
-> +	return send(sk, &rsp, sizeof(rsp), 0);
-> +}
-> diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
-> index b0a91e5..2686ea8 100644
-> --- a/profiles/network/bnep.h
-> +++ b/profiles/network/bnep.h
-> @@ -40,10 +40,8 @@ void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
->  								void *data);
->  void bnep_disconnect(struct bnep *session);
->  
-> -int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
-> -							const bdaddr_t *addr);
-> +int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
-> +						uint8_t *setup_data, int len);
->  void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr);
->  
->  ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp);
-> -uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
-> -								uint16_t *src);
-> diff --git a/profiles/network/server.c b/profiles/network/server.c
-> index 04f188a..4644133 100644
-> --- a/profiles/network/server.c
-> +++ b/profiles/network/server.c
-> @@ -47,6 +47,7 @@
 >  #include "src/log.h"
->  #include "src/error.h"
->  #include "src/sdpd.h"
-> +#include "src/shared/util.h"
->  
->  #include "bnep.h"
->  #include "server.h"
-> @@ -281,11 +282,14 @@ static void setup_destroy(void *user_data)
->  static gboolean bnep_setup(GIOChannel *chan,
->  			GIOCondition cond, gpointer user_data)
->  {
-> +	const uint8_t bt_base[] = { 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
-> +					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB };
->  	struct network_adapter *na = user_data;
->  	struct network_server *ns;
->  	uint8_t packet[BNEP_MTU];
->  	struct bnep_setup_conn_req *req = (void *) packet;
-> -	uint16_t src_role, dst_role, rsp = BNEP_CONN_NOT_ALLOWED;
-> +	uint16_t dst_role, rsp = BNEP_CONN_NOT_ALLOWED;
-> +	uint32_t val;
->  	int n, sk;
->  
->  	if (cond & G_IO_NVAL)
-> @@ -305,29 +309,36 @@ static gboolean bnep_setup(GIOChannel *chan,
->  		return FALSE;
->  	}
->  
-> -	/* Highest known Control command ID
-> -	 * is BNEP_FILTER_MULT_ADDR_RSP = 0x06 */
-> -	if (req->type == BNEP_CONTROL &&
-> -				req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
-> -		uint8_t pkt[3];
-> -
-> -		pkt[0] = BNEP_CONTROL;
-> -		pkt[1] = BNEP_CMD_NOT_UNDERSTOOD;
-> -		pkt[2] = req->ctrl;
-> -
-> -		send(sk, pkt, sizeof(pkt), 0);
-> -
-> +	/*
-> +	 * Initial received data packet is BNEP_SETUP_CONNECTION_REQUEST_MSG
-> +	 * minimal size of this frame is 3 octets: 1 byte of BNEP Type +
-> +	 * 1 byte of BNEP Control Type + 1 byte of BNEP services UUID size.
-> +	 */
-> +	if (n < 3) {
-> +		error("To few setup connection request data received");
->  		return FALSE;
->  	}
->  
-> -	if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ)
-> -		return FALSE;
-> +	switch (req->uuid_size) {
-> +	case 2:
-> +		dst_role = get_be16(req->service);
-> +		break;
-> +	case 16:
-> +		if (memcmp(&req->service[4], bt_base, sizeof(bt_base)) != 0)
-> +			return FALSE;
->  
-> -	rsp = bnep_setup_decode(req, &dst_role, &src_role);
-> -	if (rsp != BNEP_SUCCESS)
-> -		goto reply;
-> +		/* Intentional no-brake */
->  
-> -	rsp = BNEP_CONN_NOT_ALLOWED;
-> +	case 4:
-> +		val = get_be32(req->service);
-> +		if (val > 0xffff)
-> +			return FALSE;
+> +#include "btio/btio.h"
+> +#include "lib/bnep.h"
+> +#include "profiles/network/bnep.h"
 > +
-> +		dst_role = val;
-> +		break;
-> +	default:
+> +enum {
+> +	MODE_NONE,
+> +	MODE_CONNECT,
+> +	MODE_LISTEN,
+> +};
+>  
+>  static GMainLoop *mloop;
+> +static GIOChannel *bnep_io;
+> +
+> +static int mode;
+> +static bool no_close_after_disconn;
+> +static int send_ctrl_frame_timeout;
+> +
+> +static bdaddr_t src_addr, dst_addr;
+> +static char iface[16] = "nap_iface%d";
+> +static char bridge[16] = "bnep_bridge";
+> +static uint8_t send_msg_type = 0x00;
+> +static uint16_t local_role = BNEP_SVC_PANU;
+> +static uint16_t remote_role = BNEP_SVC_NAP;
+> +static uint16_t ntw_proto_down_range = 0x0000;
+> +static uint16_t ntw_proto_up_range = 0xdc05;
+> +static uint8_t mcast_addr_down_range[6] = { 0x00, 0x00, 0x00, 0x00, 0x00,
+> +									0x00 };
+> +static uint8_t mcast_addr_up_range[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+> +static struct bnep *session;
+> +
+> +
+> +static int set_forward_delay(int sk)
+> +{
+> +	unsigned long args[4] = { BRCTL_SET_BRIDGE_FORWARD_DELAY, 0, 0, 0 };
+> +	struct ifreq ifr;
+> +
+> +	memset(&ifr, 0, sizeof(ifr));
+> +	strncpy(ifr.ifr_name, bridge, IFNAMSIZ);
+> +	ifr.ifr_data = (char *) args;
+> +
+> +	if (ioctl(sk, SIOCDEVPRIVATE, &ifr) < 0) {
+> +		error("setting forward delay failed: %d (%s)",
+> +							errno, strerror(errno));
+> +		return -1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int nap_create_bridge(void)
+> +{
+> +	int sk, err;
+> +
+> +	sk = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+> +	if (sk < 0)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (ioctl(sk, SIOCBRADDBR, bridge) < 0) {
+> +		err = -errno;
+> +		if (err != -EEXIST) {
+> +			close(sk);
+> +			return -EOPNOTSUPP;
+> +		}
+> +	}
+> +
+> +	err = set_forward_delay(sk);
+> +	if (err < 0) {
+> +		printf("failed to set forward delay\n");
+> +		ioctl(sk, SIOCBRDELBR, bridge);
+> +	}
+> +
+> +	close(sk);
+> +
+> +	return err;
+> +}
+> +
+> +static int cleanup(void)
+> +{
+> +	bnep_cleanup();
+> +
+> +	if (mode == MODE_LISTEN)
+> +		bnep_server_delete(bridge, iface, &dst_addr);
+> +
+> +	if (bnep_io) {
+> +		g_io_channel_shutdown(bnep_io, TRUE, NULL);
+> +		g_io_channel_unref(bnep_io);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
+> +							gpointer user_data)
+> +{
+> +	printf("%s\n", __func__);
+> +
+> +	if (no_close_after_disconn)
+> +		return FALSE;
+> +
+> +	/* Cleanup since it's called when disconnected l2cap */
+> +	if (cleanup() < 0) {
+> +		printf("cleanup went wrong...\n");
 > +		return FALSE;
 > +	}
+> +
+> +	g_main_loop_quit(mloop);
+> +	return FALSE;
+> +}
+> +
+> +static ssize_t send_ctrl_frame(int sk)
+> +{
+> +	/* Max buff size = type(1byte) + ctrl(1byte) + len(2byte) +
+> +	 * mcast_addr_down(6byte) + mcast_addr_up(6byte) */
+> +	uint8_t buff[16];
+> +	int err;
+> +
+> +	printf("%s\n", __func__);
+> +
+> +	if (send_ctrl_frame_timeout > 0) {
+> +		printf("waiting %d seconds before sending msg\n",
+> +						send_ctrl_frame_timeout);
+> +		sleep(send_ctrl_frame_timeout);
+> +	}
+> +
+> +	switch (send_msg_type) {
+> +	case BNEP_FILTER_NET_TYPE_SET: {
+> +		struct bnep_set_filter_req *frame = (void *)buff;
+> +
+> +		frame->type = BNEP_CONTROL;
+> +		frame->ctrl = send_msg_type;
+> +		frame->len = htons(sizeof(ntw_proto_down_range) +
+> +						sizeof(ntw_proto_up_range));
+> +		memcpy(frame->list, &ntw_proto_down_range,
+> +						sizeof(ntw_proto_down_range));
+> +		memcpy(frame->list + sizeof(ntw_proto_down_range),
+> +			&ntw_proto_up_range, sizeof(ntw_proto_up_range));
+> +
+> +		err = send(sk, frame, sizeof(*frame) +
+> +						sizeof(ntw_proto_down_range) +
+> +						sizeof(ntw_proto_up_range), 0);
+> +
+> +		break;
+> +
+> +	}
+> +	case BNEP_FILTER_MULT_ADDR_SET: {
+> +		struct bnep_set_filter_req *frame = (void *)buff;
+> +
+> +		frame->type = BNEP_CONTROL;
+> +		frame->ctrl = send_msg_type;
+> +		frame->len = htons(sizeof(mcast_addr_down_range) +
+> +						sizeof(mcast_addr_up_range));
+> +		memcpy(frame->list, mcast_addr_down_range,
+> +						sizeof(mcast_addr_down_range));
+> +		memcpy(frame->list + sizeof(mcast_addr_down_range),
+> +			mcast_addr_up_range, sizeof(mcast_addr_up_range));
+> +
+> +		err = send(sk, frame, sizeof(*frame) +
+> +					sizeof(mcast_addr_down_range) +
+> +					sizeof(mcast_addr_up_range), 0);
+> +
+> +		break;
+> +
+> +	}
+> +	default:
+> +		err = -1;
+> +	}
+> +
+> +	return err;
+> +}
+> +
+> +static gboolean setup_bnep_cb(GIOChannel *chan, GIOCondition cond,
+> +							gpointer user_data)
+> +{
+> +	uint8_t packet[BNEP_MTU];
+> +	int sk, n, err;
+> +
+> +	printf("%s\n", __func__);
+> +
+> +	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
+> +		error("hangup or error or inval on BNEP socket");
+> +		return FALSE;
+> +	}
+> +
+> +	sk = g_io_channel_unix_get_fd(chan);
+> +
+> +	/* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
+> +	n = read(sk, packet, sizeof(packet));
+> +	if (n  < 0) {
+> +		error("read(): %s(%d)", strerror(errno), errno);
+> +		return FALSE;
+> +	}
+> +
+> +	err = nap_create_bridge();
+> +	if (err < 0) {
+> +		error("failed to create bridge: %s (%d)", strerror(-err), err);
+> +		return FALSE;
+> +	}
+> +
+> +	if (bnep_server_add(sk, (err < 0) ? NULL : bridge, iface, &dst_addr,
+> +							packet, n) < 0) {
+> +		printf("server_connadd failed\n");
+> +		cleanup();
+> +		return FALSE;
+> +	}
+> +
+> +	g_io_add_watch(chan, G_IO_HUP | G_IO_ERR | G_IO_NVAL, bnep_watchdog_cb,
+> +									NULL);
+> +
+> +	if (send_msg_type) {
+> +		if (send_ctrl_frame(sk) < 0)
+> +			printf("error while sending ctrl frame : %s (%d)\n",
+> +							strerror(errno), errno);
+> +	}
+> +
+> +	g_io_channel_unref(bnep_io);
+> +	bnep_io = NULL;
+> +
+> +	return FALSE;
+> +}
+> +
+> +static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+> +{
+> +	printf("%s\n", __func__);
+> +
+> +	if (err) {
+> +		error("%s", err->message);
+> +		return;
+> +	}
+> +
+> +	g_io_add_watch(chan, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+> +							setup_bnep_cb, NULL);
+> +}
+> +
+> +static void connected_client_cb(char *iface, int err, void *data)
+> +{
+> +	int sk = *((int *)data);
+> +
+> +	printf("%s\n", __func__);
+> +
+> +	free(data);
+> +
+> +	if (send_msg_type) {
+> +		if (send_ctrl_frame(sk) < 0)
+> +			printf("error while sendind ctrl frame : %s (%d)\n",
+> +							strerror(errno), errno);
+> +	}
+> +}
+> +
+> +static void disconnected_client_cb(void *data)
+> +{
+> +	printf("%s\n", __func__);
+> +
+> +	if (no_close_after_disconn)
+> +		return;
+> +
+> +	/* Cleanup since it's called when disconnected l2cap */
+> +	if (cleanup() < 0) {
+> +		printf("cleanup went wrong...\n");
+> +		return;
+> +	}
+> +
+> +	g_main_loop_quit(mloop);
+> +}
+> +
+> +static void connect_client_cb(GIOChannel *chan, GError *err, gpointer user_data)
+> +{
+> +	int perr;
+> +	int *sk;
+> +
+> +	sk = malloc(sizeof(*sk));
+> +
+> +	*sk = g_io_channel_unix_get_fd(bnep_io);
+> +
+> +	session = bnep_new(*sk, local_role, remote_role, bridge);
+> +	if (!session) {
+> +		printf("cannot create bnep session\n");
+> +		free(sk);
+> +		return;
+> +	}
+> +
+> +	perr = bnep_connect(session, connected_client_cb,
+> +					disconnected_client_cb, sk, NULL);
+> +	if (perr < 0)
+> +		printf("cannot initiate bnep connection\n");
+> +}
+> +
+> +static void confirm_cb(GIOChannel *chan, gpointer data)
+> +{
+> +	GError *err = NULL;
+> +	char address[18];
+> +
+> +	printf("%s\n", __func__);
+> +
+> +	bt_io_get(chan, &err, BT_IO_OPT_DEST_BDADDR, &dst_addr, BT_IO_OPT_DEST,
+> +						address, BT_IO_OPT_INVALID);
+> +	if (err) {
+> +		error("%s", err->message);
+> +		g_error_free(err);
+> +		return;
+> +	}
+> +
+> +	printf("incoming connection from: %s\n", address);
+> +
+> +	bnep_io = g_io_channel_ref(chan);
+> +	g_io_channel_set_close_on_unref(bnep_io, TRUE);
+> +
+> +	if (!bt_io_accept(bnep_io, connect_cb, NULL, NULL, &err)) {
+> +		error("bt_io_accept: %s", err->message);
+> +		g_error_free(err);
+> +	}
+> +}
+> +
+> +static int bnep_server_listen(void)
+> +{
+> +	GError *gerr = NULL;
+> +
+> +	printf("%s\n", __func__);
+> +
+> +	bnep_io = bt_io_listen(NULL, confirm_cb, NULL, NULL, &gerr,
+> +					BT_IO_OPT_SOURCE_BDADDR, &src_addr,
+> +					BT_IO_OPT_PSM, BNEP_PSM,
+> +					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+> +					BT_IO_OPT_OMTU, BNEP_MTU,
+> +					BT_IO_OPT_IMTU, BNEP_MTU,
+> +					BT_IO_OPT_INVALID);
+> +
+> +	if (!bnep_io) {
+> +		printf("can't start server listening: err %s\n", gerr->message);
+> +		g_error_free(gerr);
+> +		return -1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int bnep_client_connect(void)
+> +{
+> +	GError *gerr = NULL;
+> +	char *dst_addr_str = batostr(&dst_addr);
+> +
+> +	printf("%s\n", __func__);
+> +
+> +	printf("connecting %s\n", dst_addr_str);
+> +	free(dst_addr_str);
+> +
+> +	bnep_io = bt_io_connect(connect_client_cb, NULL, NULL, &gerr,
+> +					BT_IO_OPT_SOURCE_BDADDR, &src_addr,
+> +					BT_IO_OPT_DEST_BDADDR, &dst_addr,
+> +					BT_IO_OPT_PSM, BNEP_PSM,
+> +					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+> +					BT_IO_OPT_OMTU, BNEP_MTU,
+> +					BT_IO_OPT_IMTU, BNEP_MTU,
+> +					BT_IO_OPT_INVALID);
+> +
+> +	if (!bnep_io) {
+> +		printf("cannot connect: err %s\n", gerr->message);
+> +		g_error_free(gerr);
+> +		return -1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void exit_handler(int sig)
+> +{
+> +	printf("got sig = %d, cleaning up...\n", sig);
+> +
+> +	if (cleanup() < 0)
+> +		printf("cleanup failure...\n");
+> +	else
+> +		printf("cleanup successful - exit\n");
+> +
+> +	exit(0);
+> +}
 >  
->  	ns = find_server(na->servers, dst_role);
->  	if (!ns) {
-> @@ -348,8 +359,8 @@ static gboolean bnep_setup(GIOChannel *chan,
->  	strncpy(na->setup->dev, BNEP_INTERFACE, 16);
->  	na->setup->dev[15] = '\0';
+>  static void usage(void)
+>  {
+>  	printf("bneptest - BNEP testing ver %s\n", VERSION);
+>  	printf("Usage:\n"
+> -		"\tbneptest [options]\n");
+> +		"\tbneptest <connection mode> [send_ctrl_cmd] [options]\n");
+> +	printf("Connect Mode:\n"
+> +		"\t-c connect <dst_addr>\n"
+> +		"\t-r remote role <16 bit svc value>\n"
+> +		"\t-l local role <16 bit svc valu>\n");
+> +	printf("Listen Mode:\n"
+> +		"\t-s start server listening\n");
+> +	printf("Send control command:\n"
+> +		"\t-t send message type <control msg type>\n"
+> +		"\t-T send message timeout after setup <seconds>\n"
+> +		"\t-e starting network protocol type range <16 bit value>\n"
+> +		"\t-d ending network protocol type range <16 bit value>\n"
+> +		"\t-g starting multicast addr range <xx:xx:xx:xx:xx:xx>\n"
+> +		"\t-j ending multicast addr range <xx:xx:xx:xx:xx:xx>\n");
+> +	printf("Options:\n"
+> +		"\t-b bridge name <string>\n"
+> +		"\t-n interface name <string>\n");
+>  }
 >  
-> -	if (bnep_server_add(sk, dst_role, ns->bridge, na->setup->dev,
-> -							&na->setup->dst) < 0)
-> +	if (bnep_server_add(sk, ns->bridge, na->setup->dev,
-> +						&na->setup->dst, packet, n) < 0)
->  		goto reply;
+>  static struct option main_options[] = {
+> -	{ "help",		0, 0, 'h' },
+> +	{ "device",			1, 0, 'i' },
+> +	{ "listen",			0, 0, 's' },
+> +	{ "connect",			1, 0, 'c' },
+> +	{ "snd_msg_type",		1, 0, 't' },
+> +	{ "send_timeout",		1, 0, 'T' },
+> +	{ "ntw_proto_down_range",	1, 0, 'd' },
+> +	{ "ntw_proto_up_range",		1, 0, 'e' },
+> +	{ "mcast_addr_down_range",	1, 0, 'g' },
+> +	{ "mcast_addr_up_range",	1, 0, 'j' },
+> +	{ "local_role",			1, 0, 'l' },
+> +	{ "remote_role",		1, 0, 'r' },
+> +	{ "bridge name",		1, 0, 'b' },
+> +	{ "iface name",			1, 0, 'n' },
+> +	{ "no_close",			0, 0, 'N' },
+> +	{ "help",			0, 0, 'h' },
+>  	{ 0, 0, 0, 0 }
+>  };
 >  
->  	na->setup = NULL;
-
-Patches 1-4 are now applied, thanks.
-
- 
+>  int main(int argc, char *argv[])
+>  {
+>  	int opt;
+> +	int err;
+>  
+>  	DBG("");
+>  
+> +	signal(SIGINT, exit_handler);
+> +
+> +	hci_devba(0, &src_addr);
+> +	bacpy(&src_addr, BDADDR_ANY);
+> +
+>  	mloop = g_main_loop_new(NULL, FALSE);
+>  	if (!mloop) {
+> -		printf("Cannot create main loop\n");
+> +		printf("cannot create main loop\n");
+>  
+>  		exit(1);
+>  	}
+>  
+> -	while ((opt = getopt_long(argc, argv, "h", main_options, NULL))
+> -								!= EOF) {
+> +	while ((opt = getopt_long(argc, argv, "+i:b:n:c:t:T:d:e:g:j:Nsh",
+> +						main_options, NULL)) != EOF) {
+>  		switch (opt) {
+> +		case 'i':
+> +			if (!strncmp(optarg, "hci", 3))
+> +				hci_devba(atoi(optarg + 3), &src_addr);
+> +			else
+> +				str2ba(optarg, &src_addr);
+> +
+> +			break;
+> +
+> +		case 's':
+> +			mode = MODE_LISTEN;
+> +			break;
+> +
+> +		case 'c':
+> +			str2ba(optarg, &dst_addr);
+> +			mode = MODE_CONNECT;
+> +
+> +			break;
+> +
+> +		case 't':
+> +			send_msg_type = atoi(optarg);
+> +
+> +			break;
+> +
+> +		case 'T':
+> +			send_ctrl_frame_timeout = atoi(optarg);
+> +
+> +			break;
+> +
+> +		case 'd':
+> +			ntw_proto_down_range = htons(atoi(optarg));
+> +
+> +			break;
+> +
+> +		case 'e':
+> +			ntw_proto_up_range = htons(atoi(optarg));
+> +
+> +			break;
+> +
+> +		case 'g': {
+> +			int i = 0;
+> +
+> +			for (i = 5; i >= 0; i--, optarg += 3)
+> +				mcast_addr_down_range[i] =
+> +						strtol(optarg, NULL, 16);
+> +
+> +			break;
+> +		}
+> +
+> +		case 'j': {
+> +			int i = 0;
+> +
+> +			for (i = 5; i >= 0; i--, optarg += 3)
+> +				mcast_addr_up_range[i] =
+> +						strtol(optarg, NULL, 16);
+> +
+> +			break;
+> +		}
+> +
+> +		case 'l':
+> +			local_role = atoi(optarg);
+> +
+> +			break;
+> +
+> +		case 'r':
+> +			remote_role = atoi(optarg);
+> +
+> +			break;
+> +
+> +		case 'b':
+> +			strncpy(bridge, optarg, 16);
+> +			bridge[15] = '\0';
+> +
+> +			break;
+> +
+> +		case 'n':
+> +			strncpy(iface, optarg, 16);
+> +			iface[15] = '\0';
+> +
+> +			break;
+> +
+> +		case 'N':
+> +			no_close_after_disconn = true;
+> +
+> +			break;
+> +
+>  		case 'h':
+>  		default:
+>  			usage();
+> @@ -70,5 +576,42 @@ int main(int argc, char *argv[])
+>  		}
+>  	}
+>  
+> +	switch (mode) {
+> +	case MODE_CONNECT:
+> +		err = bnep_init();
+> +		if (err < 0) {
+> +			printf("cannot initialize bnep\n");
+> +			exit(1);
+> +		}
+> +		err = bnep_client_connect();
+> +		if (err < 0)
+> +			exit(1);
+> +
+> +		break;
+> +
+> +	case MODE_LISTEN:
+> +		err = bnep_init();
+> +		if (err < 0) {
+> +			printf("cannot initialize bnep\n");
+> +			exit(1);
+> +		}
+> +		err = bnep_server_listen();
+> +		if (err < 0)
+> +			exit(1);
+> +
+> +		break;
+> +
+> +	case MODE_NONE:
+> +	default:
+> +		printf("connect/listen mode not set, exit...\n");
+> +		exit(1);
+> +	}
+> +
+> +	g_main_loop_run(mloop);
+> +
+> +	printf("Done\n");
+> +
+> +	g_main_loop_unref(mloop);
+> +
+>  	return 0;
+>  }
+> 
 
 -- 
 Best regards, 
