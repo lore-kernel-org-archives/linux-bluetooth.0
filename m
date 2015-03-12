@@ -1,277 +1,168 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1426180319-16509-3-git-send-email-jamuraa@chromium.org>
-References: <1426180319-16509-1-git-send-email-jamuraa@chromium.org>
-	<1426180319-16509-3-git-send-email-jamuraa@chromium.org>
-Date: Thu, 12 Mar 2015 12:42:11 -0700
-Message-ID: <CAHrH25RvMWWdedEU-8-RfbVtNQiFioUrN0RaAgiecrxm8DwxCQ@mail.gmail.com>
-Subject: Re: [BlueZ 02/12] core: advertising: add LEAdvertisingManager stubs
-From: Arman Uguray <armansito@chromium.org>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] doc: Add mangement API for service information feature
+Date: Thu, 12 Mar 2015 12:42:31 -0700
+Message-Id: <1426189351-4277-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+---
+ doc/mgmt-api.txt | 137 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 137 insertions(+)
 
-> On Thu, Mar 12, 2015 at 10:11 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> Introducing src/advertising-manager which will implement the
-> org.bluez.LEAdvertisingManager1 D-Bus interface defined in
-> doc/advertising-api.txt.  Each LE-capable controller gets
-> an instance of the interface.
-> ---
->  Makefile.am               |   1 +
->  src/adapter.c             |  19 ++++++++
->  src/advertising-manager.c | 120 ++++++++++++++++++++++++++++++++++++++++++++++
->  src/advertising-manager.h |  25 ++++++++++
->  4 files changed, 165 insertions(+)
->  create mode 100644 src/advertising-manager.c
->  create mode 100644 src/advertising-manager.h
->
-> diff --git a/Makefile.am b/Makefile.am
-> index d0da411..38f9420 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -175,6 +175,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
->                         src/uinput.h \
->                         src/plugin.h src/plugin.c \
->                         src/storage.h src/storage.c \
-> +                       src/advertising-manager.h src/advertising-manager.c \
->                         src/agent.h src/agent.c \
->                         src/error.h src/error.c \
->                         src/adapter.h src/adapter.c \
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 329e9b4..d4401ec 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -74,6 +74,7 @@
->  #include "attrib/gatt.h"
->  #include "attrib-server.h"
->  #include "gatt-database.h"
-> +#include "advertising-manager.h"
->  #include "eir.h"
->
->  #define ADAPTER_INTERFACE      "org.bluez.Adapter1"
-> @@ -210,6 +211,7 @@ struct btd_adapter {
->         sdp_list_t *services;           /* Services associated to adapter */
->
->         struct btd_gatt_database *database;
-> +       struct btd_advertising_manager *adv_manager;
->
->         gboolean initialized;
->
-> @@ -4607,6 +4609,9 @@ static void adapter_remove(struct btd_adapter *adapter)
->         btd_gatt_database_destroy(adapter->database);
->         adapter->database = NULL;
->
-> +       btd_advertising_manager_destroy(adapter->adv_manager);
-> +       adapter->adv_manager = NULL;
-> +
->         g_slist_free(adapter->pin_callbacks);
->         adapter->pin_callbacks = NULL;
->
-> @@ -6679,6 +6684,20 @@ static int adapter_register(struct btd_adapter *adapter)
->                 return -EINVAL;
->         }
->
-> +       /* Don't start advertising managers on non-LE controllers. */
-> +       if (adapter->supported_settings && MGMT_SETTING_LE) {
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index d4df8d94208d..af85b3c10ce1 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -2390,6 +2390,114 @@ Read Extended Controller Index List Command
+ 	a Command Status event on failure.
+ 
+ 
++Add Service Information Command
++===============================
++
++	Command Code:		0x003d
++	Controller Index:	<controller id>
++	Command Parameters:	UUID (16 Octets)
++				Type (1 Octet)
++				Timeout (2 Octets)
++				Data_Len (1 Octet)
++				Data (0-255 Octets)
++	Return Parameters:	UUID (16 Octets)
++
++	This command is used to add service information for Bluetooth
++	Low Energy controllers. These information are used when the
++	controller has to advertise its services.
++
++	The Type parameter defines the actions associcated with the
++	provided UUID. The following values are defined:
++
++		0	Service UUID (opportunistic)
++		1	Service UUID (required)
++		2	Service data information
++		3	Service solicitation using general discoverable mode
++		4	Service solicitation using limited discoverable mode
++
++	Every UUID can only be provided once and can only be associated
++	with one of these types. It is possible to change the current
++	type, but it means that it will no longer advertised using the
++	previous configured type.
++
++	The Service UUID (type 0 and 1) are advertised using the standard
++	Service UUID advertising data type. The difference is that type 1
++	UUID are mandatory to include and the command will fail in case
++	there is no space in the advertising data. The type 0 will add
++	the UUID and add the UUID if there is space. It is preferred to
++	use type 0 over type 1 to provide the Bluetooth core with maximum
++	flexibility to choose which UUIDs to include.
++
++	The Service data information will include the data information
++	instead of the Service UUID. Since both types include the UUID,
++	it makes no sense to be duplicated. However Service data information
++	is treated the same as type 1 and mandatory. If it does not fit,
++	then the command will return an error.
++
++	For type 0, 1 and 2 the Set Advertising command has to be used
++	to enable advertising in the first place. Adding the Service UUID
++	or Service data will not enable advertising.
++
++	The Service solicitation however will actually enable advertising
++	in general or limited discoverable mode. This means that adding
++	a UUID with type 3 or 4 will cause the Bluetooth core to advertise.
++
++	In case the controller is not configured as connectable, then
++	using type 3 or 4 will return an error. In that sense it behaves
++	similar to Set Discoverable mode. For the Service solicitation,
++	the Timeout parameter can be used to limit the transaction. The
++	Bluetooth core will disable advertising and discoverable mode
++	automatically then.
++
++	The Timeout parameter can also be used for type 0, 1 and 2 in
++	case advertising of a certain UUID should be limited to a certain
++	amount of time. The Timeout paramter value is specified in seconds
++	and a value of 0 disables the timeout handling.
++
++	UUID values configured will stay around when the controller gets
++	powered down and will be automatically programmed back into the
++	controller once it gets powered on. However for UUID values with
++	a timeout, the powering down of the controller result in the
++	timeout triggering and the UUID being removed. The same applies
++	for type 3 and 4 when connectable setting is turned off.
++
++	This command can be used when the controller is not powered and
++	all settings will be programmed once powered.
++
++	This command generates a Command Complete event on success
++	or failure.
++
++	Possible errors:	Failed
++				Not Supported
++				Invalid Parameters
++				Invalid Index
++
++
++Remove Service Information Command
++==================================
++
++	Command Code:		0x003e
++	Controller Index:	<controller id>
++	Command Parameters:	UUID (16 Octets)
++	Return Parameters:	UUID (16 Octets)
++
++	This command is used to remove service information from a Bluetooth
++	Low Energy controller previously added by using the Add Service
++	Information command.
++
++	When the UUID parameter is an empty UUID (16 x 0x00), then all
++	previously loaded UUIDs will be removed.
++
++	This command can be used when the controller is not powered and
++	all settings will be programmed once powered.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
+@@ -3164,3 +3272,32 @@ Extended Index Removed Event
+ 	This event will only be used after Read Extended Controller Index
+ 	List has been used at least once. If it has not been used, then
+ 	Index Removed and Unconfigured Index Removed are send instead.
++
++
++Service Information Added Event
++===============================
++
++	Event Code:		0x0022
++	Controller Index:	<controller id>
++	Event Parameters:	UUID (16 Octets)
++				Type (1 Octet)
++
++	This event indicates that service information have been added
++	using the Add Service Information command.
++
++	The event will only be sent to management sockets other than the
++	one through which the command was sent.
++
++
++Service Information Removed Event
++=================================
++
++	Event Code:		0x0023
++	Controller Index:	<controller id>
++	Event Parameters:	UUID (16 Octets)
++
++	This event indicates that service information have been removed
++	using the Remove Service Information command.
++
++	The event will only be sent to management sockets other than the
++	one through which the command was sent.
+-- 
+2.1.0
 
-Did you mean to do a bitwise-& here?
-
-> +               adapter->adv_manager = btd_advertising_manager_new(adapter);
-> +               if (!adapter->adv_manager) {
-> +                       error("Failed to register LEAdvertisingManager1 "
-> +                                               "interface for adapter");
-> +                       btd_gatt_database_destroy(adapter->database);
-> +                       adapter->database = NULL;
-> +                       return -EINVAL;
-> +               }
-> +       } else {
-> +               error("Not starting LEAdvertisingManager, LE not supported");
-> +       }
-> +
->         db = btd_gatt_database_get_db(adapter->database);
->         adapter->db_id = gatt_db_register(db, services_modified,
->                                                         services_modified,
-> diff --git a/src/advertising-manager.c b/src/advertising-manager.c
-> new file mode 100644
-> index 0000000..754b6ff
-> --- /dev/null
-> +++ b/src/advertising-manager.c
-> @@ -0,0 +1,120 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2015  Google Inc.
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + */
-> +
-> +#include "advertising-manager.h"
-> +
-> +#include <dbus/dbus.h>
-> +#include <gdbus/gdbus.h>
-> +
-> +#include "adapter.h"
-> +#include "dbus-common.h"
-> +#include "log.h"
-> +#include "src/shared/util.h"
-> +
-> +#define LE_ADVERTISING_MGR_IFACE "org.bluez.LEAdvertisingManager1"
-> +
-> +struct btd_advertising_manager {
-> +       struct btd_adapter *adapter;
-> +};
-> +
-> +static DBusMessage *register_advertisement(DBusConnection *conn,
-> +                                               DBusMessage *msg,
-> +                                               void *user_data)
-> +{
-> +       DBG("RegisterAdvertisement");
-> +
-> +       /* TODO */
-> +       return NULL;
-> +}
-> +
-> +static DBusMessage *unregister_advertisement(DBusConnection *conn,
-> +                                               DBusMessage *msg,
-> +                                               void *user_data)
-> +{
-> +       DBG("UnregisterAdvertisement");
-> +
-> +       /* TODO */
-> +       return NULL;
-> +}
-> +
-> +static const GDBusMethodTable methods[] = {
-> +       { GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterAdvertisement",
-> +                                       GDBUS_ARGS({ "advertisement", "o"},
-
-nit: I would pick a consistent style for static initializers and
-spacing, i.e either {a, b} or { a, b } (not sure what the recommended
-style is for BlueZ), you seem to have a mix of everything here.
-
-> +                                                       { "options", "a{sv}" }),
-> +                                       NULL, register_advertisement) },
-> +       { GDBUS_EXPERIMENTAL_ASYNC_METHOD("UnregisterAdvertisement",
-> +                                               GDBUS_ARGS({"service", "o"}),
-> +                                               NULL,
-> +                                               unregister_advertisement) },
-> +       { }
-> +};
-> +
-> +static struct btd_advertising_manager *
-> +advertising_manager_create(struct btd_adapter *adapter)
-> +{
-> +       struct btd_advertising_manager *manager;
-> +
-> +       manager = new0(struct btd_advertising_manager, 1);
-> +       if (!manager)
-> +               return NULL;
-> +
-> +       manager->adapter = adapter;
-> +
-> +       if (!g_dbus_register_interface(btd_get_dbus_connection(),
-> +                                               adapter_get_path(adapter),
-> +                                               LE_ADVERTISING_MGR_IFACE,
-> +                                               methods, NULL, NULL, adapter,
-
-The user_data should be |manager| here instead of |adapter|, no?
-
-> +                                               NULL)) {
-> +               error("Failed to register " LE_ADVERTISING_MGR_IFACE);
-> +               free(manager);
-> +               return NULL;
-> +       }
-> +
-> +       return manager;
-> +}
-> +
-> +struct btd_advertising_manager *
-> +btd_advertising_manager_new(struct btd_adapter *adapter)
-> +{
-> +       struct btd_advertising_manager *manager;
-> +
-> +       if (!adapter)
-> +               return NULL;
-> +
-> +       manager = advertising_manager_create(adapter);
-> +       if (!manager)
-> +               return NULL;
-> +
-> +       DBG("LE Advertising Manager created for adapter: %s",
-> +                                               adapter_get_path(adapter));
-> +
-> +       return manager;
-> +}
-> +
-> +void btd_advertising_manager_destroy(struct btd_advertising_manager *manager)
-> +{
-> +       if (!manager)
-> +               return;
-> +
-> +       g_dbus_unregister_interface(btd_get_dbus_connection(),
-> +                                       adapter_get_path(manager->adapter),
-> +                                       LE_ADVERTISING_MGR_IFACE);
-> +
-> +       free(manager);
-
-You can also pass "free" as the destroy function to
-g_dbus_register_interface above, if you pass "manager" as the user
-data.
-
-> +}
-> diff --git a/src/advertising-manager.h b/src/advertising-manager.h
-> new file mode 100644
-> index 0000000..4046013
-> --- /dev/null
-> +++ b/src/advertising-manager.h
-> @@ -0,0 +1,25 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2015  Google Inc.
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + */
-> +
-> +struct btd_adapter;
-> +struct btd_advertising_manager;
-> +
-> +struct btd_advertising_manager *btd_advertising_manager_new(
-> +                                               struct btd_adapter *adapter);
-> +void btd_advertising_manager_destroy(struct btd_advertising_manager *manager);
-> --
-> 2.2.0.rc0.207.ga3a616c
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Thanks,
-Arman
