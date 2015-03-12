@@ -1,132 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v5 3/6] profiles/network: Move disconn cb setting to bnep connect method
-Date: Thu, 12 Mar 2015 18:07:30 +0100
-Message-Id: <1426180053-26646-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v5 1/6] profiles/network: Remove unneded bnep_uuid function from bnep code
+Date: Thu, 12 Mar 2015 18:07:28 +0100
+Message-Id: <1426180053-26646-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1426180053-26646-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1426180053-26646-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Disconnect callback can be set while connececting bnep. In previous
-implementation there was separated method to setting up the disconnect
-callback and it was always called immediately after calling connect -
-this method was redundand.
+This function is no longer needed since connection and server can handle
+this funcionality by itself.
 ---
- android/pan.c                 |  5 ++---
- profiles/network/bnep.c       | 22 +++++++---------------
- profiles/network/bnep.h       |  6 +++---
- profiles/network/connection.c |  4 +---
- 4 files changed, 13 insertions(+), 24 deletions(-)
+ profiles/network/bnep.c       | 10 ----------
+ profiles/network/bnep.h       |  1 -
+ profiles/network/connection.c | 19 ++++++++++++-------
+ profiles/network/server.c     | 36 ++++++++++++++++++++++++++++++------
+ 4 files changed, 42 insertions(+), 24 deletions(-)
 
-diff --git a/android/pan.c b/android/pan.c
-index a14ed84..6c9815b 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -324,14 +324,13 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	if (!dev->session)
- 		goto fail;
- 
--	perr = bnep_connect(dev->session, bnep_conn_cb, dev);
-+	perr = bnep_connect(dev->session, bnep_conn_cb, bnep_disconn_cb, dev,
-+									dev);
- 	if (perr < 0) {
- 		error("bnep connect req failed: %s", strerror(-perr));
- 		goto fail;
- 	}
- 
--	bnep_set_disconnect(dev->session, bnep_disconn_cb, dev);
--
- 	if (dev->io) {
- 		g_io_channel_unref(dev->io);
- 		dev->io = NULL;
 diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 9dbdb7a..e325b72 100644
+index 779c5fb..7280149 100644
 --- a/profiles/network/bnep.c
 +++ b/profiles/network/bnep.c
-@@ -369,17 +369,21 @@ void bnep_free(struct bnep *session)
- 	g_free(session);
- }
+@@ -85,16 +85,6 @@ struct bnep {
+ 	void	*disconn_data;
+ };
  
--int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb, void *data)
-+int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb,
-+					bnep_disconnect_cb disconn_cb,
-+					void *conn_data, void *disconn_data)
- {
- 	GError *gerr = NULL;
- 	int err;
- 
--	if (!session || !conn_cb)
-+	if (!session || !conn_cb || !disconn_cb)
- 		return -EINVAL;
- 
- 	session->attempts = 0;
- 	session->conn_cb = conn_cb;
--	session->conn_data = data;
-+	session->disconn_cb = disconn_cb;
-+	session->conn_data = conn_data;
-+	session->disconn_data = disconn_data;
- 
- 	bt_io_get(session->io, &gerr, BT_IO_OPT_DEST_BDADDR, &session->dst_addr,
- 							BT_IO_OPT_INVALID);
-@@ -417,18 +421,6 @@ void bnep_disconnect(struct bnep *session)
- 	bnep_conndel(&session->dst_addr);
- }
- 
--void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
--								void *data)
+-const char *bnep_uuid(uint16_t id)
 -{
--	if (!session || !disconn_cb)
--		return;
+-	int i;
 -
--	if (!session->disconn_cb && !session->disconn_data) {
--		session->disconn_cb = disconn_cb;
--		session->disconn_data = data;
--	}
+-	for (i = 0; __svc[i].uuid128; i++)
+-		if (__svc[i].id == id)
+-			return __svc[i].uuid128;
+-	return NULL;
 -}
 -
- static int bnep_add_to_bridge(const char *devname, const char *bridge)
+ const char *bnep_name(uint16_t id)
  {
- 	int ifindex;
+ 	int i;
 diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
-index da706ac..e9f4c1c 100644
+index 31579f9..811ea14 100644
 --- a/profiles/network/bnep.h
 +++ b/profiles/network/bnep.h
-@@ -31,10 +31,10 @@ struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
- void bnep_free(struct bnep *session);
+@@ -26,7 +26,6 @@ struct bnep;
+ int bnep_init(void);
+ int bnep_cleanup(void);
  
- typedef void (*bnep_connect_cb) (char *iface, int err, void *data);
--int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb, void *data);
- typedef void (*bnep_disconnect_cb) (void *data);
--void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
--								void *data);
-+int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb,
-+					bnep_disconnect_cb disconn_cb,
-+					void *conn_data, void *disconn_data);
- void bnep_disconnect(struct bnep *session);
+-const char *bnep_uuid(uint16_t id);
+ const char *bnep_name(uint16_t id);
  
- int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
 diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index 9439d34..2b07771 100644
+index 4311cc9..9439d34 100644
 --- a/profiles/network/connection.c
 +++ b/profiles/network/connection.c
-@@ -258,14 +258,12 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	if (!nc->session)
- 		goto failed;
+@@ -284,21 +284,23 @@ static DBusMessage *local_connect(DBusConnection *conn,
+ 	struct btd_service *service;
+ 	struct network_conn *nc;
+ 	const char *svc;
+-	const char *uuid;
+ 	uint16_t id;
+ 	int err;
++	char uuid_str[MAX_LEN_UUID_STR];
++	bt_uuid_t uuid16, uuid128;
  
--	perr = bnep_connect(nc->session, bnep_conn_cb, nc);
-+	perr = bnep_connect(nc->session, bnep_conn_cb, bnep_disconn_cb, nc, nc);
- 	if (perr < 0) {
- 		error("bnep connect(): %s (%d)", strerror(-perr), -perr);
- 		goto failed;
+ 	if (dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &svc,
+ 						DBUS_TYPE_INVALID) == FALSE)
+ 		return btd_error_invalid_args(msg);
+ 
+ 	id = get_pan_srv_id(svc);
+-	uuid = bnep_uuid(id);
++	bt_uuid16_create(&uuid16, id);
++	bt_uuid_to_uuid128(&uuid128, &uuid16);
+ 
+-	if (uuid == NULL)
++	if (bt_uuid_to_string(&uuid128, uuid_str, MAX_LEN_UUID_STR) < 0)
+ 		return btd_error_invalid_args(msg);
+ 
+-	service = btd_device_get_service(peer->device, uuid);
++	service = btd_device_get_service(peer->device, uuid_str);
+ 	if (service == NULL)
+ 		return btd_error_not_supported(msg);
+ 
+@@ -439,15 +441,18 @@ static gboolean network_property_get_uuid(const GDBusPropertyTable *property,
+ {
+ 	struct network_peer *peer = data;
+ 	struct network_conn *nc;
+-	const char *uuid;
++	char uuid_str[MAX_LEN_UUID_STR];
++	bt_uuid_t uuid16, uuid128;
+ 
+ 	nc = find_connection_by_state(peer->connections, CONNECTED);
+ 	if (nc == NULL)
+ 		return FALSE;
+ 
+-	uuid = bnep_uuid(nc->id);
++	bt_uuid16_create(&uuid16, nc->id);
++	bt_uuid_to_uuid128(&uuid128, &uuid16);
++	bt_uuid_to_string(&uuid128, uuid_str, MAX_LEN_UUID_STR);
+ 
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid_str);
+ 
+ 	return TRUE;
+ }
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index 9caabb0..32aafc3 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -114,14 +114,38 @@ static struct network_server *find_server(GSList *list, uint16_t id)
+ static struct network_server *find_server_by_uuid(GSList *list,
+ 							const char *uuid)
+ {
+-	for (; list; list = list->next) {
+-		struct network_server *ns = list->data;
++	bt_uuid_t srv_uuid, bnep_uuid;
+ 
+-		if (strcasecmp(uuid, bnep_uuid(ns->id)) == 0)
+-			return ns;
++	if (!bt_string_to_uuid(&srv_uuid, uuid)) {
++		for (; list; list = list->next) {
++			struct network_server *ns = list->data;
+ 
+-		if (strcasecmp(uuid, bnep_name(ns->id)) == 0)
+-			return ns;
++			bt_uuid16_create(&bnep_uuid, ns->id);
++
++			/* UUID value compare */
++			if (!bt_uuid_cmp(&srv_uuid, &bnep_uuid))
++				return ns;
++		}
++	} else {
++		for (; list; list = list->next) {
++			struct network_server *ns = list->data;
++
++			/* String value compare */
++			switch (ns->id) {
++			case BNEP_SVC_PANU:
++				if (!strcasecmp(uuid, "panu"))
++					return ns;
++				break;
++			case BNEP_SVC_NAP:
++				if (!strcasecmp(uuid, "nap"))
++					return ns;
++				break;
++			case BNEP_SVC_GN:
++				if (!strcasecmp(uuid, "gn"))
++					return ns;
++				break;
++			}
++		}
  	}
  
--	bnep_set_disconnect(nc->session, bnep_disconn_cb, nc);
--
- 	if (nc->io) {
- 		g_io_channel_unref(nc->io);
- 		nc->io = NULL;
+ 	return NULL;
 -- 
 2.1.0
 
