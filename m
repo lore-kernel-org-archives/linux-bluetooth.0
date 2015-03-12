@@ -1,132 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v4 4/7] profiles/network: Move disconn cb setting to bnep connect method
-Date: Thu, 12 Mar 2015 17:06:39 +0100
-Message-Id: <1426176402-21179-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v4 3/7] profiles/network: Remove not needed get name by bnep id function
+Date: Thu, 12 Mar 2015 17:06:38 +0100
+Message-Id: <1426176402-21179-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1426176402-21179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1426176402-21179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Disconnect callback can be set while connececting bnep. In previous
-implementation there was separated method to setting up the disconnect
-callback and it was always called immediately after calling connect -
-this method was redundand.
+This function and service structure declaration is no longer needed
+since related code was distracted.
 ---
- android/pan.c                 |  5 ++---
- profiles/network/bnep.c       | 22 +++++++---------------
- profiles/network/bnep.h       |  6 +++---
- profiles/network/connection.c |  4 +---
- 4 files changed, 13 insertions(+), 24 deletions(-)
+ profiles/network/bnep.c | 21 ---------------------
+ profiles/network/bnep.h |  2 --
+ 2 files changed, 23 deletions(-)
 
-diff --git a/android/pan.c b/android/pan.c
-index a14ed84..6c9815b 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -324,14 +324,13 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	if (!dev->session)
- 		goto fail;
- 
--	perr = bnep_connect(dev->session, bnep_conn_cb, dev);
-+	perr = bnep_connect(dev->session, bnep_conn_cb, bnep_disconn_cb, dev,
-+									dev);
- 	if (perr < 0) {
- 		error("bnep connect req failed: %s", strerror(-perr));
- 		goto fail;
- 	}
- 
--	bnep_set_disconnect(dev->session, bnep_disconn_cb, dev);
--
- 	if (dev->io) {
- 		g_io_channel_unref(dev->io);
- 		dev->io = NULL;
 diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 138d805..58f4ec5 100644
+index 966fb8f..138d805 100644
 --- a/profiles/network/bnep.c
 +++ b/profiles/network/bnep.c
-@@ -369,17 +369,21 @@ void bnep_free(struct bnep *session)
- 	g_free(session);
- }
+@@ -54,17 +54,6 @@
  
--int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb, void *data)
-+int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb,
-+					bnep_disconnect_cb disconn_cb,
-+					void *conn_data, void *disconn_data)
- {
- 	GError *gerr = NULL;
- 	int err;
+ static int ctl;
  
--	if (!session || !conn_cb)
-+	if (!session || !conn_cb || !disconn_cb)
- 		return -EINVAL;
- 
- 	session->attempts = 0;
- 	session->conn_cb = conn_cb;
--	session->conn_data = data;
-+	session->disconn_cb = disconn_cb;
-+	session->conn_data = conn_data;
-+	session->disconn_data = disconn_data;
- 
- 	bt_io_get(session->io, &gerr, BT_IO_OPT_DEST_BDADDR, &session->dst_addr,
- 							BT_IO_OPT_INVALID);
-@@ -417,18 +421,6 @@ void bnep_disconnect(struct bnep *session)
- 	bnep_conndel(&session->dst_addr);
- }
- 
--void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
--								void *data)
--{
--	if (!session || !disconn_cb)
--		return;
+-static struct {
+-	const char	*name;		/* Friendly name */
+-	const char	*uuid128;	/* UUID 128 */
+-	uint16_t	id;		/* Service class identifier */
+-} __svc[] = {
+-	{ "panu",	PANU_UUID,	BNEP_SVC_PANU	},
+-	{ "gn",		GN_UUID,	BNEP_SVC_GN	},
+-	{ "nap",	NAP_UUID,	BNEP_SVC_NAP	},
+-	{ NULL }
+-};
 -
--	if (!session->disconn_cb && !session->disconn_data) {
--		session->disconn_cb = disconn_cb;
--		session->disconn_data = data;
--	}
+ struct __service_16 {
+ 	uint16_t dst;
+ 	uint16_t src;
+@@ -85,16 +74,6 @@ struct bnep {
+ 	void	*disconn_data;
+ };
+ 
+-const char *bnep_name(uint16_t id)
+-{
+-	int i;
+-
+-	for (i = 0; __svc[i].name; i++)
+-		if (__svc[i].id == id)
+-			return __svc[i].name;
+-	return NULL;
 -}
 -
- static int bnep_add_to_bridge(const char *devname, const char *bridge)
+ int bnep_init(void)
  {
- 	int ifindex;
+ 	ctl = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_BNEP);
 diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
-index da706ac..e9f4c1c 100644
+index 811ea14..da706ac 100644
 --- a/profiles/network/bnep.h
 +++ b/profiles/network/bnep.h
-@@ -31,10 +31,10 @@ struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
- void bnep_free(struct bnep *session);
+@@ -26,8 +26,6 @@ struct bnep;
+ int bnep_init(void);
+ int bnep_cleanup(void);
  
- typedef void (*bnep_connect_cb) (char *iface, int err, void *data);
--int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb, void *data);
- typedef void (*bnep_disconnect_cb) (void *data);
--void bnep_set_disconnect(struct bnep *session, bnep_disconnect_cb disconn_cb,
--								void *data);
-+int bnep_connect(struct bnep *session, bnep_connect_cb conn_cb,
-+					bnep_disconnect_cb disconn_cb,
-+					void *conn_data, void *disconn_data);
- void bnep_disconnect(struct bnep *session);
- 
- int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index da8b86e..ff4ebc9 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -258,14 +258,12 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	if (!nc->session)
- 		goto failed;
- 
--	perr = bnep_connect(nc->session, bnep_conn_cb, nc);
-+	perr = bnep_connect(nc->session, bnep_conn_cb, bnep_disconn_cb, nc, nc);
- 	if (perr < 0) {
- 		error("bnep connect(): %s (%d)", strerror(-perr), -perr);
- 		goto failed;
- 	}
- 
--	bnep_set_disconnect(nc->session, bnep_disconn_cb, nc);
+-const char *bnep_name(uint16_t id);
 -
- 	if (nc->io) {
- 		g_io_channel_unref(nc->io);
- 		nc->io = NULL;
+ struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role,
+ 								char *iface);
+ void bnep_free(struct bnep *session);
 -- 
 2.1.0
 
