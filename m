@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1426180319-16509-5-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1426180319-16509-4-git-send-email-jamuraa@chromium.org>
 References: <1426180319-16509-1-git-send-email-jamuraa@chromium.org>
-	<1426180319-16509-5-git-send-email-jamuraa@chromium.org>
-Date: Thu, 12 Mar 2015 13:00:02 -0700
-Message-ID: <CAHrH25Rqks4KxqrLC5f0enZtQhFcC0kFe0h5zfMYSafu95qjiA@mail.gmail.com>
-Subject: Re: [BlueZ 04/12] tools: Python script to test Advertisement API
+	<1426180319-16509-4-git-send-email-jamuraa@chromium.org>
+Date: Thu, 12 Mar 2015 12:55:46 -0700
+Message-ID: <CAHrH25TRjbtYx-WHdUXJYitQbqbhRnZZkgkDSxLrb+d-+0jRyQ@mail.gmail.com>
+Subject: Re: [BlueZ 03/12] advertising-manager: Implement RegisterAdvertisement
 From: Arman Uguray <armansito@chromium.org>
 To: Michael Janssen <jamuraa@chromium.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
@@ -16,189 +16,376 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Michael,
 
 > On Thu, Mar 12, 2015 at 10:11 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> This script provides an example of using the advertisement-data
-> D-Bus API from python.
+> Implement the RegisterAdvertisement method of the LEAdvertisingManager1
+> interface.
 > ---
->  tools/advertisement-example | 160 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 160 insertions(+)
->  create mode 100644 tools/advertisement-example
+>  src/advertising-manager.c | 297 +++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 295 insertions(+), 2 deletions(-)
 >
-> diff --git a/tools/advertisement-example b/tools/advertisement-example
-> new file mode 100644
-> index 0000000..dcd2ea2
-> --- /dev/null
-> +++ b/tools/advertisement-example
-> @@ -0,0 +1,160 @@
-> +#!/usr/bin/python
+> diff --git a/src/advertising-manager.c b/src/advertising-manager.c
+> index 754b6ff..76dcad9 100644
+> --- a/src/advertising-manager.c
+> +++ b/src/advertising-manager.c
+> @@ -19,27 +19,318 @@
+>
+>  #include "advertising-manager.h"
+>
+> +#include <stdbool.h>
+> +#include <stdint.h>
 > +
-> +import dbus
-> +import dbus.exceptions
-> +import dbus.mainloop.glib
-> +import dbus.service
+>  #include <dbus/dbus.h>
+>  #include <gdbus/gdbus.h>
+>
+> +#include <lib/bluetooth.h>
+> +#include <lib/bluetooth/sdp.h>
 > +
-> +import array
-> +import gobject
-> +
-> +from random import randint
-> +
-> +mainloop = None
-> +
-> +BLUEZ_SERVICE_NAME = 'org.bluez'
-> +LE_ADVERTISING_MANAGER_IFACE = 'org.bluez.LEAdvertisingManager1'
-> +DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
-> +DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
-> +
-> +LE_ADVERTISEMENT_IFACE = 'org.bluez.LEAdvertisement1'
-> +
-> +
-> +class InvalidArgsException(dbus.exceptions.DBusException):
-> +    _dbus_error_name = 'org.freedesktop.DBus.Error.InvalidArgs'
-> +
-> +
-> +class NotSupportedException(dbus.exceptions.DBusException):
-> +    _dbus_error_name = 'org.bluez.Error.NotSupported'
-> +
-> +
-> +class NotPermittedException(dbus.exceptions.DBusException):
-> +    _dbus_error_name = 'org.bluez.Error.NotPermitted'
-> +
-> +
-> +class InvalidValueLengthException(dbus.exceptions.DBusException):
-> +    _dbus_error_name = 'org.bluez.Error.InvalidValueLength'
-> +
-> +
-> +class FailedException(dbus.exceptions.DBusException):
-> +    _dbus_error_name = 'org.bluez.Error.Failed'
-> +
-> +
-> +class Advertisement(dbus.service.Object):
-> +    PATH_BASE = '/org/bluez/example/advertisement'
-> +
-> +    def __init__(self, bus, index, advertising_type):
-> +        self.path = self.PATH_BASE + str(index)
-> +        self.bus = bus
-> +        self.ad_type = advertising_type
-> +        self.service_uuids = None
-> +        self.manufacturer_specific_data = None
-> +        self.solicit_uuids = None
-> +        self.service_data = None
-> +        dbus.service.Object.__init__(self, bus, self.path)
-> +
-> +    def get_properties(self):
-> +        properties = dict()
-> +        properties['Type'] = self.ad_type
-> +        if self.service_uuids is not None:
-> +            properties['ServiceUUIDs'] = dbus.Array(self.service_uuids,
-> +                                                    signature='s')
-> +        if self.solicit_uuids is not None:
-> +            properties['SolicitUUIDs'] = dbus.Array(self.solicit_uuids,
-> +                                                    signature='s')
-> +        if self.manufacturer_specific_data is not None:
-> +            properties['ManufacturerSpecificData'] = dbus.Dictionary(
-> +                self.manufacturer_specific_data, signature='qay')
-> +        if self.service_data is not None:
-> +            properties['ServiceData'] = dbus.Dictionary(self.service_data,
-> +                                                        signature='say')
-> +        return {LE_ADVERTISEMENT_IFACE: properties}
-> +
-> +    def get_path(self):
-> +        return dbus.ObjectPath(self.path)
-> +
-> +    def add_service_uuid(self, uuid):
-> +        if not self.service_uuids:
-> +            self.service_uuids = []
-> +        self.service_uuids.append(uuid)
-> +
-> +    def add_manufacturer_data(self, manuf_code, data):
-> +        if not self.manufacturer_specific_data:
-> +            self.manufacturer_specific_data = dict()
-> +        self.manufacturer_specific_data[manuf_code] = data
-> +
-> +    @dbus.service.method(DBUS_PROP_IFACE,
-> +                         in_signature='s',
-> +                         out_signature='a{sv}')
-> +    def GetAll(self, interface):
-> +        print 'GetAll'
-> +        if interface != LE_ADVERTISEMENT_IFACE:
-> +            raise InvalidArgsException()
-> +        print 'returning props'
-> +        return self.get_properties[LE_ADVERTISEMENT_IFACE]
-> +
-> +    @dbus.service.method(DBUS_OM_IFACE, out_signature='a{oa{sa{sv}}}')
-> +    def GetManagedObjects(self):
 
-Nowhere in the documentation do we mention that ObjectManager is
-required for this API and frankly I don't think it's necessary, since
-you only register one LEAdvertisement1 object at a time (whose path
-you provide to RegisterAdvertisement already). ObjectManager was
-necessary for the GATT API, since we needed to atomically fetch the
-object paths and properties of an entire
-Service/Characteristic/Descriptor tree, but in the LEAdvertisement1
-case it's much simpler.
+If you're including the Linux includes from the system include path,
+then these should look like this:
 
-> +        response = {}
-> +        print 'GetManagedObjects'
+   #include <bluetooth/bluetooth.h>
+
+Otherwise, if you're including headers in lib/ then they should be in quotes:
+
+   #include "lib/bluetooth.h"
+
+I honestly don't know which one we prefer, so maybe somebody else can
+comment on that. Also, why is the sdp.h header needed?
+
+>  #include "adapter.h"
+>  #include "dbus-common.h"
+> +#include "error.h"
+>  #include "log.h"
+> +#include "src/shared/queue.h"
+>  #include "src/shared/util.h"
+>
+>  #define LE_ADVERTISING_MGR_IFACE "org.bluez.LEAdvertisingManager1"
+> +#define LE_ADVERTISEMENT_IFACE "org.bluez.LEAdvertisement1"
+>
+>  struct btd_advertising_manager {
+>         struct btd_adapter *adapter;
+> +       struct queue *adverts;
+> +};
 > +
-> +        print self.get_properties()
-> +        response[self.get_path()] = self.get_properties()
-> +        return response
+> +#define AD_TYPE_BROADCAST 0
+> +#define AD_TYPE_PERIPHERAL 1
 > +
+> +struct advertisement {
+> +       struct btd_advertising_manager *manager;
+> +       char *owner;
+> +       char *path;
+> +       DBusMessage *reg;
+> +       GDBusClient *client;
+
+Aren't we registering a single object? I don't think GDBusClient is
+suitable here, which interfaces with DBus.ObjectManager (which then
+has to be an API requirement), I think just fetching the properties
+via GetAll might be sufficient, so just a GDBusProxy should be
+sufficient.
+
+> +       GDBusProxy *proxy;
+> +       uint8_t type; /* Advertising type */
+> +       bool random;
+> +       bool published;
+>  };
+>
+> +static bool match_advertisement_path(const void *a, const void *b)
+> +{
+> +       const struct advertisement *ad = a;
+> +       const char *path = b;
 > +
-> +class TestAdvertisement(Advertisement):
+> +       return g_strcmp0(ad->path, path);
+> +}
 > +
-> +    def __init__(self, bus, index):
-> +        Advertisement.__init__(self, bus, index, 'broadcast')
-> +        self.add_manufacturer_data(0x00ff, 'testing')
+> +static void advertisement_free(struct advertisement *ad)
+> +{
+> +       if (ad->client) {
+> +               g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
+> +               g_dbus_client_set_proxy_handlers(ad->client, NULL, NULL, NULL,
+> +                                                                       NULL);
+> +               g_dbus_client_set_ready_watch(ad->client, NULL, NULL);
+> +               g_dbus_client_unref(ad->client);
+> +       }
 > +
+> +       if (ad->proxy)
+> +               g_dbus_proxy_unref(ad->proxy);
 > +
-> +def register_ad_cb():
-> +    print 'Advertisement registered'
+> +       if (ad->reg)
+> +               dbus_message_unref(ad->reg);
 > +
+> +       if (ad->owner)
+> +               g_free(ad->owner);
 > +
-> +def register_ad_error_cb(error):
-> +    print 'Failed to register advertisement: ' + str(error)
-> +    mainloop.quit()
+> +       if (ad->path)
+> +               g_free(ad->path);
 > +
+> +       free(ad);
+> +}
 > +
-> +def find_adapter(bus):
-> +    remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'),
-> +                               DBUS_OM_IFACE)
-> +    objects = remote_om.GetManagedObjects()
+> +static gboolean advertisement_free_idle_cb(void *data)
+> +{
+> +       advertisement_free(data);
 > +
-> +    for o, props in objects.iteritems():
-> +        if LE_ADVERTISING_MANAGER_IFACE in props:
-> +            return o
+> +       return FALSE;
+> +}
 > +
-> +    return None
+> +static void advertisement_remove(void *data)
+> +{
+> +       struct advertisement *ad = data;
 > +
+> +       g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
 > +
-> +def main():
-> +    global mainloop
+> +       queue_remove(ad->manager->adverts, ad);
 > +
-> +    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+> +       g_idle_add(advertisement_free_idle_cb, ad);
+> +}
 > +
-> +    bus = dbus.SystemBus()
+> +static void client_disconnect_cb(DBusConnection *conn, void *user_data)
+> +{
+> +       DBG("Client disconnected");
 > +
-> +    adapter = find_adapter(bus)
-> +    if not adapter:
-> +        print 'LEAdvertisingManager1 interface not found'
-> +        return
+> +       advertisement_remove(user_data);
+> +}
 > +
-> +    ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-> +                                LE_ADVERTISING_MANAGER_IFACE)
+> +static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
+> +{
+> +       struct advertisement *ad = user_data;
+> +       const char *iface, *path;
 > +
-> +    test_advertisement = TestAdvertisement(bus, 0)
+> +       iface = g_dbus_proxy_get_interface(proxy);
+> +       path = g_dbus_proxy_get_path(proxy);
 > +
-> +    mainloop = gobject.MainLoop()
+> +       if (g_strcmp0(iface, LE_ADVERTISEMENT_IFACE))
+> +               return;
 > +
-> +    ad_manager.RegisterAdvertisement(test_advertisement.get_path(), {},
-> +                                     reply_handler=register_ad_cb,
-> +                                     error_handler=register_ad_error_cb)
+> +       DBG("Object added to advertisement - path: %s iface: %s", path, iface);
 > +
-> +    mainloop.run()
+> +       ad->proxy = g_dbus_proxy_ref(proxy);
+> +}
 > +
-> +if __name__ == '__main__':
-> +    main()
+> +static void proxy_removed_cb(GDBusProxy *proxy, void *user_data)
+> +{
+> +       struct advertisement *ad = user_data;
+> +
+> +       DBG("Proxy removed, removing ad: %s", ad->path);
+> +
+> +       advertisement_remove(ad);
+> +}
+> +
+> +static bool parse_advertising_type(GDBusProxy *proxy, uint8_t *type)
+> +{
+> +       DBusMessageIter iter;
+> +       const char *msg_type;
+> +
+> +       if (!g_dbus_proxy_get_property(proxy, "Type", &iter))
+> +               return false;
+> +
+> +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
+> +               return false;
+> +
+> +       dbus_message_iter_get_basic(&iter, &msg_type);
+> +
+> +       if (!g_strcmp0(msg_type, "broadcast")) {
+> +               *type = AD_TYPE_BROADCAST;
+> +               return true;
+> +       }
+> +
+> +       if (!g_strcmp0(msg_type, "peripheral")) {
+> +               *type = AD_TYPE_PERIPHERAL;
+> +               return true;
+> +       }
+> +
+> +       return false;
+> +}
+> +
+> +static void refresh_advertisement(struct advertisement *ad)
+> +{
+> +       DBG("Refreshing advertisement: %s", ad->path);
+> +       if (!ad->published) {
+> +               /* TODO: MGMT API call to update the advertisement */
+> +       }
+> +}
+> +
+> +static bool parse_advertisement(struct advertisement *ad)
+> +{
+> +       if (!parse_advertising_type(ad->proxy, &ad->type)) {
+> +               error("Failed to read \"Type\" property of advertisement");
+> +               return false;
+> +       }
+> +
+> +       /* TODO: parse the remaining properties into a shared structure */
+> +
+> +       refresh_advertisement(ad);
+> +
+> +       return true;
+> +}
+> +
+> +static void property_changed_cb(GDBusProxy *proxy, const char *name,
+> +                                       DBusMessageIter *iter, void *user_data)
+> +{
+> +       struct advertisement *ad = user_data;
+> +
+> +       if (!parse_advertisement(ad)) {
+> +               error("Failed to parse updated advertisement");
+> +               return;
+> +       }
+> +}
+> +
+> +static void client_ready_cb(GDBusClient *client, void *user_data)
+> +{
+> +       struct advertisement *ad = user_data;
+> +
+> +       DBusMessage *reply;
+> +
+> +       bool fail = false;
+> +
+> +       if (!ad->proxy) {
+> +               error("No advertisement object!");
+> +               fail = true;
+> +               reply = btd_error_failed(ad->reg,
+> +                                       "No advertisement object found");
+> +               goto reply;
+> +       }
+> +
+> +       if (!parse_advertisement(ad)) {
+> +               error("Failed to add advertisement to controller");
+> +               fail = true;
+> +               reply = btd_error_failed(ad->reg,
+> +                               "Failed to add advertisement to controller");
+> +               goto reply;
+> +       }
+> +
+> +       if (g_dbus_proxy_set_property_watch(ad->proxy, property_changed_cb, ad)
+> +                                                               == FALSE) {
+> +               error("Failed to set up property watch for advertisement");
+> +               reply = btd_error_failed(ad->reg,
+> +                                       "Can't watch advertisement object");
+> +               goto reply;
+> +       }
+> +
+> +       DBG("Advertisement registered: %s", ad->path);
+> +
+> +       reply = dbus_message_new_method_return(ad->reg);
+> +
+> +reply:
+> +       g_dbus_send_message(btd_get_dbus_connection(), reply);
+> +       dbus_message_unref(ad->reg);
+> +       ad->reg = NULL;
+> +
+> +       if (fail)
+> +               advertisement_remove(ad);
+> +}
+> +
+> +static struct advertisement *advertisement_create(DBusConnection *conn,
+> +                                       DBusMessage *msg, const char *path)
+> +{
+> +       struct advertisement *ad;
+> +       const char *sender = dbus_message_get_sender(msg);
+> +
+> +       if (!path || !g_str_has_prefix(path, "/"))
+> +               return NULL;
+> +
+> +       ad = new0(struct advertisement, 1);
+> +       if (!ad)
+> +               return NULL;
+> +
+> +       ad->client = g_dbus_client_new_full(conn, sender, path, path);
+> +       if (!ad->client)
+> +               goto fail;
+> +
+> +       ad->owner = g_strdup(sender);
+> +       if (!ad->owner)
+> +               goto fail;
+> +
+> +       ad->path = g_strdup(path);
+> +       if (!ad->path)
+> +               goto fail;
+> +
+> +       ad->reg = dbus_message_ref(msg);
+> +
+> +       g_dbus_client_set_disconnect_watch(ad->client, client_disconnect_cb,
+> +                                                                       ad);
+> +
+> +       g_dbus_client_set_proxy_handlers(ad->client, proxy_added_cb,
+> +                                               proxy_removed_cb, NULL, ad);
+> +
+> +       g_dbus_client_set_ready_watch(ad->client, client_ready_cb, ad);
+> +
+> +       ad->random = false;
+> +       ad->published = false;
+> +
+> +       return ad;
+> +
+> +fail:
+> +       advertisement_free(ad);
+> +       return NULL;
+> +}
+> +
+>  static DBusMessage *register_advertisement(DBusConnection *conn,
+>                                                 DBusMessage *msg,
+>                                                 void *user_data)
+>  {
+> +       struct btd_advertising_manager *manager = user_data;
+> +       DBusMessageIter args;
+> +       const char *path;
+> +       struct advertisement *ad;
+> +
+>         DBG("RegisterAdvertisement");
+>
+> -       /* TODO */
+> +       if (!dbus_message_iter_init(msg, &args))
+> +               return btd_error_invalid_args(msg);
+> +
+> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
+> +               return btd_error_invalid_args(msg);
+> +
+> +       dbus_message_iter_get_basic(&args, &path);
+> +
+> +       if (queue_find(manager->adverts, match_advertisement_path, path))
+> +               return btd_error_already_exists(msg);
+> +
+> +       /* TODO: support more than one advertisement */
+> +       if (!queue_isempty(manager->adverts))
+> +               return btd_error_failed(msg, "Already advertising");
+> +
+> +       dbus_message_iter_next(&args);
+> +
+> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
+> +               return btd_error_invalid_args(msg);
+> +
+> +       ad = advertisement_create(conn, msg, path);
+> +       if (!ad)
+> +               return btd_error_failed(msg,
+> +                                       "Failed to register advertisement");
+> +
+> +       DBG("Registered advertisement at path %s", path);
+> +
+> +       ad->manager = manager;
+> +       queue_push_tail(manager->adverts, ad);
+> +
+>         return NULL;
+>  }
+>
+> @@ -79,13 +370,15 @@ advertising_manager_create(struct btd_adapter *adapter)
+>         if (!g_dbus_register_interface(btd_get_dbus_connection(),
+>                                                 adapter_get_path(adapter),
+>                                                 LE_ADVERTISING_MGR_IFACE,
+> -                                               methods, NULL, NULL, adapter,
+> +                                               methods, NULL, NULL, manager,
+>                                                 NULL)) {
+>                 error("Failed to register " LE_ADVERTISING_MGR_IFACE);
+>                 free(manager);
+>                 return NULL;
+>         }
+>
+> +       manager->adverts = queue_new();
+> +
+
+You'll need to destroy manager->adverts in manager's destructor.
+
+>         return manager;
+>  }
+>
 > --
 > 2.2.0.rc0.207.ga3a616c
 >
