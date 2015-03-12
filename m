@@ -1,98 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ 09/12] advertising-manager: Parse SolicitUUIDs
-Date: Thu, 12 Mar 2015 10:11:56 -0700
-Message-Id: <1426180319-16509-10-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1426180319-16509-1-git-send-email-jamuraa@chromium.org>
-References: <1426180319-16509-1-git-send-email-jamuraa@chromium.org>
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH 2/2] unit/test-hog: Add TC/HGRF/RH/BV-09-I test
+Date: Thu, 12 Mar 2015 18:12:56 +0100
+Message-Id: <1426180376-28475-2-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1426180376-28475-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1426180376-28475-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the SolicitUUIDs property of the LEAdvertisement1 object.
+Verify that all HID Information characteristics can be read by a
+Report Host IUT.
 ---
- src/advertising-manager.c   | 43 +++++++++++++++++++++++++++++++++++++++++++
- tools/advertisement-example |  5 +++++
- 2 files changed, 48 insertions(+)
+ unit/test-hog.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/src/advertising-manager.c b/src/advertising-manager.c
-index 92e5cad..e7c24c6 100644
---- a/src/advertising-manager.c
-+++ b/src/advertising-manager.c
-@@ -212,6 +212,44 @@ fail:
- 	return false;
+diff --git a/unit/test-hog.c b/unit/test-hog.c
+index 29fe37b..ce1cc26 100644
+--- a/unit/test-hog.c
++++ b/unit/test-hog.c
+@@ -303,5 +303,26 @@ int main(int argc, char *argv[])
+ 		raw_pdu(0x0a, 0x0a, 0x00),
+ 		raw_pdu(0x0b, 0x02, 0x03));
+ 
++	define_test("/TP/HGRF/RH/BV-09-I", test_hog,
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x12,
++			0x18, 0x05, 0x00, 0x08, 0x00, 0x12, 0x18),
++		raw_pdu(0x10, 0x09, 0x00, 0xff, 0xff, 0x00, 0x28),
++		raw_pdu(0x01, 0x10, 0x09, 0x00, 0x0a),
++		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),
++		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x02, 0x04, 0x00,
++			0x4a, 0x2a),
++		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),
++		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
++		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x02, 0x28),
++		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),
++		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x03, 0x28),
++		raw_pdu(0x09, 0x07, 0x07, 0x00, 0x02, 0x08, 0x00,
++			0x4a, 0x2a),
++		raw_pdu(0x0a, 0x04, 0x00),
++		raw_pdu(0x0b, 0x01, 0x11, 0x00, 0x01),
++		raw_pdu(0x0a, 0x08, 0x00),
++		raw_pdu(0x0b, 0x01, 0x11, 0x00, 0x01));
++
+ 	return tester_run();
  }
- 
-+static bool parse_advertising_solicit_uuids(GDBusProxy *proxy,
-+					struct advertising_data *data)
-+{
-+	DBusMessageIter iter, ariter;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "SolicitUUIDs", &iter))
-+		return true;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		return false;
-+
-+	dbus_message_iter_recurse(&iter, &ariter);
-+
-+	advertising_data_clear_solicit_uuid(data);
-+
-+	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
-+		const char *uuid_str;
-+		bt_uuid_t uuid;
-+
-+		dbus_message_iter_get_basic(&ariter, &uuid_str);
-+
-+		DBG("Adding SolicitUUID: %s", uuid_str);
-+
-+		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
-+			goto fail;
-+
-+		advertising_data_add_solicit_uuid(data, &uuid);
-+
-+		dbus_message_iter_next(&ariter);
-+	}
-+
-+	return true;
-+
-+fail:
-+	advertising_data_clear_solicit_uuid(data);
-+	return false;
-+}
-+
- static void refresh_advertisement(struct advertisement *ad)
- {
- 	DBG("Refreshing advertisement: %s", ad->path);
-@@ -232,6 +270,11 @@ static bool parse_advertisement(struct advertisement *ad)
- 		return false;
- 	}
- 
-+	if (!parse_advertising_solicit_uuids(ad->proxy, ad->data)) {
-+		error("Property \"SolicitUUIDs\" failed to parse correctly");
-+		return false;
-+	}
-+
- 	/* TODO: parse the rest of the properties */
- 
- 	refresh_advertisement(ad);
-diff --git a/tools/advertisement-example b/tools/advertisement-example
-index fb2bdde..2227009 100644
---- a/tools/advertisement-example
-+++ b/tools/advertisement-example
-@@ -78,6 +78,11 @@ class Advertisement(dbus.service.Object):
-             self.service_uuids = []
-         self.service_uuids.append(uuid)
- 
-+    def add_solicit_uuid(self, uuid):
-+        if not self.solicit_uuids:
-+            self.solicit_uuids = []
-+        self.solicit_uuids.append(uuid)
-+
-     def add_manufacturer_data(self, manuf_code, data):
-         if not self.manufacturer_specific_data:
-             self.manufacturer_specific_data = dict()
 -- 
-2.2.0.rc0.207.ga3a616c
+1.9.1
 
