@@ -1,20 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: armansito@google.com
 In-Reply-To: <1426189351-4277-1-git-send-email-marcel@holtmann.org>
 References: <1426189351-4277-1-git-send-email-marcel@holtmann.org>
-Date: Thu, 12 Mar 2015 15:11:38 -0700
-Message-ID: <CAHrH25SF5B+KDzaiEWHCc8BU-Lxg-Dz+9sCgDy_cxp6XRyY-vg@mail.gmail.com>
+Date: Thu, 12 Mar 2015 23:22:46 +0200
+Message-ID: <CABBYNZ+HB0KPDxb27YU8K12RKDZwmc2+4VSAj_CyGa23-ELwWQ@mail.gmail.com>
 Subject: Re: [PATCH] doc: Add mangement API for service information feature
-From: Arman Uguray <armansito@chromium.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-> On Thu, Mar 12, 2015 at 12:42 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Thu, Mar 12, 2015 at 9:42 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
 > ---
 >  doc/mgmt-api.txt | 137 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 >  1 file changed, 137 insertions(+)
@@ -42,14 +41,8 @@ Hi Marcel,
 > +       This command is used to add service information for Bluetooth
 > +       Low Energy controllers. These information are used when the
 > +       controller has to advertise its services.
-
-nit: "...This information is used for the controller to advertise..."
-
 > +
 > +       The Type parameter defines the actions associcated with the
-
-nit: s/associcated/associated/
-
 > +       provided UUID. The following values are defined:
 > +
 > +               0       Service UUID (opportunistic)
@@ -57,13 +50,16 @@ nit: s/associcated/associated/
 > +               2       Service data information
 > +               3       Service solicitation using general discoverable mode
 > +               4       Service solicitation using limited discoverable mode
-> +
+
+Are you intentionally leaving it out the connectable (peripheral) vs
+non-connectable (broadcaster) types, at D-Bus level we were planning
+to tight them with advertising data so the kernel could decide what
+address to use base on the type e.g. broadcaster we could just use
+different addresses for each advertisement if privacy is enabled.
+
 > +       Every UUID can only be provided once and can only be associated
 > +       with one of these types. It is possible to change the current
 > +       type, but it means that it will no longer advertised using the
-
-nit: s/no longer advertised/no longer be advertised/
-
 > +       previous configured type.
 > +
 > +       The Service UUID (type 0 and 1) are advertised using the standard
@@ -162,9 +158,6 @@ nit: s/no longer advertised/no longer be advertised/
 > +                               Type (1 Octet)
 > +
 > +       This event indicates that service information have been added
-
-nit: s/have been/has been/
-
 > +       using the Add Service Information command.
 > +
 > +       The event will only be sent to management sockets other than the
@@ -181,9 +174,6 @@ nit: s/have been/has been/
 > +       This event indicates that service information have been removed
 > +       using the Remove Service Information command.
 > +
-
-nit: s/have been/has been/
-
 > +       The event will only be sent to management sockets other than the
 > +       one through which the command was sent.
 > --
@@ -194,5 +184,7 @@ nit: s/have been/has been/
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Thanks,
-Arman
+
+
+-- 
+Luiz Augusto von Dentz
