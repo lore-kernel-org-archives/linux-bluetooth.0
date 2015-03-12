@@ -2,469 +2,121 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ 06/12] core: add advertising-data
-Date: Thu, 12 Mar 2015 10:11:53 -0700
-Message-Id: <1426180319-16509-7-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ 01/12] doc: Add LE Advertisement D-Bus API documentation
+Date: Thu, 12 Mar 2015 10:11:48 -0700
+Message-Id: <1426180319-16509-2-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1426180319-16509-1-git-send-email-jamuraa@chromium.org>
 References: <1426180319-16509-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The advetising_data structure provides an abstraction for easy
-translation of defined Advertisement Data fields into the resulting
-raw bytes needed by the Bluetooth HCI LE Set Advertising Data command.
+The LE Advertisement API allows external appications to define
+persistent LE Advertisement Data packets.
 ---
- Makefile.am                   |   2 +
- src/shared/advertising-data.c | 350 ++++++++++++++++++++++++++++++++++++++++++
- src/shared/advertising-data.h |  69 +++++++++
- 3 files changed, 421 insertions(+)
- create mode 100644 src/shared/advertising-data.c
- create mode 100644 src/shared/advertising-data.h
+ doc/advertising-api.txt | 94 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 94 insertions(+)
+ create mode 100644 doc/advertising-api.txt
 
-diff --git a/Makefile.am b/Makefile.am
-index 38f9420..bab1502 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -111,6 +111,8 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/uhid.h src/shared/uhid.c \
- 			src/shared/pcap.h src/shared/pcap.c \
- 			src/shared/btsnoop.h src/shared/btsnoop.c \
-+			src/shared/advertising-data.h \
-+			src/shared/advertising-data.c \
- 			src/shared/att-types.h \
- 			src/shared/att.h src/shared/att.c \
- 			src/shared/gatt-helpers.h src/shared/gatt-helpers.c \
-diff --git a/src/shared/advertising-data.c b/src/shared/advertising-data.c
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
 new file mode 100644
-index 0000000..4f86a78
+index 0000000..6bbe485
 --- /dev/null
-+++ b/src/shared/advertising-data.c
-@@ -0,0 +1,350 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2015  Google Inc.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ */
-+
-+#include "src/shared/advertising-data.h"
-+
-+#include "src/shared/queue.h"
-+#include "src/shared/util.h"
-+
-+struct advertising_data {
-+	int ref_count;
-+	struct queue *service_uuids;
-+	struct queue *manufacturer_data;
-+	struct queue *solicit_uuids;
-+	struct queue *service_data;
-+};
-+
-+struct uuid_tagged_data {
-+	bt_uuid_t uuid;
-+	uint8_t *data;
-+	size_t len;
-+};
-+
-+struct manufacturer_tagged_data {
-+	uint16_t manufacturer_id;
-+	uint8_t *data;
-+	size_t len;
-+};
-+
-+struct advertising_data *advertising_data_new(void)
-+{
-+	struct advertising_data *ad;
-+
-+	ad = new0(struct advertising_data, 1);
-+	if (!ad)
-+		return NULL;
-+
-+	ad->service_uuids = queue_new();
-+	if (!ad->service_uuids)
-+		goto fail;
-+
-+	ad->manufacturer_data = queue_new();
-+	if (!ad->manufacturer_data)
-+		goto fail;
-+
-+	ad->solicit_uuids = queue_new();
-+	if (!ad->solicit_uuids)
-+		goto fail;
-+
-+	ad->service_data = queue_new();
-+	if (!ad->service_data)
-+		goto fail;
-+
-+	return advertising_data_ref(ad);
-+
-+fail:
-+	queue_destroy(ad->service_uuids, NULL);
-+	queue_destroy(ad->manufacturer_data, NULL);
-+	queue_destroy(ad->solicit_uuids, NULL);
-+	queue_destroy(ad->service_data, NULL);
-+
-+	free(ad);
-+
-+	return NULL;
-+}
-+
-+struct advertising_data *advertising_data_ref(struct advertising_data *ad)
-+{
-+	ad->ref_count++;
-+	return ad;
-+}
-+
-+static void uuid_tagged_destroy(void *data)
-+{
-+	struct uuid_tagged_data *tagged = data;
-+
-+	free(tagged->data);
-+	free(tagged);
-+}
-+
-+static bool uuid_tagged_match(const void *data, const void *elem)
-+{
-+	const struct uuid_tagged_data *tagged = elem;
-+	const bt_uuid_t *uuid = data;
++++ b/doc/advertising-api.txt
+@@ -0,0 +1,94 @@
++BlueZ D-Bus LE Advertising API Description
++******************************************
 +
-+	return !bt_uuid_cmp(&tagged->uuid, uuid);
-+}
++Advertising packets are structured data which is broadcast on the LE Advertising
++channels and available for all devices in range.  Because of the limited space
++available in LE Advertising packets (32 bytes) , each packet's contents must be
++controllable.
 +
-+static void manuf_tagged_destroy(void *data)
-+{
-+	struct manufacturer_tagged_data *tagged = data;
++BlueZ acts as a store for the multiple sets of Advertisement Data which is meant
++to be sent.  It constructs the correct Advertisement Data from the structured
++data and communicates the sets of data to the kernel, where it is
++multiplexed.
 +
-+	free(tagged->data);
-+	free(tagged);
-+}
++Advertisement Data objects are registered freely and then referenced by BlueZ
++when constructing the data sent to the kernel.
 +
-+static bool manuf_tagged_match(const void *data, const void *elem)
-+{
-+	const struct manufacturer_tagged_data *tagged = elem;
-+	uint16_t manuf_id = PTR_TO_UINT(elem);
++LE Advertisement Data hierarchy
++===============================
 +
-+	return tagged->manufacturer_id == manuf_id;
-+}
++Specifies the Advertisement Data to be broadcast and some advertising
++parameters.  Properties which are not present will not be included in the
++data.  Required advertisement data types will always be included.
++All UUIDs are 128-bit versions in the API, and 16 or 32-bit
++versions of the same UUID will be used in the advertising data as appropriate.
 +
-+void advertising_data_unref(struct advertising_data *ad)
-+{
-+	if (!ad)
-+		return;
++Service		org.bluez
++Interface	org.bluez.LEAdvertisement1
++Object path	freely definable
 +
-+	if (__sync_sub_and_fetch(&ad->ref_count, 1))
-+		return;
++Properties	string Type
 +
-+	queue_destroy(ad->service_uuids, free);
++			Determines the type of advertising packet requested.
 +
-+	queue_destroy(ad->manufacturer_data, manuf_tagged_destroy);
++			Possible values: "broadcast" or "peripheral"
 +
-+	queue_destroy(ad->solicit_uuids, free);
++		array{string} ServiceUUIDs
 +
-+	queue_destroy(ad->service_data, uuid_tagged_destroy);
++			List of UUIDs to include in the "Service UUID" field of
++			the Advertising Data.
 +
-+	free(ad);
-+}
++		dict ManufacturerSpecificData
 +
-+uint8_t *advertising_data_generate(struct advertising_data *ad, uint8_t *length)
-+{
-+	/* TODO: implement */
-+	return NULL;
-+}
++			Manufactuer Specific Data fields to include in
++			the Advertising Data.  Keys are the Manufacturer ID
++			to associate with the data.
 +
-+static bool queue_add_uuid(struct queue *queue, const bt_uuid_t *uuid)
-+{
-+	bt_uuid_t *new_uuid;
++		bool IncludePower
 +
-+	if (!queue)
-+		return false;
++			If present and true, the TX Power Level will be included
++			in the Advertising Data.
 +
-+	new_uuid = new0(bt_uuid_t, 1);
-+	if (!new_uuid)
-+		return false;
++		array{string} SolicitUUIDs
 +
-+	bt_uuid_to_uuid128(uuid, new_uuid);
++			Array of UUIDs to include in "Service Solicitation"
++			Advertisement Data.
 +
-+	queue_push_tail(queue, new_uuid);
++		dict ServiceData
 +
-+	return true;
-+}
++			Service Data elements to include. The keys are the
++			UUID to associate with the data.
 +
-+static bool uuid_match(const void *data, const void *elem)
-+{
-+	const bt_uuid_t *match_uuid = data;
-+	const bt_uuid_t *uuid = elem;
 +
-+	return bt_uuid_cmp(match_uuid, uuid);
-+}
++LE Advertising Manager hierarchy
++================================
 +
-+static bool queue_remove_uuid(struct queue *queue, bt_uuid_t *uuid)
-+{
-+	bt_uuid_t *removed;
++The Advertising Manager allows external applications to register Advertisement
++Data which should be broadcast to devices.  Advertisement Data elements must
++follow the API for LE Advertisement Data described above.
 +
-+	if (!queue || !uuid)
-+		return false;
++Service		org.bluez
++Interface	org.bluez.LEAdvertisingManager1 [Experimental]
++Object path	/org/bluez/{hci0,hci1,...}
 +
-+	removed = queue_remove_if(queue, uuid_match, uuid);
++Methods		RegisterAdvertisement(object advertisement, dict options)
 +
-+	if (removed) {
-+		free(removed);
-+		return true;
-+	}
++			Registers an advertisement object to be sent over the LE
++			Advertising channel.  The service must be exported
++			under interface LEAdvertisement1. InvalidArguments
++			indicates that the object has invalid or conflicting
++			properties.  InvalidLength indicates that the data
++			provided generates a data packet which is too long.
 +
-+	return false;
-+}
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++					 org.bluez.Error.InvalidLength
 +
-+bool advertising_data_add_service_uuid(struct advertising_data *ad,
-+							const bt_uuid_t *uuid)
-+{
-+	if (!ad)
-+		return false;
++		UnregisterAdvertisement(object advertisement)
 +
-+	return queue_add_uuid(ad->service_uuids, uuid);
-+}
++			This unregisters the advertisement that has been
++			prevously registered.  The object path parameter must
++			match the same value that has been used on registration.
 +
-+bool advertising_data_remove_service_uuid(struct advertising_data *ad,
-+							bt_uuid_t *uuid)
-+{
-+	if (!ad)
-+		return false;
-+
-+	return queue_remove_uuid(ad->service_uuids, uuid);
-+}
-+
-+void advertising_data_clear_service_uuid(struct advertising_data *ad)
-+{
-+	queue_destroy(ad->service_uuids, free);
-+
-+	ad->service_uuids = queue_new();
-+}
-+
-+bool advertising_data_add_manufacturer_data(struct advertising_data *ad,
-+						uint16_t manufacturer_id,
-+						void *data, size_t len)
-+{
-+	struct manufacturer_tagged_data *new_data;
-+
-+	if (!ad)
-+		return false;
-+
-+	new_data = new0(struct manufacturer_tagged_data, 1);
-+	if (!new_data)
-+		return false;
-+
-+	new_data->manufacturer_id = manufacturer_id;
-+
-+	new_data->data = malloc(len);
-+	if (!new_data->data) {
-+		free(new_data);
-+		return false;
-+	}
-+
-+	memcpy(new_data->data, data, len);
-+
-+	if (queue_push_tail(ad->manufacturer_data, new_data))
-+		return true;
-+
-+	manuf_tagged_destroy(new_data);
-+
-+	return false;
-+}
-+
-+bool advertising_data_remove_manufacturer_data(struct advertising_data *ad,
-+						uint16_t manufacturer_id)
-+{
-+	struct manufacturer_tagged_data *data;
-+
-+	if (!ad)
-+		return false;
-+
-+	data = queue_remove_if(ad->manufacturer_data, manuf_tagged_match,
-+						UINT_TO_PTR(manufacturer_id));
-+
-+	if (!data)
-+		return false;
-+
-+	manuf_tagged_destroy(data);
-+
-+	return true;
-+}
-+
-+void advertising_data_clear_manufacturer_data(struct advertising_data *ad)
-+{
-+	queue_destroy(ad->manufacturer_data, manuf_tagged_destroy);
-+
-+	ad->manufacturer_data = queue_new();
-+}
-+
-+bool advertising_data_add_solicit_uuid(struct advertising_data *ad,
-+							const bt_uuid_t *uuid)
-+{
-+	if (!ad)
-+		return false;
-+
-+	return queue_add_uuid(ad->solicit_uuids, uuid);
-+}
-+
-+bool advertising_data_remove_solicit_uuid(struct advertising_data *ad,
-+							bt_uuid_t *uuid)
-+{
-+	if (!ad)
-+		return false;
-+
-+	return queue_remove_uuid(ad->solicit_uuids, uuid);
-+}
-+
-+void advertising_data_clear_solicit_uuid(struct advertising_data *ad)
-+{
-+	queue_destroy(ad->solicit_uuids, free);
-+
-+	ad->solicit_uuids = queue_new();
-+}
-+
-+bool advertising_data_add_service_data(struct advertising_data *ad,
-+						const bt_uuid_t *uuid,
-+						void *data, size_t len)
-+{
-+	struct uuid_tagged_data *new_data;
-+
-+	if (!ad)
-+		return false;
-+
-+	new_data = new0(struct uuid_tagged_data, 1);
-+	if (!new_data)
-+		return false;
-+
-+	bt_uuid_to_uuid128(uuid, &new_data->uuid);
-+
-+	new_data->data = malloc(len);
-+	if (!new_data) {
-+		free(new_data);
-+		return false;
-+	}
-+
-+	memcpy(new_data->data, data, len);
-+
-+	if (queue_push_tail(ad->service_data, new_data))
-+		return true;
-+
-+	uuid_tagged_destroy(new_data);
-+
-+	return false;
-+}
-+
-+bool advertising_data_remove_service_data(struct advertising_data *ad,
-+							bt_uuid_t *uuid)
-+{
-+	struct uuid_tagged_data *data;
-+
-+	if (!ad)
-+		return false;
-+
-+	data = queue_remove_if(ad->service_data, uuid_tagged_match, uuid);
-+
-+	if (!data)
-+		return false;
-+
-+	uuid_tagged_destroy(data);
-+
-+	return true;
-+}
-+
-+void advertising_data_clear_service_data(struct advertising_data *ad)
-+{
-+	queue_destroy(ad->service_data, uuid_tagged_destroy);
-+
-+	ad->service_data = queue_new();
-+}
-+
-diff --git a/src/shared/advertising-data.h b/src/shared/advertising-data.h
-new file mode 100644
-index 0000000..05d2b51
---- /dev/null
-+++ b/src/shared/advertising-data.h
-@@ -0,0 +1,69 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2015  Google Inc.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ */
-+
-+#include <inttypes.h>
-+#include <stdbool.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/uuid.h"
-+
-+struct advertising_data;
-+
-+struct advertising_data *advertising_data_new(void);
-+
-+struct advertising_data *advertising_data_ref(struct advertising_data *ad);
-+
-+void advertising_data_unref(struct advertising_data *ad);
-+
-+uint8_t *advertising_data_generate(struct advertising_data *ad,
-+							uint8_t *length);
-+
-+bool advertising_data_add_service_uuid(struct advertising_data *ad,
-+							const bt_uuid_t *uuid);
-+
-+bool advertising_data_remove_service_uuid(struct advertising_data *ad,
-+							bt_uuid_t *uuid);
-+
-+void advertising_data_clear_service_uuid(struct advertising_data *ad);
-+
-+bool advertising_data_add_manufacturer_data(struct advertising_data *ad,
-+						uint16_t manufacturer_data,
-+						void *data, size_t len);
-+
-+bool advertising_data_remove_manufacturer_data(struct advertising_data *ad,
-+						uint16_t manufacturer_id);
-+
-+void advertising_data_clear_manufacturer_data(struct advertising_data *ad);
-+
-+bool advertising_data_add_solicit_uuid(struct advertising_data *ad,
-+							const bt_uuid_t *uuid);
-+
-+bool advertising_data_remove_solicit_uuid(struct advertising_data *ad,
-+							bt_uuid_t *uuid);
-+
-+void advertising_data_clear_solicit_uuid(struct advertising_data *ad);
-+
-+bool advertising_data_add_service_data(struct advertising_data *ad,
-+						const bt_uuid_t *uuid,
-+						void *data, size_t len);
-+
-+bool advertising_data_remove_service_data(struct advertising_data *ad,
-+							bt_uuid_t *uuid);
-+
-+void advertising_data_clear_service_data(struct advertising_data *ad);
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.DoesNotExist
 -- 
 2.2.0.rc0.207.ga3a616c
 
