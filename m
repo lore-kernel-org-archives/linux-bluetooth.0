@@ -1,47 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v4 1/7] profiles/network: Fix sending error in bnep server add
-Date: Thu, 12 Mar 2015 17:06:36 +0100
-Message-Id: <1426176402-21179-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1426176402-21179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1426176402-21179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] android/gatt: Implement MTU exchange HAL API
+Date: Thu, 12 Mar 2015 16:03:36 +0100
+Message-ID: <3668094.CB29rsQEEs@leonov>
+In-Reply-To: <1426084883-10291-1-git-send-email-szymon.janc@tieto.com>
+References: <1426084883-10291-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If bnep server add will not proceed successfully, approperiate error
-should be returned. Now it returns error if control message send will
-fail.
----
- profiles/network/bnep.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+On Wednesday 11 of March 2015 15:41:19 Szymon Janc wrote:
+> This allow application to query for current MTU. MTU is always
+> exchanged on connection and notifications are sent to framework.
+> 
+> When client requests MTU exchange we just report current value but
+> don't trigger another exchange procedure (since this is against spec).
+> ---
+>  android/gatt.c | 63
+> +++++++++++++++++++++++++++++++++++++++++++++++++++++++--- 1 file changed,
+> 60 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 9c2a280..1a264ba 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -941,6 +941,39 @@ static bool get_local_mtu(struct gatt_device *dev,
+> uint16_t *mtu) return true;
+>  }
+> 
+> +static void notify_client_mtu_change(struct app_connection *conn, bool
+> success) +{
+> +	struct hal_ev_gatt_client_configure_mtu ev;
+> +	size_t mtu;
+> +
+> +	g_attrib_get_buffer(conn->device->attrib, &mtu);
+> +
+> +	ev.conn_id = conn->id;
+> +	ev.status = success ? GATT_SUCCESS : GATT_FAILURE;
+> +	ev.mtu = mtu;
+> +
+> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+> +			HAL_EV_GATT_CLIENT_CONFIGURE_MTU, sizeof(ev), &ev);
+> +}
+> +
+> +static void notify_mtu_change(void *data, void *user_data)
+> +{
+> +	struct gatt_device *device = user_data;
+> +	struct app_connection *conn = data;
+> +
+> +	if (conn->device != device)
+> +		return;
+> +
+> +	switch (conn->app->type) {
+> +	case GATT_CLIENT:
+> +		notify_client_mtu_change(conn, true);
+> +		break;
+> +	case GATT_SERVER:
+> +	default:
+> +		break;
+> +	}
+> +}
+> +
+>  static bool update_mtu(struct gatt_device *device, uint16_t rmtu)
+>  {
+>  	uint16_t mtu, lmtu;
+> @@ -965,6 +998,8 @@ static bool update_mtu(struct gatt_device *device,
+> uint16_t rmtu) return false;
+>  	}
+> 
+> +	queue_foreach(app_connections, notify_mtu_change, device);
+> +
+>  	return true;
+>  }
+> 
+> @@ -1600,6 +1635,11 @@ reply:
+>  	data.status = status;
+>  	queue_foreach(app_connections, notify_app_connect_status_by_device,
+>  									&data);
+> +
+> +	/* For BR/EDR notify about MTU since it is not negotiable*/
+> +	if (cid != ATT_CID)
+> +		queue_foreach(app_connections, notify_mtu_change, dev);
+> +
+>  	device_unref(dev);
+> 
+>  	/* Check if we should restart scan */
+> @@ -5676,14 +5716,31 @@ static void handle_client_scan_filter_enable(const
+> void *buf, uint16_t len) static void handle_client_configure_mtu(const void
+> *buf, uint16_t len) {
+>  	const struct hal_cmd_gatt_client_configure_mtu *cmd = buf;
+> +	static struct app_connection *conn;
+> +	uint8_t status;
+> 
+> -	DBG("conn_id %u", cmd->conn_id);
+> +	DBG("conn_id %u mtu %d", cmd->conn_id, cmd->mtu);
+> 
+> -	/* TODO */
+> +	conn = find_connection_by_id(cmd->conn_id);
+> +	if (!conn) {
+> +		status = HAL_STATUS_FAILED;
+> +		goto failed;
+> +	}
+> 
+> +	/*
+> +	 * currently MTU is always exchanged on connection, just report current
+> +	 * value
+> +	 *
+> +	 * TODO figure out when send failed status
+> +	 * TODO should we fail for BR/EDR?
+> +	 */
+> +	notify_client_mtu_change(conn, false);
+> +	status = HAL_STATUS_SUCCESS;
+> +
+> +failed:
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+>  					HAL_OP_GATT_CLIENT_CONFIGURE_MTU,
+> -					HAL_STATUS_UNSUPPORTED);
+> +					status);
+>  }
+> 
+>  static void handle_client_conn_param_update(const void *buf, uint16_t len)
 
-diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index adddc33..48926b4 100644
---- a/profiles/network/bnep.c
-+++ b/profiles/network/bnep.c
-@@ -650,6 +650,7 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
- 	/* Processing BNEP_SETUP_CONNECTION_REQUEST_MSG */
- 	rsp = bnep_setup_decode(sk, req, &dst);
- 	if (rsp != BNEP_SUCCESS) {
-+		err = -rsp;
- 		error("bnep: error while decoding setup connection request: %d",
- 									rsp);
- 		goto reply;
-@@ -673,10 +674,11 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
- 		rsp = BNEP_CONN_NOT_ALLOWED;
- 
- reply:
--	err = bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp);
--	if (err < 0)
-+	if (bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp) < 0) {
- 		error("bnep: send ctrl rsp error: %s (%d)", strerror(errno),
- 									errno);
-+		err = -errno;
-+	}
- 
- 	return err;
- }
+Applied.
+
 -- 
-2.1.0
-
+BR
+Szymon Janc
