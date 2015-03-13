@@ -1,62 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com
-Subject: [PATCH  1/7] unit/test-gatt: Add TP/GAW/SR/BV-05-C test
-Date: Fri, 13 Mar 2015 12:04:40 +0530
-Message-id: <1426228486-5124-2-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1426228486-5124-1-git-send-email-gowtham.ab@samsung.com>
-References: <1426228486-5124-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH] Bluetooth: Add support connectable advertising setting
+Date: Thu, 12 Mar 2015 22:30:58 -0700
+Message-Id: <1426224658-25141-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bharat Panda <bharat.panda@samsung.com>
+The patch adds a second advertising setting that allows switching of the
+controller into connectable mode independent of the global connectable
+setting.
 
-Verify that a Generic Attribute Profile server can support writing
-a long Characteristic Value selected by handle.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- unit/test-gatt.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/mgmt.c        | 39 ++++++++++++++++++++++++++++++---------
+ 2 files changed, 31 insertions(+), 9 deletions(-)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 1babe11..7578ddf 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -3143,6 +3143,34 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x12, 0x04, 0x00, 0x01, 0x02, 0x03),
- 			raw_pdu(0x01, 0x12, 0x04, 0x00, 0x03));
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index f76f45ae76c3..0f3413b285a5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -217,6 +217,7 @@ enum {
+ 	HCI_HS_ENABLED,
+ 	HCI_LE_ENABLED,
+ 	HCI_ADVERTISING,
++	HCI_ADVERTISING_CONNECTABLE,
+ 	HCI_CONNECTABLE,
+ 	HCI_DISCOVERABLE,
+ 	HCI_LIMITED_DISCOVERABLE,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 025f29bf1f1a..0761f2e0fefa 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1110,7 +1110,10 @@ static void enable_advertising(struct hci_request *req)
+ 	 */
+ 	clear_bit(HCI_LE_ADV, &hdev->dev_flags);
  
-+	define_test_server("/TP/GAW/SR/BV-05-C/small", test_server,
-+			ts_small_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x16, 0x03, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
-+			raw_pdu(0x17, 0x03, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
-+			raw_pdu(0x16, 0x03, 0x00, 0x3f, 0x00, 0xff),
-+			raw_pdu(0x17, 0x03, 0x00, 0x3f, 0x00, 0xff),
-+			raw_pdu(0x18, 0x01),
-+			raw_pdu(0x19));
+-	connectable = get_connectable(hdev);
++	if (test_bit(HCI_ADVERTISING_CONNECTABLE, &hdev->dev_flags))
++		connectable = true;
++	else
++		connectable = get_connectable(hdev);
+ 
+ 	/* Set require_privacy to true only when non-connectable
+ 	 * advertising is used. In that case it is fine to use a
+@@ -4430,7 +4433,7 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct mgmt_mode *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+-	u8 val, enabled, status;
++	u8 val, status;
+ 	int err;
+ 
+ 	BT_DBG("request for %s", hdev->name);
+@@ -4440,29 +4443,42 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
+ 				       status);
+ 
+-	if (cp->val != 0x00 && cp->val != 0x01)
++	if (cp->val != 0x00 && cp->val != 0x01 && cp->val != 0x02)
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 
+ 	hci_dev_lock(hdev);
+ 
+ 	val = !!cp->val;
+-	enabled = test_bit(HCI_ADVERTISING, &hdev->dev_flags);
+ 
+ 	/* The following conditions are ones which mean that we should
+ 	 * not do any HCI communication but directly send a mgmt
+ 	 * response to user space (after toggling the flag if
+ 	 * necessary).
+ 	 */
+-	if (!hdev_is_powered(hdev) || val == enabled ||
++	if (!hdev_is_powered(hdev) ||
++	    (val == test_bit(HCI_ADVERTISING, &hdev->dev_flags) &&
++	     (cp->val == 0x02) == test_bit(HCI_ADVERTISING_CONNECTABLE,
++					   &hdev->dev_flags)) ||
+ 	    hci_conn_num(hdev, LE_LINK) > 0 ||
+ 	    (test_bit(HCI_LE_SCAN, &hdev->dev_flags) &&
+ 	     hdev->le_scan_type == LE_SCAN_ACTIVE)) {
+-		bool changed = false;
++		bool changed;
+ 
+-		if (val != test_bit(HCI_ADVERTISING, &hdev->dev_flags)) {
+-			change_bit(HCI_ADVERTISING, &hdev->dev_flags);
+-			changed = true;
++		if (cp->val) {
++			changed = !test_and_set_bit(HCI_ADVERTISING,
++						    &hdev->dev_flags);
++			if (cp->val == 0x02)
++				set_bit(HCI_ADVERTISING_CONNECTABLE,
++					&hdev->dev_flags);
++			else
++				clear_bit(HCI_ADVERTISING_CONNECTABLE,
++					  &hdev->dev_flags);
++		} else {
++			changed = test_and_clear_bit(HCI_ADVERTISING,
++						     &hdev->dev_flags);
++			clear_bit(HCI_ADVERTISING_CONNECTABLE,
++				  &hdev->dev_flags);
+ 		}
+ 
+ 		err = send_settings_rsp(sk, MGMT_OP_SET_ADVERTISING, hdev);
+@@ -4490,6 +4506,11 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	hci_req_init(&req, hdev);
+ 
++	if (cp->val == 0x02)
++		set_bit(HCI_ADVERTISING_CONNECTABLE, &hdev->dev_flags);
++	else
++		clear_bit(HCI_ADVERTISING_CONNECTABLE, &hdev->dev_flags);
 +
-+	define_test_server("/TP/GAW/SR/BV-05-C/large-1", test_server,
-+			ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x16, 0x82, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
-+			raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
-+			raw_pdu(0x16, 0x82, 0x00, 0x3f, 0x00, 0xff),
-+			raw_pdu(0x17, 0x82, 0x00, 0x3f, 0x00, 0xff),
-+			raw_pdu(0x18, 0x01),
-+			raw_pdu(0x19));
-+
- 	define_test_client("/TP/GAW/CL/BV-08-C", test_client, service_db_1,
- 			&test_write_7,
- 			SERVICE_DATA_1_PDUS,
+ 	if (val)
+ 		enable_advertising(&req);
+ 	else
 -- 
-1.9.1
+2.1.0
 
