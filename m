@@ -1,58 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/2] android/hog: Fix double queue_destroy
-Date: Fri, 13 Mar 2015 16:28:06 +0100
-Message-ID: <1557195.lBugORj9LM@leonov>
-In-Reply-To: <1426171691-20096-1-git-send-email-mariusz.skamra@tieto.com>
-References: <8751350.UbEOeYCG5L@leonov> <1426171691-20096-1-git-send-email-mariusz.skamra@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCHv2] unit/test-hog: Add TC/HGRF/RH/BV-08-I test
+Date: Fri, 13 Mar 2015 15:39:29 +0100
+Message-Id: <1426257569-9338-1-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1426180376-28475-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1426180376-28475-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+Verify that all Report Reference characteristic descriptors for all
+Report characteristics of Report Type: Feature Report can be read
+by a Report Host IUT.
+---
+ unit/test-hog.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-On Thursday 12 of March 2015 15:48:11 Mariusz Skamra wrote:
-> There is no need to destroy these queues here, there are destroyed in
-> hog_free. Prevents from memory violation.
-> ---
->  android/hog.c | 16 ++--------------
->  1 file changed, 2 insertions(+), 14 deletions(-)
-> 
-> diff --git a/android/hog.c b/android/hog.c
-> index 88a5460..8133303 100644
-> --- a/android/hog.c
-> +++ b/android/hog.c
-> @@ -1180,23 +1180,11 @@ struct bt_hog *bt_hog_new(const char *name, uint16_t
-> vendor, uint16_t product, return NULL;
-> 
->  	hog->gatt_op = queue_new();
-> -	if (!hog->gatt_op) {
-> -		hog_free(hog);
-> -		return NULL;
-> -	}
-> -
->  	hog->bas = queue_new();
-> -	if (!hog->bas) {
-> -		queue_destroy(hog->gatt_op, NULL);
-> -		hog_free(hog);
-> -		return NULL;
-> -	}
-> -
->  	hog->uhid = bt_uhid_new_default();
-> -	if (!hog->uhid) {
-> +
-> +	if (!hog->gatt_op || !hog->bas || !hog->uhid) {
->  		hog_free(hog);
-> -		queue_destroy(hog->gatt_op, NULL);
-> -		queue_destroy(hog->bas, NULL);
->  		return NULL;
->  	}
-
-This patch is now applied, thanks.
-
+diff --git a/unit/test-hog.c b/unit/test-hog.c
+index 941e860..e63a04e 100644
+--- a/unit/test-hog.c
++++ b/unit/test-hog.c
+@@ -270,5 +270,38 @@ int main(int argc, char *argv[])
+ 				0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
+ 				0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13));
+ 
++	define_test("/TP/HGRF/RH/BV-08-I", test_hog,
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x05, 0x00, 0x12,
++			0x18, 0x06, 0x00, 0x0a, 0x00, 0x12, 0x18),
++		raw_pdu(0x10, 0x0b, 0x00, 0xff, 0xff, 0x00, 0x28),
++		raw_pdu(0x01, 0x10, 0x0b, 0x00, 0x0a),
++		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x03, 0x28),
++		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x0a, 0x04, 0x00,
++			0x4d, 0x2a),
++		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x02, 0x28),
++		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
++		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x02, 0x28),
++		raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a),
++		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x03, 0x28),
++		raw_pdu(0x09, 0x07, 0x08, 0x00, 0x0a, 0x09, 0x00,
++			0x4d, 0x2a),
++		raw_pdu(0x08, 0x04, 0x00, 0x05, 0x00, 0x03, 0x28),
++		raw_pdu(0x01, 0x08, 0x04, 0x00, 0x0a),
++		raw_pdu(0x08, 0x09, 0x00, 0x0a, 0x00, 0x03, 0x28),
++		raw_pdu(0x01, 0x08, 0x09, 0x00, 0x0a),
++		raw_pdu(0x0a, 0x04, 0x00),
++		raw_pdu(0x0b, 0xee, 0xee, 0xff, 0xff),
++		raw_pdu(0x04, 0x05, 0x00, 0x05, 0x00),
++		raw_pdu(0x05, 0x01, 0x05, 0x00, 0x08, 0x29),
++		raw_pdu(0x0a, 0x09, 0x00),
++		raw_pdu(0x0b, 0xff, 0xff, 0xee, 0xee),
++		raw_pdu(0x04, 0x0a, 0x00, 0x0a, 0x00),
++		raw_pdu(0x05, 0x01, 0x0a, 0x00, 0x08, 0x29),
++		raw_pdu(0x0a, 0x05, 0x00),
++		raw_pdu(0x0b, 0x01, 0x03),
++		raw_pdu(0x0a, 0x0a, 0x00),
++		raw_pdu(0x0b, 0x02, 0x03));
++
+ 	return tester_run();
+ }
 -- 
-BR
-Szymon Janc
+1.9.1
+
