@@ -1,189 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [BlueZ 01/12] doc: Add LE Advertisement D-Bus API documentation
+Date: Fri, 13 Mar 2015 09:11:34 +0100
+Message-ID: <1528858.3hvJhi3e6o@leonov>
+In-Reply-To: <1426180319-16509-2-git-send-email-jamuraa@chromium.org>
+References: <1426180319-16509-1-git-send-email-jamuraa@chromium.org> <1426180319-16509-2-git-send-email-jamuraa@chromium.org>
 MIME-Version: 1.0
-In-Reply-To: <1426097463-5288-5-git-send-email-marcin.kraglak@tieto.com>
-References: <1426097463-5288-1-git-send-email-marcin.kraglak@tieto.com>
-	<1426097463-5288-5-git-send-email-marcin.kraglak@tieto.com>
-Date: Fri, 13 Mar 2015 10:42:23 +0200
-Message-ID: <CABBYNZLZxvzdjz+XcjJNne9DBLOR8m79qPq-dQ7vaVEqAzJ4dA@mail.gmail.com>
-Subject: Re: [PATCH 4/4] plugins/policy: Try reconnect Control/Target services
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Michael,
 
-On Wed, Mar 11, 2015 at 8:11 PM, Marcin Kraglak
-<marcin.kraglak@tieto.com> wrote:
-> If state of Control/Remote services changed from CONNECTING to
-> DISCONNECTED, and error is set to -EAGAIN, set random timer and try
-> reconnect. This approach is described in AVRCP Spec 1.5 4.1.1:
-> "If both devices open an AVCTP channel at the same time both channels
-> shall be closed and each device shall wait a random time
-> (not more than 1 s and not less than 100ms) and then try to open
-> the AVCTP channel again."
+On Thursday 12 of March 2015 10:11:48 Michael Janssen wrote:
+> The LE Advertisement API allows external appications to define
+> persistent LE Advertisement Data packets.
 > ---
->  plugins/policy.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 80 insertions(+)
->
-> diff --git a/plugins/policy.c b/plugins/policy.c
-> index 9cbf146..306a7a3 100644
-> --- a/plugins/policy.c
-> +++ b/plugins/policy.c
-> @@ -50,6 +50,16 @@
->  #define SINK_RETRY_TIMEOUT SOURCE_RETRY_TIMEOUT
->  #define SOURCE_RETRIES 1
->  #define SINK_RETRIES SOURCE_RETRIES
-> +#define CT_RETRIES 1
-> +#define TG_RETRIES CT_RETRIES
+>  doc/advertising-api.txt | 94
+> +++++++++++++++++++++++++++++++++++++++++++++++++ 1 file changed, 94
+> insertions(+)
+>  create mode 100644 doc/advertising-api.txt
+> 
+> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+> new file mode 100644
+> index 0000000..6bbe485
+> --- /dev/null
+> +++ b/doc/advertising-api.txt
+> @@ -0,0 +1,94 @@
+> +BlueZ D-Bus LE Advertising API Description
+> +******************************************
 > +
-> +/*
-> + * AVRCP Spec 1.5 says that reconnect timeout after connection collision
-> + * should be random value between 100 ms and 1000 ms. To improve user experience
-> + * we linit MAX value to 500 ms
-> + */
-> +#define RECONNECT_MAX_TIMEOUT 500
-> +#define RECONNECT_MIN_TIMEOUT 100
+> +Advertising packets are structured data which is broadcast on the LE
+> Advertising +channels and available for all devices in range.  Because of
+> the limited space +available in LE Advertising packets (32 bytes) , each
+> packet's contents must be +controllable.
+> +
+> +BlueZ acts as a store for the multiple sets of Advertisement Data which is
+> meant +to be sent.  It constructs the correct Advertisement Data from the
+> structured +data and communicates the sets of data to the kernel, where it
+> is +multiplexed.
+> +
+> +Advertisement Data objects are registered freely and then referenced by
+> BlueZ +when constructing the data sent to the kernel.
+> +
+> +LE Advertisement Data hierarchy
+> +===============================
+> +
+> +Specifies the Advertisement Data to be broadcast and some advertising
+> +parameters.  Properties which are not present will not be included in the
+> +data.  Required advertisement data types will always be included.
+> +All UUIDs are 128-bit versions in the API, and 16 or 32-bit
+> +versions of the same UUID will be used in the advertising data as
+> appropriate. +
+> +Service		org.bluez
+> +Interface	org.bluez.LEAdvertisement1
+> +Object path	freely definable
+> +
+> +Properties	string Type
+> +
+> +			Determines the type of advertising packet requested.
+> +
+> +			Possible values: "broadcast" or "peripheral"
+> +
+> +		array{string} ServiceUUIDs
+> +
+> +			List of UUIDs to include in the "Service UUID" field of
+> +			the Advertising Data.
+> +
+> +		dict ManufacturerSpecificData
+> +
+> +			Manufactuer Specific Data fields to include in
+> +			the Advertising Data.  Keys are the Manufacturer ID
+> +			to associate with the data.
+> +
+> +		bool IncludePower
+> +
+> +			If present and true, the TX Power Level will be included
+> +			in the Advertising Data.
+> +
+> +		array{string} SolicitUUIDs
+> +
+> +			Array of UUIDs to include in "Service Solicitation"
+> +			Advertisement Data.
+> +
+> +		dict ServiceData
+> +
+> +			Service Data elements to include. The keys are the
+> +			UUID to associate with the data.
+> +
+> +
+> +LE Advertising Manager hierarchy
+> +================================
+> +
+> +The Advertising Manager allows external applications to register
+> Advertisement +Data which should be broadcast to devices.  Advertisement
+> Data elements must +follow the API for LE Advertisement Data described
+> above.
+> +
+> +Service		org.bluez
+> +Interface	org.bluez.LEAdvertisingManager1 [Experimental]
+> +Object path	/org/bluez/{hci0,hci1,...}
+> +
+> +Methods		RegisterAdvertisement(object advertisement, dict options)
+> +
+> +			Registers an advertisement object to be sent over the LE
+> +			Advertising channel.  The service must be exported
+> +			under interface LEAdvertisement1. InvalidArguments
+> +			indicates that the object has invalid or conflicting
+> +			properties.  InvalidLength indicates that the data
+> +			provided generates a data packet which is too long.
+> +
+> +			Possible errors: org.bluez.Error.InvalidArguments
+> +					 org.bluez.Error.AlreadyExists
+> +					 org.bluez.Error.InvalidLength
+> +
+> +		UnregisterAdvertisement(object advertisement)
+> +
+> +			This unregisters the advertisement that has been
+> +			prevously registered.  The object path parameter must
+> +			match the same value that has been used on registration.
+> +
+> +			Possible errors: org.bluez.Error.InvalidArguments
+> +					 org.bluez.Error.DoesNotExist
 
-Im not sure we should use sub seconds values, g_timeout_add_seconds
-allows group wake-up whereas g_timeout_add doesn't (see
-g_timeout_add_seconds_full documentation), so perhaps going with 1
-sec. for reconnect is fine here since by design g_timeout_add_seconds
-will not be precise so you have some randomness already.
+If app is allowed to change props values then there should be some way (eg 
+Unregister(error)) to report InvalidArguments error similar to what 
+RegisterAdvertisement() is reporting.
 
->  /* Tracking of remote services to be auto-reconnected upon link loss */
->
-> @@ -82,7 +92,9 @@ struct policy_data {
->         guint sink_timer;
->         uint8_t sink_retries;
->         guint ct_timer;
-> +       uint8_t ct_retries;
->         guint tg_timer;
-> +       uint8_t tg_retries;
->  };
->
->  static void policy_connect(struct policy_data *data,
-> @@ -111,6 +123,7 @@ static gboolean policy_connect_ct(gpointer user_data)
->         struct btd_service *service;
->
->         data->ct_timer = 0;
-> +       data->ct_retries++;
->
->         service = btd_device_get_service(data->dev, AVRCP_REMOTE_UUID);
->         if (service != NULL)
-> @@ -128,6 +141,23 @@ static void policy_set_ct_timer(struct policy_data *data)
->                                                 policy_connect_ct, data);
->  }
->
-> +static void policy_set_random_ct_timer(struct policy_data *data)
-> +{
-> +       GRand *rand;
-> +       int timeout;
-> +
-> +       rand = g_rand_new();
-> +       timeout = g_rand_int_range(rand, RECONNECT_MIN_TIMEOUT,
-> +                                                       RECONNECT_MAX_TIMEOUT);
-> +
-> +       if (data->ct_timer > 0)
-> +               g_source_remove(data->ct_timer);
-> +
-> +       data->ct_timer = g_timeout_add(timeout, policy_connect_ct, data);
-> +
-> +       g_rand_free(rand);
-> +}
-> +
->  static struct policy_data *find_data(struct btd_device *dev)
->  {
->         GSList *l;
-> @@ -273,6 +303,7 @@ static gboolean policy_connect_tg(gpointer user_data)
->         struct btd_service *service;
->
->         data->tg_timer = 0;
-> +       data->tg_retries++;
->
->         service = btd_device_get_service(data->dev, AVRCP_TARGET_UUID);
->         if (service != NULL)
-> @@ -291,6 +322,23 @@ static void policy_set_tg_timer(struct policy_data *data)
->                                                         data);
->  }
->
-> +static void policy_set_random_tg_timer(struct policy_data *data)
-> +{
-> +       GRand *rand;
-> +       int timeout;
-> +
-> +       rand = g_rand_new();
-> +       timeout = g_rand_int_range(rand, RECONNECT_MIN_TIMEOUT,
-> +                                                       RECONNECT_MAX_TIMEOUT);
-> +
-> +       if (data->tg_timer > 0)
-> +               g_source_remove(data->tg_timer);
-> +
-> +       data->tg_timer = g_timeout_add(timeout, policy_connect_tg, data);
-> +
-> +       g_rand_free(rand);
-> +}
-> +
->  static gboolean policy_connect_source(gpointer user_data)
->  {
->         struct policy_data *data = user_data;
-> @@ -401,6 +449,22 @@ static void controller_cb(struct btd_service *service,
->                 }
->                 break;
->         case BTD_SERVICE_STATE_DISCONNECTED:
-> +               if (old_state == BTD_SERVICE_STATE_CONNECTING) {
-> +                       int err = btd_service_get_error(service);
-> +
-> +                       if (err == -EAGAIN) {
-> +                               if (data->ct_retries < CT_RETRIES)
-> +                                       policy_set_random_ct_timer(data);
-> +                               else
-> +                                       data->ct_retries = 0;
-> +                               break;
-> +                       } else if (data->ct_timer > 0) {
-> +                               g_source_remove(data->ct_timer);
-> +                               data->ct_timer = 0;
-> +                       }
-> +               } else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
-> +                       data->ct_retries = 0;
-> +               }
->                 break;
->         case BTD_SERVICE_STATE_CONNECTING:
->                 break;
-> @@ -434,6 +498,22 @@ static void target_cb(struct btd_service *service,
->                 }
->                 break;
->         case BTD_SERVICE_STATE_DISCONNECTED:
-> +               if (old_state == BTD_SERVICE_STATE_CONNECTING) {
-> +                       int err = btd_service_get_error(service);
-> +
-> +                       if (err == -EAGAIN) {
-> +                               if (data->tg_retries < TG_RETRIES)
-> +                                       policy_set_random_tg_timer(data);
-> +                               else
-> +                                       data->tg_retries = 0;
-> +                               break;
-> +                       } else if (data->tg_timer > 0) {
-> +                               g_source_remove(data->tg_timer);
-> +                               data->tg_timer = 0;
-> +                       }
-> +               } else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
-> +                       data->tg_retries = 0;
-> +               }
->                 break;
->         case BTD_SERVICE_STATE_CONNECTING:
->                 break;
-> --
-> 2.1.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+Also there should be a note that props change should be reported all-at-once 
+since otherwise this could be racy.
 
 
 -- 
-Luiz Augusto von Dentz
+BR
+Szymon Janc
