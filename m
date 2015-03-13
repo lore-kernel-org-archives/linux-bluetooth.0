@@ -1,51 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com
-Subject: [PATCH  2/7] unit/test-gatt: Add TP/GAW/SR/BI-07-C test
-Date: Fri, 13 Mar 2015 12:04:41 +0530
-Message-id: <1426228486-5124-3-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1426228486-5124-1-git-send-email-gowtham.ab@samsung.com>
-References: <1426228486-5124-1-git-send-email-gowtham.ab@samsung.com>
+Cc: bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH  0/7] Add Write Long value server TC
+Date: Fri, 13 Mar 2015 12:04:39 +0530
+Message-id: <1426228486-5124-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Bharat Panda <bharat.panda@samsung.com>
+Adds the below server test cases (tested against small and large DB):
+1) Write Long Characteristic Value - to Server
+2) Write Long Characteristic Value – Invalid Handle Response
+3) Write Long Characteristic Value – Write Not Permitted Response
+4) Write Long Characteristic Descriptors – from Server
+5) Write Long Characteristic Descriptor – Invalid Handle
+6) Write Long Characteristic Descriptor – Write Not Permitted
 
-Verify that a Generic Attribute Profile server can detect a Write
-Long Characteristic Request with an invalid characteristic handle
-and issue an Invalid Handle Response.
----
- unit/test-gatt.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Tested using valgrind also, no regression/core dump found.
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 7578ddf..5e79293 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -3171,6 +3171,22 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x18, 0x01),
- 			raw_pdu(0x19));
- 
-+	define_test_server("/TP/GAW/SR/BI-07-C/small", test_server,
-+			ts_small_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x16, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
-+			raw_pdu(0x01, 0x16, 0x00, 0x00, 0x01));
-+
-+	define_test_server("/TP/GAW/SR/BI-07-C/large-1", test_server,
-+			ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x16, 0x0f, 0xf0, 0x00, 0x00, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
-+			raw_pdu(0x01, 0x16, 0x0f, 0xf0, 0x01));
-+
- 	define_test_client("/TP/GAW/CL/BV-08-C", test_client, service_db_1,
- 			&test_write_7,
- 			SERVICE_DATA_1_PDUS,
+Bharat Panda (3):
+  unit/test-gatt: Add TP/GAW/SR/BV-05-C test
+  unit/test-gatt: Add TP/GAW/SR/BI-07-C test
+  unit/test-gatt: Add TP/GAW/SR/BI-08-C test
+
+Gowtham Anandha Babu (4):
+  unit/test-gatt: Add TP/GAW/SR/BV-09-C test
+  unit/test-gatt: Add TP/GAW/SR/BI-25-C test
+  unit/test-gatt: Add TP/GAW/SR/BI-26-C test
+  doc/test-coverage: Update test-gatt count
+
+ doc/test-coverage.txt |   4 +-
+ unit/test-gatt.c      | 120 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 122 insertions(+), 2 deletions(-)
+
 -- 
 1.9.1
 
