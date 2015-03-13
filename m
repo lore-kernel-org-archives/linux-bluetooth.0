@@ -1,108 +1,189 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJgYRtJ-zMVsy4+4gUDx3HNFP+cTeyaScWeSJyKwFK8kw@mail.gmail.com>
-References: <CACgKv-KJjZ7y=0PeE5rz5NEiPKNFOsJekdyHjz65JN0=LqmNoA@mail.gmail.com>
- <CABBYNZL3yRRvy9FXhko+VXJ0d901iUH=W6DM1Lci3zKRJapb_A@mail.gmail.com>
- <CACgKv-+OuUqu4h5eyMxV_pA=1pvPfje87RgQuTK0SgZ9r9a+8w@mail.gmail.com>
- <CABBYNZ+_i--y2J1WRzp_d_MzgiDkXm=fqWs4FGZzmvkotCoEvg@mail.gmail.com> <CABBYNZJgYRtJ-zMVsy4+4gUDx3HNFP+cTeyaScWeSJyKwFK8kw@mail.gmail.com>
-From: Jacob Siverskog <jacob@teenageengineering.com>
-Date: Fri, 13 Mar 2015 09:44:13 +0100
-Message-ID: <CACgKv-+ud+s+LZ6+pqKiZoKbaGEuZtJ8d2Q1JJNQVBo8ji47RA@mail.gmail.com>
-Subject: Re: Missing events after reconnect (BLE)
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <1426097463-5288-5-git-send-email-marcin.kraglak@tieto.com>
+References: <1426097463-5288-1-git-send-email-marcin.kraglak@tieto.com>
+	<1426097463-5288-5-git-send-email-marcin.kraglak@tieto.com>
+Date: Fri, 13 Mar 2015 10:42:23 +0200
+Message-ID: <CABBYNZLZxvzdjz+XcjJNne9DBLOR8m79qPq-dQ7vaVEqAzJ4dA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] plugins/policy: Try reconnect Control/Target services
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz!
-I'm sorry, which set are you meaning here? I can't see any attached
-files, recent commit or e-mail that seems to resolve this issue.
+Hi Marcin,
 
-Thanks, Jacob
+On Wed, Mar 11, 2015 at 8:11 PM, Marcin Kraglak
+<marcin.kraglak@tieto.com> wrote:
+> If state of Control/Remote services changed from CONNECTING to
+> DISCONNECTED, and error is set to -EAGAIN, set random timer and try
+> reconnect. This approach is described in AVRCP Spec 1.5 4.1.1:
+> "If both devices open an AVCTP channel at the same time both channels
+> shall be closed and each device shall wait a random time
+> (not more than 1 s and not less than 100ms) and then try to open
+> the AVCTP channel again."
+> ---
+>  plugins/policy.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+>
+> diff --git a/plugins/policy.c b/plugins/policy.c
+> index 9cbf146..306a7a3 100644
+> --- a/plugins/policy.c
+> +++ b/plugins/policy.c
+> @@ -50,6 +50,16 @@
+>  #define SINK_RETRY_TIMEOUT SOURCE_RETRY_TIMEOUT
+>  #define SOURCE_RETRIES 1
+>  #define SINK_RETRIES SOURCE_RETRIES
+> +#define CT_RETRIES 1
+> +#define TG_RETRIES CT_RETRIES
+> +
+> +/*
+> + * AVRCP Spec 1.5 says that reconnect timeout after connection collision
+> + * should be random value between 100 ms and 1000 ms. To improve user experience
+> + * we linit MAX value to 500 ms
+> + */
+> +#define RECONNECT_MAX_TIMEOUT 500
+> +#define RECONNECT_MIN_TIMEOUT 100
 
-On Thu, Mar 12, 2015 at 6:27 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Jacob,
+Im not sure we should use sub seconds values, g_timeout_add_seconds
+allows group wake-up whereas g_timeout_add doesn't (see
+g_timeout_add_seconds_full documentation), so perhaps going with 1
+sec. for reconnect is fine here since by design g_timeout_add_seconds
+will not be precise so you have some randomness already.
+
+>  /* Tracking of remote services to be auto-reconnected upon link loss */
 >
-> On Thu, Mar 12, 2015 at 2:42 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Jacob,
->>
->> On Thu, Mar 12, 2015 at 12:15 PM, Jacob Siverskog
->> <jacob@teenageengineering.com> wrote:
->>> Hi Luiz!
->>> Thanks for the patch, it seems to solve the issue on newly paired
->>> devices. However, if I reboot the system it fails when registering
->>> GATT service (no device files are created):
->>>
->>> Thu Mar 12 09:43:01 2015 kern.err kernel: hid-generic
->>> 0005:2367:0004.0001: unbalanced collection at end of report
->>> description
->>> Thu Mar 12 09:43:01 2015 kern.warn kernel: hid-generic: probe of
->>> 0005:2367:0004.0001 failed with error -22
->>> Thu Mar 12 09:43:03 2015 daemon.err bluetoothd[1509]: Unable to
->>> register GATT service with handle 0x0008 for device E7:D8:E4:BB:69:88:
->>> Thu Mar 12 09:43:03 2015 daemon.err bluetoothd[1509]: Unable to
->>> register GATT service with handle 0x0014 for device E7:D8:E4:BB:69:88:
->>> Thu Mar 12 09:43:03 2015 daemon.err bluetoothd[1509]: Unable to
->>> register GATT service with handle 0x0025 for device E7:D8:E4:BB:69:88:
->>>
->>> This is something I have not seen before (without the patch).
->>
->> Yep, this is caused because once you restart bluetoothd we loose the
->> service cache which is probably passed to the kernel for probing, in
->> this case we might have to delay the notification for drivers since we
->> have to refresh the cache or just implement the persistent storage
->> which is causing this to begin with.
->>
->>> Attached is bluetoothd log and btmon log interleaved with syslog on a
->>> newly booted system. The system has one paired device (remote
->>> control). The remote control was in sleep until I pressed a button on
->>> it (at 3.17 secs in the btmon log).
+> @@ -82,7 +92,9 @@ struct policy_data {
+>         guint sink_timer;
+>         uint8_t sink_retries;
+>         guint ct_timer;
+> +       uint8_t ct_retries;
+>         guint tg_timer;
+> +       uint8_t tg_retries;
+>  };
 >
-> Can you try with latest set Ive sent, that should fix the hid problem
-> after restarting bluetoothd.
+>  static void policy_connect(struct policy_data *data,
+> @@ -111,6 +123,7 @@ static gboolean policy_connect_ct(gpointer user_data)
+>         struct btd_service *service;
 >
->>> Please let me know if you need more information.
->>>
->>>      Jacob
->>>
->>> On Wed, Mar 11, 2015 at 8:46 PM, Luiz Augusto von Dentz
->>> <luiz.dentz@gmail.com> wrote:
->>>> Hi Jacob,
->>>>
->>>> On Mon, Mar 9, 2015 at 6:11 PM, Jacob Siverskog
->>>> <jacob@teenageengineering.com> wrote:
->>>>> Hi!
->>>>> We're developing a BLE remote control with a HID profile that goes to
->>>>> sleep after being idle some time. It is waken
->>>>> up by pressing a button on it, after waking up it performs undirected
->>>>> advertising towards the host.
->>>>>
->>>>> Sometimes we see that the press is not registered by the host. We can
->>>>> see the press in btmon but it never ends up in /dev/input/XXX.
->>>>> Subsequent presses works fine.
->>>>>
->>>>> Attached are two btmon logs. What I can see is that the "press event"
->>>>> (Handle Value Notification) is received earlier in the working case.
->>>>>
->>>>> Are we simply sending the event too early? Or is there any other issue?
->>>>
->>>> Sorry for the delay, for some reason this message went to my spam
->>>> folder, anyway the problem we have is that we are not processing
->>>> notification while MTU exchange is pending, please try with the
->>>> attached patch (not tested so it may actually not work).
->>>>
->>>> --
->>>> Luiz Augusto von Dentz
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
+>         data->ct_timer = 0;
+> +       data->ct_retries++;
 >
+>         service = btd_device_get_service(data->dev, AVRCP_REMOTE_UUID);
+>         if (service != NULL)
+> @@ -128,6 +141,23 @@ static void policy_set_ct_timer(struct policy_data *data)
+>                                                 policy_connect_ct, data);
+>  }
 >
+> +static void policy_set_random_ct_timer(struct policy_data *data)
+> +{
+> +       GRand *rand;
+> +       int timeout;
+> +
+> +       rand = g_rand_new();
+> +       timeout = g_rand_int_range(rand, RECONNECT_MIN_TIMEOUT,
+> +                                                       RECONNECT_MAX_TIMEOUT);
+> +
+> +       if (data->ct_timer > 0)
+> +               g_source_remove(data->ct_timer);
+> +
+> +       data->ct_timer = g_timeout_add(timeout, policy_connect_ct, data);
+> +
+> +       g_rand_free(rand);
+> +}
+> +
+>  static struct policy_data *find_data(struct btd_device *dev)
+>  {
+>         GSList *l;
+> @@ -273,6 +303,7 @@ static gboolean policy_connect_tg(gpointer user_data)
+>         struct btd_service *service;
+>
+>         data->tg_timer = 0;
+> +       data->tg_retries++;
+>
+>         service = btd_device_get_service(data->dev, AVRCP_TARGET_UUID);
+>         if (service != NULL)
+> @@ -291,6 +322,23 @@ static void policy_set_tg_timer(struct policy_data *data)
+>                                                         data);
+>  }
+>
+> +static void policy_set_random_tg_timer(struct policy_data *data)
+> +{
+> +       GRand *rand;
+> +       int timeout;
+> +
+> +       rand = g_rand_new();
+> +       timeout = g_rand_int_range(rand, RECONNECT_MIN_TIMEOUT,
+> +                                                       RECONNECT_MAX_TIMEOUT);
+> +
+> +       if (data->tg_timer > 0)
+> +               g_source_remove(data->tg_timer);
+> +
+> +       data->tg_timer = g_timeout_add(timeout, policy_connect_tg, data);
+> +
+> +       g_rand_free(rand);
+> +}
+> +
+>  static gboolean policy_connect_source(gpointer user_data)
+>  {
+>         struct policy_data *data = user_data;
+> @@ -401,6 +449,22 @@ static void controller_cb(struct btd_service *service,
+>                 }
+>                 break;
+>         case BTD_SERVICE_STATE_DISCONNECTED:
+> +               if (old_state == BTD_SERVICE_STATE_CONNECTING) {
+> +                       int err = btd_service_get_error(service);
+> +
+> +                       if (err == -EAGAIN) {
+> +                               if (data->ct_retries < CT_RETRIES)
+> +                                       policy_set_random_ct_timer(data);
+> +                               else
+> +                                       data->ct_retries = 0;
+> +                               break;
+> +                       } else if (data->ct_timer > 0) {
+> +                               g_source_remove(data->ct_timer);
+> +                               data->ct_timer = 0;
+> +                       }
+> +               } else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
+> +                       data->ct_retries = 0;
+> +               }
+>                 break;
+>         case BTD_SERVICE_STATE_CONNECTING:
+>                 break;
+> @@ -434,6 +498,22 @@ static void target_cb(struct btd_service *service,
+>                 }
+>                 break;
+>         case BTD_SERVICE_STATE_DISCONNECTED:
+> +               if (old_state == BTD_SERVICE_STATE_CONNECTING) {
+> +                       int err = btd_service_get_error(service);
+> +
+> +                       if (err == -EAGAIN) {
+> +                               if (data->tg_retries < TG_RETRIES)
+> +                                       policy_set_random_tg_timer(data);
+> +                               else
+> +                                       data->tg_retries = 0;
+> +                               break;
+> +                       } else if (data->tg_timer > 0) {
+> +                               g_source_remove(data->tg_timer);
+> +                               data->tg_timer = 0;
+> +                       }
+> +               } else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
+> +                       data->tg_retries = 0;
+> +               }
+>                 break;
+>         case BTD_SERVICE_STATE_CONNECTING:
+>                 break;
+> --
+> 2.1.0
 >
 > --
-> Luiz Augusto von Dentz
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
