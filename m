@@ -1,37 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Mar 2015 12:48:52 +0200
+Date: Fri, 13 Mar 2015 12:27:22 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel Drake <drake@endlessm.com>
-Cc: marcel@holtmann.org, gustavo@padovan.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add helper for READ_LOCAL_VERSION
- command
-Message-ID: <20150313104852.GA23835@t440s.lan>
-References: <1424737007-4791-1-git-send-email-drake@endlessm.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] tools/btmgmt: refactor of repeated scan type
+Message-ID: <20150313102722.GC12175@t440s.lan>
+References: <1426178313-28011-1-git-send-email-jpawlowski@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1424737007-4791-1-git-send-email-drake@endlessm.com>
+In-Reply-To: <1426178313-28011-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+Hi Jakub,
 
-On Mon, Feb 23, 2015, Daniel Drake wrote:
-> Multiple codepaths duplicate some simple code to read and
-> sanity-check local version information. Before I add a couple more
-> such codepaths, add a helper to reduce duplication.
-> 
-> Signed-off-by: Daniel Drake <drake@endlessm.com>
+On Thu, Mar 12, 2015, Jakub Pawlowski wrote:
+> this patch replaces often repeated scan type with defined constants.
 > ---
->  drivers/bluetooth/btusb.c | 60 ++++++++++++++++++++++-------------------------
->  1 file changed, 28 insertions(+), 32 deletions(-)
-> 
-> v3:
->  - rebase on top of latest bluetooth-next
-> 
-> v2:
->  - drop log message (let callers do that)
->  - avoid long assignment in variable declaration
+>  tools/btmgmt.c | 54 +++++++++++++++++++-----------------------------------
+>  1 file changed, 19 insertions(+), 35 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+Applied. Thanks.
 
 Johan
