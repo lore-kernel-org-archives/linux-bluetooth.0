@@ -1,41 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  0/7] Add Write Long value server TC
-Date: Fri, 13 Mar 2015 12:04:39 +0530
-Message-id: <1426228486-5124-1-git-send-email-gowtham.ab@samsung.com>
+Cc: bharat.panda@samsung.com, cpgs@samsung.com
+Subject: [PATCH  1/7] unit/test-gatt: Add TP/GAW/SR/BV-05-C test
+Date: Fri, 13 Mar 2015 12:04:40 +0530
+Message-id: <1426228486-5124-2-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1426228486-5124-1-git-send-email-gowtham.ab@samsung.com>
+References: <1426228486-5124-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds the below server test cases (tested against small and large DB):
-1) Write Long Characteristic Value - to Server
-2) Write Long Characteristic Value – Invalid Handle Response
-3) Write Long Characteristic Value – Write Not Permitted Response
-4) Write Long Characteristic Descriptors – from Server
-5) Write Long Characteristic Descriptor – Invalid Handle
-6) Write Long Characteristic Descriptor – Write Not Permitted
+From: Bharat Panda <bharat.panda@samsung.com>
 
-Tested using valgrind also, no regression/core dump found.
+Verify that a Generic Attribute Profile server can support writing
+a long Characteristic Value selected by handle.
+---
+ unit/test-gatt.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-Bharat Panda (3):
-  unit/test-gatt: Add TP/GAW/SR/BV-05-C test
-  unit/test-gatt: Add TP/GAW/SR/BI-07-C test
-  unit/test-gatt: Add TP/GAW/SR/BI-08-C test
-
-Gowtham Anandha Babu (4):
-  unit/test-gatt: Add TP/GAW/SR/BV-09-C test
-  unit/test-gatt: Add TP/GAW/SR/BI-25-C test
-  unit/test-gatt: Add TP/GAW/SR/BI-26-C test
-  doc/test-coverage: Update test-gatt count
-
- doc/test-coverage.txt |   4 +-
- unit/test-gatt.c      | 120 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 122 insertions(+), 2 deletions(-)
-
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 1babe11..7578ddf 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -3143,6 +3143,34 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x12, 0x04, 0x00, 0x01, 0x02, 0x03),
+ 			raw_pdu(0x01, 0x12, 0x04, 0x00, 0x03));
+ 
++	define_test_server("/TP/GAW/SR/BV-05-C/small", test_server,
++			ts_small_db, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x16, 0x03, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
++				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
++			raw_pdu(0x17, 0x03, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
++				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
++			raw_pdu(0x16, 0x03, 0x00, 0x3f, 0x00, 0xff),
++			raw_pdu(0x17, 0x03, 0x00, 0x3f, 0x00, 0xff),
++			raw_pdu(0x18, 0x01),
++			raw_pdu(0x19));
++
++	define_test_server("/TP/GAW/SR/BV-05-C/large-1", test_server,
++			ts_large_db_1, NULL,
++			raw_pdu(0x03, 0x00, 0x02),
++			raw_pdu(0x16, 0x82, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
++				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
++			raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
++				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
++			raw_pdu(0x16, 0x82, 0x00, 0x3f, 0x00, 0xff),
++			raw_pdu(0x17, 0x82, 0x00, 0x3f, 0x00, 0xff),
++			raw_pdu(0x18, 0x01),
++			raw_pdu(0x19));
++
+ 	define_test_client("/TP/GAW/CL/BV-08-C", test_client, service_db_1,
+ 			&test_write_7,
+ 			SERVICE_DATA_1_PDUS,
 -- 
 1.9.1
 
