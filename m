@@ -1,38 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] core/device: Remove call to g_attrib_set_mtu
-Date: Fri, 13 Mar 2015 10:54:12 +0200
-Message-Id: <1426236852-10501-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1426236852-10501-1-git-send-email-luiz.dentz@gmail.com>
-References: <1426236852-10501-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] attrib: Fix not honoring MTU
+Date: Fri, 13 Mar 2015 10:54:10 +0200
+Message-Id: <1426236852-10501-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The call to g_attrib_set_mtu is no longer needed since
-g_attrib_get_buffer has learned to check bt_att MTU.
+If MTU has changed, by bt_gatt_client for example, the code should be
+able to figure it out without waiting g_attrib_set_mtu to be called.
 ---
- src/device.c | 5 -----
- 1 file changed, 5 deletions(-)
+ attrib/gattrib.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 0dc8c86..97c0523 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3975,11 +3975,6 @@ static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
- 		return;
- 	}
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 514fc8f..2011359 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -429,9 +429,24 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
  
--	device->att_mtu = bt_att_get_mtu(device->att);
--	g_attrib_set_mtu(device->attrib, device->att_mtu);
--
--	DBG("MTU: %u", device->att_mtu);
--
- 	register_gatt_services(device);
+ uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
+ {
++	uint16_t mtu;
++
+ 	if (!attrib || !len)
+ 		return NULL;
  
- 	device_accept_gatt_profiles(device);
++	mtu = bt_att_get_mtu(attrib->att);
++
++	/*
++	 * Clients of this expect a buffer to use.
++	 *
++	 * Pdu encoding in shared/att verifies if whole buffer fits the mtu,
++	 * thus we should set the buflen also when mtu is reduced. But we
++	 * need to reallocate the buffer only if mtu is larger.
++	 */
++	if (mtu > attrib->buflen)
++		attrib->buf = g_realloc(attrib->buf, mtu);
++
++	attrib->buflen = mtu;
+ 	*len = attrib->buflen;
+ 	return attrib->buf;
+ }
 -- 
 2.1.0
 
