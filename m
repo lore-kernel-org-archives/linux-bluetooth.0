@@ -1,201 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLZxvzdjz+XcjJNne9DBLOR8m79qPq-dQ7vaVEqAzJ4dA@mail.gmail.com>
-References: <1426097463-5288-1-git-send-email-marcin.kraglak@tieto.com>
-	<1426097463-5288-5-git-send-email-marcin.kraglak@tieto.com>
-	<CABBYNZLZxvzdjz+XcjJNne9DBLOR8m79qPq-dQ7vaVEqAzJ4dA@mail.gmail.com>
-Date: Fri, 13 Mar 2015 10:47:35 +0100
-Message-ID: <CABD6X-KmCnNyBEXTKKtzGqxd8tDgo4waixQcbyy_5wm-Gyqo+Q@mail.gmail.com>
-Subject: Re: [PATCH 4/4] plugins/policy: Try reconnect Control/Target services
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: Use DECLARE_BITMAP for hdev->dev_flags field
+Date: Fri, 13 Mar 2015 02:15:22 -0700
+Message-Id: <1426238122-13481-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+The hdev->dev_flags field has outgrown itself on 32-bit systems. So
+instead of hacking around it, switch to using DECLARE_BITMAP.
 
-On 13 March 2015 at 09:42, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Marcin,
->
-> On Wed, Mar 11, 2015 at 8:11 PM, Marcin Kraglak
-> <marcin.kraglak@tieto.com> wrote:
->> If state of Control/Remote services changed from CONNECTING to
->> DISCONNECTED, and error is set to -EAGAIN, set random timer and try
->> reconnect. This approach is described in AVRCP Spec 1.5 4.1.1:
->> "If both devices open an AVCTP channel at the same time both channels
->> shall be closed and each device shall wait a random time
->> (not more than 1 s and not less than 100ms) and then try to open
->> the AVCTP channel again."
->> ---
->>  plugins/policy.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 80 insertions(+)
->>
->> diff --git a/plugins/policy.c b/plugins/policy.c
->> index 9cbf146..306a7a3 100644
->> --- a/plugins/policy.c
->> +++ b/plugins/policy.c
->> @@ -50,6 +50,16 @@
->>  #define SINK_RETRY_TIMEOUT SOURCE_RETRY_TIMEOUT
->>  #define SOURCE_RETRIES 1
->>  #define SINK_RETRIES SOURCE_RETRIES
->> +#define CT_RETRIES 1
->> +#define TG_RETRIES CT_RETRIES
->> +
->> +/*
->> + * AVRCP Spec 1.5 says that reconnect timeout after connection collision
->> + * should be random value between 100 ms and 1000 ms. To improve user experience
->> + * we linit MAX value to 500 ms
->> + */
->> +#define RECONNECT_MAX_TIMEOUT 500
->> +#define RECONNECT_MIN_TIMEOUT 100
->
-> Im not sure we should use sub seconds values, g_timeout_add_seconds
-> allows group wake-up whereas g_timeout_add doesn't (see
-> g_timeout_add_seconds_full documentation), so perhaps going with 1
-> sec. for reconnect is fine here since by design g_timeout_add_seconds
-> will not be precise so you have some randomness already.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h      |  1 +
+ include/net/bluetooth/hci_core.h | 17 ++++++++---------
+ net/bluetooth/hci_core.c         |  2 +-
+ net/bluetooth/hci_event.c        |  2 +-
+ 4 files changed, 11 insertions(+), 11 deletions(-)
 
-That's fine with me, I'll change it to 1 sec timeout.
->
->>  /* Tracking of remote services to be auto-reconnected upon link loss */
->>
->> @@ -82,7 +92,9 @@ struct policy_data {
->>         guint sink_timer;
->>         uint8_t sink_retries;
->>         guint ct_timer;
->> +       uint8_t ct_retries;
->>         guint tg_timer;
->> +       uint8_t tg_retries;
->>  };
->>
->>  static void policy_connect(struct policy_data *data,
->> @@ -111,6 +123,7 @@ static gboolean policy_connect_ct(gpointer user_data)
->>         struct btd_service *service;
->>
->>         data->ct_timer = 0;
->> +       data->ct_retries++;
->>
->>         service = btd_device_get_service(data->dev, AVRCP_REMOTE_UUID);
->>         if (service != NULL)
->> @@ -128,6 +141,23 @@ static void policy_set_ct_timer(struct policy_data *data)
->>                                                 policy_connect_ct, data);
->>  }
->>
->> +static void policy_set_random_ct_timer(struct policy_data *data)
->> +{
->> +       GRand *rand;
->> +       int timeout;
->> +
->> +       rand = g_rand_new();
->> +       timeout = g_rand_int_range(rand, RECONNECT_MIN_TIMEOUT,
->> +                                                       RECONNECT_MAX_TIMEOUT);
->> +
->> +       if (data->ct_timer > 0)
->> +               g_source_remove(data->ct_timer);
->> +
->> +       data->ct_timer = g_timeout_add(timeout, policy_connect_ct, data);
->> +
->> +       g_rand_free(rand);
->> +}
->> +
->>  static struct policy_data *find_data(struct btd_device *dev)
->>  {
->>         GSList *l;
->> @@ -273,6 +303,7 @@ static gboolean policy_connect_tg(gpointer user_data)
->>         struct btd_service *service;
->>
->>         data->tg_timer = 0;
->> +       data->tg_retries++;
->>
->>         service = btd_device_get_service(data->dev, AVRCP_TARGET_UUID);
->>         if (service != NULL)
->> @@ -291,6 +322,23 @@ static void policy_set_tg_timer(struct policy_data *data)
->>                                                         data);
->>  }
->>
->> +static void policy_set_random_tg_timer(struct policy_data *data)
->> +{
->> +       GRand *rand;
->> +       int timeout;
->> +
->> +       rand = g_rand_new();
->> +       timeout = g_rand_int_range(rand, RECONNECT_MIN_TIMEOUT,
->> +                                                       RECONNECT_MAX_TIMEOUT);
->> +
->> +       if (data->tg_timer > 0)
->> +               g_source_remove(data->tg_timer);
->> +
->> +       data->tg_timer = g_timeout_add(timeout, policy_connect_tg, data);
->> +
->> +       g_rand_free(rand);
->> +}
->> +
->>  static gboolean policy_connect_source(gpointer user_data)
->>  {
->>         struct policy_data *data = user_data;
->> @@ -401,6 +449,22 @@ static void controller_cb(struct btd_service *service,
->>                 }
->>                 break;
->>         case BTD_SERVICE_STATE_DISCONNECTED:
->> +               if (old_state == BTD_SERVICE_STATE_CONNECTING) {
->> +                       int err = btd_service_get_error(service);
->> +
->> +                       if (err == -EAGAIN) {
->> +                               if (data->ct_retries < CT_RETRIES)
->> +                                       policy_set_random_ct_timer(data);
->> +                               else
->> +                                       data->ct_retries = 0;
->> +                               break;
->> +                       } else if (data->ct_timer > 0) {
->> +                               g_source_remove(data->ct_timer);
->> +                               data->ct_timer = 0;
->> +                       }
->> +               } else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
->> +                       data->ct_retries = 0;
->> +               }
->>                 break;
->>         case BTD_SERVICE_STATE_CONNECTING:
->>                 break;
->> @@ -434,6 +498,22 @@ static void target_cb(struct btd_service *service,
->>                 }
->>                 break;
->>         case BTD_SERVICE_STATE_DISCONNECTED:
->> +               if (old_state == BTD_SERVICE_STATE_CONNECTING) {
->> +                       int err = btd_service_get_error(service);
->> +
->> +                       if (err == -EAGAIN) {
->> +                               if (data->tg_retries < TG_RETRIES)
->> +                                       policy_set_random_tg_timer(data);
->> +                               else
->> +                                       data->tg_retries = 0;
->> +                               break;
->> +                       } else if (data->tg_timer > 0) {
->> +                               g_source_remove(data->tg_timer);
->> +                               data->tg_timer = 0;
->> +                       }
->> +               } else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
->> +                       data->tg_retries = 0;
->> +               }
->>                 break;
->>         case BTD_SERVICE_STATE_CONNECTING:
->>                 break;
->> --
->> 2.1.0
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
-
-
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 0f3413b285a5..1545853b257e 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -226,6 +226,7 @@ enum {
+ 	HCI_FAST_CONNECTABLE,
+ 	HCI_BREDR_ENABLED,
+ 	HCI_LE_SCAN_INTERRUPTED,
++	__HCI_NUM_FLAGS,
+ };
+ 
+ /* A mask for the flags that are supposed to remain when a reset happens
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 6db1333a114f..dbc6f4ba8ed6 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -354,7 +354,7 @@ struct hci_dev {
+ 	struct rfkill		*rfkill;
+ 
+ 	unsigned long		dbg_flags;
+-	unsigned long		dev_flags;
++	DECLARE_BITMAP(dev_flags, __HCI_NUM_FLAGS);
+ 
+ 	struct delayed_work	le_scan_disable;
+ 	struct delayed_work	le_scan_restart;
+@@ -502,14 +502,13 @@ extern struct list_head hci_cb_list;
+ extern rwlock_t hci_dev_list_lock;
+ extern struct mutex hci_cb_list_lock;
+ 
+-#define hci_dev_set_flag(hdev, nr)    set_bit((nr), &(hdev)->dev_flags)
+-#define hci_dev_clear_flag(hdev, nr)  clear_bit((nr), &(hdev)->dev_flags)
+-#define hci_dev_change_flag(hdev, nr) change_bit((nr), &(hdev)->dev_flags)
+-#define hci_dev_test_flag(hdev, nr)   test_bit((nr), &(hdev)->dev_flags)
+-
+-#define hci_dev_test_and_set_flag(hdev, nr)    test_and_set_bit((nr), &(hdev)->dev_flags)
+-#define hci_dev_test_and_clear_flag(hdev, nr)  test_and_clear_bit((nr), &(hdev)->dev_flags)
+-#define hci_dev_test_and_change_flag(hdev, nr) test_and_change_bit((nr), &(hdev)->dev_flags)
++#define hci_dev_set_flag(hdev, nr)             set_bit((nr), (hdev)->dev_flags)
++#define hci_dev_clear_flag(hdev, nr)           clear_bit((nr), (hdev)->dev_flags)
++#define hci_dev_change_flag(hdev, nr)          change_bit((nr), (hdev)->dev_flags)
++#define hci_dev_test_flag(hdev, nr)            test_bit((nr), (hdev)->dev_flags)
++#define hci_dev_test_and_set_flag(hdev, nr)    test_and_set_bit((nr), (hdev)->dev_flags)
++#define hci_dev_test_and_clear_flag(hdev, nr)  test_and_clear_bit((nr), (hdev)->dev_flags)
++#define hci_dev_test_and_change_flag(hdev, nr) test_and_change_bit((nr), (hdev)->dev_flags)
+ 
+ /* ----- HCI interface to upper protocols ----- */
+ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c6ed46c4f45a..89d0cabe481b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1699,7 +1699,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 
+ 	/* Clear flags */
+ 	hdev->flags &= BIT(HCI_RAW);
+-	hdev->dev_flags &= ~HCI_PERSISTENT_MASK;
++	hdev->dev_flags[0] &= ~HCI_PERSISTENT_MASK;
+ 
+ 	/* Controller radio is available but is currently powered down */
+ 	hdev->amp_status = AMP_STATUS_POWERED_DOWN;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4958b24ae5c7..f7e58b98bcff 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -198,7 +198,7 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
+ 		return;
+ 
+ 	/* Reset all non-persistent flags */
+-	hdev->dev_flags &= ~HCI_PERSISTENT_MASK;
++	hdev->dev_flags[0] &= ~HCI_PERSISTENT_MASK;
+ 
+ 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 
 -- 
-BR
-Marcin Kraglak
+2.1.0
+
