@@ -1,49 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] attrib: Fix not honoring MTU
-Date: Fri, 13 Mar 2015 10:54:10 +0200
-Message-Id: <1426236852-10501-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/3] core/device: Fix not handling notification
+Date: Fri, 13 Mar 2015 10:54:11 +0200
+Message-Id: <1426236852-10501-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1426236852-10501-1-git-send-email-luiz.dentz@gmail.com>
+References: <1426236852-10501-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If MTU has changed, by bt_gatt_client for example, the code should be
-able to figure it out without waiting g_attrib_set_mtu to be called.
+attio callbacks needs to be triggered as soon as possible once connected
+otherwise profiles such as HoG may miss notification that are sent while
+bt_gatt_client is doing MTU exchange.
 ---
- attrib/gattrib.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ src/device.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 514fc8f..2011359 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -429,9 +429,24 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
+diff --git a/src/device.c b/src/device.c
+index 831efea..0dc8c86 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3984,8 +3984,6 @@ static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
  
- uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
- {
-+	uint16_t mtu;
-+
- 	if (!attrib || !len)
- 		return NULL;
+ 	device_accept_gatt_profiles(device);
  
-+	mtu = bt_att_get_mtu(attrib->att);
-+
-+	/*
-+	 * Clients of this expect a buffer to use.
-+	 *
-+	 * Pdu encoding in shared/att verifies if whole buffer fits the mtu,
-+	 * thus we should set the buflen also when mtu is reduced. But we
-+	 * need to reallocate the buffer only if mtu is larger.
-+	 */
-+	if (mtu > attrib->buflen)
-+		attrib->buf = g_realloc(attrib->buf, mtu);
-+
-+	attrib->buflen = mtu;
- 	*len = attrib->buflen;
- 	return attrib->buf;
+-	g_slist_foreach(device->attios, attio_connected, device->attrib);
+-
+ 	btd_gatt_client_ready(device->client_dbus);
  }
+ 
+@@ -4007,6 +4005,9 @@ static void gatt_client_init(struct btd_device *device)
+ 		return;
+ 	}
+ 
++	/* Notify attio so it can react to notifications */
++	g_slist_foreach(device->attios, attio_connected, device->attrib);
++
+ 	if (!bt_gatt_client_set_ready_handler(device->client,
+ 							gatt_client_ready_cb,
+ 							device, NULL)) {
 -- 
 2.1.0
 
