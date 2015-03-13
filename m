@@ -2,10 +2,8 @@ Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 Subject: [PATCH v6 0/3] Create bneptest tool
-Date: Fri, 13 Mar 2015 13:41:49 +0100
-Message-Id: <1426250512-4322-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1426250512-4322-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1426250512-4322-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Fri, 13 Mar 2015 13:41:48 +0100
+Message-Id: <1426250512-4322-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
