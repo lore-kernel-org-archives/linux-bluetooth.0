@@ -1,63 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 1/3] unit/test-hog: Add TC/HGRF/RH/BV-06-I test
-Date: Fri, 13 Mar 2015 15:23:36 +0100
-Message-Id: <1426256618-7362-1-git-send-email-mariusz.skamra@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v6 0/3] Create bneptest tool
+Date: Fri, 13 Mar 2015 15:23:41 +0100
+Message-ID: <3164272.MDiYys34LN@leonov>
+In-Reply-To: <1426250512-4322-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1426250512-4322-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that all Report Reference characteristic descriptors for
-all Report characteristic of Report Type: Output Report can be
-read by a Report Host IUT.
----
- unit/test-hog.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+Hi Grzegorz,
 
-diff --git a/unit/test-hog.c b/unit/test-hog.c
-index ce1cc26..2d8fef2 100644
---- a/unit/test-hog.c
-+++ b/unit/test-hog.c
-@@ -324,5 +324,38 @@ int main(int argc, char *argv[])
- 		raw_pdu(0x0a, 0x08, 0x00),
- 		raw_pdu(0x0b, 0x01, 0x11, 0x00, 0x01));
- 
-+	define_test("/TP/HGRF/RH/BV-06-I", test_hog,
-+		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
-+		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x05, 0x00, 0x12,
-+			0x18, 0x06, 0x00, 0x0a, 0x00, 0x12, 0x18),
-+		raw_pdu(0x10, 0x0b, 0x00, 0xff, 0xff, 0x00, 0x28),
-+		raw_pdu(0x01, 0x10, 0x0b, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x03, 0x28),
-+		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x0a, 0x04, 0x00,
-+			0x4d, 0x2a),
-+		raw_pdu(0x08, 0x01, 0x00, 0x05, 0x00, 0x02, 0x28),
-+		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x02, 0x28),
-+		raw_pdu(0x01, 0x08, 0x06, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x06, 0x00, 0x0a, 0x00, 0x03, 0x28),
-+		raw_pdu(0x09, 0x07, 0x08, 0x00, 0x0a, 0x09, 0x00,
-+			0x4d, 0x2a),
-+		raw_pdu(0x08, 0x04, 0x00, 0x05, 0x00, 0x03, 0x28),
-+		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x09, 0x00, 0x0a, 0x00, 0x03, 0x28),
-+		raw_pdu(0x01, 0x08, 0x09, 0x00, 0x0a),
-+		raw_pdu(0x0a, 0x04, 0x00),
-+		raw_pdu(0x0b, 0xee, 0xee, 0xff, 0xff),
-+		raw_pdu(0x04, 0x05, 0x00, 0x05, 0x00),
-+		raw_pdu(0x05, 0x01, 0x05, 0x00, 0x08, 0x29),
-+		raw_pdu(0x0a, 0x09, 0x00),
-+		raw_pdu(0x0b, 0xff, 0xff, 0xee, 0xee),
-+		raw_pdu(0x04, 0x0a, 0x00, 0x0a, 0x00),
-+		raw_pdu(0x05, 0x01, 0x0a, 0x00, 0x08, 0x29),
-+		raw_pdu(0x0a, 0x05, 0x00),
-+		raw_pdu(0x0b, 0x01, 0x02),
-+		raw_pdu(0x0a, 0x0a, 0x00),
-+		raw_pdu(0x0b, 0x02, 0x02));
-+
- 	return tester_run();
- }
+On Friday 13 of March 2015 13:41:48 Grzegorz Kolodziejczyk wrote:
+> v4:
+> - Fix error returning in bnep server add
+> - Reorganize bnep service comparing (by uuid, by string),
+> - Fixed pointed by Szymon commit message typo,
+> - Add support for sending general bnep frames by bneptest,
+> - bneptest now require bridge and iface name (it was optional-def. names
+> were set)
+> - Update PTS results and test instructions.
+> v5:
+> - Fix converting uuids (16 to 128),
+> - Extend bneptest with frames retransmission parameters,
+> - Update PTS results and test instructions.
+> v6:
+> - bneptest style fix,
+> - small fixes pointed by szymon,
+> - Commit message "Bluez" typo fix.
+> 
+> Grzegorz Kolodziejczyk (3):
+>   tools/bneptest: Add initial support for bneptest tool
+>   tools/bneptest: Add generic connect/listen functionality
+>   android/pts: Add BNEP PTS 6.0 results for android 5.0
+> 
+>  .gitignore             |   1 +
+>  Makefile.tools         |  12 +-
+>  android/Android.mk     |  35 +++
+>  android/Makefile.am    |   5 +-
+>  android/pics-bnep.txt  |  26 ++
+>  android/pixit-bnep.txt |  30 ++
+>  android/pts-bnep.txt   |  48 ++++
+>  tools/bneptest.c       | 721
+> +++++++++++++++++++++++++++++++++++++++++++++++++ 8 files changed, 874
+> insertions(+), 4 deletions(-)
+>  create mode 100644 android/pics-bnep.txt
+>  create mode 100644 android/pixit-bnep.txt
+>  create mode 100644 android/pts-bnep.txt
+>  create mode 100644 tools/bneptest.c
+
+All patches applied (with small changes discussed offline), thanks.
+
 -- 
-1.9.1
-
+BR
+Szymon Janc
