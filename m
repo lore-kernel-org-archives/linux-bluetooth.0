@@ -1,126 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 10/14] Bluetooth: Remove unneeded initializer for management command table
-Date: Sat, 14 Mar 2015 19:28:02 -0700
-Message-Id: <1426386486-15962-10-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 05/14] Bluetooth: Add support for extended index management command
+Date: Sat, 14 Mar 2015 19:27:57 -0700
+Message-Id: <1426386486-15962-5-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The flags field for the management command table will be always
-initialized to zero and thus no need to do that manually.
+The Read Extended Contoller Index List command can be used for
+retrieving the complete list of local available controllers. This
+included configured, unconfigured and also AMP controllers.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 86 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 43 insertions(+), 43 deletions(-)
+ include/net/bluetooth/mgmt.h | 11 ++++++
+ net/bluetooth/mgmt.c         | 80 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 91 insertions(+)
 
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 8562f9ecf230..2534bd4d22b2 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -505,6 +505,17 @@ struct mgmt_cp_start_service_discovery {
+ } __packed;
+ #define MGMT_START_SERVICE_DISCOVERY_SIZE 4
+ 
++#define MGMT_OP_READ_EXT_INDEX_LIST	0x003C
++#define MGMT_READ_EXT_INDEX_LIST_SIZE	0
++struct mgmt_rp_read_ext_index_list {
++	__le16	num_controllers;
++	struct {
++		__le16 index;
++		__u8   type;
++		__u8   bus;
++	} entry[0];
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 484ee8e2b52c..8d67704d6116 100644
+index 56f49e9c4189..eb0211b6cfa9 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -6261,58 +6261,58 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 						HCI_MGMT_UNTRUSTED },
- 	{ read_controller_info,    MGMT_READ_INFO_SIZE,
- 						HCI_MGMT_UNTRUSTED },
--	{ set_powered,             MGMT_SETTING_SIZE,                   0 },
--	{ set_discoverable,        MGMT_SET_DISCOVERABLE_SIZE,          0 },
--	{ set_connectable,         MGMT_SETTING_SIZE,                   0 },
--	{ set_fast_connectable,    MGMT_SETTING_SIZE,                   0 },
--	{ set_bondable,            MGMT_SETTING_SIZE,                   0 },
--	{ set_link_security,       MGMT_SETTING_SIZE,                   0 },
--	{ set_ssp,                 MGMT_SETTING_SIZE,                   0 },
--	{ set_hs,                  MGMT_SETTING_SIZE,                   0 },
--	{ set_le,                  MGMT_SETTING_SIZE,                   0 },
--	{ set_dev_class,           MGMT_SET_DEV_CLASS_SIZE,             0 },
--	{ set_local_name,          MGMT_SET_LOCAL_NAME_SIZE,            0 },
--	{ add_uuid,                MGMT_ADD_UUID_SIZE,                  0 },
--	{ remove_uuid,             MGMT_REMOVE_UUID_SIZE,               0 },
-+	{ set_powered,             MGMT_SETTING_SIZE },
-+	{ set_discoverable,        MGMT_SET_DISCOVERABLE_SIZE },
-+	{ set_connectable,         MGMT_SETTING_SIZE },
-+	{ set_fast_connectable,    MGMT_SETTING_SIZE },
-+	{ set_bondable,            MGMT_SETTING_SIZE },
-+	{ set_link_security,       MGMT_SETTING_SIZE },
-+	{ set_ssp,                 MGMT_SETTING_SIZE },
-+	{ set_hs,                  MGMT_SETTING_SIZE },
-+	{ set_le,                  MGMT_SETTING_SIZE },
-+	{ set_dev_class,           MGMT_SET_DEV_CLASS_SIZE },
-+	{ set_local_name,          MGMT_SET_LOCAL_NAME_SIZE },
-+	{ add_uuid,                MGMT_ADD_UUID_SIZE },
-+	{ remove_uuid,             MGMT_REMOVE_UUID_SIZE },
- 	{ load_link_keys,          MGMT_LOAD_LINK_KEYS_SIZE,
+@@ -96,6 +96,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_EXTERNAL_CONFIG,
+ 	MGMT_OP_SET_PUBLIC_ADDRESS,
+ 	MGMT_OP_START_SERVICE_DISCOVERY,
++	MGMT_OP_READ_EXT_INDEX_LIST,
+ };
+ 
+ static const u16 mgmt_events[] = {
+@@ -518,6 +519,82 @@ static int read_unconf_index_list(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
+ 
++static int read_ext_index_list(struct sock *sk, struct hci_dev *hdev,
++			       void *data, u16 data_len)
++{
++	struct mgmt_rp_read_ext_index_list *rp;
++	struct hci_dev *d;
++	size_t rp_len;
++	u16 count;
++	int err;
++
++	BT_DBG("sock %p", sk);
++
++	read_lock(&hci_dev_list_lock);
++
++	count = 0;
++	list_for_each_entry(d, &hci_dev_list, list) {
++		if (d->dev_type == HCI_BREDR || d->dev_type == HCI_AMP)
++			count++;
++	}
++
++	rp_len = sizeof(*rp) + (3 * count);
++	rp = kmalloc(rp_len, GFP_ATOMIC);
++	if (!rp) {
++		read_unlock(&hci_dev_list_lock);
++		return -ENOMEM;
++	}
++
++	count = 0;
++	list_for_each_entry(d, &hci_dev_list, list) {
++		if (hci_dev_test_flag(d, HCI_SETUP) ||
++		    hci_dev_test_flag(d, HCI_CONFIG) ||
++		    hci_dev_test_flag(d, HCI_USER_CHANNEL))
++			continue;
++
++		/* Devices marked as raw-only are neither configured
++		 * nor unconfigured controllers.
++		 */
++		if (test_bit(HCI_QUIRK_RAW_DEVICE, &d->quirks))
++			continue;
++
++		if (d->dev_type == HCI_BREDR) {
++			if (hci_dev_test_flag(d, HCI_UNCONFIGURED))
++				rp->entry[count].type = 0x01;
++			else
++				rp->entry[count].type = 0x00;
++		} else if (d->dev_type == HCI_AMP) {
++			rp->entry[count].type = 0x02;
++		} else {
++			continue;
++		}
++
++		rp->entry[count].bus = d->bus;
++		rp->entry[count++].index = cpu_to_le16(d->id);
++		BT_DBG("Added hci%u", d->id);
++	}
++
++	rp->num_controllers = cpu_to_le16(count);
++	rp_len = sizeof(*rp) + (3 * count);
++
++	read_unlock(&hci_dev_list_lock);
++
++	/* If this command is called at least once, then all the
++	 * default index and unconfigured index events are disabled
++	 * and from now on only extended index events are used.
++	 */
++	hci_sock_set_flag(sk, HCI_MGMT_EXT_INDEX_EVENTS);
++	hci_sock_clear_flag(sk, HCI_MGMT_INDEX_EVENTS);
++	hci_sock_clear_flag(sk, HCI_MGMT_UNCONF_INDEX_EVENTS);
++
++	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE,
++				MGMT_OP_READ_EXT_INDEX_LIST, 0, rp, rp_len);
++
++	kfree(rp);
++
++	return err;
++}
++
+ static bool is_configured(struct hci_dev *hdev)
+ {
+ 	if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) &&
+@@ -6264,6 +6341,9 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 						HCI_MGMT_UNCONFIGURED },
+ 	{ start_service_discovery, MGMT_START_SERVICE_DISCOVERY_SIZE,
  						HCI_MGMT_VAR_LEN },
- 	{ load_long_term_keys,     MGMT_LOAD_LONG_TERM_KEYS_SIZE,
- 						HCI_MGMT_VAR_LEN },
--	{ disconnect,              MGMT_DISCONNECT_SIZE,                0 },
--	{ get_connections,         MGMT_GET_CONNECTIONS_SIZE,           0 },
--	{ pin_code_reply,          MGMT_PIN_CODE_REPLY_SIZE,            0 },
--	{ pin_code_neg_reply,      MGMT_PIN_CODE_NEG_REPLY_SIZE,        0 },
--	{ set_io_capability,       MGMT_SET_IO_CAPABILITY_SIZE,         0 },
--	{ pair_device,             MGMT_PAIR_DEVICE_SIZE,               0 },
--	{ cancel_pair_device,      MGMT_CANCEL_PAIR_DEVICE_SIZE,        0 },
--	{ unpair_device,           MGMT_UNPAIR_DEVICE_SIZE,             0 },
--	{ user_confirm_reply,      MGMT_USER_CONFIRM_REPLY_SIZE,        0 },
--	{ user_confirm_neg_reply,  MGMT_USER_CONFIRM_NEG_REPLY_SIZE,    0 },
--	{ user_passkey_reply,      MGMT_USER_PASSKEY_REPLY_SIZE,        0 },
--	{ user_passkey_neg_reply,  MGMT_USER_PASSKEY_NEG_REPLY_SIZE,    0 },
-+	{ disconnect,              MGMT_DISCONNECT_SIZE },
-+	{ get_connections,         MGMT_GET_CONNECTIONS_SIZE },
-+	{ pin_code_reply,          MGMT_PIN_CODE_REPLY_SIZE },
-+	{ pin_code_neg_reply,      MGMT_PIN_CODE_NEG_REPLY_SIZE },
-+	{ set_io_capability,       MGMT_SET_IO_CAPABILITY_SIZE },
-+	{ pair_device,             MGMT_PAIR_DEVICE_SIZE },
-+	{ cancel_pair_device,      MGMT_CANCEL_PAIR_DEVICE_SIZE },
-+	{ unpair_device,           MGMT_UNPAIR_DEVICE_SIZE },
-+	{ user_confirm_reply,      MGMT_USER_CONFIRM_REPLY_SIZE },
-+	{ user_confirm_neg_reply,  MGMT_USER_CONFIRM_NEG_REPLY_SIZE },
-+	{ user_passkey_reply,      MGMT_USER_PASSKEY_REPLY_SIZE },
-+	{ user_passkey_neg_reply,  MGMT_USER_PASSKEY_NEG_REPLY_SIZE },
- 	{ read_local_oob_data,     MGMT_READ_LOCAL_OOB_DATA_SIZE },
- 	{ add_remote_oob_data,     MGMT_ADD_REMOTE_OOB_DATA_SIZE,
- 						HCI_MGMT_VAR_LEN },
--	{ remove_remote_oob_data,  MGMT_REMOVE_REMOTE_OOB_DATA_SIZE,    0 },
--	{ start_discovery,         MGMT_START_DISCOVERY_SIZE,           0 },
--	{ stop_discovery,          MGMT_STOP_DISCOVERY_SIZE,            0 },
--	{ confirm_name,            MGMT_CONFIRM_NAME_SIZE,              0 },
--	{ block_device,            MGMT_BLOCK_DEVICE_SIZE,              0 },
--	{ unblock_device,          MGMT_UNBLOCK_DEVICE_SIZE,            0 },
--	{ set_device_id,           MGMT_SET_DEVICE_ID_SIZE,             0 },
--	{ set_advertising,         MGMT_SETTING_SIZE,                   0 },
--	{ set_bredr,               MGMT_SETTING_SIZE,                   0 },
--	{ set_static_address,      MGMT_SET_STATIC_ADDRESS_SIZE,        0 },
--	{ set_scan_params,         MGMT_SET_SCAN_PARAMS_SIZE,           0 },
--	{ set_secure_conn,         MGMT_SETTING_SIZE,                   0 },
--	{ set_debug_keys,          MGMT_SETTING_SIZE,                   0 },
--	{ set_privacy,             MGMT_SET_PRIVACY_SIZE,               0 },
-+	{ remove_remote_oob_data,  MGMT_REMOVE_REMOTE_OOB_DATA_SIZE },
-+	{ start_discovery,         MGMT_START_DISCOVERY_SIZE },
-+	{ stop_discovery,          MGMT_STOP_DISCOVERY_SIZE },
-+	{ confirm_name,            MGMT_CONFIRM_NAME_SIZE },
-+	{ block_device,            MGMT_BLOCK_DEVICE_SIZE },
-+	{ unblock_device,          MGMT_UNBLOCK_DEVICE_SIZE },
-+	{ set_device_id,           MGMT_SET_DEVICE_ID_SIZE },
-+	{ set_advertising,         MGMT_SETTING_SIZE },
-+	{ set_bredr,               MGMT_SETTING_SIZE },
-+	{ set_static_address,      MGMT_SET_STATIC_ADDRESS_SIZE },
-+	{ set_scan_params,         MGMT_SET_SCAN_PARAMS_SIZE },
-+	{ set_secure_conn,         MGMT_SETTING_SIZE },
-+	{ set_debug_keys,          MGMT_SETTING_SIZE },
-+	{ set_privacy,             MGMT_SET_PRIVACY_SIZE },
- 	{ load_irks,               MGMT_LOAD_IRKS_SIZE,
- 						HCI_MGMT_VAR_LEN },
--	{ get_conn_info,           MGMT_GET_CONN_INFO_SIZE,             0 },
--	{ get_clock_info,          MGMT_GET_CLOCK_INFO_SIZE,            0 },
--	{ add_device,              MGMT_ADD_DEVICE_SIZE,                0 },
--	{ remove_device,           MGMT_REMOVE_DEVICE_SIZE,             0 },
-+	{ get_conn_info,           MGMT_GET_CONN_INFO_SIZE },
-+	{ get_clock_info,          MGMT_GET_CLOCK_INFO_SIZE },
-+	{ add_device,              MGMT_ADD_DEVICE_SIZE },
-+	{ remove_device,           MGMT_REMOVE_DEVICE_SIZE },
- 	{ load_conn_param,         MGMT_LOAD_CONN_PARAM_SIZE,
- 						HCI_MGMT_VAR_LEN },
- 	{ read_unconf_index_list,  MGMT_READ_UNCONF_INDEX_LIST_SIZE,
++	{ NULL },
++	{ read_ext_index_list,     MGMT_READ_EXT_INDEX_LIST_SIZE,
++						HCI_MGMT_NO_HDEV },
+ };
+ 
+ int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
 -- 
 2.1.0
 
