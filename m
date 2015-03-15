@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 7/7] Bluetooth: Convert local OOB data reading to use HCI request
-Date: Sun, 15 Mar 2015 11:07:35 +0200
-Message-Id: <1426410455-18368-8-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v4 6/7] Bluetooth: Move hci_get_cmd_complete() to hci_event.c
+Date: Sun, 15 Mar 2015 11:07:34 +0200
+Message-Id: <1426410455-18368-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1426410455-18368-1-git-send-email-johan.hedberg@gmail.com>
 References: <1426410455-18368-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,203 +11,179 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that there's a HCI request API available where the callback receives
-the resulting skb, we can convert the local OOB data reading to use this
-new API. This patch does the necessary update in mgmt.c (which also
-requires moving the callback higher up since it's now a static function)
-and removes the custom calls from hci_event.c that are no-longer
-necessary.
+To make the hci_req_run_skb() API consistent with hci_cmd_sync_ev()
+the callback should receive the cmd_complete parameters in the 'normal'
+case and the full HCI event if a special event was expected. This patch
+moves the hci_get_cmd_complete() function from hci_core.c to hci_event.c
+where it's used to strip the skb from the needed headers before passing
+it on to the callback.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |   3 --
- net/bluetooth/hci_event.c        |  12 -----
- net/bluetooth/mgmt.c             | 105 ++++++++++++++++++++++++---------------
- 3 files changed, 65 insertions(+), 55 deletions(-)
+ net/bluetooth/hci_core.c  | 52 ++++--------------------------------------
+ net/bluetooth/hci_event.c | 57 ++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 58 insertions(+), 51 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 33fa477839f5..fd6eb27686e1 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1376,9 +1376,6 @@ void mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
- void mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
- 				    u8 status);
- void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status);
--void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
--				       u8 *rand192, u8 *hash256, u8 *rand256,
--				       u8 status);
- void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
- 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 682609c45132..19254053e732 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1045,11 +1045,6 @@ static void hci_cc_read_local_oob_data(struct hci_dev *hdev,
- 	struct hci_rp_read_local_oob_data *rp = (void *) skb->data;
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
--
--	hci_dev_lock(hdev);
--	mgmt_read_local_oob_data_complete(hdev, rp->hash, rp->rand, NULL, NULL,
--					  rp->status);
--	hci_dev_unlock(hdev);
- }
- 
- static void hci_cc_read_local_oob_ext_data(struct hci_dev *hdev,
-@@ -1058,15 +1053,8 @@ static void hci_cc_read_local_oob_ext_data(struct hci_dev *hdev,
- 	struct hci_rp_read_local_oob_ext_data *rp = (void *) skb->data;
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
--
--	hci_dev_lock(hdev);
--	mgmt_read_local_oob_data_complete(hdev, rp->hash192, rp->rand192,
--					  rp->hash256, rp->rand256,
--					  rp->status);
--	hci_dev_unlock(hdev);
- }
- 
--
- static void hci_cc_le_set_random_addr(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6cb0a304182f..ddc0387e1975 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3721,10 +3721,70 @@ failed:
- 	return err;
- }
- 
-+static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
-+				         u16 opcode, struct sk_buff *skb)
-+{
-+	struct mgmt_rp_read_local_oob_data mgmt_rp;
-+	size_t rp_size = sizeof(mgmt_rp);
-+	struct mgmt_pending_cmd *cmd;
-+
-+	BT_DBG("%s status %u", hdev->name, status);
-+
-+	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev);
-+	if (!cmd)
-+		return;
-+
-+	if (status || !skb) {
-+		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
-+				status ? mgmt_status(status) : MGMT_STATUS_FAILED);
-+		goto remove;
-+	}
-+
-+	memset(&mgmt_rp, 0, sizeof(mgmt_rp));
-+
-+	if (opcode == HCI_OP_READ_LOCAL_OOB_DATA) {
-+		struct hci_rp_read_local_oob_data *rp = (void *) skb->data;
-+
-+		if (skb->len < sizeof(*rp)) {
-+			mgmt_cmd_status(cmd->sk, hdev->id,
-+					MGMT_OP_READ_LOCAL_OOB_DATA,
-+					MGMT_STATUS_FAILED);
-+			goto remove;
-+		}
-+
-+		memcpy(mgmt_rp.hash192, rp->hash, sizeof(rp->hash));
-+		memcpy(mgmt_rp.rand192, rp->rand, sizeof(rp->rand));
-+
-+		rp_size -= sizeof(mgmt_rp.hash256) + sizeof(mgmt_rp.rand256);
-+	} else {
-+		struct hci_rp_read_local_oob_ext_data *rp = (void *) skb->data;
-+
-+		if (skb->len < sizeof(*rp)) {
-+			mgmt_cmd_status(cmd->sk, hdev->id,
-+					MGMT_OP_READ_LOCAL_OOB_DATA,
-+					MGMT_STATUS_FAILED);
-+			goto remove;
-+		}
-+
-+		memcpy(mgmt_rp.hash192, rp->hash192, sizeof(rp->hash192));
-+		memcpy(mgmt_rp.rand192, rp->rand192, sizeof(rp->rand192));
-+
-+		memcpy(mgmt_rp.hash256, rp->hash256, sizeof(rp->hash256));
-+		memcpy(mgmt_rp.rand256, rp->rand256, sizeof(rp->rand256));
-+	}
-+
-+	mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
-+			  MGMT_STATUS_SUCCESS, &mgmt_rp, rp_size);
-+
-+remove:
-+	mgmt_pending_remove(cmd);
-+}
-+
- static int read_local_oob_data(struct sock *sk, struct hci_dev *hdev,
- 			       void *data, u16 data_len)
- {
- 	struct mgmt_pending_cmd *cmd;
-+	struct hci_request req;
- 	int err;
- 
- 	BT_DBG("%s", hdev->name);
-@@ -3755,12 +3815,14 @@ static int read_local_oob_data(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 9f88b7c74a80..fef81321bb78 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -166,53 +166,6 @@ static void hci_req_cancel(struct hci_dev *hdev, int err)
  	}
- 
-+	hci_req_init(&req, hdev);
-+
- 	if (bredr_sc_enabled(hdev))
--		err = hci_send_cmd(hdev, HCI_OP_READ_LOCAL_OOB_EXT_DATA,
--				   0, NULL);
-+		hci_req_add(&req, HCI_OP_READ_LOCAL_OOB_EXT_DATA, 0, NULL);
- 	else
--		err = hci_send_cmd(hdev, HCI_OP_READ_LOCAL_OOB_DATA, 0, NULL);
-+		hci_req_add(&req, HCI_OP_READ_LOCAL_OOB_DATA, 0, NULL);
- 
-+	err = hci_req_run_skb(&req, read_local_oob_data_complete);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 
-@@ -7510,43 +7572,6 @@ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status)
- 			   cmd ? cmd->sk : NULL);
  }
  
--void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
--				       u8 *rand192, u8 *hash256, u8 *rand256,
--				       u8 status)
+-static struct sk_buff *hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
+-					    u8 event, struct sk_buff *skb)
 -{
--	struct mgmt_pending_cmd *cmd;
+-	struct hci_ev_cmd_complete *ev;
+-	struct hci_event_hdr *hdr;
 -
--	BT_DBG("%s status %u", hdev->name, status);
+-	if (!skb)
+-		return ERR_PTR(-ENODATA);
 -
--	cmd = mgmt_pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev);
--	if (!cmd)
--		return;
--
--	if (status) {
--		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
--			        mgmt_status(status));
--	} else {
--		struct mgmt_rp_read_local_oob_data rp;
--		size_t rp_size = sizeof(rp);
--
--		memcpy(rp.hash192, hash192, sizeof(rp.hash192));
--		memcpy(rp.rand192, rand192, sizeof(rp.rand192));
--
--		if (bredr_sc_enabled(hdev) && hash256 && rand256) {
--			memcpy(rp.hash256, hash256, sizeof(rp.hash256));
--			memcpy(rp.rand256, rand256, sizeof(rp.rand256));
--		} else {
--			rp_size -= sizeof(rp.hash256) + sizeof(rp.rand256);
--		}
--
--		mgmt_cmd_complete(cmd->sk, hdev->id,
--				  MGMT_OP_READ_LOCAL_OOB_DATA, 0,
--				  &rp, rp_size);
+-	if (skb->len < sizeof(*hdr)) {
+-		BT_ERR("Too short HCI event");
+-		goto failed;
 -	}
 -
--	mgmt_pending_remove(cmd);
+-	hdr = (void *) skb->data;
+-	skb_pull(skb, HCI_EVENT_HDR_SIZE);
+-
+-	if (event) {
+-		if (hdr->evt != event)
+-			goto failed;
+-		return skb;
+-	}
+-
+-	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
+-		BT_DBG("Last event is not cmd complete (0x%2.2x)", hdr->evt);
+-		goto failed;
+-	}
+-
+-	if (skb->len < sizeof(*ev)) {
+-		BT_ERR("Too short cmd_complete event");
+-		goto failed;
+-	}
+-
+-	ev = (void *) skb->data;
+-	skb_pull(skb, sizeof(*ev));
+-
+-	if (opcode == __le16_to_cpu(ev->opcode))
+-		return skb;
+-
+-	BT_DBG("opcode doesn't match (0x%2.2x != 0x%2.2x)", opcode,
+-	       __le16_to_cpu(ev->opcode));
+-
+-failed:
+-	kfree_skb(skb);
+-	return ERR_PTR(-ENODATA);
 -}
 -
- static inline bool has_uuid(u8 *uuid, u16 uuid_count, u8 (*uuids)[16])
+ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 				  const void *param, u8 event, u32 timeout)
  {
- 	int i;
+@@ -271,7 +224,10 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 		return ERR_PTR(err);
+ 	}
+ 
+-	return hci_get_cmd_complete(hdev, opcode, event, skb);
++	if (!skb)
++		return ERR_PTR(-ENODATA);
++
++	return skb;
+ }
+ EXPORT_SYMBOL(__hci_cmd_sync_ev);
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f57bb6236591..682609c45132 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5032,13 +5032,58 @@ static void hci_chan_selected_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	amp_read_loc_assoc_final_data(hdev, hcon);
+ }
+ 
++static bool hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
++				 u8 event, struct sk_buff *skb)
++{
++	struct hci_ev_cmd_complete *ev;
++	struct hci_event_hdr *hdr;
++
++	if (!skb)
++		return false;
++
++	if (skb->len < sizeof(*hdr)) {
++		BT_ERR("Too short HCI event");
++		return false;
++	}
++
++	hdr = (void *) skb->data;
++	skb_pull(skb, HCI_EVENT_HDR_SIZE);
++
++	if (event) {
++		if (hdr->evt != event)
++			return false;
++		return true;
++	}
++
++	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
++		BT_DBG("Last event is not cmd complete (0x%2.2x)", hdr->evt);
++		return false;
++	}
++
++	if (skb->len < sizeof(*ev)) {
++		BT_ERR("Too short cmd_complete event");
++		return false;
++	}
++
++	ev = (void *) skb->data;
++	skb_pull(skb, sizeof(*ev));
++
++	if (opcode != __le16_to_cpu(ev->opcode)) {
++		BT_DBG("opcode doesn't match (0x%2.2x != 0x%2.2x)", opcode,
++		       __le16_to_cpu(ev->opcode));
++		return false;
++	}
++
++	return true;
++}
++
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_event_hdr *hdr = (void *) skb->data;
+ 	hci_req_complete_t req_complete = NULL;
+ 	hci_req_complete_skb_t req_complete_skb = NULL;
+ 	struct sk_buff *orig_skb = NULL;
+-	u8 status = 0, event = hdr->evt;
++	u8 status = 0, event = hdr->evt, req_evt = 0;
+ 	u16 opcode = HCI_OP_NOP;
+ 
+ 	if (hdev->sent_cmd && bt_cb(hdev->sent_cmd)->req_event == event) {
+@@ -5046,6 +5091,7 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		opcode = __le16_to_cpu(cmd_hdr->opcode);
+ 		hci_req_cmd_complete(hdev, opcode, status, &req_complete,
+ 				     &req_complete_skb);
++		req_evt = event;
+ 	}
+ 
+ 	/* If it looks like we might end up having to call
+@@ -5239,10 +5285,15 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		break;
+ 	}
+ 
+-	if (req_complete)
++	if (req_complete) {
+ 		req_complete(hdev, status, opcode);
+-	else if (req_complete_skb)
++	} else if (req_complete_skb) {
++		if (!hci_get_cmd_complete(hdev, opcode, req_evt, orig_skb)) {
++			kfree_skb(orig_skb);
++			orig_skb = NULL;
++		}
+ 		req_complete_skb(hdev, status, opcode, orig_skb);
++	}
+ 
+ 	kfree_skb(orig_skb);
+ 	kfree_skb(skb);
 -- 
 2.1.0
 
