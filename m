@@ -1,104 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add simple version of Read Advertising Features command
-Date: Sat, 14 Mar 2015 20:24:42 -0700
-Message-Id: <1426389882-15128-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 13/14] Bluetooth: Send global configuration updates to all management users
+Date: Sat, 14 Mar 2015 19:28:05 -0700
+Message-Id: <1426386486-15962-13-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for the simplest possible version of Read Advertising
-Features management command. It allows basic testing of the interface.
+Changes to the global configuration updates like settings, class of
+device, name etc. can be received by every user. They are allowed to
+read them in the first place so provide the updates via events as
+well. Otherwise untrusted users start polling for updates and that
+is not a desired behavior.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/mgmt.h | 11 +++++++++++
- net/bluetooth/mgmt.c         | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 47 insertions(+)
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_sock.c    |  5 +++++
+ net/bluetooth/mgmt.c        | 34 ++++++++++++++++++++--------------
+ 3 files changed, 26 insertions(+), 14 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index f3baad589db0..4d0ccd194c01 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -517,6 +517,17 @@ struct mgmt_rp_read_ext_index_list {
- 	} entry[0];
- } __packed;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 7a24acaafeea..7f41c7741e76 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -185,6 +185,7 @@ enum {
+ 	HCI_MGMT_INDEX_EVENTS,
+ 	HCI_MGMT_UNCONF_INDEX_EVENTS,
+ 	HCI_MGMT_EXT_INDEX_EVENTS,
++	HCI_MGMT_GENERIC_EVENTS,
+ };
  
-+#define MGMT_OP_READ_ADV_FEATURES	0x0003D
-+#define MGMT_READ_ADV_FEATURES_SIZE	0
-+struct mgmt_rp_read_adv_features {
-+	__le32 supported_flags;
-+	__u8   max_adv_data_len;
-+	__u8   max_scan_rsp_len;
-+	__u8   max_instances;
-+	__u8   num_instances;
-+	__u8   instance[0];
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
+ /*
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index f4b10344b1e5..7c719602dbca 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -808,10 +808,15 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 		 * socket when binding keeps this functionality. They
+ 		 * however might be cleared later and then sending of these
+ 		 * events will be disabled, but that is then intentional.
++		 *
++		 * This also enables generic events that are safe to be
++		 * received by untrusted users. Example for such events
++		 * are changes to settings, class of device, name etc.
+ 		 */
+ 		if (haddr.hci_channel == HCI_CHANNEL_CONTROL) {
+ 			hci_sock_set_flag(sk, HCI_MGMT_INDEX_EVENTS);
+ 			hci_sock_set_flag(sk, HCI_MGMT_UNCONF_INDEX_EVENTS);
++			hci_sock_set_flag(sk, HCI_MGMT_GENERIC_EVENTS);
+ 		}
+ 		break;
+ 	}
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 981dfb4f94f0..5c8eef695964 100644
+index fe2dc753787f..981dfb4f94f0 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -97,6 +97,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_SET_PUBLIC_ADDRESS,
- 	MGMT_OP_START_SERVICE_DISCOVERY,
- 	MGMT_OP_READ_EXT_INDEX_LIST,
-+	MGMT_OP_READ_ADV_FEATURES,
- };
- 
- static const u16 mgmt_events[] = {
-@@ -6254,6 +6255,40 @@ unlock:
- 	return err;
+@@ -260,6 +260,13 @@ static int mgmt_index_event(u16 event, struct hci_dev *hdev, void *data,
+ 			       flag, NULL);
  }
  
-+static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
-+			     void *data, u16 data_len)
++static int mgmt_generic_event(u16 event, struct hci_dev *hdev, void *data,
++			      u16 len, struct sock *skip_sk)
 +{
-+	struct mgmt_rp_read_adv_features *rp;
-+	size_t rp_len;
-+	int err;
-+
-+	BT_DBG("sock %p", sk);
-+
-+	hci_dev_lock(hdev);
-+
-+	rp_len = sizeof(*rp);
-+	rp = kmalloc(rp_len, GFP_ATOMIC);
-+	if (!rp) {
-+		hci_dev_unlock(hdev);
-+		return -ENOMEM;
-+	}
-+
-+	rp->supported_flags = cpu_to_le32(0);
-+	rp->max_adv_data_len = 31;
-+	rp->max_scan_rsp_len = 31;
-+	rp->max_instances = 0;
-+	rp->num_instances = 0;
-+
-+	hci_dev_unlock(hdev);
-+
-+	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_READ_ADV_FEATURES, 0,
-+				rp, rp_len);
-+
-+	kfree(rp);
-+
-+	return err;
++	return mgmt_send_event(event, hdev, HCI_CHANNEL_CONTROL, data, len,
++			       HCI_MGMT_GENERIC_EVENTS, skip_sk);
 +}
 +
- static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ NULL }, /* 0x0000 (no command) */
- 	{ read_version,            MGMT_READ_VERSION_SIZE,
-@@ -6337,6 +6372,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ read_ext_index_list,     MGMT_READ_EXT_INDEX_LIST_SIZE,
- 						HCI_MGMT_NO_HDEV |
- 						HCI_MGMT_UNTRUSTED },
-+	{ read_adv_features,       MGMT_READ_ADV_FEATURES_SIZE },
- };
+ static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 len,
+ 		      struct sock *skip_sk)
+ {
+@@ -607,8 +614,8 @@ static int new_options(struct hci_dev *hdev, struct sock *skip)
+ {
+ 	__le32 options = get_missing_options(hdev);
  
- int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
+-	return mgmt_event(MGMT_EV_NEW_CONFIG_OPTIONS, hdev, &options,
+-			  sizeof(options), skip);
++	return mgmt_generic_event(MGMT_EV_NEW_CONFIG_OPTIONS, hdev, &options,
++				  sizeof(options), skip);
+ }
+ 
+ static int send_options_rsp(struct sock *sk, u16 opcode, struct hci_dev *hdev)
+@@ -1552,11 +1559,10 @@ failed:
+ 
+ static int new_settings(struct hci_dev *hdev, struct sock *skip)
+ {
+-	__le32 ev;
+-
+-	ev = cpu_to_le32(get_current_settings(hdev));
++	__le32 ev = cpu_to_le32(get_current_settings(hdev));
+ 
+-	return mgmt_event(MGMT_EV_NEW_SETTINGS, hdev, &ev, sizeof(ev), skip);
++	return mgmt_generic_event(MGMT_EV_NEW_SETTINGS, hdev, &ev,
++				  sizeof(ev), skip);
+ }
+ 
+ int mgmt_new_settings(struct hci_dev *hdev)
+@@ -3677,8 +3683,8 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		if (err < 0)
+ 			goto failed;
+ 
+-		err = mgmt_event(MGMT_EV_LOCAL_NAME_CHANGED, hdev, data, len,
+-				 sk);
++		err = mgmt_generic_event(MGMT_EV_LOCAL_NAME_CHANGED, hdev,
++					 data, len, sk);
+ 
+ 		goto failed;
+ 	}
+@@ -6673,8 +6679,8 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered)
+ 	mgmt_pending_foreach(0, hdev, cmd_complete_rsp, &status);
+ 
+ 	if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0)
+-		mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
+-			   zero_cod, sizeof(zero_cod), NULL);
++		mgmt_generic_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
++				   zero_cod, sizeof(zero_cod), NULL);
+ 
+ new_settings:
+ 	err = new_settings(hdev, match.sk);
+@@ -7325,8 +7331,8 @@ void mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
+ 	mgmt_pending_foreach(MGMT_OP_REMOVE_UUID, hdev, sk_lookup, &match);
+ 
+ 	if (!status)
+-		mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev, dev_class, 3,
+-			   NULL);
++		mgmt_generic_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
++				   dev_class, 3, NULL);
+ 
+ 	if (match.sk)
+ 		sock_put(match.sk);
+@@ -7355,8 +7361,8 @@ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status)
+ 			return;
+ 	}
+ 
+-	mgmt_event(MGMT_EV_LOCAL_NAME_CHANGED, hdev, &ev, sizeof(ev),
+-		   cmd ? cmd->sk : NULL);
++	mgmt_generic_event(MGMT_EV_LOCAL_NAME_CHANGED, hdev, &ev, sizeof(ev),
++			   cmd ? cmd->sk : NULL);
+ }
+ 
+ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
 -- 
 2.1.0
 
