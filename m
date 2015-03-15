@@ -1,85 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: Add support for untrusted access to management commands
-Date: Sat, 14 Mar 2015 18:09:50 -0700
-Message-Id: <1426381792-31788-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/4] Bluetooth: Add hci_sock_test_flag helper function
+Date: Sat, 14 Mar 2015 18:09:49 -0700
+Message-Id: <1426381792-31788-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some management commands are safe to be accessed from any user without
-special permissions. First step for allowing access to any of these
-commands from untrusted application is to mark them accordingly.
+The management interface will need access to the socket flags and so
+provide a helper function for checking them.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  3 ++-
- net/bluetooth/mgmt.c             | 21 ++++++++++++++-------
- 2 files changed, 16 insertions(+), 8 deletions(-)
+ include/net/bluetooth/bluetooth.h | 1 +
+ net/bluetooth/hci_sock.c          | 7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 859005c9a8fc..3546789c1616 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1291,7 +1291,8 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index ae1f2ee1eaf3..d871ba313f64 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -337,6 +337,7 @@ int bt_to_errno(__u16 code);
  
- #define HCI_MGMT_VAR_LEN	(1 << 0)
- #define HCI_MGMT_NO_HDEV	(1 << 1)
--#define HCI_MGMT_UNCONFIGURED	(1 << 2)
-+#define HCI_MGMT_UNTRUSTED	(1 << 2)
-+#define HCI_MGMT_UNCONFIGURED	(1 << 3)
+ void hci_sock_set_flag(struct sock *sk, int nr);
+ void hci_sock_clear_flag(struct sock *sk, int nr);
++int hci_sock_test_flag(struct sock *sk, int nr);
  
- struct hci_mgmt_handler {
- 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index bd65f7630725..484ee8e2b52c 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6251,12 +6251,16 @@ unlock:
- static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ NULL }, /* 0x0000 (no command) */
- 	{ read_version,            MGMT_READ_VERSION_SIZE,
--						HCI_MGMT_NO_HDEV },
-+						HCI_MGMT_NO_HDEV |
-+						HCI_MGMT_UNTRUSTED },
- 	{ read_commands,           MGMT_READ_COMMANDS_SIZE,
--						HCI_MGMT_NO_HDEV },
-+						HCI_MGMT_NO_HDEV |
-+						HCI_MGMT_UNTRUSTED },
- 	{ read_index_list,         MGMT_READ_INDEX_LIST_SIZE,
--						HCI_MGMT_NO_HDEV },
--	{ read_controller_info,    MGMT_READ_INFO_SIZE,                 0 },
-+						HCI_MGMT_NO_HDEV |
-+						HCI_MGMT_UNTRUSTED },
-+	{ read_controller_info,    MGMT_READ_INFO_SIZE,
-+						HCI_MGMT_UNTRUSTED },
- 	{ set_powered,             MGMT_SETTING_SIZE,                   0 },
- 	{ set_discoverable,        MGMT_SET_DISCOVERABLE_SIZE,          0 },
- 	{ set_connectable,         MGMT_SETTING_SIZE,                   0 },
-@@ -6312,9 +6316,11 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ load_conn_param,         MGMT_LOAD_CONN_PARAM_SIZE,
- 						HCI_MGMT_VAR_LEN },
- 	{ read_unconf_index_list,  MGMT_READ_UNCONF_INDEX_LIST_SIZE,
--						HCI_MGMT_NO_HDEV },
-+						HCI_MGMT_NO_HDEV |
-+						HCI_MGMT_UNTRUSTED },
- 	{ read_config_info,        MGMT_READ_CONFIG_INFO_SIZE,
--						HCI_MGMT_UNCONFIGURED },
-+						HCI_MGMT_UNCONFIGURED |
-+						HCI_MGMT_UNTRUSTED },
- 	{ set_external_config,     MGMT_SET_EXTERNAL_CONFIG_SIZE,
- 						HCI_MGMT_UNCONFIGURED },
- 	{ set_public_address,      MGMT_SET_PUBLIC_ADDRESS_SIZE,
-@@ -6323,7 +6329,8 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 						HCI_MGMT_VAR_LEN },
- 	{ NULL },
- 	{ read_ext_index_list,     MGMT_READ_EXT_INDEX_LIST_SIZE,
--						HCI_MGMT_NO_HDEV },
-+						HCI_MGMT_NO_HDEV |
-+						HCI_MGMT_UNTRUSTED },
- };
+ int hci_sock_init(void);
+ void hci_sock_cleanup(void);
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index e7f463f6fd69..df23c184c897 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -60,6 +60,11 @@ void hci_sock_clear_flag(struct sock *sk, int nr)
+ 	clear_bit(nr, &hci_pi(sk)->flags);
+ }
  
- int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
++int hci_sock_test_flag(struct sock *sk, int nr)
++{
++	return test_bit(nr, &hci_pi(sk)->flags);
++}
++
+ static inline int hci_test_bit(int nr, const void *addr)
+ {
+ 	return *((const __u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
+@@ -211,7 +216,7 @@ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+ 		struct sk_buff *nskb;
+ 
+ 		/* Ignore socket without the flag set */
+-		if (!test_bit(flag, &hci_pi(sk)->flags))
++		if (!hci_sock_test_flag(sk, flag))
+ 			continue;
+ 
+ 		/* Skip the original socket */
 -- 
 2.1.0
 
