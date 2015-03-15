@@ -1,52 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 11/14] Bluetooth: Add support for trust verification of management commands
-Date: Sat, 14 Mar 2015 19:28:03 -0700
-Message-Id: <1426386486-15962-11-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 14/14] Bluetooth: Use BIT(n) macro instead of manually encoding (1 << n)
+Date: Sat, 14 Mar 2015 19:28:06 -0700
+Message-Id: <1426386486-15962-14-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Check the required trust level of each management command with the trust
-level of the management socket. If it does not match up, then return the
-newly introduced permission denied error.
+The flags for the management command table used manual encoding of
+bits in the form of (1 << n). It is however preferred to use BIT(n)
+macro instead.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/mgmt.h | 1 +
- net/bluetooth/mgmt.c         | 7 +++++++
- 2 files changed, 8 insertions(+)
+ include/net/bluetooth/hci_core.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 2534bd4d22b2..f3baad589db0 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -44,6 +44,7 @@
- #define MGMT_STATUS_INVALID_INDEX	0x11
- #define MGMT_STATUS_RFKILLED		0x12
- #define MGMT_STATUS_ALREADY_PAIRED	0x13
-+#define MGMT_STATUS_PERMISSION_DENIED	0x14
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 3546789c1616..ce94bcb33600 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1289,10 +1289,10 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
  
- struct mgmt_hdr {
- 	__le16	opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8d67704d6116..fe2dc753787f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6379,6 +6379,13 @@ int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
+ void hci_sock_dev_event(struct hci_dev *hdev, int event);
  
- 	handler = &chan->handlers[opcode];
+-#define HCI_MGMT_VAR_LEN	(1 << 0)
+-#define HCI_MGMT_NO_HDEV	(1 << 1)
+-#define HCI_MGMT_UNTRUSTED	(1 << 2)
+-#define HCI_MGMT_UNCONFIGURED	(1 << 3)
++#define HCI_MGMT_VAR_LEN	BIT(0)
++#define HCI_MGMT_NO_HDEV	BIT(1)
++#define HCI_MGMT_UNTRUSTED	BIT(2)
++#define HCI_MGMT_UNCONFIGURED	BIT(3)
  
-+	if (!hci_sock_test_flag(sk, HCI_SOCK_TRUSTED) &&
-+	    !(handler->flags & HCI_MGMT_UNTRUSTED)) {
-+		err = mgmt_cmd_status(sk, index, opcode,
-+				      MGMT_STATUS_PERMISSION_DENIED);
-+		goto done;
-+	}
-+
- 	if (index != MGMT_INDEX_NONE) {
- 		hdev = hci_dev_get(index);
- 		if (!hdev) {
+ struct hci_mgmt_handler {
+ 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
 -- 
 2.1.0
 
