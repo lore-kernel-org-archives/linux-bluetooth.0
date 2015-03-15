@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: Add simple version of Read Advertising Features command
-Date: Sat, 14 Mar 2015 20:53:25 -0700
-Message-Id: <1426391605-20983-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2] Bluetooth: Add simple version of Read Advertising Features command
+Date: Sat, 14 Mar 2015 20:45:29 -0700
+Message-Id: <1426391129-15865-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -39,7 +39,7 @@ index f3baad589db0..4d0ccd194c01 100644
  struct mgmt_ev_cmd_complete {
  	__le16	opcode;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 981dfb4f94f0..ce3b8410dcb4 100644
+index 981dfb4f94f0..57de151902f8 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
 @@ -97,6 +97,7 @@ static const u16 mgmt_commands[] = {
@@ -80,8 +80,8 @@ index 981dfb4f94f0..ce3b8410dcb4 100644
 +
 +	hci_dev_unlock(hdev);
 +
-+	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_READ_ADV_FEATURES,
-+				MGMT_STATUS_SUCCESS, rp, rp_len);
++	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_READ_ADV_FEATURES, 0,
++				rp, rp_len);
 +
 +	kfree(rp);
 +
