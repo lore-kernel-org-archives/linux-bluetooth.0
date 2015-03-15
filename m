@@ -1,33 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Add defines for LE Bluetooth Device Address and LE Role
-Date: Sat, 14 Mar 2015 22:43:18 -0700
-Message-Id: <1426398199-11977-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/3] Bluetooth: Move eir_append_data function to a different location
+Date: Sat, 14 Mar 2015 22:43:17 -0700
+Message-Id: <1426398199-11977-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The OOB data requires to include LE Bluetooth Device Address and LE Role
-and so add the type constants for these fields.
+The eir_append_data helper function is needed for generating the
+extended local OOB data fields. So move it up into the right location.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/mgmt.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 7f41c7741e76..af9893b704ff 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -456,6 +456,8 @@ enum {
- #define EIR_SSP_HASH_C		0x0E /* Simple Pairing Hash C */
- #define EIR_SSP_RAND_R		0x0F /* Simple Pairing Randomizer R */
- #define EIR_DEVICE_ID		0x10 /* device ID */
-+#define EIR_LE_BDADDR		0x1B /* LE Bluetooth device address */
-+#define EIR_LE_ROLE		0x1C /* LE role */
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ce3b8410dcb4..3e430c8b8030 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6255,6 +6255,17 @@ unlock:
+ 	return err;
+ }
  
- /* Low Energy Advertising Flags */
- #define LE_AD_LIMITED		0x01 /* Limited Discoverable */
++static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
++				  u8 data_len)
++{
++	eir[eir_len++] = sizeof(type) + data_len;
++	eir[eir_len++] = type;
++	memcpy(&eir[eir_len], data, data_len);
++	eir_len += data_len;
++
++	return eir_len;
++}
++
+ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
+ 			     void *data, u16 data_len)
+ {
+@@ -6932,17 +6943,6 @@ void mgmt_new_conn_param(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	mgmt_event(MGMT_EV_NEW_CONN_PARAM, hdev, &ev, sizeof(ev), NULL);
+ }
+ 
+-static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
+-				  u8 data_len)
+-{
+-	eir[eir_len++] = sizeof(type) + data_len;
+-	eir[eir_len++] = type;
+-	memcpy(&eir[eir_len], data, data_len);
+-	eir_len += data_len;
+-
+-	return eir_len;
+-}
+-
+ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
+ 			   u32 flags, u8 *name, u8 name_len)
+ {
 -- 
 2.1.0
 
