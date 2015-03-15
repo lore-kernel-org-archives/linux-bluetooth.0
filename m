@@ -1,66 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Introduce trusted flag for management control sockets
-Date: Sat, 14 Mar 2015 17:36:43 -0700
-Message-Id: <1426379804-16300-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 4/5] Bluetooth: Add support for extended index management events
+Date: Sat, 14 Mar 2015 17:02:00 -0700
+Message-Id: <1426377721-735-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Providing a global trusted flag for management control sockets provides
-an easy way for identifying sockets and imposing restriction on it. For
-now all management sockets are trusted since they require CAP_NET_ADMIN.
-
-The same applies to monitor sockets since they require CAP_NET_RAW and
-with that are implicitly trusted.
+This introduces support for using Extended Index Added and Extended
+Index Removed events. These events contain the controller type and
+also the hardware bus information from the driver.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_sock.c    | 11 +++++++++++
- 2 files changed, 12 insertions(+)
+ include/net/bluetooth/hci.h  |  1 +
+ include/net/bluetooth/mgmt.h |  9 +++++++++
+ net/bluetooth/mgmt.c         | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index b8318711135a..7a24acaafeea 100644
+index 0995ec755959..b8318711135a 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -181,6 +181,7 @@ enum {
- 
- /* HCI socket flags */
+@@ -183,6 +183,7 @@ enum {
  enum {
-+	HCI_SOCK_TRUSTED,
  	HCI_MGMT_INDEX_EVENTS,
  	HCI_MGMT_UNCONF_INDEX_EVENTS,
- 	HCI_MGMT_EXT_INDEX_EVENTS,
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 00775c4fef83..54118868b3f6 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -796,6 +796,11 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 			goto done;
- 		}
++	HCI_MGMT_EXT_INDEX_EVENTS,
+ };
  
-+		/* The monitor interface is restricted to CAP_NET_RAW
-+		 * capabilities and with that implicitly trusted.
-+		 */
-+		hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
+ /*
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 5bf6af9cee78..8562f9ecf230 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -692,3 +692,12 @@ struct mgmt_ev_new_conn_param {
+ #define MGMT_EV_UNCONF_INDEX_REMOVED	0x001e
+ 
+ #define MGMT_EV_NEW_CONFIG_OPTIONS	0x001f
 +
- 		send_monitor_replay(sk);
- 
- 		atomic_inc(&monitor_promisc);
-@@ -817,6 +822,12 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 			goto done;
- 		}
- 
-+		/* Since the access to control channels is currently
-+		 * restricted to CAP_NET_ADMIN capabilities, every
-+		 * socket is implicitly trusted.
-+		 */
-+		hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
++struct mgmt_ev_ext_index {
++	__u8 type;
++	__u8 bus;
++} __packed;
 +
- 		/* At the moment the index and unconfigured index events
- 		 * are enabled unconditionally. Setting them on each
- 		 * socket when binding keeps this functionality. They
++#define MGMT_EV_EXT_INDEX_ADDED		0x0020
++
++#define MGMT_EV_EXT_INDEX_REMOVED	0x0021
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 6b58c13b2b51..56f49e9c4189 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -128,6 +128,8 @@ static const u16 mgmt_events[] = {
+ 	MGMT_EV_UNCONF_INDEX_ADDED,
+ 	MGMT_EV_UNCONF_INDEX_REMOVED,
+ 	MGMT_EV_NEW_CONFIG_OPTIONS,
++	MGMT_EV_EXT_INDEX_ADDED,
++	MGMT_EV_EXT_INDEX_REMOVED,
+ };
+ 
+ #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
+@@ -6370,6 +6372,7 @@ done:
+ 
+ void mgmt_index_added(struct hci_dev *hdev)
+ {
++	struct mgmt_ev_ext_index ev;
+ 
+ 	if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
+ 		return;
+@@ -6379,16 +6382,29 @@ void mgmt_index_added(struct hci_dev *hdev)
+ 		if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
+ 			mgmt_index_event(MGMT_EV_UNCONF_INDEX_ADDED, hdev,
+ 					 NULL, 0, HCI_MGMT_UNCONF_INDEX_EVENTS);
++			ev.type = 0x01;
+ 		} else {
+ 			mgmt_index_event(MGMT_EV_INDEX_ADDED, hdev, NULL, 0,
+ 					 HCI_MGMT_INDEX_EVENTS);
++			ev.type = 0x00;
+ 		}
+ 		break;
++	case HCI_AMP:
++		ev.type = 0x02;
++		break;
++	default:
++		return;
+ 	}
++
++	ev.bus = hdev->bus;
++
++	mgmt_index_event(MGMT_EV_EXT_INDEX_ADDED, hdev, &ev, sizeof(ev),
++			 HCI_MGMT_EXT_INDEX_EVENTS);
+ }
+ 
+ void mgmt_index_removed(struct hci_dev *hdev)
+ {
++	struct mgmt_ev_ext_index ev;
+ 	u8 status = MGMT_STATUS_INVALID_INDEX;
+ 
+ 	if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
+@@ -6401,12 +6417,24 @@ void mgmt_index_removed(struct hci_dev *hdev)
+ 		if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
+ 			mgmt_index_event(MGMT_EV_UNCONF_INDEX_REMOVED, hdev,
+ 					 NULL, 0, HCI_MGMT_UNCONF_INDEX_EVENTS);
++			ev.type = 0x01;
+ 		} else {
+ 			mgmt_index_event(MGMT_EV_INDEX_REMOVED, hdev, NULL, 0,
+ 					 HCI_MGMT_INDEX_EVENTS);
++			ev.type = 0x00;
+ 		}
+ 		break;
++	case HCI_AMP:
++		ev.type = 0x02;
++		break;
++	default:
++		return;
+ 	}
++
++	ev.bus = hdev->bus;
++
++	mgmt_index_event(MGMT_EV_EXT_INDEX_REMOVED, hdev, &ev, sizeof(ev),
++			 HCI_MGMT_EXT_INDEX_EVENTS);
+ }
+ 
+ /* This function requires the caller holds hdev->lock */
 -- 
 2.1.0
 
