@@ -1,62 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1426236852-10501-1-git-send-email-luiz.dentz@gmail.com>
-References: <1426236852-10501-1-git-send-email-luiz.dentz@gmail.com>
-Date: Sun, 15 Mar 2015 09:05:52 +0200
-Message-ID: <CABBYNZLHxk+KC31052hquQNBDDp0281y1T2F+7xc1GHMMtwFRw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] attrib: Fix not honoring MTU
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] Bluetooth: Add defines for LE Bluetooth Device Address and LE Role
+Date: Sat, 14 Mar 2015 22:43:18 -0700
+Message-Id: <1426398199-11977-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+The OOB data requires to include LE Bluetooth Device Address and LE Role
+and so add the type constants for these fields.
 
-On Fri, Mar 13, 2015 at 10:54 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If MTU has changed, by bt_gatt_client for example, the code should be
-> able to figure it out without waiting g_attrib_set_mtu to be called.
-> ---
->  attrib/gattrib.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->
-> diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-> index 514fc8f..2011359 100644
-> --- a/attrib/gattrib.c
-> +++ b/attrib/gattrib.c
-> @@ -429,9 +429,24 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
->
->  uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
->  {
-> +       uint16_t mtu;
-> +
->         if (!attrib || !len)
->                 return NULL;
->
-> +       mtu = bt_att_get_mtu(attrib->att);
-> +
-> +       /*
-> +        * Clients of this expect a buffer to use.
-> +        *
-> +        * Pdu encoding in shared/att verifies if whole buffer fits the mtu,
-> +        * thus we should set the buflen also when mtu is reduced. But we
-> +        * need to reallocate the buffer only if mtu is larger.
-> +        */
-> +       if (mtu > attrib->buflen)
-> +               attrib->buf = g_realloc(attrib->buf, mtu);
-> +
-> +       attrib->buflen = mtu;
->         *len = attrib->buflen;
->         return attrib->buf;
->  }
-> --
-> 2.1.0
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Applied.
-
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 7f41c7741e76..af9893b704ff 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -456,6 +456,8 @@ enum {
+ #define EIR_SSP_HASH_C		0x0E /* Simple Pairing Hash C */
+ #define EIR_SSP_RAND_R		0x0F /* Simple Pairing Randomizer R */
+ #define EIR_DEVICE_ID		0x10 /* device ID */
++#define EIR_LE_BDADDR		0x1B /* LE Bluetooth device address */
++#define EIR_LE_ROLE		0x1C /* LE role */
+ 
+ /* Low Energy Advertising Flags */
+ #define LE_AD_LIMITED		0x01 /* Limited Discoverable */
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
