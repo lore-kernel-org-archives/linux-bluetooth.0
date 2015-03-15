@@ -3,8 +3,8 @@ From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
 Subject: [PATCH] android/hog: Allow to pass custom fd for uhid
-Date: Sun, 15 Mar 2015 14:44:32 +0100
-Message-Id: <1426427072-20085-1-git-send-email-szymon.janc@tieto.com>
+Date: Sun, 15 Mar 2015 14:43:41 +0100
+Message-Id: <1426427021-19973-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
