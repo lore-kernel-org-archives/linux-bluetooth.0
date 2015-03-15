@@ -1,82 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/5] Bluetooth: Provide hci_send_to_flagged_channel helper function
-Date: Sat, 14 Mar 2015 17:01:58 -0700
-Message-Id: <1426377721-735-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 1/5] Bluetooth: Add flags field and setting function for HCI sockets
+Date: Sat, 14 Mar 2015 17:01:57 -0700
+Message-Id: <1426377721-735-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The hci_send_to_flagged_channel helper function can be used to send
-packets to all channels that have a certain HCI socket flag set.
+To filter out certain actions for certain HCI sockets introcuce a flags
+field that allows to configure specific settings on individual sockets.
 
-This is especially useful for managment events that are limited to
-sockets that have first enabled certain functionality. This allows
-for filtering of events without confusing existing users.
+Since the hci_pinfo structure is private in hci_sock.c, provide helper
+functions for setting and clearing a given flag.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_sock.c         | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+)
+ include/net/bluetooth/bluetooth.h |  3 +++
+ net/bluetooth/hci_sock.c          | 11 +++++++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6afbf5b014a1..d38f6e426e84 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1285,6 +1285,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
- void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
- void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
- 			 struct sock *skip_sk);
-+void hci_send_to_flagged_channel(unsigned short channel, struct sk_buff *skb,
-+				 int flag);
- void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index e598ca096ec9..ae1f2ee1eaf3 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -335,6 +335,9 @@ out:
  
- void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ int bt_to_errno(__u16 code);
+ 
++void hci_sock_set_flag(struct sock *sk, int nr);
++void hci_sock_clear_flag(struct sock *sk, int nr);
++
+ int hci_sock_init(void);
+ void hci_sock_cleanup(void);
+ 
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index bf5365c49c9c..174a353a7dcf 100644
+index b614543b4fe3..bf5365c49c9c 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -231,6 +231,39 @@ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
- 	read_unlock(&hci_sk_list.lock);
- }
+@@ -47,8 +47,19 @@ struct hci_pinfo {
+ 	struct hci_filter filter;
+ 	__u32             cmsg_mask;
+ 	unsigned short    channel;
++	unsigned long     flags;
+ };
  
-+/* Send frame to sockets with specific channel flag set */
-+void hci_send_to_flagged_channel(unsigned short channel, struct sk_buff *skb,
-+				 int flag)
++void hci_sock_set_flag(struct sock *sk, int nr)
 +{
-+	struct sock *sk;
-+
-+	BT_DBG("channel %u len %d", channel, skb->len);
-+
-+	read_lock(&hci_sk_list.lock);
-+
-+	sk_for_each(sk, &hci_sk_list.head) {
-+		struct sk_buff *nskb;
-+
-+		if (!test_bit(flag, &hci_pi(sk)->flags))
-+			continue;
-+
-+		if (sk->sk_state != BT_BOUND)
-+			continue;
-+
-+		if (hci_pi(sk)->channel != channel)
-+			continue;
-+
-+		nskb = skb_clone(skb, GFP_ATOMIC);
-+		if (!nskb)
-+			continue;
-+
-+		if (sock_queue_rcv_skb(sk, nskb))
-+			kfree_skb(nskb);
-+	}
-+
-+	read_unlock(&hci_sk_list.lock);
++	set_bit(nr, &hci_pi(sk)->flags);
 +}
 +
- /* Send frame to monitor socket */
- void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
++void hci_sock_clear_flag(struct sock *sk, int nr)
++{
++	clear_bit(nr, &hci_pi(sk)->flags);
++}
++
+ static inline int hci_test_bit(int nr, const void *addr)
  {
+ 	return *((const __u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
 -- 
 2.1.0
 
