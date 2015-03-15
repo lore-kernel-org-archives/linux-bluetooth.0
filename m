@@ -1,149 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 05/14] Bluetooth: Add support for extended index management command
-Date: Sat, 14 Mar 2015 19:27:57 -0700
-Message-Id: <1426386486-15962-5-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 07/14] Bluetooth: Consolidate socket channel sending function back into one
+Date: Sat, 14 Mar 2015 19:27:59 -0700
+Message-Id: <1426386486-15962-7-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Read Extended Contoller Index List command can be used for
-retrieving the complete list of local available controllers. This
-included configured, unconfigured and also AMP controllers.
+With the introduction of trusted socket flag for control and monitor
+channels, it is now possible to use a single function for sending
+packets to these sockets. And with that consolidate the handling.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/mgmt.h | 11 ++++++
- net/bluetooth/mgmt.c         | 80 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 91 insertions(+)
+ include/net/bluetooth/hci_core.h |  4 +---
+ net/bluetooth/hci_sock.c         | 45 ++++++++--------------------------------
+ net/bluetooth/mgmt.c             | 34 +++++++-----------------------
+ 3 files changed, 17 insertions(+), 66 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 8562f9ecf230..2534bd4d22b2 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -505,6 +505,17 @@ struct mgmt_cp_start_service_discovery {
- } __packed;
- #define MGMT_START_SERVICE_DISCOVERY_SIZE 4
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d38f6e426e84..859005c9a8fc 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1284,9 +1284,7 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+ /* ----- HCI Sockets ----- */
+ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb);
+ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+-			 struct sock *skip_sk);
+-void hci_send_to_flagged_channel(unsigned short channel, struct sk_buff *skb,
+-				 int flag);
++			 int flag, struct sock *skip_sk);
+ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
  
-+#define MGMT_OP_READ_EXT_INDEX_LIST	0x003C
-+#define MGMT_READ_EXT_INDEX_LIST_SIZE	0
-+struct mgmt_rp_read_ext_index_list {
-+	__le16	num_controllers;
-+	struct {
-+		__le16 index;
-+		__u8   type;
-+		__u8   bus;
-+	} entry[0];
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 56f49e9c4189..eb0211b6cfa9 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -96,6 +96,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_SET_EXTERNAL_CONFIG,
- 	MGMT_OP_SET_PUBLIC_ADDRESS,
- 	MGMT_OP_START_SERVICE_DISCOVERY,
-+	MGMT_OP_READ_EXT_INDEX_LIST,
- };
+ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 54118868b3f6..e7f463f6fd69 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -199,7 +199,7 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
  
- static const u16 mgmt_events[] = {
-@@ -518,6 +519,82 @@ static int read_unconf_index_list(struct sock *sk, struct hci_dev *hdev,
- 	return err;
+ /* Send frame to sockets with specific channel */
+ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+-			 struct sock *skip_sk)
++			 int flag, struct sock *skip_sk)
+ {
+ 	struct sock *sk;
+ 
+@@ -210,41 +210,12 @@ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+ 	sk_for_each(sk, &hci_sk_list.head) {
+ 		struct sk_buff *nskb;
+ 
+-		/* Skip the original socket */
+-		if (sk == skip_sk)
+-			continue;
+-
+-		if (sk->sk_state != BT_BOUND)
+-			continue;
+-
+-		if (hci_pi(sk)->channel != channel)
+-			continue;
+-
+-		nskb = skb_clone(skb, GFP_ATOMIC);
+-		if (!nskb)
++		/* Ignore socket without the flag set */
++		if (!test_bit(flag, &hci_pi(sk)->flags))
+ 			continue;
+ 
+-		if (sock_queue_rcv_skb(sk, nskb))
+-			kfree_skb(nskb);
+-	}
+-
+-	read_unlock(&hci_sk_list.lock);
+-}
+-
+-/* Send frame to sockets with specific channel flag set */
+-void hci_send_to_flagged_channel(unsigned short channel, struct sk_buff *skb,
+-				 int flag)
+-{
+-	struct sock *sk;
+-
+-	BT_DBG("channel %u len %d", channel, skb->len);
+-
+-	read_lock(&hci_sk_list.lock);
+-
+-	sk_for_each(sk, &hci_sk_list.head) {
+-		struct sk_buff *nskb;
+-
+-		if (!test_bit(flag, &hci_pi(sk)->flags))
++		/* Skip the original socket */
++		if (sk == skip_sk)
+ 			continue;
+ 
+ 		if (sk->sk_state != BT_BOUND)
+@@ -310,7 +281,8 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hdr->index = cpu_to_le16(hdev->id);
+ 	hdr->len = cpu_to_le16(skb->len);
+ 
+-	hci_send_to_channel(HCI_CHANNEL_MONITOR, skb_copy, NULL);
++	hci_send_to_channel(HCI_CHANNEL_MONITOR, skb_copy,
++			    HCI_SOCK_TRUSTED, NULL);
+ 	kfree_skb(skb_copy);
  }
  
-+static int read_ext_index_list(struct sock *sk, struct hci_dev *hdev,
-+			       void *data, u16 data_len)
-+{
-+	struct mgmt_rp_read_ext_index_list *rp;
-+	struct hci_dev *d;
-+	size_t rp_len;
-+	u16 count;
-+	int err;
-+
-+	BT_DBG("sock %p", sk);
-+
-+	read_lock(&hci_dev_list_lock);
-+
-+	count = 0;
-+	list_for_each_entry(d, &hci_dev_list, list) {
-+		if (d->dev_type == HCI_BREDR || d->dev_type == HCI_AMP)
-+			count++;
-+	}
-+
-+	rp_len = sizeof(*rp) + (3 * count);
-+	rp = kmalloc(rp_len, GFP_ATOMIC);
-+	if (!rp) {
-+		read_unlock(&hci_dev_list_lock);
-+		return -ENOMEM;
-+	}
-+
-+	count = 0;
-+	list_for_each_entry(d, &hci_dev_list, list) {
-+		if (hci_dev_test_flag(d, HCI_SETUP) ||
-+		    hci_dev_test_flag(d, HCI_CONFIG) ||
-+		    hci_dev_test_flag(d, HCI_USER_CHANNEL))
-+			continue;
-+
-+		/* Devices marked as raw-only are neither configured
-+		 * nor unconfigured controllers.
-+		 */
-+		if (test_bit(HCI_QUIRK_RAW_DEVICE, &d->quirks))
-+			continue;
-+
-+		if (d->dev_type == HCI_BREDR) {
-+			if (hci_dev_test_flag(d, HCI_UNCONFIGURED))
-+				rp->entry[count].type = 0x01;
-+			else
-+				rp->entry[count].type = 0x00;
-+		} else if (d->dev_type == HCI_AMP) {
-+			rp->entry[count].type = 0x02;
-+		} else {
-+			continue;
-+		}
-+
-+		rp->entry[count].bus = d->bus;
-+		rp->entry[count++].index = cpu_to_le16(d->id);
-+		BT_DBG("Added hci%u", d->id);
-+	}
-+
-+	rp->num_controllers = cpu_to_le16(count);
-+	rp_len = sizeof(*rp) + (3 * count);
-+
-+	read_unlock(&hci_dev_list_lock);
-+
-+	/* If this command is called at least once, then all the
-+	 * default index and unconfigured index events are disabled
-+	 * and from now on only extended index events are used.
-+	 */
-+	hci_sock_set_flag(sk, HCI_MGMT_EXT_INDEX_EVENTS);
-+	hci_sock_clear_flag(sk, HCI_MGMT_INDEX_EVENTS);
-+	hci_sock_clear_flag(sk, HCI_MGMT_UNCONF_INDEX_EVENTS);
-+
-+	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE,
-+				MGMT_OP_READ_EXT_INDEX_LIST, 0, rp, rp_len);
-+
-+	kfree(rp);
-+
-+	return err;
-+}
-+
- static bool is_configured(struct hci_dev *hdev)
- {
- 	if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) &&
-@@ -6264,6 +6341,9 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 						HCI_MGMT_UNCONFIGURED },
- 	{ start_service_discovery, MGMT_START_SERVICE_DISCOVERY_SIZE,
- 						HCI_MGMT_VAR_LEN },
-+	{ NULL },
-+	{ read_ext_index_list,     MGMT_READ_EXT_INDEX_LIST_SIZE,
-+						HCI_MGMT_NO_HDEV },
- };
+@@ -417,7 +389,8 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
  
- int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
+ 		skb = create_monitor_event(hdev, event);
+ 		if (skb) {
+-			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb, NULL);
++			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
++					    HCI_SOCK_TRUSTED, NULL);
+ 			kfree_skb(skb);
+ 		}
+ 	}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index eb0211b6cfa9..bd65f7630725 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -224,7 +224,7 @@ static u8 mgmt_status(u8 hci_status)
+ 
+ static int mgmt_send_event(u16 event, struct hci_dev *hdev,
+ 			   unsigned short channel, void *data, u16 data_len,
+-			   struct sock *skip_sk)
++			   int flag, struct sock *skip_sk)
+ {
+ 	struct sk_buff *skb;
+ 	struct mgmt_hdr *hdr;
+@@ -247,44 +247,24 @@ static int mgmt_send_event(u16 event, struct hci_dev *hdev,
+ 	/* Time stamp */
+ 	__net_timestamp(skb);
+ 
+-	hci_send_to_channel(channel, skb, skip_sk);
++	hci_send_to_channel(channel, skb, flag, skip_sk);
+ 	kfree_skb(skb);
+ 
+ 	return 0;
+ }
+ 
+-static int mgmt_index_event(u16 event, struct hci_dev *hdev,
+-			    void *data, u16 data_len, int flag)
++static int mgmt_index_event(u16 event, struct hci_dev *hdev, void *data,
++			    u16 len, int flag)
+ {
+-	struct sk_buff *skb;
+-	struct mgmt_hdr *hdr;
+-
+-	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_KERNEL);
+-	if (!skb)
+-		return -ENOMEM;
+-
+-	hdr = (void *) skb_put(skb, sizeof(*hdr));
+-	hdr->opcode = cpu_to_le16(event);
+-	hdr->index = cpu_to_le16(hdev->id);
+-	hdr->len = cpu_to_le16(data_len);
+-
+-	if (data)
+-		memcpy(skb_put(skb, data_len), data, data_len);
+-
+-	/* Time stamp */
+-	__net_timestamp(skb);
+-
+-	hci_send_to_flagged_channel(HCI_CHANNEL_CONTROL, skb, flag);
+-	kfree_skb(skb);
+-
+-	return 0;
++	return mgmt_send_event(event, hdev, HCI_CHANNEL_CONTROL, data, len,
++			       flag, NULL);
+ }
+ 
+ static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 len,
+ 		      struct sock *skip_sk)
+ {
+ 	return mgmt_send_event(event, hdev, HCI_CHANNEL_CONTROL, data, len,
+-			       skip_sk);
++			       HCI_SOCK_TRUSTED, skip_sk);
+ }
+ 
+ static int mgmt_cmd_status(struct sock *sk, u16 index, u16 cmd, u8 status)
 -- 
 2.1.0
 
