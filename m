@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 4/7] Bluetooth: Remove unneeded recv_event variable
-Date: Sun, 15 Mar 2015 11:07:32 +0200
-Message-Id: <1426410455-18368-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v4 5/7] Bluetooth: Remove unused hci_req_pending() function
+Date: Sun, 15 Mar 2015 11:07:33 +0200
+Message-Id: <1426410455-18368-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1426410455-18368-1-git-send-email-johan.hedberg@gmail.com>
 References: <1426410455-18368-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,66 +11,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that the synchronous HCI requests use the new API and a new private
-variable the recv_evt member of hci_dev is no-longer needed. This patch
-removes it.
+The hci_req_pending() function has no users anymore, so simply remove
+it.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/hci_core.c         |  3 ---
- net/bluetooth/hci_event.c        | 12 ------------
- 3 files changed, 16 deletions(-)
+ include/net/bluetooth/hci_core.h | 2 --
+ net/bluetooth/hci_core.c         | 5 -----
+ 2 files changed, 7 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3f3ed1da88a6..d090571a856f 100644
+index d090571a856f..33fa477839f5 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -315,7 +315,6 @@ struct hci_dev {
- 	struct sk_buff_head	raw_q;
- 	struct sk_buff_head	cmd_q;
+@@ -1267,8 +1267,6 @@ static inline int hci_check_conn_params(u16 min, u16 max, u16 latency,
+ int hci_register_cb(struct hci_cb *hcb);
+ int hci_unregister_cb(struct hci_cb *hcb);
  
--	struct sk_buff		*recv_evt;
- 	struct sk_buff		*sent_cmd;
- 	struct sk_buff		*reassembly[NUM_REASSEMBLY];
- 
+-bool hci_req_pending(struct hci_dev *hdev);
+-
+ struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 			       const void *param, u32 timeout);
+ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index eb1e46d4f090..985c344dfcab 100644
+index 985c344dfcab..9f88b7c74a80 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1690,9 +1690,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		hdev->sent_cmd = NULL;
+@@ -3544,11 +3544,6 @@ static void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
  	}
+ }
  
--	kfree_skb(hdev->recv_evt);
--	hdev->recv_evt = NULL;
+-bool hci_req_pending(struct hci_dev *hdev)
+-{
+-	return (hdev->req_status == HCI_REQ_PEND);
+-}
 -
- 	/* After this point our queues are empty
- 	 * and no tasks are scheduled. */
- 	hdev->close(hdev);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f077a0c4d1e3..f57bb6236591 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5041,18 +5041,6 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	u8 status = 0, event = hdr->evt;
- 	u16 opcode = HCI_OP_NOP;
- 
--	hci_dev_lock(hdev);
--
--	/* Received events are (currently) only needed when a request is
--	 * ongoing so avoid unnecessary memory allocation.
--	 */
--	if (hci_req_pending(hdev)) {
--		kfree_skb(hdev->recv_evt);
--		hdev->recv_evt = skb_clone(skb, GFP_KERNEL);
--	}
--
--	hci_dev_unlock(hdev);
--
- 	if (hdev->sent_cmd && bt_cb(hdev->sent_cmd)->req_event == event) {
- 		struct hci_command_hdr *cmd_hdr = (void *) hdev->sent_cmd->data;
- 		opcode = __le16_to_cpu(cmd_hdr->opcode);
+ /* Send HCI command */
+ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
+ 		 const void *param)
 -- 
 2.1.0
 
