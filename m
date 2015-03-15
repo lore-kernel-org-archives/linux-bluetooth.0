@@ -1,128 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/5] Bluetooth: Add support for extended index management events
-Date: Sat, 14 Mar 2015 17:02:00 -0700
-Message-Id: <1426377721-735-4-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 5/5] Bluetooth: Add support for extended index management command
+Date: Sat, 14 Mar 2015 17:02:01 -0700
+Message-Id: <1426377721-735-5-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This introduces support for using Extended Index Added and Extended
-Index Removed events. These events contain the controller type and
-also the hardware bus information from the driver.
+The Read Extended Contoller Index List command can be used for
+retrieving the complete list of local available controllers. This
+included configured, unconfigured and also AMP controllers.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h  |  1 +
- include/net/bluetooth/mgmt.h |  9 +++++++++
- net/bluetooth/mgmt.c         | 28 ++++++++++++++++++++++++++++
- 3 files changed, 38 insertions(+)
+ include/net/bluetooth/mgmt.h | 11 ++++++
+ net/bluetooth/mgmt.c         | 80 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 91 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 0995ec755959..b8318711135a 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -183,6 +183,7 @@ enum {
- enum {
- 	HCI_MGMT_INDEX_EVENTS,
- 	HCI_MGMT_UNCONF_INDEX_EVENTS,
-+	HCI_MGMT_EXT_INDEX_EVENTS,
- };
- 
- /*
 diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 5bf6af9cee78..8562f9ecf230 100644
+index 8562f9ecf230..2534bd4d22b2 100644
 --- a/include/net/bluetooth/mgmt.h
 +++ b/include/net/bluetooth/mgmt.h
-@@ -692,3 +692,12 @@ struct mgmt_ev_new_conn_param {
- #define MGMT_EV_UNCONF_INDEX_REMOVED	0x001e
+@@ -505,6 +505,17 @@ struct mgmt_cp_start_service_discovery {
+ } __packed;
+ #define MGMT_START_SERVICE_DISCOVERY_SIZE 4
  
- #define MGMT_EV_NEW_CONFIG_OPTIONS	0x001f
-+
-+struct mgmt_ev_ext_index {
-+	__u8 type;
-+	__u8 bus;
++#define MGMT_OP_READ_EXT_INDEX_LIST	0x003C
++#define MGMT_READ_EXT_INDEX_LIST_SIZE	0
++struct mgmt_rp_read_ext_index_list {
++	__le16	num_controllers;
++	struct {
++		__le16 index;
++		__u8   type;
++		__u8   bus;
++	} entry[0];
 +} __packed;
 +
-+#define MGMT_EV_EXT_INDEX_ADDED		0x0020
-+
-+#define MGMT_EV_EXT_INDEX_REMOVED	0x0021
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6b58c13b2b51..56f49e9c4189 100644
+index 56f49e9c4189..eb0211b6cfa9 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -128,6 +128,8 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_UNCONF_INDEX_ADDED,
- 	MGMT_EV_UNCONF_INDEX_REMOVED,
- 	MGMT_EV_NEW_CONFIG_OPTIONS,
-+	MGMT_EV_EXT_INDEX_ADDED,
-+	MGMT_EV_EXT_INDEX_REMOVED,
+@@ -96,6 +96,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_EXTERNAL_CONFIG,
+ 	MGMT_OP_SET_PUBLIC_ADDRESS,
+ 	MGMT_OP_START_SERVICE_DISCOVERY,
++	MGMT_OP_READ_EXT_INDEX_LIST,
  };
  
- #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
-@@ -6370,6 +6372,7 @@ done:
- 
- void mgmt_index_added(struct hci_dev *hdev)
- {
-+	struct mgmt_ev_ext_index ev;
- 
- 	if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
- 		return;
-@@ -6379,16 +6382,29 @@ void mgmt_index_added(struct hci_dev *hdev)
- 		if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
- 			mgmt_index_event(MGMT_EV_UNCONF_INDEX_ADDED, hdev,
- 					 NULL, 0, HCI_MGMT_UNCONF_INDEX_EVENTS);
-+			ev.type = 0x01;
- 		} else {
- 			mgmt_index_event(MGMT_EV_INDEX_ADDED, hdev, NULL, 0,
- 					 HCI_MGMT_INDEX_EVENTS);
-+			ev.type = 0x00;
- 		}
- 		break;
-+	case HCI_AMP:
-+		ev.type = 0x02;
-+		break;
-+	default:
-+		return;
- 	}
-+
-+	ev.bus = hdev->bus;
-+
-+	mgmt_index_event(MGMT_EV_EXT_INDEX_ADDED, hdev, &ev, sizeof(ev),
-+			 HCI_MGMT_EXT_INDEX_EVENTS);
+ static const u16 mgmt_events[] = {
+@@ -518,6 +519,82 @@ static int read_unconf_index_list(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
  }
  
- void mgmt_index_removed(struct hci_dev *hdev)
++static int read_ext_index_list(struct sock *sk, struct hci_dev *hdev,
++			       void *data, u16 data_len)
++{
++	struct mgmt_rp_read_ext_index_list *rp;
++	struct hci_dev *d;
++	size_t rp_len;
++	u16 count;
++	int err;
++
++	BT_DBG("sock %p", sk);
++
++	read_lock(&hci_dev_list_lock);
++
++	count = 0;
++	list_for_each_entry(d, &hci_dev_list, list) {
++		if (d->dev_type == HCI_BREDR || d->dev_type == HCI_AMP)
++			count++;
++	}
++
++	rp_len = sizeof(*rp) + (3 * count);
++	rp = kmalloc(rp_len, GFP_ATOMIC);
++	if (!rp) {
++		read_unlock(&hci_dev_list_lock);
++		return -ENOMEM;
++	}
++
++	count = 0;
++	list_for_each_entry(d, &hci_dev_list, list) {
++		if (hci_dev_test_flag(d, HCI_SETUP) ||
++		    hci_dev_test_flag(d, HCI_CONFIG) ||
++		    hci_dev_test_flag(d, HCI_USER_CHANNEL))
++			continue;
++
++		/* Devices marked as raw-only are neither configured
++		 * nor unconfigured controllers.
++		 */
++		if (test_bit(HCI_QUIRK_RAW_DEVICE, &d->quirks))
++			continue;
++
++		if (d->dev_type == HCI_BREDR) {
++			if (hci_dev_test_flag(d, HCI_UNCONFIGURED))
++				rp->entry[count].type = 0x01;
++			else
++				rp->entry[count].type = 0x00;
++		} else if (d->dev_type == HCI_AMP) {
++			rp->entry[count].type = 0x02;
++		} else {
++			continue;
++		}
++
++		rp->entry[count].bus = d->bus;
++		rp->entry[count++].index = cpu_to_le16(d->id);
++		BT_DBG("Added hci%u", d->id);
++	}
++
++	rp->num_controllers = cpu_to_le16(count);
++	rp_len = sizeof(*rp) + (3 * count);
++
++	read_unlock(&hci_dev_list_lock);
++
++	/* If this command is called at least once, then all the
++	 * default index and unconfigured index events are disabled
++	 * and from now on only extended index events are used.
++	 */
++	hci_sock_set_flag(sk, HCI_MGMT_EXT_INDEX_EVENTS);
++	hci_sock_clear_flag(sk, HCI_MGMT_INDEX_EVENTS);
++	hci_sock_clear_flag(sk, HCI_MGMT_UNCONF_INDEX_EVENTS);
++
++	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE,
++				MGMT_OP_READ_EXT_INDEX_LIST, 0, rp, rp_len);
++
++	kfree(rp);
++
++	return err;
++}
++
+ static bool is_configured(struct hci_dev *hdev)
  {
-+	struct mgmt_ev_ext_index ev;
- 	u8 status = MGMT_STATUS_INVALID_INDEX;
+ 	if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) &&
+@@ -6264,6 +6341,9 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 						HCI_MGMT_UNCONFIGURED },
+ 	{ start_service_discovery, MGMT_START_SERVICE_DISCOVERY_SIZE,
+ 						HCI_MGMT_VAR_LEN },
++	{ NULL },
++	{ read_ext_index_list,     MGMT_READ_EXT_INDEX_LIST_SIZE,
++						HCI_MGMT_NO_HDEV },
+ };
  
- 	if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
-@@ -6401,12 +6417,24 @@ void mgmt_index_removed(struct hci_dev *hdev)
- 		if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
- 			mgmt_index_event(MGMT_EV_UNCONF_INDEX_REMOVED, hdev,
- 					 NULL, 0, HCI_MGMT_UNCONF_INDEX_EVENTS);
-+			ev.type = 0x01;
- 		} else {
- 			mgmt_index_event(MGMT_EV_INDEX_REMOVED, hdev, NULL, 0,
- 					 HCI_MGMT_INDEX_EVENTS);
-+			ev.type = 0x00;
- 		}
- 		break;
-+	case HCI_AMP:
-+		ev.type = 0x02;
-+		break;
-+	default:
-+		return;
- 	}
-+
-+	ev.bus = hdev->bus;
-+
-+	mgmt_index_event(MGMT_EV_EXT_INDEX_REMOVED, hdev, &ev, sizeof(ev),
-+			 HCI_MGMT_EXT_INDEX_EVENTS);
- }
- 
- /* This function requires the caller holds hdev->lock */
+ int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
 -- 
 2.1.0
 
