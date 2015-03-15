@@ -1,40 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 14/14] Bluetooth: Use BIT(n) macro instead of manually encoding (1 << n)
-Date: Sat, 14 Mar 2015 19:28:06 -0700
-Message-Id: <1426386486-15962-14-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 12/14] Bluetooth: Open management interface for untrusted users
+Date: Sat, 14 Mar 2015 19:28:04 -0700
+Message-Id: <1426386486-15962-12-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The flags for the management command table used manual encoding of
-bits in the form of (1 << n). It is however preferred to use BIT(n)
-macro instead.
+Until now the management interface was restricted to CAP_NET_ADMIN. With
+this change every user can open the management socket. However the list
+of commands is heavily restricted to getting basic information about the
+attached controllers. No access for configuration or other operation is
+provided. The events are also limited. This is done so that no keys can
+leak or untrusted users can mess with the Bluetooth configuration.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_sock.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3546789c1616..ce94bcb33600 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1289,10 +1289,10 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb);
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index df23c184c897..f4b10344b1e5 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -795,16 +795,13 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 			goto done;
+ 		}
  
- void hci_sock_dev_event(struct hci_dev *hdev, int event);
+-		if (!capable(CAP_NET_ADMIN)) {
+-			err = -EPERM;
+-			goto done;
+-		}
+-
+-		/* Since the access to control channels is currently
+-		 * restricted to CAP_NET_ADMIN capabilities, every
+-		 * socket is implicitly trusted.
++		/* Users with CAP_NET_ADMIN capabilities are allowed
++		 * access to all management commands and events. For
++		 * untrusted users the interface is restricted and
++		 * also only untrusted events are sent.
+ 		 */
+-		hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
++		if (capable(CAP_NET_ADMIN))
++			hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
  
--#define HCI_MGMT_VAR_LEN	(1 << 0)
--#define HCI_MGMT_NO_HDEV	(1 << 1)
--#define HCI_MGMT_UNTRUSTED	(1 << 2)
--#define HCI_MGMT_UNCONFIGURED	(1 << 3)
-+#define HCI_MGMT_VAR_LEN	BIT(0)
-+#define HCI_MGMT_NO_HDEV	BIT(1)
-+#define HCI_MGMT_UNTRUSTED	BIT(2)
-+#define HCI_MGMT_UNCONFIGURED	BIT(3)
- 
- struct hci_mgmt_handler {
- 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+ 		/* At the moment the index and unconfigured index events
+ 		 * are enabled unconditionally. Setting them on each
 -- 
 2.1.0
 
