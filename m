@@ -1,63 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 06/14] Bluetooth: Introduce trusted flag for management control sockets
-Date: Sat, 14 Mar 2015 19:27:58 -0700
-Message-Id: <1426386486-15962-6-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 11/14] Bluetooth: Add support for trust verification of management commands
+Date: Sat, 14 Mar 2015 19:28:03 -0700
+Message-Id: <1426386486-15962-11-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Providing a global trusted flag for management control sockets provides
-an easy way for identifying sockets and imposing restriction on it. For
-now all management sockets are trusted since they require CAP_NET_ADMIN.
+Check the required trust level of each management command with the trust
+level of the management socket. If it does not match up, then return the
+newly introduced permission denied error.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_sock.c    | 11 +++++++++++
- 2 files changed, 12 insertions(+)
+ include/net/bluetooth/mgmt.h | 1 +
+ net/bluetooth/mgmt.c         | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index b8318711135a..7a24acaafeea 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -181,6 +181,7 @@ enum {
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 2534bd4d22b2..f3baad589db0 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -44,6 +44,7 @@
+ #define MGMT_STATUS_INVALID_INDEX	0x11
+ #define MGMT_STATUS_RFKILLED		0x12
+ #define MGMT_STATUS_ALREADY_PAIRED	0x13
++#define MGMT_STATUS_PERMISSION_DENIED	0x14
  
- /* HCI socket flags */
- enum {
-+	HCI_SOCK_TRUSTED,
- 	HCI_MGMT_INDEX_EVENTS,
- 	HCI_MGMT_UNCONF_INDEX_EVENTS,
- 	HCI_MGMT_EXT_INDEX_EVENTS,
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 00775c4fef83..54118868b3f6 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -796,6 +796,11 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 			goto done;
- 		}
+ struct mgmt_hdr {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 8d67704d6116..fe2dc753787f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6379,6 +6379,13 @@ int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
  
-+		/* The monitor interface is restricted to CAP_NET_RAW
-+		 * capabilities and with that implicitly trusted.
-+		 */
-+		hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
+ 	handler = &chan->handlers[opcode];
+ 
++	if (!hci_sock_test_flag(sk, HCI_SOCK_TRUSTED) &&
++	    !(handler->flags & HCI_MGMT_UNTRUSTED)) {
++		err = mgmt_cmd_status(sk, index, opcode,
++				      MGMT_STATUS_PERMISSION_DENIED);
++		goto done;
++	}
 +
- 		send_monitor_replay(sk);
- 
- 		atomic_inc(&monitor_promisc);
-@@ -817,6 +822,12 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 			goto done;
- 		}
- 
-+		/* Since the access to control channels is currently
-+		 * restricted to CAP_NET_ADMIN capabilities, every
-+		 * socket is implicitly trusted.
-+		 */
-+		hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
-+
- 		/* At the moment the index and unconfigured index events
- 		 * are enabled unconditionally. Setting them on each
- 		 * socket when binding keeps this functionality. They
+ 	if (index != MGMT_INDEX_NONE) {
+ 		hdev = hci_dev_get(index);
+ 		if (!hdev) {
 -- 
 2.1.0
 
