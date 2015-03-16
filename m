@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] Bluetooth: Fix verifying confirm value when lacking remote OOB data
-Date: Mon, 16 Mar 2015 11:45:46 +0200
-Message-Id: <1426499146-11959-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 3/4] Bluetooth: Set local OOB data flag if remote has our OOB data
+Date: Mon, 16 Mar 2015 11:45:45 +0200
+Message-Id: <1426499146-11959-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1426499146-11959-1-git-send-email-johan.hedberg@gmail.com>
 References: <1426499146-11959-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,39 +11,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-If we haven't received remote OOB data we cannot perform any special
-checks on the confirm value. This patch updates the check after having
-received the public key to only perform the verification if we have
-remote OOB data present.
+If the SMP Pairing Request or Response PDU received from the remote
+device indicates that it has received our OOB data we should set the
+SMP_FLAG_LOCAL_OOB flag.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/bluetooth/smp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index b8a6ce840603..de53ba1905fe 100644
+index c8382f4fcd5c..b8a6ce840603 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -2562,7 +2562,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
- 		return sc_passkey_round(smp, SMP_CMD_PUBLIC_KEY);
- 	}
+@@ -1735,6 +1735,9 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	memcpy(&smp->preq[1], req, sizeof(*req));
+ 	skb_pull(skb, sizeof(*req));
  
--	if (smp->method == REQ_OOB) {
-+	if (test_bit(SMP_FLAG_REMOTE_OOB, &smp->flags)) {
- 		err = smp_f4(smp->tfm_cmac, smp->remote_pk, smp->remote_pk,
- 			     smp->rr, 0, cfm.confirm_val);
- 		if (err)
-@@ -2570,7 +2570,9 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
++	if (req->oob_flag == SMP_OOB_PRESENT)
++		set_bit(SMP_FLAG_LOCAL_OOB, &smp->flags);
++
+ 	/* SMP over BR/EDR requires special treatment */
+ 	if (conn->hcon->type == ACL_LINK) {
+ 		/* We must have a BR/EDR SC link */
+@@ -1899,6 +1902,9 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (hci_dev_test_flag(hdev, HCI_SC_ONLY) && !(auth & SMP_AUTH_SC))
+ 		return SMP_AUTH_REQUIREMENTS;
  
- 		if (memcmp(cfm.confirm_val, smp->pcnf, 16))
- 			return SMP_CONFIRM_FAILED;
-+	}
++	if (rsp->oob_flag == SMP_OOB_PRESENT)
++		set_bit(SMP_FLAG_LOCAL_OOB, &smp->flags);
++
+ 	smp->prsp[0] = SMP_CMD_PAIRING_RSP;
+ 	memcpy(&smp->prsp[1], rsp, sizeof(*rsp));
  
-+	if (smp->method == REQ_OOB) {
- 		if (hcon->out)
- 			smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM,
- 				     sizeof(smp->prnd), smp->prnd);
 -- 
 2.1.0
 
