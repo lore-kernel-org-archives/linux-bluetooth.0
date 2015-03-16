@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Add support for Local OOB Extended Data Update events
-Date: Mon, 16 Mar 2015 16:11:21 -0700
-Message-Id: <1426547481-7184-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Add support for Local OOB Extended Data Update events
+Date: Mon, 16 Mar 2015 16:07:58 -0700
+Message-Id: <1426547278-2094-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -16,8 +16,8 @@ Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
  include/net/bluetooth/hci.h  |  1 +
  include/net/bluetooth/mgmt.h |  7 +++++++
- net/bluetooth/mgmt.c         | 16 ++++++++++++++++
- 3 files changed, 24 insertions(+)
+ net/bluetooth/mgmt.c         | 15 +++++++++++++++
+ 3 files changed, 23 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
 index ce757303dc07..a6ea156dc7e9 100644
@@ -47,18 +47,10 @@ index 543c1ba3d892..a1a68671bf88 100644
 +	__u8	eir[0];
 +} __packed;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7fa3c4b8384b..72e41d29e301 100644
+index 7fa3c4b8384b..4cdc72028597 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -133,6 +133,7 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_NEW_CONFIG_OPTIONS,
- 	MGMT_EV_EXT_INDEX_ADDED,
- 	MGMT_EV_EXT_INDEX_REMOVED,
-+	MGMT_EV_LOCAL_OOB_DATA_UPDATED,
- };
- 
- #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
-@@ -262,6 +263,13 @@ static int mgmt_index_event(u16 event, struct hci_dev *hdev, void *data,
+@@ -262,6 +262,13 @@ static int mgmt_index_event(u16 event, struct hci_dev *hdev, void *data,
  			       flag, NULL);
  }
  
@@ -72,7 +64,7 @@ index 7fa3c4b8384b..72e41d29e301 100644
  static int mgmt_generic_event(u16 event, struct hci_dev *hdev, void *data,
  			      u16 len, struct sock *skip_sk)
  {
-@@ -6387,8 +6395,16 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
+@@ -6387,8 +6394,16 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
  
  	hci_dev_unlock(hdev);
  
