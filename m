@@ -1,151 +1,333 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5506FF1B.4040600@ubnt.com>
-Date: Mon, 16 Mar 2015 18:04:43 +0200
-From: Andrejs Hanins <andrejs.hanins@ubnt.com>
-MIME-Version: 1.0
-To: Arman Uguray <armansito@chromium.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] core/gatt-database:  Honor offset when reading external
- chrc.
-References: <5506F29B.20902@ubnt.com> <CAHrH25Q4DqvsTOi1YZOS3=r40YSRJdXz3cPdreU9Kb06pUY2EQ@mail.gmail.com>
-In-Reply-To: <CAHrH25Q4DqvsTOi1YZOS3=r40YSRJdXz3cPdreU9Kb06pUY2EQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCHv2 1/6] unit/test-hog: Add TC/HGRF/RH/BV-01-I test
+Date: Mon, 16 Mar 2015 16:38:52 +0100
+Message-Id: <1426520337-21545-2-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1426520337-21545-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1426520337-21545-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Verify that all Report Map characteristics can be read by
+Report Host IUT
+---
+ Makefile.am     |  15 +++
+ unit/test-hog.c | 278 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 293 insertions(+)
+ create mode 100644 unit/test-hog.c
 
-On 2015.03.16. 17:23, Arman Uguray wrote:
-> Hi Andrejs,
-> 
->> On Mon, Mar 16, 2015 at 8:11 AM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
->> Honor offset when reading external characteristics via D-Bus and respond with properly chunked data.
->> ---
-> 
-> The subject should contain "core/gatt: " as its prefix, at least
-> that's how we've been organizing patches to different parts of the
-> code.
-> 
-> Also, a similar problem may also exist with WriteValue but we may not
-> be able to fully address it without an API change.
-You are right. I just made a test by writing a big chunk of data (more than negotiated ATT_MTU) from the mobile phone and D-Bus method "WriteValue" is called twice - for the first and second pieces of data. But the data itself looks to be correct, i.e. both chunks concatenated together give the original data. IMO, the bluez daemon should do the assembly of long write chunks and call D-Bus "WriteValue" only once providing the whole write request as initiated by the other side. This way, the API will continue to be simple.
+diff --git a/Makefile.am b/Makefile.am
+index d0da411..cb8f2f5 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -383,6 +383,21 @@ unit_test_gatt_SOURCES = unit/test-gatt.c
+ unit_test_gatt_LDADD = src/libshared-glib.la \
+ 				lib/libbluetooth-internal.la @GLIB_LIBS@
+ 
++unit_tests += unit/test-hog
++
++unit_test_hog_SOURCES = unit/test-hog.c \
++			$(btio_sources) \
++			android/hog.h android/hog.c \
++			android/scpp.h android/scpp.c \
++			android/bas.h android/bas.c \
++			android/dis.h android/dis.c \
++			src/log.h src/log.c \
++			attrib/att.h attrib/att.c \
++			attrib/gatt.h attrib/gatt.c \
++			attrib/gattrib.h attrib/gattrib.c
++unit_test_hog_LDADD = src/libshared-glib.la \
++				lib/libbluetooth-internal.la @GLIB_LIBS@
++
+ unit_tests += unit/test-gattrib
+ 
+ unit_test_gattrib_SOURCES = unit/test-gattrib.c attrib/gattrib.c $(btio_sources) src/log.h src/log.c
+diff --git a/unit/test-hog.c b/unit/test-hog.c
+new file mode 100644
+index 0000000..ddfafca
+--- /dev/null
++++ b/unit/test-hog.c
+@@ -0,0 +1,278 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2015  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <unistd.h>
++#include <string.h>
++#include <sys/socket.h>
++#include <fcntl.h>
++
++#include <glib.h>
++
++#include "src/shared/util.h"
++#include "src/shared/tester.h"
++
++#include "attrib/gattrib.h"
++
++#include "android/hog.h"
++
++struct test_pdu {
++	bool valid;
++	const uint8_t *data;
++	size_t size;
++};
++
++struct test_data {
++	char *test_name;
++	struct test_pdu *pdu_list;
++};
++
++struct context {
++	GAttrib *attrib;
++	struct bt_hog *hog;
++	guint source;
++	guint process;
++	int fd;
++	unsigned int pdu_offset;
++	const struct test_data *data;
++};
++
++#define data(args...) ((const unsigned char[]) { args })
++
++#define raw_pdu(args...)    \
++{      \
++	.valid = true,		\
++	.data = data(args), \
++	.size = sizeof(data(args)),\
++}
++
++#define false_pdu()	\
++{						\
++		.valid = false, \
++}
++
++#define define_test(name, function, args...)      \
++	do {    \
++		const struct test_pdu pdus[] = {			\
++			args, { }					\
++		};		\
++		static struct test_data data;      \
++		data.test_name = g_strdup(name);   \
++		data.pdu_list = g_malloc(sizeof(pdus));			\
++		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
++		tester_add(name, &data, NULL, function, NULL);     \
++	} while (0)
++
++static void test_debug(const char *str, void *user_data)
++{
++	const char *prefix = user_data;
++
++	tester_debug("%s%s", prefix, str);
++}
++
++static gboolean context_quit(gpointer user_data)
++{
++	struct context *context = user_data;
++
++	if (context->process > 0)
++		g_source_remove(context->process);
++
++	if (context->source > 0)
++		g_source_remove(context->source);
++
++	bt_hog_unref(context->hog);
++
++	g_attrib_unref(context->attrib);
++
++	g_free(context);
++
++	tester_test_passed();
++
++	return FALSE;
++}
++
++static gboolean send_pdu(gpointer user_data)
++{
++	struct context *context = user_data;
++	const struct test_pdu *pdu;
++	ssize_t len;
++
++	pdu = &context->data->pdu_list[context->pdu_offset++];
++
++	len = write(context->fd, pdu->data, pdu->size);
++
++	util_hexdump('<', pdu->data, len, test_debug, "hog: ");
++
++	g_assert_cmpint(len, ==, pdu->size);
++
++	context->process = 0;
++
++	if (!context->data->pdu_list[context->pdu_offset].valid)
++		context_quit(context);
++
++	return FALSE;
++}
++
++static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
++							gpointer user_data)
++{
++	struct context *context = user_data;
++	unsigned char buf[512];
++	const struct test_pdu *pdu;
++	ssize_t len;
++	int fd;
++
++	pdu = &context->data->pdu_list[context->pdu_offset++];
++
++	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
++		context->source = 0;
++		g_print("%s: cond %x\n", __func__, cond);
++		return FALSE;
++	}
++
++	fd = g_io_channel_unix_get_fd(channel);
++
++	len = read(fd, buf, sizeof(buf));
++
++	g_assert(len > 0);
++
++	util_hexdump('>', buf, len, test_debug, "hog: ");
++
++	g_assert_cmpint(len, ==, pdu->size);
++
++	g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
++
++	context->process = g_idle_add(send_pdu, context);
++
++	return TRUE;
++}
++
++static struct context *create_context(gconstpointer data)
++{
++	struct context *context;
++	GIOChannel *channel, *att_io;
++	int err, sv[2], fd;
++	char name[] = "bluez-hog";
++	uint16_t vendor = 0x0002;
++	uint16_t product = 0x0001;
++	uint16_t version = 0x0001;
++
++	context = g_new0(struct context, 1);
++	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
++	g_assert(err == 0);
++
++	att_io = g_io_channel_unix_new(sv[0]);
++
++	g_io_channel_set_close_on_unref(att_io, TRUE);
++
++	context->attrib = g_attrib_new(att_io, 23);
++	g_assert(context->attrib);
++
++	g_io_channel_unref(att_io);
++
++	fd = open("/dev/null", O_WRONLY | O_CLOEXEC);
++	g_assert(fd > 0);
++
++	context->hog = bt_hog_new(fd, name, vendor, product, version, NULL);
++	g_assert(context->hog);
++
++	channel = g_io_channel_unix_new(sv[1]);
++
++	g_io_channel_set_close_on_unref(channel, TRUE);
++	g_io_channel_set_encoding(channel, NULL, NULL);
++	g_io_channel_set_buffered(channel, FALSE);
++
++	context->source = g_io_add_watch(channel,
++				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++				test_handler, context);
++	g_assert(context->source > 0);
++
++	g_io_channel_unref(channel);
++
++	context->fd = sv[1];
++	context->data = data;
++
++	return context;
++}
++
++static void test_hog(gconstpointer data)
++{
++	struct context *context = create_context(data);
++
++	g_assert(bt_hog_attach(context->hog, context->attrib));
++}
++
++int main(int argc, char *argv[])
++{
++	tester_init(&argc, &argv);
++
++	define_test("/TP/HGRF/RH/BV-01-I", test_hog,
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x12,
++			0x18, 0x05, 0x00, 0x08, 0x00, 0x12, 0x18),
++		raw_pdu(0x10, 0x09, 0x00, 0xff, 0xff, 0x00, 0x28),
++		raw_pdu(0x01, 0x10, 0x09, 0x00, 0x0a),
++		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),
++		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x02, 0x04, 0x00,
++			0x4b, 0x2a),
++		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),
++		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
++		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x02, 0x28),
++		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),
++		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x03, 0x28),
++		raw_pdu(0x09, 0x07, 0x07, 0x00, 0x02, 0x08, 0x00,
++			0x4b, 0x2a),
++		raw_pdu(0x0a, 0x04, 0x00),
++		raw_pdu(0x0b, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
++			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
++			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
++			0x15, 0x16),
++		raw_pdu(0x0a, 0x08, 0x00),
++		raw_pdu(0x0b, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
++			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
++			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
++			0x15, 0x16),
++		raw_pdu(0x0c, 0x04, 0x00, 0x16, 0x00),
++		raw_pdu(0x0d, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
++			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
++			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
++			0x15, 0x16),
++		raw_pdu(0x0c, 0x08, 0x00, 0x16, 0x00),
++		raw_pdu(0x0d, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
++			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
++			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
++			0x15, 0x16),
++		raw_pdu(0x0c, 0x04, 0x00, 0x2c, 0x00),
++		raw_pdu(0x0d, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
++			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
++			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13),
++		raw_pdu(0x0c, 0x08, 0x00, 0x2c, 0x00),
++		raw_pdu(0x0d, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
++			0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d,
++			0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13));
++
++	return tester_run();
++}
+-- 
+1.9.1
 
-> 
->>  src/gatt-database.c | 25 ++++++++++++++++++++-----
->>  1 file changed, 20 insertions(+), 5 deletions(-)
->>
->> diff --git a/src/gatt-database.c b/src/gatt-database.c
->> index e07c70f..3ae2f62 100644
->> --- a/src/gatt-database.c
->> +++ b/src/gatt-database.c
->> @@ -119,6 +119,7 @@ struct pending_op {
->>         struct gatt_db_attribute *attrib;
->>         struct queue *owner_queue;
->>         struct iovec data;
->> +       uint16_t offset;
->>  };
->>
->>  struct device_state {
->> @@ -1446,6 +1447,19 @@ static void read_reply_cb(DBusMessage *message, void *user_data)
->>                 goto done;
->>         }
->>
->> +       if (op->offset > len) {
->> +               ecode = BT_ATT_ERROR_INVALID_OFFSET;
->> +               value = NULL;
->> +               len = 0;
->> +               goto done;
->> +       } else if (op->offset == len) {
-> 
-> No need for the else statement since the previous if-body ends in a goto.
-> 
->> +               value = NULL;
->> +               len = 0;
->> +       } else {
->> +               len -= op->offset;
->> +               value = &value[op->offset];
->> +       }
-> 
-> The above code is a bit redundant since we already do the NULL
-> assignment below. Basically, all you should need to do is this:
-> 
->        if (op->offset > len) {
->                ecode = BT_ATT_ERROR_INVALID_OFFSET;
->                value = NULL;
->                len = 0;
->                goto done;
->        }
-> 
->        len -= op->offset;
-> 
->        /* Truncate the value if it's too large */
->        len = MIN(BT_ATT_MAX_VALUE_LEN, len);
->        value = len ? &value[op->offset] : NULL;
-> 
-> If len == op->offset, len will end up with 0 as its value and since
-> you already handle the offset being larger than len above, this won't
-> cause an overflow.
-Noted. Thank you!
-
-> 
->> +
->>         /* Truncate the value if it's too large */
->>         len = MIN(BT_ATT_MAX_VALUE_LEN, len);
->>         value = len ? value : NULL;
->> @@ -1466,7 +1480,7 @@ static void pending_op_free(void *data)
->>
->>  static struct pending_op *pending_read_new(struct queue *owner_queue,
->>                                         struct gatt_db_attribute *attrib,
->> -                                       unsigned int id)
->> +                                       unsigned int id, uint16_t offset)
->>  {
->>         struct pending_op *op;
->>
->> @@ -1477,6 +1491,7 @@ static struct pending_op *pending_read_new(struct queue *owner_queue,
->>         op->owner_queue = owner_queue;
->>         op->attrib = attrib;
->>         op->id = id;
->> +       op->offset = offset;
->>         queue_push_tail(owner_queue, op);
->>
->>         return op;
->> @@ -1484,12 +1499,12 @@ static struct pending_op *pending_read_new(struct queue *owner_queue,
->>
->>  static void send_read(struct gatt_db_attribute *attrib, GDBusProxy *proxy,
->>                                                 struct queue *owner_queue,
->> -                                               unsigned int id)
->> +                                               unsigned int id, uint16_t offset)
->>  {
->>         struct pending_op *op;
->>         uint8_t ecode = BT_ATT_ERROR_UNLIKELY;
->>
->> -       op = pending_read_new(owner_queue, attrib, id);
->> +       op = pending_read_new(owner_queue, attrib, id, offset);
->>         if (!op) {
->>                 error("Failed to allocate memory for pending read call");
->>                 ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
->> @@ -1785,7 +1800,7 @@ static void desc_read_cb(struct gatt_db_attribute *attrib,
->>                 return;
->>         }
->>
->> -       send_read(attrib, desc->proxy, desc->pending_reads, id);
->> +       send_read(attrib, desc->proxy, desc->pending_reads, id, offset);
->>  }
->>
->>  static void desc_write_cb(struct gatt_db_attribute *attrib,
->> @@ -1843,7 +1858,7 @@ static void chrc_read_cb(struct gatt_db_attribute *attrib,
->>                 return;
->>         }
->>
->> -       send_read(attrib, chrc->proxy, chrc->pending_reads, id);
->> +       send_read(attrib, chrc->proxy, chrc->pending_reads, id, offset);
->>  }
->>
->>  static void chrc_write_cb(struct gatt_db_attribute *attrib,
->> --
->> 1.9.1
->>
-> 
-> Thanks,
-> Arman
-> 
