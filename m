@@ -1,316 +1,317 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] shared/gatt-client: Fix handling of services
-Date: Mon, 16 Mar 2015 12:32:30 +0200
-Message-Id: <1426501952-26670-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <54FD4B0E.9010306@freescale.com>
+References: <54D96429.8000304@freescale.com>
+	<CAN_7+Yai0m39=crfcqJdJZfoTOOuh4zxPi_46wn6EXbewHGf8g@mail.gmail.com>
+	<54DB22D8.1020700@freescale.com>
+	<CAN_7+YZu0v0zekp0LrQM3dbtkYL=cY_ALT5+exHDeyUmO_0uCQ@mail.gmail.com>
+	<54DC0E4A.2070709@freescale.com>
+	<CAN_7+YaXZd4VPwk0VnSW8dP21PpmQMphf7T+UrkC9f4V7HcELg@mail.gmail.com>
+	<54F40908.1090501@freescale.com>
+	<CAN_7+YYoD6CsEMr_KqUEvSG+eqMcZpbdgn1_7oG8m_5k_8Q-kw@mail.gmail.com>
+	<54FD4B0E.9010306@freescale.com>
+Date: Mon, 16 Mar 2015 11:16:46 +0100
+Message-ID: <CAN_7+YaC29TS1UjZAMJfPMEsmi4OjEzx_UXAMRp_Hg_rMOP=tg@mail.gmail.com>
+Subject: Re: BlueZ for Android 4.4.3
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Zheng Tao-B46827 <b46827@freescale.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	max.tsai@freescale.com, xiao-lizhang@freescale.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Tony,
 
-Remote services may contain gaps between their handles so they need to be
-inserted in a proper position.
----
- src/shared/gatt-client.c |   8 ++--
- src/shared/gatt-db.c     | 122 +++++++++++++++++++++++++++++++++++++++--------
- src/shared/gatt-db.h     |  17 +++++++
- 3 files changed, 123 insertions(+), 24 deletions(-)
+On Mon, Mar 9, 2015 at 8:26 AM, Zheng Tao-B46827 <b46827@freescale.com> wrote:
+>
+>
+> On 3/4/2015 7:43 PM, Lukasz Rymanowski wrote:
+>>
+>> Hi Tony,
+>>
+>> On Mon, Mar 2, 2015 at 7:54 AM, Zheng Tao-B46827 <b46827@freescale.com>
+>> wrote:
+>>>
+>>> On 2/14/2015 12:02 AM, Lukasz Rymanowski wrote:
+>>>>
+>>>> Hi Tony,
+>>>>
+>>>> On Thu, Feb 12, 2015 at 3:22 AM, Zheng Tao-B46827 <b46827@freescale.com>
+>>>> wrote:
+>>>>>
+>>>>> Hi, Lukasz
+>>>>>
+>>>>>
+>>>>> On 2/11/2015 7:41 PM, Lukasz Rymanowski wrote:
+>>>>>>
+>>>>>> Hi,
+>>>>>>
+>>>>>> On Wed, Feb 11, 2015 at 10:37 AM, Zheng Tao-B46827
+>>>>>> <b46827@freescale.com>
+>>>>>> wrote:
+>>>>>>>
+>>>>>>> Hi, Lukasz
+>>>>>>> Thanks for your reply. Following you steps, the previous problem has
+>>>>>>> been
+>>>>>>> resolved, but it seems that the connection is not stable. When I
+>>>>>>> execute
+>>>>>>> av
+>>>>>>> connect, I can hear "Connected" from my Bluetooth headset, but it
+>>>>>>> will
+>>>>>>> be
+>>>>>>> disconnected immediately which i can hear "disconnected".  And it
+>>>>>>> will
+>>>>>>> prompt "I/bluetoothd( 1061): bluetoothd[1062]: Unable to find
+>>>>>>> matching
+>>>>>>> endpoint". Is this a bug? can you give some advise?
+>>>>>>>
+>>>>>>>> av connect 24:fd:52:b6:a0:99
+>>>>>>>
+>>>>>>> connection_state: connection_state=BTAV_CONNECTION_STATE_CONNECTING
+>>>>>>> remote_bd_addr=24:fd:52:b6:a0:99
+>>>>>>> if_av->connect: BT_STATUS_SUCCESS
+>>>>>>>>
+>>>>>>>> D/BlueZ   ( 1060):
+>>>>>>>> external/bluetooth/bluez/android/hal-a2dp.c:a2dp_connect()
+>>>>>>>
+>>>>>>> acl_state_changed_cb: status=BT_STATUS_SUCCESS
+>>>>>>> remote_bd_addr=24:fd:52:b6:a0:99 state=BT_ACL_STATE_CONNECTED
+>>>>>>>>
+>>>>>>>> D/BlueZ   ( 1060):
+>>>>>>>>
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed()
+>>>>>>>> state 0
+>>>>>>>
+>>>>>>> connection_state: connection_state=BTAV_CONNECTION_STATE_DISCONNECTED
+>>>>>>> remote_bd_addr=24:fd:52:b6:a0:99
+>>>>>>>>
+>>>>>>>> I/bluetoothd( 1061): bluetoothd[1062]: Unable to find matching
+>>>>>>>> endpoint
+>>>>>>
+>>>>>> Here is the clue.
+>>>>>>
+>>>>>> Can you provide btmon logs?
+>>>>>
+>>>>> I found this log when execute av connect command:
+>>>>> < HCI Command: Disconnect (0x01|0x0006) plen 3 [hci0] 215.582054
+>>>>>           Handle: 71
+>>>>>           Reason: Remote User Terminated Connection (0x13)
+>>>>> I doubt that why "Remote User Terminated Connection", because when I
+>>>>> heard
+>>>>> "connected" from Bluetooth headset and I have done nothing with it.
+>>>>> The
+>>>>> full log when execute av connect command is attached. Thanks.
+>>>>>
+>>>>   From your logs I see that we did discover SEPs on your Jabra device
+>>>> and got capabilities of SBC SNK endpoint.
+>>>> Then we want to connect that SEP to our SRC endpoint but it is
+>>>> actually not there.
+>>>>
+>>>> After that I realized that I told you to do "av connect" before
+>>>> actually "audio init" and that is wrong.
+>>>> "Audio init" does register your SRC endpoints. So you should do that
+>>>> and after that try "av connect"
+>>>>
+>>>>
+>>>> BR
+>>>> Lukasz
+>>>
+>>> Sorry to reply to you so late for Chinese New Year. Do you mean to follow
+>>> steps like this:
+>>>
+>>> 1. bluetooth init
+>>> 2. bluetooth enable
+>>> 3. bluetooth get_profile_interface a2dp
+>>> 4. bluetooth start_discovery
+>>> 5. bluetooth create_bond xxxxxxxx
+>>> 6. audio init
+>>> 7. av connect xxxxxxxx
+>>> 8. audio open_output_stream
+>>>
+>> You got BT_STATUS_NOT_READY because a2dp was not initialized
+>>
+>> Actually you should have smth like this:
+>>
+>> 1. bluetooth init
+>> 2. bluetooth enable
+>> 3. bluetooth get_profile_interface a2dp
+>> 4. bluetooth start_discovery
+>> 5. bluetooth create_bond xxxxxxxx
+>>
+>> 6. av init  <--- this will initiate a2dp profile
+>>
+>> 7. audio init   <--- this will setup endpoinds
+>> 8. av connect xxxxxxxx
+>> 9. audio open_output_stream
+>>
+>> After that you can try:
+>>
+>> 10. audio play
+>>
+>> If still there is some issue please send full logs
+>>
+>> \Lukasz
+>
+> Sorry. I find that there are some wrong with my email client and you don't
+> receive this email. So, resend this email. Thanks for your detailed steps.
+> Through some tuning, I can connect to Jabra device, but it
+> open_output_stream failed.
+> 1. bluetooth init
+> 2. bluetooth enable
+> 3. bluetooth get_profile_interface a2dp
+> 4. bluetooth start_discovery
+> 5. bluetooth create_bond xxxxxxxx
+> 6. audio init
+> 7. av init
+> 8. av connect xxxxxxxx
+> 9. audio open_output_stream
+>
+> After executing "av connect", I can ensure that the connected state is
+> stable(NO disconnected automatically), but it will prompt "/bluetoothd(
+> 1109): bluetoothd[1110]: SET_CONFIGURATION request rejected: Configuration
+> not supported (41)". When executing "audio open_output_stream", it will
+> prompt "I/bluetoothd( 1086): bluetoothd[1087]: Unable to find stream for
+> endpoint 0". Is this a blueZ bug for Android?
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index f33d8c9..3e28c6e 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -588,7 +588,8 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
- 	*discovering = false;
- 
- 	while ((chrc_data = queue_pop_head(op->pending_chrcs))) {
--		attr = gatt_db_service_add_characteristic(op->cur_svc,
-+		attr = gatt_db_service_insert_characteristic(op->cur_svc,
-+							chrc_data->value_handle,
- 							&chrc_data->uuid, 0,
- 							chrc_data->properties,
- 							NULL, NULL, NULL);
-@@ -679,8 +680,9 @@ static void discover_descs_cb(bool success, uint8_t att_ecode,
- 						"handle: 0x%04x, uuid: %s",
- 						handle, uuid_str);
- 
--		attr = gatt_db_service_add_descriptor(op->cur_svc, &uuid, 0,
--							NULL, NULL, NULL);
-+		attr = gatt_db_service_insert_descriptor(op->cur_svc, handle,
-+							&uuid, 0, NULL, NULL,
-+							NULL);
- 		if (!attr)
- 			goto failed;
- 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index eb81372..29361af 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -158,6 +158,7 @@ static void attribute_destroy(struct gatt_db_attribute *attribute)
- }
- 
- static struct gatt_db_attribute *new_attribute(struct gatt_db_service *service,
-+							uint16_t handle,
- 							const bt_uuid_t *type,
- 							const uint8_t *val,
- 							uint16_t len)
-@@ -169,6 +170,7 @@ static struct gatt_db_attribute *new_attribute(struct gatt_db_service *service,
- 		return NULL;
- 
- 	attribute->service = service;
-+	attribute->handle = handle;
- 	attribute->uuid = *type;
- 	attribute->value_len = len;
- 	if (len) {
-@@ -371,6 +373,7 @@ static bool le_to_uuid(const uint8_t *src, size_t len, bt_uuid_t *uuid)
- }
- 
- static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
-+							uint16_t handle,
- 							bool primary,
- 							uint16_t num_handles)
- {
-@@ -399,7 +402,8 @@ static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
- 
- 	len = uuid_to_le(uuid, value);
- 
--	service->attributes[0] = new_attribute(service, type, value, len);
-+	service->attributes[0] = new_attribute(service, handle, type, value,
-+									len);
- 	if (!service->attributes[0]) {
- 		gatt_db_service_destroy(service);
- 		return NULL;
-@@ -533,7 +537,7 @@ struct gatt_db_attribute *gatt_db_insert_service(struct gatt_db *db,
- 	if (!find_insert_loc(db, handle, handle + num_handles - 1, &after))
- 		return NULL;
- 
--	service = gatt_db_service_create(uuid, primary, num_handles);
-+	service = gatt_db_service_create(uuid, handle, primary, num_handles);
- 
- 	if (!service)
- 		return NULL;
-@@ -663,8 +667,9 @@ static void set_attribute_data(struct gatt_db_attribute *attribute,
- 	attribute->user_data = user_data;
- }
- 
--struct gatt_db_attribute *
--gatt_db_service_add_characteristic(struct gatt_db_attribute *attrib,
-+static struct gatt_db_attribute *
-+service_insert_characteristic(struct gatt_db_service *service,
-+					uint16_t handle,
- 					const bt_uuid_t *uuid,
- 					uint32_t permissions,
- 					uint8_t properties,
-@@ -672,35 +677,38 @@ gatt_db_service_add_characteristic(struct gatt_db_attribute *attrib,
- 					gatt_db_write_t write_func,
- 					void *user_data)
- {
--	struct gatt_db_service *service;
- 	uint8_t value[MAX_CHAR_DECL_VALUE_LEN];
- 	uint16_t len = 0;
- 	int i;
- 
--	if (!attrib)
-+	/* Check if handle is in within service range */
-+	if (handle && handle <= service->attributes[0]->handle)
- 		return NULL;
- 
--	service = attrib->service;
--
- 	i = get_attribute_index(service, 1);
- 	if (!i)
- 		return NULL;
- 
-+	if (!handle)
-+		handle = get_handle_at_index(service, i - 1) + 2;
-+
- 	value[0] = properties;
- 	len += sizeof(properties);
-+
- 	/* We set handle of characteristic value, which will be added next */
--	put_le16(get_handle_at_index(service, i - 1) + 2, &value[1]);
-+	put_le16(handle, &value[1]);
- 	len += sizeof(uint16_t);
- 	len += uuid_to_le(uuid, &value[3]);
- 
--	service->attributes[i] = new_attribute(service, &characteristic_uuid,
--								value, len);
-+	service->attributes[i] = new_attribute(service, handle - 1,
-+							&characteristic_uuid,
-+							value, len);
- 	if (!service->attributes[i])
- 		return NULL;
- 
--	attribute_update(service, i++);
-+	i++;
- 
--	service->attributes[i] = new_attribute(service, uuid, NULL, 0);
-+	service->attributes[i] = new_attribute(service, handle, uuid, NULL, 0);
- 	if (!service->attributes[i]) {
- 		free(service->attributes[i - 1]);
- 		return NULL;
-@@ -709,37 +717,109 @@ gatt_db_service_add_characteristic(struct gatt_db_attribute *attrib,
- 	set_attribute_data(service->attributes[i], read_func, write_func,
- 							permissions, user_data);
- 
--	return attribute_update(service, i);
-+	return service->attributes[i];
- }
- 
- struct gatt_db_attribute *
--gatt_db_service_add_descriptor(struct gatt_db_attribute *attrib,
-+gatt_db_service_insert_characteristic(struct gatt_db_attribute *attrib,
-+					uint16_t handle,
- 					const bt_uuid_t *uuid,
- 					uint32_t permissions,
-+					uint8_t properties,
- 					gatt_db_read_t read_func,
- 					gatt_db_write_t write_func,
- 					void *user_data)
- {
--	struct gatt_db_service *service;
--	int i;
-+	if (!attrib || !handle)
-+		return NULL;
- 
-+	return service_insert_characteristic(attrib->service, handle, uuid,
-+						permissions, properties,
-+						read_func, write_func,
-+						user_data);
-+}
-+
-+struct gatt_db_attribute *
-+gatt_db_service_add_characteristic(struct gatt_db_attribute *attrib,
-+					const bt_uuid_t *uuid,
-+					uint32_t permissions,
-+					uint8_t properties,
-+					gatt_db_read_t read_func,
-+					gatt_db_write_t write_func,
-+					void *user_data)
-+{
- 	if (!attrib)
- 		return NULL;
- 
--	service = attrib->service;
-+	return service_insert_characteristic(attrib->service, 0, uuid,
-+						permissions, properties,
-+						read_func, write_func,
-+						user_data);
-+}
-+
-+static struct gatt_db_attribute *
-+service_insert_descriptor(struct gatt_db_service *service,
-+					uint16_t handle,
-+					const bt_uuid_t *uuid,
-+					uint32_t permissions,
-+					gatt_db_read_t read_func,
-+					gatt_db_write_t write_func,
-+					void *user_data)
-+{
-+	int i;
- 
- 	i = get_attribute_index(service, 0);
- 	if (!i)
- 		return NULL;
- 
--	service->attributes[i] = new_attribute(service, uuid, NULL, 0);
-+	/* Check if handle is in within service range */
-+	if (handle && handle <= service->attributes[0]->handle)
-+		return NULL;
-+
-+	if (!handle)
-+		handle = get_handle_at_index(service, i - 1) + 1;
-+
-+	service->attributes[i] = new_attribute(service, handle, uuid, NULL, 0);
- 	if (!service->attributes[i])
- 		return NULL;
- 
- 	set_attribute_data(service->attributes[i], read_func, write_func,
- 							permissions, user_data);
- 
--	return attribute_update(service, i);
-+	return service->attributes[i];
-+}
-+
-+struct gatt_db_attribute *
-+gatt_db_service_insert_descriptor(struct gatt_db_attribute *attrib,
-+					uint16_t handle,
-+					const bt_uuid_t *uuid,
-+					uint32_t permissions,
-+					gatt_db_read_t read_func,
-+					gatt_db_write_t write_func,
-+					void *user_data)
-+{
-+	if (!attrib || !handle)
-+		return NULL;
-+
-+	return service_insert_descriptor(attrib->service, handle, uuid,
-+					permissions, read_func, write_func,
-+					user_data);
-+}
-+
-+struct gatt_db_attribute *
-+gatt_db_service_add_descriptor(struct gatt_db_attribute *attrib,
-+					const bt_uuid_t *uuid,
-+					uint32_t permissions,
-+					gatt_db_read_t read_func,
-+					gatt_db_write_t write_func,
-+					void *user_data)
-+{
-+	if (!attrib)
-+		return NULL;
-+
-+	return service_insert_descriptor(attrib->service, 0, uuid,
-+					permissions, read_func, write_func,
-+					user_data);
- }
- 
- struct gatt_db_attribute *
-@@ -781,7 +861,7 @@ gatt_db_service_add_included(struct gatt_db_attribute *attrib,
- 	if (!index)
- 		return NULL;
- 
--	service->attributes[index] = new_attribute(service,
-+	service->attributes[index] = new_attribute(service, 0,
- 							&included_service_uuid,
- 							value, len);
- 	if (!service->attributes[index])
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 74b37bc..96cceb9 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -67,6 +67,15 @@ gatt_db_service_add_characteristic(struct gatt_db_attribute *attrib,
- 					gatt_db_read_t read_func,
- 					gatt_db_write_t write_func,
- 					void *user_data);
-+struct gatt_db_attribute *
-+gatt_db_service_insert_characteristic(struct gatt_db_attribute *attrib,
-+					uint16_t handle,
-+					const bt_uuid_t *uuid,
-+					uint32_t permissions,
-+					uint8_t properties,
-+					gatt_db_read_t read_func,
-+					gatt_db_write_t write_func,
-+					void *user_data);
- 
- struct gatt_db_attribute *
- gatt_db_service_add_descriptor(struct gatt_db_attribute *attrib,
-@@ -75,6 +84,14 @@ gatt_db_service_add_descriptor(struct gatt_db_attribute *attrib,
- 					gatt_db_read_t read_func,
- 					gatt_db_write_t write_func,
- 					void *user_data);
-+struct gatt_db_attribute *
-+gatt_db_service_insert_descriptor(struct gatt_db_attribute *attrib,
-+					uint16_t handle,
-+					const bt_uuid_t *uuid,
-+					uint32_t permissions,
-+					gatt_db_read_t read_func,
-+					gatt_db_write_t write_func,
-+					void *user_data);
- 
- struct gatt_db_attribute *
- gatt_db_service_add_included(struct gatt_db_attribute *attrib,
--- 
-2.1.0
+This is actually interesting.
+The only idea I have now is that there is something wrong with byte order
 
+When you look into SET_CONFIGURATION package:
+
+
+< ACL Data TX: Handle 71 flags 0x00 dlen 18                   [hci0] 378.410443
+     Channel: 192 len 14 [PSM 25 mode 0] {chan 0}
+       20 03 04 04 01 00 07 06 00 00 12 51 02 35
+
+it seems like SBC codec information is switched.
+there is "12 51" probably should be "21 15".
+With "12 51"  block length, subband and allocation method are
+corrupted if I decode it correctly. That would
+explain why remote device reject those settings.
+
+For what machine you are building? Could you check what endianness you
+are using (a2dp-codecs.h)?
+
+\Łukasz
+
+> The attachment #1 is logcat information. #2 is btmon information.
+>>
+>>
+>>> But in this way, when I execute "audio init", I will return back the
+>>> initial
+>>> problems:
+>>>   "D/BlueZ   ( 1033):
+>>> external/bluetooth/bluez/android/hal-audio.c:ipc_handler() Waiting for
+>>> connection ..."
+>>> and when execute "av connect xxxxxxxx", it will prompt "if_av->connect:
+>>> BT_STATUS_NOT_READY".
+>>>>>>>
+>>>>>>> acl_state_changed_cb: status=BT_STATUS_SUCCESS
+>>>>>>>
+>>>>>>> remote_bd_addr=24:fd:52:b6:a0:99 state=BT_ACL_STATE_DISCONNECTED
+>>>>>>>>
+>>>>>>>> D/BlueZ   ( 1060):
+>>>>>>>>
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed()
+>>>>>>>> state 1
+>>>>>>>
+>>>>>>>
+>>>>>> \Łukasz
+>>>>>>
+>>>>>>> On 2/11/2015 4:16 PM, Lukasz Rymanowski wrote:
+>>>>>>>>
+>>>>>>>> Hi Tony,
+>>>>>>>>
+>>>>>>>> On Tue, Feb 10, 2015 at 2:51 AM, Zheng Tao-B46827
+>>>>>>>> <b46827@freescale.com>
+>>>>>>>> wrote:
+>>>>>>>>>
+>>>>>>>>> Hi, Peers
+>>>>>>>>>
+>>>>>>>>> Thanks for your hard work that let us can experience BlueZ for
+>>>>>>>>> Android.
+>>>>>>>>> But
+>>>>>>>>> I am faced with a audio/a2dp problems that stick me many weeks.
+>>>>>>>>>
+>>>>>>>>> I’m try to port Bluez to kitkat 4.4.3, and many common profiles,
+>>>>>>>>> such
+>>>>>>>>> as
+>>>>>>>>> HIDP/FTP/GATT can function successfully. But the A2DP profile
+>>>>>>>>> failed.
+>>>>>>>>>
+>>>>>>>>> So, I try to debug it using haltest tool as follows(with USB
+>>>>>>>>> Bluetooth
+>>>>>>>>> Dongle):
+>>>>>>>>>
+>>>>>>>>> 1.bluetooth init
+>>>>>>>>>
+>>>>>>>>> 2.bluetooth enable
+>>>>>>>>>
+>>>>>>>>> 3.bluetooth get_profile_interface a2dp
+>>>>>>>>>
+>>>>>>>>> 4.bluetooth start_discovery
+>>>>>>>>>
+>>>>>>>>> 5.bluetooth create_bond xxxxxxxx
+>>>>>>>>>
+>>>>>>>> Here you should setup A2DP using "av connect <bdaddr>." (don't
+>>>>>>>> forget
+>>>>>>>> to do av init before.)  Once you are connected you can open stream.
+>>>>>>>>
+>>>>>>>>
+>>>>>>>>> 6.audio init
+>>>>>>>>>
+>>>>>>>>> 7.audio open_output_stream
+>>>>>>>>>
+>>>>>>>>> Then it will prompts:
+>>>>>>>>>
+>>>>>>>>> D/BlueZ   ( 1106):
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> external/bluetooth/bluez/android/hal-audio.c:audio_open_output_stream()
+>>>>>>>>>
+>>>>>>>>> D/BlueZ   ( 1106):
+>>>>>>>>> external/bluetooth/bluez/android/hal-audio.c:ipc_open_stream_cmd()
+>>>>>>>>>
+>>>>>>>>> E/BlueZ   ( 1106): audio: Invalid cmd socket passed to
+>>>>>>>>> audio_ipc_cmd
+>>>>>>>>>
+>>>>>>>>> E/BlueZ   ( 1106): audio: cannot open output stream
+>>>>>>>>>
+>>>>>>>>> when I debug it , I found that
+>>>>>>>>>
+>>>>>>>>> BlueZ   ( 1106):
+>>>>>>>>> external/bluetooth/bluez/android/hal-audio.c:ipc_handler()
+>>>>>>>>> Waiting for connection ...
+>>>>>>>>>
+>>>>>>>>> And it seems that there is no audio socket to connect it.
+>>>>>>>>>
+>>>>>>>>> I’m not familiar with Bluez stack details, can you give some
+>>>>>>>>> advice?
+>>>>>>>>> What
+>>>>>>>>> should I do to enable audio/a2dp functionality and execute audio
+>>>>>>>>> play
+>>>>>>>>> command? Thanks.
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> \Lukasz
+>>>>>>>>
+>>>>>>>>> ----------------------------------------------
+>>>>>>>>>
+>>>>>>>>> *Best Regards!*
+>>>>>>>>>
+>>>>>>>>> Tony Zheng
+>>>>>>>>>
+>>>>>>>>> --
+>>>>>>>>> To unsubscribe from this list: send the line "unsubscribe
+>>>>>>>>> linux-bluetooth"
+>>>>>>>>> in
+>>>>>>>>> the body of a message to majordomo@vger.kernel.org
+>>>>>>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>>>>>
+>>>>>>>
+>
