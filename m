@@ -1,119 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/hog: Allow to pass custom fd for uhid
-Date: Mon, 16 Mar 2015 16:28:47 +0100
-Message-ID: <10891269.ckYh92OItJ@leonov>
-In-Reply-To: <1426427072-20085-1-git-send-email-szymon.janc@tieto.com>
-References: <1426427072-20085-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <5506F29B.20902@ubnt.com>
+References: <5506F29B.20902@ubnt.com>
+Date: Mon, 16 Mar 2015 08:23:02 -0700
+Message-ID: <CAHrH25Q4DqvsTOi1YZOS3=r40YSRJdXz3cPdreU9Kb06pUY2EQ@mail.gmail.com>
+Subject: Re: [PATCH] Honor offset when reading external chrc.
+From: Arman Uguray <armansito@chromium.org>
+To: Andrejs Hanins <andrejs.hanins@ubnt.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Arman Uguray <armansito@chromium.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sunday 15 of March 2015 14:44:32 Szymon Janc wrote:
-> This will be useful for unitests.
+Hi Andrejs,
+
+> On Mon, Mar 16, 2015 at 8:11 AM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
+> Honor offset when reading external characteristics via D-Bus and respond with properly chunked data.
 > ---
->  android/hidhost.c |  2 +-
->  android/hog.c     | 25 ++++++++++++++++++++-----
->  android/hog.h     |  9 +++++++--
->  3 files changed, 28 insertions(+), 8 deletions(-)
-> 
-> diff --git a/android/hidhost.c b/android/hidhost.c
-> index 2e589f4..729b884 100644
-> --- a/android/hidhost.c
-> +++ b/android/hidhost.c
-> @@ -817,7 +817,7 @@ static void hog_conn_cb(const bdaddr_t *addr, int err,
-> void *attrib)
-> 
->  	if (!dev->hog) {
->  		/* TODO: Get device details and primary */
-> -		dev->hog = bt_hog_new("bluez-input-device", dev->vendor,
-> +		dev->hog = bt_hog_new_default("bluez-input-device", dev->vendor,
->  					dev->product, dev->version, NULL);
->  		if (!dev->hog) {
->  			error("HoG: unable to create session");
-> diff --git a/android/hog.c b/android/hog.c
-> index 8133303..ff77bb3 100644
-> --- a/android/hog.c
-> +++ b/android/hog.c
-> @@ -87,6 +87,7 @@ struct bt_hog {
->  	GAttrib			*attrib;
->  	GSList			*reports;
->  	struct bt_uhid		*uhid;
-> +	int			uhid_fd;
->  	gboolean		has_report_id;
->  	uint16_t		bcdhid;
->  	uint8_t			bcountrycode;
-> @@ -1170,8 +1171,16 @@ static void hog_free(void *data)
->  	g_free(hog);
->  }
-> 
-> -struct bt_hog *bt_hog_new(const char *name, uint16_t vendor, uint16_t
-> product, -					uint16_t version, void *primary)
-> +struct bt_hog *bt_hog_new_default(const char *name, uint16_t vendor,
-> +					uint16_t product, uint16_t version,
-> +					void *primary)
-> +{
-> +	return bt_hog_new(-1, name, vendor, product, version, primary);
-> +}
+
+The subject should contain "core/gatt: " as its prefix, at least
+that's how we've been organizing patches to different parts of the
+code.
+
+Also, a similar problem may also exist with WriteValue but we may not
+be able to fully address it without an API change.
+
+>  src/gatt-database.c | 25 ++++++++++++++++++++-----
+>  1 file changed, 20 insertions(+), 5 deletions(-)
+>
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index e07c70f..3ae2f62 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -119,6 +119,7 @@ struct pending_op {
+>         struct gatt_db_attribute *attrib;
+>         struct queue *owner_queue;
+>         struct iovec data;
+> +       uint16_t offset;
+>  };
+>
+>  struct device_state {
+> @@ -1446,6 +1447,19 @@ static void read_reply_cb(DBusMessage *message, void *user_data)
+>                 goto done;
+>         }
+>
+> +       if (op->offset > len) {
+> +               ecode = BT_ATT_ERROR_INVALID_OFFSET;
+> +               value = NULL;
+> +               len = 0;
+> +               goto done;
+> +       } else if (op->offset == len) {
+
+No need for the else statement since the previous if-body ends in a goto.
+
+> +               value = NULL;
+> +               len = 0;
+> +       } else {
+> +               len -= op->offset;
+> +               value = &value[op->offset];
+> +       }
+
+The above code is a bit redundant since we already do the NULL
+assignment below. Basically, all you should need to do is this:
+
+       if (op->offset > len) {
+               ecode = BT_ATT_ERROR_INVALID_OFFSET;
+               value = NULL;
+               len = 0;
+               goto done;
+       }
+
+       len -= op->offset;
+
+       /* Truncate the value if it's too large */
+       len = MIN(BT_ATT_MAX_VALUE_LEN, len);
+       value = len ? &value[op->offset] : NULL;
+
+If len == op->offset, len will end up with 0 as its value and since
+you already handle the offset being larger than len above, this won't
+cause an overflow.
+
 > +
-> +struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
-> +					uint16_t product, uint16_t version,
-> +					void *primary)
+>         /* Truncate the value if it's too large */
+>         len = MIN(BT_ATT_MAX_VALUE_LEN, len);
+>         value = len ? value : NULL;
+> @@ -1466,7 +1480,7 @@ static void pending_op_free(void *data)
+>
+>  static struct pending_op *pending_read_new(struct queue *owner_queue,
+>                                         struct gatt_db_attribute *attrib,
+> -                                       unsigned int id)
+> +                                       unsigned int id, uint16_t offset)
 >  {
->  	struct bt_hog *hog;
-> 
-> @@ -1181,7 +1190,13 @@ struct bt_hog *bt_hog_new(const char *name, uint16_t
-> vendor, uint16_t product,
-> 
->  	hog->gatt_op = queue_new();
->  	hog->bas = queue_new();
-> -	hog->uhid = bt_uhid_new_default();
-> +
-> +	if (fd < 0)
-> +		hog->uhid = bt_uhid_new_default();
-> +	else
-> +		hog->uhid = bt_uhid_new(fd);
-> +
-> +	hog->uhid_fd = fd;
-> 
->  	if (!hog->gatt_op || !hog->bas || !hog->uhid) {
->  		hog_free(hog);
-> @@ -1305,8 +1320,8 @@ static void hog_attach_hog(struct bt_hog *hog, struct
-> gatt_primary *primary) return;
->  	}
-> 
-> -	instance = bt_hog_new(hog->name, hog->vendor, hog->product,
-> -							hog->version, primary);
-> +	instance = bt_hog_new(hog->uhid_fd, hog->name, hog->vendor,
-> +					hog->product, hog->version, primary);
->  	if (!instance)
->  		return;
-> 
-> diff --git a/android/hog.h b/android/hog.h
-> index ddb2cea..2a9b899 100644
-> --- a/android/hog.h
-> +++ b/android/hog.h
-> @@ -23,8 +23,13 @@
-> 
->  struct bt_hog;
-> 
-> -struct bt_hog *bt_hog_new(const char *name, uint16_t vendor, uint16_t
-> product, -					uint16_t version, void *primary);
-> +struct bt_hog *bt_hog_new_default(const char *name, uint16_t vendor,
-> +					uint16_t product, uint16_t version,
-> +					void *primary);
-> +
-> +struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
-> +					uint16_t product, uint16_t version,
-> +					void *primary);
-> 
->  struct bt_hog *bt_hog_ref(struct bt_hog *hog);
->  void bt_hog_unref(struct bt_hog *hog);
+>         struct pending_op *op;
+>
+> @@ -1477,6 +1491,7 @@ static struct pending_op *pending_read_new(struct queue *owner_queue,
+>         op->owner_queue = owner_queue;
+>         op->attrib = attrib;
+>         op->id = id;
+> +       op->offset = offset;
+>         queue_push_tail(owner_queue, op);
+>
+>         return op;
+> @@ -1484,12 +1499,12 @@ static struct pending_op *pending_read_new(struct queue *owner_queue,
+>
+>  static void send_read(struct gatt_db_attribute *attrib, GDBusProxy *proxy,
+>                                                 struct queue *owner_queue,
+> -                                               unsigned int id)
+> +                                               unsigned int id, uint16_t offset)
+>  {
+>         struct pending_op *op;
+>         uint8_t ecode = BT_ATT_ERROR_UNLIKELY;
+>
+> -       op = pending_read_new(owner_queue, attrib, id);
+> +       op = pending_read_new(owner_queue, attrib, id, offset);
+>         if (!op) {
+>                 error("Failed to allocate memory for pending read call");
+>                 ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+> @@ -1785,7 +1800,7 @@ static void desc_read_cb(struct gatt_db_attribute *attrib,
+>                 return;
+>         }
+>
+> -       send_read(attrib, desc->proxy, desc->pending_reads, id);
+> +       send_read(attrib, desc->proxy, desc->pending_reads, id, offset);
+>  }
+>
+>  static void desc_write_cb(struct gatt_db_attribute *attrib,
+> @@ -1843,7 +1858,7 @@ static void chrc_read_cb(struct gatt_db_attribute *attrib,
+>                 return;
+>         }
+>
+> -       send_read(attrib, chrc->proxy, chrc->pending_reads, id);
+> +       send_read(attrib, chrc->proxy, chrc->pending_reads, id, offset);
+>  }
+>
+>  static void chrc_write_cb(struct gatt_db_attribute *attrib,
+> --
+> 1.9.1
+>
 
-Applied.
-
--- 
-BR
-Szymon Janc
+Thanks,
+Arman
