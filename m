@@ -2,48 +2,79 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH 3/7] core: adapter: Add SetDiscoveryFilter method
-Date: Mon, 16 Mar 2015 12:51:32 -0700
-Message-Id: <1426535496-25996-3-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1426535496-25996-1-git-send-email-jpawlowski@google.com>
-References: <1426535496-25996-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH 1/7] core: device: add device_set_rssi_no_delta
+Date: Mon, 16 Mar 2015 12:51:30 -0700
+Message-Id: <1426535496-25996-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds SetDiscoveryFilter method, as described in
-doc/adapter-api.txt to DBus interface. Method content wil follow in
-next patches.
+This patch adds new method that allow to update RSSI value without
+taking delta into account. It will be used by StartFilteredDiscovery
+method, in order to achieve more accurate proximity detection.
 ---
- src/adapter.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ src/device.c | 14 +++++++++++---
+ src/device.h |  2 ++
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 66a6234..8fe922c 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1760,6 +1760,12 @@ static DBusMessage *start_discovery(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
+diff --git a/src/device.c b/src/device.c
+index 97c0523..295143a 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -83,6 +83,8 @@
+ #define MIN(a, b) ((a) < (b) ? (a) : (b))
+ #endif
+ 
++#define RSSI_THRESHOLD		8
++
+ static DBusConnection *dbus_conn = NULL;
+ static unsigned service_state_cb_id;
+ 
+@@ -4534,7 +4536,8 @@ void device_set_legacy(struct btd_device *device, bool legacy)
+ 					DEVICE_INTERFACE, "LegacyPairing");
  }
  
-+static DBusMessage *set_discovery_filter(DBusConnection *conn,
-+					 DBusMessage *msg, void *user_data)
+-void device_set_rssi(struct btd_device *device, int8_t rssi)
++void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
++				int8_t delta_threshold)
+ {
+ 	if (!device)
+ 		return;
+@@ -4554,8 +4557,8 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
+ 		else
+ 			delta = rssi - device->rssi;
+ 
+-		/* only report changes of 8 dBm or more */
+-		if (delta < 8)
++		/* only report changes of delta_threshold dBm or more */
++		if (delta < delta_threshold)
+ 			return;
+ 
+ 		DBG("rssi %d delta %d", rssi, delta);
+@@ -4567,6 +4570,11 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
+ 						DEVICE_INTERFACE, "RSSI");
+ }
+ 
++void device_set_rssi(struct btd_device *device, int8_t rssi)
 +{
-+	return btd_error_failed(msg, "Not implemented yet");
++	device_set_rssi_with_delta(device, rssi, RSSI_THRESHOLD);
 +}
 +
- static DBusMessage *stop_discovery(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
+ static gboolean start_discovery(gpointer user_data)
  {
-@@ -2332,6 +2338,9 @@ static DBusMessage *remove_device(DBusConnection *conn,
- 
- static const GDBusMethodTable adapter_methods[] = {
- 	{ GDBUS_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
-+	{ GDBUS_METHOD("SetDiscoveryFilter",
-+		GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
-+		set_discovery_filter) },
- 	{ GDBUS_METHOD("StopDiscovery", NULL, NULL, stop_discovery) },
- 	{ GDBUS_ASYNC_METHOD("RemoveDevice",
- 			GDBUS_ARGS({ "device", "o" }), NULL, remove_device) },
+ 	struct btd_device *device = user_data;
+diff --git a/src/device.h b/src/device.h
+index 8edd0df..4945c1a 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -90,6 +90,8 @@ void btd_device_set_temporary(struct btd_device *device, gboolean temporary);
+ void btd_device_set_trusted(struct btd_device *device, gboolean trusted);
+ void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
+ void device_set_legacy(struct btd_device *device, bool legacy);
++void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
++				int8_t delta_threshold);
+ void device_set_rssi(struct btd_device *device, int8_t rssi);
+ bool btd_device_is_connected(struct btd_device *dev);
+ uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
 -- 
 2.2.0.rc0.207.ga3a616c
 
