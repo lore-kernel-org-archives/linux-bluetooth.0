@@ -1,33 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH] Bluetooth: Add clarifying comment when setting local OOB flag
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: The P-256 randomizer is 16 octets long and not 19 octets
-Date: Mon, 16 Mar 2015 12:24:33 -0700
-Message-Id: <1426533873-25880-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1426533154-10483-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 16 Mar 2015 12:16:56 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <5DDE521D-FAC0-4513-B307-03028AA2BA1D@holtmann.org>
+References: <1426533154-10483-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This seems to be a simple typo in the debugfs entry for the remote
-out-of-band data entries.
+Hi Johan,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> It might be a bit counterintuitive to set a 'local' flag based on remote
+> data. This patch adds a clarifying comment to the pairing req/rsp
+> handlers when setting the LOCAL_OOB flag based on the PDU received from
+> the remote side.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/smp.c | 8 ++++++++
+> 1 file changed, 8 insertions(+)
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index bc801e9db834..0818fabf346a 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -166,7 +166,7 @@ static int remote_oob_show(struct seq_file *f, void *ptr)
- 		seq_printf(f, "%pMR (type %u) %u %*phN %*phN %*phN %*phN\n",
- 			   &data->bdaddr, data->bdaddr_type, data->present,
- 			   16, data->hash192, 16, data->rand192,
--			   16, data->hash256, 19, data->rand256);
-+			   16, data->hash256, 16, data->rand256);
- 	}
- 	hci_dev_unlock(hdev);
- 
--- 
-2.1.0
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
