@@ -1,62 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Don't send public key if OOB data verification fails
-Date: Mon, 16 Mar 2015 18:12:57 +0200
-Message-Id: <1426522377-31485-1-git-send-email-johan.hedberg@gmail.com>
+Message-ID: <5506FF1B.4040600@ubnt.com>
+Date: Mon, 16 Mar 2015 18:04:43 +0200
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
+MIME-Version: 1.0
+To: Arman Uguray <armansito@chromium.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] core/gatt-database:  Honor offset when reading external
+ chrc.
+References: <5506F29B.20902@ubnt.com> <CAHrH25Q4DqvsTOi1YZOS3=r40YSRJdXz3cPdreU9Kb06pUY2EQ@mail.gmail.com>
+In-Reply-To: <CAHrH25Q4DqvsTOi1YZOS3=r40YSRJdXz3cPdreU9Kb06pUY2EQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Arman,
 
-When we receive the remote public key, if we have remote OOB data
-there's no point in sending our public key to the remote if the OOB data
-doesn't match. This patch moves the test for this higher up in the
-smp_cmd_public_key() function.
+On 2015.03.16. 17:23, Arman Uguray wrote:
+> Hi Andrejs,
+> 
+>> On Mon, Mar 16, 2015 at 8:11 AM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
+>> Honor offset when reading external characteristics via D-Bus and respond with properly chunked data.
+>> ---
+> 
+> The subject should contain "core/gatt: " as its prefix, at least
+> that's how we've been organizing patches to different parts of the
+> code.
+> 
+> Also, a similar problem may also exist with WriteValue but we may not
+> be able to fully address it without an API change.
+You are right. I just made a test by writing a big chunk of data (more than negotiated ATT_MTU) from the mobile phone and D-Bus method "WriteValue" is called twice - for the first and second pieces of data. But the data itself looks to be correct, i.e. both chunks concatenated together give the original data. IMO, the bluez daemon should do the assembly of long write chunks and call D-Bus "WriteValue" only once providing the whole write request as initiated by the other side. This way, the API will continue to be simple.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+> 
+>>  src/gatt-database.c | 25 ++++++++++++++++++++-----
+>>  1 file changed, 20 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/src/gatt-database.c b/src/gatt-database.c
+>> index e07c70f..3ae2f62 100644
+>> --- a/src/gatt-database.c
+>> +++ b/src/gatt-database.c
+>> @@ -119,6 +119,7 @@ struct pending_op {
+>>         struct gatt_db_attribute *attrib;
+>>         struct queue *owner_queue;
+>>         struct iovec data;
+>> +       uint16_t offset;
+>>  };
+>>
+>>  struct device_state {
+>> @@ -1446,6 +1447,19 @@ static void read_reply_cb(DBusMessage *message, void *user_data)
+>>                 goto done;
+>>         }
+>>
+>> +       if (op->offset > len) {
+>> +               ecode = BT_ATT_ERROR_INVALID_OFFSET;
+>> +               value = NULL;
+>> +               len = 0;
+>> +               goto done;
+>> +       } else if (op->offset == len) {
+> 
+> No need for the else statement since the previous if-body ends in a goto.
+> 
+>> +               value = NULL;
+>> +               len = 0;
+>> +       } else {
+>> +               len -= op->offset;
+>> +               value = &value[op->offset];
+>> +       }
+> 
+> The above code is a bit redundant since we already do the NULL
+> assignment below. Basically, all you should need to do is this:
+> 
+>        if (op->offset > len) {
+>                ecode = BT_ATT_ERROR_INVALID_OFFSET;
+>                value = NULL;
+>                len = 0;
+>                goto done;
+>        }
+> 
+>        len -= op->offset;
+> 
+>        /* Truncate the value if it's too large */
+>        len = MIN(BT_ATT_MAX_VALUE_LEN, len);
+>        value = len ? &value[op->offset] : NULL;
+> 
+> If len == op->offset, len will end up with 0 as its value and since
+> you already handle the offset being larger than len above, this won't
+> cause an overflow.
+Noted. Thank you!
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index de53ba1905fe..82824213d0fb 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -2515,6 +2515,16 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	memcpy(smp->remote_pk, key, 64);
- 
-+	if (test_bit(SMP_FLAG_REMOTE_OOB, &smp->flags)) {
-+		err = smp_f4(smp->tfm_cmac, smp->remote_pk, smp->remote_pk,
-+			     smp->rr, 0, cfm.confirm_val);
-+		if (err)
-+			return SMP_UNSPECIFIED;
-+
-+		if (memcmp(cfm.confirm_val, smp->pcnf, 16))
-+			return SMP_CONFIRM_FAILED;
-+	}
-+
- 	/* Non-initiating device sends its public key after receiving
- 	 * the key from the initiating device.
- 	 */
-@@ -2562,16 +2572,6 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
- 		return sc_passkey_round(smp, SMP_CMD_PUBLIC_KEY);
- 	}
- 
--	if (test_bit(SMP_FLAG_REMOTE_OOB, &smp->flags)) {
--		err = smp_f4(smp->tfm_cmac, smp->remote_pk, smp->remote_pk,
--			     smp->rr, 0, cfm.confirm_val);
--		if (err)
--			return SMP_UNSPECIFIED;
--
--		if (memcmp(cfm.confirm_val, smp->pcnf, 16))
--			return SMP_CONFIRM_FAILED;
--	}
--
- 	if (smp->method == REQ_OOB) {
- 		if (hcon->out)
- 			smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM,
--- 
-2.1.0
-
+> 
+>> +
+>>         /* Truncate the value if it's too large */
+>>         len = MIN(BT_ATT_MAX_VALUE_LEN, len);
+>>         value = len ? value : NULL;
+>> @@ -1466,7 +1480,7 @@ static void pending_op_free(void *data)
+>>
+>>  static struct pending_op *pending_read_new(struct queue *owner_queue,
+>>                                         struct gatt_db_attribute *attrib,
+>> -                                       unsigned int id)
+>> +                                       unsigned int id, uint16_t offset)
+>>  {
+>>         struct pending_op *op;
+>>
+>> @@ -1477,6 +1491,7 @@ static struct pending_op *pending_read_new(struct queue *owner_queue,
+>>         op->owner_queue = owner_queue;
+>>         op->attrib = attrib;
+>>         op->id = id;
+>> +       op->offset = offset;
+>>         queue_push_tail(owner_queue, op);
+>>
+>>         return op;
+>> @@ -1484,12 +1499,12 @@ static struct pending_op *pending_read_new(struct queue *owner_queue,
+>>
+>>  static void send_read(struct gatt_db_attribute *attrib, GDBusProxy *proxy,
+>>                                                 struct queue *owner_queue,
+>> -                                               unsigned int id)
+>> +                                               unsigned int id, uint16_t offset)
+>>  {
+>>         struct pending_op *op;
+>>         uint8_t ecode = BT_ATT_ERROR_UNLIKELY;
+>>
+>> -       op = pending_read_new(owner_queue, attrib, id);
+>> +       op = pending_read_new(owner_queue, attrib, id, offset);
+>>         if (!op) {
+>>                 error("Failed to allocate memory for pending read call");
+>>                 ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+>> @@ -1785,7 +1800,7 @@ static void desc_read_cb(struct gatt_db_attribute *attrib,
+>>                 return;
+>>         }
+>>
+>> -       send_read(attrib, desc->proxy, desc->pending_reads, id);
+>> +       send_read(attrib, desc->proxy, desc->pending_reads, id, offset);
+>>  }
+>>
+>>  static void desc_write_cb(struct gatt_db_attribute *attrib,
+>> @@ -1843,7 +1858,7 @@ static void chrc_read_cb(struct gatt_db_attribute *attrib,
+>>                 return;
+>>         }
+>>
+>> -       send_read(attrib, chrc->proxy, chrc->pending_reads, id);
+>> +       send_read(attrib, chrc->proxy, chrc->pending_reads, id, offset);
+>>  }
+>>
+>>  static void chrc_write_cb(struct gatt_db_attribute *attrib,
+>> --
+>> 1.9.1
+>>
+> 
+> Thanks,
+> Arman
+> 
