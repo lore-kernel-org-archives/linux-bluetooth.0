@@ -1,34 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/8] Bluetooth: Add constants for LE SC Confirmation and Random values
-Date: Mon, 16 Mar 2015 01:10:20 -0700
-Message-Id: <1426493425-7427-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 8/8] Bluetooth: Use smp->local_pk + 32 instead of &smp->local_pk[32]
+Date: Mon, 16 Mar 2015 01:10:25 -0700
+Message-Id: <1426493425-7427-8-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The LE Secure Connections Confirmation Value and LE Secure Connections
-Random Value contants are required for the out-of-band data and so
-just define them.
-
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/smp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index af9893b704ff..ce757303dc07 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -458,6 +458,8 @@ enum {
- #define EIR_DEVICE_ID		0x10 /* device ID */
- #define EIR_LE_BDADDR		0x1B /* LE Bluetooth device address */
- #define EIR_LE_ROLE		0x1C /* LE role */
-+#define EIR_LE_SC_CONFIRM	0x22 /* LE SC Confirmation Value */
-+#define EIR_LE_SC_RANDOM	0x23 /* LE SC Random Value */
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 0fcd8c8f1a6b..f0c5c2827372 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1859,7 +1859,7 @@ static u8 sc_send_public_key(struct smp_chan *smp)
  
- /* Low Energy Advertising Flags */
- #define LE_AD_LIMITED		0x01 /* Limited Discoverable */
+ done:
+ 	SMP_DBG("Local Public Key X: %32phN", smp->local_pk);
+-	SMP_DBG("Local Public Key Y: %32phN", &smp->local_pk[32]);
++	SMP_DBG("Local Public Key Y: %32phN", smp->local_pk + 32);
+ 	SMP_DBG("Local Private Key:  %32phN", smp->local_sk);
+ 
+ 	smp_send_cmd(smp->conn, SMP_CMD_PUBLIC_KEY, 64, smp->local_pk);
 -- 
 2.1.0
 
