@@ -1,120 +1,216 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLKfh7xPufAMfjG6P--Q-NkOVq4oYUdXEpqc5WsvQpu2g@mail.gmail.com>
-References: <54F752D8.1000605@ubnt.com>
-	<CAHrH25RVKCL9RQCeFBJAsUsNV1umOR92VWV1JQgkwy-RNh-GAg@mail.gmail.com>
-	<CAN_7+Yagp-R+H+nhCtmdqWyAJm4jO_VsB5c343A=39zurwqpPw@mail.gmail.com>
-	<007858C7-D538-407D-8212-D3B0CB880165@ubnt.com>
-	<CABBYNZLKfh7xPufAMfjG6P--Q-NkOVq4oYUdXEpqc5WsvQpu2g@mail.gmail.com>
-Date: Mon, 16 Mar 2015 13:05:23 +0200
-Message-ID: <CABBYNZLHtCJCoUp_4miapZJOReh=FP4_sJVFkyh5uE+NHV2x=A@mail.gmail.com>
-Subject: Re: Non-consecutive handle values in GATT
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrejs Hanins <andrejs.hanins@ubnt.com>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
-	Arman Uguray <armansito@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Marcin Kraglak <marcin.kraglak@tieto.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 3/3] unit/test-gatt: Add /TP/GAD/CL/BV-06-C/client-2 test
+Date: Mon, 16 Mar 2015 12:32:32 +0200
+Message-Id: <1426501952-26670-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1426501952-26670-1-git-send-email-luiz.dentz@gmail.com>
+References: <1426501952-26670-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrejs,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Mar 5, 2015 at 10:39 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Andrejs,
->
-> On Thu, Mar 5, 2015 at 12:34 AM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
->>
->>
->>> On 05 Mar 2015, at 00:21, Lukasz Rymanowski <lukasz.rymanowski@gmail.com> wrote:
->>>
->>> Hi Andrejs,
->>>
->>>> On Wed, Mar 4, 2015 at 10:39 PM, Arman Uguray <armansito@chromium.org> wrote:
->>>> Hi Andrejs,
->>>>
->>>>> On Wed, Mar 4, 2015 at 10:45 AM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
->>>>> Hello,
->>>>>
->>>>>    I'm experimenting with an LE peripheral device which provides GATT
->>>>> services described by attributes with non-consecutive handle values, i.e.
->>>>> there are "gaps" between handle values. According to the Bluetooth Core
->>>>> specification 4.0 (Volume 3, Part G, "2.5.1 Overview") it is allowed:
->>>>>
->>>>>     Although the Attribute Handle values are in increasing order, following
->>>>> Attribute Handle values may differ by more than one.
->>>>>
->>>>>    Based on my experiments, BlueZ 5.28 and also git-master as of today does
->>>>> not support non-consecutive handle values GATT table. As a result, I can't
->>>>> connect to my device because gatt-client fails to initialize properly. The
->>>>> failing place is in discover_descs():
->>>>>
->>>>>      if (gatt_db_attribute_get_handle(attr) !=
->>>>>                            chrc_data->value_handle)
->>>>>            goto failed;
->>>>>
->>>>>    The value of chrc_data->value_handle is correct and matches GATT table
->>>>> one the device, but the attr->handle has the value of previous attribute
->>>>> (Primary Service UUID in my case) +2. This handle value calculation happens
->>>>> in gatt_db_service_add_characteristic() which has strange code:
->>>>>
->>>>>    /* We set handle of characteristic value, which will be added next */
->>>>>    put_le16(get_handle_at_index(service, i - 1) + 2, &value[1]);
->>>>>
->>>>>    Before trying to fix the problem by myself it would be great to hear
->>>>> some comments about this issue. Does it seem like a bug or I missed
->>>>> something?
->>>>>
->>>>>    As a note, I can successfully connect to my LE peripheral from an iPhone
->>>>> LightBlue app, which does not posses any issues during GATT discovery and
->>>>> can read/write the characteristic on the device.
->>>
->>> Can you share what device are you using? Is it on the market already?
->>> I'm just curious as I haven't seen any device doing it on last couple UPFs
->>>
->>> But indeed, it looks like this is something we need to fix.
->> It's a Broadcom dev kit for LE development. I'm running one of Broadcom examples which has non-consecutive handle values within single service. Of course, there is a full control over GATT and we can change handle values to be on +1 basis, no big deal, but in general BT core specs do not require it, so fix is nice to have to be on a safe side in case there will be such device in a wild. I spent a day to understand it digging the code :)
->>
->
-> I guess because it is a low level API you can basically use whatever
-> handles you want, probably OS API would not allow that but as you said
-> we may encounter devices out in the market that do that already.
->
->>> \Lukasz
->>>>
->>>> This is interesting. The gatt-db was initially designed for the
->>>> server-role, with the assumption being that the handles of a service
->>>> will be contiguous. So, it allows gaps between separate service ranges
->>>> but not between individual attributes between the handles of a
->>>> service. This assumption is OK for server-role but now that we also
->>>> use gatt-db for the client role, then maybe this assumption is
->>>> incorrect in some cases.
->>>>
->>>> So I guess we need a way to enter individual attributes with arbitrary
->>>> handles directly into the database, since it currently creates a
->>>> contiguous array to store the attributes of a service. I remember Luiz
->>>> was talking about changing the way the gatt-db addition/removal works
->>>> on IRC so maybe he can provide more input here. Fwiw, we never
->>>> encountered this issue because in practice I've never seen a database
->>>> implementation that skips attribute handles within a service.
->
-> Well that was not exactly the problem I was discussing, but anyway it
-> is a problem that we need to fix. Id probably start by adding a unit
-> test where a service skips handles and then fix the gatt_db
-> implementation to handle that, speaking about implementation we could
-> either go with list but the entries would then need to store the
-> handles separately or we keep the current array and leave the gaps
-> with NULL pointers, I guess the later is still more efficient since we
-> are talking about a special case and storing the handles per list
-> entry might increase our memory consumption.
+This veryfy we the code is able to parse services with gaps between
+handles.
+---
+ unit/test-gatt.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 109 insertions(+), 15 deletions(-)
 
-I just posted a patch-set that attempts to fix this, at least with
-unit test Ive created it seems to work but I would appreciate if you
-could try with your setup as well.
-
-
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 33d4b9f..7bc2d25 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -149,6 +149,35 @@ struct context {
+ 		raw_pdu(0x04, 0x08, 0x00, 0x08, 0x00),			\
+ 		raw_pdu(0x05, 0x01, 0x08, 0x00, 0x01, 0x29)
+ 
++#define SERVICE_DATA_2_PDUS						\
++		MTU_EXCHANGE_CLIENT_PDUS,				\
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x01, 0x18),\
++		raw_pdu(0x10, 0x05, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x06, 0x05, 0x00, 0x0a, 0x00, 0x0d, 0x18),\
++		raw_pdu(0x10, 0x0b, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x01, 0x10, 0x0b, 0x00, 0x0a),			\
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
++		raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),			\
++		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),			\
++		raw_pdu(0x08, 0x05, 0x00, 0x0a, 0x00, 0x02, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),			\
++		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),	\
++		raw_pdu(0x09, 0x07, 0x02, 0x00, 0x02, 0x03, 0x00, 0x00,	\
++				0x2a),					\
++		raw_pdu(0x08, 0x03, 0x00, 0x04, 0x00, 0x03, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x03, 0x00, 0x0a),			\
++		raw_pdu(0x04, 0x04, 0x00, 0x04, 0x00),			\
++		raw_pdu(0x05, 0x01, 0x04, 0x00, 0x01, 0x29),		\
++		raw_pdu(0x08, 0x05, 0x00, 0x0a, 0x00, 0x03, 0x28),	\
++		raw_pdu(0x09, 0x07, 0x07, 0x00, 0x0a, 0x08, 0x00, 0x29,	\
++				0x2a),					\
++		raw_pdu(0x08, 0x08, 0x00, 0x0a, 0x00, 0x03, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x08, 0x00, 0x0a),			\
++		raw_pdu(0x04, 0x09, 0x00, 0x0a, 0x00),			\
++		raw_pdu(0x05, 0x01, 0x0a, 0x00, 0x01, 0x29)
++
+ #define PRIMARY_DISC_SMALL_DB						\
+ 		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),	\
+ 		raw_pdu(0x11, 0x06, 0x10, 0xF0, 0x17, 0xF0, 0x00, 0x18,	\
+@@ -966,16 +995,23 @@ static void att_write_cb(struct gatt_db_attribute *att, int err,
+ 	g_assert(!err);
+ }
+ 
+-static struct gatt_db_attribute *add_char_with_value(struct gatt_db *db,
+-					struct gatt_db_attribute *service_att,
+-					bt_uuid_t *uuid,
+-					uint32_t att_permissions,
+-					uint8_t char_properties,
+-					const void *value, size_t len)
++static struct gatt_db_attribute *
++add_char_with_value(struct gatt_db_attribute *service_att, uint16_t handle,
++				bt_uuid_t *uuid, uint32_t att_permissions,
++				uint8_t char_properties, const void *value,
++				size_t len)
+ {
+ 	struct gatt_db_attribute *attrib;
+ 
+-	attrib = gatt_db_service_add_characteristic(service_att, uuid,
++	if (handle)
++		attrib = gatt_db_service_insert_characteristic(service_att,
++								handle, uuid,
++								att_permissions,
++								char_properties,
++								NULL, NULL,
++								NULL);
++	else
++		attrib = gatt_db_service_add_characteristic(service_att, uuid,
+ 								att_permissions,
+ 								char_properties,
+ 								NULL, NULL,
+@@ -990,14 +1026,19 @@ static struct gatt_db_attribute *add_char_with_value(struct gatt_db *db,
+ }
+ 
+ static struct gatt_db_attribute *
+-add_desc_with_value(struct gatt_db_attribute *att, bt_uuid_t *uuid,
+-				uint32_t att_perms, const uint8_t *value,
+-				size_t len)
++add_desc_with_value(struct gatt_db_attribute *att, uint16_t handle,
++					bt_uuid_t *uuid, uint32_t att_perms,
++					const uint8_t *value, size_t len)
+ {
+ 	struct gatt_db_attribute *desc_att;
+ 
+-	desc_att = gatt_db_service_add_descriptor(att, uuid, att_perms, NULL,
+-								NULL, NULL);
++	if (handle)
++		desc_att = gatt_db_service_insert_descriptor(att, handle, uuid,
++							att_perms, NULL, NULL,
++							NULL);
++	else
++		desc_att = gatt_db_service_add_descriptor(att, uuid, att_perms,
++							NULL, NULL, NULL);
+ 
+ 	gatt_db_attribute_write(desc_att, 0, value, len, 0x00, NULL,
+ 							att_write_cb, NULL);
+@@ -1124,7 +1165,7 @@ static struct gatt_db *make_db(const struct att_handle_spec *spec)
+ 		case CHARACTERISTIC:
+ 			bt_string_to_uuid(&uuid, spec->uuid);
+ 
+-			add_char_with_value(db, att, &uuid,
++			add_char_with_value(att, spec->handle, &uuid,
+ 							spec->att_permissions,
+ 							spec->char_properties,
+ 							spec->value, spec->len);
+@@ -1134,7 +1175,8 @@ static struct gatt_db *make_db(const struct att_handle_spec *spec)
+ 		case DESCRIPTOR:
+ 			bt_string_to_uuid(&uuid, spec->uuid);
+ 
+-			add_desc_with_value(att, &uuid, spec->att_permissions,
++			add_desc_with_value(att, spec->handle, &uuid,
++							spec->att_permissions,
+ 							spec->value, spec->len);
+ 
+ 			break;
+@@ -1168,6 +1210,52 @@ static struct gatt_db *make_service_data_1_db(void)
+ 	return make_db(specs);
+ }
+ 
++#define CHARACTERISTIC_STR_AT(chr_handle, chr_uuid, permissions, properties, \
++								string) \
++	{								\
++		.valid = true,						\
++		.handle = chr_handle,					\
++		.type = CHARACTERISTIC,					\
++		.uuid = STR(chr_uuid),					\
++		.att_permissions = permissions,				\
++		.char_properties = properties,				\
++		.value = (uint8_t *)string,				\
++		.len = strlen(string),					\
++	}
++
++#define DESCRIPTOR_STR_AT(desc_handle, desc_uuid, permissions, string)	\
++	{								\
++		.valid = true,						\
++		.handle = desc_handle,					\
++		.type = DESCRIPTOR,					\
++		.uuid = STR(desc_uuid),					\
++		.att_permissions = permissions,				\
++		.value = (uint8_t *)string,				\
++		.len = strlen(string),					\
++	}
++
++static struct gatt_db *make_service_data_2_db(void)
++{
++	const struct att_handle_spec specs[] = {
++		PRIMARY_SERVICE(0x0001, GATT_UUID, 4),
++		CHARACTERISTIC_STR(GATT_CHARAC_DEVICE_NAME, BT_ATT_PERM_READ,
++					BT_GATT_CHRC_PROP_READ, "BlueZ"),
++		DESCRIPTOR_STR(GATT_CHARAC_USER_DESC_UUID, BT_ATT_PERM_READ,
++								"Device Name"),
++		PRIMARY_SERVICE(0x0005, HEART_RATE_UUID, 6),
++		CHARACTERISTIC_STR_AT(0x0008,
++					GATT_CHARAC_MANUFACTURER_NAME_STRING,
++					BT_ATT_PERM_READ,
++					BT_GATT_CHRC_PROP_READ |
++					BT_GATT_CHRC_PROP_WRITE, ""),
++		DESCRIPTOR_STR_AT(0x000a, GATT_CHARAC_USER_DESC_UUID,
++					BT_ATT_PERM_READ, "Manufacturer Name"),
++		{ }
++	};
++
++	return make_db(specs);
++}
++
+ /*
+  * Defined Test database 1:
+  * Tiny database fits into a single minimum sized-pdu.
+@@ -1961,11 +2049,13 @@ static const struct test_step test_indication_server_1 = {
+ 
+ int main(int argc, char *argv[])
+ {
+-	struct gatt_db *service_db_1, *ts_small_db, *ts_large_db_1;
++	struct gatt_db *service_db_1, *service_db_2;
++	struct gatt_db *ts_small_db, *ts_large_db_1;
+ 
+ 	tester_init(&argc, &argv);
+ 
+ 	service_db_1 = make_service_data_1_db();
++	service_db_2 = make_service_data_2_db();
+ 	ts_small_db = make_test_spec_small_db();
+ 	ts_large_db_1 = make_test_spec_large_db_1();
+ 
+@@ -2273,6 +2363,10 @@ int main(int argc, char *argv[])
+ 			service_db_1, NULL,
+ 			SERVICE_DATA_1_PDUS);
+ 
++	define_test_client("/TP/GAD/CL/BV-06-C/client-2", test_client,
++			service_db_2, NULL,
++			SERVICE_DATA_2_PDUS);
++
+ 	define_test_server("/TP/GAD/SR/BV-06-C/small", test_server,
+ 			ts_small_db, NULL,
+ 			raw_pdu(0x03, 0x00, 0x02),
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
