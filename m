@@ -1,317 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <54FD4B0E.9010306@freescale.com>
-References: <54D96429.8000304@freescale.com>
-	<CAN_7+Yai0m39=crfcqJdJZfoTOOuh4zxPi_46wn6EXbewHGf8g@mail.gmail.com>
-	<54DB22D8.1020700@freescale.com>
-	<CAN_7+YZu0v0zekp0LrQM3dbtkYL=cY_ALT5+exHDeyUmO_0uCQ@mail.gmail.com>
-	<54DC0E4A.2070709@freescale.com>
-	<CAN_7+YaXZd4VPwk0VnSW8dP21PpmQMphf7T+UrkC9f4V7HcELg@mail.gmail.com>
-	<54F40908.1090501@freescale.com>
-	<CAN_7+YYoD6CsEMr_KqUEvSG+eqMcZpbdgn1_7oG8m_5k_8Q-kw@mail.gmail.com>
-	<54FD4B0E.9010306@freescale.com>
-Date: Mon, 16 Mar 2015 11:16:46 +0100
-Message-ID: <CAN_7+YaC29TS1UjZAMJfPMEsmi4OjEzx_UXAMRp_Hg_rMOP=tg@mail.gmail.com>
-Subject: Re: BlueZ for Android 4.4.3
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Zheng Tao-B46827 <b46827@freescale.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	max.tsai@freescale.com, xiao-lizhang@freescale.com
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 4/4] Bluetooth: Fix verifying confirm value when lacking remote OOB data
+Date: Mon, 16 Mar 2015 11:45:46 +0200
+Message-Id: <1426499146-11959-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1426499146-11959-1-git-send-email-johan.hedberg@gmail.com>
+References: <1426499146-11959-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tony,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Mon, Mar 9, 2015 at 8:26 AM, Zheng Tao-B46827 <b46827@freescale.com> wrote:
->
->
-> On 3/4/2015 7:43 PM, Lukasz Rymanowski wrote:
->>
->> Hi Tony,
->>
->> On Mon, Mar 2, 2015 at 7:54 AM, Zheng Tao-B46827 <b46827@freescale.com>
->> wrote:
->>>
->>> On 2/14/2015 12:02 AM, Lukasz Rymanowski wrote:
->>>>
->>>> Hi Tony,
->>>>
->>>> On Thu, Feb 12, 2015 at 3:22 AM, Zheng Tao-B46827 <b46827@freescale.com>
->>>> wrote:
->>>>>
->>>>> Hi, Lukasz
->>>>>
->>>>>
->>>>> On 2/11/2015 7:41 PM, Lukasz Rymanowski wrote:
->>>>>>
->>>>>> Hi,
->>>>>>
->>>>>> On Wed, Feb 11, 2015 at 10:37 AM, Zheng Tao-B46827
->>>>>> <b46827@freescale.com>
->>>>>> wrote:
->>>>>>>
->>>>>>> Hi, Lukasz
->>>>>>> Thanks for your reply. Following you steps, the previous problem has
->>>>>>> been
->>>>>>> resolved, but it seems that the connection is not stable. When I
->>>>>>> execute
->>>>>>> av
->>>>>>> connect, I can hear "Connected" from my Bluetooth headset, but it
->>>>>>> will
->>>>>>> be
->>>>>>> disconnected immediately which i can hear "disconnected".  And it
->>>>>>> will
->>>>>>> prompt "I/bluetoothd( 1061): bluetoothd[1062]: Unable to find
->>>>>>> matching
->>>>>>> endpoint". Is this a bug? can you give some advise?
->>>>>>>
->>>>>>>> av connect 24:fd:52:b6:a0:99
->>>>>>>
->>>>>>> connection_state: connection_state=BTAV_CONNECTION_STATE_CONNECTING
->>>>>>> remote_bd_addr=24:fd:52:b6:a0:99
->>>>>>> if_av->connect: BT_STATUS_SUCCESS
->>>>>>>>
->>>>>>>> D/BlueZ   ( 1060):
->>>>>>>> external/bluetooth/bluez/android/hal-a2dp.c:a2dp_connect()
->>>>>>>
->>>>>>> acl_state_changed_cb: status=BT_STATUS_SUCCESS
->>>>>>> remote_bd_addr=24:fd:52:b6:a0:99 state=BT_ACL_STATE_CONNECTED
->>>>>>>>
->>>>>>>> D/BlueZ   ( 1060):
->>>>>>>>
->>>>>>>>
->>>>>>>>
->>>>>>>> external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed()
->>>>>>>> state 0
->>>>>>>
->>>>>>> connection_state: connection_state=BTAV_CONNECTION_STATE_DISCONNECTED
->>>>>>> remote_bd_addr=24:fd:52:b6:a0:99
->>>>>>>>
->>>>>>>> I/bluetoothd( 1061): bluetoothd[1062]: Unable to find matching
->>>>>>>> endpoint
->>>>>>
->>>>>> Here is the clue.
->>>>>>
->>>>>> Can you provide btmon logs?
->>>>>
->>>>> I found this log when execute av connect command:
->>>>> < HCI Command: Disconnect (0x01|0x0006) plen 3 [hci0] 215.582054
->>>>>           Handle: 71
->>>>>           Reason: Remote User Terminated Connection (0x13)
->>>>> I doubt that why "Remote User Terminated Connection", because when I
->>>>> heard
->>>>> "connected" from Bluetooth headset and I have done nothing with it.
->>>>> The
->>>>> full log when execute av connect command is attached. Thanks.
->>>>>
->>>>   From your logs I see that we did discover SEPs on your Jabra device
->>>> and got capabilities of SBC SNK endpoint.
->>>> Then we want to connect that SEP to our SRC endpoint but it is
->>>> actually not there.
->>>>
->>>> After that I realized that I told you to do "av connect" before
->>>> actually "audio init" and that is wrong.
->>>> "Audio init" does register your SRC endpoints. So you should do that
->>>> and after that try "av connect"
->>>>
->>>>
->>>> BR
->>>> Lukasz
->>>
->>> Sorry to reply to you so late for Chinese New Year. Do you mean to follow
->>> steps like this:
->>>
->>> 1. bluetooth init
->>> 2. bluetooth enable
->>> 3. bluetooth get_profile_interface a2dp
->>> 4. bluetooth start_discovery
->>> 5. bluetooth create_bond xxxxxxxx
->>> 6. audio init
->>> 7. av connect xxxxxxxx
->>> 8. audio open_output_stream
->>>
->> You got BT_STATUS_NOT_READY because a2dp was not initialized
->>
->> Actually you should have smth like this:
->>
->> 1. bluetooth init
->> 2. bluetooth enable
->> 3. bluetooth get_profile_interface a2dp
->> 4. bluetooth start_discovery
->> 5. bluetooth create_bond xxxxxxxx
->>
->> 6. av init  <--- this will initiate a2dp profile
->>
->> 7. audio init   <--- this will setup endpoinds
->> 8. av connect xxxxxxxx
->> 9. audio open_output_stream
->>
->> After that you can try:
->>
->> 10. audio play
->>
->> If still there is some issue please send full logs
->>
->> \Lukasz
->
-> Sorry. I find that there are some wrong with my email client and you don't
-> receive this email. So, resend this email. Thanks for your detailed steps.
-> Through some tuning, I can connect to Jabra device, but it
-> open_output_stream failed.
-> 1. bluetooth init
-> 2. bluetooth enable
-> 3. bluetooth get_profile_interface a2dp
-> 4. bluetooth start_discovery
-> 5. bluetooth create_bond xxxxxxxx
-> 6. audio init
-> 7. av init
-> 8. av connect xxxxxxxx
-> 9. audio open_output_stream
->
-> After executing "av connect", I can ensure that the connected state is
-> stable(NO disconnected automatically), but it will prompt "/bluetoothd(
-> 1109): bluetoothd[1110]: SET_CONFIGURATION request rejected: Configuration
-> not supported (41)". When executing "audio open_output_stream", it will
-> prompt "I/bluetoothd( 1086): bluetoothd[1087]: Unable to find stream for
-> endpoint 0". Is this a blueZ bug for Android?
+If we haven't received remote OOB data we cannot perform any special
+checks on the confirm value. This patch updates the check after having
+received the public key to only perform the verification if we have
+remote OOB data present.
 
-This is actually interesting.
-The only idea I have now is that there is something wrong with byte order
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-When you look into SET_CONFIGURATION package:
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index b8a6ce840603..de53ba1905fe 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -2562,7 +2562,7 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		return sc_passkey_round(smp, SMP_CMD_PUBLIC_KEY);
+ 	}
+ 
+-	if (smp->method == REQ_OOB) {
++	if (test_bit(SMP_FLAG_REMOTE_OOB, &smp->flags)) {
+ 		err = smp_f4(smp->tfm_cmac, smp->remote_pk, smp->remote_pk,
+ 			     smp->rr, 0, cfm.confirm_val);
+ 		if (err)
+@@ -2570,7 +2570,9 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 		if (memcmp(cfm.confirm_val, smp->pcnf, 16))
+ 			return SMP_CONFIRM_FAILED;
++	}
+ 
++	if (smp->method == REQ_OOB) {
+ 		if (hcon->out)
+ 			smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM,
+ 				     sizeof(smp->prnd), smp->prnd);
+-- 
+2.1.0
 
-
-< ACL Data TX: Handle 71 flags 0x00 dlen 18                   [hci0] 378.410443
-     Channel: 192 len 14 [PSM 25 mode 0] {chan 0}
-       20 03 04 04 01 00 07 06 00 00 12 51 02 35
-
-it seems like SBC codec information is switched.
-there is "12 51" probably should be "21 15".
-With "12 51"  block length, subband and allocation method are
-corrupted if I decode it correctly. That would
-explain why remote device reject those settings.
-
-For what machine you are building? Could you check what endianness you
-are using (a2dp-codecs.h)?
-
-\Łukasz
-
-> The attachment #1 is logcat information. #2 is btmon information.
->>
->>
->>> But in this way, when I execute "audio init", I will return back the
->>> initial
->>> problems:
->>>   "D/BlueZ   ( 1033):
->>> external/bluetooth/bluez/android/hal-audio.c:ipc_handler() Waiting for
->>> connection ..."
->>> and when execute "av connect xxxxxxxx", it will prompt "if_av->connect:
->>> BT_STATUS_NOT_READY".
->>>>>>>
->>>>>>> acl_state_changed_cb: status=BT_STATUS_SUCCESS
->>>>>>>
->>>>>>> remote_bd_addr=24:fd:52:b6:a0:99 state=BT_ACL_STATE_DISCONNECTED
->>>>>>>>
->>>>>>>> D/BlueZ   ( 1060):
->>>>>>>>
->>>>>>>>
->>>>>>>>
->>>>>>>> external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed()
->>>>>>>> state 1
->>>>>>>
->>>>>>>
->>>>>> \Łukasz
->>>>>>
->>>>>>> On 2/11/2015 4:16 PM, Lukasz Rymanowski wrote:
->>>>>>>>
->>>>>>>> Hi Tony,
->>>>>>>>
->>>>>>>> On Tue, Feb 10, 2015 at 2:51 AM, Zheng Tao-B46827
->>>>>>>> <b46827@freescale.com>
->>>>>>>> wrote:
->>>>>>>>>
->>>>>>>>> Hi, Peers
->>>>>>>>>
->>>>>>>>> Thanks for your hard work that let us can experience BlueZ for
->>>>>>>>> Android.
->>>>>>>>> But
->>>>>>>>> I am faced with a audio/a2dp problems that stick me many weeks.
->>>>>>>>>
->>>>>>>>> I’m try to port Bluez to kitkat 4.4.3, and many common profiles,
->>>>>>>>> such
->>>>>>>>> as
->>>>>>>>> HIDP/FTP/GATT can function successfully. But the A2DP profile
->>>>>>>>> failed.
->>>>>>>>>
->>>>>>>>> So, I try to debug it using haltest tool as follows(with USB
->>>>>>>>> Bluetooth
->>>>>>>>> Dongle):
->>>>>>>>>
->>>>>>>>> 1.bluetooth init
->>>>>>>>>
->>>>>>>>> 2.bluetooth enable
->>>>>>>>>
->>>>>>>>> 3.bluetooth get_profile_interface a2dp
->>>>>>>>>
->>>>>>>>> 4.bluetooth start_discovery
->>>>>>>>>
->>>>>>>>> 5.bluetooth create_bond xxxxxxxx
->>>>>>>>>
->>>>>>>> Here you should setup A2DP using "av connect <bdaddr>." (don't
->>>>>>>> forget
->>>>>>>> to do av init before.)  Once you are connected you can open stream.
->>>>>>>>
->>>>>>>>
->>>>>>>>> 6.audio init
->>>>>>>>>
->>>>>>>>> 7.audio open_output_stream
->>>>>>>>>
->>>>>>>>> Then it will prompts:
->>>>>>>>>
->>>>>>>>> D/BlueZ   ( 1106):
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> external/bluetooth/bluez/android/hal-audio.c:audio_open_output_stream()
->>>>>>>>>
->>>>>>>>> D/BlueZ   ( 1106):
->>>>>>>>> external/bluetooth/bluez/android/hal-audio.c:ipc_open_stream_cmd()
->>>>>>>>>
->>>>>>>>> E/BlueZ   ( 1106): audio: Invalid cmd socket passed to
->>>>>>>>> audio_ipc_cmd
->>>>>>>>>
->>>>>>>>> E/BlueZ   ( 1106): audio: cannot open output stream
->>>>>>>>>
->>>>>>>>> when I debug it , I found that
->>>>>>>>>
->>>>>>>>> BlueZ   ( 1106):
->>>>>>>>> external/bluetooth/bluez/android/hal-audio.c:ipc_handler()
->>>>>>>>> Waiting for connection ...
->>>>>>>>>
->>>>>>>>> And it seems that there is no audio socket to connect it.
->>>>>>>>>
->>>>>>>>> I’m not familiar with Bluez stack details, can you give some
->>>>>>>>> advice?
->>>>>>>>> What
->>>>>>>>> should I do to enable audio/a2dp functionality and execute audio
->>>>>>>>> play
->>>>>>>>> command? Thanks.
->>>>>>>>
->>>>>>>>
->>>>>>>> \Lukasz
->>>>>>>>
->>>>>>>>> ----------------------------------------------
->>>>>>>>>
->>>>>>>>> *Best Regards!*
->>>>>>>>>
->>>>>>>>> Tony Zheng
->>>>>>>>>
->>>>>>>>> --
->>>>>>>>> To unsubscribe from this list: send the line "unsubscribe
->>>>>>>>> linux-bluetooth"
->>>>>>>>> in
->>>>>>>>> the body of a message to majordomo@vger.kernel.org
->>>>>>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>>>>
->>>>>>>
->
