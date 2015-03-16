@@ -1,80 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH 1/7] core: device: add device_set_rssi_no_delta
-Date: Mon, 16 Mar 2015 12:51:30 -0700
-Message-Id: <1426535496-25996-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v2] Bluetooth: Do not include LE SC out-of-band data if not enabled
+Date: Mon, 16 Mar 2015 12:38:41 -0700
+Message-Id: <1426534721-29007-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds new method that allow to update RSSI value without
-taking delta into account. It will be used by StartFilteredDiscovery
-method, in order to achieve more accurate proximity detection.
----
- src/device.c | 14 +++++++++++---
- src/device.h |  2 ++
- 2 files changed, 13 insertions(+), 3 deletions(-)
+In case LE Secure Connections is not enabled, then the command for
+returning local out-of-band data should not include the confirmation
+and random value for LE SC pairing. All other fields are still valid,
+but these two need to be left out. In that case it is also no needed
+to generate the public/private key pair for out-of-band pairing.
 
-diff --git a/src/device.c b/src/device.c
-index 97c0523..295143a 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -83,6 +83,8 @@
- #define MIN(a, b) ((a) < (b) ? (a) : (b))
- #endif
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 5322584460c1..32c2c75c0888 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6327,12 +6327,13 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
+ 					  hdev->dev_class, 3);
+ 		break;
+ 	case (BIT(BDADDR_LE_PUBLIC) | BIT(BDADDR_LE_RANDOM)):
+-		if (smp_generate_oob(hdev, hash, rand) < 0) {
++		if (hci_dev_test_flag(hdev, HCI_SC_ENABLED) &&
++		    smp_generate_oob(hdev, hash, rand) < 0) {
+ 			hci_dev_unlock(hdev);
+ 			err = mgmt_cmd_complete(sk, hdev->id,
+-					 MGMT_OP_READ_LOCAL_OOB_EXT_DATA,
+-					 MGMT_STATUS_FAILED,
+-					 &cp->type, sizeof(cp->type));
++						MGMT_OP_READ_LOCAL_OOB_EXT_DATA,
++						MGMT_STATUS_FAILED,
++						&cp->type, sizeof(cp->type));
+ 			goto done;
+ 		}
  
-+#define RSSI_THRESHOLD		8
-+
- static DBusConnection *dbus_conn = NULL;
- static unsigned service_state_cb_id;
+@@ -6361,11 +6362,15 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
+ 		eir_len = eir_append_data(rp->eir, eir_len, EIR_LE_ROLE,
+ 					  &role, sizeof(role));
  
-@@ -4534,7 +4536,8 @@ void device_set_legacy(struct btd_device *device, bool legacy)
- 					DEVICE_INTERFACE, "LegacyPairing");
- }
+-		eir_len = eir_append_data(rp->eir, eir_len, EIR_LE_SC_CONFIRM,
+-					  hash, sizeof(hash));
++		if (hci_dev_test_flag(hdev, HCI_SC_ENABLED)) {
++			eir_len = eir_append_data(rp->eir, eir_len,
++						  EIR_LE_SC_CONFIRM,
++						  hash, sizeof(hash));
  
--void device_set_rssi(struct btd_device *device, int8_t rssi)
-+void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
-+				int8_t delta_threshold)
- {
- 	if (!device)
- 		return;
-@@ -4554,8 +4557,8 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
- 		else
- 			delta = rssi - device->rssi;
+-		eir_len = eir_append_data(rp->eir, eir_len, EIR_LE_SC_RANDOM,
+-					  rand, sizeof(rand));
++			eir_len = eir_append_data(rp->eir, eir_len,
++						  EIR_LE_SC_RANDOM,
++						  rand, sizeof(rand));
++		}
  
--		/* only report changes of 8 dBm or more */
--		if (delta < 8)
-+		/* only report changes of delta_threshold dBm or more */
-+		if (delta < delta_threshold)
- 			return;
+ 		flags = get_adv_discov_flags(hdev);
  
- 		DBG("rssi %d delta %d", rssi, delta);
-@@ -4567,6 +4570,11 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
- 						DEVICE_INTERFACE, "RSSI");
- }
- 
-+void device_set_rssi(struct btd_device *device, int8_t rssi)
-+{
-+	device_set_rssi_with_delta(device, rssi, RSSI_THRESHOLD);
-+}
-+
- static gboolean start_discovery(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
-diff --git a/src/device.h b/src/device.h
-index 8edd0df..4945c1a 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -90,6 +90,8 @@ void btd_device_set_temporary(struct btd_device *device, gboolean temporary);
- void btd_device_set_trusted(struct btd_device *device, gboolean trusted);
- void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
- void device_set_legacy(struct btd_device *device, bool legacy);
-+void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
-+				int8_t delta_threshold);
- void device_set_rssi(struct btd_device *device, int8_t rssi);
- bool btd_device_is_connected(struct btd_device *dev);
- uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
 -- 
-2.2.0.rc0.207.ga3a616c
+2.1.0
 
