@@ -1,59 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 7/8] Bluetooth: Use OOB key pair for LE SC pairing with OOB method
-Date: Mon, 16 Mar 2015 01:10:24 -0700
-Message-Id: <1426493425-7427-7-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 4/8] Bluetooth: Add support for AES-CMAC hash for security manager device
+Date: Mon, 16 Mar 2015 01:10:21 -0700
+Message-Id: <1426493425-7427-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The OOB public and secret key pair is different from the non-OOB pairing
-procedure. SO when OOB method is in use, then use this key pair instead
-of generating a new one.
+The security manager device will require the use of AES-CMAC hash for
+out-of-band data generation. This patch makes sure it is correctly
+set up and available.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/smp.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ net/bluetooth/smp.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 1669e7127e2e..0fcd8c8f1a6b 100644
+index 952ba6376e1c..12e9c833885b 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -1819,6 +1819,25 @@ static u8 sc_send_public_key(struct smp_chan *smp)
+@@ -75,6 +75,7 @@ enum {
  
- 	BT_DBG("");
+ struct smp_dev {
+ 	struct crypto_blkcipher	*tfm_aes;
++	struct crypto_hash	*tfm_cmac;
+ };
  
-+	if (test_bit(SMP_FLAG_OOB, &smp->flags)) {
-+		struct l2cap_chan *chan = hdev->smp_data;
-+		struct smp_dev *smp_dev;
-+
-+		if (!chan || !chan->data)
-+			return SMP_UNSPECIFIED;
-+
-+		smp_dev = chan->data;
-+
-+		memcpy(smp->local_pk, smp_dev->local_pk, 64);
-+		memcpy(smp->local_sk, smp_dev->local_sk, 32);
-+		memcpy(smp->rr, smp_dev->local_rr, 16);
-+
-+		if (smp_dev->debug_key)
-+			set_bit(SMP_FLAG_DEBUG_KEY, &smp->flags);
-+
-+		goto done;
-+	}
-+
- 	if (hci_dev_test_flag(hdev, HCI_USE_DEBUG_KEYS)) {
- 		BT_DBG("Using debug keys");
- 		memcpy(smp->local_pk, debug_pk, 64);
-@@ -1838,6 +1857,7 @@ static u8 sc_send_public_key(struct smp_chan *smp)
- 		}
+ struct smp_chan {
+@@ -2936,6 +2937,7 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
+ 	struct l2cap_chan *chan;
+ 	struct smp_dev *smp;
+ 	struct crypto_blkcipher *tfm_aes;
++	struct crypto_hash *tfm_cmac;
+ 
+ 	if (cid == L2CAP_CID_SMP_BREDR) {
+ 		smp = NULL;
+@@ -2953,12 +2955,22 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
+ 		return ERR_CAST(tfm_aes);
  	}
  
-+done:
- 	SMP_DBG("Local Public Key X: %32phN", smp->local_pk);
- 	SMP_DBG("Local Public Key Y: %32phN", &smp->local_pk[32]);
- 	SMP_DBG("Local Private Key:  %32phN", smp->local_sk);
++	tfm_cmac = crypto_alloc_hash("cmac(aes)", 0, CRYPTO_ALG_ASYNC);
++	if (IS_ERR(tfm_cmac)) {
++		BT_ERR("Unable to create CMAC crypto context");
++		crypto_free_blkcipher(tfm_aes);
++		kzfree(smp);
++		return ERR_CAST(tfm_cmac);
++	}
++
+ 	smp->tfm_aes = tfm_aes;
++	smp->tfm_cmac = tfm_cmac;
+ 
+ create_chan:
+ 	chan = l2cap_chan_create();
+ 	if (!chan) {
+ 		crypto_free_blkcipher(smp->tfm_aes);
++		crypto_free_hash(smp->tfm_cmac);
+ 		kzfree(smp);
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+@@ -3005,6 +3017,8 @@ static void smp_del_chan(struct l2cap_chan *chan)
+ 		chan->data = NULL;
+ 		if (smp->tfm_aes)
+ 			crypto_free_blkcipher(smp->tfm_aes);
++		if (smp->tfm_cmac)
++			crypto_free_hash(smp->tfm_cmac);
+ 		kzfree(smp);
+ 	}
+ 
 -- 
 2.1.0
 
