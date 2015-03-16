@@ -2,81 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH 2/7] core/adapter: Refactor of scan type
-Date: Mon, 16 Mar 2015 12:51:31 -0700
-Message-Id: <1426535496-25996-2-git-send-email-jpawlowski@google.com>
+Subject: [PATCH 3/7] core: adapter: Add SetDiscoveryFilter method
+Date: Mon, 16 Mar 2015 12:51:32 -0700
+Message-Id: <1426535496-25996-3-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1426535496-25996-1-git-send-email-jpawlowski@google.com>
 References: <1426535496-25996-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch replaces scan type with defined constants, and creates
-new method that might be used to get currently avaliable scan type.
+This patch adds SetDiscoveryFilter method, as described in
+doc/adapter-api.txt to DBus interface. Method content wil follow in
+next patches.
 ---
- src/adapter.c | 29 +++++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+ src/adapter.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 3744c2b..66a6234 100644
+index 66a6234..8fe922c 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -88,6 +88,10 @@
- #define TEMP_DEV_TIMEOUT (3 * 60)
- #define BONDING_TIMEOUT (2 * 60)
- 
-+#define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
-+#define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
-+#define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
-+
- static DBusConnection *dbus_conn = NULL;
- 
- static bool kernel_conn_control = false;
-@@ -1185,7 +1189,7 @@ static gboolean passive_scanning_timeout(gpointer user_data)
- 
- 	adapter->passive_scan_timeout = 0;
- 
--	cp.type = (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
-+	cp.type = SCAN_TYPE_LE;
- 
- 	mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
- 				adapter->dev_id, sizeof(cp), &cp,
-@@ -1327,6 +1331,21 @@ static void cancel_passive_scanning(struct btd_adapter *adapter)
- 	}
+@@ -1760,6 +1760,12 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
  }
  
-+static uint8_t get_current_type(struct btd_adapter *adapter)
++static DBusMessage *set_discovery_filter(DBusConnection *conn,
++					 DBusMessage *msg, void *user_data)
 +{
-+	uint8_t type;
-+
-+	if (adapter->current_settings & MGMT_SETTING_BREDR)
-+		type = SCAN_TYPE_BREDR;
-+	else
-+		type = 0;
-+
-+	if (adapter->current_settings & MGMT_SETTING_LE)
-+		type |= SCAN_TYPE_LE;
-+
-+	return type;
++	return btd_error_failed(msg, "Not implemented yet");
 +}
 +
- static void trigger_start_discovery(struct btd_adapter *adapter, guint delay);
+ static DBusMessage *stop_discovery(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -2332,6 +2338,9 @@ static DBusMessage *remove_device(DBusConnection *conn,
  
- static void start_discovery_complete(uint8_t status, uint16_t length,
-@@ -1372,13 +1391,7 @@ static gboolean start_discovery_timeout(gpointer user_data)
- 
- 	adapter->discovery_idle_timeout = 0;
- 
--	if (adapter->current_settings & MGMT_SETTING_BREDR)
--		new_type = (1 << BDADDR_BREDR);
--	else
--		new_type = 0;
--
--	if (adapter->current_settings & MGMT_SETTING_LE)
--		new_type |= (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
-+	new_type = get_current_type(adapter);
- 
- 	if (adapter->discovery_enable == 0x01) {
- 		/*
+ static const GDBusMethodTable adapter_methods[] = {
+ 	{ GDBUS_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
++	{ GDBUS_METHOD("SetDiscoveryFilter",
++		GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
++		set_discovery_filter) },
+ 	{ GDBUS_METHOD("StopDiscovery", NULL, NULL, stop_discovery) },
+ 	{ GDBUS_ASYNC_METHOD("RemoveDevice",
+ 			GDBUS_ARGS({ "device", "o" }), NULL, remove_device) },
 -- 
 2.2.0.rc0.207.ga3a616c
 
