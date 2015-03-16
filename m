@@ -1,127 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAAJ3C+MfihmVWyaR3EgY3YvF0AV2HeX+7MAi7jDUu1m=NXf2A@mail.gmail.com>
-References: <CAAAJ3CJEXf+mYvst26fHasYsAvrXffhXFkEAO0a2Di=BLrxGOg@mail.gmail.com>
-	<CABBYNZJA1hjO4chzFffYHRKsTJHKaGca+5O8U493kbTq=9CRPg@mail.gmail.com>
-	<CAAAJ3C+JOP6rABtsfi274bKfe_Y9FB4uh-K7zs6Hmi30JB+TRQ@mail.gmail.com>
-	<CAAAJ3C+MfihmVWyaR3EgY3YvF0AV2HeX+7MAi7jDUu1m=NXf2A@mail.gmail.com>
-Date: Mon, 16 Mar 2015 14:22:10 +0200
-Message-ID: <CABBYNZ+aPxS4p_LFDtS-eDDBMjTCvLnqUOCD5u_SXKQ46tO9Ug@mail.gmail.com>
-Subject: Re: Bluetoothd crash/segfault when Chrombook creates connection with
- Samsung gear circle
+In-Reply-To: <CABBYNZLKfh7xPufAMfjG6P--Q-NkOVq4oYUdXEpqc5WsvQpu2g@mail.gmail.com>
+References: <54F752D8.1000605@ubnt.com>
+	<CAHrH25RVKCL9RQCeFBJAsUsNV1umOR92VWV1JQgkwy-RNh-GAg@mail.gmail.com>
+	<CAN_7+Yagp-R+H+nhCtmdqWyAJm4jO_VsB5c343A=39zurwqpPw@mail.gmail.com>
+	<007858C7-D538-407D-8212-D3B0CB880165@ubnt.com>
+	<CABBYNZLKfh7xPufAMfjG6P--Q-NkOVq4oYUdXEpqc5WsvQpu2g@mail.gmail.com>
+Date: Mon, 16 Mar 2015 13:05:23 +0200
+Message-ID: <CABBYNZLHtCJCoUp_4miapZJOReh=FP4_sJVFkyh5uE+NHV2x=A@mail.gmail.com>
+Subject: Re: Non-consecutive handle values in GATT
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ethan <ethancsge@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Andrejs Hanins <andrejs.hanins@ubnt.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
+	Arman Uguray <armansito@chromium.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Marcin Kraglak <marcin.kraglak@tieto.com>,
+	Szymon Janc <szymon.janc@tieto.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ethan,
+Hi Andrejs,
 
-
-On Mon, Mar 16, 2015 at 2:14 PM, Ethan <ethancsge@gmail.com> wrote:
+On Thu, Mar 5, 2015 at 10:39 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Andrejs,
 >
-> Hi Luiz,
->
-> I used gdb to dump crash file, and found it caused from invalid address access. In below function, it tried to access address that seems is invalid and crash. is it possible add protection?
->
-> avrcp_player_value_rsp
-> avrcp_get_play_status_rsp
-> avrcp_get_element_attributes_rsp
->
-> [GDB dump]
->
-> Program terminated with signal SIGSEGV, Segmentation fault.
-> #0  avrcp_get_play_status_rsp (conn=0x7f515c8febb0, code=10 '\n', subunit=9 '\t', operands=0x7f515c8e8ce6 "", operand_count=8,
->     user_data=0x7f515c8ff3b0) at profiles/audio/avrcp.c:1805
-> 1805    profiles/audio/avrcp.c: No such file or directory.
->
-> Program terminated with signal SIGSEGV, Segmentation fault.
-> #0  avrcp_player_value_rsp (conn=0x7f35056a15d0, code=8 '\b', subunit=9 '\t', operands=0x7f3505690936 "", operand_count=7,
->     user_data=0x7f35056a2b30) at profiles/audio/avrcp.c:1873
-> 1873    profiles/audio/avrcp.c: No such file or directory.
-
-No top-posting in the mailing list please, reply inline, on topic are
-these 2 different crashes? I wonder if you could try running with
-valgrind, it should generate a backtrace when the crash happen.
-
->
->
->
->
-> 2015-03-12 18:28 GMT+08:00 Ethan <ethancsge@gmail.com>:
+> On Thu, Mar 5, 2015 at 12:34 AM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
 >>
->> Hi Luiz,
 >>
->> is it better to provide GDB for this issue?
->>
->> Regards,
->> Ethan
->>
->> 2015-03-12 16:34 GMT+08:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>>> On 05 Mar 2015, at 00:21, Lukasz Rymanowski <lukasz.rymanowski@gmail.com> wrote:
 >>>
->>> Hi Ethan,
+>>> Hi Andrejs,
 >>>
->>> On Thu, Mar 12, 2015 at 10:04 AM, Ethan <ethancsge@gmail.com> wrote:
->>> >
->>> >
->>> > Hi,
->>> >
->>> > There has an issue about bluetoothd crash/segfault when Chrombook creates connection with Samsung gear circle.
->>> > The bluez version is 5.28. From sniffer, it shows get capabilities response error due to capability count is less than 2.
->>> > so I modified the code in function avrcp_get_capabilities_resp as below and issue can not be reproduced. I am not sure it's good for fixing, please help to check.
->>> > Attached file is sniffer log and patch.
->>> > Thanks
->>> >
->>> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
->>> > index 11de6ee..f19d26b 100644
->>> > --- a/profiles/audio/avrcp.c
->>> > +++ b/profiles/audio/avrcp.c
->>> > @@ -3228,7 +3228,7 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
->>> >         uint8_t count;
->>> >
->>> >         if (code == AVC_CTYPE_REJECTED || code == AVC_CTYPE_NOT_IMPLEMENTED ||
->>> > -                       pdu == NULL || pdu->params[0] != CAP_EVENTS_SUPPORTED)
->>> > +                       pdu == NULL || pdu->params[0] != CAP_EVENTS_SUPPORTED || pdu->params[1] < 2 )
->>> >                 return FALSE;
->>> >
->>> >         /* Connect browsing if pending */
->>> >
->>> > 015-03-11T09:16:03.462714+02:00 DEBUG bluetoothd[3304]: src/service.c:change_state() 0x7fdba9a0a7d0: device A0:B4:A5:1F:56:B9 profile avrcp-controller state changed: disconnected -> connecting (0)
->>> > 2015-03-11T09:16:03.462746+02:00 DEBUG bluetoothd[3304]: src/service.c:btd_service_ref() 0x7fdba9a0a8a0: ref=3
->>> > 2015-03-11T09:16:03.462760+02:00 DEBUG bluetoothd[3304]: plugins/policy.c:service_cb() Added a2dp-sink reconnect 0
->>> > 2015-03-11T09:16:03.462772+02:00 DEBUG bluetoothd[3304]: profiles/audio/sink.c:sink_set_state() State changed /org/bluez/hci0/dev_A0_B4_A5_1F_56_B9: SINK_STATE_CONNECTING -> SINK_STATE_CONNECTED
->>> > 2015-03-11T09:16:03.462784+02:00 DEBUG bluetoothd[3304]: profiles/audio/transport.c:transport_update_playing() /org/bluez/hci0/dev_A0_B4_A5_1F_56_B9/fd0 State=TRANSPORT_STATE_IDLE Playing=0
->>> > 2015-03-11T09:16:03.520141+02:00 DEBUG bluetoothd[3304]: profiles/audio/avctp.c:avctp_connect_cb() AVCTP: connected to A0:B4:A5:1F:56:B9
->>> > 2015-03-11T09:16:03.520189+02:00 ERR bluetoothd[3304]: Can't open input device: No such file or directory (2)
->>> > 2015-03-11T09:16:03.520205+02:00 ERR bluetoothd[3304]: AVRCP: failed to init uinput for A0:B4:A5:1F:56:B9
->>> > 2015-03-11T09:16:03.520216+02:00 DEBUG bluetoothd[3304]: profiles/audio/avrcp.c:target_init() 0x7fdba9a09bd0 version 0x0105
->>> > 2015-03-11T09:16:03.520227+02:00 DEBUG bluetoothd[3304]: src/service.c:change_state() 0x7fdba9a0a7d0: device A0:B4:A5:1F:56:B9 profile avrcp-controller state changed: connecting -> connected (0)
->>> > 2015-03-11T09:16:03.520239+02:00 DEBUG bluetoothd[3304]: src/device.c:device_profile_connected() avrcp-controller Success (0)
->>> > 2015-03-11T09:16:03.520250+02:00 DEBUG bluetoothd[3304]: profiles/audio/avctp.c:avctp_set_state() AVCTP Connected
->>> > 2015-03-11T09:16:03.613393+02:00 DEBUG bluetoothd[3304]: profiles/audio/avrcp.c:handle_vendordep_pdu() AVRCP PDU 0x10, company 0x001958 len 0x0001
->>> > 2015-03-11T09:16:03.613423+02:00 DEBUG bluetoothd[3304]: profiles/audio/avrcp.c:avrcp_handle_get_capabilities() id=3
->>> > 2015-03-11T09:16:03.719326+02:00 DEBUG bluetoothd[3304]: src/device.c:search_cb() A0:B4:A5:1F:56:B9: No service update
->>> > 2015-03-11T09:16:03.719358+02:00 DEBUG bluetoothd[3304]: src/device.c:device_svc_resolved() /org/bluez/hci0/dev_A0_B4_A5_1F_56_B9 err 0
->>> > 2015-03-11T09:16:05.597080+02:00 INFO kernel: [  232.700006] bluetoothd[3304]: segfault at 0 ip 00007fdba8143369 sp 00007fff95799110 error 4 in bluetoothd[7fdba8115000+b4000]
->>> > 2015-03-11T09:16:05.675496+02:00 WARNING crash_reporter[16211]: Received crash notification for bluetoothd[3304] sig 11, user 218 (handling)
->>> > 2015-03-11T09:16:05.678077+02:00 INFO crash_reporter[16211]: State of crashed process [3304]: S (sleeping)
->>> > 2015-03-11T09:16:05.696673+02:00 INFO crash_reporter[16211]: Stored minidump to /var/spool/crash/bluetoothd.20150311.091605.3304.dmp
->>> > 2015-03-11T09:16:05.702634+02:00 WARNING minijail0[3298]: libminijail: child process 3304 received signal 11
->>> > 2015-03-11T09:16:05.703799+02:00 WARNING kernel: [  232.806836] init: bluetoothd main process (3298) terminated with status 139
->>> > 2015-03-11T09:16:05.703823+02:00 WARNING kernel: [  232.806914] init: bluetoothd main process ended, respawning
+>>>> On Wed, Mar 4, 2015 at 10:39 PM, Arman Uguray <armansito@chromium.org> wrote:
+>>>> Hi Andrejs,
+>>>>
+>>>>> On Wed, Mar 4, 2015 at 10:45 AM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
+>>>>> Hello,
+>>>>>
+>>>>>    I'm experimenting with an LE peripheral device which provides GATT
+>>>>> services described by attributes with non-consecutive handle values, i.e.
+>>>>> there are "gaps" between handle values. According to the Bluetooth Core
+>>>>> specification 4.0 (Volume 3, Part G, "2.5.1 Overview") it is allowed:
+>>>>>
+>>>>>     Although the Attribute Handle values are in increasing order, following
+>>>>> Attribute Handle values may differ by more than one.
+>>>>>
+>>>>>    Based on my experiments, BlueZ 5.28 and also git-master as of today does
+>>>>> not support non-consecutive handle values GATT table. As a result, I can't
+>>>>> connect to my device because gatt-client fails to initialize properly. The
+>>>>> failing place is in discover_descs():
+>>>>>
+>>>>>      if (gatt_db_attribute_get_handle(attr) !=
+>>>>>                            chrc_data->value_handle)
+>>>>>            goto failed;
+>>>>>
+>>>>>    The value of chrc_data->value_handle is correct and matches GATT table
+>>>>> one the device, but the attr->handle has the value of previous attribute
+>>>>> (Primary Service UUID in my case) +2. This handle value calculation happens
+>>>>> in gatt_db_service_add_characteristic() which has strange code:
+>>>>>
+>>>>>    /* We set handle of characteristic value, which will be added next */
+>>>>>    put_le16(get_handle_at_index(service, i - 1) + 2, &value[1]);
+>>>>>
+>>>>>    Before trying to fix the problem by myself it would be great to hear
+>>>>> some comments about this issue. Does it seem like a bug or I missed
+>>>>> something?
+>>>>>
+>>>>>    As a note, I can successfully connect to my LE peripheral from an iPhone
+>>>>> LightBlue app, which does not posses any issues during GATT discovery and
+>>>>> can read/write the characteristic on the device.
 >>>
->>> This does not match the picture since I can see List Player Settings
->>> packet so I afraid it is crashing in some other place, also your
->>> sniffer got this wrong it is allowed to send 1 as capability counter
->>> if you are the controller you usually only have Volume Changed event.
+>>> Can you share what device are you using? Is it on the market already?
+>>> I'm just curious as I haven't seen any device doing it on last couple UPFs
 >>>
->>> --
->>> Luiz Augusto von Dentz
->>
+>>> But indeed, it looks like this is something we need to fix.
+>> It's a Broadcom dev kit for LE development. I'm running one of Broadcom examples which has non-consecutive handle values within single service. Of course, there is a full control over GATT and we can change handle values to be on +1 basis, no big deal, but in general BT core specs do not require it, so fix is nice to have to be on a safe side in case there will be such device in a wild. I spent a day to understand it digging the code :)
 >>
 >
+> I guess because it is a low level API you can basically use whatever
+> handles you want, probably OS API would not allow that but as you said
+> we may encounter devices out in the market that do that already.
+>
+>>> \Lukasz
+>>>>
+>>>> This is interesting. The gatt-db was initially designed for the
+>>>> server-role, with the assumption being that the handles of a service
+>>>> will be contiguous. So, it allows gaps between separate service ranges
+>>>> but not between individual attributes between the handles of a
+>>>> service. This assumption is OK for server-role but now that we also
+>>>> use gatt-db for the client role, then maybe this assumption is
+>>>> incorrect in some cases.
+>>>>
+>>>> So I guess we need a way to enter individual attributes with arbitrary
+>>>> handles directly into the database, since it currently creates a
+>>>> contiguous array to store the attributes of a service. I remember Luiz
+>>>> was talking about changing the way the gatt-db addition/removal works
+>>>> on IRC so maybe he can provide more input here. Fwiw, we never
+>>>> encountered this issue because in practice I've never seen a database
+>>>> implementation that skips attribute handles within a service.
+>
+> Well that was not exactly the problem I was discussing, but anyway it
+> is a problem that we need to fix. Id probably start by adding a unit
+> test where a service skips handles and then fix the gatt_db
+> implementation to handle that, speaking about implementation we could
+> either go with list but the entries would then need to store the
+> handles separately or we keep the current array and leave the gaps
+> with NULL pointers, I guess the later is still more efficient since we
+> are talking about a special case and storing the handles per list
+> entry might increase our memory consumption.
 
+I just posted a patch-set that attempts to fix this, at least with
+unit test Ive created it seems to work but I would appreciate if you
+could try with your setup as well.
 
 
 -- 
