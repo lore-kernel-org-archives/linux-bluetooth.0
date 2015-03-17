@@ -1,51 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] core/device: Fix btd_device_set_temporary
-Date: Tue, 17 Mar 2015 11:13:12 +0200
-Message-Id: <1426583595-28502-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 17 Mar 2015 09:34:10 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btusb: Fix minor whitespace issue in QCA ROME
+ device entries
+Message-ID: <20150317073410.GA26461@t440s.lan>
+References: <1426575364-8673-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1426575364-8673-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-In case the device is set as not temporary it should trigger
-store_device_info but the function checks if temporary flag is set but
-since currently the code only set the flag after the call nothing really
-happens.
----
- src/device.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+On Mon, Mar 16, 2015, Marcel Holtmann wrote:
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btusb.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 97c0523..6100341 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4474,17 +4474,19 @@ void btd_device_set_temporary(struct btd_device *device, gboolean temporary)
- 
- 	DBG("temporary %d", temporary);
- 
-+	device->temporary = temporary;
-+
- 	if (temporary) {
- 		if (device->bredr)
- 			adapter_whitelist_remove(device->adapter, device);
- 		adapter_connect_list_remove(device->adapter, device);
--	} else {
--		if (device->bredr)
--			adapter_whitelist_add(device->adapter, device);
--		store_device_info(device);
-+		return;
- 	}
- 
--	device->temporary = temporary;
-+	if (device->bredr)
-+		adapter_whitelist_add(device->adapter, device);
-+
-+	store_device_info(device);
- }
- 
- void btd_device_set_trusted(struct btd_device *device, gboolean trusted)
--- 
-2.1.0
+Applied to bluetooth-next. Thanks.
 
+Johan
