@@ -2,81 +2,290 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v2 03/14] gdbus/client: add g_dbus_proxy_set_read_watch
-Date: Tue, 17 Mar 2015 16:49:50 -0700
-Message-Id: <1426636201-30057-4-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v2 05/14] advertising-manager: Implement RegisterAdvertisement
+Date: Tue, 17 Mar 2015 16:49:52 -0700
+Message-Id: <1426636201-30057-6-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1426636201-30057-1-git-send-email-jamuraa@chromium.org>
 References: <1426636201-30057-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds a new gdbus utility function which will set a function to be called
-after the properties of a proxy are updated.
-
-This enables using GDBusClient for objects without the ObjectManager
-interface as long as you know in advance the object path using
-g_dbus_proxy_new
+Initial implementation of the RegisterAdvertisement function of the
+LEAdvertisingManager1 interface.
 ---
- gdbus/client.c | 17 +++++++++++++++++
- gdbus/gdbus.h  |  3 +++
- 2 files changed, 20 insertions(+)
+ src/advertising-manager.c | 229 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 228 insertions(+), 1 deletion(-)
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index fe0c0db..c913773 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -76,6 +76,8 @@ struct GDBusProxy {
- 	void *prop_data;
- 	GDBusProxyFunction removed_func;
- 	void *removed_data;
-+	GDBusProxyFunction read_func;
-+	void *read_data;
+diff --git a/src/advertising-manager.c b/src/advertising-manager.c
+index c3f85c2..59f198e 100644
+--- a/src/advertising-manager.c
++++ b/src/advertising-manager.c
+@@ -30,7 +30,9 @@
+ 
+ #include "adapter.h"
+ #include "dbus-common.h"
++#include "error.h"
+ #include "log.h"
++#include "src/shared/queue.h"
+ #include "src/shared/util.h"
+ 
+ #define LE_ADVERTISING_MGR_IFACE "org.bluez.LEAdvertisingManager1"
+@@ -38,15 +40,236 @@
+ 
+ struct btd_advertising_manager {
+ 	struct btd_adapter *adapter;
++	struct queue *adverts;
  };
  
- struct prop_entry {
-@@ -297,6 +299,9 @@ static void get_all_properties_reply(DBusPendingCall *call, void *user_data)
- 
- 	update_properties(proxy, &iter, FALSE);
- 
-+	if (proxy->read_func)
-+		proxy->read_func(proxy, proxy->read_data);
++#define AD_TYPE_BROADCAST 0
++#define AD_TYPE_PERIPHERAL 1
 +
- done:
- 	if (g_list_find(client->proxy_list, proxy) == NULL) {
- 		if (client->proxy_added)
-@@ -914,6 +919,18 @@ gboolean g_dbus_proxy_set_removed_watch(GDBusProxy *proxy,
- 	return TRUE;
- }
- 
-+gboolean g_dbus_proxy_set_read_watch(GDBusProxy *proxy,
-+				GDBusProxyFunction function, void *user_data)
++struct advertisement {
++	struct btd_advertising_manager *manager;
++	char *owner;
++	char *path;
++	GDBusClient *client;
++	GDBusProxy *proxy;
++	DBusMessage *reg;
++	uint8_t type; /* Advertising type */
++	bool published;
++};
++
++static bool match_advertisement_path(const void *a, const void *b)
 +{
-+	if (proxy == NULL)
-+		return FALSE;
++	const struct advertisement *ad = a;
++	const char *path = b;
 +
-+	proxy->read_func = function;
-+	proxy->read_data = user_data;
-+
-+	return TRUE;
++	return g_strcmp0(ad->path, path);
 +}
 +
- static void refresh_properties(GDBusClient *client)
- {
- 	GList *list;
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 9814838..ae281d9 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -353,6 +353,9 @@ gboolean g_dbus_proxy_set_property_watch(GDBusProxy *proxy,
- gboolean g_dbus_proxy_set_removed_watch(GDBusProxy *proxy,
- 			GDBusProxyFunction destroy, void *user_data);
- 
-+gboolean g_dbus_proxy_set_read_watch(GDBusProxy *proxy,
-+			GDBusProxyFunction ready, void *user_data);
++static void advertisement_free(void *data)
++{
++	struct advertisement *ad = data;
 +
- GDBusClient *g_dbus_client_new(DBusConnection *connection,
- 					const char *service, const char *path);
- GDBusClient *g_dbus_client_new_full(DBusConnection *connection,
++	if (ad->client) {
++		g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
++		g_dbus_client_unref(ad->client);
++	}
++
++	if (ad->proxy)
++		g_dbus_proxy_unref(ad->proxy);
++
++	if (ad->owner)
++		g_free(ad->owner);
++
++	if (ad->path)
++		g_free(ad->path);
++
++	free(ad);
++}
++
++static gboolean advertisement_free_idle_cb(void *data)
++{
++	advertisement_free(data);
++
++	return FALSE;
++}
++
++static void advertisement_remove(void *data)
++{
++	struct advertisement *ad = data;
++
++	g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
++
++	queue_remove(ad->manager->adverts, ad);
++
++	g_idle_add(advertisement_free_idle_cb, ad);
++}
++
++static void client_disconnect_cb(DBusConnection *conn, void *user_data)
++{
++	DBG("Client disconnected");
++
++	advertisement_remove(user_data);
++}
++
++static bool parse_advertising_type(GDBusProxy *proxy, uint8_t *type)
++{
++	DBusMessageIter iter;
++	const char *msg_type;
++
++	if (!g_dbus_proxy_get_property(proxy, "Type", &iter))
++		return false;
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return false;
++
++	dbus_message_iter_get_basic(&iter, &msg_type);
++
++	if (!g_strcmp0(msg_type, "broadcast")) {
++		*type = AD_TYPE_BROADCAST;
++		return true;
++	}
++
++	if (!g_strcmp0(msg_type, "peripheral")) {
++		*type = AD_TYPE_PERIPHERAL;
++		return true;
++	}
++
++	return false;
++}
++
++static void refresh_advertisement(struct advertisement *ad)
++{
++	DBG("Refreshing advertisement: %s", ad->path);
++	if (!ad->published) {
++		/* TODO: MGMT API call to update the advertisement */
++	}
++}
++
++static bool parse_advertisement(struct advertisement *ad)
++{
++	if (!parse_advertising_type(ad->proxy, &ad->type)) {
++		error("Failed to read \"Type\" property of advertisement");
++		return false;
++	}
++
++	/* TODO: parse the remaining properties into a shared structure */
++
++	refresh_advertisement(ad);
++
++	return true;
++}
++
++static void advertisement_proxy_ready(GDBusProxy *proxy, void *data)
++{
++	struct advertisement *ad = data;
++	DBusMessage *reply;
++
++	if (!parse_advertisement(ad)) {
++		error("Failed to parse advertisement");
++
++		reply = btd_error_failed(ad->reg,
++					"Failed to register advertisement");
++		goto done;
++	}
++
++	g_dbus_client_set_disconnect_watch(ad->client, client_disconnect_cb,
++									ad);
++
++	reply = dbus_message_new_method_return(ad->reg);
++
++	DBG("Advertisement registered: %s", ad->path);
++
++done:
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++
++	dbus_message_unref(ad->reg);
++	ad->reg = NULL;
++}
++
++static struct advertisement *advertisement_create(DBusConnection *conn,
++					DBusMessage *msg, const char *path)
++{
++	struct advertisement *ad;
++	const char *sender = dbus_message_get_sender(msg);
++
++	if (!path || !g_str_has_prefix(path, "/"))
++		return NULL;
++
++	ad = new0(struct advertisement, 1);
++	if (!ad)
++		return NULL;
++
++	ad->published = false;
++
++	ad->client = g_dbus_client_new_full(conn, sender, path, path);
++	if (!ad->client)
++		goto fail;
++
++	ad->owner = g_strdup(sender);
++	if (!ad->owner)
++		goto fail;
++
++	ad->path = g_strdup(path);
++	if (!ad->path)
++		goto fail;
++
++	DBG("Adding proxy for %s", path);
++	ad->proxy = g_dbus_proxy_new(ad->client, path, LE_ADVERTISEMENT_IFACE);
++	if (!ad->proxy)
++		goto fail;
++
++	g_dbus_proxy_set_read_watch(ad->proxy, advertisement_proxy_ready, ad);
++
++	ad->reg = dbus_message_ref(msg);
++
++	return ad;
++
++fail:
++	advertisement_free(ad);
++	return NULL;
++}
++
+ static DBusMessage *register_advertisement(DBusConnection *conn,
+ 						DBusMessage *msg,
+ 						void *user_data)
+ {
++	struct btd_advertising_manager *manager = user_data;
++	DBusMessageIter args;
++	const char *path;
++	struct advertisement *ad;
++
+ 	DBG("RegisterAdvertisement");
+ 
+-	/* TODO */
++	if (!dbus_message_iter_init(msg, &args))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&args, &path);
++
++	if (queue_find(manager->adverts, match_advertisement_path, path))
++		return btd_error_already_exists(msg);
++
++	/* TODO: support more than one advertisement */
++	if (!queue_isempty(manager->adverts))
++		return btd_error_failed(msg, "Already advertising");
++
++	dbus_message_iter_next(&args);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
++		return btd_error_invalid_args(msg);
++
++	ad = advertisement_create(conn, msg, path);
++	if (!ad)
++		return btd_error_failed(msg,
++					"Failed to register advertisement");
++
++	DBG("Registered advertisement at path %s", path);
++
++	ad->manager = manager;
++	queue_push_tail(manager->adverts, ad);
++
+ 	return NULL;
+ }
+ 
+@@ -76,6 +299,8 @@ static void advertising_manager_destroy(void *user_data)
+ {
+ 	struct btd_advertising_manager *manager = user_data;
+ 
++	queue_destroy(manager->adverts, advertisement_free);
++
+ 	free(manager);
+ }
+ 
+@@ -100,6 +325,8 @@ advertising_manager_create(struct btd_adapter *adapter)
+ 		return NULL;
+ 	}
+ 
++	manager->adverts = queue_new();
++
+ 	return manager;
+ }
+ 
 -- 
 2.2.0.rc0.207.ga3a616c
 
