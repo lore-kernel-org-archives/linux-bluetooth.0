@@ -1,139 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <55080DF0.8020103@ubnt.com>
+Date: Tue, 17 Mar 2015 13:20:16 +0200
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLAFKWQB8EYtSt-S49rcqw-TdX_vLjvXU7LSWaxq_xq2g@mail.gmail.com>
-References: <CAAAJ3CJEXf+mYvst26fHasYsAvrXffhXFkEAO0a2Di=BLrxGOg@mail.gmail.com>
-	<CABBYNZJA1hjO4chzFffYHRKsTJHKaGca+5O8U493kbTq=9CRPg@mail.gmail.com>
-	<CAAAJ3C+JOP6rABtsfi274bKfe_Y9FB4uh-K7zs6Hmi30JB+TRQ@mail.gmail.com>
-	<CAAAJ3C+MfihmVWyaR3EgY3YvF0AV2HeX+7MAi7jDUu1m=NXf2A@mail.gmail.com>
-	<CABBYNZ+aPxS4p_LFDtS-eDDBMjTCvLnqUOCD5u_SXKQ46tO9Ug@mail.gmail.com>
-	<CAAAJ3CL-WRRXr0cofDCeRM46H-jNf7L=dcZ5Uo7C6xp=K2QFyw@mail.gmail.com>
-	<CABBYNZLAFKWQB8EYtSt-S49rcqw-TdX_vLjvXU7LSWaxq_xq2g@mail.gmail.com>
-Date: Tue, 17 Mar 2015 13:44:06 +0200
-Message-ID: <CABBYNZ+Dekw2OKPb-3Ej9p0dKF3VUnNe4URrPwvuSaofkudAYg@mail.gmail.com>
-Subject: Re: Bluetoothd crash/segfault when Chrombook creates connection with
- Samsung gear circle
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ethan <ethancsge@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+CC: Arman Uguray <armansito@chromium.org>
+Subject: core/gatt-db: Long writes into external GATT characteristics issue
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ethan,
+Hi,
 
-On Tue, Mar 17, 2015 at 12:51 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Ethan,
->
-> On Tue, Mar 17, 2015 at 12:13 PM, Ethan <ethancsge@gmail.com> wrote:
->> Hi Luiz,
->>
->> OK, I will follow the rule.
->> And actually, there have three crashes in function as
->> "avrcp_player_value_rsp", "avrcp_get_play_status_rsp" and
->> "avrcp_get_element_attributes_rsp". I tried to mark all code of function
->> "avrcp_get_play_status_rsp" and return FALSE while finding first crash.
->> Then I built bluetoothd, and it crashed again in avrcp_get_play_status_rsp.
->> The same way, next crash is in avrcp_get_element_attributes_rsp.
->>
->> I traced code and check issue log as attached message file, it seems that
->> code "struct avrcp *session = user_data;" get invalid address in function
->> avrcp_get_capabilities_resp. Also, I tried to create a same type structure
->> and assign to session as below, and issue can not be reproduced. Hope these
->> information can help you to find root cause. Thanks.
->>
->> --- a/profiles/audio/avrcp.c
->> +++ b/profiles/audio/avrcp.c
->> @@ -3222,10 +3222,12 @@ static gboolean avrcp_get_capabilities_resp(struct
->> avctp *conn,
->>                      uint8_t *operands, size_t operand_count,
->>                      void *user_data)
->>  {
->> -    struct avrcp *session = user_data;
->> +        struct avrcp  test;
->> +    struct avrcp *session = &test;
->>
->>
->> The attached file is backtrace for three crash by GDB
->>
->>
->> static gboolean avrcp_get_play_status_rsp(struct avctp *conn,
->>                     uint8_t code, uint8_t subunit,
->>                     uint8_t *operands, size_t operand_count,
->>                     void *user_data)
->> {
->>     struct avrcp *session = user_data;
->>     struct avrcp_player *player = session->controller->player;
->>     struct media_player *mp = player->user_data;                  /*
->> --->crash */
->>
->>
->>
->> static gboolean avrcp_get_element_attributes_rsp(struct avctp *conn,
->>                         uint8_t code, uint8_t subunit,
->>                         uint8_t *operands,
->>                         size_t operand_count,
->>                         void *user_data)
->> {
->>     struct avrcp *session = user_data;
->>     struct avrcp_player *player = session->controller->player;   /*
->> --->crash */
->>
->> static gboolean avrcp_player_value_rsp(struct avctp *conn,
->>                     uint8_t code, uint8_t subunit,
->>                     uint8_t *operands, size_t operand_count,
->>                     void *user_data)
->> {
->>     struct avrcp *session = user_data;
->>     struct avrcp_player *player = session->controller->player;
->>     struct media_player *mp = player->user_data;                   /*
->> --->crash */
->>
->>
->> 2015-03-17T20:52:23.347640+11:00 DEBUG bluetoothd[21717]:
->> profiles/audio/avctp.c:avctp_connect_cb() AVCTP: connected to
->> A0:B4:A5:1F:56:B9
->> 2015-03-17T20:52:23.348292+11:00 DEBUG bluetoothd[21717]:
->> profiles/audio/avctp.c:init_uinput() AVRCP: uinput initialized for
->> A0:B4:A5:1F:56:B9
->> 2015-03-17T20:52:23.348337+11:00 DEBUG bluetoothd[21717]:
->> profiles/audio/avrcp.c:target_init() 0x7f601c964a20 version 0x0105
->
-> Here seems to be the problem, it seems we only are initiating the
-> target not the controller, which should be fine except that the remote
-> will not be able to qualify with support of absolute volume control
-> since that requires both records. Anyway there is no reason for us to
-> crash even if the remote device is doing some strange stuff, we might
-> need to check if controller is not initialized just volume control
-> should be enabled.
+	To begin with, there is an issue with long reading/writing of external GATT characteristics registered via GattManager1. Related ATT ops are ReadBlob, PrepareWrite, ExecuteWrite etc. Reading issue is easily fixed in a patch I sent yesterday. But the write case is more tricky. Currently, long write into external chrc (D-Bus method "WriteValue") is executed in a "chunked" fashion. Thats is, each ATT PrepareWrite op eventually causes an invocation of "WriteValue" with appropriate buffer (see exec_next_prep_write()). I see no easy way for external D-Bus GATT service to distinguish between full and partial writes, so no way to tell when the chrc is fully written.
 
-Could you try with these changes:
+	I see two solutions for the issue:
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 414ee25..cc26eed 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -3252,12 +3252,18 @@ static gboolean
-avrcp_get_capabilities_resp(struct avctp *conn,
-                case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
-                case AVRCP_EVENT_UIDS_CHANGED:
-                case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
-+                       /* These events above are controller specific */
-+                       if (!session->controller)
-+                               break;
-                case AVRCP_EVENT_VOLUME_CHANGED:
-                        avrcp_register_notification(session, event);
-                        break;
-                }
-        }
+1. Add a new method to GattCharacteristic1 called "WriteValuePartial" with a single buffer argument, so that len(buffer)==0 denotes that all chunks have been written and service can assemble the whole buffer for further processing. Or the existing "WriteValue" method can be extended with a parameter like op_type = ["Single", "Partial", "End"]. I'm not a BlueZ design expert, but IMO this approach stinks a bit... D-Bus level API should be simple. I doubt that external service should have an burden related to ATT MTU fragmentation.
 
-+       if (!session->controller)
-+               return FALSE;
-+
-        if (!(events & (1 << AVRCP_EVENT_SETTINGS_CHANGED)))
-                avrcp_list_player_attributes(session);
+2. Add some logic to BlueZ daemon so that "WriteValue" is always executed with fully assembled data from multiple PrepareWrite ops. Such approach will not require any D-Bus API changes, which is good. The problem is that I personally don't see a clean and easy way how to implement it in the code. Attributes are written using gatt_db_attribute_write() which has ATT opcode and write offset, but this info is not enough to understand when the last chunk of an attribute value is being written to complete the operation in a single step. In case of external chrc, the gatt_db_attribute::write_func equals to chrc_write_cb() which immediately sends D-Bus calls to "WriteValue", thats it doing the "chunking". If there would be a possibility to tell when the call to gatt_db_attribute::write_func is for the last chunk of data, then chrc_write_cb() could do the assembly and invoke "WriteValue" only once. The task can be accomplished by adding an additional argument to gatt_db_write_t functor definit
+ion telling that write is chunked and if the chunk is last or not. Not sure, does it look like a "brutal hack" or not for BlueZ gurus :)
 
+Maybe someone with better BlueZ design knowledge can suggest how the 2-nd solution can be implemented or maybe propose something completely different.
 
-
--- 
-Luiz Augusto von Dentz
+BR, Andrey
