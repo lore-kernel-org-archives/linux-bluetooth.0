@@ -2,192 +2,125 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v2 06/14] tools: Python script to test Advertisement API
-Date: Tue, 17 Mar 2015 16:49:53 -0700
-Message-Id: <1426636201-30057-7-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v2 01/14] doc: Add LE Advertisement D-Bus API documentation
+Date: Tue, 17 Mar 2015 16:49:48 -0700
+Message-Id: <1426636201-30057-2-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1426636201-30057-1-git-send-email-jamuraa@chromium.org>
 References: <1426636201-30057-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This script provides an example of using the advertisement-data
-D-Bus API from python.
+The LE Advertisement API allows external appications to define
+persistent LE Advertisement Data packets.
 ---
- tools/advertisement-example | 165 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 165 insertions(+)
- create mode 100644 tools/advertisement-example
+ doc/advertising-api.txt | 98 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 98 insertions(+)
+ create mode 100644 doc/advertising-api.txt
 
-diff --git a/tools/advertisement-example b/tools/advertisement-example
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
 new file mode 100644
-index 0000000..1eb4a13
+index 0000000..5c4eff8
 --- /dev/null
-+++ b/tools/advertisement-example
-@@ -0,0 +1,165 @@
-+#!/usr/bin/python
++++ b/doc/advertising-api.txt
+@@ -0,0 +1,98 @@
++BlueZ D-Bus LE Advertising API Description
++******************************************
 +
-+import dbus
-+import dbus.exceptions
-+import dbus.mainloop.glib
-+import dbus.service
++Advertising packets are structured data which is broadcast on the LE Advertising
++channels and available for all devices in range.  Because of the limited space
++available in LE Advertising packets (32 bytes), each packet's contents must be
++carefully controlled.
 +
-+import array
-+import gobject
++BlueZ acts as a store for the Advertisement Data which is meant to be sent.
++It constructs the correct Advertisement Data from the structured
++data and configured the kernel to send the correct advertisement.
 +
-+from random import randint
++Advertisement Data objects are registered freely and then referenced by BlueZ
++when constructing the data sent to the kernel.
 +
-+mainloop = None
++LE Advertisement Data hierarchy
++===============================
 +
-+BLUEZ_SERVICE_NAME = 'org.bluez'
-+LE_ADVERTISING_MANAGER_IFACE = 'org.bluez.LEAdvertisingManager1'
-+DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
-+DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
++Specifies the Advertisement Data to be broadcast and some advertising
++parameters.  Properties which are not present will not be included in the
++data.  Required advertisement data types will always be included.
++All UUIDs are 128-bit versions in the API, and 16 or 32-bit
++versions of the same UUID will be used in the advertising data as appropriate.
 +
-+LE_ADVERTISEMENT_IFACE = 'org.bluez.LEAdvertisement1'
++Service		org.bluez
++Interface	org.bluez.LEAdvertisement1
++Object path	freely definable
 +
++Properties	string Type
 +
-+class InvalidArgsException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.freedesktop.DBus.Error.InvalidArgs'
++			Determines the type of advertising packet requested.
 +
++			Possible values: "broadcast" or "peripheral"
 +
-+class NotSupportedException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.NotSupported'
++		array{string} ServiceUUIDs
 +
++			List of UUIDs to include in the "Service UUID" field of
++			the Advertising Data.
 +
-+class NotPermittedException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.NotPermitted'
++		dict ManufacturerSpecificData
 +
++			Manufactuer Specific Data fields to include in
++			the Advertising Data.  Keys are the Manufacturer ID
++			to associate with the data.
 +
-+class InvalidValueLengthException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.InvalidValueLength'
++		bool IncludePower
 +
++			If present and true, the TX Power Level will be included
++			in the Advertising Data.
 +
-+class FailedException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.Failed'
++		array{string} SolicitUUIDs
 +
++			Array of UUIDs to include in "Service Solicitation"
++			Advertisement Data.
 +
-+class Advertisement(dbus.service.Object):
-+    PATH_BASE = '/org/bluez/example/advertisement'
++		dict ServiceData
 +
-+    def __init__(self, bus, index, advertising_type):
-+        self.path = self.PATH_BASE + str(index)
-+        self.bus = bus
-+        self.ad_type = advertising_type
-+        self.service_uuids = None
-+        self.manufacturer_specific_data = None
-+        self.solicit_uuids = None
-+        self.service_data = None
-+        dbus.service.Object.__init__(self, bus, self.path)
-+
-+    def get_properties(self):
-+        properties = dict()
-+        properties['Type'] = self.ad_type
-+        if self.service_uuids is not None:
-+            properties['ServiceUUIDs'] = dbus.Array(self.service_uuids,
-+                                                    signature='s')
-+        if self.solicit_uuids is not None:
-+            properties['SolicitUUIDs'] = dbus.Array(self.solicit_uuids,
-+                                                    signature='s')
-+        if self.manufacturer_specific_data is not None:
-+            properties['ManufacturerSpecificData'] = dbus.Dictionary(
-+                self.manufacturer_specific_data, signature='qay')
-+        if self.service_data is not None:
-+            properties['ServiceData'] = dbus.Dictionary(self.service_data,
-+                                                        signature='say')
-+        return {LE_ADVERTISEMENT_IFACE: properties}
-+
-+    def get_path(self):
-+        return dbus.ObjectPath(self.path)
-+
-+    def add_service_uuid(self, uuid):
-+        if not self.service_uuids:
-+            self.service_uuids = []
-+        self.service_uuids.append(uuid)
-+
-+    def add_solicit_uuid(self, uuid):
-+        if not self.solicit_uuids:
-+            self.solicit_uuids = []
-+        self.solicit_uuids.append(uuid)
-+
-+    def add_manufacturer_data(self, manuf_code, data):
-+        if not self.manufacturer_specific_data:
-+            self.manufacturer_specific_data = dict()
-+        self.manufacturer_specific_data[manuf_code] = data
-+
-+    def add_service_data(self, uuid, data):
-+        if not self.service_data:
-+            self.service_data = dict()
-+        self.service_data[uuid] = data
-+
-+    @dbus.service.method(DBUS_PROP_IFACE,
-+                         in_signature='s',
-+                         out_signature='a{sv}')
-+    def GetAll(self, interface):
-+        print 'GetAll'
-+        if interface != LE_ADVERTISEMENT_IFACE:
-+            raise InvalidArgsException()
-+        print 'returning props'
-+        return self.get_properties()[LE_ADVERTISEMENT_IFACE]
++			Service Data elements to include. The keys are the
++			UUID to associate with the data.
 +
 +
-+class TestAdvertisement(Advertisement):
++LE Advertising Manager hierarchy
++================================
 +
-+    def __init__(self, bus, index):
-+        Advertisement.__init__(self, bus, index, 'broadcast')
-+        self.add_service_uuid('0000180D-0000-1000-8000-00805F9B34FB')
-+        self.add_service_uuid('0000180F-0000-1000-8000-00805F9B34FB')
-+        self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
-+        self.add_service_data('00009999-0000-1000-8000-00805F9B34FB',
-+                              [0x00, 0x01, 0x02, 0x03, 0x04])
++The Advertising Manager allows external applications to register Advertisement
++Data which should be broadcast to devices.  Advertisement Data elements must
++follow the API for LE Advertisement Data described above.
 +
++Service		org.bluez
++Interface	org.bluez.LEAdvertisingManager1 [Experimental]
++Object path	/org/bluez/{hci0,hci1,...}
 +
-+def register_ad_cb():
-+    print 'Advertisement registered'
++Methods		RegisterAdvertisement(object advertisement, dict options)
 +
++			Registers an advertisement object to be sent over the LE
++			Advertising channel.  The service must be exported
++			under interface LEAdvertisement1. InvalidArguments
++			indicates that the object has invalid or conflicting
++			properties.  InvalidLength indicates that the data
++			provided generates a data packet which is too long.
++			The properties of this object are parser when it is
++			registered, and any changes are ignored.
++			Currently only one advertisement at a time is supported,
++			attempting to register two advertisements will result in
++			an AlreadyExists error.
 +
-+def register_ad_error_cb(error):
-+    print 'Failed to register advertisement: ' + str(error)
-+    mainloop.quit()
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++					 org.bluez.Error.InvalidLength
 +
++		UnregisterAdvertisement(object advertisement)
 +
-+def find_adapter(bus):
-+    remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'),
-+                               DBUS_OM_IFACE)
-+    objects = remote_om.GetManagedObjects()
++			This unregisters an advertisement that has been
++			prevously registered.  The object path parameter must
++			match the same value that has been used on registration.
 +
-+    for o, props in objects.iteritems():
-+        if LE_ADVERTISING_MANAGER_IFACE in props:
-+            return o
-+
-+    return None
-+
-+
-+def main():
-+    global mainloop
-+
-+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+    bus = dbus.SystemBus()
-+
-+    adapter = find_adapter(bus)
-+    if not adapter:
-+        print 'LEAdvertisingManager1 interface not found'
-+        return
-+
-+    ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-+                                LE_ADVERTISING_MANAGER_IFACE)
-+
-+    test_advertisement = TestAdvertisement(bus, 0)
-+
-+    mainloop = gobject.MainLoop()
-+
-+    ad_manager.RegisterAdvertisement(test_advertisement.get_path(), {},
-+                                     reply_handler=register_ad_cb,
-+                                     error_handler=register_ad_error_cb)
-+
-+    mainloop.run()
-+
-+if __name__ == '__main__':
-+    main()
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.DoesNotExist
 -- 
 2.2.0.rc0.207.ga3a616c
 
