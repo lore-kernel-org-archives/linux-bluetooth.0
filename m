@@ -2,29 +2,27 @@ Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 2/2] unit/test-hog: Add TC/HGRF/HH/BV-18-I test
-Date: Tue, 17 Mar 2015 12:18:12 +0100
-Message-Id: <1426591092-19666-2-git-send-email-mariusz.skamra@tieto.com>
-In-Reply-To: <1426591092-19666-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1426591092-19666-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: [PATCH 1/2] unit/test-hog: Add TC/HGDC/HH/BV-08-I test
+Date: Tue, 17 Mar 2015 12:18:11 +0100
+Message-Id: <1426591092-19666-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that all Protocol Mode characteristics can be read by HID
-Host IUT.
+Verify that all Protocol Mode characteristics can be discovered
+by a HID Host IUT.
 ---
- unit/test-hog.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ unit/test-hog.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/unit/test-hog.c b/unit/test-hog.c
-index c6107ee..9fb3896 100644
+index 2a25d09..c6107ee 100644
 --- a/unit/test-hog.c
 +++ b/unit/test-hog.c
-@@ -454,5 +454,26 @@ int main(int argc, char *argv[])
- 		raw_pdu(0x09, 0x07, 0x07, 0x00, 0x06, 0x08, 0x00,
- 			0x4e, 0x2a));
+@@ -437,5 +437,22 @@ int main(int argc, char *argv[])
+ 		raw_pdu(0x0a, 0x0a, 0x00),
+ 		raw_pdu(0x0b, 0x19, 0x2a));
  
-+	define_test("/TP/HGRF/HH/BV-18-I", test_hog,
++	define_test("/TP/HGDC/HH/BV-08-I", test_hog,
 +		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
 +		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x12,
 +			0x18, 0x05, 0x00, 0x08, 0x00, 0x12, 0x18),
@@ -39,11 +37,7 @@ index c6107ee..9fb3896 100644
 +		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),
 +		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x03, 0x28),
 +		raw_pdu(0x09, 0x07, 0x07, 0x00, 0x06, 0x08, 0x00,
-+			0x4e, 0x2a),
-+		raw_pdu(0x0a, 0x04, 0x00),
-+		raw_pdu(0x0b, 0x01),
-+		raw_pdu(0x0a, 0x08, 0x00),
-+		raw_pdu(0x0b, 0x01));
++			0x4e, 0x2a));
 +
  	return tester_run();
  }
