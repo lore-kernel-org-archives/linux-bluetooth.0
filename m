@@ -1,26 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55080DF0.8020103@ubnt.com>
-Date: Tue, 17 Mar 2015 13:20:16 +0200
-From: Andrejs Hanins <andrejs.hanins@ubnt.com>
-MIME-Version: 1.0
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-CC: Arman Uguray <armansito@chromium.org>
-Subject: core/gatt-db: Long writes into external GATT characteristics issue
-Content-Type: text/plain; charset=utf-8
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH 2/2] unit/test-hog: Add TC/HGRF/HH/BV-18-I test
+Date: Tue, 17 Mar 2015 12:18:12 +0100
+Message-Id: <1426591092-19666-2-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1426591092-19666-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1426591092-19666-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Verify that all Protocol Mode characteristics can be read by HID
+Host IUT.
+---
+ unit/test-hog.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-	To begin with, there is an issue with long reading/writing of external GATT characteristics registered via GattManager1. Related ATT ops are ReadBlob, PrepareWrite, ExecuteWrite etc. Reading issue is easily fixed in a patch I sent yesterday. But the write case is more tricky. Currently, long write into external chrc (D-Bus method "WriteValue") is executed in a "chunked" fashion. Thats is, each ATT PrepareWrite op eventually causes an invocation of "WriteValue" with appropriate buffer (see exec_next_prep_write()). I see no easy way for external D-Bus GATT service to distinguish between full and partial writes, so no way to tell when the chrc is fully written.
+diff --git a/unit/test-hog.c b/unit/test-hog.c
+index c6107ee..9fb3896 100644
+--- a/unit/test-hog.c
++++ b/unit/test-hog.c
+@@ -454,5 +454,26 @@ int main(int argc, char *argv[])
+ 		raw_pdu(0x09, 0x07, 0x07, 0x00, 0x06, 0x08, 0x00,
+ 			0x4e, 0x2a));
+ 
++	define_test("/TP/HGRF/HH/BV-18-I", test_hog,
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
++		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x12,
++			0x18, 0x05, 0x00, 0x08, 0x00, 0x12, 0x18),
++		raw_pdu(0x10, 0x09, 0x00, 0xff, 0xff, 0x00, 0x28),
++		raw_pdu(0x01, 0x10, 0x09, 0x00, 0x0a),
++		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),
++		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x06, 0x04, 0x00,
++			0x4e, 0x2a),
++		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),
++		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
++		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x02, 0x28),
++		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),
++		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x03, 0x28),
++		raw_pdu(0x09, 0x07, 0x07, 0x00, 0x06, 0x08, 0x00,
++			0x4e, 0x2a),
++		raw_pdu(0x0a, 0x04, 0x00),
++		raw_pdu(0x0b, 0x01),
++		raw_pdu(0x0a, 0x08, 0x00),
++		raw_pdu(0x0b, 0x01));
++
+ 	return tester_run();
+ }
+-- 
+1.9.1
 
-	I see two solutions for the issue:
-
-1. Add a new method to GattCharacteristic1 called "WriteValuePartial" with a single buffer argument, so that len(buffer)==0 denotes that all chunks have been written and service can assemble the whole buffer for further processing. Or the existing "WriteValue" method can be extended with a parameter like op_type = ["Single", "Partial", "End"]. I'm not a BlueZ design expert, but IMO this approach stinks a bit... D-Bus level API should be simple. I doubt that external service should have an burden related to ATT MTU fragmentation.
-
-2. Add some logic to BlueZ daemon so that "WriteValue" is always executed with fully assembled data from multiple PrepareWrite ops. Such approach will not require any D-Bus API changes, which is good. The problem is that I personally don't see a clean and easy way how to implement it in the code. Attributes are written using gatt_db_attribute_write() which has ATT opcode and write offset, but this info is not enough to understand when the last chunk of an attribute value is being written to complete the operation in a single step. In case of external chrc, the gatt_db_attribute::write_func equals to chrc_write_cb() which immediately sends D-Bus calls to "WriteValue", thats it doing the "chunking". If there would be a possibility to tell when the call to gatt_db_attribute::write_func is for the last chunk of data, then chrc_write_cb() could do the assembly and invoke "WriteValue" only once. The task can be accomplished by adding an additional argument to gatt_db_write_t functor definit
-ion telling that write is chunked and if the chunk is last or not. Not sure, does it look like a "brutal hack" or not for BlueZ gurus :)
-
-Maybe someone with better BlueZ design knowledge can suggest how the 2-nd solution can be implemented or maybe propose something completely different.
-
-BR, Andrey
