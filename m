@@ -2,173 +2,207 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v5 3/6] Bluetooth: Add simultaneous dual mode scan
-Date: Mon, 16 Mar 2015 21:19:30 -0700
-Message-Id: <1426565973-27545-3-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v5 2/6] Bluetooth: Refactor BR/EDR inquiry and LE scan triggering.
+Date: Mon, 16 Mar 2015 21:19:29 -0700
+Message-Id: <1426565973-27545-2-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1426565973-27545-1-git-send-email-jpawlowski@google.com>
 References: <1426565973-27545-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When doing scan through mgmt api, some controllers can do both le and
-classic scan at same time. They can be distinguished by
-HCI_QUIRK_SIMULTANEOUS_DISCOVERY set.
-
-This patch enables them to use this feature when doing dual mode scan.
-Instead of doing le, then classic scan, both scans are run at once.
+This patch refactor BR/EDR inquiry and LE scan triggering logic into
+separate methods.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- net/bluetooth/hci_core.c  | 24 +++++++++++++++++++-----
- net/bluetooth/hci_event.c | 22 ++++++++++++++++++++--
- net/bluetooth/mgmt.c      | 36 ++++++++++++++++++++++++++++++++----
- 3 files changed, 71 insertions(+), 11 deletions(-)
+ net/bluetooth/mgmt.c | 152 +++++++++++++++++++++++++++++----------------------
+ 1 file changed, 87 insertions(+), 65 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 750d344..773f216 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2902,12 +2902,26 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
- 
- 		hci_dev_lock(hdev);
- 
--		hci_inquiry_cache_flush(hdev);
-+		if (test_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY,
-+			     &hdev->quirks)) {
-+			/* If we were running LE only scan, change discovery
-+			 * state. If we were running both LE and BR/EDR inquiry
-+			 * simultaneously, and BR/EDR inquiry is already
-+			 * finished, stop discovery, otherwise BR/EDR inquiry
-+			 * will stop discovery when finished.
-+			 */
-+			if (!test_bit(HCI_INQUIRY, &hdev->flags))
-+				hci_discovery_set_state(hdev,
-+							DISCOVERY_STOPPED);
-+		} else {
-+			hci_inquiry_cache_flush(hdev);
- 
--		err = hci_req_run(&req, inquiry_complete);
--		if (err) {
--			BT_ERR("Inquiry request failed: err %d", err);
--			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+			err = hci_req_run(&req, inquiry_complete);
-+			if (err) {
-+				BT_ERR("Inquiry request failed: err %d", err);
-+				hci_discovery_set_state(hdev,
-+							DISCOVERY_STOPPED);
-+			}
- 		}
- 
- 		hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d800f0c..62f92a5 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2126,7 +2126,16 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		goto unlock;
- 
- 	if (list_empty(&discov->resolve)) {
--		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+		/* When BR/EDR inquiry is active and no LE scanning is in
-+		 * progress, then change discovery state to indicate completion.
-+		 *
-+		 * When running LE scanning and BR/EDR inquiry simultaneously
-+		 * and the LE scan already finished, then change the discovery
-+		 * state to indicate completion.
-+		 */
-+		if (!hci_dev_test_flag(hdev, HCI_LE_SCAN) ||
-+		    !test_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks))
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 		goto unlock;
- 	}
- 
-@@ -2135,7 +2144,16 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		e->name_state = NAME_PENDING;
- 		hci_discovery_set_state(hdev, DISCOVERY_RESOLVING);
- 	} else {
--		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+		/* When BR/EDR inquiry is active and no LE scanning is in
-+		 * progress, then change discovery state to indicate completion.
-+		 *
-+		 * When running LE scanning and BR/EDR inquiry simultaneously
-+		 * and the LE scan already finished, then change the discovery
-+		 * state to indicate completion.
-+		 */
-+		if (!hci_dev_test_flag(hdev, HCI_LE_SCAN) ||
-+		    !test_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks))
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 	}
- 
- unlock:
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 84234b4..5257347 100644
+index 32c2c75..84234b4 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1400,9 +1400,10 @@ static bool hci_stop_discovery(struct hci_request *req)
+@@ -3913,93 +3913,115 @@ done:
+ 	return err;
+ }
  
- 	switch (hdev->discovery.state) {
- 	case DISCOVERY_FINDING:
--		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
-+		if (test_bit(HCI_INQUIRY, &hdev->flags))
- 			hci_req_add(req, HCI_OP_INQUIRY_CANCEL, 0, NULL);
--		} else {
+-static bool trigger_discovery(struct hci_request *req, u8 *status)
++static bool trigger_bredr_inquiry(struct hci_request *req, u8 *status)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+-	struct hci_cp_le_set_scan_param param_cp;
+-	struct hci_cp_le_set_scan_enable enable_cp;
+-	struct hci_cp_inquiry inq_cp;
++	struct hci_cp_inquiry cp;
+ 	/* General inquiry access code (GIAC) */
+ 	u8 lap[3] = { 0x33, 0x8b, 0x9e };
 +
-+		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
- 			cancel_delayed_work(&hdev->le_scan_disable);
- 			hci_req_add_le_scan_disable(req);
- 		}
-@@ -4012,6 +4013,23 @@ static bool trigger_discovery(struct hci_request *req, u8 *status)
- 		break;
++	*status = mgmt_bredr_support(hdev);
++	if (*status)
++		return false;
++
++	if (hci_dev_test_flag(hdev, HCI_INQUIRY)) {
++		*status = MGMT_STATUS_BUSY;
++		return false;
++	}
++
++	hci_inquiry_cache_flush(hdev);
++
++	memset(&cp, 0, sizeof(cp));
++	memcpy(&cp.lap, lap, sizeof(cp.lap));
++	cp.length = DISCOV_BREDR_INQUIRY_LEN;
++
++	hci_req_add(req, HCI_OP_INQUIRY, sizeof(cp), &cp);
++
++	return true;
++}
++
++static bool trigger_le_scan(struct hci_request *req, __le16 interval,
++			    u8 *status)
++{
++	struct hci_dev *hdev = req->hdev;
++	struct hci_cp_le_set_scan_param param_cp;
++	struct hci_cp_le_set_scan_enable enable_cp;
+ 	u8 own_addr_type;
+ 	int err;
  
- 	case DISCOV_TYPE_INTERLEAVED:
-+		if (test_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY,
-+			     &hdev->quirks)) {
-+			/* During simultaneous discovery, we double LE scan
-+			 * interval. We must leave some time for the controller
-+			 * to do BR/EDR inquiry.
-+			 */
-+			if (!trigger_le_scan(req,
-+					     cpu_to_le16(DISCOV_LE_SCAN_INT * 2),
-+					     status))
-+				return false;
-+
-+			if (!trigger_bredr_inquiry(req, status))
-+				return false;
-+
-+			return true;
-+		}
-+
- 		if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED)) {
- 			*status = MGMT_STATUS_NOT_SUPPORTED;
- 			return false;
-@@ -4021,7 +4039,6 @@ static bool trigger_discovery(struct hci_request *req, u8 *status)
- 	case DISCOV_TYPE_LE:
- 		if (!trigger_le_scan(req, cpu_to_le16(DISCOV_LE_SCAN_INT),
- 				     status))
+-	switch (hdev->discovery.type) {
+-	case DISCOV_TYPE_BREDR:
+-		*status = mgmt_bredr_support(hdev);
+-		if (*status)
 -			return false;
++	*status = mgmt_le_support(hdev);
++	if (*status)
++		return false;
+ 
+-		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
+-			*status = MGMT_STATUS_BUSY;
++	if (hci_dev_test_flag(hdev, HCI_LE_ADV)) {
++		/* Don't let discovery abort an outgoing connection attempt
++		 * that's using directed advertising.
++		 */
++		if (hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT)) {
++			*status = MGMT_STATUS_REJECTED;
+ 			return false;
+ 		}
+ 
+-		hci_inquiry_cache_flush(hdev);
++		disable_advertising(req);
++	}
+ 
+-		memset(&inq_cp, 0, sizeof(inq_cp));
+-		memcpy(&inq_cp.lap, lap, sizeof(inq_cp.lap));
+-		inq_cp.length = DISCOV_BREDR_INQUIRY_LEN;
+-		hci_req_add(req, HCI_OP_INQUIRY, sizeof(inq_cp), &inq_cp);
+-		break;
++	/* If controller is scanning, it means the background scanning is
++	 * running. Thus, we should temporarily stop it in order to set the
++	 * discovery scanning parameters.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
++		hci_req_add_le_scan_disable(req);
+ 
+-	case DISCOV_TYPE_LE:
+-	case DISCOV_TYPE_INTERLEAVED:
+-		*status = mgmt_le_support(hdev);
+-		if (*status)
+-			return false;
++	/* All active scans will be done with either a resolvable private
++	 * address (when privacy feature has been enabled) or non-resolvable
++	 * private address.
++	 */
++	err = hci_update_random_address(req, true, &own_addr_type);
++	if (err < 0) {
++		*status = MGMT_STATUS_FAILED;
++		return false;
++	}
+ 
+-		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
+-		    !hci_dev_test_flag(hdev, HCI_BREDR_ENABLED)) {
+-			*status = MGMT_STATUS_NOT_SUPPORTED;
+-			return false;
+-		}
++	memset(&param_cp, 0, sizeof(param_cp));
++	param_cp.type = LE_SCAN_ACTIVE;
++	param_cp.interval = interval;
++	param_cp.window = cpu_to_le16(DISCOV_LE_SCAN_WIN);
++	param_cp.own_address_type = own_addr_type;
+ 
+-		if (hci_dev_test_flag(hdev, HCI_LE_ADV)) {
+-			/* Don't let discovery abort an outgoing
+-			 * connection attempt that's using directed
+-			 * advertising.
+-			 */
+-			if (hci_conn_hash_lookup_state(hdev, LE_LINK,
+-						       BT_CONNECT)) {
+-				*status = MGMT_STATUS_REJECTED;
+-				return false;
+-			}
++	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
++		    &param_cp);
+ 
+-			disable_advertising(req);
+-		}
++	memset(&enable_cp, 0, sizeof(enable_cp));
++	enable_cp.enable = LE_SCAN_ENABLE;
++	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
+ 
+-		/* If controller is scanning, it means the background scanning
+-		 * is running. Thus, we should temporarily stop it in order to
+-		 * set the discovery scanning parameters.
+-		 */
+-		if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
+-			hci_req_add_le_scan_disable(req);
++	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
++		    &enable_cp);
++
++	return true;
++}
+ 
+-		memset(&param_cp, 0, sizeof(param_cp));
++static bool trigger_discovery(struct hci_request *req, u8 *status)
++{
++	struct hci_dev *hdev = req->hdev;
+ 
+-		/* All active scans will be done with either a resolvable
+-		 * private address (when privacy feature has been enabled)
+-		 * or non-resolvable private address.
+-		 */
+-		err = hci_update_random_address(req, true, &own_addr_type);
+-		if (err < 0) {
+-			*status = MGMT_STATUS_FAILED;
++	switch (hdev->discovery.type) {
++	case DISCOV_TYPE_BREDR:
++		if (!trigger_bredr_inquiry(req, status))
++			return false;
++		break;
++
++	case DISCOV_TYPE_INTERLEAVED:
++		if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED)) {
++			*status = MGMT_STATUS_NOT_SUPPORTED;
+ 			return false;
+ 		}
++		/* fall through */
+ 
+-		param_cp.type = LE_SCAN_ACTIVE;
+-		param_cp.interval = cpu_to_le16(DISCOV_LE_SCAN_INT);
+-		param_cp.window = cpu_to_le16(DISCOV_LE_SCAN_WIN);
+-		param_cp.own_address_type = own_addr_type;
+-		hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
+-			    &param_cp);
+-
+-		memset(&enable_cp, 0, sizeof(enable_cp));
+-		enable_cp.enable = LE_SCAN_ENABLE;
+-		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
+-		hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+-			    &enable_cp);
++	case DISCOV_TYPE_LE:
++		if (!trigger_le_scan(req, cpu_to_le16(DISCOV_LE_SCAN_INT),
++				     status))
++			return false;
  		break;
  
  	default:
-@@ -4066,7 +4083,18 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status,
- 		timeout = msecs_to_jiffies(DISCOV_LE_TIMEOUT);
- 		break;
- 	case DISCOV_TYPE_INTERLEAVED:
--		timeout = msecs_to_jiffies(hdev->discov_interleaved_timeout);
-+		 /* When running simultaneous discovery, the LE scanning time
-+		 * should occupy the whole discovery time sine BR/EDR inquiry
-+		 * and LE scanning are scheduled by the controller.
-+		 *
-+		 * For interleaving discovery in comparison, BR/EDR inquiry
-+		 * and LE scanning are done sequentially with separate
-+		 * timeouts.
-+		 */
-+		if (test_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks))
-+			timeout = msecs_to_jiffies(DISCOV_LE_TIMEOUT);
-+		else
-+			timeout = msecs_to_jiffies(hdev->discov_interleaved_timeout);
- 		break;
- 	case DISCOV_TYPE_BREDR:
- 		timeout = 0;
 -- 
 2.2.0.rc0.207.ga3a616c
 
