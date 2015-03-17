@@ -2,74 +2,89 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v2 11/14] advertising-manager: Parse SolicitUUIDs
-Date: Tue, 17 Mar 2015 16:49:58 -0700
-Message-Id: <1426636201-30057-12-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v2 12/14] advertising-manager: Parse ManufacturerSpecificData
+Date: Tue, 17 Mar 2015 16:49:59 -0700
+Message-Id: <1426636201-30057-13-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1426636201-30057-1-git-send-email-jamuraa@chromium.org>
 References: <1426636201-30057-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the SolicitUUIDs property of the LEAdvertisement1 object.
+Parse the ManufacturerSpecificData property of the LEAdvertisement1
 ---
- src/advertising-manager.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ src/advertising-manager.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
 diff --git a/src/advertising-manager.c b/src/advertising-manager.c
-index c470df1..993ab4b 100644
+index 993ab4b..eaa8d3d 100644
 --- a/src/advertising-manager.c
 +++ b/src/advertising-manager.c
-@@ -180,6 +180,44 @@ fail:
+@@ -218,6 +218,58 @@ fail:
  	return false;
  }
  
-+static bool parse_advertising_solicit_uuids(GDBusProxy *proxy,
-+					struct advertising_data *data)
++static bool parse_advertising_manufacturer_data(GDBusProxy *proxy,
++						struct advertising_data *data)
 +{
-+	DBusMessageIter iter, ariter;
++	DBusMessageIter iter, entries;
 +
-+	if (!g_dbus_proxy_get_property(proxy, "SolicitUUIDs", &iter))
++	if (!g_dbus_proxy_get_property(proxy, "ManufacturerSpecificData",
++									&iter))
 +		return true;
 +
 +	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
 +		return false;
 +
-+	dbus_message_iter_recurse(&iter, &ariter);
++	dbus_message_iter_recurse(&iter, &entries);
 +
-+	advertising_data_clear_solicit_uuid(data);
++	advertising_data_clear_manufacturer_data(data);
 +
-+	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
-+		const char *uuid_str;
-+		bt_uuid_t uuid;
++	while (dbus_message_iter_get_arg_type(&entries)
++						== DBUS_TYPE_DICT_ENTRY) {
++		DBusMessageIter value, entry;
++		uint16_t manuf_id;
++		uint8_t *manuf_data;
++		int len;
 +
-+		dbus_message_iter_get_basic(&ariter, &uuid_str);
++		dbus_message_iter_recurse(&entries, &entry);
++		dbus_message_iter_get_basic(&entry, &manuf_id);
 +
-+		DBG("Adding SolicitUUID: %s", uuid_str);
-+
-+		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
++		dbus_message_iter_next(&entry);
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_ARRAY)
 +			goto fail;
 +
-+		advertising_data_add_solicit_uuid(data, &uuid);
++		dbus_message_iter_recurse(&entry, &value);
 +
-+		dbus_message_iter_next(&ariter);
++		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_BYTE)
++			goto fail;
++
++		dbus_message_iter_get_fixed_array(&value, &manuf_data, &len);
++
++		DBG("Adding ManufactuerSpecificData for %04x", manuf_id);
++
++		advertising_data_add_manufacturer_data(data, manuf_id,
++							manuf_data, len);
++
++		dbus_message_iter_next(&entries);
 +	}
 +
 +	return true;
 +
 +fail:
-+	advertising_data_clear_solicit_uuid(data);
++	advertising_data_clear_manufacturer_data(data);
 +	return false;
 +}
 +
  static void refresh_advertisement(struct advertisement *ad)
  {
  	DBG("Refreshing advertisement: %s", ad->path);
-@@ -200,6 +238,11 @@ static bool parse_advertisement(struct advertisement *ad)
+@@ -243,6 +295,12 @@ static bool parse_advertisement(struct advertisement *ad)
  		return false;
  	}
  
-+	if (!parse_advertising_solicit_uuids(ad->proxy, ad->data)) {
-+		error("Property \"SolicitUUIDs\" failed to parse correctly");
++	if (!parse_advertising_manufacturer_data(ad->proxy, ad->data)) {
++		error("Property \"ManufactuerSpecificData\" failed to parse"
++								" correctly");
 +		return false;
 +	}
 +
