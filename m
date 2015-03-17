@@ -1,32 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Fix minor whitespace issue in QCA ROME device entries
-Date: Mon, 16 Mar 2015 23:56:04 -0700
-Message-Id: <1426575364-8673-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 17 Mar 2015 08:20:55 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix length for Read Local OOB Extended Data
+ respone packet
+Message-ID: <20150317062055.GB21460@t440s.P-661HNU-F1>
+References: <1426547144-1935-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1426547144-1935-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btusb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Marcel,
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6fa9338745cf..f6ef75f4d7cc 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -215,8 +215,8 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe03c), .driver_info = BTUSB_ATH3012 },
- 
- 	/* QCA ROME chipset */
--	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME},
--	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME},
-+	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
-+	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
- 
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
--- 
-2.1.0
+On Mon, Mar 16, 2015, Marcel Holtmann wrote:
+> The length of the respone packet for Read Local OOB Extended Data
+> command has a calculation error. In case LE Secure Connections support
+> is not enabled, the actual response is shorter. Keep this in mind and
+> update the value accordingly.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/mgmt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
+Applied to bluetooth-next. Thanks.
+
+Johan
