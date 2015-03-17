@@ -1,46 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 1/2] unit/test-hog: Add TC/HGDC/HH/BV-08-I test
-Date: Tue, 17 Mar 2015 12:18:11 +0100
-Message-Id: <1426591092-19666-1-git-send-email-mariusz.skamra@tieto.com>
+Message-ID: <BAY176-W679B1127159C091585D3AD3030@phx.gbl>
+From: Ssagarr Patil <hugarsagar@outlook.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: bluez5 pairing devices
+Date: Tue, 17 Mar 2015 16:18:07 +0530
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that all Protocol Mode characteristics can be discovered
-by a HID Host IUT.
----
- unit/test-hog.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+Hi Folks,
 
-diff --git a/unit/test-hog.c b/unit/test-hog.c
-index 2a25d09..c6107ee 100644
---- a/unit/test-hog.c
-+++ b/unit/test-hog.c
-@@ -437,5 +437,22 @@ int main(int argc, char *argv[])
- 		raw_pdu(0x0a, 0x0a, 0x00),
- 		raw_pdu(0x0b, 0x19, 0x2a));
- 
-+	define_test("/TP/HGDC/HH/BV-08-I", test_hog,
-+		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),
-+		raw_pdu(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x12,
-+			0x18, 0x05, 0x00, 0x08, 0x00, 0x12, 0x18),
-+		raw_pdu(0x10, 0x09, 0x00, 0xff, 0xff, 0x00, 0x28),
-+		raw_pdu(0x01, 0x10, 0x09, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),
-+		raw_pdu(0x09, 0x07, 0x03, 0x00, 0x06, 0x04, 0x00,
-+			0x4e, 0x2a),
-+		raw_pdu(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28),
-+		raw_pdu(0x01, 0x08, 0x01, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x02, 0x28),
-+		raw_pdu(0x01, 0x08, 0x05, 0x00, 0x0a),
-+		raw_pdu(0x08, 0x05, 0x00, 0x08, 0x00, 0x03, 0x28),
-+		raw_pdu(0x09, 0x07, 0x07, 0x00, 0x06, 0x08, 0x00,
-+			0x4e, 0x2a));
-+
- 	return tester_run();
- }
--- 
-1.9.1
+I am very new to bluetooth, so sorry for a novice query.
 
+1: I am using 2.6.37 Linux kernel, can bluez5 stack be used on this or should I use bluez4 ?
+2: With bluez5 I am able to scan devices and also see the device on other device but I am not able to pair them 
+    Is there some sort of deamon required to pair them ?
+
+Regards,
+--Sagar
+
+ 		 	   		  
