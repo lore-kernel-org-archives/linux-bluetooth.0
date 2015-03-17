@@ -1,58 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1426583744-10750-1-git-send-email-hychao@chromium.org>
-References: <1426583744-10750-1-git-send-email-hychao@chromium.org>
-Date: Tue, 17 Mar 2015 17:47:16 +0200
-Message-ID: <CABBYNZKc3fsrp1bga5dYALr-FAhJjBFKqQydSefsN5U1KWFY0A@mail.gmail.com>
-Subject: Re: [PATCH] audio/avdtp: Fix crash at NULL cb of discover_callback
+In-Reply-To: <1426583595-28502-1-git-send-email-luiz.dentz@gmail.com>
+References: <1426583595-28502-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 17 Mar 2015 17:46:59 +0200
+Message-ID: <CABBYNZKX4X0r432Q-V1uFYGqZxgOL+Y=nNKi8ReC01O+9K0s_Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/4] core/device: Fix btd_device_set_temporary
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Hsin-Yu Chao <hychao@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Arman Uguray <armansito@chromium.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Tue, Mar 17, 2015 at 11:15 AM, Hsin-Yu Chao <hychao@chromium.org> wrote:
-> This fixes a crash with below trace that a discover_callback
-> object has a NULL cb function pointer being triggered, which
-> may due to an error happened in avdtp_discover() and left it
-> unset.
+On Tue, Mar 17, 2015 at 11:13 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> 0x00000000 in ?? ()
-> 0xb6f5606e in finalize_discovery (err=22, session=0xb7514a00)
->   at profiles/audio/avdtp.c:1043
-> connection_lost (session=session@entry=0xb7514a00, err=err@entry=22)
->   at profiles/audio/avdtp.c:1143
-> 0xb6f57cf6 in avdtp_connect_cb (chan=<optimized out>, err=0xb7514410,
->   user_data=0xb7514a00) at profiles/audio/avdtp.c:2373
-> 0xb6f723e4 in accept_cb (io=0xb7516a10, cond=<optimized out>,
->   user_data=0xb7516b48) at btio/btio.c:203
-> 0xb6e6cf10 in ?? ()
+> In case the device is set as not temporary it should trigger
+> store_device_info but the function checks if temporary flag is set but
+> since currently the code only set the flag after the call nothing really
+> happens.
 > ---
->  profiles/audio/avdtp.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  src/device.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
 >
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 4be2d25..f38188f 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -1033,7 +1033,8 @@ static void finalize_discovery(struct avdtp *session, int err)
->         if (discover->id > 0)
->                 g_source_remove(discover->id);
+> diff --git a/src/device.c b/src/device.c
+> index 97c0523..6100341 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -4474,17 +4474,19 @@ void btd_device_set_temporary(struct btd_device *device, gboolean temporary)
 >
-> -       discover->cb(session, session->seps, err ? &avdtp_err : NULL,
-> +       if (discover->cb)
-> +               discover->cb(session, session->seps, err ? &avdtp_err : NULL,
->                                                         discover->user_data);
->         g_free(discover);
->         session->discover = NULL;
+>         DBG("temporary %d", temporary);
+>
+> +       device->temporary = temporary;
+> +
+>         if (temporary) {
+>                 if (device->bredr)
+>                         adapter_whitelist_remove(device->adapter, device);
+>                 adapter_connect_list_remove(device->adapter, device);
+> -       } else {
+> -               if (device->bredr)
+> -                       adapter_whitelist_add(device->adapter, device);
+> -               store_device_info(device);
+> +               return;
+>         }
+>
+> -       device->temporary = temporary;
+> +       if (device->bredr)
+> +               adapter_whitelist_add(device->adapter, device);
+> +
+> +       store_device_info(device);
+>  }
+>
+>  void btd_device_set_trusted(struct btd_device *device, gboolean trusted)
 > --
-> 2.2.0.rc0.207.ga3a616c
+> 2.1.0
 
-Applied, thanks.
+Applied.
 
 
 -- 
