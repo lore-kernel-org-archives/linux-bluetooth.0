@@ -1,37 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY176-W3225225E7B048E9761125FD3030@phx.gbl>
-From: Ssagarr Patil <hugarsagar@outlook.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: bluez5 pairing devices
-Date: Tue, 17 Mar 2015 21:35:20 +0530
-In-Reply-To: <94A95B77-D50A-4B0E-9038-424B14DFF965@holtmann.org>
-References: 
- <BAY176-W679B1127159C091585D3AD3030@phx.gbl>,<94A95B77-D50A-4B0E-9038-424B14DFF965@holtmann.org>
-Content-Type: text/plain; charset="iso-8859-1"
+Message-ID: <55085091.5030202@ubnt.com>
+Date: Tue, 17 Mar 2015 18:04:33 +0200
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
 MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Arman Uguray <armansito@chromium.org>
+Subject: Re: core/gatt-db: Long writes into external GATT characteristics
+ issue
+References: <55080DF0.8020103@ubnt.com> <CABBYNZ+EysOFUSZ12RGw-4gUOF+Yj6XyoXpQ=CX=uShn6Wur=Q@mail.gmail.com>
+In-Reply-To: <CABBYNZ+EysOFUSZ12RGw-4gUOF+Yj6XyoXpQ=CX=uShn6Wur=Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel=2C=0A=
-=0A=
-Thanks for the response.=0A=
-=0A=
->> I am very new to bluetooth=2C so sorry for a novice query.=0A=
->>=0A=
->> 1: I am using 2.6.37 Linux kernel=2C can bluez5 stack be used on this or=
- should I use bluez4 ?=0A=
->> 2: With bluez5 I am able to scan devices and also see the device on othe=
-r device but I am not able to pair them=0A=
->> Is there some sort of deamon required to pair them ?=0A=
->=0A=
-> BlueZ 5 requires a Bluetooth subsystem with management API support. So at=
- least kernel 3.4 or you have to use Linux backports to at least bring the =
-Bluetooth subsystem to your 2.6.37 kernel. And I have heard of success from=
- people doing that=2C but I have not personally done that.=0A=
->=0A=
-Probably that would take me more time in back porting. In case of 2.6.37 wh=
-at version of bluez4 would be best ?=0A=
-=0A=
-Regards=2C=0A=
-Sagar=0A=
- 		 	   		  =
+Hi Luiz,
+
+On 2015.03.17. 17:15, Luiz Augusto von Dentz wrote:
+> Hi Andrejs,
+> 
+> On Tue, Mar 17, 2015 at 1:20 PM, Andrejs Hanins 
+> <andrejs.hanins@ubnt.com> wrote:
+>> Hi,
+>> 
+>> To begin with, there is an issue with long reading/writing of 
+>> external GATT characteristics registered via GattManager1. Related 
+>> ATT ops are ReadBlob, PrepareWrite, ExecuteWrite etc. Reading issue
+>> is easily fixed in a patch I sent yesterday. But the write case is
+>> more tricky. Currently, long write into external chrc (D-Bus method
+>> "WriteValue") is executed in a "chunked" fashion. Thats is, each
+>> ATT PrepareWrite op eventually causes an invocation of "WriteValue"
+>> with appropriate buffer (see exec_next_prep_write()). I see no easy
+>> way for external D-Bus GATT service to distinguish between full and
+>> partial writes, so no way to tell when the chrc is fully written.
+>> 
+>> I see two solutions for the issue:
+>> 
+>> 1. Add a new method to GattCharacteristic1 called 
+>> "WriteValuePartial" with a single buffer argument, so that 
+>> len(buffer)==0 denotes that all chunks have been written and 
+>> service can assemble the whole buffer for further processing. Or 
+>> the existing "WriteValue" method can be extended with a parameter 
+>> like op_type = ["Single", "Partial", "End"]. I'm not a BlueZ
+>> design expert, but IMO this approach stinks a bit... D-Bus level
+>> API should be simple. I doubt that external service should have an
+>>  burden related to ATT MTU fragmentation.
+>> 
+>> 2. Add some logic to BlueZ daemon so that "WriteValue" is always 
+>> executed with fully assembled data from multiple PrepareWrite ops. 
+>> Such approach will not require any D-Bus API changes, which is 
+>> good. The problem is that I personally don't see a clean and easy 
+>> way how to implement it in the code. Attributes are written using 
+>> gatt_db_attribute_write() which has ATT opcode and write offset, 
+>> but this info is not enough to understand when the last chunk of
+>> an attribute value is being written to complete the operation in a
+>>  single step. In case of external chrc, the 
+>> gatt_db_attribute::write_func equals to chrc_write_cb() which 
+>> immediately sends D-Bus calls to "WriteValue", thats it doing the 
+>> "chunking". If there would be a possibility to tell when the call 
+>> to gatt_db_attribute::write_func is for the last chunk of data, 
+>> then chrc_write_cb() could do the assembly and invoke "WriteValue" 
+>> only once. The task can be accomplished by adding an additional 
+>> argument to gatt_db_write_t functor definit ion telling that write 
+>> is chunked and if the chunk is last or not. Not sure, does it look 
+>> like a "brutal hack" or not for BlueZ gurus :)
+> 
+> I guess what we should do is to queue the prepare writes and wait 
+> execute to actually do the write in gatt_db,
+
+This is exactly what is happening now. ExecuteWrite triggers all queued chunks to be written one by one into gatt_db, but not each PrepareWrite. PrepareWrite does only queuing.
+
+> I would probably leave this to bt_gatt_server since it should be 
+> doing permission checking, etc, it could handle the prepare queue. 
+
+It looks wrong to me, because the API to write into gatt_db (gatt_db_attribute_write()) is supposed to carry the knowledge about partial writes based on the 'offset' argument. There will be no reason to have 'offset' argument if bt_gatt_server would always squash all 'prepare write' chunks into one.
+
+> Anyway, anything that write on prepare is probably wrong since with 
+> prepare there is the possibility to cancel the queue so we should 
+> never call WriteValue in the first place.
+
+As said, it is already like this.
+
+> 
+>> Maybe someone with better BlueZ design knowledge can suggest how 
+>> the 2-nd solution can be implemented or maybe propose something 
+>> completely different.
+>> 
+>> BR, Andrey -- To unsubscribe from this list: send the line 
+>> "unsubscribe linux-bluetooth" in the body of a message to 
+>> majordomo@vger.kernel.org More majordomo info at 
+>> http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
