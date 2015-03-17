@@ -1,139 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <55082D38.4020306@ubnt.com>
-References: <54F752D8.1000605@ubnt.com>
-	<CAHrH25RVKCL9RQCeFBJAsUsNV1umOR92VWV1JQgkwy-RNh-GAg@mail.gmail.com>
-	<CAN_7+Yagp-R+H+nhCtmdqWyAJm4jO_VsB5c343A=39zurwqpPw@mail.gmail.com>
-	<007858C7-D538-407D-8212-D3B0CB880165@ubnt.com>
-	<CABBYNZLKfh7xPufAMfjG6P--Q-NkOVq4oYUdXEpqc5WsvQpu2g@mail.gmail.com>
-	<CABBYNZLHtCJCoUp_4miapZJOReh=FP4_sJVFkyh5uE+NHV2x=A@mail.gmail.com>
-	<5506D8AB.1040903@ubnt.com>
-	<5506E0A6.1080709@ubnt.com>
-	<CABBYNZKg1gMsoZyD4mHiZDiGkvFuzAcTPGauFTaLRr0V7ntkbg@mail.gmail.com>
-	<5506E715.3000709@ubnt.com>
-	<CABBYNZJK7SVUbThK_wfVFa2NvxK5NiFJ4HRA-FK3Pmo9+peYZw@mail.gmail.com>
-	<55082D38.4020306@ubnt.com>
-Date: Tue, 17 Mar 2015 17:01:49 +0200
-Message-ID: <CABBYNZLuPyZ3O3Awv_Dsi3fUXzFtwvN7_Tsy4u_C293E2h5TgA@mail.gmail.com>
-Subject: Re: Non-consecutive handle values in GATT
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrejs Hanins <andrejs.hanins@ubnt.com>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
-	Arman Uguray <armansito@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Marcin Kraglak <marcin.kraglak@tieto.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH] android/hog: Remove read Protocol Mode characteristic
+Date: Tue, 17 Mar 2015 15:57:44 +0100
+Message-Id: <1426604264-791-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrejs,
+We can faster set up a connection with HOG device if we won't
+read Protocol Mode characteristic. According to HOGP specification:
+"There is no requirements on Report Host to use the Protocol Mode
+characteristic" ... "The Report Host may discover the Protocol Mode
+characteristic for each HID Service on the GATT server."
+It is used mainly by Boot Host to set the value to Boot
+Protocol mode.
+According to HID specification "Report protocol is the default
+mode for all HID devices" so every HID device shall operate in
+report protocol mode by default.
+---
+ android/hog.c | 51 ++-------------------------------------------------
+ 1 file changed, 2 insertions(+), 49 deletions(-)
 
-On Tue, Mar 17, 2015 at 3:33 PM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
-> Hi Luiz,
->
-> On 2015.03.17. 15:07, Luiz Augusto von Dentz wrote:
->> Hi Andrejs,
->>
->>
->>>>>> ACL data: handle 64 flags 0x02 dlen 20
->>>>>     ATT: Read By Type resp (0x09)
->>>>>       length: 7
->>>>>         handle 0x0110, value 0x02 0x11 0x01 0x00 0x2a
->>>>>         handle 0x0120, value 0x02 0x21 0x01 0x01 0x2a
->>>>> < ACL data: handle 64 flags 0x00 dlen 11
->>>>>     ATT: Read By Type req (0x08)
->>>>>       start 0x0121, end 0x0121
->>>>>       type-uuid 0x2803      <--- as without patch, this seems to be suspicious. Single att read request with wrong UUID.
->>>>
->>>> Maybe this is off by 1 error except if start 0x0100, end 0x0121 range
->>>> actually exclude the last, but it would be still wrong the start
->>>> 0x0121, end 0x0121, anyway this seems to be some other problem.
->>
->> Actually this is fine, we are discovering the characteristics since
->> they may not fit in a single frame we just continue from where we stop
->> at 0x0121 until the end of the service range with just happen to be
->> 0x0121.
->>
->>>>
->>>>>
->>>>>
->>>>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>>>     handle 64 packets 2
->>>>>> ACL data: handle 64 flags 0x02 dlen 9
->>>>>     ATT: Error (0x01)
->>>>>       Error: Attribute not found (10)
->>>>>       Read By Type req (0x08) on handle 0x0121
->>>>> < ACL data: handle 64 flags 0x00 dlen 9
->>>>>     ATT: Find Information req (0x04)
->>>>>       start 0x0112, end 0x011f
->>>>>> ACL data: handle 64 flags 0x02 dlen 9
->>>>>     ATT: Error (0x01)
->>>>>       Error: Attribute not found (10)
->>>>>       Find Information req (0x04) on handle 0x0112
->>>>> < ACL data: handle 64 flags 0x00 dlen 11
->>>>>     ATT: Read By Type req (0x08)
->>>>>       start 0x0300, end 0x0320
->>>>>       type-uuid 0x2803
->>>>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>>>     handle 64 packets 1
->>>>>> ACL data: handle 64 flags 0x02 dlen 27
->>>>>     ATT: Read By Type resp (0x09)
->>>>>       length: 21
->>>>>         handle 0x0310, value 0x3e 0x11 0x03 0x34 0x5b 0xe2 0x12 0x5e 0xb1 0x45 0x03 0xb6 0x29 0x24 0x55 0x8a 0x11 0x1e 0x36
->>>>> < ACL data: handle 64 flags 0x00 dlen 11
->>>>>     ATT: Read By Type req (0x08)
->>>>>       start 0x0311, end 0x0320
->>>>>       type-uuid 0x2803
->>>>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>>>     handle 64 packets 2
->>>>>> ACL data: handle 64 flags 0x02 dlen 9
->>>>>     ATT: Error (0x01)
->>>>>       Error: Attribute not found (10)
->>>>>       Read By Type req (0x08) on handle 0x0311
->>>>
->>>> Can you collect the trace in binary format, e.g. btmon -w <file>, I
->>>> can perhaps try to create the very same database for unit tests, also
->>>> it would be good to have bluetoothd traces.
->>> Traces attached.
->>
->> Can you please enable bt_gatt_client debug with the following patch:
->>
->> diff --git a/src/device.c b/src/device.c
->> index aaa9f43..6a23adc 100644
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -3989,6 +3989,11 @@ static void
->> gatt_client_service_changed(uint16_t start_handle,
->>         DBG("start 0x%04x, end: 0x%04x", start_handle, end_handle);
->>  }
->>
->> +static void gatt_debug(const char *str, void *user_data)
->> +{
->> +       DBG("%s", str);
->> +}
->> +
->>  static void gatt_client_init(struct btd_device *device)
->>  {
->>         gatt_client_cleanup(device);
->> @@ -4000,6 +4005,8 @@ static void gatt_client_init(struct btd_device *device)
->>                 return;
->>         }
->>
->> +       bt_gatt_client_set_debug(device->client, gatt_debug, NULL, NULL);
->> +
->>         /* Notify attio so it can react to notifications */
->>         g_slist_foreach(device->attios, attio_connected, device->attrib);
->>
->>
-> See attachments. Fresh dumps from both btmon and daemon. With your patch "shared/gatt-client: Fix handling of services" applied.
-
-Still not sure what is going own, it seems the 10 is
-BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND but I suspect there is something else
-wrong since in this case we should just proceed to the next operation.
-Anyway I will send some cleanup patches and Im also planning to have
-proper errors so in future we can tell what is going on.
-
-
+diff --git a/android/hog.c b/android/hog.c
+index ff77bb3..c27af86 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -63,16 +63,12 @@
+ #define HOG_INFO_UUID		0x2A4A
+ #define HOG_REPORT_MAP_UUID	0x2A4B
+ #define HOG_REPORT_UUID		0x2A4D
+-#define HOG_PROTO_MODE_UUID	0x2A4E
+ #define HOG_CONTROL_POINT_UUID	0x2A4C
+ 
+ #define HOG_REPORT_TYPE_INPUT	1
+ #define HOG_REPORT_TYPE_OUTPUT	2
+ #define HOG_REPORT_TYPE_FEATURE	3
+ 
+-#define HOG_PROTO_MODE_BOOT    0
+-#define HOG_PROTO_MODE_REPORT  1
+-
+ #define HOG_REPORT_MAP_MAX_SIZE        512
+ #define HID_INFO_SIZE			4
+ #define ATT_NOTIFICATION_HEADER_SIZE	3
+@@ -91,7 +87,6 @@ struct bt_hog {
+ 	gboolean		has_report_id;
+ 	uint16_t		bcdhid;
+ 	uint8_t			bcountrycode;
+-	uint16_t		proto_mode_handle;
+ 	uint16_t		ctrlpt_handle;
+ 	uint8_t			flags;
+ 	unsigned int		getrep_att;
+@@ -1038,49 +1033,16 @@ static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 			hog->bcdhid, hog->bcountrycode, hog->flags);
+ }
+ 
+-static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+-							gpointer user_data)
+-{
+-	struct gatt_request *req = user_data;
+-	struct bt_hog *hog = req->user_data;
+-	uint8_t value;
+-	ssize_t vlen;
+-
+-	destroy_gatt_req(req);
+-
+-	if (status != 0) {
+-		error("Protocol Mode characteristic read failed: %s",
+-							att_ecode2str(status));
+-		return;
+-	}
+-
+-	vlen = dec_read_resp(pdu, plen, &value, sizeof(value));
+-	if (vlen < 0) {
+-		error("ATT protocol error");
+-		return;
+-	}
+-
+-	if (value == HOG_PROTO_MODE_BOOT) {
+-		uint8_t nval = HOG_PROTO_MODE_REPORT;
+-
+-		DBG("HoG is operating in Boot Procotol Mode");
+-
+-		gatt_write_cmd(hog->attrib, hog->proto_mode_handle, &nval,
+-						sizeof(nval), NULL, NULL);
+-	} else if (value == HOG_PROTO_MODE_REPORT)
+-		DBG("HoG is operating in Report Protocol Mode");
+-}
+-
+ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ {
+ 	struct gatt_request *req = user_data;
+ 	struct bt_hog *hog = req->user_data;
+ 	struct gatt_primary *primary = hog->primary;
+ 	bt_uuid_t report_uuid, report_map_uuid, info_uuid;
+-	bt_uuid_t proto_mode_uuid, ctrlpt_uuid;
++	bt_uuid_t ctrlpt_uuid;
+ 	struct report *report;
+ 	GSList *l;
+-	uint16_t info_handle = 0, proto_mode_handle = 0;
++	uint16_t info_handle = 0;
+ 
+ 	destroy_gatt_req(req);
+ 
+@@ -1093,7 +1055,6 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 	bt_uuid16_create(&report_uuid, HOG_REPORT_UUID);
+ 	bt_uuid16_create(&report_map_uuid, HOG_REPORT_MAP_UUID);
+ 	bt_uuid16_create(&info_uuid, HOG_INFO_UUID);
+-	bt_uuid16_create(&proto_mode_uuid, HOG_PROTO_MODE_UUID);
+ 	bt_uuid16_create(&ctrlpt_uuid, HOG_CONTROL_POINT_UUID);
+ 
+ 	for (l = chars; l; l = g_slist_next(l)) {
+@@ -1121,18 +1082,10 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 			discover_external(hog, hog->attrib, start, end, hog);
+ 		} else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
+ 			info_handle = chr->value_handle;
+-		else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
+-			proto_mode_handle = chr->value_handle;
+ 		else if (bt_uuid_cmp(&uuid, &ctrlpt_uuid) == 0)
+ 			hog->ctrlpt_handle = chr->value_handle;
+ 	}
+ 
+-	if (proto_mode_handle) {
+-		hog->proto_mode_handle = proto_mode_handle;
+-		read_char(hog, hog->attrib, proto_mode_handle,
+-						proto_mode_read_cb, hog);
+-	}
+-
+ 	if (info_handle)
+ 		read_char(hog, hog->attrib, info_handle, info_read_cb, hog);
+ }
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
