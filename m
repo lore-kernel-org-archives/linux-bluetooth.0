@@ -1,122 +1,306 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <5506E715.3000709@ubnt.com>
-References: <54F752D8.1000605@ubnt.com>
-	<CAHrH25RVKCL9RQCeFBJAsUsNV1umOR92VWV1JQgkwy-RNh-GAg@mail.gmail.com>
-	<CAN_7+Yagp-R+H+nhCtmdqWyAJm4jO_VsB5c343A=39zurwqpPw@mail.gmail.com>
-	<007858C7-D538-407D-8212-D3B0CB880165@ubnt.com>
-	<CABBYNZLKfh7xPufAMfjG6P--Q-NkOVq4oYUdXEpqc5WsvQpu2g@mail.gmail.com>
-	<CABBYNZLHtCJCoUp_4miapZJOReh=FP4_sJVFkyh5uE+NHV2x=A@mail.gmail.com>
-	<5506D8AB.1040903@ubnt.com>
-	<5506E0A6.1080709@ubnt.com>
-	<CABBYNZKg1gMsoZyD4mHiZDiGkvFuzAcTPGauFTaLRr0V7ntkbg@mail.gmail.com>
-	<5506E715.3000709@ubnt.com>
-Date: Tue, 17 Mar 2015 15:07:28 +0200
-Message-ID: <CABBYNZJK7SVUbThK_wfVFa2NvxK5NiFJ4HRA-FK3Pmo9+peYZw@mail.gmail.com>
-Subject: Re: Non-consecutive handle values in GATT
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrejs Hanins <andrejs.hanins@ubnt.com>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
-	Arman Uguray <armansito@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Marcin Kraglak <marcin.kraglak@tieto.com>,
-	Szymon Janc <szymon.janc@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5/5] Bluetooth: Move generic mgmt command dispatcher to hci_sock.c
+Date: Tue, 17 Mar 2015 13:48:50 +0200
+Message-Id: <1426592930-5842-6-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1426592930-5842-1-git-send-email-johan.hedberg@gmail.com>
+References: <1426592930-5842-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrejs,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
+The mgmt.c file should be reserved purely for HCI_CHANNEL_CONTROL. The
+mgmt_control() function in it is already completely generic and has a
+single user in hci_sock.c. This patch moves the function there and
+renames it a bit more appropriately to hci_mgmt_cmd() (as it's a command
+dispatcher).
 
->>>> ACL data: handle 64 flags 0x02 dlen 20
->>>     ATT: Read By Type resp (0x09)
->>>       length: 7
->>>         handle 0x0110, value 0x02 0x11 0x01 0x00 0x2a
->>>         handle 0x0120, value 0x02 0x21 0x01 0x01 0x2a
->>> < ACL data: handle 64 flags 0x00 dlen 11
->>>     ATT: Read By Type req (0x08)
->>>       start 0x0121, end 0x0121
->>>       type-uuid 0x2803      <--- as without patch, this seems to be suspicious. Single att read request with wrong UUID.
->>
->> Maybe this is off by 1 error except if start 0x0100, end 0x0121 range
->> actually exclude the last, but it would be still wrong the start
->> 0x0121, end 0x0121, anyway this seems to be some other problem.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |   3 -
+ net/bluetooth/hci_sock.c         | 116 ++++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/mgmt.c             | 111 -------------------------------------
+ 3 files changed, 115 insertions(+), 115 deletions(-)
 
-Actually this is fine, we are discovering the characteristics since
-they may not fit in a single frame we just continue from where we stop
-at 0x0121 until the end of the service range with just happen to be
-0x0121.
-
->>
->>>
->>>
->>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>     handle 64 packets 2
->>>> ACL data: handle 64 flags 0x02 dlen 9
->>>     ATT: Error (0x01)
->>>       Error: Attribute not found (10)
->>>       Read By Type req (0x08) on handle 0x0121
->>> < ACL data: handle 64 flags 0x00 dlen 9
->>>     ATT: Find Information req (0x04)
->>>       start 0x0112, end 0x011f
->>>> ACL data: handle 64 flags 0x02 dlen 9
->>>     ATT: Error (0x01)
->>>       Error: Attribute not found (10)
->>>       Find Information req (0x04) on handle 0x0112
->>> < ACL data: handle 64 flags 0x00 dlen 11
->>>     ATT: Read By Type req (0x08)
->>>       start 0x0300, end 0x0320
->>>       type-uuid 0x2803
->>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>     handle 64 packets 1
->>>> ACL data: handle 64 flags 0x02 dlen 27
->>>     ATT: Read By Type resp (0x09)
->>>       length: 21
->>>         handle 0x0310, value 0x3e 0x11 0x03 0x34 0x5b 0xe2 0x12 0x5e 0xb1 0x45 0x03 0xb6 0x29 0x24 0x55 0x8a 0x11 0x1e 0x36
->>> < ACL data: handle 64 flags 0x00 dlen 11
->>>     ATT: Read By Type req (0x08)
->>>       start 0x0311, end 0x0320
->>>       type-uuid 0x2803
->>>> HCI Event: Number of Completed Packets (0x13) plen 5
->>>     handle 64 packets 2
->>>> ACL data: handle 64 flags 0x02 dlen 9
->>>     ATT: Error (0x01)
->>>       Error: Attribute not found (10)
->>>       Read By Type req (0x08) on handle 0x0311
->>
->> Can you collect the trace in binary format, e.g. btmon -w <file>, I
->> can perhaps try to create the very same database for unit tests, also
->> it would be good to have bluetoothd traces.
-> Traces attached.
-
-Can you please enable bt_gatt_client debug with the following patch:
-
-diff --git a/src/device.c b/src/device.c
-index aaa9f43..6a23adc 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3989,6 +3989,11 @@ static void
-gatt_client_service_changed(uint16_t start_handle,
-        DBG("start 0x%04x, end: 0x%04x", start_handle, end_handle);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 93e7b2b05a17..b65c53de6a69 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1330,9 +1330,6 @@ void hci_mgmt_chan_unregister(struct hci_mgmt_chan *c);
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
+ #define DISCOV_LE_RESTART_DELAY		msecs_to_jiffies(200)	/* msec */
+ 
+-int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
+-		 struct msghdr *msg, size_t msglen);
+-
+ int mgmt_new_settings(struct hci_dev *hdev);
+ void mgmt_index_added(struct hci_dev *hdev);
+ void mgmt_index_removed(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 9ba1a2667eaa..85a44a7dc150 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -30,6 +30,9 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/hci_mon.h>
++#include <net/bluetooth/mgmt.h>
++
++#include "mgmt_util.h"
+ 
+ static LIST_HEAD(mgmt_chan_list);
+ static DEFINE_MUTEX(mgmt_chan_list_lock);
+@@ -951,6 +954,117 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 	return err ? : copied;
  }
-
-+static void gatt_debug(const char *str, void *user_data)
+ 
++static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
++			struct msghdr *msg, size_t msglen)
 +{
-+       DBG("%s", str);
++	void *buf;
++	u8 *cp;
++	struct mgmt_hdr *hdr;
++	u16 opcode, index, len;
++	struct hci_dev *hdev = NULL;
++	const struct hci_mgmt_handler *handler;
++	bool var_len, no_hdev;
++	int err;
++
++	BT_DBG("got %zu bytes", msglen);
++
++	if (msglen < sizeof(*hdr))
++		return -EINVAL;
++
++	buf = kmalloc(msglen, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	if (memcpy_from_msg(buf, msg, msglen)) {
++		err = -EFAULT;
++		goto done;
++	}
++
++	hdr = buf;
++	opcode = __le16_to_cpu(hdr->opcode);
++	index = __le16_to_cpu(hdr->index);
++	len = __le16_to_cpu(hdr->len);
++
++	if (len != msglen - sizeof(*hdr)) {
++		err = -EINVAL;
++		goto done;
++	}
++
++	if (opcode >= chan->handler_count ||
++	    chan->handlers[opcode].func == NULL) {
++		BT_DBG("Unknown op %u", opcode);
++		err = mgmt_cmd_status(sk, index, opcode,
++				      MGMT_STATUS_UNKNOWN_COMMAND);
++		goto done;
++	}
++
++	handler = &chan->handlers[opcode];
++
++	if (!hci_sock_test_flag(sk, HCI_SOCK_TRUSTED) &&
++	    !(handler->flags & HCI_MGMT_UNTRUSTED)) {
++		err = mgmt_cmd_status(sk, index, opcode,
++				      MGMT_STATUS_PERMISSION_DENIED);
++		goto done;
++	}
++
++	if (index != MGMT_INDEX_NONE) {
++		hdev = hci_dev_get(index);
++		if (!hdev) {
++			err = mgmt_cmd_status(sk, index, opcode,
++					      MGMT_STATUS_INVALID_INDEX);
++			goto done;
++		}
++
++		if (hci_dev_test_flag(hdev, HCI_SETUP) ||
++		    hci_dev_test_flag(hdev, HCI_CONFIG) ||
++		    hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
++			err = mgmt_cmd_status(sk, index, opcode,
++					      MGMT_STATUS_INVALID_INDEX);
++			goto done;
++		}
++
++		if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED) &&
++		    !(handler->flags & HCI_MGMT_UNCONFIGURED)) {
++			err = mgmt_cmd_status(sk, index, opcode,
++					      MGMT_STATUS_INVALID_INDEX);
++			goto done;
++		}
++	}
++
++	no_hdev = (handler->flags & HCI_MGMT_NO_HDEV);
++	if (no_hdev != !hdev) {
++		err = mgmt_cmd_status(sk, index, opcode,
++				      MGMT_STATUS_INVALID_INDEX);
++		goto done;
++	}
++
++	var_len = (handler->flags & HCI_MGMT_VAR_LEN);
++	if ((var_len && len < handler->data_len) ||
++	    (!var_len && len != handler->data_len)) {
++		err = mgmt_cmd_status(sk, index, opcode,
++				      MGMT_STATUS_INVALID_PARAMS);
++		goto done;
++	}
++
++	if (hdev && chan->hdev_init)
++		chan->hdev_init(sk, hdev);
++
++	cp = buf + sizeof(*hdr);
++
++	err = handler->func(sk, hdev, cp, len);
++	if (err < 0)
++		goto done;
++
++	err = msglen;
++
++done:
++	if (hdev)
++		hci_dev_put(hdev);
++
++	kfree(buf);
++	return err;
 +}
 +
- static void gatt_client_init(struct btd_device *device)
+ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 			    size_t len)
  {
-        gatt_client_cleanup(device);
-@@ -4000,6 +4005,8 @@ static void gatt_client_init(struct btd_device *device)
-                return;
-        }
-
-+       bt_gatt_client_set_debug(device->client, gatt_debug, NULL, NULL);
-+
-        /* Notify attio so it can react to notifications */
-        g_slist_foreach(device->attios, attio_connected, device->attrib);
-
-
+@@ -984,7 +1098,7 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		mutex_lock(&mgmt_chan_list_lock);
+ 		chan = __hci_mgmt_chan_find(hci_pi(sk)->channel);
+ 		if (chan)
+-			err = mgmt_control(chan, sk, msg, len);
++			err = hci_mgmt_cmd(chan, sk, msg, len);
+ 		else
+ 			err = -EINVAL;
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 363a4348c40b..cb302f81e39c 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6353,117 +6353,6 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 	{ read_adv_features,       MGMT_READ_ADV_FEATURES_SIZE },
+ };
+ 
+-int mgmt_control(struct hci_mgmt_chan *chan, struct sock *sk,
+-		 struct msghdr *msg, size_t msglen)
+-{
+-	void *buf;
+-	u8 *cp;
+-	struct mgmt_hdr *hdr;
+-	u16 opcode, index, len;
+-	struct hci_dev *hdev = NULL;
+-	const struct hci_mgmt_handler *handler;
+-	bool var_len, no_hdev;
+-	int err;
+-
+-	BT_DBG("got %zu bytes", msglen);
+-
+-	if (msglen < sizeof(*hdr))
+-		return -EINVAL;
+-
+-	buf = kmalloc(msglen, GFP_KERNEL);
+-	if (!buf)
+-		return -ENOMEM;
+-
+-	if (memcpy_from_msg(buf, msg, msglen)) {
+-		err = -EFAULT;
+-		goto done;
+-	}
+-
+-	hdr = buf;
+-	opcode = __le16_to_cpu(hdr->opcode);
+-	index = __le16_to_cpu(hdr->index);
+-	len = __le16_to_cpu(hdr->len);
+-
+-	if (len != msglen - sizeof(*hdr)) {
+-		err = -EINVAL;
+-		goto done;
+-	}
+-
+-	if (opcode >= chan->handler_count ||
+-	    chan->handlers[opcode].func == NULL) {
+-		BT_DBG("Unknown op %u", opcode);
+-		err = mgmt_cmd_status(sk, index, opcode,
+-				      MGMT_STATUS_UNKNOWN_COMMAND);
+-		goto done;
+-	}
+-
+-	handler = &chan->handlers[opcode];
+-
+-	if (!hci_sock_test_flag(sk, HCI_SOCK_TRUSTED) &&
+-	    !(handler->flags & HCI_MGMT_UNTRUSTED)) {
+-		err = mgmt_cmd_status(sk, index, opcode,
+-				      MGMT_STATUS_PERMISSION_DENIED);
+-		goto done;
+-	}
+-
+-	if (index != MGMT_INDEX_NONE) {
+-		hdev = hci_dev_get(index);
+-		if (!hdev) {
+-			err = mgmt_cmd_status(sk, index, opcode,
+-					      MGMT_STATUS_INVALID_INDEX);
+-			goto done;
+-		}
+-
+-		if (hci_dev_test_flag(hdev, HCI_SETUP) ||
+-		    hci_dev_test_flag(hdev, HCI_CONFIG) ||
+-		    hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+-			err = mgmt_cmd_status(sk, index, opcode,
+-					      MGMT_STATUS_INVALID_INDEX);
+-			goto done;
+-		}
+-
+-		if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED) &&
+-		    !(handler->flags & HCI_MGMT_UNCONFIGURED)) {
+-			err = mgmt_cmd_status(sk, index, opcode,
+-					      MGMT_STATUS_INVALID_INDEX);
+-			goto done;
+-		}
+-	}
+-
+-	no_hdev = (handler->flags & HCI_MGMT_NO_HDEV);
+-	if (no_hdev != !hdev) {
+-		err = mgmt_cmd_status(sk, index, opcode,
+-				      MGMT_STATUS_INVALID_INDEX);
+-		goto done;
+-	}
+-
+-	var_len = (handler->flags & HCI_MGMT_VAR_LEN);
+-	if ((var_len && len < handler->data_len) ||
+-	    (!var_len && len != handler->data_len)) {
+-		err = mgmt_cmd_status(sk, index, opcode,
+-				      MGMT_STATUS_INVALID_PARAMS);
+-		goto done;
+-	}
+-
+-	if (hdev && chan->hdev_init)
+-		chan->hdev_init(sk, hdev);
+-
+-	cp = buf + sizeof(*hdr);
+-
+-	err = handler->func(sk, hdev, cp, len);
+-	if (err < 0)
+-		goto done;
+-
+-	err = msglen;
+-
+-done:
+-	if (hdev)
+-		hci_dev_put(hdev);
+-
+-	kfree(buf);
+-	return err;
+-}
+-
+ void mgmt_index_added(struct hci_dev *hdev)
+ {
+ 	struct mgmt_ev_ext_index ev;
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
