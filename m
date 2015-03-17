@@ -1,45 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v6 1/6] Bluetooth: Introduce HCI_QUIRK_SIMULTANEOUS_DISCOVERY
-Date: Tue, 17 Mar 2015 09:04:12 -0700
-Message-Id: <1426608257-20332-1-git-send-email-jpawlowski@google.com>
+Date: Tue, 17 Mar 2015 17:48:32 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5 2/6] Bluetooth: Refactor BR/EDR inquiry and LE scan
+ triggering.
+Message-ID: <20150317154832.GA11787@t440s.P-661HNU-F1>
+References: <1426565973-27545-1-git-send-email-jpawlowski@google.com>
+ <1426565973-27545-2-git-send-email-jpawlowski@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1426565973-27545-2-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some controllers allow both LE scan and BR/EDR inquiry to run at
-the same time, while others allow only one, LE SCAN or BR/EDR
-inquiry at given time.
+Hi Jakub,
 
-Since this is specific to each controller, add a new quirk setting
-that allows drivers to tell the core wether given controller can
-do both LE scan and BR/EDR inquiry at same time.
+On Mon, Mar 16, 2015, Jakub Pawlowski wrote:
+> +static bool trigger_le_scan(struct hci_request *req, __le16 interval,
+> +			    u8 *status)
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
----
- include/net/bluetooth/hci.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Minor thing here: 'interval' should be u16 and the conversion done
+inside the function. It's only for raw protocol PDU data that we use the
+explicit-endian types.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index a6ea156..06e7eee 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -160,6 +160,14 @@ enum {
- 	 * during the hdev->setup vendor callback.
- 	 */
- 	HCI_QUIRK_STRICT_DUPLICATE_FILTER,
-+
-+	/* When this quirk is set, LE scan and BR/EDR inquiry is done
-+	 * simultaneously, otherwise it's interleaved.
-+	 *
-+	 * This quirk can be set before hci_register_dev is called or
-+	 * during the hdev->setup vendor callback.
-+	 */
-+	HCI_QUIRK_SIMULTANEOUS_DISCOVERY,
- };
- 
- /* HCI device flags */
--- 
-2.2.0.rc0.207.ga3a616c
+> +	param_cp.interval = interval;
 
+And here you'd then do param_cp.interval = cpu_to_le16(interval);
+
+Johan
