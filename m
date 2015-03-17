@@ -1,291 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v2 05/14] advertising-manager: Implement RegisterAdvertisement
-Date: Tue, 17 Mar 2015 16:49:52 -0700
-Message-Id: <1426636201-30057-6-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1426636201-30057-1-git-send-email-jamuraa@chromium.org>
-References: <1426636201-30057-1-git-send-email-jamuraa@chromium.org>
+Message-ID: <55087B0F.3010808@ubnt.com>
+Date: Tue, 17 Mar 2015 21:05:51 +0200
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Arman Uguray <armansito@chromium.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: core/gatt-db: Long writes into external GATT characteristics
+ issue
+References: <55080DF0.8020103@ubnt.com>	<CABBYNZ+EysOFUSZ12RGw-4gUOF+Yj6XyoXpQ=CX=uShn6Wur=Q@mail.gmail.com>	<55085091.5030202@ubnt.com>	<CABBYNZJrqE=wrCXWZtNuk7bAviJX=rxRDd5Ne1JRb9kvkKBvWw@mail.gmail.com>	<CAHrH25S+=VR-fRzT35Je_0oD47ZQKLUvtY0ydmdVF4LSg5vEzw@mail.gmail.com> <CABBYNZJKvdGuJUOgSuL68cwc0nWh4MzO6qJZZEm1+2gOidu6Tg@mail.gmail.com>
+In-Reply-To: <CABBYNZJKvdGuJUOgSuL68cwc0nWh4MzO6qJZZEm1+2gOidu6Tg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Initial implementation of the RegisterAdvertisement function of the
-LEAdvertisingManager1 interface.
----
- src/advertising-manager.c | 229 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 228 insertions(+), 1 deletion(-)
+Hi,
 
-diff --git a/src/advertising-manager.c b/src/advertising-manager.c
-index c3f85c2..59f198e 100644
---- a/src/advertising-manager.c
-+++ b/src/advertising-manager.c
-@@ -30,7 +30,9 @@
- 
- #include "adapter.h"
- #include "dbus-common.h"
-+#include "error.h"
- #include "log.h"
-+#include "src/shared/queue.h"
- #include "src/shared/util.h"
- 
- #define LE_ADVERTISING_MGR_IFACE "org.bluez.LEAdvertisingManager1"
-@@ -38,15 +40,236 @@
- 
- struct btd_advertising_manager {
- 	struct btd_adapter *adapter;
-+	struct queue *adverts;
- };
- 
-+#define AD_TYPE_BROADCAST 0
-+#define AD_TYPE_PERIPHERAL 1
-+
-+struct advertisement {
-+	struct btd_advertising_manager *manager;
-+	char *owner;
-+	char *path;
-+	GDBusClient *client;
-+	GDBusProxy *proxy;
-+	DBusMessage *reg;
-+	uint8_t type; /* Advertising type */
-+	bool published;
-+};
-+
-+static bool match_advertisement_path(const void *a, const void *b)
-+{
-+	const struct advertisement *ad = a;
-+	const char *path = b;
-+
-+	return g_strcmp0(ad->path, path);
-+}
-+
-+static void advertisement_free(void *data)
-+{
-+	struct advertisement *ad = data;
-+
-+	if (ad->client) {
-+		g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
-+		g_dbus_client_unref(ad->client);
-+	}
-+
-+	if (ad->proxy)
-+		g_dbus_proxy_unref(ad->proxy);
-+
-+	if (ad->owner)
-+		g_free(ad->owner);
-+
-+	if (ad->path)
-+		g_free(ad->path);
-+
-+	free(ad);
-+}
-+
-+static gboolean advertisement_free_idle_cb(void *data)
-+{
-+	advertisement_free(data);
-+
-+	return FALSE;
-+}
-+
-+static void advertisement_remove(void *data)
-+{
-+	struct advertisement *ad = data;
-+
-+	g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
-+
-+	queue_remove(ad->manager->adverts, ad);
-+
-+	g_idle_add(advertisement_free_idle_cb, ad);
-+}
-+
-+static void client_disconnect_cb(DBusConnection *conn, void *user_data)
-+{
-+	DBG("Client disconnected");
-+
-+	advertisement_remove(user_data);
-+}
-+
-+static bool parse_advertising_type(GDBusProxy *proxy, uint8_t *type)
-+{
-+	DBusMessageIter iter;
-+	const char *msg_type;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "Type", &iter))
-+		return false;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return false;
-+
-+	dbus_message_iter_get_basic(&iter, &msg_type);
-+
-+	if (!g_strcmp0(msg_type, "broadcast")) {
-+		*type = AD_TYPE_BROADCAST;
-+		return true;
-+	}
-+
-+	if (!g_strcmp0(msg_type, "peripheral")) {
-+		*type = AD_TYPE_PERIPHERAL;
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+static void refresh_advertisement(struct advertisement *ad)
-+{
-+	DBG("Refreshing advertisement: %s", ad->path);
-+	if (!ad->published) {
-+		/* TODO: MGMT API call to update the advertisement */
-+	}
-+}
-+
-+static bool parse_advertisement(struct advertisement *ad)
-+{
-+	if (!parse_advertising_type(ad->proxy, &ad->type)) {
-+		error("Failed to read \"Type\" property of advertisement");
-+		return false;
-+	}
-+
-+	/* TODO: parse the remaining properties into a shared structure */
-+
-+	refresh_advertisement(ad);
-+
-+	return true;
-+}
-+
-+static void advertisement_proxy_ready(GDBusProxy *proxy, void *data)
-+{
-+	struct advertisement *ad = data;
-+	DBusMessage *reply;
-+
-+	if (!parse_advertisement(ad)) {
-+		error("Failed to parse advertisement");
-+
-+		reply = btd_error_failed(ad->reg,
-+					"Failed to register advertisement");
-+		goto done;
-+	}
-+
-+	g_dbus_client_set_disconnect_watch(ad->client, client_disconnect_cb,
-+									ad);
-+
-+	reply = dbus_message_new_method_return(ad->reg);
-+
-+	DBG("Advertisement registered: %s", ad->path);
-+
-+done:
-+	g_dbus_send_message(btd_get_dbus_connection(), reply);
-+
-+	dbus_message_unref(ad->reg);
-+	ad->reg = NULL;
-+}
-+
-+static struct advertisement *advertisement_create(DBusConnection *conn,
-+					DBusMessage *msg, const char *path)
-+{
-+	struct advertisement *ad;
-+	const char *sender = dbus_message_get_sender(msg);
-+
-+	if (!path || !g_str_has_prefix(path, "/"))
-+		return NULL;
-+
-+	ad = new0(struct advertisement, 1);
-+	if (!ad)
-+		return NULL;
-+
-+	ad->published = false;
-+
-+	ad->client = g_dbus_client_new_full(conn, sender, path, path);
-+	if (!ad->client)
-+		goto fail;
-+
-+	ad->owner = g_strdup(sender);
-+	if (!ad->owner)
-+		goto fail;
-+
-+	ad->path = g_strdup(path);
-+	if (!ad->path)
-+		goto fail;
-+
-+	DBG("Adding proxy for %s", path);
-+	ad->proxy = g_dbus_proxy_new(ad->client, path, LE_ADVERTISEMENT_IFACE);
-+	if (!ad->proxy)
-+		goto fail;
-+
-+	g_dbus_proxy_set_read_watch(ad->proxy, advertisement_proxy_ready, ad);
-+
-+	ad->reg = dbus_message_ref(msg);
-+
-+	return ad;
-+
-+fail:
-+	advertisement_free(ad);
-+	return NULL;
-+}
-+
- static DBusMessage *register_advertisement(DBusConnection *conn,
- 						DBusMessage *msg,
- 						void *user_data)
- {
-+	struct btd_advertising_manager *manager = user_data;
-+	DBusMessageIter args;
-+	const char *path;
-+	struct advertisement *ad;
-+
- 	DBG("RegisterAdvertisement");
- 
--	/* TODO */
-+	if (!dbus_message_iter_init(msg, &args))
-+		return btd_error_invalid_args(msg);
-+
-+	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&args, &path);
-+
-+	if (queue_find(manager->adverts, match_advertisement_path, path))
-+		return btd_error_already_exists(msg);
-+
-+	/* TODO: support more than one advertisement */
-+	if (!queue_isempty(manager->adverts))
-+		return btd_error_failed(msg, "Already advertising");
-+
-+	dbus_message_iter_next(&args);
-+
-+	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
-+		return btd_error_invalid_args(msg);
-+
-+	ad = advertisement_create(conn, msg, path);
-+	if (!ad)
-+		return btd_error_failed(msg,
-+					"Failed to register advertisement");
-+
-+	DBG("Registered advertisement at path %s", path);
-+
-+	ad->manager = manager;
-+	queue_push_tail(manager->adverts, ad);
-+
- 	return NULL;
- }
- 
-@@ -76,6 +299,8 @@ static void advertising_manager_destroy(void *user_data)
- {
- 	struct btd_advertising_manager *manager = user_data;
- 
-+	queue_destroy(manager->adverts, advertisement_free);
-+
- 	free(manager);
- }
- 
-@@ -100,6 +325,8 @@ advertising_manager_create(struct btd_adapter *adapter)
- 		return NULL;
- 	}
- 
-+	manager->adverts = queue_new();
-+
- 	return manager;
- }
- 
--- 
-2.2.0.rc0.207.ga3a616c
+On 2015.03.17. 20:30, Luiz Augusto von Dentz wrote:
+> Hi Arman,
+> 
+> On Tue, Mar 17, 2015 at 8:15 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi Luiz & Andrejs,
+>>
+>> On Tue, Mar 17, 2015 at 9:49 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Andrejs,
+>>>
+>>> On Tue, Mar 17, 2015 at 6:04 PM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
+>>>> Hi Luiz,
+>>>>
+>>>> On 2015.03.17. 17:15, Luiz Augusto von Dentz wrote:
+>>>>> Hi Andrejs,
+>>>>>
+>>>>> On Tue, Mar 17, 2015 at 1:20 PM, Andrejs Hanins
+>>>>> <andrejs.hanins@ubnt.com> wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> To begin with, there is an issue with long reading/writing of
+>>>>>> external GATT characteristics registered via GattManager1. Related
+>>>>>> ATT ops are ReadBlob, PrepareWrite, ExecuteWrite etc. Reading issue
+>>>>>> is easily fixed in a patch I sent yesterday. But the write case is
+>>>>>> more tricky. Currently, long write into external chrc (D-Bus method
+>>>>>> "WriteValue") is executed in a "chunked" fashion. Thats is, each
+>>>>>> ATT PrepareWrite op eventually causes an invocation of "WriteValue"
+>>>>>> with appropriate buffer (see exec_next_prep_write()). I see no easy
+>>>>>> way for external D-Bus GATT service to distinguish between full and
+>>>>>> partial writes, so no way to tell when the chrc is fully written.
+>>>>>>
+>>>>>> I see two solutions for the issue:
+>>>>>>
+>>>>>> 1. Add a new method to GattCharacteristic1 called
+>>>>>> "WriteValuePartial" with a single buffer argument, so that
+>>>>>> len(buffer)==0 denotes that all chunks have been written and
+>>>>>> service can assemble the whole buffer for further processing. Or
+>>>>>> the existing "WriteValue" method can be extended with a parameter
+>>>>>> like op_type = ["Single", "Partial", "End"]. I'm not a BlueZ
+>>>>>> design expert, but IMO this approach stinks a bit... D-Bus level
+>>>>>> API should be simple. I doubt that external service should have an
+>>>>>>  burden related to ATT MTU fragmentation.
+>>>>>>
+>>>>>> 2. Add some logic to BlueZ daemon so that "WriteValue" is always
+>>>>>> executed with fully assembled data from multiple PrepareWrite ops.
+>>>>>> Such approach will not require any D-Bus API changes, which is
+>>>>>> good. The problem is that I personally don't see a clean and easy
+>>>>>> way how to implement it in the code. Attributes are written using
+>>>>>> gatt_db_attribute_write() which has ATT opcode and write offset,
+>>>>>> but this info is not enough to understand when the last chunk of
+>>>>>> an attribute value is being written to complete the operation in a
+>>>>>>  single step. In case of external chrc, the
+>>>>>> gatt_db_attribute::write_func equals to chrc_write_cb() which
+>>>>>> immediately sends D-Bus calls to "WriteValue", thats it doing the
+>>>>>> "chunking". If there would be a possibility to tell when the call
+>>>>>> to gatt_db_attribute::write_func is for the last chunk of data,
+>>>>>> then chrc_write_cb() could do the assembly and invoke "WriteValue"
+>>>>>> only once. The task can be accomplished by adding an additional
+>>>>>> argument to gatt_db_write_t functor definit ion telling that write
+>>>>>> is chunked and if the chunk is last or not. Not sure, does it look
+>>>>>> like a "brutal hack" or not for BlueZ gurus :)
+>>>>>
+>>>>> I guess what we should do is to queue the prepare writes and wait
+>>>>> execute to actually do the write in gatt_db,
+>>>>
+>>>> This is exactly what is happening now. ExecuteWrite triggers all queued chunks to be written one by one into gatt_db, but not each PrepareWrite. PrepareWrite does only queuing.
+>>>>
+>>>>> I would probably leave this to bt_gatt_server since it should be
+>>>>> doing permission checking, etc, it could handle the prepare queue.
+>>>>
+>>>> It looks wrong to me, because the API to write into gatt_db (gatt_db_attribute_write()) is supposed to carry the knowledge about partial writes based on the 'offset' argument. There will be no reason to have 'offset' argument if bt_gatt_server would always squash all 'prepare write' chunks into one.
+>>>
+>>> Not really, the offset is still useful to tell where it start, but if
+>>> prepare writes are in sequence, like it should be for long write, than
+>>> there is no need to write multiple sets instead we should just use
+>>> realloc and reuse the same buffer, this is actually cheaper since we
+>>> don't have to allocate more elements in the queue and cause overall
+>>> less calls. Now if you have different areas to write to we still going
+>>> to do multiple writes, but I guess this less likely to happen in
+>>> practice.
+>>>
+>>>>> Anyway, anything that write on prepare is probably wrong since with
+>>>>> prepare there is the possibility to cancel the queue so we should
+>>>>> never call WriteValue in the first place.
+>>>>
+>>>> As said, it is already like this.
+>>>>
+>>>>>
+>>>>>> Maybe someone with better BlueZ design knowledge can suggest how
+>>>>>> the 2-nd solution can be implemented or maybe propose something
+>>>>>> completely different.
+>>>>>>
+>>
+>> bt_gatt_server already correctly handles long writes (and multiple
+>> writes) according to the spec; it maintains a prepare queue and
+>> executes them only when it receives an ExecuteWrite. The problem here
+>> is that a remote client may actually want to only partially modify a
+>> characteristic value; this is why the offset parameter exists in the
+>> first place. So this is a problem at the D-Bus API layer, not at the
+>> shared/gatt layer.
+> 
+> Yes, but still my point about squashing fragments together if they are
+> continuous should be taken care of, we don't want to cause several
+> D-Bus calls to WriteValue on a row for long write that is for sure.
 
+I also think that squashing contiguous fragments into one WriteValue is right thing, especially if first offset=0, because multiple fragments committed by an ExecuteWrite should be treated as an atomic op anyway. But there is one potential use case which complicates the matter - what if PrepareWrite fragments do not start with offset=0 and have gaps in between? It means, ExecuteWrite should pass all fragments to external service at once, like an array of buffers each having its own length and offset. Kinda crazy, not sure whether it happens in practice.
+
+> 
+>> IMO, extending the WriteValue with an offset parameter is very much
+>> reasonable and it's something that every platform API already allows.
+>> I think this is useful for both client and server cases, for an
+>> application to be able to specify an offset and even things like
+>> Signed Write, WriteWithoutResponse, and so on. Adding a parameter
+>> dictionary would be clean way to achieve this without breaking
+>> existing apps (which shouldn't technically matter since the API is
+>> still in experimental). This way, we also wouldn't have to do all the
+>> magic guesswork in the client code as to which type of write procedure
+>> should be used.
+> 
+> offset should be needed, but things like signature are not even
+> possible to the client since they have no access to CSRK, by design,
+> also WriteWithoutResponse is basically ignoring the D-Bus reply.
+> 
+
+So, by using offset and squashing contiguous fragments into one buffer it will be possible to issue a single WriteValue D-Bus call as an atomic op. But it will not be enough to support scattered fragments as I noted earlier. But do we really need it?
