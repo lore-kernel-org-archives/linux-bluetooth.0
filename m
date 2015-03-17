@@ -1,158 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1426604264-791-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1426604264-791-1-git-send-email-mariusz.skamra@tieto.com>
-Date: Tue, 17 Mar 2015 17:29:56 +0200
-Message-ID: <CABBYNZJA5+zLoVQQ1cj-8XtF2vcKN6xORnHuAhm5h8mnQN3DVw@mail.gmail.com>
-Subject: Re: [PATCH] android/hog: Remove read Protocol Mode characteristic
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] shared/gatt-helper: Consolidate error checking
+Date: Tue, 17 Mar 2015 17:19:33 +0200
+Message-Id: <1426605574-13691-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Mar 17, 2015 at 4:57 PM, Mariusz Skamra
-<mariusz.skamra@tieto.com> wrote:
-> We can faster set up a connection with HOG device if we won't
-> read Protocol Mode characteristic. According to HOGP specification:
-> "There is no requirements on Report Host to use the Protocol Mode
-> characteristic" ... "The Report Host may discover the Protocol Mode
-> characteristic for each HID Service on the GATT server."
-> It is used mainly by Boot Host to set the value to Boot
-> Protocol mode.
-> According to HID specification "Report protocol is the default
-> mode for all HID devices" so every HID device shall operate in
-> report protocol mode by default.
+This consolidate the error checking for attribute not found in
+discover_op_complete.
+---
+ src/shared/gatt-helpers.c | 47 ++++++-----------------------------------------
+ 1 file changed, 6 insertions(+), 41 deletions(-)
 
-I wonder if this would break if for example a bios setup the for boot
-mode and set CCC then upon reconnecting I think it would remember its
-mode, anyway this only speed up things for the first connection for
-reconnecting we are not rediscovering anything.
-
-> ---
->  android/hog.c | 51 ++-------------------------------------------------
->  1 file changed, 2 insertions(+), 49 deletions(-)
->
-> diff --git a/android/hog.c b/android/hog.c
-> index ff77bb3..c27af86 100644
-> --- a/android/hog.c
-> +++ b/android/hog.c
-> @@ -63,16 +63,12 @@
->  #define HOG_INFO_UUID          0x2A4A
->  #define HOG_REPORT_MAP_UUID    0x2A4B
->  #define HOG_REPORT_UUID                0x2A4D
-> -#define HOG_PROTO_MODE_UUID    0x2A4E
->  #define HOG_CONTROL_POINT_UUID 0x2A4C
->
->  #define HOG_REPORT_TYPE_INPUT  1
->  #define HOG_REPORT_TYPE_OUTPUT 2
->  #define HOG_REPORT_TYPE_FEATURE        3
->
-> -#define HOG_PROTO_MODE_BOOT    0
-> -#define HOG_PROTO_MODE_REPORT  1
-> -
->  #define HOG_REPORT_MAP_MAX_SIZE        512
->  #define HID_INFO_SIZE                  4
->  #define ATT_NOTIFICATION_HEADER_SIZE   3
-> @@ -91,7 +87,6 @@ struct bt_hog {
->         gboolean                has_report_id;
->         uint16_t                bcdhid;
->         uint8_t                 bcountrycode;
-> -       uint16_t                proto_mode_handle;
->         uint16_t                ctrlpt_handle;
->         uint8_t                 flags;
->         unsigned int            getrep_att;
-> @@ -1038,49 +1033,16 @@ static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
->                         hog->bcdhid, hog->bcountrycode, hog->flags);
->  }
->
-> -static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
-> -                                                       gpointer user_data)
-> -{
-> -       struct gatt_request *req = user_data;
-> -       struct bt_hog *hog = req->user_data;
-> -       uint8_t value;
-> -       ssize_t vlen;
-> -
-> -       destroy_gatt_req(req);
-> -
-> -       if (status != 0) {
-> -               error("Protocol Mode characteristic read failed: %s",
-> -                                                       att_ecode2str(status));
-> -               return;
-> -       }
-> -
-> -       vlen = dec_read_resp(pdu, plen, &value, sizeof(value));
-> -       if (vlen < 0) {
-> -               error("ATT protocol error");
-> -               return;
-> -       }
-> -
-> -       if (value == HOG_PROTO_MODE_BOOT) {
-> -               uint8_t nval = HOG_PROTO_MODE_REPORT;
-> -
-> -               DBG("HoG is operating in Boot Procotol Mode");
-> -
-> -               gatt_write_cmd(hog->attrib, hog->proto_mode_handle, &nval,
-> -                                               sizeof(nval), NULL, NULL);
-> -       } else if (value == HOG_PROTO_MODE_REPORT)
-> -               DBG("HoG is operating in Report Protocol Mode");
-> -}
-> -
->  static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
->  {
->         struct gatt_request *req = user_data;
->         struct bt_hog *hog = req->user_data;
->         struct gatt_primary *primary = hog->primary;
->         bt_uuid_t report_uuid, report_map_uuid, info_uuid;
-> -       bt_uuid_t proto_mode_uuid, ctrlpt_uuid;
-> +       bt_uuid_t ctrlpt_uuid;
->         struct report *report;
->         GSList *l;
-> -       uint16_t info_handle = 0, proto_mode_handle = 0;
-> +       uint16_t info_handle = 0;
->
->         destroy_gatt_req(req);
->
-> @@ -1093,7 +1055,6 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
->         bt_uuid16_create(&report_uuid, HOG_REPORT_UUID);
->         bt_uuid16_create(&report_map_uuid, HOG_REPORT_MAP_UUID);
->         bt_uuid16_create(&info_uuid, HOG_INFO_UUID);
-> -       bt_uuid16_create(&proto_mode_uuid, HOG_PROTO_MODE_UUID);
->         bt_uuid16_create(&ctrlpt_uuid, HOG_CONTROL_POINT_UUID);
->
->         for (l = chars; l; l = g_slist_next(l)) {
-> @@ -1121,18 +1082,10 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
->                         discover_external(hog, hog->attrib, start, end, hog);
->                 } else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
->                         info_handle = chr->value_handle;
-> -               else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
-> -                       proto_mode_handle = chr->value_handle;
->                 else if (bt_uuid_cmp(&uuid, &ctrlpt_uuid) == 0)
->                         hog->ctrlpt_handle = chr->value_handle;
->         }
->
-> -       if (proto_mode_handle) {
-> -               hog->proto_mode_handle = proto_mode_handle;
-> -               read_char(hog, hog->attrib, proto_mode_handle,
-> -                                               proto_mode_read_cb, hog);
-> -       }
-> -
->         if (info_handle)
->                 read_char(hog, hog->attrib, info_handle, info_read_cb, hog);
->  }
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 2d6088e..45c620c 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -625,6 +625,10 @@ static void async_req_unref(void *data)
+ static void discovery_op_complete(struct bt_gatt_request *op, bool success,
+ 								uint8_t ecode)
+ {
++	/* Reset success if there is some result to report */
++	if (ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND && op->result_head)
++		success = true;
++
+ 	if (op->callback)
+ 		op->callback(success, ecode, success ? op->result_head : NULL,
+ 								op->user_data);
+@@ -650,11 +654,6 @@ static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
+ 	if (opcode == BT_ATT_OP_ERROR_RSP) {
+ 		success = false;
+ 		att_ecode = process_error(pdu, length);
+-
+-		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
+-								op->result_head)
+-			goto success;
+-
+ 		goto done;
+ 	}
+ 
+@@ -718,7 +717,6 @@ static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
+ 		put_le16(op->end_handle,
+ 				cur_result->pdu + length - data_length + 1);
+ 
+-success:
+ 	success = true;
+ 
+ done:
+@@ -736,11 +734,6 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+ 	if (opcode == BT_ATT_OP_ERROR_RSP) {
+ 		success = false;
+ 		att_ecode = process_error(pdu, length);
+-
+-		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
+-								op->result_head)
+-			goto success;
+-
+ 		goto done;
+ 	}
+ 
+@@ -785,8 +778,7 @@ static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+ 		goto done;
+ 	}
+ 
+-success:
+-	success = true;
++	success = false;
+ 
+ done:
+ 	discovery_op_complete(op, success, att_ecode);
+@@ -1047,11 +1039,6 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+ 
+ 	if (opcode == BT_ATT_OP_ERROR_RSP) {
+ 		att_ecode = process_error(pdu, length);
+-
+-		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
+-							op->result_head)
+-			goto done;
+-
+ 		success = false;
+ 		goto failed;
+ 	}
+@@ -1118,7 +1105,6 @@ static void discover_included_cb(uint8_t opcode, const void *pdu,
+ 		goto failed;
+ 	}
+ 
+-done:
+ 	success = true;
+ 
+ failed:
+@@ -1174,11 +1160,6 @@ static void discover_chrcs_cb(uint8_t opcode, const void *pdu,
+ 	if (opcode == BT_ATT_OP_ERROR_RSP) {
+ 		success = false;
+ 		att_ecode = process_error(pdu, length);
+-
+-		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
+-							op->result_head)
+-			goto success;
+-
+ 		goto done;
+ 	}
+ 
+@@ -1228,9 +1209,6 @@ static void discover_chrcs_cb(uint8_t opcode, const void *pdu,
+ 		goto done;
+ 	}
+ 
+-success:
+-	success = true;
+-
+ done:
+ 	discovery_op_complete(op, success, att_ecode);
+ }
+@@ -1283,13 +1261,7 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
+ 
+ 	if (opcode == BT_ATT_OP_ERROR_RSP) {
+ 		att_ecode = process_error(pdu, length);
+-
+-		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
+-							op->result_head)
+-			success = true;
+-		else
+-			success = false;
+-
++		success = false;
+ 		goto done;
+ 	}
+ 
+@@ -1389,11 +1361,6 @@ static void discover_descs_cb(uint8_t opcode, const void *pdu,
+ 	if (opcode == BT_ATT_OP_ERROR_RSP) {
+ 		success = false;
+ 		att_ecode = process_error(pdu, length);
+-
+-		if (att_ecode == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
+-								op->result_head)
+-			goto success;
+-
+ 		goto done;
+ 	}
+ 
+@@ -1445,10 +1412,8 @@ static void discover_descs_cb(uint8_t opcode, const void *pdu,
+ 			return;
+ 
+ 		success = false;
+-		goto done;
+ 	}
+ 
+-success:
+ 	success = true;
+ 
+ done:
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
