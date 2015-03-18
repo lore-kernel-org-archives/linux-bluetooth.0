@@ -1,105 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1426682851.3386.21.camel@linux.intel.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Add skeleton for 6LoWPAN mgmt command
- handling
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 18 Mar 2015 14:47:31 +0200
-In-Reply-To: <1426669840-2933-1-git-send-email-johan.hedberg@gmail.com>
-References: <1426669840-2933-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <BAY176-W40E12E1C2F620AB0D38605D3000@phx.gbl>
+From: Ssagarr Patil <hugarsagar@outlook.com>
+To: Szymon Janc <szymon.janc@tieto.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: bluez5 pairing devices
+Date: Wed, 18 Mar 2015 17:39:26 +0530
+In-Reply-To: <12627750.IG3ACNRtuD@leonov>
+References: <BAY176-W679B1127159C091585D3AD3030@phx.gbl>
+ <46068BD2-CF33-4617-80DB-5AE5C1FCA364@holtmann.org>,<12627750.IG3ACNRtuD@leonov>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Szymon/Marcel,
 
-On ke, 2015-03-18 at 11:10 +0200, Johan Hedberg wrote:
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> This patch defines a new HCI channel for 6LoWPAN usage and registers a
-> command handler table for it in the 6lowpan module.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-
-Looks good to me.
-
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> On Tuesday 17 of March 2015 09:42:44 Marcel Holtmann wrote:
+>> Hi Sagar,
+>>
+[Snip]
+> Just an note that recent backports dropped support for kernels older than 3.0.
+> So some older release might be needed for 2.6.37.
+>
+I have managed to backport it thanks.
 
 
-> ---
->  include/net/bluetooth/hci_sock.h |  1 +
->  net/bluetooth/6lowpan.c          | 21 ++++++++++++++++++++-
->  2 files changed, 21 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
-> index 9a46d665c1b5..6be6120e1bc9 100644
-> --- a/include/net/bluetooth/hci_sock.h
-> +++ b/include/net/bluetooth/hci_sock.h
-> @@ -45,6 +45,7 @@ struct sockaddr_hci {
->  #define HCI_CHANNEL_USER	1
->  #define HCI_CHANNEL_MONITOR	2
->  #define HCI_CHANNEL_CONTROL	3
-> +#define HCI_CHANNEL_6LOWPAN	4
->  
->  struct hci_filter {
->  	unsigned long type_mask;
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 1742b849fcff..524218aeea6f 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -25,6 +25,7 @@
->  
->  #include <net/bluetooth/bluetooth.h>
->  #include <net/bluetooth/hci_core.h>
-> +#include <net/bluetooth/hci_sock.h>
->  #include <net/bluetooth/l2cap.h>
->  
->  #include <net/6lowpan.h> /* for the compression support */
-> @@ -1433,8 +1434,20 @@ static struct notifier_block bt_6lowpan_dev_notifier = {
->  	.notifier_call = device_event,
->  };
->  
-> +static const struct hci_mgmt_handler bt_6lowpan_handlers[] = {
-> +	{ NULL }, /* 0x0000 (no command) */
-> +};
-> +
-> +static struct hci_mgmt_chan bt_6lowpan_chan = {
-> +	.channel	= HCI_CHANNEL_6LOWPAN,
-> +	.handler_count	= ARRAY_SIZE(bt_6lowpan_handlers),
-> +	.handlers	= bt_6lowpan_handlers,
-> +};
-> +
->  static int __init bt_6lowpan_init(void)
->  {
-> +	int err;
-> +
->  	lowpan_enable_debugfs = debugfs_create_file("6lowpan_enable", 0644,
->  						    bt_debugfs, NULL,
->  						    &lowpan_enable_fops);
-> @@ -1442,11 +1455,17 @@ static int __init bt_6lowpan_init(void)
->  						     bt_debugfs, NULL,
->  						     &lowpan_control_fops);
->  
-> -	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
-> +	err = register_netdevice_notifier(&bt_6lowpan_dev_notifier);
-> +	if (err)
-> +		return err;
-> +
-> +	return hci_mgmt_chan_register(&bt_6lowpan_chan);
->  }
->  
->  static void __exit bt_6lowpan_exit(void)
->  {
-> +	hci_mgmt_chan_unregister(&bt_6lowpan_chan);
-> +
->  	debugfs_remove(lowpan_enable_debugfs);
->  	debugfs_remove(lowpan_control_debugfs);
->  
+But bluetoothctl doesnt detect it, It says the following:
 
+# bluetoothctl 
+[bluetooth]# power on
+No default controller available
+[bluetooth]# 
 
-Cheers,
-Jukka
+Here is output of hciconfig:
 
+$ hciconfig  -a
+hci0:   Type: BR/EDR  Bus: UART
+        BD Address: 34:B1:F7:E2:DE:CB  ACL MTU: 1021:6  SCO MTU: 180:4
+        UP RUNNING PSCAN ISCAN 
+        RX bytes:12525 acl:56 sco:0 events:262 errors:0
+        TX bytes:2948 acl:52 sco:0 commands:108 errors:0
+        Features: 0xff 0xfe 0x2d 0xfe 0xdb 0xff 0x7b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+        Link policy: RSWITCH HOLD SNIFF 
+        Link mode: SLAVE ACCEPT 
+        Name: 'bt_hw'
+        Class: 0x001f00
+        Service Classes: Unspecified
+        Device Class: Invalid Device Class!
+        HCI Version: 4.1 (0x7)  Revision: 0x0
+        LMP Version: 4.1 (0x7)  Subversion: 0xac7c
+        Manufacturer: Texas Instruments Inc. (13)
 
+# 
+
+And I scan devices using hcitool as well.
+
+Any pointers why bluetoothctl fails ?
+
+Regards,
+Sagar
+
+ 		 	   		  
