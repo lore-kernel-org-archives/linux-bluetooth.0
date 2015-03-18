@@ -1,51 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Gracefully response to enabling LE on LE only devices
-Date: Wed, 18 Mar 2015 16:15:07 -0700
-Message-Id: <1426720507-28458-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH BlueZ 2/5] unit/test-gatt: Add /TP/GAD/CL/BV-06-C/client-1 test
+Date: Wed, 18 Mar 2015 23:04:48 +0200
+Message-Id: <1426712691-5048-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1426712691-5048-1-git-send-email-luiz.dentz@gmail.com>
+References: <1426712691-5048-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently the enabling of LE on LE only devices causes an error. This
-is a bit difference from other commands where trying to set the same
-existing settings causes a positive response. Fix this behavior for
-this single corner case.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+This is similar to TP/GAD/CL/BV-06-C but using bt_gatt_client to
+discover everything.
 ---
- net/bluetooth/mgmt.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ unit/test-gatt.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f3a957905193..cee9bc9735af 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2209,10 +2209,22 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_LE,
- 				       MGMT_STATUS_INVALID_PARAMS);
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 93ee2c7..33d4b9f 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -2269,6 +2269,10 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x05, 0x01, 0x15, 0x00, 0x04, 0x29, 0x16, 0x00,
+ 					0x05, 0x29));
  
--	/* LE-only devices do not allow toggling LE on/off */
--	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
-+	/* Bluetooth single mode LE only controllers or dual-mode
-+	 * controllers configured as LE only devices, do not allow
-+	 * switching LE off. These have either LE enabled explicitly
-+	 * or BR/EDR has been previously switched off.
-+	 *
-+	 * When trying to enable an already enabled LE, then gracefully
-+	 * send a positive response. Trying to disable it however will
-+	 * result into rejection.
-+	 */
-+	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED)) {
-+		if (cp->val == 0x01)
-+			return send_settings_rsp(sk, MGMT_OP_SET_LE, hdev);
++	define_test_client("/TP/GAD/CL/BV-06-C/client-1", test_client,
++			service_db_1, NULL,
++			SERVICE_DATA_1_PDUS);
 +
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_LE,
- 				       MGMT_STATUS_REJECTED);
-+	}
- 
- 	hci_dev_lock(hdev);
- 
+ 	define_test_server("/TP/GAD/SR/BV-06-C/small", test_server,
+ 			ts_small_db, NULL,
+ 			raw_pdu(0x03, 0x00, 0x02),
 -- 
 2.1.0
 
