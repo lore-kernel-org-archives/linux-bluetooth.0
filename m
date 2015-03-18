@@ -1,145 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1426636201-30057-2-git-send-email-jamuraa@chromium.org>
-References: <1426636201-30057-1-git-send-email-jamuraa@chromium.org>
-	<1426636201-30057-2-git-send-email-jamuraa@chromium.org>
-Date: Wed, 18 Mar 2015 10:59:44 +0200
-Message-ID: <CABBYNZLOUf0qa8updZONnOM=N2u7G+v-a5_dzTiCthyUj+PZjw@mail.gmail.com>
-Subject: Re: [BlueZ v2 01/14] doc: Add LE Advertisement D-Bus API documentation
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH] Bluetooth: expose quirks through debugfs
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1426657742-13963-1-git-send-email-jpawlowski@google.com>
+Date: Wed, 18 Mar 2015 00:36:26 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A161469C-895B-40AC-A81F-5B7F2A59DABF@holtmann.org>
+References: <1426657742-13963-1-git-send-email-jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi Jakub,
 
-On Wed, Mar 18, 2015 at 1:49 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> The LE Advertisement API allows external appications to define
-> persistent LE Advertisement Data packets.
+> This patch expose controller quirks through debugfs. It would be
+> useful for BlueZ tests using vhci. Currently there is no way to
+> test quirk dependent behaviour. It might be also useful for manual
+> testing.
+> 
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 > ---
->  doc/advertising-api.txt | 98 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 98 insertions(+)
->  create mode 100644 doc/advertising-api.txt
->
-> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-> new file mode 100644
-> index 0000000..5c4eff8
-> --- /dev/null
-> +++ b/doc/advertising-api.txt
-> @@ -0,0 +1,98 @@
-> +BlueZ D-Bus LE Advertising API Description
-> +******************************************
+> include/net/bluetooth/hci.h |  2 ++
+> net/bluetooth/hci_debugfs.c | 29 +++++++++++++++++++++++++++++
+> 2 files changed, 31 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 06e7eee..e9cec98 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -168,6 +168,8 @@ enum {
+> 	 * during the hdev->setup vendor callback.
+> 	 */
+> 	HCI_QUIRK_SIMULTANEOUS_DISCOVERY,
 > +
-> +Advertising packets are structured data which is broadcast on the LE Advertising
-> +channels and available for all devices in range.  Because of the limited space
-> +available in LE Advertising packets (32 bytes), each packet's contents must be
-> +carefully controlled.
+> +	__HCI_NUM_QUIRKS
+> };
+> 
+> /* HCI device flags */
+> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+> index 0818fab..0011d1e 100644
+> --- a/net/bluetooth/hci_debugfs.c
+> +++ b/net/bluetooth/hci_debugfs.c
+> @@ -277,6 +277,33 @@ static const struct file_operations sc_only_mode_fops = {
+> 	.llseek		= default_llseek,
+> };
+> 
+> +static int quirks_set(void *data, u64 val)
+> +{
+> +	struct hci_dev *hdev = data;
 > +
-> +BlueZ acts as a store for the Advertisement Data which is meant to be sent.
-> +It constructs the correct Advertisement Data from the structured
-> +data and configured the kernel to send the correct advertisement.
+> +	if (val >= (1 << __HCI_NUM_QUIRKS))
+> +		return -EINVAL;
 > +
-> +Advertisement Data objects are registered freely and then referenced by BlueZ
-> +when constructing the data sent to the kernel.
+> +	hci_dev_lock(hdev);
+> +	hdev->quirks = val;
+> +	hci_dev_unlock(hdev);
 > +
-> +LE Advertisement Data hierarchy
-> +===============================
+> +	return 0;
+> +}
 > +
-> +Specifies the Advertisement Data to be broadcast and some advertising
-> +parameters.  Properties which are not present will not be included in the
-> +data.  Required advertisement data types will always be included.
-> +All UUIDs are 128-bit versions in the API, and 16 or 32-bit
-> +versions of the same UUID will be used in the advertising data as appropriate.
+> +static int quirks_get(void *data, u64 *val)
+> +{
+> +	struct hci_dev *hdev = data;
 > +
-> +Service                org.bluez
-> +Interface      org.bluez.LEAdvertisement1
-> +Object path    freely definable
+> +	hci_dev_lock(hdev);
+> +	*val = hdev->quirks;
+> +	hci_dev_unlock(hdev);
 > +
-> +Properties     string Type
+> +	return 0;
+> +}
 > +
-> +                       Determines the type of advertising packet requested.
+> +DEFINE_SIMPLE_ATTRIBUTE(quirks_fops, quirks_get, quirks_set, "%llu\n");
 > +
-> +                       Possible values: "broadcast" or "peripheral"
+> void hci_debugfs_create_common(struct hci_dev *hdev)
+> {
+> 	debugfs_create_file("features", 0444, hdev->debugfs, hdev,
+> @@ -308,6 +335,8 @@ void hci_debugfs_create_common(struct hci_dev *hdev)
+> 	if (lmp_sc_capable(hdev) || lmp_le_capable(hdev))
+> 		debugfs_create_file("sc_only_mode", 0444, hdev->debugfs,
+> 				    hdev, &sc_only_mode_fops);
 > +
-> +               array{string} ServiceUUIDs
-> +
-> +                       List of UUIDs to include in the "Service UUID" field of
-> +                       the Advertising Data.
-> +
-> +               dict ManufacturerSpecificData
+> +	debugfs_create_file("quirks", 0644, hdev->debugfs, hdev, &quirks_fops);
+> }
 
-I thought we decided to drop the Specific term and just use ManufacturerData.
+actually I do not like this solution. It is way too hackish since not all quirks are equal. Some of them can actually not be applied later on and some really need to be provided during hdev->setup. So I think we should focus on the ones that actually can change behavior at runtime.
 
-> +
-> +                       Manufactuer Specific Data fields to include in
-> +                       the Advertising Data.  Keys are the Manufacturer ID
-> +                       to associate with the data.
-> +
-> +               bool IncludePower
-> +
-> +                       If present and true, the TX Power Level will be included
-> +                       in the Advertising Data.
+So first of all, I think all quirk modifications need to be limited to when the controller is powered down. Doing this at runtime when the controller is doing actual HCI transaction is dangerous. It will cause state confusing and race conditions. I am not prepared at all to debug any of these.
 
-This I guess we had dropped, the daemon can figure out if there is
-space to include TX Power we should probably do it, anyway we can add
-it later if there is something that we should really have.
+Second we should have separate boolean debugfs entries for each quirk that is actually applicable. That makes it really easy to pick the right one without knowing all the magic bit positions.
 
-> +               array{string} SolicitUUIDs
-> +
-> +                       Array of UUIDs to include in "Service Solicitation"
-> +                       Advertisement Data.
-> +
-> +               dict ServiceData
-> +
-> +                       Service Data elements to include. The keys are the
-> +                       UUID to associate with the data.
-> +
+I mean the goal should be that a user can go in and test if a quirk is causing a problem or if quirk might work. That way we can have people test stuff without asking them recompile the kernel. However they need to be able easily identify the quirk and echo its activation or deactivation into it.
 
-Usually we have a Release method for agent interface so the daemon can
-notify when an object has been unregistered.
+Regards
 
-> +LE Advertising Manager hierarchy
-> +================================
-> +
-> +The Advertising Manager allows external applications to register Advertisement
-> +Data which should be broadcast to devices.  Advertisement Data elements must
-> +follow the API for LE Advertisement Data described above.
-> +
-> +Service                org.bluez
-> +Interface      org.bluez.LEAdvertisingManager1 [Experimental]
-> +Object path    /org/bluez/{hci0,hci1,...}
-> +
-> +Methods                RegisterAdvertisement(object advertisement, dict options)
-> +
-> +                       Registers an advertisement object to be sent over the LE
-> +                       Advertising channel.  The service must be exported
-> +                       under interface LEAdvertisement1. InvalidArguments
-> +                       indicates that the object has invalid or conflicting
-> +                       properties.  InvalidLength indicates that the data
-> +                       provided generates a data packet which is too long.
-> +                       The properties of this object are parser when it is
-> +                       registered, and any changes are ignored.
-> +                       Currently only one advertisement at a time is supported,
-> +                       attempting to register two advertisements will result in
-> +                       an AlreadyExists error.
-> +
-> +                       Possible errors: org.bluez.Error.InvalidArguments
-> +                                        org.bluez.Error.AlreadyExists
-> +                                        org.bluez.Error.InvalidLength
-> +
-> +               UnregisterAdvertisement(object advertisement)
-> +
-> +                       This unregisters an advertisement that has been
-> +                       prevously registered.  The object path parameter must
-> +                       match the same value that has been used on registration.
-> +
-> +                       Possible errors: org.bluez.Error.InvalidArguments
-> +                                        org.bluez.Error.DoesNotExist
+Marcel
 
-You need to include this in the EXTRA_DIST so it gets into the tarball.
-
-
--- 
-Luiz Augusto von Dentz
