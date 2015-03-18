@@ -1,70 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  2/7] unit/test-gatt: Add TP/GAW/SR/BV-10-C test
-Date: Wed, 18 Mar 2015 15:35:36 +0530
-Message-id: <1426673141-17700-3-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1426673141-17700-1-git-send-email-gowtham.ab@samsung.com>
-References: <1426673141-17700-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH  0/7] Add Reliable Writes Server test cases
+Date: Wed, 18 Mar 2015 15:35:34 +0530
+Message-id: <1426673141-17700-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Verify that a Generic Attribute Profile server can support nested
-reliable writing to long Characteristic Values selected by handle.
----
- unit/test-gatt.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+Adds the below server test cases (tested against small and large DB):
+1) Characteristic Value Reliable Writes - to Server
+2) Nested Long Characteristic Value Reliable Writes - to Server
+3) Characteristic Value Reliable Writes - Invalid Handle Response
+4) Characteristic Value Reliable Writes - Write Not Permitted Response
+5) Cancel Reliable Write Characteristic – from Server
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 65bdc52..09ca61a 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -1204,7 +1204,7 @@ static struct gatt_db *make_test_spec_small_db(void)
- 							BT_GATT_CHRC_PROP_READ,
- 							"BlueZ Unit Tester"),
- 		CHARACTERISTIC(0000B009-0000-0000-0123-456789abcdef,
--						BT_ATT_PERM_READ,
-+						BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
- 						BT_GATT_CHRC_PROP_READ, 0x09),
- 		CHARACTERISTIC(GATT_CHARAC_APPEARANCE, BT_ATT_PERM_READ,
- 					BT_GATT_CHRC_PROP_READ, 0x00, 0x00),
-@@ -3219,6 +3219,34 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x18, 0x01),
- 			raw_pdu(0x19));
- 
-+	define_test_server("/TP/GAW/SR/BV-10-C/small", test_server,
-+			ts_small_db, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x16, 0x03, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x17, 0x03, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x16, 0x15, 0xf0, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x17, 0x15, 0xf0, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x16, 0x03, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x17, 0x03, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x16, 0x15, 0xf0, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x17, 0x15, 0xf0, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x18, 0x01),
-+			raw_pdu(0x19));
-+
-+	define_test_server("/TP/GAW/SR/BV-10-C/large-1", test_server,
-+			ts_large_db_1, NULL,
-+			raw_pdu(0x03, 0x00, 0x02),
-+			raw_pdu(0x16, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x16, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x17, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x16, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x17, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x16, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x17, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
-+			raw_pdu(0x18, 0x01),
-+			raw_pdu(0x19));
-+
- 	define_test_client("/TP/GAW/CL/BV-08-C", test_client, service_db_1,
- 			&test_write_7,
- 			SERVICE_DATA_1_PDUS,
+Tested using valgrind, no regression/core dump found.
+
+Gowtham Anandha Babu (7):
+  unit/test-gatt: Add TP/GAW/SR/BV-06-C test
+  unit/test-gatt: Add TP/GAW/SR/BV-10-C test
+  unit/test-gatt: Add TP/GAW/SR/BI-14-C test
+  unit/test-gatt: Add TP/GAW/SR/BI-15-C test
+  unit/test-gatt: Add TP/GAW/SR/BV-07-C test
+  doc/test-coverage: Update test-gatt count
+  shared/tester: Fix divide by zero error
+
+ doc/test-coverage.txt |  4 +--
+ src/shared/tester.c   |  3 +-
+ unit/test-gatt.c      | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 95 insertions(+), 4 deletions(-)
+
 -- 
 1.9.1
 
