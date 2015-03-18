@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/5] unit/test-gatt: Add /TP/GAD/CL/BV-06-C/client-1 test
-Date: Wed, 18 Mar 2015 23:04:48 +0200
-Message-Id: <1426712691-5048-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/5] shared/gatt-client: Fix service discovery
+Date: Wed, 18 Mar 2015 23:04:51 +0200
+Message-Id: <1426712691-5048-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1426712691-5048-1-git-send-email-luiz.dentz@gmail.com>
 References: <1426712691-5048-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is similar to TP/GAD/CL/BV-06-C but using bt_gatt_client to
-discover everything.
+The code should proceed to discover all descriptors before moving to
+next service otherwise it may attempt to insert characteristics in the
+wrong service which would probably fail.
 ---
- unit/test-gatt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/shared/gatt-client.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 93ee2c7..33d4b9f 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -2269,6 +2269,10 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x05, 0x01, 0x15, 0x00, 0x04, 0x29, 0x16, 0x00,
- 					0x05, 0x29));
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 3e28c6e..729bd87 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -690,13 +690,13 @@ static void discover_descs_cb(bool success, uint8_t att_ecode,
+ 			goto failed;
+ 	}
  
-+	define_test_client("/TP/GAD/CL/BV-06-C/client-1", test_client,
-+			service_db_1, NULL,
-+			SERVICE_DATA_1_PDUS);
-+
- 	define_test_server("/TP/GAD/SR/BV-06-C/small", test_server,
- 			ts_small_db, NULL,
- 			raw_pdu(0x03, 0x00, 0x02),
++next:
+ 	if (!discover_descs(op, &discovering))
+ 		goto failed;
+ 
+ 	if (discovering)
+ 		return;
+ 
+-next:
+ 	/* Done with the current service */
+ 	gatt_db_service_set_active(op->cur_svc, true);
+ 
 -- 
 2.1.0
 
