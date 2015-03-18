@@ -3,37 +3,35 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  7/7] shared/tester: Fix divide by zero error
-Date: Wed, 18 Mar 2015 15:35:41 +0530
-Message-id: <1426673141-17700-8-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH  6/7] doc/test-coverage: Update test-gatt count
+Date: Wed, 18 Mar 2015 15:35:40 +0530
+Message-id: <1426673141-17700-7-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1426673141-17700-1-git-send-email-gowtham.ab@samsung.com>
 References: <1426673141-17700-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Before adding a check - o/p:
-Total: 0, Passed: 0 (-nan%), Failed: 0, Not Run: 0
-
-After check - o/p:
-Total: 0, Passed: 0 (0.0%), Failed: 0, Not Run: 0
 ---
- src/shared/tester.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ doc/test-coverage.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index d05bf08..3c3089f 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -319,7 +319,8 @@ static int tester_summarize(void)
- 		COLOR_RED "Failed: %d" COLOR_OFF ", "
- 		COLOR_YELLOW "Not Run: %d" COLOR_OFF "\n",
- 			not_run + passed + failed, passed,
--			(float) passed * 100 / (not_run + passed + failed),
-+			(not_run + passed + failed) ?
-+			(float) passed * 100 / (not_run + passed + failed) : 0,
- 			failed, not_run);
+diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+index c64057c..1f179c8 100644
+--- a/doc/test-coverage.txt
++++ b/doc/test-coverage.txt
+@@ -29,10 +29,10 @@ test-gobex-header	  28	OBEX header handling
+ test-gobex-apparam	  18	OBEX apparam handling
+ test-gobex-transfer	  36	OBEX transfer handling
+ test-gdbus-client	  13	D-Bus client handling
+-test-gatt		 149	GATT qualification test cases
++test-gatt		 159	GATT qualification test cases
+ test-hog		   6	HID Over GATT qualification test cases
+ 			-----
+-			 730
++			 740
  
- 	execution_time = g_timer_elapsed(test_timer, NULL);
+ 
+ Automated end-to-end testing
 -- 
 1.9.1
 
