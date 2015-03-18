@@ -1,39 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  0/7] Add Reliable Writes Server test cases
-Date: Wed, 18 Mar 2015 15:35:34 +0530
-Message-id: <1426673141-17700-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH 1/2] Bluetooth: Add skeleton for 6LoWPAN mgmt command handling
+Date: Wed, 18 Mar 2015 11:10:39 +0200
+Message-Id: <1426669840-2933-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds the below server test cases (tested against small and large DB):
-1) Characteristic Value Reliable Writes - to Server
-2) Nested Long Characteristic Value Reliable Writes - to Server
-3) Characteristic Value Reliable Writes - Invalid Handle Response
-4) Characteristic Value Reliable Writes - Write Not Permitted Response
-5) Cancel Reliable Write Characteristic – from Server
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Tested using valgrind, no regression/core dump found.
+This patch defines a new HCI channel for 6LoWPAN usage and registers a
+command handler table for it in the 6lowpan module.
 
-Gowtham Anandha Babu (7):
-  unit/test-gatt: Add TP/GAW/SR/BV-06-C test
-  unit/test-gatt: Add TP/GAW/SR/BV-10-C test
-  unit/test-gatt: Add TP/GAW/SR/BI-14-C test
-  unit/test-gatt: Add TP/GAW/SR/BI-15-C test
-  unit/test-gatt: Add TP/GAW/SR/BV-07-C test
-  doc/test-coverage: Update test-gatt count
-  shared/tester: Fix divide by zero error
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_sock.h |  1 +
+ net/bluetooth/6lowpan.c          | 21 ++++++++++++++++++++-
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
- doc/test-coverage.txt |  4 +--
- src/shared/tester.c   |  3 +-
- unit/test-gatt.c      | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 95 insertions(+), 4 deletions(-)
-
+diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
+index 9a46d665c1b5..6be6120e1bc9 100644
+--- a/include/net/bluetooth/hci_sock.h
++++ b/include/net/bluetooth/hci_sock.h
+@@ -45,6 +45,7 @@ struct sockaddr_hci {
+ #define HCI_CHANNEL_USER	1
+ #define HCI_CHANNEL_MONITOR	2
+ #define HCI_CHANNEL_CONTROL	3
++#define HCI_CHANNEL_6LOWPAN	4
+ 
+ struct hci_filter {
+ 	unsigned long type_mask;
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 1742b849fcff..524218aeea6f 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -25,6 +25,7 @@
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/hci_sock.h>
+ #include <net/bluetooth/l2cap.h>
+ 
+ #include <net/6lowpan.h> /* for the compression support */
+@@ -1433,8 +1434,20 @@ static struct notifier_block bt_6lowpan_dev_notifier = {
+ 	.notifier_call = device_event,
+ };
+ 
++static const struct hci_mgmt_handler bt_6lowpan_handlers[] = {
++	{ NULL }, /* 0x0000 (no command) */
++};
++
++static struct hci_mgmt_chan bt_6lowpan_chan = {
++	.channel	= HCI_CHANNEL_6LOWPAN,
++	.handler_count	= ARRAY_SIZE(bt_6lowpan_handlers),
++	.handlers	= bt_6lowpan_handlers,
++};
++
+ static int __init bt_6lowpan_init(void)
+ {
++	int err;
++
+ 	lowpan_enable_debugfs = debugfs_create_file("6lowpan_enable", 0644,
+ 						    bt_debugfs, NULL,
+ 						    &lowpan_enable_fops);
+@@ -1442,11 +1455,17 @@ static int __init bt_6lowpan_init(void)
+ 						     bt_debugfs, NULL,
+ 						     &lowpan_control_fops);
+ 
+-	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
++	err = register_netdevice_notifier(&bt_6lowpan_dev_notifier);
++	if (err)
++		return err;
++
++	return hci_mgmt_chan_register(&bt_6lowpan_chan);
+ }
+ 
+ static void __exit bt_6lowpan_exit(void)
+ {
++	hci_mgmt_chan_unregister(&bt_6lowpan_chan);
++
+ 	debugfs_remove(lowpan_enable_debugfs);
+ 	debugfs_remove(lowpan_control_debugfs);
+ 
 -- 
-1.9.1
+2.1.0
 
