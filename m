@@ -1,58 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY176-W24D0233AE18250D3778E44D3010@phx.gbl>
-From: Ssagarr Patil <hugarsagar@outlook.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Szymon Janc <szymon.janc@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: bluez5 pairing devices
-Date: Thu, 19 Mar 2015 20:43:18 +0530
-In-Reply-To: <CC6FAAF0-122B-4678-9865-F5E237073C09@holtmann.org>
-References: <BAY176-W679B1127159C091585D3AD3030@phx.gbl>
- <,<46068BD2-CF33-4617-80DB-5AE5C1FCA364@holtmann.org>
- <,<,<12627750.IG3ACNRtuD@leonov>>>
- <,<BAY176-W40E12E1C2F620AB0D38605D3000@phx.gbl>,<440EB08C-2BD4-4373-B3DC-80361AA74722@holtmann.org>,<BAY176-W203E6BB20ECCED0D35B6A7D3010@phx.gbl>>>
- <BAY176-W11EC25DD22E46D52ED6D92D3010@phx.gbl>,<CC6FAAF0-122B-4678-9865-F5E237073C09@holtmann.org>
-Content-Type: text/plain; charset="Windows-1252"
+Message-ID: <550AE43D.8000705@cogentembedded.com>
+Date: Thu, 19 Mar 2015 17:59:09 +0300
+From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Harish Jenny K N <harish_kandiga@mentor.com>, marcel@holtmann.org
+CC: gustavo@padovan.org, johan.hedberg@gmail.com, davem@davemloft.net,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix use after free in l2cap_chan_timeout
+References: <1426753191-9468-1-git-send-email-harish_kandiga@mentor.com>
+In-Reply-To: <1426753191-9468-1-git-send-email-harish_kandiga@mentor.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hello.
 
-----------------------------------------
-> Subject: Re: bluez5 pairing devices
-> From: marcel@holtmann.org
-> Date: Thu, 19 Mar 2015 07:08:21 -0700
-> CC: szymon.janc@tieto.com; linux-bluetooth@vger.kernel.org
-> To: hugarsagar@outlook.com
->
-> Hi Sagar,
->
->>>>> # bluetoothctl
->>>>> [bluetooth]# power on
->>>>> No default controller available
->>>>> [bluetooth]#
->>>>
->>>> you need a running bluetoothd for bluetoothctl.
->>>>
->>> Isnt bluetoothd part of bluez5 stack ? as I am not able to see it.
->>>
->> A further debug showed me this:
->>
->> Mar 19 12:51:51 evm systemd[1]: Starting Bluetooth service...
->> Mar 19 12:51:51 evm bluetoothd[189]: Bluetooth daemon 5.29
->> Mar 19 12:51:51 evm systemd[1]: Started Bluetooth service.
->> Mar 19 12:51:51 evm bluetoothd[189]: Starting SDP server
->> Mar 19 12:51:51 evm bluetoothd[189]: Bluetooth management interface 1.1 initialized
->> Mar 19 12:51:51 evm bluetoothd[189]: Failed to read info for index 54749: Invalid Index (0x11)
->
-> this looks like an endian bug to me. That is no a valid index. Unless you really added 54749 Bluetooth dongles on your system. So something is screwed up that that needs to be investigated.
->
-Not sure what’s wrong here! because I have ported v3.5 bluetooth stack.
+On 3/19/2015 11:19 AM, Harish Jenny K N wrote:
 
-Is it true we cannot pair LE devices in bluez4.101 ?
+> There is a potential use after free in bt_sock_poll when a
+> socket gets killed without getting unlinked from accept_q.
+> Hence added code to unlink from accpept_q by calling teardown
+> before freeing the socket for channel type L2CAP_CHAN_CONN_ORIENTED.
 
+> Signed-off-by: Harish Jenny K N <harish_kandiga@mentor.com>
+> ---
+>   net/bluetooth/l2cap_core.c |    5 +++++
+>   1 file changed, 5 insertions(+)
 
-Regards
-Sagar
- 		 	   		  
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 6ba33f9..c6955fb 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -415,6 +415,11 @@ static void l2cap_chan_timeout(struct work_struct *work)
+>
+>   	l2cap_chan_close(chan, reason);
+>
+> +	if ((chan->state == BT_CONNECTED || chan->state == BT_CONFIG) &&
+> +	    chan->chan_type == L2CAP_CHAN_CONN_ORIENTED) {
+> +		chan->ops->teardown(chan, 0);
+> +	}
+> +
+
+    {} not needed here.
+
+[...]
+
+WBR, Sergei
