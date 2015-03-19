@@ -1,348 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] doc: Add initial 6LoWPAN API definition
-Date: Thu, 19 Mar 2015 11:22:40 +0100
-Message-ID: <1526447.VGJJGt7NUY@uw000953>
-In-Reply-To: <1426756230-422-1-git-send-email-johan.hedberg@gmail.com>
-References: <1426756230-422-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <550A7C86.8050403@ubnt.com>
+References: <1426712691-5048-1-git-send-email-luiz.dentz@gmail.com>
+	<1426712691-5048-6-git-send-email-luiz.dentz@gmail.com>
+	<550A7C86.8050403@ubnt.com>
+Date: Thu, 19 Mar 2015 12:17:14 +0200
+Message-ID: <CABBYNZL-_mTC+jNfN=8qHWi=zJ4t4u8+dU5wfBcebdQ3fj_uSA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 5/5] shared/gatt-client: Fix service discovery
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrejs Hanins <andrejs.hanins@ubnt.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andrejs,
 
-On Thursday 19 of March 2015 11:10:30 Johan Hedberg wrote:
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> ---
->  Makefile.am         |   2 +-
->  doc/6lowpan-api.txt | 291 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 292 insertions(+), 1 deletion(-)
->  create mode 100644 doc/6lowpan-api.txt
-> 
-> diff --git a/Makefile.am b/Makefile.am
-> index 90bb86baefdc..d6726dde40a0 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -239,7 +239,7 @@ EXTRA_DIST += $(test_scripts)
->  EXTRA_DIST += doc/assigned-numbers.txt doc/supported-features.txt \
->  				doc/test-coverage.txt doc/settings-storage.txt
->  
-> -EXTRA_DIST += doc/mgmt-api.txt \
-> +EXTRA_DIST += doc/mgmt-api.txt doc/6lowpan-api.txt \
->  		doc/adapter-api.txt doc/device-api.txt \
->  		doc/agent-api.txt doc/profile-api.txt \
->  		doc/network-api.txt doc/media-api.txt \
-> diff --git a/doc/6lowpan-api.txt b/doc/6lowpan-api.txt
-> new file mode 100644
-> index 000000000000..6c4e2fb7201a
-> --- /dev/null
-> +++ b/doc/6lowpan-api.txt
-> @@ -0,0 +1,291 @@
-> +6LoWPAN Management API
-> +**********************
-> +
-> +Copyright (C) 2015  Intel Corporation
-> +
-> +
-> +Overview
-> +========
-> +
-> +The 6LoWPAN Management API follows largely the same principles as the
-> +main Bluetooth Management API described in mgmt-api.txt. The main
-> +difference is a separate namespace for command and event codes,
-> +distinguished by using HCI_CHANNEL_6LOWPAN rather than
-> +HCI_CHANNEL_CONTROL when creating the mgmt socket.
-> +
-> +
-> +Read 6LoWPAN Version Information Command
-> +========================================
-> +
-> +	Command Code:		0x0001
-> +	Controller Index:	<non-controller>
-> +	Command Parameters:
-> +	Return Parameters:	Version (1 Octets)
-> +				Revision (2 Octets)
-> +
-> +	This command returns the 6LoWPAN version and revision.
-> +	Besides, being informational the information can be used to
-> +	determine whether certain behavior has changed or bugs fixed
-> +	when interacting with the kernel.
-> +
-> +	This command generates a Command Complete event on success or
-> +	a Command Status event on failure.
-> +
-> +
-> +Read 6LoWPAN Supported Commands Command
-> +========================================
-> +
-> +	Command Code:		0x0002
-> +	Controller Index:	<non-controller>
-> +	Command Parameters:
-> +	Return Parameters:	Num_Of_Commands (2 Octets)
-> +				Num_Of_Events (2 Octets)
-> +				Command1 (2 Octets)
-> +				Command2 (2 Octets)
-> +				...
-> +				Event1 (2 Octets)
-> +				Event2 (2 Octets)
-> +				...
-> +
-> +	This command returns the list of supported 6LoWPAN commands
-> +	and events.
-> +
-> +	The commands Read 6LoWPAN Version Information and Read
-> +	6LoWPAN Supported Commands are not included in this list.
-> +	Both commands are always supported and mandatory.
-> +
-> +	The events Command Status and Command Complete are not included
-> +	in this list. Both are implicit and mandatory.
-> +
-> +	This command generates a Command Complete event on success or
-> +	a Command Status event on failure.
-> +
-> +
-> +Read Controller Index List Command
-> +==================================
-> +
-> +	Command Code:		0x0003
-> +	Controller Index:	<non-controller>
-> +	Command Parameters:
-> +	Return Parameters:	Num_Controllers (2 Octets)
-> +				Controller_Index[i] (2 Octets)
-> +				Supported_Features[i] (4 Octets)
-> +
-> +	This command returns the list of currently known controllers
-> +	that can be used for 6LoWPAN connections. Controllers added or
-> +	removed after calling this command can be monitored using the
-> +	Index Added and Index Removed events.
-> +
-> +	The Supported_Features is a bitmask with the following available
-> +	bits:
-> +
-> +		0	Node Role Supported
-> +		1	Router Role Supported
-> +
-> +	This command generates a Command Complete event on success or
-> +	a Command Status event on failure.
-> +
-> +
-> +Connect Command
-> +===============
-> +
-> +	Command Code:		0x0004
-> +	Controller Index:	<controller id>
-> +	Command Parameters:	Address (6 Octets)
-> +				Address_Type (1 Octet)
-> +	Return Parameters:	Address (6 Octets)
-> +				Address_Type (1 Octet)
-> +				Network_Interface (16 Octets)
-> +
-> +	This command is used to connect to a remote 6LoWPAN server.
-> +
-> +	The returned Network_Interface parameter is a nul-terminated
-> +	string containing the created network interface name.
-> +
-> +	This command generates a Command Complete event on success or
-> +	a Command Status event on failure.
+On Thu, Mar 19, 2015 at 9:36 AM, Andrejs Hanins <andrejs.hanins@ubnt.com> wrote:
+> Hi Luiz
+>
+> On 2015.03.18. 23:04, Luiz Augusto von Dentz wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> The code should proceed to discover all descriptors before moving to
+>> next service otherwise it may attempt to insert characteristics in the
+>> wrong service which would probably fail.
+>> ---
+>>  src/shared/gatt-client.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+>> index 3e28c6e..729bd87 100644
+>> --- a/src/shared/gatt-client.c
+>> +++ b/src/shared/gatt-client.c
+>> @@ -690,13 +690,13 @@ static void discover_descs_cb(bool success, uint8_t att_ecode,
+>>                       goto failed;
+>>       }
+>>
+>> +next:
+>>       if (!discover_descs(op, &discovering))
+>>               goto failed;
+>>
+>>       if (discovering)
+>>               return;
+>>
+>> -next:
+>>       /* Done with the current service */
+>>       gatt_db_service_set_active(op->cur_svc, true);
+>>
+>>
+>
+> I tested this new patch-set and and results are the following:
+> 1. Three characteristics (GAP, GATT and custom) do appear on D-BUs. This was not the case before.
+> 2. CCC descriptor still does not appear on D-Bus. If I change handles on the peripheral back to sequential, then CCC appears on D-Bus also.
+> 3. Reading of any characteristic times out with 'g-io-error-quark: Timeout was reached (24)'. Logs attached. Based on HCI dumps the ATT reading is OK, but for some reason result is not propagated to the D-Bus level, so D-Dbus method times out. With sequential handles reading works fine.
 
-Shouldn't this always return command complete? ie for userspace to be
-able to easily handle multiple connect commands?
-(currently mgmt lib handles only 1 command at once but...)
+Strange for me it is working normally:
 
-> +
-> +	Possible errors:	Busy
-> +				Invalid Parameters
-> +				Not Powered
-> +				Invalid Index
-> +
-> +
-> +Disconnect Command
-> +==================
-> +
-> +	Command Code:		0x0005
-> +	Controller Index:	<controller id>
-> +	Command Parameters:	Address (6 Octets)
-> +				Address_Type (1 Octet)
-> +	Return Parameters:	Address (6 Octets)
-> +				Address_Type (1 Octet)
-> +
-> +	This command is used to disconnect from a remote 6LoWPAN server.
-> +
-> +	This command generates a Command Complete event on success or
-> +	a Command Status event on failure.
+[NEW] Service /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011
+Battery Service (Primary)
+[NEW] Characteristic
+/org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012 Battery
+Level
+[NEW] Descriptor
+/org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012/desc0014
+Client Characteristic Configuration
+[Arc Touch Mouse SE]# select-attribute
+/org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012
+[Arc Touch Mouse SE:/service0011/char0012]# read
+Attempting to read /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012
+[CHG] Attribute
+/org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012 Value: 0x5d
+  5d                                               ]
+[Arc Touch Mouse SE:/service0011/char0012]# select-attribute
+/org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012/desc0014
+[Arc Touch Mouse SE:/service0011/char0012/desc0014]# read
+Attempting to read
+/org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012/desc0014
+[CHG] Attribute
+/org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012/desc0014
+Value: 0x00
+[CHG] Attribute
+/org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012/desc0014
+Value: 0x00
+  00 00
 
-Same here.
+But perhaps this is because the handles are in sequence as you said,
+can you try with the following changes:
 
-> +
-> +	Possible errors:	Busy
-> +				Not Connected
-> +				Invalid Parameters
-> +				Not Powered
-> +				Invalid Index
-> +
-> +
-> +Start Server Command
-> +====================
-> +
-> +	Command Code:		0x0005
-> +	Controller Index:	<controller id>
-> +	Command Parameters:
-> +	Return Parameters:
-> +
-> +	This command is used to start a 6LoWPAN server for a specified
-> +	controller.
-> +
-> +	This command generates a Command Complete event on success or
-> +	a Command Status event on failure.
-> +
-> +	Possible errors:	Busy
-> +				Invalid Index
-> +
-> +
-> +Stop Server Command
-> +===================
-> +
-> +	Command Code:		0x0006
-> +	Controller Index:	<controller id>
-> +	Command Parameters:
-> +	Return Parameters:
-> +
-> +	This command is used to stop a 6LoWPAN server for a specified
-> +	controller.
-> +
-> +	This command generates a Command Complete event on success or
-> +	a Command Status event on failure.
-> +
-> +	Possible errors:	Rejected
-> +				Invalid Index
-> +
-> +
-> +Command Complete Event
-> +======================
-> +
-> +	Event Code:		0x0001
-> +	Controller Index:	<controller id> or <non-controller>
-> +	Event Parameters:	Command_Opcode (2 Octets)
-> +				Status (1 Octet)
-> +				Return_Parameters
-> +
-> +	This event is an indication that a command has completed. The
-> +	fixed set of parameters includes the opcode to identify the
-> +	command that completed as well as a status value to indicate
-> +	success or failure. The rest of the parameters are command
-> +	specific and documented in the section for each command
-> +	separately.
-> +
-> +
-> +Command Status Event
-> +====================
-> +
-> +	Event Code:		0x0002
-> +	Controller Index:	<controller id> or <non-controller>
-> +	Event Parameters:	Command_Opcode (2 Octets)
-> +				Status (1 Octet)
-> +
-> +	The command status event is used to indicate an early status for
-> +	a pending command. In the case that the status indicates failure
-> +	(anything else except success status) this also means that the
-> +	command has finished executing.
-> +
-> +
-> +Index Added Event
-> +=================
-> +
-> +	Event Code:		0x0003
-> +	Controller Index:	<controller id>
-> +	Event Parameters:	Supported_Features (4 octets)
-> +
-> +	This event indicates that a new controller has been added to the
-> +	system that can be used for 6LoWPAN.
-> +
-> +	The Supported_Features is a bitmask with the following available
-> +	bits:
-> +
-> +		0	Node Role Supported
-> +		1	Router Role Supported
-> +
-> +
-> +Index Removed Event
-> +===================
-> +
-> +	Event Code:		0x0004
-> +	Controller Index:	<controller id>
-> +	Event Parameters:
-> +
-> +	This event indicates that a 6LoWPAN-capable controller has been
-> +	removed from the system.
-> +
-> +
-> +6LoWPAN Connected Event
-> +=======================
-> +
-> +	Event Code:		0x0005
-> +	Controller Index:	<controller id>
-> +	Event Parameters:	Address (6 Octets)
-> +				Address_Type (1 Octet)
-> +				Role (1 Octet)
-> +				Interface_Name (16 Octets)
-> +
-> +	This event indicates that a successful 6LoWPAN connection has
-> +	been created to the remote device.
-> +
-> +	Possible values for the Address_Type parameter:
-> +		1	LE Public
-> +		2	LE Random
-> +
-> +	For devices using resolvable random addresses with a known
-> +	identity resolving key, the Address and Address_Type will
-> +	contain the identity information.
-> +
-> +	The Role parameter indicates which role the local system has for
-> +	the connection. The parameter has the following possible values:
-> +		0x00	Node
-> +		0x01	Router
-> +
-> +	The Network_Interface parameter is a nul-terminated
-> +	string containing the created network interface name.
-> +
-> +
-> +6LoWPAN Disconnected Event
-> +==========================
-> +
-> +	Event Code:		0x0006
-> +	Controller Index:	<controller id>
-> +	Event Parameters:	Address (6 Octets)
-> +				Address_Type (1 Octet)
-> +				Role (1 Octet)
-> +				Reason (1 Octet)
-> +
-> +	This event indicates that the 6LoWPAN connection was lost to a
-> +	remote device.
-> +
-> +	Possible values for the Address_Type parameter:
-> +		1	LE Public
-> +		2	LE Random
-> +
-> +	For devices using resolvable random addresses with a known
-> +	identity resolving key, the Address and Address_Type will
-> +	contain the identity information.
-> +
-> +	The Role parameter indicates which role the local system has for
-> +	the connection. The parameter has the following possible values:
-> +		0x00	Node
-> +		0x01	Router
-> +
-> +	Possible values for the Reason parameter:
-> +		0	Unspecified
-> +		1	Connection timeout
-> +		2	Connection terminated by local host
-> +		3	Connection terminated by remote host
-> 
+http://fpaste.org/199962/67601931/
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
