@@ -1,129 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v3 01/15] doc: Add LE Advertisement D-Bus API documentation
-Date: Thu, 19 Mar 2015 10:34:23 -0700
-Message-Id: <1426786477-27229-2-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
-References: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: bluez5 pairing devices
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <BAY176-W24D0233AE18250D3778E44D3010@phx.gbl>
+Date: Thu, 19 Mar 2015 09:02:49 -0700
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <03048CAB-EDA3-46D6-A65B-BB17927B1F7E@holtmann.org>
+References: <BAY176-W679B1127159C091585D3AD3030@phx.gbl> <,<46068BD2-CF33-4617-80DB-5AE5C1FCA364@holtmann.org> <,<,<12627750.IG3ACNRtuD@leonov> <>>> <,<BAY176-W40E12E1C2F620AB0D38605D3000@phx.gbl> <,<440EB08C-2BD4-4373-B3DC-80361AA74722@holtmann.org> <,<BAY176-W203E6BB20ECCED0D35B6A7D3010@phx.gbl>>>>> <BAY176-W11EC25DD22E46D52ED6D92D3010@phx.gbl> <,<CC6FAAF0-122B-4678-9865-F5E237073C09@holtmann.org> <>> <BAY176-W24D0233AE18250D3778E44D3010@phx.gbl>
+To: Ssagarr Patil <hugarsagar@outlook.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The LE Advertisement API allows external appications to define
-persistent LE Advertisement Data packets.
----
- doc/advertising-api.txt | 101 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
- create mode 100644 doc/advertising-api.txt
+Hi Sagar,
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-new file mode 100644
-index 0000000..7fb34ee
---- /dev/null
-+++ b/doc/advertising-api.txt
-@@ -0,0 +1,101 @@
-+BlueZ D-Bus LE Advertising API Description
-+******************************************
-+
-+Advertising packets are structured data which is broadcast on the LE Advertising
-+channels and available for all devices in range.  Because of the limited space
-+available in LE Advertising packets (32 bytes), each packet's contents must be
-+carefully controlled.
-+
-+BlueZ acts as a store for the Advertisement Data which is meant to be sent.
-+It constructs the correct Advertisement Data from the structured
-+data and configured the kernel to send the correct advertisement.
-+
-+Advertisement Data objects are registered freely and then referenced by BlueZ
-+when constructing the data sent to the kernel.
-+
-+LE Advertisement Data hierarchy
-+===============================
-+
-+Specifies the Advertisement Data to be broadcast and some advertising
-+parameters.  Properties which are not present will not be included in the
-+data.  Required advertisement data types will always be included.
-+All UUIDs are 128-bit versions in the API, and 16 or 32-bit
-+versions of the same UUID will be used in the advertising data as appropriate.
-+
-+Service		org.bluez
-+Interface	org.bluez.LEAdvertisement1
-+Object path	freely definable
-+
-+Methods		void Release() [noreply]
-+
-+			This method gets called when the service daemon
-+			removes the Advertisement. A client can use it to do
-+			cleanup tasks. There is no need to call
-+			UnregisterAdvertisement because when this method gets
-+			called it has already been unregistered.
-+
-+Properties	string Type
-+
-+			Determines the type of advertising packet requested.
-+
-+			Possible values: "broadcast" or "peripheral"
-+
-+		array{string} ServiceUUIDs
-+
-+			List of UUIDs to include in the "Service UUID" field of
-+			the Advertising Data.
-+
-+		dict ManufacturerData
-+
-+			Manufactuer Data fields to include in
-+			the Advertising Data.  Keys are the Manufacturer ID
-+			to associate with the data.
-+
-+		array{string} SolicitUUIDs
-+
-+			Array of UUIDs to include in "Service Solicitation"
-+			Advertisement Data.
-+
-+		dict ServiceData
-+
-+			Service Data elements to include. The keys are the
-+			UUID to associate with the data.
-+
-+
-+LE Advertising Manager hierarchy
-+================================
-+
-+The Advertising Manager allows external applications to register Advertisement
-+Data which should be broadcast to devices.  Advertisement Data elements must
-+follow the API for LE Advertisement Data described above.
-+
-+Service		org.bluez
-+Interface	org.bluez.LEAdvertisingManager1 [Experimental]
-+Object path	/org/bluez/{hci0,hci1,...}
-+
-+Methods		RegisterAdvertisement(object advertisement, dict options)
-+
-+			Registers an advertisement object to be sent over the LE
-+			Advertising channel.  The service must be exported
-+			under interface LEAdvertisement1. InvalidArguments
-+			indicates that the object has invalid or conflicting
-+			properties.  InvalidLength indicates that the data
-+			provided generates a data packet which is too long.
-+			The properties of this object are parser when it is
-+			registered, and any changes are ignored.
-+			Currently only one advertisement at a time is supported,
-+			attempting to register two advertisements will result in
-+			an AlreadyExists error.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.AlreadyExists
-+					 org.bluez.Error.InvalidLength
-+
-+		UnregisterAdvertisement(object advertisement)
-+
-+			This unregisters an advertisement that has been
-+			prevously registered.  The object path parameter must
-+			match the same value that has been used on registration.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.DoesNotExist
--- 
-2.2.0.rc0.207.ga3a616c
+>>>>>> # bluetoothctl
+>>>>>> [bluetooth]# power on
+>>>>>> No default controller available
+>>>>>> [bluetooth]#
+>>>>> 
+>>>>> you need a running bluetoothd for bluetoothctl.
+>>>>> 
+>>>> Isnt bluetoothd part of bluez5 stack ? as I am not able to see it.
+>>>> 
+>>> A further debug showed me this:
+>>> 
+>>> Mar 19 12:51:51 evm systemd[1]: Starting Bluetooth service...
+>>> Mar 19 12:51:51 evm bluetoothd[189]: Bluetooth daemon 5.29
+>>> Mar 19 12:51:51 evm systemd[1]: Started Bluetooth service.
+>>> Mar 19 12:51:51 evm bluetoothd[189]: Starting SDP server
+>>> Mar 19 12:51:51 evm bluetoothd[189]: Bluetooth management interface 1.1 initialized
+>>> Mar 19 12:51:51 evm bluetoothd[189]: Failed to read info for index 54749: Invalid Index (0x11)
+>> 
+>> this looks like an endian bug to me. That is no a valid index. Unless you really added 54749 Bluetooth dongles on your system. So something is screwed up that that needs to be investigated.
+>> 
+> Not sure what’s wrong here! because I have ported v3.5 bluetooth stack.
+
+maybe the backport has some issues that got fixed. The latest stable kernel is 3.19.2.
+
+> Is it true we cannot pair LE devices in bluez4.101 ?
+
+LE support with BlueZ 4 is limited to not really working at all. So if want to work on LE, then you need mgmt API support and a recent Bluetooth subsystem and BlueZ 5.
+
+Regards
+
+Marcel
 
