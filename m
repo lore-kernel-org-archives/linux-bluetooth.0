@@ -2,101 +2,80 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v3 13/15] advertising-manager: Parse ManufacturerSpecificData
-Date: Thu, 19 Mar 2015 10:34:35 -0700
-Message-Id: <1426786477-27229-14-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v3 12/15] advertising-manager: Parse SolicitUUIDs
+Date: Thu, 19 Mar 2015 10:34:34 -0700
+Message-Id: <1426786477-27229-13-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
 References: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the ManufacturerSpecificData property of the LEAdvertisement1
+Parse the SolicitUUIDs property of the LEAdvertisement1 object.
 ---
- src/advertising-manager.c | 60 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 58 insertions(+), 2 deletions(-)
+ src/advertising-manager.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
 diff --git a/src/advertising-manager.c b/src/advertising-manager.c
-index efd05ba..432cdad 100644
+index 18d0bf3..efd05ba 100644
 --- a/src/advertising-manager.c
 +++ b/src/advertising-manager.c
-@@ -244,6 +244,57 @@ fail:
+@@ -206,6 +206,44 @@ fail:
  	return false;
  }
  
-+static bool parse_advertising_manufacturer_data(GDBusProxy *proxy,
-+						struct advertising_data *data)
++static bool parse_advertising_solicit_uuids(GDBusProxy *proxy,
++					struct advertising_data *data)
 +{
-+	DBusMessageIter iter, entries;
++	DBusMessageIter iter, ariter;
 +
-+	if (!g_dbus_proxy_get_property(proxy, "ManufacturerData", &iter))
++	if (!g_dbus_proxy_get_property(proxy, "SolicitUUIDs", &iter))
 +		return true;
 +
 +	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
 +		return false;
 +
-+	dbus_message_iter_recurse(&iter, &entries);
++	dbus_message_iter_recurse(&iter, &ariter);
 +
-+	advertising_data_clear_manufacturer_data(data);
++	advertising_data_clear_solicit_uuid(data);
 +
-+	while (dbus_message_iter_get_arg_type(&entries)
-+						== DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter value, entry;
-+		uint16_t manuf_id;
-+		uint8_t *manuf_data;
-+		int len;
++	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
++		const char *uuid_str;
++		bt_uuid_t uuid;
 +
-+		dbus_message_iter_recurse(&entries, &entry);
-+		dbus_message_iter_get_basic(&entry, &manuf_id);
++		dbus_message_iter_get_basic(&ariter, &uuid_str);
 +
-+		dbus_message_iter_next(&entry);
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_ARRAY)
++		DBG("Adding SolicitUUID: %s", uuid_str);
++
++		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
 +			goto fail;
 +
-+		dbus_message_iter_recurse(&entry, &value);
++		advertising_data_add_solicit_uuid(data, &uuid);
 +
-+		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_BYTE)
-+			goto fail;
-+
-+		dbus_message_iter_get_fixed_array(&value, &manuf_data, &len);
-+
-+		DBG("Adding ManufacturerData for %04x", manuf_id);
-+
-+		advertising_data_add_manufacturer_data(data, manuf_id,
-+							manuf_data, len);
-+
-+		dbus_message_iter_next(&entries);
++		dbus_message_iter_next(&ariter);
 +	}
 +
 +	return true;
 +
 +fail:
-+	advertising_data_clear_manufacturer_data(data);
++	advertising_data_clear_solicit_uuid(data);
 +	return false;
 +}
 +
  static void refresh_advertisement(struct advertisement *ad)
  {
  	DBG("Refreshing advertisement: %s", ad->path);
-@@ -260,12 +311,17 @@ static bool parse_advertisement(struct advertisement *ad)
- 	}
- 
- 	if (!parse_advertising_service_uuids(ad->proxy, ad->data)) {
--		error("Property \"ServiceUUIDs\" failed to parse correctly");
-+		error("Property \"ServiceUUIDs\" failed to parse");
+@@ -226,6 +264,11 @@ static bool parse_advertisement(struct advertisement *ad)
  		return false;
  	}
  
- 	if (!parse_advertising_solicit_uuids(ad->proxy, ad->data)) {
--		error("Property \"SolicitUUIDs\" failed to parse correctly");
-+		error("Property \"SolicitUUIDs\" failed to parse");
++	if (!parse_advertising_solicit_uuids(ad->proxy, ad->data)) {
++		error("Property \"SolicitUUIDs\" failed to parse correctly");
 +		return false;
 +	}
 +
-+	if (!parse_advertising_manufacturer_data(ad->proxy, ad->data)) {
-+		error("Property \"ManufacturerData\" failed to parse");
- 		return false;
- 	}
+ 	/* TODO: parse the rest of the properties */
  
+ 	refresh_advertisement(ad);
 -- 
 2.2.0.rc0.207.ga3a616c
 
