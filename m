@@ -1,47 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: bluez5 pairing devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <BAY176-W11EC25DD22E46D52ED6D92D3010@phx.gbl>
-Date: Thu, 19 Mar 2015 07:08:21 -0700
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <CC6FAAF0-122B-4678-9865-F5E237073C09@holtmann.org>
-References: <BAY176-W679B1127159C091585D3AD3030@phx.gbl> <,<46068BD2-CF33-4617-80DB-5AE5C1FCA364@holtmann.org> <,<,<12627750.IG3ACNRtuD@leonov>>> <,<BAY176-W40E12E1C2F620AB0D38605D3000@phx.gbl>,<440EB08C-2BD4-4373-B3DC-80361AA74722@holtmann.org>,<BAY176-W203E6BB20ECCED0D35B6A7D3010@phx.gbl>>> <BAY176-W11EC25DD22E46D52ED6D92D3010@phx.gbl>
-To: Ssagarr Patil <hugarsagar@outlook.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 7/7] core/gatt: Check if attribute is valid
+Date: Thu, 19 Mar 2015 15:13:20 +0200
+Message-Id: <1426770800-21649-7-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1426770800-21649-1-git-send-email-luiz.dentz@gmail.com>
+References: <1426770800-21649-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sagar,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
->>>> # bluetoothctl
->>>> [bluetooth]# power on
->>>> No default controller available
->>>> [bluetooth]#
->>> 
->>> you need a running bluetoothd for bluetoothctl.
->>> 
->> Isnt bluetoothd part of bluez5 stack ? as I am not able to see it.
->> 
-> A further debug showed me this:
-> 
-> Mar 19 12:51:51 evm systemd[1]: Starting Bluetooth service...
-> Mar 19 12:51:51 evm bluetoothd[189]: Bluetooth daemon 5.29
-> Mar 19 12:51:51 evm systemd[1]: Started Bluetooth service.
-> Mar 19 12:51:51 evm bluetoothd[189]: Starting SDP server
-> Mar 19 12:51:51 evm bluetoothd[189]: Bluetooth management interface 1.1 initialized
-> Mar 19 12:51:51 evm bluetoothd[189]: Failed to read info for index 54749: Invalid Index (0x11)
+This checks the return of gatt_db_get_attribute and fail if return NULL.
+---
+ src/gatt-client.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-this looks like an endian bug to me. That is no a valid index. Unless you really added 54749 Bluetooth dongles on your system. So something is screwed up that that needs to be investigated.
-
-> Mar 19 12:51:51 evm connmand[149]: Method "ListAdapters" with signature "" on interface "org.bluez.Manager" doesn't exist
-> 
-> org.bluez.Manager service is missing in from services shouldnt it come from bluez5 ?
-
-It uses D-Bus Object Manager to retrieve all objects.
-
-Regards
-
-Marcel
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index 8f67db3..608f96d 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1339,8 +1339,15 @@ static struct characteristic *characteristic_create(
+ 	gatt_db_attribute_get_char_data(attr, &chrc->handle,
+ 							&chrc->value_handle,
+ 							&chrc->props, &uuid);
++
+ 	chrc->attr = gatt_db_get_attribute(service->client->db,
+ 							chrc->value_handle);
++	if (!chrc->attr) {
++		error("Attribute 0x%04x not found", chrc->value_handle);
++		characteristic_free(chrc);
++		return NULL;
++	}
++
+ 	bt_uuid_to_uuid128(&uuid, &chrc->uuid);
+ 
+ 	chrc->path = g_strdup_printf("%s/char%04x", service->path,
+-- 
+2.1.0
 
