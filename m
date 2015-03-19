@@ -2,62 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v3 10/15] advertising-manager: use advertising_data
-Date: Thu, 19 Mar 2015 10:34:32 -0700
-Message-Id: <1426786477-27229-11-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v3 07/15] build: add advertising-api.txt to docs distributed
+Date: Thu, 19 Mar 2015 10:34:29 -0700
+Message-Id: <1426786477-27229-8-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
 References: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Start using the newly introduced struct advertising_data API.
+Add doc/advertising-api.txt to the docs.
 ---
- src/advertising-manager.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/advertising-manager.c b/src/advertising-manager.c
-index f6d9f0e..e0259e4 100644
---- a/src/advertising-manager.c
-+++ b/src/advertising-manager.c
-@@ -32,6 +32,7 @@
- #include "dbus-common.h"
- #include "error.h"
- #include "log.h"
-+#include "src/shared/advertising-data.h"
- #include "src/shared/queue.h"
- #include "src/shared/util.h"
+diff --git a/Makefile.am b/Makefile.am
+index 1ddf3f2..db2978e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -250,7 +250,7 @@ EXTRA_DIST += doc/mgmt-api.txt \
+ EXTRA_DIST += doc/alert-api.txt \
+ 		doc/proximity-api.txt doc/heartrate-api.txt \
+ 		doc/thermometer-api.txt doc/cyclingspeed-api.txt \
+-		doc/gatt-api.txt
++		doc/gatt-api.txt doc/advertising-api.txt
  
-@@ -55,6 +56,7 @@ struct advertisement {
- 	DBusMessage *reg;
- 	uint8_t type; /* Advertising type */
- 	bool published;
-+	struct advertising_data *data;
- };
+ EXTRA_DIST += doc/obex-api.txt doc/obex-agent-api.txt
  
- static bool match_advertisement_path(const void *a, const void *b)
-@@ -74,8 +76,9 @@ static void advertisement_free(void *data)
- 		g_dbus_client_unref(ad->client);
- 	}
- 
--	if (ad->proxy)
--		g_dbus_proxy_unref(ad->proxy);
-+	advertising_data_unref(ad->data);
-+
-+	g_dbus_proxy_unref(ad->proxy);
- 
- 	if (ad->owner)
- 		g_free(ad->owner);
-@@ -250,6 +253,10 @@ static struct advertisement *advertisement_create(DBusConnection *conn,
- 
- 	ad->reg = dbus_message_ref(msg);
- 
-+	ad->data = advertising_data_new();
-+	if (!ad->data)
-+		goto fail;
-+
- 	return ad;
- 
- fail:
 -- 
 2.2.0.rc0.207.ga3a616c
 
