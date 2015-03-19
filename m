@@ -1,65 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: gmt@be-evil.net
+From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"Gregory M. Turner" <gmt@be-evil.net>
-Subject: [PATCH v3 1/1] bluetooth: l2cap_core: ratelimit continuation frame printk
-Date: Thu, 19 Mar 2015 11:54:28 -0700
-Message-Id: <1426791268-18938-1-git-send-email-gmt@be-evil.net>
-In-Reply-To: <1424759141-17889-2-git-send-email-gmt@be-evil.net>
-References: <1424759141-17889-2-git-send-email-gmt@be-evil.net>
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [BlueZ v3 11/15] advertising-manager: Parse ServiceUUIDs
+Date: Thu, 19 Mar 2015 10:34:33 -0700
+Message-Id: <1426786477-27229-12-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
+References: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Gregory M. Turner" <gmt@be-evil.net>
-
-For ages, some(1) users, presumably with broken hardware or buggy
-drivers, get storms of "Unexpected continuation frame (len 0)"
-messages flooding their logs (but are otherwise able to scrape
-by without resolving the underlying problem).  So, ratelimit this
-printk.
-
-(1)
-me
-https://bugs.launchpad.net/ubuntu/+source/bluetooth-alsa/+bug/192502
-https://bugzilla.kernel.org/show_bug.cgi?id=11705
-https://bugzilla.redhat.com/show_bug.cgi?id=450490
-.
-.
-(just Google, I'm not making it up)
-
-Signed-off-by: Gregory M. Turner <gmt@be-evil.net>
+Parse the ServiceUUIDs property of the LEAdvertisement1 object.
 ---
- include/net/bluetooth/bluetooth.h | 2 ++
- net/bluetooth/l2cap_core.c        | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ src/advertising-manager.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index e00455a..4d47ef6 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -128,6 +128,8 @@ void bt_err(const char *fmt, ...);
- #define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
- #define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
+diff --git a/src/advertising-manager.c b/src/advertising-manager.c
+index e0259e4..18d0bf3 100644
+--- a/src/advertising-manager.c
++++ b/src/advertising-manager.c
+@@ -168,6 +168,44 @@ static bool parse_advertising_type(GDBusProxy *proxy, uint8_t *type)
+ 	return false;
+ }
  
-+#define BT_ERR_RATELIMITED(fmt, ...)	pr_err_ratelimited(fmt "\n", ##__VA_ARGS__)
++static bool parse_advertising_service_uuids(GDBusProxy *proxy,
++					struct advertising_data *data)
++{
++	DBusMessageIter iter, ariter;
 +
- /* Connection and socket states */
- enum {
- 	BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6ba33f9..7090aa0 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7493,7 +7493,7 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 		BT_DBG("Cont: frag len %d (expecting %d)", skb->len, conn->rx_len);
++	if (!g_dbus_proxy_get_property(proxy, "ServiceUUIDs", &iter))
++		return true;
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++		return false;
++
++	dbus_message_iter_recurse(&iter, &ariter);
++
++	advertising_data_clear_service_uuid(data);
++
++	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
++		const char *uuid_str;
++		bt_uuid_t uuid;
++
++		dbus_message_iter_get_basic(&ariter, &uuid_str);
++
++		DBG("Adding ServiceUUID: %s", uuid_str);
++
++		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
++			goto fail;
++
++		advertising_data_add_service_uuid(data, &uuid);
++
++		dbus_message_iter_next(&ariter);
++	}
++
++	return true;
++
++fail:
++	advertising_data_clear_service_uuid(data);
++	return false;
++}
++
+ static void refresh_advertisement(struct advertisement *ad)
+ {
+ 	DBG("Refreshing advertisement: %s", ad->path);
+@@ -183,7 +221,12 @@ static bool parse_advertisement(struct advertisement *ad)
+ 		return false;
+ 	}
  
- 		if (!conn->rx_len) {
--			BT_ERR("Unexpected continuation frame (len %d)", skb->len);
-+			BT_ERR_RATELIMITED("Unexpected continuation frame (len %d)", skb->len);
- 			l2cap_conn_unreliable(conn, ECOMM);
- 			goto drop;
- 		}
+-	/* TODO: parse the remaining properties into a shared structure */
++	if (!parse_advertising_service_uuids(ad->proxy, ad->data)) {
++		error("Property \"ServiceUUIDs\" failed to parse correctly");
++		return false;
++	}
++
++	/* TODO: parse the rest of the properties */
+ 
+ 	refresh_advertisement(ad);
+ 
 -- 
-2.3.3
+2.2.0.rc0.207.ga3a616c
 
