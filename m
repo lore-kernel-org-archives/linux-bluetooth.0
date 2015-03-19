@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 7/7] core/gatt: Check if attribute is valid
-Date: Thu, 19 Mar 2015 15:13:20 +0200
-Message-Id: <1426770800-21649-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 5/7] shared/gatt-client: Fix service discovery
+Date: Thu, 19 Mar 2015 15:13:18 +0200
+Message-Id: <1426770800-21649-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1426770800-21649-1-git-send-email-luiz.dentz@gmail.com>
 References: <1426770800-21649-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,31 +11,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This checks the return of gatt_db_get_attribute and fail if return NULL.
+The code should proceed to discover all descriptors before moving to
+next service otherwise it may attempt to insert characteristics in the
+wrong service which would probably fail.
 ---
- src/gatt-client.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ src/shared/gatt-client.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 8f67db3..608f96d 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1339,8 +1339,15 @@ static struct characteristic *characteristic_create(
- 	gatt_db_attribute_get_char_data(attr, &chrc->handle,
- 							&chrc->value_handle,
- 							&chrc->props, &uuid);
-+
- 	chrc->attr = gatt_db_get_attribute(service->client->db,
- 							chrc->value_handle);
-+	if (!chrc->attr) {
-+		error("Attribute 0x%04x not found", chrc->value_handle);
-+		characteristic_free(chrc);
-+		return NULL;
-+	}
-+
- 	bt_uuid_to_uuid128(&uuid, &chrc->uuid);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 3e28c6e..729bd87 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -690,13 +690,13 @@ static void discover_descs_cb(bool success, uint8_t att_ecode,
+ 			goto failed;
+ 	}
  
- 	chrc->path = g_strdup_printf("%s/char%04x", service->path,
++next:
+ 	if (!discover_descs(op, &discovering))
+ 		goto failed;
+ 
+ 	if (discovering)
+ 		return;
+ 
+-next:
+ 	/* Done with the current service */
+ 	gatt_db_service_set_active(op->cur_svc, true);
+ 
 -- 
 2.1.0
 
