@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 5/7] shared/gatt-client: Fix service discovery
-Date: Thu, 19 Mar 2015 16:21:25 +0200
-Message-Id: <1426774887-25646-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 4/7] unit/test-gatt: Add /TP/GAD/CL/BV-06-C/client-3 test
+Date: Thu, 19 Mar 2015 16:21:24 +0200
+Message-Id: <1426774887-25646-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1426774887-25646-1-git-send-email-luiz.dentz@gmail.com>
 References: <1426774887-25646-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,32 +11,137 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The code should proceed to discover all descriptors before moving to
-next service otherwise it may attempt to insert characteristics in the
-wrong service which would probably fail.
+This verify the code is able to parse services with different gaps
+between handles.
 ---
- src/shared/gatt-client.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ unit/test-gatt.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 86 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 3e28c6e..729bd87 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -690,13 +690,13 @@ static void discover_descs_cb(bool success, uint8_t att_ecode,
- 			goto failed;
- 	}
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 7bc2d25..f1f814a 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -178,6 +178,36 @@ struct context {
+ 		raw_pdu(0x04, 0x09, 0x00, 0x0a, 0x00),			\
+ 		raw_pdu(0x05, 0x01, 0x0a, 0x00, 0x01, 0x29)
  
-+next:
- 	if (!discover_descs(op, &discovering))
- 		goto failed;
++#define SERVICE_DATA_3_PDUS						\
++		MTU_EXCHANGE_CLIENT_PDUS,				\
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x06, 0x00, 0x01, 0x21, 0x01, 0x00, 0x18, \
++			0x00, 0x02, 0x00, 0x02, 0x01, 0x18),		\
++		raw_pdu(0x10, 0x01, 0x02, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x11, 0x06, 0x00, 0x03, 0x20, 0x03, 0x0d, 0x18),\
++		raw_pdu(0x10, 0x21, 0x03, 0xff, 0xff, 0x00, 0x28),	\
++		raw_pdu(0x01, 0x10, 0x21, 0x03, 0x0a),			\
++		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28),	\
++		raw_pdu(0x01, 0x10, 0x01, 0x00, 0x0a),			\
++		raw_pdu(0x08, 0x00, 0x01, 0x21, 0x01, 0x02, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x00, 0x01, 0x0a),			\
++		raw_pdu(0x08, 0x00, 0x03, 0x20, 0x03, 0x02, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x00, 0x03, 0x0a),			\
++		raw_pdu(0x08, 0x00, 0x01, 0x21, 0x01, 0x03, 0x28),	\
++		raw_pdu(0x09, 0x07, 0x10, 0x01, 0x02, 0x11, 0x01, 0x00,	\
++			0x2a, 0x20, 0x01, 0x02, 0x21, 0x01, 0x01, 0x2a),\
++		raw_pdu(0x08, 0x21, 0x01, 0x21, 0x01, 0x03, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x21, 0x01, 0x0a),			\
++		raw_pdu(0x04, 0x12, 0x01, 0x1f, 0x01),			\
++		raw_pdu(0x01, 0x04, 0x12, 0x01, 0x0a),			\
++		raw_pdu(0x08, 0x00, 0x03, 0x20, 0x03, 0x03, 0x28),	\
++		raw_pdu(0x09, 0x07, 0x10, 0x03, 0x0a, 0x11, 0x03, 0x29,	\
++			0x2a),						\
++		raw_pdu(0x08, 0x11, 0x03, 0x20, 0x03, 0x03, 0x28),	\
++		raw_pdu(0x01, 0x08, 0x11, 0x03, 0x0a),			\
++		raw_pdu(0x04, 0x12, 0x03, 0x20, 0x03),			\
++		raw_pdu(0x05, 0x01, 0x20, 0x03, 0x02, 0x29)
++
+ #define PRIMARY_DISC_SMALL_DB						\
+ 		raw_pdu(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28),	\
+ 		raw_pdu(0x11, 0x06, 0x10, 0xF0, 0x17, 0xF0, 0x00, 0x18,	\
+@@ -1256,6 +1286,56 @@ static struct gatt_db *make_service_data_2_db(void)
+ 	return make_db(specs);
+ }
  
- 	if (discovering)
- 		return;
++#define CHARACTERISTIC_AT(chr_handle, chr_uuid, permissions, properties, \
++							bytes...)	\
++	{								\
++		.valid = true,						\
++		.handle = chr_handle,					\
++		.type = CHARACTERISTIC,					\
++		.uuid = STR(chr_uuid),					\
++		.att_permissions = permissions,				\
++		.char_properties = properties,				\
++		.value = data(bytes),					\
++		.len = sizeof(data(bytes)),				\
++	}
++
++#define DESCRIPTOR_AT(desc_handle, desc_uuid, permissions, bytes...)	\
++	{								\
++		.valid = true,						\
++		.handle = desc_handle,					\
++		.type = DESCRIPTOR,					\
++		.uuid = STR(desc_uuid),					\
++		.att_permissions = permissions,				\
++		.value = data(bytes),					\
++		.len = sizeof(data(bytes)),				\
++	}
++
++static struct gatt_db *make_service_data_3_db(void)
++{
++	const struct att_handle_spec specs[] = {
++		PRIMARY_SERVICE(0x0100, GAP_UUID, 0x0121 - 0x0100 + 1),
++		CHARACTERISTIC_STR_AT(0x0111, GATT_CHARAC_DEVICE_NAME,
++					BT_ATT_PERM_READ,
++					BT_GATT_CHRC_PROP_READ, "BlueZ"),
++		CHARACTERISTIC_AT(0x0121, GATT_CHARAC_APPEARANCE,
++					BT_ATT_PERM_READ,
++					BT_GATT_CHRC_PROP_READ, 0x00, 0x00),
++		PRIMARY_SERVICE(0x0200, GATT_UUID, 0x0200 - 0x0200 + 1),
++		PRIMARY_SERVICE(0x0300, HEART_RATE_UUID, 0x0320 - 0x0300 + 1),
++		CHARACTERISTIC_STR_AT(0x0311,
++					GATT_CHARAC_MANUFACTURER_NAME_STRING,
++					BT_ATT_PERM_READ,
++					BT_GATT_CHRC_PROP_READ |
++					BT_GATT_CHRC_PROP_WRITE, ""),
++		DESCRIPTOR_AT(0x0320, GATT_CLIENT_CHARAC_CFG_UUID,
++					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++					0x00, 0x00),
++		{ }
++	};
++
++	return make_db(specs);
++}
++
+ /*
+  * Defined Test database 1:
+  * Tiny database fits into a single minimum sized-pdu.
+@@ -2049,13 +2129,14 @@ static const struct test_step test_indication_server_1 = {
  
--next:
- 	/* Done with the current service */
- 	gatt_db_service_set_active(op->cur_svc, true);
+ int main(int argc, char *argv[])
+ {
+-	struct gatt_db *service_db_1, *service_db_2;
++	struct gatt_db *service_db_1, *service_db_2, *service_db_3;
+ 	struct gatt_db *ts_small_db, *ts_large_db_1;
  
+ 	tester_init(&argc, &argv);
+ 
+ 	service_db_1 = make_service_data_1_db();
+ 	service_db_2 = make_service_data_2_db();
++	service_db_3 = make_service_data_3_db();
+ 	ts_small_db = make_test_spec_small_db();
+ 	ts_large_db_1 = make_test_spec_large_db_1();
+ 
+@@ -2367,6 +2448,10 @@ int main(int argc, char *argv[])
+ 			service_db_2, NULL,
+ 			SERVICE_DATA_2_PDUS);
+ 
++	define_test_client("/TP/GAD/CL/BV-06-C/client-3", test_client,
++			service_db_3, NULL,
++			SERVICE_DATA_3_PDUS);
++
+ 	define_test_server("/TP/GAD/SR/BV-06-C/small", test_server,
+ 			ts_small_db, NULL,
+ 			raw_pdu(0x03, 0x00, 0x02),
 -- 
 2.1.0
 
