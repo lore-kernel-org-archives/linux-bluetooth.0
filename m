@@ -1,159 +1,330 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZL-_mTC+jNfN=8qHWi=zJ4t4u8+dU5wfBcebdQ3fj_uSA@mail.gmail.com>
-References: <1426712691-5048-1-git-send-email-luiz.dentz@gmail.com>
-	<1426712691-5048-6-git-send-email-luiz.dentz@gmail.com>
-	<550A7C86.8050403@ubnt.com>
-	<CABBYNZL-_mTC+jNfN=8qHWi=zJ4t4u8+dU5wfBcebdQ3fj_uSA@mail.gmail.com>
-Date: Thu, 19 Mar 2015 12:56:52 +0200
-Message-ID: <CABBYNZ+3zdW1z2xjcyO6pmeU3-9C7Bw1Kh8kAxoHFCfFY_iWCA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 5/5] shared/gatt-client: Fix service discovery
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrejs Hanins <andrejs.hanins@ubnt.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary=001a11c34c54bb99010511a20e93
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] doc: Add initial 6LoWPAN API definition
+Date: Thu, 19 Mar 2015 12:39:28 +0200
+Message-Id: <1426761568-7649-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a11c34c54bb99010511a20e93
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Hi Andrejs,
+---
+ Makefile.am         |   2 +-
+ doc/6lowpan-api.txt | 291 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 292 insertions(+), 1 deletion(-)
+ create mode 100644 doc/6lowpan-api.txt
 
-On Thu, Mar 19, 2015 at 12:17 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Andrejs,
->
-> On Thu, Mar 19, 2015 at 9:36 AM, Andrejs Hanins <andrejs.hanins@ubnt.com>=
- wrote:
->> Hi Luiz
->>
->> On 2015.03.18. 23:04, Luiz Augusto von Dentz wrote:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> The code should proceed to discover all descriptors before moving to
->>> next service otherwise it may attempt to insert characteristics in the
->>> wrong service which would probably fail.
->>> ---
->>>  src/shared/gatt-client.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->>> index 3e28c6e..729bd87 100644
->>> --- a/src/shared/gatt-client.c
->>> +++ b/src/shared/gatt-client.c
->>> @@ -690,13 +690,13 @@ static void discover_descs_cb(bool success, uint8=
-_t att_ecode,
->>>                       goto failed;
->>>       }
->>>
->>> +next:
->>>       if (!discover_descs(op, &discovering))
->>>               goto failed;
->>>
->>>       if (discovering)
->>>               return;
->>>
->>> -next:
->>>       /* Done with the current service */
->>>       gatt_db_service_set_active(op->cur_svc, true);
->>>
->>>
->>
->> I tested this new patch-set and and results are the following:
->> 1. Three characteristics (GAP, GATT and custom) do appear on D-BUs. This=
- was not the case before.
->> 2. CCC descriptor still does not appear on D-Bus. If I change handles on=
- the peripheral back to sequential, then CCC appears on D-Bus also.
->> 3. Reading of any characteristic times out with 'g-io-error-quark: Timeo=
-ut was reached (24)'. Logs attached. Based on HCI dumps the ATT reading is =
-OK, but for some reason result is not propagated to the D-Bus level, so D-D=
-bus method times out. With sequential handles reading works fine.
->
-> Strange for me it is working normally:
->
-> [NEW] Service /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011
-> Battery Service (Primary)
-> [NEW] Characteristic
-> /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012 Battery
-> Level
-> [NEW] Descriptor
-> /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012/desc0014
-> Client Characteristic Configuration
-> [Arc Touch Mouse SE]# select-attribute
-> /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012
-> [Arc Touch Mouse SE:/service0011/char0012]# read
-> Attempting to read /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char=
-0012
-> [CHG] Attribute
-> /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012 Value: 0x5d
->   5d                                               ]
-> [Arc Touch Mouse SE:/service0011/char0012]# select-attribute
-> /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012/desc0014
-> [Arc Touch Mouse SE:/service0011/char0012/desc0014]# read
-> Attempting to read
-> /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012/desc0014
-> [CHG] Attribute
-> /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012/desc0014
-> Value: 0x00
-> [CHG] Attribute
-> /org/bluez/hci0/dev_F3_43_74_B7_86_24/service0011/char0012/desc0014
-> Value: 0x00
->   00 00
->
-> But perhaps this is because the handles are in sequence as you said,
-> can you try with the following changes:
->
-> http://fpaste.org/199962/67601931/
+diff --git a/Makefile.am b/Makefile.am
+index 90bb86baefdc..d6726dde40a0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -239,7 +239,7 @@ EXTRA_DIST += $(test_scripts)
+ EXTRA_DIST += doc/assigned-numbers.txt doc/supported-features.txt \
+ 				doc/test-coverage.txt doc/settings-storage.txt
+ 
+-EXTRA_DIST += doc/mgmt-api.txt \
++EXTRA_DIST += doc/mgmt-api.txt doc/6lowpan-api.txt \
+ 		doc/adapter-api.txt doc/device-api.txt \
+ 		doc/agent-api.txt doc/profile-api.txt \
+ 		doc/network-api.txt doc/media-api.txt \
+diff --git a/doc/6lowpan-api.txt b/doc/6lowpan-api.txt
+new file mode 100644
+index 000000000000..03dffbff8968
+--- /dev/null
++++ b/doc/6lowpan-api.txt
+@@ -0,0 +1,291 @@
++6LoWPAN Management API
++**********************
++
++Copyright (C) 2015  Intel Corporation
++
++
++Overview
++========
++
++The 6LoWPAN Management API follows largely the same principles as the
++main Bluetooth Management API described in mgmt-api.txt. The main
++difference is a separate namespace for command and event codes,
++distinguished by using HCI_CHANNEL_6LOWPAN rather than
++HCI_CHANNEL_CONTROL when creating the mgmt socket.
++
++
++Read 6LoWPAN Version Information Command
++========================================
++
++	Command Code:		0x0001
++	Controller Index:	<non-controller>
++	Command Parameters:
++	Return Parameters:	Version (1 Octets)
++				Revision (2 Octets)
++
++	This command returns the 6LoWPAN version and revision.
++	Besides, being informational the information can be used to
++	determine whether certain behavior has changed or bugs fixed
++	when interacting with the kernel.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++
++Read 6LoWPAN Supported Commands Command
++========================================
++
++	Command Code:		0x0002
++	Controller Index:	<non-controller>
++	Command Parameters:
++	Return Parameters:	Num_Of_Commands (2 Octets)
++				Num_Of_Events (2 Octets)
++				Command1 (2 Octets)
++				Command2 (2 Octets)
++				...
++				Event1 (2 Octets)
++				Event2 (2 Octets)
++				...
++
++	This command returns the list of supported 6LoWPAN commands
++	and events.
++
++	The commands Read 6LoWPAN Version Information and Read
++	6LoWPAN Supported Commands are not included in this list.
++	Both commands are always supported and mandatory.
++
++	The events Command Status and Command Complete are not included
++	in this list. Both are implicit and mandatory.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++
++Read Controller Index List Command
++==================================
++
++	Command Code:		0x0003
++	Controller Index:	<non-controller>
++	Command Parameters:
++	Return Parameters:	Num_Controllers (2 Octets)
++				Controller_Index[i] (2 Octets)
++				Supported_Features[i] (4 Octets)
++
++	This command returns the list of currently known controllers
++	that can be used for 6LoWPAN connections. Controllers added or
++	removed after calling this command can be monitored using the
++	Index Added and Index Removed events.
++
++	The Supported_Features is a bitmask with the following available
++	bits:
++
++		0	Node Role Supported
++		1	Router Role Supported
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++
++Connect Command
++===============
++
++	Command Code:		0x0004
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Network_Interface (16 Octets)
++
++	This command is used to connect to a remote 6LoWPAN Node.
++
++	The returned Network_Interface parameter is a nul-terminated
++	string containing the created network interface name.
++
++	This command generates a Command Complete event on success
++	or failure.
++
++	Possible errors:	Busy
++				Invalid Parameters
++				Not Powered
++				Invalid Index
++
++
++Disconnect Command
++==================
++
++	Command Code:		0x0005
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++
++	This command is used to disconnect from a remote 6LoWPAN Node.
++
++	This command generates a Command Complete event on success
++	or failure.
++
++	Possible errors:	Busy
++				Not Connected
++				Invalid Parameters
++				Not Powered
++				Invalid Index
++
++
++Start Node Command
++==================
++
++	Command Code:		0x0005
++	Controller Index:	<controller id>
++	Command Parameters:
++	Return Parameters:
++
++	This command is used create a 6LoWPAN Node for a specified
++	controller.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Busy
++				Invalid Index
++
++
++Stop Node Command
++=================
++
++	Command Code:		0x0006
++	Controller Index:	<controller id>
++	Command Parameters:
++	Return Parameters:
++
++	This command is used to stop a 6LoWPAN Node for a specified
++	controller.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Rejected
++				Invalid Index
++
++
++Command Complete Event
++======================
++
++	Event Code:		0x0001
++	Controller Index:	<controller id> or <non-controller>
++	Event Parameters:	Command_Opcode (2 Octets)
++				Status (1 Octet)
++				Return_Parameters
++
++	This event is an indication that a command has completed. The
++	fixed set of parameters includes the opcode to identify the
++	command that completed as well as a status value to indicate
++	success or failure. The rest of the parameters are command
++	specific and documented in the section for each command
++	separately.
++
++
++Command Status Event
++====================
++
++	Event Code:		0x0002
++	Controller Index:	<controller id> or <non-controller>
++	Event Parameters:	Command_Opcode (2 Octets)
++				Status (1 Octet)
++
++	The command status event is used to indicate an early status for
++	a pending command. In the case that the status indicates failure
++	(anything else except success status) this also means that the
++	command has finished executing.
++
++
++Index Added Event
++=================
++
++	Event Code:		0x0003
++	Controller Index:	<controller id>
++	Event Parameters:	Supported_Features (4 octets)
++
++	This event indicates that a new controller has been added to the
++	system that can be used for 6LoWPAN.
++
++	The Supported_Features is a bitmask with the following available
++	bits:
++
++		0	Node Role Supported
++		1	Router Role Supported
++
++
++Index Removed Event
++===================
++
++	Event Code:		0x0004
++	Controller Index:	<controller id>
++	Event Parameters:
++
++	This event indicates that a 6LoWPAN-capable controller has been
++	removed from the system.
++
++
++6LoWPAN Connected Event
++=======================
++
++	Event Code:		0x0005
++	Controller Index:	<controller id>
++	Event Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Role (1 Octet)
++				Interface_Name (16 Octets)
++
++	This event indicates that a successful 6LoWPAN connection has
++	been created to the remote device.
++
++	Possible values for the Address_Type parameter:
++		1	LE Public
++		2	LE Random
++
++	For devices using resolvable random addresses with a known
++	identity resolving key, the Address and Address_Type will
++	contain the identity information.
++
++	The Role parameter indicates which role the local system has for
++	the connection. The parameter has the following possible values:
++		0x00	Node
++		0x01	Router
++
++	The Network_Interface parameter is a nul-terminated
++	string containing the created network interface name.
++
++
++6LoWPAN Disconnected Event
++==========================
++
++	Event Code:		0x0006
++	Controller Index:	<controller id>
++	Event Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Role (1 Octet)
++				Reason (1 Octet)
++
++	This event indicates that the 6LoWPAN connection was lost to a
++	remote device.
++
++	Possible values for the Address_Type parameter:
++		1	LE Public
++		2	LE Random
++
++	For devices using resolvable random addresses with a known
++	identity resolving key, the Address and Address_Type will
++	contain the identity information.
++
++	The Role parameter indicates which role the local system has for
++	the connection. The parameter has the following possible values:
++		0x00	Node
++		0x01	Router
++
++	Possible values for the Reason parameter:
++		0	Unspecified
++		1	Connection timeout
++		2	Connection terminated by local host
++		3	Connection terminated by remote host
+-- 
+2.1.0
 
-See if the attachment works.
-
-
---=20
-Luiz Augusto von Dentz
-
---001a11c34c54bb99010511a20e93
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-core-gatt-Fix-not-replying-if-db-operation-fail.patch"
-Content-Disposition: attachment;
-	filename="0001-core-gatt-Fix-not-replying-if-db-operation-fail.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_i7g1ma9i0
-
-RnJvbSBkYmFkMDNiZjE0MzJmMWVlYzMyNjBmNmRiNzdjMDhhY2E1OGUyNTc1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LnZvbi5kZW50
-ekBpbnRlbC5jb20+CkRhdGU6IFRodSwgMTkgTWFyIDIwMTUgMTI6NTI6NDcgKzAyMDAKU3ViamVj
-dDogW1BBVENIIEJsdWVaXSBjb3JlL2dhdHQ6IEZpeCBub3QgcmVwbHlpbmcgaWYgZGIgb3BlcmF0
-aW9uIGZhaWwKCi0tLQogc3JjL2dhdHQtY2xpZW50LmMgfCAyOSArKysrKysrKysrKysrKysrKysr
-LS0tLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQsIDE5IGluc2VydGlvbnMoKyksIDEwIGRlbGV0aW9u
-cygtKQoKZGlmZiAtLWdpdCBhL3NyYy9nYXR0LWNsaWVudC5jIGIvc3JjL2dhdHQtY2xpZW50LmMK
-aW5kZXggYTg1YjlkMi4uODBiOWY0NyAxMDA2NDQKLS0tIGEvc3JjL2dhdHQtY2xpZW50LmMKKysr
-IGIvc3JjL2dhdHQtY2xpZW50LmMKQEAgLTc3OCwyMCArNzc4LDE5IEBAIHN0YXRpYyB2b2lkIGNo
-cmNfcmVhZF9jYihib29sIHN1Y2Nlc3MsIHVpbnQ4X3QgYXR0X2Vjb2RlLCBjb25zdCB1aW50OF90
-ICp2YWx1ZSwKIAlzdHJ1Y3QgYXN5bmNfZGJ1c19vcCAqb3AgPSB1c2VyX2RhdGE7CiAJc3RydWN0
-IGNoYXJhY3RlcmlzdGljICpjaHJjID0gb3AtPmRhdGE7CiAJc3RydWN0IHNlcnZpY2UgKnNlcnZp
-Y2UgPSBjaHJjLT5zZXJ2aWNlOworCURCdXNNZXNzYWdlICpyZXBseTsKIAotCWlmICghc3VjY2Vz
-cykgewotCQlEQnVzTWVzc2FnZSAqcmVwbHkgPSBjcmVhdGVfZ2F0dF9kYnVzX2Vycm9yKG9wLT5t
-c2csIGF0dF9lY29kZSk7Ci0KLQkJY2hyYy0+cmVhZF9pZCA9IDA7Ci0JCWdfZGJ1c19zZW5kX21l
-c3NhZ2UoYnRkX2dldF9kYnVzX2Nvbm5lY3Rpb24oKSwgcmVwbHkpOwotCQlyZXR1cm4gOwotCX0K
-KwlpZiAoIXN1Y2Nlc3MpCisJCWdvdG8gZmFpbDsKIAogCWlmICghb3AtPm9mZnNldCkKIAkJZ2F0
-dF9kYl9hdHRyaWJ1dGVfcmVzZXQoY2hyYy0+YXR0cik7CiAKLQlnYXR0X2RiX2F0dHJpYnV0ZV93
-cml0ZShjaHJjLT5hdHRyLCBvcC0+b2Zmc2V0LCB2YWx1ZSwgbGVuZ3RoLCAwLCBOVUxMLAotCQkJ
-CQkJd3JpdGVfY2hhcmFjdGVyaXN0aWNfY2IsIGNocmMpOworCWlmICghZ2F0dF9kYl9hdHRyaWJ1
-dGVfd3JpdGUoY2hyYy0+YXR0ciwgb3AtPm9mZnNldCwgdmFsdWUsIGxlbmd0aCwgMCwKKwkJCQkJ
-TlVMTCwgd3JpdGVfY2hhcmFjdGVyaXN0aWNfY2IsIGNocmMpKSB7CisJCWVycm9yKCJGYWlsZWQg
-dG8gc3RvcmUgYXR0cmlidXRlIik7CisJCWdvdG8gZmFpbDsKKwl9CiAKIAkvKgogCSAqIElmIHRo
-ZSB2YWx1ZSBsZW5ndGggaXMgZXhhY3RseSBNVFUtMSwgdGhlbiB3ZSBtYXkgbm90IGhhdmUgcmVh
-ZCB0aGUKQEAgLTgxNCw3ICs4MTMsMTcgQEAgc3RhdGljIHZvaWQgY2hyY19yZWFkX2NiKGJvb2wg
-c3VjY2VzcywgdWludDhfdCBhdHRfZWNvZGUsIGNvbnN0IHVpbnQ4X3QgKnZhbHVlLAogCWNocmMt
-PnJlYWRfaWQgPSAwOwogCiAJLyogUmVhZCB0aGUgc3RvcmVkIGRhdGEgZnJvbSBkYiAqLwotCWdh
-dHRfZGJfYXR0cmlidXRlX3JlYWQoY2hyYy0+YXR0ciwgMCwgMCwgTlVMTCwgcmVhZF9vcF9jYiwg
-b3ApOworCWlmICghZ2F0dF9kYl9hdHRyaWJ1dGVfcmVhZChjaHJjLT5hdHRyLCAwLCAwLCBOVUxM
-LCByZWFkX29wX2NiLCBvcCkpIHsKKwkJZXJyb3IoIkZhaWxlZCB0byByZWFkIGRhdGFiYXNlIik7
-CisJCWdvdG8gZmFpbDsKKwl9CisKKwlyZXR1cm47CisKK2ZhaWw6CisJcmVwbHkgPSBjcmVhdGVf
-Z2F0dF9kYnVzX2Vycm9yKG9wLT5tc2csIGF0dF9lY29kZSk7CisJY2hyYy0+cmVhZF9pZCA9IDA7
-CisJZ19kYnVzX3NlbmRfbWVzc2FnZShidGRfZ2V0X2RidXNfY29ubmVjdGlvbigpLCByZXBseSk7
-CiB9CiAKIHN0YXRpYyBEQnVzTWVzc2FnZSAqY2hhcmFjdGVyaXN0aWNfcmVhZF92YWx1ZShEQnVz
-Q29ubmVjdGlvbiAqY29ubiwKLS0gCjIuMS4wCgo=
---001a11c34c54bb99010511a20e93--
