@@ -2,197 +2,468 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v3 06/15] tools: Python script to test Advertisement API
-Date: Thu, 19 Mar 2015 10:34:28 -0700
-Message-Id: <1426786477-27229-7-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v3 09/15] shared: add advertising-data
+Date: Thu, 19 Mar 2015 10:34:31 -0700
+Message-Id: <1426786477-27229-10-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
 References: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This script provides an example of using the advertisement-data
-D-Bus API from python.
+The advetising_data structure provides an abstraction for easy
+translation of defined Advertisement Data fields into the resulting
+raw bytes needed by the Bluetooth HCI LE Set Advertising Data command.
 ---
- tools/advertisement-example | 170 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 170 insertions(+)
- create mode 100644 tools/advertisement-example
+ Makefile.am                   |   2 +
+ src/shared/advertising-data.c | 349 ++++++++++++++++++++++++++++++++++++++++++
+ src/shared/advertising-data.h |  69 +++++++++
+ 3 files changed, 420 insertions(+)
+ create mode 100644 src/shared/advertising-data.c
+ create mode 100644 src/shared/advertising-data.h
 
-diff --git a/tools/advertisement-example b/tools/advertisement-example
+diff --git a/Makefile.am b/Makefile.am
+index db2978e..7334b1a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -111,6 +111,8 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+ 			src/shared/uhid.h src/shared/uhid.c \
+ 			src/shared/pcap.h src/shared/pcap.c \
+ 			src/shared/btsnoop.h src/shared/btsnoop.c \
++			src/shared/advertising-data.h \
++			src/shared/advertising-data.c \
+ 			src/shared/att-types.h \
+ 			src/shared/att.h src/shared/att.c \
+ 			src/shared/gatt-helpers.h src/shared/gatt-helpers.c \
+diff --git a/src/shared/advertising-data.c b/src/shared/advertising-data.c
 new file mode 100644
-index 0000000..98aeafa
+index 0000000..800856c
 --- /dev/null
-+++ b/tools/advertisement-example
-@@ -0,0 +1,170 @@
-+#!/usr/bin/python
++++ b/src/shared/advertising-data.c
+@@ -0,0 +1,349 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2015  Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ */
 +
-+import dbus
-+import dbus.exceptions
-+import dbus.mainloop.glib
-+import dbus.service
++#include "src/shared/advertising-data.h"
 +
-+import array
-+import gobject
++#include "src/shared/queue.h"
++#include "src/shared/util.h"
 +
-+from random import randint
++struct advertising_data {
++	int ref_count;
++	struct queue *service_uuids;
++	struct queue *manufacturer_data;
++	struct queue *solicit_uuids;
++	struct queue *service_data;
++};
 +
-+mainloop = None
++struct uuid_tagged_data {
++	bt_uuid_t uuid;
++	uint8_t *data;
++	size_t len;
++};
 +
-+BLUEZ_SERVICE_NAME = 'org.bluez'
-+LE_ADVERTISING_MANAGER_IFACE = 'org.bluez.LEAdvertisingManager1'
-+DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
-+DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
++struct manufacturer_tagged_data {
++	uint16_t manufacturer_id;
++	uint8_t *data;
++	size_t len;
++};
 +
-+LE_ADVERTISEMENT_IFACE = 'org.bluez.LEAdvertisement1'
++struct advertising_data *advertising_data_new(void)
++{
++	struct advertising_data *ad;
 +
++	ad = new0(struct advertising_data, 1);
++	if (!ad)
++		return NULL;
 +
-+class InvalidArgsException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.freedesktop.DBus.Error.InvalidArgs'
++	ad->service_uuids = queue_new();
++	if (!ad->service_uuids)
++		goto fail;
 +
++	ad->manufacturer_data = queue_new();
++	if (!ad->manufacturer_data)
++		goto fail;
 +
-+class NotSupportedException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.NotSupported'
++	ad->solicit_uuids = queue_new();
++	if (!ad->solicit_uuids)
++		goto fail;
 +
++	ad->service_data = queue_new();
++	if (!ad->service_data)
++		goto fail;
 +
-+class NotPermittedException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.NotPermitted'
++	return advertising_data_ref(ad);
 +
++fail:
++	queue_destroy(ad->service_uuids, NULL);
++	queue_destroy(ad->manufacturer_data, NULL);
++	queue_destroy(ad->solicit_uuids, NULL);
++	queue_destroy(ad->service_data, NULL);
 +
-+class InvalidValueLengthException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.InvalidValueLength'
++	free(ad);
 +
++	return NULL;
++}
 +
-+class FailedException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.Failed'
++struct advertising_data *advertising_data_ref(struct advertising_data *ad)
++{
++	ad->ref_count++;
++	return ad;
++}
 +
++static void uuid_tagged_destroy(void *data)
++{
++	struct uuid_tagged_data *tagged = data;
 +
-+class Advertisement(dbus.service.Object):
-+    PATH_BASE = '/org/bluez/example/advertisement'
++	free(tagged->data);
++	free(tagged);
++}
 +
-+    def __init__(self, bus, index, advertising_type):
-+        self.path = self.PATH_BASE + str(index)
-+        self.bus = bus
-+        self.ad_type = advertising_type
-+        self.service_uuids = None
-+        self.manufacturer_data = None
-+        self.solicit_uuids = None
-+        self.service_data = None
-+        dbus.service.Object.__init__(self, bus, self.path)
++static bool uuid_tagged_match(const void *data, const void *elem)
++{
++	const struct uuid_tagged_data *tagged = elem;
++	const bt_uuid_t *uuid = data;
 +
-+    def get_properties(self):
-+        properties = dict()
-+        properties['Type'] = self.ad_type
-+        if self.service_uuids is not None:
-+            properties['ServiceUUIDs'] = dbus.Array(self.service_uuids,
-+                                                    signature='s')
-+        if self.solicit_uuids is not None:
-+            properties['SolicitUUIDs'] = dbus.Array(self.solicit_uuids,
-+                                                    signature='s')
-+        if self.manufacturer_data is not None:
-+            properties['ManufacturerData'] = dbus.Dictionary(
-+                self.manufacturer_data, signature='qay')
-+        if self.service_data is not None:
-+            properties['ServiceData'] = dbus.Dictionary(self.service_data,
-+                                                        signature='say')
-+        return {LE_ADVERTISEMENT_IFACE: properties}
++	return !bt_uuid_cmp(&tagged->uuid, uuid);
++}
 +
-+    def get_path(self):
-+        return dbus.ObjectPath(self.path)
++static void manuf_tagged_destroy(void *data)
++{
++	struct manufacturer_tagged_data *tagged = data;
 +
-+    def add_service_uuid(self, uuid):
-+        if not self.service_uuids:
-+            self.service_uuids = []
-+        self.service_uuids.append(uuid)
++	free(tagged->data);
++	free(tagged);
++}
 +
-+    def add_solicit_uuid(self, uuid):
-+        if not self.solicit_uuids:
-+            self.solicit_uuids = []
-+        self.solicit_uuids.append(uuid)
++static bool manuf_tagged_match(const void *data, const void *elem)
++{
++	const struct manufacturer_tagged_data *tagged = elem;
++	uint16_t manuf_id = PTR_TO_UINT(elem);
 +
-+    def add_manufacturer_data(self, manuf_code, data):
-+        if not self.manufacturer_data:
-+            self.manufacturer_data = dict()
-+        self.manufacturer_data[manuf_code] = data
++	return tagged->manufacturer_id == manuf_id;
++}
 +
-+    def add_service_data(self, uuid, data):
-+        if not self.service_data:
-+            self.service_data = dict()
-+        self.service_data[uuid] = data
++void advertising_data_unref(struct advertising_data *ad)
++{
++	if (!ad)
++		return;
 +
-+    @dbus.service.method(DBUS_PROP_IFACE,
-+                         in_signature='s',
-+                         out_signature='a{sv}')
-+    def GetAll(self, interface):
-+        print 'GetAll'
-+        if interface != LE_ADVERTISEMENT_IFACE:
-+            raise InvalidArgsException()
-+        print 'returning props'
-+        return self.get_properties()[LE_ADVERTISEMENT_IFACE]
++	if (__sync_sub_and_fetch(&ad->ref_count, 1))
++		return;
 +
-+    @dbus.service.method(LE_ADVERTISEMENT_IFACE,
-+                         in_signature='',
-+                         out_signature='')
-+    def Release(self):
-+        print '%s: Released!' % self.path
++	queue_destroy(ad->service_uuids, free);
 +
-+class TestAdvertisement(Advertisement):
++	queue_destroy(ad->manufacturer_data, manuf_tagged_destroy);
 +
-+    def __init__(self, bus, index):
-+        Advertisement.__init__(self, bus, index, 'broadcast')
-+        self.add_service_uuid('0000180D-0000-1000-8000-00805F9B34FB')
-+        self.add_service_uuid('0000180F-0000-1000-8000-00805F9B34FB')
-+        self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
-+        self.add_service_data('00009999-0000-1000-8000-00805F9B34FB',
-+                              [0x00, 0x01, 0x02, 0x03, 0x04])
++	queue_destroy(ad->solicit_uuids, free);
 +
++	queue_destroy(ad->service_data, uuid_tagged_destroy);
 +
-+def register_ad_cb():
-+    print 'Advertisement registered'
++	free(ad);
++}
 +
++uint8_t *advertising_data_generate(struct advertising_data *ad, uint8_t *length)
++{
++	/* TODO: implement */
++	return NULL;
++}
 +
-+def register_ad_error_cb(error):
-+    print 'Failed to register advertisement: ' + str(error)
-+    mainloop.quit()
++static bool queue_add_uuid(struct queue *queue, const bt_uuid_t *uuid)
++{
++	bt_uuid_t *new_uuid;
 +
++	if (!queue)
++		return false;
 +
-+def find_adapter(bus):
-+    remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'),
-+                               DBUS_OM_IFACE)
-+    objects = remote_om.GetManagedObjects()
++	new_uuid = new0(bt_uuid_t, 1);
++	if (!new_uuid)
++		return false;
 +
-+    for o, props in objects.iteritems():
-+        if LE_ADVERTISING_MANAGER_IFACE in props:
-+            return o
++	bt_uuid_to_uuid128(uuid, new_uuid);
 +
-+    return None
++	queue_push_tail(queue, new_uuid);
 +
++	return true;
++}
 +
-+def main():
-+    global mainloop
++static bool uuid_match(const void *data, const void *elem)
++{
++	const bt_uuid_t *match_uuid = data;
++	const bt_uuid_t *uuid = elem;
 +
-+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++	return bt_uuid_cmp(match_uuid, uuid);
++}
 +
-+    bus = dbus.SystemBus()
++static bool queue_remove_uuid(struct queue *queue, bt_uuid_t *uuid)
++{
++	bt_uuid_t *removed;
 +
-+    adapter = find_adapter(bus)
-+    if not adapter:
-+        print 'LEAdvertisingManager1 interface not found'
-+        return
++	if (!queue || !uuid)
++		return false;
 +
-+    ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-+                                LE_ADVERTISING_MANAGER_IFACE)
++	removed = queue_remove_if(queue, uuid_match, uuid);
 +
-+    test_advertisement = TestAdvertisement(bus, 0)
++	if (removed) {
++		free(removed);
++		return true;
++	}
 +
-+    mainloop = gobject.MainLoop()
++	return false;
++}
 +
-+    ad_manager.RegisterAdvertisement(test_advertisement.get_path(), {},
-+                                     reply_handler=register_ad_cb,
-+                                     error_handler=register_ad_error_cb)
++bool advertising_data_add_service_uuid(struct advertising_data *ad,
++							const bt_uuid_t *uuid)
++{
++	if (!ad)
++		return false;
 +
-+    mainloop.run()
++	return queue_add_uuid(ad->service_uuids, uuid);
++}
 +
-+if __name__ == '__main__':
-+    main()
++bool advertising_data_remove_service_uuid(struct advertising_data *ad,
++							bt_uuid_t *uuid)
++{
++	if (!ad)
++		return false;
++
++	return queue_remove_uuid(ad->service_uuids, uuid);
++}
++
++void advertising_data_clear_service_uuid(struct advertising_data *ad)
++{
++	queue_destroy(ad->service_uuids, free);
++
++	ad->service_uuids = queue_new();
++}
++
++bool advertising_data_add_manufacturer_data(struct advertising_data *ad,
++						uint16_t manufacturer_id,
++						void *data, size_t len)
++{
++	struct manufacturer_tagged_data *new_data;
++
++	if (!ad)
++		return false;
++
++	new_data = new0(struct manufacturer_tagged_data, 1);
++	if (!new_data)
++		return false;
++
++	new_data->manufacturer_id = manufacturer_id;
++
++	new_data->data = malloc(len);
++	if (!new_data->data) {
++		free(new_data);
++		return false;
++	}
++
++	memcpy(new_data->data, data, len);
++
++	if (queue_push_tail(ad->manufacturer_data, new_data))
++		return true;
++
++	manuf_tagged_destroy(new_data);
++
++	return false;
++}
++
++bool advertising_data_remove_manufacturer_data(struct advertising_data *ad,
++						uint16_t manufacturer_id)
++{
++	struct manufacturer_tagged_data *data;
++
++	if (!ad)
++		return false;
++
++	data = queue_remove_if(ad->manufacturer_data, manuf_tagged_match,
++						UINT_TO_PTR(manufacturer_id));
++
++	if (!data)
++		return false;
++
++	manuf_tagged_destroy(data);
++
++	return true;
++}
++
++void advertising_data_clear_manufacturer_data(struct advertising_data *ad)
++{
++	queue_destroy(ad->manufacturer_data, manuf_tagged_destroy);
++
++	ad->manufacturer_data = queue_new();
++}
++
++bool advertising_data_add_solicit_uuid(struct advertising_data *ad,
++							const bt_uuid_t *uuid)
++{
++	if (!ad)
++		return false;
++
++	return queue_add_uuid(ad->solicit_uuids, uuid);
++}
++
++bool advertising_data_remove_solicit_uuid(struct advertising_data *ad,
++							bt_uuid_t *uuid)
++{
++	if (!ad)
++		return false;
++
++	return queue_remove_uuid(ad->solicit_uuids, uuid);
++}
++
++void advertising_data_clear_solicit_uuid(struct advertising_data *ad)
++{
++	queue_destroy(ad->solicit_uuids, free);
++
++	ad->solicit_uuids = queue_new();
++}
++
++bool advertising_data_add_service_data(struct advertising_data *ad,
++						const bt_uuid_t *uuid,
++						void *data, size_t len)
++{
++	struct uuid_tagged_data *new_data;
++
++	if (!ad)
++		return false;
++
++	new_data = new0(struct uuid_tagged_data, 1);
++	if (!new_data)
++		return false;
++
++	bt_uuid_to_uuid128(uuid, &new_data->uuid);
++
++	new_data->data = malloc(len);
++	if (!new_data) {
++		free(new_data);
++		return false;
++	}
++
++	memcpy(new_data->data, data, len);
++
++	if (queue_push_tail(ad->service_data, new_data))
++		return true;
++
++	uuid_tagged_destroy(new_data);
++
++	return false;
++}
++
++bool advertising_data_remove_service_data(struct advertising_data *ad,
++							bt_uuid_t *uuid)
++{
++	struct uuid_tagged_data *data;
++
++	if (!ad)
++		return false;
++
++	data = queue_remove_if(ad->service_data, uuid_tagged_match, uuid);
++
++	if (!data)
++		return false;
++
++	uuid_tagged_destroy(data);
++
++	return true;
++}
++
++void advertising_data_clear_service_data(struct advertising_data *ad)
++{
++	queue_destroy(ad->service_data, uuid_tagged_destroy);
++
++	ad->service_data = queue_new();
++}
+diff --git a/src/shared/advertising-data.h b/src/shared/advertising-data.h
+new file mode 100644
+index 0000000..05d2b51
+--- /dev/null
++++ b/src/shared/advertising-data.h
+@@ -0,0 +1,69 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2015  Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ */
++
++#include <inttypes.h>
++#include <stdbool.h>
++
++#include "lib/bluetooth.h"
++#include "lib/uuid.h"
++
++struct advertising_data;
++
++struct advertising_data *advertising_data_new(void);
++
++struct advertising_data *advertising_data_ref(struct advertising_data *ad);
++
++void advertising_data_unref(struct advertising_data *ad);
++
++uint8_t *advertising_data_generate(struct advertising_data *ad,
++							uint8_t *length);
++
++bool advertising_data_add_service_uuid(struct advertising_data *ad,
++							const bt_uuid_t *uuid);
++
++bool advertising_data_remove_service_uuid(struct advertising_data *ad,
++							bt_uuid_t *uuid);
++
++void advertising_data_clear_service_uuid(struct advertising_data *ad);
++
++bool advertising_data_add_manufacturer_data(struct advertising_data *ad,
++						uint16_t manufacturer_data,
++						void *data, size_t len);
++
++bool advertising_data_remove_manufacturer_data(struct advertising_data *ad,
++						uint16_t manufacturer_id);
++
++void advertising_data_clear_manufacturer_data(struct advertising_data *ad);
++
++bool advertising_data_add_solicit_uuid(struct advertising_data *ad,
++							const bt_uuid_t *uuid);
++
++bool advertising_data_remove_solicit_uuid(struct advertising_data *ad,
++							bt_uuid_t *uuid);
++
++void advertising_data_clear_solicit_uuid(struct advertising_data *ad);
++
++bool advertising_data_add_service_data(struct advertising_data *ad,
++						const bt_uuid_t *uuid,
++						void *data, size_t len);
++
++bool advertising_data_remove_service_data(struct advertising_data *ad,
++							bt_uuid_t *uuid);
++
++void advertising_data_clear_service_data(struct advertising_data *ad);
 -- 
 2.2.0.rc0.207.ga3a616c
 
