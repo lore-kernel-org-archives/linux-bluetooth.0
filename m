@@ -1,103 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1426786477-27229-4-git-send-email-jamuraa@chromium.org>
-References: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
-	<1426786477-27229-4-git-send-email-jamuraa@chromium.org>
-Date: Fri, 20 Mar 2015 15:57:05 +0200
-Message-ID: <CABBYNZ+4MQbhXTFZpjq7G7QUZasoHHd1xLAdtuj-1+nwdrkdWQ@mail.gmail.com>
-Subject: Re: [BlueZ v3 03/15] gdbus/client: add g_dbus_proxy_set_read_watch
+In-Reply-To: <1426833308-23046-1-git-send-email-bharat.panda@samsung.com>
+References: <1426833308-23046-1-git-send-email-bharat.panda@samsung.com>
+Date: Fri, 20 Mar 2015 15:38:56 +0200
+Message-ID: <CABBYNZ+5L+QKdTrLpaw92gW=LYbCaPuZbUHj2HOzk2SHaGzJhA@mail.gmail.com>
+Subject: Re: [PATCH ] obexd/pbap: Fix NULL check to avoid potential crash
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi Bharat,
 
-On Thu, Mar 19, 2015 at 7:34 PM, Michael Janssen <jamuraa@chromium.org> wrote:
-> Adds a new gdbus utility function which will set a function to be called
-> after the properties of a proxy are updated.
->
-> This enables using GDBusClient for objects without the ObjectManager
-> interface as long as you know in advance the object path using
-> g_dbus_proxy_new
+On Fri, Mar 20, 2015 at 8:35 AM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> NULL pointer check for name is done before using the same.
 > ---
->  gdbus/client.c | 17 +++++++++++++++++
->  gdbus/gdbus.h  |  3 +++
->  2 files changed, 20 insertions(+)
+>  obexd/plugins/pbap.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 >
-> diff --git a/gdbus/client.c b/gdbus/client.c
-> index fe0c0db..c913773 100644
-> --- a/gdbus/client.c
-> +++ b/gdbus/client.c
-> @@ -76,6 +76,8 @@ struct GDBusProxy {
->         void *prop_data;
->         GDBusProxyFunction removed_func;
->         void *removed_data;
-> +       GDBusProxyFunction read_func;
-> +       void *read_data;
->  };
+> diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
+> index cec5acd..f2f9166 100644
+> --- a/obexd/plugins/pbap.c
+> +++ b/obexd/plugins/pbap.c
+> @@ -728,6 +728,11 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
+>         int ret;
+>         void *request;
 >
->  struct prop_entry {
-> @@ -297,6 +299,9 @@ static void get_all_properties_reply(DBusPendingCall *call, void *user_data)
->
->         update_properties(proxy, &iter, FALSE);
->
-> +       if (proxy->read_func)
-> +               proxy->read_func(proxy, proxy->read_data);
+> +       if (name == NULL) {
+> +               ret = -EBADR;
+> +               goto fail;
+> +       }
 > +
->  done:
->         if (g_list_find(client->proxy_list, proxy) == NULL) {
->                 if (client->proxy_added)
-> @@ -914,6 +919,18 @@ gboolean g_dbus_proxy_set_removed_watch(GDBusProxy *proxy,
->         return TRUE;
->  }
+>         DBG("name %s context %p valid %d", name, context, pbap->cache.valid);
 >
-> +gboolean g_dbus_proxy_set_read_watch(GDBusProxy *proxy,
-> +                               GDBusProxyFunction function, void *user_data)
-> +{
-> +       if (proxy == NULL)
-> +               return FALSE;
-> +
-> +       proxy->read_func = function;
-> +       proxy->read_data = user_data;
-> +
-> +       return TRUE;
-> +}
-> +
->  static void refresh_properties(GDBusClient *client)
->  {
->         GList *list;
-> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-> index 9814838..ae281d9 100644
-> --- a/gdbus/gdbus.h
-> +++ b/gdbus/gdbus.h
-> @@ -353,6 +353,9 @@ gboolean g_dbus_proxy_set_property_watch(GDBusProxy *proxy,
->  gboolean g_dbus_proxy_set_removed_watch(GDBusProxy *proxy,
->                         GDBusProxyFunction destroy, void *user_data);
+>         if (oflag != O_RDONLY) {
+> @@ -735,11 +740,6 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
+>                 goto fail;
+>         }
 >
-> +gboolean g_dbus_proxy_set_read_watch(GDBusProxy *proxy,
-> +                       GDBusProxyFunction ready, void *user_data);
-
-Is this supposed to be ready or read watch, Id say this is a ready
-watch? Also you should name the callback consistently in one place you
-call it ready and in the other function, I would go with the later.
-
-Btw, it looks like this would still trigger proxy added callback so I
-wonder why you did not use it instead of creating a new callback?
-
->  GDBusClient *g_dbus_client_new(DBusConnection *connection,
->                                         const char *service, const char *path);
->  GDBusClient *g_dbus_client_new_full(DBusConnection *connection,
+> -       if (name == NULL) {
+> -               ret = -EBADR;
+> -               goto fail;
+> -       }
+> -
+>         /* PullvCardListing always get the contacts from the cache */
+>
+>         if (pbap->cache.valid) {
 > --
-> 2.2.0.rc0.207.ga3a616c
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.9.1
 
+Applied, thanks.
 
 
 -- 
