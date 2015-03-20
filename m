@@ -1,59 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1426833308-23046-1-git-send-email-bharat.panda@samsung.com>
-References: <1426833308-23046-1-git-send-email-bharat.panda@samsung.com>
-Date: Fri, 20 Mar 2015 15:38:56 +0200
-Message-ID: <CABBYNZ+5L+QKdTrLpaw92gW=LYbCaPuZbUHj2HOzk2SHaGzJhA@mail.gmail.com>
-Subject: Re: [PATCH ] obexd/pbap: Fix NULL check to avoid potential crash
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: 'Johan Hedberg' <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1426851395-29076-1-git-send-email-bharat.panda@samsung.com>
+ <20150320120459.GA20347@t440s.ger.corp.intel.com>
+In-reply-to: <20150320120459.GA20347@t440s.ger.corp.intel.com>
+Subject: RE: [PATCH ] monitor: Add AVDTP support to btmon
+Date: Fri, 20 Mar 2015 19:02:23 +0530
+Message-id: <020f01d06312$5e137900$1a3a6b00$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+Hi Johan,
 
-On Fri, Mar 20, 2015 at 8:35 AM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> NULL pointer check for name is done before using the same.
-> ---
->  obexd/plugins/pbap.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-> index cec5acd..f2f9166 100644
-> --- a/obexd/plugins/pbap.c
-> +++ b/obexd/plugins/pbap.c
-> @@ -728,6 +728,11 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
->         int ret;
->         void *request;
->
-> +       if (name == NULL) {
-> +               ret = -EBADR;
-> +               goto fail;
-> +       }
-> +
->         DBG("name %s context %p valid %d", name, context, pbap->cache.valid);
->
->         if (oflag != O_RDONLY) {
-> @@ -735,11 +740,6 @@ static void *vobject_list_open(const char *name, int oflag, mode_t mode,
->                 goto fail;
->         }
->
-> -       if (name == NULL) {
-> -               ret = -EBADR;
-> -               goto fail;
-> -       }
-> -
->         /* PullvCardListing always get the contacts from the cache */
->
->         if (pbap->cache.valid) {
-> --
-> 1.9.1
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Johan Hedberg
+> Sent: Friday, March 20, 2015 5:35 PM
+> To: Bharat Panda
+> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> Subject: Re: [PATCH ] monitor: Add AVDTP support to btmon
+> 
+> Hi Bharat,
+> 
+> On Fri, Mar 20, 2015, Bharat Panda wrote:
+> > +static char *pt2str(uint8_t hdr)
+> 
+> This should be static const char *
+> 
+> > +static char *mt2str(uint8_t hdr)
+> 
+> Same here.
+> 
+> > +static char *sig2str(uint8_t tsid)
+> 
+> And here.
+> 
 
-Applied, thanks.
+I have incorporated above review comments and submitted v2 for the same.
 
+> Johan
 
--- 
-Luiz Augusto von Dentz
+Thanks
+Best Regards,
+Bharat
+
