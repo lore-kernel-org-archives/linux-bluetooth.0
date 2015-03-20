@@ -1,103 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+4MQbhXTFZpjq7G7QUZasoHHd1xLAdtuj-1+nwdrkdWQ@mail.gmail.com>
-References: <1426786477-27229-1-git-send-email-jamuraa@chromium.org>
-	<1426786477-27229-4-git-send-email-jamuraa@chromium.org>
-	<CABBYNZ+4MQbhXTFZpjq7G7QUZasoHHd1xLAdtuj-1+nwdrkdWQ@mail.gmail.com>
-Date: Fri, 20 Mar 2015 07:55:28 -0700
-Message-ID: <CAJLTA8i=idW6dDBNcsbEf=3pEVSUNU_AooGGaO2LEE++3J-_Wg@mail.gmail.com>
-Subject: Re: [BlueZ v3 03/15] gdbus/client: add g_dbus_proxy_set_read_watch
-From: Michael Janssen <jamuraa@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 20 Mar 2015 23:46:41 +0900
+Message-ID: <CALhfZZrF0O2EREvYPrhC_vPYbyHX2c1qpySb+yj2ONjB1+jvgg@mail.gmail.com>
+Subject: [PATCH] lib/bluetooth : Fix implicit pointer cast
+From: Masaki Waga <masakiwaga@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Implicit cast void* to uint8_t* is invalid in C++, so add explicit cast.
 
-On Fri, Mar 20, 2015 at 6:57 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Michael,
->
-> On Thu, Mar 19, 2015 at 7:34 PM, Michael Janssen <jamuraa@chromium.org> wrote:
->> Adds a new gdbus utility function which will set a function to be called
->> after the properties of a proxy are updated.
->>
->> This enables using GDBusClient for objects without the ObjectManager
->> interface as long as you know in advance the object path using
->> g_dbus_proxy_new
->> ---
->>  gdbus/client.c | 17 +++++++++++++++++
->>  gdbus/gdbus.h  |  3 +++
->>  2 files changed, 20 insertions(+)
->>
->> diff --git a/gdbus/client.c b/gdbus/client.c
->> index fe0c0db..c913773 100644
->> --- a/gdbus/client.c
->> +++ b/gdbus/client.c
->> @@ -76,6 +76,8 @@ struct GDBusProxy {
->>         void *prop_data;
->>         GDBusProxyFunction removed_func;
->>         void *removed_data;
->> +       GDBusProxyFunction read_func;
->> +       void *read_data;
->>  };
->>
->>  struct prop_entry {
->> @@ -297,6 +299,9 @@ static void get_all_properties_reply(DBusPendingCall *call, void *user_data)
->>
->>         update_properties(proxy, &iter, FALSE);
->>
->> +       if (proxy->read_func)
->> +               proxy->read_func(proxy, proxy->read_data);
->> +
->>  done:
->>         if (g_list_find(client->proxy_list, proxy) == NULL) {
->>                 if (client->proxy_added)
->> @@ -914,6 +919,18 @@ gboolean g_dbus_proxy_set_removed_watch(GDBusProxy *proxy,
->>         return TRUE;
->>  }
->>
->> +gboolean g_dbus_proxy_set_read_watch(GDBusProxy *proxy,
->> +                               GDBusProxyFunction function, void *user_data)
->> +{
->> +       if (proxy == NULL)
->> +               return FALSE;
->> +
->> +       proxy->read_func = function;
->> +       proxy->read_data = user_data;
->> +
->> +       return TRUE;
->> +}
->> +
->>  static void refresh_properties(GDBusClient *client)
->>  {
->>         GList *list;
->> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
->> index 9814838..ae281d9 100644
->> --- a/gdbus/gdbus.h
->> +++ b/gdbus/gdbus.h
->> @@ -353,6 +353,9 @@ gboolean g_dbus_proxy_set_property_watch(GDBusProxy *proxy,
->>  gboolean g_dbus_proxy_set_removed_watch(GDBusProxy *proxy,
->>                         GDBusProxyFunction destroy, void *user_data);
->>
->> +gboolean g_dbus_proxy_set_read_watch(GDBusProxy *proxy,
->> +                       GDBusProxyFunction ready, void *user_data);
->
-> Is this supposed to be ready or read watch, Id say this is a ready
-> watch? Also you should name the callback consistently in one place you
-> call it ready and in the other function, I would go with the later.
->
-> Btw, it looks like this would still trigger proxy added callback so I
-> wonder why you did not use it instead of creating a new callback?
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 6ca64b6..3367315 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -345,8 +345,8 @@ typedef struct {
 
-It is called a read watch because it will be called whenever the
-properties are all updated on the proxy.  I would expect a ready watch
-to remove itself after it is done.
+ static inline void bswap_128(const void *src, void *dst)
+ {
+- const uint8_t *s = src;
+- uint8_t *d = dst;
++ const uint8_t *s = (uint8_t*) src;
++ uint8_t *d = (uint8_t*) dst;
+  int i;
 
-The proxy added callback requires the use of the ObjectManager
-interface, which this method avoids, as mentioned in the commit
-message.
-
-Michael Janssen
+  for (i = 0; i < 16; i++)
