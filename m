@@ -1,54 +1,379 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY176-W6C88AB3C728FAD951FEC0D30E0@phx.gbl>
-From: Ssagarr Patil <hugarsagar@outlook.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Szymon Janc <szymon.janc@tieto.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: bluez5 pairing devices
-Date: Fri, 20 Mar 2015 15:36:09 +0530
-In-Reply-To: <BAY176-W527F50DD202F6D774CBD56D3010@phx.gbl>
-References: 
- <BAY176-W679B1127159C091585D3AD3030@phx.gbl>,<,<46068BD2-CF33-4617-80DB-5AE5C1FCA364@holtmann.org>,<,<,<12627750.IG3ACNRtuD@leonov>
- <>>>,<,<BAY176-W40E12E1C2F620AB0D38605D3000@phx.gbl>,<,<440EB08C-2BD4-4373-B3DC-80361AA74722@holtmann.org>,<,<BAY176-W203E6BB20ECCED0D35B6A7D3010@phx.gbl>>>>>,<BAY176-W11EC25DD22E46D52ED6D92D3010@phx.gbl>,<,<CC6FAAF0-122B-4678-9865-F5E237073C09@holtmann.org>
- <>>,<BAY176-W24D0233AE18250D3778E44D3010@phx.gbl>,<03048CAB-EDA3-46D6-A65B-BB17927B1F7E@holtmann.org>,<BAY176-W527F50DD202F6D774CBD56D3010@phx.gbl>
-Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
+In-Reply-To: <1426774887-25646-1-git-send-email-luiz.dentz@gmail.com>
+References: <1426774887-25646-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 20 Mar 2015 11:19:24 +0200
+Message-ID: <CABBYNZLD_EkTd05WpNSp6uLEumS5yDVhu=6+F3X+PTN-h=ez4g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 1/7] shared/gatt-client: Fix handling of services
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel=2C=0A=
-=0A=
->>=0A=
->> maybe the backport has some issues that got fixed. The latest stable ker=
-nel is 3.19.2.=0A=
->>=0A=
->>> Is it true we cannot pair LE devices in bluez4.101 ?=0A=
->>=0A=
->> LE support with BlueZ 4 is limited to not really working at all. So if w=
-ant to work on LE=2C then you need mgmt API support and a recent Bluetooth =
-subsystem and BlueZ 5.=0A=
->>=0A=
-> With gattool and hcitool lecc I am able to pair.  But I am not sure How t=
-o get the data from le device ?=0A=
-> Any pointers on doing this ?=0A=
->=0A=
-$ # hcitool=A0 lecc 54:4A:16:5E:1B:9D=0A=
-Connection handle 1025=0A=
-=0A=
-Does it create a fd ? so that me C app can access ?=0A=
-=0A=
-# gatttool=A0 -b 54:4A:16:5E:1B:9D -I=0A=
-[=A0=A0 ][54:4A:16:5E:1B:9D][LE]> connect=0A=
-[CON][54:4A:16:5E:1B:9D][LE]> char-desc=0A=
-[CON][54:4A:16:5E:1B:9D][LE]> =0A=
-handle: 0x0001=2C uuid: 2800=0A=
-handle: 0x0002=2C uuid: 2803=0A=
-handle: 0x0003=2C uuid: 2a00=0A=
-handle: 0x0004=2C uuid: 2803=0A=
-handle: 0x0005=2C uuid: 2a01=0A=
-=0A=
-I am not sure how to get events=2C how to hook for my application and get t=
-he packets.=0A=
-=A0=0A=
-Regards=2C=0A=
-Sagar=0A=
- 		 	   		  =
+Hi,
+
+On Thu, Mar 19, 2015 at 4:21 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Remote services may contain gaps between their handles so they need to be
+> inserted in a proper position.
+> ---
+> v2: Fix gatt_db_get_attribute to work with non-sequential handles
+> v3: Fix gatt_db_service_foreach_desc to work with non-sequential handles
+>
+>  src/shared/gatt-client.c |   8 ++-
+>  src/shared/gatt-db.c     | 147 +++++++++++++++++++++++++++++++++++++----------
+>  src/shared/gatt-db.h     |  17 ++++++
+>  3 files changed, 139 insertions(+), 33 deletions(-)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index f33d8c9..3e28c6e 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -588,7 +588,8 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
+>         *discovering = false;
+>
+>         while ((chrc_data = queue_pop_head(op->pending_chrcs))) {
+> -               attr = gatt_db_service_add_characteristic(op->cur_svc,
+> +               attr = gatt_db_service_insert_characteristic(op->cur_svc,
+> +                                                       chrc_data->value_handle,
+>                                                         &chrc_data->uuid, 0,
+>                                                         chrc_data->properties,
+>                                                         NULL, NULL, NULL);
+> @@ -679,8 +680,9 @@ static void discover_descs_cb(bool success, uint8_t att_ecode,
+>                                                 "handle: 0x%04x, uuid: %s",
+>                                                 handle, uuid_str);
+>
+> -               attr = gatt_db_service_add_descriptor(op->cur_svc, &uuid, 0,
+> -                                                       NULL, NULL, NULL);
+> +               attr = gatt_db_service_insert_descriptor(op->cur_svc, handle,
+> +                                                       &uuid, 0, NULL, NULL,
+> +                                                       NULL);
+>                 if (!attr)
+>                         goto failed;
+>
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index eb81372..2b2090c 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -158,6 +158,7 @@ static void attribute_destroy(struct gatt_db_attribute *attribute)
+>  }
+>
+>  static struct gatt_db_attribute *new_attribute(struct gatt_db_service *service,
+> +                                                       uint16_t handle,
+>                                                         const bt_uuid_t *type,
+>                                                         const uint8_t *val,
+>                                                         uint16_t len)
+> @@ -169,6 +170,7 @@ static struct gatt_db_attribute *new_attribute(struct gatt_db_service *service,
+>                 return NULL;
+>
+>         attribute->service = service;
+> +       attribute->handle = handle;
+>         attribute->uuid = *type;
+>         attribute->value_len = len;
+>         if (len) {
+> @@ -371,6 +373,7 @@ static bool le_to_uuid(const uint8_t *src, size_t len, bt_uuid_t *uuid)
+>  }
+>
+>  static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
+> +                                                       uint16_t handle,
+>                                                         bool primary,
+>                                                         uint16_t num_handles)
+>  {
+> @@ -399,7 +402,8 @@ static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
+>
+>         len = uuid_to_le(uuid, value);
+>
+> -       service->attributes[0] = new_attribute(service, type, value, len);
+> +       service->attributes[0] = new_attribute(service, handle, type, value,
+> +                                                                       len);
+>         if (!service->attributes[0]) {
+>                 gatt_db_service_destroy(service);
+>                 return NULL;
+> @@ -533,7 +537,7 @@ struct gatt_db_attribute *gatt_db_insert_service(struct gatt_db *db,
+>         if (!find_insert_loc(db, handle, handle + num_handles - 1, &after))
+>                 return NULL;
+>
+> -       service = gatt_db_service_create(uuid, primary, num_handles);
+> +       service = gatt_db_service_create(uuid, handle, primary, num_handles);
+>
+>         if (!service)
+>                 return NULL;
+> @@ -663,8 +667,9 @@ static void set_attribute_data(struct gatt_db_attribute *attribute,
+>         attribute->user_data = user_data;
+>  }
+>
+> -struct gatt_db_attribute *
+> -gatt_db_service_add_characteristic(struct gatt_db_attribute *attrib,
+> +static struct gatt_db_attribute *
+> +service_insert_characteristic(struct gatt_db_service *service,
+> +                                       uint16_t handle,
+>                                         const bt_uuid_t *uuid,
+>                                         uint32_t permissions,
+>                                         uint8_t properties,
+> @@ -672,35 +677,38 @@ gatt_db_service_add_characteristic(struct gatt_db_attribute *attrib,
+>                                         gatt_db_write_t write_func,
+>                                         void *user_data)
+>  {
+> -       struct gatt_db_service *service;
+>         uint8_t value[MAX_CHAR_DECL_VALUE_LEN];
+>         uint16_t len = 0;
+>         int i;
+>
+> -       if (!attrib)
+> +       /* Check if handle is in within service range */
+> +       if (handle && handle <= service->attributes[0]->handle)
+>                 return NULL;
+>
+> -       service = attrib->service;
+> -
+>         i = get_attribute_index(service, 1);
+>         if (!i)
+>                 return NULL;
+>
+> +       if (!handle)
+> +               handle = get_handle_at_index(service, i - 1) + 2;
+> +
+>         value[0] = properties;
+>         len += sizeof(properties);
+> +
+>         /* We set handle of characteristic value, which will be added next */
+> -       put_le16(get_handle_at_index(service, i - 1) + 2, &value[1]);
+> +       put_le16(handle, &value[1]);
+>         len += sizeof(uint16_t);
+>         len += uuid_to_le(uuid, &value[3]);
+>
+> -       service->attributes[i] = new_attribute(service, &characteristic_uuid,
+> -                                                               value, len);
+> +       service->attributes[i] = new_attribute(service, handle - 1,
+> +                                                       &characteristic_uuid,
+> +                                                       value, len);
+>         if (!service->attributes[i])
+>                 return NULL;
+>
+> -       attribute_update(service, i++);
+> +       i++;
+>
+> -       service->attributes[i] = new_attribute(service, uuid, NULL, 0);
+> +       service->attributes[i] = new_attribute(service, handle, uuid, NULL, 0);
+>         if (!service->attributes[i]) {
+>                 free(service->attributes[i - 1]);
+>                 return NULL;
+> @@ -709,37 +717,109 @@ gatt_db_service_add_characteristic(struct gatt_db_attribute *attrib,
+>         set_attribute_data(service->attributes[i], read_func, write_func,
+>                                                         permissions, user_data);
+>
+> -       return attribute_update(service, i);
+> +       return service->attributes[i];
+>  }
+>
+>  struct gatt_db_attribute *
+> -gatt_db_service_add_descriptor(struct gatt_db_attribute *attrib,
+> +gatt_db_service_insert_characteristic(struct gatt_db_attribute *attrib,
+> +                                       uint16_t handle,
+>                                         const bt_uuid_t *uuid,
+>                                         uint32_t permissions,
+> +                                       uint8_t properties,
+>                                         gatt_db_read_t read_func,
+>                                         gatt_db_write_t write_func,
+>                                         void *user_data)
+>  {
+> -       struct gatt_db_service *service;
+> -       int i;
+> +       if (!attrib || !handle)
+> +               return NULL;
+>
+> +       return service_insert_characteristic(attrib->service, handle, uuid,
+> +                                               permissions, properties,
+> +                                               read_func, write_func,
+> +                                               user_data);
+> +}
+> +
+> +struct gatt_db_attribute *
+> +gatt_db_service_add_characteristic(struct gatt_db_attribute *attrib,
+> +                                       const bt_uuid_t *uuid,
+> +                                       uint32_t permissions,
+> +                                       uint8_t properties,
+> +                                       gatt_db_read_t read_func,
+> +                                       gatt_db_write_t write_func,
+> +                                       void *user_data)
+> +{
+>         if (!attrib)
+>                 return NULL;
+>
+> -       service = attrib->service;
+> +       return service_insert_characteristic(attrib->service, 0, uuid,
+> +                                               permissions, properties,
+> +                                               read_func, write_func,
+> +                                               user_data);
+> +}
+> +
+> +static struct gatt_db_attribute *
+> +service_insert_descriptor(struct gatt_db_service *service,
+> +                                       uint16_t handle,
+> +                                       const bt_uuid_t *uuid,
+> +                                       uint32_t permissions,
+> +                                       gatt_db_read_t read_func,
+> +                                       gatt_db_write_t write_func,
+> +                                       void *user_data)
+> +{
+> +       int i;
+>
+>         i = get_attribute_index(service, 0);
+>         if (!i)
+>                 return NULL;
+>
+> -       service->attributes[i] = new_attribute(service, uuid, NULL, 0);
+> +       /* Check if handle is in within service range */
+> +       if (handle && handle <= service->attributes[0]->handle)
+> +               return NULL;
+> +
+> +       if (!handle)
+> +               handle = get_handle_at_index(service, i - 1) + 1;
+> +
+> +       service->attributes[i] = new_attribute(service, handle, uuid, NULL, 0);
+>         if (!service->attributes[i])
+>                 return NULL;
+>
+>         set_attribute_data(service->attributes[i], read_func, write_func,
+>                                                         permissions, user_data);
+>
+> -       return attribute_update(service, i);
+> +       return service->attributes[i];
+> +}
+> +
+> +struct gatt_db_attribute *
+> +gatt_db_service_insert_descriptor(struct gatt_db_attribute *attrib,
+> +                                       uint16_t handle,
+> +                                       const bt_uuid_t *uuid,
+> +                                       uint32_t permissions,
+> +                                       gatt_db_read_t read_func,
+> +                                       gatt_db_write_t write_func,
+> +                                       void *user_data)
+> +{
+> +       if (!attrib || !handle)
+> +               return NULL;
+> +
+> +       return service_insert_descriptor(attrib->service, handle, uuid,
+> +                                       permissions, read_func, write_func,
+> +                                       user_data);
+> +}
+> +
+> +struct gatt_db_attribute *
+> +gatt_db_service_add_descriptor(struct gatt_db_attribute *attrib,
+> +                                       const bt_uuid_t *uuid,
+> +                                       uint32_t permissions,
+> +                                       gatt_db_read_t read_func,
+> +                                       gatt_db_write_t write_func,
+> +                                       void *user_data)
+> +{
+> +       if (!attrib)
+> +               return NULL;
+> +
+> +       return service_insert_descriptor(attrib->service, 0, uuid,
+> +                                       permissions, read_func, write_func,
+> +                                       user_data);
+>  }
+>
+>  struct gatt_db_attribute *
+> @@ -781,7 +861,7 @@ gatt_db_service_add_included(struct gatt_db_attribute *attrib,
+>         if (!index)
+>                 return NULL;
+>
+> -       service->attributes[index] = new_attribute(service,
+> +       service->attributes[index] = new_attribute(service, 0,
+>                                                         &included_service_uuid,
+>                                                         value, len);
+>         if (!service->attributes[index])
+> @@ -1184,7 +1264,13 @@ void gatt_db_service_foreach_desc(struct gatt_db_attribute *attrib,
+>         service = attrib->service;
+>
+>         /* Start from the attribute following the value handle */
+> -       i = attrib->handle - service->attributes[0]->handle + 2;
+> +       for (i = 0; i < service->num_handles; i++) {
+> +               if (service->attributes[i] == attrib) {
+> +                       i += 2;
+> +                       break;
+> +               }
+> +       }
+> +
+>         for (; i < service->num_handles; i++) {
+>                 attr = service->attributes[i];
+>                 if (!attr)
+> @@ -1222,7 +1308,7 @@ struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+>                                                         uint16_t handle)
+>  {
+>         struct gatt_db_service *service;
+> -       uint16_t service_handle;
+> +       int i;
+>
+>         if (!db || !handle)
+>                 return NULL;
+> @@ -1232,14 +1318,15 @@ struct gatt_db_attribute *gatt_db_get_attribute(struct gatt_db *db,
+>         if (!service)
+>                 return NULL;
+>
+> -       service_handle = service->attributes[0]->handle;
+> +       for (i = 0; i < service->num_handles; i++) {
+> +               if (!service->attributes[i])
+> +                       continue;
+>
+> -       /*
+> -        * We can safely get attribute from attributes array with offset,
+> -        * because find_service_for_handle() check if given handle is
+> -        * in service range.
+> -        */
+> -       return service->attributes[handle - service_handle];
+> +               if (service->attributes[i]->handle == handle)
+> +                       return service->attributes[i];
+> +       }
+> +
+> +       return NULL;
+>  }
+>
+>  static bool find_service_with_uuid(const void *data, const void *user_data)
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index 74b37bc..96cceb9 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -67,6 +67,15 @@ gatt_db_service_add_characteristic(struct gatt_db_attribute *attrib,
+>                                         gatt_db_read_t read_func,
+>                                         gatt_db_write_t write_func,
+>                                         void *user_data);
+> +struct gatt_db_attribute *
+> +gatt_db_service_insert_characteristic(struct gatt_db_attribute *attrib,
+> +                                       uint16_t handle,
+> +                                       const bt_uuid_t *uuid,
+> +                                       uint32_t permissions,
+> +                                       uint8_t properties,
+> +                                       gatt_db_read_t read_func,
+> +                                       gatt_db_write_t write_func,
+> +                                       void *user_data);
+>
+>  struct gatt_db_attribute *
+>  gatt_db_service_add_descriptor(struct gatt_db_attribute *attrib,
+> @@ -75,6 +84,14 @@ gatt_db_service_add_descriptor(struct gatt_db_attribute *attrib,
+>                                         gatt_db_read_t read_func,
+>                                         gatt_db_write_t write_func,
+>                                         void *user_data);
+> +struct gatt_db_attribute *
+> +gatt_db_service_insert_descriptor(struct gatt_db_attribute *attrib,
+> +                                       uint16_t handle,
+> +                                       const bt_uuid_t *uuid,
+> +                                       uint32_t permissions,
+> +                                       gatt_db_read_t read_func,
+> +                                       gatt_db_write_t write_func,
+> +                                       void *user_data);
+>
+>  struct gatt_db_attribute *
+>  gatt_db_service_add_included(struct gatt_db_attribute *attrib,
+> --
+> 2.1.0
+
+Applied.
+
+
+-- 
+Luiz Augusto von Dentz
