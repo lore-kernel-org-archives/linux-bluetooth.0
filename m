@@ -1,34 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v2 0/7] Introduce APIs to set advertising data
-Date: Sat, 21 Mar 2015 00:03:30 -0700
-Message-Id: <1426921417-3419-1-git-send-email-armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 21 Mar 2015 08:04:07 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Read Verbose Config Version Info for Broadcom
+ devices
+Message-ID: <20150321060407.GA10728@t440s.P-661HNU-F1>
+References: <1426896996-26511-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1426896996-26511-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-*v2: - Addressed Marcel's comments on v1.
+Hi Marcel,
 
-*v1: - Addressed Marcel's comments.
-     - Included support for setting scan response data and timeouts.
+On Fri, Mar 20, 2015, Marcel Holtmann wrote:
+> The Broadcom devices expose their chip id via Read Verbose Config
+> Version Info command. While this information is not used at the
+> moment, it might be useful for debugging purposes and so read it
+> before patching the firmware. This makes it show up in dmesg and
+> HCI traces taken for the system.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btusb.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
 
-Arman Uguray (7):
-  Bluetooth: Add definitions for Add/Remove Advertising API
-  Bluetooth: Introduce HCI_ADVERTISING_INSTANCE setting and add AD flags
-  Bluetooth: Add data structure for advertising instance
-  Bluetooth: Implement the Add Advertising command
-  Bluetooth: Implement the Remove Advertising command
-  Bluetooth: Add support for instance scan response
-  Bluetooth: Add support for adv instance timeout
+Applied to bluetooth-next. Thanks.
 
- include/net/bluetooth/hci.h      |   2 +
- include/net/bluetooth/hci_core.h |  18 ++
- include/net/bluetooth/mgmt.h     |  34 +++
- net/bluetooth/hci_core.c         |   1 +
- net/bluetooth/mgmt.c             | 491 +++++++++++++++++++++++++++++++++++++--
- 5 files changed, 533 insertions(+), 13 deletions(-)
-
--- 
-2.2.0.rc0.207.ga3a616c
-
+Johan
