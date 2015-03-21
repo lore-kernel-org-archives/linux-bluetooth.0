@@ -1,31 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 21 Mar 2015 08:04:07 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Read Verbose Config Version Info for Broadcom
- devices
-Message-ID: <20150321060407.GA10728@t440s.P-661HNU-F1>
-References: <1426896996-26511-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1426896996-26511-1-git-send-email-marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix memory leak in le_scan_disable_work_complete()
+Date: Sat, 21 Mar 2015 08:02:23 +0200
+Message-Id: <1426917743-10597-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Fri, Mar 20, 2015, Marcel Holtmann wrote:
-> The Broadcom devices expose their chip id via Read Verbose Config
-> Version Info command. While this information is not used at the
-> moment, it might be useful for debugging purposes and so read it
-> before patching the firmware. This makes it show up in dmesg and
-> HCI traces taken for the system.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/btusb.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
+The hci_request in le_scan_disable_work_complete() was being initialized
+in a general context but only used in a specific branch in the function
+(when simultaneous discovery is not supported). This patch moves the
+usage to be limited to the branch where hci_req_run() is actually
+called.
 
-Applied to bluetooth-next. Thanks.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_core.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 773f2164d9a1..17f52a195ba8 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2874,7 +2874,6 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
+ {
+ 	/* General inquiry access code (GIAC) */
+ 	u8 lap[3] = { 0x33, 0x8b, 0x9e };
+-	struct hci_request req;
+ 	struct hci_cp_inquiry cp;
+ 	int err;
+ 
+@@ -2893,13 +2892,6 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
+ 		break;
+ 
+ 	case DISCOV_TYPE_INTERLEAVED:
+-		hci_req_init(&req, hdev);
+-
+-		memset(&cp, 0, sizeof(cp));
+-		memcpy(&cp.lap, lap, sizeof(cp.lap));
+-		cp.length = DISCOV_INTERLEAVED_INQUIRY_LEN;
+-		hci_req_add(&req, HCI_OP_INQUIRY, sizeof(cp), &cp);
+-
+ 		hci_dev_lock(hdev);
+ 
+ 		if (test_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY,
+@@ -2914,8 +2906,17 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
+ 				hci_discovery_set_state(hdev,
+ 							DISCOVERY_STOPPED);
+ 		} else {
++			struct hci_request req;
++
+ 			hci_inquiry_cache_flush(hdev);
+ 
++			hci_req_init(&req, hdev);
++
++			memset(&cp, 0, sizeof(cp));
++			memcpy(&cp.lap, lap, sizeof(cp.lap));
++			cp.length = DISCOV_INTERLEAVED_INQUIRY_LEN;
++			hci_req_add(&req, HCI_OP_INQUIRY, sizeof(cp), &cp);
++
+ 			err = hci_req_run(&req, inquiry_complete);
+ 			if (err) {
+ 				BT_ERR("Inquiry request failed: err %d", err);
+-- 
+2.1.0
+
