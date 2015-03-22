@@ -1,54 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY176-W52A5C926B24D89B1552450D30C0@phx.gbl>
-From: Ssagarr Patil <hugarsagar@outlook.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Szymon Janc <szymon.janc@tieto.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: bluez5 pairing devices
-Date: Sun, 22 Mar 2015 15:07:13 +0530
-In-Reply-To: <BAY176-W6C88AB3C728FAD951FEC0D30E0@phx.gbl>
-References: 
- <BAY176-W679B1127159C091585D3AD3030@phx.gbl>,<,<46068BD2-CF33-4617-80DB-5AE5C1FCA364@holtmann.org>,<,<,<12627750.IG3ACNRtuD@leonov>,<>>>,<,<BAY176-W40E12E1C2F620AB0D38605D3000@phx.gbl>,<,<440EB08C-2BD4-4373-B3DC-80361AA74722@holtmann.org>,<,<BAY176-W203E6BB20ECCED0D35B6A7D3010@phx.gbl>>>>>,<BAY176-W11EC25DD22E46D52ED6D92D3010@phx.gbl>,<,<CC6FAAF0-122B-4678-9865-F5E237073C09@holtmann.org>,<>>,<BAY176-W24D0233AE18250D3778E44D3010@phx.gbl>,<03048CAB-EDA3-46D6-A65B-BB17927B1F7E@holtmann.org>,<BAY176-W527F50DD202F6D774CBD56D3010@phx.gbl>,<BAY176-W6C88AB3C728FAD951FEC0D30E0@phx.gbl>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH] Bluetooth: Fix memory leak in le_scan_disable_work_complete()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1426917743-10597-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 22 Mar 2015 00:09:32 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <CC713F7E-147B-4C84-A553-11673AB692F1@holtmann.org>
+References: <1426917743-10597-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel=0A=
-=0A=
->>>=0A=
->>> maybe the backport has some issues that got fixed. The latest stable ke=
-rnel is 3.19.2.=0A=
->>>=0A=
->>>> Is it true we cannot pair LE devices in bluez4.101 ?=0A=
->>>=0A=
->>> LE support with BlueZ 4 is limited to not really working at all. So if =
-want to work on LE=2C then you need mgmt API support and a recent Bluetooth=
- subsystem and BlueZ 5.=0A=
->>>=0A=
->> With gattool and hcitool lecc I am able to pair. But I am not sure How t=
-o get the data from le device ?=0A=
->> Any pointers on doing this ?=0A=
->>=0A=
-> $ # hcitool  lecc 54:4A:16:5E:1B:9D=0A=
-> Connection handle 1025=0A=
->=0A=
-> Does it create a fd ? so that me C app can access ?=0A=
->=0A=
-> # gatttool  -b 54:4A:16:5E:1B:9D -I=0A=
-> [   ][54:4A:16:5E:1B:9D][LE]> connect=0A=
-> [CON][54:4A:16:5E:1B:9D][LE]> char-desc=0A=
-> [CON][54:4A:16:5E:1B:9D][LE]>=0A=
-> handle: 0x0001=2C uuid: 2800=0A=
-> handle: 0x0002=2C uuid: 2803=0A=
-> handle: 0x0003=2C uuid: 2a00=0A=
-> handle: 0x0004=2C uuid: 2803=0A=
-> handle: 0x0005=2C uuid: 2a01=0A=
->=0A=
-> I am not sure how to get events=2C how to hook for my application and get=
- the packets.=0A=
->=0A=
-Gentle Ping.=0A=
-=0A=
-Regards=2C=0A=
-Sagar=0A=
- 		 	   		  =
+Hi John,
+
+> The hci_request in le_scan_disable_work_complete() was being initialized
+> in a general context but only used in a specific branch in the function
+> (when simultaneous discovery is not supported). This patch moves the
+> usage to be limited to the branch where hci_req_run() is actually
+> called.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_core.c | 17 +++++++++--------
+> 1 file changed, 9 insertions(+), 8 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
