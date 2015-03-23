@@ -2,97 +2,103 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v4 14/15] advertising-manager: Parse ServiceData
-Date: Mon, 23 Mar 2015 08:11:06 -0700
-Message-Id: <1427123467-13445-15-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v4 04/15] unit/test-dbus-client: test for g_dbus_set_ready_watch
+Date: Mon, 23 Mar 2015 08:10:56 -0700
+Message-Id: <1427123467-13445-5-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1427123467-13445-1-git-send-email-jamuraa@chromium.org>
 References: <1427123467-13445-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the ServiceData property of LEAdvertisement1
+Adds a test for the functionality of g_dbus_set_ready_watch.
 ---
- src/advertising-manager.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ unit/test-gdbus-client.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
 
-diff --git a/src/advertising-manager.c b/src/advertising-manager.c
-index 7621631..f4ae5ae 100644
---- a/src/advertising-manager.c
-+++ b/src/advertising-manager.c
-@@ -295,6 +295,61 @@ fail:
- 	return false;
+diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
+index 11ad1f7..e2ab9cf 100644
+--- a/unit/test-gdbus-client.c
++++ b/unit/test-gdbus-client.c
+@@ -908,6 +908,70 @@ static void client_proxy_removed(void)
+ 	destroy_context(context);
  }
  
-+static bool parse_advertising_service_data(GDBusProxy *proxy,
-+						struct advertising_data *data)
++static void proxy_ready(GDBusProxy *proxy, void *user_data)
 +{
-+	DBusMessageIter iter, entries;
++	struct context *context = user_data;
++	DBusMessageIter iter;
++	const char *string;
 +
-+	if (!g_dbus_proxy_get_property(proxy, "ServiceData", &iter))
-+		return true;
++	if (g_test_verbose())
++		g_print("proxy for %s ready\n",
++					g_dbus_proxy_get_interface(proxy));
 +
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		return false;
++	g_assert(context->proxy == proxy);
 +
-+	dbus_message_iter_recurse(&iter, &entries);
++	g_assert(g_dbus_proxy_get_property(proxy, "String", &iter));
 +
-+	advertising_data_clear_manufacturer_data(data);
++	dbus_message_iter_get_basic(&iter, &string);
++	g_assert(g_strcmp0(string, "value1") == 0);
 +
-+	while (dbus_message_iter_get_arg_type(&entries)
-+						== DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter value, entry;
-+		const char *uuid_str;
-+		bt_uuid_t uuid;
-+		uint8_t *service_data;
-+		int len;
-+
-+		dbus_message_iter_recurse(&entries, &entry);
-+		dbus_message_iter_get_basic(&entry, &uuid_str);
-+
-+		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
-+			goto fail;
-+
-+		dbus_message_iter_next(&entry);
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_ARRAY)
-+			goto fail;
-+
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_BYTE)
-+			goto fail;
-+
-+		dbus_message_iter_get_fixed_array(&value, &service_data, &len);
-+
-+		DBG("Adding ServiceData for %s", uuid_str);
-+
-+		advertising_data_add_service_data(data, &uuid,
-+							service_data, len);
-+
-+		dbus_message_iter_next(&entries);
-+	}
-+
-+	return true;
-+
-+fail:
-+	advertising_data_clear_manufacturer_data(data);
-+	return false;
++	g_main_loop_quit(context->main_loop);
 +}
 +
- static void refresh_advertisement(struct advertisement *ad)
- {
- 	DBG("Refreshing advertisement: %s", ad->path);
-@@ -325,6 +380,11 @@ static bool parse_advertisement(struct advertisement *ad)
- 		return false;
- 	}
- 
-+	if (!parse_advertising_service_data(ad->proxy, ad->data)) {
-+		error("Property \"ServiceData\" failed to parse correctly");
-+		return false;
-+	}
++static void client_proxy_ready(void)
++{
++	struct context *context = create_context();
++	DBusConnection *conn;
++	DBusMessageIter iter;
++	static const GDBusPropertyTable string_properties[] = {
++		{ "String", "s", get_string, set_string, string_exists },
++		{ },
++	};
 +
- 	/* TODO: parse the rest of the properties */
++	if (context == NULL)
++		return;
++
++	conn = g_dbus_setup_private(DBUS_BUS_SESSION, SERVICE_NAME1, NULL);
++	g_assert(conn != NULL);
++
++	context->data = g_strdup("value1");
++
++	g_dbus_register_interface(conn,
++				SERVICE_PATH, SERVICE_NAME1,
++				methods, signals, string_properties,
++				context, NULL);
++
++	context->dbus_client = g_dbus_client_new(context->dbus_conn,
++						SERVICE_NAME1, SERVICE_PATH);
++
++	context->proxy = g_dbus_proxy_new(context->dbus_client, SERVICE_PATH,
++								SERVICE_NAME1);
++
++	g_dbus_proxy_set_ready_watch(context->proxy, proxy_ready, context);
++
++	g_assert(!g_dbus_proxy_get_property(context->proxy, "String", &iter));
++
++	g_main_loop_run(context->main_loop);
++
++	g_dbus_unregister_interface(conn, SERVICE_PATH, SERVICE_NAME1);
++
++	dbus_connection_flush(conn);
++	dbus_connection_close(conn);
++	dbus_connection_unref(conn);
++
++	destroy_context(context);
++}
++
+ static void proxy_force_disconnect(GDBusProxy *proxy, void *user_data)
+ {
+ 	struct context *context = user_data;
+@@ -1051,6 +1115,8 @@ int main(int argc, char *argv[])
  
- 	refresh_advertisement(ad);
+ 	g_test_add_func("/gdbus/client_proxy_removed", client_proxy_removed);
+ 
++	g_test_add_func("/gdbus/client_proxy_ready", client_proxy_ready);
++
+ 	g_test_add_func("/gdbus/client_force_disconnect",
+ 						client_force_disconnect);
+ 
 -- 
 2.2.0.rc0.207.ga3a616c
 
