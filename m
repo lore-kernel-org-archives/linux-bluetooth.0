@@ -1,118 +1,214 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1427087337-17479-1-git-send-email-jaganath.k@samsung.com>
-References: <1427087337-17479-1-git-send-email-jaganath.k@samsung.com>
-Date: Mon, 23 Mar 2015 16:45:56 -0700
-Message-ID: <CAHrH25SJXjAj6oayUUL1_Mi7o4gi8i=JcEGVUZ4J8DOhBoTNRQ@mail.gmail.com>
-Subject: Re: [PATCH] Fix crash during register_notify after service_changed_event
 From: Arman Uguray <armansito@chromium.org>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH v3 7/7] Bluetooth: Add support for adv instance timeout
+Date: Mon, 23 Mar 2015 15:57:15 -0700
+Message-Id: <1427151435-24958-8-git-send-email-armansito@chromium.org>
+In-Reply-To: <1427151435-24958-1-git-send-email-armansito@chromium.org>
+References: <1427151435-24958-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+This patch implements support for the timeout parameter of the
+Add Advertising command.
 
-> On Sun, Mar 22, 2015 at 10:08 PM, Jaganath Kanakkassery <jaganath.k@samsung.com> wrote:
-> During service changed event the characteristics of the modified
-> services will be destroyed and corresponding notify clients also
-> will be freed. But those notify clients are not removed from
-> all_notify_clients queue of btd_client which causes the below
-> crash
->
-> 0  queue_remove (queue=0x1, data=0xb8e97a68) at src/shared/queue.c:292
->         entry = <value optimized out>
->         prev = <value optimized out>
-> 1  0xb6f84c34 in register_notify (data=0xb8e9a900, user_data=0xb8e97a68)
->     at src/gatt-client.c:1833
-> No locals.
-> 2  register_notify (data=0xb8e9a900, user_data=0xb8e97a68)
->     at src/gatt-client.c:1807
->         notify_client = 0xb8e9a900
->         client = 0xb8e97a68
->         op = 0xb8e91f30
-> 3  0xb6f9a41a in queue_foreach (queue=0xb8e97a98,
->     function=0xb6f84bd9 <register_notify>, user_data=0xb8e97a68)
->     at src/shared/queue.c:251
->         next = <value optimized out>
->         entry = 0xb8e9baf0
-> 4  0xb6f89b62 in gatt_client_ready_cb (success=<value optimized out>,
->     att_ecode=<value optimized out>, user_data=0xb8e97770) at src/device.c:5173
-> No locals.
-> 5  gatt_client_ready_cb (success=<value optimized out>,
->     att_ecode=<value optimized out>, user_data=0xb8e97770) at src/device.c:5132
->         device = 0xb8e97770
-> 6  0xb6f9e232 in notify_client_ready (client=0xb8e90710,
-> ---Type <return> to continue, or q <return> to quit---
->     success=<value optimized out>, att_ecode=<value optimized out>)
->     at src/shared/gatt-client.c:1019
-> No locals.
-> 7  0xb6f9cb6a in complete_notify_request (data=<value optimized out>)
->     at src/shared/gatt-client.c:1405
->         notify_data = <value optimized out>
-> 8  0xb6f9e168 in enable_ccc_callback (opcode=<value optimized out>,
->     pdu=<value optimized out>, length=<value optimized out>,
->     user_data=0xb8e911a8) at src/shared/gatt-client.c:1488
->         notify_data = 0xb8e911a8
->         att_ecode = <value optimized out>
->         __PRETTY_FUNCTION__ = "enable_ccc_callback"
-> 9  0xb6f9c6d8 in handle_rsp (io=<value optimized out>, user_data=0xb8e9a330)
->     at src/shared/att.c:640
->         rsp_opcode = 19 '\023'
->         rsp_pdu = <value optimized out>
->         rsp_pdu_len = <value optimized out>
->         op = 0xb8e8ece8
->         req_opcode = <value optimized out>
->
-> This patch removes the notify clients (which will be freed) from
-> all_notify_clients as well
+Signed-off-by: Arman Uguray <armansito@chromium.org>
+---
+ include/net/bluetooth/hci_core.h |   2 +
+ net/bluetooth/mgmt.c             | 101 +++++++++++++++++++++++++++++++--------
+ 2 files changed, 83 insertions(+), 20 deletions(-)
 
-Your patch looks good to me. I also tested it and everything seems to
-work fine, although if you can also add a test case to unit/test-gatt
-for this particular crash it would be great.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 3a6d4e3..540c07f 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -156,8 +156,10 @@ struct oob_data {
+ };
+ 
+ struct adv_info {
++	struct delayed_work timeout_exp;
+ 	__u8	instance;
+ 	__u32	flags;
++	__u16	timeout;
+ 	__u16	adv_data_len;
+ 	__u8	adv_data[HCI_MAX_AD_LENGTH];
+ 	__u16	scan_rsp_len;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 762ca9b..eda5239 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1336,6 +1336,49 @@ static bool hci_stop_discovery(struct hci_request *req)
+ 	return false;
+ }
+ 
++static void advertising_added(struct sock *sk, struct hci_dev *hdev,
++			      u8 instance)
++{
++	struct mgmt_ev_advertising_added ev;
++
++	ev.instance = instance;
++
++	mgmt_event(MGMT_EV_ADVERTISING_ADDED, hdev, &ev, sizeof(ev), sk);
++}
++
++static void advertising_removed(struct sock *sk, struct hci_dev *hdev,
++				u8 instance)
++{
++	struct mgmt_ev_advertising_removed ev;
++
++	ev.instance = instance;
++
++	mgmt_event(MGMT_EV_ADVERTISING_REMOVED, hdev, &ev, sizeof(ev), sk);
++}
++
++static void clear_adv_instance(struct hci_dev *hdev)
++{
++	struct hci_request req;
++
++	if (!hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE))
++		return;
++
++	if (hdev->adv_instance.timeout)
++		cancel_delayed_work(&hdev->adv_instance.timeout_exp);
++
++	memset(&hdev->adv_instance, 0, sizeof(hdev->adv_instance));
++	advertising_removed(NULL, hdev, 1);
++	hci_dev_clear_flag(hdev, HCI_ADVERTISING_INSTANCE);
++
++	if (!hdev_is_powered(hdev) ||
++	    hci_dev_test_flag(hdev, HCI_ADVERTISING))
++		return;
++
++	hci_req_init(&req, hdev);
++	disable_advertising(&req);
++	hci_req_run(&req, NULL);
++}
++
+ static int clean_up_hci_state(struct hci_dev *hdev)
+ {
+ 	struct hci_request req;
+@@ -1351,6 +1394,9 @@ static int clean_up_hci_state(struct hci_dev *hdev)
+ 		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+ 	}
+ 
++	if (hdev->adv_instance.timeout)
++		clear_adv_instance(hdev);
++
+ 	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+ 		disable_advertising(&req);
+ 
+@@ -6468,26 +6514,6 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
+ 	return true;
+ }
+ 
+-static void advertising_added(struct sock *sk, struct hci_dev *hdev,
+-			      u8 instance)
+-{
+-	struct mgmt_ev_advertising_added ev;
+-
+-	ev.instance = instance;
+-
+-	mgmt_event(MGMT_EV_ADVERTISING_ADDED, hdev, &ev, sizeof(ev), sk);
+-}
+-
+-static void advertising_removed(struct sock *sk, struct hci_dev *hdev,
+-				u8 instance)
+-{
+-	struct mgmt_ev_advertising_removed ev;
+-
+-	ev.instance = instance;
+-
+-	mgmt_event(MGMT_EV_ADVERTISING_REMOVED, hdev, &ev, sizeof(ev), sk);
+-}
+-
+ static void add_advertising_complete(struct hci_dev *hdev, u8 status,
+ 				     u16 opcode)
+ {
+@@ -6524,6 +6550,18 @@ unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void adv_timeout_expired(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev,
++					    adv_instance.timeout_exp.work);
++
++	hdev->adv_instance.timeout = 0;
++
++	hci_dev_lock(hdev);
++	clear_adv_instance(hdev);
++	hci_dev_unlock(hdev);
++}
++
+ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 			   void *data, u16 data_len)
+ {
+@@ -6531,6 +6569,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 	struct mgmt_rp_add_advertising rp;
+ 	u32 flags;
+ 	u8 status;
++	u16 timeout;
+ 	int err;
+ 	struct mgmt_pending_cmd *cmd;
+ 	struct hci_request req;
+@@ -6543,6 +6582,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 				       status);
+ 
+ 	flags = __le32_to_cpu(cp->flags);
++	timeout = __le16_to_cpu(cp->timeout);
+ 
+ 	/* The current implementation only supports adding one instance and
+ 	 * doesn't support flags.
+@@ -6553,6 +6593,12 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (timeout && !hdev_is_powered(hdev)) {
++		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
++				      MGMT_STATUS_REJECTED);
++		goto unlock;
++	}
++
+ 	if (pending_find(MGMT_OP_ADD_ADVERTISING, hdev) ||
+ 	    pending_find(MGMT_OP_REMOVE_ADVERTISING, hdev) ||
+ 	    pending_find(MGMT_OP_SET_LE, hdev)) {
+@@ -6569,6 +6615,8 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
++	INIT_DELAYED_WORK(&hdev->adv_instance.timeout_exp, adv_timeout_expired);
++
+ 	hdev->adv_instance.flags = flags;
+ 	hdev->adv_instance.adv_data_len = cp->adv_data_len;
+ 	hdev->adv_instance.scan_rsp_len = cp->scan_rsp_len;
+@@ -6580,6 +6628,16 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		memcpy(hdev->adv_instance.scan_rsp_data,
+ 		       cp->data + cp->adv_data_len, cp->scan_rsp_len);
+ 
++	if (hdev->adv_instance.timeout)
++		cancel_delayed_work(&hdev->adv_instance.timeout_exp);
++
++	hdev->adv_instance.timeout = timeout;
++
++	if (timeout)
++		queue_delayed_work(hdev->workqueue,
++				   &hdev->adv_instance.timeout_exp,
++				   msecs_to_jiffies(timeout * 1000));
++
+ 	if (!hci_dev_test_and_set_flag(hdev, HCI_ADVERTISING_INSTANCE))
+ 		advertising_added(sk, hdev, 1);
+ 
+@@ -6682,6 +6740,9 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
++	if (hdev->adv_instance.timeout)
++		cancel_delayed_work(&hdev->adv_instance.timeout_exp);
++
+ 	memset(&hdev->adv_instance, 0, sizeof(hdev->adv_instance));
+ 
+ 	advertising_removed(sk, hdev, 1);
+-- 
+2.2.0.rc0.207.ga3a616c
 
-> ---
->  src/gatt-client.c |   12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index 863492a..2e26ed7 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -1370,6 +1370,16 @@ static struct characteristic *characteristic_create(
->         return chrc;
->  }
->
-> +static void remove_client(void *data)
-> +{
-> +       struct notify_client *ntfy_client = data;
-> +       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
-> +
-> +       queue_remove(client->all_notify_clients, ntfy_client);
-> +
-> +       notify_client_unref(ntfy_client);
-> +}
-> +
->  static void unregister_characteristic(void *data)
->  {
->         struct characteristic *chrc = data;
-> @@ -1383,7 +1393,7 @@ static void unregister_characteristic(void *data)
->         if (chrc->write_id)
->                 bt_gatt_client_cancel(gatt, chrc->write_id);
->
-> -       queue_remove_all(chrc->notify_clients, NULL, NULL, notify_client_unref);
-> +       queue_remove_all(chrc->notify_clients, NULL, NULL, remove_client);
->         queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
->
->         g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
-> --
-> 1.7.9.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Thanks,
-Arman
