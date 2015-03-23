@@ -1,82 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v4 03/15] gdbus/client: add g_dbus_proxy_set_ready_watch
-Date: Mon, 23 Mar 2015 08:10:55 -0700
-Message-Id: <1427123467-13445-4-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1427123467-13445-1-git-send-email-jamuraa@chromium.org>
-References: <1427123467-13445-1-git-send-email-jamuraa@chromium.org>
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1426858595-29346-1-git-send-email-bharat.panda@samsung.com>
+ <022501d0654c$9ee015b0$dca04110$@samsung.com>
+ <CABBYNZLzrFhgq7K6DdFCMUg0AaQpj5RmGWDCZcZS_K3-HN8q7A@mail.gmail.com>
+In-reply-to: <CABBYNZLzrFhgq7K6DdFCMUg0AaQpj5RmGWDCZcZS_K3-HN8q7A@mail.gmail.com>
+Subject: RE: [PATCH v2] monitor: Add AVDTP support to btmon
+Date: Mon, 23 Mar 2015 20:26:33 +0530
+Message-id: <022f01d06579$955ccec0$c0166c40$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds a new gdbus utility function which will set a function to be called
-after the properties of a proxy are updated.
+Hi Luiz,
 
-This enables using GDBusClient for objects without the ObjectManager
-interface as long as you know in advance the object path using
-g_dbus_proxy_new
----
- gdbus/client.c | 17 +++++++++++++++++
- gdbus/gdbus.h  |  3 +++
- 2 files changed, 20 insertions(+)
+> >> +
+> >> +void avdtp_packet(const struct l2cap_frame *frame) {
+> >> +     struct l2cap_frame *l2cap_frame;
+> >> +     struct avdtp_frame avdtp_frame;
+> >> +     const char *pdu_color;
+> >> +
+> >> +     l2cap_frame_pull(&avdtp_frame.l2cap_frame, frame, 0);
+> >> +
+> >> +     l2cap_frame = &avdtp_frame.l2cap_frame;
+> >> +
+> >> +     avdtp_frame.tsid = 0x00;
+> >> +     if (!l2cap_frame_get_u8(l2cap_frame, &avdtp_frame.hdr) ||
+> >> +                     !l2cap_frame_get_u8(l2cap_frame,
+> >> &avdtp_frame.tsid)) {
+> >> +             print_text(COLOR_ERROR, "frame too short");
+> >> +             packet_hexdump(frame->data, frame->size);
+> >> +             return;
+> >> +     }
+> 
+> It looks like you are treating all frames as signalling but A2DP uses the same
+> PSM for streaming so I wonder if you have tried this with an active stream?
+Yes, I was testing it through mecApp, so couldn't test the real media streaming of the same.
+I agree, it is treating all frames as signaling frames, which is how it should not be. I will submit another version for this patch handling the same.
+> 
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index fe0c0db..dcfa0f6 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -76,6 +76,8 @@ struct GDBusProxy {
- 	void *prop_data;
- 	GDBusProxyFunction removed_func;
- 	void *removed_data;
-+	GDBusProxyFunction read_func;
-+	void *read_data;
- };
- 
- struct prop_entry {
-@@ -297,6 +299,9 @@ static void get_all_properties_reply(DBusPendingCall *call, void *user_data)
- 
- 	update_properties(proxy, &iter, FALSE);
- 
-+	if (proxy->read_func)
-+		proxy->read_func(proxy, proxy->read_data);
-+
- done:
- 	if (g_list_find(client->proxy_list, proxy) == NULL) {
- 		if (client->proxy_added)
-@@ -914,6 +919,18 @@ gboolean g_dbus_proxy_set_removed_watch(GDBusProxy *proxy,
- 	return TRUE;
- }
- 
-+gboolean g_dbus_proxy_set_ready_watch(GDBusProxy *proxy,
-+				GDBusProxyFunction function, void *user_data)
-+{
-+	if (proxy == NULL)
-+		return FALSE;
-+
-+	proxy->read_func = function;
-+	proxy->read_data = user_data;
-+
-+	return TRUE;
-+}
-+
- static void refresh_properties(GDBusClient *client)
- {
- 	GList *list;
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 9814838..277f592 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -353,6 +353,9 @@ gboolean g_dbus_proxy_set_property_watch(GDBusProxy *proxy,
- gboolean g_dbus_proxy_set_removed_watch(GDBusProxy *proxy,
- 			GDBusProxyFunction destroy, void *user_data);
- 
-+gboolean g_dbus_proxy_set_ready_watch(GDBusProxy *proxy,
-+			GDBusProxyFunction ready, void *user_data);
-+
- GDBusClient *g_dbus_client_new(DBusConnection *connection,
- 					const char *service, const char *path);
- GDBusClient *g_dbus_client_new_full(DBusConnection *connection,
--- 
-2.2.0.rc0.207.ga3a616c
+Thanks
+Best Regards,
+Bharat
 
