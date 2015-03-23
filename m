@@ -2,128 +2,316 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v4 01/15] doc: Add LE Advertisement D-Bus API documentation
-Date: Mon, 23 Mar 2015 08:10:53 -0700
-Message-Id: <1427123467-13445-2-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v4 05/15] advertising-manager: Implement RegisterAdvertisement
+Date: Mon, 23 Mar 2015 08:10:57 -0700
+Message-Id: <1427123467-13445-6-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1427123467-13445-1-git-send-email-jamuraa@chromium.org>
 References: <1427123467-13445-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The LE Advertisement API allows external appications to define
-persistent LE Advertisement Data packets.
+Initial implementation of the RegisterAdvertisement function of the
+LEAdvertisingManager1 interface.
 ---
- doc/advertising-api.txt | 101 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
- create mode 100644 doc/advertising-api.txt
+ src/advertising-manager.c | 255 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 254 insertions(+), 1 deletion(-)
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-new file mode 100644
-index 0000000..7fb34ee
---- /dev/null
-+++ b/doc/advertising-api.txt
-@@ -0,0 +1,101 @@
-+BlueZ D-Bus LE Advertising API Description
-+******************************************
+diff --git a/src/advertising-manager.c b/src/advertising-manager.c
+index c3f85c2..958177c 100644
+--- a/src/advertising-manager.c
++++ b/src/advertising-manager.c
+@@ -30,7 +30,9 @@
+ 
+ #include "adapter.h"
+ #include "dbus-common.h"
++#include "error.h"
+ #include "log.h"
++#include "src/shared/queue.h"
+ #include "src/shared/util.h"
+ 
+ #define LE_ADVERTISING_MGR_IFACE "org.bluez.LEAdvertisingManager1"
+@@ -38,15 +40,262 @@
+ 
+ struct btd_advertising_manager {
+ 	struct btd_adapter *adapter;
++	struct queue *adverts;
+ };
+ 
++#define AD_TYPE_BROADCAST 0
++#define AD_TYPE_PERIPHERAL 1
 +
-+Advertising packets are structured data which is broadcast on the LE Advertising
-+channels and available for all devices in range.  Because of the limited space
-+available in LE Advertising packets (32 bytes), each packet's contents must be
-+carefully controlled.
++struct advertisement {
++	struct btd_advertising_manager *manager;
++	char *owner;
++	char *path;
++	GDBusClient *client;
++	GDBusProxy *proxy;
++	DBusMessage *reg;
++	uint8_t type; /* Advertising type */
++	bool published;
++};
 +
-+BlueZ acts as a store for the Advertisement Data which is meant to be sent.
-+It constructs the correct Advertisement Data from the structured
-+data and configured the kernel to send the correct advertisement.
++static bool match_advertisement_path(const void *a, const void *b)
++{
++	const struct advertisement *ad = a;
++	const char *path = b;
 +
-+Advertisement Data objects are registered freely and then referenced by BlueZ
-+when constructing the data sent to the kernel.
++	return g_strcmp0(ad->path, path);
++}
 +
-+LE Advertisement Data hierarchy
-+===============================
++static void advertisement_free(void *data)
++{
++	struct advertisement *ad = data;
 +
-+Specifies the Advertisement Data to be broadcast and some advertising
-+parameters.  Properties which are not present will not be included in the
-+data.  Required advertisement data types will always be included.
-+All UUIDs are 128-bit versions in the API, and 16 or 32-bit
-+versions of the same UUID will be used in the advertising data as appropriate.
++	if (ad->client) {
++		g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
++		g_dbus_client_unref(ad->client);
++	}
 +
-+Service		org.bluez
-+Interface	org.bluez.LEAdvertisement1
-+Object path	freely definable
++	if (ad->proxy)
++		g_dbus_proxy_unref(ad->proxy);
 +
-+Methods		void Release() [noreply]
++	if (ad->owner)
++		g_free(ad->owner);
 +
-+			This method gets called when the service daemon
-+			removes the Advertisement. A client can use it to do
-+			cleanup tasks. There is no need to call
-+			UnregisterAdvertisement because when this method gets
-+			called it has already been unregistered.
++	if (ad->path)
++		g_free(ad->path);
 +
-+Properties	string Type
++	free(ad);
++}
 +
-+			Determines the type of advertising packet requested.
++static gboolean advertisement_free_idle_cb(void *data)
++{
++	advertisement_free(data);
 +
-+			Possible values: "broadcast" or "peripheral"
++	return FALSE;
++}
 +
-+		array{string} ServiceUUIDs
++static void advertisement_release(void *data)
++{
++	struct advertisement *ad = data;
++	DBusMessage *message;
 +
-+			List of UUIDs to include in the "Service UUID" field of
-+			the Advertising Data.
++	DBG("Releasing advertisement %s, %s", ad->owner, ad->path);
 +
-+		dict ManufacturerData
++	message = dbus_message_new_method_call(ad->owner, ad->path,
++							LE_ADVERTISEMENT_IFACE,
++							"Release");
 +
-+			Manufactuer Data fields to include in
-+			the Advertising Data.  Keys are the Manufacturer ID
-+			to associate with the data.
++	if (message == NULL) {
++		error("Couldn't allocate D-Bus message");
++		return;
++	}
 +
-+		array{string} SolicitUUIDs
++	g_dbus_send_message(btd_get_dbus_connection(), message);
++}
 +
-+			Array of UUIDs to include in "Service Solicitation"
-+			Advertisement Data.
-+
-+		dict ServiceData
-+
-+			Service Data elements to include. The keys are the
-+			UUID to associate with the data.
++static void advertisement_destroy(void *data)
++{
++	advertisement_release(data);
++	advertisement_free(data);
++}
 +
 +
-+LE Advertising Manager hierarchy
-+================================
++static void advertisement_remove(void *data)
++{
++	struct advertisement *ad = data;
 +
-+The Advertising Manager allows external applications to register Advertisement
-+Data which should be broadcast to devices.  Advertisement Data elements must
-+follow the API for LE Advertisement Data described above.
++	g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
 +
-+Service		org.bluez
-+Interface	org.bluez.LEAdvertisingManager1 [Experimental]
-+Object path	/org/bluez/{hci0,hci1,...}
++	queue_remove(ad->manager->adverts, ad);
 +
-+Methods		RegisterAdvertisement(object advertisement, dict options)
++	g_idle_add(advertisement_free_idle_cb, ad);
++}
 +
-+			Registers an advertisement object to be sent over the LE
-+			Advertising channel.  The service must be exported
-+			under interface LEAdvertisement1. InvalidArguments
-+			indicates that the object has invalid or conflicting
-+			properties.  InvalidLength indicates that the data
-+			provided generates a data packet which is too long.
-+			The properties of this object are parser when it is
-+			registered, and any changes are ignored.
-+			Currently only one advertisement at a time is supported,
-+			attempting to register two advertisements will result in
-+			an AlreadyExists error.
++static void client_disconnect_cb(DBusConnection *conn, void *user_data)
++{
++	DBG("Client disconnected");
 +
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.AlreadyExists
-+					 org.bluez.Error.InvalidLength
++	advertisement_remove(user_data);
++}
 +
-+		UnregisterAdvertisement(object advertisement)
++static bool parse_advertising_type(GDBusProxy *proxy, uint8_t *type)
++{
++	DBusMessageIter iter;
++	const char *msg_type;
 +
-+			This unregisters an advertisement that has been
-+			prevously registered.  The object path parameter must
-+			match the same value that has been used on registration.
++	if (!g_dbus_proxy_get_property(proxy, "Type", &iter))
++		return false;
 +
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.DoesNotExist
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return false;
++
++	dbus_message_iter_get_basic(&iter, &msg_type);
++
++	if (!g_strcmp0(msg_type, "broadcast")) {
++		*type = AD_TYPE_BROADCAST;
++		return true;
++	}
++
++	if (!g_strcmp0(msg_type, "peripheral")) {
++		*type = AD_TYPE_PERIPHERAL;
++		return true;
++	}
++
++	return false;
++}
++
++static void refresh_advertisement(struct advertisement *ad)
++{
++	DBG("Refreshing advertisement: %s", ad->path);
++	if (!ad->published) {
++		/* TODO: MGMT API call to update the advertisement */
++	}
++}
++
++static bool parse_advertisement(struct advertisement *ad)
++{
++	if (!parse_advertising_type(ad->proxy, &ad->type)) {
++		error("Failed to read \"Type\" property of advertisement");
++		return false;
++	}
++
++	/* TODO: parse the remaining properties into a shared structure */
++
++	refresh_advertisement(ad);
++
++	return true;
++}
++
++static void advertisement_proxy_ready(GDBusProxy *proxy, void *data)
++{
++	struct advertisement *ad = data;
++	DBusMessage *reply;
++
++	if (!parse_advertisement(ad)) {
++		error("Failed to parse advertisement");
++
++		reply = btd_error_failed(ad->reg,
++					"Failed to register advertisement");
++		goto done;
++	}
++
++	g_dbus_client_set_disconnect_watch(ad->client, client_disconnect_cb,
++									ad);
++
++	reply = dbus_message_new_method_return(ad->reg);
++
++	DBG("Advertisement registered: %s", ad->path);
++
++done:
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++
++	dbus_message_unref(ad->reg);
++	ad->reg = NULL;
++}
++
++static struct advertisement *advertisement_create(DBusConnection *conn,
++					DBusMessage *msg, const char *path)
++{
++	struct advertisement *ad;
++	const char *sender = dbus_message_get_sender(msg);
++
++	if (!path || !g_str_has_prefix(path, "/"))
++		return NULL;
++
++	ad = new0(struct advertisement, 1);
++	if (!ad)
++		return NULL;
++
++	ad->published = false;
++
++	ad->client = g_dbus_client_new_full(conn, sender, path, path);
++	if (!ad->client)
++		goto fail;
++
++	ad->owner = g_strdup(sender);
++	if (!ad->owner)
++		goto fail;
++
++	ad->path = g_strdup(path);
++	if (!ad->path)
++		goto fail;
++
++	DBG("Adding proxy for %s", path);
++	ad->proxy = g_dbus_proxy_new(ad->client, path, LE_ADVERTISEMENT_IFACE);
++	if (!ad->proxy)
++		goto fail;
++
++	g_dbus_proxy_set_ready_watch(ad->proxy, advertisement_proxy_ready, ad);
++
++	ad->reg = dbus_message_ref(msg);
++
++	return ad;
++
++fail:
++	advertisement_free(ad);
++	return NULL;
++}
++
+ static DBusMessage *register_advertisement(DBusConnection *conn,
+ 						DBusMessage *msg,
+ 						void *user_data)
+ {
++	struct btd_advertising_manager *manager = user_data;
++	DBusMessageIter args;
++	const char *path;
++	struct advertisement *ad;
++
+ 	DBG("RegisterAdvertisement");
+ 
+-	/* TODO */
++	if (!dbus_message_iter_init(msg, &args))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&args, &path);
++
++	if (queue_find(manager->adverts, match_advertisement_path, path))
++		return btd_error_already_exists(msg);
++
++	/* TODO: support more than one advertisement */
++	if (!queue_isempty(manager->adverts))
++		return btd_error_failed(msg, "Already advertising");
++
++	dbus_message_iter_next(&args);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
++		return btd_error_invalid_args(msg);
++
++	ad = advertisement_create(conn, msg, path);
++	if (!ad)
++		return btd_error_failed(msg,
++					"Failed to register advertisement");
++
++	DBG("Registered advertisement at path %s", path);
++
++	ad->manager = manager;
++	queue_push_tail(manager->adverts, ad);
++
+ 	return NULL;
+ }
+ 
+@@ -76,6 +325,8 @@ static void advertising_manager_destroy(void *user_data)
+ {
+ 	struct btd_advertising_manager *manager = user_data;
+ 
++	queue_destroy(manager->adverts, advertisement_destroy);
++
+ 	free(manager);
+ }
+ 
+@@ -100,6 +351,8 @@ advertising_manager_create(struct btd_adapter *adapter)
+ 		return NULL;
+ 	}
+ 
++	manager->adverts = queue_new();
++
+ 	return manager;
+ }
+ 
 -- 
 2.2.0.rc0.207.ga3a616c
 
