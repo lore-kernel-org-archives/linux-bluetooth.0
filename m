@@ -1,98 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1426976135-2783-2-git-send-email-jpawlowski@google.com>
-References: <1426976135-2783-1-git-send-email-jpawlowski@google.com>
-	<1426976135-2783-2-git-send-email-jpawlowski@google.com>
-Date: Mon, 23 Mar 2015 16:58:32 -0700
-Message-ID: <CAHrH25Si72YGyV3Dy+AkQ0T4WgWDwK-uR98DSjf67+AN_c3wQw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/8] core/adapter: Refactor of scan type
+In-Reply-To: <1427087337-17479-1-git-send-email-jaganath.k@samsung.com>
+References: <1427087337-17479-1-git-send-email-jaganath.k@samsung.com>
+Date: Mon, 23 Mar 2015 16:45:56 -0700
+Message-ID: <CAHrH25SJXjAj6oayUUL1_Mi7o4gi8i=JcEGVUZ4J8DOhBoTNRQ@mail.gmail.com>
+Subject: Re: [PATCH] Fix crash during register_notify after service_changed_event
 From: Arman Uguray <armansito@chromium.org>
-To: Jakub Pawlowski <jpawlowski@google.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Jaganath,
 
-> On Sat, Mar 21, 2015 at 3:15 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> This patch replaces scan type with defined constants, and creates
-> new method that might be used to get currently avaliable scan type.
+> On Sun, Mar 22, 2015 at 10:08 PM, Jaganath Kanakkassery <jaganath.k@samsung.com> wrote:
+> During service changed event the characteristics of the modified
+> services will be destroyed and corresponding notify clients also
+> will be freed. But those notify clients are not removed from
+> all_notify_clients queue of btd_client which causes the below
+> crash
+>
+> 0  queue_remove (queue=0x1, data=0xb8e97a68) at src/shared/queue.c:292
+>         entry = <value optimized out>
+>         prev = <value optimized out>
+> 1  0xb6f84c34 in register_notify (data=0xb8e9a900, user_data=0xb8e97a68)
+>     at src/gatt-client.c:1833
+> No locals.
+> 2  register_notify (data=0xb8e9a900, user_data=0xb8e97a68)
+>     at src/gatt-client.c:1807
+>         notify_client = 0xb8e9a900
+>         client = 0xb8e97a68
+>         op = 0xb8e91f30
+> 3  0xb6f9a41a in queue_foreach (queue=0xb8e97a98,
+>     function=0xb6f84bd9 <register_notify>, user_data=0xb8e97a68)
+>     at src/shared/queue.c:251
+>         next = <value optimized out>
+>         entry = 0xb8e9baf0
+> 4  0xb6f89b62 in gatt_client_ready_cb (success=<value optimized out>,
+>     att_ecode=<value optimized out>, user_data=0xb8e97770) at src/device.c:5173
+> No locals.
+> 5  gatt_client_ready_cb (success=<value optimized out>,
+>     att_ecode=<value optimized out>, user_data=0xb8e97770) at src/device.c:5132
+>         device = 0xb8e97770
+> 6  0xb6f9e232 in notify_client_ready (client=0xb8e90710,
+> ---Type <return> to continue, or q <return> to quit---
+>     success=<value optimized out>, att_ecode=<value optimized out>)
+>     at src/shared/gatt-client.c:1019
+> No locals.
+> 7  0xb6f9cb6a in complete_notify_request (data=<value optimized out>)
+>     at src/shared/gatt-client.c:1405
+>         notify_data = <value optimized out>
+> 8  0xb6f9e168 in enable_ccc_callback (opcode=<value optimized out>,
+>     pdu=<value optimized out>, length=<value optimized out>,
+>     user_data=0xb8e911a8) at src/shared/gatt-client.c:1488
+>         notify_data = 0xb8e911a8
+>         att_ecode = <value optimized out>
+>         __PRETTY_FUNCTION__ = "enable_ccc_callback"
+> 9  0xb6f9c6d8 in handle_rsp (io=<value optimized out>, user_data=0xb8e9a330)
+>     at src/shared/att.c:640
+>         rsp_opcode = 19 '\023'
+>         rsp_pdu = <value optimized out>
+>         rsp_pdu_len = <value optimized out>
+>         op = 0xb8e8ece8
+>         req_opcode = <value optimized out>
+>
+> This patch removes the notify clients (which will be freed) from
+> all_notify_clients as well
+
+Your patch looks good to me. I also tested it and everything seems to
+work fine, although if you can also add a test case to unit/test-gatt
+for this particular crash it would be great.
+
 > ---
->  src/adapter.c | 29 +++++++++++++++++++++--------
->  1 file changed, 21 insertions(+), 8 deletions(-)
+>  src/gatt-client.c |   12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 >
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 6eeb2f9..99f9786 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -88,6 +88,10 @@
->  #define TEMP_DEV_TIMEOUT (3 * 60)
->  #define BONDING_TIMEOUT (2 * 60)
->
-> +#define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
-> +#define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
-> +#define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
-
-SCAN_TYPE_DUAL isn't being used anywhere in this patch, is it needed
-here? Maybe only include this in the patch that actually uses it?
-
-> +
->  static DBusConnection *dbus_conn = NULL;
->
->  static bool kernel_conn_control = false;
-> @@ -1185,7 +1189,7 @@ static gboolean passive_scanning_timeout(gpointer user_data)
->
->         adapter->passive_scan_timeout = 0;
->
-> -       cp.type = (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
-> +       cp.type = SCAN_TYPE_LE;
->
->         mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
->                                 adapter->dev_id, sizeof(cp), &cp,
-> @@ -1327,6 +1331,21 @@ static void cancel_passive_scanning(struct btd_adapter *adapter)
->         }
+> diff --git a/src/gatt-client.c b/src/gatt-client.c
+> index 863492a..2e26ed7 100644
+> --- a/src/gatt-client.c
+> +++ b/src/gatt-client.c
+> @@ -1370,6 +1370,16 @@ static struct characteristic *characteristic_create(
+>         return chrc;
 >  }
 >
-> +static uint8_t get_current_type(struct btd_adapter *adapter)
+> +static void remove_client(void *data)
 > +{
-> +       uint8_t type;
+> +       struct notify_client *ntfy_client = data;
+> +       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
 > +
-> +       if (adapter->current_settings & MGMT_SETTING_BREDR)
-> +               type = SCAN_TYPE_BREDR;
-> +       else
-> +               type = 0;
-
-I'd just initialize type = 0 and then bitwise or SCAN_TYPE_BREDR if
-the BREDR setting is set, which I think makes for more readable code.
-
+> +       queue_remove(client->all_notify_clients, ntfy_client);
 > +
-> +       if (adapter->current_settings & MGMT_SETTING_LE)
-> +               type |= SCAN_TYPE_LE;
-> +
-> +       return type;
+> +       notify_client_unref(ntfy_client);
 > +}
 > +
->  static void trigger_start_discovery(struct btd_adapter *adapter, guint delay);
+>  static void unregister_characteristic(void *data)
+>  {
+>         struct characteristic *chrc = data;
+> @@ -1383,7 +1393,7 @@ static void unregister_characteristic(void *data)
+>         if (chrc->write_id)
+>                 bt_gatt_client_cancel(gatt, chrc->write_id);
 >
->  static void start_discovery_complete(uint8_t status, uint16_t length,
-> @@ -1372,13 +1391,7 @@ static gboolean start_discovery_timeout(gpointer user_data)
+> -       queue_remove_all(chrc->notify_clients, NULL, NULL, notify_client_unref);
+> +       queue_remove_all(chrc->notify_clients, NULL, NULL, remove_client);
+>         queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
 >
->         adapter->discovery_idle_timeout = 0;
->
-> -       if (adapter->current_settings & MGMT_SETTING_BREDR)
-> -               new_type = (1 << BDADDR_BREDR);
-> -       else
-> -               new_type = 0;
-> -
-> -       if (adapter->current_settings & MGMT_SETTING_LE)
-> -               new_type |= (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
-> +       new_type = get_current_type(adapter);
->
->         if (adapter->discovery_enable == 0x01) {
->                 /*
+>         g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
 > --
-> 2.2.0.rc0.207.ga3a616c
+> 1.7.9.5
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
