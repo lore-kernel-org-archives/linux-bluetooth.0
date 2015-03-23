@@ -1,20 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BAY176-W41ED82C7CFED32B2A1FB0CD30D0@phx.gbl>
-From: Ssagarr Patil <hugarsagar@outlook.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Bluez5 Device interface
-Date: Mon, 23 Mar 2015 21:27:34 +0530
-Content-Type: text/plain; charset=US-ASCII
-MIME-Version: 1.0
+From: Michael Janssen <jamuraa@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [BlueZ v4 07/15] build: add advertising-api.txt to docs distributed
+Date: Mon, 23 Mar 2015 08:10:59 -0700
+Message-Id: <1427123467-13445-8-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1427123467-13445-1-git-send-email-jamuraa@chromium.org>
+References: <1427123467-13445-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Add doc/advertising-api.txt to the docs.
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I am working on 3.14 kernel and using bluez5, My device supports ble devices, I havent found how can I write a C application which will pair devices and transfer data.
+diff --git a/Makefile.am b/Makefile.am
+index 1ddf3f2..db2978e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -250,7 +250,7 @@ EXTRA_DIST += doc/mgmt-api.txt \
+ EXTRA_DIST += doc/alert-api.txt \
+ 		doc/proximity-api.txt doc/heartrate-api.txt \
+ 		doc/thermometer-api.txt doc/cyclingspeed-api.txt \
+-		doc/gatt-api.txt
++		doc/gatt-api.txt doc/advertising-api.txt
+ 
+ EXTRA_DIST += doc/obex-api.txt doc/obex-agent-api.txt
+ 
+-- 
+2.2.0.rc0.207.ga3a616c
 
-Can any one please point me in right direction.
-
-Regards,
-Sagar
- 		 	   		  
