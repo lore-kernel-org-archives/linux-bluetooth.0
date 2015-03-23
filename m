@@ -2,44 +2,35 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v3 2/7] Bluetooth: Introduce HCI_ADVERTISING_INSTANCE setting and add AD flags
-Date: Mon, 23 Mar 2015 15:57:10 -0700
-Message-Id: <1427151435-24958-3-git-send-email-armansito@chromium.org>
-In-Reply-To: <1427151435-24958-1-git-send-email-armansito@chromium.org>
-References: <1427151435-24958-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH v3 0/7] Introduce APIs to set advertising data
+Date: Mon, 23 Mar 2015 15:57:08 -0700
+Message-Id: <1427151435-24958-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces the HCI_ADVERTISING_INSTANCE setting, which is set
-when an at least one advertising instance has been added using the
-"Add Advertising" mgmt command. This patch also adds a macro definition
-for the EIR_APPEARANCE field type.
+*v3: - Addressed Marcel's comments on v2.
 
-Signed-off-by: Arman Uguray <armansito@chromium.org>
----
- include/net/bluetooth/hci.h | 2 ++
- 1 file changed, 2 insertions(+)
+*v2: - Addressed Marcel's comments on v1.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 06e7eee..3acecf3 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -227,6 +227,7 @@ enum {
- 	HCI_LE_ENABLED,
- 	HCI_ADVERTISING,
- 	HCI_ADVERTISING_CONNECTABLE,
-+	HCI_ADVERTISING_INSTANCE,
- 	HCI_CONNECTABLE,
- 	HCI_DISCOVERABLE,
- 	HCI_LIMITED_DISCOVERABLE,
-@@ -465,6 +466,7 @@ enum {
- #define EIR_SSP_HASH_C		0x0E /* Simple Pairing Hash C */
- #define EIR_SSP_RAND_R		0x0F /* Simple Pairing Randomizer R */
- #define EIR_DEVICE_ID		0x10 /* device ID */
-+#define EIR_APPEARANCE		0x19 /* Device appearance */
- #define EIR_LE_BDADDR		0x1B /* LE Bluetooth device address */
- #define EIR_LE_ROLE		0x1C /* LE role */
- #define EIR_LE_SC_CONFIRM	0x22 /* LE SC Confirmation Value */
+*v1: - Addressed Marcel's comments.
+     - Included support for setting scan response data and timeouts.
+
+Arman Uguray (7):
+  Bluetooth: Add definitions for Add/Remove Advertising API
+  Bluetooth: Introduce HCI_ADVERTISING_INSTANCE setting and add AD flags
+  Bluetooth: Add data structure for advertising instance
+  Bluetooth: Implement the Add Advertising command
+  Bluetooth: Implement the Remove Advertising command
+  Bluetooth: Add support for instance scan response
+  Bluetooth: Add support for adv instance timeout
+
+ include/net/bluetooth/hci.h      |   2 +
+ include/net/bluetooth/hci_core.h |  18 ++
+ include/net/bluetooth/mgmt.h     |  34 +++
+ net/bluetooth/hci_core.c         |   1 +
+ net/bluetooth/mgmt.c             | 493 +++++++++++++++++++++++++++++++++++++--
+ 5 files changed, 534 insertions(+), 14 deletions(-)
+
 -- 
 2.2.0.rc0.207.ga3a616c
 
