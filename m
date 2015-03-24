@@ -1,53 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <BAY176-W322C4D8EC226A93AC4A2E8D30A0@phx.gbl>
+References: <BAY176-W41ED82C7CFED32B2A1FB0CD30D0@phx.gbl>
+	<CABBYNZL01nxa2rsGUXZPtbL6Y0QmF7ri=DiV77JxfoJiS0MzBA@mail.gmail.com>
+	<BAY176-W322C4D8EC226A93AC4A2E8D30A0@phx.gbl>
+Date: Tue, 24 Mar 2015 14:04:04 +0200
+Message-ID: <CABBYNZ+EXPGMqf+TFHLg6cKGbgizH=jNgoC0O2k0OikqqUX0LA@mail.gmail.com>
+Subject: Re: Bluez5 Device interface
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] gdbus: Make GDBusClient work without ObjectManager
-Date: Tue, 24 Mar 2015 14:10:31 +0200
-Message-Id: <1427199032-23492-1-git-send-email-luiz.dentz@gmail.com>
+To: Ssagarr Patil <hugarsagar@outlook.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Sagar,
 
-This makes GDBusClient work normally without ObjectManager.
----
- gdbus/client.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+On Tue, Mar 24, 2015 at 1:55 PM, Ssagarr Patil <hugarsagar@outlook.com> wrote:
+> Hi Luiz,
+>
+>>
+>> On Mon, Mar 23, 2015 at 5:57 PM, Ssagarr Patil <hugarsagar@outlook.com> wrote:
+>>> Hi,
+>>>
+>>> I am working on 3.14 kernel and using bluez5, My device supports ble devices, I havent found how can I write a C application which will pair devices and transfer data.
+>>>
+>>> Can any one please point me in right direction.
+>>
+>> Have you looked at bluetoothctl? It is written in C, the source code
+>> is under client/:
+>>
+>> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/client
+>>
+> Thanks for the pointers, that really helped.
+>
+> Just another quick thing, I dont have BT_RFCOMM_TTY support are there any other alternatives for it ?
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index fe0c0db..48711ae 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -1111,7 +1111,8 @@ static void get_managed_objects(GDBusClient *client)
- 	if (!client->connected)
- 		return;
- 
--	if (!client->proxy_added && !client->proxy_removed) {
-+	if ((!client->proxy_added && !client->proxy_removed) ||
-+							!client->root_path) {
- 		refresh_properties(client);
- 		return;
- 	}
-@@ -1212,7 +1213,7 @@ GDBusClient *g_dbus_client_new_full(DBusConnection *connection,
- 	GDBusClient *client;
- 	unsigned int i;
- 
--	if (!connection || !service || !root_path)
-+	if (!connection || !service)
- 		return NULL;
- 
- 	client = g_try_new0(GDBusClient, 1);
-@@ -1238,6 +1239,10 @@ GDBusClient *g_dbus_client_new_full(DBusConnection *connection,
- 						service_connect,
- 						service_disconnect,
- 						client, NULL);
-+
-+	if (!root_path)
-+		return g_dbus_client_ref(client);
-+
- 	client->added_watch = g_dbus_add_signal_watch(connection, service,
- 						client->root_path,
- 						DBUS_INTERFACE_OBJECT_MANAGER,
+We normally don't recommend using TTY, instead use socket API directly
+or even better use org.bluez.Profile API:
+
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/profile-api.txt
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
