@@ -1,196 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZJC1u3buiOPTxcfiBuS0t+6FvZ6dF+rHO0eegnm+YAe4Q@mail.gmail.com>
-References: <1427139103-26441-1-git-send-email-jpawlowski@google.com>
-	<1427139103-26441-4-git-send-email-jpawlowski@google.com>
-	<CAHrH25Qo_yNOXa-MSMUGtBkK1J=gBBNMMkvep-H-Uhhr2chOgw@mail.gmail.com>
-	<CAD0=r8wYKCbkh0Ve1XK1iMK3eaB-ZLTF=w+e3mdYsfyD6X_U7Q@mail.gmail.com>
-	<CABBYNZJC1u3buiOPTxcfiBuS0t+6FvZ6dF+rHO0eegnm+YAe4Q@mail.gmail.com>
-Date: Tue, 24 Mar 2015 12:53:47 -0700
-Message-ID: <CAD0=r8x6yvEFMEXRfa+u9R2FeJrhMuod=jmKAQ6+qyiennGKPg@mail.gmail.com>
-Subject: Re: [PATCH v2 4/8] core: adapter: Add parameter parsing to SetDiscoveryFilter
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Arman Uguray <armansito@chromium.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH 4/4] tools/btmgmt: Add "--uuid" option to add-adv
+Date: Tue, 24 Mar 2015 11:35:11 -0700
+Message-Id: <1427222111-15481-4-git-send-email-armansito@chromium.org>
+In-Reply-To: <1427222111-15481-1-git-send-email-armansito@chromium.org>
+References: <1427222111-15481-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 24, 2015 at 2:16 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Jakub,
->
-> On Tue, Mar 24, 2015 at 10:01 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->> On Mon, Mar 23, 2015 at 5:22 PM, Arman Uguray <armansito@chromium.org> wrote:
->>> Hi Jakub,
->>>
->>>> On Mon, Mar 23, 2015 at 12:31 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->>>> This patch adds parameter parsing, and basic internal logic checks to
->>>> SetDiscoveryFilter method.
->>>> ---
->>>>  src/adapter.c | 172 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>  1 file changed, 172 insertions(+)
->>>>
->>>> diff --git a/src/adapter.c b/src/adapter.c
->>>> index 7c51399..f57b58c 100644
->>>> --- a/src/adapter.c
->>>> +++ b/src/adapter.c
->>>> @@ -92,6 +92,8 @@
->>>>  #define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
->>>>  #define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
->>>>
->>>> +#define        DISTNACE_VAL_INVALID    0x7FFF
->>>
->>> s/DISTNACE/DISTANCE/
->> fixed
->>>
->>> Also, where does the 0x7FFF come from? Why not just 0xFFFF?
->>>> +
->>>>  static DBusConnection *dbus_conn = NULL;
->>>>
->>>>  static bool kernel_conn_control = false;
->>>> @@ -145,6 +147,13 @@ struct conn_param {
->>>>         uint16_t timeout;
->>>>  };
->>>>
->>>> +struct discovery_filter {
->>>> +       uint8_t type;
->>>> +       uint16_t pathloss;
->>>> +       int16_t rssi;
->>>> +       GSList *uuids;
->>>> +};
->>>> +
->>>>  struct watch_client {
->>>>         struct btd_adapter *adapter;
->>>>         char *owner;
->>>> @@ -1760,9 +1769,172 @@ static DBusMessage *start_discovery(DBusConnection *conn,
->>>>         return dbus_message_new_method_return(msg);
->>>>  }
->>>>
->>>> +static bool parse_discovery_filter_entry(char *key, DBusMessageIter *value,
->>>> +                                     GSList **uuids, int16_t *rssi,
->>>> +                                     uint16_t *pathloss, uint8_t *transport)
->>>> +{
->>>> +       uint8_t type;
->>>> +
->>>> +       if (strcmp("UUIDs", key) == 0) {
->>>
->>> Use "if (!strcmp("UUIDs"..." instead of "== 0".
->>>
->> fixed
->>>> +               DBusMessageIter arriter;
->>>> +
->>>> +               if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_ARRAY)
->>>> +                       return false;
->>>
->>> New line after return.
->>>
->> fixed
->>>> +               dbus_message_iter_recurse(value, &arriter);
->>>> +               while ((type = dbus_message_iter_get_arg_type(&arriter)) !=
->>>> +                                                       DBUS_TYPE_INVALID) {
->>>> +                       char *uuid_str;
->>>> +                       char *result_uuid;
->>>> +                       uuid_t uuid_tmp;
->>>
->>> I'd use bt_uuid_t here instead of uuid_t, since the latter is defined
->>> for sdp specific usage. Though I'd check with the others here still.
->> still discussing
->>>
->>>> +
->>>> +                       if (dbus_message_iter_get_arg_type(&arriter) !=
->>>> +                                                       DBUS_TYPE_STRING)
->>>> +                               return false;
->>>> +
->>>> +                       dbus_message_iter_get_basic(&arriter, &uuid_str);
->>>> +                       if (bt_string2uuid(&uuid_tmp, uuid_str) < 0)
->>>> +                               return false;
->>>> +
->>>> +                       result_uuid = bt_uuid2string(&uuid_tmp);
->>>> +
->>>> +                       *uuids = g_slist_prepend(*uuids, result_uuid);
->>>> +
->>>> +               dbus_message_iter_next(&arriter);
->>>
->>> Indentation looks off here. You should probably run checkpatch on
->>> these for general formatting.
->> fixed
->>>
->>>> +               }
->>>> +       } else if (strcmp("RSSI", key) == 0) {
->>>> +               if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_INT16)
->>>> +                       return false;
->>>
->>> It makes code more readable if you add a new line after returns within a block.
->>>
->> fixed
->>>> +               dbus_message_iter_get_basic(value, rssi);
->>>> +               if (*rssi > 0 || *rssi < -127)
->>>
->>> Why are positive RSSI values not allowed? doc/adapter.txt doesn't
->>> provide the unit of measurement for RSSI but I assume it's dBm, which
->>> can be positive, no? Eitherway, add a comment here explaining these
->>> checks.
->>>
->> I checked that in spec, added proper comment
->>>> +                       return false;
->>>> +       } else if (strcmp("Pathloss", key) == 0) {
->>>> +               if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT16)
->>>> +                       return false;
->>>> +               dbus_message_iter_get_basic(value, pathloss);
->>>> +               if (*pathloss > 127)
->>>
->>> Add a comment here explaining why this is. Also it probably makes
->>> sense to define a macro constant for 127.
->> actually after looking at spec, max pathloss might be 137, RSSI =
->> -127, TX_POWER=10
->>>
->>>> +                       return false;
->>>> +       } else if (strcmp("Transport", key) == 0) {
->>>> +               char *transport_str;
->>>> +
->>>> +               if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_STRING)
->>>> +                       return false;
->>>> +               dbus_message_iter_get_basic(value, &transport_str);
->>>> +
->>>> +               if (strcmp(transport_str, "bredr") == 0)
->>>> +                       *transport = SCAN_TYPE_BREDR;
->>>> +               else if (strcmp(transport_str, "le") == 0)
->>>> +                       *transport = SCAN_TYPE_LE;
->>>> +               else if (strcmp(transport_str, "auto") == 0)
->>>> +                       *transport = SCAN_TYPE_DUAL;
->>>> +               else
->>>> +                       return false;
->>>> +       } else {
->>>> +               DBG("Unknown key parameter: %s!\n", key);
->>>> +               return false;
->>>> +       }
->>>> +
->>>> +       return true;
->
-> You could perhaps split these into e.g. parse_pathloss, parse_transport, etc.
->
-Done. Looks better, thanks!
->>>> +}
->>>> +
->>>> +/* This method is responsible for parsing parameters to SetDiscoveryFilter. If
->>>> + * filter in msg was empty, sets *filter to NULL. If whole parsing was
->>>> + * successful, sets *filter to proper value.
->>>> + * Returns false on any error, and true on success.
->>>> + */
->>>> +static bool parse_discovery_filter_dict(struct discovery_filter **filter,
->>>> +                                       DBusMessage *msg)
->
-> Why don't you return the struct discovery_filter * instead of bool?
+This patch adds the --uuid (-u) option to the add-adv command. This
+allows callers to specify individual 128-bit or 16-bit UUIDs to be
+included in the "Complete List of Service CLass UUIDs" field of
+advertising data.
+---
+ tools/btmgmt.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 68 insertions(+), 5 deletions(-)
 
-Returned value means that parsing was successful/unsuccessful.
-When it was successfull, the filter parameter will be either NULL
-(filter was cleared), or point to the filter.
-I think it's according to convention (returning status). How would you
-like that modified?
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 06f32f3..a769fc3 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -3693,6 +3693,7 @@ static void add_adv_usage(void)
+ 
+ static struct option add_adv_options[] = {
+ 	{ "help",	0, 0, 'h' },
++	{ "uuid",	1, 0, 'u' },
+ 	{ "adv-data",	1, 0, 'd' },
+ 	{ "scan-rsp",	1, 0, 's' },
+ 	{ "timeout",	1, 0, 't' },
+@@ -3739,6 +3740,8 @@ static bool parse_bytes(char *optarg, uint8_t **bytes, size_t *len)
+ 	return true;
+ }
+ 
++#define MAX_AD_UUID_BYTES 32
++
+ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
+ 							int argc, char **argv)
+ {
+@@ -3747,19 +3750,70 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
+ 	uint8_t *adv_data = NULL, *scan_rsp = NULL;
+ 	size_t adv_len = 0, scan_rsp_len = 0;
+ 	size_t cp_len;
++	uint8_t uuids[MAX_AD_UUID_BYTES];
++	size_t uuid_bytes = 0;
++	uint8_t uuid_type = 0;
+ 	uint16_t timeout = 0;
+ 	uint8_t instance;
++	uuid_t uuid;
+ 	bool success = false;
+ 	bool quit = true;
+ 
+-	while ((opt = getopt_long(argc, argv, "+d:s:t:h",
++	while ((opt = getopt_long(argc, argv, "+u:d:s:t:h",
+ 						add_adv_options, NULL)) != -1) {
+ 		switch (opt) {
++		case 'u':
++			if (bt_string2uuid(&uuid, optarg) < 0) {
++				print("Invalid UUID: %s", optarg);
++				goto done;
++			}
++
++			if (uuid_type && uuid_type != uuid.type) {
++				print("UUID types must be consistent");
++				goto done;
++			}
++
++			if (uuid.type == SDP_UUID16) {
++				if (uuid_bytes + 2 >= MAX_AD_UUID_BYTES) {
++					print("Too many UUIDs");
++					goto done;
++				}
++
++				put_le16(uuid.value.uuid16, uuids + uuid_bytes);
++				uuid_bytes += 2;
++			} else if (uuid.type == SDP_UUID128) {
++				if (uuid_bytes + 16 >= MAX_AD_UUID_BYTES) {
++					print("Too many UUIDs");
++					goto done;
++				}
++
++				bswap_128(uuid.value.uuid128.data,
++							uuids + uuid_bytes);
++				uuid_bytes += 16;
++			} else {
++				printf("Unsupported UUID type");
++				goto done;
++			}
++
++			if (!uuid_type)
++				uuid_type = uuid.type;
++
++			break;
+ 		case 'd':
++			if (adv_len) {
++				print("Only one adv-data option allowed");
++				goto done;
++			}
++
+ 			if (!parse_bytes(optarg, &adv_data, &adv_len))
+ 				goto done;
+ 			break;
+ 		case 's':
++			if (scan_rsp_len) {
++				print("Only one scan-rsp option allowed");
++				goto done;
++			}
++
+ 			if (!parse_bytes(optarg, &scan_rsp, &scan_rsp_len))
+ 				goto done;
+ 			break;
+@@ -3783,23 +3837,32 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
+ 		goto done;
+ 	}
+ 
++	if (uuid_bytes)
++		uuid_bytes += 2;
++
+ 	instance = strtol(argv[0], NULL, 0);
+ 
+ 	if (index == MGMT_INDEX_NONE)
+ 		index = 0;
+ 
+-	cp_len = sizeof(*cp) + (adv_len + scan_rsp_len) * sizeof(uint8_t);
++	cp_len = sizeof(*cp) + uuid_bytes + adv_len + scan_rsp_len;
+ 	cp = malloc0(cp_len);
+ 	if (!cp)
+ 		goto done;
+ 
+ 	cp->instance = instance;
+ 	put_le16(timeout, &cp->timeout);
+-	cp->adv_data_len = adv_len;
++	cp->adv_data_len = adv_len + uuid_bytes;
+ 	cp->scan_rsp_len = scan_rsp_len;
+ 
+-	memcpy(cp->data, adv_data, adv_len * sizeof(uint8_t));
+-	memcpy(cp->data + adv_len, scan_rsp, scan_rsp_len * sizeof(uint8_t));
++	if (uuid_bytes) {
++		cp->data[0] = uuid_bytes - 1;
++		cp->data[1] = uuid_type == SDP_UUID16 ? 0x03 : 0x07;
++		memcpy(cp->data + 2, uuids, uuid_bytes - 2);
++	}
++
++	memcpy(cp->data + uuid_bytes, adv_data, adv_len);
++	memcpy(cp->data + uuid_bytes + adv_len, scan_rsp, scan_rsp_len);
+ 
+ 	if (!mgmt_send(mgmt, MGMT_OP_ADD_ADVERTISING, index, cp_len, cp,
+ 						add_adv_rsp, NULL, NULL)) {
+-- 
+2.2.0.rc0.207.ga3a616c
 
->
->
-> --
-> Luiz Augusto von Dentz
