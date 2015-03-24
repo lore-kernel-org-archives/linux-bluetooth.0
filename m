@@ -2,115 +2,240 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v3 7/8] core: adapter: filter discovery results when filered discovery is used
-Date: Tue, 24 Mar 2015 00:57:19 -0700
-Message-Id: <1427183840-8089-7-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v3 5/8] core: adapter: set the filter for each discovery client
+Date: Tue, 24 Mar 2015 00:57:17 -0700
+Message-Id: <1427183840-8089-5-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1427183840-8089-1-git-send-email-jpawlowski@google.com>
 References: <1427183840-8089-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds filtering to device found event, and enforces lack
-of RSSI delta for filtered scan.
+This patch adds logic for setting, updating and deleting discovery
+filter for each client.
 
-When filtering, we compare against each client filter. That
-additionally removes some of reports.
+Note that the filter is not used yet, making use from filter will
+be added in following patches.
 ---
- src/adapter.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 72 insertions(+), 1 deletion(-)
+ src/adapter.c | 120 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 113 insertions(+), 7 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 8b98c41..f96d05a 100644
+index 47333b8..cd53c46 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -5249,6 +5249,67 @@ static void adapter_msd_notify(struct btd_adapter *adapter,
- 	}
+@@ -159,6 +159,7 @@ struct watch_client {
+ 	struct btd_adapter *adapter;
+ 	char *owner;
+ 	guint watch;
++	struct discovery_filter *discovery_filter;
+ };
+ 
+ struct service_auth {
+@@ -208,6 +209,9 @@ struct btd_adapter {
+ 	uint8_t discovery_enable;	/* discovery enabled/disabled */
+ 	bool discovery_suspended;	/* discovery has been suspended */
+ 	GSList *discovery_list;		/* list of discovery clients */
++	GSList *set_filter_list;	/* list of clients that specified
++					 * filter, but don't scan yet
++					 */
+ 	GSList *discovery_found;	/* list of found devices */
+ 	guint discovery_idle_timeout;	/* timeout between discovery runs */
+ 	guint passive_scan_timeout;	/* timeout between passive scans */
+@@ -1356,6 +1360,15 @@ static uint8_t get_current_type(struct btd_adapter *adapter)
+ 	return type;
  }
  
-+static gint g_strcmp(gconstpointer a, gconstpointer b)
++static void free_discovery_filter(struct discovery_filter *discovery_filter)
 +{
-+	return strcmp(a, b);
-+}
-+
-+static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
-+								int8_t rssi)
-+{
-+	GSList *l, *m;
-+	bool got_match = false;
-+
-+	for (l = discovery_filter; l != NULL && got_match != true;
-+							l = g_slist_next(l)) {
-+		struct watch_client *client = l->data;
-+		struct discovery_filter *item = client->discovery_filter;
-+
-+		/* if one of currently running scans is regular scan, then
-+		 * return all devices as matches
-+		 */
-+		if (item == NULL) {
-+			got_match = true;
-+			continue;
-+		}
-+
-+		/* if someone started discovery with empty uuids, he wants all
-+		 * devices in given proximity.
-+		 */
-+		if (item->uuids == NULL)
-+			got_match = true;
-+		else
-+			for (m = item->uuids; m != NULL && got_match != true;
-+							   m = g_slist_next(m))
-+				/* m->data contains string representation of
-+				 * uuid.
-+				 */
-+				if (g_slist_find_custom(eir_data->services,
-+							m->data,
-+							g_strcmp) != NULL)
-+					got_match = true;
-+
-+		if (got_match) {
-+			/* we have service match, check proximity */
-+			if (item->rssi != DISTANCE_VAL_INVALID &&
-+			    item->rssi > rssi)
-+				got_match = false;
-+			if (item->pathloss != DISTANCE_VAL_INVALID &&
-+			   (eir_data->tx_power == 127 ||
-+			   eir_data->tx_power - rssi > item->pathloss))
-+				got_match = false;
-+
-+			if (got_match)
-+				return true;
-+		}
-+	}
-+
-+	if (!got_match)
-+		return false;
-+
-+	return true;
-+}
-+
- static void update_found_devices(struct btd_adapter *adapter,
- 					const bdaddr_t *bdaddr,
- 					uint8_t bdaddr_type, int8_t rssi,
-@@ -5315,8 +5376,18 @@ static void update_found_devices(struct btd_adapter *adapter,
- 		return;
- 	}
- 
-+	if (adapter->filtered_discovery &&
-+	    !is_filter_match(adapter->discovery_list, &eir_data, rssi)) {
-+		eir_data_free(&eir_data);
++	if (!discovery_filter)
 +		return;
++
++	g_slist_free_full(discovery_filter->uuids, g_free);
++	g_free(discovery_filter);
++}
++
+ static void trigger_start_discovery(struct btd_adapter *adapter, guint delay);
+ 
+ static void start_discovery_complete(uint8_t status, uint16_t length,
+@@ -1655,9 +1668,17 @@ static void discovery_destroy(void *user_data)
+ 
+ 	DBG("owner %s", client->owner);
+ 
++	adapter->set_filter_list = g_slist_remove(adapter->set_filter_list,
++								client);
++
+ 	adapter->discovery_list = g_slist_remove(adapter->discovery_list,
+ 								client);
+ 
++	if (!client->discovery_filter) {
++		free_discovery_filter(client->discovery_filter);
++		client->discovery_filter = NULL;
 +	}
 +
- 	device_set_legacy(dev, legacy);
--	device_set_rssi(dev, rssi);
-+
-+	if (adapter->filtered_discovery)
-+		device_set_rssi_with_delta(dev, rssi, 0);
-+	else
-+		device_set_rssi(dev, rssi);
+ 	g_free(client->owner);
+ 	g_free(client);
  
- 	if (eir_data.appearance != 0)
- 		device_set_appearance(dev, eir_data.appearance);
+@@ -1694,6 +1715,9 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
+ 
+ 	DBG("owner %s", client->owner);
+ 
++	adapter->set_filter_list = g_slist_remove(adapter->set_filter_list,
++								client);
++
+ 	adapter->discovery_list = g_slist_remove(adapter->discovery_list,
+ 								client);
+ 
+@@ -1727,36 +1751,74 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
+ 				stop_discovery_complete, adapter, NULL);
+ }
+ 
++/* returns true if client was already discovering, false otherwise. *client
++ * will point to discovering client, or client that have pre-set his filter.
++ */
++static bool get_discovery_client(struct btd_adapter *adapter,
++				 const char *owner,
++				 struct watch_client **client)
++{
++	GSList *list = g_slist_find_custom(adapter->discovery_list, owner,
++				   compare_sender);
++	if (list) {
++		*client = list->data;
++		return true;
++	}
++
++	list = g_slist_find_custom(adapter->set_filter_list, owner,
++				   compare_sender);
++	if (list) {
++		*client = list->data;
++		return false;
++	}
++
++	*client = NULL;
++	return false;
++}
++
+ static DBusMessage *start_discovery(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+ 	struct btd_adapter *adapter = user_data;
+ 	const char *sender = dbus_message_get_sender(msg);
+ 	struct watch_client *client;
+-	GSList *list;
++	bool is_discovering;
+ 
+ 	DBG("sender %s", sender);
+ 
+ 	if (!(adapter->current_settings & MGMT_SETTING_POWERED))
+ 		return btd_error_not_ready(msg);
+ 
++	is_discovering = get_discovery_client(adapter, sender, &client);
++
+ 	/*
+ 	 * Every client can only start one discovery, if the client
+ 	 * already started a discovery then return an error.
+ 	 */
+-	list = g_slist_find_custom(adapter->discovery_list, sender,
+-						compare_sender);
+-	if (list)
++	if (is_discovering)
+ 		return btd_error_busy(msg);
+ 
++	/*
++	 * If there was pre-set filter, just reconnect it to discovery_list,
++	 * and trigger scan.
++	 */
++	if (client) {
++		adapter->set_filter_list = g_slist_remove(
++					     adapter->set_filter_list, client);
++		adapter->discovery_list = g_slist_prepend(
++					     adapter->discovery_list, client);
++		trigger_start_discovery(adapter, 0);
++		return dbus_message_new_method_return(msg);
++	}
++
+ 	client = g_new0(struct watch_client, 1);
+ 
+ 	client->adapter = adapter;
+ 	client->owner = g_strdup(sender);
++	client->discovery_filter = NULL;
+ 	client->watch = g_dbus_add_disconnect_watch(dbus_conn, sender,
+ 						discovery_disconnect, client,
+ 						discovery_destroy);
+-
+ 	adapter->discovery_list = g_slist_prepend(adapter->discovery_list,
+ 								client);
+ 
+@@ -1928,9 +1990,10 @@ static DBusMessage *set_discovery_filter(DBusConnection *conn,
+ 					 DBusMessage *msg, void *user_data)
+ {
+ 	struct btd_adapter *adapter = user_data;
++	struct watch_client *client;
+ 	struct discovery_filter *discovery_filter;
+-
+ 	const char *sender = dbus_message_get_sender(msg);
++	bool is_discovering;
+ 
+ 	DBG("sender %s", sender);
+ 
+@@ -1941,7 +2004,38 @@ static DBusMessage *set_discovery_filter(DBusConnection *conn,
+ 	if (!parse_discovery_filter_dict(&discovery_filter, msg))
+ 		return btd_error_invalid_args(msg);
+ 
+-	return btd_error_failed(msg, "Not implemented yet");
++	is_discovering = get_discovery_client(adapter, sender, &client);
++
++	if (client) {
++		free_discovery_filter(client->discovery_filter);
++		client->discovery_filter = discovery_filter;
++
++		if (discovery_filter || is_discovering)
++			return dbus_message_new_method_return(msg);
++
++		/* Removing pre-set filter */
++		adapter->set_filter_list = g_slist_remove(
++					      adapter->set_filter_list,
++					      client);
++		g_free(client->owner);
++		g_free(client);
++		DBG("successfully cleared pre-set filter");
++	} else if (discovery_filter) {
++		/* Client pre-setting his filter for first time */
++		client = g_new0(struct watch_client, 1);
++		client->adapter = adapter;
++		client->owner = g_strdup(sender);
++		client->discovery_filter = discovery_filter;
++		client->watch = g_dbus_add_disconnect_watch(dbus_conn, sender,
++						discovery_disconnect, client,
++						discovery_destroy);
++		adapter->set_filter_list = g_slist_prepend(
++					     adapter->set_filter_list, client);
++
++		DBG("successfully pre-set filter");
++	}
++
++	return dbus_message_new_method_return(msg);
+ }
+ 
+ static DBusMessage *stop_discovery(DBusConnection *conn,
+@@ -5166,6 +5260,18 @@ static void adapter_stop(struct btd_adapter *adapter)
+ 
+ 	cancel_passive_scanning(adapter);
+ 
++	while (adapter->set_filter_list) {
++		struct watch_client *client;
++
++		client = adapter->set_filter_list->data;
++
++		/* g_dbus_remove_watch will remove the client from the
++		 * adapter's list and free it using the discovery_destroy
++		 * function.
++		 */
++		g_dbus_remove_watch(dbus_conn, client->watch);
++	}
++
+ 	while (adapter->discovery_list) {
+ 		struct watch_client *client;
+ 
 -- 
 2.2.0.rc0.207.ga3a616c
 
