@@ -1,239 +1,283 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] client: Add register-profile command
-Date: Tue, 24 Mar 2015 11:37:51 +0200
-Message-Id: <1427189873-29770-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1427189873-29770-1-git-send-email-luiz.dentz@gmail.com>
-References: <1427189873-29770-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/4] core/gatt: Add implementation of RegisterProfile
+Date: Tue, 24 Mar 2015 11:37:50 +0200
+Message-Id: <1427189873-29770-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support to register-profile command which uses
-GattManager1.RegisterProfile.
+This adds initial implementation of RegisterProfile.
 ---
- client/gatt.c | 104 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- client/gatt.h |   6 ++++
- client/main.c |  29 ++++++++++++++++
- 3 files changed, 139 insertions(+)
+ src/gatt-database.c | 197 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 197 insertions(+)
 
-diff --git a/client/gatt.c b/client/gatt.c
-index 884c4f2..2d35905 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -31,6 +31,7 @@
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index e07c70f..e701439 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -23,6 +23,7 @@
+ 
+ #include <stdint.h>
  #include <stdlib.h>
- #include <stdbool.h>
- #include <sys/uio.h>
-+#include <wordexp.h>
++#include <errno.h>
  
- #include <readline/readline.h>
- #include <readline/history.h>
-@@ -41,6 +42,9 @@
- #include "display.h"
- #include "gatt.h"
+ #include "lib/bluetooth.h"
+ #include "lib/sdp.h"
+@@ -41,6 +42,7 @@
+ #include "device.h"
+ #include "gatt-database.h"
+ #include "dbus-common.h"
++#include "profile.h"
  
-+#define PROFILE_PATH "/org/bluez/profile"
-+#define PROFILE_INTERFACE "org.bluez.GattProfile1"
+ #ifndef ATT_CID
+ #define ATT_CID 4
+@@ -75,6 +77,7 @@ struct btd_gatt_database {
+ 	struct gatt_db_attribute *svc_chngd;
+ 	struct gatt_db_attribute *svc_chngd_ccc;
+ 	struct queue *services;
++	struct queue *profiles;
+ };
+ 
+ struct external_service {
+@@ -91,6 +94,14 @@ struct external_service {
+ 	struct queue *descs;
+ };
+ 
++struct external_profile {
++	struct btd_gatt_database *database;
++	char *owner;
++	char *path;	/* Path to GattProfile1 */
++	unsigned int id;
++	struct queue *profiles; /* btd_profile list */
++};
 +
- /* String display constants */
- #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
- #define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
-@@ -49,6 +53,7 @@
- static GList *services;
- static GList *characteristics;
- static GList *descriptors;
-+static GList *managers;
- 
- static void print_service(GDBusProxy *proxy, const char *description)
- {
-@@ -512,3 +517,102 @@ void gatt_notify_attribute(GDBusProxy *proxy, bool enable)
- 	rl_printf("Unable to notify attribute %s\n",
- 						g_dbus_proxy_get_path(proxy));
+ struct external_chrc {
+ 	struct external_service *service;
+ 	char *path;
+@@ -364,6 +375,35 @@ static void service_free(void *data)
+ 	free(service);
  }
-+
-+static void register_profile_setup(DBusMessageIter *iter, void *user_data)
+ 
++static void profile_remove(void *data)
 +{
-+	wordexp_t *w = user_data;
-+	DBusMessageIter uuids, opt;
-+	const char *path = PROFILE_PATH;
-+	size_t i;
++	struct btd_profile *p = data;
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
++	DBG("Removed \"%s\"", p->name);
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "s", &uuids);
-+	for (i = 0; i < w->we_wordc; i++)
-+		dbus_message_iter_append_basic(&uuids, DBUS_TYPE_STRING,
-+							&w->we_wordv[i]);
-+	dbus_message_iter_close_container(iter, &uuids);
++	adapter_foreach(adapter_remove_profile, p);
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+					DBUS_TYPE_STRING_AS_STRING
-+					DBUS_TYPE_VARIANT_AS_STRING
-+					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-+					&opt);
-+	dbus_message_iter_close_container(iter, &opt);
++	g_free((void *) p->name);
++	g_free((void *) p->remote_uuid);
 +
++	free(p);
 +}
 +
-+static void register_profile_reply(DBusMessage *message, void *user_data)
++static void profile_free(void *data)
 +{
-+	DBusError error;
++	struct external_profile *profile = data;
 +
-+	dbus_error_init(&error);
++	queue_destroy(profile->profiles, profile_remove);
 +
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		rl_printf("Failed to register profile: %s\n", error.name);
-+		dbus_error_free(&error);
-+		return;
++	if (profile->id)
++		g_dbus_remove_watch(btd_get_dbus_connection(), profile->id);
++
++	g_free(profile->owner);
++	g_free(profile->path);
++
++	free(profile);
++}
++
+ static void gatt_database_free(void *data)
+ {
+ 	struct btd_gatt_database *database = data;
+@@ -390,6 +430,7 @@ static void gatt_database_free(void *data)
+ 
+ 	queue_destroy(database->device_states, device_state_free);
+ 	queue_destroy(database->services, service_free);
++	queue_destroy(database->profiles, profile_free);
+ 	queue_destroy(database->ccc_callbacks, ccc_cb_free);
+ 	database->device_states = NULL;
+ 	database->ccc_callbacks = NULL;
+@@ -2133,6 +2174,154 @@ static DBusMessage *manager_unregister_service(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
++static void profile_exited(DBusConnection *conn, void *user_data)
++{
++	struct external_profile *profile = user_data;
++
++	DBG("\"%s\" exited", profile->owner);
++
++	profile->id = 0;
++
++	queue_remove(profile->database->profiles, profile);
++
++	profile_free(profile);
++}
++
++static int profile_add(struct external_profile *profile, const char *uuid)
++{
++	struct btd_profile *p;
++
++	p = new0(struct btd_profile, 1);
++	if (!p)
++		return -ENOMEM;
++
++	/* Assign directly to avoid having extra fields */
++	p->name = (const void *) g_strdup_printf("%s%s/%s", profile->owner,
++							profile->path, uuid);
++	if (!p->name)
++		return -ENOMEM;
++
++	p->remote_uuid = (const void *) g_strdup(uuid);
++	if (!p->remote_uuid)
++		return -ENOMEM;
++
++	p->auto_connect = true;
++
++	queue_push_tail(profile->profiles, p);
++
++	DBG("Added \"%s\"", p->name);
++
++	return 0;
++}
++
++static void add_profile(void *data, void *user_data)
++{
++	struct btd_adapter *adapter = user_data;
++
++	adapter_add_profile(adapter, data);
++}
++
++static int profile_create(DBusConnection *conn,
++				struct btd_gatt_database *database,
++				const char *sender, const char *path,
++				DBusMessageIter *iter)
++{
++	struct external_profile *profile;
++	DBusMessageIter uuids;
++
++	if (!path || !g_str_has_prefix(path, "/"))
++		return -EINVAL;
++
++	profile = new0(struct external_profile, 1);
++	if (!profile)
++		return -ENOMEM;
++
++	profile->owner = g_strdup(sender);
++	if (!profile->owner)
++		goto fail;
++
++	profile->path = g_strdup(path);
++	if (!profile->path)
++		goto fail;
++
++	profile->profiles = queue_new();
++	if (!profile->profiles)
++		goto fail;
++
++	profile->database = database;
++	profile->id = g_dbus_add_disconnect_watch(conn, sender, profile_exited,
++								profile, NULL);
++
++	dbus_message_iter_recurse(iter, &uuids);
++
++	while (dbus_message_iter_get_arg_type(&uuids) == DBUS_TYPE_STRING) {
++		const char *uuid;
++
++		dbus_message_iter_get_basic(&uuids, &uuid);
++
++		if (profile_add(profile, uuid) < 0)
++			goto fail;
++
++		dbus_message_iter_next(&uuids);
 +	}
 +
-+	rl_printf("Profile registered\n");
++	if (queue_isempty(profile->profiles))
++		goto fail;
++
++	queue_foreach(profile->profiles, add_profile, database->adapter);
++	queue_push_tail(database->profiles, profile);
++
++	return 0;
++
++fail:
++	profile_free(profile);
++	return -EINVAL;
 +}
 +
-+void gatt_add_manager(GDBusProxy *proxy)
++static bool match_profile(const void *a, const void *b)
 +{
-+	managers = g_list_append(managers, proxy);
++	const struct external_profile *profile = a;
++	const struct svc_match_data *data = b;
++
++	return g_strcmp0(profile->path, data->path) == 0 &&
++				g_strcmp0(profile->owner, data->sender) == 0;
 +}
 +
-+void gatt_remove_manager(GDBusProxy *proxy)
-+{
-+	managers = g_list_remove(managers, proxy);
-+}
-+
-+static int match_proxy(const void *a, const void *b)
-+{
-+	GDBusProxy *proxy1 = (void *) a;
-+	GDBusProxy *proxy2 = (void *) b;
-+
-+	return strcmp(g_dbus_proxy_get_path(proxy1),
-+						g_dbus_proxy_get_path(proxy2));
-+}
-+
-+static DBusMessage *release_profile(DBusConnection *conn,
++static DBusMessage *manager_register_profile(DBusConnection *conn,
 +					DBusMessage *msg, void *user_data)
 +{
-+	g_dbus_unregister_interface(conn, PROFILE_PATH, PROFILE_INTERFACE);
++	struct btd_gatt_database *database = user_data;
++	const char *sender = dbus_message_get_sender(msg);
++	DBusMessageIter args;
++	const char *path;
++	struct svc_match_data match_data;
++
++	DBG("sender %s", sender);
++
++	if (!dbus_message_iter_init(msg, &args))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&args, &path);
++
++	match_data.path = path;
++	match_data.sender = sender;
++
++	if (queue_find(database->profiles, match_profile, &match_data))
++		return btd_error_already_exists(msg);
++
++	dbus_message_iter_next(&args);
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
++		return btd_error_invalid_args(msg);
++
++	if (profile_create(conn, database, sender, path, &args) < 0)
++		return btd_error_failed(msg, "Failed to register profile");
 +
 +	return dbus_message_new_method_return(msg);
 +}
 +
-+static const GDBusMethodTable methods[] = {
-+	{ GDBUS_METHOD("Release", NULL, NULL, release_profile) },
-+	{ }
-+};
-+
-+void gatt_register_profile(DBusConnection *conn, GDBusProxy *proxy,
-+								wordexp_t *w)
-+{
-+	GList *l;
-+
-+	l = g_list_find_custom(managers, proxy, match_proxy);
-+	if (!l) {
-+		rl_printf("Unable to find GattManager proxy\n");
-+		return;
-+	}
-+
-+	if (g_dbus_register_interface(conn, PROFILE_PATH,
-+					PROFILE_INTERFACE, methods,
-+					NULL, NULL, NULL, NULL) == FALSE) {
-+		rl_printf("Failed to register profile object\n");
-+		return;
-+	}
-+
-+	if (g_dbus_proxy_method_call(l->data, "RegisterProfile",
-+						register_profile_setup,
-+						register_profile_reply, w,
-+						NULL) == FALSE) {
-+		rl_printf("Failed register profile\n");
-+		return;
-+	}
-+}
-diff --git a/client/gatt.h b/client/gatt.h
-index effee5e..547e84a 100644
---- a/client/gatt.h
-+++ b/client/gatt.h
-@@ -37,3 +37,9 @@ char *gatt_attribute_generator(const char *text, int state);
- void gatt_read_attribute(GDBusProxy *proxy);
- void gatt_write_attribute(GDBusProxy *proxy, const char *arg);
- void gatt_notify_attribute(GDBusProxy *proxy, bool enable);
-+
-+void gatt_add_manager(GDBusProxy *proxy);
-+void gatt_remove_manager(GDBusProxy *proxy);
-+
-+void gatt_register_profile(DBusConnection *conn, GDBusProxy *proxy,
-+								wordexp_t *w);
-diff --git a/client/main.c b/client/main.c
-index 7f1c903..b2c6b41 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -32,6 +32,7 @@
- #include <stdbool.h>
- #include <signal.h>
- #include <sys/signalfd.h>
-+#include <wordexp.h>
+ static const GDBusMethodTable manager_methods[] = {
+ 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterService",
+ 			GDBUS_ARGS({ "service", "o" }, { "options", "a{sv}" }),
+@@ -2140,6 +2329,10 @@ static const GDBusMethodTable manager_methods[] = {
+ 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("UnregisterService",
+ 					GDBUS_ARGS({ "service", "o" }),
+ 					NULL, manager_unregister_service) },
++	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterProfile",
++			GDBUS_ARGS({ "profile", "o" }, { "UUIDs", "as" },
++			{ "options", "a{sv}" }), NULL,
++			manager_register_profile) },
+ 	{ }
+ };
  
- #include <readline/readline.h>
- #include <readline/history.h>
-@@ -348,6 +349,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
- 		gatt_add_characteristic(proxy);
- 	} else if (!strcmp(interface, "org.bluez.GattDescriptor1")) {
- 		gatt_add_descriptor(proxy);
-+	} else if (!strcmp(interface, "org.bluez.GattManager1")) {
-+		gatt_add_manager(proxy);
- 	}
- }
+@@ -2169,6 +2362,10 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
+ 	if (!database->services)
+ 		goto fail;
  
-@@ -443,6 +446,8 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 
- 		if (default_attr == proxy)
- 			set_default_attribute(NULL);
-+	} else if (!strcmp(interface, "org.bluez.GattManager1")) {
-+		gatt_remove_manager(proxy);
- 	}
- }
- 
-@@ -1329,6 +1334,28 @@ static void cmd_notify(const char *arg)
- 	gatt_notify_attribute(default_attr, enable ? true : false);
- }
- 
-+static void cmd_register_profile(const char *arg)
-+{
-+	wordexp_t w;
++	database->profiles = queue_new();
++	if (!database->profiles)
++		goto fail;
 +
-+	if (check_default_ctrl() == FALSE)
-+		return;
-+
-+	if (wordexp(arg, &w, WRDE_NOCMD)) {
-+		rl_printf("Invalid argument\n");
-+		return;
-+	}
-+
-+	if (w.we_wordc == 0) {
-+		rl_printf("Missing argument\n");
-+		return;
-+	}
-+
-+	gatt_register_profile(dbus_conn, default_ctrl, &w);
-+
-+	wordfree(&w);
-+}
-+
- static void cmd_version(const char *arg)
- {
- 	rl_printf("Version %s\n", VERSION);
-@@ -1462,6 +1489,8 @@ static const struct {
- 	{ "write",        "<data=[xx xx ...]>", cmd_write,
- 						"Write attribute value" },
- 	{ "notify",       "<on/off>", cmd_notify, "Notify attribute value" },
-+	{ "register-profile", "<UUID ...>", cmd_register_profile,
-+						"Register profile to connect" },
- 	{ "version",      NULL,       cmd_version, "Display version" },
- 	{ "quit",         NULL,       cmd_quit, "Quit program" },
- 	{ "exit",         NULL,       cmd_quit },
+ 	database->ccc_callbacks = queue_new();
+ 	if (!database->ccc_callbacks)
+ 		goto fail;
 -- 
 2.1.0
 
