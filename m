@@ -1,283 +1,291 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1427183840-8089-8-git-send-email-jpawlowski@google.com>
+References: <1427183840-8089-1-git-send-email-jpawlowski@google.com>
+	<1427183840-8089-8-git-send-email-jpawlowski@google.com>
+Date: Tue, 24 Mar 2015 11:35:27 +0200
+Message-ID: <CABBYNZLUMpt_RTcHqEHPqm0iMt4nWxXBDaWJfw8bpzh1iFLycQ@mail.gmail.com>
+Subject: Re: [PATCH v3 8/8] client: main: add support for SetDiscoveryFilter
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] core/gatt: Add implementation of RegisterProfile
-Date: Tue, 24 Mar 2015 11:37:50 +0200
-Message-Id: <1427189873-29770-1-git-send-email-luiz.dentz@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Jakub,
 
-This adds initial implementation of RegisterProfile.
----
- src/gatt-database.c | 197 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 197 insertions(+)
+On Tue, Mar 24, 2015 at 9:57 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> This patch adds filtered-scan command to sample DBus client that might
+> be used to call SetDiscoveryFilter.
+> ---
+>  client/main.c | 235 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 235 insertions(+)
+>
+> diff --git a/client/main.c b/client/main.c
+> index 7f1c903..d3c6853 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -891,6 +891,239 @@ static void cmd_scan(const char *arg)
+>         }
+>  }
+>
+> +static void append_variant(DBusMessageIter *iter, int type, void *val)
+> +{
+> +       DBusMessageIter value;
+> +       char sig[2] = { type, '\0' };
+> +
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
+> +
+> +       dbus_message_iter_append_basic(&value, type, val);
+> +
+> +       dbus_message_iter_close_container(iter, &value);
+> +}
+> +
+> +static void dict_append_entry(DBusMessageIter *dict, const char *key,
+> +                                                       int type, void *val)
+> +{
+> +       DBusMessageIter entry;
+> +
+> +       if (type == DBUS_TYPE_STRING) {
+> +               const char *str = *((const char **) val);
+> +
+> +               if (str == NULL)
+> +                       return;
+> +       }
+> +
+> +       dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
+> +                                                       NULL, &entry);
+> +
+> +       dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
+> +
+> +       append_variant(&entry, type, val);
+> +
+> +       dbus_message_iter_close_container(dict, &entry);
+> +}
+> +
+> +#define        DISTNACE_VAL_INVALID    0x7FFF
+> +
+> +struct set_discovery_filter_args {
+> +       char *transport;
+> +       dbus_uint16_t rssi;
+> +       dbus_int16_t pathloss;
+> +       GList *uuids;
+> +};
+> +
+> +static void set_discovery_filter_setup(DBusMessageIter *iter,
+> +                                          void *user_data)
+> +{
+> +       struct set_discovery_filter_args *args = user_data;
+> +       DBusMessageIter dict;
+> +
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> +                           DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+> +                           DBUS_TYPE_STRING_AS_STRING
+> +                           DBUS_TYPE_VARIANT_AS_STRING
+> +                           DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+> +
+> +       if (args->uuids != NULL) {
+> +               DBusMessageIter entry, value, arrayIter;
+> +               char *uuids = "UUIDs";
+> +               GList *list;
+> +
+> +               dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
+> +                                                NULL, &entry);
+> +               /* dict key */
+> +               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+> +                                              &uuids);
+> +
+> +               dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
+> +                                                "as", &value);
+> +
+> +               dbus_message_iter_open_container(&value, DBUS_TYPE_ARRAY, "s",
+> +                                                &arrayIter);
+> +
+> +               for (list = g_list_first(args->uuids); list;
+> +                                                     list = g_list_next(list))
+> +                       /* list->data contains string representation of uuid */
+> +                       dbus_message_iter_append_basic(&arrayIter,
+> +                                                      DBUS_TYPE_STRING,
+> +                                                      &list->data);
+> +
+> +               dbus_message_iter_close_container(&value, &arrayIter);
+> +
+> +               /* close vararg*/
+> +               dbus_message_iter_close_container(&entry, &value);
+> +
+> +               /* close entry */
+> +               dbus_message_iter_close_container(&dict, &entry);
+> +       }
+> +
+> +       if (args->pathloss != DISTNACE_VAL_INVALID)
+> +               dict_append_entry(&dict, "Pathloss", DBUS_TYPE_UINT16,
+> +                                 &args->pathloss);
+> +
+> +       if (args->rssi != DISTNACE_VAL_INVALID)
+> +               dict_append_entry(&dict, "RSSI", DBUS_TYPE_INT16, &args->rssi);
+> +
+> +       if (args->transport != NULL)
+> +               dict_append_entry(&dict, "Transport", DBUS_TYPE_STRING,
+> +                                 &args->transport);
+> +
+> +       dbus_message_iter_close_container(iter, &dict);
+> +}
+> +
+> +
+> +static void set_discovery_filter_reply(DBusMessage *message,
+> +                                      void *user_data)
+> +{
+> +       DBusError error;
+> +
+> +       dbus_error_init(&error);
+> +       if (dbus_set_error_from_message(&error, message) == TRUE) {
+> +               rl_printf("SetDiscoveryFilter failed: %s\n", error.name);
+> +               dbus_error_free(&error);
+> +               return;
+> +       }
+> +
+> +       rl_printf("SetDiscoveryFilter success\n");
+> +}
+> +
+> +static gint filtered_scan_rssi, filtered_scan_pathloss;
+> +static char **filtered_scan_uuids;
+> +static gboolean filtered_scan_help;
+> +static char *filtered_scan_transport;
+> +
+> +static GOptionEntry filtered_discovery_options[] = {
+> +       { "rssi", 'r', 0, G_OPTION_ARG_INT, &filtered_scan_rssi,
+> +                               "RSSI filter" },
+> +       { "pathloss", 'p', 0, G_OPTION_ARG_INT, &filtered_scan_pathloss,
+> +                               "pathloss filter" },
+> +       { "transport", 't', 0, G_OPTION_ARG_STRING, &filtered_scan_transport,
+> +                               "transport" },
+> +       { "uuids", 'u', 0, G_OPTION_ARG_STRING_ARRAY, &filtered_scan_uuids,
+> +                               "uuid to filter by" },
+> +       { "help", 'h', 0, G_OPTION_ARG_NONE, &filtered_scan_help,
+> +                               "show help" },
+> +       { NULL },
+> +};
+> +
+> +static void cmd_set_discovery_filter(const char *arg)
+> +{
+> +       struct set_discovery_filter_args args;
+> +       int argc, loop;
+> +       GOptionContext *context;
+> +       GError *error = NULL;
+> +
+> +       gchar **arguments = NULL, **argv, *cmdline_arg;
+> +
+> +       /* add fake program name at beginning for g_shell_parse_argv */
+> +       cmdline_arg = g_strconcat("set-discovery-filter ", arg, NULL);
+> +       if (g_shell_parse_argv(cmdline_arg, &argc, &arguments, &error)
+> +                                                                   == FALSE) {
+> +               if (error != NULL) {
+> +                       g_printerr("error when parsing arguments: %s\n",
+> +                                  error->message);
+> +                       g_error_free(error);
+> +               } else
+> +                       g_printerr("An unknown error occurred\n");
+> +
+> +               g_strfreev(arguments);
+> +               g_free(cmdline_arg);
+> +               return;
+> +       }
+> +       g_free(cmdline_arg);
+> +
+> +       argc = g_strv_length(arguments);
+> +
+> +       /* Rewrite arguments to argv, argv is not null-terminated and will be
+> +        * passed to g_option_context_parse.
+> +        */
+> +       argv = g_new(gchar *, argc);
+> +       for (loop = 0; loop < argc; loop++)
+> +               argv[loop] = arguments[loop];
+> +
+> +       context = g_option_context_new(NULL);
+> +       g_option_context_add_main_entries(context, filtered_discovery_options,
+> +                                                                        NULL);
+> +       /* set default values for all options */
+> +       filtered_scan_rssi = DISTNACE_VAL_INVALID;
+> +       filtered_scan_pathloss = DISTNACE_VAL_INVALID;
+> +       filtered_scan_uuids = NULL;
+> +       filtered_scan_transport = NULL;
+> +       filtered_scan_help = FALSE;
+> +
+> +       g_option_context_set_help_enabled(context, FALSE);
+> +       if (g_option_context_parse(context, &argc, &argv, &error) == FALSE) {
+> +               if (error != NULL) {
+> +                       g_printerr("error in g_option_context_parse: %s\n",
+> +                                                              error->message);
+> +                       g_error_free(error);
+> +               } else
+> +                       g_printerr("An unknown error occurred\n");
+> +
+> +               g_strfreev(arguments);
+> +               g_free(argv);
+> +               return;
+> +       }
+> +
+> +       if (filtered_scan_help) {
+> +               printf("Set discovery filter. Usage:\n");
+> +               printf("        set-discovery-filter [-r rssi | -p pathlos] ");
+> +               printf("[-t transport] -u <uuid1> [-u <uuid2> ...]\n");
+> +               printf("\n");
+> +               printf("Example: set-discovery-filter -p 65 -u baba -u 1900\n");
+> +               return;
+> +       }
+> +
+> +       args.uuids = NULL;
+> +       args.pathloss = filtered_scan_pathloss;
+> +       args.rssi = filtered_scan_rssi;
+> +       args.transport = filtered_scan_transport;
+> +
+> +       if (filtered_scan_uuids != NULL)
+> +               for (loop = 0; filtered_scan_uuids[loop] != NULL; loop++) {
+> +                       args.uuids = g_list_append(args.uuids,
+> +                                           strdup(filtered_scan_uuids[loop]));
+> +               }
+> +
+> +       g_strfreev(arguments);
+> +       g_free(argv);
+> +       g_strfreev(filtered_scan_uuids);
+> +
+> +       g_option_context_free(context);
+> +
+> +       if (check_default_ctrl() == FALSE)
+> +               return;
+> +
+> +       if (g_dbus_proxy_method_call(default_ctrl, "SetDiscoveryFilter",
+> +               set_discovery_filter_setup, set_discovery_filter_reply,
+> +               &args, NULL /* TODO: proper freeing method here*/) == FALSE) {
+> +               rl_printf("Failed to set discovery filter\n");
+> +               return;
+> +       }
+> +}
+> +
+>  static struct GDBusProxy *find_device(const char *arg)
+>  {
+>         GDBusProxy *proxy;
+> @@ -1433,6 +1666,8 @@ static const struct {
+>                                                         capability_generator},
+>         { "default-agent",NULL,       cmd_default_agent,
+>                                 "Set agent as the default one" },
+> +       { "set-discovery-filter", "", cmd_set_discovery_filter,
+> +               "Set discovery filter. Run discovery-filter -h for help" },
+>         { "scan",         "<on/off>", cmd_scan, "Scan for devices" },
+>         { "info",         "[dev]",    cmd_info, "Device information",
+>                                                         dev_generator },
+> --
+> 2.2.0.rc0.207.ga3a616c
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index e07c70f..e701439 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -23,6 +23,7 @@
- 
- #include <stdint.h>
- #include <stdlib.h>
-+#include <errno.h>
- 
- #include "lib/bluetooth.h"
- #include "lib/sdp.h"
-@@ -41,6 +42,7 @@
- #include "device.h"
- #include "gatt-database.h"
- #include "dbus-common.h"
-+#include "profile.h"
- 
- #ifndef ATT_CID
- #define ATT_CID 4
-@@ -75,6 +77,7 @@ struct btd_gatt_database {
- 	struct gatt_db_attribute *svc_chngd;
- 	struct gatt_db_attribute *svc_chngd_ccc;
- 	struct queue *services;
-+	struct queue *profiles;
- };
- 
- struct external_service {
-@@ -91,6 +94,14 @@ struct external_service {
- 	struct queue *descs;
- };
- 
-+struct external_profile {
-+	struct btd_gatt_database *database;
-+	char *owner;
-+	char *path;	/* Path to GattProfile1 */
-+	unsigned int id;
-+	struct queue *profiles; /* btd_profile list */
-+};
-+
- struct external_chrc {
- 	struct external_service *service;
- 	char *path;
-@@ -364,6 +375,35 @@ static void service_free(void *data)
- 	free(service);
- }
- 
-+static void profile_remove(void *data)
-+{
-+	struct btd_profile *p = data;
-+
-+	DBG("Removed \"%s\"", p->name);
-+
-+	adapter_foreach(adapter_remove_profile, p);
-+
-+	g_free((void *) p->name);
-+	g_free((void *) p->remote_uuid);
-+
-+	free(p);
-+}
-+
-+static void profile_free(void *data)
-+{
-+	struct external_profile *profile = data;
-+
-+	queue_destroy(profile->profiles, profile_remove);
-+
-+	if (profile->id)
-+		g_dbus_remove_watch(btd_get_dbus_connection(), profile->id);
-+
-+	g_free(profile->owner);
-+	g_free(profile->path);
-+
-+	free(profile);
-+}
-+
- static void gatt_database_free(void *data)
- {
- 	struct btd_gatt_database *database = data;
-@@ -390,6 +430,7 @@ static void gatt_database_free(void *data)
- 
- 	queue_destroy(database->device_states, device_state_free);
- 	queue_destroy(database->services, service_free);
-+	queue_destroy(database->profiles, profile_free);
- 	queue_destroy(database->ccc_callbacks, ccc_cb_free);
- 	database->device_states = NULL;
- 	database->ccc_callbacks = NULL;
-@@ -2133,6 +2174,154 @@ static DBusMessage *manager_unregister_service(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
- }
- 
-+static void profile_exited(DBusConnection *conn, void *user_data)
-+{
-+	struct external_profile *profile = user_data;
-+
-+	DBG("\"%s\" exited", profile->owner);
-+
-+	profile->id = 0;
-+
-+	queue_remove(profile->database->profiles, profile);
-+
-+	profile_free(profile);
-+}
-+
-+static int profile_add(struct external_profile *profile, const char *uuid)
-+{
-+	struct btd_profile *p;
-+
-+	p = new0(struct btd_profile, 1);
-+	if (!p)
-+		return -ENOMEM;
-+
-+	/* Assign directly to avoid having extra fields */
-+	p->name = (const void *) g_strdup_printf("%s%s/%s", profile->owner,
-+							profile->path, uuid);
-+	if (!p->name)
-+		return -ENOMEM;
-+
-+	p->remote_uuid = (const void *) g_strdup(uuid);
-+	if (!p->remote_uuid)
-+		return -ENOMEM;
-+
-+	p->auto_connect = true;
-+
-+	queue_push_tail(profile->profiles, p);
-+
-+	DBG("Added \"%s\"", p->name);
-+
-+	return 0;
-+}
-+
-+static void add_profile(void *data, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+
-+	adapter_add_profile(adapter, data);
-+}
-+
-+static int profile_create(DBusConnection *conn,
-+				struct btd_gatt_database *database,
-+				const char *sender, const char *path,
-+				DBusMessageIter *iter)
-+{
-+	struct external_profile *profile;
-+	DBusMessageIter uuids;
-+
-+	if (!path || !g_str_has_prefix(path, "/"))
-+		return -EINVAL;
-+
-+	profile = new0(struct external_profile, 1);
-+	if (!profile)
-+		return -ENOMEM;
-+
-+	profile->owner = g_strdup(sender);
-+	if (!profile->owner)
-+		goto fail;
-+
-+	profile->path = g_strdup(path);
-+	if (!profile->path)
-+		goto fail;
-+
-+	profile->profiles = queue_new();
-+	if (!profile->profiles)
-+		goto fail;
-+
-+	profile->database = database;
-+	profile->id = g_dbus_add_disconnect_watch(conn, sender, profile_exited,
-+								profile, NULL);
-+
-+	dbus_message_iter_recurse(iter, &uuids);
-+
-+	while (dbus_message_iter_get_arg_type(&uuids) == DBUS_TYPE_STRING) {
-+		const char *uuid;
-+
-+		dbus_message_iter_get_basic(&uuids, &uuid);
-+
-+		if (profile_add(profile, uuid) < 0)
-+			goto fail;
-+
-+		dbus_message_iter_next(&uuids);
-+	}
-+
-+	if (queue_isempty(profile->profiles))
-+		goto fail;
-+
-+	queue_foreach(profile->profiles, add_profile, database->adapter);
-+	queue_push_tail(database->profiles, profile);
-+
-+	return 0;
-+
-+fail:
-+	profile_free(profile);
-+	return -EINVAL;
-+}
-+
-+static bool match_profile(const void *a, const void *b)
-+{
-+	const struct external_profile *profile = a;
-+	const struct svc_match_data *data = b;
-+
-+	return g_strcmp0(profile->path, data->path) == 0 &&
-+				g_strcmp0(profile->owner, data->sender) == 0;
-+}
-+
-+static DBusMessage *manager_register_profile(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	struct btd_gatt_database *database = user_data;
-+	const char *sender = dbus_message_get_sender(msg);
-+	DBusMessageIter args;
-+	const char *path;
-+	struct svc_match_data match_data;
-+
-+	DBG("sender %s", sender);
-+
-+	if (!dbus_message_iter_init(msg, &args))
-+		return btd_error_invalid_args(msg);
-+
-+	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&args, &path);
-+
-+	match_data.path = path;
-+	match_data.sender = sender;
-+
-+	if (queue_find(database->profiles, match_profile, &match_data))
-+		return btd_error_already_exists(msg);
-+
-+	dbus_message_iter_next(&args);
-+	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
-+		return btd_error_invalid_args(msg);
-+
-+	if (profile_create(conn, database, sender, path, &args) < 0)
-+		return btd_error_failed(msg, "Failed to register profile");
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
- static const GDBusMethodTable manager_methods[] = {
- 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterService",
- 			GDBUS_ARGS({ "service", "o" }, { "options", "a{sv}" }),
-@@ -2140,6 +2329,10 @@ static const GDBusMethodTable manager_methods[] = {
- 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("UnregisterService",
- 					GDBUS_ARGS({ "service", "o" }),
- 					NULL, manager_unregister_service) },
-+	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterProfile",
-+			GDBUS_ARGS({ "profile", "o" }, { "UUIDs", "as" },
-+			{ "options", "a{sv}" }), NULL,
-+			manager_register_profile) },
- 	{ }
- };
- 
-@@ -2169,6 +2362,10 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
- 	if (!database->services)
- 		goto fail;
- 
-+	database->profiles = queue_new();
-+	if (!database->profiles)
-+		goto fail;
-+
- 	database->ccc_callbacks = queue_new();
- 	if (!database->ccc_callbacks)
- 		goto fail;
+This looks really messy, Id probably add support for sub parser
+separately so it parses the parameters before the callback so we don't
+have to duplicate this code for each command, but Im not sure we want
+GOptionEntry either since for the other commands we normally don't use
+that style. Perhaps another way would be to have each filter as
+separate command e.g. set-pathloss, set-rssi, and just update the
+filter everytime it changes. Btw we also need a way to reset the
+filter.
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
