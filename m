@@ -1,147 +1,289 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25Sw9qdqbsSiY5cWsgikkUmAv8V7dj-aUFuH7HH34Zp9eg@mail.gmail.com>
-References: <1427087337-17479-1-git-send-email-jaganath.k@samsung.com>
-	<CAHrH25SJXjAj6oayUUL1_Mi7o4gi8i=JcEGVUZ4J8DOhBoTNRQ@mail.gmail.com>
-	<CAHrH25Sw9qdqbsSiY5cWsgikkUmAv8V7dj-aUFuH7HH34Zp9eg@mail.gmail.com>
-Date: Tue, 24 Mar 2015 11:06:16 +0200
-Message-ID: <CABBYNZKHVz7Xu+Gno_ECp2AMqC+7TWWPbRA-HGHNmFkpx0a1Tw@mail.gmail.com>
-Subject: Re: [PATCH] Fix crash during register_notify after service_changed_event
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <CAHrH25TkwtuSAPGoqf2+p1ikqLNA+3Os+VtaU-FpAUhPhpzvkQ@mail.gmail.com>
+References: <1427139103-26441-1-git-send-email-jpawlowski@google.com>
+	<1427139103-26441-5-git-send-email-jpawlowski@google.com>
+	<CAHrH25TkwtuSAPGoqf2+p1ikqLNA+3Os+VtaU-FpAUhPhpzvkQ@mail.gmail.com>
+Date: Tue, 24 Mar 2015 01:04:05 -0700
+Message-ID: <CAD0=r8w6VRaSDgGiiQ2mSftX0d6Qt6EGu-j_715vPi0QENBNOg@mail.gmail.com>
+Subject: Re: [PATCH v2 5/8] core: adapter: properly set the filter for each
+ discovery client
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: Arman Uguray <armansito@chromium.org>
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
-
-On Tue, Mar 24, 2015 at 7:25 AM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Jaganath,
+On Mon, Mar 23, 2015 at 5:42 PM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Jakub,
 >
->> On Mon, Mar 23, 2015 at 4:45 PM, Arman Uguray <armansito@chromium.org> wrote:
->> Hi Jaganath,
->>
->>> On Sun, Mar 22, 2015 at 10:08 PM, Jaganath Kanakkassery <jaganath.k@samsung.com> wrote:
->>> During service changed event the characteristics of the modified
->>> services will be destroyed and corresponding notify clients also
->>> will be freed. But those notify clients are not removed from
->>> all_notify_clients queue of btd_client which causes the below
->>> crash
->>>
->>> 0  queue_remove (queue=0x1, data=0xb8e97a68) at src/shared/queue.c:292
->>>         entry = <value optimized out>
->>>         prev = <value optimized out>
->>> 1  0xb6f84c34 in register_notify (data=0xb8e9a900, user_data=0xb8e97a68)
->>>     at src/gatt-client.c:1833
->>> No locals.
->>> 2  register_notify (data=0xb8e9a900, user_data=0xb8e97a68)
->>>     at src/gatt-client.c:1807
->>>         notify_client = 0xb8e9a900
->>>         client = 0xb8e97a68
->>>         op = 0xb8e91f30
->>> 3  0xb6f9a41a in queue_foreach (queue=0xb8e97a98,
->>>     function=0xb6f84bd9 <register_notify>, user_data=0xb8e97a68)
->>>     at src/shared/queue.c:251
->>>         next = <value optimized out>
->>>         entry = 0xb8e9baf0
->>> 4  0xb6f89b62 in gatt_client_ready_cb (success=<value optimized out>,
->>>     att_ecode=<value optimized out>, user_data=0xb8e97770) at src/device.c:5173
->>> No locals.
->>> 5  gatt_client_ready_cb (success=<value optimized out>,
->>>     att_ecode=<value optimized out>, user_data=0xb8e97770) at src/device.c:5132
->>>         device = 0xb8e97770
->>> 6  0xb6f9e232 in notify_client_ready (client=0xb8e90710,
->>> ---Type <return> to continue, or q <return> to quit---
->>>     success=<value optimized out>, att_ecode=<value optimized out>)
->>>     at src/shared/gatt-client.c:1019
->>> No locals.
->>> 7  0xb6f9cb6a in complete_notify_request (data=<value optimized out>)
->>>     at src/shared/gatt-client.c:1405
->>>         notify_data = <value optimized out>
->>> 8  0xb6f9e168 in enable_ccc_callback (opcode=<value optimized out>,
->>>     pdu=<value optimized out>, length=<value optimized out>,
->>>     user_data=0xb8e911a8) at src/shared/gatt-client.c:1488
->>>         notify_data = 0xb8e911a8
->>>         att_ecode = <value optimized out>
->>>         __PRETTY_FUNCTION__ = "enable_ccc_callback"
->>> 9  0xb6f9c6d8 in handle_rsp (io=<value optimized out>, user_data=0xb8e9a330)
->>>     at src/shared/att.c:640
->>>         rsp_opcode = 19 '\023'
->>>         rsp_pdu = <value optimized out>
->>>         rsp_pdu_len = <value optimized out>
->>>         op = 0xb8e8ece8
->>>         req_opcode = <value optimized out>
->>>
->>> This patch removes the notify clients (which will be freed) from
->>> all_notify_clients as well
->>
->> Your patch looks good to me. I also tested it and everything seems to
->> work fine, although if you can also add a test case to unit/test-gatt
->> for this particular crash it would be great.
->>
+>> On Mon, Mar 23, 2015 at 12:31 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>> This patch adds logic for properly setting, updating and deleting
+>> discovery filter for each client.
 >
-> I realized that this can't really be unit tested using unit/test-gatt
-> since that only exercises shared/gatt. It would still be nice to have
-> tests for this particular case though, I'm not sure if we have any
-> test cases for Service Changed.
-
-There is the test TP/GAS/CL/BV-01-C but it would only affect shared/
-code, for D-Bus we need end-to-end tests like we did for android.
-
->>> ---
->>>  src/gatt-client.c |   12 +++++++++++-
->>>  1 file changed, 11 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/src/gatt-client.c b/src/gatt-client.c
->>> index 863492a..2e26ed7 100644
->>> --- a/src/gatt-client.c
->>> +++ b/src/gatt-client.c
->>> @@ -1370,6 +1370,16 @@ static struct characteristic *characteristic_create(
->>>         return chrc;
->>>  }
->>>
->>> +static void remove_client(void *data)
->>> +{
->>> +       struct notify_client *ntfy_client = data;
->>> +       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
->>> +
->>> +       queue_remove(client->all_notify_clients, ntfy_client);
->>> +
->>> +       notify_client_unref(ntfy_client);
->>> +}
->>> +
->>>  static void unregister_characteristic(void *data)
->>>  {
->>>         struct characteristic *chrc = data;
->>> @@ -1383,7 +1393,7 @@ static void unregister_characteristic(void *data)
->>>         if (chrc->write_id)
->>>                 bt_gatt_client_cancel(gatt, chrc->write_id);
->>>
->>> -       queue_remove_all(chrc->notify_clients, NULL, NULL, notify_client_unref);
->>> +       queue_remove_all(chrc->notify_clients, NULL, NULL, remove_client);
->>>         queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
->>>
->>>         g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
->>> --
->>> 1.7.9.5
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Saying "properly set" makes me think that your code used to
+> "improperly" set the filters, so I'd just drop that entirely.
 >
-> Pushed.
+fixed
+>>
+>> Note that the filter is not used yet, making proper use from filter
+>> will be added in following patches.
+>> ---
+>>  src/adapter.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>>  1 file changed, 116 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/src/adapter.c b/src/adapter.c
+>> index f57b58c..672f550 100644
+>> --- a/src/adapter.c
+>> +++ b/src/adapter.c
+>> @@ -158,6 +158,7 @@ struct watch_client {
+>>         struct btd_adapter *adapter;
+>>         char *owner;
+>>         guint watch;
+>> +       struct discovery_filter *discovery_filter;
+>>  };
+>>
+>>  struct service_auth {
+>> @@ -207,6 +208,9 @@ struct btd_adapter {
+>>         uint8_t discovery_enable;       /* discovery enabled/disabled */
+>>         bool discovery_suspended;       /* discovery has been suspended */
+>>         GSList *discovery_list;         /* list of discovery clients */
+>> +       GSList *set_filter_list;        /* list of clients that specified
+>> +                                        * filter, but don't scan yet
+>> +                                        */
+>>         GSList *discovery_found;        /* list of found devices */
+>>         guint discovery_idle_timeout;   /* timeout between discovery runs */
+>>         guint passive_scan_timeout;     /* timeout between passive scans */
+>> @@ -1355,6 +1359,17 @@ static uint8_t get_current_type(struct btd_adapter *adapter)
+>>         return type;
+>>  }
+>>
+>> +static void free_discovery_filter(struct discovery_filter *discovery_filter)
+>> +{
+>> +       if (!discovery_filter)
+>> +               return;
+>
+> Since this is an internal function, I wouldn't have this above check
+> without a particular use for it. Basically, the sites that call this
+> code should make sure that discovery_filter isn't NULL when this gets
+> called.
+>
+isn't it better to have this check once here, than 3 times in different places?
+>> +
+>> +       if (discovery_filter->uuids)
+>
+> I think this check is unnecessary; afaik g_slist_free_full should
+> treat a NULL value as an empty GSList. I'd still test for this of
+> course.
+>
+fixed.
+>> +               g_slist_free_full(discovery_filter->uuids, g_free);
+>> +
+>> +       g_free(discovery_filter);
+>> +}
+>> +
+>>  static void trigger_start_discovery(struct btd_adapter *adapter, guint delay);
+>>
+>>  static void start_discovery_complete(uint8_t status, uint16_t length,
+>> @@ -1654,9 +1669,17 @@ static void discovery_destroy(void *user_data)
+>>
+>>         DBG("owner %s", client->owner);
+>>
+>> +       adapter->set_filter_list = g_slist_remove(adapter->set_filter_list,
+>> +                                                               client);
+>> +
+>>         adapter->discovery_list = g_slist_remove(adapter->discovery_list,
+>>                                                                 client);
+>>
+>> +       if (client->discovery_filter != NULL) {
+>
+> if (!client->discovery_filter) {
+>
+fixed
+>> +               free_discovery_filter(client->discovery_filter);
+>> +               client->discovery_filter = NULL;
+>> +       }
+>> +
+>>         g_free(client->owner);
+>>         g_free(client);
+>>
+>> @@ -1693,6 +1716,9 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
+>>
+>>         DBG("owner %s", client->owner);
+>>
+>> +       adapter->set_filter_list = g_slist_remove(adapter->set_filter_list,
+>> +                                                               client);
+>> +
+>>         adapter->discovery_list = g_slist_remove(adapter->discovery_list,
+>>                                                                 client);
+>>
+>> @@ -1748,16 +1774,28 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+>>         if (list)
+>>                 return btd_error_busy(msg);
+>>
+>> -       client = g_new0(struct watch_client, 1);
+>> +       /* If client called SetDiscoveryFilter before, use pre-set filter. */
+>> +       list = g_slist_find_custom(adapter->set_filter_list, sender,
+>> +                                  compare_sender);
+>>
+>> -       client->adapter = adapter;
+>> -       client->owner = g_strdup(sender);
+>> -       client->watch = g_dbus_add_disconnect_watch(dbus_conn, sender,
+>> -                                               discovery_disconnect, client,
+>> -                                               discovery_destroy);
+>> +       if (list) {
+>> +               client = list->data;
+>> +               adapter->set_filter_list = g_slist_remove(
+>> +                                              adapter->set_filter_list, list);
+>> +       } else {
+>> +               client = g_new0(struct watch_client, 1);
+>> +
+>> +               client->adapter = adapter;
+>> +               client->owner = g_strdup(sender);
+>> +               client->discovery_filter = NULL;
+>> +               client->watch = g_dbus_add_disconnect_watch(dbus_conn, sender,
+>> +                                                       discovery_disconnect,
+>> +                                                       client,
+>> +                                                       discovery_destroy);
+>> +       }
+>>
+>>         adapter->discovery_list = g_slist_prepend(adapter->discovery_list,
+>> -                                                               client);
+>> +                                                 client);
+>>
+>>         /*
+>>          * Just trigger the discovery here. In case an already running
+>> @@ -1922,8 +1960,9 @@ static DBusMessage *set_discovery_filter(DBusConnection *conn,
+>>                                          DBusMessage *msg, void *user_data)
+>>  {
+>>         struct btd_adapter *adapter = user_data;
+>> +       struct watch_client *client;
+>>         struct discovery_filter *discovery_filter;
+>> -
+>> +       GSList *list;
+>>         const char *sender = dbus_message_get_sender(msg);
+>>
+>>         DBG("sender %s", sender);
+>> @@ -1935,6 +1974,63 @@ static DBusMessage *set_discovery_filter(DBusConnection *conn,
+>>         if (!parse_discovery_filter_dict(&discovery_filter, msg))
+>>                 return btd_error_invalid_args(msg);
+>>
+>> +       list = g_slist_find_custom(adapter->discovery_list, sender,
+>> +                                  compare_sender);
+>> +
+>> +       if (!list) {
+>> +               /* Client is not running any form of discovery. */
+>> +               GSList *filter_list;
+>> +
+>> +               /* Check wether client already pre-set his filter. */
+>
+> s/wether/whether/
+>
+fixed
+>> +               filter_list = g_slist_find_custom(adapter->set_filter_list,
+>> +                                                  sender, compare_sender);
+>> +
+>> +               if (filter_list) {
+>> +                       client = filter_list->data;
+>> +                       free_discovery_filter(client->discovery_filter);
+>> +
+>> +                       if (discovery_filter != NULL) {
+>
+> if (!discovery_filter) {
+>
+fixed
+>> +                               /* just update existing pre-set filter */
+>> +                               client->discovery_filter = discovery_filter;
+>> +                               DBG("successfully modified pre-set filter");
+>> +                               return dbus_message_new_method_return(msg);
+>> +                       }
+>> +
+>> +                       /* Removing pre-set filter */
+>> +                       adapter->set_filter_list = g_slist_remove(
+>> +                                                     adapter->set_filter_list,
+>> +                                                     client);
+>> +                       g_free(client->owner);
+>> +                       g_free(client);
+>> +                       DBG("successfully cleared pre-set filter");
+>> +                       return dbus_message_new_method_return(msg);
+>> +               }
+>> +               /* Client haven't pre-set his filter yet. */
+>> +
+>> +               /* If there's no filter, no need to do anything. */
+>> +               if (discovery_filter == NULL)
+>
+> if (!discovery_filter) {
+>
+fied
+>> +                       return dbus_message_new_method_return(msg);
+>> +
+>> +               /* Client pre-setting his filter for first time */
+>> +               client = g_new0(struct watch_client, 1);
+>> +               client->adapter = adapter;
+>> +               client->owner = g_strdup(sender);
+>> +               client->discovery_filter = discovery_filter;
+>> +               client->watch = g_dbus_add_disconnect_watch(dbus_conn, sender,
+>> +                                               discovery_disconnect, client,
+>> +                                               discovery_destroy);
+>
+> This code is being repeated here and above for start_discovery_filter
+> and you're ending up with these huge nested if-else statements which
+> makes this code too hard to follow. I'd simplify this a little. Maybe
+> create a helper function that simply returns you a watch_client by
+> looking it up in both filter list and discovery list (perhaps we don't
+> even need to have both lists, e.g. you could add a filed to
+> watch_client that indicates whether or not discovery is in progress).
+> Something like:
+>
+> client = get_discovery_client(adapter, owner);
+>
+> This automatically allocates one and inserts it in the appropriate
+> list automatically. Then you won't need these repeated look ups.
+>
+I've made method similar to what you wanted, it greatly simplified code. Thanks!
+
+>> +               adapter->set_filter_list = g_slist_prepend(
+>> +                                            adapter->set_filter_list, client);
+>> +
+>> +               DBG("successfully pre-set filter");
+>> +               return dbus_message_new_method_return(msg);
+>> +       }
+>> +
+>> +       /* Client have already started discovery. */
+>> +       client = list->data;
+>> +       free_discovery_filter(client->discovery_filter);
+>> +       client->discovery_filter = discovery_filter;
+>> +
+>>         return btd_error_failed(msg, "Not implemented yet");
+>>  }
+>>
+>> @@ -5160,6 +5256,18 @@ static void adapter_stop(struct btd_adapter *adapter)
+>>
+>>         cancel_passive_scanning(adapter);
+>>
+>> +       while (adapter->set_filter_list) {
+>> +               struct watch_client *client;
+>> +
+>> +               client = adapter->set_filter_list->data;
+>> +
+>> +               /* g_dbus_remove_watch will remove the client from the
+>> +                * adapter's list and free it using the discovery_destroy
+>> +                * function.
+>> +                */
+>> +               g_dbus_remove_watch(dbus_conn, client->watch);
+>> +       }
+>> +
+>>         while (adapter->discovery_list) {
+>>                 struct watch_client *client;
+>>
+>> --
+>> 2.2.0.rc0.207.ga3a616c
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
 > Thanks,
 > Arman
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
