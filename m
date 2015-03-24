@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] client: Add unregister-profile command
-Date: Tue, 24 Mar 2015 11:37:53 +0200
-Message-Id: <1427189873-29770-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] core/gatt: Add implementation of UnregisterProfile
+Date: Tue, 24 Mar 2015 11:37:52 +0200
+Message-Id: <1427189873-29770-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1427189873-29770-1-git-send-email-luiz.dentz@gmail.com>
 References: <1427189873-29770-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,103 +11,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support to unregister-profile command which uses
-GattManager1.UnregisterProfile.
+This adds initial implementation of GattProfile.UnregisterProfile.
 ---
- client/gatt.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- client/gatt.h |  1 +
- client/main.c | 10 ++++++++++
- 3 files changed, 55 insertions(+)
+ src/gatt-database.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/client/gatt.c b/client/gatt.c
-index 2d35905..737ecea 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -616,3 +616,47 @@ void gatt_register_profile(DBusConnection *conn, GDBusProxy *proxy,
- 		return;
- 	}
- }
-+
-+static void unregister_profile_reply(DBusMessage *message, void *user_data)
-+{
-+	DBusConnection *conn = user_data;
-+	DBusError error;
-+
-+	dbus_error_init(&error);
-+
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		rl_printf("Failed to unregister profile: %s\n", error.name);
-+		dbus_error_free(&error);
-+		return;
-+	}
-+
-+	rl_printf("Profile unregistered\n");
-+
-+	g_dbus_unregister_interface(conn, PROFILE_PATH, PROFILE_INTERFACE);
-+}
-+
-+static void unregister_profile_setup(DBusMessageIter *iter, void *user_data)
-+{
-+	const char *path = PROFILE_PATH;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
-+}
-+
-+void gatt_unregister_profile(DBusConnection *conn, GDBusProxy *proxy)
-+{
-+	GList *l;
-+
-+	l = g_list_find_custom(managers, proxy, match_proxy);
-+	if (!l) {
-+		rl_printf("Unable to find GattManager proxy\n");
-+		return;
-+	}
-+
-+	if (g_dbus_proxy_method_call(l->data, "UnregisterProfile",
-+						unregister_profile_setup,
-+						unregister_profile_reply, conn,
-+						NULL) == FALSE) {
-+		rl_printf("Failed unregister profile\n");
-+		return;
-+	}
-+}
-diff --git a/client/gatt.h b/client/gatt.h
-index 547e84a..689bb4d 100644
---- a/client/gatt.h
-+++ b/client/gatt.h
-@@ -43,3 +43,4 @@ void gatt_remove_manager(GDBusProxy *proxy);
- 
- void gatt_register_profile(DBusConnection *conn, GDBusProxy *proxy,
- 								wordexp_t *w);
-+void gatt_unregister_profile(DBusConnection *conn, GDBusProxy *proxy);
-diff --git a/client/main.c b/client/main.c
-index b2c6b41..4360930 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1356,6 +1356,14 @@ static void cmd_register_profile(const char *arg)
- 	wordfree(&w);
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index e701439..9e9a368 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -2322,6 +2322,37 @@ static DBusMessage *manager_register_profile(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
  }
  
-+static void cmd_unregister_profile(const char *arg)
++static DBusMessage *manager_unregister_profile(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
 +{
-+	if (check_default_ctrl() == FALSE)
-+		return;
++	struct btd_gatt_database *database = user_data;
++	const char *sender = dbus_message_get_sender(msg);
++	const char *path;
++	DBusMessageIter args;
++	struct external_profile *profile;
++	struct svc_match_data match_data;
 +
-+	gatt_unregister_profile(dbus_conn, default_ctrl);
++	if (!dbus_message_iter_init(msg, &args))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&args, &path);
++
++	match_data.path = path;
++	match_data.sender = sender;
++
++	profile = queue_remove_if(database->profiles, match_profile,
++								&match_data);
++	if (!profile)
++		return btd_error_does_not_exist(msg);
++
++	profile_free(profile);
++
++	return dbus_message_new_method_return(msg);
 +}
 +
- static void cmd_version(const char *arg)
- {
- 	rl_printf("Version %s\n", VERSION);
-@@ -1491,6 +1499,8 @@ static const struct {
- 	{ "notify",       "<on/off>", cmd_notify, "Notify attribute value" },
- 	{ "register-profile", "<UUID ...>", cmd_register_profile,
- 						"Register profile to connect" },
-+	{ "unregister-profile", NULL, cmd_unregister_profile,
-+						"Unregister profile" },
- 	{ "version",      NULL,       cmd_version, "Display version" },
- 	{ "quit",         NULL,       cmd_quit, "Quit program" },
- 	{ "exit",         NULL,       cmd_quit },
+ static const GDBusMethodTable manager_methods[] = {
+ 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterService",
+ 			GDBUS_ARGS({ "service", "o" }, { "options", "a{sv}" }),
+@@ -2333,6 +2364,9 @@ static const GDBusMethodTable manager_methods[] = {
+ 			GDBUS_ARGS({ "profile", "o" }, { "UUIDs", "as" },
+ 			{ "options", "a{sv}" }), NULL,
+ 			manager_register_profile) },
++	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("UnregisterProfile",
++					GDBUS_ARGS({ "profile", "o" }),
++					NULL, manager_unregister_profile) },
+ 	{ }
+ };
+ 
 -- 
 2.1.0
 
