@@ -2,239 +2,226 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v3 5/8] core: adapter: set the filter for each discovery client
-Date: Tue, 24 Mar 2015 00:57:17 -0700
-Message-Id: <1427183840-8089-5-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v3 4/8] core: adapter: Add parameter parsing to SetDiscoveryFilter
+Date: Tue, 24 Mar 2015 00:57:16 -0700
+Message-Id: <1427183840-8089-4-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1427183840-8089-1-git-send-email-jpawlowski@google.com>
 References: <1427183840-8089-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds logic for setting, updating and deleting discovery
-filter for each client.
-
-Note that the filter is not used yet, making use from filter will
-be added in following patches.
+This patch adds parameter parsing, and basic internal logic checks to
+SetDiscoveryFilter method.
 ---
- src/adapter.c | 120 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 113 insertions(+), 7 deletions(-)
+ src/adapter.c | 179 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 179 insertions(+)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 47333b8..cd53c46 100644
+index 17acb94..47333b8 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -159,6 +159,7 @@ struct watch_client {
- 	struct btd_adapter *adapter;
- 	char *owner;
- 	guint watch;
-+	struct discovery_filter *discovery_filter;
+@@ -90,6 +90,10 @@
+ 
+ #define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
+ #define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
++#define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
++
++#define	DISTANCE_VAL_INVALID	0x7FFF
++#define	PATHLOSS_MAX 137
+ 
+ static DBusConnection *dbus_conn = NULL;
+ 
+@@ -144,6 +148,13 @@ struct conn_param {
+ 	uint16_t timeout;
  };
  
- struct service_auth {
-@@ -208,6 +209,9 @@ struct btd_adapter {
- 	uint8_t discovery_enable;	/* discovery enabled/disabled */
- 	bool discovery_suspended;	/* discovery has been suspended */
- 	GSList *discovery_list;		/* list of discovery clients */
-+	GSList *set_filter_list;	/* list of clients that specified
-+					 * filter, but don't scan yet
-+					 */
- 	GSList *discovery_found;	/* list of found devices */
- 	guint discovery_idle_timeout;	/* timeout between discovery runs */
- 	guint passive_scan_timeout;	/* timeout between passive scans */
-@@ -1356,6 +1360,15 @@ static uint8_t get_current_type(struct btd_adapter *adapter)
- 	return type;
++struct discovery_filter {
++	uint8_t type;
++	uint16_t pathloss;
++	int16_t rssi;
++	GSList *uuids;
++};
++
+ struct watch_client {
+ 	struct btd_adapter *adapter;
+ 	char *owner;
+@@ -1759,9 +1770,177 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
  }
  
-+static void free_discovery_filter(struct discovery_filter *discovery_filter)
++static bool parse_discovery_filter_entry(char *key, DBusMessageIter *value,
++				      GSList **uuids, int16_t *rssi,
++				      uint16_t *pathloss, uint8_t *transport)
 +{
-+	if (!discovery_filter)
-+		return;
++	uint8_t type;
 +
-+	g_slist_free_full(discovery_filter->uuids, g_free);
-+	g_free(discovery_filter);
-+}
++	if (!strcmp("UUIDs", key)) {
++		DBusMessageIter arriter;
 +
- static void trigger_start_discovery(struct btd_adapter *adapter, guint delay);
- 
- static void start_discovery_complete(uint8_t status, uint16_t length,
-@@ -1655,9 +1668,17 @@ static void discovery_destroy(void *user_data)
- 
- 	DBG("owner %s", client->owner);
- 
-+	adapter->set_filter_list = g_slist_remove(adapter->set_filter_list,
-+								client);
++		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_ARRAY)
++			return false;
 +
- 	adapter->discovery_list = g_slist_remove(adapter->discovery_list,
- 								client);
- 
-+	if (!client->discovery_filter) {
-+		free_discovery_filter(client->discovery_filter);
-+		client->discovery_filter = NULL;
-+	}
++		dbus_message_iter_recurse(value, &arriter);
++		while ((type = dbus_message_iter_get_arg_type(&arriter)) !=
++							DBUS_TYPE_INVALID) {
++			char *uuid_str;
++			char *result_uuid;
++			uuid_t uuid_tmp;
 +
- 	g_free(client->owner);
- 	g_free(client);
- 
-@@ -1694,6 +1715,9 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
- 
- 	DBG("owner %s", client->owner);
- 
-+	adapter->set_filter_list = g_slist_remove(adapter->set_filter_list,
-+								client);
++			if (dbus_message_iter_get_arg_type(&arriter) !=
++							DBUS_TYPE_STRING)
++				return false;
 +
- 	adapter->discovery_list = g_slist_remove(adapter->discovery_list,
- 								client);
- 
-@@ -1727,36 +1751,74 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
- 				stop_discovery_complete, adapter, NULL);
- }
- 
-+/* returns true if client was already discovering, false otherwise. *client
-+ * will point to discovering client, or client that have pre-set his filter.
-+ */
-+static bool get_discovery_client(struct btd_adapter *adapter,
-+				 const char *owner,
-+				 struct watch_client **client)
-+{
-+	GSList *list = g_slist_find_custom(adapter->discovery_list, owner,
-+				   compare_sender);
-+	if (list) {
-+		*client = list->data;
-+		return true;
-+	}
++			dbus_message_iter_get_basic(&arriter, &uuid_str);
++			if (bt_string2uuid(&uuid_tmp, uuid_str) < 0)
++				return false;
 +
-+	list = g_slist_find_custom(adapter->set_filter_list, owner,
-+				   compare_sender);
-+	if (list) {
-+		*client = list->data;
++			result_uuid = bt_uuid2string(&uuid_tmp);
++
++			*uuids = g_slist_prepend(*uuids, result_uuid);
++
++			dbus_message_iter_next(&arriter);
++		}
++	} else if (!strcmp("RSSI", key)) {
++		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_INT16)
++			return false;
++
++		dbus_message_iter_get_basic(value, rssi);
++		/* -127 <= RSSI <= +20 (spec V4.2 [Vol 2, Part E] 7.7.65.2) */
++		if (*rssi > 20 || *rssi < -127)
++			return false;
++
++	} else if (!strcmp("Pathloss", key)) {
++		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_UINT16)
++			return false;
++
++		dbus_message_iter_get_basic(value, pathloss);
++		/* pathloss filter must be smaller that PATHLOSS_MAX */
++		if (*pathloss > PATHLOSS_MAX)
++			return false;
++
++	} else if (!strcmp("Transport", key)) {
++		char *transport_str;
++
++		if (dbus_message_iter_get_arg_type(value) != DBUS_TYPE_STRING)
++			return false;
++
++		dbus_message_iter_get_basic(value, &transport_str);
++
++		if (!strcmp(transport_str, "bredr"))
++			*transport = SCAN_TYPE_BREDR;
++		else if (!strcmp(transport_str, "le"))
++			*transport = SCAN_TYPE_LE;
++		else if (!strcmp(transport_str, "auto"))
++			*transport = SCAN_TYPE_DUAL;
++		else
++			return false;
++
++	} else {
++		DBG("Unknown key parameter: %s!\n", key);
 +		return false;
 +	}
 +
-+	*client = NULL;
++	return true;
++}
++
++/* This method is responsible for parsing parameters to SetDiscoveryFilter. If
++ * filter in msg was empty, sets *filter to NULL. If whole parsing was
++ * successful, sets *filter to proper value.
++ * Returns false on any error, and true on success.
++ */
++static bool parse_discovery_filter_dict(struct discovery_filter **filter,
++					DBusMessage *msg)
++{
++	DBusMessageIter iter, subiter, dictiter, variantiter;
++	GSList *uuids = NULL;
++	uint16_t pathloss = DISTANCE_VAL_INVALID;
++	int16_t rssi = DISTANCE_VAL_INVALID;
++	uint8_t transport = SCAN_TYPE_DUAL;
++	bool is_empty = true;
++
++	dbus_message_iter_init(msg, &iter);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY ||
++	    dbus_message_iter_get_element_type(&iter) != DBUS_TYPE_DICT_ENTRY)
++		return false;
++
++	dbus_message_iter_recurse(&iter, &subiter);
++	do {
++		int type = dbus_message_iter_get_arg_type(&subiter);
++		char *key;
++
++		if (type == DBUS_TYPE_INVALID)
++			break;
++
++		is_empty = false;
++		dbus_message_iter_recurse(&subiter, &dictiter);
++
++		dbus_message_iter_get_basic(&dictiter, &key);
++		if (!dbus_message_iter_next(&dictiter))
++			goto invalid_args;
++
++		if (dbus_message_iter_get_arg_type(&dictiter) !=
++							     DBUS_TYPE_VARIANT)
++			goto invalid_args;
++
++		dbus_message_iter_recurse(&dictiter, &variantiter);
++
++		if (!parse_discovery_filter_entry(key, &variantiter, &uuids,
++						  &rssi, &pathloss, &transport))
++			goto invalid_args;
++
++		dbus_message_iter_next(&subiter);
++	} while (true);
++
++	if (is_empty) {
++		*filter = NULL;
++		return true;
++	}
++
++	/* only pathlos or rssi can be set, never both */
++	if (pathloss != DISTANCE_VAL_INVALID && rssi != DISTANCE_VAL_INVALID)
++		goto invalid_args;
++
++	DBG("filtered discovery params: transport: %d rssi: %d pathloss: %d",
++	    transport, rssi, pathloss);
++
++	*filter = g_try_malloc(sizeof(**filter));
++	if (!*filter) {
++		g_slist_free_full(uuids, g_free);
++		return false;
++	}
++
++	(*filter)->type = transport;
++	(*filter)->pathloss = pathloss;
++	(*filter)->rssi = rssi;
++	(*filter)->uuids = uuids;
++
++	return true;
++
++invalid_args:
++	g_slist_free_full(uuids, g_free);
 +	return false;
 +}
 +
- static DBusMessage *start_discovery(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
- 	struct btd_adapter *adapter = user_data;
- 	const char *sender = dbus_message_get_sender(msg);
- 	struct watch_client *client;
--	GSList *list;
-+	bool is_discovering;
- 
- 	DBG("sender %s", sender);
- 
- 	if (!(adapter->current_settings & MGMT_SETTING_POWERED))
- 		return btd_error_not_ready(msg);
- 
-+	is_discovering = get_discovery_client(adapter, sender, &client);
-+
- 	/*
- 	 * Every client can only start one discovery, if the client
- 	 * already started a discovery then return an error.
- 	 */
--	list = g_slist_find_custom(adapter->discovery_list, sender,
--						compare_sender);
--	if (list)
-+	if (is_discovering)
- 		return btd_error_busy(msg);
- 
-+	/*
-+	 * If there was pre-set filter, just reconnect it to discovery_list,
-+	 * and trigger scan.
-+	 */
-+	if (client) {
-+		adapter->set_filter_list = g_slist_remove(
-+					     adapter->set_filter_list, client);
-+		adapter->discovery_list = g_slist_prepend(
-+					     adapter->discovery_list, client);
-+		trigger_start_discovery(adapter, 0);
-+		return dbus_message_new_method_return(msg);
-+	}
-+
- 	client = g_new0(struct watch_client, 1);
- 
- 	client->adapter = adapter;
- 	client->owner = g_strdup(sender);
-+	client->discovery_filter = NULL;
- 	client->watch = g_dbus_add_disconnect_watch(dbus_conn, sender,
- 						discovery_disconnect, client,
- 						discovery_destroy);
--
- 	adapter->discovery_list = g_slist_prepend(adapter->discovery_list,
- 								client);
- 
-@@ -1928,9 +1990,10 @@ static DBusMessage *set_discovery_filter(DBusConnection *conn,
+ static DBusMessage *set_discovery_filter(DBusConnection *conn,
  					 DBusMessage *msg, void *user_data)
  {
- 	struct btd_adapter *adapter = user_data;
-+	struct watch_client *client;
- 	struct discovery_filter *discovery_filter;
--
- 	const char *sender = dbus_message_get_sender(msg);
-+	bool is_discovering;
- 
- 	DBG("sender %s", sender);
- 
-@@ -1941,7 +2004,38 @@ static DBusMessage *set_discovery_filter(DBusConnection *conn,
- 	if (!parse_discovery_filter_dict(&discovery_filter, msg))
- 		return btd_error_invalid_args(msg);
- 
--	return btd_error_failed(msg, "Not implemented yet");
-+	is_discovering = get_discovery_client(adapter, sender, &client);
++	struct btd_adapter *adapter = user_data;
++	struct discovery_filter *discovery_filter;
 +
-+	if (client) {
-+		free_discovery_filter(client->discovery_filter);
-+		client->discovery_filter = discovery_filter;
++	const char *sender = dbus_message_get_sender(msg);
 +
-+		if (discovery_filter || is_discovering)
-+			return dbus_message_new_method_return(msg);
++	DBG("sender %s", sender);
 +
-+		/* Removing pre-set filter */
-+		adapter->set_filter_list = g_slist_remove(
-+					      adapter->set_filter_list,
-+					      client);
-+		g_free(client->owner);
-+		g_free(client);
-+		DBG("successfully cleared pre-set filter");
-+	} else if (discovery_filter) {
-+		/* Client pre-setting his filter for first time */
-+		client = g_new0(struct watch_client, 1);
-+		client->adapter = adapter;
-+		client->owner = g_strdup(sender);
-+		client->discovery_filter = discovery_filter;
-+		client->watch = g_dbus_add_disconnect_watch(dbus_conn, sender,
-+						discovery_disconnect, client,
-+						discovery_destroy);
-+		adapter->set_filter_list = g_slist_prepend(
-+					     adapter->set_filter_list, client);
++	if (!(adapter->current_settings & MGMT_SETTING_POWERED))
++		return btd_error_not_ready(msg);
 +
-+		DBG("successfully pre-set filter");
-+	}
++	/* parse parameters */
++	if (!parse_discovery_filter_dict(&discovery_filter, msg))
++		return btd_error_invalid_args(msg);
 +
-+	return dbus_message_new_method_return(msg);
+ 	return btd_error_failed(msg, "Not implemented yet");
  }
- 
- static DBusMessage *stop_discovery(DBusConnection *conn,
-@@ -5166,6 +5260,18 @@ static void adapter_stop(struct btd_adapter *adapter)
- 
- 	cancel_passive_scanning(adapter);
- 
-+	while (adapter->set_filter_list) {
-+		struct watch_client *client;
-+
-+		client = adapter->set_filter_list->data;
-+
-+		/* g_dbus_remove_watch will remove the client from the
-+		 * adapter's list and free it using the discovery_destroy
-+		 * function.
-+		 */
-+		g_dbus_remove_watch(dbus_conn, client->watch);
-+	}
-+
- 	while (adapter->discovery_list) {
- 		struct watch_client *client;
  
 -- 
 2.2.0.rc0.207.ga3a616c
