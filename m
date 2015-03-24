@@ -1,109 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: Broadcom 43340 BT support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Filter list of supported commands/events for untrusted users
-Date: Tue, 24 Mar 2015 17:31:03 -0700
-Message-Id: <1427243463-13987-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <201503242237.07923.Juergen.Bausa@online.de>
+Date: Tue, 24 Mar 2015 16:42:29 -0700
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <F2171E58-C919-4EEB-9305-6BC3858A7242@holtmann.org>
+References: <201503242237.07923.Juergen.Bausa@online.de>
+To: =?utf-8?Q?J=C3=BCrgen_Bausa?= <juergen.Bausa@online.de>,
+	Arend Van Spriel <arend@broadcom.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the user of the management interface is not trusted, then it only
-has access to a limited set of commands and events. When providing the
-list of supported commands and events take the trusted vs untrusted
-status of the user into account and return different lists.
+Hi Juergen,
 
-This way the untrusted user knows exactly which commands it can
-execute and which events it can receive. So no guesswork needed.
+> I have a laptop (asus x205ta / intel-baytrail) with the broadcom 43340 
+> chipset. However, while wireless is working now, bluetooth is not. I am 
+> running debian jessie 32 bit with kernel 4.0rc4:
+> 
+> root@lina:/home/jba# hciconfig --all
+> hci0:   Type: BR/EDR  Bus: SDIO
+>        BD Address: 00:00:00:00:00:00  ACL MTU: 0:0  SCO MTU: 0:0
+>        DOWN 
+>        RX bytes:0 acl:0 sco:0 events:0 errors:0
+>        TX bytes:0 acl:0 sco:0 commands:0 errors:0
+>        Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>        Packet type: DM1 DH1 HV1 
+>        Link policy: 
+>        Link mode: SLAVE ACCEPT 
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 53 +++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 46 insertions(+), 7 deletions(-)
+can you figure out which driver is claiming that it is SDIO based? I assumed the Baytrail Bluetooth controllers are all attached via UARTs. I didn't know that Broadcom had Bluetooth on SDIO. The WiFi part yes, but the Bluetooth part should be on an UART.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index eda52397a648..38b03bd14723 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -141,6 +141,27 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_ADVERTISING_REMOVED,
- };
- 
-+static const u16 mgmt_untrusted_commands[] = {
-+	MGMT_OP_READ_INDEX_LIST,
-+	MGMT_OP_READ_INFO,
-+	MGMT_OP_READ_UNCONF_INDEX_LIST,
-+	MGMT_OP_READ_CONFIG_INFO,
-+	MGMT_OP_READ_EXT_INDEX_LIST,
-+};
-+
-+static const u16 mgmt_untrusted_events[] = {
-+	MGMT_EV_INDEX_ADDED,
-+	MGMT_EV_INDEX_REMOVED,
-+	MGMT_EV_NEW_SETTINGS,
-+	MGMT_EV_CLASS_OF_DEV_CHANGED,
-+	MGMT_EV_LOCAL_NAME_CHANGED,
-+	MGMT_EV_UNCONF_INDEX_ADDED,
-+	MGMT_EV_UNCONF_INDEX_REMOVED,
-+	MGMT_EV_NEW_CONFIG_OPTIONS,
-+	MGMT_EV_EXT_INDEX_ADDED,
-+	MGMT_EV_EXT_INDEX_REMOVED,
-+};
-+
- #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
- 
- #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
-@@ -265,14 +286,20 @@ static int read_commands(struct sock *sk, struct hci_dev *hdev, void *data,
- 			 u16 data_len)
- {
- 	struct mgmt_rp_read_commands *rp;
--	const u16 num_commands = ARRAY_SIZE(mgmt_commands);
--	const u16 num_events = ARRAY_SIZE(mgmt_events);
--	__le16 *opcode;
-+	u16 num_commands, num_events;
- 	size_t rp_size;
- 	int i, err;
- 
- 	BT_DBG("sock %p", sk);
- 
-+	if (hci_sock_test_flag(sk, HCI_SOCK_TRUSTED)) {
-+		num_commands = ARRAY_SIZE(mgmt_commands);
-+		num_events = ARRAY_SIZE(mgmt_events);
-+	} else {
-+		num_commands = ARRAY_SIZE(mgmt_untrusted_commands);
-+		num_events = ARRAY_SIZE(mgmt_untrusted_events);
-+	}
-+
- 	rp_size = sizeof(*rp) + ((num_commands + num_events) * sizeof(u16));
- 
- 	rp = kmalloc(rp_size, GFP_KERNEL);
-@@ -282,11 +309,23 @@ static int read_commands(struct sock *sk, struct hci_dev *hdev, void *data,
- 	rp->num_commands = cpu_to_le16(num_commands);
- 	rp->num_events = cpu_to_le16(num_events);
- 
--	for (i = 0, opcode = rp->opcodes; i < num_commands; i++, opcode++)
--		put_unaligned_le16(mgmt_commands[i], opcode);
-+	if (hci_sock_test_flag(sk, HCI_SOCK_TRUSTED)) {
-+		__le16 *opcode = rp->opcodes;
-+
-+		for (i = 0; i < num_commands; i++, opcode++)
-+			put_unaligned_le16(mgmt_commands[i], opcode);
-+
-+		for (i = 0; i < num_events; i++, opcode++)
-+			put_unaligned_le16(mgmt_events[i], opcode);
-+	} else {
-+		__le16 *opcode = rp->opcodes;
-+
-+		for (i = 0; i < num_commands; i++, opcode++)
-+			put_unaligned_le16(mgmt_untrusted_commands[i], opcode);
- 
--	for (i = 0; i < num_events; i++, opcode++)
--		put_unaligned_le16(mgmt_events[i], opcode);
-+		for (i = 0; i < num_events; i++, opcode++)
-+			put_unaligned_le16(mgmt_untrusted_events[i], opcode);
-+	}
- 
- 	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE, MGMT_OP_READ_COMMANDS, 0,
- 				rp, rp_size);
--- 
-2.1.0
+Please also check with "rfkill list" if the device might be blocked.
+
+Arend might know more, but you would need to dig into the list of SDIO devices. Sadly I think Linux does not yet have a lssdio tool. So maybe lshw can get us some info on what the kernel thinks about this device. Alternatively you need to dig you sysfs and look at ACPI. Maybe dmesg reveals something useful.
+
+Regards
+
+Marcel
 
