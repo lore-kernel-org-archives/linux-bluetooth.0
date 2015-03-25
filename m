@@ -2,37 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 1/7] lib: Add macros for advertising instance flags
-Date: Tue, 24 Mar 2015 20:05:48 -0700
-Message-Id: <1427252754-27889-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH 7/7] Bluetooth: Update supported_flags for AD features
+Date: Tue, 24 Mar 2015 20:03:02 -0700
+Message-Id: <1427252582-24814-7-git-send-email-armansito@chromium.org>
+In-Reply-To: <1427252582-24814-1-git-send-email-armansito@chromium.org>
+References: <1427252582-24814-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds macro definitions for possible advertising instance
-flags that can be passed to the "Add Advertising" mgmt command.
----
- lib/mgmt.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+This patch updates the "supported_flags" parameter returned from the
+"Read Advertising Features" command.
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 01d948b..eb13c42 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -498,6 +498,14 @@ struct mgmt_rp_add_advertising {
- 	uint8_t instance;
- } __packed;
+Signed-off-by: Arman Uguray <armansito@chromium.org>
+---
+ net/bluetooth/mgmt.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 8795037..a4a0d6b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6530,6 +6530,7 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
+ 	size_t rp_len;
+ 	int err;
+ 	bool instance;
++	u32 supported_flags;
  
-+#define MGMT_ADV_FLAG_CONNECTABLE	(1 << 0)
-+#define MGMT_ADV_FLAG_DISCOV		(1 << 1)
-+#define MGMT_ADV_FLAG_LIMITED_DISCOV	(1 << 2)
-+#define MGMT_ADV_FLAG_MANAGED_FLAGS	(1 << 3)
-+#define MGMT_ADV_FLAG_TX_POWER		(1 << 4)
-+#define MGMT_ADV_FLAG_APPEARANCE	(1 << 5)
-+#define MGMT_ADV_FLAG_LOCAL_NAME	(1 << 6)
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -6550,7 +6551,13 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
+ 		return -ENOMEM;
+ 	}
+ 
+-	rp->supported_flags = cpu_to_le32(0);
++	supported_flags = MGMT_ADV_FLAG_CONNECTABLE;
++	supported_flags |= MGMT_ADV_FLAG_DISCOV;
++	supported_flags |= MGMT_ADV_FLAG_LIMITED_DISCOV;
++	supported_flags |= MGMT_ADV_FLAG_MANAGED_FLAGS;
++	supported_flags |= MGMT_ADV_FLAG_TX_POWER;
 +
- #define MGMT_OP_REMOVE_ADVERTISING	0x003F
- struct mgmt_cp_remove_advertising {
- 	uint8_t instance;
++	rp->supported_flags = cpu_to_le32(supported_flags);
+ 	rp->max_adv_data_len = HCI_MAX_AD_LENGTH;
+ 	rp->max_scan_rsp_len = HCI_MAX_AD_LENGTH;
+ 	rp->max_instances = 1;
 -- 
 2.2.0.rc0.207.ga3a616c
 
