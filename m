@@ -1,42 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAPuY=zMC+MX=a-HisNnUSJ9zuORUtqukALj9hhv3EKHpTaGDEg@mail.gmail.com>
-References: <CAPuY=zMC+MX=a-HisNnUSJ9zuORUtqukALj9hhv3EKHpTaGDEg@mail.gmail.com>
-Date: Wed, 25 Mar 2015 16:21:38 +0200
-Message-ID: <CAPuY=zODx6jR_QrtLmy5TqeDTavMBcm=Y7J6mQRZu4QKHgsE3Q@mail.gmail.com>
-Subject: Fwd: bluez: using "service data" in BLE advertisement packets
-From: Alon Ziv <nolaviz@google.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH] Bluetooth: hci_ldisc: Add setup callback
+Date: Wed, 25 Mar 2015 15:19:30 +0100
+Message-Id: <1427293170-3658-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Some Bluetooth controllers require initialization before
+being used (vendor config, firmware download).
+Add possibility for a HCI UART proto to implement this
+early init via the setup callback.
 
-We are developing some applications with non-connectable BLE
-advertisers that broadcast data in a "service data" element of the
-advertisement packet. So far we have used these devices with Android
-and with iOS, both of which can easily support these devices as the
-entire advertisement packet payload is exposed to scanning
-applications.
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+---
+ drivers/bluetooth/hci_ldisc.c | 11 +++++++++++
+ drivers/bluetooth/hci_uart.h  |  1 +
+ 2 files changed, 12 insertions(+)
 
-Looking at the bluez DBus API, it appears that no equivalent
-functionality exists: in particular, when the advertisement packets
-are parsed (eir_parse() called from
-src/adapter.c:update_found_devices()) any service-data elements are
-simply discarded. Even worse (for us), if the devices' advertisements
-are not marked "discoverable" they are simply dropped outright. And
-even if the device is discoverable, it looks like we'd get only a
-single notification when the device is first seen - but we won't be
-able to verify it is still in range (i.e. continued reception of
-advertisement packets).
-
-Is the above summarization correct?
-
-(The API documentation claims to support "observer" mode, but these
-limitations actually put the lie to this statement - an observer is
-supposed to see _all_ advertisement packets, including non-first ones
-and those from non-discoverable devices...)
-
-Regards
--- Alon Ziv
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index dc487b5..48a0c25 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -261,6 +261,16 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return 0;
+ }
+ 
++static int hci_uart_setup(struct hci_dev *hdev)
++{
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++
++	if (hu->proto->setup)
++		return hu->proto->setup(hu);
++
++	return 0;
++}
++
+ /* ------ LDISC part ------ */
+ /* hci_uart_tty_open
+  *
+@@ -426,6 +436,7 @@ static int hci_uart_register_dev(struct hci_uart *hu)
+ 	hdev->close = hci_uart_close;
+ 	hdev->flush = hci_uart_flush;
+ 	hdev->send  = hci_uart_send_frame;
++	hdev->setup = hci_uart_setup;
+ 	SET_HCIDEV_DEV(hdev, hu->tty->dev);
+ 
+ 	if (test_bit(HCI_UART_RAW_DEVICE, &hu->hdev_flags))
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 247488e..074ed29 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -59,6 +59,7 @@ struct hci_uart_proto {
+ 	int (*flush)(struct hci_uart *hu);
+ 	int (*recv)(struct hci_uart *hu, void *data, int len);
+ 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
++	int (*setup)(struct hci_uart *hu);
+ 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
+ };
+ 
+-- 
+1.9.1
