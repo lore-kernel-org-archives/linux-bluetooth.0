@@ -2,97 +2,280 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v5 10/13] core/advertising: Parse ServiceData
-Date: Wed, 25 Mar 2015 16:00:58 -0700
-Message-Id: <1427324461-27651-11-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v5 12/13] shared/advertising: implement advertising_data_generate
+Date: Wed, 25 Mar 2015 16:01:00 -0700
+Message-Id: <1427324461-27651-13-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1427324461-27651-1-git-send-email-jamuraa@chromium.org>
 References: <1427324461-27651-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the ServiceData property of LEAdvertisement1
+Implements the function to provide a raw version of the advertising data
+packet for passing to the kernel.
 ---
- src/advertising.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ src/shared/advertising-data.c | 240 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 238 insertions(+), 2 deletions(-)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 1bd657c..604f7ac 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -295,6 +295,61 @@ fail:
- 	return false;
+diff --git a/src/shared/advertising-data.c b/src/shared/advertising-data.c
+index 800856c..ccef2a4 100644
+--- a/src/shared/advertising-data.c
++++ b/src/shared/advertising-data.c
+@@ -22,6 +22,21 @@
+ #include "src/shared/queue.h"
+ #include "src/shared/util.h"
+ 
++#define MAX_ADV_DATA_LEN 31
++
++#define LE_AD_TYPE_UUID16_ALL		0x03 /* 16-bit service UUIDs, all */
++#define LE_AD_TYPE_UUID32_ALL		0x05 /* 16-bit service UUIDs, all */
++#define LE_AD_TYPE_UUID128_ALL		0x07 /* 16-bit service UUIDs, all */
++#define LE_AD_TYPE_SOLICIT16		0x14 /* 16-bit service solic. UUIDs */
++#define LE_AD_TYPE_SOLICIT32		0x1F /* 32-bit service solic. UUIDs */
++#define LE_AD_TYPE_SOLICIT128		0x15 /* 128-bit service solic. UUIDs */
++#define LE_AD_TYPE_SVC_DATA16		0x16 /* Service Data - 16-bit UUID */
++#define LE_AD_TYPE_SVC_DATA32		0x20 /* Service Data - 32-bit UUID */
++#define LE_AD_TYPE_SVC_DATA128		0x21 /* Service Data - 128-bit UUID */
++#define LE_AD_TYPE_PUB_TRGT_ADDR	0x17 /* Public Target Address */
++#define LE_AD_TYPE_RND_TRGT_ADDR	0x18 /* Random Target Address */
++#define LE_AD_TYPE_MANUF_DATA		0xFF /* Manufacturer Specific Data */
++
+ struct advertising_data {
+ 	int ref_count;
+ 	struct queue *service_uuids;
+@@ -136,10 +151,231 @@ void advertising_data_unref(struct advertising_data *ad)
+ 	free(ad);
  }
  
-+static bool parse_advertising_service_data(GDBusProxy *proxy,
-+						struct advertising_data *data)
++static uint8_t uuid_list_length(struct queue *uuid_queue)
 +{
-+	DBusMessageIter iter, entries;
++	bool uuid16_included = false;
++	bool uuid32_included = false;
++	bool uuid128_included = false;
++	uint8_t length = 0;
++	const struct queue_entry *entry;
 +
-+	if (!g_dbus_proxy_get_property(proxy, "ServiceData", &iter))
-+		return true;
++	entry = queue_get_entries(uuid_queue);
 +
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		return false;
++	while (entry) {
++		bt_uuid_t *uuid = entry->data;
++		uint8_t uuid_len = bt_uuid_len(uuid);
 +
-+	dbus_message_iter_recurse(&iter, &entries);
++		length += uuid_len;
 +
-+	advertising_data_clear_manufacturer_data(data);
++		if (uuid_len == 2)
++			uuid16_included = true;
++		else if (uuid_len == 4)
++			uuid32_included = true;
++		else
++			uuid128_included = true;
 +
-+	while (dbus_message_iter_get_arg_type(&entries)
-+						== DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter value, entry;
-+		const char *uuid_str;
-+		bt_uuid_t uuid;
-+		uint8_t *service_data;
-+		int len;
-+
-+		dbus_message_iter_recurse(&entries, &entry);
-+		dbus_message_iter_get_basic(&entry, &uuid_str);
-+
-+		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
-+			goto fail;
-+
-+		dbus_message_iter_next(&entry);
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_ARRAY)
-+			goto fail;
-+
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_BYTE)
-+			goto fail;
-+
-+		dbus_message_iter_get_fixed_array(&value, &service_data, &len);
-+
-+		DBG("Adding ServiceData for %s", uuid_str);
-+
-+		advertising_data_add_service_data(data, &uuid,
-+							service_data, len);
-+
-+		dbus_message_iter_next(&entries);
++		entry = entry->next;
 +	}
 +
-+	return true;
++	if (uuid16_included)
++		length += 2;
 +
-+fail:
-+	advertising_data_clear_manufacturer_data(data);
-+	return false;
++	if (uuid32_included)
++		length += 2;
++
++	if (uuid128_included)
++		length += 2;
++
++	return length;
 +}
 +
- static void refresh_advertisement(struct advertisement *ad)
- {
- 	DBG("Refreshing advertisement: %s", ad->path);
-@@ -325,6 +380,11 @@ static bool parse_advertisement(struct advertisement *ad)
- 		return false;
- 	}
- 
-+	if (!parse_advertising_service_data(ad->proxy, ad->data)) {
-+		error("Property \"ServiceData\" failed to parse correctly");
-+		return false;
++static uint8_t mfg_data_length(struct queue *manuf_data)
++{
++	uint8_t length = 0;
++	const struct queue_entry *entry;
++
++	entry = queue_get_entries(manuf_data);
++
++	while (entry) {
++		struct manufacturer_tagged_data *data = entry->data;
++
++		length += 2 + sizeof(uint16_t) + data->len;
++
++		entry = entry->next;
 +	}
 +
- 	/* TODO: parse the rest of the properties */
++	return length;
++}
++
++static uint8_t uuid_data_length(struct queue *tagged_data)
++{
++	uint8_t length = 0;
++	const struct queue_entry *entry;
++
++	entry = queue_get_entries(tagged_data);
++
++	while (entry) {
++		struct uuid_tagged_data *data = entry->data;
++
++		length += 2 + bt_uuid_len(&data->uuid) + data->len;
++
++		entry = entry->next;
++	}
++
++	return length;
++}
++
++static uint8_t calculate_length(struct advertising_data *ad)
++{
++	uint8_t length = 0;
++
++	length += uuid_list_length(ad->service_uuids);
++
++	length += uuid_list_length(ad->solicit_uuids);
++
++	length += mfg_data_length(ad->manufacturer_data);
++
++	length += uuid_data_length(ad->service_data);
++
++	return length;
++}
++
++static void serialize_uuids(struct queue *uuids, uint8_t uuid_type,
++					uint8_t ad_type, uint8_t *buf,
++					uint8_t *pos)
++{
++	const struct queue_entry *entry = queue_get_entries(uuids);
++	bool added = false;
++	uint8_t length_pos = 0;
++
++	while (entry) {
++		bt_uuid_t *uuid = entry->data;
++
++		if (uuid->type == uuid_type) {
++			if (!added) {
++				length_pos = (*pos)++;
++				buf[(*pos)++] = ad_type;
++				added = true;
++			}
++
++			if (uuid_type != BT_UUID32)
++				bt_uuid_to_le(uuid, buf + *pos);
++			else
++				bt_put_le32(uuid->value.u32, buf + *pos);
++
++			*pos += bt_uuid_len(uuid);
++		}
++
++		entry = entry->next;
++	}
++
++	if (added)
++		buf[length_pos] = *pos - length_pos;
++}
++
++static void serialize_service_uuids(struct queue *uuids, uint8_t *buf,
++								uint8_t *pos)
++{
++	serialize_uuids(uuids, BT_UUID16, LE_AD_TYPE_UUID16_ALL, buf, pos);
++
++	serialize_uuids(uuids, BT_UUID32, LE_AD_TYPE_UUID32_ALL, buf, pos);
++
++	serialize_uuids(uuids, BT_UUID128, LE_AD_TYPE_UUID128_ALL, buf, pos);
++}
++
++static void serialize_solicit_uuids(struct queue *uuids, uint8_t *buf,
++								uint8_t *pos)
++{
++	serialize_uuids(uuids, BT_UUID16, LE_AD_TYPE_SOLICIT16, buf, pos);
++
++	serialize_uuids(uuids, BT_UUID32, LE_AD_TYPE_SOLICIT32, buf, pos);
++
++	serialize_uuids(uuids, BT_UUID128, LE_AD_TYPE_SOLICIT128, buf, pos);
++}
++
++static void serialize_manuf_data(struct queue *manuf_data, uint8_t *buf,
++								uint8_t *pos)
++{
++	const struct queue_entry *entry = queue_get_entries(manuf_data);
++
++	while (entry) {
++		struct manufacturer_tagged_data *data = entry->data;
++
++		buf[(*pos)++] = data->len + 2 + 1;
++
++		buf[(*pos)++] = LE_AD_TYPE_MANUF_DATA;
++
++		bt_put_le16(data->manufacturer_id, buf + (*pos));
++
++		*pos += 2;
++
++		memcpy(buf + *pos, data->data, data->len);
++
++		*pos += data->len;
++
++		entry = entry->next;
++	}
++}
++
++static void serialize_service_data(struct queue *service_data, uint8_t *buf,
++								uint8_t *pos)
++{
++	const struct queue_entry *entry = queue_get_entries(service_data);
++
++	while (entry) {
++		struct uuid_tagged_data *data = entry->data;
++		int uuid_len = bt_uuid_len(&data->uuid);
++
++		buf[(*pos)++] =  uuid_len + data->len + 1;
++
++		switch (uuid_len) {
++		case 2:
++			buf[(*pos)++] = LE_AD_TYPE_SVC_DATA16;
++			break;
++		case 4:
++			buf[(*pos)++] = LE_AD_TYPE_SVC_DATA32;
++			break;
++		case 16:
++			buf[(*pos)++] = LE_AD_TYPE_SVC_DATA128;
++			break;
++		}
++
++		if (uuid_len != 4)
++			bt_uuid_to_le(&data->uuid, buf + *pos);
++		else
++			bt_put_le32(data->uuid.value.u32, buf + *pos);
++
++		*pos += uuid_len;
++
++		memcpy(buf + *pos, data->data, data->len);
++
++		*pos += data->len;
++
++		entry = entry->next;
++	}
++}
++
+ uint8_t *advertising_data_generate(struct advertising_data *ad, uint8_t *length)
+ {
+-	/* TODO: implement */
+-	return NULL;
++	uint8_t *adv_data;
++	uint8_t pos = 0;
++
++	*length = calculate_length(ad);
++
++	if (*length > MAX_ADV_DATA_LEN)
++		return NULL;
++
++	adv_data = malloc(*length);
++
++	serialize_service_uuids(ad->service_uuids, adv_data, &pos);
++
++	serialize_solicit_uuids(ad->solicit_uuids, adv_data, &pos);
++
++	serialize_manuf_data(ad->manufacturer_data, adv_data, &pos);
++
++	serialize_service_data(ad->service_data, adv_data, &pos);
++
++	return adv_data;
+ }
  
- 	refresh_advertisement(ad);
+ static bool queue_add_uuid(struct queue *queue, const bt_uuid_t *uuid)
 -- 
 2.2.0.rc0.207.ga3a616c
 
