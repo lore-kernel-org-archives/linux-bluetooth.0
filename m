@@ -1,38 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <BAY176-W2D78A6F5517165B5BEDAED30B0@phx.gbl>
+References: <BAY176-W2D78A6F5517165B5BEDAED30B0@phx.gbl>
+Date: Wed, 25 Mar 2015 15:27:42 +0200
+Message-ID: <CABBYNZ+SEMRS-ogz_Czje_OgGj5=QD=gC2dhAopcVZ519Jj0mw@mail.gmail.com>
+Subject: Re: Heartrate monitor profile
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] doc/device-api: Add ServiceData and ManufacturerData
-Date: Wed, 25 Mar 2015 15:46:33 +0200
-Message-Id: <1427291193-9958-1-git-send-email-luiz.dentz@gmail.com>
+To: Ssagarr Patil <hugarsagar@outlook.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Sagar,
 
-This adds ServiceData and ManufacturerData from advertisement data.
----
- doc/device-api.txt | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+On Wed, Mar 25, 2015 at 2:11 PM, Ssagarr Patil <hugarsagar@outlook.com> wrote:
+> Hi,
+>
+> Are there any sample apps demonstrating heart rate monitoring using bluez5 ?
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index eec0024..72c597e 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -195,3 +195,14 @@ Properties	string Address [readonly]
- 
- 			Received Signal Strength Indicator of the remote
- 			device (inquiry or advertising).
-+
-+		dict ManufacturerData [readonly, optional]
-+
-+			Manufacturer specific advertisement data. Keys are
-+			16 bits Manufacturer ID followed by its byte array
-+			value.
-+
-+		dict ServiceData [readonly, optional]
-+
-+			Service advertisement data. Keys are the UUIDs in
-+			string format followed by its byte array value.
+As a client/central or server/peripheral? For the former we have a
+plugin that expose the following API:
+
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/heartrate-api.txt
+
+But I think we will probably deprecate this in favor of generic GATT
+API since heartrate does not require tight integration.
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
