@@ -1,62 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH 7/7] Bluetooth: Update supported_flags for AD features
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1427252582-24814-7-git-send-email-armansito@chromium.org>
-Date: Wed, 25 Mar 2015 09:21:10 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <4450BD63-777C-4903-88BB-3D1974971EC5@holtmann.org>
-References: <1427252582-24814-1-git-send-email-armansito@chromium.org> <1427252582-24814-7-git-send-email-armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <CAPuY=zMC+MX=a-HisNnUSJ9zuORUtqukALj9hhv3EKHpTaGDEg@mail.gmail.com>
+References: <CAPuY=zMC+MX=a-HisNnUSJ9zuORUtqukALj9hhv3EKHpTaGDEg@mail.gmail.com>
+Date: Wed, 25 Mar 2015 16:21:38 +0200
+Message-ID: <CAPuY=zODx6jR_QrtLmy5TqeDTavMBcm=Y7J6mQRZu4QKHgsE3Q@mail.gmail.com>
+Subject: Fwd: bluez: using "service data" in BLE advertisement packets
+From: Alon Ziv <nolaviz@google.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi all,
 
-> This patch updates the "supported_flags" parameter returned from the
-> "Read Advertising Features" command.
-> 
-> Signed-off-by: Arman Uguray <armansito@chromium.org>
-> ---
-> net/bluetooth/mgmt.c | 9 ++++++++-
-> 1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 8795037..a4a0d6b 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -6530,6 +6530,7 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
-> 	size_t rp_len;
-> 	int err;
-> 	bool instance;
-> +	u32 supported_flags;
-> 
-> 	BT_DBG("%s", hdev->name);
-> 
-> @@ -6550,7 +6551,13 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
-> 		return -ENOMEM;
-> 	}
-> 
-> -	rp->supported_flags = cpu_to_le32(0);
-> +	supported_flags = MGMT_ADV_FLAG_CONNECTABLE;
-> +	supported_flags |= MGMT_ADV_FLAG_DISCOV;
-> +	supported_flags |= MGMT_ADV_FLAG_LIMITED_DISCOV;
-> +	supported_flags |= MGMT_ADV_FLAG_MANAGED_FLAGS;
-> +	supported_flags |= MGMT_ADV_FLAG_TX_POWER;
-> +
+We are developing some applications with non-connectable BLE
+advertisers that broadcast data in a "service data" element of the
+advertisement packet. So far we have used these devices with Android
+and with iOS, both of which can easily support these devices as the
+entire advertisement packet payload is exposed to scanning
+applications.
 
-	supported_flags = MGMT_foo |
-			  MGMT_bar;
+Looking at the bluez DBus API, it appears that no equivalent
+functionality exists: in particular, when the advertisement packets
+are parsed (eir_parse() called from
+src/adapter.c:update_found_devices()) any service-data elements are
+simply discarded. Even worse (for us), if the devices' advertisements
+are not marked "discoverable" they are simply dropped outright. And
+even if the device is discoverable, it looks like we'd get only a
+single notification when the device is first seen - but we won't be
+able to verify it is still in range (i.e. continued reception of
+advertisement packets).
 
-I would prefer we do it this way.
+Is the above summarization correct?
 
-> +	rp->supported_flags = cpu_to_le32(supported_flags);
-> 	rp->max_adv_data_len = HCI_MAX_AD_LENGTH;
-> 	rp->max_scan_rsp_len = HCI_MAX_AD_LENGTH;
-> 	rp->max_instances = 1;
+(The API documentation claims to support "observer" mode, but these
+limitations actually put the lie to this statement - an observer is
+supposed to see _all_ advertisement packets, including non-first ones
+and those from non-discoverable devices...)
 
 Regards
-
-Marcel
-
+-- Alon Ziv
