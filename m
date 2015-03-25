@@ -1,47 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Prabhu Chawandi <foss.chaws@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: HID Over GATT
-Date: Wed, 25 Mar 2015 08:58:12 +0100
-Message-ID: <5471283.ZkqiNuijOo@leonov>
-In-Reply-To: <CAKafyqpoxYifTLCpazGFHG5g3dsvN-THX0eB9=xqVEpWD1EP+Q@mail.gmail.com>
-References: <CAKafyqpoxYifTLCpazGFHG5g3dsvN-THX0eB9=xqVEpWD1EP+Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH 7/7] tools/btmgmt: Add the 'clr-adv' command
+Date: Tue, 24 Mar 2015 20:05:54 -0700
+Message-Id: <1427252754-27889-7-git-send-email-armansito@chromium.org>
+In-Reply-To: <1427252754-27889-1-git-send-email-armansito@chromium.org>
+References: <1427252754-27889-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch introduces the 'clr-adv' command which allows users to remove
+all registered advertising instances.
+---
+ tools/btmgmt.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-On Wednesday 25 of March 2015 07:55:17 Prabhu Chawandi wrote:
-> Hi All,
-> 
->   Can any one help me understand, how can I use the
-> sample/uhid/uhid-sample.c . I have built and ran it I dint get what it
-> is doing?
-
-You don't need to run this.
-
-> With 5.28 there is no hidd daemon is there any alternative for that.
-> I want my BT LE KBD and Mouse to be paired and connected to my
-> embedded device not the Desktop linux.
-> 
-> Your inputs will be very helpful
-
-HoG is handled by bluetoothd. Just pair with device and bluetoothd will take 
-care of the rest.
-
-so:
-make sure bluetoothd is running
-
-start bluetoothctl:
-agent on
-default-agent
-scan on
-scan off
-pair <your_device_address>
-
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 54dd0f2..f64327b 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -3955,6 +3955,14 @@ static void cmd_rm_adv(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
+ 	}
+ }
+ 
++static void cmd_clr_adv(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
++{
++	char *all_instances = "0";
++	char *rm_argv[] = { "rm-adv", all_instances, NULL };
++
++	cmd_rm_adv(mgmt, index, 2, rm_argv);
++}
++
+ struct cmd_info {
+ 	char *cmd;
+ 	void (*func)(struct mgmt *mgmt, uint16_t index, int argc, char **argv);
+@@ -4018,8 +4026,9 @@ static struct cmd_info all_cmd[] = {
+ 	{ "bredr-oob",	cmd_bredr_oob,	"Local OOB data (BR/EDR)"	},
+ 	{ "le-oob",	cmd_le_oob,	"Local OOB data (LE)"		},
+ 	{ "advinfo",	cmd_advinfo,	"Show advertising features"	},
+-	{ "add-adv",	cmd_add_adv,	"Add Advertising Data"		},
+-	{ "rm-adv",	cmd_rm_adv,	"Remove Advertising Data"	},
++	{ "add-adv",	cmd_add_adv,	"Add advertising instance"	},
++	{ "rm-adv",	cmd_rm_adv,	"Remove advertising instance"	},
++	{ "clr-adv",	cmd_clr_adv,	"Clear advertising instances"	},
+ };
+ 
+ static void cmd_quit(struct mgmt *mgmt, uint16_t index,
 -- 
-BR
-Szymon Janc
+2.2.0.rc0.207.ga3a616c
+
