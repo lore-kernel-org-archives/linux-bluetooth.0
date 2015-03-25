@@ -1,66 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] Bluetooth: hci_ldisc: Add setup callback
-Date: Wed, 25 Mar 2015 15:19:30 +0100
-Message-Id: <1427293170-3658-1-git-send-email-loic.poulain@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC BlueZ] doc/device-api: Add ServiceData and ManufacturerData
+Date: Wed, 25 Mar 2015 15:46:33 +0200
+Message-Id: <1427291193-9958-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some Bluetooth controllers require initialization before
-being used (vendor config, firmware download).
-Add possibility for a HCI UART proto to implement this
-early init via the setup callback.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+This adds ServiceData and ManufacturerData from advertisement data.
 ---
- drivers/bluetooth/hci_ldisc.c | 11 +++++++++++
- drivers/bluetooth/hci_uart.h  |  1 +
- 2 files changed, 12 insertions(+)
+ doc/device-api.txt | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index dc487b5..48a0c25 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -261,6 +261,16 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
- }
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index eec0024..72c597e 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -195,3 +195,14 @@ Properties	string Address [readonly]
  
-+static int hci_uart_setup(struct hci_dev *hdev)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 			Received Signal Strength Indicator of the remote
+ 			device (inquiry or advertising).
 +
-+	if (hu->proto->setup)
-+		return hu->proto->setup(hu);
++		dict ManufacturerData [readonly, optional]
 +
-+	return 0;
-+}
++			Manufacturer specific advertisement data. Keys are
++			16 bits Manufacturer ID followed by its byte array
++			value.
 +
- /* ------ LDISC part ------ */
- /* hci_uart_tty_open
-  *
-@@ -426,6 +436,7 @@ static int hci_uart_register_dev(struct hci_uart *hu)
- 	hdev->close = hci_uart_close;
- 	hdev->flush = hci_uart_flush;
- 	hdev->send  = hci_uart_send_frame;
-+	hdev->setup = hci_uart_setup;
- 	SET_HCIDEV_DEV(hdev, hu->tty->dev);
- 
- 	if (test_bit(HCI_UART_RAW_DEVICE, &hu->hdev_flags))
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 247488e..074ed29 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -59,6 +59,7 @@ struct hci_uart_proto {
- 	int (*flush)(struct hci_uart *hu);
- 	int (*recv)(struct hci_uart *hu, void *data, int len);
- 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
-+	int (*setup)(struct hci_uart *hu);
- 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
- };
- 
++		dict ServiceData [readonly, optional]
++
++			Service advertisement data. Keys are the UUIDs in
++			string format followed by its byte array value.
 -- 
-1.9.1
+2.1.0
+
