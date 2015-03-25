@@ -2,51 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 5/7] Bluetooth: Support the "managed-flags" adv flag
-Date: Tue, 24 Mar 2015 20:03:00 -0700
-Message-Id: <1427252582-24814-5-git-send-email-armansito@chromium.org>
+Subject: [PATCH 4/7] Bluetooth: Support the "limited-discoverable" adv flag
+Date: Tue, 24 Mar 2015 20:02:59 -0700
+Message-Id: <1427252582-24814-4-git-send-email-armansito@chromium.org>
 In-Reply-To: <1427252582-24814-1-git-send-email-armansito@chromium.org>
 References: <1427252582-24814-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for the "managed-flags" flag of the Add
-Advertising command.
+This patch adds support for the "limited-discoverable" flag of the
+Add Advertising command.
 
 Signed-off-by: Arman Uguray <armansito@chromium.org>
 ---
- net/bluetooth/mgmt.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ net/bluetooth/mgmt.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 846546d..9905614b 100644
+index b197dc1..846546d 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -986,7 +986,13 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 *ptr)
- 	if (hdev->adv_instance.flags & MGMT_ADV_FLAG_LIMITED_DISCOV)
- 		flags |= LE_AD_LIMITED;
+@@ -977,9 +977,15 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 *ptr)
+ {
+ 	u8 ad_len = 0, flags = 0;
  
--	if (flags) {
-+	if (flags || (hdev->adv_instance.flags & MGMT_ADV_FLAG_MANAGED_FLAGS)) {
-+		/* If a discovery flag wasn't provided, simply use the global
-+		 * settings.
-+		 */
-+		if (!flags)
-+			flags |= get_adv_discov_flags(hdev);
++	/* The Add Advertising command allows userspace to set both the general
++	 * and limited discoverable flags.
++	 */
+ 	if (hdev->adv_instance.flags & MGMT_ADV_FLAG_DISCOV)
+ 		flags |= LE_AD_GENERAL;
+ 
++	if (hdev->adv_instance.flags & MGMT_ADV_FLAG_LIMITED_DISCOV)
++		flags |= LE_AD_LIMITED;
 +
+ 	if (flags) {
  		if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
  			flags |= LE_AD_NO_BREDR;
- 
-@@ -6565,7 +6571,8 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
+@@ -6559,8 +6565,9 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
  	u8 max_len = HCI_MAX_AD_LENGTH;
  	int i, cur_len;
  	bool flags_managed = false;
--	u32 flags_params = MGMT_ADV_FLAG_DISCOV | MGMT_ADV_FLAG_LIMITED_DISCOV;
-+	u32 flags_params = MGMT_ADV_FLAG_DISCOV | MGMT_ADV_FLAG_LIMITED_DISCOV |
-+			   MGMT_ADV_FLAG_MANAGED_FLAGS;
++	u32 flags_params = MGMT_ADV_FLAG_DISCOV | MGMT_ADV_FLAG_LIMITED_DISCOV;
  
- 	if (is_adv_data && (adv_flags & flags_params)) {
+-	if (is_adv_data && (adv_flags & MGMT_ADV_FLAG_DISCOV)) {
++	if (is_adv_data && (adv_flags & flags_params)) {
  		flags_managed = true;
+ 		max_len -= 3;
+ 	}
 -- 
 2.2.0.rc0.207.ga3a616c
 
