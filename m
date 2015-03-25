@@ -2,49 +2,73 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 7/7] Bluetooth: Update supported_flags for AD features
-Date: Tue, 24 Mar 2015 20:03:02 -0700
-Message-Id: <1427252582-24814-7-git-send-email-armansito@chromium.org>
+Subject: [PATCH 6/7] Bluetooth: Support the "tx-power" adv flag
+Date: Tue, 24 Mar 2015 20:03:01 -0700
+Message-Id: <1427252582-24814-6-git-send-email-armansito@chromium.org>
 In-Reply-To: <1427252582-24814-1-git-send-email-armansito@chromium.org>
 References: <1427252582-24814-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates the "supported_flags" parameter returned from the
-"Read Advertising Features" command.
+This patch adds support for the "tx-power" flag of the Add
+Advertising command.
 
 Signed-off-by: Arman Uguray <armansito@chromium.org>
 ---
- net/bluetooth/mgmt.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8795037..a4a0d6b 100644
+index 9905614b..8795037 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -6530,6 +6530,7 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- 	size_t rp_len;
- 	int err;
- 	bool instance;
-+	u32 supported_flags;
- 
- 	BT_DBG("%s", hdev->name);
- 
-@@ -6550,7 +6551,13 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- 		return -ENOMEM;
+@@ -1004,6 +1004,16 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 *ptr)
+ 		ptr += 3;
  	}
  
--	rp->supported_flags = cpu_to_le32(0);
-+	supported_flags = MGMT_ADV_FLAG_CONNECTABLE;
-+	supported_flags |= MGMT_ADV_FLAG_DISCOV;
-+	supported_flags |= MGMT_ADV_FLAG_LIMITED_DISCOV;
-+	supported_flags |= MGMT_ADV_FLAG_MANAGED_FLAGS;
-+	supported_flags |= MGMT_ADV_FLAG_TX_POWER;
++	if (hdev->adv_tx_power != HCI_TX_POWER_INVALID &&
++	    (hdev->adv_instance.flags & MGMT_ADV_FLAG_TX_POWER)) {
++		ptr[0] = 0x02;
++		ptr[1] = EIR_TX_POWER;
++		ptr[2] = (u8)hdev->adv_tx_power;
 +
-+	rp->supported_flags = cpu_to_le32(supported_flags);
- 	rp->max_adv_data_len = HCI_MAX_AD_LENGTH;
- 	rp->max_scan_rsp_len = HCI_MAX_AD_LENGTH;
- 	rp->max_instances = 1;
++		ad_len += 3;
++		ptr += 3;
++	}
++
+ 	memcpy(ptr, hdev->adv_instance.adv_data,
+ 	       hdev->adv_instance.adv_data_len);
+ 	ad_len += hdev->adv_instance.adv_data_len;
+@@ -6571,6 +6581,7 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
+ 	u8 max_len = HCI_MAX_AD_LENGTH;
+ 	int i, cur_len;
+ 	bool flags_managed = false;
++	bool tx_power_managed = false;
+ 	u32 flags_params = MGMT_ADV_FLAG_DISCOV | MGMT_ADV_FLAG_LIMITED_DISCOV |
+ 			   MGMT_ADV_FLAG_MANAGED_FLAGS;
+ 
+@@ -6579,6 +6590,11 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
+ 		max_len -= 3;
+ 	}
+ 
++	if (is_adv_data && (adv_flags & MGMT_ADV_FLAG_TX_POWER)) {
++		tx_power_managed = true;
++		max_len -= 3;
++	}
++
+ 	if (len > max_len)
+ 		return false;
+ 
+@@ -6589,6 +6605,9 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
+ 		if (flags_managed && data[i + 1] == EIR_FLAGS)
+ 			return false;
+ 
++		if (tx_power_managed && data[i + 1] == EIR_TX_POWER)
++			return false;
++
+ 		/* If the current field length would exceed the total data
+ 		 * length, then it's invalid.
+ 		 */
 -- 
 2.2.0.rc0.207.ga3a616c
 
