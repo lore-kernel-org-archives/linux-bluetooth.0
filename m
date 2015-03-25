@@ -2,58 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] android/avrcp: Move SDP features defines to common header
-Date: Wed, 25 Mar 2015 09:52:47 +0100
-Message-Id: <1427273567-8711-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1427273567-8711-1-git-send-email-szymon.janc@tieto.com>
-References: <1427273567-8711-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/2] audio/control: Remove unused control_is_active function
+Date: Wed, 25 Mar 2015 09:52:46 +0100
+Message-Id: <1427273567-8711-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Those will be used also by linux implementation so no need to
-duplicate them.
 ---
- android/avrcp-lib.h | 10 ++++++++++
- android/avrcp.c     |  5 -----
- 2 files changed, 10 insertions(+), 5 deletions(-)
+ profiles/audio/control.c | 10 ----------
+ profiles/audio/control.h |  1 -
+ 2 files changed, 11 deletions(-)
 
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 8e6ee40..add7739 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -126,6 +126,16 @@
- #define AVRCP_MEDIA_SEARCH			0x02
- #define AVRCP_MEDIA_NOW_PLAYING			0x03
+diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+index 4db5b92..f4656d8 100644
+--- a/profiles/audio/control.c
++++ b/profiles/audio/control.c
+@@ -338,13 +338,3 @@ int control_init_remote(struct btd_service *service)
  
-+/* SDP features */
-+#define AVRCP_FEATURE_CATEGORY_1	0x0001
-+#define AVRCP_FEATURE_CATEGORY_2	0x0002
-+#define AVRCP_FEATURE_CATEGORY_3	0x0004
-+#define AVRCP_FEATURE_CATEGORY_4	0x0008
-+#define AVRCP_FEATURE_PLAYER_SETTINGS	0x0010
-+#define AVRCP_FEATURE_GROUP_NAVIGATION	0x0020
-+#define AVRCP_FEATURE_BROWSING		0x0040
-+#define AVRCP_FEATURE_MULTIPLE_PLAYERS	0x0080
-+
- /* Company IDs for vendor dependent commands */
- #define IEEEID_BTSIG		0x001958
- 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index a0d412d..bcb4228 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -49,11 +49,6 @@
- 
- #define L2CAP_PSM_AVCTP 0x17
- 
--#define AVRCP_FEATURE_CATEGORY_1	0x0001
--#define AVRCP_FEATURE_CATEGORY_2	0x0002
--#define AVRCP_FEATURE_CATEGORY_3	0x0004
--#define AVRCP_FEATURE_CATEGORY_4	0x0008
+ 	return 0;
+ }
 -
- static bdaddr_t adapter_addr;
- static uint32_t record_tg_id = 0;
- static uint32_t record_ct_id = 0;
+-gboolean control_is_active(struct btd_service *service)
+-{
+-	struct control *control = btd_service_get_user_data(service);
+-
+-	if (control && control->session)
+-		return TRUE;
+-
+-	return FALSE;
+-}
+diff --git a/profiles/audio/control.h b/profiles/audio/control.h
+index da8f16c..4bda896 100644
+--- a/profiles/audio/control.h
++++ b/profiles/audio/control.h
+@@ -29,7 +29,6 @@ struct btd_service;
+ int control_init_target(struct btd_service *service);
+ int control_init_remote(struct btd_service *service);
+ void control_unregister(struct btd_service *service);
+-gboolean control_is_active(struct btd_service *service);
+ 
+ int control_connect(struct btd_service *service);
+ int control_disconnect(struct btd_service *service);
 -- 
 1.9.3
 
