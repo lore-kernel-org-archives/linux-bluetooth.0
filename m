@@ -1,55 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5512919B.9000707@broadcom.com>
-Date: Wed, 25 Mar 2015 11:44:43 +0100
-From: Arend van Spriel <arend@broadcom.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: =?ISO-8859-1?Q?J=FCrgen_Bausa?= <juergen.Bausa@online.de>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: Broadcom 43340 BT support
-References: <201503242237.07923.Juergen.Bausa@online.de> <F2171E58-C919-4EEB-9305-6BC3858A7242@holtmann.org>
-In-Reply-To: <F2171E58-C919-4EEB-9305-6BC3858A7242@holtmann.org>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+In-Reply-To: <1427123467-13445-1-git-send-email-jamuraa@chromium.org>
+References: <1427123467-13445-1-git-send-email-jamuraa@chromium.org>
+Date: Wed, 25 Mar 2015 12:43:56 +0200
+Message-ID: <CABBYNZLkt=9QHdCDxBekk4jby1P2NL9B1NFqOD34PZEEnzVz0Q@mail.gmail.com>
+Subject: Re: [BlueZ v4 00/15] Introduce LE Advertisement D-Bus API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 03/25/15 00:42, Marcel Holtmann wrote:
-> Hi Juergen,
->
->> I have a laptop (asus x205ta / intel-baytrail) with the broadcom 43340
->> chipset. However, while wireless is working now, bluetooth is not. I am
->> running debian jessie 32 bit with kernel 4.0rc4:
->>
->> root@lina:/home/jba# hciconfig --all
->> hci0:   Type: BR/EDR  Bus: SDIO
->>         BD Address: 00:00:00:00:00:00  ACL MTU: 0:0  SCO MTU: 0:0
->>         DOWN
->>         RX bytes:0 acl:0 sco:0 events:0 errors:0
->>         TX bytes:0 acl:0 sco:0 commands:0 errors:0
->>         Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
->>         Packet type: DM1 DH1 HV1
->>         Link policy:
->>         Link mode: SLAVE ACCEPT
->
-> can you figure out which driver is claiming that it is SDIO based? I assumed the Baytrail Bluetooth controllers are all attached via UARTs. I didn't know that Broadcom had Bluetooth on SDIO. The WiFi part yes, but the Bluetooth part should be on an UART.
+Hi Michael,
 
-According to documentation SDIO function #3 is providing access to BT 
-over SDIO. However, I did not (yet) come across any device that uses 
-that. I did find some devices where function #3 cis says BT and btsdio 
-claims it, but the BT part is not hooked up to it. So it is either usb 
-or uart. For uart our BT group plans to upstream a new driver (something 
-they never did before), but have not heard much on that recently.
-
-> Please also check with "rfkill list" if the device might be blocked.
+On Mon, Mar 23, 2015 at 5:10 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+> Introduces and starts implementation of a LE Advertisement API.
 >
-> Arend might know more, but you would need to dig into the list of SDIO devices. Sadly I think Linux does not yet have a lssdio tool. So maybe lshw can get us some info on what the kernel thinks about this device. Alternatively you need to dig you sysfs and look at ACPI. Maybe dmesg reveals something useful.
-
-You can confirm it is function #3 of the same mmc device as wifi, but 
-chances are BT requires the UART driver.
-
-Regards,
-Arend
-
-> Regards
+> Things that are missing still (and added to the TODO):
+>  * MGMT API for modifying the LE Advertisements
+>  * Semantics for multiple Advertisements (currently any more than one will fail)
+>  * TX Power property parsing / interface
 >
-> Marcel
+> v1 -> v2:
+>  * Cleanup based on comments from Arman
+>  * Add g_dbus_proxy_set_read_watch function to avoid ObjectManager dependency
+>  * Consolidate script updates into single test script
 >
+> v2 -> v3:
+>  * Change "ManufacturerSpecificData" to "ManufacturerData"
+>  * Add advertisement-api.txt to EXTRA_DIST
+>  * Add Release() callback to org.bluez.LEAdvertisement1
+>  * Remove IncludePower from the LEAdvertisement1 API
+>
+> v3 -> v4:
+>  * Rename "g_dbus_proxy_set_read_watch" to "g_dbus_proxy_set_ready_watch"
+>
+> Michael Janssen (15):
+>   doc: Add LE Advertisement D-Bus API documentation
+>   core: advertising: add LEAdvertisingManager stubs
+>   gdbus/client: add g_dbus_proxy_set_ready_watch
+>   unit/test-dbus-client: test for g_dbus_set_ready_watch
+>   advertising-manager: Implement RegisterAdvertisement
+>   tools: Python script to test Advertisement API
+>   build: add advertising-api.txt to docs distributed
+>   advertising-manager: implement UnregisterAdvertisement
+>   shared: add advertising-data
+>   advertising-manager: use advertising_data
+>   advertising-manager: Parse ServiceUUIDs
+>   advertising-manager: Parse SolicitUUIDs
+>   advertising-manager: Parse ManufacturerSpecificData
+>   advertising-manager: Parse ServiceData
+>   Update TODO for LE Advertising
+>
+>  Makefile.am                   |   5 +-
+>  TODO                          |  21 +-
+>  doc/advertising-api.txt       | 101 +++++++
+>  gdbus/client.c                |  17 ++
+>  gdbus/gdbus.h                 |   3 +
+>  src/adapter.c                 |  19 ++
+>  src/advertising-manager.c     | 614 ++++++++++++++++++++++++++++++++++++++++++
+>  src/advertising-manager.h     |  25 ++
+>  src/shared/advertising-data.c | 349 ++++++++++++++++++++++++
+>  src/shared/advertising-data.h |  69 +++++
+>  tools/advertisement-example   | 170 ++++++++++++
+>  unit/test-gdbus-client.c      |  66 +++++
+>  12 files changed, 1448 insertions(+), 11 deletions(-)
+>  create mode 100644 doc/advertising-api.txt
+>  create mode 100644 src/advertising-manager.c
+>  create mode 100644 src/advertising-manager.h
+>  create mode 100644 src/shared/advertising-data.c
+>  create mode 100644 src/shared/advertising-data.h
+>  create mode 100644 tools/advertisement-example
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
+
+Patch 01/15 was already applied, since I applied my patch for of gdbus
+you will probably need to rebase and once you do please change the
+name of the file to just advertising.c and make the prefix
+core/advertising: for the patches touching it.
+
+
+-- 
+Luiz Augusto von Dentz
