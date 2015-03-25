@@ -2,280 +2,149 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v5 12/13] shared/advertising: implement advertising_data_generate
-Date: Wed, 25 Mar 2015 16:01:00 -0700
-Message-Id: <1427324461-27651-13-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v5 13/13] core/advertising: Add and Remove AD using MGMT
+Date: Wed, 25 Mar 2015 16:01:01 -0700
+Message-Id: <1427324461-27651-14-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1427324461-27651-1-git-send-email-jamuraa@chromium.org>
 References: <1427324461-27651-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implements the function to provide a raw version of the advertising data
-packet for passing to the kernel.
+Updates the advertising manager to add and remove the LE Advertising Data
+using MGMT interface commands.
 ---
- src/shared/advertising-data.c | 240 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 238 insertions(+), 2 deletions(-)
+ src/advertising.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 57 insertions(+), 6 deletions(-)
 
-diff --git a/src/shared/advertising-data.c b/src/shared/advertising-data.c
-index 800856c..ccef2a4 100644
---- a/src/shared/advertising-data.c
-+++ b/src/shared/advertising-data.c
-@@ -22,6 +22,21 @@
+diff --git a/src/advertising.c b/src/advertising.c
+index 604f7ac..2fab8d0 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -26,6 +26,7 @@
+ #include <gdbus/gdbus.h>
+ 
+ #include "lib/bluetooth.h"
++#include "lib/mgmt.h"
+ #include "lib/sdp.h"
+ 
+ #include "adapter.h"
+@@ -33,6 +34,7 @@
+ #include "error.h"
+ #include "log.h"
+ #include "src/shared/advertising-data.h"
++#include "src/shared/mgmt.h"
  #include "src/shared/queue.h"
  #include "src/shared/util.h"
  
-+#define MAX_ADV_DATA_LEN 31
-+
-+#define LE_AD_TYPE_UUID16_ALL		0x03 /* 16-bit service UUIDs, all */
-+#define LE_AD_TYPE_UUID32_ALL		0x05 /* 16-bit service UUIDs, all */
-+#define LE_AD_TYPE_UUID128_ALL		0x07 /* 16-bit service UUIDs, all */
-+#define LE_AD_TYPE_SOLICIT16		0x14 /* 16-bit service solic. UUIDs */
-+#define LE_AD_TYPE_SOLICIT32		0x1F /* 32-bit service solic. UUIDs */
-+#define LE_AD_TYPE_SOLICIT128		0x15 /* 128-bit service solic. UUIDs */
-+#define LE_AD_TYPE_SVC_DATA16		0x16 /* Service Data - 16-bit UUID */
-+#define LE_AD_TYPE_SVC_DATA32		0x20 /* Service Data - 32-bit UUID */
-+#define LE_AD_TYPE_SVC_DATA128		0x21 /* Service Data - 128-bit UUID */
-+#define LE_AD_TYPE_PUB_TRGT_ADDR	0x17 /* Public Target Address */
-+#define LE_AD_TYPE_RND_TRGT_ADDR	0x18 /* Random Target Address */
-+#define LE_AD_TYPE_MANUF_DATA		0xFF /* Manufacturer Specific Data */
-+
- struct advertising_data {
- 	int ref_count;
- 	struct queue *service_uuids;
-@@ -136,10 +151,231 @@ void advertising_data_unref(struct advertising_data *ad)
- 	free(ad);
- }
+@@ -41,6 +43,8 @@
  
-+static uint8_t uuid_list_length(struct queue *uuid_queue)
-+{
-+	bool uuid16_included = false;
-+	bool uuid32_included = false;
-+	bool uuid128_included = false;
-+	uint8_t length = 0;
-+	const struct queue_entry *entry;
-+
-+	entry = queue_get_entries(uuid_queue);
-+
-+	while (entry) {
-+		bt_uuid_t *uuid = entry->data;
-+		uint8_t uuid_len = bt_uuid_len(uuid);
-+
-+		length += uuid_len;
-+
-+		if (uuid_len == 2)
-+			uuid16_included = true;
-+		else if (uuid_len == 4)
-+			uuid32_included = true;
-+		else
-+			uuid128_included = true;
-+
-+		entry = entry->next;
-+	}
-+
-+	if (uuid16_included)
-+		length += 2;
-+
-+	if (uuid32_included)
-+		length += 2;
-+
-+	if (uuid128_included)
-+		length += 2;
-+
-+	return length;
-+}
-+
-+static uint8_t mfg_data_length(struct queue *manuf_data)
-+{
-+	uint8_t length = 0;
-+	const struct queue_entry *entry;
-+
-+	entry = queue_get_entries(manuf_data);
-+
-+	while (entry) {
-+		struct manufacturer_tagged_data *data = entry->data;
-+
-+		length += 2 + sizeof(uint16_t) + data->len;
-+
-+		entry = entry->next;
-+	}
-+
-+	return length;
-+}
-+
-+static uint8_t uuid_data_length(struct queue *tagged_data)
-+{
-+	uint8_t length = 0;
-+	const struct queue_entry *entry;
-+
-+	entry = queue_get_entries(tagged_data);
-+
-+	while (entry) {
-+		struct uuid_tagged_data *data = entry->data;
-+
-+		length += 2 + bt_uuid_len(&data->uuid) + data->len;
-+
-+		entry = entry->next;
-+	}
-+
-+	return length;
-+}
-+
-+static uint8_t calculate_length(struct advertising_data *ad)
-+{
-+	uint8_t length = 0;
-+
-+	length += uuid_list_length(ad->service_uuids);
-+
-+	length += uuid_list_length(ad->solicit_uuids);
-+
-+	length += mfg_data_length(ad->manufacturer_data);
-+
-+	length += uuid_data_length(ad->service_data);
-+
-+	return length;
-+}
-+
-+static void serialize_uuids(struct queue *uuids, uint8_t uuid_type,
-+					uint8_t ad_type, uint8_t *buf,
-+					uint8_t *pos)
-+{
-+	const struct queue_entry *entry = queue_get_entries(uuids);
-+	bool added = false;
-+	uint8_t length_pos = 0;
-+
-+	while (entry) {
-+		bt_uuid_t *uuid = entry->data;
-+
-+		if (uuid->type == uuid_type) {
-+			if (!added) {
-+				length_pos = (*pos)++;
-+				buf[(*pos)++] = ad_type;
-+				added = true;
-+			}
-+
-+			if (uuid_type != BT_UUID32)
-+				bt_uuid_to_le(uuid, buf + *pos);
-+			else
-+				bt_put_le32(uuid->value.u32, buf + *pos);
-+
-+			*pos += bt_uuid_len(uuid);
-+		}
-+
-+		entry = entry->next;
-+	}
-+
-+	if (added)
-+		buf[length_pos] = *pos - length_pos;
-+}
-+
-+static void serialize_service_uuids(struct queue *uuids, uint8_t *buf,
-+								uint8_t *pos)
-+{
-+	serialize_uuids(uuids, BT_UUID16, LE_AD_TYPE_UUID16_ALL, buf, pos);
-+
-+	serialize_uuids(uuids, BT_UUID32, LE_AD_TYPE_UUID32_ALL, buf, pos);
-+
-+	serialize_uuids(uuids, BT_UUID128, LE_AD_TYPE_UUID128_ALL, buf, pos);
-+}
-+
-+static void serialize_solicit_uuids(struct queue *uuids, uint8_t *buf,
-+								uint8_t *pos)
-+{
-+	serialize_uuids(uuids, BT_UUID16, LE_AD_TYPE_SOLICIT16, buf, pos);
-+
-+	serialize_uuids(uuids, BT_UUID32, LE_AD_TYPE_SOLICIT32, buf, pos);
-+
-+	serialize_uuids(uuids, BT_UUID128, LE_AD_TYPE_SOLICIT128, buf, pos);
-+}
-+
-+static void serialize_manuf_data(struct queue *manuf_data, uint8_t *buf,
-+								uint8_t *pos)
-+{
-+	const struct queue_entry *entry = queue_get_entries(manuf_data);
-+
-+	while (entry) {
-+		struct manufacturer_tagged_data *data = entry->data;
-+
-+		buf[(*pos)++] = data->len + 2 + 1;
-+
-+		buf[(*pos)++] = LE_AD_TYPE_MANUF_DATA;
-+
-+		bt_put_le16(data->manufacturer_id, buf + (*pos));
-+
-+		*pos += 2;
-+
-+		memcpy(buf + *pos, data->data, data->len);
-+
-+		*pos += data->len;
-+
-+		entry = entry->next;
-+	}
-+}
-+
-+static void serialize_service_data(struct queue *service_data, uint8_t *buf,
-+								uint8_t *pos)
-+{
-+	const struct queue_entry *entry = queue_get_entries(service_data);
-+
-+	while (entry) {
-+		struct uuid_tagged_data *data = entry->data;
-+		int uuid_len = bt_uuid_len(&data->uuid);
-+
-+		buf[(*pos)++] =  uuid_len + data->len + 1;
-+
-+		switch (uuid_len) {
-+		case 2:
-+			buf[(*pos)++] = LE_AD_TYPE_SVC_DATA16;
-+			break;
-+		case 4:
-+			buf[(*pos)++] = LE_AD_TYPE_SVC_DATA32;
-+			break;
-+		case 16:
-+			buf[(*pos)++] = LE_AD_TYPE_SVC_DATA128;
-+			break;
-+		}
-+
-+		if (uuid_len != 4)
-+			bt_uuid_to_le(&data->uuid, buf + *pos);
-+		else
-+			bt_put_le32(data->uuid.value.u32, buf + *pos);
-+
-+		*pos += uuid_len;
-+
-+		memcpy(buf + *pos, data->data, data->len);
-+
-+		*pos += data->len;
-+
-+		entry = entry->next;
-+	}
-+}
-+
- uint8_t *advertising_data_generate(struct advertising_data *ad, uint8_t *length)
+ struct btd_advertising_manager {
+ 	struct btd_adapter *adapter;
++	struct mgmt *mgmt;
++	uint16_t mgmt_index;
+ 	struct queue *adverts;
+ };
+ 
+@@ -55,7 +59,7 @@ struct advertisement {
+ 	GDBusProxy *proxy;
+ 	DBusMessage *reg;
+ 	uint8_t type; /* Advertising type */
+-	bool published;
++	uint8_t instance;
+ 	struct advertising_data *data;
+ };
+ 
+@@ -125,10 +129,15 @@ static void advertisement_destroy(void *data)
+ static void advertisement_remove(void *data)
  {
--	/* TODO: implement */
--	return NULL;
-+	uint8_t *adv_data;
-+	uint8_t pos = 0;
+ 	struct advertisement *ad = data;
++	struct mgmt_cp_remove_advertising cp;
+ 
+ 	g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
+ 
+-	/* TODO: mgmt API call to remove advert */
++	cp.instance = ad->instance;
 +
-+	*length = calculate_length(ad);
-+
-+	if (*length > MAX_ADV_DATA_LEN)
-+		return NULL;
-+
-+	adv_data = malloc(*length);
-+
-+	serialize_service_uuids(ad->service_uuids, adv_data, &pos);
-+
-+	serialize_solicit_uuids(ad->solicit_uuids, adv_data, &pos);
-+
-+	serialize_manuf_data(ad->manufacturer_data, adv_data, &pos);
-+
-+	serialize_service_data(ad->service_data, adv_data, &pos);
-+
-+	return adv_data;
++	mgmt_send(ad->manager->mgmt, MGMT_OP_REMOVE_ADVERTISING,
++			ad->manager->mgmt_index, sizeof(cp), &cp, NULL, NULL,
++			NULL);
+ 
+ 	queue_remove(ad->manager->adverts, ad);
+ 
+@@ -350,12 +359,44 @@ fail:
+ 	return false;
  }
  
- static bool queue_add_uuid(struct queue *queue, const bt_uuid_t *uuid)
++static void add_advertising_callback(uint8_t status, uint16_t length,
++					  const void *param, void *user_data)
++{
++	struct advertisement *ad = user_data;
++	const struct mgmt_rp_add_advertising *rp = param;
++
++	if (status || !param) {
++		error("Failed to set advertising data!");
++		return;
++	}
++
++	ad->instance = rp->instance;
++}
++
+ static void refresh_advertisement(struct advertisement *ad)
+ {
++	struct mgmt_cp_add_advertising *cp;
++	uint8_t adv_data_len, param_len;
++	uint8_t *adv_data;
++
+ 	DBG("Refreshing advertisement: %s", ad->path);
+-	if (!ad->published) {
+-		/* TODO: MGMT API call to update the advertisement */
+-	}
++
++	adv_data = advertising_data_generate(ad->data, &adv_data_len);
++
++	param_len = sizeof(struct mgmt_cp_add_advertising) + adv_data_len;
++
++	cp = malloc(param_len);
++
++	cp->instance = ad->instance;
++	cp->flags = 0;
++	cp->duration = 0;
++	cp->timeout = 0;
++	cp->adv_data_len = adv_data_len;
++	memcpy(cp->data, adv_data, adv_data_len);
++
++	mgmt_send(ad->manager->mgmt, MGMT_OP_ADD_ADVERTISING,
++					ad->manager->mgmt_index, param_len, cp,
++					add_advertising_callback, ad, NULL);
+ }
+ 
+ static bool parse_advertisement(struct advertisement *ad)
+@@ -432,7 +473,7 @@ static struct advertisement *advertisement_create(DBusConnection *conn,
+ 	if (!ad)
+ 		return NULL;
+ 
+-	ad->published = false;
++	ad->instance = 1;
+ 
+ 	ad->client = g_dbus_client_new_full(conn, sender, path, path);
+ 	if (!ad->client)
+@@ -571,6 +612,16 @@ advertising_manager_create(struct btd_adapter *adapter)
+ 
+ 	manager->adapter = adapter;
+ 
++	manager->mgmt = mgmt_new_default();
++
++	if (!manager->mgmt) {
++		error("Failed to access management interface");
++		free(manager);
++		return NULL;
++	}
++
++	manager->mgmt_index = btd_adapter_get_index(adapter);
++
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 						adapter_get_path(adapter),
+ 						LE_ADVERTISING_MGR_IFACE,
 -- 
 2.2.0.rc0.207.ga3a616c
 
