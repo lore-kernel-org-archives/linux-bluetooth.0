@@ -1,36 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <CAKafyqpa44b6=kM_=4OzdeL038W2aZW2A9TKAXEwPRSdorP11Q@mail.gmail.com>
+References: <CAKafyqpa44b6=kM_=4OzdeL038W2aZW2A9TKAXEwPRSdorP11Q@mail.gmail.com>
+Date: Thu, 26 Mar 2015 18:25:50 +0530
+Message-ID: <CAKafyqp_CqXk+m413bA0at2Vv1Mn4BbEmQd_96UV61f2KtEONg@mail.gmail.com>
+Subject: Re: [PATCH] android Require at least 1.3 version of mgmt interface
+From: Prabhu Chawandi <foss.chaws@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  0/7] Add Write Long Characteristic Value client TC
-Date: Thu, 26 Mar 2015 18:29:05 +0530
-Message-id: <1427374752-26053-1-git-send-email-gowtham.ab@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds the below client test cases:
-1) Write Long Characteristic Value - by Client
-2) Write Long Characteristic Value - Invalid Handle
-3) Write Long Characteristic Value - Write Not Permitted
-4) Write Long Characteristic Value - Insufficient Authorization
-5) Write Long Characteristic Value - Insufficient Authentication
-6) Write Long Characteristic Value - Insufficient Encryption Key Size
+Sorry ...
 
-Gowtham Anandha Babu (7):
-  unit/test-gatt: Add TP/GAW/CL/BV-05-C test
-  unit/test-gatt: Add TP/GAW/CL/BI-07-C test
-  unit/test-gatt: Add TP/GAW/CL/BI-08-C test
-  unit/test-gatt: Add TP/GAW/CL/BI-11-C test
-  unit/test-gatt: Add TP/GAW/CL/BI-12-C test
-  unit/test-gatt: Add TP/GAW/CL/BI-13-C test
-  shared/gatt-client: Add const qualifier to prepare write value
+I got information from
 
- src/shared/gatt-client.c |   2 +-
- src/shared/gatt-client.h |   2 +-
- unit/test-gatt.c         | 331 ++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 330 insertions(+), 5 deletions(-)
+https://kernel.googlesource.com/pub/scm/bluetooth/bluez/+/5.15/android/README
 
--- 
-1.9.1
+manyThanks,
+Prabhu
 
+On Thu, Mar 26, 2015 at 6:23 PM, Prabhu Chawandi <foss.chaws@gmail.com> wrote:
+> Hello,
+>
+>   I see  below logs while android/bluetoothd is started. Please tell
+> me what is this Management interface is in kernel, I want to upgrade
+> it in my kernel.
+>
+> bluetoothd[1295]: android/main.c:main() Entering main loop
+> bluetoothd[1295]: android/bluetooth.c:read_version_complete()
+> bluetoothd[1295]: Bluetooth management interface 1.2 initialized
+> bluetoothd[1295]: Version 1.3 or later of management interface required
+> bluetoothd[1295]: Adapter initialization failed: Input/output error
+>
+> manyThanks,
+> Prabhu
