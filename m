@@ -2,111 +2,80 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v6 7/8] core: adapter: filter discovery results when filered discovery is used
-Date: Thu, 26 Mar 2015 01:29:15 -0700
-Message-Id: <1427358556-3276-7-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v6 2/8] core/adapter: Refactor of scan type
+Date: Thu, 26 Mar 2015 01:29:10 -0700
+Message-Id: <1427358556-3276-2-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1427358556-3276-1-git-send-email-jpawlowski@google.com>
 References: <1427358556-3276-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds filtering to device found event, and enforces lack
-of RSSI delta for filtered scan.
-
-When filtering, we compare against each client filter. That
-additionally removes some of reports.
+This patch replaces scan type with defined constants, and creates
+new method that might be used to get currently avaliable scan type.
 ---
- src/adapter.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 68 insertions(+), 1 deletion(-)
+ src/adapter.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index fe9530c..ee07a9e 100644
+index 6eeb2f9..23a9a81 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -5292,6 +5292,63 @@ static void adapter_msd_notify(struct btd_adapter *adapter,
+@@ -88,6 +88,9 @@
+ #define TEMP_DEV_TIMEOUT (3 * 60)
+ #define BONDING_TIMEOUT (2 * 60)
+ 
++#define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
++#define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
++
+ static DBusConnection *dbus_conn = NULL;
+ 
+ static bool kernel_conn_control = false;
+@@ -1185,7 +1188,7 @@ static gboolean passive_scanning_timeout(gpointer user_data)
+ 
+ 	adapter->passive_scan_timeout = 0;
+ 
+-	cp.type = (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
++	cp.type = SCAN_TYPE_LE;
+ 
+ 	mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
+ 				adapter->dev_id, sizeof(cp), &cp,
+@@ -1327,6 +1330,21 @@ static void cancel_passive_scanning(struct btd_adapter *adapter)
  	}
  }
  
-+static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
-+								int8_t rssi)
++static uint8_t get_scan_type(struct btd_adapter *adapter)
 +{
-+	GSList *l, *m;
-+	bool got_match = false;
++	uint8_t type;
 +
-+	for (l = discovery_filter; l != NULL && got_match != true;
-+							l = g_slist_next(l)) {
-+		struct watch_client *client = l->data;
-+		struct discovery_filter *item = client->discovery_filter;
++	if (adapter->current_settings & MGMT_SETTING_BREDR)
++		type = SCAN_TYPE_BREDR;
++	else
++		type = 0;
 +
-+		/*
-+		 * If one of currently running scans is regular scan, then
-+		 * return all devices as matches
-+		 */
-+		if (!item) {
-+			got_match = true;
-+			continue;
-+		}
++	if (adapter->current_settings & MGMT_SETTING_LE)
++		type |= SCAN_TYPE_LE;
 +
-+		/* if someone started discovery with empty uuids, he wants all
-+		 * devices in given proximity.
-+		 */
-+		if (!item->uuids)
-+			got_match = true;
-+		else
-+			for (m = item->uuids; m != NULL && got_match != true;
-+							   m = g_slist_next(m))
-+				/* m->data contains string representation of
-+				 * uuid.
-+				 */
-+				if (g_slist_find_custom(eir_data->services,
-+							m->data,
-+							g_strcmp) != NULL)
-+					got_match = true;
-+
-+		if (got_match) {
-+			/* we have service match, check proximity */
-+			if (item->rssi != DISTANCE_VAL_INVALID &&
-+			    item->rssi > rssi)
-+				got_match = false;
-+			if (item->pathloss != DISTANCE_VAL_INVALID &&
-+			   (eir_data->tx_power == 127 ||
-+			   eir_data->tx_power - rssi > item->pathloss))
-+				got_match = false;
-+
-+			if (got_match)
-+				return true;
-+		}
-+	}
-+
-+	if (!got_match)
-+		return false;
-+
-+	return true;
++	return type;
 +}
 +
- static void update_found_devices(struct btd_adapter *adapter,
- 					const bdaddr_t *bdaddr,
- 					uint8_t bdaddr_type, int8_t rssi,
-@@ -5358,8 +5415,18 @@ static void update_found_devices(struct btd_adapter *adapter,
- 		return;
- 	}
+ static void trigger_start_discovery(struct btd_adapter *adapter, guint delay);
  
-+	if (adapter->filtered_discovery &&
-+	    !is_filter_match(adapter->discovery_list, &eir_data, rssi)) {
-+		eir_data_free(&eir_data);
-+		return;
-+	}
-+
- 	device_set_legacy(dev, legacy);
--	device_set_rssi(dev, rssi);
-+
-+	if (adapter->filtered_discovery)
-+		device_set_rssi_with_delta(dev, rssi, 0);
-+	else
-+		device_set_rssi(dev, rssi);
+ static void start_discovery_complete(uint8_t status, uint16_t length,
+@@ -1372,13 +1390,7 @@ static gboolean start_discovery_timeout(gpointer user_data)
  
- 	if (eir_data.appearance != 0)
- 		device_set_appearance(dev, eir_data.appearance);
+ 	adapter->discovery_idle_timeout = 0;
+ 
+-	if (adapter->current_settings & MGMT_SETTING_BREDR)
+-		new_type = (1 << BDADDR_BREDR);
+-	else
+-		new_type = 0;
+-
+-	if (adapter->current_settings & MGMT_SETTING_LE)
+-		new_type |= (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
++	new_type = get_scan_type(adapter);
+ 
+ 	if (adapter->discovery_enable == 0x01) {
+ 		/*
 -- 
 2.2.0.rc0.207.ga3a616c
 
