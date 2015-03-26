@@ -3,50 +3,55 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  7/7] shared/gatt-client: Add const qualifier to prepare write
- value
-Date: Thu, 26 Mar 2015 18:29:12 +0530
-Message-id: <1427374752-26053-8-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH  6/7] unit/test-gatt: Add TP/GAW/CL/BI-13-C test
+Date: Thu, 26 Mar 2015 18:29:11 +0530
+Message-id: <1427374752-26053-7-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1427374752-26053-1-git-send-email-gowtham.ab@samsung.com>
 References: <1427374752-26053-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For all GATT write operation, value remains constant throughout the
-transaction. All bt_gatt_client_write procedure in
-src/shared/gatt-client.h follows this convention.
-Tested in ubuntu.
+Verify Generic Attribute Profile client behavior when the Write
+Long Characteristic Value procedure fails due to insufficient
+encryption key size.
 ---
- src/shared/gatt-client.c | 2 +-
- src/shared/gatt-client.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ unit/test-gatt.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 729bd87..056f812 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -2703,7 +2703,7 @@ static struct request *get_reliable_request(struct bt_gatt_client *client,
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index e65d724..1c1d4bf 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -1083,6 +1083,14 @@ static const struct test_step test_long_write_5 = {
+ 	.length = 0x03
+ };
  
- unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
- 				unsigned int id, uint16_t value_handle,
--				uint16_t offset, uint8_t *value,
-+				uint16_t offset, const uint8_t *value,
- 				uint16_t length,
- 				bt_gatt_client_write_long_callback_t callback,
- 				void *user_data,
-diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
-index 8e5e0f5..b816cc4 100644
---- a/src/shared/gatt-client.h
-+++ b/src/shared/gatt-client.h
-@@ -111,7 +111,7 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
- unsigned int bt_gatt_client_prepare_write(struct bt_gatt_client *client,
- 				unsigned int id,
- 				uint16_t value_handle, uint16_t offset,
--				uint8_t *value, uint16_t length,
-+				const uint8_t *value, uint16_t length,
- 				bt_gatt_client_write_long_callback_t callback,
- 				void *user_data,
- 				bt_gatt_client_destroy_func_t destroy);
++static const struct test_step test_long_write_6 = {
++	.handle = 0x0007,
++	.func = test_long_write,
++	.expected_att_ecode = 0x0c,
++	.value = write_data_1,
++	.length = 0x03
++};
++
+ static void att_write_cb(struct gatt_db_attribute *att, int err,
+ 								void *user_data)
+ {
+@@ -3657,6 +3665,14 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x18, 0x00),
+ 			raw_pdu(0x19));
+ 
++	define_test_client("/TP/GAW/CL/BI-13-C", test_client, service_db_1,
++			&test_long_write_6,
++			SERVICE_DATA_1_PDUS,
++			raw_pdu(0x16, 0x07, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x01, 0x16, 0x07, 0x00, 0x0c),
++			raw_pdu(0x18, 0x00),
++			raw_pdu(0x19));
++
+ 	define_test_server("/TP/GAW/SR/BV-05-C/small", test_server,
+ 			ts_small_db, NULL,
+ 			raw_pdu(0x03, 0x00, 0x02),
 -- 
 1.9.1
 
