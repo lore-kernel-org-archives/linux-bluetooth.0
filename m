@@ -3,33 +3,32 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  4/7] unit/test-gatt: Add TP/GAW/CL/BI-11-C test
-Date: Thu, 26 Mar 2015 18:29:09 +0530
-Message-id: <1427374752-26053-5-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH  3/7] unit/test-gatt: Add TP/GAW/CL/BI-08-C test
+Date: Thu, 26 Mar 2015 18:29:08 +0530
+Message-id: <1427374752-26053-4-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1427374752-26053-1-git-send-email-gowtham.ab@samsung.com>
 References: <1427374752-26053-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Verify Generic Attribute Profile client behavior when the Write
-Long Characteristic Value procedure fails due to insufficient
-authorization.
+Long Characteristic Value procedure fails due to write not permitted.
 ---
  unit/test-gatt.c | 16 ++++++++++++++++
  1 file changed, 16 insertions(+)
 
 diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index be20da9..f2c771a 100644
+index 5adc4e5..be20da9 100644
 --- a/unit/test-gatt.c
 +++ b/unit/test-gatt.c
-@@ -1067,6 +1067,14 @@ static const struct test_step test_long_write_3 = {
+@@ -1059,6 +1059,14 @@ static const struct test_step test_long_write_2 = {
  	.length = 0x03
  };
  
-+static const struct test_step test_long_write_4 = {
-+	.handle = 0x0007,
++static const struct test_step test_long_write_3 = {
++	.handle = 0x0003,
 +	.func = test_long_write,
-+	.expected_att_ecode = 0x08,
++	.expected_att_ecode = 0x03,
 +	.value = write_data_1,
 +	.length = 0x03
 +};
@@ -37,15 +36,15 @@ index be20da9..f2c771a 100644
  static void att_write_cb(struct gatt_db_attribute *att, int err,
  								void *user_data)
  {
-@@ -3625,6 +3633,14 @@ int main(int argc, char *argv[])
+@@ -3609,6 +3617,14 @@ int main(int argc, char *argv[])
  			raw_pdu(0x18, 0x00),
  			raw_pdu(0x19));
  
-+	define_test_client("/TP/GAW/CL/BI-11-C", test_client, service_db_1,
-+			&test_long_write_4,
++	define_test_client("/TP/GAW/CL/BI-08-C", test_client, service_db_1,
++			&test_long_write_3,
 +			SERVICE_DATA_1_PDUS,
-+			raw_pdu(0x16, 0x07, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
-+			raw_pdu(0x01, 0x16, 0x07, 0x00, 0x08),
++			raw_pdu(0x16, 0x03, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x01, 0x16, 0x03, 0x00, 0x03),
 +			raw_pdu(0x18, 0x00),
 +			raw_pdu(0x19));
 +
