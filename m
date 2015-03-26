@@ -2,47 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v2 3/4] tools/btmgmt: Fix crash in add-adv data parsing
-Date: Wed, 25 Mar 2015 20:29:56 -0700
-Message-Id: <1427340597-8193-3-git-send-email-armansito@chromium.org>
-In-Reply-To: <1427340597-8193-1-git-send-email-armansito@chromium.org>
-References: <1427340597-8193-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH v2 1/4] tools/btmgmt: Rename add-adv --discoverable option
+Date: Wed, 25 Mar 2015 20:29:54 -0700
+Message-Id: <1427340597-8193-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes an invalid free in parse_byte when an invalid data
-string is given:
-
-0  0x00007ffff78204b7 in raise () from /usr/lib/libc.so.6
-1  0x00007ffff782188a in abort () from /usr/lib/libc.so.6
-2  0x00007ffff785e993 in __libc_message () from /usr/lib/libc.so.6
-3  0x00007ffff7863dee in malloc_printerr () from /usr/lib/libc.so.6
-4  0x00007ffff78645cb in _int_free () from /usr/lib/libc.so.6
-5  0x00000000004034f4 in parse_bytes (optarg=0x67ee30 "-l", bytes=bytes@entry=0x7fffffffe8f0, len=len@entry=0x7fffffffe900) at tools/btmgmt.c:3739
-6  0x0000000000404182 in cmd_add_adv (mgmt=0x635010, index=65535, argc=4, argv=0x67eae0) at tools/btmgmt.c:3814
-7  0x00000000004057f8 in rl_handler (input=0x67eb10 "add-adv -d -l 1") at tools/btmgmt.c:4237
-8  0x00007ffff7bbe25e in rl_callback_read_char () from /usr/lib/libreadline.so.6
-9  0x0000000000403339 in prompt_read (io=<optimized out>, user_data=<optimized out>) at tools/btmgmt.c:4302
-10 0x000000000041c7c9 in io_callback (fd=<optimized out>, events=1, user_data=0x635bc0) at src/shared/io-mainloop.c:123
-11 0x000000000041cff3 in mainloop_run () at src/shared/mainloop.c:157
-12 0x0000000000402630 in main (argc=0, argv=<optimized out>) at tools/btmgmt.c:4389
+This patch renames the --discoverable option of the add-adv command to
+--general-discov, which is more consistent with the --limited-discov
+option.
 ---
- tools/btmgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/btmgmt.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index bd83ac7..f995ada 100644
+index f64327b..19eeda1 100644
 --- a/tools/btmgmt.c
 +++ b/tools/btmgmt.c
-@@ -3746,7 +3746,7 @@ static bool parse_bytes(char *optarg, uint8_t **bytes, size_t *len)
- 	for (i = 0; i < *len; i++) {
- 		if (sscanf(optarg + (i * 2), "%2hhx", *bytes + i) != 1) {
- 			error("Invalid data");
--			free(bytes);
-+			free(*bytes);
- 			*bytes = NULL;
- 			return false;
- 		}
+@@ -3698,7 +3698,7 @@ static struct option add_adv_options[] = {
+ 	{ "scan-rsp",		1, 0, 's' },
+ 	{ "timeout",		1, 0, 't' },
+ 	{ "connectable",	0, 0, 'c' },
+-	{ "discoverable",	0, 0, 'e' },
++	{ "general-discov",	0, 0, 'g' },
+ 	{ "limited-discov",	0, 0, 'l' },
+ 	{ "managed-flags",	0, 0, 'm' },
+ 	{ "tx-power",		0, 0, 'p' },
+@@ -3765,7 +3765,7 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
+ 	bool quit = true;
+ 	uint32_t flags = 0;
+ 
+-	while ((opt = getopt_long(argc, argv, "+u:d:s:t:celmph",
++	while ((opt = getopt_long(argc, argv, "+u:d:s:t:cglmph",
+ 						add_adv_options, NULL)) != -1) {
+ 		switch (opt) {
+ 		case 'u':
+@@ -3829,7 +3829,7 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
+ 		case 'c':
+ 			flags |= MGMT_ADV_FLAG_CONNECTABLE;
+ 			break;
+-		case 'e':
++		case 'g':
+ 			flags |= MGMT_ADV_FLAG_DISCOV;
+ 			break;
+ 		case 'l':
 -- 
 2.2.0.rc0.207.ga3a616c
 
