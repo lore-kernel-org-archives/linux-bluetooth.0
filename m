@@ -1,39 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Harish Jenny K N <harish_kandiga@mentor.com>
-To: <marcel@holtmann.org>
-CC: <gustavo@padovan.org>, <johan.hedberg@gmail.com>, <davem@davemloft.net>,
-	<linux-bluetooth@vger.kernel.org>, <harish_kandiga@mentor.com>
-Subject: [PATCH] Bluetooth: Fix use after free in l2cap_chan_timeout
-Date: Thu, 26 Mar 2015 14:40:47 +0530
-Message-ID: <1427361047-7168-1-git-send-email-harish_kandiga@mentor.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Prabhu Chawandi <foss.chaws@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: andoid/bluetoothd IPC: command socket connect failed android bluetooth
+Date: Thu, 26 Mar 2015 09:54:55 +0100
+Message-ID: <2215776.K1gUTklLIe@leonov>
+In-Reply-To: <CAKafyqo7gj0uAOONe1Cf0HOXsKvEUC3mroD4A4xp8z0K9ECW6w@mail.gmail.com>
+References: <CAKafyqo7gj0uAOONe1Cf0HOXsKvEUC3mroD4A4xp8z0K9ECW6w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is a potential use after free in bt_sock_poll when a
-socket gets killed without getting unlinked from accept_q.
-Hence added code to unlink from accpept_q by calling teardown
-before freeing the socket for channel type L2CAP_CHAN_CONN_ORIENTED.
+Hi Prabhu Chawandi,
 
-Signed-off-by: Harish Jenny K N <harish_kandiga@mentor.com>
----
- net/bluetooth/l2cap_core.c |    4 ++++
- 1 file changed, 4 insertions(+)
+On Thursday 26 of March 2015 11:54:32 Prabhu Chawandi wrote:
+> Hi,
+> 
+>   When I started ths android daemon, I am getting above error.
+> 
+> Is there anything I am missing ??
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6ba33f9..3e273e6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -415,6 +415,10 @@ static void l2cap_chan_timeout(struct work_struct *work)
- 
- 	l2cap_chan_close(chan, reason);
- 
-+	if ((chan->state == BT_CONNECTED || chan->state == BT_CONFIG) &&
-+	    chan->chan_type == L2CAP_CHAN_CONN_ORIENTED)
-+		chan->ops->teardown(chan, 0);
-+
- 	l2cap_chan_unlock(chan);
- 
- 	chan->ops->close(chan);
+On android bluetoothd is not suppose to be started directly. It is started as 
+a service by init (check android/android/init.bluetooth.rc) when BT user 
+(haltest or android framework) requests it. By BT user I mean process that 
+loaded bluetooth.default.so via hw_get_module_by_class() call.
+
+When bluetooth.default.so is initialized it creates listening socket and 
+starts bluetoothd service so bluetoothd can then connect to it.
+
 -- 
-1.7.9.5
+BR
+Szymon Janc
