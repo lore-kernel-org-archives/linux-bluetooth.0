@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/6] android/avdtp: Fix test /TP/SIG/SMG/BI-19-C
-Date: Thu, 26 Mar 2015 16:20:24 +0200
-Message-Id: <1427379625-20412-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/6] android/avctp: Fix crashes caused by re-entrant calls
+Date: Thu, 26 Mar 2015 16:20:21 +0200
+Message-Id: <1427379625-20412-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1427379625-20412-1-git-send-email-luiz.dentz@gmail.com>
 References: <1427379625-20412-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,51 +11,137 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Test /TP/SIG/SMG/BI-19-C was causing the following backtrace:
-
-Invalid write of size 4
-   at 0x415653: avdtp_parse_rej (avdtp.c:2801)
-   by 0x415653: session_cb (avdtp.c:2067)
-   by 0x4E7E7FA: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4200.2)
-   by 0x4E7EB97: ??? (in /usr/lib64/libglib-2.0.so.0.4200.2)
-   by 0x4E7EEC1: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.4200.2)
-   by 0x4189D1: tester_run (tester.c:831)
-   by 0x40C8C7: main (test-avdtp.c:1392)
- Address 0x5c75b60 is 96 bytes inside a block of size 104 free'd
-   at 0x4C2ACE9: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-   by 0x4E8450E: g_free (in /usr/lib64/libglib-2.0.so.0.4200.2)
-   by 0x4101F0: stream_free (avdtp.c:697)
-   by 0x4E9C7FC: g_slist_foreach (in /usr/lib64/libglib-2.0.so.0.4200.2)
-   by 0x4E9C81A: g_slist_free_full (in /usr/lib64/libglib-2.0.so.0.4200.2)
-   by 0x4106FF: avdtp_free (avdtp.c:974)
-   by 0x4106FF: avdtp_unref (avdtp.c:1042)
-   by 0x40CE18: destroy_context (test-avdtp.c:130)
-   by 0x40CE18: context_quit (test-avdtp.c:145)
-   by 0x40E38F: sep_start_cfm (test-avdtp.c:481)
-   by 0x415652: avdtp_parse_rej (avdtp.c:2799)
-   by 0x415652: session_cb (avdtp.c:2067)
-   by 0x4E7E7FA: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4200.2)
-   by 0x4E7EB97: ??? (in /usr/lib64/libglib-2.0.so.0.4200.2)
-   by 0x4E7EEC1: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.4200.2)
+This make sure that while processing a PDU the session callbacks are
+not able to destroy the session causing crashes.
 ---
- android/avdtp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/avctp.c | 74 ++++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 50 insertions(+), 24 deletions(-)
 
-diff --git a/android/avdtp.c b/android/avdtp.c
-index 2252782..7dcccd0 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -2808,9 +2808,9 @@ static gboolean avdtp_parse_rej(struct avdtp *session,
- 		error("START request rejected: %s (%d)",
- 				avdtp_strerror(&err), err.err.error_code);
- 		if (sep && sep->cfm && sep->cfm->start) {
-+			stream->starting = FALSE;
- 			sep->cfm->start(session, sep, stream, &err,
- 					sep->user_data);
--			stream->starting = FALSE;
- 		}
- 		return TRUE;
- 	case AVDTP_SUSPEND:
+diff --git a/android/avctp.c b/android/avctp.c
+index 758dbd4..0d92a81 100644
+--- a/android/avctp.c
++++ b/android/avctp.c
+@@ -162,6 +162,7 @@ struct key_pressed {
+ };
+ 
+ struct avctp {
++	unsigned int ref;
+ 	int uinput;
+ 
+ 	unsigned int passthrough_id;
+@@ -708,6 +709,47 @@ static gboolean process_queue(void *user_data)
+ 
+ }
+ 
++static struct avctp *avctp_ref(struct avctp *session)
++{
++	__sync_fetch_and_add(&session->ref, 1);
++
++	DBG("%p: ref=%d", session, session->ref);
++
++	return session;
++}
++
++static void avctp_unref(struct avctp *session)
++{
++	if (__sync_sub_and_fetch(&session->ref, 1))
++		return;
++
++	DBG("%p: ref=%d", session, session->ref);
++
++	if (session->browsing)
++		avctp_channel_destroy(session->browsing);
++
++	if (session->control)
++		avctp_channel_destroy(session->control);
++
++	if (session->destroy)
++		session->destroy(session->data);
++
++	g_free(session->handler);
++
++	if (session->key.timer > 0)
++		g_source_remove(session->key.timer);
++
++	if (session->uinput >= 0) {
++		DBG("AVCTP: closing uinput");
++
++		ioctl(session->uinput, UI_DEV_DESTROY);
++		close(session->uinput);
++		session->uinput = -1;
++	}
++
++	g_free(session);
++}
++
+ static void control_response(struct avctp_channel *control,
+ 					struct avctp_header *avctp,
+ 					struct avc_header *avc,
+@@ -740,6 +782,8 @@ static void control_response(struct avctp_channel *control,
+ 		if (p->transaction != avctp->transaction)
+ 			continue;
+ 
++		avctp_ref(control->session);
++
+ 		if (req->func && req->func(control->session, avc->code,
+ 						avc->subunit_type,
+ 						operands, operand_count,
+@@ -749,6 +793,8 @@ static void control_response(struct avctp_channel *control,
+ 		control->processed = g_slist_remove(control->processed, p);
+ 		pending_destroy(p, NULL);
+ 
++		avctp_unref(control->session);
++
+ 		return;
+ 	}
+ }
+@@ -784,6 +830,8 @@ static void browsing_response(struct avctp_channel *browsing,
+ 		if (p->transaction != avctp->transaction)
+ 			continue;
+ 
++		avctp_ref(browsing->session);
++
+ 		if (req->func && req->func(browsing->session, operands,
+ 						operand_count, req->user_data))
+ 			return;
+@@ -1563,7 +1611,7 @@ struct avctp *avctp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+ 	control->watch = g_io_add_watch(session->control->io, cond,
+ 						(GIOFunc) session_cb, session);
+ 
+-	return session;
++	return avctp_ref(session);
+ }
+ 
+ int avctp_connect_browsing(struct avctp *session, int fd, size_t imtu,
+@@ -1599,27 +1647,5 @@ void avctp_shutdown(struct avctp *session)
+ 	if (!session)
+ 		return;
+ 
+-	if (session->browsing)
+-		avctp_channel_destroy(session->browsing);
+-
+-	if (session->control)
+-		avctp_channel_destroy(session->control);
+-
+-	if (session->destroy)
+-		session->destroy(session->data);
+-
+-	g_free(session->handler);
+-
+-	if (session->key.timer > 0)
+-		g_source_remove(session->key.timer);
+-
+-	if (session->uinput >= 0) {
+-		DBG("AVCTP: closing uinput");
+-
+-		ioctl(session->uinput, UI_DEV_DESTROY);
+-		close(session->uinput);
+-		session->uinput = -1;
+-	}
+-
+-	g_free(session);
++	avctp_unref(session);
+ }
 -- 
 2.1.0
 
