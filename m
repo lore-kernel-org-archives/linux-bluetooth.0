@@ -1,88 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLR2coVgyuV-7YtSB+B9U8YGUE-SsUBJvSZbvH21_GOAg@mail.gmail.com>
-References: <CAPuY=zMC+MX=a-HisNnUSJ9zuORUtqukALj9hhv3EKHpTaGDEg@mail.gmail.com>
-	<CAPuY=zODx6jR_QrtLmy5TqeDTavMBcm=Y7J6mQRZu4QKHgsE3Q@mail.gmail.com>
-	<CABBYNZLR2coVgyuV-7YtSB+B9U8YGUE-SsUBJvSZbvH21_GOAg@mail.gmail.com>
-Date: Thu, 26 Mar 2015 13:33:12 +0200
-Message-ID: <CAPuY=zPoZTdod8uNxPXyPp8Hi0hz3SPoGVMi+r__4A_w3CmJyw@mail.gmail.com>
-Subject: Re: bluez: using "service data" in BLE advertisement packets
-From: Alon Ziv <nolaviz@google.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: bnep: Add support to extended headers of control frames
+Date: Thu, 26 Mar 2015 12:02:35 +0100
+Message-Id: <1427367755-13950-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1427367755-13950-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1427367755-13950-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ah... Yes, this looks good (or at least much better :) )
+Handling extended headers of control frames is required BNEP
+functionality. Previously setup success response was handled in user
+space and whole extended header was omitted. This patch allows to
+handle setup success response and parsing extended headers in control
+messages.
 
-In our specific case the service data changes relatively frequently,
-on the order of once per minute. And we usually need the most
-up-to-date data when an application actually inspects the device (as I
-mentioned above, the devices aren't connectable, so the only way to
-receive any data from them is through the advertisement packets).
+Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+---
+ net/bluetooth/bnep/core.c | 55 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 44 insertions(+), 11 deletions(-)
 
-In terms of filtering, we also see cases where we will need to filter
-on the contents of the service data (i.e. when many devices of the
-same type are in the same area, we will want to only receive
-notifications on a subset of them). Think e.g. of iBeacons - an
-application may want to only be notified on beacons that belong to the
-app's developer (iPhones use this method to achieve low-power scanning
-of BLE beacons).
--- Alon Ziv
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index c627817..eb459da 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -231,7 +231,13 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+ 		break;
+ 
+ 	case BNEP_SETUP_CONN_REQ:
+-		err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
++		/* Successful response should be sent only once */
++		if (test_and_clear_bit(BNEP_SETUP_RSP_FLAG, &s->flags))
++			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
++					    BNEP_SUCCESS);
++		else
++			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
++					    BNEP_CONN_NOT_ALLOWED);
+ 		break;
+ 
+ 	default: {
+@@ -292,29 +298,55 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
+ {
+ 	struct net_device *dev = s->dev;
+ 	struct sk_buff *nskb;
+-	u8 type;
++	u8 type, ctrl_type;
+ 
+ 	dev->stats.rx_bytes += skb->len;
+ 
+ 	type = *(u8 *) skb->data;
+ 	skb_pull(skb, 1);
++	ctrl_type = *(u8 *)skb->data;
+ 
+ 	if ((type & BNEP_TYPE_MASK) >= sizeof(__bnep_rx_hlen))
+ 		goto badframe;
+ 
+ 	if ((type & BNEP_TYPE_MASK) == BNEP_CONTROL) {
+-		bnep_rx_control(s, skb->data, skb->len);
+-		kfree_skb(skb);
+-		return 0;
+-	}
++		if (bnep_rx_control(s, skb->data, skb->len) < 0) {
++			dev->stats.tx_errors++;
++			kfree_skb(skb);
++			return 0;
++		}
+ 
+-	skb_reset_mac_header(skb);
++		if (!(type & BNEP_EXT_HEADER)) {
++			kfree_skb(skb);
++			return 0;
++		}
+ 
+-	/* Verify and pull out header */
+-	if (!skb_pull(skb, __bnep_rx_hlen[type & BNEP_TYPE_MASK]))
+-		goto badframe;
++		/* Verify and pull ctrl message since it's already processed */
++		switch (ctrl_type) {
++		case BNEP_SETUP_CONN_REQ:
++			/* Pull: ctrl type (1 b), len (1 b), data (len bytes) */
++			if (!skb_pull(skb, 2 + *(u8 *)(skb->data + 1) * 2))
++				goto badframe;
++			break;
++		case BNEP_FILTER_MULTI_ADDR_SET:
++		case BNEP_FILTER_NET_TYPE_SET:
++			/* Pull: ctrl type (1 b), len (2 b), data (len bytes) */
++			if (!skb_pull(skb, 3 + *(u16 *)(skb->data + 1) * 2))
++				goto badframe;
++			break;
++		default:
++			kfree_skb(skb);
++			return 0;
++		}
++	} else {
++		skb_reset_mac_header(skb);
+ 
+-	s->eh.h_proto = get_unaligned((__be16 *) (skb->data - 2));
++		/* Verify and pull out header */
++		if (!skb_pull(skb, __bnep_rx_hlen[type & BNEP_TYPE_MASK]))
++			goto badframe;
++
++		s->eh.h_proto = get_unaligned((__be16 *) (skb->data - 2));
++	}
+ 
+ 	if (type & BNEP_EXT_HEADER) {
+ 		if (bnep_rx_extension(s, skb) < 0)
+@@ -566,6 +598,7 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+ 	s->sock  = sock;
+ 	s->role  = req->role;
+ 	s->state = BT_CONNECTED;
++	s->flags = req->flags;
+ 
+ 	s->msg.msg_flags = MSG_NOSIGNAL;
+ 
+-- 
+2.1.0
 
-
-On Thu, Mar 26, 2015 at 11:37 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Alon,
->
-> On Wed, Mar 25, 2015 at 4:21 PM, Alon Ziv <nolaviz@google.com> wrote:
->> Hi all,
->>
->> We are developing some applications with non-connectable BLE
->> advertisers that broadcast data in a "service data" element of the
->> advertisement packet. So far we have used these devices with Android
->> and with iOS, both of which can easily support these devices as the
->> entire advertisement packet payload is exposed to scanning
->> applications.
->>
->> Looking at the bluez DBus API, it appears that no equivalent
->> functionality exists: in particular, when the advertisement packets
->> are parsed (eir_parse() called from
->> src/adapter.c:update_found_devices()) any service-data elements are
->> simply discarded. Even worse (for us), if the devices' advertisements
->> are not marked "discoverable" they are simply dropped outright. And
->> even if the device is discoverable, it looks like we'd get only a
->> single notification when the device is first seen - but we won't be
->> able to verify it is still in range (i.e. continued reception of
->> advertisement packets).
->>
->> Is the above summarization correct?
->
-> We working on adding advertising support right, perhaps you should
-> take a look at my proposal:
-> [RFC BlueZ] doc/device-api: Add ServiceData and ManufacturerData
->
-> Do expect the service data to change frequently? I guess we are
-> programming the controller to filter duplicates, but we are working
-> (actually most of the work is coming from your colleague Jakub
-> Pawlowski) SetDiscoveryFilter:
->
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/adapter-api.txt
->
->> (The API documentation claims to support "observer" mode, but these
->> limitations actually put the lie to this statement - an observer is
->> supposed to see _all_ advertisement packets, including non-first ones
->> and those from non-discoverable devices...)
->>
->> Regards
->> -- Alon Ziv
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
