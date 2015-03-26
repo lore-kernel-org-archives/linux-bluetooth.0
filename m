@@ -1,33 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <5511CDE3.2000004@message-id.googlemail.com>
-References: <5511CDE3.2000004@message-id.googlemail.com>
-Date: Thu, 26 Mar 2015 11:40:39 +0200
-Message-ID: <CABBYNZKtV8rSRoWvSUao-hoY6ds2pRc+VsHM4ik8cFf0kpuFRQ@mail.gmail.com>
-Subject: Re: More testsuite breakage unveiled by gcc-5.0
+In-Reply-To: <CAPuY=zODx6jR_QrtLmy5TqeDTavMBcm=Y7J6mQRZu4QKHgsE3Q@mail.gmail.com>
+References: <CAPuY=zMC+MX=a-HisNnUSJ9zuORUtqukALj9hhv3EKHpTaGDEg@mail.gmail.com>
+	<CAPuY=zODx6jR_QrtLmy5TqeDTavMBcm=Y7J6mQRZu4QKHgsE3Q@mail.gmail.com>
+Date: Thu, 26 Mar 2015 11:37:58 +0200
+Message-ID: <CABBYNZLR2coVgyuV-7YtSB+B9U8YGUE-SsUBJvSZbvH21_GOAg@mail.gmail.com>
+Subject: Re: bluez: using "service data" in BLE advertisement packets
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Stefan Seyfried <stefan.seyfried@googlemail.com>
+To: Alon Ziv <nolaviz@google.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stefan,
+Hi Alon,
 
-On Tue, Mar 24, 2015 at 10:49 PM, Stefan Seyfried
-<stefan.seyfried@googlemail.com> wrote:
+On Wed, Mar 25, 2015 at 4:21 PM, Alon Ziv <nolaviz@google.com> wrote:
 > Hi all,
 >
-> the test suite apparently has more problems unveiled by gcc-5.0
+> We are developing some applications with non-connectable BLE
+> advertisers that broadcast data in a "service data" element of the
+> advertisement packet. So far we have used these devices with Android
+> and with iOS, both of which can easily support these devices as the
+> entire advertisement packet payload is exposed to scanning
+> applications.
 >
-> The gory details are in
-> https://bugzilla.opensuse.org/show_bug.cgi?id=923768
+> Looking at the bluez DBus API, it appears that no equivalent
+> functionality exists: in particular, when the advertisement packets
+> are parsed (eir_parse() called from
+> src/adapter.c:update_found_devices()) any service-data elements are
+> simply discarded. Even worse (for us), if the devices' advertisements
+> are not marked "discoverable" they are simply dropped outright. And
+> even if the device is discoverable, it looks like we'd get only a
+> single notification when the device is first seen - but we won't be
+> able to verify it is still in range (i.e. continued reception of
+> advertisement packets).
 >
-> I'm off to conferences / vacation now, so my latency will be big :-)
+> Is the above summarization correct?
 
-Thanks for reporting, I will be looking into that, apparently this
-only happen on 32 bits but I managed to reproduce with gcc 4.9.2 as
-well.
+We working on adding advertising support right, perhaps you should
+take a look at my proposal:
+[RFC BlueZ] doc/device-api: Add ServiceData and ManufacturerData
+
+Do expect the service data to change frequently? I guess we are
+programming the controller to filter duplicates, but we are working
+(actually most of the work is coming from your colleague Jakub
+Pawlowski) SetDiscoveryFilter:
+
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/adapter-api.txt
+
+> (The API documentation claims to support "observer" mode, but these
+> limitations actually put the lie to this statement - an observer is
+> supposed to see _all_ advertisement packets, including non-first ones
+> and those from non-discoverable devices...)
+>
+> Regards
+> -- Alon Ziv
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 
 
 -- 
