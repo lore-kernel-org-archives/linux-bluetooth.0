@@ -1,55 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Mar 2015 07:36:01 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools/btmgmt: Fix crash in interactive mode
-Message-ID: <20150327053601.GA23428@t440s.P-661HNU-F1>
-References: <1427407164-20354-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1427407164-20354-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Michael Janssen <jamuraa@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [BlueZ v6 13/13] core/advertising: Add and Remove AD using MGMT
+Date: Thu, 26 Mar 2015 15:08:43 -0700
+Message-Id: <1427407723-27232-14-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1427407723-27232-1-git-send-email-jamuraa@chromium.org>
+References: <1427407723-27232-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Updates the advertising manager to add and remove the LE Advertising Data
+using MGMT interface commands.
+---
+ src/advertising.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 58 insertions(+), 1 deletion(-)
 
-On Thu, Mar 26, 2015, Lukasz Rymanowski wrote:
-> Optind needs to be reset to 0 so getopt_long do reinitialization on new
-> parsing. Otherwise we got crash:
-> 
-> [hci1]# find --help
-> Usage: find [-l|-b]>
-> [hci1]# find --help
-> ==16382== Invalid read of size 1
-> ==16382==    at 0x513CA96: _getopt_internal_r (getopt.c:429)
-> ==16382==    by 0x513DBFA: _getopt_internal (getopt.c:1177)
-> ==16382==    by 0x513DC82: getopt_long (getopt1.c:66)
-> ==16382==    by 0x406721: cmd_find (btmgmt.c:2111)
-> ==16382==    by 0x40C712: rl_handler (btmgmt.c:4275)
-> ==16382==    by 0x4E5A727: rl_callback_read_char (in
-> /lib/x86_64-linux-gnu/libreadline.so.6.2)
-> ==16382==    by 0x402ED8: prompt_read (btmgmt.c:4340)
-> ==16382==    by 0x41D117: io_callback (io-mainloop.c:123)
-> ==16382==    by 0x41D9F3: mainloop_run (mainloop.c:157)
-> ==16382==    by 0x4026C2: main (btmgmt.c:4427)
-> ==16382==  Address 0x567e576 is 6 bytes inside a block of size 101
-> free'd
-> ==16382==    at 0x4C2A82E: free (in
-> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-> ==16382==    by 0x5158DE8: wordfree (wordexp.c:2235)
-> ==16382==    by 0x40C71A: rl_handler (btmgmt.c:4304)
-> ==16382==    by 0x4E5A727: rl_callback_read_char (in
-> /lib/x86_64-linux-gnu/libreadline.so.6.2)
-> ==16382==    by 0x402ED8: prompt_read (btmgmt.c:4340)
-> ==16382==    by 0x41D117: io_callback (io-mainloop.c:123)
-> ==16382==    by 0x41D9F3: mainloop_run (mainloop.c:157)
-> ==16382==    by 0x4026C2: main (btmgmt.c:4427)
-> ==16382==
-> ---
->  tools/btmgmt.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
+diff --git a/src/advertising.c b/src/advertising.c
+index 3705a22..7fd9c78 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -26,6 +26,7 @@
+ #include <gdbus/gdbus.h>
+ 
+ #include "lib/bluetooth.h"
++#include "lib/mgmt.h"
+ #include "lib/sdp.h"
+ 
+ #include "adapter.h"
+@@ -33,6 +34,7 @@
+ #include "error.h"
+ #include "log.h"
+ #include "src/shared/advertising-data.h"
++#include "src/shared/mgmt.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/util.h"
+ 
+@@ -41,6 +43,8 @@
+ 
+ struct btd_advertising {
+ 	struct btd_adapter *adapter;
++	struct mgmt *mgmt;
++	uint16_t mgmt_index;
+ 	struct queue *adverts;
+ };
+ 
+@@ -55,6 +59,7 @@ struct advertisement {
+ 	GDBusProxy *proxy;
+ 	DBusMessage *reg;
+ 	uint8_t type; /* Advertising type */
++	uint8_t instance;
+ 	struct advertising_data *data;
+ };
+ 
+@@ -123,10 +128,15 @@ static void advertisement_destroy(void *data)
+ static void advertisement_remove(void *data)
+ {
+ 	struct advertisement *ad = data;
++	struct mgmt_cp_remove_advertising cp;
+ 
+ 	g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
+ 
+-	/* TODO: mgmt API call to remove advert */
++	cp.instance = ad->instance;
++
++	mgmt_send(ad->manager->mgmt, MGMT_OP_REMOVE_ADVERTISING,
++			ad->manager->mgmt_index, sizeof(cp), &cp, NULL, NULL,
++			NULL);
+ 
+ 	queue_remove(ad->manager->adverts, ad);
+ 
+@@ -348,9 +358,44 @@ fail:
+ 	return false;
+ }
+ 
++static void add_advertising_callback(uint8_t status, uint16_t length,
++					  const void *param, void *user_data)
++{
++	struct advertisement *ad = user_data;
++	const struct mgmt_rp_add_advertising *rp = param;
++
++	if (status || !param) {
++		error("Failed to set advertising data!");
++		return;
++	}
++
++	ad->instance = rp->instance;
++}
++
+ static void refresh_advertisement(struct advertisement *ad)
+ {
++	struct mgmt_cp_add_advertising *cp;
++	uint8_t adv_data_len, param_len;
++	uint8_t *adv_data;
++
+ 	DBG("Refreshing advertisement: %s", ad->path);
++
++	adv_data = advertising_data_generate(ad->data, &adv_data_len);
++
++	param_len = sizeof(struct mgmt_cp_add_advertising) + adv_data_len;
++
++	cp = malloc(param_len);
++
++	cp->instance = ad->instance;
++	cp->flags = 0;
++	cp->duration = 0;
++	cp->timeout = 0;
++	cp->adv_data_len = adv_data_len;
++	memcpy(cp->data, adv_data, adv_data_len);
++
++	mgmt_send(ad->manager->mgmt, MGMT_OP_ADD_ADVERTISING,
++					ad->manager->mgmt_index, param_len, cp,
++					add_advertising_callback, ad, NULL);
+ }
+ 
+ static bool parse_advertisement(struct advertisement *ad)
+@@ -427,6 +472,8 @@ static struct advertisement *advertisement_create(DBusConnection *conn,
+ 	if (!ad)
+ 		return NULL;
+ 
++	ad->instance = 1;
++
+ 	ad->client = g_dbus_client_new_full(conn, sender, path, path);
+ 	if (!ad->client)
+ 		goto fail;
+@@ -564,6 +611,16 @@ advertising_manager_create(struct btd_adapter *adapter)
+ 
+ 	manager->adapter = adapter;
+ 
++	manager->mgmt = mgmt_new_default();
++
++	if (!manager->mgmt) {
++		error("Failed to access management interface");
++		free(manager);
++		return NULL;
++	}
++
++	manager->mgmt_index = btd_adapter_get_index(adapter);
++
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 						adapter_get_path(adapter),
+ 						LE_ADVERTISING_MGR_IFACE,
+-- 
+2.2.0.rc0.207.ga3a616c
 
-Applied. Thanks.
-
-Johan
