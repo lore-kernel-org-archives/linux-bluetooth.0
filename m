@@ -2,69 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v2 4/4] tools/btmgmt: Prettify supported flags in advinfo
-Date: Wed, 25 Mar 2015 20:29:57 -0700
-Message-Id: <1427340597-8193-4-git-send-email-armansito@chromium.org>
+Subject: [PATCH v2 3/4] tools/btmgmt: Fix crash in add-adv data parsing
+Date: Wed, 25 Mar 2015 20:29:56 -0700
+Message-Id: <1427340597-8193-3-git-send-email-armansito@chromium.org>
 In-Reply-To: <1427340597-8193-1-git-send-email-armansito@chromium.org>
 References: <1427340597-8193-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch makes advinfo print human readable strings for the supported
-flags field of Read Advertising Features response for the advinfo
-command.
+This patch fixes an invalid free in parse_byte when an invalid data
+string is given:
+
+0  0x00007ffff78204b7 in raise () from /usr/lib/libc.so.6
+1  0x00007ffff782188a in abort () from /usr/lib/libc.so.6
+2  0x00007ffff785e993 in __libc_message () from /usr/lib/libc.so.6
+3  0x00007ffff7863dee in malloc_printerr () from /usr/lib/libc.so.6
+4  0x00007ffff78645cb in _int_free () from /usr/lib/libc.so.6
+5  0x00000000004034f4 in parse_bytes (optarg=0x67ee30 "-l", bytes=bytes@entry=0x7fffffffe8f0, len=len@entry=0x7fffffffe900) at tools/btmgmt.c:3739
+6  0x0000000000404182 in cmd_add_adv (mgmt=0x635010, index=65535, argc=4, argv=0x67eae0) at tools/btmgmt.c:3814
+7  0x00000000004057f8 in rl_handler (input=0x67eb10 "add-adv -d -l 1") at tools/btmgmt.c:4237
+8  0x00007ffff7bbe25e in rl_callback_read_char () from /usr/lib/libreadline.so.6
+9  0x0000000000403339 in prompt_read (io=<optimized out>, user_data=<optimized out>) at tools/btmgmt.c:4302
+10 0x000000000041c7c9 in io_callback (fd=<optimized out>, events=1, user_data=0x635bc0) at src/shared/io-mainloop.c:123
+11 0x000000000041cff3 in mainloop_run () at src/shared/mainloop.c:157
+12 0x0000000000402630 in main (argc=0, argv=<optimized out>) at tools/btmgmt.c:4389
 ---
- tools/btmgmt.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ tools/btmgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index f995ada..36a8681 100644
+index bd83ac7..f995ada 100644
 --- a/tools/btmgmt.c
 +++ b/tools/btmgmt.c
-@@ -3616,6 +3616,34 @@ static void cmd_le_oob(struct mgmt *mgmt, uint16_t index,
- 	}
- }
- 
-+static const char *adv_flags_str[] = {
-+				"connectable",
-+				"general-discoverable",
-+				"limited-discoverable",
-+				"managed-flags",
-+				"tx-power",
-+				"scan-rsp-appearance",
-+				"scan-rsp-local-name",
-+};
-+
-+static const char *adv_flags2str(uint32_t flags)
-+{
-+	static char str[256];
-+	unsigned i;
-+	int off;
-+
-+	off = 0;
-+	str[0] = '\0';
-+
-+	for (i = 0; i < NELEM(adv_flags_str); i++) {
-+		if ((flags & (1 << i)) != 0)
-+			off += snprintf(str + off, sizeof(str) - off, "%s ",
-+							adv_flags_str[i]);
-+	}
-+
-+	return str;
-+}
-+
- static void adv_features_rsp(uint8_t status, uint16_t len, const void *param,
- 							void *user_data)
- {
-@@ -3640,7 +3668,7 @@ static void adv_features_rsp(uint8_t status, uint16_t len, const void *param,
- 	}
- 
- 	supported_flags = le32_to_cpu(rp->supported_flags);
--	print("Supported flags: 0x%04x", supported_flags);
-+	print("Supported flags: %s", adv_flags2str(supported_flags));
- 	print("Max advertising data len: %u", rp->max_adv_data_len);
- 	print("Max scan response data len: %u", rp->max_scan_rsp_len);
- 	print("Max instances: %u", rp->max_instances);
+@@ -3746,7 +3746,7 @@ static bool parse_bytes(char *optarg, uint8_t **bytes, size_t *len)
+ 	for (i = 0; i < *len; i++) {
+ 		if (sscanf(optarg + (i * 2), "%2hhx", *bytes + i) != 1) {
+ 			error("Invalid data");
+-			free(bytes);
++			free(*bytes);
+ 			*bytes = NULL;
+ 			return false;
+ 		}
 -- 
 2.2.0.rc0.207.ga3a616c
 
