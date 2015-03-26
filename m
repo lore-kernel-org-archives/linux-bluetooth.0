@@ -1,88 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1427324461-27651-1-git-send-email-jamuraa@chromium.org>
-References: <1427324461-27651-1-git-send-email-jamuraa@chromium.org>
-Date: Thu, 26 Mar 2015 16:22:54 +0200
-Message-ID: <CABBYNZJkLvHdy95acCCuWNtXGzhkf8K2aOa4uVdCWgGX8fWMsQ@mail.gmail.com>
-Subject: Re: [BlueZ v5 00/13] Implement LE Advertisement D-Bus API
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 6/6] android/avdtp: Fix test /TP/SIG/SMG/BV-09-C
+Date: Thu, 26 Mar 2015 16:20:25 +0200
+Message-Id: <1427379625-20412-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1427379625-20412-1-git-send-email-luiz.dentz@gmail.com>
+References: <1427379625-20412-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Mar 26, 2015 at 1:00 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> Implementation of the LE Advertisement API.
->
-> Things that are missing still (and added to the TODO):
->  * Semantics for multiple Advertisements (currently any more than one will fail)
->  * TX Power property parsing / interface
->
-> v1 -> v2:
->  * Cleanup based on comments from Arman
->  * Add g_dbus_proxy_set_read_watch function to avoid ObjectManager dependency
->  * Consolidate script updates into single test script
->
-> v2 -> v3:
->  * Change "ManufacturerSpecificData" to "ManufacturerData"
->  * Add advertisement-api.txt to EXTRA_DIST
->  * Add Release() callback to org.bluez.LEAdvertisement1
->  * Remove IncludePower from the LEAdvertisement1 API
->
-> v3 -> v4:
->  * Rename "g_dbus_proxy_set_read_watch" to "g_dbus_proxy_set_ready_watch"
->
-> v4 -> v5:
->  * Rebase
->  * Use g_dbus_client_set_proxy_handlers instead of g_dbus_proxy_set_ready_watch
->  * Add MGMT interface calls to actually advertise.
+Test /TP/SIG/SMG/BV-09-C frees the session after set_configuration is
+called causing the following backtrace:
 
-Apparently you forgot to rename advertising-manager.c to
-advertising.c, the former is awful long and I would also change to the
-struct name to btd_advertising.
+Invalid read of size 8
+   at 0x412B81: avdtp_sep_set_state (avdtp.c:846)
+   by 0x413F3F: avdtp_set_configuration_resp (avdtp.c:2515)
+   by 0x413F3F: avdtp_parse_resp (avdtp.c:2656)
+   by 0x4159B7: session_cb (avdtp.c:2057)
+   by 0x4E7E7FA: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4200.2)
+   by 0x4E7EB97: ??? (in /usr/lib64/libglib-2.0.so.0.4200.2)
+   by 0x4E7EEC1: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.4200.2)
+   by 0x4189D1: tester_run (tester.c:831)
+   by 0x40C8C7: main (test-avdtp.c:1392)
+ Address 0x58572b8 is 8 bytes inside a block of size 64 free'd
+   at 0x4C2ACE9: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x4E8450E: g_free (in /usr/lib64/libglib-2.0.so.0.4200.2)
+   by 0x4164B8: avdtp_unregister_sep (avdtp.c:3417)
+   by 0x40CEA5: unregister_sep (test-avdtp.c:123)
+   by 0x41704F: queue_remove_all (queue.c:387)
+   by 0x4170B4: queue_destroy (queue.c:76)
+   by 0x40CE54: destroy_context (test-avdtp.c:133)
+   by 0x40CE54: context_quit (test-avdtp.c:145)
+   by 0x40E74F: sep_setconf_cfm (test-avdtp.c:417)
+   by 0x413F27: avdtp_set_configuration_resp (avdtp.c:2512)
+   by 0x413F27: avdtp_parse_resp (avdtp.c:2656)
+   by 0x4159B7: session_cb (avdtp.c:2057)
+   by 0x4E7E7FA: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4200.2)
+   by 0x4E7EB97: ??? (in /usr/lib64/libglib-2.0.so.0.4200.2)
+---
+ android/avdtp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Michael Janssen (13):
->   core: advertising: add LEAdvertisingManager stubs
->   core/advertising: Implement RegisterAdvertisement
->   tools: Python script to test Advertisement API
->   core/advertising: implement UnregisterAdvertisement
->   shared: add advertising-data
->   core/advertising: use advertising_data
->   core/advertising: Parse ServiceUUIDs
->   core/advertising: Parse SolicitUUIDs
->   core/advertising: Parse ManufacturerSpecificData
->   core/advertising: Parse ServiceData
->   Update TODO for LE Advertising
->   shared/advertising: implement advertising_data_generate
->   core/advertising: Add and Remove AD using MGMT
->
->  Makefile.am                   |   3 +
->  TODO                          |  21 +-
->  src/adapter.c                 |  19 ++
->  src/advertising.c             | 666 ++++++++++++++++++++++++++++++++++++++++++
->  src/advertising.h             |  25 ++
->  src/shared/advertising-data.c | 585 +++++++++++++++++++++++++++++++++++++
->  src/shared/advertising-data.h |  69 +++++
->  tools/advertisement-example   | 170 +++++++++++
->  8 files changed, 1548 insertions(+), 10 deletions(-)
->  create mode 100644 src/advertising.c
->  create mode 100644 src/advertising.h
->  create mode 100644 src/shared/advertising-data.c
->  create mode 100644 src/shared/advertising-data.h
->  create mode 100644 tools/advertisement-example
->
-> --
-> 2.2.0.rc0.207.ga3a616c
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 7dcccd0..7e61280 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -2522,12 +2522,12 @@ static gboolean avdtp_set_configuration_resp(struct avdtp *session,
+ {
+ 	struct avdtp_local_sep *sep = stream->lsep;
+ 
++	avdtp_sep_set_state(session, sep, AVDTP_STATE_CONFIGURED);
++
+ 	if (sep->cfm && sep->cfm->set_configuration)
+ 		sep->cfm->set_configuration(session, sep, stream, NULL,
+ 						sep->user_data);
+ 
+-	avdtp_sep_set_state(session, sep, AVDTP_STATE_CONFIGURED);
+-
+ 	return TRUE;
+ }
+ 
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
