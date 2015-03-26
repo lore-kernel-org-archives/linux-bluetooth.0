@@ -1,487 +1,237 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1427271541-7509-6-git-send-email-jpawlowski@google.com>
-References: <1427271541-7509-1-git-send-email-jpawlowski@google.com>
-	<1427271541-7509-6-git-send-email-jpawlowski@google.com>
-Date: Wed, 25 Mar 2015 22:25:51 -0700
-Message-ID: <CAHrH25Qo4WCZT+RnRCAiBer3WTYxQf2PQSYqBu6u=LugxDyxsA@mail.gmail.com>
-Subject: Re: [PATCH v5 6/8] core: adapter: start proper discovery depending on
- filter type
-From: Arman Uguray <armansito@chromium.org>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Wed, 25 Mar 2015 22:56:58 -0600
+Message-ID: <CALdogvEPfgXMB78dp0NjuSicGoGHOET1icdurmpSXpn4MphtrQ@mail.gmail.com>
+Subject: CSR Radio Becomes Unresponsive
+From: daron anderson <daronanderson7@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+I am experiencing a Bluetooth radio failure on a CSR Bluetooth module
+using kernel 3.10 and Bluez 5.29.  The radio I am using is a Bluegiga
+WT21 USB radio which is hardwired to an internal USB bus inside an
+Intermec CV61 mobile computer.  The failure results in the Bluetooth
+radio being unresponsive after a reboot until the unit is powered down
+and powered up again.  I have worked out a concise test case that
+causes the failure to appear with details below.  There appears to be
+other scenarios where the radio failure occurs, but this is the
+simplest repeatable test case I have found.
 
-> On Wed, Mar 25, 2015 at 1:18 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> This patch implement starting and updating filtered discovery,
-> depending on kind of filters used by each client. It also removes
-> iddle timeout for filtered scans, to make sure that this kind of
-> scan will run continuously.
-> ---
->  src/adapter.c | 280 +++++++++++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 258 insertions(+), 22 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 402b94a..f6e0093 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -92,6 +92,7 @@
->  #define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
->  #define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
->
-> +#define        HCI_RSSI_INVALID        127
->  #define        DISTANCE_VAL_INVALID    0x7FFF
->  #define        PATHLOSS_MAX 137
->
-> @@ -205,6 +206,9 @@ struct btd_adapter {
->         char *stored_alias;             /* stored adapter name alias */
->
->         bool discovering;               /* discovering property state */
-> +       bool filtered_discovery;        /* we are doing filtered discovery */
-> +       bool no_scan_restart_delay;     /* when this flag is set, restart scan
-> +                                        * without delay */
->         uint8_t discovery_type;         /* current active discovery type */
->         uint8_t discovery_enable;       /* discovery enabled/disabled */
->         bool discovery_suspended;       /* discovery has been suspended */
-> @@ -212,6 +216,9 @@ struct btd_adapter {
->         GSList *set_filter_list;        /* list of clients that specified
->                                          * filter, but don't scan yet
->                                          */
-> +       /* current discovery filter, if any */
-> +       struct mgmt_cp_start_service_discovery *current_discovery_filter;
-> +
->         GSList *discovery_found;        /* list of found devices */
->         guint discovery_idle_timeout;   /* timeout between discovery runs */
->         guint passive_scan_timeout;     /* timeout between passive scans */
-> @@ -1388,6 +1395,11 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
->                 adapter->discovery_type = rp->type;
->                 adapter->discovery_enable = 0x01;
->
-> +               if (adapter->current_discovery_filter)
-> +                       adapter->filtered_discovery = true;
-> +               else
-> +                       adapter->filtered_discovery = false;
-> +
->                 if (adapter->discovering)
->                         return;
->
-> @@ -1407,21 +1419,32 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
->  static gboolean start_discovery_timeout(gpointer user_data)
->  {
->         struct btd_adapter *adapter = user_data;
-> -       struct mgmt_cp_start_discovery cp;
-> +       struct mgmt_cp_start_service_discovery *sd_cp;
->         uint8_t new_type;
->
->         DBG("");
->
->         adapter->discovery_idle_timeout = 0;
->
-> +       /* If we're doing filtered discovery, it must be quickly restarted */
-> +       adapter->no_scan_restart_delay = !!adapter->current_discovery_filter;
-> +
-> +       DBG("adapter->current_discovery_filter == %d",
-> +           !!adapter->current_discovery_filter);
-> +
->         new_type = get_scan_type(adapter);
->
->         if (adapter->discovery_enable == 0x01) {
-> +               struct mgmt_cp_stop_discovery cp;
-> +
->                 /*
-> -                * If there is an already running discovery and it has the
-> -                * same type, then just keep it.
-> +                * If we're asked to start regular discovery, and there is an
-> +                *  already running regular discovery and it has the same type,
-> +                * then just keep it.
->                  */
-> -               if (adapter->discovery_type == new_type) {
-> +               if (adapter->current_discovery_filter == NULL &&
-> +                   adapter->filtered_discovery == false &&
-> +                   adapter->discovery_type == new_type) {
 
-Prefer !<var> over <var> == NULL, here and elsewhere.
 
->                         if (adapter->discovering)
->                                 return FALSE;
->
-> @@ -1436,20 +1459,43 @@ static gboolean start_discovery_timeout(gpointer user_data)
->                  * queue up a stop discovery command.
->                  *
->                  * This can happen if a passive scanning for Low Energy
-> -                * devices is ongoing.
-> +                * devices is ongoing, or scan type is changed between
-> +                * regular and filtered, or filter was updated.
->                  */
->                 cp.type = adapter->discovery_type;
-> -
->                 mgmt_send(adapter->mgmt, MGMT_OP_STOP_DISCOVERY,
->                                         adapter->dev_id, sizeof(cp), &cp,
->                                         NULL, NULL, NULL);
-> +
-> +               /* Don't even bother to try to quickly start discovery
-> +                * just after stopping it, it would fail with status
-> +                * MGMT_BUSY. Instead discovering_callback will take
-> +                * care of that.
-> +                */
-> +               return FALSE;
-> +
->         }
->
-> -       cp.type = new_type;
-> +       if (adapter->current_discovery_filter == NULL) {
-> +               /* Regular discovery is required */
+lsusb reports:
 
-Don't mix comments/code with declarations. Plus this comment should
-probably go above the if statement.
+Bus 005 Device 002: ID 0a12:0002 Cambridge Silicon Radio, Ltd
+Frontline Test Equipment Bluetooth Device
 
-> +               struct mgmt_cp_start_discovery cp;
->
-> -       mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
-> +               cp.type = new_type;
-> +               mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
->                                 adapter->dev_id, sizeof(cp), &cp,
->                                 start_discovery_complete, adapter, NULL);
-> +               return FALSE;
-> +       }
-> +
-> +       /* Filtered discovery is required */
-> +       sd_cp = adapter->current_discovery_filter;
-> +
-> +       DBG("sending MGMT_OP_START_SERVICE_DISCOVERY %d, %d, %d",
-> +           sd_cp->rssi, sd_cp->type, sd_cp->uuid_count);
-> +
-> +       mgmt_send(adapter->mgmt, MGMT_OP_START_SERVICE_DISCOVERY,
-> +                 adapter->dev_id, sizeof(*sd_cp) + sd_cp->uuid_count * 16,
-> +                 sd_cp, start_discovery_complete, adapter, NULL);
->
->         return FALSE;
->  }
-> @@ -1561,8 +1607,8 @@ static void discovering_callback(uint16_t index, uint16_t length,
->                 return;
->         }
->
-> -       DBG("hci%u type %u discovering %u", adapter->dev_id,
-> -                                       ev->type, ev->discovering);
-> +       DBG("hci%u type %u discovering %u method %d", adapter->dev_id, ev->type,
-> +                               ev->discovering, adapter->filtered_discovery);
->
->         if (adapter->discovery_enable == ev->discovering)
->                 return;
-> @@ -1588,7 +1634,10 @@ static void discovering_callback(uint16_t index, uint16_t length,
->
->         switch (adapter->discovery_enable) {
->         case 0x00:
-> -               trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT);
-> +               if (adapter->no_scan_restart_delay)
-> +                       trigger_start_discovery(adapter, 0);
-> +               else
-> +                       trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT);
->                 break;
->
->         case 0x01:
-> @@ -1596,6 +1645,7 @@ static void discovering_callback(uint16_t index, uint16_t length,
->                         g_source_remove(adapter->discovery_idle_timeout);
->                         adapter->discovery_idle_timeout = 0;
->                 }
-> +
->                 break;
->         }
->  }
-> @@ -1610,7 +1660,8 @@ static void stop_discovery_complete(uint8_t status, uint16_t length,
->         if (status == MGMT_STATUS_SUCCESS) {
->                 adapter->discovery_type = 0x00;
->                 adapter->discovery_enable = 0x00;
-> -
-> +               adapter->filtered_discovery = false;
-> +               adapter->no_scan_restart_delay = false;
->                 adapter->discovering = false;
->                 g_dbus_emit_property_changed(dbus_conn, adapter->path,
->                                         ADAPTER_INTERFACE, "Discovering");
-> @@ -1661,6 +1712,182 @@ static gboolean remove_temp_devices(gpointer user_data)
->         return FALSE;
->  }
->
-> +/* This method merges all adapter filters into one that will be send to kernel.
-> + * cp_ptr is set to null when regular non-filtered discovery is needed,
-> + * otherwise it's pointing to filter. Returns 0 on succes, -1 on error
-> + */
-> +static int discovery_filter_to_mgmt_cp(struct btd_adapter *adapter,
-> +                              struct mgmt_cp_start_service_discovery **cp_ptr)
-> +{
-> +       GSList *l, *m;
-> +       struct mgmt_cp_start_service_discovery *cp;
-> +       int rssi = DISTANCE_VAL_INVALID;
-> +       int uuid_count = 0;
-> +       uint8_t discovery_type = 0;
-> +       uint8_t (*current_uuid)[16];
-> +       /* empty_uuid variable determines wether there was any filter with no
-> +        * uuids. In this case someone might be looking for all devices in
-> +        * certain proximity, and we need to have empty uuids in kernel filter.
-> +        */
 
-Don't mix in comments and variable declarations if possible.
 
-> +       bool empty_uuid = false;
-> +       bool has_regular_discovery = false;
-> +       bool has_filtered_discovery = false;
-> +
-> +       DBG("");
+I have a minimal RedHat RHEL 7 installed.  No GNOME or other desktop
+is installed.  I removed the Bluez 4.101 rpms and built Bluez 5.29
+from the raw source as follows:
 
-nit: add new line after this
 
-> +       for (l = adapter->discovery_list; l != NULL; l = g_slist_next(l)) {
-> +               struct watch_client *client = l->data;
-> +               struct discovery_filter *item = client->discovery_filter;
-> +               int curr_uuid_count;
-> +
-> +               if (item == NULL) {
-> +                       has_regular_discovery = true;
-> +                       continue;
-> +               }
-> +
-> +               has_filtered_discovery = true;
-> +
-> +               discovery_type |= item->type;
-> +
-> +               /*
-> +                * Rule for merging rssi and pathloss into rssi field of kernel
-> +                * filter is as follow:
-> +                * - if there's any client without proximity filter, then do no
-> +                *   proximity filtering,
-> +                * - if all clients specified RSSI, then use lowest value,
-> +                * - if any client specified pathloss, then kernel filter should
-> +                *   do no proximity, as kernel can't compute pathloss. We'll do
-> +                *   filtering on our own.
-> +                */
-> +               if (item->rssi == DISTANCE_VAL_INVALID)
-> +                       rssi = HCI_RSSI_INVALID;
-> +               else if (rssi != HCI_RSSI_INVALID && rssi >= item->rssi)
-> +                       rssi = item->rssi;
-> +               else if (item->pathloss != DISTANCE_VAL_INVALID)
-> +                       rssi = HCI_RSSI_INVALID;
-> +
-> +               curr_uuid_count = g_slist_length(item->uuids);
-> +
-> +               if (curr_uuid_count == 0)
-> +                       empty_uuid = true;
-> +
-> +               uuid_count += curr_uuid_count;
-> +       }
-> +
-> +       /* if no proximity filtering is set, disable it */
-> +       if (rssi == DISTANCE_VAL_INVALID)
-> +               rssi = HCI_RSSI_INVALID;
-> +
-> +       /* if any of filters had empty uuid, do not filter by uuid */
-> +       if (empty_uuid == true)
-> +               uuid_count = 0;
-> +
-> +       if (has_regular_discovery) {
-> +               /*
-> +                * It there is both regular and filtered scan running, then
-> +                * clear whole fitler to report all devices. If tere are only
-> +                * regular scans, run just regular scan.
-> +                */
-> +               if (has_filtered_discovery) {
-> +                       discovery_type = get_scan_type(adapter);
-> +                       uuid_count = 0;
-> +                       rssi = HCI_RSSI_INVALID;
-> +               } else {
-> +                       *cp_ptr = NULL;
-> +                       return 0;
-> +               }
-> +       }
-> +
-> +       cp = g_try_malloc(sizeof(cp) + 16*uuid_count);
-> +       *cp_ptr = cp;
-> +       if (cp == NULL)
-> +               return -1;
-> +
-> +       cp->type = discovery_type;
-> +       cp->rssi = rssi;
-> +       cp->uuid_count = uuid_count;
-> +
-> +       /* If filter requires no uuids filter, stop processing here */
-> +       if (uuid_count == 0)
-> +               return 0;
-> +
-> +       current_uuid = cp->uuids;
-> +       for (l = adapter->discovery_list; l != NULL; l = g_slist_next(l)) {
-> +               struct watch_client *client = l->data;
-> +               struct discovery_filter *item = client->discovery_filter;
-> +
-> +               for (m = item->uuids; m != NULL; m = g_slist_next(m)) {
-> +                       char *uuid_str = m->data;
-> +                       bt_uuid_t uuid, u128;
-> +                       uint128_t uint128;
-> +
-> +                       bt_string_to_uuid(&uuid, uuid_str);
-> +                       bt_uuid_to_uuid128(&uuid, &u128);
-> +
-> +                       ntoh128((uint128_t *) u128.value.u128.data, &uint128);
-> +                       htob128(&uint128, (uint128_t *) current_uuid);
-> +
-> +                       current_uuid++;
-> +               }
-> +       }
+[root@localhost ~]#  yum update
+[root@localhost ~]#  reboot
+….
+[root@localhost ~]#  yum -y install readline-devel libical-devel
+dbus-devel glib2-devel gcc kernel-headers kernel-devel
+[root@localhost ~]#  yum erase "bluedevil*" "bluez*"
+[root@localhost ~]#  wget
+http://www.kernel.org/pub/linux/bluetooth/bluez-5.29.tar.xz
+[root@localhost ~]#  tar xf bluez-5.29.tar.xz
+[root@localhost ~]#  cd bluez-5.29
+[root@localhost ~]#  ./configure --prefix=/usr --mandir=/usr/share/man
+--sysconfdir=/etc --localstatedir=/var --disable-udev
+[root@localhost ~]#  make
+[root@localhost ~]#  make install
 
-This function is pretty big and has a lot of nested/extra loops, you
-could probably make use of helpers and g_slist_foreach.
 
-> +       return 0;
-> +}
-> +
-> +static bool filters_equal(struct mgmt_cp_start_service_discovery *a,
-> +                  struct mgmt_cp_start_service_discovery *b) {
-> +       if (a == NULL && b == NULL)
-> +               return true;
-> +
-> +       if ((a == NULL && b != NULL) || (a != NULL && b == NULL))
-> +               return false;
-> +
-> +       if (a->type != b->type)
-> +               return false;
-> +
-> +       if (a->rssi != b->rssi)
-> +               return false;
-> +
-> +       /*
-> +        * When we create mgmt_cp_start_service_discovery structure inside
-> +        * discovery_filter_to_mgmt_cp, we always keep uuids sorted, and
-> +        * unique, so we're safe to compare uuid_count, and uuids like that.
-> +        */
-> +       if (a->uuid_count != b->uuid_count)
-> +               return false;
-> +
-> +       if (memcmp(a->uuids, b->uuids, 16 * a->uuid_count) != 0)
-> +               return false;
-> +
-> +       return true;
-> +}
-> +
-> +static void update_discovery_filter(struct btd_adapter *adapter)
-> +{
-> +       struct mgmt_cp_start_service_discovery *sd_cp;
-> +
-> +       DBG("");
-> +
-> +       if (discovery_filter_to_mgmt_cp(adapter, &sd_cp)) {
-> +               error("discovery_filter_to_mgmt_cp returned error");
-> +               return;
-> +       }
-> +
-> +       /*
-> +        * If filters are equal, then don't update scan, except for when
-> +        * starting discovery.
-> +        */
-> +       if (filters_equal(adapter->current_discovery_filter, sd_cp) &&
-> +           adapter->discovering != 0) {
-> +               DBG("filters were equal, deciding to not restart the scan.");
-> +               g_free(sd_cp);
-> +               return;
-> +       }
-> +
-> +       g_free(adapter->current_discovery_filter);
-> +       adapter->current_discovery_filter = sd_cp;
-> +
-> +       trigger_start_discovery(adapter, 0);
-> +}
-> +
->  static void discovery_destroy(void *user_data)
->  {
->         struct watch_client *client = user_data;
-> @@ -1728,8 +1955,10 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
->          * However in case this is the last client, the discovery in
->          * the kernel needs to be disabled.
->          */
-> -       if (adapter->discovery_list)
-> +       if (adapter->discovery_list) {
-> +               update_discovery_filter(adapter);
->                 return;
-> +       }
->
->         /*
->          * In the idle phase of a discovery, there is no need to stop it
-> @@ -1751,7 +1980,8 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
->                                 stop_discovery_complete, adapter, NULL);
->  }
->
-> -/* returns true if client was already discovering, false otherwise. *client
-> +/*
-> + * Return true if client was already discovering, false otherwise. *client
->   * will point to discovering client, or client that have pre-set his filter.
->   */
->  static bool get_discovery_client(struct btd_adapter *adapter,
-> @@ -1806,8 +2036,8 @@ static DBusMessage *start_discovery(DBusConnection *conn,
->                 adapter->set_filter_list = g_slist_remove(
->                                              adapter->set_filter_list, client);
->                 adapter->discovery_list = g_slist_prepend(
-> -                                            adapter->discovery_list, client);
-> -               trigger_start_discovery(adapter, 0);
-> +                                             adapter->discovery_list, client);
-> +               update_discovery_filter(adapter);
->                 return dbus_message_new_method_return(msg);
->         }
->
-> @@ -1827,7 +2057,7 @@ static DBusMessage *start_discovery(DBusConnection *conn,
->          * discovery in idle phase exists, it will be restarted right
->          * away.
->          */
-> -       trigger_start_discovery(adapter, 0);
-> +       update_discovery_filter(adapter);
->
->         return dbus_message_new_method_return(msg);
->  }
-> @@ -2033,6 +2263,9 @@ static DBusMessage *set_discovery_filter(DBusConnection *conn,
->                 free_discovery_filter(client->discovery_filter);
->                 client->discovery_filter = discovery_filter;
->
-> +               if (is_discovering)
-> +                       update_discovery_filter(adapter);
-> +
->                 if (discovery_filter || is_discovering)
->                         return dbus_message_new_method_return(msg);
->
-> @@ -2090,12 +2323,10 @@ static DBusMessage *stop_discovery(DBusConnection *conn,
->          */
->         g_dbus_remove_watch(dbus_conn, client->watch);
->
-> -       /*
-> -        * As long as other discovery clients are still active, just
-> -        * return success.
-> -        */
-> -       if (adapter->discovery_list)
-> +       if (adapter->discovery_list) {
-> +               update_discovery_filter(adapter);
->                 return dbus_message_new_method_return(msg);
-> +       }
->
->         /*
->          * In the idle phase of a discovery, there is no need to stop it
-> @@ -5307,6 +5538,11 @@ static void adapter_stop(struct btd_adapter *adapter)
->                 g_dbus_remove_watch(dbus_conn, client->watch);
->         }
->
-> +       adapter->filtered_discovery = false;
-> +       adapter->no_scan_restart_delay = false;
-> +       g_free(adapter->current_discovery_filter);
-> +       adapter->current_discovery_filter = NULL;
-> +
->         adapter->discovering = false;
->
->         while (adapter->connections) {
-> --
-> 2.2.0.rc0.207.ga3a616c
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+---------------------------------------------------
 
-Thanks,
-Arman
+To reproduce the issue, I execute the following commands, then I set
+up another Bluetooth device to attempt connections with the Intermec
+CV61 device.  The peer device in the following test is an Intermec
+SF61 barcode scanner, which uses a Bluegiga WT41 bluetooth module.
+This device defaults to connect to its host and use SPP.  In this
+test, I have disabled security on the SF61 unit so that no agent is
+required.  The CV61 and SF61 both support Bluetooth 2.1+EDR.
+
+
+
+[root@localhost ~]# hcidump > hcidump_$(date +%Y%m%d_%H%M%S_%N).txt &
+[root@localhost ~]# /usr/libexec/bluetooth/bluetoothd --compat &
+[root@localhost ~]# hciconfig hci0 up
+[root@localhost ~]# sleep 2
+[root@localhost ~]# hciconfig hci0 class 0x4a010c
+[root@localhost ~]# hciconfig hci0 sspmode 0
+[root@localhost ~]# sdptool add SP
+
+[root@localhost ~]# hciconfig –a hci0
+hci0:       Type: BR/EDR  Bus: USB
+                BD Address: 00:10:40:57:B4:CA  ACL MTU: 310:10  SCO MTU: 64:8
+                UP RUNNING PSCAN
+                RX bytes:1582 acl:0 sco:0 events:55 errors:0
+                TX bytes:1421 acl:0 sco:0 commands:53 errors:0
+                Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x59 0x83
+                Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+                Link policy: RSWITCH HOLD SNIFF PARK
+                Link mode: SLAVE ACCEPT
+                Name: 'localhost.localdomain-0'
+                Class: 0x4a010c
+                Service Classes: Networking, Capturing, Telephony
+                Device Class: Computer, Laptop
+                HCI Version: 2.1 (0x4)  Revision: 0x12e9
+                LMP Version: 2.1 (0x4)  Subversion: 0x12e9
+                Manufacturer: Cambridge Silicon Radio (10)
+
+
+The SF61 attempts about 4 connections to the CV61 computer, but I have
+no application listening to accept the connection attempts.  After
+waiting several seconds, I run hciconfig hci0 down, then reboot.
+
+
+[root@localhost ~]# hciconfig hci0 down
+[root@localhost ~]# reboot
+
+After rebooting the WT21 bluetooth module is unresponsive:
+
+[root@localhost ~]# hciconfig –a hci0
+hci0:       Type: BR/EDR  Bus: USB
+                BD Address: 00:00:00:00:00:00  ACL MTU: 0:0  SCO MTU: 0:0
+                DOWN
+                RX bytes:0 acl:0 sco:0 events:0 errors:0
+                TX bytes:15 acl:0 sco:0 commands:5 errors:0
+                Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+                Packet type: DM1 DH1 HV1
+                Link policy:
+                Link mode: SLAVE ACCEPT
+
+[root@localhost ~]# hciconfig hci0 up
+
+Can't init device hci0: Connection timed out (110)
+
+After reboot, hcidump does not show any activity.
+
+-----------------------------------------------------------
+
+
+Below is an excerpt from hcidump before the failure occurs, which
+shows the activity during a single connection attempt from the SF61
+device to the CV61 device.  I have the full hcidump for all activity
+between the “hciconfig hci0 up” and “hciconfig hci0 down” commands, if
+it would be useful.
+
+
+
+
+
+> HCI Event: Connect Request (0x04) plen 10
+    bdaddr 00:07:80:73:2C:3D class 0x080500 type ACL
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+    bdaddr 00:07:80:73:2C:3D role 0x00
+    Role: Master
+> HCI Event: Command Status (0x0f) plen 4
+    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> HCI Event: Role Change (0x12) plen 8
+    status 0x00 bdaddr 00:07:80:73:2C:3D role 0x00
+    Role: Master
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 37 bdaddr 00:07:80:73:2C:3D type ACL encrypt 0x00
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+    handle 37
+> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+    bdaddr 00:07:80:73:2C:3D mode 1
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 0
+> HCI Event: Max Slots Change (0x1b) plen 3
+    handle 37 slots 5
+> HCI Event: Command Status (0x0f) plen 4
+    Unknown (0x00|0x0000) status 0x00 ncmd 1
+> ACL data: handle 37 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 1 scid 0x0380
+< ACL data: handle 37 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0380 result 1 status 0
+      Connection pending - No futher information available
+< ACL data: handle 37 flags 0x00 dlen 10
+    L2CAP(s): Info req: type 2
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 37 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 37 packets 1
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 37
+    Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x59 0x87
+> ACL data: handle 37 flags 0x02 dlen 16
+    L2CAP(s): Info rsp: type 2 result 0
+      Extended feature mask 0x0228
+        Enhanced Retransmission mode
+        FCS Option
+        Unicast Connectless Data Reception
+< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+    handle 37 page 1
+< ACL data: handle 37 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0380 result 0 status 0
+      Connection successful
+< ACL data: handle 37 flags 0x00 dlen 23
+    L2CAP(s): Config req: dcid 0x0380 flags 0x00 clen 11
+      RFC 0x00 (Basic)
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 37 packets 1
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 37 packets 1
+> HCI Event: Read Remote Extended Features (0x23) plen 13
+    status 0x00 handle 37 page 1 max 1
+    Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> ACL data: handle 37 flags 0x02 dlen 16
+    L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+      MTU 48
+< ACL data: handle 37 flags 0x00 dlen 18
+    L2CAP(s): Config rsp: scid 0x0380 flags 0x00 result 0 clen 4
+      MTU 48
+> ACL data: handle 37 flags 0x02 dlen 14
+    L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 0
+      Success
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 37 packets 1
+> ACL data: handle 37 flags 0x02 dlen 36
+    L2CAP(d): cid 0x0040 len 32 [psm 1]
+        SDP SSA Req: tid 0x1 len 0x1b
+          pat uuid-128 00001101-0000-1000-8000-00805f9b34fb
+          max 38
+          aid(s) 0x0004 (ProtocolDescList)
+          cont 00
+< ACL data: handle 37 flags 0x00 dlen 33
+   L2CAP(d): cid 0x0380 len 29 [psm 1]
+        SDP SSA Rsp: tid 0x1 len 0x18
+          count 21
+          record #0
+              aid 0x0004 (ProtocolDescList)
+                 < < uuid-16 0x0100 (L2CAP) > <
+                 uuid-16 0x0003 (RFCOMM) uint 0x1 > >
+          cont 00
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 37 packets 1
+> ACL data: handle 37 flags 0x02 dlen 12
+    L2CAP(s): Connect req: psm 3 scid 0x03c1
+< ACL data: handle 37 flags 0x00 dlen 16
+    L2CAP(s): Connect rsp: dcid 0x0000 scid 0x03c1 result 2 status 0
+      Connection refused - PSM not supported
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 37 packets 1
+> ACL data: handle 37 flags 0x02 dlen 12
+    L2CAP(s): Disconn req: dcid 0x0040 scid 0x0380
+< ACL data: handle 37 flags 0x00 dlen 12
+    L2CAP(s): Disconn rsp: dcid 0x0040 scid 0x0380
+> HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 37 packets 1
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 37 reason 0x13
+    Reason: Remote User Terminated Connection
+
+Thank you,
+Daron
