@@ -2,80 +2,79 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v6 2/8] core/adapter: Refactor of scan type
-Date: Thu, 26 Mar 2015 01:29:10 -0700
-Message-Id: <1427358556-3276-2-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1427358556-3276-1-git-send-email-jpawlowski@google.com>
-References: <1427358556-3276-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v6 1/8] core: device: add device_set_rssi_no_delta
+Date: Thu, 26 Mar 2015 01:29:09 -0700
+Message-Id: <1427358556-3276-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch replaces scan type with defined constants, and creates
-new method that might be used to get currently avaliable scan type.
+This patch adds new method that allow to update RSSI value without
+taking delta into account. It will be used by StartFilteredDiscovery
+method, in order to achieve more accurate proximity detection.
 ---
- src/adapter.c | 28 ++++++++++++++++++++--------
- 1 file changed, 20 insertions(+), 8 deletions(-)
+ src/device.c | 14 +++++++++++---
+ src/device.h |  2 ++
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 6eeb2f9..23a9a81 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -88,6 +88,9 @@
- #define TEMP_DEV_TIMEOUT (3 * 60)
- #define BONDING_TIMEOUT (2 * 60)
+diff --git a/src/device.c b/src/device.c
+index 8ad62d3..f0dded8 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -83,6 +83,8 @@
+ #define MIN(a, b) ((a) < (b) ? (a) : (b))
+ #endif
  
-+#define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
-+#define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
++#define RSSI_THRESHOLD		8
 +
  static DBusConnection *dbus_conn = NULL;
+ static unsigned service_state_cb_id;
  
- static bool kernel_conn_control = false;
-@@ -1185,7 +1188,7 @@ static gboolean passive_scanning_timeout(gpointer user_data)
- 
- 	adapter->passive_scan_timeout = 0;
- 
--	cp.type = (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
-+	cp.type = SCAN_TYPE_LE;
- 
- 	mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
- 				adapter->dev_id, sizeof(cp), &cp,
-@@ -1327,6 +1330,21 @@ static void cancel_passive_scanning(struct btd_adapter *adapter)
- 	}
+@@ -4547,7 +4549,8 @@ void device_set_legacy(struct btd_device *device, bool legacy)
+ 					DEVICE_INTERFACE, "LegacyPairing");
  }
  
-+static uint8_t get_scan_type(struct btd_adapter *adapter)
+-void device_set_rssi(struct btd_device *device, int8_t rssi)
++void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
++				int8_t delta_threshold)
+ {
+ 	if (!device)
+ 		return;
+@@ -4567,8 +4570,8 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
+ 		else
+ 			delta = rssi - device->rssi;
+ 
+-		/* only report changes of 8 dBm or more */
+-		if (delta < 8)
++		/* only report changes of delta_threshold dBm or more */
++		if (delta < delta_threshold)
+ 			return;
+ 
+ 		DBG("rssi %d delta %d", rssi, delta);
+@@ -4580,6 +4583,11 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
+ 						DEVICE_INTERFACE, "RSSI");
+ }
+ 
++void device_set_rssi(struct btd_device *device, int8_t rssi)
 +{
-+	uint8_t type;
-+
-+	if (adapter->current_settings & MGMT_SETTING_BREDR)
-+		type = SCAN_TYPE_BREDR;
-+	else
-+		type = 0;
-+
-+	if (adapter->current_settings & MGMT_SETTING_LE)
-+		type |= SCAN_TYPE_LE;
-+
-+	return type;
++	device_set_rssi_with_delta(device, rssi, RSSI_THRESHOLD);
 +}
 +
- static void trigger_start_discovery(struct btd_adapter *adapter, guint delay);
- 
- static void start_discovery_complete(uint8_t status, uint16_t length,
-@@ -1372,13 +1390,7 @@ static gboolean start_discovery_timeout(gpointer user_data)
- 
- 	adapter->discovery_idle_timeout = 0;
- 
--	if (adapter->current_settings & MGMT_SETTING_BREDR)
--		new_type = (1 << BDADDR_BREDR);
--	else
--		new_type = 0;
--
--	if (adapter->current_settings & MGMT_SETTING_LE)
--		new_type |= (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
-+	new_type = get_scan_type(adapter);
- 
- 	if (adapter->discovery_enable == 0x01) {
- 		/*
+ static gboolean start_discovery(gpointer user_data)
+ {
+ 	struct btd_device *device = user_data;
+diff --git a/src/device.h b/src/device.h
+index b17f53a..d50fc84 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -90,6 +90,8 @@ void btd_device_set_temporary(struct btd_device *device, bool temporary);
+ void btd_device_set_trusted(struct btd_device *device, gboolean trusted);
+ void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
+ void device_set_legacy(struct btd_device *device, bool legacy);
++void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
++				int8_t delta_threshold);
+ void device_set_rssi(struct btd_device *device, int8_t rssi);
+ bool btd_device_is_connected(struct btd_device *dev);
+ uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
 -- 
 2.2.0.rc0.207.ga3a616c
 
