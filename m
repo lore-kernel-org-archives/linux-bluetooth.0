@@ -2,49 +2,73 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v6 11/13] Update TODO for LE Advertising
-Date: Thu, 26 Mar 2015 15:08:41 -0700
-Message-Id: <1427407723-27232-12-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1427407723-27232-1-git-send-email-jamuraa@chromium.org>
-References: <1427407723-27232-1-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v6 00/13] Implement LE Advertisement D-Bus API
+Date: Thu, 26 Mar 2015 15:08:30 -0700
+Message-Id: <1427407723-27232-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- TODO | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+Implementation of the LE Advertisement D-Bus API.
 
-diff --git a/TODO b/TODO
-index 65e19ee..2945392 100644
---- a/TODO
-+++ b/TODO
-@@ -64,16 +64,16 @@ General
- Low Energy
- ==========
- 
--- Advertising management. Adapter interface needs to be changed to manage
--  connection modes, adapter type and advertising policy. See Volume 3,
--  Part C, section 9.3. If Attribute Server is enabled the LE capable
--  adapter shall to start advertising. Further investigation is necessary
--  to define which connectable mode needs to be supported: Non-connectable,
--  directed connectable and undirected connectable. Basically, two connectable
--  scenarios shall be addressed:
--  1. GATT client is disconnected, but intends to become a Peripheral to
--     receive indications/notifications.
--  2. GATT server intends to accept connections.
-+- Connection modes. Adapter interface needs to be changed to manage
-+  connection modes and adapter type. See Volume 3, Part C, section 9.3.
-+  1. Mode management: Peripheral / Central
-+
-+  Priority: Medium
-+  Complexity: C2
-+
-+- Advertising data. The D-Bus interface needs to be updated to enable setting
-+  scan response data, and to read the advertising and scan response data which
-+  has been broadcast from other LE devices.
- 
-   Priority: Medium
-   Complexity: C2
+Things that are missing still (and added to the TODO):
+ * MGMT API for modifying the LE Advertisements
+ * Semantics for multiple Advertisements (currently any more than one will fail)
+ * TX Power property parsing / interface
+
+v1 -> v2:
+ * Cleanup based on comments from Arman
+ * Add g_dbus_proxy_set_read_watch function to avoid ObjectManager dependency
+ * Consolidate script updates into single test script
+
+v2 -> v3:
+ * Change "ManufacturerSpecificData" to "ManufacturerData"
+ * Add advertisement-api.txt to EXTRA_DIST
+ * Add Release() callback to org.bluez.LEAdvertisement1
+ * Remove IncludePower from the LEAdvertisement1 API
+
+v3 -> v4:
+ * Rename "g_dbus_proxy_set_read_watch" to "g_dbus_proxy_set_ready_watch"
+
+v4 -> v5:
+ * Rebase
+ * Use g_dbus_client_set_proxy_handlers instead of g_dbus_proxy_set_ready_watch
+ * Add MGMT interface calls to actually advertise.
+
+v5 -> v6:
+ * Minor patch cruft cleanup
+ * Rename btd_advertising_manager to btd_advertising and fix filename change.
+
+
+Michael Janssen (13):
+  core: advertising: add LEAdvertisingManager stubs
+  core/advertising: Implement RegisterAdvertisement
+  tools: Python script to test Advertisement API
+  core/advertising: implement UnregisterAdvertisement
+  shared: add advertising-data
+  core/advertising: use advertising_data
+  core/advertising: Parse ServiceUUIDs
+  core/advertising: Parse SolicitUUIDs
+  core/advertising: Parse ManufacturerSpecificData
+  core/advertising: Parse ServiceData
+  Update TODO for LE Advertising
+  shared/advertising: implement advertising_data_generate
+  core/advertising: Add and Remove AD using MGMT
+
+ Makefile.am                   |   3 +
+ TODO                          |  20 +-
+ src/adapter.c                 |  19 ++
+ src/advertising.c             | 665 ++++++++++++++++++++++++++++++++++++++++++
+ src/advertising.h             |  25 ++
+ src/shared/advertising-data.c | 585 +++++++++++++++++++++++++++++++++++++
+ src/shared/advertising-data.h |  69 +++++
+ tools/advertisement-example   | 170 +++++++++++
+ 8 files changed, 1546 insertions(+), 10 deletions(-)
+ create mode 100644 src/advertising.c
+ create mode 100644 src/advertising.h
+ create mode 100644 src/shared/advertising-data.c
+ create mode 100644 src/shared/advertising-data.h
+ create mode 100644 tools/advertisement-example
+
 -- 
 2.2.0.rc0.207.ga3a616c
 
