@@ -2,197 +2,82 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v6 03/13] tools: Python script to test Advertisement API
-Date: Thu, 26 Mar 2015 15:08:33 -0700
-Message-Id: <1427407723-27232-4-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v6 07/13] core/advertising: Parse ServiceUUIDs
+Date: Thu, 26 Mar 2015 15:08:37 -0700
+Message-Id: <1427407723-27232-8-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1427407723-27232-1-git-send-email-jamuraa@chromium.org>
 References: <1427407723-27232-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This script provides an example of using the advertisement-data
-D-Bus API from python.
+Parse the ServiceUUIDs property of the LEAdvertisement1 object.
 ---
- tools/advertisement-example | 170 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 170 insertions(+)
- create mode 100644 tools/advertisement-example
+ src/advertising.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/tools/advertisement-example b/tools/advertisement-example
-new file mode 100644
-index 0000000..98aeafa
---- /dev/null
-+++ b/tools/advertisement-example
-@@ -0,0 +1,170 @@
-+#!/usr/bin/python
+diff --git a/src/advertising.c b/src/advertising.c
+index ff082ae..6568dd0 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -166,6 +166,44 @@ static bool parse_advertising_type(GDBusProxy *proxy, uint8_t *type)
+ 	return false;
+ }
+ 
++static bool parse_advertising_service_uuids(GDBusProxy *proxy,
++					struct advertising_data *data)
++{
++	DBusMessageIter iter, ariter;
 +
-+import dbus
-+import dbus.exceptions
-+import dbus.mainloop.glib
-+import dbus.service
++	if (!g_dbus_proxy_get_property(proxy, "ServiceUUIDs", &iter))
++		return true;
 +
-+import array
-+import gobject
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++		return false;
 +
-+from random import randint
++	dbus_message_iter_recurse(&iter, &ariter);
 +
-+mainloop = None
++	advertising_data_clear_service_uuid(data);
 +
-+BLUEZ_SERVICE_NAME = 'org.bluez'
-+LE_ADVERTISING_MANAGER_IFACE = 'org.bluez.LEAdvertisingManager1'
-+DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
-+DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
++	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
++		const char *uuid_str;
++		bt_uuid_t uuid;
 +
-+LE_ADVERTISEMENT_IFACE = 'org.bluez.LEAdvertisement1'
++		dbus_message_iter_get_basic(&ariter, &uuid_str);
 +
++		DBG("Adding ServiceUUID: %s", uuid_str);
 +
-+class InvalidArgsException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.freedesktop.DBus.Error.InvalidArgs'
++		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
++			goto fail;
 +
++		advertising_data_add_service_uuid(data, &uuid);
 +
-+class NotSupportedException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.NotSupported'
++		dbus_message_iter_next(&ariter);
++	}
 +
++	return true;
 +
-+class NotPermittedException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.NotPermitted'
++fail:
++	advertising_data_clear_service_uuid(data);
++	return false;
++}
 +
+ static void refresh_advertisement(struct advertisement *ad)
+ {
+ 	DBG("Refreshing advertisement: %s", ad->path);
+@@ -178,7 +216,12 @@ static bool parse_advertisement(struct advertisement *ad)
+ 		return false;
+ 	}
+ 
+-	/* TODO: parse the remaining properties into a shared structure */
++	if (!parse_advertising_service_uuids(ad->proxy, ad->data)) {
++		error("Property \"ServiceUUIDs\" failed to parse");
++		return false;
++	}
 +
-+class InvalidValueLengthException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.InvalidValueLength'
-+
-+
-+class FailedException(dbus.exceptions.DBusException):
-+    _dbus_error_name = 'org.bluez.Error.Failed'
-+
-+
-+class Advertisement(dbus.service.Object):
-+    PATH_BASE = '/org/bluez/example/advertisement'
-+
-+    def __init__(self, bus, index, advertising_type):
-+        self.path = self.PATH_BASE + str(index)
-+        self.bus = bus
-+        self.ad_type = advertising_type
-+        self.service_uuids = None
-+        self.manufacturer_data = None
-+        self.solicit_uuids = None
-+        self.service_data = None
-+        dbus.service.Object.__init__(self, bus, self.path)
-+
-+    def get_properties(self):
-+        properties = dict()
-+        properties['Type'] = self.ad_type
-+        if self.service_uuids is not None:
-+            properties['ServiceUUIDs'] = dbus.Array(self.service_uuids,
-+                                                    signature='s')
-+        if self.solicit_uuids is not None:
-+            properties['SolicitUUIDs'] = dbus.Array(self.solicit_uuids,
-+                                                    signature='s')
-+        if self.manufacturer_data is not None:
-+            properties['ManufacturerData'] = dbus.Dictionary(
-+                self.manufacturer_data, signature='qay')
-+        if self.service_data is not None:
-+            properties['ServiceData'] = dbus.Dictionary(self.service_data,
-+                                                        signature='say')
-+        return {LE_ADVERTISEMENT_IFACE: properties}
-+
-+    def get_path(self):
-+        return dbus.ObjectPath(self.path)
-+
-+    def add_service_uuid(self, uuid):
-+        if not self.service_uuids:
-+            self.service_uuids = []
-+        self.service_uuids.append(uuid)
-+
-+    def add_solicit_uuid(self, uuid):
-+        if not self.solicit_uuids:
-+            self.solicit_uuids = []
-+        self.solicit_uuids.append(uuid)
-+
-+    def add_manufacturer_data(self, manuf_code, data):
-+        if not self.manufacturer_data:
-+            self.manufacturer_data = dict()
-+        self.manufacturer_data[manuf_code] = data
-+
-+    def add_service_data(self, uuid, data):
-+        if not self.service_data:
-+            self.service_data = dict()
-+        self.service_data[uuid] = data
-+
-+    @dbus.service.method(DBUS_PROP_IFACE,
-+                         in_signature='s',
-+                         out_signature='a{sv}')
-+    def GetAll(self, interface):
-+        print 'GetAll'
-+        if interface != LE_ADVERTISEMENT_IFACE:
-+            raise InvalidArgsException()
-+        print 'returning props'
-+        return self.get_properties()[LE_ADVERTISEMENT_IFACE]
-+
-+    @dbus.service.method(LE_ADVERTISEMENT_IFACE,
-+                         in_signature='',
-+                         out_signature='')
-+    def Release(self):
-+        print '%s: Released!' % self.path
-+
-+class TestAdvertisement(Advertisement):
-+
-+    def __init__(self, bus, index):
-+        Advertisement.__init__(self, bus, index, 'broadcast')
-+        self.add_service_uuid('0000180D-0000-1000-8000-00805F9B34FB')
-+        self.add_service_uuid('0000180F-0000-1000-8000-00805F9B34FB')
-+        self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
-+        self.add_service_data('00009999-0000-1000-8000-00805F9B34FB',
-+                              [0x00, 0x01, 0x02, 0x03, 0x04])
-+
-+
-+def register_ad_cb():
-+    print 'Advertisement registered'
-+
-+
-+def register_ad_error_cb(error):
-+    print 'Failed to register advertisement: ' + str(error)
-+    mainloop.quit()
-+
-+
-+def find_adapter(bus):
-+    remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'),
-+                               DBUS_OM_IFACE)
-+    objects = remote_om.GetManagedObjects()
-+
-+    for o, props in objects.iteritems():
-+        if LE_ADVERTISING_MANAGER_IFACE in props:
-+            return o
-+
-+    return None
-+
-+
-+def main():
-+    global mainloop
-+
-+    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-+
-+    bus = dbus.SystemBus()
-+
-+    adapter = find_adapter(bus)
-+    if not adapter:
-+        print 'LEAdvertisingManager1 interface not found'
-+        return
-+
-+    ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-+                                LE_ADVERTISING_MANAGER_IFACE)
-+
-+    test_advertisement = TestAdvertisement(bus, 0)
-+
-+    mainloop = gobject.MainLoop()
-+
-+    ad_manager.RegisterAdvertisement(test_advertisement.get_path(), {},
-+                                     reply_handler=register_ad_cb,
-+                                     error_handler=register_ad_error_cb)
-+
-+    mainloop.run()
-+
-+if __name__ == '__main__':
-+    main()
++	/* TODO: parse the rest of the properties */
+ 
+ 	refresh_advertisement(ad);
+ 
 -- 
 2.2.0.rc0.207.ga3a616c
 
