@@ -1,67 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH 2/3] Bluetooth: bnep: Add support for get bnep features via ioctl
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1427367755-13950-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Date: Thu, 26 Mar 2015 08:13:15 -0700
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A6B5F048-964C-44D7-8915-FED770F2DDC8@holtmann.org>
-References: <1427367755-13950-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1427367755-13950-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH BlueZ 2/6] android/avctp: Fix crashes caused by re-entrant calls
+Date: Thu, 26 Mar 2015 15:39:05 +0100
+Message-ID: <1494330.WEzLnnu2PD@leonov>
+In-Reply-To: <1427379625-20412-2-git-send-email-luiz.dentz@gmail.com>
+References: <1427379625-20412-1-git-send-email-luiz.dentz@gmail.com> <1427379625-20412-2-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Luiz,
 
-> This is needed if user space wants to know supported bnep features
-> by kernel, eg. if kernel supports sending response to bnep setup
-> control message.
+On Thursday 26 of March 2015 16:20:21 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+> This make sure that while processing a PDU the session callbacks are
+> not able to destroy the session causing crashes.
 > ---
-> net/bluetooth/bnep/bnep.h | 4 ++++
-> net/bluetooth/bnep/sock.c | 8 ++++++++
-> 2 files changed, 12 insertions(+)
+>  android/avctp.c | 74
+> ++++++++++++++++++++++++++++++++++++++------------------- 1 file changed,
+> 50 insertions(+), 24 deletions(-)
 > 
-> diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
-> index 5a5b16f..a116e2e 100644
-> --- a/net/bluetooth/bnep/bnep.h
-> +++ b/net/bluetooth/bnep/bnep.h
-> @@ -80,6 +80,9 @@
-> #define BNEP_TYPE_MASK	0x7f
-> #define BNEP_EXT_HEADER	0x80
+> diff --git a/android/avctp.c b/android/avctp.c
+> index 758dbd4..0d92a81 100644
+> --- a/android/avctp.c
+> +++ b/android/avctp.c
+> @@ -162,6 +162,7 @@ struct key_pressed {
+>  };
 > 
-> +/* Flags */
-> +#define BNEP_SETUP_RSP_FLAG	0x00000000
+>  struct avctp {
+> +	unsigned int ref;
+>  	int uinput;
+> 
+>  	unsigned int passthrough_id;
+> @@ -708,6 +709,47 @@ static gboolean process_queue(void *user_data)
+> 
+>  }
+> 
+> +static struct avctp *avctp_ref(struct avctp *session)
+> +{
+> +	__sync_fetch_and_add(&session->ref, 1);
 > +
-> struct bnep_setup_conn_req {
-> 	__u8 type;
-> 	__u8 ctrl;
-> @@ -111,6 +114,7 @@ struct bnep_ext_hdr {
-> #define BNEPCONNDEL	_IOW('B', 201, int)
-> #define BNEPGETCONNLIST	_IOR('B', 210, int)
-> #define BNEPGETCONNINFO	_IOR('B', 211, int)
-> +#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
-
-as mentioned on IRC, you forgot compat_ioctl.h
-
-> struct bnep_connadd_req {
-> 	int   sock;		/* Connected socket */
-> diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
-> index 5f05129..6b84baf 100644
-> --- a/net/bluetooth/bnep/sock.c
-> +++ b/net/bluetooth/bnep/sock.c
-> @@ -29,6 +29,8 @@
-> 
-> #include "bnep.h"
-> 
-> +static const __u32 supp_feat = BIT(BNEP_SETUP_RSP_FLAG);
+> +	DBG("%p: ref=%d", session, session->ref);
 > +
+> +	return session;
+> +}
+> +
+> +static void avctp_unref(struct avctp *session)
+> +{
+> +	if (__sync_sub_and_fetch(&session->ref, 1))
+> +		return;
+> +
+> +	DBG("%p: ref=%d", session, session->ref);
 
-I am confused with the naming here. Are we exposing current state or supported features or what?
+I'd print this debug before subtracting so that one can track unrefs.
 
-Regards
+> +
+> +	if (session->browsing)
+> +		avctp_channel_destroy(session->browsing);
+> +
+> +	if (session->control)
+> +		avctp_channel_destroy(session->control);
+> +
+> +	if (session->destroy)
+> +		session->destroy(session->data);
+> +
+> +	g_free(session->handler);
+> +
+> +	if (session->key.timer > 0)
+> +		g_source_remove(session->key.timer);
+> +
+> +	if (session->uinput >= 0) {
+> +		DBG("AVCTP: closing uinput");
+> +
+> +		ioctl(session->uinput, UI_DEV_DESTROY);
+> +		close(session->uinput);
+> +		session->uinput = -1;
+> +	}
+> +
+> +	g_free(session);
+> +}
+> +
+>  static void control_response(struct avctp_channel *control,
+>  					struct avctp_header *avctp,
+>  					struct avc_header *avc,
+> @@ -740,6 +782,8 @@ static void control_response(struct avctp_channel
+> *control, if (p->transaction != avctp->transaction)
+>  			continue;
+> 
+> +		avctp_ref(control->session);
+> +
+>  		if (req->func && req->func(control->session, avc->code,
+>  						avc->subunit_type,
+>  						operands, operand_count,
+> @@ -749,6 +793,8 @@ static void control_response(struct avctp_channel
+> *control, control->processed = g_slist_remove(control->processed, p);
+>  		pending_destroy(p, NULL);
+> 
+> +		avctp_unref(control->session);
+> +
+>  		return;
+>  	}
+>  }
+> @@ -784,6 +830,8 @@ static void browsing_response(struct avctp_channel
+> *browsing, if (p->transaction != avctp->transaction)
+>  			continue;
+> 
+> +		avctp_ref(browsing->session);
+> +
+>  		if (req->func && req->func(browsing->session, operands,
+>  						operand_count, req->user_data))
+>  			return;
+> @@ -1563,7 +1611,7 @@ struct avctp *avctp_new(int fd, size_t imtu, size_t
+> omtu, uint16_t version) control->watch =
+> g_io_add_watch(session->control->io, cond,
+>  						(GIOFunc) session_cb, session);
+> 
+> -	return session;
+> +	return avctp_ref(session);
+>  }
+> 
+>  int avctp_connect_browsing(struct avctp *session, int fd, size_t imtu,
+> @@ -1599,27 +1647,5 @@ void avctp_shutdown(struct avctp *session)
+>  	if (!session)
+>  		return;
+> 
+> -	if (session->browsing)
+> -		avctp_channel_destroy(session->browsing);
+> -
+> -	if (session->control)
+> -		avctp_channel_destroy(session->control);
+> -
+> -	if (session->destroy)
+> -		session->destroy(session->data);
+> -
+> -	g_free(session->handler);
+> -
+> -	if (session->key.timer > 0)
+> -		g_source_remove(session->key.timer);
+> -
+> -	if (session->uinput >= 0) {
+> -		DBG("AVCTP: closing uinput");
+> -
+> -		ioctl(session->uinput, UI_DEV_DESTROY);
+> -		close(session->uinput);
+> -		session->uinput = -1;
+> -	}
+> -
+> -	g_free(session);
+> +	avctp_unref(session);
+>  }
 
-Marcel
-
+-- 
+BR
+Szymon Janc
