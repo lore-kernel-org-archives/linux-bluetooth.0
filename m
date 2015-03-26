@@ -1,197 +1,212 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] tools/btmgmt: Fix crash in interactive mode
-Date: Thu, 26 Mar 2015 22:59:24 +0100
-Message-Id: <1427407164-20354-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1427339794-6970-1-git-send-email-armansito@chromium.org>
+References: <1427339794-6970-1-git-send-email-armansito@chromium.org>
+Date: Thu, 26 Mar 2015 14:44:34 -0700
+Message-ID: <CAHrH25QNTVRdF_o4uMt=57qiNsvM03QpxhcEs0YzgXgydgW81w@mail.gmail.com>
+Subject: Re: [PATCH 1/2] tools/mgmt-tester: Add test cases for AD flags 0-4
+From: Arman Uguray <armansito@chromium.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Optind needs to be reset to 0 so getopt_long do reinitialization on new
-parsing. Otherwise we got crash:
+Hi,
 
-[hci1]# find --help
-Usage: find [-l|-b]>
-[hci1]# find --help
-==16382== Invalid read of size 1
-==16382==    at 0x513CA96: _getopt_internal_r (getopt.c:429)
-==16382==    by 0x513DBFA: _getopt_internal (getopt.c:1177)
-==16382==    by 0x513DC82: getopt_long (getopt1.c:66)
-==16382==    by 0x406721: cmd_find (btmgmt.c:2111)
-==16382==    by 0x40C712: rl_handler (btmgmt.c:4275)
-==16382==    by 0x4E5A727: rl_callback_read_char (in
-/lib/x86_64-linux-gnu/libreadline.so.6.2)
-==16382==    by 0x402ED8: prompt_read (btmgmt.c:4340)
-==16382==    by 0x41D117: io_callback (io-mainloop.c:123)
-==16382==    by 0x41D9F3: mainloop_run (mainloop.c:157)
-==16382==    by 0x4026C2: main (btmgmt.c:4427)
-==16382==  Address 0x567e576 is 6 bytes inside a block of size 101
-free'd
-==16382==    at 0x4C2A82E: free (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==16382==    by 0x5158DE8: wordfree (wordexp.c:2235)
-==16382==    by 0x40C71A: rl_handler (btmgmt.c:4304)
-==16382==    by 0x4E5A727: rl_callback_read_char (in
-/lib/x86_64-linux-gnu/libreadline.so.6.2)
-==16382==    by 0x402ED8: prompt_read (btmgmt.c:4340)
-==16382==    by 0x41D117: io_callback (io-mainloop.c:123)
-==16382==    by 0x41D9F3: mainloop_run (mainloop.c:157)
-==16382==    by 0x4026C2: main (btmgmt.c:4427)
-==16382==
----
- tools/btmgmt.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+> On Wed, Mar 25, 2015 at 8:16 PM, Arman Uguray <armansito@chromium.org> wrote:
+> This patch adds unit test cases for the Add Advertising flags 0-4.
+> ---
+>  tools/mgmt-tester.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 144 insertions(+)
+>
+> diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+> index 5de9967..0721a64 100644
+> --- a/tools/mgmt-tester.c
+> +++ b/tools/mgmt-tester.c
+> @@ -797,6 +797,12 @@ static const struct generic_data set_connectable_off_le_test_2 = {
+>         .expect_hci_len = sizeof(set_connectable_off_adv_param),
+>  };
+>
+> +static uint16_t settings_powered_le_discoverable[] = {
+> +                                       MGMT_OP_SET_LE,
+> +                                       MGMT_OP_SET_CONNECTABLE,
+> +                                       MGMT_OP_SET_POWERED,
+> +                                       MGMT_OP_SET_DISCOVERABLE, 0 };
+> +
+>  static uint16_t settings_powered_le_discoverable_advertising[] = {
+>                                         MGMT_OP_SET_LE,
+>                                         MGMT_OP_SET_CONNECTABLE,
+> @@ -3800,6 +3806,36 @@ static const uint8_t add_advertising_param_3[] = {
+>         0x04, 0xff, 0x01, 0x02, 0x03,
+>  };
+>
+> +static const uint8_t add_advertising_param_4[] = {
+> +       0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00,
+> +       0x03, 0x02, 0x0d, 0x18,
+> +       0x04, 0xff, 0x01, 0x02, 0x03,
+> +};
+> +
+> +static const uint8_t add_advertising_param_5[] = {
+> +       0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00,
+> +       0x03, 0x02, 0x0d, 0x18,
+> +       0x04, 0xff, 0x01, 0x02, 0x03,
+> +};
+> +
+> +static const uint8_t add_advertising_param_6[] = {
+> +       0x01, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00,
+> +       0x03, 0x02, 0x0d, 0x18,
+> +       0x04, 0xff, 0x01, 0x02, 0x03,
+> +};
+> +
+> +static const uint8_t add_advertising_param_7[] = {
+> +       0x01, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00,
+> +       0x03, 0x02, 0x0d, 0x18,
+> +       0x04, 0xff, 0x01, 0x02, 0x03,
+> +};
+> +
+> +static const uint8_t add_advertising_param_8[] = {
+> +       0x01, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00,
+> +       0x03, 0x02, 0x0d, 0x18,
+> +       0x04, 0xff, 0x01, 0x02, 0x03,
+> +};
+> +
+>  static const uint8_t advertising_instance_param[] = {
+>         0x01,
+>  };
+> @@ -3832,6 +3868,34 @@ static const uint8_t set_adv_data_4[] = {
+>         0x00, 0x00,
+>  };
+>
+> +static const uint8_t set_adv_data_5[] = {
+> +       0x0c, 0x02, 0x01, 0x02, 0x03, 0x02, 0x0d, 0x18, 0x04, 0xff,
+> +       0x01, 0x02, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +       0x00, 0x00,
+> +};
+> +
+> +static const uint8_t set_adv_data_6[] = {
+> +       0x0c, 0x02, 0x01, 0x01, 0x03, 0x02, 0x0d, 0x18, 0x04, 0xff,
+> +       0x01, 0x02, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +       0x00, 0x00,
+> +};
+> +
+> +static const uint8_t set_adv_data_7[] = {
+> +       0x0c, 0x02, 0x01, 0x02, 0x03, 0x02, 0x0d, 0x18, 0x04, 0xff,
+> +       0x01, 0x02, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +       0x00, 0x00,
+> +};
+> +
+> +static const uint8_t set_adv_data_8[] = {
+> +       0x0c, 0x02, 0x0a, 0x00, 0x03, 0x02, 0x0d, 0x18, 0x04, 0xff,
+> +       0x01, 0x02, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +       0x00, 0x00,
+> +};
+> +
+>  static const uint8_t set_scan_rsp_1[] = {
+>         0x0a, 0x03, 0x19, 0x40, 0x03, 0x05, 0x03, 0x0d, 0x18, 0x0f,
+>         0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> @@ -4105,6 +4169,71 @@ static const struct generic_data add_advertising_success_7 = {
+>         .expect_hci_len = sizeof(set_scan_rsp_1),
+>  };
+>
+> +static const struct generic_data add_advertising_success_8 = {
+> +       .setup_settings = settings_powered_le,
+> +       .send_opcode = MGMT_OP_ADD_ADVERTISING,
+> +       .send_param = add_advertising_param_4,
+> +       .send_len = sizeof(add_advertising_param_4),
+> +       .expect_param = advertising_instance_param,
+> +       .expect_len = sizeof(advertising_instance_param),
+> +       .expect_status = MGMT_STATUS_SUCCESS,
+> +       .expect_hci_command = BT_HCI_CMD_LE_SET_ADV_PARAMETERS,
+> +       .expect_hci_param = set_connectable_on_adv_param,
+> +       .expect_hci_len = sizeof(set_connectable_on_adv_param),
+> +};
+> +
+> +static const struct generic_data add_advertising_success_9 = {
+> +       .setup_settings = settings_powered_le,
+> +       .send_opcode = MGMT_OP_ADD_ADVERTISING,
+> +       .send_param = add_advertising_param_5,
+> +       .send_len = sizeof(add_advertising_param_5),
+> +       .expect_param = advertising_instance_param,
+> +       .expect_len = sizeof(advertising_instance_param),
+> +       .expect_status = MGMT_STATUS_SUCCESS,
+> +       .expect_hci_command = BT_HCI_CMD_LE_SET_ADV_DATA,
+> +       .expect_hci_param = set_adv_data_5,
+> +       .expect_hci_len = sizeof(set_adv_data_5),
+> +};
+> +
+> +static const struct generic_data add_advertising_success_10 = {
+> +       .setup_settings = settings_powered_le,
+> +       .send_opcode = MGMT_OP_ADD_ADVERTISING,
+> +       .send_param = add_advertising_param_6,
+> +       .send_len = sizeof(add_advertising_param_6),
+> +       .expect_param = advertising_instance_param,
+> +       .expect_len = sizeof(advertising_instance_param),
+> +       .expect_status = MGMT_STATUS_SUCCESS,
+> +       .expect_hci_command = BT_HCI_CMD_LE_SET_ADV_DATA,
+> +       .expect_hci_param = set_adv_data_6,
+> +       .expect_hci_len = sizeof(set_adv_data_6),
+> +};
+> +
+> +static const struct generic_data add_advertising_success_11 = {
+> +       .setup_settings = settings_powered_le_discoverable,
+> +       .send_opcode = MGMT_OP_ADD_ADVERTISING,
+> +       .send_param = add_advertising_param_7,
+> +       .send_len = sizeof(add_advertising_param_7),
+> +       .expect_param = advertising_instance_param,
+> +       .expect_len = sizeof(advertising_instance_param),
+> +       .expect_status = MGMT_STATUS_SUCCESS,
+> +       .expect_hci_command = BT_HCI_CMD_LE_SET_ADV_DATA,
+> +       .expect_hci_param = set_adv_data_7,
+> +       .expect_hci_len = sizeof(set_adv_data_7),
+> +};
+> +
+> +static const struct generic_data add_advertising_success_12 = {
+> +       .setup_settings = settings_powered_le_discoverable,
+> +       .send_opcode = MGMT_OP_ADD_ADVERTISING,
+> +       .send_param = add_advertising_param_8,
+> +       .send_len = sizeof(add_advertising_param_8),
+> +       .expect_param = advertising_instance_param,
+> +       .expect_len = sizeof(advertising_instance_param),
+> +       .expect_status = MGMT_STATUS_SUCCESS,
+> +       .expect_hci_command = BT_HCI_CMD_LE_SET_ADV_DATA,
+> +       .expect_hci_param = set_adv_data_8,
+> +       .expect_hci_len = sizeof(set_adv_data_8),
+> +};
+> +
+>  static const char set_powered_off_le_settings_param[] = {
+>         0x80, 0x02, 0x00, 0x00
+>  };
+> @@ -6057,6 +6186,21 @@ int main(int argc, char *argv[])
+>         test_bredrle("Add Advertising - Success 5",
+>                                         &add_advertising_success_7,
+>                                         NULL, test_command_generic);
+> +       test_bredrle("Add Advertising - Success 6 - Flag 0",
+> +                                       &add_advertising_success_8,
+> +                                       NULL, test_command_generic);
+> +       test_bredrle("Add Advertising - Success 7 - Flag 1",
+> +                                       &add_advertising_success_9,
+> +                                       NULL, test_command_generic);
+> +       test_bredrle("Add Advertising - Success 8 - Flag 2",
+> +                                       &add_advertising_success_10,
+> +                                       NULL, test_command_generic);
+> +       test_bredrle("Add Advertising - Success 8 - Flag 3",
+> +                                       &add_advertising_success_11,
+> +                                       NULL, test_command_generic);
+> +       test_bredrle("Add Advertising - Success 9 - Flag 4",
+> +                                       &add_advertising_success_12,
+> +                                       NULL, test_command_generic);
+>
+>         test_bredrle("Remove Advertising - Invalid Params 1",
+>                                         &remove_advertising_fail_1,
+> --
+> 2.2.0.rc0.207.ga3a616c
+>
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 36a8681..d7af7f0 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -1879,9 +1879,11 @@ static void cmd_disconnect(struct mgmt *mgmt, uint16_t index, int argc,
- 			break;
- 		case 'h':
- 			disconnect_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_SUCCESS);
- 		default:
- 			disconnect_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_FAILURE);
- 		}
- 	}
-@@ -2027,11 +2029,13 @@ static void cmd_find_service(struct mgmt *mgmt, uint16_t index, int argc,
- 		case 'u':
- 			if (count == MAX_UUIDS) {
- 				print("Max %u UUIDs supported", MAX_UUIDS);
-+				optind = 0;
- 				return noninteractive_quit(EXIT_FAILURE);
- 			}
- 
- 			if (bt_string2uuid(&uuid, optarg) < 0) {
- 				print("Invalid UUID: %s", optarg);
-+				optind = 0;
- 				return noninteractive_quit(EXIT_FAILURE);
- 			}
- 			cp = (void *) buf;
-@@ -2045,9 +2049,11 @@ static void cmd_find_service(struct mgmt *mgmt, uint16_t index, int argc,
- 			break;
- 		case 'h':
- 			find_service_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_SUCCESS);
- 		default:
- 			find_service_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_FAILURE);
- 		}
- 	}
-@@ -2121,9 +2127,11 @@ static void cmd_find(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
- 			break;
- 		case 'h':
- 			find_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_SUCCESS);
- 		default:
- 			find_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_FAILURE);
- 		}
- 	}
-@@ -2195,6 +2203,7 @@ static void cmd_stop_find(struct mgmt *mgmt, uint16_t index, int argc,
- 		case 'h':
- 		default:
- 			stop_find_usage();
-+			optind = 0;
- 			exit(EXIT_SUCCESS);
- 		}
- 	}
-@@ -2311,9 +2320,11 @@ static void cmd_pair(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
- 			break;
- 		case 'h':
- 			pair_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_SUCCESS);
- 		default:
- 			pair_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_FAILURE);
- 		}
- 	}
-@@ -2400,9 +2411,11 @@ static void cmd_cancel_pair(struct mgmt *mgmt, uint16_t index, int argc,
- 			break;
- 		case 'h':
- 			cancel_pair_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_SUCCESS);
- 		default:
- 			cancel_pair_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_FAILURE);
- 		}
- 	}
-@@ -2484,9 +2497,11 @@ static void cmd_unpair(struct mgmt *mgmt, uint16_t index, int argc,
- 			break;
- 		case 'h':
- 			unpair_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_SUCCESS);
- 		default:
- 			unpair_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_FAILURE);
- 		}
- 	}
-@@ -2615,6 +2630,7 @@ static void cmd_irks(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
- 		case 'l':
- 			if (count >= MAX_IRKS) {
- 				error("Number of IRKs exceeded");
-+				optind = 0;
- 				return noninteractive_quit(EXIT_FAILURE);
- 			}
- 			if (strlen(optarg) > 3 &&
-@@ -2624,15 +2640,18 @@ static void cmd_irks(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
- 				local_index = atoi(optarg);
- 			if (!load_identity(local_index, &cp->irks[count])) {
- 				error("Unable to load identity");
-+				optind = 0;
- 				return noninteractive_quit(EXIT_FAILURE);
- 			}
- 			count++;
- 			break;
- 		case 'h':
- 			irks_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_SUCCESS);
- 		default:
- 			irks_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_FAILURE);
- 		}
- 	}
-@@ -2710,9 +2729,11 @@ static void cmd_block(struct mgmt *mgmt, uint16_t index, int argc, char **argv)
- 			break;
- 		case 'h':
- 			block_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_SUCCESS);
- 		default:
- 			block_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_FAILURE);
- 		}
- 	}
-@@ -2760,9 +2781,11 @@ static void cmd_unblock(struct mgmt *mgmt, uint16_t index, int argc,
- 			break;
- 		case 'h':
- 			unblock_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_SUCCESS);
- 		default:
- 			unblock_usage();
-+			optind = 0;
- 			return noninteractive_quit(EXIT_FAILURE);
- 		}
- 	}
--- 
-1.8.4
+Both patches in this series have been applied.
 
+Thanks,
+Arman
