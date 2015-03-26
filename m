@@ -1,35 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/3] Handling extended headers of bnep control frames
-Date: Thu, 26 Mar 2015 12:02:32 +0100
-Message-Id: <1427367755-13950-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <5511CDE3.2000004@message-id.googlemail.com>
+References: <5511CDE3.2000004@message-id.googlemail.com>
+Date: Thu, 26 Mar 2015 11:40:39 +0200
+Message-ID: <CABBYNZKtV8rSRoWvSUao-hoY6ds2pRc+VsHM4ik8cFf0kpuFRQ@mail.gmail.com>
+Subject: Re: More testsuite breakage unveiled by gcc-5.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Stefan Seyfried <stefan.seyfried@googlemail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set adds support for handling extended headers of bnep control
-frames which is mandatory. Until now extended headers for control messages was
-ignored.
+Hi Stefan,
 
-Patch [1/3] adds setting of err variable if control message is not understood.
-Patch [2/3] adds additional ioctl for get supported bnep features. This is
-needed for user space to know if handling of sending success setup response
-frame should be handled by kernel or by user space.
-Patch [3/3] adds support for handling extended headers of bnep control frames.
+On Tue, Mar 24, 2015 at 10:49 PM, Stefan Seyfried
+<stefan.seyfried@googlemail.com> wrote:
+> Hi all,
+>
+> the test suite apparently has more problems unveiled by gcc-5.0
+>
+> The gory details are in
+> https://bugzilla.opensuse.org/show_bug.cgi?id=923768
+>
+> I'm off to conferences / vacation now, so my latency will be big :-)
 
-Patch set tested with PTS bnep test cases. No regression, issues found during
-testing.
+Thanks for reporting, I will be looking into that, apparently this
+only happen on 32 bits but I managed to reproduce with gcc 4.9.2 as
+well.
 
-Grzegorz Kolodziejczyk (3):
-  Bluetooth: bnep: Return err value while sending cmd is not understood
-  Bluetooth: bnep: Add support for get bnep features via ioctl
-  Bluetooth: bnep: Add support to extended headers of control frames
-
- net/bluetooth/bnep/bnep.h |  4 ++++
- net/bluetooth/bnep/core.c | 57 +++++++++++++++++++++++++++++++++++++----------
- net/bluetooth/bnep/sock.c |  8 +++++++
- 3 files changed, 57 insertions(+), 12 deletions(-)
 
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
