@@ -1,44 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 1/3] tools/btmgmt: Better usage info for add-adv
-Date: Wed, 25 Mar 2015 20:07:10 -0700
-Message-Id: <1427339232-27053-1-git-send-email-armansito@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH v2 1/8] Bluetooth: Add macros for advertising instance flags
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1427334826-14858-1-git-send-email-armansito@chromium.org>
+Date: Wed, 25 Mar 2015 19:32:25 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <812789AD-931E-4003-9956-D2EB8CAD2E66@holtmann.org>
+References: <1427334826-14858-1-git-send-email-armansito@chromium.org>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch improves the usage string that gets printed for the add-adv
-command to provide more details about the possible options.
----
- tools/btmgmt.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+Hi Arman,
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index f64327b..58a5926 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -3687,8 +3687,18 @@ static void add_adv_rsp(uint8_t status, uint16_t len, const void *param,
- 
- static void add_adv_usage(void)
- {
--	print("Usage: add-adv [-u uuid] [-d adv_data] [-s scan_rsp] "
--		"[-t timeout] [-c] [-d] [-e] [-l] [-m] [-p] <instance_id>");
-+	print("Usage: add-adv [options] <instance_id>\nOptions:\n"
-+		"\t -u, --uuid <uuid>\t\tService UUID\n"
-+		"\t -d, --adv-data <data>\t\tAdvertising Data bytes\n"
-+		"\t -s, --scan-rsp <data>\t\tScan Response Data bytes\n"
-+		"\t -t, --timeout <timeout>\tTimeout in seconds\n"
-+		"\t -c, --connectable\t\t\"connectable\" flag\n"
-+		"\t -e, --discoverable\t\t\"general-discoverable\" flag\n"
-+		"\t -l, --limited-discov\t\t\"limited-discoverable\" flag\n"
-+		"\t -m, --managed-flags\t\t\"managed-flags\" flag\n"
-+		"\t -p, --tx-power\t\t\t\"tx-power\" flag\n"
-+		"e.g.:\n"
-+		"\tadd-adv -u 180d -u 180f -d 080954657374204C45 1");
- }
- 
- static struct option add_adv_options[] = {
--- 
-2.2.0.rc0.207.ga3a616c
+> This patch adds macro definitions for possible advertising instance
+> flags that can be passed to the "Add Advertising" command.
+> 
+> Signed-off-by: Arman Uguray <armansito@chromium.org>
+> ---
+> include/net/bluetooth/mgmt.h | 8 ++++++++
+> 1 file changed, 8 insertions(+)
+
+all 8 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
