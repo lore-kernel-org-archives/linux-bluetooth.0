@@ -1,64 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <2438722.WgYkM0ao6e@leonov>
-References: <1427208744-11805-1-git-send-email-richard@lm-technologies.com>
-	<2438722.WgYkM0ao6e@leonov>
-Date: Fri, 27 Mar 2015 10:53:05 +0000
-Message-ID: <CAFSTUk7pB_V6ossJAGUmvK6HGuQ2qLAdTzENH76VTzKRgy9SUg@mail.gmail.com>
-Subject: Re: [PATCH] lib: Fix compilation error in C++ due to inline function
-From: Richard Palethorpe <richard@lm-technologies.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1426858595-29346-1-git-send-email-bharat.panda@samsung.com>
+ <022501d0654c$9ee015b0$dca04110$@samsung.com>
+ <CABBYNZLzrFhgq7K6DdFCMUg0AaQpj5RmGWDCZcZS_K3-HN8q7A@mail.gmail.com>
+ <022f01d06579$955ccec0$c0166c40$@samsung.com>
+In-reply-to: <022f01d06579$955ccec0$c0166c40$@samsung.com>
+Subject: RE: [PATCH v2] monitor: Add AVDTP support to btmon
+Date: Fri, 27 Mar 2015 16:20:34 +0530
+Message-id: <000001d0687b$df7d95c0$9e78c140$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Szymon,
+Hi Luiz,
 
-Sorry, I haven't submitted a patch before, so should I add the spaces
-then resubmit it as [PATCH V2] with it signed off by you?
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Bharat Bhusan Panda
+> Sent: Monday, March 23, 2015 8:27 PM
+> To: 'Luiz Augusto von Dentz'
+> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> Subject: RE: [PATCH v2] monitor: Add AVDTP support to btmon
+> 
+> Hi Luiz,
+> 
+> > >> +
+> > >> +void avdtp_packet(const struct l2cap_frame *frame) {
+> > >> +     struct l2cap_frame *l2cap_frame;
+> > >> +     struct avdtp_frame avdtp_frame;
+> > >> +     const char *pdu_color;
+> > >> +
+> > >> +     l2cap_frame_pull(&avdtp_frame.l2cap_frame, frame, 0);
+> > >> +
+> > >> +     l2cap_frame = &avdtp_frame.l2cap_frame;
+> > >> +
+> > >> +     avdtp_frame.tsid = 0x00;
+> > >> +     if (!l2cap_frame_get_u8(l2cap_frame, &avdtp_frame.hdr) ||
+> > >> +                     !l2cap_frame_get_u8(l2cap_frame,
+> > >> &avdtp_frame.tsid)) {
+> > >> +             print_text(COLOR_ERROR, "frame too short");
+> > >> +             packet_hexdump(frame->data, frame->size);
+> > >> +             return;
+> > >> +     }
+> >
+> > It looks like you are treating all frames as signalling but A2DP uses
+> > the same PSM for streaming so I wonder if you have tried this with an
+> active stream?
+> Yes, I was testing it through mecApp, so couldn't test the real media
+> streaming of the same.
+> I agree, it is treating all frames as signaling frames, which is how it should not
+> be. I will submit another version for this patch handling the same.
+> >
+> 
+I have submitted new version of the patch, which treats signaling and media frames in different frame numbers (as it is done in hcidump).
+As of now, this patch parses only AVDTP signaling frame and raw dump on media frames (which will be handled in my following set of patches.
+Please review.
 
-On Fri, Mar 27, 2015 at 7:40 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Richard,
->
-> On Tuesday 24 of March 2015 14:52:24 Richard Palethorpe wrote:
->> This adds explicit typecasts to an inline function to make it C++
->> compatible. ---
->>  lib/bluetooth.h | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
->> index 6ca64b6..ab24443 100644
->> --- a/lib/bluetooth.h
->> +++ b/lib/bluetooth.h
->> @@ -345,8 +345,8 @@ typedef struct {
->>
->>  static inline void bswap_128(const void *src, void *dst)
->>  {
->> -     const uint8_t *s = src;
->> -     uint8_t *d = dst;
->> +     const uint8_t *s = (const uint8_t *)src;
->> +     uint8_t *d = (uint8_t *)dst;
->>       int i;
->
-> Just a nitpick: there should be space after cast
-> (see M5 in doc/coding-style.txt).
->
->>       for (i = 0; i < 16; i++)
->
-> Other than that patch looks good to me.
->
-> --
-> BR
-> Szymon Janc
+Thanks
+Best Regards,
+Bharat
 
-
-
--- 
-Many thanks,
-
-Richard Palethorpe
-
-Software Developer
-
-R&D Department
