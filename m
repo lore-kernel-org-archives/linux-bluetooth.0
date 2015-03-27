@@ -1,63 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <5515641A.4020907@ontarget-group.com>
+Date: Fri, 27 Mar 2015 17:07:22 +0300
+From: Alexey Pavlyuk <alexey.pavlyuk@ontarget-group.com>
 MIME-Version: 1.0
-In-Reply-To: <1427446194-5646-1-git-send-email-luiz.dentz@gmail.com>
-References: <1427446194-5646-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 27 Mar 2015 16:36:41 +0200
-Message-ID: <CABBYNZKTahGAsP4fn9OxZwc9qih9S2Q8tsbm56spAs4XxV7MzA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] unit/test-avctp: Remove DBG calls
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: Bluez 5.29 BLE connection issue
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi, can you help me with bluetooth connection issue?
+I'm developing server which should work on BeagleBone Black device and 
+connected with Android application by bluetooth LE or Classic. The 
+server use Bluez library and set LE advertisement data, parameters and 
+enable advertising. Than it create L2CAP socket and waits for connection.
+Debian 7.5 system ("wheezy") is installed on BeagleBone. I removed old 
+bluez version than installed bluez-5.29 from source and run "bluetoothd 
+--compat -d -n".
+After that I cannot connect from Android to the server using BLE protocol.
+Here is debug log:
 
-On Fri, Mar 27, 2015 at 10:49 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> ---
->  unit/test-avctp.c | 7 -------
->  1 file changed, 7 deletions(-)
->
-> diff --git a/unit/test-avctp.c b/unit/test-avctp.c
-> index ce52222..689a825 100644
-> --- a/unit/test-avctp.c
-> +++ b/unit/test-avctp.c
-> @@ -220,9 +220,6 @@ static ssize_t handler(struct avctp *session,
->                                         uint8_t *subunit, uint8_t *operands,
->                                         size_t operand_count, void *user_data)
->  {
-> -       DBG("transaction %d code %d subunit %d operand_count %zu",
-> -               transaction, *code, *subunit, operand_count);
-> -
->         g_assert_cmpint(transaction, ==, 0);
->         g_assert_cmpint(*code, ==, 0);
->         g_assert_cmpint(*subunit, ==, 0);
-> @@ -238,9 +235,6 @@ static gboolean handler_response(struct avctp *session,
->  {
->         struct context *context = user_data;
->
-> -       DBG("code 0x%02x subunit %d operand_count %zu", code, subunit,
-> -                                                               operand_count);
-> -
->         g_assert_cmpint(code, ==, 0x0a);
->         g_assert_cmpint(subunit, ==, 0);
->         g_assert_cmpint(operand_count, ==, 0);
-> @@ -265,7 +259,6 @@ static void test_server(gconstpointer data)
->
->                 ret = avctp_register_pdu_handler(context->session,
->                                         AVC_OP_VENDORDEP, handler, NULL);
-> -               DBG("ret %d", ret);
->                 g_assert_cmpint(ret, !=, 0);
->         }
->
-> --
-> 2.1.0
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/adapter.c:connected_callback() hci0 device X:X:X:X:X:X connected 
+eir_len 0
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/gatt-database.c:connect_cb() New incoming LE ATT connection
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/adapter.c:connected_callback() hci0 device X:X:X:X:X:X connected 
+eir_len 0
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/gatt-database.c:connect_cb() New incoming LE ATT connection
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+attrib/gattrib.c:g_attrib_ref() 0x8dd20: g_attrib_ref=1
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/adapter.c:adapter_connect_list_remove() device 
+/org/bluez/hci0/dev_X_X_X_X_X_X is not on the list, ignoring
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+attrib/gattrib.c:g_attrib_ref() 0x8dd20: g_attrib_ref=1
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/adapter.c:adapter_connect_list_remove() device 
+/org/bluez/hci0/dev_X_X_X_X_X_X is not on the list, ignoring
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/adapter.c:dev_disconnected() Device X:X:X:X:X:X disconnected, reason 3
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/adapter.c:adapter_remove_connection()
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+plugins/policy.c:disconnect_cb() reason 3
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/adapter.c:bonding_attempt_complete() hci0 bdaddr X:X:X:X:X:X type 1 
+status 0xe
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/device.c:device_bonding_complete() bonding (nil) status 0x0e
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/device.c:device_bonding_failed() status 14
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/adapter.c:resume_discovery()
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/device.c:att_disconnected_cb()
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/device.c:att_disconnected_cb() Connection reset by peer (104)
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+src/device.c:att_disconnected_cb() Automatic connection disabled
+Mar 27 12:27:22 beaglebone bluetoothd[601]: bluetoothd[601]: 
+attrib/gattrib.c:g_attrib_unref() 0x8dd20: g_attrib_unref=0
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/adapter.c:dev_disconnected() Device X:X:X:X:X:X disconnected, reason 3
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/adapter.c:adapter_remove_connection()
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+plugins/policy.c:disconnect_cb() reason 3
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/adapter.c:bonding_attempt_complete() hci0 bdaddr X:X:X:X:X:X type 1 
+status 0xe
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/device.c:device_bonding_complete() bonding (nil) status 0x0e
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/device.c:device_bonding_failed() status 14
+Mar 27 12:27:22 beaglebone bluetoothd[601]: src/adapter.c:resume_discovery()
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/device.c:att_disconnected_cb()
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/device.c:att_disconnected_cb() Connection reset by peer (104)
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+src/device.c:att_disconnected_cb() Automatic connection disabled
+Mar 27 12:27:22 beaglebone bluetoothd[601]: 
+attrib/gattrib.c:g_attrib_unref() 0x8dd20: g_attrib_unref=0
 
-Applied.
+When I stop bluetoothd, BLE connection is working. But I need SDP server 
+for Classic Bluetooth connection.
+Also all is working well with Bluez-4.99 library and the daemon.
 
+Bluetooth dongle on 'Broadcom BCM20702' chipset is used.
 
--- 
-Luiz Augusto von Dentz
+Thank you,
+Alexey
