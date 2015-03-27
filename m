@@ -1,38 +1,154 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <551525E8.7070103@intel.com>
-Date: Fri, 27 Mar 2015 10:42:00 +0100
-From: loic <loic.poulain@intel.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Intel: Introduce btvnd_intel library
-References: <1427387863-2629-1-git-send-email-loic.poulain@intel.com> <3354DD05-A6FC-4F73-9D77-485D570944B1@holtmann.org>
-In-Reply-To: <3354DD05-A6FC-4F73-9D77-485D570944B1@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 5/5] unit: Replace use of g_malloc+memcpy with gmemdup
+Date: Fri, 27 Mar 2015 10:49:54 +0200
+Message-Id: <1427446194-5646-5-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1427446194-5646-1-git-send-email-luiz.dentz@gmail.com>
+References: <1427446194-5646-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Hi Marcel,
+This seems to fix problems of make check not working in 32 bit systems
+with gcc 5.0.
+---
+ unit/test-avctp.c | 3 +--
+ unit/test-avdtp.c | 3 +--
+ unit/test-avrcp.c | 3 +--
+ unit/test-gatt.c  | 3 +--
+ unit/test-hfp.c   | 6 ++----
+ unit/test-hog.c   | 3 +--
+ unit/test-sdp.c   | 3 +--
+ unit/test-uhid.c  | 3 +--
+ 8 files changed, 9 insertions(+), 18 deletions(-)
 
-On 26/03/2015 17:56, Marcel Holtmann wrote:
-> Hi Loic,
->
->> Most Intel Bluetooth controllers use a same set of vendor HCI commands
->> and procedures regardless of the transport layer (USB, UART, etc).
->> In order to prevent code duplication, this patch adds common library
->> for Intel bluetooth drivers.
->> This is essentially a move of btusb Intel code to btvnd_intel.
-> actually in the beginning I would prefer to actually go with independent code for USB and UART for the Intel silicon. The reason I am saying that is because there are still things to be figured out before we can have generic code. So we might accept duplicate at first and once both transports are working, we will slowly start moving code out into a common module.
-Seems reasonable.
->
-> Also I think only BTUSB_INTEL_NEW support needs to be considered in the beginning. The older Intel silicon support should only be considered when the need arises.
->
-> To give a little bit background, the functions that we need to consider are hdev->shutdown, hdev->setup and hdev->set_bdaddr. That would be simplest split into a separate module. However they are a bit tricky since for BTUSB_INTEL_NEW we already know that we have to handle asynchronous event reception from the firmware download. With regard, I would like to see the UART code first merged upstream and then we go and move common pieces into a more generic solution.
-Async events (boot up, patch complete) are currently managed by the 
-Bluetooth transport driver itself (hook).
-Could we consider to introduce a hci_wait_vendor_event helper?
+diff --git a/unit/test-avctp.c b/unit/test-avctp.c
+index 689a825..3bc3569 100644
+--- a/unit/test-avctp.c
++++ b/unit/test-avctp.c
+@@ -77,8 +77,7 @@ struct context {
+ 		};							\
+ 		static struct test_data data;				\
+ 		data.test_name = g_strdup(name);			\
+-		data.pdu_list = g_malloc(sizeof(pdus));			\
+-		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
++		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+ 		tester_add(name, &data, NULL, function, NULL);		\
+ 	} while (0)
+ 
+diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+index 58628a7..dd8aed7 100644
+--- a/unit/test-avdtp.c
++++ b/unit/test-avdtp.c
+@@ -80,8 +80,7 @@ struct test_data {
+ 		};							\
+ 		static struct test_data data;				\
+ 		data.test_name = g_strdup(name);			\
+-		data.pdu_list = g_malloc(sizeof(pdus));			\
+-		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
++		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+ 		tester_add(name, &data, NULL, function, NULL);		\
+ 	} while (0)
+ 
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 024e38e..a610ad5 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -109,8 +109,7 @@ struct context {
+ 		};							\
+ 		static struct test_data data;				\
+ 		data.test_name = g_strdup(name);			\
+-		data.pdu_list = g_malloc(sizeof(pdus));			\
+-		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
++		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+ 		tester_add(name, &data, NULL, function, NULL);		\
+ 	} while (0)
+ 
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 92ab6dc..5cb2e9f 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -102,8 +102,7 @@ struct context {
+ 		data.uuid = bt_uuid;					\
+ 		data.step = test_step;					\
+ 		data.source_db = db;					\
+-		data.pdu_list = g_malloc(sizeof(pdus));			\
+-		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
++		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+ 		tester_add(name, &data, NULL, function, NULL);		\
+ 	} while (0)
+ 
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index face9a4..66966ce 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -95,9 +95,8 @@ struct test_data {
+ 		};							\
+ 		static struct test_data data;				\
+ 		data.test_name = g_strdup(name);			\
+-		data.pdu_list = g_malloc(sizeof(pdus));			\
++		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+ 		data.result_func = result_function;			\
+-		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
+ 		g_test_add_data_func(name, &data, function);		\
+ 		data.test_handler = test_handler;			\
+ 	} while (0)
+@@ -110,10 +109,9 @@ struct test_data {
+ 		};							\
+ 		static struct test_data data;				\
+ 		data.test_name = g_strdup(name);			\
+-		data.pdu_list = g_malloc(sizeof(pdus));			\
++		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+ 		data.hf_result_func = result_func;			\
+ 		data.response_func = response_function;			\
+-		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
+ 		g_test_add_data_func(name, &data, function);		\
+ 		data.test_handler = test_hf_handler;			\
+ 	} while (0)
+diff --git a/unit/test-hog.c b/unit/test-hog.c
+index 2a25d09..778f087 100644
+--- a/unit/test-hog.c
++++ b/unit/test-hog.c
+@@ -81,8 +81,7 @@ struct context {
+ 		};		\
+ 		static struct test_data data;      \
+ 		data.test_name = g_strdup(name);   \
+-		data.pdu_list = g_malloc(sizeof(pdus));			\
+-		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
++		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+ 		tester_add(name, &data, NULL, function, NULL);     \
+ 	} while (0)
+ 
+diff --git a/unit/test-sdp.c b/unit/test-sdp.c
+index a89dbfc..b4ef4d1 100644
+--- a/unit/test-sdp.c
++++ b/unit/test-sdp.c
+@@ -77,8 +77,7 @@ struct test_data {
+ 		};							\
+ 		static struct test_data data;				\
+ 		data.mtu = _mtu;					\
+-		data.pdu_list = g_malloc(sizeof(pdus));			\
+-		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
++		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+ 		g_test_add_data_func(name, &data, test_sdp);		\
+ 	} while (0)
+ 
+diff --git a/unit/test-uhid.c b/unit/test-uhid.c
+index 85e1356..b48e0fa 100644
+--- a/unit/test-uhid.c
++++ b/unit/test-uhid.c
+@@ -73,8 +73,7 @@ struct context {
+ 		};							\
+ 		static struct test_data data;				\
+ 		data.test_name = g_strdup(name);			\
+-		data.pdu_list = g_malloc(sizeof(pdus));			\
+-		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
++		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+ 		g_test_add_data_func(name, &data, function);		\
+ 	} while (0)
+ 
+-- 
+2.1.0
 
-Regards,
-Loic
