@@ -1,70 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] android/avrcp-lib: Fix memory leak
-Date: Fri, 27 Mar 2015 13:55:33 +0100
-Message-Id: <1427460934-20283-1-git-send-email-szymon.janc@tieto.com>
+To: Richard Palethorpe <richard@lm-technologies.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] lib: Fix compilation error in C++ due to inline function
+Date: Fri, 27 Mar 2015 11:59:38 +0100
+Message-ID: <35689164.lY2YZdPzLT@leonov>
+In-Reply-To: <CAFSTUk7pB_V6ossJAGUmvK6HGuQ2qLAdTzENH76VTzKRgy9SUg@mail.gmail.com>
+References: <1427208744-11805-1-git-send-email-richard@lm-technologies.com> <2438722.WgYkM0ao6e@leonov> <CAFSTUk7pB_V6ossJAGUmvK6HGuQ2qLAdTzENH76VTzKRgy9SUg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Memory allocated by parse_elements() was never freed.
+On Friday 27 of March 2015 10:53:05 Richard Palethorpe wrote:
+> Hello Szymon,
+> 
+> Sorry, I haven't submitted a patch before, so should I add the spaces
+> then resubmit it as [PATCH V2] with it signed off by you?
 
-63 bytes in 6 blocks are definitely lost in loss record 198 of 318
-   at 0x4A0645D: malloc (in /usr/lib64/valgrind/
-      vgpreload_memcheck-amd64-linux.so)
-   by 0x36A7E4EE6E: g_malloc (in /usr/lib64/libglib-2.0.so.0.3800.2)
-   by 0x36A7E667B7: g_strndup (in /usr/lib64/libglib-2.0.so.0.3800.2)
-   by 0x423BBE: parse_attribute_list.isra.5 (avrcp-lib.c:2445)
-   by 0x423CBF: get_element_attributes_rsp (avrcp-lib.c:2474)
-   by 0x420B94: session_cb (avctp.c:743)
-   by 0x36A7E492A5: g_main_context_dispatch (in /usr/lib64/
-      libglib-2.0.so.0.3800.2)
-   by 0x36A7E49627: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
-   by 0x36A7E49A39: g_main_loop_run (in /usr/lib64/
-      libglib-2.0.so.0.3800.2)
-   by 0x40AC45: main (main.c:661)
----
- android/avrcp-lib.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Yes, please resend as [PATCH V2]. Since we don't use SOB in userspace code 
+don't add any.
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 23dea62..eba99ab 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -2457,6 +2457,12 @@ fail:
- 	return -EPROTO;
- }
- 
-+static void free_attribute_list(uint8_t number, char **text)
-+{
-+	while(number--)
-+		g_free(text[number]);
-+}
-+
- static int parse_elements(struct avrcp_header *pdu, uint8_t *number,
- 						uint32_t *attrs, char **text)
- {
-@@ -2531,6 +2537,9 @@ done:
- 	player->cfm->get_element_attributes(session, err, number, attrs, text,
- 							player->user_data);
- 
-+	if (err == 0)
-+		free_attribute_list(number, text);
-+
- 	return FALSE;
- }
- 
-@@ -2855,6 +2864,9 @@ done:
- 	player->cfm->get_item_attributes(session, err, number, attrs, text,
- 							player->user_data);
- 
-+	if (err == 0)
-+		free_attribute_list(number, text);
-+
- 	return FALSE;
- }
- 
+Also put sample compilation error in commit message (we usually do that for 
+compilation fix patches).
+
+And please don't top post.
+
+> 
+> On Fri, Mar 27, 2015 at 7:40 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> > Hi Richard,
+> > 
+> > On Tuesday 24 of March 2015 14:52:24 Richard Palethorpe wrote:
+> >> This adds explicit typecasts to an inline function to make it C++
+> >> compatible. ---
+> >> 
+> >>  lib/bluetooth.h | 4 ++--
+> >>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >> 
+> >> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+> >> index 6ca64b6..ab24443 100644
+> >> --- a/lib/bluetooth.h
+> >> +++ b/lib/bluetooth.h
+> >> @@ -345,8 +345,8 @@ typedef struct {
+> >> 
+> >>  static inline void bswap_128(const void *src, void *dst)
+> >>  {
+> >> 
+> >> -     const uint8_t *s = src;
+> >> -     uint8_t *d = dst;
+> >> +     const uint8_t *s = (const uint8_t *)src;
+> >> +     uint8_t *d = (uint8_t *)dst;
+> >> 
+> >>       int i;
+> > 
+> > Just a nitpick: there should be space after cast
+> > (see M5 in doc/coding-style.txt).
+> > 
+> >>       for (i = 0; i < 16; i++)
+> > 
+> > Other than that patch looks good to me.
+> > 
+> > --
+> > BR
+> > Szymon Janc
+
 -- 
-1.9.3
-
+BR
+Szymon Janc
