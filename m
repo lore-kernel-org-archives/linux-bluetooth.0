@@ -1,48 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1427374752-26053-1-git-send-email-gowtham.ab@samsung.com>
-References: <1427374752-26053-1-git-send-email-gowtham.ab@samsung.com>
-Date: Fri, 27 Mar 2015 16:37:13 +0200
-Message-ID: <CABBYNZJk4enaxKhGcg7MU5ojC82XxSNfCkbuCXP_UhH5xW69Mw@mail.gmail.com>
-Subject: Re: [PATCH 0/7] Add Write Long Characteristic Value client TC
+In-Reply-To: <1427446194-5646-1-git-send-email-luiz.dentz@gmail.com>
+References: <1427446194-5646-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 27 Mar 2015 16:36:41 +0200
+Message-ID: <CABBYNZKTahGAsP4fn9OxZwc9qih9S2Q8tsbm56spAs4XxV7MzA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/5] unit/test-avctp: Remove DBG calls
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi,
 
-On Thu, Mar 26, 2015 at 2:59 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Adds the below client test cases:
-> 1) Write Long Characteristic Value - by Client
-> 2) Write Long Characteristic Value - Invalid Handle
-> 3) Write Long Characteristic Value - Write Not Permitted
-> 4) Write Long Characteristic Value - Insufficient Authorization
-> 5) Write Long Characteristic Value - Insufficient Authentication
-> 6) Write Long Characteristic Value - Insufficient Encryption Key Size
+On Fri, Mar 27, 2015 at 10:49 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Gowtham Anandha Babu (7):
->   unit/test-gatt: Add TP/GAW/CL/BV-05-C test
->   unit/test-gatt: Add TP/GAW/CL/BI-07-C test
->   unit/test-gatt: Add TP/GAW/CL/BI-08-C test
->   unit/test-gatt: Add TP/GAW/CL/BI-11-C test
->   unit/test-gatt: Add TP/GAW/CL/BI-12-C test
->   unit/test-gatt: Add TP/GAW/CL/BI-13-C test
->   shared/gatt-client: Add const qualifier to prepare write value
+> ---
+>  unit/test-avctp.c | 7 -------
+>  1 file changed, 7 deletions(-)
 >
->  src/shared/gatt-client.c |   2 +-
->  src/shared/gatt-client.h |   2 +-
->  unit/test-gatt.c         | 331 ++++++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 330 insertions(+), 5 deletions(-)
+> diff --git a/unit/test-avctp.c b/unit/test-avctp.c
+> index ce52222..689a825 100644
+> --- a/unit/test-avctp.c
+> +++ b/unit/test-avctp.c
+> @@ -220,9 +220,6 @@ static ssize_t handler(struct avctp *session,
+>                                         uint8_t *subunit, uint8_t *operands,
+>                                         size_t operand_count, void *user_data)
+>  {
+> -       DBG("transaction %d code %d subunit %d operand_count %zu",
+> -               transaction, *code, *subunit, operand_count);
+> -
+>         g_assert_cmpint(transaction, ==, 0);
+>         g_assert_cmpint(*code, ==, 0);
+>         g_assert_cmpint(*subunit, ==, 0);
+> @@ -238,9 +235,6 @@ static gboolean handler_response(struct avctp *session,
+>  {
+>         struct context *context = user_data;
+>
+> -       DBG("code 0x%02x subunit %d operand_count %zu", code, subunit,
+> -                                                               operand_count);
+> -
+>         g_assert_cmpint(code, ==, 0x0a);
+>         g_assert_cmpint(subunit, ==, 0);
+>         g_assert_cmpint(operand_count, ==, 0);
+> @@ -265,7 +259,6 @@ static void test_server(gconstpointer data)
+>
+>                 ret = avctp_register_pdu_handler(context->session,
+>                                         AVC_OP_VENDORDEP, handler, NULL);
+> -               DBG("ret %d", ret);
+>                 g_assert_cmpint(ret, !=, 0);
+>         }
 >
 > --
-> 1.9.1
+> 2.1.0
 
-Applied, thanks.
+Applied.
 
 
 -- 
