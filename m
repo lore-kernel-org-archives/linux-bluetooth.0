@@ -1,103 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1427470759-30114-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1427470759-30114-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<1427470759-30114-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Date: Fri, 27 Mar 2015 16:42:43 +0100
-Message-ID: <CAMv5GbdTE9btr_CE=3czJPH6axVE36F25NswSjEoVG+nVX5d+A@mail.gmail.com>
-Subject: Re: [PATCH 2/2] shared/gatt-db: Use bt_uuid_to_le instead of local function
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] lib/uuid: Add uuid conversion to 16 bit uuid
+Date: Fri, 27 Mar 2015 16:39:54 +0100
+Message-Id: <1427470794-30222-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch allows to cut bluetooth base if it's bluetooth base uuid.
+If the uuid is bluetooth base, src uuid can be converted, otherwise
+error is returned.
+---
+ lib/uuid.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ lib/uuid.h |  1 +
+ 2 files changed, 45 insertions(+)
 
-One more comment here.
+diff --git a/lib/uuid.c b/lib/uuid.c
+index 4f34b17..15fbd66 100644
+--- a/lib/uuid.c
++++ b/lib/uuid.c
+@@ -73,6 +73,34 @@ static void bt_uuid32_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst)
+ 	memcpy(&dst->value.u128.data[BASE_UUID32_OFFSET], &be32, sizeof(be32));
+ }
+ 
++static int bt_uuid128_to_uuid16(const bt_uuid_t *src, bt_uuid_t *dst)
++{
++	if (memcmp(&src->value.u128.data, &bluetooth_base_uuid.data, 2) ||
++					memcmp(&src->value.u128.data[4],
++					&bluetooth_base_uuid.data[4], 12))
++		return -EINVAL;
++
++	dst->type = BT_UUID16;
++
++	memcpy(&dst->value.u16, &src->value.u128.data[BASE_UUID16_OFFSET],
++							sizeof(uint16_t));
++
++	return 0;
++}
++
++static int bt_uuid32_to_uuid16(const bt_uuid_t *src, bt_uuid_t *dst)
++{
++	/* Bluetooth base have zeroized first two bytes */
++	if (src->value.u32 & 0xffff0000)
++		return -EINVAL;
++
++	dst->type = BT_UUID16;
++
++	dst->value.u16 = src->value.u32 & 0x0000ffff;
++
++	return 0;
++}
++
+ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst)
+ {
+ 	switch (src->type) {
+@@ -91,6 +119,22 @@ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst)
+ 	}
+ }
+ 
++int bt_uuid_to_uuid16(const bt_uuid_t *src, bt_uuid_t *dst)
++{
++	switch (src->type) {
++	case BT_UUID128:
++		return bt_uuid128_to_uuid16(src, dst);
++	case BT_UUID32:
++		return bt_uuid32_to_uuid16(src, dst);
++	case BT_UUID16:
++		*dst = *src;
++		return 0;
++	case BT_UUID_UNSPEC:
++	default:
++		return -EINVAL;
++	}
++}
++
+ static int bt_uuid128_cmp(const bt_uuid_t *u1, const bt_uuid_t *u2)
+ {
+ 	return memcmp(&u1->value.u128, &u2->value.u128, sizeof(uint128_t));
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 2dcfe9e..26f8532 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -161,6 +161,7 @@ int bt_uuid128_create(bt_uuid_t *btuuid, uint128_t value);
+ 
+ int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2);
+ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
++int bt_uuid_to_uuid16(const bt_uuid_t *src, bt_uuid_t *dst);
+ 
+ #define MAX_LEN_UUID_STR 37
+ 
+-- 
+2.1.0
 
-On 27 March 2015 at 16:39, Grzegorz Kolodziejczyk
-<grzegorz.kolodziejczyk@tieto.com> wrote:
-> This patch use lib/uuid library for uuids instead of local functions.
-> ---
->  src/shared/gatt-db.c | 36 ++++++++++++++++++------------------
->  1 file changed, 18 insertions(+), 18 deletions(-)
->
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 2b2090c..323ce91 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -335,20 +335,6 @@ bool gatt_db_isempty(struct gatt_db *db)
->         return queue_isempty(db->services);
->  }
->
-> -static int uuid_to_le(const bt_uuid_t *uuid, uint8_t *dst)
-> -{
-> -       bt_uuid_t uuid128;
-> -
-> -       if (uuid->type == BT_UUID16) {
-> -               put_le16(uuid->value.u16, dst);
-> -               return bt_uuid_len(uuid);
-> -       }
-> -
-> -       bt_uuid_to_uuid128(uuid, &uuid128);
-> -       bswap_128(&uuid128.value.u128, dst);
-> -       return bt_uuid_len(&uuid128);
-> -}
-> -
->  static bool le_to_uuid(const uint8_t *src, size_t len, bt_uuid_t *uuid)
->  {
->         uint128_t u128;
-> @@ -379,8 +365,8 @@ static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
->  {
->         struct gatt_db_service *service;
->         const bt_uuid_t *type;
-> +       bt_uuid_t uuid128;
->         uint8_t value[16];
-> -       uint16_t len;
->
->         if (num_handles < 1)
->                 return NULL;
-> @@ -400,10 +386,23 @@ static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
->         else
->                 type = &secondary_service_uuid;
->
-> -       len = uuid_to_le(uuid, value);
-> +       switch (uuid->type) {
-> +       case BT_UUID16:
-> +       case BT_UUID128:
-> +               bt_uuid_to_le(uuid, value);
-> +               break;
-> +       case BT_UUID32:
-> +               bt_uuid_to_uuid128(uuid, &uuid128);
-> +               bt_uuid_to_le(&uuid128, value);
-> +               break;
-> +       case BT_UUID_UNSPEC:
-> +       default:
-> +               gatt_db_service_destroy(service);
-> +               return NULL;
-> +       }
-I'm not sure if we should generally handle 32bit uuids.
->
->         service->attributes[0] = new_attribute(service, handle, type, value,
-> -                                                                       len);
-> +                                                               uuid->type/8);
->         if (!service->attributes[0]) {
->                 gatt_db_service_destroy(service);
->                 return NULL;
-> @@ -698,7 +697,8 @@ service_insert_characteristic(struct gatt_db_service *service,
->         /* We set handle of characteristic value, which will be added next */
->         put_le16(handle, &value[1]);
->         len += sizeof(uint16_t);
-> -       len += uuid_to_le(uuid, &value[3]);
-> +       len += uuid->type/8;
-> +       bt_uuid_to_le(uuid, &value[3]);
->
->         service->attributes[i] = new_attribute(service, handle - 1,
->                                                         &characteristic_uuid,
-> --
-> 2.1.0
->
-
-BR,
-Grzegorz
