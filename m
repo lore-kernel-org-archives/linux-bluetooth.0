@@ -1,40 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/3] Handling extended headers of bnep control frames
-Date: Fri, 27 Mar 2015 09:17:08 +0100
-Message-Id: <1427444231-25010-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Richard Palethorpe <richard@lm-technologies.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] lib: Fix compilation error in C++ due to inline function
+Date: Fri, 27 Mar 2015 08:40:57 +0100
+Message-ID: <2438722.WgYkM0ao6e@leonov>
+In-Reply-To: <1427208744-11805-1-git-send-email-richard@lm-technologies.com>
+References: <1427208744-11805-1-git-send-email-richard@lm-technologies.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set adds support for handling extended headers of bnep control
-frames which is mandatory. Until now extended headers for control messages was
-ignored.
+Hi Richard,
 
-Patch [1/3] adds setting of err variable if control message is not understood.
-Patch [2/3] adds additional ioctl for get supported bnep features. This is
-needed for user space to know if handling of sending success setup response
-frame should be handled by kernel or by user space.
-Patch [3/3] adds support for handling extended headers of bnep control frames.
+On Tuesday 24 of March 2015 14:52:24 Richard Palethorpe wrote:
+> This adds explicit typecasts to an inline function to make it C++
+> compatible. ---
+>  lib/bluetooth.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+> index 6ca64b6..ab24443 100644
+> --- a/lib/bluetooth.h
+> +++ b/lib/bluetooth.h
+> @@ -345,8 +345,8 @@ typedef struct {
+> 
+>  static inline void bswap_128(const void *src, void *dst)
+>  {
+> -	const uint8_t *s = src;
+> -	uint8_t *d = dst;
+> +	const uint8_t *s = (const uint8_t *)src;
+> +	uint8_t *d = (uint8_t *)dst;
+>  	int i;
 
-Patch set tested with PTS bnep test cases. No regression, issues found during
-testing.
+Just a nitpick: there should be space after cast
+(see M5 in doc/coding-style.txt).
 
-v2.
-- Added ioctl definition to compat_ioctl,
-- Distinct bnep session flags and bnep features.
+>  	for (i = 0; i < 16; i++)
 
-Grzegorz Kolodziejczyk (3):
-  Bluetooth: bnep: Return err value while sending cmd is not understood
-  Bluetooth: bnep: Add support for get bnep features via ioctl
-  Bluetooth: bnep: Add support to extended headers of control frames
-
- fs/compat_ioctl.c         |  1 +
- net/bluetooth/bnep/bnep.h |  7 ++++++
- net/bluetooth/bnep/core.c | 57 +++++++++++++++++++++++++++++++++++++----------
- net/bluetooth/bnep/sock.c |  8 +++++++
- 4 files changed, 61 insertions(+), 12 deletions(-)
+Other than that patch looks good to me.
 
 -- 
-2.1.0
-
+BR
+Szymon Janc
