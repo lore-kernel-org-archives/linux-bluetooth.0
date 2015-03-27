@@ -1,49 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/5] unit/test-avctp: Remove DBG calls
-Date: Fri, 27 Mar 2015 10:49:50 +0200
-Message-Id: <1427446194-5646-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 3/3] Bluetooth: bnep: Add support to extended headers of control frames
+Date: Fri, 27 Mar 2015 09:17:11 +0100
+Message-Id: <1427444231-25010-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1427444231-25010-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1427444231-25010-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Handling extended headers of control frames is required BNEP
+functionality. Previously setup success response was handled in user
+space and whole extended header was omitted. This patch allows to
+handle setup success response and parsing extended headers in control
+messages.
 
+Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 ---
- unit/test-avctp.c | 7 -------
- 1 file changed, 7 deletions(-)
+ net/bluetooth/bnep/bnep.h |  3 +++
+ net/bluetooth/bnep/core.c | 55 +++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 47 insertions(+), 11 deletions(-)
 
-diff --git a/unit/test-avctp.c b/unit/test-avctp.c
-index ce52222..689a825 100644
---- a/unit/test-avctp.c
-+++ b/unit/test-avctp.c
-@@ -220,9 +220,6 @@ static ssize_t handler(struct avctp *session,
- 					uint8_t *subunit, uint8_t *operands,
- 					size_t operand_count, void *user_data)
- {
--	DBG("transaction %d code %d subunit %d operand_count %zu",
--		transaction, *code, *subunit, operand_count);
--
- 	g_assert_cmpint(transaction, ==, 0);
- 	g_assert_cmpint(*code, ==, 0);
- 	g_assert_cmpint(*subunit, ==, 0);
-@@ -238,9 +235,6 @@ static gboolean handler_response(struct avctp *session,
- {
- 	struct context *context = user_data;
+diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
+index d19831e..bd8cde2 100644
+--- a/net/bluetooth/bnep/bnep.h
++++ b/net/bluetooth/bnep/bnep.h
+@@ -83,6 +83,9 @@
+ /* Features */
+ #define BNEP_SETUP_RSP_FEAT	0x01
  
--	DBG("code 0x%02x subunit %d operand_count %zu", code, subunit,
--								operand_count);
--
- 	g_assert_cmpint(code, ==, 0x0a);
- 	g_assert_cmpint(subunit, ==, 0);
- 	g_assert_cmpint(operand_count, ==, 0);
-@@ -265,7 +259,6 @@ static void test_server(gconstpointer data)
++/* Session flags */
++#define BNEP_SETUP_RSP_FLAG	0x00000000
++
+ struct bnep_setup_conn_req {
+ 	__u8 type;
+ 	__u8 ctrl;
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index c627817..eb459da 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -231,7 +231,13 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+ 		break;
  
- 		ret = avctp_register_pdu_handler(context->session,
- 					AVC_OP_VENDORDEP, handler, NULL);
--		DBG("ret %d", ret);
- 		g_assert_cmpint(ret, !=, 0);
- 	}
+ 	case BNEP_SETUP_CONN_REQ:
+-		err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
++		/* Successful response should be sent only once */
++		if (test_and_clear_bit(BNEP_SETUP_RSP_FLAG, &s->flags))
++			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
++					    BNEP_SUCCESS);
++		else
++			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
++					    BNEP_CONN_NOT_ALLOWED);
+ 		break;
+ 
+ 	default: {
+@@ -292,29 +298,55 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
+ {
+ 	struct net_device *dev = s->dev;
+ 	struct sk_buff *nskb;
+-	u8 type;
++	u8 type, ctrl_type;
+ 
+ 	dev->stats.rx_bytes += skb->len;
+ 
+ 	type = *(u8 *) skb->data;
+ 	skb_pull(skb, 1);
++	ctrl_type = *(u8 *)skb->data;
+ 
+ 	if ((type & BNEP_TYPE_MASK) >= sizeof(__bnep_rx_hlen))
+ 		goto badframe;
+ 
+ 	if ((type & BNEP_TYPE_MASK) == BNEP_CONTROL) {
+-		bnep_rx_control(s, skb->data, skb->len);
+-		kfree_skb(skb);
+-		return 0;
+-	}
++		if (bnep_rx_control(s, skb->data, skb->len) < 0) {
++			dev->stats.tx_errors++;
++			kfree_skb(skb);
++			return 0;
++		}
+ 
+-	skb_reset_mac_header(skb);
++		if (!(type & BNEP_EXT_HEADER)) {
++			kfree_skb(skb);
++			return 0;
++		}
+ 
+-	/* Verify and pull out header */
+-	if (!skb_pull(skb, __bnep_rx_hlen[type & BNEP_TYPE_MASK]))
+-		goto badframe;
++		/* Verify and pull ctrl message since it's already processed */
++		switch (ctrl_type) {
++		case BNEP_SETUP_CONN_REQ:
++			/* Pull: ctrl type (1 b), len (1 b), data (len bytes) */
++			if (!skb_pull(skb, 2 + *(u8 *)(skb->data + 1) * 2))
++				goto badframe;
++			break;
++		case BNEP_FILTER_MULTI_ADDR_SET:
++		case BNEP_FILTER_NET_TYPE_SET:
++			/* Pull: ctrl type (1 b), len (2 b), data (len bytes) */
++			if (!skb_pull(skb, 3 + *(u16 *)(skb->data + 1) * 2))
++				goto badframe;
++			break;
++		default:
++			kfree_skb(skb);
++			return 0;
++		}
++	} else {
++		skb_reset_mac_header(skb);
+ 
+-	s->eh.h_proto = get_unaligned((__be16 *) (skb->data - 2));
++		/* Verify and pull out header */
++		if (!skb_pull(skb, __bnep_rx_hlen[type & BNEP_TYPE_MASK]))
++			goto badframe;
++
++		s->eh.h_proto = get_unaligned((__be16 *) (skb->data - 2));
++	}
+ 
+ 	if (type & BNEP_EXT_HEADER) {
+ 		if (bnep_rx_extension(s, skb) < 0)
+@@ -566,6 +598,7 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+ 	s->sock  = sock;
+ 	s->role  = req->role;
+ 	s->state = BT_CONNECTED;
++	s->flags = req->flags;
+ 
+ 	s->msg.msg_flags = MSG_NOSIGNAL;
  
 -- 
 2.1.0
