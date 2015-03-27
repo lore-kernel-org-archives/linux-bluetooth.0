@@ -1,156 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH v2 3/3] Bluetooth: bnep: Add support to extended headers of control frames
+Subject: Re: [PATCH v2 2/3] Bluetooth: bnep: Add support for get bnep features via ioctl
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1427444231-25010-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Date: Fri, 27 Mar 2015 16:15:24 -0700
+In-Reply-To: <1427444231-25010-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Fri, 27 Mar 2015 16:15:16 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C894FD4D-ED14-4687-88FC-91E649DFF33D@holtmann.org>
-References: <1427444231-25010-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1427444231-25010-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Message-Id: <6F9BF6F7-55D5-4BF1-93A7-723BF01665DE@holtmann.org>
+References: <1427444231-25010-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1427444231-25010-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Grzegorz,
 
-> Handling extended headers of control frames is required BNEP
-> functionality. Previously setup success response was handled in user
-> space and whole extended header was omitted. This patch allows to
-> handle setup success response and parsing extended headers in control
-> messages.
+> This is needed if user space wants to know supported bnep features
+> by kernel, eg. if kernel supports sending response to bnep setup
+> control message.
 > 
 > Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 > ---
-> net/bluetooth/bnep/bnep.h |  3 +++
-> net/bluetooth/bnep/core.c | 55 +++++++++++++++++++++++++++++++++++++----------
-> 2 files changed, 47 insertions(+), 11 deletions(-)
+> fs/compat_ioctl.c         | 1 +
+> net/bluetooth/bnep/bnep.h | 4 ++++
+> net/bluetooth/bnep/sock.c | 8 ++++++++
+> 3 files changed, 13 insertions(+)
 > 
+> diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
+> index afec645..19fb0c8 100644
+> --- a/fs/compat_ioctl.c
+> +++ b/fs/compat_ioctl.c
+> @@ -570,6 +570,7 @@ static int mt_ioctl_trans(unsigned int fd, unsigned int cmd, void __user *argp)
+> #define BNEPCONNDEL	_IOW('B', 201, int)
+> #define BNEPGETCONNLIST	_IOR('B', 210, int)
+> #define BNEPGETCONNINFO	_IOR('B', 211, int)
+> +#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
+> 
+> #define CMTPCONNADD	_IOW('C', 200, int)
+> #define CMTPCONNDEL	_IOW('C', 201, int)
 > diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
-> index d19831e..bd8cde2 100644
+> index 5a5b16f..d19831e 100644
 > --- a/net/bluetooth/bnep/bnep.h
 > +++ b/net/bluetooth/bnep/bnep.h
-> @@ -83,6 +83,9 @@
-> /* Features */
-> #define BNEP_SETUP_RSP_FEAT	0x01
+> @@ -80,6 +80,9 @@
+> #define BNEP_TYPE_MASK	0x7f
+> #define BNEP_EXT_HEADER	0x80
 > 
-> +/* Session flags */
-> +#define BNEP_SETUP_RSP_FLAG	0x00000000
+> +/* Features */
+> +#define BNEP_SETUP_RSP_FEAT	0x01
 > +
 
-if these are just internal flags, then this should be an enum.
+this should be most likely defined like this:
 
-	enum {
-		BNEP_SETUP_RSP_SENT,
-	};
+#define BNEP_SETUP_RSP_SUPPORT	0
+
+Most of the code in HIPD and CMTP does (1 << FOO). So we should use bit positions here.
 
 > struct bnep_setup_conn_req {
 > 	__u8 type;
 > 	__u8 ctrl;
-> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-> index c627817..eb459da 100644
-> --- a/net/bluetooth/bnep/core.c
-> +++ b/net/bluetooth/bnep/core.c
-> @@ -231,7 +231,13 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
-> 		break;
+> @@ -111,6 +114,7 @@ struct bnep_ext_hdr {
+> #define BNEPCONNDEL	_IOW('B', 201, int)
+> #define BNEPGETCONNLIST	_IOR('B', 210, int)
+> #define BNEPGETCONNINFO	_IOR('B', 211, int)
+> +#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
 > 
-> 	case BNEP_SETUP_CONN_REQ:
-> -		err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
-> +		/* Successful response should be sent only once */
-> +		if (test_and_clear_bit(BNEP_SETUP_RSP_FLAG, &s->flags))
-> +			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
-> +					    BNEP_SUCCESS);
-> +		else
-> +			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
-> +					    BNEP_CONN_NOT_ALLOWED);
-> 		break;
-
-Lets use a positive method of actually setting the flag and not clearing it.
-
+> struct bnep_connadd_req {
+> 	int   sock;		/* Connected socket */
+> diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
+> index 5f05129..fea611c 100644
+> --- a/net/bluetooth/bnep/sock.c
+> +++ b/net/bluetooth/bnep/sock.c
+> @@ -29,6 +29,8 @@
 > 
-> 	default: {
-> @@ -292,29 +298,55 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
-> {
-> 	struct net_device *dev = s->dev;
-> 	struct sk_buff *nskb;
-> -	u8 type;
-> +	u8 type, ctrl_type;
+> #include "bnep.h"
 > 
-> 	dev->stats.rx_bytes += skb->len;
-> 
-> 	type = *(u8 *) skb->data;
-> 	skb_pull(skb, 1);
-> +	ctrl_type = *(u8 *)skb->data;
-> 
-> 	if ((type & BNEP_TYPE_MASK) >= sizeof(__bnep_rx_hlen))
-> 		goto badframe;
-> 
-> 	if ((type & BNEP_TYPE_MASK) == BNEP_CONTROL) {
-> -		bnep_rx_control(s, skb->data, skb->len);
-> -		kfree_skb(skb);
-> -		return 0;
-> -	}
-> +		if (bnep_rx_control(s, skb->data, skb->len) < 0) {
-> +			dev->stats.tx_errors++;
-> +			kfree_skb(skb);
-> +			return 0;
-> +		}
-> 
-> -	skb_reset_mac_header(skb);
-> +		if (!(type & BNEP_EXT_HEADER)) {
-> +			kfree_skb(skb);
-> +			return 0;
-> +		}
-> 
-> -	/* Verify and pull out header */
-> -	if (!skb_pull(skb, __bnep_rx_hlen[type & BNEP_TYPE_MASK]))
-> -		goto badframe;
-> +		/* Verify and pull ctrl message since it's already processed */
-> +		switch (ctrl_type) {
-> +		case BNEP_SETUP_CONN_REQ:
-> +			/* Pull: ctrl type (1 b), len (1 b), data (len bytes) */
-> +			if (!skb_pull(skb, 2 + *(u8 *)(skb->data + 1) * 2))
-> +				goto badframe;
-> +			break;
-> +		case BNEP_FILTER_MULTI_ADDR_SET:
-> +		case BNEP_FILTER_NET_TYPE_SET:
-> +			/* Pull: ctrl type (1 b), len (2 b), data (len bytes) */
-> +			if (!skb_pull(skb, 3 + *(u16 *)(skb->data + 1) * 2))
-> +				goto badframe;
-> +			break;
-> +		default:
-> +			kfree_skb(skb);
-> +			return 0;
-> +		}
-> +	} else {
-> +		skb_reset_mac_header(skb);
-> 
-> -	s->eh.h_proto = get_unaligned((__be16 *) (skb->data - 2));
-> +		/* Verify and pull out header */
-> +		if (!skb_pull(skb, __bnep_rx_hlen[type & BNEP_TYPE_MASK]))
-> +			goto badframe;
+> +static const __u8 supp_feat = BNEP_SETUP_RSP_FEAT;
 > +
-> +		s->eh.h_proto = get_unaligned((__be16 *) (skb->data - 2));
-> +	}
 
-Doesn't it make sense to refactor this first and then add the handling for setup_conn_req instead of intermixing this.
+Why are we doing here __u8 and not __u32. I like to understand the rational since the commit message is pretty sparse actually. A more detailed commit message explaining the new API would actually help.
 
+> static struct bt_sock_list bnep_sk_list = {
+> 	.lock = __RW_LOCK_UNLOCKED(bnep_sk_list.lock)
+> };
+> @@ -120,6 +122,12 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
 > 
-> 	if (type & BNEP_EXT_HEADER) {
-> 		if (bnep_rx_extension(s, skb) < 0)
-> @@ -566,6 +598,7 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
-> 	s->sock  = sock;
-> 	s->role  = req->role;
-> 	s->state = BT_CONNECTED;
-> +	s->flags = req->flags;
-
-Intermixing userspace flags here with kernel internal states is a really bad idea. You really want to keep that separate.
-
-Since we have flags for HIDP userspace, I think this should be pretty much the same for BNEP now.
-
-#define BNEP_HANDLE_SETUP_RSP	0
-
-Also when we start using the flags, we should return EINVAL error for unsupported flags. That should be the first patch that enforce this from now on. Something that might also needs fixing in HIDP and CMTP.
+> 		return err;
+> 
+> +	case BNEPGETSUPPFEAT:
+> +		if (copy_to_user(argp, &supp_feat, sizeof(supp_feat)))
+> +			return -EFAULT;
+> +
+> +		return 0;
+> +
+> 	default:
+> 		return -EINVAL;
+> 	}
 
 Regards
 
