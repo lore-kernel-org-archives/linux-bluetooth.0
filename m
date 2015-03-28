@@ -1,131 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: Fix error returns for Read Local OOB Extended Data commands
-Date: Sat, 28 Mar 2015 15:18:59 -0700
-Message-Id: <1427581139-10931-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 1/2] Bluetooth: Move memory location outside of hci_dev lock
+Date: Sat, 28 Mar 2015 15:18:58 -0700
+Message-Id: <1427581139-10931-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Read Local OOB Extended Data commands are required to return the
-address type and the data length at least. However currently the error
-returns only the address type.
-
-To fix this and avoid any extra allocations or stack memory, rearrange
-the code so that the same path can be used for error returns.
+Taking the hci_dev lock for just a memory allocation seems a bit too
+much and not really needed. So instead try to allocate the memory first
+and then take the lock.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 71 +++++++++++++++++++++++++---------------------------
- 1 file changed, 34 insertions(+), 37 deletions(-)
+ net/bluetooth/mgmt.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a9a0036ff0a7..3048092b1264 100644
+index 29cbd98f4649..a9a0036ff0a7 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -6414,36 +6414,30 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
- 
- 	BT_DBG("%s", hdev->name);
- 
--	if (!hdev_is_powered(hdev))
--		return mgmt_cmd_complete(sk, hdev->id,
--					 MGMT_OP_READ_LOCAL_OOB_EXT_DATA,
--					 MGMT_STATUS_NOT_POWERED,
--					 &cp->type, sizeof(cp->type));
--
--	switch (cp->type) {
--	case BIT(BDADDR_BREDR):
--		status = mgmt_bredr_support(hdev);
--		if (status)
--			return mgmt_cmd_complete(sk, hdev->id,
--						 MGMT_OP_READ_LOCAL_OOB_EXT_DATA,
--						 status, &cp->type,
--						 sizeof(cp->type));
--		eir_len = 5;
--		break;
--	case (BIT(BDADDR_LE_PUBLIC) | BIT(BDADDR_LE_RANDOM)):
--		status = mgmt_le_support(hdev);
--		if (status)
--			return mgmt_cmd_complete(sk, hdev->id,
--						 MGMT_OP_READ_LOCAL_OOB_EXT_DATA,
--						 status, &cp->type,
--						 sizeof(cp->type));
--		eir_len = 9 + 3 + 18 + 18 + 3;
--		break;
--	default:
--		return mgmt_cmd_complete(sk, hdev->id,
--					 MGMT_OP_READ_LOCAL_OOB_EXT_DATA,
--					 MGMT_STATUS_INVALID_PARAMS,
--					 &cp->type, sizeof(cp->type));
-+	if (hdev_is_powered(hdev)) {
-+		switch (cp->type) {
-+		case BIT(BDADDR_BREDR):
-+			status = mgmt_bredr_support(hdev);
-+			if (status)
-+				eir_len = 0;
-+			else
-+				eir_len = 5;
-+			break;
-+		case (BIT(BDADDR_LE_PUBLIC) | BIT(BDADDR_LE_RANDOM)):
-+			status = mgmt_le_support(hdev);
-+			if (status)
-+				eir_len = 0;
-+			else
-+				eir_len = 9 + 3 + 18 + 18 + 3;
-+			break;
-+		default:
-+			status = MGMT_STATUS_INVALID_PARAMS;
-+			eir_len = 0;
-+			break;
-+		}
-+	} else {
-+		status = MGMT_STATUS_NOT_POWERED;
-+		eir_len = 0;
+@@ -6446,14 +6446,12 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
+ 					 &cp->type, sizeof(cp->type));
  	}
  
+-	hci_dev_lock(hdev);
+-
  	rp_len = sizeof(*rp) + eir_len;
-@@ -6451,6 +6445,9 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
- 	if (!rp)
+ 	rp = kmalloc(rp_len, GFP_ATOMIC);
+-	if (!rp) {
+-		hci_dev_unlock(hdev);
++	if (!rp)
  		return -ENOMEM;
- 
-+	if (status)
-+		goto complete;
+-	}
 +
- 	hci_dev_lock(hdev);
++	hci_dev_lock(hdev);
  
  	eir_len = 0;
-@@ -6463,11 +6460,8 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
- 		if (hci_dev_test_flag(hdev, HCI_SC_ENABLED) &&
- 		    smp_generate_oob(hdev, hash, rand) < 0) {
- 			hci_dev_unlock(hdev);
--			err = mgmt_cmd_complete(sk, hdev->id,
--						MGMT_OP_READ_LOCAL_OOB_EXT_DATA,
--						MGMT_STATUS_FAILED,
--						&cp->type, sizeof(cp->type));
--			goto done;
-+			status = MGMT_STATUS_FAILED;
-+			goto complete;
- 		}
+ 	switch (cp->type) {
+@@ -6517,13 +6515,13 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
+ 		break;
+ 	}
  
- 		if (hci_dev_test_flag(hdev, HCI_PRIVACY)) {
-@@ -6519,12 +6513,15 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
+-	rp->type = cp->type;
+-	rp->eir_len = cpu_to_le16(eir_len);
+-
+ 	hci_dev_unlock(hdev);
  
  	hci_sock_set_flag(sk, HCI_MGMT_OOB_DATA_EVENTS);
  
-+	status = MGMT_STATUS_SUCCESS;
++	rp->type = cp->type;
++	rp->eir_len = cpu_to_le16(eir_len);
 +
-+complete:
- 	rp->type = cp->type;
- 	rp->eir_len = cpu_to_le16(eir_len);
- 
  	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_EXT_DATA,
--				MGMT_STATUS_SUCCESS, rp, sizeof(*rp) + eir_len);
--	if (err < 0)
-+				status, rp, sizeof(*rp) + eir_len);
-+	if (err < 0 || status)
- 		goto done;
- 
- 	err = mgmt_limited_event(MGMT_EV_LOCAL_OOB_DATA_UPDATED, hdev,
+ 				MGMT_STATUS_SUCCESS, rp, sizeof(*rp) + eir_len);
+ 	if (err < 0)
 -- 
 2.1.0
 
