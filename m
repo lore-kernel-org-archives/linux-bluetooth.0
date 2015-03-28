@@ -1,29 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Mar 2015 08:03:02 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] Bluetooth: Move memory location outside of
- hci_dev lock
-Message-ID: <20150329050302.GA28050@t440s.P-661HNU-F1>
-References: <1427581139-10931-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1427581139-10931-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Remove superfluous extra empty line between functions
+Date: Sat, 28 Mar 2015 15:32:52 -0700
+Message-Id: <1427581972-11162-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_event.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-On Sat, Mar 28, 2015, Marcel Holtmann wrote:
-> Taking the hci_dev lock for just a memory allocation seems a bit too
-> much and not really needed. So instead try to allocate the memory first
-> and then take the lock.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/mgmt.c | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3ac23964e108..20f34b861426 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1066,7 +1066,6 @@ static void hci_cc_read_local_oob_ext_data(struct hci_dev *hdev,
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-
+ static void hci_cc_le_set_random_addr(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+-- 
+2.1.0
 
-Both patches have been applied to bluetooth-next. Thanks.
-
-Johan
