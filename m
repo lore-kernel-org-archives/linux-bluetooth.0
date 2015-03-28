@@ -2,121 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH] tools/mgmt-tester: Add new add-adv test cases
-Date: Sat, 28 Mar 2015 11:51:29 -0700
-Message-Id: <1427568689-15251-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH 2/2] Bluetooth: Use ADV_SCAN_IND for adv. instances
+Date: Sat, 28 Mar 2015 11:49:28 -0700
+Message-Id: <1427568568-15102-2-git-send-email-armansito@chromium.org>
+In-Reply-To: <1427568568-15102-1-git-send-email-armansito@chromium.org>
+References: <1427568568-15102-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds new test cases for the Add Advertising command for the
-following conditions:
+With this patch, ADV_SCAN_IND will be used for advertising instances
+that have non-zero scan response data while the global "connectable"
+setting is "off".
 
-  - ADV_SCAN_IND, ADV_NONCONN_IND, and ADV_IND correctly configured based on the
-    global "connectable" setting and the instance scan response length.
-  - ADV_IND is used when the global "connectable" setting is "on" and instance
-    flags is 0.
+Signed-off-by: Arman Uguray <armansito@chromium.org>
 ---
- tools/mgmt-tester.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+ net/bluetooth/mgmt.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 0721a64..d3fba97 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -4234,6 +4234,74 @@ static const struct generic_data add_advertising_success_12 = {
- 	.expect_hci_len = sizeof(set_adv_data_8),
- };
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d998ec3..2d84fc1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -994,6 +994,18 @@ static u32 get_adv_instance_flags(struct hci_dev *hdev, u8 instance)
+ 	return flags;
+ }
  
-+static uint16_t settings_powered_le_connectable[] = {
-+						MGMT_OP_SET_POWERED,
-+						MGMT_OP_SET_LE,
-+						MGMT_OP_SET_CONNECTABLE, 0 };
++static u8 get_adv_instance_scan_rsp_len(struct hci_dev *hdev, u8 instance)
++{
++	/* Ignore instance 0 and other unsupported instances */
++	if (instance != 0x01)
++		return 0;
 +
-+static const struct generic_data add_advertising_success_13 = {
-+	.setup_settings = settings_powered_le_connectable,
-+	.send_opcode = MGMT_OP_ADD_ADVERTISING,
-+	.send_param = add_advertising_param_1,
-+	.send_len = sizeof(add_advertising_param_1),
-+	.expect_param = advertising_instance_param,
-+	.expect_len = sizeof(advertising_instance_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_ADV_PARAMETERS,
-+	.expect_hci_param = set_connectable_on_adv_param,
-+	.expect_hci_len = sizeof(set_connectable_on_adv_param),
-+};
++	/* TODO: Take into account the "appearance" and "local-name" flags here.
++	 * These are currently being ignored as they are not supported.
++	 */
++	return hdev->adv_instance.scan_rsp_len;
++}
 +
-+static uint8_t set_connectable_off_scan_adv_param[] = {
-+		0x00, 0x08,				/* min_interval */
-+		0x00, 0x08,				/* max_interval */
-+		0x02,					/* type */
-+		0x01,					/* own_addr_type */
-+		0x00,					/* direct_addr_type */
-+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* direct_addr */
-+		0x07,					/* channel_map */
-+		0x00,					/* filter_policy */
-+};
+ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ {
+ 	u8 ad_len = 0, flags = 0;
+@@ -1260,7 +1272,14 @@ static void enable_advertising(struct hci_request *req)
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.min_interval = cpu_to_le16(hdev->le_adv_min_interval);
+ 	cp.max_interval = cpu_to_le16(hdev->le_adv_max_interval);
+-	cp.type = connectable ? LE_ADV_IND : LE_ADV_NONCONN_IND;
 +
-+static const struct generic_data add_advertising_success_14 = {
-+	.setup_settings = settings_powered_le,
-+	.send_opcode = MGMT_OP_ADD_ADVERTISING,
-+	.send_param = add_advertising_param_2,
-+	.send_len = sizeof(add_advertising_param_2),
-+	.expect_param = advertising_instance_param,
-+	.expect_len = sizeof(advertising_instance_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_ADV_PARAMETERS,
-+	.expect_hci_param = set_connectable_off_scan_adv_param,
-+	.expect_hci_len = sizeof(set_connectable_off_scan_adv_param),
-+};
++	if (connectable)
++		cp.type = LE_ADV_IND;
++	else if (get_adv_instance_scan_rsp_len(hdev, instance))
++		cp.type = LE_ADV_SCAN_IND;
++	else
++		cp.type = LE_ADV_NONCONN_IND;
 +
-+static const struct generic_data add_advertising_success_15 = {
-+	.setup_settings = settings_powered_le,
-+	.send_opcode = MGMT_OP_ADD_ADVERTISING,
-+	.send_param = add_advertising_param_1,
-+	.send_len = sizeof(add_advertising_param_1),
-+	.expect_param = advertising_instance_param,
-+	.expect_len = sizeof(advertising_instance_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_ADV_PARAMETERS,
-+	.expect_hci_param = set_connectable_off_adv_param,
-+	.expect_hci_len = sizeof(set_connectable_off_adv_param),
-+};
-+
-+static const struct generic_data add_advertising_success_16 = {
-+	.setup_settings = settings_powered_le_connectable,
-+	.send_opcode = MGMT_OP_ADD_ADVERTISING,
-+	.send_param = add_advertising_param_1,
-+	.send_len = sizeof(add_advertising_param_1),
-+	.expect_param = advertising_instance_param,
-+	.expect_len = sizeof(advertising_instance_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_ADV_PARAMETERS,
-+	.expect_hci_param = set_connectable_on_adv_param,
-+	.expect_hci_len = sizeof(set_connectable_on_adv_param),
-+};
-+
- static const char set_powered_off_le_settings_param[] = {
- 	0x80, 0x02, 0x00, 0x00
- };
-@@ -6201,6 +6269,18 @@ int main(int argc, char *argv[])
- 	test_bredrle("Add Advertising - Success 9 - Flag 4",
- 					&add_advertising_success_12,
- 					NULL, test_command_generic);
-+	test_bredrle("Add Advertising - Success 10 - connectable on",
-+					&add_advertising_success_13,
-+					NULL, test_command_generic);
-+	test_bredrle("Add Advertising - Success 11 - ADV_SCAN_IND",
-+					&add_advertising_success_14,
-+					NULL, test_command_generic);
-+	test_bredrle("Add Advertising - Success 12 - ADV_NONCONN_IND",
-+					&add_advertising_success_15,
-+					NULL, test_command_generic);
-+	test_bredrle("Add Advertising - Success 13 - ADV_IND",
-+					&add_advertising_success_16,
-+					NULL, test_command_generic);
+ 	cp.own_address_type = own_addr_type;
+ 	cp.channel_map = hdev->le_adv_channel_map;
  
- 	test_bredrle("Remove Advertising - Invalid Params 1",
- 					&remove_advertising_fail_1,
 -- 
 2.2.0.rc0.207.ga3a616c
 
