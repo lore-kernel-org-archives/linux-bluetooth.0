@@ -1,54 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 1/2] Bluetooth: Fix using global connectable settings for adv
-Date: Sat, 28 Mar 2015 11:49:27 -0700
-Message-Id: <1427568568-15102-1-git-send-email-armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <5516AD7C.3040401@gmail.com>
+Date: Sat, 28 Mar 2015 14:32:44 +0100
+From: Florian Grandel <fgrandel@gmail.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Multi-Advertising: implementation options, timing questions
+References: <5515ECE9.9080101@gmail.com> <0B4D986A-2913-46C0-8EB2-53EE29C67739@holtmann.org> <55164DEC.6070009@gmail.com> <E29758F5-D9B1-49AE-A35E-FE06CDD7835F@holtmann.org>
+In-Reply-To: <E29758F5-D9B1-49AE-A35E-FE06CDD7835F@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes a bug where ADV_NONCONN_IND was being used for
-advertising instances >0 while the global connectable setting was
-set to "on".
+ >
+> Whatever you read in the link layer section is something you can forget about right now. That is why the mgmt API actually does not mention advertising delay or internal or alike. It is a bit higher level API with the same affect. It is just less efficient to do that in kernel, then in the controller.
+>
+> So here is how it is suppose to be done. The duration parameter controls the length an advertising instance stays active. Let say you have two instances, both with 5 seconds each as duration parameter. All instances will be scheduled in round robin fashion.
+>
+> 	instance 1 -> 5 seconds, instance 2 -> 5 seconds, instance 1 -> 5 seconds and so on
+>
+> One thing we need to figure out if controllers let us change the advertising data and scan response data on the fly without disabling advertising or if we have to disable it first. Maybe this needs quirking if different controllers behave differently.
+>
+> This is as close as we get towards multi-advertising that we just emulate in the host. If there is a controller with offload capabilities, we can at some point just start using it. However that is not the main concern. It has to work on standard hardware as well. Even if it is less efficient.
+>
 
-Signed-off-by: Arman Uguray <armansito@chromium.org>
----
- net/bluetooth/mgmt.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+Got it. Makes all sense to me.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index fb2e764..d998ec3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -985,9 +985,10 @@ static u32 get_adv_instance_flags(struct hci_dev *hdev, u8 instance)
- 	/* Instance 0 always manages the "Tx Power" and "Flags" fields */
- 	flags = MGMT_ADV_FLAG_TX_POWER | MGMT_ADV_FLAG_MANAGED_FLAGS;
- 
--	/* For instance 0, assemble the flags from global settings */
--	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE) ||
--	    get_connectable(hdev))
-+	/* For instance 0, the HCI_ADVERTISING_CONNECTABLE setting corresponds
-+	 * to the "connectable" instance flag.
-+	 */
-+	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE))
- 		flags |= MGMT_ADV_FLAG_CONNECTABLE;
- 
- 	return flags;
-@@ -1242,7 +1243,12 @@ static void enable_advertising(struct hci_request *req)
- 
- 	instance = get_current_adv_instance(hdev);
- 	flags = get_adv_instance_flags(hdev, instance);
--	connectable = (flags & MGMT_ADV_FLAG_CONNECTABLE);
-+
-+	/* If the "connectable" instance flag was not set, then choose between
-+	 * ADV_IND and ADV_NONCONN_IND based on the global connectable setting.
-+	 */
-+	connectable = (flags & MGMT_ADV_FLAG_CONNECTABLE) ||
-+		      get_connectable(hdev);
- 
- 	/* Set require_privacy to true only when non-connectable
- 	 * advertising is used. In that case it is fine to use a
--- 
-2.2.0.rc0.207.ga3a616c
+I also found the documentation for the command in mgmt-api.txt in the 
+meantime.
 
+I'll see how far I get from here then...
