@@ -2,62 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 2/2] Bluetooth: Use ADV_SCAN_IND for adv. instances
-Date: Sat, 28 Mar 2015 11:49:28 -0700
-Message-Id: <1427568568-15102-2-git-send-email-armansito@chromium.org>
-In-Reply-To: <1427568568-15102-1-git-send-email-armansito@chromium.org>
-References: <1427568568-15102-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH 1/2] Bluetooth: Fix using global connectable settings for adv
+Date: Sat, 28 Mar 2015 11:49:27 -0700
+Message-Id: <1427568568-15102-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch, ADV_SCAN_IND will be used for advertising instances
-that have non-zero scan response data while the global "connectable"
-setting is "off".
+This patch fixes a bug where ADV_NONCONN_IND was being used for
+advertising instances >0 while the global connectable setting was
+set to "on".
 
 Signed-off-by: Arman Uguray <armansito@chromium.org>
 ---
- net/bluetooth/mgmt.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d998ec3..2d84fc1 100644
+index fb2e764..d998ec3 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -994,6 +994,18 @@ static u32 get_adv_instance_flags(struct hci_dev *hdev, u8 instance)
- 	return flags;
- }
+@@ -985,9 +985,10 @@ static u32 get_adv_instance_flags(struct hci_dev *hdev, u8 instance)
+ 	/* Instance 0 always manages the "Tx Power" and "Flags" fields */
+ 	flags = MGMT_ADV_FLAG_TX_POWER | MGMT_ADV_FLAG_MANAGED_FLAGS;
  
-+static u8 get_adv_instance_scan_rsp_len(struct hci_dev *hdev, u8 instance)
-+{
-+	/* Ignore instance 0 and other unsupported instances */
-+	if (instance != 0x01)
-+		return 0;
-+
-+	/* TODO: Take into account the "appearance" and "local-name" flags here.
-+	 * These are currently being ignored as they are not supported.
+-	/* For instance 0, assemble the flags from global settings */
+-	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE) ||
+-	    get_connectable(hdev))
++	/* For instance 0, the HCI_ADVERTISING_CONNECTABLE setting corresponds
++	 * to the "connectable" instance flag.
 +	 */
-+	return hdev->adv_instance.scan_rsp_len;
-+}
-+
- static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
- {
- 	u8 ad_len = 0, flags = 0;
-@@ -1260,7 +1272,14 @@ static void enable_advertising(struct hci_request *req)
- 	memset(&cp, 0, sizeof(cp));
- 	cp.min_interval = cpu_to_le16(hdev->le_adv_min_interval);
- 	cp.max_interval = cpu_to_le16(hdev->le_adv_max_interval);
--	cp.type = connectable ? LE_ADV_IND : LE_ADV_NONCONN_IND;
-+
-+	if (connectable)
-+		cp.type = LE_ADV_IND;
-+	else if (get_adv_instance_scan_rsp_len(hdev, instance))
-+		cp.type = LE_ADV_SCAN_IND;
-+	else
-+		cp.type = LE_ADV_NONCONN_IND;
-+
- 	cp.own_address_type = own_addr_type;
- 	cp.channel_map = hdev->le_adv_channel_map;
++	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE))
+ 		flags |= MGMT_ADV_FLAG_CONNECTABLE;
  
+ 	return flags;
+@@ -1242,7 +1243,12 @@ static void enable_advertising(struct hci_request *req)
+ 
+ 	instance = get_current_adv_instance(hdev);
+ 	flags = get_adv_instance_flags(hdev, instance);
+-	connectable = (flags & MGMT_ADV_FLAG_CONNECTABLE);
++
++	/* If the "connectable" instance flag was not set, then choose between
++	 * ADV_IND and ADV_NONCONN_IND based on the global connectable setting.
++	 */
++	connectable = (flags & MGMT_ADV_FLAG_CONNECTABLE) ||
++		      get_connectable(hdev);
+ 
+ 	/* Set require_privacy to true only when non-connectable
+ 	 * advertising is used. In that case it is fine to use a
 -- 
 2.2.0.rc0.207.ga3a616c
 
