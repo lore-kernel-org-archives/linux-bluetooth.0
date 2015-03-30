@@ -1,33 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-From: Freek de Kruijf <f.de.kruijf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Problem with bluetooth device Broadcom Corp. BCM20702A0
-Date: Mon, 30 Mar 2015 18:03:13 +0200
-Message-ID: <13869276.gxvsrOEmG3@eik132.beelaertsict.nl>
+Message-ID: <5519688A.20508@cchtml.com>
+Date: Mon, 30 Mar 2015 10:15:22 -0500
+From: Michael Cronenworth <mike@cchtml.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: header change affects c++ projects
+References: <5517B933.1080809@cchtml.com>	<CABBYNZ+VdZkU9y2TyH_6rsM_=8tVdGNrXUp9yX5NTAjy5k06bQ@mail.gmail.com>	<55185E7F.9040604@cchtml.com> <CABBYNZJS9e2aGeX+cWnNWycvDv6XNKs-xNyoPqKLzdJrqzd-vw@mail.gmail.com> <55194C56.7010700@cchtml.com>
+In-Reply-To: <55194C56.7010700@cchtml.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all,
+On 03/30/2015 08:15 AM, Michael Cronenworth wrote:
+>
+> However, the conversion of void* *must* be fixed. This is the key issue.
 
-I have a Bluetooth dongle in a Raspberry Pi which identifies itself via lsusb 
-as: ID 0a5c:21e8 Broadcom Corp. BCM20702A0 Bluetooth 4.0
-
-This device is used in a Rapberry Pi and uses bluez-5.23-1.2
-
-After some days working OK. It suddenly does not work anymore. A command 
-"hcitool scan" hangs and produces only lines showing "scanning...". It even 
-blocks and hangs the system. Putting "timeout -k 10s 1m" in front of that 
-command makes the system to continue. The command "hciconfig hci0 down" seems 
-to work. At least the device status is down. However "hciconfig hci0 up" does 
-not bring the device up. I tried "modprobe -f btusb" and after that "hciconfig 
-hci0 up" and the device status became up and the device did work again.
-
-Any suggestion?
-
--- 
-fr.gr.
-
-Freek de Kruijf
+I see you committed a fix this morning, thanks.
 
