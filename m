@@ -1,55 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1427474019-25186-1-git-send-email-richard@lm-technologies.com>
-References: <1427474019-25186-1-git-send-email-richard@lm-technologies.com>
-Date: Mon, 30 Mar 2015 10:16:10 +0300
-Message-ID: <CABBYNZKGJRYrjmFWTFO-33yj2dHwJqXG=Ab5Yb8G+yUBRTysvQ@mail.gmail.com>
-Subject: Re: [PATCH V2] lib: Fix compilation error in C++ due to inline function
+In-Reply-To: <55185E7F.9040604@cchtml.com>
+References: <5517B933.1080809@cchtml.com>
+	<CABBYNZ+VdZkU9y2TyH_6rsM_=8tVdGNrXUp9yX5NTAjy5k06bQ@mail.gmail.com>
+	<55185E7F.9040604@cchtml.com>
+Date: Mon, 30 Mar 2015 10:13:53 +0300
+Message-ID: <CABBYNZJS9e2aGeX+cWnNWycvDv6XNKs-xNyoPqKLzdJrqzd-vw@mail.gmail.com>
+Subject: Re: header change affects c++ projects
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Richard Palethorpe <richard@lm-technologies.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Szymon Janc <szymon.janc@tieto.com>
+To: Michael Cronenworth <mike@cchtml.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Richard,
+Hi Michael,
 
-On Fri, Mar 27, 2015 at 6:33 PM, Richard Palethorpe
-<richard@lm-technologies.com> wrote:
-> This adds explicit typecasts to an inline function to make it C++
-> compatible. What follows is a sample error message from g++ when
-> compiling without this patch.
+On Sun, Mar 29, 2015 at 11:20 PM, Michael Cronenworth <mike@cchtml.com> wrote:
+> On 03/29/2015 01:57 PM, Luiz Augusto von Dentz wrote:
+>>
+>> It will probably get applied, no reason to get neurotic on the weekend
+>> no one said we would not take it, so please be patience.
 >
-> /usr/include/bluetooth/bluetooth.h:
->   In function 'void bswap_128(const void*, void*)':
-> /usr/include/bluetooth/bluetooth.h:348:21:
->   error: invalid conversion from 'const void*' to 'const uint8_t*
->          {aka const unsigned char*}' [-fpermissive]
->   const uint8_t *s = src;
-> ---
->  lib/bluetooth.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-> index 6ca64b6..852a6b2 100644
-> --- a/lib/bluetooth.h
-> +++ b/lib/bluetooth.h
-> @@ -345,8 +345,8 @@ typedef struct {
->
->  static inline void bswap_128(const void *src, void *dst)
->  {
-> -       const uint8_t *s = src;
-> -       uint8_t *d = dst;
-> +       const uint8_t *s = (const uint8_t *) src;
-> +       uint8_t *d = (uint8_t *) dst;
->         int i;
->
->         for (i = 0; i < 16; i++)
-> --
-> 2.3.4
+> I'm not following you here. What are you trying to say?
 
-Applied, thanks.
+I though you were the same guy sending the patch, nevermind we have a
+fix already.
+
+>> It is a fix to uuid: Add bt_uuid_to_le since the convention is to define
+>> 128 bit UUIDs as big endian which then need to be swaped regardless of
+>> endianess.
+>
+>
+> The commit doesn't change anything though. Please revert it or fix it to not
+> have a conversion or precision loss. If you need help I will make a patch.
+
+uint128_t is a byte array:
+
+typedef struct {
+uint8_t data[16];
+} uint128_t;
+
+There is no precision loss.
 
 
 -- 
