@@ -1,74 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] android/avctp: Fix reference counting
+Date: Mon, 30 Mar 2015 12:03:31 +0200
+Message-ID: <2377316.UHsmVUP4OF@leonov>
+In-Reply-To: <1427496535-17777-1-git-send-email-szymon.janc@tieto.com>
+References: <1427496535-17777-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKr3n1jqkZPuKcjopc-Lrp4CozaaHSykga-57=_6QhdQg@mail.gmail.com>
-References: <1427705138-21398-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<CABBYNZKr3n1jqkZPuKcjopc-Lrp4CozaaHSykga-57=_6QhdQg@mail.gmail.com>
-Date: Mon, 30 Mar 2015 12:39:23 +0200
-Message-ID: <CAMv5Gbfwc+Ctuy1QdCieq3+4HVtMtYQtKGnD_Awg2rtmNwRwrg@mail.gmail.com>
-Subject: Re: [PATCH] lib/uuid: Fix 32 bit bt_uuid to le
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Friday 27 of March 2015 23:48:55 Szymon Janc wrote:
+> Drop extra reference before exiting function.
+> ---
+> V2: get ref before loop and drop after
+> 
+>  android/avctp.c | 20 ++++++++++++--------
+>  1 file changed, 12 insertions(+), 8 deletions(-)
+> 
+> diff --git a/android/avctp.c b/android/avctp.c
+> index d1d2f95..6d7d8cf 100644
+> --- a/android/avctp.c
+> +++ b/android/avctp.c
+> @@ -775,6 +775,8 @@ static void control_response(struct avctp_channel
+> *control, control);
+>  	}
+> 
+> +	avctp_ref(control->session);
+> +
+>  	for (l = control->processed; l; l = l->next) {
+>  		p = l->data;
+>  		req = p->data;
+> @@ -788,15 +790,15 @@ static void control_response(struct avctp_channel
+> *control, avc->subunit_type,
+>  						operands, operand_count,
+>  						req->user_data))
+> -			return;
+> +			break;
+> 
+>  		control->processed = g_slist_remove(control->processed, p);
+>  		pending_destroy(p, NULL);
+> 
+> -		avctp_unref(control->session);
+> -
+> -		return;
+> +		break;
+>  	}
+> +
+> +	avctp_unref(control->session);
+>  }
+> 
+>  static void browsing_response(struct avctp_channel *browsing,
+> @@ -823,6 +825,8 @@ static void browsing_response(struct avctp_channel
+> *browsing, browsing);
+>  	}
+> 
+> +	avctp_ref(browsing->session);
+> +
+>  	for (l = browsing->processed; l; l = l->next) {
+>  		p = l->data;
+>  		req = p->data;
+> @@ -830,17 +834,17 @@ static void browsing_response(struct avctp_channel
+> *browsing, if (p->transaction != avctp->transaction)
+>  			continue;
+> 
+> -		avctp_ref(browsing->session);
+> -
+>  		if (req->func && req->func(browsing->session, operands,
+>  						operand_count, req->user_data))
+> -			return;
+> +			break;
+> 
+>  		browsing->processed = g_slist_remove(browsing->processed, p);
+>  		pending_destroy(p, NULL);
+> 
+> -		return;
+> +		break;
+>  	}
+> +
+> +	avctp_unref(browsing->session);
+>  }
+> 
+>  static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
 
-On 30 March 2015 at 11:39, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Grzegorz,
->
-> On Mon, Mar 30, 2015 at 11:45 AM, Grzegorz Kolodziejczyk
-> <grzegorz.kolodziejczyk@tieto.com> wrote:
->> Conversion from be to le can be done using bluetooth funcion.
->> ---
->>  lib/uuid.c | 6 ++----
->>  1 file changed, 2 insertions(+), 4 deletions(-)
->>
->> diff --git a/lib/uuid.c b/lib/uuid.c
->> index 15fbd66..2f598b8 100644
->> --- a/lib/uuid.c
->> +++ b/lib/uuid.c
->> @@ -338,15 +338,13 @@ int bt_uuid_strcmp(const void *a, const void *b)
->>
->>  int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
->>  {
->> -       bt_uuid_t uuid;
->> -
->>         switch (src->type) {
->>         case BT_UUID16:
->>                 bt_put_le16(src->value.u16, dst);
->>                 return 0;
->>         case BT_UUID32:
->> -               bt_uuid_to_uuid128(src, &uuid);
->> -               /* Fallthrough */
->> +               bt_put_le32(src->value.u32, dst);
->> +               return 0;
->
-> I think the idea is to either use 16 or 128 bits format and never 32
-> bits thus the reason why we convert to 32 to 128, btw 128 format is in
-> fact a byte arrays therefore endianess conversion per architecture
-> don't apply, we do have a convention to define the array in big endian
-> format, thus we always need to swap.
->
-I agree that conversion to 128-bit value is needed if somehow we would
-like to process this 32-bit uuid, but this is a little bit confusing
-that change of byte ordering make internal conversion. It looks like
-lib/uuid is prepared to process 32 bit values, we have functions like
-create 32bit uuid, convert to 32bit uuid, string to uuid 32.
-Btw. original code anyway looks bad. Conversion 32bit-128bit is from
-src uuid_t to uuid and then swap is on non existing/not set u128 src
-value (src has set u32), uuid variable is omitted.
->>         case BT_UUID128:
->>                 /* Convert from 128-bit BE to LE */
->>                 bswap_128(&src->value.u128, dst);
->> --
->> 2.1.0
->
->
->
->
-> --
-> Luiz Augusto von Dentz
-BR,
-Grzegorz
+Applied.
+
+-- 
+BR
+Szymon Janc
