@@ -1,260 +1,196 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: Refactor L2CAP variables into l2cap_ctrl
-Date: Mon, 30 Mar 2015 21:45:56 +0300
-Message-Id: <1427741157-6320-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25ToJqmXQEo8dYbkUP2jtJCvAGZfj5NhQjm5XacTYDqp0A@mail.gmail.com>
+References: <5515ECE9.9080101@gmail.com>
+	<0B4D986A-2913-46C0-8EB2-53EE29C67739@holtmann.org>
+	<55164DEC.6070009@gmail.com>
+	<E29758F5-D9B1-49AE-A35E-FE06CDD7835F@holtmann.org>
+	<5516AD7C.3040401@gmail.com>
+	<CAHrH25RbwtPDgLuRNVa92a=5+y5beMYgzrJLfwf19ut-T=cANA@mail.gmail.com>
+	<55188985.80001@gmail.com>
+	<2F40B83E-682C-47A4-A7A3-BF2CDE2DA4D5@holtmann.org>
+	<CAD0=r8xjG4opS5LdLJnsXWNLF6DHEzikAQK4NEcy9ZocF3uOLA@mail.gmail.com>
+	<CAHrH25ToJqmXQEo8dYbkUP2jtJCvAGZfj5NhQjm5XacTYDqp0A@mail.gmail.com>
+Date: Mon, 30 Mar 2015 11:04:42 -0700
+Message-ID: <CAD0=r8xDwtyZr44+Qq3zOBF5e692U7CBO+OdcbfWeTQ4B+7pOw@mail.gmail.com>
+Subject: Re: Multi-Advertising: implementation options, timing questions
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Arman Uguray <armansito@google.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Florian Grandel <fgrandel@gmail.com>,
+	Arman Uguray <armansito@chromium.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+On Mon, Mar 30, 2015 at 10:44 AM, Arman Uguray <armansito@google.com> wrote=
+:
+> Hi Jakub,
+>
+>> On Mon, Mar 30, 2015 at 10:23 AM, Jakub Pawlowski <jpawlowski@google.com=
+> wrote:
+>> On Sun, Mar 29, 2015 at 5:48 PM, Marcel Holtmann <marcel@holtmann.org> w=
+rote:
+>>> Hi Florian,
+>>>
+>>>> > Now that most of the logic for a single instance is in place it shou=
+ld
+>>>>> be straightforward to extend it for multiple instances. I would start
+>>>>> by turning the adv_instance field of hci_dev into a list of
+>>>>> adv_instances and a way to determine and get a pointer to the
+>>>>> currently active instance.
+>>>>
+>>>> Yes, agreed. That's exactly where I started. Happy to hear that you go=
+t the same procedure in mind. I experimented with a dynamically extended ar=
+ray and a linked list. The latter seems to be the better choice as it allow=
+s us to easily remove entries in the middle of the list.
+>>>>
+>>>>> You would then modify the code in
+>>>>> net/bluetooth/mgmt.c that accesses the instance 1 parameters to use
+>>>>> the new getter instead. Once all of that is done, the second step
+>>>>> would be a matter of inserting new elements into the advertising list
+>>>>> and handling the round-robin logic and the duration parameter.
+>>>>
+>>>> Agreed. That's what I had in mind, too.
+>>>>
+>>>>> If it makes things easier I can start tackling the first step which i=
+s
+>>>>> mostly refactoring my recent code to enable multiple instances. You
+>>>>> can then cleanly build the multiple instance logic on top of that.
+>>>>
+>>>> It's up to you. Just let me know so that I don't interfere with your w=
+ork. I don't want to block you as I'll certainly take much longer to get it=
+ right (newbie + evenings/weekends only). Today I just set up my dev env an=
+d made the build + e2e-tests run on a vm with a minimal kernel. So not much=
+ done in the code, yet.
+>>>>
+>>>> Apart from that I got a few thoughts while familiarizing myself with t=
+he source that you might be able to comment on:
+>>>>
+>>>> - Why do we have two flags to distinguish between multi- and single-in=
+stance advertising (HCI_ADVERTISING[_INSTANCE])? Doesn't that allow for inc=
+onsistencies (=3Dboth true)? Wouldn't it be better to interpret one as "adv=
+ertising generally en-/disabled" and the other as a switch between single a=
+nd multi adv mode? That would also allow us to keep track of the adv mode w=
+hen advertising is temporarily disabled and then re-enabled. As Marcel comm=
+ented this might be necessary for some controllers in multi-adv mode when a=
+dv data cannot be changed on-the-fly.
+>>>
+>>> the HCI_ADVERTISING maps to the advertising setting. And it always take=
+s precedence. It is essentially instance 0. This fact is actually documente=
+d. So if both flags are true, then instance 0 is used and all the other one=
+s will be disabled.
+>>>
+>>>> - What do you think of the idea to handle "set adv" and multi-adv more=
+ uniformly? I have the following in mind:
+>>>> 1) whenever an adv mode switch occurs, all current adv instances will =
+be canceled and destroyed
+>>>> 2) "set adv" will add/replace a single instance to the list
+>>>> 3) "add adv" will add instances up to max_instances
+>>>> This would probably dry up the code and duplicate memory structures qu=
+ite a bit and also remove some logic quirks.
+>>>
+>>> See comment above, we can not really change legacy API. It has to stay =
+around for backwards compatibility. And that is why set advertising takes p=
+recedence over anything added by add advertising.
+>>>
+>>>> - Instances are currently being identified by an integer "adv_info.ins=
+tance". When we add instances more dynamically would it not be better to pa=
+ss pointers around and get rid of that integer? That would remove the neces=
+sity to keep track of, synchronize and verify instance ids.
+>>>
+>>> What are you planning to verify here. The instance id is coming from us=
+erspace.
+>>>
+>>>> - The mgmt_rp_read_adv_features structure contains an unused instance[=
+0]. Seems to be redundant and could be removed, right?
+>>>
+>>> Read up on what instance[0] actually does in a struct. We have used the=
+se constructs before. I am sensing that you misunderstood what this is for.
+>>
+>> Sorry for my late response, but I wanted to raise a concern about how
+>> you want to rotate advertisement data.
+>>
+>> When you advertise, you probably want someone to scan and find your
+>> device. That might be hard, because filtered LE scan is widely used,
+>> i.e. BlueZ uses filtered LE scan, that's restarted every 10 seconds.
+>> That means, that during those 10 seconds your remote device will be
+>> reported once, and changes you're making to advertised data will not
+>> be visible. I think same is true for Windows (you can currently scan
+>> only from control panel), and Mac (you can configure it to do
+>> non-filtered scan in your app)
+>>
+>> When you just modify advertisement data, device that's doing filtered
+>> LE scan will report one MAC address only once during this scan (except
+>> for CSR, which reports RSSI changes).
+>> I recently wrote MGMT_OP_START_SERVICE_DISCOVERY, but it also uses
+>> filtered scan, and restarts the scan, but only if device with proper
+>> UUID was found. It assumes that UUID was there when device started
+>> advertising.
+>>
+>>
+>> There are two propertiary solutions I know:
+>> - one is used in iOS devices, they have special 'overflow' data, that
+>> only other iOS device can see (not even MAC), so they can advertise
+>> more in one MAC address. I think it's described here but I'm not 100%
+>> sure, only for members:
+>> https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=3D2844=
+51
+>> . To use that you need a special chip that would properly handle this
+>> data.
+>> - second is used in Android phones (currently only Nexus 6) that can
+>> advertise as multiple MAC addresses, each having different adv data at
+>> the same time (it might be same thing that broadcom propertiary
+>> solution you were discussing). It uses multiple MAC addresses to
+>> advertise more, so filtered scan will find those devices  and report
+>> them properly.
+>>
+>>
+>> There's command that rotates mac address:
+>> HCI_LE_Set_Resolvable_Private_Address_Timeout, but there's no way to
+>> go back to 'previous' mac in order to have something like 'round
+>> ribbon'. I'm also not sure whether that would have any effect on
+>> currently estabilished connections, I think all devices connected to
+>> private address get disconnected when it rotates, but I'm not 100%
+>> sure. Also when you rotate MAC, controller will not respond to connect
+>> event to old address.
+>>
+>> The other problem is that rotating advertisement will cause slow discove=
+ry.
+>>
+>> So I think rotating only adv data is not good idea. Maybe we can have
+>> different mechanism that decide what gets advertised ? I.e.
+>> application that's in foreground is deciding what gets advertised. Or
+>> applications register their advertisements, and user can pick from
+>> system menu what is currently being advertised ?
+>>
+>
+> I think you're overthinking what this API does. At the mgmt layer we
+> don't have a concept of a "foreground app". We simply have a way for
+> userspace to enter new advertising instances. If there's some special
+> magic in hardware this code can take advantage of that in the future
+> using some driver interface, otherwise it just reprograms the
+> controller in software, so the round robin is managed in the kernel.
+> That's all there is to this API. How the userspace wants to manage
+> this is up to the daemon.
+>
 
-We're getting very close to the maximum possible size of bt_skb_cb. To
-prepare to shrink the struct with the help of a union this patch moves
-all L2CAP related variables into the l2cap_ctrl struct. To later add
-other 'ctrl' structs the L2CAP one is renamed simple 'l2cap' instead
-of 'control'.
+Ok, I probably shouldn't even mention 'foreground' app solution, or
+picking app. My main concern was that if you advertise in round ribbon
+right now, it will just not work, because of the way scanning is done.
+And that's pretty serious.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/bluetooth.h |  8 +++----
- net/bluetooth/l2cap_core.c        | 48 +++++++++++++++++++--------------------
- net/bluetooth/l2cap_sock.c        |  6 ++---
- net/bluetooth/smp.c               |  2 +-
- 4 files changed, 32 insertions(+), 32 deletions(-)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 33a5e00025aa..d8367cc7c76e 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -269,6 +269,9 @@ struct l2cap_ctrl {
- 	__u16	reqseq;
- 	__u16	txseq;
- 	__u8	retries;
-+	__le16  psm;
-+	bdaddr_t bdaddr;
-+	struct l2cap_chan *chan;
- };
- 
- struct hci_dev;
-@@ -284,10 +287,7 @@ struct bt_skb_cb {
- 	__u8 req_start:1;
- 	u8 req_event;
- 	hci_req_complete_t req_complete;
--	struct l2cap_chan *chan;
--	struct l2cap_ctrl control;
--	bdaddr_t bdaddr;
--	__le16 psm;
-+	struct l2cap_ctrl l2cap;
- };
- #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d69861c89bb5..dad419782a12 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -292,7 +292,7 @@ static struct sk_buff *l2cap_ertm_seq_in_queue(struct sk_buff_head *head,
- 	struct sk_buff *skb;
- 
- 	skb_queue_walk(head, skb) {
--		if (bt_cb(skb)->control.txseq == seq)
-+		if (bt_cb(skb)->l2cap.txseq == seq)
- 			return skb;
- 	}
- 
-@@ -954,11 +954,11 @@ static inline void __unpack_control(struct l2cap_chan *chan,
- {
- 	if (test_bit(FLAG_EXT_CTRL, &chan->flags)) {
- 		__unpack_extended_control(get_unaligned_le32(skb->data),
--					  &bt_cb(skb)->control);
-+					  &bt_cb(skb)->l2cap);
- 		skb_pull(skb, L2CAP_EXT_CTRL_SIZE);
- 	} else {
- 		__unpack_enhanced_control(get_unaligned_le16(skb->data),
--					  &bt_cb(skb)->control);
-+					  &bt_cb(skb)->l2cap);
- 		skb_pull(skb, L2CAP_ENH_CTRL_SIZE);
- 	}
- }
-@@ -1200,8 +1200,8 @@ static void l2cap_move_setup(struct l2cap_chan *chan)
- 
- 	chan->retry_count = 0;
- 	skb_queue_walk(&chan->tx_q, skb) {
--		if (bt_cb(skb)->control.retries)
--			bt_cb(skb)->control.retries = 1;
-+		if (bt_cb(skb)->l2cap.retries)
-+			bt_cb(skb)->l2cap.retries = 1;
- 		else
- 			break;
- 	}
-@@ -1846,8 +1846,8 @@ static void l2cap_streaming_send(struct l2cap_chan *chan,
- 
- 		skb = skb_dequeue(&chan->tx_q);
- 
--		bt_cb(skb)->control.retries = 1;
--		control = &bt_cb(skb)->control;
-+		bt_cb(skb)->l2cap.retries = 1;
-+		control = &bt_cb(skb)->l2cap;
- 
- 		control->reqseq = 0;
- 		control->txseq = chan->next_tx_seq;
-@@ -1891,8 +1891,8 @@ static int l2cap_ertm_send(struct l2cap_chan *chan)
- 
- 		skb = chan->tx_send_head;
- 
--		bt_cb(skb)->control.retries = 1;
--		control = &bt_cb(skb)->control;
-+		bt_cb(skb)->l2cap.retries = 1;
-+		control = &bt_cb(skb)->l2cap;
- 
- 		if (test_and_clear_bit(CONN_SEND_FBIT, &chan->conn_state))
- 			control->final = 1;
-@@ -1963,11 +1963,11 @@ static void l2cap_ertm_resend(struct l2cap_chan *chan)
- 			continue;
- 		}
- 
--		bt_cb(skb)->control.retries++;
--		control = bt_cb(skb)->control;
-+		bt_cb(skb)->l2cap.retries++;
-+		control = bt_cb(skb)->l2cap;
- 
- 		if (chan->max_tx != 0 &&
--		    bt_cb(skb)->control.retries > chan->max_tx) {
-+		    bt_cb(skb)->l2cap.retries > chan->max_tx) {
- 			BT_DBG("Retry limit exceeded (%d)", chan->max_tx);
- 			l2cap_send_disconn_req(chan, ECONNRESET);
- 			l2cap_seq_list_clear(&chan->retrans_list);
-@@ -2045,7 +2045,7 @@ static void l2cap_retransmit_all(struct l2cap_chan *chan,
- 
- 	if (chan->unacked_frames) {
- 		skb_queue_walk(&chan->tx_q, skb) {
--			if (bt_cb(skb)->control.txseq == control->reqseq ||
-+			if (bt_cb(skb)->l2cap.txseq == control->reqseq ||
- 			    skb == chan->tx_send_head)
- 				break;
- 		}
-@@ -2055,7 +2055,7 @@ static void l2cap_retransmit_all(struct l2cap_chan *chan,
- 				break;
- 
- 			l2cap_seq_list_append(&chan->retrans_list,
--					      bt_cb(skb)->control.txseq);
-+					      bt_cb(skb)->l2cap.txseq);
- 		}
- 
- 		l2cap_ertm_resend(chan);
-@@ -2267,8 +2267,8 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
- 		return ERR_PTR(err);
- 	}
- 
--	bt_cb(skb)->control.fcs = chan->fcs;
--	bt_cb(skb)->control.retries = 0;
-+	bt_cb(skb)->l2cap.fcs = chan->fcs;
-+	bt_cb(skb)->l2cap.retries = 0;
- 	return skb;
- }
- 
-@@ -2321,7 +2321,7 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
- 			return PTR_ERR(skb);
- 		}
- 
--		bt_cb(skb)->control.sar = sar;
-+		bt_cb(skb)->l2cap.sar = sar;
- 		__skb_queue_tail(seg_queue, skb);
- 
- 		len -= pdu_len;
-@@ -2856,7 +2856,7 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
- 			continue;
- 
- 		/* Don't send frame to the channel it came from */
--		if (bt_cb(skb)->chan == chan)
-+		if (bt_cb(skb)->l2cap.chan == chan)
- 			continue;
- 
- 		nskb = skb_clone(skb, GFP_KERNEL);
-@@ -5918,7 +5918,7 @@ static int l2cap_rx_queued_iframes(struct l2cap_chan *chan)
- 
- 		skb_unlink(skb, &chan->srej_q);
- 		chan->buffer_seq = __next_seq(chan, chan->buffer_seq);
--		err = l2cap_reassemble_sdu(chan, skb, &bt_cb(skb)->control);
-+		err = l2cap_reassemble_sdu(chan, skb, &bt_cb(skb)->l2cap);
- 		if (err)
- 			break;
- 	}
-@@ -5952,7 +5952,7 @@ static void l2cap_handle_srej(struct l2cap_chan *chan,
- 		return;
- 	}
- 
--	if (chan->max_tx != 0 && bt_cb(skb)->control.retries >= chan->max_tx) {
-+	if (chan->max_tx != 0 && bt_cb(skb)->l2cap.retries >= chan->max_tx) {
- 		BT_DBG("Retry limit exceeded (%d)", chan->max_tx);
- 		l2cap_send_disconn_req(chan, ECONNRESET);
- 		return;
-@@ -6005,7 +6005,7 @@ static void l2cap_handle_rej(struct l2cap_chan *chan,
- 	skb = l2cap_ertm_seq_in_queue(&chan->tx_q, control->reqseq);
- 
- 	if (chan->max_tx && skb &&
--	    bt_cb(skb)->control.retries >= chan->max_tx) {
-+	    bt_cb(skb)->l2cap.retries >= chan->max_tx) {
- 		BT_DBG("Retry limit exceeded (%d)", chan->max_tx);
- 		l2cap_send_disconn_req(chan, ECONNRESET);
- 		return;
-@@ -6565,7 +6565,7 @@ static int l2cap_stream_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
- 
- static int l2cap_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
- {
--	struct l2cap_ctrl *control = &bt_cb(skb)->control;
-+	struct l2cap_ctrl *control = &bt_cb(skb)->l2cap;
- 	u16 len;
- 	u8 event;
- 
-@@ -6864,8 +6864,8 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
- 		goto drop;
- 
- 	/* Store remote BD_ADDR and PSM for msg_name */
--	bacpy(&bt_cb(skb)->bdaddr, &hcon->dst);
--	bt_cb(skb)->psm = psm;
-+	bacpy(&bt_cb(skb)->l2cap.bdaddr, &hcon->dst);
-+	bt_cb(skb)->l2cap.psm = psm;
- 
- 	if (!chan->ops->recv(chan, skb)) {
- 		l2cap_chan_put(chan);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 9070720eedc8..a7278f05eafb 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1330,7 +1330,7 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
- 
- 	skb->priority = sk->sk_priority;
- 
--	bt_cb(skb)->chan = chan;
-+	bt_cb(skb)->l2cap.chan = chan;
- 
- 	return skb;
- }
-@@ -1444,8 +1444,8 @@ static void l2cap_skb_msg_name(struct sk_buff *skb, void *msg_name,
- 
- 	memset(la, 0, sizeof(struct sockaddr_l2));
- 	la->l2_family = AF_BLUETOOTH;
--	la->l2_psm = bt_cb(skb)->psm;
--	bacpy(&la->l2_bdaddr, &bt_cb(skb)->bdaddr);
-+	la->l2_psm = bt_cb(skb)->l2cap.psm;
-+	bacpy(&la->l2_bdaddr, &bt_cb(skb)->l2cap.bdaddr);
- 
- 	*msg_namelen = sizeof(struct sockaddr_l2);
- }
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 1ec3f66b5a74..1910c5806974 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3017,7 +3017,7 @@ static struct sk_buff *smp_alloc_skb_cb(struct l2cap_chan *chan,
- 		return ERR_PTR(-ENOMEM);
- 
- 	skb->priority = HCI_PRIO_MAX;
--	bt_cb(skb)->chan = chan;
-+	bt_cb(skb)->l2cap.chan = chan;
- 
- 	return skb;
- }
--- 
-2.1.0
-
+>>
+>>
+>>>
+>>> Regards
+>>>
+>>> Marcel
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetoo=
+th" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> Thanks,
+> Arman
