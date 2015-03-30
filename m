@@ -1,27 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55194C56.7010700@cchtml.com>
-Date: Mon, 30 Mar 2015 08:15:02 -0500
-From: Michael Cronenworth <mike@cchtml.com>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: header change affects c++ projects
-References: <5517B933.1080809@cchtml.com>	<CABBYNZ+VdZkU9y2TyH_6rsM_=8tVdGNrXUp9yX5NTAjy5k06bQ@mail.gmail.com>	<55185E7F.9040604@cchtml.com> <CABBYNZJS9e2aGeX+cWnNWycvDv6XNKs-xNyoPqKLzdJrqzd-vw@mail.gmail.com>
-In-Reply-To: <CABBYNZJS9e2aGeX+cWnNWycvDv6XNKs-xNyoPqKLzdJrqzd-vw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] lib/uuid: Fix bt_uuid_to_le
+Date: Mon, 30 Mar 2015 16:50:26 +0300
+Message-Id: <1427723426-4316-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 03/30/2015 02:13 AM, Luiz Augusto von Dentz wrote:
-> uint128_t is a byte array:
->
-> typedef struct {
-> uint8_t data[16];
-> } uint128_t;
->
-> There is no precision loss.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Thanks, I did not see the definition.
+bt_uuid_to_le is currently broken if the src uuid is type 32 bits since
+it does the conversion to 128 bits but still uses the original value to
+swap instead of the coverted one.
+---
+ lib/uuid.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-However, the conversion of void* *must* be fixed. This is the key issue.
+diff --git a/lib/uuid.c b/lib/uuid.c
+index 4f34b17..fd61968 100644
+--- a/lib/uuid.c
++++ b/lib/uuid.c
+@@ -301,7 +301,8 @@ int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
+ 		bt_put_le16(src->value.u16, dst);
+ 		return 0;
+ 	case BT_UUID32:
+-		bt_uuid_to_uuid128(src, &uuid);
++		bt_uuid32_to_uuid128(src, &uuid);
++		src = &uuid;
+ 		/* Fallthrough */
+ 	case BT_UUID128:
+ 		/* Convert from 128-bit BE to LE */
+-- 
+2.1.0
 
