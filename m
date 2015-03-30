@@ -1,80 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v6 1/8] core: device: add device_set_rssi_no_delta
-Date: Mon, 30 Mar 2015 16:32:13 -0700
-Message-Id: <1427758340-14949-1-git-send-email-jpawlowski@google.com>
+From: Randy Yates <yates@digitalsignallabs.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Hard-configuring a BT Module
+References: <87k2xyp18h.fsf@digitalsignallabs.com>
+	<987BC9D9-2FE8-4ED5-8171-33E3727501EB@holtmann.org>
+Date: Mon, 30 Mar 2015 18:59:42 -0400
+In-Reply-To: <987BC9D9-2FE8-4ED5-8171-33E3727501EB@holtmann.org> (Marcel
+	Holtmann's message of "Mon, 30 Mar 2015 15:49:59 -0700")
+Message-ID: <87zj6unlb5.fsf@digitalsignallabs.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds new method that allow to update RSSI value without
-taking delta into account. It will be used by StartFilteredDiscovery
-method, in order to achieve more accurate proximity detection.
----
- src/device.c | 14 +++++++++++---
- src/device.h |  2 ++
- 2 files changed, 13 insertions(+), 3 deletions(-)
+Marcel Holtmann <marcel@holtmann.org> writes:
 
-diff --git a/src/device.c b/src/device.c
-index 8ad62d3..f0dded8 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -83,6 +83,8 @@
- #define MIN(a, b) ((a) < (b) ? (a) : (b))
- #endif
- 
-+#define RSSI_THRESHOLD		8
-+
- static DBusConnection *dbus_conn = NULL;
- static unsigned service_state_cb_id;
- 
-@@ -4547,7 +4549,8 @@ void device_set_legacy(struct btd_device *device, bool legacy)
- 					DEVICE_INTERFACE, "LegacyPairing");
- }
- 
--void device_set_rssi(struct btd_device *device, int8_t rssi)
-+void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
-+				int8_t delta_threshold)
- {
- 	if (!device)
- 		return;
-@@ -4567,8 +4570,8 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
- 		else
- 			delta = rssi - device->rssi;
- 
--		/* only report changes of 8 dBm or more */
--		if (delta < 8)
-+		/* only report changes of delta_threshold dBm or more */
-+		if (delta < delta_threshold)
- 			return;
- 
- 		DBG("rssi %d delta %d", rssi, delta);
-@@ -4580,6 +4583,11 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
- 						DEVICE_INTERFACE, "RSSI");
- }
- 
-+void device_set_rssi(struct btd_device *device, int8_t rssi)
-+{
-+	device_set_rssi_with_delta(device, rssi, RSSI_THRESHOLD);
-+}
-+
- static gboolean start_discovery(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
-diff --git a/src/device.h b/src/device.h
-index b17f53a..d50fc84 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -90,6 +90,8 @@ void btd_device_set_temporary(struct btd_device *device, bool temporary);
- void btd_device_set_trusted(struct btd_device *device, gboolean trusted);
- void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
- void device_set_legacy(struct btd_device *device, bool legacy);
-+void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
-+				int8_t delta_threshold);
- void device_set_rssi(struct btd_device *device, int8_t rssi);
- bool btd_device_is_connected(struct btd_device *dev);
- uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
+> Hi Randy,
+>
+>> we are building a custom board using the TI AM335x ARM processor and
+>> want to base it on the armhf port of debian linux.
+>> 
+>> to save cost/power/etc), our system will not have a usb bridge, so the
+>> usual method of adding a bluetooth device via plugging it into a usb
+>> port will not be used.
+>> 
+>> is it possible to configure bluez and/or the kernel to recognize and use
+>> a BT module (an LSR TiWi-uB2) that has its HCI serial interface
+>> hard-wired to a specific serial port / uart on the ARM?
+>
+> you are looking for hciattach or btattach tool to attach a serial port to the kernel.
+>
+>> also, is the LSR TiWi-uB2 known to operate with bluez correctly?
+>
+> No idea. Nobody ever send me board and enough instructions to test this all. There is TI support in hciattach. So at least there is a starting point if it does not work out of the box.
+
+Aha! Excellent! Thank you, Marcel.
 -- 
-2.2.0.rc0.207.ga3a616c
-
+Randy Yates
+Digital Signal Labs
+http://www.digitalsignallabs.com
