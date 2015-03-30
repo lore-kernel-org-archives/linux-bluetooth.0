@@ -1,91 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] android/avctp: Fix reference counting
-Date: Mon, 30 Mar 2015 12:03:31 +0200
-Message-ID: <2377316.UHsmVUP4OF@leonov>
-In-Reply-To: <1427496535-17777-1-git-send-email-szymon.janc@tieto.com>
-References: <1427496535-17777-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CAMv5GbdBTQ+P5C0yxsHb3B2NCd69Ls9AsDjKTQSiFetBegEbhQ@mail.gmail.com>
+References: <1427470759-30114-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<1427470759-30114-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<CAMv5GbdTE9btr_CE=3czJPH6axVE36F25NswSjEoVG+nVX5d+A@mail.gmail.com>
+	<CABBYNZJZnjMEpdnzmsdRb6_8v+yp9SpHuBkBLSop9=ggagA-Zg@mail.gmail.com>
+	<CAMv5GbdBTQ+P5C0yxsHb3B2NCd69Ls9AsDjKTQSiFetBegEbhQ@mail.gmail.com>
+Date: Mon, 30 Mar 2015 12:51:00 +0300
+Message-ID: <CABBYNZLTzAsnvtL_KZhmxifaqtN3MuE2Tz=KGO7_ta=oQyk1rg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] shared/gatt-db: Use bt_uuid_to_le instead of local function
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 27 of March 2015 23:48:55 Szymon Janc wrote:
-> Drop extra reference before exiting function.
-> ---
-> V2: get ref before loop and drop after
-> 
->  android/avctp.c | 20 ++++++++++++--------
->  1 file changed, 12 insertions(+), 8 deletions(-)
-> 
-> diff --git a/android/avctp.c b/android/avctp.c
-> index d1d2f95..6d7d8cf 100644
-> --- a/android/avctp.c
-> +++ b/android/avctp.c
-> @@ -775,6 +775,8 @@ static void control_response(struct avctp_channel
-> *control, control);
->  	}
-> 
-> +	avctp_ref(control->session);
-> +
->  	for (l = control->processed; l; l = l->next) {
->  		p = l->data;
->  		req = p->data;
-> @@ -788,15 +790,15 @@ static void control_response(struct avctp_channel
-> *control, avc->subunit_type,
->  						operands, operand_count,
->  						req->user_data))
-> -			return;
-> +			break;
-> 
->  		control->processed = g_slist_remove(control->processed, p);
->  		pending_destroy(p, NULL);
-> 
-> -		avctp_unref(control->session);
-> -
-> -		return;
-> +		break;
->  	}
-> +
-> +	avctp_unref(control->session);
->  }
-> 
->  static void browsing_response(struct avctp_channel *browsing,
-> @@ -823,6 +825,8 @@ static void browsing_response(struct avctp_channel
-> *browsing, browsing);
->  	}
-> 
-> +	avctp_ref(browsing->session);
-> +
->  	for (l = browsing->processed; l; l = l->next) {
->  		p = l->data;
->  		req = p->data;
-> @@ -830,17 +834,17 @@ static void browsing_response(struct avctp_channel
-> *browsing, if (p->transaction != avctp->transaction)
->  			continue;
-> 
-> -		avctp_ref(browsing->session);
-> -
->  		if (req->func && req->func(browsing->session, operands,
->  						operand_count, req->user_data))
-> -			return;
-> +			break;
-> 
->  		browsing->processed = g_slist_remove(browsing->processed, p);
->  		pending_destroy(p, NULL);
-> 
-> -		return;
-> +		break;
->  	}
-> +
-> +	avctp_unref(browsing->session);
->  }
-> 
->  static gboolean session_browsing_cb(GIOChannel *chan, GIOCondition cond,
+Hi Grzegorz,
 
-Applied.
+On Mon, Mar 30, 2015 at 12:38 PM, Grzegorz Kolodziejczyk
+<grzegorz.kolodziejczyk@tieto.com> wrote:
+> Hi Luiz,
+>
+> On 30 March 2015 at 09:49, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>> Hi Grzegorz,
+>>
+>> On Fri, Mar 27, 2015 at 5:42 PM, Grzegorz Kolodziejczyk
+>> <grzegorz.kolodziejczyk@tieto.com> wrote:
+>>> Hi,
+>>>
+>>> One more comment here.
+>>>
+>>> On 27 March 2015 at 16:39, Grzegorz Kolodziejczyk
+>>> <grzegorz.kolodziejczyk@tieto.com> wrote:
+>>>> This patch use lib/uuid library for uuids instead of local functions.
+>>>> ---
+>>>>  src/shared/gatt-db.c | 36 ++++++++++++++++++------------------
+>>>>  1 file changed, 18 insertions(+), 18 deletions(-)
+>>>>
+>>>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>>>> index 2b2090c..323ce91 100644
+>>>> --- a/src/shared/gatt-db.c
+>>>> +++ b/src/shared/gatt-db.c
+>>>> @@ -335,20 +335,6 @@ bool gatt_db_isempty(struct gatt_db *db)
+>>>>         return queue_isempty(db->services);
+>>>>  }
+>>>>
+>>>> -static int uuid_to_le(const bt_uuid_t *uuid, uint8_t *dst)
+>>>> -{
+>>>> -       bt_uuid_t uuid128;
+>>>> -
+>>>> -       if (uuid->type == BT_UUID16) {
+>>>> -               put_le16(uuid->value.u16, dst);
+>>>> -               return bt_uuid_len(uuid);
+>>>> -       }
+>>>> -
+>>>> -       bt_uuid_to_uuid128(uuid, &uuid128);
+>>>> -       bswap_128(&uuid128.value.u128, dst);
+>>>> -       return bt_uuid_len(&uuid128);
+>>>> -}
+>>>> -
+>>>>  static bool le_to_uuid(const uint8_t *src, size_t len, bt_uuid_t *uuid)
+>>>>  {
+>>>>         uint128_t u128;
+>>>> @@ -379,8 +365,8 @@ static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
+>>>>  {
+>>>>         struct gatt_db_service *service;
+>>>>         const bt_uuid_t *type;
+>>>> +       bt_uuid_t uuid128;
+>>>>         uint8_t value[16];
+>>>> -       uint16_t len;
+>>>>
+>>>>         if (num_handles < 1)
+>>>>                 return NULL;
+>>>> @@ -400,10 +386,23 @@ static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
+>>>>         else
+>>>>                 type = &secondary_service_uuid;
+>>>>
+>>>> -       len = uuid_to_le(uuid, value);
+>>>> +       switch (uuid->type) {
+>>>> +       case BT_UUID16:
+>>>> +       case BT_UUID128:
+>>>> +               bt_uuid_to_le(uuid, value);
+>>>> +               break;
+>>>> +       case BT_UUID32:
+>>>> +               bt_uuid_to_uuid128(uuid, &uuid128);
+>>>> +               bt_uuid_to_le(&uuid128, value);
+>>
+>> bt_uuid_to_le already does this conversion, so this switch is not
+>> actually needed.
+>>
+> lib/uuid library is only gatt oriented ? Specification 2.5.4 - says
+> that "All 32-bit UUIDs shall be converted to 128-bit UUIDs when the
+> UUID is contained in an ATT PDU". I've sent patch, few minutes ago
+> which changes functionality of bt_uuid_to_le. I think it should only
+> convert value to le order.
+
+That why I said we should keep the conversion from 32 to 128 bits on
+bt_uuid_to_le, and yes the only user of bt_uuid_to_le is GATT.
+
+>>>> +               break;
+>>>> +       case BT_UUID_UNSPEC:
+>>>> +       default:
+>>>> +               gatt_db_service_destroy(service);
+>>>> +               return NULL;
+>>>> +       }
+>>> I'm not sure if we should generally handle 32bit uuids.
+>>>>
+>>>>         service->attributes[0] = new_attribute(service, handle, type, value,
+>>>> -                                                                       len);
+>>>> +                                                               uuid->type/8);
+>>
+>> Maybe we should make bt_uuid_to_le return how much it has written so
+>> we don't have to guess with uuid->type / 8.
+>>
+> Yes, I agree.
+>>>>         if (!service->attributes[0]) {
+>>>>                 gatt_db_service_destroy(service);
+>>>>                 return NULL;
+>>>> @@ -698,7 +697,8 @@ service_insert_characteristic(struct gatt_db_service *service,
+>>>>         /* We set handle of characteristic value, which will be added next */
+>>>>         put_le16(handle, &value[1]);
+>>>>         len += sizeof(uint16_t);
+>>>> -       len += uuid_to_le(uuid, &value[3]);
+>>>> +       len += uuid->type/8;
+>>>> +       bt_uuid_to_le(uuid, &value[3]);
+>>>>
+>>>>         service->attributes[i] = new_attribute(service, handle - 1,
+>>>>                                                         &characteristic_uuid,
+>>>> --
+>>>> 2.1.0
+>>>>
+>>>
+>>> BR,
+>>> Grzegorz
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+> BR,
+> Grzegorz
+
+
 
 -- 
-BR
-Szymon Janc
+Luiz Augusto von Dentz
