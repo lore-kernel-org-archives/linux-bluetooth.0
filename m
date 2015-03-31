@@ -1,84 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH v3 4/4] Bluetooth: bnep: Handle BNEP connection setup request
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1427813761-32123-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Date: Tue, 31 Mar 2015 08:27:30 -0700
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Prabhu Chawandi <foss.chaws@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <EFA40BD5-89FD-47FB-A37E-926B9B45CF5A@holtmann.org>
-References: <1427813761-32123-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1427813761-32123-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: Crash in android/hal-sco.c
+Date: Tue, 31 Mar 2015 17:06:14 +0200
+Message-ID: <4841807.9Mv5T1jXya@leonov>
+In-Reply-To: <CAKafyqooRHOCtKbzWdLeDW4Dr3S151+tz-S0S+YBsRhWADVYsQ@mail.gmail.com>
+References: <CAKafyqooRHOCtKbzWdLeDW4Dr3S151+tz-S0S+YBsRhWADVYsQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grezegorz,
+Hi,
 
-> With this patch kernel will be able to handle setup request. This is
-> needed if we would like to handle control mesages with extension
-> headers. User space will be only resposible for reading setup data and
-> checking if scenario is conformance to specification (dst and src device
-> bnep role). In case of new user space, setup data must be leaved(peek
-> msg) on queue. New bnep session will be responsible for handling this
-> data.
+On Tuesday 31 of March 2015 18:43:16 Prabhu Chawandi wrote:
+> Hi,
 > 
-> Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-> ---
-> net/bluetooth/bnep/bnep.h |  5 +++++
-> net/bluetooth/bnep/core.c | 10 +++++++++-
-> 2 files changed, 14 insertions(+), 1 deletion(-)
+>   I was trying to do SCO read using haltest but I was getting FPERROR.
 > 
-> diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
-> index 12d2c84..0b88f92 100644
-> --- a/net/bluetooth/bnep/bnep.h
-> +++ b/net/bluetooth/bnep/bnep.h
-> @@ -83,6 +83,11 @@
-> /* Features */
-> #define BNEP_SETUP_RSP_SUPPORT	0
+> So further I went debug coredump
 > 
-> +/* Session flags */
-> +enum {
-> +	BNEP_SETUP_RSP_SENT,
-> +};
-> +
-
-since we have done this in HIDP, I am find adding this as value 10 to the same list. It is more like internal flags that are not exposed to userspace.
-
-We just really need an extra patch that check allows flags from userspace and reject unsupported flags.
-
-> struct bnep_setup_conn_req {
-> 	__u8 type;
-> 	__u8 ctrl;
-> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-> index 77ae725..aa0966a 100644
-> --- a/net/bluetooth/bnep/core.c
-> +++ b/net/bluetooth/bnep/core.c
-> @@ -231,7 +231,15 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
-> 		break;
 > 
-> 	case BNEP_SETUP_CONN_REQ:
-> -		err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
-> +		/* Successful response should be sent only once */
-> +		if (!test_bit(BNEP_SETUP_RSP_SENT, &s->flags)) {
-> +			set_bit(BNEP_SETUP_RSP_SENT, &s->flags);
+> static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
+>                                                                 size_t
+> bytes) {
+>         struct sco_stream_in *in = (struct sco_stream_in *) stream;
+> #if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+>         size_t frame_size = audio_stream_in_frame_size(&in->stream);
+> #else
+>         size_t frame_size = audio_stream_frame_size(&stream->common);
+> #endif
+> 
+>         size_t frame_num = bytes / frame_size; ===> Floating point error.
+> 
+>         size_t input_frame_num = frame_num;
+> 
+> 
+> I am getting channel number as 1  from audio_channel_count_from_in_mask
+> 
+> which is reserved for future hence I am getting zero as return which
+> leading to the crash
 
-This is hackish. It just works by magically having the same value.
+Thanks for reporting.
+I've just send a patch "android/hal-sco: Fix divide by zero". This should fix 
+the crash so please test.
 
-> +			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
-> +					    BNEP_SUCCESS);
-> +		} else {
-> +			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
-> +					    BNEP_CONN_NOT_ALLOWED);
-> +		}
-> 		break;
-
-	if (test_bit(BNEP_SETUP_RESONSE, &s->flags) &&
-	    !test_and_set_bit(BNEP_SETUP_RSP_SENT, &s->flags))
-		--> success
-	else
-		--> failure
-
-Regards
-
-Marcel
-
+-- 
+BR
+Szymon Janc
