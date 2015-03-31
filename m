@@ -1,516 +1,401 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25QJyWLWWEzObuOVvGuUQpOoH+sxb+qCnt0E_-1OfiJjoQ@mail.gmail.com>
-References: <1427758340-14949-1-git-send-email-jpawlowski@google.com>
-	<1427758340-14949-6-git-send-email-jpawlowski@google.com>
-	<CAHrH25QJyWLWWEzObuOVvGuUQpOoH+sxb+qCnt0E_-1OfiJjoQ@mail.gmail.com>
-Date: Tue, 31 Mar 2015 00:33:16 -0700
-Message-ID: <CAD0=r8yP527Jq6PP0ZaAG90k+EU4G9DWeL=B=GaY8y-A_WSeXg@mail.gmail.com>
-Subject: Re: [PATCH v6 6/8] core: adapter: start proper discovery depending on
- filter type
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com
+References: <1427692567-631-1-git-send-email-bharat.panda@samsung.com>
+In-reply-to: <1427692567-631-1-git-send-email-bharat.panda@samsung.com>
+Subject: RE: [PATCH v4] monitor: Add AVDTP support to btmon
+Date: Tue, 31 Mar 2015 10:58:43 +0530
+Message-id: <004101d06b73$9289a650$b79cf2f0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 30, 2015 at 6:26 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Jakub,
->
->> On Mon, Mar 30, 2015 at 4:32 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->> This patch implement starting and updating filtered discovery,
->> depending on kind of filters used by each client. It also removes
->> iddle timeout for filtered scans, to make sure that this kind of
->> scan will run continuously.
->> ---
->>  src/adapter.c | 291 +++++++++++++++++++++++++++++++++++++++++++++++++++++-----
->>  1 file changed, 269 insertions(+), 22 deletions(-)
->>
->> diff --git a/src/adapter.c b/src/adapter.c
->> index 166e74e..67db99c 100644
->> --- a/src/adapter.c
->> +++ b/src/adapter.c
->> @@ -93,6 +93,7 @@
->>  #define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
->>  #define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
->>
->> +#define        HCI_RSSI_INVALID        127
->>  #define        DISTANCE_VAL_INVALID    0x7FFF
->>  #define        PATHLOSS_MAX 137
->>
->> @@ -206,6 +207,9 @@ struct btd_adapter {
->>         char *stored_alias;             /* stored adapter name alias */
->>
->>         bool discovering;               /* discovering property state */
->> +       bool filtered_discovery;        /* we are doing filtered discovery */
->> +       bool no_scan_restart_delay;     /* when this flag is set, restart scan
->> +                                        * without delay */
->>         uint8_t discovery_type;         /* current active discovery type */
->>         uint8_t discovery_enable;       /* discovery enabled/disabled */
->>         bool discovery_suspended;       /* discovery has been suspended */
->> @@ -213,6 +217,9 @@ struct btd_adapter {
->>         GSList *set_filter_list;        /* list of clients that specified
->>                                          * filter, but don't scan yet
->>                                          */
->> +       /* current discovery filter, if any */
->> +       struct mgmt_cp_start_service_discovery *current_discovery_filter;
->> +
->>         GSList *discovery_found;        /* list of found devices */
->>         guint discovery_idle_timeout;   /* timeout between discovery runs */
->>         guint passive_scan_timeout;     /* timeout between passive scans */
->> @@ -1390,6 +1397,11 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
->>                 adapter->discovery_type = rp->type;
->>                 adapter->discovery_enable = 0x01;
->>
->> +               if (adapter->current_discovery_filter)
->> +                       adapter->filtered_discovery = true;
->> +               else
->> +                       adapter->filtered_discovery = false;
->> +
->>                 if (adapter->discovering)
->>                         return;
->>
->> @@ -1409,21 +1421,32 @@ static void start_discovery_complete(uint8_t status, uint16_t length,
->>  static gboolean start_discovery_timeout(gpointer user_data)
->>  {
->>         struct btd_adapter *adapter = user_data;
->> -       struct mgmt_cp_start_discovery cp;
->> +       struct mgmt_cp_start_service_discovery *sd_cp;
->>         uint8_t new_type;
->>
->>         DBG("");
->>
->>         adapter->discovery_idle_timeout = 0;
->>
->> +       /* If we're doing filtered discovery, it must be quickly restarted */
->> +       adapter->no_scan_restart_delay = !!adapter->current_discovery_filter;
->> +
->> +       DBG("adapter->current_discovery_filter == %d",
->> +           !!adapter->current_discovery_filter);
->> +
->>         new_type = get_scan_type(adapter);
->>
->>         if (adapter->discovery_enable == 0x01) {
->> +               struct mgmt_cp_stop_discovery cp;
->> +
->>                 /*
->> -                * If there is an already running discovery and it has the
->> -                * same type, then just keep it.
->> +                * If we're asked to start regular discovery, and there is an
->> +                *  already running regular discovery and it has the same type,
->
-> Remove extra space before 'already'.
->
-fixed
+ping
 
->> +                * then just keep it.
->>                  */
->> -               if (adapter->discovery_type == new_type) {
->> +               if (!adapter->current_discovery_filter &&
->> +                   !adapter->filtered_discovery &&
->> +                   adapter->discovery_type == new_type) {
->>                         if (adapter->discovering)
->>                                 return FALSE;
->>
->> @@ -1438,20 +1461,43 @@ static gboolean start_discovery_timeout(gpointer user_data)
->>                  * queue up a stop discovery command.
->>                  *
->>                  * This can happen if a passive scanning for Low Energy
->> -                * devices is ongoing.
->> +                * devices is ongoing, or scan type is changed between
->> +                * regular and filtered, or filter was updated.
->>                  */
->>                 cp.type = adapter->discovery_type;
->> -
->>                 mgmt_send(adapter->mgmt, MGMT_OP_STOP_DISCOVERY,
->>                                         adapter->dev_id, sizeof(cp), &cp,
->>                                         NULL, NULL, NULL);
->> +
->> +               /* Don't even bother to try to quickly start discovery
->> +                * just after stopping it, it would fail with status
->> +                * MGMT_BUSY. Instead discovering_callback will take
->> +                * care of that.
->> +                */
->> +               return FALSE;
->> +
->>         }
->>
->> -       cp.type = new_type;
->> +       /* Regular discovery is required */
->> +       if (!adapter->current_discovery_filter) {
->> +               struct mgmt_cp_start_discovery cp;
->>
->> -       mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
->> +               cp.type = new_type;
->> +               mgmt_send(adapter->mgmt, MGMT_OP_START_DISCOVERY,
->>                                 adapter->dev_id, sizeof(cp), &cp,
->>                                 start_discovery_complete, adapter, NULL);
->> +               return FALSE;
->> +       }
->> +
->> +       /* Filtered discovery is required */
->> +       sd_cp = adapter->current_discovery_filter;
->> +
->> +       DBG("sending MGMT_OP_START_SERVICE_DISCOVERY %d, %d, %d",
->> +           sd_cp->rssi, sd_cp->type, sd_cp->uuid_count);
->> +
->> +       mgmt_send(adapter->mgmt, MGMT_OP_START_SERVICE_DISCOVERY,
->> +                 adapter->dev_id, sizeof(*sd_cp) + sd_cp->uuid_count * 16,
->> +                 sd_cp, start_discovery_complete, adapter, NULL);
->>
->>         return FALSE;
->>  }
->> @@ -1563,8 +1609,8 @@ static void discovering_callback(uint16_t index, uint16_t length,
->>                 return;
->>         }
->>
->> -       DBG("hci%u type %u discovering %u", adapter->dev_id,
->> -                                       ev->type, ev->discovering);
->> +       DBG("hci%u type %u discovering %u method %d", adapter->dev_id, ev->type,
->> +                               ev->discovering, adapter->filtered_discovery);
->>
->>         if (adapter->discovery_enable == ev->discovering)
->>                 return;
->> @@ -1590,7 +1636,10 @@ static void discovering_callback(uint16_t index, uint16_t length,
->>
->>         switch (adapter->discovery_enable) {
->>         case 0x00:
->> -               trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT);
->> +               if (adapter->no_scan_restart_delay)
->> +                       trigger_start_discovery(adapter, 0);
->> +               else
->> +                       trigger_start_discovery(adapter, IDLE_DISCOV_TIMEOUT);
->>                 break;
->>
->>         case 0x01:
->> @@ -1598,6 +1647,7 @@ static void discovering_callback(uint16_t index, uint16_t length,
->>                         g_source_remove(adapter->discovery_idle_timeout);
->>                         adapter->discovery_idle_timeout = 0;
->>                 }
->> +
->>                 break;
->>         }
->>  }
->> @@ -1612,7 +1662,8 @@ static void stop_discovery_complete(uint8_t status, uint16_t length,
->>         if (status == MGMT_STATUS_SUCCESS) {
->>                 adapter->discovery_type = 0x00;
->>                 adapter->discovery_enable = 0x00;
->> -
->> +               adapter->filtered_discovery = false;
->> +               adapter->no_scan_restart_delay = false;
->>                 adapter->discovering = false;
->>                 g_dbus_emit_property_changed(dbus_conn, adapter->path,
->>                                         ADAPTER_INTERFACE, "Discovering");
->> @@ -1663,6 +1714,193 @@ static gboolean remove_temp_devices(gpointer user_data)
->>         return FALSE;
->>  }
->>
->> +static gint g_strcmp(gconstpointer a, gconstpointer b)
->> +{
->> +       return strcmp(a, b);
->> +}
->> +
->> +static void extract_unique_uuids(gpointer data, gpointer user_data)
->> +{
->> +       char *uuid_str = data;
->> +       GSList **uuids = user_data;
->> +
->> +       if (!g_slist_find_custom(*uuids, uuid_str, g_strcmp))
->> +               *uuids = g_slist_insert_sorted(*uuids, uuid_str, g_strcmp);
->> +}
->> +
->> +/*
->> + * This method merges all adapter filters into one that will be send to kernel.
->> + * cp_ptr is set to null when regular non-filtered discovery is needed,
->> + * otherwise it's pointing to filter. Returns 0 on succes, -1 on error
->> + */
->> +static int discovery_filter_to_mgmt_cp(struct btd_adapter *adapter,
->> +                              struct mgmt_cp_start_service_discovery **cp_ptr)
->> +{
->> +       GSList *l, *uuids = NULL;
->> +       struct mgmt_cp_start_service_discovery *cp;
->> +       int rssi = DISTANCE_VAL_INVALID;
->> +       int uuid_count;
->> +       uint8_t discovery_type = 0;
->> +       uint8_t (*current_uuid)[16];
->> +       bool empty_uuid = false;
->> +       bool has_regular_discovery = false;
->> +       bool has_filtered_discovery = false;
->> +
->> +       DBG("");
->> +
->> +       for (l = adapter->discovery_list; l != NULL; l = g_slist_next(l)) {
->
-> It might be cleaner to put this loop into g_slist_foreach as well.
-> This way you would break this big function down into smaller helpers.
->
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Bharat Panda
+> Sent: Monday, March 30, 2015 10:46 AM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: cpgs@samsung.com; Bharat Panda
+> Subject: [PATCH v4] monitor: Add AVDTP support to btmon
+> 
+> Initial support for decoding AVDTP signaling packets added to btmon.
+> 
+> e.g.
+> 
+> > ACL Data RX: Handle 70 flags 0x02 dlen 18
+>       Channel: 64 len 14 [PSM 25 mode 0] {chan 0}
+> 		AVDTP: Command Get Config(0x04): transaction 11 nsp 0x00
+> 
+>         50 03 04 04 01 00 07 06 00 00 11 15 02 fa < ACL Data TX: Handle 70
+flags
+> 0x00 dlen 6
+>       Channel: 64 len 2 [PSM 25 mode 0] {chan 0}
+> 		AVDTP: Response Set Config(0x03): transaction 5 nsp 0x00
+> 
+>         52 03
+> ---
+>  Makefile.tools  |   1 +
+>  monitor/avdtp.c | 185
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  monitor/avdtp.h |  25 ++++++++
+>  monitor/l2cap.c |  22 +++++++
+>  monitor/l2cap.h |   2 +
+>  5 files changed, 235 insertions(+)
+>  create mode 100644 monitor/avdtp.c
+>  create mode 100644 monitor/avdtp.h
+> 
+> diff --git a/Makefile.tools b/Makefile.tools index 1d2dc94..e663b46 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -27,6 +27,7 @@ monitor_btmon_SOURCES = monitor/main.c
+> monitor/bt.h \
+>  				monitor/l2cap.h monitor/l2cap.c \
+>  				monitor/sdp.h monitor/sdp.c \
+>  				monitor/avctp.h monitor/avctp.c \
+> +				monitor/avdtp.h monitor/avdtp.c \
+>  				monitor/rfcomm.h monitor/rfcomm.c \
+>  				monitor/uuid.h monitor/uuid.c \
+>  				monitor/hwdb.h monitor/hwdb.c \
+> diff --git a/monitor/avdtp.c b/monitor/avdtp.c new file mode 100644 index
+> 0000000..389dde0
+> --- /dev/null
+> +++ b/monitor/avdtp.c
+> @@ -0,0 +1,185 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2004-2011  Marcel Holtmann <marcel@holtmann.org>
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or
+> +modify
+> + *  it under the terms of the GNU General Public License as published
+> +by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+> +02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <ctype.h>
+> +#include <inttypes.h>
+> +
+> +#include "lib/bluetooth.h"
+> +
+> +#include "src/shared/util.h"
+> +#include "bt.h"
+> +#include "packet.h"
+> +#include "display.h"
+> +#include "l2cap.h"
+> +#include "uuid.h"
+> +#include "keys.h"
+> +#include "sdp.h"
+> +#include "avdtp.h"
+> +
+> +/* AVDTP opcodes */
+> +#define AVDTP_DISCOVER_SEP				0x01
+> +#define AVDTP_GET_CAPABILITIES			0x02
+> +#define AVDTP_SET_CONFIG					0x03
+> +#define AVDTP_GET_CONFIG					0x04
+> +#define AVDTP_RECONFIG				0x05
+> +#define AVDTP_OPEN					0x06
+> +#define AVDTP_START					0x07
+> +#define AVDTP_CLOSE					0x08
+> +#define AVDTP_SUSPEND				0x09
+> +#define AVDTP_ABORT					0x0A
+> +#define AVDTP_SEC_CONTROL			0x0B
+> +#define AVDTP_GET_ALL_CAPABILITIES	0x0C
+> +#define AVDTP_DELAY_REPORT			0x0D
+> +
+> +struct avdtp_frame {
+> +	uint8_t hdr;
+> +	uint8_t nsp;
+> +	uint8_t tsid;
+> +	struct l2cap_frame l2cap_frame;
+> +};
+> +
+> +static const char *pt2str(uint8_t hdr)
+> +{
+> +	switch (hdr & 0x0c) {
+> +	case 0x00:
+> +		return "Single";
+> +	case 0x04:
+> +		return "Start";
+> +	case 0x08:
+> +		return "Cont";
+> +	case 0x0c:
+> +		return "End";
+> +	default:
+> +		return "Unknown";
+> +	}
+> +}
+> +
+> +static const char *mt2str(uint8_t hdr)
+> +{
+> +	switch (hdr & 0x03) {
+> +	case 0x00:
+> +		return "Command";
+> +	case 0x02:
+> +		return "Response";
+> +	case 0x03:
+> +		return "Reject";
+> +	default:
+> +		return "Unknown";
+> +	}
+> +}
+> +
+> +static const char *sig2str(uint8_t tsid) {
+> +	switch (tsid) {
+> +	case AVDTP_DISCOVER_SEP:
+> +		return "Discover";
+> +	case AVDTP_GET_CAPABILITIES:
+> +		return "Get Capabilities";
+> +	case AVDTP_SET_CONFIG:
+> +		return "Set Config";
+> +	case AVDTP_GET_CONFIG:
+> +		return "Get Config";
+> +	case AVDTP_RECONFIG:
+> +		return "Reconfig";
+> +	case AVDTP_OPEN:
+> +		return "Open";
+> +	case AVDTP_START:
+> +		return "Start";
+> +	case AVDTP_CLOSE:
+> +		return "Close";
+> +	case AVDTP_SUSPEND:
+> +		return "Suspend";
+> +	case AVDTP_ABORT:
+> +		return "Anort";
+> +	case AVDTP_SEC_CONTROL:
+> +		return "Security Control";
+> +	case AVDTP_GET_ALL_CAPABILITIES:
+> +		return "Get All Capabilities";
+> +	case AVDTP_DELAY_REPORT:
+> +		return "Delay report";
+> +	default:
+> +		return "Unknown Opcode";
+> +	}
+> +}
+> +
+> +void avdtp_packet(const struct l2cap_frame *frame) {
+> +	struct l2cap_frame *l2cap_frame;
+> +	struct avdtp_frame avdtp_frame;
+> +	const char *pdu_color;
+> +
+> +	l2cap_frame_pull(&avdtp_frame.l2cap_frame, frame, 0);
+> +
+> +	l2cap_frame = &avdtp_frame.l2cap_frame;
+> +	l2cap_frame->num = get_num(l2cap_frame);
+> +
+> +	avdtp_frame.tsid = 0x00;
+> +	avdtp_frame.nsp = 0x00;
+> +
+> +	switch (l2cap_frame->num) {
+> +	case 1:
+> +		if (!l2cap_frame_get_u8(l2cap_frame, &avdtp_frame.hdr) ||
+> +			!l2cap_frame_get_u8(l2cap_frame,
+> &avdtp_frame.tsid)) {
+> +			print_text(COLOR_ERROR, "frame too short");
+> +			packet_hexdump(frame->data, frame->size);
+> +			return;
+> +		}
+> +
+> +		if ((avdtp_frame.hdr & 0x0c) == 0x04)
+> +			if (!l2cap_frame_get_u8(l2cap_frame,
+> +					&avdtp_frame.nsp)) {
+> +				packet_hexdump(frame->data, frame-
+> >size);
+> +				return;
+> +		}
+> +
+> +		l2cap_frame_get_u8(l2cap_frame, &avdtp_frame.tsid);
+> +
+> +		if (frame->in)
+> +			pdu_color = COLOR_MAGENTA;
+> +		else
+> +			pdu_color = COLOR_BLUE;
+> +
+> +		print_indent(8, pdu_color, "AVDTP: ",
+> +					mt2str(avdtp_frame.hdr),
+> COLOR_OFF,
+> +					" %s(0x%02x): transaction %d nsp
+> 0x%02x\n",
+> +					avdtp_frame.hdr & 0x08 ?
+> +					pt2str(avdtp_frame.hdr) :
+> +					sig2str(avdtp_frame.tsid),
+> avdtp_frame.tsid,
+> +					avdtp_frame.hdr >> 4,
+> avdtp_frame.nsp);
+> +
+> +		packet_hexdump(frame->data, frame->size);
+> +		break;
+> +
+> +	case 2:
+> +		/* Media Packets */
+> +		packet_hexdump(frame->data, frame->size);
+> +		break;
+> +	}
+> +}
+> diff --git a/monitor/avdtp.h b/monitor/avdtp.h new file mode 100644 index
+> 0000000..0173c21
+> --- /dev/null
+> +++ b/monitor/avdtp.h
+> @@ -0,0 +1,25 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2011-2014  Intel Corporation
+> + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+> +02110-1301  USA
+> + *
+> + */
+> +
+> +void avdtp_packet(const struct l2cap_frame *frame);
+> diff --git a/monitor/l2cap.c b/monitor/l2cap.c index 5faa26f..3031e13
+100644
+> --- a/monitor/l2cap.c
+> +++ b/monitor/l2cap.c
+> @@ -42,6 +42,7 @@
+>  #include "keys.h"
+>  #include "sdp.h"
+>  #include "avctp.h"
+> +#include "avdtp.h"
+>  #include "rfcomm.h"
+> 
+>  /* L2CAP Control Field bit masks */
+> @@ -95,6 +96,7 @@ struct chan_data {
+>  	uint16_t scid;
+>  	uint16_t dcid;
+>  	uint16_t psm;
+> +	uint16_t num;
+>  	uint8_t  ctrlid;
+>  	uint8_t  mode;
+>  	uint8_t  ext_ctrl;
+> @@ -102,10 +104,23 @@ struct chan_data {
+> 
+>  static struct chan_data chan_list[MAX_CHAN];
+> 
+> +uint16_t get_num(struct l2cap_frame *frame) {
+> +	register int i;
+> +
+> +	for (i = 0; i < MAX_CHAN; i++)
+> +		if (chan_list[i].handle == frame->handle &&
+> +				chan_list[i].scid == frame->cid)
+> +			return chan_list[i].num;
+> +
+> +	return 0;
+> +}
+> +
+>  static void assign_scid(const struct l2cap_frame *frame,
+>  				uint16_t scid, uint16_t psm, uint8_t ctrlid)
+{
+>  	int i, n = -1;
+> +	int num = 1;
+> 
+>  	for (i = 0; i < MAX_CHAN; i++) {
+>  		if (n < 0 && chan_list[i].handle == 0x0000) @@ -128,6 +143,8
+> @@ static void assign_scid(const struct l2cap_frame *frame,
+>  				break;
+>  			}
+>  		}
+> +		if (chan_list[i].psm == psm)
+> +			num++;
+>  	}
+> 
+>  	if (n < 0)
+> @@ -137,6 +154,7 @@ static void assign_scid(const struct l2cap_frame
+> *frame,
+>  	chan_list[n].index = frame->index;
+>  	chan_list[n].handle = frame->handle;
+>  	chan_list[n].ident = frame->ident;
+> +	chan_list[n].num = num;
+> 
+>  	if (frame->in)
+>  		chan_list[n].dcid = scid;
+> @@ -1314,6 +1332,7 @@ static void l2cap_frame_init(struct l2cap_frame
+> *frame, uint16_t index, bool in,
+>  	frame->psm    = get_psm(frame);
+>  	frame->mode   = get_mode(frame);
+>  	frame->chan   = get_chan(frame);
+> +	frame->num    = 0;
+>  }
+> 
+>  static void bredr_sig_packet(uint16_t index, bool in, uint16_t handle, @@
+-
+> 2958,6 +2977,9 @@ static void l2cap_frame(uint16_t index, bool in,
+uint16_t
+> handle,
+>  		case 0x001B:
+>  			avctp_packet(&frame);
+>  			break;
+> +		case 0x019:
+> +			avdtp_packet(&frame);
+> +			break;
+>  		default:
+>  			packet_hexdump(data, size);
+>  			break;
+> diff --git a/monitor/l2cap.h b/monitor/l2cap.h index 711bcb1..fac8625
+100644
+> --- a/monitor/l2cap.h
+> +++ b/monitor/l2cap.h
+> @@ -33,11 +33,13 @@ struct l2cap_frame {
+>  	uint16_t cid;
+>  	uint16_t psm;
+>  	uint16_t chan;
+> +	uint16_t num;
+>  	uint8_t mode;
+>  	const void *data;
+>  	uint16_t size;
+>  };
+> 
+> +uint16_t get_num(struct l2cap_frame *frame);
+>  static inline void l2cap_frame_pull(struct l2cap_frame *frame,
+>  				const struct l2cap_frame *source, uint16_t
+> len)  {
+> --
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
-So instead of using g_slist_foreach I decided to move whole loop
-together with few lines after it into new method -
-merge_discovery_filters.
-
->> +               struct watch_client *client = l->data;
->> +               struct discovery_filter *item = client->discovery_filter;
->> +
->> +               if (!item) {
->> +                       has_regular_discovery = true;
->> +                       continue;
->> +               }
->> +
->> +               has_filtered_discovery = true;
->> +
->> +               discovery_type |= item->type;
->> +
->> +               /*
->> +                * Rule for merging rssi and pathloss into rssi field of kernel
->> +                * filter is as follow:
->> +                * - if there's any client without proximity filter, then do no
->> +                *   proximity filtering,
->> +                * - if all clients specified RSSI, then use lowest value,
->> +                * - if any client specified pathloss, then kernel filter should
->> +                *   do no proximity, as kernel can't compute pathloss. We'll do
->> +                *   filtering on our own.
->> +                */
->> +               if (item->rssi == DISTANCE_VAL_INVALID)
->> +                       rssi = HCI_RSSI_INVALID;
->> +               else if (rssi != HCI_RSSI_INVALID && rssi >= item->rssi)
->> +                       rssi = item->rssi;
->> +               else if (item->pathloss != DISTANCE_VAL_INVALID)
->> +                       rssi = HCI_RSSI_INVALID;
->> +
->> +               if (!g_slist_length(item->uuids))
->> +                       empty_uuid = true;
->> +
->> +               g_slist_foreach(item->uuids, extract_unique_uuids, &uuids);
->> +       }
->> +
->> +       /* If no proximity filtering is set, disable it */
->> +       if (rssi == DISTANCE_VAL_INVALID)
->> +               rssi = HCI_RSSI_INVALID;
->> +
->> +       /*
->> +        * Empty_uuid variable determines wether there was any filter with no
->> +        * uuids. In this case someone might be looking for all devices in
->> +        * certain proximity, and we need to have empty uuids in kernel filter.
->> +        */
->> +       if (empty_uuid) {
->> +               g_slist_free(uuids);
->> +               uuids = NULL;
->> +       }
->> +
->> +       if (has_regular_discovery) {
->> +               /*
->> +                * It there is both regular and filtered scan running, then
->> +                * clear whole fitler to report all devices. If there are only
->> +                * regular scans, run just regular scan.
->> +                */
->> +               if (has_filtered_discovery) {
->> +                       discovery_type = get_scan_type(adapter);
->> +                       rssi = HCI_RSSI_INVALID;
->> +                       g_slist_free(uuids);
->> +                       uuids = NULL;
->> +               } else {
->> +                       *cp_ptr = NULL;
->
-> Don't you need to free "uuids" here?
-No, if there is regular discovery, and no filtered discovery, there
-are no uuids in filter for sure. There must be at least one filtered
-discovery to have uuids in it.
->
->> +                       return 0;
->> +               }
->> +       }
->> +
->> +       uuid_count = g_slist_length(uuids);
->> +
->> +       cp = g_try_malloc(sizeof(cp) + 16*uuid_count);
->
-> sizeof(*cp) ?
-
-Good catch, fixed.
->
->> +       *cp_ptr = cp;
->> +       if (!cp)
->> +               return -1;
->
-> Shouldn't "uuids" be freed here?
->
-Fixed.
->> +
->> +       cp->type = discovery_type;
->> +       cp->rssi = rssi;
->> +       cp->uuid_count = uuid_count;
->> +
->> +       current_uuid = cp->uuids;
->> +
->> +       for (l = uuids; l != NULL; l = g_slist_next(l)) {
->
-> Use a helper function here? Basically you want a
-> populate_mgmt_filter_uuids of sorts.
->
->> +               bt_uuid_t uuid, u128;
->> +               uint128_t uint128;
->> +
->> +               bt_string_to_uuid(&uuid, l->data);
->> +               bt_uuid_to_uuid128(&uuid, &u128);
->> +
->> +               ntoh128((uint128_t *) u128.value.u128.data, &uint128);
->> +               htob128(&uint128, (uint128_t *) current_uuid);
->> +
->> +               current_uuid++;
->> +       }
->> +
->> +       g_slist_free(uuids);
->> +       return 0;
->> +}
->> +
->> +static bool filters_equal(struct mgmt_cp_start_service_discovery *a,
->> +                  struct mgmt_cp_start_service_discovery *b) {
->> +       if (!a && !b)
->> +               return true;
->> +
->> +       if ((!a && b) || (a && !b))
->> +               return false;
->> +
->> +       if (a->type != b->type)
->> +               return false;
->> +
->> +       if (a->rssi != b->rssi)
->> +               return false;
->> +
->> +       /*
->> +        * When we create mgmt_cp_start_service_discovery structure inside
->> +        * discovery_filter_to_mgmt_cp, we always keep uuids sorted, and
->> +        * unique, so we're safe to compare uuid_count, and uuids like that.
->> +        */
->> +       if (a->uuid_count != b->uuid_count)
->> +               return false;
->> +
->> +       if (memcmp(a->uuids, b->uuids, 16 * a->uuid_count) != 0)
->> +               return false;
->> +
->> +       return true;
->> +}
->> +
->> +static void update_discovery_filter(struct btd_adapter *adapter)
->> +{
->> +       struct mgmt_cp_start_service_discovery *sd_cp;
->> +
->> +       DBG("");
->> +
->> +       if (discovery_filter_to_mgmt_cp(adapter, &sd_cp)) {
->> +               error("discovery_filter_to_mgmt_cp returned error");
->> +               return;
->> +       }
->> +
->> +       /*
->> +        * If filters are equal, then don't update scan, except for when
->> +        * starting discovery.
->> +        */
->> +       if (filters_equal(adapter->current_discovery_filter, sd_cp) &&
->> +           adapter->discovering != 0) {
->> +               DBG("filters were equal, deciding to not restart the scan.");
->> +               g_free(sd_cp);
->> +               return;
->> +       }
->> +
->> +       g_free(adapter->current_discovery_filter);
->> +       adapter->current_discovery_filter = sd_cp;
->> +
->> +       trigger_start_discovery(adapter, 0);
->> +}
->> +
->>  static void discovery_destroy(void *user_data)
->>  {
->>         struct watch_client *client = user_data;
->> @@ -1730,8 +1968,10 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
->>          * However in case this is the last client, the discovery in
->>          * the kernel needs to be disabled.
->>          */
->> -       if (adapter->discovery_list)
->> +       if (adapter->discovery_list) {
->> +               update_discovery_filter(adapter);
->>                 return;
->> +       }
->>
->>         /*
->>          * In the idle phase of a discovery, there is no need to stop it
->> @@ -1753,7 +1993,8 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
->>                                 stop_discovery_complete, adapter, NULL);
->>  }
->>
->> -/* returns true if client was already discovering, false otherwise. *client
->> +/*
->> + * Return true if client was already discovering, false otherwise. *client
->>   * will point to discovering client, or client that have pre-set his filter.
->>   */
->>  static bool get_discovery_client(struct btd_adapter *adapter,
->> @@ -1808,8 +2049,8 @@ static DBusMessage *start_discovery(DBusConnection *conn,
->>                 adapter->set_filter_list = g_slist_remove(
->>                                              adapter->set_filter_list, client);
->>                 adapter->discovery_list = g_slist_prepend(
->> -                                            adapter->discovery_list, client);
->> -               trigger_start_discovery(adapter, 0);
->> +                                             adapter->discovery_list, client);
->> +               update_discovery_filter(adapter);
->>                 return dbus_message_new_method_return(msg);
->>         }
->>
->> @@ -1829,7 +2070,7 @@ static DBusMessage *start_discovery(DBusConnection *conn,
->>          * discovery in idle phase exists, it will be restarted right
->>          * away.
->>          */
->> -       trigger_start_discovery(adapter, 0);
->> +       update_discovery_filter(adapter);
->>
->>         return dbus_message_new_method_return(msg);
->>  }
->> @@ -2035,6 +2276,9 @@ static DBusMessage *set_discovery_filter(DBusConnection *conn,
->>                 free_discovery_filter(client->discovery_filter);
->>                 client->discovery_filter = discovery_filter;
->>
->> +               if (is_discovering)
->> +                       update_discovery_filter(adapter);
->> +
->>                 if (discovery_filter || is_discovering)
->>                         return dbus_message_new_method_return(msg);
->>
->> @@ -2092,12 +2336,10 @@ static DBusMessage *stop_discovery(DBusConnection *conn,
->>          */
->>         g_dbus_remove_watch(dbus_conn, client->watch);
->>
->> -       /*
->> -        * As long as other discovery clients are still active, just
->> -        * return success.
->> -        */
->> -       if (adapter->discovery_list)
->> +       if (adapter->discovery_list) {
->> +               update_discovery_filter(adapter);
->>                 return dbus_message_new_method_return(msg);
->> +       }
->>
->>         /*
->>          * In the idle phase of a discovery, there is no need to stop it
->> @@ -5312,6 +5554,11 @@ static void adapter_stop(struct btd_adapter *adapter)
->>                 g_dbus_remove_watch(dbus_conn, client->watch);
->>         }
->>
->> +       adapter->filtered_discovery = false;
->> +       adapter->no_scan_restart_delay = false;
->> +       g_free(adapter->current_discovery_filter);
->> +       adapter->current_discovery_filter = NULL;
->> +
->>         adapter->discovering = false;
->>
->>         while (adapter->connections) {
->> --
->> 2.2.0.rc0.207.ga3a616c
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Thanks,
-> Arman
