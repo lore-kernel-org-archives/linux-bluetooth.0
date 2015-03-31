@@ -1,61 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/hal-sco: Fix divide by zero
-Date: Tue, 31 Mar 2015 20:08:09 +0200
-Message-ID: <1449857.uyI4ObloS9@leonov>
-In-Reply-To: <1427814210-27752-1-git-send-email-szymon.janc@tieto.com>
-References: <1427814210-27752-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [BlueZ v7 10/10] test: improvements to advertising-example
+Date: Tue, 31 Mar 2015 10:24:04 -0700
+Message-Id: <1427822644-39009-11-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1427822644-39009-1-git-send-email-jamuraa@chromium.org>
+References: <1427822644-39009-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 31 of March 2015 17:03:30 Szymon Janc wrote:
-> audio_stream_in_frame_size or audio_stream_frame_size can return 0 so
-> this needs to be checked before divide.
-> ---
->  android/hal-sco.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/android/hal-sco.c b/android/hal-sco.c
-> index 380b2a8..2c95866 100644
-> --- a/android/hal-sco.c
-> +++ b/android/hal-sco.c
-> @@ -1054,17 +1054,23 @@ static ssize_t in_read(struct audio_stream_in
-> *stream, void *buffer, size_t bytes)
->  {
->  	struct sco_stream_in *in = (struct sco_stream_in *) stream;
-> -#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-> -	size_t frame_size = audio_stream_in_frame_size(&in->stream);
-> -#else
-> -	size_t frame_size = audio_stream_frame_size(&stream->common);
-> -#endif
-> -	size_t frame_num = bytes / frame_size;
-> -	size_t input_frame_num = frame_num;
-> +	size_t frame_size, frame_num, input_frame_num;
->  	void *read_buf = buffer;
->  	size_t total = bytes;
->  	int ret;
-> 
-> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-> +	frame_size = audio_stream_in_frame_size(&in->stream);
-> +#else
-> +	frame_size = audio_stream_frame_size(&stream->common);
-> +#endif
-> +
-> +	if (!frame_size)
-> +		return -1;
-> +
-> +	frame_num = bytes / frame_size;
-> +	input_frame_num = frame_num;
-> +
->  	DBG("Read from fd %d bytes %zu", sco_fd, bytes);
-> 
->  	if (ipc_get_sco_fd(&in->bd_addr) != SCO_STATUS_SUCCESS)
+Improves the advertising-example in two ways:
 
-Applied.
+It uses 16-bit service UUIDs so that it does not overflow the
+Advertisement Data
 
+It turns the adapter's power on so that it works out of the box.
+---
+ test/advertisement-example | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/test/advertisement-example b/test/advertisement-example
+index 98aeafa..6e47391 100644
+--- a/test/advertisement-example
++++ b/test/advertisement-example
+@@ -113,11 +113,10 @@ class TestAdvertisement(Advertisement):
+ 
+     def __init__(self, bus, index):
+         Advertisement.__init__(self, bus, index, 'broadcast')
+-        self.add_service_uuid('0000180D-0000-1000-8000-00805F9B34FB')
+-        self.add_service_uuid('0000180F-0000-1000-8000-00805F9B34FB')
++        self.add_service_uuid('180D')
++        self.add_service_uuid('180F')
+         self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
+-        self.add_service_data('00009999-0000-1000-8000-00805F9B34FB',
+-                              [0x00, 0x01, 0x02, 0x03, 0x04])
++        self.add_service_data('9999', [0x00, 0x01, 0x02, 0x03, 0x04])
+ 
+ 
+ def register_ad_cb():
+@@ -153,6 +152,11 @@ def main():
+         print 'LEAdvertisingManager1 interface not found'
+         return
+ 
++    adapter_props = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
++                                   "org.freedesktop.DBus.Properties");
++
++    adapter_props.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(1))
++
+     ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
+                                 LE_ADVERTISING_MANAGER_IFACE)
+ 
 -- 
-BR
-Szymon Janc
+2.2.0.rc0.207.ga3a616c
+
