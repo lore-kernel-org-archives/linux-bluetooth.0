@@ -1,50 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 0/4] Handling extended headers of bnep control frames
-Date: Tue, 31 Mar 2015 16:55:57 +0200
-Message-Id: <1427813761-32123-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <004101d06b73$9289a650$b79cf2f0$@samsung.com>
+References: <1427692567-631-1-git-send-email-bharat.panda@samsung.com>
+	<004101d06b73$9289a650$b79cf2f0$@samsung.com>
+Date: Tue, 31 Mar 2015 16:26:47 +0300
+Message-ID: <CABBYNZ+wrVLJen3F1Wxx==syH325RwgUL9OcGc6ygtiwhceDkw@mail.gmail.com>
+Subject: Re: [PATCH v4] monitor: Add AVDTP support to btmon
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set adds support for handling extended headers of bnep control
-frames which is mandatory. Until now extended headers for control messages was
-ignored.
+Hi Bharat,
 
-Patch [1/4] adds setting of err variable if control message is not understood.
-Patch [2/4] adds additional ioctl for get supported bnep features. This is
-needed for user space to know if handling of sending success setup response
-frame should be handled by kernel or by user space.
-Patch [3/4] adds support for handling extended headers of bnep control frames.
-Patch [4/4] adds support for handling connection setup request.
+On Tue, Mar 31, 2015 at 8:28 AM, Bharat Bhusan Panda
+<bharat.panda@samsung.com> wrote:
+> ping
 
-Patch set tested with PTS bnep test cases. No regression, issues found during
-testing.
+Looks like it would be a problem for multiple devices connected since
+at assign_scid we don't have the information about the device just the
+psm? Did you try that?
 
-v2.
-- Added ioctl definition to compat_ioctl,
-- Distinct bnep session flags and bnep features.
-
-v3.
-- Splited extended header, connection setup request handling into separated
-	patches,
-- Fixed flags, supported features defines as Marcel pointed,
-- Extended commit messages,
-- Remove copying flags from us to kernel bnep session,
-- Fix setting bnep session bits as Marcel pointed.
-
-Grzegorz Kolodziejczyk (4):
-  Bluetooth: bnep: Return err value while sending cmd is not understood
-  Bluetooth: bnep: Add support for get bnep features via ioctl
-  Bluetooth: bnep: Add support to extended headers of control frames
-  Bluetooth: bnep: Handle BNEP connection setup request
-
- fs/compat_ioctl.c         |  1 +
- net/bluetooth/bnep/bnep.h |  9 ++++++++
- net/bluetooth/bnep/core.c | 58 +++++++++++++++++++++++++++++++++++++----------
- net/bluetooth/bnep/sock.c |  8 +++++++
- 4 files changed, 64 insertions(+), 12 deletions(-)
 
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
