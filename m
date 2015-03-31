@@ -1,63 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v7 02/10] core/advertising: use bt_ad
-Date: Tue, 31 Mar 2015 10:23:56 -0700
-Message-Id: <1427822644-39009-3-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1427822644-39009-1-git-send-email-jamuraa@chromium.org>
-References: <1427822644-39009-1-git-send-email-jamuraa@chromium.org>
+Date: Tue, 31 Mar 2015 12:46:17 -0400 (EDT)
+Message-Id: <20150331.124617.1546299018838329382.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2015-03-27
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20150327184058.GA10609@t440s.P-661HNU-F1>
+References: <20150327184058.GA10609@t440s.P-661HNU-F1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Start using the newly introduced struct bt_ad API.
----
- src/advertising.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Fri, 27 Mar 2015 20:40:58 +0200
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 04492f7..275e2d7 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -32,6 +32,7 @@
- #include "dbus-common.h"
- #include "error.h"
- #include "log.h"
-+#include "src/shared/ad.h"
- #include "src/shared/queue.h"
- #include "src/shared/util.h"
- 
-@@ -54,6 +55,7 @@ struct advertisement {
- 	GDBusProxy *proxy;
- 	DBusMessage *reg;
- 	uint8_t type; /* Advertising type */
-+	struct bt_ad *data;
- };
- 
- static bool match_advertisement_path(const void *a, const void *b)
-@@ -73,8 +75,9 @@ static void advertisement_free(void *data)
- 		g_dbus_client_unref(ad->client);
- 	}
- 
--	if (ad->proxy)
--		g_dbus_proxy_unref(ad->proxy);
-+	bt_ad_unref(ad->data);
-+
-+	g_dbus_proxy_unref(ad->proxy);
- 
- 	if (ad->owner)
- 		g_free(ad->owner);
-@@ -244,6 +247,10 @@ static struct advertisement *advertisement_create(DBusConnection *conn,
- 
- 	ad->reg = dbus_message_ref(msg);
- 
-+	ad->data = bt_ad_new();
-+	if (!ad->data)
-+		goto fail;
-+
- 	return ad;
- 
- fail:
--- 
-2.2.0.rc0.207.ga3a616c
+> Here's another set of Bluetooth & 802.15.4 patches for 4.1:
+> 
+>  - New API to control LE advertising data (i.e. peripheral role)
+>  - mac802154 & at86rf230 cleanups
+>  - Support for toggling quirks from debugfs (useful for testing)
+>  - Memory leak fix for LE scanning
+>  - Extra version info reading support for Broadcom controllers
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
+Pulled, thanks Johan.
