@@ -2,17 +2,15 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v7 1/8] core: device: add device_set_rssi_with_delta
-Date: Tue, 31 Mar 2015 00:33:23 -0700
-Message-Id: <1427787210-4436-2-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1427787210-4436-1-git-send-email-jpawlowski@google.com>
-References: <1427787210-4436-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v7 1/8] core: device: add device_set_rssi_no_delta
+Date: Tue, 31 Mar 2015 00:33:22 -0700
+Message-Id: <1427787210-4436-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds new method that allow to update RSSI value with
-given delta threshold. It will be used in upcoming patches with
-SetDiscoveryFilter, in order to disable delta threshold.
+This patch adds new method that allow to update RSSI value without
+taking delta into account. It will be used by StartFilteredDiscovery
+method, in order to achieve more accurate proximity detection.
 ---
  src/device.c | 14 +++++++++++---
  src/device.h |  2 ++
