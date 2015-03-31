@@ -2,49 +2,81 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v7 07/10] Update TODO for LE Advertising
-Date: Tue, 31 Mar 2015 10:24:01 -0700
-Message-Id: <1427822644-39009-8-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v7 04/10] core/advertising: Parse SolicitUUIDs
+Date: Tue, 31 Mar 2015 10:23:58 -0700
+Message-Id: <1427822644-39009-5-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1427822644-39009-1-git-send-email-jamuraa@chromium.org>
 References: <1427822644-39009-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Parse the SolicitUUIDs property of the LEAdvertisement1 object.
 ---
- TODO | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ src/advertising.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/TODO b/TODO
-index 65e19ee..2945392 100644
---- a/TODO
-+++ b/TODO
-@@ -64,16 +64,16 @@ General
- Low Energy
- ==========
+diff --git a/src/advertising.c b/src/advertising.c
+index 9867e1e..d736ea9 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -205,6 +205,45 @@ fail:
+ 	return false;
+ }
  
--- Advertising management. Adapter interface needs to be changed to manage
--  connection modes, adapter type and advertising policy. See Volume 3,
--  Part C, section 9.3. If Attribute Server is enabled the LE capable
--  adapter shall to start advertising. Further investigation is necessary
--  to define which connectable mode needs to be supported: Non-connectable,
--  directed connectable and undirected connectable. Basically, two connectable
--  scenarios shall be addressed:
--  1. GATT client is disconnected, but intends to become a Peripheral to
--     receive indications/notifications.
--  2. GATT server intends to accept connections.
-+- Connection modes. Adapter interface needs to be changed to manage
-+  connection modes and adapter type. See Volume 3, Part C, section 9.3.
-+  1. Mode management: Peripheral / Central
++static bool parse_advertising_solicit_uuids(GDBusProxy *proxy,
++							struct bt_ad *data)
++{
++	DBusMessageIter iter, ariter;
 +
-+  Priority: Medium
-+  Complexity: C2
++	if (!g_dbus_proxy_get_property(proxy, "SolicitUUIDs", &iter))
++		return true;
 +
-+- Advertising data. The D-Bus interface needs to be updated to enable setting
-+  scan response data, and to read the advertising and scan response data which
-+  has been broadcast from other LE devices.
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++		return false;
++
++	dbus_message_iter_recurse(&iter, &ariter);
++
++	bt_ad_clear_solicit_uuid(data);
++
++	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
++		const char *uuid_str;
++		bt_uuid_t uuid;
++
++		dbus_message_iter_get_basic(&ariter, &uuid_str);
++
++		DBG("Adding SolicitUUID: %s", uuid_str);
++
++		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
++			goto fail;
++
++		if (!bt_ad_add_solicit_uuid(data, &uuid))
++			goto fail;
++
++		dbus_message_iter_next(&ariter);
++	}
++
++	return true;
++
++fail:
++	bt_ad_clear_solicit_uuid(data);
++	return false;
++}
++
+ static void refresh_advertisement(struct advertisement *ad)
+ {
+ 	DBG("Refreshing advertisement: %s", ad->path);
+@@ -222,6 +261,11 @@ static bool parse_advertisement(struct advertisement *ad)
+ 		return false;
+ 	}
  
-   Priority: Medium
-   Complexity: C2
++	if (!parse_advertising_solicit_uuids(ad->proxy, ad->data)) {
++		error("Property \"SolicitUUIDs\" failed to parse");
++		return false;
++	}
++
+ 	/* TODO: parse the rest of the properties */
+ 
+ 	refresh_advertisement(ad);
 -- 
 2.2.0.rc0.207.ga3a616c
 
