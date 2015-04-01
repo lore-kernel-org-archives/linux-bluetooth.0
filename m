@@ -1,163 +1,285 @@
 Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@gmail.com>
-Subject: [PATCH 17/28] android/scpp: Remove tracking pending gatt operations
-Date: Wed,  1 Apr 2015 18:40:33 +0200
-Message-Id: <1427906444-11769-18-git-send-email-mariusz.skamra@tieto.com>
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH 16/28] android/dis: Introduce bt_gatt_client
+Date: Wed,  1 Apr 2015 18:40:32 +0200
+Message-Id: <1427906444-11769-17-git-send-email-mariusz.skamra@tieto.com>
 In-Reply-To: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com>
 References: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mariusz Skamra <mariusz.skamra@gmail.com>
-
-Since the use of bt_gatt_client there is no need to queue pending gatt
-operations. bt_gatt_client already keeps track on that, so that
-on bt_gatt_client_unref the queue of pending requests is destroyed.
+This patch replaces gattrib with bt_gatt_client and strips glib dependencies.
 ---
- android/scpp.c | 72 ++++------------------------------------------------------
- 1 file changed, 4 insertions(+), 68 deletions(-)
+ android/dis.c | 104 ++++++++++++++++++++++------------------------------------
+ android/dis.h |   4 +--
+ android/hog.c |  18 ++++------
+ 3 files changed, 48 insertions(+), 78 deletions(-)
 
-diff --git a/android/scpp.c b/android/scpp.c
-index f8f81f3..a28fbb6 100644
---- a/android/scpp.c
-+++ b/android/scpp.c
-@@ -62,62 +62,13 @@ struct bt_scpp {
- 	uint16_t iwhandle;
- 	uint16_t refresh_handle;
- 	guint refresh_cb_id;
--	struct queue *gatt_op;
+diff --git a/android/dis.c b/android/dis.c
+index f699046..4a28c5a 100644
+--- a/android/dis.c
++++ b/android/dis.c
+@@ -27,61 +27,52 @@
+ #include <stdbool.h>
+ #include <errno.h>
+ 
+-#include <glib.h>
+-
+ #include "src/log.h"
+ 
+ #include "lib/bluetooth.h"
+-#include "lib/sdp.h"
+ #include "lib/uuid.h"
+ 
+ #include "src/shared/util.h"
+ #include "src/shared/queue.h"
+-
+-#include "attrib/gattrib.h"
+-#include "attrib/att.h"
+-#include "attrib/gatt.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-db.h"
++#include "src/shared/gatt-client.h"
+ 
+ #include "android/dis.h"
+ 
+-#define PNP_ID_SIZE	7
+-
+ struct bt_dis {
+ 	int			ref_count;
++	uint16_t		service_handle;
+ 	uint16_t		handle;
+ 	uint8_t			source;
+ 	uint16_t		vendor;
+ 	uint16_t		product;
+ 	uint16_t		version;
+-	GAttrib			*attrib;	/* GATT connection */
+-	struct gatt_primary	*primary;	/* Primary details */
+ 	bt_dis_notify		notify;
+ 	void			*notify_data;
+-};
+-
+-struct characteristic {
+-	struct gatt_char	attr;	/* Characteristic */
+-	struct bt_dis		*d;	/* deviceinfo where the char belongs */
++	struct bt_gatt_client	*client;
++	struct gatt_db		*db;
  };
  
--static void discover_char(struct bt_scpp *scpp, GAttrib *attrib,
--						uint16_t start, uint16_t end,
--						bt_uuid_t *uuid, gatt_cb_t func,
--						gpointer user_data)
--{
--	unsigned int id;
--
--	id = gatt_discover_char(attrib, start, end, uuid, func, user_data);
--
--	if (queue_push_head(scpp->gatt_op, UINT_TO_PTR(id)))
--		return;
--
--	error("scpp: Could not discover characteristic");
--	g_attrib_cancel(attrib, id);
--}
--
--static void discover_desc(struct bt_scpp *scpp, GAttrib *attrib,
--				uint16_t start, uint16_t end, bt_uuid_t *uuid,
--				gatt_cb_t func, gpointer user_data)
--{
--	unsigned int id;
--
--	id = gatt_discover_desc(attrib, start, end, uuid, func, user_data);
--
--	if (queue_push_head(scpp->gatt_op, UINT_TO_PTR(id)))
--		return;
--
--	error("scpp: Could not discover descriptor");
--	g_attrib_cancel(attrib, id);
--}
--
--static void write_char(struct bt_scpp *scan, GAttrib *attrib, uint16_t handle,
--					const uint8_t *value, size_t vlen,
--					GAttribResultFunc func,
--					gpointer user_data)
--{
--	unsigned int id;
--
--	id = gatt_write_char(attrib, handle, value, vlen, func, user_data);
--
--	if (queue_push_head(scan->gatt_op, UINT_TO_PTR(id)))
--		return;
--
--	error("scpp: Could not read char");
--	g_attrib_cancel(attrib, id);
--}
--
- static void scpp_free(struct bt_scpp *scan)
+ static void dis_free(struct bt_dis *dis)
  {
- 	bt_scpp_detach(scan);
+ 	bt_dis_detach(dis);
  
- 	g_free(scan->primary);
--	queue_destroy(scan->gatt_op, NULL); /* cleared in bt_scpp_detach */
- 	g_free(scan);
+-	g_free(dis->primary);
+-	g_free(dis);
++	free(dis);
  }
  
-@@ -132,12 +83,6 @@ struct bt_scpp *bt_scpp_new(void *primary)
- 	scan->interval = SCAN_INTERVAL;
- 	scan->window = SCAN_WINDOW;
+-struct bt_dis *bt_dis_new(void *primary)
++struct bt_dis *bt_dis_new(uint16_t service_handle)
+ {
+ 	struct bt_dis *dis;
  
--	scan->gatt_op = queue_new();
--	if (!scan->gatt_op) {
--		scpp_free(scan);
--		return NULL;
+-	dis = g_try_new0(struct bt_dis, 1);
++	if (!service_handle)
++		return NULL;
++
++	dis = new0(struct bt_dis, 1);
+ 	if (!dis)
+ 		return NULL;
+ 
+-	if (primary)
+-		dis->primary = g_memdup(primary, sizeof(*dis->primary));
++	dis->service_handle = service_handle;
+ 
+ 	return bt_dis_ref(dis);
+ }
+@@ -107,26 +98,13 @@ void bt_dis_unref(struct bt_dis *dis)
+ 	dis_free(dis);
+ }
+ 
+-static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
+-							gpointer user_data)
++static void read_pnpid_cb(bool success, uint8_t att_ecode, const uint8_t *value,
++					uint16_t length, void *user_data)
+ {
+ 	struct bt_dis *dis = user_data;
+-	uint8_t value[PNP_ID_SIZE];
+-	ssize_t vlen;
+-
+-	if (status != 0) {
+-		error("Error reading PNP_ID value: %s", att_ecode2str(status));
+-		return;
 -	}
 -
- 	if (primary)
- 		scan->primary = g_memdup(primary, sizeof(*scan->primary));
+-	vlen = dec_read_resp(pdu, len, value, sizeof(value));
+-	if (vlen < 0) {
+-		error("Error reading PNP_ID: Protocol error");
+-		return;
+-	}
  
-@@ -213,7 +158,7 @@ static void write_ccc(struct bt_scpp *scan, GAttrib *attrib, uint16_t handle,
+-	if (vlen < 7) {
+-		error("Error reading PNP_ID: Invalid pdu length received");
++	if (length < 7) {
++		error("Error reading PNP_ID: Invalid length received");
+ 		return;
+ 	}
  
- 	put_le16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
- 
--	write_char(scan, attrib, handle, value, sizeof(value), ccc_written_cb,
-+	gatt_write_char(attrib, handle, value, sizeof(value), ccc_written_cb,
- 								user_data);
+@@ -143,53 +121,51 @@ static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 						dis->version, dis->notify_data);
  }
  
-@@ -266,7 +211,7 @@ static void refresh_discovered_cb(uint8_t status, GSList *chars,
+-static void configure_deviceinfo_cb(uint8_t status, GSList *characteristics,
++static void configure_deviceinfo_cb(struct gatt_db_attribute *attrib,
+ 								void *user_data)
+ {
+-	struct bt_dis *d = user_data;
+-	GSList *l;
++	struct bt_dis *dis = user_data;
++	bt_uuid_t uuid, pnpid_uuid;
++	uint16_t value_handle;
  
- 	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
+-	if (status != 0) {
+-		error("Discover deviceinfo characteristics: %s",
+-							att_ecode2str(status));
+-		return;
+-	}
++	gatt_db_attribute_get_char_data(attrib, NULL, &value_handle,
++							NULL, &uuid);
  
--	discover_desc(scan, scan->attrib, start, end, &uuid,
-+	gatt_discover_desc(scan->attrib, start, end, &uuid,
- 					discover_descriptor_cb, user_data);
+-	for (l = characteristics; l; l = l->next) {
+-		struct gatt_char *c = l->data;
++	bt_string_to_uuid(&pnpid_uuid, PNPID_UUID);
+ 
+-		if (strcmp(c->uuid, PNPID_UUID) == 0) {
+-			d->handle = c->value_handle;
+-			gatt_read_char(d->attrib, d->handle, read_pnpid_cb, d);
+-			break;
+-		}
++	if (!bt_uuid_cmp(&uuid, &pnpid_uuid)) {
++		dis->handle = value_handle;
++		bt_gatt_client_read_value(dis->client, value_handle,
++						read_pnpid_cb, dis, NULL);
+ 	}
  }
  
-@@ -304,7 +249,7 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
- 								scan->window);
- 	else {
- 		bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
--		discover_char(scan, scan->attrib, scan->primary->range.start,
-+		gatt_discover_char(scan->attrib, scan->primary->range.start,
- 					scan->primary->range.end, &iwin_uuid,
- 					iwin_discovered_cb, scan);
- 	}
-@@ -315,7 +260,7 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
- 				refresh_value_cb, scan, NULL);
- 	else {
- 		bt_uuid16_create(&refresh_uuid, SCAN_REFRESH_UUID);
--		discover_char(scan, scan->attrib, scan->primary->range.start,
-+		gatt_discover_char(scan->attrib, scan->primary->range.start,
- 					scan->primary->range.end, &refresh_uuid,
- 					refresh_discovered_cb, scan);
- 	}
-@@ -323,14 +268,6 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
+-bool bt_dis_attach(struct bt_dis *dis, void *attrib)
++bool bt_dis_attach(struct bt_dis *dis, struct bt_gatt_client *client)
+ {
+-	struct gatt_primary *primary = dis->primary;
++	struct gatt_db_attribute *attrib;
+ 
+-	if (dis->attrib || !primary)
++	if (!dis || dis->client || !dis->service_handle)
+ 		return false;
+ 
+-	dis->attrib = g_attrib_ref(attrib);
++	dis->client = bt_gatt_client_ref(client);
++	dis->db = bt_gatt_client_get_db(client);
++	attrib = gatt_db_get_attribute(dis->db, dis->service_handle);
+ 
+ 	if (!dis->handle)
+-		gatt_discover_char(dis->attrib, primary->range.start,
+-						primary->range.end, NULL,
+-						configure_deviceinfo_cb, dis);
++		gatt_db_service_foreach_char(attrib, configure_deviceinfo_cb,
++									dis);
+ 
  	return true;
  }
  
--static void cancel_gatt_req(void *data, void *user_data)
--{
--	unsigned int id = PTR_TO_UINT(data);
--	struct bt_scpp *scan = user_data;
--
--	g_attrib_cancel(scan->attrib, id);
--}
--
- void bt_scpp_detach(struct bt_scpp *scan)
+ void bt_dis_detach(struct bt_dis *dis)
  {
- 	if (!scan || !scan->attrib)
-@@ -341,7 +278,6 @@ void bt_scpp_detach(struct bt_scpp *scan)
- 		scan->refresh_cb_id = 0;
+-	if (!dis->attrib)
++	if (!dis->client)
+ 		return;
+ 
+-	g_attrib_unref(dis->attrib);
+-	dis->attrib = NULL;
++	gatt_db_unref(dis->db);
++	bt_gatt_client_unref(dis->client);
++	dis->client = NULL;
+ }
+ 
+ bool bt_dis_set_notification(struct bt_dis *dis, bt_dis_notify func,
+diff --git a/android/dis.h b/android/dis.h
+index faf27b3..55c6625 100644
+--- a/android/dis.h
++++ b/android/dis.h
+@@ -23,12 +23,12 @@
+ 
+ struct bt_dis;
+ 
+-struct bt_dis *bt_dis_new(void *primary);
++struct bt_dis *bt_dis_new(uint16_t service_handle);
+ 
+ struct bt_dis *bt_dis_ref(struct bt_dis *dis);
+ void bt_dis_unref(struct bt_dis *dis);
+ 
+-bool bt_dis_attach(struct bt_dis *dis, void *gatt);
++bool bt_dis_attach(struct bt_dis *dis, struct bt_gatt_client *client);
+ void bt_dis_detach(struct bt_dis *dis);
+ 
+ typedef void (*bt_dis_notify) (uint8_t source, uint16_t vendor,
+diff --git a/android/hog.c b/android/hog.c
+index 9f4ca44..71f8c50 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -976,17 +976,17 @@ static void dis_notify(uint8_t source, uint16_t vendor, uint16_t product,
+ 	hog->version = version;
+ }
+ 
+-static void hog_attach_dis(struct bt_hog *hog, struct gatt_primary *primary)
++static void hog_attach_dis(struct bt_hog *hog, uint16_t service_handle)
+ {
+ 	if (hog->dis) {
+-		bt_dis_attach(hog->dis, hog->attrib);
++		bt_dis_attach(hog->dis, hog->client);
+ 		return;
  	}
  
--	queue_foreach(scan->gatt_op, cancel_gatt_req, scan);
- 	g_attrib_unref(scan->attrib);
- 	scan->attrib = NULL;
+-	hog->dis = bt_dis_new(primary);
++	hog->dis = bt_dis_new(service_handle);
+ 	if (hog->dis) {
+ 		bt_dis_set_notification(hog->dis, dis_notify, hog);
+-		bt_dis_attach(hog->dis, hog->attrib);
++		bt_dis_attach(hog->dis, hog->client);
+ 	}
  }
+ 
+@@ -1052,11 +1052,6 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ 			continue;
+ 		}
+ 
+-		if (strcmp(primary->uuid, DEVICE_INFORMATION_UUID) == 0) {
+-			hog_attach_dis(hog, primary);
+-			continue;
+-		}
+-
+ 		if (strcmp(primary->uuid, BATTERY_UUID) == 0) {
+ 			hog_attach_bas(hog, primary);
+ 		}
+@@ -1082,8 +1077,7 @@ static void service_cb(struct gatt_db_attribute *attrib, void *user_data)
+ 		/* TODO */
+ 		return;
+ 	else if (!bt_uuid_strcmp(uuid, DEVICE_INFORMATION_UUID))
+-		/* TODO */
+-		return;
++		hog_attach_dis(hog, service_handle);
+ 	else if (!bt_uuid_strcmp(uuid, BATTERY_UUID))
+ 		/* TODO */
+ 		return;
+@@ -1110,7 +1104,7 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt, void *client)
+ 		bt_scpp_attach(hog->scpp, gatt);
+ 
+ 	if (hog->dis)
+-		bt_dis_attach(hog->dis, gatt);
++		bt_dis_attach(hog->dis, hog->client);
+ 
+ 	queue_foreach(hog->bas, (void *) bt_bas_attach, gatt);
+ 
 -- 
 1.9.1
 
