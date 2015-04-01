@@ -1,121 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <E81E28E1-07A5-49BF-8F9D-2728E81808E1@holtmann.org>
-References: <1427813761-32123-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<1427813761-32123-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<E81E28E1-07A5-49BF-8F9D-2728E81808E1@holtmann.org>
-Date: Wed, 1 Apr 2015 10:44:22 +0200
-Message-ID: <CAMv5Gbee0tRmDgMM82x_NWpW4UvQLiFKXenaDoeXxh_crbMcqQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/4] Bluetooth: bnep: Add support for get bnep features
- via ioctl
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1427822644-39009-2-git-send-email-jamuraa@chromium.org>
+References: <1427822644-39009-1-git-send-email-jamuraa@chromium.org>
+	<1427822644-39009-2-git-send-email-jamuraa@chromium.org>
+Date: Wed, 1 Apr 2015 10:40:17 +0300
+Message-ID: <CABBYNZ+1wPQtiUmcGnAHmSv2cmaAoq9oZz71jB+AW8NGkRcr_g@mail.gmail.com>
+Subject: Re: [BlueZ v7 01/10] shared: add bt_ad structure
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Michael,
+
+On Tue, Mar 31, 2015 at 8:23 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+> The bt_ad structure provides an abstraction for easy translation of defined
+> Advertisement Data fields into the resulting raw bytes needed by the Bluetooth
+> HCI LE Set Advertising Data command.
+> ---
+>  Makefile.am     |   1 +
+>  src/shared/ad.c | 346 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/ad.h |  60 ++++++++++
+>  3 files changed, 407 insertions(+)
+>  create mode 100644 src/shared/ad.c
+>  create mode 100644 src/shared/ad.h
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index 676d929..e144428 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -111,6 +111,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+>                         src/shared/uhid.h src/shared/uhid.c \
+>                         src/shared/pcap.h src/shared/pcap.c \
+>                         src/shared/btsnoop.h src/shared/btsnoop.c \
+> +                       src/shared/ad.h src/shared/ad.c \
+>                         src/shared/att-types.h \
+>                         src/shared/att.h src/shared/att.c \
+>                         src/shared/gatt-helpers.h src/shared/gatt-helpers.c \
+> diff --git a/src/shared/ad.c b/src/shared/ad.c
+> new file mode 100644
+> index 0000000..8e38d26
+> --- /dev/null
+> +++ b/src/shared/ad.c
+> @@ -0,0 +1,346 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2015  Google Inc.
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + */
+> +
+> +#include "src/shared/ad.h"
+> +
+> +#include "src/shared/queue.h"
+> +#include "src/shared/util.h"
+> +
+> +struct bt_ad {
+> +       int ref_count;
+> +       struct queue *service_uuids;
+> +       struct queue *manufacturer_data;
+> +       struct queue *solicit_uuids;
+> +       struct queue *service_data;
+
+Did you thought about using a single queue and carrying a type in the
+struct data? Perhaps it would be simpler, but in the other hand it may
+consume more memory per entry but usually we don't have many entries.
+
+> +};
+> +
+> +struct uuid_tagged_data {
+> +       bt_uuid_t uuid;
+> +       uint8_t *data;
+> +       size_t len;
+> +};
+> +
+> +struct manufacturer_tagged_data {
+> +       uint16_t manufacturer_id;
+> +       uint8_t *data;
+> +       size_t len;
+> +};
+
+I would remove tagged term from these structs.
 
 
-On 31 March 2015 at 17:28, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Grzegorz,
->
->> This is needed if user space wants to know supported bnep features
->> by kernel, e.g. if kernel supports sending response to bnep setup
->> control message. By now there is no possibility to know supported
->> features by kernel in case of bnep. Ioctls allows only to add connection,
->> delete connection, get connection list, get connection info. Adding
->> connection if it's possible (establishing network device connection) is
->> equivalent to starting bnep session. Bnep session handles data queue of
->> transmit, receive messages over bnep channel. It means that if we add
->> connection the received/transmitted data will be parsed immediately. In
->> case of get bnep features we want to know before session start, if we
->> should leave setup data on socket queue and let kernel to handle with it,
->> or in case of no setup handling support, if we should pull this message
->> and handle setup response within user space.
->>
->> Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
->> ---
->> fs/compat_ioctl.c         | 1 +
->> net/bluetooth/bnep/bnep.h | 4 ++++
->> net/bluetooth/bnep/sock.c | 8 ++++++++
->> 3 files changed, 13 insertions(+)
->>
->> diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
->> index afec645..19fb0c8 100644
->> --- a/fs/compat_ioctl.c
->> +++ b/fs/compat_ioctl.c
->> @@ -570,6 +570,7 @@ static int mt_ioctl_trans(unsigned int fd, unsigned int cmd, void __user *argp)
->> #define BNEPCONNDEL   _IOW('B', 201, int)
->> #define BNEPGETCONNLIST       _IOR('B', 210, int)
->> #define BNEPGETCONNINFO       _IOR('B', 211, int)
->> +#define BNEPGETSUPPFEAT      _IOR('B', 212, int)
->>
->> #define CMTPCONNADD   _IOW('C', 200, int)
->> #define CMTPCONNDEL   _IOW('C', 201, int)
->> diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
->> index 5a5b16f..12d2c84 100644
->> --- a/net/bluetooth/bnep/bnep.h
->> +++ b/net/bluetooth/bnep/bnep.h
->> @@ -80,6 +80,9 @@
->> #define BNEP_TYPE_MASK        0x7f
->> #define BNEP_EXT_HEADER       0x80
->>
->> +/* Features */
->> +#define BNEP_SETUP_RSP_SUPPORT       0
->> +
->> struct bnep_setup_conn_req {
->>       __u8 type;
->>       __u8 ctrl;
->> @@ -111,6 +114,7 @@ struct bnep_ext_hdr {
->> #define BNEPCONNDEL   _IOW('B', 201, int)
->> #define BNEPGETCONNLIST       _IOR('B', 210, int)
->> #define BNEPGETCONNINFO       _IOR('B', 211, int)
->> +#define BNEPGETSUPPFEAT      _IOR('B', 212, int)
->
-> actually lets put the features definition here. They are essentially the flags like in CMTP and HIDP.
->
-> And lets use BNEP_SETUP_RESPONSE here. Then we can use it as flags and as features mask. This makes is pretty similar to what we have with HIDP and CMTP.
->
-Ok, I'll change it.
->>
->> struct bnep_connadd_req {
->>       int   sock;             /* Connected socket */
->> diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
->> index 5f05129..ff0ea10 100644
->> --- a/net/bluetooth/bnep/sock.c
->> +++ b/net/bluetooth/bnep/sock.c
->> @@ -29,6 +29,8 @@
->>
->> #include "bnep.h"
->>
->> +static const __u32 supp_feat = BIT(BNEP_SETUP_RSP_SUPPORT);
->> +
->
-> And lets move this one just into bnep_sock_ioctl since there seems to be no need to make this global.
->
-Yes, I agree.
->> static struct bt_sock_list bnep_sk_list = {
->>       .lock = __RW_LOCK_UNLOCKED(bnep_sk_list.lock)
->> };
->> @@ -120,6 +122,12 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
->>
->>               return err;
->>
->> +     case BNEPGETSUPPFEAT:
->> +             if (copy_to_user(argp, &supp_feat, sizeof(supp_feat)))
->> +                     return -EFAULT;
->> +
->> +             return 0;
->> +
->>       default:
->>               return -EINVAL;
->>       }
->
-> Regards
->
-> Marcel
->
+> +void bt_ad_clear_service_uuid(struct bt_ad *ad)
+> +{
 
-Regards,
-Grzegorz
+For public functions please add a NULL check first.
+
+> +       queue_destroy(ad->service_uuids, free);
+> +
+> +       ad->service_uuids = queue_new();
+
+I would prefer queue_remove_all instead of queue_destroy+queue_new to cleanup.
+
+> +bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id,
+> +                                                       void *data, size_t len)
+> +{
+> +       struct manufacturer_tagged_data *new_data;
+> +
+> +       if (!ad)
+> +               return false;
+> +
+> +       new_data = new0(struct manufacturer_tagged_data, 1);
+> +       if (!new_data)
+> +               return false;
+> +
+> +       new_data->manufacturer_id = manufacturer_id;
+> +
+> +       new_data->data = malloc(len);
+> +       if (!new_data->data) {
+> +               free(new_data);
+> +               return false;
+> +       }
+> +
+> +       memcpy(new_data->data, data, len);
+
+How about having a memdup?
+
+
+-- 
+Luiz Augusto von Dentz
