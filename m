@@ -2,123 +2,134 @@ Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 13/28] android/hog: Replace definitions of characteristic uuids with bt_uuids
-Date: Wed,  1 Apr 2015 18:40:29 +0200
-Message-Id: <1427906444-11769-14-git-send-email-mariusz.skamra@tieto.com>
+Subject: [PATCH 14/28] android/hog: Replace GSList of hog instances with queue of instances
+Date: Wed,  1 Apr 2015 18:40:30 +0200
+Message-Id: <1427906444-11769-15-git-send-email-mariusz.skamra@tieto.com>
 In-Reply-To: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com>
 References: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Instead of using simply define and then convert the uuid values to
-bt_uuid everytime the char_discovered_cb is called, it's better to
-define these bt_uuids directly.
+Thanks to this patch hog instances can be now stored in queue.
+This will help to clean the code from glib dependencies.
 ---
- android/hog.c | 40 ++++++++++++++++++----------------------
- 1 file changed, 18 insertions(+), 22 deletions(-)
+ android/hog.c | 34 +++++++++++++++-------------------
+ 1 file changed, 15 insertions(+), 19 deletions(-)
 
 diff --git a/android/hog.c b/android/hog.c
-index 08196d4..e1ccaf3 100644
+index e1ccaf3..9f4ca44 100644
 --- a/android/hog.c
 +++ b/android/hog.c
-@@ -61,12 +61,6 @@
- #include "android/bas.h"
- #include "android/hog.h"
+@@ -106,7 +106,7 @@ struct bt_hog {
+ 	struct bt_scpp		*scpp;
+ 	struct bt_dis		*dis;
+ 	struct queue		*bas;
+-	GSList			*instances;
++	struct queue		*instances;
+ 	struct bt_gatt_client	*client;
+ 	struct gatt_db		*db;
+ };
+@@ -870,7 +870,7 @@ static void hog_free(void *data)
+ 	bt_hog_detach(hog);
  
--#define HOG_INFO_UUID		0x2A4A
--#define HOG_REPORT_MAP_UUID	0x2A4B
--#define HOG_REPORT_UUID		0x2A4D
--#define HOG_PROTO_MODE_UUID	0x2A4E
--#define HOG_CONTROL_POINT_UUID	0x2A4C
--
- #define HOG_REPORT_TYPE_INPUT	1
- #define HOG_REPORT_TYPE_OUTPUT	2
- #define HOG_REPORT_TYPE_FEATURE	3
-@@ -77,6 +71,17 @@
- #define HOG_REPORT_MAP_MAX_SIZE        512
- #define HID_INFO_SIZE			4
+ 	queue_destroy(hog->bas, (void *) bt_bas_unref);
+-	g_slist_free_full(hog->instances, hog_free);
++	queue_destroy(hog->instances, hog_free);
  
-+static const bt_uuid_t info_uuid = { .type = BT_UUID16,
-+					.value.u16 = 0x2A4A };
-+static const bt_uuid_t report_map_uuid = { .type = BT_UUID16,
-+					.value.u16 = 0x2A4B };
-+static const bt_uuid_t control_point_uuid = { .type = BT_UUID16,
-+					.value.u16 = 0x2A4C };
-+static const bt_uuid_t report_uuid = { .type = BT_UUID16,
-+					.value.u16 = 0x2A4D };
-+static const bt_uuid_t protocol_mode_uuid = { .type = BT_UUID16,
-+					.value.u16 = 0x2A4E };
-+
- struct bt_hog {
- 	int			ref_count;
- 	uint16_t		service_handle;
-@@ -300,7 +305,6 @@ static void external_report_reference_cb(bool success, uint8_t status,
- 					void *user_data)
- {
- 	struct bt_hog *hog = user_data;
--	uint16_t uuid16;
- 	bt_uuid_t uuid;
- 	struct queue *chrs;
+ 	bt_scpp_unref(hog->scpp);
+ 	bt_dis_unref(hog->dis);
+@@ -899,6 +899,7 @@ struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
  
-@@ -315,12 +319,12 @@ static void external_report_reference_cb(bool success, uint8_t status,
- 		return;
+ 	hog->bas = queue_new();
+ 	hog->reports = queue_new();
++	hog->instances = queue_new();
+ 
+ 	if (fd < 0)
+ 		hog->uhid = bt_uhid_new_default();
+@@ -907,7 +908,7 @@ struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
+ 
+ 	hog->uhid_fd = fd;
+ 
+-	if (!hog->bas || !hog->uhid || !hog->reports) {
++	if (!hog->bas || !hog->uhid || !hog->reports || !hog->instances) {
+ 		hog_free(hog);
+ 		return NULL;
  	}
- 
--	uuid16 = get_le16(value);
--	DBG("External report reference read, external report characteristic "
--						"UUID: 0x%04x", uuid16);
-+	DBG("External report characteristic UUID: 0x%04x", get_le16(value));
-+
-+	bt_uuid16_create(&uuid, get_le16(value));
- 
- 	/* Do not discover if is not a Report */
--	if (uuid16 != HOG_REPORT_UUID)
-+	if (bt_uuid_cmp(&uuid, &report_uuid))
+@@ -1021,7 +1022,7 @@ static void hog_attach_hog(struct bt_hog *hog, uint16_t service_handle)
  		return;
  
- 	chrs = queue_new();
-@@ -329,7 +333,6 @@ static void external_report_reference_cb(bool success, uint8_t status,
- 		return;
- 	}
- 
--	bt_uuid16_create(&uuid, uuid16);
- 	gatt_db_read_by_type(hog->db, 0x0001, 0xffff, uuid, chrs);
- 
- 	if (queue_isempty(chrs))
-@@ -823,18 +826,11 @@ static void char_discovered_cb(struct gatt_db_attribute *attrib,
- 								void *user_data)
- {
- 	struct bt_hog *hog = user_data;
--	bt_uuid_t report_uuid, report_map_uuid, proto_mode_uuid, ctrlpt_uuid;
--	bt_uuid_t info_uuid, uuid;
-+	bt_uuid_t uuid;
- 	struct report *report;
- 	uint16_t value_handle;
- 	uint8_t properties;
- 
--	bt_uuid16_create(&report_uuid, HOG_REPORT_UUID);
--	bt_uuid16_create(&report_map_uuid, HOG_REPORT_MAP_UUID);
--	bt_uuid16_create(&info_uuid, HOG_INFO_UUID);
--	bt_uuid16_create(&proto_mode_uuid, HOG_PROTO_MODE_UUID);
--	bt_uuid16_create(&ctrlpt_uuid, HOG_CONTROL_POINT_UUID);
--
- 	gatt_db_attribute_get_char_data(attrib, NULL, &value_handle,
- 							&properties, &uuid);
- 
-@@ -849,11 +845,11 @@ static void char_discovered_cb(struct gatt_db_attribute *attrib,
- 	} else if (!bt_uuid_cmp(&uuid, &info_uuid)) {
- 		bt_gatt_client_read_value(hog->client, value_handle,
- 						info_read_cb, hog, NULL);
--	} else if (!bt_uuid_cmp(&uuid, &proto_mode_uuid)) {
-+	} else if (!bt_uuid_cmp(&uuid, &protocol_mode_uuid)) {
- 		hog->proto_mode_handle = value_handle;
- 		bt_gatt_client_read_value(hog->client, value_handle,
- 						proto_mode_read_cb, hog, NULL);
--	} else if (!bt_uuid_cmp(&uuid, &ctrlpt_uuid)) {
-+	} else if (!bt_uuid_cmp(&uuid, &control_point_uuid)) {
- 		hog->ctrlpt_handle = value_handle;
- 	}
+ 	bt_hog_attach(instance, hog->attrib, hog->client);
+-	hog->instances = g_slist_append(hog->instances, instance);
++	queue_push_tail(hog->instances, instance);
  }
+ 
+ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+@@ -1090,7 +1091,7 @@ static void service_cb(struct gatt_db_attribute *attrib, void *user_data)
+ 
+ bool bt_hog_attach(struct bt_hog *hog, void *gatt, void *client)
+ {
+-	GSList *l;
++	const struct queue_entry *hog_entry;
+ 
+ 	if (hog->attrib || hog->client)
+ 		return false;
+@@ -1113,8 +1114,9 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt, void *client)
+ 
+ 	queue_foreach(hog->bas, (void *) bt_bas_attach, gatt);
+ 
+-	for (l = hog->instances; l; l = l->next) {
+-		struct bt_hog *instance = l->data;
++	hog_entry = queue_get_entries(hog->instances);
++	while (hog_entry) {
++		struct bt_hog *instance = hog_entry->data;
+ 
+ 		bt_hog_attach(instance, gatt, client);
+ 	}
+@@ -1135,19 +1137,11 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt, void *client)
+ 
+ void bt_hog_detach(struct bt_hog *hog)
+ {
+-	GSList *l;
+-
+ 	if (!hog->attrib || !hog->client)
+ 		return;
+ 
+ 	queue_foreach(hog->bas, (void *) bt_bas_detach, NULL);
+-
+-	for (l = hog->instances; l; l = l->next) {
+-		struct bt_hog *instance = l->data;
+-
+-		bt_hog_detach(instance);
+-	}
+-
++	queue_foreach(hog->instances, (void *) bt_hog_detach, NULL);
+ 	queue_foreach(hog->reports, report_disable_notif, NULL);
+ 
+ 	if (hog->scpp)
+@@ -1182,7 +1176,7 @@ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
+ int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type)
+ {
+ 	struct report *report;
+-	GSList *l;
++	const struct queue_entry *hog_entry;
+ 
+ 	if (!hog)
+ 		return -EINVAL;
+@@ -1207,10 +1201,12 @@ int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type)
+ 						report->decl->value_handle,
+ 						false, data, size);
+ 
+-	for (l = hog->instances; l; l = l->next) {
+-		struct bt_hog *instance = l->data;
++	hog_entry = queue_get_entries(hog->instances);
++	while (hog_entry) {
++		struct bt_hog *instance = hog_entry->data;
+ 
+ 		bt_hog_send_report(instance, data, size, type);
++		hog_entry = hog_entry->next;
+ 	}
+ 
+ 	return 0;
 -- 
 1.9.1
 
