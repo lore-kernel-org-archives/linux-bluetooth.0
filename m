@@ -1,82 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v8 04/10] core/advertising: Parse SolicitUUIDs
-Date: Wed,  1 Apr 2015 14:09:56 -0700
-Message-Id: <1427922602-6253-5-git-send-email-jamuraa@chromium.org>
-In-Reply-To: <1427922602-6253-1-git-send-email-jamuraa@chromium.org>
-References: <1427922602-6253-1-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH 4/4] Bluetooth: Restrict BNEP flags to only valid ones
+Date: Wed,  1 Apr 2015 13:51:54 -0700
+Message-Id: <1427921514-22465-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the SolicitUUIDs property of the LEAdvertisement1 object.
----
- src/advertising.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+The BNEP flags should be clearly restricted to valid ones. So this puts
+extra checks in place to ensure this.
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 9867e1e..d736ea9 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -205,6 +205,45 @@ fail:
- 	return false;
- }
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/bnep/core.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 05f57e491ccb..8287ff4eff61 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -525,6 +525,7 @@ static struct device_type bnep_type = {
  
-+static bool parse_advertising_solicit_uuids(GDBusProxy *proxy,
-+							struct bt_ad *data)
-+{
-+	DBusMessageIter iter, ariter;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "SolicitUUIDs", &iter))
-+		return true;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		return false;
-+
-+	dbus_message_iter_recurse(&iter, &ariter);
-+
-+	bt_ad_clear_solicit_uuid(data);
-+
-+	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
-+		const char *uuid_str;
-+		bt_uuid_t uuid;
-+
-+		dbus_message_iter_get_basic(&ariter, &uuid_str);
-+
-+		DBG("Adding SolicitUUID: %s", uuid_str);
-+
-+		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
-+			goto fail;
-+
-+		if (!bt_ad_add_solicit_uuid(data, &uuid))
-+			goto fail;
-+
-+		dbus_message_iter_next(&ariter);
-+	}
-+
-+	return true;
-+
-+fail:
-+	bt_ad_clear_solicit_uuid(data);
-+	return false;
-+}
-+
- static void refresh_advertisement(struct advertisement *ad)
+ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
  {
- 	DBG("Refreshing advertisement: %s", ad->path);
-@@ -222,6 +261,11 @@ static bool parse_advertisement(struct advertisement *ad)
- 		return false;
- 	}
++	__u32 valid_flags = 0;
+ 	struct net_device *dev;
+ 	struct bnep_session *s, *ss;
+ 	u8 dst[ETH_ALEN], src[ETH_ALEN];
+@@ -535,6 +536,9 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+ 	if (!l2cap_is_socket(sock))
+ 		return -EBADFD;
  
-+	if (!parse_advertising_solicit_uuids(ad->proxy, ad->data)) {
-+		error("Property \"SolicitUUIDs\" failed to parse");
-+		return false;
-+	}
++	if (req->flags & ~valid_flags)
++		return -EINVAL;
 +
- 	/* TODO: parse the rest of the properties */
+ 	baswap((void *) dst, &l2cap_pi(sock->sk)->chan->dst);
+ 	baswap((void *) src, &l2cap_pi(sock->sk)->chan->src);
  
- 	refresh_advertisement(ad);
+@@ -611,11 +615,15 @@ failed:
+ 
+ int bnep_del_connection(struct bnep_conndel_req *req)
+ {
++	__u32 valid_flags = 0;
+ 	struct bnep_session *s;
+ 	int  err = 0;
+ 
+ 	BT_DBG("");
+ 
++	if (req->flags & ~valid_flags)
++		return -EINVAL;
++
+ 	down_read(&bnep_session_sem);
+ 
+ 	s = __bnep_get_session(req->dst);
+@@ -631,10 +639,12 @@ int bnep_del_connection(struct bnep_conndel_req *req)
+ 
+ static void __bnep_copy_ci(struct bnep_conninfo *ci, struct bnep_session *s)
+ {
++	__u32 valid_flags = 0;
++
+ 	memset(ci, 0, sizeof(*ci));
+ 	memcpy(ci->dst, s->eh.h_source, ETH_ALEN);
+ 	strcpy(ci->device, s->dev->name);
+-	ci->flags = s->flags;
++	ci->flags = s->flags & valid_flags;
+ 	ci->state = s->state;
+ 	ci->role  = s->role;
+ }
 -- 
-2.2.0.rc0.207.ga3a616c
+2.1.0
 
