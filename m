@@ -2,80 +2,464 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v8 00/10] Implement LE Advertisement D-Bus API
-Date: Wed,  1 Apr 2015 14:09:52 -0700
-Message-Id: <1427922602-6253-1-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v8 01/10] shared: add bt_ad structure
+Date: Wed,  1 Apr 2015 14:09:53 -0700
+Message-Id: <1427922602-6253-2-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1427922602-6253-1-git-send-email-jamuraa@chromium.org>
+References: <1427922602-6253-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implementation of the LE Advertisement D-Bus API.
-
-Things that are missing still:
- * Semantics for multiple Advertisements (currently any more than one will fail)
- * TX Power property parsing / interface
- * Setting other Flags in the advertisement.
-
-v1 -> v2:
- * Cleanup based on comments from Arman
- * Add g_dbus_proxy_set_read_watch function to avoid ObjectManager dependency
- * Consolidate script updates into single test script
-
-v2 -> v3:
- * Change "ManufacturerSpecificData" to "ManufacturerData"
- * Add advertisement-api.txt to EXTRA_DIST
- * Add Release() callback to org.bluez.LEAdvertisement1
- * Remove IncludePower from the LEAdvertisement1 API
-
-v3 -> v4:
- * Rename "g_dbus_proxy_set_read_watch" to "g_dbus_proxy_set_ready_watch"
-
-v4 -> v5:
- * Rebase
- * Use g_dbus_client_set_proxy_handlers instead of g_dbus_proxy_set_ready_watch
- * Add MGMT interface calls to actually advertise.
-
-v5 -> v6:
- * Minor patch cruft cleanup
- * Rename btd_advertising_manager to btd_advertising and fix filename change.
-
-v6 -> v7:
- * Rebase for included patches
- * Rename ad structure to bt_ad
- * Fixes for bt_ad_generate bugs
- * Correctly error for invalid length
- * Improvements so advertisement-example works out of the box
-
-v7 -> v8:
- * Rebase
- * Use eir.h constants instead of local constants
- * Rename internal structures for brevity
- * Add null checks
- * Check for queue_* failures
- * Address misc other comments
-
-Michael Janssen (10):
-  shared: add bt_ad structure
-  core/advertising: use bt_ad
-  core/advertising: Parse ServiceUUIDs
-  core/advertising: Parse SolicitUUIDs
-  core/advertising: Parse ManufacturerSpecificData
-  core/advertising: Parse ServiceData
-  Update TODO for LE Advertising
-  shared/ad: implement bt_ad_generate
-  core/advertising: Add and Remove AD using MGMT
-  test: improvements to advertising-example
-
- Makefile.am                |   1 +
- TODO                       |  20 +-
- src/advertising.c          | 310 +++++++++++++++++++++++-
- src/eir.h                  |  12 +
- src/shared/ad.c            | 584 +++++++++++++++++++++++++++++++++++++++++++++
- src/shared/ad.h            |  60 +++++
- test/example-advertisement |  12 +-
- 7 files changed, 972 insertions(+), 27 deletions(-)
+The bt_ad structure provides an abstraction for easy translation of defined
+Advertisement Data fields into the resulting raw bytes needed by the Bluetooth
+HCI LE Set Advertising Data command.
+---
+ Makefile.am     |   1 +
+ src/shared/ad.c | 355 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/ad.h |  60 ++++++++++
+ 3 files changed, 416 insertions(+)
  create mode 100644 src/shared/ad.c
  create mode 100644 src/shared/ad.h
 
+diff --git a/Makefile.am b/Makefile.am
+index 2255ce8..ba09c50 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -111,6 +111,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+ 			src/shared/uhid.h src/shared/uhid.c \
+ 			src/shared/pcap.h src/shared/pcap.c \
+ 			src/shared/btsnoop.h src/shared/btsnoop.c \
++			src/shared/ad.h src/shared/ad.c \
+ 			src/shared/att-types.h \
+ 			src/shared/att.h src/shared/att.c \
+ 			src/shared/gatt-helpers.h src/shared/gatt-helpers.c \
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+new file mode 100644
+index 0000000..9307114
+--- /dev/null
++++ b/src/shared/ad.c
+@@ -0,0 +1,355 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2015  Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ */
++
++#include "src/shared/ad.h"
++
++#include "src/shared/queue.h"
++#include "src/shared/util.h"
++
++struct bt_ad {
++	int ref_count;
++	struct queue *service_uuids;
++	struct queue *manufacturer_data;
++	struct queue *solicit_uuids;
++	struct queue *service_data;
++};
++
++struct uuid_data {
++	bt_uuid_t uuid;
++	uint8_t *data;
++	size_t len;
++};
++
++struct manufacturer_data {
++	uint16_t manufacturer_id;
++	uint8_t *data;
++	size_t len;
++};
++
++struct bt_ad *bt_ad_new(void)
++{
++	struct bt_ad *ad;
++
++	ad = new0(struct bt_ad, 1);
++	if (!ad)
++		return NULL;
++
++	ad->service_uuids = queue_new();
++	if (!ad->service_uuids)
++		goto fail;
++
++	ad->manufacturer_data = queue_new();
++	if (!ad->manufacturer_data)
++		goto fail;
++
++	ad->solicit_uuids = queue_new();
++	if (!ad->solicit_uuids)
++		goto fail;
++
++	ad->service_data = queue_new();
++	if (!ad->service_data)
++		goto fail;
++
++	return bt_ad_ref(ad);
++
++fail:
++	queue_destroy(ad->service_uuids, NULL);
++	queue_destroy(ad->manufacturer_data, NULL);
++	queue_destroy(ad->solicit_uuids, NULL);
++	queue_destroy(ad->service_data, NULL);
++
++	free(ad);
++
++	return NULL;
++}
++
++struct bt_ad *bt_ad_ref(struct bt_ad *ad)
++{
++	if (!ad)
++		return NULL;
++
++	ad->ref_count++;
++	return ad;
++}
++
++static void uuid_destroy(void *data)
++{
++	struct uuid_data *uuid_data = data;
++
++	free(uuid_data->data);
++	free(uuid_data);
++}
++
++static bool uuid_data_match(const void *data, const void *elem)
++{
++	const struct uuid_data *uuid_data = elem;
++	const bt_uuid_t *uuid = data;
++
++	return !bt_uuid_cmp(&uuid_data->uuid, uuid);
++}
++
++static void manuf_destroy(void *data)
++{
++	struct manufacturer_data *manuf = data;
++
++	free(manuf->data);
++	free(manuf);
++}
++
++static bool manuf_match(const void *data, const void *elem)
++{
++	const struct manufacturer_data *manuf = elem;
++	uint16_t manuf_id = PTR_TO_UINT(elem);
++
++	return manuf->manufacturer_id == manuf_id;
++}
++
++void bt_ad_unref(struct bt_ad *ad)
++{
++	if (!ad)
++		return;
++
++	if (__sync_sub_and_fetch(&ad->ref_count, 1))
++		return;
++
++	queue_destroy(ad->service_uuids, free);
++
++	queue_destroy(ad->manufacturer_data, manuf_destroy);
++
++	queue_destroy(ad->solicit_uuids, free);
++
++	queue_destroy(ad->service_data, uuid_destroy);
++
++	free(ad);
++}
++
++uint8_t *bt_ad_generate(struct bt_ad *ad, uint8_t *length)
++{
++	/* TODO: implement */
++	return NULL;
++}
++
++static bool queue_add_uuid(struct queue *queue, const bt_uuid_t *uuid)
++{
++	bt_uuid_t *new_uuid;
++
++	if (!queue)
++		return false;
++
++	new_uuid = new0(bt_uuid_t, 1);
++	if (!new_uuid)
++		return false;
++
++	bt_uuid_to_uuid128(uuid, new_uuid);
++
++	if (queue_push_tail(queue, new_uuid))
++		return true;
++
++	free(new_uuid);
++
++	return false;
++}
++
++static bool uuid_match(const void *data, const void *elem)
++{
++	const bt_uuid_t *match_uuid = data;
++	const bt_uuid_t *uuid = elem;
++
++	return bt_uuid_cmp(match_uuid, uuid);
++}
++
++static bool queue_remove_uuid(struct queue *queue, bt_uuid_t *uuid)
++{
++	bt_uuid_t *removed;
++
++	if (!queue || !uuid)
++		return false;
++
++	removed = queue_remove_if(queue, uuid_match, uuid);
++
++	if (removed) {
++		free(removed);
++		return true;
++	}
++
++	return false;
++}
++
++bool bt_ad_add_service_uuid(struct bt_ad *ad, const bt_uuid_t *uuid)
++{
++	if (!ad)
++		return false;
++
++	return queue_add_uuid(ad->service_uuids, uuid);
++}
++
++bool bt_ad_remove_service_uuid(struct bt_ad *ad, bt_uuid_t *uuid)
++{
++	if (!ad)
++		return false;
++
++	return queue_remove_uuid(ad->service_uuids, uuid);
++}
++
++void bt_ad_clear_service_uuid(struct bt_ad *ad)
++{
++	if (!ad)
++		return;
++
++	queue_remove_all(ad->service_uuids, NULL, NULL, free);
++}
++
++bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id,
++							void *data, size_t len)
++{
++	struct manufacturer_data *new_data;
++
++	if (!ad)
++		return false;
++
++	new_data = new0(struct manufacturer_data, 1);
++	if (!new_data)
++		return false;
++
++	new_data->manufacturer_id = manufacturer_id;
++
++	new_data->data = malloc(len);
++	if (!new_data->data) {
++		free(new_data);
++		return false;
++	}
++
++	memcpy(new_data->data, data, len);
++
++	new_data->len = len;
++
++	if (queue_push_tail(ad->manufacturer_data, new_data))
++		return true;
++
++	manuf_destroy(new_data);
++
++	return false;
++}
++
++bool bt_ad_remove_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id)
++{
++	struct manufacturer_data *data;
++
++	if (!ad)
++		return false;
++
++	data = queue_remove_if(ad->manufacturer_data, manuf_match,
++						UINT_TO_PTR(manufacturer_id));
++
++	if (!data)
++		return false;
++
++	manuf_destroy(data);
++
++	return true;
++}
++
++void bt_ad_clear_manufacturer_data(struct bt_ad *ad)
++{
++	if (!ad)
++		return;
++
++	queue_remove_all(ad->manufacturer_data, NULL, NULL, manuf_destroy);
++}
++
++bool bt_ad_add_solicit_uuid(struct bt_ad *ad, const bt_uuid_t *uuid)
++{
++	if (!ad)
++		return false;
++
++	return queue_add_uuid(ad->solicit_uuids, uuid);
++}
++
++bool bt_ad_remove_solicit_uuid(struct bt_ad *ad, bt_uuid_t *uuid)
++{
++	if (!ad)
++		return false;
++
++	return queue_remove_uuid(ad->solicit_uuids, uuid);
++}
++
++void bt_ad_clear_solicit_uuid(struct bt_ad *ad)
++{
++	if (!ad)
++		return;
++
++	queue_remove_all(ad->solicit_uuids, NULL, NULL, free);
++}
++
++bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
++								size_t len)
++{
++	struct uuid_data *new_data;
++
++	if (!ad)
++		return false;
++
++	new_data = new0(struct uuid_data, 1);
++	if (!new_data)
++		return false;
++
++	bt_uuid_to_uuid128(uuid, &new_data->uuid);
++
++	new_data->data = malloc(len);
++	if (!new_data->data) {
++		free(new_data);
++		return false;
++	}
++
++	memcpy(new_data->data, data, len);
++
++	new_data->len = len;
++
++	if (queue_push_tail(ad->service_data, new_data))
++		return true;
++
++	uuid_destroy(new_data);
++
++	return false;
++}
++
++bool bt_ad_remove_service_data(struct bt_ad *ad, bt_uuid_t *uuid)
++{
++	struct uuid_data *data;
++
++	if (!ad)
++		return false;
++
++	data = queue_remove_if(ad->service_data, uuid_data_match, uuid);
++
++	if (!data)
++		return false;
++
++	uuid_destroy(data);
++
++	return true;
++}
++
++void bt_ad_clear_service_data(struct bt_ad *ad)
++{
++	if (!ad)
++		return;
++
++	queue_remove_all(ad->service_data, NULL, NULL, uuid_destroy);
++}
+diff --git a/src/shared/ad.h b/src/shared/ad.h
+new file mode 100644
+index 0000000..0e41da0
+--- /dev/null
++++ b/src/shared/ad.h
+@@ -0,0 +1,60 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2015  Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ */
++
++#include <inttypes.h>
++#include <stdbool.h>
++
++#include "lib/bluetooth.h"
++#include "lib/uuid.h"
++
++struct bt_ad;
++
++struct bt_ad *bt_ad_new(void);
++
++struct bt_ad *bt_ad_ref(struct bt_ad *ad);
++
++void bt_ad_unref(struct bt_ad *ad);
++
++uint8_t *bt_ad_generate(struct bt_ad *ad, uint8_t *length);
++
++bool bt_ad_add_service_uuid(struct bt_ad *ad, const bt_uuid_t *uuid);
++
++bool bt_ad_remove_service_uuid(struct bt_ad *ad, bt_uuid_t *uuid);
++
++void bt_ad_clear_service_uuid(struct bt_ad *ad);
++
++bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_data,
++						void *data, size_t len);
++
++bool bt_ad_remove_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id);
++
++void bt_ad_clear_manufacturer_data(struct bt_ad *ad);
++
++bool bt_ad_add_solicit_uuid(struct bt_ad *ad, const bt_uuid_t *uuid);
++
++bool bt_ad_remove_solicit_uuid(struct bt_ad *ad, bt_uuid_t *uuid);
++
++void bt_ad_clear_solicit_uuid(struct bt_ad *ad);
++
++bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
++								size_t len);
++
++bool bt_ad_remove_service_data(struct bt_ad *ad, bt_uuid_t *uuid);
++
++void bt_ad_clear_service_data(struct bt_ad *ad);
 -- 
 2.2.0.rc0.207.ga3a616c
 
