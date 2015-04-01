@@ -1,83 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1749491.DZ1N48qHzk@leonov>
-References: <CAKafyqoaN+fQBH5hjqv6_+ZMt6_b7hGfF_2a6mKAngLF+PR_0w@mail.gmail.com>
-	<1749491.DZ1N48qHzk@leonov>
-Date: Wed, 1 Apr 2015 20:29:25 +0530
-Message-ID: <CAKafyqpUNyBJz673P0_B8T09Bp3Hr7OWptVZNXK5QLomk0xTfQ@mail.gmail.com>
-Subject: Re: android/handsfree.c | Possible Fix | Review
-From: Prabhu Chawandi <foss.chaws@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4 4/4] Bluetooth: bnep: Handle BNEP connection setup request
+Date: Wed,  1 Apr 2015 16:24:15 +0200
+Message-Id: <1427898255-27496-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1427898255-27496-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1427898255-27496-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+With this patch kernel will be able to handle setup request. This is
+needed if we would like to handle control mesages with extension
+headers. User space will be only resposible for reading setup data and
+checking if scenario is conformance to specification (dst and src device
+bnep role). In case of new user space, setup data must be leaved(peek
+msg) on queue. New bnep session will be responsible for handling this
+data.
 
-  Sure, I will send the patch soon, I have to pull 5.30 as I am
-currently on 5.28.
+Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+---
+ net/bluetooth/bnep/bnep.h |  3 +++
+ net/bluetooth/bnep/core.c | 10 +++++++++-
+ net/bluetooth/bnep/sock.c |  2 +-
+ 3 files changed, 13 insertions(+), 2 deletions(-)
 
-with sco read, I was not able to initiate read at all, when i debug it
-is always return at the same point where I had pointed a crash couple
-of days ago in hal-sco,c
+diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
+index 8709733..40854c9 100644
+--- a/net/bluetooth/bnep/bnep.h
++++ b/net/bluetooth/bnep/bnep.h
+@@ -113,6 +113,9 @@ struct bnep_ext_hdr {
+ #define BNEPGETCONNINFO	_IOR('B', 211, int)
+ #define BNEPGETSUPPFEAT	_IOR('B', 212, int)
+ 
++#define BNEP_SETUP_RESPONSE	0
++#define BNEP_SETUP_RSP_SENT	10
++
+ struct bnep_connadd_req {
+ 	int   sock;		/* Connected socket */
+ 	__u32 flags;
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 77ae725..2135b89 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -231,7 +231,14 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+ 		break;
+ 
+ 	case BNEP_SETUP_CONN_REQ:
+-		err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
++		/* Successful response should be sent only once */
++		if (test_bit(BNEP_SETUP_RESPONSE, &s->flags) &&
++		    !test_and_set_bit(BNEP_SETUP_RSP_SENT, &s->flags))
++			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
++					    BNEP_SUCCESS);
++		else
++			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
++					    BNEP_CONN_NOT_ALLOWED);
+ 		break;
+ 
+ 	default: {
+@@ -592,6 +599,7 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+ 	s->sock  = sock;
+ 	s->role  = req->role;
+ 	s->state = BT_CONNECTED;
++	s->flags = req->flags & (1 << BNEP_SETUP_RESPONSE);
+ 
+ 	s->msg.msg_flags = MSG_NOSIGNAL;
+ 
+diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
+index f18b6bd..116e7d3 100644
+--- a/net/bluetooth/bnep/sock.c
++++ b/net/bluetooth/bnep/sock.c
+@@ -58,7 +58,7 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
+ 	struct socket *nsock;
+ 	void __user *argp = (void __user *)arg;
+ 	int err;
+-	const __u32 supp_feat = 0;
++	const __u32 supp_feat = BIT(BNEP_SETUP_RESPONSE);
+ 
+ 
+ 	BT_DBG("cmd %x arg %lx", cmd, arg);
+-- 
+2.1.0
 
-I get channel number allocated but I am not able to understand why I
-am getting frame size as zero.. please through some light on it.
-
-        if (!frame_size)
-                return -1;  ==>
-
-        frame_num = bytes / frame_size;
-        input_frame_num = frame_num;
-
-
- Actually, we are trying on linux host, we are not using the Android framework.
-May be if you have some free time (Not sure :(), please capture the
-sequences, one profile at time. sorry if I am asking fore more !
-
-manyThanks,
-Prabhu
-
-
-
-On Wed, Apr 1, 2015 at 7:41 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Prabhu,
->
-> On Wednesday 01 of April 2015 18:40:52 Prabhu Chawandi wrote:
->> Hi,
->>
->>   When we were testing handsfree we were seeing command is not being
->> identified and when looked size was  sent zero when we set it as below
->> it started working.
->>
->> static const struct ipc_handler sco_handlers[] = {
->>         /* SCO_OP_GET_FD */
->> -        { bt_sco_get_fd, false, 0 }
->> };
->>
->>
->> static const struct ipc_handler sco_handlers[] = {
->>         /* SCO_OP_GET_FD */
->>  +       { bt_sco_get_fd, false, sizeof(struct sco_cmd_get_fd) }
->> };
->
-> Yes, the fix is correct. Could you send a proper patch for it?
->
->> one request -  have you documented anywhere the sequence of commands
->> to test each profiles supported till now. if we get the the proper
->> sequences we can validate much faster stabilising the code. Else we
->> need to spend time in identifying the sequences.
->>
->> So, if you have documented anywhere request you to share,
->
-> Those sequences are defined by android code (framework or multimedia) and are
-> not really documented. You could find some suggestion if you look at our PTS
-> testing documentation (android/pts-*.txt) where we do use haltest for tests.
->
-> Note that if possible we prefer to use Android Framework for validation
-> instead of haltest (which is mostly development tool).
->
-> --
-> BR
-> Szymon Janc
