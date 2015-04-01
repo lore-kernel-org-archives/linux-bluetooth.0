@@ -2,127 +2,122 @@ Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 10/28] android/hog: Add helper to create uhid device
-Date: Wed,  1 Apr 2015 18:40:26 +0200
-Message-Id: <1427906444-11769-11-git-send-email-mariusz.skamra@tieto.com>
+Subject: [PATCH 08/28] android/hog: Replace gatt_write_char with bt_gatt_client_write_value
+Date: Wed,  1 Apr 2015 18:40:24 +0200
+Message-Id: <1427906444-11769-9-git-send-email-mariusz.skamra@tieto.com>
 In-Reply-To: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com>
 References: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves the code responsible for creation of uhid device
-into separate function. This improves code readability.
 ---
- android/hog.c | 82 ++++++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 47 insertions(+), 35 deletions(-)
+ android/hog.c | 38 ++++++++++++++++++++------------------
+ 1 file changed, 20 insertions(+), 18 deletions(-)
 
 diff --git a/android/hog.c b/android/hog.c
-index 5b93cb5..ac8c819 100644
+index bcda1af..85a2b6a 100644
 --- a/android/hog.c
 +++ b/android/hog.c
-@@ -666,15 +666,57 @@ static char *item2string(char *str, const uint8_t *buf, uint8_t len)
- 	return str;
+@@ -411,10 +411,9 @@ static struct report *find_report_by_rtype(struct bt_hog *hog, uint8_t rtype,
+ 	return find_report(hog, type, id);
  }
  
-+static bool uhid_create(struct bt_hog *hog, const uint8_t *value, uint16_t vlen)
-+{
-+	struct uhid_event ev;
-+	int err;
-+	GError *gerr = NULL;
-+
-+	/* create uHID device */
-+	memset(&ev, 0, sizeof(ev));
-+	ev.type = UHID_CREATE;
-+
-+	bt_io_get(g_attrib_get_channel(hog->attrib), &gerr,
-+			BT_IO_OPT_SOURCE, ev.u.create.phys,
-+			BT_IO_OPT_DEST, ev.u.create.uniq,
-+			BT_IO_OPT_INVALID);
-+	if (gerr) {
-+		error("Failed to connection details: %s", gerr->message);
-+		g_error_free(gerr);
-+		return false;
-+	}
-+
-+	strcpy((char *) ev.u.create.name, hog->name);
-+	ev.u.create.vendor = hog->vendor;
-+	ev.u.create.product = hog->product;
-+	ev.u.create.version = hog->version;
-+	ev.u.create.country = hog->bcountrycode;
-+	ev.u.create.bus = BUS_BLUETOOTH;
-+	ev.u.create.rd_data = (uint8_t *) value;
-+	ev.u.create.rd_size = vlen;
-+
-+	err = bt_uhid_send(hog->uhid, &ev);
-+	if (err < 0) {
-+		error("bt_uhid_send: %s", strerror(-err));
-+		return false;
-+	}
-+
-+	bt_uhid_register(hog->uhid, UHID_OUTPUT, forward_report, hog);
-+	bt_uhid_register(hog->uhid, UHID_FEATURE, get_feature, hog);
-+	bt_uhid_register(hog->uhid, UHID_GET_REPORT, get_report, hog);
-+	bt_uhid_register(hog->uhid, UHID_SET_REPORT, set_report, hog);
-+
-+	return true;
-+}
-+
- static void report_map_read_cb(bool success, uint8_t att_ecode,
- 					const uint8_t *value, uint16_t vlen,
- 					void *user_data)
+-static void output_written_cb(guint8 status, const guint8 *pdu,
+-					guint16 plen, gpointer user_data)
++static void output_written_cb(bool success, uint8_t status, void *user_data)
+ {
+-	if (status != 0) {
++	if (!success) {
+ 		error("Write output report failed: %s", att_ecode2str(status));
+ 		return;
+ 	}
+@@ -442,12 +441,14 @@ static void forward_report(struct uhid_event *ev, void *user_data)
+ 	DBG("Sending report type %d ID %d to handle 0x%X", report->type,
+ 				report->id, report->decl->value_handle);
+ 
+-	if (hog->attrib == NULL)
++	if (hog->client == NULL)
+ 		return;
+ 
+ 	if (report->decl->properties & GATT_CHR_PROP_WRITE)
+-		gatt_write_char(hog->attrib, report->decl->value_handle,
+-				data, size, output_written_cb, hog);
++		bt_gatt_client_write_value(hog->client,
++						report->decl->value_handle,
++						data, size, output_written_cb,
++						hog, NULL);
+ 	else if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
+ 		bt_gatt_client_write_without_response(hog->client,
+ 						report->decl->value_handle,
+@@ -486,8 +487,7 @@ done:
+ 		error("bt_uhid_send: %s", strerror(-err));
+ }
+ 
+-static void set_report_cb(guint8 status, const guint8 *pdu,
+-					guint16 plen, gpointer user_data)
++static void set_report_cb(bool success, uint8_t status, void *user_data)
  {
  	struct bt_hog *hog = user_data;
--	struct uhid_event ev;
-+
- 	char itemstr[20]; /* 5x3 (data) + 4 (continuation) + 1 (null) */
--	int i, err;
--	GError *gerr = NULL;
-+	int i;
+ 	struct uhid_event rsp;
+@@ -500,7 +500,7 @@ static void set_report_cb(guint8 status, const guint8 *pdu,
+ 	rsp.u.set_report_reply.id = hog->setrep_id;
+ 	rsp.u.set_report_reply.err = status;
  
- 	if (!success) {
- 		error("Report Map read failed: %s", att_ecode2str(att_ecode));
-@@ -704,39 +746,9 @@ static void report_map_read_cb(bool success, uint8_t att_ecode,
- 		}
+-	if (status != 0)
++	if (!success)
+ 		error("Error setting Report value: %s", att_ecode2str(status));
+ 
+ 	err = bt_uhid_send(hog->uhid, &rsp);
+@@ -518,7 +518,7 @@ static void set_report(struct uhid_event *ev, void *user_data)
+ 
+ 	/* uhid never sends reqs in parallel; if there's a req, it timed out */
+ 	if (hog->setrep_att) {
+-		g_attrib_cancel(hog->attrib, hog->setrep_att);
++		bt_gatt_client_cancel(hog->client, hog->setrep_att);
+ 		hog->setrep_att = 0;
  	}
  
--	/* create uHID device */
--	memset(&ev, 0, sizeof(ev));
--	ev.type = UHID_CREATE;
--
--	bt_io_get(g_attrib_get_channel(hog->attrib), &gerr,
--			BT_IO_OPT_SOURCE, ev.u.create.phys,
--			BT_IO_OPT_DEST, ev.u.create.uniq,
--			BT_IO_OPT_INVALID);
--	if (gerr) {
--		error("Failed to connection details: %s", gerr->message);
--		g_error_free(gerr);
-+	/* TODO Error handling */
-+	if (!uhid_create(hog, value, vlen))
+@@ -541,13 +541,13 @@ static void set_report(struct uhid_event *ev, void *user_data)
+ 	DBG("Sending report type %d ID %d to handle 0x%X", report->type,
+ 				report->id, report->decl->value_handle);
+ 
+-	if (hog->attrib == NULL)
++	if (hog->client == NULL)
  		return;
--	}
--
--	strcpy((char *) ev.u.create.name, hog->name);
--	ev.u.create.vendor = hog->vendor;
--	ev.u.create.product = hog->product;
--	ev.u.create.version = hog->version;
--	ev.u.create.country = hog->bcountrycode;
--	ev.u.create.bus = BUS_BLUETOOTH;
--	ev.u.create.rd_data = (uint8_t *) value;
--	ev.u.create.rd_size = vlen;
--
--	err = bt_uhid_send(hog->uhid, &ev);
--	if (err < 0) {
--		error("bt_uhid_send: %s", strerror(-err));
--		return;
--	}
--
--	bt_uhid_register(hog->uhid, UHID_OUTPUT, forward_report, hog);
--	bt_uhid_register(hog->uhid, UHID_FEATURE, get_feature, hog);
--	bt_uhid_register(hog->uhid, UHID_GET_REPORT, get_report, hog);
--	bt_uhid_register(hog->uhid, UHID_SET_REPORT, set_report, hog);
+ 
+-	hog->setrep_att = gatt_write_char(hog->attrib,
+-						report->decl->value_handle,
+-						data, size, set_report_cb,
+-						hog);
++	hog->setrep_att = bt_gatt_client_write_value(hog->client,
++					report->decl->value_handle, data, size,
++					set_report_cb, hog, NULL);
++
+ 	if (!hog->setrep_att) {
+ 		err = ENOMEM;
+ 		goto fail;
+@@ -556,7 +556,7 @@ static void set_report(struct uhid_event *ev, void *user_data)
+ 	return;
+ fail:
+ 	/* cancel the request on failure */
+-	set_report_cb(err, NULL, 0, hog);
++	set_report_cb(false, err, hog);
  }
  
- static void info_read_cb(bool success, uint8_t status, const uint8_t *value,
+ static void get_report_cb(bool success, uint8_t status, const uint8_t *value,
+@@ -1239,8 +1239,10 @@ int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type)
+ 	DBG("hog: Write report, handle 0x%X", report->decl->value_handle);
+ 
+ 	if (report->decl->properties & GATT_CHR_PROP_WRITE)
+-		gatt_write_char(hog->attrib, report->decl->value_handle,
+-				data, size, output_written_cb, hog);
++		bt_gatt_client_write_value(hog->client,
++						report->decl->value_handle,
++						data, size, output_written_cb,
++						hog, NULL);
+ 
+ 	if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
+ 		bt_gatt_client_write_without_response(hog->client,
 -- 
 1.9.1
 
