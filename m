@@ -1,68 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH v4 4/4] Bluetooth: bnep: Handle BNEP connection setup request
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] Bluetooth: Restrict HIDP flags to only valid ones
-Date: Wed,  1 Apr 2015 13:51:53 -0700
-Message-Id: <1427921514-22465-3-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1427898255-27496-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Wed, 1 Apr 2015 13:28:20 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <0ACB7B57-AFF2-47DE-9839-923BF8318DE5@holtmann.org>
+References: <1427898255-27496-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1427898255-27496-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The HIDP flags should be clearly restricted to valid ones. So this puts
-extra checks in place to ensure this.
+Hi Grzegorz,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hidp/core.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+> With this patch kernel will be able to handle setup request. This is
+> needed if we would like to handle control mesages with extension
+> headers. User space will be only resposible for reading setup data and
+> checking if scenario is conformance to specification (dst and src device
+> bnep role). In case of new user space, setup data must be leaved(peek
+> msg) on queue. New bnep session will be responsible for handling this
+> data.
+> 
+> Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+> ---
+> net/bluetooth/bnep/bnep.h |  3 +++
+> net/bluetooth/bnep/core.c | 10 +++++++++-
+> net/bluetooth/bnep/sock.c |  2 +-
+> 3 files changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
+> index 8709733..40854c9 100644
+> --- a/net/bluetooth/bnep/bnep.h
+> +++ b/net/bluetooth/bnep/bnep.h
+> @@ -113,6 +113,9 @@ struct bnep_ext_hdr {
+> #define BNEPGETCONNINFO	_IOR('B', 211, int)
+> #define BNEPGETSUPPFEAT	_IOR('B', 212, int)
+> 
+> +#define BNEP_SETUP_RESPONSE	0
+> +#define BNEP_SETUP_RSP_SENT	10
+> +
+> struct bnep_connadd_req {
+> 	int   sock;		/* Connected socket */
+> 	__u32 flags;
+> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+> index 77ae725..2135b89 100644
+> --- a/net/bluetooth/bnep/core.c
+> +++ b/net/bluetooth/bnep/core.c
+> @@ -231,7 +231,14 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+> 		break;
+> 
+> 	case BNEP_SETUP_CONN_REQ:
+> -		err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
+> +		/* Successful response should be sent only once */
+> +		if (test_bit(BNEP_SETUP_RESPONSE, &s->flags) &&
+> +		    !test_and_set_bit(BNEP_SETUP_RSP_SENT, &s->flags))
+> +			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
+> +					    BNEP_SUCCESS);
+> +		else
+> +			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
+> +					    BNEP_CONN_NOT_ALLOWED);
+> 		break;
+> 
+> 	default: {
+> @@ -592,6 +599,7 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+> 	s->sock  = sock;
+> 	s->role  = req->role;
+> 	s->state = BT_CONNECTED;
+> +	s->flags = req->flags & (1 << BNEP_SETUP_RESPONSE);
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 07348e142f16..27a2d948d561 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -70,10 +70,11 @@ static void hidp_session_terminate(struct hidp_session *s);
- 
- static void hidp_copy_session(struct hidp_session *session, struct hidp_conninfo *ci)
- {
-+	__u32 valid_flags = 0;
- 	memset(ci, 0, sizeof(*ci));
- 	bacpy(&ci->bdaddr, &session->bdaddr);
- 
--	ci->flags = session->flags;
-+	ci->flags = session->flags & valid_flags;
- 	ci->state = BT_CONNECTED;
- 
- 	if (session->input) {
-@@ -1312,6 +1313,7 @@ int hidp_connection_add(struct hidp_connadd_req *req,
- 			struct socket *ctrl_sock,
- 			struct socket *intr_sock)
- {
-+	__u32 valid_flags = 0;
- 	struct hidp_session *session;
- 	struct l2cap_conn *conn;
- 	struct l2cap_chan *chan;
-@@ -1321,6 +1323,9 @@ int hidp_connection_add(struct hidp_connadd_req *req,
- 	if (ret)
- 		return ret;
- 
-+	if (req->flags & ~valid_flags)
-+		return -EINVAL;
-+
- 	chan = l2cap_pi(ctrl_sock->sk)->chan;
- 	conn = NULL;
- 	l2cap_chan_lock(chan);
-@@ -1351,8 +1356,12 @@ out_conn:
- 
- int hidp_connection_del(struct hidp_conndel_req *req)
- {
-+	__u32 valid_flags = BIT(HIDP_VIRTUAL_CABLE_UNPLUG);
- 	struct hidp_session *session;
- 
-+	if (req->flags & ~valid_flags)
-+		return -EINVAL;
-+
- 	session = hidp_session_find(&req->bdaddr);
- 	if (!session)
- 		return -ENOENT;
--- 
-2.1.0
+Use BIT() here as well.
+
+However this is not really what I asked for. What I asked for was to actually reject any flags that do not have 0 or BIT(0) set. I mean you would just create a mask for this.
+
+> 	s->msg.msg_flags = MSG_NOSIGNAL;
+> 
+> diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
+> index f18b6bd..116e7d3 100644
+> --- a/net/bluetooth/bnep/sock.c
+> +++ b/net/bluetooth/bnep/sock.c
+> @@ -58,7 +58,7 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
+> 	struct socket *nsock;
+> 	void __user *argp = (void __user *)arg;
+> 	int err;
+> -	const __u32 supp_feat = 0;
+> +	const __u32 supp_feat = BIT(BNEP_SETUP_RESPONSE);
+> 
+> 
+> 	BT_DBG("cmd %x arg %lx", cmd, arg);
+
+Regards
+
+Marcel
 
