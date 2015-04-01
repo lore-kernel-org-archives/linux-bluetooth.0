@@ -2,94 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v8 05/10] core/advertising: Parse ManufacturerSpecificData
-Date: Wed,  1 Apr 2015 14:09:57 -0700
-Message-Id: <1427922602-6253-6-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v8 07/10] Update TODO for LE Advertising
+Date: Wed,  1 Apr 2015 14:09:59 -0700
+Message-Id: <1427922602-6253-8-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1427922602-6253-1-git-send-email-jamuraa@chromium.org>
 References: <1427922602-6253-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the ManufacturerSpecificData property of the LEAdvertisement1
 ---
- src/advertising.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ TODO | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index d736ea9..8d6c13e 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -244,6 +244,58 @@ fail:
- 	return false;
- }
+diff --git a/TODO b/TODO
+index 65e19ee..2945392 100644
+--- a/TODO
++++ b/TODO
+@@ -64,16 +64,16 @@ General
+ Low Energy
+ ==========
  
-+static bool parse_advertising_manufacturer_data(GDBusProxy *proxy,
-+							struct bt_ad *data)
-+{
-+	DBusMessageIter iter, entries;
+-- Advertising management. Adapter interface needs to be changed to manage
+-  connection modes, adapter type and advertising policy. See Volume 3,
+-  Part C, section 9.3. If Attribute Server is enabled the LE capable
+-  adapter shall to start advertising. Further investigation is necessary
+-  to define which connectable mode needs to be supported: Non-connectable,
+-  directed connectable and undirected connectable. Basically, two connectable
+-  scenarios shall be addressed:
+-  1. GATT client is disconnected, but intends to become a Peripheral to
+-     receive indications/notifications.
+-  2. GATT server intends to accept connections.
++- Connection modes. Adapter interface needs to be changed to manage
++  connection modes and adapter type. See Volume 3, Part C, section 9.3.
++  1. Mode management: Peripheral / Central
 +
-+	if (!g_dbus_proxy_get_property(proxy, "ManufacturerData", &iter))
-+		return true;
++  Priority: Medium
++  Complexity: C2
 +
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		return false;
-+
-+	dbus_message_iter_recurse(&iter, &entries);
-+
-+	bt_ad_clear_manufacturer_data(data);
-+
-+	while (dbus_message_iter_get_arg_type(&entries)
-+						== DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter value, entry;
-+		uint16_t manuf_id;
-+		uint8_t *manuf_data;
-+		int len;
-+
-+		dbus_message_iter_recurse(&entries, &entry);
-+		dbus_message_iter_get_basic(&entry, &manuf_id);
-+
-+		dbus_message_iter_next(&entry);
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_ARRAY)
-+			goto fail;
-+
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_BYTE)
-+			goto fail;
-+
-+		dbus_message_iter_get_fixed_array(&value, &manuf_data, &len);
-+
-+		DBG("Adding ManufacturerData for %04x", manuf_id);
-+
-+		if (!bt_ad_add_manufacturer_data(data, manuf_id, manuf_data,
-+									len))
-+			goto fail;
-+
-+		dbus_message_iter_next(&entries);
-+	}
-+
-+	return true;
-+
-+fail:
-+	bt_ad_clear_manufacturer_data(data);
-+	return false;
-+}
-+
- static void refresh_advertisement(struct advertisement *ad)
- {
- 	DBG("Refreshing advertisement: %s", ad->path);
-@@ -266,6 +318,11 @@ static bool parse_advertisement(struct advertisement *ad)
- 		return false;
- 	}
++- Advertising data. The D-Bus interface needs to be updated to enable setting
++  scan response data, and to read the advertising and scan response data which
++  has been broadcast from other LE devices.
  
-+	if (!parse_advertising_manufacturer_data(ad->proxy, ad->data)) {
-+		error("Property \"ManufacturerData\" failed to parse");
-+		return false;
-+	}
-+
- 	/* TODO: parse the rest of the properties */
- 
- 	refresh_advertisement(ad);
+   Priority: Medium
+   Complexity: C2
 -- 
 2.2.0.rc0.207.ga3a616c
 
