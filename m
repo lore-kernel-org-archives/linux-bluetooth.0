@@ -2,55 +2,94 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v8 10/10] test: improvements to advertising-example
-Date: Wed,  1 Apr 2015 14:10:02 -0700
-Message-Id: <1427922602-6253-11-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v8 05/10] core/advertising: Parse ManufacturerSpecificData
+Date: Wed,  1 Apr 2015 14:09:57 -0700
+Message-Id: <1427922602-6253-6-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1427922602-6253-1-git-send-email-jamuraa@chromium.org>
 References: <1427922602-6253-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Improves the advertising-example in two ways:
-
-It uses 16-bit service UUIDs so that it does not overflow the
-Advertisement Data
-
-It turns the adapter's power on so that it works out of the box.
+Parse the ManufacturerSpecificData property of the LEAdvertisement1
 ---
- test/example-advertisement | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ src/advertising.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
-diff --git a/test/example-advertisement b/test/example-advertisement
-index 98aeafa..6e47391 100755
---- a/test/example-advertisement
-+++ b/test/example-advertisement
-@@ -113,11 +113,10 @@ class TestAdvertisement(Advertisement):
+diff --git a/src/advertising.c b/src/advertising.c
+index d736ea9..8d6c13e 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -244,6 +244,58 @@ fail:
+ 	return false;
+ }
  
-     def __init__(self, bus, index):
-         Advertisement.__init__(self, bus, index, 'broadcast')
--        self.add_service_uuid('0000180D-0000-1000-8000-00805F9B34FB')
--        self.add_service_uuid('0000180F-0000-1000-8000-00805F9B34FB')
-+        self.add_service_uuid('180D')
-+        self.add_service_uuid('180F')
-         self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
--        self.add_service_data('00009999-0000-1000-8000-00805F9B34FB',
--                              [0x00, 0x01, 0x02, 0x03, 0x04])
-+        self.add_service_data('9999', [0x00, 0x01, 0x02, 0x03, 0x04])
- 
- 
- def register_ad_cb():
-@@ -153,6 +152,11 @@ def main():
-         print 'LEAdvertisingManager1 interface not found'
-         return
- 
-+    adapter_props = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-+                                   "org.freedesktop.DBus.Properties");
++static bool parse_advertising_manufacturer_data(GDBusProxy *proxy,
++							struct bt_ad *data)
++{
++	DBusMessageIter iter, entries;
 +
-+    adapter_props.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(1))
++	if (!g_dbus_proxy_get_property(proxy, "ManufacturerData", &iter))
++		return true;
 +
-     ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-                                 LE_ADVERTISING_MANAGER_IFACE)
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++		return false;
++
++	dbus_message_iter_recurse(&iter, &entries);
++
++	bt_ad_clear_manufacturer_data(data);
++
++	while (dbus_message_iter_get_arg_type(&entries)
++						== DBUS_TYPE_DICT_ENTRY) {
++		DBusMessageIter value, entry;
++		uint16_t manuf_id;
++		uint8_t *manuf_data;
++		int len;
++
++		dbus_message_iter_recurse(&entries, &entry);
++		dbus_message_iter_get_basic(&entry, &manuf_id);
++
++		dbus_message_iter_next(&entry);
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_ARRAY)
++			goto fail;
++
++		dbus_message_iter_recurse(&entry, &value);
++
++		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_BYTE)
++			goto fail;
++
++		dbus_message_iter_get_fixed_array(&value, &manuf_data, &len);
++
++		DBG("Adding ManufacturerData for %04x", manuf_id);
++
++		if (!bt_ad_add_manufacturer_data(data, manuf_id, manuf_data,
++									len))
++			goto fail;
++
++		dbus_message_iter_next(&entries);
++	}
++
++	return true;
++
++fail:
++	bt_ad_clear_manufacturer_data(data);
++	return false;
++}
++
+ static void refresh_advertisement(struct advertisement *ad)
+ {
+ 	DBG("Refreshing advertisement: %s", ad->path);
+@@ -266,6 +318,11 @@ static bool parse_advertisement(struct advertisement *ad)
+ 		return false;
+ 	}
  
++	if (!parse_advertising_manufacturer_data(ad->proxy, ad->data)) {
++		error("Property \"ManufacturerData\" failed to parse");
++		return false;
++	}
++
+ 	/* TODO: parse the rest of the properties */
+ 
+ 	refresh_advertisement(ad);
 -- 
 2.2.0.rc0.207.ga3a616c
 
