@@ -1,93 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH v4 4/4] Bluetooth: bnep: Handle BNEP connection setup request
+Subject: Re: [PATCH v4 2/4] Bluetooth: bnep: Add support for get bnep features via ioctl
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1427898255-27496-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Date: Wed, 1 Apr 2015 13:28:20 -0700
+In-Reply-To: <1427898255-27496-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Wed, 1 Apr 2015 13:26:46 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0ACB7B57-AFF2-47DE-9839-923BF8318DE5@holtmann.org>
-References: <1427898255-27496-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1427898255-27496-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Message-Id: <71A9BC4E-A1AC-46F7-887A-1050664A6587@holtmann.org>
+References: <1427898255-27496-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1427898255-27496-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Grzegorz,
 
-> With this patch kernel will be able to handle setup request. This is
-> needed if we would like to handle control mesages with extension
-> headers. User space will be only resposible for reading setup data and
-> checking if scenario is conformance to specification (dst and src device
-> bnep role). In case of new user space, setup data must be leaved(peek
-> msg) on queue. New bnep session will be responsible for handling this
-> data.
+> This is needed if user space wants to know supported bnep features
+> by kernel, e.g. if kernel supports sending response to bnep setup
+> control message. By now there is no possibility to know supported
+> features by kernel in case of bnep. Ioctls allows only to add connection,
+> delete connection, get connection list, get connection info. Adding
+> connection if it's possible (establishing network device connection) is
+> equivalent to starting bnep session. Bnep session handles data queue of
+> transmit, receive messages over bnep channel. It means that if we add
+> connection the received/transmitted data will be parsed immediately. In
+> case of get bnep features we want to know before session start, if we
+> should leave setup data on socket queue and let kernel to handle with it,
+> or in case of no setup handling support, if we should pull this message
+> and handle setup response within user space.
 > 
 > Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 > ---
-> net/bluetooth/bnep/bnep.h |  3 +++
-> net/bluetooth/bnep/core.c | 10 +++++++++-
-> net/bluetooth/bnep/sock.c |  2 +-
-> 3 files changed, 13 insertions(+), 2 deletions(-)
+> fs/compat_ioctl.c         | 1 +
+> net/bluetooth/bnep/bnep.h | 1 +
+> net/bluetooth/bnep/sock.c | 8 ++++++++
+> 3 files changed, 10 insertions(+)
 > 
+> diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
+> index afec645..19fb0c8 100644
+> --- a/fs/compat_ioctl.c
+> +++ b/fs/compat_ioctl.c
+> @@ -570,6 +570,7 @@ static int mt_ioctl_trans(unsigned int fd, unsigned int cmd, void __user *argp)
+> #define BNEPCONNDEL	_IOW('B', 201, int)
+> #define BNEPGETCONNLIST	_IOR('B', 210, int)
+> #define BNEPGETCONNINFO	_IOR('B', 211, int)
+> +#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
+> 
+> #define CMTPCONNADD	_IOW('C', 200, int)
+> #define CMTPCONNDEL	_IOW('C', 201, int)
 > diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
-> index 8709733..40854c9 100644
+> index 5a5b16f..8709733 100644
 > --- a/net/bluetooth/bnep/bnep.h
 > +++ b/net/bluetooth/bnep/bnep.h
-> @@ -113,6 +113,9 @@ struct bnep_ext_hdr {
+> @@ -111,6 +111,7 @@ struct bnep_ext_hdr {
+> #define BNEPCONNDEL	_IOW('B', 201, int)
+> #define BNEPGETCONNLIST	_IOR('B', 210, int)
 > #define BNEPGETCONNINFO	_IOR('B', 211, int)
-> #define BNEPGETSUPPFEAT	_IOR('B', 212, int)
+> +#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
 > 
-> +#define BNEP_SETUP_RESPONSE	0
-> +#define BNEP_SETUP_RSP_SENT	10
-> +
 > struct bnep_connadd_req {
 > 	int   sock;		/* Connected socket */
-> 	__u32 flags;
-> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-> index 77ae725..2135b89 100644
-> --- a/net/bluetooth/bnep/core.c
-> +++ b/net/bluetooth/bnep/core.c
-> @@ -231,7 +231,14 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
-> 		break;
-> 
-> 	case BNEP_SETUP_CONN_REQ:
-> -		err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
-> +		/* Successful response should be sent only once */
-> +		if (test_bit(BNEP_SETUP_RESPONSE, &s->flags) &&
-> +		    !test_and_set_bit(BNEP_SETUP_RSP_SENT, &s->flags))
-> +			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
-> +					    BNEP_SUCCESS);
-> +		else
-> +			err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
-> +					    BNEP_CONN_NOT_ALLOWED);
-> 		break;
-> 
-> 	default: {
-> @@ -592,6 +599,7 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
-> 	s->sock  = sock;
-> 	s->role  = req->role;
-> 	s->state = BT_CONNECTED;
-> +	s->flags = req->flags & (1 << BNEP_SETUP_RESPONSE);
-
-Use BIT() here as well.
-
-However this is not really what I asked for. What I asked for was to actually reject any flags that do not have 0 or BIT(0) set. I mean you would just create a mask for this.
-
-> 	s->msg.msg_flags = MSG_NOSIGNAL;
-> 
 > diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
-> index f18b6bd..116e7d3 100644
+> index 5f05129..f18b6bd 100644
 > --- a/net/bluetooth/bnep/sock.c
 > +++ b/net/bluetooth/bnep/sock.c
-> @@ -58,7 +58,7 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
+> @@ -58,6 +58,8 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
 > 	struct socket *nsock;
 > 	void __user *argp = (void __user *)arg;
 > 	int err;
-> -	const __u32 supp_feat = 0;
-> +	const __u32 supp_feat = BIT(BNEP_SETUP_RESPONSE);
-> 
-> 
+> +	const __u32 supp_feat = 0;
+
+I doubt that const is needed here. It is on the stack anyway. And personally I prefer it before the int err.
+
+> +
+
+This extra empty line is against any coding style. Please be careful with these.
+
 > 	BT_DBG("cmd %x arg %lx", cmd, arg);
+> 
+> @@ -120,6 +122,12 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
+> 
+> 		return err;
+> 
+> +	case BNEPGETSUPPFEAT:
+> +		if (copy_to_user(argp, &supp_feat, sizeof(supp_feat)))
+> +			return -EFAULT;
+> +
+> +		return 0;
+> +
+> 	default:
+> 		return -EINVAL;
+> 	}
 
 Regards
 
