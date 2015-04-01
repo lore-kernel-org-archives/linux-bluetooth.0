@@ -1,43 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <551BD9BD.9040501@message-id.googlemail.com>
-Date: Wed, 01 Apr 2015 13:42:53 +0200
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
 MIME-Version: 1.0
-To: BlueZ devel list <linux-bluetooth@vger.kernel.org>
-CC: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: unit/test-gatt broken again (as always :-)
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <EFA40BD5-89FD-47FB-A37E-926B9B45CF5A@holtmann.org>
+References: <1427813761-32123-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<1427813761-32123-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<EFA40BD5-89FD-47FB-A37E-926B9B45CF5A@holtmann.org>
+Date: Wed, 1 Apr 2015 13:39:49 +0200
+Message-ID: <CAMv5GbdPbqNJ1_bn0GrZH2KpVELvW1GXNX7dZEWsQ9cp1ebLbw@mail.gmail.com>
+Subject: Re: [PATCH v3 4/4] Bluetooth: bnep: Handle BNEP connection setup request
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Marcel,
 
-in bluez-5.30, the testsuite again does not complete with
+On 31 March 2015 at 17:27, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Grezegorz,
+>
+>> With this patch kernel will be able to handle setup request. This is
+>> needed if we would like to handle control mesages with extension
+>> headers. User space will be only resposible for reading setup data and
+>> checking if scenario is conformance to specification (dst and src device
+>> bnep role). In case of new user space, setup data must be leaved(peek
+>> msg) on queue. New bnep session will be responsible for handling this
+>> data.
+>>
+>> Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+>> ---
+>> net/bluetooth/bnep/bnep.h |  5 +++++
+>> net/bluetooth/bnep/core.c | 10 +++++++++-
+>> 2 files changed, 14 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
+>> index 12d2c84..0b88f92 100644
+>> --- a/net/bluetooth/bnep/bnep.h
+>> +++ b/net/bluetooth/bnep/bnep.h
+>> @@ -83,6 +83,11 @@
+>> /* Features */
+>> #define BNEP_SETUP_RSP_SUPPORT        0
+>>
+>> +/* Session flags */
+>> +enum {
+>> +     BNEP_SETUP_RSP_SENT,
+>> +};
+>> +
+>
+> since we have done this in HIDP, I am find adding this as value 10 to the same list. It is more like internal flags that are not exposed to userspace.
+>
+> We just really need an extra patch that check allows flags from userspace and reject unsupported flags.
+>
+Ok, I'll add it.
+>> struct bnep_setup_conn_req {
+>>       __u8 type;
+>>       __u8 ctrl;
+>> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+>> index 77ae725..aa0966a 100644
+>> --- a/net/bluetooth/bnep/core.c
+>> +++ b/net/bluetooth/bnep/core.c
+>> @@ -231,7 +231,15 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+>>               break;
+>>
+>>       case BNEP_SETUP_CONN_REQ:
+>> -             err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
+>> +             /* Successful response should be sent only once */
+>> +             if (!test_bit(BNEP_SETUP_RSP_SENT, &s->flags)) {
+>> +                     set_bit(BNEP_SETUP_RSP_SENT, &s->flags);
+>
+> This is hackish. It just works by magically having the same value.
+>
+>> +                     err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
+>> +                                         BNEP_SUCCESS);
+>> +             } else {
+>> +                     err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
+>> +                                         BNEP_CONN_NOT_ALLOWED);
+>> +             }
+>>               break;
+>
+>         if (test_bit(BNEP_SETUP_RESONSE, &s->flags) &&
+>             !test_and_set_bit(BNEP_SETUP_RSP_SENT, &s->flags))
+>                 --> success
+>         else
+>                 --> failure
+>
+I'll change it to proposed style.
+> Regards
+>
+> Marcel
+>
 
-MALLOC_CHECK_=3 MALLOC_PERTURB_=69 make check
-
-Valgrind complains about a use-after-free.
-
-I simply bisected the issue, this is the broken commit.
-
-commit 9a0d6d99c79e5cecb76b7a61b53556447f0ccbd1
-Author: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Date:   Thu Mar 26 18:29:06 2015 +0530
-
-    unit/test-gatt: Add TP/GAW/CL/BV-05-C test
-
-    Verify that a Generic Attribute Profile client can write a long
-    Characteristic Value selected by handle.
-
-This is on plain x86_64, gcc-4.8.3 (old)
-
-Best regards,
-
-	Stefan
--- 
-Stefan Seyfried
-Linux Consultant & Developer -- GPG Key: 0x731B665B
-
-B1 Systems GmbH
-Osterfeldstraße 7 / 85088 Vohburg / http://www.b1-systems.de
-GF: Ralph Dehner / Unternehmenssitz: Vohburg / AG: Ingolstadt,HRB 3537
+Regards,
+Grzegorz
