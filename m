@@ -1,64 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Expose current Device ID information via debugfs
-Date: Wed,  1 Apr 2015 13:21:37 -0700
-Message-Id: <1427919697-11385-1-git-send-email-marcel@holtmann.org>
+Message-ID: <551C51E2.7060806@message-id.googlemail.com>
+Date: Wed, 01 Apr 2015 22:15:30 +0200
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: BlueZ devel list <linux-bluetooth@vger.kernel.org>,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: Re: unit/test-gatt broken again (as always :-)
+References: <551BD9BD.9040501@message-id.googlemail.com> <CABBYNZ+EzzcX2uMMrSQvrPhMqnruDxLf5d-vfqHNcZJOD=BCuA@mail.gmail.com>
+In-Reply-To: <CABBYNZ+EzzcX2uMMrSQvrPhMqnruDxLf5d-vfqHNcZJOD=BCuA@mail.gmail.com>
+Content-Type: multipart/mixed;
+ boundary="------------040005010202040505080504"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For debugging purposes it is good to be able to read the current
-configured Device ID details.
+This is a multi-part message in MIME format.
+--------------040005010202040505080504
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_debugfs.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+Hi Luiz,
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index e6255833a258..7db4220941cc 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -114,6 +114,30 @@ static const struct file_operations features_fops = {
- 	.release	= single_release,
- };
- 
-+static int device_id_show(struct seq_file *f, void *ptr)
-+{
-+	struct hci_dev *hdev = f->private;
-+
-+	hci_dev_lock(hdev);
-+	seq_printf(f, "%4.4x:%4.4x:%4.4x:%4.4x\n", hdev->devid_source,
-+		  hdev->devid_vendor, hdev->devid_product, hdev->devid_version);
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+static int device_id_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, device_id_show, inode->i_private);
-+}
-+
-+static const struct file_operations device_id_fops = {
-+	.open		= device_id_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- static int device_list_show(struct seq_file *f, void *ptr)
- {
- 	struct hci_dev *hdev = f->private;
-@@ -335,6 +359,8 @@ void hci_debugfs_create_common(struct hci_dev *hdev)
- 	debugfs_create_u16("hci_revision", 0444, hdev->debugfs, &hdev->hci_rev);
- 	debugfs_create_u8("hardware_error", 0444, hdev->debugfs,
- 			  &hdev->hw_error_code);
-+	debugfs_create_file("device_id", 0444, hdev->debugfs, hdev,
-+			    &device_id_fops);
- 
- 	debugfs_create_file("device_list", 0444, hdev->debugfs, hdev,
- 			    &device_list_fops);
+Am 01.04.2015 um 14:08 schrieb Luiz Augusto von Dentz:
+
+> This is actually a fault in our code that the test uncovered which is
+> good but we failed to see it happening, I actually have some plans to
+
+Ok. Then it's good that the openSUSE Buildservice setup has these
+parameters set as default for building :-)
+
+> have a check-valgrind target to catch this type of problems or maybe
+> there is a way to add MALLOC_CHECK_=3 MALLOC_PERTURB_=69 directly.
+
+I can help with that, see attached patch (sorry for the attachment, but
+making thunderbird behave well is out of scope for now :-)
+
+Best regards,
+
+	Stefan
 -- 
-2.1.0
+Stefan Seyfried
+Linux Consultant & Developer -- GPG Key: 0x731B665B
 
+B1 Systems GmbH
+Osterfeldstraße 7 / 85088 Vohburg / http://www.b1-systems.de
+GF: Ralph Dehner / Unternehmenssitz: Vohburg / AG: Ingolstadt,HRB 3537
+
+--------------040005010202040505080504
+Content-Type: text/x-patch;
+ name="0001-enable-glibc-s-malloc-checks-for-the-test-suite.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename*0="0001-enable-glibc-s-malloc-checks-for-the-test-suite.patch"
+
+>From f76391a35bd168a31d62ab0ea16dfdc3bdeb52e1 Mon Sep 17 00:00:00 2001
+From: Stefan Seyfried <seife+dev@b1-systems.com>
+Date: Wed, 1 Apr 2015 22:04:41 +0200
+Subject: [PATCH] enable glibc's malloc checks for the test suite
+
+Setting MALLOC_CHECK_=3 causes additional checks in glibc for malloc()
+usage errors, abort()ing the test if those trigger. MALLOC_PERTURB_=69
+causes free()'d memory to be poisoned with 0x45, leading to crashes in
+case of use-after-free.
+Together, both are useful for spotting more errors during "make check"
+
+Signed-off-by: Stefan Seyfried <seife+dev@b1-systems.com>
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 2255ce8..b6beb42 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -413,6 +413,7 @@ noinst_PROGRAMS += $(unit_tests)
+ endif
+ 
+ TESTS = $(unit_tests)
++AM_TESTS_ENVIRONMENT = MALLOC_CHECK_=3 MALLOC_PERTURB_=69
+ 
+ pkgconfigdir = $(libdir)/pkgconfig
+ 
+-- 
+2.3.3
+
+
+--------------040005010202040505080504--
