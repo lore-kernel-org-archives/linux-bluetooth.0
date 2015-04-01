@@ -1,88 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <551C51E2.7060806@message-id.googlemail.com>
-Date: Wed, 01 Apr 2015 22:15:30 +0200
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: BlueZ devel list <linux-bluetooth@vger.kernel.org>,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: Re: unit/test-gatt broken again (as always :-)
-References: <551BD9BD.9040501@message-id.googlemail.com> <CABBYNZ+EzzcX2uMMrSQvrPhMqnruDxLf5d-vfqHNcZJOD=BCuA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+EzzcX2uMMrSQvrPhMqnruDxLf5d-vfqHNcZJOD=BCuA@mail.gmail.com>
-Content-Type: multipart/mixed;
- boundary="------------040005010202040505080504"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: Export ECDH selftest result in debugfs
+Date: Wed,  1 Apr 2015 12:52:12 -0700
+Message-Id: <1427917933-32183-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------040005010202040505080504
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+When ECDH selftest is enabled, then besides printing the result into the
+kernel message buffer, also create a debugfs file that allows retrieving
+the same information.
 
-Hi Luiz,
-
-Am 01.04.2015 um 14:08 schrieb Luiz Augusto von Dentz:
-
-> This is actually a fault in our code that the test uncovered which is
-> good but we failed to see it happening, I actually have some plans to
-
-Ok. Then it's good that the openSUSE Buildservice setup has these
-parameters set as default for building :-)
-
-> have a check-valgrind target to catch this type of problems or maybe
-> there is a way to add MALLOC_CHECK_=3 MALLOC_PERTURB_=69 directly.
-
-I can help with that, see attached patch (sorry for the attachment, but
-making thunderbird behave well is out of scope for now :-)
-
-Best regards,
-
-	Stefan
--- 
-Stefan Seyfried
-Linux Consultant & Developer -- GPG Key: 0x731B665B
-
-B1 Systems GmbH
-Osterfeldstraße 7 / 85088 Vohburg / http://www.b1-systems.de
-GF: Ralph Dehner / Unternehmenssitz: Vohburg / AG: Ingolstadt,HRB 3537
-
---------------040005010202040505080504
-Content-Type: text/x-patch;
- name="0001-enable-glibc-s-malloc-checks-for-the-test-suite.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename*0="0001-enable-glibc-s-malloc-checks-for-the-test-suite.patch"
-
->From f76391a35bd168a31d62ab0ea16dfdc3bdeb52e1 Mon Sep 17 00:00:00 2001
-From: Stefan Seyfried <seife+dev@b1-systems.com>
-Date: Wed, 1 Apr 2015 22:04:41 +0200
-Subject: [PATCH] enable glibc's malloc checks for the test suite
-
-Setting MALLOC_CHECK_=3 causes additional checks in glibc for malloc()
-usage errors, abort()ing the test if those trigger. MALLOC_PERTURB_=69
-causes free()'d memory to be poisoned with 0x45, leading to crashes in
-case of use-after-free.
-Together, both are useful for spotting more errors during "make check"
-
-Signed-off-by: Stefan Seyfried <seife+dev@b1-systems.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- Makefile.am | 1 +
- 1 file changed, 1 insertion(+)
+ net/bluetooth/selftest.c | 35 +++++++++++++++++++++++++++++++----
+ 1 file changed, 31 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 2255ce8..b6beb42 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -413,6 +413,7 @@ noinst_PROGRAMS += $(unit_tests)
- endif
+diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
+index 378f4064952c..dc688f13e496 100644
+--- a/net/bluetooth/selftest.c
++++ b/net/bluetooth/selftest.c
+@@ -21,6 +21,8 @@
+    SOFTWARE IS DISCLAIMED.
+ */
  
- TESTS = $(unit_tests)
-+AM_TESTS_ENVIRONMENT = MALLOC_CHECK_=3 MALLOC_PERTURB_=69
++#include <linux/debugfs.h>
++
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
  
- pkgconfigdir = $(libdir)/pkgconfig
+@@ -154,6 +156,21 @@ static int __init test_ecdh_sample(const u8 priv_a[32], const u8 priv_b[32],
+ 	return 0;
+ }
  
++static char test_ecdh_buffer[32];
++
++static ssize_t test_ecdh_read(struct file *file, char __user *user_buf,
++			      size_t count, loff_t *ppos)
++{
++	return simple_read_from_buffer(user_buf, count, ppos, test_ecdh_buffer,
++				       strlen(test_ecdh_buffer));
++}
++
++static const struct file_operations test_ecdh_fops = {
++	.open		= simple_open,
++	.read		= test_ecdh_read,
++	.llseek		= default_llseek,
++};
++
+ static int __init test_ecdh(void)
+ {
+ 	ktime_t calltime, delta, rettime;
+@@ -165,19 +182,19 @@ static int __init test_ecdh(void)
+ 	err = test_ecdh_sample(priv_a_1, priv_b_1, pub_a_1, pub_b_1, dhkey_1);
+ 	if (err) {
+ 		BT_ERR("ECDH sample 1 failed");
+-		return err;
++		goto done;
+ 	}
+ 
+ 	err = test_ecdh_sample(priv_a_2, priv_b_2, pub_a_2, pub_b_2, dhkey_2);
+ 	if (err) {
+ 		BT_ERR("ECDH sample 2 failed");
+-		return err;
++		goto done;
+ 	}
+ 
+ 	err = test_ecdh_sample(priv_a_3, priv_a_3, pub_a_3, pub_a_3, dhkey_3);
+ 	if (err) {
+ 		BT_ERR("ECDH sample 3 failed");
+-		return err;
++		goto done;
+ 	}
+ 
+ 	rettime = ktime_get();
+@@ -186,7 +203,17 @@ static int __init test_ecdh(void)
+ 
+ 	BT_INFO("ECDH test passed in %llu usecs", duration);
+ 
+-	return 0;
++done:
++	if (!err)
++		snprintf(test_ecdh_buffer, sizeof(test_ecdh_buffer),
++			 "PASS (%llu usecs)\n", duration);
++	else
++		snprintf(test_ecdh_buffer, sizeof(test_ecdh_buffer), "FAIL\n");
++
++	debugfs_create_file("selftest_ecdh", 0444, bt_debugfs, NULL,
++			    &test_ecdh_fops);
++
++	return err;
+ }
+ 
+ #else
 -- 
-2.3.3
+2.1.0
 
-
---------------040005010202040505080504--
