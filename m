@@ -1,98 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Export ECDH selftest result in debugfs
-Date: Wed,  1 Apr 2015 12:52:12 -0700
-Message-Id: <1427917933-32183-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/2] Bluetooth: Export SMP selftest result in debugfs
+Date: Wed,  1 Apr 2015 12:52:13 -0700
+Message-Id: <1427917933-32183-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When ECDH selftest is enabled, then besides printing the result into the
+When SMP selftest is enabled, then besides printing the result into the
 kernel message buffer, also create a debugfs file that allows retrieving
 the same information.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/selftest.c | 35 +++++++++++++++++++++++++++++++----
- 1 file changed, 31 insertions(+), 4 deletions(-)
+ net/bluetooth/smp.c | 43 ++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 34 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/selftest.c b/net/bluetooth/selftest.c
-index 378f4064952c..dc688f13e496 100644
---- a/net/bluetooth/selftest.c
-+++ b/net/bluetooth/selftest.c
-@@ -21,6 +21,8 @@
-    SOFTWARE IS DISCLAIMED.
- */
- 
-+#include <linux/debugfs.h>
-+
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- 
-@@ -154,6 +156,21 @@ static int __init test_ecdh_sample(const u8 priv_a[32], const u8 priv_b[32],
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 1910c5806974..1ab3dc9c8f99 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -3549,6 +3549,21 @@ static int __init test_h6(struct crypto_hash *tfm_cmac)
  	return 0;
  }
  
-+static char test_ecdh_buffer[32];
++static char test_smp_buffer[32];
 +
-+static ssize_t test_ecdh_read(struct file *file, char __user *user_buf,
-+			      size_t count, loff_t *ppos)
++static ssize_t test_smp_read(struct file *file, char __user *user_buf,
++			     size_t count, loff_t *ppos)
 +{
-+	return simple_read_from_buffer(user_buf, count, ppos, test_ecdh_buffer,
-+				       strlen(test_ecdh_buffer));
++	return simple_read_from_buffer(user_buf, count, ppos, test_smp_buffer,
++				       strlen(test_smp_buffer));
 +}
 +
-+static const struct file_operations test_ecdh_fops = {
++static const struct file_operations test_smp_fops = {
 +	.open		= simple_open,
-+	.read		= test_ecdh_read,
++	.read		= test_smp_read,
 +	.llseek		= default_llseek,
 +};
 +
- static int __init test_ecdh(void)
+ static int __init run_selftests(struct crypto_blkcipher *tfm_aes,
+ 				struct crypto_hash *tfm_cmac)
  {
- 	ktime_t calltime, delta, rettime;
-@@ -165,19 +182,19 @@ static int __init test_ecdh(void)
- 	err = test_ecdh_sample(priv_a_1, priv_b_1, pub_a_1, pub_b_1, dhkey_1);
+@@ -3561,49 +3576,49 @@ static int __init run_selftests(struct crypto_blkcipher *tfm_aes,
+ 	err = test_ah(tfm_aes);
  	if (err) {
- 		BT_ERR("ECDH sample 1 failed");
+ 		BT_ERR("smp_ah test failed");
 -		return err;
 +		goto done;
  	}
  
- 	err = test_ecdh_sample(priv_a_2, priv_b_2, pub_a_2, pub_b_2, dhkey_2);
+ 	err = test_c1(tfm_aes);
  	if (err) {
- 		BT_ERR("ECDH sample 2 failed");
+ 		BT_ERR("smp_c1 test failed");
 -		return err;
 +		goto done;
  	}
  
- 	err = test_ecdh_sample(priv_a_3, priv_a_3, pub_a_3, pub_a_3, dhkey_3);
+ 	err = test_s1(tfm_aes);
  	if (err) {
- 		BT_ERR("ECDH sample 3 failed");
+ 		BT_ERR("smp_s1 test failed");
+-		return err;
++		goto done;
+ 	}
+ 
+ 	err = test_f4(tfm_cmac);
+ 	if (err) {
+ 		BT_ERR("smp_f4 test failed");
+-		return err;
++		goto done;
+ 	}
+ 
+ 	err = test_f5(tfm_cmac);
+ 	if (err) {
+ 		BT_ERR("smp_f5 test failed");
+-		return err;
++		goto done;
+ 	}
+ 
+ 	err = test_f6(tfm_cmac);
+ 	if (err) {
+ 		BT_ERR("smp_f6 test failed");
+-		return err;
++		goto done;
+ 	}
+ 
+ 	err = test_g2(tfm_cmac);
+ 	if (err) {
+ 		BT_ERR("smp_g2 test failed");
+-		return err;
++		goto done;
+ 	}
+ 
+ 	err = test_h6(tfm_cmac);
+ 	if (err) {
+ 		BT_ERR("smp_h6 test failed");
 -		return err;
 +		goto done;
  	}
  
  	rettime = ktime_get();
-@@ -186,7 +203,17 @@ static int __init test_ecdh(void)
+@@ -3612,7 +3627,17 @@ static int __init run_selftests(struct crypto_blkcipher *tfm_aes,
  
- 	BT_INFO("ECDH test passed in %llu usecs", duration);
+ 	BT_INFO("SMP test passed in %llu usecs", duration);
  
 -	return 0;
 +done:
 +	if (!err)
-+		snprintf(test_ecdh_buffer, sizeof(test_ecdh_buffer),
++		snprintf(test_smp_buffer, sizeof(test_smp_buffer),
 +			 "PASS (%llu usecs)\n", duration);
 +	else
-+		snprintf(test_ecdh_buffer, sizeof(test_ecdh_buffer), "FAIL\n");
++		snprintf(test_smp_buffer, sizeof(test_smp_buffer), "FAIL\n");
 +
-+	debugfs_create_file("selftest_ecdh", 0444, bt_debugfs, NULL,
-+			    &test_ecdh_fops);
++	debugfs_create_file("selftest_smp", 0444, bt_debugfs, NULL,
++			    &test_smp_fops);
 +
 +	return err;
  }
  
- #else
+ int __init bt_selftest_smp(void)
 -- 
 2.1.0
 
