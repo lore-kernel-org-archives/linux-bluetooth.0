@@ -1,68 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 00/28] android/hog Introduce bt_gatt_client
-Date: Wed,  1 Apr 2015 18:40:16 +0200
-Message-Id: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1749491.DZ1N48qHzk@leonov>
+References: <CAKafyqoaN+fQBH5hjqv6_+ZMt6_b7hGfF_2a6mKAngLF+PR_0w@mail.gmail.com>
+	<1749491.DZ1N48qHzk@leonov>
+Date: Wed, 1 Apr 2015 20:29:25 +0530
+Message-ID: <CAKafyqpUNyBJz673P0_B8T09Bp3Hr7OWptVZNXK5QLomk0xTfQ@mail.gmail.com>
+Subject: Re: android/handsfree.c | Possible Fix | Review
+From: Prabhu Chawandi <foss.chaws@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches replace gattrib with bt_gatt_client.
-It is part of HoG deduplication. HoG, ScPP, DIS, BAS have been
-cleaned from glib, btio, attrib dependencies.
+Hi Szymon,
 
-Note, that unit/test-hog tests are no longer valid and won't work since
-were written to be used with attrib. Fixes for unit tests will be
-sent in the next set of patches.
+  Sure, I will send the patch soon, I have to pull 5.30 as I am
+currently on 5.28.
 
-Mariusz Skamra (28):
-  android/hidhost: Create bt_gatt_client
-  android/hog: Introduce bt_gatt_client
-  shared/gatt-client: Expose gatt_db
-  android/hog: Remove tracking gatt operations
-  android/hog: Use bt_gatt_client to read characteristic value
-  android/hog: Use bt_gatt_client to register for notifications
-  android/hog: Use bt_gatt_client to write without response
-  android/hog: Replace gatt_write_char with bt_gatt_client_write_value
-  android/hog: Use gatt_db to search for services and characteristics in
-    db
-  android/hog: Add helper to create uhid device
-  lib/uuid: Add define for HoG UUID
-  android/hog: Replace list of reports with a queue of reports
-  android/hog: Replace definitions of characteristic uuids with bt_uuids
-  android/hog: Replace GSList of hog instances with queue of instances
-  android/dis: Remove tracking pending gatt operations
-  android/dis: Introduce bt_gatt_client
-  android/scpp: Remove tracking pending gatt operations
-  android/scpp: Introduce bt_gatt_client
-  android/scpp: Merge refresh_discovered_cb with iwin_discovered_cb
-  android/bas: Remove tracking pending gatt operations
-  android/bas: Start using bt_gatt_client
-  android/hog: Strip btio dependencies
-  android/hog: Enable Input Report notifications only if uhid is created
-  android/bas: Enable Battery Level notifications after reconnection
-  android/hog: Add MIN definition
-  android/hog: Remove attrib/
-  android/hog: Remove glib dependencies
-  android/hog: Remove redundant code
+with sco read, I was not able to initiate read at all, when i debug it
+is always return at the same point where I had pointed a crash couple
+of days ago in hal-sco,c
 
- android/Android.mk       |    2 +
- android/bas.c            |  312 +++----------
- android/bas.h            |    4 +-
- android/dis.c            |  203 ++-------
- android/dis.h            |    4 +-
- android/hidhost.c        |   80 +++-
- android/hog.c            | 1132 ++++++++++++++++------------------------------
- android/hog.h            |   12 +-
- android/scpp.c           |  262 +++--------
- android/scpp.h           |    4 +-
- lib/uuid.h               |    1 +
- src/shared/gatt-client.c |    8 +
- src/shared/gatt-client.h |    1 +
- unit/test-hog.c          |    9 +-
- 14 files changed, 646 insertions(+), 1388 deletions(-)
+I get channel number allocated but I am not able to understand why I
+am getting frame size as zero.. please through some light on it.
 
--- 
-1.9.1
+        if (!frame_size)
+                return -1;  ==>
 
+        frame_num = bytes / frame_size;
+        input_frame_num = frame_num;
+
+
+ Actually, we are trying on linux host, we are not using the Android framework.
+May be if you have some free time (Not sure :(), please capture the
+sequences, one profile at time. sorry if I am asking fore more !
+
+manyThanks,
+Prabhu
+
+
+
+On Wed, Apr 1, 2015 at 7:41 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi Prabhu,
+>
+> On Wednesday 01 of April 2015 18:40:52 Prabhu Chawandi wrote:
+>> Hi,
+>>
+>>   When we were testing handsfree we were seeing command is not being
+>> identified and when looked size was  sent zero when we set it as below
+>> it started working.
+>>
+>> static const struct ipc_handler sco_handlers[] = {
+>>         /* SCO_OP_GET_FD */
+>> -        { bt_sco_get_fd, false, 0 }
+>> };
+>>
+>>
+>> static const struct ipc_handler sco_handlers[] = {
+>>         /* SCO_OP_GET_FD */
+>>  +       { bt_sco_get_fd, false, sizeof(struct sco_cmd_get_fd) }
+>> };
+>
+> Yes, the fix is correct. Could you send a proper patch for it?
+>
+>> one request -  have you documented anywhere the sequence of commands
+>> to test each profiles supported till now. if we get the the proper
+>> sequences we can validate much faster stabilising the code. Else we
+>> need to spend time in identifying the sequences.
+>>
+>> So, if you have documented anywhere request you to share,
+>
+> Those sequences are defined by android code (framework or multimedia) and are
+> not really documented. You could find some suggestion if you look at our PTS
+> testing documentation (android/pts-*.txt) where we do use haltest for tests.
+>
+> Note that if possible we prefer to use Android Framework for validation
+> instead of haltest (which is mostly development tool).
+>
+> --
+> BR
+> Szymon Janc
