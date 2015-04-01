@@ -1,44 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <551BD9BD.9040501@message-id.googlemail.com>
+References: <551BD9BD.9040501@message-id.googlemail.com>
+Date: Wed, 1 Apr 2015 15:08:00 +0300
+Message-ID: <CABBYNZ+EzzcX2uMMrSQvrPhMqnruDxLf5d-vfqHNcZJOD=BCuA@mail.gmail.com>
+Subject: Re: unit/test-gatt broken again (as always :-)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/gatt-client: Fix possible crash
-Date: Wed,  1 Apr 2015 15:18:44 +0300
-Message-Id: <1427890724-22149-1-git-send-email-luiz.dentz@gmail.com>
+To: Stefan Seyfried <stefan.seyfried@googlemail.com>
+Cc: BlueZ devel list <linux-bluetooth@vger.kernel.org>,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Stefan,
 
-Similar to issue found with unit test it is necessary to protect
-bt_gatt_client instance before calling the callback otherwise it may
-destroy it causing a crash.
----
- src/shared/gatt-client.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+On Wed, Apr 1, 2015 at 2:42 PM, Stefan Seyfried
+<stefan.seyfried@googlemail.com> wrote:
+> Hi all,
+>
+> in bluez-5.30, the testsuite again does not complete with
+>
+> MALLOC_CHECK_=3 MALLOC_PERTURB_=69 make check
+>
+> Valgrind complains about a use-after-free.
+>
+> I simply bisected the issue, this is the broken commit.
+>
+> commit 9a0d6d99c79e5cecb76b7a61b53556447f0ccbd1
+> Author: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+> Date:   Thu Mar 26 18:29:06 2015 +0530
+>
+>     unit/test-gatt: Add TP/GAW/CL/BV-05-C test
+>
+>     Verify that a Generic Attribute Profile client can write a long
+>     Characteristic Value selected by handle.
+>
+> This is on plain x86_64, gcc-4.8.3 (old)
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index df994d7..b92d7b1 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -2456,14 +2456,17 @@ static void complete_write_long_op(struct request *req, bool success,
- 	if (req->att_id)
- 		return;
- 
--
- 	request_unref(req);
- 	success = false;
- 
-+	bt_gatt_client_ref(op->client);
-+
- 	if (op->callback)
- 		op->callback(success, reliable_error, att_ecode, op->user_data);
- 
- 	start_next_long_write(op->client);
-+
-+	bt_gatt_client_unref(op->client);
- }
- 
- static void prepare_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
+This is actually a fault in our code that the test uncovered which is
+good but we failed to see it happening, I actually have some plans to
+have a check-valgrind target to catch this type of problems or maybe
+there is a way to add MALLOC_CHECK_=3 MALLOC_PERTURB_=69 directly.
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
