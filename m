@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1427890724-22149-1-git-send-email-luiz.dentz@gmail.com>
-References: <1427890724-22149-1-git-send-email-luiz.dentz@gmail.com>
-Date: Thu, 2 Apr 2015 11:21:38 +0300
-Message-ID: <CABBYNZJYpeSvhSnMhyAdsRfAd_06DFOqQwukosh6j6W+22EGFA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-client: Fix possible crash
+In-Reply-To: <1427889880-9976-1-git-send-email-luiz.dentz@gmail.com>
+References: <1427889880-9976-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 2 Apr 2015 11:21:21 +0300
+Message-ID: <CABBYNZLWDRDa4MN7Dvz-rpUTwaWMmed_uQs+iVbCM3eemHMR3g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/gatt-client: Fix invalid read on TP/GAW/CL/BV-05-C
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
@@ -13,40 +13,62 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wed, Apr 1, 2015 at 3:18 PM, Luiz Augusto von Dentz
+On Wed, Apr 1, 2015 at 3:04 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Similar to issue found with unit test it is necessary to protect
-> bt_gatt_client instance before calling the callback otherwise it may
-> destroy it causing a crash.
+> This fixes TP/GAW/CL/BV-05-C which destroy bt_gatt_client instance on
+> the called producing the following bracktrace:
+>
+>    at 0x445C7C: start_next_long_write.isra.2 (gatt-client.c:2393)
+>    by 0x4462A8: execute_write_cb (gatt-client.c:2429)
+>    by 0x44099B: handle_rsp (att.c:640)
+>    by 0x44099B: can_read_data (att.c:813)
+>    by 0x44E4BA: watch_callback (io-glib.c:170)
+>    by 0x4E7E7FA: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4200.2)
+>    by 0x4E7EB97: ??? (in /usr/lib64/libglib-2.0.so.0.4200.2)
+>    by 0x4E7EEC1: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.4200.2)
+>    by 0x43E791: tester_run (tester.c:831)
+>    by 0x43A685: main (test-gatt.c:3935)
+>  Address 0x5b12fd8 is 104 bytes inside a block of size 208 free'd
+>    at 0x4C2ACE9: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+>    by 0x446820: bt_gatt_client_unref (gatt-client.c:1694)
+>    by 0x43AB7C: destroy_context (test-gatt.c:342)
+>    by 0x43AB7C: context_quit (test-gatt.c:370)
+>    by 0x43AD0F: test_long_write_cb (test-gatt.c:1029)
+>    by 0x446290: execute_write_cb (gatt-client.c:2426)
+>    by 0x44099B: handle_rsp (att.c:640)
+>    by 0x44099B: can_read_data (att.c:813)
+>    by 0x44E4BA: watch_callback (io-glib.c:170)
+>    by 0x4E7E7FA: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4200.2)
+>    by 0x4E7EB97: ??? (in /usr/lib64/libglib-2.0.so.0.4200.2)
+>    by 0x4E7EEC1: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.4200.2)
+>    by 0x43E791: tester_run (tester.c:831)
+>    by 0x43A685: main (test-gatt.c:3935)
 > ---
->  src/shared/gatt-client.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  src/shared/gatt-client.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
 > diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index df994d7..b92d7b1 100644
+> index 056f812..df994d7 100644
 > --- a/src/shared/gatt-client.c
 > +++ b/src/shared/gatt-client.c
-> @@ -2456,14 +2456,17 @@ static void complete_write_long_op(struct request *req, bool success,
->         if (req->att_id)
->                 return;
->
-> -
->         request_unref(req);
->         success = false;
+> @@ -2422,11 +2422,15 @@ static void execute_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
+>         } else if (opcode != BT_ATT_OP_EXEC_WRITE_RSP || pdu || length)
+>                 success = false;
 >
 > +       bt_gatt_client_ref(op->client);
 > +
 >         if (op->callback)
->                 op->callback(success, reliable_error, att_ecode, op->user_data);
+>                 op->callback(success, op->reliable_error, att_ecode,
+>                                                                 op->user_data);
 >
 >         start_next_long_write(op->client);
 > +
 > +       bt_gatt_client_unref(op->client);
 >  }
 >
->  static void prepare_write_cb(uint8_t opcode, const void *pdu, uint16_t length,
+>  static void complete_write_long_op(struct request *req, bool success,
 > --
 > 2.1.0
 
