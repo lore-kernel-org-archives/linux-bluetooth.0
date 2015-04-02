@@ -1,66 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <551CA5BC.5040307@gmail.com>
-References: <551CA5BC.5040307@gmail.com>
-Date: Wed, 1 Apr 2015 19:49:03 -0700
-Message-ID: <CAHrH25Tq4cQhiaGu7HnTu1ep1XNd85UJJr-FbcGnyx5c9W9Evw@mail.gmail.com>
-Subject: Re: How to get the hci_dev from an adv instance's work struct in a
- linked list?
-From: Arman Uguray <armansito@chromium.org>
-To: Florian Grandel <fgrandel@gmail.com>
+In-Reply-To: <1427922602-6253-11-git-send-email-jamuraa@chromium.org>
+References: <1427922602-6253-1-git-send-email-jamuraa@chromium.org>
+	<1427922602-6253-11-git-send-email-jamuraa@chromium.org>
+Date: Wed, 1 Apr 2015 19:40:34 -0700
+Message-ID: <CAHrH25Qff4Ft_6jhkWM=Pf7SmQLfodE0KPwi_WJKpzgYQDQpSA@mail.gmail.com>
+Subject: Re: [BlueZ v8 10/10] test: improvements to advertising-example
+From: Arman Uguray <armansito@google.com>
+To: Michael Janssen <jamuraa@chromium.org>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Florian,
+Hi Michael,
 
-> On Wed, Apr 1, 2015 at 7:13 PM, Florian Grandel <fgrandel@gmail.com> wrote:
-> Hi!
->
-> I got quite far today refactoring from
->
-> struct hci_dev { ... struct adv_info adv_instance; ... };
->
-> to
->
-> struct hci_dev { ... struct list_head adv_instances; ... };
->
-> But in the end I got stuck on refactoring the adv timeout callback.
-> Originally it looked like this:
->
-> static void adv_timeout_expired(struct work_struct *work)
-> {
->   struct hci_dev *hdev = container_of(work, struct hci_dev,
->                                       adv_instance.timeout_exp.work);
->   ...
-> }
->
-> But now I would have to construct a pointer to the hci_dev struct from a
-> list entry:
->
-> static void adv_timeout_expired(struct work_struct *work)
-> {
->   struct adv_info *adv_instance = container_of(work, struct adv_info,
->                                                timeout_exp.work);
->   ...
-> }
->
-> I couldn't find a way to get the list head of the adv info list entry so
-> that I could retrieve its containing hci_dev structure, though.
->
+> On Wed, Apr 1, 2015 at 2:10 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+> Improves the advertising-example in two ways:
 
-Once simple solution is to add a struct hci_dev pointer to struct
-adv_info. Once you get the pointer to the instance then you can obtain
-the hci_dev pointer that way.
+I'd change the commit message to say 'example-advertisement' following
+the new naming.
 
-> How would I construct the required hci_dev struct from the work pointer in
-> this case? Any ideas?
 >
-> Florian
+> It uses 16-bit service UUIDs so that it does not overflow the
+> Advertisement Data
+>
+> It turns the adapter's power on so that it works out of the box.
+> ---
+>  test/example-advertisement | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/test/example-advertisement b/test/example-advertisement
+> index 98aeafa..6e47391 100755
+> --- a/test/example-advertisement
+> +++ b/test/example-advertisement
+> @@ -113,11 +113,10 @@ class TestAdvertisement(Advertisement):
+>
+>      def __init__(self, bus, index):
+>          Advertisement.__init__(self, bus, index, 'broadcast')
+> -        self.add_service_uuid('0000180D-0000-1000-8000-00805F9B34FB')
+> -        self.add_service_uuid('0000180F-0000-1000-8000-00805F9B34FB')
+> +        self.add_service_uuid('180D')
+> +        self.add_service_uuid('180F')
+>          self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
+> -        self.add_service_data('00009999-0000-1000-8000-00805F9B34FB',
+> -                              [0x00, 0x01, 0x02, 0x03, 0x04])
+> +        self.add_service_data('9999', [0x00, 0x01, 0x02, 0x03, 0x04])
+>
+>
+>  def register_ad_cb():
+> @@ -153,6 +152,11 @@ def main():
+>          print 'LEAdvertisingManager1 interface not found'
+>          return
+>
+> +    adapter_props = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
+> +                                   "org.freedesktop.DBus.Properties");
+> +
+> +    adapter_props.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(1))
+> +
+>      ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
+>                                  LE_ADVERTISING_MANAGER_IFACE)
+>
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
+> 2.2.0.rc0.207.ga3a616c
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
