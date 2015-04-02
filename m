@@ -1,175 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 5/5] Bluetooth: hci_uart: Add BCM specific UART speed management
-Date: Thu,  2 Apr 2015 16:37:36 +0200
-Message-Id: <1427985456-31536-6-git-send-email-frederic.danis@linux.intel.com>
+Subject: [RFC 1/5] Bluetooth: hci_uart: Add HCIUARTSETDEVTYPE ioctl
+Date: Thu,  2 Apr 2015 16:37:32 +0200
+Message-Id: <1427985456-31536-2-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1427985456-31536-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1427985456-31536-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to setup the final speed for UART communication.
-This also allows to load firmware at final speed.
+This allows user space application to set the correct vendor specific
+setup function.
 
 Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 ---
- drivers/bluetooth/hci_bcm.c | 111 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
+ drivers/bluetooth/hci_ldisc.c | 50 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_uart.h  |  4 ++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 7cec648..7501732 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -11,6 +11,7 @@
- */
- 
- #include <linux/kernel.h>
-+#include <linux/tty.h>
- #include <linux/errno.h>
- #include <linux/skbuff.h>
- #include <linux/firmware.h>
-@@ -20,6 +21,9 @@
- 
- #include "hci_uart.h"
- 
-+#define BCM43XX_CLOCK_48 1
-+#define BCM43XX_CLOCK_24 2
-+
- static int hci_bcm_reset(struct hci_uart *hu)
- {
- 	struct hci_dev *hdev = hu->hdev;
-@@ -113,6 +117,87 @@ static int hci_bcm_read_local_version(struct hci_uart *hu, char *name,
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 1363dc6..cb7fcc6 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -467,9 +467,19 @@ static int hci_uart_register_dev(struct hci_uart *hu)
  	return 0;
  }
  
-+static int hci_bcm_set_clock(struct hci_uart *hu, unsigned char clock)
-+{
-+	struct hci_dev *hdev = hu->hdev;
-+	struct sk_buff *skb;
++struct hci_uart_devtype_t {
++	char type[HCI_UART_DEVTYPE_SIZE];
++	int (*setup)(struct hci_uart *hu);
++};
 +
-+	BT_DBG("%s: Set Controller clock (%d)", hdev->name, clock);
++struct hci_uart_devtype_t devtypes[] = {
++		{ "", 0 }
++};
 +
-+	skb = __hci_cmd_sync(hdev, 0xfc45, 1, &clock, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: failed to write update clock command (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return PTR_ERR(skb);
+ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ {
+ 	struct hci_uart_proto *p;
++	int i;
+ 	int err;
+ 
+ 	p = hci_uart_get_proto(id);
+@@ -482,6 +492,13 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+ 
+ 	hu->proto = p;
+ 
++	/* Select vendor specific setup */
++	hu->proto->setup = NULL;
++	for (i = 0; devtypes[i].type[0]; i++) {
++		if (!strcmp(devtypes[i].type, hu->dev_type))
++			hu->proto->setup = devtypes[i].setup;
 +	}
 +
-+	if (skb->data[0]) {
-+		u8 evt_status = skb->data[0];
-+
-+		BT_ERR("%s: write update clock event failed (%02x)",
-+		       hdev->name, evt_status);
-+		kfree_skb(skb);
-+		return -bt_to_errno(evt_status);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
-+static int hci_bcm_set_speed(struct hci_uart *hu, uint32_t speed)
+ 	err = hci_uart_register_dev(hu);
+ 	if (err) {
+ 		p->close(hu);
+@@ -507,6 +524,33 @@ static int hci_uart_set_flags(struct hci_uart *hu, unsigned long flags)
+ 	return 0;
+ }
+ 
++static int hci_tty_ioctl_set_devtype(struct hci_uart *hu, unsigned int cmd,
++							unsigned long arg)
 +{
-+	struct hci_dev *hdev = hu->hdev;
-+	struct sk_buff *skb;
-+	unsigned char param[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-+	struct ktermios ktermios;
++	unsigned int size = _IOC_SIZE(cmd);
++	char dev_type[HCI_UART_DEVTYPE_SIZE];
++	int i;
++	bool found = false;
 +
-+	if (speed > 3000000 && hci_bcm_set_clock(hu, BCM43XX_CLOCK_48))
++	if (size > HCI_UART_DEVTYPE_SIZE)
 +		return -EINVAL;
 +
-+	param[2] = (uint8_t) (speed);
-+	param[3] = (uint8_t) (speed >> 8);
-+	param[4] = (uint8_t) (speed >> 16);
-+	param[5] = (uint8_t) (speed >> 24);
++	if (copy_from_user(dev_type, (void __user *)arg, size))
++		return -EFAULT;
 +
-+	BT_DBG("%s: Set Controller UART speed to %d bit/s", hdev->name, speed);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc18, sizeof(param), param,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: failed to write update baudrate command (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return PTR_ERR(skb);
++	for (i = 0; devtypes[i].type[0]; i++) {
++		if (!strcmp(devtypes[i].type, dev_type))
++			found = true;
 +	}
 +
-+	if (skb->data[0]) {
-+		u8 evt_status = skb->data[0];
++	if (!found)
++		return -EINVAL;
 +
-+		BT_ERR("%s: write update baudrate event failed (%02x)",
-+		       hdev->name, evt_status);
-+		kfree_skb(skb);
-+		return -bt_to_errno(evt_status);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	if (!hu->tty) {
-+		BT_ERR("%s: Can't set host baud rate", hdev->name);
-+		return -EIO;
-+	}
-+
-+	ktermios = hu->tty->termios;
-+	ktermios.c_cflag &= ~CBAUD;
-+	ktermios.c_cflag |= BOTHER;
-+	tty_termios_encode_baud_rate(&ktermios, speed, speed);
-+
-+	tty_set_termios(hu->tty, &ktermios);
-+
-+	BT_DBG("%s: New tty speed: %d", hdev->name, hu->tty->termios.c_ispeed);
++	strncpy(hu->dev_type, dev_type, size);
 +
 +	return 0;
 +}
 +
- static const struct firmware *hci_bcm_get_fw(struct hci_uart *hu,
- 						const char *fwname)
- {
-@@ -223,15 +308,41 @@ int hci_bcm_setup(struct hci_uart *hu)
+ /* hci_uart_tty_ioctl()
+  *
+  *    Process IOCTL system call for the tty device.
+@@ -565,6 +609,12 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file * file,
+ 	case HCIUARTGETFLAGS:
+ 		return hu->hdev_flags;
  
- 	fw = hci_bcm_get_fw(hu, fwname);
- 	if (fw) {
-+		struct ktermios ktermios;
-+		speed_t init_speed = hu->tty->termios.c_ispeed;
++	case HCIUARTSETDEVTYPE:
++		err = hci_tty_ioctl_set_devtype(hu, cmd, arg);
++		if (err)
++			return err;
++		break;
 +
-+		BT_DBG("%s: tty speed: %d",
-+		       hu->hdev->name, hu->tty->termios.c_ispeed);
-+
-+		if (hu->speed) {
-+			err = hci_bcm_set_speed(hu, hu->speed);
-+			if (err)
-+				goto failed;
-+		}
-+
- 		err = hci_bcm_load_firmware(hu, fw);
- 		if (err)
- 			goto failed;
+ 	default:
+ 		err = n_tty_ioctl_helper(tty, file, cmd, arg);
+ 		break;
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 074ed29..bd56409 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -33,6 +33,7 @@
+ #define HCIUARTGETDEVICE	_IOR('U', 202, int)
+ #define HCIUARTSETFLAGS		_IOW('U', 203, int)
+ #define HCIUARTGETFLAGS		_IOR('U', 204, int)
++#define HCIUARTSETDEVTYPE	_IOW('U', 205, int)
  
-+		/* Controller speed has been reset to default speed */
-+		if (hu->speed) {
-+			ktermios = hu->tty->termios;
-+			tty_termios_encode_baud_rate(&ktermios, init_speed,
-+						     init_speed);
-+			tty_set_termios(hu->tty, &ktermios);
-+
-+			BT_DBG("%s: New tty speed: %d",
-+			       hu->hdev->name, hu->tty->termios.c_ispeed);
-+		}
-+
- 		err = hci_bcm_reset(hu);
- 		if (err)
- 			goto failed;
- 	}
+ /* UART protocols */
+ #define HCI_UART_MAX_PROTO	6
+@@ -50,6 +51,8 @@
+ #define HCI_UART_INIT_PENDING	3
+ #define HCI_UART_EXT_CONFIG	4
  
-+	if (hu->speed)
-+		err = hci_bcm_set_speed(hu, hu->speed);
++#define HCI_UART_DEVTYPE_SIZE	32
 +
- failed:
- 	if (fw)
- 		release_firmware(fw);
+ struct hci_uart;
+ 
+ struct hci_uart_proto {
+@@ -68,6 +71,7 @@ struct hci_uart {
+ 	struct hci_dev		*hdev;
+ 	unsigned long		flags;
+ 	unsigned long		hdev_flags;
++	char			dev_type[HCI_UART_DEVTYPE_SIZE];
+ 
+ 	struct work_struct	init_ready;
+ 	struct work_struct	write_work;
 -- 
 1.9.1
 
