@@ -2,51 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v9 12/12] core: Only start Advertising Manager when experimental
-Date: Thu,  2 Apr 2015 11:59:28 -0700
-Message-Id: <1428001168-32822-13-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v9 11/12] gdbus: Add g_dbus_get_flags function
+Date: Thu,  2 Apr 2015 11:59:27 -0700
+Message-Id: <1428001168-32822-12-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1428001168-32822-1-git-send-email-jamuraa@chromium.org>
 References: <1428001168-32822-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Check the experimental flag, there is no value in starting the
-Advertising Manager when there is no method for advertising.
-
-This also makes startup quieter when experimental is not set.
+The g_dbus_get_flags function enables detection of when the
+G_DBUS_FLAG_ENABLE_EXPERIMENTAL is set.
 ---
- src/adapter.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ gdbus/gdbus.h  | 1 +
+ gdbus/object.c | 5 +++++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index ccc67fc..7ffd302 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7334,16 +7334,14 @@ static int adapter_register(struct btd_adapter *adapter)
- 		return -EINVAL;
- 	}
+diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+index 9814838..d99c254 100644
+--- a/gdbus/gdbus.h
++++ b/gdbus/gdbus.h
+@@ -216,6 +216,7 @@ struct GDBusSecurityTable {
+ 	.flags = G_DBUS_SIGNAL_FLAG_EXPERIMENTAL
  
--	/* Don't start advertising managers on non-LE controllers. */
--	if (adapter->supported_settings & MGMT_SETTING_LE) {
--		adapter->adv_manager = btd_advertising_manager_new(adapter);
--
--		/* LEAdvertisingManager1 is experimental so optional */
--		if (!adapter->adv_manager)
--			error("Failed to register LEAdvertisingManager1 "
--						"interface for adapter");
--	} else {
--		info("Not starting LEAdvertisingManager, LE not supported");
-+	if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
-+		/* Don't start advertising managers on non-LE controllers. */
-+		if (adapter->supported_settings & MGMT_SETTING_LE) {
-+			adapter->adv_manager =
-+					btd_advertising_manager_new(adapter);
-+		} else {
-+			info("LEAdvertisingManager skipped, LE unavailable");
-+		}
- 	}
+ void g_dbus_set_flags(int flags);
++int g_dbus_get_flags(void);
  
- 	db = btd_gatt_database_get_db(adapter->database);
+ gboolean g_dbus_register_interface(DBusConnection *connection,
+ 					const char *path, const char *name,
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 4d5a64c..b62c062 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -1816,3 +1816,8 @@ void g_dbus_set_flags(int flags)
+ {
+ 	global_flags = flags;
+ }
++
++int g_dbus_get_flags(void)
++{
++	return global_flags;
++}
 -- 
 2.2.0.rc0.207.ga3a616c
 
