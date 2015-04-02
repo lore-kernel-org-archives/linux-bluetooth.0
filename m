@@ -1,61 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
-To: linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	peter@hurleysoftware.com
-Subject: [Patch] tty: Re-add external interface for tty_set_termios()
-Date: Fri,  3 Apr 2015 12:03:15 +0200
-Message-Id: <1428055395-10648-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25R4KzZCQZg=1mTbgbUL5LepRjA_POCOi+Z6is+x0Zv59Q@mail.gmail.com>
+References: <1428001168-32822-1-git-send-email-jamuraa@chromium.org>
+	<1428001168-32822-13-git-send-email-jamuraa@chromium.org>
+	<CAHrH25R4KzZCQZg=1mTbgbUL5LepRjA_POCOi+Z6is+x0Zv59Q@mail.gmail.com>
+Date: Thu, 2 Apr 2015 16:59:14 -0700
+Message-ID: <CAHrH25TQZ8_+_hT=VJtLPETxzm0ohXYPxKbwFyJBZzbHiNVWOw@mail.gmail.com>
+Subject: Re: [BlueZ v9 12/12] core: Only start Advertising Manager when experimental
+From: Arman Uguray <armansito@chromium.org>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a partial revert of patch "tty: Remove external interface for
-tty_set_termios()" from Peter Hurley (2015-01-25 SHA1 632f32e2107) to
-set tty_set_termios() publicly available.
+Hi Michael,
 
-This will be needed by Bluetooth hci_uart module to be able to change
-Bluetooth controller and local UART speed during vendor specific
-initialization.
+> On Thu, Apr 2, 2015 at 4:19 PM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Michael,
+>
+>> On Thu, Apr 2, 2015 at 11:59 AM, Michael Janssen <jamuraa@chromium.org> wrote:
+>> Check the experimental flag, there is no value in starting the
+>> Advertising Manager when there is no method for advertising.
+>>
+>> This also makes startup quieter when experimental is not set.
+>> ---
+>>  src/adapter.c | 18 ++++++++----------
+>>  1 file changed, 8 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/src/adapter.c b/src/adapter.c
+>> index ccc67fc..7ffd302 100644
+>> --- a/src/adapter.c
+>> +++ b/src/adapter.c
+>> @@ -7334,16 +7334,14 @@ static int adapter_register(struct btd_adapter *adapter)
+>>                 return -EINVAL;
+>>         }
+>>
+>> -       /* Don't start advertising managers on non-LE controllers. */
+>> -       if (adapter->supported_settings & MGMT_SETTING_LE) {
+>> -               adapter->adv_manager = btd_advertising_manager_new(adapter);
+>> -
+>> -               /* LEAdvertisingManager1 is experimental so optional */
+>> -               if (!adapter->adv_manager)
+>> -                       error("Failed to register LEAdvertisingManager1 "
+>> -                                               "interface for adapter");
+>> -       } else {
+>> -               info("Not starting LEAdvertisingManager, LE not supported");
+>> +       if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
+>
+> I think this check for experimental is not necessary. I'd just
+> silently fail here here and perhaps just add a TODO saying that we
+> should log an error when this moves out of experimental. We probably
+> don't need to add a g_dbus_get_flags function just for this case.
+>
+>> +               /* Don't start advertising managers on non-LE controllers. */
+>> +               if (adapter->supported_settings & MGMT_SETTING_LE) {
+>> +                       adapter->adv_manager =
+>> +                                       btd_advertising_manager_new(adapter);
+>> +               } else {
+>> +                       info("LEAdvertisingManager skipped, LE unavailable");
+>> +               }
+>>         }
+>>
+>>         db = btd_gatt_database_get_db(adapter->database);
+>> --
+>> 2.2.0.rc0.207.ga3a616c
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> I'm going to test these patches and then probably apply patches 1-10
+> if nobody else objects. I can add the TODO to log error here myself
+> and perhaps just log DBG for now if we fail to create the manager.
+>
+> Thanks,
+> Arman
 
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
----
- drivers/tty/tty_ioctl.c | 3 ++-
- include/linux/tty.h     | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+Actually I changed my mind, I'm fine with this. As long as the others
+are OK with adding g_dbus_get_flags, I have no objections to these
+last two patches.
 
-diff --git a/drivers/tty/tty_ioctl.c b/drivers/tty/tty_ioctl.c
-index 632fc81..8e53fe4 100644
---- a/drivers/tty/tty_ioctl.c
-+++ b/drivers/tty/tty_ioctl.c
-@@ -536,7 +536,7 @@ EXPORT_SYMBOL(tty_termios_hw_change);
-  *	Locking: termios_rwsem
-  */
- 
--static int tty_set_termios(struct tty_struct *tty, struct ktermios *new_termios)
-+int tty_set_termios(struct tty_struct *tty, struct ktermios *new_termios)
- {
- 	struct ktermios old_termios;
- 	struct tty_ldisc *ld;
-@@ -569,6 +569,7 @@ static int tty_set_termios(struct tty_struct *tty, struct ktermios *new_termios)
- 	up_write(&tty->termios_rwsem);
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(tty_set_termios);
- 
- /**
-  *	set_termios		-	set termios values for a tty
-diff --git a/include/linux/tty.h b/include/linux/tty.h
-index 358a337..fe5623c 100644
---- a/include/linux/tty.h
-+++ b/include/linux/tty.h
-@@ -491,6 +491,7 @@ static inline speed_t tty_get_baud_rate(struct tty_struct *tty)
- 
- extern void tty_termios_copy_hw(struct ktermios *new, struct ktermios *old);
- extern int tty_termios_hw_change(struct ktermios *a, struct ktermios *b);
-+extern int tty_set_termios(struct tty_struct *tty, struct ktermios *kt);
- 
- extern struct tty_ldisc *tty_ldisc_ref(struct tty_struct *);
- extern void tty_ldisc_deref(struct tty_ldisc *);
--- 
-1.9.1
-
+Thanks,
+Arman
