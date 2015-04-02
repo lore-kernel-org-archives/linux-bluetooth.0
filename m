@@ -1,63 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH v5 0/7] Bluetooth: New callback type for HCI requests
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1427971273-14881-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 2 Apr 2015 07:21:48 -0700
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <49E82AAD-BD54-43B8-B3AD-8D8D09560427@holtmann.org>
-References: <1427971273-14881-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH 03/28] shared/gatt-client: Expose gatt_db
+Date: Thu, 02 Apr 2015 16:20:26 +0200
+Message-ID: <3161016.OXAJy3G5XP@leonov>
+In-Reply-To: <1427906444-11769-4-git-send-email-mariusz.skamra@tieto.com>
+References: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com> <1427906444-11769-4-git-send-email-mariusz.skamra@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Mariusz,
 
-> v5: rebased (and tested) against latest bluetooth-next.git
-> v4: rebased (and tested) against latest bluetooth-next.git
-> v3: Make skb callback consistent with hci_cmd_sync_ev() semantics
-> v2: rebased (and tested) against latest bluetooth-next.git
+On Wednesday 01 of April 2015 18:40:19 Mariusz Skamra wrote:
+> This patch adds the bt_gatt_client_get_db function, which allows
+> to get a reference to db from client structure. This is useful
+> when as a client we need to have an access db, to explore some
+> attributes.
+> ---
+>  src/shared/gatt-client.c | 8 ++++++++
+>  src/shared/gatt-client.h | 1 +
+>  2 files changed, 9 insertions(+)
 > 
-> Original cover letter:
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 729bd87..877abea 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -1760,6 +1760,14 @@ uint16_t bt_gatt_client_get_mtu(struct bt_gatt_client
+> *client) return bt_att_get_mtu(client->att);
+>  }
 > 
-> This patch set adds a new callback type for HCI requests which allows
-> passing the resulting command completion skb to the callback for further
-> parsing. The set also converts the first two users for this new API,
-> namely the synchronous requests as well as reading local OOB data.
-> 
-> The tricky part with passing the skb was the fact that typically HCI
-> request callbacks are done after all other hci_event.c processing, while
-> the skb we want to pass to the callback should be in pristine form (i.e.
-> no skb_pull() or other modifications that hci_event.c handlers may do).
-> To solve this the patches create a prestine copy of the skb with
-> skb_clone() in the beginning of hci_event_packet() and move the callback
-> access to a single place at the end of this function.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (7):
->      Bluetooth: Add clarifying comment to command status handling
->      Bluetooth: Add second hci_request callback option for full skb
->      Bluetooth: Convert hci_req_sync family of function to new request API
->      Bluetooth: Remove unneeded recv_event variable
->      Bluetooth: Remove unused hci_req_pending() function
->      Bluetooth: Move hci_get_cmd_complete() to hci_event.c
->      Bluetooth: Convert local OOB data reading to use HCI request
-> 
-> include/net/bluetooth/bluetooth.h |   3 +
-> include/net/bluetooth/hci_core.h  |   7 +-
-> net/bluetooth/hci_core.c          | 114 +++++++--------------------
-> net/bluetooth/hci_event.c         | 150 +++++++++++++++++++++++++-----------
-> net/bluetooth/hci_request.c       |  14 +++-
-> net/bluetooth/hci_request.h       |   5 +-
-> net/bluetooth/mgmt.c              | 105 +++++++++++++++----------
-> 7 files changed, 220 insertions(+), 178 deletions(-)
+> +struct gatt_db *bt_gatt_client_get_db(struct bt_gatt_client *client)
+> +{
+> +	if (!client || !client->db)
+> +		return 0;
 
-all 7 patches have been applied to bluetooth-next tree.
+Should be NULL instead of 0. I wonder why GCC didn't warn on this since
+Wint-to-pointer-cast is enabled by default.
 
-Regards
+> +
+> +	return gatt_db_ref(client->db);
 
-Marcel
+I'd leave getting reference to the user instead of doing this implicitly in 
+bt_gatt_client_get_db.
 
+> +}
+> +
+>  static bool match_req_id(const void *a, const void *b)
+>  {
+>  	const struct request *req = a;
+> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+> index 8e5e0f5..f539a61 100644
+> --- a/src/shared/gatt-client.h
+> +++ b/src/shared/gatt-client.h
+> @@ -70,6 +70,7 @@ bool bt_gatt_client_set_debug(struct bt_gatt_client
+> *client, bt_gatt_client_destroy_func_t destroy);
+> 
+>  uint16_t bt_gatt_client_get_mtu(struct bt_gatt_client *client);
+> +struct gatt_db *bt_gatt_client_get_db(struct bt_gatt_client *client);
+> 
+>  bool bt_gatt_client_cancel(struct bt_gatt_client *client, unsigned int id);
+> bool bt_gatt_client_cancel_all(struct bt_gatt_client *client);
+
+-- 
+BR
+Szymon Janc
