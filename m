@@ -1,56 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [RFC 3/5] Bluetooth: hci_uart: Add HCIUARTSETBAUDRATE ioctl
+Subject: Re: [RFC 4/5] tty: Re-add external interface for tty_set_termios()
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1427985456-31536-4-git-send-email-frederic.danis@linux.intel.com>
-Date: Thu, 2 Apr 2015 08:12:37 -0700
+In-Reply-To: <1427985456-31536-5-git-send-email-frederic.danis@linux.intel.com>
+Date: Thu, 2 Apr 2015 08:08:59 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5B2C0E42-6EE3-4B82-94FA-01A1E4FEE9F6@holtmann.org>
-References: <1427985456-31536-1-git-send-email-frederic.danis@linux.intel.com> <1427985456-31536-4-git-send-email-frederic.danis@linux.intel.com>
+Message-Id: <5D684794-B7FF-4A1A-A2F4-54BA4EA5F501@holtmann.org>
+References: <1427985456-31536-1-git-send-email-frederic.danis@linux.intel.com> <1427985456-31536-5-git-send-email-frederic.danis@linux.intel.com>
 To: Frederic Danis <frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
-> This allows user space application to set final speed requested for UART
-> device. UART port is open at init speed by user space application.
+> This is needed by Bluetooth hci_uart module to be able to change speed
+> of Bluetooth controller and local UART.
 > 
 > Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 > ---
-> drivers/bluetooth/hci_ldisc.c | 4 ++++
-> drivers/bluetooth/hci_uart.h  | 2 ++
-> 2 files changed, 6 insertions(+)
+> drivers/tty/tty_ioctl.c | 3 ++-
+> include/linux/tty.h     | 1 +
+> 2 files changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index e8412f8..4b09369 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -614,6 +614,10 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file * file,
-> 	case HCIUARTGETFLAGS:
-> 		return hu->hdev_flags;
+> diff --git a/drivers/tty/tty_ioctl.c b/drivers/tty/tty_ioctl.c
+> index 632fc81..8e53fe4 100644
+> --- a/drivers/tty/tty_ioctl.c
+> +++ b/drivers/tty/tty_ioctl.c
+> @@ -536,7 +536,7 @@ EXPORT_SYMBOL(tty_termios_hw_change);
+>  *	Locking: termios_rwsem
+>  */
 > 
-> +	case HCIUARTSETBAUDRATE:
-> +		hu->speed = arg;
-> +		break;
-> +
-> 	case HCIUARTSETDEVTYPE:
-> 		err = hci_tty_ioctl_set_devtype(hu, cmd, arg);
-> 		if (err)
-> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-> index bf6f0e5..dcbedaf 100644
-> --- a/drivers/bluetooth/hci_uart.h
-> +++ b/drivers/bluetooth/hci_uart.h
-> @@ -34,6 +34,7 @@
-> #define HCIUARTSETFLAGS		_IOW('U', 203, int)
-> #define HCIUARTGETFLAGS		_IOR('U', 204, int)
-> #define HCIUARTSETDEVTYPE	_IOW('U', 205, int)
-> +#define HCIUARTSETBAUDRATE	_IOW('U', 206, int)
+> -static int tty_set_termios(struct tty_struct *tty, struct ktermios *new_termios)
+> +int tty_set_termios(struct tty_struct *tty, struct ktermios *new_termios)
+> {
+> 	struct ktermios old_termios;
+> 	struct tty_ldisc *ld;
+> @@ -569,6 +569,7 @@ static int tty_set_termios(struct tty_struct *tty, struct ktermios *new_termios)
+> 	up_write(&tty->termios_rwsem);
+> 	return 0;
+> }
+> +EXPORT_SYMBOL_GPL(tty_set_termios);
 
-lets do a combination of SET and GET here. We want to be able readout the the baudrate configured as well.
-
-The only question I have is we want to do some enumeration or the plain baud rate value. Any thoughts on this?
+can you send this one to the Linux TTY mailing list first to get at least an Ack from Greg KH on this.
 
 Regards
 
