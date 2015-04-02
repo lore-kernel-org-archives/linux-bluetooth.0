@@ -1,94 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH ] core/gatt: Parse InProgress error code from err_msg
-Date: Thu, 02 Apr 2015 14:56:23 +0530
-Message-id: <1427966783-15629-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <0ACB7B57-AFF2-47DE-9839-923BF8318DE5@holtmann.org>
+References: <1427898255-27496-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<1427898255-27496-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<0ACB7B57-AFF2-47DE-9839-923BF8318DE5@holtmann.org>
+Date: Thu, 2 Apr 2015 10:40:56 +0200
+Message-ID: <CAMv5GbefideNi55Gu_xATQs_Pu+A6-Lmm6_PSiUTS2p=09PRqA@mail.gmail.com>
+Subject: Re: [PATCH v4 4/4] Bluetooth: bnep: Handle BNEP connection setup request
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In Common Profile and Service Error Code descriptions (Supplement
-to Bluetooth Core Specification, sections 1.2 and 2), it is
-mentioned that following error codes are sent over the Attribute
-Protocol.
-1)Client Characteristic Configuration Descriptor Improperly Configured(0xFD)
-2)Procedure Already in Progress(0xFE)
-3)Out of Range(0xFF)
+Hi Marcel,
 
-It should be treated as ATT Error codes. So, moved those to att-types.h
-and handled org.bluez.Error.InProgress.
----
- src/gatt-database.c    |  4 +++-
- src/shared/att-types.h | 10 ++++++++++
- src/shared/att.c       | 10 ----------
- 3 files changed, 13 insertions(+), 11 deletions(-)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index bbeb7cd..fd456e5 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -1441,7 +1441,6 @@ static bool parse_primary(GDBusProxy *proxy, bool *primary)
- 
- static uint8_t dbus_error_to_att_ecode(const char *error_name)
- {
--	/* TODO: Parse error ATT ecode from error_message */
- 
- 	if (strcmp(error_name, "org.bluez.Error.Failed") == 0)
- 		return 0x80;  /* For now return this "application error" */
-@@ -1455,6 +1454,9 @@ static uint8_t dbus_error_to_att_ecode(const char *error_name)
- 	if (strcmp(error_name, "org.bluez.Error.InvalidValueLength") == 0)
- 		return BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
- 
-+	if (strcmp(error_name, "org.bluez.Error.InProgress") == 0)
-+		return BT_ERROR_ALREADY_IN_PROGRESS;
-+
- 	return 0;
- }
- 
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index aa7f0da..10a42f2 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -92,6 +92,16 @@ struct bt_att_pdu_error_rsp {
- #define BT_ATT_ERROR_INSUFFICIENT_RESOURCES		0x11
- 
- /*
-+ * Common Profile and Service Error Code descriptions (see Supplement to the
-+ * Bluetooth Core Specification, sections 1.2 and 2). The error codes within
-+ * 0xE0-0xFC are reserved for future use. The remaining 3 are defined as the
-+ * following:
-+ */
-+#define BT_ERROR_CCC_IMPROPERLY_CONFIGURED      0xfd
-+#define BT_ERROR_ALREADY_IN_PROGRESS            0xfe
-+#define BT_ERROR_OUT_OF_RANGE                   0xff
-+
-+/*
-  * ATT attribute permission bitfield values. Permissions are grouped as
-  * "Access", "Encryption", "Authentication", and "Authorization". A bitmask of
-  * permissions is a byte that encodes a combination of these.
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 422cc2c..b920eb8 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -43,16 +43,6 @@
- #define ATT_OP_SIGNED_MASK		0x80
- #define ATT_TIMEOUT_INTERVAL		30000  /* 30000 ms */
- 
--/*
-- * Common Profile and Service Error Code descriptions (see Supplement to the
-- * Bluetooth Core Specification, sections 1.2 and 2). The error codes within
-- * 0xE0-0xFC are reserved for future use. The remaining 3 are defined as the
-- * following:
-- */
--#define BT_ERROR_CCC_IMPROPERLY_CONFIGURED	0xfd
--#define BT_ERROR_ALREADY_IN_PROGRESS		0xfe
--#define BT_ERROR_OUT_OF_RANGE			0xff
--
- /* Length of signature in write signed packet */
- #define BT_ATT_SIGNATURE_LEN		12
- 
--- 
-1.9.1
-
+On 1 April 2015 at 22:28, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Grzegorz,
+>
+>> With this patch kernel will be able to handle setup request. This is
+>> needed if we would like to handle control mesages with extension
+>> headers. User space will be only resposible for reading setup data and
+>> checking if scenario is conformance to specification (dst and src device
+>> bnep role). In case of new user space, setup data must be leaved(peek
+>> msg) on queue. New bnep session will be responsible for handling this
+>> data.
+>>
+>> Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+>> ---
+>> net/bluetooth/bnep/bnep.h |  3 +++
+>> net/bluetooth/bnep/core.c | 10 +++++++++-
+>> net/bluetooth/bnep/sock.c |  2 +-
+>> 3 files changed, 13 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
+>> index 8709733..40854c9 100644
+>> --- a/net/bluetooth/bnep/bnep.h
+>> +++ b/net/bluetooth/bnep/bnep.h
+>> @@ -113,6 +113,9 @@ struct bnep_ext_hdr {
+>> #define BNEPGETCONNINFO       _IOR('B', 211, int)
+>> #define BNEPGETSUPPFEAT       _IOR('B', 212, int)
+>>
+>> +#define BNEP_SETUP_RESPONSE  0
+>> +#define BNEP_SETUP_RSP_SENT  10
+>> +
+>> struct bnep_connadd_req {
+>>       int   sock;             /* Connected socket */
+>>       __u32 flags;
+>> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+>> index 77ae725..2135b89 100644
+>> --- a/net/bluetooth/bnep/core.c
+>> +++ b/net/bluetooth/bnep/core.c
+>> @@ -231,7 +231,14 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+>>               break;
+>>
+>>       case BNEP_SETUP_CONN_REQ:
+>> -             err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP, BNEP_CONN_NOT_ALLOWED);
+>> +             /* Successful response should be sent only once */
+>> +             if (test_bit(BNEP_SETUP_RESPONSE, &s->flags) &&
+>> +                 !test_and_set_bit(BNEP_SETUP_RSP_SENT, &s->flags))
+>> +                     err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
+>> +                                         BNEP_SUCCESS);
+>> +             else
+>> +                     err = bnep_send_rsp(s, BNEP_SETUP_CONN_RSP,
+>> +                                         BNEP_CONN_NOT_ALLOWED);
+>>               break;
+>>
+>>       default: {
+>> @@ -592,6 +599,7 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+>>       s->sock  = sock;
+>>       s->role  = req->role;
+>>       s->state = BT_CONNECTED;
+>> +     s->flags = req->flags & (1 << BNEP_SETUP_RESPONSE);
+>
+> Use BIT() here as well.
+>
+> However this is not really what I asked for. What I asked for was to actually reject any flags that do not have 0 or BIT(0) set. I mean you would just create a mask for this.
+>
+Sorry, I've must misunderstood you. So now I'll rebase on your "mask
+bnep flags" patch and set valid_flags to BIT(BNEP_SETUP_RESPONSE) with
+session flags set to BIT(BNEP_SETUP_RESPONSE) also - is it ok ?
+>>       s->msg.msg_flags = MSG_NOSIGNAL;
+>>
+>> diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
+>> index f18b6bd..116e7d3 100644
+>> --- a/net/bluetooth/bnep/sock.c
+>> +++ b/net/bluetooth/bnep/sock.c
+>> @@ -58,7 +58,7 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
+>>       struct socket *nsock;
+>>       void __user *argp = (void __user *)arg;
+>>       int err;
+>> -     const __u32 supp_feat = 0;
+>> +     const __u32 supp_feat = BIT(BNEP_SETUP_RESPONSE);
+>>
+>>
+>>       BT_DBG("cmd %x arg %lx", cmd, arg);
+>
+> Regards
+>
+> Marcel
+>
+Regards,
+Grzegorz
