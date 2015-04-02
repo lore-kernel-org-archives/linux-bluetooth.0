@@ -1,42 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/5] lib/uuid: Modify bt_uuid_to_le return value to uuid len
-Date: Thu,  2 Apr 2015 13:15:26 +0200
-Message-Id: <1427973328-22329-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1427973328-22329-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1427973328-22329-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 1/5] lib/uuid: Add uuid conversion to 16 bit uuid
+Date: Thu,  2 Apr 2015 13:15:24 +0200
+Message-Id: <1427973328-22329-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch modifies return value of bt_uuid_to_le function to uuid
-length in case of successful conversion.
+This patch allows to cut bluetooth base if it's bluetooth base uuid.
+If the uuid is bluetooth base, src uuid can be converted, otherwise
+error is returned.
 ---
- lib/uuid.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ lib/uuid.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ lib/uuid.h |  1 +
+ 2 files changed, 45 insertions(+)
 
 diff --git a/lib/uuid.c b/lib/uuid.c
-index d2ad66d..b962adf 100644
+index fd61968..d2ad66d 100644
 --- a/lib/uuid.c
 +++ b/lib/uuid.c
-@@ -343,7 +343,7 @@ int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
+@@ -73,6 +73,34 @@ static void bt_uuid32_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst)
+ 	memcpy(&dst->value.u128.data[BASE_UUID32_OFFSET], &be32, sizeof(be32));
+ }
+ 
++static int bt_uuid128_to_uuid16(const bt_uuid_t *src, bt_uuid_t *dst)
++{
++	if (memcmp(&src->value.u128.data, &bluetooth_base_uuid.data, 2) ||
++					memcmp(&src->value.u128.data[4],
++					&bluetooth_base_uuid.data[4], 12))
++		return -EINVAL;
++
++	dst->type = BT_UUID16;
++
++	memcpy(&dst->value.u16, &src->value.u128.data[BASE_UUID16_OFFSET],
++							sizeof(uint16_t));
++
++	return 0;
++}
++
++static int bt_uuid32_to_uuid16(const bt_uuid_t *src, bt_uuid_t *dst)
++{
++	/* Bluetooth base have zeroized first two bytes */
++	if (src->value.u32 & 0xffff0000)
++		return -EINVAL;
++
++	dst->type = BT_UUID16;
++
++	dst->value.u16 = src->value.u32 & 0x0000ffff;
++
++	return 0;
++}
++
+ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst)
+ {
  	switch (src->type) {
- 	case BT_UUID16:
- 		bt_put_le16(src->value.u16, dst);
--		return 0;
-+		return sizeof(src->value.u16);
- 	case BT_UUID32:
- 		bt_uuid32_to_uuid128(src, &uuid);
- 		src = &uuid;
-@@ -351,7 +351,7 @@ int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
- 	case BT_UUID128:
- 		/* Convert from 128-bit BE to LE */
- 		bswap_128(&src->value.u128, dst);
--		return 0;
-+		return sizeof(src->value.u128);
- 	case BT_UUID_UNSPEC:
- 	default:
- 		return -EINVAL;
+@@ -91,6 +119,22 @@ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst)
+ 	}
+ }
+ 
++int bt_uuid_to_uuid16(const bt_uuid_t *src, bt_uuid_t *dst)
++{
++	switch (src->type) {
++	case BT_UUID128:
++		return bt_uuid128_to_uuid16(src, dst);
++	case BT_UUID32:
++		return bt_uuid32_to_uuid16(src, dst);
++	case BT_UUID16:
++		*dst = *src;
++		return 0;
++	case BT_UUID_UNSPEC:
++	default:
++		return -EINVAL;
++	}
++}
++
+ static int bt_uuid128_cmp(const bt_uuid_t *u1, const bt_uuid_t *u2)
+ {
+ 	return memcmp(&u1->value.u128, &u2->value.u128, sizeof(uint128_t));
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 2dcfe9e..26f8532 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -161,6 +161,7 @@ int bt_uuid128_create(bt_uuid_t *btuuid, uint128_t value);
+ 
+ int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2);
+ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
++int bt_uuid_to_uuid16(const bt_uuid_t *src, bt_uuid_t *dst);
+ 
+ #define MAX_LEN_UUID_STR 37
+ 
 -- 
 2.1.0
 
