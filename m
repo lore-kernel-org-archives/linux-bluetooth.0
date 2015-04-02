@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 2/3] btattach: Add SetBaudRate ioctl call
-Date: Thu,  2 Apr 2015 16:38:02 +0200
-Message-Id: <1427985483-31580-3-git-send-email-frederic.danis@linux.intel.com>
+Subject: [RFC 1/3] btattach: Add SetDevType ioctl call
+Date: Thu,  2 Apr 2015 16:38:01 +0200
+Message-Id: <1427985483-31580-2-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1427985483-31580-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1427985483-31580-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -11,31 +11,30 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- tools/btattach.c  | 22 ++++++++++++++++++----
+ tools/btattach.c  | 22 +++++++++++++++++-----
  tools/hciattach.h |  1 +
- 2 files changed, 19 insertions(+), 4 deletions(-)
+ 2 files changed, 18 insertions(+), 5 deletions(-)
 
 diff --git a/tools/btattach.c b/tools/btattach.c
-index 63620e4..d97429e 100644
+index b7948a3..63620e4 100644
 --- a/tools/btattach.c
 +++ b/tools/btattach.c
-@@ -106,7 +106,8 @@ static void local_version_callback(const void *data, uint8_t size,
+@@ -106,7 +106,7 @@ static void local_version_callback(const void *data, uint8_t size,
  }
  
  static int attach_proto(const char *path, unsigned int proto,
--					unsigned int flags, const char *type)
-+					unsigned int flags, const char *type,
-+					unsigned int speed)
+-						unsigned int flags)
++					unsigned int flags, const char *type)
  {
  	int fd, dev_id;
  
-@@ -128,6 +129,14 @@ static int attach_proto(const char *path, unsigned int proto,
- 		}
+@@ -120,6 +120,14 @@ static int attach_proto(const char *path, unsigned int proto,
+ 		return -1;
  	}
  
-+	if (speed) {
-+		if (ioctl(fd, HCIUARTSETBAUDRATE, speed) < 0) {
-+			perror("Failed to set speed");
++	if (type) {
++		if (ioctl(fd, HCIUARTSETDEVTYPE, type) < 0) {
++			perror("Failed to set device type");
 +			close(fd);
 +			return -1;
 +		}
@@ -44,68 +43,69 @@ index 63620e4..d97429e 100644
  	if (ioctl(fd, HCIUARTSETPROTO, proto) < 0) {
  		perror("Failed to set protocol");
  		close(fd);
-@@ -202,6 +211,7 @@ static const struct option main_options[] = {
+@@ -193,6 +201,7 @@ static void usage(void)
+ static const struct option main_options[] = {
  	{ "bredr",   required_argument, NULL, 'B' },
  	{ "amp",     required_argument, NULL, 'A' },
- 	{ "type",    required_argument, NULL, 't' },
-+	{ "speed",   required_argument, NULL, 's' },
++	{ "type",    required_argument, NULL, 't' },
  	{ "version", no_argument,       NULL, 'v' },
  	{ "help",    no_argument,       NULL, 'h' },
  	{ }
-@@ -210,6 +220,7 @@ static const struct option main_options[] = {
+@@ -200,7 +209,7 @@ static const struct option main_options[] = {
+ 
  int main(int argc, char *argv[])
  {
- 	const char *bredr_path = NULL, *amp_path = NULL, *type = NULL;
-+	unsigned int speed = 0;
+-	const char *bredr_path = NULL, *amp_path = NULL;
++	const char *bredr_path = NULL, *amp_path = NULL, *type = NULL;
  	bool raw_device = false;
  	sigset_t mask;
  	int exit_status, count = 0;
-@@ -217,7 +228,7 @@ int main(int argc, char *argv[])
+@@ -208,7 +217,7 @@ int main(int argc, char *argv[])
  	for (;;) {
  		int opt;
  
--		opt = getopt_long(argc, argv, "B:A:t:Rvh",
-+		opt = getopt_long(argc, argv, "B:A:t:s:Rvh",
+-		opt = getopt_long(argc, argv, "B:A:Rvh",
++		opt = getopt_long(argc, argv, "B:A:t:Rvh",
  						main_options, NULL);
  		if (opt < 0)
  			break;
-@@ -229,6 +240,9 @@ int main(int argc, char *argv[])
+@@ -220,6 +229,9 @@ int main(int argc, char *argv[])
  		case 'A':
  			amp_path = optarg;
  			break;
-+		case 's':
-+			speed = atoi(optarg);
++		case 't':
++			type = optarg;
 +			break;
- 		case 't':
- 			type = optarg;
+ 		case 'R':
+ 			raw_device = true;
  			break;
-@@ -270,7 +284,7 @@ int main(int argc, char *argv[])
+@@ -258,7 +270,7 @@ int main(int argc, char *argv[])
  		if (raw_device)
  			flags = (1 << HCI_UART_RAW_DEVICE);
  
--		fd = attach_proto(bredr_path, HCI_UART_H4, flags, type);
-+		fd = attach_proto(bredr_path, HCI_UART_H4, flags, type, speed);
+-		fd = attach_proto(bredr_path, HCI_UART_H4, flags);
++		fd = attach_proto(bredr_path, HCI_UART_H4, flags, type);
  		if (fd >= 0) {
  			mainloop_add_fd(fd, 0, uart_callback, NULL, NULL);
  			count++;
-@@ -289,7 +303,7 @@ int main(int argc, char *argv[])
+@@ -277,7 +289,7 @@ int main(int argc, char *argv[])
  		if (raw_device)
  			flags = (1 << HCI_UART_RAW_DEVICE);
  
--		fd = attach_proto(amp_path, HCI_UART_H4, flags, type);
-+		fd = attach_proto(amp_path, HCI_UART_H4, flags, type, speed);
+-		fd = attach_proto(amp_path, HCI_UART_H4, flags);
++		fd = attach_proto(amp_path, HCI_UART_H4, flags, type);
  		if (fd >= 0) {
  			mainloop_add_fd(fd, 0, uart_callback, NULL, NULL);
  			count++;
 diff --git a/tools/hciattach.h b/tools/hciattach.h
-index 8a199e9..2a084f7 100644
+index 2aaf075..8a199e9 100644
 --- a/tools/hciattach.h
 +++ b/tools/hciattach.h
-@@ -33,6 +33,7 @@
+@@ -32,6 +32,7 @@
+ #define HCIUARTGETDEVICE	_IOR('U', 202, int)
  #define HCIUARTSETFLAGS		_IOW('U', 203, int)
  #define HCIUARTGETFLAGS		_IOR('U', 204, int)
- #define HCIUARTSETDEVTYPE	_IOW('U', 205, int)
-+#define HCIUARTSETBAUDRATE	_IOW('U', 206, int)
++#define HCIUARTSETDEVTYPE	_IOW('U', 205, int)
  
  #define HCI_UART_H4	0
  #define HCI_UART_BCSP	1
