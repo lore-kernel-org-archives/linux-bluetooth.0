@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 02/28] android/hog: Introduce bt_gatt_client
-Date: Thu, 02 Apr 2015 16:17:32 +0200
-Message-ID: <713993885.Yr0x8UAtWy@leonov>
-In-Reply-To: <1427906444-11769-3-git-send-email-mariusz.skamra@tieto.com>
-References: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com> <1427906444-11769-3-git-send-email-mariusz.skamra@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mariusz Skamra <mariusz.skamra@gmail.com>
+Subject: Re: [PATCH 01/28] android/hidhost: Create bt_gatt_client
+Date: Thu, 02 Apr 2015 16:16:17 +0200
+Message-ID: <52890061.YpcNOg0Lq6@leonov>
+In-Reply-To: <1427906444-11769-2-git-send-email-mariusz.skamra@tieto.com>
+References: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com> <1427906444-11769-2-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,215 +15,195 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mariusz,
 
-On Wednesday 01 of April 2015 18:40:18 Mariusz Skamra wrote:
-> This patch introduces bt_gatt_client to HoG. Service handle will be used
-> to obtain the attribute from cached database.
-> ---
->  android/hidhost.c |  4 ++--
->  android/hog.c     | 30 +++++++++++++++++++++---------
->  android/hog.h     |  6 +++---
->  unit/test-hog.c   |  4 ++--
->  4 files changed, 28 insertions(+), 16 deletions(-)
+On Wednesday 01 of April 2015 18:40:17 Mariusz Skamra wrote:
+> From: Mariusz Skamra <mariusz.skamra@gmail.com>
 > 
+> This patch introduces bt_gatt_client to be used by HoG profile.
+> As long as the android/gatt doesn't use bt_gatt_client, initialization
+> can be performed here.
+> ---
+>  android/Android.mk |  2 ++
+>  android/hidhost.c  | 75
+> +++++++++++++++++++++++++++++++++++++++++++++--------- 2 files changed, 65
+> insertions(+), 12 deletions(-)
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index f218805..b9dd1c8 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -72,6 +72,8 @@ LOCAL_SRC_FILES := \
+>  	bluez/src/shared/crypto.c \
+>  	bluez/src/shared/uhid.c \
+>  	bluez/src/shared/att.c \
+> +	bluez/src/shared/gatt-helpers.c \
+> +	bluez/src/shared/gatt-client.c \
+>  	bluez/src/sdpd-database.c \
+>  	bluez/src/sdpd-service.c \
+>  	bluez/src/sdpd-request.c \
 > diff --git a/android/hidhost.c b/android/hidhost.c
-> index 3da1130..47e5840 100644
+> index 729b884..3da1130 100644
 > --- a/android/hidhost.c
 > +++ b/android/hidhost.c
-> @@ -818,7 +818,7 @@ static void client_ready_cb(bool success, uint8_t
-> att_ecode, void *user_data) goto fail;
->  	}
+> @@ -36,15 +36,22 @@
 > 
-> -	if (!bt_hog_attach(dev->hog, dev->attrib)) {
-> +	if (!bt_hog_attach(dev->hog, dev->attrib, dev->client)) {
->  		error("HoG: unable to attach");
->  		goto fail;
->  	}
-> @@ -864,7 +864,7 @@ static void hog_conn_cb(const bdaddr_t *addr, int err,
-> void *attrib) if (!dev->hog) {
->  		/* TODO: Get device details */
->  		dev->hog = bt_hog_new_default("bluez-input-device", dev->vendor,
-> -					dev->product, dev->version, NULL);
-> +					dev->product, dev->version, NULL, 0);
->  		if (!dev->hog) {
->  			error("HoG: unable to create session");
->  			goto fail;
-> diff --git a/android/hog.c b/android/hog.c
-> index ff77bb3..5b8c079 100644
-> --- a/android/hog.c
-> +++ b/android/hog.c
-> @@ -45,6 +45,9 @@
+>  #include "btio/btio.h"
+>  #include "lib/bluetooth.h"
+> +#include "lib/uuid.h"
+>  #include "lib/sdp.h"
+>  #include "lib/sdp_lib.h"
+>  #include "src/shared/mgmt.h"
+> +#include "src/shared/queue.h"
 >  #include "src/shared/util.h"
 >  #include "src/shared/uhid.h"
->  #include "src/shared/queue.h"
 > +#include "src/shared/att.h"
 > +#include "src/shared/gatt-db.h"
 > +#include "src/shared/gatt-client.h"
+>  #include "src/sdp-client.h"
+>  #include "src/uuid-helper.h"
 >  #include "src/log.h"
 > 
->  #include "attrib/att.h"
-> @@ -79,6 +82,7 @@
-> 
->  struct bt_hog {
->  	int			ref_count;
-> +	uint16_t		service_handle;
->  	char			*name;
->  	uint16_t		vendor;
->  	uint16_t		product;
-> @@ -103,6 +107,7 @@ struct bt_hog {
->  	struct queue		*bas;
->  	GSList			*instances;
->  	struct queue		*gatt_op;
-> +	struct bt_gatt_client	*client;
+> +#include "attrib/gattrib.h"
+> +
+>  #include "hal-msg.h"
+>  #include "ipc-common.h"
+>  #include "ipc.h"
+> @@ -113,6 +120,9 @@ struct hid_device {
+>  	uint8_t		last_hid_msg;
+>  	struct bt_hog	*hog;
+>  	int		sec_level;
+> +	GAttrib		*attrib;
+> +	struct gatt_db	*db;
+> +	struct bt_gatt_client *client;
 >  };
 > 
->  struct report {
-> @@ -1173,14 +1178,15 @@ static void hog_free(void *data)
+>  static int device_cmp(gconstpointer s, gconstpointer user_data)
+> @@ -142,8 +152,15 @@ static void hid_device_free(void *data)
+>  	if (dev->uhid)
+>  		bt_uhid_unref(dev->uhid);
 > 
->  struct bt_hog *bt_hog_new_default(const char *name, uint16_t vendor,
->  					uint16_t product, uint16_t version,
-> -					void *primary)
-> +					void *primary, uint16_t service_handle)
->  {
-> -	return bt_hog_new(-1, name, vendor, product, version, primary);
-> +	return bt_hog_new(-1, name, vendor, product, version, primary,
-> +								service_handle);
->  }
-> 
->  struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
->  					uint16_t product, uint16_t version,
-> -					void *primary)
-> +					void *primary, uint16_t service_handle)
->  {
->  	struct bt_hog *hog;
-> 
-> @@ -1211,6 +1217,9 @@ struct bt_hog *bt_hog_new(int fd, const char *name,
-> uint16_t vendor, if (primary)
->  		hog->primary = g_memdup(primary, sizeof(*hog->primary));
-> 
-> +	if (service_handle)
-> +		hog->service_handle = service_handle;
+> -	if (dev->hog)
+> +	if (dev->hog) {
+>  		bt_hog_unref(dev->hog);
+> +		dev->hog = NULL;
+> +	}
+
+dev is freed few lines later so setting dev->hog to NULL shouldn't be needed.
+
 > +
->  	return bt_hog_ref(hog);
+> +	if (dev->db) {
+> +		gatt_db_unref(dev->db);
+> +		dev->db = NULL;
+> +	}
+
+Same here.
+
+> 
+>  	g_free(dev->rd_data);
+>  	g_free(dev);
+> @@ -792,10 +809,37 @@ fail:
+>  	hid_device_remove(dev);
 >  }
 > 
-> @@ -1321,14 +1330,14 @@ static void hog_attach_hog(struct bt_hog *hog,
-> struct gatt_primary *primary) }
-> 
->  	instance = bt_hog_new(hog->uhid_fd, hog->name, hog->vendor,
-> -					hog->product, hog->version, primary);
-> +					hog->product, hog->version, primary, 0);
->  	if (!instance)
->  		return;
-> 
->  	find_included(instance, hog->attrib, primary->range.start,
->  			primary->range.end, find_included_cb, instance);
-> 
-> -	bt_hog_attach(instance, hog->attrib);
-> +	bt_hog_attach(instance, hog->attrib, hog->client);
->  	hog->instances = g_slist_append(hog->instances, instance);
->  }
-> 
-> @@ -1377,15 +1386,16 @@ static void primary_cb(uint8_t status, GSList
-> *services, void *user_data) }
->  }
-> 
-> -bool bt_hog_attach(struct bt_hog *hog, void *gatt)
-> +bool bt_hog_attach(struct bt_hog *hog, void *gatt, void *client)
+> +static void client_ready_cb(bool success, uint8_t att_ecode, void
+> *user_data) +{
+> +	struct hid_device *dev = user_data;
+> +
+> +	if (!success) {
+> +		error("HoG: client not ready");
+> +		goto fail;
+> +	}
+> +
+> +	if (!bt_hog_attach(dev->hog, dev->attrib)) {
+> +		error("HoG: unable to attach");
+> +		goto fail;
+> +	}
+> +
+> +	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
+> +
+> +	if (!bt_gatt_add_autoconnect(hog_app, &dev->dst))
+> +		error("HoG: Could not add to autoconnect list");
+> +
+> +	return;
+> +fail:
+> +	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
+> +	hid_device_remove(dev);
+> +}
+> +
+>  static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
 >  {
->  	struct gatt_primary *primary = hog->primary;
 >  	GSList *l;
+>  	struct hid_device *dev;
+> +	struct bt_att *att;
+> +	uint16_t mtu;
 > 
-> -	if (hog->attrib)
-> +	if (hog->attrib || hog->client)
->  		return false;
+>  	l = g_slist_find_custom(devices, addr, device_cmp);
+>  	dev = l ? l->data : NULL;
+> @@ -807,6 +851,8 @@ static void hog_conn_cb(const bdaddr_t *addr, int err,
+> void *attrib) bt_hid_notify_state(dev,
+>  						HAL_HIDHOST_STATE_DISCONNECTED);
+>  			bt_hog_detach(dev->hog);
+> +			bt_gatt_client_unref(dev->client);
+> +			g_attrib_unref(dev->attrib);
+
+Shouldn't we NULL those to avoid dangling pointers?
+
+>  			return;
+>  		}
+>  		goto fail;
+> @@ -816,34 +862,39 @@ static void hog_conn_cb(const bdaddr_t *addr, int err,
+> void *attrib) dev = hid_device_new(addr);
 > 
->  	hog->attrib = g_attrib_ref(gatt);
-> +	hog->client = bt_gatt_client_ref(client);
+>  	if (!dev->hog) {
+> -		/* TODO: Get device details and primary */
+> +		/* TODO: Get device details */
+>  		dev->hog = bt_hog_new_default("bluez-input-device", dev->vendor,
+>  					dev->product, dev->version, NULL);
+>  		if (!dev->hog) {
+>  			error("HoG: unable to create session");
+>  			goto fail;
+>  		}
+> -	}
 > 
->  	if (!primary) {
->  		discover_primary(hog, hog->attrib, NULL, primary_cb, hog);
-> @@ -1403,7 +1413,7 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
->  	for (l = hog->instances; l; l = l->next) {
->  		struct bt_hog *instance = l->data;
-> 
-> -		bt_hog_attach(instance, gatt);
-> +		bt_hog_attach(instance, gatt, client);
+> -	if (!bt_hog_attach(dev->hog, attrib)) {
+> -		error("HoG: unable to attach");
+> -		goto fail;
+> +		dev->db = gatt_db_new();
+> +		if (!dev->db) {
+> +			error("HoG: unable to create gatt_db");
+> +			goto fail;
+> +		}
 >  	}
 > 
->  	if (hog->reports == NULL) {
-> @@ -1429,7 +1439,7 @@ void bt_hog_detach(struct bt_hog *hog)
->  {
->  	GSList *l;
+> -	if (!bt_gatt_set_security(addr, BT_IO_SEC_MEDIUM)) {
+> +	att = g_attrib_get_att(attrib);
+> +	dev->attrib = g_attrib_ref(attrib);
+> +	mtu = bt_att_get_mtu(att);
+> +
+> +	/* Enable encryption before gatt_client starts discovering services */
+> +	if (!bt_att_set_sec_level(att, BT_SECURITY_MEDIUM)) {
+>  		error("Failed to set security level");
+>  		goto fail;
+>  	}
 > 
-> -	if (!hog->attrib)
-> +	if (!hog->attrib || !hog->client)
->  		return;
+>  	DBG("");
 > 
->  	queue_foreach(hog->bas, (void *) bt_bas_detach, NULL);
-> @@ -1456,7 +1466,9 @@ void bt_hog_detach(struct bt_hog *hog)
->  		bt_dis_detach(hog->dis);
-> 
->  	queue_foreach(hog->gatt_op, (void *) cancel_gatt_req, NULL);
-> +	bt_gatt_client_unref(hog->client);
->  	g_attrib_unref(hog->attrib);
-> +	hog->client = NULL;
->  	hog->attrib = NULL;
+> -	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
+> -
+> -	if (!bt_gatt_add_autoconnect(hog_app, &dev->dst))
+> -		error("hidhost: Could not add to autoconnect list");
+> +	dev->client = bt_gatt_client_new(dev->db, att, mtu);
 
-Usually we do this like:
-unref(foo);
-foo = NULL;
+This can return NULL.
 
-unref(bar);
-bar = NULL;
-
->  }
 > 
-> diff --git a/android/hog.h b/android/hog.h
-> index 2a9b899..61d756c 100644
-> --- a/android/hog.h
-> +++ b/android/hog.h
-> @@ -25,16 +25,16 @@ struct bt_hog;
-> 
->  struct bt_hog *bt_hog_new_default(const char *name, uint16_t vendor,
->  					uint16_t product, uint16_t version,
-> -					void *primary);
-> +					void *primary, uint16_t service_handle);
-> 
->  struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
->  					uint16_t product, uint16_t version,
-> -					void *primary);
-> +					void *primary, uint16_t service_handle);
-> 
->  struct bt_hog *bt_hog_ref(struct bt_hog *hog);
->  void bt_hog_unref(struct bt_hog *hog);
-> 
-> -bool bt_hog_attach(struct bt_hog *hog, void *gatt);
-> +bool bt_hog_attach(struct bt_hog *hog, void *gatt, void *client);
->  void bt_hog_detach(struct bt_hog *hog);
-> 
->  int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
-> diff --git a/unit/test-hog.c b/unit/test-hog.c
-> index 2a25d09..c7c64e4 100644
-> --- a/unit/test-hog.c
-> +++ b/unit/test-hog.c
-> @@ -196,7 +196,7 @@ static struct context *create_context(gconstpointer
-> data) fd = open("/dev/null", O_WRONLY | O_CLOEXEC);
->  	g_assert(fd > 0);
-> 
-> -	context->hog = bt_hog_new(fd, name, vendor, product, version, NULL);
-> +	context->hog = bt_hog_new(fd, name, vendor, product, version, NULL, 0);
->  	g_assert(context->hog);
-> 
->  	channel = g_io_channel_unix_new(sv[1]);
-> @@ -222,7 +222,7 @@ static void test_hog(gconstpointer data)
->  {
->  	struct context *context = create_context(data);
-> 
-> -	g_assert(bt_hog_attach(context->hog, context->attrib));
-> +	g_assert(bt_hog_attach(context->hog, context->attrib, NULL));
->  }
-> 
->  int main(int argc, char *argv[])
+> +	/* Wait until client is initialized */
+> +	bt_gatt_client_set_ready_handler(dev->client, client_ready_cb,
+> +								dev, NULL);
+>  	return;
+> -
+>  fail:
+>  	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
+>  	hid_device_remove(dev);
 
 -- 
 BR
