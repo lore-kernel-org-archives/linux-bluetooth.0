@@ -1,210 +1,239 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mariusz Skamra <mariusz.skamra@gmail.com>
-Subject: Re: [PATCH 01/28] android/hidhost: Create bt_gatt_client
-Date: Thu, 02 Apr 2015 16:16:17 +0200
-Message-ID: <52890061.YpcNOg0Lq6@leonov>
-In-Reply-To: <1427906444-11769-2-git-send-email-mariusz.skamra@tieto.com>
-References: <1427906444-11769-1-git-send-email-mariusz.skamra@tieto.com> <1427906444-11769-2-git-send-email-mariusz.skamra@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH] monitor: Add initial support for BNEP
+Date: Thu, 02 Apr 2015 17:02:05 +0530
+Message-id: <1427974325-3280-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+> ACL Data RX: Handle 71 flags 0x02 dlen 11                                                                                                                                                 [hci0] 17.739883
+      Channel: 64 len 7 [PSM 15 mode 0] {chan 0}
+      BNEP: Control (0x01|0)
+        01 02 11 16 11 15                                ......
 
-On Wednesday 01 of April 2015 18:40:17 Mariusz Skamra wrote:
-> From: Mariusz Skamra <mariusz.skamra@gmail.com>
-> 
-> This patch introduces bt_gatt_client to be used by HoG profile.
-> As long as the android/gatt doesn't use bt_gatt_client, initialization
-> can be performed here.
-> ---
->  android/Android.mk |  2 ++
->  android/hidhost.c  | 75
-> +++++++++++++++++++++++++++++++++++++++++++++--------- 2 files changed, 65
-> insertions(+), 12 deletions(-)
-> 
-> diff --git a/android/Android.mk b/android/Android.mk
-> index f218805..b9dd1c8 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -72,6 +72,8 @@ LOCAL_SRC_FILES := \
->  	bluez/src/shared/crypto.c \
->  	bluez/src/shared/uhid.c \
->  	bluez/src/shared/att.c \
-> +	bluez/src/shared/gatt-helpers.c \
-> +	bluez/src/shared/gatt-client.c \
->  	bluez/src/sdpd-database.c \
->  	bluez/src/sdpd-service.c \
->  	bluez/src/sdpd-request.c \
-> diff --git a/android/hidhost.c b/android/hidhost.c
-> index 729b884..3da1130 100644
-> --- a/android/hidhost.c
-> +++ b/android/hidhost.c
-> @@ -36,15 +36,22 @@
-> 
->  #include "btio/btio.h"
->  #include "lib/bluetooth.h"
-> +#include "lib/uuid.h"
->  #include "lib/sdp.h"
->  #include "lib/sdp_lib.h"
->  #include "src/shared/mgmt.h"
-> +#include "src/shared/queue.h"
->  #include "src/shared/util.h"
->  #include "src/shared/uhid.h"
-> +#include "src/shared/att.h"
-> +#include "src/shared/gatt-db.h"
-> +#include "src/shared/gatt-client.h"
->  #include "src/sdp-client.h"
->  #include "src/uuid-helper.h"
->  #include "src/log.h"
-> 
-> +#include "attrib/gattrib.h"
-> +
->  #include "hal-msg.h"
->  #include "ipc-common.h"
->  #include "ipc.h"
-> @@ -113,6 +120,9 @@ struct hid_device {
->  	uint8_t		last_hid_msg;
->  	struct bt_hog	*hog;
->  	int		sec_level;
-> +	GAttrib		*attrib;
-> +	struct gatt_db	*db;
-> +	struct bt_gatt_client *client;
->  };
-> 
->  static int device_cmp(gconstpointer s, gconstpointer user_data)
-> @@ -142,8 +152,15 @@ static void hid_device_free(void *data)
->  	if (dev->uhid)
->  		bt_uhid_unref(dev->uhid);
-> 
-> -	if (dev->hog)
-> +	if (dev->hog) {
->  		bt_hog_unref(dev->hog);
-> +		dev->hog = NULL;
-> +	}
+> ACL Data RX: Handle 71 flags 0x01 dlen 35                                                                                                                                                [hci0] 175.293028
+      Channel: 64 len 1532 [PSM 15 mode 0] {chan 0}
+      BNEP: General Ethernet (0x00|1)
+        00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 0f  ................
+        05 00 0c 03 00 00 20 00 00 03 00 00 20 00 00 3c  ...... ..... ..<
 
-dev is freed few lines later so setting dev->hog to NULL shouldn't be needed.
+> ACL Data RX: Handle 71 flags 0x01 dlen 12                                                                                                                                                [hci0] 145.825018
+      Channel: 64 len 1509 [PSM 15 mode 0] {chan 0}
+      BNEP: Compressed Ethernet Dest Only (0x04|0)
+        00 00 00 00 00 00 08 00 3c 3b 3a 39 38 37 36 35  ........<;:98765
+        34 33 32 31 30 2f 2e 2d 2c 2b 2a 29 28 27 26 25  43210/.-,+*)('&%
+---
+ Makefile.tools     |   1 +
+ android/Android.mk |   1 +
+ monitor/bnep.c     | 116 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ monitor/bnep.h     |  25 ++++++++++++
+ monitor/l2cap.c    |   4 ++
+ 5 files changed, 147 insertions(+)
+ create mode 100644 monitor/bnep.c
+ create mode 100644 monitor/bnep.h
 
-> +
-> +	if (dev->db) {
-> +		gatt_db_unref(dev->db);
-> +		dev->db = NULL;
-> +	}
-
-Same here.
-
-> 
->  	g_free(dev->rd_data);
->  	g_free(dev);
-> @@ -792,10 +809,37 @@ fail:
->  	hid_device_remove(dev);
->  }
-> 
-> +static void client_ready_cb(bool success, uint8_t att_ecode, void
-> *user_data) +{
-> +	struct hid_device *dev = user_data;
-> +
-> +	if (!success) {
-> +		error("HoG: client not ready");
-> +		goto fail;
-> +	}
-> +
-> +	if (!bt_hog_attach(dev->hog, dev->attrib)) {
-> +		error("HoG: unable to attach");
-> +		goto fail;
-> +	}
-> +
-> +	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
-> +
-> +	if (!bt_gatt_add_autoconnect(hog_app, &dev->dst))
-> +		error("HoG: Could not add to autoconnect list");
-> +
-> +	return;
-> +fail:
-> +	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
-> +	hid_device_remove(dev);
-> +}
-> +
->  static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
->  {
->  	GSList *l;
->  	struct hid_device *dev;
-> +	struct bt_att *att;
-> +	uint16_t mtu;
-> 
->  	l = g_slist_find_custom(devices, addr, device_cmp);
->  	dev = l ? l->data : NULL;
-> @@ -807,6 +851,8 @@ static void hog_conn_cb(const bdaddr_t *addr, int err,
-> void *attrib) bt_hid_notify_state(dev,
->  						HAL_HIDHOST_STATE_DISCONNECTED);
->  			bt_hog_detach(dev->hog);
-> +			bt_gatt_client_unref(dev->client);
-> +			g_attrib_unref(dev->attrib);
-
-Shouldn't we NULL those to avoid dangling pointers?
-
->  			return;
->  		}
->  		goto fail;
-> @@ -816,34 +862,39 @@ static void hog_conn_cb(const bdaddr_t *addr, int err,
-> void *attrib) dev = hid_device_new(addr);
-> 
->  	if (!dev->hog) {
-> -		/* TODO: Get device details and primary */
-> +		/* TODO: Get device details */
->  		dev->hog = bt_hog_new_default("bluez-input-device", dev->vendor,
->  					dev->product, dev->version, NULL);
->  		if (!dev->hog) {
->  			error("HoG: unable to create session");
->  			goto fail;
->  		}
-> -	}
-> 
-> -	if (!bt_hog_attach(dev->hog, attrib)) {
-> -		error("HoG: unable to attach");
-> -		goto fail;
-> +		dev->db = gatt_db_new();
-> +		if (!dev->db) {
-> +			error("HoG: unable to create gatt_db");
-> +			goto fail;
-> +		}
->  	}
-> 
-> -	if (!bt_gatt_set_security(addr, BT_IO_SEC_MEDIUM)) {
-> +	att = g_attrib_get_att(attrib);
-> +	dev->attrib = g_attrib_ref(attrib);
-> +	mtu = bt_att_get_mtu(att);
-> +
-> +	/* Enable encryption before gatt_client starts discovering services */
-> +	if (!bt_att_set_sec_level(att, BT_SECURITY_MEDIUM)) {
->  		error("Failed to set security level");
->  		goto fail;
->  	}
-> 
->  	DBG("");
-> 
-> -	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
-> -
-> -	if (!bt_gatt_add_autoconnect(hog_app, &dev->dst))
-> -		error("hidhost: Could not add to autoconnect list");
-> +	dev->client = bt_gatt_client_new(dev->db, att, mtu);
-
-This can return NULL.
-
-> 
-> +	/* Wait until client is initialized */
-> +	bt_gatt_client_set_ready_handler(dev->client, client_ready_cb,
-> +								dev, NULL);
->  	return;
-> -
->  fail:
->  	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
->  	hid_device_remove(dev);
-
+diff --git a/Makefile.tools b/Makefile.tools
+index b8dd90a..b37b774 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -28,6 +28,7 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+ 				monitor/sdp.h monitor/sdp.c \
+ 				monitor/avctp.h monitor/avctp.c \
+ 				monitor/rfcomm.h monitor/rfcomm.c \
++				monitor/bnep.h monitor/bnep.c \
+ 				monitor/uuid.h monitor/uuid.c \
+ 				monitor/hwdb.h monitor/hwdb.c \
+ 				monitor/keys.h monitor/keys.c \
+diff --git a/android/Android.mk b/android/Android.mk
+index f218805..880e3ba 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -340,6 +340,7 @@ LOCAL_SRC_FILES := \
+ 	bluez/monitor/l2cap.c \
+ 	bluez/monitor/avctp.c \
+ 	bluez/monitor/rfcomm.c \
++	bluez/monitor/bnep.c \
+ 	bluez/monitor/uuid.c \
+ 	bluez/monitor/sdp.c \
+ 	bluez/monitor/vendor.c \
+diff --git a/monitor/bnep.c b/monitor/bnep.c
+new file mode 100644
+index 0000000..1450f85
+--- /dev/null
++++ b/monitor/bnep.c
+@@ -0,0 +1,116 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011-2014  Intel Corporation
++ *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <ctype.h>
++#include <inttypes.h>
++
++#include "lib/bluetooth.h"
++
++#include "src/shared/util.h"
++#include "bt.h"
++#include "packet.h"
++#include "display.h"
++#include "l2cap.h"
++#include "uuid.h"
++#include "keys.h"
++#include "sdp.h"
++#include "bnep.h"
++
++#define GET_PKT_TYPE(type) (type & 0x7f)
++#define GET_EXTENSION(type) (type & 0x80)
++
++struct bnep_frame {
++	uint8_t type;
++	int extension;
++	struct l2cap_frame l2cap_frame;
++};
++
++struct bnep_data {
++	uint8_t type;
++	const char *str;
++};
++
++static const struct bnep_data bnep_table[] = {
++	{ 0x00, "General Ethernet"},
++	{ 0x01, "Control"},
++	{ 0x02, "Compressed Ethernet"},
++	{ 0x03, "Compressed Ethernet Src Only"},
++	{ 0x04, "Compressed Ethernet Dest Only"},
++	{ }
++};
++
++void bnep_packet(const struct l2cap_frame *frame)
++{
++	uint8_t type;
++	struct bnep_frame bnep_frame;
++	struct l2cap_frame *l2cap_frame;
++	const struct bnep_data *bnep_data = NULL;
++	const char *pdu_color, *pdu_str;
++	int i;
++
++	l2cap_frame_pull(&bnep_frame.l2cap_frame, frame, 0);
++	l2cap_frame = &bnep_frame.l2cap_frame;
++
++	if (!l2cap_frame_get_u8(l2cap_frame, &type))
++		goto fail;
++
++	bnep_frame.extension = GET_EXTENSION(type);
++	bnep_frame.type = GET_PKT_TYPE(type);
++
++	for (i = 0; bnep_table[i].str; i++) {
++		if (bnep_table[i].type == bnep_frame.type) {
++			bnep_data = &bnep_table[i];
++			break;
++		}
++	}
++
++	if (bnep_data) {
++		if (frame->in)
++			pdu_color = COLOR_MAGENTA;
++		else
++			pdu_color = COLOR_BLUE;
++		pdu_str = bnep_data->str;
++	} else {
++		pdu_color = COLOR_WHITE_BG;
++		pdu_str = "Unknown packet type";
++	}
++
++	print_indent(6, pdu_color, "BNEP: ", pdu_str, COLOR_OFF,
++				" (0x%02x|%s)", bnep_frame.type,
++				bnep_frame.extension ? "1" : "0");
++
++	packet_hexdump(l2cap_frame->data, l2cap_frame->size);
++	return;
++
++fail:
++	print_text(COLOR_ERROR, "frame too short");
++	packet_hexdump(frame->data, frame->size);
++}
+diff --git a/monitor/bnep.h b/monitor/bnep.h
+new file mode 100644
+index 0000000..38340d6
+--- /dev/null
++++ b/monitor/bnep.h
+@@ -0,0 +1,25 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2011-2014  Intel Corporation
++ *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++void bnep_packet(const struct l2cap_frame *frame);
+diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+index 5faa26f..fc565b1 100644
+--- a/monitor/l2cap.c
++++ b/monitor/l2cap.c
+@@ -43,6 +43,7 @@
+ #include "sdp.h"
+ #include "avctp.h"
+ #include "rfcomm.h"
++#include "bnep.h"
+ 
+ /* L2CAP Control Field bit masks */
+ #define L2CAP_CTRL_SAR_MASK		0xC000
+@@ -2951,6 +2952,9 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
+ 		case 0x0003:
+ 			rfcomm_packet(&frame);
+ 			break;
++		case 0x000f:
++			bnep_packet(&frame);
++			break;
+ 		case 0x001f:
+ 			att_packet(index, in, handle, cid, data, size);
+ 			break;
 -- 
-BR
-Szymon Janc
+1.9.1
+
