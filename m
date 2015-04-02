@@ -1,86 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'BlueZ devel list' <linux-bluetooth@vger.kernel.org>
-Cc: 'Bharat Bhusan Panda' <bharat.panda@samsung.com>
-Subject: Found few memory leaks in gatt-client
-Date: Thu, 02 Apr 2015 15:31:40 +0530
-Message-id: <000a01d06d2c$05c04660$1140d320$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Message-ID: <551D12CD.4080705@gmail.com>
+Date: Thu, 02 Apr 2015 11:58:37 +0200
+From: Florian Grandel <fgrandel@gmail.com>
+MIME-Version: 1.0
+To: Arman Uguray <armansito@chromium.org>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: How to get the hci_dev from an adv instance's work struct in
+ a linked list?
+References: <551CA5BC.5040307@gmail.com> <CAHrH25Tq4cQhiaGu7HnTu1ep1XNd85UJJr-FbcGnyx5c9W9Evw@mail.gmail.com>
+In-Reply-To: <CAHrH25Tq4cQhiaGu7HnTu1ep1XNd85UJJr-FbcGnyx5c9W9Evw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Arman,
 
-Found few memory leaks when testing the prepare write and execute write
-using btgatt-client tool with PTS 6.0.1. Below are the logs for the same.
+it's impressive how responsive you are on this list here. Really cool. :-)
 
-~/latest_bluez/bluez$  MALLOC_CHECK_=3 MALLOC_PERTURB_=69 valgrind
---trace-children=yes --track-origins=yes --show-possibly-lost=no
---leak-check=full -v ./tools/btgatt-client -i hci0 -d 00:1B:DC:07:33:4E
+ >> I got quite far today refactoring from
+>>
+>> struct hci_dev { ... struct adv_info adv_instance; ... };
+>>
+>> to
+>>
+>> struct hci_dev { ... struct list_head adv_instances; ... };
+>>
+>> But in the end I got stuck on refactoring the adv timeout callback.
+>> Originally it looked like this:
+>>
+>> static void adv_timeout_expired(struct work_struct *work)
+>> {
+>>    struct hci_dev *hdev = container_of(work, struct hci_dev,
+>>                                        adv_instance.timeout_exp.work);
+>>    ...
+>> }
+>>
+>> But now I would have to construct a pointer to the hci_dev struct from a
+>> list entry:
+>>
+>> static void adv_timeout_expired(struct work_struct *work)
+>> {
+>>    struct adv_info *adv_instance = container_of(work, struct adv_info,
+>>                                                 timeout_exp.work);
+>>    ...
+>> }
+>>
+>> I couldn't find a way to get the list head of the adv info list entry so
+>> that I could retrieve its containing hci_dev structure, though.
+>>
+>
+> Once simple solution is to add a struct hci_dev pointer to struct
+> adv_info. Once you get the pointer to the instance then you can obtain
+> the hci_dev pointer that way.
 
-[GATT client]# write-prepare -s 0 0x00cd 00 00 03
---18895-- REDIR: 0x4ec2c10 (memchr) redirected to 0x4c2f390 (memchr)
---18895-- REDIR: 0x4ec8780 (__GI_memcpy) redirected to 0x4c2fc90
-(__GI_memcpy)
---18895-- REDIR: 0x4ebe070 (strcmp) redirected to 0x4a25720
-(_vgnU_ifunc_wrapper)
---18895-- REDIR: 0x4eced20 (__strcmp_sse2_unaligned) redirected to 0x4c2f1b0
-(strcmp)
-Prepare write success.
-Session id: 1 to be used on next write
-[GATT client]# Write successful
-[GATT client]# write-execute 1 1 
-[GATT client]# 
-Write successful
-[GATT client]# ^C
+Yes, that's an obvious solution albeit it's a bit ugly as it introduces 
+extra redundancy. I thought of it, too, but I hoped I could avoid it. 
+Maybe I can solve it like that for now and then we see whether another 
+solution emerges once we got the refactored code in front of us.
 
-Shutting down...
-==18895== 
-==18895== HEAP SUMMARY:
-==18895==     in use at exit: 2,862 bytes in 86 blocks
-==18895==   total heap usage: 1,305 allocs, 1,219 frees, 49,976 bytes
-allocated
-==18895== 
-==18895== Searching for pointers to 86 not-freed blocks
-==18895== Checked 91,288 bytes
-==18895== 
-==18895== 46 (40 direct, 6 indirect) bytes in 1 blocks are definitely lost
-in loss record 2 of 4
-==18895==    at 0x4C2CC70: calloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18895==    by 0x4093E0: bt_gatt_client_prepare_write (gatt-client.c:2690)
-==18895==    by 0x4031A7: cmd_write_prepare (btgatt-client.c:1015)
-==18895==    by 0x4028F0: prompt_read_cb (btgatt-client.c:1402)
-==18895==    by 0x40C7B2: mainloop_run (mainloop.c:157)
-==18895==    by 0x401FC4: main (btgatt-client.c:1658)
-==18895== 
-==18895== 2,656 bytes in 83 blocks are definitely lost in loss record 4 of 4
-==18895==    at 0x4C2AB80: malloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==18895==    by 0x40C8D9: mainloop_add_timeout (mainloop.c:327)
-==18895==    by 0x40C342: timeout_add (timeout-mainloop.c:69)
-==18895==    by 0x404AE2: can_write_data (att.c:504)
-==18895==    by 0x40BEDE: io_callback (io-mainloop.c:138)
-==18895==    by 0x40C7B2: mainloop_run (mainloop.c:157)
-==18895==    by 0x401FC4: main (btgatt-client.c:1658)
-==18895== 
-==18895== LEAK SUMMARY:
-==18895==    definitely lost: 2,696 bytes in 84 blocks
-==18895==    indirectly lost: 6 bytes in 1 blocks
-==18895==      possibly lost: 0 bytes in 0 blocks
-==18895==    still reachable: 160 bytes in 1 blocks
-==18895==         suppressed: 0 bytes in 0 blocks
-==18895== Reachable blocks (those to which a pointer was found) are not
-shown.
-==18895== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==18895== 
-==18895== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)
-==18895== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)
-
-git - up-to-date
-gcc - 4.9.2
-
-Regards
-Gowtham Anandha Babu
-
+Florian
