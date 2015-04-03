@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <551E7E40.5030904@hurleysoftware.com>
-Date: Fri, 03 Apr 2015 07:49:20 -0400
-From: Peter Hurley <peter@hurleysoftware.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Prabhu Chawandi <foss.chaws@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] andorid/handsfree.c setting sizeof struct properly for sco_handlers[]
+Date: Fri, 03 Apr 2015 12:59:27 +0200
+Message-ID: <1602721.z7bkgJokoX@leonov>
+In-Reply-To: <CAKafyqr3qcejbQWYQcMDCiOnjTnUC9Di8J0aKzBosm7Ft32vOw@mail.gmail.com>
+References: <CAKafyqr3qcejbQWYQcMDCiOnjTnUC9Di8J0aKzBosm7Ft32vOw@mail.gmail.com>
 MIME-Version: 1.0
-To: Frederic Danis <frederic.danis@linux.intel.com>
-CC: linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Greg KH <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.cz>
-Subject: Re: [Patch] tty: Re-add external interface for tty_set_termios()
-References: <1428055395-10648-1-git-send-email-frederic.danis@linux.intel.com> <551E6BCA.7000807@hurleysoftware.com>
-In-Reply-To: <551E6BCA.7000807@hurleysoftware.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-[ +cc GregKH, JiriS ]
+Hi Prabhu,
 
-On 04/03/2015 06:30 AM, Peter Hurley wrote:
-> Hi Frederic,
-> 
-> On 04/03/2015 06:03 AM, Frederic Danis wrote:
->> This is a partial revert of patch "tty: Remove external interface for
->> tty_set_termios()" from Peter Hurley (2015-01-25 SHA1 632f32e2107) to
->> set tty_set_termios() publicly available.
->>
->> This will be needed by Bluetooth hci_uart module to be able to change
->> Bluetooth controller and local UART speed during vendor specific
->> initialization.
-> 
-> NAK.
-> 
-> 1. Where is this _proposed_ usage?
+On Thursday 02 of April 2015 09:15:14 Prabhu Chawandi wrote:
 
-Found it. RFC series in linux-bluetooth.
+There is typo in commit subject andorid->android
 
+Also please use 'fix' term in commit subject eg
+"android/handsfree: Fix invalid size of SCO_OP_GET_FD parameters"
+
+
+And this patch doesn't apply on top of master branch so you will have to 
+rebase it before resend.
+
+> diff --git a/android/handsfree.c b/android/handsfree.c
+> index 7cdc8b4..e6c4b1b 100644
+> --- a/android/handsfree.c
+> +++ b/android/handsfree.c
+> @@ -2891,7 +2891,7 @@ failed:
+> 
+>  static const struct ipc_handler sco_handlers[] = {
+>         /* SCO_OP_GET_FD */
+> -       { bt_sco_get_fd, false, 0 }
+> +       { bt_sco_get_fd, false, sizeof(struct sco_cmd_get_fd) }
+>  };
+> 
+>  static void bt_sco_unregister(void)
+
+-- 
+BR
+Szymon Janc
