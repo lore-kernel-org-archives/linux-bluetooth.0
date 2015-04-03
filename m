@@ -1,61 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 0/4] Handling extended headers of bnep control frames
-Date: Fri,  3 Apr 2015 12:14:51 +0200
-Message-Id: <1428056095-21978-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Frederic Danis <frederic.danis@linux.intel.com>
+To: linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	peter@hurleysoftware.com
+Subject: [Patch] tty: Re-add external interface for tty_set_termios()
+Date: Fri,  3 Apr 2015 12:03:15 +0200
+Message-Id: <1428055395-10648-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set adds support for handling extended headers of bnep control
-frames which is mandatory. Until now extended headers for control messages was
-ignored.
+This is a partial revert of patch "tty: Remove external interface for
+tty_set_termios()" from Peter Hurley (2015-01-25 SHA1 632f32e2107) to
+set tty_set_termios() publicly available.
 
-Patch [1/4] adds setting of err variable if control message is not understood.
-Patch [2/4] adds additional ioctl for get supported bnep features. This is
-needed for user space to know if handling of sending success setup response
-frame should be handled by kernel or by user space.
-Patch [3/4] adds support for handling extended headers of bnep control frames.
-Patch [4/4] adds support for handling connection setup request.
+This will be needed by Bluetooth hci_uart module to be able to change
+Bluetooth controller and local UART speed during vendor specific
+initialization.
 
-Patch set tested with PTS bnep test cases. No regression, issues found during
-testing.
+Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+---
+ drivers/tty/tty_ioctl.c | 3 ++-
+ include/linux/tty.h     | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-v2.
-- Added ioctl definition to compat_ioctl,
-- Distinct bnep session flags and bnep features.
-
-v3.
-- Splited extended header, connection setup request handling into separated
-	patches,
-- Fixed flags, supported features defines as Marcel pointed,
-- Extended commit messages,
-- Remove copying flags from us to kernel bnep session,
-- Fix setting bnep session bits as Marcel pointed.
-
-v4.
-- Unify internal/us flags usage like in HIDP, CMTP,
-- Refactor send setup response as Marcel suggested,
-- Make supported feature variable as local ioctl variable and set it while
-adding session if required.
-
-v5.
-- Rebase on top of "flags validation check" patch set,
-- Remove blank line style fix,
-- Add session flag setting after validation flag check.
-
-Grzegorz Kolodziejczyk (4):
-  Bluetooth: bnep: Return err value while sending cmd is not understood
-  Bluetooth: bnep: Add support for get bnep features via ioctl
-  Bluetooth: bnep: Add support to extended headers of control frames
-  Bluetooth: bnep: Handle BNEP connection setup request
-
- fs/compat_ioctl.c         |  1 +
- net/bluetooth/bnep/bnep.h |  4 +++
- net/bluetooth/bnep/core.c | 64 ++++++++++++++++++++++++++++++++++++-----------
- net/bluetooth/bnep/sock.c |  7 ++++++
- 4 files changed, 62 insertions(+), 14 deletions(-)
-
+diff --git a/drivers/tty/tty_ioctl.c b/drivers/tty/tty_ioctl.c
+index 632fc81..8e53fe4 100644
+--- a/drivers/tty/tty_ioctl.c
++++ b/drivers/tty/tty_ioctl.c
+@@ -536,7 +536,7 @@ EXPORT_SYMBOL(tty_termios_hw_change);
+  *	Locking: termios_rwsem
+  */
+ 
+-static int tty_set_termios(struct tty_struct *tty, struct ktermios *new_termios)
++int tty_set_termios(struct tty_struct *tty, struct ktermios *new_termios)
+ {
+ 	struct ktermios old_termios;
+ 	struct tty_ldisc *ld;
+@@ -569,6 +569,7 @@ static int tty_set_termios(struct tty_struct *tty, struct ktermios *new_termios)
+ 	up_write(&tty->termios_rwsem);
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(tty_set_termios);
+ 
+ /**
+  *	set_termios		-	set termios values for a tty
+diff --git a/include/linux/tty.h b/include/linux/tty.h
+index 358a337..fe5623c 100644
+--- a/include/linux/tty.h
++++ b/include/linux/tty.h
+@@ -491,6 +491,7 @@ static inline speed_t tty_get_baud_rate(struct tty_struct *tty)
+ 
+ extern void tty_termios_copy_hw(struct ktermios *new, struct ktermios *old);
+ extern int tty_termios_hw_change(struct ktermios *a, struct ktermios *b);
++extern int tty_set_termios(struct tty_struct *tty, struct ktermios *kt);
+ 
+ extern struct tty_ldisc *tty_ldisc_ref(struct tty_struct *);
+ extern void tty_ldisc_deref(struct tty_ldisc *);
 -- 
-2.1.0
+1.9.1
 
