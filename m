@@ -2,94 +2,83 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v10 05/12] core/advertising: Parse ManufacturerSpecificData
-Date: Fri,  3 Apr 2015 15:02:05 -0700
-Message-Id: <1428098532-5257-6-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v10 03/12] core/advertising: Parse ServiceUUIDs
+Date: Fri,  3 Apr 2015 15:02:03 -0700
+Message-Id: <1428098532-5257-4-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 References: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the ManufacturerSpecificData property of the LEAdvertisement1
+Parse the ServiceUUIDs property of the LEAdvertisement1 object.
 ---
- src/advertising.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ src/advertising.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
 diff --git a/src/advertising.c b/src/advertising.c
-index d736ea9..8d6c13e 100644
+index 275e2d7..9867e1e 100644
 --- a/src/advertising.c
 +++ b/src/advertising.c
-@@ -244,6 +244,58 @@ fail:
+@@ -166,6 +166,45 @@ static bool parse_advertising_type(GDBusProxy *proxy, uint8_t *type)
  	return false;
  }
  
-+static bool parse_advertising_manufacturer_data(GDBusProxy *proxy,
-+							struct bt_ad *data)
++static bool parse_advertising_service_uuids(GDBusProxy *proxy,
++					struct bt_ad *data)
 +{
-+	DBusMessageIter iter, entries;
++	DBusMessageIter iter, ariter;
 +
-+	if (!g_dbus_proxy_get_property(proxy, "ManufacturerData", &iter))
++	if (!g_dbus_proxy_get_property(proxy, "ServiceUUIDs", &iter))
 +		return true;
 +
 +	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
 +		return false;
 +
-+	dbus_message_iter_recurse(&iter, &entries);
++	dbus_message_iter_recurse(&iter, &ariter);
 +
-+	bt_ad_clear_manufacturer_data(data);
++	bt_ad_clear_service_uuid(data);
 +
-+	while (dbus_message_iter_get_arg_type(&entries)
-+						== DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter value, entry;
-+		uint16_t manuf_id;
-+		uint8_t *manuf_data;
-+		int len;
++	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
++		const char *uuid_str;
++		bt_uuid_t uuid;
 +
-+		dbus_message_iter_recurse(&entries, &entry);
-+		dbus_message_iter_get_basic(&entry, &manuf_id);
++		dbus_message_iter_get_basic(&ariter, &uuid_str);
 +
-+		dbus_message_iter_next(&entry);
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_ARRAY)
++		DBG("Adding ServiceUUID: %s", uuid_str);
++
++		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
 +			goto fail;
 +
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_BYTE)
++		if (!bt_ad_add_service_uuid(data, &uuid))
 +			goto fail;
 +
-+		dbus_message_iter_get_fixed_array(&value, &manuf_data, &len);
-+
-+		DBG("Adding ManufacturerData for %04x", manuf_id);
-+
-+		if (!bt_ad_add_manufacturer_data(data, manuf_id, manuf_data,
-+									len))
-+			goto fail;
-+
-+		dbus_message_iter_next(&entries);
++		dbus_message_iter_next(&ariter);
 +	}
 +
 +	return true;
 +
 +fail:
-+	bt_ad_clear_manufacturer_data(data);
++	bt_ad_clear_service_uuid(data);
 +	return false;
 +}
 +
  static void refresh_advertisement(struct advertisement *ad)
  {
  	DBG("Refreshing advertisement: %s", ad->path);
-@@ -266,6 +318,11 @@ static bool parse_advertisement(struct advertisement *ad)
+@@ -178,7 +217,12 @@ static bool parse_advertisement(struct advertisement *ad)
  		return false;
  	}
  
-+	if (!parse_advertising_manufacturer_data(ad->proxy, ad->data)) {
-+		error("Property \"ManufacturerData\" failed to parse");
+-	/* TODO: parse the remaining properties into a shared structure */
++	if (!parse_advertising_service_uuids(ad->proxy, ad->data)) {
++		error("Property \"ServiceUUIDs\" failed to parse");
 +		return false;
 +	}
 +
- 	/* TODO: parse the rest of the properties */
++	/* TODO: parse the rest of the properties */
  
  	refresh_advertisement(ad);
+ 
 -- 
 2.2.0.rc0.207.ga3a616c
 
