@@ -2,49 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v10 07/12] Update TODO for LE Advertising
-Date: Fri,  3 Apr 2015 15:02:07 -0700
-Message-Id: <1428098532-5257-8-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v10 11/12] gdbus: Add g_dbus_get_flags function
+Date: Fri,  3 Apr 2015 15:02:11 -0700
+Message-Id: <1428098532-5257-12-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 References: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The g_dbus_get_flags function enables detection of when the
+G_DBUS_FLAG_ENABLE_EXPERIMENTAL is set.
 ---
- TODO | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ gdbus/gdbus.h  | 1 +
+ gdbus/object.c | 5 +++++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/TODO b/TODO
-index 65e19ee..2945392 100644
---- a/TODO
-+++ b/TODO
-@@ -64,16 +64,16 @@ General
- Low Energy
- ==========
+diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+index 9814838..d99c254 100644
+--- a/gdbus/gdbus.h
++++ b/gdbus/gdbus.h
+@@ -216,6 +216,7 @@ struct GDBusSecurityTable {
+ 	.flags = G_DBUS_SIGNAL_FLAG_EXPERIMENTAL
  
--- Advertising management. Adapter interface needs to be changed to manage
--  connection modes, adapter type and advertising policy. See Volume 3,
--  Part C, section 9.3. If Attribute Server is enabled the LE capable
--  adapter shall to start advertising. Further investigation is necessary
--  to define which connectable mode needs to be supported: Non-connectable,
--  directed connectable and undirected connectable. Basically, two connectable
--  scenarios shall be addressed:
--  1. GATT client is disconnected, but intends to become a Peripheral to
--     receive indications/notifications.
--  2. GATT server intends to accept connections.
-+- Connection modes. Adapter interface needs to be changed to manage
-+  connection modes and adapter type. See Volume 3, Part C, section 9.3.
-+  1. Mode management: Peripheral / Central
-+
-+  Priority: Medium
-+  Complexity: C2
-+
-+- Advertising data. The D-Bus interface needs to be updated to enable setting
-+  scan response data, and to read the advertising and scan response data which
-+  has been broadcast from other LE devices.
+ void g_dbus_set_flags(int flags);
++int g_dbus_get_flags(void);
  
-   Priority: Medium
-   Complexity: C2
+ gboolean g_dbus_register_interface(DBusConnection *connection,
+ 					const char *path, const char *name,
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 4d5a64c..b62c062 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -1816,3 +1816,8 @@ void g_dbus_set_flags(int flags)
+ {
+ 	global_flags = flags;
+ }
++
++int g_dbus_get_flags(void)
++{
++	return global_flags;
++}
 -- 
 2.2.0.rc0.207.ga3a616c
 
