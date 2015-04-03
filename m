@@ -2,83 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v10 03/12] core/advertising: Parse ServiceUUIDs
-Date: Fri,  3 Apr 2015 15:02:03 -0700
-Message-Id: <1428098532-5257-4-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v10 02/12] core/advertising: use bt_ad
+Date: Fri,  3 Apr 2015 15:02:02 -0700
+Message-Id: <1428098532-5257-3-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 References: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the ServiceUUIDs property of the LEAdvertisement1 object.
+Start using the newly introduced struct bt_ad API.
 ---
- src/advertising.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
+ src/advertising.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/src/advertising.c b/src/advertising.c
-index 275e2d7..9867e1e 100644
+index 04492f7..275e2d7 100644
 --- a/src/advertising.c
 +++ b/src/advertising.c
-@@ -166,6 +166,45 @@ static bool parse_advertising_type(GDBusProxy *proxy, uint8_t *type)
- 	return false;
- }
+@@ -32,6 +32,7 @@
+ #include "dbus-common.h"
+ #include "error.h"
+ #include "log.h"
++#include "src/shared/ad.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/util.h"
  
-+static bool parse_advertising_service_uuids(GDBusProxy *proxy,
-+					struct bt_ad *data)
-+{
-+	DBusMessageIter iter, ariter;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "ServiceUUIDs", &iter))
-+		return true;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		return false;
-+
-+	dbus_message_iter_recurse(&iter, &ariter);
-+
-+	bt_ad_clear_service_uuid(data);
-+
-+	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
-+		const char *uuid_str;
-+		bt_uuid_t uuid;
-+
-+		dbus_message_iter_get_basic(&ariter, &uuid_str);
-+
-+		DBG("Adding ServiceUUID: %s", uuid_str);
-+
-+		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
-+			goto fail;
-+
-+		if (!bt_ad_add_service_uuid(data, &uuid))
-+			goto fail;
-+
-+		dbus_message_iter_next(&ariter);
-+	}
-+
-+	return true;
-+
-+fail:
-+	bt_ad_clear_service_uuid(data);
-+	return false;
-+}
-+
- static void refresh_advertisement(struct advertisement *ad)
- {
- 	DBG("Refreshing advertisement: %s", ad->path);
-@@ -178,7 +217,12 @@ static bool parse_advertisement(struct advertisement *ad)
- 		return false;
+@@ -54,6 +55,7 @@ struct advertisement {
+ 	GDBusProxy *proxy;
+ 	DBusMessage *reg;
+ 	uint8_t type; /* Advertising type */
++	struct bt_ad *data;
+ };
+ 
+ static bool match_advertisement_path(const void *a, const void *b)
+@@ -73,8 +75,9 @@ static void advertisement_free(void *data)
+ 		g_dbus_client_unref(ad->client);
  	}
  
--	/* TODO: parse the remaining properties into a shared structure */
-+	if (!parse_advertising_service_uuids(ad->proxy, ad->data)) {
-+		error("Property \"ServiceUUIDs\" failed to parse");
-+		return false;
-+	}
+-	if (ad->proxy)
+-		g_dbus_proxy_unref(ad->proxy);
++	bt_ad_unref(ad->data);
 +
-+	/* TODO: parse the rest of the properties */
++	g_dbus_proxy_unref(ad->proxy);
  
- 	refresh_advertisement(ad);
+ 	if (ad->owner)
+ 		g_free(ad->owner);
+@@ -244,6 +247,10 @@ static struct advertisement *advertisement_create(DBusConnection *conn,
  
+ 	ad->reg = dbus_message_ref(msg);
+ 
++	ad->data = bt_ad_new();
++	if (!ad->data)
++		goto fail;
++
+ 	return ad;
+ 
+ fail:
 -- 
 2.2.0.rc0.207.ga3a616c
 
