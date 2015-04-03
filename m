@@ -1,37 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jason Flanagan <jason@bitcircle.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: bluetoothctl Segmentation Fault on confirm
-Date: Fri, 03 Apr 2015 12:51:24 +0200
-Message-ID: <10129831.UNLGbbm0e3@leonov>
-In-Reply-To: <551D879B.7020409@bitcircle.com>
-References: <551D879B.7020409@bitcircle.com>
+Message-ID: <551E6BCA.7000807@hurleysoftware.com>
+Date: Fri, 03 Apr 2015 06:30:34 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+To: Frederic Danis <frederic.danis@linux.intel.com>,
+	linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [Patch] tty: Re-add external interface for tty_set_termios()
+References: <1428055395-10648-1-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1428055395-10648-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jason,
+Hi Frederic,
 
-On Thursday 02 of April 2015 14:16:59 Jason Flanagan wrote:
-> The issue that i'm currently having with BlueZ 5.29 is that when i say
-> no to confirming a passkey i get a "Segmentation Fault". I've tried
-> multiple times on multiple devices and i get the same result.
+On 04/03/2015 06:03 AM, Frederic Danis wrote:
+> This is a partial revert of patch "tty: Remove external interface for
+> tty_set_termios()" from Peter Hurley (2015-01-25 SHA1 632f32e2107) to
+> set tty_set_termios() publicly available.
 > 
-> bluetoothctl
-> [bluetooth]#agent on
-> [bluetooth]#default-agent
-> [bluetooth]# pair XX:XX:XX:XX:XX:XX
-> Attempting to pair with XX:XX:XX:XX:XX:XX
-> [CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
-> Request confirmation
-> [agent] Confirm passkey 080443 (yes/no): no
-> Segmentation fault
+> This will be needed by Bluetooth hci_uart module to be able to change
+> Bluetooth controller and local UART speed during vendor specific
+> initialization.
 
-I'm not able to reproduce this. Could you try running bluetoothctl under 
-valgrind or gdb and provide full backtrace of crash?
+NAK.
 
--- 
-BR
-Szymon Janc
+1. Where is this _proposed_ usage?
+2. The HCI line discipline has no business changing the line rate.
+
+Regards,
+Peter Hurley
