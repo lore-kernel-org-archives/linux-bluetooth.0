@@ -1,83 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 2/4] Bluetooth: bnep: Add support for get bnep features via ioctl
-Date: Fri,  3 Apr 2015 12:14:53 +0200
-Message-Id: <1428056095-21978-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v5 1/4] Bluetooth: bnep: Return err value while sending cmd is not understood
+Date: Fri,  3 Apr 2015 12:14:52 +0200
+Message-Id: <1428056095-21978-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1428056095-21978-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1428056095-21978-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is needed if user space wants to know supported bnep features
-by kernel, e.g. if kernel supports sending response to bnep setup
-control message. By now there is no possibility to know supported
-features by kernel in case of bnep. Ioctls allows only to add connection,
-delete connection, get connection list, get connection info. Adding
-connection if it's possible (establishing network device connection) is
-equivalent to starting bnep session. Bnep session handles data queue of
-transmit, receive messages over bnep channel. It means that if we add
-connection the received/transmitted data will be parsed immediately. In
-case of get bnep features we want to know before session start, if we
-should leave setup data on socket queue and let kernel to handle with it,
-or in case of no setup handling support, if we should pull this message
-and handle setup response within user space.
+Send command not understood response should be verified if it was
+successfully sent, like all send responses.
 
 Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 ---
- fs/compat_ioctl.c         | 1 +
- net/bluetooth/bnep/bnep.h | 1 +
- net/bluetooth/bnep/sock.c | 7 +++++++
- 3 files changed, 9 insertions(+)
+ net/bluetooth/bnep/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
-index afec645..19fb0c8 100644
---- a/fs/compat_ioctl.c
-+++ b/fs/compat_ioctl.c
-@@ -570,6 +570,7 @@ static int mt_ioctl_trans(unsigned int fd, unsigned int cmd, void __user *argp)
- #define BNEPCONNDEL	_IOW('B', 201, int)
- #define BNEPGETCONNLIST	_IOR('B', 210, int)
- #define BNEPGETCONNINFO	_IOR('B', 211, int)
-+#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
- 
- #define CMTPCONNADD	_IOW('C', 200, int)
- #define CMTPCONNDEL	_IOW('C', 201, int)
-diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
-index 5a5b16f..8709733 100644
---- a/net/bluetooth/bnep/bnep.h
-+++ b/net/bluetooth/bnep/bnep.h
-@@ -111,6 +111,7 @@ struct bnep_ext_hdr {
- #define BNEPCONNDEL	_IOW('B', 201, int)
- #define BNEPGETCONNLIST	_IOR('B', 210, int)
- #define BNEPGETCONNINFO	_IOR('B', 211, int)
-+#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
- 
- struct bnep_connadd_req {
- 	int   sock;		/* Connected socket */
-diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
-index 5f05129..5766e6b 100644
---- a/net/bluetooth/bnep/sock.c
-+++ b/net/bluetooth/bnep/sock.c
-@@ -57,6 +57,7 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
- 	struct bnep_conninfo ci;
- 	struct socket *nsock;
- 	void __user *argp = (void __user *)arg;
-+	__u32 supp_feat = 0;
- 	int err;
- 
- 	BT_DBG("cmd %x arg %lx", cmd, arg);
-@@ -120,6 +121,12 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
- 
- 		return err;
- 
-+	case BNEPGETSUPPFEAT:
-+		if (copy_to_user(argp, &supp_feat, sizeof(supp_feat)))
-+			return -EFAULT;
-+
-+		return 0;
-+
- 	default:
- 		return -EINVAL;
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 8287ff4..48bc44a 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -239,7 +239,7 @@ static int bnep_rx_control(struct bnep_session *s, void *data, int len)
+ 			pkt[0] = BNEP_CONTROL;
+ 			pkt[1] = BNEP_CMD_NOT_UNDERSTOOD;
+ 			pkt[2] = cmd;
+-			bnep_send(s, pkt, sizeof(pkt));
++			err = bnep_send(s, pkt, sizeof(pkt));
+ 		}
+ 		break;
  	}
 -- 
 2.1.0
