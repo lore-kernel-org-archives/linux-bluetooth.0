@@ -1,189 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@gmail.com>
-Subject: [PATCHv2 01/27] android/hidhost: Create bt_gatt_client
-Date: Fri,  3 Apr 2015 15:43:30 +0200
-Message-Id: <1428068636-13073-2-git-send-email-mariusz.skamra@tieto.com>
-In-Reply-To: <1428068636-13073-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1428068636-13073-1-git-send-email-mariusz.skamra@tieto.com>
+Message-ID: <551E8C6A.8040009@linux.intel.com>
+Date: Fri, 03 Apr 2015 14:49:46 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+To: Peter Hurley <peter@hurleysoftware.com>
+CC: linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+	jslaby@suse.cz
+Subject: Re: [RFC 3/5] Bluetooth: hci_uart: Add HCIUARTSETBAUDRATE ioctl
+References: <1427985456-31536-1-git-send-email-frederic.danis@linux.intel.com> <1427985456-31536-4-git-send-email-frederic.danis@linux.intel.com> <551E717A.6040500@hurleysoftware.com>
+In-Reply-To: <551E717A.6040500@hurleysoftware.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mariusz Skamra <mariusz.skamra@gmail.com>
+[ +cc GregKH, JiriS ]
 
-This patch introduces bt_gatt_client to be used by HoG profile.
-As long as the android/gatt doesn't use bt_gatt_client, initialization
-can be performed here.
----
- android/Android.mk |  2 ++
- android/hidhost.c  | 75 ++++++++++++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 66 insertions(+), 11 deletions(-)
+On 03/04/2015 12:54, Peter Hurley wrote:
+> On 04/02/2015 10:37 AM, Frederic Danis wrote:
+>> This allows user space application to set final speed requested for UART
+>> device. UART port is open at init speed by user space application.
+>
+> If userspace opened the tty and knows this is a UART, why can it not
+> use the for-purpose tty ioctls to change the line rate?
 
-diff --git a/android/Android.mk b/android/Android.mk
-index f218805..b9dd1c8 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -72,6 +72,8 @@ LOCAL_SRC_FILES := \
- 	bluez/src/shared/crypto.c \
- 	bluez/src/shared/uhid.c \
- 	bluez/src/shared/att.c \
-+	bluez/src/shared/gatt-helpers.c \
-+	bluez/src/shared/gatt-client.c \
- 	bluez/src/sdpd-database.c \
- 	bluez/src/sdpd-service.c \
- 	bluez/src/sdpd-request.c \
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 729b884..26a8013 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -36,15 +36,22 @@
- 
- #include "btio/btio.h"
- #include "lib/bluetooth.h"
-+#include "lib/uuid.h"
- #include "lib/sdp.h"
- #include "lib/sdp_lib.h"
- #include "src/shared/mgmt.h"
-+#include "src/shared/queue.h"
- #include "src/shared/util.h"
- #include "src/shared/uhid.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-client.h"
- #include "src/sdp-client.h"
- #include "src/uuid-helper.h"
- #include "src/log.h"
- 
-+#include "attrib/gattrib.h"
-+
- #include "hal-msg.h"
- #include "ipc-common.h"
- #include "ipc.h"
-@@ -113,6 +120,9 @@ struct hid_device {
- 	uint8_t		last_hid_msg;
- 	struct bt_hog	*hog;
- 	int		sec_level;
-+	GAttrib		*attrib;
-+	struct gatt_db	*db;
-+	struct bt_gatt_client *client;
- };
- 
- static int device_cmp(gconstpointer s, gconstpointer user_data)
-@@ -145,6 +155,9 @@ static void hid_device_free(void *data)
- 	if (dev->hog)
- 		bt_hog_unref(dev->hog);
- 
-+	if (dev->db)
-+		gatt_db_unref(dev->db);
-+
- 	g_free(dev->rd_data);
- 	g_free(dev);
- }
-@@ -792,10 +805,37 @@ fail:
- 	hid_device_remove(dev);
- }
- 
-+static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
-+{
-+	struct hid_device *dev = user_data;
-+
-+	if (!success) {
-+		error("HoG: client not ready");
-+		goto fail;
-+	}
-+
-+	if (!bt_hog_attach(dev->hog, dev->attrib)) {
-+		error("HoG: unable to attach");
-+		goto fail;
-+	}
-+
-+	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
-+
-+	if (!bt_gatt_add_autoconnect(hog_app, &dev->dst))
-+		error("HoG: Could not add to autoconnect list");
-+
-+	return;
-+fail:
-+	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
-+	hid_device_remove(dev);
-+}
-+
- static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
- {
- 	GSList *l;
- 	struct hid_device *dev;
-+	struct bt_att *att;
-+	uint16_t mtu;
- 
- 	l = g_slist_find_custom(devices, addr, device_cmp);
- 	dev = l ? l->data : NULL;
-@@ -807,6 +847,10 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
- 			bt_hid_notify_state(dev,
- 						HAL_HIDHOST_STATE_DISCONNECTED);
- 			bt_hog_detach(dev->hog);
-+			bt_gatt_client_unref(dev->client);
-+			g_attrib_unref(dev->attrib);
-+			dev->attrib = NULL;
-+			dev->client = NULL;
- 			return;
- 		}
- 		goto fail;
-@@ -816,34 +860,43 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
- 		dev = hid_device_new(addr);
- 
- 	if (!dev->hog) {
--		/* TODO: Get device details and primary */
-+		/* TODO: Get device details */
- 		dev->hog = bt_hog_new_default("bluez-input-device", dev->vendor,
- 					dev->product, dev->version, NULL);
- 		if (!dev->hog) {
- 			error("HoG: unable to create session");
- 			goto fail;
- 		}
--	}
- 
--	if (!bt_hog_attach(dev->hog, attrib)) {
--		error("HoG: unable to attach");
--		goto fail;
-+		dev->db = gatt_db_new();
-+		if (!dev->db) {
-+			error("HoG: unable to create gatt_db");
-+			goto fail;
-+		}
- 	}
- 
--	if (!bt_gatt_set_security(addr, BT_IO_SEC_MEDIUM)) {
-+	att = g_attrib_get_att(attrib);
-+	dev->attrib = g_attrib_ref(attrib);
-+	mtu = bt_att_get_mtu(att);
-+
-+	/* Enable encryption before gatt_client starts discovering services */
-+	if (!bt_att_set_sec_level(att, BT_SECURITY_MEDIUM)) {
- 		error("Failed to set security level");
- 		goto fail;
- 	}
- 
- 	DBG("");
- 
--	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
--
--	if (!bt_gatt_add_autoconnect(hog_app, &dev->dst))
--		error("hidhost: Could not add to autoconnect list");
-+	dev->client = bt_gatt_client_new(dev->db, att, mtu);
-+	if (!dev->client) {
-+		error("Failed to create gatt_client");
-+		goto fail;
-+	}
- 
-+	/* Wait until client is initialized */
-+	bt_gatt_client_set_ready_handler(dev->client, client_ready_cb,
-+								dev, NULL);
- 	return;
--
- fail:
- 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
- 	hid_device_remove(dev);
+The purpose of this Bluetooth set of patches is to move device setup for 
+Bluetooth UART devices into the kernel.
+The idea is that userspace only needs to open the tty at initial speed 
+and set correct line discipline, then userspace has no more to do, its 
+up to HCI UART driver to manage the device (including firmware loading, 
+bluetooth address and device speed setup).
+
+However the driver may want to modify device speed (by using vendor 
+specific HCI commands) to operate at full speed. Moreover, in case of 
+firmware loading, some devices reset their speed to the default one, 
+which will imply to change UART host speed to be able to continue 
+communication.
+
+Userspace can not know when all those speed changes occur.
+
+Regards
+
+Fred
+
 -- 
-1.9.1
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
 
