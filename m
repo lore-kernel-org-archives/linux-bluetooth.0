@@ -1,95 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 3/4] Bluetooth: bnep: Add support to extended headers of control frames
-Date: Fri,  3 Apr 2015 12:14:54 +0200
-Message-Id: <1428056095-21978-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v5 2/4] Bluetooth: bnep: Add support for get bnep features via ioctl
+Date: Fri,  3 Apr 2015 12:14:53 +0200
+Message-Id: <1428056095-21978-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1428056095-21978-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1428056095-21978-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Handling extended headers of control frames is required BNEP
-functionality. This patch refractor bnep rx frame handling function.
-Extended header for control frames shouldn't be omitted as it was
-previously done. Every control frame should be checked if it contains
-extended header and then every extension should be parsed separately.
+This is needed if user space wants to know supported bnep features
+by kernel, e.g. if kernel supports sending response to bnep setup
+control message. By now there is no possibility to know supported
+features by kernel in case of bnep. Ioctls allows only to add connection,
+delete connection, get connection list, get connection info. Adding
+connection if it's possible (establishing network device connection) is
+equivalent to starting bnep session. Bnep session handles data queue of
+transmit, receive messages over bnep channel. It means that if we add
+connection the received/transmitted data will be parsed immediately. In
+case of get bnep features we want to know before session start, if we
+should leave setup data on socket queue and let kernel to handle with it,
+or in case of no setup handling support, if we should pull this message
+and handle setup response within user space.
 
 Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 ---
- net/bluetooth/bnep/core.c | 46 ++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 36 insertions(+), 10 deletions(-)
+ fs/compat_ioctl.c         | 1 +
+ net/bluetooth/bnep/bnep.h | 1 +
+ net/bluetooth/bnep/sock.c | 7 +++++++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index 48bc44a..dcc02e8 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -292,29 +292,55 @@ static int bnep_rx_frame(struct bnep_session *s, struct sk_buff *skb)
- {
- 	struct net_device *dev = s->dev;
- 	struct sk_buff *nskb;
--	u8 type;
-+	u8 type, ctrl_type;
+diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
+index afec645..19fb0c8 100644
+--- a/fs/compat_ioctl.c
++++ b/fs/compat_ioctl.c
+@@ -570,6 +570,7 @@ static int mt_ioctl_trans(unsigned int fd, unsigned int cmd, void __user *argp)
+ #define BNEPCONNDEL	_IOW('B', 201, int)
+ #define BNEPGETCONNLIST	_IOR('B', 210, int)
+ #define BNEPGETCONNINFO	_IOR('B', 211, int)
++#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
  
- 	dev->stats.rx_bytes += skb->len;
+ #define CMTPCONNADD	_IOW('C', 200, int)
+ #define CMTPCONNDEL	_IOW('C', 201, int)
+diff --git a/net/bluetooth/bnep/bnep.h b/net/bluetooth/bnep/bnep.h
+index 5a5b16f..8709733 100644
+--- a/net/bluetooth/bnep/bnep.h
++++ b/net/bluetooth/bnep/bnep.h
+@@ -111,6 +111,7 @@ struct bnep_ext_hdr {
+ #define BNEPCONNDEL	_IOW('B', 201, int)
+ #define BNEPGETCONNLIST	_IOR('B', 210, int)
+ #define BNEPGETCONNINFO	_IOR('B', 211, int)
++#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
  
- 	type = *(u8 *) skb->data;
- 	skb_pull(skb, 1);
-+	ctrl_type = *(u8 *)skb->data;
+ struct bnep_connadd_req {
+ 	int   sock;		/* Connected socket */
+diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
+index 5f05129..5766e6b 100644
+--- a/net/bluetooth/bnep/sock.c
++++ b/net/bluetooth/bnep/sock.c
+@@ -57,6 +57,7 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
+ 	struct bnep_conninfo ci;
+ 	struct socket *nsock;
+ 	void __user *argp = (void __user *)arg;
++	__u32 supp_feat = 0;
+ 	int err;
  
- 	if ((type & BNEP_TYPE_MASK) >= sizeof(__bnep_rx_hlen))
- 		goto badframe;
+ 	BT_DBG("cmd %x arg %lx", cmd, arg);
+@@ -120,6 +121,12 @@ static int bnep_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long
  
- 	if ((type & BNEP_TYPE_MASK) == BNEP_CONTROL) {
--		bnep_rx_control(s, skb->data, skb->len);
--		kfree_skb(skb);
--		return 0;
--	}
-+		if (bnep_rx_control(s, skb->data, skb->len) < 0) {
-+			dev->stats.tx_errors++;
-+			kfree_skb(skb);
-+			return 0;
-+		}
+ 		return err;
  
--	skb_reset_mac_header(skb);
-+		if (!(type & BNEP_EXT_HEADER)) {
-+			kfree_skb(skb);
-+			return 0;
-+		}
- 
--	/* Verify and pull out header */
--	if (!skb_pull(skb, __bnep_rx_hlen[type & BNEP_TYPE_MASK]))
--		goto badframe;
-+		/* Verify and pull ctrl message since it's already processed */
-+		switch (ctrl_type) {
-+		case BNEP_SETUP_CONN_REQ:
-+			/* Pull: ctrl type (1 b), len (1 b), data (len bytes) */
-+			if (!skb_pull(skb, 2 + *(u8 *)(skb->data + 1) * 2))
-+				goto badframe;
-+			break;
-+		case BNEP_FILTER_MULTI_ADDR_SET:
-+		case BNEP_FILTER_NET_TYPE_SET:
-+			/* Pull: ctrl type (1 b), len (2 b), data (len bytes) */
-+			if (!skb_pull(skb, 3 + *(u16 *)(skb->data + 1) * 2))
-+				goto badframe;
-+			break;
-+		default:
-+			kfree_skb(skb);
-+			return 0;
-+		}
-+	} else {
-+		skb_reset_mac_header(skb);
- 
--	s->eh.h_proto = get_unaligned((__be16 *) (skb->data - 2));
-+		/* Verify and pull out header */
-+		if (!skb_pull(skb, __bnep_rx_hlen[type & BNEP_TYPE_MASK]))
-+			goto badframe;
++	case BNEPGETSUPPFEAT:
++		if (copy_to_user(argp, &supp_feat, sizeof(supp_feat)))
++			return -EFAULT;
 +
-+		s->eh.h_proto = get_unaligned((__be16 *) (skb->data - 2));
-+	}
- 
- 	if (type & BNEP_EXT_HEADER) {
- 		if (bnep_rx_extension(s, skb) < 0)
++		return 0;
++
+ 	default:
+ 		return -EINVAL;
+ 	}
 -- 
 2.1.0
 
