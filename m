@@ -2,72 +2,87 @@ Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCHv2 00/27] HoG: Replace gattrib with gatt_client
-Date: Fri,  3 Apr 2015 15:43:29 +0200
-Message-Id: <1428068636-13073-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: [PATCHv2 07/27] android/hog: Use bt_gatt_client to write without response
+Date: Fri,  3 Apr 2015 15:43:36 +0200
+Message-Id: <1428068636-13073-8-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1428068636-13073-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1428068636-13073-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches replace gattrib with bt_gatt_client.
-It is part of HoG deduplication. HoG, ScPP, DIS, BAS have been
-cleaned from glib, btio, attrib dependencies.
+This patch replaces gatt_write_cmd with
+bt_gatt_client_write_without_response.
+---
+ android/hog.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-Note, that unit/test-hog tests are no longer valid and won't work since
-were written to be used with attrib. Fixes for unit tests will be
-sent in the next set of patches.
-
-v2:
-Fixed dangling pointers;
-Added check if pointer to allocated mem isn't null
-Merged "Add MIN definition" and "Remove attrib" patches
-Corrected commit subjects and messages
-
-Mariusz Skamra (27):
-  android/hidhost: Create bt_gatt_client
-  android/hog: Introduce bt_gatt_client
-  shared/gatt-client: Expose gatt_db
-  android/hog: Remove tracking gatt operations
-  android/hog: Use bt_gatt_client to read characteristic value
-  android/hog: Use bt_gatt_client to register for notifications
-  android/hog: Use bt_gatt_client to write without response
-  android/hog: Replace gatt_write_char with bt_gatt_client_write_value
-  android/hog: Use gatt_db to search for services and characteristics in
-    db
-  android/hog: Add helper to create uhid device
-  lib/uuid: Add define for HoG UUID
-  android/hog: Replace list of reports with a queue of reports
-  android/hog: Replace GSList of hog instances with queue of instances
-  android/dis: Remove tracking pending gatt operations
-  android/dis: Introduce bt_gatt_client
-  android/scpp: Remove tracking pending gatt operations
-  android/scpp: Introduce bt_gatt_client
-  android/scpp: Merge refresh_discovered_cb with iwin_discovered_cb
-  android/bas: Remove tracking pending gatt operations
-  android/bas: Start using bt_gatt_client
-  android/hog: Strip btio dependencies
-  android/hog: Enable Input Report notifications only if uhid is created
-  android/bas: Enable Battery Level notifications after reconnection
-  android/hog: Clean the code from attrib dependencies
-  android/hog: Remove glib dependencies
-  android/hog: Remove redundant code
-  android/hog: Replace definitions of characteristic uuids with bt_uuids
-
- android/Android.mk       |    2 +
- android/bas.c            |  313 +++----------
- android/bas.h            |    4 +-
- android/dis.c            |  203 ++------
- android/dis.h            |    4 +-
- android/hidhost.c        |   80 +++-
- android/hog.c            | 1150 ++++++++++++++++------------------------------
- android/hog.h            |   12 +-
- android/scpp.c           |  263 +++--------
- android/scpp.h           |    4 +-
- lib/uuid.h               |    1 +
- src/shared/gatt-client.c |    8 +
- src/shared/gatt-client.h |    1 +
- unit/test-hog.c          |    9 +-
- 14 files changed, 664 insertions(+), 1390 deletions(-)
-
+diff --git a/android/hog.c b/android/hog.c
+index 58c9d48..88f3ca1 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -449,8 +449,9 @@ static void forward_report(struct uhid_event *ev, void *user_data)
+ 		gatt_write_char(hog->attrib, report->decl->value_handle,
+ 				data, size, output_written_cb, hog);
+ 	else if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
+-		gatt_write_cmd(hog->attrib, report->decl->value_handle,
+-						data, size, NULL, NULL);
++		bt_gatt_client_write_without_response(hog->client,
++						report->decl->value_handle,
++						false, data, size);
+ }
+ 
+ static void get_feature(struct uhid_event *ev, void *user_data)
+@@ -816,8 +817,9 @@ static void proto_mode_read_cb(bool success, uint8_t att_ecode,
+ 
+ 		DBG("HoG is operating in Boot Procotol Mode");
+ 
+-		gatt_write_cmd(hog->attrib, hog->proto_mode_handle, &nval,
+-						sizeof(nval), NULL, NULL);
++		bt_gatt_client_write_without_response(hog->client,
++						hog->proto_mode_handle, false,
++						&nval, sizeof(nval));
+ 	} else if (value[0] == HOG_PROTO_MODE_REPORT)
+ 		DBG("HoG is operating in Report Protocol Mode");
+ }
+@@ -1207,14 +1209,14 @@ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
+ {
+ 	uint8_t value = suspend ? 0x00 : 0x01;
+ 
+-	if (hog->attrib == NULL)
++	if (hog->client == NULL)
+ 		return -ENOTCONN;
+ 
+ 	if (hog->ctrlpt_handle == 0)
+ 		return -ENOTSUP;
+ 
+-	gatt_write_cmd(hog->attrib, hog->ctrlpt_handle, &value,
+-					sizeof(value), NULL, NULL);
++	bt_gatt_client_write_without_response(hog->client, hog->ctrlpt_handle,
++						false, &value, sizeof(value));
+ 
+ 	return 0;
+ }
+@@ -1227,7 +1229,7 @@ int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type)
+ 	if (!hog)
+ 		return -EINVAL;
+ 
+-	if (!hog->attrib)
++	if (!hog->client)
+ 		return -ENOTCONN;
+ 
+ 	report = find_report(hog, type, 0);
+@@ -1241,8 +1243,9 @@ int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type)
+ 				data, size, output_written_cb, hog);
+ 
+ 	if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
+-		gatt_write_cmd(hog->attrib, report->decl->value_handle,
+-						data, size, NULL, NULL);
++		bt_gatt_client_write_without_response(hog->client,
++						report->decl->value_handle,
++						false, data, size);
+ 
+ 	for (l = hog->instances; l; l = l->next) {
+ 		struct bt_hog *instance = l->data;
 -- 
 1.9.1
 
