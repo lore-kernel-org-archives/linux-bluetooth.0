@@ -1,68 +1,211 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [RFC 3/5] Bluetooth: hci_uart: Add HCIUARTSETBAUDRATE ioctl
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <551EB5A1.9040409@hurleysoftware.com>
-Date: Fri, 3 Apr 2015 10:39:27 -0700
-Cc: Loic Poulain <loic.poulain@intel.com>,
-	Frederic Danis <frederic.danis@linux.intel.com>,
-	linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
-	jslaby@suse.cz
-Message-Id: <D74E0673-5A60-4E8F-A050-60DB4A0F43A7@holtmann.org>
-References: <1427985456-31536-1-git-send-email-frederic.danis@linux.intel.com> <1427985456-31536-4-git-send-email-frederic.danis@linux.intel.com> <551E717A.6040500@hurleysoftware.com> <551E8C6A.8040009@linux.intel.com> <551E9987.9050800@hurleysoftware.com> <551EA13B.7010307@intel.com> <551EB5A1.9040409@hurleysoftware.com>
-To: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+In-Reply-To: <1428068636-13073-2-git-send-email-mariusz.skamra@tieto.com>
+References: <1428068636-13073-1-git-send-email-mariusz.skamra@tieto.com>
+	<1428068636-13073-2-git-send-email-mariusz.skamra@tieto.com>
+Date: Fri, 3 Apr 2015 09:33:45 -0700
+Message-ID: <CAJLTA8ikb_8AS_x+L6f_9iGCnHN213guX5-09QX=wBqDpXropQ@mail.gmail.com>
+Subject: Re: [PATCHv2 01/27] android/hidhost: Create bt_gatt_client
+From: Michael Janssen <jamuraa@google.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mariusz Skamra <mariusz.skamra@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hi Mariusz,
 
->>> The line discipline is always notified of line rate changes
->>> via the set_termios() method, so if you add that to the hci_ldisc,
->>> you'll be able to keep the BT device in sync with your
->>> vendor-specific commands.
->> If I'm not wrong, line discipline is notified after the tty termios change.
->> So, it's too late to send the  HCI change speed command.
->> Moreover, user space is not aware of the device behavior, the driver should
->> be the only one to manage the device and its serial link.
->> Here, user space is just a bootstrap which hands over to the driver.
-> 
-> You realize that you're telling me that userspace is unaware of
-> this in a thread that begins with a proposed userspace ioctl change to
-> the line discipline? An ioctl change that adds a new ioctl to set the
-> speed in a line discipline? For which there are already lots of ioctls
-> to set the line speed?
+Just a minor thing.
 
-actually the problem is a little bit different here. Every Bluetooth UART chip has its default baudrate. Mostly that is 115k, but some actually have others.
+On Fri, Apr 3, 2015 at 6:43 AM, Mariusz Skamra <mariusz.skamra@tieto.com> wrote:
+> From: Mariusz Skamra <mariusz.skamra@gmail.com>
+>
+> This patch introduces bt_gatt_client to be used by HoG profile.
+> As long as the android/gatt doesn't use bt_gatt_client, initialization
+> can be performed here.
+> ---
+>  android/Android.mk |  2 ++
+>  android/hidhost.c  | 75 ++++++++++++++++++++++++++++++++++++++++++++++--------
+>  2 files changed, 66 insertions(+), 11 deletions(-)
+>
+> diff --git a/android/Android.mk b/android/Android.mk
+> index f218805..b9dd1c8 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -72,6 +72,8 @@ LOCAL_SRC_FILES := \
+>         bluez/src/shared/crypto.c \
+>         bluez/src/shared/uhid.c \
+>         bluez/src/shared/att.c \
+> +       bluez/src/shared/gatt-helpers.c \
+> +       bluez/src/shared/gatt-client.c \
+>         bluez/src/sdpd-database.c \
+>         bluez/src/sdpd-service.c \
+>         bluez/src/sdpd-request.c \
+> diff --git a/android/hidhost.c b/android/hidhost.c
+> index 729b884..26a8013 100644
+> --- a/android/hidhost.c
+> +++ b/android/hidhost.c
+> @@ -36,15 +36,22 @@
+>
+>  #include "btio/btio.h"
+>  #include "lib/bluetooth.h"
+> +#include "lib/uuid.h"
+>  #include "lib/sdp.h"
+>  #include "lib/sdp_lib.h"
+>  #include "src/shared/mgmt.h"
+> +#include "src/shared/queue.h"
+>  #include "src/shared/util.h"
+>  #include "src/shared/uhid.h"
+> +#include "src/shared/att.h"
+> +#include "src/shared/gatt-db.h"
+> +#include "src/shared/gatt-client.h"
+>  #include "src/sdp-client.h"
+>  #include "src/uuid-helper.h"
+>  #include "src/log.h"
+>
+> +#include "attrib/gattrib.h"
+> +
+>  #include "hal-msg.h"
+>  #include "ipc-common.h"
+>  #include "ipc.h"
+> @@ -113,6 +120,9 @@ struct hid_device {
+>         uint8_t         last_hid_msg;
+>         struct bt_hog   *hog;
+>         int             sec_level;
+> +       GAttrib         *attrib;
+> +       struct gatt_db  *db;
+> +       struct bt_gatt_client *client;
+>  };
+>
+>  static int device_cmp(gconstpointer s, gconstpointer user_data)
+> @@ -145,6 +155,9 @@ static void hid_device_free(void *data)
+>         if (dev->hog)
+>                 bt_hog_unref(dev->hog);
+>
+> +       if (dev->db)
+> +               gatt_db_unref(dev->db);
+> +
 
-The general idea was that userspace deals with opening the TTY, send the HCI commands to change the rate, then change the termios setting, attach the ldisc and then hand it to the kernel.
+gatt_db_unref already checks for null, so you don't need a check here.
+bt_hog_unref does too although it's unrelated.
 
-This is however not how at least two major Bluetooth controllers work when you have to do firmware loading. When they boot into the firmware, then baudrate falls back to default and you have to do that all over again.
+>         g_free(dev->rd_data);
+>         g_free(dev);
+>  }
+> @@ -792,10 +805,37 @@ fail:
+>         hid_device_remove(dev);
+>  }
+>
+> +static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
+> +{
+> +       struct hid_device *dev = user_data;
+> +
+> +       if (!success) {
+> +               error("HoG: client not ready");
+> +               goto fail;
+> +       }
+> +
+> +       if (!bt_hog_attach(dev->hog, dev->attrib)) {
+> +               error("HoG: unable to attach");
+> +               goto fail;
+> +       }
+> +
+> +       bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
+> +
+> +       if (!bt_gatt_add_autoconnect(hog_app, &dev->dst))
+> +               error("HoG: Could not add to autoconnect list");
+> +
+> +       return;
+> +fail:
+> +       bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
+> +       hid_device_remove(dev);
+> +}
+> +
+>  static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
+>  {
+>         GSList *l;
+>         struct hid_device *dev;
+> +       struct bt_att *att;
+> +       uint16_t mtu;
+>
+>         l = g_slist_find_custom(devices, addr, device_cmp);
+>         dev = l ? l->data : NULL;
+> @@ -807,6 +847,10 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
+>                         bt_hid_notify_state(dev,
+>                                                 HAL_HIDHOST_STATE_DISCONNECTED);
+>                         bt_hog_detach(dev->hog);
+> +                       bt_gatt_client_unref(dev->client);
+> +                       g_attrib_unref(dev->attrib);
+> +                       dev->attrib = NULL;
+> +                       dev->client = NULL;
+>                         return;
+>                 }
+>                 goto fail;
+> @@ -816,34 +860,43 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
+>                 dev = hid_device_new(addr);
+>
+>         if (!dev->hog) {
+> -               /* TODO: Get device details and primary */
+> +               /* TODO: Get device details */
+>                 dev->hog = bt_hog_new_default("bluez-input-device", dev->vendor,
+>                                         dev->product, dev->version, NULL);
+>                 if (!dev->hog) {
+>                         error("HoG: unable to create session");
+>                         goto fail;
+>                 }
+> -       }
+>
+> -       if (!bt_hog_attach(dev->hog, attrib)) {
+> -               error("HoG: unable to attach");
+> -               goto fail;
+> +               dev->db = gatt_db_new();
+> +               if (!dev->db) {
+> +                       error("HoG: unable to create gatt_db");
+> +                       goto fail;
+> +               }
+>         }
+>
+> -       if (!bt_gatt_set_security(addr, BT_IO_SEC_MEDIUM)) {
+> +       att = g_attrib_get_att(attrib);
+> +       dev->attrib = g_attrib_ref(attrib);
+> +       mtu = bt_att_get_mtu(att);
+> +
+> +       /* Enable encryption before gatt_client starts discovering services */
+> +       if (!bt_att_set_sec_level(att, BT_SECURITY_MEDIUM)) {
+>                 error("Failed to set security level");
+>                 goto fail;
+>         }
+>
+>         DBG("");
+>
+> -       bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
+> -
+> -       if (!bt_gatt_add_autoconnect(hog_app, &dev->dst))
+> -               error("hidhost: Could not add to autoconnect list");
+> +       dev->client = bt_gatt_client_new(dev->db, att, mtu);
+> +       if (!dev->client) {
+> +               error("Failed to create gatt_client");
+> +               goto fail;
+> +       }
+>
+> +       /* Wait until client is initialized */
+> +       bt_gatt_client_set_ready_handler(dev->client, client_ready_cb,
+> +                                                               dev, NULL);
+>         return;
+> -
+>  fail:
+>         bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
+>         hid_device_remove(dev);
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-So what this ioctl will just tell the kernel about is the desired baudrate that it wants to be set whenever possible. The whenever possible is important here since depending on the manufacturer that might be a total different times. And with firmware download procedures being fully vendor specific this will vary.
 
-> Setting aside the problem with the firmware load, I see no reason why
-> this can't be done within the existing line discipline framework.
 
-So far everything has been done in hciattach tool. And it is so ugly and does not even work properly for any complex UART protocols like BCSP or 3-Wire. There is a patch for a modified 3-Wire setup from one vendor that made my eyes bleed. So what you really want is having the kernel take control over HCI from the beginning. Otherwise this goes out of control and handling exceptions like hardware error event becomes impossible.
-
-In summary what we have to do these days is this:
-
-- Send Reset
-- Send a few basic HCI commands
-- Send baud rate change command
-- Change actual baud rate on the TTY
-- Download firmware
-- Send Reset to boot the firmware
-- Change actual baud rate back to default
-- Send baud rate change command
-- Change actual baud rate
-- Send Reset
-- Standard init sequence
-
-Now tell me how the line discipline framework helps us here? Keep in mind you have to tell the controller via HCI commands over the old baud rate to change its rate. And then change it on the TTY to match what the controller does on its side.
-
-Regards
-
-Marcel
-
+-- 
+Michael Janssen
