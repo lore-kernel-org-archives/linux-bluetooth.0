@@ -1,180 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCHv2 25/27] android/hog: Remove glib dependencies
-Date: Fri,  3 Apr 2015 15:43:54 +0200
-Message-Id: <1428068636-13073-26-git-send-email-mariusz.skamra@tieto.com>
+Cc: Mariusz Skamra <mariusz.skamra@gmail.com>
+Subject: [PATCHv2 16/27] android/scpp: Remove tracking pending gatt operations
+Date: Fri,  3 Apr 2015 15:43:45 +0200
+Message-Id: <1428068636-13073-17-git-send-email-mariusz.skamra@tieto.com>
 In-Reply-To: <1428068636-13073-1-git-send-email-mariusz.skamra@tieto.com>
 References: <1428068636-13073-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All the glib functions and types have been replaced so that
-glib can be excluded
----
- android/hog.c | 62 ++++++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 40 insertions(+), 22 deletions(-)
+From: Mariusz Skamra <mariusz.skamra@gmail.com>
 
-diff --git a/android/hog.c b/android/hog.c
-index fdcd95a..22aac76 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -36,8 +36,6 @@
- #include <sys/stat.h>
- #include <fcntl.h>
+Since the use of bt_gatt_client there is no need to queue pending gatt
+operations. bt_gatt_client already keeps track on that, so that
+on bt_gatt_client_unref the queue of pending requests is destroyed.
+---
+ android/scpp.c | 72 ++++------------------------------------------------------
+ 1 file changed, 4 insertions(+), 68 deletions(-)
+
+diff --git a/android/scpp.c b/android/scpp.c
+index f8f81f3..a28fbb6 100644
+--- a/android/scpp.c
++++ b/android/scpp.c
+@@ -62,62 +62,13 @@ struct bt_scpp {
+ 	uint16_t iwhandle;
+ 	uint16_t refresh_handle;
+ 	guint refresh_cb_id;
+-	struct queue *gatt_op;
+ };
  
--#include <glib.h>
--
- #include "lib/bluetooth.h"
- #include "lib/sdp.h"
- #include "lib/uuid.h"
-@@ -88,7 +86,7 @@ struct bt_hog {
- 	struct queue		*reports;
- 	struct bt_uhid		*uhid;
- 	int			uhid_fd;
--	gboolean		has_report_id;
-+	bool			has_report_id;
- 	uint16_t		bcdhid;
- 	uint8_t			bcountrycode;
- 	uint16_t		proto_mode_handle;
-@@ -246,6 +244,15 @@ static void discover_report_cb(struct gatt_db_attribute *attrib,
- 					report_reference_cb, report, NULL);
- }
- 
-+static void report_free(void *data)
-+{
-+	struct report *report = data;
-+
-+	free(report->value);
-+	free(report->decl);
-+	free(report);
-+}
-+
- static void report_read_cb(bool success, uint8_t att_ecode,
- 				const uint8_t *value, uint16_t len,
- 				void *user_data)
-@@ -258,9 +265,15 @@ static void report_read_cb(bool success, uint8_t att_ecode,
- 	}
- 
- 	if (report->value)
--		g_free(report->value);
-+		free(report->value);
- 
--	report->value = g_memdup(value, len);
-+	report->value = new0(uint8_t, len);
-+	if (!report->value) {
-+		report_free(report);
-+		return;
-+	}
-+
-+	memcpy(report->value, value, len);
- 	report->len = len;
- }
- 
-@@ -269,9 +282,17 @@ static struct report *report_new(struct bt_hog *hog, uint16_t value_handle,
- {
- 	struct report *report;
- 
--	report = g_new0(struct report, 1);
--	report->hog = hog;
-+	report = new0(struct report, 1);
-+	if (!report)
-+		return NULL;
-+
- 	report->decl = new0(struct gatt_char, 1);
-+	if (!report->decl) {
-+		free(report);
-+		return NULL;
-+	}
-+
-+	report->hog = hog;
- 	report->decl->value_handle = value_handle;
- 	report->decl->properties = properties;
- 	queue_push_tail(hog->reports, report);
-@@ -294,6 +315,9 @@ static void external_service_char_cb(void *data, void *user_data)
- 							&properties, NULL);
- 
- 	report = report_new(hog, value_handle, properties);
-+	if (!report)
-+		return;
-+
- 	gatt_db_service_foreach_desc(attrib, discover_report_cb, report);
- }
- 
-@@ -598,7 +622,7 @@ static void get_report(struct uhid_event *ev, void *user_data)
- {
- 	struct bt_hog *hog = user_data;
- 	struct report *report;
--	guint8 err;
-+	uint8_t err;
- 
- 	/* uhid never sends reqs in parallel; if there's a req, it timed out */
- 	if (hog->getrep_att) {
-@@ -750,7 +774,7 @@ static void report_map_read_cb(bool success, uint8_t att_ecode,
- 								&long_item)) {
- 			/* Report ID is short item with prefix 100001xx */
- 			if (!long_item && (value[i] & 0xfc) == 0x84)
--				hog->has_report_id = TRUE;
-+				hog->has_report_id = true;
- 
- 			DBG("\t%s", item2string(itemstr, &value[i], ilen));
- 
-@@ -837,6 +861,9 @@ static void char_discovered_cb(struct gatt_db_attribute *attrib,
- 
- 	if (!bt_uuid_cmp(&uuid, &report_uuid)) {
- 		report = report_new(hog, value_handle, properties);
-+		if (!report)
-+			return;
-+
- 		gatt_db_service_foreach_desc(attrib, discover_report_cb,
- 									report);
- 	} else if (!bt_uuid_cmp(&uuid, &report_map_uuid)) {
-@@ -855,15 +882,6 @@ static void char_discovered_cb(struct gatt_db_attribute *attrib,
- 	}
- }
- 
--static void report_free(void *data)
+-static void discover_char(struct bt_scpp *scpp, GAttrib *attrib,
+-						uint16_t start, uint16_t end,
+-						bt_uuid_t *uuid, gatt_cb_t func,
+-						gpointer user_data)
 -{
--	struct report *report = data;
+-	unsigned int id;
 -
--	g_free(report->value);
--	free(report->decl);
--	g_free(report);
+-	id = gatt_discover_char(attrib, start, end, uuid, func, user_data);
+-
+-	if (queue_push_head(scpp->gatt_op, UINT_TO_PTR(id)))
+-		return;
+-
+-	error("scpp: Could not discover characteristic");
+-	g_attrib_cancel(attrib, id);
 -}
 -
- static void hog_free(void *data)
+-static void discover_desc(struct bt_scpp *scpp, GAttrib *attrib,
+-				uint16_t start, uint16_t end, bt_uuid_t *uuid,
+-				gatt_cb_t func, gpointer user_data)
+-{
+-	unsigned int id;
+-
+-	id = gatt_discover_desc(attrib, start, end, uuid, func, user_data);
+-
+-	if (queue_push_head(scpp->gatt_op, UINT_TO_PTR(id)))
+-		return;
+-
+-	error("scpp: Could not discover descriptor");
+-	g_attrib_cancel(attrib, id);
+-}
+-
+-static void write_char(struct bt_scpp *scan, GAttrib *attrib, uint16_t handle,
+-					const uint8_t *value, size_t vlen,
+-					GAttribResultFunc func,
+-					gpointer user_data)
+-{
+-	unsigned int id;
+-
+-	id = gatt_write_char(attrib, handle, value, vlen, func, user_data);
+-
+-	if (queue_push_head(scan->gatt_op, UINT_TO_PTR(id)))
+-		return;
+-
+-	error("scpp: Could not read char");
+-	g_attrib_cancel(attrib, id);
+-}
+-
+ static void scpp_free(struct bt_scpp *scan)
  {
- 	struct bt_hog *hog = data;
-@@ -877,8 +895,8 @@ static void hog_free(void *data)
- 	bt_dis_unref(hog->dis);
- 	bt_uhid_unref(hog->uhid);
- 	queue_destroy(hog->reports, report_free);
--	g_free(hog->name);
--	g_free(hog);
-+	free(hog->name);
-+	free(hog);
+ 	bt_scpp_detach(scan);
+ 
+ 	g_free(scan->primary);
+-	queue_destroy(scan->gatt_op, NULL); /* cleared in bt_scpp_detach */
+ 	g_free(scan);
  }
  
- struct bt_hog *bt_hog_new_default(const char *name, uint16_t vendor,
-@@ -897,7 +915,7 @@ struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
+@@ -132,12 +83,6 @@ struct bt_scpp *bt_scpp_new(void *primary)
+ 	scan->interval = SCAN_INTERVAL;
+ 	scan->window = SCAN_WINDOW;
+ 
+-	scan->gatt_op = queue_new();
+-	if (!scan->gatt_op) {
+-		scpp_free(scan);
+-		return NULL;
+-	}
+-
+ 	if (primary)
+ 		scan->primary = g_memdup(primary, sizeof(*scan->primary));
+ 
+@@ -213,7 +158,7 @@ static void write_ccc(struct bt_scpp *scan, GAttrib *attrib, uint16_t handle,
+ 
+ 	put_le16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
+ 
+-	write_char(scan, attrib, handle, value, sizeof(value), ccc_written_cb,
++	gatt_write_char(attrib, handle, value, sizeof(value), ccc_written_cb,
+ 								user_data);
+ }
+ 
+@@ -266,7 +211,7 @@ static void refresh_discovered_cb(uint8_t status, GSList *chars,
+ 
+ 	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
+ 
+-	discover_desc(scan, scan->attrib, start, end, &uuid,
++	gatt_discover_desc(scan->attrib, start, end, &uuid,
+ 					discover_descriptor_cb, user_data);
+ }
+ 
+@@ -304,7 +249,7 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
+ 								scan->window);
+ 	else {
+ 		bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
+-		discover_char(scan, scan->attrib, scan->primary->range.start,
++		gatt_discover_char(scan->attrib, scan->primary->range.start,
+ 					scan->primary->range.end, &iwin_uuid,
+ 					iwin_discovered_cb, scan);
+ 	}
+@@ -315,7 +260,7 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
+ 				refresh_value_cb, scan, NULL);
+ 	else {
+ 		bt_uuid16_create(&refresh_uuid, SCAN_REFRESH_UUID);
+-		discover_char(scan, scan->attrib, scan->primary->range.start,
++		gatt_discover_char(scan->attrib, scan->primary->range.start,
+ 					scan->primary->range.end, &refresh_uuid,
+ 					refresh_discovered_cb, scan);
+ 	}
+@@ -323,14 +268,6 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
+ 	return true;
+ }
+ 
+-static void cancel_gatt_req(void *data, void *user_data)
+-{
+-	unsigned int id = PTR_TO_UINT(data);
+-	struct bt_scpp *scan = user_data;
+-
+-	g_attrib_cancel(scan->attrib, id);
+-}
+-
+ void bt_scpp_detach(struct bt_scpp *scan)
  {
- 	struct bt_hog *hog;
- 
--	hog = g_try_new0(struct bt_hog, 1);
-+	hog = new0(struct bt_hog, 1);
- 	if (!hog)
- 		return NULL;
- 
-@@ -917,7 +935,7 @@ struct bt_hog *bt_hog_new(int fd, const char *name, uint16_t vendor,
- 		return NULL;
+ 	if (!scan || !scan->attrib)
+@@ -341,7 +278,6 @@ void bt_scpp_detach(struct bt_scpp *scan)
+ 		scan->refresh_cb_id = 0;
  	}
  
--	hog->name = g_strdup(name);
-+	hog->name = strdup(name);
- 	hog->vendor = vendor;
- 	hog->product = product;
- 	hog->version = version;
+-	queue_foreach(scan->gatt_op, cancel_gatt_req, scan);
+ 	g_attrib_unref(scan->attrib);
+ 	scan->attrib = NULL;
+ }
 -- 
 1.9.1
 
