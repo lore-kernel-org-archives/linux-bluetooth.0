@@ -1,54 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <551E9987.9050800@hurleysoftware.com>
-Date: Fri, 03 Apr 2015 09:45:43 -0400
-From: Peter Hurley <peter@hurleysoftware.com>
-MIME-Version: 1.0
-To: Frederic Danis <frederic.danis@linux.intel.com>
-CC: linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
-	jslaby@suse.cz
-Subject: Re: [RFC 3/5] Bluetooth: hci_uart: Add HCIUARTSETBAUDRATE ioctl
-References: <1427985456-31536-1-git-send-email-frederic.danis@linux.intel.com> <1427985456-31536-4-git-send-email-frederic.danis@linux.intel.com> <551E717A.6040500@hurleysoftware.com> <551E8C6A.8040009@linux.intel.com>
-In-Reply-To: <551E8C6A.8040009@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCHv2 00/27] HoG: Replace gattrib with gatt_client
+Date: Fri,  3 Apr 2015 15:43:29 +0200
+Message-Id: <1428068636-13073-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 04/03/2015 08:49 AM, Frederic Danis wrote:
-> [ +cc GregKH, JiriS ]
-> 
-> On 03/04/2015 12:54, Peter Hurley wrote:
->> On 04/02/2015 10:37 AM, Frederic Danis wrote:
->>> This allows user space application to set final speed requested for UART
->>> device. UART port is open at init speed by user space application.
->>
->> If userspace opened the tty and knows this is a UART, why can it not
->> use the for-purpose tty ioctls to change the line rate?
-> 
-> The purpose of this Bluetooth set of patches is to move device setup for Bluetooth UART devices into the kernel.
-> The idea is that userspace only needs to open the tty at initial speed and set correct line discipline, then userspace has no more to do, its up to HCI UART driver to manage the device (including firmware loading, bluetooth address and device speed setup).
-> 
-> However the driver may want to modify device speed (by using vendor specific HCI commands) to operate at full speed. Moreover, in case of firmware loading, some devices reset their speed to the default one, which will imply to change UART host speed to be able to continue communication.
-> 
-> Userspace can not know when all those speed changes occur.
+These patches replace gattrib with bt_gatt_client.
+It is part of HoG deduplication. HoG, ScPP, DIS, BAS have been
+cleaned from glib, btio, attrib dependencies.
 
-The line discipline is always notified of line rate changes
-via the set_termios() method, so if you add that to the hci_ldisc,
-you'll be able to keep the BT device in sync with your
-vendor-specific commands.
+Note, that unit/test-hog tests are no longer valid and won't work since
+were written to be used with attrib. Fixes for unit tests will be
+sent in the next set of patches.
 
-I'd like to be able to help out with the firmware download problem
-but it's not clear to me at what point that is being executed since
-the patch that adds a setup() method to the protocol doesn't compile:
+v2:
+Fixed dangling pointers;
+Added check if pointer to allocated mem isn't null
+Merged "Add MIN definition" and "Remove attrib" patches
+Corrected commit subjects and messages
 
-/home/peter/src/kernels/mainline/drivers/bluetooth/hci_ldisc.c: In function ‘hci_uart_set_proto’:
-/home/peter/src/kernels/mainline/drivers/bluetooth/hci_ldisc.c:485:11: error: ‘struct hci_uart_proto’ has no member named ‘setup’
-  hu->proto->setup = NULL;
-           ^
-/home/peter/src/kernels/mainline/drivers/bluetooth/hci_ldisc.c:488:13: error: ‘struct hci_uart_proto’ has no member named ‘setup’
-    hu->proto->setup = devtypes[i].setup;
-             ^
-make[3]: *** [drivers/bluetooth/hci_ldisc.o] Error 1
+Mariusz Skamra (27):
+  android/hidhost: Create bt_gatt_client
+  android/hog: Introduce bt_gatt_client
+  shared/gatt-client: Expose gatt_db
+  android/hog: Remove tracking gatt operations
+  android/hog: Use bt_gatt_client to read characteristic value
+  android/hog: Use bt_gatt_client to register for notifications
+  android/hog: Use bt_gatt_client to write without response
+  android/hog: Replace gatt_write_char with bt_gatt_client_write_value
+  android/hog: Use gatt_db to search for services and characteristics in
+    db
+  android/hog: Add helper to create uhid device
+  lib/uuid: Add define for HoG UUID
+  android/hog: Replace list of reports with a queue of reports
+  android/hog: Replace GSList of hog instances with queue of instances
+  android/dis: Remove tracking pending gatt operations
+  android/dis: Introduce bt_gatt_client
+  android/scpp: Remove tracking pending gatt operations
+  android/scpp: Introduce bt_gatt_client
+  android/scpp: Merge refresh_discovered_cb with iwin_discovered_cb
+  android/bas: Remove tracking pending gatt operations
+  android/bas: Start using bt_gatt_client
+  android/hog: Strip btio dependencies
+  android/hog: Enable Input Report notifications only if uhid is created
+  android/bas: Enable Battery Level notifications after reconnection
+  android/hog: Clean the code from attrib dependencies
+  android/hog: Remove glib dependencies
+  android/hog: Remove redundant code
+  android/hog: Replace definitions of characteristic uuids with bt_uuids
 
-Regards,
-Peter Hurley
+ android/Android.mk       |    2 +
+ android/bas.c            |  313 +++----------
+ android/bas.h            |    4 +-
+ android/dis.c            |  203 ++------
+ android/dis.h            |    4 +-
+ android/hidhost.c        |   80 +++-
+ android/hog.c            | 1150 ++++++++++++++++------------------------------
+ android/hog.h            |   12 +-
+ android/scpp.c           |  263 +++--------
+ android/scpp.h           |    4 +-
+ lib/uuid.h               |    1 +
+ src/shared/gatt-client.c |    8 +
+ src/shared/gatt-client.h |    1 +
+ unit/test-hog.c          |    9 +-
+ 14 files changed, 664 insertions(+), 1390 deletions(-)
+
+-- 
+1.9.1
 
