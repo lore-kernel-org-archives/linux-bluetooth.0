@@ -2,51 +2,55 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v10 12/12] core: Only start Advertising Manager when experimental
-Date: Fri,  3 Apr 2015 15:02:12 -0700
-Message-Id: <1428098532-5257-13-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v10 10/12] test: improvements to example-advertisement
+Date: Fri,  3 Apr 2015 15:02:10 -0700
+Message-Id: <1428098532-5257-11-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 References: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Check the experimental flag, there is no value in starting the
-Advertising Manager when there is no method for advertising.
+Improves the example-advertisement script in two ways:
 
-This also makes startup quieter when experimental is not set.
+It uses 16-bit service UUIDs so that it does not overflow the
+Advertisement Data
+
+It turns the adapter's power on so that it works out of the box.
 ---
- src/adapter.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ test/example-advertisement | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index ccc67fc..7ffd302 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7334,16 +7334,14 @@ static int adapter_register(struct btd_adapter *adapter)
- 		return -EINVAL;
- 	}
+diff --git a/test/example-advertisement b/test/example-advertisement
+index 98aeafa..6e47391 100755
+--- a/test/example-advertisement
++++ b/test/example-advertisement
+@@ -113,11 +113,10 @@ class TestAdvertisement(Advertisement):
  
--	/* Don't start advertising managers on non-LE controllers. */
--	if (adapter->supported_settings & MGMT_SETTING_LE) {
--		adapter->adv_manager = btd_advertising_manager_new(adapter);
--
--		/* LEAdvertisingManager1 is experimental so optional */
--		if (!adapter->adv_manager)
--			error("Failed to register LEAdvertisingManager1 "
--						"interface for adapter");
--	} else {
--		info("Not starting LEAdvertisingManager, LE not supported");
-+	if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
-+		/* Don't start advertising managers on non-LE controllers. */
-+		if (adapter->supported_settings & MGMT_SETTING_LE) {
-+			adapter->adv_manager =
-+					btd_advertising_manager_new(adapter);
-+		} else {
-+			info("LEAdvertisingManager skipped, LE unavailable");
-+		}
- 	}
+     def __init__(self, bus, index):
+         Advertisement.__init__(self, bus, index, 'broadcast')
+-        self.add_service_uuid('0000180D-0000-1000-8000-00805F9B34FB')
+-        self.add_service_uuid('0000180F-0000-1000-8000-00805F9B34FB')
++        self.add_service_uuid('180D')
++        self.add_service_uuid('180F')
+         self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
+-        self.add_service_data('00009999-0000-1000-8000-00805F9B34FB',
+-                              [0x00, 0x01, 0x02, 0x03, 0x04])
++        self.add_service_data('9999', [0x00, 0x01, 0x02, 0x03, 0x04])
  
- 	db = btd_gatt_database_get_db(adapter->database);
+ 
+ def register_ad_cb():
+@@ -153,6 +152,11 @@ def main():
+         print 'LEAdvertisingManager1 interface not found'
+         return
+ 
++    adapter_props = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
++                                   "org.freedesktop.DBus.Properties");
++
++    adapter_props.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(1))
++
+     ad_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
+                                 LE_ADVERTISING_MANAGER_IFACE)
+ 
 -- 
 2.2.0.rc0.207.ga3a616c
 
