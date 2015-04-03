@@ -1,98 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Janssen <jamuraa@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v10 00/12] Implement LE Advertisement D-Bus API
-Date: Fri,  3 Apr 2015 15:02:00 -0700
-Message-Id: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCH v5 2/4] Bluetooth: bnep: Add support for get bnep features via ioctl
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1428056095-21978-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Fri, 3 Apr 2015 14:24:27 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <FC839784-CD2D-41FC-A6F5-1BB749D69AEB@holtmann.org>
+References: <1428056095-21978-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1428056095-21978-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implementation of the LE Advertisement D-Bus API.
+Hi Grzegorz,
 
-Things that are missing still:
- * Semantics for multiple Advertisements (currently any more than one will fail)
- * TX Power property parsing / interface
- * Setting other Flags in the advertisement.
+> This is needed if user space wants to know supported bnep features
+> by kernel, e.g. if kernel supports sending response to bnep setup
+> control message. By now there is no possibility to know supported
+> features by kernel in case of bnep. Ioctls allows only to add connection,
+> delete connection, get connection list, get connection info. Adding
+> connection if it's possible (establishing network device connection) is
+> equivalent to starting bnep session. Bnep session handles data queue of
+> transmit, receive messages over bnep channel. It means that if we add
+> connection the received/transmitted data will be parsed immediately. In
+> case of get bnep features we want to know before session start, if we
+> should leave setup data on socket queue and let kernel to handle with it,
+> or in case of no setup handling support, if we should pull this message
+> and handle setup response within user space.
+> 
+> Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+> ---
+> fs/compat_ioctl.c         | 1 +
+> net/bluetooth/bnep/bnep.h | 1 +
+> net/bluetooth/bnep/sock.c | 7 +++++++
+> 3 files changed, 9 insertions(+)
+> 
+> diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
+> index afec645..19fb0c8 100644
+> --- a/fs/compat_ioctl.c
+> +++ b/fs/compat_ioctl.c
+> @@ -570,6 +570,7 @@ static int mt_ioctl_trans(unsigned int fd, unsigned int cmd, void __user *argp)
+> #define BNEPCONNDEL	_IOW('B', 201, int)
+> #define BNEPGETCONNLIST	_IOR('B', 210, int)
+> #define BNEPGETCONNINFO	_IOR('B', 211, int)
+> +#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
 
-v1 -> v2:
- * Cleanup based on comments from Arman
- * Add g_dbus_proxy_set_read_watch function to avoid ObjectManager dependency
- * Consolidate script updates into single test script
+actually you forgot to add COMPATIBLE_IOCTL. Sometimes doing a git grep BNEPGETCONNINFO would have nicely given you a hint on what to do for compat ioctl use cases.
 
-v2 -> v3:
- * Change "ManufacturerSpecificData" to "ManufacturerData"
- * Add advertisement-api.txt to EXTRA_DIST
- * Add Release() callback to org.bluez.LEAdvertisement1
- * Remove IncludePower from the LEAdvertisement1 API
+Regards
 
-v3 -> v4:
- * Rename "g_dbus_proxy_set_read_watch" to "g_dbus_proxy_set_ready_watch"
-
-v4 -> v5:
- * Rebase
- * Use g_dbus_client_set_proxy_handlers instead of g_dbus_proxy_set_ready_watch
- * Add MGMT interface calls to actually advertise.
-
-v5 -> v6:
- * Minor patch cruft cleanup
- * Rename btd_advertising_manager to btd_advertising and fix filename change.
-
-v6 -> v7:
- * Rebase for included patches
- * Rename ad structure to bt_ad
- * Fixes for bt_ad_generate bugs
- * Correctly error for invalid length
- * Improvements so advertisement-example works out of the box
-
-v7 -> v8:
- * Rebase
- * Use eir.h constants instead of local constants
- * Rename internal structures for brevity
- * Add null checks
- * Check for queue_* failures
- * Address misc other comments
-
-v8 -> v9:
- * Rebase
- * Rephrase example-advertisement patch message
- * Don't try to start LEAdvertisingManager when not in experimental
- * Set MGMT flags correctly for peripheral vs. broadcast
- * Fix memory leaks in refresh_advertisement
-
-v9 -> v10:
- * Rebase
- * Add length checks to bt_ad_add_service_data and bt_ad_add_manufacturer_data
- * Use size_t where appropriate to avoid overflows
-
-Michael Janssen (12):
-  shared: add bt_ad structure
-  core/advertising: use bt_ad
-  core/advertising: Parse ServiceUUIDs
-  core/advertising: Parse SolicitUUIDs
-  core/advertising: Parse ManufacturerSpecificData
-  core/advertising: Parse ServiceData
-  Update TODO for LE Advertising
-  shared/ad: implement bt_ad_generate
-  core/advertising: Add and Remove AD using MGMT
-  test: improvements to example-advertisement
-  gdbus: Add g_dbus_get_flags function
-  core: Only start Advertising Manager when experimental
-
- Makefile.am                |   1 +
- TODO                       |  20 +-
- gdbus/gdbus.h              |   1 +
- gdbus/object.c             |   5 +
- src/adapter.c              |  18 +-
- src/advertising.c          | 325 ++++++++++++++++++++++++-
- src/eir.h                  |  12 +
- src/shared/ad.c            | 589 +++++++++++++++++++++++++++++++++++++++++++++
- src/shared/ad.h            |  60 +++++
- test/example-advertisement |  12 +-
- 10 files changed, 1006 insertions(+), 37 deletions(-)
- create mode 100644 src/shared/ad.c
- create mode 100644 src/shared/ad.h
-
--- 
-2.2.0.rc0.207.ga3a616c
+Marcel
 
