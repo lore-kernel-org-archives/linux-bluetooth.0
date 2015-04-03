@@ -2,236 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v10 09/12] core/advertising: Add and Remove AD using MGMT
-Date: Fri,  3 Apr 2015 15:02:09 -0700
-Message-Id: <1428098532-5257-10-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v10 12/12] core: Only start Advertising Manager when experimental
+Date: Fri,  3 Apr 2015 15:02:12 -0700
+Message-Id: <1428098532-5257-13-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 References: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Updates the advertising manager to add and remove the LE Advertising Data
-using MGMT interface commands.
----
- src/advertising.c | 119 ++++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 103 insertions(+), 16 deletions(-)
+Check the experimental flag, there is no value in starting the
+Advertising Manager when there is no method for advertising.
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 74b9cbd..8d0f10c 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -26,6 +26,7 @@
- #include <gdbus/gdbus.h>
- 
- #include "lib/bluetooth.h"
-+#include "lib/mgmt.h"
- #include "lib/sdp.h"
- 
- #include "adapter.h"
-@@ -33,6 +34,7 @@
- #include "error.h"
- #include "log.h"
- #include "src/shared/ad.h"
-+#include "src/shared/mgmt.h"
- #include "src/shared/queue.h"
- #include "src/shared/util.h"
- 
-@@ -42,6 +44,8 @@
- struct btd_advertising {
- 	struct btd_adapter *adapter;
- 	struct queue *ads;
-+	struct mgmt *mgmt;
-+	uint16_t mgmt_index;
- };
- 
- #define AD_TYPE_BROADCAST 0
-@@ -56,6 +60,7 @@ struct advertisement {
- 	DBusMessage *reg;
- 	uint8_t type; /* Advertising type */
- 	struct bt_ad *data;
-+	uint8_t instance;
- };
- 
- static bool match_advertisement_path(const void *a, const void *b)
-@@ -123,10 +128,15 @@ static void advertisement_destroy(void *data)
- static void advertisement_remove(void *data)
- {
- 	struct advertisement *ad = data;
-+	struct mgmt_cp_remove_advertising cp;
- 
- 	g_dbus_client_set_disconnect_watch(ad->client, NULL, NULL);
- 
--	/* TODO: mgmt API call to remove advert */
-+	cp.instance = ad->instance;
-+
-+	mgmt_send(ad->manager->mgmt, MGMT_OP_REMOVE_ADVERTISING,
-+			ad->manager->mgmt_index, sizeof(cp), &cp, NULL, NULL,
-+			NULL);
- 
- 	queue_remove(ad->manager->ads, ad);
- 
-@@ -351,43 +361,105 @@ fail:
- 	return false;
- }
- 
--static void refresh_advertisement(struct advertisement *ad)
-+static void add_advertising_callback(uint8_t status, uint16_t length,
-+					  const void *param, void *user_data)
- {
-+	struct advertisement *ad = user_data;
-+	const struct mgmt_rp_add_advertising *rp = param;
-+
-+	if (status || !param) {
-+		error("Failed to add advertising MGMT");
-+		return;
-+	}
-+
-+	ad->instance = rp->instance;
-+}
-+
-+static DBusMessage *refresh_advertisement(struct advertisement *ad)
-+{
-+	struct mgmt_cp_add_advertising *cp;
-+	uint8_t adv_data_len, param_len;
-+	uint8_t *adv_data;
-+
- 	DBG("Refreshing advertisement: %s", ad->path);
-+
-+	adv_data = bt_ad_generate(ad->data, &adv_data_len);
-+
-+	if (!adv_data) {
-+		error("Advertising data couldn't be generated.");
-+
-+		return g_dbus_create_error(ad->reg, ERROR_INTERFACE
-+						".InvalidLength",
-+						"Advertising data too long.");
-+	}
-+
-+	param_len = sizeof(struct mgmt_cp_add_advertising) + adv_data_len;
-+
-+	cp = malloc0(param_len);
-+
-+	if (!cp) {
-+		error("Couldn't allocate for MGMT!");
-+
-+		free(adv_data);
-+
-+		return btd_error_failed(ad->reg, "Failed");
-+	}
-+
-+	if (ad->type == AD_TYPE_PERIPHERAL)
-+		cp->flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
-+
-+	cp->instance = ad->instance;
-+	cp->adv_data_len = adv_data_len;
-+	memcpy(cp->data, adv_data, adv_data_len);
-+
-+	free(adv_data);
-+
-+	if (!mgmt_send(ad->manager->mgmt, MGMT_OP_ADD_ADVERTISING,
-+					ad->manager->mgmt_index, param_len, cp,
-+					add_advertising_callback, ad, NULL)) {
-+		error("Failed to add Advertising Data");
-+
-+		free(cp);
-+
-+		return btd_error_failed(ad->reg, "Failed");
-+	}
-+
-+	free(cp);
-+
-+	return NULL;
- }
- 
--static bool parse_advertisement(struct advertisement *ad)
-+static DBusMessage *parse_advertisement(struct advertisement *ad)
- {
- 	if (!parse_advertising_type(ad->proxy, &ad->type)) {
- 		error("Failed to read \"Type\" property of advertisement");
--		return false;
-+		goto fail;
+This also makes startup quieter when experimental is not set.
+---
+ src/adapter.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index ccc67fc..7ffd302 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7334,16 +7334,14 @@ static int adapter_register(struct btd_adapter *adapter)
+ 		return -EINVAL;
  	}
  
- 	if (!parse_advertising_service_uuids(ad->proxy, ad->data)) {
- 		error("Property \"ServiceUUIDs\" failed to parse");
--		return false;
-+		goto fail;
- 	}
- 
- 	if (!parse_advertising_solicit_uuids(ad->proxy, ad->data)) {
- 		error("Property \"SolicitUUIDs\" failed to parse");
--		return false;
-+		goto fail;
- 	}
- 
- 	if (!parse_advertising_manufacturer_data(ad->proxy, ad->data)) {
- 		error("Property \"ManufacturerData\" failed to parse");
--		return false;
-+		goto fail;
- 	}
- 
- 	if (!parse_advertising_service_data(ad->proxy, ad->data)) {
- 		error("Property \"ServiceData\" failed to parse");
--		return false;
-+		goto fail;
- 	}
- 
--	/* TODO: parse the rest of the properties */
-+	return refresh_advertisement(ad);
- 
--	refresh_advertisement(ad);
+-	/* Don't start advertising managers on non-LE controllers. */
+-	if (adapter->supported_settings & MGMT_SETTING_LE) {
+-		adapter->adv_manager = btd_advertising_manager_new(adapter);
 -
--	return true;
-+fail:
-+	return btd_error_failed(ad->reg, "Failed to parse advertisement.");
- }
- 
- static void advertisement_proxy_added(GDBusProxy *proxy, void *data)
-@@ -395,11 +467,14 @@ static void advertisement_proxy_added(GDBusProxy *proxy, void *data)
- 	struct advertisement *ad = data;
- 	DBusMessage *reply;
- 
--	if (!parse_advertisement(ad)) {
--		error("Failed to parse advertisement");
-+	reply = parse_advertisement(ad);
-+
-+	if (reply) {
-+		/* Failed to publish for some reason, remove. */
-+		queue_remove(ad->manager->ads, ad);
-+
-+		g_idle_add(advertisement_free_idle_cb, ad);
- 
--		reply = btd_error_failed(ad->reg,
--					"Failed to register advertisement");
- 		goto done;
+-		/* LEAdvertisingManager1 is experimental so optional */
+-		if (!adapter->adv_manager)
+-			error("Failed to register LEAdvertisingManager1 "
+-						"interface for adapter");
+-	} else {
+-		info("Not starting LEAdvertisingManager, LE not supported");
++	if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
++		/* Don't start advertising managers on non-LE controllers. */
++		if (adapter->supported_settings & MGMT_SETTING_LE) {
++			adapter->adv_manager =
++					btd_advertising_manager_new(adapter);
++		} else {
++			info("LEAdvertisingManager skipped, LE unavailable");
++		}
  	}
  
-@@ -430,6 +505,8 @@ static struct advertisement *advertisement_create(DBusConnection *conn,
- 	if (!ad)
- 		return NULL;
- 
-+	ad->instance = 1;
-+
- 	ad->client = g_dbus_client_new_full(conn, sender, path, path);
- 	if (!ad->client)
- 		goto fail;
-@@ -567,6 +644,16 @@ advertising_manager_create(struct btd_adapter *adapter)
- 
- 	manager->adapter = adapter;
- 
-+	manager->mgmt = mgmt_new_default();
-+
-+	if (!manager->mgmt) {
-+		error("Failed to access management interface");
-+		free(manager);
-+		return NULL;
-+	}
-+
-+	manager->mgmt_index = btd_adapter_get_index(adapter);
-+
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 						adapter_get_path(adapter),
- 						LE_ADVERTISING_MGR_IFACE,
+ 	db = btd_gatt_database_get_db(adapter->database);
 -- 
 2.2.0.rc0.207.ga3a616c
 
