@@ -2,75 +2,88 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [BlueZ v10 04/12] core/advertising: Parse SolicitUUIDs
-Date: Fri,  3 Apr 2015 15:02:04 -0700
-Message-Id: <1428098532-5257-5-git-send-email-jamuraa@chromium.org>
+Subject: [BlueZ v10 05/12] core/advertising: Parse ManufacturerSpecificData
+Date: Fri,  3 Apr 2015 15:02:05 -0700
+Message-Id: <1428098532-5257-6-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 References: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Parse the SolicitUUIDs property of the LEAdvertisement1 object.
+Parse the ManufacturerSpecificData property of the LEAdvertisement1
 ---
- src/advertising.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ src/advertising.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
 diff --git a/src/advertising.c b/src/advertising.c
-index 9867e1e..d736ea9 100644
+index d736ea9..8d6c13e 100644
 --- a/src/advertising.c
 +++ b/src/advertising.c
-@@ -205,6 +205,45 @@ fail:
+@@ -244,6 +244,58 @@ fail:
  	return false;
  }
  
-+static bool parse_advertising_solicit_uuids(GDBusProxy *proxy,
++static bool parse_advertising_manufacturer_data(GDBusProxy *proxy,
 +							struct bt_ad *data)
 +{
-+	DBusMessageIter iter, ariter;
++	DBusMessageIter iter, entries;
 +
-+	if (!g_dbus_proxy_get_property(proxy, "SolicitUUIDs", &iter))
++	if (!g_dbus_proxy_get_property(proxy, "ManufacturerData", &iter))
 +		return true;
 +
 +	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
 +		return false;
 +
-+	dbus_message_iter_recurse(&iter, &ariter);
++	dbus_message_iter_recurse(&iter, &entries);
 +
-+	bt_ad_clear_solicit_uuid(data);
++	bt_ad_clear_manufacturer_data(data);
 +
-+	while (dbus_message_iter_get_arg_type(&ariter) == DBUS_TYPE_STRING) {
-+		const char *uuid_str;
-+		bt_uuid_t uuid;
++	while (dbus_message_iter_get_arg_type(&entries)
++						== DBUS_TYPE_DICT_ENTRY) {
++		DBusMessageIter value, entry;
++		uint16_t manuf_id;
++		uint8_t *manuf_data;
++		int len;
 +
-+		dbus_message_iter_get_basic(&ariter, &uuid_str);
++		dbus_message_iter_recurse(&entries, &entry);
++		dbus_message_iter_get_basic(&entry, &manuf_id);
 +
-+		DBG("Adding SolicitUUID: %s", uuid_str);
-+
-+		if (bt_string_to_uuid(&uuid, uuid_str) < 0)
++		dbus_message_iter_next(&entry);
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_ARRAY)
 +			goto fail;
 +
-+		if (!bt_ad_add_solicit_uuid(data, &uuid))
++		dbus_message_iter_recurse(&entry, &value);
++
++		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_BYTE)
 +			goto fail;
 +
-+		dbus_message_iter_next(&ariter);
++		dbus_message_iter_get_fixed_array(&value, &manuf_data, &len);
++
++		DBG("Adding ManufacturerData for %04x", manuf_id);
++
++		if (!bt_ad_add_manufacturer_data(data, manuf_id, manuf_data,
++									len))
++			goto fail;
++
++		dbus_message_iter_next(&entries);
 +	}
 +
 +	return true;
 +
 +fail:
-+	bt_ad_clear_solicit_uuid(data);
++	bt_ad_clear_manufacturer_data(data);
 +	return false;
 +}
 +
  static void refresh_advertisement(struct advertisement *ad)
  {
  	DBG("Refreshing advertisement: %s", ad->path);
-@@ -222,6 +261,11 @@ static bool parse_advertisement(struct advertisement *ad)
+@@ -266,6 +318,11 @@ static bool parse_advertisement(struct advertisement *ad)
  		return false;
  	}
  
-+	if (!parse_advertising_solicit_uuids(ad->proxy, ad->data)) {
-+		error("Property \"SolicitUUIDs\" failed to parse");
++	if (!parse_advertising_manufacturer_data(ad->proxy, ad->data)) {
++		error("Property \"ManufacturerData\" failed to parse");
 +		return false;
 +	}
 +
