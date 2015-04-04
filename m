@@ -1,118 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [RFC 3/5] Bluetooth: hci_uart: Add HCIUARTSETBAUDRATE ioctl
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <55206E46.10706@hurleysoftware.com>
-Date: Sat, 4 Apr 2015 16:35:04 -0700
-Cc: Loic Poulain <loic.poulain@intel.com>,
-	Frederic Danis <frederic.danis@linux.intel.com>,
-	linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
-	jslaby@suse.cz
-Message-Id: <A3143A1C-D32E-4EE4-A52B-446160A5F484@holtmann.org>
-References: <1427985456-31536-1-git-send-email-frederic.danis@linux.intel.com> <1427985456-31536-4-git-send-email-frederic.danis@linux.intel.com> <551E717A.6040500@hurleysoftware.com> <551E8C6A.8040009@linux.intel.com> <551E9987.9050800@hurleysoftware.com> <551EA13B.7010307@intel.com> <551EB5A1.9040409@hurleysoftware.com> <D74E0673-5A60-4E8F-A050-60DB4A0F43A7@holtmann.org> <55206E46.10706@hurleysoftware.com>
-To: Peter Hurley <peter@hurleysoftware.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] Bluetooth: hci_uart: Add support Intel address configuration
+Date: Sat,  4 Apr 2015 16:13:02 -0700
+Message-Id: <1428189183-12932-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+When using vendor detection, this adds support for the Intel specific
+address configuration command.
 
->>>>> The line discipline is always notified of line rate changes
->>>>> via the set_termios() method, so if you add that to the hci_ldisc,
->>>>> you'll be able to keep the BT device in sync with your
->>>>> vendor-specific commands.
->>>> If I'm not wrong, line discipline is notified after the tty termios change.
->>>> So, it's too late to send the  HCI change speed command.
->>>> Moreover, user space is not aware of the device behavior, the driver should
->>>> be the only one to manage the device and its serial link.
->>>> Here, user space is just a bootstrap which hands over to the driver.
->>> 
->>> You realize that you're telling me that userspace is unaware of
->>> this in a thread that begins with a proposed userspace ioctl change to
->>> the line discipline? An ioctl change that adds a new ioctl to set the
->>> speed in a line discipline? For which there are already lots of ioctls
->>> to set the line speed?
->> 
->> actually the problem is a little bit different here.
-> 
-> Thanks for taking the time to outline the operation of hciattach. It's
-> been a while since I was involved in the BT userspace code so I hadn't
-> realized how much hciattach had morphed.
-> 
->> Every Bluetooth UART chip has its default baudrate. Mostly that is 115k, but some actually have others.
->> 
->> The general idea was that userspace deals with opening the TTY, send the HCI commands to change the rate, then change the termios setting, attach the ldisc and then hand it to the kernel.
->> 
->> This is however not how at least two major Bluetooth controllers work when you have to do firmware loading. When they boot into the firmware, then baudrate falls back to default and you have to do that all over again.
->> 
->> So what this ioctl will just tell the kernel about is the desired baudrate that it wants to be set whenever possible. The whenever possible is important here since depending on the manufacturer that might be a total different times. And with firmware download procedures being fully vendor specific this will vary.
->> 
->>> Setting aside the problem with the firmware load, I see no reason why
->>> this can't be done within the existing line discipline framework.
->> 
->> So far everything has been done in hciattach tool. And it is so ugly and does not even work properly for any complex UART protocols like BCSP or 3-Wire. There is a patch for a modified 3-Wire setup from one vendor that made my eyes bleed. So what you really want is having the kernel take control over HCI from the beginning. Otherwise this goes out of control and handling exceptions like hardware error event becomes impossible.
->> 
->> In summary what we have to do these days is this:
->> 
->> - Send Reset
->> - Send a few basic HCI commands
->> - Send baud rate change command
->> - Change actual baud rate on the TTY
->> - Download firmware
->> - Send Reset to boot the firmware
->> - Change actual baud rate back to default
->> - Send baud rate change command
->> - Change actual baud rate
->> - Send Reset
->> - Standard init sequence
->> 
->> Now tell me how the line discipline framework helps us here?
-> 
-> Well,
-> 1. in hciattach I would have set the N_HCI line discipline immediately
->   after opening the uart device.
-> 2. in the N_HCI line discipline, I would have implemented write() so
->   userspace command write()s would still write through to the uart
->   device.
-> 3. either,
->   a. I would have added a new line discipline method for pre-termios changes, or
->   b. I would have caught set termios ioctls in the N_HCI line discipline ioctl.
-> 
->   and handled sending target line speed change commands there.
->   Userspace would simply change the line speed.
-> 
-> Userspace firmware loads are straightforward.
-> 
-> However, it seems that the new intel approach (tied in with the protocol)
-> is trickier to accommodate, but I haven't spent a lot of time trying to follow
-> that setup.
-> 
-> I'm not sure I understand why the firmware load is tied to the protocol;
-> can the intel part load a different firmware that implements a different protocol?
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/Kconfig     |  9 ++++++++
+ drivers/bluetooth/Makefile    |  1 +
+ drivers/bluetooth/hci_intel.c | 48 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_ldisc.c |  5 +++++
+ drivers/bluetooth/hci_uart.h  |  7 ++++++-
+ 5 files changed, 69 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/bluetooth/hci_intel.c
 
-the firmware loading procedure for USB and UART is actually the same. That applies to Broadcom and Intel controllers for sure and most likely also for other vendors. One goal is to share the firmware loading code between USB and UART based SKUs of these controllers. Where are not there yet, but that is where this is heading. So while we can hack around certain things in userspace, we really do not want to do that since it just means duplicated code.
-
-Implementing the write() is a bad idea in my opinion. That is like injecting HCI commands behind your back. All sorts of messy things can happen if you allow that. And that is why this is actually not even implemented at the moment. Remember that HCI protocol comes with flow control for their commands and events. Injecting something without taking care of the command flow control means you are doing evil stuff. The firmware loading is using HCI commands and thus it should go through the high-level Bluetooth core that understands HCI commands.
-
-Our idea is essentially that we set the N_HCI line discipline and then set the vendor protocol. That is it. From that point on it is the kernels problem to handle the bringup of the Bluetooth device. Including firmware download, address configuration and so on. Before setting N_HCI we would correctly configure the default baudrate and all other needed settings. However that is as much as we do from userspace.
-
-For this to work, we need to be able to tell the TTY to change its baudrate. And this has to happen at least 3 times now. Higher baudrate before downloading the firmware, back to default baudrate after that, switch to higher baudrate and only then we are at normal operation.
-
-So how does intercepting the termios ioctl will help us in this regard. The kernel needs to control the baudrate change and not userspace.
-
->> Keep in mind you have to tell the controller via HCI commands over the old baud rate to change its rate. And then change it on the TTY to match what the controller does on its side.
-> 
-> I'm conscious of the limitations of using tty/serial in the current manner.
-> 
-> A fun project for one of these vendors would be to split the serial core
-> into a separate tty driver and an abstraction layer that would allow other
-> kernel subsystems to enslave the port.
-
-They are proposing TTY slave devices and maybe that will help eventually, but finding agreement on that seems hard as well. And that is also mostly for handling the extra GPIO configuration for power up/down the Bluetooth chip behind the TTY and not the TTY itself.
-
-I would love if we could just expose these TTYs as bi-directional pipes on a "serial bus" and just have a driver attach to it instead of going through a line discipline.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 364f080768d0..4356f718ea3d 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -94,6 +94,15 @@ config BT_HCIUART_3WIRE
+ 
+ 	  Say Y here to compile support for Three-wire UART protocol.
+ 
++config BT_HCIUART_INTEL
++	bool "Intel protocol support"
++	depends on BT_HCIUART
++	help
++	  The Intel protocol support enables Bluetooth HCI over serial
++	  port interface for Intel Bluetooth controllers.
++
++	  Say Y here to compile support for Intel protocol.
++
+ config BT_HCIBCM203X
+ 	tristate "HCI BCM203x USB driver"
+ 	depends on USB
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 9fe8a875a827..adb99457d016 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -29,6 +29,7 @@ hci_uart-$(CONFIG_BT_HCIUART_BCSP)	+= hci_bcsp.o
+ hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
+ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
+ hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
++hci_uart-$(CONFIG_BT_HCIUART_INTEL)	+= hci_intel.o
+ hci_uart-objs				:= $(hci_uart-y)
+ 
+ ccflags-y += -D__CHECK_ENDIAN__
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+new file mode 100644
+index 000000000000..b7bd50a41080
+--- /dev/null
++++ b/drivers/bluetooth/hci_intel.c
+@@ -0,0 +1,48 @@
++/*
++ *
++ *  Bluetooth HCI UART driver for Intel devices
++ *
++ *  Copyright (C) 2015  Intel Corporation
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++
++#include <linux/kernel.h>
++#include <linux/errno.h>
++#include <linux/skbuff.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++
++#include "hci_uart.h"
++
++int intel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	struct sk_buff *skb;
++	int err;
++
++	skb = __hci_cmd_sync(hdev, 0xfc31, 6, bdaddr, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		BT_ERR("%s: Changing Intel device address failed (%d)",
++		       hdev->name, err);
++		return err;
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index b1e8083044ce..03f9defac39d 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -290,6 +290,11 @@ static int hci_uart_setup(struct hci_dev *hdev)
+ 	ver = (struct hci_rp_read_local_version *)skb->data;
+ 
+ 	switch (le16_to_cpu(ver->manufacturer)) {
++#ifdef CONFIG_BT_HCIUART_INTEL
++	case 2:
++		hdev->set_bdaddr = intel_set_bdaddr;
++		break;
++#endif
+ 	}
+ 
+ done:
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 22a5f7c74266..687aa7e9eb2e 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -35,7 +35,7 @@
+ #define HCIUARTGETFLAGS		_IOR('U', 204, int)
+ 
+ /* UART protocols */
+-#define HCI_UART_MAX_PROTO	6
++#define HCI_UART_MAX_PROTO	7
+ 
+ #define HCI_UART_H4	0
+ #define HCI_UART_BCSP	1
+@@ -43,6 +43,7 @@
+ #define HCI_UART_H4DS	3
+ #define HCI_UART_LL	4
+ #define HCI_UART_ATH3K	5
++#define HCI_UART_INTEL	6
+ 
+ #define HCI_UART_RAW_DEVICE	0
+ #define HCI_UART_RESET_ON_INIT	1
+@@ -118,3 +119,7 @@ int ath_deinit(void);
+ int h5_init(void);
+ int h5_deinit(void);
+ #endif
++
++#ifdef CONFIG_BT_HCIUART_INTEL
++int intel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
++#endif
+-- 
+2.1.0
 
