@@ -1,101 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/14] Bluetooth: btintel: Add function for checking Intel default address
-Date: Sun,  5 Apr 2015 03:04:49 -0700
-Message-Id: <1428228299-28415-4-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 07/14] Bluetooth: btusb: Move Intel command structs into its own header
+Date: Sun,  5 Apr 2015 03:04:52 -0700
+Message-Id: <1428228299-28415-7-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Intel default address is special and for proper functionality it
-needs to be verified that this one is not set. This provides a generic
-function for this that can be used by multiple modules.
+Since the Intel Bluetooth support has its own header, it makes sense
+to move all command structs into it.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btintel.c | 47 +++++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  6 ++++++
- 2 files changed, 53 insertions(+)
+ drivers/bluetooth/btintel.h | 33 +++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btusb.c   | 33 ---------------------------------
+ 2 files changed, 33 insertions(+), 33 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index d78273626c61..91d54babe48a 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -28,6 +28,53 @@
- 
- #define VERSION "0.1"
- 
-+#define BDADDR_INTEL (&(bdaddr_t) {{0x00, 0x8b, 0x9e, 0x19, 0x03, 0x00}})
-+
-+int btintel_check_bdaddr(struct hci_dev *hdev)
-+{
-+	struct hci_rp_read_bd_addr *bda;
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		int err = PTR_ERR(skb);
-+		BT_ERR("%s: Reading Intel device address failed (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+
-+	if (skb->len != sizeof(*bda)) {
-+		BT_ERR("%s: Intel device address length mismatch", hdev->name);
-+		kfree_skb(skb);
-+		return -EIO;
-+	}
-+
-+	bda = (struct hci_rp_read_bd_addr *)skb->data;
-+	if (bda->status) {
-+		BT_ERR("%s: Intel device address result failed (%02x)",
-+		       hdev->name, bda->status);
-+		kfree_skb(skb);
-+		return -bt_to_errno(bda->status);
-+	}
-+
-+	/* For some Intel based controllers, the default Bluetooth device
-+	 * address 00:03:19:9E:8B:00 can be found. These controllers are
-+	 * fully operational, but have the danger of duplicate addresses
-+	 * and that in turn can cause problems with Bluetooth operation.
-+	 */
-+	if (!bacmp(&bda->bdaddr, BDADDR_INTEL)) {
-+		BT_ERR("%s: Found Intel default device address (%pMR)",
-+		       hdev->name, &bda->bdaddr);
-+		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_check_bdaddr);
-+
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- {
- 	struct sk_buff *skb;
 diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 550fbcdf0c47..20be247d2ff6 100644
+index 20be247d2ff6..d1581150679a 100644
 --- a/drivers/bluetooth/btintel.h
 +++ b/drivers/bluetooth/btintel.h
-@@ -23,10 +23,16 @@
+@@ -21,6 +21,39 @@
+  *
+  */
  
++struct intel_version {
++	u8 status;
++	u8 hw_platform;
++	u8 hw_variant;
++	u8 hw_revision;
++	u8 fw_variant;
++	u8 fw_revision;
++	u8 fw_build_num;
++	u8 fw_build_ww;
++	u8 fw_build_yy;
++	u8 fw_patch_num;
++} __packed;
++
++struct intel_boot_params {
++	__u8     status;
++	__u8     otp_format;
++	__u8     otp_content;
++	__u8     otp_patch;
++	__le16   dev_revid;
++	__u8     secure_boot;
++	__u8     key_from_hdr;
++	__u8     key_type;
++	__u8     otp_lock;
++	__u8     api_lock;
++	__u8     debug_lock;
++	bdaddr_t otp_bdaddr;
++	__u8     min_fw_build_nn;
++	__u8     min_fw_build_cw;
++	__u8     min_fw_build_yy;
++	__u8     limited_cce;
++	__u8     unlocked_state;
++} __packed;
++
  #if IS_ENABLED(CONFIG_BT_INTEL)
  
-+int btintel_check_bdaddr(struct hci_dev *hdev);
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int btintel_check_bdaddr(struct hci_dev *hdev);
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index ab2d587e97a1..664bcb0745b0 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1345,39 +1345,6 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+ 	return ret;
+ }
  
- #else
- 
-+static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+-struct intel_version {
+-	u8 status;
+-	u8 hw_platform;
+-	u8 hw_variant;
+-	u8 hw_revision;
+-	u8 fw_variant;
+-	u8 fw_revision;
+-	u8 fw_build_num;
+-	u8 fw_build_ww;
+-	u8 fw_build_yy;
+-	u8 fw_patch_num;
+-} __packed;
+-
+-struct intel_boot_params {
+-	__u8     status;
+-	__u8     otp_format;
+-	__u8     otp_content;
+-	__u8     otp_patch;
+-	__le16   dev_revid;
+-	__u8     secure_boot;
+-	__u8     key_from_hdr;
+-	__u8     key_type;
+-	__u8     otp_lock;
+-	__u8     api_lock;
+-	__u8     debug_lock;
+-	bdaddr_t otp_bdaddr;
+-	__u8     min_fw_build_nn;
+-	__u8     min_fw_build_cw;
+-	__u8     min_fw_build_yy;
+-	__u8     limited_cce;
+-	__u8     unlocked_state;
+-} __packed;
+-
+ static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
+ 						       struct intel_version *ver)
  {
- 	return -EOPNOTSUPP;
 -- 
 2.1.0
 
