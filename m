@@ -1,109 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/14] Bluetooth: btusb: Move Intel command structs into its own header
-Date: Sun,  5 Apr 2015 03:04:52 -0700
-Message-Id: <1428228299-28415-7-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 02/14] Bluetooth: btusb: Use generic Intel support for address setting
+Date: Sun,  5 Apr 2015 03:04:47 -0700
+Message-Id: <1428228299-28415-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since the Intel Bluetooth support has its own header, it makes sense
-to move all command structs into it.
+The Bluetooth address setting for Intel devices is provided by a generic
+module now. Start using that module instead of relying it being included
+in the driver.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btintel.h | 33 +++++++++++++++++++++++++++++++++
- drivers/bluetooth/btusb.c   | 33 ---------------------------------
- 2 files changed, 33 insertions(+), 33 deletions(-)
+ drivers/bluetooth/Kconfig |  1 +
+ drivers/bluetooth/btusb.c | 23 ++++-------------------
+ 2 files changed, 5 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 20be247d2ff6..d1581150679a 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -21,6 +21,39 @@
-  *
-  */
- 
-+struct intel_version {
-+	u8 status;
-+	u8 hw_platform;
-+	u8 hw_variant;
-+	u8 hw_revision;
-+	u8 fw_variant;
-+	u8 fw_revision;
-+	u8 fw_build_num;
-+	u8 fw_build_ww;
-+	u8 fw_build_yy;
-+	u8 fw_patch_num;
-+} __packed;
-+
-+struct intel_boot_params {
-+	__u8     status;
-+	__u8     otp_format;
-+	__u8     otp_content;
-+	__u8     otp_patch;
-+	__le16   dev_revid;
-+	__u8     secure_boot;
-+	__u8     key_from_hdr;
-+	__u8     key_type;
-+	__u8     otp_lock;
-+	__u8     api_lock;
-+	__u8     debug_lock;
-+	bdaddr_t otp_bdaddr;
-+	__u8     min_fw_build_nn;
-+	__u8     min_fw_build_cw;
-+	__u8     min_fw_build_yy;
-+	__u8     limited_cce;
-+	__u8     unlocked_state;
-+} __packed;
-+
- #if IS_ENABLED(CONFIG_BT_INTEL)
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 951a80b2660e..95b4626da4fb 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -8,6 +8,7 @@ config BT_INTEL
+ config BT_HCIBTUSB
+ 	tristate "HCI USB driver"
+ 	depends on USB
++	select BT_INTEL
+ 	help
+ 	  Bluetooth HCI USB driver.
+ 	  This driver is required if you want to use Bluetooth devices with
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ab2d587e97a1..664bcb0745b0 100644
+index 6e4ff16e487b..8fafd880b148 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -1345,39 +1345,6 @@ static int btusb_setup_csr(struct hci_dev *hdev)
- 	return ret;
+@@ -29,6 +29,8 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ 
++#include "btintel.h"
++
+ #define VERSION "0.7"
+ 
+ static bool disable_scofix;
+@@ -2340,23 +2342,6 @@ static void btusb_hw_error_intel(struct hci_dev *hdev, u8 code)
+ 	kfree_skb(skb);
  }
  
--struct intel_version {
--	u8 status;
--	u8 hw_platform;
--	u8 hw_variant;
--	u8 hw_revision;
--	u8 fw_variant;
--	u8 fw_revision;
--	u8 fw_build_num;
--	u8 fw_build_ww;
--	u8 fw_build_yy;
--	u8 fw_patch_num;
--} __packed;
+-static int btusb_set_bdaddr_intel(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+-{
+-	struct sk_buff *skb;
+-	long ret;
 -
--struct intel_boot_params {
--	__u8     status;
--	__u8     otp_format;
--	__u8     otp_content;
--	__u8     otp_patch;
--	__le16   dev_revid;
--	__u8     secure_boot;
--	__u8     key_from_hdr;
--	__u8     key_type;
--	__u8     otp_lock;
--	__u8     api_lock;
--	__u8     debug_lock;
--	bdaddr_t otp_bdaddr;
--	__u8     min_fw_build_nn;
--	__u8     min_fw_build_cw;
--	__u8     min_fw_build_yy;
--	__u8     limited_cce;
--	__u8     unlocked_state;
--} __packed;
+-	skb = __hci_cmd_sync(hdev, 0xfc31, 6, bdaddr, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		ret = PTR_ERR(skb);
+-		BT_ERR("%s: changing Intel device address failed (%ld)",
+-		       hdev->name, ret);
+-		return ret;
+-	}
+-	kfree_skb(skb);
 -
- static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
- 						       struct intel_version *ver)
+-	return 0;
+-}
+-
+ static int btusb_shutdown_intel(struct hci_dev *hdev)
  {
+ 	struct sk_buff *skb;
+@@ -3068,7 +3053,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_INTEL) {
+ 		hdev->setup = btusb_setup_intel;
+ 		hdev->shutdown = btusb_shutdown_intel;
+-		hdev->set_bdaddr = btusb_set_bdaddr_intel;
++		hdev->set_bdaddr = btintel_set_bdaddr;
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 	}
+@@ -3077,7 +3062,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		hdev->send = btusb_send_frame_intel;
+ 		hdev->setup = btusb_setup_intel_new;
+ 		hdev->hw_error = btusb_hw_error_intel;
+-		hdev->set_bdaddr = btusb_set_bdaddr_intel;
++		hdev->set_bdaddr = btintel_set_bdaddr;
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 	}
+ 
 -- 
 2.1.0
 
