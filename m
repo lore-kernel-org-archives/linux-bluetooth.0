@@ -1,66 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Make data pointer of hci_recv_stream_fragment const
-Date: Sat,  4 Apr 2015 20:54:23 -0700
-Message-Id: <1428206064-28396-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/2] Bluetooth: hci_uart: Use const data pointer for received data
+Date: Sat,  4 Apr 2015 20:54:24 -0700
+Message-Id: <1428206064-28396-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The data pointer provided to hci_recv_stream_fragment function should
-have been marked const. The function has no business in modifying the
-original data. So fix this now.
+The TTY layer provides its data pointers as const, but the HCI UART
+callbacks expect them as general data pointers. This is of course
+wrong and instead of casting them, just fix the individual drivers
+to actually take a const data pointer.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 2 +-
- net/bluetooth/hci_core.c         | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/bluetooth/hci_ath.c   | 2 +-
+ drivers/bluetooth/hci_bcsp.c  | 4 ++--
+ drivers/bluetooth/hci_h4.c    | 2 +-
+ drivers/bluetooth/hci_ldisc.c | 2 +-
+ drivers/bluetooth/hci_ll.c    | 4 ++--
+ drivers/bluetooth/hci_uart.h  | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 93fd3e756b8a..ad957f336ead 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1012,7 +1012,7 @@ int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
- 
- int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb);
--int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count);
-+int hci_recv_stream_fragment(struct hci_dev *hdev, const void *data, int count);
- 
- void hci_init_sysfs(struct hci_dev *hdev);
- void hci_conn_init_sysfs(struct hci_conn *conn);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 46b114c0140b..c9e7cafb245a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3320,7 +3320,7 @@ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+index 9c4dcf4c62ea..4e89d3e33b7b 100644
+--- a/drivers/bluetooth/hci_ath.c
++++ b/drivers/bluetooth/hci_ath.c
+@@ -188,7 +188,7 @@ static struct sk_buff *ath_dequeue(struct hci_uart *hu)
  }
- EXPORT_SYMBOL(hci_recv_frame);
  
--static int hci_reassembly(struct hci_dev *hdev, int type, void *data,
-+static int hci_reassembly(struct hci_dev *hdev, int type, const void *data,
- 			  int count, __u8 index)
+ /* Recv data */
+-static int ath_recv(struct hci_uart *hu, void *data, int count)
++static int ath_recv(struct hci_uart *hu, const void *data, int count)
  {
- 	int len = 0;
-@@ -3430,7 +3430,7 @@ static int hci_reassembly(struct hci_dev *hdev, int type, void *data,
+ 	int ret;
  
- #define STREAM_REASSEMBLY 0
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index 21cc45b34f13..50ef2e613d59 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -554,10 +554,10 @@ static u16 bscp_get_crc(struct bcsp_struct *bcsp)
+ }
  
--int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count)
-+int hci_recv_stream_fragment(struct hci_dev *hdev, const void *data, int count)
+ /* Recv data */
+-static int bcsp_recv(struct hci_uart *hu, void *data, int count)
++static int bcsp_recv(struct hci_uart *hu, const void *data, int count)
  {
- 	int type;
- 	int rem = 0;
-@@ -3439,7 +3439,7 @@ int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count)
- 		struct sk_buff *skb = hdev->reassembly[STREAM_REASSEMBLY];
+ 	struct bcsp_struct *bcsp = hu->priv;
+-	unsigned char *ptr;
++	const unsigned char *ptr;
  
- 		if (!skb) {
--			struct { char type; } *pkt;
-+			const struct { char type; } *pkt;
+ 	BT_DBG("hu %p count %d rx_state %d rx_count %ld", 
+ 		hu, count, bcsp->rx_state, bcsp->rx_count);
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 0d9ba07d2730..97a5df4941b4 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -113,7 +113,7 @@ static int h4_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+ }
  
- 			/* Start of the frame */
- 			pkt = data;
+ /* Recv data */
+-static int h4_recv(struct hci_uart *hu, void *data, int count)
++static int h4_recv(struct hci_uart *hu, const void *data, int count)
+ {
+ 	int ret;
+ 
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index a3b906bcfca6..50dbaf3579ed 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -441,7 +441,7 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
+ 		return;
+ 
+ 	spin_lock(&hu->rx_lock);
+-	hu->proto->recv(hu, (void *) data, count);
++	hu->proto->recv(hu, data, count);
+ 
+ 	if (hu->hdev)
+ 		hu->hdev->stat.byte_rx += count;
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 69a90b1b5ff5..79eea1cbd988 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -370,10 +370,10 @@ static inline int ll_check_data_len(struct hci_dev *hdev, struct ll_struct *ll,
+ }
+ 
+ /* Recv data */
+-static int ll_recv(struct hci_uart *hu, void *data, int count)
++static int ll_recv(struct hci_uart *hu, const void *data, int count)
+ {
+ 	struct ll_struct *ll = hu->priv;
+-	char *ptr;
++	const char *ptr;
+ 	struct hci_event_hdr *eh;
+ 	struct hci_acl_hdr   *ah;
+ 	struct hci_sco_hdr   *sh;
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 4dc8ab3009a9..79bbcefb0112 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -60,7 +60,7 @@ struct hci_uart_proto {
+ 	int (*open)(struct hci_uart *hu);
+ 	int (*close)(struct hci_uart *hu);
+ 	int (*flush)(struct hci_uart *hu);
+-	int (*recv)(struct hci_uart *hu, void *data, int len);
++	int (*recv)(struct hci_uart *hu, const void *data, int len);
+ 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
+ 	int (*setup)(struct hci_uart *hu);
+ 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
 -- 
 2.1.0
 
