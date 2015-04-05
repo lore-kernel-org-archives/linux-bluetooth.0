@@ -1,37 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 5 Apr 2015 09:19:23 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Bluetooth: hci_uart: Add support for vendor
- detection flag
-Message-ID: <20150405061923.GA11977@t440s.P-661HNU-F1>
-References: <1428189183-12932-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1428189183-12932-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_uart: Update version number driver
+Date: Sat,  4 Apr 2015 22:36:04 -0700
+Message-Id: <1428212164-19437-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+This version number is more cosmetic and for debugging purposes, but
+since there has been a few changes lately, increase it now.
 
-On Sat, Apr 04, 2015, Marcel Holtmann wrote:
-> This adds a new HCI_UART_VND_DETECT flag to allow automatic vendor
-> detection. This allows to enable known vendor commands (for example
-> for setting the public device address) when using a standard H:4
-> UART protocol or when running in virtual machines.
-> 
-> When this new flag is configured and no vendor specific setup
-> routine is provided, then the local version information are read
-> and the provided manufacturer information can be evaluated to
-> configure extra vendor callbacks.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/hci_ldisc.c | 29 ++++++++++++++++++++++++++++-
->  drivers/bluetooth/hci_uart.h  |  1 +
->  2 files changed, 29 insertions(+), 1 deletion(-)
+Two left-over and not used version constants that were never exposed
+anywhere are removed since they have no actual value.
 
-All three patches in this set have been applied to bluetooth-next.
-Thanks.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/hci_bcsp.c  | 2 --
+ drivers/bluetooth/hci_h4.c    | 2 --
+ drivers/bluetooth/hci_ldisc.c | 2 +-
+ 3 files changed, 1 insertion(+), 5 deletions(-)
 
-Johan
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index a467aa28009a..dc8e3d4356a0 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -47,8 +47,6 @@
+ 
+ #include "hci_uart.h"
+ 
+-#define VERSION "0.3"
+-
+ static bool txcrc = 1;
+ static bool hciextn = 1;
+ 
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 81ad249fc44f..07f5f7a21961 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -46,8 +46,6 @@
+ 
+ #include "hci_uart.h"
+ 
+-#define VERSION "1.2"
+-
+ struct h4_struct {
+ 	struct sk_buff *rx_skb;
+ 	struct sk_buff_head txq;
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 19d0960489b6..b265abcb9eb6 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -46,7 +46,7 @@
+ 
+ #include "hci_uart.h"
+ 
+-#define VERSION "2.2"
++#define VERSION "2.3"
+ 
+ static const struct hci_uart_proto *hup[HCI_UART_MAX_PROTO];
+ 
+-- 
+2.1.0
+
