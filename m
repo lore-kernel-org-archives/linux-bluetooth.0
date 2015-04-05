@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: Make data pointer of hci_recv_stream_fragment const
-Date: Sat,  4 Apr 2015 20:59:40 -0700
-Message-Id: <1428206381-6111-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/2] Bluetooth: Make data pointer of hci_recv_stream_fragment const
+Date: Sat,  4 Apr 2015 20:54:23 -0700
+Message-Id: <1428206064-28396-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
