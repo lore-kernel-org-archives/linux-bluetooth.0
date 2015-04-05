@@ -1,293 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Grzegorz Kolodziejczyk' <grzegorz.kolodziejczyk@tieto.com>
-Cc: 'linux-bluetooth' <linux-bluetooth@vger.kernel.org>,
-	bharat.panda@samsung.com, cpgs@samsung.com
-References: <1427974325-3280-1-git-send-email-gowtham.ab@samsung.com>
- <CAMv5Gbd3P_+iN_DL5ZZXn_EzyodjKhUyoE=cxtfOD6j7mtDYSA@mail.gmail.com>
-In-reply-to: <CAMv5Gbd3P_+iN_DL5ZZXn_EzyodjKhUyoE=cxtfOD6j7mtDYSA@mail.gmail.com>
-Subject: RE: [PATCH] monitor: Add initial support for BNEP
-Date: Mon, 06 Apr 2015 11:12:49 +0530
-Message-id: <001401d0702c$8add5f60$a0981e20$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
+From: Florian Grandel <fgrandel@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Florian Grandel <fgrandel@gmail.com>
+Subject: [BlueZ v2 3/3] tools: add read adv features success tests
+Date: Sun,  5 Apr 2015 21:11:28 +0200
+Message-Id: <1428261088-14121-4-git-send-email-fgrandel@gmail.com>
+In-Reply-To: <1428261088-14121-1-git-send-email-fgrandel@gmail.com>
+References: <1428261088-14121-1-git-send-email-fgrandel@gmail.com>
+In-Reply-To: <1428259165-10021-3-git-send-email-fgrandel@gmail.com>
+References: <1428259165-10021-3-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+The mgmt-tester did not yet contain tests for the success path of the
+MGMT_OP_READ_ADV_FEATURES command. This patch adds two tests: one
+calling the command without an advertising instance and one with one
+advertising instance added.
+---
+ doc/test-coverage.txt |  2 +-
+ tools/mgmt-tester.c   | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 1 deletion(-)
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Grzegorz Kolodziejczyk
-> Sent: Friday, April 03, 2015 4:23 PM
-> To: Gowtham Anandha Babu
-> Cc: linux-bluetooth; bharat.panda@samsung.com; cpgs@samsung.com
-> Subject: Re: [PATCH] monitor: Add initial support for BNEP
-> 
-> Hi Gowtham,
-> 
-> On 2 April 2015 at 13:32, Gowtham Anandha Babu
-> <gowtham.ab@samsung.com> wrote:
-> >> ACL Data RX: Handle 71 flags 0x02 dlen 11
-> [hci0] 17.739883
-> >       Channel: 64 len 7 [PSM 15 mode 0] {chan 0}
-> >       BNEP: Control (0x01|0)
-> >         01 02 11 16 11 15                                ......
-> >
-> >> ACL Data RX: Handle 71 flags 0x01 dlen 35
-> [hci0] 175.293028
-> >       Channel: 64 len 1532 [PSM 15 mode 0] {chan 0}
-> >       BNEP: General Ethernet (0x00|1)
-> >         00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 0f  ................
-> >         05 00 0c 03 00 00 20 00 00 03 00 00 20 00 00 3c  ...... .....
-> > ..<
-> >
-> >> ACL Data RX: Handle 71 flags 0x01 dlen 12
-> [hci0] 145.825018
-> >       Channel: 64 len 1509 [PSM 15 mode 0] {chan 0}
-> >       BNEP: Compressed Ethernet Dest Only (0x04|0)
-> >         00 00 00 00 00 00 08 00 3c 3b 3a 39 38 37 36 35  ........<;:98765
-> >         34 33 32 31 30 2f 2e 2d 2c 2b 2a 29 28 27 26 25
-> > 43210/.-,+*)('&%
-> > ---
-> >  Makefile.tools     |   1 +
-> >  android/Android.mk |   1 +
-> >  monitor/bnep.c     | 116
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  monitor/bnep.h     |  25 ++++++++++++
-> >  monitor/l2cap.c    |   4 ++
-> >  5 files changed, 147 insertions(+)
-> >  create mode 100644 monitor/bnep.c
-> >  create mode 100644 monitor/bnep.h
-> >
-> > diff --git a/Makefile.tools b/Makefile.tools index b8dd90a..b37b774
-> > 100644
-> > --- a/Makefile.tools
-> > +++ b/Makefile.tools
-> > @@ -28,6 +28,7 @@ monitor_btmon_SOURCES = monitor/main.c
-> monitor/bt.h \
-> >                                 monitor/sdp.h monitor/sdp.c \
-> >                                 monitor/avctp.h monitor/avctp.c \
-> >                                 monitor/rfcomm.h monitor/rfcomm.c \
-> > +                               monitor/bnep.h monitor/bnep.c \
-> >                                 monitor/uuid.h monitor/uuid.c \
-> >                                 monitor/hwdb.h monitor/hwdb.c \
-> >                                 monitor/keys.h monitor/keys.c \ diff
-> > --git a/android/Android.mk b/android/Android.mk index f218805..880e3ba
-> > 100644
-> > --- a/android/Android.mk
-> > +++ b/android/Android.mk
-> > @@ -340,6 +340,7 @@ LOCAL_SRC_FILES := \
-> >         bluez/monitor/l2cap.c \
-> >         bluez/monitor/avctp.c \
-> >         bluez/monitor/rfcomm.c \
-> > +       bluez/monitor/bnep.c \
-> >         bluez/monitor/uuid.c \
-> >         bluez/monitor/sdp.c \
-> >         bluez/monitor/vendor.c \
-> > diff --git a/monitor/bnep.c b/monitor/bnep.c new file mode 100644
-> > index 0000000..1450f85
-> > --- /dev/null
-> > +++ b/monitor/bnep.c
-> > @@ -0,0 +1,116 @@
-> > +/*
-> > + *
-> > + *  BlueZ - Bluetooth protocol stack for Linux
-> > + *
-> > + *  Copyright (C) 2011-2014  Intel Corporation
-> > + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-> > + *
-> > + *
-> > + *  This library is free software; you can redistribute it and/or
-> > + *  modify it under the terms of the GNU Lesser General Public
-> > + *  License as published by the Free Software Foundation; either
-> > + *  version 2.1 of the License, or (at your option) any later version.
-> > + *
-> > + *  This library is distributed in the hope that it will be useful,
-> > + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> GNU
-> > + *  Lesser General Public License for more details.
-> > + *
-> > + *  You should have received a copy of the GNU Lesser General Public
-> > + *  License along with this library; if not, write to the Free
-> > +Software
-> > + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-> > +02110-1301  USA
-> > + *
-> > + */
-> > +
-> > +#ifdef HAVE_CONFIG_H
-> > +#include <config.h>
-> > +#endif
-> > +
-> > +#include <stdio.h>
-> > +#include <stdlib.h>
-> > +#include <string.h>
-> > +#include <ctype.h>
-> > +#include <inttypes.h>
-> > +
-> > +#include "lib/bluetooth.h"
-> > +
-> > +#include "src/shared/util.h"
-> > +#include "bt.h"
-> > +#include "packet.h"
-> > +#include "display.h"
-> > +#include "l2cap.h"
-> > +#include "uuid.h"
-> > +#include "keys.h"
-> > +#include "sdp.h"
-> > +#include "bnep.h"
-> > +
-> > +#define GET_PKT_TYPE(type) (type & 0x7f) #define
-> GET_EXTENSION(type)
-> > +(type & 0x80)
-> > +
-> > +struct bnep_frame {
-> > +       uint8_t type;
-> > +       int extension;
-> > +       struct l2cap_frame l2cap_frame; };
-> > +
-> > +struct bnep_data {
-> > +       uint8_t type;
-> > +       const char *str;
-> > +};
-> > +
-> > +static const struct bnep_data bnep_table[] = {
-> > +       { 0x00, "General Ethernet"},
-> > +       { 0x01, "Control"},
-> > +       { 0x02, "Compressed Ethernet"},
-> > +       { 0x03, "Compressed Ethernet Src Only"},
-> > +       { 0x04, "Compressed Ethernet Dest Only"},
-> > +       { }
-> > +};
-> > +
-> > +void bnep_packet(const struct l2cap_frame *frame) {
-> > +       uint8_t type;
-> > +       struct bnep_frame bnep_frame;
-> > +       struct l2cap_frame *l2cap_frame;
-> > +       const struct bnep_data *bnep_data = NULL;
-> > +       const char *pdu_color, *pdu_str;
-> > +       int i;
-> > +
-> > +       l2cap_frame_pull(&bnep_frame.l2cap_frame, frame, 0);
-> > +       l2cap_frame = &bnep_frame.l2cap_frame;
-> > +
-> > +       if (!l2cap_frame_get_u8(l2cap_frame, &type))
-> > +               goto fail;
-> > +
-> > +       bnep_frame.extension = GET_EXTENSION(type);
-> > +       bnep_frame.type = GET_PKT_TYPE(type);
-> > +
-> > +       for (i = 0; bnep_table[i].str; i++) {
-> > +               if (bnep_table[i].type == bnep_frame.type) {
-> > +                       bnep_data = &bnep_table[i];
-> > +                       break;
-> > +               }
-> > +       }
-> > +
-> > +       if (bnep_data) {
-> > +               if (frame->in)
-> > +                       pdu_color = COLOR_MAGENTA;
-> > +               else
-> > +                       pdu_color = COLOR_BLUE;
-> > +               pdu_str = bnep_data->str;
-> > +       } else {
-> > +               pdu_color = COLOR_WHITE_BG;
-> > +               pdu_str = "Unknown packet type";
-> > +       }
-> > +
-> > +       print_indent(6, pdu_color, "BNEP: ", pdu_str, COLOR_OFF,
-> > +                               " (0x%02x|%s)", bnep_frame.type,
-> > +                               bnep_frame.extension ? "1" : "0");
-> > +
-> > +       packet_hexdump(l2cap_frame->data, l2cap_frame->size);
-> > +       return;
-> > +
-> > +fail:
-> > +       print_text(COLOR_ERROR, "frame too short");
-> > +       packet_hexdump(frame->data, frame->size); }
-> > diff --git a/monitor/bnep.h b/monitor/bnep.h new file mode 100644
-> > index 0000000..38340d6
-> > --- /dev/null
-> > +++ b/monitor/bnep.h
-> > @@ -0,0 +1,25 @@
-> > +/*
-> > + *
-> > + *  BlueZ - Bluetooth protocol stack for Linux
-> > + *
-> > + *  Copyright (C) 2011-2014  Intel Corporation
-> > + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-> > + *
-> > + *
-> > + *  This library is free software; you can redistribute it and/or
-> > + *  modify it under the terms of the GNU Lesser General Public
-> > + *  License as published by the Free Software Foundation; either
-> > + *  version 2.1 of the License, or (at your option) any later version.
-> > + *
-> > + *  This library is distributed in the hope that it will be useful,
-> > + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> GNU
-> > + *  Lesser General Public License for more details.
-> > + *
-> > + *  You should have received a copy of the GNU Lesser General Public
-> > + *  License along with this library; if not, write to the Free
-> > +Software
-> > + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-> > +02110-1301  USA
-> > + *
-> > + */
-> > +
-> > +void bnep_packet(const struct l2cap_frame *frame);
-> > diff --git a/monitor/l2cap.c b/monitor/l2cap.c index 5faa26f..fc565b1
-> > 100644
-> > --- a/monitor/l2cap.c
-> > +++ b/monitor/l2cap.c
-> > @@ -43,6 +43,7 @@
-> >  #include "sdp.h"
-> >  #include "avctp.h"
-> >  #include "rfcomm.h"
-> > +#include "bnep.h"
-> >
-> >  /* L2CAP Control Field bit masks */
-> >  #define L2CAP_CTRL_SAR_MASK            0xC000
-> > @@ -2951,6 +2952,9 @@ static void l2cap_frame(uint16_t index, bool in,
-> uint16_t handle,
-> >                 case 0x0003:
-> >                         rfcomm_packet(&frame);
-> >                         break;
-> > +               case 0x000f:
-> > +                       bnep_packet(&frame);
-> > +                       break;
-> >                 case 0x001f:
-> >                         att_packet(index, in, handle, cid, data, size);
-> >                         break;
-> > --
-> > 1.9.1
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe
-> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> I've tested it and for me it looks ok. For further development please
-> remember about frames with extension headers. It'll be also nice to have
-> specified frame sections/flags (e.g. control frame type, header len).
-> 
-
-Thanks for testing. I am planning to do in that way.
-In the next set, all the BNEP packet type listed above will be handled.
-Then only the extended headers will be handled.
-Btw, complete support to handle the extended headers in kernel is done or yet to be completed?
-
-Regards,
-Gowtham Anandha Babu
-
-> BR,
-> Grzegorz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+index fa8a04a..19bb73c 100644
+--- a/doc/test-coverage.txt
++++ b/doc/test-coverage.txt
+@@ -39,7 +39,7 @@ Automated end-to-end testing
+ 
+ Application		Count	Description
+ -------------------------------------------
+-mgmt-tester		 293	Kernel management interface testing
++mgmt-tester		 295	Kernel management interface testing
+ l2cap-tester		  27	Kernel L2CAP implementation testing
+ rfcomm-tester		   9	Kernel RFCOMM implementation testing
+ bnep-tester		   1	Kernel BNEP implementation testing
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 72e9bd9..c0f58ce 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -3862,6 +3862,28 @@ static const struct generic_data read_adv_features_invalid_index_test = {
+ 	.expect_status = MGMT_STATUS_INVALID_INDEX,
+ };
+ 
++static const uint8_t read_adv_features_rsp_1[] =  {
++			0x1f, 0x00, 0x00, 0x00, 0x1f, 0x1f, 0x01, 0x00,
++};
++
++static const struct generic_data read_adv_features_success_1 = {
++	.send_opcode = MGMT_OP_READ_ADV_FEATURES,
++	.expect_param = read_adv_features_rsp_1,
++	.expect_len = sizeof(read_adv_features_rsp_1),
++	.expect_status = MGMT_STATUS_SUCCESS,
++};
++
++static const uint8_t read_adv_features_rsp_2[] =  {
++			0x1f, 0x00, 0x00, 0x00, 0x1f, 0x1f, 0x01, 0x01, 0x01
++};
++
++static const struct generic_data read_adv_features_success_2 = {
++	.send_opcode = MGMT_OP_READ_ADV_FEATURES,
++	.expect_param = read_adv_features_rsp_2,
++	.expect_len = sizeof(read_adv_features_rsp_2),
++	.expect_status = MGMT_STATUS_SUCCESS,
++};
++
+ static const uint8_t add_advertising_param_1[] = {
+ 	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00,
+ 	0x03, 0x02, 0x0d, 0x18,
+@@ -6384,6 +6406,13 @@ int main(int argc, char *argv[])
+ 	test_bredrle("Read Advertising Features - Invalid index",
+ 				&read_adv_features_invalid_index_test,
+ 				NULL, test_command_generic);
++	test_bredrle("Read Advertising Features - Success 1 (No instance)",
++				&read_adv_features_success_1,
++				NULL, test_command_generic);
++	test_bredrle("Read Advertising Features - Success 2 (One instance)",
++				&read_adv_features_success_2,
++				setup_add_advertising,
++				test_command_generic);
+ 
+ 	test_bredrle("Add Advertising - Failure: LE off",
+ 					&add_advertising_fail_1,
+-- 
+1.9.1
 
