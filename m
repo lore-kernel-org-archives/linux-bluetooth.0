@@ -2,34 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Florian Grandel <fgrandel@gmail.com>
-Subject: [BlueZ 2/3] tools: fix misleading test output
-Date: Sun,  5 Apr 2015 20:39:24 +0200
-Message-Id: <1428259165-10021-2-git-send-email-fgrandel@gmail.com>
-In-Reply-To: <1428259165-10021-1-git-send-email-fgrandel@gmail.com>
-References: <1428259165-10021-1-git-send-email-fgrandel@gmail.com>
+Subject: [BlueZ 1/3] doc: fix minor typos
+Date: Sun,  5 Apr 2015 20:39:23 +0200
+Message-Id: <1428259165-10021-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The setup_add_advertising() function claimed to add an advertising
-instance while unpowered although it actually adds the instance while
-powered. This patch fixes the tester output accordingly.
----
- tools/mgmt-tester.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The documentation contained minor typos which are being fixed here.
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 6a9b527..174c3b7 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -4894,7 +4894,7 @@ static void setup_add_advertising(const void *test_data)
- 	unsigned char adv_param[sizeof(*cp) + 6];
- 	unsigned char param[] = { 0x01 };
+Signed-off-by: Florian Grandel <fgrandel@gmail.com>
+---
+ doc/coding-style.txt          | 2 +-
+ doc/maintainer-guidelines.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/doc/coding-style.txt b/doc/coding-style.txt
+index b3fbd2e..f0bf880 100644
+--- a/doc/coding-style.txt
++++ b/doc/coding-style.txt
+@@ -61,7 +61,7 @@ if (err || !S_ISDIR(st.st_mode))
+ M2: Multiple line comment
+ =========================
  
--	tester_print("Adding advertising instance while unpowered");
-+	tester_print("Adding advertising instance while powered");
+-If your comments have more then one line, please start it from the second line.
++If your comment has more than one line, please start it from the second line.
  
- 	cp = (struct mgmt_cp_add_advertising *) adv_param;
- 	memset(cp, 0, sizeof(*cp));
+ Example:
+ /*
+diff --git a/doc/maintainer-guidelines.txt b/doc/maintainer-guidelines.txt
+index fef90c8..21162d4 100644
+--- a/doc/maintainer-guidelines.txt
++++ b/doc/maintainer-guidelines.txt
+@@ -99,7 +99,7 @@ verified first:
+ 	- Check that the names are acceptible with other maintainers
+ 	- Ensure that the file modes are correct
+ 	- Verify that the license & copyright headers are correct
+-	- If the file is supposed to be part of the release taraball,
++	- If the file is supposed to be part of the release tarball,
+ 	  make sure that it gets picked up by 'make dist' (particularly
+ 	  important for documentation or other files that are not code)
+ 
 -- 
 1.9.1
 
