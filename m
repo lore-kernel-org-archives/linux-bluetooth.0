@@ -1,63 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: hci_uart: Use h4_recv_buf helper for H:4 protocol
-Date: Sat,  4 Apr 2015 21:59:25 -0700
-Message-Id: <1428209967-20757-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/4] Bluetooth: hci_uart: Introduce h4_recv_buf helper function
+Date: Sat,  4 Apr 2015 21:59:24 -0700
+Message-Id: <1428209967-20757-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Instead of using hci_recv_stream_fragment, use the local available
-h4_recv_buf helper function.
+The h4_recv_buf helper function can be used for receiving H:4 packets
+out of a TTY stream. It is self-contained and allows for reuse by all
+HCI UART protocols.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/hci_h4.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ drivers/bluetooth/hci_h4.c   | 98 ++++++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_uart.h |  3 ++
+ 2 files changed, 101 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-index 09270bc26654..d8414540f743 100644
+index 97a5df4941b4..09270bc26654 100644
 --- a/drivers/bluetooth/hci_h4.c
 +++ b/drivers/bluetooth/hci_h4.c
-@@ -49,6 +49,7 @@
- #define VERSION "1.2"
- 
- struct h4_struct {
-+	struct sk_buff *rx_skb;
- 	struct sk_buff_head txq;
- };
- 
-@@ -92,6 +93,8 @@ static int h4_close(struct hci_uart *hu)
- 
- 	skb_queue_purge(&h4->txq);
- 
-+	kfree_skb(h4->rx_skb);
-+
- 	hu->priv = NULL;
- 	kfree(h4);
- 
-@@ -115,15 +118,16 @@ static int h4_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- /* Recv data */
- static int h4_recv(struct hci_uart *hu, const void *data, int count)
+@@ -161,3 +161,101 @@ int __exit h4_deinit(void)
  {
--	int ret;
-+	struct h4_struct *h4 = hu->priv;
+ 	return hci_uart_unregister_proto(&h4p);
+ }
++
++struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
++			    const unsigned char *buffer, int count)
++{
++	while (count) {
++		int len;
++
++		if (!skb) {
++			switch (buffer[0]) {
++			case HCI_ACLDATA_PKT:
++				skb = bt_skb_alloc(HCI_MAX_FRAME_SIZE,
++						   GFP_ATOMIC);
++				if (!skb)
++					return ERR_PTR(-ENOMEM);
++
++				bt_cb(skb)->pkt_type = HCI_ACLDATA_PKT;
++				bt_cb(skb)->expect = HCI_ACL_HDR_SIZE;
++				break;
++			case HCI_SCODATA_PKT:
++				skb = bt_skb_alloc(HCI_MAX_SCO_SIZE,
++						   GFP_ATOMIC);
++				if (!skb)
++					return ERR_PTR(-ENOMEM);
++
++				bt_cb(skb)->pkt_type = HCI_SCODATA_PKT;
++				bt_cb(skb)->expect = HCI_SCO_HDR_SIZE;
++				break;
++			case HCI_EVENT_PKT:
++				skb = bt_skb_alloc(HCI_MAX_EVENT_SIZE,
++						   GFP_ATOMIC);
++				if (!skb)
++					return ERR_PTR(-ENOMEM);
++
++				bt_cb(skb)->pkt_type = HCI_EVENT_PKT;
++				bt_cb(skb)->expect = HCI_EVENT_HDR_SIZE;
++				break;
++			default:
++				return ERR_PTR(-EILSEQ);
++			}
++
++			count -= 1;
++			buffer += 1;
++		}
++
++		len = min_t(uint, bt_cb(skb)->expect, count);
++		memcpy(skb_put(skb, len), buffer, len);
++
++		count -= len;
++		buffer += len;
++		bt_cb(skb)->expect -= len;
++
++		switch (bt_cb(skb)->pkt_type) {
++		case HCI_ACLDATA_PKT:
++			if (skb->len == HCI_ACL_HDR_SIZE) {
++				__le16 dlen = hci_acl_hdr(skb)->dlen;
++
++				/* Complete ACL header */
++				bt_cb(skb)->expect = __le16_to_cpu(dlen);
++
++				if (skb_tailroom(skb) < bt_cb(skb)->expect) {
++					kfree_skb(skb);
++					return ERR_PTR(-EMSGSIZE);
++				}
++			}
++			break;
++		case HCI_SCODATA_PKT:
++			if (skb->len == HCI_SCO_HDR_SIZE) {
++				/* Complete SCO header */
++				bt_cb(skb)->expect = hci_sco_hdr(skb)->dlen;
++
++				if (skb_tailroom(skb) < bt_cb(skb)->expect) {
++					kfree_skb(skb);
++					return ERR_PTR(-EMSGSIZE);
++				}
++			}
++			break;
++		case HCI_EVENT_PKT:
++			if (skb->len == HCI_EVENT_HDR_SIZE) {
++				/* Complete event header */
++				bt_cb(skb)->expect = hci_event_hdr(skb)->plen;
++
++				if (skb_tailroom(skb) < bt_cb(skb)->expect) {
++					kfree_skb(skb);
++					return ERR_PTR(-EMSGSIZE);
++				}
++			}
++			break;
++		}
++
++		if (bt_cb(skb)->expect == 0) {
++			/* Complete frame */
++			hci_recv_frame(hdev, skb);
++			skb = NULL;
++		}
++	}
++
++	return skb;
++}
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 79bbcefb0112..53b329229f2e 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -99,6 +99,9 @@ int hci_uart_init_ready(struct hci_uart *hu);
+ #ifdef CONFIG_BT_HCIUART_H4
+ int h4_init(void);
+ int h4_deinit(void);
++
++struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
++			    const unsigned char *buffer, int count);
+ #endif
  
- 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
- 		return -EUNATCH;
- 
--	ret = hci_recv_stream_fragment(hu->hdev, data, count);
--	if (ret < 0) {
--		BT_ERR("Frame Reassembly Failed");
--		return ret;
-+	h4->rx_skb = h4_recv_buf(hu->hdev, h4->rx_skb, data, count);
-+	if (IS_ERR(h4->rx_skb)) {
-+		int err = PTR_ERR(h4->rx_skb);
-+		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
-+		return err;
- 	}
- 
- 	return count;
+ #ifdef CONFIG_BT_HCIUART_BCSP
 -- 
 2.1.0
 
