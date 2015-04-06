@@ -1,29 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] core: Mention defaults for ReconnectUUIDs
-Date: Tue,  7 Apr 2015 10:27:03 +0300
-Message-Id: <1428391624-25864-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 06 Apr 2015 17:15:38 -0400 (EDT)
+Message-Id: <20150406.171538.1861592247290486681.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2015-04-04
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20150404062406.GA29882@t440s.P-661HNU-F1>
+References: <20150404062406.GA29882@t440s.P-661HNU-F1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Sat, 4 Apr 2015 09:24:06 +0300
 
-This documents the defaults used for ReconnectUUIDs.
----
- src/main.conf | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Here's what's probably the last bluetooth-next pull request for 4.1:
+> 
+>  - Fixes for LE advertising data & advertising parameters
+>  - Fix for race condition with HCI_RESET flag
+>  - New BNEPGETSUPPFEAT ioctl, needed for certification
+>  - New HCI request callback type to get the resulting skb
+>  - Cleanups to use BIT() macro wherever possible
+>  - Consolidate Broadcom device entries in the btusb HCI driver
+>  - Check for valid flags in CMTP, HIDP & BNEP
+>  - Disallow local privacy & OOB data combo to prevent a potential race
+>  - Expose SMP & ECDH selftest results through debugfs
+>  - Expose current Device ID info through debugfs
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-diff --git a/src/main.conf b/src/main.conf
-index 884f68d..2e696ff 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -73,4 +73,4 @@
- # timeout). The policy plugin should contain a sane set of values by
- # default, but this list can be overridden here. By setting the list to
- # empty the reconnection feature gets disabled.
--#ReconnectUUIDs=
-+#ReconnectUUIDs=00001112-0000-1000-8000-00805f9b34fb, 0000111f-0000-1000-8000-00805f9b34fb, 0000110a-0000-1000-8000-00805f9b34fb
--- 
-2.1.0
-
+Pulled, thanks Johan.
