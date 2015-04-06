@@ -1,171 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH ] tools/hciconfig: Configure LE adv data flags
-Date: Mon, 06 Apr 2015 15:10:10 +0530
-Message-id: <1428313210-4519-1-git-send-email-bharat.panda@samsung.com>
+Subject: [PATCH 4/4] Bluetooth: hci_uart: Use generic Intel support for address setting
+Date: Mon,  6 Apr 2015 00:52:14 -0700
+Message-Id: <1428306734-14210-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support for LE advertisement data flags by adding a new command
-in hciconfig tool "leadvflags".
+The Bluetooth address setting for Intel devices is provided by a generic
+module now. Start using that module instead of relying it being included
+in the driver.
 
-LE adv flag values can be refered from CSS 5, section 1.3.2, formats.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- tools/hciconfig.c | 125 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 125 insertions(+)
+ drivers/bluetooth/Kconfig     |  1 +
+ drivers/bluetooth/hci_intel.c | 17 -----------------
+ drivers/bluetooth/hci_ldisc.c |  4 +++-
+ drivers/bluetooth/hci_uart.h  |  4 ----
+ 4 files changed, 4 insertions(+), 22 deletions(-)
 
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index 6397e71..0a4c874 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -47,6 +47,14 @@
- #include "src/shared/util.h"
- #include "tools/csr.h"
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index b50fe3361659..ed5c2738bea2 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -117,6 +117,7 @@ config BT_HCIUART_3WIRE
+ config BT_HCIUART_INTEL
+ 	bool "Intel protocol support"
+ 	depends on BT_HCIUART
++	select BT_INTEL
+ 	help
+ 	  The Intel protocol support enables Bluetooth HCI over serial
+ 	  port interface for Intel Bluetooth controllers.
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index b7bd50a41080..5dd07bf05236 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -29,20 +29,3 @@
+ #include <net/bluetooth/hci_core.h>
  
-+#define EIR_FLAGS		0x01 /* flags */
-+#define EIR_NAME_SHORT		0x08 /* shortened local name */
-+#define EIR_NAME_COMPLETE	0x09 /* complete local name */
-+#define EIR_TX_POWER		0x0A /* transmit power level */
-+#define EIR_GAP_APPEARANCE	0x19  /* GAP appearance */
-+
-+#define HCI_MAX_AD_LENGTH	31
-+
- static struct hci_dev_info di;
- static int all;
+ #include "hci_uart.h"
+-
+-int intel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+-{
+-	struct sk_buff *skb;
+-	int err;
+-
+-	skb = __hci_cmd_sync(hdev, 0xfc31, 6, bdaddr, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		err = PTR_ERR(skb);
+-		BT_ERR("%s: Changing Intel device address failed (%d)",
+-		       hdev->name, err);
+-		return err;
+-	}
+-	kfree_skb(skb);
+-
+-	return 0;
+-}
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index a106c3e201e3..5c9a73f02664 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -44,6 +44,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
  
-@@ -234,6 +242,116 @@ static void cmd_le_addr(int ctl, int hdev, char *opt)
- 	hci_close_dev(dd);
- }
++#include "btintel.h"
+ #include "btbcm.h"
+ #include "hci_uart.h"
  
-+static uint8_t create_ad(uint8_t *ptr, uint8_t type)
-+{
-+	uint8_t ad_len = 0, flags = 0;
-+	size_t name_len;
-+	char *name;
-+
-+	flags = type;
-+
-+	ptr[0] = 2;
-+	ptr[1] = EIR_FLAGS;
-+	ptr[2] = flags;
-+
-+	ad_len += 3;
-+	ptr += 3;
-+
-+	ptr[0] = 2;
-+	ptr[1] = EIR_TX_POWER;
-+	ptr[2] = 0x12;
-+
-+	ad_len += 3;
-+	ptr += 3;
-+
-+	if (ad_len + 4 <= HCI_MAX_AD_LENGTH) {
-+		ptr[0] = 3;
-+		ptr[1] = EIR_GAP_APPEARANCE;
-+
-+		/* Generic Phone */
-+		bt_put_le16((uint16_t)64, ptr + 2);
-+
-+		ad_len += 4;
-+		ptr += 4;
-+	}
-+
-+	name = strdup("ZEQ");
-+	name_len = strlen(name);
-+	if (name_len > 0) {
-+		size_t max_len = HCI_MAX_AD_LENGTH - ad_len - 2;
-+
-+		if (name_len > max_len) {
-+			name_len = max_len;
-+			ptr[1] = EIR_NAME_SHORT;
-+		} else
-+			ptr[1] = EIR_NAME_COMPLETE;
-+
-+		ptr[0] = name_len + 1;
-+
-+		memcpy(ptr + 2, name, name_len);
-+
-+		ad_len += (name_len + 2);
-+		ptr += (name_len + 2);
-+	}
-+
-+	return ad_len;
-+}
-+
-+static void cmd_le_adv_flags(int ctl, int hdev, char *opt)
-+{
-+	struct hci_request rq;
-+	le_set_advertising_data_cp advertise_data_cp;
-+	uint8_t status;
-+	uint8_t len;
-+	int dd, ret;
-+	unsigned int type = 0;
-+
-+	if (hdev < 0)
-+		hdev = hci_get_route(NULL);
-+
-+	dd = hci_open_dev(hdev);
-+	if (dd < 0) {
-+		perror("Could not open device");
-+		exit(1);
-+	}
-+
-+	memset(&advertise_data_cp, 0, sizeof(advertise_data_cp));
-+	if (opt)
-+		type = atoi(opt);
-+
-+	len = create_ad(advertise_data_cp.data, type);
-+
-+	advertise_data_cp.length = len;
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_ADVERTISING_DATA;
-+	rq.cparam = &advertise_data_cp;
-+	rq.clen = LE_SET_ADVERTISING_DATA_CP_SIZE;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	ret = hci_send_req(dd, &rq, 1000);
-+	if (ret < 0)
-+		goto done;
-+
-+done:
-+	hci_close_dev(dd);
-+
-+	if (ret < 0) {
-+		fprintf(stderr, "Can't set advertise mode on hci%d: %s (%d)\n",
-+						hdev, strerror(errno), errno);
-+		exit(1);
-+	}
-+
-+	if (status) {
-+		fprintf(stderr,
-+			"LE set advertise enable on hci%d returned status %d\n",
-+								hdev, status);
-+		exit(1);
-+	}
-+
-+}
-+
- static void cmd_le_adv(int ctl, int hdev, char *opt)
- {
- 	struct hci_request rq;
-@@ -1950,6 +2068,13 @@ static struct {
- 		"\n\t\t\t3 - Non connectable undirected advertising"},
- 	{ "noleadv",	cmd_no_le_adv,	0,		"Disable LE advertising" },
- 	{ "lestates",	cmd_le_states,	0,		"Display the supported LE states" },
-+	{ "leadvflags",	cmd_le_adv_flags, "[type]",	"Set data flags"
-+		"\n\t\t\t (Flags value can be reffered from spec CSS 5, section 1.3.2, formats)\n"
-+		"\n\t\t\t 0x01 - Limited Discoverable"
-+		"\n\t\t\t 0x02 - General Discoverable"
-+		"\n\t\t\t 0x04 - No BR/EDR"
-+		"\n\t\t\t 0x08 - Simultaneous LE and BR/EDR to Same Device Capable(Controller)"
-+		"\n\t\t\t 0x16 - Simultaneous LE and BR/EDR to Same Device Capable(Host)"},
- 	{ NULL, NULL, 0 }
- };
+@@ -295,7 +296,8 @@ static int hci_uart_setup(struct hci_dev *hdev)
+ 	switch (le16_to_cpu(ver->manufacturer)) {
+ #ifdef CONFIG_BT_HCIUART_INTEL
+ 	case 2:
+-		hdev->set_bdaddr = intel_set_bdaddr;
++		hdev->set_bdaddr = btintel_set_bdaddr;
++		btintel_check_bdaddr(hdev);
+ 		break;
+ #endif
+ #ifdef CONFIG_BT_HCIUART_BCM
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index d1fa6263f7c2..72120a5ba13c 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -156,10 +156,6 @@ int h5_init(void);
+ int h5_deinit(void);
+ #endif
  
+-#ifdef CONFIG_BT_HCIUART_INTEL
+-int intel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+-#endif
+-
+ #ifdef CONFIG_BT_HCIUART_BCM
+ int bcm_init(void);
+ int bcm_deinit(void);
 -- 
-1.9.1
+2.1.0
 
