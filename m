@@ -1,36 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Apr 2015 09:04:02 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 01/10] Bluetooth: btbcm: Introduce generic Broadcom
- Bluetooth support
-Message-ID: <20150406060402.GA6539@t440s.P-661HNU-F1>
-References: <1428299539-8273-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1428299539-8273-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 08/10] Bluetooth: hci_uart: Move setup callback into different location
+Date: Sun,  5 Apr 2015 22:52:17 -0700
+Message-Id: <1428299539-8273-8-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+The setup callback got wrongly inserted between the enqueue and dequeue
+callbacks. Move it to a better location.
 
-On Sun, Apr 05, 2015, Marcel Holtmann wrote:
-> The majority of Broadcom Bluetooth vendor commands are shared between
-> USB and UART transports. This creates a separate module that eventually
-> will hold all Broadcom specific commands, but for now just start with
-> the commands to change the Bluetooth public address and check for the
-> default address.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/Kconfig  |  3 ++
->  drivers/bluetooth/Makefile |  1 +
->  drivers/bluetooth/btbcm.c  | 99 ++++++++++++++++++++++++++++++++++++++++++++++
->  drivers/bluetooth/btbcm.h  | 41 +++++++++++++++++++
->  4 files changed, 144 insertions(+)
->  create mode 100644 drivers/bluetooth/btbcm.c
->  create mode 100644 drivers/bluetooth/btbcm.h
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/hci_uart.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-All 10 patches have been applied to bluetooth-next. Thanks.
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index ad03f57e794b..466798acf049 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -61,9 +61,9 @@ struct hci_uart_proto {
+ 	int (*open)(struct hci_uart *hu);
+ 	int (*close)(struct hci_uart *hu);
+ 	int (*flush)(struct hci_uart *hu);
++	int (*setup)(struct hci_uart *hu);
+ 	int (*recv)(struct hci_uart *hu, const void *data, int len);
+ 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
+-	int (*setup)(struct hci_uart *hu);
+ 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
+ };
+ 
+-- 
+2.1.0
 
-Johan
