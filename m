@@ -3,8 +3,8 @@ From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
 Subject: [PATCH ] tools/hciconfig: Configure LE adv data flags
-Date: Mon, 06 Apr 2015 15:46:24 +0530
-Message-id: <1428315384-4984-1-git-send-email-bharat.panda@samsung.com>
+Date: Mon, 06 Apr 2015 15:10:10 +0530
+Message-id: <1428313210-4519-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -13,11 +13,11 @@ in hciconfig tool "leadvflags".
 
 LE adv flag values can be refered from CSS 5, section 1.3.2, formats.
 ---
- tools/hciconfig.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 121 insertions(+)
+ tools/hciconfig.c | 125 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 125 insertions(+)
 
 diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index 6397e71..cf389d5 100644
+index 6397e71..0a4c874 100644
 --- a/tools/hciconfig.c
 +++ b/tools/hciconfig.c
 @@ -47,6 +47,14 @@
@@ -35,7 +35,7 @@ index 6397e71..cf389d5 100644
  static struct hci_dev_info di;
  static int all;
  
-@@ -234,6 +242,112 @@ static void cmd_le_addr(int ctl, int hdev, char *opt)
+@@ -234,6 +242,116 @@ static void cmd_le_addr(int ctl, int hdev, char *opt)
  	hci_close_dev(dd);
  }
  
@@ -128,8 +128,12 @@ index 6397e71..cf389d5 100644
 +	rq.rlen = 1;
 +
 +	ret = hci_send_req(dd, &rq, 1000);
++	if (ret < 0)
++		goto done;
 +
++done:
 +	hci_close_dev(dd);
++
 +	if (ret < 0) {
 +		fprintf(stderr, "Can't set advertise mode on hci%d: %s (%d)\n",
 +						hdev, strerror(errno), errno);
@@ -148,7 +152,7 @@ index 6397e71..cf389d5 100644
  static void cmd_le_adv(int ctl, int hdev, char *opt)
  {
  	struct hci_request rq;
-@@ -1950,6 +2064,13 @@ static struct {
+@@ -1950,6 +2068,13 @@ static struct {
  		"\n\t\t\t3 - Non connectable undirected advertising"},
  	{ "noleadv",	cmd_no_le_adv,	0,		"Disable LE advertising" },
  	{ "lestates",	cmd_le_states,	0,		"Display the supported LE states" },
@@ -158,7 +162,7 @@ index 6397e71..cf389d5 100644
 +		"\n\t\t\t 0x02 - General Discoverable"
 +		"\n\t\t\t 0x04 - No BR/EDR"
 +		"\n\t\t\t 0x08 - Simultaneous LE and BR/EDR to Same Device Capable(Controller)"
-+		"\n\t\t\t 0x10 - Simultaneous LE and BR/EDR to Same Device Capable(Host)"},
++		"\n\t\t\t 0x16 - Simultaneous LE and BR/EDR to Same Device Capable(Host)"},
  	{ NULL, NULL, 0 }
  };
  
