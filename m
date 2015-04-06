@@ -1,206 +1,293 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 01/10] Bluetooth: btbcm: Introduce generic Broadcom Bluetooth support
-Date: Sun,  5 Apr 2015 22:52:10 -0700
-Message-Id: <1428299539-8273-1-git-send-email-marcel@holtmann.org>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Grzegorz Kolodziejczyk' <grzegorz.kolodziejczyk@tieto.com>
+Cc: 'linux-bluetooth' <linux-bluetooth@vger.kernel.org>,
+	bharat.panda@samsung.com, cpgs@samsung.com
+References: <1427974325-3280-1-git-send-email-gowtham.ab@samsung.com>
+ <CAMv5Gbd3P_+iN_DL5ZZXn_EzyodjKhUyoE=cxtfOD6j7mtDYSA@mail.gmail.com>
+In-reply-to: <CAMv5Gbd3P_+iN_DL5ZZXn_EzyodjKhUyoE=cxtfOD6j7mtDYSA@mail.gmail.com>
+Subject: RE: [PATCH] monitor: Add initial support for BNEP
+Date: Mon, 06 Apr 2015 11:12:49 +0530
+Message-id: <001401d0702c$8add5f60$a0981e20$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The majority of Broadcom Bluetooth vendor commands are shared between
-USB and UART transports. This creates a separate module that eventually
-will hold all Broadcom specific commands, but for now just start with
-the commands to change the Bluetooth public address and check for the
-default address.
+Hi Grzegorz,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/Kconfig  |  3 ++
- drivers/bluetooth/Makefile |  1 +
- drivers/bluetooth/btbcm.c  | 99 ++++++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btbcm.h  | 41 +++++++++++++++++++
- 4 files changed, 144 insertions(+)
- create mode 100644 drivers/bluetooth/btbcm.c
- create mode 100644 drivers/bluetooth/btbcm.h
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Grzegorz Kolodziejczyk
+> Sent: Friday, April 03, 2015 4:23 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth; bharat.panda@samsung.com; cpgs@samsung.com
+> Subject: Re: [PATCH] monitor: Add initial support for BNEP
+> 
+> Hi Gowtham,
+> 
+> On 2 April 2015 at 13:32, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> >> ACL Data RX: Handle 71 flags 0x02 dlen 11
+> [hci0] 17.739883
+> >       Channel: 64 len 7 [PSM 15 mode 0] {chan 0}
+> >       BNEP: Control (0x01|0)
+> >         01 02 11 16 11 15                                ......
+> >
+> >> ACL Data RX: Handle 71 flags 0x01 dlen 35
+> [hci0] 175.293028
+> >       Channel: 64 len 1532 [PSM 15 mode 0] {chan 0}
+> >       BNEP: General Ethernet (0x00|1)
+> >         00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 0f  ................
+> >         05 00 0c 03 00 00 20 00 00 03 00 00 20 00 00 3c  ...... .....
+> > ..<
+> >
+> >> ACL Data RX: Handle 71 flags 0x01 dlen 12
+> [hci0] 145.825018
+> >       Channel: 64 len 1509 [PSM 15 mode 0] {chan 0}
+> >       BNEP: Compressed Ethernet Dest Only (0x04|0)
+> >         00 00 00 00 00 00 08 00 3c 3b 3a 39 38 37 36 35  ........<;:98765
+> >         34 33 32 31 30 2f 2e 2d 2c 2b 2a 29 28 27 26 25
+> > 43210/.-,+*)('&%
+> > ---
+> >  Makefile.tools     |   1 +
+> >  android/Android.mk |   1 +
+> >  monitor/bnep.c     | 116
+> +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  monitor/bnep.h     |  25 ++++++++++++
+> >  monitor/l2cap.c    |   4 ++
+> >  5 files changed, 147 insertions(+)
+> >  create mode 100644 monitor/bnep.c
+> >  create mode 100644 monitor/bnep.h
+> >
+> > diff --git a/Makefile.tools b/Makefile.tools index b8dd90a..b37b774
+> > 100644
+> > --- a/Makefile.tools
+> > +++ b/Makefile.tools
+> > @@ -28,6 +28,7 @@ monitor_btmon_SOURCES = monitor/main.c
+> monitor/bt.h \
+> >                                 monitor/sdp.h monitor/sdp.c \
+> >                                 monitor/avctp.h monitor/avctp.c \
+> >                                 monitor/rfcomm.h monitor/rfcomm.c \
+> > +                               monitor/bnep.h monitor/bnep.c \
+> >                                 monitor/uuid.h monitor/uuid.c \
+> >                                 monitor/hwdb.h monitor/hwdb.c \
+> >                                 monitor/keys.h monitor/keys.c \ diff
+> > --git a/android/Android.mk b/android/Android.mk index f218805..880e3ba
+> > 100644
+> > --- a/android/Android.mk
+> > +++ b/android/Android.mk
+> > @@ -340,6 +340,7 @@ LOCAL_SRC_FILES := \
+> >         bluez/monitor/l2cap.c \
+> >         bluez/monitor/avctp.c \
+> >         bluez/monitor/rfcomm.c \
+> > +       bluez/monitor/bnep.c \
+> >         bluez/monitor/uuid.c \
+> >         bluez/monitor/sdp.c \
+> >         bluez/monitor/vendor.c \
+> > diff --git a/monitor/bnep.c b/monitor/bnep.c new file mode 100644
+> > index 0000000..1450f85
+> > --- /dev/null
+> > +++ b/monitor/bnep.c
+> > @@ -0,0 +1,116 @@
+> > +/*
+> > + *
+> > + *  BlueZ - Bluetooth protocol stack for Linux
+> > + *
+> > + *  Copyright (C) 2011-2014  Intel Corporation
+> > + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+> > + *
+> > + *
+> > + *  This library is free software; you can redistribute it and/or
+> > + *  modify it under the terms of the GNU Lesser General Public
+> > + *  License as published by the Free Software Foundation; either
+> > + *  version 2.1 of the License, or (at your option) any later version.
+> > + *
+> > + *  This library is distributed in the hope that it will be useful,
+> > + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> GNU
+> > + *  Lesser General Public License for more details.
+> > + *
+> > + *  You should have received a copy of the GNU Lesser General Public
+> > + *  License along with this library; if not, write to the Free
+> > +Software
+> > + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+> > +02110-1301  USA
+> > + *
+> > + */
+> > +
+> > +#ifdef HAVE_CONFIG_H
+> > +#include <config.h>
+> > +#endif
+> > +
+> > +#include <stdio.h>
+> > +#include <stdlib.h>
+> > +#include <string.h>
+> > +#include <ctype.h>
+> > +#include <inttypes.h>
+> > +
+> > +#include "lib/bluetooth.h"
+> > +
+> > +#include "src/shared/util.h"
+> > +#include "bt.h"
+> > +#include "packet.h"
+> > +#include "display.h"
+> > +#include "l2cap.h"
+> > +#include "uuid.h"
+> > +#include "keys.h"
+> > +#include "sdp.h"
+> > +#include "bnep.h"
+> > +
+> > +#define GET_PKT_TYPE(type) (type & 0x7f) #define
+> GET_EXTENSION(type)
+> > +(type & 0x80)
+> > +
+> > +struct bnep_frame {
+> > +       uint8_t type;
+> > +       int extension;
+> > +       struct l2cap_frame l2cap_frame; };
+> > +
+> > +struct bnep_data {
+> > +       uint8_t type;
+> > +       const char *str;
+> > +};
+> > +
+> > +static const struct bnep_data bnep_table[] = {
+> > +       { 0x00, "General Ethernet"},
+> > +       { 0x01, "Control"},
+> > +       { 0x02, "Compressed Ethernet"},
+> > +       { 0x03, "Compressed Ethernet Src Only"},
+> > +       { 0x04, "Compressed Ethernet Dest Only"},
+> > +       { }
+> > +};
+> > +
+> > +void bnep_packet(const struct l2cap_frame *frame) {
+> > +       uint8_t type;
+> > +       struct bnep_frame bnep_frame;
+> > +       struct l2cap_frame *l2cap_frame;
+> > +       const struct bnep_data *bnep_data = NULL;
+> > +       const char *pdu_color, *pdu_str;
+> > +       int i;
+> > +
+> > +       l2cap_frame_pull(&bnep_frame.l2cap_frame, frame, 0);
+> > +       l2cap_frame = &bnep_frame.l2cap_frame;
+> > +
+> > +       if (!l2cap_frame_get_u8(l2cap_frame, &type))
+> > +               goto fail;
+> > +
+> > +       bnep_frame.extension = GET_EXTENSION(type);
+> > +       bnep_frame.type = GET_PKT_TYPE(type);
+> > +
+> > +       for (i = 0; bnep_table[i].str; i++) {
+> > +               if (bnep_table[i].type == bnep_frame.type) {
+> > +                       bnep_data = &bnep_table[i];
+> > +                       break;
+> > +               }
+> > +       }
+> > +
+> > +       if (bnep_data) {
+> > +               if (frame->in)
+> > +                       pdu_color = COLOR_MAGENTA;
+> > +               else
+> > +                       pdu_color = COLOR_BLUE;
+> > +               pdu_str = bnep_data->str;
+> > +       } else {
+> > +               pdu_color = COLOR_WHITE_BG;
+> > +               pdu_str = "Unknown packet type";
+> > +       }
+> > +
+> > +       print_indent(6, pdu_color, "BNEP: ", pdu_str, COLOR_OFF,
+> > +                               " (0x%02x|%s)", bnep_frame.type,
+> > +                               bnep_frame.extension ? "1" : "0");
+> > +
+> > +       packet_hexdump(l2cap_frame->data, l2cap_frame->size);
+> > +       return;
+> > +
+> > +fail:
+> > +       print_text(COLOR_ERROR, "frame too short");
+> > +       packet_hexdump(frame->data, frame->size); }
+> > diff --git a/monitor/bnep.h b/monitor/bnep.h new file mode 100644
+> > index 0000000..38340d6
+> > --- /dev/null
+> > +++ b/monitor/bnep.h
+> > @@ -0,0 +1,25 @@
+> > +/*
+> > + *
+> > + *  BlueZ - Bluetooth protocol stack for Linux
+> > + *
+> > + *  Copyright (C) 2011-2014  Intel Corporation
+> > + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+> > + *
+> > + *
+> > + *  This library is free software; you can redistribute it and/or
+> > + *  modify it under the terms of the GNU Lesser General Public
+> > + *  License as published by the Free Software Foundation; either
+> > + *  version 2.1 of the License, or (at your option) any later version.
+> > + *
+> > + *  This library is distributed in the hope that it will be useful,
+> > + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> GNU
+> > + *  Lesser General Public License for more details.
+> > + *
+> > + *  You should have received a copy of the GNU Lesser General Public
+> > + *  License along with this library; if not, write to the Free
+> > +Software
+> > + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+> > +02110-1301  USA
+> > + *
+> > + */
+> > +
+> > +void bnep_packet(const struct l2cap_frame *frame);
+> > diff --git a/monitor/l2cap.c b/monitor/l2cap.c index 5faa26f..fc565b1
+> > 100644
+> > --- a/monitor/l2cap.c
+> > +++ b/monitor/l2cap.c
+> > @@ -43,6 +43,7 @@
+> >  #include "sdp.h"
+> >  #include "avctp.h"
+> >  #include "rfcomm.h"
+> > +#include "bnep.h"
+> >
+> >  /* L2CAP Control Field bit masks */
+> >  #define L2CAP_CTRL_SAR_MASK            0xC000
+> > @@ -2951,6 +2952,9 @@ static void l2cap_frame(uint16_t index, bool in,
+> uint16_t handle,
+> >                 case 0x0003:
+> >                         rfcomm_packet(&frame);
+> >                         break;
+> > +               case 0x000f:
+> > +                       bnep_packet(&frame);
+> > +                       break;
+> >                 case 0x001f:
+> >                         att_packet(index, in, handle, cid, data, size);
+> >                         break;
+> > --
+> > 1.9.1
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> I've tested it and for me it looks ok. For further development please
+> remember about frames with extension headers. It'll be also nice to have
+> specified frame sections/flags (e.g. control frame type, header len).
+> 
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index f8a41975c30d..4fbe067cd33a 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -2,6 +2,9 @@
- menu "Bluetooth device drivers"
- 	depends on BT
- 
-+config BT_BCM
-+	tristate
-+
- config BT_HCIBTUSB
- 	tristate "HCI USB driver"
- 	depends on USB
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index 51f9d0c18963..51c98546fa03 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -19,6 +19,7 @@ obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
- obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
- obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
- obj-$(CONFIG_BT_WILINK)		+= btwilink.o
-+obj-$(CONFIG_BT_BCM)		+= btbcm.o
- 
- btmrvl-y			:= btmrvl_main.o
- btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-new file mode 100644
-index 000000000000..20c744a9a3f1
---- /dev/null
-+++ b/drivers/bluetooth/btbcm.c
-@@ -0,0 +1,99 @@
-+/*
-+ *
-+ *  Bluetooth support for Broadcom devices
-+ *
-+ *  Copyright (C) 2015  Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+
-+#include <linux/module.h>
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+#include "btbcm.h"
-+
-+#define VERSION "0.1"
-+
-+#define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
-+
-+int btbcm_check_bdaddr(struct hci_dev *hdev)
-+{
-+	struct hci_rp_read_bd_addr *bda;
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		int err = PTR_ERR(skb);
-+		BT_ERR("%s: BCM: Reading device address failed (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+
-+	if (skb->len != sizeof(*bda)) {
-+		BT_ERR("%s: BCM: Device address length mismatch", hdev->name);
-+		kfree_skb(skb);
-+		return -EIO;
-+	}
-+
-+	bda = (struct hci_rp_read_bd_addr *)skb->data;
-+	if (bda->status) {
-+		BT_ERR("%s: BCM: Device address result failed (%02x)",
-+		       hdev->name, bda->status);
-+		kfree_skb(skb);
-+		return -bt_to_errno(bda->status);
-+	}
-+
-+	/* The address 00:20:70:02:A0:00 indicates a BCM20702A0 controller
-+	 * with no configured address.
-+	 */
-+	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0)) {
-+		BT_INFO("%s: BCM: Using default device address (%pMR)",
-+			hdev->name, &bda->bdaddr);
-+		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btbcm_check_bdaddr);
-+
-+int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-+{
-+	struct sk_buff *skb;
-+	int err;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc01, 6, bdaddr, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		BT_ERR("%s: BCM: Change address command failed (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
-+
-+MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
-+MODULE_DESCRIPTION("Bluetooth support for Broadcom devices ver " VERSION);
-+MODULE_VERSION(VERSION);
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-new file mode 100644
-index 000000000000..813f7e7e191d
---- /dev/null
-+++ b/drivers/bluetooth/btbcm.h
-@@ -0,0 +1,41 @@
-+/*
-+ *
-+ *  Bluetooth support for Broadcom devices
-+ *
-+ *  Copyright (C) 2015  Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+
-+#if IS_ENABLED(CONFIG_BT_BCM)
-+
-+int btbcm_check_bdaddr(struct hci_dev *hdev);
-+int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-+
-+#else
-+
-+static inline int btbcm_check_bdaddr(struct hci_dev *hdev)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+#endif
--- 
-2.1.0
+Thanks for testing. I am planning to do in that way.
+In the next set, all the BNEP packet type listed above will be handled.
+Then only the extended headers will be handled.
+Btw, complete support to handle the extended headers in kernel is done or yet to be completed?
+
+Regards,
+Gowtham Anandha Babu
+
+> BR,
+> Grzegorz
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
