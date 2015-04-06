@@ -1,208 +1,194 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] Bluetooth: btintel: Introduce generic Intel Bluetooth support
-Date: Mon,  6 Apr 2015 00:52:11 -0700
-Message-Id: <1428306734-14210-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/4] Bluetooth: btusb: Use generic Intel support for address support
+Date: Mon,  6 Apr 2015 00:52:12 -0700
+Message-Id: <1428306734-14210-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The majority of Intel Bluetooth vendor commands are shared between USB
-and UART transports. This creates a separate module that eventually
-will hold all Intel specific commands, but for now just start with the
-commands to change the Bluetooth public address and check for the
-default address.
+The Bluetooth address handling for Intel devices is provided by a generic
+module now. Start using that module instead of relying it being included
+in the driver.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/Kconfig   |   3 ++
- drivers/bluetooth/Makefile  |   1 +
- drivers/bluetooth/btintel.c | 101 ++++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  41 ++++++++++++++++++
- 4 files changed, 146 insertions(+)
- create mode 100644 drivers/bluetooth/btintel.c
- create mode 100644 drivers/bluetooth/btintel.h
+ drivers/bluetooth/Kconfig |  1 +
+ drivers/bluetooth/btusb.c | 79 ++++++-----------------------------------------
+ 2 files changed, 10 insertions(+), 70 deletions(-)
 
 diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 93351b91bbb4..e4aff8ca7870 100644
+index e4aff8ca7870..b50fe3361659 100644
 --- a/drivers/bluetooth/Kconfig
 +++ b/drivers/bluetooth/Kconfig
-@@ -2,6 +2,9 @@
- menu "Bluetooth device drivers"
- 	depends on BT
+@@ -12,6 +12,7 @@ config BT_BCM
+ config BT_HCIBTUSB
+ 	tristate "HCI USB driver"
+ 	depends on USB
++	select BT_INTEL
+ 	help
+ 	  Bluetooth HCI USB driver.
+ 	  This driver is required if you want to use Bluetooth devices with
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8dae3daf821d..5798aec44824 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -28,6 +28,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
  
-+config BT_INTEL
-+	tristate
-+
- config BT_BCM
- 	tristate
- 	select FW_LOADER
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index 51c98546fa03..dd0d9c40b999 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -15,6 +15,7 @@ obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
- obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
- obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
- 
-+obj-$(CONFIG_BT_INTEL)		+= btintel.o
- obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
- obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
- obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-new file mode 100644
-index 000000000000..2d43d4279b00
---- /dev/null
-+++ b/drivers/bluetooth/btintel.c
-@@ -0,0 +1,101 @@
-+/*
-+ *
-+ *  Bluetooth support for Intel devices
-+ *
-+ *  Copyright (C) 2015  Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+
-+#include <linux/module.h>
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
 +#include "btintel.h"
-+
-+#define VERSION "0.1"
-+
-+#define BDADDR_INTEL (&(bdaddr_t) {{0x00, 0x8b, 0x9e, 0x19, 0x03, 0x00}})
-+
-+int btintel_check_bdaddr(struct hci_dev *hdev)
-+{
-+	struct hci_rp_read_bd_addr *bda;
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		int err = PTR_ERR(skb);
-+		BT_ERR("%s: Reading Intel device address failed (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+
-+	if (skb->len != sizeof(*bda)) {
-+		BT_ERR("%s: Intel device address length mismatch", hdev->name);
-+		kfree_skb(skb);
-+		return -EIO;
-+	}
-+
-+	bda = (struct hci_rp_read_bd_addr *)skb->data;
-+	if (bda->status) {
-+		BT_ERR("%s: Intel device address result failed (%02x)",
-+		       hdev->name, bda->status);
-+		kfree_skb(skb);
-+		return -bt_to_errno(bda->status);
-+	}
-+
-+	/* For some Intel based controllers, the default Bluetooth device
-+	 * address 00:03:19:9E:8B:00 can be found. These controllers are
-+	 * fully operational, but have the danger of duplicate addresses
-+	 * and that in turn can cause problems with Bluetooth operation.
-+	 */
-+	if (!bacmp(&bda->bdaddr, BDADDR_INTEL)) {
-+		BT_ERR("%s: Found Intel default device address (%pMR)",
-+		       hdev->name, &bda->bdaddr);
-+		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_check_bdaddr);
-+
-+int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-+{
-+	struct sk_buff *skb;
-+	int err;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc31, 6, bdaddr, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		BT_ERR("%s: Changing Intel device address failed (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_set_bdaddr);
-+
-+MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
-+MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
-+MODULE_VERSION(VERSION);
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-new file mode 100644
-index 000000000000..20be247d2ff6
---- /dev/null
-+++ b/drivers/bluetooth/btintel.h
-@@ -0,0 +1,41 @@
-+/*
-+ *
-+ *  Bluetooth support for Intel devices
-+ *
-+ *  Copyright (C) 2015  Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+
-+#if IS_ENABLED(CONFIG_BT_INTEL)
-+
-+int btintel_check_bdaddr(struct hci_dev *hdev);
-+int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-+
-+#else
-+
-+static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+#endif
+ #include "btbcm.h"
+ 
+ #define VERSION "0.8"
+@@ -1533,51 +1534,6 @@ static int btusb_setup_intel_patching(struct hci_dev *hdev,
+ 	return 0;
+ }
+ 
+-#define BDADDR_INTEL (&(bdaddr_t) {{0x00, 0x8b, 0x9e, 0x19, 0x03, 0x00}})
+-
+-static int btusb_check_bdaddr_intel(struct hci_dev *hdev)
+-{
+-	struct sk_buff *skb;
+-	struct hci_rp_read_bd_addr *rp;
+-
+-	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
+-			     HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		BT_ERR("%s reading Intel device address failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
+-		return PTR_ERR(skb);
+-	}
+-
+-	if (skb->len != sizeof(*rp)) {
+-		BT_ERR("%s Intel device address length mismatch", hdev->name);
+-		kfree_skb(skb);
+-		return -EIO;
+-	}
+-
+-	rp = (struct hci_rp_read_bd_addr *)skb->data;
+-	if (rp->status) {
+-		BT_ERR("%s Intel device address result failed (%02x)",
+-		       hdev->name, rp->status);
+-		kfree_skb(skb);
+-		return -bt_to_errno(rp->status);
+-	}
+-
+-	/* For some Intel based controllers, the default Bluetooth device
+-	 * address 00:03:19:9E:8B:00 can be found. These controllers are
+-	 * fully operational, but have the danger of duplicate addresses
+-	 * and that in turn can cause problems with Bluetooth operation.
+-	 */
+-	if (!bacmp(&rp->bdaddr, BDADDR_INTEL)) {
+-		BT_ERR("%s found Intel default device address (%pMR)",
+-		       hdev->name, &rp->bdaddr);
+-		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+-	}
+-
+-	kfree_skb(skb);
+-
+-	return 0;
+-}
+-
+ static int btusb_setup_intel(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -1650,7 +1606,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 		BT_INFO("%s: Intel device is already patched. patch num: %02x",
+ 			hdev->name, ver->fw_patch_num);
+ 		kfree_skb(skb);
+-		btusb_check_bdaddr_intel(hdev);
++		btintel_check_bdaddr(hdev);
+ 		return 0;
+ 	}
+ 
+@@ -1663,7 +1619,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	fw = btusb_setup_intel_get_fw(hdev, ver);
+ 	if (!fw) {
+ 		kfree_skb(skb);
+-		btusb_check_bdaddr_intel(hdev);
++		btintel_check_bdaddr(hdev);
+ 		return 0;
+ 	}
+ 	fw_ptr = fw->data;
+@@ -1744,7 +1700,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	BT_INFO("%s: Intel Bluetooth firmware patch completed and activated",
+ 		hdev->name);
+ 
+-	btusb_check_bdaddr_intel(hdev);
++	btintel_check_bdaddr(hdev);
+ 	return 0;
+ 
+ exit_mfg_disable:
+@@ -1760,7 +1716,7 @@ exit_mfg_disable:
+ 
+ 	BT_INFO("%s: Intel Bluetooth firmware patch completed", hdev->name);
+ 
+-	btusb_check_bdaddr_intel(hdev);
++	btintel_check_bdaddr(hdev);
+ 	return 0;
+ 
+ exit_mfg_deactivate:
+@@ -1781,7 +1737,7 @@ exit_mfg_deactivate:
+ 	BT_INFO("%s: Intel Bluetooth firmware patch completed and deactivated",
+ 		hdev->name);
+ 
+-	btusb_check_bdaddr_intel(hdev);
++	btintel_check_bdaddr(hdev);
+ 	return 0;
+ }
+ 
+@@ -2057,7 +2013,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	if (ver->fw_variant == 0x23) {
+ 		kfree_skb(skb);
+ 		clear_bit(BTUSB_BOOTLOADER, &data->flags);
+-		btusb_check_bdaddr_intel(hdev);
++		btintel_check_bdaddr(hdev);
+ 		return 0;
+ 	}
+ 
+@@ -2341,23 +2297,6 @@ static void btusb_hw_error_intel(struct hci_dev *hdev, u8 code)
+ 	kfree_skb(skb);
+ }
+ 
+-static int btusb_set_bdaddr_intel(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+-{
+-	struct sk_buff *skb;
+-	long ret;
+-
+-	skb = __hci_cmd_sync(hdev, 0xfc31, 6, bdaddr, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		ret = PTR_ERR(skb);
+-		BT_ERR("%s: changing Intel device address failed (%ld)",
+-		       hdev->name, ret);
+-		return ret;
+-	}
+-	kfree_skb(skb);
+-
+-	return 0;
+-}
+-
+ static int btusb_shutdown_intel(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -2808,7 +2747,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_INTEL) {
+ 		hdev->setup = btusb_setup_intel;
+ 		hdev->shutdown = btusb_shutdown_intel;
+-		hdev->set_bdaddr = btusb_set_bdaddr_intel;
++		hdev->set_bdaddr = btintel_set_bdaddr;
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 	}
+@@ -2817,7 +2756,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		hdev->send = btusb_send_frame_intel;
+ 		hdev->setup = btusb_setup_intel_new;
+ 		hdev->hw_error = btusb_hw_error_intel;
+-		hdev->set_bdaddr = btusb_set_bdaddr_intel;
++		hdev->set_bdaddr = btintel_set_bdaddr;
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 	}
+ 
 -- 
 2.1.0
 
