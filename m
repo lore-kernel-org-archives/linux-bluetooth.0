@@ -1,114 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
-References: <1428098532-5257-1-git-send-email-jamuraa@chromium.org>
-Date: Tue, 7 Apr 2015 18:07:23 +0300
-Message-ID: <CABBYNZ+ufWrdf3FjOsV9h30veHym8PdCOToSXtdAp-e559ixGg@mail.gmail.com>
-Subject: Re: [BlueZ v10 00/12] Implement LE Advertisement D-Bus API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Loic Poulain <loic.poulain@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCHv2] tools: Add protocol option for btattach utility
+Date: Tue,  7 Apr 2015 16:22:08 +0200
+Message-Id: <1428416528-2427-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+---
+ v2: fix removed NULL terminator in option struct
+ tools/btattach.c | 53 ++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 44 insertions(+), 9 deletions(-)
 
-On Sat, Apr 4, 2015 at 1:02 AM, Michael Janssen <jamuraa@chromium.org> wrote:
-> Implementation of the LE Advertisement D-Bus API.
->
-> Things that are missing still:
->  * Semantics for multiple Advertisements (currently any more than one will fail)
->  * TX Power property parsing / interface
->  * Setting other Flags in the advertisement.
->
-> v1 -> v2:
->  * Cleanup based on comments from Arman
->  * Add g_dbus_proxy_set_read_watch function to avoid ObjectManager dependency
->  * Consolidate script updates into single test script
->
-> v2 -> v3:
->  * Change "ManufacturerSpecificData" to "ManufacturerData"
->  * Add advertisement-api.txt to EXTRA_DIST
->  * Add Release() callback to org.bluez.LEAdvertisement1
->  * Remove IncludePower from the LEAdvertisement1 API
->
-> v3 -> v4:
->  * Rename "g_dbus_proxy_set_read_watch" to "g_dbus_proxy_set_ready_watch"
->
-> v4 -> v5:
->  * Rebase
->  * Use g_dbus_client_set_proxy_handlers instead of g_dbus_proxy_set_ready_watch
->  * Add MGMT interface calls to actually advertise.
->
-> v5 -> v6:
->  * Minor patch cruft cleanup
->  * Rename btd_advertising_manager to btd_advertising and fix filename change.
->
-> v6 -> v7:
->  * Rebase for included patches
->  * Rename ad structure to bt_ad
->  * Fixes for bt_ad_generate bugs
->  * Correctly error for invalid length
->  * Improvements so advertisement-example works out of the box
->
-> v7 -> v8:
->  * Rebase
->  * Use eir.h constants instead of local constants
->  * Rename internal structures for brevity
->  * Add null checks
->  * Check for queue_* failures
->  * Address misc other comments
->
-> v8 -> v9:
->  * Rebase
->  * Rephrase example-advertisement patch message
->  * Don't try to start LEAdvertisingManager when not in experimental
->  * Set MGMT flags correctly for peripheral vs. broadcast
->  * Fix memory leaks in refresh_advertisement
->
-> v9 -> v10:
->  * Rebase
->  * Add length checks to bt_ad_add_service_data and bt_ad_add_manufacturer_data
->  * Use size_t where appropriate to avoid overflows
->
-> Michael Janssen (12):
->   shared: add bt_ad structure
->   core/advertising: use bt_ad
->   core/advertising: Parse ServiceUUIDs
->   core/advertising: Parse SolicitUUIDs
->   core/advertising: Parse ManufacturerSpecificData
->   core/advertising: Parse ServiceData
->   Update TODO for LE Advertising
->   shared/ad: implement bt_ad_generate
->   core/advertising: Add and Remove AD using MGMT
->   test: improvements to example-advertisement
->   gdbus: Add g_dbus_get_flags function
->   core: Only start Advertising Manager when experimental
->
->  Makefile.am                |   1 +
->  TODO                       |  20 +-
->  gdbus/gdbus.h              |   1 +
->  gdbus/object.c             |   5 +
->  src/adapter.c              |  18 +-
->  src/advertising.c          | 325 ++++++++++++++++++++++++-
->  src/eir.h                  |  12 +
->  src/shared/ad.c            | 589 +++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/ad.h            |  60 +++++
->  test/example-advertisement |  12 +-
->  10 files changed, 1006 insertions(+), 37 deletions(-)
->  create mode 100644 src/shared/ad.c
->  create mode 100644 src/shared/ad.h
->
-> --
-> 2.2.0.rc0.207.ga3a616c
-
-Applied, thanks.
-
-Note that I did have to do some small fixup, remember to run git
-rebase --exec make next time to avoid breaking the build between
-patches.
-
-
+diff --git a/tools/btattach.c b/tools/btattach.c
+index b7948a3..fa0ce11 100644
+--- a/tools/btattach.c
++++ b/tools/btattach.c
+@@ -187,28 +187,44 @@ static void usage(void)
+ 	printf("options:\n"
+ 		"\t-B, --bredr <device>   Attach BR/EDR controller\n"
+ 		"\t-A, --amp <device>     Attach AMP controller\n"
++		"\t-P, --protocol <proto> Specify protocol type\n"
+ 		"\t-h, --help             Show help options\n");
+ }
+ 
+ static const struct option main_options[] = {
+-	{ "bredr",   required_argument, NULL, 'B' },
+-	{ "amp",     required_argument, NULL, 'A' },
+-	{ "version", no_argument,       NULL, 'v' },
+-	{ "help",    no_argument,       NULL, 'h' },
++	{ "bredr",    required_argument, NULL, 'B' },
++	{ "amp",      required_argument, NULL, 'A' },
++	{ "protocol", required_argument, NULL, 'P' },
++	{ "version",  no_argument,       NULL, 'v' },
++	{ "help",     no_argument,       NULL, 'h' },
++	{ }
++};
++
++static const struct {
++	unsigned int id;
++	const char *name;
++} proto_table[] = {
++	{HCI_UART_H4,    "h4"},
++	{HCI_UART_BCSP,  "bcsp"},
++	{HCI_UART_3WIRE, "3wire"},
++	{HCI_UART_H4DS,  "h4ds"},
++	{HCI_UART_LL,    "ll"},
++	{HCI_UART_ATH3K, "ath3k"},
++	{HCI_UART_INTEL, "intel"},
+ 	{ }
+ };
+ 
+ int main(int argc, char *argv[])
+ {
+-	const char *bredr_path = NULL, *amp_path = NULL;
++	const char *bredr_path = NULL, *amp_path = NULL, *proto = NULL;
+ 	bool raw_device = false;
+ 	sigset_t mask;
+-	int exit_status, count = 0;
++	int exit_status, count = 0, proto_id = HCI_UART_H4;
+ 
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "B:A:Rvh",
++		opt = getopt_long(argc, argv, "B:A:P:Rvh",
+ 						main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -220,6 +236,9 @@ int main(int argc, char *argv[])
+ 		case 'A':
+ 			amp_path = optarg;
+ 			break;
++		case 'P':
++			proto = optarg;
++			break;
+ 		case 'R':
+ 			raw_device = true;
+ 			break;
+@@ -247,6 +266,22 @@ int main(int argc, char *argv[])
+ 
+ 	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
+ 
++	if (proto) {
++		unsigned int i;
++
++		for (i = 0; proto_table[i].name; i++) {
++			if (!strcmp(proto_table[i].name, proto)) {
++				proto_id = proto_table[i].id;
++				break;
++			}
++		}
++
++		if (!proto_table[i].name) {
++			fprintf(stderr, "Invalid protocol\n");
++			return EXIT_FAILURE;
++		}
++	}
++
+ 	if (bredr_path) {
+ 		unsigned long flags;
+ 		int fd;
+@@ -258,7 +293,7 @@ int main(int argc, char *argv[])
+ 		if (raw_device)
+ 			flags = (1 << HCI_UART_RAW_DEVICE);
+ 
+-		fd = attach_proto(bredr_path, HCI_UART_H4, flags);
++		fd = attach_proto(bredr_path, proto_id, flags);
+ 		if (fd >= 0) {
+ 			mainloop_add_fd(fd, 0, uart_callback, NULL, NULL);
+ 			count++;
+@@ -277,7 +312,7 @@ int main(int argc, char *argv[])
+ 		if (raw_device)
+ 			flags = (1 << HCI_UART_RAW_DEVICE);
+ 
+-		fd = attach_proto(amp_path, HCI_UART_H4, flags);
++		fd = attach_proto(amp_path, proto_id, flags);
+ 		if (fd >= 0) {
+ 			mainloop_add_fd(fd, 0, uart_callback, NULL, NULL);
+ 			count++;
 -- 
-Luiz Augusto von Dentz
+1.9.1
