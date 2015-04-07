@@ -1,60 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Jason Flanagan <jason@bitcircle.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: bluetoothctl Segmentation Fault on confirm
-Date: Tue, 07 Apr 2015 22:58:54 +0200
-Message-ID: <3673842.0CdpFuVUFE@leonov>
-In-Reply-To: <8658927.JRclqFpaYF@leonov>
-References: <551D879B.7020409@bitcircle.com> <55240848.9000408@bitcircle.com> <8658927.JRclqFpaYF@leonov>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 1/2] gdbus: Use g_dbus_create_error_valist internally
+Date: Tue,  7 Apr 2015 22:10:48 +0200
+Message-Id: <1428437449-11210-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jason,
+There is no need to duplicate code in g_dbus_send_error_valist.
+---
+ gdbus/object.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-On Tuesday 07 of April 2015 20:54:34 Szymon Janc wrote:
-> Hi Jason,
-> 
-> On Tuesday 07 of April 2015 12:39:36 Jason Flanagan wrote:
-> > Sorry for the wait, I just heard back from my supervisor that the error
-> > only occurs when we cross compile with the uClibc library.
-> > (libuClibc-0.9.33.2)
-> > The actual error message is
-> > 
-> > bluetoothctl[2545]: segfault at 0 ip b7564efd sp bff77324 error 4 in
-> > libuClibc-0.9.33.2.so[b753f000+4f000]
-> 
-> OK, I was able to reproduce this with musl C library.
-
-Patches that should fix the crash are on ML. Please test if that fix your 
-problem.
-
-> 
-> PS please don't top post on ML
-> 
-> > On 04/03/2015 06:51 AM, Szymon Janc wrote:
-> > > Hi Jason,
-> > > 
-> > > On Thursday 02 of April 2015 14:16:59 Jason Flanagan wrote:
-> > >> The issue that i'm currently having with BlueZ 5.29 is that when i say
-> > >> no to confirming a passkey i get a "Segmentation Fault". I've tried
-> > >> multiple times on multiple devices and i get the same result.
-> > >> 
-> > >> bluetoothctl
-> > >> [bluetooth]#agent on
-> > >> [bluetooth]#default-agent
-> > >> [bluetooth]# pair XX:XX:XX:XX:XX:XX
-> > >> Attempting to pair with XX:XX:XX:XX:XX:XX
-> > >> [CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
-> > >> Request confirmation
-> > >> [agent] Confirm passkey 080443 (yes/no): no
-> > >> Segmentation fault
-> > > 
-> > > I'm not able to reproduce this. Could you try running bluetoothctl under
-> > > valgrind or gdb and provide full backtrace of crash?
-
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 4d5a64c..c3c137b 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -1530,11 +1530,8 @@ gboolean g_dbus_send_error_valist(DBusConnection *connection,
+ 					const char *format, va_list args)
+ {
+ 	DBusMessage *error;
+-	char str[1024];
+-
+-	vsnprintf(str, sizeof(str), format, args);
+ 
+-	error = dbus_message_new_error(message, name, str);
++	error = g_dbus_create_error_valist(message, name, format, args);
+ 	if (error == NULL)
+ 		return FALSE;
+ 
 -- 
-BR
-Szymon Janc
+1.9.3
+
