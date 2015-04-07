@@ -1,122 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] tools: Add protocol option for btattach utility
-Date: Tue,  7 Apr 2015 16:16:52 +0200
-Message-Id: <1428416212-2017-1-git-send-email-loic.poulain@intel.com>
+Subject: [PATCH 2/2] Bluetooth: Add local SSP OOB data to OOB ext data mgmt command
+Date: Tue,  7 Apr 2015 14:36:30 +0300
+Message-Id: <1428406590-30002-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1428406590-30002-1-git-send-email-johan.hedberg@gmail.com>
+References: <1428406590-30002-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/btattach.c | 52 +++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 43 insertions(+), 9 deletions(-)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/tools/btattach.c b/tools/btattach.c
-index b7948a3..a7d5dbc 100644
---- a/tools/btattach.c
-+++ b/tools/btattach.c
-@@ -187,28 +187,43 @@ static void usage(void)
- 	printf("options:\n"
- 		"\t-B, --bredr <device>   Attach BR/EDR controller\n"
- 		"\t-A, --amp <device>     Attach AMP controller\n"
-+		"\t-P, --protocol <proto> Specify protocol type\n"
- 		"\t-h, --help             Show help options\n");
+The Read Local Out Of Band Extended Data mgmt command is specified to
+return the SSP values when given a BR/EDR address type as input
+parameter. The returned values may include either the 192-bit variants
+of C and R, or their 256-bit variants, or both, depending on the status
+of Secure Connections and Secure Connections Only modes. If SSP is not
+enabled the command will only return the Class of Device value (like it
+has done so far).
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 152 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 149 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 845dfcc43a20..df721370605b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6466,6 +6466,140 @@ static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
+ 	return eir_len;
  }
  
- static const struct option main_options[] = {
--	{ "bredr",   required_argument, NULL, 'B' },
--	{ "amp",     required_argument, NULL, 'A' },
--	{ "version", no_argument,       NULL, 'v' },
--	{ "help",    no_argument,       NULL, 'h' },
-+	{ "bredr",    required_argument, NULL, 'B' },
-+	{ "amp",      required_argument, NULL, 'A' },
-+	{ "protocol", required_argument, NULL, 'P' },
-+	{ "version",  no_argument,       NULL, 'v' },
-+	{ "help",     no_argument,       NULL, 'h' },
-+};
++static void read_local_oob_ext_data_complete(struct hci_dev *hdev, u8 status,
++					     u16 opcode, struct sk_buff *skb)
++{
++	const struct mgmt_cp_read_local_oob_ext_data *mgmt_cp;
++	struct mgmt_rp_read_local_oob_ext_data *mgmt_rp;
++	u8 *h192, *r192, *h256, *r256;
++	struct mgmt_pending_cmd *cmd;
++	u16 eir_len;
++	int err;
 +
-+static const struct {
-+	unsigned int id;
-+	const char *name;
-+} proto_table[] = {
-+	{HCI_UART_H4,    "h4"},
-+	{HCI_UART_BCSP,  "bcsp"},
-+	{HCI_UART_3WIRE, "3wire"},
-+	{HCI_UART_H4DS,  "h4ds"},
-+	{HCI_UART_LL,    "ll"},
-+	{HCI_UART_ATH3K, "ath3k"},
-+	{HCI_UART_INTEL, "intel"},
- 	{ }
- };
- 
- int main(int argc, char *argv[])
- {
--	const char *bredr_path = NULL, *amp_path = NULL;
-+	const char *bredr_path = NULL, *amp_path = NULL, *proto = NULL;
- 	bool raw_device = false;
- 	sigset_t mask;
--	int exit_status, count = 0;
-+	int exit_status, count = 0, proto_id = HCI_UART_H4;
- 
- 	for (;;) {
- 		int opt;
- 
--		opt = getopt_long(argc, argv, "B:A:Rvh",
-+		opt = getopt_long(argc, argv, "B:A:P:Rvh",
- 						main_options, NULL);
- 		if (opt < 0)
- 			break;
-@@ -220,6 +235,9 @@ int main(int argc, char *argv[])
- 		case 'A':
- 			amp_path = optarg;
- 			break;
-+		case 'P':
-+			proto = optarg;
-+			break;
- 		case 'R':
- 			raw_device = true;
- 			break;
-@@ -247,6 +265,22 @@ int main(int argc, char *argv[])
- 
- 	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
- 
-+	if (proto) {
-+		unsigned int i;
++	BT_DBG("%s status %u", hdev->name, status);
 +
-+		for (i = 0; proto_table[i].name; i++) {
-+			if (!strcmp(proto_table[i].name, proto)) {
-+				proto_id = proto_table[i].id;
-+				break;
-+			}
++	cmd = pending_find(MGMT_OP_READ_LOCAL_OOB_EXT_DATA, hdev);
++	if (!cmd)
++		return;
++
++	mgmt_cp = cmd->param;
++
++	if (status) {
++		status = mgmt_status(status);
++		eir_len = 0;
++	} else if (opcode == HCI_OP_READ_LOCAL_OOB_DATA) {
++		struct hci_rp_read_local_oob_data *rp;
++
++		if (skb->len != sizeof(*rp)) {
++			status = MGMT_STATUS_FAILED;
++			eir_len = 0;
++		} else {
++			status = MGMT_STATUS_SUCCESS;
++			rp = (void *) skb->data;
++
++			eir_len = 5 + 18 + 18;
++			h192 = rp->hash;
++			r192 = rp->rand;
++			h256 = NULL;
++			r256 = NULL;
 +		}
++	} else {
++		struct hci_rp_read_local_oob_ext_data *rp;
 +
-+		if (!proto_table[i].name) {
-+			fprintf(stderr, "Invalid protocol\n");
-+			return EXIT_FAILURE;
++		if (skb->len != sizeof(*rp)) {
++			status = MGMT_STATUS_FAILED;
++			eir_len = 0;
++		} else {
++			status = MGMT_STATUS_SUCCESS;
++			rp = (void *) skb->data;
++
++			if (hci_dev_test_flag(hdev, HCI_SC_ONLY)) {
++				eir_len = 5 + 18 + 18;
++				h192 = NULL;
++				r192 = NULL;
++			} else {
++				eir_len = 5 + 18 + 18 + 18 + 18;
++				h192 = rp->hash192;
++				r192 = rp->rand192;
++			}
++
++			h256 = rp->hash256;
++			r256 = rp->rand256;
 +		}
 +	}
 +
- 	if (bredr_path) {
- 		unsigned long flags;
- 		int fd;
-@@ -258,7 +292,7 @@ int main(int argc, char *argv[])
- 		if (raw_device)
- 			flags = (1 << HCI_UART_RAW_DEVICE);
- 
--		fd = attach_proto(bredr_path, HCI_UART_H4, flags);
-+		fd = attach_proto(bredr_path, proto_id, flags);
- 		if (fd >= 0) {
- 			mainloop_add_fd(fd, 0, uart_callback, NULL, NULL);
- 			count++;
-@@ -277,7 +311,7 @@ int main(int argc, char *argv[])
- 		if (raw_device)
- 			flags = (1 << HCI_UART_RAW_DEVICE);
- 
--		fd = attach_proto(amp_path, HCI_UART_H4, flags);
-+		fd = attach_proto(amp_path, proto_id, flags);
- 		if (fd >= 0) {
- 			mainloop_add_fd(fd, 0, uart_callback, NULL, NULL);
- 			count++;
++	mgmt_rp = kmalloc(sizeof(*mgmt_rp) + eir_len, GFP_KERNEL);
++	if (!mgmt_rp)
++		goto done;
++
++	if (status)
++		goto send_rsp;
++
++	eir_len = eir_append_data(mgmt_rp->eir, 0, EIR_CLASS_OF_DEV,
++				  hdev->dev_class, 3);
++
++	if (h192 && r192) {
++		eir_len = eir_append_data(mgmt_rp->eir, eir_len,
++					  EIR_SSP_HASH_C192, h192, 16);
++		eir_len = eir_append_data(mgmt_rp->eir, eir_len,
++					  EIR_SSP_RAND_R192, r192, 16);
++	}
++
++	if (h256 && r256) {
++		eir_len = eir_append_data(mgmt_rp->eir, eir_len,
++					  EIR_SSP_HASH_C256, h256, 16);
++		eir_len = eir_append_data(mgmt_rp->eir, eir_len,
++					  EIR_SSP_RAND_R256, r256, 16);
++	}
++
++send_rsp:
++	mgmt_rp->type = mgmt_cp->type;
++	mgmt_rp->eir_len = cpu_to_le16(eir_len);
++
++	err = mgmt_cmd_complete(cmd->sk, hdev->id,
++				MGMT_OP_READ_LOCAL_OOB_EXT_DATA, status,
++				mgmt_rp, sizeof(*mgmt_rp) + eir_len);
++	if (err < 0 || status)
++		goto done;
++
++	hci_sock_set_flag(cmd->sk, HCI_MGMT_OOB_DATA_EVENTS);
++
++	err = mgmt_limited_event(MGMT_EV_LOCAL_OOB_DATA_UPDATED, hdev,
++				 mgmt_rp, sizeof(*mgmt_rp) + eir_len,
++				 HCI_MGMT_OOB_DATA_EVENTS, cmd->sk);
++done:
++	kfree(mgmt_rp);
++	mgmt_pending_remove(cmd);
++}
++
++static int read_local_ssp_oob_req(struct hci_dev *hdev, struct sock *sk,
++				  struct mgmt_cp_read_local_oob_ext_data *cp)
++{
++	struct mgmt_pending_cmd *cmd;
++	struct hci_request req;
++	int err;
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_READ_LOCAL_OOB_EXT_DATA, hdev,
++			       cp, sizeof(*cp));
++	if (!cmd)
++		return -ENOMEM;
++
++	hci_req_init(&req, hdev);
++
++	if (bredr_sc_enabled(hdev))
++		hci_req_add(&req, HCI_OP_READ_LOCAL_OOB_EXT_DATA, 0, NULL);
++	else
++		hci_req_add(&req, HCI_OP_READ_LOCAL_OOB_DATA, 0, NULL);
++
++	err = hci_req_run_skb(&req, read_local_oob_ext_data_complete);
++	if (err < 0) {
++		mgmt_pending_remove(cmd);
++		return err;
++	}
++
++	return 0;
++}
++
+ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
+ 				   void *data, u16 data_len)
+ {
+@@ -6517,9 +6651,21 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
+ 	eir_len = 0;
+ 	switch (cp->type) {
+ 	case BIT(BDADDR_BREDR):
+-		eir_len = eir_append_data(rp->eir, eir_len, EIR_CLASS_OF_DEV,
+-					  hdev->dev_class, 3);
+-		break;
++		if (!hci_dev_test_flag(hdev, HCI_SSP_ENABLED)) {
++			eir_len = eir_append_data(rp->eir, eir_len,
++						  EIR_CLASS_OF_DEV,
++						  hdev->dev_class, 3);
++			break;
++		}
++
++		err = read_local_ssp_oob_req(hdev, sk, cp);
++		hci_dev_unlock(hdev);
++		if (err) {
++			status = MGMT_STATUS_FAILED;
++			goto complete;
++		}
++
++		goto done;
+ 	case (BIT(BDADDR_LE_PUBLIC) | BIT(BDADDR_LE_RANDOM)):
+ 		if (hci_dev_test_flag(hdev, HCI_SC_ENABLED) &&
+ 		    smp_generate_oob(hdev, hash, rand) < 0) {
 -- 
-1.9.1
+2.1.0
+
