@@ -1,180 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Read LE remote features during connection establishment
-Date: Wed,  8 Apr 2015 01:25:20 -0700
-Message-Id: <1428481520-29567-1-git-send-email-marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Jason Flanagan <jason@bitcircle.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: bluetoothctl Segmentation Fault on confirm
+Date: Tue, 07 Apr 2015 22:58:54 +0200
+Message-ID: <3673842.0CdpFuVUFE@leonov>
+In-Reply-To: <8658927.JRclqFpaYF@leonov>
+References: <551D879B.7020409@bitcircle.com> <55240848.9000408@bitcircle.com> <8658927.JRclqFpaYF@leonov>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When establishing a Bluetooth LE connection, read the remote used
-features mask to determine which features are supported. This was
-not really needed with Bluetooth 4.0, but since Bluetooth 4.1 and
-also 4.2 have introduced new optional features, this becomes more
-important.
+Hi Jason,
 
-This works the same as with BR/EDR where the connection enters the
-BT_CONFIG stage and hci_connect_cfm call is delayed until the remote
-features have been retrieved. Only after successfully receiving the
-remote features, the connection enters the BT_CONNECTED state.
+On Tuesday 07 of April 2015 20:54:34 Szymon Janc wrote:
+> Hi Jason,
+> 
+> On Tuesday 07 of April 2015 12:39:36 Jason Flanagan wrote:
+> > Sorry for the wait, I just heard back from my supervisor that the error
+> > only occurs when we cross compile with the uClibc library.
+> > (libuClibc-0.9.33.2)
+> > The actual error message is
+> > 
+> > bluetoothctl[2545]: segfault at 0 ip b7564efd sp bff77324 error 4 in
+> > libuClibc-0.9.33.2.so[b753f000+4f000]
+> 
+> OK, I was able to reproduce this with musl C library.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h | 12 ++++++++
- net/bluetooth/hci_event.c   | 75 +++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 85 insertions(+), 2 deletions(-)
+Patches that should fix the crash are on ML. Please test if that fix your 
+problem.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 2f8c830e600c..cb568ecc43a5 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1376,6 +1376,11 @@ struct hci_cp_le_conn_update {
- 	__le16   max_ce_len;
- } __packed;
- 
-+#define HCI_OP_LE_READ_REMOTE_FEATURES	0x2016
-+struct hci_cp_le_read_remote_features {
-+	__le16	 handle;
-+} __packed;
-+
- #define HCI_OP_LE_START_ENC		0x2019
- struct hci_cp_le_start_enc {
- 	__le16	handle;
-@@ -1868,6 +1873,13 @@ struct hci_ev_le_conn_update_complete {
- 	__le16   supervision_timeout;
- } __packed;
- 
-+#define HCI_EV_LE_REMOTE_FEAT_COMPLETE	0x04
-+struct hci_ev_le_remote_feat_complete {
-+	__u8     status;
-+	__le16   handle;
-+	__u8     features[8];
-+} __packed;
-+
- #define HCI_EV_LE_LTK_REQ		0x05
- struct hci_ev_le_ltk_req {
- 	__le16	handle;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 01031038eb0e..123a6400a9d7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2036,6 +2036,33 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_cs_le_read_remote_features(struct hci_dev *hdev, u8 status)
-+{
-+	struct hci_cp_le_read_remote_features *cp;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	if (!status)
-+		return;
-+
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_READ_REMOTE_FEATURES);
-+	if (!cp)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
-+	if (conn) {
-+		if (conn->state == BT_CONFIG) {
-+			hci_connect_cfm(conn, status);
-+			hci_conn_drop(conn);
-+		}
-+	}
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
- {
- 	struct hci_cp_le_start_enc *cp;
-@@ -3104,6 +3131,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb,
- 		hci_cs_le_create_conn(hdev, ev->status);
- 		break;
- 
-+	case HCI_OP_LE_READ_REMOTE_FEATURES:
-+		hci_cs_le_read_remote_features(hdev, ev->status);
-+		break;
-+
- 	case HCI_OP_LE_START_ENC:
- 		hci_cs_le_start_enc(hdev, ev->status);
- 		break;
-@@ -4515,7 +4546,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->handle = __le16_to_cpu(ev->handle);
--	conn->state = BT_CONNECTED;
-+	conn->state = BT_CONFIG;
- 
- 	conn->le_conn_interval = le16_to_cpu(ev->interval);
- 	conn->le_conn_latency = le16_to_cpu(ev->latency);
-@@ -4524,7 +4555,18 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_debugfs_create_conn(conn);
- 	hci_conn_add_sysfs(conn);
- 
--	hci_connect_cfm(conn, ev->status);
-+	if (!ev->status) {
-+		struct hci_cp_le_read_remote_features cp;
-+
-+		cp.handle = __cpu_to_le16(conn->handle);
-+
-+		hci_send_cmd(hdev, HCI_OP_LE_READ_REMOTE_FEATURES,
-+			     sizeof(cp), &cp);
-+
-+		hci_conn_hold(conn);
-+	} else {
-+		hci_connect_cfm(conn, ev->status);
-+	}
- 
- 	params = hci_pend_le_action_lookup(&hdev->pend_le_conns, &conn->dst,
- 					   conn->dst_type);
-@@ -4826,6 +4868,31 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev,
-+					    struct sk_buff *skb)
-+{
-+	struct hci_ev_le_remote_feat_complete *ev = (void *)skb->data;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
-+	if (conn) {
-+		if (!ev->status)
-+			memcpy(conn->features[0], ev->features, 8);
-+
-+		if (conn->state == BT_CONFIG) {
-+			conn->state = BT_CONNECTED;
-+			hci_connect_cfm(conn, ev->status);
-+			hci_conn_drop(conn);
-+		}
-+	}
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_le_ltk_req *ev = (void *) skb->data;
-@@ -4999,6 +5066,10 @@ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_le_adv_report_evt(hdev, skb);
- 		break;
- 
-+	case HCI_EV_LE_REMOTE_FEAT_COMPLETE:
-+		hci_le_remote_feat_complete_evt(hdev, skb);
-+		break;
-+
- 	case HCI_EV_LE_LTK_REQ:
- 		hci_le_ltk_request_evt(hdev, skb);
- 		break;
+> 
+> PS please don't top post on ML
+> 
+> > On 04/03/2015 06:51 AM, Szymon Janc wrote:
+> > > Hi Jason,
+> > > 
+> > > On Thursday 02 of April 2015 14:16:59 Jason Flanagan wrote:
+> > >> The issue that i'm currently having with BlueZ 5.29 is that when i say
+> > >> no to confirming a passkey i get a "Segmentation Fault". I've tried
+> > >> multiple times on multiple devices and i get the same result.
+> > >> 
+> > >> bluetoothctl
+> > >> [bluetooth]#agent on
+> > >> [bluetooth]#default-agent
+> > >> [bluetooth]# pair XX:XX:XX:XX:XX:XX
+> > >> Attempting to pair with XX:XX:XX:XX:XX:XX
+> > >> [CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
+> > >> Request confirmation
+> > >> [agent] Confirm passkey 080443 (yes/no): no
+> > >> Segmentation fault
+> > > 
+> > > I'm not able to reproduce this. Could you try running bluetoothctl under
+> > > valgrind or gdb and provide full backtrace of crash?
+
 -- 
-2.1.0
-
+BR
+Szymon Janc
