@@ -3,21 +3,20 @@ From: Loic Poulain <loic.poulain@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCHv2] tools: Add protocol option for btattach utility
-Date: Tue,  7 Apr 2015 16:22:08 +0200
-Message-Id: <1428416528-2427-1-git-send-email-loic.poulain@intel.com>
+Subject: [PATCH] tools: Add protocol option for btattach utility
+Date: Tue,  7 Apr 2015 16:16:52 +0200
+Message-Id: <1428416212-2017-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- v2: fix removed NULL terminator in option struct
- tools/btattach.c | 53 ++++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 44 insertions(+), 9 deletions(-)
+ tools/btattach.c | 52 +++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 43 insertions(+), 9 deletions(-)
 
 diff --git a/tools/btattach.c b/tools/btattach.c
-index b7948a3..fa0ce11 100644
+index b7948a3..a7d5dbc 100644
 --- a/tools/btattach.c
 +++ b/tools/btattach.c
-@@ -187,28 +187,44 @@ static void usage(void)
+@@ -187,28 +187,43 @@ static void usage(void)
  	printf("options:\n"
  		"\t-B, --bredr <device>   Attach BR/EDR controller\n"
  		"\t-A, --amp <device>     Attach AMP controller\n"
@@ -35,7 +34,6 @@ index b7948a3..fa0ce11 100644
 +	{ "protocol", required_argument, NULL, 'P' },
 +	{ "version",  no_argument,       NULL, 'v' },
 +	{ "help",     no_argument,       NULL, 'h' },
-+	{ }
 +};
 +
 +static const struct {
@@ -69,7 +67,7 @@ index b7948a3..fa0ce11 100644
  						main_options, NULL);
  		if (opt < 0)
  			break;
-@@ -220,6 +236,9 @@ int main(int argc, char *argv[])
+@@ -220,6 +235,9 @@ int main(int argc, char *argv[])
  		case 'A':
  			amp_path = optarg;
  			break;
@@ -79,7 +77,7 @@ index b7948a3..fa0ce11 100644
  		case 'R':
  			raw_device = true;
  			break;
-@@ -247,6 +266,22 @@ int main(int argc, char *argv[])
+@@ -247,6 +265,22 @@ int main(int argc, char *argv[])
  
  	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
  
@@ -102,7 +100,7 @@ index b7948a3..fa0ce11 100644
  	if (bredr_path) {
  		unsigned long flags;
  		int fd;
-@@ -258,7 +293,7 @@ int main(int argc, char *argv[])
+@@ -258,7 +292,7 @@ int main(int argc, char *argv[])
  		if (raw_device)
  			flags = (1 << HCI_UART_RAW_DEVICE);
  
@@ -111,7 +109,7 @@ index b7948a3..fa0ce11 100644
  		if (fd >= 0) {
  			mainloop_add_fd(fd, 0, uart_callback, NULL, NULL);
  			count++;
-@@ -277,7 +312,7 @@ int main(int argc, char *argv[])
+@@ -277,7 +311,7 @@ int main(int argc, char *argv[])
  		if (raw_device)
  			flags = (1 << HCI_UART_RAW_DEVICE);
  
