@@ -1,32 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] tools: Fix btmgmt build on Android
-Date: Tue,  7 Apr 2015 10:44:36 +0200
-Message-Id: <1428396276-9396-1-git-send-email-mariusz.skamra@tieto.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'linux-bluetooth' <linux-bluetooth@vger.kernel.org>
+Cc: 'Bharat Bhusan Panda' <bharat.panda@samsung.com>
+Subject: Query reagarding unit test-gatt
+Date: Tue, 07 Apr 2015 14:00:44 +0530
+Message-id: <000301d0710d$273c2130$75b46390$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-target Executable: btmgmt (out/target/product/mako/obj/EXECUTABLES/btmgmt_intermediates/LINKED/btmgmt)
-external/bluetooth/bluez/tools/btmgmt.c:1477: error: undefined reference to 'hci_bustostr'
-collect2: error: ld returned 1 exit status
----
- android/Android.mk | 1 +
- 1 file changed, 1 insertion(+)
+Hi All,
 
-diff --git a/android/Android.mk b/android/Android.mk
-index f218805..1e22ca6 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -539,6 +539,7 @@ include $(CLEAR_VARS)
- LOCAL_SRC_FILES := \
- 	bluez/tools/btmgmt.c \
- 	bluez/lib/bluetooth.c \
-+	bluez/lib/hci.c \
- 	bluez/lib/sdp.c \
- 	bluez/src/shared/mainloop.c \
- 	bluez/src/shared/io-mainloop.c \
--- 
-1.9.1
+I am currently adding test cases for GATT. I am unable to understand the
+behavior of the following scenario.
+
+When I execute the following test case,
+TP/GAW/CL/BV-08-C  - [Write Characteristic Descriptors - by Client]
+
+bluez$  ./unit/test-gatt -d -p /TP/GAW/CL/BV-08-C
+
+  GATT: > 12 08 00 01 02 03                                ......          
+  GATT: < 13
+
+Test Summary
+------------
+/TP/GAW/CL/BV-08-C                                   Passed       0.002
+seconds
+
+Total: 1, Passed: 1 (100.0%), Failed: 0, Not Run: 0
+
+Here I am able to write it successfully. But in service_db_1 declaration,
+0x0008 handle is a descriptor with only read permission.
+As per its definition, it should return write not permitted error.
+Is there any bug in gatt-client procedure or test-gatt or is this the
+expected behavior ?
+
+
+Regards,
+Gowtham Anandha Babu
 
