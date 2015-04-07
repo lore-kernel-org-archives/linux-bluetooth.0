@@ -1,42 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'linux-bluetooth' <linux-bluetooth@vger.kernel.org>
-Cc: 'Bharat Bhusan Panda' <bharat.panda@samsung.com>
-Subject: Query reagarding unit test-gatt
-Date: Tue, 07 Apr 2015 14:00:44 +0530
-Message-id: <000301d0710d$273c2130$75b46390$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+MIME-Version: 1.0
+In-Reply-To: <1428068636-13073-4-git-send-email-mariusz.skamra@tieto.com>
+References: <1428068636-13073-1-git-send-email-mariusz.skamra@tieto.com>
+	<1428068636-13073-4-git-send-email-mariusz.skamra@tieto.com>
+Date: Tue, 7 Apr 2015 11:01:14 +0300
+Message-ID: <CABBYNZKYNKz_WNrdYqj+7+NRvuSa_mWZMZjM1z0QePXC8gk92g@mail.gmail.com>
+Subject: Re: [PATCHv2 03/27] shared/gatt-client: Expose gatt_db
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Mariusz,
 
-I am currently adding test cases for GATT. I am unable to understand the
-behavior of the following scenario.
+On Fri, Apr 3, 2015 at 4:43 PM, Mariusz Skamra <mariusz.skamra@tieto.com> wrote:
+> This patch adds the bt_gatt_client_get_db function, which allows
+> to get a reference to db from client structure. This is useful
+> when as a client we need to have an access db, to explore some
+> attributes.
+> ---
+>  src/shared/gatt-client.c | 8 ++++++++
+>  src/shared/gatt-client.h | 1 +
+>  2 files changed, 9 insertions(+)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 729bd87..f006ae6 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -1760,6 +1760,14 @@ uint16_t bt_gatt_client_get_mtu(struct bt_gatt_client *client)
+>         return bt_att_get_mtu(client->att);
+>  }
+>
+> +struct gatt_db *bt_gatt_client_get_db(struct bt_gatt_client *client)
+> +{
+> +       if (!client || !client->db)
+> +               return NULL;
+> +
+> +       return client->db;
+> +}
+> +
+>  static bool match_req_id(const void *a, const void *b)
+>  {
+>         const struct request *req = a;
+> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+> index 8e5e0f5..f539a61 100644
+> --- a/src/shared/gatt-client.h
+> +++ b/src/shared/gatt-client.h
+> @@ -70,6 +70,7 @@ bool bt_gatt_client_set_debug(struct bt_gatt_client *client,
+>                                         bt_gatt_client_destroy_func_t destroy);
+>
+>  uint16_t bt_gatt_client_get_mtu(struct bt_gatt_client *client);
+> +struct gatt_db *bt_gatt_client_get_db(struct bt_gatt_client *client);
+>
+>  bool bt_gatt_client_cancel(struct bt_gatt_client *client, unsigned int id);
+>  bool bt_gatt_client_cancel_all(struct bt_gatt_client *client);
+> --
+> 1.9.1
 
-When I execute the following test case,
-TP/GAW/CL/BV-08-C  - [Write Characteristic Descriptors - by Client]
-
-bluez$  ./unit/test-gatt -d -p /TP/GAW/CL/BV-08-C
-
-  GATT: > 12 08 00 01 02 03                                ......          
-  GATT: < 13
-
-Test Summary
-------------
-/TP/GAW/CL/BV-08-C                                   Passed       0.002
-seconds
-
-Total: 1, Passed: 1 (100.0%), Failed: 0, Not Run: 0
-
-Here I am able to write it successfully. But in service_db_1 declaration,
-0x0008 handle is a descriptor with only read permission.
-As per its definition, it should return write not permitted error.
-Is there any bug in gatt-client procedure or test-gatt or is this the
-expected behavior ?
+I went ahead and applied this one.
 
 
-Regards,
-Gowtham Anandha Babu
-
+-- 
+Luiz Augusto von Dentz
