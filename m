@@ -3,52 +3,77 @@ From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Veseli Veseljko <veseljko75@gmail.com>, Alex Gal <a.gal@miip.ca>,
 	Szymon Janc <szymon.janc@gmail.com>
-Subject: [RFC v2 0/3] sixaxis: Improved support for DualShock 3 clones
-Date: Wed,  8 Apr 2015 22:51:28 +0200
-Message-Id: <1428526291-11217-1-git-send-email-szymon.janc@gmail.com>
+Subject: [RFC v2 1/3] core/device: Add support for setting SDP record
+Date: Wed,  8 Apr 2015 22:51:29 +0200
+Message-Id: <1428526291-11217-2-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1428526291-11217-1-git-send-email-szymon.janc@gmail.com>
+References: <1428526291-11217-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This allows to set SDP record for device without resolving services
+over SDP. After SDP is provided profiles are probed.
+---
+ src/device.c | 31 +++++++++++++++++++++++++++++++
+ src/device.h |  3 +++
+ 2 files changed, 34 insertions(+)
 
-Some DualShock3 clones (eg ShanWan) were reported to not provide valid SDP
-record required by HID profile. Due to this those failed to work with
-current BlueZ sixaxis code (ie no input device were created).
-
-This small serie is an attempt to extend DS3 support also with those
-misbehaving clones. Idea is that we can provide fixed SDP recrod for devices
-that use valid PID/VID and skip SDP search.
-
-In this version SDP is kept in sixaxis plugin and provided via
-btd_device_set_record instead of SDP search. Nice addition is that
-sixaxis specific code is no longer needed in input server.
-
-This makes code similar to how original Fedora sixaxis plugin worked
-as suggested in previous review round.
-
-I tested this with genuine DS3 and it seems to work OK. Testing with
-clones is stil required though.
-
-@Alex
-Testing with Navigation Controller is also needed ie if SDP record
-is same as with DS3 or if we need dedicated one.
-
-BR
-Szymon Janc
-
-
-Szymon Janc (3):
-  core/device: Add support for setting SDP record
-  sixaxis: Provide DualShock 3 SDP record while adding new device
-  profiles/input: Remove sixaxis specific code
-
- Makefile.plugins        |   1 +
- plugins/sixaxis.c       | 166 ++++++++++++++++++++++++++++++++++++++++++++++++
- profiles/input/server.c |  89 +-------------------------
- src/device.c            |  31 +++++++++
- src/device.h            |   3 +
- 5 files changed, 203 insertions(+), 87 deletions(-)
-
+diff --git a/src/device.c b/src/device.c
+index 91dea27..e5cf362 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -5293,6 +5293,37 @@ static sdp_list_t *read_device_records(struct btd_device *device)
+ 	return recs;
+ }
+ 
++void btd_device_set_record(struct btd_device *device, const char *uuid,
++							sdp_record_t *rec)
++{
++	/* This API is only used for BR/EDR */
++	struct bearer_state *state = &device->bredr_state;
++	struct browse_req *req;
++	sdp_list_t *recs = NULL;
++
++	if (!rec)
++		return;
++
++	req = browse_request_new(device, NULL);
++	if (!req)
++		return;
++
++	recs = sdp_list_append(recs, rec);
++	update_bredr_services(req, recs);
++	sdp_list_free(recs, NULL);
++
++	device->svc_refreshed = true;
++	state->svc_resolved = true;
++
++	device_probe_profiles(device, req->profiles_added);
++
++	/* Propagate services changes */
++	g_dbus_emit_property_changed(dbus_conn, req->device->path,
++						DEVICE_INTERFACE, "UUIDs");
++
++	device_svc_resolved(device, device->bdaddr_type, 0);
++}
++
+ const sdp_record_t *btd_device_get_record(struct btd_device *device,
+ 							const char *uuid)
+ {
+diff --git a/src/device.h b/src/device.h
+index 9e86469..7e9a369 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -62,6 +62,9 @@ struct device_addr_type {
+ int device_addr_type_cmp(gconstpointer a, gconstpointer b);
+ GSList *btd_device_get_uuids(struct btd_device *device);
+ void device_probe_profiles(struct btd_device *device, GSList *profiles);
++
++void btd_device_set_record(struct btd_device *device, const char *uuid,
++							sdp_record_t *rec);
+ const sdp_record_t *btd_device_get_record(struct btd_device *device,
+ 						const char *uuid);
+ struct gatt_primary *btd_device_get_primary(struct btd_device *device,
 -- 
 2.1.4
 
