@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-References: <1427966783-15629-1-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1427966783-15629-1-git-send-email-gowtham.ab@samsung.com>
-Subject: RE: [PATCH ] core/gatt: Parse InProgress error code from err_msg
-Date: Wed, 08 Apr 2015 16:01:09 +0530
-Message-id: <001601d071e7$272b7d50$758277f0$@samsung.com>
+To: 'BlueZ devel list' <linux-bluetooth@vger.kernel.org>
+References: <000a01d06d2c$05c04660$1140d320$@samsung.com>
+In-reply-to: <000a01d06d2c$05c04660$1140d320$@samsung.com>
+Subject: RE: Found few memory leaks in gatt-client
+Date: Wed, 08 Apr 2015 16:00:40 +0530
+Message-id: <001501d071e7$1499eb40$3dcdc1c0$@samsung.com>
 MIME-version: 1.0
 Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,104 +16,86 @@ Ping.
 > -----Original Message-----
 > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
 > owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
-> Sent: Thursday, April 02, 2015 2:56 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
-> Babu
-> Subject: [PATCH ] core/gatt: Parse InProgress error code from err_msg
+> Sent: Thursday, April 02, 2015 3:32 PM
+> To: 'BlueZ devel list'
+> Cc: 'Bharat Bhusan Panda'
+> Subject: Found few memory leaks in gatt-client
 > 
-> In Common Profile and Service Error Code descriptions (Supplement to
-> Bluetooth Core Specification, sections 1.2 and 2), it is mentioned that
-> following error codes are sent over the Attribute Protocol.
-> 1)Client Characteristic Configuration Descriptor Improperly
-Configured(0xFD)
-> 2)Procedure Already in Progress(0xFE) 3)Out of Range(0xFF)
+> Hi All,
 > 
-> It should be treated as ATT Error codes. So, moved those to att-types.h
-and
-> handled org.bluez.Error.InProgress.
-> ---
->  src/gatt-database.c    |  4 +++-
->  src/shared/att-types.h | 10 ++++++++++
->  src/shared/att.c       | 10 ----------
->  3 files changed, 13 insertions(+), 11 deletions(-)
+> Found few memory leaks when testing the prepare write and execute write
+> using btgatt-client tool with PTS 6.0.1. Below are the logs for the same.
 > 
-> diff --git a/src/gatt-database.c b/src/gatt-database.c index
-bbeb7cd..fd456e5
-> 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -1441,7 +1441,6 @@ static bool parse_primary(GDBusProxy *proxy, bool
-> *primary)
+> ~/latest_bluez/bluez$  MALLOC_CHECK_=3 MALLOC_PERTURB_=69 valgrind
+> --trace-children=yes --track-origins=yes --show-possibly-lost=no --leak-
+> check=full -v ./tools/btgatt-client -i hci0 -d 00:1B:DC:07:33:4E
 > 
->  static uint8_t dbus_error_to_att_ecode(const char *error_name)  {
-> -	/* TODO: Parse error ATT ecode from error_message */
+> [GATT client]# write-prepare -s 0 0x00cd 00 00 03
+> --18895-- REDIR: 0x4ec2c10 (memchr) redirected to 0x4c2f390 (memchr)
+> --18895-- REDIR: 0x4ec8780 (__GI_memcpy) redirected to 0x4c2fc90
+> (__GI_memcpy)
+> --18895-- REDIR: 0x4ebe070 (strcmp) redirected to 0x4a25720
+> (_vgnU_ifunc_wrapper)
+> --18895-- REDIR: 0x4eced20 (__strcmp_sse2_unaligned) redirected to
+> 0x4c2f1b0
+> (strcmp)
+> Prepare write success.
+> Session id: 1 to be used on next write
+> [GATT client]# Write successful
+> [GATT client]# write-execute 1 1
+> [GATT client]#
+> Write successful
+> [GATT client]# ^C
 > 
->  	if (strcmp(error_name, "org.bluez.Error.Failed") == 0)
->  		return 0x80;  /* For now return this "application error" */
-> @@ -1455,6 +1454,9 @@ static uint8_t dbus_error_to_att_ecode(const char
-> *error_name)
->  	if (strcmp(error_name, "org.bluez.Error.InvalidValueLength") == 0)
->  		return BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
+> Shutting down...
+> ==18895==
+> ==18895== HEAP SUMMARY:
+> ==18895==     in use at exit: 2,862 bytes in 86 blocks
+> ==18895==   total heap usage: 1,305 allocs, 1,219 frees, 49,976 bytes
+> allocated
+> ==18895==
+> ==18895== Searching for pointers to 86 not-freed blocks ==18895== Checked
+> 91,288 bytes ==18895== ==18895== 46 (40 direct, 6 indirect) bytes in 1
+blocks
+> are definitely lost in loss record 2 of 4
+> ==18895==    at 0x4C2CC70: calloc (in
+> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==18895==    by 0x4093E0: bt_gatt_client_prepare_write
+(gatt-client.c:2690)
+> ==18895==    by 0x4031A7: cmd_write_prepare (btgatt-client.c:1015)
+> ==18895==    by 0x4028F0: prompt_read_cb (btgatt-client.c:1402)
+> ==18895==    by 0x40C7B2: mainloop_run (mainloop.c:157)
+> ==18895==    by 0x401FC4: main (btgatt-client.c:1658)
+> ==18895==
+> ==18895== 2,656 bytes in 83 blocks are definitely lost in loss record 4 of
+4
+> ==18895==    at 0x4C2AB80: malloc (in
+> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==18895==    by 0x40C8D9: mainloop_add_timeout (mainloop.c:327)
+> ==18895==    by 0x40C342: timeout_add (timeout-mainloop.c:69)
+> ==18895==    by 0x404AE2: can_write_data (att.c:504)
+> ==18895==    by 0x40BEDE: io_callback (io-mainloop.c:138)
+> ==18895==    by 0x40C7B2: mainloop_run (mainloop.c:157)
+> ==18895==    by 0x401FC4: main (btgatt-client.c:1658)
+> ==18895==
+> ==18895== LEAK SUMMARY:
+> ==18895==    definitely lost: 2,696 bytes in 84 blocks
+> ==18895==    indirectly lost: 6 bytes in 1 blocks
+> ==18895==      possibly lost: 0 bytes in 0 blocks
+> ==18895==    still reachable: 160 bytes in 1 blocks
+> ==18895==         suppressed: 0 bytes in 0 blocks
+> ==18895== Reachable blocks (those to which a pointer was found) are not
+> shown.
+> ==18895== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+> ==18895== ==18895== ERROR SUMMARY: 2 errors from 2 contexts
+> (suppressed: 0 from 0) ==18895== ERROR SUMMARY: 2 errors from 2
+> contexts (suppressed: 0 from 0)
 > 
-> +	if (strcmp(error_name, "org.bluez.Error.InProgress") == 0)
-> +		return BT_ERROR_ALREADY_IN_PROGRESS;
-> +
->  	return 0;
->  }
+> git - up-to-date
+> gcc - 4.9.2
 > 
-> diff --git a/src/shared/att-types.h b/src/shared/att-types.h index
-> aa7f0da..10a42f2 100644
-> --- a/src/shared/att-types.h
-> +++ b/src/shared/att-types.h
-> @@ -92,6 +92,16 @@ struct bt_att_pdu_error_rsp {
->  #define BT_ATT_ERROR_INSUFFICIENT_RESOURCES		0x11
-> 
->  /*
-> + * Common Profile and Service Error Code descriptions (see Supplement
-> +to the
-> + * Bluetooth Core Specification, sections 1.2 and 2). The error codes
-> +within
-> + * 0xE0-0xFC are reserved for future use. The remaining 3 are defined
-> +as the
-> + * following:
-> + */
-> +#define BT_ERROR_CCC_IMPROPERLY_CONFIGURED      0xfd
-> +#define BT_ERROR_ALREADY_IN_PROGRESS            0xfe
-> +#define BT_ERROR_OUT_OF_RANGE                   0xff
-> +
-> +/*
->   * ATT attribute permission bitfield values. Permissions are grouped as
->   * "Access", "Encryption", "Authentication", and "Authorization". A
-bitmask
-> of
->   * permissions is a byte that encodes a combination of these.
-> diff --git a/src/shared/att.c b/src/shared/att.c index 422cc2c..b920eb8
-100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -43,16 +43,6 @@
->  #define ATT_OP_SIGNED_MASK		0x80
->  #define ATT_TIMEOUT_INTERVAL		30000  /* 30000 ms */
-> 
-> -/*
-> - * Common Profile and Service Error Code descriptions (see Supplement to
-> the
-> - * Bluetooth Core Specification, sections 1.2 and 2). The error codes
-within
-> - * 0xE0-0xFC are reserved for future use. The remaining 3 are defined as
-the
-> - * following:
-> - */
-> -#define BT_ERROR_CCC_IMPROPERLY_CONFIGURED	0xfd
-> -#define BT_ERROR_ALREADY_IN_PROGRESS		0xfe
-> -#define BT_ERROR_OUT_OF_RANGE			0xff
-> -
->  /* Length of signature in write signed packet */
->  #define BT_ATT_SIGNATURE_LEN		12
-> 
-> --
-> 1.9.1
+> Regards
+> Gowtham Anandha Babu
 > 
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
