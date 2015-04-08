@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: Read LE remote features during connection establishment
-Date: Wed,  8 Apr 2015 09:05:27 -0700
-Message-Id: <1428509127-12882-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2] Bluetooth: Read LE remote features during connection establishment
+Date: Wed,  8 Apr 2015 08:32:19 -0700
+Message-Id: <1428507139-1191-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -20,23 +20,15 @@ remote features, the connection enters the BT_CONNECTED state.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h |  13 ++++++
- net/bluetooth/hci_event.c   | 107 +++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 118 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci.h | 12 +++++++
+ net/bluetooth/hci_event.c   | 87 +++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 97 insertions(+), 2 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 2f8c830e600c..d95da83cb1b0 100644
+index 2f8c830e600c..cb568ecc43a5 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -374,6 +374,7 @@ enum {
- /* LE features */
- #define HCI_LE_ENCRYPTION		0x01
- #define HCI_LE_CONN_PARAM_REQ_PROC	0x02
-+#define HCI_LE_SLAVE_FEATURES		0x08
- #define HCI_LE_PING			0x10
- #define HCI_LE_DATA_LEN_EXT		0x20
- #define HCI_LE_EXT_SCAN_POLICY		0x80
-@@ -1376,6 +1377,11 @@ struct hci_cp_le_conn_update {
+@@ -1376,6 +1376,11 @@ struct hci_cp_le_conn_update {
  	__le16   max_ce_len;
  } __packed;
  
@@ -48,7 +40,7 @@ index 2f8c830e600c..d95da83cb1b0 100644
  #define HCI_OP_LE_START_ENC		0x2019
  struct hci_cp_le_start_enc {
  	__le16	handle;
-@@ -1868,6 +1874,13 @@ struct hci_ev_le_conn_update_complete {
+@@ -1868,6 +1873,13 @@ struct hci_ev_le_conn_update_complete {
  	__le16   supervision_timeout;
  } __packed;
  
@@ -63,7 +55,7 @@ index 2f8c830e600c..d95da83cb1b0 100644
  struct hci_ev_le_ltk_req {
  	__le16	handle;
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 01031038eb0e..7b61be73650f 100644
+index 01031038eb0e..8b6f8a40b4e0 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
 @@ -2036,6 +2036,33 @@ unlock:
@@ -120,7 +112,7 @@ index 01031038eb0e..7b61be73650f 100644
  
  	conn->le_conn_interval = le16_to_cpu(ev->interval);
  	conn->le_conn_latency = le16_to_cpu(ev->latency);
-@@ -4524,7 +4555,33 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -4524,7 +4555,30 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  	hci_debugfs_create_conn(conn);
  	hci_conn_add_sysfs(conn);
  
@@ -130,13 +122,10 @@ index 01031038eb0e..7b61be73650f 100644
 +		 * role only. So only in case of an initiated connection
 +		 * request the remote features.
 +		 *
-+		 * If the local controller supports slave-initiated features
-+		 * exchange, then requesting the remote features in slave
-+		 * role is possible. Otherwise just transition into the
-+		 * connected state without requesting the remote features.
++		 * For slave connections, just transition into the connected
++		 * state without requesting the remote features.
 +		 */
-+		if (conn->out ||
-+		    (hdev->le_features[0] & HCI_LE_SLAVE_FEATURES)) {
++		if (conn->out) {
 +			struct hci_cp_le_read_remote_features cp;
 +
 +			cp.handle = __cpu_to_le16(conn->handle);
@@ -155,7 +144,7 @@ index 01031038eb0e..7b61be73650f 100644
  
  	params = hci_pend_le_action_lookup(&hdev->pend_le_conns, &conn->dst,
  					   conn->dst_type);
-@@ -4826,6 +4883,48 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -4826,6 +4880,31 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
  	hci_dev_unlock(hdev);
  }
  
@@ -175,25 +164,8 @@ index 01031038eb0e..7b61be73650f 100644
 +			memcpy(conn->features[0], ev->features, 8);
 +
 +		if (conn->state == BT_CONFIG) {
-+			__u8 status;
-+
-+			/* If the local controller supports slave-initiated
-+			 * features exchange, but the remote controller does
-+			 * not, then it is possible that the error code 0x1a
-+			 * for unsupported remote feature gets returned.
-+			 *
-+			 * In this specific case, allow the connection to
-+			 * transition into connected state and mark it as
-+			 * successful.
-+			 */
-+			if ((hdev->le_features[0] & HCI_LE_SLAVE_FEATURES) &&
-+			    !conn->out && ev->status == 0x1a)
-+				status = 0x00;
-+			else
-+				status = ev->status;
-+
 +			conn->state = BT_CONNECTED;
-+			hci_connect_cfm(conn, status);
++			hci_connect_cfm(conn, ev->status);
 +			hci_conn_drop(conn);
 +		}
 +	}
@@ -204,7 +176,7 @@ index 01031038eb0e..7b61be73650f 100644
  static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
  	struct hci_ev_le_ltk_req *ev = (void *) skb->data;
-@@ -4999,6 +5098,10 @@ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -4999,6 +5078,10 @@ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
  		hci_le_adv_report_evt(hdev, skb);
  		break;
  
