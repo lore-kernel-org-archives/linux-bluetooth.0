@@ -1,144 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH] Bluetooth: Read LE remote features during connection establishment
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1511796.UbcSWGBgdv@uw000953>
-Date: Wed, 8 Apr 2015 07:34:27 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <9B308340-AC37-48AB-B807-E337432C4A6A@holtmann.org>
-References: <1428481520-29567-1-git-send-email-marcel@holtmann.org> <1511796.UbcSWGBgdv@uw000953>
-To: Szymon Janc <szymon.janc@tieto.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: 'BlueZ devel list' <linux-bluetooth@vger.kernel.org>
+References: <000a01d06d2c$05c04660$1140d320$@samsung.com>
+ <001501d071e7$1499eb40$3dcdc1c0$@samsung.com>
+ <CABBYNZKkKf1n7mZMaLq-GsaiPCrKNrZuV_cAuTcGrxqK01pBuw@mail.gmail.com>
+In-reply-to: <CABBYNZKkKf1n7mZMaLq-GsaiPCrKNrZuV_cAuTcGrxqK01pBuw@mail.gmail.com>
+Subject: RE: Found few memory leaks in gatt-client
+Date: Wed, 08 Apr 2015 18:23:53 +0530
+Message-id: <001b01d071fb$2656b110$73041330$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Luiz,
 
->> When establishing a Bluetooth LE connection, read the remote used
->> features mask to determine which features are supported. This was
->> not really needed with Bluetooth 4.0, but since Bluetooth 4.1 and
->> also 4.2 have introduced new optional features, this becomes more
->> important.
->> 
->> This works the same as with BR/EDR where the connection enters the
->> BT_CONFIG stage and hci_connect_cfm call is delayed until the remote
->> features have been retrieved. Only after successfully receiving the
->> remote features, the connection enters the BT_CONNECTED state.
->> 
->> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->> ---
->> include/net/bluetooth/hci.h | 12 ++++++++
->> net/bluetooth/hci_event.c   | 75 +++++++++++++++++++++++++++++++++++++++++++--
->> 2 files changed, 85 insertions(+), 2 deletions(-)
->> 
->> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->> index 2f8c830e600c..cb568ecc43a5 100644
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -1376,6 +1376,11 @@ struct hci_cp_le_conn_update {
->> 	__le16   max_ce_len;
->> } __packed;
->> 
->> +#define HCI_OP_LE_READ_REMOTE_FEATURES	0x2016
->> +struct hci_cp_le_read_remote_features {
->> +	__le16	 handle;
->> +} __packed;
->> +
->> #define HCI_OP_LE_START_ENC		0x2019
->> struct hci_cp_le_start_enc {
->> 	__le16	handle;
->> @@ -1868,6 +1873,13 @@ struct hci_ev_le_conn_update_complete {
->> 	__le16   supervision_timeout;
->> } __packed;
->> 
->> +#define HCI_EV_LE_REMOTE_FEAT_COMPLETE	0x04
->> +struct hci_ev_le_remote_feat_complete {
->> +	__u8     status;
->> +	__le16   handle;
->> +	__u8     features[8];
->> +} __packed;
->> +
->> #define HCI_EV_LE_LTK_REQ		0x05
->> struct hci_ev_le_ltk_req {
->> 	__le16	handle;
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 01031038eb0e..123a6400a9d7 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -2036,6 +2036,33 @@ unlock:
->> 	hci_dev_unlock(hdev);
->> }
->> 
->> +static void hci_cs_le_read_remote_features(struct hci_dev *hdev, u8 status)
->> +{
->> +	struct hci_cp_le_read_remote_features *cp;
->> +	struct hci_conn *conn;
->> +
->> +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
->> +
->> +	if (!status)
->> +		return;
->> +
->> +	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_READ_REMOTE_FEATURES);
->> +	if (!cp)
->> +		return;
->> +
->> +	hci_dev_lock(hdev);
->> +
->> +	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
->> +	if (conn) {
->> +		if (conn->state == BT_CONFIG) {
->> +			hci_connect_cfm(conn, status);
->> +			hci_conn_drop(conn);
->> +		}
->> +	}
->> +
->> +	hci_dev_unlock(hdev);
->> +}
->> +
->> static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
->> {
->> 	struct hci_cp_le_start_enc *cp;
->> @@ -3104,6 +3131,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb,
->> 		hci_cs_le_create_conn(hdev, ev->status);
->> 		break;
->> 
->> +	case HCI_OP_LE_READ_REMOTE_FEATURES:
->> +		hci_cs_le_read_remote_features(hdev, ev->status);
->> +		break;
->> +
->> 	case HCI_OP_LE_START_ENC:
->> 		hci_cs_le_start_enc(hdev, ev->status);
->> 		break;
->> @@ -4515,7 +4546,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
->> 
->> 	conn->sec_level = BT_SECURITY_LOW;
->> 	conn->handle = __le16_to_cpu(ev->handle);
->> -	conn->state = BT_CONNECTED;
->> +	conn->state = BT_CONFIG;
->> 
->> 	conn->le_conn_interval = le16_to_cpu(ev->interval);
->> 	conn->le_conn_latency = le16_to_cpu(ev->latency);
->> @@ -4524,7 +4555,18 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
->> 	hci_debugfs_create_conn(conn);
->> 	hci_conn_add_sysfs(conn);
->> 
->> -	hci_connect_cfm(conn, ev->status);
->> +	if (!ev->status) {
->> +		struct hci_cp_le_read_remote_features cp;
->> +
->> +		cp.handle = __cpu_to_le16(conn->handle);
->> +
->> +		hci_send_cmd(hdev, HCI_OP_LE_READ_REMOTE_FEATURES,
->> +			     sizeof(cp), &cp);
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Wednesday, April 08, 2015 6:15 PM
+> To: Gowtham Anandha Babu
+> Cc: BlueZ devel list
+> Subject: Re: Found few memory leaks in gatt-client
 > 
-> Core Spec 4.0 allows this command to be send only when local role is master.
-> Shouldn't this be checked here (at least for 4.0 HW)? Otherwise we will drop
-> connection as slave if HW replies eg with command disallowed CS.
+> Hi Gowtham,
+> 
+> On Wed, Apr 8, 2015 at 1:30 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > Ping.
+> 
+> I thought you would be looking into that, or you don't know how to fix it?
 
-I mentioned to Johan on IRC that I have not tested the slave side. So this is a good catch. I think we need to check the local features for "Slave-initiated Features Exchange" and when we are slave only send it if that is supported.
+I don’t know how to fix it.
 
-Regards
+> 
+> >> -----Original Message-----
+> >> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> >> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> >> Sent: Thursday, April 02, 2015 3:32 PM
+> >> To: 'BlueZ devel list'
+> >> Cc: 'Bharat Bhusan Panda'
+> >> Subject: Found few memory leaks in gatt-client
+> >>
+> >> Hi All,
+> >>
+> >> Found few memory leaks when testing the prepare write and execute
+> >> write using btgatt-client tool with PTS 6.0.1. Below are the logs for the
+> same.
+> >>
+> >> ~/latest_bluez/bluez$  MALLOC_CHECK_=3 MALLOC_PERTURB_=69
+> valgrind
+> >> --trace-children=yes --track-origins=yes --show-possibly-lost=no
+> >> --leak- check=full -v ./tools/btgatt-client -i hci0 -d
+> >> 00:1B:DC:07:33:4E
+> >>
+> >> [GATT client]# write-prepare -s 0 0x00cd 00 00 03
+> >> --18895-- REDIR: 0x4ec2c10 (memchr) redirected to 0x4c2f390 (memchr)
+> >> --18895-- REDIR: 0x4ec8780 (__GI_memcpy) redirected to 0x4c2fc90
+> >> (__GI_memcpy)
+> >> --18895-- REDIR: 0x4ebe070 (strcmp) redirected to 0x4a25720
+> >> (_vgnU_ifunc_wrapper)
+> >> --18895-- REDIR: 0x4eced20 (__strcmp_sse2_unaligned) redirected to
+> >> 0x4c2f1b0
+> >> (strcmp)
+> >> Prepare write success.
+> >> Session id: 1 to be used on next write [GATT client]# Write
+> >> successful [GATT client]# write-execute 1 1 [GATT client]# Write
+> >> successful [GATT client]# ^C
+> >>
+> >> Shutting down...
+> >> ==18895==
+> >> ==18895== HEAP SUMMARY:
+> >> ==18895==     in use at exit: 2,862 bytes in 86 blocks
+> >> ==18895==   total heap usage: 1,305 allocs, 1,219 frees, 49,976 bytes
+> >> allocated
+> >> ==18895==
+> >> ==18895== Searching for pointers to 86 not-freed blocks ==18895==
+> >> Checked
+> >> 91,288 bytes ==18895== ==18895== 46 (40 direct, 6 indirect) bytes in
+> >> 1
+> > blocks
+> >> are definitely lost in loss record 2 of 4
+> >> ==18895==    at 0x4C2CC70: calloc (in
+> >> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> >> ==18895==    by 0x4093E0: bt_gatt_client_prepare_write
+> > (gatt-client.c:2690)
+> >> ==18895==    by 0x4031A7: cmd_write_prepare (btgatt-client.c:1015)
+> >> ==18895==    by 0x4028F0: prompt_read_cb (btgatt-client.c:1402)
+> >> ==18895==    by 0x40C7B2: mainloop_run (mainloop.c:157)
+> >> ==18895==    by 0x401FC4: main (btgatt-client.c:1658)
+> >> ==18895==
+> >> ==18895== 2,656 bytes in 83 blocks are definitely lost in loss record
+> >> 4 of
+> > 4
+> >> ==18895==    at 0x4C2AB80: malloc (in
+> >> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> >> ==18895==    by 0x40C8D9: mainloop_add_timeout (mainloop.c:327)
+> >> ==18895==    by 0x40C342: timeout_add (timeout-mainloop.c:69)
+> >> ==18895==    by 0x404AE2: can_write_data (att.c:504)
+> >> ==18895==    by 0x40BEDE: io_callback (io-mainloop.c:138)
+> >> ==18895==    by 0x40C7B2: mainloop_run (mainloop.c:157)
+> >> ==18895==    by 0x401FC4: main (btgatt-client.c:1658)
+> >> ==18895==
+> >> ==18895== LEAK SUMMARY:
+> >> ==18895==    definitely lost: 2,696 bytes in 84 blocks
+> >> ==18895==    indirectly lost: 6 bytes in 1 blocks
+> >> ==18895==      possibly lost: 0 bytes in 0 blocks
+> >> ==18895==    still reachable: 160 bytes in 1 blocks
+> >> ==18895==         suppressed: 0 bytes in 0 blocks
+> >> ==18895== Reachable blocks (those to which a pointer was found) are
+> >> not shown.
+> >> ==18895== To see them, rerun with: --leak-check=full
+> >> --show-leak-kinds=all ==18895== ==18895== ERROR SUMMARY: 2 errors
+> >> from 2 contexts
+> >> (suppressed: 0 from 0) ==18895== ERROR SUMMARY: 2 errors from 2
+> >> contexts (suppressed: 0 from 0)
+> >>
+> >> git - up-to-date
+> >> gcc - 4.9.2
+> >>
+> >> Regards
+> >> Gowtham Anandha Babu
+> >>
+> >> --
+> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> > in
+> >> the body of a message to majordomo@vger.kernel.org More majordomo
+> >> info at  http://vger.kernel.org/majordomo-info.html
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
+> --
+> Luiz Augusto von Dentz
+> --
 
-Marcel
+Regards,
+Gowtham Anandha Babu
+
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
