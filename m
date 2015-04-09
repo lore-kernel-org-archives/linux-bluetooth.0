@@ -1,146 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Use proper data structures for Intel vendor events
-Date: Wed,  8 Apr 2015 22:52:28 -0700
-Message-Id: <1428558748-527-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <5525D11B.3010601@huawei.com>
+Date: Thu, 9 Apr 2015 09:08:43 +0800
+From: Zefan Li <lizefan@huawei.com>
+MIME-Version: 1.0
+To: Tim Niemeyer <tim.niemeyer@corscience.de>
+CC: <stable@vger.kernel.org>,
+	Jaganath Kanakkassery <jaganath.k@samsung.com>,
+	Chan-Yeol Park <chanyeol.park@samsung.com>,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+	Jianguo Wu <wujianguo@huawei.com>,
+	"Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	<linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [3.4 PATCH] Bluetooth: Fix invalid length check in l2cap_information_rsp()
+References: <1427707657-28545-1-git-send-email-tim.niemeyer@corscience.de>
+In-Reply-To: <1427707657-28545-1-git-send-email-tim.niemeyer@corscience.de>
+Content-Type: text/plain; charset="GB2312"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Intel vendors events indicating firmware loading result and the
-bootup of the operational firmware are currently hardcoded byte
-comparisons. So intead of doing that, provide proper data structures
-and actually use them.
+On 2015/3/30 17:27, Tim Niemeyer wrote:
+> first backport commit 6ec88fcb4aa2c33fe2fe2a23c576a7e2581c5c3d changes
+> l2cap_move_channel_confirm_rsp and not the l2cap_information_rsp. So
+> revert this and fix at the correct position.
+> 
+> commit 3f6fa3d489e127ca5a5b298eabac3ff5dbe0e112 upstream.
+> 
+> The length check is invalid since the length varies with type of
+> info response.
+> 
+> This was introduced by the commit cb3b3152b2f5939d67005cff841a1ca748b19888
+> 
+> Because of this, l2cap info rsp is not handled and command reject is sent.
+> 
+>> ACL data: handle 11 flags 0x02 dlen 16
+>         L2CAP(s): Info rsp: type 2 result 0
+>           Extended feature mask 0x00b8
+>             Enhanced Retransmission mode
+>             Streaming mode
+>             FCS Option
+>             Fixed Channels
+> < ACL data: handle 11 flags 0x00 dlen 10
+>         L2CAP(s): Command rej: reason 0
+>           Command not understood
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+> Signed-off-by: Chan-Yeol Park <chanyeol.park@samsung.com>
+> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> Cc: Jianguo Wu <wujianguo@huawei.com>
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Tim Niemeyer <tim.niemeyer@corscience.de>
+> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> Patch for 3.4-stable.
+> 
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btintel.h | 15 +++++++++
- drivers/bluetooth/btusb.c   | 79 ++++++++++++++++++++++++++++++---------------
- 2 files changed, 68 insertions(+), 26 deletions(-)
-
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index d1581150679a..4bda6ab34f60 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -54,6 +54,21 @@ struct intel_boot_params {
- 	__u8     unlocked_state;
- } __packed;
- 
-+struct intel_bootup {
-+	__u8     zero;
-+	__u8     num_cmds;
-+	__u8     source;
-+	__u8     reset_type;
-+	__u8     reset_reason;
-+	__u8     ddc_status;
-+} __packed;
-+
-+struct intel_secure_send_result {
-+	__u8     result;
-+	__le16   opcode;
-+	__u8     status;
-+} __packed;
-+
- #if IS_ENABLED(CONFIG_BT_INTEL)
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c06ceec13dbb..55760bb870e9 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1746,6 +1746,38 @@ static int btusb_recv_bulk_intel(struct btusb_data *data, void *buffer,
- 	return btusb_recv_bulk(data, buffer, count);
- }
- 
-+static void btusb_intel_bootup(struct btusb_data *data, const void *ptr,
-+			       unsigned int len)
-+{
-+	const struct intel_bootup *evt = ptr;
-+
-+	if (len != sizeof(*evt))
-+		return;
-+
-+	if (test_and_clear_bit(BTUSB_BOOTING, &data->flags)) {
-+		smp_mb__after_atomic();
-+		wake_up_bit(&data->flags, BTUSB_BOOTING);
-+	}
-+}
-+
-+static void btusb_intel_secure_send_result(struct btusb_data *data,
-+					   const void *ptr, unsigned int len)
-+{
-+	const struct intel_secure_send_result *evt = ptr;
-+
-+	if (len != sizeof(*evt))
-+		return;
-+
-+	if (!evt->result)
-+		test_bit(BTUSB_FIRMWARE_FAILED, &data->flags);
-+
-+	if (test_and_clear_bit(BTUSB_DOWNLOADING, &data->flags) &&
-+	    test_bit(BTUSB_FIRMWARE_LOADED, &data->flags)) {
-+		smp_mb__after_atomic();
-+		wake_up_bit(&data->flags, BTUSB_DOWNLOADING);
-+	}
-+}
-+
- static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
-@@ -1753,32 +1785,27 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (test_bit(BTUSB_BOOTLOADER, &data->flags)) {
- 		struct hci_event_hdr *hdr = (void *)skb->data;
- 
--		/* When the firmware loading completes the device sends
--		 * out a vendor specific event indicating the result of
--		 * the firmware loading.
--		 */
--		if (skb->len == 7 && hdr->evt == 0xff && hdr->plen == 0x05 &&
--		    skb->data[2] == 0x06) {
--			if (skb->data[3] != 0x00)
--				test_bit(BTUSB_FIRMWARE_FAILED, &data->flags);
--
--			if (test_and_clear_bit(BTUSB_DOWNLOADING,
--					       &data->flags) &&
--			    test_bit(BTUSB_FIRMWARE_LOADED, &data->flags)) {
--				smp_mb__after_atomic();
--				wake_up_bit(&data->flags, BTUSB_DOWNLOADING);
--			}
--		}
--
--		/* When switching to the operational firmware the device
--		 * sends a vendor specific event indicating that the bootup
--		 * completed.
--		 */
--		if (skb->len == 9 && hdr->evt == 0xff && hdr->plen == 0x07 &&
--		    skb->data[2] == 0x02) {
--			if (test_and_clear_bit(BTUSB_BOOTING, &data->flags)) {
--				smp_mb__after_atomic();
--				wake_up_bit(&data->flags, BTUSB_BOOTING);
-+		if (skb->len > HCI_EVENT_HDR_SIZE && hdr->evt == 0xff &&
-+		    hdr->plen > 0) {
-+			const void *ptr = skb->data + HCI_EVENT_HDR_SIZE + 1;
-+			unsigned int len = skb->len - HCI_EVENT_HDR_SIZE - 1;
-+
-+			switch (skb->data[2]) {
-+			case 0x02:
-+				/* When switching to the operational firmware
-+				 * the device sends a vendor specific event
-+				 * indicating that the bootup completed.
-+				 */
-+				btusb_intel_bootup(data, ptr, len);
-+				break;
-+			case 0x06:
-+				/* When the firmware loading completes the
-+				 * device sends out a vendor specific event
-+				 * indicating the result of the firmware
-+				 * loading.
-+				 */
-+				btusb_intel_secure_send_result(data, ptr, len);
-+				break;
- 			}
- 		}
- 	}
--- 
-2.1.0
-
+Queued up for 3.4. Thanks!
