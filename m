@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: btusb: Use proper data structures for Intel vendor events
-Date: Thu,  9 Apr 2015 00:35:19 -0700
-Message-Id: <1428564919-10398-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2] Bluetooth: btusb: Use proper data structures for Intel vendor events
+Date: Wed,  8 Apr 2015 23:07:50 -0700
+Message-Id: <1428559670-831-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -45,7 +45,7 @@ index d1581150679a..4bda6ab34f60 100644
  
  int btintel_check_bdaddr(struct hci_dev *hdev);
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c06ceec13dbb..de7b236eeae7 100644
+index c06ceec13dbb..4681f2f9a7fd 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
 @@ -1746,6 +1746,38 @@ static int btusb_recv_bulk_intel(struct btusb_data *data, void *buffer,
@@ -74,7 +74,7 @@ index c06ceec13dbb..de7b236eeae7 100644
 +	if (len != sizeof(*evt))
 +		return;
 +
-+	if (evt->result)
++	if (!evt->result)
 +		set_bit(BTUSB_FIRMWARE_FAILED, &data->flags);
 +
 +	if (test_and_clear_bit(BTUSB_DOWNLOADING, &data->flags) &&
