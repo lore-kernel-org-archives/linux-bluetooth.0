@@ -1,466 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2] Bluetooth: hci_uart: Add protocol support for Nokia UART devices
-Date: Thu,  9 Apr 2015 14:08:52 -0700
-Message-Id: <1428613732-1349-1-git-send-email-marcel@holtmann.org>
+Date: Thu, 9 Apr 2015 22:58:50 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next 2015-04-09
+Message-ID: <20150409195850.GA23404@t440s.P-661HNU-F1>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="pWyiEgJYm5f9v55/"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-WARNING: This driver is not complete. It only contains the H4+ protocol
-part and not the serial line or GPIO setup.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+--pWyiEgJYm5f9v55/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi Dave,
+
+We've had enough new patches during the past week (especially from
+Marcel) that it'd be good to still get these queued for 4.1.
+
+The majority of the changes are from Marcel with lots of cleanup &
+refactoring patches for the HCI UART driver. Marcel also split out some
+Broadcom & Intel vendor specific functionality into two new btintel &
+btbcm modules.
+
+In addition to the HCI driver changes there's the completion of our
+local OOB data interface for pairing, added support for requesting
+remote LE features when connecting, as well as a couple of minor fixes
+for mac802154.
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
 ---
- drivers/bluetooth/Kconfig     |  12 ++
- drivers/bluetooth/Makefile    |   1 +
- drivers/bluetooth/hci_ldisc.c |   6 +
- drivers/bluetooth/hci_nok.c   | 346 ++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/hci_uart.h  |   8 +-
- 5 files changed, 372 insertions(+), 1 deletion(-)
- create mode 100644 drivers/bluetooth/hci_nok.c
+The following changes since commit 7abccdba25be45630eede85053496f1f48d36ec8:
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index ed5c2738bea2..efc8115b3bbe 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -135,6 +135,18 @@ config BT_HCIUART_BCM
- 
- 	  Say Y here to compile support for Broadcom protocol.
- 
-+config BT_HCIUART_NOK
-+	bool "Nokia protocol support"
-+	depends on BT_HCIUART
-+	select BT_HCIUART_H4
-+	select BT_BCM
-+	help
-+	  The Nokia protocol support enables Bluetooth HCI over serial
-+	  port interface for Bluetooth devices in Nokia products. This
-+	  is sometimes also referenced H4+ UART protocol.
-+
-+	  Say Y here to compile support for Nokia protocol.
-+
- config BT_HCIBCM203X
- 	tristate "HCI BCM203x USB driver"
- 	depends on USB
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index dd0d9c40b999..2d748e291629 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -33,6 +33,7 @@ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
- hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
- hci_uart-$(CONFIG_BT_HCIUART_INTEL)	+= hci_intel.o
- hci_uart-$(CONFIG_BT_HCIUART_BCM)	+= hci_bcm.o
-+hci_uart-$(CONFIG_BT_HCIUART_NOK)	+= hci_nok.o
- hci_uart-objs				:= $(hci_uart-y)
- 
- ccflags-y += -D__CHECK_ENDIAN__
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 5c9a73f02664..8d9849579866 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -684,6 +684,9 @@ static int __init hci_uart_init(void)
- #ifdef CONFIG_BT_HCIUART_BCM
- 	bcm_init();
- #endif
-+#ifdef CONFIG_BT_HCIUART_NOK
-+	nok_init();
-+#endif
- 
- 	return 0;
- }
-@@ -710,6 +713,9 @@ static void __exit hci_uart_exit(void)
- #ifdef CONFIG_BT_HCIUART_BCM
- 	bcm_deinit();
- #endif
-+#ifdef CONFIG_BT_HCIUART_NOK
-+	nok_deinit();
-+#endif
- 
- 	/* Release tty registration of line discipline */
- 	err = tty_unregister_ldisc(N_HCI);
-diff --git a/drivers/bluetooth/hci_nok.c b/drivers/bluetooth/hci_nok.c
-new file mode 100644
-index 000000000000..82acba8de5a0
---- /dev/null
-+++ b/drivers/bluetooth/hci_nok.c
-@@ -0,0 +1,346 @@
-+/*
-+ *
-+ *  Bluetooth HCI UART driver for Nokia devices
-+ *
-+ *  Copyright (C) 2015  Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/errno.h>
-+#include <linux/skbuff.h>
-+#include <linux/tty.h>
-+#include <linux/firmware.h>
-+#include <asm/unaligned.h>
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+#include "btbcm.h"
-+#include "hci_uart.h"
-+
-+#define NOK_NEG_PKT	0x06
-+#define NOK_ALIVE_PKT	0x07
-+#define NOK_RADIO_PKT	0x08
-+
-+#define NOK_NEG_HDR_SIZE	1
-+#define NOK_ALIVE_HDR_SIZE	1
-+
-+#define NOK_NEQ_REQ	0x00
-+#define NOK_NEG_ACK	0x20
-+#define NOK_NEG_NAK	0x40
-+
-+#define NOK_PROTO_PKT	0x44
-+#define NOK_PROTO_BYTE	0x4c
-+
-+#define NOK_ALIVE_REQ	0x55
-+#define NOK_ALIVE_RESP	0xcc
-+
-+#define NOK_PKT_PEND	0
-+
-+struct nok_data {
-+	unsigned long flags;
-+	struct sk_buff *pkt_skb;
-+	struct sk_buff *rx_skb;
-+	struct sk_buff_head txq;
-+};
-+
-+static int nok_open(struct hci_uart *hu)
-+{
-+	struct nok_data *nok;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	nok = kzalloc(sizeof(*nok), GFP_KERNEL);
-+	if (!nok)
-+		return -ENOMEM;
-+
-+	skb_queue_head_init(&nok->txq);
-+
-+	hu->priv = nok;
-+	return 0;
-+}
-+
-+static int nok_close(struct hci_uart *hu)
-+{
-+	struct nok_data *nok = hu->priv;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	skb_queue_purge(&nok->txq);
-+	kfree_skb(nok->rx_skb);
-+	kfree_skb(nok->pkt_skb);
-+	kfree(nok);
-+
-+	hu->priv = NULL;
-+	return 0;
-+}
-+
-+static int nok_flush(struct hci_uart *hu)
-+{
-+	struct nok_data *nok = hu->priv;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	skb_queue_purge(&nok->txq);
-+
-+	return 0;
-+}
-+
-+struct sk_buff *__nok_pkt_sync(struct hci_uart *hu, u8 pkt_type, u8 plen,
-+			       const void *param, u32 timeout)
-+{
-+	struct nok_data *nok = hu->priv;
-+	struct sk_buff *skb;
-+	int err;
-+
-+	skb = bt_skb_alloc(plen + 1, GFP_KERNEL);
-+	if (!skb)
-+		return ERR_PTR(-ENOMEM);
-+
-+	/* Add length and packet parameters */
-+	memcpy(skb_put(skb, 1), &plen, 1);
-+	memcpy(skb_put(skb, plen), param, plen);
-+
-+	/* Prepend skb with frame type */
-+	memcpy(skb_push(skb, 1), &pkt_type, 1);
-+	skb_queue_tail(&nok->txq, skb);
-+
-+	set_bit(NOK_PKT_PEND, &nok->flags);
-+
-+	hci_uart_tx_wakeup(hu);
-+
-+	err = wait_on_bit_timeout(&nok->flags, NOK_PKT_PEND,
-+				  TASK_INTERRUPTIBLE, timeout);
-+
-+	if (err == 1)
-+		return ERR_PTR(-EINTR);
-+	if (err)
-+		return ERR_PTR(-ETIMEDOUT);
-+	if (!nok->pkt_skb)
-+		return ERR_PTR(-ENODATA);
-+
-+	skb = nok->pkt_skb;
-+	nok->pkt_skb = NULL;
-+
-+	return skb;
-+}
-+
-+static int nok_setup(struct hci_uart *hu)
-+{
-+	const struct firmware *fw;
-+	const u8 *fw_ptr;
-+	size_t fw_size;
-+	int err;
-+
-+	BT_DBG("hu %p", hu);
-+
-+	err = request_firmware(&fw, "nokia/bcmfw.bin", hu->tty->dev);
-+	if (err < 0) {
-+		BT_ERR("%s: Failed to load Nokia firmware file (%d)",
-+		       hu->hdev->name, err);
-+		return err;
-+	}
-+
-+	fw_ptr = fw->data;
-+	fw_size = fw->size;
-+
-+	while (fw_size >= 4) {
-+		u16 pkt_size = get_unaligned_le16(fw_ptr);
-+		u8 pkt_type = fw_ptr[2];
-+		const struct hci_command_hdr *cmd;
-+		u16 opcode;
-+		struct sk_buff *skb;
-+
-+		switch (pkt_type) {
-+		case HCI_COMMAND_PKT:
-+		case NOK_RADIO_PKT:
-+			cmd = (struct hci_command_hdr *)(fw_ptr + 3);
-+			opcode = le16_to_cpu(cmd->opcode);
-+
-+			skb = __hci_cmd_sync(hu->hdev, opcode, cmd->plen,
-+					     fw_ptr + 3 + HCI_COMMAND_HDR_SIZE,
-+					     HCI_INIT_TIMEOUT);
-+			if (IS_ERR(skb)) {
-+				err = PTR_ERR(skb);
-+				BT_ERR("%s: Firmware command %04x failed (%d)",
-+				       hu->hdev->name, opcode, err);
-+				goto done;
-+			}
-+			kfree_skb(skb);
-+			break;
-+		case NOK_NEG_PKT:
-+		case NOK_ALIVE_PKT:
-+			skb = __nok_pkt_sync(hu, pkt_type, fw_ptr[3],
-+					     fw_ptr + 4, HCI_INIT_TIMEOUT);
-+			if (IS_ERR(skb)) {
-+				err = PTR_ERR(skb);
-+				BT_ERR("%s: Nokia packet %u failed (%d)",
-+				       hu->hdev->name, pkt_type, err);
-+				goto done;
-+			}
-+			kfree_skb(skb);
-+			break;
-+		}
-+
-+		fw_ptr += pkt_size + 2;
-+		fw_size -= pkt_size + 2;
-+	}
-+
-+	hu->hdev->set_bdaddr = btbcm_set_bdaddr;
-+	set_bit(HCI_QUIRK_INVALID_BDADDR, &hu->hdev->quirks);
-+
-+done:
-+	release_firmware(fw);
-+	return err;
-+}
-+
-+static int nok_recv_pkt(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct nok_data *nok = hu->priv;
-+
-+	if (test_and_clear_bit(NOK_PKT_PEND, &nok->flags)) {
-+		nok->pkt_skb = skb;
-+		smp_mb__after_atomic();
-+		wake_up_bit(&nok->flags, NOK_PKT_PEND);
-+	} else {
-+		kfree_skb(skb);
-+	}
-+
-+	return 0;
-+}
-+
-+static int nok_recv_neg(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	return nok_recv_pkt(hdev, skb);
-+}
-+
-+static int nok_recv_alive(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	return nok_recv_pkt(hdev, skb);
-+}
-+
-+static int nok_recv_radio(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	/* Packets received on the dedicated radio channel are
-+	 * HCI events and so feed them back into the core.
-+	 */
-+	bt_cb(skb)->pkt_type = HCI_EVENT_PKT;
-+	return hci_recv_frame(hdev, skb);
-+}
-+
-+#define NOK_RECV_NEG \
-+	.type = NOK_NEG_PKT, \
-+	.hlen = NOK_NEG_HDR_SIZE, \
-+	.loff = 0, \
-+	.lsize = 1, \
-+	.maxlen = HCI_MAX_EVENT_SIZE
-+
-+#define NOK_RECV_ALIVE \
-+	.type = NOK_ALIVE_PKT, \
-+	.hlen = NOK_ALIVE_HDR_SIZE, \
-+	.loff = 0, \
-+	.lsize = 1, \
-+	.maxlen = HCI_MAX_EVENT_SIZE
-+
-+#define NOK_RECV_RADIO \
-+	.type = NOK_RADIO_PKT, \
-+	.hlen = HCI_EVENT_HDR_SIZE, \
-+	.loff = 1, \
-+	.lsize = 1, \
-+	.maxlen = HCI_MAX_EVENT_SIZE
-+
-+static const struct h4_recv_pkt nok_recv_pkts[] = {
-+	{ H4_RECV_ACL,    .recv = hci_recv_frame },
-+	{ H4_RECV_SCO,    .recv = hci_recv_frame },
-+	{ H4_RECV_EVENT,  .recv = hci_recv_frame },
-+	{ NOK_RECV_NEG,   .recv = nok_recv_neg   },
-+	{ NOK_RECV_ALIVE, .recv = nok_recv_alive },
-+	{ NOK_RECV_RADIO, .recv = nok_recv_radio },
-+};
-+
-+static int nok_recv(struct hci_uart *hu, const void *data, int count)
-+{
-+	struct nok_data *nok = hu->priv;
-+
-+	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
-+		return -EUNATCH;
-+
-+	nok->rx_skb = h4_recv_buf(hu->hdev, nok->rx_skb, data, count,
-+				  nok_recv_pkts, ARRAY_SIZE(nok_recv_pkts));
-+	if (IS_ERR(nok->rx_skb)) {
-+		int err = PTR_ERR(nok->rx_skb);
-+		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
-+		return err;
-+	}
-+
-+	return count;
-+}
-+
-+static int nok_enqueue(struct hci_uart *hu, struct sk_buff *skb)
-+{
-+	struct nok_data *nok = hu->priv;
-+	u8 pkt_type;
-+
-+	BT_DBG("hu %p skb %p", hu, skb);
-+
-+	/* Packets for the FM radio control are standard HCI commands, but
-+	 * they are sent through the dedicated radio channel.
-+	 */
-+	if (bt_cb(skb)->pkt_type == HCI_COMMAND_PKT &&
-+	    bt_cb(skb)->opcode == 0xfc15)
-+		pkt_type = NOK_RADIO_PKT;
-+	else
-+		pkt_type = bt_cb(skb)->pkt_type;
-+
-+	/* Prepend skb with frame type */
-+	memcpy(skb_push(skb, 1), &pkt_type, 1);
-+	skb_queue_tail(&nok->txq, skb);
-+
-+	return 0;
-+}
-+
-+static struct sk_buff *nok_dequeue(struct hci_uart *hu)
-+{
-+	struct nok_data *nok = hu->priv;
-+
-+	return skb_dequeue(&nok->txq);
-+}
-+
-+static const struct hci_uart_proto nok_proto = {
-+	.id		= HCI_UART_NOK,
-+	.name		= "Nokia",
-+	.open		= nok_open,
-+	.close		= nok_close,
-+	.flush		= nok_flush,
-+	.setup		= nok_setup,
-+	.recv		= nok_recv,
-+	.enqueue	= nok_enqueue,
-+	.dequeue	= nok_dequeue,
-+};
-+
-+int __init nok_init(void)
-+{
-+	return hci_uart_register_proto(&nok_proto);
-+}
-+
-+int __exit nok_deinit(void)
-+{
-+	return hci_uart_unregister_proto(&nok_proto);
-+}
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 72120a5ba13c..3735c8adc6e6 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -35,7 +35,7 @@
- #define HCIUARTGETFLAGS		_IOR('U', 204, int)
- 
- /* UART protocols */
--#define HCI_UART_MAX_PROTO	8
-+#define HCI_UART_MAX_PROTO	9
- 
- #define HCI_UART_H4	0
- #define HCI_UART_BCSP	1
-@@ -45,6 +45,7 @@
- #define HCI_UART_ATH3K	5
- #define HCI_UART_INTEL	6
- #define HCI_UART_BCM	7
-+#define HCI_UART_NOK	8
- 
- #define HCI_UART_RAW_DEVICE	0
- #define HCI_UART_RESET_ON_INIT	1
-@@ -160,3 +161,8 @@ int h5_deinit(void);
- int bcm_init(void);
- int bcm_deinit(void);
- #endif
-+
-+#ifdef CONFIG_BT_HCIUART_NOK
-+int nok_init(void);
-+int nok_deinit(void);
-+#endif
--- 
-2.1.0
+  Merge branch 'for-upstream' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next (2015-04-07 11:47:52 -0400)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+
+for you to fetch changes up to 23310f6f3a8f30f4b6794e941763da4708f7471a:
+
+  mac802154: fix transmission power datatype (2015-04-09 19:56:15 +0200)
+
+----------------------------------------------------------------
+Johan Hedberg (2):
+      Bluetooth: Update SSP OOB data EIR definitions
+      Bluetooth: Add local SSP OOB data to OOB ext data mgmt command
+
+Marcel Holtmann (34):
+      Bluetooth: hci_uart: Add support for vendor detection flag
+      Bluetooth: hci_uart: Add support Intel address configuration
+      Bluetooth: hci_uart: Add support Broadcom address configuration
+      Bluetooth: hci_uart: Remove unneeded cast of tty->disc_data
+      Bluetooth: hci_uart: Fix indentation issues for multi-line functions
+      Bluetooth: hci_uart: Remove unused h4->rx_skb field
+      Bluetooth: hci_uart: Remove unused h4->rx_state and h4->rx_count field
+      Bluetooth: Make data pointer of hci_recv_stream_fragment const
+      Bluetooth: hci_uart: Use const data pointer for received data
+      Bluetooth: hci_uart: Introduce h4_recv_buf helper function
+      Bluetooth: hci_uart: Use h4_recv_buf helper for H:4 protocol
+      Bluetooth: hci_uart: Use h4_recv_buf helper for Atheros AR300x
+      Bluetooth: Remove hci_recv_stream_fragment function
+      Bluetooth: hci_uart: Make struct hci_uart_proto always const
+      Bluetooth: hci_uart: Add name information to hci_uart_proto struct
+      Bluetooth: hci_uart: Remove the manual protocol init message
+      Bluetooth: hci_uart: Update version number driver
+      Bluetooth: btbcm: Introduce generic Broadcom Bluetooth support
+      Bluetooth: btusb: Use generic functionality by Broadcom module
+      Bluetooth: hci_uart: Use generic functionality from Broadcom module
+      Bluetooth: btbcm: Add support for Broadcom controller setup
+      Bluetooth: btusb: Add option for Broadcom protocol support
+      Bluetooth: btusb: Move Broadcom quirk setting into support module
+      Bluetooth: btusb: Update version number of the module
+      Bluetooth: hci_uart: Move setup callback into different location
+      Bluetooth: hci_uart: Add protocol support for Broadcom UART devices
+      Bluetooth: btbcm: Add firmware table for UART based devices
+      Bluetooth: hci_uart: Provide generic H:4 receive framework
+      Bluetooth: btintel: Introduce generic Intel Bluetooth support
+      Bluetooth: btusb: Use generic Intel support for address support
+      Bluetooth: btusb: Move Intel command structs into its own header
+      Bluetooth: hci_uart: Use generic Intel support for address setting
+      Bluetooth: Read LE remote features during connection establishment
+      Bluetooth: btusb: Use proper data structures for Intel vendor events
+
+Varka Bhadram (2):
+      mac802154: fix typo for device
+      mac802154: fix transmission power datatype
+
+ drivers/bluetooth/Kconfig          |  41 ++++
+ drivers/bluetooth/Makefile         |   4 +
+ drivers/bluetooth/btbcm.c          | 387 +++++++++++++++++++++++++++++
+ drivers/bluetooth/btbcm.h          |  54 +++++
+ drivers/bluetooth/btintel.c        | 101 ++++++++
+ drivers/bluetooth/btintel.h        |  89 +++++++
+ drivers/bluetooth/btusb.c          | 469 ++++++------------------------------
+ drivers/bluetooth/hci_ath.c        |  49 ++--
+ drivers/bluetooth/hci_bcm.c        | 153 ++++++++++++
+ drivers/bluetooth/hci_bcsp.c       |  18 +-
+ drivers/bluetooth/hci_h4.c         | 132 ++++++++--
+ drivers/bluetooth/hci_h5.c         |  16 +-
+ drivers/bluetooth/hci_intel.c      |  31 +++
+ drivers/bluetooth/hci_ldisc.c      |  86 +++++--
+ drivers/bluetooth/hci_ll.c         |  16 +-
+ drivers/bluetooth/hci_uart.h       |  55 ++++-
+ drivers/net/ieee802154/at86rf230.c |   2 +-
+ include/net/bluetooth/hci.h        |  19 +-
+ include/net/bluetooth/hci_core.h   |   3 -
+ include/net/mac802154.h            |   4 +-
+ net/bluetooth/hci_core.c           | 148 +-----------
+ net/bluetooth/hci_event.c          | 107 +++++++-
+ net/bluetooth/mgmt.c               | 154 +++++++++++-
+ 23 files changed, 1481 insertions(+), 657 deletions(-)
+ create mode 100644 drivers/bluetooth/btbcm.c
+ create mode 100644 drivers/bluetooth/btbcm.h
+ create mode 100644 drivers/bluetooth/btintel.c
+ create mode 100644 drivers/bluetooth/btintel.h
+ create mode 100644 drivers/bluetooth/hci_bcm.c
+ create mode 100644 drivers/bluetooth/hci_intel.c
+
+
+--pWyiEgJYm5f9v55/
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJVJtn6AAoJECQj9vv5qNQSuxYQAJnmigi6anuyeYKhO8jbIMS7
++uT1HgSRYMS2Ueh/gUduSqha2P+q9fEdrB4C4IJg2vBP0JM2ikZMXJkbLzKJLOxb
+XLBoudge9xh6XqDU1Z4ALob65T4FvtzlszLx8BbUGssRtCtu4/tOzy0WE5Q0XkY2
+cjbFVKp2vECoKpJnHeD4jhdZd8kcaDDvZBokpKJkuxj14IVOM2doH3Lemgwr7i01
+Jf+pqrKtoHt4RvfxOws9xqyUOGhKwOBX0OO2/0EhEuHVwJ4864I+SWKCWULs9w/o
+SVPLKdeb2dsMi7s2GryLw1sIKI4BenUnAwpU3EzLNOFL2p1Rdc7BrWjWVJEc0ZpB
+ASYlNSK5WFPPYlTbi8f2M9DyElVAm7gOuVUhGWjbsH+t7WQwc4WjAQupQUBw8xhe
+aA2Pmn6JZHB8xNQOpZHsQIDqFv3NBfmiJ6FPvjvcXGpWJ3N08t/B2jV7xpc4qNCG
+ti8JCeu4YpN+iEtg16NEqEX8fm+oWGuMZhzt/swanHSxzXt4vKSXZIXjgy5jwCSQ
+drFkjiRdPfQTBlmTb5lwiz2QCYomGaakWAKB1W33/I/y1ngr88KYDSwoTCpVqaVb
+dp5flDYpV12RcE8LcTtqc7x3F29pRl59E5R4ld1gkmIQ4NwKjBoLP6zLXqwfa9Ry
+Ojnza6Wa3V+cOT6UPko4
+=G9nk
+-----END PGP SIGNATURE-----
+
+--pWyiEgJYm5f9v55/--
