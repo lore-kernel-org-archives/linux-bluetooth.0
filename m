@@ -1,38 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Marcus Redeker <marcus@openremote.org>
+Content-Type: text/plain; charset=utf-8
+Subject: Bluez with dbus and Java
+Message-Id: <B8A1D36D-3BFE-428D-B879-AE7294B33EE4@openremote.org>
+Date: Thu, 9 Apr 2015 12:20:41 +0200
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  0/6] Add Write Long Characteristic Descriptors client TC
-Date: Thu, 09 Apr 2015 16:41:25 +0530
-Message-id: <1428577891-3885-1-git-send-email-gowtham.ab@samsung.com>
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds the below client test cases:
-1) Write Long Characteristic Descriptors – by Client
-2) Write Long Characteristic Descriptors - Invalid Handle
-3) Write Long Characteristic Descriptors - Write Not Permitted
-4) Write Long Characteristic Descriptors - Insufficient Authorization
-5) Write Long Characteristic Descriptors - Insufficient Authentication
-6) Write Long Characteristic Descriptors - Insufficient Encryption Key Size
+All,
 
+I am currently trying to interface with bluez from Java. Since I don’t want to create a JNI/JNA native mapping I thought that dbus is the way to go.
+I am testing with debian Jessie which has already bluez5 support since I do want to use the new dbus interfaces.
 
-Bharat Panda (2):
-  unit/test-gatt: Add TP/GAW/CL/BI-30-C test
-  unit/test-gatt: Add TP/GAW/CL/BI-31-C test
+Can anybody point me to some how to’s or documentation? 
 
-Gowtham Anandha Babu (4):
-  unit/test-gatt: Add TP/GAW/CL/BV-09-C test
-  unit/test-gatt: Add TP/GAW/CL/BI-25-C test
-  unit/test-gatt: Add TP/GAW/CL/BI-26-C test
-  unit/test-gatt: Add TP/GAW/CL/BI-29-C test
+I am already looking at the doc folder and the python dbus tests.
+My goal is to simulate a bluetooth keyboard so our openremote home automation controller could eg. control a firetv.
 
- unit/test-gatt.c | 304 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 304 insertions(+)
+My understanding so far is that I need to use the adapter-api to make myself discoverable and set a name and alias eg. „OR Virtual Keyboard“.
+But I cannot set my device class through this api, correct? I will need to set this in /etc/bluetooth/main.conf?
+The keyword „disable-plugins“ is not supported in main.conf anymore. How can I tell bluez to not listen on the HID PSM’s anymore since I want to use them?
 
--- 
-1.9.1
+Once this is solved I should use the profile-api to register my HID service, correct?
+How can I create an SDP record? Do  I need to create a XML of my SDP record and use  "void RegisterProfile(object profile, string uuid, dict options)“.
+
+Which API do I have to use the actually send my key events?
+
+Thanks a lot for any help which is really appreciated.
+
+Regards,
+-Marcus
+
 
