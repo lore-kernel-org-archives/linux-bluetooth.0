@@ -1,37 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Apr 2015 12:42:43 +0300
+Date: Thu, 9 Apr 2015 10:42:38 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Florian Grandel <fgrandel@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [BlueZ v2 0/3] Minor improvements to the docs and mgmt API tests
-Message-ID: <20150409094243.GA10676@t440s.lan>
-References: <1428259165-10021-3-git-send-email-fgrandel@gmail.com>
- <1428261088-14121-1-git-send-email-fgrandel@gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: btusb: Use proper data structures for
+ Intel vendor events
+Message-ID: <20150409074238.GA27217@t440s.lan>
+References: <1428564919-10398-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1428261088-14121-1-git-send-email-fgrandel@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1428564919-10398-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Florian,
+Hi Marcel,
 
-On Sun, Apr 05, 2015, Florian Grandel wrote:
-> v1 -> v2: found more instances of misleading test messages
+On Thu, Apr 09, 2015, Marcel Holtmann wrote:
+> The Intel vendors events indicating firmware loading result and the
+> bootup of the operational firmware are currently hardcoded byte
+> comparisons. So intead of doing that, provide proper data structures
+> and actually use them.
 > 
-> Florian Grandel (3):
->   doc: fix minor typos
->   tools: fix misleading test output
->   tools: add read adv features success tests
-> 
->  doc/coding-style.txt          |  2 +-
->  doc/maintainer-guidelines.txt |  2 +-
->  doc/test-coverage.txt         |  2 +-
->  tools/mgmt-tester.c           | 37 +++++++++++++++++++++++++++++++++----
->  4 files changed, 36 insertions(+), 7 deletions(-)
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btintel.h | 15 +++++++++
+>  drivers/bluetooth/btusb.c   | 79 ++++++++++++++++++++++++++++++---------------
+>  2 files changed, 68 insertions(+), 26 deletions(-)
 
-All three patches have been applied. Thanks.
-
-One note: I had to manually remove the "Signed-off-by" from one patch
-1/3 since we don't use that for the user space tree.
+Applied to bluetooth-next. Thanks.
 
 Johan
