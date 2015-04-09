@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] gdbus: Use g_dbus_create_error_valist internally
-Date: Thu, 09 Apr 2015 16:39:32 +0200
-Message-ID: <1504839.97hPZ0nfai@leonov>
-In-Reply-To: <1428437449-11210-1-git-send-email-szymon.janc@tieto.com>
-References: <1428437449-11210-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Subject: [PATCH 1/3] lib/bnep: Update bnep header with BNEPGETSUPPFEAT and setup response
+Date: Thu,  9 Apr 2015 13:55:17 +0200
+Message-Id: <1428580519-3856-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 07 of April 2015 22:10:48 Szymon Janc wrote:
-> There is no need to duplicate code in g_dbus_send_error_valist.
-> ---
->  gdbus/object.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index 4d5a64c..c3c137b 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -1530,11 +1530,8 @@ gboolean g_dbus_send_error_valist(DBusConnection
-> *connection, const char *format, va_list args)
->  {
->  	DBusMessage *error;
-> -	char str[1024];
-> -
-> -	vsnprintf(str, sizeof(str), format, args);
-> 
-> -	error = dbus_message_new_error(message, name, str);
-> +	error = g_dbus_create_error_valist(message, name, format, args);
->  	if (error == NULL)
->  		return FALSE;
+This patch updates bnep header with get bnep supported features ioctl
+and bnep setup response flag.
+---
+ lib/bnep.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Applied.
-
+diff --git a/lib/bnep.h b/lib/bnep.h
+index aa46852..e7c2c87 100644
+--- a/lib/bnep.h
++++ b/lib/bnep.h
+@@ -126,6 +126,9 @@ struct bnep_ext_hdr {
+ #define BNEPCONNDEL	_IOW('B', 201, int)
+ #define BNEPGETCONNLIST	_IOR('B', 210, int)
+ #define BNEPGETCONNINFO	_IOR('B', 211, int)
++#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
++
++#define BNEP_SETUP_RESPONSE	0
+ 
+ struct bnep_connadd_req {
+ 	int      sock;		/* Connected socket */
 -- 
-BR
-Szymon Janc
+2.1.0
+
