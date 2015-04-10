@@ -1,24 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55279AD0.9010305@ubnt.com>
-Date: Fri, 10 Apr 2015 12:41:36 +0300
-From: Andrejs Hanins <andrejs.hanins@ubnt.com>
+From: DingXiang <dingxiang@huawei.com>
+To: <linux-bluetooth@vger.kernel.org>,
+	<kernel-janitors@vger.kernel.org>
+CC: dingxiang <dingxiang@huawei.com>
+Subject: [PATCH] Bluetooth:deltele some unuseful comments
+Date: Fri, 10 Apr 2015 16:45:58 +0800
+Message-ID: <1428655558-6300-1-git-send-email-dingxiang@huawei.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: D-Bus signal race condition for Gatt characteristic notification
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: dingxiang <dingxiang@huawei.com>
 
-	There is a race condition when Gatt-client characteristic (att attribute) is notified (or indicated) by the remote server multiple times in a row and D-Bus property change signals with notified "Value" are emitted. It happens in write_characteristic_cb(). D-Bus signal is scheduled to be emitted later (during main loop idle, for example) in g_dbus_emit_property_changed::add_pending(). As I see, there are two issues here:
+I think the comments are used to debug, and we don't need them in
+mainline code
 
-1) Each property can have at most one pending notification signal. If the previous signal is not yet sent out, the new signal is discarded (see g_dbus_emit_property_changed::find_property()). It looks bad to me, because there is no guarantee that D-Bus listener will get all received notifications/indications.
+Signed-off-by: DingXiang <dingxiang@huawei.com>
+---
+ drivers/bluetooth/bt3c_cs.c |    3 ---
+ 1 files changed, 0 insertions(+), 3 deletions(-)
 
-2) When property change D-Bus signal is emitted, the current value of the characteristic is used which might be already overwritten since the moment of Att notify/indicate receiving.
+diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
+index 4f7e8d4..6de97b3 100644
+--- a/drivers/bluetooth/bt3c_cs.c
++++ b/drivers/bluetooth/bt3c_cs.c
+@@ -227,7 +227,6 @@ static void bt3c_receive(struct bt3c_info *info)
+ 	iobase = info->p_dev->resource[0]->start;
+ 
+ 	avail = bt3c_read(iobase, 0x7006);
+-	//printk("bt3c_cs: receiving %d bytes\n", avail);
+ 
+ 	bt3c_address(iobase, 0x7480);
+ 	while (size < avail) {
+@@ -250,7 +249,6 @@ static void bt3c_receive(struct bt3c_info *info)
+ 
+ 			bt_cb(info->rx_skb)->pkt_type = inb(iobase + DATA_L);
+ 			inb(iobase + DATA_H);
+-			//printk("bt3c: PACKET_TYPE=%02x\n", bt_cb(info->rx_skb)->pkt_type);
+ 
+ 			switch (bt_cb(info->rx_skb)->pkt_type) {
+ 
+@@ -364,7 +362,6 @@ static irqreturn_t bt3c_interrupt(int irq, void *dev_inst)
+ 			if (stat & 0x0001)
+ 				bt3c_receive(info);
+ 			if (stat & 0x0002) {
+-				//BT_ERR("Ack (stat=0x%04x)", stat);
+ 				clear_bit(XMIT_SENDING, &(info->tx_state));
+ 				bt3c_write_wakeup(info);
+ 			}
+-- 
+1.7.1
 
-Such behavior is fatal when each notification carries some new data. If notification is lost, data is also lost.
 
-I have fixed it in a trivial way - by adding g_dbus_flush() call into the write_characteristic_cb(). So that each each Att notification synchronously triggers the sending of D-Bus property change signal and it helps in my scenario. The question - is it a good way to fix it? If yes, I can submit a patch.
-
-BR, Andrey
