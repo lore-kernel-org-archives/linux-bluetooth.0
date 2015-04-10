@@ -2,53 +2,173 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ 3/4] core/advertising: Support more than one advertisement.
-Date: Fri, 10 Apr 2015 12:06:07 -0700
-Message-Id: <1428692768-31941-4-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ 2/4] core/advertising: Parse IncludeTXPower
+Date: Fri, 10 Apr 2015 12:06:06 -0700
+Message-Id: <1428692768-31941-3-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1428692768-31941-1-git-send-email-jamuraa@chromium.org>
 References: <1428692768-31941-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use the Read Advertising Features response to determine the maximum
-number of advertisements, and limit the number of advertisements based
-on this.
+Parse the IncludeTXPower property of the advertisement object, and
+pass the appropriate flag to MGMT if it is set.
+
+Uses MGMT Read Advertising Features Command to determine the maximum
+length allowed.
 ---
- src/advertising.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ src/advertising.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 74 insertions(+), 5 deletions(-)
 
 diff --git a/src/advertising.c b/src/advertising.c
-index 8acd5b4..c3e9a72 100644
+index 2f8e539..8acd5b4 100644
 --- a/src/advertising.c
 +++ b/src/advertising.c
-@@ -47,6 +47,7 @@ struct btd_advertising {
+@@ -46,6 +46,7 @@ struct btd_advertising {
+ 	struct queue *ads;
  	struct mgmt *mgmt;
  	uint16_t mgmt_index;
- 	uint8_t max_adv_len;
-+	uint8_t max_ads;
++	uint8_t max_adv_len;
  };
  
  #define AD_TYPE_BROADCAST 0
-@@ -610,9 +611,8 @@ static DBusMessage *register_advertisement(DBusConnection *conn,
- 	if (queue_find(manager->ads, match_advertisement_path, path))
- 		return btd_error_already_exists(msg);
- 
--	/* TODO: support more than one advertisement */
--	if (!queue_isempty(manager->ads))
--		return btd_error_failed(msg, "Already advertising");
-+	if (queue_length(manager->ads) > manager->max_ads)
-+		return btd_error_failed(msg, "Maximum advertisements reached");
- 
- 	dbus_message_iter_next(&args);
- 
-@@ -695,6 +695,7 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
- 	}
- 
- 	manager->max_adv_len = feat->max_adv_data_len;
-+	manager->max_ads = feat->max_instances;
+@@ -59,6 +60,7 @@ struct advertisement {
+ 	GDBusProxy *proxy;
+ 	DBusMessage *reg;
+ 	uint8_t type; /* Advertising type */
++	bool include_tx_power;
+ 	struct bt_ad *data;
+ 	uint8_t instance;
+ };
+@@ -361,6 +363,22 @@ fail:
+ 	return false;
  }
  
++static bool parse_advertising_include_tx_power(GDBusProxy *proxy,
++							bool *included)
++{
++	DBusMessageIter iter;
++
++	if (!g_dbus_proxy_get_property(proxy, "IncludeTXPower", &iter))
++		return true;
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BOOLEAN)
++		return false;
++
++	dbus_message_iter_get_basic(&iter, included);
++
++	return true;
++}
++
+ static void add_advertising_callback(uint8_t status, uint16_t length,
+ 					  const void *param, void *user_data)
+ {
+@@ -375,19 +393,44 @@ static void add_advertising_callback(uint8_t status, uint16_t length,
+ 	ad->instance = rp->instance;
+ }
+ 
++static size_t calc_max_adv_len(struct advertisement *ad,
++								uint32_t flags)
++{
++	size_t max = ad->manager->max_adv_len;
++
++	if (flags & MGMT_ADV_FLAG_TX_POWER)
++		max -= 3;
++
++	if (flags & (MGMT_ADV_FLAG_DISCOV | MGMT_ADV_FLAG_LIMITED_DISCOV |
++						MGMT_ADV_FLAG_MANAGED_FLAGS))
++		max -= 3;
++
++	if (flags & MGMT_ADV_FLAG_APPEARANCE)
++		max -= 4;
++
++	return max;
++}
++
+ static DBusMessage *refresh_advertisement(struct advertisement *ad)
+ {
+ 	struct mgmt_cp_add_advertising *cp;
+ 	uint8_t param_len;
+ 	uint8_t *adv_data;
+ 	size_t adv_data_len;
++	uint32_t flags = 0;
+ 
+ 	DBG("Refreshing advertisement: %s", ad->path);
+ 
++	if (ad->type == AD_TYPE_PERIPHERAL)
++		flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
++
++	if (ad->include_tx_power)
++		flags |= MGMT_ADV_FLAG_TX_POWER;
++
+ 	adv_data = bt_ad_generate(ad->data, &adv_data_len);
+ 
+-	if (!adv_data) {
+-		error("Advertising data couldn't be generated.");
++	if (!adv_data || (adv_data_len > calc_max_adv_len(ad, flags))) {
++		error("Advertising data too long or couldn't be generated.");
+ 
+ 		return g_dbus_create_error(ad->reg, ERROR_INTERFACE
+ 						".InvalidLength",
+@@ -406,9 +449,7 @@ static DBusMessage *refresh_advertisement(struct advertisement *ad)
+ 		return btd_error_failed(ad->reg, "Failed");
+ 	}
+ 
+-	if (ad->type == AD_TYPE_PERIPHERAL)
+-		cp->flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
+-
++	cp->flags = flags;
+ 	cp->instance = ad->instance;
+ 	cp->adv_data_len = adv_data_len;
+ 	memcpy(cp->data, adv_data, adv_data_len);
+@@ -457,6 +498,12 @@ static DBusMessage *parse_advertisement(struct advertisement *ad)
+ 		goto fail;
+ 	}
+ 
++	if (!parse_advertising_include_tx_power(ad->proxy,
++						&ad->include_tx_power)) {
++		error("Property \"IncludeTXPower\" failed to parse");
++		goto fail;
++	}
++
+ 	return refresh_advertisement(ad);
+ 
+ fail:
+@@ -636,6 +683,20 @@ static void advertising_manager_destroy(void *user_data)
+ 	free(manager);
+ }
+ 
++static void read_adv_features_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct btd_advertising *manager = user_data;
++	const struct mgmt_rp_read_adv_features *feat = param;
++
++	if (status || !param) {
++		error("Failed to read advertising features");
++		return;
++	}
++
++	manager->max_adv_len = feat->max_adv_data_len;
++}
++
  static struct btd_advertising *
+ advertising_manager_create(struct btd_adapter *adapter)
+ {
+@@ -657,6 +718,14 @@ advertising_manager_create(struct btd_adapter *adapter)
+ 
+ 	manager->mgmt_index = btd_adapter_get_index(adapter);
+ 
++	if (!mgmt_send(manager->mgmt, MGMT_OP_READ_ADV_FEATURES,
++				manager->mgmt_index, 0, NULL,
++				read_adv_features_callback, manager, NULL)) {
++		error("Cannot read advertising features, MGMT version too low");
++		advertising_manager_destroy(manager);
++		return NULL;
++	}
++
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 						adapter_get_path(adapter),
+ 						LE_ADVERTISING_MGR_IFACE,
 -- 
 2.2.0.rc0.207.ga3a616c
 
