@@ -1,125 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH 3/7] Bluetooth: hci_uart: Support final speed during setup
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1428673066-1349-3-git-send-email-frederic.danis@linux.intel.com>
-Date: Fri, 10 Apr 2015 12:05:57 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <90917BF0-1804-4AE1-BB6B-AB1D44648FEE@holtmann.org>
-References: <1428673066-1349-1-git-send-email-frederic.danis@linux.intel.com> <1428673066-1349-3-git-send-email-frederic.danis@linux.intel.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <55281F06.7020104@hurleysoftware.com>
+Date: Fri, 10 Apr 2015 15:05:42 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Frederic Danis <frederic.danis@linux.intel.com>,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/7] Bluetooth: hci_uart: Add HCIUARTSETBAUDRATE ioctl
+References: <1428673066-1349-1-git-send-email-frederic.danis@linux.intel.com> <1428673066-1349-2-git-send-email-frederic.danis@linux.intel.com> <5527EB14.9000608@hurleysoftware.com> <488A23CF-9578-42F5-A2E6-9D8450A15309@holtmann.org>
+In-Reply-To: <488A23CF-9578-42F5-A2E6-9D8450A15309@holtmann.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
-
-> Change to full speed as soon as possible.
-> Vendor specific setup is splited into setup() and post_setup() functions
-> because setup() may have reseted Bluetooth controller speed to default
-> speed during firmware loading.
-> This implies to set UART speed back to default speed then set speed to
-> full speed again before calling post_setup().
+On 04/10/2015 02:20 PM, Marcel Holtmann wrote:
+> Hi Peter,
 > 
-> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
-> ---
-> drivers/bluetooth/hci_ldisc.c | 48 +++++++++++++++++++++++++++++++++++++++++--
-> drivers/bluetooth/hci_uart.h  |  2 ++
-> 2 files changed, 48 insertions(+), 2 deletions(-)
+>>> This allows user space application to set final speed requested for UART
+>>> device. UART port is open at init speed by user space application.
+>>>
+>>> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+>>> ---
+>>> drivers/bluetooth/hci_ldisc.c | 6 ++++++
+>>> drivers/bluetooth/hci_uart.h  | 2 ++
+>>> 2 files changed, 8 insertions(+)
+>>>
+>>> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+>>> index 5c9a73f..190a7f8 100644
+>>> --- a/drivers/bluetooth/hci_ldisc.c
+>>> +++ b/drivers/bluetooth/hci_ldisc.c
+>>> @@ -609,6 +609,12 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file *file,
+>>> 	case HCIUARTGETFLAGS:
+>>> 		return hu->hdev_flags;
+>>>
+>>> +	case HCIUARTSETBAUDRATE:
+>>> +		if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
+>>> +			return -EBUSY;
+>>> +		hu->speed = arg;
+>>> +		break;
+>>> +
+>>
+>> So now that the kernel can set line rate, why is an ioctl necessary
+>> to determine what the line rate should be?
 > 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index 190a7f8..6e33a14 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -265,14 +265,58 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
-> 	return 0;
-> }
+> actually I think we should skip this for now and only introduce it if it is really needed. For the chips we want to support initially we only need the default baudrate and the max baudrate. So the default baudrate is vendor specific and we would just hardcode that in the driver. The max baudrate is platform specific and most likely should come via ACPI or DT. Or some default value in case it is platform specific driver in the first place.
 > 
-> +static void hci_uart_set_baudrate(struct hci_uart *hu, speed_t speed)
-> +{
-> +	struct tty_struct *tty = hu->tty;
-> +	struct ktermios ktermios;
-> +
-> +	ktermios = tty->termios;
-> +	ktermios.c_cflag &= ~CBAUD;
-> +	ktermios.c_cflag |= BOTHER;
-> +	tty_termios_encode_baud_rate(&ktermios, speed, speed);
-> +
-> +	tty_set_termios(tty, &ktermios);
-> +
-> +	BT_DBG("%s: New tty speed: %d", hu->hdev->name, tty->termios.c_ispeed);
-> +}
-> +
-> static int hci_uart_setup(struct hci_dev *hdev)
-> {
-> 	struct hci_uart *hu = hci_get_drvdata(hdev);
-> 	struct hci_rp_read_local_version *ver;
-> 	struct sk_buff *skb;
-> +	speed_t init_speed = hu->tty->termios.c_ispeed;
-> +	int err;
-> +
-> +	if (hu->proto->set_baudrate && hu->speed) {
-> +		err = hu->proto->set_baudrate(hu, hu->speed);
-> +		if (err)
-> +			return err;
-> +		hci_uart_set_baudrate(hu, hu->speed);
-> +	}
+> Just as background, this command is not for actually setting the baudrate at that point, it is informing the kernel about the max baudrate for operational use. It will be programmed way later. However as stated above, I think for now we should skip this and only introduce it if the kernel needs input from userspace on the max baudrate.
 
-I would prefer if we split this into multiple patches. The first one should just set the operational baudrate. Since that is something that we need for all drivers that specify this baudrate.
+Or through sysfs.
 
-You also need to set the default baudrate first. Then issue the HCI command and then set the operational one.
-
-> +
-> +	if (hu->proto->setup) {
-> +		err = hu->proto->setup(hu);
-> +		/* If there is no firmware (-ENOENT), discard the error and
-> +		 * continue */
-> +		if (err == -ENOENT)
-> +			return 0;
-
-This is actually a bug in the setup callback then. If there is no firmware and the hardware can operate without it, then it should just return 0.
-
-And with that I think the vendor specific setup should trigger the baudrate change. The reason for is that we can not always assume that the setup will drop us back into default baud rate. Some controllers might stay in operational baudrate.
-
-> +
-> +		if (hu->proto->set_baudrate && hu->speed) {
-> +			/* Controller speed has been reset to default speed */
-> +			hci_uart_set_baudrate(hu, init_speed);
-> +
-> +			err = hu->proto->set_baudrate(hu, hu->speed);
-> +			if (err)
-> +				return err;
-> +			hci_uart_set_baudrate(hu, hu->speed);
-> +		}
-> +
-> +		if (hu->proto->post_setup)
-> +			err = hu->proto->post_setup(hu);
+> Fred, I think what we really want at this point is to add default and operational baudrate fields to hci_uart_proto.
 > 
-> -	if (hu->proto->setup)
-> -		return hu->proto->setup(hu);
-> +		return err;
-> +	}
+> Regards
 > 
-> 	if (!test_bit(HCI_UART_VND_DETECT, &hu->hdev_flags))
-> 		return 0;
-> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-> index 09a47b4..18050e0 100644
-> --- a/drivers/bluetooth/hci_uart.h
-> +++ b/drivers/bluetooth/hci_uart.h
-> @@ -63,6 +63,8 @@ struct hci_uart_proto {
-> 	int (*close)(struct hci_uart *hu);
-> 	int (*flush)(struct hci_uart *hu);
-> 	int (*setup)(struct hci_uart *hu);
-> +	int (*post_setup)(struct hci_uart *hu);
-> +	int (*set_baudrate)(struct hci_uart *hu, int speed);
-
-Lets keep the patch for baudrate support independent from any post setup support. Maybe introducint hci_uart_reset_baudrate that can be called from hu->setup will just work and we do not need a post_setup at all here.
-
-> 	int (*recv)(struct hci_uart *hu, const void *data, int len);
-> 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
-> 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
-
-Regards
-
-Marcel
-
+> Marcel
+> 
