@@ -1,106 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/7] Bluetooth: hci_uart: Support final speed during setup
-Date: Fri, 10 Apr 2015 15:37:42 +0200
-Message-Id: <1428673066-1349-3-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH 7/7] Bluetooth: btbcm: Add bcm_set_baudrate()
+Date: Fri, 10 Apr 2015 15:37:46 +0200
+Message-Id: <1428673066-1349-7-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1428673066-1349-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1428673066-1349-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change to full speed as soon as possible.
-Vendor specific setup is splited into setup() and post_setup() functions
-because setup() may have reseted Bluetooth controller speed to default
-speed during firmware loading.
-This implies to set UART speed back to default speed then set speed to
-full speed again before calling post_setup().
+Add vendor specific command to change controller device speed.
 
 Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 48 +++++++++++++++++++++++++++++++++++++++++--
- drivers/bluetooth/hci_uart.h  |  2 ++
- 2 files changed, 48 insertions(+), 2 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 71 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 190a7f8..6e33a14 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -265,14 +265,58 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
- }
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 25c9883..7308cf4 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -24,6 +24,7 @@
+ #include <linux/kernel.h>
+ #include <linux/errno.h>
+ #include <linux/skbuff.h>
++#include <linux/tty.h>
  
-+static void hci_uart_set_baudrate(struct hci_uart *hu, speed_t speed)
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -31,11 +32,80 @@
+ #include "btbcm.h"
+ #include "hci_uart.h"
+ 
++#define BCM43XX_CLOCK_48 1
++#define BCM43XX_CLOCK_24 2
++
+ struct bcm_data {
+ 	struct sk_buff *rx_skb;
+ 	struct sk_buff_head txq;
+ };
+ 
++static int bcm_set_clock(struct hci_uart *hu, unsigned char clock)
 +{
-+	struct tty_struct *tty = hu->tty;
-+	struct ktermios ktermios;
++	struct hci_dev *hdev = hu->hdev;
++	struct sk_buff *skb;
 +
-+	ktermios = tty->termios;
-+	ktermios.c_cflag &= ~CBAUD;
-+	ktermios.c_cflag |= BOTHER;
-+	tty_termios_encode_baud_rate(&ktermios, speed, speed);
++	BT_DBG("%s: Set Controller clock (%d)", hdev->name, clock);
 +
-+	tty_set_termios(tty, &ktermios);
++	skb = __hci_cmd_sync(hdev, 0xfc45, 1, &clock, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		BT_ERR("%s: failed to write update clock command (%ld)",
++		       hdev->name, PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
 +
-+	BT_DBG("%s: New tty speed: %d", hu->hdev->name, tty->termios.c_ispeed);
++	if (skb->data[0]) {
++		u8 evt_status = skb->data[0];
++
++		BT_ERR("%s: write update clock event failed (%02x)",
++		       hdev->name, evt_status);
++		kfree_skb(skb);
++		return -bt_to_errno(evt_status);
++	}
++
++	kfree_skb(skb);
++
++	return 0;
 +}
 +
- static int hci_uart_setup(struct hci_dev *hdev)
++struct hci_cp_bcm_set_speed {
++	__le16   dummy;
++	__le32   speed;
++} __packed;
++
++static int bcm_set_baudrate(struct hci_uart *hu, int speed)
++{
++	struct hci_dev *hdev = hu->hdev;
++	struct sk_buff *skb;
++	struct hci_cp_bcm_set_speed param = { 0, cpu_to_le32(speed) };
++
++	if (speed > 3000000 && bcm_set_clock(hu, BCM43XX_CLOCK_48))
++		return -EINVAL;
++
++	BT_DBG("%s: Set Controller UART speed to %d bit/s", hdev->name, speed);
++
++	skb = __hci_cmd_sync(hdev, 0xfc18, sizeof(param), &param,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		BT_ERR("%s: failed to write update baudrate command (%ld)",
++		       hdev->name, PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++
++	if (skb->data[0]) {
++		u8 evt_status = skb->data[0];
++
++		BT_ERR("%s: write update baudrate event failed (%02x)",
++		       hdev->name, evt_status);
++		kfree_skb(skb);
++		return -bt_to_errno(evt_status);
++	}
++
++	kfree_skb(skb);
++
++	return 0;
++}
++
+ static int bcm_open(struct hci_uart *hu)
  {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct hci_rp_read_local_version *ver;
- 	struct sk_buff *skb;
-+	speed_t init_speed = hu->tty->termios.c_ispeed;
-+	int err;
-+
-+	if (hu->proto->set_baudrate && hu->speed) {
-+		err = hu->proto->set_baudrate(hu, hu->speed);
-+		if (err)
-+			return err;
-+		hci_uart_set_baudrate(hu, hu->speed);
-+	}
-+
-+	if (hu->proto->setup) {
-+		err = hu->proto->setup(hu);
-+		/* If there is no firmware (-ENOENT), discard the error and
-+		 * continue */
-+		if (err == -ENOENT)
-+			return 0;
-+
-+		if (hu->proto->set_baudrate && hu->speed) {
-+			/* Controller speed has been reset to default speed */
-+			hci_uart_set_baudrate(hu, init_speed);
-+
-+			err = hu->proto->set_baudrate(hu, hu->speed);
-+			if (err)
-+				return err;
-+			hci_uart_set_baudrate(hu, hu->speed);
-+		}
-+
-+		if (hu->proto->post_setup)
-+			err = hu->proto->post_setup(hu);
- 
--	if (hu->proto->setup)
--		return hu->proto->setup(hu);
-+		return err;
-+	}
- 
- 	if (!test_bit(HCI_UART_VND_DETECT, &hu->hdev_flags))
- 		return 0;
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 09a47b4..18050e0 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -63,6 +63,8 @@ struct hci_uart_proto {
- 	int (*close)(struct hci_uart *hu);
- 	int (*flush)(struct hci_uart *hu);
- 	int (*setup)(struct hci_uart *hu);
-+	int (*post_setup)(struct hci_uart *hu);
-+	int (*set_baudrate)(struct hci_uart *hu, int speed);
- 	int (*recv)(struct hci_uart *hu, const void *data, int len);
- 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
- 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
+ 	struct bcm_data *bcm;
+@@ -145,6 +215,7 @@ static const struct hci_uart_proto bcm_proto = {
+ 	.flush		= bcm_flush,
+ 	.setup		= bcm_setup,
+ 	.post_setup	= bcm_post_setup,
++	.set_baudrate	= bcm_set_baudrate,
+ 	.recv		= bcm_recv,
+ 	.enqueue	= bcm_enqueue,
+ 	.dequeue	= bcm_dequeue,
 -- 
 1.9.1
 
