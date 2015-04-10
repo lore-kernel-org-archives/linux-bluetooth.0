@@ -2,47 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Michael Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Michael Janssen <jamuraa@chromium.org>
-Subject: [PATCH BlueZ 4/4] test: add IncludeTXPower to example-advertisement
-Date: Fri, 10 Apr 2015 12:06:08 -0700
-Message-Id: <1428692768-31941-5-git-send-email-jamuraa@chromium.org>
+Subject: [PATCH BlueZ 3/4] core/advertising: Support more than one advertisement.
+Date: Fri, 10 Apr 2015 12:06:07 -0700
+Message-Id: <1428692768-31941-4-git-send-email-jamuraa@chromium.org>
 In-Reply-To: <1428692768-31941-1-git-send-email-jamuraa@chromium.org>
 References: <1428692768-31941-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Use the Read Advertising Features response to determine the maximum
+number of advertisements, and limit the number of advertisements based
+on this.
 ---
- test/example-advertisement | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/advertising.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/test/example-advertisement b/test/example-advertisement
-index 6e47391..1198f2e 100755
---- a/test/example-advertisement
-+++ b/test/example-advertisement
-@@ -51,6 +51,7 @@ class Advertisement(dbus.service.Object):
-         self.manufacturer_data = None
-         self.solicit_uuids = None
-         self.service_data = None
-+        self.include_tx_power = None
-         dbus.service.Object.__init__(self, bus, self.path)
+diff --git a/src/advertising.c b/src/advertising.c
+index 8acd5b4..c3e9a72 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -47,6 +47,7 @@ struct btd_advertising {
+ 	struct mgmt *mgmt;
+ 	uint16_t mgmt_index;
+ 	uint8_t max_adv_len;
++	uint8_t max_ads;
+ };
  
-     def get_properties(self):
-@@ -68,6 +69,8 @@ class Advertisement(dbus.service.Object):
-         if self.service_data is not None:
-             properties['ServiceData'] = dbus.Dictionary(self.service_data,
-                                                         signature='say')
-+        if self.include_tx_power is not None:
-+            properties['IncludeTXPower'] = dbus.Boolean(self.include_tx_power)
-         return {LE_ADVERTISEMENT_IFACE: properties}
+ #define AD_TYPE_BROADCAST 0
+@@ -610,9 +611,8 @@ static DBusMessage *register_advertisement(DBusConnection *conn,
+ 	if (queue_find(manager->ads, match_advertisement_path, path))
+ 		return btd_error_already_exists(msg);
  
-     def get_path(self):
-@@ -117,6 +120,7 @@ class TestAdvertisement(Advertisement):
-         self.add_service_uuid('180F')
-         self.add_manufacturer_data(0xffff, [0x00, 0x01, 0x02, 0x03, 0x04])
-         self.add_service_data('9999', [0x00, 0x01, 0x02, 0x03, 0x04])
-+        self.include_tx_power = True
+-	/* TODO: support more than one advertisement */
+-	if (!queue_isempty(manager->ads))
+-		return btd_error_failed(msg, "Already advertising");
++	if (queue_length(manager->ads) > manager->max_ads)
++		return btd_error_failed(msg, "Maximum advertisements reached");
  
+ 	dbus_message_iter_next(&args);
  
- def register_ad_cb():
+@@ -695,6 +695,7 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
+ 	}
+ 
+ 	manager->max_adv_len = feat->max_adv_data_len;
++	manager->max_ads = feat->max_instances;
+ }
+ 
+ static struct btd_advertising *
 -- 
 2.2.0.rc0.207.ga3a616c
 
