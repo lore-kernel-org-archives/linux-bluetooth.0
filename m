@@ -1,110 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1428674761-24609-1-git-send-email-luiz.dentz@gmail.com>
-References: <1428674761-24609-1-git-send-email-luiz.dentz@gmail.com>
-Date: Sun, 12 Apr 2015 21:58:19 +0300
-Message-ID: <CABBYNZLSFL2DvN0Hz_AUZkQonPN10njY2MPeCCXX2dWEx91izw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/9] unit/test-crc: Use tester framework
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] bluetoothd: add option to automatically power on the first adapter found
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <552A397D.50709@ahsoftware.de>
+Date: Sun, 12 Apr 2015 11:50:20 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <273C2B2C-FE29-4E28-8B50-7A9BE82C098D@holtmann.org>
+References: <1428685062-2911-1-git-send-email-holler@ahsoftware.de> <97E0530A-49BA-4776-BF4E-DF500F28116E@holtmann.org> <55280525.7040902@ahsoftware.de> <55289DD3.1080509@ahsoftware.de> <5528AC01.80804@ahsoftware.de> <55295063.2010106@ahsoftware.de> <72FEAB70-4102-4048-94E0-4AA0B4D67217@holtmann.org> <552A397D.50709@ahsoftware.de>
+To: Alexander Holler <holler@ahsoftware.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Alexander,
 
-On Fri, Apr 10, 2015 at 5:05 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> ---
->  Makefile.am     |  2 +-
->  unit/test-crc.c | 37 ++++++++++++++++++-------------------
->  2 files changed, 19 insertions(+), 20 deletions(-)
->
-> diff --git a/Makefile.am b/Makefile.am
-> index 2a1fe76..f9f26aa 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -282,7 +282,7 @@ unit_test_textfile_LDADD = @GLIB_LIBS@
->  unit_tests += unit/test-crc
->
->  unit_test_crc_SOURCES = unit/test-crc.c monitor/crc.h monitor/crc.c
-> -unit_test_crc_LDADD = @GLIB_LIBS@
-> +unit_test_crc_LDADD = src/libshared-glib.la @GLIB_LIBS@
->
->  unit_tests += unit/test-crypto
->
-> diff --git a/unit/test-crc.c b/unit/test-crc.c
-> index db40dc9..791fa51 100644
-> --- a/unit/test-crc.c
-> +++ b/unit/test-crc.c
-> @@ -26,6 +26,7 @@
->  #endif
->
->  #include "monitor/crc.h"
-> +#include "src/shared/tester.h"
->
->  #include <glib.h>
->
-> @@ -160,35 +161,33 @@ static void test_crc(gconstpointer data)
->         crc = crc24_calculate(crc_init, test_data->packet + 4,
->                                                 test_data->size - 7);
->
-> -       if (g_test_verbose())
-> -               g_print("CRC: 0x%6.6x, Calculated: 0x%6.6x\n",
-> -                                               crc_value, crc);
-> +       tester_debug("CRC: 0x%6.6x, Calculated: 0x%6.6x", crc_value, crc);
->
->         g_assert(crc_value == crc);
->
->         rev = crc24_reverse(crc_value, test_data->packet + 4,
->                                                 test_data->size - 7);
->
-> -       if (g_test_verbose())
-> -               g_print("Preset: 0x%6.6x, Calculated: 0x%6.6x\n",
-> -                                               crc_init, rev);
-> +       tester_debug("Preset: 0x%6.6x, Calculated: 0x%6.6x", crc_init, rev);
->
->         g_assert(crc_init == rev);
-> +
-> +       tester_test_passed();
->  }
->
->  int main(int argc, char *argv[])
->  {
-> -       g_test_init(&argc, &argv, NULL);
-> -
-> -       g_test_add_data_func("/crc/1", &crc_1, test_crc);
-> -       g_test_add_data_func("/crc/2", &crc_2, test_crc);
-> -       g_test_add_data_func("/crc/3", &crc_3, test_crc);
-> -       g_test_add_data_func("/crc/4", &crc_4, test_crc);
-> -       g_test_add_data_func("/crc/5", &crc_5, test_crc);
-> -       g_test_add_data_func("/crc/6", &crc_6, test_crc);
-> -       g_test_add_data_func("/crc/7", &crc_7, test_crc);
-> -       g_test_add_data_func("/crc/8", &crc_8, test_crc);
-> -       g_test_add_data_func("/crc/9", &crc_9, test_crc);
-> -
-> -       return g_test_run();
-> +       tester_init(&argc, &argv);
-> +
-> +       tester_add("/crc/1", &crc_1, NULL, test_crc, NULL);
-> +       tester_add("/crc/2", &crc_2, NULL, test_crc, NULL);
-> +       tester_add("/crc/3", &crc_3, NULL, test_crc, NULL);
-> +       tester_add("/crc/4", &crc_4, NULL, test_crc, NULL);
-> +       tester_add("/crc/5", &crc_5, NULL, test_crc, NULL);
-> +       tester_add("/crc/6", &crc_6, NULL, test_crc, NULL);
-> +       tester_add("/crc/7", &crc_7, NULL, test_crc, NULL);
-> +       tester_add("/crc/8", &crc_8, NULL, test_crc, NULL);
-> +       tester_add("/crc/9", &crc_9, NULL, test_crc, NULL);
-> +
-> +       return tester_run();
->  }
-> --
-> 2.1.0
+>>>>>>> We took the power on policy out of BlueZ 5 on purpose.
+>>>>>> 
+>>>>>> Nobody has to use the option which is by default off.
+>>>>> 
+>>>>> Sorry, but I just have to ask that in order to keep my reputation as
+>>>>> troll:
+>>>>> 
+>>>>> What's that purpose?
+>>>>> 
+>>>>> Defeating usability? ;)
+>>>> 
+>>>> Just to clarify my patch. Its purpose is not to reimplement a "power on
+>>>> by default" policy because I understand that it's a good idea to not
+>>>> power on bt-adapters by default.
+>>>> 
+>>>> The purpose of my patch is to offer users a simple, fast and reliable
+>>>> way to power on an adapter on startup, without the need to wait until
+>>>> dbus and udev are ready and without the need for additional tools (or
+>>>> complications) like udev-rules, hciconfig or bluetootctl.
+>>> 
+>>> 
+>>> And just in case some people don't understand why I'm calling a simple looking udev-rule a complication, here is an incomplete list what all might fail when using such error-prone mechanisms:
+>>> 
+>>> As example I use the rule
+>>> 
+>>> ACTION=="add", KERNEL=="hci0", RUN+="/usr/bin/hciconfig hci0 up"
+>>> 
+>>> which might work as a bad replacement for the patch I've posted.
+>>> 
+>>> - There is the devicename (hci0). That might change.
+>> 
+>> that is actually not true. The device name stays the same as long as the hardware is plugged in.
+> 
+> Yes, but the initial name might change. We just (a year or 2 ago) had such for most network devices and since that change I have e.g. only a 70% chance that a bt-network device is named bnep0 when I'm starting a bnep-connection. The other 30% it's named en* (on one of my systems where I regulary do so). Up to now I still haven't searched where that randomness does come from and I'm using it here just as an example for an existing uncertainty in regard to device names. There's no need to discuss this problem further in this thread.
 
-Applied.
+I you start intermixing network interface names with Bluetooth HCI device names, then there is really nothing much more to add. They are two different things. Plain and simple.
 
+>>> - There is the need for a working hciconfig-executable.
+>>> - The path to the executable might change (think at /usr/bin -> /bin)
+>>> - The call to hciconfig (like options) might change without notice
+>> 
+>> hciconfig is a deprecated tool and should not be used anymore. That might be your biggest problem that the binary might go away in BlueZ 6.
+>> 
+>>> - The partition the unnecessarily needed third executable (besides bluetoothd and dbus) might be mounted to late (maybe through a change in some mount order)
+>> 
+>> To be fair, we could just built this into bluetoothctl as a command.
+> 
+> As said, this (currently) needs that dbus is ready and bluetoothctl can communicate with bluetoothd. And on a reasonable fast machine (4 core x86_64 2ghz+) this needs more than 4 seconds after startup here (invoked through /etc/rc.d/rc.local on f21).
 
--- 
-Luiz Augusto von Dentz
+Szymon send an example on how to add wait-for-adapter in bluetoothctl. Together with that and a proper systemd unit, I bet you that this does not take 4 seconds.
+
+If you insist on doing old fashion rc.local stuff, then I can not help you. You can look into systemd target definitions, but I am pretty sure it ends up being started after something else happened.
+
+>>> - the udev-rule syntax might change
+>> 
+>> That would be a udev / systemd regression that one should highly object against.
+>> 
+>>> - udev might not be available at all (there are still some alternatives)
+>> 
+>> And now we are getting into the funny cases where it is a home baked distro. Then someone might also just compile their own version of BlueZ with all sorts of patches. Upstream can not support every corner cases. So this is something I would not entertain at all.
+>> 
+>>> - ...
+>>> 
+>>> And please don't try to tell me that all of the above possiblities for errors are pure fiction which only might be found inside my brain. I've experienced almost all of them (not in regard to bluez or hciconfig) and most of them not just once or on systems I (mis)configured myself.
+>> 
+>> What we can do is add an option AutomaticEnabling=true,false into the [Policy] section that would equally just power on all controllers when they are found.
+> 
+> Then people will ask which [Policy] section? E.g. on Fedora the configuration file disappeared completely. There's none in /etc anymore and no example in /usr/share/doc (likely because make install doesn't install such).
+
+That is a documentation problem. Send patches for it.
+
+>> This needs to be clearly marked as policy since that is what it is. And it also needs to be implemented correctly. Since you need to program all the keys before you power on. Otherwise you might have tons of race conditions when it comes to re-connection of the mouse/keyboard and the key is missing.
+>> 
+>> One more complicated option would to do the Apple way in the sense, when there is not keyboard attached, they start the HID pairing UI to let you pair one. However that should be better done in the UI.
+> 
+> I'm not just talking about BT HID devices, also these are likely the main use cases. It's about automatically turning on a bt-adapter I either plug in or which is fixed, if the user wants such a behaviour.
+
+Let me repeat this. This is a policy decision. I proposed a way for doing that with BlueZ in an upstream compatible fashion that fits into the framework.
+
+> And I don't want to end up in a discussion about the necessary initial pairing processs for bt-keyboards. On Linux, since ever, you need either a second keyboard or an ssh connection to do so. That's a complete different problem and isn't easy to solve without some special sw in order to do this without the need for a different input device (or network login or similiar).
+> 
+> What I just don't understand is, what's wrong with that simple command line option done with a simple patch (3 files changed, 15 insertions(+), 4 deletions(-))?
+
+Your patch is wrong. I explained that in my initial response. Either you believe me or you don't. Saying that you hacked up something and insisting is not going to make your case here.
+
+> Why should there be a need to use bluetoothctl for that purpose? I don't care if it's my patch with names I've choosen for the option and would be happy with any patch from any author which would let me do this with a simple command line option for bluetoothd.
+
+You did read my response. Either it become an option in the [Policy] section of main.conf or you do it with bluetoothctl. You can make your choice, but it is one of these and not some freaky command line switch.
+
+Regards
+
+Marcel
+
