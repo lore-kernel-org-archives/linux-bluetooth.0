@@ -1,21 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 13 Apr 2015 16:42:05 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 0/2] Add serial console input handler support
-Message-ID: <20150413134203.GB17871@aemeltch-MOBL1>
-References: <1428928990-3016-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1428928990-3016-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH v2 3/3] android/pts: Update BNEP PTS 6.0 results for android 5.0
+Date: Mon, 13 Apr 2015 15:14:47 +0200
+Message-Id: <1428930887-25519-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1428930887-25519-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1428930887-25519-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Apr 13, 2015 at 03:43:08PM +0300, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+This patch updates BNEP PTS 6.0 results for android 5.0 witch added
+support for handling extension headers of BNEP control frames.
+---
+ android/pts-bnep.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Sorry please disconsider this set of patches.
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/android/pts-bnep.txt b/android/pts-bnep.txt
+index 91ef1c5..42f6438 100644
+--- a/android/pts-bnep.txt
++++ b/android/pts-bnep.txt
+@@ -1,7 +1,7 @@
+ PTS test results for BNEP
+ 
+ PTS version: 6.0
+-Tested: 12-March-2015
++Tested: 09-April-2015
+ Android version: 5.0
+ Kernel version: 3.20
+ 
+@@ -33,8 +33,7 @@ TC_CTRL_BV_09_C		PASS	bneptest -c <PTS addr> -b <bridge> -n <iface>
+ 					-j ff:ff:ff:ff:ff:ff -y 1
+ TC_CTRL_BV_10_C		PASS	PTS issue #13169
+ 				bneptest -s -b <bridge> -n <iface>
+-TC_CTRL_BV_19_C		INC	JIRA #BA-343
+-				bneptest -s -b <bridge> -n <iface>
++TC_CTRL_BV_19_C		PASS	bneptest -s -b <bridge> -n <iface>
+ TC_RX_TYPE_0_BV_11_C	PASS	bneptest -s -b <bridge> -n <iface>
+ TC_RX_C_BV_12_C		PASS	bneptest -s -b <bridge> -n <iface>
+ TC_RX_C_S_BV_13_C	PASS	bneptest -s -b <bridge> -n <iface>
+-- 
+2.1.0
 
