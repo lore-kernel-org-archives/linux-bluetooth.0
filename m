@@ -1,42 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: BUG: Unable to add a second characteristic (after adding a descriptor)
-From: Dan Kunin <dkunin@ninuksoftware.com>
-In-Reply-To: <CABBYNZ+XV7u-Xm-A8UhdnD1AzPxnpdJ-AEw4ZULBrZ9C1aY7fw@mail.gmail.com>
-Date: Mon, 13 Apr 2015 11:58:18 -0400
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <CA026D85-CC21-4907-9827-C4E7FBD06451@ninuksoftware.com>
-References: <12D8720A-944B-4266-9097-2813F7239A6C@ninuksoftware.com> <FDBF022C-4A53-4B7F-BD7F-35E13FC6F021@ninuksoftware.com> <CABBYNZ+XV7u-Xm-A8UhdnD1AzPxnpdJ-AEw4ZULBrZ9C1aY7fw@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1428934490-20840-1-git-send-email-gowtham.ab@samsung.com>
+References: <1428934490-20840-1-git-send-email-gowtham.ab@samsung.com>
+Date: Mon, 13 Apr 2015 18:07:25 +0300
+Message-ID: <CABBYNZJSWanVhkngcfnh-_xo6apzxx2MJaf0GGY4Ex89B9KPJg@mail.gmail.com>
+Subject: Re: [PATCH] shared/att: Add packed struct definition for err_rsp
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Luiz,
+Hi Gowtham,
 
-The issue is surrounding multiple characteristics per service once adding a descriptor, not adding multiple services, which works fine.  If you comment out the descriptors for the characteristics of the service, you can then successfully add multiple characteristics.
+On Mon, Apr 13, 2015 at 5:14 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Reused the structure definition (bt_att_pdu_error_rsp) defined in
+> att-types.h by removing uint8_t array for sending err rsp pdu.
+> ---
+>  src/shared/att.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+>
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index 422cc2c..e0c6d76 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -689,14 +689,13 @@ static bool opcode_match(uint8_t opcode, uint8_t test_opcode)
+>
+>  static void respond_not_supported(struct bt_att *att, uint8_t opcode)
+>  {
+> -       uint8_t pdu[4];
+> +       struct bt_att_pdu_error_rsp pdu;
+>
+> -       pdu[0] = opcode;
+> -       pdu[1] = 0;
+> -       pdu[2] = 0;
+> -       pdu[3] = BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
+> +       pdu.opcode = opcode;
+> +       pdu.handle = 0x0000;
+> +       pdu.ecode = BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
+>
+> -       bt_att_send(att, BT_ATT_OP_ERROR_RSP, pdu, sizeof(pdu), NULL, NULL,
+> +       bt_att_send(att, BT_ATT_OP_ERROR_RSP, &pdu, sizeof(pdu), NULL, NULL,
+>                                                                         NULL);
+>  }
+>
+> --
+> 1.9.1
 
-Dan
+Applied, thanks.
 
-> On Apr 13, 2015, at 8:22 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> 
-> Hi Dan,
-> 
-> On Sun, Apr 12, 2015 at 11:59 PM, Dan Kunin <dkunin@ninuksoftware.com> wrote:
->> Found a problem while using the new GATT DBUS API.
->> 
->> After adding a descriptor to a characteristic, one can not add another characteristic to the service. bluetoothd hangs with no error output.  Once you remove the descriptor(s), you can add more characteristics.
-> 
-> Thanks for the report, we don't actually support multiple services per
-> RegisterService, but nevertheless it should not cause a endless loop
-> so I sent a fix for that. That said we may actually need to support at
-> least included services or at least add some means to references other
-> services already registered.
-> 
-> Btw, your script is outdated, the latest one actually register
-> multiple services:
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/example-gatt-server
-> 
-> -- 
-> Luiz Augusto von Dentz
 
+-- 
+Luiz Augusto von Dentz
