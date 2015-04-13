@@ -1,37 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLwepfONDEtS_E9oODRRwzEfcB5hHcwFcBGhd1X9wyPPA@mail.gmail.com>
+References: <1428692768-31941-1-git-send-email-jamuraa@chromium.org>
+	<CABBYNZLwepfONDEtS_E9oODRRwzEfcB5hHcwFcBGhd1X9wyPPA@mail.gmail.com>
+Date: Mon, 13 Apr 2015 10:22:16 -0700
+Message-ID: <CAJLTA8hkry_iv8-Qe49J2vHiSLphycGFOu_aUKSPD8+hv9+=0g@mail.gmail.com>
 Subject: Re: [PATCH BlueZ 0/4] Improvements to the LE Advertising API
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJLTA8hkry_iv8-Qe49J2vHiSLphycGFOu_aUKSPD8+hv9+=0g@mail.gmail.com>
-Date: Mon, 13 Apr 2015 11:16:07 -0700
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <97A5FA5F-A2DD-472B-A5F2-BEB218B10403@holtmann.org>
-References: <1428692768-31941-1-git-send-email-jamuraa@chromium.org> <CABBYNZLwepfONDEtS_E9oODRRwzEfcB5hHcwFcBGhd1X9wyPPA@mail.gmail.com> <CAJLTA8hkry_iv8-Qe49J2vHiSLphycGFOu_aUKSPD8+hv9+=0g@mail.gmail.com>
-To: Michael Janssen <jamuraa@chromium.org>
+From: Michael Janssen <jamuraa@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi Luiz,
 
->>> Adds a method to add the TX Power attribute to the advertisements that are sent
->>> through the D-Bus interface, and supports more than one advertisement based on
->>> the maximum number reported by the kernel.
->> 
->> That doesn't say why we should expose the IncludeTXPower, I thought we
->> would let bluetoothd figure if that should be included or not, we may
->> not have enough space or don't have this information from the
->> controller.
->> 
-> 
-> This just exposes the flag that is available on the MGMT API. If we
-> don't have a reason to turn it on and off from user space, we should
-> remove that flag too.
+On Mon, Apr 13, 2015 at 6:38 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Michael,
+>
+> On Fri, Apr 10, 2015 at 10:06 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+>> Adds a method to add the TX Power attribute to the advertisements that are sent
+>> through the D-Bus interface, and supports more than one advertisement based on
+>> the maximum number reported by the kernel.
+>
+> That doesn't say why we should expose the IncludeTXPower, I thought we
+> would let bluetoothd figure if that should be included or not, we may
+> not have enough space or don't have this information from the
+> controller.
+>
 
-the kernel side needs this flag. You can not emulate it from userspace. The reason is that userspace has no idea what the actual TX power is. Only the kernel knows. If you build the value in userspace by yourself, then you are plain faking / hardcoding it.
+This just exposes the flag that is available on the MGMT API. If we
+don't have a reason to turn it on and off from user space, we should
+remove that flag too.
 
-Regards
+I would rather get an error when I want to include TX Power and there
+isn't enough space to include it instead of having to discover by
+testing that it is not there when I want to use it.
 
-Marcel
+>> Michael Janssen (4):
+>>   doc: Add IncludeTXPower to LE Advertising API
+>>   core/advertising: Parse IncludeTXPower
+>>   core/advertising: Support more than one advertisement.
+>>   test: add IncludeTXPower to example-advertisement
+>>
+>>  doc/advertising-api.txt    |  5 +++
+>>  src/advertising.c          | 86 +++++++++++++++++++++++++++++++++++++++++-----
+>>  test/example-advertisement |  4 +++
+>>  3 files changed, 87 insertions(+), 8 deletions(-)
+>>
+>> --
+>> 2.2.0.rc0.207.ga3a616c
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
+-- 
+M Janssen
