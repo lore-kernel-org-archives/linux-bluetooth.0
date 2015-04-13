@@ -1,55 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1428927059-14345-1-git-send-email-luiz.dentz@gmail.com>
-References: <1428927059-14345-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 13 Apr 2015 16:54:38 +0300
-Message-ID: <CABBYNZ+Ks2GzGXQiW-m8MKf8rcL-_p49zSRws7_KyBWz21eWAQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/gatt-database: Fix endless loop
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] unit/test-eir: Add ad/g-tag test
+Date: Mon, 13 Apr 2015 16:54:04 +0300
+Message-Id: <1428933245-8289-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Apr 13, 2015 at 3:10 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> The descriptors list may contain descriptors from another services which
-> should be ignored but the code did not iterate to next item causing an
-> endless loop if that happen.
-> ---
->  src/gatt-database.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index bbeb7cd..f182fd0 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -1964,7 +1964,7 @@ static bool database_add_chrc(struct external_service *service,
->                 struct external_desc *desc = entry->data;
->
->                 if (desc->handled || g_strcmp0(desc->chrc_path, chrc->path))
-> -                       continue;
-> +                       goto next;
->
->                 if (!database_add_desc(service, desc)) {
->                         chrc->attrib = NULL;
-> @@ -1972,6 +1972,7 @@ static bool database_add_chrc(struct external_service *service,
->                         return false;
->                 }
->
-> +next:
->                 entry = entry->next;
->         }
->
-> --
-> 2.1.0
+This adds a test for Gigaset G-tag advertisement and prints manufacturer
+specific data.
+---
+ unit/test-eir.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-Applied.
-
-
+diff --git a/unit/test-eir.c b/unit/test-eir.c
+index 8fc7af8..4d557a8 100644
+--- a/unit/test-eir.c
++++ b/unit/test-eir.c
+@@ -33,6 +33,7 @@
+ #include "lib/hci.h"
+ #include "lib/sdp.h"
+ #include "src/shared/tester.h"
++#include "src/shared/util.h"
+ #include "src/eir.h"
+ 
+ struct test_data {
+@@ -544,6 +545,13 @@ static void test_basic(const void *data)
+ 	tester_test_passed();
+ }
+ 
++static void print_debug(const char *str, void *user_data)
++{
++	char *prefix = user_data;
++
++	tester_debug("%s%s", prefix, str);
++}
++
+ static void test_parsing(gconstpointer data)
+ {
+ 	const struct test_data *test = data;
+@@ -588,11 +596,39 @@ static void test_parsing(gconstpointer data)
+ 		g_assert(eir.services == NULL);
+ 	}
+ 
++	for (list = eir.msd_list; list; list = list->next) {
++		struct eir_msd *msd = list->data;
++
++		tester_debug("Manufacturer ID: 0x%04x", msd->company);
++		util_hexdump(' ', msd->data, msd->data_len, print_debug,
++							"Manufacturer Data:");
++	}
++
+ 	eir_data_free(&eir);
+ 
+ 	tester_test_passed();
+ }
+ 
++static const unsigned char gigaset_gtag_data[] = {
++		0x02, 0x01, 0x06, 0x0d, 0xff, 0x80, 0x01, 0x02,
++		0x15, 0x12, 0x34, 0x80, 0x91, 0xd0, 0xf2, 0xbb,
++		0xc5, 0x03, 0x02, 0x0f, 0x18, 0x00, 0x00, 0x00,
++		0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++static const char *gigaset_gtag_uuid[] = {
++		"0000180f-0000-1000-8000-00805f9b34fb",
++		NULL
++};
++
++static const struct test_data gigaset_gtag_test = {
++	.eir_data = gigaset_gtag_data,
++	.eir_size = sizeof(gigaset_gtag_data),
++	.flags = 0x06,
++	.tx_power = 127,
++	.uuid = gigaset_gtag_uuid,
++};
++
+ int main(int argc, char *argv[])
+ {
+ 	tester_init(&argc, &argv);
+@@ -616,6 +652,7 @@ int main(int argc, char *argv[])
+ 	tester_add("/ad/citizen1", &citizen_adv_test, NULL, test_parsing, NULL);
+ 	tester_add("/ad/citizen2", &citizen_scan_test, NULL, test_parsing,
+ 									NULL);
++	tester_add("ad/g-tag", &gigaset_gtag_test, NULL, test_parsing, NULL);
+ 
+ 	return tester_run();
+ }
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
