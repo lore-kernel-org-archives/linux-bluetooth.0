@@ -1,192 +1,147 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] profiles/network: Add support for handling extension hdr in ctrl msg
-Date: Mon, 13 Apr 2015 12:56:15 +0200
-Message-ID: <17865098.8RAsnonGg2@uw000953>
-In-Reply-To: <1428580519-3856-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1428580519-3856-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1428580519-3856-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com
+References: <1427966783-15629-1-git-send-email-gowtham.ab@samsung.com>
+ <001601d071e7$272b7d50$758277f0$@samsung.com>
+In-reply-to: <001601d071e7$272b7d50$758277f0$@samsung.com>
+Subject: RE: [PATCH ] core/gatt: Parse InProgress error code from err_msg
+Date: Mon, 13 Apr 2015 15:03:37 +0530
+Message-id: <000601d075cc$f5d52870$e17f7950$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Ping.
 
-On Thursday 09 of April 2015 13:55:18 Grzegorz Kolodziejczyk wrote:
-> Support for extension headers is mandatory functionality. This patch
-> add support to it and leave responsibility for processing extension
-> header and sending setup success response to kernel.
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Wednesday, April 08, 2015 4:01 PM
+> To: linux-bluetooth@vger.kernel.org
+> Subject: RE: [PATCH ] core/gatt: Parse InProgress error code from err_msg
 > 
-> This patch is necessary to pass PTS bnep test TC_CTRL_BV_19_C.
-> ---
->  android/pan.c             |  2 +-
->  profiles/network/bnep.c   | 41 +++++++++++++++++++++++++++++++++++++----
->  profiles/network/server.c |  2 +-
->  tools/bneptest.c          |  2 +-
->  4 files changed, 40 insertions(+), 7 deletions(-)
+> Ping.
 > 
-> diff --git a/android/pan.c b/android/pan.c
-> index 6c9815b..b98fccd 100644
-> --- a/android/pan.c
-> +++ b/android/pan.c
-> @@ -472,7 +472,7 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
->  	sk = g_io_channel_unix_get_fd(chan);
->  
->  	/* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
-> -	n = read(sk, packet, sizeof(packet));
-> +	n = recv(sk, packet, sizeof(packet), MSG_PEEK);
->  	if (n  < 0) {
->  		error("read(): %s(%d)", strerror(errno), errno);
->  		goto failed;
-> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-> index e325b72..79ca80d 100644
-> --- a/profiles/network/bnep.c
-> +++ b/profiles/network/bnep.c
-> @@ -124,6 +124,7 @@ static int bnep_connadd(int sk, uint16_t role, char *dev)
->  
->  	req.sock = sk;
->  	req.role = role;
-> +	req.flags = (1 << BNEP_SETUP_RESPONSE);
->  	if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
->  		int err = -errno;
->  		error("bnep: Failed to add device %s: %s(%d)",
-> @@ -135,6 +136,21 @@ static int bnep_connadd(int sk, uint16_t role, char *dev)
->  	return 0;
->  }
->  
-> +static uint32_t bnep_getsuppfeat(void)
-> +{
-> +	uint32_t feat;
-> +
-> +	if (ioctl(ctl, BNEPGETSUPPFEAT, &feat) < 0) {
-> +		int err = -errno;
-> +
-> +		info("bnep: Failed to get supported features: %s(%d)",
-> +							strerror(err), err);
-
-strerror() takes positive error code.
-
-> +		return 0;
-> +	}
-
-but I'd just skip info message and just print features in DBG:
-
-	if (ioctl(ctl, BNEPGETSUPPFEAT, &feat) < 0)
-        feat = 0;
-
-DBG("supported features: 0x%x", feat);
-
-return feat;
-
-
-> +
-> +	return feat;
-> +}
-> +
->  static int bnep_if_up(const char *devname)
->  {
->  	struct ifreq ifr;
-> @@ -530,7 +546,9 @@ static uint16_t bnep_setup_decode(int sk, struct bnep_setup_conn_req *req,
->  	uint8_t *dest, *source;
->  	uint32_t val;
->  
-> -	if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ)
-> +	if (((req->type != BNEP_CONTROL) &&
-> +		(req->type != (BNEP_CONTROL | BNEP_EXT_HEADER)))  ||
-> +					req->ctrl != BNEP_SETUP_CONN_REQ)
->  		return BNEP_CONN_NOT_ALLOWED;
->  
->  	dest = req->service;
-> @@ -591,6 +609,7 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
->  						uint8_t *setup_data, int len)
->  {
->  	int err;
-> +	uint32_t feat;
->  	uint16_t rsp, dst;
->  	struct bnep_setup_conn_req *req = (void *) setup_data;
->  
-> @@ -617,6 +636,16 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
->  		goto reply;
->  	}
->  
-> +	feat = bnep_getsuppfeat();
-
-To keep this simple lets factor out legacy support to separate function ie.
-
-if (!(feat & (1 << BNEP_SETUP_RESPONSE))
-    return server_add_legacy();
-
-then implicit else path would only handle new way.    
-
-
-> +
-> +	/*
-> +	 * Take out setup data if kernel doesn't support handling it, especially
-> +	 * setup request. If kernel would have set session flags, they should
-> +	 * be checked and handled respectively.
-> +	 */
-> +	if (!feat || !(feat & (1 << BNEP_SETUP_RESPONSE)))
-> +		read(sk, setup_data, len);
-
-Remember to check if read succeed and if enough bytes were read.
-
-> +
->  	err = bnep_connadd(sk, dst, iface);
->  	if (err < 0) {
->  		rsp = BNEP_CONN_NOT_ALLOWED;
-> @@ -626,15 +655,19 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
->  	err = bnep_add_to_bridge(iface, bridge);
->  	if (err < 0) {
->  		bnep_conndel(addr);
-> -		rsp = BNEP_CONN_NOT_ALLOWED;
-> -		goto reply;
-> +		return err;
->  	}
->  
->  	err = bnep_if_up(iface);
->  	if (err < 0)
-> -		rsp = BNEP_CONN_NOT_ALLOWED;
-> +		return err;
-> +
-> +	/* Kernel will handle success setup response */
-> +	if (feat & (1 << BNEP_SETUP_RESPONSE))
-> +		return err;
->  
->  reply:
-> +	/* If supported - setup success is handled by bnep session in kernel */
->  	if (bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp) < 0) {
->  		err = -errno;
->  		error("bnep: send ctrl rsp error: %s (%d)", strerror(errno),
-> diff --git a/profiles/network/server.c b/profiles/network/server.c
-> index 32aafc3..ec37c97 100644
-> --- a/profiles/network/server.c
-> +++ b/profiles/network/server.c
-> @@ -328,7 +328,7 @@ static gboolean bnep_setup(GIOChannel *chan,
->  	sk = g_io_channel_unix_get_fd(chan);
->  
->  	/* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
-> -	n = read(sk, packet, sizeof(packet));
-> +	n = recv(sk, packet, sizeof(packet), MSG_PEEK);
->  	if (n < 0) {
->  		error("read(): %s(%d)", strerror(errno), errno);
->  		return FALSE;
-> diff --git a/tools/bneptest.c b/tools/bneptest.c
-> index 98ee9b1..a7d5815 100644
-> --- a/tools/bneptest.c
-> +++ b/tools/bneptest.c
-> @@ -327,7 +327,7 @@ static gboolean setup_bnep_cb(GIOChannel *chan, GIOCondition cond,
->  	sk = g_io_channel_unix_get_fd(chan);
->  
->  	/* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
-> -	n = read(sk, packet, sizeof(packet));
-> +	n = recv(sk, packet, sizeof(packet), MSG_PEEK);
->  	if (n < 0) {
->  		error("read(): %s(%d)", strerror(errno), errno);
->  		return FALSE;
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> > Sent: Thursday, April 02, 2015 2:56 PM
+> > To: linux-bluetooth@vger.kernel.org
+> > Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
+> Babu
+> > Subject: [PATCH ] core/gatt: Parse InProgress error code from err_msg
+> >
+> > In Common Profile and Service Error Code descriptions (Supplement to
+> > Bluetooth Core Specification, sections 1.2 and 2), it is mentioned
+> > that following error codes are sent over the Attribute Protocol.
+> > 1)Client Characteristic Configuration Descriptor Improperly
+> Configured(0xFD)
+> > 2)Procedure Already in Progress(0xFE) 3)Out of Range(0xFF)
+> >
+> > It should be treated as ATT Error codes. So, moved those to
+> > att-types.h
+> and
+> > handled org.bluez.Error.InProgress.
+> > ---
+> >  src/gatt-database.c    |  4 +++-
+> >  src/shared/att-types.h | 10 ++++++++++
+> >  src/shared/att.c       | 10 ----------
+> >  3 files changed, 13 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/src/gatt-database.c b/src/gatt-database.c index
+> bbeb7cd..fd456e5
+> > 100644
+> > --- a/src/gatt-database.c
+> > +++ b/src/gatt-database.c
+> > @@ -1441,7 +1441,6 @@ static bool parse_primary(GDBusProxy *proxy,
+> > bool
+> > *primary)
+> >
+> >  static uint8_t dbus_error_to_att_ecode(const char *error_name)  {
+> > -	/* TODO: Parse error ATT ecode from error_message */
+> >
+> >  	if (strcmp(error_name, "org.bluez.Error.Failed") == 0)
+> >  		return 0x80;  /* For now return this "application error" */
+> @@
+> > -1455,6 +1454,9 @@ static uint8_t dbus_error_to_att_ecode(const char
+> > *error_name)
+> >  	if (strcmp(error_name, "org.bluez.Error.InvalidValueLength") == 0)
+> >  		return BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
+> >
+> > +	if (strcmp(error_name, "org.bluez.Error.InProgress") == 0)
+> > +		return BT_ERROR_ALREADY_IN_PROGRESS;
+> > +
+> >  	return 0;
+> >  }
+> >
+> > diff --git a/src/shared/att-types.h b/src/shared/att-types.h index
+> > aa7f0da..10a42f2 100644
+> > --- a/src/shared/att-types.h
+> > +++ b/src/shared/att-types.h
+> > @@ -92,6 +92,16 @@ struct bt_att_pdu_error_rsp {
+> >  #define BT_ATT_ERROR_INSUFFICIENT_RESOURCES		0x11
+> >
+> >  /*
+> > + * Common Profile and Service Error Code descriptions (see Supplement
+> > +to the
+> > + * Bluetooth Core Specification, sections 1.2 and 2). The error codes
+> > +within
+> > + * 0xE0-0xFC are reserved for future use. The remaining 3 are defined
+> > +as the
+> > + * following:
+> > + */
+> > +#define BT_ERROR_CCC_IMPROPERLY_CONFIGURED      0xfd
+> > +#define BT_ERROR_ALREADY_IN_PROGRESS            0xfe
+> > +#define BT_ERROR_OUT_OF_RANGE                   0xff
+> > +
+> > +/*
+> >   * ATT attribute permission bitfield values. Permissions are grouped as
+> >   * "Access", "Encryption", "Authentication", and "Authorization". A
+> bitmask
+> > of
+> >   * permissions is a byte that encodes a combination of these.
+> > diff --git a/src/shared/att.c b/src/shared/att.c index
+> > 422cc2c..b920eb8
+> 100644
+> > --- a/src/shared/att.c
+> > +++ b/src/shared/att.c
+> > @@ -43,16 +43,6 @@
+> >  #define ATT_OP_SIGNED_MASK		0x80
+> >  #define ATT_TIMEOUT_INTERVAL		30000  /* 30000 ms */
+> >
+> > -/*
+> > - * Common Profile and Service Error Code descriptions (see Supplement
+> > to the
+> > - * Bluetooth Core Specification, sections 1.2 and 2). The error codes
+> within
+> > - * 0xE0-0xFC are reserved for future use. The remaining 3 are defined
+> > as
+> the
+> > - * following:
+> > - */
+> > -#define BT_ERROR_CCC_IMPROPERLY_CONFIGURED	0xfd
+> > -#define BT_ERROR_ALREADY_IN_PROGRESS		0xfe
+> > -#define BT_ERROR_OUT_OF_RANGE			0xff
+> > -
+> >  /* Length of signature in write signed packet */
+> >  #define BT_ATT_SIGNATURE_LEN		12
+> >
+> > --
+> > 1.9.1
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+linux-bluetooth"
+> in
+> > the body of a message to majordomo@vger.kernel.org More majordomo
+> info
+> > at  http://vger.kernel.org/majordomo-info.html
 > 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
--- 
-Best regards, 
-Szymon Janc
