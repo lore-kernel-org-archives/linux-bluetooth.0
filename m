@@ -1,43 +1,206 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/3] android/pts: Update BNEP PTS 6.0 results for android 5.0
-Date: Mon, 13 Apr 2015 15:14:47 +0200
-Message-Id: <1428930887-25519-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 2/3] profiles/network: Add support for handling extension hdr in ctrl msg
+Date: Mon, 13 Apr 2015 15:14:46 +0200
+Message-Id: <1428930887-25519-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1428930887-25519-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1428930887-25519-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates BNEP PTS 6.0 results for android 5.0 witch added
-support for handling extension headers of BNEP control frames.
----
- android/pts-bnep.txt | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Support for extension headers is mandatory functionality. This patch
+add support to it and leave responsibility for processing extension
+header and sending setup success response to kernel.
 
-diff --git a/android/pts-bnep.txt b/android/pts-bnep.txt
-index 91ef1c5..42f6438 100644
---- a/android/pts-bnep.txt
-+++ b/android/pts-bnep.txt
-@@ -1,7 +1,7 @@
- PTS test results for BNEP
+This patch is necessary to pass PTS bnep test TC_CTRL_BV_19_C.
+---
+ android/pan.c             |  2 +-
+ profiles/network/bnep.c   | 83 +++++++++++++++++++++++++++++++++++++++++++----
+ profiles/network/server.c |  2 +-
+ tools/bneptest.c          |  2 +-
+ 4 files changed, 80 insertions(+), 9 deletions(-)
+
+diff --git a/android/pan.c b/android/pan.c
+index 6c9815b..b98fccd 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -472,7 +472,7 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
+ 	sk = g_io_channel_unix_get_fd(chan);
  
- PTS version: 6.0
--Tested: 12-March-2015
-+Tested: 09-April-2015
- Android version: 5.0
- Kernel version: 3.20
+ 	/* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
+-	n = read(sk, packet, sizeof(packet));
++	n = recv(sk, packet, sizeof(packet), MSG_PEEK);
+ 	if (n  < 0) {
+ 		error("read(): %s(%d)", strerror(errno), errno);
+ 		goto failed;
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index e325b72..a878d14 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -124,6 +124,7 @@ static int bnep_connadd(int sk, uint16_t role, char *dev)
  
-@@ -33,8 +33,7 @@ TC_CTRL_BV_09_C		PASS	bneptest -c <PTS addr> -b <bridge> -n <iface>
- 					-j ff:ff:ff:ff:ff:ff -y 1
- TC_CTRL_BV_10_C		PASS	PTS issue #13169
- 				bneptest -s -b <bridge> -n <iface>
--TC_CTRL_BV_19_C		INC	JIRA #BA-343
--				bneptest -s -b <bridge> -n <iface>
-+TC_CTRL_BV_19_C		PASS	bneptest -s -b <bridge> -n <iface>
- TC_RX_TYPE_0_BV_11_C	PASS	bneptest -s -b <bridge> -n <iface>
- TC_RX_C_BV_12_C		PASS	bneptest -s -b <bridge> -n <iface>
- TC_RX_C_S_BV_13_C	PASS	bneptest -s -b <bridge> -n <iface>
+ 	req.sock = sk;
+ 	req.role = role;
++	req.flags = (1 << BNEP_SETUP_RESPONSE);
+ 	if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
+ 		int err = -errno;
+ 		error("bnep: Failed to add device %s: %s(%d)",
+@@ -135,6 +136,18 @@ static int bnep_connadd(int sk, uint16_t role, char *dev)
+ 	return 0;
+ }
+ 
++static uint32_t bnep_getsuppfeat(void)
++{
++	uint32_t feat;
++
++	if (ioctl(ctl, BNEPGETSUPPFEAT, &feat) < 0)
++		feat = 0;
++
++	DBG("supported features: 0x%x", feat);
++
++	return feat;
++}
++
+ static int bnep_if_up(const char *devname)
+ {
+ 	struct ifreq ifr;
+@@ -530,7 +543,9 @@ static uint16_t bnep_setup_decode(int sk, struct bnep_setup_conn_req *req,
+ 	uint8_t *dest, *source;
+ 	uint32_t val;
+ 
+-	if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ)
++	if (((req->type != BNEP_CONTROL) &&
++		(req->type != (BNEP_CONTROL | BNEP_EXT_HEADER)))  ||
++					req->ctrl != BNEP_SETUP_CONN_REQ)
+ 		return BNEP_CONN_NOT_ALLOWED;
+ 
+ 	dest = req->service;
+@@ -587,10 +602,52 @@ static uint16_t bnep_setup_decode(int sk, struct bnep_setup_conn_req *req,
+ 	return BNEP_CONN_INVALID_DST;
+ }
+ 
++static int bnep_server_add_legacy(int sk, uint16_t dst, char *bridge,
++					char *iface, const bdaddr_t *addr,
++					uint8_t *setup_data, int len)
++{
++	int err, n;
++	uint16_t rsp;
++
++	n = read(sk, setup_data, len);
++	if (n != len) {
++		err = -1;
++		rsp = BNEP_CONN_NOT_ALLOWED;
++		goto reply;
++	}
++
++	err = bnep_connadd(sk, dst, iface);
++	if (err < 0) {
++		rsp = BNEP_CONN_NOT_ALLOWED;
++		goto reply;
++	}
++
++	err = bnep_add_to_bridge(iface, bridge);
++	if (err < 0) {
++		bnep_conndel(addr);
++		rsp = BNEP_CONN_NOT_ALLOWED;
++		goto reply;
++	}
++
++	err = bnep_if_up(iface);
++	if (err < 0)
++		rsp = BNEP_CONN_NOT_ALLOWED;
++
++reply:
++	if (bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp) < 0) {
++		err = -errno;
++		error("bnep: send ctrl rsp error: %s (%d)", strerror(-err),
++									-err);
++	}
++
++	return err;
++}
++
+ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 						uint8_t *setup_data, int len)
+ {
+ 	int err;
++	uint32_t feat;
+ 	uint16_t rsp, dst;
+ 	struct bnep_setup_conn_req *req = (void *) setup_data;
+ 
+@@ -617,6 +674,17 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 		goto reply;
+ 	}
+ 
++	feat = bnep_getsuppfeat();
++
++	/*
++	 * Take out setup data if kernel doesn't support handling it, especially
++	 * setup request. If kernel would have set session flags, they should
++	 * be checked and handled respectively.
++	 */
++	if (!feat || !(feat & (1 << BNEP_SETUP_RESPONSE)))
++		return bnep_server_add_legacy(sk, dst, bridge, iface, addr,
++							setup_data, len);
++
+ 	err = bnep_connadd(sk, dst, iface);
+ 	if (err < 0) {
+ 		rsp = BNEP_CONN_NOT_ALLOWED;
+@@ -626,19 +694,22 @@ int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t *addr,
+ 	err = bnep_add_to_bridge(iface, bridge);
+ 	if (err < 0) {
+ 		bnep_conndel(addr);
+-		rsp = BNEP_CONN_NOT_ALLOWED;
+-		goto reply;
++		return err;
+ 	}
+ 
+ 	err = bnep_if_up(iface);
+ 	if (err < 0)
+-		rsp = BNEP_CONN_NOT_ALLOWED;
++		return err;
++
++	/* Kernel will handle success setup response */
++	if (feat & (1 << BNEP_SETUP_RESPONSE))
++		return err;
+ 
+ reply:
+ 	if (bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp) < 0) {
+ 		err = -errno;
+-		error("bnep: send ctrl rsp error: %s (%d)", strerror(errno),
+-									errno);
++		error("bnep: send ctrl rsp error: %s (%d)", strerror(-err),
++									-err);
+ 	}
+ 
+ 	return err;
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index 32aafc3..ec37c97 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -328,7 +328,7 @@ static gboolean bnep_setup(GIOChannel *chan,
+ 	sk = g_io_channel_unix_get_fd(chan);
+ 
+ 	/* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
+-	n = read(sk, packet, sizeof(packet));
++	n = recv(sk, packet, sizeof(packet), MSG_PEEK);
+ 	if (n < 0) {
+ 		error("read(): %s(%d)", strerror(errno), errno);
+ 		return FALSE;
+diff --git a/tools/bneptest.c b/tools/bneptest.c
+index 98ee9b1..a7d5815 100644
+--- a/tools/bneptest.c
++++ b/tools/bneptest.c
+@@ -327,7 +327,7 @@ static gboolean setup_bnep_cb(GIOChannel *chan, GIOCondition cond,
+ 	sk = g_io_channel_unix_get_fd(chan);
+ 
+ 	/* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
+-	n = read(sk, packet, sizeof(packet));
++	n = recv(sk, packet, sizeof(packet), MSG_PEEK);
+ 	if (n < 0) {
+ 		error("read(): %s(%d)", strerror(errno), errno);
+ 		return FALSE;
 -- 
 2.1.0
 
