@@ -1,83 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Apr 2015 11:33:57 +0300
-From: Jouni Malinen <jouni@qca.qualcomm.com>
-To: Ben Hutchings <ben@decadent.org.uk>
-CC: Kyle McMartin <kyle@infradead.org>,
-	Kalle Valo <kvalo@qca.qualcomm.com>,
-	<linux-firmware@kernel.org>, <linux-bluetooth@vger.kernel.org>,
-	<agoel@qca.qualcomm.com>
-Subject: Re: [PATCH] ath3k: update AR3012 2.2.1 firmware with v.170
-Message-ID: <20150415083357.GA3907@jouni.qca.qualcomm.com>
-References: <1428687294-10706-1-git-send-email-kvalo@qca.qualcomm.com>
- <20150413140205.GB27807@merlin.infradead.org>
- <20150413140617.GC27807@merlin.infradead.org>
- <1428934503.3211.7.camel@decadent.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <1428934503.3211.7.camel@decadent.org.uk>
+From: Michael Janssen <jamuraa@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michael Janssen <jamuraa@chromium.org>
+Subject: [PATCH BlueZ v2 1/6] core/advertising: Fix dbus object matching
+Date: Tue, 14 Apr 2015 15:06:56 -0700
+Message-Id: <1429049221-21984-2-git-send-email-jamuraa@chromium.org>
+In-Reply-To: <1429049221-21984-1-git-send-email-jamuraa@chromium.org>
+References: <1429049221-21984-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> On Mon, 2015-04-13 at 10:06 -0400, Kyle McMartin wrote:
-> > actually, one question before i push it out, this license is the same as
-> > LICENSE.QualcommAtheros_ath10k... can we rename and fix references?
+Objects should be matched on both their path and the sending
+application.
+---
+ src/advertising.c | 37 ++++++++++++++++++++++++++-----------
+ 1 file changed, 26 insertions(+), 11 deletions(-)
 
-While the license text is practically same at the moment, our preference
-would be to use separate files for clarity.
-
-
-On Mon, Apr 13, 2015 at 03:15:03PM +0100, Ben Hutchings wrote:
-> I have some concern about the narrower patent license in this version.
-> 
-> The new patent license specifically excludes patents that are not owned
-> by QCA (whereas the old license also included those 'controlled' by
-> Atheros) and any that are obtained after the date of submission.  This
-> seems to allow revoking permission to distribute at a later date, if
-> there are any other patent applications in the pipeline.
-> 
-> If QCA wants the firmware to be redistributed freely (with the legal
-> notices intact, only for use with their hardware) then I don't see what
-> the point is of restricting the patent license in this way.
-
-I don't think there is such limitation for redistribution (see the
-copyright license above in the "Redistribution" section). As far as the
-limited patent license language is concerned, would the following
-changes address your concern?
-
-
-Old:
-
-The term "Patents" as used in this agreement means only those patents
--or- patent applications owned solely and exclusively by Licensor as of
-the date of Licensor's submission of the Software and any patents
-deriving priority (i.e., having a first effective filing date)
-therefrom.
-...
-Notwithstanding anything to the contrary herein, Licensor does not grant
-and Licensee does not receive, by virtue of this agreement or the
-Licensor's submission of any Software, any license or other rights under
-any patent or patent application owned by any affiliate of Licensor -or
-any other entity- (other than Licensor), whether expressly, impliedly,
-by virtue of estoppel or exhaustion, or otherwise.
-
-
-New:
-
-The term "Patents" as used in this agreement means only those patents
-_and_ patent applications owned _or controlled_ solely and exclusively
-by Licensor as of the date of Licensor's submission of the Software and
-any patents _and patent applications_ deriving priority (i.e., having a
-first effective filing date) therefrom."
-...
-Notwithstanding anything to the contrary herein, Licensor does not grant
-and Licensee does not receive, by virtue of this agreement or the
-Licensor's submission of any Software, any license or other rights under
-any patent or patent application owned by any affiliate of Licensor
-(other than _an entity in which more than 50% of the voting power held
-by shares or other securities entitled to vote is owned or controlled,
-either directly or indirectly, by_ Licensor), whether expressly,
-impliedly, by virtue of estoppel or exhaustion, or otherwise.
-
+diff --git a/src/advertising.c b/src/advertising.c
+index 2f8e539..78178f2 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -63,12 +63,23 @@ struct advertisement {
+ 	uint8_t instance;
+ };
+ 
+-static bool match_advertisement_path(const void *a, const void *b)
++struct dbus_obj_match {
++	const char *owner;
++	const char *path;
++};
++
++static bool match_advertisement(const void *a, const void *b)
+ {
+ 	const struct advertisement *ad = a;
+-	const char *path = b;
++	const struct dbus_obj_match *match = b;
++
++	if (match->owner && !g_strcmp0(ad->owner, match->owner))
++		return false;
++
++	if (match->path && !g_strcmp0(ad->path, match->path))
++		return false;
+ 
+-	return g_strcmp0(ad->path, path);
++	return true;
+ }
+ 
+ static void advertisement_free(void *data)
+@@ -547,8 +558,8 @@ static DBusMessage *register_advertisement(DBusConnection *conn,
+ {
+ 	struct btd_advertising *manager = user_data;
+ 	DBusMessageIter args;
+-	const char *path;
+ 	struct advertisement *ad;
++	struct dbus_obj_match match;
+ 
+ 	DBG("RegisterAdvertisement");
+ 
+@@ -558,9 +569,11 @@ static DBusMessage *register_advertisement(DBusConnection *conn,
+ 	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
+ 		return btd_error_invalid_args(msg);
+ 
+-	dbus_message_iter_get_basic(&args, &path);
++	dbus_message_iter_get_basic(&args, &match.path);
+ 
+-	if (queue_find(manager->ads, match_advertisement_path, path))
++	match.owner = dbus_message_get_sender(msg);
++
++	if (queue_find(manager->ads, match_advertisement, &match))
+ 		return btd_error_already_exists(msg);
+ 
+ 	/* TODO: support more than one advertisement */
+@@ -572,12 +585,12 @@ static DBusMessage *register_advertisement(DBusConnection *conn,
+ 	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
+ 		return btd_error_invalid_args(msg);
+ 
+-	ad = advertisement_create(conn, msg, path);
++	ad = advertisement_create(conn, msg, match.path);
+ 	if (!ad)
+ 		return btd_error_failed(msg,
+ 					"Failed to register advertisement");
+ 
+-	DBG("Registered advertisement at path %s", path);
++	DBG("Registered advertisement at path %s", match.path);
+ 
+ 	ad->manager = manager;
+ 	queue_push_tail(manager->ads, ad);
+@@ -591,8 +604,8 @@ static DBusMessage *unregister_advertisement(DBusConnection *conn,
+ {
+ 	struct btd_advertising *manager = user_data;
+ 	DBusMessageIter args;
+-	const char *path;
+ 	struct advertisement *ad;
++	struct dbus_obj_match match;
+ 
+ 	DBG("UnregisterAdvertisement");
+ 
+@@ -602,9 +615,11 @@ static DBusMessage *unregister_advertisement(DBusConnection *conn,
+ 	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
+ 		return btd_error_invalid_args(msg);
+ 
+-	dbus_message_iter_get_basic(&args, &path);
++	dbus_message_iter_get_basic(&args, &match.path);
++
++	match.owner = dbus_message_get_sender(msg);
+ 
+-	ad = queue_find(manager->ads, match_advertisement_path, path);
++	ad = queue_find(manager->ads, match_advertisement, &match);
+ 	if (!ad)
+ 		return btd_error_does_not_exist(msg);
  
 -- 
-Jouni Malinen                                            PGP id EFC895FA
+2.2.0.rc0.207.ga3a616c
+
