@@ -1,36 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Apr 2015 13:49:22 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com,
-	kernel@pengutronix.de
-Subject: creating infrastructure for generic 6LoWPAN branch
-Message-ID: <20150414114917.GA2179@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Cc: bharat.panda@samsung.com, cpgs@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH] tools: Handle the common profile & service ecode
+Date: Tue, 14 Apr 2015 17:07:48 +0530
+Message-id: <1429011468-13667-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Handles the common profile and service error codes sent over the
+Attribute Protocol in btgatt-client and monitor.
+---
+ monitor/l2cap.c       | 9 +++++++++
+ tools/btgatt-client.c | 6 ++++++
+ 2 files changed, 15 insertions(+)
 
-I was thinking about to create some infrastructure to handle generic
-6LoWPAN development things, which is shared between bluetooth and
-802.15.4. I mean everything which is in "net/6lowpan" and things which
-are 6LoWPAN "specific/related/mostly used in 6LoWPAN" and works in L3 and
-upper layers.
+diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+index fc565b1..55efa54 100644
+--- a/monitor/l2cap.c
++++ b/monitor/l2cap.c
+@@ -2046,6 +2046,15 @@ static void att_error_response(const struct l2cap_frame *frame)
+ 	case 0x11:
+ 		str = "Insufficient Resources";
+ 		break;
++	case 0xfd:
++		str = "CCC Improperly Configured";
++		break;
++	case 0xfe:
++		str = "Procedure Already in Progress";
++		break;
++	case 0xff:
++		str = "Out of Range";
++		break;
+ 	default:
+ 		str = "Reserved";
+ 		break;
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index ee5315d..3935a7e 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -114,6 +114,12 @@ static const char *ecode_to_string(uint8_t ecode)
+ 		return "Group type Not Supported";
+ 	case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
+ 		return "Insufficient Resources";
++	case BT_ERROR_CCC_IMPROPERLY_CONFIGURED:
++		return "CCC Improperly Configured";
++	case BT_ERROR_ALREADY_IN_PROGRESS:
++		return "Procedure Already in Progress";
++	case BT_ERROR_OUT_OF_RANGE:
++		return "Out of Range";
+ 	default:
+ 		return "Unknown error type";
+ 	}
+-- 
+1.9.1
 
-What we should need is some kind of website which contains a ToDo list
-of everything which is outside there and what we currently support. I
-mean a general information site for "6LoWPAN" implementation inside
-Linux kernel.
-
-Additionally we need some repository which contains some userspace tools
-for handling generic 6LoWPAN things like userspace configuration tool
-for the 6LoWPAN nhc layer. These tools can be used then for all 6LoWPAN
-implementations (BTLE/802.15.4 at the moment). That was one idea which
-was discussed while bringing nhc layer mainline.
-
-Any ideas where we should host this site, do we really need this or
-any others suggestions?
-
-- Alex
