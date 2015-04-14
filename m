@@ -1,58 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH] tools: Handle the common profile & service ecode
-Date: Tue, 14 Apr 2015 17:07:48 +0530
-Message-id: <1429011468-13667-1-git-send-email-gowtham.ab@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1428933245-8289-1-git-send-email-luiz.dentz@gmail.com>
+References: <1428933245-8289-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 14 Apr 2015 14:19:21 +0300
+Message-ID: <CABBYNZK3wLLAZpgahitWmH9mDdHY5soyz+2jpgY=U91OCyem5g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] unit/test-eir: Add ad/g-tag test
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Handles the common profile and service error codes sent over the
-Attribute Protocol in btgatt-client and monitor.
----
- monitor/l2cap.c       | 9 +++++++++
- tools/btgatt-client.c | 6 ++++++
- 2 files changed, 15 insertions(+)
+Hi,
 
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index fc565b1..55efa54 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -2046,6 +2046,15 @@ static void att_error_response(const struct l2cap_frame *frame)
- 	case 0x11:
- 		str = "Insufficient Resources";
- 		break;
-+	case 0xfd:
-+		str = "CCC Improperly Configured";
-+		break;
-+	case 0xfe:
-+		str = "Procedure Already in Progress";
-+		break;
-+	case 0xff:
-+		str = "Out of Range";
-+		break;
- 	default:
- 		str = "Reserved";
- 		break;
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index ee5315d..3935a7e 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -114,6 +114,12 @@ static const char *ecode_to_string(uint8_t ecode)
- 		return "Group type Not Supported";
- 	case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
- 		return "Insufficient Resources";
-+	case BT_ERROR_CCC_IMPROPERLY_CONFIGURED:
-+		return "CCC Improperly Configured";
-+	case BT_ERROR_ALREADY_IN_PROGRESS:
-+		return "Procedure Already in Progress";
-+	case BT_ERROR_OUT_OF_RANGE:
-+		return "Out of Range";
- 	default:
- 		return "Unknown error type";
- 	}
+On Mon, Apr 13, 2015 at 4:54 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds a test for Gigaset G-tag advertisement and prints manufacturer
+> specific data.
+> ---
+>  unit/test-eir.c | 37 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
+>
+> diff --git a/unit/test-eir.c b/unit/test-eir.c
+> index 8fc7af8..4d557a8 100644
+> --- a/unit/test-eir.c
+> +++ b/unit/test-eir.c
+> @@ -33,6 +33,7 @@
+>  #include "lib/hci.h"
+>  #include "lib/sdp.h"
+>  #include "src/shared/tester.h"
+> +#include "src/shared/util.h"
+>  #include "src/eir.h"
+>
+>  struct test_data {
+> @@ -544,6 +545,13 @@ static void test_basic(const void *data)
+>         tester_test_passed();
+>  }
+>
+> +static void print_debug(const char *str, void *user_data)
+> +{
+> +       char *prefix = user_data;
+> +
+> +       tester_debug("%s%s", prefix, str);
+> +}
+> +
+>  static void test_parsing(gconstpointer data)
+>  {
+>         const struct test_data *test = data;
+> @@ -588,11 +596,39 @@ static void test_parsing(gconstpointer data)
+>                 g_assert(eir.services == NULL);
+>         }
+>
+> +       for (list = eir.msd_list; list; list = list->next) {
+> +               struct eir_msd *msd = list->data;
+> +
+> +               tester_debug("Manufacturer ID: 0x%04x", msd->company);
+> +               util_hexdump(' ', msd->data, msd->data_len, print_debug,
+> +                                                       "Manufacturer Data:");
+> +       }
+> +
+>         eir_data_free(&eir);
+>
+>         tester_test_passed();
+>  }
+>
+> +static const unsigned char gigaset_gtag_data[] = {
+> +               0x02, 0x01, 0x06, 0x0d, 0xff, 0x80, 0x01, 0x02,
+> +               0x15, 0x12, 0x34, 0x80, 0x91, 0xd0, 0xf2, 0xbb,
+> +               0xc5, 0x03, 0x02, 0x0f, 0x18, 0x00, 0x00, 0x00,
+> +               0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+> +};
+> +
+> +static const char *gigaset_gtag_uuid[] = {
+> +               "0000180f-0000-1000-8000-00805f9b34fb",
+> +               NULL
+> +};
+> +
+> +static const struct test_data gigaset_gtag_test = {
+> +       .eir_data = gigaset_gtag_data,
+> +       .eir_size = sizeof(gigaset_gtag_data),
+> +       .flags = 0x06,
+> +       .tx_power = 127,
+> +       .uuid = gigaset_gtag_uuid,
+> +};
+> +
+>  int main(int argc, char *argv[])
+>  {
+>         tester_init(&argc, &argv);
+> @@ -616,6 +652,7 @@ int main(int argc, char *argv[])
+>         tester_add("/ad/citizen1", &citizen_adv_test, NULL, test_parsing, NULL);
+>         tester_add("/ad/citizen2", &citizen_scan_test, NULL, test_parsing,
+>                                                                         NULL);
+> +       tester_add("ad/g-tag", &gigaset_gtag_test, NULL, test_parsing, NULL);
+>
+>         return tester_run();
+>  }
+> --
+> 2.1.0
+
+Applied.
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
