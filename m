@@ -1,94 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/avrcp-lib: Use void pointer in register_notification
-Date: Tue, 14 Apr 2015 15:48:35 +0200
-Message-Id: <1429019315-29216-1-git-send-email-szymon.janc@tieto.com>
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] monitor: Add AVRCP GetFolderItems Support
+Date: Tue, 14 Apr 2015 18:59:23 +0530
+Message-id: <1429018163-6124-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In this callback params vary depending on code. Passing those as void*
-allows to avoid extra memcpy that would be otherwise needed to
-avoid warnings due to increased alignment when casting.
----
- android/avrcp-lib.h | 2 +-
- android/avrcp.c     | 5 +++--
- unit/test-avrcp.c   | 9 +++++----
- 3 files changed, 9 insertions(+), 7 deletions(-)
+Support for decoding AVRCP GetFolderItems added in btmon.
 
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index add7739..6554b12 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -224,7 +224,7 @@ struct avrcp_control_cfm {
- 					char **text, void *user_data);
- 	bool (*register_notification) (struct avrcp *session, int err,
- 					uint8_t code, uint8_t event,
--					uint8_t *params, void *user_data);
-+					void *params, void *user_data);
- 	void (*set_volume) (struct avrcp *session, int err, uint8_t volume,
- 					void *user_data);
- 	void (*set_addressed) (struct avrcp *session, int err,
-diff --git a/android/avrcp.c b/android/avrcp.c
-index bcb4228..8c3e25a 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -748,11 +748,12 @@ static const struct avrcp_control_ind control_ind = {
+      Channel: 65 len 20 ctrl 0x0000 [PSM 27 mode 3] {chan 1}
+      I-frame: Unsegmented TxSeq 0 ReqSeq 0
+      AVCTP Browsing: Command: type 0x00 label 0 PID 0x110e
+        AVRCP: GetFolderItems: len 0x000a
+          Scope: 0x01 (Media Player Virtual Filesystem)
+          StartItem: 0x00000000 (0)
+          EndItem: 0x0000000a (10)
+          AttributeCount: 0xff (255)
+          AttributeID: 0x0000326e (Reserved)
+---
+ monitor/avctp.c | 113 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 111 insertions(+), 2 deletions(-)
+
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index c599aa4..a55cb41 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -182,6 +182,11 @@
+ #define AVRCP_MEDIA_SEARCH		0x02
+ #define AVRCP_MEDIA_NOW_PLAYING		0x03
  
- static bool handle_register_notification_rsp(struct avrcp *session, int err,
- 						uint8_t code, uint8_t event,
--						uint8_t *params,
-+						void *params,
- 						void *user_data)
++/* Media Item Type */
++#define AVRCP_MEDIA_PLAYER_ITEM_TYPE	0x01
++#define AVRCP_FOLDER_ITEM_TYPE			0x02
++#define AVRCP_MEDIA_ELEMENT_ITEM_TYPE	0x03
++
+ /* operands in passthrough commands */
+ #define AVC_PANEL_VOLUME_UP		0x41
+ #define AVC_PANEL_VOLUME_DOWN		0x42
+@@ -677,6 +682,20 @@ static char *op2str(uint8_t op)
+ 	}
+ }
+ 
++static const char *type2str(uint8_t type)
++{
++	switch (type) {
++	case AVRCP_MEDIA_PLAYER_ITEM_TYPE:
++		return "Media Player";
++	case AVRCP_FOLDER_ITEM_TYPE:
++		return "Folder";
++	case AVRCP_MEDIA_ELEMENT_ITEM_TYPE:
++		return "Media Element";
++	default:
++		return "Unknown";
++	}
++}
++
+ static bool avrcp_passthrough_packet(struct avctp_frame *avctp_frame,
+ 								uint8_t indent)
  {
- 	struct avrcp_device *dev = user_data;
- 	struct hal_ev_avrcp_volume_changed ev;
-+	uint8_t *volume = params;
+@@ -1096,10 +1115,10 @@ static bool avrcp_get_element_attributes(struct avctp_frame *avctp_frame,
+ 	for (; num > 0; num--) {
+ 		uint32_t attr;
  
- 	if (err < 0) {
- 		error("AVRCP: %s", strerror(-err));
-@@ -766,7 +767,7 @@ static bool handle_register_notification_rsp(struct avrcp *session, int err,
- 		return false;
+-		if (!l2cap_frame_get_be32(frame, &attr))
++		if (!l2cap_frame_get_le32(frame, &attr))
+ 			return false;
  
- 	ev.type = code;
--	ev.volume = params[0] & 0x7f;
-+	ev.volume = volume[0];
- 
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
- 					HAL_EV_AVRCP_VOLUME_CHANGED,
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index a610ad5..01307e6 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -826,22 +826,23 @@ static void set_volume_rsp(struct avrcp *session, int err, uint8_t volume,
- 
- static bool register_notification_rsp(struct avrcp *session, int err,
- 					uint8_t code, uint8_t event,
--					uint8_t *params, void *user_data)
-+					void *params, void *user_data)
- {
- 	struct context *context = user_data;
-+	uint8_t *p = params;
- 
- 	g_assert_cmpint(err, ==, 0);
- 
- 	switch (event) {
- 	case AVRCP_EVENT_VOLUME_CHANGED:
- 		if (g_str_equal(context->data->test_name, "/TP/VLH/BV-03-C")) {
--			g_assert_cmpint(params[0], ==, 0);
-+			g_assert_cmpint(p[0], ==, 0);
- 			break;
- 		} else if (code == AVC_CTYPE_INTERIM) {
--			g_assert_cmpint(params[0], ==, 0);
-+			g_assert_cmpint(p[0], ==, 0);
- 			return true;
- 		}
--		g_assert_cmpint(params[0], ==, 1);
-+		g_assert_cmpint(p[0], ==, 1);
- 		break;
+-		print_field("%*cAttribute: 0x%08x (%s)", (indent - 8),
++		print_field("%*cAttributeID: 0x%08x (%s)", (indent - 8),
+ 					' ', attr, mediattr2str(attr));
  	}
  
+@@ -1637,6 +1656,93 @@ static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
+ 	}
+ }
+ 
++static bool avrcp_get_folder_items(struct avctp_frame *avctp_frame)
++{
++	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
++	uint8_t scope, count, status, indent = 2;
++	uint32_t start, end;
++	uint16_t uid, num;
++
++	if (avctp_frame->hdr & 0x02)
++		goto response;
++
++	if (!l2cap_frame_get_u8(frame, &scope))
++		return false;
++
++	print_field("%*cScope: 0x%02x (%s)", indent, ' ',
++					scope, scope2str(scope));
++
++	if (!l2cap_frame_get_be32(frame, &start))
++		return false;
++
++	print_field("%*cStartItem: 0x%08x (%u)", indent, ' ', start, start);
++
++	if (!l2cap_frame_get_be32(frame, &end))
++		return false;
++
++	print_field("%*cEndItem: 0x%08x (%u)", indent, ' ', end, end);
++
++	if (!l2cap_frame_get_u8(frame, &count))
++		return false;
++
++	print_field("%*cAttributeCount: 0x%02x (%u)", indent, ' ',
++						count, count);
++
++	for (; count > 0; count--) {
++		uint16_t attr;
++
++		if (!l2cap_frame_get_be16(frame, &attr)) {
++			return false;
++		}
++
++		print_field("%*cAttributeID: 0x%08x (%s)", indent, ' ',
++					attr, mediattr2str(attr));
++	}
++
++	return false;
++
++response:
++	if (!l2cap_frame_get_u8(frame, &status))
++		return false;
++
++	print_field("%*cStatus: 0x%02x (%s)", indent, ' ',
++				status, error2str(status));
++
++	if (!l2cap_frame_get_be16(frame, &uid))
++		return false;
++
++	print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ', uid, uid);
++
++	if (!l2cap_frame_get_be16(frame, &num))
++		return false;
++
++	print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ', num, num);
++
++	for (; num > 0; num--) {
++		uint8_t type;
++		uint16_t len;
++
++		if (!l2cap_frame_get_u8(frame, &type))
++			return false;
++
++		if (!l2cap_frame_get_be16(frame, &len))
++			return false;
++
++		print_field("%*cItem: 0x%02x (%s) ", indent, ' ',
++					type, type2str(type));
++		print_field("%*cLength: 0x%04x (%u)", indent, ' ', len, len);
++
++		switch (type) {
++		case AVRCP_MEDIA_PLAYER_ITEM_TYPE:
++		case AVRCP_FOLDER_ITEM_TYPE:
++		case AVRCP_MEDIA_ELEMENT_ITEM_TYPE:
++			packet_hexdump(frame->data, frame->size);
++			break;
++		}
++	}
++	return true;
++}
++
+ static bool avrcp_set_browsed_player(struct avctp_frame *avctp_frame)
+ {
+ 	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+@@ -1722,6 +1828,9 @@ static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
+ 	case AVRCP_SET_BROWSED_PLAYER:
+ 		avrcp_set_browsed_player(avctp_frame);
+ 		break;
++	case AVRCP_GET_FOLDER_ITEMS:
++		avrcp_get_folder_items(avctp_frame);
++		break;
+ 	default:
+ 		packet_hexdump(frame->data, frame->size);
+ 	}
 -- 
-1.9.3
+1.9.1
 
