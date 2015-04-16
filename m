@@ -1,265 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/client: Allow parsing hex and int arguments
-Date: Thu, 16 Apr 2015 12:27:36 +0200
-Message-ID: <2197509.BIj6Z2QEPY@leonov>
-In-Reply-To: <1429086935-17657-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1429086935-17657-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: Device class not writeable via dbus
+From: Marcus Redeker <marcus@openremote.org>
+In-Reply-To: <CABBYNZKtkTp2-VuP8oEiiKm7AV1n190bcXNXiGjggUWF7w4-Pw@mail.gmail.com>
+Date: Thu, 16 Apr 2015 12:08:56 +0200
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <20F8C232-B06F-4723-8B1A-6E60A14E3B68@openremote.org>
+References: <16972ECC-114B-4CA0-A2B1-1BE0FB115199@openremote.org> <1815811.8ZlaWYb6CG@leonov> <A1432115-C15B-4A07-BB90-E6A731C20B3B@openremote.org> <5181722.aJ0IxrIXHx@uw000953> <CABBYNZ+_kxPquUwh3AQedu+m70PBjC=jwz0X73G6bj8DvJyssQ@mail.gmail.com> <BF008F71-1F11-49B1-ADFF-B883B0C19666@openremote.org> <CABBYNZKtkTp2-VuP8oEiiKm7AV1n190bcXNXiGjggUWF7w4-Pw@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
 
-On Wednesday 15 of April 2015 10:35:35 Grzegorz Kolodziejczyk wrote:
-> This patch modify parsing of arguments. Arguments should be properly
-> parsed as hex (string with 0x) and as integer.
-> ---
->  android/client/if-gatt.c | 56
-> ++++++++++++++++++++++++------------------------ 1 file changed, 28
-> insertions(+), 28 deletions(-)
+> On 16.04.2015, at 11:36, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 > 
-> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-> index 70287fc..aaa4394 100644
-> --- a/android/client/if-gatt.c
-> +++ b/android/client/if-gatt.c
-> @@ -1170,13 +1170,13 @@ static void scan_p(int argc, const char **argv)
+> Hi Marcus,
 > 
->  	/* start */
->  	if (argc >= 4)
-> -		start = atoi(argv[3]);
-> +		start = strtol(argv[3], NULL, 0);
+> On Thu, Apr 16, 2015 at 11:53 AM, Marcus Redeker <marcus@openremote.org> wrote:
+>> 
+>>> On 16.04.2015, at 10:15, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>> 
+>>> Hi Szymon, Marcus,
+>>> 
+>>> On Thu, Apr 16, 2015 at 11:01 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+>>>> Hi Marcus,
+>>>> 
+>>>> On Thursday 16 of April 2015 09:09:28 Marcus Redeker wrote:
+>>>>> True, but  I would like todo that through dbus and not manually and have to restart bluetoothd afterwards.
+>>>>> Any chance this can be done in the near future?
+>>>>> -Marcus
+>>>>> 
+>>>> 
+>>>> Class of Device is rather static configuration as those describe form factor
+>>>> and that usually doesn't change.
+>>>> 
+>>>> Why do you need to change CoD on the fly?
+>>> 
+>>> It is possible to change at runtime by using systemd hostname plugin
+>>> then change the org.freedesktop.hostname1.Chassis property, but Im not
+>>> sure how easy is to change that. Anyway the point is that this should
+>>> not changed by applications at will as it could break discovery
+>>> filtering, even thought filtering by class is probably broken by
+>>> design.
+>>> 
+>>> --
+>>> Luiz Augusto von Dentz
+>> 
+>> This would allow to change the name of the bluetooth adapter but not the device class.
+>> The name can already be changed using the read/write alias property which is no problem.
 > 
->  	EXEC(if_gatt->client->scan, client_if, start);
->  #else
->  	/* start */
->  	if (argc >= 3)
-> -		start = atoi(argv[2]);
-> +		start = strtol(argv[2], NULL, 0);
+> Looks like you know more than us how BlueZ works, perhaps you want to
+> tell me what is this code for:
 > 
->  	EXEC(if_gatt->client->scan, start);
->  #endif
-> @@ -1211,14 +1211,14 @@ static void connect_p(int argc, const char **argv)
+> http://fpaste.org/211586/76181142/
 > 
->  	/* is_direct */
->  	if (argc > 4)
-> -		is_direct = atoi(argv[4]);
-> +		is_direct = strtol(argv[4], NULL, 0);
+> Btw, BLE don't really have a class it has appearance which is not
+> quite the same, we may actually have a different property for
+> appearance along with a main.conf entry to set it and also a
+> conversion from chassis to appearance.
 > 
->  #if ANDROID_VERSION < PLATFORM_VER(5, 0, 0)
->  	EXEC(if_gatt->client->connect, client_if, &bd_addr, is_direct);
->  #else
->  	/* transport */
->  	if (argc > 5)
-> -		transport = atoi(argv[5]);
-> +		transport = strtol(argv[5], NULL, 0);
 > 
->  	EXEC(if_gatt->client->connect, client_if, &bd_addr, is_direct,
->  								transport);
-> @@ -1272,7 +1272,7 @@ static void listen_p(int argc, const char **argv)
 > 
->  	/* start */
->  	if (argc >= 4)
-> -		start = atoi(argv[3]);
-> +		start = strtol(argv[3], NULL, 0);
-> 
->  	EXEC(if_gatt->client->listen, client_if, start);
->  }
-> @@ -1412,7 +1412,7 @@ static void read_characteristic_p(int argc, const char
-> **argv)
-> 
->  	/* auth_req */
->  	if (argc > 5)
-> -		auth_req = atoi(argv[5]);
-> +		auth_req = strtol(argv[5], NULL, 0);
-> 
->  	EXEC(if_gatt->client->read_characteristic, conn_id, &srvc_id, &char_id,
->  								auth_req);
-> @@ -1458,13 +1458,13 @@ static void write_characteristic_p(int argc, const
-> char **argv) haltest_error("No write type specified\n");
->  		return;
->  	}
-> -	write_type = atoi(argv[5]);
-> +	write_type = strtol(argv[5], NULL, 0);
-> 
->  	GET_VERIFY_HEX_STRING(6, value, len);
-> 
->  	/* auth_req */
->  	if (argc > 7)
-> -		auth_req = atoi(argv[7]);
-> +		auth_req = strtol(argv[7], NULL, 0);
-> 
->  	EXEC(if_gatt->client->write_characteristic, conn_id, &srvc_id, &char_id,
->  				write_type, len, auth_req, (char *) value);
-> @@ -1491,7 +1491,7 @@ static void read_descriptor_p(int argc, const char
-> **argv)
-> 
->  	/* auth_req */
->  	if (argc > 6)
-> -		auth_req = atoi(argv[6]);
-> +		auth_req = strtol(argv[6], NULL, 0);
-> 
->  	EXEC(if_gatt->client->read_descriptor, conn_id, &srvc_id, &char_id,
->  							&descr_id, auth_req);
-> @@ -1539,7 +1539,7 @@ static void write_descriptor_p(int argc, const char
-> **argv) haltest_error("No write type specified\n");
->  		return;
->  	}
-> -	write_type = atoi(argv[6]);
-> +	write_type = strtol(argv[6], NULL, 0);
-> 
->  	/* value */
->  	if (argc <= 7) {
-> @@ -1557,7 +1557,7 @@ static void write_descriptor_p(int argc, const char
-> **argv)
-> 
->  	/* auth_req */
->  	if (argc > 8)
-> -		auth_req = atoi(argv[8]);
-> +		auth_req = strtol(argv[8], NULL, 0);
-> 
->  	EXEC(if_gatt->client->write_descriptor, conn_id, &srvc_id, &char_id,
->  			&descr_id, write_type, len, auth_req, (char *) value);
-> @@ -1581,7 +1581,7 @@ static void execute_write_p(int argc, const char
-> **argv) haltest_error("No execute specified\n");
->  		return;
->  	}
-> -	execute = atoi(argv[3]);
-> +	execute = strtol(argv[3], NULL, 0);
-> 
->  	EXEC(if_gatt->client->execute_write, conn_id, execute);
->  }
-> @@ -1807,7 +1807,7 @@ static void scan_filter_enable_p(int argc, const char
-> **argv)
-> 
->  	/* enable */
->  	if (argc >= 4)
-> -		enable = atoi(argv[3]);
-> +		enable = strtol(argv[3], NULL, 0);
-> 
->  	EXEC(if_gatt->client->scan_filter_clear, client_if, enable);
->  }
-> @@ -1841,13 +1841,13 @@ static void set_adv_data_p(int argc, const char
-> **argv)
-> 
->  	/* set scan response */
->  	if (argc >= 4)
-> -		set_scan_rsp = atoi(argv[3]);
-> +		set_scan_rsp = strtol(argv[3], NULL, 0);
->  	/* include name */
->  	if (argc >= 5)
-> -		include_name = atoi(argv[4]);
-> +		include_name = strtol(argv[4], NULL, 0);
->  	/* include txpower */
->  	if (argc >= 6)
-> -		include_txpower = atoi(argv[5]);
-> +		include_txpower = strtol(argv[5], NULL, 0);
-> 
->  	VERIFY_MIN_INTERVAL(6, min_interval);
->  	VERIFY_MAX_INTERVAL(7, max_interval);
-> @@ -2018,13 +2018,13 @@ static void multi_adv_set_inst_data_p(int argc,
-> const char **argv)
-> 
->  	/* set scan response */
->  	if (argc >= 4)
-> -		set_scan_rsp = atoi(argv[3]);
-> +		set_scan_rsp = strtol(argv[3], NULL, 0);
->  	/* include name */
->  	if (argc >= 5)
-> -		include_name = atoi(argv[4]);
-> +		include_name = strtol(argv[4], NULL, 0);
->  	/* include txpower */
->  	if (argc >= 6)
-> -		include_txpower = atoi(argv[5]);
-> +		include_txpower = strtol(argv[5], NULL, 0);
-> 
->  	VERIFY_APPEARANCE(6, appearance);
->  	GET_VERIFY_HEX_STRING(7, manufacturer_data, manufacturer_len);
-> @@ -2206,7 +2206,7 @@ static void test_command_p(int argc, const char
-> **argv) haltest_error("No command specified\n");
->  		return;
->  	}
-> -	command = atoi(argv[2]);
-> +	command = strtol(argv[2], NULL, 0);
-> 
->  	VERIFY_ADDR_ARG(3, &bd_addr);
->  	VERIFY_UUID(4, &uuid);
-> @@ -2366,14 +2366,14 @@ static void gatts_connect_p(int argc, const char
-> *argv[])
-> 
->  	/* is_direct */
->  	if (argc > 4)
-> -		is_direct = atoi(argv[4]);
-> +		is_direct = strtol(argv[4], NULL, 0);
-> 
->  #if ANDROID_VERSION < PLATFORM_VER(5, 0, 0)
->  	EXEC(if_gatt->server->connect, server_if, &bd_addr, is_direct);
->  #else
->  	/* transport */
->  	if (argc > 5)
-> -		transport = atoi(argv[5]);
-> +		transport = strtol(argv[5], NULL, 0);
-> 
->  	EXEC(if_gatt->server->connect, server_if, &bd_addr, is_direct,
->  								transport);
-> @@ -2431,7 +2431,7 @@ static void gatts_add_service_p(int argc, const char
-> *argv[]) haltest_error("No num_handles specified\n");
->  		return;
->  	}
-> -	num_handles = atoi(argv[4]);
-> +	num_handles = strtol(argv[4], NULL, 0);
-> 
->  	EXEC(if_gatt->server->add_service, server_if, &srvc_id, num_handles);
->  }
-> @@ -2479,14 +2479,14 @@ static void gatts_add_characteristic_p(int argc,
-> const char *argv[]) haltest_error("No properties specified\n");
->  		return;
->  	}
-> -	properties = atoi(argv[5]);
-> +	properties = strtol(argv[5], NULL, 0);
-> 
->  	/* permissions */
->  	if (argc <= 6) {
->  		haltest_error("No permissions specified\n");
->  		return;
->  	}
-> -	permissions = atoi(argv[6]);
-> +	permissions = strtol(argv[6], NULL, 0);
-> 
->  	EXEC(if_gatt->server->add_characteristic, server_if, service_handle,
->  						&uuid, properties, permissions);
-> @@ -2514,7 +2514,7 @@ static void gatts_add_descriptor_p(int argc, const
-> char *argv[]) haltest_error("No permissions specified\n");
->  		return;
->  	}
-> -	permissions = atoi(argv[5]);
-> +	permissions = strtol(argv[5], NULL, 0);
-> 
->  	EXEC(if_gatt->server->add_descriptor, server_if, service_handle, &uuid,
->  								permissions);
-> @@ -2540,7 +2540,7 @@ static void gatts_start_service_p(int argc, const char
-> *argv[]) haltest_error("No transport specified\n");
->  		return;
->  	}
-> -	transport = atoi(argv[4]);
-> +	transport = strtol(argv[4], NULL, 0);
-> 
->  	EXEC(if_gatt->server->start_service, server_if, service_handle,
->  								transport);
-> @@ -2601,7 +2601,7 @@ static void gatts_send_indication_p(int argc, const
-> char *argv[]) haltest_error("No transport specified\n");
->  		return;
->  	}
-> -	confirm = atoi(argv[5]);
-> +	confirm = strtol(argv[5], NULL, 0);
-> 
->  	GET_VERIFY_HEX_STRING(6, data, len);
+> -- 
+> Luiz Augusto von Dentz
 
-Applied, thanks.
+Sorry, if I stated something wrong. I did not check the BlueZ code.
+I don’t know BlueZ at all and I am just trying to look at it from a user prospective who is trying to use dbus and BlueZ to create an application.
 
--- 
-BR
-Szymon Janc
+Looking at the complete file hostname.c, I can see that changing the Chassis property would indeed change the device class but only to predefinded values desktop, server, laptop, handset and tablet.
+I will not be able to use it to change to HID device class 0x000540
+
+-Marcus
