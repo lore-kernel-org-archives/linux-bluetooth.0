@@ -1,40 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v2 01/13] doc/device-api: Add ServiceData and ManufacturerData
-Date: Thu, 16 Apr 2015 17:41:03 +0300
-Message-Id: <1429195275-19635-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1429195275-19635-1-git-send-email-luiz.dentz@gmail.com>
-References: <1429195275-19635-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [BlueZ PATCH v2 00/13] Add support for Advertisement Data
+Date: Thu, 16 Apr 2015 17:41:02 +0300
+Message-Id: <1429195275-19635-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds ServiceData and ManufacturerData from advertisement data.
----
- doc/device-api.txt | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+v2: Fix parsing of ServiceData and add a patch to create device objects
+for non-connectable devices.
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index eec0024..72c597e 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -195,3 +195,14 @@ Properties	string Address [readonly]
- 
- 			Received Signal Strength Indicator of the remote
- 			device (inquiry or advertising).
-+
-+		dict ManufacturerData [readonly, optional]
-+
-+			Manufacturer specific advertisement data. Keys are
-+			16 bits Manufacturer ID followed by its byte array
-+			value.
-+
-+		dict ServiceData [readonly, optional]
-+
-+			Service advertisement data. Keys are the UUIDs in
-+			string format followed by its byte array value.
+This adds support for ServiceData and ManufacturerData and make the
+necessary to bluetoothctl to print them:
+
+[bluetooth]# info XX:XX:XX:XX:XX:XX
+Device XX:XX:XX:XX:XX:XX
+	Alias: XX-XX-XX-XX-XX-XX
+	Paired: no
+	Trusted: no
+	Blocked: no
+	Connected: no
+	LegacyPairing: no
+	ManufacturerData Key: 0x004c
+	ManufacturerData Value: 0x0c
+	ManufacturerData Value: 0x0e
+	ManufacturerData Value: 0x00
+	ManufacturerData Value: 0xf1
+	ManufacturerData Value: 0xa6
+	ManufacturerData Value: 0xdc
+	ManufacturerData Value: 0xa1
+	ManufacturerData Value: 0xc0
+	ManufacturerData Value: 0x51
+	ManufacturerData Value: 0x80
+	ManufacturerData Value: 0xa7
+	ManufacturerData Value: 0x83
+	ManufacturerData Value: 0x62
+	ManufacturerData Value: 0x95
+	ManufacturerData Value: 0x18
+	ManufacturerData Value: 0x79
+
+[bluetooth]# info XX:XX:XX:XX:XX:XX
+Device XX:XX:XX:XX:XX:XX
+	Name: URI Beacon
+	Alias: URI Beacon
+	Paired: no
+	Trusted: no
+	Blocked: no
+	Connected: no
+	LegacyPairing: no
+	UUID: Unknown                   (0000fed8-0000-1000-8000-00805f9b34fb)
+	ServiceData Key: fed8
+	ServiceData Value: 0x00
+	ServiceData Value: 0x20
+	ServiceData Value: 0x00
+	ServiceData Value: 0x63
+	ServiceData Value: 0x72
+	ServiceData Value: 0x6f
+	ServiceData Value: 0x73
+	ServiceData Value: 0x73
+	ServiceData Value: 0x77
+	ServiceData Value: 0x61
+	ServiceData Value: 0x6c
+	ServiceData Value: 0x6b
+	ServiceData Value: 0x2d
+	ServiceData Value: 0x70
+	ServiceData Value: 0x72
+	ServiceData Value: 0x6f
+	ServiceData Value: 0x6a
+	ServiceData Value: 0x65
+	ServiceData Value: 0x63
+	ServiceData Value: 0x74
+	ServiceData Value: 0x08
+
+Currently the data is not stored persistently since it may change over
+time, but it should be relatively easy to change that in case we want to
+persist the information over restart/reboot.
+
+Luiz Augusto von Dentz (13):
+  doc/device-api: Add ServiceData and ManufacturerData
+  shared/ad: Add bt_ad_foreach_manufacturer_data
+  shared/ad: Add bt_ad_has_manufacturer_data
+  core/dbus-common: Add dict helpers for basic keys
+  core: Add implementation of ManufacturerData
+  client: Fix no handling dict properly
+  client: Make command info print ManufacturerData
+  shared/ad: Add bt_ad_foreach_service_data
+  shared/ad: Add bt_ad_has_service_data
+  core: Add implementation of ServiceData
+  client: Make command info print ServiceData
+  core/eir: Fix service data parsing
+  core/adapter: Create device even if not-connectable
+
+ client/main.c      |  12 ++++-
+ doc/device-api.txt |  11 +++++
+ src/adapter.c      |  17 +++++--
+ src/dbus-common.c  |  27 ++++++++---
+ src/dbus-common.h  |   5 ++
+ src/device.c       | 137 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/device.h       |   2 +
+ src/eir.c          |   4 ++
+ src/shared/ad.c    | 120 ++++++++++++++++++++++++++++++++++++----------
+ src/shared/ad.h    |  26 ++++++++++
+ 10 files changed, 322 insertions(+), 39 deletions(-)
+
 -- 
 2.1.0
 
