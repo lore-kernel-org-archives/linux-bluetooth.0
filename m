@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v2 10/13] core: Add implementation of ServiceData
-Date: Thu, 16 Apr 2015 17:41:12 +0300
-Message-Id: <1429195275-19635-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [BlueZ PATCH v2 08/13] shared/ad: Add bt_ad_foreach_service_data
+Date: Thu, 16 Apr 2015 17:41:10 +0300
+Message-Id: <1429195275-19635-9-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1429195275-19635-1-git-send-email-luiz.dentz@gmail.com>
 References: <1429195275-19635-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,129 +11,131 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds 'ServiceData' property to Device interface.
+This adds bt_ad_foreach_service_data function that can be used
+list entries added as service data.
 ---
- src/adapter.c |  3 +++
- src/device.c  | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/device.h  |  1 +
- 3 files changed, 69 insertions(+)
+ src/shared/ad.c | 29 ++++++++++++++++-------------
+ src/shared/ad.h |  9 +++++++++
+ 2 files changed, 25 insertions(+), 13 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 078a8d2..9de161b 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5475,6 +5475,9 @@ static void update_found_devices(struct btd_adapter *adapter,
- 		adapter_msd_notify(adapter, dev, eir_data.msd_list);
- 	}
- 
-+	if (eir_data.sd_list)
-+		device_set_service_data(dev, eir_data.sd_list);
-+
- 	eir_data_free(&eir_data);
- 
- 	/*
-diff --git a/src/device.c b/src/device.c
-index 9284b8f..3552999 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1133,6 +1133,47 @@ dev_property_manufacturer_data_exist(const GDBusPropertyTable *property,
- 	return bt_ad_has_manufacturer_data(device->ad, NULL);
- }
- 
-+static void append_service_data(void *data, void *user_data)
-+{
-+	struct bt_ad_service_data *sd = data;
-+	DBusMessageIter *dict = user_data;
-+	char uuid_str[MAX_LEN_UUID_STR];
-+
-+	bt_uuid_to_string(&sd->uuid, uuid_str, sizeof(uuid_str));
-+
-+	dict_append_array(dict, uuid_str, DBUS_TYPE_BYTE, &sd->data, sd->len);
-+}
-+
-+static gboolean
-+dev_property_get_service_data(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_device *device = data;
-+	DBusMessageIter dict;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+					DBUS_TYPE_STRING_AS_STRING
-+					DBUS_TYPE_VARIANT_AS_STRING
-+					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-+					&dict);
-+
-+	bt_ad_foreach_service_data(device->ad, append_service_data, &dict);
-+
-+	dbus_message_iter_close_container(iter, &dict);
-+
-+	return TRUE;
-+}
-+
-+static gboolean
-+dev_property_service_data_exist(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct btd_device *device = data;
-+
-+	return bt_ad_has_service_data(device->ad, NULL);
-+}
-+
- static gboolean disconnect_all(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
-@@ -1481,6 +1522,27 @@ void device_set_manufacturer_data(struct btd_device *dev, GSList *list)
- 	g_slist_foreach(list, add_manufacturer_data, dev);
- }
- 
-+static void add_service_data(void *data, void *user_data)
-+{
-+	struct eir_sd *sd = data;
-+	struct btd_device *dev = user_data;
-+	bt_uuid_t uuid;
-+
-+	if (bt_string_to_uuid(&uuid, sd->uuid) < 0)
-+		return;
-+
-+	if (!bt_ad_add_service_data(dev->ad, &uuid, sd->data, sd->data_len))
-+		return;
-+
-+	g_dbus_emit_property_changed(dbus_conn, dev->path,
-+					DEVICE_INTERFACE, "ServiceData");
-+}
-+
-+void device_set_service_data(struct btd_device *dev, GSList *list)
-+{
-+	g_slist_foreach(list, add_service_data, dev);
-+}
-+
- static struct btd_service *find_connectable_service(struct btd_device *dev,
- 							const char *uuid)
- {
-@@ -2240,6 +2302,9 @@ static const GDBusPropertyTable device_properties[] = {
- 	{ "ManufacturerData", "a{qv}", dev_property_get_manufacturer_data,
- 				NULL, dev_property_manufacturer_data_exist,
- 				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "ServiceData", "a{sv}", dev_property_get_service_data,
-+				NULL, dev_property_service_data_exist,
-+				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ }
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index 90d27e3..7eb74ab 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -33,12 +33,6 @@ struct bt_ad {
+ 	struct queue *service_data;
  };
  
-diff --git a/src/device.h b/src/device.h
-index 1378d0f..b91916d 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -76,6 +76,7 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io);
- void btd_device_add_uuid(struct btd_device *device, const char *uuid);
- void device_add_eir_uuids(struct btd_device *dev, GSList *uuids);
- void device_set_manufacturer_data(struct btd_device *dev, GSList *list);
-+void device_set_service_data(struct btd_device *dev, GSList *list);
- void device_probe_profile(gpointer a, gpointer b);
- void device_remove_profile(gpointer a, gpointer b);
- struct btd_adapter *device_get_adapter(struct btd_device *device);
+-struct uuid_data {
+-	bt_uuid_t uuid;
+-	uint8_t *data;
+-	size_t len;
+-};
+-
+ struct bt_ad *bt_ad_new(void)
+ {
+ 	struct bt_ad *ad;
+@@ -87,7 +81,7 @@ struct bt_ad *bt_ad_ref(struct bt_ad *ad)
+ 
+ static void uuid_destroy(void *data)
+ {
+-	struct uuid_data *uuid_data = data;
++	struct bt_ad_service_data *uuid_data = data;
+ 
+ 	free(uuid_data->data);
+ 	free(uuid_data);
+@@ -95,7 +89,7 @@ static void uuid_destroy(void *data)
+ 
+ static bool uuid_data_match(const void *data, const void *elem)
+ {
+-	const struct uuid_data *uuid_data = elem;
++	const struct bt_ad_service_data *uuid_data = elem;
+ 	const bt_uuid_t *uuid = data;
+ 
+ 	return !bt_uuid_cmp(&uuid_data->uuid, uuid);
+@@ -199,7 +193,7 @@ static size_t uuid_data_length(struct queue *uuid_data)
+ 	entry = queue_get_entries(uuid_data);
+ 
+ 	while (entry) {
+-		struct uuid_data *data = entry->data;
++		struct bt_ad_service_data *data = entry->data;
+ 
+ 		length += 2 + bt_uuid_len(&data->uuid) + data->len;
+ 
+@@ -307,7 +301,7 @@ static void serialize_service_data(struct queue *service_data, uint8_t *buf,
+ 	const struct queue_entry *entry = queue_get_entries(service_data);
+ 
+ 	while (entry) {
+-		struct uuid_data *data = entry->data;
++		struct bt_ad_service_data *data = entry->data;
+ 		int uuid_len = bt_uuid_len(&data->uuid);
+ 
+ 		buf[(*pos)++] =  uuid_len + data->len + 1;
+@@ -565,7 +559,7 @@ void bt_ad_clear_solicit_uuid(struct bt_ad *ad)
+ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
+ 								size_t len)
+ {
+-	struct uuid_data *new_data;
++	struct bt_ad_service_data *new_data;
+ 
+ 	if (!ad)
+ 		return false;
+@@ -573,7 +567,7 @@ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
+ 	if (len > (MAX_ADV_DATA_LEN - 2 - (size_t)bt_uuid_len(uuid)))
+ 		return false;
+ 
+-	new_data = new0(struct uuid_data, 1);
++	new_data = new0(struct bt_ad_service_data, 1);
+ 	if (!new_data)
+ 		return false;
+ 
+@@ -597,9 +591,18 @@ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
+ 	return false;
+ }
+ 
++void bt_ad_foreach_service_data(struct bt_ad *ad, bt_ad_func_t func,
++							void *user_data)
++{
++	if (!ad)
++		return;
++
++	queue_foreach(ad->service_data, func, user_data);
++}
++
+ bool bt_ad_remove_service_data(struct bt_ad *ad, bt_uuid_t *uuid)
+ {
+-	struct uuid_data *data;
++	struct bt_ad_service_data *data;
+ 
+ 	if (!ad)
+ 		return false;
+diff --git a/src/shared/ad.h b/src/shared/ad.h
+index b7d9ade..c31a040 100644
+--- a/src/shared/ad.h
++++ b/src/shared/ad.h
+@@ -33,6 +33,12 @@ struct bt_ad_manufacturer_data {
+ 	size_t len;
+ };
+ 
++struct bt_ad_service_data {
++	bt_uuid_t uuid;
++	uint8_t *data;
++	size_t len;
++};
++
+ struct bt_ad *bt_ad_new(void);
+ 
+ struct bt_ad *bt_ad_ref(struct bt_ad *ad);
+@@ -69,6 +75,9 @@ void bt_ad_clear_solicit_uuid(struct bt_ad *ad);
+ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
+ 								size_t len);
+ 
++void bt_ad_foreach_service_data(struct bt_ad *ad, bt_ad_func_t func,
++							void *user_data);
++
+ bool bt_ad_remove_service_data(struct bt_ad *ad, bt_uuid_t *uuid);
+ 
+ void bt_ad_clear_service_data(struct bt_ad *ad);
 -- 
 2.1.0
 
