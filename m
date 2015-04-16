@@ -3,35 +3,55 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  7/7] doc/test-coverage: Update test-gatt count
-Date: Thu, 16 Apr 2015 18:18:41 +0530
-Message-id: <1429188521-30894-8-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH  6/7] unit/gatt: Add TP/GAW/CL/BI-19-C test
+Date: Thu, 16 Apr 2015 18:18:40 +0530
+Message-id: <1429188521-30894-7-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1429188521-30894-1-git-send-email-gowtham.ab@samsung.com>
 References: <1429188521-30894-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Verify Generic Attribute Profile client behavior when the Characteristic
+Value Reliable Write procedure fails due to insufficient encryption
+key size.
 ---
- doc/test-coverage.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ unit/test-gatt.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
-index 19bb73c..2fb70ad 100644
---- a/doc/test-coverage.txt
-+++ b/doc/test-coverage.txt
-@@ -28,10 +28,10 @@ test-gobex-header	  28	OBEX header handling
- test-gobex-apparam	  18	OBEX apparam handling
- test-gobex-transfer	  36	OBEX transfer handling
- test-gdbus-client	  13	D-Bus client handling
--test-gatt		 159	GATT qualification test cases
-+test-gatt		 180	GATT qualification test cases
- test-hog		   6	HID Over GATT qualification test cases
- 			-----
--			 740
-+			 761
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 40e17fd..415680b 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -1201,6 +1201,14 @@ static const struct test_step test_reliable_write_5 = {
+ 	.length = 0x03
+ };
  
++static const struct test_step test_reliable_write_6 = {
++	.handle = 0x0007,
++	.func = test_reliable_write,
++	.expected_att_ecode = 0x0c,
++	.value = write_data_1,
++	.length = 0x03
++};
++
+ static void att_write_cb(struct gatt_db_attribute *att, int err,
+ 								void *user_data)
+ {
+@@ -3883,6 +3891,14 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x18, 0x00),
+ 			raw_pdu(0x19));
  
- Automated end-to-end testing
++	define_test_client("/TP/GAW/CL/BI-19-C", test_client, service_db_1,
++			&test_reliable_write_6,
++			SERVICE_DATA_1_PDUS,
++			raw_pdu(0x16, 0x07, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x01, 0x16, 0x07, 0x00, 0x0c),
++			raw_pdu(0x18, 0x00),
++			raw_pdu(0x19));
++
+ 	define_test_server("/TP/GAW/SR/BV-06-C/small", test_server,
+ 			ts_small_db, NULL,
+ 			raw_pdu(0x03, 0x00, 0x02),
 -- 
 1.9.1
 
