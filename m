@@ -1,45 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <3B9B5B7C-9801-4A1D-8585-59DBD156148C@holtmann.org>
-References: <1429130874-24831-1-git-send-email-drake@endlessm.com>
-	<3B9B5B7C-9801-4A1D-8585-59DBD156148C@holtmann.org>
-Date: Thu, 16 Apr 2015 10:22:32 -0600
-Message-ID: <CAD8Lp468eiB4j-gTxQrXRHBO_QGsn3_yctyUrE5PFCJA+Xtj4g@mail.gmail.com>
-Subject: Re: [PATCH v7] Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support
-From: Daniel Drake <drake@endlessm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>, Larry Finger <larry.finger@lwfinger.net>,
-	Champion Chen <champion_chen@realsil.com.cn>, Carlo Caione <carlo@endlessm.com>
+In-Reply-To: <1429049221-21984-1-git-send-email-jamuraa@chromium.org>
+References: <1429049221-21984-1-git-send-email-jamuraa@chromium.org>
+Date: Thu, 16 Apr 2015 18:05:43 +0300
+Message-ID: <CABBYNZLrTeEPMzMq_5tfERZmGmCc_wnb-uQT0qYLAK-Hc1NXGg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 0/6] Improvements to the LE Advertising API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for the fast feedback!
+Hi Michael,
 
-On Wed, Apr 15, 2015 at 4:26 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Since this is not your fault, I am willing to merge this change (after mi=
-nor cleanup) and then convert it over to move the vendor HCI commands into =
-btrtl.ko separate module.
+On Wed, Apr 15, 2015 at 1:06 AM, Michael Janssen <jamuraa@chromium.org> wrote:
+> Adds a method to add the TX Power attribute to the advertisements that are sent
+> through the D-Bus interface, and supports more than one advertisement based on
+> the maximum number reported by the kernel.
 >
-> I have already done this for btbcm.ko and btintel.ko and I will do this w=
-ith other vendor details as well. So this is the strategy that we are headi=
-ng towards. As I said, this is something that came along and is a new requi=
-rement and I am willing to do fix this up for you after merging the patch. =
-So nothing to worry about. It is just a heads up.
-
-Nice. I would be happy to do this, but it might take me a week or so
-to get to it.
-
-> This needs to be a separate patch on top of adding basic support for Real=
-tek devices. So please split this out.
+> v1 -> v2:
+>   * Rebase
+>   * Bugfixes
+>   * Improve error messages from MGMT api
+>   * Fix possible issue with dbus_bool_t type
+>   * Patch to fix object matching
+>   * Fix instance ids
 >
-> And while you do, please create a data->flags for it and not copy the dri=
-ver_info into the btusb_data structure. Lets define a common flag indicatin=
-g the need for reset_resume =3D 1. And then only if the Realtek hardware ha=
-s been detected, this flag gets set.
+> Michael Janssen (6):
+>   core/advertising: Fix dbus object matching
+>   doc: Add IncludeTXPower to LE Advertising API
+>   core/advertising: Parse IncludeTXPower
+>   core/advertising: Support more than one advertisement.
+>   test: add IncludeTXPower to example-advertisement
+>   core/advertising: improve errors for add advertising
+>
+>  doc/advertising-api.txt    |   5 ++
+>  src/advertising.c          | 150 ++++++++++++++++++++++++++++++++++++++-------
+>  test/example-advertisement |   4 ++
+>  3 files changed, 137 insertions(+), 22 deletions(-)
+>
+> --
+> 2.2.0.rc0.207.ga3a616c
 
-OK. I will submit this as a separate patch once the main part has gone in.
+Applied, thanks.
 
-Thanks
-Daniel
+
+-- 
+Luiz Augusto von Dentz
