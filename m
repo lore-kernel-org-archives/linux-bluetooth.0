@@ -1,46 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] Bluetooth: Pre-initialize variables in read_local_oob_ext_data_complete()
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Fix two coding style issues
-Date: Thu, 16 Apr 2015 23:15:50 +0200
-Message-Id: <1429218950-21313-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1429212265-26750-1-git-send-email-geert@linux-m68k.org>
+Date: Thu, 16 Apr 2015 13:34:54 -0700
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Message-Id: <A962A040-4EB5-4AE6-A790-A8767185172B@holtmann.org>
+References: <1429212265-26750-1-git-send-email-geert@linux-m68k.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ERROR: spaces required around that '<' (ctx:WxV)
-+		if (err <0)
- 		        ^
+Hi Geert,
 
-ERROR: code indent should use tabs where possible
-+^I^I^I^I        sizeof(ver));$
+> net/bluetooth/mgmt.c: In function ‘read_local_oob_ext_data_complete’:
+> net/bluetooth/mgmt.c:6474: warning: ‘r256’ may be used uninitialized in this function
+> net/bluetooth/mgmt.c:6474: warning: ‘h256’ may be used uninitialized in this function
+> net/bluetooth/mgmt.c:6474: warning: ‘r192’ may be used uninitialized in this function
+> net/bluetooth/mgmt.c:6474: warning: ‘h192’ may be used uninitialized in this function
+> 
+> While these are false positives, the code can be shortened by
+> pre-initializing the hash table pointers and eir_len. This has the side
+> effect of killing the compiler warnings.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btusb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+can you be a bit specific on which compiler version is this. I fixed one occurrence that seemed valid. However in this case the compiler seems to be just plain stupid. On a gcc 4.9, I am not seeing these for example.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 84f998532117..920f6fbd28ac 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -916,7 +916,7 @@ static int btusb_open(struct hci_dev *hdev)
- 	 */
- 	if (data->setup_on_usb) {
- 		err = data->setup_on_usb(hdev);
--		if (err <0)
-+		if (err < 0)
- 			return err;
- 	}
- 
-@@ -2973,7 +2973,7 @@ static int btusb_setup_qca(struct hci_dev *hdev)
- 	int i, err;
- 
- 	err = btusb_qca_send_vendor_req(hdev, QCA_GET_TARGET_VERSION, &ver,
--				        sizeof(ver));
-+					sizeof(ver));
- 	if (err < 0)
- 		return err;
- 
--- 
-2.1.0
+Regards
+
+Marcel
 
