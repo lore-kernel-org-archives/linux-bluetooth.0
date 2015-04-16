@@ -1,110 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v2 00/13] Add support for Advertisement Data
-Date: Thu, 16 Apr 2015 17:41:02 +0300
-Message-Id: <1429195275-19635-1-git-send-email-luiz.dentz@gmail.com>
+References: <1429011468-13667-1-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1429011468-13667-1-git-send-email-gowtham.ab@samsung.com>
+Subject: RE: [PATCH] tools: Handle the common profile & service ecode
+Date: Thu, 16 Apr 2015 19:23:10 +0530
+Message-id: <000301d0784c$be534440$3af9ccc0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Ping.
 
-v2: Fix parsing of ServiceData and add a patch to create device objects
-for non-connectable devices.
-
-This adds support for ServiceData and ManufacturerData and make the
-necessary to bluetoothctl to print them:
-
-[bluetooth]# info XX:XX:XX:XX:XX:XX
-Device XX:XX:XX:XX:XX:XX
-	Alias: XX-XX-XX-XX-XX-XX
-	Paired: no
-	Trusted: no
-	Blocked: no
-	Connected: no
-	LegacyPairing: no
-	ManufacturerData Key: 0x004c
-	ManufacturerData Value: 0x0c
-	ManufacturerData Value: 0x0e
-	ManufacturerData Value: 0x00
-	ManufacturerData Value: 0xf1
-	ManufacturerData Value: 0xa6
-	ManufacturerData Value: 0xdc
-	ManufacturerData Value: 0xa1
-	ManufacturerData Value: 0xc0
-	ManufacturerData Value: 0x51
-	ManufacturerData Value: 0x80
-	ManufacturerData Value: 0xa7
-	ManufacturerData Value: 0x83
-	ManufacturerData Value: 0x62
-	ManufacturerData Value: 0x95
-	ManufacturerData Value: 0x18
-	ManufacturerData Value: 0x79
-
-[bluetooth]# info XX:XX:XX:XX:XX:XX
-Device XX:XX:XX:XX:XX:XX
-	Name: URI Beacon
-	Alias: URI Beacon
-	Paired: no
-	Trusted: no
-	Blocked: no
-	Connected: no
-	LegacyPairing: no
-	UUID: Unknown                   (0000fed8-0000-1000-8000-00805f9b34fb)
-	ServiceData Key: fed8
-	ServiceData Value: 0x00
-	ServiceData Value: 0x20
-	ServiceData Value: 0x00
-	ServiceData Value: 0x63
-	ServiceData Value: 0x72
-	ServiceData Value: 0x6f
-	ServiceData Value: 0x73
-	ServiceData Value: 0x73
-	ServiceData Value: 0x77
-	ServiceData Value: 0x61
-	ServiceData Value: 0x6c
-	ServiceData Value: 0x6b
-	ServiceData Value: 0x2d
-	ServiceData Value: 0x70
-	ServiceData Value: 0x72
-	ServiceData Value: 0x6f
-	ServiceData Value: 0x6a
-	ServiceData Value: 0x65
-	ServiceData Value: 0x63
-	ServiceData Value: 0x74
-	ServiceData Value: 0x08
-
-Currently the data is not stored persistently since it may change over
-time, but it should be relatively easy to change that in case we want to
-persist the information over restart/reboot.
-
-Luiz Augusto von Dentz (13):
-  doc/device-api: Add ServiceData and ManufacturerData
-  shared/ad: Add bt_ad_foreach_manufacturer_data
-  shared/ad: Add bt_ad_has_manufacturer_data
-  core/dbus-common: Add dict helpers for basic keys
-  core: Add implementation of ManufacturerData
-  client: Fix no handling dict properly
-  client: Make command info print ManufacturerData
-  shared/ad: Add bt_ad_foreach_service_data
-  shared/ad: Add bt_ad_has_service_data
-  core: Add implementation of ServiceData
-  client: Make command info print ServiceData
-  core/eir: Fix service data parsing
-  core/adapter: Create device even if not-connectable
-
- client/main.c      |  12 ++++-
- doc/device-api.txt |  11 +++++
- src/adapter.c      |  17 +++++--
- src/dbus-common.c  |  27 ++++++++---
- src/dbus-common.h  |   5 ++
- src/device.c       | 137 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/device.h       |   2 +
- src/eir.c          |   4 ++
- src/shared/ad.c    | 120 ++++++++++++++++++++++++++++++++++++----------
- src/shared/ad.h    |  26 ++++++++++
- 10 files changed, 322 insertions(+), 39 deletions(-)
-
--- 
-2.1.0
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Tuesday, April 14, 2015 5:08 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
+> Babu
+> Subject: [PATCH] tools: Handle the common profile & service ecode
+> 
+> Handles the common profile and service error codes sent over the Attribute
+> Protocol in btgatt-client and monitor.
+> ---
+>  monitor/l2cap.c       | 9 +++++++++
+>  tools/btgatt-client.c | 6 ++++++
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/monitor/l2cap.c b/monitor/l2cap.c index fc565b1..55efa54
+100644
+> --- a/monitor/l2cap.c
+> +++ b/monitor/l2cap.c
+> @@ -2046,6 +2046,15 @@ static void att_error_response(const struct
+> l2cap_frame *frame)
+>  	case 0x11:
+>  		str = "Insufficient Resources";
+>  		break;
+> +	case 0xfd:
+> +		str = "CCC Improperly Configured";
+> +		break;
+> +	case 0xfe:
+> +		str = "Procedure Already in Progress";
+> +		break;
+> +	case 0xff:
+> +		str = "Out of Range";
+> +		break;
+>  	default:
+>  		str = "Reserved";
+>  		break;
+> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c index
+> ee5315d..3935a7e 100644
+> --- a/tools/btgatt-client.c
+> +++ b/tools/btgatt-client.c
+> @@ -114,6 +114,12 @@ static const char *ecode_to_string(uint8_t ecode)
+>  		return "Group type Not Supported";
+>  	case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
+>  		return "Insufficient Resources";
+> +	case BT_ERROR_CCC_IMPROPERLY_CONFIGURED:
+> +		return "CCC Improperly Configured";
+> +	case BT_ERROR_ALREADY_IN_PROGRESS:
+> +		return "Procedure Already in Progress";
+> +	case BT_ERROR_OUT_OF_RANGE:
+> +		return "Out of Range";
+>  	default:
+>  		return "Unknown error type";
+>  	}
+> --
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
