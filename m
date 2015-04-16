@@ -1,58 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  0/7] Add Characteristic Value Reliable Write client TC's
-Date: Thu, 16 Apr 2015 18:18:34 +0530
-Message-id: <1429188521-30894-1-git-send-email-gowtham.ab@samsung.com>
+Subject: Re: [PATCH] android/avrcp-lib: Use void pointer in register_notification
+Date: Thu, 16 Apr 2015 13:24:23 +0200
+Message-ID: <204171214.V0XEUk3NZF@leonov>
+In-Reply-To: <1429019315-29216-1-git-send-email-szymon.janc@tieto.com>
+References: <1429019315-29216-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds the below client test cases:
-1) Characteristic Value Reliable Write - by Client
-2) Characteristic Value Reliable Write – Invalid Handle
-3) Characteristic Value Reliable Write – Write Not Permitted
-4) Characteristic Value Reliable Write – Insufficient Authorization
-5) Characteristic Value Reliable Write – Insufficient Authentication
-6) Characteristic Value Reliable Write – Insufficient Encryption Key Size
+On Tuesday 14 of April 2015 15:48:35 Szymon Janc wrote:
+> In this callback params vary depending on code. Passing those as void*
+> allows to avoid extra memcpy that would be otherwise needed to
+> avoid warnings due to increased alignment when casting.
+> ---
+>  android/avrcp-lib.h | 2 +-
+>  android/avrcp.c     | 5 +++--
+>  unit/test-avrcp.c   | 9 +++++----
+>  3 files changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+> index add7739..6554b12 100644
+> --- a/android/avrcp-lib.h
+> +++ b/android/avrcp-lib.h
+> @@ -224,7 +224,7 @@ struct avrcp_control_cfm {
+>  					char **text, void *user_data);
+>  	bool (*register_notification) (struct avrcp *session, int err,
+>  					uint8_t code, uint8_t event,
+> -					uint8_t *params, void *user_data);
+> +					void *params, void *user_data);
+>  	void (*set_volume) (struct avrcp *session, int err, uint8_t volume,
+>  					void *user_data);
+>  	void (*set_addressed) (struct avrcp *session, int err,
+> diff --git a/android/avrcp.c b/android/avrcp.c
+> index bcb4228..8c3e25a 100644
+> --- a/android/avrcp.c
+> +++ b/android/avrcp.c
+> @@ -748,11 +748,12 @@ static const struct avrcp_control_ind control_ind = {
+> 
+>  static bool handle_register_notification_rsp(struct avrcp *session, int
+> err, uint8_t code, uint8_t event,
+> -						uint8_t *params,
+> +						void *params,
+>  						void *user_data)
+>  {
+>  	struct avrcp_device *dev = user_data;
+>  	struct hal_ev_avrcp_volume_changed ev;
+> +	uint8_t *volume = params;
+> 
+>  	if (err < 0) {
+>  		error("AVRCP: %s", strerror(-err));
+> @@ -766,7 +767,7 @@ static bool handle_register_notification_rsp(struct
+> avrcp *session, int err, return false;
+> 
+>  	ev.type = code;
+> -	ev.volume = params[0] & 0x7f;
+> +	ev.volume = volume[0];
+> 
+>  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
+>  					HAL_EV_AVRCP_VOLUME_CHANGED,
+> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+> index a610ad5..01307e6 100644
+> --- a/unit/test-avrcp.c
+> +++ b/unit/test-avrcp.c
+> @@ -826,22 +826,23 @@ static void set_volume_rsp(struct avrcp *session, int
+> err, uint8_t volume,
+> 
+>  static bool register_notification_rsp(struct avrcp *session, int err,
+>  					uint8_t code, uint8_t event,
+> -					uint8_t *params, void *user_data)
+> +					void *params, void *user_data)
+>  {
+>  	struct context *context = user_data;
+> +	uint8_t *p = params;
+> 
+>  	g_assert_cmpint(err, ==, 0);
+> 
+>  	switch (event) {
+>  	case AVRCP_EVENT_VOLUME_CHANGED:
+>  		if (g_str_equal(context->data->test_name, "/TP/VLH/BV-03-C")) {
+> -			g_assert_cmpint(params[0], ==, 0);
+> +			g_assert_cmpint(p[0], ==, 0);
+>  			break;
+>  		} else if (code == AVC_CTYPE_INTERIM) {
+> -			g_assert_cmpint(params[0], ==, 0);
+> +			g_assert_cmpint(p[0], ==, 0);
+>  			return true;
+>  		}
+> -		g_assert_cmpint(params[0], ==, 1);
+> +		g_assert_cmpint(p[0], ==, 1);
+>  		break;
+>  	}
 
-Current GATT TS Summary:
-------------------------------------------------------------------------
-Group                       Client                          Server
--------------------------------------------------------------------------
-Configuration             100% (1 / 1)                100% (1 / 1)
-Discovery                  75% (6 / 8)                  75% (6 / 8)
-Read                         100% (40 / 40)           40.5% (17 / 42)
-Write                        82.1% (32 / 39)             41.5% (17 / 41)
-Notification/Indication 100% (2 / 2)                  100% (2 / 2)
-Services                    0% (0 / 1)                   0% (0 / 1)
-Timeouts                   0% (0 / 2)                   0% (0 / 1)
-Attributes                  0% (0 / 10)                  0% (0 / 10)
-----------------------------------------------------------------------------
-Total                         78.6% (81 / 103)         40.5% (43 / 106)
-----------------------------------------------------------------------------
-
-ps: Not included the extra tests like small vs large DB, etc., computed it as single.
-
-The reason for low server test cases are its missing functionality (encryption / authorization / authentication),
-as discussed in the previous thread http://thread.gmane.org/gmane.linux.bluez.kernel/58852/focus=58853.
-
-Gowtham Anandha Babu (7):
-  unit/gatt: Add TP/GAW/CL/BV-06-C test
-  unit/gatt: Add TP/GAW/CL/BI-14-C test
-  unit/gatt: Add TP/GAW/CL/BI-15-C test
-  unit/gatt: Add TP/GAW/CL/BI-17-C test
-  unit/gatt: Add TP/GAW/CL/BI-18-C test
-  unit/gatt: Add TP/GAW/CL/BI-19-C test
-  doc/test-coverage: Update test-gatt count
-
- doc/test-coverage.txt |   4 +-
- unit/test-gatt.c      | 119 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 121 insertions(+), 2 deletions(-)
+Applied.
 
 -- 
-1.9.1
-
+BR
+Szymon Janc
