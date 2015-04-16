@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v2 13/13] core/adapter: Create device even if not-connectable
-Date: Thu, 16 Apr 2015 17:41:15 +0300
-Message-Id: <1429195275-19635-14-git-send-email-luiz.dentz@gmail.com>
+Subject: [BlueZ PATCH v2 12/13] core/eir: Fix service data parsing
+Date: Thu, 16 Apr 2015 17:41:14 +0300
+Message-Id: <1429195275-19635-13-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1429195275-19635-1-git-send-email-luiz.dentz@gmail.com>
 References: <1429195275-19635-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,52 +11,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If the device is in fact discoverable it should be no problem to create
-a D-Bus object for it as the object is required in order to attach the
-advertisement data in case a broadcaster/beacons come in range.
+The UUID type was not being set correctly.
 ---
- src/adapter.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ src/eir.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 9de161b..5af8489 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5373,6 +5373,7 @@ static void update_found_devices(struct btd_adapter *adapter,
- 					const bdaddr_t *bdaddr,
- 					uint8_t bdaddr_type, int8_t rssi,
- 					bool confirm, bool legacy,
-+					bool not_connectable,
- 					const uint8_t *data, uint8_t data_len)
- {
- 	struct btd_device *dev;
-@@ -5501,6 +5502,10 @@ static void update_found_devices(struct btd_adapter *adapter,
- 	return;
+diff --git a/src/eir.c b/src/eir.c
+index 34f6e16..c984fa5 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -191,6 +191,7 @@ static void eir_parse_uuid16_data(struct eir_data *eir, const uint8_t *data,
+ 	if (len < 2 || len > EIR_SD_MAX_LEN)
+ 		return;
  
- connect_le:
-+	/* Ignore non-connectable events */
-+	if (not_connectable)
-+		return;
-+
- 	/*
- 	 * If we're in the process of stopping passive scanning and
- 	 * connecting another (or maybe even the same) LE device just
-@@ -5563,15 +5568,12 @@ static void device_found_callback(uint16_t index, uint16_t length,
- 	DBG("hci%u addr %s, rssi %d flags 0x%04x eir_len %u",
- 			index, addr, ev->rssi, flags, eir_len);
- 
--	/* Ignore non-connectable events for now */
--	if (flags & MGMT_DEV_FOUND_NOT_CONNECTABLE)
--		return;
--
- 	confirm_name = (flags & MGMT_DEV_FOUND_CONFIRM_NAME);
- 	legacy = (flags & MGMT_DEV_FOUND_LEGACY_PAIRING);
- 
- 	update_found_devices(adapter, &ev->addr.bdaddr, ev->addr.type,
- 					ev->rssi, confirm_name, legacy,
-+					flags & MGMT_DEV_FOUND_NOT_CONNECTABLE,
- 					eir, eir_len);
++	service.type = SDP_UUID16;
+ 	service.value.uuid16 = get_le16(data);
+ 	eir_parse_sd(eir, &service, data + 2, len - 2);
  }
+@@ -203,6 +204,7 @@ static void eir_parse_uuid32_data(struct eir_data *eir, const uint8_t *data,
+ 	if (len < 4 || len > EIR_SD_MAX_LEN)
+ 		return;
+ 
++	service.type = SDP_UUID32;
+ 	service.value.uuid32 = get_le32(data);
+ 	eir_parse_sd(eir, &service, data + 4, len - 4);
+ }
+@@ -216,6 +218,8 @@ static void eir_parse_uuid128_data(struct eir_data *eir, const uint8_t *data,
+ 	if (len < 16 || len > EIR_SD_MAX_LEN)
+ 		return;
+ 
++	service.type = SDP_UUID128;
++
+ 	for (k = 0; k < 16; k++)
+ 		service.value.uuid128.data[k] = data[16 - k - 1];
  
 -- 
 2.1.0
