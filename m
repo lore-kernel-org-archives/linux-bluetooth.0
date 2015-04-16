@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v2 09/13] shared/ad: Add bt_ad_has_service_data
-Date: Thu, 16 Apr 2015 17:41:11 +0300
-Message-Id: <1429195275-19635-10-git-send-email-luiz.dentz@gmail.com>
+Subject: [BlueZ PATCH v2 07/13] client: Make command info print ManufacturerData
+Date: Thu, 16 Apr 2015 17:41:09 +0300
+Message-Id: <1429195275-19635-8-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1429195275-19635-1-git-send-email-luiz.dentz@gmail.com>
 References: <1429195275-19635-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,76 +11,23 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds bt_ad_has_service_data function that can be used to
-verify if data exists or in case of NULL if any data has been added.
+This makes command info to also print ManufacturerData if available.
 ---
- src/shared/ad.c | 31 +++++++++++++++++++++++++++++++
- src/shared/ad.h |  3 +++
- 2 files changed, 34 insertions(+)
+ client/main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index 7eb74ab..83f01e4 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -583,6 +583,11 @@ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
- 
- 	new_data->len = len;
- 
-+	if (bt_ad_has_service_data(ad, new_data)) {
-+		uuid_destroy(new_data);
-+		return false;
-+	}
-+
- 	if (queue_push_tail(ad->service_data, new_data))
- 		return true;
- 
-@@ -591,6 +596,32 @@ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
- 	return false;
+diff --git a/client/main.c b/client/main.c
+index 1e76aef..f7a50f6 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -950,6 +950,7 @@ static void cmd_info(const char *arg)
+ 	print_property(proxy, "LegacyPairing");
+ 	print_uuids(proxy);
+ 	print_property(proxy, "Modalias");
++	print_property(proxy, "ManufacturerData");
  }
  
-+static bool service_data_match(const void *data, const void *user_data)
-+{
-+	const struct bt_ad_service_data *s1 = data;
-+	const struct bt_ad_service_data *s2 = data;
-+
-+	if (bt_uuid_cmp(&s1->uuid, &s2->uuid))
-+		return false;
-+
-+	if (s1->len != s2->len)
-+		return false;
-+
-+	return !memcmp(s1->data, s2->data, s1->len);
-+}
-+
-+bool bt_ad_has_service_data(struct bt_ad *ad,
-+					const struct bt_ad_service_data *data)
-+{
-+	if (!ad)
-+		return false;
-+
-+	if (!data)
-+		return !queue_isempty(ad->service_data);
-+
-+	return queue_find(ad->service_data, service_data_match, data);
-+}
-+
- void bt_ad_foreach_service_data(struct bt_ad *ad, bt_ad_func_t func,
- 							void *user_data)
- {
-diff --git a/src/shared/ad.h b/src/shared/ad.h
-index c31a040..4b313ab 100644
---- a/src/shared/ad.h
-+++ b/src/shared/ad.h
-@@ -75,6 +75,9 @@ void bt_ad_clear_solicit_uuid(struct bt_ad *ad);
- bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
- 								size_t len);
- 
-+bool bt_ad_has_service_data(struct bt_ad *ad,
-+					const struct bt_ad_service_data *data);
-+
- void bt_ad_foreach_service_data(struct bt_ad *ad, bt_ad_func_t func,
- 							void *user_data);
- 
+ static void pair_reply(DBusMessage *message, void *user_data)
 -- 
 2.1.0
 
