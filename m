@@ -1,102 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] hog: rework HoG report notification enable
-Message-Id: <20150417220033.1BD45220209@puck.mtv.corp.google.com>
-Date: Fri, 17 Apr 2015 15:00:32 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [V4.1] Regression: Bluetooth mouse not working.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CA+55aFz=9pmC5gBY11Lcwizro1KzSt1ms6iUkOLUNJovHu4k4A@mail.gmail.com>
+Date: Fri, 17 Apr 2015 14:26:04 -0700
+Cc: =?utf-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Message-Id: <BD15FF48-C4C3-4FE6-BF24-7BB6B461AE07@holtmann.org>
+References: <CADDKRnBzf+dPqzHxXBWynwssc4su-7LVDCteZCNJJXJEuVca0w@mail.gmail.com> <CA+55aFz3hLbESYbzeMWtyMLbYnCUr-Tx56DA_C=39wxhVGJd6g@mail.gmail.com> <CADDKRnCsTgDfAZ+rbzKvEXh2ut2=sMKBfS7a7YR+5Rxi02557g@mail.gmail.com> <CADDKRnBiB+z2iMc+04ZzntRkGhVW5isNQ+sLt-UVPg3mo+Q7jg@mail.gmail.com> <300602D8-9DB7-4F8D-AC97-B60924554093@holtmann.org> <CADDKRnB0ioBM+EQcNfuk4=BRw=CCxi4aFfZVpSXzJWmBPSNy+g@mail.gmail.com> <38429B86-0E46-4C6A-9954-3260D864B10C@holtmann.org> <CA+55aFx+NrXEtd4bveFbZqw0r9UHxkrQ7rzdZBbfBiGdvEX3zw@mail.gmail.com> <024FA95B-C70F-42ED-BDBF-69D09AA58203@holtmann.org> <CA+55aFz=9pmC5gBY11Lcwizro1KzSt1ms6iUkOLUNJovHu4k4A@mail.gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-1. Add client characteristic configuration handle (ccc_handle) to
-   HoG report structure.
-2. Rename write_ccc() to enable_report_notification().
-3. Rename report_ccc_written_cb() to report_notification_enable_cb().
-4. In enable_report_notification(), first register the callback for
-   HoG report notifications and then enable the notification on the
-   HoG device.
-5. In report_notification_enable_cb(), improve the emitted messages.
----
- profiles/input/hog.c | 40 ++++++++++++++++++++++++----------------
- 1 file changed, 24 insertions(+), 16 deletions(-)
+Hi Linus,
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index 3d23d5b..c55443c 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -98,6 +98,7 @@ struct hog_device {
- struct report {
- 	uint8_t			id;
- 	uint8_t			type;
-+	uint16_t		ccc_handle;
- 	guint			notifyid;
- 	struct gatt_char	*decl;
- 	struct hog_device	*hogdev;
-@@ -146,34 +147,40 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
- 	DBG("HoG report (%u bytes)", ev.u.input.size);
- }
- 
--static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
-+static void report_notification_enable_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data)
- {
- 	struct report *report = user_data;
--	struct hog_device *hogdev = report->hogdev;
- 
- 	if (status != 0) {
--		error("Write report characteristic descriptor failed: %s",
--							att_ecode2str(status));
-+		error("Report 0x%04x client characteristic configuration "
-+		      "write failed: %s",
-+				report->decl->handle, att_ecode2str(status));
- 		return;
- 	}
- 
--	report->notifyid = g_attrib_register(hogdev->attrib,
--					ATT_OP_HANDLE_NOTIFY,
--					report->decl->value_handle,
--					report_value_cb, report, NULL);
--
--	DBG("Report characteristic descriptor written: notifications enabled");
-+	DBG("Report 0x%04x client characteristic configuration written: "
-+	    "notifications enabled", report->decl->handle);
- }
- 
--static void write_ccc(uint16_t handle, gpointer user_data)
-+static void enable_report_notification(struct report *report)
- {
--	struct report *report = user_data;
- 	struct hog_device *hogdev = report->hogdev;
--	uint8_t value[] = { 0x01, 0x00 };
-+	uint8_t value[2];
-+
-+	if (!report->ccc_handle)
-+		return;
-+
-+	/* Register callback for HoG report notifications */
-+	report->notifyid = g_attrib_register(hogdev->attrib,
-+					ATT_OP_HANDLE_NOTIFY,
-+					report->decl->value_handle,
-+					report_value_cb, report, NULL);
- 
--	gatt_write_char(hogdev->attrib, handle, value, sizeof(value),
--					report_ccc_written_cb, report);
-+	/* Enable the HoG report notification */
-+	put_le16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
-+	gatt_write_char(hogdev->attrib, report->ccc_handle, value,
-+			sizeof(value), report_notification_enable_cb, report);
- }
- 
- static void report_reference_cb(guint8 status, const guint8 *pdu,
-@@ -220,7 +227,8 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
- 		switch (desc->uuid16) {
- 		case GATT_CLIENT_CHARAC_CFG_UUID:
- 			report = user_data;
--			write_ccc(desc->handle, report);
-+			report->ccc_handle = desc->handle;
-+			enable_report_notification(report);
- 			break;
- 		case GATT_REPORT_REFERENCE:
- 			report = user_data;
--- 
-2.2.0.rc0.207.ga3a616c
+>> accepting all flags regardless was an oversight on my part in the first place. What this patch tried to do is to limit it to what userspace is currently actually using. My mistake was to look only at BlueZ 5.x userspace and not at BlueZ 4.x userspace.
+> 
+> So what about anybody else? Android doesn't use BlueZ, afaik. Any
+> other direct accesses?
+
+this interface is for bluetoothd (Bluetooth userspace daemon) since you need to do a lot of initial setup before you can hand this over to the kernel to drive HID. On Android this was never used. And even BlueZ for Android (replacement for Bluedroid) is not using it today either.
+
+Google Fiber (their set-top boxes) actually moved this all over to /dev/uhid now since it gives them better re-connect experience for their remotes.
+
+> If we already know that BlueZ 4.x did something else, what makes you
+> so sure that this now covers all cases?
+
+I am certain since nothing else than bluetoothd ever used this interface.
+
+> The thing is, the bluetooth code has clearly never cared about these
+> bits before. Is there any real reason to think that people haven't
+> passed in garbage? Do we even know that those flags were *initialized*
+> at all by user space in all use cases?
+> 
+> So I'm ok with trying to fix things up, but I have to say that if the
+> fixed-up case also causes problems (because there was some other case
+> that you didn't think of), I'm going to be pissed off, and I'm going
+> to expect you to *jump* on it, and revert the whole thing.
+
+The reason why I starting cleaning this up is because there is an overlay with internal and external flags mixed together. This is clearly a bug, but sadly that also can open up security issues since we clearly do not want userspace allowing messing with internal flags. That is actually worse.
+
+My viewpoint is the reverting the whole patch is actually not helping here either. So either we take the patch that I just send around to fix the breakage that I caused with BlueZ 4.x userspace. Or an as alternative we keep allowing userspace to provide whatever flags it wants, but clear all unknown ones before using them in the HIDP logic. My intent was to make this old code less vulnerable.
+
+Is one of these options acceptable for you compared to reverting the whole patch?
+
+Regards
+
+Marcel
 
