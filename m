@@ -1,70 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: linus971@gmail.com
-In-Reply-To: <38429B86-0E46-4C6A-9954-3260D864B10C@holtmann.org>
-References: <CADDKRnBzf+dPqzHxXBWynwssc4su-7LVDCteZCNJJXJEuVca0w@mail.gmail.com>
-	<CA+55aFz3hLbESYbzeMWtyMLbYnCUr-Tx56DA_C=39wxhVGJd6g@mail.gmail.com>
-	<CADDKRnCsTgDfAZ+rbzKvEXh2ut2=sMKBfS7a7YR+5Rxi02557g@mail.gmail.com>
-	<CADDKRnBiB+z2iMc+04ZzntRkGhVW5isNQ+sLt-UVPg3mo+Q7jg@mail.gmail.com>
-	<300602D8-9DB7-4F8D-AC97-B60924554093@holtmann.org>
-	<CADDKRnB0ioBM+EQcNfuk4=BRw=CCxi4aFfZVpSXzJWmBPSNy+g@mail.gmail.com>
-	<38429B86-0E46-4C6A-9954-3260D864B10C@holtmann.org>
-Date: Fri, 17 Apr 2015 16:18:20 -0400
-Message-ID: <CA+55aFx+NrXEtd4bveFbZqw0r9UHxkrQ7rzdZBbfBiGdvEX3zw@mail.gmail.com>
-Subject: Re: [V4.1] Regression: Bluetooth mouse not working.
-From: Linus Torvalds <torvalds@linux-foundation.org>
+Sender: geert.uytterhoeven@gmail.com
+In-Reply-To: <A962A040-4EB5-4AE6-A790-A8767185172B@holtmann.org>
+References: <1429212265-26750-1-git-send-email-geert@linux-m68k.org>
+	<A962A040-4EB5-4AE6-A790-A8767185172B@holtmann.org>
+Date: Fri, 17 Apr 2015 22:03:29 +0200
+Message-ID: <CAMuHMdUxnrg1BVoFpKExzGHKj2aOmYGp+wChhMbPfmWvMzQT=Q@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Pre-initialize variables in read_local_oob_ext_data_complete()
+From: Geert Uytterhoeven <geert@linux-m68k.org>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?UTF-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Apr 17, 2015 at 1:02 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+Hi Marcel,
+
+On Thu, Apr 16, 2015 at 10:34 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+>> net/bluetooth/mgmt.c: In function =E2=80=98read_local_oob_ext_data_compl=
+ete=E2=80=99:
+>> net/bluetooth/mgmt.c:6474: warning: =E2=80=98r256=E2=80=99 may be used u=
+ninitialized in this function
+>> net/bluetooth/mgmt.c:6474: warning: =E2=80=98h256=E2=80=99 may be used u=
+ninitialized in this function
+>> net/bluetooth/mgmt.c:6474: warning: =E2=80=98r192=E2=80=99 may be used u=
+ninitialized in this function
+>> net/bluetooth/mgmt.c:6474: warning: =E2=80=98h192=E2=80=99 may be used u=
+ninitialized in this function
+>>
+>> While these are false positives, the code can be shortened by
+>> pre-initializing the hash table pointers and eir_len. This has the side
+>> effect of killing the compiler warnings.
 >
-> okay. I only looked at BlueZ 5.x and that might have been my mistake. Let me check this and fix this properly.
+> can you be a bit specific on which compiler version is this. I fixed one =
+occurrence that seemed valid. However in this case the compiler seems to be=
+ just plain stupid. On a gcc 4.9, I am not seeing these for example.
 
-Why not just revert that commit. It looks like garbage. It has odd code like
+gcc 4.1.2. As there were too many false positives, these warnings were
+disabled in later versions (throwing away the children with the bad water).
 
-+       u32 valid_flags = 0;
-+       ci->flags = session->flags & valid_flags;
+If you don't like my patch, just drop it. I only look at newly
+introduced warnings
+of this kind anyway.
 
-which is basically saying "no flags are valid, and we are silently
-just clearing them all when copying".
+Gr{oetje,eeting}s,
 
-The reason I think it's garbage is
+                        Geert
 
- (a) the commit clearly breaks something, so the whole "let's check
-flags that we've never checked before" is already fundamentally
-suspicious
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
- (b) code like the above is just crap to begin with, because it makes
-things superficially "look" sensible when looking at individual lines
-of code (for example, when grepping things), and then when you look at
-the actual bigger picture, it turns out that the code doesn't actually
-care about the flags it is "copying", it just clears them all.
-
-The other code sequences do things like
-
-+       u32 valid_flags = 0;
-+       if (req->flags & ~valid_flags)
-+               return -EINVAL;
-
-Which again is just a very unreadable way of saying "if any flags are
-set, return an error". This kind of thing is presumably what breaks
-things, because clearly people *have* set flags that you thought are
-invalid.
-
-Now *IF* the interfaces had had these kinds of flag validation checks
-from day one, that would be one thing. But adding these kinds of
-things after the fact, when somebody then reports that they break
-things, then that's just a big big flag that you shouldn't try to do
-this at all. It's water under the bridge. That ship has sailed. It's
-too late. Give up on it.
-
-So I don't think this code is "fixable". It really smells like a
-fundamental mistake to begin with. Just revert it, chalk it up as "ok,
-that was a stupid idea", and move on.
-
-           Linus
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
