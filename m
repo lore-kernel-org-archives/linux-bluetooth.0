@@ -1,65 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Sun, 19 Apr 2015 17:34:17 -0500
-Message-ID: <CABKPALoBuLSHyzWrULQADxq83McSoSeEh58FLhPwL_j5OLHwOQ@mail.gmail.com>
-Subject: Running bluez on Raspberry Pi
-From: Neil Martin <neil@vnp.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <024FA95B-C70F-42ED-BDBF-69D09AA58203@holtmann.org>
+References: <CADDKRnBzf+dPqzHxXBWynwssc4su-7LVDCteZCNJJXJEuVca0w@mail.gmail.com>
+	<CA+55aFz3hLbESYbzeMWtyMLbYnCUr-Tx56DA_C=39wxhVGJd6g@mail.gmail.com>
+	<CADDKRnCsTgDfAZ+rbzKvEXh2ut2=sMKBfS7a7YR+5Rxi02557g@mail.gmail.com>
+	<CADDKRnBiB+z2iMc+04ZzntRkGhVW5isNQ+sLt-UVPg3mo+Q7jg@mail.gmail.com>
+	<300602D8-9DB7-4F8D-AC97-B60924554093@holtmann.org>
+	<CADDKRnB0ioBM+EQcNfuk4=BRw=CCxi4aFfZVpSXzJWmBPSNy+g@mail.gmail.com>
+	<38429B86-0E46-4C6A-9954-3260D864B10C@holtmann.org>
+	<CA+55aFx+NrXEtd4bveFbZqw0r9UHxkrQ7rzdZBbfBiGdvEX3zw@mail.gmail.com>
+	<024FA95B-C70F-42ED-BDBF-69D09AA58203@holtmann.org>
+Date: Sat, 18 Apr 2015 12:18:55 +0200
+Message-ID: <CADDKRnDJM4ObYxq0_16cD_sB7+oNu6GCD4Q-=sn1Du1XHLNghQ@mail.gmail.com>
+Subject: Re: [V4.1] Regression: Bluetooth mouse not working.
+From: =?UTF-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm new to bluez and fairly green with Bluetooth in general.  I have
-built 5.30 on a Raspberry PI 2 running raspbian wheezy.  Here's the
-configure command that I used (arrived at by experimentation and
-Googling for various build problems I encountered):
+What this patch tried to do is to limit it to what userspace is
+currently actually using. My mistake was to look only at BlueZ 5.x
+userspace and not at BlueZ 4.x userspace. The fix to not break
+existing userspace is essentially this:
+>
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index a05b9dbf14c9..9070dfd6b4ad 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -1313,7 +1313,8 @@ int hidp_connection_add(struct hidp_connadd_req *re=
+q,
+>                         struct socket *ctrl_sock,
+>                         struct socket *intr_sock)
+>  {
+> -       u32 valid_flags =3D 0;
+> +       u32 valid_flags =3D BIT(HIDP_VIRTUAL_CABLE_UNPLUG) |
+> +                         BIT(HIDP_BOOT_PROTOCOL_MODE);
+>
+> I ask Joerg to test this patch, but looking at old userspace is that is w=
+hat is happening there.
+>
 
-LDFLAGS=-lrt ./configure --disable-systemd --enable-experimental
---enable-maintainer-mode
+I think the last 3 lines are missing, the complete patch is:
 
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index a05b9db..02298bc 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -1313,7 +1313,8 @@ int hidp_connection_add(struct hidp_connadd_req *req,
+  struct socket *ctrl_sock,
+  struct socket *intr_sock)
+ {
+- u32 valid_flags =3D 0;
++ u32 valid_flags =3D BIT(HIDP_VIRTUAL_CABLE_UNPLUG) |
++                         BIT(HIDP_BOOT_PROTOCOL_MODE);
+  struct hidp_session *session;
+  struct l2cap_conn *conn;
+  struct l2cap_chan *chan;
 
-The hci tools seem to work as expected.  Also btgatt-client works - I
-am able to connect to a BLE heart rate monitor and I see the HR
-related services.
+that patch works for me.
 
-
-However, btgatt-server does not seem to do anything, but no errors
-reported either.  I'm running it like this:
-
-sudo ./btgatt-server -r
-
-and get this as the only output:
-
-Started listening on ATT channel. Waiting for connections
-
-
-I'm assuming that I should be seeing this advertising when I run
-hcitool lescan?  I don't see anything.  Also btmon shows no activity
-when I run btgatt-server.
-
-
-Additionally, if I try to run bluetoothd, I get the following output
-which doesn't look good!
-
-
-sudo ./bluetoothd -nE
-
-bluetoothd[19968]: Bluetooth daemon 5.30
-bluetoothd[19968]: Starting SDP server
-bluetoothd[19968]: Bluetooth management interface 1.7 initialized
-bluetoothd[19968]: Failed to obtain handles for "Service Changed" characteristic
-bluetoothd[19968]: Not enough free handles to register service
-bluetoothd[19968]: Error adding Link Loss service
-bluetoothd[19968]: Not enough free handles to register service
-bluetoothd[19968]: Not enough free handles to register service
-bluetoothd[19968]: Not enough free handles to register service
-bluetoothd[19968]: Current Time Service could not be registered
-bluetoothd[19968]: gatt-time-server: Input/output error (5)
-bluetoothd[19968]: Not enough free handles to register service
-bluetoothd[19968]: Not enough free handles to register service
-
-
-I've done plenty of googling and not finding anything useful, so I'm
-hoping that someone here will have some insight.
-
-Thanks, Neil
+Thanks, J=C3=B6rg
