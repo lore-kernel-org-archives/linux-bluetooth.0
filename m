@@ -1,31 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 18 Apr 2015 09:32:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: btusb: Fix two coding style issues
-Message-ID: <20150418063244.GA19881@t440s.P-661HNU-F1>
-References: <1429218950-21313-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1429218950-21313-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <CADxtLgQ=N2qHgD7_Yx44Wu2Y9-EWtgKe+1_m=k=8CGx7yxyu4w@mail.gmail.com>
+References: <CADxtLgT5xqHQ53QZvRH_zWSgdg_Ba1YKY6NReeNjQ4pK=oeTvg@mail.gmail.com>
+	<CADxtLgQ=N2qHgD7_Yx44Wu2Y9-EWtgKe+1_m=k=8CGx7yxyu4w@mail.gmail.com>
+Date: Fri, 17 Apr 2015 22:23:26 -0700
+Message-ID: <CAHrH25R_B=Xn8VHSpkXVyz95LY--hGU9+GJrEwVBSekRKoo98Q@mail.gmail.com>
+Subject: Re: BLE device GATT service discovery without pairing?
+From: Arman Uguray <armansito@chromium.org>
+To: Tony DiCola <tony@tonydicola.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Kevin Townsend <kevin@ktownsend.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Tony,
 
-On Thu, Apr 16, 2015, Marcel Holtmann wrote:
-> ERROR: spaces required around that '<' (ctx:WxV)
-> +		if (err <0)
->  		        ^
-> 
-> ERROR: code indent should use tabs where possible
-> +^I^I^I^I        sizeof(ver));$
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/btusb.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> On Fri, Apr 17, 2015 at 9:00 PM, Tony DiCola <tony@tonydicola.com> wrote:
+> On Fri, Apr 17, 2015 at 12:04 PM, Tony DiCola <tony@tonydicola.com> wrote:
+>> Hi all, I'm using bluez 5.3's dbus API (also running bluetoothd with
+>> the --experimental option) and wanted to check is it possible to
+>> connect to a BLE device and discover its GATT services without pairing
+>> to the device?
+>>
+>> I'm using the dbus APIs and see that the device Pair() function docs
+>> call out that it will perform GATT service discovery.  This matches
+>> what I see in practice--when I turn on an adapter's discovery with
+>> StartDiscovery() I start to see nearby BLE devices added to the bluez
+>> dbus root (with the org.bluez.Device1 interface).  I can connect to
+>> those devices, but only when I call the device Pair() function do I
+>> see all the GATT services, characteristics, descriptors, etc. added to
+>> the bluez dbus root (using the org.bluez.GattService1,
+>> org.bluez.GattCharacteristic1, etc. interfaces).
+>>
+>> However using just the dbus interface is it possible to trigger the
+>> discovery of all those GATT service, characteristic, etc. objects
+>> without pairing with a device?  I.e. is there an explicit GATT service
+>> discovery command for a connected device?
+>>
+>> Let me know if the question isn't clear, and thanks for any help foks
+>> can provide.
+>>
+>> -Tony
+>
+> Just to follow up and close the loop, I went back and realized I
+> actually am getting all the GATT services, characteristics, etc.
+> without pairing.  I must have had an issue with what I was trying
+> earlier and see now after just a device connect call the GATT
+> information shows up a short while after connecting.
+>
+> One quick question, is there any easy way to check if a device has
+> finished its service discovery?  Right now I can watch the bluez
+> ObjectManager's InterfacesAdded signal to see exactly when GATT
+> objects are created, or even just poll the bluez dbus object hiearchy
+> for their existance.  Just curious if there's a more explicit way like
+> a signal or changed property to know when a device's service discovery
+> completes.  Thanks!
+>
 
-Applied to bluetooth-next. Thanks.
+It's pretty straightforward to know when all the attributes of an
+individual service have been discovered; basically, once all the
+GattCharacteristic1 objects under a service have been exported, the
+"Characteristics" property of the service (GattService1) will be
+updated and you'll receive a PropertiesChanged signal for it.
 
-Johan
+Finding out that the complete list of services have been discovered
+and the objects have been exported is a bit trickier. Usually, the
+"UUIDs" property on org.bluez.Device1 will be populated before a
+connection with services obtained via advertising/inquiry. Upon
+connection and when GATT/SDP service discovery has completed (and
+after the service objects have been exported), the UUIDs property will
+update with the full list of services. Here you could do something
+like tracking InterfacesAdded signals and comparing the newly added
+services to the initial UUID list.
+
+I would be open to adding a signal/property to notify applications
+when service discovery completes though this hasn't really been an
+issue so far. Usually applications can be built in a very event based
+manner and update their state on a per-service basis as service
+hierarchies get added and removed.
+
+I hope this helps!
+Arman
