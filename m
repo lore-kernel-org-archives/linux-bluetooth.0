@@ -1,48 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: bluetooth-next HCI user channel issue
+Subject: Re: [patch] Bluetooth: btusb: off by one in rtl8723b_parse_firmware()
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5534D661.1000703@intel.com>
-Date: Mon, 20 Apr 2015 19:43:36 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A7E7D666-B172-4A02-A7E9-86483D630C81@holtmann.org>
-References: <5534D661.1000703@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
+In-Reply-To: <20150420155135.GB10518@mwanda>
+Date: Mon, 20 Apr 2015 19:14:23 +0200
+Cc: Daniel Drake <drake@endlessm.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>, kernel-janitors@vger.kernel.org
+Message-Id: <D6EE667A-6BA5-487A-B98A-7D84A355CEEB@holtmann.org>
+References: <20150420155135.GB10518@mwanda>
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi Dan,
 
-> Seems there is a regression in bluetooth-next.
-> I'm unable to communicate with my Intel WP chip via HCI User channel.
-> To test user channel, I use bluemoon:
-> $ hciconfig hci0 down
-> $ bluemoon -i hci0
-> Bluemoon configuration utility ver 5.30
+> The ">" should be ">=" so that we don't read past the end of the array.
 > 
-> Then bluemoon hangs up, no HCI event...
-> 
-> HCI packet seems successfully sent, but no HCI response:
-> [  491.525914] Bluetooth: hci0
-> [  491.525918] Bluetooth: hci0
-> [  491.525924] Bluetooth: hci0
-> [  491.525927] Bluetooth: hci0
-> [  491.525964] Bluetooth: hci0
-> [  491.526114] Bluetooth: hci0 urb ffff8800c1f320c0 status 0 count 3
-> 
-> When I kill bluemoon, I get same kind of issue (cmd timeout):
-> [  895.603661] Bluetooth: hci0 urb ffff8802f89d5b40 status 0 count 3
-> [  897.606323] Bluetooth: hci0 command 0xfc3f tx timeout
-> [  897.606350] Bluetooth: hci0
-> [  897.607011] Bluetooth: hci0 urb ffff88030c2c83c0 status 0 count 244
-> [  899.612007] Bluetooth: hci0 command 0x0c52 tx timeout
-> 
-> After that, device still usable by other sockets (hciconfig, hcitool...)
-> 
-> I wonder if you reproduce this issue on your side?
+> Fixes: 9d9a113e3695 ('Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support')
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-can you git bisect this to pin point the patch that broke this for you.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
