@@ -1,66 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 20 Apr 2015 18:51:35 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Daniel Drake <drake@endlessm.com>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [patch] Bluetooth: btusb: off by one in rtl8723b_parse_firmware()
+Message-ID: <20150420155135.GB10518@mwanda>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJjNLoeF3Yc5n+f7W7V0pN5tXmek9GyHNNmZ36Vy4Nhjw@mail.gmail.com>
-References: <1429319372-25172-1-git-send-email-jpawlowski@google.com>
-	<CABBYNZJjNLoeF3Yc5n+f7W7V0pN5tXmek9GyHNNmZ36Vy4Nhjw@mail.gmail.com>
-Date: Mon, 20 Apr 2015 08:55:28 -0700
-Message-ID: <CAD0=r8zdTAnR25junwBfU23KhCXMkxZXgUf3ouDsn9g6Y-PNjA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] doc/device-api: Add TxPower
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz
+The ">" should be ">=" so that we don't read past the end of the array.
 
-On Mon, Apr 20, 2015 at 7:32 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Jakub,
->
-> On Sat, Apr 18, 2015 at 4:09 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->> This adds TxPower from advertisement data.
->>
->> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
->> ---
->>  doc/device-api.txt | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/doc/device-api.txt b/doc/device-api.txt
->> index 72c597e..875fd9d 100644
->> --- a/doc/device-api.txt
->> +++ b/doc/device-api.txt
->> @@ -196,6 +196,11 @@ Properties string Address [readonly]
->>                         Received Signal Strength Indicator of the remote
->>                         device (inquiry or advertising).
->>
->> +               int16 TxPower [readonly, optional]
->> +
->> +                       Advertised transmitted power level (inquiry or
->> +                       advertising).
->> +
->>                 dict ManufacturerData [readonly, optional]
->>
->>                         Manufacturer specific advertisement data. Keys are
->> --
->> 2.2.0.rc0.207.ga3a616c
->
-> I thought we discussed about this before and we would like to have the
-> pathloss instead of TxPower, or do you have something else useful for
-> TxPower?
+Fixes: 9d9a113e3695 ('Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support')
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-I don't remember such discussion, I remember we were discussing about
-SetDiscoveryFilter, and it have option to filter by pathloss.
-So I exposed TxPower for two reasons:
-1. It's just a field in advertisement, and I wanted just to access it
-as any other.
-2. If I turn it into Pathloss field, it would change together with
-RSSI, and PropertyChanged event will be doubled. Pathloss is very
-simple to compute, so having only RSSI that change is more efficient.
-
-
->
->
-> --
-> Luiz Augusto von Dentz
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 920f6fb..d21f3b4 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1502,7 +1502,7 @@ static int rtl8723b_parse_firmware(struct hci_dev *hdev, u16 lmp_subver,
+ 		return -EINVAL;
+ 	}
+ 
+-	if (project_id > ARRAY_SIZE(project_id_to_lmp_subver)) {
++	if (project_id >= ARRAY_SIZE(project_id_to_lmp_subver)) {
+ 		BT_ERR("%s: unknown project id %d", hdev->name, project_id);
+ 		return -EINVAL;
+ 	}
