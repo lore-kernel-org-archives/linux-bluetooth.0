@@ -1,68 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20150417220040.A379A220209@puck.mtv.corp.google.com>
-References: <20150417220040.A379A220209@puck.mtv.corp.google.com>
-Date: Mon, 20 Apr 2015 17:50:52 +0300
-Message-ID: <CABBYNZKHUbsLjzZrxNqUKe8Qp8L+F=COftCZfed1C+2JwydDOA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] hog: re-enable HoG report notifications on HoG device reconnect
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Petri Gynther <pgynther@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bharat Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] monitor: Add AVRCP ChangePath support
+Date: Mon, 20 Apr 2015 20:19:10 +0530
+Message-id: <1429541350-30882-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+Add support for decoding AVRCP ChangePath in bluetooth monitor.
 
-On Sat, Apr 18, 2015 at 1:00 AM, Petri Gynther <pgynther@google.com> wrote:
-> On HoG device reconnect, re-enable HoG report notifications every
-> time by writing the client characteristic configuration attribute
-> of each HoG report.
->
-> Doing this on every reconnect:
-> 1. ensures that HoG report notifications are always enabled
->    (e.g. lost report notification state in battery swap).
-> 2. signals to HoG device that it can start sending HoG reports
->    (e.g. buffered keypresses while the reconnect is still pending).
+      Channel: 65 len 21 ctrl 0x0000 [PSM 27 mode 3] {chan 1}
+      I-frame: Unsegmented TxSeq 0 ReqSeq 0
+      AVCTP Browsing: Command: type 0x00 label 0 PID 0x110e
+        AVRCP: ChangePath: len 0x000b
+          UIDCounter: 0x0000 (0)
+          Direction: 0x01 (Folder Down)
+          FolderUID: 0x               1 (1)
+---
+ monitor/avctp.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-Is that happening for a specific device? For 1 I suppose it would
-loose the paring keys as well which means we would not be able to
-connect at all as HoG mandates pairing, or does it loose only the CCC
-configuration? Reason 2 is not necessary the behavior every device
-would have, for example I don't expect a mouse to buffer anything and
-even a keyboard may buffer only the last key pressed since it might
-have very little memory to spend in buffering, anyway I suppose reason
-1 is what you should really concentrate to tell us what is going on.
-
-> ---
->  profiles/input/hog.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
->
-> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-> index c55443c..690fd43 100644
-> --- a/profiles/input/hog.c
-> +++ b/profiles/input/hog.c
-> @@ -842,10 +842,7 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
->         for (l = hogdev->reports; l; l = l->next) {
->                 struct report *r = l->data;
->
-> -               r->notifyid = g_attrib_register(hogdev->attrib,
-> -                                       ATT_OP_HANDLE_NOTIFY,
-> -                                       r->decl->value_handle,
-> -                                       report_value_cb, r, NULL);
-> +               enable_report_notification(r);
->         }
->  }
->
-> --
-> 2.2.0.rc0.207.ga3a616c
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index f4f3250..e071393 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -1742,6 +1742,74 @@ static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
+ 	}
+ }
+ 
++static const char *dir2str(uint8_t dir)
++{
++	switch (dir) {
++	case 0x00:
++		return "Folder Up";
++	case 0x01:
++		return "Folder Down";
++	}
++
++	return "Reserved";
++}
++
++static bool avrcp_change_path(struct avctp_frame *avctp_frame)
++{
++	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
++	uint64_t uid;
++	uint32_t items;
++	uint16_t uidcounter;
++	uint8_t dir, status, indent = 2;
++
++	if (avctp_frame->hdr & 0x02)
++		goto response;
++
++	if (frame->size < 11) {
++		print_field("%*cPDU Malformed", indent, ' ');
++		packet_hexdump(frame->data, frame->size);
++		return false;
++	}
++
++	if (!l2cap_frame_get_be16(frame, &uidcounter))
++		return false;
++
++	print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ',
++					uidcounter, uidcounter);
++
++	if (!l2cap_frame_get_u8(frame, &dir))
++		return false;
++
++	print_field("%*cDirection: 0x%02x (%s)", indent, ' ',
++					dir, dir2str(dir));
++
++	if (!l2cap_frame_get_be64(frame, &uid))
++		return false;
++
++	print_field("%*cFolderUID: 0x%16" PRIx64 " (%" PRIu64 ")", indent, ' ',
++					uid, uid);
++
++	return true;
++
++response:
++	if (!l2cap_frame_get_u8(frame, &status))
++		return false;
++
++	print_field("%*cStatus: 0x%02x (%s)", indent, ' ',
++					status, error2str(status));
++
++	if (frame->size == 1)
++		return false;
++
++	if (!l2cap_frame_get_be32(frame, &items))
++		return false;
++
++	print_field("%*cNumber of Items: 0x%04x (%u)", indent, ' ',
++					items, items);
++
++	return true;
++}
++
+ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
+ 							uint8_t indent)
+ {
+@@ -2136,6 +2204,9 @@ static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
+ 	case AVRCP_GET_FOLDER_ITEMS:
+ 		avrcp_get_folder_items(avctp_frame);
+ 		break;
++	case AVRCP_CHANGE_PATH:
++		avrcp_change_path(avctp_frame);
++		break;
+ 	default:
+ 		packet_hexdump(frame->data, frame->size);
+ 	}
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
