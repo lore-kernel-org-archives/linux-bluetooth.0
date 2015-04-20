@@ -1,72 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: bluetooth-next HCI user channel issue
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] doc: Add command for limited discoverable procedure
-Date: Mon, 20 Apr 2015 20:02:18 +0200
-Message-Id: <1429552938-71139-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <5534D661.1000703@intel.com>
+Date: Mon, 20 Apr 2015 19:43:36 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A7E7D666-B172-4A02-A7E9-86483D630C81@holtmann.org>
+References: <5534D661.1000703@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+Hi Loic,
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 7a5d33f0f5c0..4b97aad3c6cb 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2655,6 +2655,51 @@ Remove Advertising Command
- 				Invalid Index
- 
- 
-+Start Limited Discovery Command
-+===============================
-+
-+	Command Code:		0x0040
-+	Controller Index:	<controller id>
-+	Command Parameters:	Address_Type (1 Octet)
-+	Return Parameters:	Address_Type (1 Octet)
-+
-+	This command is used to start the process of discovering remote
-+	devices using the limited discovery procedure. A Device Found event
-+	will be sent for each discovered device.
-+
-+	Possible values for the Address_Type parameter are a bit-wise or
-+	of the following bits:
-+
-+		0	BR/EDR
-+		1	LE Public
-+		2	LE Random
-+
-+	By combining these e.g. the following values are possible:
-+
-+		1	BR/EDR
-+		6	LE (public & random)
-+		7	BR/EDR/LE (interleaved discovery)
-+
-+	The limited discovery uses active scanning for Low Energy scanning
-+	and will search for devices with the limited discoverabilty flag
-+	configured. On BR/EDR it uses LIAC and filters on the limited
-+	discoverabilty flag of the class of device.
-+
-+	When the discovery procedure starts the Discovery event will
-+	notify this similar to Start Discovery.
-+
-+	This command can only be used when the controller is powered.
-+
-+	This command generates a Command Complete event on success
-+	or failure.
-+
-+	Possible errors:	Busy
-+				Not Supported
-+				Invalid Parameters
-+				Not Powered
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
--- 
-2.1.0
+> Seems there is a regression in bluetooth-next.
+> I'm unable to communicate with my Intel WP chip via HCI User channel.
+> To test user channel, I use bluemoon:
+> $ hciconfig hci0 down
+> $ bluemoon -i hci0
+> Bluemoon configuration utility ver 5.30
+> 
+> Then bluemoon hangs up, no HCI event...
+> 
+> HCI packet seems successfully sent, but no HCI response:
+> [  491.525914] Bluetooth: hci0
+> [  491.525918] Bluetooth: hci0
+> [  491.525924] Bluetooth: hci0
+> [  491.525927] Bluetooth: hci0
+> [  491.525964] Bluetooth: hci0
+> [  491.526114] Bluetooth: hci0 urb ffff8800c1f320c0 status 0 count 3
+> 
+> When I kill bluemoon, I get same kind of issue (cmd timeout):
+> [  895.603661] Bluetooth: hci0 urb ffff8802f89d5b40 status 0 count 3
+> [  897.606323] Bluetooth: hci0 command 0xfc3f tx timeout
+> [  897.606350] Bluetooth: hci0
+> [  897.607011] Bluetooth: hci0 urb ffff88030c2c83c0 status 0 count 244
+> [  899.612007] Bluetooth: hci0 command 0x0c52 tx timeout
+> 
+> After that, device still usable by other sockets (hciconfig, hcitool...)
+> 
+> I wonder if you reproduce this issue on your side?
+
+can you git bisect this to pin point the patch that broke this for you.
+
+Regards
+
+Marcel
 
