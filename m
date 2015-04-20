@@ -1,31 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Apr 2015 18:51:35 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Daniel Drake <drake@endlessm.com>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [patch] Bluetooth: btusb: off by one in rtl8723b_parse_firmware()
-Message-ID: <20150420155135.GB10518@mwanda>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1429276429-13660-1-git-send-email-luiz.dentz@gmail.com>
+References: <1429276429-13660-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 20 Apr 2015 17:58:56 +0300
+Message-ID: <CABBYNZKaw9=Gw6kBEV8U4jGMaYKxYhk8p_ztWoFSoLDu2oezjw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] unit/test-eir: Add ad/uri-beacon test
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The ">" should be ">=" so that we don't read past the end of the array.
+Hi,
 
-Fixes: 9d9a113e3695 ('Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support')
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+On Fri, Apr 17, 2015 at 4:13 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds test for uir-beacon define bellow:
+>
+> https://github.com/google/uribeacon/blob/master/specification/AdvertisingMode.md
+> ---
+>  unit/test-eir.c | 28 +++++++++++++++++++++++++++-
+>  1 file changed, 27 insertions(+), 1 deletion(-)
+>
+> diff --git a/unit/test-eir.c b/unit/test-eir.c
+> index 4d557a8..421d0db 100644
+> --- a/unit/test-eir.c
+> +++ b/unit/test-eir.c
+> @@ -572,7 +572,7 @@ static void test_parsing(gconstpointer data)
+>                 tester_debug("UUID: %s", uuid_str);
+>         }
+>
+> -       g_assert(eir.flags == test->flags);
+> +       g_assert_cmpint(eir.flags, ==, test->flags);
+>
+>         if (test->name) {
+>                 g_assert_cmpstr(eir.name, ==, test->name);
+> @@ -604,6 +604,14 @@ static void test_parsing(gconstpointer data)
+>                                                         "Manufacturer Data:");
+>         }
+>
+> +       for (list = eir.sd_list; list; list = list->next) {
+> +               struct eir_sd *sd = list->data;
+> +
+> +               tester_debug("Service UUID: %s", sd->uuid);
+> +               util_hexdump(' ', sd->data, sd->data_len, print_debug,
+> +                                                       "Service Data:");
+> +       }
+> +
+>         eir_data_free(&eir);
+>
+>         tester_test_passed();
+> @@ -629,6 +637,23 @@ static const struct test_data gigaset_gtag_test = {
+>         .uuid = gigaset_gtag_uuid,
+>  };
+>
+> +static const char *uri_beacon_uuid[] = {
+> +               "0000fed8-0000-1000-8000-00805f9b34fb",
+> +               NULL
+> +};
+> +
+> +static const unsigned char uri_beacon_data[] = {
+> +               0x03, 0x03, 0xd8, 0xfe, 0x0c, 0x16, 0xd8, 0xfe, 0x00,
+> +               0x20, 0x00, 'b', 'l', 'u', 'e', 'z', 0x08
+> +};
+> +
+> +static const struct test_data uri_beacon_test = {
+> +       .eir_data = uri_beacon_data,
+> +       .eir_size = sizeof(uri_beacon_data),
+> +       .tx_power = 127,
+> +       .uuid = uri_beacon_uuid,
+> +};
+> +
+>  int main(int argc, char *argv[])
+>  {
+>         tester_init(&argc, &argv);
+> @@ -653,6 +678,7 @@ int main(int argc, char *argv[])
+>         tester_add("/ad/citizen2", &citizen_scan_test, NULL, test_parsing,
+>                                                                         NULL);
+>         tester_add("ad/g-tag", &gigaset_gtag_test, NULL, test_parsing, NULL);
+> +       tester_add("ad/uri-beacon", &uri_beacon_test, NULL, test_parsing, NULL);
+>
+>         return tester_run();
+>  }
+> --
+> 2.1.0
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 920f6fb..d21f3b4 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1502,7 +1502,7 @@ static int rtl8723b_parse_firmware(struct hci_dev *hdev, u16 lmp_subver,
- 		return -EINVAL;
- 	}
- 
--	if (project_id > ARRAY_SIZE(project_id_to_lmp_subver)) {
-+	if (project_id >= ARRAY_SIZE(project_id_to_lmp_subver)) {
- 		BT_ERR("%s: unknown project id %d", hdev->name, project_id);
- 		return -EINVAL;
- 	}
+Applied.
+
+
+-- 
+Luiz Augusto von Dentz
