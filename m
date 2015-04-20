@@ -1,138 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAGXr9JEbTY9J+iVoMWaL=Vujcd5VWW=53775q9eL0kkMb3C4-A@mail.gmail.com>
-References: <20150417220040.A379A220209@puck.mtv.corp.google.com>
-	<CABBYNZKHUbsLjzZrxNqUKe8Qp8L+F=COftCZfed1C+2JwydDOA@mail.gmail.com>
-	<CAGXr9JH3PdfGsNreQF_CxeAESuJG6t_=CD=m6KW9DenT9pSxUg@mail.gmail.com>
-	<CABBYNZKZCQ-g+VCDQcZQnrwskPaShUsgXwkqHysQ-6CffPGF3g@mail.gmail.com>
-	<CAGXr9JEbTY9J+iVoMWaL=Vujcd5VWW=53775q9eL0kkMb3C4-A@mail.gmail.com>
-Date: Mon, 20 Apr 2015 16:17:17 -0700
-Message-ID: <CAGXr9JFvvLRUWFcRiwVFw4v7ABb=t9sAYrwg5B9xX4ZSP8rbSg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] hog: re-enable HoG report notifications on HoG device reconnect
-From: Petri Gynther <pgynther@google.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABKPALoBuLSHyzWrULQADxq83McSoSeEh58FLhPwL_j5OLHwOQ@mail.gmail.com>
+References: <CABKPALoBuLSHyzWrULQADxq83McSoSeEh58FLhPwL_j5OLHwOQ@mail.gmail.com>
+Date: Mon, 20 Apr 2015 15:29:02 -0700
+Message-ID: <CAHrH25TKwCouXPHHNmTWLAXyQoaymUPMOFqjT+gtZZ0ShkK2VA@mail.gmail.com>
+Subject: Re: Running bluez on Raspberry Pi
+From: Arman Uguray <armansito@chromium.org>
+To: Neil Martin <neil@vnp.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Neil,
 
-On Mon, Apr 20, 2015 at 2:54 PM, Petri Gynther <pgynther@google.com> wrote:
-> Hi Luiz,
+> On Sun, Apr 19, 2015 at 3:34 PM, Neil Martin <neil@vnp.com> wrote:
+> I'm new to bluez and fairly green with Bluetooth in general.  I have
+> built 5.30 on a Raspberry PI 2 running raspbian wheezy.  Here's the
+> configure command that I used (arrived at by experimentation and
+> Googling for various build problems I encountered):
 >
-> On Mon, Apr 20, 2015 at 1:12 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Petri,
->>
->> On Mon, Apr 20, 2015 at 7:34 PM, Petri Gynther <pgynther@google.com> wrote:
->>> Hi Luiz,
->>>
->>> On Mon, Apr 20, 2015 at 7:50 AM, Luiz Augusto von Dentz
->>> <luiz.dentz@gmail.com> wrote:
->>>> Hi Petri,
->>>>
->>>> On Sat, Apr 18, 2015 at 1:00 AM, Petri Gynther <pgynther@google.com> wrote:
->>>>> On HoG device reconnect, re-enable HoG report notifications every
->>>>> time by writing the client characteristic configuration attribute
->>>>> of each HoG report.
->>>>>
->>>>> Doing this on every reconnect:
->>>>> 1. ensures that HoG report notifications are always enabled
->>>>>    (e.g. lost report notification state in battery swap).
->>>>> 2. signals to HoG device that it can start sending HoG reports
->>>>>    (e.g. buffered keypresses while the reconnect is still pending).
->>>>
->>>> Is that happening for a specific device? For 1 I suppose it would
->>>> loose the paring keys as well which means we would not be able to
->>>> connect at all as HoG mandates pairing, or does it loose only the CCC
->>>> configuration? Reason 2 is not necessary the behavior every device
->>>> would have, for example I don't expect a mouse to buffer anything and
->>>> even a keyboard may buffer only the last key pressed since it might
->>>> have very little memory to spend in buffering, anyway I suppose reason
->>>> 1 is what you should really concentrate to tell us what is going on.
->>>>
->>>
->>> On the device that I'm working on, pairing info is stored in
->>> persistent storage, so it survives battery swap. However, I'm not sure
->>> yet about HoG report notification enable/disable state. Waiting for
->>> confirmation from vendor.
->>
->> I would expect it to store the CCC state as well in the persistent
->> storage if one exists.
->>
->>> Anyways, we are seeing (2). The first keypress from HoG device is
->>> getting lost on reconnect, leading to bad user experience. The device
->>> is sending the keypress immediately when the connection is good, but
->>> too early before BlueZ has managed to re-register the handler with
->>> g_attrib_register(). During the reconnect, the HoG device has no way
->>> of knowing when BlueZ is ready and has registered the handler. So, to
->>> provide this indication, I propose to re-enable the HoG report
->>> notification every time.
->>
->> But I already fixed this problem not long ago:
->>
->> commit 14569a33418a4c1dc07cca090b9336373d63a085
->> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->> Date:   Wed Mar 11 21:23:55 2015 +0200
->>
->>     core/device: Fix not handling notification
->>
->>     attio callbacks needs to be triggered as soon as possible once connected
->>     otherwise profiles such as HoG may miss notification that are sent while
->>     bt_gatt_client is doing MTU exchange.
->>
->> Perhaps you don't have this patch?
->>
+> LDFLAGS=-lrt ./configure --disable-systemd --enable-experimental
+> --enable-maintainer-mode
 >
-> Thanks for pointing this out. We are still using BlueZ 5.28, so don't
-> have this. I'll patch this in and see how HoG reconnect works then.
+>
+> The hci tools seem to work as expected.  Also btgatt-client works - I
+> am able to connect to a BLE heart rate monitor and I see the HR
+> related services.
+>
+>
+> However, btgatt-server does not seem to do anything, but no errors
+> reported either.  I'm running it like this:
+>
+> sudo ./btgatt-server -r
+>
+> and get this as the only output:
+>
+> Started listening on ATT channel. Waiting for connections
+>
+>
+> I'm assuming that I should be seeing this advertising when I run
+> hcitool lescan?  I don't see anything.  Also btmon shows no activity
+> when I run btgatt-server.
+
+Nope, btgatt-server doesn't configure anything related to advertising;
+it simply sets up and attaches a GATT server to a listening L2CAP
+socket on the ATT channel. So you need to set up advertising
+separately, e.g. by running 'btmgmt advertising on' or 'btmgmt
+add-adv'.
+
+Note that you usually don't want to run btgatt-server while bluetoothd
+is running since they will interfere with eachother.
+
+>
+>
+> Additionally, if I try to run bluetoothd, I get the following output
+> which doesn't look good!
+>
+>
+> sudo ./bluetoothd -nE
+>
+> bluetoothd[19968]: Bluetooth daemon 5.30
+> bluetoothd[19968]: Starting SDP server
+> bluetoothd[19968]: Bluetooth management interface 1.7 initialized
+> bluetoothd[19968]: Failed to obtain handles for "Service Changed" characteristic
+> bluetoothd[19968]: Not enough free handles to register service
+> bluetoothd[19968]: Error adding Link Loss service
+> bluetoothd[19968]: Not enough free handles to register service
+> bluetoothd[19968]: Not enough free handles to register service
+> bluetoothd[19968]: Not enough free handles to register service
+> bluetoothd[19968]: Current Time Service could not be registered
+> bluetoothd[19968]: gatt-time-server: Input/output error (5)
+> bluetoothd[19968]: Not enough free handles to register service
+> bluetoothd[19968]: Not enough free handles to register service
 >
 
-I reverted my 3 patches and applied your "core/device: Fix not
-handling notification" patch on top of our BlueZ 5.28 stack.
-Unfortunately, your patch breaks our HoG device completely. Our
-device's report map ends up being read incorrectly, and as a result,
-not a single keypress works any more.
+We really need to clean these up. Basically bluetoothd fails to
+register all the experimental local services since we changed the
+internal plumbing to the new shared stack. Fwiw these are all plugins
+that we are deprecating and the actual local GATT server will work
+regardless.
 
-Applying your patch causes attio_connected_cb() getting called very
-early, before the MTU exchange has been negotiated. Somehow, this
-doesn't work for our device.
+Also, if you want the daemon running, I suggest using the GATT D-Bus
+API for hosting your own services.
 
->>>>> ---
->>>>>  profiles/input/hog.c | 5 +----
->>>>>  1 file changed, 1 insertion(+), 4 deletions(-)
->>>>>
->>>>> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
->>>>> index c55443c..690fd43 100644
->>>>> --- a/profiles/input/hog.c
->>>>> +++ b/profiles/input/hog.c
->>>>> @@ -842,10 +842,7 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
->>>>>         for (l = hogdev->reports; l; l = l->next) {
->>>>>                 struct report *r = l->data;
->>>>>
->>>>> -               r->notifyid = g_attrib_register(hogdev->attrib,
->>>>> -                                       ATT_OP_HANDLE_NOTIFY,
->>>>> -                                       r->decl->value_handle,
->>>>> -                                       report_value_cb, r, NULL);
->>>>> +               enable_report_notification(r);
->>>>>         }
->>>>>  }
->>>>>
->>>>> --
->>>>> 2.2.0.rc0.207.ga3a616c
->>>>>
->>>>> --
->>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>>> the body of a message to majordomo@vger.kernel.org
->>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>
->>>>
->>>>
->>>> --
->>>> Luiz Augusto von Dentz
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
+>
+> I've done plenty of googling and not finding anything useful, so I'm
+> hoping that someone here will have some insight.
+>
+> Thanks, Neil
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Thanks!
+Arman
