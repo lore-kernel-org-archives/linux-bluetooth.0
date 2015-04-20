@@ -1,50 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <5534D661.1000703@intel.com>
+Date: Mon, 20 Apr 2015 12:35:13 +0200
+From: Loic Poulain <loic.poulain@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1429319372-25172-1-git-send-email-jpawlowski@google.com>
-References: <1429319372-25172-1-git-send-email-jpawlowski@google.com>
-Date: Mon, 20 Apr 2015 17:32:18 +0300
-Message-ID: <CABBYNZJjNLoeF3Yc5n+f7W7V0pN5tXmek9GyHNNmZ36Vy4Nhjw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] doc/device-api: Add TxPower
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: bluetooth-next HCI user channel issue
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Marcel,
 
-On Sat, Apr 18, 2015 at 4:09 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> This adds TxPower from advertisement data.
->
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-> ---
->  doc/device-api.txt | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index 72c597e..875fd9d 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -196,6 +196,11 @@ Properties string Address [readonly]
->                         Received Signal Strength Indicator of the remote
->                         device (inquiry or advertising).
->
-> +               int16 TxPower [readonly, optional]
-> +
-> +                       Advertised transmitted power level (inquiry or
-> +                       advertising).
-> +
->                 dict ManufacturerData [readonly, optional]
->
->                         Manufacturer specific advertisement data. Keys are
-> --
-> 2.2.0.rc0.207.ga3a616c
+Seems there is a regression in bluetooth-next.
+I'm unable to communicate with my Intel WP chip via HCI User channel.
+To test user channel, I use bluemoon:
+$ hciconfig hci0 down
+$ bluemoon -i hci0
+Bluemoon configuration utility ver 5.30
 
-I thought we discussed about this before and we would like to have the
-pathloss instead of TxPower, or do you have something else useful for
-TxPower?
+Then bluemoon hangs up, no HCI event...
 
+HCI packet seems successfully sent, but no HCI response:
+[  491.525914] Bluetooth: hci0
+[  491.525918] Bluetooth: hci0
+[  491.525924] Bluetooth: hci0
+[  491.525927] Bluetooth: hci0
+[  491.525964] Bluetooth: hci0
+[  491.526114] Bluetooth: hci0 urb ffff8800c1f320c0 status 0 count 3
+
+When I kill bluemoon, I get same kind of issue (cmd timeout):
+[  895.603661] Bluetooth: hci0 urb ffff8802f89d5b40 status 0 count 3
+[  897.606323] Bluetooth: hci0 command 0xfc3f tx timeout
+[  897.606350] Bluetooth: hci0
+[  897.607011] Bluetooth: hci0 urb ffff88030c2c83c0 status 0 count 244
+[  899.612007] Bluetooth: hci0 command 0x0c52 tx timeout
+
+After that, device still usable by other sockets (hciconfig, hcitool...)
+
+I wonder if you reproduce this issue on your side?
+
+Regards,
+Loic
 
 -- 
-Luiz Augusto von Dentz
+Intel Open Source Technology Center
+http://oss.intel.com/
+
