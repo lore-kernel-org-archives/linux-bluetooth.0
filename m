@@ -1,24 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com, cpgs@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  0/5] Add decoding for BNEP packet types
-Date: Tue, 21 Apr 2015 14:44:24 +0530
-Message-id: <1429607669-30669-1-git-send-email-gowtham.ab@samsung.com>
+Date: Tue, 21 Apr 2015 11:06:40 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: Frederic Danis <frederic.danis@linux.intel.com>,
+	linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	jslaby@suse.cz
+Subject: Re: [PATCH] tty: Re-add external interface for tty_set_termios()
+Message-ID: <20150421090640.GB1569@kroah.com>
+References: <1428671585-13310-1-git-send-email-frederic.danis@linux.intel.com>
+ <5527CEFB.5070406@hurleysoftware.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5527CEFB.5070406@hurleysoftware.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Gowtham Anandha Babu (5):
-  monitor: Add support for decoding bnep General pkt
-  monitor: Add support for decoding bnep Control pkt
-  monitor: Add support for decoding bnep Compressed pkt
-  monitor: Add support for decoding bnep SrcOnly pkt
-  monitor: Add support for decoding bnep DestOnly pkt
+On Fri, Apr 10, 2015 at 09:24:11AM -0400, Peter Hurley wrote:
+> On 04/10/2015 09:13 AM, Frederic Danis wrote:
+> > This is needed by Bluetooth hci_uart module to be able to change speed
+> > of Bluetooth controller and local UART.
+> 
+> Because this is the lesser evil right now,
+> 
+> Reviewed-by: Peter Hurley <peter@hurleysoftware.com>
 
- monitor/bnep.c | 179 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 169 insertions(+), 10 deletions(-)
+Does this need to be in 4.1-rc1?  Or is this a 4.2 thing?
 
--- 
-1.9.1
+thanks,
 
+greg k-h
