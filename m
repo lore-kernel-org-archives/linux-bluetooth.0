@@ -3,40 +3,73 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  3/5] monitor: Add support for decoding bnep Compressed pkt
-Date: Tue, 21 Apr 2015 14:44:27 +0530
-Message-id: <1429607669-30669-4-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH  2/5] monitor: Add support for decoding bnep Control pkt
+Date: Tue, 21 Apr 2015 14:44:26 +0530
+Message-id: <1429607669-30669-3-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1429607669-30669-1-git-send-email-gowtham.ab@samsung.com>
 References: <1429607669-30669-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-      BNEP: Compressed Ethernet (0x02|0)
-         [proto 0x0300]
-        3c 3b 3a 39 38 37 36 35 34 33 32 31 30 2f 2e 2d
-        2c 2b 2a 29 28 27 26 25 24 23 22 21 20 1f 1e 1d
+      BNEP: Control (0x01|0)
+         Filter MultAddr Set (0x05)
+        00 30 ff ff ff ff ff ff ff ff ff ff ff ff 33 33
+        00 00 00 01 33 33 00 00 00 01 01 00 5e 00 00 01
 ---
- monitor/bnep.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ monitor/bnep.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 48 insertions(+), 1 deletion(-)
 
 diff --git a/monitor/bnep.c b/monitor/bnep.c
-index d417e2f..1735a7a 100644
+index 61b5d71..d417e2f 100644
 --- a/monitor/bnep.c
 +++ b/monitor/bnep.c
-@@ -142,6 +142,20 @@ static bool bnep_control(struct bnep_frame *bnep_frame,
- 	return true;
+@@ -95,6 +95,53 @@ static bool bnep_general(struct bnep_frame *bnep_frame,
+ 
  }
  
-+static bool bnep_compressed(struct bnep_frame *bnep_frame,
++struct bnep_control_data {
++	uint8_t type;
++	const char *str;
++};
++
++static const struct bnep_control_data bnep_control_table[] = {
++	{ 0x00, "Command Not Understood",	},
++	{ 0x01, "Setup Conn Req",		},
++	{ 0x02, "Setup Conn Rsp",		},
++	{ 0x03, "Filter NetType Set",		},
++	{ 0x04, "Filter NetType Rsp",		},
++	{ 0x05, "Filter MultAddr Set",		},
++	{ 0x06, "Filter MultAddr Rsp",		},
++	{ }
++};
++
++static bool bnep_control(struct bnep_frame *bnep_frame,
 +					uint8_t indent,	int hdr_len)
 +{
-+
++	uint8_t ctype;
 +	struct l2cap_frame *frame = &bnep_frame->l2cap_frame;
++	const struct bnep_control_data *bnep_control_data = NULL;
++	const char *type_str;
++	int i;
 +
-+	if (!l2cap_frame_get_be16(frame, &proto))
++	if (!l2cap_frame_get_u8(frame, &ctype))
 +		return false;
 +
-+	print_field("%*c[proto 0x%04x] ", indent, ' ', proto);
++	for (i = 0; bnep_control_table[i].str; i++) {
++		if (bnep_control_table[i].type == ctype) {
++			bnep_control_data = &bnep_control_table[i];
++			break;
++		}
++	}
++
++	if (bnep_control_data)
++		type_str = bnep_control_data->str;
++	else
++		type_str = "Unknown control type";
++
++	print_field("%*c%s (0x%02x) ", indent, ' ', type_str, ctype);
++
++	/* TODO: Handle BNEP control types */
 +
 +	return true;
 +}
@@ -44,15 +77,15 @@ index d417e2f..1735a7a 100644
  struct bnep_data {
  	uint8_t type;
  	const char *str;
-@@ -151,7 +165,7 @@ struct bnep_data {
+@@ -103,7 +150,7 @@ struct bnep_data {
+ 
  static const struct bnep_data bnep_table[] = {
  	{ 0x00, "General Ethernet",		bnep_general	},
- 	{ 0x01, "Control",			bnep_control	},
--	{ 0x02, "Compressed Ethernet",				},
-+	{ 0x02, "Compressed Ethernet",		bnep_compressed	},
+-	{ 0x01, "Control",					},
++	{ 0x01, "Control",			bnep_control	},
+ 	{ 0x02, "Compressed Ethernet",				},
  	{ 0x03, "Compressed Ethernet SrcOnly",			},
  	{ 0x04, "Compressed Ethernet DestOnly",			},
- 	{ }
 -- 
 1.9.1
 
