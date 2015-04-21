@@ -1,39 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <patila@marvell.com>,
-        Xinming Hu
-	<huxm@marvell.com>, Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH] Bluetooth: btmrvl: fix compilation warning
-Date: Tue, 21 Apr 2015 06:59:56 -0700
-Message-ID: <1429624796-4598-1-git-send-email-akarwar@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+References: <1429011468-13667-1-git-send-email-gowtham.ab@samsung.com>
+ <000301d0784c$be534440$3af9ccc0$@samsung.com>
+In-reply-to: <000301d0784c$be534440$3af9ccc0$@samsung.com>
+Subject: RE: [PATCH] tools: Handle the common profile & service ecode
+Date: Tue, 21 Apr 2015 17:53:46 +0530
+Message-id: <003101d07c2e$0b3d2200$21b76600$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Xinming Hu <huxm@marvell.com>
+Ping.
 
-This patch fixes a compile warnning "dump_num maybe used uninitialized in
-this function".
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Thursday, April 16, 2015 7:23 PM
+> To: linux-bluetooth@vger.kernel.org
+> Subject: RE: [PATCH] tools: Handle the common profile & service ecode
+> 
+> Ping.
+> 
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> > Sent: Tuesday, April 14, 2015 5:08 PM
+> > To: linux-bluetooth@vger.kernel.org
+> > Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
+> Babu
+> > Subject: [PATCH] tools: Handle the common profile & service ecode
+> >
+> > Handles the common profile and service error codes sent over the
+> > Attribute Protocol in btgatt-client and monitor.
+> > ---
+> >  monitor/l2cap.c       | 9 +++++++++
+> >  tools/btgatt-client.c | 6 ++++++
+> >  2 files changed, 15 insertions(+)
+> >
+> > diff --git a/monitor/l2cap.c b/monitor/l2cap.c index fc565b1..55efa54
+> 100644
+> > --- a/monitor/l2cap.c
+> > +++ b/monitor/l2cap.c
+> > @@ -2046,6 +2046,15 @@ static void att_error_response(const struct
+> > l2cap_frame *frame)
+> >  	case 0x11:
+> >  		str = "Insufficient Resources";
+> >  		break;
+> > +	case 0xfd:
+> > +		str = "CCC Improperly Configured";
+> > +		break;
+> > +	case 0xfe:
+> > +		str = "Procedure Already in Progress";
+> > +		break;
+> > +	case 0xff:
+> > +		str = "Out of Range";
+> > +		break;
+> >  	default:
+> >  		str = "Reserved";
+> >  		break;
+> > diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c index
+> > ee5315d..3935a7e 100644
+> > --- a/tools/btgatt-client.c
+> > +++ b/tools/btgatt-client.c
+> > @@ -114,6 +114,12 @@ static const char *ecode_to_string(uint8_t ecode)
+> >  		return "Group type Not Supported";
+> >  	case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
+> >  		return "Insufficient Resources";
+> > +	case BT_ERROR_CCC_IMPROPERLY_CONFIGURED:
+> > +		return "CCC Improperly Configured";
+> > +	case BT_ERROR_ALREADY_IN_PROGRESS:
+> > +		return "Procedure Already in Progress";
+> > +	case BT_ERROR_OUT_OF_RANGE:
+> > +		return "Out of Range";
+> >  	default:
+> >  		return "Unknown error type";
+> >  	}
+> > --
+> > 1.9.1
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+linux-bluetooth"
+> in
+> > the body of a message to majordomo@vger.kernel.org More majordomo
+> info
+> > at  http://vger.kernel.org/majordomo-info.html
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
-Signed-off-by: Xinming Hu <huxm@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
- drivers/bluetooth/btmrvl_sdio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 01d6da5..b9a8119 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1217,7 +1217,7 @@ static void btmrvl_sdio_dump_firmware(struct btmrvl_private *priv)
- 	unsigned int reg, reg_start, reg_end;
- 	enum rdwr_status stat;
- 	u8 *dbg_ptr, *end_ptr, *fw_dump_data, *fw_dump_ptr;
--	u8 dump_num, idx, i, read_reg, doneflag = 0;
-+	u8 dump_num = 0, idx, i, read_reg, doneflag = 0;
- 	u32 memory_size, fw_dump_len = 0;
- 
- 	/* dump sdio register first */
--- 
-1.8.1.4
