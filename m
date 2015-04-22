@@ -1,54 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Prabhu Chawandi <foss.chaws@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: android/hid
+Date: Wed, 22 Apr 2015 17:21:52 +0200
+Message-ID: <6165450.GeaFHTnZGY@leonov>
+In-Reply-To: <CAKafyqqB5JKGt6iXKXwBrz1za6f64CJZA-d9oUjXD6vbbjU2=g@mail.gmail.com>
+References: <CAKafyqqB5JKGt6iXKXwBrz1za6f64CJZA-d9oUjXD6vbbjU2=g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1429686894-29667-1-git-send-email-luiz.dentz@gmail.com>
-References: <1429686894-29667-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 22 Apr 2015 09:14:38 -0700
-Message-ID: <CAHrH25TKR51pkSh_+-UpCsL=71t+-DxEfBmxtOMkJGJfvMf92w@mail.gmail.com>
-Subject: Re: [RFC BlueZ] doc/gatt-api: Add encryption flag
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Prabhu,
 
-> On Wed, Apr 22, 2015 at 12:14 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This add encryption flag which can be used when registering a service to
-> require encryption when accessing a characteristic.
-> ---
->  doc/gatt-api.txt | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> index 088d285..92118fd 100644
-> --- a/doc/gatt-api.txt
-> +++ b/doc/gatt-api.txt
-> @@ -148,6 +148,7 @@ Properties  string UUID [read-only]
->                                 "authenticated-signed-writes"
->                                 "reliable-write"
->                                 "writable-auxiliaries"
-> +                               "encryption"
->
->                 array{object} Descriptors [read-only]
->
-> --
-> 2.1.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+On Wednesday 22 of April 2015 16:09:57 Prabhu Chawandi wrote:
+> Hi,
+> 
+> I got a BT HID device which has support for GAMEPAD and MOUSE, this is
+> not LE device.  When i try to bond, its failing?
+> 
+> Can you give me pointers to debug, further ?
 
-I've actually been planning to send a patch to add a "Permissions"
-property to GattCharacteristic1 and GattDescriptor1, which would be
-more in line with GATT attribute permissions. What I had in mind was a
-"Permissions" property, which would have array{string} as the type.
-And potential values would be "read-encrypted", "read-authenticated",
-etc. What do you think?
+Please provide full debug logs from logcat. Check 'Enabling BlueZ debugs' in 
+android/README for details how to enable those.
 
-Thanks,
-Arman
+Also please provide HCI traces.
+
+-- 
+BR
+Szymon Janc
