@@ -1,20 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 22 Apr 2015 16:09:57 +0530
-Message-ID: <CAKafyqqB5JKGt6iXKXwBrz1za6f64CJZA-d9oUjXD6vbbjU2=g@mail.gmail.com>
-Subject: android/hid
-From: Prabhu Chawandi <foss.chaws@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH BlueZ] unit/test-gdbus-client: Fix hanging if D-Bus fails to launch
+Date: Wed, 22 Apr 2015 10:39:57 +0200
+Message-Id: <1429691997-6469-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I got a BT HID device which has support for GAMEPAD and MOUSE, this is
-not LE device.  When i try to bond, its failing?
+In case D-Bus fails to launch make the test fails so it does not hang
+other tests.
+---
+ unit/test-gdbus-client.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Can you give me pointers to debug, further ?
+diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
+index 5a4b974..7e16d16 100644
+--- a/unit/test-gdbus-client.c
++++ b/unit/test-gdbus-client.c
+@@ -72,6 +72,7 @@ static struct context *create_context(void)
+ 		}
+ 
+ 		g_free(context);
++		tester_test_failed();
+ 		return NULL;
+ 	}
+ 
+-- 
+2.1.0
 
-Thanks,
-Prabhu
