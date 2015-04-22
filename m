@@ -1,162 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Cc: chanyeol.park@samsung.com
-Subject: [BlueZ RFC 1/3] monitor: Add btsnoop data link transfer way
-Date: Thu, 23 Apr 2015 03:49:23 -0400
-Message-Id: <1429775365-17215-1-git-send-email-chanyeol.park@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25TKwCouXPHHNmTWLAXyQoaymUPMOFqjT+gtZZ0ShkK2VA@mail.gmail.com>
+References: <CABKPALoBuLSHyzWrULQADxq83McSoSeEh58FLhPwL_j5OLHwOQ@mail.gmail.com>
+	<CAHrH25TKwCouXPHHNmTWLAXyQoaymUPMOFqjT+gtZZ0ShkK2VA@mail.gmail.com>
+Date: Wed, 22 Apr 2015 17:29:32 -0500
+Message-ID: <CABKPALpXmiPU+C=2JQbXfLdSP6DVG+YugG4+upJk3VwJbyWXYA@mail.gmail.com>
+Subject: Re: Running bluez on Raspberry Pi
+From: Neil Martin <neil@vnp.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+Hi Arman,
 
-Current btmon's btsnoop data link type is BTSNOOP_TYPE_MONITOR:2001.
-but some of btsnoop viewer could not handle it because they just
-support BTSNOOP_TYPE_HCI(1001).
+Many thanks for the reply!
 
-So they need transform way to analyze the btsnoop file captured by
-btmon.
----
- monitor/control.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- monitor/control.h |  1 +
- monitor/main.c    | 13 +++++++++++-
- 3 files changed, 74 insertions(+), 1 deletion(-)
+On Mon, Apr 20, 2015 at 5:29 PM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Neil,
+>
+>> On Sun, Apr 19, 2015 at 3:34 PM, Neil Martin <neil@vnp.com> wrote:
+>> I'm new to bluez and fairly green with Bluetooth in general.  I have
+>> built 5.30 on a Raspberry PI 2 running raspbian wheezy.  Here's the
+>> configure command that I used (arrived at by experimentation and
+>> Googling for various build problems I encountered):
+>>
+>> LDFLAGS=-lrt ./configure --disable-systemd --enable-experimental
+>> --enable-maintainer-mode
+>>
+>>
+>> The hci tools seem to work as expected.  Also btgatt-client works - I
+>> am able to connect to a BLE heart rate monitor and I see the HR
+>> related services.
+>>
+>>
+>> However, btgatt-server does not seem to do anything, but no errors
+>> reported either.  I'm running it like this:
+>>
+>> sudo ./btgatt-server -r
+>>
+>> and get this as the only output:
+>>
+>> Started listening on ATT channel. Waiting for connections
+>>
+>>
+>> I'm assuming that I should be seeing this advertising when I run
+>> hcitool lescan?  I don't see anything.  Also btmon shows no activity
+>> when I run btgatt-server.
+>
+> Nope, btgatt-server doesn't configure anything related to advertising;
+> it simply sets up and attaches a GATT server to a listening L2CAP
+> socket on the ATT channel. So you need to set up advertising
+> separately, e.g. by running 'btmgmt advertising on' or 'btmgmt
+> add-acv'.
 
-diff --git a/monitor/control.c b/monitor/control.c
-index e61a79d..00e4bc0 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -1131,6 +1131,67 @@ bool control_writer(const char *path)
- 	return !!btsnoop_file;
- }
- 
-+void transfer_btsnoop_data_link(const char *path, const char *writer_path)
-+{
-+	unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
-+	uint16_t pktlen;
-+	uint32_t type;
-+	struct timeval tv;
-+	struct btsnoop *btsnoop_write_file = NULL;
-+	unsigned long num_packets = 0;
-+
-+	btsnoop_file = btsnoop_open(path, BTSNOOP_FLAG_PKLG_SUPPORT);
-+	if (!btsnoop_file)
-+		return;
-+
-+	btsnoop_write_file = btsnoop_create(writer_path, BTSNOOP_TYPE_HCI);
-+	if (!btsnoop_write_file)
-+		return;
-+
-+	type = btsnoop_get_type(btsnoop_file);
-+
-+	switch (type) {
-+	case BTSNOOP_TYPE_HCI:
-+	case BTSNOOP_TYPE_UART:
-+	case BTSNOOP_TYPE_SIMULATOR:
-+		packet_del_filter(PACKET_FILTER_SHOW_INDEX);
-+		break;
-+
-+	case BTSNOOP_TYPE_MONITOR:
-+		packet_add_filter(PACKET_FILTER_SHOW_INDEX);
-+		break;
-+	}
-+
-+	switch (type) {
-+	case BTSNOOP_TYPE_HCI:
-+	case BTSNOOP_TYPE_UART:
-+	case BTSNOOP_TYPE_MONITOR:
-+		while (1) {
-+			uint16_t index, opcode;
-+
-+			if (!btsnoop_read_hci(btsnoop_file, &tv, &index,
-+							&opcode, buf, &pktlen))
-+				break;
-+
-+			if (opcode == 0xffff)
-+				continue;
-+
-+			btsnoop_write_hci(btsnoop_write_file, &tv, index,
-+							opcode, buf, pktlen);
-+			num_packets++;
-+		}
-+		break;
-+	}
-+
-+	btsnoop_unref(btsnoop_file);
-+	btsnoop_unref(btsnoop_write_file);
-+
-+	printf("BT Snoop data link transfer is completed for %lu packets\n",
-+								num_packets);
-+	printf("Output is saved in %s\n", writer_path);
-+}
-+
-+
- void control_reader(const char *path)
- {
- 	unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
-diff --git a/monitor/control.h b/monitor/control.h
-index 28f16db..267d71b 100644
---- a/monitor/control.h
-+++ b/monitor/control.h
-@@ -28,5 +28,6 @@ bool control_writer(const char *path);
- void control_reader(const char *path);
- void control_server(const char *path);
- int control_tracing(void);
-+void transfer_btsnoop_data_link(const char *path, const char *writer_path);
- 
- void control_message(uint16_t opcode, const void *data, uint16_t size);
-diff --git a/monitor/main.c b/monitor/main.c
-index de48db5..6e7d4b3 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -59,6 +59,7 @@ static void usage(void)
- 	printf("options:\n"
- 		"\t-r, --read <file>      Read traces in btsnoop format\n"
- 		"\t-w, --write <file>     Save traces in btsnoop format\n"
-+		"\t-f, --transfer <file>  Transfer btsnoop data link type\n"
- 		"\t-a, --analyze <file>   Analyze traces in btsnoop format\n"
- 		"\t-s, --server <socket>  Start monitor server socket\n"
- 		"\t-i, --index <num>      Show only specified controller\n"
-@@ -72,6 +73,7 @@ static void usage(void)
- static const struct option main_options[] = {
- 	{ "read",    required_argument, NULL, 'r' },
- 	{ "write",   required_argument, NULL, 'w' },
-+	{ "transfer", required_argument, NULL, 'f' },
- 	{ "analyze", required_argument, NULL, 'a' },
- 	{ "server",  required_argument, NULL, 's' },
- 	{ "index",   required_argument, NULL, 'i' },
-@@ -104,7 +106,7 @@ int main(int argc, char *argv[])
- 	for (;;) {
- 		int opt;
- 
--		opt = getopt_long(argc, argv, "r:w:a:s:i:tTSE:vh",
-+		opt = getopt_long(argc, argv, "r:w:f:a:s:i:tTSE:vh",
- 						main_options, NULL);
- 		if (opt < 0)
- 			break;
-@@ -116,6 +118,10 @@ int main(int argc, char *argv[])
- 		case 'w':
- 			writer_path = optarg;
- 			break;
-+		case 'f':
-+			reader_path = optarg;
-+			writer_path = "btsnoop_type_hci.log";
-+			break;
- 		case 'a':
- 			analyze_path = optarg;
- 			break;
-@@ -191,6 +197,11 @@ int main(int argc, char *argv[])
- 		return EXIT_SUCCESS;
- 	}
- 
-+	if (reader_path && writer_path) {
-+		transfer_btsnoop_data_link(reader_path, writer_path);
-+		return EXIT_SUCCESS;
-+	}
-+
- 	if (reader_path) {
- 		if (ellisys_server)
- 			ellisys_enable(ellisys_server, ellisys_port);
--- 
-2.1.0
+Got it.  Thanks for pointing me at btmgmt - I wasn't aware of that tool.
 
+I did try the btmgmt advertising commands without success and I wonder
+if you could answer a few questions on this.
+
+1) Seems like I needed to issue a 'btmgmt le on' before the 'btmgmt
+advertising on' otherwise it fails.  Does that make sense?
+
+2) What does  'btmgmt advertising on' do?  Is that command needed to
+switch advertising on before issuing 'btmgt add-adv"?
+
+3) I played around with the add-adv command and it spits out a message
+if you give it params that it doesn't like.  That message contains an
+example invocation, so I tried that.  Here's the command and the error
+message:
+
+sudo ./btmgmt add-adv -u 180d -u 180f -d 080954657374204C45 1
+Add Advertising failed with status 0x01 (Unknown Command)
+
+4) I also noticed that btmgmt has some other useful commands.  One in
+particular that interested me was 'find-service'.  I get an error with
+this too:
+
+sudo ./btmgmt find-service -u 180d
+Start Service Discovery failed: status 0x01 (Unknown Command)
+
+Btw, 'btmgmt find' does work.
+
+
+Now back to btgatt-server :)
+
+Now I understand why I wasn't seeing any advertising; is it the case
+that I should be able to connect to it using bggatt-client?  I tried
+this from a different machine while running 'sudo ./btgatt-server
+-rv':
+
+sudo ./btgatt-client -i hci0 -d 5C:F3:70:65:CF:E6 -v
+btgatt-client: Opening L2CAP LE connection on ATT channel:
+src: 5C:F3:70:64:FB:97
+dest: 5C:F3:70:65:CF:E6
+Connecting to device... Failed to connect: Transport endpoint is not connected
+
+>
+> Note that you usually don't want to run btgatt-server while bluetoothd
+> is running since they will interfere with each other.
+
+I figured that might be the case.  Btw, I noticed when I cntrl C out
+of bluetoothd that my bluetooth interface goes down.  Is that
+expected?
+
+I know that's a lot of stuff, but I'm hoping there might be a common
+thread to the issues I'm hitting.
+
+Thanks again!
+
+Neil
+
+
+>
+>>
+>>
+>> Additionally, if I try to run bluetoothd, I get the following output
+>> which doesn't look good!
+>>
+>>
+>> sudo ./bluetoothd -nE
+>>
+>> bluetoothd[19968]: Bluetooth daemon 5.30
+>> bluetoothd[19968]: Starting SDP server
+>> bluetoothd[19968]: Bluetooth management interface 1.7 initialized
+>> bluetoothd[19968]: Failed to obtain handles for "Service Changed" characteristic
+>> bluetoothd[19968]: Not enough free handles to register service
+>> bluetoothd[19968]: Error adding Link Loss service
+>> bluetoothd[19968]: Not enough free handles to register service
+>> bluetoothd[19968]: Not enough free handles to register service
+>> bluetoothd[19968]: Not enough free handles to register service
+>> bluetoothd[19968]: Current Time Service could not be registered
+>> bluetoothd[19968]: gatt-time-server: Input/output error (5)
+>> bluetoothd[19968]: Not enough free handles to register service
+>> bluetoothd[19968]: Not enough free handles to register service
+>>
+>
+> We really need to clean these up. Basically bluetoothd fails to
+> register all the experimental local services since we changed the
+> internal plumbing to the new shared stack. Fwiw these are all plugins
+> that we are deprecating and the actual local GATT server will work
+> regardless.
+>
+> Also, if you want the daemon running, I suggest using the GATT D-Bus
+> API for hosting your own services.
+>
+>>
+>> I've done plenty of googling and not finding anything useful, so I'm
+>> hoping that someone here will have some insight.
+>>
+>> Thanks, Neil
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> Thanks!
+> Arman
