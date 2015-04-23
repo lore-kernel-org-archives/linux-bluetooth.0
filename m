@@ -1,63 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1429798808-24388-1-git-send-email-luiz.dentz@gmail.com>
-References: <1429798808-24388-1-git-send-email-luiz.dentz@gmail.com>
-Date: Thu, 23 Apr 2015 12:14:48 -0700
-Message-ID: <CAHrH25QqYhKGYitV4oVDPibjpCte6ACgPigr_+rW0r5LYwOPwQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] doc/gatt-api: Add encryption flags
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [BlueZ RFC 2/3] monitor: Add btsnoop data link type option
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <4816983.5v9O5K046c@leonov>
+Date: Thu, 23 Apr 2015 09:53:52 -0700
+Cc: chanyeol.park@gmail.com, linux-bluetooth@vger.kernel.org,
+	chanyeol.park@samsung.com
+Message-Id: <2AC37407-D18A-4A49-ACE9-A6FD1B70FF67@holtmann.org>
+References: <1429775365-17215-1-git-send-email-chanyeol.park@samsung.com> <1429775365-17215-2-git-send-email-chanyeol.park@samsung.com> <4816983.5v9O5K046c@leonov>
+To: Szymon Janc <szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Szymon,
 
-> On Thu, Apr 23, 2015 at 7:20 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This add encryption flags which can be used when registering a service to
-> require encryption when accessing a characteristic.
-> ---
->  doc/gatt-api.txt | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> index 088d285..8db35f2 100644
-> --- a/doc/gatt-api.txt
-> +++ b/doc/gatt-api.txt
-> @@ -148,6 +148,10 @@ Properties string UUID [read-only]
->                                 "authenticated-signed-writes"
->                                 "reliable-write"
->                                 "writable-auxiliaries"
-> +                               "encrypt-read"
-> +                               "encrypt-write"
-> +                               "encrypt-authenticated-read"
-> +                               "encrypt-authenticated-write"
+>> Current btmon's btsnoop data link type is BTSNOOP_TYPE_MONITOR(2001)
+>> statically. but some of btsnoop viewer just support BTSNOOP_TYPE_HCI(1001,
+>> so they could not use btmon's btsnoop. If this option is set, they could
+>> parse btsnoop. ---
+>> monitor/control.c | 4 ++--
+>> monitor/control.h | 2 +-
+>> monitor/main.c    | 9 ++++++++-
+>> 3 files changed, 11 insertions(+), 4 deletions(-)
+>> 
+>> diff --git a/monitor/control.c b/monitor/control.c
+>> index 00e4bc0..72204bf 100644
+>> --- a/monitor/control.c
+>> +++ b/monitor/control.c
+>> @@ -1124,9 +1124,9 @@ void control_server(const char *path)
+>> 	server_fd = fd;
+>> }
+>> 
+>> -bool control_writer(const char *path)
+>> +bool control_writer(const char *path, uint32_t type)
+>> {
+>> -	btsnoop_file = btsnoop_create(path, BTSNOOP_TYPE_MONITOR);
+>> +	btsnoop_file = btsnoop_create(path, type);
+>> 
+>> 	return !!btsnoop_file;
+>> }
+>> diff --git a/monitor/control.h b/monitor/control.h
+>> index 267d71b..680e6b6 100644
+>> --- a/monitor/control.h
+>> +++ b/monitor/control.h
+>> @@ -24,7 +24,7 @@
+>> 
+>> #include <stdint.h>
+>> 
+>> -bool control_writer(const char *path);
+>> +bool control_writer(const char *path, uint32_t type);
+>> void control_reader(const char *path);
+>> void control_server(const char *path);
+>> int control_tracing(void);
+>> diff --git a/monitor/main.c b/monitor/main.c
+>> index 6e7d4b3..66d7ad1 100644
+>> --- a/monitor/main.c
+>> +++ b/monitor/main.c
+>> @@ -33,6 +33,7 @@
+>> #include <getopt.h>
+>> 
+>> #include "src/shared/mainloop.h"
+>> +#include "src/shared/btsnoop.h"
+>> 
+>> #include "packet.h"
+>> #include "lmp.h"
+>> @@ -66,6 +67,7 @@ static void usage(void)
+>> 		"\t-t, --time             Show time instead of time offset\n"
+>> 		"\t-T, --date             Show time and date information\n"
+>> 		"\t-S, --sco              Dump SCO traffic\n"
+>> +		"\t-H, --hci              Use BTSNOOP_TYPE_HCI\n"
+>> 		"\t-E, --ellisys [ip]     Send Ellisys HCI Injection\n"
+>> 		"\t-h, --help             Show help options\n");
+>> }
+>> @@ -80,6 +82,7 @@ static const struct option main_options[] = {
+>> 	{ "time",    no_argument,       NULL, 't' },
+>> 	{ "date",    no_argument,       NULL, 'T' },
+>> 	{ "sco",     no_argument,	NULL, 'S' },
+>> +	{ "hci",     no_argument,	NULL, 'H' },
+>> 	{ "ellisys", required_argument, NULL, 'E' },
+>> 	{ "todo",    no_argument,       NULL, '#' },
+>> 	{ "version", no_argument,       NULL, 'v' },
+>> @@ -98,6 +101,7 @@ int main(int argc, char *argv[])
+>> 	const char *str;
+>> 	int exit_status;
+>> 	sigset_t mask;
+>> +	uint32_t type = BTSNOOP_TYPE_MONITOR;
+>> 
+>> 	mainloop_init();
+>> 
+>> @@ -151,6 +155,9 @@ int main(int argc, char *argv[])
+>> 		case 'S':
+>> 			filter_mask |= PACKET_FILTER_SHOW_SCO_DATA;
+>> 			break;
+>> +		case 'H':
+>> +			type = BTSNOOP_TYPE_HCI;
+>> +			break;
+>> 		case 'E':
+>> 			ellisys_server = optarg;
+>> 			ellisys_port = 24352;
+>> @@ -210,7 +217,7 @@ int main(int argc, char *argv[])
+>> 		return EXIT_SUCCESS;
+>> 	}
+>> 
+>> -	if (writer_path && !control_writer(writer_path)) {
+>> +	if (writer_path && !control_writer(writer_path, type)) {
+>> 		printf("Failed to open '%s'\n", writer_path);
+>> 		return EXIT_FAILURE;
+>> 	}
+> 
+> This option should be tightly coupled with --index option since legacy format 
+> cannot store index id.
 
-So I guess you decided not to go with a "Permissions" property? I
-guess that's fine but we need to handle this for descriptors as well.
-So probably add a "Flags" property to GattDescriptor1 also. There
-we'll want read, write, encrypt-*, and encrypt-authenticated-*.
+I do not like this. btmon should always write the new format. Otherwise you are missing the index added and removed extra meta data.
 
->
->                 array{object} Descriptors [read-only]
->
-> --
-> 2.1.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Regards
 
-Can you also update test/example-gatt-server with new characteristics
-and descriptors that demonstrate the permissions feature? You can add
-them as new vendor-specific test characteristics (there's a
-vendor-specific test service in there) and/or modify one of the other
-two example services (HR and Battery). Let's get that into this patch
-set so we know we have some way to test it.
+Marcel
 
-Thanks,
-Arman
