@@ -1,118 +1,180 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] core/gatt: Add support for encryption flags
-Date: Thu, 23 Apr 2015 16:20:06 +0200
-Message-Id: <1429798808-24388-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1429798808-24388-1-git-send-email-luiz.dentz@gmail.com>
-References: <1429798808-24388-1-git-send-email-luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: chanyeol.park@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, chanyeol.park@samsung.com
+Subject: Re: [BlueZ RFC 1/3] monitor: Add btsnoop data link transfer way
+Date: Thu, 23 Apr 2015 13:25:55 +0200
+Message-ID: <31085236.0AZ1lbYsZp@leonov>
+In-Reply-To: <1429775365-17215-1-git-send-email-chanyeol.park@samsung.com>
+References: <1429775365-17215-1-git-send-email-chanyeol.park@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Chan-yeol Park,
 
-This adds support to encryption related flags as defined in the
-documentation.
----
- src/gatt-database.c    | 28 ++++++++++++++++++++++++++--
- src/shared/att-types.h | 30 ++++++++++++++++++++++--------
- 2 files changed, 48 insertions(+), 10 deletions(-)
+On Thursday 23 of April 2015 03:49:23 chanyeol.park@gmail.com wrote:
+> From: Chan-yeol Park <chanyeol.park@samsung.com>
+> 
+> Current btmon's btsnoop data link type is BTSNOOP_TYPE_MONITOR:2001.
+> but some of btsnoop viewer could not handle it because they just
+> support BTSNOOP_TYPE_HCI(1001).
+> 
+> So they need transform way to analyze the btsnoop file captured by
+> btmon.
+> ---
+>  monitor/control.c | 61
+> +++++++++++++++++++++++++++++++++++++++++++++++++++++++ monitor/control.h |
+>  1 +
+>  monitor/main.c    | 13 +++++++++++-
+>  3 files changed, 74 insertions(+), 1 deletion(-)
+> 
+> diff --git a/monitor/control.c b/monitor/control.c
+> index e61a79d..00e4bc0 100644
+> --- a/monitor/control.c
+> +++ b/monitor/control.c
+> @@ -1131,6 +1131,67 @@ bool control_writer(const char *path)
+>  	return !!btsnoop_file;
+>  }
+> 
+> +void transfer_btsnoop_data_link(const char *path, const char *writer_path)
+> +{
+> +	unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
+> +	uint16_t pktlen;
+> +	uint32_t type;
+> +	struct timeval tv;
+> +	struct btsnoop *btsnoop_write_file = NULL;
+> +	unsigned long num_packets = 0;
+> +
+> +	btsnoop_file = btsnoop_open(path, BTSNOOP_FLAG_PKLG_SUPPORT);
+> +	if (!btsnoop_file)
+> +		return;
+> +
+> +	btsnoop_write_file = btsnoop_create(writer_path, BTSNOOP_TYPE_HCI);
+> +	if (!btsnoop_write_file)
+> +		return;
+> +
+> +	type = btsnoop_get_type(btsnoop_file);
+> +
+> +	switch (type) {
+> +	case BTSNOOP_TYPE_HCI:
+> +	case BTSNOOP_TYPE_UART:
+> +	case BTSNOOP_TYPE_SIMULATOR:
+> +		packet_del_filter(PACKET_FILTER_SHOW_INDEX);
+> +		break;
+> +
+> +	case BTSNOOP_TYPE_MONITOR:
+> +		packet_add_filter(PACKET_FILTER_SHOW_INDEX);
+> +		break;
+> +	}
+> +
+> +	switch (type) {
+> +	case BTSNOOP_TYPE_HCI:
+> +	case BTSNOOP_TYPE_UART:
+> +	case BTSNOOP_TYPE_MONITOR:
+> +		while (1) {
+> +			uint16_t index, opcode;
+> +
+> +			if (!btsnoop_read_hci(btsnoop_file, &tv, &index,
+> +							&opcode, buf, &pktlen))
+> +				break;
+> +
+> +			if (opcode == 0xffff)
+> +				continue;
+> +
+> +			btsnoop_write_hci(btsnoop_write_file, &tv, index,
+> +							opcode, buf, pktlen);
+> +			num_packets++;
+> +		}
+> +		break;
+> +	}
+> +
+> +	btsnoop_unref(btsnoop_file);
+> +	btsnoop_unref(btsnoop_write_file);
+> +
+> +	printf("BT Snoop data link transfer is completed for %lu packets\n",
+> +								num_packets);
+> +	printf("Output is saved in %s\n", writer_path);
+> +}
+> +
+> +
+>  void control_reader(const char *path)
+>  {
+>  	unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
+> diff --git a/monitor/control.h b/monitor/control.h
+> index 28f16db..267d71b 100644
+> --- a/monitor/control.h
+> +++ b/monitor/control.h
+> @@ -28,5 +28,6 @@ bool control_writer(const char *path);
+>  void control_reader(const char *path);
+>  void control_server(const char *path);
+>  int control_tracing(void);
+> +void transfer_btsnoop_data_link(const char *path, const char *writer_path);
+> 
+>  void control_message(uint16_t opcode, const void *data, uint16_t size);
+> diff --git a/monitor/main.c b/monitor/main.c
+> index de48db5..6e7d4b3 100644
+> --- a/monitor/main.c
+> +++ b/monitor/main.c
+> @@ -59,6 +59,7 @@ static void usage(void)
+>  	printf("options:\n"
+>  		"\t-r, --read <file>      Read traces in btsnoop format\n"
+>  		"\t-w, --write <file>     Save traces in btsnoop format\n"
+> +		"\t-f, --transfer <file>  Transfer btsnoop data link type\n"
+>  		"\t-a, --analyze <file>   Analyze traces in btsnoop format\n"
+>  		"\t-s, --server <socket>  Start monitor server socket\n"
+>  		"\t-i, --index <num>      Show only specified controller\n"
+> @@ -72,6 +73,7 @@ static void usage(void)
+>  static const struct option main_options[] = {
+>  	{ "read",    required_argument, NULL, 'r' },
+>  	{ "write",   required_argument, NULL, 'w' },
+> +	{ "transfer", required_argument, NULL, 'f' },
+>  	{ "analyze", required_argument, NULL, 'a' },
+>  	{ "server",  required_argument, NULL, 's' },
+>  	{ "index",   required_argument, NULL, 'i' },
+> @@ -104,7 +106,7 @@ int main(int argc, char *argv[])
+>  	for (;;) {
+>  		int opt;
+> 
+> -		opt = getopt_long(argc, argv, "r:w:a:s:i:tTSE:vh",
+> +		opt = getopt_long(argc, argv, "r:w:f:a:s:i:tTSE:vh",
+>  						main_options, NULL);
+>  		if (opt < 0)
+>  			break;
+> @@ -116,6 +118,10 @@ int main(int argc, char *argv[])
+>  		case 'w':
+>  			writer_path = optarg;
+>  			break;
+> +		case 'f':
+> +			reader_path = optarg;
+> +			writer_path = "btsnoop_type_hci.log";
+> +			break;
+>  		case 'a':
+>  			analyze_path = optarg;
+>  			break;
+> @@ -191,6 +197,11 @@ int main(int argc, char *argv[])
+>  		return EXIT_SUCCESS;
+>  	}
+> 
+> +	if (reader_path && writer_path) {
+> +		transfer_btsnoop_data_link(reader_path, writer_path);
+> +		return EXIT_SUCCESS;
+> +	}
+> +
+>  	if (reader_path) {
+>  		if (ellisys_server)
+>  			ellisys_enable(ellisys_server, ellisys_port);
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 2261398..aaa8ad1 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -1241,6 +1241,14 @@ static bool parse_flags(GDBusProxy *proxy, uint8_t *props, uint8_t *ext_props)
- 			*ext_props |= BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE;
- 		else if (!strcmp("writable-auxiliaries", flag))
- 			*ext_props |= BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX;
-+		else if (!strcmp("encrypt-read", flag))
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_ENC_READ;
-+		else if (!strcmp("encrypt-write", flag))
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_ENC_WRITE;
-+		else if (!strcmp("encrypt-authenticated-read", flag))
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_READ;
-+		else if (!strcmp("encrypt-authenticated-write", flag))
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_WRITE;
- 		else {
- 			error("Invalid characteristic flag: %s", flag);
- 			return false;
-@@ -1668,12 +1676,28 @@ static uint32_t permissions_from_props(uint8_t props, uint8_t ext_props)
- 
- 	if (props & BT_GATT_CHRC_PROP_WRITE ||
- 			props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP ||
--			ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE)
-+			ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE ||
-+			ext_props & BT_GATT_CHRC_EXT_PROP_ENC_WRITE ||
-+			ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
- 		perm |= BT_ATT_PERM_WRITE;
- 
--	if (props & BT_GATT_CHRC_PROP_READ)
-+	if (props & BT_GATT_CHRC_PROP_READ ||
-+			ext_props & BT_GATT_CHRC_EXT_PROP_ENC_READ ||
-+			ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_READ)
- 		perm |= BT_ATT_PERM_READ;
- 
-+	if (ext_props & BT_GATT_CHRC_EXT_PROP_ENC_READ)
-+		perm |= BT_ATT_PERM_READ_ENCRYPT;
-+
-+	if (ext_props & BT_GATT_CHRC_EXT_PROP_ENC_WRITE)
-+		perm |= BT_ATT_PERM_WRITE_ENCRYPT;
-+
-+	if (ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_READ)
-+		perm |= BT_ATT_PERM_READ_AUTHEN;
-+
-+	if (ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
-+		perm |= BT_ATT_PERM_WRITE_AUTHEN;
-+
- 	return perm;
- }
- 
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index 10a42f2..ce531d1 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -106,12 +106,18 @@ struct bt_att_pdu_error_rsp {
-  * "Access", "Encryption", "Authentication", and "Authorization". A bitmask of
-  * permissions is a byte that encodes a combination of these.
-  */
--#define BT_ATT_PERM_READ	0x01
--#define BT_ATT_PERM_WRITE	0x02
--#define BT_ATT_PERM_ENCRYPT	0x04
--#define BT_ATT_PERM_AUTHEN	0x08
--#define BT_ATT_PERM_AUTHOR	0x10
--#define BT_ATT_PERM_NONE	0x20
-+#define BT_ATT_PERM_READ		0x01
-+#define BT_ATT_PERM_WRITE		0x02
-+#define BT_ATT_PERM_READ_ENCRYPT	0x04
-+#define BT_ATT_PERM_WRITE_ENCRYPT	0x08
-+#define BT_ATT_PERM_ENCRYPT		BT_ATT_PERM_READ_ENCRYPT | \
-+					BT_ATT_PERM_WRITE_ENCRYPT
-+#define BT_ATT_PERM_READ_AUTHEN		0x10
-+#define BT_ATT_PERM_WRITE_AUTHEN	0x20
-+#define BT_ATT_PERM_AUTHEN		BT_ATT_PERM_READ_AUTHEN | \
-+					BT_ATT_PERM_WRITE_AUTHEN
-+#define BT_ATT_PERM_AUTHOR		0x40
-+#define BT_ATT_PERM_NONE		0x80
- 
- /* GATT Characteristic Properties Bitfield values */
- #define BT_GATT_CHRC_PROP_BROADCAST			0x01
-@@ -124,5 +130,13 @@ struct bt_att_pdu_error_rsp {
- #define BT_GATT_CHRC_PROP_EXT_PROP			0x80
- 
- /* GATT Characteristic Extended Properties Bitfield values */
--#define BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE	0x01
--#define BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX	0x02
-+#define BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE		0x01
-+#define BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX		0x02
-+#define BT_GATT_CHRC_EXT_PROP_ENC_READ			0x04
-+#define BT_GATT_CHRC_EXT_PROP_ENC_WRITE			0x08
-+#define BT_GATT_CHRC_EXT_PROP_ENC	BT_GATT_CHRC_EXT_PROP_ENC_READ | \
-+					BT_GATT_CHRC_EXT_PROP_ENC_WRITE
-+#define BT_GATT_CHRC_EXT_PROP_AUTH_READ			0x10
-+#define BT_GATT_CHRC_EXT_PROP_AUTH_WRITE		0x20
-+#define BT_GATT_CHRC_EXT_PROP_AUTH	BT_GATT_CHRC_EXT_PROP_AUTH_READ | \
-+					BT_GATT_CHRC_EXT_PROP_AUTH_WRITE
+Those patches will make problems with multiple adapters.
+So if you really want to put this into btmon --transfer option should create 1 
+file per adapter eg. btmon --trasfer foo.btsnoop would result in multiple 
+foo_legacy_hciX.btsnoop files (or whatever it would be called).
+
+
+Personally I wouldn't put this into monitor but maybe provide additional 
+option to btsnoop tool for splitting into legacy files.
+
 -- 
-2.1.0
-
+BR
+Szymon Janc
