@@ -1,32 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1429607669-30669-1-git-send-email-gowtham.ab@samsung.com>
-References: <1429607669-30669-1-git-send-email-gowtham.ab@samsung.com>
-Date: Thu, 23 Apr 2015 18:37:21 +0300
-Message-ID: <CABBYNZK3NqLdnzb=XcjgdQ6pumLEZyeBZy3LW5r23=DPtwSYKg@mail.gmail.com>
-Subject: Re: [PATCH 0/5] Add decoding for BNEP packet types
+In-Reply-To: <1429541350-30882-1-git-send-email-bharat.panda@samsung.com>
+References: <1429541350-30882-1-git-send-email-bharat.panda@samsung.com>
+Date: Thu, 23 Apr 2015 17:35:40 +0300
+Message-ID: <CABBYNZKWtU0ZDPhfDTXBq0pRK=Y=b8kTo_pYDGkRtEPdWF8qeQ@mail.gmail.com>
+Subject: Re: [PATCH ] monitor: Add AVRCP ChangePath support
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: Bharat Panda <bharat.panda@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+	cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi Bharat,
 
-On Tue, Apr 21, 2015 at 12:14 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Gowtham Anandha Babu (5):
->   monitor: Add support for decoding bnep General pkt
->   monitor: Add support for decoding bnep Control pkt
->   monitor: Add support for decoding bnep Compressed pkt
->   monitor: Add support for decoding bnep SrcOnly pkt
->   monitor: Add support for decoding bnep DestOnly pkt
+On Mon, Apr 20, 2015 at 5:49 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Add support for decoding AVRCP ChangePath in bluetooth monitor.
 >
->  monitor/bnep.c | 179 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 169 insertions(+), 10 deletions(-)
+>       Channel: 65 len 21 ctrl 0x0000 [PSM 27 mode 3] {chan 1}
+>       I-frame: Unsegmented TxSeq 0 ReqSeq 0
+>       AVCTP Browsing: Command: type 0x00 label 0 PID 0x110e
+>         AVRCP: ChangePath: len 0x000b
+>           UIDCounter: 0x0000 (0)
+>           Direction: 0x01 (Folder Down)
+>           FolderUID: 0x               1 (1)
+> ---
+>  monitor/avctp.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 71 insertions(+)
 >
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index f4f3250..e071393 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -1742,6 +1742,74 @@ static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
+>         }
+>  }
+>
+> +static const char *dir2str(uint8_t dir)
+> +{
+> +       switch (dir) {
+> +       case 0x00:
+> +               return "Folder Up";
+> +       case 0x01:
+> +               return "Folder Down";
+> +       }
+> +
+> +       return "Reserved";
+> +}
+> +
+> +static bool avrcp_change_path(struct avctp_frame *avctp_frame)
+> +{
+> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
+> +       uint64_t uid;
+> +       uint32_t items;
+> +       uint16_t uidcounter;
+> +       uint8_t dir, status, indent = 2;
+> +
+> +       if (avctp_frame->hdr & 0x02)
+> +               goto response;
+> +
+> +       if (frame->size < 11) {
+> +               print_field("%*cPDU Malformed", indent, ' ');
+> +               packet_hexdump(frame->data, frame->size);
+> +               return false;
+> +       }
+> +
+> +       if (!l2cap_frame_get_be16(frame, &uidcounter))
+> +               return false;
+> +
+> +       print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ',
+> +                                       uidcounter, uidcounter);
+> +
+> +       if (!l2cap_frame_get_u8(frame, &dir))
+> +               return false;
+> +
+> +       print_field("%*cDirection: 0x%02x (%s)", indent, ' ',
+> +                                       dir, dir2str(dir));
+> +
+> +       if (!l2cap_frame_get_be64(frame, &uid))
+> +               return false;
+> +
+> +       print_field("%*cFolderUID: 0x%16" PRIx64 " (%" PRIu64 ")", indent, ' ',
+> +                                       uid, uid);
+> +
+> +       return true;
+> +
+> +response:
+> +       if (!l2cap_frame_get_u8(frame, &status))
+> +               return false;
+> +
+> +       print_field("%*cStatus: 0x%02x (%s)", indent, ' ',
+> +                                       status, error2str(status));
+> +
+> +       if (frame->size == 1)
+> +               return false;
+> +
+> +       if (!l2cap_frame_get_be32(frame, &items))
+> +               return false;
+> +
+> +       print_field("%*cNumber of Items: 0x%04x (%u)", indent, ' ',
+> +                                       items, items);
+> +
+> +       return true;
+> +}
+> +
+>  static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
+>                                                         uint8_t indent)
+>  {
+> @@ -2136,6 +2204,9 @@ static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
+>         case AVRCP_GET_FOLDER_ITEMS:
+>                 avrcp_get_folder_items(avctp_frame);
+>                 break;
+> +       case AVRCP_CHANGE_PATH:
+> +               avrcp_change_path(avctp_frame);
+> +               break;
+>         default:
+>                 packet_hexdump(frame->data, frame->size);
+>         }
 > --
 > 1.9.1
 
