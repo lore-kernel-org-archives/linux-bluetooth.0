@@ -1,66 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] shared/att: Add own security definitions
-Date: Thu, 23 Apr 2015 16:20:07 +0200
-Message-Id: <1429798808-24388-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1429798808-24388-1-git-send-email-luiz.dentz@gmail.com>
-References: <1429798808-24388-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/4] doc/gatt-api: Add encryption flags
+Date: Thu, 23 Apr 2015 16:20:05 +0200
+Message-Id: <1429798808-24388-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This defines security level at ATT level so it is not necessary to use
-transport specific defines.
+This add encryption flags which can be used when registering a service to
+require encryption when accessing a characteristic.
 ---
- src/shared/att-types.h | 5 +++++
- src/shared/att.c       | 2 +-
- unit/test-gatt.c       | 2 +-
- 3 files changed, 7 insertions(+), 2 deletions(-)
+ doc/gatt-api.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index ce531d1..ea4c009 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -27,6 +27,11 @@
- #define __packed __attribute__((packed))
- #endif
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 088d285..8db35f2 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -148,6 +148,10 @@ Properties	string UUID [read-only]
+ 				"authenticated-signed-writes"
+ 				"reliable-write"
+ 				"writable-auxiliaries"
++				"encrypt-read"
++				"encrypt-write"
++				"encrypt-authenticated-read"
++				"encrypt-authenticated-write"
  
-+#define BT_ATT_SECURITY_NONE	0
-+#define BT_ATT_SECURITY_LOW	1
-+#define BT_ATT_SECURITY_MEDIUM	2
-+#define BT_ATT_SECURITY_HIGH	3
-+
- #define BT_ATT_DEFAULT_LE_MTU	23
- #define BT_ATT_MAX_LE_MTU	517
- #define BT_ATT_MAX_VALUE_LEN	512
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 3b37cdf..f24da18 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -1364,7 +1364,7 @@ bool bt_att_set_sec_level(struct bt_att *att, int level)
- {
- 	struct bt_security sec;
+ 		array{object} Descriptors [read-only]
  
--	if (!att || level < BT_SECURITY_LOW || level > BT_SECURITY_HIGH)
-+	if (!att || level < BT_ATT_SECURITY_LOW || level > BT_ATT_SECURITY_HIGH)
- 		return false;
- 
- 	if (!att->io_on_l2cap) {
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 415680b..caaacbd 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -1002,7 +1002,7 @@ static void test_signed_write_seclevel(struct context *context)
- 	g_assert(bt_att_set_local_key(context->att, key, local_counter,
- 								context));
- 
--	g_assert(bt_att_set_sec_level(context->att, BT_SECURITY_MEDIUM));
-+	g_assert(bt_att_set_sec_level(context->att, BT_ATT_SECURITY_MEDIUM));
- 
- 	g_assert(bt_gatt_client_write_without_response(context->client,
- 							step->handle,
 -- 
 2.1.0
 
