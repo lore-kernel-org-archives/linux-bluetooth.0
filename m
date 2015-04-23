@@ -1,262 +1,287 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1428633041-18415-2-git-send-email-fgrandel@gmail.com>
-References: <20150409094913.GB10676@t440s.lan>
-	<1428633041-18415-1-git-send-email-fgrandel@gmail.com>
-	<1428633041-18415-2-git-send-email-fgrandel@gmail.com>
-Date: Thu, 23 Apr 2015 17:37:32 -0700
-Message-ID: <CAHrH25S6iCxuThBz0ZtKRu7PpoZkBjTHsFEU+NBozaNFJVyPqA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] Bluetooth: hci_core: Introduce multi-adv inst list
+In-Reply-To: <1429141368-32190-1-git-send-email-jpawlowski@google.com>
+References: <1429141368-32190-1-git-send-email-jpawlowski@google.com>
+Date: Thu, 23 Apr 2015 13:21:53 -0700
+Message-ID: <CAHrH25Q-87WCYAMoRUXeraZ7HcpeuXKsjsKh0bd3EJNNU4WHtg@mail.gmail.com>
+Subject: Re: [PATCH v8] client: main: add support for SetDiscoveryFilter
 From: Arman Uguray <armansito@chromium.org>
-To: Florian Grandel <fgrandel@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Florian,
+Hi,
 
-Sorry for my delayed response, please see my comments inline below.
-
-> On Thu, Apr 9, 2015 at 7:30 PM, Florian Grandel <fgrandel@gmail.com> wrote:
-> The current hci dev structure only supports a single advertising
-> instance. To support multi-instance advertising it is necessary to
-> introduce a linked list of advertising instances so that multiple
-> advertising instances can be dynamically added and/or removed.
+> On Wed, Apr 15, 2015 at 4:42 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> This patch adds set-scan-filter-* commands to sample DBus client that
+> might be used to modify discovery filter.
 >
-> In a first step, the existing adv_instance member of the hci_dev
-> struct is supplemented by a linked list of advertising instances.
-> This patch introduces the list and supporting list management
-> infrastructure. The list is not being used yet.
->
-> Signed-off-by: Florian Grandel <fgrandel@gmail.com>
+> set-scan-filter-uuids - sets filter uuids field
+> set-scan-filter-rssi - sets filter rssi and clears pathloss
+> set-scan-filter-pathloss - sets filter pathloss and clears rssi
+> set-scan-filter-transport - sets filter transport
+> set-scan-filter-clear - clears filter
 > ---
->  include/net/bluetooth/hci_core.h |  14 +++++
->  net/bluetooth/hci_core.c         | 116 +++++++++++++++++++++++++++++++++++++++
->  2 files changed, 130 insertions(+)
+>  client/main.c | 227 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 227 insertions(+)
 >
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index a056c2b..98678eb 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -156,6 +156,7 @@ struct oob_data {
->  };
->
->  struct adv_info {
-> +       struct list_head list;
->         struct delayed_work timeout_exp;
->         __u8    instance;
->         __u32   flags;
-> @@ -166,6 +167,8 @@ struct adv_info {
->         __u8    scan_rsp_data[HCI_MAX_AD_LENGTH];
->  };
->
-> +#define HCI_MAX_ADV_INSTANCES          1
-> +
-
-Now that you've added this constant, this is what you should use to
-populate "rp->max_instances" in
-net/bluetooth/mgmt.c:read_adv_features.
-
->  #define HCI_MAX_SHORT_NAME_LENGTH      10
->
->  /* Default LE RPA expiry time, 15 minutes */
-> @@ -374,6 +377,8 @@ struct hci_dev {
->         __u8                    scan_rsp_data_len;
->
->         struct adv_info         adv_instance;
-
-Is this still needed?
-
-> +       struct list_head        adv_instances;
-> +       __u8                    cur_adv_instance;
->
->         __u8                    irk[16];
->         __u32                   rpa_timeout;
-> @@ -1007,6 +1012,15 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
->  int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
->                                u8 bdaddr_type);
->
-> +int hci_num_adv_instances(struct hci_dev *hdev);
-> +void hci_adv_instances_clear(struct hci_dev *hdev);
-> +struct adv_info *hci_find_adv_instance(struct hci_dev *hdev, u8 instance);
-> +int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
-> +                        u16 adv_data_len, u8 *adv_data,
-> +                        u16 scan_rsp_len, u8 *scan_rsp_data,
-> +                        work_func_t timeout_work, u16 timeout);
-> +int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance);
-> +
->  void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
->
->  int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 476709b..1859e67 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2613,6 +2613,119 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
->         return 0;
+> diff --git a/client/main.c b/client/main.c
+> index bb67f3d..5b2d381 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -896,6 +896,222 @@ static void cmd_scan(const char *arg)
+>         }
 >  }
 >
-> +struct adv_info *hci_find_adv_instance(struct hci_dev *hdev, u8 instance)
+> +static void append_variant(DBusMessageIter *iter, int type, void *val)
 > +{
-
-Doesn't this require a lock as well?
-
-> +       struct adv_info *adv_instance;
+> +       DBusMessageIter value;
+> +       char sig[2] = { type, '\0' };
 > +
-> +       list_for_each_entry(adv_instance, &hdev->adv_instances, list) {
-> +               if (adv_instance->instance != instance)
-> +                       continue;
-> +               return adv_instance;
-
-Simpler to just do:
-
-    if (adv_instance->instance == instance)
-            return adv_instance;
-
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
+> +
+> +       dbus_message_iter_append_basic(&value, type, val);
+> +
+> +       dbus_message_iter_close_container(iter, &value);
+> +}
+> +
+> +static void dict_append_entry(DBusMessageIter *dict, const char *key,
+> +                                                       int type, void *val)
+> +{
+> +       DBusMessageIter entry;
+> +
+> +       if (type == DBUS_TYPE_STRING) {
+> +               const char *str = *((const char **) val);
+> +
+> +               if (str == NULL)
+> +                       return;
 > +       }
 > +
-> +       return NULL;
+> +       dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
+> +                                                       NULL, &entry);
+> +
+> +       dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
+> +
+> +       append_variant(&entry, type, val);
+> +
+> +       dbus_message_iter_close_container(dict, &entry);
 > +}
 > +
-> +/* This function requires the caller holds hdev->lock */
-> +int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance)
+> +#define        DISTANCE_VAL_INVALID    0x7FFF
+> +
+> +struct set_discovery_filter_args {
+> +       char *transport;
+> +       dbus_uint16_t rssi;
+> +       dbus_int16_t pathloss;
+> +       GSList *uuids;
+> +};
+> +
+> +static void set_discovery_filter_setup(DBusMessageIter *iter,
+> +                                          void *user_data)
 > +{
-> +       struct adv_info *adv_instance;
+> +       struct set_discovery_filter_args *args = user_data;
+> +       DBusMessageIter dict;
 > +
-> +       adv_instance = hci_find_adv_instance(hdev, instance);
-> +       if (!adv_instance)
-> +               return -ENOENT;
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> +                           DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+> +                           DBUS_TYPE_STRING_AS_STRING
+> +                           DBUS_TYPE_VARIANT_AS_STRING
+> +                           DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
 > +
-> +       BT_DBG("%s removing %dMR", hdev->name, instance);
+> +       if (args->uuids != NULL) {
+> +               DBusMessageIter entry, value, arrayIter;
+> +               char *uuids = "UUIDs";
+> +               GSList *l;
 > +
-> +       if (adv_instance->timeout)
-> +               cancel_delayed_work(&adv_instance->timeout_exp);
+> +               dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
+> +                                                NULL, &entry);
+> +               /* dict key */
+> +               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+> +                                              &uuids);
 > +
-> +       list_del(&adv_instance->list);
-> +       kfree(adv_instance);
+> +               dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
+> +                                                "as", &value);
 > +
-> +       return 0;
+> +               dbus_message_iter_open_container(&value, DBUS_TYPE_ARRAY, "s",
+> +                                                &arrayIter);
+> +
+> +               for (l = args->uuids; l != NULL; l = g_slist_next(l))
+> +                       /* list->data contains string representation of uuid */
+> +                       dbus_message_iter_append_basic(&arrayIter,
+> +                                                      DBUS_TYPE_STRING,
+> +                                                      &l->data);
+> +
+> +               dbus_message_iter_close_container(&value, &arrayIter);
+> +
+> +               /* close vararg*/
+> +               dbus_message_iter_close_container(&entry, &value);
+> +
+> +               /* close entry */
+> +               dbus_message_iter_close_container(&dict, &entry);
+> +       }
+> +
+> +       if (args->pathloss != DISTANCE_VAL_INVALID)
+> +               dict_append_entry(&dict, "Pathloss", DBUS_TYPE_UINT16,
+> +                                 &args->pathloss);
+> +
+> +       if (args->rssi != DISTANCE_VAL_INVALID)
+> +               dict_append_entry(&dict, "RSSI", DBUS_TYPE_INT16, &args->rssi);
+> +
+> +       if (args->transport != NULL)
+> +               dict_append_entry(&dict, "Transport", DBUS_TYPE_STRING,
+> +                                 &args->transport);
+> +
+> +       dbus_message_iter_close_container(iter, &dict);
 > +}
 > +
-> +/* This function requires the caller holds hdev->lock */
-> +void hci_adv_instances_clear(struct hci_dev *hdev)
+> +
+> +static void set_discovery_filter_reply(DBusMessage *message,
+> +                                      void *user_data)
 > +{
-> +       struct adv_info *adv_instance, *n;
+> +       DBusError error;
 > +
-> +       list_for_each_entry_safe(adv_instance, n, &hdev->adv_instances, list) {
-> +               if (adv_instance->timeout)
-> +                       cancel_delayed_work(&adv_instance->timeout_exp);
+> +       dbus_error_init(&error);
+> +       if (dbus_set_error_from_message(&error, message) == TRUE) {
+> +               rl_printf("SetDiscoveryFilter failed: %s\n", error.name);
+> +               dbus_error_free(&error);
+> +               return;
+> +       }
 > +
-> +               list_del(&adv_instance->list);
-> +               kfree(adv_instance);
+> +       rl_printf("SetDiscoveryFilter success\n");
+> +}
+> +
+> +static gint filtered_scan_rssi = DISTANCE_VAL_INVALID;
+> +static gint filtered_scan_pathloss = DISTANCE_VAL_INVALID;
+> +static GSList *filtered_scan_uuids;
+> +static char *filtered_scan_transport;
+> +
+> +static void cmd_set_scan_filter_commit(void)
+> +{
+> +       struct set_discovery_filter_args args;
+> +
+> +       args.uuids = NULL;
+> +       args.pathloss = filtered_scan_pathloss;
+> +       args.rssi = filtered_scan_rssi;
+> +       args.transport = filtered_scan_transport;
+> +       args.uuids = filtered_scan_uuids;
+> +
+> +       if (check_default_ctrl() == FALSE)
+> +               return;
+> +
+> +       if (g_dbus_proxy_method_call(default_ctrl, "SetDiscoveryFilter",
+> +               set_discovery_filter_setup, set_discovery_filter_reply,
+> +               &args, NULL) == FALSE) {
+> +               rl_printf("Failed to set discovery filter\n");
+> +               return;
 > +       }
 > +}
 > +
-> +int hci_num_adv_instances(struct hci_dev *hdev)
+> +static void cmd_set_scan_filter_uuids(const char *arg)
 > +{
-> +       struct adv_info *adv_instance;
-> +       int num = 0;
+> +       char *uuid_str, *saveptr, *uuids, *uuidstmp;
 > +
-> +       list_for_each_entry(adv_instance, &hdev->adv_instances, list) {
-> +               num++;
-> +       }
-
-I'm not particularly opinionated on this but it would be more
-efficient to keep a count in hci_dev, though that's up to Johan.
-
+> +       g_slist_free_full(filtered_scan_uuids, g_free);
+> +       filtered_scan_uuids = NULL;
 > +
-> +       return num;
-> +}
+> +       if (!arg || !strlen(arg))
+> +               return;
 > +
-> +/* This function requires the caller holds hdev->lock */
-> +int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
-> +                        u16 adv_data_len, u8 *adv_data,
-> +                        u16 scan_rsp_len, u8 *scan_rsp_data,
-> +                        work_func_t timeout_work, u16 timeout)
-> +{
-> +       struct adv_info *adv_instance;
-> +
-> +       adv_instance = hci_find_adv_instance(hdev, instance);
-> +       if (adv_instance) {
-> +               if (adv_instance->timeout)
-> +                       cancel_delayed_work(&adv_instance->timeout_exp);
-> +
-> +               memset(adv_instance->adv_data, 0,
-> +                      sizeof(adv_instance->adv_data));
-> +               memset(adv_instance->scan_rsp_data, 0,
-> +                      sizeof(adv_instance->scan_rsp_data));
-> +       } else {
-> +               if (hci_num_adv_instances(hdev) >= HCI_MAX_ADV_INSTANCES)
-> +                       return -EOVERFLOW;
-> +
-> +               adv_instance = kmalloc(sizeof(*adv_instance), GFP_KERNEL);
-> +               if (!adv_instance)
-> +                       return -ENOMEM;
-> +
-> +               memset(adv_instance, 0, sizeof(*adv_instance));
-> +               INIT_DELAYED_WORK(&adv_instance->timeout_exp, timeout_work);
-> +               adv_instance->instance = instance;
-> +               list_add(&adv_instance->list, &hdev->adv_instances);
+> +       uuids = g_strdup(arg);
+> +       for (uuidstmp = uuids; ; uuidstmp = NULL) {
+> +               uuid_str = strtok_r(uuidstmp, " \t", &saveptr);
+> +               if (uuid_str == NULL)
+> +                       break;
+> +           filtered_scan_uuids = g_slist_append(filtered_scan_uuids,
+> +                                                       strdup(uuid_str));
 > +       }
 > +
-> +       adv_instance->flags = flags;
-> +       adv_instance->adv_data_len = adv_data_len;
-> +       adv_instance->scan_rsp_len = scan_rsp_len;
+> +       g_free(uuids);
 > +
-> +       if (adv_data_len)
-> +               memcpy(adv_instance->adv_data, adv_data, adv_data_len);
-> +
-> +       if (scan_rsp_len)
-> +               memcpy(adv_instance->scan_rsp_data,
-> +                      scan_rsp_data, scan_rsp_len);
-> +
-> +       adv_instance->timeout = timeout;
-> +
-> +       if (timeout)
-> +               queue_delayed_work(hdev->workqueue,
-> +                                  &adv_instance->timeout_exp,
-> +                                  msecs_to_jiffies(timeout * 1000));
-> +
-> +       BT_DBG("%s for %dMR", hdev->name, instance);
-> +
-> +       return 0;
+> +       cmd_set_scan_filter_commit();
 > +}
 > +
->  struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
->                                          bdaddr_t *bdaddr, u8 type)
+> +static void cmd_set_scan_filter_rssi(const char *arg)
+> +{
+> +       filtered_scan_pathloss = DISTANCE_VAL_INVALID;
+> +
+> +       if (!arg || !strlen(arg))
+> +               filtered_scan_rssi = DISTANCE_VAL_INVALID;
+> +       else
+> +               filtered_scan_rssi = atoi(arg);
+> +
+> +       cmd_set_scan_filter_commit();
+> +}
+> +
+> +static void cmd_set_scan_filter_pathloss(const char *arg)
+> +{
+> +       filtered_scan_rssi = DISTANCE_VAL_INVALID;
+> +
+> +       if (!arg || !strlen(arg))
+> +               filtered_scan_pathloss = DISTANCE_VAL_INVALID;
+> +       else
+> +               filtered_scan_pathloss = atoi(arg);
+> +
+> +       cmd_set_scan_filter_commit();
+> +}
+> +
+> +static void cmd_set_scan_filter_transport(const char *arg)
+> +{
+> +       g_free(filtered_scan_transport);
+> +
+> +       if (!arg || !strlen(arg))
+> +               filtered_scan_transport = NULL;
+> +       else
+> +               filtered_scan_transport = g_strdup(arg);
+> +
+> +       cmd_set_scan_filter_commit();
+> +}
+> +
+> +static void cmd_set_scan_filter_clear(const char *arg)
+> +{
+> +       /* set default values for all options */
+> +       filtered_scan_rssi = DISTANCE_VAL_INVALID;
+> +       filtered_scan_pathloss = DISTANCE_VAL_INVALID;
+> +       g_slist_free_full(filtered_scan_uuids, g_free);
+> +       filtered_scan_uuids = NULL;
+> +       g_free(filtered_scan_transport);
+> +       filtered_scan_transport = NULL;
+> +
+> +       cmd_set_scan_filter_commit();
+> +}
+> +
+>  static struct GDBusProxy *find_device(const char *arg)
 >  {
-> @@ -3016,6 +3129,7 @@ struct hci_dev *hci_alloc_dev(void)
->         hdev->manufacturer = 0xffff;    /* Default to internal use */
->         hdev->inq_tx_power = HCI_TX_POWER_INVALID;
->         hdev->adv_tx_power = HCI_TX_POWER_INVALID;
-> +       hdev->cur_adv_instance = 0x00;
->
->         hdev->sniff_max_interval = 800;
->         hdev->sniff_min_interval = 80;
-> @@ -3057,6 +3171,7 @@ struct hci_dev *hci_alloc_dev(void)
->         INIT_LIST_HEAD(&hdev->pend_le_conns);
->         INIT_LIST_HEAD(&hdev->pend_le_reports);
->         INIT_LIST_HEAD(&hdev->conn_hash.list);
-> +       INIT_LIST_HEAD(&hdev->adv_instances);
->
->         INIT_WORK(&hdev->rx_work, hci_rx_work);
->         INIT_WORK(&hdev->cmd_work, hci_cmd_work);
-> @@ -3250,6 +3365,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
->         hci_smp_ltks_clear(hdev);
->         hci_smp_irks_clear(hdev);
->         hci_remote_oob_data_clear(hdev);
-> +       hci_adv_instances_clear(hdev);
->         hci_bdaddr_list_clear(&hdev->le_white_list);
->         hci_conn_params_clear_all(hdev);
->         hci_discovery_filter_clear(hdev);
+>         GDBusProxy *proxy;
+> @@ -1468,6 +1684,17 @@ static const struct {
+>                                                         capability_generator},
+>         { "default-agent",NULL,       cmd_default_agent,
+>                                 "Set agent as the default one" },
+> +       { "set-scan-filter-uuids", "[uuid1 uuid2 ...]",
+> +                       cmd_set_scan_filter_uuids, "Set scan filter uuids" },
+> +       { "set-scan-filter-rssi", "[rssi]", cmd_set_scan_filter_rssi,
+> +                               "Set scan filter rssi, and clears pathloss" },
+> +       { "set-scan-filter-pathloss", "[pathloss]",
+> +                                               cmd_set_scan_filter_pathloss,
+> +                               "Set scan filter pathloss, and clears rssi" },
+> +       { "set-scan-filter-transport", "[transport]",
+> +               cmd_set_scan_filter_transport, "Set scan filter transport" },
+> +       { "set-scan-filter-clear", "", cmd_set_scan_filter_clear,
+> +                                               "Clears discovery filter." },
+>         { "scan",         "<on/off>", cmd_scan, "Scan for devices" },
+>         { "info",         "[dev]",    cmd_info, "Device information",
+>                                                         dev_generator },
 > --
-> 1.9.1
+> 2.2.0.rc0.207.ga3a616c
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Luiz, any comments on this one? Is this good to go?
 
 Thanks,
 Arman
