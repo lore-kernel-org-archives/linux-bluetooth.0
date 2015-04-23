@@ -1,128 +1,234 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1429541350-30882-1-git-send-email-bharat.panda@samsung.com>
-References: <1429541350-30882-1-git-send-email-bharat.panda@samsung.com>
-Date: Thu, 23 Apr 2015 17:35:40 +0300
-Message-ID: <CABBYNZKWtU0ZDPhfDTXBq0pRK=Y=b8kTo_pYDGkRtEPdWF8qeQ@mail.gmail.com>
-Subject: Re: [PATCH ] monitor: Add AVRCP ChangePath support
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] shared/gatt-server: Check attribute permissions
+Date: Thu, 23 Apr 2015 16:20:08 +0200
+Message-Id: <1429798808-24388-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1429798808-24388-1-git-send-email-luiz.dentz@gmail.com>
+References: <1429798808-24388-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Apr 20, 2015 at 5:49 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Add support for decoding AVRCP ChangePath in bluetooth monitor.
->
->       Channel: 65 len 21 ctrl 0x0000 [PSM 27 mode 3] {chan 1}
->       I-frame: Unsegmented TxSeq 0 ReqSeq 0
->       AVCTP Browsing: Command: type 0x00 label 0 PID 0x110e
->         AVRCP: ChangePath: len 0x000b
->           UIDCounter: 0x0000 (0)
->           Direction: 0x01 (Folder Down)
->           FolderUID: 0x               1 (1)
-> ---
->  monitor/avctp.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 71 insertions(+)
->
-> diff --git a/monitor/avctp.c b/monitor/avctp.c
-> index f4f3250..e071393 100644
-> --- a/monitor/avctp.c
-> +++ b/monitor/avctp.c
-> @@ -1742,6 +1742,74 @@ static bool avrcp_control_packet(struct avctp_frame *avctp_frame)
->         }
->  }
->
-> +static const char *dir2str(uint8_t dir)
-> +{
-> +       switch (dir) {
-> +       case 0x00:
-> +               return "Folder Up";
-> +       case 0x01:
-> +               return "Folder Down";
-> +       }
-> +
-> +       return "Reserved";
-> +}
-> +
-> +static bool avrcp_change_path(struct avctp_frame *avctp_frame)
-> +{
-> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-> +       uint64_t uid;
-> +       uint32_t items;
-> +       uint16_t uidcounter;
-> +       uint8_t dir, status, indent = 2;
-> +
-> +       if (avctp_frame->hdr & 0x02)
-> +               goto response;
-> +
-> +       if (frame->size < 11) {
-> +               print_field("%*cPDU Malformed", indent, ' ');
-> +               packet_hexdump(frame->data, frame->size);
-> +               return false;
-> +       }
-> +
-> +       if (!l2cap_frame_get_be16(frame, &uidcounter))
-> +               return false;
-> +
-> +       print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ',
-> +                                       uidcounter, uidcounter);
-> +
-> +       if (!l2cap_frame_get_u8(frame, &dir))
-> +               return false;
-> +
-> +       print_field("%*cDirection: 0x%02x (%s)", indent, ' ',
-> +                                       dir, dir2str(dir));
-> +
-> +       if (!l2cap_frame_get_be64(frame, &uid))
-> +               return false;
-> +
-> +       print_field("%*cFolderUID: 0x%16" PRIx64 " (%" PRIu64 ")", indent, ' ',
-> +                                       uid, uid);
-> +
-> +       return true;
-> +
-> +response:
-> +       if (!l2cap_frame_get_u8(frame, &status))
-> +               return false;
-> +
-> +       print_field("%*cStatus: 0x%02x (%s)", indent, ' ',
-> +                                       status, error2str(status));
-> +
-> +       if (frame->size == 1)
-> +               return false;
-> +
-> +       if (!l2cap_frame_get_be32(frame, &items))
-> +               return false;
-> +
-> +       print_field("%*cNumber of Items: 0x%04x (%u)", indent, ' ',
-> +                                       items, items);
-> +
-> +       return true;
-> +}
-> +
->  static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
->                                                         uint8_t indent)
->  {
-> @@ -2136,6 +2204,9 @@ static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
->         case AVRCP_GET_FOLDER_ITEMS:
->                 avrcp_get_folder_items(avctp_frame);
->                 break;
-> +       case AVRCP_CHANGE_PATH:
-> +               avrcp_change_path(avctp_frame);
-> +               break;
->         default:
->                 packet_hexdump(frame->data, frame->size);
->         }
-> --
-> 1.9.1
+---
+ src/shared/att-types.h   | 16 ++++-----
+ src/shared/gatt-server.c | 93 ++++++++++++++++++++++++++----------------------
+ 2 files changed, 58 insertions(+), 51 deletions(-)
 
-Applied, thanks.
-
-
+diff --git a/src/shared/att-types.h b/src/shared/att-types.h
+index ea4c009..ee20992 100644
+--- a/src/shared/att-types.h
++++ b/src/shared/att-types.h
+@@ -115,12 +115,12 @@ struct bt_att_pdu_error_rsp {
+ #define BT_ATT_PERM_WRITE		0x02
+ #define BT_ATT_PERM_READ_ENCRYPT	0x04
+ #define BT_ATT_PERM_WRITE_ENCRYPT	0x08
+-#define BT_ATT_PERM_ENCRYPT		BT_ATT_PERM_READ_ENCRYPT | \
+-					BT_ATT_PERM_WRITE_ENCRYPT
++#define BT_ATT_PERM_ENCRYPT		(BT_ATT_PERM_READ_ENCRYPT | \
++					BT_ATT_PERM_WRITE_ENCRYPT)
+ #define BT_ATT_PERM_READ_AUTHEN		0x10
+ #define BT_ATT_PERM_WRITE_AUTHEN	0x20
+-#define BT_ATT_PERM_AUTHEN		BT_ATT_PERM_READ_AUTHEN | \
+-					BT_ATT_PERM_WRITE_AUTHEN
++#define BT_ATT_PERM_AUTHEN		(BT_ATT_PERM_READ_AUTHEN | \
++					BT_ATT_PERM_WRITE_AUTHEN)
+ #define BT_ATT_PERM_AUTHOR		0x40
+ #define BT_ATT_PERM_NONE		0x80
+ 
+@@ -139,9 +139,9 @@ struct bt_att_pdu_error_rsp {
+ #define BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX		0x02
+ #define BT_GATT_CHRC_EXT_PROP_ENC_READ			0x04
+ #define BT_GATT_CHRC_EXT_PROP_ENC_WRITE			0x08
+-#define BT_GATT_CHRC_EXT_PROP_ENC	BT_GATT_CHRC_EXT_PROP_ENC_READ | \
+-					BT_GATT_CHRC_EXT_PROP_ENC_WRITE
++#define BT_GATT_CHRC_EXT_PROP_ENC	(BT_GATT_CHRC_EXT_PROP_ENC_READ | \
++					BT_GATT_CHRC_EXT_PROP_ENC_WRITE)
+ #define BT_GATT_CHRC_EXT_PROP_AUTH_READ			0x10
+ #define BT_GATT_CHRC_EXT_PROP_AUTH_WRITE		0x20
+-#define BT_GATT_CHRC_EXT_PROP_AUTH	BT_GATT_CHRC_EXT_PROP_AUTH_READ | \
+-					BT_GATT_CHRC_EXT_PROP_AUTH_WRITE
++#define BT_GATT_CHRC_EXT_PROP_AUTH	(BT_GATT_CHRC_EXT_PROP_AUTH_READ | \
++					BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index b5f55ad..ae77dcc 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -377,12 +377,39 @@ done:
+ 	process_read_by_type(op);
+ }
+ 
++static uint8_t check_permissions(struct bt_gatt_server *server,
++				struct gatt_db_attribute *attr, uint32_t mask)
++{
++	uint32_t perm;
++	int security;
++
++	perm = gatt_db_attribute_get_permissions(attr);
++
++	if (perm && mask & BT_ATT_PERM_READ && !(perm & BT_ATT_PERM_READ))
++		return BT_ATT_ERROR_READ_NOT_PERMITTED;
++
++	if (perm && mask & BT_ATT_PERM_WRITE && !(perm & BT_ATT_PERM_WRITE))
++		return BT_ATT_ERROR_WRITE_NOT_PERMITTED;
++
++	perm &= mask;
++	if (!perm)
++		return 0;
++
++	security = bt_att_get_sec_level(server->att);
++	if (perm & BT_ATT_PERM_AUTHEN && security < BT_ATT_SECURITY_HIGH)
++		return BT_ATT_ERROR_AUTHENTICATION;
++
++	if (perm & BT_ATT_PERM_ENCRYPT && security < BT_ATT_SECURITY_MEDIUM)
++		return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION;
++
++	return 0;
++}
++
+ static void process_read_by_type(struct async_read_op *op)
+ {
+ 	struct bt_gatt_server *server = op->server;
+ 	uint8_t ecode;
+ 	struct gatt_db_attribute *attr;
+-	uint32_t perm;
+ 
+ 	attr = queue_pop_head(op->db_data);
+ 
+@@ -395,18 +422,11 @@ static void process_read_by_type(struct async_read_op *op)
+ 		return;
+ 	}
+ 
+-	perm = gatt_db_attribute_get_permissions(attr);
+-
+-	/*
+-	 * Check for the READ access permission. Encryption,
+-	 * authentication, and authorization permissions need to be
+-	 * checked by the read handler, since bt_att is agnostic to
+-	 * connection type and doesn't have security information on it.
+-	 */
+-	if (perm && !(perm & BT_ATT_PERM_READ)) {
+-		ecode = BT_ATT_ERROR_READ_NOT_PERMITTED;
++	ecode = check_permissions(server, attr, BT_ATT_PERM_READ |
++						BT_ATT_PERM_READ_AUTHEN |
++						BT_ATT_PERM_READ_ENCRYPT);
++	if (ecode)
+ 		goto error;
+-	}
+ 
+ 	if (gatt_db_attribute_read(attr, 0, op->opcode, server->att,
+ 					read_by_type_read_complete_cb, op))
+@@ -752,7 +772,6 @@ static void write_cb(uint8_t opcode, const void *pdu,
+ 	uint16_t handle = 0;
+ 	struct async_write_op *op = NULL;
+ 	uint8_t ecode;
+-	uint32_t perm;
+ 
+ 	if (length < 2) {
+ 		ecode = BT_ATT_ERROR_INVALID_PDU;
+@@ -771,12 +790,11 @@ static void write_cb(uint8_t opcode, const void *pdu,
+ 				(opcode == BT_ATT_OP_WRITE_REQ) ? "Req" : "Cmd",
+ 				handle);
+ 
+-	perm = gatt_db_attribute_get_permissions(attr);
+-
+-	if (!(perm & BT_ATT_PERM_WRITE)) {
+-		ecode = BT_ATT_ERROR_WRITE_NOT_PERMITTED;
++	ecode = check_permissions(server, attr, BT_ATT_PERM_WRITE |
++						BT_ATT_PERM_WRITE_AUTHEN |
++						BT_ATT_PERM_WRITE_ENCRYPT);
++	if (ecode)
+ 		goto error;
+-	}
+ 
+ 	if (server->pending_write_op) {
+ 		ecode = BT_ATT_ERROR_UNLIKELY;
+@@ -871,7 +889,6 @@ static void handle_read_req(struct bt_gatt_server *server, uint8_t opcode,
+ {
+ 	struct gatt_db_attribute *attr;
+ 	uint8_t ecode;
+-	uint32_t perm;
+ 	struct async_read_op *op = NULL;
+ 
+ 	attr = gatt_db_get_attribute(server->db, handle);
+@@ -885,12 +902,11 @@ static void handle_read_req(struct bt_gatt_server *server, uint8_t opcode,
+ 			opcode == BT_ATT_OP_READ_BLOB_REQ ? "Blob " : "",
+ 			handle);
+ 
+-	perm = gatt_db_attribute_get_permissions(attr);
+-
+-	if (perm && !(perm & BT_ATT_PERM_READ)) {
+-		ecode = BT_ATT_ERROR_READ_NOT_PERMITTED;
++	ecode = check_permissions(server, attr, BT_ATT_PERM_READ |
++						BT_ATT_PERM_READ_AUTHEN |
++						BT_ATT_PERM_READ_ENCRYPT);
++	if (ecode)
+ 		goto error;
+-	}
+ 
+ 	if (server->pending_read_op) {
+ 		ecode = BT_ATT_ERROR_UNLIKELY;
+@@ -980,8 +996,8 @@ static void read_multiple_complete_cb(struct gatt_db_attribute *attr, int err,
+ {
+ 	struct read_multiple_resp_data *data = user_data;
+ 	struct gatt_db_attribute *next_attr;
+-	uint32_t perm;
+ 	uint16_t handle = gatt_db_attribute_get_handle(attr);
++	uint8_t ecode;
+ 
+ 	if (err != 0) {
+ 		bt_att_send_error_rsp(data->server->att,
+@@ -990,12 +1006,12 @@ static void read_multiple_complete_cb(struct gatt_db_attribute *attr, int err,
+ 		return;
+ 	}
+ 
+-	perm = gatt_db_attribute_get_permissions(attr);
+-
+-	if (perm && !(perm & BT_ATT_PERM_READ)) {
++	ecode = check_permissions(data->server, attr, BT_ATT_PERM_READ |
++						BT_ATT_PERM_READ_AUTHEN |
++						BT_ATT_PERM_READ_ENCRYPT);
++	if (ecode) {
+ 		bt_att_send_error_rsp(data->server->att,
+-					BT_ATT_OP_READ_MULT_REQ, handle,
+-					BT_ATT_ERROR_READ_NOT_PERMITTED);
++					BT_ATT_OP_READ_MULT_REQ, handle, ecode);
+ 		read_multiple_resp_data_free(data);
+ 		return;
+ 	}
+@@ -1107,7 +1123,6 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 	uint16_t offset;
+ 	struct gatt_db_attribute *attr;
+ 	uint8_t ecode;
+-	uint32_t perm;
+ 
+ 	if (length < 4) {
+ 		ecode = BT_ATT_ERROR_INVALID_PDU;
+@@ -1131,19 +1146,11 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 	util_debug(server->debug_callback, server->debug_data,
+ 				"Prep Write Req - handle: 0x%04x", handle);
+ 
+-	perm = gatt_db_attribute_get_permissions(attr);
+-
+-	/*
+-	 * TODO: The "Prepare Write" request requires security permission checks
+-	 * to be performed before the write is executed. I.e., we can't leave
+-	 * the permission check to the upper layer since we can't call
+-	 * gatt_db_write until the entire queue is atomically processed during
+-	 * an "Execute Write" request. Figure out how to make this check here.
+-	 */
+-	if (!(perm & BT_ATT_PERM_WRITE)) {
+-		ecode = BT_ATT_ERROR_WRITE_NOT_PERMITTED;
++	ecode = check_permissions(server, attr, BT_ATT_PERM_WRITE |
++						BT_ATT_PERM_WRITE_AUTHEN |
++						BT_ATT_PERM_WRITE_ENCRYPT);
++	if (ecode)
+ 		goto error;
+-	}
+ 
+ 	prep_data = new0(struct prep_write_data, 1);
+ 	if (!prep_data) {
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
