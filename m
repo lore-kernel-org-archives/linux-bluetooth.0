@@ -1,70 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAD0=r8zdTAnR25junwBfU23KhCXMkxZXgUf3ouDsn9g6Y-PNjA@mail.gmail.com>
-References: <1429319372-25172-1-git-send-email-jpawlowski@google.com>
-	<CABBYNZJjNLoeF3Yc5n+f7W7V0pN5tXmek9GyHNNmZ36Vy4Nhjw@mail.gmail.com>
-	<CAD0=r8zdTAnR25junwBfU23KhCXMkxZXgUf3ouDsn9g6Y-PNjA@mail.gmail.com>
-Date: Thu, 23 Apr 2015 08:56:47 -0700
-Message-ID: <CAD0=r8x_sWuPo+JMhAdiA7GXJqX+XED7qwbJzBb7VF9tA1THPg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] doc/device-api: Add TxPower
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1429617947-5784-1-git-send-email-bharat.panda@samsung.com>
+References: <1429617947-5784-1-git-send-email-bharat.panda@samsung.com>
+Date: Thu, 23 Apr 2015 18:37:54 +0300
+Message-ID: <CABBYNZJF=FXrFDaqtEXVX_Doe8A2bzHeGV9OqwAJFAKxb24_dQ@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Add support for decoding AVRCP browsing packets
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping ?
+Hi Bharat,
 
-On Mon, Apr 20, 2015 at 8:55 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> Hi Luiz
+On Tue, Apr 21, 2015 at 3:05 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Decodes below AVRCP browsing packets,
 >
-> On Mon, Apr 20, 2015 at 7:32 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Jakub,
->>
->> On Sat, Apr 18, 2015 at 4:09 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->>> This adds TxPower from advertisement data.
->>>
->>> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
->>> ---
->>>  doc/device-api.txt | 5 +++++
->>>  1 file changed, 5 insertions(+)
->>>
->>> diff --git a/doc/device-api.txt b/doc/device-api.txt
->>> index 72c597e..875fd9d 100644
->>> --- a/doc/device-api.txt
->>> +++ b/doc/device-api.txt
->>> @@ -196,6 +196,11 @@ Properties string Address [readonly]
->>>                         Received Signal Strength Indicator of the remote
->>>                         device (inquiry or advertising).
->>>
->>> +               int16 TxPower [readonly, optional]
->>> +
->>> +                       Advertised transmitted power level (inquiry or
->>> +                       advertising).
->>> +
->>>                 dict ManufacturerData [readonly, optional]
->>>
->>>                         Manufacturer specific advertisement data. Keys are
->>> --
->>> 2.2.0.rc0.207.ga3a616c
->>
->> I thought we discussed about this before and we would like to have the
->> pathloss instead of TxPower, or do you have something else useful for
->> TxPower?
+> 1) Get Item Attibutes
+> 2) Search Item
+> 3) General Reject
 >
-> I don't remember such discussion, I remember we were discussing about
-> SetDiscoveryFilter, and it have option to filter by pathloss.
-> So I exposed TxPower for two reasons:
-> 1. It's just a field in advertisement, and I wanted just to access it
-> as any other.
-> 2. If I turn it into Pathloss field, it would change together with
-> RSSI, and PropertyChanged event will be doubled. Pathloss is very
-> simple to compute, so having only RSSI that change is more efficient.
+> Bharat Panda (3):
+>   monitor: Add Support for AVRCP GetItemAttributes
+>   monitor: Add support for AVRCP Search
+>   monitor: Add support for AVRCP GeneralReject
 >
+>  monitor/avctp.c | 173 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 173 insertions(+)
 >
->>
->>
->> --
->> Luiz Augusto von Dentz
+> --
+> 1.9.1
+
+Applied, thanks.
+
+
+-- 
+Luiz Augusto von Dentz
