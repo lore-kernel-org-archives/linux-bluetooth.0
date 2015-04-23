@@ -1,78 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAD0=r8x_sWuPo+JMhAdiA7GXJqX+XED7qwbJzBb7VF9tA1THPg@mail.gmail.com>
-References: <1429319372-25172-1-git-send-email-jpawlowski@google.com>
-	<CABBYNZJjNLoeF3Yc5n+f7W7V0pN5tXmek9GyHNNmZ36Vy4Nhjw@mail.gmail.com>
-	<CAD0=r8zdTAnR25junwBfU23KhCXMkxZXgUf3ouDsn9g6Y-PNjA@mail.gmail.com>
-	<CAD0=r8x_sWuPo+JMhAdiA7GXJqX+XED7qwbJzBb7VF9tA1THPg@mail.gmail.com>
-Date: Thu, 23 Apr 2015 22:50:03 +0300
-Message-ID: <CABBYNZJJQvJD3wZ2GLQWeA9pJJ6u0v=X+ghZ-bZB-WHj6PSnhg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] doc/device-api: Add TxPower
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZJX4n-pJ56enQ6W2O2qxWWX4r6Gi9zUTXwG4-HXB4z9rQ@mail.gmail.com>
+References: <1429798808-24388-1-git-send-email-luiz.dentz@gmail.com>
+	<CAHrH25QqYhKGYitV4oVDPibjpCte6ACgPigr_+rW0r5LYwOPwQ@mail.gmail.com>
+	<CABBYNZJX4n-pJ56enQ6W2O2qxWWX4r6Gi9zUTXwG4-HXB4z9rQ@mail.gmail.com>
+Date: Thu, 23 Apr 2015 12:27:12 -0700
+Message-ID: <CAHrH25Q6P+GAyf4Pq5FpPrE4nL7eD8x56Jz6b+u3mkgHzOSHew@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/4] doc/gatt-api: Add encryption flags
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Luiz,
 
-On Thu, Apr 23, 2015 at 6:56 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> Ping ?
-
-Sorry, I forgot about this one.
-
-> On Mon, Apr 20, 2015 at 8:55 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->> Hi Luiz
+> On Thu, Apr 23, 2015 at 12:21 PM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Arman,
+>
+> On Thu, Apr 23, 2015 at 10:14 PM, Arman Uguray <armansito@chromium.org> wrote:
+>> Hi Luiz,
 >>
->> On Mon, Apr 20, 2015 at 7:32 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Jakub,
+>>> On Thu, Apr 23, 2015 at 7:20 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >>>
->>> On Sat, Apr 18, 2015 at 4:09 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->>>> This adds TxPower from advertisement data.
->>>>
->>>> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
->>>> ---
->>>>  doc/device-api.txt | 5 +++++
->>>>  1 file changed, 5 insertions(+)
->>>>
->>>> diff --git a/doc/device-api.txt b/doc/device-api.txt
->>>> index 72c597e..875fd9d 100644
->>>> --- a/doc/device-api.txt
->>>> +++ b/doc/device-api.txt
->>>> @@ -196,6 +196,11 @@ Properties string Address [readonly]
->>>>                         Received Signal Strength Indicator of the remote
->>>>                         device (inquiry or advertising).
->>>>
->>>> +               int16 TxPower [readonly, optional]
->>>> +
->>>> +                       Advertised transmitted power level (inquiry or
->>>> +                       advertising).
->>>> +
->>>>                 dict ManufacturerData [readonly, optional]
->>>>
->>>>                         Manufacturer specific advertisement data. Keys are
->>>> --
->>>> 2.2.0.rc0.207.ga3a616c
+>>> This add encryption flags which can be used when registering a service to
+>>> require encryption when accessing a characteristic.
+>>> ---
+>>>  doc/gatt-api.txt | 4 ++++
+>>>  1 file changed, 4 insertions(+)
 >>>
->>> I thought we discussed about this before and we would like to have the
->>> pathloss instead of TxPower, or do you have something else useful for
->>> TxPower?
+>>> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+>>> index 088d285..8db35f2 100644
+>>> --- a/doc/gatt-api.txt
+>>> +++ b/doc/gatt-api.txt
+>>> @@ -148,6 +148,10 @@ Properties string UUID [read-only]
+>>>                                 "authenticated-signed-writes"
+>>>                                 "reliable-write"
+>>>                                 "writable-auxiliaries"
+>>> +                               "encrypt-read"
+>>> +                               "encrypt-write"
+>>> +                               "encrypt-authenticated-read"
+>>> +                               "encrypt-authenticated-write"
 >>
->> I don't remember such discussion, I remember we were discussing about
->> SetDiscoveryFilter, and it have option to filter by pathloss.
->> So I exposed TxPower for two reasons:
->> 1. It's just a field in advertisement, and I wanted just to access it
->> as any other.
->> 2. If I turn it into Pathloss field, it would change together with
->> RSSI, and PropertyChanged event will be doubled. Pathloss is very
->> simple to compute, so having only RSSI that change is more efficient.
+>> So I guess you decided not to go with a "Permissions" property? I
+>> guess that's fine but we need to handle this for descriptors as well.
+>> So probably add a "Flags" property to GattDescriptor1 also. There
+>> we'll want read, write, encrypt-*, and encrypt-authenticated-*.
+>
+> Sure, will do that in the next set. What is more important now is
+> getting feedback if the API is good enough, I have been debating in
+> using secure instead of encrypt, what do you think?
+>
 
-Fair enough, I just notice I did not mark the these properties as
-experimental in the documentation, but no need to send another version
-I will fix it when applying your patches.
+I'm fine with encrypt, I think staying closer to the GATT spec lingo
+will be less confusing for developers. "secure" is somewhat unclear
+whereas encrypt is very explicit and it has a matching ATT protocol
+error that a developer can immediately associate this permission with.
 
+Looking through some of the other platform APIs, I see these:
 
--- 
-Luiz Augusto von Dentz
+iOS:
+
+typedef enum {
+    CBAttributePermissionsReadable = 0x01,
+    CBAttributePermissionsWriteable = 0x02,
+    CBAttributePermissionsReadEncryptionRequired = 0x04,
+    CBAttributePermissionsWriteEncryptionRequired = 0x08,
+} CBAttributePermissions;
+
+and Android has READ_ENCRYPTED, READ_ENCRYPTED_MITM, etc as you
+already know. So "encrypt" should sound familiar to developers.
+
+>>>                 array{object} Descriptors [read-only]
+>>>
+>>> --
+>>> 2.1.0
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> Can you also update test/example-gatt-server with new characteristics
+>> and descriptors that demonstrate the permissions feature? You can add
+>> them as new vendor-specific test characteristics (there's a
+>> vendor-specific test service in there) and/or modify one of the other
+>> two example services (HR and Battery). Let's get that into this patch
+>> set so we know we have some way to test it.
+>
+> Yep, I was thinking about that just now, will add this in the next version.
+>
+
+Cool, thanks.
+
+>
+> --
+> Luiz Augusto von Dentz
+
+-Arman
