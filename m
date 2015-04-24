@@ -1,183 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
-To: linux-bluetooth@vger.kernel.org
-Cc: chanyeol.park@samsung.com
-Subject: [PATCH v2 1/2] tools/btsnoop: Add split option
-Date: Fri, 24 Apr 2015 18:24:59 +0900
-Message-id: <1429867500-5633-1-git-send-email-chanyeol.park@samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [BlueZ RFC 2/3] monitor: Add btsnoop data link type option
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1429852906.2609.13.camel@gmail.com>
+Date: Thu, 23 Apr 2015 23:23:51 -0700
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	linux-bluetooth@vger.kernel.org, chanyeol.park@samsung.com
+Message-Id: <7F96B98E-3B7C-4B93-992C-427E12D4307A@holtmann.org>
+References: <1429775365-17215-1-git-send-email-chanyeol.park@samsung.com> <1429775365-17215-2-git-send-email-chanyeol.park@samsung.com> <4816983.5v9O5K046c@leonov> <2AC37407-D18A-4A49-ACE9-A6FD1B70FF67@holtmann.org> <1429852906.2609.13.camel@gmail.com>
+To: Chanyeol Park <chanyeol.park@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+Hi Chanyeol,
 
-Current btmon's btsnoop data link type is BTSNOOP_TYPE_MONITOR:2001.
-but some of btsnoop viewer could not handle it because they just
-support BTSNOOP_TYPE_HCI(1001).
+>>>> Current btmon's btsnoop data link type is BTSNOOP_TYPE_MONITOR(2001)
+>>>> statically. but some of btsnoop viewer just support BTSNOOP_TYPE_HCI(1001,
+>>>> so they could not use btmon's btsnoop. If this option is set, they could
+>>>> parse btsnoop. ---
+>>>> monitor/control.c | 4 ++--
+>>>> monitor/control.h | 2 +-
+>>>> monitor/main.c    | 9 ++++++++-
+>>>> 3 files changed, 11 insertions(+), 4 deletions(-)
+>>>> 
+>>>> diff --git a/monitor/control.c b/monitor/control.c
+>>>> index 00e4bc0..72204bf 100644
+>>>> --- a/monitor/control.c
+>>>> +++ b/monitor/control.c
+>>>> @@ -1124,9 +1124,9 @@ void control_server(const char *path)
+>>>> 	server_fd = fd;
+>>>> }
+>>>> 
+>>>> -bool control_writer(const char *path)
+>>>> +bool control_writer(const char *path, uint32_t type)
+>>>> {
+>>>> -	btsnoop_file = btsnoop_create(path, BTSNOOP_TYPE_MONITOR);
+>>>> +	btsnoop_file = btsnoop_create(path, type);
+>>>> 
+>>>> 	return !!btsnoop_file;
+>>>> }
+>>>> diff --git a/monitor/control.h b/monitor/control.h
+>>>> index 267d71b..680e6b6 100644
+>>>> --- a/monitor/control.h
+>>>> +++ b/monitor/control.h
+>>>> @@ -24,7 +24,7 @@
+>>>> 
+>>>> #include <stdint.h>
+>>>> 
+>>>> -bool control_writer(const char *path);
+>>>> +bool control_writer(const char *path, uint32_t type);
+>>>> void control_reader(const char *path);
+>>>> void control_server(const char *path);
+>>>> int control_tracing(void);
+>>>> diff --git a/monitor/main.c b/monitor/main.c
+>>>> index 6e7d4b3..66d7ad1 100644
+>>>> --- a/monitor/main.c
+>>>> +++ b/monitor/main.c
+>>>> @@ -33,6 +33,7 @@
+>>>> #include <getopt.h>
+>>>> 
+>>>> #include "src/shared/mainloop.h"
+>>>> +#include "src/shared/btsnoop.h"
+>>>> 
+>>>> #include "packet.h"
+>>>> #include "lmp.h"
+>>>> @@ -66,6 +67,7 @@ static void usage(void)
+>>>> 		"\t-t, --time             Show time instead of time offset\n"
+>>>> 		"\t-T, --date             Show time and date information\n"
+>>>> 		"\t-S, --sco              Dump SCO traffic\n"
+>>>> +		"\t-H, --hci              Use BTSNOOP_TYPE_HCI\n"
+>>>> 		"\t-E, --ellisys [ip]     Send Ellisys HCI Injection\n"
+>>>> 		"\t-h, --help             Show help options\n");
+>>>> }
+>>>> @@ -80,6 +82,7 @@ static const struct option main_options[] = {
+>>>> 	{ "time",    no_argument,       NULL, 't' },
+>>>> 	{ "date",    no_argument,       NULL, 'T' },
+>>>> 	{ "sco",     no_argument,	NULL, 'S' },
+>>>> +	{ "hci",     no_argument,	NULL, 'H' },
+>>>> 	{ "ellisys", required_argument, NULL, 'E' },
+>>>> 	{ "todo",    no_argument,       NULL, '#' },
+>>>> 	{ "version", no_argument,       NULL, 'v' },
+>>>> @@ -98,6 +101,7 @@ int main(int argc, char *argv[])
+>>>> 	const char *str;
+>>>> 	int exit_status;
+>>>> 	sigset_t mask;
+>>>> +	uint32_t type = BTSNOOP_TYPE_MONITOR;
+>>>> 
+>>>> 	mainloop_init();
+>>>> 
+>>>> @@ -151,6 +155,9 @@ int main(int argc, char *argv[])
+>>>> 		case 'S':
+>>>> 			filter_mask |= PACKET_FILTER_SHOW_SCO_DATA;
+>>>> 			break;
+>>>> +		case 'H':
+>>>> +			type = BTSNOOP_TYPE_HCI;
+>>>> +			break;
+>>>> 		case 'E':
+>>>> 			ellisys_server = optarg;
+>>>> 			ellisys_port = 24352;
+>>>> @@ -210,7 +217,7 @@ int main(int argc, char *argv[])
+>>>> 		return EXIT_SUCCESS;
+>>>> 	}
+>>>> 
+>>>> -	if (writer_path && !control_writer(writer_path)) {
+>>>> +	if (writer_path && !control_writer(writer_path, type)) {
+>>>> 		printf("Failed to open '%s'\n", writer_path);
+>>>> 		return EXIT_FAILURE;
+>>>> 	}
+>>> 
+>>> This option should be tightly coupled with --index option since legacy format 
+>>> cannot store index id.
+>> 
+>> I do not like this. btmon should always write the new format. Otherwise you are missing the index added and removed extra meta data.
+>> 
+>> Regards
+>> 
+>> Marcel
+>> 
+> Thanks for your opinion. I am not clear which tool(btmon, hcidump,
+> android hcidump in bluez) is the best option to capture Bluetooth
+> packets in real products.
+> 
+> As you know tizen uses hcidump. but it seems that development of hcidump
+> is stopped. So I would like to use btmon instead of hcidump if possible.
+> 
+> Currently our popular Bluetooth analyzer, front line viewer could not
+> open btmon packet. Is btmon way standard? I could not find it.
 
-So they need split option to analyze the btsnoop file captured by
-btmon.
----
- tools/btsnoop.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 98 insertions(+), 2 deletions(-)
+the original btsnoop format is from Frontline. I extended the format to the newer btmon format. Maybe it is time to ask Frontline to support it. Wireshark does already for example.
 
-diff --git a/tools/btsnoop.c b/tools/btsnoop.c
-index 3eb8082..0ea4c65 100644
---- a/tools/btsnoop.c
-+++ b/tools/btsnoop.c
-@@ -34,6 +34,8 @@
- #include <stdint.h>
- #include <stdbool.h>
- #include <string.h>
-+#include <time.h>
-+#include <sys/time.h>
- #include <getopt.h>
- #include <endian.h>
- #include <arpa/inet.h>
-@@ -272,6 +274,86 @@ close_input:
- 		close(input_fd[i]);
- }
- 
-+#define BT_SNOOP_TYPE_HCI_PREFIX "btsnoop_type_hci"
-+
-+static void command_split(const char *input)
-+{
-+	unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
-+	uint16_t pktlen,opcode;
-+	uint32_t type;
-+	struct timeval tv;
-+	uint16_t index, max_index = 0;
-+	char write_file_name[255];
-+	struct btsnoop *btsnoop_read_file = NULL;
-+	struct btsnoop *btsnoop_write_file[16];
-+	time_t t;
-+	struct tm tm;
-+	unsigned long num_packets = 0;
-+
-+	btsnoop_read_file = btsnoop_open(input, BTSNOOP_FLAG_PKLG_SUPPORT);
-+	if (!btsnoop_read_file)
-+		return;
-+
-+	type = btsnoop_get_type(btsnoop_read_file);
-+	if (type != BTSNOOP_TYPE_MONITOR) {
-+		fprintf(stderr, "unsupported link data type %u\n", type);
-+		btsnoop_unref(btsnoop_read_file);
-+		return;
-+	}
-+
-+next_packet:
-+	if (!btsnoop_read_hci(btsnoop_read_file, &tv, &index, &opcode, buf,
-+								&pktlen))
-+		goto close_files;
-+
-+	if (opcode == 0xffff)
-+		goto next_packet;
-+
-+	switch (opcode) {
-+	case BTSNOOP_OPCODE_NEW_INDEX:
-+		t = tv.tv_sec;
-+		localtime_r(&t, &tm);
-+
-+		if (max_index < index)
-+			max_index = index;
-+
-+		sprintf(write_file_name, "%s%d_%02d:%02d:%02d.%06lu.log",
-+			BT_SNOOP_TYPE_HCI_PREFIX, index, tm.tm_hour, tm.tm_min,
-+			tm.tm_sec, tv.tv_usec);
-+
-+		printf("New Index %d would be saved in %s\n", index,
-+							write_file_name);
-+
-+		btsnoop_write_file[index] = btsnoop_create(write_file_name,
-+							BTSNOOP_TYPE_HCI);
-+		if (!btsnoop_write_file[index])
-+			goto close_files;
-+
-+		break;
-+	case BTSNOOP_OPCODE_DEL_INDEX:
-+		printf("Del Index %d\n", index);
-+
-+		btsnoop_unref(btsnoop_write_file[index]);
-+		btsnoop_write_file[index] = NULL;
-+		break;
-+	default:
-+		btsnoop_write_hci(btsnoop_write_file[index], &tv, index,
-+							opcode, buf, pktlen);
-+	}
-+	num_packets++;
-+
-+	goto next_packet;
-+
-+close_files:
-+	for (index = 0; index < max_index; index++)
-+		btsnoop_unref(btsnoop_write_file[index]);
-+
-+	btsnoop_unref(btsnoop_read_file);
-+
-+	printf("BT Snoop data link transfer is completed for %lu packets\n",
-+								num_packets);
-+}
-+
- static void command_extract_eir(const char *input)
- {
- 	struct btsnoop_pkt pkt;
-@@ -518,6 +600,7 @@ static void usage(void)
- 	printf("commands:\n"
- 		"\t-m, --merge <output>   Merge multiple btsnoop files\n"
- 		"\t-e, --extract <input>  Extract data from btsnoop file\n"
-+		"\t-s, --split <input>    Split btmon file into legacy btsnoop file(s)\n"
- 		"\t-h, --help             Show help options\n");
- }
- 
-@@ -525,12 +608,13 @@ static const struct option main_options[] = {
- 	{ "merge",   required_argument, NULL, 'm' },
- 	{ "extract", required_argument, NULL, 'e' },
- 	{ "type",    required_argument, NULL, 't' },
-+	{ "split",   required_argument, NULL, 's' },
- 	{ "version", no_argument,       NULL, 'v' },
- 	{ "help",    no_argument,       NULL, 'h' },
- 	{ }
- };
- 
--enum { INVALID, MERGE, EXTRACT };
-+enum { INVALID, MERGE, EXTRACT, SPLIT };
- 
- int main(int argc, char *argv[])
- {
-@@ -542,7 +626,7 @@ int main(int argc, char *argv[])
- 	for (;;) {
- 		int opt;
- 
--		opt = getopt_long(argc, argv, "m:e:t:vh", main_options, NULL);
-+		opt = getopt_long(argc, argv, "m:e:s:t:vh", main_options, NULL);
- 		if (opt < 0)
- 			break;
- 
-@@ -555,6 +639,9 @@ int main(int argc, char *argv[])
- 			command = EXTRACT;
- 			input_path = optarg;
- 			break;
-+		case 's':
-+			command = SPLIT;
-+			input_path = optarg;
- 		case 't':
- 			type = optarg;
- 			break;
-@@ -600,6 +687,15 @@ int main(int argc, char *argv[])
- 			fprintf(stderr, "extract type not supported\n");
- 		break;
- 
-+	case SPLIT:
-+		if (argc - optind > 0) {
-+			fprintf(stderr, "extra arguments not allowed\n");
-+			return EXIT_FAILURE;
-+		}
-+
-+		command_split(input_path);
-+		break;
-+
- 	default:
- 		usage();
- 		return EXIT_FAILURE;
--- 
-2.1.0
+I expect people to use btmon and we will deprecate hcidump at some point. btmon uses the Bluetooth monitor interface which is way more efficient and clean compared to the old legacy hcidump raw interface. The old interface has problems and eventually there will be a kernel option that allows disabling it.
+
+So use btmon and just add support to btsnoop for conversion. Seems btsnoop should get a --split option.
+
+> If we use your proposal well, I think the index added and removed extra
+> meta data could be written in hcidump file name, for example
+> foo_leagacy_hci0_12:34:56.log only when user wants.
+
+I will not add this to btmon. I am fine have a --split option for btsnoop tool.
+
+Regards
+
+Marcel
 
