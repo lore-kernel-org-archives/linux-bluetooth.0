@@ -2,528 +2,182 @@ Return-Path: <cyrus@holtmann.org>
 From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
 Cc: chanyeol.park@samsung.com
-Subject: [PATCH v2 2/2] monitor: Remove unused btsnoop files
-Date: Fri, 24 Apr 2015 18:25:00 +0900
-Message-id: <1429867500-5633-2-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1429867500-5633-1-git-send-email-chanyeol.park@samsung.com>
-References: <1429867500-5633-1-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH v2 1/2] tools/btsnoop: Add split option
+Date: Fri, 24 Apr 2015 18:24:59 +0900
+Message-id: <1429867500-5633-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 
----
- monitor/btsnoop.c | 430 ------------------------------------------------------
- monitor/btsnoop.h |  63 --------
- 2 files changed, 493 deletions(-)
- delete mode 100644 monitor/btsnoop.c
- delete mode 100644 monitor/btsnoop.h
+Current btmon's btsnoop data link type is BTSNOOP_TYPE_MONITOR:2001.
+but some of btsnoop viewer could not handle it because they just
+support BTSNOOP_TYPE_HCI(1001).
 
-diff --git a/monitor/btsnoop.c b/monitor/btsnoop.c
-deleted file mode 100644
-index a32335a..0000000
---- a/monitor/btsnoop.c
-+++ /dev/null
-@@ -1,430 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2014  Intel Corporation
-- *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <errno.h>
--#include <fcntl.h>
--#include <unistd.h>
--#include <stdint.h>
--#include <string.h>
--#include <sys/stat.h>
--#include <arpa/inet.h>
--
--#include "lib/bluetooth.h"
--#include "lib/hci.h"
--
--#include "btsnoop.h"
--
--struct btsnoop_hdr {
--	uint8_t		id[8];		/* Identification Pattern */
--	uint32_t	version;	/* Version Number = 1 */
--	uint32_t	type;		/* Datalink Type */
--} __attribute__ ((packed));
--#define BTSNOOP_HDR_SIZE (sizeof(struct btsnoop_hdr))
--
--struct btsnoop_pkt {
--	uint32_t	size;		/* Original Length */
--	uint32_t	len;		/* Included Length */
--	uint32_t	flags;		/* Packet Flags */
--	uint32_t	drops;		/* Cumulative Drops */
--	uint64_t	ts;		/* Timestamp microseconds */
--	uint8_t		data[0];	/* Packet Data */
--} __attribute__ ((packed));
--#define BTSNOOP_PKT_SIZE (sizeof(struct btsnoop_pkt))
--
--static const uint8_t btsnoop_id[] = { 0x62, 0x74, 0x73, 0x6e,
--				      0x6f, 0x6f, 0x70, 0x00 };
--
--static const uint32_t btsnoop_version = 1;
--static uint32_t btsnoop_type = 0;
--
--static int btsnoop_fd = -1;
--static uint16_t btsnoop_index = 0xffff;
--
--void btsnoop_create(const char *path, uint32_t type)
--{
--	struct btsnoop_hdr hdr;
--	ssize_t written;
--
--	if (btsnoop_fd >= 0)
--		return;
--
--	btsnoop_fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC,
--				S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
--	if (btsnoop_fd < 0)
--		return;
--
--	btsnoop_type = type;
--
--	memcpy(hdr.id, btsnoop_id, sizeof(btsnoop_id));
--	hdr.version = htobe32(btsnoop_version);
--	hdr.type = htobe32(btsnoop_type);
--
--	written = write(btsnoop_fd, &hdr, BTSNOOP_HDR_SIZE);
--	if (written < 0) {
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return;
--	}
--}
--
--void btsnoop_write(struct timeval *tv, uint32_t flags,
--					const void *data, uint16_t size)
--{
--	struct btsnoop_pkt pkt;
--	uint64_t ts;
--	ssize_t written;
--
--	ts = (tv->tv_sec - 946684800ll) * 1000000ll + tv->tv_usec;
--
--	pkt.size  = htobe32(size);
--	pkt.len   = htobe32(size);
--	pkt.flags = htobe32(flags);
--	pkt.drops = htobe32(0);
--	pkt.ts    = htobe64(ts + 0x00E03AB44A676000ll);
--
--	written = write(btsnoop_fd, &pkt, BTSNOOP_PKT_SIZE);
--	if (written < 0)
--		return;
--
--	if (data && size > 0) {
--		written = write(btsnoop_fd, data, size);
--		if (written < 0)
--			return;
--	}
--}
--
--static uint32_t get_flags_from_opcode(uint16_t opcode)
--{
--	switch (opcode) {
--	case BTSNOOP_OPCODE_NEW_INDEX:
--	case BTSNOOP_OPCODE_DEL_INDEX:
--		break;
--	case BTSNOOP_OPCODE_COMMAND_PKT:
--		return 0x02;
--	case BTSNOOP_OPCODE_EVENT_PKT:
--		return 0x03;
--	case BTSNOOP_OPCODE_ACL_TX_PKT:
--		return 0x00;
--	case BTSNOOP_OPCODE_ACL_RX_PKT:
--		return 0x01;
--	case BTSNOOP_OPCODE_SCO_TX_PKT:
--	case BTSNOOP_OPCODE_SCO_RX_PKT:
--		break;
--	}
--
--	return 0xff;
--}
--
--void btsnoop_write_hci(struct timeval *tv, uint16_t index, uint16_t opcode,
--					const void *data, uint16_t size)
--{
--	uint32_t flags;
--
--	if (!tv)
--		return;
--
--	if (btsnoop_fd < 0)
--		return;
--
--	switch (btsnoop_type) {
--	case BTSNOOP_TYPE_HCI:
--		if (btsnoop_index == 0xffff)
--			btsnoop_index = index;
--
--		if (index != btsnoop_index)
--			return;
--
--		flags = get_flags_from_opcode(opcode);
--		if (flags == 0xff)
--			return;
--		break;
--
--	case BTSNOOP_TYPE_MONITOR:
--		flags = (index << 16) | opcode;
--		break;
--
--	default:
--		return;
--	}
--
--	btsnoop_write(tv, flags, data, size);
--}
--
--void btsnoop_write_phy(struct timeval *tv, uint16_t frequency,
--					const void *data, uint16_t size)
--{
--	uint32_t flags;
--
--	if (!tv)
--		return;
--
--	if (btsnoop_fd < 0)
--		return;
--
--	switch (btsnoop_type) {
--	case BTSNOOP_TYPE_SIMULATOR:
--		flags = (1 << 16) | frequency;
--		break;
--
--	default:
--		return;
--	}
--
--	btsnoop_write(tv, flags, data, size);
--}
--
--int btsnoop_open(const char *path, uint32_t *type)
--{
--	struct btsnoop_hdr hdr;
--	ssize_t len;
--
--	if (btsnoop_fd >= 0) {
--		fprintf(stderr, "Too many open files\n");
--		return -1;
--	}
--
--	btsnoop_fd = open(path, O_RDONLY | O_CLOEXEC);
--	if (btsnoop_fd < 0) {
--		perror("Failed to open file");
--		return -1;
--	}
--
--	len = read(btsnoop_fd, &hdr, BTSNOOP_HDR_SIZE);
--	if (len < 0 || len != BTSNOOP_HDR_SIZE) {
--		perror("Failed to read header");
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return -1;
--	}
--
--	if (memcmp(hdr.id, btsnoop_id, sizeof(btsnoop_id))) {
--		fprintf(stderr, "Invalid btsnoop header\n");
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return -1;
--	}
--
--	if (be32toh(hdr.version) != btsnoop_version) {
--		fprintf(stderr, "Invalid btsnoop version\n");
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return -1;
--	}
--
--	btsnoop_type = be32toh(hdr.type);
--
--	if (type)
--		*type = btsnoop_type;
--
--	return 0;
--}
--
--static uint16_t get_opcode_from_flags(uint8_t type, uint32_t flags)
--{
--	switch (type) {
--	case HCI_COMMAND_PKT:
--		return BTSNOOP_OPCODE_COMMAND_PKT;
--	case HCI_ACLDATA_PKT:
--		if (flags & 0x01)
--			return BTSNOOP_OPCODE_ACL_RX_PKT;
--		else
--			return BTSNOOP_OPCODE_ACL_TX_PKT;
--	case HCI_SCODATA_PKT:
--		if (flags & 0x01)
--			return BTSNOOP_OPCODE_SCO_RX_PKT;
--		else
--			return BTSNOOP_OPCODE_SCO_TX_PKT;
--	case HCI_EVENT_PKT:
--		return BTSNOOP_OPCODE_EVENT_PKT;
--	case 0xff:
--		if (flags & 0x02) {
--			if (flags & 0x01)
--				return BTSNOOP_OPCODE_EVENT_PKT;
--			else
--				return BTSNOOP_OPCODE_COMMAND_PKT;
--		} else {
--			if (flags & 0x01)
--				return BTSNOOP_OPCODE_ACL_RX_PKT;
--			else
--				return BTSNOOP_OPCODE_ACL_TX_PKT;
--		}
--		break;
--	}
--
--	return 0xff;
--}
--
--int btsnoop_read_hci(struct timeval *tv, uint16_t *index, uint16_t *opcode,
--						void *data, uint16_t *size)
--{
--	struct btsnoop_pkt pkt;
--	uint32_t toread, flags;
--	uint64_t ts;
--	uint8_t pkt_type;
--	ssize_t len;
--
--	if (btsnoop_fd < 0)
--		return -1;
--
--	len = read(btsnoop_fd, &pkt, BTSNOOP_PKT_SIZE);
--	if (len == 0)
--		return -1;
--
--	if (len < 0 || len != BTSNOOP_PKT_SIZE) {
--		perror("Failed to read packet");
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return -1;
--	}
--
--	toread = be32toh(pkt.size);
--	if (toread > BTSNOOP_MAX_PACKET_SIZE) {
--		perror("Packet len suspicially big: %u", toread);
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return -1;
--	}
--
--	flags = be32toh(pkt.flags);
--
--	ts = be64toh(pkt.ts) - 0x00E03AB44A676000ll;
--	tv->tv_sec = (ts / 1000000ll) + 946684800ll;
--	tv->tv_usec = ts % 1000000ll;
--
--	switch (btsnoop_type) {
--	case BTSNOOP_TYPE_HCI:
--		*index = 0;
--		*opcode = get_opcode_from_flags(0xff, flags);
--		break;
--
--	case BTSNOOP_TYPE_UART:
--		len = read(btsnoop_fd, &pkt_type, 1);
--		if (len < 0) {
--			perror("Failed to read packet type");
--			close(btsnoop_fd);
--			btsnoop_fd = -1;
--			return -1;
--		}
--		toread--;
--
--		*index = 0;
--		*opcode = get_opcode_from_flags(pkt_type, flags);
--		break;
--
--	case BTSNOOP_TYPE_MONITOR:
--		*index = flags >> 16;
--		*opcode = flags & 0xffff;
--		break;
--
--	default:
--		fprintf(stderr, "Unknown packet type\n");
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return -1;
--	}
--
--	len = read(btsnoop_fd, data, toread);
--	if (len < 0) {
--		perror("Failed to read data");
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return -1;
--	}
--
--	*size = toread;
--
--	return 0;
--}
--
--int btsnoop_read_phy(struct timeval *tv, uint16_t *frequency,
--						void *data, uint16_t *size)
--{
--	struct btsnoop_pkt pkt;
--	uint32_t toread, flags;
--	uint64_t ts;
--	ssize_t len;
--
--	if (btsnoop_fd < 0)
--		return -1;
--
--	len = read(btsnoop_fd, &pkt, BTSNOOP_PKT_SIZE);
--	if (len == 0)
--		return -1;
--
--	if (len < 0 || len != BTSNOOP_PKT_SIZE) {
--		perror("Failed to read packet");
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return -1;
--	}
--
--	toread = be32toh(pkt.size);
--	flags = be32toh(pkt.flags);
--
--	ts = be64toh(pkt.ts) - 0x00E03AB44A676000ll;
--	tv->tv_sec = (ts / 1000000ll) + 946684800ll;
--	tv->tv_usec = ts % 1000000ll;
--
--	switch (btsnoop_type) {
--	case BTSNOOP_TYPE_SIMULATOR:
--		if ((flags >> 16) != 1)
--			break;
--		*frequency = flags & 0xffff;
--		break;
--
--	default:
--		fprintf(stderr, "Unknown packet type\n");
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return -1;
--	}
--
--	len = read(btsnoop_fd, data, toread);
--	if (len < 0) {
--		perror("Failed to read data");
--		close(btsnoop_fd);
--		btsnoop_fd = -1;
--		return -1;
--	}
--
--	*size = toread;
--
--	return 0;
--}
--
--void btsnoop_close(void)
--{
--	if (btsnoop_fd < 0)
--		return;
--
--	close(btsnoop_fd);
--	btsnoop_fd = -1;
--
--	btsnoop_index = 0xffff;
--}
-diff --git a/monitor/btsnoop.h b/monitor/btsnoop.h
-deleted file mode 100644
-index be4e2ed..0000000
---- a/monitor/btsnoop.h
-+++ /dev/null
-@@ -1,63 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2011-2014  Intel Corporation
-- *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#include <stdint.h>
--#include <sys/time.h>
--
--#define BTSNOOP_TYPE_HCI		1001
--#define BTSNOOP_TYPE_UART		1002
--#define BTSNOOP_TYPE_BCSP		1003
--#define BTSNOOP_TYPE_3WIRE		1004
--#define BTSNOOP_TYPE_MONITOR		2001
--#define BTSNOOP_TYPE_SIMULATOR		2002
--
--#define BTSNOOP_OPCODE_NEW_INDEX	0
--#define BTSNOOP_OPCODE_DEL_INDEX	1
--#define BTSNOOP_OPCODE_COMMAND_PKT	2
--#define BTSNOOP_OPCODE_EVENT_PKT	3
--#define BTSNOOP_OPCODE_ACL_TX_PKT	4
--#define BTSNOOP_OPCODE_ACL_RX_PKT	5
--#define BTSNOOP_OPCODE_SCO_TX_PKT	6
--#define BTSNOOP_OPCODE_SCO_RX_PKT	7
--
--struct btsnoop_opcode_new_index {
--	uint8_t  type;
--	uint8_t  bus;
--	uint8_t  bdaddr[6];
--	char     name[8];
--} __attribute__((packed));
--
--void btsnoop_create(const char *path, uint32_t type);
--void btsnoop_write(struct timeval *tv, uint32_t flags,
--					const void *data, uint16_t size);
--void btsnoop_write_hci(struct timeval *tv, uint16_t index, uint16_t opcode,
--					const void *data, uint16_t size);
--void btsnoop_write_phy(struct timeval *tv, uint16_t frequency,
--					const void *data, uint16_t size);
--int btsnoop_open(const char *path, uint32_t *type);
--int btsnoop_read_hci(struct timeval *tv, uint16_t *index, uint16_t *opcode,
--						void *data, uint16_t *size);
--int btsnoop_read_phy(struct timeval *tv, uint16_t *frequency,
--						void *data, uint16_t *size);
--void btsnoop_close(void);
+So they need split option to analyze the btsnoop file captured by
+btmon.
+---
+ tools/btsnoop.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 98 insertions(+), 2 deletions(-)
+
+diff --git a/tools/btsnoop.c b/tools/btsnoop.c
+index 3eb8082..0ea4c65 100644
+--- a/tools/btsnoop.c
++++ b/tools/btsnoop.c
+@@ -34,6 +34,8 @@
+ #include <stdint.h>
+ #include <stdbool.h>
+ #include <string.h>
++#include <time.h>
++#include <sys/time.h>
+ #include <getopt.h>
+ #include <endian.h>
+ #include <arpa/inet.h>
+@@ -272,6 +274,86 @@ close_input:
+ 		close(input_fd[i]);
+ }
+ 
++#define BT_SNOOP_TYPE_HCI_PREFIX "btsnoop_type_hci"
++
++static void command_split(const char *input)
++{
++	unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
++	uint16_t pktlen,opcode;
++	uint32_t type;
++	struct timeval tv;
++	uint16_t index, max_index = 0;
++	char write_file_name[255];
++	struct btsnoop *btsnoop_read_file = NULL;
++	struct btsnoop *btsnoop_write_file[16];
++	time_t t;
++	struct tm tm;
++	unsigned long num_packets = 0;
++
++	btsnoop_read_file = btsnoop_open(input, BTSNOOP_FLAG_PKLG_SUPPORT);
++	if (!btsnoop_read_file)
++		return;
++
++	type = btsnoop_get_type(btsnoop_read_file);
++	if (type != BTSNOOP_TYPE_MONITOR) {
++		fprintf(stderr, "unsupported link data type %u\n", type);
++		btsnoop_unref(btsnoop_read_file);
++		return;
++	}
++
++next_packet:
++	if (!btsnoop_read_hci(btsnoop_read_file, &tv, &index, &opcode, buf,
++								&pktlen))
++		goto close_files;
++
++	if (opcode == 0xffff)
++		goto next_packet;
++
++	switch (opcode) {
++	case BTSNOOP_OPCODE_NEW_INDEX:
++		t = tv.tv_sec;
++		localtime_r(&t, &tm);
++
++		if (max_index < index)
++			max_index = index;
++
++		sprintf(write_file_name, "%s%d_%02d:%02d:%02d.%06lu.log",
++			BT_SNOOP_TYPE_HCI_PREFIX, index, tm.tm_hour, tm.tm_min,
++			tm.tm_sec, tv.tv_usec);
++
++		printf("New Index %d would be saved in %s\n", index,
++							write_file_name);
++
++		btsnoop_write_file[index] = btsnoop_create(write_file_name,
++							BTSNOOP_TYPE_HCI);
++		if (!btsnoop_write_file[index])
++			goto close_files;
++
++		break;
++	case BTSNOOP_OPCODE_DEL_INDEX:
++		printf("Del Index %d\n", index);
++
++		btsnoop_unref(btsnoop_write_file[index]);
++		btsnoop_write_file[index] = NULL;
++		break;
++	default:
++		btsnoop_write_hci(btsnoop_write_file[index], &tv, index,
++							opcode, buf, pktlen);
++	}
++	num_packets++;
++
++	goto next_packet;
++
++close_files:
++	for (index = 0; index < max_index; index++)
++		btsnoop_unref(btsnoop_write_file[index]);
++
++	btsnoop_unref(btsnoop_read_file);
++
++	printf("BT Snoop data link transfer is completed for %lu packets\n",
++								num_packets);
++}
++
+ static void command_extract_eir(const char *input)
+ {
+ 	struct btsnoop_pkt pkt;
+@@ -518,6 +600,7 @@ static void usage(void)
+ 	printf("commands:\n"
+ 		"\t-m, --merge <output>   Merge multiple btsnoop files\n"
+ 		"\t-e, --extract <input>  Extract data from btsnoop file\n"
++		"\t-s, --split <input>    Split btmon file into legacy btsnoop file(s)\n"
+ 		"\t-h, --help             Show help options\n");
+ }
+ 
+@@ -525,12 +608,13 @@ static const struct option main_options[] = {
+ 	{ "merge",   required_argument, NULL, 'm' },
+ 	{ "extract", required_argument, NULL, 'e' },
+ 	{ "type",    required_argument, NULL, 't' },
++	{ "split",   required_argument, NULL, 's' },
+ 	{ "version", no_argument,       NULL, 'v' },
+ 	{ "help",    no_argument,       NULL, 'h' },
+ 	{ }
+ };
+ 
+-enum { INVALID, MERGE, EXTRACT };
++enum { INVALID, MERGE, EXTRACT, SPLIT };
+ 
+ int main(int argc, char *argv[])
+ {
+@@ -542,7 +626,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "m:e:t:vh", main_options, NULL);
++		opt = getopt_long(argc, argv, "m:e:s:t:vh", main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+ 
+@@ -555,6 +639,9 @@ int main(int argc, char *argv[])
+ 			command = EXTRACT;
+ 			input_path = optarg;
+ 			break;
++		case 's':
++			command = SPLIT;
++			input_path = optarg;
+ 		case 't':
+ 			type = optarg;
+ 			break;
+@@ -600,6 +687,15 @@ int main(int argc, char *argv[])
+ 			fprintf(stderr, "extract type not supported\n");
+ 		break;
+ 
++	case SPLIT:
++		if (argc - optind > 0) {
++			fprintf(stderr, "extra arguments not allowed\n");
++			return EXIT_FAILURE;
++		}
++
++		command_split(input_path);
++		break;
++
+ 	default:
+ 		usage();
+ 		return EXIT_FAILURE;
 -- 
 2.1.0
 
