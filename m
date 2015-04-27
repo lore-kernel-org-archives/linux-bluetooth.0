@@ -1,295 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHrH25Q-87WCYAMoRUXeraZ7HcpeuXKsjsKh0bd3EJNNU4WHtg@mail.gmail.com>
-References: <1429141368-32190-1-git-send-email-jpawlowski@google.com>
-	<CAHrH25Q-87WCYAMoRUXeraZ7HcpeuXKsjsKh0bd3EJNNU4WHtg@mail.gmail.com>
-Date: Mon, 27 Apr 2015 16:33:06 +0300
-Message-ID: <CABBYNZ+Esxo41DT_fWuwuUfQnGt9SoW=kq=KJF_npocA4M=nTA@mail.gmail.com>
-Subject: Re: [PATCH v8] client: main: add support for SetDiscoveryFilter
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: Jakub Pawlowski <jpawlowski@google.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 8/8] test/example-gatt-server: Add encrypt attributes
+Date: Mon, 27 Apr 2015 16:14:35 +0300
+Message-Id: <1430140475-20349-9-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
+References: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Apr 23, 2015 at 11:21 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi,
->
->> On Wed, Apr 15, 2015 at 4:42 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->> This patch adds set-scan-filter-* commands to sample DBus client that
->> might be used to modify discovery filter.
->>
->> set-scan-filter-uuids - sets filter uuids field
->> set-scan-filter-rssi - sets filter rssi and clears pathloss
->> set-scan-filter-pathloss - sets filter pathloss and clears rssi
->> set-scan-filter-transport - sets filter transport
->> set-scan-filter-clear - clears filter
->> ---
->>  client/main.c | 227 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 227 insertions(+)
->>
->> diff --git a/client/main.c b/client/main.c
->> index bb67f3d..5b2d381 100644
->> --- a/client/main.c
->> +++ b/client/main.c
->> @@ -896,6 +896,222 @@ static void cmd_scan(const char *arg)
->>         }
->>  }
->>
->> +static void append_variant(DBusMessageIter *iter, int type, void *val)
->> +{
->> +       DBusMessageIter value;
->> +       char sig[2] = { type, '\0' };
->> +
->> +       dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
->> +
->> +       dbus_message_iter_append_basic(&value, type, val);
->> +
->> +       dbus_message_iter_close_container(iter, &value);
->> +}
->> +
->> +static void dict_append_entry(DBusMessageIter *dict, const char *key,
->> +                                                       int type, void *val)
->> +{
->> +       DBusMessageIter entry;
->> +
->> +       if (type == DBUS_TYPE_STRING) {
->> +               const char *str = *((const char **) val);
->> +
->> +               if (str == NULL)
->> +                       return;
->> +       }
->> +
->> +       dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
->> +                                                       NULL, &entry);
->> +
->> +       dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
->> +
->> +       append_variant(&entry, type, val);
->> +
->> +       dbus_message_iter_close_container(dict, &entry);
->> +}
->> +
->> +#define        DISTANCE_VAL_INVALID    0x7FFF
->> +
->> +struct set_discovery_filter_args {
->> +       char *transport;
->> +       dbus_uint16_t rssi;
->> +       dbus_int16_t pathloss;
->> +       GSList *uuids;
->> +};
->> +
->> +static void set_discovery_filter_setup(DBusMessageIter *iter,
->> +                                          void *user_data)
->> +{
->> +       struct set_discovery_filter_args *args = user_data;
->> +       DBusMessageIter dict;
->> +
->> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
->> +                           DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
->> +                           DBUS_TYPE_STRING_AS_STRING
->> +                           DBUS_TYPE_VARIANT_AS_STRING
->> +                           DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
->> +
->> +       if (args->uuids != NULL) {
->> +               DBusMessageIter entry, value, arrayIter;
->> +               char *uuids = "UUIDs";
->> +               GSList *l;
->> +
->> +               dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
->> +                                                NULL, &entry);
->> +               /* dict key */
->> +               dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
->> +                                              &uuids);
->> +
->> +               dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
->> +                                                "as", &value);
->> +
->> +               dbus_message_iter_open_container(&value, DBUS_TYPE_ARRAY, "s",
->> +                                                &arrayIter);
->> +
->> +               for (l = args->uuids; l != NULL; l = g_slist_next(l))
->> +                       /* list->data contains string representation of uuid */
->> +                       dbus_message_iter_append_basic(&arrayIter,
->> +                                                      DBUS_TYPE_STRING,
->> +                                                      &l->data);
->> +
->> +               dbus_message_iter_close_container(&value, &arrayIter);
->> +
->> +               /* close vararg*/
->> +               dbus_message_iter_close_container(&entry, &value);
->> +
->> +               /* close entry */
->> +               dbus_message_iter_close_container(&dict, &entry);
->> +       }
->> +
->> +       if (args->pathloss != DISTANCE_VAL_INVALID)
->> +               dict_append_entry(&dict, "Pathloss", DBUS_TYPE_UINT16,
->> +                                 &args->pathloss);
->> +
->> +       if (args->rssi != DISTANCE_VAL_INVALID)
->> +               dict_append_entry(&dict, "RSSI", DBUS_TYPE_INT16, &args->rssi);
->> +
->> +       if (args->transport != NULL)
->> +               dict_append_entry(&dict, "Transport", DBUS_TYPE_STRING,
->> +                                 &args->transport);
->> +
->> +       dbus_message_iter_close_container(iter, &dict);
->> +}
->> +
->> +
->> +static void set_discovery_filter_reply(DBusMessage *message,
->> +                                      void *user_data)
->> +{
->> +       DBusError error;
->> +
->> +       dbus_error_init(&error);
->> +       if (dbus_set_error_from_message(&error, message) == TRUE) {
->> +               rl_printf("SetDiscoveryFilter failed: %s\n", error.name);
->> +               dbus_error_free(&error);
->> +               return;
->> +       }
->> +
->> +       rl_printf("SetDiscoveryFilter success\n");
->> +}
->> +
->> +static gint filtered_scan_rssi = DISTANCE_VAL_INVALID;
->> +static gint filtered_scan_pathloss = DISTANCE_VAL_INVALID;
->> +static GSList *filtered_scan_uuids;
->> +static char *filtered_scan_transport;
->> +
->> +static void cmd_set_scan_filter_commit(void)
->> +{
->> +       struct set_discovery_filter_args args;
->> +
->> +       args.uuids = NULL;
->> +       args.pathloss = filtered_scan_pathloss;
->> +       args.rssi = filtered_scan_rssi;
->> +       args.transport = filtered_scan_transport;
->> +       args.uuids = filtered_scan_uuids;
->> +
->> +       if (check_default_ctrl() == FALSE)
->> +               return;
->> +
->> +       if (g_dbus_proxy_method_call(default_ctrl, "SetDiscoveryFilter",
->> +               set_discovery_filter_setup, set_discovery_filter_reply,
->> +               &args, NULL) == FALSE) {
->> +               rl_printf("Failed to set discovery filter\n");
->> +               return;
->> +       }
->> +}
->> +
->> +static void cmd_set_scan_filter_uuids(const char *arg)
->> +{
->> +       char *uuid_str, *saveptr, *uuids, *uuidstmp;
->> +
->> +       g_slist_free_full(filtered_scan_uuids, g_free);
->> +       filtered_scan_uuids = NULL;
->> +
->> +       if (!arg || !strlen(arg))
->> +               return;
->> +
->> +       uuids = g_strdup(arg);
->> +       for (uuidstmp = uuids; ; uuidstmp = NULL) {
->> +               uuid_str = strtok_r(uuidstmp, " \t", &saveptr);
->> +               if (uuid_str == NULL)
->> +                       break;
->> +           filtered_scan_uuids = g_slist_append(filtered_scan_uuids,
->> +                                                       strdup(uuid_str));
->> +       }
->> +
->> +       g_free(uuids);
->> +
->> +       cmd_set_scan_filter_commit();
->> +}
->> +
->> +static void cmd_set_scan_filter_rssi(const char *arg)
->> +{
->> +       filtered_scan_pathloss = DISTANCE_VAL_INVALID;
->> +
->> +       if (!arg || !strlen(arg))
->> +               filtered_scan_rssi = DISTANCE_VAL_INVALID;
->> +       else
->> +               filtered_scan_rssi = atoi(arg);
->> +
->> +       cmd_set_scan_filter_commit();
->> +}
->> +
->> +static void cmd_set_scan_filter_pathloss(const char *arg)
->> +{
->> +       filtered_scan_rssi = DISTANCE_VAL_INVALID;
->> +
->> +       if (!arg || !strlen(arg))
->> +               filtered_scan_pathloss = DISTANCE_VAL_INVALID;
->> +       else
->> +               filtered_scan_pathloss = atoi(arg);
->> +
->> +       cmd_set_scan_filter_commit();
->> +}
->> +
->> +static void cmd_set_scan_filter_transport(const char *arg)
->> +{
->> +       g_free(filtered_scan_transport);
->> +
->> +       if (!arg || !strlen(arg))
->> +               filtered_scan_transport = NULL;
->> +       else
->> +               filtered_scan_transport = g_strdup(arg);
->> +
->> +       cmd_set_scan_filter_commit();
->> +}
->> +
->> +static void cmd_set_scan_filter_clear(const char *arg)
->> +{
->> +       /* set default values for all options */
->> +       filtered_scan_rssi = DISTANCE_VAL_INVALID;
->> +       filtered_scan_pathloss = DISTANCE_VAL_INVALID;
->> +       g_slist_free_full(filtered_scan_uuids, g_free);
->> +       filtered_scan_uuids = NULL;
->> +       g_free(filtered_scan_transport);
->> +       filtered_scan_transport = NULL;
->> +
->> +       cmd_set_scan_filter_commit();
->> +}
->> +
->>  static struct GDBusProxy *find_device(const char *arg)
->>  {
->>         GDBusProxy *proxy;
->> @@ -1468,6 +1684,17 @@ static const struct {
->>                                                         capability_generator},
->>         { "default-agent",NULL,       cmd_default_agent,
->>                                 "Set agent as the default one" },
->> +       { "set-scan-filter-uuids", "[uuid1 uuid2 ...]",
->> +                       cmd_set_scan_filter_uuids, "Set scan filter uuids" },
->> +       { "set-scan-filter-rssi", "[rssi]", cmd_set_scan_filter_rssi,
->> +                               "Set scan filter rssi, and clears pathloss" },
->> +       { "set-scan-filter-pathloss", "[pathloss]",
->> +                                               cmd_set_scan_filter_pathloss,
->> +                               "Set scan filter pathloss, and clears rssi" },
->> +       { "set-scan-filter-transport", "[transport]",
->> +               cmd_set_scan_filter_transport, "Set scan filter transport" },
->> +       { "set-scan-filter-clear", "", cmd_set_scan_filter_clear,
->> +                                               "Clears discovery filter." },
->>         { "scan",         "<on/off>", cmd_scan, "Scan for devices" },
->>         { "info",         "[dev]",    cmd_info, "Device information",
->>                                                         dev_generator },
->> --
->> 2.2.0.rc0.207.ga3a616c
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Luiz, any comments on this one? Is this good to go?
+This adds new attributes that requires encryption for TestService.
+---
+ test/example-gatt-server | 52 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 50 insertions(+), 2 deletions(-)
 
-This looks much better, I'd add the output of a test run just for the
-sake of completeness.
-
-
+diff --git a/test/example-gatt-server b/test/example-gatt-server
+index 9e7d0f5..47219b8 100755
+--- a/test/example-gatt-server
++++ b/test/example-gatt-server
+@@ -172,10 +172,11 @@ class Characteristic(dbus.service.Object):
+ 
+ 
+ class Descriptor(dbus.service.Object):
+-    def __init__(self, bus, index, uuid, characteristic):
++    def __init__(self, bus, index, uuid, flags, characteristic):
+         self.path = characteristic.path + '/desc' + str(index)
+         self.bus = bus
+         self.uuid = uuid
++        self.flags = flags
+         self.chrc = characteristic
+         dbus.service.Object.__init__(self, bus, self.path)
+ 
+@@ -184,6 +185,7 @@ class Descriptor(dbus.service.Object):
+                 GATT_DESC_IFACE: {
+                         'Characteristic': self.chrc.get_path(),
+                         'UUID': self.uuid,
++                        'Flags': self.flags,
+                 }
+         }
+ 
+@@ -401,7 +403,7 @@ class TestService(Service):
+     def __init__(self, bus, index):
+         Service.__init__(self, bus, index, self.TEST_SVC_UUID, False)
+         self.add_characteristic(TestCharacteristic(bus, 0, self))
+-
++        self.add_characteristic(TestEncryptCharacteristic(bus, 1, self))
+ 
+ class TestCharacteristic(Characteristic):
+     """
+@@ -442,6 +444,7 @@ class TestDescriptor(Descriptor):
+         Descriptor.__init__(
+                 self, bus, index,
+                 self.TEST_DESC_UUID,
++                ['read', 'write'],
+                 characteristic)
+ 
+     def ReadValue(self):
+@@ -464,6 +467,7 @@ class CharacteristicUserDescriptionDescriptor(Descriptor):
+         Descriptor.__init__(
+                 self, bus, index,
+                 self.CUD_UUID,
++                ['read', 'write'],
+                 characteristic)
+ 
+     def ReadValue(self):
+@@ -474,6 +478,50 @@ class CharacteristicUserDescriptionDescriptor(Descriptor):
+             raise NotPermittedException()
+         self.value = value
+ 
++class TestEncryptCharacteristic(Characteristic):
++    """
++    Dummy test characteristic requiring encryption.
++
++    """
++    TEST_CHRC_UUID = '12345678-1234-5678-1234-56789abcdef3'
++
++    def __init__(self, bus, index, service):
++        Characteristic.__init__(
++                self, bus, index,
++                self.TEST_CHRC_UUID,
++                ['encrypt-read', 'encrypt-write'],
++                service)
++        self.value = []
++        self.add_descriptor(TestEncryptDescriptor(bus, 2, self))
++        self.add_descriptor(
++                CharacteristicUserDescriptionDescriptor(bus, 3, self))
++
++    def ReadValue(self):
++        print('TestCharacteristic Read: ' + repr(self.value))
++        return self.value
++
++    def WriteValue(self, value):
++        print('TestCharacteristic Write: ' + repr(value))
++        self.value = value
++
++class TestEncryptDescriptor(Descriptor):
++    """
++    Dummy test descriptor requiring encryption. Returns a static value.
++
++    """
++    TEST_DESC_UUID = '12345678-1234-5678-1234-56789abcdef4'
++
++    def __init__(self, bus, index, characteristic):
++        Descriptor.__init__(
++                self, bus, index,
++                self.TEST_DESC_UUID,
++                ['encrypt-read', 'encrypt-write'],
++                characteristic)
++
++    def ReadValue(self):
++        return [
++                dbus.Byte('T'), dbus.Byte('e'), dbus.Byte('s'), dbus.Byte('t')
++        ]
+ 
+ def register_service_cb():
+     print('GATT service registered')
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
