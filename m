@@ -1,156 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1430140475-20349-3-git-send-email-luiz.dentz@gmail.com>
-References: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
-	<1430140475-20349-3-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 27 Apr 2015 12:51:49 -0700
-Message-ID: <CAHrH25TD07p8yMQhg+-+j61hH8WJGenx=Y1MDrZoU0Pop+ithQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/8] core/gatt: Add support for encryption flags
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] bluetoothd: add option to automatically power on the first adapter found
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <553DFD48.8010200@ahsoftware.de>
+Date: Mon, 27 Apr 2015 11:53:37 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <83A0A25D-0162-4EF1-9736-3C3B2F22940B@holtmann.org>
+References: <1428685062-2911-1-git-send-email-holler@ahsoftware.de> <97E0530A-49BA-4776-BF4E-DF500F28116E@holtmann.org> <55280525.7040902@ahsoftware.de> <55289DD3.1080509@ahsoftware.de> <5528AC01.80804@ahsoftware.de> <55295063.2010106@ahsoftware.de> <72FEAB70-4102-4048-94E0-4AA0B4D67217@holtmann.org> <552A397D.50709@ahsoftware.de> <273C2B2C-FE29-4E28-8B50-7A9BE82C098D@holtmann.org> <552B87EE.5040800@ahsoftware.de> <B8F6B143-DA86-4F06-B4C8-FA2790AA33B3@holtmann.org> <552C1413.1000504@ahsoftware.de> <A619270B-434E-4F83-A3A3-21E25C1DC237@holtmann.org> <552CD0F2.7080605@ahsoftware.de> <35E686A5-9C85-421D-BB8B-DF14F7D1A276@holtmann.org> <552EA70F.9050706@ahsoftware.de> <553B6BC5.4060407@ahsoftware.de> <BBD84100-9DE9-4A7A-8DA3-4DD8B3458F25@holtmann.org> <553DFD48.8010200@ahsoftware.de>
+To: Alexander Holler <holler@ahsoftware.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Alexander,
 
-> On Mon, Apr 27, 2015 at 6:14 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds support to encryption related flags as defined in the
-> documentation.
-> ---
->  src/gatt-database.c    | 34 +++++++++++++++++++++++++++++++---
->  src/shared/att-types.h | 30 ++++++++++++++++++++++--------
->  2 files changed, 53 insertions(+), 11 deletions(-)
->
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index 2261398..cf75b41 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -1241,7 +1241,19 @@ static bool parse_flags(GDBusProxy *proxy, uint8_t *props, uint8_t *ext_props)
->                         *ext_props |= BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE;
->                 else if (!strcmp("writable-auxiliaries", flag))
->                         *ext_props |= BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX;
-> -               else {
-> +               else if (!strcmp("encrypt-read", flag)) {
-> +                       *props |= BT_GATT_CHRC_PROP_READ;
-> +                       *ext_props |= BT_GATT_CHRC_EXT_PROP_ENC_READ;
+>>>>> Your race power on vs keys and known devices programmed into the
+>>>>> kernel. It needs to be done in the right order.
+>>>> 
+>>>> Hmm, I still seem to function, no sign of races, besides that I'm
+>>>> happily working without a Linux kernel.
+>>>> 
+>>>> But in regard to the patch. Maybe. No idea. It works for me (tm) and is
+>>>> faster and more reliable here than other stuff.
+>>> 
+>>> To pick up that thread again, if you want that I remove a race in that patch I don't see by looking at it, you have to be a bit more verbose about the race.
+>> 
+>> it is pretty simple, you want to configure the list of known devices and its keys before you turn on your device for general operation. If you don't do that, you have a race condition.
+>> 
+>>> For me it currently reads like you're more talking about an existing problem in the kernel. If the kernel doesn't like it that a bt-device will be turned on before something like keys and known devices have been setup, then the kernel should throw an error back to userspace.
+>> 
+>> The kernel is not enforcing policy. We can not require to have keys loaded first. There might be no keys or you want to use the Bluetooth subsystem for something else. The kernel mgmt interface provides a flexible way into the general procedures that Bluetooth requires. With bluetoothd we enforce profiles and other behaviors to be consistent. That is not the kernel's job.
+>> 
+>> And even if we wanted to restrict this heavily, we can not easily do that without potentially breaking existing userspace.
+>> 
+>>> But that's just an assumption from me, I haven't read through all the source in bluetoothd or the kernel, but instead just turned on a knob like it would be turned on by issuing "power on" in bluetoothctl.
+>> 
+>> With bluetoothctl you talk over the D-Bus interface to bluetoothd. So when you turn power on there, then it is ensured that everything happens in the right order. That is what bluetoothd enforces. It is not the kernels job to do that.
+> 
+> For me this reads like kernel <-> userspace API is very fragile.
+> 
+> Also I haven't looked at the source for that, I would assume that it should be no problem to submit an empty list of keys and devices to the kernel. So a probably stable design of that part of the API would be:
+> 
+> - Require that userspace sets up various stuff
+> - Require that userspace sends a list of keys (maybe empty)
+> - Require that userspace sends a list of devices (maybe empty)
+> - Turn on devices which are requested to be turned on and start operation.
+> 
+> I'm aware that this might involve problems with older userspace, but just trying to discuss a problem away (e.g. by murdering the messenger) is usually a bad solution.
+> 
+> Right now it looks like userspace can confuse the kernel quiet a lot which it should not be able to do.
+> 
+> For example you are calling it a race if my patch for bluetoothd is used. Which bad things might happen? Do I have to fear my machine blows up and will erase my storage? Or, as we are talking about wireless stuff, do I have to fear that security is absent and everyone might be able to connect to my machine?
 
-You should store these flags separately, perhaps in a
-"permission_flags" variable. These shouldn't be part of ext_props as
-they are not part of the CS definition of "Characteristic Extended
-Properties". Plus, the ext_props variable serves the attribute value
-for the local "Characteristic Extended Properties" descriptor when it
-exists, so this logic will cause undefined values to be returned from
-that descriptor.
+the kernel is different from bluetoothd. You are changing code in bluetoothd and thus lets do it correctly. I really have no idea what you are arguing here for.
 
-> +               } else if (!strcmp("encrypt-write", flag)) {
-> +                       *props |= BT_GATT_CHRC_PROP_WRITE;
-> +                       *ext_props |= BT_GATT_CHRC_EXT_PROP_ENC_WRITE;
-> +               } else if (!strcmp("encrypt-authenticated-read", flag)) {
-> +                       *props |= BT_GATT_CHRC_PROP_READ;
-> +                       *ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_READ;
-> +               } else if (!strcmp("encrypt-authenticated-write", flag)) {
-> +                       *props |= BT_GATT_CHRC_PROP_WRITE;
-> +                       *ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_WRITE;
-> +               } else {
->                         error("Invalid characteristic flag: %s", flag);
->                         return false;
->                 }
-> @@ -1668,12 +1680,28 @@ static uint32_t permissions_from_props(uint8_t props, uint8_t ext_props)
->
->         if (props & BT_GATT_CHRC_PROP_WRITE ||
->                         props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP ||
-> -                       ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE)
-> +                       ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE ||
-> +                       ext_props & BT_GATT_CHRC_EXT_PROP_ENC_WRITE ||
-> +                       ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
->                 perm |= BT_ATT_PERM_WRITE;
->
-> -       if (props & BT_GATT_CHRC_PROP_READ)
-> +       if (props & BT_GATT_CHRC_PROP_READ ||
-> +                       ext_props & BT_GATT_CHRC_EXT_PROP_ENC_READ ||
-> +                       ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_READ)
->                 perm |= BT_ATT_PERM_READ;
->
-> +       if (ext_props & BT_GATT_CHRC_EXT_PROP_ENC_READ)
-> +               perm |= BT_ATT_PERM_READ_ENCRYPT;
-> +
-> +       if (ext_props & BT_GATT_CHRC_EXT_PROP_ENC_WRITE)
-> +               perm |= BT_ATT_PERM_WRITE_ENCRYPT;
-> +
-> +       if (ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_READ)
-> +               perm |= BT_ATT_PERM_READ_AUTHEN;
-> +
-> +       if (ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
-> +               perm |= BT_ATT_PERM_WRITE_AUTHEN;
-> +
->         return perm;
->  }
->
-> diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-> index 10a42f2..ce531d1 100644
-> --- a/src/shared/att-types.h
-> +++ b/src/shared/att-types.h
-> @@ -106,12 +106,18 @@ struct bt_att_pdu_error_rsp {
->   * "Access", "Encryption", "Authentication", and "Authorization". A bitmask of
->   * permissions is a byte that encodes a combination of these.
->   */
-> -#define BT_ATT_PERM_READ       0x01
-> -#define BT_ATT_PERM_WRITE      0x02
-> -#define BT_ATT_PERM_ENCRYPT    0x04
-> -#define BT_ATT_PERM_AUTHEN     0x08
-> -#define BT_ATT_PERM_AUTHOR     0x10
-> -#define BT_ATT_PERM_NONE       0x20
-> +#define BT_ATT_PERM_READ               0x01
-> +#define BT_ATT_PERM_WRITE              0x02
-> +#define BT_ATT_PERM_READ_ENCRYPT       0x04
-> +#define BT_ATT_PERM_WRITE_ENCRYPT      0x08
-> +#define BT_ATT_PERM_ENCRYPT            BT_ATT_PERM_READ_ENCRYPT | \
-> +                                       BT_ATT_PERM_WRITE_ENCRYPT
-> +#define BT_ATT_PERM_READ_AUTHEN                0x10
-> +#define BT_ATT_PERM_WRITE_AUTHEN       0x20
-> +#define BT_ATT_PERM_AUTHEN             BT_ATT_PERM_READ_AUTHEN | \
-> +                                       BT_ATT_PERM_WRITE_AUTHEN
-> +#define BT_ATT_PERM_AUTHOR             0x40
-> +#define BT_ATT_PERM_NONE               0x80
->
->  /* GATT Characteristic Properties Bitfield values */
->  #define BT_GATT_CHRC_PROP_BROADCAST                    0x01
-> @@ -124,5 +130,13 @@ struct bt_att_pdu_error_rsp {
->  #define BT_GATT_CHRC_PROP_EXT_PROP                     0x80
->
->  /* GATT Characteristic Extended Properties Bitfield values */
-> -#define BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE   0x01
-> -#define BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX     0x02
-> +#define BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE           0x01
-> +#define BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX             0x02
-> +#define BT_GATT_CHRC_EXT_PROP_ENC_READ                 0x04
-> +#define BT_GATT_CHRC_EXT_PROP_ENC_WRITE                        0x08
-> +#define BT_GATT_CHRC_EXT_PROP_ENC      BT_GATT_CHRC_EXT_PROP_ENC_READ | \
-> +                                       BT_GATT_CHRC_EXT_PROP_ENC_WRITE
-> +#define BT_GATT_CHRC_EXT_PROP_AUTH_READ                        0x10
-> +#define BT_GATT_CHRC_EXT_PROP_AUTH_WRITE               0x20
-> +#define BT_GATT_CHRC_EXT_PROP_AUTH     BT_GATT_CHRC_EXT_PROP_AUTH_READ | \
-> +                                       BT_GATT_CHRC_EXT_PROP_AUTH_WRITE
+> Sorry that I don't understand your reasoning, but if I would translate that, it would mean the same like if it's a race to call unlink(2) on a non-existing file. Of course, it would be much easier for the kernel to not have to handle all the possible error conditions, but that's the dream of any sw-dev and will never become reality. Handling all the possible error conditions just has to be part of almost any sw, regardless if it's a kernel or not.
+> 
+> Anyway, to come back to the problem of easy and reliable turning on bt-devices at startup, I will look if I find the place in bluetoothd where the keys and devices are submitted to the kernel in order to put the requested power-on after that. But as I'm still happy with my current solution, I don't make any promises on a timeline. ;)
 
-We should keep these new flags separate from the extended properties
-stored in ATT. The GATT/ATT spec doesn't define these as extended
-properties so these definitions don't really belong here; shared/att
-should be strictly for GATT/ATT as defined by the spec whereas the new
-permission flags are D-Bus API specific.. I'd define the D-Bus API
-flags that represent your new attribute permissions in
-src/gatt-database.h.
+If you want the patch to get upstream, I clearly gave you instructions on what has to change to make it upstream acceptable. The work here is on you.
 
-> --
-> 2.1.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Regards
 
-Thanks,
-Arman
+Marcel
+
