@@ -1,124 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/8] core/gatt: Add support for encryption flags
-Date: Mon, 27 Apr 2015 16:14:29 +0300
-Message-Id: <1430140475-20349-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
-References: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 0/8] core/gatt: Introduce encryption flags
+Date: Mon, 27 Apr 2015 16:14:27 +0300
+Message-Id: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support to encryption related flags as defined in the
-documentation.
----
- src/gatt-database.c    | 34 +++++++++++++++++++++++++++++++---
- src/shared/att-types.h | 30 ++++++++++++++++++++++--------
- 2 files changed, 53 insertions(+), 11 deletions(-)
+This set introduce encryption flags to GattCharacteristic and
+GattDescriptor along with the necessary changes to bt_gatt_server to
+honor them.
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 2261398..cf75b41 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -1241,7 +1241,19 @@ static bool parse_flags(GDBusProxy *proxy, uint8_t *props, uint8_t *ext_props)
- 			*ext_props |= BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE;
- 		else if (!strcmp("writable-auxiliaries", flag))
- 			*ext_props |= BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX;
--		else {
-+		else if (!strcmp("encrypt-read", flag)) {
-+			*props |= BT_GATT_CHRC_PROP_READ;
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_ENC_READ;
-+		} else if (!strcmp("encrypt-write", flag)) {
-+			*props |= BT_GATT_CHRC_PROP_WRITE;
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_ENC_WRITE;
-+		} else if (!strcmp("encrypt-authenticated-read", flag)) {
-+			*props |= BT_GATT_CHRC_PROP_READ;
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_READ;
-+		} else if (!strcmp("encrypt-authenticated-write", flag)) {
-+			*props |= BT_GATT_CHRC_PROP_WRITE;
-+			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_WRITE;
-+		} else {
- 			error("Invalid characteristic flag: %s", flag);
- 			return false;
- 		}
-@@ -1668,12 +1680,28 @@ static uint32_t permissions_from_props(uint8_t props, uint8_t ext_props)
- 
- 	if (props & BT_GATT_CHRC_PROP_WRITE ||
- 			props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP ||
--			ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE)
-+			ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE ||
-+			ext_props & BT_GATT_CHRC_EXT_PROP_ENC_WRITE ||
-+			ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
- 		perm |= BT_ATT_PERM_WRITE;
- 
--	if (props & BT_GATT_CHRC_PROP_READ)
-+	if (props & BT_GATT_CHRC_PROP_READ ||
-+			ext_props & BT_GATT_CHRC_EXT_PROP_ENC_READ ||
-+			ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_READ)
- 		perm |= BT_ATT_PERM_READ;
- 
-+	if (ext_props & BT_GATT_CHRC_EXT_PROP_ENC_READ)
-+		perm |= BT_ATT_PERM_READ_ENCRYPT;
-+
-+	if (ext_props & BT_GATT_CHRC_EXT_PROP_ENC_WRITE)
-+		perm |= BT_ATT_PERM_WRITE_ENCRYPT;
-+
-+	if (ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_READ)
-+		perm |= BT_ATT_PERM_READ_AUTHEN;
-+
-+	if (ext_props & BT_GATT_CHRC_EXT_PROP_AUTH_WRITE)
-+		perm |= BT_ATT_PERM_WRITE_AUTHEN;
-+
- 	return perm;
- }
- 
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index 10a42f2..ce531d1 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -106,12 +106,18 @@ struct bt_att_pdu_error_rsp {
-  * "Access", "Encryption", "Authentication", and "Authorization". A bitmask of
-  * permissions is a byte that encodes a combination of these.
-  */
--#define BT_ATT_PERM_READ	0x01
--#define BT_ATT_PERM_WRITE	0x02
--#define BT_ATT_PERM_ENCRYPT	0x04
--#define BT_ATT_PERM_AUTHEN	0x08
--#define BT_ATT_PERM_AUTHOR	0x10
--#define BT_ATT_PERM_NONE	0x20
-+#define BT_ATT_PERM_READ		0x01
-+#define BT_ATT_PERM_WRITE		0x02
-+#define BT_ATT_PERM_READ_ENCRYPT	0x04
-+#define BT_ATT_PERM_WRITE_ENCRYPT	0x08
-+#define BT_ATT_PERM_ENCRYPT		BT_ATT_PERM_READ_ENCRYPT | \
-+					BT_ATT_PERM_WRITE_ENCRYPT
-+#define BT_ATT_PERM_READ_AUTHEN		0x10
-+#define BT_ATT_PERM_WRITE_AUTHEN	0x20
-+#define BT_ATT_PERM_AUTHEN		BT_ATT_PERM_READ_AUTHEN | \
-+					BT_ATT_PERM_WRITE_AUTHEN
-+#define BT_ATT_PERM_AUTHOR		0x40
-+#define BT_ATT_PERM_NONE		0x80
- 
- /* GATT Characteristic Properties Bitfield values */
- #define BT_GATT_CHRC_PROP_BROADCAST			0x01
-@@ -124,5 +130,13 @@ struct bt_att_pdu_error_rsp {
- #define BT_GATT_CHRC_PROP_EXT_PROP			0x80
- 
- /* GATT Characteristic Extended Properties Bitfield values */
--#define BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE	0x01
--#define BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX	0x02
-+#define BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE		0x01
-+#define BT_GATT_CHRC_EXT_PROP_WRITABLE_AUX		0x02
-+#define BT_GATT_CHRC_EXT_PROP_ENC_READ			0x04
-+#define BT_GATT_CHRC_EXT_PROP_ENC_WRITE			0x08
-+#define BT_GATT_CHRC_EXT_PROP_ENC	BT_GATT_CHRC_EXT_PROP_ENC_READ | \
-+					BT_GATT_CHRC_EXT_PROP_ENC_WRITE
-+#define BT_GATT_CHRC_EXT_PROP_AUTH_READ			0x10
-+#define BT_GATT_CHRC_EXT_PROP_AUTH_WRITE		0x20
-+#define BT_GATT_CHRC_EXT_PROP_AUTH	BT_GATT_CHRC_EXT_PROP_AUTH_READ | \
-+					BT_GATT_CHRC_EXT_PROP_AUTH_WRITE
+In addition to that example-gatt-server has been updated to include
+attributes that makes use of the new flags.
+
+The following is the output using bluetoothctl to navigate in the new
+attributes introduced to example-gatt-server:
+
+[Vudentz's T440s:/service0016/char001c]# attribute-info 
+Characteristic - Vendor specific
+	UUID: 12345678-1234-5678-1234-56789abcdef1
+	Service: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016
+	Notifying: no
+	Flags: read
+	Flags: write
+	Flags: extended-properties
+	Flags: writable-auxiliaries
+	Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char001c/desc001e
+	Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char001c/desc001f
+	Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char001c/desc0020
+[Vudentz's T440s:/service0016/char001c]# select-attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
+[Vudentz's T440s:/service0016/char0017]# attribute-info 
+Characteristic - Vendor specific
+	UUID: 12345678-1234-5678-1234-56789abcdef3
+	Service: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016
+	Notifying: no
+	Flags: read
+	Flags: write
+	Flags: extended-properties
+	Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc0019
+	Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
+	Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001b
+[Vudentz's T440s:/service0016/char0017]# read
+Attempting to read /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
+Failed to read: org.bluez.Error.NotPermitted
+[Vudentz's T440s:/service0016/char0017]# write 00
+Attempting to write /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
+Failed to write: org.bluez.Error.NotPermitted
+[Vudentz's T440s:/service0016/char0017]# select-attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
+[Vudentz's T440s:/service0016/char0017/desc001a]# attribute-info 
+Descriptor - Vendor specific
+	UUID: 12345678-1234-5678-1234-56789abcdef4
+	Characteristic: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
+[Vudentz's T440s:/service0016/char0017/desc001a]# read
+Attempting to read /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
+Failed to read: org.bluez.Error.NotPermitted
+[Vudentz's T440s:/service0016/char0017/desc001a]# write 00
+Attempting to write /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
+Failed to write: org.bluez.Error.NotPermitted
+
+Luiz Augusto von Dentz (8):
+  doc/gatt-api: Add encryption flags
+  core/gatt: Add support for encryption flags
+  shared/att: Add own security definitions
+  shared/gatt-server: Check attribute permissions
+  doc/gatt-api: Add Flags property to GattDescriptor
+  shared/gatt: Drop CHRC term of properties define
+  core/gatt: Add Flags property to GattDescriptor
+  test/example-gatt-server: Add encrypt attributes
+
+ doc/gatt-api.txt         |  18 +++++
+ src/gatt-client.c        |  32 ++++----
+ src/gatt-database.c      | 185 +++++++++++++++++++++++++++++++++++------------
+ src/shared/att-types.h   |  51 +++++++++----
+ src/shared/att.c         |   2 +-
+ src/shared/gatt-client.c |   4 +-
+ src/shared/gatt-server.c |  93 +++++++++++++-----------
+ test/example-gatt-server |  52 ++++++++++++-
+ tools/btgatt-server.c    |  14 ++--
+ unit/test-gatt.c         | 148 ++++++++++++++++++-------------------
+ 10 files changed, 392 insertions(+), 207 deletions(-)
+
 -- 
 2.1.0
 
