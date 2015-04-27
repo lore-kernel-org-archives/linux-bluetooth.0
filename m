@@ -1,54 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] Bluetooth: Skip the shutdown routine if the interface is not up
+Subject: Re: [PATCH] bluetoothd: add option to automatically power on the first adapter found
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1430074310-3192-1-git-send-email-gabriele.mzt@gmail.com>
-Date: Sun, 26 Apr 2015 21:49:06 -0700
-Cc: "An, Tedd" <tedd.an@intel.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Message-Id: <C0DF74E2-3705-42A4-898D-3E89C8C95D4A@holtmann.org>
-References: <1430074310-3192-1-git-send-email-gabriele.mzt@gmail.com>
-To: Gabriele Mazzotta <gabriele.mzt@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <553B6BC5.4060407@ahsoftware.de>
+Date: Sun, 26 Apr 2015 21:40:29 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <BBD84100-9DE9-4A7A-8DA3-4DD8B3458F25@holtmann.org>
+References: <1428685062-2911-1-git-send-email-holler@ahsoftware.de> <97E0530A-49BA-4776-BF4E-DF500F28116E@holtmann.org> <55280525.7040902@ahsoftware.de> <55289DD3.1080509@ahsoftware.de> <5528AC01.80804@ahsoftware.de> <55295063.2010106@ahsoftware.de> <72FEAB70-4102-4048-94E0-4AA0B4D67217@holtmann.org> <552A397D.50709@ahsoftware.de> <273C2B2C-FE29-4E28-8B50-7A9BE82C098D@holtmann.org> <552B87EE.5040800@ahsoftware.de> <B8F6B143-DA86-4F06-B4C8-FA2790AA33B3@holtmann.org> <552C1413.1000504@ahsoftware.de> <A619270B-434E-4F83-A3A3-21E25C1DC237@holtmann.org> <552CD0F2.7080605@ahsoftware.de> <35E686A5-9C85-421D-BB8B-DF14F7D1A276@holtmann.org> <552EA70F.9050706@ahsoftware.de> <553B6BC5.4060407@ahsoftware.de>
+To: Alexander Holler <holler@ahsoftware.de>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gabriele,
+Hi Alexander,
 
-> Most likely, the shutdown routine requires the interface to be up.
-> This is the case for BTUSB_INTEL: the routine tries to send a command
-> to the interface, but since this one is down, it fails and exits once
-> HCI_INIT_TIMEOUT has expired.
+>>> Your race power on vs keys and known devices programmed into the
+>>> kernel. It needs to be done in the right order.
+>> 
+>> Hmm, I still seem to function, no sign of races, besides that I'm
+>> happily working without a Linux kernel.
+>> 
+>> But in regard to the patch. Maybe. No idea. It works for me (tm) and is
+>> faster and more reliable here than other stuff.
 > 
-> Signed-off-by: Gabriele Mazzotta <gabriele.mzt@gmail.com>
-> ---
-> net/bluetooth/hci_core.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 476709b..4663c3d 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1557,7 +1557,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
-> {
-> 	BT_DBG("%s %p", hdev->name, hdev);
-> 
-> -	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
-> +	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> +	    test_bit(HCI_UP, &hdev->flags)) {
-> 		/* Execute vendor specific shutdown routine */
-> 		if (hdev->shutdown)
-> 			hdev->shutdown(hdev);
+> To pick up that thread again, if you want that I remove a race in that patch I don't see by looking at it, you have to be a bit more verbose about the race.
 
-this is a good catch.
+it is pretty simple, you want to configure the list of known devices and its keys before you turn on your device for general operation. If you don't do that, you have a race condition.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-Cc: stable@vger.kernel.org # 4.0.x
+> For me it currently reads like you're more talking about an existing problem in the kernel. If the kernel doesn't like it that a bt-device will be turned on before something like keys and known devices have been setup, then the kernel should throw an error back to userspace.
 
-Dave, do you want to take this patch straight into your stable tree?
+The kernel is not enforcing policy. We can not require to have keys loaded first. There might be no keys or you want to use the Bluetooth subsystem for something else. The kernel mgmt interface provides a flexible way into the general procedures that Bluetooth requires. With bluetoothd we enforce profiles and other behaviors to be consistent. That is not the kernel's job.
+
+And even if we wanted to restrict this heavily, we can not easily do that without potentially breaking existing userspace.
+
+> But that's just an assumption from me, I haven't read through all the source in bluetoothd or the kernel, but instead just turned on a knob like it would be turned on by issuing "power on" in bluetoothctl.
+
+With bluetoothctl you talk over the D-Bus interface to bluetoothd. So when you turn power on there, then it is ensured that everything happens in the right order. That is what bluetoothd enforces. It is not the kernels job to do that.
 
 Regards
 
