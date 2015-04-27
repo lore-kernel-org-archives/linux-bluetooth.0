@@ -1,173 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <553E9DD7.3010808@ahsoftware.de>
+Date: Mon, 27 Apr 2015 22:36:39 +0200
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJutjCQEKA+w4EBKEAK17LLW=AQZKvPCqX3hN9RPhTaUQ@mail.gmail.com>
-References: <20150417220040.A379A220209@puck.mtv.corp.google.com>
-	<CABBYNZKHUbsLjzZrxNqUKe8Qp8L+F=COftCZfed1C+2JwydDOA@mail.gmail.com>
-	<CAGXr9JH3PdfGsNreQF_CxeAESuJG6t_=CD=m6KW9DenT9pSxUg@mail.gmail.com>
-	<CABBYNZKZCQ-g+VCDQcZQnrwskPaShUsgXwkqHysQ-6CffPGF3g@mail.gmail.com>
-	<CAGXr9JEbTY9J+iVoMWaL=Vujcd5VWW=53775q9eL0kkMb3C4-A@mail.gmail.com>
-	<CAGXr9JFvvLRUWFcRiwVFw4v7ABb=t9sAYrwg5B9xX4ZSP8rbSg@mail.gmail.com>
-	<CABBYNZ+hYUYOu_CMZ+dvRN_ZdUbqy79btAreDk4m-Qn5QkoepQ@mail.gmail.com>
-	<CAGXr9JHJ5p81ScZbhXo1JN9eSqovbzykWmTM2XMi=NZ7w09LWA@mail.gmail.com>
-	<CABBYNZJutjCQEKA+w4EBKEAK17LLW=AQZKvPCqX3hN9RPhTaUQ@mail.gmail.com>
-Date: Mon, 27 Apr 2015 20:17:27 -0700
-Message-ID: <CAHrH25Q-X+G2Z-FbGsqXSBhiC7zUXmC7hjsk8PoG10yuXpANuw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] hog: re-enable HoG report notifications on HoG device reconnect
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Petri Gynther <pgynther@google.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetoothd: add option to automatically power on the
+ first adapter found
+References: <1428685062-2911-1-git-send-email-holler@ahsoftware.de> <97E0530A-49BA-4776-BF4E-DF500F28116E@holtmann.org> <55280525.7040902@ahsoftware.de> <55289DD3.1080509@ahsoftware.de> <5528AC01.80804@ahsoftware.de> <55295063.2010106@ahsoftware.de> <72FEAB70-4102-4048-94E0-4AA0B4D67217@holtmann.org> <552A397D.50709@ahsoftware.de> <273C2B2C-FE29-4E28-8B50-7A9BE82C098D@holtmann.org> <552B87EE.5040800@ahsoftware.de> <B8F6B143-DA86-4F06-B4C8-FA2790AA33B3@holtmann.org> <552C1413.1000504@ahsoftware.de> <A619270B-434E-4F83-A3A3-21E25C1DC237@holtmann.org> <552CD0F2.7080605@ahsoftware.de> <35E686A5-9C85-421D-BB8B-DF14F7D1A276@holtmann.org> <552EA70F.9050706@ahsoftware.de> <553B6BC5.4060407@ahsoftware.de> <BBD84100-9DE9-4A7A-8DA3-4DD8B3458F25@holtmann.org> <553DFD48.8010200@ahsoftware.de> <83A0A25D-0162-4EF1-9736-3C3B2F22940B@holtmann.org>
+In-Reply-To: <83A0A25D-0162-4EF1-9736-3C3B2F22940B@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz & Petri,
-
-> On Tue, Apr 21, 2015 at 1:49 PM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Petri,
+Am 27.04.2015 um 20:53 schrieb Marcel Holtmann:
+> Hi Alexander,
 >
-> On Tue, Apr 21, 2015 at 11:27 PM, Petri Gynther <pgynther@google.com> wrote:
->> Hi Luiz,
->>
->> On Mon, Apr 20, 2015 at 11:08 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Petri,
->>>
->>> On Tue, Apr 21, 2015 at 2:17 AM, Petri Gynther <pgynther@google.com> wrote:
->>>> Hi Luiz,
->>>>
->>>> On Mon, Apr 20, 2015 at 2:54 PM, Petri Gynther <pgynther@google.com> wrote:
->>>>> Hi Luiz,
+>>>>>> Your race power on vs keys and known devices programmed into the
+>>>>>> kernel. It needs to be done in the right order.
 >>>>>
->>>>> On Mon, Apr 20, 2015 at 1:12 PM, Luiz Augusto von Dentz
->>>>> <luiz.dentz@gmail.com> wrote:
->>>>>> Hi Petri,
->>>>>>
->>>>>> On Mon, Apr 20, 2015 at 7:34 PM, Petri Gynther <pgynther@google.com> wrote:
->>>>>>> Hi Luiz,
->>>>>>>
->>>>>>> On Mon, Apr 20, 2015 at 7:50 AM, Luiz Augusto von Dentz
->>>>>>> <luiz.dentz@gmail.com> wrote:
->>>>>>>> Hi Petri,
->>>>>>>>
->>>>>>>> On Sat, Apr 18, 2015 at 1:00 AM, Petri Gynther <pgynther@google.com> wrote:
->>>>>>>>> On HoG device reconnect, re-enable HoG report notifications every
->>>>>>>>> time by writing the client characteristic configuration attribute
->>>>>>>>> of each HoG report.
->>>>>>>>>
->>>>>>>>> Doing this on every reconnect:
->>>>>>>>> 1. ensures that HoG report notifications are always enabled
->>>>>>>>>    (e.g. lost report notification state in battery swap).
->>>>>>>>> 2. signals to HoG device that it can start sending HoG reports
->>>>>>>>>    (e.g. buffered keypresses while the reconnect is still pending).
->>>>>>>>
->>>>>>>> Is that happening for a specific device? For 1 I suppose it would
->>>>>>>> loose the paring keys as well which means we would not be able to
->>>>>>>> connect at all as HoG mandates pairing, or does it loose only the CCC
->>>>>>>> configuration? Reason 2 is not necessary the behavior every device
->>>>>>>> would have, for example I don't expect a mouse to buffer anything and
->>>>>>>> even a keyboard may buffer only the last key pressed since it might
->>>>>>>> have very little memory to spend in buffering, anyway I suppose reason
->>>>>>>> 1 is what you should really concentrate to tell us what is going on.
->>>>>>>>
->>>>>>>
->>>>>>> On the device that I'm working on, pairing info is stored in
->>>>>>> persistent storage, so it survives battery swap. However, I'm not sure
->>>>>>> yet about HoG report notification enable/disable state. Waiting for
->>>>>>> confirmation from vendor.
->>>>>>
->>>>>> I would expect it to store the CCC state as well in the persistent
->>>>>> storage if one exists.
->>>>>>
->>>>>>> Anyways, we are seeing (2). The first keypress from HoG device is
->>>>>>> getting lost on reconnect, leading to bad user experience. The device
->>>>>>> is sending the keypress immediately when the connection is good, but
->>>>>>> too early before BlueZ has managed to re-register the handler with
->>>>>>> g_attrib_register(). During the reconnect, the HoG device has no way
->>>>>>> of knowing when BlueZ is ready and has registered the handler. So, to
->>>>>>> provide this indication, I propose to re-enable the HoG report
->>>>>>> notification every time.
->>>>>>
->>>>>> But I already fixed this problem not long ago:
->>>>>>
->>>>>> commit 14569a33418a4c1dc07cca090b9336373d63a085
->>>>>> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>>> Date:   Wed Mar 11 21:23:55 2015 +0200
->>>>>>
->>>>>>     core/device: Fix not handling notification
->>>>>>
->>>>>>     attio callbacks needs to be triggered as soon as possible once connected
->>>>>>     otherwise profiles such as HoG may miss notification that are sent while
->>>>>>     bt_gatt_client is doing MTU exchange.
->>>>>>
->>>>>> Perhaps you don't have this patch?
->>>>>>
+>>>>> Hmm, I still seem to function, no sign of races, besides that I'm
+>>>>> happily working without a Linux kernel.
 >>>>>
->>>>> Thanks for pointing this out. We are still using BlueZ 5.28, so don't
->>>>> have this. I'll patch this in and see how HoG reconnect works then.
->>>>>
+>>>>> But in regard to the patch. Maybe. No idea. It works for me (tm) and is
+>>>>> faster and more reliable here than other stuff.
 >>>>
->>>> I reverted my 3 patches and applied your "core/device: Fix not
->>>> handling notification" patch on top of our BlueZ 5.28 stack.
->>>> Unfortunately, your patch breaks our HoG device completely. Our
->>>> device's report map ends up being read incorrectly, and as a result,
->>>> not a single keypress works any more.
->>>>
->>>> Applying your patch causes attio_connected_cb() getting called very
->>>> early, before the MTU exchange has been negotiated. Somehow, this
->>>> doesn't work for our device.
+>>>> To pick up that thread again, if you want that I remove a race in that patch I don't see by looking at it, you have to be a bit more verbose about the race.
 >>>
->>> You might need to following as well:
+>>> it is pretty simple, you want to configure the list of known devices and its keys before you turn on your device for general operation. If you don't do that, you have a race condition.
 >>>
->>>     attrib: Fix not honoring MTU
+>>>> For me it currently reads like you're more talking about an existing problem in the kernel. If the kernel doesn't like it that a bt-device will be turned on before something like keys and known devices have been setup, then the kernel should throw an error back to userspace.
 >>>
->>>     If MTU has changed, by bt_gatt_client for example, the code should be
->>>     able to figure it out without waiting g_attrib_set_mtu to be called.
+>>> The kernel is not enforcing policy. We can not require to have keys loaded first. There might be no keys or you want to use the Bluetooth subsystem for something else. The kernel mgmt interface provides a flexible way into the general procedures that Bluetooth requires. With bluetoothd we enforce profiles and other behaviors to be consistent. That is not the kernel's job.
 >>>
->>> --
->>> Luiz Augusto von Dentz
+>>> And even if we wanted to restrict this heavily, we can not easily do that without potentially breaking existing userspace.
+>>>
+>>>> But that's just an assumption from me, I haven't read through all the source in bluetoothd or the kernel, but instead just turned on a knob like it would be turned on by issuing "power on" in bluetoothctl.
+>>>
+>>> With bluetoothctl you talk over the D-Bus interface to bluetoothd. So when you turn power on there, then it is ensured that everything happens in the right order. That is what bluetoothd enforces. It is not the kernels job to do that.
 >>
->> I merged 5.30 into our codebase. Our HoG device is now operational
->> (report map is OK), but the first keypress is still lost on reconnect.
+>> For me this reads like kernel <-> userspace API is very fragile.
 >>
->> I'll have to dig deeper with btmon, once I get it compiling.
->> Unfortunately, 5.30 has a dependency on #include <wordexp.h>, which
->> our uClibc doesn't support.
+>> Also I haven't looked at the source for that, I would assume that it should be no problem to submit an empty list of keys and devices to the kernel. So a probably stable design of that part of the API would be:
+>>
+>> - Require that userspace sets up various stuff
+>> - Require that userspace sends a list of keys (maybe empty)
+>> - Require that userspace sends a list of devices (maybe empty)
+>> - Turn on devices which are requested to be turned on and start operation.
+>>
+>> I'm aware that this might involve problems with older userspace, but just trying to discuss a problem away (e.g. by murdering the messenger) is usually a bad solution.
+>>
+>> Right now it looks like userspace can confuse the kernel quiet a lot which it should not be able to do.
+>>
+>> For example you are calling it a race if my patch for bluetoothd is used. Which bad things might happen? Do I have to fear my machine blows up and will erase my storage? Or, as we are talking about wireless stuff, do I have to fear that security is absent and everyone might be able to connect to my machine?
 >
-> Maybe try with your own box? We actually have this problem of missing
-> keys before so I would surprised if it is still happening since we
-> should be registering the notification handler within
-> device_attach_att on gatt_client_init and the notification should only
-> be triggering on att.c:can_read_data.
+> the kernel is different from bluetoothd. You are changing code in bluetoothd and thus lets do it correctly. I really have no idea what you are arguing here for.
+
+You are saying that it's a race to power on the dongle before keys and 
+devices are setup. And I'm assuming the keys and/or devices are managed, 
+at least in part, by the kernel.
+
+If not, then it's a of course just an userspace only problem. Also I'm 
+still interested what might go wrong, it's unlikely I will get an answer 
+as I seem to have to look up that myself.
+
+>> Sorry that I don't understand your reasoning, but if I would translate that, it would mean the same like if it's a race to call unlink(2) on a non-existing file. Of course, it would be much easier for the kernel to not have to handle all the possible error conditions, but that's the dream of any sw-dev and will never become reality. Handling all the possible error conditions just has to be part of almost any sw, regardless if it's a kernel or not.
+>>
+>> Anyway, to come back to the problem of easy and reliable turning on bt-devices at startup, I will look if I find the place in bluetoothd where the keys and devices are submitted to the kernel in order to put the requested power-on after that. But as I'm still happy with my current solution, I don't make any promises on a timeline. ;)
 >
-> --
-> Luiz Augusto von Dentz
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> If you want the patch to get upstream, I clearly gave you instructions on what has to change to make it upstream acceptable. The work here is on you.
 
-Are there any updates on this? I've been chasing a similar bug lately,
-where after a connection I can see the ATT protocol notifications over
-btmon but writing the reports to uhid fails (bt_uhid_send fails with
-"Invalid Arguments").
+Sorry, but as said several times before, I don't care much for any Linux 
+upstream anymore. It's just too cumbersome to discuss about maintainer 
+specific styles and other maintainer specific preferences and I've 
+already wasted much too much time in making patches ready for submission 
+which never ended up anywhere (but for which I still receive 
+mails/requests from other users). I now just care for other users and 
+post a patch if I really think it might help several people or if I'm 
+annoyed because I've read too much complaints about a problem. So no 
+work is on me.
 
-Somewhat tangentially to this, I ran into some other issues in the HoG
-plugin. After running some tests on two different LE keyboards (one
-from HP and one from DELL), I realized that these return the 16-bit
-"GATT UUID" value from the "External Report Reference" descriptor in
-big endian format rather than little endian. I'm not sure which is
-correct but the plugin ends up parsing the UUID wrong and thus fails
-to properly discover the "Report Reference" descriptors under the
-included "Battery Level" characteristic. The discovery itself gets
-performed using the wrong handle range as well (0x00-0xff, rather than
-0x0001-0xffff), which also results in an error response from the
-remote end.
+Regards,
 
-I'm not sure how closely these two issues are related since the
-bt_uhid issue is frequent but sporadic. Either way, maybe it's time to
-move this profile over to use shared/gatt instead of attrib/ and we
-can flesh out some of these bugs in the process.
-
-Thanks,
-Arman
+Alexander Holler
