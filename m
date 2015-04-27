@@ -1,37 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/8] doc/gatt-api: Add encryption flags
-Date: Mon, 27 Apr 2015 16:14:28 +0300
-Message-Id: <1430140475-20349-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
-References: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <553DFD48.8010200@ahsoftware.de>
+Date: Mon, 27 Apr 2015 11:11:36 +0200
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetoothd: add option to automatically power on the
+ first adapter found
+References: <1428685062-2911-1-git-send-email-holler@ahsoftware.de> <97E0530A-49BA-4776-BF4E-DF500F28116E@holtmann.org> <55280525.7040902@ahsoftware.de> <55289DD3.1080509@ahsoftware.de> <5528AC01.80804@ahsoftware.de> <55295063.2010106@ahsoftware.de> <72FEAB70-4102-4048-94E0-4AA0B4D67217@holtmann.org> <552A397D.50709@ahsoftware.de> <273C2B2C-FE29-4E28-8B50-7A9BE82C098D@holtmann.org> <552B87EE.5040800@ahsoftware.de> <B8F6B143-DA86-4F06-B4C8-FA2790AA33B3@holtmann.org> <552C1413.1000504@ahsoftware.de> <A619270B-434E-4F83-A3A3-21E25C1DC237@holtmann.org> <552CD0F2.7080605@ahsoftware.de> <35E686A5-9C85-421D-BB8B-DF14F7D1A276@holtmann.org> <552EA70F.9050706@ahsoftware.de> <553B6BC5.4060407@ahsoftware.de> <BBD84100-9DE9-4A7A-8DA3-4DD8B3458F25@holtmann.org>
+In-Reply-To: <BBD84100-9DE9-4A7A-8DA3-4DD8B3458F25@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Am 27.04.2015 um 06:40 schrieb Marcel Holtmann:
+> Hi Alexander,
+>
+>>>> Your race power on vs keys and known devices programmed into the
+>>>> kernel. It needs to be done in the right order.
+>>>
+>>> Hmm, I still seem to function, no sign of races, besides that I'm
+>>> happily working without a Linux kernel.
+>>>
+>>> But in regard to the patch. Maybe. No idea. It works for me (tm) and is
+>>> faster and more reliable here than other stuff.
+>>
+>> To pick up that thread again, if you want that I remove a race in that patch I don't see by looking at it, you have to be a bit more verbose about the race.
+>
+> it is pretty simple, you want to configure the list of known devices and its keys before you turn on your device for general operation. If you don't do that, you have a race condition.
+>
+>> For me it currently reads like you're more talking about an existing problem in the kernel. If the kernel doesn't like it that a bt-device will be turned on before something like keys and known devices have been setup, then the kernel should throw an error back to userspace.
+>
+> The kernel is not enforcing policy. We can not require to have keys loaded first. There might be no keys or you want to use the Bluetooth subsystem for something else. The kernel mgmt interface provides a flexible way into the general procedures that Bluetooth requires. With bluetoothd we enforce profiles and other behaviors to be consistent. That is not the kernel's job.
+>
+> And even if we wanted to restrict this heavily, we can not easily do that without potentially breaking existing userspace.
+>
+>> But that's just an assumption from me, I haven't read through all the source in bluetoothd or the kernel, but instead just turned on a knob like it would be turned on by issuing "power on" in bluetoothctl.
+>
+> With bluetoothctl you talk over the D-Bus interface to bluetoothd. So when you turn power on there, then it is ensured that everything happens in the right order. That is what bluetoothd enforces. It is not the kernels job to do that.
 
-This add encryption flags which can be used when registering a service to
-require encryption when accessing a characteristic.
----
- doc/gatt-api.txt | 4 ++++
- 1 file changed, 4 insertions(+)
+For me this reads like kernel <-> userspace API is very fragile.
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index 088d285..8db35f2 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -148,6 +148,10 @@ Properties	string UUID [read-only]
- 				"authenticated-signed-writes"
- 				"reliable-write"
- 				"writable-auxiliaries"
-+				"encrypt-read"
-+				"encrypt-write"
-+				"encrypt-authenticated-read"
-+				"encrypt-authenticated-write"
- 
- 		array{object} Descriptors [read-only]
- 
--- 
-2.1.0
+Also I haven't looked at the source for that, I would assume that it 
+should be no problem to submit an empty list of keys and devices to the 
+kernel. So a probably stable design of that part of the API would be:
 
+- Require that userspace sets up various stuff
+- Require that userspace sends a list of keys (maybe empty)
+- Require that userspace sends a list of devices (maybe empty)
+- Turn on devices which are requested to be turned on and start operation.
+
+I'm aware that this might involve problems with older userspace, but 
+just trying to discuss a problem away (e.g. by murdering the messenger) 
+is usually a bad solution.
+
+Right now it looks like userspace can confuse the kernel quiet a lot 
+which it should not be able to do.
+
+For example you are calling it a race if my patch for bluetoothd is 
+used. Which bad things might happen? Do I have to fear my machine blows 
+up and will erase my storage? Or, as we are talking about wireless 
+stuff, do I have to fear that security is absent and everyone might be 
+able to connect to my machine?
+
+Sorry that I don't understand your reasoning, but if I would translate 
+that, it would mean the same like if it's a race to call unlink(2) on a 
+non-existing file. Of course, it would be much easier for the kernel to 
+not have to handle all the possible error conditions, but that's the 
+dream of any sw-dev and will never become reality. Handling all the 
+possible error conditions just has to be part of almost any sw, 
+regardless if it's a kernel or not.
+
+Anyway, to come back to the problem of easy and reliable turning on 
+bt-devices at startup, I will look if I find the place in bluetoothd 
+where the keys and devices are submitted to the kernel in order to put 
+the requested power-on after that. But as I'm still happy with my 
+current solution, I don't make any promises on a timeline. ;)
+
+Regards,
+
+Alexander Holler
