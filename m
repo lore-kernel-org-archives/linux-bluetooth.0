@@ -1,114 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] shared/att: Rename sec_level to security
-Date: Tue, 28 Apr 2015 17:35:31 +0300
-Message-Id: <1430231734-26699-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/4] shared/gatt-client: Rename sec_level to security
+Date: Tue, 28 Apr 2015 17:35:32 +0300
+Message-Id: <1430231734-26699-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1430231734-26699-1-git-send-email-luiz.dentz@gmail.com>
+References: <1430231734-26699-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- src/shared/att.c         | 4 ++--
- src/shared/att.h         | 4 ++--
- src/shared/gatt-client.c | 6 +++---
- src/shared/gatt-server.c | 2 +-
- unit/test-gatt.c         | 2 +-
- 5 files changed, 9 insertions(+), 9 deletions(-)
+ src/shared/gatt-client.c | 5 ++---
+ src/shared/gatt-client.h | 4 ++--
+ tools/btgatt-client.c    | 4 ++--
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index f24da18..c5eaa09 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -1341,7 +1341,7 @@ bool bt_att_unregister_all(struct bt_att *att)
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 56bad60..7bc3b71 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -2998,8 +2998,7 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
  	return true;
  }
  
--int bt_att_get_sec_level(struct bt_att *att)
-+int bt_att_get_security(struct bt_att *att)
+-bool bt_gatt_client_set_sec_level(struct bt_gatt_client *client,
+-								int level)
++bool bt_gatt_client_set_security(struct bt_gatt_client *client, int level)
  {
- 	struct bt_security sec;
- 	socklen_t len;
-@@ -1360,7 +1360,7 @@ int bt_att_get_sec_level(struct bt_att *att)
- 	return sec.level;
- }
- 
--bool bt_att_set_sec_level(struct bt_att *att, int level)
-+bool bt_att_set_security(struct bt_att *att, int level)
- {
- 	struct bt_security sec;
- 
-diff --git a/src/shared/att.h b/src/shared/att.h
-index fb6247e..80810a1 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -83,8 +83,8 @@ bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id);
- 
- bool bt_att_unregister_all(struct bt_att *att);
- 
--int bt_att_get_sec_level(struct bt_att *att);
--bool bt_att_set_sec_level(struct bt_att *att, int level);
-+int bt_att_get_security(struct bt_att *att);
-+bool bt_att_set_security(struct bt_att *att, int level);
- 
- bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
- 			bt_att_counter_func_t func, void *user_data);
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 7b628fe..56bad60 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -2217,7 +2217,7 @@ unsigned int bt_gatt_client_write_without_response(
- 
- 	/* Only use signed write if unencrypted */
- 	if (signed_write) {
--		security = bt_att_get_sec_level(client->att);
-+		security = bt_att_get_security(client->att);
- 		op = security > BT_SECURITY_LOW ?  BT_ATT_OP_WRITE_CMD :
- 						BT_ATT_OP_SIGNED_WRITE_CMD;
- 	} else
-@@ -3004,7 +3004,7 @@ bool bt_gatt_client_set_sec_level(struct bt_gatt_client *client,
  	if (!client)
  		return false;
- 
--	return bt_att_set_sec_level(client->att, level);
-+	return bt_att_set_security(client->att, level);
+@@ -3007,7 +3006,7 @@ bool bt_gatt_client_set_sec_level(struct bt_gatt_client *client,
+ 	return bt_att_set_security(client->att, level);
  }
  
- int bt_gatt_client_get_sec_level(struct bt_gatt_client *client)
-@@ -3012,5 +3012,5 @@ int bt_gatt_client_get_sec_level(struct bt_gatt_client *client)
+-int bt_gatt_client_get_sec_level(struct bt_gatt_client *client)
++int bt_gatt_client_get_security(struct bt_gatt_client *client)
+ {
  	if (!client)
  		return -1;
+diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+index 980222c..befa43f 100644
+--- a/src/shared/gatt-client.h
++++ b/src/shared/gatt-client.h
+@@ -131,5 +131,5 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
+ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
+ 							unsigned int id);
  
--	return bt_att_get_sec_level(client->att);
-+	return bt_att_get_security(client->att);
- }
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index ae77dcc..6167065 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -395,7 +395,7 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
- 	if (!perm)
- 		return 0;
+-bool bt_gatt_client_set_sec_level(struct bt_gatt_client *client, int level);
+-int bt_gatt_client_get_sec_level(struct bt_gatt_client *client);
++bool bt_gatt_client_set_security(struct bt_gatt_client *client, int level);
++int bt_gatt_client_get_security(struct bt_gatt_client *client);
+diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+index ee5315d..a49e16a 100644
+--- a/tools/btgatt-client.c
++++ b/tools/btgatt-client.c
+@@ -1233,7 +1233,7 @@ static void cmd_set_sec_level(struct client *cli, char *cmd_str)
+ 		return;
+ 	}
  
--	security = bt_att_get_sec_level(server->att);
-+	security = bt_att_get_security(server->att);
- 	if (perm & BT_ATT_PERM_AUTHEN && security < BT_ATT_SECURITY_HIGH)
- 		return BT_ATT_ERROR_AUTHENTICATION;
+-	if (!bt_gatt_client_set_sec_level(cli->gatt, level))
++	if (!bt_gatt_client_set_security(cli->gatt, level))
+ 		printf("Could not set sec level\n");
+ 	else
+ 		printf("Setting security level %d success\n", level);
+@@ -1248,7 +1248,7 @@ static void cmd_get_sec_level(struct client *cli, char *cmd_str)
+ 		return;
+ 	}
  
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index caaacbd..a7ea7cd 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -1002,7 +1002,7 @@ static void test_signed_write_seclevel(struct context *context)
- 	g_assert(bt_att_set_local_key(context->att, key, local_counter,
- 								context));
- 
--	g_assert(bt_att_set_sec_level(context->att, BT_ATT_SECURITY_MEDIUM));
-+	g_assert(bt_att_set_security(context->att, BT_ATT_SECURITY_MEDIUM));
- 
- 	g_assert(bt_gatt_client_write_without_response(context->client,
- 							step->handle,
+-	level = bt_gatt_client_get_sec_level(cli->gatt);
++	level = bt_gatt_client_get_security(cli->gatt);
+ 	if (level < 0)
+ 		printf("Could not set sec level\n");
+ 	else
 -- 
 2.1.0
 
