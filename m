@@ -1,103 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Ankur Patel <ankur@embertec.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: btmgmt: failure with advertising report event
+Date: Tue, 28 Apr 2015 11:14:10 +0200
+Message-ID: <2192025.GhQfbnVRUg@leonov>
+In-Reply-To: <BD5E516FF3711A41B93DC005170007BB010D94331BDC@EMBSVR01.ember.local>
+References: <BD5E516FF3711A41B93DC005170007BB010D94331BDC@EMBSVR01.ember.local>
 MIME-Version: 1.0
-In-Reply-To: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
-References: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 28 Apr 2015 14:58:36 +0300
-Message-ID: <CABBYNZKmYbJiV4QXt-CWtHB5jy13bZUrtxxZqMNvJmLh5YzTRA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/8] core/gatt: Introduce encryption flags
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Ankur,
 
-On Mon, Apr 27, 2015 at 4:14 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This set introduce encryption flags to GattCharacteristic and
-> GattDescriptor along with the necessary changes to bt_gatt_server to
-> honor them.
->
-> In addition to that example-gatt-server has been updated to include
-> attributes that makes use of the new flags.
->
-> The following is the output using bluetoothctl to navigate in the new
-> attributes introduced to example-gatt-server:
->
-> [Vudentz's T440s:/service0016/char001c]# attribute-info
-> Characteristic - Vendor specific
->         UUID: 12345678-1234-5678-1234-56789abcdef1
->         Service: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016
->         Notifying: no
->         Flags: read
->         Flags: write
->         Flags: extended-properties
->         Flags: writable-auxiliaries
->         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char001c/desc001e
->         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char001c/desc001f
->         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char001c/desc0020
-> [Vudentz's T440s:/service0016/char001c]# select-attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
-> [Vudentz's T440s:/service0016/char0017]# attribute-info
-> Characteristic - Vendor specific
->         UUID: 12345678-1234-5678-1234-56789abcdef3
->         Service: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016
->         Notifying: no
->         Flags: read
->         Flags: write
->         Flags: extended-properties
->         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc0019
->         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
->         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001b
-> [Vudentz's T440s:/service0016/char0017]# read
-> Attempting to read /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
-> Failed to read: org.bluez.Error.NotPermitted
-> [Vudentz's T440s:/service0016/char0017]# write 00
-> Attempting to write /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
-> Failed to write: org.bluez.Error.NotPermitted
-> [Vudentz's T440s:/service0016/char0017]# select-attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
-> [Vudentz's T440s:/service0016/char0017/desc001a]# attribute-info
-> Descriptor - Vendor specific
->         UUID: 12345678-1234-5678-1234-56789abcdef4
->         Characteristic: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
-> [Vudentz's T440s:/service0016/char0017/desc001a]# read
-> Attempting to read /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
-> Failed to read: org.bluez.Error.NotPermitted
-> [Vudentz's T440s:/service0016/char0017/desc001a]# write 00
-> Attempting to write /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
-> Failed to write: org.bluez.Error.NotPermitted
->
-> Luiz Augusto von Dentz (8):
->   doc/gatt-api: Add encryption flags
->   core/gatt: Add support for encryption flags
->   shared/att: Add own security definitions
->   shared/gatt-server: Check attribute permissions
->   doc/gatt-api: Add Flags property to GattDescriptor
->   shared/gatt: Drop CHRC term of properties define
->   core/gatt: Add Flags property to GattDescriptor
->   test/example-gatt-server: Add encrypt attributes
->
->  doc/gatt-api.txt         |  18 +++++
->  src/gatt-client.c        |  32 ++++----
->  src/gatt-database.c      | 185 +++++++++++++++++++++++++++++++++++------------
->  src/shared/att-types.h   |  51 +++++++++----
->  src/shared/att.c         |   2 +-
->  src/shared/gatt-client.c |   4 +-
->  src/shared/gatt-server.c |  93 +++++++++++++-----------
->  test/example-gatt-server |  52 ++++++++++++-
->  tools/btgatt-server.c    |  14 ++--
->  unit/test-gatt.c         | 148 ++++++++++++++++++-------------------
->  10 files changed, 392 insertions(+), 207 deletions(-)
->
+On Tuesday 28 of April 2015 17:24:58 Ankur Patel wrote:
+> Hello Friends,
+> 
+> I am using Linux Kernel 3.10.32 on i.mx28 based platform with TI WL1831
+> WiFi/BT Module. It runs linux with Bluez 5.30. I am trying to run tests on
+> PTS esp. for LE only mode. Hence following
+> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/pts-gap.txt
+> commands to execute on device with "btmgmt" to run the tests. It fails to
+> execute most of the commands mentioned for eg. "btmgmt advertising on"
+> 
+> It returns with Error:
+> root@imx28evk:~# btmgmt advertising on
+> Set Advertising for hci0 failed with status 0x01 (Unknown Command)
+> 
+> Any pointers on how to solve this error?
+> 
+> I have read some more documentation and found (not sure) that full feature
+> for btmgmt is supported with Linux Kernel 3.18 only. Is that true? If Yes,
+> Is there any way I can use that with v3.10.32?
+
+You need newer kernel. Or at least newer kernel bluetooth subsystem ie via 
+backports project [1].
+
+You can check in mgmt-api.txt [2] what commands were introduced in which 
+kernel version.
+
+> Regards,
+> Ankur
 > --
-> 2.1.0
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Ive applied this set after reworking the descriptor flag handling, the
-final version pushed contains only permission and don't reuse the
-defines of characteristic properties.
 
+[1] https://backports.wiki.kernel.org
+[2] https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/mgmt-api.txt
 
 -- 
-Luiz Augusto von Dentz
+BR
+Szymon Janc
