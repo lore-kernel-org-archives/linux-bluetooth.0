@@ -1,102 +1,309 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1429896969-629-1-git-send-email-hychao@chromium.org>
-References: <1429896969-629-1-git-send-email-hychao@chromium.org>
-Date: Tue, 28 Apr 2015 10:41:26 +0300
-Message-ID: <CABBYNZJK6nr9Rx0VyYpqwg+33zn9POkAqNd6ZdU9=zVwwj6dkw@mail.gmail.com>
-Subject: Re: [PATCH v1] src/profile: Set service to connecting in ext_connect
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Hsin-Yu Chao <hychao@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Arman Uguray <armansito@chromium.org>
-Content-Type: text/plain; charset=UTF-8
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v9] client: main: add support for SetDiscoveryFilter
+Date: Tue, 28 Apr 2015 00:04:55 -0700
+Message-Id: <1430204695-22711-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch adds set-scan-filter-* commands to sample DBus client that
+might be used to modify discovery filter.
 
-On Fri, Apr 24, 2015 at 8:36 PM, Hsin-Yu Chao <hychao@chromium.org> wrote:
-> For the profile connection initiated by remote device,
-> ext_connect() function is triggered without advance the state
-> of device's service to BTD_SERVICE_STATE_CONNECTING.
-> This is causing a problems when the later 'NewConnection'
-> dbus method call is made to registered application. If
-> the remote device gets disconnected during the period of
-> time waiting for the reply of 'NewConnection' method, the
-> btd_service_disconnect() call will fail at the service state
-> check and never handle the profile disconnection due to that
-> state was incorrectly left as BTD_SERVICE_STATE_DISCONNECTED.
-> Fix the problem by use service_accept() call in ext_connect()
-> to assure the service state has changed. Also modify the logic
-> of service state check in btd_service_connecting_complete()
-> to prevent the problem when the 'NewConnect' reply changes
-> service state to BTD_SERVICE_STATE_CONNECTED while the device
-> has already disconnected before it arrives.
->
-> ---
->  src/profile.c |  6 ++++--
->  src/service.c | 11 +++++++----
->  2 files changed, 11 insertions(+), 6 deletions(-)
->
-> diff --git a/src/profile.c b/src/profile.c
-> index ca1dfec..4e68afc 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -1036,8 +1036,10 @@ static void ext_connect(GIOChannel *io, GError *err, gpointer user_data)
->                                                                         conn);
->         }
->
-> -       if (send_new_connection(ext, conn))
-> -               return;
-> +       if (conn->service && service_accept(conn->service) == 0) {
-> +               if (send_new_connection(ext, conn))
-> +                       return;
-> +       }
->
->  drop:
->         if (conn->service)
-> diff --git a/src/service.c b/src/service.c
-> index 4d1f1cb..cae2804 100644
-> --- a/src/service.c
-> +++ b/src/service.c
-> @@ -185,16 +185,20 @@ int service_accept(struct btd_service *service)
->         int err;
->
->         if (!service->profile->accept)
-> -               return 0;
-> +               goto done;
->
->         err = service->profile->accept(service);
->         if (!err)
-> -               return 0;
-> +               goto done;
->
->         ba2str(device_get_address(service->device), addr);
->         error("%s profile accept failed for %s", service->profile->name, addr);
->
->         return err;
-> +
-> +done:
-> +       change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
-> +       return 0;
->  }
->
->  int btd_service_connect(struct btd_service *service)
-> @@ -336,8 +340,7 @@ bool btd_service_remove_state_cb(unsigned int id)
->
->  void btd_service_connecting_complete(struct btd_service *service, int err)
->  {
-> -       if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
-> -                               service->state != BTD_SERVICE_STATE_CONNECTING)
-> +       if (service->state != BTD_SERVICE_STATE_CONNECTING)
->                 return;
->
->         if (err == 0)
-> --
-> 2.1.2
+set-scan-filter-uuids - sets filter uuids field
+set-scan-filter-rssi - sets filter rssi and clears pathloss
+set-scan-filter-pathloss - sets filter pathloss and clears rssi
+set-scan-filter-transport - sets filter transport
+set-scan-filter-clear - clears filter
 
-Applied, thanks.
+Sample output:
+[bluetooth]# power on
+Changing power on succeeded
+[bluetooth]# set-scan-filter-uuids babe
+SetDiscoveryFilter success
+[bluetooth]# set-scan-filter-transport le
+SetDiscoveryFilter success
+[bluetooth]# set-scan-filter-rssi -69
+SetDiscoveryFilter success
+[bluetooth]# scan on
+Discovery started
+[CHG] Controller 00:1A:7D:DA:71:13 Discovering: yes
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -66
+[CHG] Device 44:89:1C:C5:67:94 TxPower: -21
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -65
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -58
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -64
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -59
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -65
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -59
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -64
+[bluetooth]# set-scan-filter-rssi -90
+SetDiscoveryFilter success
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -76
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -82
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -75
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -81
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -76
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -76
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -81
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -75
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -82
+[CHG] Device 44:89:1C:C5:67:94 RSSI: -82
+[bluetooth]# scan off
+[CHG] Device 44:89:1C:C5:67:94 TxPower is nil
+[CHG] Device 44:89:1C:C5:67:94 RSSI is nil
+Discovery stopped
+[CHG] Controller 00:1A:7D:DA:71:13 Discovering: no
+---
+ client/main.c | 227 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 227 insertions(+)
 
-
+diff --git a/client/main.c b/client/main.c
+index 46ef72a..41e95b2 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -902,6 +902,222 @@ static void cmd_scan(const char *arg)
+ 	}
+ }
+ 
++static void append_variant(DBusMessageIter *iter, int type, void *val)
++{
++	DBusMessageIter value;
++	char sig[2] = { type, '\0' };
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
++
++	dbus_message_iter_append_basic(&value, type, val);
++
++	dbus_message_iter_close_container(iter, &value);
++}
++
++static void dict_append_entry(DBusMessageIter *dict, const char *key,
++							int type, void *val)
++{
++	DBusMessageIter entry;
++
++	if (type == DBUS_TYPE_STRING) {
++		const char *str = *((const char **) val);
++
++		if (str == NULL)
++			return;
++	}
++
++	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
++							NULL, &entry);
++
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++
++	append_variant(&entry, type, val);
++
++	dbus_message_iter_close_container(dict, &entry);
++}
++
++#define	DISTANCE_VAL_INVALID	0x7FFF
++
++struct set_discovery_filter_args {
++	char *transport;
++	dbus_uint16_t rssi;
++	dbus_int16_t pathloss;
++	GSList *uuids;
++};
++
++static void set_discovery_filter_setup(DBusMessageIter *iter,
++					   void *user_data)
++{
++	struct set_discovery_filter_args *args = user_data;
++	DBusMessageIter dict;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++			    DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			    DBUS_TYPE_STRING_AS_STRING
++			    DBUS_TYPE_VARIANT_AS_STRING
++			    DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
++
++	if (args->uuids != NULL) {
++		DBusMessageIter entry, value, arrayIter;
++		char *uuids = "UUIDs";
++		GSList *l;
++
++		dbus_message_iter_open_container(&dict, DBUS_TYPE_DICT_ENTRY,
++						 NULL, &entry);
++		/* dict key */
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++					       &uuids);
++
++		dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++						 "as", &value);
++
++		dbus_message_iter_open_container(&value, DBUS_TYPE_ARRAY, "s",
++						 &arrayIter);
++
++		for (l = args->uuids; l != NULL; l = g_slist_next(l))
++			/* list->data contains string representation of uuid */
++			dbus_message_iter_append_basic(&arrayIter,
++						       DBUS_TYPE_STRING,
++						       &l->data);
++
++		dbus_message_iter_close_container(&value, &arrayIter);
++
++		/* close vararg*/
++		dbus_message_iter_close_container(&entry, &value);
++
++		/* close entry */
++		dbus_message_iter_close_container(&dict, &entry);
++	}
++
++	if (args->pathloss != DISTANCE_VAL_INVALID)
++		dict_append_entry(&dict, "Pathloss", DBUS_TYPE_UINT16,
++				  &args->pathloss);
++
++	if (args->rssi != DISTANCE_VAL_INVALID)
++		dict_append_entry(&dict, "RSSI", DBUS_TYPE_INT16, &args->rssi);
++
++	if (args->transport != NULL)
++		dict_append_entry(&dict, "Transport", DBUS_TYPE_STRING,
++				  &args->transport);
++
++	dbus_message_iter_close_container(iter, &dict);
++}
++
++
++static void set_discovery_filter_reply(DBusMessage *message,
++				       void *user_data)
++{
++	DBusError error;
++
++	dbus_error_init(&error);
++	if (dbus_set_error_from_message(&error, message) == TRUE) {
++		rl_printf("SetDiscoveryFilter failed: %s\n", error.name);
++		dbus_error_free(&error);
++		return;
++	}
++
++	rl_printf("SetDiscoveryFilter success\n");
++}
++
++static gint filtered_scan_rssi = DISTANCE_VAL_INVALID;
++static gint filtered_scan_pathloss = DISTANCE_VAL_INVALID;
++static GSList *filtered_scan_uuids;
++static char *filtered_scan_transport;
++
++static void cmd_set_scan_filter_commit(void)
++{
++	struct set_discovery_filter_args args;
++
++	args.uuids = NULL;
++	args.pathloss = filtered_scan_pathloss;
++	args.rssi = filtered_scan_rssi;
++	args.transport = filtered_scan_transport;
++	args.uuids = filtered_scan_uuids;
++
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	if (g_dbus_proxy_method_call(default_ctrl, "SetDiscoveryFilter",
++		set_discovery_filter_setup, set_discovery_filter_reply,
++		&args, NULL) == FALSE) {
++		rl_printf("Failed to set discovery filter\n");
++		return;
++	}
++}
++
++static void cmd_set_scan_filter_uuids(const char *arg)
++{
++	char *uuid_str, *saveptr, *uuids, *uuidstmp;
++
++	g_slist_free_full(filtered_scan_uuids, g_free);
++	filtered_scan_uuids = NULL;
++
++	if (!arg || !strlen(arg))
++		return;
++
++	uuids = g_strdup(arg);
++	for (uuidstmp = uuids; ; uuidstmp = NULL) {
++		uuid_str = strtok_r(uuidstmp, " \t", &saveptr);
++		if (uuid_str == NULL)
++			break;
++	    filtered_scan_uuids = g_slist_append(filtered_scan_uuids,
++							strdup(uuid_str));
++	}
++
++	g_free(uuids);
++
++	cmd_set_scan_filter_commit();
++}
++
++static void cmd_set_scan_filter_rssi(const char *arg)
++{
++	filtered_scan_pathloss = DISTANCE_VAL_INVALID;
++
++	if (!arg || !strlen(arg))
++		filtered_scan_rssi = DISTANCE_VAL_INVALID;
++	else
++		filtered_scan_rssi = atoi(arg);
++
++	cmd_set_scan_filter_commit();
++}
++
++static void cmd_set_scan_filter_pathloss(const char *arg)
++{
++	filtered_scan_rssi = DISTANCE_VAL_INVALID;
++
++	if (!arg || !strlen(arg))
++		filtered_scan_pathloss = DISTANCE_VAL_INVALID;
++	else
++		filtered_scan_pathloss = atoi(arg);
++
++	cmd_set_scan_filter_commit();
++}
++
++static void cmd_set_scan_filter_transport(const char *arg)
++{
++	g_free(filtered_scan_transport);
++
++	if (!arg || !strlen(arg))
++		filtered_scan_transport = NULL;
++	else
++		filtered_scan_transport = g_strdup(arg);
++
++	cmd_set_scan_filter_commit();
++}
++
++static void cmd_set_scan_filter_clear(const char *arg)
++{
++	/* set default values for all options */
++	filtered_scan_rssi = DISTANCE_VAL_INVALID;
++	filtered_scan_pathloss = DISTANCE_VAL_INVALID;
++	g_slist_free_full(filtered_scan_uuids, g_free);
++	filtered_scan_uuids = NULL;
++	g_free(filtered_scan_transport);
++	filtered_scan_transport = NULL;
++
++	cmd_set_scan_filter_commit();
++}
++
+ static struct GDBusProxy *find_device(const char *arg)
+ {
+ 	GDBusProxy *proxy;
+@@ -1478,6 +1694,17 @@ static const struct {
+ 							capability_generator},
+ 	{ "default-agent",NULL,       cmd_default_agent,
+ 				"Set agent as the default one" },
++	{ "set-scan-filter-uuids", "[uuid1 uuid2 ...]",
++			cmd_set_scan_filter_uuids, "Set scan filter uuids" },
++	{ "set-scan-filter-rssi", "[rssi]", cmd_set_scan_filter_rssi,
++				"Set scan filter rssi, and clears pathloss" },
++	{ "set-scan-filter-pathloss", "[pathloss]",
++						cmd_set_scan_filter_pathloss,
++				"Set scan filter pathloss, and clears rssi" },
++	{ "set-scan-filter-transport", "[transport]",
++		cmd_set_scan_filter_transport, "Set scan filter transport" },
++	{ "set-scan-filter-clear", "", cmd_set_scan_filter_clear,
++						"Clears discovery filter." },
+ 	{ "scan",         "<on/off>", cmd_scan, "Scan for devices" },
+ 	{ "info",         "[dev]",    cmd_info, "Device information",
+ 							dev_generator },
 -- 
-Luiz Augusto von Dentz
+2.2.0.rc0.207.ga3a616c
+
