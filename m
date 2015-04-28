@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] tools/btgatt-client: Rename sec_level to security
-Date: Tue, 28 Apr 2015 17:35:33 +0300
-Message-Id: <1430231734-26699-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/4] core/gatt: Auto retry if read/write fails
+Date: Tue, 28 Apr 2015 17:35:34 +0300
+Message-Id: <1430231734-26699-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1430231734-26699-1-git-send-email-luiz.dentz@gmail.com>
 References: <1430231734-26699-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,69 +11,329 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This adds auto retry logic to ReadValue and WriteValue when a security
+error happen, it will first attempt to elevate the security to match the
+requirement and then retry sending the same operation.
 ---
- tools/btgatt-client.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ src/gatt-client.c | 182 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 176 insertions(+), 6 deletions(-)
 
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index a49e16a..fbc01db 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -1195,15 +1195,15 @@ static void cmd_unregister_notify(struct client *cli, char *cmd_str)
- 	printf("Unregistered notify handler with id: %u\n", id);
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index 2e26ed7..7fd814c 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -223,6 +223,9 @@ static bool parse_value_arg(DBusMessage *msg, uint8_t **value,
+ 	return true;
  }
  
--static void set_sec_level_usage(void)
-+static void set_security_usage(void)
- {
--	printf("Usage: set_sec_level <level>\n"
-+	printf("Usage: set_security <level>\n"
- 		"level: 1-3\n"
- 		"e.g.:\n"
- 		"\tset-sec-level 2\n");
++struct async_dbus_op;
++
++typedef bool (*async_dbus_op_retry_t)(struct async_dbus_op *op, uint8_t ecode);
+ typedef bool (*async_dbus_op_complete_t)(void *data);
+ 
+ struct async_dbus_op {
+@@ -230,6 +233,7 @@ struct async_dbus_op {
+ 	DBusMessage *msg;
+ 	void *data;
+ 	uint16_t offset;
++	async_dbus_op_retry_t retry;
+ 	async_dbus_op_complete_t complete;
+ };
+ 
+@@ -337,6 +341,23 @@ static void read_op_cb(struct gatt_db_attribute *attrib, int err,
+ 	g_dbus_send_message(btd_get_dbus_connection(), reply);
  }
  
--static void cmd_set_sec_level(struct client *cli, char *cmd_str)
-+static void cmd_set_security(struct client *cli, char *cmd_str)
- {
- 	char *argvbuf[1];
- 	char **argv = argvbuf;
-@@ -1218,12 +1218,12 @@ static void cmd_set_sec_level(struct client *cli, char *cmd_str)
++static bool check_security(struct bt_gatt_client *gatt, uint8_t ecode)
++{
++	int security;
++
++	security = bt_gatt_client_get_security(gatt);
++	if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
++					security < BT_ATT_SECURITY_MEDIUM)
++		security = BT_ATT_SECURITY_MEDIUM;
++	else if (ecode == BT_ATT_ERROR_AUTHENTICATION &&
++					security < BT_ATT_SECURITY_HIGH)
++		security = BT_ATT_SECURITY_HIGH;
++	else
++		return false;
++
++	return bt_gatt_client_set_security(gatt, security);
++}
++
+ static void desc_read_cb(bool success, uint8_t att_ecode,
+ 					const uint8_t *value, uint16_t length,
+ 					void *user_data)
+@@ -346,8 +367,12 @@ static void desc_read_cb(bool success, uint8_t att_ecode,
+ 	struct service *service = desc->chrc->service;
+ 	DBusMessage *reply;
  
- 	if (!parse_args(cmd_str, 1, argv, &argc)) {
- 		printf("Too many arguments\n");
--		set_sec_level_usage();
-+		set_security_usage();
- 		return;
+-	if (!success)
++	if (!success) {
++		if (op->retry && op->retry(op, att_ecode))
++			return;
++
+ 		goto fail;
++	}
+ 
+ 	if (!op->offset)
+ 		gatt_db_attribute_reset(desc->attr);
+@@ -393,6 +418,28 @@ fail:
+ 	return;
+ }
+ 
++static bool desc_read_retry(struct async_dbus_op *op, uint8_t ecode)
++{
++	struct descriptor *desc = op->data;
++	struct bt_gatt_client *gatt = desc->chrc->service->client->gatt;
++
++	if (!check_security(gatt, ecode))
++		return false;
++
++	desc->read_id = bt_gatt_client_read_value(gatt, desc->handle,
++							desc_read_cb,
++							async_dbus_op_ref(op),
++							async_dbus_op_unref);
++	if (desc->read_id) {
++		op->retry = NULL;
++		return true;
++	}
++
++	async_dbus_op_unref(op);
++
++	return false;
++}
++
+ static DBusMessage *descriptor_read_value(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -412,6 +459,7 @@ static DBusMessage *descriptor_read_value(DBusConnection *conn,
+ 
+ 	op->msg = dbus_message_ref(msg);
+ 	op->data = desc;
++	op->retry = desc_read_retry;
+ 
+ 	desc->read_id = bt_gatt_client_read_value(gatt, desc->handle,
+ 							desc_read_cb,
+@@ -437,6 +485,9 @@ static void write_result_cb(bool success, bool reliable_error,
  	}
  
- 	if (argc < 1) {
--		set_sec_level_usage();
-+		set_security_usage();
- 		return;
- 	}
- 
-@@ -1239,7 +1239,7 @@ static void cmd_set_sec_level(struct client *cli, char *cmd_str)
- 		printf("Setting security level %d success\n", level);
+ 	if (!success) {
++		if (op->retry && op->retry(op, att_ecode))
++			return;
++
+ 		if (reliable_error)
+ 			reply = btd_error_failed(op->msg,
+ 						"Reliable write failed");
+@@ -466,6 +517,7 @@ static unsigned int start_long_write(DBusMessage *msg, uint16_t handle,
+ 					struct bt_gatt_client *gatt,
+ 					bool reliable, const uint8_t *value,
+ 					size_t value_len, void *data,
++					async_dbus_op_retry_t retry,
+ 					async_dbus_op_complete_t complete)
+ {
+ 	struct async_dbus_op *op;
+@@ -493,7 +545,7 @@ static unsigned int start_long_write(DBusMessage *msg, uint16_t handle,
+ static unsigned int start_write_request(DBusMessage *msg, uint16_t handle,
+ 					struct bt_gatt_client *gatt,
+ 					const uint8_t *value, size_t value_len,
+-					void *data,
++					void *data, async_dbus_op_retry_t retry,
+ 					async_dbus_op_complete_t complete)
+ {
+ 	struct async_dbus_op *op;
+@@ -529,6 +581,46 @@ static bool desc_write_complete(void *data)
+ 	return !!desc->chrc;
  }
  
--static void cmd_get_sec_level(struct client *cli, char *cmd_str)
-+static void cmd_get_security(struct client *cli, char *cmd_str)
++static bool desc_write_retry(struct async_dbus_op *op, uint8_t ecode)
++{
++	struct descriptor *desc = op->data;
++	struct bt_gatt_client *gatt = desc->chrc->service->client->gatt;
++	uint8_t *value = NULL;
++	size_t value_len = 0;
++
++	if (!check_security(gatt, ecode))
++		return false;
++
++	if (!parse_value_arg(op->msg, &value, &value_len))
++		return false;
++
++	/*
++	 * Based on the value length and the MTU, either use a write or a long
++	 * write.
++	 */
++	if (value_len <= (unsigned) bt_gatt_client_get_mtu(gatt) - 3)
++		desc->write_id = bt_gatt_client_write_value(gatt, desc->handle,
++							value, value_len,
++							write_cb,
++							async_dbus_op_ref(op),
++							async_dbus_op_free);
++	else
++		desc->write_id = bt_gatt_client_write_long_value(gatt,
++							false, desc->handle,
++							0, value, value_len,
++							write_result_cb,
++							async_dbus_op_ref(op),
++							async_dbus_op_free);
++	if (desc->write_id) {
++		op->retry = NULL;
++		return true;
++	}
++
++	async_dbus_op_free(op);
++
++	return false;
++}
++
+ static DBusMessage *descriptor_write_value(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
  {
- 	int level;
+@@ -562,11 +654,13 @@ static DBusMessage *descriptor_write_value(DBusConnection *conn,
+ 		desc->write_id = start_write_request(msg, desc->handle,
+ 							gatt, value,
+ 							value_len, desc,
++							desc_write_retry,
+ 							desc_write_complete);
+ 	else
+ 		desc->write_id = start_long_write(msg, desc->handle,
+ 							gatt, false, value,
+ 							value_len, desc,
++							desc_write_retry,
+ 							desc_write_complete);
  
-@@ -1342,9 +1342,9 @@ static struct {
- 			"\tSubscribe to not/ind from a characteristic" },
- 	{ "unregister-notify", cmd_unregister_notify,
- 						"Unregister a not/ind session"},
--	{ "set-sec-level", cmd_set_sec_level,
-+	{ "set-security", cmd_set_security,
- 				"\tSet security level on le connection"},
--	{ "get-sec-level", cmd_get_sec_level,
-+	{ "get-security", cmd_get_security,
- 				"\tGet security level on le connection"},
- 	{ "set-sign-key", cmd_set_sign_key,
- 				"\tSet signing key for signed write command"},
+ 	if (!desc->write_id)
+@@ -790,8 +884,12 @@ static void chrc_read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
+ 	struct service *service = chrc->service;
+ 	DBusMessage *reply;
+ 
+-	if (!success)
++	if (!success) {
++		if (op->retry && op->retry(op, att_ecode))
++			return;
++
+ 		goto fail;
++	}
+ 
+ 	if (!op->offset)
+ 		gatt_db_attribute_reset(chrc->attr);
+@@ -836,6 +934,29 @@ fail:
+ 	g_dbus_send_message(btd_get_dbus_connection(), reply);
+ }
+ 
++static bool chrc_read_retry(struct async_dbus_op *op, uint8_t ecode)
++{
++	struct characteristic *chrc = op->data;
++	struct bt_gatt_client *gatt = chrc->service->client->gatt;
++
++	if (!check_security(gatt, ecode))
++		return false;
++
++	chrc->read_id = bt_gatt_client_read_value(gatt, chrc->value_handle,
++							chrc_read_cb,
++							async_dbus_op_ref(op),
++							async_dbus_op_unref);
++	if (chrc->read_id) {
++		/* Only retry once */
++		op->retry = NULL;
++		return true;
++	}
++
++	async_dbus_op_free(op);
++
++	return false;
++}
++
+ static DBusMessage *characteristic_read_value(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -855,6 +976,7 @@ static DBusMessage *characteristic_read_value(DBusConnection *conn,
+ 
+ 	op->msg = dbus_message_ref(msg);
+ 	op->data = chrc;
++	op->retry = chrc_read_retry;
+ 
+ 	chrc->read_id = bt_gatt_client_read_value(gatt, chrc->value_handle,
+ 							chrc_read_cb,
+@@ -881,6 +1003,51 @@ static bool chrc_write_complete(void *data)
+ 	return !!chrc->service;
+ }
+ 
++static bool chrc_write_retry(struct async_dbus_op *op, uint8_t ecode)
++{
++	struct characteristic *chrc = op->data;
++	struct bt_gatt_client *gatt = chrc->service->client->gatt;
++	uint8_t *value = NULL;
++	size_t value_len = 0;
++	bool reliable;
++
++	if (!check_security(gatt, ecode))
++		return false;
++
++	if (!parse_value_arg(op->msg, &value, &value_len))
++		return false;
++
++	reliable = (chrc->ext_props & BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE);
++
++	/*
++	 * Based on the value length and the MTU, either use a write or a long
++	 * write.
++	 */
++	if (value_len <= (unsigned) bt_gatt_client_get_mtu(gatt) - 3 &&
++								!reliable)
++		chrc->write_id = bt_gatt_client_write_value(gatt,
++							chrc->value_handle,
++							value, value_len,
++							write_cb,
++							async_dbus_op_ref(op),
++							async_dbus_op_free);
++	else
++		chrc->write_id = bt_gatt_client_write_long_value(gatt, reliable,
++							chrc->value_handle,
++							0, value, value_len,
++							write_result_cb,
++							async_dbus_op_ref(op),
++							async_dbus_op_free);
++	if (chrc->write_id) {
++		op->retry = NULL;
++		return true;
++	}
++
++	async_dbus_op_free(op);
++
++	return false;
++}
++
+ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -914,7 +1081,8 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+ 		supported = true;
+ 		chrc->write_id = start_long_write(msg, chrc->value_handle, gatt,
+ 						true, value, value_len,
+-						chrc, chrc_write_complete);
++						chrc, chrc_write_retry,
++						chrc_write_complete);
+ 		if (chrc->write_id)
+ 			return NULL;
+ 	}
+@@ -931,12 +1099,14 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+ 			chrc->write_id = start_write_request(msg,
+ 						chrc->value_handle,
+ 						gatt, value, value_len,
+-						chrc, chrc_write_complete);
++						chrc, chrc_write_retry,
++						chrc_write_complete);
+ 		else
+ 			chrc->write_id = start_long_write(msg,
+ 						chrc->value_handle, gatt,
+ 						false, value, value_len,
+-						chrc, chrc_write_complete);
++						chrc, chrc_write_retry,
++						chrc_write_complete);
+ 
+ 		if (chrc->write_id)
+ 			return NULL;
 -- 
 2.1.0
 
