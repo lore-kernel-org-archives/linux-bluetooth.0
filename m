@@ -1,55 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH] unit/test-gdbus-client: Set DISPLAY=:0 for D-Bus
-Date: Tue, 28 Apr 2015 14:21:11 -0700
-Message-Id: <1430256071-17261-1-git-send-email-armansito@chromium.org>
+Subject: [PATCH BlueZ 1/4] shared/att: Rename sec_level to security
+Date: Tue, 28 Apr 2015 17:35:31 +0300
+Message-Id: <1430231734-26699-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-unit/test-gdbus-client has been failing when run without X11 with the
-following error in all test cases:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  D-Bus setup failed: Unable to autolaunch a dbus-daemon without a $DISPLAY for X11
-
-This patch fixes this by setting the DISPLAY environment variable to
-":0" from within the test process. This allows the test to be run
-without an X session, e.g. over ssh.
 ---
- unit/test-gdbus-client.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ src/shared/att.c         | 4 ++--
+ src/shared/att.h         | 4 ++--
+ src/shared/gatt-client.c | 6 +++---
+ src/shared/gatt-server.c | 2 +-
+ unit/test-gatt.c         | 2 +-
+ 5 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
-index 7e16d16..9d9ff16 100644
---- a/unit/test-gdbus-client.c
-+++ b/unit/test-gdbus-client.c
-@@ -25,6 +25,7 @@
- #include <config.h>
- #endif
+diff --git a/src/shared/att.c b/src/shared/att.c
+index f24da18..c5eaa09 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -1341,7 +1341,7 @@ bool bt_att_unregister_all(struct bt_att *att)
+ 	return true;
+ }
  
-+#include <stdlib.h>
- #include <glib.h>
+-int bt_att_get_sec_level(struct bt_att *att)
++int bt_att_get_security(struct bt_att *att)
+ {
+ 	struct bt_security sec;
+ 	socklen_t len;
+@@ -1360,7 +1360,7 @@ int bt_att_get_sec_level(struct bt_att *att)
+ 	return sec.level;
+ }
  
- #include "gdbus/gdbus.h"
-@@ -61,6 +62,17 @@ static struct context *create_context(void)
- 	struct context *context = g_new0(struct context, 1);
- 	DBusError err;
+-bool bt_att_set_sec_level(struct bt_att *att, int level)
++bool bt_att_set_security(struct bt_att *att, int level)
+ {
+ 	struct bt_security sec;
  
-+	/*
-+	 * Set the display variable to ":0" to allow setting up a D-Bus session
-+	 * without X11.
-+	 */
-+	if (putenv("DISPLAY=:0")) {
-+		tester_debug("Failed to set $DISPLAY environment variable");
-+		g_free(context);
-+		tester_test_failed();
-+		return NULL;
-+	}
-+
- 	dbus_error_init(&err);
+diff --git a/src/shared/att.h b/src/shared/att.h
+index fb6247e..80810a1 100644
+--- a/src/shared/att.h
++++ b/src/shared/att.h
+@@ -83,8 +83,8 @@ bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id);
  
- 	context->dbus_conn = g_dbus_setup_private(DBUS_BUS_SESSION,
+ bool bt_att_unregister_all(struct bt_att *att);
+ 
+-int bt_att_get_sec_level(struct bt_att *att);
+-bool bt_att_set_sec_level(struct bt_att *att, int level);
++int bt_att_get_security(struct bt_att *att);
++bool bt_att_set_security(struct bt_att *att, int level);
+ 
+ bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
+ 			bt_att_counter_func_t func, void *user_data);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 7b628fe..56bad60 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -2217,7 +2217,7 @@ unsigned int bt_gatt_client_write_without_response(
+ 
+ 	/* Only use signed write if unencrypted */
+ 	if (signed_write) {
+-		security = bt_att_get_sec_level(client->att);
++		security = bt_att_get_security(client->att);
+ 		op = security > BT_SECURITY_LOW ?  BT_ATT_OP_WRITE_CMD :
+ 						BT_ATT_OP_SIGNED_WRITE_CMD;
+ 	} else
+@@ -3004,7 +3004,7 @@ bool bt_gatt_client_set_sec_level(struct bt_gatt_client *client,
+ 	if (!client)
+ 		return false;
+ 
+-	return bt_att_set_sec_level(client->att, level);
++	return bt_att_set_security(client->att, level);
+ }
+ 
+ int bt_gatt_client_get_sec_level(struct bt_gatt_client *client)
+@@ -3012,5 +3012,5 @@ int bt_gatt_client_get_sec_level(struct bt_gatt_client *client)
+ 	if (!client)
+ 		return -1;
+ 
+-	return bt_att_get_sec_level(client->att);
++	return bt_att_get_security(client->att);
+ }
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index ae77dcc..6167065 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -395,7 +395,7 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
+ 	if (!perm)
+ 		return 0;
+ 
+-	security = bt_att_get_sec_level(server->att);
++	security = bt_att_get_security(server->att);
+ 	if (perm & BT_ATT_PERM_AUTHEN && security < BT_ATT_SECURITY_HIGH)
+ 		return BT_ATT_ERROR_AUTHENTICATION;
+ 
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index caaacbd..a7ea7cd 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -1002,7 +1002,7 @@ static void test_signed_write_seclevel(struct context *context)
+ 	g_assert(bt_att_set_local_key(context->att, key, local_counter,
+ 								context));
+ 
+-	g_assert(bt_att_set_sec_level(context->att, BT_ATT_SECURITY_MEDIUM));
++	g_assert(bt_att_set_security(context->att, BT_ATT_SECURITY_MEDIUM));
+ 
+ 	g_assert(bt_gatt_client_write_without_response(context->client,
+ 							step->handle,
 -- 
-2.2.0.rc0.207.ga3a616c
+2.1.0
 
