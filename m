@@ -1,35 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <54F70642BAB21D4498E1AA3EFE3D519A460B4122@rsex2.realsil.com.cn>
-References: <1429214995-11833-1-git-send-email-drake@endlessm.com>
-	<54F70642BAB21D4498E1AA3EFE3D519A460B4122@rsex2.realsil.com.cn>
-Date: Tue, 28 Apr 2015 08:05:38 -0600
-Message-ID: <CAD8Lp445gJO479LFwVfQ8+iRutTJCuc4pEb7jLk8_DU=VMU4xg@mail.gmail.com>
-Subject: =?UTF-8?B?UmU6IOetlOWkjTogW1BBVENIIHY4XSBCbHVldG9vdGg6IGJ0dXNiOiBBZGQgUmVhbHRlaw==?=
-	=?UTF-8?B?IDg3MjNBLzg3MjNCLzg3NjFBLzg4MjFBIHN1cHBvcnQ=?=
-From: Daniel Drake <drake@endlessm.com>
-To: =?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-Cc: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org" <gustavo@padovan.org>,
-	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"larry.finger@lwfinger.net" <larry.finger@lwfinger.net>, "carlo@endlessm.com" <carlo@endlessm.com>,
-	=?UTF-8?B?5piO6bmP6aOe?= <mike_ming@realsil.com.cn>,
-	=?UTF-8?B?5q+b5Li66ZSL?= <jason_mao@realsil.com.cn>,
-	ChungYi <chungyi_hsieh@realtek.com>
+In-Reply-To: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
+References: <1430140475-20349-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 28 Apr 2015 14:58:36 +0300
+Message-ID: <CABBYNZKmYbJiV4QXt-CWtHB5jy13bZUrtxxZqMNvJmLh5YzTRA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/8] core/gatt: Introduce encryption flags
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Champion,
+Hi,
 
-On Mon, Apr 27, 2015 at 11:50 PM, =E9=99=88=E8=89=B3=E8=90=8D <champion_che=
-n@realsil.com.cn> wrote:
-> Dear Daniel,
->         I did not find the patches at http://git.kernel.org/, would you p=
-lease send me the website address?
+On Mon, Apr 27, 2015 at 4:14 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This set introduce encryption flags to GattCharacteristic and
+> GattDescriptor along with the necessary changes to bt_gatt_server to
+> honor them.
+>
+> In addition to that example-gatt-server has been updated to include
+> attributes that makes use of the new flags.
+>
+> The following is the output using bluetoothctl to navigate in the new
+> attributes introduced to example-gatt-server:
+>
+> [Vudentz's T440s:/service0016/char001c]# attribute-info
+> Characteristic - Vendor specific
+>         UUID: 12345678-1234-5678-1234-56789abcdef1
+>         Service: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016
+>         Notifying: no
+>         Flags: read
+>         Flags: write
+>         Flags: extended-properties
+>         Flags: writable-auxiliaries
+>         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char001c/desc001e
+>         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char001c/desc001f
+>         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char001c/desc0020
+> [Vudentz's T440s:/service0016/char001c]# select-attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
+> [Vudentz's T440s:/service0016/char0017]# attribute-info
+> Characteristic - Vendor specific
+>         UUID: 12345678-1234-5678-1234-56789abcdef3
+>         Service: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016
+>         Notifying: no
+>         Flags: read
+>         Flags: write
+>         Flags: extended-properties
+>         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc0019
+>         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
+>         Descriptors: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001b
+> [Vudentz's T440s:/service0016/char0017]# read
+> Attempting to read /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
+> Failed to read: org.bluez.Error.NotPermitted
+> [Vudentz's T440s:/service0016/char0017]# write 00
+> Attempting to write /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
+> Failed to write: org.bluez.Error.NotPermitted
+> [Vudentz's T440s:/service0016/char0017]# select-attribute /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
+> [Vudentz's T440s:/service0016/char0017/desc001a]# attribute-info
+> Descriptor - Vendor specific
+>         UUID: 12345678-1234-5678-1234-56789abcdef4
+>         Characteristic: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017
+> [Vudentz's T440s:/service0016/char0017/desc001a]# read
+> Attempting to read /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
+> Failed to read: org.bluez.Error.NotPermitted
+> [Vudentz's T440s:/service0016/char0017/desc001a]# write 00
+> Attempting to write /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0016/char0017/desc001a
+> Failed to write: org.bluez.Error.NotPermitted
+>
+> Luiz Augusto von Dentz (8):
+>   doc/gatt-api: Add encryption flags
+>   core/gatt: Add support for encryption flags
+>   shared/att: Add own security definitions
+>   shared/gatt-server: Check attribute permissions
+>   doc/gatt-api: Add Flags property to GattDescriptor
+>   shared/gatt: Drop CHRC term of properties define
+>   core/gatt: Add Flags property to GattDescriptor
+>   test/example-gatt-server: Add encrypt attributes
+>
+>  doc/gatt-api.txt         |  18 +++++
+>  src/gatt-client.c        |  32 ++++----
+>  src/gatt-database.c      | 185 +++++++++++++++++++++++++++++++++++------------
+>  src/shared/att-types.h   |  51 +++++++++----
+>  src/shared/att.c         |   2 +-
+>  src/shared/gatt-client.c |   4 +-
+>  src/shared/gatt-server.c |  93 +++++++++++++-----------
+>  test/example-gatt-server |  52 ++++++++++++-
+>  tools/btgatt-server.c    |  14 ++--
+>  unit/test-gatt.c         | 148 ++++++++++++++++++-------------------
+>  10 files changed, 392 insertions(+), 207 deletions(-)
+>
+> --
+> 2.1.0
 
-These patches are scheduled for inclusion in Linux 4.2, you can find them h=
-ere:
-http://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git
+Ive applied this set after reworking the descriptor flag handling, the
+final version pushed contains only permission and don't reuse the
+defines of characteristic properties.
 
-Thanks
-Daniel
+
+-- 
+Luiz Augusto von Dentz
