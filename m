@@ -1,59 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5540F386.3010707@linux.intel.com>
-Date: Wed, 29 Apr 2015 17:06:46 +0200
+Message-ID: <5540EB21.80704@linux.intel.com>
+Date: Wed, 29 Apr 2015 16:30:57 +0200
 From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Peter Hurley <peter@hurleysoftware.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/7] Bluetooth: hci_uart: Add HCIUARTSETBAUDRATE ioctl
-References: <1428673066-1349-1-git-send-email-frederic.danis@linux.intel.com> <1428673066-1349-2-git-send-email-frederic.danis@linux.intel.com> <5527EB14.9000608@hurleysoftware.com> <488A23CF-9578-42F5-A2E6-9D8450A15309@holtmann.org>
-In-Reply-To: <488A23CF-9578-42F5-A2E6-9D8450A15309@holtmann.org>
+Subject: Re: [PATCH 7/7] Bluetooth: btbcm: Add bcm_set_baudrate()
+References: <1428673066-1349-1-git-send-email-frederic.danis@linux.intel.com> <1428673066-1349-7-git-send-email-frederic.danis@linux.intel.com> <2CB8E093-5FFF-4A9D-A7C0-07F684DDFED4@holtmann.org>
+In-Reply-To: <2CB8E093-5FFF-4A9D-A7C0-07F684DDFED4@holtmann.org>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hello Marcel,
 
-On 10/04/2015 20:20, Marcel Holtmann wrote:
-> Hi Peter,
+On 10/04/2015 22:19, Marcel Holtmann wrote:
+<snip>
+>> +static int bcm_set_clock(struct hci_uart *hu, unsigned char clock)
+>> +{
+>> +	struct hci_dev *hdev = hu->hdev;
+>> +	struct sk_buff *skb;
+>> +
+>> +	BT_DBG("%s: Set Controller clock (%d)", hdev->name, clock);
+>> +
+>> +	skb = __hci_cmd_sync(hdev, 0xfc45, 1, &clock, HCI_INIT_TIMEOUT);
+>> +	if (IS_ERR(skb)) {
+>> +		BT_ERR("%s: failed to write update clock command (%ld)",
+>> +		       hdev->name, PTR_ERR(skb));
+>> +		return PTR_ERR(skb);
+>> +	}
+>> +
+>> +	if (skb->data[0]) {
+>> +		u8 evt_status = skb->data[0];
+>> +
+>> +		BT_ERR("%s: write update clock event failed (%02x)",
+>> +		       hdev->name, evt_status);
+>> +		kfree_skb(skb);
+>> +		return -bt_to_errno(evt_status);
+>> +	}
+>> +
+>> +	kfree_skb(skb);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +struct hci_cp_bcm_set_speed {
+>> +	__le16   dummy;
+>> +	__le32   speed;
+>> +} __packed;
+>> +
+>> +static int bcm_set_baudrate(struct hci_uart *hu, int speed)
+>> +{
+>> +	struct hci_dev *hdev = hu->hdev;
+>> +	struct sk_buff *skb;
+>> +	struct hci_cp_bcm_set_speed param = { 0, cpu_to_le32(speed) };
+>> +
+>> +	if (speed > 3000000 && bcm_set_clock(hu, BCM43XX_CLOCK_48))
+>> +		return -EINVAL;
 >
->>> This allows user space application to set final speed requested for UART
->>> device. UART port is open at init speed by user space application.
->>>
->>> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
->>> ---
->>> drivers/bluetooth/hci_ldisc.c | 6 ++++++
->>> drivers/bluetooth/hci_uart.h  | 2 ++
->>> 2 files changed, 8 insertions(+)
->>>
->>> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
->>> index 5c9a73f..190a7f8 100644
->>> --- a/drivers/bluetooth/hci_ldisc.c
->>> +++ b/drivers/bluetooth/hci_ldisc.c
->>> @@ -609,6 +609,12 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file *file,
->>> 	case HCIUARTGETFLAGS:
->>> 		return hu->hdev_flags;
->>>
->>> +	case HCIUARTSETBAUDRATE:
->>> +		if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
->>> +			return -EBUSY;
->>> +		hu->speed = arg;
->>> +		break;
->>> +
->>
->> So now that the kernel can set line rate, why is an ioctl necessary
->> to determine what the line rate should be?
->
-> actually I think we should skip this for now and only introduce it if it is really needed. For the chips we want to support initially we only need the default baudrate and the max baudrate. So the default baudrate is vendor specific and we would just hardcode that in the driver. The max baudrate is platform specific and most likely should come via ACPI or DT. Or some default value in case it is platform specific driver in the first place.
->
-> Just as background, this command is not for actually setting the baudrate at that point, it is informing the kernel about the max baudrate for operational use. It will be programmed way later. However as stated above, I think for now we should skip this and only introduce it if the kernel needs input from userspace on the max baudrate.
->
-> Fred, I think what we really want at this point is to add default and operational baudrate fields to hci_uart_proto.
+> Please just fold this in to this function. I prefer if you can read the changes like a sequence of actions that have to happen.
 
-OK, I will add default and operational speed to hci_uart_proto.
-I tried to find the operational speed in T100's ACPI table but only find 
-default speed. (first time I work on ACPI table so I may have missed it).
+OK, I will move bcm_set_clock code to bcm_set_baudrate
+
+> Also curious is when we fallback to default baudrate, do we have to change the clock back to 24?
+
+Currently, controller speed is set back to default baudrate by firmware 
+loading. hci_bcm do not set it explicitly.
+
+>> +
+>> +	BT_DBG("%s: Set Controller UART speed to %d bit/s", hdev->name, speed);
+>> +
+>> +	skb = __hci_cmd_sync(hdev, 0xfc18, sizeof(param), &param,
+>> +			     HCI_INIT_TIMEOUT);
+>> +	if (IS_ERR(skb)) {
+>> +		BT_ERR("%s: failed to write update baudrate command (%ld)",
+>> +		       hdev->name, PTR_ERR(skb));
+>> +		return PTR_ERR(skb);
+>> +	}
+>> +
+>> +	if (skb->data[0]) {
+>> +		u8 evt_status = skb->data[0];
+>
+> This part seems a bit duplicated. I actually wonder if we should change __hci_cmd_sync to also handle command complete events and just extract the error/status for us. I have done it that way in userspace and the command complete return response parameters are guaranteed to have status as their first parameter. So it is doable. Do you mind looking into that.
+
+OK, I will send a patch adding a status parameter to __hci_cmd_sync.
 
 Regards
 
