@@ -1,55 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20150228.160047.214686672558902639.davem@davemloft.net>
-References: <CAHsH6Guq33N755dcuNEmzgP06O=PBdy2Tzt5vSr-iRFoj4uGtw@mail.gmail.com>
-	<20150228.150830.1726900309943339124.davem@davemloft.net>
-	<CAHsH6GvvQxHbt4JJrotn3y=BG172Wbw4NrMD+gTUA_R=jbPDTw@mail.gmail.com>
-	<20150228.160047.214686672558902639.davem@davemloft.net>
-Date: Sun, 1 Mar 2015 07:09:54 +0200
-Message-ID: <CAHsH6Gv8Dh3RQ0V7KURcca9bzZGY0FwiqGj-mP9oKA_Vv72nUA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 4/7] net: packet: use skb->dev as storage for
- skb orig len instead of skb->cb[]
-From: Eyal Birger <eyal.birger@gmail.com>
-To: David Miller <davem@davemloft.net>
-Cc: Willem de Bruijn <willemb@google.com>, Eric Dumazet <edumazet@google.com>,
-	Shmulik Ladkani <shmulik.ladkani@gmail.com>, linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1430322370.2268.12.camel@gmail.com>
+Subject: Re: [RFCv1 14/20] android/avdtp: Add set vendor codec function
+From: chanten <chanyeol.park@gmail.com>
+To: luiz.von.dentz@intel.com
+Cc: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+In-Reply-To: <1425049388-18333-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1425049388-18333-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	 <1425049388-18333-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 30 Apr 2015 00:46:10 +0900
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Feb 28, 2015 at 11:00 PM, David Miller <davem@davemloft.net> wrote:
-> From: Eyal Birger <eyal.birger@gmail.com>
-> Date: Sat, 28 Feb 2015 22:38:04 +0200
->
->> My concern is that any value I pick based on the existing implementations
->> would need to be adjusted come a protocol with a larger address length.
->
-> Then we need a method that requires protocols to register their
-> address length in a manner that will allow us to validate that
-> limit at compile time.
->
+Hi, 
+On Fri, 2015-02-27 at 17:03 +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  profiles/audio/avdtp.c | 22 ++++++++++++++++++++++
+>  profiles/audio/avdtp.h |  2 ++
+>  2 files changed, 24 insertions(+)
+> 
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index 6132c13..c396e8f 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -49,6 +49,7 @@
+>  #include "src/adapter.h"
+>  #include "src/device.h"
+>  
+> +#include "../profiles/audio/a2dp-codecs.h"
+>  #include "avdtp.h"
+>  #include "a2dp.h"
+>  #include "sink.h"
+> @@ -330,6 +331,8 @@ struct avdtp_local_sep {
+>  	struct avdtp_stream *stream;
+>  	struct seid_info info;
+>  	uint8_t codec;
+> +	uint32_t vndcodec_vendor;
+> +	uint16_t vndcodec_codec;
+>  	gboolean delay_reporting;
+>  	GSList *caps;
+>  	struct avdtp_sep_ind *ind;
+> @@ -1274,6 +1277,18 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+>  		if (codec_data->media_codec_type != lsep->codec)
+>  			continue;
+>  
+> +		/* FIXME: Add Vendor Specific Codec match to SEP callback */
+> +		if (lsep->codec == A2DP_CODEC_VENDOR) {
+> +			a2dp_vendor_codec_t *vndcodec =
+> +						(void *) codec_data->data;
+> +
+> +			if (btohl(vndcodec->vendor_id) != lsep->vndcodec_vendor)
+> +				continue;
+> +
+> +			if (btohs(vndcodec->codec_id) != lsep->vndcodec_codec)
+> +				continue;
+> +		}
+> +
+>  		if (sep->stream == NULL)
+>  			return sep;
+>  	}
+> @@ -3753,6 +3768,13 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+>  	return sep;
+>  }
+>  
+> +void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
+> +							uint16_t codec_id)
+> +{
+> +	sep->vndcodec_vendor = vendor_id;
+> +	sep->vndcodec_codec = codec_id;
+> +}
+> +
+>  int avdtp_unregister_sep(struct queue *lseps, struct avdtp_local_sep *sep)
+>  {
+>  	if (!sep)
+> diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+> index af55f76..0fc8fe2 100644
+> --- a/profiles/audio/avdtp.h
+> +++ b/profiles/audio/avdtp.h
+> @@ -282,6 +282,8 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+>  						struct avdtp_sep_ind *ind,
+>  						struct avdtp_sep_cfm *cfm,
+>  						void *user_data);
+> +void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
+> +							uint16_t codec_id);
+>  
+>  /* Find a matching pair of local and remote SEP ID's */
+>  struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
 
-Sorry to reiterate this, but such validation will inherently become the
-actual limit for hardware addresses.
-So, it would be equivalent to changing the in-kernel definition of
-MAX_ADDR_SIZE.
+I find out that bluez a2dp also do not work fine in case of multiple
+vendor codecs in remote. So I think bluez also needs this android bluez
+patch.
 
-Is this something to be considered?
+Originally I consider to use check_vendor(profile/audio/a2dp.c)function
+from avdtp_find_remote_sep. but it does not seem good to me.
 
-> This is not rocket science.
->
-> Right now we're proposing to do utterly stupid shit like encoding
-> integers in device pointers in the sk_buff, when that is absolutely
-> not necessary at all.
+Could you give us the guidance?
 
-Ok. Another suggestion I received was to delay the preparation of the full
-sockaddr_ll until it is needed, and store the skb original length in the first
-two fields (sll_protocol and sll_family) as they can be derived later on from
-the skb.
+Thanks
+Chanyeol
 
-IMHO, It would still be somewhat of a hack though.
-
-Would that approach be considered?
-
-Regards,
-Eyal.
