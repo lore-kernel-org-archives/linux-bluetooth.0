@@ -1,106 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1430322403.2268.13.camel@gmail.com>
-Subject: Re: [RFCv1 14/20] android/avdtp: Add set vendor codec function
-From: chanten <chanyeol.park@gmail.com>
-To: luiz.von.dentz@intel.com
-Cc: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Date: Thu, 30 Apr 2015 00:46:43 +0900
-In-Reply-To: <1425049388-18333-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1425049388-18333-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1425049388-18333-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <5540F386.3010707@linux.intel.com>
+Date: Wed, 29 Apr 2015 17:06:46 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Peter Hurley <peter@hurleysoftware.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/7] Bluetooth: hci_uart: Add HCIUARTSETBAUDRATE ioctl
+References: <1428673066-1349-1-git-send-email-frederic.danis@linux.intel.com> <1428673066-1349-2-git-send-email-frederic.danis@linux.intel.com> <5527EB14.9000608@hurleysoftware.com> <488A23CF-9578-42F5-A2E6-9D8450A15309@holtmann.org>
+In-Reply-To: <488A23CF-9578-42F5-A2E6-9D8450A15309@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, 
-On Fri, 2015-02-27 at 17:03 +0200, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> ---
->  profiles/audio/avdtp.c | 22 ++++++++++++++++++++++
->  profiles/audio/avdtp.h |  2 ++
->  2 files changed, 24 insertions(+)
-> 
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 6132c13..c396e8f 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -49,6 +49,7 @@
->  #include "src/adapter.h"
->  #include "src/device.h"
->  
-> +#include "../profiles/audio/a2dp-codecs.h"
->  #include "avdtp.h"
->  #include "a2dp.h"
->  #include "sink.h"
-> @@ -330,6 +331,8 @@ struct avdtp_local_sep {
->  	struct avdtp_stream *stream;
->  	struct seid_info info;
->  	uint8_t codec;
-> +	uint32_t vndcodec_vendor;
-> +	uint16_t vndcodec_codec;
->  	gboolean delay_reporting;
->  	GSList *caps;
->  	struct avdtp_sep_ind *ind;
-> @@ -1274,6 +1277,18 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
->  		if (codec_data->media_codec_type != lsep->codec)
->  			continue;
->  
-> +		/* FIXME: Add Vendor Specific Codec match to SEP callback */
-> +		if (lsep->codec == A2DP_CODEC_VENDOR) {
-> +			a2dp_vendor_codec_t *vndcodec =
-> +						(void *) codec_data->data;
-> +
-> +			if (btohl(vndcodec->vendor_id) != lsep->vndcodec_vendor)
-> +				continue;
-> +
-> +			if (btohs(vndcodec->codec_id) != lsep->vndcodec_codec)
-> +				continue;
-> +		}
-> +
->  		if (sep->stream == NULL)
->  			return sep;
->  	}
-> @@ -3753,6 +3768,13 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
->  	return sep;
->  }
->  
-> +void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
-> +							uint16_t codec_id)
-> +{
-> +	sep->vndcodec_vendor = vendor_id;
-> +	sep->vndcodec_codec = codec_id;
-> +}
-> +
->  int avdtp_unregister_sep(struct queue *lseps, struct avdtp_local_sep *sep)
->  {
->  	if (!sep)
-> diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-> index af55f76..0fc8fe2 100644
-> --- a/profiles/audio/avdtp.h
-> +++ b/profiles/audio/avdtp.h
-> @@ -282,6 +282,8 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
->  						struct avdtp_sep_ind *ind,
->  						struct avdtp_sep_cfm *cfm,
->  						void *user_data);
-> +void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
-> +							uint16_t codec_id);
->  
->  /* Find a matching pair of local and remote SEP ID's */
->  struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+Hello Marcel,
 
-I find out that bluez a2dp also do not work fine in case of multiple
-vendor codecs in remote. So I think bluez also needs this android bluez
-patch.
+On 10/04/2015 20:20, Marcel Holtmann wrote:
+> Hi Peter,
+>
+>>> This allows user space application to set final speed requested for UART
+>>> device. UART port is open at init speed by user space application.
+>>>
+>>> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+>>> ---
+>>> drivers/bluetooth/hci_ldisc.c | 6 ++++++
+>>> drivers/bluetooth/hci_uart.h  | 2 ++
+>>> 2 files changed, 8 insertions(+)
+>>>
+>>> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+>>> index 5c9a73f..190a7f8 100644
+>>> --- a/drivers/bluetooth/hci_ldisc.c
+>>> +++ b/drivers/bluetooth/hci_ldisc.c
+>>> @@ -609,6 +609,12 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, struct file *file,
+>>> 	case HCIUARTGETFLAGS:
+>>> 		return hu->hdev_flags;
+>>>
+>>> +	case HCIUARTSETBAUDRATE:
+>>> +		if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
+>>> +			return -EBUSY;
+>>> +		hu->speed = arg;
+>>> +		break;
+>>> +
+>>
+>> So now that the kernel can set line rate, why is an ioctl necessary
+>> to determine what the line rate should be?
+>
+> actually I think we should skip this for now and only introduce it if it is really needed. For the chips we want to support initially we only need the default baudrate and the max baudrate. So the default baudrate is vendor specific and we would just hardcode that in the driver. The max baudrate is platform specific and most likely should come via ACPI or DT. Or some default value in case it is platform specific driver in the first place.
+>
+> Just as background, this command is not for actually setting the baudrate at that point, it is informing the kernel about the max baudrate for operational use. It will be programmed way later. However as stated above, I think for now we should skip this and only introduce it if the kernel needs input from userspace on the max baudrate.
+>
+> Fred, I think what we really want at this point is to add default and operational baudrate fields to hci_uart_proto.
 
-Originally I consider to use check_vendor(profile/audio/a2dp.c)function
-from avdtp_find_remote_sep. but it does not seem good to me.
+OK, I will add default and operational speed to hci_uart_proto.
+I tried to find the operational speed in T100's ACPI table but only find 
+default speed. (first time I work on ACPI table so I may have missed it).
 
-Could you give us the guidance?
+Regards
 
-Thanks
-Chanyeol
+Fred
 
+-- 
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
 
