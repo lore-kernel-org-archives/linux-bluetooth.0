@@ -1,128 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1430231734-26699-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <CAHrH25T1qZ1x1O2yKjmWNK7-xSXtw-sZAYHCcHEcJzEjkaGmtQ@mail.gmail.com>
 References: <1430231734-26699-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 29 Apr 2015 13:03:45 +0300
-Message-ID: <CABBYNZKbvO9TK4V0h-Ydgz=GwSE1xnaBaRxaf50AFVWo0e6erQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] shared/att: Rename sec_level to security
+	<1430231734-26699-4-git-send-email-luiz.dentz@gmail.com>
+	<CAHrH25T1qZ1x1O2yKjmWNK7-xSXtw-sZAYHCcHEcJzEjkaGmtQ@mail.gmail.com>
+Date: Wed, 29 Apr 2015 12:40:04 +0300
+Message-ID: <CABBYNZ+ALd4QMJerokrpjd9Kegaw3p7wqEeg+ke_WxshNawZVw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/4] core/gatt: Auto retry if read/write fails
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Arman Uguray <armansito@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Arman,
 
-On Tue, Apr 28, 2015 at 5:35 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, Apr 29, 2015 at 12:28 AM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Luiz,
 >
-> ---
->  src/shared/att.c         | 4 ++--
->  src/shared/att.h         | 4 ++--
->  src/shared/gatt-client.c | 6 +++---
->  src/shared/gatt-server.c | 2 +-
->  unit/test-gatt.c         | 2 +-
->  5 files changed, 9 insertions(+), 9 deletions(-)
+>> On Tue, Apr 28, 2015 at 7:35 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This adds auto retry logic to ReadValue and WriteValue when a security
+>> error happen, it will first attempt to elevate the security to match the
+>> requirement and then retry sending the same operation.
+>> ---
+>>  src/gatt-client.c | 182 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 176 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>> index 2e26ed7..7fd814c 100644
+>> --- a/src/gatt-client.c
+>> +++ b/src/gatt-client.c
+>> @@ -223,6 +223,9 @@ static bool parse_value_arg(DBusMessage *msg, uint8_t **value,
+>>         return true;
+>>  }
+>>
+>> +struct async_dbus_op;
+>> +
+>> +typedef bool (*async_dbus_op_retry_t)(struct async_dbus_op *op, uint8_t ecode);
+>>  typedef bool (*async_dbus_op_complete_t)(void *data);
+>>
+>>  struct async_dbus_op {
+>> @@ -230,6 +233,7 @@ struct async_dbus_op {
+>>         DBusMessage *msg;
+>>         void *data;
+>>         uint16_t offset;
+>> +       async_dbus_op_retry_t retry;
+>>         async_dbus_op_complete_t complete;
+>>  };
+>>
+>> @@ -337,6 +341,23 @@ static void read_op_cb(struct gatt_db_attribute *attrib, int err,
+>>         g_dbus_send_message(btd_get_dbus_connection(), reply);
+>>  }
+>>
+>> +static bool check_security(struct bt_gatt_client *gatt, uint8_t ecode)
+>> +{
+>> +       int security;
+>> +
+>> +       security = bt_gatt_client_get_security(gatt);
+>> +       if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
+>> +                                       security < BT_ATT_SECURITY_MEDIUM)
+>> +               security = BT_ATT_SECURITY_MEDIUM;
+>> +       else if (ecode == BT_ATT_ERROR_AUTHENTICATION &&
+>> +                                       security < BT_ATT_SECURITY_HIGH)
+>> +               security = BT_ATT_SECURITY_HIGH;
+>> +       else
+>> +               return false;
+>> +
+>> +       return bt_gatt_client_set_security(gatt, security);
+>> +}
 >
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index f24da18..c5eaa09 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -1341,7 +1341,7 @@ bool bt_att_unregister_all(struct bt_att *att)
->         return true;
->  }
->
-> -int bt_att_get_sec_level(struct bt_att *att)
-> +int bt_att_get_security(struct bt_att *att)
->  {
->         struct bt_security sec;
->         socklen_t len;
-> @@ -1360,7 +1360,7 @@ int bt_att_get_sec_level(struct bt_att *att)
->         return sec.level;
->  }
->
-> -bool bt_att_set_sec_level(struct bt_att *att, int level)
-> +bool bt_att_set_security(struct bt_att *att, int level)
->  {
->         struct bt_security sec;
->
-> diff --git a/src/shared/att.h b/src/shared/att.h
-> index fb6247e..80810a1 100644
-> --- a/src/shared/att.h
-> +++ b/src/shared/att.h
-> @@ -83,8 +83,8 @@ bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id);
->
->  bool bt_att_unregister_all(struct bt_att *att);
->
-> -int bt_att_get_sec_level(struct bt_att *att);
-> -bool bt_att_set_sec_level(struct bt_att *att, int level);
-> +int bt_att_get_security(struct bt_att *att);
-> +bool bt_att_set_security(struct bt_att *att, int level);
->
->  bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
->                         bt_att_counter_func_t func, void *user_data);
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 7b628fe..56bad60 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -2217,7 +2217,7 @@ unsigned int bt_gatt_client_write_without_response(
->
->         /* Only use signed write if unencrypted */
->         if (signed_write) {
-> -               security = bt_att_get_sec_level(client->att);
-> +               security = bt_att_get_security(client->att);
->                 op = security > BT_SECURITY_LOW ?  BT_ATT_OP_WRITE_CMD :
->                                                 BT_ATT_OP_SIGNED_WRITE_CMD;
->         } else
-> @@ -3004,7 +3004,7 @@ bool bt_gatt_client_set_sec_level(struct bt_gatt_client *client,
->         if (!client)
->                 return false;
->
-> -       return bt_att_set_sec_level(client->att, level);
-> +       return bt_att_set_security(client->att, level);
->  }
->
->  int bt_gatt_client_get_sec_level(struct bt_gatt_client *client)
-> @@ -3012,5 +3012,5 @@ int bt_gatt_client_get_sec_level(struct bt_gatt_client *client)
->         if (!client)
->                 return -1;
->
-> -       return bt_att_get_sec_level(client->att);
-> +       return bt_att_get_security(client->att);
->  }
-> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> index ae77dcc..6167065 100644
-> --- a/src/shared/gatt-server.c
-> +++ b/src/shared/gatt-server.c
-> @@ -395,7 +395,7 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
->         if (!perm)
->                 return 0;
->
-> -       security = bt_att_get_sec_level(server->att);
-> +       security = bt_att_get_security(server->att);
->         if (perm & BT_ATT_PERM_AUTHEN && security < BT_ATT_SECURITY_HIGH)
->                 return BT_ATT_ERROR_AUTHENTICATION;
->
-> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-> index caaacbd..a7ea7cd 100644
-> --- a/unit/test-gatt.c
-> +++ b/unit/test-gatt.c
-> @@ -1002,7 +1002,7 @@ static void test_signed_write_seclevel(struct context *context)
->         g_assert(bt_att_set_local_key(context->att, key, local_counter,
->                                                                 context));
->
-> -       g_assert(bt_att_set_sec_level(context->att, BT_ATT_SECURITY_MEDIUM));
-> +       g_assert(bt_att_set_security(context->att, BT_ATT_SECURITY_MEDIUM));
->
->         g_assert(bt_gatt_client_write_without_response(context->client,
->                                                         step->handle,
-> --
-> 2.1.0
+> This is mostly a nice to have but I wonder if we should try the same
+> thing from within shared/gatt-client as well in some cases, for
+> example when it fails to write to the CCC for a Service Changed
+> characteristic due to permissions. Just a thought.
 
-Patches 1-3 were applied, I will probably rework 4/4 so to make
-bt_gatt_client able to elevate the security on its own.
-
+We can probably do that, I actually started with the idea that
+bt_gatt_client itself would retry, the problem is that in Android this
+is left for the upper layer to deal with so we would probably need
+some means to disable this. Perhaps something like
+bt_gatt_client_set_auto_retry, by default I think I would leave it to
+false otherwise it might affect the unit tests.
 
 -- 
 Luiz Augusto von Dentz
