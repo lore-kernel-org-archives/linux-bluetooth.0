@@ -1,36 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] android/gatt: Fix updating mtu for no registered app
-Date: Wed, 29 Apr 2015 11:15:53 +0200
-Message-Id: <1430298953-31018-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 3/4] android/gatt: Send notify mtu change for BR/EDR success conn
+Date: Wed, 29 Apr 2015 11:15:52 +0200
+Message-Id: <1430298953-31018-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1430298953-31018-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1430298953-31018-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Gatt shouldn't notify about updating mtu if no apps are registered.
-Without this patch, while connecting crash can occur.
+This patch fixes sending mtu change notification for BR/EDR gatt
+connections. For unsuccessful connection, notify mtu change shouldn't be
+sent. This avoid sending bogus mtu values as notify mtu change.
 ---
- android/gatt.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ android/gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 04f89af..157b89d 100644
+index 656abfc..04f89af 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -978,6 +978,11 @@ static void notify_mtu_change(void *data, void *user_data)
- 	if (conn->device != device)
- 		return;
+@@ -1652,7 +1652,7 @@ reply:
+ 									&data);
  
-+	if (!conn->app) {
-+		error("gatt: can't notify mtu - no app registered for conn");
-+		return;
-+	}
-+
- 	switch (conn->app->type) {
- 	case GATT_CLIENT:
- 		notify_client_mtu_change(conn, true);
+ 	/* For BR/EDR notify about MTU since it is not negotiable*/
+-	if (cid != ATT_CID)
++	if (cid != ATT_CID && status == GATT_SUCCESS)
+ 		queue_foreach(app_connections, notify_mtu_change, dev);
+ 
+ 	device_unref(dev);
 -- 
 2.1.0
 
