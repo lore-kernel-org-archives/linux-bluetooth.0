@@ -1,31 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] android/client: Fix missing new line character
-Date: Wed, 29 Apr 2015 11:15:50 +0200
-Message-Id: <1430298953-31018-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1430256071-17261-1-git-send-email-armansito@chromium.org>
+References: <1430256071-17261-1-git-send-email-armansito@chromium.org>
+Date: Wed, 29 Apr 2015 11:24:38 +0300
+Message-ID: <CABBYNZJAzBvfjiyOEdmFCkQMV3J4uxrBgfR2rOy7gkogjXv5UA@mail.gmail.com>
+Subject: Re: [PATCH] unit/test-gdbus-client: Set DISPLAY=:0 for D-Bus
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-New line character is missing for haltest_info. Without this logs are
-distorted after receiving configure mtu callback log.
----
- android/client/if-gatt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Arman,
 
-diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index 70287fc..e66cc20 100644
---- a/android/client/if-gatt.c
-+++ b/android/client/if-gatt.c
-@@ -679,7 +679,7 @@ static void gattc_listen_cb(int status, int client_if)
- /* Callback invoked when the MTU for a given connection changes */
- static void gattc_configure_mtu_cb(int conn_id, int status, int mtu)
- {
--	haltest_info("%s: conn_id=%d, status=%d, mtu=%d", __func__, conn_id,
-+	haltest_info("%s: conn_id=%d, status=%d, mtu=%d\n", __func__, conn_id,
- 								status, mtu);
- }
- 
+On Wed, Apr 29, 2015 at 12:21 AM, Arman Uguray <armansito@chromium.org> wrote:
+> unit/test-gdbus-client has been failing when run without X11 with the
+> following error in all test cases:
+>
+>   D-Bus setup failed: Unable to autolaunch a dbus-daemon without a $DISPLAY for X11
+>
+> This patch fixes this by setting the DISPLAY environment variable to
+> ":0" from within the test process. This allows the test to be run
+> without an X session, e.g. over ssh.
+> ---
+>  unit/test-gdbus-client.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>
+> diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
+> index 7e16d16..9d9ff16 100644
+> --- a/unit/test-gdbus-client.c
+> +++ b/unit/test-gdbus-client.c
+> @@ -25,6 +25,7 @@
+>  #include <config.h>
+>  #endif
+>
+> +#include <stdlib.h>
+>  #include <glib.h>
+>
+>  #include "gdbus/gdbus.h"
+> @@ -61,6 +62,17 @@ static struct context *create_context(void)
+>         struct context *context = g_new0(struct context, 1);
+>         DBusError err;
+>
+> +       /*
+> +        * Set the display variable to ":0" to allow setting up a D-Bus session
+> +        * without X11.
+> +        */
+> +       if (putenv("DISPLAY=:0")) {
+> +               tester_debug("Failed to set $DISPLAY environment variable");
+> +               g_free(context);
+> +               tester_test_failed();
+> +               return NULL;
+> +       }
+> +
+>         dbus_error_init(&err);
+>
+>         context->dbus_conn = g_dbus_setup_private(DBUS_BUS_SESSION,
+> --
+> 2.2.0.rc0.207.ga3a616c
+
+I rather have dbus-run-session
+(http://dbus.freedesktop.org/doc/dbus-run-session.1.html) then, we
+should not depend on X for running these tests.
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
