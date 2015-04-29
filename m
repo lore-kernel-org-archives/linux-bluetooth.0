@@ -1,69 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1430256071-17261-1-git-send-email-armansito@chromium.org>
-References: <1430256071-17261-1-git-send-email-armansito@chromium.org>
-Date: Wed, 29 Apr 2015 11:24:38 +0300
-Message-ID: <CABBYNZJAzBvfjiyOEdmFCkQMV3J4uxrBgfR2rOy7gkogjXv5UA@mail.gmail.com>
-Subject: Re: [PATCH] unit/test-gdbus-client: Set DISPLAY=:0 for D-Bus
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1430266288-13755-1-git-send-email-labbott@fedoraproject.org>
+References: <1430266288-13755-1-git-send-email-labbott@fedoraproject.org>
+Date: Wed, 29 Apr 2015 12:23:16 +0800
+Message-ID: <CACVXFVNuzBVTALi7G9qtCYvTJhxrLB+WsYuM=UsJBMHpvfq7Rw@mail.gmail.com>
+Subject: Re: [RFC][PATCH] firmware: Drop WARN from usermodehelper_read_trylock
+ error case
+From: Ming Lei <ming.lei@canonical.com>
+To: Laura Abbott <labbott@fedoraproject.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+On Wed, Apr 29, 2015 at 8:11 AM, Laura Abbott <labbott@fedoraproject.org> wrote:
+> We've received a number of reports of warnings when coming
+> out of suspend with certain bluetooth firmware configurations:
+>
+> WARNING: CPU: 3 PID: 3280 at drivers/base/firmware_class.c:1126
+> _request_firmware+0x558/0x810()
+> Modules linked in: ccm ip6t_rpfilter ip6t_REJECT nf_reject_ipv6
+> xt_conntrack ebtable_nat ebtable_broute bridge stp llc ebtable_filter
+> ebtables ip6table_nat nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6
+> ip6table_mangle ip6table_security ip6table_raw ip6table_filter
+> ip6_tables iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4
+> nf_nat nf_conntrack iptable_mangle iptable_security iptable_raw
+> binfmt_misc bnep intel_rapl iosf_mbi arc4 x86_pkg_temp_thermal
+> snd_hda_codec_hdmi coretemp kvm_intel joydev snd_hda_codec_realtek
+> iwldvm snd_hda_codec_generic kvm iTCO_wdt mac80211 iTCO_vendor_support
+> snd_hda_intel snd_hda_controller snd_hda_codec crct10dif_pclmul
+> snd_hwdep crc32_pclmul snd_seq crc32c_intel ghash_clmulni_intel uvcvideo
+> snd_seq_device iwlwifi btusb videobuf2_vmalloc snd_pcm videobuf2_core
+>  serio_raw bluetooth cfg80211 videobuf2_memops sdhci_pci v4l2_common
+> videodev thinkpad_acpi sdhci i2c_i801 lpc_ich mfd_core wacom mmc_core
+> media snd_timer tpm_tis hid_logitech_hidpp wmi tpm rfkill snd mei_me mei
+> shpchp soundcore nfsd auth_rpcgss nfs_acl lockd grace sunrpc i915
+> i2c_algo_bit drm_kms_helper e1000e drm hid_logitech_dj ptp pps_core
+> video
+> CPU: 3 PID: 3280 Comm: kworker/u17:0 Not tainted 3.19.3-200.fc21.x86_64
+> Hardware name: LENOVO 343522U/343522U, BIOS GCET96WW (2.56 ) 10/22/2013
+> Workqueue: hci0 hci_power_on [bluetooth]
+>  0000000000000000 0000000089944328 ffff88040acffb78 ffffffff8176e215
+>  0000000000000000 0000000000000000 ffff88040acffbb8 ffffffff8109bc1a
+>  0000000000000000 ffff88040acffcd0 00000000fffffff5 ffff8804076bac40
+> Call Trace:
+>  [<ffffffff8176e215>] dump_stack+0x45/0x57
+>  [<ffffffff8109bc1a>] warn_slowpath_common+0x8a/0xc0
+>  [<ffffffff8109bd4a>] warn_slowpath_null+0x1a/0x20
+>  [<ffffffff814dbe78>] _request_firmware+0x558/0x810
+>  [<ffffffff814dc165>] request_firmware+0x35/0x50
+>  [<ffffffffa03a7886>] btusb_setup_bcm_patchram+0x86/0x590 [btusb]
+>  [<ffffffff814d40e6>] ? rpm_idle+0xd6/0x230
+>  [<ffffffffa04d4801>] hci_dev_do_open+0xe1/0xa90 [bluetooth]
+>  [<ffffffff810c51dd>] ? ttwu_do_activate.constprop.90+0x5d/0x70
+>  [<ffffffffa04d5980>] hci_power_on+0x40/0x200 [bluetooth]
+>  [<ffffffff810b487c>] process_one_work+0x14c/0x3f0
+>  [<ffffffff810b52f3>] worker_thread+0x53/0x470
+>  [<ffffffff810b52a0>] ? rescuer_thread+0x300/0x300
+>  [<ffffffff810ba548>] kthread+0xd8/0xf0
+>  [<ffffffff810ba470>] ? kthread_create_on_node+0x1b0/0x1b0
+>  [<ffffffff81774958>] ret_from_fork+0x58/0x90
+>  [<ffffffff810ba470>] ? kthread_create_on_node+0x1b0/0x1b0
+>
+> This occurs after every resume.
+>
+> When resuming, the bluetooth driver needs to re-request the
+> firmware. This re-request is happening before usermodehelper
+> is fully enabled. If the firmware load succeeded previously, the
+> caching behavior of the firmware code typically negates the
+> need to call the usermodehelper code again and the request
+> succeeds. If the firmware was never loaded because it isn't
+> actually present in the file system, this results in a call
+> to usermodehelper and a failure warning every resume. Rather
 
-On Wed, Apr 29, 2015 at 12:21 AM, Arman Uguray <armansito@chromium.org> wrote:
-> unit/test-gdbus-client has been failing when run without X11 with the
-> following error in all test cases:
+Yes, it is a driver problem, and loading firmware from filesystem
+isn't safe during resume, and that is the purpose of the warning.
+
+> than have a WARN clogging up the kernel messages each time,
+> just drop the warn. There is still a dev_err for debugging
+> purposes.
 >
->   D-Bus setup failed: Unable to autolaunch a dbus-daemon without a $DISPLAY for X11
->
-> This patch fixes this by setting the DISPLAY environment variable to
-> ":0" from within the test process. This allows the test to be run
-> without an X session, e.g. over ssh.
+> Signed-off-by: Laura Abbott <labbott@fedoraproject.org>
 > ---
->  unit/test-gdbus-client.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+> This might be papering over a real issue but I'm not
+> familiar enough with any of suspend/resume, bluetooth,
+> or firmware loading to identify an alternate fix.
+> The backtrace is from bcm patchram but the problem
+> isn't limited to that hardware. Intel also does a
+> request firmware and I was able to reproduce the
+> same backtrace on that driver by requesting non-existant
+> firmware file.
+> ---
+>  drivers/base/firmware_class.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
-> index 7e16d16..9d9ff16 100644
-> --- a/unit/test-gdbus-client.c
-> +++ b/unit/test-gdbus-client.c
-> @@ -25,6 +25,7 @@
->  #include <config.h>
->  #endif
->
-> +#include <stdlib.h>
->  #include <glib.h>
->
->  #include "gdbus/gdbus.h"
-> @@ -61,6 +62,17 @@ static struct context *create_context(void)
->         struct context *context = g_new0(struct context, 1);
->         DBusError err;
->
-> +       /*
-> +        * Set the display variable to ":0" to allow setting up a D-Bus session
-> +        * without X11.
-> +        */
-> +       if (putenv("DISPLAY=:0")) {
-> +               tester_debug("Failed to set $DISPLAY environment variable");
-> +               g_free(context);
-> +               tester_test_failed();
-> +               return NULL;
-> +       }
-> +
->         dbus_error_init(&err);
->
->         context->dbus_conn = g_dbus_setup_private(DBUS_BUS_SESSION,
+> diff --git a/drivers/base/firmware_class.c b/drivers/base/firmware_class.c
+> index 171841a..48ce9ac 100644
+> --- a/drivers/base/firmware_class.c
+> +++ b/drivers/base/firmware_class.c
+> @@ -1115,7 +1115,7 @@ _request_firmware(const struct firmware **firmware_p, const char *name,
+>                 }
+>         } else {
+>                 ret = usermodehelper_read_trylock();
+> -               if (WARN_ON(ret)) {
+> +               if (ret) {
+>                         dev_err(device, "firmware: %s will not be loaded\n",
+>                                 name);
+>                         goto out;
 > --
-> 2.2.0.rc0.207.ga3a616c
-
-I rather have dbus-run-session
-(http://dbus.freedesktop.org/doc/dbus-run-session.1.html) then, we
-should not depend on X for running these tests.
-
-
--- 
-Luiz Augusto von Dentz
+> 2.1.0
+>
