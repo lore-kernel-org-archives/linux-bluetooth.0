@@ -1,70 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Reizer, Eyal" <eyalr@ti.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        One Thousand Gnomes
-	<gnomes@lxorguk.ukuu.org.uk>
-CC: Eyal Reizer <eyalreizer@gmail.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        Pavan Savoy <pavan_savoy@ti.com>, "Mahaveer,
- Vishal" <vishalm@ti.com>,
-        "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>,
-        "Ziv, Dotan" <dotanz@ti.com>
-Subject: RE: [PATCH] Bluetooth: Add tty HCI driver
-Date: Thu, 30 Apr 2015 14:38:49 +0000
-Message-ID: <8665E2433BC68541A24DFFCA87B70F5B2365DFEB@DFRE01.ent.ti.com>
-References: <1430380089-2395-1-git-send-email-eyalr@ti.com>
- <20150430113103.3ad0bfac@lxorguk.ukuu.org.uk>
- <2A731A0F-6BEB-4614-94E8-90B28BEE2DD9@holtmann.org>
-In-Reply-To: <2A731A0F-6BEB-4614-94E8-90B28BEE2DD9@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <1430393178-29983-2-git-send-email-mariusz.skamra@gmail.com>
+References: <1430393178-29983-1-git-send-email-mariusz.skamra@gmail.com>
+	<1430393178-29983-2-git-send-email-mariusz.skamra@gmail.com>
+Date: Thu, 30 Apr 2015 17:32:26 +0300
+Message-ID: <CABBYNZLXidvJyGpuh=C_vNhik8v_5VNhsTceY-kG3jF9c+jCVw@mail.gmail.com>
+Subject: Re: [PATCH 2/4] src/eir: Fix eir parser
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mariusz Skamra <mariusz.skamra@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mariusz,
 
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> Sent: Thursday, April 30, 2015 5:25 PM
-> To: One Thousand Gnomes
-> Cc: Eyal Reizer; linux-kernel@vger.kernel.org; Reizer, Eyal; Pavan Savoy;
-> Mahaveer, Vishal; linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH] Bluetooth: Add tty HCI driver
->=20
-> Hi,
->=20
-> >> tty_hci driver exposes a /dev/hci_tty character device node, that
-> >> intends to emulate a generic /dev/ttyX device that would be used by
-> >> the user-space Bluetooth stacks to send/receive data to/from the WL
-> >> combo-connectivity chipsets.
-> >
-> > We have an in kernel bluetooth stack, why do we care about this - how
-> > will people test and debug driver interactions with binary only
-> > bluetooth stacks in userspace ?
->=20
-> NAK to this driver.
->=20
-> If you want to run an external Bluetooth stack, then use HCI User Channel=
-. The
-> functionality already exists.
+On Thu, Apr 30, 2015 at 2:26 PM, Mariusz Skamra
+<mariusz.skamra@gmail.com> wrote:
+> Some devices (like Gigaset's G-Tag) sends Advertising Report with significant part
+> set to 0. According specification (Core 4.2, Vol 3, Part C, Sec 11) it is proper
+> behaviour. So if ADV and SCAN_RSP data are merged, there is a possibility to lose
+> SCAN_RSP data if the parser found early terminator.
 
-This is a pretty old driver that has been written a couple of years back an=
-d is being used by customers (including android that use a userspace based =
-stack).
-If there is another driver already available that provides same functionali=
-ty, of course we will be happy to use it instead.=20
-Any idea of where we can get info on the HCI User Channel?
+This sounds like a bug in the code merging ADV and SCAN_RSP together,
+it should have taken care of eliminating the early terminator
+otherwise we are changing the format which breaks userspace.
 
->=20
-> We do not want to have two drivers for the same hardware. Work with the
-> Bluetooth stack that is present in the kernel and please stop hacking aro=
-und it.
->=20
-There are in fact quite a few products that use commercial user space based=
- Bluetooth stacks.
-One reason is that bluez has not been certified but I assume they have othe=
-r reasons as well.
+> This patch fixes this issue by checking the address type. For LE, early termination
+> won't be not used.
+> ---
+>  android/bluetooth.c |  2 +-
+>  src/adapter.c       |  4 ++--
+>  src/eir.c           | 19 +++++++++++++------
+>  src/eir.h           |  3 ++-
+>  unit/test-eir.c     |  6 ++++--
+>  5 files changed, 22 insertions(+), 12 deletions(-)
+>
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 4d0cd48..09a31f8 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1920,7 +1920,7 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+>
+>         memset(&eir, 0, sizeof(eir));
+>
+> -       eir_parse(&eir, data, data_len);
+> +       eir_parse(&eir, data, data_len, bdaddr_type);
+>
+>         dev = get_device(bdaddr, bdaddr_type);
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 8ee5b5b..762fb19 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -5384,7 +5384,7 @@ static void update_found_devices(struct btd_adapter *adapter,
+>         char addr[18];
+>
+>         memset(&eir_data, 0, sizeof(eir_data));
+> -       eir_parse(&eir_data, data, data_len);
+> +       eir_parse(&eir_data, data, data_len, bdaddr_type);
+>
+>         if (bdaddr_type == BDADDR_BREDR)
+>                 discoverable = true;
+> @@ -7467,7 +7467,7 @@ static void connected_callback(uint16_t index, uint16_t length,
+>
+>         memset(&eir_data, 0, sizeof(eir_data));
+>         if (eir_len > 0)
+> -               eir_parse(&eir_data, ev->eir, eir_len);
+> +               eir_parse(&eir_data, ev->eir, eir_len, ev->addr.type);
+>
+>         if (eir_data.class != 0)
+>                 device_set_class(device, eir_data.class);
+> diff --git a/src/eir.c b/src/eir.c
+> index c984fa5..423a37f 100644
+> --- a/src/eir.c
+> +++ b/src/eir.c
+> @@ -226,7 +226,8 @@ static void eir_parse_uuid128_data(struct eir_data *eir, const uint8_t *data,
+>         eir_parse_sd(eir, &service, data + 16, len - 16);
+>  }
+>
+> -void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+> +void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len,
+> +                                                       uint8_t bdaddr_type)
+>  {
+>         uint16_t len = 0;
+>
+> @@ -242,15 +243,21 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+>                 const uint8_t *data;
+>                 uint8_t data_len;
+>
+> -               /* Check for the end of EIR */
+> -               if (field_len == 0)
+> +               /* Do not continue EIR Data parsing if got incorrect length */
+> +               if (len > eir_len)
+>                         break;
+>
+>                 len += field_len + 1;
+>
+> -               /* Do not continue EIR Data parsing if got incorrect length */
+> -               if (len > eir_len)
+> +               if (field_len == 0) {
+> +                       /* Ignore redundant advertising data over LE*/
+> +                       if (bdaddr_type != BDADDR_BREDR) {
+> +                               eir_data += field_len + 1;
+> +                               continue;
+> +                       }
+> +                       /* field_len == 0 for BREDR means the end of EIR */
+>                         break;
+> +               }
+>
+>                 data = &eir_data[2];
+>                 data_len = field_len - 1;
+> @@ -370,7 +377,7 @@ int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len)
+>
+>         /* optional OOB EIR data */
+>         if (eir_len > 0)
+> -               eir_parse(eir, eir_data, eir_len);
+> +               eir_parse(eir, eir_data, eir_len, 0);
+>
+>         return 0;
+>  }
+> diff --git a/src/eir.h b/src/eir.h
+> index 219ee79..944413d 100644
+> --- a/src/eir.h
+> +++ b/src/eir.h
+> @@ -95,7 +95,8 @@ struct eir_data {
+>  };
+>
+>  void eir_data_free(struct eir_data *eir);
+> -void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len);
+> +void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len,
+> +                                                       uint8_t bdaddr_type);
+>  int eir_parse_oob(struct eir_data *eir, uint8_t *eir_data, uint16_t eir_len);
+>  int eir_create_oob(const bdaddr_t *addr, const char *name, uint32_t cod,
+>                         const uint8_t *hash, const uint8_t *randomizer,
+> diff --git a/unit/test-eir.c b/unit/test-eir.c
+> index 53abfa4..09d9865 100644
+> --- a/unit/test-eir.c
+> +++ b/unit/test-eir.c
+> @@ -44,6 +44,7 @@ struct test_data {
+>         bool name_complete;
+>         int8_t tx_power;
+>         const char **uuid;
+> +       uint8_t bdaddr_type;
+>  };
+>
+>  static const unsigned char macbookair_data[] = {
+> @@ -536,7 +537,7 @@ static void test_basic(const void *data)
+>         memset(buf, 0, sizeof(buf));
+>         memset(&eir, 0, sizeof(eir));
+>
+> -       eir_parse(&eir, buf, HCI_MAX_EIR_LENGTH);
+> +       eir_parse(&eir, buf, HCI_MAX_EIR_LENGTH, BDADDR_BREDR);
+>         g_assert(eir.services == NULL);
+>         g_assert(eir.name == NULL);
+>
+> @@ -560,7 +561,7 @@ static void test_parsing(gconstpointer data)
+>
+>         memset(&eir, 0, sizeof(eir));
+>
+> -       eir_parse(&eir, test->eir_data, test->eir_size);
+> +       eir_parse(&eir, test->eir_data, test->eir_size, test->bdaddr_type);
+>
+>         tester_debug("Flags: %d", eir.flags);
+>         tester_debug("Name: %s", eir.name);
+> @@ -639,6 +640,7 @@ static const struct test_data gigaset_gtag_test = {
+>         .uuid = gigaset_gtag_uuid,
+>         .name = "Gigaset G-tag",
+>         .name_complete = true,
+> +       .bdaddr_type = BDADDR_LE_PUBLIC,
+>  };
+>
+>  static const char *uri_beacon_uuid[] = {
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Best Regards,
-Eyal
+
+
+-- 
+Luiz Augusto von Dentz
