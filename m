@@ -1,250 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Apr 2015 11:31:03 +0100
-From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-To: Eyal Reizer <eyalreizer@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Eyal Reizer <eyalr@ti.com>,
-	Pavan Savoy <pavan_savoy@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add tty HCI driver
-Message-ID: <20150430113103.3ad0bfac@lxorguk.ukuu.org.uk>
-In-Reply-To: <1430380089-2395-1-git-send-email-eyalr@ti.com>
-References: <1430380089-2395-1-git-send-email-eyalr@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <BFDF2CCB-4B3E-48A4-9C4E-319FE4E174B1@holtmann.org>
+References: <1430266288-13755-1-git-send-email-labbott@fedoraproject.org>
+	<47E8D3FC-0E25-4C4C-A6C3-01E6797CC836@holtmann.org>
+	<55413EE6.4020802@redhat.com>
+	<BFDF2CCB-4B3E-48A4-9C4E-319FE4E174B1@holtmann.org>
+Date: Thu, 30 Apr 2015 18:02:45 +0800
+Message-ID: <CACVXFVN5qTtp6qPk8wfktJjs4Y93D5DiH4mQrD=fceW4UTm=fw@mail.gmail.com>
+Subject: Re: [RFC][PATCH] firmware: Drop WARN from usermodehelper_read_trylock
+ error case
+From: Ming Lei <ming.lei@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Laura Abbott <labbott@redhat.com>, Laura Abbott <labbott@fedoraproject.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 30 Apr 2015 10:48:09 +0300
-Eyal Reizer <eyalreizer@gmail.com> wrote:
+On Thu, Apr 30, 2015 at 7:04 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Laura,
+>
+>>>> We've received a number of reports of warnings when coming
+>>>> out of suspend with certain bluetooth firmware configurations:
+>>>>
+>>>> WARNING: CPU: 3 PID: 3280 at drivers/base/firmware_class.c:1126
+>>>> _request_firmware+0x558/0x810()
+>>>> Modules linked in: ccm ip6t_rpfilter ip6t_REJECT nf_reject_ipv6
+>>>> xt_conntrack ebtable_nat ebtable_broute bridge stp llc ebtable_filter
+>>>> ebtables ip6table_nat nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6
+>>>> ip6table_mangle ip6table_security ip6table_raw ip6table_filter
+>>>> ip6_tables iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4
+>>>> nf_nat nf_conntrack iptable_mangle iptable_security iptable_raw
+>>>> binfmt_misc bnep intel_rapl iosf_mbi arc4 x86_pkg_temp_thermal
+>>>> snd_hda_codec_hdmi coretemp kvm_intel joydev snd_hda_codec_realtek
+>>>> iwldvm snd_hda_codec_generic kvm iTCO_wdt mac80211 iTCO_vendor_support
+>>>> snd_hda_intel snd_hda_controller snd_hda_codec crct10dif_pclmul
+>>>> snd_hwdep crc32_pclmul snd_seq crc32c_intel ghash_clmulni_intel uvcvid=
+eo
+>>>> snd_seq_device iwlwifi btusb videobuf2_vmalloc snd_pcm videobuf2_core
+>>>> serio_raw bluetooth cfg80211 videobuf2_memops sdhci_pci v4l2_common
+>>>> videodev thinkpad_acpi sdhci i2c_i801 lpc_ich mfd_core wacom mmc_core
+>>>> media snd_timer tpm_tis hid_logitech_hidpp wmi tpm rfkill snd mei_me m=
+ei
+>>>> shpchp soundcore nfsd auth_rpcgss nfs_acl lockd grace sunrpc i915
+>>>> i2c_algo_bit drm_kms_helper e1000e drm hid_logitech_dj ptp pps_core
+>>>> video
+>>>> CPU: 3 PID: 3280 Comm: kworker/u17:0 Not tainted 3.19.3-200.fc21.x86_6=
+4
+>>>> Hardware name: LENOVO 343522U/343522U, BIOS GCET96WW (2.56 ) 10/22/201=
+3
+>>>> Workqueue: hci0 hci_power_on [bluetooth]
+>>>> 0000000000000000 0000000089944328 ffff88040acffb78 ffffffff8176e215
+>>>> 0000000000000000 0000000000000000 ffff88040acffbb8 ffffffff8109bc1a
+>>>> 0000000000000000 ffff88040acffcd0 00000000fffffff5 ffff8804076bac40
+>>>> Call Trace:
+>>>> [<ffffffff8176e215>] dump_stack+0x45/0x57
+>>>> [<ffffffff8109bc1a>] warn_slowpath_common+0x8a/0xc0
+>>>> [<ffffffff8109bd4a>] warn_slowpath_null+0x1a/0x20
+>>>> [<ffffffff814dbe78>] _request_firmware+0x558/0x810
+>>>> [<ffffffff814dc165>] request_firmware+0x35/0x50
+>>>> [<ffffffffa03a7886>] btusb_setup_bcm_patchram+0x86/0x590 [btusb]
+>>>> [<ffffffff814d40e6>] ? rpm_idle+0xd6/0x230
+>>>> [<ffffffffa04d4801>] hci_dev_do_open+0xe1/0xa90 [bluetooth]
+>>>> [<ffffffff810c51dd>] ? ttwu_do_activate.constprop.90+0x5d/0x70
+>>>> [<ffffffffa04d5980>] hci_power_on+0x40/0x200 [bluetooth]
+>>>> [<ffffffff810b487c>] process_one_work+0x14c/0x3f0
+>>>> [<ffffffff810b52f3>] worker_thread+0x53/0x470
+>>>> [<ffffffff810b52a0>] ? rescuer_thread+0x300/0x300
+>>>> [<ffffffff810ba548>] kthread+0xd8/0xf0
+>>>> [<ffffffff810ba470>] ? kthread_create_on_node+0x1b0/0x1b0
+>>>> [<ffffffff81774958>] ret_from_fork+0x58/0x90
+>>>> [<ffffffff810ba470>] ? kthread_create_on_node+0x1b0/0x1b0
+>>>>
+>>>> This occurs after every resume.
+>>>>
+>>>> When resuming, the bluetooth driver needs to re-request the
+>>>> firmware. This re-request is happening before usermodehelper
+>>>> is fully enabled. If the firmware load succeeded previously, the
+>>>> caching behavior of the firmware code typically negates the
+>>>> need to call the usermodehelper code again and the request
+>>>> succeeds. If the firmware was never loaded because it isn't
+>>>> actually present in the file system, this results in a call
+>>>> to usermodehelper and a failure warning every resume. Rather
+>>>> than have a WARN clogging up the kernel messages each time,
+>>>> just drop the warn. There is still a dev_err for debugging
+>>>> purposes.
+>>>>
+>>>> Signed-off-by: Laura Abbott <labbott@fedoraproject.org>
+>>>> ---
+>>>> This might be papering over a real issue but I'm not
+>>>> familiar enough with any of suspend/resume, bluetooth,
+>>>> or firmware loading to identify an alternate fix.
+>>>> The backtrace is from bcm patchram but the problem
+>>>> isn't limited to that hardware. Intel also does a
+>>>> request firmware and I was able to reproduce the
+>>>> same backtrace on that driver by requesting non-existant
+>>>> firmware file.
+>>>
+>>> so here is the thing with Bluetooth firmware. Some of them
+>>> are  RAM patches to fix the ROM modules. Others are full firmware
+>>> that are required to be downloaded first.
+>>>
+>>> For ROM modules, the RAM patching procedure is optional. So we
+>>> will proceed even if no firmware is available. This means that
+>>> the kernel will never cache it (since it is not there in the
+>>> first place) and also on every resume we have the same issues.
+>>> So optional firmware is something that happens for Bluetooth USB
+>> > dongles a lot.
+>>>
+>>> In the driver we know which firmwares are optional and which are
+>> > required. So we could tell the firmware class this if this would make
+>> > things better and result in clearer errors and warnings. Is that
+>> > something we want here?
+>>>
+>>
+>> The response on another reply was
+>>
+>> "Yes, it is a driver problem, and loading firmware from filesystem
+>> isn't safe during resume, and that is the purpose of the warning."
+>>
+>> It isn't clear if this means request_firmware shouldn't be called
+>> on resume at all or if request_firmware shouldn't be called unless
+>> we can guarantee it won't make a call into the file system. I'd
 
-> tty_hci driver exposes a /dev/hci_tty character device node, that intends
-> to emulate a generic /dev/ttyX device that would be used by the user-space
-> Bluetooth stacks to send/receive data to/from the WL combo-connectivity
-> chipsets.
+If the firmware is cached before resume, it is ok to call request_firmware(=
+)
+during resume. Otherwise it will call filesystem and disks, which may
+be a problem because the disk may not be ready for completing the
+request during resume.
 
-We have an in kernel bluetooth stack, why do we care about this - how
-will people test and debug driver interactions with binary only bluetooth
-stacks in userspace ?
+>> be okay with adding another api (request_optional_firmware?) to
+>> represent this if the firmware maintainers aren't against the
+>> concept. If the firmware maintainers are against the concept,
+>> it seems like the only solution is to rework the bluetooth drivers
+>> to not request anything on resume.
 
-That aside
+So do you just want to work around the warning by introducing a new
+API?
 
-Either
+>
+> I think request_optional_firmware concept sounds like an useful addition.
+>
+> However the problem here is that the driver does not know that it is call=
+ed from resume path. It is easy to say that this is a driver problem, but t=
+he driver does not know it.
 
-- Use the tty layer to provide your interface with a correct "emulation",
+>From USB stack view, one usb driver should know it is in the resume path
+because the root entry is the .resume() callback of the USB BT driver.
 
-or
-
-- Don't pretend to be a tty device in the first place
-
-Your code behaviour is nothing like a tty or indeed much like anything
-else sane.
-
-> +int hci_tty_open(struct inode *inod, struct file *file)
-> +{
-> +	int i = 0, err = 0;
-> +	unsigned long timeleft;
-> +	struct ti_st *hst;
-> +
-> +	pr_info("inside %s (%p, %p)\n", __func__, inod, file);
-> +
-> +	hst = kzalloc(sizeof(*hst), GFP_KERNEL);
-> +	file->private_data = hst;
-> +	hst = file->private_data;
-
-Just crashed if you ran out of memory
-
-
-> +		pr_debug("waiting for registration completion signal from ST");
-> +		timeleft = wait_for_completion_timeout
-> +			(&hst->wait_reg_completion,
-> +			 msecs_to_jiffies(BT_REGISTER_TIMEOUT));
-> +		if (!timeleft) {
-> +			pr_err("Timeout(%d sec),didn't get reg completion signal from ST",
-> +			       BT_REGISTER_TIMEOUT / 1000);
-> +			err = -ETIMEDOUT;
-> +			goto error;
-
-Without de-registering stuff ?
-
- +
-> +/** hci_tty_read Function
-> + *
-> + *  Parameters :
-> + *  @file  : File pointer for BT char driver
-> + *  @data  : Data which needs to be passed to APP
-> + *  @size  : Length of the data passesd
-> + *  offset :
-> + *  Returns  Size of packet received -  on success
-> + *           else suitable error code
-> + */
-> +ssize_t hci_tty_read(struct file *file, char __user *data, size_t size,
-> +		     loff_t *offset)
-> +{
-> +	int len = 0, tout;
-> +	struct sk_buff *skb = NULL, *rskb = NULL;
-> +	struct ti_st	*hst;
-> +
-> +	pr_debug("inside %s (%p, %p, %u, %p)\n",
-> +		 __func__, file, data, size, offset);
-> +
-> +	/* Validate input parameters */
-> +	if ((NULL == file) || (((NULL == data) || (0 == size)))) {
-> +		pr_err("Invalid input params passed to %s", __func__);
-> +		return -EINVAL;
-> +	}
-
-Why ... if they are broken here then the kernel is already crashed.
-
-> +
-> +	hst = file->private_data;
-> +
-> +	/* cannot come here if poll-ed before reading
-> +	 * if not poll-ed wait on the same wait_q
-> +	 */
-> +	tout = wait_event_interruptible_timeout(hst->data_q,
-> +						!skb_queue_empty(&hst->rx_list),
-> +						msecs_to_jiffies(1000));
-> +	/* Check for timed out condition */
-> +	if (0 == tout) {
-> +		pr_err("Device Read timed out\n");
-> +		return -ETIMEDOUT;
-> +	}
-> +
-> +	/* hst->rx_list not empty skb already present */
-> +	skb = skb_dequeue(&hst->rx_list);
-> +	if (!skb) {
-> +		pr_err("dequed skb is null?\n");
-> +		return -EIO;
-> +	}
-> +
-> +#ifdef VERBOSE
-> +	print_hex_dump(KERN_INFO, ">in>", DUMP_PREFIX_NONE,
-> +		       16, 1, skb->data, skb->len, 0);
-> +#endif
-> +
-> +	/* Forward the data to the user */
-> +	if (skb->len >= size) {
-> +		pr_err("FIONREAD not done before read\n");
-> +		return -ENOMEM;
-
-Even if the user did an FIONREAD this wouldn't work with two threads.
-ENOMEM is a nonsense return for it
-The semantics of read/write on a tty are not those you have implemented
-You don't want to allow users to fill the log with error messages
-
-
-> +	}
-> +	/* returning skb */
-> +	rskb = alloc_skb(size, GFP_KERNEL);
-> +	if (!rskb)
-> +		return -ENOMEM;
-> +
-> +	/* cb[0] has the pkt_type 0x04 or 0x02 or 0x03 */
-> +	memcpy(skb_put(rskb, 1), &skb->cb[0], 1);
-> +	memcpy(skb_put(rskb, skb->len), skb->data, skb->len);
-> +
-> +	if (copy_to_user(data, rskb->data, rskb->len)) {
-> +		pr_err("unable to copy to user space\n");
-
-Same problem with error messages
-
-> +		/* Queue the skb back to head */
-> +		skb_queue_head(&hst->rx_list, skb);
-
-You've just re-ordered your list if threaded
-
-
-> +/** hci_tty_ioctl Function
-> + *  This will peform the functions as directed by the command and command
-> + *  argument.
-> + *
-> + *  Parameters :
-> + *  @file  : File pointer for BT char driver
-> + *  @cmd   : IOCTL Command
-> + *  @arg   : Command argument for IOCTL command
-> + *  Returns  0 on success
-> + *           else suitable error code
-> + */
-> +static long hci_tty_ioctl(struct file *file,
-> +			  unsigned int cmd, unsigned long arg)
-> +{
-> +	struct sk_buff *skb = NULL;
-> +	int		retcode = 0;
-> +	struct ti_st	*hst;
-> +
-> +	pr_debug("inside %s (%p, %u, %lx)", __func__, file, cmd, arg);
-> +
-> +	/* Validate input parameters */
-> +	if ((NULL == file) || (0 == cmd)) {
-> +		pr_err("invalid input parameters passed to %s", __func__);
-> +		return -EINVAL;
-> +	}
-
-More nonsense validation
-> +
-> +	hst = file->private_data;
-> +
-> +	switch (cmd) {
-> +	case FIONREAD:
-> +		/* Deque the SKB from the head if rx_list is not empty
-> +		 * update the argument with skb->len to provide amount of data
-> +		 * available in the available SKB +1 for the PKT_TYPE
-> +		 * field not provided in data by TI-ST.
-> +		 */
-> +		skb = skb_dequeue(&hst->rx_list);
-> +		if (skb) {
-> +			*(unsigned int *)arg = skb->len + 1;
-
-arg is in userspace is it not - if so you've just added some interesting
-holes because you should be using the proper user access functions.
-
-> +			/* Re-Store the SKB for furtur Read operations */
-> +			skb_queue_head(&hst->rx_list, skb);
-
-Re-ordering problems again here.
-
-> +		} else {
-> +			*(unsigned int *)arg = 0;
-> +		}
-> +		pr_debug("returning %d\n", *(unsigned int *)arg);
-> +		break;
-> +	default:
-> +		pr_debug("Un-Identified IOCTL %d", cmd);
-> +		retcode = 0;
-> +		break;
-> +	}
-> +
-> +	return retcode;
-> +}
-> +
-> +/** hci_tty_poll Function
-> + *  This function will wait till some data is received to the hci_tty driver from ST
-> + *
-> + *  Parameters :
-> + *  @file  : File pointer for BT char driver
-> + *  @wait  : POLL wait information
-> + *  Returns  status of POLL on success
-> + *           else suitable error code
-> + */
-> +static unsigned int hci_tty_poll(struct file *file, poll_table *wait)
-> +{
-> +	struct ti_st	*hst = file->private_data;
-> +	unsigned long mask = 0;
-> +
-> +	pr_debug("@ %s\n", __func__);
-> +
-> +	/* wait to be completed by st_receive */
-> +	poll_wait(file, &hst->data_q, wait);
-> +	pr_debug("poll broke\n");
-
-Why "broke" ?
-
-> +
-> +	if (!skb_queue_empty(&hst->rx_list)) {
-> +		pr_debug("rx list que !empty\n");
-> +		mask |= POLLIN;	/* TODO: check app for mask */
-> +	}
-> +
-
-Alan
+>
+> If the hci_register_dev is called which in fact triggers hdev->setup to d=
+eal with vendor specific firmware path, then it means the driver just went =
+through its probe() phase again. How would the driver differentiate this fr=
+om any hot plug event. So to say this is a driver problem is just plain stu=
+pid. The driver does not know we are ending up in a reset_resume use case o=
+r when ACPI/BIOS decides to emulate an USB disconnect.
+>
+> Regards
+>
+> Marcel
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" i=
+n
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
