@@ -1,100 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Florian Grandel <fgrandel@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 00/17] BlueZ/Bluetooth: Multi-advertising infrastructure
-Date: Thu, 30 Apr 2015 17:33:03 +0200
-Message-Id: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
-In-Reply-To: <1428633041-18415-1-git-send-email-fgrandel@gmail.com>
-References: <1428633041-18415-1-git-send-email-fgrandel@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] Bluetooth: Add tty HCI driver
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CFED3E0323D4A34CA12CA6A6CB42014223C43FEE@DFRE01.ent.ti.com>
+Date: Thu, 30 Apr 2015 08:19:23 -0700
+Cc: "Reizer, Eyal" <eyalr@ti.com>,
+	One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>,
+	Eyal Reizer <eyalreizer@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Pavan Savoy <pavan_savoy@ti.com>,
+	"Mahaveer, Vishal" <vishalm@ti.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <3872C987-6698-4BB2-AA97-AC329CCD930D@holtmann.org>
+References: <1430380089-2395-1-git-send-email-eyalr@ti.com> <20150430113103.3ad0bfac@lxorguk.ukuu.org.uk> <2A731A0F-6BEB-4614-94E8-90B28BEE2DD9@holtmann.org> <8665E2433BC68541A24DFFCA87B70F5B2365DFEB@DFRE01.ent.ti.com> <E924CD28-8A0C-4F39-AA87-D97185B68786@holtmann.org> <CFED3E0323D4A34CA12CA6A6CB42014223C43FEE@DFRE01.ent.ti.com>
+To: "Ziv, Dotan" <dotanz@ti.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a patch set introducing the infrastructure for multi-advertising
-capability to the HCI core and mgmt API.
+Hi Dotan,
 
-v1 -> v2:
-- add missing braces in read_adv_features()
+>>>>>> tty_hci driver exposes a /dev/hci_tty character device node, that
+>>>>>> intends to emulate a generic /dev/ttyX device that would be used by
+>>>>>> the user-space Bluetooth stacks to send/receive data to/from the WL
+>>>>>> combo-connectivity chipsets.
+>>>>> 
+>>>>> We have an in kernel bluetooth stack, why do we care about this -
+>>>>> how will people test and debug driver interactions with binary only
+>>>>> bluetooth stacks in userspace ?
+>>>> 
+>>>> NAK to this driver.
+>>>> 
+>>>> If you want to run an external Bluetooth stack, then use HCI User
+>>>> Channel. The functionality already exists.
+>>> 
+>>> This is a pretty old driver that has been written a couple of years back and is
+>> being used by customers (including android that use a userspace based stack).
+>>> If there is another driver already available that provides same functionality,
+>> of course we will be happy to use it instead.
+>>> Any idea of where we can get info on the HCI User Channel?
+>> 
+>> search for my BlueZ for Android presentation from Android Builders Summit
+>> from 2014. It has an explanation on how HCI User Channel works.
+>> 
+>> Otherwise look into bluez.git since it contains a bunch of examples on how to
+>> use the HCI User Channel. It is a generic functionality for raw access to the HCI
+>> layer. Look for HCI_CHANNEL_USER.
+>> 
+>>>> We do not want to have two drivers for the same hardware. Work with
+>>>> the Bluetooth stack that is present in the kernel and please stop hacking
+>> around it.
+>>>> 
+>>> There are in fact quite a few products that use commercial user space based
+>> Bluetooth stacks.
+>>> One reason is that bluez has not been certified but I assume they have
+>> other reasons as well.
+>> 
+>> Please stop this FUD. BlueZ has been qualified multiple times.
+>> 
+>> And let me tell you this, when doing BlueZ for Android, we went through a
+>> lengthy period of qualification and fixing PTS with 65 errata today. I don't
+>> know if any commercial stack was actually such a good citizen in ensuring that
+>> the certification tools get fixed. And we documented all of it.
+>> 
+> 
+> No argue here, as a matter of fact, we (TI) certified BlueZ several times in the past. Our customers are using large variety of Kernel versions and might use a different version of BlueZ. Our BQE requested us to certify the stack per kernel and per BlueZ version which is practically impossible (due to certification costs and the time it takes). 
+> If you are familiar with a way to bypass it, that would be great.
 
-v2 -> v3:
-- split change-set into several patches
-- replace err == 0 by !err
-- fix coding style problems
+that is why we documented everything for BlueZ for Android in such detail so that the whole host stack can be qualified using PTS. It still means that you have to run 1000+ test cases, but at least you have the full documentation with detailed instructions for it.
 
-v3 -> v4:
-publicly visible change:
-- when calling remove_advertising with an instance value of zero (i.e.
-  remove all instances), the command response also returns an instance
-  value of zero now as it doesn't make sense to return a single instance
-  id when removing several instances
+Automating PTS is work in progress actually. So that you can just start the process and once it is done, you get your evidence for qualification.
 
-refactoring and fixes (due to Arman's review):
-- splitting the change set into a much larger number of patches to
-  facilitate review
-- use HCI_MAX_ADV_INSTANCES in the same patch that introduces it
-- use adv_info->hdev in the same patch that introduces it
-- make the logic of hci_find_adv_instance() more readable
-- make sure that hci_find_adv_instance() is called while hci_dev is
-  locked
-- replace hci_num_adv_instances() by an instance counter in hci_dev
-- add inline comment in get_adv_instance_flags() explaining its return
-  value in the error case
-- generate zero-length adv data if the current instance identifier is
-  invalid
-- revert erroneous changes to the logic in clear_adv_instance()
-- use hci_adv_instances_clear() in clear_adv_instance() when removing
-  all advertising instances also removing a reduntant error check
-- inserting TODO messages to make sure that advertising will not be
-  switched off prematurely once we allow more than one advertising
-  instance
-- inserting TODO messages to make sure that multiple advertising
-  instances will be advertised in a round-robin fashion once we allow
-  for more than one advertising instance
-- identify peding advertising instances (just added but not yet
-  confirmed in add_advertising_complete) by a boolean flag in the
-  adv_info struct so that we can identify and remove them even when
-  the pending add_advertising command cannot be retrieved for some
-  reason - makes sure that we do not lead advertising instances in this
-  case
-- only send HCI commands to update advertising data when a new instance
-  has actually been added
+Regards
 
-
-
-Userland:
-
-Florian Grandel (1):
-  tools/mgmt_tester: expect 0 rp when removing all adv inst
-
- tools/mgmt-tester.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-
-
-Kernel:
-
-Florian Grandel (16):
-  Bluetooth: hci_core: Introduce multi-adv inst list
-  Bluetooth: mgmt: dry update_scan_rsp_data()
-  Bluetooth: mgmt: multi adv for read_adv_features()
-  Bluetooth: mgmt: multi adv for get_current_adv_instance()
-  Bluetooth: mgmt: multi adv for get_adv_instance_flags()
-  Bluetooth: mgmt: improve get_adv_instance_flags() readability
-  Bluetooth: mgmt: multi adv for enable_advertising()
-  Bluetooth: mgmt: use current adv instance in set_advertising()
-  Bluetooth: mgmt: multi adv for create_instance_scan_rsp_data()
-  Bluetooth: mgmt: multi adv for create_instance_adv_data()
-  Bluetooth: mgmt: refactor update_*_data()
-  Bluetooth: mgmt: multi adv for set_advertising_complete()
-  Bluetooth: mgmt: multi adv for add_advertising()
-  Bluetooth: mgmt: multi adv for clear_adv_instances()
-  Bluetooth: multi adv for remove_advertising()
-  Bluetooth: hci_core: Remove obsolete adv_instance
-
- include/net/bluetooth/hci_core.h |  22 ++-
- net/bluetooth/hci_core.c         | 113 ++++++++++++-
- net/bluetooth/mgmt.c             | 352 ++++++++++++++++++++++-----------------
- 3 files changed, 328 insertions(+), 159 deletions(-)
-
--- 
-1.9.1
+Marcel
 
