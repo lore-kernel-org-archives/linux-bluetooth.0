@@ -2,63 +2,99 @@ Return-Path: <cyrus@holtmann.org>
 From: Petri Gynther <pgynther@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: luiz.dentz@gmail.com
-Subject: [PATCH v2 2/3] hog: enable HoG report notifications only after uHID is ready
-Message-Id: <20150430214010.B4E29220C1B@puck.mtv.corp.google.com>
-Date: Thu, 30 Apr 2015 14:40:10 -0700 (PDT)
+Subject: [PATCH v2 1/3] hog: rework HoG report notifications enable
+Message-Id: <20150430214001.50CB1220C1B@puck.mtv.corp.google.com>
+Date: Thu, 30 Apr 2015 14:40:01 -0700 (PDT)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HoG report notifications should be enabled only after the uHID device
-has been created. uHID layer cannot process HoG reports any earlier.
+1. Store HoG report CCC handle in the report data structure, so that
+   it can be used when needed.
+2. Rename write_ccc() to enable_report_notifications().
+3. In enable_report_notifications():
+   - first register the callback for HoG report notifications
+   - then enable the notifications on the HoG device
+4. In report_ccc_written_cb():
+   - improve the emitted messages
 ---
- profiles/input/hog.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ profiles/input/hog.c | 39 +++++++++++++++++++++++++--------------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
 
 diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index 5661e39..ff0c559 100644
+index 3d23d5b..5661e39 100644
 --- a/profiles/input/hog.c
 +++ b/profiles/input/hog.c
-@@ -83,6 +83,7 @@ struct hog_device {
- 	struct gatt_primary	*hog_primary;
- 	GSList			*reports;
- 	struct bt_uhid		*uhid;
-+	gboolean		uhid_created;
- 	gboolean		has_report_id;
- 	uint16_t		bcdhid;
- 	uint8_t			bcountrycode;
-@@ -168,6 +169,9 @@ static void enable_report_notifications(struct report *report,
- 	struct hog_device *hogdev = report->hogdev;
- 	uint8_t value[2];
- 
-+	if (!hogdev->uhid_created)
-+		return;
-+
- 	if (!report->ccc_handle)
- 		return;
- 
-@@ -627,6 +631,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	ssize_t vlen;
- 	char itemstr[20]; /* 5x3 (data) + 4 (continuation) + 1 (null) */
- 	int i, err;
-+	GSList *l;
+@@ -98,6 +98,7 @@ struct hog_device {
+ struct report {
+ 	uint8_t			id;
+ 	uint8_t			type;
++	uint16_t		ccc_handle;
+ 	guint			notifyid;
+ 	struct gatt_char	*decl;
+ 	struct hog_device	*hogdev;
+@@ -150,30 +151,39 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data)
+ {
+ 	struct report *report = user_data;
+-	struct hog_device *hogdev = report->hogdev;
  
  	if (status != 0) {
- 		error("Report Map read failed: %s", att_ecode2str(status));
-@@ -696,6 +701,14 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	bt_uhid_register(hogdev->uhid, UHID_OUTPUT, forward_report, hogdev);
- 	bt_uhid_register(hogdev->uhid, UHID_SET_REPORT, set_report, hogdev);
- 	bt_uhid_register(hogdev->uhid, UHID_GET_REPORT, get_report, hogdev);
+-		error("Write report characteristic descriptor failed: %s",
+-							att_ecode2str(status));
++		error("Report 0x%04x CCC write failed: %s",
++				report->decl->handle, att_ecode2str(status));
+ 		return;
+ 	}
+ 
++	DBG("Report 0x%04x CCC written: notifications enabled",
++							report->decl->handle);
++}
 +
-+	hogdev->uhid_created = TRUE;
++static void enable_report_notifications(struct report *report,
++							bool enable_on_device)
++{
++	struct hog_device *hogdev = report->hogdev;
++	uint8_t value[2];
 +
-+	for (l = hogdev->reports; l; l = l->next) {
-+		struct report *r = l->data;
++	if (!report->ccc_handle)
++		return;
 +
-+		enable_report_notifications(r, true);
-+	}
++	/* Register callback for HoG report notifications */
+ 	report->notifyid = g_attrib_register(hogdev->attrib,
+ 					ATT_OP_HANDLE_NOTIFY,
+ 					report->decl->value_handle,
+ 					report_value_cb, report, NULL);
+ 
+-	DBG("Report characteristic descriptor written: notifications enabled");
+-}
+-
+-static void write_ccc(uint16_t handle, gpointer user_data)
+-{
+-	struct report *report = user_data;
+-	struct hog_device *hogdev = report->hogdev;
+-	uint8_t value[] = { 0x01, 0x00 };
++	if (!enable_on_device)
++		return;
+ 
+-	gatt_write_char(hogdev->attrib, handle, value, sizeof(value),
+-					report_ccc_written_cb, report);
++	/* Enable HoG report notifications on the HoG device */
++	put_le16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
++	gatt_write_char(hogdev->attrib, report->ccc_handle, value,
++				sizeof(value), report_ccc_written_cb, report);
  }
  
- static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ static void report_reference_cb(guint8 status, const guint8 *pdu,
+@@ -220,7 +230,8 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 		switch (desc->uuid16) {
+ 		case GATT_CLIENT_CHARAC_CFG_UUID:
+ 			report = user_data;
+-			write_ccc(desc->handle, report);
++			report->ccc_handle = desc->handle;
++			enable_report_notifications(report, true);
+ 			break;
+ 		case GATT_REPORT_REFERENCE:
+ 			report = user_data;
 -- 
 2.2.0.rc0.207.ga3a616c
 
