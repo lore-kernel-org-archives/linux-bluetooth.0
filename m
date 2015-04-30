@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 03/17] Bluetooth: mgmt: dry update_scan_rsp_data()
-Date: Thu, 30 Apr 2015 17:33:06 +0200
-Message-Id: <1430408000-17785-4-git-send-email-fgrandel@gmail.com>
+Subject: [BlueZ v4 01/17] tools/mgmt_tester: expect 0 rp when removing all adv inst
+Date: Thu, 30 Apr 2015 17:33:04 +0200
+Message-Id: <1430408000-17785-2-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
 References: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1428633041-18415-1-git-send-email-fgrandel@gmail.com>
@@ -11,80 +11,35 @@ References: <1428633041-18415-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-update_scan_rsp_data() duplicates code from get_current_adv_instance().
-This is being fixed by letting the former make use of the latter.
+The kernel would previously return a hard coded instance value of 0x01
+even when removing multiple advertising instances. This was ok as long
+as we only had a single advertising instance but no longer makes sense
+now that we allow for multiple advertising instances.
 
-Signed-off-by: Florian Grandel <fgrandel@gmail.com>
+We therefore expect the mgmt API to return zero when multiple instances
+have been removed. This corresponds to the semantics of the mgmt API
+call made in the first place.
+
+The corresponding test is updated to reflect that logic.
 ---
- net/bluetooth/mgmt.c | 41 +++++++++++++++--------------------------
- 1 file changed, 15 insertions(+), 26 deletions(-)
+ tools/mgmt-tester.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ce25b6d..9dc4905 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -832,6 +832,20 @@ static struct mgmt_pending_cmd *pending_find_data(u16 opcode,
- 	return mgmt_pending_find_data(HCI_CHANNEL_CONTROL, opcode, hdev, data);
- }
- 
-+static u8 get_current_adv_instance(struct hci_dev *hdev)
-+{
-+	/* The "Set Advertising" setting supersedes the "Add Advertising"
-+	 * setting. Here we set the advertising data based on which
-+	 * setting was set. When neither apply, default to the global settings,
-+	 * represented by instance "0".
-+	 */
-+	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
-+	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
-+		return 0x01;
-+
-+	return 0x00;
-+}
-+
- static u8 create_default_scan_rsp_data(struct hci_dev *hdev, u8 *ptr)
- {
- 	u8 ad_len = 0;
-@@ -901,18 +915,7 @@ static void update_scan_rsp_data_for_instance(struct hci_request *req,
- static void update_scan_rsp_data(struct hci_request *req)
- {
- 	struct hci_dev *hdev = req->hdev;
--	u8 instance;
--
--	/* The "Set Advertising" setting supersedes the "Add Advertising"
--	 * setting. Here we set the scan response data based on which
--	 * setting was set. When neither apply, default to the global settings,
--	 * represented by instance "0".
--	 */
--	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
--	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
--		instance = 0x01;
--	else
--		instance = 0x00;
-+	u8 instance = get_current_adv_instance(hdev);
- 
- 	update_scan_rsp_data_for_instance(req, instance);
- }
-@@ -941,20 +944,6 @@ static u8 get_adv_discov_flags(struct hci_dev *hdev)
- 	return 0;
- }
- 
--static u8 get_current_adv_instance(struct hci_dev *hdev)
--{
--	/* The "Set Advertising" setting supersedes the "Add Advertising"
--	 * setting. Here we set the advertising data based on which
--	 * setting was set. When neither apply, default to the global settings,
--	 * represented by instance "0".
--	 */
--	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
--	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
--		return 0x01;
--
--	return 0x00;
--}
--
- static bool get_connectable(struct hci_dev *hdev)
- {
- 	struct mgmt_pending_cmd *cmd;
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index c0f58ce..4c62a6b 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -4465,8 +4465,8 @@ static const struct generic_data remove_advertising_success_2 = {
+ 	.send_param = remove_advertising_param_2,
+ 	.send_len = sizeof(remove_advertising_param_2),
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_param = remove_advertising_param_1,
+-	.expect_len = sizeof(remove_advertising_param_1),
++	.expect_param = remove_advertising_param_2,
++	.expect_len = sizeof(remove_advertising_param_2),
+ 	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
+ 	.expect_alt_ev_param = advertising_instance_param,
+ 	.expect_alt_ev_len = sizeof(advertising_instance_param),
 -- 
 1.9.1
 
