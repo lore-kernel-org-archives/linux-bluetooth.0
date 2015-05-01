@@ -1,105 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1430322370.2268.12.camel@gmail.com>
-Subject: Re: [RFCv1 14/20] android/avdtp: Add set vendor codec function
-From: chanten <chanyeol.park@gmail.com>
-To: luiz.von.dentz@intel.com
-Cc: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-In-Reply-To: <1425049388-18333-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1425049388-18333-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	 <1425049388-18333-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 30 Apr 2015 00:46:10 +0900
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1430347796-9771-1-git-send-email-jamuraa@chromium.org>
+References: <1430347796-9771-1-git-send-email-jamuraa@chromium.org>
+Date: Thu, 30 Apr 2015 19:27:54 -0700
+Message-ID: <CAHrH25TmUA3Lg1NECqTQLoMnJ_OcT=_fJSkVuLn2E6mmLruqrQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core/advertising: Don't expose with no kernel support
+From: Arman Uguray <armansito@chromium.org>
+To: Michael Janssen <jamuraa@chromium.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, 
-On Fri, 2015-02-27 at 17:03 +0200, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
+Hi Michael,
+
+> On Wed, Apr 29, 2015 at 3:49 PM, Michael Janssen <jamuraa@chromium.org> wrote:
+> Currently we expose LEAdvertisingManager1 even if there isn't kernel
+> support for the MGMT command which implements the feature.  This changes
+> it to be registered after we confirm with MGMT that both Add Advertising
+> is available and that a non-zero number of advertisements can be added.
 > ---
->  profiles/audio/avdtp.c | 22 ++++++++++++++++++++++
->  profiles/audio/avdtp.h |  2 ++
->  2 files changed, 24 insertions(+)
-> 
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 6132c13..c396e8f 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -49,6 +49,7 @@
->  #include "src/adapter.h"
->  #include "src/device.h"
->  
-> +#include "../profiles/audio/a2dp-codecs.h"
->  #include "avdtp.h"
->  #include "a2dp.h"
->  #include "sink.h"
-> @@ -330,6 +331,8 @@ struct avdtp_local_sep {
->  	struct avdtp_stream *stream;
->  	struct seid_info info;
->  	uint8_t codec;
-> +	uint32_t vndcodec_vendor;
-> +	uint16_t vndcodec_codec;
->  	gboolean delay_reporting;
->  	GSList *caps;
->  	struct avdtp_sep_ind *ind;
-> @@ -1274,6 +1277,18 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
->  		if (codec_data->media_codec_type != lsep->codec)
->  			continue;
->  
-> +		/* FIXME: Add Vendor Specific Codec match to SEP callback */
-> +		if (lsep->codec == A2DP_CODEC_VENDOR) {
-> +			a2dp_vendor_codec_t *vndcodec =
-> +						(void *) codec_data->data;
+>  src/advertising.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+>
+> diff --git a/src/advertising.c b/src/advertising.c
+> index cd78584..0eb489a 100644
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -730,6 +730,16 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
+>
+>         manager->max_adv_len = feat->max_adv_data_len;
+>         manager->max_ads = feat->max_instances;
 > +
-> +			if (btohl(vndcodec->vendor_id) != lsep->vndcodec_vendor)
-> +				continue;
+> +       if (manager->max_ads == 0)
+> +               return;
 > +
-> +			if (btohs(vndcodec->codec_id) != lsep->vndcodec_codec)
-> +				continue;
-> +		}
-> +
->  		if (sep->stream == NULL)
->  			return sep;
->  	}
-> @@ -3753,6 +3768,13 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
->  	return sep;
+> +       if (!g_dbus_register_interface(btd_get_dbus_connection(),
+> +                                       adapter_get_path(manager->adapter),
+> +                                       LE_ADVERTISING_MGR_IFACE,
+> +                                       methods, NULL, NULL, manager,
+> +                                       advertising_manager_destroy))
+> +               error("Failed to register " LE_ADVERTISING_MGR_IFACE);
 >  }
->  
-> +void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
-> +							uint16_t codec_id)
-> +{
-> +	sep->vndcodec_vendor = vendor_id;
-> +	sep->vndcodec_codec = codec_id;
-> +}
-> +
->  int avdtp_unregister_sep(struct queue *lseps, struct avdtp_local_sep *sep)
->  {
->  	if (!sep)
-> diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-> index af55f76..0fc8fe2 100644
-> --- a/profiles/audio/avdtp.h
-> +++ b/profiles/audio/avdtp.h
-> @@ -282,6 +282,8 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
->  						struct avdtp_sep_ind *ind,
->  						struct avdtp_sep_cfm *cfm,
->  						void *user_data);
-> +void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
-> +							uint16_t codec_id);
->  
->  /* Find a matching pair of local and remote SEP ID's */
->  struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+>
+>  static struct btd_advertising *
+> @@ -761,16 +771,6 @@ advertising_manager_create(struct btd_adapter *adapter)
+>                 return NULL;
+>         }
+>
+> -       if (!g_dbus_register_interface(btd_get_dbus_connection(),
+> -                                               adapter_get_path(adapter),
+> -                                               LE_ADVERTISING_MGR_IFACE,
+> -                                               methods, NULL, NULL, manager,
+> -                                               advertising_manager_destroy)) {
+> -               error("Failed to register " LE_ADVERTISING_MGR_IFACE);
+> -               free(manager);
+> -               return NULL;
+> -       }
+> -
+>         manager->ads = queue_new();
+>
+>         manager->next_instance_id = 1;
+> --
+> 2.2.0.rc0.207.ga3a616c
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I find out that bluez a2dp also do not work fine in case of multiple
-vendor codecs in remote. So I think bluez also needs this android bluez
-patch.
+Pushed.
 
-Originally I consider to use check_vendor(profile/audio/a2dp.c)function
-from avdtp_find_remote_sep. but it does not seem good to me.
-
-Could you give us the guidance?
-
-Thanks
-Chanyeol
-
+Thanks,
+Arman
