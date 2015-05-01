@@ -1,66 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1430347796-9771-1-git-send-email-jamuraa@chromium.org>
-References: <1430347796-9771-1-git-send-email-jamuraa@chromium.org>
-Date: Thu, 30 Apr 2015 19:27:54 -0700
-Message-ID: <CAHrH25TmUA3Lg1NECqTQLoMnJ_OcT=_fJSkVuLn2E6mmLruqrQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/advertising: Don't expose with no kernel support
+In-Reply-To: <20150430214001.50CB1220C1B@puck.mtv.corp.google.com>
+References: <20150430214001.50CB1220C1B@puck.mtv.corp.google.com>
+Date: Thu, 30 Apr 2015 18:53:05 -0700
+Message-ID: <CAHrH25R6EhPE=p2xtyE4rBoc4pYjo4MGaP_kXfDihAkt2ZZTLQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] hog: rework HoG report notifications enable
 From: Arman Uguray <armansito@chromium.org>
-To: Michael Janssen <jamuraa@chromium.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+To: Petri Gynther <pgynther@google.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michael,
+Hi Petri,
 
-> On Wed, Apr 29, 2015 at 3:49 PM, Michael Janssen <jamuraa@chromium.org> wrote:
-> Currently we expose LEAdvertisingManager1 even if there isn't kernel
-> support for the MGMT command which implements the feature.  This changes
-> it to be registered after we confirm with MGMT that both Add Advertising
-> is available and that a non-zero number of advertisements can be added.
+> On Thu, Apr 30, 2015 at 2:40 PM, Petri Gynther <pgynther@google.com> wrote:
+> 1. Store HoG report CCC handle in the report data structure, so that
+>    it can be used when needed.
+> 2. Rename write_ccc() to enable_report_notifications().
+> 3. In enable_report_notifications():
+>    - first register the callback for HoG report notifications
+>    - then enable the notifications on the HoG device
+> 4. In report_ccc_written_cb():
+>    - improve the emitted messages
 > ---
->  src/advertising.c | 20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
+>  profiles/input/hog.c | 39 +++++++++++++++++++++++++--------------
+>  1 file changed, 25 insertions(+), 14 deletions(-)
 >
-> diff --git a/src/advertising.c b/src/advertising.c
-> index cd78584..0eb489a 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -730,6 +730,16 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
+> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> index 3d23d5b..5661e39 100644
+> --- a/profiles/input/hog.c
+> +++ b/profiles/input/hog.c
+> @@ -98,6 +98,7 @@ struct hog_device {
+>  struct report {
+>         uint8_t                 id;
+>         uint8_t                 type;
+> +       uint16_t                ccc_handle;
+>         guint                   notifyid;
+>         struct gatt_char        *decl;
+>         struct hog_device       *hogdev;
+> @@ -150,30 +151,39 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+>                                         guint16 plen, gpointer user_data)
+>  {
+>         struct report *report = user_data;
+> -       struct hog_device *hogdev = report->hogdev;
 >
->         manager->max_adv_len = feat->max_adv_data_len;
->         manager->max_ads = feat->max_instances;
-> +
-> +       if (manager->max_ads == 0)
-> +               return;
-> +
-> +       if (!g_dbus_register_interface(btd_get_dbus_connection(),
-> +                                       adapter_get_path(manager->adapter),
-> +                                       LE_ADVERTISING_MGR_IFACE,
-> +                                       methods, NULL, NULL, manager,
-> +                                       advertising_manager_destroy))
-> +               error("Failed to register " LE_ADVERTISING_MGR_IFACE);
->  }
->
->  static struct btd_advertising *
-> @@ -761,16 +771,6 @@ advertising_manager_create(struct btd_adapter *adapter)
->                 return NULL;
+>         if (status != 0) {
+> -               error("Write report characteristic descriptor failed: %s",
+> -                                                       att_ecode2str(status));
+> +               error("Report 0x%04x CCC write failed: %s",
+> +                               report->decl->handle, att_ecode2str(status));
+>                 return;
 >         }
 >
-> -       if (!g_dbus_register_interface(btd_get_dbus_connection(),
-> -                                               adapter_get_path(adapter),
-> -                                               LE_ADVERTISING_MGR_IFACE,
-> -                                               methods, NULL, NULL, manager,
-> -                                               advertising_manager_destroy)) {
-> -               error("Failed to register " LE_ADVERTISING_MGR_IFACE);
-> -               free(manager);
-> -               return NULL;
-> -       }
-> -
->         manager->ads = queue_new();
+> +       DBG("Report 0x%04x CCC written: notifications enabled",
+> +                                                       report->decl->handle);
+> +}
+> +
+> +static void enable_report_notifications(struct report *report,
+> +                                                       bool enable_on_device)
+> +{
+> +       struct hog_device *hogdev = report->hogdev;
+> +       uint8_t value[2];
+> +
+> +       if (!report->ccc_handle)
+> +               return;
+> +
+> +       /* Register callback for HoG report notifications */
+>         report->notifyid = g_attrib_register(hogdev->attrib,
+>                                         ATT_OP_HANDLE_NOTIFY,
+>                                         report->decl->value_handle,
+>                                         report_value_cb, report, NULL);
 >
->         manager->next_instance_id = 1;
+> -       DBG("Report characteristic descriptor written: notifications enabled");
+> -}
+> -
+> -static void write_ccc(uint16_t handle, gpointer user_data)
+> -{
+> -       struct report *report = user_data;
+> -       struct hog_device *hogdev = report->hogdev;
+> -       uint8_t value[] = { 0x01, 0x00 };
+> +       if (!enable_on_device)
+> +               return;
+>
+> -       gatt_write_char(hogdev->attrib, handle, value, sizeof(value),
+> -                                       report_ccc_written_cb, report);
+> +       /* Enable HoG report notifications on the HoG device */
+> +       put_le16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
+> +       gatt_write_char(hogdev->attrib, report->ccc_handle, value,
+> +                               sizeof(value), report_ccc_written_cb, report);
+>  }
+>
+>  static void report_reference_cb(guint8 status, const guint8 *pdu,
+> @@ -220,7 +230,8 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+>                 switch (desc->uuid16) {
+>                 case GATT_CLIENT_CHARAC_CFG_UUID:
+>                         report = user_data;
+> -                       write_ccc(desc->handle, report);
+> +                       report->ccc_handle = desc->handle;
+> +                       enable_report_notifications(report, true);
+>                         break;
+>                 case GATT_REPORT_REFERENCE:
+>                         report = user_data;
 > --
 > 2.2.0.rc0.207.ga3a616c
 >
@@ -69,7 +111,7 @@ Hi Michael,
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Pushed.
+I've tested and applied all 3 patches in this set.
 
 Thanks,
 Arman
