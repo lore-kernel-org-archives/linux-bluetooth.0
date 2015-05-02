@@ -1,33 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Volkov Aleksey <avv@kupivip.ru>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] add new device for fixed bug 60901
-Date: Sun, 03 May 2015 16:33:22 +0300
-Message-ID: <2051896.tGxFBs1H7o@it1765>
+Message-ID: <554504B2.1050404@gmail.com>
+Date: Sat, 02 May 2015 20:09:06 +0300
+From: Dmitry Tunin <hanipouspilot@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: No firmware for some AR3012 chips
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
-That patch fix bug https://bugzilla.kernel.org/show_bug.cgi?id=60901 for my Roper Class 1 dongle
+Please look at https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1024884
 
-Signed-off-by: Aleksei Volkov <info@dv2c.ru>
----
- drivers/bluetooth/btusb.c | 1+
- 1 file changed, 1 insertion(+), 0 deletion(-)
+It looks like ath3k is looking for some different firmware files.
+AthrBT_0x11020100.dfu
+ramps_0x11020100_40.dfu
 
-diff -up linux-4.0.0-gentoo/drivers/bluetooth/btusb.c.orig linux-4.0.0-gentoo/drivers/bluetooth/btusb.c 
---- linux-4.0.0/drivers/bluetooth/btusb.c.orig	2015-05-01 12:06:59.000000000 +0300
-+++ linux-4.0.0/drivers/bluetooth/btusb.c	2015-05-01 12:02:00.000000000 +0300
-@@ -254,6 +254,7 @@ static const struct usb_device_id blackl
- 
- 	/* Roper Class 1 Bluetooth Dongle (Silicon Wave based) */
- 	{ USB_DEVICE(0x1300, 0x0001), .driver_info = BTUSB_SWAVE },
-+	{ USB_DEVICE(0x1310, 0x0001), .driver_info = BTUSB_SWAVE },
- 
- 	/* Digianswer devices */
- 	{ USB_DEVICE(0x08fd, 0x0001), .driver_info = BTUSB_DIGIANSWER },
--- 
+Linux-firmware does not contain these files. It must be some new version of the firmware.
+And should a patch for this device is sent?
 
+Regards,
 
+Dmitry
