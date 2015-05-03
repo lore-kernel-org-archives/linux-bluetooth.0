@@ -1,81 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 May 2015 12:21:54 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth 2015-05-04
-Message-ID: <20150504092154.GA9096@t440s.lan>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cNdxnHkX5QqsyA0e"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] add new device for fixed bug 60901
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <2051896.tGxFBs1H7o@it1765>
+Date: Sun, 3 May 2015 08:38:38 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <65A90F2F-1E02-486F-9CE6-C1CFE45502BA@holtmann.org>
+References: <2051896.tGxFBs1H7o@it1765>
+To: Volkov Aleksey <avv@kupivip.ru>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Aleksei,
 
---cNdxnHkX5QqsyA0e
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+the subject line needs to read "[PATCH] Bluetooth: btusb: " as prefix so we can clearly identify where this belong to. Also stating a random bug number in the subject is useless, refer to the device in question.
 
-Hi Dave,
+> That patch fix bug https://bugzilla.kernel.org/show_bug.cgi?id=60901 for my Roper Class 1 dongle
 
-Here are a couple of important Bluetooth & mac802154 fixes for 4.1:
+You need to include the output of /sys/kernel/debug/usb/devices for this specific device in the commit message. I also prefer that instead of just referring to a bug number, you explain why this patch is needed. For example output of hcidump or btmon showing the problem here.
 
- - mac802154 fix for crypto algorithm allocation failure checking
- - mac802154 wpan phy leak fix for error code path
- - Fix for not calling Bluetooth shutdown() if interface is not up
+> Signed-off-by: Aleksei Volkov <info@dv2c.ru>
+> ---
+> drivers/bluetooth/btusb.c | 1+
+> 1 file changed, 1 insertion(+), 0 deletion(-)
+> 
+> diff -up linux-4.0.0-gentoo/drivers/bluetooth/btusb.c.orig linux-4.0.0-gentoo/drivers/bluetooth/btusb.c 
+> --- linux-4.0.0/drivers/bluetooth/btusb.c.orig	2015-05-01 12:06:59.000000000 +0300
+> +++ linux-4.0.0/drivers/bluetooth/btusb.c	2015-05-01 12:02:00.000000000 +0300
+> @@ -254,6 +254,7 @@ static const struct usb_device_id blackl
+> 
+> 	/* Roper Class 1 Bluetooth Dongle (Silicon Wave based) */
+> 	{ USB_DEVICE(0x1300, 0x0001), .driver_info = BTUSB_SWAVE },
+> +	{ USB_DEVICE(0x1310, 0x0001), .driver_info = BTUSB_SWAVE },
 
-Let me know if there are any issues pulling. Thanks.
+Did I wrong used 0x1300 originally and meant actually 0x1310 or does Roper really have two USB Vendor IDs this close to each other?
 
-Johan
+> 	/* Digianswer devices */
+> 	{ USB_DEVICE(0x08fd, 0x0001), .driver_info = BTUSB_DIGIANSWER },
 
----
-The following changes since commit 7f0b8a56c978b0a3315ac84c6cbb065413afb8e9:
+Regards
 
-  cxgb4: Fix MC1 memory offset calculation (2015-04-29 15:50:16 -0400)
+Marcel
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to 89eb6d0677a6daf134015bc7bd5ec1432911eed2:
-
-  mac802154: llsec: fix return value check in llsec_key_alloc() (2015-04-30 18:46:28 +0200)
-
-----------------------------------------------------------------
-Alexander Aring (1):
-      mac802154: fix ieee802154_register_hw error handling
-
-Gabriele Mazzotta (1):
-      Bluetooth: Skip the shutdown routine if the interface is not up
-
-Wei Yongjun (1):
-      mac802154: llsec: fix return value check in llsec_key_alloc()
-
- net/bluetooth/hci_core.c | 3 ++-
- net/mac802154/llsec.c    | 4 ++--
- net/mac802154/main.c     | 4 +++-
- 3 files changed, 7 insertions(+), 4 deletions(-)
-
-
---cNdxnHkX5QqsyA0e
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJVRzoyAAoJECQj9vv5qNQSOwUP/jI54ySBOkTAfyjVSuPUlcmg
-yCPv1mxYTK66detAheMiLZj/CRO1J4wssqK6o1bu5MFOBmqnWQSMoFvOoCnP5VGu
-XeU+eQJhEa1qq3PVAtKGNrji6lgRHa3nCpEfri6twM0gBqUMMwTWIqH1JUhQYDY5
-QIg4iTtwFupRlg0AA/PgfhG1T2X15y/pgvqx3KkFumUIJvJrr/z30jEgqM4Ap2ZW
-VLsC4tMiX5TxvhQBbFkXkJ21L+zVGGTsKs71i4GY+esSh7LgfPogucncHaX4g6fy
-z3gzfGW1JbMix0Gk/uh1fA0SNYH3DU9Mj6e4SfYCvyCgSqkKiEr0Xcb3YLMEe5Wt
-ALu9j7+xFQaagLAc5NknjU3PdGcV6oCsFSPLPLXigGugHkmK9/O6jO5BHBOyMRuQ
-nT6HMkmFMyaQO6HABd9oSCCHC0nB6kNs6i9l/ti2ucWtvueL4g7Ud1cTguFnGLSG
-eMZ0oVXogV6G8N0jdpHH0tP3c+747D/+q07Pi/KrukZ60KYuBFVEuSH14JrCvGII
-ELqujDpqZ8oReksRsctiG3I1JafeJ46kFENMriQvvZf6OsciCjT0lMYqUTbj+waR
-zDUJjJTVqNw1GfyNb+YKiCvb85O3vhUKEGl4qpAEvfbJmI50ogDqmjD+RuIQuuc0
-EbugTLNXUs6Cvvm+qhHy
-=FnzA
------END PGP SIGNATURE-----
-
---cNdxnHkX5QqsyA0e--
