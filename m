@@ -1,37 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Leo Yan <leo.yan@linaro.org>
-To: linux-bluetooth@vger.kernel.org,
-	Pavan Savoy <pavan_savoy@ti.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-kernel@vger.kernel.org
-Cc: Leo Yan <leo.yan@linaro.org>
-Subject: [PATCH] Bluetooth: btwilink: remove DEBUG define
-Date: Tue,  5 May 2015 15:09:17 +0800
-Message-Id: <1430809757-23282-1-git-send-email-leo.yan@linaro.org>
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: ortuno@google.com, Arman Uguray <armansito@chromium.org>
+Subject: [RFC BlueZ] doc/device-api: Add GattServices
+Date: Mon,  4 May 2015 16:57:30 -0700
+Message-Id: <1430783850-21140-1-git-send-email-armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove the DEBUG define as the debug code; so can remove mass debug info
-from log buffer when using dmesg.
-
-Signed-off-by: Leo Yan <leo.yan@linaro.org>
+This patch introduces the GattServices property that contains the object
+paths of exported GattService1 objects. The purpose of this property is
+to signal when all GATT services on a remote device have been
+discovered.
 ---
- drivers/bluetooth/btwilink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ doc/device-api.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/bluetooth/btwilink.c b/drivers/bluetooth/btwilink.c
-index 55c135b..7a722df 100644
---- a/drivers/bluetooth/btwilink.c
-+++ b/drivers/bluetooth/btwilink.c
-@@ -22,7 +22,7 @@
-  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-  *
-  */
--#define DEBUG
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 20d6c65..a8076a2 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -211,3 +211,11 @@ Properties	string Address [readonly]
+ 
+ 			Service advertisement data. Keys are the UUIDs in
+ 			string format followed by its byte array value.
 +
- #include <linux/platform_device.h>
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
++		array{object} GattServices [readonly, optional]
++
++			List of GATT service object paths. Each referenced
++			object exports the org.bluez.GattService1 interface and
++			represents a remote GATT service. This property will be
++			updated once all remote GATT services of this device
++			have been discovered and exported over D-Bus.
 -- 
-1.9.1
+2.2.0.rc0.207.ga3a616c
+
