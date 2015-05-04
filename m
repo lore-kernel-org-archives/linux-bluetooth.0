@@ -1,29 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 04 May 2015 15:36:27 -0400 (EDT)
-Message-Id: <20150504.153627.768616765733905013.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2015-05-04
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20150504093436.GB9096@t440s.lan>
-References: <20150504093436.GB9096@t440s.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Sender: Larry Finger <larry.finger@gmail.com>
+Message-ID: <5547C7C7.2080909@lwfinger.net>
+Date: Mon, 04 May 2015 14:25:59 -0500
+From: Larry Finger <Larry.Finger@lwfinger.net>
+MIME-Version: 1.0
+To: Daniel Drake <drake@endlessm.com>, marcel@holtmann.org,
+ gustavo@padovan.org, johan.hedberg@gmail.com
+CC: linux-bluetooth@vger.kernel.org, champion_chen@realsil.com.cn,
+ carlo@endlessm.com
+Subject: Re: [PATCH v8] Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A
+ support
+References: <1429214995-11833-1-git-send-email-drake@endlessm.com>
+In-Reply-To: <1429214995-11833-1-git-send-email-drake@endlessm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Mon, 4 May 2015 12:34:36 +0300
+On 04/16/2015 03:09 PM, Daniel Drake wrote:
+> Realtek ship a variety of bluetooth USB devices that identify
+> themselves with standard USB Bluetooth device class values, but
+> require a special driver to actually work. Without that driver,
+> you never get any scan results.
+>
+> More recently however, Realtek appear to have wisened up and simply
+> posted a firmware update that makes these devices comply with
+> normal btusb protocols. The firmware needs to be uploaded on each boot.
+>
+> Based on Realtek code from https://github.com/lwfinger/rtl8723au_bt
+> ('new' branch).
 
-> Here's the first bluetooth-next pull request for 4.2:
-> 
->  - Various fixes for at86rf230 driver
->  - ieee802154: trace events support for rdev->ops
->  - HCI UART driver refactoring
->  - New Realtek IDs added to btusb driver
->  - Off-by-one fix for rtl8723b in btusb driver
->  - Refactoring of btbcm driver for both UART & USB use
-> 
-> Please let me know if there are any issues pulling. Thanks.
+Daniel,
 
-Pulled, thanks Johan.
+I am told that these changes have now landed in linux-next, and it is time to 
+think about firmware. Are you sending it to linux-firmware, or should I do it?
+
+Thanks,
+
+Larry
