@@ -1,29 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 0/4] Fix clang compile errors/warnings
-Date: Mon,  4 May 2015 16:28:10 -0700
-Message-Id: <1430782094-18396-1-git-send-email-armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <5547C7C7.2080909@lwfinger.net>
+References: <1429214995-11833-1-git-send-email-drake@endlessm.com>
+	<5547C7C7.2080909@lwfinger.net>
+Date: Mon, 4 May 2015 14:08:43 -0600
+Message-ID: <CAD8Lp45tNL-fWKisamEenP2i5P_aP40PzOZRqWRAKHN-+rpPXg@mail.gmail.com>
+Subject: Re: [PATCH v8] Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support
+From: Daniel Drake <drake@endlessm.com>
+To: Larry Finger <Larry.Finger@lwfinger.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+	=?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>,
+	Carlo Caione <carlo@endlessm.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set fixes some clang compile errors and warnings. These do
-not cover errors that are produced when BlueZ for Android is compiled
-using clang (i.e. passing --disable-android to ./bootstrap-configure).
+On Mon, May 4, 2015 at 1:25 PM, Larry Finger <Larry.Finger@lwfinger.net> wrote:
+> I am told that these changes have now landed in linux-next, and it is time
+> to think about firmware. Are you sending it to linux-firmware, or should I
+> do it?
 
-Arman Uguray (4):
-  plugins/policy: Fix clang compile error
-  tools/smp-tester: Remove unused variable.
-  tools/mgmt-tester: Remove unused set_adv_data_2
-  tools/gatt-service: Fix clang compile error
+I already sent that, no response so I'll do it again today. Thanks for
+the reminder.
 
- plugins/policy.c     |  8 ++++----
- tools/gatt-service.c |  4 +---
- tools/mgmt-tester.c  | 46 +++++++++++++++++++---------------------------
- tools/smp-tester.c   |  9 ---------
- 4 files changed, 24 insertions(+), 43 deletions(-)
-
--- 
-2.2.0.rc0.207.ga3a616c
-
+Daniel
