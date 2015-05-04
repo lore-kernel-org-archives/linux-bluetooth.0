@@ -1,129 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 May 2015 12:34:36 +0300
+Date: Mon, 4 May 2015 12:21:54 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth-next 2015-05-04
-Message-ID: <20150504093436.GB9096@t440s.lan>
+Subject: pull request: bluetooth 2015-05-04
+Message-ID: <20150504092154.GA9096@t440s.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="St7VIuEGZ6dlpu13"
-Sender: netdev-owner@vger.kernel.org
+	protocol="application/pgp-signature"; boundary="cNdxnHkX5QqsyA0e"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---St7VIuEGZ6dlpu13
-Content-Type: text/plain; charset=iso-8859-1
+--cNdxnHkX5QqsyA0e
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
 Hi Dave,
 
-Here's the first bluetooth-next pull request for 4.2:
+Here are a couple of important Bluetooth & mac802154 fixes for 4.1:
 
- - Various fixes for at86rf230 driver
- - ieee802154: trace events support for rdev->ops
- - HCI UART driver refactoring
- - New Realtek IDs added to btusb driver
- - Off-by-one fix for rtl8723b in btusb driver
- - Refactoring of btbcm driver for both UART & USB use
+ - mac802154 fix for crypto algorithm allocation failure checking
+ - mac802154 wpan phy leak fix for error code path
+ - Fix for not calling Bluetooth shutdown() if interface is not up
 
-Please let me know if there are any issues pulling. Thanks.
+Let me know if there are any issues pulling. Thanks.
 
 Johan
 
 ---
-The following changes since commit 9dac8835440622c2f84591673969d510ce198c11:
+The following changes since commit 7f0b8a56c978b0a3315ac84c6cbb065413afb8e9:
 
-  tcp: update reordering first before detecting loss (2015-04-29 17:10:38 -=
-0400)
+  cxgb4: Fix MC1 memory offset calculation (2015-04-29 15:50:16 -0400)
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t for-upstream
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
 
-for you to fetch changes up to 1add15646672ff4e7fe59bec2afcb5a0c80c5e49:
+for you to fetch changes up to 89eb6d0677a6daf134015bc7bd5ec1432911eed2:
 
-  ieee802154: trace: fix endian convertion (2015-04-30 18:48:11 +0200)
+  mac802154: llsec: fix return value check in llsec_key_alloc() (2015-04-30 18:46:28 +0200)
 
 ----------------------------------------------------------------
-Alexander Aring (7):
-      at86rf230: remove tabs after define
-      at86rf230: move cal_timeout to state change
-      at86rf230: add TX_ARET_ON for calibration timeout
-      at86rf230: remove unnecessary tx state change
-      at86rf230: change state change if from trx_off
-      at86rf230: add slp_tr support to start tx
-      ieee802154: trace: fix endian convertion
+Alexander Aring (1):
+      mac802154: fix ieee802154_register_hw error handling
 
-Christoffer Holmstedt (1):
-      at86rf230: Add macro for TRX STATE MASK
+Gabriele Mazzotta (1):
+      Bluetooth: Skip the shutdown routine if the interface is not up
 
-Dan Carpenter (1):
-      Bluetooth: btusb: off by one in rtl8723b_parse_firmware()
+Wei Yongjun (1):
+      mac802154: llsec: fix return value check in llsec_key_alloc()
 
-Daniel Drake (1):
-      Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support
+ net/bluetooth/hci_core.c | 3 ++-
+ net/mac802154/llsec.c    | 4 ++--
+ net/mac802154/main.c     | 4 +++-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-DingXiang (1):
-      Bluetooth: bt3c: Delete some unuseful comments
 
-Guido G=FCnther (1):
-      ieee802154: Add trace events for rdev->ops
-
-Marcel Holtmann (4):
-      Bluetooth: btbcm: Export patchram download as separate function
-      Bluetooth: hci_uart: Reorder Atheros specific driver callbacks
-      Bluetooth: hci_uart: Add Atheros support for address configuration
-      Bluetooth: btusb: Fix two coding style issues
-
-Varka Bhadram (2):
-      mac802154: add description to mac802154 APIs
-      cfg802154: pass name_assign_type to rdev_add_virtual_intf()
-
- drivers/bluetooth/bt3c_cs.c        |   3 -
- drivers/bluetooth/btbcm.c          | 148 +++++++------
- drivers/bluetooth/btbcm.h          |   6 +
- drivers/bluetooth/btusb.c          | 403 +++++++++++++++++++++++++++++++++=
-++-
- drivers/bluetooth/hci_ath.c        |  98 +++++----
- drivers/net/ieee802154/at86rf230.c | 390 ++++++++++++++++++----------------
- include/net/cfg802154.h            |   2 +
- include/net/mac802154.h            |  94 ++++++++-
- net/ieee802154/Makefile            |   4 +-
- net/ieee802154/nl-phy.c            |   5 +-
- net/ieee802154/nl802154.c          |   2 +-
- net/ieee802154/rdev-ops.h          |  85 ++++++--
- net/ieee802154/trace.c             |   7 +
- net/ieee802154/trace.h             | 247 ++++++++++++++++++++++
- net/mac802154/cfg.c                |   9 +-
- net/mac802154/ieee802154_i.h       |   3 +-
- net/mac802154/iface.c              |   5 +-
- net/mac802154/main.c               |   3 +-
- 18 files changed, 1196 insertions(+), 318 deletions(-)
- create mode 100644 net/ieee802154/trace.c
- create mode 100644 net/ieee802154/trace.h
-
---St7VIuEGZ6dlpu13
+--cNdxnHkX5QqsyA0e
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJVRz0sAAoJECQj9vv5qNQS2+4QAIdCl4PRidaA3aJGAVe0gsrB
-nbcQBx9qCcx7xn8H/Wat3yvS8QKE566tk82mjF6xC7pm/brtJibNJcy0js67b1TR
-ku+Hx7yIISGU8NMZ+9EMeKIHHeI0DbxDM+Mdhn9gt6f/tt6h7wNRcFuSYPM9HbCL
-NUXob/bCrw6mDLtZ5ScI5blgmFCrRw2E1a1HPnYTMiPKKz4iUzY52cHrot1VcMMK
-IYaXEgeOAcKMlE29fMrDr3Bn9eCzgGNWI37LZn+/EdaLPzhKL3SB6RYcnQvZGlpU
-UWEvuFjnm6UrpO9vK607x//al0X8hah6c7OT9olPs9RV1/tJnr4zKnFYUVHFoCt3
-ln4C71d6YR4+5lddzYfW/vFOnqrVkwtepkWYUPGJFm9sTMRZis5WTSGrhcdB5Gx1
-y4JGY4rNA23Zpl84HsKDku8jM3GLs9/K54xCO5xz33Fmv8kb0Abb0Ovmv9TeH85V
-B3JKVR+eM1AB23trWo9zDirQWhOXrcMM1tVODX7s3ytk2nO3xxDBVUJsOyJI7oSM
-84YkpJU2T1b2H5UVd29eH6N/Ax8yz/YBWxmVHc0TYSPC94M33mXkvNlixl5JXNIA
-pAM5YC4iyR9AdKifSShBiyd3i1pIf0aLpvesq+1+MDGwPBflfDEz2zm7p7IPZyeD
-vHXKoDGqOJRvKUhBNlK5
-=DMrU
+iQIcBAEBAgAGBQJVRzoyAAoJECQj9vv5qNQSOwUP/jI54ySBOkTAfyjVSuPUlcmg
+yCPv1mxYTK66detAheMiLZj/CRO1J4wssqK6o1bu5MFOBmqnWQSMoFvOoCnP5VGu
+XeU+eQJhEa1qq3PVAtKGNrji6lgRHa3nCpEfri6twM0gBqUMMwTWIqH1JUhQYDY5
+QIg4iTtwFupRlg0AA/PgfhG1T2X15y/pgvqx3KkFumUIJvJrr/z30jEgqM4Ap2ZW
+VLsC4tMiX5TxvhQBbFkXkJ21L+zVGGTsKs71i4GY+esSh7LgfPogucncHaX4g6fy
+z3gzfGW1JbMix0Gk/uh1fA0SNYH3DU9Mj6e4SfYCvyCgSqkKiEr0Xcb3YLMEe5Wt
+ALu9j7+xFQaagLAc5NknjU3PdGcV6oCsFSPLPLXigGugHkmK9/O6jO5BHBOyMRuQ
+nT6HMkmFMyaQO6HABd9oSCCHC0nB6kNs6i9l/ti2ucWtvueL4g7Ud1cTguFnGLSG
+eMZ0oVXogV6G8N0jdpHH0tP3c+747D/+q07Pi/KrukZ60KYuBFVEuSH14JrCvGII
+ELqujDpqZ8oReksRsctiG3I1JafeJ46kFENMriQvvZf6OsciCjT0lMYqUTbj+waR
+zDUJjJTVqNw1GfyNb+YKiCvb85O3vhUKEGl4qpAEvfbJmI50ogDqmjD+RuIQuuc0
+EbugTLNXUs6Cvvm+qhHy
+=FnzA
 -----END PGP SIGNATURE-----
 
---St7VIuEGZ6dlpu13--
+--cNdxnHkX5QqsyA0e--
