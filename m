@@ -1,27 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <5547C7C7.2080909@lwfinger.net>
-References: <1429214995-11833-1-git-send-email-drake@endlessm.com>
-	<5547C7C7.2080909@lwfinger.net>
-Date: Mon, 4 May 2015 14:08:43 -0600
-Message-ID: <CAD8Lp45tNL-fWKisamEenP2i5P_aP40PzOZRqWRAKHN-+rpPXg@mail.gmail.com>
-Subject: Re: [PATCH v8] Bluetooth: btusb: Add Realtek 8723A/8723B/8761A/8821A support
-From: Daniel Drake <drake@endlessm.com>
-To: Larry Finger <Larry.Finger@lwfinger.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
-	=?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>,
-	Carlo Caione <carlo@endlessm.com>
-Content-Type: text/plain; charset=UTF-8
+Date: Mon, 04 May 2015 15:36:27 -0400 (EDT)
+Message-Id: <20150504.153627.768616765733905013.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2015-05-04
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20150504093436.GB9096@t440s.lan>
+References: <20150504093436.GB9096@t440s.lan>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, May 4, 2015 at 1:25 PM, Larry Finger <Larry.Finger@lwfinger.net> wrote:
-> I am told that these changes have now landed in linux-next, and it is time
-> to think about firmware. Are you sending it to linux-firmware, or should I
-> do it?
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Mon, 4 May 2015 12:34:36 +0300
 
-I already sent that, no response so I'll do it again today. Thanks for
-the reminder.
+> Here's the first bluetooth-next pull request for 4.2:
+> 
+>  - Various fixes for at86rf230 driver
+>  - ieee802154: trace events support for rdev->ops
+>  - HCI UART driver refactoring
+>  - New Realtek IDs added to btusb driver
+>  - Off-by-one fix for rtl8723b in btusb driver
+>  - Refactoring of btbcm driver for both UART & USB use
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-Daniel
+Pulled, thanks Johan.
