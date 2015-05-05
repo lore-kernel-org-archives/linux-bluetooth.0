@@ -1,71 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1430783850-21140-1-git-send-email-armansito@chromium.org>
+References: <1430783850-21140-1-git-send-email-armansito@chromium.org>
+Date: Tue, 5 May 2015 14:57:00 -0700
+Message-ID: <CAHrH25TPnkoWYY5Et8WWyBL_byH2o8QEm0mYwNi4qRTtB4ZFwQ@mail.gmail.com>
+Subject: Re: [RFC BlueZ] doc/device-api: Add GattServices
 From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: ortuno@google.com, Arman Uguray <armansito@chromium.org>
-Subject: [PATCH BlueZ 1/2] core/gatt: Add btd_gatt_client_foreach_service
-Date: Tue,  5 May 2015 15:05:53 -0700
-Message-Id: <1430863554-30611-1-git-send-email-armansito@chromium.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: =?UTF-8?Q?Giovanni_Ortu=C3=B1o?= <ortuno@google.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces btd_gatt_client_foreach_service which allows
-users to iterate through the object paths of currently exported
-GattService1 objects.
----
- src/gatt-client.c | 28 ++++++++++++++++++++++++++++
- src/gatt-client.h |  6 ++++++
- 2 files changed, 34 insertions(+)
+Hi,
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 2e26ed7..3614553 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1961,3 +1961,31 @@ void btd_gatt_client_disconnected(struct btd_gatt_client *client)
- 	bt_gatt_client_unref(client->gatt);
- 	client->gatt = NULL;
- }
-+
-+struct foreach_service_data {
-+	btd_gatt_client_service_path_t func;
-+	void *user_data;
-+};
-+
-+static void client_service_foreach(void *data, void *user_data)
-+{
-+	struct service *service = data;
-+	struct foreach_service_data *foreach_data = user_data;
-+
-+	foreach_data->func(service->path, foreach_data->user_data);
-+}
-+
-+void btd_gatt_client_foreach_service(struct btd_gatt_client *client,
-+					btd_gatt_client_service_path_t func,
-+					void *user_data)
-+{
-+	struct foreach_service_data data;
-+
-+	if (!client)
-+		return;
-+
-+	data.func = func;
-+	data.user_data = user_data;
-+
-+	queue_foreach(client->services, client_service_foreach, &data);
-+}
-diff --git a/src/gatt-client.h b/src/gatt-client.h
-index f6da3b0..a18db17 100644
---- a/src/gatt-client.h
-+++ b/src/gatt-client.h
-@@ -28,3 +28,9 @@ void btd_gatt_client_service_added(struct btd_gatt_client *client,
- void btd_gatt_client_service_removed(struct btd_gatt_client *client,
- 					struct gatt_db_attribute *attrib);
- void btd_gatt_client_disconnected(struct btd_gatt_client *client);
-+
-+typedef void (*btd_gatt_client_service_path_t)(const char *service_path,
-+							void *user_data);
-+void btd_gatt_client_foreach_service(struct btd_gatt_client *client,
-+					btd_gatt_client_service_path_t func,
-+					void *user_data);
--- 
-2.2.0.rc0.207.ga3a616c
+> On Mon, May 4, 2015 at 4:57 PM, Arman Uguray <armansito@chromium.org> wrote:
+> This patch introduces the GattServices property that contains the object
+> paths of exported GattService1 objects. The purpose of this property is
+> to signal when all GATT services on a remote device have been
+> discovered.
+> ---
+>  doc/device-api.txt | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/doc/device-api.txt b/doc/device-api.txt
+> index 20d6c65..a8076a2 100644
+> --- a/doc/device-api.txt
+> +++ b/doc/device-api.txt
+> @@ -211,3 +211,11 @@ Properties string Address [readonly]
+>
+>                         Service advertisement data. Keys are the UUIDs in
+>                         string format followed by its byte array value.
+> +
+> +               array{object} GattServices [readonly, optional]
+> +
+> +                       List of GATT service object paths. Each referenced
+> +                       object exports the org.bluez.GattService1 interface and
+> +                       represents a remote GATT service. This property will be
+> +                       updated once all remote GATT services of this device
+> +                       have been discovered and exported over D-Bus.
+> --
+> 2.2.0.rc0.207.ga3a616c
+>
 
+Since there have been no objections, I pushed this proposal. It's a
+simple enough addition anyway, and it's consistent with the current
+GATT API.
+
+Thanks,
+Arman
