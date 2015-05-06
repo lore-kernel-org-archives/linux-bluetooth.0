@@ -1,115 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5549ECAF.8000009@gmail.com>
-Date: Wed, 06 May 2015 12:27:59 +0200
-From: "jerico.dev" <jerico.dev@gmail.com>
-MIME-Version: 1.0
+From: Laura Abbott <labbott@fedoraproject.org>
 To: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 00/17] BlueZ/Bluetooth: Multi-advertising infrastructure
-References: <1428633041-18415-1-git-send-email-fgrandel@gmail.com> <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
-In-Reply-To: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Laura Abbott <labbott@fedoraproject.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@canonical.com>,
+        Takashi Iwai <tiwai@suse.de>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Subject: [PATCH] Bluetooth: Make request workqueue freezable
+Date: Tue,  5 May 2015 17:06:01 -0700
+Message-Id: <1430870761-31720-1-git-send-email-labbott@fedoraproject.org>
+In-Reply-To: <5543E097.7000004@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel and Johan,
+We've received a number of reports of warnings when coming
+out of suspend with certain bluetooth firmware configurations:
 
-Arman was so kind to review my patch set and I implemented all his 
-proposals for change. Same for the comments Johan had made earlier.
+WARNING: CPU: 3 PID: 3280 at drivers/base/firmware_class.c:1126
+_request_firmware+0x558/0x810()
+Modules linked in: ccm ip6t_rpfilter ip6t_REJECT nf_reject_ipv6
+xt_conntrack ebtable_nat ebtable_broute bridge stp llc ebtable_filter
+ebtables ip6table_nat nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6
+ip6table_mangle ip6table_security ip6table_raw ip6table_filter
+ip6_tables iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4
+nf_nat nf_conntrack iptable_mangle iptable_security iptable_raw
+binfmt_misc bnep intel_rapl iosf_mbi arc4 x86_pkg_temp_thermal
+snd_hda_codec_hdmi coretemp kvm_intel joydev snd_hda_codec_realtek
+iwldvm snd_hda_codec_generic kvm iTCO_wdt mac80211 iTCO_vendor_support
+snd_hda_intel snd_hda_controller snd_hda_codec crct10dif_pclmul
+snd_hwdep crc32_pclmul snd_seq crc32c_intel ghash_clmulni_intel uvcvideo
+snd_seq_device iwlwifi btusb videobuf2_vmalloc snd_pcm videobuf2_core
+ serio_raw bluetooth cfg80211 videobuf2_memops sdhci_pci v4l2_common
+videodev thinkpad_acpi sdhci i2c_i801 lpc_ich mfd_core wacom mmc_core
+media snd_timer tpm_tis hid_logitech_hidpp wmi tpm rfkill snd mei_me mei
+shpchp soundcore nfsd auth_rpcgss nfs_acl lockd grace sunrpc i915
+i2c_algo_bit drm_kms_helper e1000e drm hid_logitech_dj ptp pps_core
+video
+CPU: 3 PID: 3280 Comm: kworker/u17:0 Not tainted 3.19.3-200.fc21.x86_64
+Hardware name: LENOVO 343522U/343522U, BIOS GCET96WW (2.56 ) 10/22/2013
+Workqueue: hci0 hci_power_on [bluetooth]
+ 0000000000000000 0000000089944328 ffff88040acffb78 ffffffff8176e215
+ 0000000000000000 0000000000000000 ffff88040acffbb8 ffffffff8109bc1a
+ 0000000000000000 ffff88040acffcd0 00000000fffffff5 ffff8804076bac40
+Call Trace:
+ [<ffffffff8176e215>] dump_stack+0x45/0x57
+ [<ffffffff8109bc1a>] warn_slowpath_common+0x8a/0xc0
+ [<ffffffff8109bd4a>] warn_slowpath_null+0x1a/0x20
+ [<ffffffff814dbe78>] _request_firmware+0x558/0x810
+ [<ffffffff814dc165>] request_firmware+0x35/0x50
+ [<ffffffffa03a7886>] btusb_setup_bcm_patchram+0x86/0x590 [btusb]
+ [<ffffffff814d40e6>] ? rpm_idle+0xd6/0x230
+ [<ffffffffa04d4801>] hci_dev_do_open+0xe1/0xa90 [bluetooth]
+ [<ffffffff810c51dd>] ? ttwu_do_activate.constprop.90+0x5d/0x70
+ [<ffffffffa04d5980>] hci_power_on+0x40/0x200 [bluetooth]
+ [<ffffffff810b487c>] process_one_work+0x14c/0x3f0
+ [<ffffffff810b52f3>] worker_thread+0x53/0x470
+ [<ffffffff810b52a0>] ? rescuer_thread+0x300/0x300
+ [<ffffffff810ba548>] kthread+0xd8/0xf0
+ [<ffffffff810ba470>] ? kthread_create_on_node+0x1b0/0x1b0
+ [<ffffffff81774958>] ret_from_fork+0x58/0x90
+ [<ffffffff810ba470>] ? kthread_create_on_node+0x1b0/0x1b0
 
-Will you be able to review the patch series in its current form?
+This occurs after every resume.
 
-Of course I'll be available to make any further required changes.
+When resuming, the bluetooth stack calls hci_register_dev,
+allocates a new workqueue, and immediately schedules the
+power_on on the newly created workqueue. Since the new
+workqueue is not freezable, the work runs immediately and
+triggers the warning since resume is still happening and
+usermodehelper has not yet been re-enabled. Fix this by
+making the request workqueue freezable. This ensures
+the work will not run until unfreezing occurs and usermodehelper
+is re-enabled.
 
-Florian
+Signed-off-by: Laura Abbott <labbott@fedoraproject.org>
+---
+I think this should be fixing the actual root cause.
+---
+ net/bluetooth/hci_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-
-
-
-On 04/30/2015 05:33 PM, Florian Grandel wrote:
-> This is a patch set introducing the infrastructure for multi-advertising
-> capability to the HCI core and mgmt API.
->
-> v1 -> v2:
-> - add missing braces in read_adv_features()
->
-> v2 -> v3:
-> - split change-set into several patches
-> - replace err == 0 by !err
-> - fix coding style problems
->
-> v3 -> v4:
-> publicly visible change:
-> - when calling remove_advertising with an instance value of zero (i.e.
->    remove all instances), the command response also returns an instance
->    value of zero now as it doesn't make sense to return a single instance
->    id when removing several instances
->
-> refactoring and fixes (due to Arman's review):
-> - splitting the change set into a much larger number of patches to
->    facilitate review
-> - use HCI_MAX_ADV_INSTANCES in the same patch that introduces it
-> - use adv_info->hdev in the same patch that introduces it
-> - make the logic of hci_find_adv_instance() more readable
-> - make sure that hci_find_adv_instance() is called while hci_dev is
->    locked
-> - replace hci_num_adv_instances() by an instance counter in hci_dev
-> - add inline comment in get_adv_instance_flags() explaining its return
->    value in the error case
-> - generate zero-length adv data if the current instance identifier is
->    invalid
-> - revert erroneous changes to the logic in clear_adv_instance()
-> - use hci_adv_instances_clear() in clear_adv_instance() when removing
->    all advertising instances also removing a reduntant error check
-> - inserting TODO messages to make sure that advertising will not be
->    switched off prematurely once we allow more than one advertising
->    instance
-> - inserting TODO messages to make sure that multiple advertising
->    instances will be advertised in a round-robin fashion once we allow
->    for more than one advertising instance
-> - identify peding advertising instances (just added but not yet
->    confirmed in add_advertising_complete) by a boolean flag in the
->    adv_info struct so that we can identify and remove them even when
->    the pending add_advertising command cannot be retrieved for some
->    reason - makes sure that we do not lead advertising instances in this
->    case
-> - only send HCI commands to update advertising data when a new instance
->    has actually been added
->
->
->
-> Userland:
->
-> Florian Grandel (1):
->    tools/mgmt_tester: expect 0 rp when removing all adv inst
->
->   tools/mgmt-tester.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->
->
->
-> Kernel:
->
-> Florian Grandel (16):
->    Bluetooth: hci_core: Introduce multi-adv inst list
->    Bluetooth: mgmt: dry update_scan_rsp_data()
->    Bluetooth: mgmt: multi adv for read_adv_features()
->    Bluetooth: mgmt: multi adv for get_current_adv_instance()
->    Bluetooth: mgmt: multi adv for get_adv_instance_flags()
->    Bluetooth: mgmt: improve get_adv_instance_flags() readability
->    Bluetooth: mgmt: multi adv for enable_advertising()
->    Bluetooth: mgmt: use current adv instance in set_advertising()
->    Bluetooth: mgmt: multi adv for create_instance_scan_rsp_data()
->    Bluetooth: mgmt: multi adv for create_instance_adv_data()
->    Bluetooth: mgmt: refactor update_*_data()
->    Bluetooth: mgmt: multi adv for set_advertising_complete()
->    Bluetooth: mgmt: multi adv for add_advertising()
->    Bluetooth: mgmt: multi adv for clear_adv_instances()
->    Bluetooth: multi adv for remove_advertising()
->    Bluetooth: hci_core: Remove obsolete adv_instance
->
->   include/net/bluetooth/hci_core.h |  22 ++-
->   net/bluetooth/hci_core.c         | 113 ++++++++++++-
->   net/bluetooth/mgmt.c             | 352 ++++++++++++++++++++++-----------------
->   3 files changed, 328 insertions(+), 159 deletions(-)
->
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 476709b..87f2e48 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3131,7 +3131,8 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	}
+ 
+ 	hdev->req_workqueue = alloc_workqueue("%s", WQ_HIGHPRI | WQ_UNBOUND |
+-					      WQ_MEM_RECLAIM, 1, hdev->name);
++					      WQ_MEM_RECLAIM | WQ_FREEZABLE,
++					      1, hdev->name);
+ 	if (!hdev->req_workqueue) {
+ 		destroy_workqueue(hdev->workqueue);
+ 		error = -ENOMEM;
+-- 
+2.1.0
