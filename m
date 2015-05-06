@@ -1,57 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 1/3] audio/a2dp: connect A2DP vendor codec if possible
-Date: Thu, 07 May 2015 00:10:34 +0900
-Message-id: <1430925036-20245-1-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH BlueZ 2/2] policy: Fix not incrementing attempts
+Date: Wed,  6 May 2015 17:08:54 +0300
+Message-Id: <1430921334-16124-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1430921334-16124-1-git-send-email-luiz.dentz@gmail.com>
+References: <1430921334-16124-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch gives the priority on vendor codec during A2DP codec
-negotiation.
+The number of attempts and intervals maybe different causing the attempts
+to not be incremented properly.
 ---
- profiles/audio/a2dp.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ plugins/policy.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 31c5086..d9a2f72 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1751,6 +1751,8 @@ static gboolean check_vendor_codec(struct a2dp_sep *sep, uint8_t *cap,
- static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
- 					const char *sender)
+diff --git a/plugins/policy.c b/plugins/policy.c
+index 7687203..6bb8268 100644
+--- a/plugins/policy.c
++++ b/plugins/policy.c
+@@ -683,6 +683,8 @@ static void reconnect_set_timer(struct reconnect_data *reconnect)
  {
-+	struct a2dp_sep *selected_sep = NULL;
+ 	static int timeout = 0;
+ 
++	reconnect->attempt++;
 +
- 	for (; list; list = list->next) {
- 		struct a2dp_sep *sep = list->data;
- 		struct avdtp_remote_sep *rsep;
-@@ -1776,15 +1778,20 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
- 		service = avdtp_get_codec(rsep);
- 		cap = (struct avdtp_media_codec_capability *) service->data;
+ 	if (reconnect->attempt < reconnect_intervals_len)
+ 		timeout = reconnect_intervals[reconnect->attempt];
  
--		if (cap->media_codec_type != A2DP_CODEC_VENDOR)
--			return sep;
-+		if (cap->media_codec_type != A2DP_CODEC_VENDOR) {
-+			selected_sep = sep;
-+			continue;
-+		}
- 
- 		if (check_vendor_codec(sep, cap->data,
- 					service->length - sizeof(*cap)))
- 			return sep;
- 	}
- 
--	return NULL;
-+	if (selected_sep)
-+		return selected_sep;
-+	else
-+		return NULL;
- }
- 
- static struct a2dp_sep *a2dp_select_sep(struct avdtp *session, uint8_t type,
 -- 
 2.1.0
 
