@@ -1,96 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] audio/avrcp: Use position changed event to resync
-Date: Wed,  6 May 2015 17:08:53 +0300
-Message-Id: <1430921334-16124-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <5549ECAF.8000009@gmail.com>
+Date: Wed, 06 May 2015 12:27:59 +0200
+From: "jerico.dev" <jerico.dev@gmail.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4 00/17] BlueZ/Bluetooth: Multi-advertising infrastructure
+References: <1428633041-18415-1-git-send-email-fgrandel@gmail.com> <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
+In-Reply-To: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel and Johan,
 
-Some player do not change state when backward is pressed only once,
-instead it will just start the track from the beginning.
+Arman was so kind to review my patch set and I implemented all his 
+proposals for change. Same for the comments Johan had made earlier.
 
-To fix this subscribe to playback position changed event since it is
-mandatory to be sent in the following conditions:
+Will you be able to review the patch series in its current form?
 
- - TG has reached the registered playback Interval time.
- - Changed PLAY STATUS.
- - Changed Current Track.
- - Reached end or beginning of track.
----
- profiles/audio/avrcp.c | 23 +++++++++++++++++++++++
- profiles/audio/avrcp.h |  1 +
- 2 files changed, 24 insertions(+)
+Of course I'll be available to make any further required changes.
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index cc26eed..245b3fc 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -3084,6 +3084,17 @@ static void avrcp_track_changed(struct avrcp *session,
- 		avrcp_get_element_attributes(session);
- }
- 
-+static void avrcp_playback_pos_changed(struct avrcp *session,
-+						struct avrcp_header *pdu)
-+{
-+	struct avrcp_player *player = session->controller->player;
-+	struct media_player *mp = player->user_data;
-+	uint32_t position;
-+
-+	position = get_be32(&pdu->params[1]);
-+	media_player_set_position(mp, position);
-+}
-+
- static void avrcp_setting_changed(struct avrcp *session,
- 						struct avrcp_header *pdu)
- {
-@@ -3177,6 +3188,9 @@ static gboolean avrcp_handle_event(struct avctp *conn,
- 	case AVRCP_EVENT_TRACK_CHANGED:
- 		avrcp_track_changed(session, pdu);
- 		break;
-+	case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
-+		avrcp_playback_pos_changed(session, pdu);
-+		break;
- 	case AVRCP_EVENT_SETTINGS_CHANGED:
- 		avrcp_setting_changed(session, pdu);
- 		break;
-@@ -3208,6 +3222,14 @@ static void avrcp_register_notification(struct avrcp *session, uint8_t event)
- 	pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
- 	pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
- 	pdu->params[0] = event;
-+
-+	/*
-+	 * Set maximum interval possible for position changed as we only
-+	 * use it to resync.
-+	 */
-+	if (event == AVRCP_EVENT_PLAYBACK_POS_CHANGED)
-+		bt_put_be32(UINT32_MAX, &pdu->params[1]);
-+
- 	pdu->params_len = htons(AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH);
- 
- 	length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
-@@ -3248,6 +3270,7 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
- 		switch (event) {
- 		case AVRCP_EVENT_STATUS_CHANGED:
- 		case AVRCP_EVENT_TRACK_CHANGED:
-+		case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
- 		case AVRCP_EVENT_SETTINGS_CHANGED:
- 		case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
- 		case AVRCP_EVENT_UIDS_CHANGED:
-diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-index 6ac5294..a9aeb1a 100644
---- a/profiles/audio/avrcp.h
-+++ b/profiles/audio/avrcp.h
-@@ -74,6 +74,7 @@
- #define AVRCP_EVENT_TRACK_CHANGED		0x02
- #define AVRCP_EVENT_TRACK_REACHED_END		0x03
- #define AVRCP_EVENT_TRACK_REACHED_START		0x04
-+#define AVRCP_EVENT_PLAYBACK_POS_CHANGED	0x05
- #define AVRCP_EVENT_SETTINGS_CHANGED		0x08
- #define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED	0x0a
- #define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED	0x0b
--- 
-2.1.0
+Florian
 
+
+
+
+On 04/30/2015 05:33 PM, Florian Grandel wrote:
+> This is a patch set introducing the infrastructure for multi-advertising
+> capability to the HCI core and mgmt API.
+>
+> v1 -> v2:
+> - add missing braces in read_adv_features()
+>
+> v2 -> v3:
+> - split change-set into several patches
+> - replace err == 0 by !err
+> - fix coding style problems
+>
+> v3 -> v4:
+> publicly visible change:
+> - when calling remove_advertising with an instance value of zero (i.e.
+>    remove all instances), the command response also returns an instance
+>    value of zero now as it doesn't make sense to return a single instance
+>    id when removing several instances
+>
+> refactoring and fixes (due to Arman's review):
+> - splitting the change set into a much larger number of patches to
+>    facilitate review
+> - use HCI_MAX_ADV_INSTANCES in the same patch that introduces it
+> - use adv_info->hdev in the same patch that introduces it
+> - make the logic of hci_find_adv_instance() more readable
+> - make sure that hci_find_adv_instance() is called while hci_dev is
+>    locked
+> - replace hci_num_adv_instances() by an instance counter in hci_dev
+> - add inline comment in get_adv_instance_flags() explaining its return
+>    value in the error case
+> - generate zero-length adv data if the current instance identifier is
+>    invalid
+> - revert erroneous changes to the logic in clear_adv_instance()
+> - use hci_adv_instances_clear() in clear_adv_instance() when removing
+>    all advertising instances also removing a reduntant error check
+> - inserting TODO messages to make sure that advertising will not be
+>    switched off prematurely once we allow more than one advertising
+>    instance
+> - inserting TODO messages to make sure that multiple advertising
+>    instances will be advertised in a round-robin fashion once we allow
+>    for more than one advertising instance
+> - identify peding advertising instances (just added but not yet
+>    confirmed in add_advertising_complete) by a boolean flag in the
+>    adv_info struct so that we can identify and remove them even when
+>    the pending add_advertising command cannot be retrieved for some
+>    reason - makes sure that we do not lead advertising instances in this
+>    case
+> - only send HCI commands to update advertising data when a new instance
+>    has actually been added
+>
+>
+>
+> Userland:
+>
+> Florian Grandel (1):
+>    tools/mgmt_tester: expect 0 rp when removing all adv inst
+>
+>   tools/mgmt-tester.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>
+>
+> Kernel:
+>
+> Florian Grandel (16):
+>    Bluetooth: hci_core: Introduce multi-adv inst list
+>    Bluetooth: mgmt: dry update_scan_rsp_data()
+>    Bluetooth: mgmt: multi adv for read_adv_features()
+>    Bluetooth: mgmt: multi adv for get_current_adv_instance()
+>    Bluetooth: mgmt: multi adv for get_adv_instance_flags()
+>    Bluetooth: mgmt: improve get_adv_instance_flags() readability
+>    Bluetooth: mgmt: multi adv for enable_advertising()
+>    Bluetooth: mgmt: use current adv instance in set_advertising()
+>    Bluetooth: mgmt: multi adv for create_instance_scan_rsp_data()
+>    Bluetooth: mgmt: multi adv for create_instance_adv_data()
+>    Bluetooth: mgmt: refactor update_*_data()
+>    Bluetooth: mgmt: multi adv for set_advertising_complete()
+>    Bluetooth: mgmt: multi adv for add_advertising()
+>    Bluetooth: mgmt: multi adv for clear_adv_instances()
+>    Bluetooth: multi adv for remove_advertising()
+>    Bluetooth: hci_core: Remove obsolete adv_instance
+>
+>   include/net/bluetooth/hci_core.h |  22 ++-
+>   net/bluetooth/hci_core.c         | 113 ++++++++++++-
+>   net/bluetooth/mgmt.c             | 352 ++++++++++++++++++++++-----------------
+>   3 files changed, 328 insertions(+), 159 deletions(-)
+>
