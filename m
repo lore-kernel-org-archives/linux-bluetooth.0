@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
 From: Ilya Faenson <ifaenson@broadcom.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>, Ilya Faenson <ifaenson@broadcom.com>
+CC: <linux-bluetooth@vger.kernel.org>,
+	Ilya Faenson <ifaenson@broadcom.com>
 Subject: [RFC 0/2] *** Broadcom Bluetooth UART support ***
-Date: Wed, 6 May 2015 15:08:48 -0400
-Message-ID: <1430939330-15071-1-git-send-email-ifaenson@broadcom.com>
+Date: Wed, 6 May 2015 15:06:47 -0400
+Message-ID: <1430939209-14978-1-git-send-email-ifaenson@broadcom.com>
 MIME-Version: 1.0
 Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 *** First take on the Broadcom Bluetooth UART support ***
@@ -30,3 +32,4 @@ Ilya Faenson (2):
 
 -- 
 1.9.1
+
