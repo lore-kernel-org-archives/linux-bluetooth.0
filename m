@@ -1,108 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1430921334-16124-1-git-send-email-luiz.dentz@gmail.com>
-References: <1430921334-16124-1-git-send-email-luiz.dentz@gmail.com>
-Date: Thu, 7 May 2015 11:26:38 +0300
-Message-ID: <CABBYNZL189kWWM42a93A9Fy1M4no9yA6yF9YEwLS7ioNHTVHSQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] audio/avrcp: Use position changed event to resync
+In-Reply-To: <1430925036-20245-1-git-send-email-chanyeol.park@samsung.com>
+References: <1430925036-20245-1-git-send-email-chanyeol.park@samsung.com>
+Date: Thu, 7 May 2015 11:20:50 +0300
+Message-ID: <CABBYNZ+tM==j0Af=X93jCCQAqenspFbtbLRs6KqFrMuA8-niOg@mail.gmail.com>
+Subject: Re: [RFC BlueZ 1/3] audio/a2dp: connect A2DP vendor codec if possible
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Chan-yeol Park <chanyeol.park@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Chan-yeol,
 
-On Wed, May 6, 2015 at 5:08 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, May 6, 2015 at 6:10 PM,  <chanyeol.park@samsung.com> wrote:
+> From: Chan-yeol Park <chanyeol.park@samsung.com>
 >
-> Some player do not change state when backward is pressed only once,
-> instead it will just start the track from the beginning.
->
-> To fix this subscribe to playback position changed event since it is
-> mandatory to be sent in the following conditions:
->
->  - TG has reached the registered playback Interval time.
->  - Changed PLAY STATUS.
->  - Changed Current Track.
->  - Reached end or beginning of track.
+> This patch gives the priority on vendor codec during A2DP codec
+> negotiation.
+
+There is already a prioritization based on the sender and in the order
+the endpoints are registered, so by doing this you would be breaking
+the prioritization instead register the codecs in order of preference
+that should have the same results.
+
 > ---
->  profiles/audio/avrcp.c | 23 +++++++++++++++++++++++
->  profiles/audio/avrcp.h |  1 +
->  2 files changed, 24 insertions(+)
+>  profiles/audio/a2dp.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
 >
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index cc26eed..245b3fc 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -3084,6 +3084,17 @@ static void avrcp_track_changed(struct avrcp *session,
->                 avrcp_get_element_attributes(session);
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index 31c5086..d9a2f72 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -1751,6 +1751,8 @@ static gboolean check_vendor_codec(struct a2dp_sep *sep, uint8_t *cap,
+>  static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+>                                         const char *sender)
+>  {
+> +       struct a2dp_sep *selected_sep = NULL;
+> +
+>         for (; list; list = list->next) {
+>                 struct a2dp_sep *sep = list->data;
+>                 struct avdtp_remote_sep *rsep;
+> @@ -1776,15 +1778,20 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+>                 service = avdtp_get_codec(rsep);
+>                 cap = (struct avdtp_media_codec_capability *) service->data;
+>
+> -               if (cap->media_codec_type != A2DP_CODEC_VENDOR)
+> -                       return sep;
+> +               if (cap->media_codec_type != A2DP_CODEC_VENDOR) {
+> +                       selected_sep = sep;
+> +                       continue;
+> +               }
+>
+>                 if (check_vendor_codec(sep, cap->data,
+>                                         service->length - sizeof(*cap)))
+>                         return sep;
+>         }
+>
+> -       return NULL;
+> +       if (selected_sep)
+> +               return selected_sep;
+> +       else
+> +               return NULL;
 >  }
 >
-> +static void avrcp_playback_pos_changed(struct avrcp *session,
-> +                                               struct avrcp_header *pdu)
-> +{
-> +       struct avrcp_player *player = session->controller->player;
-> +       struct media_player *mp = player->user_data;
-> +       uint32_t position;
-> +
-> +       position = get_be32(&pdu->params[1]);
-> +       media_player_set_position(mp, position);
-> +}
-> +
->  static void avrcp_setting_changed(struct avrcp *session,
->                                                 struct avrcp_header *pdu)
->  {
-> @@ -3177,6 +3188,9 @@ static gboolean avrcp_handle_event(struct avctp *conn,
->         case AVRCP_EVENT_TRACK_CHANGED:
->                 avrcp_track_changed(session, pdu);
->                 break;
-> +       case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
-> +               avrcp_playback_pos_changed(session, pdu);
-> +               break;
->         case AVRCP_EVENT_SETTINGS_CHANGED:
->                 avrcp_setting_changed(session, pdu);
->                 break;
-> @@ -3208,6 +3222,14 @@ static void avrcp_register_notification(struct avrcp *session, uint8_t event)
->         pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
->         pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
->         pdu->params[0] = event;
-> +
-> +       /*
-> +        * Set maximum interval possible for position changed as we only
-> +        * use it to resync.
-> +        */
-> +       if (event == AVRCP_EVENT_PLAYBACK_POS_CHANGED)
-> +               bt_put_be32(UINT32_MAX, &pdu->params[1]);
-> +
->         pdu->params_len = htons(AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH);
->
->         length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
-> @@ -3248,6 +3270,7 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
->                 switch (event) {
->                 case AVRCP_EVENT_STATUS_CHANGED:
->                 case AVRCP_EVENT_TRACK_CHANGED:
-> +               case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
->                 case AVRCP_EVENT_SETTINGS_CHANGED:
->                 case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
->                 case AVRCP_EVENT_UIDS_CHANGED:
-> diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-> index 6ac5294..a9aeb1a 100644
-> --- a/profiles/audio/avrcp.h
-> +++ b/profiles/audio/avrcp.h
-> @@ -74,6 +74,7 @@
->  #define AVRCP_EVENT_TRACK_CHANGED              0x02
->  #define AVRCP_EVENT_TRACK_REACHED_END          0x03
->  #define AVRCP_EVENT_TRACK_REACHED_START                0x04
-> +#define AVRCP_EVENT_PLAYBACK_POS_CHANGED       0x05
->  #define AVRCP_EVENT_SETTINGS_CHANGED           0x08
->  #define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED  0x0a
->  #define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED   0x0b
+>  static struct a2dp_sep *a2dp_select_sep(struct avdtp *session, uint8_t type,
 > --
 > 2.1.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Applied,
 
 
 -- 
