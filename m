@@ -1,121 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
 From: chanyeol.park@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ v2 1/2] audio/a2dp: Fix SEP selection
-Date: Thu, 07 May 2015 19:02:57 +0900
-Message-id: <1430992978-26779-1-git-send-email-chanyeol.park@samsung.com>
+Subject: [RFC BlueZ v2 2/2] audio/a2dp: Remove useless check_vendor_codec()
+Date: Thu, 07 May 2015 19:02:58 +0900
+Message-id: <1430992978-26779-2-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1430992978-26779-1-git-send-email-chanyeol.park@samsung.com>
+References: <1430992978-26779-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 
-When matching remote SEP to local SEP we do not match vendor codecs
-properly, i.e. neither vendor ID not codec ID are checked, which may
-cause wrong endpoint to be selected in case there are more that one
-endpoints using vendor codec on remote.
-
-This patch fixes this by assinging vendor codec indentification to
-local SEP after it's registered and uses this information when matching
-SEPs.
-
-This patch is made based on e1c7dddd0dd2f5e23e4d4cf98a9dde713fe6dd53
-written by Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>.
+This function could be removed because A2DP vendor codec match is already
+verified in avdtp_find_remote_sep().
 ---
- profiles/audio/a2dp.c  | 11 +++++++++++
- profiles/audio/avdtp.c | 22 ++++++++++++++++++++++
- profiles/audio/avdtp.h |  3 ++-
- 3 files changed, 35 insertions(+), 1 deletion(-)
+ profiles/audio/a2dp.c | 52 ++-------------------------------------------------
+ 1 file changed, 2 insertions(+), 50 deletions(-)
 
 diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 31c5086..85ec753 100644
+index 85ec753..2842b26 100644
 --- a/profiles/audio/a2dp.c
 +++ b/profiles/audio/a2dp.c
-@@ -1597,6 +1597,17 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
- 		return NULL;
- 	}
- 
-+	if (codec == A2DP_CODEC_VENDOR) {
-+		uint8_t *capabilities;
-+		a2dp_vendor_codec_t *vndcodec;
-+
-+		endpoint->get_capabilities(sep, &capabilities, user_data);
-+		vndcodec = (a2dp_vendor_codec_t *) capabilities;
-+		avdtp_sep_set_vendor_codec(sep->lsep,
-+						btohl(vndcodec->vendor_id),
-+						btohs(vndcodec->codec_id));
-+	}
-+
- 	sep->server = server;
- 	sep->endpoint = endpoint;
- 	sep->codec = codec;
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index f38188f..df6fd42 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -49,6 +49,7 @@
- #include "src/device.h"
- 
- #include "avdtp.h"
-+#include "a2dp-codecs.h"
- #include "sink.h"
- #include "source.h"
- 
-@@ -328,6 +329,8 @@ struct avdtp_local_sep {
- 	struct avdtp_stream *stream;
- 	struct seid_info info;
- 	uint8_t codec;
-+	uint32_t vndcodec_vendor;
-+	uint16_t vndcodec_codec;
- 	gboolean delay_reporting;
- 	GSList *caps;
- 	struct avdtp_sep_ind *ind;
-@@ -1197,6 +1200,13 @@ static struct avdtp_local_sep *find_local_sep_by_seid(struct avdtp *session,
- 	return queue_find(session->lseps, match_by_seid, INT_TO_PTR(seid));
+@@ -1723,50 +1723,11 @@ done:
+ 	finalize_select(setup);
  }
  
-+void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
-+							uint16_t codec_id)
-+{
-+	sep->vndcodec_vendor = vendor_id;
-+	sep->vndcodec_codec = codec_id;
-+}
-+
- struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
- 						struct avdtp_local_sep *lsep)
+-static gboolean check_vendor_codec(struct a2dp_sep *sep, uint8_t *cap,
+-								size_t len)
+-{
+-	uint8_t *capabilities;
+-	size_t length;
+-	a2dp_vendor_codec_t *local_codec;
+-	a2dp_vendor_codec_t *remote_codec;
+-
+-	if (len < sizeof(a2dp_vendor_codec_t))
+-		return FALSE;
+-
+-	remote_codec = (a2dp_vendor_codec_t *) cap;
+-
+-	if (sep->endpoint == NULL)
+-		return FALSE;
+-
+-	length = sep->endpoint->get_capabilities(sep,
+-				&capabilities, sep->user_data);
+-
+-	if (length < sizeof(a2dp_vendor_codec_t))
+-		return FALSE;
+-
+-	local_codec = (a2dp_vendor_codec_t *) capabilities;
+-
+-	if (btohl(remote_codec->vendor_id) != btohl(local_codec->vendor_id))
+-		return FALSE;
+-
+-	if (btohs(remote_codec->codec_id) != btohs(local_codec->codec_id))
+-		return FALSE;
+-
+-	DBG("vendor 0x%08x codec 0x%04x", btohl(remote_codec->vendor_id),
+-						btohs(remote_codec->codec_id));
+-
+-	return TRUE;
+-}
+-
+ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+ 					const char *sender)
  {
-@@ -1226,6 +1236,18 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
- 		if (codec_data->media_codec_type != lsep->codec)
+ 	for (; list; list = list->next) {
+ 		struct a2dp_sep *sep = list->data;
+-		struct avdtp_remote_sep *rsep;
+-		struct avdtp_media_codec_capability *cap;
+-		struct avdtp_service_capability *service;
+ 
+ 		/* Use sender's endpoint if available */
+ 		if (sender) {
+@@ -1780,19 +1741,10 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+ 				continue;
+ 		}
+ 
+-		rsep = avdtp_find_remote_sep(session, sep->lsep);
+-		if (rsep == NULL)
++		if (avdtp_find_remote_sep(session, sep->lsep) == NULL)
  			continue;
  
-+		/* FIXME: Add Vendor Specific Codec match to SEP callback */
-+		if (lsep->codec == A2DP_CODEC_VENDOR) {
-+			a2dp_vendor_codec_t *vndcodec =
-+				(void *) codec_data->data;
-+
-+			if (btohl(vndcodec->vendor_id) != lsep->vndcodec_vendor)
-+				continue;
-+
-+			if (btohs(vndcodec->codec_id) != lsep->vndcodec_codec)
-+				continue;
-+		}
-+
- 		if (sep->stream == NULL)
- 			return sep;
- 	}
-diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-index 1b02232..e237b10 100644
---- a/profiles/audio/avdtp.h
-+++ b/profiles/audio/avdtp.h
-@@ -276,7 +276,8 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
- 						struct avdtp_sep_ind *ind,
- 						struct avdtp_sep_cfm *cfm,
- 						void *user_data);
+-		service = avdtp_get_codec(rsep);
+-		cap = (struct avdtp_media_codec_capability *) service->data;
 -
-+void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
-+							uint16_t codec_id);
- /* Find a matching pair of local and remote SEP ID's */
- struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
- 						struct avdtp_local_sep *lsep);
+-		if (cap->media_codec_type != A2DP_CODEC_VENDOR)
+-			return sep;
+-
+-		if (check_vendor_codec(sep, cap->data,
+-					service->length - sizeof(*cap)))
+-			return sep;
++		return sep;
+ 	}
+ 
+ 	return NULL;
 -- 
 2.1.0
 
