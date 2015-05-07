@@ -1,24 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
+From: Ankur Patel <ankur@embertec.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 7 May 2015 16:18:09 +0930
+Subject: Alternative to 'gattc' 'gatts' commands for Linux
+Message-ID: <BD5E516FF3711A41B93DC005170007BB010D943988C6@EMBSVR01.ember.local>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <BD5E516FF3711A41B93DC005170007BB010D943988C6@EMBSVR01.ember.local>
-References: <BD5E516FF3711A41B93DC005170007BB010D943988C6@EMBSVR01.ember.local>
-Date: Thu, 7 May 2015 09:08:39 +0200
-Message-ID: <CAMv5GbdcD==pTmDEYXZ90K0SCdR6gc6hSaAa20YmPHAskw1Y-Q@mail.gmail.com>
-Subject: Re: Alternative to 'gattc' 'gatts' commands for Linux
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Ankur Patel <ankur@embertec.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ankur,
+Hello Folks,
 
-gattc, gatts are shortcuts of haltest (bluez tool for android hal
-test) prefix commands related to client and server.
+I am now using 3.18.12 Linux kernel and Bluez 5.30 version on board. Running tests mentioned at http://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/pts-gap.txt, some of the commands like 'gattc' and 'gatts' are not available for linux. Is there any alternative commands/tools I can use to run those tests on linux?
 
-Instead of gattc you can use btgatt-client tool and gatts -
-btgatt-server tool, both of them are in bluez/tools/ .
-
-Br,
-Grzegorz
+Thank you,
+Regards,
+Ankur.
