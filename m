@@ -1,209 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/5] Bluetooth: btbcm: Split setup() function
-Date: Thu,  7 May 2015 16:24:58 +0200
-Message-Id: <1431008699-6419-4-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v2 5/5] Bluetooth: btbcm: Add bcm_set_baudrate()
+Date: Thu,  7 May 2015 16:24:59 +0200
+Message-Id: <1431008699-6419-5-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1431008699-6419-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1431008699-6419-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Split btbcm_setup_patchram in 3 functions : btbcm_setup_patchram,
-btbcm_patchram (already existing) and btbcm_setup_post.
-For UART controllers this will allow to reset speed to default one
-after firmware loading, which will have reseted controller speed to
-default one.
+Add vendor specific command to change controller device speed.
 
 Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 ---
- drivers/bluetooth/btbcm.c   | 29 +++++++++++++++++------------
- drivers/bluetooth/btbcm.h   | 11 +++++++++--
- drivers/bluetooth/btusb.c   | 23 ++++++++++++++++++++++-
- drivers/bluetooth/hci_bcm.c | 19 ++++++++++++++++++-
- 4 files changed, 66 insertions(+), 16 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 71 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index b258454..f2efbbd 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -277,9 +277,8 @@ static const struct {
- 	{ }
- };
- 
--int btbcm_setup_patchram(struct hci_dev *hdev)
-+int btbcm_setup_patchram(struct hci_dev *hdev, char *fw_name, size_t len)
- {
--	char fw_name[64];
- 	u16 subver, rev, pid, vid;
- 	const char *hw_name = NULL;
- 	struct sk_buff *skb;
-@@ -319,8 +318,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 			}
- 		}
- 
--		snprintf(fw_name, sizeof(fw_name), "brcm/%s.hcd",
--			 hw_name ? : "BCM");
-+		snprintf(fw_name, len, "brcm/%s.hcd", hw_name ? : "BCM");
- 		break;
- 	case 1:
- 	case 2:
-@@ -340,7 +338,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 			}
- 		}
- 
--		snprintf(fw_name, sizeof(fw_name), "brcm/%s-%4.4x-%4.4x.hcd",
-+		snprintf(fw_name, len, "brcm/%s-%4.4x-%4.4x.hcd",
- 			 hw_name ? : "BCM", vid, pid);
- 		break;
- 	default:
-@@ -351,9 +349,16 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 		hw_name ? : "BCM", (subver & 0x7000) >> 13,
- 		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
- 
--	err = btbcm_patchram(hdev, fw_name);
--	if (err == -ENOENT)
--		return 0;
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btbcm_setup_patchram);
-+
-+int btbcm_setup_post(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+	struct hci_rp_read_local_version *ver;
-+	u16 subver, rev;
-+	int err;
- 
- 	/* Reset */
- 	err = btbcm_reset(hdev);
-@@ -370,9 +375,9 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 	subver = le16_to_cpu(ver->lmp_subver);
- 	kfree_skb(skb);
- 
--	BT_INFO("%s: %s (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
--		hw_name ? : "BCM", (subver & 0x7000) >> 13,
--		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
-+	BT_INFO("%s: BCM (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
-+		(subver & 0x7000) >> 13, (subver & 0x1f00) >> 8,
-+		(subver & 0x00ff), rev & 0x0fff);
- 
- 	btbcm_check_bdaddr(hdev);
- 
-@@ -380,7 +385,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(btbcm_setup_patchram);
-+EXPORT_SYMBOL_GPL(btbcm_setup_post);
- 
- int btbcm_setup_apple(struct hci_dev *hdev)
- {
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-index eb6ab5f..73d92a2 100644
---- a/drivers/bluetooth/btbcm.h
-+++ b/drivers/bluetooth/btbcm.h
-@@ -27,7 +27,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev);
- int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int btbcm_patchram(struct hci_dev *hdev, const char *firmware);
- 
--int btbcm_setup_patchram(struct hci_dev *hdev);
-+int btbcm_setup_patchram(struct hci_dev *hdev, char *fw_name, size_t len);
-+int btbcm_setup_post(struct hci_dev *hdev);
- int btbcm_setup_apple(struct hci_dev *hdev);
- 
- #else
-@@ -47,7 +48,13 @@ static inline int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
- 	return -EOPNOTSUPP;
- }
- 
--static inline int btbcm_setup_patchram(struct hci_dev *hdev)
-+static inline int btbcm_setup_patchram(struct hci_dev *hdev, char *fw_name,
-+								size_t len)
-+{
-+	return 0;
-+}
-+
-+static int btbcm_setup_post(struct hci_dev *hdev)
- {
- 	return 0;
- }
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 77c1f8c..15225d9 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1333,6 +1333,27 @@ static int btusb_setup_bcm92035(struct hci_dev *hdev)
- 	return 0;
- }
- 
-+#ifdef CONFIG_BT_HCIBTUSB_BCM
-+static int btusb_setup_bcm(struct hci_dev *hdev)
-+{
-+	char fw_name[64];
-+	int err;
-+
-+	err = btbcm_setup_patchram(hdev, fw_name, sizeof(fw_name));
-+	if (err)
-+		return err;
-+
-+	err = btbcm_patchram(hdev, fw_name);
-+	/* If there is no firmware (-ENOENT), discard the error and continue */
-+	if (err == -ENOENT)
-+		return 0;
-+
-+	err = btbcm_setup_post(hdev);
-+
-+	return err;
-+}
-+#endif
-+
- static int btusb_setup_csr(struct hci_dev *hdev)
- {
- 	struct hci_rp_read_local_version *rp;
-@@ -3132,7 +3153,7 @@ static int btusb_probe(struct usb_interface *intf,
- 
- #ifdef CONFIG_BT_HCIBTUSB_BCM
- 	if (id->driver_info & BTUSB_BCM_PATCHRAM) {
--		hdev->setup = btbcm_setup_patchram;
-+		hdev->setup = btusb_setup_bcm;
- 		hdev->set_bdaddr = btbcm_set_bdaddr;
- 	}
- 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 1ec0b4a..0e77b9a 100644
+index 0e77b9a..6b3f5d5 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -79,11 +79,28 @@ static int bcm_flush(struct hci_uart *hu)
+@@ -24,6 +24,7 @@
+ #include <linux/kernel.h>
+ #include <linux/errno.h>
+ #include <linux/skbuff.h>
++#include <linux/tty.h>
  
- static int bcm_setup(struct hci_uart *hu)
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -31,11 +32,71 @@
+ #include "btbcm.h"
+ #include "hci_uart.h"
+ 
++#define BCM43XX_CLOCK_48 1
++#define BCM43XX_CLOCK_24 2
++
+ struct bcm_data {
+ 	struct sk_buff *rx_skb;
+ 	struct sk_buff_head txq;
+ };
+ 
++struct hci_cp_bcm_set_speed {
++	__le16   dummy;
++	__le32   speed;
++} __packed;
++
++static int bcm_set_baudrate(struct hci_uart *hu, int speed)
++{
++	struct hci_dev *hdev = hu->hdev;
++	struct sk_buff *skb;
++	struct hci_cp_bcm_set_speed param = { 0, cpu_to_le32(speed) };
++	u8 status;
++
++	if (speed > 3000000) {
++		u8 clock = BCM43XX_CLOCK_48;
++
++		BT_DBG("%s: Set Controller clock (%d)", hdev->name, clock);
++
++		skb = __hci_cmd_sync(hdev, 0xfc45, 1, &clock, HCI_INIT_TIMEOUT,
++				     &status);
++		if (IS_ERR(skb)) {
++			BT_ERR("%s: failed to write update clock command (%ld)",
++			       hdev->name, PTR_ERR(skb));
++			return PTR_ERR(skb);
++		}
++
++		if (status) {
++			BT_ERR("%s: write update clock event failed (%02x)",
++			       hdev->name, status);
++			kfree_skb(skb);
++			return -bt_to_errno(status);
++		}
++
++		kfree_skb(skb);
++	}
++
++	BT_DBG("%s: Set Controller UART speed to %d bit/s", hdev->name, speed);
++
++	skb = __hci_cmd_sync(hdev, 0xfc18, sizeof(param), &param,
++			     HCI_INIT_TIMEOUT, &status);
++	if (IS_ERR(skb)) {
++		BT_ERR("%s: failed to write update baudrate command (%ld)",
++		       hdev->name, PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++
++	if (status) {
++		BT_ERR("%s: write update baudrate event failed (%02x)",
++		       hdev->name, status);
++		kfree_skb(skb);
++		return -bt_to_errno(status);
++	}
++
++	kfree_skb(skb);
++
++	return 0;
++}
++
+ static int bcm_open(struct hci_uart *hu)
  {
-+	char fw_name[64];
-+	int err;
-+
- 	BT_DBG("hu %p", hu);
+ 	struct bcm_data *bcm;
+@@ -98,6 +159,13 @@ static int bcm_setup(struct hci_uart *hu)
+ 	if (hu->proto->default_speed)
+ 		hci_uart_set_baudrate(hu, hu->proto->default_speed);
  
- 	hu->hdev->set_bdaddr = btbcm_set_bdaddr;
++	if (hu->proto->operational_speed) {
++		err = bcm_set_baudrate(hu, hu->proto->operational_speed);
++		if (err)
++			return err;
++		hci_uart_set_baudrate(hu, hu->proto->operational_speed);
++	}
++
+ 	err = btbcm_setup_post(hu->hdev);
  
--	return btbcm_setup_patchram(hu->hdev);
-+	err = btbcm_setup_patchram(hu->hdev, fw_name, sizeof(fw_name));
-+	if (err)
-+		return err;
-+
-+	err = btbcm_patchram(hu->hdev, fw_name);
-+	/* If there is no firmware (-ENOENT), discard the error and continue */
-+	if (err == -ENOENT)
-+		return 0;
-+
-+	if (hu->proto->default_speed)
-+		hci_uart_set_baudrate(hu, hu->proto->default_speed);
-+
-+	err = btbcm_setup_post(hu->hdev);
-+
-+	return err;
- }
- 
- static const struct h4_recv_pkt bcm_recv_pkts[] = {
+ 	return err;
+@@ -150,10 +218,13 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
+ static const struct hci_uart_proto bcm_proto = {
+ 	.id		= HCI_UART_BCM,
+ 	.name		= "BCM",
++	.default_speed	= 115200,
++	.operational_speed = 4000000,
+ 	.open		= bcm_open,
+ 	.close		= bcm_close,
+ 	.flush		= bcm_flush,
+ 	.setup		= bcm_setup,
++	.set_baudrate	= bcm_set_baudrate,
+ 	.recv		= bcm_recv,
+ 	.enqueue	= bcm_enqueue,
+ 	.dequeue	= bcm_dequeue,
 -- 
 1.9.1
 
