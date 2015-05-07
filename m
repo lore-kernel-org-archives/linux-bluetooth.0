@@ -1,260 +1,218 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Amitkumar Karwar <akarwar@marvell.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH] Bluetooth: btmrvl: add manufacturing mode support
-Date: Thu, 07 May 2015 18:33:40 +0200
-Message-ID: <9058872.bsh93WddjV@leonov>
-In-Reply-To: <1431012963-2754-1-git-send-email-akarwar@marvell.com>
-References: <1431012963-2754-1-git-send-email-akarwar@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH v2 4/5] Bluetooth: btbcm: Split setup() function
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1431008699-6419-4-git-send-email-frederic.danis@linux.intel.com>
+Date: Thu, 7 May 2015 17:22:13 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6F8C6327-C7F0-4081-B3A8-8A3A609C915E@holtmann.org>
+References: <1431008699-6419-1-git-send-email-frederic.danis@linux.intel.com> <1431008699-6419-4-git-send-email-frederic.danis@linux.intel.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Amitkumar,
+Hi Fred,
 
-On Thursday 07 of May 2015 08:36:03 Amitkumar Karwar wrote:
-> Default firmware is chosen when driver is loaded. This patch
-> adds provision to download manufacturing firmware which is
-> used for RF tests in the factory through sysfs configuration.
+> Split btbcm_setup_patchram in 3 functions : btbcm_setup_patchram,
+> btbcm_patchram (already existing) and btbcm_setup_post.
+> For UART controllers this will allow to reset speed to default one
+> after firmware loading, which will have reseted controller speed to
+> default one.
 > 
-> Procedure
-> 1) Switch from normal mode to manufacturing mode.
->     echo 1 > /sys/class/bluetooth/hci0/mfg_mode.
->     echo "mrvl/sdio8897_mfg.bin" > /sys/class/bluetooth/hci0/mfg_firmware
->     Trigger chip reset from wlan driver.
-> 
-> 2) Switch from manufacturing mode to normal mode.
->    echo 0 > /sys/class/bluetooth/hci0/mfg_mode
->    Trigger chip reset from wlan driver.
-> 
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 > ---
->  drivers/bluetooth/Makefile       |   1 +
->  drivers/bluetooth/btmrvl_drv.h   |   7 +++
->  drivers/bluetooth/btmrvl_main.c  |   3 ++
->  drivers/bluetooth/btmrvl_sdio.c  |  16 +++++-
->  drivers/bluetooth/btmrvl_sysfs.c | 103
-> +++++++++++++++++++++++++++++++++++++++ 5 files changed, 128 insertions(+),
-> 2 deletions(-)
->  create mode 100644 drivers/bluetooth/btmrvl_sysfs.c
+> drivers/bluetooth/btbcm.c   | 29 +++++++++++++++++------------
+> drivers/bluetooth/btbcm.h   | 11 +++++++++--
+> drivers/bluetooth/btusb.c   | 23 ++++++++++++++++++++++-
+> drivers/bluetooth/hci_bcm.c | 19 ++++++++++++++++++-
+> 4 files changed, 66 insertions(+), 16 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-> index dd0d9c4..11042ac 100644
-> --- a/drivers/bluetooth/Makefile
-> +++ b/drivers/bluetooth/Makefile
-> @@ -23,6 +23,7 @@ obj-$(CONFIG_BT_WILINK)		+= btwilink.o
->  obj-$(CONFIG_BT_BCM)		+= btbcm.o
+> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> index b258454..f2efbbd 100644
+> --- a/drivers/bluetooth/btbcm.c
+> +++ b/drivers/bluetooth/btbcm.c
+> @@ -277,9 +277,8 @@ static const struct {
+> 	{ }
+> };
 > 
->  btmrvl-y			:= btmrvl_main.o
-> +btmrvl-y			+= btmrvl_sysfs.o
->  btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
-> 
->  hci_uart-y				:= hci_ldisc.o
-> diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-> index 086f0ec..71dc407 100644
-> --- a/drivers/bluetooth/btmrvl_drv.h
-> +++ b/drivers/bluetooth/btmrvl_drv.h
-> @@ -89,6 +89,7 @@ struct btmrvl_adapter {
->  	wait_queue_head_t event_hs_wait_q;
->  	u8 cmd_complete;
->  	bool is_suspended;
-> +	bool mfg_mode;
->  };
-> 
->  struct btmrvl_private {
-> @@ -155,6 +156,9 @@ struct btmrvl_event {
->  	u8 data[4];
->  } __packed;
-> 
-> +extern bool mfg_mode;
-> +extern char mfg_firmware[32];
-> +
->  /* Prototype of global function */
-> 
->  int btmrvl_register_hdev(struct btmrvl_private *priv);
-> @@ -174,6 +178,9 @@ int btmrvl_prepare_command(struct btmrvl_private *priv);
-> int btmrvl_enable_hs(struct btmrvl_private *priv);
->  void btmrvl_firmware_dump(struct btmrvl_private *priv);
-> 
-> +int btmrvl_sysfs_register(struct hci_dev *hdev);
-> +void btmrvl_sysfs_unregister(struct hci_dev *hdev);
-> +
->  #ifdef CONFIG_DEBUG_FS
->  void btmrvl_debugfs_init(struct hci_dev *hdev);
->  void btmrvl_debugfs_remove(struct hci_dev *hdev);
-> diff --git a/drivers/bluetooth/btmrvl_main.c
-> b/drivers/bluetooth/btmrvl_main.c index de05deb..1a76bdd 100644
-> --- a/drivers/bluetooth/btmrvl_main.c
-> +++ b/drivers/bluetooth/btmrvl_main.c
-> @@ -432,6 +432,7 @@ static void btmrvl_init_adapter(struct btmrvl_private
-> *priv)
-> 
->  	init_waitqueue_head(&priv->adapter->cmd_wait_q);
->  	init_waitqueue_head(&priv->adapter->event_hs_wait_q);
-> +	priv->adapter->mfg_mode = mfg_mode;
->  }
-> 
->  static void btmrvl_free_adapter(struct btmrvl_private *priv)
-> @@ -716,6 +717,7 @@ int btmrvl_register_hdev(struct btmrvl_private *priv)
->  #ifdef CONFIG_DEBUG_FS
->  	btmrvl_debugfs_init(hdev);
->  #endif
-> +	btmrvl_sysfs_register(hdev);
-> 
->  	return 0;
-> 
-> @@ -791,6 +793,7 @@ int btmrvl_remove_card(struct btmrvl_private *priv)
->  #ifdef CONFIG_DEBUG_FS
->  	btmrvl_debugfs_remove(hdev);
->  #endif
-> +	btmrvl_sysfs_unregister(hdev);
-> 
->  	hci_unregister_dev(hdev);
-> 
-> diff --git a/drivers/bluetooth/btmrvl_sdio.c
-> b/drivers/bluetooth/btmrvl_sdio.c index 01d6da5..82268717 100644
-> --- a/drivers/bluetooth/btmrvl_sdio.c
-> +++ b/drivers/bluetooth/btmrvl_sdio.c
-> @@ -452,8 +452,20 @@ static int btmrvl_sdio_download_fw_w_helper(struct
-> btmrvl_sdio_card *card) u16 len, blksz_dl = card->sd_blksz_fw_dl;
->  	int txlen = 0, tx_blocks = 0, count = 0;
-> 
-> -	ret = request_firmware(&fw_firmware, card->firmware,
-> -							&card->func->dev);
-> +	if (mfg_mode && !strlen(mfg_firmware)) {
-> +		mfg_mode = 0;
-> +		BT_ERR("mfg firmware missing. Ignoring manufacturing mode");
-> +	}
-> +
-> +	/* override default firmware name with new one if provided by user */
-> +	if (mfg_mode) {
-> +		ret = request_firmware(&fw_firmware, mfg_firmware,
-> +				       &card->func->dev);
-> +	} else {
-> +		ret = request_firmware(&fw_firmware, card->firmware,
-> +				       &card->func->dev);
-> +	}
-> +
->  	if ((ret < 0) || !fw_firmware) {
->  		BT_ERR("request_firmware(firmware) failed, error code = %d",
->  									ret);
-> diff --git a/drivers/bluetooth/btmrvl_sysfs.c
-> b/drivers/bluetooth/btmrvl_sysfs.c new file mode 100644
-> index 0000000..b39938e
-> --- /dev/null
-> +++ b/drivers/bluetooth/btmrvl_sysfs.c
-> @@ -0,0 +1,103 @@
-> +/* Marvell Bluetooth driver: sysfs related functions
-> + *
-> + * Copyright (C) 2015, Marvell International Ltd.
-> + *
-> + * This software file (the "File") is distributed by Marvell International
-> + * Ltd. under the terms of the GNU General Public License Version 2, June
-> 1991 + * (the "License").  You may use, redistribute and/or modify this
-> File in + * accordance with the terms and conditions of the License, a copy
-> of which + * is available on the worldwide web at
-> + * http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
-> + *
-> + * THE FILE IS DISTRIBUTED AS-IS, WITHOUT WARRANTY OF ANY KIND, AND THE
-> + * IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR
-> PURPOSE + * ARE EXPRESSLY DISCLAIMED.  The License provides additional
-> details about + * this warranty disclaimer.
-> + */
-> +
-> +#include <net/bluetooth/bluetooth.h>
-> +#include <net/bluetooth/hci_core.h>
-> +#include "btmrvl_drv.h"
-> +
-> +bool mfg_mode;
-> +EXPORT_SYMBOL_GPL(mfg_mode);
-> +char mfg_firmware[32];
-> +EXPORT_SYMBOL_GPL(mfg_firmware);
-> +
-> +static ssize_t
-> +btmrvl_sysfs_get_mfg_mode(struct device *dev, struct device_attribute
-> *attr, +			  char *buf)
-> +{
-> +	struct btmrvl_private *priv = hci_get_drvdata(to_hci_dev(dev));
-> +
-> +	return snprintf(buf, PAGE_SIZE, "%d\n", priv->adapter->mfg_mode);
-> +}
-> +
-> +static ssize_t
-> +btmrvl_sysfs_set_mfg_mode(struct device *dev, struct device_attribute
-> *attr, +			  const char *buf, size_t count)
-> +{
-> +	bool res;
-> +
-> +	if (strtobool(buf, &res))
-> +		return -EINVAL;
-> +
-> +	mfg_mode = res;
-> +
-> +	return count;
-> +}
-> +
-> +static DEVICE_ATTR(mfg_mode, S_IRUGO | S_IWUSR,
-> +		   btmrvl_sysfs_get_mfg_mode,
-> +		   btmrvl_sysfs_set_mfg_mode);
-> +
-> +static ssize_t btmrvl_sysfs_show_mfg_firmware(struct device *dev,
-> +					      struct device_attribute *attr,
-> +					      char *buf)
-> +{
-> +	return snprintf(buf, PAGE_SIZE, "%s\n", mfg_firmware);
-> +}
-> +
-> +static ssize_t btmrvl_sysfs_store_mfg_firmware(struct device *dev,
-> +					       struct device_attribute *attr,
-> +					       const char *buf, size_t count)
-> +{
-> +	int len;
-> +
-> +	len = strlen(buf);
-> +	if (len > sizeof(mfg_firmware))
-> +		return -EINVAL;
-> +
-> +	strcpy(mfg_firmware, buf);
+> -int btbcm_setup_patchram(struct hci_dev *hdev)
+> +int btbcm_setup_patchram(struct hci_dev *hdev, char *fw_name, size_t len)
 
-if len == sizeof(mfg_firmware) you will write 1 byte after mfg_firmware
+what is this len for? The fw_name is not a return value. I think the functions for doing the patchram should just get a firmware and then just do patchram.
 
-> +	mfg_firmware[len - 1] = '\0';
-
-if len == 0 you will write 1 byte before mfg_firmware
-
-> +
-> +	return count;
+> {
+> -	char fw_name[64];
+> 	u16 subver, rev, pid, vid;
+> 	const char *hw_name = NULL;
+> 	struct sk_buff *skb;
+> @@ -319,8 +318,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+> 			}
+> 		}
+> 
+> -		snprintf(fw_name, sizeof(fw_name), "brcm/%s.hcd",
+> -			 hw_name ? : "BCM");
+> +		snprintf(fw_name, len, "brcm/%s.hcd", hw_name ? : "BCM");
+> 		break;
+> 	case 1:
+> 	case 2:
+> @@ -340,7 +338,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+> 			}
+> 		}
+> 
+> -		snprintf(fw_name, sizeof(fw_name), "brcm/%s-%4.4x-%4.4x.hcd",
+> +		snprintf(fw_name, len, "brcm/%s-%4.4x-%4.4x.hcd",
+> 			 hw_name ? : "BCM", vid, pid);
+> 		break;
+> 	default:
+> @@ -351,9 +349,16 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+> 		hw_name ? : "BCM", (subver & 0x7000) >> 13,
+> 		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
+> 
+> -	err = btbcm_patchram(hdev, fw_name);
+> -	if (err == -ENOENT)
+> -		return 0;
+> +	return 0;
 > +}
-> +static DEVICE_ATTR(mfg_firmware, S_IRUGO | S_IWUSR,
-> +		   btmrvl_sysfs_show_mfg_firmware,
-> +		   btmrvl_sysfs_store_mfg_firmware);
+> +EXPORT_SYMBOL_GPL(btbcm_setup_patchram);
 > +
-> +int btmrvl_sysfs_register(struct hci_dev *hdev)
+> +int btbcm_setup_post(struct hci_dev *hdev)
 > +{
-> +	int ret;
-> +
-> +	/* Create sysfs file to control manufacturing mode feature*/
-> +	ret = device_create_file(&hdev->dev, &dev_attr_mfg_mode);
-> +	if (ret)
-> +		BT_ERR("%s failed to create sysfs file mfg_mode", hdev->name);
-> +
-> +	/* Create sysfs file to store manufacturing firmware name */
-> +	ret = device_create_file(&hdev->dev, &dev_attr_mfg_firmware);
-> +	if (ret)
-> +		BT_ERR("%s failed to create sysfs file mfg_firmware",
-> +		       hdev->name);
-> +
-> +	return ret;
-> +}
-> +
-> +void btmrvl_sysfs_unregister(struct hci_dev *hdev)
+> +	struct sk_buff *skb;
+> +	struct hci_rp_read_local_version *ver;
+> +	u16 subver, rev;
+> +	int err;
+> 
+> 	/* Reset */
+> 	err = btbcm_reset(hdev);
+> @@ -370,9 +375,9 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+> 	subver = le16_to_cpu(ver->lmp_subver);
+> 	kfree_skb(skb);
+> 
+> -	BT_INFO("%s: %s (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
+> -		hw_name ? : "BCM", (subver & 0x7000) >> 13,
+> -		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
+> +	BT_INFO("%s: BCM (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
+> +		(subver & 0x7000) >> 13, (subver & 0x1f00) >> 8,
+> +		(subver & 0x00ff), rev & 0x0fff);
+> 
+> 	btbcm_check_bdaddr(hdev);
+> 
+> @@ -380,7 +385,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+> 
+> 	return 0;
+> }
+> -EXPORT_SYMBOL_GPL(btbcm_setup_patchram);
+> +EXPORT_SYMBOL_GPL(btbcm_setup_post);
+> 
+> int btbcm_setup_apple(struct hci_dev *hdev)
+> {
+> diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
+> index eb6ab5f..73d92a2 100644
+> --- a/drivers/bluetooth/btbcm.h
+> +++ b/drivers/bluetooth/btbcm.h
+> @@ -27,7 +27,8 @@ int btbcm_check_bdaddr(struct hci_dev *hdev);
+> int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+> int btbcm_patchram(struct hci_dev *hdev, const char *firmware);
+> 
+> -int btbcm_setup_patchram(struct hci_dev *hdev);
+> +int btbcm_setup_patchram(struct hci_dev *hdev, char *fw_name, size_t len);
+> +int btbcm_setup_post(struct hci_dev *hdev);
+> int btbcm_setup_apple(struct hci_dev *hdev);
+> 
+> #else
+> @@ -47,7 +48,13 @@ static inline int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
+> 	return -EOPNOTSUPP;
+> }
+> 
+> -static inline int btbcm_setup_patchram(struct hci_dev *hdev)
+> +static inline int btbcm_setup_patchram(struct hci_dev *hdev, char *fw_name,
+> +								size_t len)
 > +{
-> +	device_remove_file(&hdev->dev, &dev_attr_mfg_mode);
-> +	device_remove_file(&hdev->dev, &dev_attr_mfg_firmware);
+> +	return 0;
 > +}
 > +
+> +static int btbcm_setup_post(struct hci_dev *hdev)
+> {
+> 	return 0;
+> }
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 77c1f8c..15225d9 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1333,6 +1333,27 @@ static int btusb_setup_bcm92035(struct hci_dev *hdev)
+> 	return 0;
+> }
+> 
+> +#ifdef CONFIG_BT_HCIBTUSB_BCM
+> +static int btusb_setup_bcm(struct hci_dev *hdev)
+> +{
+> +	char fw_name[64];
+> +	int err;
+> +
+> +	err = btbcm_setup_patchram(hdev, fw_name, sizeof(fw_name));
+> +	if (err)
+> +		return err;
+> +
+> +	err = btbcm_patchram(hdev, fw_name);
+> +	/* If there is no firmware (-ENOENT), discard the error and continue */
+> +	if (err == -ENOENT)
+> +		return 0;
+> +
+> +	err = btbcm_setup_post(hdev);
+> +
+> +	return err;
+> +}
+> +#endif
+> +
+> static int btusb_setup_csr(struct hci_dev *hdev)
+> {
+> 	struct hci_rp_read_local_version *rp;
+> @@ -3132,7 +3153,7 @@ static int btusb_probe(struct usb_interface *intf,
+> 
+> #ifdef CONFIG_BT_HCIBTUSB_BCM
+> 	if (id->driver_info & BTUSB_BCM_PATCHRAM) {
+> -		hdev->setup = btbcm_setup_patchram;
+> +		hdev->setup = btusb_setup_bcm;
+> 		hdev->set_bdaddr = btbcm_set_bdaddr;
+> 	}
+> 
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index 1ec0b4a..0e77b9a 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -79,11 +79,28 @@ static int bcm_flush(struct hci_uart *hu)
+> 
+> static int bcm_setup(struct hci_uart *hu)
+> {
+> +	char fw_name[64];
+> +	int err;
+> +
+> 	BT_DBG("hu %p", hu);
+> 
+> 	hu->hdev->set_bdaddr = btbcm_set_bdaddr;
+> 
+> -	return btbcm_setup_patchram(hu->hdev);
+> +	err = btbcm_setup_patchram(hu->hdev, fw_name, sizeof(fw_name));
+> +	if (err)
+> +		return err;
+> +
+> +	err = btbcm_patchram(hu->hdev, fw_name);
+> +	/* If there is no firmware (-ENOENT), discard the error and continue */
+> +	if (err == -ENOENT)
+> +		return 0;
+> +
+> +	if (hu->proto->default_speed)
+> +		hci_uart_set_baudrate(hu, hu->proto->default_speed);
+> +
+> +	err = btbcm_setup_post(hu->hdev);
+> +
+> +	return err;
+> }
+> 
+> static const struct h4_recv_pkt bcm_recv_pkts[] = {
 
--- 
-BR
-Szymon Janc
+Regards
+
+Marcel
+
