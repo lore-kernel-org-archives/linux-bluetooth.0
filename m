@@ -1,144 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v2 5/5] Bluetooth: btbcm: Add bcm_set_baudrate()
+Subject: Re: [PATCH v2 3/5] Bluetooth: hci_uart: Support operational speed during setup
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1431008699-6419-5-git-send-email-frederic.danis@linux.intel.com>
-Date: Thu, 7 May 2015 17:16:24 +0100
+In-Reply-To: <1431008699-6419-3-git-send-email-frederic.danis@linux.intel.com>
+Date: Thu, 7 May 2015 17:13:28 +0100
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <46D1E4EC-7381-4DBA-AB08-54734FCF38C7@holtmann.org>
-References: <1431008699-6419-1-git-send-email-frederic.danis@linux.intel.com> <1431008699-6419-5-git-send-email-frederic.danis@linux.intel.com>
+Message-Id: <F52177DA-151A-436D-85A5-51FABF054B24@holtmann.org>
+References: <1431008699-6419-1-git-send-email-frederic.danis@linux.intel.com> <1431008699-6419-3-git-send-email-frederic.danis@linux.intel.com>
 To: Frederic Danis <frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
-> Add vendor specific command to change controller device speed.
+> Add default and operational speeds.
+> Change to operational speed as soon as possible.
 > 
 > Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 > ---
-> drivers/bluetooth/hci_bcm.c | 71 +++++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 71 insertions(+)
+> drivers/bluetooth/hci_ldisc.c | 26 ++++++++++++++++++++++++++
+> drivers/bluetooth/hci_uart.h  |  4 ++++
+> 2 files changed, 30 insertions(+)
 > 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index 0e77b9a..6b3f5d5 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -24,6 +24,7 @@
-> #include <linux/kernel.h>
-> #include <linux/errno.h>
-> #include <linux/skbuff.h>
-> +#include <linux/tty.h>
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index 2b5d946..071f09c 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -265,11 +265,37 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+> 	return 0;
+> }
 > 
-> #include <net/bluetooth/bluetooth.h>
-> #include <net/bluetooth/hci_core.h>
-> @@ -31,11 +32,71 @@
-> #include "btbcm.h"
-> #include "hci_uart.h"
-> 
-> +#define BCM43XX_CLOCK_48 1
-> +#define BCM43XX_CLOCK_24 2
-> +
-> struct bcm_data {
-> 	struct sk_buff *rx_skb;
-> 	struct sk_buff_head txq;
-> };
-> 
-> +struct hci_cp_bcm_set_speed {
-> +	__le16   dummy;
-> +	__le32   speed;
-> +} __packed;
-> +
-> +static int bcm_set_baudrate(struct hci_uart *hu, int speed)
+> +void hci_uart_set_baudrate(struct hci_uart *hu, unsigned long speed)
 > +{
-> +	struct hci_dev *hdev = hu->hdev;
-> +	struct sk_buff *skb;
-> +	struct hci_cp_bcm_set_speed param = { 0, cpu_to_le32(speed) };
-> +	u8 status;
+> +	struct tty_struct *tty = hu->tty;
+> +	struct ktermios ktermios;
 > +
-> +	if (speed > 3000000) {
-> +		u8 clock = BCM43XX_CLOCK_48;
+> +	ktermios = tty->termios;
+> +	ktermios.c_cflag &= ~CBAUD;
+> +	ktermios.c_cflag |= BOTHER;
+> +	tty_termios_encode_baud_rate(&ktermios, speed, speed);
 > +
-> +		BT_DBG("%s: Set Controller clock (%d)", hdev->name, clock);
+> +	tty_set_termios(tty, &ktermios);
 > +
-> +		skb = __hci_cmd_sync(hdev, 0xfc45, 1, &clock, HCI_INIT_TIMEOUT,
-> +				     &status);
-> +		if (IS_ERR(skb)) {
-> +			BT_ERR("%s: failed to write update clock command (%ld)",
-> +			       hdev->name, PTR_ERR(skb));
-> +			return PTR_ERR(skb);
-> +		}
-> +
-> +		if (status) {
-> +			BT_ERR("%s: write update clock event failed (%02x)",
-> +			       hdev->name, status);
-> +			kfree_skb(skb);
-> +			return -bt_to_errno(status);
-> +		}
-> +
-> +		kfree_skb(skb);
-> +	}
-> +
-> +	BT_DBG("%s: Set Controller UART speed to %d bit/s", hdev->name, speed);
-> +
-> +	skb = __hci_cmd_sync(hdev, 0xfc18, sizeof(param), &param,
-> +			     HCI_INIT_TIMEOUT, &status);
-> +	if (IS_ERR(skb)) {
-> +		BT_ERR("%s: failed to write update baudrate command (%ld)",
-> +		       hdev->name, PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +
-> +	if (status) {
-> +		BT_ERR("%s: write update baudrate event failed (%02x)",
-> +		       hdev->name, status);
-> +		kfree_skb(skb);
-> +		return -bt_to_errno(status);
-> +	}
-> +
-> +	kfree_skb(skb);
-> +
-> +	return 0;
+> +	BT_DBG("%s: New tty speed: %d", hu->hdev->name, tty->termios.c_ispeed);
 > +}
 > +
-> static int bcm_open(struct hci_uart *hu)
+> static int hci_uart_setup(struct hci_dev *hdev)
 > {
-> 	struct bcm_data *bcm;
-> @@ -98,6 +159,13 @@ static int bcm_setup(struct hci_uart *hu)
-> 	if (hu->proto->default_speed)
-> 		hci_uart_set_baudrate(hu, hu->proto->default_speed);
-> 
-> +	if (hu->proto->operational_speed) {
-> +		err = bcm_set_baudrate(hu, hu->proto->operational_speed);
+> 	struct hci_uart *hu = hci_get_drvdata(hdev);
+> 	struct hci_rp_read_local_version *ver;
+> 	struct sk_buff *skb;
+> +	int err;
+> +
+> +	if (hu->proto->default_speed)
+> +		hci_uart_set_baudrate(hu, hu->proto->default_speed);
+> +
+> +	if (hu->proto->set_baudrate && hu->proto->operational_speed) {
+> +		err = hu->proto->set_baudrate(hu, hu->proto->operational_speed);
 > +		if (err)
 > +			return err;
-
-Why would we fail here. I think we can just gracefully continue. It just means it is slower.
-
 > +		hci_uart_set_baudrate(hu, hu->proto->operational_speed);
-
-This one failing would be pretty bad and we might need to check that. However it could be well that this can not fail at all actually. Check the TTY layer and add a comment here explaining it either way.
-
 > +	}
-> +
-> 	err = btbcm_setup_post(hu->hdev);
 > 
-> 	return err;
-> @@ -150,10 +218,13 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
-> static const struct hci_uart_proto bcm_proto = {
-> 	.id		= HCI_UART_BCM,
-> 	.name		= "BCM",
-> +	.default_speed	= 115200,
-> +	.operational_speed = 4000000,
-> 	.open		= bcm_open,
-> 	.close		= bcm_close,
-> 	.flush		= bcm_flush,
-> 	.setup		= bcm_setup,
-> +	.set_baudrate	= bcm_set_baudrate,
-> 	.recv		= bcm_recv,
-> 	.enqueue	= bcm_enqueue,
-> 	.dequeue	= bcm_dequeue,
+> 	if (hu->proto->setup)
+> 		return hu->proto->setup(hu);
+> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> index 72120a5..572ac04 100644
+> --- a/drivers/bluetooth/hci_uart.h
+> +++ b/drivers/bluetooth/hci_uart.h
+> @@ -58,10 +58,13 @@ struct hci_uart;
+> struct hci_uart_proto {
+> 	unsigned int id;
+> 	const char *name;
+> +	unsigned long default_speed;
+> +	unsigned long operational_speed;
+
+I get the feeling we want init_speed and oper_speed here to keep it shorter.
+ 
+> 	int (*open)(struct hci_uart *hu);
+> 	int (*close)(struct hci_uart *hu);
+> 	int (*flush)(struct hci_uart *hu);
+> 	int (*setup)(struct hci_uart *hu);
+> +	int (*set_baudrate)(struct hci_uart *hu, int speed);
+
+So what is the speed now? int or unsigned long?
+
+> 	int (*recv)(struct hci_uart *hu, const void *data, int len);
+> 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
+> 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
+> @@ -96,6 +99,7 @@ int hci_uart_register_proto(const struct hci_uart_proto *p);
+> int hci_uart_unregister_proto(const struct hci_uart_proto *p);
+> int hci_uart_tx_wakeup(struct hci_uart *hu);
+> int hci_uart_init_ready(struct hci_uart *hu);
+> +void hci_uart_set_baudrate(struct hci_uart *hu, unsigned long speed);
 
 Regards
 
