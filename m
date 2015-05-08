@@ -1,43 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/4] android/gatt: Fix autoconnect
-Date: Fri, 08 May 2015 14:46:22 +0200
-Message-ID: <5915398.yFWW3tx09O@leonov>
-In-Reply-To: <1430393178-29983-4-git-send-email-mariusz.skamra@gmail.com>
-References: <1430393178-29983-1-git-send-email-mariusz.skamra@gmail.com> <1430393178-29983-4-git-send-email-mariusz.skamra@gmail.com>
+Date: Fri, 8 May 2015 03:59:46 -0700
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>, tedd.an@intel.com
+Subject: [PATCH] Bluetooth: btusb: Apply Intel device configuration routine
+Message-ID: <20150508035946.0039963d@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-On Thursday 30 of April 2015 13:26:18 Mariusz Skamra wrote:
-> This patch fixes autoconnect issue, however there is also race hazard in
-> Android Gatt framework. If app uses autoconnect while connecting,
-> direct flag is set to false. Then bt_gatt_add_autoconnect should be called
-> to add this app's id to autoconnect_apps queue.
-> ---
->  android/gatt.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 4da959f..72a27ab 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -1972,6 +1972,7 @@ static bool trigger_connection(struct app_connection
-> *conn, bool direct) if (direct)
->  			return connect_le(conn->device) == 0;
-> 
-> +		bt_gatt_add_autoconnect(conn->app->id, &conn->device->bdaddr);
->  		return auto_connect_le(conn->device);
->  	case DEVICE_CONNECTED:
->  		notify_app_connect_status(conn, GATT_SUCCESS);
+This patch adds support to apply the device configuration parameters
+(DDC) after firwmare downloading on Intel 8265 device.
 
-This patch is now applied. Thanks.
+This is optional configuration parameters and good to have.
+So, even if it fails to apply it, it is not necessary to fail the
+setup.
 
+The file format is same as previous firmware patch (.bseq) and
+this is only applicable to Intel 8265 device.
+
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btusb.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index d21f3b4..27cd2bf 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2644,6 +2644,40 @@ done:
+ 
+ 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+ 
++	/* Once the device is running in operational mode, it needs to apply
++	 * the configuration parameters to the device.
++	 */
++	snprintf(fwname, sizeof(fwname), "intel/ibt-11.bseq");
++
++	/* Device can work without this configuration so even if it fails
++	 * to load the file, no need to fail the setup
++	 */
++	err = request_firmware_direct(&fw, fwname, &hdev->dev);
++	if (err < 0) {
++		BT_INFO("%s: WARNING: unable to load configuration file (%d)",
++			hdev->name, err);
++		return 0;
++	}
++
++	BT_INFO("%s: Found device configuration file: %s", hdev->name, fwname);
++
++	fw_ptr = fw->data;
++	while (fw->size > fw_ptr - fw->data) {
++		int ignore;
++
++		err = btusb_setup_intel_patching(hdev, fw, &fw_ptr,
++						 &ignore);
++		if (err < 0) {
++			BT_INFO("%s: WARNING: failed to send configuration(%d)",
++				hdev->name, err);
++			release_firmware(fw);
++			return 0;
++		}
++	}
++	release_firmware(fw);
++
++	BT_INFO("%s: Device configuration completed", hdev->name);
++
+ 	return 0;
+ }
+ 
 -- 
-BR
-Szymon Janc
+2.1.0
+
