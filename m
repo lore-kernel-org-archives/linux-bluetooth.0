@@ -1,35 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] audio/avrcp: Reduce the interval of position changed
-Date: Fri,  8 May 2015 16:58:19 +0300
-Message-Id: <1431093499-25762-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 8 May 2015 06:57:01 -0700
+Subject: RE: [PATCH] Bluetooth: btmrvl: add manufacturing mode support
+Message-ID: <5FF020A1CFFEEC49BD1E09530C4FF5951B17110716@SC-VEXCH1.marvell.com>
+References: <1431012963-2754-1-git-send-email-akarwar@marvell.com>
+ <473D0724-1A5E-4F6C-9A88-0EA53BF64116@holtmann.org>
+In-Reply-To: <473D0724-1A5E-4F6C-9A88-0EA53BF64116@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-Using UINT32_MAX overflow in Android implementation as it multiple the
-value by 1000 to get the interval in miliseconds which seem to truncate
-the value causing it to send position changed too frequently flooding
-the channel.
----
- profiles/audio/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> Hi Amitkumar,
+>=20
+> > Default firmware is chosen when driver is loaded. This patch adds
+> > provision to download manufacturing firmware which is used for RF
+> > tests in the factory through sysfs configuration.
+> >
+> > Procedure
+> > 1) Switch from normal mode to manufacturing mode.
+> >    echo 1 > /sys/class/bluetooth/hci0/mfg_mode.
+> >    echo "mrvl/sdio8897_mfg.bin" >
+> /sys/class/bluetooth/hci0/mfg_firmware
+> >    Trigger chip reset from wlan driver.
+> >
+> > 2) Switch from manufacturing mode to normal mode.
+> >   echo 0 > /sys/class/bluetooth/hci0/mfg_mode
+> >   Trigger chip reset from wlan driver.
+>=20
+> I am really not happy with this being sysfs. It would mean this is an
+> API now and clearly it is Marvell specific. So I would propose that you
+> do this via debugfs and clearly prefix it with mrvl_ to indicate that
+> this is Marvell specific.
+>=20
+> Also I do not see the need for providing the firmware name. We could
+> just have that hardcoded in the driver. Since the name is so generic
+> depending on the model you have, it will not change. Also if devices do
+> not support manufacturing firmware, then do not expose the debugfs file.
+> That way this becomes easy testable.
+>=20
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 245b3fc..60f8cbf 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -3228,7 +3228,7 @@ static void avrcp_register_notification(struct avrcp *session, uint8_t event)
- 	 * use it to resync.
- 	 */
- 	if (event == AVRCP_EVENT_PLAYBACK_POS_CHANGED)
--		bt_put_be32(UINT32_MAX, &pdu->params[1]);
-+		bt_put_be32(UINT32_MAX / 1000, &pdu->params[1]);
- 
- 	pdu->params_len = htons(AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH);
- 
--- 
-2.1.0
+Thanks for your comments. We will work on them.
+Basically we intend to change firmware runtime while switching between norm=
+al and manufacturing mode. This is possible by power cycling the chip using=
+ our wlan driver's API.
+When device is reenumerated, we are checking global mfg_mode variable(confi=
+gured via sysfs/debugfs earlier) and accordingly choosing firmware for down=
+load. We will check if we can avoid global variable usage.
 
+Regards,
+Amit
