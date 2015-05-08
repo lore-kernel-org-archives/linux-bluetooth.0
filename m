@@ -1,144 +1,245 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1430992978-26779-1-git-send-email-chanyeol.park@samsung.com>
-References: <1430992978-26779-1-git-send-email-chanyeol.park@samsung.com>
-Date: Fri, 8 May 2015 16:56:09 +0300
-Message-ID: <CABBYNZJ8OB_65U2E4hj1gBEas3+-uSLgxyZ0yrd+W=nCwBXzpA@mail.gmail.com>
-Subject: Re: [RFC BlueZ v2 1/2] audio/a2dp: Fix SEP selection
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Chan-yeol Park <chanyeol.park@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <4544955.5Mj2SbYDcF@leonov>
+References: <1428930887-25519-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<1428930887-25519-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<4544955.5Mj2SbYDcF@leonov>
+Date: Fri, 8 May 2015 15:33:25 +0200
+Message-ID: <CAMv5Gbd=WJzgxVg7hV7qegd+oZiohz9X--FucwTqJ85zX+rnKg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] profiles/network: Add support for handling
+ extension hdr in ctrl msg
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chan-yeol,
+Hi Szymon,
 
-On Thu, May 7, 2015 at 1:02 PM,  <chanyeol.park@samsung.com> wrote:
-> From: Chan-yeol Park <chanyeol.park@samsung.com>
+On 8 May 2015 at 15:27, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi Grzegorz,
 >
-> When matching remote SEP to local SEP we do not match vendor codecs
-> properly, i.e. neither vendor ID not codec ID are checked, which may
-> cause wrong endpoint to be selected in case there are more that one
-> endpoints using vendor codec on remote.
+> On Monday 13 of April 2015 15:14:46 Grzegorz Kolodziejczyk wrote:
+>> Support for extension headers is mandatory functionality. This patch
+>> add support to it and leave responsibility for processing extension
+>> header and sending setup success response to kernel.
+>>
+>> This patch is necessary to pass PTS bnep test TC_CTRL_BV_19_C.
+>> ---
+>>  android/pan.c             |  2 +-
+>>  profiles/network/bnep.c   | 83
+>> +++++++++++++++++++++++++++++++++++++++++++---- profiles/network/server.c |
+>>  2 +-
+>>  tools/bneptest.c          |  2 +-
+>>  4 files changed, 80 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/android/pan.c b/android/pan.c
+>> index 6c9815b..b98fccd 100644
+>> --- a/android/pan.c
+>> +++ b/android/pan.c
+>> @@ -472,7 +472,7 @@ static gboolean nap_setup_cb(GIOChannel *chan,
+>> GIOCondition cond, sk = g_io_channel_unix_get_fd(chan);
+>>
+>>       /* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
+>> -     n = read(sk, packet, sizeof(packet));
+>> +     n = recv(sk, packet, sizeof(packet), MSG_PEEK);
 >
-> This patch fixes this by assinging vendor codec indentification to
-> local SEP after it's registered and uses this information when matching
-> SEPs.
+> Add a comment here why PEEK is needed.
 >
-> This patch is made based on e1c7dddd0dd2f5e23e4d4cf98a9dde713fe6dd53
-> written by Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>.
-> ---
->  profiles/audio/a2dp.c  | 11 +++++++++++
->  profiles/audio/avdtp.c | 22 ++++++++++++++++++++++
->  profiles/audio/avdtp.h |  3 ++-
->  3 files changed, 35 insertions(+), 1 deletion(-)
+Ok, this is good idea.
+>>       if (n  < 0) {
+>>               error("read(): %s(%d)", strerror(errno), errno);
+>>               goto failed;
+>> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+>> index e325b72..a878d14 100644
+>> --- a/profiles/network/bnep.c
+>> +++ b/profiles/network/bnep.c
+>> @@ -124,6 +124,7 @@ static int bnep_connadd(int sk, uint16_t role, char
+>> *dev)
+>>
+>>       req.sock = sk;
+>>       req.role = role;
+>> +     req.flags = (1 << BNEP_SETUP_RESPONSE);
+>>       if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
+>>               int err = -errno;
+>>               error("bnep: Failed to add device %s: %s(%d)",
+>> @@ -135,6 +136,18 @@ static int bnep_connadd(int sk, uint16_t role, char
+>> *dev) return 0;
+>>  }
+>>
+>> +static uint32_t bnep_getsuppfeat(void)
+>> +{
+>> +     uint32_t feat;
+>> +
+>> +     if (ioctl(ctl, BNEPGETSUPPFEAT, &feat) < 0)
+>> +             feat = 0;
+>> +
+>> +     DBG("supported features: 0x%x", feat);
+>> +
+>> +     return feat;
+>> +}
+>> +
+>>  static int bnep_if_up(const char *devname)
+>>  {
+>>       struct ifreq ifr;
+>> @@ -530,7 +543,9 @@ static uint16_t bnep_setup_decode(int sk, struct
+>> bnep_setup_conn_req *req, uint8_t *dest, *source;
+>>       uint32_t val;
+>>
+>> -     if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ)
+>> +     if (((req->type != BNEP_CONTROL) &&
+>> +             (req->type != (BNEP_CONTROL | BNEP_EXT_HEADER)))  ||
+>> +                                     req->ctrl != BNEP_SETUP_CONN_REQ)
+>>               return BNEP_CONN_NOT_ALLOWED;
+>>
+>>       dest = req->service;
+>> @@ -587,10 +602,52 @@ static uint16_t bnep_setup_decode(int sk, struct
+>> bnep_setup_conn_req *req, return BNEP_CONN_INVALID_DST;
+>>  }
+>>
+>> +static int bnep_server_add_legacy(int sk, uint16_t dst, char *bridge,
+>> +                                     char *iface, const bdaddr_t *addr,
+>> +                                     uint8_t *setup_data, int len)
+>> +{
+>> +     int err, n;
+>> +     uint16_t rsp;
+>> +
+>> +     n = read(sk, setup_data, len);
+>> +     if (n != len) {
+>> +             err = -1;
+>> +             rsp = BNEP_CONN_NOT_ALLOWED;
+>> +             goto reply;
+>> +     }
+>> +
+>> +     err = bnep_connadd(sk, dst, iface);
+>> +     if (err < 0) {
+>> +             rsp = BNEP_CONN_NOT_ALLOWED;
+>> +             goto reply;
+>> +     }
+>> +
+>> +     err = bnep_add_to_bridge(iface, bridge);
+>> +     if (err < 0) {
+>> +             bnep_conndel(addr);
+>> +             rsp = BNEP_CONN_NOT_ALLOWED;
+>> +             goto reply;
+>> +     }
+>> +
+>> +     err = bnep_if_up(iface);
+>> +     if (err < 0)
+>> +             rsp = BNEP_CONN_NOT_ALLOWED;
+>> +
+>> +reply:
+>> +     if (bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp) < 0) {
+>> +             err = -errno;
+>> +             error("bnep: send ctrl rsp error: %s (%d)", strerror(-err),
+>> +                                                                     -err);
+>> +     }
+>> +
+>> +     return err;
+>> +}
+>> +
+>>  int bnep_server_add(int sk, char *bridge, char *iface, const bdaddr_t
+>> *addr, uint8_t *setup_data, int len)
+>>  {
+>>       int err;
+>> +     uint32_t feat;
+>>       uint16_t rsp, dst;
+>>       struct bnep_setup_conn_req *req = (void *) setup_data;
+>>
+>> @@ -617,6 +674,17 @@ int bnep_server_add(int sk, char *bridge, char *iface,
+>> const bdaddr_t *addr, goto reply;
+>>       }
+>>
+>> +     feat = bnep_getsuppfeat();
+>> +
+>> +     /*
+>> +      * Take out setup data if kernel doesn't support handling it, especially
+>> +      * setup request. If kernel would have set session flags, they should
+>> +      * be checked and handled respectively.
+>> +      */
+>> +     if (!feat || !(feat & (1 << BNEP_SETUP_RESPONSE)))
+>> +             return bnep_server_add_legacy(sk, dst, bridge, iface, addr,
+>> +                                                     setup_data, len);
+>> +
+>>       err = bnep_connadd(sk, dst, iface);
+>>       if (err < 0) {
+>>               rsp = BNEP_CONN_NOT_ALLOWED;
+>> @@ -626,19 +694,22 @@ int bnep_server_add(int sk, char *bridge, char *iface,
+>> const bdaddr_t *addr, err = bnep_add_to_bridge(iface, bridge);
+>>       if (err < 0) {
+>>               bnep_conndel(addr);
+>> -             rsp = BNEP_CONN_NOT_ALLOWED;
+>> -             goto reply;
+>> +             return err;
+>>       }
+>>
+>>       err = bnep_if_up(iface);
+>>       if (err < 0)
+>> -             rsp = BNEP_CONN_NOT_ALLOWED;
+>> +             return err;
 >
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index 31c5086..85ec753 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -1597,6 +1597,17 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
->                 return NULL;
->         }
+> Cleanupis  missing.
 >
-> +       if (codec == A2DP_CODEC_VENDOR) {
-> +               uint8_t *capabilities;
-> +               a2dp_vendor_codec_t *vndcodec;
-> +
-> +               endpoint->get_capabilities(sep, &capabilities, user_data);
-
-This sounds much better than what we have in Android actually, but I
-just wonder why we need to store this in the first place? Instead I
-would just do what you are doing above when matching which saves
-memory and you can also skip the byte order conversion.
-
-> +               vndcodec = (a2dp_vendor_codec_t *) capabilities;
-> +               avdtp_sep_set_vendor_codec(sep->lsep,
-> +                                               btohl(vndcodec->vendor_id),
-> +                                               btohs(vndcodec->codec_id));
-> +       }
-> +
->         sep->server = server;
->         sep->endpoint = endpoint;
->         sep->codec = codec;
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index f38188f..df6fd42 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -49,6 +49,7 @@
->  #include "src/device.h"
 >
->  #include "avdtp.h"
-> +#include "a2dp-codecs.h"
->  #include "sink.h"
->  #include "source.h"
+Yes, I'll add it in next set.
+>> +
+>> +     /* Kernel will handle success setup response */
+>> +     if (feat & (1 << BNEP_SETUP_RESPONSE))
+>> +             return err;
 >
-> @@ -328,6 +329,8 @@ struct avdtp_local_sep {
->         struct avdtp_stream *stream;
->         struct seid_info info;
->         uint8_t codec;
-> +       uint32_t vndcodec_vendor;
-> +       uint16_t vndcodec_codec;
->         gboolean delay_reporting;
->         GSList *caps;
->         struct avdtp_sep_ind *ind;
-> @@ -1197,6 +1200,13 @@ static struct avdtp_local_sep *find_local_sep_by_seid(struct avdtp *session,
->         return queue_find(session->lseps, match_by_seid, INT_TO_PTR(seid));
->  }
+> This path is executed only with BNEP_SETUP_RESPONSE set so check is not
+> needed.
 >
-> +void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
-> +                                                       uint16_t codec_id)
-> +{
-> +       sep->vndcodec_vendor = vendor_id;
-> +       sep->vndcodec_codec = codec_id;
-> +}
-> +
->  struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
->                                                 struct avdtp_local_sep *lsep)
->  {
-> @@ -1226,6 +1236,18 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
->                 if (codec_data->media_codec_type != lsep->codec)
->                         continue;
+> I'd also add specific fail paths that would handle cleanup bridge setup, del
+> conn etc if something failed. (same should be done for legacy path)
 >
-> +               /* FIXME: Add Vendor Specific Codec match to SEP callback */
-> +               if (lsep->codec == A2DP_CODEC_VENDOR) {
-> +                       a2dp_vendor_codec_t *vndcodec =
-> +                               (void *) codec_data->data;
-> +
-> +                       if (btohl(vndcodec->vendor_id) != lsep->vndcodec_vendor)
-> +                               continue;
-> +
-> +                       if (btohs(vndcodec->codec_id) != lsep->vndcodec_codec)
-> +                               continue;
-> +               }
-> +
->                 if (sep->stream == NULL)
->                         return sep;
->         }
-> diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-> index 1b02232..e237b10 100644
-> --- a/profiles/audio/avdtp.h
-> +++ b/profiles/audio/avdtp.h
-> @@ -276,7 +276,8 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
->                                                 struct avdtp_sep_ind *ind,
->                                                 struct avdtp_sep_cfm *cfm,
->                                                 void *user_data);
-> -
-> +void avdtp_sep_set_vendor_codec(struct avdtp_local_sep *sep, uint32_t vendor_id,
-> +                                                       uint16_t codec_id);
->  /* Find a matching pair of local and remote SEP ID's */
->  struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
->                                                 struct avdtp_local_sep *lsep);
+Right.
+>>
+>>  reply:
+>>       if (bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp) < 0) {
+>>               err = -errno;
+>> -             error("bnep: send ctrl rsp error: %s (%d)", strerror(errno),
+>> -                                                                     errno);
+>> +             error("bnep: send ctrl rsp error: %s (%d)", strerror(-err),
+>> +                                                                     -err);
+>>       }
+>>
+>>       return err;
+>> diff --git a/profiles/network/server.c b/profiles/network/server.c
+>> index 32aafc3..ec37c97 100644
+>> --- a/profiles/network/server.c
+>> +++ b/profiles/network/server.c
+>> @@ -328,7 +328,7 @@ static gboolean bnep_setup(GIOChannel *chan,
+>>       sk = g_io_channel_unix_get_fd(chan);
+>>
+>>       /* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
+>> -     n = read(sk, packet, sizeof(packet));
+>> +     n = recv(sk, packet, sizeof(packet), MSG_PEEK);
+>
+> Add a comment here why PEEK is needed.
+>
+ok.
+>>       if (n < 0) {
+>>               error("read(): %s(%d)", strerror(errno), errno);
+>>               return FALSE;
+>> diff --git a/tools/bneptest.c b/tools/bneptest.c
+>> index 98ee9b1..a7d5815 100644
+>> --- a/tools/bneptest.c
+>> +++ b/tools/bneptest.c
+>> @@ -327,7 +327,7 @@ static gboolean setup_bnep_cb(GIOChannel *chan,
+>> GIOCondition cond, sk = g_io_channel_unix_get_fd(chan);
+>>
+>>       /* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
+>> -     n = read(sk, packet, sizeof(packet));
+>> +     n = recv(sk, packet, sizeof(packet), MSG_PEEK);
+>>       if (n < 0) {
+>>               error("read(): %s(%d)", strerror(errno), errno);
+>>               return FALSE;
+>
 > --
-> 2.1.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> BR
+> Szymon Janc
 
-
-
--- 
-Luiz Augusto von Dentz
+BR,
+Grzegorz Kolodziejczyk
