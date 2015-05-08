@@ -1,26 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: "frederic.danis@linux.intel.com" <frederic.danis@linux.intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Arend Van Spriel <arend@broadcom.com>
-Subject: RE: [PATCH v2 1/5] Bluetooth: hci_core: return cmd status in
- __hci_cmd_sync()
-Date: Fri, 8 May 2015 18:15:43 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E94254663@IRVEXCHMB15.corp.ad.broadcom.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Fri, 8 May 2015 13:41:50 -0400
+From: Kyle McMartin <kyle@infradead.org>
+To: Kalle Valo <kvalo@qca.qualcomm.com>
+Cc: Ben Hutchings <ben@decadent.org.uk>,
+	Jouni Malinen <jouni@qca.qualcomm.com>,
+	Kyle McMartin <kyle@infradead.org>, linux-firmware@kernel.org,
+	linux-bluetooth@vger.kernel.org, agoel@qca.qualcomm.com
+Subject: Re: [PATCH] ath3k: update AR3012 2.2.1 firmware with v.170
+Message-ID: <20150508174150.GL27807@merlin.infradead.org>
+References: <1428687294-10706-1-git-send-email-kvalo@qca.qualcomm.com>
+ <20150413140205.GB27807@merlin.infradead.org>
+ <20150413140617.GC27807@merlin.infradead.org>
+ <1428934503.3211.7.camel@decadent.org.uk>
+ <20150415083357.GA3907@jouni.qca.qualcomm.com>
+ <87h9rxzkor.fsf@kamboji.qca.qualcomm.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <87h9rxzkor.fsf@kamboji.qca.qualcomm.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+On Thu, Apr 30, 2015 at 06:43:00PM +0300, Kalle Valo wrote:
+> > I don't think there is such limitation for redistribution (see the
+> > copyright license above in the "Redistribution" section). As far as the
+> > limited patent license language is concerned, would the following
+> > changes address your concern?
+> 
+> Did you have a chance to look at the proposal? It would be good to solve
+> this so that we can get the bluetooth firmware images to linux-firmware.
 
-Thank you for trying to enhance the BlueZ support for the Broadcom Bluetoot=
-h UART devices.
+Any thoughts, Ben? I'll merge this and the ath10k patches today if you
+give the OK.
 
-As you see from the "Broadcom Bluetooth UART device driver" RFC sent this w=
-eek, Broadcom itself is now proceeding with a very similar effort. Could we=
- rather concentrate on enhancing the Broadcom code to this extent?
-
-Would appreciate your insights,
-
-Ilya Faenson
-Broadcom Corporation
+regards, Kyle
