@@ -1,27 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 09 May 2015 15:51:45 -0400 (EDT)
-Message-Id: <20150509.155145.527774516378951132.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2015-05-04
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20150506182102.GA16001@t440s>
-References: <20150504093436.GB9096@t440s.lan>
-	<20150504.153627.768616765733905013.davem@davemloft.net>
-	<20150506182102.GA16001@t440s>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Ilya Faenson <ifaenson@broadcom.com>
+To: "frederic.danis@linux.intel.com" <frederic.danis@linux.intel.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>, Arend Van Spriel <arend@broadcom.com>
+Subject: RE: [PATCH v2 1/5] Bluetooth: hci_core: return cmd status in
+ __hci_cmd_sync()
+Date: Fri, 8 May 2015 18:15:43 +0000
+Message-ID: <E0D3336E15B58B4294723AC879BA5E94254663@IRVEXCHMB15.corp.ad.broadcom.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Wed, 6 May 2015 20:21:02 +0200
+Hi Fred,
 
-> Seems you pulled this into net.git and not net-next.git?
+Thank you for trying to enhance the BlueZ support for the Broadcom Bluetoot=
+h UART devices.
 
-Ooops, an accident.  I'm going to leave it for now.
+As you see from the "Broadcom Bluetooth UART device driver" RFC sent this w=
+eek, Broadcom itself is now proceeding with a very similar effort. Could we=
+ rather concentrate on enhancing the Broadcom code to this extent?
 
-> Meanwhile, the bluetooth.git request I also made on the 4th is still
-> untouched.
+Would appreciate your insights,
 
-I pulled in that May 4th pull request, thanks.
+Ilya Faenson
+Broadcom Corporation
