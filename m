@@ -3,10 +3,10 @@ From: Martin Townsend <mtownsend1973@gmail.com>
 To: alex.aring@gmail.com
 Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	Martin Townsend <martin.townsend@xsilon.com>
-Subject: [PATCHv2 bluetooth-next] mac802154: fakelb: Fix potential NULL pointer dereference.
-Date: Fri,  8 May 2015 09:57:10 +0100
-Message-Id: <1431075430-20872-1-git-send-email-martin.townsend@xsilon.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Subject: [PATCH bluetooth-next] mac802154: fakelb: Fix potential NULL pointer deference.
+Date: Fri,  8 May 2015 09:39:09 +0100
+Message-Id: <1431074349-20676-1-git-send-email-martin.townsend@xsilon.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 fakelb_hw_deliver creates a copy of the skb's header which can
