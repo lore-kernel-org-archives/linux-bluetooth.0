@@ -1,37 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: Martin Townsend <mtownsend1973@gmail.com>
-To: alex.aring@gmail.com
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Martin Townsend <martin.townsend@xsilon.com>
-Subject: [PATCH bluetooth-next] mac802154: fakelb: Fix potential NULL pointer deference.
-Date: Fri,  8 May 2015 09:39:09 +0100
-Message-Id: <1431074349-20676-1-git-send-email-martin.townsend@xsilon.com>
+From: Ankur Patel <ankur@embertec.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 8 May 2015 17:40:00 +0930
+Subject: RE: Alternative to 'gattc' 'gatts' commands for Linux
+Message-ID: <BD5E516FF3711A41B93DC005170007BB010D943FD5C1@EMBSVR01.ember.local>
+References: <BD5E516FF3711A41B93DC005170007BB010D943988C6@EMBSVR01.ember.local>
+ <CAMv5GbdcD==pTmDEYXZ90K0SCdR6gc6hSaAa20YmPHAskw1Y-Q@mail.gmail.com>
+In-Reply-To: <CAMv5GbdcD==pTmDEYXZ90K0SCdR6gc6hSaAa20YmPHAskw1Y-Q@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-fakelb_hw_deliver creates a copy of the skb's header which can
-potentially return NULL so we now check for this before actually
-delivering to the 802.15.4 MAC layer.
-
-Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
----
- drivers/net/ieee802154/fakelb.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
-index dc2bfb6..baa8d36 100644
---- a/drivers/net/ieee802154/fakelb.c
-+++ b/drivers/net/ieee802154/fakelb.c
-@@ -69,7 +69,8 @@ fakelb_hw_deliver(struct fakelb_dev_priv *priv, struct sk_buff *skb)
- 	spin_lock(&priv->lock);
- 	if (priv->working) {
- 		newskb = pskb_copy(skb, GFP_ATOMIC);
--		ieee802154_rx_irqsafe(priv->hw, newskb, 0xcc);
-+		if (newskb)
-+			ieee802154_rx_irqsafe(priv->hw, newskb, 0xcc);
- 	}
- 	spin_unlock(&priv->lock);
- }
--- 
-1.9.1
-
+QEdyemVnb3J6OiBUaGFuayB5b3UgZm9yIHNoYXJpbmcuDQo=
