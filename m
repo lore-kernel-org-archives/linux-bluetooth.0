@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] android/client: Fix missing new line character
-Date: Fri, 08 May 2015 15:03:28 +0200
-Message-ID: <2922399.uuX8CnvgJR@leonov>
-In-Reply-To: <1430298953-31018-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1430298953-31018-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH] android/pts: Update GATT PTS 6.1 TC_GPA_SR_BV_11_C result
+Date: Fri, 08 May 2015 14:51:32 +0200
+Message-ID: <4198550.lJUgKxGh9e@leonov>
+In-Reply-To: <1429895216-26420-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1429895216-26420-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,27 +14,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Grzegorz,
 
-On Wednesday 29 of April 2015 11:15:50 Grzegorz Kolodziejczyk wrote:
-> New line character is missing for haltest_info. Without this logs are
-> distorted after receiving configure mtu callback log.
+On Friday 24 of April 2015 19:06:56 Grzegorz Kolodziejczyk wrote:
+> This patch updates GATT PTS 6.1 TC_GPA_SR_BV_11_C result by PTS errata
+> number and result.
 > ---
->  android/client/if-gatt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  android/pts-gatt.txt | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-> index 70287fc..e66cc20 100644
-> --- a/android/client/if-gatt.c
-> +++ b/android/client/if-gatt.c
-> @@ -679,7 +679,7 @@ static void gattc_listen_cb(int status, int client_if)
->  /* Callback invoked when the MTU for a given connection changes */
->  static void gattc_configure_mtu_cb(int conn_id, int status, int mtu)
->  {
-> -	haltest_info("%s: conn_id=%d, status=%d, mtu=%d", __func__, conn_id,
-> +	haltest_info("%s: conn_id=%d, status=%d, mtu=%d\n", __func__, conn_id,
->  								status, mtu);
->  }
+> diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
+> index 0f0b706..29e4761 100644
+> --- a/android/pts-gatt.txt
+> +++ b/android/pts-gatt.txt
+> @@ -1403,7 +1403,8 @@ TC_GPA_SR_BV_08_C	PASS	haltest:
+>  				gatts add_descriptor <UUID> 2903
+>  				gatts start_service
+>  				gatts send_response
+> -TC_GPA_SR_BV_11_C	PASS	haltest:
+> +TC_GPA_SR_BV_11_C	INC	PTS Issue #13392
+> +				haltest:
+>  				gatts add_service
+>  				gatts add_chaaracteristic:
+>  						<properties> 138 <permissions> 17
 
-All patches applied, thanks.
+Patch applied, thanks.
 
 -- 
 BR
