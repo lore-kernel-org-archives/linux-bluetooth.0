@@ -1,74 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-To: Daniel Drake <drake@endlessm.com>
-CC: Larry Finger <Larry.Finger@lwfinger.net>,
-	Carlo Caione <carlo@endlessm.com>,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>,
-	"shaofu@realtek.com > shaofu" <shaofu@realtek.com>,
-	=?utf-8?B?5byg5b+X56Wl?= <askijerry_zhang@realsil.com.cn>,
-	=?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>,
-	Chih-Hsiang Wang <wangchihhs@realtek.com>,
-	=?utf-8?B?5q+b5Li66ZSL?= <jason_mao@realsil.com.cn>,
-	Pkshih <pkshih@realtek.com>
-Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IFJlYWx0ZWsgVVNCIGJsdWV0b290aDogbm8gc2Nh?= =?utf-8?Q?n_results_when_wifi_is_connected?=
-Date: Wed, 13 May 2015 07:51:46 +0000
-Message-ID: <54F70642BAB21D4498E1AA3EFE3D519A46101B24@rsex2.realsil.com.cn>
-References: <CAD8Lp47=G8rFJtow9fn9WBg6FAyygopvYh7k0FNS0w8FgKXD6A@mail.gmail.com>
-	<554E804F.9090407@lwfinger.net>
-	<54F70642BAB21D4498E1AA3EFE3D519A461012DA@rsex2.realsil.com.cn>
- <CAD8Lp472ZD=2RBHD3boAgenEe6D=eqGh3dZugUDHR=-AW18BxA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Sat, 9 May 2015 06:50:52 -0700
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Apply Intel device configuration
+ routine
+Message-ID: <20150509065052.7f713c5b@tedd-fedora-vm>
+In-Reply-To: <0FCA425A-2499-4826-AB00-E7D6B215889F@holtmann.org>
+References: <20150508035946.0039963d@intel.com>
+	<0FCA425A-2499-4826-AB00-E7D6B215889F@holtmann.org>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-RGVhciBEYW5pZWwsDQpQbGVhc2UgdHJ5IHRvIGNvbW1lbnQgdGhlIGZvbGxvd2luZyBjb2RlIGlu
-IHdpZmkgZHJpdmVyIGhhbGJ0Yzg3MjNiMmFudF9hY3Rpb25fYnRfaW5xdWlyeSgpIA0KLyoNCgkJ
-Y29leF9kbS0+bmVlZF9yZWNvdmVyMHg5NDggPSB0cnVlOw0KCQljb2V4X2RtLT5iYWNrdXAweDk0
-OCA9IGJ0Y29leGlzdC0+YnRjX3JlYWRfNGJ5dGUoYnRjb2V4aXN0LCAweDk0OCk7DQoNCgkJaGFs
-YnRjODcyM2IyYW50X3NldF9hbnRfcGF0aChidGNvZXhpc3QsIEJUQ19BTlRfV0lGSV9BVF9BVVgs
-IGZhbHNlLCBmYWxzZSk7DQoJKi8NCg0KLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0K5Y+R5Lu25Lq6
-OiDpmYjoibPokI0gDQrlj5HpgIHml7bpl7Q6IDIwMTXlubQ15pyIMTPml6UgMTA6MzcNCuaUtuS7
-tuS6ujogJ0RhbmllbCBEcmFrZScNCuaKhOmAgTogTGFycnkgRmluZ2VyOyBDYXJsbyBDYWlvbmU7
-IExpbnV4IEJsdWV0b290aCBtYWlsaW5nIGxpc3Q7IHNoYW9mdUByZWFsdGVrLmNvbSA+IHNoYW9m
-dTsg5byg5b+X56WlOyDpmYbmnLHkvJ87IENoaWgtSHNpYW5nIFdhbmc7IOavm+S4uumUiw0K5Li7
-6aKYOiDnrZTlpI06IOetlOWkjTogUmVhbHRlayBVU0IgYmx1ZXRvb3RoOiBubyBzY2FuIHJlc3Vs
-dHMgd2hlbiB3aWZpIGlzIGNvbm5lY3RlZA0KDQpEZWFyIERhbmllbCwNCglGb3IgIDg3MjNCVSwJ
-ICAgYWx3YXlzIHVzZSBDT05GSUdfUzBfQU5UVEVOQe+8mw0KCUZvciAgODcyM0JFIO+8jCAxIGFu
-dGVubmEgQ09ORklHX1MxX0FOVFRFTkE7IDIgYW50ZW5uYXMgQ09ORklHX1MwX0FOVFRFTkENCg0K
-RGVhciAgc2hhb2Z1LA0KCVdvdWxkIHlvdSBwbGVhc2UgaGVscCB0byBjaGVjayB3aXRoIGhhbGJ0
-Yzg3MjNiMmFudC5jIGJ0Y29leGlzdCBkcml2ZXI/DQoNCi0tLS0t6YKu5Lu25Y6f5Lu2LS0tLS0N
-CuWPkeS7tuS6ujogRGFuaWVsIERyYWtlIFttYWlsdG86ZHJha2VAZW5kbGVzc20uY29tXSANCuWP
-kemAgeaXtumXtDogMjAxNeW5tDXmnIgxMuaXpSAyMDo1Mw0K5pS25Lu25Lq6OiDpmYjoibPokI0N
-CuaKhOmAgTogTGFycnkgRmluZ2VyOyBDYXJsbyBDYWlvbmU7IExpbnV4IEJsdWV0b290aCBtYWls
-aW5nIGxpc3Q7IHNoYW9mdUByZWFsdGVrLmNvbSA+IHNoYW9mdTsg5byg5b+X56WlOyDpmYbmnLHk
-vJ87IENoaWgtSHNpYW5nIFdhbmc7IOavm+S4uumUiw0K5Li76aKYOiBSZTog562U5aSNOiBSZWFs
-dGVrIFVTQiBibHVldG9vdGg6IG5vIHNjYW4gcmVzdWx0cyB3aGVuIHdpZmkgaXMgY29ubmVjdGVk
-DQoNCkhpIENoYW1waW9uLA0KDQpUaGFua3MgZm9yIHRoZSBzdWdnZXN0aW9uLg0KDQpPbiBNb24s
-IE1heSAxMSwgMjAxNSBhdCA4OjU0IFBNLCDpmYjoibPokI0gPGNoYW1waW9uX2NoZW5AcmVhbHNp
-bC5jb20uY24+IHdyb3RlOg0KPiBEZWFyIERhbmllbCwNCj4gICAgICAgICBGb3Igc29tZSByZWFz
-b24sIDg3MjNCIGNoaXAgd2l0aCBzaW5nbGUgYW50ZW5uYSBhbmQgMiBhbnRlbm5hcyBoYXZlIGRp
-ZmZlcmVudCBzZXR0aW5ncyBhbmQgdGhpcyBjYW4gb25seSBiZSBtb2RpZmllZCBtYW51YWxseS4N
-Cj4gQlQgZHJpdmVyIHdpbGwgc2V0IGNvbnRyb2xsZXIgdG8gdXNlIFMwIHdoZW4gdXNlIDIgYW50
-ZW5uYXMuDQo+ICAgICAgICAgSW4gbXkgc3VibWl0dGVkIGRyaXZlciAsIHRoZXJlIGFyZSBmb2xs
-b3dpbmcgY29kZXMgdG8gYWRkIHRoZSBjb25maWcgc2V0dGluZ3MgYXQgdGhlIGVuZCBvZiBmaXJt
-d2FyZSB0byBiZSBkb3dubG9hZGVkLg0KPiBXb3VsZCB5b3UgcGxlYXNlIHRyeSB0byBhZGQgdGhl
-c2UgY29kZXMgYW5kIHRlc3QgYWdhaW4/DQo+DQo+IC8qZm9yIDg3MjNCLHVzZSBTMCBBbnR0ZW5h
-IGZvciBibHVldG9vdGgqLw0KPiAgICAgICAgIGlmKGxtcF92ZXJzaW9uPT1ST01fTE1QXzg3MjNC
-KQ0KPiAgICAgICAgIHsNCj4gICAgICAgICAgICAgICAgIG1lbWNweSgqYnVmK3BhdGNoX2VudHJ5
-LT5wYXRjaF9sZW5ndGgsUlRLX0NPTkZJR19TSUdOQVRVUkUsNik7DQo+ICAgICAgICAgICAgICAg
-ICBpZiAoVVNFX1MwX0FOVFRFTkEpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgIG1lbWNweSgq
-YnVmK3BhdGNoX2VudHJ5LT5wYXRjaF9sZW5ndGgrNixDT05GSUdfUzBfQU5UVEVOQSw0KTsNCj4g
-ICAgICAgICAgICAgICAgIGVsc2UNCj4gICAgICAgICAgICAgICAgICAgICAgICAgbWVtY3B5KCpi
-dWYrcGF0Y2hfZW50cnktPnBhdGNoX2xlbmd0aCs2LENPTkZJR19TMV9BTlRURU5BLDQpOw0KPiAg
-ICAgICAgICAgICAgICAgKmJ1Zl9sZW4gKz0gMTA7DQo+ICAgICAgICAgICAgICAgICBCVF9EQkco
-IlVTRV9TMF9BTlRURU5BIik7DQo+ICAgICAgICAgfQ0KDQpZZXMsIEkgc2F3IHRoaXMgY29kZSBh
-bHJlYWR5IGFuZCBleHBlcmltZW50ZWQgd2l0aCBpdC4gSXQgZGlkbid0IHNlZW0gdG8gbWFrZSBh
-bnkgZGlmZmVyZW5jZS4gSSdsbCB0cnkgYWdhaW4gdGhvdWdoLCB3aGljaCBjb25maWd1cmF0aW9u
-IHNob3VsZCBJIHVzZSwgQ09ORklHX1MwX0FOVFRFTkEgb3IgQ09ORklHX1MxX0FOVFRFTkE/DQoN
-CkJ5IG9ubHkgY29ubmVjdGluZyBvbmUgYW50ZW5uYSBhdCBhIHRpbWUsIEkgd2FzIGFibGUgdG8g
-c2VlIHRoYXQgYmx1ZXRvb3RoIGhhcHBpbHkgdXNlcyBlaXRoZXIgb25lLiBJIGhhdmUgYSBmZWVs
-aW5nIHRoYXQgdGhlIHByZWZlcmVuY2UgeW91IHdyaXRlIGFib3ZlIGlzIG92ZXJyaWRkZW4gYnkg
-Y29kZSBpbiB0aGUgaGFsYnRjODcyM2IyYW50LmMgYnRjb2V4aXN0IGRyaXZlci4NCg0KRGFuaWVs
-DQo=
+Hi Marcel,
+
+On Tue, 12 May 2015 17:05:21 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
+
+> Hi Tedd,
+> 
+> > This patch adds support to apply the device configuration parameters
+> > (DDC) after firwmare downloading on Intel 8265 device.
+> > 
+> > This is optional configuration parameters and good to have.
+> > So, even if it fails to apply it, it is not necessary to fail the
+> > setup.
+> > 
+> > The file format is same as previous firmware patch (.bseq) and
+> > this is only applicable to Intel 8265 device.
+> 
+> my preference is actually to not use *.bseq files since they are generic HCI commands. We want to use a new *.ddc file format that just contains the parameters. I clearly prefer that over just sending HCI commands. What we have to do is to actually define a simple DDC file format that lets us include the key/param pairs.
+> 
+
+HCI command in .bseq is pretty simple to decode so extracting DDC contents (key/parmas) will not be a problem.
+For DDC file, I think the simplest is [len] [key] [params] [len] [key] [params] ... in binary. So, the driver simpley read the full data and send with Intel_DDC_Write function.
+
+Let me know if you have anything in your mind or any example in the other driver that I can refer.
+
+> Regards
+> 
+> Marcel
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
