@@ -1,89 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 9 May 2015 04:17:16 -0700
+Date: Sat, 9 May 2015 04:15:36 -0700
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, "Marcel Holtmann"
  <marcel@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: btusb: Apply Intel device configuration
- routine
-Message-ID: <20150509041716.6e10056c@tedd-fedora-vm>
-In-Reply-To: <20150508035946.0039963d@intel.com>
-References: <20150508035946.0039963d@intel.com>
+Subject: Re: [PATCH] Bluetooth: btusb: fixed command length alignment for
+ Intel 8260
+Message-ID: <20150509041536.3ca988f4@tedd-fedora-vm>
+In-Reply-To: <20150507090856.6c0eca7f@intel.com>
+References: <20150507090856.6c0eca7f@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-I just wonder if you had a chance to review this pacth.
+I just wonder if you had a chance to take a look at this patch.
 
 Let me know if you have any comments.
 
 Regards,
 Tedd
 
-On Fri, 8 May 2015 03:59:46 -0700
+On Thu, 7 May 2015 09:08:56 -0700
 Tedd Ho-Jeong An <tedd.an@intel.com> wrote:
 
 > From: Tedd Ho-Jeong An <tedd.an@intel.com>
 > 
-> This patch adds support to apply the device configuration parameters
-> (DDC) after firwmare downloading on Intel 8265 device.
+> This patch fixes the command length alignment issue for Intel Bluetooth
+> 8260.
 > 
-> This is optional configuration parameters and good to have.
-> So, even if it fails to apply it, it is not necessary to fail the
-> setup.
+> The length of parameters in the firmware downloading command must be
+> multiplication of 4. If not, the command must append Intel_NOP command
+> with extra parameters, zeros, at the end and the firmware file is
+> already included Intel_NOP command for alignment.
 > 
-> The file format is same as previous firmware patch (.bseq) and
-> this is only applicable to Intel 8265 device.
+> This patch checks the length of the parameters and if it is not aligned,
+> then read the next command which is Intel_NOP command and append it to
+> the first read command and send to the device together.
+> 
+> For example, if the data from the firmware file is like this:
+> 8E FC 03 11 22 33 02 FC 03 00 00 00
+> 
+> Previously, btusb sends two commands:
+> 09 FC 06 8E FC 03 11 22 33
+> 09 FC 06 02 FC 03 00 00 00
+> 
+> This will not work due to the length of parameters are 6 and the device
+> failed to align the data.
+> 
+> This patch will append them together and send one command:
+> 09 FC 0B 8E FC 03 11 22 33 02 FC 03 00 00 00
 > 
 > Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 > ---
->  drivers/bluetooth/btusb.c | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
+>  drivers/bluetooth/btusb.c | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
 > 
 > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index d21f3b4..27cd2bf 100644
+> index d21f3b4..57f4eac 100644
 > --- a/drivers/bluetooth/btusb.c
 > +++ b/drivers/bluetooth/btusb.c
-> @@ -2644,6 +2644,40 @@ done:
+> @@ -2541,6 +2541,41 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
 >  
->  	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+>  		cmd_len = sizeof(*cmd) + cmd->plen;
 >  
-> +	/* Once the device is running in operational mode, it needs to apply
-> +	 * the configuration parameters to the device.
-> +	 */
-> +	snprintf(fwname, sizeof(fwname), "intel/ibt-11.bseq");
+> +		/* The parameter length of secure send command should be a
+> +		 * multiplication of 4. If it is not, it appends Intel_NOP
+> +		 * command with arbitrary number of parameters (zeros) to meet
+> +		 * the 4 byte alignment.
+> +		 * The FW file has already aligned and appended Intel_NOP
+> +		 * command. So it needs to read next Intel_NOP command and send
+> +		 * them together.
+> +		 */
+> +		if ((cmd_len % 4) != 0) {
+> +			/* Make sure the next command is Intel_NOP command.
+> +			 */
+> +			struct hci_command_hdr *nop_cmd =
+> +						(void *)(fw_ptr + cmd_len);
+> +			if (nop_cmd->opcode != 0xfc02) {
+> +				BT_ERR("%s: Intel_NOP command is missing",
+> +				       hdev->name);
+> +				err = -EBADF;
+> +				goto done;
+> +			}
 > +
-> +	/* Device can work without this configuration so even if it fails
-> +	 * to load the file, no need to fail the setup
-> +	 */
-> +	err = request_firmware_direct(&fw, fwname, &hdev->dev);
-> +	if (err < 0) {
-> +		BT_INFO("%s: WARNING: unable to load configuration file (%d)",
-> +			hdev->name, err);
-> +		return 0;
-> +	}
+> +			/* Command data is updated to include NOP command
+> +			 */
+> +			cmd_len += sizeof(*nop_cmd) + nop_cmd->plen;
 > +
-> +	BT_INFO("%s: Found device configuration file: %s", hdev->name, fwname);
-> +
-> +	fw_ptr = fw->data;
-> +	while (fw->size > fw_ptr - fw->data) {
-> +		int ignore;
-> +
-> +		err = btusb_setup_intel_patching(hdev, fw, &fw_ptr,
-> +						 &ignore);
-> +		if (err < 0) {
-> +			BT_INFO("%s: WARNING: failed to send configuration(%d)",
-> +				hdev->name, err);
-> +			release_firmware(fw);
-> +			return 0;
+> +			/* Make sure the total length is aligned and smaller
+> +			 * than maximum param length
+> +			 */
+> +			if ((cmd_len % 4) != 0 || cmd_len > 252)   {
+> +				BT_ERR("%s: 4 byte alignment failed",
+> +				       hdev->name);
+> +				err = -EBADF;
+> +				goto done;
+> +			}
 > +		}
-> +	}
-> +	release_firmware(fw);
 > +
-> +	BT_INFO("%s: Device configuration completed", hdev->name);
-> +
->  	return 0;
->  }
->  
+>  		/* Send each command from the firmware data buffer as
+>  		 * a single Data fragment.
+>  		 */
