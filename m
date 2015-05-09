@@ -1,68 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Sat, 9 May 2015 14:32:20 -0600
-Message-ID: <CAD8Lp47=G8rFJtow9fn9WBg6FAyygopvYh7k0FNS0w8FgKXD6A@mail.gmail.com>
-Subject: Realtek USB bluetooth: no scan results when wifi is connected
-From: Daniel Drake <drake@endlessm.com>
-To: =?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-Cc: Carlo Caione <carlo@endlessm.com>,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>,
-	Larry Finger <Larry.Finger@lwfinger.net>
-Content-Type: text/plain; charset=UTF-8
+Date: Sat, 09 May 2015 15:51:45 -0400 (EDT)
+Message-Id: <20150509.155145.527774516378951132.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2015-05-04
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20150506182102.GA16001@t440s>
+References: <20150504093436.GB9096@t440s.lan>
+	<20150504.153627.768616765733905013.davem@davemloft.net>
+	<20150506182102.GA16001@t440s>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Champion,
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Wed, 6 May 2015 20:21:02 +0200
 
-I have a card here which has RTL8723BE wifi and bluetooth combined. 2 antennas.
+> Seems you pulled this into net.git and not net-next.git?
 
-In linux-next (Linux 4.2) the bluetooth and wifi work fine separately,
-but when using them together, I can sometimes see a problem. This is
-using the btusb driver based on your code (now included in Linux 4.2),
-and the RTL8723B rtlwifi driver, all using the latest firmware in the
-linux-firmware git repo.
+Ooops, an accident.  I'm going to leave it for now.
 
-To reproduce:
- - Boot with no wifi connection active
- - "hcitool scan" and verify that my laptop and phone can be seen
- - Connect to wifi
- - Run "hcitool scan" again a few times a minute, within 2-5 minutes
-normally my phone and laptop can no longer be seen
- - Disconnect from wifi and immediately run "hcitool scan" again, my
-phone and laptop can be seen
+> Meanwhile, the bluetooth.git request I also made on the 4th is still
+> untouched.
 
-3 interesting observations when the scan results are coming back empty:
- 1. I can still get the names of the remote devices by running
-"hcitool name <addr>"
- 2. I can still query the remote devices by running "hcitool info
-<addr>". After this, the scan suddenly starts working again!
- 3. Even though both of my local bluetooth devices no longer appear in
-scan results, I can sometimes see my neighbour's phone coming up as a
-scan result at this time.
-
-Anyway, disabling btcoexist avoids the issue, so I dug through that
-code, and found the exact line of code that seems to (sometimes) make
-us enter this strange mode.
-
-Call chain inside drivers/net/wireless/rtlwifi/btcoexist/halbtc8723b2ant.c:
-ex_btc8723b2ant_bt_info_notify (called when starting and finishing a BT scan)
-btc8723b2ant_run_coexist_mechanism
-btc8723b2ant_action_bt_inquiry
-
-As wifi is connected, we now call:
-        btc8723b2ant_ps_tdma(btcoexist, NORMAL_EXEC, true, 3);
-
-This is the function call that sometimes puts us into the mode where
-there are no scan results. Inside this function, if I comment out
-these lines in the turn_on section, the bug is avoided:
-
-        case 3:
-            //btc8723b2ant_set_fw_ps_tdma(btcoexist, 0xe3, 0x1c,
-            //                0x3, 0xf1, 0x90);
-            break;
-
-Any idea what is happening here? Can you help me find a better fix?
-
-Thanks
-Daniel
+I pulled in that May 4th pull request, thanks.
