@@ -1,78 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] android/pts: Update DIS test results
-Date: Tue, 12 May 2015 08:53:09 +0200
-Message-Id: <1431413589-19137-1-git-send-email-mariusz.skamra@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 9 May 2015 04:17:16 -0700
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann
+ <marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: btusb: Apply Intel device configuration
+ routine
+Message-ID: <20150509041716.6e10056c@tedd-fedora-vm>
+In-Reply-To: <20150508035946.0039963d@intel.com>
+References: <20150508035946.0039963d@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PTS 6.1 and Android 5.1
----
- android/pics-dis.txt  | 6 +++---
- android/pixit-dis.txt | 2 +-
- android/pts-dis.txt   | 6 +++---
- 3 files changed, 7 insertions(+), 7 deletions(-)
+Hi Marcel,
 
-diff --git a/android/pics-dis.txt b/android/pics-dis.txt
-index ed207c8..83f25ce 100644
---- a/android/pics-dis.txt
-+++ b/android/pics-dis.txt
-@@ -1,6 +1,6 @@
- DIS PICS for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- 
-@@ -14,7 +14,7 @@ Parameter Name	Selected	Description
- TSPC_DIS_1_1	True		Service supported over BR/EDR (C.1)
- TSPC_DIS_1_2	True		Service supported over LE (C.1)
- -------------------------------------------------------------------------------
--C.1: Mandatory to support at least one of 1/1 or 1/2.
-+C.1: Mandatory to support at least one of TSPC_DIS_1_1 or TSPC_DIS_1_2.
- -------------------------------------------------------------------------------
- 
- 
-@@ -35,7 +35,7 @@ TSPC_DIS_2_9	False (*)	IEEE 11073-20601 Regulatory Certification
- TSPC_DIS_2_10	True		SDP Interoperability (C.1)
- TSPC_DIS_2_11	True		PnP ID (O)
- -------------------------------------------------------------------------------
--C.1: Mandatory if 1/1 (BR/EDR) is supported, otherwise excluded.
-+C.1: Mandatory if TSPC_DIS_1_1 (BR/EDR) is supported, otherwise excluded.
- -------------------------------------------------------------------------------
- 
- 
-diff --git a/android/pixit-dis.txt b/android/pixit-dis.txt
-index 13fe78f..e53532e 100644
---- a/android/pixit-dis.txt
-+++ b/android/pixit-dis.txt
-@@ -1,6 +1,6 @@
- DIS PIXIT for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-dis.txt b/android/pts-dis.txt
-index 857a149..c7900fd 100644
---- a/android/pts-dis.txt
-+++ b/android/pts-dis.txt
-@@ -1,8 +1,8 @@
- PTS test results for DIS
- 
--PTS version: 6.0
--Tested: 22-January-2015
--Android version: 5.0
-+PTS version: 6.1
-+Tested: 11-May-2015
-+Android version: 5.1
- 
- Results:
- PASS	test passed
--- 
-1.9.1
+I just wonder if you had a chance to review this pacth.
 
+Let me know if you have any comments.
+
+Regards,
+Tedd
+
+On Fri, 8 May 2015 03:59:46 -0700
+Tedd Ho-Jeong An <tedd.an@intel.com> wrote:
+
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+> 
+> This patch adds support to apply the device configuration parameters
+> (DDC) after firwmare downloading on Intel 8265 device.
+> 
+> This is optional configuration parameters and good to have.
+> So, even if it fails to apply it, it is not necessary to fail the
+> setup.
+> 
+> The file format is same as previous firmware patch (.bseq) and
+> this is only applicable to Intel 8265 device.
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> ---
+>  drivers/bluetooth/btusb.c | 34 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 34 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index d21f3b4..27cd2bf 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2644,6 +2644,40 @@ done:
+>  
+>  	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+>  
+> +	/* Once the device is running in operational mode, it needs to apply
+> +	 * the configuration parameters to the device.
+> +	 */
+> +	snprintf(fwname, sizeof(fwname), "intel/ibt-11.bseq");
+> +
+> +	/* Device can work without this configuration so even if it fails
+> +	 * to load the file, no need to fail the setup
+> +	 */
+> +	err = request_firmware_direct(&fw, fwname, &hdev->dev);
+> +	if (err < 0) {
+> +		BT_INFO("%s: WARNING: unable to load configuration file (%d)",
+> +			hdev->name, err);
+> +		return 0;
+> +	}
+> +
+> +	BT_INFO("%s: Found device configuration file: %s", hdev->name, fwname);
+> +
+> +	fw_ptr = fw->data;
+> +	while (fw->size > fw_ptr - fw->data) {
+> +		int ignore;
+> +
+> +		err = btusb_setup_intel_patching(hdev, fw, &fw_ptr,
+> +						 &ignore);
+> +		if (err < 0) {
+> +			BT_INFO("%s: WARNING: failed to send configuration(%d)",
+> +				hdev->name, err);
+> +			release_firmware(fw);
+> +			return 0;
+> +		}
+> +	}
+> +	release_firmware(fw);
+> +
+> +	BT_INFO("%s: Device configuration completed", hdev->name);
+> +
+>  	return 0;
+>  }
+>  
