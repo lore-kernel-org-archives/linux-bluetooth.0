@@ -1,53 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: LE only Mode:  PICS reference 
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <BD5E516FF3711A41B93DC005170007BB010D943FD6AC@EMBSVR01.ember.local>
-Date: Mon, 11 May 2015 15:24:53 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <F726DD6C-2E39-44C1-B168-CE2723CF9069@holtmann.org>
-References: <BD5E516FF3711A41B93DC005170007BB010D943FD6AC@EMBSVR01.ember.local>
-To: Ankur Patel <ankur@embertec.com>
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH 5/5] android/pts: Update DID test results
+Date: Mon, 11 May 2015 14:49:48 +0200
+Message-Id: <1431348588-3974-5-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1431348588-3974-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1431348588-3974-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ankur,
+PTS 6.1 and Android 5.1
+---
+ android/pics-did.txt  | 2 +-
+ android/pixit-did.txt | 2 +-
+ android/pts-did.txt   | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-> I am new to the BT LE and pls bare with me if I ask some silly questions. Thank you for support. 
-> 
-> I am now using 3.18.12 Linux kernel and Bluez 5.30 version on board. Our product requirement is to support only LE modes. To create PICS for host system using bluez, do I have to take  http://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/pics-gap.txt as a reference for selecting the configuration?
-> If yes, then in that case, why it has  Broadcaster and Observer selected to 'False' under line#150-151 in pics-gap.txt as bluez does supports Central/Broadcaster/Observer LE roles as mentioned under bluez-5.30/doc/supported-features.txt?
-
-the main focus is central and peripheral role when it comes to Android. The broadcaster and observer roles are connectionless and not much in use.
-
-You can select them in the PICS and qualify BlueZ as broadcaster and observer only, but then a lot of the settings need to be chosen correctly. In addition bluetoothd will not be of much help since that is build for central and peripheral roles.
-
-> Inaddition, I am having some issue running the testcase TC_IDLE_NAMP_BV_02_C. pts-gts.txt says: "btmgmt advertising on" should work, but it is not working on my side.
-> 
-> Following Log info:
-> Test case : TC_IDLE_NAMP_BV_02_C started
->                - MTC: Successfully received HCI_LE_CLEAR_WHITE_LIST_COMPLETE_EVENT.
->                - MTC: Successfully received HCI_LE_ADD_DEVICE_TO_WHITE_LIST_COMPLETE_EVENT.
->                - MTC: Successfully received HCI_LE_SET_SCAN_PARAMETERS_COMPLETE_EVENT.
->                - MTC: Successfully received HCI_LE_SET_SCAN_ENABLE_COMPLETE_EVENT.
->                - MTC: Receive Advertising report successfully.
->                - MTC: Successfully received HCI_LE_SET_SCAN_ENABLE_COMPLETE_EVENT.
->                - MTC: ATT connection established successfully.
->                - MTC-INCONC: Error returned in ATT_READ_BY_TYPE_CFM.
->                - CM_EXIT
->                - CM_EXIT
->                - CM_EXIT
->                - CM_EXIT
->                - MTC: Test case ended
->                -Final Verdict: INCONC
-> TC_IDLE_NAMP_BV_02_C finished
-> 
-> -	Prior to running above command I have also set name using command 'btmgmt name test_dev'. Do I need to run more commands to it?
-
-The name also needs to be available via a GAP characteristic. Normally running bluetoothd will do that for you. But if you do that manually, then need to register the GAP services.
-
-Regards
-
-Marcel
+diff --git a/android/pics-did.txt b/android/pics-did.txt
+index da2e090..9ecb86d 100644
+--- a/android/pics-did.txt
++++ b/android/pics-did.txt
+@@ -1,6 +1,6 @@
+ DID PICS for the PTS tool.
+ 
+-PTS version: 6.0
++PTS version: 6.1
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-did.txt b/android/pixit-did.txt
+index 295febc..0a0f1cc 100644
+--- a/android/pixit-did.txt
++++ b/android/pixit-did.txt
+@@ -1,6 +1,6 @@
+ DID PIXIT for the PTS tool.
+ 
+-PTS version: 6.0
++PTS version: 6.1
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-did.txt b/android/pts-did.txt
+index 8fd434d..f44bf8f 100644
+--- a/android/pts-did.txt
++++ b/android/pts-did.txt
+@@ -1,8 +1,8 @@
+ PTS test results for DID
+ 
+-PTS version: 6.0
+-Tested: 22-January-2015
+-Android version: 5.0
++PTS version: 6.1
++Tested: 04-May-2015
++Android version: 5.1
+ 
+ Results:
+ PASS	test passed
+-- 
+1.9.1
 
