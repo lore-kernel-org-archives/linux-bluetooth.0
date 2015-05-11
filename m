@@ -1,70 +1,172 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <5550AE14.1010202@lampreynetworks.com>
-References: <554CC8A9.4090604@lampreynetworks.com>
-	<CABBYNZKtYh2pUiyr5sTV31SMDm6sw=_zX3PphqHmn+99LE7wOg@mail.gmail.com>
-	<CABBYNZKHvd6ffM1ixRVce6w+wT_=36zqu-VAZdDOmL=wf3Y-fg@mail.gmail.com>
-	<5550AE14.1010202@lampreynetworks.com>
-Date: Mon, 11 May 2015 18:16:11 +0300
-Message-ID: <CABBYNZLXg5ze2pu5G7FJBj_pbz=Bca-W3NRBgGBMYv0jd54TGA@mail.gmail.com>
-Subject: Re: LE device automatic pairing
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Tom Harada <tharada@lampreynetworks.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Bharat Bhusan Panda' <bharat.panda@samsung.com>,
+	cpgs@samsung.com,
+	'Grzegorz Kolodziejczyk' <grzegorz.kolodziejczyk@tieto.com>
+References: <001a01d08bda$91503ab0$b3f0b010$@samsung.com>
+ <CABBYNZJ_SJowxX47YGWAvHa5D1a2SwDD5cE90UE6=fHLTwTsTQ@mail.gmail.com>
+ <001b01d08be3$bcaa7870$35ff6950$@samsung.com>
+ <CABBYNZJ7UsmsnO+WJr3b3Ke2Scu5CtTsof0w4-4b+-2xEw6w9A@mail.gmail.com>
+In-reply-to: <CABBYNZJ7UsmsnO+WJr3b3Ke2Scu5CtTsof0w4-4b+-2xEw6w9A@mail.gmail.com>
+Subject: RE: Query regarding bneptest tool
+Date: Mon, 11 May 2015 19:49:42 +0530
+Message-id: <002501d08bf5$8d509020$a7f1b060$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tom,
+Hi Luiz,
 
-On Mon, May 11, 2015 at 4:26 PM, Tom Harada <tharada@lampreynetworks.com> wrote:
-> Hi Luiz,
->
->
-> On 05/11/15 04:04, Luiz Augusto von Dentz wrote:
->>
->> Hi Tom,
->>
->> On Mon, May 11, 2015 at 11:03 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>>
->>> Hi Tom,
->>>
->>> On Fri, May 8, 2015 at 5:31 PM, Tom Harada <tharada@lampreynetworks.com>
->>> wrote:
->>>>
->>>> Hi all,
->>>>
->>>> On a system with kernel 4.0.1 and BlueZ 5.22 or newer, I've noticed that
->>>> BlueZ seems to be automatically pairing with LE devices as soon as it
->>>> detects their advertisements. Is this an intended feature? If so, how
->>>> can I
->>>> prevent it from happening?
->>>
->>> It should be pairing, bluetoothd will create objects for devices found
->>
->> I meant it should not be pairing...
->>
->>> during the scan but they are considered temporary as long as you don't
->>> request to connect or pair, if you connect to it will still not be
->>> paired but it will be stored persistently in the storage so you can
->>> access after restarting bluetoothd.
->>>
->>> With this in mind, what had made you believe we were performing
->>> pairing during scanning?
->
-> bluetoothctl prints a line like "[CHG] Device 90:59:AF:1D:F4:66 Paired: yes"
-> and reports the device as paired. In other words, it behaves exactly as if I
-> had explicitly requested to pair with the device, except I did no such
-> thing. In btmon, I can see the pairing request taking place, followed by a
-> GATT service discovery. I've attached an example to show what I mean.
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Monday, May 11, 2015 5:58 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; Bharat Bhusan Panda;
+> cpgs@samsung.com; Grzegorz Kolodziejczyk
+> Subject: Re: Query regarding bneptest tool
+> 
+> Hi Gowtham,
+> 
+> On Mon, May 11, 2015 at 3:12 PM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > Hi Luiz,
+> >
+> >> -----Original Message-----
+> >> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> >> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> >> Sent: Monday, May 11, 2015 5:06 PM
+> >> To: Gowtham Anandha Babu
+> >> Cc: linux-bluetooth@vger.kernel.org; Bharat Bhusan Panda;
+> >> cpgs@samsung.com; Grzegorz Kolodziejczyk
+> >> Subject: Re: Query regarding bneptest tool
+> >>
+> >> Hi Gowtham,
+> >>
+> >> On Mon, May 11, 2015 at 2:06 PM, Gowtham Anandha Babu
+> >> <gowtham.ab@samsung.com> wrote:
+> >> > Hi All,
+> >> >
+> >> > I am testing BlueZ bnep test tool (tools/bneptest) using PTS 6.1.0.
+> >> > The BNEP client test cases are not passing in BT_IO_SEC_MEDIUM
+> >> > security level.
+> >> > My PTS PICS and PIXIT are same as android/pixit-bnep.txt,
+> >> > android/pics-bnep.txt.
+> >> > Whereas when the security level is BT_IO_SEC_LOW, it is passing.
+> >> > If it is a valid fix, then I will send a patch for the same.
+> >> > This is tested in Linux, not sure about android.
+> >>
+> >> It might be related to pairing then, do you have any agent registered
+> >> in the system? Check the HCI logs with btmon, it should tell us what is
+> happening.
+> >>
+> >
+> > I have attached both logs. Below is the procedure I followed.
+> >
+> > --------------------------------------------------------------------
+> > PTS output:
+> > Test case : TC_CTRL_BV_02_C started
+> >         - Received passkey: 564246, from: gowtham-ab-0
+> >         - User canceled the current operation MMI.
+> >         - MMI CM_EXIT
+> >         - got an OTHERWISE
+> >         - MTC: Test case ended
+> >          -Final Verdict: INCONC
+> > TC_CTRL_BV_02_C finished
+> > --------------------------------------------------------------------
+> > BlueZ output:
+> > /latest_bluez/bluez/test$  sudo ./bneptest -c 00:1B:DC:07:33:4E -b
+> > pan0 -n bnep0 bnep_client_connect connecting 00:1B:DC:07:33:4E cannot
+> > initiate bnep connection connected_client_cb ^Cgot sig = 2, cleaning
+> > up...
+> > cleanup successful - exit
+> > --------------------------------------------------------------------
+> > /latest_bluez/bluez/test$ ./simple-agent Agent registered Release
+> > gowtham.ab@gowtham-ab:~/latest_bluez/bluez/test$ ./simple-agent
+> Agent
+> > registered RequestConfirmation
+> (/org/bluez/hci0/dev_00_1B_DC_07_33_4E,
+> > 564246) Confirm passkey (yes/no): yes Release
+> > --------------------------------------------------------------------
+> 
+> The passkey looks correct:
+> 
+> > HCI Event: User Confirmation Request (0x33) plen 10         [hci0] 128.242120
+>         Address: 00:1B:DC:07:33:4E (Vencer Co., Ltd.)
+>         Passkey: 564246
+> 
+> But we never confirm it then PTS probably times out waiting for it. If you are
+> getting release that probably means the agent is no longer registered, but
+> then I wonder why it received the RequestConfirmation.
+> 
+> > After confirming the passkey, it becomes Authentication Failure and
+> > Remote User Terminated Connection as captured in  btmon, hcidump logs.
+> > What might be the problem?
+> 
+> > HCI Event: Simple Pairing Complete (0x36) plen 7            [hci0] 158.243129
+>         Status: Authentication Failure (0x05)
+>         Address: 00:1B:DC:07:33:4E (Vencer Co., Ltd.)
+> > HCI Event: Auth Complete (0x06) plen 3                      [hci0] 158.244139
+>         Status: Authentication Failure (0x05)
+>         Handle: 70
+> 
+> 30 seconds has passed then probably PTS gives up.
+> 
 
-This sounds like the device was programmed for auto connect, did you
-connected to it before? It would explain why it is connecting but not
-why it is paring but perhaps it is because the service connecting does
-require encryption e.g. HoG. Try removing the device, it should stop
-reconnecting every time the device advertises.
+Sorry. The issue is in controller. When I used PTS dongle, there are no issues, working perfectly.
+All test cases are passing.
+Thanks.
 
+> >
+> >> >
+> >> > diff --git a/tools/bneptest.c b/tools/bneptest.c index
+> >> > 98ee9b1..fccecd2 100644
+> >> > --- a/tools/bneptest.c
+> >> > +++ b/tools/bneptest.c
+> >> > @@ -477,7 +477,7 @@ static int bnep_client_connect(void)
+> >> >                                         BT_IO_OPT_SOURCE_BDADDR, &src_addr,
+> >> >                                         BT_IO_OPT_DEST_BDADDR, &dst_addr,
+> >> >                                         BT_IO_OPT_PSM, BNEP_PSM,
+> >> > -                                       BT_IO_OPT_SEC_LEVEL,
+> >> > BT_IO_SEC_MEDIUM,
+> >> > +                                       BT_IO_OPT_SEC_LEVEL,
+> >> > + BT_IO_SEC_LOW,
+> >> >                                         BT_IO_OPT_OMTU, BNEP_MTU,
+> >> >                                         BT_IO_OPT_IMTU, BNEP_MTU,
+> >> >                                         BT_IO_OPT_INVALID);
+> >> >
+> >> >
+> >> > Regards,
+> >> > Gowtham Anandha Babu
+> >> >
+> >>
+> >>
+> >>
+> >> --
+> >> Luiz Augusto von Dentz
+> >> --
+> >
+> > Regards,
+> > Gowtham Anandha Babu
+> >
+> >> To unsubscribe from this list: send the line "unsubscribe
+> >> linux-bluetooth" in the body of a message to
+> >> majordomo@vger.kernel.org More majordomo info at
+> >> http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
+> --
+> Luiz Augusto von Dentz
+> --
 
--- 
-Luiz Augusto von Dentz
+Regards,
+Gowtham Anandha Babu
+
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
+
