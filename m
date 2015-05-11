@@ -1,89 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ankur Patel <ankur@embertec.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 12 May 2015 10:03:19 +0930
-Subject: RE: LE only Mode:  PICS reference 
-Message-ID: <BD5E516FF3711A41B93DC005170007BB010D943FD8B1@EMBSVR01.ember.local>
-References: <BD5E516FF3711A41B93DC005170007BB010D943FD6AC@EMBSVR01.ember.local>
- <F726DD6C-2E39-44C1-B168-CE2723CF9069@holtmann.org>
-In-Reply-To: <F726DD6C-2E39-44C1-B168-CE2723CF9069@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [RFC 1/2] Bluetooth UART Device Tree bindings
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1431030329-22929-2-git-send-email-ifaenson@broadcom.com>
+Date: Mon, 11 May 2015 21:14:23 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <67402AFC-4646-4C56-904B-462282E98666@holtmann.org>
+References: <1431030329-22929-1-git-send-email-ifaenson@broadcom.com> <1431030329-22929-2-git-send-email-ifaenson@broadcom.com>
+To: Ilya Faenson <ifaenson@broadcom.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hi Ankur,
->=20
-> > I am new to the BT LE and pls bare with me if I ask some silly question=
-s.
-> Thank you for support.
-> >
-> > I am now using 3.18.12 Linux kernel and Bluez 5.30 version on board. Ou=
-r
-> product requirement is to support only LE modes. To create PICS for host
-> system using bluez, do I have to take
-> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/pics-gap.txt =
-as a
-> reference for selecting the configuration?
-> > If yes, then in that case, why it has  Broadcaster and Observer selecte=
-d to
-> 'False' under line#150-151 in pics-gap.txt as bluez does supports
-> Central/Broadcaster/Observer LE roles as mentioned under bluez-
-> 5.30/doc/supported-features.txt?
->=20
-> the main focus is central and peripheral role when it comes to Android. T=
-he
-> broadcaster and observer roles are connectionless and not much in use.
->=20
-> You can select them in the PICS and qualify BlueZ as broadcaster and
-> observer only, but then a lot of the settings need to be chosen correctly=
-. In
-> addition bluetoothd will not be of much help since that is build for cent=
-ral and
-> peripheral roles.
->=20
-> > Inaddition, I am having some issue running the testcase
-> TC_IDLE_NAMP_BV_02_C. pts-gts.txt says: "btmgmt advertising on" should
-> work, but it is not working on my side.
-> >
-> > Following Log info:
-> > Test case : TC_IDLE_NAMP_BV_02_C started
-> >                - MTC: Successfully received
-> HCI_LE_CLEAR_WHITE_LIST_COMPLETE_EVENT.
-> >                - MTC: Successfully received
-> HCI_LE_ADD_DEVICE_TO_WHITE_LIST_COMPLETE_EVENT.
-> >                - MTC: Successfully received
-> HCI_LE_SET_SCAN_PARAMETERS_COMPLETE_EVENT.
-> >                - MTC: Successfully received
-> HCI_LE_SET_SCAN_ENABLE_COMPLETE_EVENT.
-> >                - MTC: Receive Advertising report successfully.
-> >                - MTC: Successfully received
-> HCI_LE_SET_SCAN_ENABLE_COMPLETE_EVENT.
-> >                - MTC: ATT connection established successfully.
-> >                - MTC-INCONC: Error returned in ATT_READ_BY_TYPE_CFM.
-> >                - CM_EXIT
-> >                - CM_EXIT
-> >                - CM_EXIT
-> >                - CM_EXIT
-> >                - MTC: Test case ended
-> >                -Final Verdict: INCONC
-> > TC_IDLE_NAMP_BV_02_C finished
-> >
-> > -	Prior to running above command I have also set name using
-> command 'btmgmt name test_dev'. Do I need to run more commands to it?
->=20
-> The name also needs to be available via a GAP characteristic. Normally
-> running bluetoothd will do that for you. But if you do that manually, the=
-n
-> need to register the GAP services.
->=20
-> Regards
->=20
-> Marcel
+Hi Ilya,
 
-@Marcel @Luiz: Appreciate your help. Let me do some homework. I am looking =
-forward to create similar documentation as available for android.=20
+> Device Tree bindings to configure the Bluetooth UART device.
+> 
+> Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
+> ---
+> .../devicetree/bindings/net/bluetooth/btbcm.txt    | 54 ++++++++++++++++++++++
+> 1 file changed, 54 insertions(+)
+> create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+> new file mode 100644
+> index 0000000..cc9f225
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+> @@ -0,0 +1,54 @@
+> +btbcm
+> +------
+> +
+> +Required properties:
+> +
+> +	- compatible : must be "brcm,brcm-bt-uart".
+> +	- tty : tty device connected to this Bluetooth device.
+> +
+> +Optional properties:
+> +
+> +  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an interrupt.
+> +
+> +  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume device.
+> +
+> +  - reg-on-gpios : reg-on output GPIO to be used to power device on/off.
+> +
+> +  - baud-rate-before-config-download : initial Bluetooth device baud rate.
+> +    Default: 3000000.
+> +
+> +  - manual-fc : flow control UART in suspend / resume scenarios.
+> +    Default: 0.
+> +
+> +  - configure-sleep : configure suspend / resume flag.
+> +    Default: 0.
+> +
+> +  - configure-audio : configure platform PCM SCO flag.
+> +    Default: 0.
+> +
+> +  - PCM* : SCO PCM platform parameters. Work with Broadcom on setting.
+> +    Defaults: see the example below.
 
-Regards,
-Ankur
+I think at some point this needs to be reviewed by the DT guys as well. They surely want to have some say in the naming and how to deal with the Bluetooth devices behind UART controllers.
+
+Regards
+
+Marcel
+
