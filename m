@@ -1,202 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 1/5] android/pts: Update SM PTS 6.1 results for android 5.1
-Date: Mon, 11 May 2015 14:49:44 +0200
-Message-Id: <1431348588-3974-1-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=Y
+In-Reply-To: <001b01d08be3$bcaa7870$35ff6950$@samsung.com>
+References: <001a01d08bda$91503ab0$b3f0b010$@samsung.com>
+	<CABBYNZJ_SJowxX47YGWAvHa5D1a2SwDD5cE90UE6=fHLTwTsTQ@mail.gmail.com>
+	<001b01d08be3$bcaa7870$35ff6950$@samsung.com>
+Date: Mon, 11 May 2015 15:28:06 +0300
+Message-ID: <CABBYNZJ7UsmsnO+WJr3b3Ke2Scu5CtTsof0w4-4b+-2xEw6w9A@mail.gmail.com>
+Subject: Re: Query regarding bneptest tool
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Bhusan Panda <bharat.panda@samsung.com>,
+	cpgs@samsung.com,
+	Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates test case results, pics and instructions for
-SM profile against android 5.1.
----
- android/pics-sm.txt  | 23 ++++++++++++++---------
- android/pixit-sm.txt |  2 +-
- android/pts-sm.txt   | 38 ++++++++++++--------------------------
- 3 files changed, 27 insertions(+), 36 deletions(-)
+Hi Gowtham,
 
-diff --git a/android/pics-sm.txt b/android/pics-sm.txt
-index c5caec6..c31fe76 100644
---- a/android/pics-sm.txt
-+++ b/android/pics-sm.txt
-@@ -1,8 +1,9 @@
- SM PICS for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
-+^ - field not available on PTS
- 
- M - mandatory
- O - optional
-@@ -12,9 +13,11 @@ O - optional
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
- TSPC_SM_1_1	True		Master Role (Initiator) (C.1)
--TSPC_SM_1_2	True		Slave Role (Responder) (C.1)
-+TSPC_SM_1_2	True		Slave Role (Responder) (C.2)
- -------------------------------------------------------------------------------
--C.1: At least one of these features shall be supported.
-+C.1: Mandatory to support if TSPC_SM_1_2 is NOT supported, otherwise Optional
-+C.2: Optional IF ((4.0 OR 4.0+HS) AND TSPC_GAP_5_3) OR ((4.1 OR 4.1+HS OR 4.2
-+	OR 4.2+HS) AND (TSPC_GAP_5_3 OR TSPC_GAP_38_3)))
- -------------------------------------------------------------------------------
- 
- 
-@@ -26,8 +29,10 @@ TSPC_SM_2_1	True		Authenticated MITM protection (O)
- TSPC_SM_2_2	True		Unauthenticated no MITM protection (C.1)
- TSPC_SM_2_3	True		No security requirements (M)
- TSPC_SM_2_4	False (*)	OOB supported (O)
-+TSPC_SM_2_5	(^)		LE Secure Connections (C.2)
- -------------------------------------------------------------------------------
- C.1: If TSPC_SM_2_1 is supported then Mandatory, else Optional
-+C.2: Optional IF Core 4.2 OR Core 4.2+HS are supported, otherwise Excluded
- -------------------------------------------------------------------------------
- 
- 
-@@ -47,8 +52,8 @@ TSPC_SM_4_1	True		Just Works (O)
- TSPC_SM_4_2	True		Passkey Entry (C.1)
- TSPC_SM_4_3	False (*)	Out of Band (C.1)
- -------------------------------------------------------------------------------
--C.1: If TSPC_SM_2_1 is supported, at least one of these features shall be
--	supported.
-+C.1: Mandatory to support at least one of the defined methods IF TSPC_SM_2_1 is
-+	supported, otherwise Excluded.
- -------------------------------------------------------------------------------
- 
- 
-@@ -63,7 +68,7 @@ TSPC_SM_5_4	True		Slave Initiated Security – Master response(C.2)
- -------------------------------------------------------------------------------
- C.1: Mandatory if TSPC_SM_1_2 is supported, otherwise Excluded
- C.2: Mandatory if TSPC_SM_1_1 is supported, otherwise Excluded
--C.3: Mandatory IF TSPC_SM_2_1 OR TSPC_SM_2_1 OR TSPC_SM_2_4 is supported,
-+C.3: Mandatory IF TSPC_SM_2_1 OR TSPC_SM_2_2 OR TSPC_SM_2_4 is supported,
- 	otherwise Excluded
- -------------------------------------------------------------------------------
- 
-@@ -85,7 +90,7 @@ TSPC_SM_7_1	True		Encryption Key (C.1)
- TSPC_SM_7_2	True		Identity Key (C.2)
- TSPC_SM_7_3	True		Signing Key (C.3)
- -------------------------------------------------------------------------------
--C.1: Mandatory if GAP (24/2 OR 42/6) is supported, ELSE Optional
--C.2: Mandatory if GAP (26/3) is supported, ELSE Optional
--C.3: Mandatory if GAP (25/6 OR 35/6) is supported, ELSE Optional
-+C.1: Mandatory if TSPC_GAP_24_2 OR TSPC_GAP_42_6 is supported, ELSE Optional
-+C.2: Mandatory if TSPC_GAP_26_3 is supported, ELSE Optional
-+C.3: Mandatory if TSPC_GAP_25_6 OR TSPC_GAP_35_6 is supported, ELSE Optional
- -------------------------------------------------------------------------------
-diff --git a/android/pixit-sm.txt b/android/pixit-sm.txt
-index 98e2ab5..6facbb8 100644
---- a/android/pixit-sm.txt
-+++ b/android/pixit-sm.txt
-@@ -1,6 +1,6 @@
- SM PIXIT for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-sm.txt b/android/pts-sm.txt
-index 91737cc..9b9e120 100644
---- a/android/pts-sm.txt
-+++ b/android/pts-sm.txt
-@@ -1,8 +1,8 @@
- PTS test results for SM
- 
--PTS version: 6.0
--Tested: 11-February-2015
--Android version: 5.0
-+PTS version: 6.1
-+Tested: 04-May-2015
-+Android version: 5.1
- kernel version: 3.20
- 
- Results:
-@@ -24,12 +24,7 @@ TC_JW_BV_02_C		PASS	btmgmt advertising on
- TC_JW_BV_05_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
- TC_JW_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
- TC_JW_BI_02_C		PASS	btmgmt pairable on
--TC_JW_BI_03_C		PASS	bluetoothd is NOT running
--				btmgmt power on
--				btmgmt le on
--				btmgmt connectable on
--				btmgmt pairable on
--				btmgmt discov on
-+TC_JW_BI_03_C		PASS	btmgmt pairable on
- 				btmgmt advertising on
- TC_JW_BI_04_C		PASS	btmgmt pairable off
- 				btmgmg pair -c 0x03 -t 0x01 <addr>
-@@ -38,8 +33,6 @@ TC_PKE_BV_01_C		PASS	btmgmt pairable off
- 				Note: provide passkey to PTS
- TC_PKE_BV_02_C		PASS	btmgmt pairable off
- 				btmgmt io-cap 0x04
--				btmgmt advertising on
--				btmgmt monitor
- 				Note: provide passkey
- TC_PKE_BV_04_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
- TC_PKE_BV_05_C		PASS	btmgmt io-cap 0x04
-@@ -50,7 +43,6 @@ TC_PKE_BI_02_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
- 				Note: provide passkey
- TC_PKE_BI_03_C		PASS	btmgmt io-cap 0x04
- 				btmgmt advertising on
--				btmgmt monitor
- 				Note: Enter invalid passkey in PTS
- TC_OOB_BV_01_C		N/A
- TC_OOB_BV_02_C		N/A
-@@ -59,12 +51,10 @@ TC_OOB_BV_04_C		N/A
- TC_OOB_BV_05_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
- 				Note: Enter valid passkey in PTS
- TC_OOB_BV_06_C		PASS	btmgmt advertising on
--				btmgmt monitor
- 				Note: Enter valid passkey in PTS
- TC_OOB_BV_07_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
- TC_OOB_BV_08_C		PASS	btmgmt advertising on
--				btmgmt monitor
--				Note: Accept pairing in btmgmt monitor
-+				Note: Accept pairing in btmgmt
- TC_OOB_BV_09_C		N/A
- TC_OOB_BV_10_C		N/A
- TC_OOB_BI_01_C		N/A
-@@ -72,17 +62,15 @@ TC_OOB_BI_02_C		N/A
- TC_EKS_BV_01_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
- 				Note: Enter valid passkey in PTS
- TC_EKS_BV_02_C		PASS	btmgmt advertising on
--				btmgmt monitor
--				Note: Accept pairing in btmgmt monitor
--TC_EKS_BI_01_C		PASS	btmgmt io-cap 0x03
--				btmgmt pair -c 0x03 -t 0x01 <addr>
-+				Note: Accept pairing in btmgmt
-+TC_EKS_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
- TC_EKS_BI_02_C		PASS	btmgmt advertising on
- TC_SIGN_BV_01_C		INC	PTS issue #12305
--TC_SIGN_BV_03_C		PASS	haltest:
-+TC_SIGN_BV_03_C		INC	haltest:
- 				gattc register_client 1234
- 				gattc listen 1 1
- 				Note: IUT must be connectable and discoverable
--TC_SIGN_BI_01_C		PASS	haltest:
-+TC_SIGN_BI_01_C		INC	haltest:
- 				gattc register client 1234
- 				gattc listen 1 1
- 				Note: IUT must be connectable and discoverable
-@@ -108,9 +96,7 @@ TC_KDU_BV_05_C		PASS	PTS issue #12302
- TC_KDU_BV_06_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
- TC_KDU_BV_07_C		PASS	btmgmt pairable on
- TC_SIP_BV_01_C		PASS	btmgmt advertising on
--				btmgmt pair -c 0x03 -t 0x01 <addr>
--TC_SIP_BV_02_C		PASS	btmgmt advertising off
--				l2test -n -J4 -V le_public <addr>
--TC_SIE_BV_01_C		PASS	btmgmt advertising on
--				btmgmt pair -c 0x03 -t 0x01 <addr>
-+TC_SIP_BV_02_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
-+TC_SIE_BV_01_C		PASS	btmgmt io-cap 0x03
-+				btmgmt advertising on
- -------------------------------------------------------------------------------
+On Mon, May 11, 2015 at 3:12 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Hi Luiz,
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+>> Sent: Monday, May 11, 2015 5:06 PM
+>> To: Gowtham Anandha Babu
+>> Cc: linux-bluetooth@vger.kernel.org; Bharat Bhusan Panda;
+>> cpgs@samsung.com; Grzegorz Kolodziejczyk
+>> Subject: Re: Query regarding bneptest tool
+>>
+>> Hi Gowtham,
+>>
+>> On Mon, May 11, 2015 at 2:06 PM, Gowtham Anandha Babu
+>> <gowtham.ab@samsung.com> wrote:
+>> > Hi All,
+>> >
+>> > I am testing BlueZ bnep test tool (tools/bneptest) using PTS 6.1.0.
+>> > The BNEP client test cases are not passing in BT_IO_SEC_MEDIUM
+>> > security level.
+>> > My PTS PICS and PIXIT are same as android/pixit-bnep.txt,
+>> > android/pics-bnep.txt.
+>> > Whereas when the security level is BT_IO_SEC_LOW, it is passing.
+>> > If it is a valid fix, then I will send a patch for the same.
+>> > This is tested in Linux, not sure about android.
+>>
+>> It might be related to pairing then, do you have any agent registered in the
+>> system? Check the HCI logs with btmon, it should tell us what is happening.
+>>
+>
+> I have attached both logs. Below is the procedure I followed.
+>
+> --------------------------------------------------------------------
+> PTS output:
+> Test case : TC_CTRL_BV_02_C started
+>         - Received passkey: 564246, from: gowtham-ab-0
+>         - User canceled the current operation MMI.
+>         - MMI CM_EXIT
+>         - got an OTHERWISE
+>         - MTC: Test case ended
+>          -Final Verdict: INCONC
+> TC_CTRL_BV_02_C finished
+> --------------------------------------------------------------------
+> BlueZ output:
+> /latest_bluez/bluez/test$  sudo ./bneptest -c 00:1B:DC:07:33:4E -b pan0 -n bnep0
+> bnep_client_connect
+> connecting 00:1B:DC:07:33:4E
+> cannot initiate bnep connection
+> connected_client_cb
+> ^Cgot sig = 2, cleaning up...
+> cleanup successful - exit
+> --------------------------------------------------------------------
+> /latest_bluez/bluez/test$ ./simple-agent
+> Agent registered
+> Release
+> gowtham.ab@gowtham-ab:~/latest_bluez/bluez/test$ ./simple-agent
+> Agent registered
+> RequestConfirmation (/org/bluez/hci0/dev_00_1B_DC_07_33_4E, 564246)
+> Confirm passkey (yes/no): yes
+> Release
+> --------------------------------------------------------------------
+
+The passkey looks correct:
+
+> HCI Event: User Confirmation Request (0x33) plen 10         [hci0] 128.242120
+        Address: 00:1B:DC:07:33:4E (Vencer Co., Ltd.)
+        Passkey: 564246
+
+But we never confirm it then PTS probably times out waiting for it. If
+you are getting release that probably means the agent is no longer
+registered, but then I wonder why it received the RequestConfirmation.
+
+> After confirming the passkey, it becomes Authentication Failure and Remote User Terminated Connection
+> as captured in  btmon, hcidump logs.
+> What might be the problem?
+
+> HCI Event: Simple Pairing Complete (0x36) plen 7            [hci0] 158.243129
+        Status: Authentication Failure (0x05)
+        Address: 00:1B:DC:07:33:4E (Vencer Co., Ltd.)
+> HCI Event: Auth Complete (0x06) plen 3                      [hci0] 158.244139
+        Status: Authentication Failure (0x05)
+        Handle: 70
+
+30 seconds has passed then probably PTS gives up.
+
+>
+>> >
+>> > diff --git a/tools/bneptest.c b/tools/bneptest.c index
+>> > 98ee9b1..fccecd2 100644
+>> > --- a/tools/bneptest.c
+>> > +++ b/tools/bneptest.c
+>> > @@ -477,7 +477,7 @@ static int bnep_client_connect(void)
+>> >                                         BT_IO_OPT_SOURCE_BDADDR, &src_addr,
+>> >                                         BT_IO_OPT_DEST_BDADDR, &dst_addr,
+>> >                                         BT_IO_OPT_PSM, BNEP_PSM,
+>> > -                                       BT_IO_OPT_SEC_LEVEL,
+>> > BT_IO_SEC_MEDIUM,
+>> > +                                       BT_IO_OPT_SEC_LEVEL,
+>> > + BT_IO_SEC_LOW,
+>> >                                         BT_IO_OPT_OMTU, BNEP_MTU,
+>> >                                         BT_IO_OPT_IMTU, BNEP_MTU,
+>> >                                         BT_IO_OPT_INVALID);
+>> >
+>> >
+>> > Regards,
+>> > Gowtham Anandha Babu
+>> >
+>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>> --
+>
+> Regards,
+> Gowtham Anandha Babu
+>
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org More majordomo
+>> info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
