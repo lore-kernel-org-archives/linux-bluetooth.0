@@ -1,33 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5550CD07.1000105@lwfinger.net>
-Date: Mon, 11 May 2015 10:38:47 -0500
-From: Larry Finger <Larry.Finger@lwfinger.net>
-MIME-Version: 1.0
-To: Daniel Drake <drake@endlessm.com>
-CC: =?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>,
-	Carlo Caione <carlo@endlessm.com>,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>,
-	"shaofu@realtek.com >> shaofu" <shaofu@realtek.com>
-Subject: Re: Realtek USB bluetooth: no scan results when wifi is connected
-References: <CAD8Lp47=G8rFJtow9fn9WBg6FAyygopvYh7k0FNS0w8FgKXD6A@mail.gmail.com>	<554E804F.9090407@lwfinger.net> <CAD8Lp46ueGkGvit9CZ_vm+kTWSm30xXvsf0E8eaQ=oeA8j=nUw@mail.gmail.com>
-In-Reply-To: <CAD8Lp46ueGkGvit9CZ_vm+kTWSm30xXvsf0E8eaQ=oeA8j=nUw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/pts: Update BNEP PTS 6.1 results for android 5.1
+Date: Mon, 11 May 2015 17:17:34 +0200
+Message-Id: <1431357454-30227-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1431357454-30227-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1431357454-30227-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 05/11/2015 08:36 AM, Daniel Drake wrote:
-> Hi Larry,
->
-> On Sat, May 9, 2015 at 3:46 PM, Larry Finger <Larry.Finger@lwfinger.net> wrote:
->> Do you see any adverse side effects when you comment out the "case 3" code?
->
-> No, it fixes the scan results issue and I also tested a simultaneous
-> download over wifi while sending a file over bluetooth. Seems to be
-> working fine.
+This patch updates BNEP PTS 6.1 results for android 5.1 and kernel
+4.1.0-rc1+.
+---
+ android/pics-bnep.txt  |  2 +-
+ android/pixit-bnep.txt |  2 +-
+ android/pts-bnep.txt   | 20 ++++++++++++--------
+ 3 files changed, 14 insertions(+), 10 deletions(-)
 
-OK. As I know you are busy, I will submit the patch to 
-linux-wireless@vger.kernel.org for you.
-
-Larry
+diff --git a/android/pics-bnep.txt b/android/pics-bnep.txt
+index 09aa725..289e470 100644
+--- a/android/pics-bnep.txt
++++ b/android/pics-bnep.txt
+@@ -1,6 +1,6 @@
+ BNEP PICS for the PTS tool.
+ 
+-PTS version: 6.0
++PTS version: 6.1
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-bnep.txt b/android/pixit-bnep.txt
+index 9a26cd2..1366535 100644
+--- a/android/pixit-bnep.txt
++++ b/android/pixit-bnep.txt
+@@ -1,6 +1,6 @@
+ BNEP PIXIT for the PTS tool.
+ 
+-PTS version: 6.0
++PTS version: 6.1
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-bnep.txt b/android/pts-bnep.txt
+index 42f6438..8b6986a 100644
+--- a/android/pts-bnep.txt
++++ b/android/pts-bnep.txt
+@@ -1,9 +1,9 @@
+ PTS test results for BNEP
+ 
+-PTS version: 6.0
+-Tested: 09-April-2015
+-Android version: 5.0
+-Kernel version: 3.20
++PTS version: 6.1
++Tested: 11-May-2015
++Android version: 5.1
++Kernel version: 4.1
+ 
+ Results:
+ PASS	test passed
+@@ -34,10 +34,14 @@ TC_CTRL_BV_09_C		PASS	bneptest -c <PTS addr> -b <bridge> -n <iface>
+ TC_CTRL_BV_10_C		PASS	PTS issue #13169
+ 				bneptest -s -b <bridge> -n <iface>
+ TC_CTRL_BV_19_C		PASS	bneptest -s -b <bridge> -n <iface>
+-TC_RX_TYPE_0_BV_11_C	PASS	bneptest -s -b <bridge> -n <iface>
+-TC_RX_C_BV_12_C		PASS	bneptest -s -b <bridge> -n <iface>
+-TC_RX_C_S_BV_13_C	PASS	bneptest -s -b <bridge> -n <iface>
+-TC_RX_C_S_BV_14_C	PASS	bneptest -s -b <bridge> -n <iface>
++TC_RX_TYPE_0_BV_11_C	PASS	PTS issue #13171
++				bneptest -s -b <bridge> -n <iface>
++TC_RX_C_BV_12_C		PASS	PTS issue #13171
++				bneptest -s -b <bridge> -n <iface>
++TC_RX_C_S_BV_13_C	PASS	PTS issue #13171
++				bneptest -s -b <bridge> -n <iface>
++TC_RX_C_S_BV_14_C	PASS	PTS issue #13171
++				bneptest -s -b <bridge> -n <iface>
+ TC_RX_TYPE_0_BV_15_C	PASS	PTS issue #13169
+ 				bneptest -s -b <bridge> -n <iface>
+ TC_RX_TYPE_0_BV_16_C	PASS	PTS issue #13171
+-- 
+2.1.0
 
