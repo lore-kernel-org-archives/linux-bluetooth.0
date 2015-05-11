@@ -2,268 +2,201 @@ Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 2/5] shared/att: Add ext_signed flag to be able to use external crypto
-Date: Mon, 11 May 2015 14:49:45 +0200
-Message-Id: <1431348588-3974-2-git-send-email-mariusz.skamra@tieto.com>
-In-Reply-To: <1431348588-3974-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1431348588-3974-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: [PATCH 1/5] android/pts: Update SM PTS 6.1 results for android 5.1
+Date: Mon, 11 May 2015 14:49:44 +0200
+Message-Id: <1431348588-3974-1-git-send-email-mariusz.skamra@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=Y
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Due to the issues with CSRK tests ext_signed flag has been added to
-allow android/gatt handle signed write operations.
-
-This patch fixes following tests:
-GAP__TC_SEC_CSIGN_BV_02_C
-GAP__TC_SEC_CSIGN_BI_01_C
-GAP__TC_SEC_CSIGN_BI_02_C
-GAP__TC_SEC_CSIGN_BI_03_C
-GAP__TC_SEC_CSIGN_BI_04_C
-SM__TC_SIGN_BV_03_C
+This patch updates test case results, pics and instructions for
+SM profile against android 5.1.
 ---
- android/gatt.c        |  2 +-
- attrib/gattrib.c      |  4 ++--
- attrib/gattrib.h      |  2 +-
- attrib/gatttool.c     |  2 +-
- attrib/interactive.c  |  2 +-
- peripheral/gatt.c     |  2 +-
- src/device.c          |  2 +-
- src/shared/att.c      | 10 ++++++----
- src/shared/att.h      |  2 +-
- tools/btgatt-client.c |  2 +-
- tools/btgatt-server.c |  2 +-
- unit/test-gatt.c      |  2 +-
- unit/test-gattrib.c   |  2 +-
- unit/test-hog.c       |  2 +-
- 14 files changed, 20 insertions(+), 18 deletions(-)
+ android/pics-sm.txt  | 23 ++++++++++++++---------
+ android/pixit-sm.txt |  2 +-
+ android/pts-sm.txt   | 38 ++++++++++++--------------------------
+ 3 files changed, 27 insertions(+), 36 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 4da959f..1f131e8 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1564,7 +1564,7 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 	if (cid == ATT_CID)
- 		mtu = ATT_DEFAULT_LE_MTU;
+diff --git a/android/pics-sm.txt b/android/pics-sm.txt
+index c5caec6..c31fe76 100644
+--- a/android/pics-sm.txt
++++ b/android/pics-sm.txt
+@@ -1,8 +1,9 @@
+ SM PICS for the PTS tool.
  
--	attrib = g_attrib_new(io, mtu);
-+	attrib = g_attrib_new(io, mtu, true);
- 	if (!attrib) {
- 		error("gatt: unable to create new GAttrib instance");
- 		device_set_state(dev, DEVICE_DISCONNECTED);
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 2011359..2e1e39a 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -95,7 +95,7 @@ static struct id_pair *store_id(GAttrib *attrib, unsigned int org_id,
- 	return NULL;
- }
+-PTS version: 6.0
++PTS version: 6.1
  
--GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
-+GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu, bool ext_signed)
- {
- 	gint fd;
- 	GAttrib *attr;
-@@ -111,7 +111,7 @@ GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu)
- 	g_io_channel_ref(io);
- 	attr->io = io;
+ * - different than PTS defaults
++^ - field not available on PTS
  
--	attr->att = bt_att_new(fd);
-+	attr->att = bt_att_new(fd, ext_signed);
- 	if (!attr->att)
- 		goto fail;
+ M - mandatory
+ O - optional
+@@ -12,9 +13,11 @@ O - optional
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_SM_1_1	True		Master Role (Initiator) (C.1)
+-TSPC_SM_1_2	True		Slave Role (Responder) (C.1)
++TSPC_SM_1_2	True		Slave Role (Responder) (C.2)
+ -------------------------------------------------------------------------------
+-C.1: At least one of these features shall be supported.
++C.1: Mandatory to support if TSPC_SM_1_2 is NOT supported, otherwise Optional
++C.2: Optional IF ((4.0 OR 4.0+HS) AND TSPC_GAP_5_3) OR ((4.1 OR 4.1+HS OR 4.2
++	OR 4.2+HS) AND (TSPC_GAP_5_3 OR TSPC_GAP_38_3)))
+ -------------------------------------------------------------------------------
  
-diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-index 374bac2..611f952 100644
---- a/attrib/gattrib.h
-+++ b/attrib/gattrib.h
-@@ -42,7 +42,7 @@ typedef void (*GAttribDebugFunc)(const char *str, gpointer user_data);
- typedef void (*GAttribNotifyFunc)(const guint8 *pdu, guint16 len,
- 							gpointer user_data);
  
--GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu);
-+GAttrib *g_attrib_new(GIOChannel *io, guint16 mtu, bool ext_signed);
- GAttrib *g_attrib_ref(GAttrib *attrib);
- void g_attrib_unref(GAttrib *attrib);
+@@ -26,8 +29,10 @@ TSPC_SM_2_1	True		Authenticated MITM protection (O)
+ TSPC_SM_2_2	True		Unauthenticated no MITM protection (C.1)
+ TSPC_SM_2_3	True		No security requirements (M)
+ TSPC_SM_2_4	False (*)	OOB supported (O)
++TSPC_SM_2_5	(^)		LE Secure Connections (C.2)
+ -------------------------------------------------------------------------------
+ C.1: If TSPC_SM_2_1 is supported then Mandatory, else Optional
++C.2: Optional IF Core 4.2 OR Core 4.2+HS are supported, otherwise Excluded
+ -------------------------------------------------------------------------------
  
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index 1a40c94..95bd20a 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -148,7 +148,7 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
- 	if (cid == ATT_CID)
- 		mtu = ATT_DEFAULT_LE_MTU;
  
--	attrib = g_attrib_new(io, mtu);
-+	attrib = g_attrib_new(io, mtu, false);
+@@ -47,8 +52,8 @@ TSPC_SM_4_1	True		Just Works (O)
+ TSPC_SM_4_2	True		Passkey Entry (C.1)
+ TSPC_SM_4_3	False (*)	Out of Band (C.1)
+ -------------------------------------------------------------------------------
+-C.1: If TSPC_SM_2_1 is supported, at least one of these features shall be
+-	supported.
++C.1: Mandatory to support at least one of the defined methods IF TSPC_SM_2_1 is
++	supported, otherwise Excluded.
+ -------------------------------------------------------------------------------
  
- 	if (opt_listen)
- 		g_idle_add(listen_start, attrib);
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index 451be23..7d4786a 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -174,7 +174,7 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
- 	if (cid == ATT_CID)
- 		mtu = ATT_DEFAULT_LE_MTU;
  
--	attrib = g_attrib_new(iochannel, mtu);
-+	attrib = g_attrib_new(iochannel, mtu, false);
- 	g_attrib_register(attrib, ATT_OP_HANDLE_NOTIFY, GATTRIB_ALL_HANDLES,
- 						events_handler, attrib, NULL);
- 	g_attrib_register(attrib, ATT_OP_HANDLE_IND, GATTRIB_ALL_HANDLES,
-diff --git a/peripheral/gatt.c b/peripheral/gatt.c
-index 8df62a6..554124e 100644
---- a/peripheral/gatt.c
-+++ b/peripheral/gatt.c
-@@ -116,7 +116,7 @@ static struct gatt_conn *gatt_conn_new(int fd)
- 	if (!conn)
- 		return NULL;
+@@ -63,7 +68,7 @@ TSPC_SM_5_4	True		Slave Initiated Security – Master response(C.2)
+ -------------------------------------------------------------------------------
+ C.1: Mandatory if TSPC_SM_1_2 is supported, otherwise Excluded
+ C.2: Mandatory if TSPC_SM_1_1 is supported, otherwise Excluded
+-C.3: Mandatory IF TSPC_SM_2_1 OR TSPC_SM_2_1 OR TSPC_SM_2_4 is supported,
++C.3: Mandatory IF TSPC_SM_2_1 OR TSPC_SM_2_2 OR TSPC_SM_2_4 is supported,
+ 	otherwise Excluded
+ -------------------------------------------------------------------------------
  
--	conn->att = bt_att_new(fd);
-+	conn->att = bt_att_new(fd, false);
- 	if (!conn->att) {
- 		fprintf(stderr, "Failed to initialze ATT transport layer\n");
- 		free(conn);
-diff --git a/src/device.c b/src/device.c
-index 8b678a9..88440d9 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4272,7 +4272,7 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 	}
+@@ -85,7 +90,7 @@ TSPC_SM_7_1	True		Encryption Key (C.1)
+ TSPC_SM_7_2	True		Identity Key (C.2)
+ TSPC_SM_7_3	True		Signing Key (C.3)
+ -------------------------------------------------------------------------------
+-C.1: Mandatory if GAP (24/2 OR 42/6) is supported, ELSE Optional
+-C.2: Mandatory if GAP (26/3) is supported, ELSE Optional
+-C.3: Mandatory if GAP (25/6 OR 35/6) is supported, ELSE Optional
++C.1: Mandatory if TSPC_GAP_24_2 OR TSPC_GAP_42_6 is supported, ELSE Optional
++C.2: Mandatory if TSPC_GAP_26_3 is supported, ELSE Optional
++C.3: Mandatory if TSPC_GAP_25_6 OR TSPC_GAP_35_6 is supported, ELSE Optional
+ -------------------------------------------------------------------------------
+diff --git a/android/pixit-sm.txt b/android/pixit-sm.txt
+index 98e2ab5..6facbb8 100644
+--- a/android/pixit-sm.txt
++++ b/android/pixit-sm.txt
+@@ -1,6 +1,6 @@
+ SM PIXIT for the PTS tool.
  
- 	dev->att_mtu = MIN(mtu, BT_ATT_MAX_LE_MTU);
--	attrib = g_attrib_new(io, dev->att_mtu);
-+	attrib = g_attrib_new(io, dev->att_mtu, false);
- 	if (!attrib) {
- 		error("Unable to create new GAttrib instance");
- 		return false;
-diff --git a/src/shared/att.c b/src/shared/att.c
-index c5eaa09..053aa47 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -82,6 +82,7 @@ struct bt_att {
- 	void *debug_data;
+-PTS version: 6.0
++PTS version: 6.1
  
- 	struct bt_crypto *crypto;
-+	bool ext_signed;
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-sm.txt b/android/pts-sm.txt
+index 91737cc..9b9e120 100644
+--- a/android/pts-sm.txt
++++ b/android/pts-sm.txt
+@@ -1,8 +1,8 @@
+ PTS test results for SM
  
- 	struct sign_info *local_sign;
- 	struct sign_info *remote_sign;
-@@ -732,7 +733,7 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- 	const struct queue_entry *entry;
- 	bool found;
+-PTS version: 6.0
+-Tested: 11-February-2015
+-Android version: 5.0
++PTS version: 6.1
++Tested: 04-May-2015
++Android version: 5.1
+ kernel version: 3.20
  
--	if (opcode & ATT_OP_SIGNED_MASK) {
-+	if (opcode & ATT_OP_SIGNED_MASK & !att->ext_signed) {
- 		if (!handle_signed(att, opcode, pdu, pdu_len))
- 			return;
- 		pdu_len -= BT_ATT_SIGNATURE_LEN;
-@@ -900,7 +901,7 @@ static void bt_att_free(struct bt_att *att)
- 	free(att);
- }
- 
--struct bt_att *bt_att_new(int fd)
-+struct bt_att *bt_att_new(int fd, bool ext_signed)
- {
- 	struct bt_att *att;
- 
-@@ -912,7 +913,7 @@ struct bt_att *bt_att_new(int fd)
- 		return NULL;
- 
- 	att->fd = fd;
--
-+	att->ext_signed = ext_signed;
- 	att->mtu = BT_ATT_DEFAULT_LE_MTU;
- 	att->buf = malloc(att->mtu);
- 	if (!att->buf)
-@@ -923,7 +924,8 @@ struct bt_att *bt_att_new(int fd)
- 		goto fail;
- 
- 	/* crypto is optional, if not available leave it NULL */
--	att->crypto = bt_crypto_new();
-+	if (!ext_signed)
-+		att->crypto = bt_crypto_new();
- 
- 	att->req_queue = queue_new();
- 	if (!att->req_queue)
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 80810a1..2a7f87e 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -28,7 +28,7 @@
- 
- struct bt_att;
- 
--struct bt_att *bt_att_new(int fd);
-+struct bt_att *bt_att_new(int fd, bool ext_signed);
- 
- struct bt_att *bt_att_ref(struct bt_att *att);
- void bt_att_unref(struct bt_att *att);
-diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-index fbc01db..1fc8730 100644
---- a/tools/btgatt-client.c
-+++ b/tools/btgatt-client.c
-@@ -179,7 +179,7 @@ static struct client *client_create(int fd, uint16_t mtu)
- 		return NULL;
- 	}
- 
--	cli->att = bt_att_new(fd);
-+	cli->att = bt_att_new(fd, false);
- 	if (!cli->att) {
- 		fprintf(stderr, "Failed to initialze ATT transport layer\n");
- 		bt_att_unref(cli->att);
-diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index b30a958..292b584 100644
---- a/tools/btgatt-server.c
-+++ b/tools/btgatt-server.c
-@@ -548,7 +548,7 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
- 		return NULL;
- 	}
- 
--	server->att = bt_att_new(fd);
-+	server->att = bt_att_new(fd, false);
- 	if (!server->att) {
- 		fprintf(stderr, "Failed to initialze ATT transport layer\n");
- 		goto fail;
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index a7ea7cd..40e2ca9 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -647,7 +647,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
- 	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
- 	g_assert(err == 0);
- 
--	context->att = bt_att_new(sv[0]);
-+	context->att = bt_att_new(sv[0], false);
- 	g_assert(context->att);
- 
- 	switch (test_data->context_type) {
-diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
-index 28542f3..416e596 100644
---- a/unit/test-gattrib.c
-+++ b/unit/test-gattrib.c
-@@ -92,7 +92,7 @@ static void setup_context(struct context *cxt, gconstpointer data)
- 	g_io_channel_set_encoding(cxt->server_io, NULL, NULL);
- 	g_io_channel_set_buffered(cxt->server_io, FALSE);
- 
--	cxt->att = g_attrib_new(cxt->att_io, DEFAULT_MTU);
-+	cxt->att = g_attrib_new(cxt->att_io, DEFAULT_MTU, false);
- 	g_assert(cxt->att != NULL);
- }
- 
-diff --git a/unit/test-hog.c b/unit/test-hog.c
-index 778f087..24731d7 100644
---- a/unit/test-hog.c
-+++ b/unit/test-hog.c
-@@ -187,7 +187,7 @@ static struct context *create_context(gconstpointer data)
- 
- 	g_io_channel_set_close_on_unref(att_io, TRUE);
- 
--	context->attrib = g_attrib_new(att_io, 23);
-+	context->attrib = g_attrib_new(att_io, 23, false);
- 	g_assert(context->attrib);
- 
- 	g_io_channel_unref(att_io);
+ Results:
+@@ -24,12 +24,7 @@ TC_JW_BV_02_C		PASS	btmgmt advertising on
+ TC_JW_BV_05_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+ TC_JW_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+ TC_JW_BI_02_C		PASS	btmgmt pairable on
+-TC_JW_BI_03_C		PASS	bluetoothd is NOT running
+-				btmgmt power on
+-				btmgmt le on
+-				btmgmt connectable on
+-				btmgmt pairable on
+-				btmgmt discov on
++TC_JW_BI_03_C		PASS	btmgmt pairable on
+ 				btmgmt advertising on
+ TC_JW_BI_04_C		PASS	btmgmt pairable off
+ 				btmgmg pair -c 0x03 -t 0x01 <addr>
+@@ -38,8 +33,6 @@ TC_PKE_BV_01_C		PASS	btmgmt pairable off
+ 				Note: provide passkey to PTS
+ TC_PKE_BV_02_C		PASS	btmgmt pairable off
+ 				btmgmt io-cap 0x04
+-				btmgmt advertising on
+-				btmgmt monitor
+ 				Note: provide passkey
+ TC_PKE_BV_04_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
+ TC_PKE_BV_05_C		PASS	btmgmt io-cap 0x04
+@@ -50,7 +43,6 @@ TC_PKE_BI_02_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
+ 				Note: provide passkey
+ TC_PKE_BI_03_C		PASS	btmgmt io-cap 0x04
+ 				btmgmt advertising on
+-				btmgmt monitor
+ 				Note: Enter invalid passkey in PTS
+ TC_OOB_BV_01_C		N/A
+ TC_OOB_BV_02_C		N/A
+@@ -59,12 +51,10 @@ TC_OOB_BV_04_C		N/A
+ TC_OOB_BV_05_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
+ 				Note: Enter valid passkey in PTS
+ TC_OOB_BV_06_C		PASS	btmgmt advertising on
+-				btmgmt monitor
+ 				Note: Enter valid passkey in PTS
+ TC_OOB_BV_07_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
+ TC_OOB_BV_08_C		PASS	btmgmt advertising on
+-				btmgmt monitor
+-				Note: Accept pairing in btmgmt monitor
++				Note: Accept pairing in btmgmt
+ TC_OOB_BV_09_C		N/A
+ TC_OOB_BV_10_C		N/A
+ TC_OOB_BI_01_C		N/A
+@@ -72,17 +62,15 @@ TC_OOB_BI_02_C		N/A
+ TC_EKS_BV_01_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
+ 				Note: Enter valid passkey in PTS
+ TC_EKS_BV_02_C		PASS	btmgmt advertising on
+-				btmgmt monitor
+-				Note: Accept pairing in btmgmt monitor
+-TC_EKS_BI_01_C		PASS	btmgmt io-cap 0x03
+-				btmgmt pair -c 0x03 -t 0x01 <addr>
++				Note: Accept pairing in btmgmt
++TC_EKS_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+ TC_EKS_BI_02_C		PASS	btmgmt advertising on
+ TC_SIGN_BV_01_C		INC	PTS issue #12305
+-TC_SIGN_BV_03_C		PASS	haltest:
++TC_SIGN_BV_03_C		INC	haltest:
+ 				gattc register_client 1234
+ 				gattc listen 1 1
+ 				Note: IUT must be connectable and discoverable
+-TC_SIGN_BI_01_C		PASS	haltest:
++TC_SIGN_BI_01_C		INC	haltest:
+ 				gattc register client 1234
+ 				gattc listen 1 1
+ 				Note: IUT must be connectable and discoverable
+@@ -108,9 +96,7 @@ TC_KDU_BV_05_C		PASS	PTS issue #12302
+ TC_KDU_BV_06_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+ TC_KDU_BV_07_C		PASS	btmgmt pairable on
+ TC_SIP_BV_01_C		PASS	btmgmt advertising on
+-				btmgmt pair -c 0x03 -t 0x01 <addr>
+-TC_SIP_BV_02_C		PASS	btmgmt advertising off
+-				l2test -n -J4 -V le_public <addr>
+-TC_SIE_BV_01_C		PASS	btmgmt advertising on
+-				btmgmt pair -c 0x03 -t 0x01 <addr>
++TC_SIP_BV_02_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
++TC_SIE_BV_01_C		PASS	btmgmt io-cap 0x03
++				btmgmt advertising on
+ -------------------------------------------------------------------------------
 -- 
 1.9.1
 
