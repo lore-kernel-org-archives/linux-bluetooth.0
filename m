@@ -1,54 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 May 2015 20:35:32 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] Bluetooth: hci_core: return cmd status in
- __hci_cmd_sync()
-Message-ID: <20150511173532.GA21779@t440s.P-661HNU-F1>
-References: <1431359418-23502-1-git-send-email-frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1431359418-23502-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: Can't update remote name in function of "hci_check_pending_name" because of discov->state == DISCOVERY_STOPPED
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAAAJ3C+iyc+YwWBPpoQnnQKmCb3oJ3weaDtxvEfUb9FwRqWx9Q@mail.gmail.com>
+Date: Mon, 11 May 2015 19:15:53 +0200
+Cc: jpawlowski@google.com, armansito@chromium.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <BE452B3B-EF90-4389-8B1C-878EF3DBA0C5@holtmann.org>
+References: <CAAAJ3C+iyc+YwWBPpoQnnQKmCb3oJ3weaDtxvEfUb9FwRqWx9Q@mail.gmail.com>
+To: Ethan <ethancsge@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+Hi Ethan,
 
-On Mon, May 11, 2015, Frederic Danis wrote:
-> @@ -234,7 +227,18 @@ EXPORT_SYMBOL(__hci_cmd_sync_ev);
->  struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
->  			       const void *param, u32 timeout)
->  {
-> -	return __hci_cmd_sync_ev(hdev, opcode, plen, param, 0, timeout);
-> +	struct sk_buff *skb;
-> +	int err;
-> +
-> +	skb = __hci_cmd_sync_ev(hdev, opcode, plen, param, 0, timeout);
-> +	if (!IS_ERR(skb) && skb->data[0]) {
-> +		err = -bt_to_errno(skb->data[0]);
-> +		kfree_skb(skb);
-> +
-> +		return ERR_PTR(err);
-> +	}
-> +
-> +	return skb;
+so first of all, you need to stop sending HTML emails to the mailing list. They will not get through and are not helping you in getting attention.
 
-Are you absolutely sure that this is needed? To my understanding the
-__hci_cmd_sync_ev() function should already be returning an error if we
-got a non-zero status either through a Command Complete or a Command
-Status event.
+> We found this issue in Chromebook with kernel 3.14. From btmon, Stack received event of Remote Name Req Complete with Device name “Name: VGP-BMS21”, but it’s after @ Discovering: 0x00 (7). It means le_scan_disable_work_complete set discover status to STOPPED for starting new discovery which caused hci_check_pending_name return without update the name information because discovery status is STOPPED. Then user space will always get null name, even hci_remote_name_evt shows everything is correct at HCI layer.
+> 
+> Is it possible setting LE Set Scan Enable to disable after Remote Name Req Complete? Or adding condition for hci_discovery_set_state(hdev, DISCOVERY_STOPPED) in function of le_scan_disable_work_complete?
 
-For both of these events the status is collected up in the event
-handlers called by hci_event_packet() and then passed as the second
-parameter to req_complete_skb(). The req_complete_skb() callback in turn
-is hci_req_sync_complete() for __hci_cmd_sync_ev() which stores the
-status in hdev->req_result. The hdev->req_result is then further
-converted through bt_to_errno() back in __hci_cmd_sync_ev().
+I have been asking for mgmt-tester test cases for simultaneous discovery for a while. Getting this feature tested in more detail and reproducible is needed. Things need to happen reliable.
 
-So to me it seems like your addition above should not be needed. What we
-do want however is all the code removals in your patches that remove
-code that was (incorrectly) assuming that non-zero statuses would be
-returned as actual skbs rather than errors.
+I am not convinced that the name request result is something that I would consider relevant. If it comes in too late, then it comes in too late. Bad luck. However the code should have send a HCI Remote Name Request Cancel command to actual free the baseband resources in case this is ongoing.
 
-Johan
+Now the real question might be is if we disable LE scanning after the time and continue trying to resolve BR/EDR names that still need resolving. Even these days with 4.2 out the door, there are still new devices that do not want to include their name in EIR and behave like 2.0 and earlier devices.
+
+I feel really uncomfortable trying to change anything until we have mgmt-tester test case that can be run on a regular basis and ensuring the behavior stays the same.
+
+Regards
+
+Marcel
+
