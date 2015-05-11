@@ -1,46 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1430994139-4829-1-git-send-email-gowtham.ab@samsung.com>
-References: <1430994139-4829-1-git-send-email-gowtham.ab@samsung.com>
-Date: Mon, 11 May 2015 11:12:18 +0300
-Message-ID: <CABBYNZK216huJmzBL0K0wMmLH3F_QS1iKmc-vdo4ABLtTRVZaA@mail.gmail.com>
-Subject: Re: [PATCH 0/6] Add decoding of BNEP control msg packet types
+In-Reply-To: <CABBYNZKtYh2pUiyr5sTV31SMDm6sw=_zX3PphqHmn+99LE7wOg@mail.gmail.com>
+References: <554CC8A9.4090604@lampreynetworks.com>
+	<CABBYNZKtYh2pUiyr5sTV31SMDm6sw=_zX3PphqHmn+99LE7wOg@mail.gmail.com>
+Date: Mon, 11 May 2015 11:04:32 +0300
+Message-ID: <CABBYNZKHvd6ffM1ixRVce6w+wT_=36zqu-VAZdDOmL=wf3Y-fg@mail.gmail.com>
+Subject: Re: LE device automatic pairing
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+To: Tom Harada <tharada@lampreynetworks.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi Tom,
 
-On Thu, May 7, 2015 at 1:22 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> Decodes below BNEP control msg pkt:
-> 1) Commad Not Understood Msg
-> 2) Setup Connection Req Msg
-> 3) Filter NetType Set Msg
-> 4) Filter MultiAddr Set Msg
-> 5) Common Rsp msg for above requests.
+On Mon, May 11, 2015 at 11:03 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Tom,
 >
-> And also handles the BNEP extension header packet.
+> On Fri, May 8, 2015 at 5:31 PM, Tom Harada <tharada@lampreynetworks.com> wrote:
+>> Hi all,
+>>
+>> On a system with kernel 4.0.1 and BlueZ 5.22 or newer, I've noticed that
+>> BlueZ seems to be automatically pairing with LE devices as soon as it
+>> detects their advertisements. Is this an intended feature? If so, how can I
+>> prevent it from happening?
 >
-> Gowtham Anandha Babu (6):
->   monitor: Add decoding of Cmd Not Understood pkt
->   monitor: Add decoding of Setup Conn Req pkt
->   monitor: Add decoding of Filter NetType Set pkt
->   monitor: Add decoding of Filter MultAddr Set pkt
->   monitor: Add decoding of common rsp msg pkt
->   monitor: Add decoding of BNEP Extension Header pkt
+> It should be pairing, bluetoothd will create objects for devices found
+
+I meant it should not be pairing...
+
+> during the scan but they are considered temporary as long as you don't
+> request to connect or pair, if you connect to it will still not be
+> paired but it will be stored persistently in the storage so you can
+> access after restarting bluetoothd.
 >
->  monitor/bnep.c | 225 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 216 insertions(+), 9 deletions(-)
+> With this in mind, what had made you believe we were performing
+> pairing during scanning?
+>
 >
 > --
-> 1.9.1
+> Luiz Augusto von Dentz
 
-Applied, thanks.
 
 
 -- 
