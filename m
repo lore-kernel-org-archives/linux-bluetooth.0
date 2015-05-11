@@ -1,45 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: 'Bharat Bhusan Panda' <bharat.panda@samsung.com>, cpgs@samsung.com,
-	'Grzegorz Kolodziejczyk' <grzegorz.kolodziejczyk@tieto.com>,
-	'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Subject: Query regarding bneptest tool
-Date: Mon, 11 May 2015 16:36:33 +0530
-Message-id: <001a01d08bda$91503ab0$b3f0b010$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+MIME-Version: 1.0
+In-Reply-To: <1430994139-4829-1-git-send-email-gowtham.ab@samsung.com>
+References: <1430994139-4829-1-git-send-email-gowtham.ab@samsung.com>
+Date: Mon, 11 May 2015 11:12:18 +0300
+Message-ID: <CABBYNZK216huJmzBL0K0wMmLH3F_QS1iKmc-vdo4ABLtTRVZaA@mail.gmail.com>
+Subject: Re: [PATCH 0/6] Add decoding of BNEP control msg packet types
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>, cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Gowtham,
 
-I am testing BlueZ bnep test tool (tools/bneptest) using PTS 6.1.0.
-The BNEP client test cases are not passing in BT_IO_SEC_MEDIUM security
-level.
-My PTS PICS and PIXIT are same as android/pixit-bnep.txt,
-android/pics-bnep.txt.
-Whereas when the security level is BT_IO_SEC_LOW, it is passing.
-If it is a valid fix, then I will send a patch for the same.
-This is tested in Linux, not sure about android.
+On Thu, May 7, 2015 at 1:22 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Decodes below BNEP control msg pkt:
+> 1) Commad Not Understood Msg
+> 2) Setup Connection Req Msg
+> 3) Filter NetType Set Msg
+> 4) Filter MultiAddr Set Msg
+> 5) Common Rsp msg for above requests.
+>
+> And also handles the BNEP extension header packet.
+>
+> Gowtham Anandha Babu (6):
+>   monitor: Add decoding of Cmd Not Understood pkt
+>   monitor: Add decoding of Setup Conn Req pkt
+>   monitor: Add decoding of Filter NetType Set pkt
+>   monitor: Add decoding of Filter MultAddr Set pkt
+>   monitor: Add decoding of common rsp msg pkt
+>   monitor: Add decoding of BNEP Extension Header pkt
+>
+>  monitor/bnep.c | 225 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 216 insertions(+), 9 deletions(-)
+>
+> --
+> 1.9.1
+
+Applied, thanks.
 
 
-diff --git a/tools/bneptest.c b/tools/bneptest.c
-index 98ee9b1..fccecd2 100644
---- a/tools/bneptest.c
-+++ b/tools/bneptest.c
-@@ -477,7 +477,7 @@ static int bnep_client_connect(void)
-                                        BT_IO_OPT_SOURCE_BDADDR, &src_addr,
-                                        BT_IO_OPT_DEST_BDADDR, &dst_addr,
-                                        BT_IO_OPT_PSM, BNEP_PSM,
--                                       BT_IO_OPT_SEC_LEVEL,
-BT_IO_SEC_MEDIUM,
-+                                       BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-                                        BT_IO_OPT_OMTU, BNEP_MTU,
-                                        BT_IO_OPT_IMTU, BNEP_MTU,
-                                        BT_IO_OPT_INVALID);
-
-
-Regards,
-Gowtham Anandha Babu
-
+-- 
+Luiz Augusto von Dentz
