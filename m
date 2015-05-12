@@ -1,58 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 12 May 2015 15:18:48 +0300
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: wesley.kuo@intel.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix remote name event return directly.
+Message-ID: <20150512121848.GA4613@t440s.lan>
+References: <1431425837-25244-1-git-send-email-wesley.kuo@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <54F70642BAB21D4498E1AA3EFE3D519A461012DA@rsex2.realsil.com.cn>
-References: <CAD8Lp47=G8rFJtow9fn9WBg6FAyygopvYh7k0FNS0w8FgKXD6A@mail.gmail.com>
-	<554E804F.9090407@lwfinger.net>
-	<54F70642BAB21D4498E1AA3EFE3D519A461012DA@rsex2.realsil.com.cn>
-Date: Tue, 12 May 2015 06:53:29 -0600
-Message-ID: <CAD8Lp472ZD=2RBHD3boAgenEe6D=eqGh3dZugUDHR=-AW18BxA@mail.gmail.com>
-Subject: =?UTF-8?Q?Re=3A_=E7=AD=94=E5=A4=8D=3A_Realtek_USB_bluetooth=3A_no_scan_results_w?=
-	=?UTF-8?Q?hen_wifi_is_connected?=
-From: Daniel Drake <drake@endlessm.com>
-To: =?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-Cc: Larry Finger <Larry.Finger@lwfinger.net>,
-	Carlo Caione <carlo@endlessm.com>,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>,
-	"shaofu@realtek.com > shaofu" <shaofu@realtek.com>,
-	=?UTF-8?B?5byg5b+X56Wl?= <askijerry_zhang@realsil.com.cn>,
-	=?UTF-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>,
-	Chih-Hsiang Wang <wangchihhs@realtek.com>,
-	=?UTF-8?B?5q+b5Li66ZSL?= <jason_mao@realsil.com.cn>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1431425837-25244-1-git-send-email-wesley.kuo@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Champion,
+Hi Wesley,
 
-Thanks for the suggestion.
+On Tue, May 12, 2015, wesley.kuo@intel.com wrote:
+> From: wesleyku <wesley.kuo@intel.com>
 
-On Mon, May 11, 2015 at 8:54 PM, 陈艳萍 <champion_chen@realsil.com.cn> wrote:
-> Dear Daniel,
->         For some reason, 8723B chip with single antenna and 2 antennas have different settings and this can only be modified manually.
-> BT driver will set controller to use S0 when use 2 antennas.
->         In my submitted driver , there are following codes to add the config settings at the end of firmware to be downloaded.
-> Would you please try to add these codes and test again?
->
-> /*for 8723B,use S0 Anttena for bluetooth*/
->         if(lmp_version==ROM_LMP_8723B)
->         {
->                 memcpy(*buf+patch_entry->patch_length,RTK_CONFIG_SIGNATURE,6);
->                 if (USE_S0_ANTTENA)
->                         memcpy(*buf+patch_entry->patch_length+6,CONFIG_S0_ANTTENA,4);
->                 else
->                         memcpy(*buf+patch_entry->patch_length+6,CONFIG_S1_ANTTENA,4);
->                 *buf_len += 10;
->                 BT_DBG("USE_S0_ANTTENA");
->         }
+You probably want to fix up your git author name to be of "First Last"
+format. I don't think something like the above is acceptable to the git
+history.
 
-Yes, I saw this code already and experimented with it. It didn't seem
-to make any difference. I'll try again though, which configuration
-should I use, CONFIG_S0_ANTTENA or CONFIG_S1_ANTTENA?
+> @@ -2855,7 +2855,8 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
+>  			 * finished, stop discovery, otherwise BR/EDR inquiry
+>  			 * will stop discovery when finished.
+>  			 */
+> -			if (!test_bit(HCI_INQUIRY, &hdev->flags))
+> +			if (!test_bit(HCI_INQUIRY, &hdev->flags) &&
+> +			    hdev->discovery.state != DISCOVERY_RESOLVING)
+>  				hci_discovery_set_state(hdev,
+>  							DISCOVERY_STOPPED);
 
-By only connecting one antenna at a time, I was able to see that
-bluetooth happily uses either one. I have a feeling that the
-preference you write above is overridden by code in the
-halbtc8723b2ant.c btcoexist driver.
+Does the code comment above this if-statement also need additions or
+clarifying? If so, please add that.
 
-Daniel
+Johan
