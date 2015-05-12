@@ -1,111 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core/advertising: Fix not waiting Add Advertising response
-Date: Tue, 12 May 2015 23:21:08 +0300
-Message-Id: <1431462068-4242-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <BD5E516FF3711A41B93DC005170007BB010D943FDA25@EMBSVR01.ember.local>
+References: <BD5E516FF3711A41B93DC005170007BB010D943FDA25@EMBSVR01.ember.local>
+Date: Tue, 12 May 2015 11:19:00 -0700
+Message-ID: <CAJLTA8gaxn4qt-U7Rmud7NPA=HXysMVw0hTqNkysbfrGPc25Fw@mail.gmail.com>
+Subject: Re: Issue with Add Advertisement and Bonding Procedure
+From: Michael Janssen <jamuraa@google.com>
+To: Ankur Patel <ankur@embertec.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Ankur,
 
-When registering a new instance it must wait MGMT_OP_ADD_ADVERTISING
-before replying to the client since the command can still fail.
----
- src/advertising.c | 60 ++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 37 insertions(+), 23 deletions(-)
+On Tue, May 12, 2015 at 2:23 AM, Ankur Patel <ankur@embertec.com> wrote:
+> Hello Folks,
+>
+> Back with some more questions. I did tried googling but couldn't able to find much info on 'btmgmt' tool hence sharing issues.
+>
+> Ran below commands to Setup the device (All went Good):
+> btmgmt name testbt
+> btmgmt privacy on
+> btmgmt le on
+> btmgmt keys on
+> btmgmt ltks off
+> btmgmt irks
+> btmgmt connectable on
+> btmgmt bondable on
+> btmgmt pairable on
+> btmgmt discov on
+> btmgmt advertising on
+> btmgmt fast-conn on
+> btmgmt linksec on
+> btmgmt power on
+>
+> Failed to Add Advertisement
+> ------------------------------------
+>
+> root@imx28evk:~/tools# btmgmt info
+> Index list with 1 item
+> hci0:   Primary controller
+>         addr 1C:BA:8C:86:81:21 version 6 manufacturer 13 class 0x000000
+>         supported settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
+>         current settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
+>         name testbt
+>         short name
+>
+> // Starting Gatt Service
+> root@imx28evk:~/tools# ./gatt-service &
+> gatt-service unique name: :1.6
+> Registered service: /service1
+> Get UUID: 00001802-0000-1000-8000-00805f9b34fb
+> Exist Includes: 00001802-0000-1000-8000-00805f9b34fb
+> Characteristic(00002a06-0000-1000-8000-00805f9b34fb): Get("Value")
+> Descriptor(8260c653-1a54-426b-9e36-e84c238bc669): Get("Value")
+>
+> // Adding Advertisement but Fails
+> root@imx28evk:~/tools# btmgmt add-adv -u 180d -u 180f -d 090954657374204C4505FFE0000102 1
+> Add Advertising failed with status 0x01 (Unknown Command)
+>
+> I am sure I am missing something to add advertisement. Can anyone share how to add advertisement?
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 0eb489a..d6ab084 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -395,24 +395,48 @@ static bool parse_advertising_include_tx_power(GDBusProxy *proxy,
- 	return true;
- }
- 
-+static void add_adverting_complete(struct advertisement *ad, uint8_t status)
-+{
-+	DBusMessage *reply;
-+
-+	if (status) {
-+		error("Failed to add advertisement: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+		reply = btd_error_failed(ad->reg,
-+					"Failed to register advertisement");
-+		queue_remove(ad->manager->ads, ad);
-+		g_idle_add(advertisement_free_idle_cb, ad);
-+
-+	} else
-+		reply = dbus_message_new_method_return(ad->reg);
-+
-+	g_dbus_send_message(btd_get_dbus_connection(), reply);
-+	dbus_message_unref(ad->reg);
-+	ad->reg = NULL;
-+}
-+
- static void add_advertising_callback(uint8_t status, uint16_t length,
- 					  const void *param, void *user_data)
- {
- 	struct advertisement *ad = user_data;
- 	const struct mgmt_rp_add_advertising *rp = param;
- 
--	if (status || !param) {
--		error("Failed to add advertisement: %s (0x%02x)",
--						mgmt_errstr(status), status);
--		return;
--	}
-+	if (status)
-+		goto done;
- 
--	if (length < sizeof(*rp)) {
--		error("Wrong size of add advertising response");
--		return;
-+	if (!param || length < sizeof(*rp)) {
-+		status = MGMT_STATUS_FAILED;
-+		goto done;
- 	}
- 
- 	ad->instance = rp->instance;
-+
-+	g_dbus_client_set_disconnect_watch(ad->client, client_disconnect_cb,
-+									ad);
-+	DBG("Advertisement registered: %s", ad->path);
-+
-+done:
-+	add_adverting_complete(ad, status);
- }
- 
- static size_t calc_max_adv_len(struct advertisement *ad, uint32_t flags)
-@@ -541,24 +565,14 @@ static void advertisement_proxy_added(GDBusProxy *proxy, void *data)
- 	DBusMessage *reply;
- 
- 	reply = parse_advertisement(ad);
-+	if (!reply)
-+		return;
- 
--	if (reply) {
--		/* Failed to publish for some reason, remove. */
--		queue_remove(ad->manager->ads, ad);
--
--		g_idle_add(advertisement_free_idle_cb, ad);
--
--		goto done;
--	}
--
--	g_dbus_client_set_disconnect_watch(ad->client, client_disconnect_cb,
--									ad);
--
--	reply = dbus_message_new_method_return(ad->reg);
-+	/* Failed to publish for some reason, remove. */
-+	queue_remove(ad->manager->ads, ad);
- 
--	DBG("Advertisement registered: %s", ad->path);
-+	g_idle_add(advertisement_free_idle_cb, ad);
- 
--done:
- 	g_dbus_send_message(btd_get_dbus_connection(), reply);
- 
- 	dbus_message_unref(ad->reg);
+This usually means that your kernel does not have support for the Add
+Advertisement MGMT command, which recently got added currently in
+mainline Linux 4.1 rc kernels but not 4.0.
+
+> Test case: TC_CONN_GCEP_BV_03_C
+> -----------------------------------------------
+> PTS Address:        00:1B:DC:07:2E:85
+>
+> Ran below command on device before running the test:
+>
+> root@imx28evk:~/tools# btmgmt info
+> Index list with 1 item
+> hci0:   Primary controller
+>         addr 1C:BA:8C:86:81:21 version 6 manufacturer 13 class 0x000000
+>         supported settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
+>         current settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
+>         name testbt
+>         short name
+> root@imx28evk:~/tools# btmgmt keys on
+> Keys successfully loaded
+> root@imx28evk:~/tools# btmgmt ltks off
+> Long term keys successfully loaded
+
+The keys and ltks commands of btmgmt don't take an argument, so the
+"off" and "on" doesn't do anything here..  It will always load the
+keys.
+
+> root@imx28evk:~/tools# btmgmt irks
+> Identity Resolving Keys successfully loaded
+>
+> Step1) Run the testcase from PTS gui.
+> Step2) It comes with popup: "Please send connect request to establish a connection"
+> Step3) Ran below command on Device:
+>
+>         root@imx28evk:~/tools# btmgmt add-device -a 0x1  -t 0x01 00:1B:DC:07:2E:85
+>         Adding device with 00:1B:DC:07:2E:85 (LE Public)
+>
+>         root@imx28evk:~/tools# btmgmt pair -c 0x03 -t 0x01 00:1B:DC:07:2E:85
+>         Pairing with 00:1B:DC:07:2E:85 (LE Public)
+>         hci0 00:1B:DC:07:2E:85 type LE Public connected eir_len 0
+>         <Waited for 2 mins. Not returned to command prompt - Hence did ctrl-c>
+>
+>         Then run below command to check if the connection is there or not.
+>
+>         root@imx28evk:~/tools# btmgmt con
+>         00:1B:DC:07:2E:85 type LE Public
+>
+> Step4) Meanwhile, on PTS "Connect request" Popup disappear and new popup appears "Please start the Bonding Procedure in bondable mode" and stays forever.
+>
+> ON PTS Output Window:
+> Test case : TC_CONN_GCEP_BV_03_C started
+>         - MTC: Successfully received HCI_LE_CLEAR_WHITE_LIST_COMPLETE_EVENT.
+>         - MTC: Successfully received HCI_LE_ADD_DEVICE_TO_WHITE_LIST_COMPLETE_EVENT.
+>         - MTC: LE bondable mode successfully set.
+>         - MTC: Successfully received HCI_LE_SET_ADVERTISING_PARAMETERS_COMPLETE_EVENT.
+>         - MTC: Successfully received HCI_LE_SET_ADVERTISING_DATA_COMPLETE_EVENT.
+>         - MTC: Successfully received HCI_LE_SET_SCAN_RESPONSE_DATA_COMPLETE_EVENT.
+>         - MTC: Successfully received HCI_LE_SET_ADVERTISE_ENABLE_COMMAND_COMPLETE_EVENT.
+>         - MTC: Successfully received HCI_LE_CONNECTION_COMPLETE_EVENT.
+>     <No More Output>
+>
+> The device is in bondable mode based on the btmgmt info command output as above. Still I couldnt able to find why PTS fails to start Bonding Procedure? Is there something related to storing of the ltks keys?
+>
+> Please share your suggestions.
+>
+> Thank you,
+> Ankur.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.1.0
-
+M Janssen
