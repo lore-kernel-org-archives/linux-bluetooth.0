@@ -1,223 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4] Bluetooth: Fix calls to __hci_cmd_sync()
-Date: Tue, 12 May 2015 12:11:43 +0200
-Message-Id: <1431425503-9120-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH] android/pts: Update RFCOMM test results
+Date: Tue, 12 May 2015 11:34:22 +0200
+Message-Id: <1431423262-31970-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove test of command reply status as it is already performed by
-__hci_cmd_sync().
-
-__hci_cmd_sync_ev() function already returns an error if it got a
-non-zero status either through a Command Complete or a Command
-Status event.
-
-For both of these events the status is collected up in the event
-handlers called by hci_event_packet() and then passed as the second
-parameter to req_complete_skb(). The req_complete_skb() callback in
-turn is hci_req_sync_complete() for __hci_cmd_sync_ev() which stores
-the status in hdev->req_result. The hdev->req_result is then further
-converted through bt_to_errno() back in __hci_cmd_sync_ev().
-
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+PTS 6.1 and Android 5.1
 ---
- drivers/bluetooth/btbcm.c   |  6 -----
- drivers/bluetooth/btintel.c |  6 -----
- drivers/bluetooth/btusb.c   | 53 +++------------------------------------------
- net/bluetooth/hci_core.c    |  5 -----
- 4 files changed, 3 insertions(+), 67 deletions(-)
+ android/pics-rfcomm.txt  |  8 +++-----
+ android/pixit-rfcomm.txt |  2 +-
+ android/pts-rfcomm.txt   | 14 ++++++--------
+ 3 files changed, 10 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 4bba866..728fce3 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -55,12 +55,6 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
- 	}
+diff --git a/android/pics-rfcomm.txt b/android/pics-rfcomm.txt
+index 384f81d..032ee73 100644
+--- a/android/pics-rfcomm.txt
++++ b/android/pics-rfcomm.txt
+@@ -1,6 +1,6 @@
+ RFCOMM PICS for the PTS tool.
  
- 	bda = (struct hci_rp_read_bd_addr *)skb->data;
--	if (bda->status) {
--		BT_ERR("%s: BCM: Device address result failed (%02x)",
--		       hdev->name, bda->status);
--		kfree_skb(skb);
--		return -bt_to_errno(bda->status);
--	}
+-PTS version: 6.0
++PTS version: 6.1
  
- 	/* The address 00:20:70:02:A0:00 indicates a BCM20702A0 controller
- 	 * with no configured address.
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 2d43d42..828f2f8 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -53,12 +53,6 @@ int btintel_check_bdaddr(struct hci_dev *hdev)
- 	}
+ * - different than PTS defaults
+ # - not yet implemented/supported
+@@ -25,7 +25,7 @@ Parameter Name		Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_RFCOMM_1_1		True (*)	Initialize RFCOMM Session (C.2)
+ TSPC_RFCOMM_1_2		True (*)	Respond to Initialization of an RFCOMM
+-					Session (C.2)
++					Session (C.1)
+ TSPC_RFCOMM_1_3		True		Shutdown RFCOMM Session (M)
+ TSPC_RFCOMM_1_4		True		Respond to a Shutdown of an RFCOMM
+ 					Session (M)
+@@ -49,13 +49,11 @@ TSPC_RFCOMM_1_20	True (*)	Send RPN Command (O)
+ TSPC_RFCOMM_1_21	True (*)	Closing Multiplexer by First Sending
+ 					a DISC Command (O)
+ TSPC_RFCOMM_1_22	True		Support of Credit Based Flow Control (M)
+-TSPC_RFCOMM_1_23	True (*)	IUT Responds to Establishment of
+-					a DLC (C.1)
+ -------------------------------------------------------------------------------
+ C.1: Mandatory if SPP 1/2 (Device B) is supported, otherwise Excluded.
+ C.2: Mandatory if SPP 1/1 (Device A) is supported, otherwise Excluded.
+ C.3: Mandatory if SPP 1/1 (Device A) is supported, otherwise Optional.
+-C.4: Mandatory to support if 0/2 (RFCOMM 1.2) is supported, otherwise Optional.
++C.4: Mandatory to support if TSPC_RFCOMM_0_2 is supported, otherwise Optional.
+ -------------------------------------------------------------------------------
  
- 	bda = (struct hci_rp_read_bd_addr *)skb->data;
--	if (bda->status) {
--		BT_ERR("%s: Intel device address result failed (%02x)",
--		       hdev->name, bda->status);
--		kfree_skb(skb);
--		return -bt_to_errno(bda->status);
--	}
  
- 	/* For some Intel based controllers, the default Bluetooth device
- 	 * address 00:03:19:9E:8B:00 can be found. These controllers are
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d21f3b4..2de1b56 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1403,7 +1403,6 @@ static int rtl_read_rom_version(struct hci_dev *hdev, u8 *version)
- {
- 	struct rtl_rom_version_evt *rom_version;
- 	struct sk_buff *skb;
--	int ret;
+diff --git a/android/pixit-rfcomm.txt b/android/pixit-rfcomm.txt
+index a3fbb27..88402a5 100644
+--- a/android/pixit-rfcomm.txt
++++ b/android/pixit-rfcomm.txt
+@@ -1,6 +1,6 @@
+ RFCOMM PIXIT for the PTS tool.
  
- 	/* Read RTL ROM version command */
- 	skb = __hci_cmd_sync(hdev, 0xfc6d, 0, NULL, HCI_INIT_TIMEOUT);
-@@ -1423,12 +1422,10 @@ static int rtl_read_rom_version(struct hci_dev *hdev, u8 *version)
- 	BT_INFO("%s: rom_version status=%x version=%x",
- 		hdev->name, rom_version->status, rom_version->version);
+-PTS version: 6.0
++PTS version: 6.1
  
--	ret = rom_version->status;
--	if (ret == 0)
--		*version = rom_version->version;
-+	*version = rom_version->version;
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-rfcomm.txt b/android/pts-rfcomm.txt
+index e9b3f26..b1fce28 100644
+--- a/android/pts-rfcomm.txt
++++ b/android/pts-rfcomm.txt
+@@ -1,9 +1,9 @@
+ PTS test results for RFCOMM
  
- 	kfree_skb(skb);
--	return ret;
-+	return 0;
- }
+-PTS version: 6.0
+-Tested: 02-February-2015
+-Android version: 5.0
+-Kernel version: 3.19
++PTS version: 6.1
++Tested: 12-May-2015
++Android version: 5.1
++Kernel version: 4.1
  
- static int rtl8723b_parse_firmware(struct hci_dev *hdev, u16 lmp_subver,
-@@ -1587,7 +1584,6 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 		return -ENOMEM;
- 
- 	for (i = 0; i < frag_num; i++) {
--		struct rtl_download_response *dl_resp;
- 		struct sk_buff *skb;
- 
- 		BT_DBG("download fw (%d/%d)", i, frag_num);
-@@ -1609,7 +1605,7 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 			goto out;
- 		}
- 
--		if (skb->len != sizeof(*dl_resp)) {
-+		if (skb->len != sizeof(struct rtl_download_response)) {
- 			BT_ERR("%s: download fw event length mismatch",
- 			       hdev->name);
- 			kfree_skb(skb);
-@@ -1617,13 +1613,6 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 			goto out;
- 		}
- 
--		dl_resp = (struct rtl_download_response *)skb->data;
--		if (dl_resp->status != 0) {
--			kfree_skb(skb);
--			ret = bt_to_errno(dl_resp->status);
--			goto out;
--		}
--
- 		kfree_skb(skb);
- 		data += RTL_FRAG_LEN;
- 	}
-@@ -1948,12 +1937,6 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	}
- 
- 	ver = (struct intel_version *)skb->data;
--	if (ver->status) {
--		BT_ERR("%s Intel fw version event failed (%02x)", hdev->name,
--		       ver->status);
--		kfree_skb(skb);
--		return -bt_to_errno(ver->status);
--	}
- 
- 	BT_INFO("%s: read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
- 		hdev->name, ver->hw_platform, ver->hw_variant,
-@@ -2001,15 +1984,6 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 		return PTR_ERR(skb);
- 	}
- 
--	if (skb->data[0]) {
--		u8 evt_status = skb->data[0];
--
--		BT_ERR("%s enable Intel manufacturer mode event failed (%02x)",
--		       hdev->name, evt_status);
--		kfree_skb(skb);
--		release_firmware(fw);
--		return -bt_to_errno(evt_status);
--	}
- 	kfree_skb(skb);
- 
- 	disable_patch = 1;
-@@ -2355,13 +2329,6 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	}
- 
- 	ver = (struct intel_version *)skb->data;
--	if (ver->status) {
--		BT_ERR("%s: Intel version command failure (%02x)",
--		       hdev->name, ver->status);
--		err = -bt_to_errno(ver->status);
--		kfree_skb(skb);
--		return err;
--	}
- 
- 	/* The hardware platform number has a fixed value of 0x37 and
- 	 * for now only accept this single value.
-@@ -2436,13 +2403,6 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	}
- 
- 	params = (struct intel_boot_params *)skb->data;
--	if (params->status) {
--		BT_ERR("%s: Intel boot parameters command failure (%02x)",
--		       hdev->name, params->status);
--		err = -bt_to_errno(params->status);
--		kfree_skb(skb);
--		return err;
--	}
- 
- 	BT_INFO("%s: Device revision is %u", hdev->name,
- 		le16_to_cpu(params->dev_revid));
-@@ -2675,13 +2635,6 @@ static void btusb_hw_error_intel(struct hci_dev *hdev, u8 code)
- 		return;
- 	}
- 
--	if (skb->data[0] != 0x00) {
--		BT_ERR("%s: Exception info command failure (%02x)",
--		       hdev->name, skb->data[0]);
--		kfree_skb(skb);
--		return;
--	}
--
- 	BT_ERR("%s: Exception info %s", hdev->name, (char *)(skb->data + 1));
- 
- 	kfree_skb(skb);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 476709b..1183eba 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -94,7 +94,6 @@ static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
- 	char buf[32];
- 	size_t buf_size = min(count, (sizeof(buf)-1));
- 	bool enable;
--	int err;
- 
- 	if (!test_bit(HCI_UP, &hdev->flags))
- 		return -ENETDOWN;
-@@ -121,12 +120,8 @@ static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 
--	err = -bt_to_errno(skb->data[0]);
- 	kfree_skb(skb);
- 
--	if (err < 0)
--		return err;
--
- 	hci_dev_change_flag(hdev, HCI_DUT_MODE);
- 
- 	return count;
+ Results:
+ PASS	test passed
+@@ -32,9 +32,7 @@ TC_RFC_BV_14_C		N/A
+ TC_RFC_BV_15_C		PASS	rctest -r -P 1
+ TC_RFC_BV_17_C		PASS	rctest -d -P 1
+ TC_RFC_BV_19_C		PASS
+-TC_RFC_BV_21_C		PASS	PTS issue #13011
+-				rctest -w -N 10 -P 1
+-TC_RFC_BV_22_C		PASS	PTS issue #13011
+-				rctest -w -N 10 -P 1
++TC_RFC_BV_21_C		PASS	rctest -w -N 10 -P 1
++TC_RFC_BV_22_C		PASS	rctest -w -N 10 -P 1
+ TC_RFC_BV_25_C		PASS	rctest -r -P 1
+ -------------------------------------------------------------------------------
 -- 
 1.9.1
 
