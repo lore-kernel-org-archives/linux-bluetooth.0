@@ -1,140 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BD5E516FF3711A41B93DC005170007BB010D943FDA25@EMBSVR01.ember.local>
-References: <BD5E516FF3711A41B93DC005170007BB010D943FDA25@EMBSVR01.ember.local>
-Date: Tue, 12 May 2015 11:19:00 -0700
-Message-ID: <CAJLTA8gaxn4qt-U7Rmud7NPA=HXysMVw0hTqNkysbfrGPc25Fw@mail.gmail.com>
-Subject: Re: Issue with Add Advertisement and Bonding Procedure
-From: Michael Janssen <jamuraa@google.com>
-To: Ankur Patel <ankur@embertec.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] Bluetooth: btusb: fixed command length alignment for Intel 8260
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150507090856.6c0eca7f@intel.com>
+Date: Tue, 12 May 2015 17:31:49 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <91738548-8638-41AA-9BEE-757BC21BFBE2@holtmann.org>
+References: <20150507090856.6c0eca7f@intel.com>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ankur,
+Hi Tedd,
 
-On Tue, May 12, 2015 at 2:23 AM, Ankur Patel <ankur@embertec.com> wrote:
-> Hello Folks,
->
-> Back with some more questions. I did tried googling but couldn't able to find much info on 'btmgmt' tool hence sharing issues.
->
-> Ran below commands to Setup the device (All went Good):
-> btmgmt name testbt
-> btmgmt privacy on
-> btmgmt le on
-> btmgmt keys on
-> btmgmt ltks off
-> btmgmt irks
-> btmgmt connectable on
-> btmgmt bondable on
-> btmgmt pairable on
-> btmgmt discov on
-> btmgmt advertising on
-> btmgmt fast-conn on
-> btmgmt linksec on
-> btmgmt power on
->
-> Failed to Add Advertisement
-> ------------------------------------
->
-> root@imx28evk:~/tools# btmgmt info
-> Index list with 1 item
-> hci0:   Primary controller
->         addr 1C:BA:8C:86:81:21 version 6 manufacturer 13 class 0x000000
->         supported settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
->         current settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
->         name testbt
->         short name
->
-> // Starting Gatt Service
-> root@imx28evk:~/tools# ./gatt-service &
-> gatt-service unique name: :1.6
-> Registered service: /service1
-> Get UUID: 00001802-0000-1000-8000-00805f9b34fb
-> Exist Includes: 00001802-0000-1000-8000-00805f9b34fb
-> Characteristic(00002a06-0000-1000-8000-00805f9b34fb): Get("Value")
-> Descriptor(8260c653-1a54-426b-9e36-e84c238bc669): Get("Value")
->
-> // Adding Advertisement but Fails
-> root@imx28evk:~/tools# btmgmt add-adv -u 180d -u 180f -d 090954657374204C4505FFE0000102 1
-> Add Advertising failed with status 0x01 (Unknown Command)
->
-> I am sure I am missing something to add advertisement. Can anyone share how to add advertisement?
+> This patch fixes the command length alignment issue for Intel Bluetooth
+> 8260.
+> 
+> The length of parameters in the firmware downloading command must be
+> multiplication of 4. If not, the command must append Intel_NOP command
+> with extra parameters, zeros, at the end and the firmware file is
+> already included Intel_NOP command for alignment.
+> 
+> This patch checks the length of the parameters and if it is not aligned,
+> then read the next command which is Intel_NOP command and append it to
+> the first read command and send to the device together.
+> 
+> For example, if the data from the firmware file is like this:
+> 8E FC 03 11 22 33 02 FC 03 00 00 00
+> 
+> Previously, btusb sends two commands:
+> 09 FC 06 8E FC 03 11 22 33
+> 09 FC 06 02 FC 03 00 00 00
+> 
+> This will not work due to the length of parameters are 6 and the device
+> failed to align the data.
+> 
+> This patch will append them together and send one command:
+> 09 FC 0B 8E FC 03 11 22 33 02 FC 03 00 00 00
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> ---
+> drivers/bluetooth/btusb.c | 35 +++++++++++++++++++++++++++++++++++
+> 1 file changed, 35 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index d21f3b4..57f4eac 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2541,6 +2541,41 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> 
+> 		cmd_len = sizeof(*cmd) + cmd->plen;
+> 
+> +		/* The parameter length of secure send command should be a
+> +		 * multiplication of 4. If it is not, it appends Intel_NOP
+> +		 * command with arbitrary number of parameters (zeros) to meet
+> +		 * the 4 byte alignment.
+> +		 * The FW file has already aligned and appended Intel_NOP
+> +		 * command. So it needs to read next Intel_NOP command and send
+> +		 * them together.
+> +		 */
 
-This usually means that your kernel does not have support for the Add
-Advertisement MGMT command, which recently got added currently in
-mainline Linux 4.1 rc kernels but not 4.0.
+I would assume we just rely on the firmware file to build this correctly. So instead of checking the alignment, I would prefer that we check if the next command is a NOP and then send both commands.
 
-> Test case: TC_CONN_GCEP_BV_03_C
-> -----------------------------------------------
-> PTS Address:        00:1B:DC:07:2E:85
->
-> Ran below command on device before running the test:
->
-> root@imx28evk:~/tools# btmgmt info
-> Index list with 1 item
-> hci0:   Primary controller
->         addr 1C:BA:8C:86:81:21 version 6 manufacturer 13 class 0x000000
->         supported settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
->         current settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
->         name testbt
->         short name
-> root@imx28evk:~/tools# btmgmt keys on
-> Keys successfully loaded
-> root@imx28evk:~/tools# btmgmt ltks off
-> Long term keys successfully loaded
+> +		if ((cmd_len % 4) != 0) {
+> +			/* Make sure the next command is Intel_NOP command.
+> +			 */
+> +			struct hci_command_hdr *nop_cmd =
+> +						(void *)(fw_ptr + cmd_len);
+> +			if (nop_cmd->opcode != 0xfc02) {
 
-The keys and ltks commands of btmgmt don't take an argument, so the
-"off" and "on" doesn't do anything here..  It will always load the
-keys.
+This is not big-endian safe.
 
-> root@imx28evk:~/tools# btmgmt irks
-> Identity Resolving Keys successfully loaded
->
-> Step1) Run the testcase from PTS gui.
-> Step2) It comes with popup: "Please send connect request to establish a connection"
-> Step3) Ran below command on Device:
->
->         root@imx28evk:~/tools# btmgmt add-device -a 0x1  -t 0x01 00:1B:DC:07:2E:85
->         Adding device with 00:1B:DC:07:2E:85 (LE Public)
->
->         root@imx28evk:~/tools# btmgmt pair -c 0x03 -t 0x01 00:1B:DC:07:2E:85
->         Pairing with 00:1B:DC:07:2E:85 (LE Public)
->         hci0 00:1B:DC:07:2E:85 type LE Public connected eir_len 0
->         <Waited for 2 mins. Not returned to command prompt - Hence did ctrl-c>
->
->         Then run below command to check if the connection is there or not.
->
->         root@imx28evk:~/tools# btmgmt con
->         00:1B:DC:07:2E:85 type LE Public
->
-> Step4) Meanwhile, on PTS "Connect request" Popup disappear and new popup appears "Please start the Bonding Procedure in bondable mode" and stays forever.
->
-> ON PTS Output Window:
-> Test case : TC_CONN_GCEP_BV_03_C started
->         - MTC: Successfully received HCI_LE_CLEAR_WHITE_LIST_COMPLETE_EVENT.
->         - MTC: Successfully received HCI_LE_ADD_DEVICE_TO_WHITE_LIST_COMPLETE_EVENT.
->         - MTC: LE bondable mode successfully set.
->         - MTC: Successfully received HCI_LE_SET_ADVERTISING_PARAMETERS_COMPLETE_EVENT.
->         - MTC: Successfully received HCI_LE_SET_ADVERTISING_DATA_COMPLETE_EVENT.
->         - MTC: Successfully received HCI_LE_SET_SCAN_RESPONSE_DATA_COMPLETE_EVENT.
->         - MTC: Successfully received HCI_LE_SET_ADVERTISE_ENABLE_COMMAND_COMPLETE_EVENT.
->         - MTC: Successfully received HCI_LE_CONNECTION_COMPLETE_EVENT.
->     <No More Output>
->
-> The device is in bondable mode based on the btmgmt info command output as above. Still I couldnt able to find why PTS fails to start Bonding Procedure? Is there something related to storing of the ltks keys?
->
-> Please share your suggestions.
->
-> Thank you,
-> Ankur.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +				BT_ERR("%s: Intel_NOP command is missing",
+> +				       hdev->name);
+> +				err = -EBADF;
+> +				goto done;
+> +			}
+> +
+> +			/* Command data is updated to include NOP command
+> +			 */
+> +			cmd_len += sizeof(*nop_cmd) + nop_cmd->plen;
+> +
+> +			/* Make sure the total length is aligned and smaller
+> +			 * than maximum param length
+> +			 */
+> +			if ((cmd_len % 4) != 0 || cmd_len > 252)   {
 
+I wonder why we check again here? The fragmentation is done the secure_send helper.
 
+> +				BT_ERR("%s: 4 byte alignment failed",
+> +				       hdev->name);
+> +				err = -EBADF;
+> +				goto done;
+> +			}
+> +		}
+> +
+> 		/* Send each command from the firmware data buffer as
+> 		 * a single Data fragment.
+> 		 */
 
--- 
-M Janssen
+Regards
+
+Marcel
+
