@@ -1,98 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] android/pts: Update RFCOMM test results
-Date: Tue, 12 May 2015 11:34:22 +0200
-Message-Id: <1431423262-31970-1-git-send-email-mariusz.skamra@tieto.com>
+From: Ankur Patel <ankur@embertec.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 12 May 2015 18:53:26 +0930
+Subject: Issue with Add Advertisement and Bonding Procedure 
+Message-ID: <BD5E516FF3711A41B93DC005170007BB010D943FDA25@EMBSVR01.ember.local>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PTS 6.1 and Android 5.1
----
- android/pics-rfcomm.txt  |  8 +++-----
- android/pixit-rfcomm.txt |  2 +-
- android/pts-rfcomm.txt   | 14 ++++++--------
- 3 files changed, 10 insertions(+), 14 deletions(-)
+Hello Folks,
 
-diff --git a/android/pics-rfcomm.txt b/android/pics-rfcomm.txt
-index 384f81d..032ee73 100644
---- a/android/pics-rfcomm.txt
-+++ b/android/pics-rfcomm.txt
-@@ -1,6 +1,6 @@
- RFCOMM PICS for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -25,7 +25,7 @@ Parameter Name		Selected	Description
- -------------------------------------------------------------------------------
- TSPC_RFCOMM_1_1		True (*)	Initialize RFCOMM Session (C.2)
- TSPC_RFCOMM_1_2		True (*)	Respond to Initialization of an RFCOMM
--					Session (C.2)
-+					Session (C.1)
- TSPC_RFCOMM_1_3		True		Shutdown RFCOMM Session (M)
- TSPC_RFCOMM_1_4		True		Respond to a Shutdown of an RFCOMM
- 					Session (M)
-@@ -49,13 +49,11 @@ TSPC_RFCOMM_1_20	True (*)	Send RPN Command (O)
- TSPC_RFCOMM_1_21	True (*)	Closing Multiplexer by First Sending
- 					a DISC Command (O)
- TSPC_RFCOMM_1_22	True		Support of Credit Based Flow Control (M)
--TSPC_RFCOMM_1_23	True (*)	IUT Responds to Establishment of
--					a DLC (C.1)
- -------------------------------------------------------------------------------
- C.1: Mandatory if SPP 1/2 (Device B) is supported, otherwise Excluded.
- C.2: Mandatory if SPP 1/1 (Device A) is supported, otherwise Excluded.
- C.3: Mandatory if SPP 1/1 (Device A) is supported, otherwise Optional.
--C.4: Mandatory to support if 0/2 (RFCOMM 1.2) is supported, otherwise Optional.
-+C.4: Mandatory to support if TSPC_RFCOMM_0_2 is supported, otherwise Optional.
- -------------------------------------------------------------------------------
- 
- 
-diff --git a/android/pixit-rfcomm.txt b/android/pixit-rfcomm.txt
-index a3fbb27..88402a5 100644
---- a/android/pixit-rfcomm.txt
-+++ b/android/pixit-rfcomm.txt
-@@ -1,6 +1,6 @@
- RFCOMM PIXIT for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-rfcomm.txt b/android/pts-rfcomm.txt
-index e9b3f26..b1fce28 100644
---- a/android/pts-rfcomm.txt
-+++ b/android/pts-rfcomm.txt
-@@ -1,9 +1,9 @@
- PTS test results for RFCOMM
- 
--PTS version: 6.0
--Tested: 02-February-2015
--Android version: 5.0
--Kernel version: 3.19
-+PTS version: 6.1
-+Tested: 12-May-2015
-+Android version: 5.1
-+Kernel version: 4.1
- 
- Results:
- PASS	test passed
-@@ -32,9 +32,7 @@ TC_RFC_BV_14_C		N/A
- TC_RFC_BV_15_C		PASS	rctest -r -P 1
- TC_RFC_BV_17_C		PASS	rctest -d -P 1
- TC_RFC_BV_19_C		PASS
--TC_RFC_BV_21_C		PASS	PTS issue #13011
--				rctest -w -N 10 -P 1
--TC_RFC_BV_22_C		PASS	PTS issue #13011
--				rctest -w -N 10 -P 1
-+TC_RFC_BV_21_C		PASS	rctest -w -N 10 -P 1
-+TC_RFC_BV_22_C		PASS	rctest -w -N 10 -P 1
- TC_RFC_BV_25_C		PASS	rctest -r -P 1
- -------------------------------------------------------------------------------
--- 
-1.9.1
+Back with some more questions. I did tried googling but couldn't able to find much info on 'btmgmt' tool hence sharing issues. 
 
+Ran below commands to Setup the device (All went Good):
+btmgmt name testbt
+btmgmt privacy on
+btmgmt le on  
+btmgmt keys on
+btmgmt ltks off
+btmgmt irks
+btmgmt connectable on
+btmgmt bondable on
+btmgmt pairable on
+btmgmt discov on
+btmgmt advertising on
+btmgmt fast-conn on
+btmgmt linksec on
+btmgmt power on
+
+Failed to Add Advertisement
+------------------------------------
+
+root@imx28evk:~/tools# btmgmt info
+Index list with 1 item
+hci0:   Primary controller
+        addr 1C:BA:8C:86:81:21 version 6 manufacturer 13 class 0x000000
+        supported settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
+        current settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
+        name testbt
+        short name
+
+// Starting Gatt Service
+root@imx28evk:~/tools# ./gatt-service &
+gatt-service unique name: :1.6
+Registered service: /service1
+Get UUID: 00001802-0000-1000-8000-00805f9b34fb
+Exist Includes: 00001802-0000-1000-8000-00805f9b34fb
+Characteristic(00002a06-0000-1000-8000-00805f9b34fb): Get("Value")
+Descriptor(8260c653-1a54-426b-9e36-e84c238bc669): Get("Value")
+
+// Adding Advertisement but Fails
+root@imx28evk:~/tools# btmgmt add-adv -u 180d -u 180f -d 090954657374204C4505FFE0000102 1
+Add Advertising failed with status 0x01 (Unknown Command)
+
+I am sure I am missing something to add advertisement. Can anyone share how to add advertisement? 
+
+Test case: TC_CONN_GCEP_BV_03_C
+-----------------------------------------------
+PTS Address:        00:1B:DC:07:2E:85
+
+Ran below command on device before running the test:
+
+root@imx28evk:~/tools# btmgmt info
+Index list with 1 item
+hci0:   Primary controller
+        addr 1C:BA:8C:86:81:21 version 6 manufacturer 13 class 0x000000
+        supported settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
+        current settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising debug-keys privacy
+        name testbt
+        short name
+root@imx28evk:~/tools# btmgmt keys on
+Keys successfully loaded
+root@imx28evk:~/tools# btmgmt ltks off
+Long term keys successfully loaded
+root@imx28evk:~/tools# btmgmt irks
+Identity Resolving Keys successfully loaded
+
+Step1) Run the testcase from PTS gui.
+Step2) It comes with popup: "Please send connect request to establish a connection"
+Step3) Ran below command on Device:
+
+        root@imx28evk:~/tools# btmgmt add-device -a 0x1  -t 0x01 00:1B:DC:07:2E:85
+        Adding device with 00:1B:DC:07:2E:85 (LE Public)
+
+        root@imx28evk:~/tools# btmgmt pair -c 0x03 -t 0x01 00:1B:DC:07:2E:85
+        Pairing with 00:1B:DC:07:2E:85 (LE Public)
+        hci0 00:1B:DC:07:2E:85 type LE Public connected eir_len 0
+        <Waited for 2 mins. Not returned to command prompt - Hence did ctrl-c>
+
+        Then run below command to check if the connection is there or not. 
+
+        root@imx28evk:~/tools# btmgmt con
+        00:1B:DC:07:2E:85 type LE Public
+
+Step4) Meanwhile, on PTS "Connect request" Popup disappear and new popup appears "Please start the Bonding Procedure in bondable mode" and stays forever.
+
+ON PTS Output Window:
+Test case : TC_CONN_GCEP_BV_03_C started
+	- MTC: Successfully received HCI_LE_CLEAR_WHITE_LIST_COMPLETE_EVENT.
+	- MTC: Successfully received HCI_LE_ADD_DEVICE_TO_WHITE_LIST_COMPLETE_EVENT.
+	- MTC: LE bondable mode successfully set.
+	- MTC: Successfully received HCI_LE_SET_ADVERTISING_PARAMETERS_COMPLETE_EVENT.
+	- MTC: Successfully received HCI_LE_SET_ADVERTISING_DATA_COMPLETE_EVENT.
+	- MTC: Successfully received HCI_LE_SET_SCAN_RESPONSE_DATA_COMPLETE_EVENT.
+	- MTC: Successfully received HCI_LE_SET_ADVERTISE_ENABLE_COMMAND_COMPLETE_EVENT.
+	- MTC: Successfully received HCI_LE_CONNECTION_COMPLETE_EVENT.
+    <No More Output>
+    
+The device is in bondable mode based on the btmgmt info command output as above. Still I couldnt able to find why PTS fails to start Bonding Procedure? Is there something related to storing of the ltks keys? 
+
+Please share your suggestions.
+
+Thank you,
+Ankur.
