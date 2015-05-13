@@ -1,19 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
 From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: btusb: Add support for 0cf3:e007
-Date: Wed, 13 May 2015 11:39:25 +0800
-Message-Id: <1431488365-24403-2-git-send-email-jesse.sung@canonical.com>
-In-Reply-To: <1431488365-24403-1-git-send-email-jesse.sung@canonical.com>
-References: <1431488365-24403-1-git-send-email-jesse.sung@canonical.com>
+Subject: [PATCH 1/2] Bluetooth: ath3k: Add a new ID 0cf3:e006 to ath3k list
+Date: Wed, 13 May 2015 11:39:24 +0800
+Message-Id: <1431488365-24403-1-git-send-email-jesse.sung@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Device 0cf3:e007 is one of the QCA ROME family.
+Device info in /sys/kernel/debug/usb/devices:
 
 T:  Bus=01 Lev=01 Prnt=01 Port=05 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e007 Rev= 0.01
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e006 Rev= 0.01
 C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
 I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
@@ -40,21 +38,42 @@ E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
 Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
 ---
+ drivers/bluetooth/ath3k.c | 2 ++
  drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+ 2 files changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 288547a..9a05153 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -104,6 +104,7 @@ static const struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0xe003) },
+ 	{ USB_DEVICE(0x0CF3, 0xE004) },
+ 	{ USB_DEVICE(0x0CF3, 0xE005) },
++	{ USB_DEVICE(0x0CF3, 0xE006) },
+ 	{ USB_DEVICE(0x13d3, 0x3362) },
+ 	{ USB_DEVICE(0x13d3, 0x3375) },
+ 	{ USB_DEVICE(0x13d3, 0x3393) },
+@@ -158,6 +159,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x0CF3, 0x817a), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe006), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d4e9127..cf8276e 100644
+index de7b236..d4e9127 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -217,6 +217,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe03c), .driver_info = BTUSB_ATH3012 },
- 
- 	/* QCA ROME chipset */
-+	{ USB_DEVICE(0x0cf3, 0xe007), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
- 	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
- 
+@@ -200,6 +200,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe006), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
 -- 
 2.1.4
 
