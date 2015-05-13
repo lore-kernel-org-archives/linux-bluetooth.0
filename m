@@ -1,79 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: ath3k: Add a new ID 0cf3:e006 to ath3k list
-Date: Wed, 13 May 2015 11:39:24 +0800
-Message-Id: <1431488365-24403-1-git-send-email-jesse.sung@canonical.com>
+From: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
+To: Daniel Drake <drake@endlessm.com>
+CC: Larry Finger <Larry.Finger@lwfinger.net>,
+	Carlo Caione <carlo@endlessm.com>,
+	Linux Bluetooth mailing list
+	<linux-bluetooth@vger.kernel.org>,
+	"shaofu@realtek.com > shaofu" <shaofu@realtek.com>,
+	=?utf-8?B?5byg5b+X56Wl?= <askijerry_zhang@realsil.com.cn>,
+	=?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>,
+	Chih-Hsiang Wang <wangchihhs@realtek.com>,
+	=?utf-8?B?5q+b5Li66ZSL?= <jason_mao@realsil.com.cn>
+Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IFJlYWx0ZWsgVVNCIGJsdWV0b290aDogbm8gc2Nh?= =?utf-8?Q?n_results_when_wifi_is_connected?=
+Date: Wed, 13 May 2015 02:36:56 +0000
+Message-ID: <54F70642BAB21D4498E1AA3EFE3D519A46101882@rsex2.realsil.com.cn>
+References: <CAD8Lp47=G8rFJtow9fn9WBg6FAyygopvYh7k0FNS0w8FgKXD6A@mail.gmail.com>
+	<554E804F.9090407@lwfinger.net>
+	<54F70642BAB21D4498E1AA3EFE3D519A461012DA@rsex2.realsil.com.cn>
+ <CAD8Lp472ZD=2RBHD3boAgenEe6D=eqGh3dZugUDHR=-AW18BxA@mail.gmail.com>
+In-Reply-To: <CAD8Lp472ZD=2RBHD3boAgenEe6D=eqGh3dZugUDHR=-AW18BxA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Device info in /sys/kernel/debug/usb/devices:
-
-T:  Bus=01 Lev=01 Prnt=01 Port=05 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e006 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-
-Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
----
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- 2 files changed, 3 insertions(+)
-
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 288547a..9a05153 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -104,6 +104,7 @@ static const struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0xe003) },
- 	{ USB_DEVICE(0x0CF3, 0xE004) },
- 	{ USB_DEVICE(0x0CF3, 0xE005) },
-+	{ USB_DEVICE(0x0CF3, 0xE006) },
- 	{ USB_DEVICE(0x13d3, 0x3362) },
- 	{ USB_DEVICE(0x13d3, 0x3375) },
- 	{ USB_DEVICE(0x13d3, 0x3393) },
-@@ -158,6 +159,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x0CF3, 0x817a), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe006), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index de7b236..d4e9127 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -200,6 +200,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe006), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
--- 
-2.1.4
-
+RGVhciBEYW5pZWwsDQoJRm9yICA4NzIzQlUsCSAgIGFsd2F5cyB1c2UgQ09ORklHX1MwX0FOVFRF
+TkHvvJsNCglGb3IgIDg3MjNCRSDvvIwgMSBhbnRlbm5hIENPTkZJR19TMV9BTlRURU5BOyAyIGFu
+dGVubmFzIENPTkZJR19TMF9BTlRURU5BDQoNCkRlYXIgIHNoYW9mdSwNCglXb3VsZCB5b3UgcGxl
+YXNlIGhlbHAgdG8gY2hlY2sgd2l0aCBoYWxidGM4NzIzYjJhbnQuYyBidGNvZXhpc3QgZHJpdmVy
+Pw0KDQotLS0tLemCruS7tuWOn+S7ti0tLS0tDQrlj5Hku7bkuro6IERhbmllbCBEcmFrZSBbbWFp
+bHRvOmRyYWtlQGVuZGxlc3NtLmNvbV0gDQrlj5HpgIHml7bpl7Q6IDIwMTXlubQ15pyIMTLml6Ug
+MjA6NTMNCuaUtuS7tuS6ujog6ZmI6Imz6JCNDQrmioTpgIE6IExhcnJ5IEZpbmdlcjsgQ2FybG8g
+Q2Fpb25lOyBMaW51eCBCbHVldG9vdGggbWFpbGluZyBsaXN0OyBzaGFvZnVAcmVhbHRlay5jb20g
+PiBzaGFvZnU7IOW8oOW/l+elpTsg6ZmG5pyx5LyfOyBDaGloLUhzaWFuZyBXYW5nOyDmr5vkuLrp
+lIsNCuS4u+mimDogUmU6IOetlOWkjTogUmVhbHRlayBVU0IgYmx1ZXRvb3RoOiBubyBzY2FuIHJl
+c3VsdHMgd2hlbiB3aWZpIGlzIGNvbm5lY3RlZA0KDQpIaSBDaGFtcGlvbiwNCg0KVGhhbmtzIGZv
+ciB0aGUgc3VnZ2VzdGlvbi4NCg0KT24gTW9uLCBNYXkgMTEsIDIwMTUgYXQgODo1NCBQTSwg6ZmI
+6Imz6JCNIDxjaGFtcGlvbl9jaGVuQHJlYWxzaWwuY29tLmNuPiB3cm90ZToNCj4gRGVhciBEYW5p
+ZWwsDQo+ICAgICAgICAgRm9yIHNvbWUgcmVhc29uLCA4NzIzQiBjaGlwIHdpdGggc2luZ2xlIGFu
+dGVubmEgYW5kIDIgYW50ZW5uYXMgaGF2ZSBkaWZmZXJlbnQgc2V0dGluZ3MgYW5kIHRoaXMgY2Fu
+IG9ubHkgYmUgbW9kaWZpZWQgbWFudWFsbHkuDQo+IEJUIGRyaXZlciB3aWxsIHNldCBjb250cm9s
+bGVyIHRvIHVzZSBTMCB3aGVuIHVzZSAyIGFudGVubmFzLg0KPiAgICAgICAgIEluIG15IHN1Ym1p
+dHRlZCBkcml2ZXIgLCB0aGVyZSBhcmUgZm9sbG93aW5nIGNvZGVzIHRvIGFkZCB0aGUgY29uZmln
+IHNldHRpbmdzIGF0IHRoZSBlbmQgb2YgZmlybXdhcmUgdG8gYmUgZG93bmxvYWRlZC4NCj4gV291
+bGQgeW91IHBsZWFzZSB0cnkgdG8gYWRkIHRoZXNlIGNvZGVzIGFuZCB0ZXN0IGFnYWluPw0KPg0K
+PiAvKmZvciA4NzIzQix1c2UgUzAgQW50dGVuYSBmb3IgYmx1ZXRvb3RoKi8NCj4gICAgICAgICBp
+ZihsbXBfdmVyc2lvbj09Uk9NX0xNUF84NzIzQikNCj4gICAgICAgICB7DQo+ICAgICAgICAgICAg
+ICAgICBtZW1jcHkoKmJ1ZitwYXRjaF9lbnRyeS0+cGF0Y2hfbGVuZ3RoLFJUS19DT05GSUdfU0lH
+TkFUVVJFLDYpOw0KPiAgICAgICAgICAgICAgICAgaWYgKFVTRV9TMF9BTlRURU5BKQ0KPiAgICAg
+ICAgICAgICAgICAgICAgICAgICBtZW1jcHkoKmJ1ZitwYXRjaF9lbnRyeS0+cGF0Y2hfbGVuZ3Ro
+KzYsQ09ORklHX1MwX0FOVFRFTkEsNCk7DQo+ICAgICAgICAgICAgICAgICBlbHNlDQo+ICAgICAg
+ICAgICAgICAgICAgICAgICAgIG1lbWNweSgqYnVmK3BhdGNoX2VudHJ5LT5wYXRjaF9sZW5ndGgr
+NixDT05GSUdfUzFfQU5UVEVOQSw0KTsNCj4gICAgICAgICAgICAgICAgICpidWZfbGVuICs9IDEw
+Ow0KPiAgICAgICAgICAgICAgICAgQlRfREJHKCJVU0VfUzBfQU5UVEVOQSIpOw0KPiAgICAgICAg
+IH0NCg0KWWVzLCBJIHNhdyB0aGlzIGNvZGUgYWxyZWFkeSBhbmQgZXhwZXJpbWVudGVkIHdpdGgg
+aXQuIEl0IGRpZG4ndCBzZWVtIHRvIG1ha2UgYW55IGRpZmZlcmVuY2UuIEknbGwgdHJ5IGFnYWlu
+IHRob3VnaCwgd2hpY2ggY29uZmlndXJhdGlvbiBzaG91bGQgSSB1c2UsIENPTkZJR19TMF9BTlRU
+RU5BIG9yIENPTkZJR19TMV9BTlRURU5BPw0KDQpCeSBvbmx5IGNvbm5lY3Rpbmcgb25lIGFudGVu
+bmEgYXQgYSB0aW1lLCBJIHdhcyBhYmxlIHRvIHNlZSB0aGF0IGJsdWV0b290aCBoYXBwaWx5IHVz
+ZXMgZWl0aGVyIG9uZS4gSSBoYXZlIGEgZmVlbGluZyB0aGF0IHRoZSBwcmVmZXJlbmNlIHlvdSB3
+cml0ZSBhYm92ZSBpcyBvdmVycmlkZGVuIGJ5IGNvZGUgaW4gdGhlIGhhbGJ0Yzg3MjNiMmFudC5j
+IGJ0Y29leGlzdCBkcml2ZXIuDQoNCkRhbmllbA0K
