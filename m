@@ -1,53 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] Bluetooth: Fix potential NULL dereference
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1431519246-8136-1-git-send-email-jaganath.k@samsung.com>
-Date: Wed, 13 May 2015 22:34:34 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F204CC62-B13F-4BB1-BC3B-72B613B5B6D6@holtmann.org>
-References: <1431519246-8136-1-git-send-email-jaganath.k@samsung.com>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJLTA8j6GtyduSqSQS5Ppo5OjPmfB4Oe=ych7DWn5yBikddDrQ@mail.gmail.com>
+References: <CADxtLgRDc_=Y7EiXRUd=26LOZznueAhsxc+YZTE3eMzb+19vcA@mail.gmail.com>
+	<CAJLTA8j6GtyduSqSQS5Ppo5OjPmfB4Oe=ych7DWn5yBikddDrQ@mail.gmail.com>
+Date: Wed, 13 May 2015 13:15:17 -0700
+Message-ID: <CADxtLgTF2h7rwtaLD7pnoN2cvguFUsHPZepnvOze3fxrb=M7dg@mail.gmail.com>
+Subject: Re: BLE device advertised manufacturer data cached?
+From: Tony DiCola <tony@tonydicola.com>
+To: Michael Janssen <jamuraa@google.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Kevin Townsend <kevin@ktownsend.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+On Wed, May 13, 2015 at 9:53 AM, Michael Janssen <jamuraa@google.com> wrote:
+> Hi Tony,
+>
+> On Tue, May 12, 2015 at 6:16 PM, Tony DiCola <tony@tonydicola.com> wrote:
+>> Hi all, I'm playing with the latest bluez 5.30 and bluetooth low
+>> energy devices and am noticing that the manufacturer data field from a
+>> device's advertisement data appears to be cached somewhere internally.
+>> I wanted to check if this was expected and see if there was any way to
+>> disable that caching or work around getting back stale manufacturer
+>> data.
+>>
+>> For some context I'm using bluez 5.30's dbus API and applied these
+>> patches to make the gatt support non-experimental (so I can run
+>> bluetoothd without the --experimental flag):
+>>   https://chromium.googlesource.com/chromiumos/third_party/bluez/+/2b3a91a12c86a5708329edf58d0cea237f319f6f%5E%21/#F0
+>>   https://chromium.googlesource.com/chromiumos/third_party/bluez/+/5755965a9944f158dd8aba63655f2b0a414a1f49%5E%21/#F0
+>> However I've also tried it with the stock 5.30 code and the
+>> --experimental flag and see the same results.
+>>
+>> For my device I'm using a Nordic nRF51822-based board that I have
+>> control over the firmware and am using it to send custom advertisement
+>> data for my device.  In my advertisement data I'm sending manufacturer
+>> data that looks like this: 0x07FFFFFF00000001.  This breaks down as
+>> the length of the advertisement section (0x07 bytes), the manufacturer
+>> data advertisement type (0xFF), the testing manufacturer ID (0xFFFF),
+>> and then 4 bytes with a value of 1 (0x00000001).
+>>
+>> I see when I enable scanning on an adapter that a device object is
+>> created for my device in bluez's dbus hiearchy.  It has a
+>> ManufacturerData field that looks just like what my advertisement
+>> sends, for example here's the output of the device's dbus tree (using
+>> python):
+>>
+>> [ /org/bluez/hci0/dev_C5_25_55_09_6A_B1 ]
+>>     org.bluez.Device1
+>>       Name = UART
+>>       Paired = 0
+>>       Adapter = /org/bluez/hci0
+>>       LegacyPairing = 0
+>>       Alias = UART
+>>       ManufacturerData = dbus.Dictionary({dbus.UInt16(65535):
+>> dbus.Array([dbus.Byte(0), dbus.Byte(0), dbus.Byte(0), dbus.Byte(1)],
+>> signature=dbus.Signature('y'), variant_level=1)},
+>> signature=dbus.Signature('qv'), variant_level=1)
+>>       Connected = 0
+>>       UUIDs = dbus.Array([], signature=dbus.Signature('s'), variant_level=1)
+>>       Address = C5:25:55:09:6A:B1
+>>       Trusted = 0
+>>       Blocked = 0
+>>
+>> Everything looks great and the manufacturer data is parsed out as I
+>> expect.  However the problem is when I have the nRF51822 change the
+>> advertised manufacturer data.  For example if I change to
+>> 0x07FFFFFF00000002 (so the last 4 bytes change to 0x00000002) I'm not
+>> seeing the updated value in bluez's dbus hierarchy.  When I query the
+>> device object's ManufacturerData property I still see the old value
+>> that ends in 1.  Even if I sit in a loop querying the value every
+>> second for over a minute I still don't see the updated value (for
+>> reference the nRF51822 is advertising this updated value every
+>> second).
+>>
+>> I do notice that if I remove the device from bluez's dbus hiearchy (by
+>> getting its parent adapter and calling RemoveDevice on it) then I do
+>> see the device added back with the current/updated ManufacturerData
+>> property.  This makes me think there's something up with the
+>> manufacturer data field getting cached or never being updated.
+>>
+>> I wanted to check is this expected behavior, that the manufacturer
+>> data property won't be updated when it changes?  If so is there any
+>> clean way to disable this caching or get access to the most recently
+>> seen/up to date manufacturer data field?
+>>
+>> Let me know if anything isn't clear or if perhaps I'm doing something
+>> completely wrong.  Thanks!
+>>
+>> -Tony
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> BlueZ doesn't update the Advertising Data unless there is an active
+> discovery client or the device is already paired.  Is the device
+> paired, or are you calling the StartDiscovery method on the device?
+>
+> Note that the link layer does not need to send duplicate reports (the
+> same device address) to the host even if the advertising data changes.
+> This is acceptable behavior per the spec, as outlined in Vol 6, Part
+> B, Section 4.4.3 "Scanning State": "The advertising data may change;
+> advertising data or scan response data is not considered significant
+> when determining duplicate advertising reports."
+>
+> --
+> M Janssen
 
-> addr can be NULL and it should not be dereferenced before NULL checking.
-> 
-> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-> ---
-> net/bluetooth/rfcomm/sock.c |    8 +++++---
-> 1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-> index 825e8fb..e576374 100644
-> --- a/net/bluetooth/rfcomm/sock.c
-> +++ b/net/bluetooth/rfcomm/sock.c
-> @@ -336,14 +336,16 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
-> {
-> 	struct sockaddr_rc *sa = (struct sockaddr_rc *) addr;
-> 	struct sock *sk = sock->sk;
-> -	int chan = sa->rc_channel;
-> +	int chan;
-> 	int err = 0;
-> 
-> -	BT_DBG("sk %p %pMR", sk, &sa->rc_bdaddr);
-> -
-> 	if (!addr || addr->sa_family != AF_BLUETOOTH)
-> 		return -EINVAL;
-> 
-> +	BT_DBG("sk %p %pMR", sk, &sa->rc_bdaddr);
-> +
-> +	chan = sa->rc_channel;
-> +
+Thanks for the reply!  Yeah I've called StartDiscovery on an adapter
+so I should see advertisement data come in (and in practice I do see
+my deivce show up after StartDiscovery is called).
 
-if we start changing things here, then we better change the code into something that all the other socket handling code is doing anyway. So do the min comparison and copy the data into a local copy of the sockaddr_rc.
+However I'm not pairing or connecting to the device because I'd like
+to read advertisement data from multiple devices at the same time.
+I'm thinking of a scenario kind of like Apple's iBeacon or Google's
+UriBeacon but for reading sensors, where each device/sensor puts its
+data into an advertisement packet (just using some custom manufacturer
+data field for now) and broadcasts that reading to any device
+listening for advertisements.
 
-And on a side note, I wonder if addr can actually be NULL. It might be interesting to check the generic socket code if this really can happen if you provide no address structure to the bind() system call or if this gets filtered out by the core socket code.
+Here's pseudo code of what I'm doing:
+- Setup my device firmware to start advertising custom manufacturer
+data with value 1 (for example).
+- Get BLE adapter org.bluez.Adapter1 object.
+- Set adapter's Powered property to True/1 to make sure it's powered up.
+- Call adapter's StartDiscovery function to start listening for advertisements.
+- See that my device is added to the bluez dbus tree with the
+org.bluez.Device1 interface.
+- Verify the device's ManufacturerData property has the expected value of 1.
+- Change my device's firmware to advertise custom manufacturer data
+with value 2.
+- Sit in a loop reading the bluez device's ManufacturerData property
+every second.
+- See that the ManufacturerData from bluez still shows the old value of 1.
 
-Regards
+Here's the pseudo code of something that works, but feels pretty hacky
+to have to remove the device to get an updated value:
+- Setup my device firmware to start advertising custom manufacturer
+data with value 1 (for example).
+- Get BLE adapter org.bluez.Adapter1 object.
+- Set adapter's Powered property to True/1 to make sure it's powered up.
+- Call adapter's StartDiscovery function to start listening for advertisements.
+- See that my device is added to the bluez dbus tree with the
+org.bluez.Device1 interface.
+- Verify the device's ManufacturerData property has the expected value of 1.
+- Change my device's firmware to advertise custom manufacturer data
+with value 2.
+- Call the adapter's RemoveDevice function to remove the device from
+bluez's dbus hierararchy.
+- See that my device is added back to the bluez dbus tree again (after
+it send another advertisement).
+- Verify the device's ManufacturerData property has the new value of 2.
 
-Marcel
-
+Does that help clarify the usage?  Thanks!
