@@ -1,55 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] Bluetooth: Pre-initialize variables in read_local_oob_ext_data_complete()
+Subject: Re: bluetooth-next HCI user channel issue
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAMuHMdUXcAYe4KCqG9wV3O5QYzK9RGt+QZz7E_jk7v9yhtrkRQ@mail.gmail.com>
-Date: Wed, 13 May 2015 23:11:56 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	netdev <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-Id: <0F69C638-5050-4603-A3FE-12FD8E9B27DD@holtmann.org>
-References: <1429212265-26750-1-git-send-email-geert@linux-m68k.org> <A962A040-4EB5-4AE6-A790-A8767185172B@holtmann.org> <CAMuHMdUxnrg1BVoFpKExzGHKj2aOmYGp+wChhMbPfmWvMzQT=Q@mail.gmail.com> <8684664B-22C2-45E8-B547-48F173B3CA7A@holtmann.org> <CAMuHMdUXcAYe4KCqG9wV3O5QYzK9RGt+QZz7E_jk7v9yhtrkRQ@mail.gmail.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <A7E7D666-B172-4A02-A7E9-86483D630C81@holtmann.org>
+Date: Wed, 13 May 2015 23:10:48 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4B296AC8-6E0A-4EB4-B1BD-892449AD4ED6@holtmann.org>
+References: <5534D661.1000703@intel.com> <A7E7D666-B172-4A02-A7E9-86483D630C81@holtmann.org>
+To: Loic Poulain <loic.poulain@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Geert,
+Hi Loic,
 
->>>>> net/bluetooth/mgmt.c: In function ‘read_local_oob_ext_data_complete’:
->>>>> net/bluetooth/mgmt.c:6474: warning: ‘r256’ may be used uninitialized in this function
->>>>> net/bluetooth/mgmt.c:6474: warning: ‘h256’ may be used uninitialized in this function
->>>>> net/bluetooth/mgmt.c:6474: warning: ‘r192’ may be used uninitialized in this function
->>>>> net/bluetooth/mgmt.c:6474: warning: ‘h192’ may be used uninitialized in this function
->>>>> 
->>>>> While these are false positives, the code can be shortened by
->>>>> pre-initializing the hash table pointers and eir_len. This has the side
->>>>> effect of killing the compiler warnings.
->>>> 
->>>> can you be a bit specific on which compiler version is this. I fixed one occurrence that seemed valid. However in this case the compiler seems to be just plain stupid. On a gcc 4.9, I am not seeing these for example.
->>> 
->>> gcc 4.1.2. As there were too many false positives, these warnings were
->>> disabled in later versions (throwing away the children with the bad water).
->>> 
->>> If you don't like my patch, just drop it. I only look at newly
->>> introduced warnings
->>> of this kind anyway.
+>> Seems there is a regression in bluetooth-next.
+>> I'm unable to communicate with my Intel WP chip via HCI User channel.
+>> To test user channel, I use bluemoon:
+>> $ hciconfig hci0 down
+>> $ bluemoon -i hci0
+>> Bluemoon configuration utility ver 5.30
 >> 
->> I really do not know what is the best solution here. This is a false positive. And I have been looking at this particular code for a warning that was valid, but we missed initially. But these warnings that you are fixing are clearly false positive.
+>> Then bluemoon hangs up, no HCI event...
+>> 
+>> HCI packet seems successfully sent, but no HCI response:
+>> [  491.525914] Bluetooth: hci0
+>> [  491.525918] Bluetooth: hci0
+>> [  491.525924] Bluetooth: hci0
+>> [  491.525927] Bluetooth: hci0
+>> [  491.525964] Bluetooth: hci0
+>> [  491.526114] Bluetooth: hci0 urb ffff8800c1f320c0 status 0 count 3
+>> 
+>> When I kill bluemoon, I get same kind of issue (cmd timeout):
+>> [  895.603661] Bluetooth: hci0 urb ffff8802f89d5b40 status 0 count 3
+>> [  897.606323] Bluetooth: hci0 command 0xfc3f tx timeout
+>> [  897.606350] Bluetooth: hci0
+>> [  897.607011] Bluetooth: hci0 urb ffff88030c2c83c0 status 0 count 244
+>> [  899.612007] Bluetooth: hci0 command 0x0c52 tx timeout
+>> 
+>> After that, device still usable by other sockets (hciconfig, hcitool...)
+>> 
+>> I wonder if you reproduce this issue on your side?
 > 
-> I only sent patches to fix false positives if I think the patches improve the
-> code. As this is a subjective matter, it's up to you as the maintainer to
-> decide.
-> 
->> If this only happens with an old compiler version, I would tend to leave the code as is. Then again, what is the general preferred approach here?
-> 
-> As this is a false positive, it's clearly up to the maintainer to
-> decide if the patch
-> improves the code or not.
+> can you git bisect this to pin point the patch that broke this for you.
 
-and in this case, I have no idea if I want to bother or not. I really just don’t. Since nobody else complained, I might just leave it as is since it really is a false positive.
+any chance you did git bisect this and tell us which patch broken this?
 
 Regards
 
