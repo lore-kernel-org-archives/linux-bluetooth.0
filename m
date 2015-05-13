@@ -1,49 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 9 May 2015 06:50:52 -0700
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, Johan Hedberg
- <johan.hedberg@gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Apply Intel device configuration
- routine
-Message-ID: <20150509065052.7f713c5b@tedd-fedora-vm>
-In-Reply-To: <0FCA425A-2499-4826-AB00-E7D6B215889F@holtmann.org>
-References: <20150508035946.0039963d@intel.com>
-	<0FCA425A-2499-4826-AB00-E7D6B215889F@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: John Carter <john.carter@taitradio.com>
+Date: Wed, 13 May 2015 15:50:29 +1200
+Message-ID: <CAFD1m3E73juA0LTUWq7-rt2W0OxdGy7cONMv2e5VRs5zsg_rww@mail.gmail.com>
+Subject: Arm compilation error in tools/test-runner.c error: impossible
+ constraint in 'asm'
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Building bluez out of git within OpenEmbedded for ARM results in the
+following compilation "error impossible constraint in 'asm'"
 
-On Tue, 12 May 2015 17:05:21 +0200
-Marcel Holtmann <marcel@holtmann.org> wrote:
+arm-poky-linux-gnueabi-gcc  -march=armv7-a -marm -mthumb-interwork
+-mfloat-abi=hard -mfpu=neon -mtune=cortex-a8
+--sysroot=/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex
+-DHAVE_CONFIG_H -I.  -I./lib
+-I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/include/dbus-1.0
+-I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/lib/dbus-1.0/include
+ -I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/include/glib-2.0
+-I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/lib/glib-2.0/include
+  -O2 -pipe -g -feliminate-unused-debug-types -c -o
+tools/test-runner.o tools/test-runner.c
 
-> Hi Tedd,
-> 
-> > This patch adds support to apply the device configuration parameters
-> > (DDC) after firwmare downloading on Intel 8265 device.
-> > 
-> > This is optional configuration parameters and good to have.
-> > So, even if it fails to apply it, it is not necessary to fail the
-> > setup.
-> > 
-> > The file format is same as previous firmware patch (.bseq) and
-> > this is only applicable to Intel 8265 device.
-> 
-> my preference is actually to not use *.bseq files since they are generic HCI commands. We want to use a new *.ddc file format that just contains the parameters. I clearly prefer that over just sending HCI commands. What we have to do is to actually define a simple DDC file format that lets us include the key/param pairs.
-> 
 
-HCI command in .bseq is pretty simple to decode so extracting DDC contents (key/parmas) will not be a problem.
-For DDC file, I think the simplest is [len] [key] [params] [len] [key] [params] ... in binary. So, the driver simpley read the full data and send with Intel_DDC_Write function.
+| tools/test-runner.c: In function 'start_qemu':
+| tools/test-runner.c:224:2: error: impossible constraint in 'asm'
+|   __asm__ __volatile__("cpuid" : "=c" (ecx) : "a" (1) : "memory");
+|   ^
 
-Let me know if you have anything in your mind or any example in the other driver that I can refer.
 
-> Regards
-> 
-> Marcel
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I believe this was introduced with this commit....
+
+commit a0a03828fbc49db9f0926cee87d53d627d69bac2
+Author: Marcel Holtmann <marcel@holtmann.org>
+Date:   Mon Apr 6 20:45:39 2015 -0700
+
+    tools: Add fallback if KVM support is not available
+
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 407a985..163b610 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -195,7 +195,7 @@ static char *const qemu_argv[] = {
+        "-no-user-config",
+        "-monitor", "none",
+        "-display", "none",
+-       "-machine", "type=q35,accel=kvm",
++       "-machine", "type=q35,accel=kvm:tcg",
+        "-m", "192M",
+        "-nographic",
+        "-vga", "none",
+@@ -215,6 +215,16 @@ static char *const qemu_envp[] = {
+        NULL
+ };
+
++static void check_virtualization(void)
++{
++       uint32_t ecx;
++
++       __asm__ __volatile__("cpuid" : "=c" (ecx) : "a" (1) : "memory");
++
++       if (!!(ecx & (1 << 5)))
++               printf("Found support for Virtual Machine eXtensions\n");
++}
++
+
+
+
+-- 
+John Carter
+Phone : (64)(3) 358 6639
+Tait Electronics
+PO Box 1645 Christchurch
+New Zealand
+
+-- 
+
+------------------------------
+This email, including any attachments, is only for the intended recipient. 
+It is subject to copyright, is confidential and may be the subject of legal 
+or other privilege, none of which is waived or lost by reason of this 
+transmission.
+If you are not an intended recipient, you may not use, disseminate, 
+distribute or reproduce such email, any attachments, or any part thereof. 
+If you have received a message in error, please notify the sender 
+immediately and erase all copies of the message and any attachments.
+Unfortunately, we cannot warrant that the email has not been altered or 
+corrupted during transmission nor can we guarantee that any email or any 
+attachments are free from computer viruses or other conditions which may 
+damage or interfere with recipient data, hardware or software. The 
+recipient relies upon its own procedures and assumes all risk of use and of 
+opening any attachments.
+------------------------------
