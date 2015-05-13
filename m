@@ -1,376 +1,295 @@
 Return-Path: <cyrus@holtmann.org>
+From: Ilya Faenson <ifaenson@broadcom.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>,
+	Ilya Faenson <ifaenson@broadcom.com>
+Subject: [RFC v3 3/4] Broadcom Bluetooth protocol UART support
+Date: Wed, 13 May 2015 17:50:22 -0400
+Message-ID: <1431553823-25670-4-git-send-email-ifaenson@broadcom.com>
+In-Reply-To: <1431553823-25670-1-git-send-email-ifaenson@broadcom.com>
+References: <1431553823-25670-1-git-send-email-ifaenson@broadcom.com>
 MIME-Version: 1.0
-From: John Carter <john.carter@taitradio.com>
-Date: Thu, 14 May 2015 13:58:34 +1200
-Message-ID: <CAFD1m3FJyojPvf_f-=UTH7P+-_qgvt2iomWP+2oC3YAKxh_Rpg@mail.gmail.com>
-Subject: What does "Not enough free handles to register service" in bluetoothd
- logs mean?
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm trying to get the proximity profile working...
+Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
+---
+ drivers/bluetooth/btbcm.c | 155 ++++++++++++++++++++++++++++++++++++++++++++--
+ drivers/bluetooth/btbcm.h |  13 ++++
+ 2 files changed, 163 insertions(+), 5 deletions(-)
 
-"hcitool lescan" works, but I can't see the Proximity reporter or link
-loss api's on the dbus.
-
-My best guess is it is something to do with the "Not enough free
-handles to register service" error message in the bluetoothd logs.
-
-Here are the logs from bluetoothd -n -d --plugin=proximity
-bluetoothd[476]: Bluetooth daemon 5.30
-bluetoothd[476]: src/adapter.c:adapter_init() sending read version command
-bluetoothd[476]: Starting SDP server
-bluetoothd[476]: src/sdpd-service.c:register_device_id() Adding device
-id record for 0002:1d6b:0246:051e
-bluetoothd[476]: src/plugin.c:plugin_init() Loading builtin plugins
-bluetoothd[476]: Ignoring (cli) hostname
-bluetoothd[476]: Ignoring (cli) wiimote
-bluetoothd[476]: Ignoring (cli) autopair
-bluetoothd[476]: Ignoring (cli) policy
-bluetoothd[476]: Ignoring (cli) neard
-bluetoothd[476]: Ignoring (cli) sap
-bluetoothd[476]: Ignoring (cli) a2dp
-bluetoothd[476]: Ignoring (cli) avrcp
-bluetoothd[476]: Ignoring (cli) network
-bluetoothd[476]: Ignoring (cli) input
-bluetoothd[476]: Ignoring (cli) hog
-bluetoothd[476]: Ignoring (cli) health
-bluetoothd[476]: Ignoring (cli) gap
-bluetoothd[476]: Ignoring (cli) scanparam
-bluetoothd[476]: Ignoring (cli) deviceinfo
-bluetoothd[476]: Ignoring (cli) alert
-bluetoothd[476]: Ignoring (cli) time
-bluetoothd[476]: src/plugin.c:add_plugin() Loading proximity plugin
-bluetoothd[476]: Ignoring (cli) thermometer
-bluetoothd[476]: Ignoring (cli) heartrate
-bluetoothd[476]: Ignoring (cli) cyclingspeed
-bluetoothd[476]: src/plugin.c:plugin_init() Loading plugins
-/usr/lib/bluetooth/plugins
-bluetoothd[476]: src/main.c:main() Entering main loop
-bluetoothd[476]: src/rfkill.c:rfkill_event() RFKILL event idx 0 type 2
-op 0 soft 0 hard 0
-bluetoothd[476]: Bluetooth management interface 1.4 initialized
-bluetoothd[476]: src/adapter.c:read_version_complete() sending read
-supported commands command
-bluetoothd[476]: src/adapter.c:read_version_complete() sending read
-index list command
-bluetoothd[476]: src/adapter.c:read_commands_complete() Number of commands: 42
-bluetoothd[476]: src/adapter.c:read_commands_complete() Number of events: 21
-bluetoothd[476]: src/adapter.c:read_index_list_complete() Number of
-controllers: 1
-bluetoothd[476]: src/adapter.c:read_index_list_complete() Found index 0
-bluetoothd[476]: src/adapter.c:index_added() index 0
-bluetoothd[476]: src/adapter.c:btd_adapter_new() System name: BlueZ 5.30
-bluetoothd[476]: src/adapter.c:btd_adapter_new() Major class: 0
-bluetoothd[476]: src/adapter.c:btd_adapter_new() Minor class: 0
-bluetoothd[476]: src/adapter.c:btd_adapter_new() Modalias: usb:v1D6Bp0246d051E
-bluetoothd[476]: src/adapter.c:btd_adapter_new() Discoverable timeout:
-180 seconds
-bluetoothd[476]: src/adapter.c:btd_adapter_new() Pairable timeout: 0 seconds
-bluetoothd[476]: src/adapter.c:index_added() sending read info command
-for index 0
-bluetoothd[476]: src/adapter.c:read_info_complete() index 0 status 0x00
-bluetoothd[476]: src/adapter.c:clear_uuids() sending clear uuids
-command for index 0
-bluetoothd[476]: src/adapter.c:adapter_service_add() /org/bluez/hci0
-bluetoothd[476]: src/sdpd-service.c:add_record_to_server() Adding
-record with handle 0x10001
-bluetoothd[476]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00000007-0000-1000-8000-00805f9
-bluetoothd[476]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00000100-0000-1000-8000-00805f9
-bluetoothd[476]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00001002-0000-1000-8000-00805f9
-bluetoothd[476]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00001800-0000-1000-8000-00805f9
-bluetoothd[476]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
-bluetoothd[476]: src/adapter.c:add_uuid() sending add uuid command for index 0
-bluetoothd[476]: src/gatt-database.c:gatt_db_service_added() GATT
-Service added to local database
-bluetoothd[476]: Failed to obtain handles for "Service Changed" characteristic
-bluetoothd[476]: src/adapter.c:adapter_service_add() /org/bluez/hci0
-bluetoothd[476]: src/sdpd-service.c:add_record_to_server() Adding
-record with handle 0x10002
-bluetoothd[476]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00000007-0000-1000-8000-00805f9
-bluetoothd[476]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00000100-0000-1000-8000-00805f9
-bluetoothd[476]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00001002-0000-1000-8000-00805f9
-bluetoothd[476]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00001801-0000-1000-8000-00805f9
-bluetoothd[476]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
-bluetoothd[476]: src/adapter.c:add_uuid() sending add uuid command for index 0
-bluetoothd[476]: src/gatt-database.c:gatt_db_service_added() GATT
-Service added to local database
-bluetoothd[476]: Failed to register org.bluez.LEAdvertisingManager1
-bluetoothd[476]: Failed to register LEAdvertisingManager1 interface for adapter
-bluetoothd[476]: Not enough free handles to register service
-bluetoothd[476]: Error adding Link Loss service
-bluetoothd[476]: Not enough free handles to register service
-bluetoothd[476]: Not enough free handles to register service
-bluetoothd[476]:
-profiles/proximity/reporter.c:reporter_adapter_probe() Proximity
-Reporter for adapter 0xd3478
-bluetoothd[476]: src/adapter.c:btd_adapter_unblock_address() hci0
-00:00:00:00:00:00
-bluetoothd[476]: src/adapter.c:load_link_keys() hci0 keys 0 debug_keys 0
-bluetoothd[476]: src/adapter.c:load_ltks() hci0 keys 0
-bluetoothd[476]: src/adapter.c:load_conn_params() hci0 conn params 0
-bluetoothd[476]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
-bluetoothd[476]: src/adapter.c:add_uuid() sending add uuid command for index 0
-bluetoothd[476]: src/adapter.c:set_did() hci0 source 2 vendor 1d6b
-product 246 version 51e
-bluetoothd[476]: src/adapter.c:adapter_register() Adapter
-/org/bluez/hci0 registered
-bluetoothd[476]: src/adapter.c:set_dev_class() sending set device
-class command for index 0
-bluetoothd[476]: src/adapter.c:set_name() sending set local name
-command for index 0
-bluetoothd[476]: src/adapter.c:set_mode() sending set mode command for index 0
-bluetoothd[476]: src/adapter.c:load_link_keys_complete() link keys
-loaded for hci0
-bluetoothd[476]: src/adapter.c:load_ltks_complete() LTKs loaded for hci0
-bluetoothd[476]: hci0 Load Connection Parameters failed: Unknown Command (0x01)
-^Cbluetoothd[476]: Terminating
-bluetoothd[476]: src/adapter.c:adapter_shutdown()
-bluetoothd[476]: src/plugin.c:plugin_cleanup() Cleanup plugins
-bluetoothd[476]: src/adapter.c:adapter_remove() Removing adapter /org/bluez/hci0
-bluetoothd[476]: src/adapter.c:adapter_service_remove() /org/bluez/hci0
-bluetoothd[476]: src/adapter.c:remove_uuid() sending remove uuid
-command for index 0
-bluetoothd[476]: src/sdpd-service.c:remove_record_from_server()
-Removing record with handle 0x10002
-bluetoothd[476]: src/adapter.c:adapter_service_remove() /org/bluez/hci0
-bluetoothd[476]: src/adapter.c:remove_uuid() sending remove uuid
-command for index 0
-bluetoothd[476]: src/sdpd-service.c:remove_record_from_server()
-Removing record with handle 0x10001
-bluetoothd[476]: src/adapter.c:btd_adapter_unref() Freeing adapter
-/org/bluez/hci0
-bluetoothd[476]: src/adapter.c:adapter_free() 0xd3478
-bluetoothd[476]: Stopping SDP server
-bluetoothd[476]: Exit
-root@trex:~# ./fred -n -d --plugin=proximity
-bluetoothd[486]: Bluetooth daemon 5.30
-bluetoothd[486]: src/adapter.c:adapter_init() sending read version command
-bluetoothd[486]: Starting SDP server
-bluetoothd[486]: src/sdpd-service.c:register_device_id() Adding device
-id record for 0002:1d6b:0246:051e
-bluetoothd[486]: src/plugin.c:plugin_init() Loading builtin plugins
-bluetoothd[486]: Ignoring (cli) hostname
-bluetoothd[486]: Ignoring (cli) wiimote
-bluetoothd[486]: Ignoring (cli) autopair
-bluetoothd[486]: Ignoring (cli) policy
-bluetoothd[486]: Ignoring (cli) neard
-bluetoothd[486]: Ignoring (cli) sap
-bluetoothd[486]: Ignoring (cli) a2dp
-bluetoothd[486]: Ignoring (cli) avrcp
-bluetoothd[486]: Ignoring (cli) network
-bluetoothd[486]: Ignoring (cli) input
-bluetoothd[486]: Ignoring (cli) hog
-bluetoothd[486]: Ignoring (cli) health
-bluetoothd[486]: Ignoring (cli) gap
-bluetoothd[486]: Ignoring (cli) scanparam
-bluetoothd[486]: Ignoring (cli) deviceinfo
-bluetoothd[486]: Ignoring (cli) alert
-bluetoothd[486]: Ignoring (cli) time
-bluetoothd[486]: src/plugin.c:add_plugin() Loading proximity plugin
-bluetoothd[486]: Ignoring (cli) thermometer
-bluetoothd[486]: Ignoring (cli) heartrate
-bluetoothd[486]: Ignoring (cli) cyclingspeed
-bluetoothd[486]: src/plugin.c:plugin_init() Loading plugins
-/usr/lib/bluetooth/plugins
-bluetoothd[486]: src/main.c:main() Entering main loop
-bluetoothd[486]: src/rfkill.c:rfkill_event() RFKILL event idx 1 type 2
-op 0 soft 0 hard 0
-bluetoothd[486]: Bluetooth management interface 1.4 initialized
-bluetoothd[486]: src/adapter.c:read_version_complete() sending read
-supported commands command
-bluetoothd[486]: src/adapter.c:read_version_complete() sending read
-index list command
-bluetoothd[486]: src/adapter.c:read_commands_complete() Number of commands: 42
-bluetoothd[486]: src/adapter.c:read_commands_complete() Number of events: 21
-bluetoothd[486]: src/adapter.c:read_index_list_complete() Number of
-controllers: 1
-bluetoothd[486]: src/adapter.c:read_index_list_complete() Found index 0
-bluetoothd[486]: src/adapter.c:index_added() index 0
-bluetoothd[486]: src/adapter.c:btd_adapter_new() System name: BlueZ 5.30
-bluetoothd[486]: src/adapter.c:btd_adapter_new() Major class: 0
-bluetoothd[486]: src/adapter.c:btd_adapter_new() Minor class: 0
-bluetoothd[486]: src/adapter.c:btd_adapter_new() Modalias: usb:v1D6Bp0246d051E
-bluetoothd[486]: src/adapter.c:btd_adapter_new() Discoverable timeout:
-180 seconds
-bluetoothd[486]: src/adapter.c:btd_adapter_new() Pairable timeout: 0 seconds
-bluetoothd[486]: src/adapter.c:index_added() sending read info command
-for index 0
-bluetoothd[486]: src/adapter.c:read_info_complete() index 0 status 0x00
-bluetoothd[486]: src/adapter.c:clear_uuids() sending clear uuids
-command for index 0
-bluetoothd[486]: src/adapter.c:set_mode() sending set mode command for index 0
-bluetoothd[486]: src/adapter.c:set_mode() sending set mode command for index 0
-bluetoothd[486]: src/adapter.c:adapter_service_add() /org/bluez/hci0
-bluetoothd[486]: src/sdpd-service.c:add_record_to_server() Adding
-record with handle 0x10001
-bluetoothd[486]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00000007-0000-1000-8000-00805f9
-bluetoothd[486]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00000100-0000-1000-8000-00805f9
-bluetoothd[486]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00001002-0000-1000-8000-00805f9
-bluetoothd[486]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00001800-0000-1000-8000-00805f9
-bluetoothd[486]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
-bluetoothd[486]: src/adapter.c:add_uuid() sending add uuid command for index 0
-bluetoothd[486]: src/gatt-database.c:gatt_db_service_added() GATT
-Service added to local database
-bluetoothd[486]: Failed to obtain handles for "Service Changed" characteristic
-bluetoothd[486]: src/adapter.c:adapter_service_add() /org/bluez/hci0
-bluetoothd[486]: src/sdpd-service.c:add_record_to_server() Adding
-record with handle 0x10002
-bluetoothd[486]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00000007-0000-1000-8000-00805f9
-bluetoothd[486]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00000100-0000-1000-8000-00805f9
-bluetoothd[486]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00001002-0000-1000-8000-00805f9
-bluetoothd[486]: src/sdpd-service.c:add_record_to_server() Record
-pattern UUID 00001801-0000-1000-8000-00805f9
-bluetoothd[486]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
-bluetoothd[486]: src/adapter.c:add_uuid() sending add uuid command for index 0
-bluetoothd[486]: src/gatt-database.c:gatt_db_service_added() GATT
-Service added to local database
-bluetoothd[486]: Failed to register org.bluez.LEAdvertisingManager1
-bluetoothd[486]: Failed to register LEAdvertisingManager1 interface for adapter
-bluetoothd[486]: Not enough free handles to register service
-bluetoothd[486]: Error adding Link Loss service
-bluetoothd[486]: Not enough free handles to register service
-bluetoothd[486]: Not enough free handles to register service
-bluetoothd[486]:
-profiles/proximity/reporter.c:reporter_adapter_probe() Proximity
-Reporter for adapter 0xd3478
-bluetoothd[486]: src/adapter.c:btd_adapter_unblock_address() hci0
-00:00:00:00:00:00
-bluetoothd[486]: src/adapter.c:load_link_keys() hci0 keys 0 debug_keys 0
-bluetoothd[486]: src/adapter.c:load_ltks() hci0 keys 0
-bluetoothd[486]: src/adapter.c:load_conn_params() hci0 conn params 0
-bluetoothd[486]: src/adapter.c:load_connections() sending get
-connections command for index 0
-bluetoothd[486]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
-bluetoothd[486]: src/adapter.c:add_uuid() sending add uuid command for index 0
-bluetoothd[486]: src/adapter.c:set_did() hci0 source 2 vendor 1d6b
-product 246 version 51e
-bluetoothd[486]: src/adapter.c:adapter_register() Adapter
-/org/bluez/hci0 registered
-bluetoothd[486]: src/adapter.c:set_dev_class() sending set device
-class command for index 0
-bluetoothd[486]: src/adapter.c:set_name() sending set local name
-command for index 0
-bluetoothd[486]: src/adapter.c:set_mode() sending set mode command for index 0
-bluetoothd[486]: src/adapter.c:set_mode() sending set mode command for index 0
-bluetoothd[486]: src/adapter.c:adapter_start() adapter /org/bluez/hci0
-has been enabled
-bluetoothd[486]: src/adapter.c:new_settings_callback() Settings: 0x000000c1
-bluetoothd[486]: src/adapter.c:settings_changed() Changed settings: 0x00000040
-bluetoothd[486]: src/adapter.c:new_settings_callback() Settings: 0x000002c1
-bluetoothd[486]: src/adapter.c:settings_changed() Changed settings: 0x00000200
-bluetoothd[486]: src/adapter.c:trigger_passive_scanning()
-bluetoothd[486]: src/adapter.c:load_link_keys_complete() link keys
-loaded for hci0
-bluetoothd[486]: src/adapter.c:load_ltks_complete() LTKs loaded for hci0
-bluetoothd[486]: hci0 Load Connection Parameters failed: Unknown Command (0x01)
-bluetoothd[486]: src/adapter.c:get_connections_complete() Connection count: 0
-bluetoothd[486]: src/adapter.c:dev_class_changed_callback() Class: 0x000000
-bluetoothd[486]: src/adapter.c:local_name_changed_callback() Name: BlueZ 5.30
-bluetoothd[486]: src/adapter.c:local_name_changed_callback() Short name:
-bluetoothd[486]: src/adapter.c:local_name_changed_callback() Current
-alias: BlueZ 5.30
-bluetoothd[486]: src/adapter.c:new_settings_callback() Settings: 0x000002d1
-bluetoothd[486]: src/adapter.c:settings_changed() Changed settings: 0x00000010
-bluetoothd[486]: src/adapter.c:new_settings_callback() Settings: 0x000002d3
-bluetoothd[486]: src/adapter.c:settings_changed() Changed settings: 0x00000002
-
-Here are the matching hcidump logs....
-
-hcidump
-HCI sniffer - Bluetooth packet analyzer ver 5.30
-device: hci0 snap_len: 1500 filter: 0xffffffff
-< HCI Command: Write Simple Pairing Mode (0x03|0x0056) plen 1
-    mode 0x01
-> HCI Event: Command Complete (0x0e) plen 4
-    Write Simple Pairing Mode (0x03|0x0056) ncmd 1
-    status 0x00
-< HCI Command: Write LE Host Supported (0x03|0x006d) plen 2
-> HCI Event: Command Complete (0x0e) plen 4
-    Write LE Host Supported (0x03|0x006d) ncmd 1
-< HCI Command: LE Set Advertising Data (0x08|0x0008) plen 32
-> HCI Event: Command Complete (0x0e) plen 4
-    LE Set Advertising Data (0x08|0x0008) ncmd 1
-    status 0x00
-< HCI Command: Write Extended Inquiry Response (0x03|0x0052) plen 241
-    fec 0x00
-    TX power level: 15
-    Unknown type 0x10 with 8 bytes data
-    Complete service classes: 0x1800 0x1801
-> HCI Event: Command Complete (0x0e) plen 4
-    Write Extended Inquiry Response (0x03|0x0052) ncmd 1
-    status 0x00
-< HCI Command: Write Class of Device (0x03|0x0024) plen 3
-    class 0x000000
-> HCI Event: Command Complete (0x0e) plen 4
-    Write Class of Device (0x03|0x0024) ncmd 1
-    status 0x00
-< HCI Command: Write Local Name (0x03|0x0013) plen 248
-    name 'BlueZ 5.30'
-> HCI Event: Command Complete (0x0e) plen 4
-    Write Local Name (0x03|0x0013) ncmd 1
-    status 0x00
-< HCI Command: Write Extended Inquiry Response (0x03|0x0052) plen 241
-    fec 0x00
-    Complete local name: 'BlueZ 5.30'
-    TX power level: 15
-    Unknown type 0x10 with 8 bytes data
-    Complete service classes: 0x1800 0x1801
-> HCI Event: Command Complete (0x0e) plen 4
-    Write Extended Inquiry Response (0x03|0x0052) ncmd 1
-    status 0x00
-< HCI Command: LE Set Scan Response Data (0x08|0x0009) plen 32
-> HCI Event: Command Complete (0x0e) plen 4
-    LE Set Scan Response Data (0x08|0x0009) ncmd 1
-    status 0x00
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1
-    enable 2
-> HCI Event: Command Complete (0x0e) plen 4
-    Write Scan Enable (0x03|0x001a) ncmd 1
-    status 0x00
-
-Any guesses as to what is going wrong?
-
-
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 4bba866..8b5530d 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -3,6 +3,7 @@
+  *  Bluetooth support for Broadcom devices
+  *
+  *  Copyright (C) 2015  Intel Corporation
++ *  Copyright (C) 2015  Broadcom Corporation
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -23,14 +24,16 @@
+ 
+ #include <linux/module.h>
+ #include <linux/firmware.h>
++#include <linux/tty.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ 
++#include "hci_uart.h"
+ #include "btbcm.h"
+ 
+-#define VERSION "0.1"
++#define VERSION "0.2"
+ 
+ #define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
+ 
+@@ -246,8 +249,10 @@ static struct sk_buff *btbcm_read_usb_product(struct hci_dev *hdev)
+ static const struct {
+ 	u16 subver;
+ 	const char *name;
++	u32 baud_rate;	/* operational baud rate */
+ } bcm_uart_subver_table[] = {
+-	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
++	{ 0x410e, "BCM43341B0", 3000000},                    /* 002.001.014 */
++	{ 0x610c, "BCM4354_003.001.012.0306.0659", 3000000}, /* 003.001.012 */
+ 	{ }
+ };
+ 
+@@ -268,6 +273,127 @@ static const struct {
+ 	{ }
+ };
+ 
++/*
++ * Set the UART into the defaults
++ */
++int btbcm_init_uart(struct hci_uart *hu)
++{
++	struct tty_struct *tty = hu->tty;
++	struct ktermios ktermios;
++	int err, speed;
++
++	/* Flush the line discipline buffers and the TTY buffers */
++	if (tty->ldisc->ops->flush_buffer)
++		tty->ldisc->ops->flush_buffer(tty);
++	tty_driver_flush_buffer(tty);
++
++
++	/* Init UART to default settings */
++	ktermios = tty->termios;
++	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
++		| INLCR | IGNCR | ICRNL | IXON);
++	ktermios.c_oflag &= ~OPOST;
++	ktermios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
++	ktermios.c_cflag &= ~(CSIZE | PARENB | CBAUD);
++	ktermios.c_cflag |= CS8;
++	ktermios.c_cflag |= CRTSCTS;
++	ktermios.c_cflag |= B115200;
++	ktermios.c_ispeed = 115200;
++	ktermios.c_ospeed = 115200;
++	err = tty_set_termios(tty, &ktermios);
++	if (err) {
++		BT_DBG("init_uart set_termios failure %d", err);
++		return err;
++	}
++
++	speed = tty_get_baud_rate(tty);
++
++	BT_DBG("init_uart set_termios completed, spd %d", speed);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btbcm_init_uart);
++
++/*
++ * Set the baud rate on the UART and the device
++ */
++int btbcm_set_baud_rate(struct hci_uart *hu, int baud_rate)
++{
++	struct tty_struct *tty = hu->tty;
++	struct ktermios ktermios;
++	int status, speed, cflag;
++	struct sk_buff *skb;
++	u8 enable = 0x01;
++	u8 baud_rate_vsc_pars[] = {0, 0, 0, 0x10, 0x0e, 0};
++
++	/* If the baud rate is higher than 3000000, change the clock */
++	if (baud_rate > 3000000) {
++		skb = __hci_cmd_sync(hu->hdev, 0xfc45, 1, &enable,
++				     HCI_INIT_TIMEOUT);
++		if (IS_ERR(skb)) {
++			status = PTR_ERR(skb);
++			return status;
++		}
++
++		kfree_skb(skb);
++		BT_DBG("set_baud_rate write UART 48 MHz VSC succeeded");
++	}
++
++	/* Now let the device know about the rate change */
++	put_unaligned_le32((u32)baud_rate, &baud_rate_vsc_pars[2]);
++	skb = __hci_cmd_sync(hu->hdev, 0xfc18, sizeof(baud_rate_vsc_pars),
++			     baud_rate_vsc_pars, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		status = PTR_ERR(skb);
++		BT_ERR("set_baud_rate VSC failed (%d)", status);
++		return status;
++	}
++
++	kfree_skb(skb);
++	BT_DBG("set_baud_rate VSC succeeded");
++
++	/* Set UART into this rate as well */
++	ktermios = tty->termios;
++	BT_DBG("set_baud_rate start flags c_o %x c_l %x c_c %x spd %d/%d",
++	       ktermios.c_oflag, ktermios.c_lflag, ktermios.c_cflag,
++	       ktermios.c_ispeed, ktermios.c_ospeed);
++	switch (baud_rate) {
++	case 115200:
++		cflag |= B115200; break;
++	case 921600:
++		cflag |= B921600; break;
++	case 3000000:
++		cflag |= B3000000; break;
++	case 3500000:
++		cflag |= B3500000; break;
++	case 4000000:
++		cflag |= B4000000; break;
++	default:
++		BT_DBG("set_baud_rate unknown rate %d", baud_rate);
++		return -EINVAL;
++	}
++
++	ktermios.c_cflag &= ~CBAUD;
++	ktermios.c_cflag |= cflag;
++	ktermios.c_ispeed = baud_rate;
++	ktermios.c_ospeed = baud_rate;
++	status = tty_set_termios(tty, &ktermios);
++	if (status) {
++		BT_DBG("set_baud_rate set_termios failure %d", status);
++		return status;
++	}
++
++	speed = tty_get_baud_rate(tty);
++	BT_DBG("set_baud_rate set_termios completed, spd %d", speed);
++	ktermios = tty->termios;
++	BT_DBG("set_baud_rate flags c_o %x c_l %x c_c %x spd %d/%d",
++	       ktermios.c_oflag, ktermios.c_lflag, ktermios.c_cflag,
++	       ktermios.c_ispeed, ktermios.c_ospeed);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btbcm_set_baud_rate);
++
+ int btbcm_setup_patchram(struct hci_dev *hdev)
+ {
+ 	char fw_name[64];
+@@ -275,7 +401,8 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 	const char *hw_name = NULL;
+ 	struct sk_buff *skb;
+ 	struct hci_rp_read_local_version *ver;
+-	int i, err;
++	int i, err, is_uart = false;
++	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 
+ 	/* Reset */
+ 	err = btbcm_reset(hdev);
+@@ -297,14 +424,18 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+-	BT_INFO("%s: BCM: chip id %u", hdev->name, skb->data[1]);
++	BT_INFO("%s: BCM: chip id %u, rev 0x%x subver 0x%x",
++		hdev->name, skb->data[1], rev, subver);
+ 	kfree_skb(skb);
+ 
+ 	switch ((rev & 0xf000) >> 12) {
+ 	case 0:
++	case 1:
+ 		for (i = 0; bcm_uart_subver_table[i].name; i++) {
+ 			if (subver == bcm_uart_subver_table[i].subver) {
+ 				hw_name = bcm_uart_subver_table[i].name;
++				BT_INFO("UART firmware found: %s", hw_name);
++				is_uart = true;
+ 				break;
+ 			}
+ 		}
+@@ -312,7 +443,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 		snprintf(fw_name, sizeof(fw_name), "brcm/%s.hcd",
+ 			 hw_name ? : "BCM");
+ 		break;
+-	case 1:
++
+ 	case 2:
+ 		/* Read USB Product Info */
+ 		skb = btbcm_read_usb_product(hdev);
+@@ -345,11 +476,25 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 	if (err == -ENOENT)
+ 		return 0;
+ 
++	/* Once the patch is downloaded, the device is back at default rate */
++	if (is_uart) {
++		err = btbcm_init_uart(hu);
++		if (err)
++			return 0;
++	}
++
+ 	/* Reset */
+ 	err = btbcm_reset(hdev);
+ 	if (err)
+ 		return err;
+ 
++	if (is_uart) {
++		err = btbcm_set_baud_rate(hu,
++					  bcm_uart_subver_table[i].baud_rate);
++		if (err)
++			return 0;
++	}
++
+ 	/* Read Local Version Info */
+ 	skb = btbcm_read_local_version(hdev);
+ 	if (IS_ERR(skb))
+diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
+index eb6ab5f..77fa60a 100644
+--- a/drivers/bluetooth/btbcm.h
++++ b/drivers/bluetooth/btbcm.h
+@@ -3,6 +3,7 @@
+  *  Bluetooth support for Broadcom devices
+  *
+  *  Copyright (C) 2015  Intel Corporation
++ *  Copyright (C) 2015  Broadcom Corporation
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -30,6 +31,8 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware);
+ int btbcm_setup_patchram(struct hci_dev *hdev);
+ int btbcm_setup_apple(struct hci_dev *hdev);
+ 
++int btbcm_init_uart(struct hci_uart *hu);
++int btbcm_set_baud_rate(struct hci_uart *hu, int baud_rate);
+ #else
+ 
+ static inline int btbcm_check_bdaddr(struct hci_dev *hdev)
+@@ -57,4 +60,14 @@ static inline int btbcm_setup_apple(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++static inline int btbcm_init_uart(void *hu)
++{
++	return 0;
++}
++
++static inline int btbcm_set_baud_rate(void *hu, int baud_rate);
++{
++	return 0;
++}
++
+ #endif
 -- 
-John Carter
-Phone : (64)(3) 358 6639
-Tait Electronics
-PO Box 1645 Christchurch
-New Zealand
+1.9.1
 
--- 
-
-------------------------------
-This email, including any attachments, is only for the intended recipient. 
-It is subject to copyright, is confidential and may be the subject of legal 
-or other privilege, none of which is waived or lost by reason of this 
-transmission.
-If you are not an intended recipient, you may not use, disseminate, 
-distribute or reproduce such email, any attachments, or any part thereof. 
-If you have received a message in error, please notify the sender 
-immediately and erase all copies of the message and any attachments.
-Unfortunately, we cannot warrant that the email has not been altered or 
-corrupted during transmission nor can we guarantee that any email or any 
-attachments are free from computer viruses or other conditions which may 
-damage or interfere with recipient data, hardware or software. The 
-recipient relies upon its own procedures and assumes all risk of use and of 
-opening any attachments.
-------------------------------
