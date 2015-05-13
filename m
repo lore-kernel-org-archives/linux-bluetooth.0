@@ -1,62 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-To: Daniel Drake <drake@endlessm.com>
-CC: Larry Finger <Larry.Finger@lwfinger.net>,
-	Carlo Caione <carlo@endlessm.com>,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>,
-	"shaofu@realtek.com > shaofu" <shaofu@realtek.com>,
-	=?utf-8?B?5byg5b+X56Wl?= <askijerry_zhang@realsil.com.cn>,
-	=?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>,
-	Chih-Hsiang Wang <wangchihhs@realtek.com>,
-	=?utf-8?B?5q+b5Li66ZSL?= <jason_mao@realsil.com.cn>
-Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IFJlYWx0ZWsgVVNCIGJsdWV0b290aDogbm8gc2Nh?= =?utf-8?Q?n_results_when_wifi_is_connected?=
-Date: Wed, 13 May 2015 02:36:56 +0000
-Message-ID: <54F70642BAB21D4498E1AA3EFE3D519A46101882@rsex2.realsil.com.cn>
-References: <CAD8Lp47=G8rFJtow9fn9WBg6FAyygopvYh7k0FNS0w8FgKXD6A@mail.gmail.com>
-	<554E804F.9090407@lwfinger.net>
-	<54F70642BAB21D4498E1AA3EFE3D519A461012DA@rsex2.realsil.com.cn>
- <CAD8Lp472ZD=2RBHD3boAgenEe6D=eqGh3dZugUDHR=-AW18BxA@mail.gmail.com>
-In-Reply-To: <CAD8Lp472ZD=2RBHD3boAgenEe6D=eqGh3dZugUDHR=-AW18BxA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: wesley.kuo@intel.com
+To: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@intel.com>
+Subject: [PATCHv2] Bluetooth: Fix remote name event return directly.
+Date: Wed, 13 May 2015 10:33:15 +0800
+Message-Id: <1431484395-29634-1-git-send-email-wesley.kuo@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-RGVhciBEYW5pZWwsDQoJRm9yICA4NzIzQlUsCSAgIGFsd2F5cyB1c2UgQ09ORklHX1MwX0FOVFRF
-TkHvvJsNCglGb3IgIDg3MjNCRSDvvIwgMSBhbnRlbm5hIENPTkZJR19TMV9BTlRURU5BOyAyIGFu
-dGVubmFzIENPTkZJR19TMF9BTlRURU5BDQoNCkRlYXIgIHNoYW9mdSwNCglXb3VsZCB5b3UgcGxl
-YXNlIGhlbHAgdG8gY2hlY2sgd2l0aCBoYWxidGM4NzIzYjJhbnQuYyBidGNvZXhpc3QgZHJpdmVy
-Pw0KDQotLS0tLemCruS7tuWOn+S7ti0tLS0tDQrlj5Hku7bkuro6IERhbmllbCBEcmFrZSBbbWFp
-bHRvOmRyYWtlQGVuZGxlc3NtLmNvbV0gDQrlj5HpgIHml7bpl7Q6IDIwMTXlubQ15pyIMTLml6Ug
-MjA6NTMNCuaUtuS7tuS6ujog6ZmI6Imz6JCNDQrmioTpgIE6IExhcnJ5IEZpbmdlcjsgQ2FybG8g
-Q2Fpb25lOyBMaW51eCBCbHVldG9vdGggbWFpbGluZyBsaXN0OyBzaGFvZnVAcmVhbHRlay5jb20g
-PiBzaGFvZnU7IOW8oOW/l+elpTsg6ZmG5pyx5LyfOyBDaGloLUhzaWFuZyBXYW5nOyDmr5vkuLrp
-lIsNCuS4u+mimDogUmU6IOetlOWkjTogUmVhbHRlayBVU0IgYmx1ZXRvb3RoOiBubyBzY2FuIHJl
-c3VsdHMgd2hlbiB3aWZpIGlzIGNvbm5lY3RlZA0KDQpIaSBDaGFtcGlvbiwNCg0KVGhhbmtzIGZv
-ciB0aGUgc3VnZ2VzdGlvbi4NCg0KT24gTW9uLCBNYXkgMTEsIDIwMTUgYXQgODo1NCBQTSwg6ZmI
-6Imz6JCNIDxjaGFtcGlvbl9jaGVuQHJlYWxzaWwuY29tLmNuPiB3cm90ZToNCj4gRGVhciBEYW5p
-ZWwsDQo+ICAgICAgICAgRm9yIHNvbWUgcmVhc29uLCA4NzIzQiBjaGlwIHdpdGggc2luZ2xlIGFu
-dGVubmEgYW5kIDIgYW50ZW5uYXMgaGF2ZSBkaWZmZXJlbnQgc2V0dGluZ3MgYW5kIHRoaXMgY2Fu
-IG9ubHkgYmUgbW9kaWZpZWQgbWFudWFsbHkuDQo+IEJUIGRyaXZlciB3aWxsIHNldCBjb250cm9s
-bGVyIHRvIHVzZSBTMCB3aGVuIHVzZSAyIGFudGVubmFzLg0KPiAgICAgICAgIEluIG15IHN1Ym1p
-dHRlZCBkcml2ZXIgLCB0aGVyZSBhcmUgZm9sbG93aW5nIGNvZGVzIHRvIGFkZCB0aGUgY29uZmln
-IHNldHRpbmdzIGF0IHRoZSBlbmQgb2YgZmlybXdhcmUgdG8gYmUgZG93bmxvYWRlZC4NCj4gV291
-bGQgeW91IHBsZWFzZSB0cnkgdG8gYWRkIHRoZXNlIGNvZGVzIGFuZCB0ZXN0IGFnYWluPw0KPg0K
-PiAvKmZvciA4NzIzQix1c2UgUzAgQW50dGVuYSBmb3IgYmx1ZXRvb3RoKi8NCj4gICAgICAgICBp
-ZihsbXBfdmVyc2lvbj09Uk9NX0xNUF84NzIzQikNCj4gICAgICAgICB7DQo+ICAgICAgICAgICAg
-ICAgICBtZW1jcHkoKmJ1ZitwYXRjaF9lbnRyeS0+cGF0Y2hfbGVuZ3RoLFJUS19DT05GSUdfU0lH
-TkFUVVJFLDYpOw0KPiAgICAgICAgICAgICAgICAgaWYgKFVTRV9TMF9BTlRURU5BKQ0KPiAgICAg
-ICAgICAgICAgICAgICAgICAgICBtZW1jcHkoKmJ1ZitwYXRjaF9lbnRyeS0+cGF0Y2hfbGVuZ3Ro
-KzYsQ09ORklHX1MwX0FOVFRFTkEsNCk7DQo+ICAgICAgICAgICAgICAgICBlbHNlDQo+ICAgICAg
-ICAgICAgICAgICAgICAgICAgIG1lbWNweSgqYnVmK3BhdGNoX2VudHJ5LT5wYXRjaF9sZW5ndGgr
-NixDT05GSUdfUzFfQU5UVEVOQSw0KTsNCj4gICAgICAgICAgICAgICAgICpidWZfbGVuICs9IDEw
-Ow0KPiAgICAgICAgICAgICAgICAgQlRfREJHKCJVU0VfUzBfQU5UVEVOQSIpOw0KPiAgICAgICAg
-IH0NCg0KWWVzLCBJIHNhdyB0aGlzIGNvZGUgYWxyZWFkeSBhbmQgZXhwZXJpbWVudGVkIHdpdGgg
-aXQuIEl0IGRpZG4ndCBzZWVtIHRvIG1ha2UgYW55IGRpZmZlcmVuY2UuIEknbGwgdHJ5IGFnYWlu
-IHRob3VnaCwgd2hpY2ggY29uZmlndXJhdGlvbiBzaG91bGQgSSB1c2UsIENPTkZJR19TMF9BTlRU
-RU5BIG9yIENPTkZJR19TMV9BTlRURU5BPw0KDQpCeSBvbmx5IGNvbm5lY3Rpbmcgb25lIGFudGVu
-bmEgYXQgYSB0aW1lLCBJIHdhcyBhYmxlIHRvIHNlZSB0aGF0IGJsdWV0b290aCBoYXBwaWx5IHVz
-ZXMgZWl0aGVyIG9uZS4gSSBoYXZlIGEgZmVlbGluZyB0aGF0IHRoZSBwcmVmZXJlbmNlIHlvdSB3
-cml0ZSBhYm92ZSBpcyBvdmVycmlkZGVuIGJ5IGNvZGUgaW4gdGhlIGhhbGJ0Yzg3MjNiMmFudC5j
-IGJ0Y29leGlzdCBkcml2ZXIuDQoNCkRhbmllbA0K
+From: Wesley Kuo <wesley.kuo@intel.com>
+
+This patch fixes hci_remote_name_evt dose not resolve name during
+discovery status is RESOLVING. Before simultaneous dual mode scan enabled,
+hci_check_pending_name will set discovery status to STOPPED eventually.
+
+Signed-off-by: Wesley Kuo <wesley.kuo@intel.com>
+---
+ net/bluetooth/hci_core.c |    6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 476709b..755a147 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2853,9 +2853,11 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status,
+ 			 * state. If we were running both LE and BR/EDR inquiry
+ 			 * simultaneously, and BR/EDR inquiry is already
+ 			 * finished, stop discovery, otherwise BR/EDR inquiry
+-			 * will stop discovery when finished.
++			 * will stop discovery when finished. If we will resolve
++			 * remote device name, do not change discovery state.
+ 			 */
+-			if (!test_bit(HCI_INQUIRY, &hdev->flags))
++			if (!test_bit(HCI_INQUIRY, &hdev->flags) &&
++			    hdev->discovery.state != DISCOVERY_RESOLVING)
+ 				hci_discovery_set_state(hdev,
+ 							DISCOVERY_STOPPED);
+ 		} else {
+-- 
+1.7.9.5
+
