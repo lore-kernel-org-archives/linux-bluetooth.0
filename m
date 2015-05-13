@@ -1,79 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: Arm compilation error in tools/test-runner.c error: impossible constraint in 'asm'
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAFD1m3E73juA0LTUWq7-rt2W0OxdGy7cONMv2e5VRs5zsg_rww@mail.gmail.com>
-Date: Wed, 13 May 2015 15:42:50 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <DE23B8FA-28E3-4E55-AB1E-6FBD552881E2@holtmann.org>
-References: <CAFD1m3E73juA0LTUWq7-rt2W0OxdGy7cONMv2e5VRs5zsg_rww@mail.gmail.com>
-To: John Carter <john.carter@taitradio.com>
+MIME-Version: 1.0
+In-Reply-To: <BD5E516FF3711A41B93DC005170007BB010D943FDCC9@EMBSVR01.ember.local>
+References: <BD5E516FF3711A41B93DC005170007BB010D943FDCC9@EMBSVR01.ember.local>
+Date: Wed, 13 May 2015 16:04:57 +0300
+Message-ID: <CABBYNZJSZ=2e-sAD2f=01z0jVR4ackd3xoNO1YpVXR9stv6xzQ@mail.gmail.com>
+Subject: Re: Issue with registering GATT Services
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ankur Patel <ankur@embertec.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Ankur,
 
-> Building bluez out of git within OpenEmbedded for ARM results in the
-> following compilation "error impossible constraint in 'asm'"
-> 
-> arm-poky-linux-gnueabi-gcc  -march=armv7-a -marm -mthumb-interwork
-> -mfloat-abi=hard -mfpu=neon -mtune=cortex-a8
-> --sysroot=/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex
-> -DHAVE_CONFIG_H -I.  -I./lib
-> -I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/include/dbus-1.0
-> -I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/lib/dbus-1.0/include
-> -I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/include/glib-2.0
-> -I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/lib/glib-2.0/include
->  -O2 -pipe -g -feliminate-unused-debug-types -c -o
-> tools/test-runner.o tools/test-runner.c
-> 
-> 
-> | tools/test-runner.c: In function 'start_qemu':
-> | tools/test-runner.c:224:2: error: impossible constraint in 'asm'
-> |   __asm__ __volatile__("cpuid" : "=c" (ecx) : "a" (1) : "memory");
-> |   ^
-> 
-> 
-> I believe this was introduced with this commit....
-> 
-> commit a0a03828fbc49db9f0926cee87d53d627d69bac2
-> Author: Marcel Holtmann <marcel@holtmann.org>
-> Date:   Mon Apr 6 20:45:39 2015 -0700
-> 
->    tools: Add fallback if KVM support is not available
-> 
-> diff --git a/tools/test-runner.c b/tools/test-runner.c
-> index 407a985..163b610 100644
-> --- a/tools/test-runner.c
-> +++ b/tools/test-runner.c
-> @@ -195,7 +195,7 @@ static char *const qemu_argv[] = {
->        "-no-user-config",
->        "-monitor", "none",
->        "-display", "none",
-> -       "-machine", "type=q35,accel=kvm",
-> +       "-machine", "type=q35,accel=kvm:tcg",
->        "-m", "192M",
->        "-nographic",
->        "-vga", "none",
-> @@ -215,6 +215,16 @@ static char *const qemu_envp[] = {
->        NULL
-> };
-> 
-> +static void check_virtualization(void)
-> +{
-> +       uint32_t ecx;
-> +
-> +       __asm__ __volatile__("cpuid" : "=c" (ecx) : "a" (1) : "memory");
-> +
-> +       if (!!(ecx & (1 << 5)))
-> +               printf("Found support for Virtual Machine eXtensions\n");
-> +}
-> +
+On Wed, May 13, 2015 at 12:39 PM, Ankur Patel <ankur@embertec.com> wrote:
+> Hi Folks,
+>
+> I am having issues with registering GATT services successfully on the device.
+> Using: Linux Kernel: 3.18.12 Bluez: 5.30
+>
+> Step1> Build Bluez5.30 with --enable-experimental and --enable-maintainer-mode.
+> Step2> Ran Bluetoothd with -E option as below:
+> root@imx28evk:~ # /usr/lib/bluez5/bluetooth/bluetoothd -d -n -E &
+> Output:
+>         http://pastebin.com/eALijggh
+> Snippet:
+> ...
+> bluetoothd[462]: src/gatt-database.c:gatt_db_service_added() GATT Service added to local database
+> bluetoothd[462]: src/advertising.c:btd_advertising_manager_new() LE Advertising Manager created for adapter: /org/bluez/hci0
+> bluetoothd[462]: profiles/audio/a2dp.c:media_server_probe() path /org/bluez/hci0
+> bluetoothd[462]: plugins/hostname.c:hostname_probe()
+> bluetoothd[462]: Not enough free handles to register service
+> bluetoothd[462]: plugins/gatt-example.c:gatt_example_adapter_probe() Battery service could not be registered
+> bluetoothd[462]: gatt-example-adapter-driver: Input/output error (5)    // Not sure if this restricts GATT Service to be registered
+> ...
+> bluetoothd[462]: src/adapter.c:new_settings_callback() Settings: 0x000026f0
+> bluetoothd[462]: src/adapter.c:settings_changed() Changed settings: 0x0000000a
+>
+> Step3> Ran gatt-service:
+> root@imx28evk:~/tools# ./gatt-service
+> gatt-service unique name: :1.4
+> Registered service: /service1
+> Get UUID: 00001802-0000-1000-8000-00805f9b34fb
+> Exist Includes: 00001802-0000-1000-8000-00805f9b34fb
+> Characteristic(00002a06-0000-1000-8000-00805f9b34fb): Get("Value")
+> Descriptor(8260c653-1a54-426b-9e36-e84c238bc669): Get("Value")
+> RegisterService: Method "RegisterService" with signature "oa{sv}" on interface "org.bluez.GattManager1" doesn't exist
+>
+> I am using the Dbus config from http://git.kernel.org/cgit/bluetooth/bluez.git/tree/src/bluetooth.conf.
+>
+> Any idea why it fails to register the service? Do I need to enable other features or if there is any missing steps?
 
-just make this check IA specific so that on ARM architectures it compiles to nothing.
+It should work if you have -E, but perhaps something else is not the
+correct, like the path, etc. Btw, we do have an example here:
 
-Regards
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/example-gatt-server
 
-Marcel
-
+-- 
+Luiz Augusto von Dentz
