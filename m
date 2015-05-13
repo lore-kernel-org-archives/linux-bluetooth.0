@@ -3,8 +3,8 @@ From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 98221] [REGRESSION] Conwise Technology Co., Ltd. CW6622
  Bluetooth Dongle doesn't work
-Date: Wed, 13 May 2015 16:25:35 +0000
-Message-ID: <bug-98221-62941-3k69wg5zVm@https.bugzilla.kernel.org/>
+Date: Wed, 13 May 2015 16:19:03 +0000
+Message-ID: <bug-98221-62941-AXzbGTjGko@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-98221-62941@https.bugzilla.kernel.org/>
 References: <bug-98221-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -14,11 +14,10 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 https://bugzilla.kernel.org/show_bug.cgi?id=98221
 
-worryag@gmail.com changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-         Regression|No                          |Yes
+--- Comment #4 from worryag@gmail.com ---
+Created attachment 176711
+  --> https://bugzilla.kernel.org/attachment.cgi?id=176711&action=edit
+lsusb
 
 -- 
 You are receiving this mail because:
