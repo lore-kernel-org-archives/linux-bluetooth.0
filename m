@@ -1,83 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>, Ilya Faenson <ifaenson@broadcom.com>
-Subject: [RFC v3 1/4] Broadcom Bluetooth UART Device Tree bindings
-Date: Wed, 13 May 2015 17:50:20 -0400
-Message-ID: <1431553823-25670-2-git-send-email-ifaenson@broadcom.com>
-In-Reply-To: <1431553823-25670-1-git-send-email-ifaenson@broadcom.com>
-References: <1431553823-25670-1-git-send-email-ifaenson@broadcom.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Sender: carlo.caione@gmail.com
+In-Reply-To: <86BBEE97-B28B-429A-8D13-AE41D7BC37A0@holtmann.org>
+References: <1431100652-3658-1-git-send-email-carlo@caione.org>
+	<86BBEE97-B28B-429A-8D13-AE41D7BC37A0@holtmann.org>
+Date: Wed, 13 May 2015 23:51:45 +0200
+Message-ID: <CAOQ7t2Z=u=GyWNdAZd=v4AQ4nE7TvXwQ4KgR4GteNrHngrp=eg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btrtl: Create separate module for Realtek BT driver
+From: Carlo Caione <carlo@caione.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Carlo Caione <carlo@caione.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+	larry.finger@lwfinger.net, champion_chen@realsil.com.cn,
+	Daniel Drake <drake@endlessm.com>, Carlo Caione <carlo@endlessm.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Device Tree bindings to configure the Broadcom Bluetooth UART device.
+On Wed, May 13, 2015 at 10:56 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Carlo,
 
-Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
----
- .../devicetree/bindings/net/bluetooth/btbcm.txt    | 54 ++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+Hi Marcel,
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
-new file mode 100644
-index 0000000..cc9f225
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
-@@ -0,0 +1,54 @@
-+btbcm
-+------
-+
-+Required properties:
-+
-+	- compatible : must be "brcm,brcm-bt-uart".
-+	- tty : tty device connected to this Bluetooth device.
-+
-+Optional properties:
-+
-+  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an interrupt.
-+
-+  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume device.
-+
-+  - reg-on-gpios : reg-on output GPIO to be used to power device on/off.
-+
-+  - baud-rate-before-config-download : initial Bluetooth device baud rate.
-+    Default: 3000000.
-+
-+  - manual-fc : flow control UART in suspend / resume scenarios.
-+    Default: 0.
-+
-+  - configure-sleep : configure suspend / resume flag.
-+    Default: 0.
-+
-+  - configure-audio : configure platform PCM SCO flag.
-+    Default: 0.
-+
-+  - PCM* : SCO PCM platform parameters. Work with Broadcom on setting.
-+    Defaults: see the example below.
-+
-+
-+Example:
-+
-+	bcm4354_bt_uart: bcm4354-bt-uart {
-+		compatible = "bcm-bt-uart,bcm4354-bt-uart";
-+		bt-wake-gpios = <&gpio4 30 GPIO_ACTIVE_HIGH>;
-+		bt-host-wake-gpios = <&gpio4 31 GPIO_ACTIVE_HIGH>;
-+		tty = "ttyS0";
-+		baud-rate-before-config-download = <3000000>;
-+		configure-sleep = <1>;
-+		configure-audio = <1>;
-+		PCMClockMode = <0>;
-+		PCMFillMethod = <2>;
-+		PCMFillNum = <0>;
-+		PCMFillValue = <3>;
-+		PCMInCallBitclock = <0>;
-+		PCMLSBFirst = <0>;
-+		PCMRightJustify = <0>;
-+		PCMRouting = <0>;
-+		PCMShortFrameSync = <0>;
-+		PCMSyncMode = <0>;
-+	};
-+
+>> As already done for btintel and btbcm export setup as separate function
+>> in a vendor-specific module to hold all the Realtek specific commands.
+
+[cut]
+
+I'll fix everything in v2.
+
+>> +MODULE_AUTHOR("Carlo Caione <carlo@endlessm.com>");
+>> +MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
+>
+> I think you mean Realtek and not Intel ;)
+
+Yep, also I guess Daniel still owns the authorship of the module.
+Sorry, added my name without thinking (was in 'auto-mode' :)
+
+[cut]
+
+> The rest seems to be fine and straight forward.
+
+Thanks for the review,
+
 -- 
-1.9.1
+Carlo Caione
