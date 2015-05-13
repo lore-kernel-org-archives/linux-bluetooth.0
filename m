@@ -1,59 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: "nagaraj.dr" <nagaraj.dr@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: "nagaraj.dr" <nagaraj.dr@samsung.com>
-Subject: [PATCH 1/1] shared/gatt-client: Fix the "Find Information req" error
-Date: Wed, 13 May 2015 17:05:23 +0530
-Message-id: <1431516923-9855-1-git-send-email-nagaraj.dr@samsung.com>
+From: Ankur Patel <ankur@embertec.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 13 May 2015 19:09:08 +0930
+Subject: Issue with registering GATT Services
+Message-ID: <BD5E516FF3711A41B93DC005170007BB010D943FDCC9@EMBSVR01.ember.local>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "nagaraj.dr" <nagaraj.dr@samsung.com>
+Hi Folks,
 
-characteristic descriptor is searched b/w the
-characteristic "value_handle + 1" and
-characteristic "end_handle" using "Find Information req"
+I am having issues with registering GATT services successfully on the device.
+Using: Linux Kernel: 3.18.12 Bluez: 5.30
 
-if remote device had declared the characteristic value_handle
-at 0XFFFF (which also means there is no characteristic descriptors),then
-present code would make start_handle has 0X0000(because of 16 bit
-integer overflow) for "Find Information req"
+Step1> Build Bluez5.30 with --enable-experimental and --enable-maintainer-mode.
+Step2> Ran Bluetoothd with -E option as below:
+root@imx28evk:~ # /usr/lib/bluez5/bluetooth/bluetoothd -d -n -E &
+Output:
+	http://pastebin.com/eALijggh
+Snippet:
+...
+bluetoothd[462]: src/gatt-database.c:gatt_db_service_added() GATT Service added to local database
+bluetoothd[462]: src/advertising.c:btd_advertising_manager_new() LE Advertising Manager created for adapter: /org/bluez/hci0
+bluetoothd[462]: profiles/audio/a2dp.c:media_server_probe() path /org/bluez/hci0
+bluetoothd[462]: plugins/hostname.c:hostname_probe()
+bluetoothd[462]: Not enough free handles to register service
+bluetoothd[462]: plugins/gatt-example.c:gatt_example_adapter_probe() Battery service could not be registered
+bluetoothd[462]: gatt-example-adapter-driver: Input/output error (5)	// Not sure if this restricts GATT Service to be registered				
+...
+bluetoothd[462]: src/adapter.c:new_settings_callback() Settings: 0x000026f0
+bluetoothd[462]: src/adapter.c:settings_changed() Changed settings: 0x0000000a
 
-desc_start = chrc_data->value_handle + 1;
+Step3> Ran gatt-service:
+root@imx28evk:~/tools# ./gatt-service 
+gatt-service unique name: :1.4
+Registered service: /service1
+Get UUID: 00001802-0000-1000-8000-00805f9b34fb
+Exist Includes: 00001802-0000-1000-8000-00805f9b34fb
+Characteristic(00002a06-0000-1000-8000-00805f9b34fb): Get("Value")
+Descriptor(8260c653-1a54-426b-9e36-e84c238bc669): Get("Value")
+RegisterService: Method "RegisterService" with signature "oa{sv}" on interface "org.bluez.GattManager1" doesn't exist
 
- Consequence:  Below request will be sent,
-        ATT: Find Information req (0x04)
-        start 0x0000, end 0xffff
+I am using the Dbus config from http://git.kernel.org/cgit/bluetooth/bluez.git/tree/src/bluetooth.conf. 
 
-        and below will be the proper response from the remote device
-        ATT: Error (0x01)
-        Error: Invalid handle (1)
-        Find Information req (0x04) on handle 0x0000
----
- src/shared/gatt-client.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Any idea why it fails to register the service? Do I need to enable other features or if there is any missing steps?
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 7bc3b71..9b944ee 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -601,13 +601,13 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
- 							chrc_data->value_handle)
- 			goto failed;
- 
--		desc_start = chrc_data->value_handle + 1;
--
--		if (desc_start > chrc_data->end_handle) {
-+		if (chrc_data->value_handle >= chrc_data->end_handle) {
- 			free(chrc_data);
- 			continue;
- 		}
- 
-+		desc_start = chrc_data->value_handle + 1;
-+
- 		client->discovery_req = bt_gatt_discover_descriptors(
- 							client->att, desc_start,
- 							chrc_data->end_handle,
--- 
-1.7.9.5
-
+Thank you,
+Regards,
+Ankur.
