@@ -1,54 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH 2/2] Bluetooth: btusb: Add support for 0cf3:e007
+Subject: Re: [PATCH] Bluetooth: Fix potential NULL dereference
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1431488365-24403-2-git-send-email-jesse.sung@canonical.com>
-Date: Wed, 13 May 2015 22:39:16 +0200
+In-Reply-To: <1431519246-8136-1-git-send-email-jaganath.k@samsung.com>
+Date: Wed, 13 May 2015 22:34:34 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F6BC68F8-9FD0-40BD-A0EE-25DEB9B33A23@holtmann.org>
-References: <1431488365-24403-1-git-send-email-jesse.sung@canonical.com> <1431488365-24403-2-git-send-email-jesse.sung@canonical.com>
-To: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+Message-Id: <F204CC62-B13F-4BB1-BC3B-72B613B5B6D6@holtmann.org>
+References: <1431519246-8136-1-git-send-email-jaganath.k@samsung.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jesse,
+Hi Jaganath,
 
-> Device 0cf3:e007 is one of the QCA ROME family.
+> addr can be NULL and it should not be dereferenced before NULL checking.
 > 
-> T:  Bus=01 Lev=01 Prnt=01 Port=05 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=e007 Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
 > ---
-> drivers/bluetooth/btusb.c | 1 +
-> 1 file changed, 1 insertion(+)
+> net/bluetooth/rfcomm/sock.c |    8 +++++---
+> 1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+> index 825e8fb..e576374 100644
+> --- a/net/bluetooth/rfcomm/sock.c
+> +++ b/net/bluetooth/rfcomm/sock.c
+> @@ -336,14 +336,16 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
+> {
+> 	struct sockaddr_rc *sa = (struct sockaddr_rc *) addr;
+> 	struct sock *sk = sock->sk;
+> -	int chan = sa->rc_channel;
+> +	int chan;
+> 	int err = 0;
+> 
+> -	BT_DBG("sk %p %pMR", sk, &sa->rc_bdaddr);
+> -
+> 	if (!addr || addr->sa_family != AF_BLUETOOTH)
+> 		return -EINVAL;
+> 
+> +	BT_DBG("sk %p %pMR", sk, &sa->rc_bdaddr);
+> +
+> +	chan = sa->rc_channel;
+> +
 
-patch has been applied to bluetooth tree.
+if we start changing things here, then we better change the code into something that all the other socket handling code is doing anyway. So do the min comparison and copy the data into a local copy of the sockaddr_rc.
+
+And on a side note, I wonder if addr can actually be NULL. It might be interesting to check the generic socket code if this really can happen if you provide no address structure to the bind() system call or if this gets filtered out by the core socket code.
 
 Regards
 
