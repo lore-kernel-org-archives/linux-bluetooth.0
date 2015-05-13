@@ -1,53 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] android/pts: Update BNEP PTS 6.0 results for android 5.0
-Date: Wed, 13 May 2015 16:45:02 +0200
-Message-ID: <5245500.732iXbM3q3@leonov>
-In-Reply-To: <1428930887-25519-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1428930887-25519-1-git-send-email-grzegorz.kolodziejczyk@tieto.com> <1428930887-25519-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Message-ID: <55535B6B.9080509@linux.intel.com>
+Date: Wed, 13 May 2015 16:10:51 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] Bluetooth: btbcm: Add BCM4324B3 UART device
+References: <1431008699-6419-1-git-send-email-frederic.danis@linux.intel.com> <1431008699-6419-2-git-send-email-frederic.danis@linux.intel.com> <332D4EB4-3FCB-4CE4-9BF1-6156FA267227@holtmann.org>
+In-Reply-To: <332D4EB4-3FCB-4CE4-9BF1-6156FA267227@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hello Marcel,
 
-On Monday 13 of April 2015 15:14:47 Grzegorz Kolodziejczyk wrote:
-> This patch updates BNEP PTS 6.0 results for android 5.0 witch added
-> support for handling extension headers of BNEP control frames.
-> ---
->  android/pts-bnep.txt | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/android/pts-bnep.txt b/android/pts-bnep.txt
-> index 91ef1c5..42f6438 100644
-> --- a/android/pts-bnep.txt
-> +++ b/android/pts-bnep.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for BNEP
-> 
->  PTS version: 6.0
-> -Tested: 12-March-2015
-> +Tested: 09-April-2015
->  Android version: 5.0
->  Kernel version: 3.20
-> 
-> @@ -33,8 +33,7 @@ TC_CTRL_BV_09_C		PASS	bneptest -c <PTS addr> -b 
-<bridge>
-> -n <iface> -j ff:ff:ff:ff:ff:ff -y 1
->  TC_CTRL_BV_10_C		PASS	PTS issue #13169
->  				bneptest -s -b <bridge> -n <iface>
-> -TC_CTRL_BV_19_C		INC	JIRA #BA-343
-> -				bneptest -s -b <bridge> -n <iface>
-> +TC_CTRL_BV_19_C		PASS	bneptest -s -b <bridge> -n <iface>
->  TC_RX_TYPE_0_BV_11_C	PASS	bneptest -s -b <bridge> -n <iface>
->  TC_RX_C_BV_12_C		PASS	bneptest -s -b <bridge> -n <iface>
->  TC_RX_C_S_BV_13_C	PASS	bneptest -s -b <bridge> -n <iface>
+On 07/05/2015 18:19, Marcel Holtmann wrote:
+> Hi Fred,
+>
+> you might want to add a commit message. I dislike patches without commit messages. Explain what you are doing and why.
 
-This patch is now applied, thanks.
+OK
+
+>> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+>> ---
+>> drivers/bluetooth/btbcm.c | 7 +++++++
+>> 1 file changed, 7 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+>> index 5635d6d..b258454 100644
+>> --- a/drivers/bluetooth/btbcm.c
+>> +++ b/drivers/bluetooth/btbcm.c
+>> @@ -33,6 +33,7 @@
+>> #define VERSION "0.1"
+>>
+>> #define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
+>> +#define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
+>
+> So you have hardware that comes up with this default address? No matter what hardware you pick?
+
+On a t100, before firmware upload I get a random address, changing at 
+each reboot. After firmware upload, I always get this address which 
+seems to be hard-coded in firmware file.
+
+>>
+>> int btbcm_check_bdaddr(struct hci_dev *hdev)
+>> {
+>> @@ -71,6 +72,10 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+>> 		BT_INFO("%s: BCM: Using default device address (%pMR)",
+>> 			hdev->name, &bda->bdaddr);
+>> 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+>> +	} else if (!bacmp(&bda->bdaddr, BDADDR_BCM4324B3)) {
+>
+>> +		BT_INFO("%s: BCM: Using default device address (%pMR)",
+>> +			hdev->name, &bda->bdaddr);
+>> +		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+>
+> Just check for !bacmp || !bacmp instead of else if. No need to duplicate the error message and the quirk setting.
+
+OK
+
+>> 	}
+>>
+>> 	kfree_skb(skb);
+>> @@ -251,6 +256,7 @@ static const struct {
+>> 	const char *name;
+>> } bcm_uart_subver_table[] = {
+>> 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
+>> +	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
+>> 	{ }
+>
+> Please also send userspace patches for adding this entry to the table.
+
+OK, I will send a patch for monitor/packet.c.
+
+>> };
+>>
+>> @@ -305,6 +311,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+>>
+>> 	switch ((rev & 0xf000) >> 12) {
+>> 	case 0:
+>> +	case 3:
+>> 		for (i = 0; bcm_uart_subver_table[i].name; i++) {
+>> 			if (subver == bcm_uart_subver_table[i].subver) {
+>> 				hw_name = bcm_uart_subver_table[i].name;
+
+Regards
+
+Fred
 
 -- 
-BR
-Szymon Janc
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
