@@ -1,84 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
+From: Ankur Patel <ankur@embertec.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Michael Janssen <jamuraa@google.com>
+Date: Wed, 13 May 2015 09:43:42 +0930
+Subject: RE: Issue with Add Advertisement and Bonding Procedure
+Message-ID: <BD5E516FF3711A41B93DC005170007BB010D943FDB37@EMBSVR01.ember.local>
+References: <BD5E516FF3711A41B93DC005170007BB010D943FDA25@EMBSVR01.ember.local>
+ <CAJLTA8gaxn4qt-U7Rmud7NPA=HXysMVw0hTqNkysbfrGPc25Fw@mail.gmail.com>
+In-Reply-To: <CAJLTA8gaxn4qt-U7Rmud7NPA=HXysMVw0hTqNkysbfrGPc25Fw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Date: Tue, 12 May 2015 18:16:11 -0700
-Message-ID: <CADxtLgRDc_=Y7EiXRUd=26LOZznueAhsxc+YZTE3eMzb+19vcA@mail.gmail.com>
-Subject: BLE device advertised manufacturer data cached?
-From: Tony DiCola <tony@tonydicola.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Kevin Townsend <kevin@ktownsend.com>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all, I'm playing with the latest bluez 5.30 and bluetooth low
-energy devices and am noticing that the manufacturer data field from a
-device's advertisement data appears to be cached somewhere internally.
-I wanted to check if this was expected and see if there was any way to
-disable that caching or work around getting back stale manufacturer
-data.
-
-For some context I'm using bluez 5.30's dbus API and applied these
-patches to make the gatt support non-experimental (so I can run
-bluetoothd without the --experimental flag):
-  https://chromium.googlesource.com/chromiumos/third_party/bluez/+/2b3a91a12c86a5708329edf58d0cea237f319f6f%5E%21/#F0
-  https://chromium.googlesource.com/chromiumos/third_party/bluez/+/5755965a9944f158dd8aba63655f2b0a414a1f49%5E%21/#F0
-However I've also tried it with the stock 5.30 code and the
---experimental flag and see the same results.
-
-For my device I'm using a Nordic nRF51822-based board that I have
-control over the firmware and am using it to send custom advertisement
-data for my device.  In my advertisement data I'm sending manufacturer
-data that looks like this: 0x07FFFFFF00000001.  This breaks down as
-the length of the advertisement section (0x07 bytes), the manufacturer
-data advertisement type (0xFF), the testing manufacturer ID (0xFFFF),
-and then 4 bytes with a value of 1 (0x00000001).
-
-I see when I enable scanning on an adapter that a device object is
-created for my device in bluez's dbus hiearchy.  It has a
-ManufacturerData field that looks just like what my advertisement
-sends, for example here's the output of the device's dbus tree (using
-python):
-
-[ /org/bluez/hci0/dev_C5_25_55_09_6A_B1 ]
-    org.bluez.Device1
-      Name = UART
-      Paired = 0
-      Adapter = /org/bluez/hci0
-      LegacyPairing = 0
-      Alias = UART
-      ManufacturerData = dbus.Dictionary({dbus.UInt16(65535):
-dbus.Array([dbus.Byte(0), dbus.Byte(0), dbus.Byte(0), dbus.Byte(1)],
-signature=dbus.Signature('y'), variant_level=1)},
-signature=dbus.Signature('qv'), variant_level=1)
-      Connected = 0
-      UUIDs = dbus.Array([], signature=dbus.Signature('s'), variant_level=1)
-      Address = C5:25:55:09:6A:B1
-      Trusted = 0
-      Blocked = 0
-
-Everything looks great and the manufacturer data is parsed out as I
-expect.  However the problem is when I have the nRF51822 change the
-advertised manufacturer data.  For example if I change to
-0x07FFFFFF00000002 (so the last 4 bytes change to 0x00000002) I'm not
-seeing the updated value in bluez's dbus hierarchy.  When I query the
-device object's ManufacturerData property I still see the old value
-that ends in 1.  Even if I sit in a loop querying the value every
-second for over a minute I still don't see the updated value (for
-reference the nRF51822 is advertising this updated value every
-second).
-
-I do notice that if I remove the device from bluez's dbus hiearchy (by
-getting its parent adapter and calling RemoveDevice on it) then I do
-see the device added back with the current/updated ManufacturerData
-property.  This makes me think there's something up with the
-manufacturer data field getting cached or never being updated.
-
-I wanted to check is this expected behavior, that the manufacturer
-data property won't be updated when it changes?  If so is there any
-clean way to disable this caching or get access to the most recently
-seen/up to date manufacturer data field?
-
-Let me know if anything isn't clear or if perhaps I'm doing something
-completely wrong.  Thanks!
-
--Tony
+PiBIaSBBbmt1ciwNCj4gDQo+IE9uIFR1ZSwgTWF5IDEyLCAyMDE1IGF0IDI6MjMgQU0sIEFua3Vy
+IFBhdGVsIDxhbmt1ckBlbWJlcnRlYy5jb20+DQo+IHdyb3RlOg0KPiA+IEhlbGxvIEZvbGtzLA0K
+PiA+DQo+ID4gQmFjayB3aXRoIHNvbWUgbW9yZSBxdWVzdGlvbnMuIEkgZGlkIHRyaWVkIGdvb2ds
+aW5nIGJ1dCBjb3VsZG4ndCBhYmxlIHRvDQo+IGZpbmQgbXVjaCBpbmZvIG9uICdidG1nbXQnIHRv
+b2wgaGVuY2Ugc2hhcmluZyBpc3N1ZXMuDQo+ID4NCj4gPiBSYW4gYmVsb3cgY29tbWFuZHMgdG8g
+U2V0dXAgdGhlIGRldmljZSAoQWxsIHdlbnQgR29vZCk6DQo+ID4gYnRtZ210IG5hbWUgdGVzdGJ0
+DQo+ID4gYnRtZ210IHByaXZhY3kgb24NCj4gPiBidG1nbXQgbGUgb24NCj4gPiBidG1nbXQga2V5
+cyBvbg0KPiA+IGJ0bWdtdCBsdGtzIG9mZg0KPiA+IGJ0bWdtdCBpcmtzDQo+ID4gYnRtZ210IGNv
+bm5lY3RhYmxlIG9uDQo+ID4gYnRtZ210IGJvbmRhYmxlIG9uDQo+ID4gYnRtZ210IHBhaXJhYmxl
+IG9uDQo+ID4gYnRtZ210IGRpc2NvdiBvbg0KPiA+IGJ0bWdtdCBhZHZlcnRpc2luZyBvbg0KPiA+
+IGJ0bWdtdCBmYXN0LWNvbm4gb24NCj4gPiBidG1nbXQgbGlua3NlYyBvbg0KPiA+IGJ0bWdtdCBw
+b3dlciBvbg0KPiA+DQo+ID4gRmFpbGVkIHRvIEFkZCBBZHZlcnRpc2VtZW50DQo+ID4gLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ID4NCj4gPiByb290QGlteDI4ZXZrOn4v
+dG9vbHMjIGJ0bWdtdCBpbmZvDQo+ID4gSW5kZXggbGlzdCB3aXRoIDEgaXRlbQ0KPiA+IGhjaTA6
+ICAgUHJpbWFyeSBjb250cm9sbGVyDQo+ID4gICAgICAgICBhZGRyIDFDOkJBOjhDOjg2OjgxOjIx
+IHZlcnNpb24gNiBtYW51ZmFjdHVyZXIgMTMgY2xhc3MgMHgwMDAwMDANCj4gPiAgICAgICAgIHN1
+cHBvcnRlZCBzZXR0aW5nczogcG93ZXJlZCBjb25uZWN0YWJsZSBmYXN0LWNvbm5lY3RhYmxlDQo+
+IGRpc2NvdmVyYWJsZSBib25kYWJsZSBsaW5rLXNlY3VyaXR5IHNzcCBici9lZHIgaHMgbGUgYWR2
+ZXJ0aXNpbmcgZGVidWcta2V5cw0KPiBwcml2YWN5DQo+ID4gICAgICAgICBjdXJyZW50IHNldHRp
+bmdzOiBwb3dlcmVkIGNvbm5lY3RhYmxlIGZhc3QtY29ubmVjdGFibGUgZGlzY292ZXJhYmxlDQo+
+IGJvbmRhYmxlIGxpbmstc2VjdXJpdHkgc3NwIGJyL2VkciBocyBsZSBhZHZlcnRpc2luZyBkZWJ1
+Zy1rZXlzIHByaXZhY3kNCj4gPiAgICAgICAgIG5hbWUgdGVzdGJ0DQo+ID4gICAgICAgICBzaG9y
+dCBuYW1lDQo+ID4NCj4gPiAvLyBTdGFydGluZyBHYXR0IFNlcnZpY2UNCj4gPiByb290QGlteDI4
+ZXZrOn4vdG9vbHMjIC4vZ2F0dC1zZXJ2aWNlICYgZ2F0dC1zZXJ2aWNlIHVuaXF1ZSBuYW1lOiA6
+MS42DQo+ID4gUmVnaXN0ZXJlZCBzZXJ2aWNlOiAvc2VydmljZTEgR2V0IFVVSUQ6DQo+ID4gMDAw
+MDE4MDItMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiDQo+ID4gRXhpc3QgSW5jbHVkZXM6IDAw
+MDAxODAyLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPiA+IENoYXJhY3RlcmlzdGljKDAw
+MDAyYTA2LTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYik6IEdldCgiVmFsdWUiKQ0KPiA+IERl
+c2NyaXB0b3IoODI2MGM2NTMtMWE1NC00MjZiLTllMzYtZTg0YzIzOGJjNjY5KTogR2V0KCJWYWx1
+ZSIpDQo+ID4NCj4gPiAvLyBBZGRpbmcgQWR2ZXJ0aXNlbWVudCBidXQgRmFpbHMNCj4gPiByb290
+QGlteDI4ZXZrOn4vdG9vbHMjIGJ0bWdtdCBhZGQtYWR2IC11IDE4MGQgLXUgMTgwZiAtZA0KPiA+
+IDA5MDk1NDY1NzM3NDIwNEM0NTA1RkZFMDAwMDEwMiAxIEFkZCBBZHZlcnRpc2luZyBmYWlsZWQg
+d2l0aCBzdGF0dXMNCj4gPiAweDAxIChVbmtub3duIENvbW1hbmQpDQo+ID4NCj4gPiBJIGFtIHN1
+cmUgSSBhbSBtaXNzaW5nIHNvbWV0aGluZyB0byBhZGQgYWR2ZXJ0aXNlbWVudC4gQ2FuIGFueW9u
+ZSBzaGFyZQ0KPiBob3cgdG8gYWRkIGFkdmVydGlzZW1lbnQ/DQo+IA0KPiBUaGlzIHVzdWFsbHkg
+bWVhbnMgdGhhdCB5b3VyIGtlcm5lbCBkb2VzIG5vdCBoYXZlIHN1cHBvcnQgZm9yIHRoZSBBZGQN
+Cj4gQWR2ZXJ0aXNlbWVudCBNR01UIGNvbW1hbmQsIHdoaWNoIHJlY2VudGx5IGdvdCBhZGRlZCBj
+dXJyZW50bHkgaW4NCj4gbWFpbmxpbmUgTGludXggNC4xIHJjIGtlcm5lbHMgYnV0IG5vdCA0LjAu
+DQoNClRoYW5rIHlvdSBNaWNoYWVsIGZvciB5b3VyIGtpbmQgcmVzcG9uc2UuIFdlIGFscmVhZHkg
+cG9ydGVkIG91ciBrZXJuZWwgZnJvbSAzLjEwICB0byAzLjE4IHRvIGdldCB0aGUgbWdtdC4gc3Vw
+cG9ydCBhbmQgaXQgd2lsbCBiZSB0b3VnaCB0byBtaWdyYXRlIG9uZSBtb3JlIHRpbWUuIFRoZW4g
+aXMgdGhlcmUgYW55IHdheSB0byBhZGQgYWR2ZXJ0aXNlbWVudCBhcGFydCBmcm9tIHVzaW5nIA0K
+J2hjaWNvbmZpZycgYW5kICdoY2l0b29sJyA/DQo+IA0KPiA+IFRlc3QgY2FzZTogVENfQ09OTl9H
+Q0VQX0JWXzAzX0MNCj4gPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLQ0KPiA+IFBUUyBBZGRyZXNzOiAgICAgICAgMDA6MUI6REM6MDc6MkU6ODUNCj4gPg0K
+PiA+IFJhbiBiZWxvdyBjb21tYW5kIG9uIGRldmljZSBiZWZvcmUgcnVubmluZyB0aGUgdGVzdDoN
+Cj4gPg0KPiA+IHJvb3RAaW14Mjhldms6fi90b29scyMgYnRtZ210IGluZm8NCj4gPiBJbmRleCBs
+aXN0IHdpdGggMSBpdGVtDQo+ID4gaGNpMDogICBQcmltYXJ5IGNvbnRyb2xsZXINCj4gPiAgICAg
+ICAgIGFkZHIgMUM6QkE6OEM6ODY6ODE6MjEgdmVyc2lvbiA2IG1hbnVmYWN0dXJlciAxMyBjbGFz
+cyAweDAwMDAwMA0KPiA+ICAgICAgICAgc3VwcG9ydGVkIHNldHRpbmdzOiBwb3dlcmVkIGNvbm5l
+Y3RhYmxlIGZhc3QtY29ubmVjdGFibGUNCj4gZGlzY292ZXJhYmxlIGJvbmRhYmxlIGxpbmstc2Vj
+dXJpdHkgc3NwIGJyL2VkciBocyBsZSBhZHZlcnRpc2luZyBkZWJ1Zy1rZXlzDQo+IHByaXZhY3kN
+Cj4gPiAgICAgICAgIGN1cnJlbnQgc2V0dGluZ3M6IHBvd2VyZWQgY29ubmVjdGFibGUgZmFzdC1j
+b25uZWN0YWJsZSBkaXNjb3ZlcmFibGUNCj4gYm9uZGFibGUgbGluay1zZWN1cml0eSBzc3AgYnIv
+ZWRyIGhzIGxlIGFkdmVydGlzaW5nIGRlYnVnLWtleXMgcHJpdmFjeQ0KPiA+ICAgICAgICAgbmFt
+ZSB0ZXN0YnQNCj4gPiAgICAgICAgIHNob3J0IG5hbWUNCj4gPiByb290QGlteDI4ZXZrOn4vdG9v
+bHMjIGJ0bWdtdCBrZXlzIG9uDQo+ID4gS2V5cyBzdWNjZXNzZnVsbHkgbG9hZGVkDQo+ID4gcm9v
+dEBpbXgyOGV2azp+L3Rvb2xzIyBidG1nbXQgbHRrcyBvZmYgTG9uZyB0ZXJtIGtleXMgc3VjY2Vz
+c2Z1bGx5DQo+ID4gbG9hZGVkDQo+IA0KPiBUaGUga2V5cyBhbmQgbHRrcyBjb21tYW5kcyBvZiBi
+dG1nbXQgZG9uJ3QgdGFrZSBhbiBhcmd1bWVudCwgc28gdGhlICJvZmYiDQo+IGFuZCAib24iIGRv
+ZXNuJ3QgZG8gYW55dGhpbmcgaGVyZS4uICBJdCB3aWxsIGFsd2F5cyBsb2FkIHRoZSBrZXlzLg0K
+PiANCkkgZ290IHlvdXIgcG9pbnQuIEJ1dCBzdGlsbCBJIGRpZG7igJl0IGdldCBhbnkgaWRlYSB3
+aHkgdGhpcyB0ZXN0IGZhaWxzIG9yIHdoYXQgaXMgbWlzc2luZz8NCj4gPiByb290QGlteDI4ZXZr
+On4vdG9vbHMjIGJ0bWdtdCBpcmtzDQo+ID4gSWRlbnRpdHkgUmVzb2x2aW5nIEtleXMgc3VjY2Vz
+c2Z1bGx5IGxvYWRlZA0KPiA+DQo+ID4gU3RlcDEpIFJ1biB0aGUgdGVzdGNhc2UgZnJvbSBQVFMg
+Z3VpLg0KPiA+IFN0ZXAyKSBJdCBjb21lcyB3aXRoIHBvcHVwOiAiUGxlYXNlIHNlbmQgY29ubmVj
+dCByZXF1ZXN0IHRvIGVzdGFibGlzaCBhDQo+IGNvbm5lY3Rpb24iDQo+ID4gU3RlcDMpIFJhbiBi
+ZWxvdyBjb21tYW5kIG9uIERldmljZToNCj4gPg0KPiA+ICAgICAgICAgcm9vdEBpbXgyOGV2azp+
+L3Rvb2xzIyBidG1nbXQgYWRkLWRldmljZSAtYSAweDEgIC10IDB4MDENCj4gMDA6MUI6REM6MDc6
+MkU6ODUNCj4gPiAgICAgICAgIEFkZGluZyBkZXZpY2Ugd2l0aCAwMDoxQjpEQzowNzoyRTo4NSAo
+TEUgUHVibGljKQ0KPiA+DQo+ID4gICAgICAgICByb290QGlteDI4ZXZrOn4vdG9vbHMjIGJ0bWdt
+dCBwYWlyIC1jIDB4MDMgLXQgMHgwMSAwMDoxQjpEQzowNzoyRTo4NQ0KPiA+ICAgICAgICAgUGFp
+cmluZyB3aXRoIDAwOjFCOkRDOjA3OjJFOjg1IChMRSBQdWJsaWMpDQo+ID4gICAgICAgICBoY2kw
+IDAwOjFCOkRDOjA3OjJFOjg1IHR5cGUgTEUgUHVibGljIGNvbm5lY3RlZCBlaXJfbGVuIDANCj4g
+PiAgICAgICAgIDxXYWl0ZWQgZm9yIDIgbWlucy4gTm90IHJldHVybmVkIHRvIGNvbW1hbmQgcHJv
+bXB0IC0gSGVuY2UgZGlkDQo+ID4gY3RybC1jPg0KPiA+DQo+ID4gICAgICAgICBUaGVuIHJ1biBi
+ZWxvdyBjb21tYW5kIHRvIGNoZWNrIGlmIHRoZSBjb25uZWN0aW9uIGlzIHRoZXJlIG9yIG5vdC4N
+Cj4gPg0KPiA+ICAgICAgICAgcm9vdEBpbXgyOGV2azp+L3Rvb2xzIyBidG1nbXQgY29uDQo+ID4g
+ICAgICAgICAwMDoxQjpEQzowNzoyRTo4NSB0eXBlIExFIFB1YmxpYw0KPiA+DQo+ID4gU3RlcDQp
+IE1lYW53aGlsZSwgb24gUFRTICJDb25uZWN0IHJlcXVlc3QiIFBvcHVwIGRpc2FwcGVhciBhbmQg
+bmV3DQo+IHBvcHVwIGFwcGVhcnMgIlBsZWFzZSBzdGFydCB0aGUgQm9uZGluZyBQcm9jZWR1cmUg
+aW4gYm9uZGFibGUgbW9kZSIgYW5kDQo+IHN0YXlzIGZvcmV2ZXIuDQo+ID4NCj4gPiBPTiBQVFMg
+T3V0cHV0IFdpbmRvdzoNCj4gPiBUZXN0IGNhc2UgOiBUQ19DT05OX0dDRVBfQlZfMDNfQyBzdGFy
+dGVkDQo+ID4gICAgICAgICAtIE1UQzogU3VjY2Vzc2Z1bGx5IHJlY2VpdmVkDQo+IEhDSV9MRV9D
+TEVBUl9XSElURV9MSVNUX0NPTVBMRVRFX0VWRU5ULg0KPiA+ICAgICAgICAgLSBNVEM6IFN1Y2Nl
+c3NmdWxseSByZWNlaXZlZA0KPiBIQ0lfTEVfQUREX0RFVklDRV9UT19XSElURV9MSVNUX0NPTVBM
+RVRFX0VWRU5ULg0KPiA+ICAgICAgICAgLSBNVEM6IExFIGJvbmRhYmxlIG1vZGUgc3VjY2Vzc2Z1
+bGx5IHNldC4NCj4gPiAgICAgICAgIC0gTVRDOiBTdWNjZXNzZnVsbHkgcmVjZWl2ZWQNCj4gSENJ
+X0xFX1NFVF9BRFZFUlRJU0lOR19QQVJBTUVURVJTX0NPTVBMRVRFX0VWRU5ULg0KPiA+ICAgICAg
+ICAgLSBNVEM6IFN1Y2Nlc3NmdWxseSByZWNlaXZlZA0KPiBIQ0lfTEVfU0VUX0FEVkVSVElTSU5H
+X0RBVEFfQ09NUExFVEVfRVZFTlQuDQo+ID4gICAgICAgICAtIE1UQzogU3VjY2Vzc2Z1bGx5IHJl
+Y2VpdmVkDQo+IEhDSV9MRV9TRVRfU0NBTl9SRVNQT05TRV9EQVRBX0NPTVBMRVRFX0VWRU5ULg0K
+PiA+ICAgICAgICAgLSBNVEM6IFN1Y2Nlc3NmdWxseSByZWNlaXZlZA0KPiBIQ0lfTEVfU0VUX0FE
+VkVSVElTRV9FTkFCTEVfQ09NTUFORF9DT01QTEVURV9FVkVOVC4NCj4gPiAgICAgICAgIC0gTVRD
+OiBTdWNjZXNzZnVsbHkgcmVjZWl2ZWQgSENJX0xFX0NPTk5FQ1RJT05fQ09NUExFVEVfRVZFTlQu
+DQo+ID4gICAgIDxObyBNb3JlIE91dHB1dD4NCj4gPg0KPiA+IFRoZSBkZXZpY2UgaXMgaW4gYm9u
+ZGFibGUgbW9kZSBiYXNlZCBvbiB0aGUgYnRtZ210IGluZm8gY29tbWFuZA0KPiBvdXRwdXQgYXMg
+YWJvdmUuIFN0aWxsIEkgY291bGRudCBhYmxlIHRvIGZpbmQgd2h5IFBUUyBmYWlscyB0byBzdGFy
+dCBCb25kaW5nDQo+IFByb2NlZHVyZT8gSXMgdGhlcmUgc29tZXRoaW5nIHJlbGF0ZWQgdG8gc3Rv
+cmluZyBvZiB0aGUgbHRrcyBrZXlzPw0KPiA+DQo+ID4gUGxlYXNlIHNoYXJlIHlvdXIgc3VnZ2Vz
+dGlvbnMuDQo+ID4NCj4gPiBUaGFuayB5b3UsDQo+ID4gQW5rdXIuDQo+ID4gLS0NCj4gPiBUbyB1
+bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUNCj4g
+PiBsaW51eC1ibHVldG9vdGgiIGluIHRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9A
+dmdlci5rZXJuZWwub3JnDQo+ID4gTW9yZSBtYWpvcmRvbW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIu
+a2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQo+IA0KPiANCj4gDQo+IC0tDQo+IE0gSmFu
+c3Nlbg0KQXBwcmVjaWF0ZSB5b3VyIHN1Z2dlc3Rpb25zLiANClJlZ2FyZHMsDQpBbmt1cg0K
