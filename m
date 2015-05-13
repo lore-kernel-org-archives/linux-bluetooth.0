@@ -1,80 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update DIS test results
-Date: Wed, 13 May 2015 16:46:32 +0200
-Message-ID: <7999172.G6TBf41jvE@leonov>
-In-Reply-To: <1431413589-19137-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1431413589-19137-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: Re: [PATCH 1/2] android/pts: Update PAN PTS 6.1 results for android 5.1
+Date: Wed, 13 May 2015 16:45:40 +0200
+Message-ID: <3161913.DBqB8O5h5c@leonov>
+In-Reply-To: <1431357454-30227-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1431357454-30227-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+Hi Grzegorz,
 
-On Tuesday 12 of May 2015 08:53:09 Mariusz Skamra wrote:
-> PTS 6.1 and Android 5.1
+On Monday 11 of May 2015 17:17:33 Grzegorz Kolodziejczyk wrote:
+> This patch updates test case list and results for PAN profile against
+> android 5.1.
 > ---
->  android/pics-dis.txt  | 6 +++---
->  android/pixit-dis.txt | 2 +-
->  android/pts-dis.txt   | 6 +++---
->  3 files changed, 7 insertions(+), 7 deletions(-)
+>  android/pics-pan.txt  |  2 +-
+>  android/pixit-pan.txt |  2 +-
+>  android/pts-pan.txt   | 49
+> ++++++++++++++++++++++--------------------------- 3 files changed, 24
+> insertions(+), 29 deletions(-)
 > 
-> diff --git a/android/pics-dis.txt b/android/pics-dis.txt
-> index ed207c8..83f25ce 100644
-> --- a/android/pics-dis.txt
-> +++ b/android/pics-dis.txt
+> diff --git a/android/pics-pan.txt b/android/pics-pan.txt
+> index 73461f5..57863c0 100644
+> --- a/android/pics-pan.txt
+> +++ b/android/pics-pan.txt
 > @@ -1,6 +1,6 @@
->  DIS PICS for the PTS tool.
+>  PAN PICS for the PTS tool.
 > 
 > -PTS version: 6.0
 > +PTS version: 6.1
 > 
 >  * - different than PTS defaults
-> 
-> @@ -14,7 +14,7 @@ Parameter Name	Selected	Description
->  TSPC_DIS_1_1	True		Service supported over BR/EDR (C.1)
->  TSPC_DIS_1_2	True		Service supported over LE (C.1)
->  ---------------------------------------------------------------------------
-> ---- -C.1: Mandatory to support at least one of 1/1 or 1/2.
-> +C.1: Mandatory to support at least one of TSPC_DIS_1_1 or TSPC_DIS_1_2.
->  ---------------------------------------------------------------------------
-> ----
-> 
-> 
-> @@ -35,7 +35,7 @@ TSPC_DIS_2_9	False (*)	IEEE 11073-20601 Regulatory
-> Certification TSPC_DIS_2_10	True		SDP Interoperability (C.1)
->  TSPC_DIS_2_11	True		PnP ID (O)
->  ---------------------------------------------------------------------------
-> ---- -C.1: Mandatory if 1/1 (BR/EDR) is supported, otherwise excluded.
-> +C.1: Mandatory if TSPC_DIS_1_1 (BR/EDR) is supported, otherwise excluded.
->  ---------------------------------------------------------------------------
-> ----
-> 
-> 
-> diff --git a/android/pixit-dis.txt b/android/pixit-dis.txt
-> index 13fe78f..e53532e 100644
-> --- a/android/pixit-dis.txt
-> +++ b/android/pixit-dis.txt
+>  # - not yet implemented/supported
+> diff --git a/android/pixit-pan.txt b/android/pixit-pan.txt
+> index 6c00d27..713646e 100644
+> --- a/android/pixit-pan.txt
+> +++ b/android/pixit-pan.txt
 > @@ -1,6 +1,6 @@
->  DIS PIXIT for the PTS tool.
+>  PAN PIXIT for the PTS tool.
 > 
 > -PTS version: 6.0
 > +PTS version: 6.1
 > 
 >  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-dis.txt b/android/pts-dis.txt
-> index 857a149..c7900fd 100644
-> --- a/android/pts-dis.txt
-> +++ b/android/pts-dis.txt
+>  & - should be set to IUT or PTS Bluetooth/MAC address respectively
+> diff --git a/android/pts-pan.txt b/android/pts-pan.txt
+> index ba4afac..350b84e 100644
+> --- a/android/pts-pan.txt
+> +++ b/android/pts-pan.txt
 > @@ -1,8 +1,8 @@
->  PTS test results for DIS
+>  PTS test results for PAN
 > 
 > -PTS version: 6.0
-> -Tested: 22-January-2015
+> -Tested: 17-February-2015
 > -Android version: 5.0
 > +PTS version: 6.1
 > +Tested: 11-May-2015
@@ -82,8 +64,75 @@ On Tuesday 12 of May 2015 08:53:09 Mariusz Skamra wrote:
 > 
 >  Results:
 >  PASS	test passed
+> @@ -11,7 +11,7 @@ INC	test is inconclusive
+>  N/A	test is disabled due to PICS setup
+> 
+>  ---------------------------------------------------------------------------
+> ----- -Test Name				Result	Notes
+> +Test Name					Result	Notes
+>  ---------------------------------------------------------------------------
+> ----- TC_BNEP_BROADCAST_0_BV_01_C			N/A
+>  TC_BNEP_BROADCAST_0_BV_02_C			N/A
+> @@ -39,38 +39,33 @@ TC_BNEP_FILTER_BV_14_C_TESTER_2			N/A
+>  TC_BNEP_FILTER_BV_15_C_TESTER_1			N/A
+>  TC_BNEP_FILTER_BV_15_C_TESTER_2			N/A
+>  TC_BRIDGE_TX_BV_01_I				PASS
+> -TC_BRIDGE_RX_BV_02_I				PASS
+> -						To initiate general ethernet
+> -						use for e.g. ping.
+> -TC_IPv4_AUTONET_BV_01_I				PASS
+> -						To initiate general ethernet
+> -						use for e.g. ping.
+> +TC_BRIDGE_RX_BV_02_I				PASS	To initiate general
+> +							ethernet use for e.g.
+> +							ping.
+> +TC_IPv4_AUTONET_BV_01_I				PASS	To initiate general
+> +							ethernet use for e.g.
+> +							ping.
+>  TC_IPv6_AUTONET_BV_02_I				N/A
+>  TC_IP_DHCP_BV_03_I				PASS
+>  TC_IP_LLMNR_BV_01_I				N/A
+>  TC_IP_LLMNR_BV_02_I				N/A
+>  TC_IP_DNS_BV_01_I				N/A
+> -TC_IP_APP_BV_03_I				ip neighbour add <PTS IP addr>
+> -							lladdr <PTS HW addr>
+> -							dev bt-pan
+> -						ping -c 1 <PTS IP addr>
+> -						Note: Add ARP record if bt-pan
+> -							connection is
+> -							established
+> -TC_IP_APP_BV_05_I				ip neighbour add <PTS IP addr>
+> -							lladdr <PTS HW addr>
+> -							dev bt-pan
+> -						Note: Add of ARP record should
+> -							be done immediately
+> -							after establish of
+> -							bt-pan, because PTS
+> -							treat other than ICMP
+> -							frames as error.
+> +TC_IP_APP_BV_03_I				N/A
+> +TC_IP_APP_BV_05_I				INC	PTS issue #13436
+> +							ip neighbour add
+> +							<PTS IP addr> lladdr
+> +							<PTS HW addr> dev bt-pan
+> +							Note: ARP record should
+> +							be add immediately after
+> +							establish of bt-pan,
+> +							because PTS treat other
+> +							than ICMP frames as
+> +							error.
+>  TC_MISC_ROLE_BV_01_C				N/A
+>  TC_MISC_ROLE_BV_02_C				N/A
+>  TC_MISC_UUID_BV_01_C				PASS
+>  TC_MISC_UUID_BV_02_C				PASS
+>  TC_SDP_NAP_BV_01_C				PASS
+>  TC_SDP_GN_BV_01_C				N/A
+> -TC_SDP_PANU_BV_01_C				PASS
+> +TC_SDP_PANU_BV_01_C				N/A
+>  ---------------------------------------------------------------------------
+> -----
 
-Applied, thanks.
+Both patches applied, thanks.
 
 -- 
 BR
