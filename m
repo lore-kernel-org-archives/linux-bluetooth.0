@@ -1,96 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: John Carter <john.carter@taitradio.com>
-Date: Wed, 13 May 2015 15:50:29 +1200
-Message-ID: <CAFD1m3E73juA0LTUWq7-rt2W0OxdGy7cONMv2e5VRs5zsg_rww@mail.gmail.com>
-Subject: Arm compilation error in tools/test-runner.c error: impossible
- constraint in 'asm'
+From: Wen-chien Jesse Sung <jesse.sung@canonical.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH 2/2] Bluetooth: btusb: Add support for 0cf3:e007
+Date: Wed, 13 May 2015 11:39:25 +0800
+Message-Id: <1431488365-24403-2-git-send-email-jesse.sung@canonical.com>
+In-Reply-To: <1431488365-24403-1-git-send-email-jesse.sung@canonical.com>
+References: <1431488365-24403-1-git-send-email-jesse.sung@canonical.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Building bluez out of git within OpenEmbedded for ARM results in the
-following compilation "error impossible constraint in 'asm'"
+Device 0cf3:e007 is one of the QCA ROME family.
 
-arm-poky-linux-gnueabi-gcc  -march=armv7-a -marm -mthumb-interwork
--mfloat-abi=hard -mfpu=neon -mtune=cortex-a8
---sysroot=/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex
--DHAVE_CONFIG_H -I.  -I./lib
--I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/include/dbus-1.0
--I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/lib/dbus-1.0/include
- -I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/include/glib-2.0
--I/home/johnc/tt/ViciaHeinox/build/tmp/sysroots/trex/usr/lib/glib-2.0/include
-  -O2 -pipe -g -feliminate-unused-debug-types -c -o
-tools/test-runner.o tools/test-runner.c
+T:  Bus=01 Lev=01 Prnt=01 Port=05 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e007 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
+Signed-off-by: Wen-chien Jesse Sung <jesse.sung@canonical.com>
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-| tools/test-runner.c: In function 'start_qemu':
-| tools/test-runner.c:224:2: error: impossible constraint in 'asm'
-|   __asm__ __volatile__("cpuid" : "=c" (ecx) : "a" (1) : "memory");
-|   ^
-
-
-I believe this was introduced with this commit....
-
-commit a0a03828fbc49db9f0926cee87d53d627d69bac2
-Author: Marcel Holtmann <marcel@holtmann.org>
-Date:   Mon Apr 6 20:45:39 2015 -0700
-
-    tools: Add fallback if KVM support is not available
-
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 407a985..163b610 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -195,7 +195,7 @@ static char *const qemu_argv[] = {
-        "-no-user-config",
-        "-monitor", "none",
-        "-display", "none",
--       "-machine", "type=q35,accel=kvm",
-+       "-machine", "type=q35,accel=kvm:tcg",
-        "-m", "192M",
-        "-nographic",
-        "-vga", "none",
-@@ -215,6 +215,16 @@ static char *const qemu_envp[] = {
-        NULL
- };
-
-+static void check_virtualization(void)
-+{
-+       uint32_t ecx;
-+
-+       __asm__ __volatile__("cpuid" : "=c" (ecx) : "a" (1) : "memory");
-+
-+       if (!!(ecx & (1 << 5)))
-+               printf("Found support for Virtual Machine eXtensions\n");
-+}
-+
-
-
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index d4e9127..cf8276e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -217,6 +217,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe03c), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* QCA ROME chipset */
++	{ USB_DEVICE(0x0cf3, 0xe007), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
+ 
 -- 
-John Carter
-Phone : (64)(3) 358 6639
-Tait Electronics
-PO Box 1645 Christchurch
-New Zealand
+2.1.4
 
--- 
-
-------------------------------
-This email, including any attachments, is only for the intended recipient. 
-It is subject to copyright, is confidential and may be the subject of legal 
-or other privilege, none of which is waived or lost by reason of this 
-transmission.
-If you are not an intended recipient, you may not use, disseminate, 
-distribute or reproduce such email, any attachments, or any part thereof. 
-If you have received a message in error, please notify the sender 
-immediately and erase all copies of the message and any attachments.
-Unfortunately, we cannot warrant that the email has not been altered or 
-corrupted during transmission nor can we guarantee that any email or any 
-attachments are free from computer viruses or other conditions which may 
-damage or interfere with recipient data, hardware or software. The 
-recipient relies upon its own procedures and assumes all risk of use and of 
-opening any attachments.
-------------------------------
