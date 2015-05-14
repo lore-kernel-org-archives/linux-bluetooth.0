@@ -1,32 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 14 May 2015 17:49:21 -0700
-Message-ID: <CAHgsZ+i5rBNk8dPOzEHhJ8UVVezxNYZBsbTtrCSJqBmaZ1VcNA@mail.gmail.com>
-Subject: [A2DP] - Try to write audio data to L2CAP socket and receive EAGAIN
- as return after scanning starts.
-From: Miao-chen Chou <mcchou@google.com>
+From: Marie Janssen <jamuraa@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: Marie Janssen <jamuraa@chromium.org>
+Subject: [PATCH BlueZ] Fix name in AUTHORS
+Date: Thu, 14 May 2015 15:38:49 -0700
+Message-Id: <1431643129-37383-1-git-send-email-jamuraa@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When playing with JBL charge 2 speaker, I found that the music
-stutters badly whenever I start scanning, and it goes back to normal
-after the scanning finishes. I am wondering if this is a bug in Bluez,
-so I tried another speaker, Beats Pill, but it turns out that Pill
-plays smoothly even if I start scanning.
+Update Marie's name to be correct.
+---
+ AUTHORS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Speakers:
-- JBL charge 2 (A2DP/HSP/HFP)
-- Beats Pill (A2DP/HSP)
-Since I only use the speakers for audio output, A2DP profile was used.
+diff --git a/AUTHORS b/AUTHORS
+index 3264a36..dc53c08 100644
+--- a/AUTHORS
++++ b/AUTHORS
+@@ -97,4 +97,4 @@ Alex Gal <a.gal@miip.ca>
+ Loic Poulain <loic.poulain@intel.com>
+ Gowtham Anandha Babu <gowtham.ab@samsung.com>
+ Bharat Panda <bharat.panda@samsung.com>
+-Michael Janssen <jamuraa@chromium.org>
++Marie Janssen <jamuraa@chromium.org>
+-- 
+2.2.0.rc0.207.ga3a616c
 
-Somehow L2CAP socket buffer has no space for the outgoing audio data
-during scanning, so I keep getting EAGAIN error. My guess is that the
-previous frames have been accumulated but never been consumed, but who
-is blocking ACL for sending audio data?
-
-Does anyone see this issue before?
-
-Thanks,
--Miao
