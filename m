@@ -1,32 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 1/2] lib/bnep: Update bnep header with BNEPGETSUPPFEAT and setup response
-Date: Thu, 14 May 2015 09:47:09 +0200
-Message-Id: <1431589630-30252-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Ankur Patel <ankur@embertec.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 14 May 2015 17:08:46 +0930
+Subject: RE: Issue with registering GATT Services
+Message-ID: <BD5E516FF3711A41B93DC005170007BB010D943FDECA@EMBSVR01.ember.local>
+References: <BD5E516FF3711A41B93DC005170007BB010D943FDCC9@EMBSVR01.ember.local>
+ <CABBYNZJSZ=2e-sAD2f=01z0jVR4ackd3xoNO1YpVXR9stv6xzQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJSZ=2e-sAD2f=01z0jVR4ackd3xoNO1YpVXR9stv6xzQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch updates bnep header with get bnep supported features ioctl
-and bnep setup response flag.
----
- lib/bnep.h | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/lib/bnep.h b/lib/bnep.h
-index aa46852..e7c2c87 100644
---- a/lib/bnep.h
-+++ b/lib/bnep.h
-@@ -126,6 +126,9 @@ struct bnep_ext_hdr {
- #define BNEPCONNDEL	_IOW('B', 201, int)
- #define BNEPGETCONNLIST	_IOR('B', 210, int)
- #define BNEPGETCONNINFO	_IOR('B', 211, int)
-+#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
-+
-+#define BNEP_SETUP_RESPONSE	0
- 
- struct bnep_connadd_req {
- 	int      sock;		/* Connected socket */
--- 
-2.1.0
-
+PiBIaSBBbmt1ciwNCj4gDQo+IE9uIFdlZCwgTWF5IDEzLCAyMDE1IGF0IDEyOjM5IFBNLCBBbmt1
+ciBQYXRlbCA8YW5rdXJAZW1iZXJ0ZWMuY29tPg0KPiB3cm90ZToNCj4gPiBIaSBGb2xrcywNCj4g
+Pg0KPiA+IEkgYW0gaGF2aW5nIGlzc3VlcyB3aXRoIHJlZ2lzdGVyaW5nIEdBVFQgc2VydmljZXMg
+c3VjY2Vzc2Z1bGx5IG9uIHRoZQ0KPiBkZXZpY2UuDQo+ID4gVXNpbmc6IExpbnV4IEtlcm5lbDog
+My4xOC4xMiBCbHVlejogNS4zMA0KPiA+DQo+ID4gU3RlcDE+IEJ1aWxkIEJsdWV6NS4zMCB3aXRo
+IC0tZW5hYmxlLWV4cGVyaW1lbnRhbCBhbmQgLS1lbmFibGUtDQo+IG1haW50YWluZXItbW9kZS4N
+Cj4gPiBTdGVwMj4gUmFuIEJsdWV0b290aGQgd2l0aCAtRSBvcHRpb24gYXMgYmVsb3c6DQo+ID4g
+cm9vdEBpbXgyOGV2azp+ICMgL3Vzci9saWIvYmx1ZXo1L2JsdWV0b290aC9ibHVldG9vdGhkIC1k
+IC1uIC1FICYNCj4gPiBPdXRwdXQ6DQo+ID4gICAgICAgICBodHRwOi8vcGFzdGViaW4uY29tL2VB
+TGlqZ2doDQo+ID4gU25pcHBldDoNCj4gPiAuLi4NCj4gPiBibHVldG9vdGhkWzQ2Ml06IHNyYy9n
+YXR0LWRhdGFiYXNlLmM6Z2F0dF9kYl9zZXJ2aWNlX2FkZGVkKCkgR0FUVA0KPiA+IFNlcnZpY2Ug
+YWRkZWQgdG8gbG9jYWwgZGF0YWJhc2UNCj4gPiBibHVldG9vdGhkWzQ2Ml06IHNyYy9hZHZlcnRp
+c2luZy5jOmJ0ZF9hZHZlcnRpc2luZ19tYW5hZ2VyX25ldygpIExFDQo+ID4gQWR2ZXJ0aXNpbmcg
+TWFuYWdlciBjcmVhdGVkIGZvciBhZGFwdGVyOiAvb3JnL2JsdWV6L2hjaTANCj4gPiBibHVldG9v
+dGhkWzQ2Ml06IHByb2ZpbGVzL2F1ZGlvL2EyZHAuYzptZWRpYV9zZXJ2ZXJfcHJvYmUoKSBwYXRo
+DQo+ID4gL29yZy9ibHVlei9oY2kwDQo+ID4gYmx1ZXRvb3RoZFs0NjJdOiBwbHVnaW5zL2hvc3Ru
+YW1lLmM6aG9zdG5hbWVfcHJvYmUoKQ0KPiA+IGJsdWV0b290aGRbNDYyXTogTm90IGVub3VnaCBm
+cmVlIGhhbmRsZXMgdG8gcmVnaXN0ZXIgc2VydmljZQ0KPiA+IGJsdWV0b290aGRbNDYyXTogcGx1
+Z2lucy9nYXR0LWV4YW1wbGUuYzpnYXR0X2V4YW1wbGVfYWRhcHRlcl9wcm9iZSgpDQo+IEJhdHRl
+cnkgc2VydmljZSBjb3VsZCBub3QgYmUgcmVnaXN0ZXJlZA0KPiA+IGJsdWV0b290aGRbNDYyXTog
+Z2F0dC1leGFtcGxlLWFkYXB0ZXItZHJpdmVyOiBJbnB1dC9vdXRwdXQgZXJyb3IgKDUpICAgIC8v
+DQo+IE5vdCBzdXJlIGlmIHRoaXMgcmVzdHJpY3RzIEdBVFQgU2VydmljZSB0byBiZSByZWdpc3Rl
+cmVkDQo+ID4gLi4uDQo+ID4gYmx1ZXRvb3RoZFs0NjJdOiBzcmMvYWRhcHRlci5jOm5ld19zZXR0
+aW5nc19jYWxsYmFjaygpIFNldHRpbmdzOg0KPiA+IDB4MDAwMDI2ZjANCj4gPiBibHVldG9vdGhk
+WzQ2Ml06IHNyYy9hZGFwdGVyLmM6c2V0dGluZ3NfY2hhbmdlZCgpIENoYW5nZWQgc2V0dGluZ3M6
+DQo+ID4gMHgwMDAwMDAwYQ0KPiA+DQo+ID4gU3RlcDM+IFJhbiBnYXR0LXNlcnZpY2U6DQo+ID4g
+cm9vdEBpbXgyOGV2azp+L3Rvb2xzIyAuL2dhdHQtc2VydmljZQ0KPiA+IGdhdHQtc2VydmljZSB1
+bmlxdWUgbmFtZTogOjEuNA0KPiA+IFJlZ2lzdGVyZWQgc2VydmljZTogL3NlcnZpY2UxDQo+ID4g
+R2V0IFVVSUQ6IDAwMDAxODAyLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYg0KPiA+IEV4aXN0
+IEluY2x1ZGVzOiAwMDAwMTgwMi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmINCj4gPiBDaGFy
+YWN0ZXJpc3RpYygwMDAwMmEwNi0wMDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIpOiBHZXQoIlZh
+bHVlIikNCj4gPiBEZXNjcmlwdG9yKDgyNjBjNjUzLTFhNTQtNDI2Yi05ZTM2LWU4NGMyMzhiYzY2
+OSk6IEdldCgiVmFsdWUiKQ0KPiA+IFJlZ2lzdGVyU2VydmljZTogTWV0aG9kICJSZWdpc3RlclNl
+cnZpY2UiIHdpdGggc2lnbmF0dXJlICJvYXtzdn0iIG9uDQo+ID4gaW50ZXJmYWNlICJvcmcuYmx1
+ZXouR2F0dE1hbmFnZXIxIiBkb2Vzbid0IGV4aXN0DQo+ID4NCj4gPiBJIGFtIHVzaW5nIHRoZSBE
+YnVzIGNvbmZpZyBmcm9tDQo+IGh0dHA6Ly9naXQua2VybmVsLm9yZy9jZ2l0L2JsdWV0b290aC9i
+bHVlei5naXQvdHJlZS9zcmMvYmx1ZXRvb3RoLmNvbmYuDQo+ID4NCj4gPiBBbnkgaWRlYSB3aHkg
+aXQgZmFpbHMgdG8gcmVnaXN0ZXIgdGhlIHNlcnZpY2U/IERvIEkgbmVlZCB0byBlbmFibGUgb3Ro
+ZXINCj4gZmVhdHVyZXMgb3IgaWYgdGhlcmUgaXMgYW55IG1pc3Npbmcgc3RlcHM/DQo+IA0KPiBJ
+dCBzaG91bGQgd29yayBpZiB5b3UgaGF2ZSAtRSwgYnV0IHBlcmhhcHMgc29tZXRoaW5nIGVsc2Ug
+aXMgbm90IHRoZSBjb3JyZWN0LA0KPiBsaWtlIHRoZSBwYXRoLCBldGMuIEJ0dywgd2UgZG8gaGF2
+ZSBhbiBleGFtcGxlIGhlcmU6DQo+IA0KPiBodHRwczovL2dpdC5rZXJuZWwub3JnL2NnaXQvYmx1
+ZXRvb3RoL2JsdWV6LmdpdC90cmVlL3Rlc3QvZXhhbXBsZS1nYXR0LQ0KPiBzZXJ2ZXINCj4gDQpU
+aGFuayB5b3UgZm9yIGhpZ2hsaWdodGluZy4gSSByYW4gaXQgYW5kIGl0IHdvcmtlZCBnb29kLiBJ
+dCBhYmxlIHRvIHJlZ2lzdGVyIHRoZSBzZXJ2aWNlcyBzdWNjZXNzZnVsbHkuICBCdXQgd2hlbiBJ
+IHJhbiB0aGUgZXhhbXBsZS1nYXR0LWNsaWVudCwgaXQgd2VudCBpbnRvIGJlbG93IGVycm9yOg0K
+DQpFeGFtcGxlLWdhdHQtc2VydmVyIG91dHB1dCBhdDogaHR0cDovL3Bhc3RlYmluLmNvbS92cGhn
+czkyeA0KDQpyb290QGlteDI4ZXZrOn4vdG9vbHMjIHB5dGhvbiBleGFtcGxlLWdhdHQtY2xpZW50
+ICAvb3JnL2JsdWV6L2V4YW1wbGUvc2VydmljZTANCk1ldGhvZCAiR2V0QWxsIiB3aXRoIHNpZ25h
+dHVyZSAicyIgb24gaW50ZXJmYWNlICJvcmcuZnJlZWRlc2t0b3AuREJ1cy5Qcm9wZXJ0aWVzIiBk
+b2Vzbid0IGV4aXN0DQoNCklzIHRoZSBwYXRoIHByb3ZpZGVkIGlzIGNvcnJlY3Q/IEkgaGF2ZSBh
+IGRvdWJ0LiAgRW5kIG91dHB1dCBpcyBJIHdhbnQgdG8gcmVnaXN0ZXIgcHJpbWFyeS9zZWNvbmRh
+cnkgc2VydmljZXMuIA0KDQpUaGFuayB5b3UsDQpBbmt1ci4NCj4gLS0NCj4gTHVpeiBBdWd1c3Rv
+IHZvbiBEZW50eg0K
