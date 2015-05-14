@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] Bluetooth: Fix reporting incorrect EIR in device found mgmt event
-Date: Thu, 14 May 2015 12:48:33 +0200
-Message-Id: <1431600513-6793-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] Bluetooth: Fix reporting incorrect EIR in device found mgmt event
+Date: Thu, 14 May 2015 12:42:01 +0200
+Message-Id: <1431600121-4735-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -61,13 +61,11 @@ event is properly formatted:
 
 Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
 ---
-v2: fixed build error due to use of non-upstream BT_ERR_RATELIMITED
-
  net/bluetooth/hci_event.c | 17 +++++++++++++++++
  1 file changed, 17 insertions(+)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7b61be7..0407324 100644
+index 7b61be7..c41bb87 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
 @@ -4711,6 +4711,23 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
@@ -88,7 +86,7 @@ index 7b61be7..0407324 100644
 +
 +	/* Adjust for actual length */
 +	if (len != real_len) {
-+		BT_ERR("Corrected invalid ADV_DATA length");
++		BT_ERR_RATELIMITED("Corrected invalid ADV_DATA length");
 +		len = real_len;
 +	}
  
