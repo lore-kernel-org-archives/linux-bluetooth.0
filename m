@@ -2,109 +2,98 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/3] tools/mgmt-tester: Add Device Found test with invalid ADV_DATA
-Date: Thu, 14 May 2015 12:50:29 +0200
-Message-Id: <1431600630-8568-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1431600630-8568-1-git-send-email-szymon.janc@tieto.com>
-References: <1431600630-8568-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2] Bluetooth: Fix reporting incorrect EIR in device found mgmt event
+Date: Thu, 14 May 2015 12:48:33 +0200
+Message-Id: <1431600513-6793-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test verify if kernel correctly terminates EIR when invalid
-ADV_DATA (length includes non-significant part) was received from
- remote device.
----
- tools/mgmt-tester.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+Some remote devices (ie Gigaset G-Tag) misbehave with ADV data length.
+This can lead to incorrect EIR format in device found event when
+ADV_DATA and SCAN_RSP are merged (terminator field before SCAN_RSP
+part).
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index fd5ef7d..3ecddab 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -429,6 +429,9 @@ struct generic_data {
- 	bool force_power_off;
- 	bool addr_type_avail;
- 	uint8_t addr_type;
-+	bool set_adv;
-+	const uint8_t *adv_data;
-+	uint8_t adv_data_len;
- };
- 
- static const char dummy_data[] = { 0x00 };
-@@ -4467,6 +4470,33 @@ static const struct generic_data remove_advertising_success_2 = {
- 	.expect_hci_len = sizeof(set_adv_off_param),
- };
- 
-+/* based on G-Tag ADV_DATA */
-+static const uint8_t adv_data_invalid_significant_len[] = { 0x02, 0x01, 0x06,
-+		0x0d, 0xff, 0x80, 0x01, 0x02, 0x15, 0x12, 0x34, 0x80, 0x91,
-+		0xd0, 0xf2, 0xbb, 0xc5, 0x03, 0x02, 0x0f, 0x18, 0x00, 0x00,
-+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+Fix this by inspecting ADV_DATA and correct its length if terminator
+is found.
+
+> HCI Event: LE Meta Event (0x3e) plen 42              [hci0] 32.172182
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Connectable undirected - ADV_IND (0x00)
+        Address type: Public (0x00)
+        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
+        Data length: 30
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        Company: Gigaset Communications GmbH (384)
+          Data: 021512348094975abbc5
+        16-bit Service UUIDs (partial): 1 entry
+          Battery Service (0x180f)
+        RSSI: -65 dBm (0xbf)
+> HCI Event: LE Meta Event (0x3e) plen 27              [hci0] 32.172191
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Scan response - SCAN_RSP (0x04)
+        Address type: Public (0x00)
+        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
+        Data length: 15
+        Name (complete): Gigaset G-tag
+        RSSI: -59 dBm (0xc5)
+
+Note "Data length: 30" in ADV_DATA which results in 9 extra zero bytes
+after Battery Service UUID. Terminator field present in the middle of
+EIR in Device Found event resulted in userspace stop parsing EIR and
+skipping device name.
+
+@ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
+      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
+      c5 03 02 0f 18 00 00 00 00 00 00 00 00 00 0e 09  ................
+      47 69 67 61 73 65 74 20 47 2d 74 61 67           Gigaset G-tag
+
+With this fix EIR with merged ADV_DATA and SCAN_RSP in device found
+event is properly formatted:
+
+@ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
+      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
+      c5 03 02 0f 18 0e 09 47 69 67 61 73 65 74 20 47  .......Gigaset G
+      2d 74 61 67                                      -tag
+
+Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+---
+v2: fixed build error due to use of non-upstream BT_ERR_RATELIMITED
+
+ net/bluetooth/hci_event.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7b61be7..0407324 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4711,6 +4711,23 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	struct hci_conn *conn;
+ 	bool match;
+ 	u32 flags;
++	u8 *ptr, real_len;
 +
-+static const char device_found_valid[] = { 0x00, 0x00, 0x01, 0x01, 0xaa, 0x00,
-+		0x01, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x15, 0x00, 0x02, 0x01,
-+		0x06, 0x0d, 0xff, 0x80, 0x01, 0x02, 0x15, 0x12, 0x34, 0x80,
-+		0x91, 0xd0, 0xf2, 0xbb, 0xc5, 0x03, 0x02, 0x0f, 0x18 };
-+
-+static const struct generic_data device_found_gtag = {
-+	.setup_settings = settings_powered_le,
-+	.send_opcode = MGMT_OP_START_DISCOVERY,
-+	.send_param = start_discovery_le_param,
-+	.send_len = sizeof(start_discovery_le_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = start_discovery_le_param,
-+	.expect_len = sizeof(start_discovery_le_param),
-+	.expect_alt_ev = MGMT_EV_DEVICE_FOUND,
-+	.expect_alt_ev_param = device_found_valid,
-+	.expect_alt_ev_len = sizeof(device_found_valid),
-+	.set_adv = true,
-+	.adv_data_len = sizeof(adv_data_invalid_significant_len),
-+	.adv_data = adv_data_invalid_significant_len,
-+};
-+
- static const struct generic_data read_local_oob_not_powered_test = {
- 	.send_opcode = MGMT_OP_READ_LOCAL_OOB_DATA,
- 	.expect_status = MGMT_STATUS_NOT_POWERED,
-@@ -5481,6 +5511,29 @@ static void test_command_generic(const void *test_data)
- 	test_add_condition(data);
- }
- 
-+static void test_device_found(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct generic_data *test = data->test_data;
-+	struct bthost *bthost;
-+
-+	bthost = hciemu_client_get_host(data->hciemu);
-+
-+	if ((data->hciemu_type == HCIEMU_TYPE_LE) ||
-+				(data->hciemu_type == HCIEMU_TYPE_BREDRLE)) {
-+		if (test->set_adv)
-+			bthost_set_adv_data(bthost, test->adv_data,
-+							test->adv_data_len);
-+
-+		bthost_set_adv_enable(bthost, 0x01);
++	/* Find the 'real' end of the data in case remote incorrectly
++	 * set significant part length.
++	 */
++	for (ptr = data; ptr < data + len && *ptr; ptr += *ptr + 1) {
++		if (ptr + 1 + *ptr > data + len)
++			break;
 +	}
 +
-+	if (data->hciemu_type != HCIEMU_TYPE_LE)
-+		bthost_write_scan_enable(bthost, 0x03);
++	real_len = ptr - data;
 +
-+	test_command_generic(test_data);
-+}
-+
- static void pairing_new_conn(uint16_t handle, void *user_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -6535,5 +6588,9 @@ int main(int argc, char *argv[])
- 				&read_local_oob_success_sc_test,
- 				NULL, test_command_generic);
++	/* Adjust for actual length */
++	if (len != real_len) {
++		BT_ERR("Corrected invalid ADV_DATA length");
++		len = real_len;
++	}
  
-+	test_bredrle("Device Found - Invalid remote ADV_DATA",
-+				&device_found_gtag,
-+				NULL, test_device_found);
-+
- 	return tester_run();
- }
+ 	/* If the direct address is present, then this report is from
+ 	 * a LE Direct Advertising Report event. In that case it is
 -- 
 1.9.3
 
