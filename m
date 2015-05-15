@@ -1,169 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CADxtLgTF2h7rwtaLD7pnoN2cvguFUsHPZepnvOze3fxrb=M7dg@mail.gmail.com>
-References: <CADxtLgRDc_=Y7EiXRUd=26LOZznueAhsxc+YZTE3eMzb+19vcA@mail.gmail.com>
-	<CAJLTA8j6GtyduSqSQS5Ppo5OjPmfB4Oe=ych7DWn5yBikddDrQ@mail.gmail.com>
-	<CADxtLgTF2h7rwtaLD7pnoN2cvguFUsHPZepnvOze3fxrb=M7dg@mail.gmail.com>
-Date: Fri, 15 May 2015 14:57:27 +0300
-Message-ID: <CABBYNZLmiv6jBTPa139vCiWaFgPLL8FLpQB7YWcOUrA3j0V8+g@mail.gmail.com>
-Subject: Re: BLE device advertised manufacturer data cached?
+In-Reply-To: <000001d08ece$23413eb0$69c3bc10$@samsung.com>
+References: <1429011468-13667-1-git-send-email-gowtham.ab@samsung.com>
+	<000301d0784c$be534440$3af9ccc0$@samsung.com>
+	<003101d07c2e$0b3d2200$21b76600$@samsung.com>
+	<000001d08ece$23413eb0$69c3bc10$@samsung.com>
+Date: Fri, 15 May 2015 14:49:44 +0300
+Message-ID: <CABBYNZ+FYM8C93jXt4jAyUnJz-mnfKF4zECVVDUbOdJ=6d_Rkg@mail.gmail.com>
+Subject: Re: [PATCH] tools: Handle the common profile & service ecode
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Tony DiCola <tony@tonydicola.com>
-Cc: Michael Janssen <jamuraa@google.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Kevin Townsend <kevin@ktownsend.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Bhusan Panda <bharat.panda@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tony,
+Hi Gowtham,
 
-On Wed, May 13, 2015 at 11:15 PM, Tony DiCola <tony@tonydicola.com> wrote:
-> On Wed, May 13, 2015 at 9:53 AM, Michael Janssen <jamuraa@google.com> wrote:
->> Hi Tony,
+On Fri, May 15, 2015 at 8:15 AM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Ping.
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+>> Sent: Tuesday, April 21, 2015 5:54 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Subject: RE: [PATCH] tools: Handle the common profile & service ecode
 >>
->> On Tue, May 12, 2015 at 6:16 PM, Tony DiCola <tony@tonydicola.com> wrote:
->>> Hi all, I'm playing with the latest bluez 5.30 and bluetooth low
->>> energy devices and am noticing that the manufacturer data field from a
->>> device's advertisement data appears to be cached somewhere internally.
->>> I wanted to check if this was expected and see if there was any way to
->>> disable that caching or work around getting back stale manufacturer
->>> data.
->>>
->>> For some context I'm using bluez 5.30's dbus API and applied these
->>> patches to make the gatt support non-experimental (so I can run
->>> bluetoothd without the --experimental flag):
->>>   https://chromium.googlesource.com/chromiumos/third_party/bluez/+/2b3a91a12c86a5708329edf58d0cea237f319f6f%5E%21/#F0
->>>   https://chromium.googlesource.com/chromiumos/third_party/bluez/+/5755965a9944f158dd8aba63655f2b0a414a1f49%5E%21/#F0
->>> However I've also tried it with the stock 5.30 code and the
->>> --experimental flag and see the same results.
->>>
->>> For my device I'm using a Nordic nRF51822-based board that I have
->>> control over the firmware and am using it to send custom advertisement
->>> data for my device.  In my advertisement data I'm sending manufacturer
->>> data that looks like this: 0x07FFFFFF00000001.  This breaks down as
->>> the length of the advertisement section (0x07 bytes), the manufacturer
->>> data advertisement type (0xFF), the testing manufacturer ID (0xFFFF),
->>> and then 4 bytes with a value of 1 (0x00000001).
->>>
->>> I see when I enable scanning on an adapter that a device object is
->>> created for my device in bluez's dbus hiearchy.  It has a
->>> ManufacturerData field that looks just like what my advertisement
->>> sends, for example here's the output of the device's dbus tree (using
->>> python):
->>>
->>> [ /org/bluez/hci0/dev_C5_25_55_09_6A_B1 ]
->>>     org.bluez.Device1
->>>       Name = UART
->>>       Paired = 0
->>>       Adapter = /org/bluez/hci0
->>>       LegacyPairing = 0
->>>       Alias = UART
->>>       ManufacturerData = dbus.Dictionary({dbus.UInt16(65535):
->>> dbus.Array([dbus.Byte(0), dbus.Byte(0), dbus.Byte(0), dbus.Byte(1)],
->>> signature=dbus.Signature('y'), variant_level=1)},
->>> signature=dbus.Signature('qv'), variant_level=1)
->>>       Connected = 0
->>>       UUIDs = dbus.Array([], signature=dbus.Signature('s'), variant_level=1)
->>>       Address = C5:25:55:09:6A:B1
->>>       Trusted = 0
->>>       Blocked = 0
->>>
->>> Everything looks great and the manufacturer data is parsed out as I
->>> expect.  However the problem is when I have the nRF51822 change the
->>> advertised manufacturer data.  For example if I change to
->>> 0x07FFFFFF00000002 (so the last 4 bytes change to 0x00000002) I'm not
->>> seeing the updated value in bluez's dbus hierarchy.  When I query the
->>> device object's ManufacturerData property I still see the old value
->>> that ends in 1.  Even if I sit in a loop querying the value every
->>> second for over a minute I still don't see the updated value (for
->>> reference the nRF51822 is advertising this updated value every
->>> second).
->>>
->>> I do notice that if I remove the device from bluez's dbus hiearchy (by
->>> getting its parent adapter and calling RemoveDevice on it) then I do
->>> see the device added back with the current/updated ManufacturerData
->>> property.  This makes me think there's something up with the
->>> manufacturer data field getting cached or never being updated.
->>>
->>> I wanted to check is this expected behavior, that the manufacturer
->>> data property won't be updated when it changes?  If so is there any
->>> clean way to disable this caching or get access to the most recently
->>> seen/up to date manufacturer data field?
->>>
->>> Let me know if anything isn't clear or if perhaps I'm doing something
->>> completely wrong.  Thanks!
->>>
->>> -Tony
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> Ping.
 >>
->> BlueZ doesn't update the Advertising Data unless there is an active
->> discovery client or the device is already paired.  Is the device
->> paired, or are you calling the StartDiscovery method on the device?
->>
->> Note that the link layer does not need to send duplicate reports (the
->> same device address) to the host even if the advertising data changes.
->> This is acceptable behavior per the spec, as outlined in Vol 6, Part
->> B, Section 4.4.3 "Scanning State": "The advertising data may change;
->> advertising data or scan response data is not considered significant
->> when determining duplicate advertising reports."
+>> > -----Original Message-----
+>> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> > owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+>> > Sent: Thursday, April 16, 2015 7:23 PM
+>> > To: linux-bluetooth@vger.kernel.org
+>> > Subject: RE: [PATCH] tools: Handle the common profile & service ecode
+>> >
+>> > Ping.
+>> >
+>> > > -----Original Message-----
+>> > > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> > > owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+>> > > Sent: Tuesday, April 14, 2015 5:08 PM
+>> > > To: linux-bluetooth@vger.kernel.org
+>> > > Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham
+>> Anandha
+>> > Babu
+>> > > Subject: [PATCH] tools: Handle the common profile & service ecode
+>> > >
+>> > > Handles the common profile and service error codes sent over the
+>> > > Attribute Protocol in btgatt-client and monitor.
+>> > > ---
+>> > >  monitor/l2cap.c       | 9 +++++++++
+>> > >  tools/btgatt-client.c | 6 ++++++
+>> > >  2 files changed, 15 insertions(+)
+>> > >
+>> > > diff --git a/monitor/l2cap.c b/monitor/l2cap.c index
+>> > > fc565b1..55efa54
+>> > 100644
+>> > > --- a/monitor/l2cap.c
+>> > > +++ b/monitor/l2cap.c
+>> > > @@ -2046,6 +2046,15 @@ static void att_error_response(const struct
+>> > > l2cap_frame *frame)
+>> > >   case 0x11:
+>> > >           str = "Insufficient Resources";
+>> > >           break;
+>> > > + case 0xfd:
+>> > > +         str = "CCC Improperly Configured";
+>> > > +         break;
+>> > > + case 0xfe:
+>> > > +         str = "Procedure Already in Progress";
+>> > > +         break;
+>> > > + case 0xff:
+>> > > +         str = "Out of Range";
+>> > > +         break;
+>> > >   default:
+>> > >           str = "Reserved";
+>> > >           break;
+>> > > diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c index
+>> > > ee5315d..3935a7e 100644
+>> > > --- a/tools/btgatt-client.c
+>> > > +++ b/tools/btgatt-client.c
+>> > > @@ -114,6 +114,12 @@ static const char *ecode_to_string(uint8_t
+>> ecode)
+>> > >           return "Group type Not Supported";
+>> > >   case BT_ATT_ERROR_INSUFFICIENT_RESOURCES:
+>> > >           return "Insufficient Resources";
+>> > > + case BT_ERROR_CCC_IMPROPERLY_CONFIGURED:
+>> > > +         return "CCC Improperly Configured";
+>> > > + case BT_ERROR_ALREADY_IN_PROGRESS:
+>> > > +         return "Procedure Already in Progress";
+>> > > + case BT_ERROR_OUT_OF_RANGE:
+>> > > +         return "Out of Range";
+>> > >   default:
+>> > >           return "Unknown error type";
+>> > >   }
+>> > > --
+>> > > 1.9.1
+>> > >
+>> > > --
+>> > > To unsubscribe from this list: send the line "unsubscribe
+>> linux-bluetooth"
+>> > in
+>> > > the body of a message to majordomo@vger.kernel.org More majordomo
+>> > info
+>> > > at  http://vger.kernel.org/majordomo-info.html
+>> >
+>> > --
+>> > To unsubscribe from this list: send the line "unsubscribe
+> linux-bluetooth"
+>> in
+>> > the body of a message to majordomo@vger.kernel.org More majordomo
+>> info
+>> > at  http://vger.kernel.org/majordomo-info.html
 >>
 >> --
->> M Janssen
->
-> Thanks for the reply!  Yeah I've called StartDiscovery on an adapter
-> so I should see advertisement data come in (and in practice I do see
-> my deivce show up after StartDiscovery is called).
->
-> However I'm not pairing or connecting to the device because I'd like
-> to read advertisement data from multiple devices at the same time.
-> I'm thinking of a scenario kind of like Apple's iBeacon or Google's
-> UriBeacon but for reading sensors, where each device/sensor puts its
-> data into an advertisement packet (just using some custom manufacturer
-> data field for now) and broadcasts that reading to any device
-> listening for advertisements.
->
-> Here's pseudo code of what I'm doing:
-> - Setup my device firmware to start advertising custom manufacturer
-> data with value 1 (for example).
-> - Get BLE adapter org.bluez.Adapter1 object.
-> - Set adapter's Powered property to True/1 to make sure it's powered up.
-> - Call adapter's StartDiscovery function to start listening for advertisements.
-> - See that my device is added to the bluez dbus tree with the
-> org.bluez.Device1 interface.
-> - Verify the device's ManufacturerData property has the expected value of 1.
-> - Change my device's firmware to advertise custom manufacturer data
-> with value 2.
-> - Sit in a loop reading the bluez device's ManufacturerData property
-> every second.
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+>> the body of a message to majordomo@vger.kernel.org More majordomo
+>> info at  http://vger.kernel.org/majordomo-info.html
 
-Are you still discovering at this point? If yes then we might have a
-bug as it should be updating the data if provided it is not the same.
-
-> - See that the ManufacturerData from bluez still shows the old value of 1.
->
-> Here's the pseudo code of something that works, but feels pretty hacky
-> to have to remove the device to get an updated value:
-> - Setup my device firmware to start advertising custom manufacturer
-> data with value 1 (for example).
-> - Get BLE adapter org.bluez.Adapter1 object.
-> - Set adapter's Powered property to True/1 to make sure it's powered up.
-> - Call adapter's StartDiscovery function to start listening for advertisements.
-> - See that my device is added to the bluez dbus tree with the
-> org.bluez.Device1 interface.
-> - Verify the device's ManufacturerData property has the expected value of 1.
-> - Change my device's firmware to advertise custom manufacturer data
-> with value 2.
-> - Call the adapter's RemoveDevice function to remove the device from
-> bluez's dbus hierararchy.
-> - See that my device is added back to the bluez dbus tree again (after
-> it send another advertisement).
-> - Verify the device's ManufacturerData property has the new value of 2.
-
-Something is not right then.
+Applied, thanks.
 
 
 -- 
