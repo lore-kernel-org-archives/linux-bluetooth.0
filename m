@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 4/4] Bluetooth: btbcm: Fix calls to __hci_cmd_sync()
-Date: Fri, 15 May 2015 11:58:42 +0200
-Message-Id: <1431683922-20418-4-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v5 3/4] Bluetooth: btintel: Fix calls to __hci_cmd_sync()
+Date: Fri, 15 May 2015 11:58:41 +0200
+Message-Id: <1431683922-20418-3-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1431683922-20418-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1431683922-20418-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -26,26 +26,26 @@ converted through bt_to_errno() back in __hci_cmd_sync_ev().
 
 Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 ---
- drivers/bluetooth/btbcm.c | 6 ------
+ drivers/bluetooth/btintel.c | 6 ------
  1 file changed, 6 deletions(-)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 4bba866..728fce3 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -55,12 +55,6 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 2d43d42..828f2f8 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -53,12 +53,6 @@ int btintel_check_bdaddr(struct hci_dev *hdev)
  	}
  
  	bda = (struct hci_rp_read_bd_addr *)skb->data;
 -	if (bda->status) {
--		BT_ERR("%s: BCM: Device address result failed (%02x)",
+-		BT_ERR("%s: Intel device address result failed (%02x)",
 -		       hdev->name, bda->status);
 -		kfree_skb(skb);
 -		return -bt_to_errno(bda->status);
 -	}
  
- 	/* The address 00:20:70:02:A0:00 indicates a BCM20702A0 controller
- 	 * with no configured address.
+ 	/* For some Intel based controllers, the default Bluetooth device
+ 	 * address 00:03:19:9E:8B:00 can be found. These controllers are
 -- 
 1.9.1
 
