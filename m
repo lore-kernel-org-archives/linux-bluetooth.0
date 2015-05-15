@@ -1,117 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/8] btdev: Add LE Encrypt command support to emulator
-Date: Fri, 15 May 2015 16:46:19 +0300
-Message-Id: <1431697586-20611-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLmiv6jBTPa139vCiWaFgPLL8FLpQB7YWcOUrA3j0V8+g@mail.gmail.com>
+References: <CADxtLgRDc_=Y7EiXRUd=26LOZznueAhsxc+YZTE3eMzb+19vcA@mail.gmail.com>
+	<CAJLTA8j6GtyduSqSQS5Ppo5OjPmfB4Oe=ych7DWn5yBikddDrQ@mail.gmail.com>
+	<CADxtLgTF2h7rwtaLD7pnoN2cvguFUsHPZepnvOze3fxrb=M7dg@mail.gmail.com>
+	<CABBYNZLmiv6jBTPa139vCiWaFgPLL8FLpQB7YWcOUrA3j0V8+g@mail.gmail.com>
+Date: Fri, 15 May 2015 16:41:03 +0300
+Message-ID: <CABBYNZKAFS4gSeg9ksU14dU=4SfMOPHeBapKkFJ1B364NAGsLA@mail.gmail.com>
+Subject: Re: BLE device advertised manufacturer data cached?
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Tony DiCola <tony@tonydicola.com>
+Cc: Michael Janssen <jamuraa@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Kevin Townsend <kevin@ktownsend.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Tony,
 
-Add basic crypto support to btdev using Linux crypto infrastructure.
----
- emulator/btdev.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+On Fri, May 15, 2015 at 2:57 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Tony,
+>
+> On Wed, May 13, 2015 at 11:15 PM, Tony DiCola <tony@tonydicola.com> wrote:
+>> On Wed, May 13, 2015 at 9:53 AM, Michael Janssen <jamuraa@google.com> wrote:
+>>> Hi Tony,
+>>>
+>>> On Tue, May 12, 2015 at 6:16 PM, Tony DiCola <tony@tonydicola.com> wrote:
+>>>> Hi all, I'm playing with the latest bluez 5.30 and bluetooth low
+>>>> energy devices and am noticing that the manufacturer data field from a
+>>>> device's advertisement data appears to be cached somewhere internally.
+>>>> I wanted to check if this was expected and see if there was any way to
+>>>> disable that caching or work around getting back stale manufacturer
+>>>> data.
+>>>>
+>>>> For some context I'm using bluez 5.30's dbus API and applied these
+>>>> patches to make the gatt support non-experimental (so I can run
+>>>> bluetoothd without the --experimental flag):
+>>>>   https://chromium.googlesource.com/chromiumos/third_party/bluez/+/2b3a91a12c86a5708329edf58d0cea237f319f6f%5E%21/#F0
+>>>>   https://chromium.googlesource.com/chromiumos/third_party/bluez/+/5755965a9944f158dd8aba63655f2b0a414a1f49%5E%21/#F0
+>>>> However I've also tried it with the stock 5.30 code and the
+>>>> --experimental flag and see the same results.
+>>>>
+>>>> For my device I'm using a Nordic nRF51822-based board that I have
+>>>> control over the firmware and am using it to send custom advertisement
+>>>> data for my device.  In my advertisement data I'm sending manufacturer
+>>>> data that looks like this: 0x07FFFFFF00000001.  This breaks down as
+>>>> the length of the advertisement section (0x07 bytes), the manufacturer
+>>>> data advertisement type (0xFF), the testing manufacturer ID (0xFFFF),
+>>>> and then 4 bytes with a value of 1 (0x00000001).
+>>>>
+>>>> I see when I enable scanning on an adapter that a device object is
+>>>> created for my device in bluez's dbus hiearchy.  It has a
+>>>> ManufacturerData field that looks just like what my advertisement
+>>>> sends, for example here's the output of the device's dbus tree (using
+>>>> python):
+>>>>
+>>>> [ /org/bluez/hci0/dev_C5_25_55_09_6A_B1 ]
+>>>>     org.bluez.Device1
+>>>>       Name = UART
+>>>>       Paired = 0
+>>>>       Adapter = /org/bluez/hci0
+>>>>       LegacyPairing = 0
+>>>>       Alias = UART
+>>>>       ManufacturerData = dbus.Dictionary({dbus.UInt16(65535):
+>>>> dbus.Array([dbus.Byte(0), dbus.Byte(0), dbus.Byte(0), dbus.Byte(1)],
+>>>> signature=dbus.Signature('y'), variant_level=1)},
+>>>> signature=dbus.Signature('qv'), variant_level=1)
+>>>>       Connected = 0
+>>>>       UUIDs = dbus.Array([], signature=dbus.Signature('s'), variant_level=1)
+>>>>       Address = C5:25:55:09:6A:B1
+>>>>       Trusted = 0
+>>>>       Blocked = 0
+>>>>
+>>>> Everything looks great and the manufacturer data is parsed out as I
+>>>> expect.  However the problem is when I have the nRF51822 change the
+>>>> advertised manufacturer data.  For example if I change to
+>>>> 0x07FFFFFF00000002 (so the last 4 bytes change to 0x00000002) I'm not
+>>>> seeing the updated value in bluez's dbus hierarchy.  When I query the
+>>>> device object's ManufacturerData property I still see the old value
+>>>> that ends in 1.  Even if I sit in a loop querying the value every
+>>>> second for over a minute I still don't see the updated value (for
+>>>> reference the nRF51822 is advertising this updated value every
+>>>> second).
+>>>>
+>>>> I do notice that if I remove the device from bluez's dbus hiearchy (by
+>>>> getting its parent adapter and calling RemoveDevice on it) then I do
+>>>> see the device added back with the current/updated ManufacturerData
+>>>> property.  This makes me think there's something up with the
+>>>> manufacturer data field getting cached or never being updated.
+>>>>
+>>>> I wanted to check is this expected behavior, that the manufacturer
+>>>> data property won't be updated when it changes?  If so is there any
+>>>> clean way to disable this caching or get access to the most recently
+>>>> seen/up to date manufacturer data field?
+>>>>
+>>>> Let me know if anything isn't clear or if perhaps I'm doing something
+>>>> completely wrong.  Thanks!
+>>>>
+>>>> -Tony
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>> BlueZ doesn't update the Advertising Data unless there is an active
+>>> discovery client or the device is already paired.  Is the device
+>>> paired, or are you calling the StartDiscovery method on the device?
+>>>
+>>> Note that the link layer does not need to send duplicate reports (the
+>>> same device address) to the host even if the advertising data changes.
+>>> This is acceptable behavior per the spec, as outlined in Vol 6, Part
+>>> B, Section 4.4.3 "Scanning State": "The advertising data may change;
+>>> advertising data or scan response data is not considered significant
+>>> when determining duplicate advertising reports."
+>>>
+>>> --
+>>> M Janssen
+>>
+>> Thanks for the reply!  Yeah I've called StartDiscovery on an adapter
+>> so I should see advertisement data come in (and in practice I do see
+>> my deivce show up after StartDiscovery is called).
+>>
+>> However I'm not pairing or connecting to the device because I'd like
+>> to read advertisement data from multiple devices at the same time.
+>> I'm thinking of a scenario kind of like Apple's iBeacon or Google's
+>> UriBeacon but for reading sensors, where each device/sensor puts its
+>> data into an advertisement packet (just using some custom manufacturer
+>> data field for now) and broadcasts that reading to any device
+>> listening for advertisements.
+>>
+>> Here's pseudo code of what I'm doing:
+>> - Setup my device firmware to start advertising custom manufacturer
+>> data with value 1 (for example).
+>> - Get BLE adapter org.bluez.Adapter1 object.
+>> - Set adapter's Powered property to True/1 to make sure it's powered up.
+>> - Call adapter's StartDiscovery function to start listening for advertisements.
+>> - See that my device is added to the bluez dbus tree with the
+>> org.bluez.Device1 interface.
+>> - Verify the device's ManufacturerData property has the expected value of 1.
+>> - Change my device's firmware to advertise custom manufacturer data
+>> with value 2.
+>> - Sit in a loop reading the bluez device's ManufacturerData property
+>> every second.
+>
+> Are you still discovering at this point? If yes then we might have a
+> bug as it should be updating the data if provided it is not the same.
+>
+>> - See that the ManufacturerData from bluez still shows the old value of 1.
+>>
+>> Here's the pseudo code of something that works, but feels pretty hacky
+>> to have to remove the device to get an updated value:
+>> - Setup my device firmware to start advertising custom manufacturer
+>> data with value 1 (for example).
+>> - Get BLE adapter org.bluez.Adapter1 object.
+>> - Set adapter's Powered property to True/1 to make sure it's powered up.
+>> - Call adapter's StartDiscovery function to start listening for advertisements.
+>> - See that my device is added to the bluez dbus tree with the
+>> org.bluez.Device1 interface.
+>> - Verify the device's ManufacturerData property has the expected value of 1.
+>> - Change my device's firmware to advertise custom manufacturer data
+>> with value 2.
+>> - Call the adapter's RemoveDevice function to remove the device from
+>> bluez's dbus hierararchy.
+>> - See that my device is added back to the bluez dbus tree again (after
+>> it send another advertisement).
+>> - Verify the device's ManufacturerData property has the new value of 2.
+>
+> Something is not right then.
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index d9a0c5d..18edac6 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -39,6 +39,7 @@
- 
- #include "src/shared/util.h"
- #include "src/shared/timeout.h"
-+#include "src/shared/crypto.h"
- #include "monitor/bt.h"
- #include "btdev.h"
- 
-@@ -79,6 +80,8 @@ struct btdev {
- 
- 	struct hook *hook_list[MAX_HOOK_ENTRIES];
- 
-+	struct bt_crypto *crypto;
-+
-         uint16_t manufacturer;
-         uint8_t  version;
- 	uint16_t revision;
-@@ -418,6 +421,7 @@ static void set_le_commands(struct btdev *btdev)
- 	btdev->commands[26] |= 0x04;	/* LE Set Scan Parameters */
- 	btdev->commands[26] |= 0x08;	/* LE Set Scan Enable */
- 	btdev->commands[26] |= 0x40;	/* LE Read White List Size */
-+	btdev->commands[27] |= 0x40;	/* LE Encrypt */
- 	btdev->commands[27] |= 0x80;	/* LE Rand */
- 	btdev->commands[28] |= 0x08;	/* LE Read Supported States */
- 	btdev->commands[28] |= 0x10;	/* LE Receiver Test */
-@@ -555,6 +559,15 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- 		return NULL;
- 
- 	memset(btdev, 0, sizeof(*btdev));
-+
-+	if (type == BTDEV_TYPE_BREDRLE || type == BTDEV_TYPE_LE) {
-+		btdev->crypto = bt_crypto_new();
-+		if (!btdev->crypto) {
-+			free(btdev);
-+			return NULL;
-+		}
-+	}
-+
- 	btdev->type = type;
- 
- 	btdev->manufacturer = 63;
-@@ -603,6 +616,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- 
- 	index = add_btdev(btdev);
- 	if (index < 0) {
-+		bt_crypto_unref(btdev->crypto);
- 		free(btdev);
- 		return NULL;
- 	}
-@@ -620,6 +634,7 @@ void btdev_destroy(struct btdev *btdev)
- 	if (btdev->inquiry_id > 0)
- 		timeout_remove(btdev->inquiry_id);
- 
-+	bt_crypto_unref(btdev->crypto);
- 	del_btdev(btdev);
- 
- 	free(btdev);
-@@ -1914,6 +1929,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	const struct bt_hci_cmd_le_set_scan_enable *lsse;
- 	const struct bt_hci_cmd_le_start_encrypt *lse;
- 	const struct bt_hci_cmd_le_ltk_req_reply *llrr;
-+	const struct bt_hci_cmd_le_encrypt *lenc_cmd;
- 	const struct bt_hci_cmd_read_local_amp_assoc *rlaa_cmd;
- 	const struct bt_hci_cmd_read_rssi *rrssi;
- 	const struct bt_hci_cmd_read_tx_power *rtxp;
-@@ -1960,6 +1976,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	struct bt_hci_rsp_le_read_adv_tx_power lratp;
- 	struct bt_hci_rsp_le_read_supported_states lrss;
- 	struct bt_hci_rsp_le_read_white_list_size lrwls;
-+	struct bt_hci_rsp_le_encrypt lenc;
- 	struct bt_hci_rsp_le_rand lr;
- 	struct bt_hci_rsp_le_test_end lte;
- 	struct bt_hci_rsp_remote_name_request_cancel rnrc_rsp;
-@@ -2864,6 +2881,20 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		cmd_complete(btdev, opcode, &status, sizeof(status));
- 		break;
- 
-+	case BT_HCI_CMD_LE_ENCRYPT:
-+		if (btdev->type == BTDEV_TYPE_BREDR)
-+			goto unsupported;
-+		lenc_cmd = data;
-+		if (!bt_crypto_e(btdev->crypto, lenc_cmd->key,
-+				 lenc_cmd->plaintext, lenc.data)) {
-+			cmd_status(btdev, BT_HCI_ERR_COMMAND_DISALLOWED,
-+				   opcode);
-+			break;
-+		}
-+		lenc.status = BT_HCI_ERR_SUCCESS;
-+		cmd_complete(btdev, opcode, &lenc, sizeof(lenc));
-+		break;
-+
- 	case BT_HCI_CMD_LE_READ_SUPPORTED_STATES:
- 		if (btdev->type == BTDEV_TYPE_BREDR)
- 			goto unsupported;
+So I found the problem, please check the last 2 patches I send to the
+mailing list. The second is not exactly by the spec since it might be
+possible to have duplicated entries, even if they have the data, in
+the same report but I doubt anyone would try to do that since the
+space in the AD is very limited, anyway so what it does is detect if
+there already an entry and replace the data which should trigger
+PropertiesChanged(ManufacturerData) signal.
+
+
 -- 
-2.1.4
-
+Luiz Augusto von Dentz
