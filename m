@@ -1,93 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ankur Patel <ankur@embertec.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 15 May 2015 18:24:38 +0930
-Subject: RE: Issue with registering GATT Services
-Message-ID: <BD5E516FF3711A41B93DC005170007BB010E5D9DF13E@EMBSVR01.ember.local>
-References: <BD5E516FF3711A41B93DC005170007BB010D943FDCC9@EMBSVR01.ember.local>
- <CABBYNZJSZ=2e-sAD2f=01z0jVR4ackd3xoNO1YpVXR9stv6xzQ@mail.gmail.com>
- <BD5E516FF3711A41B93DC005170007BB010D943FDECA@EMBSVR01.ember.local>
-In-Reply-To: <BD5E516FF3711A41B93DC005170007BB010D943FDECA@EMBSVR01.ember.local>
-Content-Type: text/plain; charset="utf-8"
+From: Aleksey Volkov <info@dv2c.ru>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btusb: add one more device to fixed Invalid initialization bug for kernel since 3.x
+Date: Fri, 15 May 2015 11:14:05 +0300
+Message-ID: <1778954.MznHKqOsQy@it1765>
+In-Reply-To: <B6FB3590-0B82-4112-B1E8-1AA006CC4124@holtmann.org>
+References: <1849903.jsc2NzCIHo@vwd-1> <1588358.UJXQXaaSbI@leonov> <B6FB3590-0B82-4112-B1E8-1AA006CC4124@holtmann.org>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PiA+IEhpIEFua3VyLA0KPiA+DQo+ID4gT24gV2VkLCBNYXkgMTMsIDIwMTUgYXQgMTI6MzkgUE0s
-IEFua3VyIFBhdGVsIDxhbmt1ckBlbWJlcnRlYy5jb20+DQo+ID4gd3JvdGU6DQo+ID4gPiBIaSBG
-b2xrcywNCj4gPiA+DQo+ID4gPiBJIGFtIGhhdmluZyBpc3N1ZXMgd2l0aCByZWdpc3RlcmluZyBH
-QVRUIHNlcnZpY2VzIHN1Y2Nlc3NmdWxseSBvbg0KPiA+ID4gdGhlDQo+ID4gZGV2aWNlLg0KPiA+
-ID4gVXNpbmc6IExpbnV4IEtlcm5lbDogMy4xOC4xMiBCbHVlejogNS4zMA0KPiA+ID4NCj4gPiA+
-IFN0ZXAxPiBCdWlsZCBCbHVlejUuMzAgd2l0aCAtLWVuYWJsZS1leHBlcmltZW50YWwgYW5kIC0t
-ZW5hYmxlLQ0KPiA+IG1haW50YWluZXItbW9kZS4NCj4gPiA+IFN0ZXAyPiBSYW4gQmx1ZXRvb3Ro
-ZCB3aXRoIC1FIG9wdGlvbiBhcyBiZWxvdzoNCj4gPiA+IHJvb3RAaW14Mjhldms6fiAjIC91c3Iv
-bGliL2JsdWV6NS9ibHVldG9vdGgvYmx1ZXRvb3RoZCAtZCAtbiAtRSAmDQo+ID4gPiBPdXRwdXQ6
-DQo+ID4gPiAgICAgICAgIGh0dHA6Ly9wYXN0ZWJpbi5jb20vZUFMaWpnZ2gNCj4gPiA+IFNuaXBw
-ZXQ6DQo+ID4gPiAuLi4NCj4gPiA+IGJsdWV0b290aGRbNDYyXTogc3JjL2dhdHQtZGF0YWJhc2Uu
-YzpnYXR0X2RiX3NlcnZpY2VfYWRkZWQoKSBHQVRUDQo+ID4gPiBTZXJ2aWNlIGFkZGVkIHRvIGxv
-Y2FsIGRhdGFiYXNlDQo+ID4gPiBibHVldG9vdGhkWzQ2Ml06IHNyYy9hZHZlcnRpc2luZy5jOmJ0
-ZF9hZHZlcnRpc2luZ19tYW5hZ2VyX25ldygpIExFDQo+ID4gPiBBZHZlcnRpc2luZyBNYW5hZ2Vy
-IGNyZWF0ZWQgZm9yIGFkYXB0ZXI6IC9vcmcvYmx1ZXovaGNpMA0KPiA+ID4gYmx1ZXRvb3RoZFs0
-NjJdOiBwcm9maWxlcy9hdWRpby9hMmRwLmM6bWVkaWFfc2VydmVyX3Byb2JlKCkgcGF0aA0KPiA+
-ID4gL29yZy9ibHVlei9oY2kwDQo+ID4gPiBibHVldG9vdGhkWzQ2Ml06IHBsdWdpbnMvaG9zdG5h
-bWUuYzpob3N0bmFtZV9wcm9iZSgpDQo+ID4gPiBibHVldG9vdGhkWzQ2Ml06IE5vdCBlbm91Z2gg
-ZnJlZSBoYW5kbGVzIHRvIHJlZ2lzdGVyIHNlcnZpY2UNCj4gPiA+IGJsdWV0b290aGRbNDYyXTog
-cGx1Z2lucy9nYXR0LWV4YW1wbGUuYzpnYXR0X2V4YW1wbGVfYWRhcHRlcl9wcm9iZSgpDQo+ID4g
-QmF0dGVyeSBzZXJ2aWNlIGNvdWxkIG5vdCBiZSByZWdpc3RlcmVkDQo+ID4gPiBibHVldG9vdGhk
-WzQ2Ml06IGdhdHQtZXhhbXBsZS1hZGFwdGVyLWRyaXZlcjogSW5wdXQvb3V0cHV0IGVycm9yICg1
-KQ0KPiAvLw0KPiA+IE5vdCBzdXJlIGlmIHRoaXMgcmVzdHJpY3RzIEdBVFQgU2VydmljZSB0byBi
-ZSByZWdpc3RlcmVkDQo+ID4gPiAuLi4NCj4gPiA+IGJsdWV0b290aGRbNDYyXTogc3JjL2FkYXB0
-ZXIuYzpuZXdfc2V0dGluZ3NfY2FsbGJhY2soKSBTZXR0aW5nczoNCj4gPiA+IDB4MDAwMDI2ZjAN
-Cj4gPiA+IGJsdWV0b290aGRbNDYyXTogc3JjL2FkYXB0ZXIuYzpzZXR0aW5nc19jaGFuZ2VkKCkg
-Q2hhbmdlZCBzZXR0aW5nczoNCj4gPiA+IDB4MDAwMDAwMGENCj4gPiA+DQo+ID4gPiBTdGVwMz4g
-UmFuIGdhdHQtc2VydmljZToNCj4gPiA+IHJvb3RAaW14Mjhldms6fi90b29scyMgLi9nYXR0LXNl
-cnZpY2UgZ2F0dC1zZXJ2aWNlIHVuaXF1ZSBuYW1lOiA6MS40DQo+ID4gPiBSZWdpc3RlcmVkIHNl
-cnZpY2U6IC9zZXJ2aWNlMSBHZXQgVVVJRDoNCj4gPiA+IDAwMDAxODAyLTAwMDAtMTAwMC04MDAw
-LTAwODA1ZjliMzRmYg0KPiA+ID4gRXhpc3QgSW5jbHVkZXM6IDAwMDAxODAyLTAwMDAtMTAwMC04
-MDAwLTAwODA1ZjliMzRmYg0KPiA+ID4gQ2hhcmFjdGVyaXN0aWMoMDAwMDJhMDYtMDAwMC0xMDAw
-LTgwMDAtMDA4MDVmOWIzNGZiKTogR2V0KCJWYWx1ZSIpDQo+ID4gPiBEZXNjcmlwdG9yKDgyNjBj
-NjUzLTFhNTQtNDI2Yi05ZTM2LWU4NGMyMzhiYzY2OSk6IEdldCgiVmFsdWUiKQ0KPiA+ID4gUmVn
-aXN0ZXJTZXJ2aWNlOiBNZXRob2QgIlJlZ2lzdGVyU2VydmljZSIgd2l0aCBzaWduYXR1cmUgIm9h
-e3N2fSIgb24NCj4gPiA+IGludGVyZmFjZSAib3JnLmJsdWV6LkdhdHRNYW5hZ2VyMSIgZG9lc24n
-dCBleGlzdA0KPiA+ID4NCj4gPiA+IEkgYW0gdXNpbmcgdGhlIERidXMgY29uZmlnIGZyb20NCj4g
-PiBodHRwOi8vZ2l0Lmtlcm5lbC5vcmcvY2dpdC9ibHVldG9vdGgvYmx1ZXouZ2l0L3RyZWUvc3Jj
-L2JsdWV0b290aC5jb25mLg0KPiA+ID4NCj4gPiA+IEFueSBpZGVhIHdoeSBpdCBmYWlscyB0byBy
-ZWdpc3RlciB0aGUgc2VydmljZT8gRG8gSSBuZWVkIHRvIGVuYWJsZQ0KPiA+ID4gb3RoZXINCj4g
-PiBmZWF0dXJlcyBvciBpZiB0aGVyZSBpcyBhbnkgbWlzc2luZyBzdGVwcz8NCj4gPg0KPiA+IEl0
-IHNob3VsZCB3b3JrIGlmIHlvdSBoYXZlIC1FLCBidXQgcGVyaGFwcyBzb21ldGhpbmcgZWxzZSBp
-cyBub3QgdGhlDQo+ID4gY29ycmVjdCwgbGlrZSB0aGUgcGF0aCwgZXRjLiBCdHcsIHdlIGRvIGhh
-dmUgYW4gZXhhbXBsZSBoZXJlOg0KPiA+DQo+ID4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9jZ2l0
-L2JsdWV0b290aC9ibHVlei5naXQvdHJlZS90ZXN0L2V4YW1wbGUtZ2F0dA0KPiA+IC0NCj4gPiBz
-ZXJ2ZXINCj4gPg0KPiBUaGFuayB5b3UgZm9yIGhpZ2hsaWdodGluZy4gSSByYW4gaXQgYW5kIGl0
-IHdvcmtlZCBnb29kLiBJdCBhYmxlIHRvIHJlZ2lzdGVyIHRoZQ0KPiBzZXJ2aWNlcyBzdWNjZXNz
-ZnVsbHkuICBCdXQgd2hlbiBJIHJhbiB0aGUgZXhhbXBsZS1nYXR0LWNsaWVudCwgaXQgd2VudCBp
-bnRvDQo+IGJlbG93IGVycm9yOg0KPiANCj4gRXhhbXBsZS1nYXR0LXNlcnZlciBvdXRwdXQgYXQ6
-IGh0dHA6Ly9wYXN0ZWJpbi5jb20vdnBoZ3M5MngNCj4gDQo+IHJvb3RAaW14Mjhldms6fi90b29s
-cyMgcHl0aG9uIGV4YW1wbGUtZ2F0dC1jbGllbnQNCj4gL29yZy9ibHVlei9leGFtcGxlL3NlcnZp
-Y2UwIE1ldGhvZCAiR2V0QWxsIiB3aXRoIHNpZ25hdHVyZSAicyIgb24NCj4gaW50ZXJmYWNlICJv
-cmcuZnJlZWRlc2t0b3AuREJ1cy5Qcm9wZXJ0aWVzIiBkb2Vzbid0IGV4aXN0DQo+IA0KPiBJcyB0
-aGUgcGF0aCBwcm92aWRlZCBpcyBjb3JyZWN0PyBJIGhhdmUgYSBkb3VidC4gIEVuZCBvdXRwdXQg
-aXMgSSB3YW50IHRvDQo+IHJlZ2lzdGVyIHByaW1hcnkvc2Vjb25kYXJ5IHNlcnZpY2VzLg0KDQoN
-ClNvcnJ5IEx1aXosIEkgd2VudCBpbnRvIHRoZSB3cm9uZyBsb29wLiBBZnRlciBnb2luZyB0aHJv
-dWdoIHRoZSBjb2RlIGl0IG1ha2VzIG1lIGNsZWFyLiBUaGUgc2VydmljZXMgY2FuIGJlIHJlZ2lz
-dGVyZWQgc3VjY2Vzc2Z1bGx5IG9uIHRoZSBkZXZpY2UgYWZ0ZXIgcnVubmluZyBleGFtcGxlLWdh
-dHQtc2VydmVyLiANCkkgaGF2ZSB2ZXJpZmllZCBpdCBhcyBiZWxvdyBydW5uaW5nIGJsdWV0b290
-aGN0bDoNCltibHVldG9vdGhdIyBzaG93DQpDb250cm9sbGVyIDFDOkJBOjhDOjg2OjgxOjIxDQog
-ICAgICAgIE5hbWU6IHRlc3QtYnQNCiAgICAgICAgQWxpYXM6IHRlc3QtYnQNCiAgICAgICAgQ2xh
-c3M6IDB4NDAwMDAwDQogICAgICAgIFBvd2VyZWQ6IHllcw0KICAgICAgICBEaXNjb3ZlcmFibGU6
-IG5vDQogICAgICAgIFBhaXJhYmxlOiB5ZXMNCiAgICAgICAgVVVJRDogR2VuZXJpYyBBdHRyaWJ1
-dGUgUHJvZmlsZSAoMDAwMDE4MDEtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQ0KICAgICAg
-ICBVVUlEOiBBL1YgUmVtb3RlIENvbnRyb2wgICAgICAgICgwMDAwMTEwZS0wMDAwLTEwMDAtODAw
-MC0wMDgwNWY5YjM0ZmIpDQogICAgICAgIFVVSUQ6IFNJTSBBY2Nlc3MgICAgICAgICAgICAgICAg
-KDAwMDAxMTJkLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikNCiAgICAgICAgVVVJRDogR2Vu
-ZXJpYyBBY2Nlc3MgUHJvZmlsZSAgICAoMDAwMDE4MDAtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIz
-NGZiKQ0KICAgICAgICBVVUlEOiBQblAgSW5mb3JtYXRpb24gICAgICAgICAgICgwMDAwMTIwMC0w
-MDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIpDQogICAgICAgIFVVSUQ6IEEvViBSZW1vdGUgQ29u
-dHJvbCBUYXJnZXQgKDAwMDAxMTBjLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikNCiAgICAg
-ICAgVVVJRDogSGVhcnQgUmF0ZSAgICAgICAgICAgICAgICAoMDAwMDE4MGQtMDAwMC0xMDAwLTgw
-MDAtMDA4MDVmOWIzNGZiKQ0KICAgICAgICBVVUlEOiBWZW5kb3Igc3BlY2lmaWMgICAgICAgICAg
-ICgxMjM0NTY3OC0xMjM0LTU2NzgtMTIzNC01Njc4OWFiY2RlZjApDQogICAgICAgIE1vZGFsaWFz
-OiB1c2I6djFENkJwMDI0NmQwNTFFDQogICAgICAgIERpc2NvdmVyaW5nOiBubw0KDQpUaGFua3Mg
-Zm9yIHN1cHBvcnQuDQpBbmt1cg0KPiANCj4gVGhhbmsgeW91LA0KPiBBbmt1ci4NCj4gPiAtLQ0K
-PiA+IEx1aXogQXVndXN0byB2b24gRGVudHoNCg==
+Hi Marcel,
+
+> 
+> so I made a typo, then we just need a patch correcting this typo that also includes /sys/kernel/debug/usb/devices for this dongle to make sure this does not happen again.
+> 
+
+Patch correcting this typo exist in first mail.
+
+Content /sys/kernel/debug/usb/devices for these dongle:
+
+T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=1310 ProdID=0001 Rev=15.00
+S:  Manufacturer=SiW
+S:  Product=SiW
+S:  SerialNumber=E7BB050D0B00
+C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr= 50mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
