@@ -1,52 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Aleksey Volkov <info@dv2c.ru>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Szymon Janc <szymon.janc@tieto.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: btusb: add one more device to fixed Invalid initialization bug for kernel since 3.x
-Date: Fri, 15 May 2015 11:14:05 +0300
-Message-ID: <1778954.MznHKqOsQy@it1765>
-In-Reply-To: <B6FB3590-0B82-4112-B1E8-1AA006CC4124@holtmann.org>
-References: <1849903.jsc2NzCIHo@vwd-1> <1588358.UJXQXaaSbI@leonov> <B6FB3590-0B82-4112-B1E8-1AA006CC4124@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Date: Fri, 15 May 2015 06:20:25 +0000 (GMT)
+From: Nagaraj D R <nagaraj.dr@samsung.com>
+Subject: Fwd: [PATCH 1/1] shared/gatt-client: Fix the "Find Information req"
+ error
+To: Nagaraj D R <nagaraj.dr@samsung.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Reply-to: nagaraj.dr@samsung.com
+MIME-version: 1.0
+Content-type: text/plain; charset=windows-1252
+MIME-version: 1.0
+Message-id: <1483393657.234411431670825435.JavaMail.weblogic@ep2mlwas08d>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+cGluZw0KDQotLS0tLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0tLS0tLQ0KU2VuZGVyIDogTmFnYXJh
+aiBEIFI8bmFnYXJhai5kckBzYW1zdW5nLmNvbT4gTGVhZCBFbmdpbmVlci9TUkktQmFuZ2Fsb3Jl
+LVN5c3RlbSAmIENvbm5lY3Rpdml0eS9TYW1zdW5nIEVsZWN0cm9uaWNzDQpEYXRlIDogTWF5IDEz
+LCAyMDE1IDE3OjA1IChHTVQrMDU6MzApDQpUaXRsZSA6IFtQQVRDSCAxLzFdIHNoYXJlZC9nYXR0
+LWNsaWVudDogRml4IHRoZSAiRmluZCBJbmZvcm1hdGlvbiByZXEiIGVycm9yDQoNCkZyb206ICJu
+YWdhcmFqLmRyIiANCg0KY2hhcmFjdGVyaXN0aWMgZGVzY3JpcHRvciBpcyBzZWFyY2hlZCBiL3cg
+dGhlDQpjaGFyYWN0ZXJpc3RpYyAidmFsdWVfaGFuZGxlICsgMSIgYW5kDQpjaGFyYWN0ZXJpc3Rp
+YyAiZW5kX2hhbmRsZSIgdXNpbmcgIkZpbmQgSW5mb3JtYXRpb24gcmVxIg0KDQppZiByZW1vdGUg
+ZGV2aWNlIGhhZCBkZWNsYXJlZCB0aGUgY2hhcmFjdGVyaXN0aWMgdmFsdWVfaGFuZGxlDQphdCAw
+WEZGRkYgKHdoaWNoIGFsc28gbWVhbnMgdGhlcmUgaXMgbm8gY2hhcmFjdGVyaXN0aWMgZGVzY3Jp
+cHRvcnMpLHRoZW4NCnByZXNlbnQgY29kZSB3b3VsZCBtYWtlIHN0YXJ0X2hhbmRsZSBoYXMgMFgw
+MDAwKGJlY2F1c2Ugb2YgMTYgYml0DQppbnRlZ2VyIG92ZXJmbG93KSBmb3IgIkZpbmQgSW5mb3Jt
+YXRpb24gcmVxIg0KDQpkZXNjX3N0YXJ0ID0gY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUgKyAxOw0K
+DQpDb25zZXF1ZW5jZTogIEJlbG93IHJlcXVlc3Qgd2lsbCBiZSBzZW50LA0KICAgICAgICBBVFQ6
+IEZpbmQgSW5mb3JtYXRpb24gcmVxICgweDA0KQ0KICAgICAgICBzdGFydCAweDAwMDAsIGVuZCAw
+eGZmZmYNCg0KICAgICAgICBhbmQgYmVsb3cgd2lsbCBiZSB0aGUgcHJvcGVyIHJlc3BvbnNlIGZy
+b20gdGhlIHJlbW90ZSBkZXZpY2UNCiAgICAgICAgQVRUOiBFcnJvciAoMHgwMSkNCiAgICAgICAg
+RXJyb3I6IEludmFsaWQgaGFuZGxlICgxKQ0KICAgICAgICBGaW5kIEluZm9ybWF0aW9uIHJlcSAo
+MHgwNCkgb24gaGFuZGxlIDB4MDAwMA0KLS0tDQpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmMgfCAg
+ICA2ICsrKy0tLQ0KMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMo
+LSkNCg0KZGlmZiAtLWdpdCBhL3NyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYyBiL3NyYy9zaGFyZWQv
+Z2F0dC1jbGllbnQuYw0KaW5kZXggN2JjM2I3MS4uOWI5NDRlZSAxMDA2NDQNCi0tLSBhL3NyYy9z
+aGFyZWQvZ2F0dC1jbGllbnQuYw0KKysrIGIvc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jDQpAQCAt
+NjAxLDEzICs2MDEsMTMgQEAgc3RhdGljIGJvb2wgZGlzY292ZXJfZGVzY3Moc3RydWN0IGRpc2Nv
+dmVyeV9vcCAqb3AsIGJvb2wgKmRpc2NvdmVyaW5nKQ0KY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUp
+DQpnb3RvIGZhaWxlZDsNCg0KLSBkZXNjX3N0YXJ0ID0gY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUg
+KyAxOw0KLQ0KLSBpZiAoZGVzY19zdGFydCA+IGNocmNfZGF0YS0+ZW5kX2hhbmRsZSkgew0KKyBp
+ZiAoY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUgPj0gY2hyY19kYXRhLT5lbmRfaGFuZGxlKSB7DQpm
+cmVlKGNocmNfZGF0YSk7DQpjb250aW51ZTsNCn0NCg0KKyBkZXNjX3N0YXJ0ID0gY2hyY19kYXRh
+LT52YWx1ZV9oYW5kbGUgKyAxOw0KKw0KY2xpZW50LT5kaXNjb3ZlcnlfcmVxID0gYnRfZ2F0dF9k
+aXNjb3Zlcl9kZXNjcmlwdG9ycygNCmNsaWVudC0+YXR0LCBkZXNjX3N0YXJ0LA0KY2hyY19kYXRh
+LT5lbmRfaGFuZGxlLA0KLS0gDQoxLjcuOS41
 
-> 
-> so I made a typo, then we just need a patch correcting this typo that also includes /sys/kernel/debug/usb/devices for this dongle to make sure this does not happen again.
-> 
 
-Patch correcting this typo exist in first mail.
-
-Content /sys/kernel/debug/usb/devices for these dongle:
-
-T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=1310 ProdID=0001 Rev=15.00
-S:  Manufacturer=SiW
-S:  Product=SiW
-S:  SerialNumber=E7BB050D0B00
-C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr= 50mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
