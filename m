@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v5 2/4] Bluetooth: btusb: Fix calls to __hci_cmd_sync()
+Subject: Re: [PATCH v5 4/4] Bluetooth: btbcm: Fix calls to __hci_cmd_sync()
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1431683922-20418-2-git-send-email-frederic.danis@linux.intel.com>
-Date: Fri, 15 May 2015 16:06:57 +0200
+In-Reply-To: <1431683922-20418-4-git-send-email-frederic.danis@linux.intel.com>
+Date: Fri, 15 May 2015 16:06:54 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <64A46F1C-BD2E-4446-BE23-A1C139ED3A9E@holtmann.org>
-References: <1431683922-20418-1-git-send-email-frederic.danis@linux.intel.com> <1431683922-20418-2-git-send-email-frederic.danis@linux.intel.com>
+Message-Id: <F2642BF1-4AB0-4DEA-9310-A40797DAC9E8@holtmann.org>
+References: <1431683922-20418-1-git-send-email-frederic.danis@linux.intel.com> <1431683922-20418-4-git-send-email-frederic.danis@linux.intel.com>
 To: Frederic Danis <frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -30,8 +30,8 @@ Hi Fred,
 > 
 > Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 > ---
-> drivers/bluetooth/btusb.c | 36 ------------------------------------
-> 1 file changed, 36 deletions(-)
+> drivers/bluetooth/btbcm.c | 6 ------
+> 1 file changed, 6 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
