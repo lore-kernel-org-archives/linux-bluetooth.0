@@ -1,191 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKAFS4gSeg9ksU14dU=4SfMOPHeBapKkFJ1B364NAGsLA@mail.gmail.com>
-References: <CADxtLgRDc_=Y7EiXRUd=26LOZznueAhsxc+YZTE3eMzb+19vcA@mail.gmail.com>
-	<CAJLTA8j6GtyduSqSQS5Ppo5OjPmfB4Oe=ych7DWn5yBikddDrQ@mail.gmail.com>
-	<CADxtLgTF2h7rwtaLD7pnoN2cvguFUsHPZepnvOze3fxrb=M7dg@mail.gmail.com>
-	<CABBYNZLmiv6jBTPa139vCiWaFgPLL8FLpQB7YWcOUrA3j0V8+g@mail.gmail.com>
-	<CABBYNZKAFS4gSeg9ksU14dU=4SfMOPHeBapKkFJ1B364NAGsLA@mail.gmail.com>
-Date: Fri, 15 May 2015 12:00:39 -0700
-Message-ID: <CADxtLgTJCH8Q1zwKevnzSbq8XOkdL4tkObp8Bram87W7FZ9RjA@mail.gmail.com>
-Subject: Re: BLE device advertised manufacturer data cached?
-From: Tony DiCola <tony@tonydicola.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Michael Janssen <jamuraa@google.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Kevin Townsend <kevin@ktownsend.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH v2 4/5] Bluetooth: btbcm: Split setup() function
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5555FE93.30401@linux.intel.com>
+Date: Fri, 15 May 2015 19:17:37 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <7CF6B366-744C-4F28-88BE-32EB138D8B0C@holtmann.org>
+References: <1431008699-6419-1-git-send-email-frederic.danis@linux.intel.com> <1431008699-6419-4-git-send-email-frederic.danis@linux.intel.com> <6F8C6327-C7F0-4081-B3A8-8A3A609C915E@holtmann.org> <5555FE93.30401@linux.intel.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, May 15, 2015 at 6:41 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Tony,
->
-> On Fri, May 15, 2015 at 2:57 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Tony,
->>
->> On Wed, May 13, 2015 at 11:15 PM, Tony DiCola <tony@tonydicola.com> wrote:
->>> On Wed, May 13, 2015 at 9:53 AM, Michael Janssen <jamuraa@google.com> wrote:
->>>> Hi Tony,
->>>>
->>>> On Tue, May 12, 2015 at 6:16 PM, Tony DiCola <tony@tonydicola.com> wrote:
->>>>> Hi all, I'm playing with the latest bluez 5.30 and bluetooth low
->>>>> energy devices and am noticing that the manufacturer data field from a
->>>>> device's advertisement data appears to be cached somewhere internally.
->>>>> I wanted to check if this was expected and see if there was any way to
->>>>> disable that caching or work around getting back stale manufacturer
->>>>> data.
->>>>>
->>>>> For some context I'm using bluez 5.30's dbus API and applied these
->>>>> patches to make the gatt support non-experimental (so I can run
->>>>> bluetoothd without the --experimental flag):
->>>>>   https://chromium.googlesource.com/chromiumos/third_party/bluez/+/2b3a91a12c86a5708329edf58d0cea237f319f6f%5E%21/#F0
->>>>>   https://chromium.googlesource.com/chromiumos/third_party/bluez/+/5755965a9944f158dd8aba63655f2b0a414a1f49%5E%21/#F0
->>>>> However I've also tried it with the stock 5.30 code and the
->>>>> --experimental flag and see the same results.
->>>>>
->>>>> For my device I'm using a Nordic nRF51822-based board that I have
->>>>> control over the firmware and am using it to send custom advertisement
->>>>> data for my device.  In my advertisement data I'm sending manufacturer
->>>>> data that looks like this: 0x07FFFFFF00000001.  This breaks down as
->>>>> the length of the advertisement section (0x07 bytes), the manufacturer
->>>>> data advertisement type (0xFF), the testing manufacturer ID (0xFFFF),
->>>>> and then 4 bytes with a value of 1 (0x00000001).
->>>>>
->>>>> I see when I enable scanning on an adapter that a device object is
->>>>> created for my device in bluez's dbus hiearchy.  It has a
->>>>> ManufacturerData field that looks just like what my advertisement
->>>>> sends, for example here's the output of the device's dbus tree (using
->>>>> python):
->>>>>
->>>>> [ /org/bluez/hci0/dev_C5_25_55_09_6A_B1 ]
->>>>>     org.bluez.Device1
->>>>>       Name = UART
->>>>>       Paired = 0
->>>>>       Adapter = /org/bluez/hci0
->>>>>       LegacyPairing = 0
->>>>>       Alias = UART
->>>>>       ManufacturerData = dbus.Dictionary({dbus.UInt16(65535):
->>>>> dbus.Array([dbus.Byte(0), dbus.Byte(0), dbus.Byte(0), dbus.Byte(1)],
->>>>> signature=dbus.Signature('y'), variant_level=1)},
->>>>> signature=dbus.Signature('qv'), variant_level=1)
->>>>>       Connected = 0
->>>>>       UUIDs = dbus.Array([], signature=dbus.Signature('s'), variant_level=1)
->>>>>       Address = C5:25:55:09:6A:B1
->>>>>       Trusted = 0
->>>>>       Blocked = 0
->>>>>
->>>>> Everything looks great and the manufacturer data is parsed out as I
->>>>> expect.  However the problem is when I have the nRF51822 change the
->>>>> advertised manufacturer data.  For example if I change to
->>>>> 0x07FFFFFF00000002 (so the last 4 bytes change to 0x00000002) I'm not
->>>>> seeing the updated value in bluez's dbus hierarchy.  When I query the
->>>>> device object's ManufacturerData property I still see the old value
->>>>> that ends in 1.  Even if I sit in a loop querying the value every
->>>>> second for over a minute I still don't see the updated value (for
->>>>> reference the nRF51822 is advertising this updated value every
->>>>> second).
->>>>>
->>>>> I do notice that if I remove the device from bluez's dbus hiearchy (by
->>>>> getting its parent adapter and calling RemoveDevice on it) then I do
->>>>> see the device added back with the current/updated ManufacturerData
->>>>> property.  This makes me think there's something up with the
->>>>> manufacturer data field getting cached or never being updated.
->>>>>
->>>>> I wanted to check is this expected behavior, that the manufacturer
->>>>> data property won't be updated when it changes?  If so is there any
->>>>> clean way to disable this caching or get access to the most recently
->>>>> seen/up to date manufacturer data field?
->>>>>
->>>>> Let me know if anything isn't clear or if perhaps I'm doing something
->>>>> completely wrong.  Thanks!
->>>>>
->>>>> -Tony
->>>>> --
->>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>>> the body of a message to majordomo@vger.kernel.org
->>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>
->>>> BlueZ doesn't update the Advertising Data unless there is an active
->>>> discovery client or the device is already paired.  Is the device
->>>> paired, or are you calling the StartDiscovery method on the device?
->>>>
->>>> Note that the link layer does not need to send duplicate reports (the
->>>> same device address) to the host even if the advertising data changes.
->>>> This is acceptable behavior per the spec, as outlined in Vol 6, Part
->>>> B, Section 4.4.3 "Scanning State": "The advertising data may change;
->>>> advertising data or scan response data is not considered significant
->>>> when determining duplicate advertising reports."
->>>>
->>>> --
->>>> M Janssen
->>>
->>> Thanks for the reply!  Yeah I've called StartDiscovery on an adapter
->>> so I should see advertisement data come in (and in practice I do see
->>> my deivce show up after StartDiscovery is called).
->>>
->>> However I'm not pairing or connecting to the device because I'd like
->>> to read advertisement data from multiple devices at the same time.
->>> I'm thinking of a scenario kind of like Apple's iBeacon or Google's
->>> UriBeacon but for reading sensors, where each device/sensor puts its
->>> data into an advertisement packet (just using some custom manufacturer
->>> data field for now) and broadcasts that reading to any device
->>> listening for advertisements.
->>>
->>> Here's pseudo code of what I'm doing:
->>> - Setup my device firmware to start advertising custom manufacturer
->>> data with value 1 (for example).
->>> - Get BLE adapter org.bluez.Adapter1 object.
->>> - Set adapter's Powered property to True/1 to make sure it's powered up.
->>> - Call adapter's StartDiscovery function to start listening for advertisements.
->>> - See that my device is added to the bluez dbus tree with the
->>> org.bluez.Device1 interface.
->>> - Verify the device's ManufacturerData property has the expected value of 1.
->>> - Change my device's firmware to advertise custom manufacturer data
->>> with value 2.
->>> - Sit in a loop reading the bluez device's ManufacturerData property
->>> every second.
->>
->> Are you still discovering at this point? If yes then we might have a
->> bug as it should be updating the data if provided it is not the same.
->>
->>> - See that the ManufacturerData from bluez still shows the old value of 1.
->>>
->>> Here's the pseudo code of something that works, but feels pretty hacky
->>> to have to remove the device to get an updated value:
->>> - Setup my device firmware to start advertising custom manufacturer
->>> data with value 1 (for example).
->>> - Get BLE adapter org.bluez.Adapter1 object.
->>> - Set adapter's Powered property to True/1 to make sure it's powered up.
->>> - Call adapter's StartDiscovery function to start listening for advertisements.
->>> - See that my device is added to the bluez dbus tree with the
->>> org.bluez.Device1 interface.
->>> - Verify the device's ManufacturerData property has the expected value of 1.
->>> - Change my device's firmware to advertise custom manufacturer data
->>> with value 2.
->>> - Call the adapter's RemoveDevice function to remove the device from
->>> bluez's dbus hierararchy.
->>> - See that my device is added back to the bluez dbus tree again (after
->>> it send another advertisement).
->>> - Verify the device's ManufacturerData property has the new value of 2.
->>
->> Something is not right then.
->
-> So I found the problem, please check the last 2 patches I send to the
-> mailing list. The second is not exactly by the spec since it might be
-> possible to have duplicated entries, even if they have the data, in
-> the same report but I doubt anyone would try to do that since the
-> space in the AD is very limited, anyway so what it does is detect if
-> there already an entry and replace the data which should trigger
-> PropertiesChanged(ManufacturerData) signal.
->
->
-> --
-> Luiz Augusto von Dentz
+Hi Fred,
 
-Oh nice, thanks for taking a look and the quick response!  I'll check
-out the patch this weekend and see if it resolves the issue.  Thanks!
+>>> Split btbcm_setup_patchram in 3 functions : btbcm_setup_patchram,
+>>> btbcm_patchram (already existing) and btbcm_setup_post.
+>>> For UART controllers this will allow to reset speed to default one
+>>> after firmware loading, which will have reseted controller speed to
+>>> default one.
+>>> 
+>>> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+>>> ---
+>>> drivers/bluetooth/btbcm.c   | 29 +++++++++++++++++------------
+>>> drivers/bluetooth/btbcm.h   | 11 +++++++++--
+>>> drivers/bluetooth/btusb.c   | 23 ++++++++++++++++++++++-
+>>> drivers/bluetooth/hci_bcm.c | 19 ++++++++++++++++++-
+>>> 4 files changed, 66 insertions(+), 16 deletions(-)
+>>> 
+>>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+>>> index b258454..f2efbbd 100644
+>>> --- a/drivers/bluetooth/btbcm.c
+>>> +++ b/drivers/bluetooth/btbcm.c
+>>> @@ -277,9 +277,8 @@ static const struct {
+>>> 	{ }
+>>> };
+>>> 
+>>> -int btbcm_setup_patchram(struct hci_dev *hdev)
+>>> +int btbcm_setup_patchram(struct hci_dev *hdev, char *fw_name, size_t len)
+>> 
+>> what is this len for? The fw_name is not a return value. I think the functions for doing the patchram should just get a firmware and then just do patchram.
+> 
+> I split btbcm_setup_patchram() in 3 functions:
+> - btbcm_setup_patchram() which resets the controller and returns the firmware name.
+> - btbtcm_patchram() (already existing and public), which takes the firmware name as parameter, requests the firmware and loads it to the controller.
+> - btbcm_setup_post() which resets the controller, reads local version and checks if the controller address is a default one or not.
+> 
+> I split it between btbcm_patchram() and btbcm_setup_post() as firmware loading may reset the controller UART speed and it needs to set host UART speed back to init speed.
+> 
+> I also split it between btbcm_setup_patchram() and btbtcm_patchram() because error is not managed the same way for both of them.
+> When btbcm_setup_patchram() returns an error, this error is forwarded to caller.
+> When btbtcm_patchram() returns an error, if the error is -ENOENT then this error is discarded and 0 is returned to caller. Otherwise, the error is also discarded but there is a need to call btbcm_setup_post() to reset controller.
 
--Tony
+my proposal to make this a bit smoother and have less changes is to keep the btbcm_setup_patchram as is. Lets keep using that as is for USB and introduce helper functions to be used by the UART side of things.
+
+To get things moving, lets assume that firmware filename comes in from somewhere. Maybe coded in DTS or ACPI or something else. In the long run, we need to have a “manifest” file that lets us map original Broadcom firmware file names to platforms. For USB that will become simple since it is USB VID/PID map. For ACPI we can use the ACPI ID mapping. So my thinking is to use a simple table mapping modalias to filename and that be it. However I would put that a little bit as a problem to solve later and bring the basic UART and speed handling into place.
+
+This means that UART setup routine should be doing this:
+
+	- UART call to switch to default speed
+		-> switch to default speed
+	- btbcm_initialize()
+	- UART call to switch operational speed
+		-> trigger vendor command
+		-> switch speed
+	- btbcm_patchram()
+	- UART call to switch to default speed
+		-> switch to default speed
+	- UART call to switch to operational speed
+		-> trigger vendor command
+		-> switch speed
+	- btbcm_finalize()
+
+Maybe default speed and operational speed changes should always be combined. We have to see there.
+
+Regards
+
+Marcel
+
