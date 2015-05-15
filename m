@@ -1,93 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
 From: Ankur Patel <ankur@embertec.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 15 May 2015 18:49:20 +0930
-Subject: Issue: PTS Test case TC_CONN_GCEP_BV_03_C
-Message-ID: <BD5E516FF3711A41B93DC005170007BB010E5D9DF140@EMBSVR01.ember.local>
-Content-Type: text/plain; charset="us-ascii"
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 15 May 2015 18:24:38 +0930
+Subject: RE: Issue with registering GATT Services
+Message-ID: <BD5E516FF3711A41B93DC005170007BB010E5D9DF13E@EMBSVR01.ember.local>
+References: <BD5E516FF3711A41B93DC005170007BB010D943FDCC9@EMBSVR01.ember.local>
+ <CABBYNZJSZ=2e-sAD2f=01z0jVR4ackd3xoNO1YpVXR9stv6xzQ@mail.gmail.com>
+ <BD5E516FF3711A41B93DC005170007BB010D943FDECA@EMBSVR01.ember.local>
+In-Reply-To: <BD5E516FF3711A41B93DC005170007BB010D943FDECA@EMBSVR01.ember.local>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Folks,
-
-Device Configuration:  Linux Kernel: 3.18.12 & Bluez: 5.30++73b28a10cb
-PTS MAC Address: 00:1B:DC:07:2E:85
-Device MAC Address: 1C:BA:8C:86:81:21
-
-I am facing issue passing the Test case TC_CONN_GCEP_BV_03_C on PTS. 
-
-On Device:
-Step1> Ran Bluetoothd using command: /usr/lib/bluez5/bluetooth/bluetoothd -d -n -E & 
-Step2> Setup the Device using bluetoothctl as below: 
-[bluetooth]# show
-Controller 1C:BA:8C:86:81:21
-        Name: test-bt
-        Alias: test-bt
-        Class: 0x400000
-        Powered: yes
-        Discoverable: no
-        Pairable: yes
-        UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-        UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
-        UUID: SIM Access                (0000112d-0000-1000-8000-00805f9b34fb)
-        UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
-        UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
-        UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
-        UUID: Heart Rate                (0000180d-0000-1000-8000-00805f9b34fb)
-        UUID: Vendor specific           (12345678-1234-5678-1234-56789abcdef0)
-        Modalias: usb:v1D6Bp0246d051E
-        Discovering: no
-
-ON PTS:
-Step1) Run the testcase  TC_CONN_GCEP_BV_03_C from PTS gui.
-Step2) It comes with popup: "Please send connect request to establish a connection"
-Step3) Ran below command on Device:
-
-[bluetooth]# pair 00:1B:DC:07:2E:85
-Attempting to pair with 00:1B:DC:07:2E:85
-[CHG] Device 00:1B:DC:07:2E:85 Connected: yes
-                [bluetooth]#
-Step4) Meanwhile, on PTS "Connect request" Popup disappear and new popup appears "Please start the Bonding Procedure in bondable mode" and stays forever.
-
-ON PTS Output Window:
-Test case : TC_CONN_GCEP_BV_03_C started
-                - MTC: Successfully received HCI_LE_CLEAR_WHITE_LIST_COMPLETE_EVENT.
-                - MTC: Successfully received HCI_LE_ADD_DEVICE_TO_WHITE_LIST_COMPLETE_EVENT.
-                - MTC: LE bondable mode successfully set.
-                - MTC: Successfully received HCI_LE_SET_ADVERTISING_PARAMETERS_COMPLETE_EVENT.
-                - MTC: Successfully received HCI_LE_SET_ADVERTISING_DATA_COMPLETE_EVENT.
-                - MTC: Successfully received HCI_LE_SET_SCAN_RESPONSE_DATA_COMPLETE_EVENT.
-                - MTC: Successfully received HCI_LE_SET_ADVERTISE_ENABLE_COMMAND_COMPLETE_EVENT.
-                - MTC: Successfully received HCI_LE_CONNECTION_COMPLETE_EVENT.
-    <No More Output>
-    
-Output on DEVICE:
-bluetoothd[4521]: src/agent.c:agent_ref() 0x146c820: ref=2
-bluetoothd[4521]: src/device.c:bonding_request_new() Requesting bonding for 00:1B:DC:07:2E:85
-bluetoothd[4521]: src/agent.c:agent_ref() 0x146c820: ref=3
-bluetoothd[45[177100.375066] hci0: type 1 len 5
-21]: src/agent.c:agent_unref() 0[177100.381298] hci0: type 1 len 29
-x146c820: ref=2
-bluetoothd[4521]: src/adapter.c:suspend_discovery()
-bluetoothd[4521]: src/adapter.c:adapter_bonding_attempt() hci0 bdaddr 00:1B:DC:07:2E:85 type 1 io_cap 0x03
-[177101.727353] hci0: type 2 len 16
-bluetoothd[4521]: src/adapter.c:connected_callback() hci0 device 00:1B:DC:07:2E:85 connected eir_len 0
-bluetoothd[4521]: src/gatt-database.c:connect_cb() New incoming LE ATT connection
-bluetoothd[4521]: attrib/gattrib.c:g_att[177101.803319] hci0: type 2 len 12
-rib_ref() 0x146c6e0: g_attrib_ref=1
-[177101.864789] hci0: type 2 len 26
-bluetoothd[4521]: src/device.c:gatt_debu[177102.005372] hci0: type 2 len 16
-g() MTU exchange complete, with MTU: 23
-[177102.072631] hci0: type 2 len 26
-[177102.146201] hci0: type 2 len 16
-bluetoothd[4521]: src/device.c:gatt_debug() Primary service discovery failed. ATT ECODE: 0x0a
-[177102.212893] hci0: type 1 len 32
-bluetoothd[4521]: src/device.c:gatt_debug() Secondary service discovery failed. ATT ECODE: 0x0a
-bluetoothd[4521]: src/device.c:gatt_debug() Failed to initialize gatt-client
-bluetoothd[4521]: src/device.c:gatt_client_ready_cb() status: failed, error: 10
-
-After looking into the protocol viewer, I found that the PTS is responding "Errorcode: Attribute not found" to  Read by Group Type Request for primary/secondary service by Device. This triggers failing of bonding procedure between device and PTS. Do I need to configure PTS for this? Am I on correct direction to run the test case?
-
-Regards,
-Ankur.
+PiA+IEhpIEFua3VyLA0KPiA+DQo+ID4gT24gV2VkLCBNYXkgMTMsIDIwMTUgYXQgMTI6MzkgUE0s
+IEFua3VyIFBhdGVsIDxhbmt1ckBlbWJlcnRlYy5jb20+DQo+ID4gd3JvdGU6DQo+ID4gPiBIaSBG
+b2xrcywNCj4gPiA+DQo+ID4gPiBJIGFtIGhhdmluZyBpc3N1ZXMgd2l0aCByZWdpc3RlcmluZyBH
+QVRUIHNlcnZpY2VzIHN1Y2Nlc3NmdWxseSBvbg0KPiA+ID4gdGhlDQo+ID4gZGV2aWNlLg0KPiA+
+ID4gVXNpbmc6IExpbnV4IEtlcm5lbDogMy4xOC4xMiBCbHVlejogNS4zMA0KPiA+ID4NCj4gPiA+
+IFN0ZXAxPiBCdWlsZCBCbHVlejUuMzAgd2l0aCAtLWVuYWJsZS1leHBlcmltZW50YWwgYW5kIC0t
+ZW5hYmxlLQ0KPiA+IG1haW50YWluZXItbW9kZS4NCj4gPiA+IFN0ZXAyPiBSYW4gQmx1ZXRvb3Ro
+ZCB3aXRoIC1FIG9wdGlvbiBhcyBiZWxvdzoNCj4gPiA+IHJvb3RAaW14Mjhldms6fiAjIC91c3Iv
+bGliL2JsdWV6NS9ibHVldG9vdGgvYmx1ZXRvb3RoZCAtZCAtbiAtRSAmDQo+ID4gPiBPdXRwdXQ6
+DQo+ID4gPiAgICAgICAgIGh0dHA6Ly9wYXN0ZWJpbi5jb20vZUFMaWpnZ2gNCj4gPiA+IFNuaXBw
+ZXQ6DQo+ID4gPiAuLi4NCj4gPiA+IGJsdWV0b290aGRbNDYyXTogc3JjL2dhdHQtZGF0YWJhc2Uu
+YzpnYXR0X2RiX3NlcnZpY2VfYWRkZWQoKSBHQVRUDQo+ID4gPiBTZXJ2aWNlIGFkZGVkIHRvIGxv
+Y2FsIGRhdGFiYXNlDQo+ID4gPiBibHVldG9vdGhkWzQ2Ml06IHNyYy9hZHZlcnRpc2luZy5jOmJ0
+ZF9hZHZlcnRpc2luZ19tYW5hZ2VyX25ldygpIExFDQo+ID4gPiBBZHZlcnRpc2luZyBNYW5hZ2Vy
+IGNyZWF0ZWQgZm9yIGFkYXB0ZXI6IC9vcmcvYmx1ZXovaGNpMA0KPiA+ID4gYmx1ZXRvb3RoZFs0
+NjJdOiBwcm9maWxlcy9hdWRpby9hMmRwLmM6bWVkaWFfc2VydmVyX3Byb2JlKCkgcGF0aA0KPiA+
+ID4gL29yZy9ibHVlei9oY2kwDQo+ID4gPiBibHVldG9vdGhkWzQ2Ml06IHBsdWdpbnMvaG9zdG5h
+bWUuYzpob3N0bmFtZV9wcm9iZSgpDQo+ID4gPiBibHVldG9vdGhkWzQ2Ml06IE5vdCBlbm91Z2gg
+ZnJlZSBoYW5kbGVzIHRvIHJlZ2lzdGVyIHNlcnZpY2UNCj4gPiA+IGJsdWV0b290aGRbNDYyXTog
+cGx1Z2lucy9nYXR0LWV4YW1wbGUuYzpnYXR0X2V4YW1wbGVfYWRhcHRlcl9wcm9iZSgpDQo+ID4g
+QmF0dGVyeSBzZXJ2aWNlIGNvdWxkIG5vdCBiZSByZWdpc3RlcmVkDQo+ID4gPiBibHVldG9vdGhk
+WzQ2Ml06IGdhdHQtZXhhbXBsZS1hZGFwdGVyLWRyaXZlcjogSW5wdXQvb3V0cHV0IGVycm9yICg1
+KQ0KPiAvLw0KPiA+IE5vdCBzdXJlIGlmIHRoaXMgcmVzdHJpY3RzIEdBVFQgU2VydmljZSB0byBi
+ZSByZWdpc3RlcmVkDQo+ID4gPiAuLi4NCj4gPiA+IGJsdWV0b290aGRbNDYyXTogc3JjL2FkYXB0
+ZXIuYzpuZXdfc2V0dGluZ3NfY2FsbGJhY2soKSBTZXR0aW5nczoNCj4gPiA+IDB4MDAwMDI2ZjAN
+Cj4gPiA+IGJsdWV0b290aGRbNDYyXTogc3JjL2FkYXB0ZXIuYzpzZXR0aW5nc19jaGFuZ2VkKCkg
+Q2hhbmdlZCBzZXR0aW5nczoNCj4gPiA+IDB4MDAwMDAwMGENCj4gPiA+DQo+ID4gPiBTdGVwMz4g
+UmFuIGdhdHQtc2VydmljZToNCj4gPiA+IHJvb3RAaW14Mjhldms6fi90b29scyMgLi9nYXR0LXNl
+cnZpY2UgZ2F0dC1zZXJ2aWNlIHVuaXF1ZSBuYW1lOiA6MS40DQo+ID4gPiBSZWdpc3RlcmVkIHNl
+cnZpY2U6IC9zZXJ2aWNlMSBHZXQgVVVJRDoNCj4gPiA+IDAwMDAxODAyLTAwMDAtMTAwMC04MDAw
+LTAwODA1ZjliMzRmYg0KPiA+ID4gRXhpc3QgSW5jbHVkZXM6IDAwMDAxODAyLTAwMDAtMTAwMC04
+MDAwLTAwODA1ZjliMzRmYg0KPiA+ID4gQ2hhcmFjdGVyaXN0aWMoMDAwMDJhMDYtMDAwMC0xMDAw
+LTgwMDAtMDA4MDVmOWIzNGZiKTogR2V0KCJWYWx1ZSIpDQo+ID4gPiBEZXNjcmlwdG9yKDgyNjBj
+NjUzLTFhNTQtNDI2Yi05ZTM2LWU4NGMyMzhiYzY2OSk6IEdldCgiVmFsdWUiKQ0KPiA+ID4gUmVn
+aXN0ZXJTZXJ2aWNlOiBNZXRob2QgIlJlZ2lzdGVyU2VydmljZSIgd2l0aCBzaWduYXR1cmUgIm9h
+e3N2fSIgb24NCj4gPiA+IGludGVyZmFjZSAib3JnLmJsdWV6LkdhdHRNYW5hZ2VyMSIgZG9lc24n
+dCBleGlzdA0KPiA+ID4NCj4gPiA+IEkgYW0gdXNpbmcgdGhlIERidXMgY29uZmlnIGZyb20NCj4g
+PiBodHRwOi8vZ2l0Lmtlcm5lbC5vcmcvY2dpdC9ibHVldG9vdGgvYmx1ZXouZ2l0L3RyZWUvc3Jj
+L2JsdWV0b290aC5jb25mLg0KPiA+ID4NCj4gPiA+IEFueSBpZGVhIHdoeSBpdCBmYWlscyB0byBy
+ZWdpc3RlciB0aGUgc2VydmljZT8gRG8gSSBuZWVkIHRvIGVuYWJsZQ0KPiA+ID4gb3RoZXINCj4g
+PiBmZWF0dXJlcyBvciBpZiB0aGVyZSBpcyBhbnkgbWlzc2luZyBzdGVwcz8NCj4gPg0KPiA+IEl0
+IHNob3VsZCB3b3JrIGlmIHlvdSBoYXZlIC1FLCBidXQgcGVyaGFwcyBzb21ldGhpbmcgZWxzZSBp
+cyBub3QgdGhlDQo+ID4gY29ycmVjdCwgbGlrZSB0aGUgcGF0aCwgZXRjLiBCdHcsIHdlIGRvIGhh
+dmUgYW4gZXhhbXBsZSBoZXJlOg0KPiA+DQo+ID4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9jZ2l0
+L2JsdWV0b290aC9ibHVlei5naXQvdHJlZS90ZXN0L2V4YW1wbGUtZ2F0dA0KPiA+IC0NCj4gPiBz
+ZXJ2ZXINCj4gPg0KPiBUaGFuayB5b3UgZm9yIGhpZ2hsaWdodGluZy4gSSByYW4gaXQgYW5kIGl0
+IHdvcmtlZCBnb29kLiBJdCBhYmxlIHRvIHJlZ2lzdGVyIHRoZQ0KPiBzZXJ2aWNlcyBzdWNjZXNz
+ZnVsbHkuICBCdXQgd2hlbiBJIHJhbiB0aGUgZXhhbXBsZS1nYXR0LWNsaWVudCwgaXQgd2VudCBp
+bnRvDQo+IGJlbG93IGVycm9yOg0KPiANCj4gRXhhbXBsZS1nYXR0LXNlcnZlciBvdXRwdXQgYXQ6
+IGh0dHA6Ly9wYXN0ZWJpbi5jb20vdnBoZ3M5MngNCj4gDQo+IHJvb3RAaW14Mjhldms6fi90b29s
+cyMgcHl0aG9uIGV4YW1wbGUtZ2F0dC1jbGllbnQNCj4gL29yZy9ibHVlei9leGFtcGxlL3NlcnZp
+Y2UwIE1ldGhvZCAiR2V0QWxsIiB3aXRoIHNpZ25hdHVyZSAicyIgb24NCj4gaW50ZXJmYWNlICJv
+cmcuZnJlZWRlc2t0b3AuREJ1cy5Qcm9wZXJ0aWVzIiBkb2Vzbid0IGV4aXN0DQo+IA0KPiBJcyB0
+aGUgcGF0aCBwcm92aWRlZCBpcyBjb3JyZWN0PyBJIGhhdmUgYSBkb3VidC4gIEVuZCBvdXRwdXQg
+aXMgSSB3YW50IHRvDQo+IHJlZ2lzdGVyIHByaW1hcnkvc2Vjb25kYXJ5IHNlcnZpY2VzLg0KDQoN
+ClNvcnJ5IEx1aXosIEkgd2VudCBpbnRvIHRoZSB3cm9uZyBsb29wLiBBZnRlciBnb2luZyB0aHJv
+dWdoIHRoZSBjb2RlIGl0IG1ha2VzIG1lIGNsZWFyLiBUaGUgc2VydmljZXMgY2FuIGJlIHJlZ2lz
+dGVyZWQgc3VjY2Vzc2Z1bGx5IG9uIHRoZSBkZXZpY2UgYWZ0ZXIgcnVubmluZyBleGFtcGxlLWdh
+dHQtc2VydmVyLiANCkkgaGF2ZSB2ZXJpZmllZCBpdCBhcyBiZWxvdyBydW5uaW5nIGJsdWV0b290
+aGN0bDoNCltibHVldG9vdGhdIyBzaG93DQpDb250cm9sbGVyIDFDOkJBOjhDOjg2OjgxOjIxDQog
+ICAgICAgIE5hbWU6IHRlc3QtYnQNCiAgICAgICAgQWxpYXM6IHRlc3QtYnQNCiAgICAgICAgQ2xh
+c3M6IDB4NDAwMDAwDQogICAgICAgIFBvd2VyZWQ6IHllcw0KICAgICAgICBEaXNjb3ZlcmFibGU6
+IG5vDQogICAgICAgIFBhaXJhYmxlOiB5ZXMNCiAgICAgICAgVVVJRDogR2VuZXJpYyBBdHRyaWJ1
+dGUgUHJvZmlsZSAoMDAwMDE4MDEtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQ0KICAgICAg
+ICBVVUlEOiBBL1YgUmVtb3RlIENvbnRyb2wgICAgICAgICgwMDAwMTEwZS0wMDAwLTEwMDAtODAw
+MC0wMDgwNWY5YjM0ZmIpDQogICAgICAgIFVVSUQ6IFNJTSBBY2Nlc3MgICAgICAgICAgICAgICAg
+KDAwMDAxMTJkLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikNCiAgICAgICAgVVVJRDogR2Vu
+ZXJpYyBBY2Nlc3MgUHJvZmlsZSAgICAoMDAwMDE4MDAtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIz
+NGZiKQ0KICAgICAgICBVVUlEOiBQblAgSW5mb3JtYXRpb24gICAgICAgICAgICgwMDAwMTIwMC0w
+MDAwLTEwMDAtODAwMC0wMDgwNWY5YjM0ZmIpDQogICAgICAgIFVVSUQ6IEEvViBSZW1vdGUgQ29u
+dHJvbCBUYXJnZXQgKDAwMDAxMTBjLTAwMDAtMTAwMC04MDAwLTAwODA1ZjliMzRmYikNCiAgICAg
+ICAgVVVJRDogSGVhcnQgUmF0ZSAgICAgICAgICAgICAgICAoMDAwMDE4MGQtMDAwMC0xMDAwLTgw
+MDAtMDA4MDVmOWIzNGZiKQ0KICAgICAgICBVVUlEOiBWZW5kb3Igc3BlY2lmaWMgICAgICAgICAg
+ICgxMjM0NTY3OC0xMjM0LTU2NzgtMTIzNC01Njc4OWFiY2RlZjApDQogICAgICAgIE1vZGFsaWFz
+OiB1c2I6djFENkJwMDI0NmQwNTFFDQogICAgICAgIERpc2NvdmVyaW5nOiBubw0KDQpUaGFua3Mg
+Zm9yIHN1cHBvcnQuDQpBbmt1cg0KPiANCj4gVGhhbmsgeW91LA0KPiBBbmt1ci4NCj4gPiAtLQ0K
+PiA+IEx1aXogQXVndXN0byB2b24gRGVudHoNCg==
