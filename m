@@ -1,74 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5555FE93.30401@linux.intel.com>
-Date: Fri, 15 May 2015 16:11:31 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 4/5] Bluetooth: btbcm: Split setup() function
-References: <1431008699-6419-1-git-send-email-frederic.danis@linux.intel.com> <1431008699-6419-4-git-send-email-frederic.danis@linux.intel.com> <6F8C6327-C7F0-4081-B3A8-8A3A609C915E@holtmann.org>
-In-Reply-To: <6F8C6327-C7F0-4081-B3A8-8A3A609C915E@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <CABBYNZJqtNL58FU_iMHi9HjTBOufyb9mkEWFSf2-gUuYm_Uwzw@mail.gmail.com>
+References: <1431643129-37383-1-git-send-email-jamuraa@chromium.org>
+	<CABBYNZJqtNL58FU_iMHi9HjTBOufyb9mkEWFSf2-gUuYm_Uwzw@mail.gmail.com>
+Date: Fri, 15 May 2015 07:09:15 -0700
+Message-ID: <CAJLTA8iCPeQE1HrwWK57kjr9Qmghs+Ygmj2E+odf58xNh5Z_VA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Fix name in AUTHORS
+From: Marie Janssen <jamuraa@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel,
+Hi Luiz,
 
-On 07/05/2015 18:22, Marcel Holtmann wrote:
-> Hi Fred,
+On Fri, May 15, 2015 at 4:18 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
 >
->> Split btbcm_setup_patchram in 3 functions : btbcm_setup_patchram,
->> btbcm_patchram (already existing) and btbcm_setup_post.
->> For UART controllers this will allow to reset speed to default one
->> after firmware loading, which will have reseted controller speed to
->> default one.
->>
->> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+> On Fri, May 15, 2015 at 1:38 AM, Marie Janssen <jamuraa@chromium.org> wrote:
+>> Update Marie's name to be correct.
 >> ---
->> drivers/bluetooth/btbcm.c   | 29 +++++++++++++++++------------
->> drivers/bluetooth/btbcm.h   | 11 +++++++++--
->> drivers/bluetooth/btusb.c   | 23 ++++++++++++++++++++++-
->> drivers/bluetooth/hci_bcm.c | 19 ++++++++++++++++++-
->> 4 files changed, 66 insertions(+), 16 deletions(-)
+>>  AUTHORS | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
 >>
->> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
->> index b258454..f2efbbd 100644
->> --- a/drivers/bluetooth/btbcm.c
->> +++ b/drivers/bluetooth/btbcm.c
->> @@ -277,9 +277,8 @@ static const struct {
->> 	{ }
->> };
->>
->> -int btbcm_setup_patchram(struct hci_dev *hdev)
->> +int btbcm_setup_patchram(struct hci_dev *hdev, char *fw_name, size_t len)
+>> diff --git a/AUTHORS b/AUTHORS
+>> index 3264a36..dc53c08 100644
+>> --- a/AUTHORS
+>> +++ b/AUTHORS
+>> @@ -97,4 +97,4 @@ Alex Gal <a.gal@miip.ca>
+>>  Loic Poulain <loic.poulain@intel.com>
+>>  Gowtham Anandha Babu <gowtham.ab@samsung.com>
+>>  Bharat Panda <bharat.panda@samsung.com>
+>> -Michael Janssen <jamuraa@chromium.org>
+>> +Marie Janssen <jamuraa@chromium.org>
+>> --
+>> 2.2.0.rc0.207.ga3a616c
 >
-> what is this len for? The fw_name is not a return value. I think the functions for doing the patchram should just get a firmware and then just do patchram.
+> You got me confused, you have some far been contributing with Michael
+> as first name and there is not a single mention of Marie in git
+> shortlog, so are you planning to switch to use Marie? If so we might
+> need to update .mailmap as well.
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-I split btbcm_setup_patchram() in 3 functions:
-- btbcm_setup_patchram() which resets the controller and returns the 
-firmware name.
-- btbtcm_patchram() (already existing and public), which takes the 
-firmware name as parameter, requests the firmware and loads it to the 
-controller.
-- btbcm_setup_post() which resets the controller, reads local version 
-and checks if the controller address is a default one or not.
 
-I split it between btbcm_patchram() and btbcm_setup_post() as firmware 
-loading may reset the controller UART speed and it needs to set host 
-UART speed back to init speed.
+I am planning to switch to to Marie from now on.  I figured this was
+easiest since the email is remaining the same. I was unaware of
+.mailmap but it seems suited to this purpose as well, so I can send a
+v2 or you can fix it as you commit.
 
-I also split it between btbcm_setup_patchram() and btbtcm_patchram() 
-because error is not managed the same way for both of them.
-When btbcm_setup_patchram() returns an error, this error is forwarded to 
-caller.
-When btbtcm_patchram() returns an error, if the error is -ENOENT then 
-this error is discarded and 0 is returned to caller. Otherwise, the 
-error is also discarded but there is a need to call btbcm_setup_post() 
-to reset controller.
-
-Regards
-
-Fred
-
--- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
+--
+Marie Janssen
