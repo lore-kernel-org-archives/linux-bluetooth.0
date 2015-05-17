@@ -1,114 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
+From: Aleksey <info@dv2c.ru>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btusb: correct typo for Roper bluetooth dongle since 4.x kernel
+Date: Sun, 17 May 2015 23:36:21 +0300
+Message-ID: <4369906.br2nyPddpV@vwd-1>
 MIME-Version: 1.0
-In-Reply-To: <20150517134635.GA3114@t440s.P-661HNU-F1>
-References: <5558987E.5040604@gmail.com>
-	<20150517134635.GA3114@t440s.P-661HNU-F1>
-Date: Sun, 17 May 2015 21:22:26 -0300
-Message-ID: <CAB=SE9gggyExOBpFF1y_s9iwLYVi2FLHt0n+QH9TxqOW-N_TOQ@mail.gmail.com>
-Subject: Re: What am I missing?
-From: Florian Grandel <fgrandel@gmail.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>, Arman Uguray <armansito@chromium.org>,
-	Marcel Holtmann <marcel@holtmann.org>
-Content-Type: multipart/alternative; boundary=001a11409f183f044105165030e7
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a11409f183f044105165030e7
-Content-Type: text/plain; charset=UTF-8
+That patch correct typo in "Roper Class 1 Bluetooth Dongle" since 4.x kernel
 
->
-> Hi Florian,
->
-> On Sun, May 17, 2015, Florian Grandel wrote:
-> > Hi Marcel and Johan,
-> >
-> > here is what I did so far:
-> >
-> > - I asked you whether contributions from newcomers are welcome (which
-Marcel
-> > agreed to),
-> >
-> > - I coordinated the development target and approach with Marcel to make
-sure
-> > that my contribution will be generally useful and acceptable,
-> >
-> > - I read lots of documentation to make sure that I'm asking as few
-redundant
-> > questions as possible,
-> >
-> > - I invested a considerable amount of time to put a useful contribution
-> > together,
-> >
-> > - Arman invested a considerable amount of time to review it,
-> >
-> > - I again invested a considerable amount of time to work in all review
-> > comments.
-> >
-> > - I waited for several weeks and pinged you several times to get you to
-do
-> > your part as maintainers...
-> >
-> > What am I missing?? Did I overlook your response? Or is this the
-"normal"
-> > Kernel community approach?
->
-> No need to get worried or frustrated about your set. It hasn't been
-> forgotten about and it hasn't lost the chance to get included in the
-> first possible kernel release, i.e. 4.2. It'll very likely go into a
-> bluetooth-next pull request before the 4.2 merge window opens.
->
-> For my part I have no major objections after reading it through a couple
-> of times - I remember Marcel saying he'd take a look after Arman's
-> review, which is what I've mostly be waiting for. But in no case has
-> your set been forgotten.
->
+Content /sys/kernel/debug/usb/devices for these dongle:
 
-Ok, cool. Thanks for letting me know. I really got frustrated w/o getting
-any feedback but now it's ok. :)
+T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=1310 ProdID=0001 Rev=15.00
+S:  Manufacturer=SiW
+S:  Product=SiW
+S:  SerialNumber=E7BB050D0B00
+C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr= 50mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
---001a11409f183f044105165030e7
-Content-Type: text/html; charset=UTF-8
 
-<p dir="ltr">&gt;<br>
-&gt; Hi Florian,<br>
-&gt;<br>
-&gt; On Sun, May 17, 2015, Florian Grandel wrote:<br>
-&gt; &gt; Hi Marcel and Johan,<br>
-&gt; &gt;<br>
-&gt; &gt; here is what I did so far:<br>
-&gt; &gt;<br>
-&gt; &gt; - I asked you whether contributions from newcomers are welcome (which Marcel<br>
-&gt; &gt; agreed to),<br>
-&gt; &gt;<br>
-&gt; &gt; - I coordinated the development target and approach with Marcel to make sure<br>
-&gt; &gt; that my contribution will be generally useful and acceptable,<br>
-&gt; &gt;<br>
-&gt; &gt; - I read lots of documentation to make sure that I&#39;m asking as few redundant<br>
-&gt; &gt; questions as possible,<br>
-&gt; &gt;<br>
-&gt; &gt; - I invested a considerable amount of time to put a useful contribution<br>
-&gt; &gt; together,<br>
-&gt; &gt;<br>
-&gt; &gt; - Arman invested a considerable amount of time to review it,<br>
-&gt; &gt;<br>
-&gt; &gt; - I again invested a considerable amount of time to work in all review<br>
-&gt; &gt; comments.<br>
-&gt; &gt;<br>
-&gt; &gt; - I waited for several weeks and pinged you several times to get you to do<br>
-&gt; &gt; your part as maintainers...<br>
-&gt; &gt;<br>
-&gt; &gt; What am I missing?? Did I overlook your response? Or is this the &quot;normal&quot;<br>
-&gt; &gt; Kernel community approach?<br>
-&gt;<br>
-&gt; No need to get worried or frustrated about your set. It hasn&#39;t been<br>
-&gt; forgotten about and it hasn&#39;t lost the chance to get included in the<br>
-&gt; first possible kernel release, i.e. 4.2. It&#39;ll very likely go into a<br>
-&gt; bluetooth-next pull request before the 4.2 merge window opens.<br>
-&gt;<br>
-&gt; For my part I have no major objections after reading it through a couple<br>
-&gt; of times - I remember Marcel saying he&#39;d take a look after Arman&#39;s<br>
-&gt; review, which is what I&#39;ve mostly be waiting for. But in no case has<br>
-&gt; your set been forgotten.<br>
-&gt;</p>
-<p dir="ltr">Ok, cool. Thanks for letting me know. I really got frustrated w/o getting any feedback but now it&#39;s ok. :)</p>
 
---001a11409f183f044105165030e7--
+Signed-off-by: Aleksei Volkov <info@dv2c.ru>
+---
+ drivers/bluetooth/btusb.c | 1+-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff -up linux-4.0.0-gentoo/drivers/bluetooth/btusb.c.orig linux-4.0.0-gentoo/drivers/bluetooth/btusb.c 
+--- linux-4.0.0/drivers/bluetooth/btusb.c.orig	2015-05-01 12:06:59.000000000 +0300
++++ linux-4.0.0/drivers/bluetooth/btusb.c	2015-05-07 22:22:13.000000000 +0300
+@@ -254,6 +254,6 @@ static const struct usb_device_id blackl
+ 
+ 	/* Roper Class 1 Bluetooth Dongle (Silicon Wave based) */
+-	{ USB_DEVICE(0x1300, 0x0001), .driver_info = BTUSB_SWAVE },
++	{ USB_DEVICE(0x1310, 0x0001), .driver_info = BTUSB_SWAVE },
+ 
+ 	/* Digianswer devices */
+ 	{ USB_DEVICE(0x08fd, 0x0001), .driver_info = BTUSB_DIGIANSWER },
+-- 
