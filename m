@@ -1,81 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 17 May 2015 15:51:36 +0300
+Date: Sun, 17 May 2015 10:41:00 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth 2015-05-17
-Message-ID: <20150517125136.GA763@t440s.P-661HNU-F1>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 1/8] btdev: Add LE Encrypt command support to emulator
+Message-ID: <20150517074100.GB28324@t440s.P-661HNU-F1>
+References: <1431697586-20611-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20150517073318.GC27593@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="vtzGhvizbBRQ85DL"
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20150517073318.GC27593@t440s.P-661HNU-F1>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---vtzGhvizbBRQ85DL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Sun, May 17, 2015, Johan Hedberg wrote:
+> Hi Andrei,
+> 
+> On Fri, May 15, 2015, Andrei Emeltchenko wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Add basic crypto support to btdev using Linux crypto infrastructure.
+> > ---
+> >  emulator/btdev.c | 31 +++++++++++++++++++++++++++++++
+> >  1 file changed, 31 insertions(+)
+> 
+> Was something different in the first three patches of this set? I
+> already applied the v1 of them. Please, *always* provide a full
+> changelog of what has changed when you send new revisions (either on a
+> per-patch basis after the '---' line or with the help of a cover letter.
 
-Hi Dave,
-
-A couple more Bluetooth updates for 4.1:
-
-- New USB IDs for ath3k & btusb
-- Fix for remote name resolving during device discovery
-
-Please let me know if there are any issues pulling. Thanks.
+I went ahead and pushed the v2 through --force since the earlier patches
+only had a chance to be a couple of minutes in the upstream tree.
 
 Johan
-
----
-The following changes since commit 110bc76729d448fdbcb5cdb63b83d9fd65ce5e26:
-
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net (2015-05-12 21:10:38 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to 177d0506a911eb60b38b172215df5325ed94fa64:
-
-  Bluetooth: Fix remote name event return directly. (2015-05-14 10:35:04 +0200)
-
-----------------------------------------------------------------
-Dmitry Tunin (1):
-      Bluetooth: ath3k: add support of 04ca:300f AR3012 device
-
-Wen-chien Jesse Sung (2):
-      Bluetooth: ath3k: Add a new ID 0cf3:e006 to ath3k list
-      Bluetooth: btusb: Add support for 0cf3:e007
-
-Wesley Kuo (1):
-      Bluetooth: Fix remote name event return directly.
-
- drivers/bluetooth/ath3k.c | 4 ++++
- drivers/bluetooth/btusb.c | 3 +++
- net/bluetooth/hci_core.c  | 6 ++++--
- 3 files changed, 11 insertions(+), 2 deletions(-)
-
-
---vtzGhvizbBRQ85DL
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJVWI7YAAoJECQj9vv5qNQSy48P/i/xjBW4S11WwJLXj6PNQ2QQ
-vLvBGMWTtfuXhGlMChli2v6BysUt35N9+0UwfCKFt/UD9ZKiUyNvC9tCmpl7g2Hb
-btIZasmZ2cjukGe4H3OL35Wi/RnfwjfAlVew0WQKYOPPACdrqy3P32/2J57dc7HA
-oJRCDkvnnZ3a5k03tkBLtEBVF+iusg5t8ftiD3m48PV4+wdNPpLRp1899Wln9Og9
-sT6Nd/bqhYLLI//Z8Jib8RSOKS/i4aVpDGFQWOpURtDeOuGKjl7M9IBcRsRo8iZT
-Fme/hGzZovAhyh0HB7mnVqZT8DR7UzfeZInMTxXr68Sgv7LuCqVBPAtTIe0M5Y9v
-3EY95AqS/8pDXtuN201IwMOX97pZpkOp2Ob69LqxtLg/0EnHYhdbD/HA4mT48DSe
-DvwRNyj/n1450d8YHYoCG4ajFpcOzxX3UFqaJXNKBJfcqeK6VwTcQ+lITkCu/dqB
-rPcNPUbem5vP2vwfrYBWwSrD5vHYnPfn4UinrxpyKyaIUgDlL9a1+fNUp/B5mdzp
-L2h4TiMRQoJv7D9OXuNBIojRaYNecCLzRJtZXKKEmUDRzKWhx3SnaCxu17GtnqbW
-PwbP6wVASV/HT2ctHSw152M0tEba6Qw32QHqq9RFcwvpHkygwm9VIJkouOpibg5H
-jMAwRpuGhZOB6K9g4kru
-=MmM5
------END PGP SIGNATURE-----
-
---vtzGhvizbBRQ85DL--
