@@ -1,101 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-From: chanyeol.park@samsung.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ v3 2/2] audio/a2dp: Remove useless check_vendor_codec()
-Date: Mon, 18 May 2015 22:33:10 +0900
-Message-id: <1431955990-16506-2-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1431955990-16506-1-git-send-email-chanyeol.park@samsung.com>
-References: <1431955990-16506-1-git-send-email-chanyeol.park@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Date: Mon, 18 May 2015 17:33:56 +0530
+Message-ID: <CAE2MWkm-2EGRWGCLoAV3KsfDsGtYuqNEQy_-Kewto1XR=dnm6g@mail.gmail.com>
+Subject: Query: To disable bluetooth data path
+From: Ujjal Roy <royujjal@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Chan-yeol Park <chanyeol.park@gmail.com>
+Hi,
 
-This function could be removed because A2DP vendor codec match is
-already verified in avdtp_find_remote_sep().
----
- profiles/audio/a2dp.c | 54 +++------------------------------------------------
- 1 file changed, 3 insertions(+), 51 deletions(-)
+I want to know the API, if any exists, to disable the data path from
+bluetooth driver. Say, for e.g. netif_device_detach() works fine for
+ethernet driver. So, which API is for bluetooth?
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 291be35..4ff5969 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1742,50 +1742,11 @@ done:
- 	finalize_select(setup);
- }
- 
--static gboolean check_vendor_codec(struct a2dp_sep *sep, uint8_t *cap,
--								size_t len)
--{
--	uint8_t *capabilities;
--	size_t length;
--	a2dp_vendor_codec_t *local_codec;
--	a2dp_vendor_codec_t *remote_codec;
--
--	if (len < sizeof(a2dp_vendor_codec_t))
--		return FALSE;
--
--	remote_codec = (a2dp_vendor_codec_t *) cap;
--
--	if (sep->endpoint == NULL)
--		return FALSE;
--
--	length = sep->endpoint->get_capabilities(sep,
--				&capabilities, sep->user_data);
--
--	if (length < sizeof(a2dp_vendor_codec_t))
--		return FALSE;
--
--	local_codec = (a2dp_vendor_codec_t *) capabilities;
--
--	if (btohl(remote_codec->vendor_id) != btohl(local_codec->vendor_id))
--		return FALSE;
--
--	if (btohs(remote_codec->codec_id) != btohs(local_codec->codec_id))
--		return FALSE;
--
--	DBG("vendor 0x%08x codec 0x%04x", btohl(remote_codec->vendor_id),
--						btohs(remote_codec->codec_id));
--
--	return TRUE;
--}
--
- static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
- 					const char *sender)
- {
- 	for (; list; list = list->next) {
- 		struct a2dp_sep *sep = list->data;
--		struct avdtp_remote_sep *rsep;
--		struct avdtp_media_codec_capability *cap;
--		struct avdtp_service_capability *service;
- 
- 		/* Use sender's endpoint if available */
- 		if (sender) {
-@@ -1799,20 +1760,11 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
- 				continue;
- 		}
- 
--		rsep = avdtp_find_remote_sep(session, sep->lsep,
--							a2dp_vndcodec_matched);
--		if (rsep == NULL)
-+		if (avdtp_find_remote_sep(session, sep->lsep,
-+					a2dp_vndcodec_matched) == NULL)
- 			continue;
- 
--		service = avdtp_get_codec(rsep);
--		cap = (struct avdtp_media_codec_capability *) service->data;
--
--		if (cap->media_codec_type != A2DP_CODEC_VENDOR)
--			return sep;
--
--		if (check_vendor_codec(sep, cap->data,
--					service->length - sizeof(*cap)))
--			return sep;
-+		return sep;
- 	}
- 
- 	return NULL;
--- 
-2.1.0
+Please help ASAP.
 
+Thanks,
+UjjaL Roy
