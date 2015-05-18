@@ -1,73 +1,189 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] emulator: Add initial support for Controller to Host flow control
-Date: Mon, 18 May 2015 21:33:14 +0200
-Message-Id: <1431977594-6029-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1431955990-16506-1-git-send-email-chanyeol.park@samsung.com>
+References: <1431955990-16506-1-git-send-email-chanyeol.park@samsung.com>
+Date: Mon, 18 May 2015 17:42:42 +0300
+Message-ID: <CABBYNZ+ArOx-J-WDQq3JQO8VMhte9P8Wg5KNqvazGZxHA-tkcA@mail.gmail.com>
+Subject: Re: [RFC BlueZ v3 1/2] audio/avdtp: Add a2dp vendor codec match callback
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Chan-yeol Park <chanyeol.park@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This just allow to enable Controller to Host flow control and
-properly don't send Command Status for Host Number Of Completed
-Packets Command.
+Hi Chan-yeol,
 
-Proper handling on ACL data is still missing though.
----
- emulator/btdev.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+On Mon, May 18, 2015 at 4:33 PM,  <chanyeol.park@samsung.com> wrote:
+> From: Chan-yeol Park <chanyeol.park@gmail.com>
+>
+> When matching remote SEP to local SEP avdtp does not compare vendor
+> codecs properly, i.e. neither vendor ID not codec ID are checked,
+> which may cause wrong endpoint to be selected in case there are more
+> that one endpoints using vendor codec on remote.
+>
+> This patch fixes it by making avdtp matching a2dp vendor codec by
+> a2dp's call back.
+> ---
+>  profiles/audio/a2dp.c  | 41 +++++++++++++++++++++++++++++++++++++----
+>  profiles/audio/avdtp.c |  7 ++++++-
+>  profiles/audio/avdtp.h |  6 +++++-
+>  3 files changed, 48 insertions(+), 6 deletions(-)
+>
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index 31c5086..291be35 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -925,6 +925,35 @@ static gboolean close_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+>         return TRUE;
+>  }
+>
+> +static gboolean a2dp_vndcodec_matched(void *remote_vndcodec, void *user_data)
+> +{
+> +       struct a2dp_sep *sep = user_data;
+> +       a2dp_vendor_codec_t *remote_codec = remote_vndcodec;
+> +       a2dp_vendor_codec_t *local_codec;
+> +       uint8_t *capabilities;
+> +       size_t length;
+> +
+> +       if (sep->endpoint == NULL)
+> +               return FALSE;
+> +
+> +       length = sep->endpoint->get_capabilities(sep, &capabilities,
+> +                                                       sep->user_data);
+> +       if (length < sizeof(a2dp_vendor_codec_t))
+> +               return FALSE;
+> +
+> +       local_codec = (a2dp_vendor_codec_t *) capabilities;
+> +
+> +       if (remote_codec->vendor_id != local_codec->vendor_id)
+> +               return FALSE;
+> +
+> +       if (remote_codec->codec_id != local_codec->codec_id)
+> +               return FALSE;
+> +
+> +       DBG("vendor 0x%08x codec 0x%04x", btohl(remote_codec->vendor_id),
+> +                                               btohs(remote_codec->codec_id));
+> +       return TRUE;
+> +}
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index d9a0c5d..ca9788b 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -138,6 +138,8 @@ struct btdev {
- 	uint16_t sync_train_interval;
- 	uint32_t sync_train_timeout;
- 	uint8_t  sync_train_service_data;
-+
-+	uint8_t  flow_control;
- };
- 
- struct inquiry_data {
-@@ -1917,6 +1919,8 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	const struct bt_hci_cmd_read_local_amp_assoc *rlaa_cmd;
- 	const struct bt_hci_cmd_read_rssi *rrssi;
- 	const struct bt_hci_cmd_read_tx_power *rtxp;
-+	const struct bt_hci_cmd_set_host_flow_control *cflow;
-+	const struct bt_hci_cmd_host_num_completed_packets *host_num;
- 	struct bt_hci_rsp_read_default_link_policy rdlp;
- 	struct bt_hci_rsp_read_stored_link_key rslk;
- 	struct bt_hci_rsp_write_stored_link_key wslk;
-@@ -2980,6 +2984,28 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		cmd_complete(btdev, opcode, &lte, sizeof(lte));
- 		break;
- 
-+	case BT_HCI_CMD_SET_HOST_FLOW_CONTROL:
-+		cflow = data;
-+		if (cflow->enable > 0x03) {
-+			status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		} else {
-+			status = BT_HCI_ERR_SUCCESS;
-+			btdev->flow_control = cflow->enable;
-+		}
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
-+
-+	case BT_HCI_CMD_HOST_NUM_COMPLETED_PACKETS:
-+		host_num = data;
-+		if (btdev->flow_control > 0x00) {
-+			uint16_t i;
-+
-+			for (i = 0; i < host_num->count; i++) {
-+				/* TODO */
-+			}
-+		}
-+		break;
-+
- 	default:
- 		goto unsupported;
- 	}
+That was not what I has initially in mind, anyway Im not against
+adding a callback to interact with avdtp_find_remote_sep but perhaps
+it should happen when registering the endpoint so AVDTP code don't
+need to check if codec is 0xff, instead it just call the callback if
+it exists after checking the codec. That means adding a match callback
+avdtp_sep_ind:
+
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index 1b02232..2d55a20 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -172,6 +172,8 @@ struct avdtp_sep_cfm {
+ /* Callbacks for indicating when we received a new command. The return value
+  * indicates whether the command should be rejected or accepted */
+ struct avdtp_sep_ind {
++       gboolean (*match) (struct avdtp *session, struct avdtp_local_sep *lsep,
++                                       struct avdtp_remote_sep *rsep);
+        gboolean (*get_capability) (struct avdtp *session,
+                                        struct avdtp_local_sep *sep,
+                                        gboolean get_all,
+
+>  static gboolean a2dp_reconfigure(gpointer data)
+>  {
+>         struct a2dp_setup *setup = data;
+> @@ -939,7 +968,8 @@ static gboolean a2dp_reconfigure(gpointer data)
+>         }
+>
+>         if (!setup->rsep || sep->codec != rsep_codec->media_codec_type)
+> -               setup->rsep = avdtp_find_remote_sep(setup->session, sep->lsep);
+> +               setup->rsep = avdtp_find_remote_sep(setup->session, sep->lsep,
+> +                                                       a2dp_vndcodec_matched);
+>
+>         posix_err = avdtp_set_configuration(setup->session, setup->rsep,
+>                                                 sep->lsep,
+> @@ -1769,7 +1799,8 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+>                                 continue;
+>                 }
+>
+> -               rsep = avdtp_find_remote_sep(session, sep->lsep);
+> +               rsep = avdtp_find_remote_sep(session, sep->lsep,
+> +                                                       a2dp_vndcodec_matched);
+>                 if (rsep == NULL)
+>                         continue;
+>
+> @@ -1835,7 +1866,8 @@ unsigned int a2dp_select_capabilities(struct avdtp *session,
+>         cb_data->user_data = user_data;
+>
+>         setup->sep = sep;
+> -       setup->rsep = avdtp_find_remote_sep(session, sep->lsep);
+> +       setup->rsep = avdtp_find_remote_sep(session, sep->lsep,
+> +                                                       a2dp_vndcodec_matched);
+>
+>         if (setup->rsep == NULL) {
+>                 error("Could not find remote sep");
+> @@ -1934,7 +1966,8 @@ unsigned int a2dp_config(struct avdtp *session, struct a2dp_sep *sep,
+>                         break;
+>                 }
+>
+> -               setup->rsep = avdtp_find_remote_sep(session, sep->lsep);
+> +               setup->rsep = avdtp_find_remote_sep(session, sep->lsep,
+> +                                                       a2dp_vndcodec_matched);
+>                 if (setup->rsep == NULL) {
+>                         error("No matching ACP and INT SEPs found");
+>                         goto failed;
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index f38188f..ab07128 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -1198,7 +1198,8 @@ static struct avdtp_local_sep *find_local_sep_by_seid(struct avdtp *session,
+>  }
+>
+>  struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+> -                                               struct avdtp_local_sep *lsep)
+> +                                               struct avdtp_local_sep *lsep,
+> +                                               avdtp_vndcodec_matched_cb cb)
+>  {
+>         GSList *l;
+>
+> @@ -1226,6 +1227,10 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+>                 if (codec_data->media_codec_type != lsep->codec)
+>                         continue;
+>
+> +               if (codec_data->media_codec_type == 0xff && cb)
+> +                       if (cb(codec_data->data, lsep->user_data) == FALSE)
+> +                               continue;
+> +
+>                 if (sep->stream == NULL)
+>                         return sep;
+>         }
+> diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+> index 1b02232..5886691 100644
+> --- a/profiles/audio/avdtp.h
+> +++ b/profiles/audio/avdtp.h
+> @@ -277,9 +277,13 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+>                                                 struct avdtp_sep_cfm *cfm,
+>                                                 void *user_data);
+>
+> +typedef gboolean (*avdtp_vndcodec_matched_cb) (void *remote_vndcodec,
+> +                                                        void *user_data);
+> +
+>  /* Find a matching pair of local and remote SEP ID's */
+>  struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+> -                                               struct avdtp_local_sep *lsep);
+> +                                               struct avdtp_local_sep *lsep,
+> +                                               avdtp_vndcodec_matched_cb cb);
+>
+>  int avdtp_unregister_sep(struct queue *lseps, struct avdtp_local_sep *sep);
+>
+> --
+> 2.1.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
