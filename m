@@ -1,144 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJLTA8jZi=f-Eh5n1EmQjf3z8BJ_kRjB9t8q1EfAvP8OZM-FQg@mail.gmail.com>
-References: <1431696620-4762-1-git-send-email-luiz.dentz@gmail.com>
-	<CAJLTA8gcGVoRaHpiYzLNBgYjZFGGdocnt=g0rZ+qh9S34X2eFA@mail.gmail.com>
-	<CAJLTA8jZi=f-Eh5n1EmQjf3z8BJ_kRjB9t8q1EfAvP8OZM-FQg@mail.gmail.com>
-Date: Mon, 18 May 2015 14:14:26 +0300
-Message-ID: <CABBYNZKHn0dLOrO3NR6rWukt6ZxTwUdBwA8Pzt3j5_Ucej5nsg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/ad: Replace data if already exists
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marie Janssen <jamuraa@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] tester: Verify DHKey generation
+Date: Mon, 18 May 2015 12:41:36 +0300
+Message-Id: <1431942097-21927-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1431942097-21927-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1431942097-21927-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marie,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, May 15, 2015 at 7:04 PM, Marie Janssen <jamuraa@chromium.org> wrote:
-> On Fri, May 15, 2015 at 9:02 AM, Marie Janssen <jamuraa@chromium.org> wrote:
->> Hi Luiz,
->>
->> On Fri, May 15, 2015 at 6:30 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> If either manufacturer or service data already exist but the content
->>> is different replace with the new data.
->>> ---
->>>  src/shared/ad.c | 43 ++++++++++++++++++++++++++++++++++++++-----
->>>  1 file changed, 38 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/src/shared/ad.c b/src/shared/ad.c
->>> index 00d138d..dfc6b9a 100644
->>> --- a/src/shared/ad.c
->>> +++ b/src/shared/ad.c
->>> @@ -431,6 +431,14 @@ void bt_ad_clear_service_uuid(struct bt_ad *ad)
->>>         queue_remove_all(ad->service_uuids, NULL, NULL, free);
->>>  }
->>>
->>> +static bool manufacturer_id_data_match(const void *data, const void *user_data)
->>> +{
->>> +       const struct bt_ad_manufacturer_data *m = data;
->>> +       uint16_t id = PTR_TO_UINT(user_data);
->>> +
->>> +       return m->manufacturer_id == id;
->>> +}
->>> +
->>>  bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id,
->>>                                                         void *data, size_t len)
->>>  {
->>> @@ -442,6 +450,17 @@ bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id,
->>>         if (len > (MAX_ADV_DATA_LEN - 2 - sizeof(uint16_t)))
->>>                 return false;
->>>
->>> +       new_data = queue_find(ad->manufacturer_data, manufacturer_id_data_match,
->>> +                                               UINT_TO_PTR(manufacturer_id));
->>> +       if (new_data) {
->>> +               if (new_data->len == len && !memcmp(new_data->data, data, len))
->>> +                       return false;
->>
->> I don't think we want this check. If the data is different but length
->> the same, we still want to update the data.
->
-> Sorry I read this wrong.  We would want to return true here because
-> the data in the ad is as expected.
+Verify that HCI controller correctly generate Diffie-Hellman key.
+---
+ tools/hci-tester.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 93 insertions(+), 7 deletions(-)
 
-This is to prevent emitting duplicated signals since in fact it did
-not change anything.
-
->>> +               new_data->data = realloc(new_data->data, len);
->>> +               memcpy(new_data->data, data, len);
->>> +               new_data->len = len;
->>> +               return true;
->>> +       }
->>> +
->>>         new_data = new0(struct bt_ad_manufacturer_data, 1);
->>>         if (!new_data)
->>>                 return false;
->>> @@ -458,11 +477,6 @@ bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id,
->>>
->>>         new_data->len = len;
->>>
->>> -       if (bt_ad_has_manufacturer_data(ad, new_data)) {
->>> -               manuf_destroy(new_data);
->>> -               return false;
->>> -       }
->>> -
->>>         if (queue_push_tail(ad->manufacturer_data, new_data))
->>>                 return true;
->>>
->>> @@ -556,6 +570,15 @@ void bt_ad_clear_solicit_uuid(struct bt_ad *ad)
->>>         queue_remove_all(ad->solicit_uuids, NULL, NULL, free);
->>>  }
->>>
->>> +
->>> +static bool service_uuid_match(const void *data, const void *user_data)
->>> +{
->>> +       const struct bt_ad_service_data *s = data;
->>> +       const bt_uuid_t *uuid = user_data;
->>> +
->>> +       return bt_uuid_cmp(&s->uuid, uuid);
->>> +}
->>> +
->>>  bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
->>>                                                                 size_t len)
->>>  {
->>> @@ -567,6 +590,16 @@ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
->>>         if (len > (MAX_ADV_DATA_LEN - 2 - (size_t)bt_uuid_len(uuid)))
->>>                 return false;
->>>
->>> +       new_data = queue_find(ad->service_uuids, service_uuid_match, uuid);
->>> +       if (new_data) {
->>> +               if (new_data->len == len && !memcmp(new_data->data, data, len))
->>> +                       return false;
->>
->> Similarly here as from above, it would be better to replace the data.
->>
->>> +               new_data->data = realloc(new_data->data, len);
->>> +               memcpy(new_data->data, data, len);
->>> +               new_data->len = len;
->>> +               return true;
->>> +       }
->>> +
->>>         new_data = new0(struct bt_ad_service_data, 1);
->>>         if (!new_data)
->>>                 return false;
->>> --
->>> 2.1.0
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Marie Janssen
-
-
-
+diff --git a/tools/hci-tester.c b/tools/hci-tester.c
+index 9093129..75d09f0 100644
+--- a/tools/hci-tester.c
++++ b/tools/hci-tester.c
+@@ -474,10 +474,70 @@ static void test_le_read_local_pk(const void *test_data)
+ 	}
+ }
+ 
++static void setup_le_read_local_pk_complete(const void *data, uint8_t size,
++								void *user_data)
++{
++	const uint8_t *event = data;
++	const struct bt_hci_evt_le_read_local_pk256_complete *evt;
++	struct le_keys *keys = user_data;
++
++	if (*event != BT_HCI_EVT_LE_READ_LOCAL_PK256_COMPLETE) {
++		tester_warn("Failed Read Local PK256 command");
++		tester_setup_failed();
++		return;
++	}
++
++	evt = (void *)(event + 1);
++	if (evt->status) {
++		tester_warn("HCI Read Local PK complete failed (0x%02x)",
++								evt->status);
++		tester_setup_failed();
++		return;
++	}
++
++	memcpy(keys->local_pk, evt->local_pk256, 64);
++
++	util_hexdump('>', evt->local_pk256, 64, test_debug, NULL);
++
++	tester_setup_complete();
++}
++
++static void setup_le_read_local_pk_status(const void *data, uint8_t size,
++							void *user_data)
++{
++	uint8_t status = *((uint8_t *) data);
++
++	if (status) {
++		tester_warn("Failed to send DHKey gen cmd (0x%02x)", status);
++		tester_setup_failed();
++		return;
++	}
++}
++
++static void setup_le_generate_dhkey(const void *test_data)
++{
++	struct user_data *user = tester_get_data();
++
++	bt_hci_register(user->hci_ut, BT_HCI_EVT_LE_META_EVENT,
++				setup_le_read_local_pk_complete,
++				(void *)test_data, NULL);
++
++	if (!bt_hci_send(user->hci_ut, BT_HCI_CMD_LE_READ_LOCAL_PK256, NULL,
++				0, setup_le_read_local_pk_status,
++				NULL, NULL)) {
++		tester_warn("Failed to send HCI LE Read Local PK256 command");
++		tester_setup_failed();
++		return;
++	}
++}
++
+ static void test_le_generate_dhkey_complete(const void *data, uint8_t size,
+ 								void *user_data)
+ {
+ 	const uint8_t *event = data;
++	const struct bt_hci_evt_le_generate_dhkey_complete *evt;
++	struct le_keys *keys = user_data;
++	uint8_t dhkey[32];
+ 
+ 	if (*event != BT_HCI_EVT_LE_GENERATE_DHKEY_COMPLETE) {
+ 		tester_warn("Failed DHKey generation command");
+@@ -485,11 +545,32 @@ static void test_le_generate_dhkey_complete(const void *data, uint8_t size,
+ 		return;
+ 	}
+ 
+-	/* TODO: We have remote secret key and local public key, calculate
+-	 * DHKey and compare
++	evt = (void *)(event + 1);
++	if (evt->status) {
++		tester_warn("HCI Generate DHKey complete failed (0x%02x)",
++								evt->status);
++		tester_test_failed();
++		return;
++	}
++
++	util_hexdump('>', evt->dhkey, 32, test_debug, NULL);
++
++
++	util_hexdump('S', keys->remote_sk, 32, test_debug, NULL);
++	util_hexdump('P', keys->local_pk, 64, test_debug, NULL);
++
++	/* Generate DHKey ourself with local public key and remote
++	 * private key we got when generated public / private key
++	 * pair for BT_HCI_CMD_LE_GENERATE_DHKEY argument.
+ 	 */
++	ecdh_shared_secret(keys->local_pk, keys->remote_sk, dhkey);
+ 
+-	tester_test_passed();
++	util_hexdump('D', dhkey, 32, test_debug, NULL);
++
++	if (!memcmp(dhkey, evt->dhkey, 32))
++		tester_test_passed();
++	else
++		tester_test_failed();
+ }
+ 
+ static void test_le_generate_dhkey_status(const void *data, uint8_t size,
+@@ -508,12 +589,16 @@ static void test_le_generate_dhkey(const void *test_data)
+ {
+ 	struct user_data *user = tester_get_data();
+ 	struct bt_hci_cmd_le_generate_dhkey cmd;
+-	uint8_t remote_sk[32];
++	struct le_keys *keys = (void *)test_data;
++
++	ecc_make_key(cmd.remote_pk256, keys->remote_sk);
+ 
+-	ecc_make_key(cmd.remote_pk256, remote_sk);
++	/* Unregister handler for META event */
++	bt_hci_unregister(user->hci_ut, 1);
+ 
+ 	bt_hci_register(user->hci_ut, BT_HCI_EVT_LE_META_EVENT,
+-				test_le_generate_dhkey_complete, NULL, NULL);
++				test_le_generate_dhkey_complete, keys,
++				NULL);
+ 
+ 	if (!bt_hci_send(user->hci_ut, BT_HCI_CMD_LE_GENERATE_DHKEY, &cmd,
+ 				sizeof(cmd), test_le_generate_dhkey_status,
+@@ -849,7 +934,8 @@ int main(int argc, char *argv[])
+ 				test_le_rand);
+ 	test_hci_local("LE Read Local PK", &key_test_data, NULL,
+ 				test_le_read_local_pk);
+-	test_hci_local("LE Generate DHKey", NULL, NULL,
++	test_hci_local("LE Generate DHKey", &key_test_data,
++				setup_le_generate_dhkey,
+ 				test_le_generate_dhkey);
+ 
+ 	test_hci_local("Inquiry (LIAC)", NULL, NULL, test_inquiry_liac);
 -- 
-Luiz Augusto von Dentz
+2.1.4
+
