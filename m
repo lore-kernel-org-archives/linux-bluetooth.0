@@ -1,82 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHwR_AWn-_-=u8RVZpV8pZ-P1JeZx3oKuhZgE8j-na8c-7KXGw@mail.gmail.com>
-References: <CAHwR_AWn-_-=u8RVZpV8pZ-P1JeZx3oKuhZgE8j-na8c-7KXGw@mail.gmail.com>
-Date: Mon, 18 May 2015 08:38:48 +0200
-Message-ID: <CAHwR_AVsxXhgMSnieXzbj4if0X3gR12PzGzw1iKoeu8F8ToXMQ@mail.gmail.com>
-Subject: Re: [PATCH] hciattach: Big endian support for various TI chips.
-From: Jonas Rydow <jrydow@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20150517134635.GA3114@t440s.P-661HNU-F1>
+References: <5558987E.5040604@gmail.com>
+	<20150517134635.GA3114@t440s.P-661HNU-F1>
+Date: Sun, 17 May 2015 21:22:26 -0300
+Message-ID: <CAB=SE9gggyExOBpFF1y_s9iwLYVi2FLHt0n+QH9TxqOW-N_TOQ@mail.gmail.com>
+Subject: Re: What am I missing?
+From: Florian Grandel <fgrandel@gmail.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>, Arman Uguray <armansito@chromium.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Content-Type: multipart/alternative; boundary=001a11409f183f044105165030e7
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-Did I miss something with this patch? It has not been accepted nor
-rejected or commented.
+--001a11409f183f044105165030e7
+Content-Type: text/plain; charset=UTF-8
 
-Best regards
-Jonas
+>
+> Hi Florian,
+>
+> On Sun, May 17, 2015, Florian Grandel wrote:
+> > Hi Marcel and Johan,
+> >
+> > here is what I did so far:
+> >
+> > - I asked you whether contributions from newcomers are welcome (which
+Marcel
+> > agreed to),
+> >
+> > - I coordinated the development target and approach with Marcel to make
+sure
+> > that my contribution will be generally useful and acceptable,
+> >
+> > - I read lots of documentation to make sure that I'm asking as few
+redundant
+> > questions as possible,
+> >
+> > - I invested a considerable amount of time to put a useful contribution
+> > together,
+> >
+> > - Arman invested a considerable amount of time to review it,
+> >
+> > - I again invested a considerable amount of time to work in all review
+> > comments.
+> >
+> > - I waited for several weeks and pinged you several times to get you to
+do
+> > your part as maintainers...
+> >
+> > What am I missing?? Did I overlook your response? Or is this the
+"normal"
+> > Kernel community approach?
+>
+> No need to get worried or frustrated about your set. It hasn't been
+> forgotten about and it hasn't lost the chance to get included in the
+> first possible kernel release, i.e. 4.2. It'll very likely go into a
+> bluetooth-next pull request before the 4.2 merge window opens.
+>
+> For my part I have no major objections after reading it through a couple
+> of times - I remember Marcel saying he'd take a look after Arman's
+> review, which is what I've mostly be waiting for. But in no case has
+> your set been forgotten.
+>
 
-On Tue, Dec 16, 2014 at 9:32 AM, Jonas Rydow <jrydow@gmail.com> wrote:
-> The firmware files from TI and the loading of firmware are designed to
-> work on little endian machines. This patch adds support to load the
-> firmware on big endian hosts as well as on little endian hosts.
-> ---
-> tools/hciattach_ti.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/tools/hciattach_ti.c b/tools/hciattach_ti.c
-> index 8322b45..555fe5e 100644
-> --- a/tools/hciattach_ti.c
-> +++ b/tools/hciattach_ti.c
-> @@ -124,6 +124,8 @@ static FILE *bts_load_script(const char
-> *file_name, uint32_t *version)
->          perror("can't read firmware file");
->          goto errclose;
->      }
-> +    header.magic = htobl(header.magic);
-> +    header.version = htobl(header.version);
->
->      if (header.magic != FILE_HEADER_MAGIC) {
->          fprintf(stderr, "%s not a legal TI firmware file\n", file_name);
-> @@ -153,6 +155,9 @@ static unsigned long bts_fetch_action(FILE *fp,
-> unsigned char *action_buf,
->      if (1 != fread(&action_hdr, sizeof(struct bts_action), 1, fp))
->          return 0;
->
-> +    action_hdr.type = htobs(action_hdr.type);
-> +    action_hdr.size = htobs(action_hdr.size);
-> +
->      if (action_hdr.size > buf_size) {
->          fprintf(stderr, "bts_next_action: not enough space to read
-> next action\n");
->          return 0;
-> @@ -241,6 +246,7 @@ static int brf_send_command_socket(int fd, struct
-> bts_action_send *send_action)
->  {
->      char response[1024] = {0};
->      hci_command_hdr *cmd = (hci_command_hdr *) send_action->data;
-> +    cmd->opcode = htobs(cmd->opcode);
->      uint16_t opcode = cmd->opcode;
->
->      struct hci_request rq;
-> @@ -331,10 +337,13 @@ static int brf_do_action(uint16_t brf_type,
-> uint8_t *brf_action, long brf_size,
->          break;
->      case ACTION_SERIAL:
->          DPRINTF("S");
-> +        ((struct bts_action_serial *) brf_action)->baud =
-> htobl(((struct bts_action_serial *) brf_action)->baud);
-> +        ((struct bts_action_serial *) brf_action)->flow_control =
-> htobl(((struct bts_action_serial *) brf_action)->flow_control);
->          ret = brf_set_serial_params((struct bts_action_serial *)
-> brf_action, fd, speed, ti);
->          break;
->      case ACTION_DELAY:
->          DPRINTF("D");
-> +        ((struct bts_action_delay *) brf_action)->msec =
-> htobl(((struct bts_action_delay *) brf_action)->msec);
->          brf_delay((struct bts_action_delay *) brf_action);
->          break;
->      case ACTION_REMARKS:
+Ok, cool. Thanks for letting me know. I really got frustrated w/o getting
+any feedback but now it's ok. :)
+
+--001a11409f183f044105165030e7
+Content-Type: text/html; charset=UTF-8
+
+<p dir="ltr">&gt;<br>
+&gt; Hi Florian,<br>
+&gt;<br>
+&gt; On Sun, May 17, 2015, Florian Grandel wrote:<br>
+&gt; &gt; Hi Marcel and Johan,<br>
+&gt; &gt;<br>
+&gt; &gt; here is what I did so far:<br>
+&gt; &gt;<br>
+&gt; &gt; - I asked you whether contributions from newcomers are welcome (which Marcel<br>
+&gt; &gt; agreed to),<br>
+&gt; &gt;<br>
+&gt; &gt; - I coordinated the development target and approach with Marcel to make sure<br>
+&gt; &gt; that my contribution will be generally useful and acceptable,<br>
+&gt; &gt;<br>
+&gt; &gt; - I read lots of documentation to make sure that I&#39;m asking as few redundant<br>
+&gt; &gt; questions as possible,<br>
+&gt; &gt;<br>
+&gt; &gt; - I invested a considerable amount of time to put a useful contribution<br>
+&gt; &gt; together,<br>
+&gt; &gt;<br>
+&gt; &gt; - Arman invested a considerable amount of time to review it,<br>
+&gt; &gt;<br>
+&gt; &gt; - I again invested a considerable amount of time to work in all review<br>
+&gt; &gt; comments.<br>
+&gt; &gt;<br>
+&gt; &gt; - I waited for several weeks and pinged you several times to get you to do<br>
+&gt; &gt; your part as maintainers...<br>
+&gt; &gt;<br>
+&gt; &gt; What am I missing?? Did I overlook your response? Or is this the &quot;normal&quot;<br>
+&gt; &gt; Kernel community approach?<br>
+&gt;<br>
+&gt; No need to get worried or frustrated about your set. It hasn&#39;t been<br>
+&gt; forgotten about and it hasn&#39;t lost the chance to get included in the<br>
+&gt; first possible kernel release, i.e. 4.2. It&#39;ll very likely go into a<br>
+&gt; bluetooth-next pull request before the 4.2 merge window opens.<br>
+&gt;<br>
+&gt; For my part I have no major objections after reading it through a couple<br>
+&gt; of times - I remember Marcel saying he&#39;d take a look after Arman&#39;s<br>
+&gt; review, which is what I&#39;ve mostly be waiting for. But in no case has<br>
+&gt; your set been forgotten.<br>
+&gt;</p>
+<p dir="ltr">Ok, cool. Thanks for letting me know. I really got frustrated w/o getting any feedback but now it&#39;s ok. :)</p>
+
+--001a11409f183f044105165030e7--
