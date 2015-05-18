@@ -1,409 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools: Add initial User Channel tester
-Date: Mon, 18 May 2015 22:08:08 +0200
-Message-ID: <2235784.nv5OG9emlI@leonov>
-In-Reply-To: <1430834137-19064-2-git-send-email-szymon.janc@tieto.com>
-References: <1430834137-19064-1-git-send-email-szymon.janc@tieto.com> <1430834137-19064-2-git-send-email-szymon.janc@tieto.com>
+Subject: [Bug 81821] btusb logs error drivers/base/firmware_class.c:1105
+ _request_firmware+0x431/0x7b0()
+Date: Mon, 18 May 2015 20:06:07 +0000
+Message-ID: <bug-81821-62941-4emy6fECEh@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-81821-62941@https.bugzilla.kernel.org/>
+References: <bug-81821-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 05 of May 2015 15:55:37 Szymon Janc wrote:
-> This adds basic tests only.
-> ---
->  .gitignore                 |   1 +
->  Makefile.tools             |  11 +-
->  tools/userchannel-tester.c | 333
-> +++++++++++++++++++++++++++++++++++++++++++++ 3 files changed, 344
-> insertions(+), 1 deletion(-)
->  create mode 100644 tools/userchannel-tester.c
-> 
-> diff --git a/.gitignore b/.gitignore
-> index 08eabac..c350f49 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -109,6 +109,7 @@ tools/smp-tester
->  tools/gap-tester
->  tools/rfcomm-tester
->  tools/bnep-tester
-> +tools/userchannel-tester
->  tools/btattach
->  tools/btmgmt
->  tools/btsnoop
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 6020b01..9abe07d 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -43,7 +43,8 @@ noinst_PROGRAMS += emulator/btvirt emulator/b1ee
-> emulator/hfp \ tools/mgmt-tester tools/gap-tester \
->  					tools/l2cap-tester tools/sco-tester \
->  					tools/smp-tester tools/hci-tester \
-> -					tools/rfcomm-tester tools/bnep-tester
-> +					tools/rfcomm-tester tools/bnep-tester \
-> +					tools/userchannel-tester
-> 
->  emulator_btvirt_SOURCES = emulator/main.c monitor/bt.h \
->  				emulator/serial.h emulator/serial.c \
-> @@ -135,6 +136,14 @@ tools_sco_tester_LDADD = lib/libbluetooth-internal.la \
-> 
->  tools_hci_tester_SOURCES = tools/hci-tester.c monitor/bt.h
->  tools_hci_tester_LDADD = src/libshared-glib.la @GLIB_LIBS@
-> +
-> +tools_userchannel_tester_SOURCES = tools/userchannel-tester.c monitor/bt.h
-> \ +				emulator/hciemu.h emulator/hciemu.c \
-> +				emulator/btdev.h emulator/btdev.c \
-> +				emulator/bthost.h emulator/bthost.c \
-> +				emulator/smp.c
-> +tools_userchannel_tester_LDADD = lib/libbluetooth-internal.la \
-> +				src/libshared-glib.la @GLIB_LIBS@
->  endif
-> 
->  if TOOLS
-> diff --git a/tools/userchannel-tester.c b/tools/userchannel-tester.c
-> new file mode 100644
-> index 0000000..ec5dffd
-> --- /dev/null
-> +++ b/tools/userchannel-tester.c
-> @@ -0,0 +1,333 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014-2015  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 
-> USA + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <stdlib.h>
-> +#include <stdint.h>
-> +#include <unistd.h>
-> +#include <errno.h>
-> +#include <stdbool.h>
-> +
-> +#include <glib.h>
-> +
-> +#include "lib/bluetooth.h"
-> +#include "lib/hci.h"
-> +#include "lib/mgmt.h"
-> +
-> +#include "monitor/bt.h"
-> +#include "emulator/bthost.h"
-> +#include "emulator/hciemu.h"
-> +
-> +#include "src/shared/tester.h"
-> +#include "src/shared/mgmt.h"
-> +#include "src/shared/hci.h"
-> +#include "src/shared/util.h"
-> +
-> +struct test_data {
-> +	struct mgmt *mgmt;
-> +	uint16_t mgmt_index;
-> +	struct hciemu *hciemu;
-> +	enum hciemu_type hciemu_type;
-> +	const void *test_data;
-> +	unsigned int remove_id;
-> +};
-> +
-> +static void mgmt_debug(const char *str, void *user_data)
-> +{
-> +	const char *prefix = user_data;
-> +
-> +	tester_print("%s%s", prefix, str);
-> +}
-> +
-> +static void read_info_callback(uint8_t status, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +	const struct mgmt_rp_read_info *rp = param;
-> +	char addr[18];
-> +	uint16_t manufacturer;
-> +	uint32_t supported_settings, current_settings;
-> +
-> +	tester_print("Read Info callback");
-> +	tester_print("  Status: 0x%02x", status);
-> +
-> +	if (status || !param) {
-> +		tester_pre_setup_failed();
-> +		return;
-> +	}
-> +
-> +	ba2str(&rp->bdaddr, addr);
-> +	manufacturer = btohs(rp->manufacturer);
-> +	supported_settings = btohl(rp->supported_settings);
-> +	current_settings = btohl(rp->current_settings);
-> +
-> +	tester_print("  Address: %s", addr);
-> +	tester_print("  Version: 0x%02x", rp->version);
-> +	tester_print("  Manufacturer: 0x%04x", manufacturer);
-> +	tester_print("  Supported settings: 0x%08x", supported_settings);
-> +	tester_print("  Current settings: 0x%08x", current_settings);
-> +	tester_print("  Class: 0x%02x%02x%02x",
-> +			rp->dev_class[2], rp->dev_class[1], rp->dev_class[0]);
-> +	tester_print("  Name: %s", rp->name);
-> +	tester_print("  Short name: %s", rp->short_name);
-> +
-> +	if (strcmp(hciemu_get_address(data->hciemu), addr)) {
-> +		tester_pre_setup_failed();
-> +		return;
-> +	}
-> +
-> +	tester_pre_setup_complete();
-> +}
-> +
-> +static void index_added_callback(uint16_t index, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +
-> +	tester_print("Index Added callback");
-> +	tester_print("  Index: 0x%04x", index);
-> +
-> +	if (data->mgmt_index != MGMT_INDEX_NONE)
-> +		return;
-> +
-> +	data->mgmt_index = index;
-> +
-> +	mgmt_send(data->mgmt, MGMT_OP_READ_INFO, data->mgmt_index, 0, NULL,
-> +					read_info_callback, NULL, NULL);
-> +}
-> +
-> +static void index_removed_callback(uint16_t index, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +
-> +	tester_print("Index Removed callback");
-> +	tester_print("  Index: 0x%04x", index);
-> +
-> +	if (index != data->mgmt_index)
-> +		return;
-> +
-> +	if (data->remove_id) {
-> +		mgmt_unregister(data->mgmt, data->remove_id);
-> +		data->remove_id = 0;
-> +		tester_test_passed();
-> +		return;
-> +	}
-> +
-> +	mgmt_unregister_index(data->mgmt, data->mgmt_index);
-> +
-> +	mgmt_unref(data->mgmt);
-> +	data->mgmt = NULL;
-> +
-> +	tester_post_teardown_complete();
-> +}
-> +
-> +static void read_index_list_callback(uint8_t status, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +
-> +	tester_print("Read Index List callback");
-> +	tester_print("  Status: 0x%02x", status);
-> +
-> +	if (status || !param) {
-> +		tester_pre_setup_failed();
-> +		return;
-> +	}
-> +
-> +	mgmt_register(data->mgmt, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
-> +					index_added_callback, NULL, NULL);
-> +
-> +	data->hciemu = hciemu_new(data->hciemu_type);
-> +	if (!data->hciemu) {
-> +		tester_warn("Failed to setup HCI emulation");
-> +		tester_pre_setup_failed();
-> +	}
-> +
-> +	tester_print("New hciemu instance created");
-> +}
-> +
-> +static void test_pre_setup(const void *test_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +
-> +	data->mgmt = mgmt_new_default();
-> +	if (!data->mgmt) {
-> +		tester_warn("Failed to setup management interface");
-> +		tester_pre_setup_failed();
-> +		return;
-> +	}
-> +
-> +	if (tester_use_debug())
-> +		mgmt_set_debug(data->mgmt, mgmt_debug, "mgmt: ", NULL);
-> +
-> +	mgmt_send(data->mgmt, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0, NULL,
-> +					read_index_list_callback, NULL, NULL);
-> +}
-> +
-> +static void test_post_teardown(const void *test_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +
-> +	mgmt_register(data->mgmt, MGMT_EV_INDEX_REMOVED, data->mgmt_index,
-> +					index_removed_callback,
-> +					NULL, NULL);
-> +
-> +	hciemu_unref(data->hciemu);
-> +	data->hciemu = NULL;
-> +}
-> +
-> +static void test_data_free(void *test_data)
-> +{
-> +	struct test_data *data = test_data;
-> +
-> +	free(data);
-> +}
-> +
-> +static void setup_powered_client_callback(uint8_t status, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	if (status != MGMT_STATUS_SUCCESS) {
-> +		tester_setup_failed();
-> +		return;
-> +	}
-> +
-> +	tester_print("Controller powered on");
-> +
-> +	tester_setup_complete();
-> +}
-> +
-> +static void setup_powered(const void *test_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +	unsigned char param[] = { 0x01 };
-> +
-> +	tester_print("Powering on controller");
-> +
-> +	mgmt_send(data->mgmt, MGMT_OP_SET_POWERED, data->mgmt_index,
-> +			sizeof(param), param, setup_powered_client_callback,
-> +			NULL, NULL);
-> +}
-> +
-> +static void toggle_powered(const void *test_data);
-> +
-> +static void toggle_powered_client_callback(uint8_t status, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	bool power = PTR_TO_INT(user_data);
-> +
-> +	if (status != MGMT_STATUS_SUCCESS) {
-> +		tester_setup_failed();
-> +		return;
-> +	}
-> +
-> +	tester_print("Controller powered %s", power ? "on" : "off");
-> +
-> +	if (power)
-> +		toggle_powered(false);
-> +	else
-> +		tester_setup_complete();
-> +}
-> +
-> +static void toggle_powered(const void *test_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +	bool power = PTR_TO_INT(test_data);
-> +	unsigned char param[1];
-> +
-> +	param[0] = power ? 0x01 : 0x00;
-> +
-> +	tester_print("Powering %s controller", power ? "on" : "off");
-> +
-> +	mgmt_send(data->mgmt, MGMT_OP_SET_POWERED, data->mgmt_index,
-> +			sizeof(param), param, toggle_powered_client_callback,
-> +			INT_TO_PTR(power), NULL);
-> +}
-> +
-> +static void test_open_success(const void *test_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +	struct bt_hci *hci;
-> +
-> +	data->remove_id = mgmt_register(data->mgmt, MGMT_EV_INDEX_REMOVED,
-> +					data->mgmt_index,
-> +					index_removed_callback,
-> +					NULL, NULL);
-> +
-> +	hci = bt_hci_new_user_channel(data->mgmt_index);
-> +	if (hci) {
-> +		bt_hci_unref(hci);
-> +		return;
-> +	}
-> +
-> +	mgmt_unregister(data->mgmt, data->remove_id);
-> +	data->remove_id = 0;
-> +
-> +	tester_test_failed();
-> +}
-> +
-> +static void test_open_failed(const void *test_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +	struct bt_hci *hci;
-> +
-> +	hci = bt_hci_new_user_channel(data->mgmt_index);
-> +	if (!hci) {
-> +		tester_test_passed();
-> +		return;
-> +	}
-> +
-> +	bt_hci_unref(hci);
-> +	tester_test_failed();
-> +}
-> +
-> +#define test_user(name, data, setup, func) \
-> +	do { \
-> +		struct test_data *user; \
-> +		user = malloc(sizeof(struct test_data)); \
-> +		if (!user) \
-> +			break; \
-> +		user->hciemu_type = HCIEMU_TYPE_BREDR; \
-> +		user->mgmt_index = MGMT_INDEX_NONE; \
-> +		user->test_data = data; \
-> +		tester_add_full(name, data, \
-> +				test_pre_setup, setup, func, NULL, \
-> +				test_post_teardown, 2, user, test_data_free); \
-> +	} while (0)
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	tester_init(&argc, &argv);
-> +
-> +	test_user("User channel open - Success", NULL,
-> +					NULL, test_open_success);
-> +	test_user("User channel open - Failed", NULL,
-> +					setup_powered, test_open_failed);
-> +	test_user("User channel open - Power Toggle Success", INT_TO_PTR(true),
-> +					toggle_powered, test_open_success);
-> +
-> +	return tester_run();
-> +}
+https://bugzilla.kernel.org/show_bug.cgi?id=81821
 
-Applied.
+Michael Lipp <mnl@mnl.de> changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |mnl@mnl.de
+
+--- Comment #8 from Michael Lipp <mnl@mnl.de> ---
+Okay, here's my trace.
+
+[  167.502444] ------------[ cut here ]------------
+[  167.502455] WARNING: CPU: 6 PID: 3864 at drivers/base/firmware_class.c:1126
+_request_firmware+0x558/0x810()
+[  167.502547] Modules linked in: rfcomm fuse hidp ccm xt_CHECKSUM
+ipt_MASQUERADE nf_nat_masquerade_ipv4 tun nf_conntrack_netbios_ns
+nf_conntrack_broadcast ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 xt_conntrack
+ebtable_nat ebtable_broute bridge stp llc ebtable_filter ebtables ip6table_nat
+nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6 ip6table_mangle ip6table_security
+ip6table_raw ip6table_filter ip6_tables iptable_nat nf_conntrack_ipv4
+nf_defrag_ipv4 nf_nat_ipv4 nf_nat nf_conntrack iptable_mangle iptable_security
+iptable_raw bnep intel_rapl arc4 iosf_mbi x86_pkg_temp_thermal uvcvideo
+snd_hda_codec_realtek coretemp iwldvm snd_hda_codec_generic kvm_intel
+videobuf2_vmalloc mac80211 kvm btusb snd_hda_intel videobuf2_core iTCO_wdt
+iTCO_vendor_support bluetooth snd_hda_controller videobuf2_memops snd_hda_codec
+[  167.502549]  v4l2_common videodev snd_hwdep crct10dif_pclmul snd_seq iwlwifi
+crc32_pclmul snd_seq_device crc32c_intel sdhci_pci snd_pcm cfg80211
+ghash_clmulni_intel sdhci media cdc_acm thinkpad_acpi joydev mmc_core snd_timer
+serio_raw i2c_i801 snd mei_me lpc_ich tpm_tis mei mfd_core shpchp
+[  167.502583] PM: Finishing wakeup.
+[  167.502589] Restarting tasks ... 
+[  167.502589]  soundcore rfkill tpm wmi intel_rst binfmt_misc i915
+i2c_algo_bit drm_kms_helper e1000e drm cdc_mbim firewire_ohci cdc_ncm
+firewire_core usbnet ptp cdc_wdm crc_itu_t pps_core mii video [last unloaded:
+ipmi_msghandler]
+[  167.502618] CPU: 6 PID: 3864 Comm: kworker/u17:0 Not tainted
+3.19.7-200.fc21.x86_64 #1
+[  167.502622] Hardware name: LENOVO 24297XG/24297XG, BIOS G4ETA4WW (2.64 )
+03/31/2015
+[  167.502648] Workqueue: hci0 hci_power_on [bluetooth]
+[  167.502652]  0000000000000000 00000000ccb2203a ffff88021343fb78
+ffffffff8176f1f7
+[  167.502658]  0000000000000000 0000000000000000 ffff88021343fbb8
+ffffffff8109bc1a
+[  167.502676]  0000000000000000 ffff88021343fcd0 00000000fffffff5
+ffff880213e829c0
+[  167.502680] Call Trace:
+[  167.502687]  [<ffffffff8176f1f7>] dump_stack+0x45/0x57
+[  167.502694]  [<ffffffff8109bc1a>] warn_slowpath_common+0x8a/0xc0
+[  167.502698]  [<ffffffff8109bd4a>] warn_slowpath_null+0x1a/0x20
+[  167.502703]  [<ffffffff814dc7d8>] _request_firmware+0x558/0x810
+[  167.502708]  [<ffffffff814dcac5>] request_firmware+0x35/0x50
+[  167.502715]  [<ffffffffa0365886>] btusb_setup_bcm_patchram+0x86/0x590
+[btusb]
+[  167.502720]  [<ffffffff814d4a46>] ? rpm_idle+0xd6/0x230
+[  167.502726] usb 1-4: USB disconnect, device number 2
+[  167.502742]  [<ffffffffa0511801>] hci_dev_do_open+0xe1/0xa90 [bluetooth]
+[  167.502748]  [<ffffffff810c525d>] ? ttwu_do_activate.constprop.90+0x5d/0x70
+[  167.502766]  [<ffffffffa0512980>] hci_power_on+0x40/0x200 [bluetooth]
+[  167.502775]  [<ffffffff810b48fc>] process_one_work+0x14c/0x3f0
+[  167.502781]  [<ffffffff810b5373>] worker_thread+0x53/0x470
+[  167.502787]  [<ffffffff810b5320>] ? rescuer_thread+0x300/0x300
+[  167.502793]  [<ffffffff810ba5c8>] kthread+0xd8/0xf0
+[  167.502798]  [<ffffffff810ba4f0>] ? kthread_create_on_node+0x1b0/0x1b0
+[  167.502806]  [<ffffffff81775958>] ret_from_fork+0x58/0x90
+[  167.502811]  [<ffffffff810ba4f0>] ? kthread_create_on_node+0x1b0/0x1b0
+[  167.502815] ---[ end trace 0db0055f5709df7f ]---
+[  167.502820] bluetooth hci0: firmware: brcm/BCM20702A0-0a5c-21e6.hcd will not
+be loaded
+[  167.502828] Bluetooth: hci0: BCM: patch brcm/BCM20702A0-0a5c-21e6.hcd not
+found
 
 -- 
-BR
-Szymon Janc
+You are receiving this mail because:
+You are the assignee for the bug.
