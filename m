@@ -1,81 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update MCAP test results
-Date: Tue, 19 May 2015 20:46:09 +0200
-Message-ID: <1512420.RSjjPSexyf@leonov>
-In-Reply-To: <1432049798-29008-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1432049798-29008-1-git-send-email-mariusz.skamra@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] Bluetooth: btusb: Support for QCA61x4 on Samsung
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1432017670-6024-1-git-send-email-chanyeol.park@samsung.com>
+Date: Tue, 19 May 2015 20:21:15 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+	Chan-yeol Park <chanyeol.park@samsung.com>
+Message-Id: <D5B20D85-8B5F-4694-8B5E-2BFC670BE85C@holtmann.org>
+References: <1432017670-6024-1-git-send-email-chanyeol.park@samsung.com>
+To: chanyeol.park@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+Hi Chan-yeol,
 
-On Tuesday 19 of May 2015 17:36:38 Mariusz Skamra wrote:
-> PTS 6.1 and Android 5.1
-> ---
->  android/pics-mcap.txt  | 4 ++--
->  android/pixit-mcap.txt | 2 +-
->  android/pts-mcap.txt   | 6 +++---
->  3 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/android/pics-mcap.txt b/android/pics-mcap.txt
-> index 70e0b66..218ee80 100644
-> --- a/android/pics-mcap.txt
-> +++ b/android/pics-mcap.txt
-> @@ -1,6 +1,6 @@
->  MCAP PICS for the PTS tool.
-> 
-> -PTS version: 6.0
-> +PTS version: 6.1
-> 
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> @@ -52,7 +52,7 @@ TSPC_MCAP_2_4	False		Can support multiple 
-simultaneous
-> MCLs with
-> ---------------------------------------------------------------------------
-> ---- Parameter Name	Selected	Description
->  ---------------------------------------------------------------------------
-> ---- -TSPC_MCAP_3_1			This row inentionally left blank
-> +TSPC_MCAP_3_1			This row intentionally left blank
->  TSPC_MCAP_3_2	True (*)	Initiate creation of Control and Data Channels
->  				(C.1)
->  TSPC_MCAP_3_3	True (*)	Accept creation of Control and Data Channels
-> diff --git a/android/pixit-mcap.txt b/android/pixit-mcap.txt
-> index f3d33a1..a8bbe52 100644
-> --- a/android/pixit-mcap.txt
-> +++ b/android/pixit-mcap.txt
-> @@ -1,6 +1,6 @@
->  MCAP PIXIT for the PTS tool.
-> 
-> -PTS version: 6.0
-> +PTS version: 6.1
-> 
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
-> index 2ad2858..8e224a1 100644
-> --- a/android/pts-mcap.txt
-> +++ b/android/pts-mcap.txt
-> @@ -1,8 +1,8 @@
->  PTS test results for MCAP
-> 
-> -PTS version: 6.0
-> -Tested: 10-February-2015
-> -Android version: 5.0
-> +PTS version: 6.1
-> +Tested: 19-May-2015
-> +Android version: 5.1
-> 
->  Results:
->  PASS	test passed
+> The previous commit(3267c88) regressed QCA61x4 BT on Samsung because
+> its device info is missed in qca_devices_table[], so btusb_open()
+> return error unexpectedly.
 
-Patch applied, thanks.
+how does this regress. We never had QCA module support in the first place. The patch looks good, I was just wondering what the regression will be here?
 
--- 
-BR
-Szymon Janc
+Regards
+
+Marcel
+
