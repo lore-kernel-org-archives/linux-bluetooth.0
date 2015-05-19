@@ -1,44 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] android/hidhost: Fix connecting HOGP over BREDR
-Date: Tue, 19 May 2015 10:25:11 +0200
-Message-Id: <1432023911-7694-1-git-send-email-mariusz.skamra@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <555AF22C.7000108@broadcom.com>
+Date: Tue, 19 May 2015 10:19:56 +0200
+From: Arend van Spriel <arend@broadcom.com>
+MIME-Version: 1.0
+To: Ilya Faenson <ifaenson@broadcom.com>
+CC: Marcel Holtmann <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC v3 0/4] Broadcom Bluetooth UART device driver
+References: <1431553823-25670-1-git-send-email-ifaenson@broadcom.com>
+In-Reply-To: <1431553823-25670-1-git-send-email-ifaenson@broadcom.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes issue related to HID connection over BREDR.
-To avoid HOG connection with dual mode device connected over
-BREDR, bdaddr_type is checked, so that 'if' condition tests
-connection type, not the features of remote device.
----
- android/hidhost.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+On 05/13/15 23:50, Ilya Faenson wrote:
+> The next version of the driver changed as per Marcel's comments.
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 729b884..100432f 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -874,6 +874,7 @@ static void bt_hid_connect(const void *buf, uint16_t len)
- 	bdaddr_t dst;
- 	GSList *l;
- 	uuid_t uuid;
-+	uint8_t bdaddr_type;
- 
- 	DBG("");
- 
-@@ -891,7 +892,9 @@ static void bt_hid_connect(const void *buf, uint16_t len)
- 	ba2str(&dev->dst, addr);
- 	DBG("connecting to %s", addr);
- 
--	if (bt_is_device_le(&dst)) {
-+	bt_get_id_addr(&dst, &bdaddr_type);
-+
-+	if (bdaddr_type != BDADDR_BREDR) {
- 		if (!hog_connect(dev)) {
- 			status = HAL_STATUS_FAILED;
- 			hid_device_remove(dev);
--- 
-1.9.1
+This is just a cover letter and as such not stored in the git 
+repository, but it is stored in the mailing list archives so I would 
+recommend giving a short description here about what this patch series 
+provides followed by a change log so you can keep the description and 
+indicate in the change log what was done in the next version.
 
+Regards,
+Arend
+
+> Ilya Faenson (4):
+>    Broadcom Bluetooth UART Device Tree bindings
+>    Broadcom Bluetooth UART Platform Driver
+>    Broadcom Bluetooth protocol UART support
+>    BlueZ Broadcom UART Protocol
+>
+>   .../devicetree/bindings/net/bluetooth/btbcm.txt    |  54 ++
+>   drivers/bluetooth/Kconfig                          |   9 +
+>   drivers/bluetooth/Makefile                         |   1 +
+>   drivers/bluetooth/btbcm.c                          | 155 ++++-
+>   drivers/bluetooth/btbcm.h                          |  13 +
+>   drivers/bluetooth/btbcm_uart.c                     | 705 +++++++++++++++++++++
+>   drivers/bluetooth/btbcm_uart.h                     | 116 ++++
+>   drivers/bluetooth/hci_bcm.c                        | 528 ++++++++++++++-
+>   8 files changed, 1561 insertions(+), 20 deletions(-)
+>   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+>   create mode 100644 drivers/bluetooth/btbcm_uart.c
+>   create mode 100644 drivers/bluetooth/btbcm_uart.h
+>
