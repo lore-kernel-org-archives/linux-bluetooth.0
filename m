@@ -1,69 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] android/pts: Update MCAP test results
-Date: Tue, 19 May 2015 17:36:38 +0200
-Message-Id: <1432049798-29008-1-git-send-email-mariusz.skamra@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <Pine.LNX.4.44L0.1505191017460.1453-100000@iolanthe.rowland.org>
+Date: Tue, 19 May 2015 17:22:26 +0200
+Cc: Takashi Iwai <tiwai@suse.de>, Laura Abbott <labbott@redhat.com>,
+	Laura Abbott <labbott@fedoraproject.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Ming Lei <ming.lei@canonical.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	linux-usb@vger.kernel.org
+Message-Id: <E00D9D09-50A7-46C8-B141-9338F85B0020@holtmann.org>
+References: <Pine.LNX.4.44L0.1505191017460.1453-100000@iolanthe.rowland.org>
+To: Alan Stern <stern@rowland.harvard.edu>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PTS 6.1 and Android 5.1
----
- android/pics-mcap.txt  | 4 ++--
- android/pixit-mcap.txt | 2 +-
- android/pts-mcap.txt   | 6 +++---
- 3 files changed, 6 insertions(+), 6 deletions(-)
+Hi Alan,
 
-diff --git a/android/pics-mcap.txt b/android/pics-mcap.txt
-index 70e0b66..218ee80 100644
---- a/android/pics-mcap.txt
-+++ b/android/pics-mcap.txt
-@@ -1,6 +1,6 @@
- MCAP PICS for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -52,7 +52,7 @@ TSPC_MCAP_2_4	False		Can support multiple simultaneous MCLs with
- -------------------------------------------------------------------------------
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
--TSPC_MCAP_3_1			This row inentionally left blank
-+TSPC_MCAP_3_1			This row intentionally left blank
- TSPC_MCAP_3_2	True (*)	Initiate creation of Control and Data Channels
- 				(C.1)
- TSPC_MCAP_3_3	True (*)	Accept creation of Control and Data Channels
-diff --git a/android/pixit-mcap.txt b/android/pixit-mcap.txt
-index f3d33a1..a8bbe52 100644
---- a/android/pixit-mcap.txt
-+++ b/android/pixit-mcap.txt
-@@ -1,6 +1,6 @@
- MCAP PIXIT for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
-index 2ad2858..8e224a1 100644
---- a/android/pts-mcap.txt
-+++ b/android/pts-mcap.txt
-@@ -1,8 +1,8 @@
- PTS test results for MCAP
- 
--PTS version: 6.0
--Tested: 10-February-2015
--Android version: 5.0
-+PTS version: 6.1
-+Tested: 19-May-2015
-+Android version: 5.1
- 
- Results:
- PASS	test passed
--- 
-1.9.1
+>>>> I am not convinced. Now we are hacking the Bluetooth core layer
+>>>> (which has nothing to do with the drivers suspend/resume or
+>>>> probe) to do something different so that we do not see this
+>>>> warning.
+>>>> 
+>>>> I can not do anything about the platform in question choosing a
+>>>> unplug/replug for suspend/resume instead of having a proper USB
+>>>> suspend and resume handling. That is pretty much out of our
+>>>> control.
+> 
+> Actually one can do something about this.  I mean, one _can_ implement
+> proper USB suspend and resume handling in the Bluetooth driver.  At
+> this point the details aren't clear to me, but perhaps if the driver in
+> question had a reset_resume callback then it might work better.
+
+the btusb.ko driver has suspend/resume support. Are you saying we also need reset_resume support?
+
+>>>> I would rather have the USB subsystem delay the probe()
+>>>> callback if we tell it to.
+> 
+> This is possible.  I am not sure it would be the right thing to do,
+> though.  What happens if the probe routine gets called early on during
+> the boot-up procedure, before userspace is up and running?  The same
+> thing should happen here.
+
+For modules this will be hard. Since you need userspace before being able to load the modules. If built-in code, then in theory this might be possible. Depending on the order of the init sections.
+
+>>>> Of just have request_firmware()
+>>>> actually sleep until userspace is ready. Seriously, why is
+>>>> request_firmware not just sleeping for us.
+> 
+> It won't work.  The request_firmware call is part of the probe 
+> sequence, which in turn is part of the resume sequence.  Userspace 
+> doesn't start running again until the resume sequence is finished.  If 
+> request_firmware waited for userspace, it would hang.
+
+Then I really have no idea on how to solve this unless we silence the warning from request_firmware. From a driver perspective we go back trough probe(). So the driver has to treat this as a new device.
+
+Regards
+
+Marcel
 
