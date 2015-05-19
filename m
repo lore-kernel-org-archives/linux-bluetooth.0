@@ -1,37 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] monitor: Add Broadcom BCM4324B3 chip name information
-Date: Tue, 19 May 2015 16:20:30 +0200
-Message-Id: <1432045230-26074-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Update HFP test results
+Date: Tue, 19 May 2015 16:15:39 +0200
+Message-ID: <7271070.Sr6a4IcHuD@leonov>
+In-Reply-To: <1431622804-31740-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1431622804-31740-1-git-send-email-mariusz.skamra@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- monitor/packet.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi Mariusz,
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 8f75ee2..af51378 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -2404,6 +2404,7 @@ static const struct {
- 	const char *str;
- } broadcom_uart_subversion_table[] = {
- 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
-+	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
- 	{ }
- };
- 
-@@ -2433,6 +2434,7 @@ static void print_manufacturer_broadcom(uint16_t subversion, uint16_t revision)
- 
- 	switch ((rev & 0xf000) >> 12) {
- 	case 0:
-+	case 3:
- 		for (i = 0; broadcom_uart_subversion_table[i].str; i++) {
- 			if (broadcom_uart_subversion_table[i].ver == ver) {
- 				str = broadcom_uart_subversion_table[i].str;
+On Thursday 14 of May 2015 19:00:04 Mariusz Skamra wrote:
+> PTS 6.1 and Android 5.1
+> ---
+>  android/pics-hfp.txt  | 4 ++--
+>  android/pixit-hfp.txt | 2 +-
+>  android/pts-hfp.txt   | 6 +++---
+>  3 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/android/pics-hfp.txt b/android/pics-hfp.txt
+> index ea81289..c658a25 100644
+> --- a/android/pics-hfp.txt
+> +++ b/android/pics-hfp.txt
+> @@ -1,6 +1,6 @@
+>  HFP PICS for the PTS tool.
+> 
+> -PTS version: 6.0
+> +PTS version: 6.1
+> 
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> @@ -195,7 +195,7 @@ TSPC_HFP_4_2	True (*)	CVSD audio coding over eSCO
+> (Accepting) (C.2)
+> ---------------------------------------------------------------------------
+> ---- C.1: Mandatory if Wide band speech service is supported TSPC_HFP_2_24
+> or TSPC_HFP_3_24, otherwise excluded
+> -C.2: Mandatory IF TPSC_HFP_2_3b OR TSPC_HFP_3_3b; otherwise	Excluded.
+> +C.2: Mandatory IF TPSC_HFP_2_3b OR TSPC_HFP_3_3b; otherwise Excluded.
+>  ---------------------------------------------------------------------------
+> ----
+> 
+> 
+> diff --git a/android/pixit-hfp.txt b/android/pixit-hfp.txt
+> index dfae9bf..896744e 100644
+> --- a/android/pixit-hfp.txt
+> +++ b/android/pixit-hfp.txt
+> @@ -1,6 +1,6 @@
+>  HFP PIXIT for the PTS tool.
+> 
+> -PTS version: 6.0
+> +PTS version: 6.1
+> 
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-hfp.txt b/android/pts-hfp.txt
+> index ed17afe..05fccd8 100644
+> --- a/android/pts-hfp.txt
+> +++ b/android/pts-hfp.txt
+> @@ -1,8 +1,8 @@
+>  PTS test results for HFP
+> 
+> -PTS version: 6.0
+> -Tested: 16-February-2015
+> -Android version: 5.0
+> +PTS version: 6.1
+> +Tested: 14-May-2015
+> +Android version: 5.1
+> 
+>  Results:
+>  PASS	test passed
+
+Applied, thanks.
+
 -- 
-1.9.1
-
+BR
+Szymon Janc
