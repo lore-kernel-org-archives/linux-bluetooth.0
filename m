@@ -1,80 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 May 2015 13:17:57 -0400 (EDT)
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Marcel Holtmann <marcel@holtmann.org>
-cc: Takashi Iwai <tiwai@suse.de>, Laura Abbott <labbott@redhat.com>,
-    Laura Abbott <labbott@fedoraproject.org>,
-    "Gustavo F. Padovan" <gustavo@padovan.org>,
-    Johan Hedberg <johan.hedberg@gmail.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-    netdev <netdev@vger.kernel.org>,
-    Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-    Ming Lei <ming.lei@canonical.com>,
-    "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-     <linux-usb@vger.kernel.org>
-Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
-In-Reply-To: <E00D9D09-50A7-46C8-B141-9338F85B0020@holtmann.org>
-Message-ID: <Pine.LNX.4.44L0.1505191314290.1453-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <CABBYNZKHn0dLOrO3NR6rWukt6ZxTwUdBwA8Pzt3j5_Ucej5nsg@mail.gmail.com>
+References: <1431696620-4762-1-git-send-email-luiz.dentz@gmail.com>
+	<CAJLTA8gcGVoRaHpiYzLNBgYjZFGGdocnt=g0rZ+qh9S34X2eFA@mail.gmail.com>
+	<CAJLTA8jZi=f-Eh5n1EmQjf3z8BJ_kRjB9t8q1EfAvP8OZM-FQg@mail.gmail.com>
+	<CABBYNZKHn0dLOrO3NR6rWukt6ZxTwUdBwA8Pzt3j5_Ucej5nsg@mail.gmail.com>
+Date: Tue, 19 May 2015 10:16:11 -0700
+Message-ID: <CAJLTA8iMwgXkEtMgEejWuHrUiDsaQsN5UXqxXMi_YpisfZqnEw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/ad: Replace data if already exists
+From: Marie Janssen <jamuraa@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 19 May 2015, Marcel Holtmann wrote:
+Hi Luiz,
 
-> Hi Alan,
-> 
-> >>>> I am not convinced. Now we are hacking the Bluetooth core layer
-> >>>> (which has nothing to do with the drivers suspend/resume or
-> >>>> probe) to do something different so that we do not see this
-> >>>> warning.
-> >>>> 
-> >>>> I can not do anything about the platform in question choosing a
-> >>>> unplug/replug for suspend/resume instead of having a proper USB
-> >>>> suspend and resume handling. That is pretty much out of our
-> >>>> control.
-> > 
-> > Actually one can do something about this.  I mean, one _can_ implement
-> > proper USB suspend and resume handling in the Bluetooth driver.  At
-> > this point the details aren't clear to me, but perhaps if the driver in
-> > question had a reset_resume callback then it might work better.
-> 
-> the btusb.ko driver has suspend/resume support. Are you saying we
-> also need reset_resume support?
+On Mon, May 18, 2015 at 4:14 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Marie,
+>
+> On Fri, May 15, 2015 at 7:04 PM, Marie Janssen <jamuraa@chromium.org> wrote:
+>> On Fri, May 15, 2015 at 9:02 AM, Marie Janssen <jamuraa@chromium.org> wrote:
+>>> Hi Luiz,
+>>>
+>>> On Fri, May 15, 2015 at 6:30 AM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>
+>>>> If either manufacturer or service data already exist but the content
+>>>> is different replace with the new data.
+>>>> ---
+>>>>  src/shared/ad.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+>>>>  1 file changed, 38 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/src/shared/ad.c b/src/shared/ad.c
+>>>> index 00d138d..dfc6b9a 100644
+>>>> --- a/src/shared/ad.c
+>>>> +++ b/src/shared/ad.c
+>>>> @@ -431,6 +431,14 @@ void bt_ad_clear_service_uuid(struct bt_ad *ad)
+>>>>         queue_remove_all(ad->service_uuids, NULL, NULL, free);
+>>>>  }
+>>>>
+>>>> +static bool manufacturer_id_data_match(const void *data, const void *user_data)
+>>>> +{
+>>>> +       const struct bt_ad_manufacturer_data *m = data;
+>>>> +       uint16_t id = PTR_TO_UINT(user_data);
+>>>> +
+>>>> +       return m->manufacturer_id == id;
+>>>> +}
+>>>> +
+>>>>  bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id,
+>>>>                                                         void *data, size_t len)
+>>>>  {
+>>>> @@ -442,6 +450,17 @@ bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id,
+>>>>         if (len > (MAX_ADV_DATA_LEN - 2 - sizeof(uint16_t)))
+>>>>                 return false;
+>>>>
+>>>> +       new_data = queue_find(ad->manufacturer_data, manufacturer_id_data_match,
+>>>> +                                               UINT_TO_PTR(manufacturer_id));
+>>>> +       if (new_data) {
+>>>> +               if (new_data->len == len && !memcmp(new_data->data, data, len))
+>>>> +                       return false;
+>>>
+>>> I don't think we want this check. If the data is different but length
+>>> the same, we still want to update the data.
+>>
+>> Sorry I read this wrong.  We would want to return true here because
+>> the data in the ad is as expected.
+>
+> This is to prevent emitting duplicated signals since in fact it did
+> not change anything.
+>
 
-I don't know; I'm not familiar enough with how Bluetooth works.  If the 
-device loses power and requires its firmware to be loaded again, then a 
-reset_resume would end up doing much the same thing as probe anyway.  
-So implementing reset_resume might not make much difference.
+Previously the false return value meant that some error had occurred,
+such as memory allocation failure or the data being too long for the
+ad.  Having nothing change and the ad be basically intact seems like
+not a problem.  I guess this is a API semantics question, whether a
+true return value means "the data is set correctly" vs "the data is
+updated".
 
-> >>>> I would rather have the USB subsystem delay the probe()
-> >>>> callback if we tell it to.
-> > 
-> > This is possible.  I am not sure it would be the right thing to do,
-> > though.  What happens if the probe routine gets called early on during
-> > the boot-up procedure, before userspace is up and running?  The same
-> > thing should happen here.
-> 
-> For modules this will be hard. Since you need userspace before being
-> able to load the modules. If built-in code, then in theory this might
-> be possible. Depending on the order of the init sections.
+>>>> +               new_data->data = realloc(new_data->data, len);
+>>>> +               memcpy(new_data->data, data, len);
+>>>> +               new_data->len = len;
+>>>> +               return true;
+>>>> +       }
+>>>> +
+>>>>         new_data = new0(struct bt_ad_manufacturer_data, 1);
+>>>>         if (!new_data)
+>>>>                 return false;
+>>>> @@ -458,11 +477,6 @@ bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id,
+>>>>
+>>>>         new_data->len = len;
+>>>>
+>>>> -       if (bt_ad_has_manufacturer_data(ad, new_data)) {
+>>>> -               manuf_destroy(new_data);
+>>>> -               return false;
+>>>> -       }
+>>>> -
+>>>>         if (queue_push_tail(ad->manufacturer_data, new_data))
+>>>>                 return true;
+>>>>
+>>>> @@ -556,6 +570,15 @@ void bt_ad_clear_solicit_uuid(struct bt_ad *ad)
+>>>>         queue_remove_all(ad->solicit_uuids, NULL, NULL, free);
+>>>>  }
+>>>>
+>>>> +
+>>>> +static bool service_uuid_match(const void *data, const void *user_data)
+>>>> +{
+>>>> +       const struct bt_ad_service_data *s = data;
+>>>> +       const bt_uuid_t *uuid = user_data;
+>>>> +
+>>>> +       return bt_uuid_cmp(&s->uuid, uuid);
+>>>> +}
+>>>> +
+>>>>  bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
+>>>>                                                                 size_t len)
+>>>>  {
+>>>> @@ -567,6 +590,16 @@ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
+>>>>         if (len > (MAX_ADV_DATA_LEN - 2 - (size_t)bt_uuid_len(uuid)))
+>>>>                 return false;
+>>>>
+>>>> +       new_data = queue_find(ad->service_uuids, service_uuid_match, uuid);
+>>>> +       if (new_data) {
+>>>> +               if (new_data->len == len && !memcmp(new_data->data, data, len))
+>>>> +                       return false;
+>>>
+>>> Similarly here as from above, it would be better to replace the data.
+>>>
+>>>> +               new_data->data = realloc(new_data->data, len);
+>>>> +               memcpy(new_data->data, data, len);
+>>>> +               new_data->len = len;
+>>>> +               return true;
+>>>> +       }
+>>>> +
+>>>>         new_data = new0(struct bt_ad_service_data, 1);
+>>>>         if (!new_data)
+>>>>                 return false;
+>>>> --
+>>>> 2.1.0
+>>>>
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>>>
+>>>
+>>> --
+>>> Marie Janssen
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Yes, I meant built-in.
 
-> >>>> Of just have request_firmware()
-> >>>> actually sleep until userspace is ready. Seriously, why is
-> >>>> request_firmware not just sleeping for us.
-> > 
-> > It won't work.  The request_firmware call is part of the probe 
-> > sequence, which in turn is part of the resume sequence.  Userspace 
-> > doesn't start running again until the resume sequence is finished.  If 
-> > request_firmware waited for userspace, it would hang.
-> 
-> Then I really have no idea on how to solve this unless we silence the
-> warning from request_firmware. From a driver perspective we go back
-> trough probe(). So the driver has to treat this as a new device.
 
-Oliver's suggestion to keep the firmware in memory may be the only
-reasonable solution.
-
-Alan Stern
+-- 
+Marie Janssen
