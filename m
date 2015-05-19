@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Mariusz Skamra <mariusz.skamra@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update SPP test results
-Date: Tue, 19 May 2015 20:49:41 +0200
-Message-ID: <2357171.8DSv4DVSAN@leonov>
-In-Reply-To: <2136018.0falkM9Tx6@leonov>
-References: <1432047116-27352-1-git-send-email-mariusz.skamra@tieto.com> <2136018.0falkM9Tx6@leonov>
+Subject: Re: [PATCH] android/pts: Update MCAP test results
+Date: Tue, 19 May 2015 20:46:09 +0200
+Message-ID: <1512420.RSjjPSexyf@leonov>
+In-Reply-To: <1432049798-29008-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1432049798-29008-1-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,107 +14,67 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mariusz,
 
-On Tuesday 19 of May 2015 19:18:19 Szymon Janc wrote:
-> Hi Mariusz,
+On Tuesday 19 of May 2015 17:36:38 Mariusz Skamra wrote:
+> PTS 6.1 and Android 5.1
+> ---
+>  android/pics-mcap.txt  | 4 ++--
+>  android/pixit-mcap.txt | 2 +-
+>  android/pts-mcap.txt   | 6 +++---
+>  3 files changed, 6 insertions(+), 6 deletions(-)
 > 
-> On Tuesday 19 of May 2015 16:51:56 Mariusz Skamra wrote:
-> > PTS 6.1 and Android 5.1
-> > ---
-> > 
-> >  android/pics-spp.txt  | 12 ++++++------
-> >  android/pixit-spp.txt |  2 +-
-> >  android/pts-spp.txt   |  7 +++----
-> >  3 files changed, 10 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/android/pics-spp.txt b/android/pics-spp.txt
-> > index d9bb883..d6bf97a 100644
-> > --- a/android/pics-spp.txt
-> > +++ b/android/pics-spp.txt
-> > @@ -1,6 +1,6 @@
-> > 
-> >  SPP PICS for the PTS tool.
-> > 
-> > -PTS version: 6.0
-> > +PTS version: 6.1
-> > 
-> >  * - different than PTS defaults
-> >  # - not yet implemented/supported
-> > 
-> > @@ -80,11 +80,11 @@ TSPC_SPP_4_5	True (*)	Displayable text name 
-(C.2)
-> > 
-> >  TSPC_SPP_4_6	True (*)	BluetoothProfileDescriptorList (C.3)
-> >  -------------------------------------------------------------------------
-> >  --
-> > 
-> > ---- C.1: Mandatory for role B, if capability 'Support of Serial Profile
-> > Service' -	(SPP 2/1) supported. Irrelevant for role A.
-> > -C.2: Mandatory to support if 2/1 (Support of Serial Profile Service) AND
-> > 0/1 -	(SPP v1.1) are supported, otherwise Optional.
-> > -C.3: Mandatory to support if 2/1 (Support of Serial Profile Service) AND
-> > 0/2 -	(SPP v1.2) are supported, otherwise Optional.
-> > +	(TSPC_SPP_2_1) supported. Irrelevant for role A.
-> > +C.2: Mandatory to support if TSPC_SPP_2_1 AND TSPC_SPP_0_1 are supported,
-> > +	otherwise Optional.
-> > +C.3: Mandatory to support if TSPC_SPP_2_1 AND TSPC_SPP_0_2 are supported,
-> > +	otherwise Optional.
-> > 
-> >  -------------------------------------------------------------------------
-> >  --
-> > 
-> > ----
-> > 
-> > 
-> > diff --git a/android/pixit-spp.txt b/android/pixit-spp.txt
-> > index 8e2d70f..4bd54d0 100644
-> > --- a/android/pixit-spp.txt
-> > +++ b/android/pixit-spp.txt
-> > @@ -1,6 +1,6 @@
-> > 
-> >  SPP PIXIT for the PTS tool.
-> > 
-> > -PTS version: 6.0
-> > +PTS version: 6.1
-> > 
-> >  * - different than PTS defaults
-> >  & - should be set to IUT Bluetooth address
-> > 
-> > diff --git a/android/pts-spp.txt b/android/pts-spp.txt
-> > index 2d2815b..b1c06a3 100644
-> > --- a/android/pts-spp.txt
-> > +++ b/android/pts-spp.txt
-> > @@ -1,8 +1,8 @@
-> > 
-> >  PTS test results for SPP
-> > 
-> > -PTS version: 6.0
-> > -Tested: 29-January-2015
-> > -Android version: 5.0
-> > +PTS version: 6.1
-> > +Tested: 19-May-2015
-> > +Android version: 5.1
-> > 
-> >  Results:
-> >  PASS	test passed
-> > 
-> > @@ -22,7 +22,6 @@ TC_DevB_APP_BV_02_C	PASS	haltest: socket listen
-> > BTSOCK_RFCOMM SerialPort TC_APP_BV_03_C		N/A	Missing in PTS
-> > 
-> >  				PTS issue #12388
-> >  				Note: tests BV_03 : BV_6 currently not supported
-> > 
-> > -				ETA: December 2014 (PTS 6.0)
-> > 
-> >  TC_APP_BV_04_C		N/A	Missing in PTS
-> >  TC_APP_BV_05_C		N/A	Missing in PTS
-> >  TC_APP_BV_06_C		N/A	Missing in PTS
+> diff --git a/android/pics-mcap.txt b/android/pics-mcap.txt
+> index 70e0b66..218ee80 100644
+> --- a/android/pics-mcap.txt
+> +++ b/android/pics-mcap.txt
+> @@ -1,6 +1,6 @@
+>  MCAP PICS for the PTS tool.
 > 
-> Since we don't track unimplemented tests from TS in other profiles, let's
-> not do this here. So just remove tests that are not present in latest PTS
-> from the list.
+> -PTS version: 6.0
+> +PTS version: 6.1
+> 
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> @@ -52,7 +52,7 @@ TSPC_MCAP_2_4	False		Can support multiple 
+simultaneous
+> MCLs with
+> ---------------------------------------------------------------------------
+> ---- Parameter Name	Selected	Description
+>  ---------------------------------------------------------------------------
+> ---- -TSPC_MCAP_3_1			This row inentionally left blank
+> +TSPC_MCAP_3_1			This row intentionally left blank
+>  TSPC_MCAP_3_2	True (*)	Initiate creation of Control and Data Channels
+>  				(C.1)
+>  TSPC_MCAP_3_3	True (*)	Accept creation of Control and Data Channels
+> diff --git a/android/pixit-mcap.txt b/android/pixit-mcap.txt
+> index f3d33a1..a8bbe52 100644
+> --- a/android/pixit-mcap.txt
+> +++ b/android/pixit-mcap.txt
+> @@ -1,6 +1,6 @@
+>  MCAP PIXIT for the PTS tool.
+> 
+> -PTS version: 6.0
+> +PTS version: 6.1
+> 
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
+> index 2ad2858..8e224a1 100644
+> --- a/android/pts-mcap.txt
+> +++ b/android/pts-mcap.txt
+> @@ -1,8 +1,8 @@
+>  PTS test results for MCAP
+> 
+> -PTS version: 6.0
+> -Tested: 10-February-2015
+> -Android version: 5.0
+> +PTS version: 6.1
+> +Tested: 19-May-2015
+> +Android version: 5.1
+> 
+>  Results:
+>  PASS	test passed
 
-I applied the patch and follow up one that removed unimplemented tests so no 
-need to resend this. You already have enough work with this :)  Thanks.
+Patch applied, thanks.
 
 -- 
 BR
