@@ -1,57 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 May 2015 10:26:46 -0400 (EDT)
-From: Alan Stern <stern@rowland.harvard.edu>
-To: Takashi Iwai <tiwai@suse.de>
-cc: Laura Abbott <labbott@redhat.com>, Marcel Holtmann <marcel@holtmann.org>,
-    Laura Abbott <labbott@fedoraproject.org>,
-    "Gustavo F. Padovan" <gustavo@padovan.org>,
-    Johan Hedberg <johan.hedberg@gmail.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-    netdev <netdev@vger.kernel.org>,
-    Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-    Ming Lei <ming.lei@canonical.com>,
-    "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-     <linux-usb@vger.kernel.org>
-Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
-In-Reply-To: <s5hwq04zypv.wl-tiwai@suse.de>
-Message-ID: <Pine.LNX.4.44L0.1505191017460.1453-100000@iolanthe.rowland.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+From: Frederic Danis <frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] monitor: Add Broadcom BCM4324B3 chip name information
+Date: Tue, 19 May 2015 16:20:30 +0200
+Message-Id: <1432045230-26074-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 19 May 2015, Takashi Iwai wrote:
+---
+ monitor/packet.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> > > I am not convinced. Now we are hacking the Bluetooth core layer
-> > > (which has nothing to do with the drivers suspend/resume or
-> > > probe) to do something different so that we do not see this
-> > > warning.
-> > >
-> > > I can not do anything about the platform in question choosing a
-> > > unplug/replug for suspend/resume instead of having a proper USB
-> > > suspend and resume handling. That is pretty much out of our
-> > > control.
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 8f75ee2..af51378 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -2404,6 +2404,7 @@ static const struct {
+ 	const char *str;
+ } broadcom_uart_subversion_table[] = {
+ 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
++	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
+ 	{ }
+ };
+ 
+@@ -2433,6 +2434,7 @@ static void print_manufacturer_broadcom(uint16_t subversion, uint16_t revision)
+ 
+ 	switch ((rev & 0xf000) >> 12) {
+ 	case 0:
++	case 3:
+ 		for (i = 0; broadcom_uart_subversion_table[i].str; i++) {
+ 			if (broadcom_uart_subversion_table[i].ver == ver) {
+ 				str = broadcom_uart_subversion_table[i].str;
+-- 
+1.9.1
 
-Actually one can do something about this.  I mean, one _can_ implement
-proper USB suspend and resume handling in the Bluetooth driver.  At
-this point the details aren't clear to me, but perhaps if the driver in
-question had a reset_resume callback then it might work better.
-
-> > >  I would rather have the USB subsystem delay the probe()
-> > > callback if we tell it to.
-
-This is possible.  I am not sure it would be the right thing to do,
-though.  What happens if the probe routine gets called early on during
-the boot-up procedure, before userspace is up and running?  The same
-thing should happen here.
-
-> > >  Of just have request_firmware()
-> > > actually sleep until userspace is ready. Seriously, why is
-> > > request_firmware not just sleeping for us.
-
-It won't work.  The request_firmware call is part of the probe 
-sequence, which in turn is part of the resume sequence.  Userspace 
-doesn't start running again until the resume sequence is finished.  If 
-request_firmware waited for userspace, it would hang.
-
-Alan Stern
