@@ -3,185 +3,180 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  3/5] unit/test-queue: Use tester framework
-Date: Tue, 19 May 2015 20:31:02 +0530
-Message-id: <1432047664-23655-4-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH  2/5] unit/test-textfile: Use tester framework
+Date: Tue, 19 May 2015 20:31:01 +0530
+Message-id: <1432047664-23655-3-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1432047664-23655-1-git-send-email-gowtham.ab@samsung.com>
 References: <1432047664-23655-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- unit/test-queue.c | 55 ++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 34 insertions(+), 21 deletions(-)
+ Makefile.am          |  2 +-
+ unit/test-textfile.c | 49 +++++++++++++++++++++++--------------------------
+ 2 files changed, 24 insertions(+), 27 deletions(-)
 
-diff --git a/unit/test-queue.c b/unit/test-queue.c
-index 12319b0..d912a64 100644
---- a/unit/test-queue.c
-+++ b/unit/test-queue.c
-@@ -29,8 +29,9 @@
+diff --git a/Makefile.am b/Makefile.am
+index 9e94648..6aa8410 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -278,7 +278,7 @@ unit_test_uuid_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ unit_tests += unit/test-textfile
  
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
+ unit_test_textfile_SOURCES = unit/test-textfile.c src/textfile.h src/textfile.c
+-unit_test_textfile_LDADD = @GLIB_LIBS@
++unit_test_textfile_LDADD = src/libshared-glib.la @GLIB_LIBS@
+ 
+ unit_tests += unit/test-crc
+ 
+diff --git a/unit/test-textfile.c b/unit/test-textfile.c
+index d873df4..5250f98 100644
+--- a/unit/test-textfile.c
++++ b/unit/test-textfile.c
+@@ -34,6 +34,7 @@
+ #include <glib.h>
+ 
+ #include "src/textfile.h"
 +#include "src/shared/tester.h"
  
--static void test_basic(void)
-+static void test_basic(const void *data)
- {
- 	struct queue *queue;
- 	unsigned int n, i;
-@@ -56,6 +57,7 @@ static void test_basic(void)
- 	}
+ static const char test_pathname[] = "/tmp/textfile";
  
- 	queue_destroy(queue, NULL);
+@@ -79,7 +80,7 @@ done:
+ 	close(fd);
+ }
+ 
+-static void test_pagesize(void)
++static void test_pagesize(const void *data)
+ {
+ 	char key[18], *str;
+ 	int size;
+@@ -87,21 +88,20 @@ static void test_pagesize(void)
+ 	size = getpagesize();
+ 	g_assert(size >= 4096);
+ 
+-	if (g_test_verbose())
+-		g_print("System uses a page size of %d bytes\n", size);
++	tester_debug("System uses a page size of %d bytes\n", size);
+ 
+ 	util_create_pagesize();
+ 
+ 	sprintf(key, "11:11:11:11:11:11");
+ 	str = textfile_get(test_pathname, key);
+ 
+-	if (g_test_verbose())
+-		g_print("%s\n", str);
++	tester_debug("%s\n", str);
+ 
+ 	g_assert(str == NULL);
 +	tester_test_passed();
  }
  
- static void foreach_destroy(void *data, void *user_data)
-@@ -65,7 +67,7 @@ static void foreach_destroy(void *data, void *user_data)
- 	queue_destroy(queue, NULL);
- }
- 
--static void test_foreach_destroy(void)
-+static void test_foreach_destroy(const void *data)
+-static void test_delete(void)
++static void test_delete(const void *data)
  {
- 	struct queue *queue;
+ 	char key[18], value[512], *str;
  
-@@ -76,6 +78,7 @@ static void test_foreach_destroy(void)
- 	queue_push_tail(queue, UINT_TO_PTR(2));
+@@ -116,13 +116,13 @@ static void test_delete(void)
+ 	str = textfile_get(test_pathname, key);
+ 	g_assert(str != NULL);
  
- 	queue_foreach(queue, foreach_destroy, queue);
+-	if (g_test_verbose())
+-		g_print("%s\n", str);
++	tester_debug("%s\n", str);
+ 
+ 	g_free(str);
 +	tester_test_passed();
  }
  
- static void foreach_remove(void *data, void *user_data)
-@@ -85,7 +88,7 @@ static void foreach_remove(void *data, void *user_data)
- 	g_assert(queue_remove(queue, data));
- }
- 
--static void test_foreach_remove(void)
-+static void test_foreach_remove(const void *data)
+-static void test_overwrite(void)
++static void test_overwrite(const void *data)
  {
- 	struct queue *queue;
+ 	char key[18], value[512], *str;
  
-@@ -97,6 +100,7 @@ static void test_foreach_remove(void)
+@@ -143,10 +143,10 @@ static void test_overwrite(void)
  
- 	queue_foreach(queue, foreach_remove, queue);
- 	queue_destroy(queue, NULL);
+ 	str = textfile_get(test_pathname, key);
+ 
+-	if (g_test_verbose())
+-		g_print("%s\n", str);
++	tester_debug("%s\n", str);
+ 
+ 	g_assert(str == NULL);
 +	tester_test_passed();
  }
  
- static void foreach_remove_all(void *data, void *user_data)
-@@ -106,7 +110,7 @@ static void foreach_remove_all(void *data, void *user_data)
- 	queue_remove_all(queue, NULL, NULL, NULL);
+ static void check_entry(char *key, char *value, void *data)
+@@ -164,7 +164,7 @@ static void check_entry(char *key, char *value, void *data)
+ 	g_assert(strlen(value) == len);
  }
  
--static void test_foreach_remove_all(void)
-+static void test_foreach_remove_all(const void *data)
+-static void test_multiple(void)
++static void test_multiple(const void *data)
  {
- 	struct queue *queue;
+ 	char key[18], value[512], *str;
+ 	unsigned int i, j, max = 10;
+@@ -182,8 +182,7 @@ static void test_multiple(void)
  
-@@ -118,6 +122,7 @@ static void test_foreach_remove_all(void)
+ 		str = textfile_get(test_pathname, key);
  
- 	queue_foreach(queue, foreach_remove_all, queue);
- 	queue_destroy(queue, NULL);
-+	tester_test_passed();
- }
+-		if (g_test_verbose())
+-			g_print("%s %s\n", key, str);
++		tester_debug("%s %s\n", key, str);
  
- static void foreach_remove_backward(void *data, void *user_data)
-@@ -128,7 +133,7 @@ static void foreach_remove_backward(void *data, void *user_data)
- 	queue_remove(queue, UINT_TO_PTR(1));
- }
+ 		g_assert(str != NULL);
+ 		g_assert(strcmp(str, value) == 0);
+@@ -201,8 +200,7 @@ static void test_multiple(void)
  
--static void test_foreach_remove_backward(void)
-+static void test_foreach_remove_backward(const void *data)
- {
- 	struct queue *queue;
+ 	str = textfile_get(test_pathname, key);
  
-@@ -140,6 +145,7 @@ static void test_foreach_remove_backward(void)
+-	if (g_test_verbose())
+-		g_print("%s %s\n", key, str);
++	tester_debug("%s %s\n", key, str);
  
- 	queue_foreach(queue, foreach_remove_backward, queue);
- 	queue_destroy(queue, NULL);
-+	tester_test_passed();
- }
+ 	g_assert(str != NULL);
+ 	g_assert(strcmp(str, value) == 0);
+@@ -219,8 +217,7 @@ static void test_multiple(void)
  
- static struct queue *static_queue;
-@@ -149,7 +155,7 @@ static void destroy_remove(void *user_data)
- 	queue_remove(static_queue, user_data);
- }
+ 	str = textfile_get(test_pathname, key);
  
--static void test_destroy_remove(void)
-+static void test_destroy_remove(const void *data)
- {
- 	static_queue = queue_new();
+-	if (g_test_verbose())
+-		g_print("%s %s\n", key, str);
++	tester_debug("%s %s\n", key, str);
  
-@@ -159,9 +165,10 @@ static void test_destroy_remove(void)
- 	queue_push_tail(static_queue, UINT_TO_PTR(2));
+ 	g_assert(str != NULL);
+ 	g_assert(strcmp(str, value) == 0);
+@@ -231,8 +228,7 @@ static void test_multiple(void)
+ 		sprintf(key, "00:00:00:00:00:%02X", i);
+ 		str = textfile_get(test_pathname, key);
  
- 	queue_destroy(static_queue, destroy_remove);
-+	tester_test_passed();
- }
+-		if (g_test_verbose())
+-			g_print("%s %s\n", key, str);
++		tester_debug("%s %s\n", key, str);
  
--static void test_push_after(void)
-+static void test_push_after(const void *data)
- {
- 	struct queue *queue;
- 	unsigned int len, i;
-@@ -212,6 +219,7 @@ static void test_push_after(void)
- 	g_assert(queue_pop_head(queue) == UINT_TO_PTR(1));
+ 		g_assert(str != NULL);
  
- 	queue_destroy(queue, NULL);
-+	tester_test_passed();
- }
+@@ -262,16 +258,17 @@ static void test_multiple(void)
+ 	g_assert(textfile_del(test_pathname, key) == 0);
  
- static bool match_int(const void *a, const void *b)
-@@ -227,7 +235,7 @@ static bool match_ptr(const void *a, const void *b)
- 	return a == b;
- }
- 
--static void test_remove_all(void)
-+static void test_remove_all(const void *data)
- {
- 	struct queue *queue;
- 
-@@ -248,21 +256,26 @@ static void test_remove_all(void)
- 	g_assert(queue_isempty(queue));
- 
- 	queue_destroy(queue, NULL);
+ 	textfile_foreach(test_pathname, check_entry, GUINT_TO_POINTER(max));
 +	tester_test_passed();
  }
  
  int main(int argc, char *argv[])
  {
 -	g_test_init(&argc, &argv, NULL);
--
--	g_test_add_func("/queue/basic", test_basic);
--	g_test_add_func("/queue/foreach_destroy", test_foreach_destroy);
--	g_test_add_func("/queue/foreach_remove", test_foreach_remove);
--	g_test_add_func("/queue/foreach_remove_all", test_foreach_remove_all);
--	g_test_add_func("/queue/foreach_remove_backward",
--						test_foreach_remove_backward);
--	g_test_add_func("/queue/destroy_remove", test_destroy_remove);
--	g_test_add_func("/queue/push_after", test_push_after);
--	g_test_add_func("/queue/remove_all", test_remove_all);
--
--	return g_test_run();
 +	tester_init(&argc, &argv);
-+
-+	tester_add("/queue/basic", NULL, NULL, test_basic, NULL);
-+	tester_add("/queue/foreach_destroy", NULL, NULL,
-+						test_foreach_destroy, NULL);
-+	tester_add("/queue/foreach_remove",  NULL, NULL,
-+						test_foreach_remove, NULL);
-+	tester_add("/queue/foreach_remove_all",  NULL, NULL,
-+						test_foreach_remove_all, NULL);
-+	tester_add("/queue/foreach_remove_backward", NULL, NULL,
-+					test_foreach_remove_backward, NULL);
-+	tester_add("/queue/destroy_remove",  NULL, NULL,
-+						test_destroy_remove, NULL);
-+	tester_add("/queue/push_after",  NULL, NULL, test_push_after, NULL);
-+	tester_add("/queue/remove_all",  NULL, NULL, test_remove_all, NULL);
-+
+ 
+-	g_test_add_func("/textfile/pagesize", test_pagesize);
+-	g_test_add_func("/textfile/delete", test_delete);
+-	g_test_add_func("/textfile/overwrite", test_overwrite);
+-	g_test_add_func("/textfile/multiple", test_multiple);
++	tester_add("/textfile/pagesize", NULL, NULL, test_pagesize, NULL);
++	tester_add("/textfile/delete", NULL, NULL, test_delete, NULL);
++	tester_add("/textfile/overwrite", NULL, NULL, test_overwrite, NULL);
++	tester_add("/textfile/multiple", NULL, NULL, test_multiple, NULL);
+ 
+-	return g_test_run();
 +	return tester_run();
  }
 -- 
