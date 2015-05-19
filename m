@@ -3,162 +3,97 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com, cpgs@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  2/5] unit/test-textfile: Use tester framework
-Date: Tue, 19 May 2015 20:31:01 +0530
-Message-id: <1432047664-23655-3-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH  1/5] unit/test-ringbuf: Use tester framework
+Date: Tue, 19 May 2015 20:31:00 +0530
+Message-id: <1432047664-23655-2-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1432047664-23655-1-git-send-email-gowtham.ab@samsung.com>
 References: <1432047664-23655-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.am          |  2 +-
- unit/test-textfile.c | 49 +++++++++++++++++++++++--------------------------
- 2 files changed, 24 insertions(+), 27 deletions(-)
+ unit/test-ringbuf.c | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 9e94648..6aa8410 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -278,7 +278,7 @@ unit_test_uuid_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- unit_tests += unit/test-textfile
- 
- unit_test_textfile_SOURCES = unit/test-textfile.c src/textfile.h src/textfile.c
--unit_test_textfile_LDADD = @GLIB_LIBS@
-+unit_test_textfile_LDADD = src/libshared-glib.la @GLIB_LIBS@
- 
- unit_tests += unit/test-crc
- 
-diff --git a/unit/test-textfile.c b/unit/test-textfile.c
-index d873df4..5250f98 100644
---- a/unit/test-textfile.c
-+++ b/unit/test-textfile.c
-@@ -34,6 +34,7 @@
+diff --git a/unit/test-ringbuf.c b/unit/test-ringbuf.c
+index e28e04b..a97524e 100644
+--- a/unit/test-ringbuf.c
++++ b/unit/test-ringbuf.c
+@@ -32,6 +32,7 @@
  #include <glib.h>
  
- #include "src/textfile.h"
+ #include "src/shared/ringbuf.h"
 +#include "src/shared/tester.h"
  
- static const char test_pathname[] = "/tmp/textfile";
- 
-@@ -79,7 +80,7 @@ done:
- 	close(fd);
- }
- 
--static void test_pagesize(void)
-+static void test_pagesize(const void *data)
+ static unsigned int nlpo2(unsigned int x)
  {
- 	char key[18], *str;
- 	int size;
-@@ -87,21 +88,20 @@ static void test_pagesize(void)
- 	size = getpagesize();
- 	g_assert(size >= 4096);
- 
--	if (g_test_verbose())
--		g_print("System uses a page size of %d bytes\n", size);
-+	tester_debug("System uses a page size of %d bytes\n", size);
- 
- 	util_create_pagesize();
- 
- 	sprintf(key, "11:11:11:11:11:11");
- 	str = textfile_get(test_pathname, key);
- 
--	if (g_test_verbose())
--		g_print("%s\n", str);
-+	tester_debug("%s\n", str);
- 
- 	g_assert(str == NULL);
-+	tester_test_passed();
+@@ -54,7 +55,7 @@ static unsigned int align_power2(unsigned int u)
+ 	return 1 << fls(u - 1);
  }
  
--static void test_delete(void)
-+static void test_delete(const void *data)
+-static void test_power2(void)
++static void test_power2(const void *data)
  {
- 	char key[18], value[512], *str;
+ 	size_t i;
  
-@@ -116,13 +116,13 @@ static void test_delete(void)
- 	str = textfile_get(test_pathname, key);
- 	g_assert(str != NULL);
- 
--	if (g_test_verbose())
--		g_print("%s\n", str);
-+	tester_debug("%s\n", str);
- 
- 	g_free(str);
-+	tester_test_passed();
- }
- 
--static void test_overwrite(void)
-+static void test_overwrite(const void *data)
- {
- 	char key[18], value[512], *str;
- 
-@@ -143,10 +143,10 @@ static void test_overwrite(void)
- 
- 	str = textfile_get(test_pathname, key);
- 
--	if (g_test_verbose())
--		g_print("%s\n", str);
-+	tester_debug("%s\n", str);
- 
- 	g_assert(str == NULL);
-+	tester_test_passed();
- }
- 
- static void check_entry(char *key, char *value, void *data)
-@@ -164,7 +164,7 @@ static void check_entry(char *key, char *value, void *data)
- 	g_assert(strlen(value) == len);
- }
- 
--static void test_multiple(void)
-+static void test_multiple(const void *data)
- {
- 	char key[18], value[512], *str;
- 	unsigned int i, j, max = 10;
-@@ -182,8 +182,7 @@ static void test_multiple(void)
- 
- 		str = textfile_get(test_pathname, key);
+@@ -68,25 +69,25 @@ static void test_power2(void)
+ 		while (size3 < i && size3 < SIZE_MAX)
+ 			size3 <<= 1;
  
 -		if (g_test_verbose())
--			g_print("%s %s\n", key, str);
-+		tester_debug("%s %s\n", key, str);
+-			g_print("%zu -> size1=%zu size2=%zu size3=%zu\n",
++		tester_debug("%zu -> size1=%zu size2=%zu size3=%zu\n",
+ 						i, size1, size2, size3);
  
- 		g_assert(str != NULL);
- 		g_assert(strcmp(str, value) == 0);
-@@ -201,8 +200,7 @@ static void test_multiple(void)
+ 		g_assert(size1 == size2);
+ 		g_assert(size2 == size3);
+ 		g_assert(size3 == size1);
+ 	}
++
++	tester_test_passed();
+ }
  
- 	str = textfile_get(test_pathname, key);
+-static void test_alloc(void)
++static void test_alloc(const void *data)
+ {
+ 	int i;
  
--	if (g_test_verbose())
--		g_print("%s %s\n", key, str);
-+	tester_debug("%s %s\n", key, str);
- 
- 	g_assert(str != NULL);
- 	g_assert(strcmp(str, value) == 0);
-@@ -219,8 +217,7 @@ static void test_multiple(void)
- 
- 	str = textfile_get(test_pathname, key);
- 
--	if (g_test_verbose())
--		g_print("%s %s\n", key, str);
-+	tester_debug("%s %s\n", key, str);
- 
- 	g_assert(str != NULL);
- 	g_assert(strcmp(str, value) == 0);
-@@ -231,8 +228,7 @@ static void test_multiple(void)
- 		sprintf(key, "00:00:00:00:00:%02X", i);
- 		str = textfile_get(test_pathname, key);
+ 	for (i = 2; i < 10000; i++) {
+ 		struct ringbuf *rb;
  
 -		if (g_test_verbose())
--			g_print("%s %s\n", key, str);
-+		tester_debug("%s %s\n", key, str);
+-			g_print("Iteration %i\n", i);
++		tester_debug("Iteration %i\n", i);
  
- 		g_assert(str != NULL);
+ 		rb = ringbuf_new(i);
+ 		g_assert(rb != NULL);
+@@ -95,9 +96,11 @@ static void test_alloc(void)
  
-@@ -262,16 +258,17 @@ static void test_multiple(void)
- 	g_assert(textfile_del(test_pathname, key) == 0);
+ 		ringbuf_free(rb);
+ 	}
++
++	tester_test_passed();
+ }
  
- 	textfile_foreach(test_pathname, check_entry, GUINT_TO_POINTER(max));
+-static void test_printf(void)
++static void test_printf(const void *data)
+ {
+ 	static size_t rb_size = 500;
+ 	static size_t rb_capa = 512;
+@@ -115,8 +118,7 @@ static void test_printf(void)
+ 		if (!count)
+ 			continue;
+ 
+-		if (g_test_verbose())
+-			g_print("Iteration %i\n", i);
++		tester_debug("Iteration %i\n", i);
+ 
+ 		len = asprintf(&str, "%*c", (int) count, 'x');
+ 		g_assert(len == count);
+@@ -140,15 +142,16 @@ static void test_printf(void)
+ 	}
+ 
+ 	ringbuf_free(rb);
 +	tester_test_passed();
  }
  
@@ -167,14 +102,12 @@ index d873df4..5250f98 100644
 -	g_test_init(&argc, &argv, NULL);
 +	tester_init(&argc, &argv);
  
--	g_test_add_func("/textfile/pagesize", test_pagesize);
--	g_test_add_func("/textfile/delete", test_delete);
--	g_test_add_func("/textfile/overwrite", test_overwrite);
--	g_test_add_func("/textfile/multiple", test_multiple);
-+	tester_add("/textfile/pagesize", NULL, NULL, test_pagesize, NULL);
-+	tester_add("/textfile/delete", NULL, NULL, test_delete, NULL);
-+	tester_add("/textfile/overwrite", NULL, NULL, test_overwrite, NULL);
-+	tester_add("/textfile/multiple", NULL, NULL, test_multiple, NULL);
+-	g_test_add_func("/ringbuf/power2", test_power2);
+-	g_test_add_func("/ringbuf/alloc", test_alloc);
+-	g_test_add_func("/ringbuf/printf", test_printf);
++	tester_add("/ringbuf/power2", NULL, NULL, test_power2, NULL);
++	tester_add("/ringbuf/alloc", NULL, NULL, test_alloc, NULL);
++	tester_add("/ringbuf/printf", NULL, NULL, test_printf, NULL);
  
 -	return g_test_run();
 +	return tester_run();
