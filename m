@@ -1,81 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add debug logs for legacy SMP crypto functions
-Date: Tue, 19 May 2015 21:06:04 +0300
-Message-Id: <1432058764-17623-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1432057375.3970.4.camel@suse.com>
+Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
+From: Oliver Neukum <oneukum@suse.com>
+To: Takashi Iwai <tiwai@suse.de>
+Cc: Alan Stern <stern@rowland.harvard.edu>, Laura Abbott
+ <labbott@redhat.com>,  Marcel Holtmann <marcel@holtmann.org>, Laura Abbott
+ <labbott@fedoraproject.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, "bluez mailin list
+ (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+ netdev <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Ming Lei <ming.lei@canonical.com>, "Rafael
+ J. Wysocki" <rafael.j.wysocki@intel.com>, linux-usb@vger.kernel.org
+Date: Tue, 19 May 2015 19:42:55 +0200
+In-Reply-To: <s5hpp5wtrrp.wl-tiwai@suse.de>
+References: <s5hwq04zypv.wl-tiwai@suse.de>
+	 <Pine.LNX.4.44L0.1505191017460.1453-100000@iolanthe.rowland.org>
+	 <s5hpp5wtrrp.wl-tiwai@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+On Tue, 2015-05-19 at 19:13 +0200, Takashi Iwai wrote:
+> At Tue, 19 May 2015 10:26:46 -0400 (EDT),
+> Alan Stern wrote:
+> > 
+> > > > >  Of just have request_firmware()
+> > > > > actually sleep until userspace is ready. Seriously, why is
+> > > > > request_firmware not just sleeping for us.
+> > 
+> > It won't work.  The request_firmware call is part of the probe 
+> > sequence, which in turn is part of the resume sequence.  Userspace 
+> > doesn't start running again until the resume sequence is finished.  If 
+> > request_firmware waited for userspace, it would hang.
+> 
+> Note that the recent request_firmware() doesn't need the user-space
+> invocation (unless the fallback is explicitly enabled) but loads the
 
-To help debug legacy SMP crypto functions add debug logs of the
-various values involved.
+That is a dangerous approach. You cannot be sure you can do file IO.
+It depends on the exact shape of the device tree.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+> file directly.  And, request_firmware() for the cached data is valid
+> to be called in the resume path.
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 1ab3dc9c8f99..659371af39e4 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -371,6 +371,8 @@ static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
- 	uint8_t tmp[16], data[16];
- 	int err;
- 
-+	SMP_DBG("k %16phN r %16phN", k, r);
-+
- 	if (!tfm) {
- 		BT_ERR("tfm %p", tfm);
- 		return -EINVAL;
-@@ -400,6 +402,8 @@ static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
- 	/* Most significant octet of encryptedData corresponds to data[0] */
- 	swap_buf(data, r, 16);
- 
-+	SMP_DBG("r %16phN", r);
-+
- 	return err;
- }
- 
-@@ -410,6 +414,10 @@ static int smp_c1(struct crypto_blkcipher *tfm_aes, const u8 k[16],
- 	u8 p1[16], p2[16];
- 	int err;
- 
-+	SMP_DBG("k %16phN r %16phN", k, r);
-+	SMP_DBG("iat %u ia %6phN rat %u ra %6phN", _iat, ia, _rat, ra);
-+	SMP_DBG("preq %7phN pres %7phN", preq, pres);
-+
- 	memset(p1, 0, 16);
- 
- 	/* p1 = pres || preq || _rat || _iat */
-@@ -418,10 +426,7 @@ static int smp_c1(struct crypto_blkcipher *tfm_aes, const u8 k[16],
- 	memcpy(p1 + 2, preq, 7);
- 	memcpy(p1 + 9, pres, 7);
- 
--	/* p2 = padding || ia || ra */
--	memcpy(p2, ra, 6);
--	memcpy(p2 + 6, ia, 6);
--	memset(p2 + 12, 0, 4);
-+	SMP_DBG("p1 %16phN", p1);
- 
- 	/* res = r XOR p1 */
- 	u128_xor((u128 *) res, (u128 *) r, (u128 *) p1);
-@@ -433,6 +438,13 @@ static int smp_c1(struct crypto_blkcipher *tfm_aes, const u8 k[16],
- 		return err;
- 	}
- 
-+	/* p2 = padding || ia || ra */
-+	memcpy(p2, ra, 6);
-+	memcpy(p2 + 6, ia, 6);
-+	memset(p2 + 12, 0, 4);
-+
-+	SMP_DBG("p2 %16phN", p2);
-+
- 	/* res = res XOR p2 */
- 	u128_xor((u128 *) res, (u128 *) res, (u128 *) p2);
- 
--- 
-2.1.0
+Well, yes, if your data is cached in RAM, all is well. But that leads
+to the same problem one step further. What must be cached?
 
+	Regards
+		Oliver
