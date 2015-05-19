@@ -1,98 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Mariusz Skamra <mariusz.skamra@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update SPP test results
-Date: Tue, 19 May 2015 19:18:19 +0200
-Message-ID: <2136018.0falkM9Tx6@leonov>
-In-Reply-To: <1432047116-27352-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1432047116-27352-1-git-send-email-mariusz.skamra@tieto.com>
+Date: Tue, 19 May 2015 13:17:57 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: Takashi Iwai <tiwai@suse.de>, Laura Abbott <labbott@redhat.com>,
+    Laura Abbott <labbott@fedoraproject.org>,
+    "Gustavo F. Padovan" <gustavo@padovan.org>,
+    Johan Hedberg <johan.hedberg@gmail.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+    netdev <netdev@vger.kernel.org>,
+    Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+    Ming Lei <ming.lei@canonical.com>,
+    "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+     <linux-usb@vger.kernel.org>
+Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
+In-Reply-To: <E00D9D09-50A7-46C8-B141-9338F85B0020@holtmann.org>
+Message-ID: <Pine.LNX.4.44L0.1505191314290.1453-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mariusz,
+On Tue, 19 May 2015, Marcel Holtmann wrote:
 
-On Tuesday 19 of May 2015 16:51:56 Mariusz Skamra wrote:
-> PTS 6.1 and Android 5.1
-> ---
->  android/pics-spp.txt  | 12 ++++++------
->  android/pixit-spp.txt |  2 +-
->  android/pts-spp.txt   |  7 +++----
->  3 files changed, 10 insertions(+), 11 deletions(-)
+> Hi Alan,
 > 
-> diff --git a/android/pics-spp.txt b/android/pics-spp.txt
-> index d9bb883..d6bf97a 100644
-> --- a/android/pics-spp.txt
-> +++ b/android/pics-spp.txt
-> @@ -1,6 +1,6 @@
->  SPP PICS for the PTS tool.
+> >>>> I am not convinced. Now we are hacking the Bluetooth core layer
+> >>>> (which has nothing to do with the drivers suspend/resume or
+> >>>> probe) to do something different so that we do not see this
+> >>>> warning.
+> >>>> 
+> >>>> I can not do anything about the platform in question choosing a
+> >>>> unplug/replug for suspend/resume instead of having a proper USB
+> >>>> suspend and resume handling. That is pretty much out of our
+> >>>> control.
+> > 
+> > Actually one can do something about this.  I mean, one _can_ implement
+> > proper USB suspend and resume handling in the Bluetooth driver.  At
+> > this point the details aren't clear to me, but perhaps if the driver in
+> > question had a reset_resume callback then it might work better.
 > 
-> -PTS version: 6.0
-> +PTS version: 6.1
-> 
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> @@ -80,11 +80,11 @@ TSPC_SPP_4_5	True (*)	Displayable text name (C.2)
->  TSPC_SPP_4_6	True (*)	BluetoothProfileDescriptorList (C.3)
->  ---------------------------------------------------------------------------
-> ---- C.1: Mandatory for role B, if capability 'Support of Serial Profile
-> Service' -	(SPP 2/1) supported. Irrelevant for role A.
-> -C.2: Mandatory to support if 2/1 (Support of Serial Profile Service) AND
-> 0/1 -	(SPP v1.1) are supported, otherwise Optional.
-> -C.3: Mandatory to support if 2/1 (Support of Serial Profile Service) AND
-> 0/2 -	(SPP v1.2) are supported, otherwise Optional.
-> +	(TSPC_SPP_2_1) supported. Irrelevant for role A.
-> +C.2: Mandatory to support if TSPC_SPP_2_1 AND TSPC_SPP_0_1 are supported,
-> +	otherwise Optional.
-> +C.3: Mandatory to support if TSPC_SPP_2_1 AND TSPC_SPP_0_2 are supported,
-> +	otherwise Optional.
->  ---------------------------------------------------------------------------
-> ----
-> 
-> 
-> diff --git a/android/pixit-spp.txt b/android/pixit-spp.txt
-> index 8e2d70f..4bd54d0 100644
-> --- a/android/pixit-spp.txt
-> +++ b/android/pixit-spp.txt
-> @@ -1,6 +1,6 @@
->  SPP PIXIT for the PTS tool.
-> 
-> -PTS version: 6.0
-> +PTS version: 6.1
-> 
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-spp.txt b/android/pts-spp.txt
-> index 2d2815b..b1c06a3 100644
-> --- a/android/pts-spp.txt
-> +++ b/android/pts-spp.txt
-> @@ -1,8 +1,8 @@
->  PTS test results for SPP
-> 
-> -PTS version: 6.0
-> -Tested: 29-January-2015
-> -Android version: 5.0
-> +PTS version: 6.1
-> +Tested: 19-May-2015
-> +Android version: 5.1
-> 
->  Results:
->  PASS	test passed
-> @@ -22,7 +22,6 @@ TC_DevB_APP_BV_02_C	PASS	haltest: socket listen
-> BTSOCK_RFCOMM SerialPort TC_APP_BV_03_C		N/A	Missing in PTS
->  				PTS issue #12388
->  				Note: tests BV_03 : BV_6 currently not supported
-> -				ETA: December 2014 (PTS 6.0)
->  TC_APP_BV_04_C		N/A	Missing in PTS
->  TC_APP_BV_05_C		N/A	Missing in PTS
->  TC_APP_BV_06_C		N/A	Missing in PTS
+> the btusb.ko driver has suspend/resume support. Are you saying we
+> also need reset_resume support?
 
-Since we don't track unimplemented tests from TS in other profiles, let's not 
-do this here. So just remove tests that are not present in latest PTS from the 
-list.
+I don't know; I'm not familiar enough with how Bluetooth works.  If the 
+device loses power and requires its firmware to be loaded again, then a 
+reset_resume would end up doing much the same thing as probe anyway.  
+So implementing reset_resume might not make much difference.
 
--- 
-BR
-Szymon Janc
+> >>>> I would rather have the USB subsystem delay the probe()
+> >>>> callback if we tell it to.
+> > 
+> > This is possible.  I am not sure it would be the right thing to do,
+> > though.  What happens if the probe routine gets called early on during
+> > the boot-up procedure, before userspace is up and running?  The same
+> > thing should happen here.
+> 
+> For modules this will be hard. Since you need userspace before being
+> able to load the modules. If built-in code, then in theory this might
+> be possible. Depending on the order of the init sections.
+
+Yes, I meant built-in.
+
+> >>>> Of just have request_firmware()
+> >>>> actually sleep until userspace is ready. Seriously, why is
+> >>>> request_firmware not just sleeping for us.
+> > 
+> > It won't work.  The request_firmware call is part of the probe 
+> > sequence, which in turn is part of the resume sequence.  Userspace 
+> > doesn't start running again until the resume sequence is finished.  If 
+> > request_firmware waited for userspace, it would hang.
+> 
+> Then I really have no idea on how to solve this unless we silence the
+> warning from request_firmware. From a driver perspective we go back
+> trough probe(). So the driver has to treat this as a new device.
+
+Oliver's suggestion to keep the firmware in memory may be the only
+reasonable solution.
+
+Alan Stern
