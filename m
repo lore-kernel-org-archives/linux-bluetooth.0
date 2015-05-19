@@ -1,43 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] lib/bnep: Update bnep header with BNEPGETSUPPFEAT and setup response
-Date: Tue, 19 May 2015 16:34:39 +0200
-Message-ID: <3048713.ta9afG7rS0@leonov>
-In-Reply-To: <1431589630-30252-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1431589630-30252-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Tue, 19 May 2015 10:26:46 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Takashi Iwai <tiwai@suse.de>
+cc: Laura Abbott <labbott@redhat.com>, Marcel Holtmann <marcel@holtmann.org>,
+    Laura Abbott <labbott@fedoraproject.org>,
+    "Gustavo F. Padovan" <gustavo@padovan.org>,
+    Johan Hedberg <johan.hedberg@gmail.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+    netdev <netdev@vger.kernel.org>,
+    Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+    Ming Lei <ming.lei@canonical.com>,
+    "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+     <linux-usb@vger.kernel.org>
+Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
+In-Reply-To: <s5hwq04zypv.wl-tiwai@suse.de>
+Message-ID: <Pine.LNX.4.44L0.1505191017460.1453-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+On Tue, 19 May 2015, Takashi Iwai wrote:
 
-On Thursday 14 of May 2015 09:47:09 Grzegorz Kolodziejczyk wrote:
-> This patch updates bnep header with get bnep supported features ioctl
-> and bnep setup response flag.
-> ---
->  lib/bnep.h | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/lib/bnep.h b/lib/bnep.h
-> index aa46852..e7c2c87 100644
-> --- a/lib/bnep.h
-> +++ b/lib/bnep.h
-> @@ -126,6 +126,9 @@ struct bnep_ext_hdr {
->  #define BNEPCONNDEL	_IOW('B', 201, int)
->  #define BNEPGETCONNLIST	_IOR('B', 210, int)
->  #define BNEPGETCONNINFO	_IOR('B', 211, int)
-> +#define BNEPGETSUPPFEAT	_IOR('B', 212, int)
-> +
-> +#define BNEP_SETUP_RESPONSE	0
-> 
->  struct bnep_connadd_req {
->  	int      sock;		/* Connected socket */
+> > > I am not convinced. Now we are hacking the Bluetooth core layer
+> > > (which has nothing to do with the drivers suspend/resume or
+> > > probe) to do something different so that we do not see this
+> > > warning.
+> > >
+> > > I can not do anything about the platform in question choosing a
+> > > unplug/replug for suspend/resume instead of having a proper USB
+> > > suspend and resume handling. That is pretty much out of our
+> > > control.
 
-Both patches applied. Thanks.
+Actually one can do something about this.  I mean, one _can_ implement
+proper USB suspend and resume handling in the Bluetooth driver.  At
+this point the details aren't clear to me, but perhaps if the driver in
+question had a reset_resume callback then it might work better.
 
--- 
-BR
-Szymon Janc
+> > >  I would rather have the USB subsystem delay the probe()
+> > > callback if we tell it to.
+
+This is possible.  I am not sure it would be the right thing to do,
+though.  What happens if the probe routine gets called early on during
+the boot-up procedure, before userspace is up and running?  The same
+thing should happen here.
+
+> > >  Of just have request_firmware()
+> > > actually sleep until userspace is ready. Seriously, why is
+> > > request_firmware not just sleeping for us.
+
+It won't work.  The request_firmware call is part of the probe 
+sequence, which in turn is part of the resume sequence.  Userspace 
+doesn't start running again until the resume sequence is finished.  If 
+request_firmware waited for userspace, it would hang.
+
+Alan Stern
