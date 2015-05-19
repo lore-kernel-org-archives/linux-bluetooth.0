@@ -1,51 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <3048713.ta9afG7rS0@leonov>
-References: <1431589630-30252-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<3048713.ta9afG7rS0@leonov>
-Date: Tue, 19 May 2015 20:39:56 +0300
-Message-ID: <CABBYNZ+mw2n0W4mQ_=0HQ4vrvLhWPfZF5+2yFP_BqrX=Sx1OpA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/2] lib/bnep: Update bnep header with BNEPGETSUPPFEAT
- and setup response
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Eugene Shatokhin <eugene.shatokhin@rosalab.ru>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Andrey Ponomarenko <aponomarenko@rosalab.ru>,
+	linux-kernel@vger.kernel.org,
+	Eugene Shatokhin <eugene.shatokhin@rosalab.ru>
+Subject: [PATCH] Bluetooth: btusb: Add a quirk for BCM43142A0 (105b:e065)
+Date: Tue, 19 May 2015 20:36:25 +0300
+Message-Id: <1432056985-30040-1-git-send-email-eugene.shatokhin@rosalab.ru>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+USB Bluetooth module by Foxconn International, Inc. (USB IDs: 105b:e065)
+is based on BCM43142A0 chip by Broadcom. This module can be found, for
+example, in Lenovo B590 and a few other laptops.
 
-On Tue, May 19, 2015 at 5:34 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Grzegorz,
->
-> On Thursday 14 of May 2015 09:47:09 Grzegorz Kolodziejczyk wrote:
->> This patch updates bnep header with get bnep supported features ioctl
->> and bnep setup response flag.
->> ---
->>  lib/bnep.h | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/lib/bnep.h b/lib/bnep.h
->> index aa46852..e7c2c87 100644
->> --- a/lib/bnep.h
->> +++ b/lib/bnep.h
->> @@ -126,6 +126,9 @@ struct bnep_ext_hdr {
->>  #define BNEPCONNDEL  _IOW('B', 201, int)
->>  #define BNEPGETCONNLIST      _IOR('B', 210, int)
->>  #define BNEPGETCONNINFO      _IOR('B', 211, int)
->> +#define BNEPGETSUPPFEAT      _IOR('B', 212, int)
->> +
->> +#define BNEP_SETUP_RESPONSE  0
->>
->>  struct bnep_connadd_req {
->>       int      sock;          /* Connected socket */
->
-> Both patches applied. Thanks.
+This device requires firmware update to be operational, so this patch
+adds a quirk for it.
 
-Btw, next time please keep the first line a bit shorter.
+With the firmware properly converted and placed:
+Bluetooth: hci0: BCM: patching hci_ver=06 hci_rev=0000 lmp_ver=06
+lmp_subver=210b
+Bluetooth: hci0: BCM: firmware hci_ver=06 hci_rev=00ac lmp_ver=06
+lmp_subver=210b
 
+>From the output of usb-devices:
+T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=105b ProdID=e065 Rev=01.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM43142A0
+S:  SerialNumber=F82FA8FAFEBA
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
+Tested on Lenovo B590 with kernel 4.0.1 and 4.0.3, x86_64.
+
+Signed-off-by: Eugene Shatokhin <eugene.shatokhin@rosalab.ru>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index d21f3b4..ed3c72a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -120,6 +120,9 @@ static const struct usb_device_id btusb_table[] = {
+ 	/* Broadcom BCM20702B0 (Dynex/Insignia) */
+ 	{ USB_DEVICE(0x19ff, 0x0239), .driver_info = BTUSB_BCM_PATCHRAM },
+ 
++	/* Broadcom BCM43142A0 (Foxconn) */
++	{ USB_DEVICE(0x105b, 0xe065), .driver_info = BTUSB_BCM_PATCHRAM },
++
+ 	/* Foxconn - Hon Hai */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01),
+ 	  .driver_info = BTUSB_BCM_PATCHRAM },
 -- 
-Luiz Augusto von Dentz
+2.3.2
