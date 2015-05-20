@@ -2,33 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/3] emulator: Handle Host Number Of Completed Packets Command
-Date: Wed, 20 May 2015 19:10:45 +0200
-Message-Id: <1432141845-9207-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/3] emulator: Move Host Buffer Size Command handling block
+Date: Wed, 20 May 2015 19:10:44 +0200
+Message-Id: <1432141845-9207-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1432141845-9207-1-git-send-email-szymon.janc@tieto.com>
 References: <1432141845-9207-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Host_Number_Of_Completed_Packets command is a special command in
-the sense that no event is normally generated after the command
-has completed.
+Commands codes in switch-case are kept in ascending order.
 ---
- emulator/btdev.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ emulator/btdev.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index d47d50e..af93933 100644
+index a2a2e50..d47d50e 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -2402,6 +2402,12 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+@@ -2386,11 +2386,6 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
  		cmd_complete(btdev, opcode, &status, sizeof(status));
  		break;
  
-+	case BT_HCI_CMD_HOST_NUM_COMPLETED_PACKETS:
-+		/* This command is special in the sense that no event is
-+		 * normally generated after the command has completed.
-+		 */
+-	case BT_HCI_CMD_HOST_BUFFER_SIZE:
+-		status = BT_HCI_ERR_SUCCESS;
+-		cmd_complete(btdev, opcode, &status, sizeof(status));
+-		break;
+-
+ 	case BT_HCI_CMD_SET_HOST_FLOW_CONTROL:
+ 		shfc = data;
+ 		if (shfc->enable > 0x03) {
+@@ -2402,6 +2397,11 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 		cmd_complete(btdev, opcode, &status, sizeof(status));
+ 		break;
+ 
++	case BT_HCI_CMD_HOST_BUFFER_SIZE:
++		status = BT_HCI_ERR_SUCCESS;
++		cmd_complete(btdev, opcode, &status, sizeof(status));
 +		break;
 +
  	case BT_HCI_CMD_READ_NUM_SUPPORTED_IAC:
