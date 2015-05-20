@@ -1,228 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Skamra Mariusz <mariusz.skamra@tieto.com>
-Message-ID: <555C5991.3080903@gmail.com>
-Date: Wed, 20 May 2015 11:53:21 +0200
-MIME-Version: 1.0
-To: Szymon Janc <szymon.janc@tieto.com>,
-	Mariusz Skamra <mariusz.skamra@tieto.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] android/pts: Update SM PTS 6.1 results for android
- 5.1
-References: <1431348588-3974-1-git-send-email-mariusz.skamra@tieto.com> <3042245.L65yuk4BOz@leonov>
-In-Reply-To: <3042245.L65yuk4BOz@leonov>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1432111237.8287.3.camel@suse.com>
+Date: Wed, 20 May 2015 11:46:31 +0200
+Cc: Takashi Iwai <tiwai@suse.de>, Ming Lei <ming.lei@canonical.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Laura Abbott <labbott@fedoraproject.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Laura Abbott <labbott@redhat.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	USB list <linux-usb@vger.kernel.org>,
+	netdev <netdev@vger.kernel.org>
+Message-Id: <9BCD6CFF-0356-4A0F-97D4-776C0A2E436A@holtmann.org>
+References: <s5hwq04zypv.wl-tiwai@suse.de> <Pine.LNX.4.44L0.1505191017460.1453-100000@iolanthe.rowland.org> <s5hpp5wtrrp.wl-tiwai@suse.de> <1432057375.3970.4.camel@suse.com> <s5h7fs3u5gy.wl-tiwai@suse.de> <1432111237.8287.3.camel@suse.com>
+To: Oliver Neukum <oneukum@suse.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Oliver,
 
-On 2015-05-19 16:45, Szymon Janc wrote:
-> Hi Mariusz,
->
-> On Monday 11 of May 2015 14:49:44 Mariusz Skamra wrote:
->> This patch updates test case results, pics and instructions for
->> SM profile against android 5.1.
->> ---
->>   android/pics-sm.txt  | 23 ++++++++++++++---------
->>   android/pixit-sm.txt |  2 +-
->>   android/pts-sm.txt   | 38 ++++++++++++--------------------------
->>   3 files changed, 27 insertions(+), 36 deletions(-)
->>
->> diff --git a/android/pics-sm.txt b/android/pics-sm.txt
->> index c5caec6..c31fe76 100644
->> --- a/android/pics-sm.txt
->> +++ b/android/pics-sm.txt
->> @@ -1,8 +1,9 @@
->>   SM PICS for the PTS tool.
->>
->> -PTS version: 6.0
->> +PTS version: 6.1
->>
->>   * - different than PTS defaults
->> +^ - field not available on PTS
->>
->>   M - mandatory
->>   O - optional
->> @@ -12,9 +13,11 @@ O - optional
->>   Parameter Name	Selected	Description
->>   ---------------------------------------------------------------------------
->> ---- TSPC_SM_1_1	True		Master Role (Initiator) (C.1)
->> -TSPC_SM_1_2	True		Slave Role (Responder) (C.1)
->> +TSPC_SM_1_2	True		Slave Role (Responder) (C.2)
->>   ---------------------------------------------------------------------------
->> ---- -C.1: At least one of these features shall be supported.
->> +C.1: Mandatory to support if TSPC_SM_1_2 is NOT supported, otherwise
->> Optional +C.2: Optional IF ((4.0 OR 4.0+HS) AND TSPC_GAP_5_3) OR ((4.1 OR
->> 4.1+HS OR 4.2 +	OR 4.2+HS) AND (TSPC_GAP_5_3 OR TSPC_GAP_38_3)))
->>   ---------------------------------------------------------------------------
->> ----
->>
->>
->> @@ -26,8 +29,10 @@ TSPC_SM_2_1	True		Authenticated MITM protection
-> (O)
->>   TSPC_SM_2_2	True		Unauthenticated no MITM protection (C.1)
->>   TSPC_SM_2_3	True		No security requirements (M)
->>   TSPC_SM_2_4	False (*)	OOB supported (O)
->> +TSPC_SM_2_5	(^)		LE Secure Connections (C.2)
->>   ---------------------------------------------------------------------------
->> ---- C.1: If TSPC_SM_2_1 is supported then Mandatory, else Optional
->> +C.2: Optional IF Core 4.2 OR Core 4.2+HS are supported, otherwise Excluded
->>   ---------------------------------------------------------------------------
->> ----
->>
->>
->> @@ -47,8 +52,8 @@ TSPC_SM_4_1	True		Just Works (O)
->>   TSPC_SM_4_2	True		Passkey Entry (C.1)
->>   TSPC_SM_4_3	False (*)	Out of Band (C.1)
->>   ---------------------------------------------------------------------------
->> ---- -C.1: If TSPC_SM_2_1 is supported, at least one of these features shall
->> be -	supported.
->> +C.1: Mandatory to support at least one of the defined methods IF
->> TSPC_SM_2_1 is +	supported, otherwise Excluded.
->>   ---------------------------------------------------------------------------
->> ----
->>
->>
->> @@ -63,7 +68,7 @@ TSPC_SM_5_4	True		Slave Initiated Security – Master
->> response(C.2)
->> ---------------------------------------------------------------------------
->> ---- C.1: Mandatory if TSPC_SM_1_2 is supported, otherwise Excluded
->>   C.2: Mandatory if TSPC_SM_1_1 is supported, otherwise Excluded
->> -C.3: Mandatory IF TSPC_SM_2_1 OR TSPC_SM_2_1 OR TSPC_SM_2_4 is supported,
->> +C.3: Mandatory IF TSPC_SM_2_1 OR TSPC_SM_2_2 OR TSPC_SM_2_4 is supported,
->>   	otherwise Excluded
->>   ---------------------------------------------------------------------------
->> ----
->>
->> @@ -85,7 +90,7 @@ TSPC_SM_7_1	True		Encryption Key (C.1)
->>   TSPC_SM_7_2	True		Identity Key (C.2)
->>   TSPC_SM_7_3	True		Signing Key (C.3)
->>   ---------------------------------------------------------------------------
->> ---- -C.1: Mandatory if GAP (24/2 OR 42/6) is supported, ELSE Optional
->> -C.2: Mandatory if GAP (26/3) is supported, ELSE Optional
->> -C.3: Mandatory if GAP (25/6 OR 35/6) is supported, ELSE Optional
->> +C.1: Mandatory if TSPC_GAP_24_2 OR TSPC_GAP_42_6 is supported, ELSE
->> Optional +C.2: Mandatory if TSPC_GAP_26_3 is supported, ELSE Optional
->> +C.3: Mandatory if TSPC_GAP_25_6 OR TSPC_GAP_35_6 is supported, ELSE
->> Optional
->> ---------------------------------------------------------------------------
->> ---- diff --git a/android/pixit-sm.txt b/android/pixit-sm.txt
->> index 98e2ab5..6facbb8 100644
->> --- a/android/pixit-sm.txt
->> +++ b/android/pixit-sm.txt
->> @@ -1,6 +1,6 @@
->>   SM PIXIT for the PTS tool.
->>
->> -PTS version: 6.0
->> +PTS version: 6.1
->>
->>   * - different than PTS defaults
->>   & - should be set to IUT Bluetooth address
->> diff --git a/android/pts-sm.txt b/android/pts-sm.txt
->> index 91737cc..9b9e120 100644
->> --- a/android/pts-sm.txt
->> +++ b/android/pts-sm.txt
->> @@ -1,8 +1,8 @@
->>   PTS test results for SM
->>
->> -PTS version: 6.0
->> -Tested: 11-February-2015
->> -Android version: 5.0
->> +PTS version: 6.1
->> +Tested: 04-May-2015
->> +Android version: 5.1
->>   kernel version: 3.20
->>
->>   Results:
->> @@ -24,12 +24,7 @@ TC_JW_BV_02_C		PASS	btmgmt advertising on
->>   TC_JW_BV_05_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
->>   TC_JW_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
->>   TC_JW_BI_02_C		PASS	btmgmt pairable on
->> -TC_JW_BI_03_C		PASS	bluetoothd is NOT running
->> -				btmgmt power on
->> -				btmgmt le on
->> -				btmgmt connectable on
->> -				btmgmt pairable on
->> -				btmgmt discov on
->> +TC_JW_BI_03_C		PASS	btmgmt pairable on
->>   				btmgmt advertising on
->>   TC_JW_BI_04_C		PASS	btmgmt pairable off
->>   				btmgmg pair -c 0x03 -t 0x01 <addr>
->> @@ -38,8 +33,6 @@ TC_PKE_BV_01_C		PASS	btmgmt pairable off
->>   				Note: provide passkey to PTS
->>   TC_PKE_BV_02_C		PASS	btmgmt pairable off
->>   				btmgmt io-cap 0x04
->> -				btmgmt advertising on
->> -				btmgmt monitor
->>   				Note: provide passkey
->>   TC_PKE_BV_04_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
->>   TC_PKE_BV_05_C		PASS	btmgmt io-cap 0x04
->> @@ -50,7 +43,6 @@ TC_PKE_BI_02_C		PASS	btmgmt pair -c 0x04 -t 0x01
-> <addr>
->>   				Note: provide passkey
->>   TC_PKE_BI_03_C		PASS	btmgmt io-cap 0x04
->>   				btmgmt advertising on
->> -				btmgmt monitor
->>   				Note: Enter invalid passkey in PTS
->>   TC_OOB_BV_01_C		N/A
->>   TC_OOB_BV_02_C		N/A
->> @@ -59,12 +51,10 @@ TC_OOB_BV_04_C		N/A
->>   TC_OOB_BV_05_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
->>   				Note: Enter valid passkey in PTS
->>   TC_OOB_BV_06_C		PASS	btmgmt advertising on
->> -				btmgmt monitor
->>   				Note: Enter valid passkey in PTS
->>   TC_OOB_BV_07_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
->>   TC_OOB_BV_08_C		PASS	btmgmt advertising on
->> -				btmgmt monitor
->> -				Note: Accept pairing in btmgmt monitor
->> +				Note: Accept pairing in btmgmt
->>   TC_OOB_BV_09_C		N/A
->>   TC_OOB_BV_10_C		N/A
->>   TC_OOB_BI_01_C		N/A
->> @@ -72,17 +62,15 @@ TC_OOB_BI_02_C		N/A
->>   TC_EKS_BV_01_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
->>   				Note: Enter valid passkey in PTS
->>   TC_EKS_BV_02_C		PASS	btmgmt advertising on
->> -				btmgmt monitor
->> -				Note: Accept pairing in btmgmt monitor
->> -TC_EKS_BI_01_C		PASS	btmgmt io-cap 0x03
->> -				btmgmt pair -c 0x03 -t 0x01 <addr>
->> +				Note: Accept pairing in btmgmt
->> +TC_EKS_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
->>   TC_EKS_BI_02_C		PASS	btmgmt advertising on
->>   TC_SIGN_BV_01_C		INC	PTS issue #12305
->> -TC_SIGN_BV_03_C		PASS	haltest:
->> +TC_SIGN_BV_03_C		INC	haltest:
->>   				gattc register_client 1234
->>   				gattc listen 1 1
->>   				Note: IUT must be connectable and discoverable
->> -TC_SIGN_BI_01_C		PASS	haltest:
->> +TC_SIGN_BI_01_C		INC	haltest:
->>   				gattc register client 1234
->>   				gattc listen 1 1
->>   				Note: IUT must be connectable and discoverable
->> @@ -108,9 +96,7 @@ TC_KDU_BV_05_C		PASS	PTS issue #12302
->>   TC_KDU_BV_06_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
->>   TC_KDU_BV_07_C		PASS	btmgmt pairable on
->>   TC_SIP_BV_01_C		PASS	btmgmt advertising on
->> -				btmgmt pair -c 0x03 -t 0x01 <addr>
->> -TC_SIP_BV_02_C		PASS	btmgmt advertising off
->> -				l2test -n -J4 -V le_public <addr>
->> -TC_SIE_BV_01_C		PASS	btmgmt advertising on
->> -				btmgmt pair -c 0x03 -t 0x01 <addr>
->> +TC_SIP_BV_02_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
->> +TC_SIE_BV_01_C		PASS	btmgmt io-cap 0x03
->> +				btmgmt advertising on
->>   ---------------------------------------------------------------------------
->> ----
->
-> I've applied patches 2,3 and 5. Thanks.
->
-> But first patch gives me:
-> fatal: cannot convert from Y to UTF-8
->
-> Possibly some encoding issue while sending patch. Could you resend those SM
-> results?
->
-Yes, sure, I'll send it again.
+>> The data is cached in RAM.  More specifically, the former loaded
+>> firmware files are reloaded and saved at suspend for each device
+>> object.  See fw_pm_notify() in firmware_class.c.
+> 
+> OK, this may be a stupid idea, but do we know the firmware
+> was successfully loaded in the first place?
+> Also btusb is in the habit of falling back to a generic
+> firmware in some places. It seems to me that caching
+> firmware is conceptually not enough, but we'd also need
+> to record the absence of firmware images.
+
+in a lot of cases the firmware is optional. The device will operate fine without the firmware. There are a few devices where the firmware is required, but for many it just contains patches.
+
+It would be nice if we could tell request_firmware() if it is optional or mandatory firmware. Or if it should just cache the status of a missing firmware as well.
+
+As long as the device in question gets disconnected and we run through the USB driver probe() callback again, the btusb.ko driver can not do anything smart in this case. It has to be done in request_firmware().
+
+Regards
+
+Marcel
+
