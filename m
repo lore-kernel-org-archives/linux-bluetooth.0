@@ -1,174 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 May 2015 14:04:09 -0700
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: "An, Tedd" <tedd.an@intel.com>, Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH v3] Bluetooth: btusb: Add routine for applying Intel DDC
- parameters
-Message-ID: <20150520140409.5a3317f5@tedd-fedora-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAJLTA8iCPeQE1HrwWK57kjr9Qmghs+Ygmj2E+odf58xNh5Z_VA@mail.gmail.com>
+References: <1431643129-37383-1-git-send-email-jamuraa@chromium.org>
+	<CABBYNZJqtNL58FU_iMHi9HjTBOufyb9mkEWFSf2-gUuYm_Uwzw@mail.gmail.com>
+	<CAJLTA8iCPeQE1HrwWK57kjr9Qmghs+Ygmj2E+odf58xNh5Z_VA@mail.gmail.com>
+Date: Wed, 20 May 2015 23:21:42 +0300
+Message-ID: <CABBYNZJ4LZ0n+Jm01cTO=DcLCvaDGiPm69yZvx9qjC8oyNQHCA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Fix name in AUTHORS
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marie Janssen <jamuraa@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+Hi Marie,
 
-This patch adds the routine to apply the DDC parameter from device
-specific ddc file.
+On Fri, May 15, 2015 at 5:09 PM, Marie Janssen <jamuraa@chromium.org> wrote:
+> Hi Luiz,
+>
+> On Fri, May 15, 2015 at 4:18 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi,
+>>
+>> On Fri, May 15, 2015 at 1:38 AM, Marie Janssen <jamuraa@chromium.org> wrote:
+>>> Update Marie's name to be correct.
+>>> ---
+>>>  AUTHORS | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/AUTHORS b/AUTHORS
+>>> index 3264a36..dc53c08 100644
+>>> --- a/AUTHORS
+>>> +++ b/AUTHORS
+>>> @@ -97,4 +97,4 @@ Alex Gal <a.gal@miip.ca>
+>>>  Loic Poulain <loic.poulain@intel.com>
+>>>  Gowtham Anandha Babu <gowtham.ab@samsung.com>
+>>>  Bharat Panda <bharat.panda@samsung.com>
+>>> -Michael Janssen <jamuraa@chromium.org>
+>>> +Marie Janssen <jamuraa@chromium.org>
+>>> --
+>>> 2.2.0.rc0.207.ga3a616c
+>>
+>> You got me confused, you have some far been contributing with Michael
+>> as first name and there is not a single mention of Marie in git
+>> shortlog, so are you planning to switch to use Marie? If so we might
+>> need to update .mailmap as well.
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+>
+> I am planning to switch to to Marie from now on.  I figured this was
+> easiest since the email is remaining the same. I was unaware of
+> .mailmap but it seems suited to this purpose as well, so I can send a
+> v2 or you can fix it as you commit.
+>
+> --
+> Marie Janssen
 
-Once the device is rest to operational mode, optionally, it can
-download the device specific configration (DDC) parameters before
-the BlueZ starts the stack initialization.
+Applied, I also made the change to .mailmap.
 
-It opens the DDC file based on HW_VARIANT and send ID/Value with
-HCI_Intel_Write_DDC command.
-
-Format of DDC file
-DDC file consists of one or more number of DDC structure that has a
-'Length' field of one octet, DDC 'ID' field of two octets followed by
-the array of DDC 'Value' that gives the value of parameters itself.
-'Length' contains the length of DDC 'ID' and DDC 'Value'.
-
-+------------+----------+
-| Size(byte) |    Name  |
-+------------+----------+
-|      1     | Length   |
-+------------+----------+
-|      2     | ID       |
-+------------+----------+
-| Length - 2 | Value    |
-+------------+----------+
-
-In case of command failure, it returns the command complete with
-parameter that contains the ID that failed to apply.
-
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
----
- drivers/bluetooth/btintel.h |  5 +++
- drivers/bluetooth/btusb.c   | 75 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 80 insertions(+)
-
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 4bda6ab..affb216 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -69,6 +69,11 @@ struct intel_secure_send_result {
- 	__u8     status;
- } __packed;
- 
-+struct intel_write_ddc {
-+	__u8	status;
-+	__le16	failed_id;
-+} __packed;
-+
- #if IS_ENABLED(CONFIG_BT_INTEL)
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 13b9969..bc3697f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2318,6 +2318,66 @@ static void btusb_intel_version_info(struct hci_dev *hdev,
- 		ver->fw_build_num, ver->fw_build_ww, 2000 + ver->fw_build_yy);
- }
- 
-+static int btusb_apply_ddc_intel(struct hci_dev *hdev, u8 hw_variant)
-+{
-+	const struct firmware *fw;
-+	const u8 *fw_ptr;
-+	char fwname[64];
-+	struct sk_buff *skb;
-+	int err;
-+
-+	snprintf(fwname, sizeof(fwname), "intel/ibt-%d.ddc", hw_variant);
-+
-+	/* Device can work without DDC parameters so even if it fails to load
-+	 * the file, no need to fail the device setup.
-+	 */
-+	err = request_firmware_direct(&fw, fwname, &hdev->dev);
-+	if (err < 0) {
-+		BT_INFO("%s: WARNING: unable to load Intel DDC file: %s (%d)",
-+			hdev->name, fwname, err);
-+		return 0;
-+	}
-+
-+	BT_INFO("%s: Intel DDC file opened: %s", hdev->name, fwname);
-+
-+	fw_ptr = fw->data;
-+	while (fw->size > fw_ptr - fw->data) {
-+		struct intel_write_ddc *wr_ddc;
-+		u8 cmd_len = fw_ptr[0] + sizeof(u8);
-+
-+		skb = __hci_cmd_sync(hdev, 0xfc8b, cmd_len, fw_ptr,
-+				     HCI_INIT_TIMEOUT);
-+		if (IS_ERR(skb)) {
-+			BT_ERR("%s: Failed to send Intel_Write_DDC (%ld)",
-+			       hdev->name, PTR_ERR(skb));
-+			release_firmware(fw);
-+			return PTR_ERR(skb);
-+		}
-+
-+		wr_ddc = (struct intel_write_ddc *)skb->data;
-+		if (wr_ddc->status) {
-+			BT_ERR("%s: Intel write ddc command failure (%02x)",
-+			       hdev->name, wr_ddc->status);
-+			BT_ERR("%s: Last failed DDC ID: %04x",
-+			       hdev->name, wr_ddc->failed_id);
-+			err = -bt_to_errno(wr_ddc->status);
-+			release_firmware(fw);
-+			kfree_skb(skb);
-+			return err;
-+		}
-+
-+		fw_ptr += cmd_len;
-+
-+		kfree_skb(skb);
-+	}
-+
-+	release_firmware(fw);
-+
-+	BT_INFO("%s: Completed to apply Intel DDC parameters", hdev->name);
-+
-+	return 0;
-+}
-+
- static int btusb_setup_intel_new(struct hci_dev *hdev)
- {
- 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
-@@ -2331,6 +2391,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	char fwname[64];
- 	ktime_t calltime, delta, rettime;
- 	unsigned long long duration;
-+	u8 hw_variant;
- 	int err;
- 
- 	BT_DBG("%s", hdev->name);
-@@ -2385,6 +2446,10 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 		return -EINVAL;
- 	}
- 
-+	/* Keep this variable for later use with DDC
-+	 */
-+	hw_variant = ver->hw_variant;
-+
- 	btusb_intel_version_info(hdev, ver);
- 
- 	/* The firmware variant determines if the device is in bootloader
-@@ -2660,6 +2725,16 @@ done:
- 
- 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
- 
-+	/* Once the device is running in operational mode, it needs to apply
-+	 * the device configuration(DDC) parameters to the device.
-+	 */
-+	err = btusb_apply_ddc_intel(hdev, hw_variant);
-+	if (err < 0) {
-+		BT_ERR("%s: Failed to apply DDC parameters (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+
- 	return 0;
- }
- 
 -- 
-2.1.0
+Luiz Augusto von Dentz
