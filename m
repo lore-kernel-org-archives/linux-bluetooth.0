@@ -1,29 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 May 2015 20:56:51 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] emulator: Verify Set Controller To Host Flow Control
- Command
-Message-ID: <20150520175651.GA8383@t440s.P-661HNU-F1>
-References: <1432141845-9207-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 3/3] emulator: Handle Host Number Of Completed Packets Command
+Date: Wed, 20 May 2015 19:10:45 +0200
+Message-Id: <1432141845-9207-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1432141845-9207-1-git-send-email-szymon.janc@tieto.com>
+References: <1432141845-9207-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+The Host_Number_Of_Completed_Packets command is a special command in
+the sense that no event is normally generated after the command
+has completed.
+---
+ emulator/btdev.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-On Wed, May 20, 2015, Szymon Janc wrote:
-> Return invalid parameters error if reserved value is used.
-> ---
->  emulator/btdev.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index d47d50e..af93933 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -2402,6 +2402,12 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 		cmd_complete(btdev, opcode, &status, sizeof(status));
+ 		break;
+ 
++	case BT_HCI_CMD_HOST_NUM_COMPLETED_PACKETS:
++		/* This command is special in the sense that no event is
++		 * normally generated after the command has completed.
++		 */
++		break;
++
+ 	case BT_HCI_CMD_READ_NUM_SUPPORTED_IAC:
+ 		if (btdev->type == BTDEV_TYPE_LE)
+ 			goto unsupported;
+-- 
+1.9.3
 
-All three patches have been applied. Thanks.
-
-Bonus points if you also implement the missing HCI commands in
-emulator/le.c :)
-
-Johan
