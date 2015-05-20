@@ -1,100 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <555C7F93.9080901@samsung.com>
-Date: Wed, 20 May 2015 21:35:31 +0900
 From: Chan-yeol Park <chanyeol.park@samsung.com>
-MIME-version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>, chanyeol.park@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, Kim@samsung.com,
- Ben Young Tae <ytkim@qca.qualcomm.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Support for QCA61x4 on Samsung
-References: <1432017670-6024-1-git-send-email-chanyeol.park@samsung.com>
- <D5B20D85-8B5F-4694-8B5E-2BFC670BE85C@holtmann.org>
-In-reply-to: <D5B20D85-8B5F-4694-8B5E-2BFC670BE85C@holtmann.org>
-Content-type: multipart/alternative;
- boundary=------------040104060201050502040102
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC BlueZ v4 2/2] audio/a2dp: Remove useless check_vendor_codec()
+Date: Wed, 20 May 2015 21:09:48 +0900
+Message-id: <1432123788-12967-2-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1432123788-12967-1-git-send-email-chanyeol.park@samsung.com>
+References: <1432123788-12967-1-git-send-email-chanyeol.park@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------040104060201050502040102
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+This function could be removed because A2DP vendor codec match is
+already verified in avdtp_find_remote_sep().
+---
+ profiles/audio/a2dp.c | 51 ++-------------------------------------------------
+ 1 file changed, 2 insertions(+), 49 deletions(-)
 
-Hi Marcel,
-On 05/20/2015 03:21 AM, Marcel Holtmann wrote:
-> Hi Chan-yeol,
->
->> The previous commit(3267c88) regressed QCA61x4 BT on Samsung because
->> its device info is missed in qca_devices_table[], so btusb_open()
->> return error unexpectedly.
-> how does this regress. We never had QCA module support in the first place. The patch looks good, I was just wondering what the regression will be here?
->
-My environment was virtual box on windows.
-I guess windows download QC firmware successfully, so without firmware 
-handling in the linux I could use bluetooth adapter.
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 3c5a8a2..04c42be 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -1748,50 +1748,11 @@ done:
+ 	finalize_select(setup);
+ }
+ 
+-static gboolean check_vendor_codec(struct a2dp_sep *sep, uint8_t *cap,
+-								size_t len)
+-{
+-	uint8_t *capabilities;
+-	size_t length;
+-	a2dp_vendor_codec_t *local_codec;
+-	a2dp_vendor_codec_t *remote_codec;
+-
+-	if (len < sizeof(a2dp_vendor_codec_t))
+-		return FALSE;
+-
+-	remote_codec = (a2dp_vendor_codec_t *) cap;
+-
+-	if (sep->endpoint == NULL)
+-		return FALSE;
+-
+-	length = sep->endpoint->get_capabilities(sep,
+-				&capabilities, sep->user_data);
+-
+-	if (length < sizeof(a2dp_vendor_codec_t))
+-		return FALSE;
+-
+-	local_codec = (a2dp_vendor_codec_t *) capabilities;
+-
+-	if (btohl(remote_codec->vendor_id) != btohl(local_codec->vendor_id))
+-		return FALSE;
+-
+-	if (btohs(remote_codec->codec_id) != btohs(local_codec->codec_id))
+-		return FALSE;
+-
+-	DBG("vendor 0x%08x codec 0x%04x", btohl(remote_codec->vendor_id),
+-						btohs(remote_codec->codec_id));
+-
+-	return TRUE;
+-}
+-
+ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+ 					const char *sender)
+ {
+ 	for (; list; list = list->next) {
+ 		struct a2dp_sep *sep = list->data;
+-		struct avdtp_remote_sep *rsep;
+-		struct avdtp_media_codec_capability *cap;
+-		struct avdtp_service_capability *service;
+ 
+ 		/* Use sender's endpoint if available */
+ 		if (sender) {
+@@ -1805,19 +1766,11 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
+ 				continue;
+ 		}
+ 
+-		rsep = avdtp_find_remote_sep(session, sep->lsep);
+-		if (rsep == NULL)
++		if (avdtp_find_remote_sep(session, sep->lsep) == NULL)
+ 			continue;
+ 
+-		service = avdtp_get_codec(rsep);
+-		cap = (struct avdtp_media_codec_capability *) service->data;
+-
+-		if (cap->media_codec_type != A2DP_CODEC_VENDOR)
+-			return sep;
++		return sep;
+ 
+-		if (check_vendor_codec(sep, cap->data,
+-					service->length - sizeof(*cap)))
+-			return sep;
+ 	}
+ 
+ 	return NULL;
+-- 
+2.1.0
 
-Until now , I fail to find the exact firmware , "qca/rampatch_usb_*.bin" 
-for QCA61x4.
-I just saw the mail that Kyle McMartin reject firmware patches made by 
-Ben Young Tae Kim.
-Could you tell where I can get it?
-
-Actually my wifi QCA61x4 does not work well..
-
-Thanks
-Chanyeol
-
-
---------------040104060201050502040102
-Content-Type: text/html; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-
-<html>
-  <head>
-    <meta content="text/html; charset=windows-1252"
-      http-equiv="Content-Type">
-  </head>
-  <body bgcolor="#FFFFFF" text="#000000">
-    <div class="moz-cite-prefix">Hi Marcel,<br>
-      On 05/20/2015 03:21 AM, Marcel Holtmann wrote:<br>
-    </div>
-    <blockquote
-      cite="mid:D5B20D85-8B5F-4694-8B5E-2BFC670BE85C@holtmann.org"
-      type="cite">
-      <pre wrap="">Hi Chan-yeol,
-
-</pre>
-      <blockquote type="cite">
-        <pre wrap="">The previous commit(3267c88) regressed QCA61x4 BT on Samsung because
-its device info is missed in qca_devices_table[], so btusb_open()
-return error unexpectedly.
-</pre>
-      </blockquote>
-      <pre wrap="">
-how does this regress. We never had QCA module support in the first place. The patch looks good, I was just wondering what the regression will be here?
-
-</pre>
-    </blockquote>
-    My environment was virtual box on windows.<br>
-    I guess windows download QC firmware successfully, so without
-    firmware handling in the linux I could use bluetooth adapter.<br>
-    <br>
-    Until now , I fail to find the exact firmware ,
-    "qca/rampatch_usb_*.bin" for QCA61x4.<br>
-    I just saw the mail that
-    <meta http-equiv="content-type" content="text/html;
-      charset=windows-1252">
-    Kyle McMartin reject firmware patches made by
-    <meta http-equiv="content-type" content="text/html;
-      charset=windows-1252">
-    Ben Young Tae Kim.<br>
-    Could you tell where I can get it?<br>
-    <br>
-    Actually my wifi QCA61x4 does not work well.. <br>
-    <br>
-    Thanks<br>
-    Chanyeol<br>
-    <br>
-  </body>
-</html>
-
---------------040104060201050502040102--
