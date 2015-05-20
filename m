@@ -1,68 +1,174 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <555D1BF4.8020600@redhat.com>
-Date: Wed, 20 May 2015 16:42:44 -0700
-From: Laura Abbott <labbott@redhat.com>
+Date: Wed, 20 May 2015 14:04:09 -0700
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: "An, Tedd" <tedd.an@intel.com>, Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH v3] Bluetooth: btusb: Add routine for applying Intel DDC
+ parameters
+Message-ID: <20150520140409.5a3317f5@tedd-fedora-vm>
 MIME-Version: 1.0
-To: Takashi Iwai <tiwai@suse.de>, Marcel Holtmann <marcel@holtmann.org>
-CC: Oliver Neukum <oneukum@suse.com>, Ming Lei <ming.lei@canonical.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Laura Abbott <labbott@fedoraproject.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        USB list <linux-usb@vger.kernel.org>, netdev <netdev@vger.kernel.org>
-Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
-References: <s5hwq04zypv.wl-tiwai@suse.de>	<Pine.LNX.4.44L0.1505191017460.1453-100000@iolanthe.rowland.org>	<s5hpp5wtrrp.wl-tiwai@suse.de>	<1432057375.3970.4.camel@suse.com>	<s5h7fs3u5gy.wl-tiwai@suse.de>	<1432111237.8287.3.camel@suse.com>	<9BCD6CFF-0356-4A0F-97D4-776C0A2E436A@holtmann.org> <s5hbnhfifka.wl-tiwai@suse.de>
-In-Reply-To: <s5hbnhfifka.wl-tiwai@suse.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 05/20/2015 05:44 AM, Takashi Iwai wrote:
-> At Wed, 20 May 2015 11:46:31 +0200,
-> Marcel Holtmann wrote:
->>
->> Hi Oliver,
->>
->>>> The data is cached in RAM.  More specifically, the former loaded
->>>> firmware files are reloaded and saved at suspend for each device
->>>> object.  See fw_pm_notify() in firmware_class.c.
->>>
->>> OK, this may be a stupid idea, but do we know the firmware
->>> was successfully loaded in the first place?
->>> Also btusb is in the habit of falling back to a generic
->>> firmware in some places. It seems to me that caching
->>> firmware is conceptually not enough, but we'd also need
->>> to record the absence of firmware images.
->>
->> in a lot of cases the firmware is optional. The device will operate fine without the firmware. There are a few devices where the firmware is required, but for many it just contains patches.
->>
->> It would be nice if we could tell request_firmware() if it is optional or mandatory firmware. Or if it should just cache the status of a missing firmware as well.
->
-> OK, below is a quick hack to record the failed f/w files, too.
-> Not sure whether this helps, though.  Proper tests are appreciated.
->
->
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This doesn't quite work. We end up with the name on fw_names but
-the firmware isn't actually on the firmware cache list.
+This patch adds the routine to apply the DDC parameter from device
+specific ddc file.
 
-If request_firmware fails to get the firmware from the filesystem,
-release firmware will be called which is going to free the
-firmware_buf which has been marked as failed anyway. The only
-way to make this work would be to always piggy back and increase
-the ref so it always stays around. But this also marks the firmware
-as a permanent failure. There would need to be a hook somewhere
-to force a cache drop, else there would be no way to add new
-firmware to a running system without a reboot.
+Once the device is rest to operational mode, optionally, it can
+download the device specific configration (DDC) parameters before
+the BlueZ starts the stack initialization.
 
-Perhaps we split the difference: keep a list of firmware images
-that failed to load in the past and if one is requested during
-a time when usermodehelper isn't available, silently return an
-error? This way, if correct firmware is loaded at a regular time
-the item can be removed from the list.
+It opens the DDC file based on HW_VARIANT and send ID/Value with
+HCI_Intel_Write_DDC command.
 
-Thanks,
-Laura
+Format of DDC file
+DDC file consists of one or more number of DDC structure that has a
+'Length' field of one octet, DDC 'ID' field of two octets followed by
+the array of DDC 'Value' that gives the value of parameters itself.
+'Length' contains the length of DDC 'ID' and DDC 'Value'.
+
++------------+----------+
+| Size(byte) |    Name  |
++------------+----------+
+|      1     | Length   |
++------------+----------+
+|      2     | ID       |
++------------+----------+
+| Length - 2 | Value    |
++------------+----------+
+
+In case of command failure, it returns the command complete with
+parameter that contains the ID that failed to apply.
+
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btintel.h |  5 +++
+ drivers/bluetooth/btusb.c   | 75 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 80 insertions(+)
+
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 4bda6ab..affb216 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -69,6 +69,11 @@ struct intel_secure_send_result {
+ 	__u8     status;
+ } __packed;
+ 
++struct intel_write_ddc {
++	__u8	status;
++	__le16	failed_id;
++} __packed;
++
+ #if IS_ENABLED(CONFIG_BT_INTEL)
+ 
+ int btintel_check_bdaddr(struct hci_dev *hdev);
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 13b9969..bc3697f 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2318,6 +2318,66 @@ static void btusb_intel_version_info(struct hci_dev *hdev,
+ 		ver->fw_build_num, ver->fw_build_ww, 2000 + ver->fw_build_yy);
+ }
+ 
++static int btusb_apply_ddc_intel(struct hci_dev *hdev, u8 hw_variant)
++{
++	const struct firmware *fw;
++	const u8 *fw_ptr;
++	char fwname[64];
++	struct sk_buff *skb;
++	int err;
++
++	snprintf(fwname, sizeof(fwname), "intel/ibt-%d.ddc", hw_variant);
++
++	/* Device can work without DDC parameters so even if it fails to load
++	 * the file, no need to fail the device setup.
++	 */
++	err = request_firmware_direct(&fw, fwname, &hdev->dev);
++	if (err < 0) {
++		BT_INFO("%s: WARNING: unable to load Intel DDC file: %s (%d)",
++			hdev->name, fwname, err);
++		return 0;
++	}
++
++	BT_INFO("%s: Intel DDC file opened: %s", hdev->name, fwname);
++
++	fw_ptr = fw->data;
++	while (fw->size > fw_ptr - fw->data) {
++		struct intel_write_ddc *wr_ddc;
++		u8 cmd_len = fw_ptr[0] + sizeof(u8);
++
++		skb = __hci_cmd_sync(hdev, 0xfc8b, cmd_len, fw_ptr,
++				     HCI_INIT_TIMEOUT);
++		if (IS_ERR(skb)) {
++			BT_ERR("%s: Failed to send Intel_Write_DDC (%ld)",
++			       hdev->name, PTR_ERR(skb));
++			release_firmware(fw);
++			return PTR_ERR(skb);
++		}
++
++		wr_ddc = (struct intel_write_ddc *)skb->data;
++		if (wr_ddc->status) {
++			BT_ERR("%s: Intel write ddc command failure (%02x)",
++			       hdev->name, wr_ddc->status);
++			BT_ERR("%s: Last failed DDC ID: %04x",
++			       hdev->name, wr_ddc->failed_id);
++			err = -bt_to_errno(wr_ddc->status);
++			release_firmware(fw);
++			kfree_skb(skb);
++			return err;
++		}
++
++		fw_ptr += cmd_len;
++
++		kfree_skb(skb);
++	}
++
++	release_firmware(fw);
++
++	BT_INFO("%s: Completed to apply Intel DDC parameters", hdev->name);
++
++	return 0;
++}
++
+ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ {
+ 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
+@@ -2331,6 +2391,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	char fwname[64];
+ 	ktime_t calltime, delta, rettime;
+ 	unsigned long long duration;
++	u8 hw_variant;
+ 	int err;
+ 
+ 	BT_DBG("%s", hdev->name);
+@@ -2385,6 +2446,10 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 		return -EINVAL;
+ 	}
+ 
++	/* Keep this variable for later use with DDC
++	 */
++	hw_variant = ver->hw_variant;
++
+ 	btusb_intel_version_info(hdev, ver);
+ 
+ 	/* The firmware variant determines if the device is in bootloader
+@@ -2660,6 +2725,16 @@ done:
+ 
+ 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+ 
++	/* Once the device is running in operational mode, it needs to apply
++	 * the device configuration(DDC) parameters to the device.
++	 */
++	err = btusb_apply_ddc_intel(hdev, hw_variant);
++	if (err < 0) {
++		BT_ERR("%s: Failed to apply DDC parameters (%d)",
++		       hdev->name, err);
++		return err;
++	}
++
+ 	return 0;
+ }
+ 
+-- 
+2.1.0
