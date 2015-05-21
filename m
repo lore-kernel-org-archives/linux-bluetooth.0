@@ -1,67 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Chan-yeol Park <chanyeol.park@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btusb: Support QCA61x4 ROME v2.0
-Date: Thu, 21 May 2015 11:24:27 +0900
-Message-id: <1432175067-3156-1-git-send-email-chanyeol.park@samsung.com>
+Message-ID: <555D2A8E.7040805@qca.qualcomm.com>
+Date: Wed, 20 May 2015 17:45:02 -0700
+From: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+MIME-Version: 1.0
+To: Chanyeol Park <chanyeol.park@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+	<linux-bluetooth@vger.kernel.org>,
+	"Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Support for QCA61x4 on Samsung
+References: <1432017670-6024-1-git-send-email-chanyeol.park@samsung.com>	 <D5B20D85-8B5F-4694-8B5E-2BFC670BE85C@holtmann.org>	 <555C7F93.9080901@samsung.com> <555C819A.40600@samsung.com>	 <555CCA62.10809@qca.qualcomm.com> <1432168603.2474.20.camel@gmail.com>
+In-Reply-To: <1432168603.2474.20.camel@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The previous commit(3267c88) missed QCA61x4 ROME v2.0 info on Samsung
-so its BT is not activated and the below message is shown.
+Hi Chanyeol,
 
-[    8.009638] usb 1-1: New USB device found, idVendor=0cf3, idProduct=e300
-[    8.012637] usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-[    8.102901] Bluetooth: hci0: don't support firmware rome 0x200
+On 05/20/15 17:36, Chanyeol Park wrote:
+> Hi,Ben Kim
+>
+> On Wed, 2015-05-20 at 10:54 -0700, Ben Young Tae Kim wrote:
+>> Hi Chan-yeol,
+>>
+>> On 05/20/15 05:44, Chan-yeol Park wrote:
+>>> Hi Marcel,
+>>>
+>>> On 05/20/2015 09:35 PM, Chan-yeol Park wrote:
+>>>> Hi Marcel,
+>>>> On 05/20/2015 03:21 AM, Marcel Holtmann wrote:
+>>>>> Hi Chan-yeol,
+>>>>>> The previous commit(3267c88) regressed QCA61x4 BT on Samsung 
+>>>>>> because its device info is missed in qca_devices_table[], so 
+>>>>>> btusb_open() return error unexpectedly.
+>>>>> how does this regress. We never had QCA module support in the 
+>>>>> first place. The patch looks good, I was just wondering what 
+>>>>> the regression will be here?
+>>>> My environment was virtual box on windows.
+>>>> I guess windows download QC firmware successfully, so without 
+>>>> firmware handling in the linux I could use bluetooth adapter.
+>>>>
+>> I didn't realize ROME v2.0 was out to the market. Where did you get 
+>> this module? Does it built-in on your laptop?
+> Yes. It's built-in in my Samsung labtop bought on market.
+>
+>> Your patch looks good, however, I need your confirmation that it will 
+>> work on your board since I don't have ROME v2.0 HW. I'll send you 
+>> ROME v2.0 FW files for you and will upstream it to linux-firmware.git 
+>> if it works.
+> It works well. I test basic things such as searching, sdp, and pairing.
+> and they works fine.
+>
+> Actually before I use your driver/firmware, my "hciconfig -a" shows
+> wrong address and hci 4.0. but thanks to your driver/firmware I could
+> get hci 4.1 and normal address.
+>>  
+>>>> Until now , I fail to find the exact firmware , 
+>>>> "qca/rampatch_usb_*.bin" for QCA61x4.
+>>>> I just saw the mail that Kyle McMartin reject firmware patches 
+>>>> made by Ben Young Tae Kim.
+>>>> Could you tell where I can get it?
+>>>>
+>>>> Actually my wifi QCA61x4 does not work well..
+>> QCA61x4 WiFi will use 'ATH10k' driver. Did you enable this module 
+>> compiled on your kernel tree
+> No. I just use fedora 22, 4.0.3-300.fc22.x86_64. In case of wifi they
+> use PCI, so it's not easy to use it in guest os that use latest kernel
+> tree.
+>
+> Also I search some mail thread for ath10k, it seems that firmware is
+> not added in linux-firmware until now.
+>>> I am sending this mail again because previous mail is not sent to 
+>>> bluetooth-next due to HTML format.
+>>>
+>>> Thanks
+>>> Chanyeol
+>>>
+>> Thanks
+>> -- Ben Kim
+> I appreciate your help a lot. I could use my Bluetooth on my labtop
+> from now on.
 
-This patch adds QCA61x4 ROME v2.0 info in qca_devices_table[], and is
-verified on Samsung with the firmware provided by Kim, Ben Young Tae
-<ytkim@qca.qualcomm.com>.
+Thanks for your time & feedback. I'm going to send firmware patch to linux-firmware soon.
 
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e300 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-
-Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b9f2821..c334620 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2382,6 +2382,7 @@ struct qca_device_info {
- static const struct qca_device_info qca_devices_table[] = {
- 	{ 0x00000100, 20, 4, 10 }, /* Rome 1.0 */
- 	{ 0x00000101, 20, 4, 10 }, /* Rome 1.1 */
-+	{ 0x00000200, 28, 4, 18 }, /* Rome 2.0 */
- 	{ 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
- 	{ 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
- 	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
--- 
-2.1.4
-
+> Thanks
+> Chanyeol
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Thanks
+-- Ben Kim
