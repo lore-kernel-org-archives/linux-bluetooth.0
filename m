@@ -1,33 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: DBus API for LTK OOB keys
+Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <555D8B8C.4090007@ubnt.com>
-Date: Thu, 21 May 2015 14:12:18 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <21E176FE-31DA-4AC0-87FD-8CDB532644D1@holtmann.org>
-References: <54F8584D.6020301@ubnt.com> <20150305134024.GA20862@t440s> <54F862A3.80400@ubnt.com> <8EB5FD2F-4C46-41F8-95BA-4ACBEF0BCDE4@holtmann.org> <54F8B881.4050506@ubnt.com> <280B8CCC-6E98-477A-B805-D91966220207@holtmann.org> <555D8B8C.4090007@ubnt.com>
-To: Andrejs Hanins <andrejs.hanins@ubnt.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <s5hiobm5zo2.wl-tiwai@suse.de>
+Date: Thu, 21 May 2015 14:07:11 +0200
+Cc: Laura Abbott <labbott@redhat.com>,
+	Oliver Neukum <oneukum@suse.com>,
+	Ming Lei <ming.lei@canonical.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Laura Abbott <labbott@fedoraproject.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	USB list <linux-usb@vger.kernel.org>,
+	netdev <netdev@vger.kernel.org>
+Message-Id: <830BACF6-994B-4315-B868-D44E667BADB8@holtmann.org>
+References: <s5hwq04zypv.wl-tiwai@suse.de> <Pine.LNX.4.44L0.1505191017460.1453-100000@iolanthe.rowland.org> <s5hpp5wtrrp.wl-tiwai@suse.de> <1432057375.3970.4.camel@suse.com> <s5h7fs3u5gy.wl-tiwai@suse.de> <1432111237.8287.3.camel@suse.com> <9BCD6CFF-0356-4A0F-97D4-776C0A2E436A@holtmann.org> <s5hbnhfifka.wl-tiwai@suse.de> <555D1BF4.8020600@redhat.com> <s5hiobm5zo2.wl-tiwai@suse.de>
+To: Takashi Iwai <tiwai@suse.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrejs,
+Hi Takashi,
 
->> So LE Legacy Pairing needs the Security Manager TK value and LE Secure Connections needs the Confirmation and Random values. However right now, we can not get these ones from the kernel.
+>>>>>> The data is cached in RAM.  More specifically, the former loaded
+>>>>>> firmware files are reloaded and saved at suspend for each device
+>>>>>> object.  See fw_pm_notify() in firmware_class.c.
+>>>>> 
+>>>>> OK, this may be a stupid idea, but do we know the firmware
+>>>>> was successfully loaded in the first place?
+>>>>> Also btusb is in the habit of falling back to a generic
+>>>>> firmware in some places. It seems to me that caching
+>>>>> firmware is conceptually not enough, but we'd also need
+>>>>> to record the absence of firmware images.
+>>>> 
+>>>> in a lot of cases the firmware is optional. The device will operate fine without the firmware. There are a few devices where the firmware is required, but for many it just contains patches.
+>>>> 
+>>>> It would be nice if we could tell request_firmware() if it is optional or mandatory firmware. Or if it should just cache the status of a missing firmware as well.
+>>> 
+>>> OK, below is a quick hack to record the failed f/w files, too.
+>>> Not sure whether this helps, though.  Proper tests are appreciated.
+>>> 
+>>> 
 >> 
->> As a side note, I added tools/oobtest utility where you can test this between two controllers attached to the same host.
-> Based on oobtest/kernel code/mgmt-api comments, the OOB LE legacy pairing is still not supported: "Currently there is no support for providing the Security Manager TK Value for LE legacy pairing".
+>> This doesn't quite work. We end up with the name on fw_names but
+>> the firmware isn't actually on the firmware cache list.
+>> 
+>> If request_firmware fails to get the firmware from the filesystem,
+>> release firmware will be called which is going to free the
+>> firmware_buf which has been marked as failed anyway. The only
+>> way to make this work would be to always piggy back and increase
+>> the ref so it always stays around. But this also marks the firmware
+>> as a permanent failure. There would need to be a hook somewhere
+>> to force a cache drop, else there would be no way to add new
+>> firmware to a running system without a reboot.
+>> 
+>> Perhaps we split the difference: keep a list of firmware images
+>> that failed to load in the past and if one is requested during
+>> a time when usermodehelper isn't available, silently return an
+>> error? This way, if correct firmware is loaded at a regular time
+>> the item can be removed from the list.
 > 
-> Is there any plan to support it? Maybe some patches exist? Are there any serious technical difficulties behind the absence of this functionality?
+> Well, IMO, it's way too much expectation for the generic f/w loader.
+> The driver itself must know already which should be really loaded.
+> The fact is that it's the driver who calls the function that might not
+> work in the resume path.  So the driver can deal with such exceptions
+> at best.
 
-making OOB LE legacy pairing work is pretty tricky since it is the wrong kind of OOB. Essentially it is just a shared secret between two device and only if that shared secret is truly random and communicated out-of-band you get proper strong keys. But nothing in the process guarantees that or can verify it.
-
-It also does not fit into the SSP, BR/EDR SC or LE SC model with the public key exchange. So we actually gave up on supporting OOB LE legacy pairing.
-
-> I know that BT 4.2 SC provides better alternatives for secure pairing, but the 4.2 is not so widely adopted as 4.0 and our BT chip also don't support 4.2…
-
-You can run LE SC on Bluetooth 4.0 chips. We do that and also Apple’s iOS does that. No need for new hardware.
+I keep repeating myself here. From the driver point of view it goes via probe() callback of the USB driver. So the driver does not know. For the driver it looks like a brand new device. There are platforms that might decide to just kill the power to the USB bus where the Bluetooth controller sits on. It gets the power back on resume. However this means it is a brand new device at that point. So the driver should not have to remember everything.
 
 Regards
 
