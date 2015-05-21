@@ -1,212 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] android/pts: Update AVRCP test results
-Date: Thu, 21 May 2015 17:26:52 +0200
-Message-Id: <1432222012-17792-1-git-send-email-mariusz.skamra@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 21 May 2015 11:26:17 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Marcel Holtmann <marcel@holtmann.org>
+cc: Takashi Iwai <tiwai@suse.de>, Laura Abbott <labbott@redhat.com>,
+    Oliver Neukum <oneukum@suse.com>, Ming Lei <ming.lei@canonical.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Laura Abbott <labbott@fedoraproject.org>,
+    Johan Hedberg <johan.hedberg@gmail.com>,
+    "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+    "Gustavo F. Padovan" <gustavo@padovan.org>,
+    "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+    Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+    USB list <linux-usb@vger.kernel.org>, netdev <netdev@vger.kernel.org>
+Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
+In-Reply-To: <33C25745-6839-4858-9A3E-19EC6408ECED@holtmann.org>
+Message-ID: <Pine.LNX.4.44L0.1505211112310.1397-100000@iolanthe.rowland.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PTS 6.1 and Android 5.1
----
- android/pics-avrcp.txt  |  4 +--
- android/pixit-avrcp.txt |  2 +-
- android/pts-avrcp.txt   | 68 +++++++++++++++++++++++++++++++++++++++----------
- 3 files changed, 57 insertions(+), 17 deletions(-)
+On Thu, 21 May 2015, Marcel Holtmann wrote:
 
-diff --git a/android/pics-avrcp.txt b/android/pics-avrcp.txt
-index a25579e..7bd68fa 100644
---- a/android/pics-avrcp.txt
-+++ b/android/pics-avrcp.txt
-@@ -1,6 +1,6 @@
- AVRCP PICS for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -12,7 +12,7 @@ O - optional
- -------------------------------------------------------------------------------
- Parameter Name    Selected	Description
- -------------------------------------------------------------------------------
--SPC_AVRCP_1_1     True (*)	Role: Controller (CT) (C.1)
-+TSPC_AVRCP_1_1    True (*)	Role: Controller (CT) (C.1)
- TSPC_AVRCP_1_2    True (*)	Role: Target (TG) (C.1)
- -------------------------------------------------------------------------------
- C.1: Mandatory to support at least one of the defined roles.
-diff --git a/android/pixit-avrcp.txt b/android/pixit-avrcp.txt
-index c429828..9d5b87e 100644
---- a/android/pixit-avrcp.txt
-+++ b/android/pixit-avrcp.txt
-@@ -1,6 +1,6 @@
- AVRCP PIXIT for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-avrcp.txt b/android/pts-avrcp.txt
-index 955b37e..b7e1386 100644
---- a/android/pts-avrcp.txt
-+++ b/android/pts-avrcp.txt
-@@ -1,8 +1,8 @@
- PTS test results for AVRCP
- 
--PTS version: 6.0
--Tested: 21-January-2015
--Android version: 5.0
-+PTS version: 6.1
-+Tested: 21-May-2015
-+Android version: 5.1
- 
- Results:
- PASS	test passed
-@@ -16,6 +16,19 @@ Test Name		Result	Notes
- -------------------------------------------------------------------------------
- TC_CT_BGN_BV_01_I	N/A
- TC_CT_BGN_BV_02_I	N/A
-+TC_CT_CA_BV_01_C	N/A
-+TC_CT_CA_BV_03_C	N/A
-+TC_CT_CA_BV_05_C	N/A
-+TC_CT_CA_BV_07_C	N/A
-+TC_CT_CA_BV_09_C	N/A
-+TC_CT_CA_BV_11_C	N/A
-+TC_CT_CA_BV_13_C	N/A
-+TC_CT_CA_BV_15_C	N/A
-+TC_CT_CA_BV_17_C	N/A
-+TC_CT_CA_BV_18_C	N/A
-+TC_CT_CA_BV_01_I	N/A
-+TC_CT_CA_BV_02_I	N/A
-+TC_CT_CA_BV_03_I	N/A
- TC_CT_CEC_BV_01_I	N/A
- TC_CT_CEC_BV_02_I	N/A
- TC_CT_CFG_BV_01_C	N/A
-@@ -26,41 +39,44 @@ TC_CT_CRC_BV_02_I	N/A
- TC_CT_ICC_BV_01_I	N/A
- TC_CT_ICC_BV_02_I	N/A
- TC_CT_MCN_CB_BV_01_C	N/A
-+TC_CT_MCN_CB_BV_04_C	N/A
-+TC_CT_MCN_CB_BV_07_C	N/A
-+TC_CT_MCN_CB_BV_12_C	N/A
- TC_CT_MCN_CB_BV_01_I	N/A
- TC_CT_MCN_CB_BV_02_I	N/A
- TC_CT_MCN_CB_BV_03_I	N/A
--TC_CT_MCN_CB_BV_04_C	N/A
- TC_CT_MCN_CB_BV_04_I	N/A
- TC_CT_MCN_CB_BV_05_I	N/A
- TC_CT_MCN_CB_BV_06_I	N/A
--TC_CT_MCN_CB_BV_07_C	N/A
--TC_CT_MCN_CB_BV_07_I	N/A
- TC_CT_MCN_NP_BV_01_C	N/A
-+TC_CT_MCN_NP_BV_03_C	N/A
-+TC_CT_MCN_NP_BV_05_C	N/A
-+TC_CT_MCN_NP_BV_08_C	N/A
-+TC_CT_MCN_NP_BV_10_C	N/A
- TC_CT_MCN_NP_BV_01_I	N/A
- TC_CT_MCN_NP_BV_02_I	N/A
--TC_CT_MCN_NP_BV_03_C	N/A
- TC_CT_MCN_NP_BV_03_I	N/A
- TC_CT_MCN_NP_BV_04_I	N/A
--TC_CT_MCN_NP_BV_05_C	N/A
- TC_CT_MCN_NP_BV_05_I	N/A
- TC_CT_MCN_NP_BV_06_I	N/A
- TC_CT_MCN_NP_BV_07_I	N/A
--TC_CT_MCN_NP_BV_08_C	N/A
- TC_CT_MCN_SRC_BV_01_C	N/A
-+TC_CT_MCN_SRC_BV_03_C	N/A
-+TC_CT_MCN_SRC_BV_05_C	N/A
-+TC_CT_MCN_SRC_BV_07_C	N/A
- TC_CT_MCN_SRC_BV_01_I	N/A
- TC_CT_MCN_SRC_BV_02_I	N/A
--TC_CT_MCN_SRC_BV_03_C	N/A
- TC_CT_MCN_SRC_BV_03_I	N/A
- TC_CT_MCN_SRC_BV_04_I	N/A
--TC_CT_MCN_SRC_BV_05_C	N/A
- TC_CT_MDI_BV_01_C	N/A
- TC_CT_MDI_BV_03_C	N/A
- TC_CT_MPS_BV_01_C	N/A
-+TC_CT_MPS_BV_03_C	N/A
-+TC_CT_MPS_BV_08_C	N/A
-+TC_CT_MPS_BV_11_C	N/A
- TC_CT_MPS_BV_01_I	N/A
- TC_CT_MPS_BV_02_I	N/A
--TC_CT_MPS_BV_03_C	N/A
- TC_CT_MPS_BV_03_I	N/A
--TC_CT_MPS_BV_08_C	N/A
- TC_CT_NFY_BV_01_C	N/A
- TC_CT_PAS_BV_01_C	N/A
- TC_CT_PAS_BV_03_C	N/A
-@@ -97,6 +113,27 @@ Test Name		Result	Notes
- -------------------------------------------------------------------------------
- TC_TG_BGN_BV_01_I	N/A
- TC_TG_BGN_BV_02_I	N/A
-+TC_TG_CA_BI_01_C	N/A
-+TC_TG_CA_BI_02_C	N/A
-+TC_TG_CA_BI_03_C	N/A
-+TC_TG_CA_BI_04_C	N/A
-+TC_TG_CA_BI_05_C	N/A
-+TC_TG_CA_BI_06_C	N/A
-+TC_TG_CA_BI_07_C	N/A
-+TC_TG_CA_BI_08_C	N/A
-+TC_TG_CA_BI_09_C	N/A
-+TC_TG_CA_BI_10_C	N/A
-+TC_TG_CA_BV_02_C	N/A
-+TC_TG_CA_BV_04_C	N/A
-+TC_TG_CA_BV_06_C	N/A
-+TC_TG_CA_BV_08_C	N/A
-+TC_TG_CA_BV_10_C	N/A
-+TC_TG_CA_BV_12_C	N/A
-+TC_TG_CA_BV_14_C	N/A
-+TC_TG_CA_BV_16_C	N/A
-+TC_TG_CA_BV_01_I	N/A
-+TC_TG_CA_BV_02_I	N/A
-+TC_TG_CA_BV_03_I	N/A
- TC_TG_CEC_BV_01_I	PASS
- TC_TG_CEC_BV_02_I	PASS
- TC_TG_CFG_BI_01_C	PASS
-@@ -115,7 +152,6 @@ TC_TG_MCN_CB_BI_02_C	N/A
- TC_TG_MCN_CB_BI_03_C	N/A
- TC_TG_MCN_CB_BI_04_C	N/A
- TC_TG_MCN_CB_BI_05_C	N/A
--TC_TG_MCN_CB_BV_01_I	N/A
- TC_TG_MCN_CB_BV_02_C	N/A
- TC_TG_MCN_CB_BV_02_I	N/A
- TC_TG_MCN_CB_BV_03_C	N/A
-@@ -130,6 +166,7 @@ TC_TG_MCN_CB_BV_08_C	N/A
- TC_TG_MCN_CB_BV_09_C	N/A
- TC_TG_MCN_CB_BV_10_C	N/A
- TC_TG_MCN_CB_BV_11_C	N/A
-+TC_TG_MCN_CB_BV_13_C	N/A
- TC_TG_MCN_NP_BI_01_C	N/A
- TC_TG_MCN_NP_BI_02_C	N/A
- TC_TG_MCN_NP_BV_01_I	N/A
-@@ -144,6 +181,7 @@ TC_TG_MCN_NP_BV_06_I	N/A
- TC_TG_MCN_NP_BV_07_C	N/A
- TC_TG_MCN_NP_BV_07_I	N/A
- TC_TG_MCN_NP_BV_09_C	N/A
-+TC_TG_MCN_NP_BV_11_C	N/A
- TC_TG_MCN_SRC_BV_01_I	N/A
- TC_TG_MCN_SRC_BV_02_C	N/A
- TC_TG_MCN_SRC_BV_02_I	N/A
-@@ -151,6 +189,7 @@ TC_TG_MCN_SRC_BV_03_I	N/A
- TC_TG_MCN_SRC_BV_04_C	N/A
- TC_TG_MCN_SRC_BV_04_I	N/A
- TC_TG_MCN_SRC_BV_06_C	N/A
-+TC_TG_MCN_SRC_BV_08_C	N/A
- TC_TG_MDI_BV_02_C	PASS
- TC_TG_MDI_BV_04_C	PASS
- TC_TG_MDI_BV_05_C	PASS
-@@ -166,6 +205,7 @@ TC_TG_MPS_BV_06_C	N/A
- TC_TG_MPS_BV_07_C	N/A
- TC_TG_MPS_BV_09_C	N/A
- TC_TG_MPS_BV_10_C	N/A
-+TC_TG_MPS_BV_12_C	N/A
- TC_TG_NFY_BI_01_C	PASS
- TC_TG_NFY_BV_02_C	PASS	Change track when requested
- TC_TG_NFY_BV_03_C	N/A
--- 
-1.9.1
+> Hi Alan,
+> 
+> >> Then avoiding the failed firmware is no solution, indeed.
+> >> If it's a new probe, it should be never executed during resume.
+> > 
+> > Can you expand this comment?  What's wrong with probing during resume?
+> > 
+> > The USB stack does carry out probes during resume under certain
+> > circumstances.  A driver lacking a reset_resume callback is one of
+> > those circumstances.
+> 
+> in case the platform kills the power to the USB lines, we can never
+> do anything about this. I do not want to hack around this in the
+> driver.
+> 
+> What are the cases where we should implement reset_resume and would
+> it really help here. Since the btusb.ko driver implements
+> suspend/resume support, would reset_resume ever be called?
 
+One of those cases is exactly what you have been talking about: when
+the platform kills power to the USB lines during suspend.  The driver's
+reset_resume routine will be called during resume, as opposed to the
+probe routine being called.  Therefore the driver will be able to tell
+that this is not a new device instance.
+
+The other cases are less likely to occur: a device is unable to resume 
+normally and requires a reset before it will start working again, or 
+something else goes wrong along those lines.
+
+> However I get the feeling someone needs to go back and see if the
+> device is the same one and just gets probed again or if it is a new
+> one from the USB host stack perspective.
+
+That can be done easily enough by enabling usbcore debugging before 
+carrying out the system suspend:
+
+	echo 'module usbcore =p' >/debug/dynamic_debug/control
+
+The debugging information in the kernel log will tell just what 
+happened.
+
+
+On Thu, 21 May 2015, Takashi Iwai wrote:
+
+> At Thu, 21 May 2015 10:18:08 -0400 (EDT),
+> Alan Stern wrote:
+> > 
+> > On Thu, 21 May 2015, Takashi Iwai wrote:
+> > 
+> > > Then avoiding the failed firmware is no solution, indeed.
+> > > If it's a new probe, it should be never executed during resume.
+> > 
+> > Can you expand this comment?  What's wrong with probing during resume?
+> 
+> Well, if the probe requires the access to a user-space file, it can't
+> be done during resume.  That's the very problem we're seeing now.
+> The firmware loader can't help much alone if it's a new device
+> object.
+
+But the same thing happens during early boot, if the driver is built 
+into the kernel.  When the probe occurs, userspace isn't up and running 
+yet, so the firmware loader can't do anything.
+
+Why should probe during resume be any worse than probe during early 
+boot?
+
+> > The USB stack does carry out probes during resume under certain
+> > circumstances.  A driver lacking a reset_resume callback is one of
+> > those circumstances.
+> 
+> So, having a proper reset_resume in btusb would help in the end?
+
+It might, depending on how the driver is written.  I don't know enough 
+about the details of btusb to say.
+
+Alan Stern
