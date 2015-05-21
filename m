@@ -1,30 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <555D8B8C.4090007@ubnt.com>
-Date: Thu, 21 May 2015 10:38:52 +0300
-From: Andrejs Hanins <andrejs.hanins@ubnt.com>
+Date: Thu, 21 May 2015 10:34:15 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] tester: Refactor Read Local Public Key command
+Message-ID: <20150521073413.GB15271@comms>
+References: <1431942097-21927-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: DBus API for LTK OOB keys
-References: <54F8584D.6020301@ubnt.com> <20150305134024.GA20862@t440s> <54F862A3.80400@ubnt.com> <8EB5FD2F-4C46-41F8-95BA-4ACBEF0BCDE4@holtmann.org> <54F8B881.4050506@ubnt.com> <280B8CCC-6E98-477A-B805-D91966220207@holtmann.org>
-In-Reply-To: <280B8CCC-6E98-477A-B805-D91966220207@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1431942097-21927-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Mon, May 18, 2015 at 12:41:35PM +0300, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Save Local Public Key to calculate DHKey for later tests. Also verify
+> that Command Status and Meta Event are generated.
 
-On 03/06/2015 12:08 AM, Marcel Holtmann wrote:
-> 
-> So LE Legacy Pairing needs the Security Manager TK value and LE Secure Connections needs the Confirmation and Random values. However right now, we can not get these ones from the kernel.
-> 
-> As a side note, I added tools/oobtest utility where you can test this between two controllers attached to the same host.
-Based on oobtest/kernel code/mgmt-api comments, the OOB LE legacy pairing is still not supported: "Currently there is no support for providing the Security Manager TK Value for LE legacy pairing".
+ping
 
-Is there any plan to support it? Maybe some patches exist? Are there any serious technical difficulties behind the absence of this functionality?
-I know that BT 4.2 SC provides better alternatives for secure pairing, but the 4.2 is not so widely adopted as 4.0 and our BT chip also don't support 4.2...
-
+> ---
+>  tools/hci-tester.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 59 insertions(+), 2 deletions(-)
 > 
-> Regards
+> diff --git a/tools/hci-tester.c b/tools/hci-tester.c
+> index 460c9a9..9093129 100644
+> --- a/tools/hci-tester.c
+> +++ b/tools/hci-tester.c
+> @@ -46,6 +46,11 @@ struct user_data {
+>  	uint16_t handle_ut;
+>  };
+>  
+> +struct le_keys {
+> +	uint8_t remote_sk[32];
+> +	uint8_t local_pk[64];
+> +} key_test_data;
+> +
+>  static void swap_buf(const uint8_t *src, uint8_t *dst, uint16_t len)
+>  {
+>  	int i;
+> @@ -412,9 +417,61 @@ static void test_le_rand(const void *test_data)
+>  	test_command(BT_HCI_CMD_LE_RAND);
+>  }
+>  
+> +static void test_le_read_local_pk_complete(const void *data, uint8_t size,
+> +								void *user_data)
+> +{
+> +	const uint8_t *event = data;
+> +	const struct bt_hci_evt_le_read_local_pk256_complete *evt;
+> +	struct le_keys *keys = user_data;
+> +
+> +	if (*event != BT_HCI_EVT_LE_READ_LOCAL_PK256_COMPLETE) {
+> +		tester_warn("Failed Read Local PK256 command");
+> +		tester_test_failed();
+> +		return;
+> +	}
+> +
+> +	evt = (void *)(event + 1);
+> +	if (evt->status) {
+> +		tester_warn("HCI Read Local PK complete failed (0x%02x)",
+> +								evt->status);
+> +		tester_test_failed();
+> +		return;
+> +	}
+> +
+> +	memcpy(keys->local_pk, evt->local_pk256, 64);
+> +
+> +	util_hexdump('>', evt->local_pk256, 64, test_debug, NULL);
+> +
+> +	tester_test_passed();
+> +}
+> +
+> +static void test_le_read_local_pk_status(const void *data, uint8_t size,
+> +							void *user_data)
+> +{
+> +	uint8_t status = *((uint8_t *) data);
+> +
+> +	if (status) {
+> +		tester_warn("Failed to send DHKey gen cmd (0x%02x)", status);
+> +		tester_test_failed();
+> +		return;
+> +	}
+> +}
+> +
+>  static void test_le_read_local_pk(const void *test_data)
+>  {
+> -	test_command(BT_HCI_CMD_LE_READ_LOCAL_PK256);
+> +	struct user_data *user = tester_get_data();
+> +
+> +	bt_hci_register(user->hci_ut, BT_HCI_EVT_LE_META_EVENT,
+> +				test_le_read_local_pk_complete,
+> +				(void *)test_data, NULL);
+> +
+> +	if (!bt_hci_send(user->hci_ut, BT_HCI_CMD_LE_READ_LOCAL_PK256, NULL,
+> +				0, test_le_read_local_pk_status,
+> +				NULL, NULL)) {
+> +		tester_warn("Failed to send HCI LE Read Local PK256 command");
+> +		tester_test_failed();
+> +		return;
+> +	}
+>  }
+>  
+>  static void test_le_generate_dhkey_complete(const void *data, uint8_t size,
+> @@ -790,7 +847,7 @@ int main(int argc, char *argv[])
+>  				test_le_encrypt);
+>  	test_hci_local("LE Rand", NULL, NULL,
+>  				test_le_rand);
+> -	test_hci_local("LE Read Local PK", NULL, NULL,
+> +	test_hci_local("LE Read Local PK", &key_test_data, NULL,
+>  				test_le_read_local_pk);
+>  	test_hci_local("LE Generate DHKey", NULL, NULL,
+>  				test_le_generate_dhkey);
+> -- 
+> 2.1.4
 > 
-> Marcel
-> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
