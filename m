@@ -1,33 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH 1/2] Bluetooth: Don't call shutdown when leaving user channel
-Date: Thu, 21 May 2015 16:46:40 +0200
-Message-Id: <1432219601-3663-1-git-send-email-loic.poulain@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <Pine.LNX.4.44L0.1505211009240.1397-100000@iolanthe.rowland.org>
+Date: Thu, 21 May 2015 16:39:16 +0200
+Cc: Takashi Iwai <tiwai@suse.de>, Laura Abbott <labbott@redhat.com>,
+	Oliver Neukum <oneukum@suse.com>,
+	Ming Lei <ming.lei@canonical.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Laura Abbott <labbott@fedoraproject.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	USB list <linux-usb@vger.kernel.org>,
+	netdev <netdev@vger.kernel.org>
+Message-Id: <33C25745-6839-4858-9A3E-19EC6408ECED@holtmann.org>
+References: <Pine.LNX.4.44L0.1505211009240.1397-100000@iolanthe.rowland.org>
+To: Alan Stern <stern@rowland.harvard.edu>
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Don't interfere with the user channel exclusive access.
+Hi Alan,
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- net/bluetooth/hci_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+>> Then avoiding the failed firmware is no solution, indeed.
+>> If it's a new probe, it should be never executed during resume.
+> 
+> Can you expand this comment?  What's wrong with probing during resume?
+> 
+> The USB stack does carry out probes during resume under certain
+> circumstances.  A driver lacking a reset_resume callback is one of
+> those circumstances.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 476709b..5120fea 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1557,7 +1557,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- {
- 	BT_DBG("%s %p", hdev->name, hdev);
- 
--	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
-+	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-+	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
- 		/* Execute vendor specific shutdown routine */
- 		if (hdev->shutdown)
- 			hdev->shutdown(hdev);
--- 
-1.9.1
+in case the platform kills the power to the USB lines, we can never do anything about this. I do not want to hack around this in the driver.
+
+What are the cases where we should implement reset_resume and would it really help here. Since the btusb.ko driver implements suspend/resume support, would reset_resume ever be called?
+
+However I get the feeling someone needs to go back and see if the device is the same one and just gets probed again or if it is a new one from the USB host stack perspective.
+
+Regards
+
+Marcel
+
