@@ -1,47 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <Pine.LNX.4.44L0.1505211009240.1397-100000@iolanthe.rowland.org>
-Date: Thu, 21 May 2015 16:39:16 +0200
-Cc: Takashi Iwai <tiwai@suse.de>, Laura Abbott <labbott@redhat.com>,
-	Oliver Neukum <oneukum@suse.com>,
-	Ming Lei <ming.lei@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Laura Abbott <labbott@fedoraproject.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	USB list <linux-usb@vger.kernel.org>,
-	netdev <netdev@vger.kernel.org>
-Message-Id: <33C25745-6839-4858-9A3E-19EC6408ECED@holtmann.org>
-References: <Pine.LNX.4.44L0.1505211009240.1397-100000@iolanthe.rowland.org>
-To: Alan Stern <stern@rowland.harvard.edu>
-Sender: linux-usb-owner@vger.kernel.org
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org,
+	tedd.an@intel.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCHv2] Bluetooth: btusb: Fix Intel controller hang after shutdown
+Date: Thu, 21 May 2015 16:35:57 +0200
+Message-Id: <1432218957-3400-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+The vendor command (0xfc3f) in btusb_shutdown_intel causes an internal
+reset with old firmware. After that, upcoming HCI command will hang due
+to a controller bug with the first HCI command sent to it.
+The workaround is to send HCI Reset command first which will reset the
+number of completed commands.
 
->> Then avoiding the failed firmware is no solution, indeed.
->> If it's a new probe, it should be never executed during resume.
-> 
-> Can you expand this comment?  What's wrong with probing during resume?
-> 
-> The USB stack does carry out probes during resume under certain
-> circumstances.  A driver lacking a reset_resume callback is one of
-> those circumstances.
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+---
+ v2: Send HCI reset from shutdown instead of using HCI_QUIRK_RESET_ON_CLOSE
+ drivers/bluetooth/btusb.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-in case the platform kills the power to the USB lines, we can never do anything about this. I do not want to hack around this in the driver.
-
-What are the cases where we should implement reset_resume and would it really help here. Since the btusb.ko driver implements suspend/resume support, would reset_resume ever be called?
-
-However I get the feeling someone needs to go back and see if the device is the same one and just gets probed again or if it is a new one from the USB host stack perspective.
-
-Regards
-
-Marcel
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index d21f3b4..589f30c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2705,6 +2705,19 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
+ 	}
+ 	kfree_skb(skb);
+ 
++	/* The 0xfc3f command causes an internal reset with old firmware.
++	 * In order to avoid the Bug with the first HCI command, we have
++	 * to send a HCI reset which will reset the number of completed
++	 * command.
++	 */
++	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		BT_ERR("%s: Shutdown HCI reset command failed (%ld)",
++			hdev->name, PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++	kfree_skb(skb);
++
+ 	return 0;
+ }
+ 
+-- 
+1.9.1
