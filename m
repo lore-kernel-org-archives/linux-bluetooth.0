@@ -1,45 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH 2/2] Bluetooth: Reorder HCI user channel socket release
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1432219601-3663-2-git-send-email-loic.poulain@intel.com>
-Date: Thu, 21 May 2015 21:55:29 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <4929A894-9A29-4ACA-BD7F-CAA2C27518FA@holtmann.org>
-References: <1432219601-3663-1-git-send-email-loic.poulain@intel.com> <1432219601-3663-2-git-send-email-loic.poulain@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <555E2131.60306@redhat.com>
+Date: Thu, 21 May 2015 11:17:21 -0700
+From: Laura Abbott <labbott@redhat.com>
+MIME-Version: 1.0
+To: Takashi Iwai <tiwai@suse.de>, Alan Stern <stern@rowland.harvard.edu>
+CC: Marcel Holtmann <marcel@holtmann.org>, Oliver Neukum <oneukum@suse.com>,
+        Ming Lei <ming.lei@canonical.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Laura Abbott <labbott@fedoraproject.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>, netdev <netdev@vger.kernel.org>
+Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
+References: <s5hsiaq3pv4.wl-tiwai@suse.de>	<Pine.LNX.4.44L0.1505211332520.1397-100000@iolanthe.rowland.org> <s5hk2w14x8b.wl-tiwai@suse.de>
+In-Reply-To: <s5hk2w14x8b.wl-tiwai@suse.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+On 05/21/2015 11:11 AM, Takashi Iwai wrote:
+> At Thu, 21 May 2015 13:37:56 -0400 (EDT),
+> Alan Stern wrote:
+>>
+>> On Thu, 21 May 2015, Takashi Iwai wrote:
+>>
+>>> At Thu, 21 May 2015 11:26:17 -0400 (EDT),
+>>> Alan Stern wrote:
+>>>>
+>>>> On Thu, 21 May 2015, Takashi Iwai wrote:
+>>>>
+>>>>> At Thu, 21 May 2015 10:18:08 -0400 (EDT),
+>>>>> Alan Stern wrote:
+>>>>>>
+>>>>>> On Thu, 21 May 2015, Takashi Iwai wrote:
+>>>>>>
+>>>>>>> Then avoiding the failed firmware is no solution, indeed.
+>>>>>>> If it's a new probe, it should be never executed during resume.
+>>>>>>
+>>>>>> Can you expand this comment?  What's wrong with probing during resume?
+>>>>>
+>>>>> Well, if the probe requires the access to a user-space file, it can't
+>>>>> be done during resume.  That's the very problem we're seeing now.
+>>>>> The firmware loader can't help much alone if it's a new device
+>>>>> object.
+>>>>
+>>>> But the same thing happens during early boot, if the driver is built
+>>>> into the kernel.  When the probe occurs, userspace isn't up and running
+>>>> yet, so the firmware loader can't do anything.
+>>>>
+>>>> Why should probe during resume be any worse than probe during early
+>>>> boot?
+>>>
+>>> The early boot has initrd, so the files can be there.  But the resume
+>>> has no way to fetch the file except for cached data.
+>>
+>> I suppose USB could delay re-probing until userspace is running again,
+>> if we knew when that was.  But it would be awkward and prone to races.
+>> It also would leave a user-visible window of time during which the
+>> device does not exist, which we want to avoid.  (This may not matter
+>> for bluetooth, but it does matter for other kinds of devices.)
+>
+> Right.
+>
+>> I would prefer to solve this problem in a different way, if possible.
+>
+> Well, we're back in square again :)
+>
+> But, before going further the discussion in loop again, I'd like to
+> know which firmware file actually hits.  Is it a non-existing
+> firmware?  Or is it a firmware that should have been cached?  In the
+> latter case, why it isn't used?
+>
 
-> The hci close method needs to know if we are in user channel context.
-> Only add the index to mgmt once close is performed.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
-> ---
-> net/bluetooth/hci_sock.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 56f9edb..e1beb4e 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -503,9 +503,9 @@ static int hci_sock_release(struct socket *sock)
-> 
-> 	if (hdev) {
-> 		if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
-> -			mgmt_index_added(hdev);
-> -			hci_dev_clear_flag(hdev, HCI_USER_CHANNEL);
-> 			hci_dev_close(hdev->id);
-> +			hci_dev_clear_flag(hdev, HCI_USER_CHANNEL);
-> +			mgmt_index_added(hdev);
-> 		}
+Non-existent firmware. The firmware was never present in the system and
+was never loaded at all.
 
-this way around looks so much more logical. However now I wonder if either I was confused when writing this code in the first place or I had a really good reason for it, but just forgot to document it.
+>
+> Takashi
+>
 
-Regards
-
-Marcel
-
+Thanks,
+Laura
