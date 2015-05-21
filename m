@@ -1,97 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Chan-yeol Park <chanyeol.park@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ v5 2/2] audio/a2dp: Remove useless check_vendor_codec()
-Date: Thu, 21 May 2015 19:24:20 +0900
-Message-id: <1432203860-12371-2-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1432203860-12371-1-git-send-email-chanyeol.park@samsung.com>
-References: <1432203860-12371-1-git-send-email-chanyeol.park@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <555DB0F3.7020308@intel.com>
+Date: Thu, 21 May 2015 12:18:27 +0200
+From: Loic Poulain <loic.poulain@intel.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: bluetooth-next HCI user channel issue
+References: <5534D661.1000703@intel.com> <A7E7D666-B172-4A02-A7E9-86483D630C81@holtmann.org> <4B296AC8-6E0A-4EB4-B1BD-892449AD4ED6@holtmann.org> <5555F464.7020404@intel.com>
+In-Reply-To: <5555F464.7020404@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function could be removed because A2DP vendor codec match is
-already verified in avdtp_find_remote_sep().
----
- profiles/audio/a2dp.c | 51 ++-------------------------------------------------
- 1 file changed, 2 insertions(+), 49 deletions(-)
+Hi Marcel,
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index e9579c0..b34a4d5 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1747,50 +1747,11 @@ done:
- 	finalize_select(setup);
- }
- 
--static gboolean check_vendor_codec(struct a2dp_sep *sep, uint8_t *cap,
--								size_t len)
--{
--	uint8_t *capabilities;
--	size_t length;
--	a2dp_vendor_codec_t *local_codec;
--	a2dp_vendor_codec_t *remote_codec;
--
--	if (len < sizeof(a2dp_vendor_codec_t))
--		return FALSE;
--
--	remote_codec = (a2dp_vendor_codec_t *) cap;
--
--	if (sep->endpoint == NULL)
--		return FALSE;
--
--	length = sep->endpoint->get_capabilities(sep,
--				&capabilities, sep->user_data);
--
--	if (length < sizeof(a2dp_vendor_codec_t))
--		return FALSE;
--
--	local_codec = (a2dp_vendor_codec_t *) capabilities;
--
--	if (btohl(remote_codec->vendor_id) != btohl(local_codec->vendor_id))
--		return FALSE;
--
--	if (btohs(remote_codec->codec_id) != btohs(local_codec->codec_id))
--		return FALSE;
--
--	DBG("vendor 0x%08x codec 0x%04x", btohl(remote_codec->vendor_id),
--						btohs(remote_codec->codec_id));
--
--	return TRUE;
--}
--
- static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
- 					const char *sender)
- {
- 	for (; list; list = list->next) {
- 		struct a2dp_sep *sep = list->data;
--		struct avdtp_remote_sep *rsep;
--		struct avdtp_media_codec_capability *cap;
--		struct avdtp_service_capability *service;
- 
- 		/* Use sender's endpoint if available */
- 		if (sender) {
-@@ -1804,19 +1765,11 @@ static struct a2dp_sep *a2dp_find_sep(struct avdtp *session, GSList *list,
- 				continue;
- 		}
- 
--		rsep = avdtp_find_remote_sep(session, sep->lsep);
--		if (rsep == NULL)
-+		if (avdtp_find_remote_sep(session, sep->lsep) == NULL)
- 			continue;
- 
--		service = avdtp_get_codec(rsep);
--		cap = (struct avdtp_media_codec_capability *) service->data;
--
--		if (cap->media_codec_type != A2DP_CODEC_VENDOR)
--			return sep;
-+		return sep;
- 
--		if (check_vendor_codec(sep, cap->data,
--					service->length - sizeof(*cap)))
--			return sep;
- 	}
- 
- 	return NULL;
+>> any chance you did git bisect this and tell us which patch broken this?
+>
+> I'll give you a answer/status before the end of next week.
+>
+> Regards,
+> Loic
+>
+
+The following patch introduces the regression:
+commit bfbd45e9acd2ef90ccc31ea02e08f82af392dbec
+Bluetooth: Add device shutdown routine for Intel Bluetooth device
+
+This patch sends the 0xFC3F vendor command from the shutdown callback.
+Author says:
+"For backward compatibility of this command  with old firmware, this
+command was supported before, but it behaves same as HCI_RESET
+internally. So, it won't be the problem even if the system doesn't have
+the latest firmware patch."
+
+However this patch introduces a HCI user channel regression:
+- When hci interface is down/up with hciconfig, no problem.
+- When hci interface is re-open via HCI user channel (bluemoon), first
+command hangs.
+
+After investigating, this is due to the "first HCI command" bug.
+There is the following workaround in btusb_setup_intel:
+/* The controller has a bug with the first HCI command sent to it
+  * returning number of completed commands as zero. This would stall the
+  * command processing in the Bluetooth core.
+  *
+  * As a workaround, send HCI Reset command first which will reset the
+  * number of completed commands and allow normal command processing
+  * from now on.
+  */
+
+Seems that the 0xFC3F command puts the device in the same kind of state
+(Intel init state?).
+
+So we need to apply the same workaround by sending HCI_RESET before any
+other command, either in the open callback (QUIRK) or in the shutdown
+one (after 0xFC3F).
+
+We don't see the issue with "hciconfig up" because the first command is
+always HCI_RESET.
+
+Regards,
+Loic
+
 -- 
-2.1.0
-
+Intel Open Source Technology Center
+http://oss.intel.com/
