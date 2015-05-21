@@ -1,75 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <555E442A.808@broadcom.com>
-Date: Thu, 21 May 2015 22:46:34 +0200
-From: Arend van Spriel <arend@broadcom.com>
-MIME-Version: 1.0
-To: Takashi Iwai <tiwai@suse.de>
-CC: Alan Stern <stern@rowland.harvard.edu>, Marcel Holtmann
-	<marcel@holtmann.org>, Laura Abbott <labbott@redhat.com>, Oliver Neukum
-	<oneukum@suse.com>, Ming Lei <ming.lei@canonical.com>, "David S. Miller"
-	<davem@davemloft.net>, Laura Abbott <labbott@fedoraproject.org>, "Johan
- Hedberg" <johan.hedberg@gmail.com>, "Rafael J. Wysocki"
-	<rafael.j.wysocki@intel.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] Bluetooth: btusb: fix Realtek suspend/resume
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1432218230-11370-1-git-send-email-drake@endlessm.com>
+Date: Thu, 21 May 2015 22:04:09 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
 	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>, Linux Kernel Mailing List
-	<linux-kernel@vger.kernel.org>, USB list <linux-usb@vger.kernel.org>, netdev
-	<netdev@vger.kernel.org>
-Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
-References: <33C25745-6839-4858-9A3E-19EC6408ECED@holtmann.org>	<Pine.LNX.4.44L0.1505211112310.1397-100000@iolanthe.rowland.org>	<s5hsiaq3pv4.wl-tiwai@suse.de>	<555E158D.4090607@broadcom.com> <s5hmw0x4z12.wl-tiwai@suse.de>
-In-Reply-To: <s5hmw0x4z12.wl-tiwai@suse.de>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+	<linux-bluetooth@vger.kernel.org>,
+	Carlo Caione <carlo@endlessm.com>,
+	Larry Finger <Larry.Finger@lwfinger.net>,
+	champion_chen@realsil.com.cn
+Message-Id: <121114DC-BCD3-40ED-B0C2-961A41305937@holtmann.org>
+References: <1432218230-11370-1-git-send-email-drake@endlessm.com>
+To: Daniel Drake <drake@endlessm.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 05/21/15 19:32, Takashi Iwai wrote:
-> At Thu, 21 May 2015 19:27:41 +0200,
-> Arend van Spriel wrote:
->>
->> On 05/21/15 17:35, Takashi Iwai wrote:
->>> At Thu, 21 May 2015 11:26:17 -0400 (EDT),
->>> Alan Stern wrote:
->>>>
->>>> On Thu, 21 May 2015, Takashi Iwai wrote:
->>>>
->>>>> At Thu, 21 May 2015 10:18:08 -0400 (EDT),
->>>>> Alan Stern wrote:
->>>>>>
->>>>>> On Thu, 21 May 2015, Takashi Iwai wrote:
->>>>>>
->>>>>>> Then avoiding the failed firmware is no solution, indeed.
->>>>>>> If it's a new probe, it should be never executed during resume.
->>>>>>
->>>>>> Can you expand this comment?  What's wrong with probing during resume?
->>>>>
->>>>> Well, if the probe requires the access to a user-space file, it can't
->>>>> be done during resume.  That's the very problem we're seeing now.
->>>>> The firmware loader can't help much alone if it's a new device
->>>>> object.
+Hi Daniel,
 
-So you are saying each device driver should come up with some retry 
-mechanism. Would make more sense to come up with something like that 
-behind the scenes in the firmware loader so all device drivers can rely 
-on one and the same solution.
+> Realtek btusb devices don't currently work after suspend/resume because
+> the updated firmware is quietly lost - the USB hub doesn't notice any
+> status change upon resume, but some kind of reset has definitely
+> happened as the LMP subversion has reverted to its original value.
+> 
+> Set the reset_resume flag to trigger probe and upload the new firmware
+> again.
+> 
+> Like the vendor code, I assume this is not needed when the device is
+> selected as a wakeup source and hence will retain power during suspend.
+> On the 2 products I have to hand, when trying this configuration the
+> hardware seems unable to keep the device powered up during suspend.
+> The USB hub then detects a status change on resume and does a reset,
+> so we do not end up in broken state.
+> 
+> Signed-off-by: Daniel Drake <drake@endlessm.com>
+> ---
+> drivers/bluetooth/btusb.c | 18 +++++++++++++++++-
+> 1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index b9f2821..9c42cb5 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -328,6 +328,7 @@ static const struct usb_device_id blacklist_table[] = {
+> #define BTUSB_FIRMWARE_LOADED	7
+> #define BTUSB_FIRMWARE_FAILED	8
+> #define BTUSB_BOOTING		9
+> +#define BTUSB_RESET_RESUME	10
+> 
+> struct btusb_data {
+> 	struct hci_dev       *hdev;
+> @@ -2766,8 +2767,15 @@ static int btusb_probe(struct usb_interface *intf,
+> 	}
+> 
+> #ifdef CONFIG_BT_HCIBTUSB_RTL
+> -	if (id->driver_info & BTUSB_REALTEK)
+> +	if (id->driver_info & BTUSB_REALTEK) {
+> 		hdev->setup = btrtl_setup_realtek;
+> +
+> +		/* Realtek devices lose their updated firmware over suspend,
+> +		 * but the USB hub doesn't notice any status change.
+> +		 * Explicitly request a device reset on resume.
+> +		 */
+> +		set_bit(BTUSB_RESET_RESUME, &data->flags);
+> +	}
+> #endif
+> 
+> 	if (id->driver_info & BTUSB_AMP) {
+> @@ -2900,6 +2908,14 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
+> 	btusb_stop_traffic(data);
+> 	usb_kill_anchored_urbs(&data->tx_anchor);
+> 
+> +	/* Optionally request a device reset on resume, but only when
+> +	 * wakeups are disabled. If wakeups are enabled we assume the
+> +	 * device will stay powered up throughout suspend.
+> +	 */
+> +	if (test_bit(BTUSB_RESET_RESUME, &data->flags) &&
+> +	    !device_may_wakeup(&data->udev->dev))
+> +		data->udev->reset_resume = 1;
+> +
+> 	return 0;
 
-Regards,
-Arend
+with all the discussion happening about request_firmware and resuming without have the userspace ready, this patch seems incomplete. If we just reset and run through probe() again, we will be causing the same problem. Unless the firmware is actually cached in this case.
 
->>>> But the same thing happens during early boot, if the driver is built
->>>> into the kernel.  When the probe occurs, userspace isn't up and running
->>>> yet, so the firmware loader can't do anything.
->>>>
->>>> Why should probe during resume be any worse than probe during early
->>>> boot?
->>>
->>> The early boot has initrd, so the files can be there.  But the resume
->>> has no way to fetch the file except for cached data.
->>
->> but initrd is optional so without initrd it is pretty much the same.
->
-> User can build the firmware into the kernel.
->
->
-> Takashi
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Maybe implemented reset_resume callback support here is actually something we do need. Not sure how this will look like, but maybe it is enough to just signal the Bluetooth core that the setup routine needs to be executed again.
+
+Running through disconnect() and probe() means that the hci_dev goes away and comes back. Is that something we really want or would just reloading the firmware be enough. It might be well that we finally need to do more in hci_suspend_dev and hci_resume_dev than we are doing right now.
+
+Regards
+
+Marcel
+
