@@ -1,66 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <555DB0F3.7020308@intel.com>
-Date: Thu, 21 May 2015 12:18:27 +0200
-From: Loic Poulain <loic.poulain@intel.com>
+Message-ID: <555D8B8C.4090007@ubnt.com>
+Date: Thu, 21 May 2015 10:38:52 +0300
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
 MIME-Version: 1.0
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: bluetooth-next HCI user channel issue
-References: <5534D661.1000703@intel.com> <A7E7D666-B172-4A02-A7E9-86483D630C81@holtmann.org> <4B296AC8-6E0A-4EB4-B1BD-892449AD4ED6@holtmann.org> <5555F464.7020404@intel.com>
-In-Reply-To: <5555F464.7020404@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: DBus API for LTK OOB keys
+References: <54F8584D.6020301@ubnt.com> <20150305134024.GA20862@t440s> <54F862A3.80400@ubnt.com> <8EB5FD2F-4C46-41F8-95BA-4ACBEF0BCDE4@holtmann.org> <54F8B881.4050506@ubnt.com> <280B8CCC-6E98-477A-B805-D91966220207@holtmann.org>
+In-Reply-To: <280B8CCC-6E98-477A-B805-D91966220207@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
->> any chance you did git bisect this and tell us which patch broken this?
->
-> I'll give you a answer/status before the end of next week.
->
-> Regards,
-> Loic
->
+On 03/06/2015 12:08 AM, Marcel Holtmann wrote:
+> 
+> So LE Legacy Pairing needs the Security Manager TK value and LE Secure Connections needs the Confirmation and Random values. However right now, we can not get these ones from the kernel.
+> 
+> As a side note, I added tools/oobtest utility where you can test this between two controllers attached to the same host.
+Based on oobtest/kernel code/mgmt-api comments, the OOB LE legacy pairing is still not supported: "Currently there is no support for providing the Security Manager TK Value for LE legacy pairing".
 
-The following patch introduces the regression:
-commit bfbd45e9acd2ef90ccc31ea02e08f82af392dbec
-Bluetooth: Add device shutdown routine for Intel Bluetooth device
+Is there any plan to support it? Maybe some patches exist? Are there any serious technical difficulties behind the absence of this functionality?
+I know that BT 4.2 SC provides better alternatives for secure pairing, but the 4.2 is not so widely adopted as 4.0 and our BT chip also don't support 4.2...
 
-This patch sends the 0xFC3F vendor command from the shutdown callback.
-Author says:
-"For backward compatibility of this command  with old firmware, this
-command was supported before, but it behaves same as HCI_RESET
-internally. So, it won't be the problem even if the system doesn't have
-the latest firmware patch."
-
-However this patch introduces a HCI user channel regression:
-- When hci interface is down/up with hciconfig, no problem.
-- When hci interface is re-open via HCI user channel (bluemoon), first
-command hangs.
-
-After investigating, this is due to the "first HCI command" bug.
-There is the following workaround in btusb_setup_intel:
-/* The controller has a bug with the first HCI command sent to it
-  * returning number of completed commands as zero. This would stall the
-  * command processing in the Bluetooth core.
-  *
-  * As a workaround, send HCI Reset command first which will reset the
-  * number of completed commands and allow normal command processing
-  * from now on.
-  */
-
-Seems that the 0xFC3F command puts the device in the same kind of state
-(Intel init state?).
-
-So we need to apply the same workaround by sending HCI_RESET before any
-other command, either in the open callback (QUIRK) or in the shutdown
-one (after 0xFC3F).
-
-We don't see the issue with "hciconfig up" because the first command is
-always HCI_RESET.
-
-Regards,
-Loic
-
--- 
-Intel Open Source Technology Center
-http://oss.intel.com/
+> 
+> Regards
+> 
+> Marcel
+> 
