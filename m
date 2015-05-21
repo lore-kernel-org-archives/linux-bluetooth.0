@@ -1,128 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] android/pts: Update A2DP test results
-Date: Thu, 21 May 2015 13:29:10 +0200
-Message-Id: <1432207750-10157-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: [RFC BlueZ v5 1/2] audio/avdtp: Add a2dp vendor codec match callback
+Date: Thu, 21 May 2015 19:24:19 +0900
+Message-id: <1432203860-12371-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PTS 6.1 and Android 5.1
----
- android/pics-a2dp.txt  | 10 +++++-----
- android/pixit-a2dp.txt |  2 +-
- android/pts-a2dp.txt   | 31 +++++++++++++++++++------------
- 3 files changed, 25 insertions(+), 18 deletions(-)
+When matching remote SEP to local SEP avdtp does not compare vendor
+codecs properly, i.e. neither vendor ID not codec ID are checked,
+which may cause wrong endpoint to be selected in case there are more
+that one endpoints using vendor codec on remote.
 
-diff --git a/android/pics-a2dp.txt b/android/pics-a2dp.txt
-index 1328e7e..2e87104 100644
---- a/android/pics-a2dp.txt
-+++ b/android/pics-a2dp.txt
-@@ -1,6 +1,6 @@
- A2DP PICS for the PTS tool.
+This patch fixes it by adding a2dp codec match call back.
+---
+ profiles/audio/a2dp.c  | 37 ++++++++++++++++++++++++++++++++++++-
+ profiles/audio/avdtp.c |  7 +++++++
+ profiles/audio/avdtp.h |  4 ++++
+ 3 files changed, 47 insertions(+), 1 deletion(-)
+
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 31c5086..e9579c0 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -447,6 +447,41 @@ static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
+ 	auto_config(setup);
+ }
  
--PTS version: 6.0
-+PTS version: 6.1
++static gboolean a2dp_codec_matched_cb(
++			struct avdtp_media_codec_capability *rcodec_data,
++					void *user_data)
++{
++	struct a2dp_sep *sep = user_data;
++	a2dp_vendor_codec_t *remote_codec;
++	a2dp_vendor_codec_t *local_codec;
++	uint8_t *capabilities;
++	size_t length;
++
++	if (rcodec_data->media_codec_type != A2DP_CODEC_VENDOR)
++		return TRUE;
++
++	if (sep->endpoint == NULL)
++		return FALSE;
++
++	length = sep->endpoint->get_capabilities(sep, &capabilities,
++							sep->user_data);
++	if (length < sizeof(a2dp_vendor_codec_t))
++		return FALSE;
++
++	local_codec = (a2dp_vendor_codec_t *) capabilities;
++	remote_codec = (a2dp_vendor_codec_t *) rcodec_data->data;
++
++	if (remote_codec->vendor_id != local_codec->vendor_id)
++		return FALSE;
++
++	if (remote_codec->codec_id != local_codec->codec_id)
++		return FALSE;
++
++	DBG("vendor 0x%08x codec 0x%04x", btohl(remote_codec->vendor_id),
++						btohs(remote_codec->codec_id));
++	return TRUE;
++}
++
+ static gboolean endpoint_setconf_ind(struct avdtp *session,
+ 						struct avdtp_local_sep *sep,
+ 						struct avdtp_stream *stream,
+@@ -1588,7 +1623,7 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
+ 	sep->lsep = avdtp_register_sep(server->seps, type,
+ 					AVDTP_MEDIA_TYPE_AUDIO, codec,
+ 					delay_reporting, &endpoint_ind,
+-					&cfm, sep);
++					&cfm, a2dp_codec_matched_cb, sep);
  
- * - different than PTS defaults
- # - not yet implemented/supported
-@@ -76,8 +76,8 @@ TSPC_A2DP_3_6	False		SRC: MPEG-2,4 AAC encoder (C.1)
- TSPC_A2DP_3_7	False		SRC: ATRAC family decoder (C.1)
- TSPC_A2DP_3_8	False		SRC: ATRAC family encoder (C.1)
- -------------------------------------------------------------------------------
--C.1: At least one of the implementations shall be supported if 12/2 (Optional
--	codec) is supported, else excluded.
-+C.1: At least one of the implementations shall be supported if 3/2
-+	is supported, else excluded.
- -------------------------------------------------------------------------------
+ 	if (sep->lsep == NULL) {
+ 		g_free(sep);
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index f38188f..de44f6f 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -332,6 +332,7 @@ struct avdtp_local_sep {
+ 	GSList *caps;
+ 	struct avdtp_sep_ind *ind;
+ 	struct avdtp_sep_cfm *cfm;
++	codec_matched_cb codec_matched;
+ 	void *user_data;
+ };
  
+@@ -1226,6 +1227,10 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+ 		if (codec_data->media_codec_type != lsep->codec)
+ 			continue;
  
-@@ -138,8 +138,8 @@ TSPC_A2DP_5_3	False		SNK: MPEG-1,2 Audio (C.1)
- TSPC_A2DP_5_4	False		SNK: MPEG-2,4 AAC (C.1)
- TSPC_A2DP_5_5	False		SNK: ATRAC family (C.1)
- -------------------------------------------------------------------------------
--C.1: At least one codec shall be supported if Table 13/2 (Optional codec
--	decoder) is supported, otherwise excluded.
-+C.1: At least one codec shall be supported if Table 5/2 is supported, otherwise
-+	excluded.
- -------------------------------------------------------------------------------
++		if (lsep->codec_matched &&
++			!lsep->codec_matched(codec_data, lsep->user_data))
++				continue;
++
+ 		if (sep->stream == NULL)
+ 			return sep;
+ 	}
+@@ -3521,6 +3526,7 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+ 						gboolean delay_reporting,
+ 						struct avdtp_sep_ind *ind,
+ 						struct avdtp_sep_cfm *cfm,
++						codec_matched_cb cb,
+ 						void *user_data)
+ {
+ 	struct avdtp_local_sep *sep;
+@@ -3538,6 +3544,7 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+ 	sep->codec = codec_type;
+ 	sep->ind = ind;
+ 	sep->cfm = cfm;
++	sep->codec_matched = cb;
+ 	sep->user_data = user_data;
+ 	sep->delay_reporting = delay_reporting;
  
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index 1b02232..906f53e 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -132,6 +132,9 @@ typedef void (*avdtp_stream_state_cb) (struct avdtp_stream *stream,
+ typedef void (*avdtp_set_configuration_cb) (struct avdtp *session,
+ 						struct avdtp_stream *stream,
+ 						struct avdtp_error *err);
++typedef	gboolean (*codec_matched_cb) (
++			struct avdtp_media_codec_capability *rcodec_data,
++					void *user_data);
  
-diff --git a/android/pixit-a2dp.txt b/android/pixit-a2dp.txt
-index b6ef742..c7f9762 100644
---- a/android/pixit-a2dp.txt
-+++ b/android/pixit-a2dp.txt
-@@ -1,6 +1,6 @@
- A2DP PIXIT for the PTS tool.
+ /* Callbacks for when a reply is received to a command that we sent */
+ struct avdtp_sep_cfm {
+@@ -275,6 +278,7 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+ 						gboolean delay_reporting,
+ 						struct avdtp_sep_ind *ind,
+ 						struct avdtp_sep_cfm *cfm,
++						codec_matched_cb cb,
+ 						void *user_data);
  
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
-index 500c631..79bd348 100644
---- a/android/pts-a2dp.txt
-+++ b/android/pts-a2dp.txt
-@@ -1,8 +1,8 @@
- PTS test results for A2DP
- 
--PTS version: 6.0
--Tested: 14-January-2015
--Android version: 5.0
-+PTS version: 6.1
-+Tested 21-May-2015
-+Android version: 5.1
- 
- Results:
- PASS	test passed
-@@ -15,24 +15,29 @@ N/A	test is disabled due to PICS setup
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
- TC_SRC_CC_BV_09_I	PASS	Start streaming
--TC_SRC_CC_BV_10_I	PASS
--TC_SRC_REL_BV_01_I	PASS	Connect to PTS from IUT. When requested
--				disconnect from IUT
--TC_SRC_REL_BV_02_I	PASS
--TC_SRC_SET_BV_01_I	PASS	Connect to PTS (open a2dp)
-+TC_SRC_CC_BV_10_I	PASS	Start streaming
-+TC_SRC_REL_BV_01_I	PASS	When requested disconnect from IUT
-+TC_SRC_REL_BV_02_I	PASS	Start streaming
-+TC_SRC_SET_BV_01_I	PASS
- TC_SRC_SET_BV_02_I	PASS
- TC_SRC_SET_BV_03_I	PASS	Start streaming
- TC_SRC_SET_BV_04_I	PASS	Start streaming
--TC_SRC_SET_BV_05_I	PASS	IUT must be moved out of range
--				JIRA issue BA-314
-+TC_SRC_SET_BV_05_I	PASS	Start streaming
-+				IUT must be moved out of range
-+				Initiate connection
- TC_SRC_SET_BV_06_I	PASS	IUT must be moved out of range
--TC_SRC_SUS_BV_01_I	PASS	Stop streaming
--TC_SRC_SUS_BV_02_I	PASS
-+				PTS issue#13469
-+				To pass set TSPX_no_avrcp to TRUE
-+TC_SRC_SUS_BV_01_I	PASS	Start streaming
-+				Stop streaming
-+				Start streaming
-+TC_SRC_SUS_BV_02_I	PASS	Start streaming
- TC_SRC_SDP_BV_01_I	PASS
- TC_SRC_AS_BV_01_I	PASS	Requires checking if the output on the IUT is
- 				correct
- TC_SRC_AS_BV_02_I	N/A
- TC_SRC_AS_BV_03_I	N/A
-+TC_SRC_SYN_BV_02_I	N/A
- -------------------------------------------------------------------------------
- 
- 
-@@ -60,4 +65,6 @@ TC_SNK_SUS_BV_01_I	N/A
- TC_SNK_SUS_BV_02_I	N/A
- TC_SNK_SDP_BV_02_I	N/A
- TC_SNK_AS_BV_01_I	N/A
-+TC_SNK_AS_BV_02_I	N/A
-+TC_SNK_SYN_BV_01_I	N/A
- -------------------------------------------------------------------------------
+ /* Find a matching pair of local and remote SEP ID's */
 -- 
-1.9.1
+2.1.0
 
