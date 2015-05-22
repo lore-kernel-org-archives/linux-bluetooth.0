@@ -2,207 +2,201 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Mariusz Skamra <mariusz.skamra@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] android/pts: Update SM test results
-Date: Fri, 22 May 2015 15:13:04 +0200
-Message-ID: <2664075.ABB4cTtB6e@leonov>
-In-Reply-To: <1432115703-30609-1-git-send-email-mariusz.skamra@tieto.com>
-References: <2648839.tQezcmsJ0R@leonov> <1432115703-30609-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: Re: [PATCHv2] android/pts: Update MPS test results
+Date: Fri, 22 May 2015 15:05:55 +0200
+Message-ID: <43404835.loKr21Nrvs@leonov>
+In-Reply-To: <1432276779-15632-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1432135835-9270-1-git-send-email-mariusz.skamra@tieto.com> <1432276779-15632-1-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mariusz,
 
-On Wednesday 20 of May 2015 11:55:03 Mariusz Skamra wrote:
+On Friday 22 of May 2015 08:39:39 Mariusz Skamra wrote:
 > PTS 6.1 and Android 5.1
 > ---
->  android/pics-sm.txt  | 23 ++++++++++++++---------
->  android/pixit-sm.txt |  2 +-
->  android/pts-sm.txt   | 36 +++++++++++-------------------------
->  3 files changed, 26 insertions(+), 35 deletions(-)
+>  android/pics-mps.txt  | 82
+> +++++++++++++++++++++++++-------------------------- android/pixit-mps.txt |
+>  2 +-
+>  android/pts-mps.txt   | 10 +++----
+>  3 files changed, 46 insertions(+), 48 deletions(-)
 > 
-> diff --git a/android/pics-sm.txt b/android/pics-sm.txt
-> index c5caec6..c31fe76 100644
-> --- a/android/pics-sm.txt
-> +++ b/android/pics-sm.txt
-> @@ -1,8 +1,9 @@
->  SM PICS for the PTS tool.
+> diff --git a/android/pics-mps.txt b/android/pics-mps.txt
+> index 29b82a9..5aad7c1 100644
+> --- a/android/pics-mps.txt
+> +++ b/android/pics-mps.txt
+> @@ -1,6 +1,6 @@
+>  MPS PICS for the PTS tool.
 > 
 > -PTS version: 6.0
 > +PTS version: 6.1
 > 
 >  * - different than PTS defaults
-> +^ - field not available on PTS
-> 
->  M - mandatory
->  O - optional
-> @@ -12,9 +13,11 @@ O - optional
->  Parameter Name	Selected	Description
->  ---------------------------------------------------------------------------
-> ---- TSPC_SM_1_1	True		Master Role (Initiator) (C.1)
-> -TSPC_SM_1_2	True		Slave Role (Responder) (C.1)
-> +TSPC_SM_1_2	True		Slave Role (Responder) (C.2)
->  ---------------------------------------------------------------------------
-> ---- -C.1: At least one of these features shall be supported.
-> +C.1: Mandatory to support if TSPC_SM_1_2 is NOT supported, otherwise
-> Optional +C.2: Optional IF ((4.0 OR 4.0+HS) AND TSPC_GAP_5_3) OR ((4.1 OR
-> 4.1+HS OR 4.2 +	OR 4.2+HS) AND (TSPC_GAP_5_3 OR TSPC_GAP_38_3)))
+>  # - not yet implemented/supported
+> @@ -219,36 +219,34 @@ TSPC_MPS_6_37	True (*)	A2DP-SRC_PBAP-Server
+> Implementation Phonebook TSPC_MPS_6_38	False		A2DP-SNK and PBAP-
+Client
+> Implementation
+>  				Phonebook Download during Audio Streaming (C.12)
+>  TSPC_MPS_6_39	True (*)	HFP-AG and PBAP-Server Implementation PBAP and
+> -				HFP Connection Behavior (C.13)
+> ----------------------------------------------------------------------------
+> ---- -C.1: Mandatory if 2/1 (A2DP Source role), 2/4 (AVRCP Target role) and
+> 2/7 -	(HFP Audio Gateway role) are supported, otherwise Excluded.
+> -C.2: Mandatory if 2/2 (A2DP Sink role), 2/3 (AVRCP Controller role) and 2/8
+> -	(HFP Hands-Free role) are supported, otherwise Excluded.
+> -C.3: Mandatory if 2/5 (DUN Gateway role) and 2/7 (HFP Audio Gateway role)
+> -	are supported and 3/9 ( Ability to support parallel data and call
+> -	operation), otherwise Excluded.
+> -C.4: Mandatory if 2/6 (DUN Data Terminal role) and 2/8 (HFP Hands-Free
+> role) -	are supported, otherwise Excluded.
+> -C.5: Mandatory if 2/1 (A2DP Source role) and 2/5 (DUN Gateway role) are
+> -	supported, otherwise Excluded.
+> -C.6: Mandatory if 2/2 (A2DP Sink role) and 2/6 (DUN Data Terminal role) are
+> -	supported, otherwise Excluded.
+> -C.7: Mandatory if 2/7 (HFP Audio Gateway role) and 2/9 (PAN Network Access
+> Point -	role) and 3/11 (Ability to support parallel data and call
+> operation) are -	supported, otherwise Excluded.
+> -C.8: Mandatory if 2/8 (HFP Hands-Free role) and 2/11 (PAN User role) are
+> -	supported and 3/11, otherwise Excluded.
+> -C.9: Mandatory if 2/1 (A2DP Source role) and 2/9 (PAN Network Access Point
+> role) -	are supported, otherwise Excluded.
+> -C.10: Mandatory if 2/2 (A2DP Sink role) and 2/11 (PAN User role) are
+> supported, +				HFP Connection Behaviour (C.13)
+> +---------------------------------------------------------------------------
+> ---- +C.1: Mandatory if TSPC_MPS_2_1, TSPC_MPS_2_4 and TSPC_MPS_2_7 are
+> supported, otherwise Excluded.
+> -C.11: Mandatory if 2/1 (A2DP Source role) and 2/13 (PBAP PSE role) are
+> -	supported, otherwise Excluded.
+> -C.12: Mandatory if 2/2 (A2DP Sink role) and 2/12 (PBAP PCE role) are
+> supported, +C.2: Mandatory if TSPC_MPS_2_2, TSPC_MPS_2_3 and TSPC_MPS_2_8
+> are supported, +	otherwise Excluded.
+> +C.3: Mandatory if TSPC_MPS_2_5 and TSPC_MPS_2_7 are supported and
+> TSPC_MPS_3_9, otherwise Excluded.
+> -C.13: Mandatory if 2/7 (HFP Audio Gateway role) and 2/13 (PBAP PSE role)
+> are +C.4: Mandatory if TSPC_MPS_2_6 and TSPC_MPS_2_8 are supported,
+> otherwise +	Excluded.
+> +C.5: Mandatory if TSPC_MPS_2_1 and TSPC_MPS_2_5 are supported, otherwise
+> +	Excluded.
+> +C.6: Mandatory if TSPC_MPS_2_2 and TSPC_MPS_2_6 are supported, otherwise
+> +	Excluded.
+> +C.7: Mandatory if TSPC_MPS_2_7 and TSPC_MPS_2_9 and TSPC_MPS_3_11 are
+>  	supported, otherwise Excluded.
+> +C.8: Mandatory if TSPC_MPS_2_8 and TSPC_MPS_2_11 are supported and
+> +	TSPC_MPS_3_11, otherwise Excluded.
+> +C.9: Mandatory if TSPC_MPS_2_1 and TSPC_MPS_2_9 are supported, otherwise
+> +	Excluded.
+> +C.10: Mandatory if TSPC_MPS_2_2 and TSPC_MPS_2_11 are supported, otherwise
+> +	Excluded.
+> +C.11: Mandatory if TSPC_MPS_2_1 and TSPC_MPS_2_13 are supported, otherwise
+> +	Excluded.
+> +C.12: Mandatory if TSPC_MPS_2_2 and TSPC_MPS_2_12 are supported, otherwise
+> +	Excluded.
+> +C.13: Mandatory if TSPC_MPS_2_7 and TSPC_MPS_2_13 are supported, otherwise
+> +	Excluded.
 >  ---------------------------------------------------------------------------
 > ----
 > 
 > 
-> @@ -26,8 +29,10 @@ TSPC_SM_2_1	True		Authenticated MITM protection 
-(O)
->  TSPC_SM_2_2	True		Unauthenticated no MITM protection (C.1)
->  TSPC_SM_2_3	True		No security requirements (M)
->  TSPC_SM_2_4	False (*)	OOB supported (O)
-> +TSPC_SM_2_5	(^)		LE Secure Connections (C.2)
+> @@ -293,12 +291,12 @@ TSPC_MPS_7_14	False		A2DP-SNK and AVRCP-CT and 
+DUN-DT
+> Implementation Start Packet Data Communication during Audio
+>  				Streaming (C.3)
 >  ---------------------------------------------------------------------------
-> ---- C.1: If TSPC_SM_2_1 is supported then Mandatory, else Optional
-> +C.2: Optional IF Core 4.2 OR Core 4.2+HS are supported, otherwise Excluded
->  ---------------------------------------------------------------------------
-> ----
-> 
-> 
-> @@ -47,8 +52,8 @@ TSPC_SM_4_1	True		Just Works (O)
->  TSPC_SM_4_2	True		Passkey Entry (C.1)
->  TSPC_SM_4_3	False (*)	Out of Band (C.1)
->  ---------------------------------------------------------------------------
-> ---- -C.1: If TSPC_SM_2_1 is supported, at least one of these features shall
-> be -	supported.
-> +C.1: Mandatory to support at least one of the defined methods IF
-> TSPC_SM_2_1 is +	supported, otherwise Excluded.
+> ---- -C.1: Mandatory if 2/2 (A2DP Sink role), 2/3 (AVRCP Controller role)
+> and 2/8 -	(HFP Hands-Free role) are supported, otherwise Excluded.
+> -C.2: Mandatory if 2/1 (A2DP Source role) and 2/4 (AVRCP Target role) are
+> -	supported, otherwise Excluded.
+> -C.3: Mandatory if 2/2 (A2DP Sink role), 2/3 (AVRCP Controller role) and 2/6
+> -	(DUN Data Terminal role) supported, otherwise Excluded.
+> +C.1: Mandatory if TSPC_MPS_2_2, TSPC_MPS_2_3 and TSPC_MPS_2_8 are
+> supported, +	otherwise Excluded.
+> +C.2: Mandatory if TSPC_MPS_2_1 and TSPC_MPS_2_4 are supported, otherwise
+> +	Excluded.
+> +C.3: Mandatory if TSPC_MPS_2_2, TSPC_MPS_2_3 and 2/6TSPC_MPS_2_6 supported,
+> +	otherwise Excluded.
 >  ---------------------------------------------------------------------------
 > ----
 > 
 > 
-> @@ -63,7 +68,7 @@ TSPC_SM_5_4	True		Slave Initiated Security – Master
-> response(C.2)
-> ---------------------------------------------------------------------------
-> ---- C.1: Mandatory if TSPC_SM_1_2 is supported, otherwise Excluded
->  C.2: Mandatory if TSPC_SM_1_1 is supported, otherwise Excluded
-> -C.3: Mandatory IF TSPC_SM_2_1 OR TSPC_SM_2_1 OR TSPC_SM_2_4 is supported,
-> +C.3: Mandatory IF TSPC_SM_2_1 OR TSPC_SM_2_2 OR TSPC_SM_2_4 is supported,
->  	otherwise Excluded
+> @@ -307,12 +305,12 @@ C.3: Mandatory if 2/2 (A2DP Sink role), 2/3 (AVRCP
+> Controller role) and 2/6 Parameter Name	Selected	Description
+>  ---------------------------------------------------------------------------
+> ---- TSPC_MPS_8_1	True (*)	AVP Suspension (C.1)
+> -TSPC_MPS_8_2	True (*)	Profile (Dis-)Connection behavior (C.2)
+> +TSPC_MPS_8_2	True (*)	Profile (Dis-)Connection behaviour (C.2)
+>  ---------------------------------------------------------------------------
+> ---- -C.1: Mandatory if 1/1 (A2DP 1.2 or later) and 1/2 (AVRCP 1.3 or later)
+> are -	supported, otherwise Excluded.
+> -C.2: Mandatory if 1/1 (A2DP 1.2 or later), 1/2 (AVRCP 1.3 or later) and 1/4
+> (HFP -	1.5 or later) are supported, otherwise Excluded.
+> +C.1: Mandatory if TSPC_MPS_1_1 and TSPC_MPS_1_2 are supported, otherwise
+> +	Excluded.
+> +C.2: Mandatory if TSPC_MPS_1_1, TSPC_MPS_1_2 and TSPC_MPS_1_4 are
+> supported, +	otherwise Excluded.
 >  ---------------------------------------------------------------------------
 > ----
 > 
-> @@ -85,7 +90,7 @@ TSPC_SM_7_1	True		Encryption Key (C.1)
->  TSPC_SM_7_2	True		Identity Key (C.2)
->  TSPC_SM_7_3	True		Signing Key (C.3)
+> 
+> @@ -333,7 +331,7 @@ TSPC_MPS_10_1	True		SDP Record (M)
+>  TSPC_MPS_10_2	True (*)	Media Stream Suspension (C.1)
+>  TSPC_MPS_10_3	True (*)	Sniff Mode during Streaming (C.2)
 >  ---------------------------------------------------------------------------
-> ---- -C.1: Mandatory if GAP (24/2 OR 42/6) is supported, ELSE Optional
-> -C.2: Mandatory if GAP (26/3) is supported, ELSE Optional
-> -C.3: Mandatory if GAP (25/6 OR 35/6) is supported, ELSE Optional
-> +C.1: Mandatory if TSPC_GAP_24_2 OR TSPC_GAP_42_6 is supported, ELSE
-> Optional +C.2: Mandatory if TSPC_GAP_26_3 is supported, ELSE Optional
-> +C.3: Mandatory if TSPC_GAP_25_6 OR TSPC_GAP_35_6 is supported, ELSE
-> Optional
-> ---------------------------------------------------------------------------
-> ---- diff --git a/android/pixit-sm.txt b/android/pixit-sm.txt
-> index 98e2ab5..6facbb8 100644
-> --- a/android/pixit-sm.txt
-> +++ b/android/pixit-sm.txt
+> ---- -C.1: Mandatory if 1/1 (A2DP1.2 or later) and 1/4 (HFP 1.5 or later)
+> are -	supported, otherwise Excluded.
+> -C.2: Mandatory if 1/1 (A2DP 1.2 or later) is supported, otherwise Excluded.
+> +C.1: Mandatory if TSPC_MPS_1_1 and TSPC_MPS_1_4 are supported, otherwise
+> +	Excluded.
+> +C.2: Mandatory if TSPC_MPS_1_1 is supported, otherwise Excluded.
+>  ---------------------------------------------------------------------------
+> ---- diff --git a/android/pixit-mps.txt b/android/pixit-mps.txt
+> index 86511bd..116a8c0 100644
+> --- a/android/pixit-mps.txt
+> +++ b/android/pixit-mps.txt
 > @@ -1,6 +1,6 @@
->  SM PIXIT for the PTS tool.
+>  MPS PIXIT for the PTS tool.
 > 
 > -PTS version: 6.0
 > +PTS version: 6.1
 > 
 >  * - different than PTS defaults
 >  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-sm.txt b/android/pts-sm.txt
-> index 91737cc..1fad305 100644
-> --- a/android/pts-sm.txt
-> +++ b/android/pts-sm.txt
-> @@ -1,9 +1,9 @@
->  PTS test results for SM
+> diff --git a/android/pts-mps.txt b/android/pts-mps.txt
+> index b1096e6..87a0e45 100644
+> --- a/android/pts-mps.txt
+> +++ b/android/pts-mps.txt
+> @@ -1,8 +1,8 @@
+>  PTS test results for MPS
 > 
 > -PTS version: 6.0
-> -Tested: 11-February-2015
+> -Tested: 11-December-2014
 > -Android version: 5.0
-> -kernel version: 3.20
 > +PTS version: 6.1
-> +Tested: 04-May-2015
+> +Tested: 20-May-2015
 > +Android version: 5.1
-> +kernel version: 4.1
 > 
 >  Results:
 >  PASS	test passed
-> @@ -24,12 +24,7 @@ TC_JW_BV_02_C		PASS	btmgmt advertising on
->  TC_JW_BV_05_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
->  TC_JW_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
->  TC_JW_BI_02_C		PASS	btmgmt pairable on
-> -TC_JW_BI_03_C		PASS	bluetoothd is NOT running
-> -				btmgmt power on
-> -				btmgmt le on
-> -				btmgmt connectable on
-> -				btmgmt pairable on
-> -				btmgmt discov on
-> +TC_JW_BI_03_C		PASS	btmgmt pairable on
->  				btmgmt advertising on
->  TC_JW_BI_04_C		PASS	btmgmt pairable off
->  				btmgmg pair -c 0x03 -t 0x01 <addr>
-> @@ -38,8 +33,6 @@ TC_PKE_BV_01_C		PASS	btmgmt pairable off
->  				Note: provide passkey to PTS
->  TC_PKE_BV_02_C		PASS	btmgmt pairable off
->  				btmgmt io-cap 0x04
-> -				btmgmt advertising on
-> -				btmgmt monitor
->  				Note: provide passkey
->  TC_PKE_BV_04_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
->  TC_PKE_BV_05_C		PASS	btmgmt io-cap 0x04
-> @@ -50,7 +43,6 @@ TC_PKE_BI_02_C		PASS	btmgmt pair -c 0x04 -t 0x01 
-<addr>
->  				Note: provide passkey
->  TC_PKE_BI_03_C		PASS	btmgmt io-cap 0x04
->  				btmgmt advertising on
-> -				btmgmt monitor
->  				Note: Enter invalid passkey in PTS
->  TC_OOB_BV_01_C		N/A
->  TC_OOB_BV_02_C		N/A
-> @@ -59,12 +51,10 @@ TC_OOB_BV_04_C		N/A
->  TC_OOB_BV_05_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
->  				Note: Enter valid passkey in PTS
->  TC_OOB_BV_06_C		PASS	btmgmt advertising on
-> -				btmgmt monitor
->  				Note: Enter valid passkey in PTS
->  TC_OOB_BV_07_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
->  TC_OOB_BV_08_C		PASS	btmgmt advertising on
-> -				btmgmt monitor
-> -				Note: Accept pairing in btmgmt monitor
-> +				Note: Accept pairing in btmgmt
->  TC_OOB_BV_09_C		N/A
->  TC_OOB_BV_10_C		N/A
->  TC_OOB_BI_01_C		N/A
-> @@ -72,10 +62,8 @@ TC_OOB_BI_02_C		N/A
->  TC_EKS_BV_01_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
->  				Note: Enter valid passkey in PTS
->  TC_EKS_BV_02_C		PASS	btmgmt advertising on
-> -				btmgmt monitor
-> -				Note: Accept pairing in btmgmt monitor
-> -TC_EKS_BI_01_C		PASS	btmgmt io-cap 0x03
-> -				btmgmt pair -c 0x03 -t 0x01 <addr>
-> +				Note: Accept pairing in btmgmt
-> +TC_EKS_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
->  TC_EKS_BI_02_C		PASS	btmgmt advertising on
->  TC_SIGN_BV_01_C		INC	PTS issue #12305
->  TC_SIGN_BV_03_C		PASS	haltest:
-> @@ -108,9 +96,7 @@ TC_KDU_BV_05_C		PASS	PTS issue #12302
->  TC_KDU_BV_06_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
->  TC_KDU_BV_07_C		PASS	btmgmt pairable on
->  TC_SIP_BV_01_C		PASS	btmgmt advertising on
-> -				btmgmt pair -c 0x03 -t 0x01 <addr>
-> -TC_SIP_BV_02_C		PASS	btmgmt advertising off
-> -				l2test -n -J4 -V le_public <addr>
-> -TC_SIE_BV_01_C		PASS	btmgmt advertising on
-> -				btmgmt pair -c 0x03 -t 0x01 <addr>
-> +TC_SIP_BV_02_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
-> +TC_SIE_BV_01_C		PASS	btmgmt io-cap 0x03
-> +				btmgmt advertising on
+> @@ -19,7 +19,7 @@ For full tests conformance, "Touch sounds" on IUT should
+> be disabled Test Name				Result	Notes
 >  ---------------------------------------------------------------------------
-> ----
+> ---- TC_AG_PSE_HFPB_CTH_SD_BV_01_I		PASS
+> -TC_AG_SRC_HFAV_ACT_SD_BV_01_I		PASS	PTS issue #13138
+> +TC_AG_SRC_HFAV_ACT_SD_BV_01_I		PASS
+>  TC_AG_SRC_HFAV_ACT_SD_BV_02_I		PASS
+>  TC_AG_SRC_HFAV_ACT_SD_BV_03_I		PASS
+>  TC_AG_SRC_HFAV_CLH_SD_BV_01_I		PASS
+> @@ -27,7 +27,7 @@ TC_AG_SRC_HFAV_CLH_SD_BV_02_I		N/A
+>  TC_AG_SRC_HFAV_CLH_SD_BV_03_I		PASS
+>  TC_AG_SRC_HFAV_CLH_SD_BV_04_I		PASS
+>  TC_AG_SRC_HFAV_CLH_SD_BV_05_I		PASS
+> -TC_AG_SRC_HFAV_CLH_SD_BV_06_I		PASS	PTS issue #13138
+> +TC_AG_SRC_HFAV_CLH_SD_BV_06_I		PASS	PTS issue #13466
+>  TC_AVP_CTH_SD_BI_01_I			PASS
+>  TC_AVP_CTH_SD_BI_02_I			PASS
+>  TC_HF_SNK_HFAV_ACT_SD_BV_01_I		N/A
 
 Applied, thanks.
 
