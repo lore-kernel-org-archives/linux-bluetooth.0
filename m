@@ -1,139 +1,190 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <555EDCA9.4030007@broadcom.com>
-Date: Fri, 22 May 2015 09:37:13 +0200
-From: Arend van Spriel <arend@broadcom.com>
-MIME-Version: 1.0
-To: Laura Abbott <labbott@redhat.com>
-CC: Alan Stern <stern@rowland.harvard.edu>, Marcel Holtmann
-	<marcel@holtmann.org>, Takashi Iwai <tiwai@suse.de>, Oliver Neukum
-	<oneukum@suse.com>, Ming Lei <ming.lei@canonical.com>, "David S. Miller"
-	<davem@davemloft.net>, Laura Abbott <labbott@fedoraproject.org>, "Johan
- Hedberg" <johan.hedberg@gmail.com>, "Rafael J. Wysocki"
-	<rafael.j.wysocki@intel.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>, Linux Kernel Mailing List
-	<linux-kernel@vger.kernel.org>, USB list <linux-usb@vger.kernel.org>, netdev
-	<netdev@vger.kernel.org>
-Subject: Re: [RESEND][PATCH] Bluetooth: Make request workqueue freezable
-References: <Pine.LNX.4.44L0.1505211112310.1397-100000@iolanthe.rowland.org> <555E767B.2040808@redhat.com>
-In-Reply-To: <555E767B.2040808@redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCHv2] android/pts: Update MPS test results
+Date: Fri, 22 May 2015 08:39:39 +0200
+Message-Id: <1432276779-15632-1-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1432135835-9270-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1432135835-9270-1-git-send-email-mariusz.skamra@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 05/22/15 02:21, Laura Abbott wrote:
-> On 05/21/2015 08:26 AM, Alan Stern wrote:
->> On Thu, 21 May 2015, Marcel Holtmann wrote:
->>
->>> Hi Alan,
->>>
->>>>> Then avoiding the failed firmware is no solution, indeed.
->>>>> If it's a new probe, it should be never executed during resume.
->>>>
->>>> Can you expand this comment? What's wrong with probing during resume?
->>>>
->>>> The USB stack does carry out probes during resume under certain
->>>> circumstances. A driver lacking a reset_resume callback is one of
->>>> those circumstances.
->>>
->>> in case the platform kills the power to the USB lines, we can never
->>> do anything about this. I do not want to hack around this in the
->>> driver.
->>>
->>> What are the cases where we should implement reset_resume and would
->>> it really help here. Since the btusb.ko driver implements
->>> suspend/resume support, would reset_resume ever be called?
->>
->> One of those cases is exactly what you have been talking about: when
->> the platform kills power to the USB lines during suspend. The driver's
->> reset_resume routine will be called during resume, as opposed to the
->> probe routine being called. Therefore the driver will be able to tell
->> that this is not a new device instance.
->>
->> The other cases are less likely to occur: a device is unable to resume
->> normally and requires a reset before it will start working again, or
->> something else goes wrong along those lines.
->>
->>> However I get the feeling someone needs to go back and see if the
->>> device is the same one and just gets probed again or if it is a new
->>> one from the USB host stack perspective.
->>
->> That can be done easily enough by enabling usbcore debugging before
->> carrying out the system suspend:
->>
->> echo 'module usbcore =p' >/debug/dynamic_debug/control
->>
->> The debugging information in the kernel log will tell just what
->> happened.
->>
->>
->
-> Playing around in my test setup as a baseline
->
-> [ 41.991035] usb usb1-port11: not reset yet, waiting 50ms
-> [ 42.092902] usb 1-11: reset full-speed USB device number 4 using xhci_hcd
-> [ 42.143575] usb usb1-port11: not reset yet, waiting 50ms
-> [ 42.257822] btusb 1-11:1.0: no reset_resume for driver btusb?
-> [ 42.257823] btusb 1-11:1.1: no reset_resume for driver btusb?
-> [ 42.257825] btusb 1-11:1.0: forced unbind
-> [ 42.258305] kworker/dying (826) used greatest stack depth: 10680 bytes
-> left
-> [ 42.331342] usb 1-9.2: reset full-speed USB device number 7 using xhci_hcd
-> [ 42.416631] usb 1-9.2: ep0 maxpacket = 8
-> [ 42.681288] usb 1-9.1: reset low-speed USB device number 5 using xhci_hcd
-> [ 42.968138] usb 1-9.1: ep 0x81 - rounding interval to 64 microframes,
-> ep desc says 80 microframes
-> [ 42.968157] usb 1-9.1: ep 0x82 - rounding interval to 64 microframes,
-> ep desc says 80 microframes
-> [ 43.036290] usb 1-9.4: reset high-speed USB device number 8 using xhci_hcd
-> [ 43.123126] hub 1-9.4:1.0: hub_reset_resume
-> [ 43.123581] hub 1-9.4:1.0: enabling power on all ports
-> [ 43.224853] PM: resume of devices complete after 2456.587 msecs
-> [ 43.225038] btusb 1-11:1.0: usb_probe_interface
-> [ 43.225040] btusb 1-11:1.0: usb_probe_interface - got id
-> [ 43.225802] ------------[ cut here ]------------
-> [ 43.225807] WARNING: CPU: 7 PID: 2844 at
-> drivers/base/firmware_class.c:1118 _request_firmware+0x5ee/0x890()
->
->
-> so it is trying to call the reset resume. If I try a 'dummy reset resume'
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index a7bdac0..cda8137 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3401,6 +3401,7 @@ static struct usb_driver btusb_driver = {
-> #ifdef CONFIG_PM
-> .suspend = btusb_suspend,
-> .resume = btusb_resume,
-> + .reset_resume = btusb_resume,
-> #endif
-> .id_table = btusb_table,
-> .supports_autosuspend = 1,
->
->
-> I no longer see the warning which means that probe is no longer being
-> called.
->
-> Marcel, does implementing a proper reset_resume callback seem like the
-> right
-> approach or do you need more information?
+PTS 6.1 and Android 5.1
+---
+ android/pics-mps.txt  | 82 +++++++++++++++++++++++++--------------------------
+ android/pixit-mps.txt |  2 +-
+ android/pts-mps.txt   | 10 +++----
+ 3 files changed, 46 insertions(+), 48 deletions(-)
 
-Hi, Laura
+diff --git a/android/pics-mps.txt b/android/pics-mps.txt
+index 29b82a9..5aad7c1 100644
+--- a/android/pics-mps.txt
++++ b/android/pics-mps.txt
+@@ -1,6 +1,6 @@
+ MPS PICS for the PTS tool.
+ 
+-PTS version: 6.0
++PTS version: 6.1
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+@@ -219,36 +219,34 @@ TSPC_MPS_6_37	True (*)	A2DP-SRC_PBAP-Server Implementation Phonebook
+ TSPC_MPS_6_38	False		A2DP-SNK and PBAP-Client Implementation
+ 				Phonebook Download during Audio Streaming (C.12)
+ TSPC_MPS_6_39	True (*)	HFP-AG and PBAP-Server Implementation PBAP and
+-				HFP Connection Behavior (C.13)
+--------------------------------------------------------------------------------
+-C.1: Mandatory if 2/1 (A2DP Source role), 2/4 (AVRCP Target role) and 2/7
+-	(HFP Audio Gateway role) are supported, otherwise Excluded.
+-C.2: Mandatory if 2/2 (A2DP Sink role), 2/3 (AVRCP Controller role) and 2/8
+-	(HFP Hands-Free role) are supported, otherwise Excluded.
+-C.3: Mandatory if 2/5 (DUN Gateway role) and 2/7 (HFP Audio Gateway role)
+-	are supported and 3/9 ( Ability to support parallel data and call
+-	operation), otherwise Excluded.
+-C.4: Mandatory if 2/6 (DUN Data Terminal role) and 2/8 (HFP Hands-Free role)
+-	are supported, otherwise Excluded.
+-C.5: Mandatory if 2/1 (A2DP Source role) and 2/5 (DUN Gateway role) are
+-	supported, otherwise Excluded.
+-C.6: Mandatory if 2/2 (A2DP Sink role) and 2/6 (DUN Data Terminal role) are
+-	supported, otherwise Excluded.
+-C.7: Mandatory if 2/7 (HFP Audio Gateway role) and 2/9 (PAN Network Access Point
+-	role) and 3/11 (Ability to support parallel data and call operation) are
+-	supported, otherwise Excluded.
+-C.8: Mandatory if 2/8 (HFP Hands-Free role) and 2/11 (PAN User role) are
+-	supported and 3/11, otherwise Excluded.
+-C.9: Mandatory if 2/1 (A2DP Source role) and 2/9 (PAN Network Access Point role)
+-	are supported, otherwise Excluded.
+-C.10: Mandatory if 2/2 (A2DP Sink role) and 2/11 (PAN User role) are supported,
++				HFP Connection Behaviour (C.13)
++-------------------------------------------------------------------------------
++C.1: Mandatory if TSPC_MPS_2_1, TSPC_MPS_2_4 and TSPC_MPS_2_7 are supported,
+ 	otherwise Excluded.
+-C.11: Mandatory if 2/1 (A2DP Source role) and 2/13 (PBAP PSE role) are
+-	supported, otherwise Excluded.
+-C.12: Mandatory if 2/2 (A2DP Sink role) and 2/12 (PBAP PCE role) are supported,
++C.2: Mandatory if TSPC_MPS_2_2, TSPC_MPS_2_3 and TSPC_MPS_2_8 are supported,
++	otherwise Excluded.
++C.3: Mandatory if TSPC_MPS_2_5 and TSPC_MPS_2_7 are supported and TSPC_MPS_3_9,
+ 	otherwise Excluded.
+-C.13: Mandatory if 2/7 (HFP Audio Gateway role) and 2/13 (PBAP PSE role) are
++C.4: Mandatory if TSPC_MPS_2_6 and TSPC_MPS_2_8 are supported, otherwise
++	Excluded.
++C.5: Mandatory if TSPC_MPS_2_1 and TSPC_MPS_2_5 are supported, otherwise
++	Excluded.
++C.6: Mandatory if TSPC_MPS_2_2 and TSPC_MPS_2_6 are supported, otherwise
++	Excluded.
++C.7: Mandatory if TSPC_MPS_2_7 and TSPC_MPS_2_9 and TSPC_MPS_3_11 are
+ 	supported, otherwise Excluded.
++C.8: Mandatory if TSPC_MPS_2_8 and TSPC_MPS_2_11 are supported and
++	TSPC_MPS_3_11, otherwise Excluded.
++C.9: Mandatory if TSPC_MPS_2_1 and TSPC_MPS_2_9 are supported, otherwise
++	Excluded.
++C.10: Mandatory if TSPC_MPS_2_2 and TSPC_MPS_2_11 are supported, otherwise
++	Excluded.
++C.11: Mandatory if TSPC_MPS_2_1 and TSPC_MPS_2_13 are supported, otherwise
++	Excluded.
++C.12: Mandatory if TSPC_MPS_2_2 and TSPC_MPS_2_12 are supported, otherwise
++	Excluded.
++C.13: Mandatory if TSPC_MPS_2_7 and TSPC_MPS_2_13 are supported, otherwise
++	Excluded.
+ -------------------------------------------------------------------------------
+ 
+ 
+@@ -293,12 +291,12 @@ TSPC_MPS_7_14	False		A2DP-SNK and AVRCP-CT and DUN-DT Implementation
+ 				Start Packet Data Communication during Audio
+ 				Streaming (C.3)
+ -------------------------------------------------------------------------------
+-C.1: Mandatory if 2/2 (A2DP Sink role), 2/3 (AVRCP Controller role) and 2/8
+-	(HFP Hands-Free role) are supported, otherwise Excluded.
+-C.2: Mandatory if 2/1 (A2DP Source role) and 2/4 (AVRCP Target role) are
+-	supported, otherwise Excluded.
+-C.3: Mandatory if 2/2 (A2DP Sink role), 2/3 (AVRCP Controller role) and 2/6
+-	(DUN Data Terminal role) supported, otherwise Excluded.
++C.1: Mandatory if TSPC_MPS_2_2, TSPC_MPS_2_3 and TSPC_MPS_2_8 are supported,
++	otherwise Excluded.
++C.2: Mandatory if TSPC_MPS_2_1 and TSPC_MPS_2_4 are supported, otherwise
++	Excluded.
++C.3: Mandatory if TSPC_MPS_2_2, TSPC_MPS_2_3 and 2/6TSPC_MPS_2_6 supported,
++	otherwise Excluded.
+ -------------------------------------------------------------------------------
+ 
+ 
+@@ -307,12 +305,12 @@ C.3: Mandatory if 2/2 (A2DP Sink role), 2/3 (AVRCP Controller role) and 2/6
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_MPS_8_1	True (*)	AVP Suspension (C.1)
+-TSPC_MPS_8_2	True (*)	Profile (Dis-)Connection behavior (C.2)
++TSPC_MPS_8_2	True (*)	Profile (Dis-)Connection behaviour (C.2)
+ -------------------------------------------------------------------------------
+-C.1: Mandatory if 1/1 (A2DP 1.2 or later) and 1/2 (AVRCP 1.3 or later) are
+-	supported, otherwise Excluded.
+-C.2: Mandatory if 1/1 (A2DP 1.2 or later), 1/2 (AVRCP 1.3 or later) and 1/4 (HFP
+-	1.5 or later) are supported, otherwise Excluded.
++C.1: Mandatory if TSPC_MPS_1_1 and TSPC_MPS_1_2 are supported, otherwise
++	Excluded.
++C.2: Mandatory if TSPC_MPS_1_1, TSPC_MPS_1_2 and TSPC_MPS_1_4 are supported,
++	otherwise Excluded.
+ -------------------------------------------------------------------------------
+ 
+ 
+@@ -333,7 +331,7 @@ TSPC_MPS_10_1	True		SDP Record (M)
+ TSPC_MPS_10_2	True (*)	Media Stream Suspension (C.1)
+ TSPC_MPS_10_3	True (*)	Sniff Mode during Streaming (C.2)
+ -------------------------------------------------------------------------------
+-C.1: Mandatory if 1/1 (A2DP1.2 or later) and 1/4 (HFP 1.5 or later) are
+-	supported, otherwise Excluded.
+-C.2: Mandatory if 1/1 (A2DP 1.2 or later) is supported, otherwise Excluded.
++C.1: Mandatory if TSPC_MPS_1_1 and TSPC_MPS_1_4 are supported, otherwise
++	Excluded.
++C.2: Mandatory if TSPC_MPS_1_1 is supported, otherwise Excluded.
+ -------------------------------------------------------------------------------
+diff --git a/android/pixit-mps.txt b/android/pixit-mps.txt
+index 86511bd..116a8c0 100644
+--- a/android/pixit-mps.txt
++++ b/android/pixit-mps.txt
+@@ -1,6 +1,6 @@
+ MPS PIXIT for the PTS tool.
+ 
+-PTS version: 6.0
++PTS version: 6.1
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-mps.txt b/android/pts-mps.txt
+index b1096e6..87a0e45 100644
+--- a/android/pts-mps.txt
++++ b/android/pts-mps.txt
+@@ -1,8 +1,8 @@
+ PTS test results for MPS
+ 
+-PTS version: 6.0
+-Tested: 11-December-2014
+-Android version: 5.0
++PTS version: 6.1
++Tested: 20-May-2015
++Android version: 5.1
+ 
+ Results:
+ PASS	test passed
+@@ -19,7 +19,7 @@ For full tests conformance, "Touch sounds" on IUT should be disabled
+ Test Name				Result	Notes
+ -------------------------------------------------------------------------------
+ TC_AG_PSE_HFPB_CTH_SD_BV_01_I		PASS
+-TC_AG_SRC_HFAV_ACT_SD_BV_01_I		PASS	PTS issue #13138
++TC_AG_SRC_HFAV_ACT_SD_BV_01_I		PASS
+ TC_AG_SRC_HFAV_ACT_SD_BV_02_I		PASS
+ TC_AG_SRC_HFAV_ACT_SD_BV_03_I		PASS
+ TC_AG_SRC_HFAV_CLH_SD_BV_01_I		PASS
+@@ -27,7 +27,7 @@ TC_AG_SRC_HFAV_CLH_SD_BV_02_I		N/A
+ TC_AG_SRC_HFAV_CLH_SD_BV_03_I		PASS
+ TC_AG_SRC_HFAV_CLH_SD_BV_04_I		PASS
+ TC_AG_SRC_HFAV_CLH_SD_BV_05_I		PASS
+-TC_AG_SRC_HFAV_CLH_SD_BV_06_I		PASS	PTS issue #13138
++TC_AG_SRC_HFAV_CLH_SD_BV_06_I		PASS	PTS issue #13466
+ TC_AVP_CTH_SD_BI_01_I			PASS
+ TC_AVP_CTH_SD_BI_02_I			PASS
+ TC_HF_SNK_HFAV_ACT_SD_BV_01_I		N/A
+-- 
+1.9.1
 
-I believe that some devices supported by btusb would need to do a 
-request_firmware() in the reset_resume() callback and thus end up with 
-the same issue. btusb could store the firmware obtained during the probe 
-in it driver private structure and use that in reset_resume() callback, 
-but it means the memory for the firmware blobs will not be released 
-until the driver is unloaded.
-
-Regards,
-Arend
-
-> Thanks,
-> Laura
-> --
-> To unsubscribe from this list: send the line "unsubscribe
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at http://vger.kernel.org/majordomo-info.html
