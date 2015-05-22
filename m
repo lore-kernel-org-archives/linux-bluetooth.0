@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Mariusz Skamra <mariusz.skamra@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update AVRCP test results
-Date: Fri, 22 May 2015 15:04:39 +0200
-Message-ID: <1600355.trvS0AgB4z@leonov>
-In-Reply-To: <1432222012-17792-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1432222012-17792-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: Re: [PATCH] android/pts: Update A2DP test results
+Date: Fri, 22 May 2015 15:04:21 +0200
+Message-ID: <2907080.iFFE4HL3s5@leonov>
+In-Reply-To: <1432207750-10157-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1432207750-10157-1-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,209 +14,129 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mariusz,
 
-On Thursday 21 of May 2015 17:26:52 Mariusz Skamra wrote:
+On Thursday 21 of May 2015 13:29:10 Mariusz Skamra wrote:
 > PTS 6.1 and Android 5.1
 > ---
->  android/pics-avrcp.txt  |  4 +--
->  android/pixit-avrcp.txt |  2 +-
->  android/pts-avrcp.txt   | 68
-> +++++++++++++++++++++++++++++++++++++++---------- 3 files changed, 57
-> insertions(+), 17 deletions(-)
+>  android/pics-a2dp.txt  | 10 +++++-----
+>  android/pixit-a2dp.txt |  2 +-
+>  android/pts-a2dp.txt   | 31 +++++++++++++++++++------------
+>  3 files changed, 25 insertions(+), 18 deletions(-)
 > 
-> diff --git a/android/pics-avrcp.txt b/android/pics-avrcp.txt
-> index a25579e..7bd68fa 100644
-> --- a/android/pics-avrcp.txt
-> +++ b/android/pics-avrcp.txt
+> diff --git a/android/pics-a2dp.txt b/android/pics-a2dp.txt
+> index 1328e7e..2e87104 100644
+> --- a/android/pics-a2dp.txt
+> +++ b/android/pics-a2dp.txt
 > @@ -1,6 +1,6 @@
->  AVRCP PICS for the PTS tool.
+>  A2DP PICS for the PTS tool.
 > 
 > -PTS version: 6.0
 > +PTS version: 6.1
 > 
 >  * - different than PTS defaults
 >  # - not yet implemented/supported
-> @@ -12,7 +12,7 @@ O - optional
+> @@ -76,8 +76,8 @@ TSPC_A2DP_3_6	False		SRC: MPEG-2,4 AAC encoder 
+(C.1)
+>  TSPC_A2DP_3_7	False		SRC: ATRAC family decoder (C.1)
+>  TSPC_A2DP_3_8	False		SRC: ATRAC family encoder (C.1)
 >  ---------------------------------------------------------------------------
-> ---- Parameter Name    Selected	Description
+> ---- -C.1: At least one of the implementations shall be supported if 12/2
+> (Optional -	codec) is supported, else excluded.
+> +C.1: At least one of the implementations shall be supported if 3/2
+> +	is supported, else excluded.
 >  ---------------------------------------------------------------------------
-> ---- -SPC_AVRCP_1_1     True (*)	Role: Controller (CT) (C.1)
-> +TSPC_AVRCP_1_1    True (*)	Role: Controller (CT) (C.1)
->  TSPC_AVRCP_1_2    True (*)	Role: Target (TG) (C.1)
+> ----
+> 
+> 
+> @@ -138,8 +138,8 @@ TSPC_A2DP_5_3	False		SNK: MPEG-1,2 Audio (C.1)
+>  TSPC_A2DP_5_4	False		SNK: MPEG-2,4 AAC (C.1)
+>  TSPC_A2DP_5_5	False		SNK: ATRAC family (C.1)
 >  ---------------------------------------------------------------------------
-> ---- C.1: Mandatory to support at least one of the defined roles.
-> diff --git a/android/pixit-avrcp.txt b/android/pixit-avrcp.txt
-> index c429828..9d5b87e 100644
-> --- a/android/pixit-avrcp.txt
-> +++ b/android/pixit-avrcp.txt
+> ---- -C.1: At least one codec shall be supported if Table 13/2 (Optional
+> codec -	decoder) is supported, otherwise excluded.
+> +C.1: At least one codec shall be supported if Table 5/2 is supported,
+> otherwise +	excluded.
+>  ---------------------------------------------------------------------------
+> ----
+> 
+> 
+> diff --git a/android/pixit-a2dp.txt b/android/pixit-a2dp.txt
+> index b6ef742..c7f9762 100644
+> --- a/android/pixit-a2dp.txt
+> +++ b/android/pixit-a2dp.txt
 > @@ -1,6 +1,6 @@
->  AVRCP PIXIT for the PTS tool.
+>  A2DP PIXIT for the PTS tool.
 > 
 > -PTS version: 6.0
 > +PTS version: 6.1
 > 
 >  * - different than PTS defaults
 >  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-avrcp.txt b/android/pts-avrcp.txt
-> index 955b37e..b7e1386 100644
-> --- a/android/pts-avrcp.txt
-> +++ b/android/pts-avrcp.txt
+> diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
+> index 500c631..79bd348 100644
+> --- a/android/pts-a2dp.txt
+> +++ b/android/pts-a2dp.txt
 > @@ -1,8 +1,8 @@
->  PTS test results for AVRCP
+>  PTS test results for A2DP
 > 
 > -PTS version: 6.0
-> -Tested: 21-January-2015
+> -Tested: 14-January-2015
 > -Android version: 5.0
 > +PTS version: 6.1
-> +Tested: 21-May-2015
+> +Tested 21-May-2015
 > +Android version: 5.1
 > 
 >  Results:
 >  PASS	test passed
-> @@ -16,6 +16,19 @@ Test Name		Result	Notes
+> @@ -15,24 +15,29 @@ N/A	test is disabled due to PICS setup
+>  Test Name		Result	Notes
 >  ---------------------------------------------------------------------------
-> ---- TC_CT_BGN_BV_01_I	N/A
->  TC_CT_BGN_BV_02_I	N/A
-> +TC_CT_CA_BV_01_C	N/A
-> +TC_CT_CA_BV_03_C	N/A
-> +TC_CT_CA_BV_05_C	N/A
-> +TC_CT_CA_BV_07_C	N/A
-> +TC_CT_CA_BV_09_C	N/A
-> +TC_CT_CA_BV_11_C	N/A
-> +TC_CT_CA_BV_13_C	N/A
-> +TC_CT_CA_BV_15_C	N/A
-> +TC_CT_CA_BV_17_C	N/A
-> +TC_CT_CA_BV_18_C	N/A
-> +TC_CT_CA_BV_01_I	N/A
-> +TC_CT_CA_BV_02_I	N/A
-> +TC_CT_CA_BV_03_I	N/A
->  TC_CT_CEC_BV_01_I	N/A
->  TC_CT_CEC_BV_02_I	N/A
->  TC_CT_CFG_BV_01_C	N/A
-> @@ -26,41 +39,44 @@ TC_CT_CRC_BV_02_I	N/A
->  TC_CT_ICC_BV_01_I	N/A
->  TC_CT_ICC_BV_02_I	N/A
->  TC_CT_MCN_CB_BV_01_C	N/A
-> +TC_CT_MCN_CB_BV_04_C	N/A
-> +TC_CT_MCN_CB_BV_07_C	N/A
-> +TC_CT_MCN_CB_BV_12_C	N/A
->  TC_CT_MCN_CB_BV_01_I	N/A
->  TC_CT_MCN_CB_BV_02_I	N/A
->  TC_CT_MCN_CB_BV_03_I	N/A
-> -TC_CT_MCN_CB_BV_04_C	N/A
->  TC_CT_MCN_CB_BV_04_I	N/A
->  TC_CT_MCN_CB_BV_05_I	N/A
->  TC_CT_MCN_CB_BV_06_I	N/A
-> -TC_CT_MCN_CB_BV_07_C	N/A
-> -TC_CT_MCN_CB_BV_07_I	N/A
->  TC_CT_MCN_NP_BV_01_C	N/A
-> +TC_CT_MCN_NP_BV_03_C	N/A
-> +TC_CT_MCN_NP_BV_05_C	N/A
-> +TC_CT_MCN_NP_BV_08_C	N/A
-> +TC_CT_MCN_NP_BV_10_C	N/A
->  TC_CT_MCN_NP_BV_01_I	N/A
->  TC_CT_MCN_NP_BV_02_I	N/A
-> -TC_CT_MCN_NP_BV_03_C	N/A
->  TC_CT_MCN_NP_BV_03_I	N/A
->  TC_CT_MCN_NP_BV_04_I	N/A
-> -TC_CT_MCN_NP_BV_05_C	N/A
->  TC_CT_MCN_NP_BV_05_I	N/A
->  TC_CT_MCN_NP_BV_06_I	N/A
->  TC_CT_MCN_NP_BV_07_I	N/A
-> -TC_CT_MCN_NP_BV_08_C	N/A
->  TC_CT_MCN_SRC_BV_01_C	N/A
-> +TC_CT_MCN_SRC_BV_03_C	N/A
-> +TC_CT_MCN_SRC_BV_05_C	N/A
-> +TC_CT_MCN_SRC_BV_07_C	N/A
->  TC_CT_MCN_SRC_BV_01_I	N/A
->  TC_CT_MCN_SRC_BV_02_I	N/A
-> -TC_CT_MCN_SRC_BV_03_C	N/A
->  TC_CT_MCN_SRC_BV_03_I	N/A
->  TC_CT_MCN_SRC_BV_04_I	N/A
-> -TC_CT_MCN_SRC_BV_05_C	N/A
->  TC_CT_MDI_BV_01_C	N/A
->  TC_CT_MDI_BV_03_C	N/A
->  TC_CT_MPS_BV_01_C	N/A
-> +TC_CT_MPS_BV_03_C	N/A
-> +TC_CT_MPS_BV_08_C	N/A
-> +TC_CT_MPS_BV_11_C	N/A
->  TC_CT_MPS_BV_01_I	N/A
->  TC_CT_MPS_BV_02_I	N/A
-> -TC_CT_MPS_BV_03_C	N/A
->  TC_CT_MPS_BV_03_I	N/A
-> -TC_CT_MPS_BV_08_C	N/A
->  TC_CT_NFY_BV_01_C	N/A
->  TC_CT_PAS_BV_01_C	N/A
->  TC_CT_PAS_BV_03_C	N/A
-> @@ -97,6 +113,27 @@ Test Name		Result	Notes
+> ---- TC_SRC_CC_BV_09_I	PASS	Start streaming
+> -TC_SRC_CC_BV_10_I	PASS
+> -TC_SRC_REL_BV_01_I	PASS	Connect to PTS from IUT. When requested
+> -				disconnect from IUT
+> -TC_SRC_REL_BV_02_I	PASS
+> -TC_SRC_SET_BV_01_I	PASS	Connect to PTS (open a2dp)
+> +TC_SRC_CC_BV_10_I	PASS	Start streaming
+> +TC_SRC_REL_BV_01_I	PASS	When requested disconnect from IUT
+> +TC_SRC_REL_BV_02_I	PASS	Start streaming
+> +TC_SRC_SET_BV_01_I	PASS
+>  TC_SRC_SET_BV_02_I	PASS
+>  TC_SRC_SET_BV_03_I	PASS	Start streaming
+>  TC_SRC_SET_BV_04_I	PASS	Start streaming
+> -TC_SRC_SET_BV_05_I	PASS	IUT must be moved out of range
+> -				JIRA issue BA-314
+> +TC_SRC_SET_BV_05_I	PASS	Start streaming
+> +				IUT must be moved out of range
+> +				Initiate connection
+>  TC_SRC_SET_BV_06_I	PASS	IUT must be moved out of range
+> -TC_SRC_SUS_BV_01_I	PASS	Stop streaming
+> -TC_SRC_SUS_BV_02_I	PASS
+> +				PTS issue#13469
+> +				To pass set TSPX_no_avrcp to TRUE
+> +TC_SRC_SUS_BV_01_I	PASS	Start streaming
+> +				Stop streaming
+> +				Start streaming
+> +TC_SRC_SUS_BV_02_I	PASS	Start streaming
+>  TC_SRC_SDP_BV_01_I	PASS
+>  TC_SRC_AS_BV_01_I	PASS	Requires checking if the output on the IUT is
+>  				correct
+>  TC_SRC_AS_BV_02_I	N/A
+>  TC_SRC_AS_BV_03_I	N/A
+> +TC_SRC_SYN_BV_02_I	N/A
 >  ---------------------------------------------------------------------------
-> ---- TC_TG_BGN_BV_01_I	N/A
->  TC_TG_BGN_BV_02_I	N/A
-> +TC_TG_CA_BI_01_C	N/A
-> +TC_TG_CA_BI_02_C	N/A
-> +TC_TG_CA_BI_03_C	N/A
-> +TC_TG_CA_BI_04_C	N/A
-> +TC_TG_CA_BI_05_C	N/A
-> +TC_TG_CA_BI_06_C	N/A
-> +TC_TG_CA_BI_07_C	N/A
-> +TC_TG_CA_BI_08_C	N/A
-> +TC_TG_CA_BI_09_C	N/A
-> +TC_TG_CA_BI_10_C	N/A
-> +TC_TG_CA_BV_02_C	N/A
-> +TC_TG_CA_BV_04_C	N/A
-> +TC_TG_CA_BV_06_C	N/A
-> +TC_TG_CA_BV_08_C	N/A
-> +TC_TG_CA_BV_10_C	N/A
-> +TC_TG_CA_BV_12_C	N/A
-> +TC_TG_CA_BV_14_C	N/A
-> +TC_TG_CA_BV_16_C	N/A
-> +TC_TG_CA_BV_01_I	N/A
-> +TC_TG_CA_BV_02_I	N/A
-> +TC_TG_CA_BV_03_I	N/A
->  TC_TG_CEC_BV_01_I	PASS
->  TC_TG_CEC_BV_02_I	PASS
->  TC_TG_CFG_BI_01_C	PASS
-> @@ -115,7 +152,6 @@ TC_TG_MCN_CB_BI_02_C	N/A
->  TC_TG_MCN_CB_BI_03_C	N/A
->  TC_TG_MCN_CB_BI_04_C	N/A
->  TC_TG_MCN_CB_BI_05_C	N/A
-> -TC_TG_MCN_CB_BV_01_I	N/A
->  TC_TG_MCN_CB_BV_02_C	N/A
->  TC_TG_MCN_CB_BV_02_I	N/A
->  TC_TG_MCN_CB_BV_03_C	N/A
-> @@ -130,6 +166,7 @@ TC_TG_MCN_CB_BV_08_C	N/A
->  TC_TG_MCN_CB_BV_09_C	N/A
->  TC_TG_MCN_CB_BV_10_C	N/A
->  TC_TG_MCN_CB_BV_11_C	N/A
-> +TC_TG_MCN_CB_BV_13_C	N/A
->  TC_TG_MCN_NP_BI_01_C	N/A
->  TC_TG_MCN_NP_BI_02_C	N/A
->  TC_TG_MCN_NP_BV_01_I	N/A
-> @@ -144,6 +181,7 @@ TC_TG_MCN_NP_BV_06_I	N/A
->  TC_TG_MCN_NP_BV_07_C	N/A
->  TC_TG_MCN_NP_BV_07_I	N/A
->  TC_TG_MCN_NP_BV_09_C	N/A
-> +TC_TG_MCN_NP_BV_11_C	N/A
->  TC_TG_MCN_SRC_BV_01_I	N/A
->  TC_TG_MCN_SRC_BV_02_C	N/A
->  TC_TG_MCN_SRC_BV_02_I	N/A
-> @@ -151,6 +189,7 @@ TC_TG_MCN_SRC_BV_03_I	N/A
->  TC_TG_MCN_SRC_BV_04_C	N/A
->  TC_TG_MCN_SRC_BV_04_I	N/A
->  TC_TG_MCN_SRC_BV_06_C	N/A
-> +TC_TG_MCN_SRC_BV_08_C	N/A
->  TC_TG_MDI_BV_02_C	PASS
->  TC_TG_MDI_BV_04_C	PASS
->  TC_TG_MDI_BV_05_C	PASS
-> @@ -166,6 +205,7 @@ TC_TG_MPS_BV_06_C	N/A
->  TC_TG_MPS_BV_07_C	N/A
->  TC_TG_MPS_BV_09_C	N/A
->  TC_TG_MPS_BV_10_C	N/A
-> +TC_TG_MPS_BV_12_C	N/A
->  TC_TG_NFY_BI_01_C	PASS
->  TC_TG_NFY_BV_02_C	PASS	Change track when requested
->  TC_TG_NFY_BV_03_C	N/A
+> ----
+> 
+> 
+> @@ -60,4 +65,6 @@ TC_SNK_SUS_BV_01_I	N/A
+>  TC_SNK_SUS_BV_02_I	N/A
+>  TC_SNK_SDP_BV_02_I	N/A
+>  TC_SNK_AS_BV_01_I	N/A
+> +TC_SNK_AS_BV_02_I	N/A
+> +TC_SNK_SYN_BV_01_I	N/A
+>  ---------------------------------------------------------------------------
+> ----
 
-Patch applied, thanks.
+Applied, thanks.
 
 -- 
 BR
