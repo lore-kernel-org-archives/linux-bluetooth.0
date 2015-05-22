@@ -1,53 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-References: <1432047664-23655-1-git-send-email-gowtham.ab@samsung.com>
-In-reply-to: <1432047664-23655-1-git-send-email-gowtham.ab@samsung.com>
-Subject: RE: [PATCH  0/5] Use tester framework for unit-tests
-Date: Fri, 22 May 2015 15:50:41 +0530
-Message-id: <000801d09478$fa0851e0$ee18f5a0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Subject: [PATCH BlueZ 2/3] shared/ad: Fix service data matching
+Date: Fri, 22 May 2015 13:15:41 +0300
+Message-Id: <1432289742-23389-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1432289742-23389-1-git-send-email-luiz.dentz@gmail.com>
+References: <1432289742-23389-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
-> Sent: Tuesday, May 19, 2015 8:31 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
-> Babu
-> Subject: [PATCH 0/5] Use tester framework for unit-tests
-> 
-> Used the tester framework for unit-tests to produce much better results.
-> 
-> Gowtham Anandha Babu (5):
->   unit/test-ringbuf: Use tester framework
->   unit/test-textfile: Use tester framework
->   unit/test-queue: Use tester framework
->   unit/test-lib: Use tester framework
->   unit/test-uuid: Use tester framework
-> 
->  Makefile.am          |   8 ++--
->  unit/test-lib.c      | 106
-+++++++++++++++++++++++++++++--------------------
-> --
->  unit/test-queue.c    |  55 ++++++++++++++++----------
->  unit/test-ringbuf.c  |  31 ++++++++-------  unit/test-textfile.c |  49
-> +++++++++++-------------
->  unit/test-uuid.c     |  52 ++++++++++++++-----------
->  6 files changed, 170 insertions(+), 131 deletions(-)
-> 
-> --
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+bt_uuid_cmp return 0 if it matches not a true.
+---
+ src/shared/ad.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index 57f0a16..e841d1d 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -576,7 +576,7 @@ static bool service_uuid_match(const void *data, const void *user_data)
+ 	const struct bt_ad_service_data *s = data;
+ 	const bt_uuid_t *uuid = user_data;
+ 
+-	return bt_uuid_cmp(&s->uuid, uuid);
++	return !bt_uuid_cmp(&s->uuid, uuid);
+ }
+ 
+ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
+-- 
+2.1.0
 
