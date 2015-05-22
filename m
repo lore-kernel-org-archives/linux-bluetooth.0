@@ -1,29 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>, Arend Van Spriel
-	<arend@broadcom.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
-Date: Fri, 22 May 2015 13:55:18 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E9425A61F@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1432136770-13328-1-git-send-email-frederic.danis@linux.intel.com>
- <1432136770-13328-5-git-send-email-frederic.danis@linux.intel.com>
- <555DE2BE.8000109@broadcom.com> <555F25F8.4080408@linux.intel.com>
- <555F2EB5.1080103@broadcom.com>,<555F33E8.8010703@linux.intel.com>
-In-Reply-To: <555F33E8.8010703@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <555F33E8.8010703@linux.intel.com>
+Date: Fri, 22 May 2015 15:49:28 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-List-ID: <linux-bluetooth.vger.kernel.org>
-
-Hi Fred,
-
-________________________________________
-From: Frederic Danis [frederic.danis@linux.intel.com]
-Sent: Friday, May 22, 2015 9:49 AM
-To: Arend Van Spriel
-Cc: Marcel Holtmann; linux-bluetooth@vger.kernel.org; Ilya Faenson
+To: Arend van Spriel <arend@broadcom.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ linux-bluetooth@vger.kernel.org, Ilya Faenson <ifaenson@broadcom.com>
 Subject: Re: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
+References: <1432136770-13328-1-git-send-email-frederic.danis@linux.intel.com> <1432136770-13328-5-git-send-email-frederic.danis@linux.intel.com> <555DE2BE.8000109@broadcom.com> <555F25F8.4080408@linux.intel.com> <555F2EB5.1080103@broadcom.com>
+In-Reply-To: <555F2EB5.1080103@broadcom.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+List-ID: <linux-bluetooth.vger.kernel.org>
 
 On 22/05/2015 15:27, Arend van Spriel wrote:
 > On 05/22/15 14:50, Frederic Danis wrote:
@@ -54,14 +41,14 @@ On 22/05/2015 15:27, Arend van Spriel wrote:
 >>>> +
 >>>> BT_DBG("hu %p", hu);
 >>>>
->>>> hu->hdev->set_bdaddr =3D btbcm_set_bdaddr;
+>>>> hu->hdev->set_bdaddr = btbcm_set_bdaddr;
 >>>>
 >>>> - return btbcm_setup_patchram(hu->hdev);
->>>> + err =3D btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name));
+>>>> + err = btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name));
 >>>> + if (err)
 >>>> + return err;
 >>>> +
->>>> + err =3D btbcm_patchram(hu->hdev, fw_name);
+>>>> + err = btbcm_patchram(hu->hdev, fw_name);
 >>>> + /* If there is no firmware (-ENOENT), discard the error and
 >>>> continue */
 >>>
@@ -71,52 +58,52 @@ On 22/05/2015 15:27, Arend van Spriel wrote:
 >>> Regards,
 >>> Arend
 >>>
->>>> + if (err =3D=3D -ENOENT)
+>>>> + if (err == -ENOENT)
 >>>> + return 0;
 >>>> +
 >>>> + if (hu->proto->init_speed)
 >>>> + hci_uart_set_baudrate(hu, hu->proto->init_speed);
 >>>> +
->>>> + err =3D btbcm_finalize(hu->hdev);
+>>>> + err = btbcm_finalize(hu->hdev);
 >>>> +
 >>>> + return err;
 >>>> }
 >>>>
->>>> static const struct h4_recv_pkt bcm_recv_pkts[] =3D {
+>>>> static const struct h4_recv_pkt bcm_recv_pkts[] = {
 >>
 >> You're right, btbcm_patchram() return test does not work as I expected.
 >>
 >> I can change this by performing uart speed change only if it returns no
 >> error.
 >>
->> err =3D btbcm_patchram(hu->hdev, fw_name);
+>> err = btbcm_patchram(hu->hdev, fw_name);
 >> if (!err) {
 >> /* Firmware loading may have reseted controller UART to init speed */
 >> if (hu->proto->init_speed)
 >> hci_uart_set_baudrate(hu, hu->proto->init_speed);
 >> }
 >>
->> err =3D btbcm_finalize(hu->hdev);
+>> err = btbcm_finalize(hu->hdev);
 >>
 >>
 >> Or I can move request_firmware() out of btbcm_patchram() and test it
 >> before calling btbcm_patchram(). This will imply to change
 >> btbcm_patchram() to accept a firmware instead of firmware name.
 >>
->> err =3D request_firmware(&fw, fw_name, &hu->hdev->dev);
+>> err = request_firmware(&fw, fw_name, &hu->hdev->dev);
 >> if (err < 0) {
 >> BT_INFO("%s: BCM: patch %s not found", hu->hdev->name, fw_name);
 >> return 0;
 >> }
 >>
->> err =3D btbcm_patchram(hu->hdev, fw);
+>> err = btbcm_patchram(hu->hdev, fw);
 >> if (!err) {
 >> /* Firmware loading may have reseted controller UART to init speed */
 >> if (hu->proto->init_speed)
 >> hci_uart_set_baudrate(hu, hu->proto->init_speed);
 >> }
 >>
->> err =3D btbcm_finalize(hu->hdev);
+>> err = btbcm_finalize(hu->hdev);
 >>
 >> Arend, Marcel, any advice regarding this ?
 >
@@ -126,14 +113,10 @@ On 22/05/2015 15:27, Arend van Spriel wrote:
 > code from request_firmware is not returned?
 
 If an error is returned it will stop Bluetooth setup.
-So, when request_firmware() returns an error, the Bluetooth controller
-will be used with current firmware and 0 is returned as bcm_setup is
+So, when request_firmware() returns an error, the Bluetooth controller 
+will be used with current firmware and 0 is returned as bcm_setup is 
 completed.
-
-IF: There is generally no "current firmware" if the firmware download fails=
- or not attempted. The device would run out of the ROM then which is not te=
-rribly useful if Bluetooth functionality is needed. Thanks, -Ilya
 
 Regards
 
-Fred=
+Fred
