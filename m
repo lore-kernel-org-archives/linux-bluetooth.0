@@ -1,36 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] shared/ad: Do not lookup service data twice
-Date: Fri, 22 May 2015 13:15:40 +0300
-Message-Id: <1432289742-23389-1-git-send-email-luiz.dentz@gmail.com>
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] unit/sdp: Use update_db_timestamp() of sdpd-service
+Date: Fri, 22 May 2015 15:47:59 +0530
+Message-id: <1432289879-13705-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This remove call to bt_ad_has_service_data inside bt_ad_add_service_data
-since it already does the lookup for existing data before.
+Make update_db_timestamp() as global to use in unit/test-sdp.c
 ---
- src/shared/ad.c | 5 -----
- 1 file changed, 5 deletions(-)
+ src/sdpd-service.c | 2 +-
+ src/sdpd.h         | 1 +
+ unit/test-sdp.c    | 4 ----
+ 3 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index dfc6b9a..57f0a16 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -616,11 +616,6 @@ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index c3ee3eb..df8af94 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -308,7 +308,7 @@ uint32_t sdp_get_time(void)
+  * Set the SDP server DB. Simply a timestamp which is the marker
+  * when the DB was modified.
+  */
+-static void update_db_timestamp(void)
++void update_db_timestamp(void)
+ {
+ 	if (fixed_dbts) {
+ 		sdp_data_t *d = sdp_data_alloc(SDP_UINT32, &fixed_dbts);
+diff --git a/src/sdpd.h b/src/sdpd.h
+index 49cd98a..bcb6b07 100644
+--- a/src/sdpd.h
++++ b/src/sdpd.h
+@@ -45,6 +45,7 @@ typedef struct request {
+ void handle_internal_request(int sk, int mtu, void *data, int len);
+ void handle_request(int sk, uint8_t *data, int len);
  
- 	new_data->len = len;
++void update_db_timestamp(void);
+ void set_fixed_db_timestamp(uint32_t dbts);
  
--	if (bt_ad_has_service_data(ad, new_data)) {
--		uuid_destroy(new_data);
--		return false;
--	}
+ int service_register_req(sdp_req_t *req, sdp_buf_t *rsp);
+diff --git a/unit/test-sdp.c b/unit/test-sdp.c
+index b4ef4d1..fc4b083 100644
+--- a/unit/test-sdp.c
++++ b/unit/test-sdp.c
+@@ -257,10 +257,6 @@ static gboolean client_handler(GIOChannel *channel, GIOCondition cond,
+ 	return TRUE;
+ }
+ 
+-static void update_db_timestamp(void)
+-{
+-}
 -
- 	if (queue_push_tail(ad->service_data, new_data))
- 		return true;
- 
+ static void register_serial_port(void)
+ {
+ 	sdp_list_t *svclass_id, *apseq, *proto[2], *profiles, *root, *aproto;
 -- 
-2.1.0
+1.9.1
 
