@@ -1,61 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/6] audio/a2dp: Move PSM definition to AVDTP header
-Date: Fri, 22 May 2015 19:28:02 +0900
-Message-id: <1432290483-2910-6-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1432290483-2910-1-git-send-email-chanyeol.park@samsung.com>
-References: <1432290483-2910-1-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH RFC 0/6] how to share the code between android/avdtp.* and
+ profile/audio/avdtp.*
+Date: Fri, 22 May 2015 19:27:57 +0900
+Message-id: <1432290483-2910-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves PSM definition to AVDTP header based on
-7e518f2f9a7dfd195ec39825b41a58d8fcc4a849.
----
- profiles/audio/a2dp.c  | 2 --
- profiles/audio/avdtp.c | 2 --
- profiles/audio/avdtp.h | 2 ++
- 3 files changed, 2 insertions(+), 4 deletions(-)
+Hi Luiz,
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 31c5086..0405f58 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -61,8 +61,6 @@
- #define SUSPEND_TIMEOUT 5
- #define RECONFIGURE_TIMEOUT 500
- 
--#define AVDTP_PSM 25
--
- struct a2dp_sep {
- 	struct a2dp_server *server;
- 	struct a2dp_endpoint *endpoint;
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index eed3f88..b26f1ba 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -52,8 +52,6 @@
- #include "sink.h"
- #include "source.h"
- 
--#define AVDTP_PSM 25
--
- #define MAX_SEID 0x3E
- static unsigned int seids;
- 
-diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-index 1b02232..81705fd 100644
---- a/profiles/audio/avdtp.h
-+++ b/profiles/audio/avdtp.h
-@@ -41,6 +41,8 @@ struct avdtp_error {
- 	} err;
- };
- 
-+#define AVDTP_PSM 25
-+
- /* SEP capability categories */
- #define AVDTP_MEDIA_TRANSPORT			0x01
- #define AVDTP_REPORTING				0x02
+I would like to propose and discuss how to share the code between between
+android/avdtp.[ch] and profile/audio/avdtp.[ch]. This mail is written based on
+your proposal in IRC yesterday. I agree we need to consider AVRCP also.
+
+As far as I understand they are very similar except profile/audio dependencies. 
+
+So I consider the below steps.
+
+1. Merge patches in android/avdtp.[ch] into profile/audio/avdtp.[ch]
+*This step would merge the patches made during PTS verification.
+ To discuss I raised some of patches. After discussion I would raise remain
+ patches.
+
+2. Move the same codes between android/ and profile/. to the common files.
+ For example:
+ src/shared/avdtp-common.c
+ src/shared/avdtp-common.h
+ src/shared/avdtp-internal.h
+  -> this file would have local definition in avdtp.c[android, profile/audio]
+
+3. Handle dependencies in profile/audio/avdtp.[ch]
+Actually regarding this part I have no idea until now.
+I guess this could be discussed easily once we complete 1,2 tasks because at
+that time most of the same code are moved into src/shared so it would be easy
+ to see the dependencies are remained.
+
+Chan-yeol Park (6):
+  audio/avdtp: Fix not calling callback if DISCOVER is rejected
+  audio/avdtp: Fix not calling callback if GET_CAPABILITIES is rejected
+  audio/avdtp: Fix not calling callback if GET_CONFIGURATION is rejected
+  audio/avdtp:-Fix-not-removing-start_timer-source
+  audio/a2dp: Move PSM definition to AVDTP header
+  Move avdtp common  code into src/shared
+
+ Makefile.am            |   1 +
+ android/avdtp.c        | 240 +------------------------------------------
+ profiles/audio/a2dp.c  |   2 -
+ profiles/audio/avdtp.c | 272 +++++--------------------------------------------
+ profiles/audio/avdtp.h |   2 +
+ 5 files changed, 28 insertions(+), 489 deletions(-)
+
 -- 
 2.1.4
 
