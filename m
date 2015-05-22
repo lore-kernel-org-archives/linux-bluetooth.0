@@ -1,18 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <555F33E8.8010703@linux.intel.com>
-Date: Fri, 22 May 2015 15:49:28 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
+Message-ID: <555F3042.3000902@broadcom.com>
+Date: Fri, 22 May 2015 15:33:54 +0200
+From: Arend van Spriel <arend@broadcom.com>
 MIME-Version: 1.0
-To: Arend van Spriel <arend@broadcom.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org, Ilya Faenson <ifaenson@broadcom.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+CC: Marcel Holtmann <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>,
+	Ilya Faenson <ifaenson@broadcom.com>
 Subject: Re: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
 References: <1432136770-13328-1-git-send-email-frederic.danis@linux.intel.com> <1432136770-13328-5-git-send-email-frederic.danis@linux.intel.com> <555DE2BE.8000109@broadcom.com> <555F25F8.4080408@linux.intel.com> <555F2EB5.1080103@broadcom.com>
 In-Reply-To: <555F2EB5.1080103@broadcom.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 22/05/2015 15:27, Arend van Spriel wrote:
+On 05/22/15 15:27, Arend van Spriel wrote:
 > On 05/22/15 14:50, Frederic Danis wrote:
 >> Hello Arend,
 >>
@@ -112,11 +112,16 @@ On 22/05/2015 15:27, Arend van Spriel wrote:
 > I would go for option 2. Other question: is there a reason why the error
 > code from request_firmware is not returned?
 
-If an error is returned it will stop Bluetooth setup.
-So, when request_firmware() returns an error, the Bluetooth controller 
-will be used with current firmware and 0 is returned as bcm_setup is 
-completed.
+Forgot to mention but if going for option 2) also move release_firmware 
+call out of btbcm_patchram().
 
-Regards
+Regards,
+Arend
 
-Fred
+> Regards,
+> Arend
+> --
+> To unsubscribe from this list: send the line "unsubscribe
+> linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at http://vger.kernel.org/majordomo-info.html
