@@ -1,39 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Chan-yeol Park <chanyeol.park@samsung.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/6] audio/avdtp:-Fix-not-removing-start_timer-source
-Date: Fri, 22 May 2015 19:28:01 +0900
-Message-id: <1432290483-2910-5-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1432290483-2910-1-git-send-email-chanyeol.park@samsung.com>
-References: <1432290483-2910-1-git-send-email-chanyeol.park@samsung.com>
+Cc: cpgs@samsung.com, 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+References: <1432047664-23655-1-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1432047664-23655-1-git-send-email-gowtham.ab@samsung.com>
+Subject: RE: [PATCH  0/5] Use tester framework for unit-tests
+Date: Fri, 22 May 2015 15:50:41 +0530
+Message-id: <000801d09478$fa0851e0$ee18f5a0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is possible that stream->start_timer can be set on stream_free which
-should then should take care of remove it properly otherwise it can
-trigger which would very likely cause a crash.
+Ping.
 
-Thanks to Hannu Mallat <hannu.mallat@jolla.com> for reporting it.
-
-This patch is made based on 24fc2b639e6fe567633a60dd4d99eca36a0f1323.
----
- profiles/audio/avdtp.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index ac89370..eed3f88 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -714,6 +714,9 @@ static void stream_free(void *data)
- 	if (stream->timer)
- 		g_source_remove(stream->timer);
- 
-+	if (stream->start_timer > 0)
-+		g_source_remove(stream->start_timer);
-+
- 	if (stream->io)
- 		close_stream(stream);
- 
--- 
-2.1.4
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+> Sent: Tuesday, May 19, 2015 8:31 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: bharat.panda@samsung.com; cpgs@samsung.com; Gowtham Anandha
+> Babu
+> Subject: [PATCH 0/5] Use tester framework for unit-tests
+> 
+> Used the tester framework for unit-tests to produce much better results.
+> 
+> Gowtham Anandha Babu (5):
+>   unit/test-ringbuf: Use tester framework
+>   unit/test-textfile: Use tester framework
+>   unit/test-queue: Use tester framework
+>   unit/test-lib: Use tester framework
+>   unit/test-uuid: Use tester framework
+> 
+>  Makefile.am          |   8 ++--
+>  unit/test-lib.c      | 106
++++++++++++++++++++++++++++++--------------------
+> --
+>  unit/test-queue.c    |  55 ++++++++++++++++----------
+>  unit/test-ringbuf.c  |  31 ++++++++-------  unit/test-textfile.c |  49
+> +++++++++++-------------
+>  unit/test-uuid.c     |  52 ++++++++++++++-----------
+>  6 files changed, 170 insertions(+), 131 deletions(-)
+> 
+> --
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
