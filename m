@@ -1,115 +1,256 @@
 Return-Path: <cyrus@holtmann.org>
 From: Ilya Faenson <ifaenson@broadcom.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>,
-	<devicetree-spec@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	Ilya Faenson <ifaenson@broadcom.com>
-Subject: [RFC v4 1/4] Broadcom Bluetooth UART Device Tree bindings
-Date: Fri, 22 May 2015 16:10:17 -0400
-Message-ID: <1432325420-12782-2-git-send-email-ifaenson@broadcom.com>
+CC: <linux-bluetooth@vger.kernel.org>, <devicetree-spec@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, Ilya Faenson <ifaenson@broadcom.com>
+Subject: [RFC v4 3/4] Broadcom Bluetooth protocol UART support
+Date: Fri, 22 May 2015 16:10:19 -0400
+Message-ID: <1432325420-12782-4-git-send-email-ifaenson@broadcom.com>
 In-Reply-To: <1432325420-12782-1-git-send-email-ifaenson@broadcom.com>
 References: <1432325420-12782-1-git-send-email-ifaenson@broadcom.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Device Tree bindings to configure the Broadcom Bluetooth UART device.
 
 Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
 ---
- .../devicetree/bindings/net/bluetooth/btbcm.txt    | 82 ++++++++++++++++++++++
- 1 file changed, 82 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+ drivers/bluetooth/btbcm.c | 155 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 150 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
-new file mode 100644
-index 0000000..968421b
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
-@@ -0,0 +1,82 @@
-+btbcm
-+------
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 4bba866..8b5530d 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -3,6 +3,7 @@
+  *  Bluetooth support for Broadcom devices
+  *
+  *  Copyright (C) 2015  Intel Corporation
++ *  Copyright (C) 2015  Broadcom Corporation
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -23,14 +24,16 @@
+ 
+ #include <linux/module.h>
+ #include <linux/firmware.h>
++#include <linux/tty.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ 
++#include "hci_uart.h"
+ #include "btbcm.h"
+ 
+-#define VERSION "0.1"
++#define VERSION "0.2"
+ 
+ #define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
+ 
+@@ -246,8 +249,10 @@ static struct sk_buff *btbcm_read_usb_product(struct hci_dev *hdev)
+ static const struct {
+ 	u16 subver;
+ 	const char *name;
++	u32 baud_rate;	/* operational baud rate */
+ } bcm_uart_subver_table[] = {
+-	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
++	{ 0x410e, "BCM43341B0", 3000000},                    /* 002.001.014 */
++	{ 0x610c, "BCM4354_003.001.012.0306.0659", 3000000}, /* 003.001.012 */
+ 	{ }
+ };
+ 
+@@ -268,6 +273,127 @@ static const struct {
+ 	{ }
+ };
+ 
++/*
++ * Set the UART into the defaults
++ */
++int btbcm_init_uart(struct hci_uart *hu)
++{
++	struct tty_struct *tty = hu->tty;
++	struct ktermios ktermios;
++	int err, speed;
 +
-+Required properties:
-+
-+	- compatible : must be "brcm,brcm-bt-uart".
-+	- tty : tty device connected to this Bluetooth device.
-+
-+Optional properties:
-+
-+  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an interrupt.
-+
-+  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume device.
-+
-+  - bt-reg-on-gpios : reg-on output GPIO to be used to power device on/off.
-+
-+  - baud-rate-before-config-download : initial Bluetooth device baud rate.
-+    Default: 3000000.
-+
-+  - manual-fc : flow control UART in suspend / resume scenarios.
-+    Default: 0.
-+
-+  - configure-sleep : configure suspend / resume flag.
-+    Default: false.
-+
-+  - configure-audio : configure platform PCM SCO flag.
-+    Default: false.
-+
-+  - PCMClockMode : PCM clock mode. 0-slave, 1-master.
-+    Default: 0.
-+
-+  - PCMFillMethod : PCM fill method. 0 to 3.
-+    Default: 2.
-+
-+  - PCMFillNum : PCM number of fill bits. 0 to 3.
-+    Default: 0.
-+
-+  - PCMFillValue : PCM fill value. 0 to 7.
-+    Default: 3.
-+
-+  - PCMInCallBitclock : PCM interface rate. 0-128Kbps, 1-256Kbps, 2-512Kbps,
-+    3-1024Kbps, 4-2048Kbps.
-+    Default: 0.
-+
-+  - PCMLSBFirst : PCM LSB first. 0 or 1.
-+    Default: 0.
-+
-+  - PCMRightJustify : PCM Justify. 0-left, 1-right.
-+    Default: 0.
-+
-+  - PCMRouting : PCM routing. 0-PCM, 1-SCO over HCI.
-+    Default: 0.
-+
-+  - PCMShortFrameSync : PCM sync. 0-short, 1-long.
-+    Default: 0.
-+
-+  - PCMSyncMode : PCM sync mode. 0-slave, 1-master.
-+    Default: 0.
++	/* Flush the line discipline buffers and the TTY buffers */
++	if (tty->ldisc->ops->flush_buffer)
++		tty->ldisc->ops->flush_buffer(tty);
++	tty_driver_flush_buffer(tty);
 +
 +
-+Example:
++	/* Init UART to default settings */
++	ktermios = tty->termios;
++	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
++		| INLCR | IGNCR | ICRNL | IXON);
++	ktermios.c_oflag &= ~OPOST;
++	ktermios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
++	ktermios.c_cflag &= ~(CSIZE | PARENB | CBAUD);
++	ktermios.c_cflag |= CS8;
++	ktermios.c_cflag |= CRTSCTS;
++	ktermios.c_cflag |= B115200;
++	ktermios.c_ispeed = 115200;
++	ktermios.c_ospeed = 115200;
++	err = tty_set_termios(tty, &ktermios);
++	if (err) {
++		BT_DBG("init_uart set_termios failure %d", err);
++		return err;
++	}
 +
-+	brcm4354_bt_uart: brcm4354-bt-uart {
-+		compatible = "brcm,brcm-bt-uart";
-+		bt-wake-gpios = <&gpio4 30 GPIO_ACTIVE_HIGH>;
-+		bt-host-wake-gpios = <&gpio4 31 GPIO_ACTIVE_HIGH>;
-+		tty = "ttyS0";
-+		baud-rate-before-config-download = <3000000>;
-+		configure-sleep;
-+		configure-audio;
-+		PCMClockMode = <0>;
-+		PCMFillMethod = <2>;
-+		PCMFillNum = <0>;
-+		PCMFillValue = <3>;
-+		PCMInCallBitclock = <0>;
-+		PCMLSBFirst = <0>;
-+		PCMRightJustify = <0>;
-+		PCMRouting = <0>;
-+		PCMShortFrameSync = <0>;
-+		PCMSyncMode = <0>;
-+	};
++	speed = tty_get_baud_rate(tty);
 +
++	BT_DBG("init_uart set_termios completed, spd %d", speed);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btbcm_init_uart);
++
++/*
++ * Set the baud rate on the UART and the device
++ */
++int btbcm_set_baud_rate(struct hci_uart *hu, int baud_rate)
++{
++	struct tty_struct *tty = hu->tty;
++	struct ktermios ktermios;
++	int status, speed, cflag;
++	struct sk_buff *skb;
++	u8 enable = 0x01;
++	u8 baud_rate_vsc_pars[] = {0, 0, 0, 0x10, 0x0e, 0};
++
++	/* If the baud rate is higher than 3000000, change the clock */
++	if (baud_rate > 3000000) {
++		skb = __hci_cmd_sync(hu->hdev, 0xfc45, 1, &enable,
++				     HCI_INIT_TIMEOUT);
++		if (IS_ERR(skb)) {
++			status = PTR_ERR(skb);
++			return status;
++		}
++
++		kfree_skb(skb);
++		BT_DBG("set_baud_rate write UART 48 MHz VSC succeeded");
++	}
++
++	/* Now let the device know about the rate change */
++	put_unaligned_le32((u32)baud_rate, &baud_rate_vsc_pars[2]);
++	skb = __hci_cmd_sync(hu->hdev, 0xfc18, sizeof(baud_rate_vsc_pars),
++			     baud_rate_vsc_pars, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		status = PTR_ERR(skb);
++		BT_ERR("set_baud_rate VSC failed (%d)", status);
++		return status;
++	}
++
++	kfree_skb(skb);
++	BT_DBG("set_baud_rate VSC succeeded");
++
++	/* Set UART into this rate as well */
++	ktermios = tty->termios;
++	BT_DBG("set_baud_rate start flags c_o %x c_l %x c_c %x spd %d/%d",
++	       ktermios.c_oflag, ktermios.c_lflag, ktermios.c_cflag,
++	       ktermios.c_ispeed, ktermios.c_ospeed);
++	switch (baud_rate) {
++	case 115200:
++		cflag |= B115200; break;
++	case 921600:
++		cflag |= B921600; break;
++	case 3000000:
++		cflag |= B3000000; break;
++	case 3500000:
++		cflag |= B3500000; break;
++	case 4000000:
++		cflag |= B4000000; break;
++	default:
++		BT_DBG("set_baud_rate unknown rate %d", baud_rate);
++		return -EINVAL;
++	}
++
++	ktermios.c_cflag &= ~CBAUD;
++	ktermios.c_cflag |= cflag;
++	ktermios.c_ispeed = baud_rate;
++	ktermios.c_ospeed = baud_rate;
++	status = tty_set_termios(tty, &ktermios);
++	if (status) {
++		BT_DBG("set_baud_rate set_termios failure %d", status);
++		return status;
++	}
++
++	speed = tty_get_baud_rate(tty);
++	BT_DBG("set_baud_rate set_termios completed, spd %d", speed);
++	ktermios = tty->termios;
++	BT_DBG("set_baud_rate flags c_o %x c_l %x c_c %x spd %d/%d",
++	       ktermios.c_oflag, ktermios.c_lflag, ktermios.c_cflag,
++	       ktermios.c_ispeed, ktermios.c_ospeed);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btbcm_set_baud_rate);
++
+ int btbcm_setup_patchram(struct hci_dev *hdev)
+ {
+ 	char fw_name[64];
+@@ -275,7 +401,8 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 	const char *hw_name = NULL;
+ 	struct sk_buff *skb;
+ 	struct hci_rp_read_local_version *ver;
+-	int i, err;
++	int i, err, is_uart = false;
++	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 
+ 	/* Reset */
+ 	err = btbcm_reset(hdev);
+@@ -297,14 +424,18 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+ 
+-	BT_INFO("%s: BCM: chip id %u", hdev->name, skb->data[1]);
++	BT_INFO("%s: BCM: chip id %u, rev 0x%x subver 0x%x",
++		hdev->name, skb->data[1], rev, subver);
+ 	kfree_skb(skb);
+ 
+ 	switch ((rev & 0xf000) >> 12) {
+ 	case 0:
++	case 1:
+ 		for (i = 0; bcm_uart_subver_table[i].name; i++) {
+ 			if (subver == bcm_uart_subver_table[i].subver) {
+ 				hw_name = bcm_uart_subver_table[i].name;
++				BT_INFO("UART firmware found: %s", hw_name);
++				is_uart = true;
+ 				break;
+ 			}
+ 		}
+@@ -312,7 +443,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 		snprintf(fw_name, sizeof(fw_name), "brcm/%s.hcd",
+ 			 hw_name ? : "BCM");
+ 		break;
+-	case 1:
++
+ 	case 2:
+ 		/* Read USB Product Info */
+ 		skb = btbcm_read_usb_product(hdev);
+@@ -345,11 +476,25 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 	if (err == -ENOENT)
+ 		return 0;
+ 
++	/* Once the patch is downloaded, the device is back at default rate */
++	if (is_uart) {
++		err = btbcm_init_uart(hu);
++		if (err)
++			return 0;
++	}
++
+ 	/* Reset */
+ 	err = btbcm_reset(hdev);
+ 	if (err)
+ 		return err;
+ 
++	if (is_uart) {
++		err = btbcm_set_baud_rate(hu,
++					  bcm_uart_subver_table[i].baud_rate);
++		if (err)
++			return 0;
++	}
++
+ 	/* Read Local Version Info */
+ 	skb = btbcm_read_local_version(hdev);
+ 	if (IS_ERR(skb))
 -- 
 1.9.1
-
