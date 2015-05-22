@@ -1,146 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
 From: Ilya Faenson <ifaenson@broadcom.com>
-To: Arend Van Spriel <arend@broadcom.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>, Arend Van Spriel
+	<arend@broadcom.com>
 CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
 	<linux-bluetooth@vger.kernel.org>
-Subject: RE: [RFC v3 1/4] Broadcom Bluetooth UART Device Tree bindings
-Date: Fri, 22 May 2015 19:05:20 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E9425A6D9@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1431553823-25670-1-git-send-email-ifaenson@broadcom.com>
- <1431553823-25670-2-git-send-email-ifaenson@broadcom.com>
- <555B00ED.1000805@broadcom.com>
-In-Reply-To: <555B00ED.1000805@broadcom.com>
+Subject: RE: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
+Date: Fri, 22 May 2015 13:55:18 +0000
+Message-ID: <E0D3336E15B58B4294723AC879BA5E9425A61F@IRVEXCHMB15.corp.ad.broadcom.com>
+References: <1432136770-13328-1-git-send-email-frederic.danis@linux.intel.com>
+ <1432136770-13328-5-git-send-email-frederic.danis@linux.intel.com>
+ <555DE2BE.8000109@broadcom.com> <555F25F8.4080408@linux.intel.com>
+ <555F2EB5.1080103@broadcom.com>,<555F33E8.8010703@linux.intel.com>
+In-Reply-To: <555F33E8.8010703@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arend,
+Hi Fred,
 
------Original Message-----
-From: Arend van Spriel [mailto:arend@broadcom.com]=20
-Sent: Tuesday, May 19, 2015 5:23 AM
-To: Ilya Faenson
-Cc: Marcel Holtmann; linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v3 1/4] Broadcom Bluetooth UART Device Tree bindings
+________________________________________
+From: Frederic Danis [frederic.danis@linux.intel.com]
+Sent: Friday, May 22, 2015 9:49 AM
+To: Arend Van Spriel
+Cc: Marcel Holtmann; linux-bluetooth@vger.kernel.org; Ilya Faenson
+Subject: Re: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
 
-On 05/13/15 23:50, Ilya Faenson wrote:
-> Device Tree bindings to configure the Broadcom Bluetooth UART device.
-
-As Marcel indicated this patch needs to be reviewed by devicetree folks=20
-as well so add following to the commit message:
-
-IF: Will do, thanks.
-
-Cc: devicetree-spec@vger.kernel.org
-Cc: devicetree@vger.kernel.org
-> Signed-off-by: Ilya Faenson<ifaenson@broadcom.com>
-> ---
->   .../devicetree/bindings/net/bluetooth/btbcm.txt    | 54 +++++++++++++++=
-+++++++
->   1 file changed, 54 insertions(+)
->   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbc=
-m.txt
+On 22/05/2015 15:27, Arend van Spriel wrote:
+> On 05/22/15 14:50, Frederic Danis wrote:
+>> Hello Arend,
+>>
+>> On 21/05/2015 15:50, Arend van Spriel wrote:
+>>> On 05/20/15 17:46, Frederic Danis wrote:
+>>>> Use btbcm helpers to perform controller setup.
+>>>> Perform host UART reset to init speed between btbcm_patchram() and
+>>>> btbcm_finalize(). This may be need because firmware loading may have
+>>>> reseted controller UART to init speed.
+>>>>
+>>>> Signed-off-by: Frederic Danis<frederic.danis@linux.intel.com>
+>>>> ---
+>>>> drivers/bluetooth/hci_bcm.c | 19 ++++++++++++++++++-
+>>>> 1 file changed, 18 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>>>> index 1ec0b4a..cede445 100644
+>>>> --- a/drivers/bluetooth/hci_bcm.c
+>>>> +++ b/drivers/bluetooth/hci_bcm.c
+>>>> @@ -79,11 +79,28 @@ static int bcm_flush(struct hci_uart *hu)
+>>>>
+>>>> static int bcm_setup(struct hci_uart *hu)
+>>>> {
+>>>> + char fw_name[64];
+>>>> + int err;
+>>>> +
+>>>> BT_DBG("hu %p", hu);
+>>>>
+>>>> hu->hdev->set_bdaddr =3D btbcm_set_bdaddr;
+>>>>
+>>>> - return btbcm_setup_patchram(hu->hdev);
+>>>> + err =3D btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name));
+>>>> + if (err)
+>>>> + return err;
+>>>> +
+>>>> + err =3D btbcm_patchram(hu->hdev, fw_name);
+>>>> + /* If there is no firmware (-ENOENT), discard the error and
+>>>> continue */
+>>>
+>>> I guess -ENOENT means no firmware is required and not a
+>>> request_firmware() failure. Not sure what is meant here.
+>>>
+>>> Regards,
+>>> Arend
+>>>
+>>>> + if (err =3D=3D -ENOENT)
+>>>> + return 0;
+>>>> +
+>>>> + if (hu->proto->init_speed)
+>>>> + hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>>> +
+>>>> + err =3D btbcm_finalize(hu->hdev);
+>>>> +
+>>>> + return err;
+>>>> }
+>>>>
+>>>> static const struct h4_recv_pkt bcm_recv_pkts[] =3D {
+>>
+>> You're right, btbcm_patchram() return test does not work as I expected.
+>>
+>> I can change this by performing uart speed change only if it returns no
+>> error.
+>>
+>> err =3D btbcm_patchram(hu->hdev, fw_name);
+>> if (!err) {
+>> /* Firmware loading may have reseted controller UART to init speed */
+>> if (hu->proto->init_speed)
+>> hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>> }
+>>
+>> err =3D btbcm_finalize(hu->hdev);
+>>
+>>
+>> Or I can move request_firmware() out of btbcm_patchram() and test it
+>> before calling btbcm_patchram(). This will imply to change
+>> btbcm_patchram() to accept a firmware instead of firmware name.
+>>
+>> err =3D request_firmware(&fw, fw_name, &hu->hdev->dev);
+>> if (err < 0) {
+>> BT_INFO("%s: BCM: patch %s not found", hu->hdev->name, fw_name);
+>> return 0;
+>> }
+>>
+>> err =3D btbcm_patchram(hu->hdev, fw);
+>> if (!err) {
+>> /* Firmware loading may have reseted controller UART to init speed */
+>> if (hu->proto->init_speed)
+>> hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>> }
+>>
+>> err =3D btbcm_finalize(hu->hdev);
+>>
+>> Arend, Marcel, any advice regarding this ?
 >
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/=
-Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
-> new file mode 100644
-> index 0000000..cc9f225
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
-> @@ -0,0 +1,54 @@
-> +btbcm
-> +------
-> +
-> +Required properties:
-> +
-> +	- compatible : must be "brcm,brcm-bt-uart".
+> Well, functionally it does not make a difference as the request_firmware
+> is the first call done in btbcm_patchram(). So if it solves your problem
+> I would go for option 2. Other question: is there a reason why the error
+> code from request_firmware is not returned?
 
-The devicetree folks will probably want to see a specific device id=20
-here. Not sure where there are means to obtain that from the device=20
-itself, which could be an argument not to use it.
+If an error is returned it will stop Bluetooth setup.
+So, when request_firmware() returns an error, the Bluetooth controller
+will be used with current firmware and 0 is returned as bcm_setup is
+completed.
 
-IF: Scores of BT UART chips will be supported so we don't all of them
-to be listed. Specific chip will be listed in the device node name - see
-the example.
+IF: There is generally no "current firmware" if the firmware download fails=
+ or not attempted. The device would run out of the ROM then which is not te=
+rribly useful if Bluetooth functionality is needed. Thanks, -Ilya
 
-> +	- tty : tty device connected to this Bluetooth device.
-> +
-> +Optional properties:
-> +
-> +  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an interr=
-upt.
-> +
-> +  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume d=
-evice.
-> +
-> +  - reg-on-gpios : reg-on output GPIO to be used to power device on/off.
+Regards
 
-Maybe use bt-reg-on-gpios for sake of consistency with other gpio=20
-properties.
-
-IF: Will change.
-
-> +  - baud-rate-before-config-download : initial Bluetooth device baud rat=
-e.
-> +    Default: 3000000.
-> +
-> +  - manual-fc : flow control UART in suspend / resume scenarios.
-> +    Default: 0.
-> +
-> +  - configure-sleep : configure suspend / resume flag.
-> +    Default: 0.
-> +
-> +  - configure-audio : configure platform PCM SCO flag.
-> +    Default: 0.
-> +
-> +  - PCM* : SCO PCM platform parameters. Work with Broadcom on setting.
-
-What does "Work with Broadcom on setting" mean here?
-
-IF: Will add individual PCM property descriptions.
-
-> +    Defaults: see the example below.
-
-Devicetree properties that are for a specific device should be have=20
-vendor prefix. I can imagine some of the properties are generic to any=20
-bt device and/or bt-behind-uart.
-
-IF: All these properties apply to all Broadcom BT UART devices.
-
-> +Example:
-> +
-> +	bcm4354_bt_uart: bcm4354-bt-uart {
-> +		compatible =3D "bcm-bt-uart,bcm4354-bt-uart";
-
-This compatible string here should match the described compatible=20
-property above.
-
-IF: Will change (it's a doc issue only).
-
-> +		bt-wake-gpios =3D<&gpio4 30 GPIO_ACTIVE_HIGH>;
-> +		bt-host-wake-gpios =3D<&gpio4 31 GPIO_ACTIVE_HIGH>;
-> +		tty =3D "ttyS0";
-> +		baud-rate-before-config-download =3D<3000000>;
-> +		configure-sleep =3D<1>;
-> +		configure-audio =3D<1>;
-
-Are these configure flags boolean. If so you can drop the assignment.=20
-The presence of the property itself can be used.
-
-IF: Will change.
-
-Regards,
-Arend
-
-> +		PCMClockMode =3D<0>;
-> +		PCMFillMethod =3D<2>;
-> +		PCMFillNum =3D<0>;
-> +		PCMFillValue =3D<3>;
-> +		PCMInCallBitclock =3D<0>;
-> +		PCMLSBFirst =3D<0>;
-> +		PCMRightJustify =3D<0>;
-> +		PCMRouting =3D<0>;
-> +		PCMShortFrameSync =3D<0>;
-> +		PCMSyncMode =3D<0>;
-> +	};
-> +
+Fred=
