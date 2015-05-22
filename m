@@ -1,115 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <555F2EB5.1080103@broadcom.com>
-Date: Fri, 22 May 2015 15:27:17 +0200
-From: Arend van Spriel <arend@broadcom.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3] android/hidhost: Fix connecting HOGP over BREDR
+Date: Fri, 22 May 2015 15:17:04 +0200
+Message-ID: <1614758.WFjxB6mBNu@leonov>
+In-Reply-To: <1432115799-30849-1-git-send-email-mariusz.skamra@tieto.com>
+References: <2648839.tQezcmsJ0R@leonov> <1432115799-30849-1-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
-To: Frederic Danis <frederic.danis@linux.intel.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>,
-	Ilya Faenson <ifaenson@broadcom.com>
-Subject: Re: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
-References: <1432136770-13328-1-git-send-email-frederic.danis@linux.intel.com> <1432136770-13328-5-git-send-email-frederic.danis@linux.intel.com> <555DE2BE.8000109@broadcom.com> <555F25F8.4080408@linux.intel.com>
-In-Reply-To: <555F25F8.4080408@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 05/22/15 14:50, Frederic Danis wrote:
-> Hello Arend,
->
-> On 21/05/2015 15:50, Arend van Spriel wrote:
->> On 05/20/15 17:46, Frederic Danis wrote:
->>> Use btbcm helpers to perform controller setup.
->>> Perform host UART reset to init speed between btbcm_patchram() and
->>> btbcm_finalize(). This may be need because firmware loading may have
->>> reseted controller UART to init speed.
->>>
->>> Signed-off-by: Frederic Danis<frederic.danis@linux.intel.com>
->>> ---
->>> drivers/bluetooth/hci_bcm.c | 19 ++++++++++++++++++-
->>> 1 file changed, 18 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->>> index 1ec0b4a..cede445 100644
->>> --- a/drivers/bluetooth/hci_bcm.c
->>> +++ b/drivers/bluetooth/hci_bcm.c
->>> @@ -79,11 +79,28 @@ static int bcm_flush(struct hci_uart *hu)
->>>
->>> static int bcm_setup(struct hci_uart *hu)
->>> {
->>> + char fw_name[64];
->>> + int err;
->>> +
->>> BT_DBG("hu %p", hu);
->>>
->>> hu->hdev->set_bdaddr = btbcm_set_bdaddr;
->>>
->>> - return btbcm_setup_patchram(hu->hdev);
->>> + err = btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name));
->>> + if (err)
->>> + return err;
->>> +
->>> + err = btbcm_patchram(hu->hdev, fw_name);
->>> + /* If there is no firmware (-ENOENT), discard the error and
->>> continue */
->>
->> I guess -ENOENT means no firmware is required and not a
->> request_firmware() failure. Not sure what is meant here.
->>
->> Regards,
->> Arend
->>
->>> + if (err == -ENOENT)
->>> + return 0;
->>> +
->>> + if (hu->proto->init_speed)
->>> + hci_uart_set_baudrate(hu, hu->proto->init_speed);
->>> +
->>> + err = btbcm_finalize(hu->hdev);
->>> +
->>> + return err;
->>> }
->>>
->>> static const struct h4_recv_pkt bcm_recv_pkts[] = {
->
-> You're right, btbcm_patchram() return test does not work as I expected.
->
-> I can change this by performing uart speed change only if it returns no
-> error.
->
-> err = btbcm_patchram(hu->hdev, fw_name);
-> if (!err) {
-> /* Firmware loading may have reseted controller UART to init speed */
-> if (hu->proto->init_speed)
-> hci_uart_set_baudrate(hu, hu->proto->init_speed);
-> }
->
-> err = btbcm_finalize(hu->hdev);
->
->
-> Or I can move request_firmware() out of btbcm_patchram() and test it
-> before calling btbcm_patchram(). This will imply to change
-> btbcm_patchram() to accept a firmware instead of firmware name.
->
-> err = request_firmware(&fw, fw_name, &hu->hdev->dev);
-> if (err < 0) {
-> BT_INFO("%s: BCM: patch %s not found", hu->hdev->name, fw_name);
-> return 0;
-> }
->
-> err = btbcm_patchram(hu->hdev, fw);
-> if (!err) {
-> /* Firmware loading may have reseted controller UART to init speed */
-> if (hu->proto->init_speed)
-> hci_uart_set_baudrate(hu, hu->proto->init_speed);
-> }
->
-> err = btbcm_finalize(hu->hdev);
->
-> Arend, Marcel, any advice regarding this ?
+Hi Mariusz,
 
-Well, functionally it does not make a difference as the request_firmware 
-is the first call done in btbcm_patchram(). So if it solves your problem 
-I would go for option 2. Other question: is there a reason why the error 
-code from request_firmware is not returned?
+On Wednesday 20 of May 2015 11:56:39 Mariusz Skamra wrote:
+> This patch fixes issue related to HID connection over BREDR.
+> To avoid HOG connection with dual mode device connected over
+> BREDR, bearer type is checked not the features of remote device.
+> ---
+>  android/hidhost.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/hidhost.c b/android/hidhost.c
+> index 729b884..a2b820f 100644
+> --- a/android/hidhost.c
+> +++ b/android/hidhost.c
+> @@ -891,7 +891,7 @@ static void bt_hid_connect(const void *buf, uint16_t
+> len) ba2str(&dev->dst, addr);
+>  	DBG("connecting to %s", addr);
+> 
+> -	if (bt_is_device_le(&dst)) {
+> +	if (bt_device_last_seen_bearer(&dev->dst) != BDADDR_BREDR) {
+>  		if (!hog_connect(dev)) {
+>  			status = HAL_STATUS_FAILED;
+>  			hid_device_remove(dev);
 
-Regards,
-Arend
+Patch applied, thanks.
+
+-- 
+BR
+Szymon Janc
