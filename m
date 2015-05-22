@@ -2,225 +2,209 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Mariusz Skamra <mariusz.skamra@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update HID test results
-Date: Fri, 22 May 2015 15:15:15 +0200
-Message-ID: <2089708.8JeSL2OGkG@leonov>
-In-Reply-To: <1432026964-14205-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1432026964-14205-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: Re: [PATCHv2] android/pts: Update SM test results
+Date: Fri, 22 May 2015 15:13:04 +0200
+Message-ID: <2664075.ABB4cTtB6e@leonov>
+In-Reply-To: <1432115703-30609-1-git-send-email-mariusz.skamra@tieto.com>
+References: <2648839.tQezcmsJ0R@leonov> <1432115703-30609-1-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Mariusz,
 
-On Tuesday 19 of May 2015 11:16:04 Mariusz Skamra wrote:
+On Wednesday 20 of May 2015 11:55:03 Mariusz Skamra wrote:
 > PTS 6.1 and Android 5.1
 > ---
->  android/pics-hid.txt  | 63
-> +++++++++++++++++++++++++-------------------------- android/pixit-hid.txt |
->  2 +-
->  android/pts-hid.txt   |  7 +++---
->  3 files changed, 35 insertions(+), 37 deletions(-)
+>  android/pics-sm.txt  | 23 ++++++++++++++---------
+>  android/pixit-sm.txt |  2 +-
+>  android/pts-sm.txt   | 36 +++++++++++-------------------------
+>  3 files changed, 26 insertions(+), 35 deletions(-)
 > 
-> diff --git a/android/pics-hid.txt b/android/pics-hid.txt
-> index ffd0aff..1304de4 100644
-> --- a/android/pics-hid.txt
-> +++ b/android/pics-hid.txt
-> @@ -1,6 +1,6 @@
->  HID PICS for the PTS tool.
+> diff --git a/android/pics-sm.txt b/android/pics-sm.txt
+> index c5caec6..c31fe76 100644
+> --- a/android/pics-sm.txt
+> +++ b/android/pics-sm.txt
+> @@ -1,8 +1,9 @@
+>  SM PICS for the PTS tool.
 > 
 > -PTS version: 6.0
 > +PTS version: 6.1
 > 
 >  * - different than PTS defaults
->  # - not yet implemented/supported
-> @@ -24,13 +24,13 @@ O.1: It is Mandatory to support One of these roles.
+> +^ - field not available on PTS
+> 
+>  M - mandatory
+>  O - optional
+> @@ -12,9 +13,11 @@ O - optional
+>  Parameter Name	Selected	Description
 >  ---------------------------------------------------------------------------
-> ---- Parameter Name	Selected	Description
+> ---- TSPC_SM_1_1	True		Master Role (Initiator) (C.1)
+> -TSPC_SM_1_2	True		Slave Role (Responder) (C.1)
+> +TSPC_SM_1_2	True		Slave Role (Responder) (C.2)
 >  ---------------------------------------------------------------------------
-> ---- -TSPC_HID_2_1	True (*)	Host: Establish HID connection (M.1)
-> -TSPC_HID_2_2	True (*)	Host: Accept HID connection (M.1)
-> -TSPC_HID_2_3	True (*)	Host: Terminate HID connection (M.1)
-> -TSPC_HID_2_4	True (*)	Host: Accept termination of HID connection (M.1)
-> -TSPC_HID_2_5	True (*)	Host: Support for virtual cables (M.1)
-> -TSPC_HID_2_6	True (*)	Host: HID initiated connection (M.1)
-> -TSPC_HID_2_7	True (*)	Host: Host initiated connection (M.1)
-> +TSPC_HID_2_1	True (*)	Host: Establish HID connection (C.4)
-> +TSPC_HID_2_2	True (*)	Host: Accept HID connection (C.4)
-> +TSPC_HID_2_3	True (*)	Host: Terminate HID connection (C.4)
-> +TSPC_HID_2_4	True (*)	Host: Accept termination of HID connection (C.4)
-> +TSPC_HID_2_5	True (*)	Host: Support for virtual cables (C.4)
-> +TSPC_HID_2_6	True (*)	Host: HID initiated connection (C.4)
-> +TSPC_HID_2_7	True (*)	Host: Host initiated connection (C.4)
->  TSPC_HID_2_8	True (*)	Host: Host data transfer to HID (C.1)
->  TSPC_HID_2_9	True (*)	Host: HID data transfer to Host (C.1)
->  TSPC_HID_2_10	False		Host: Boot mode data transfer to Host (C.2)
-> @@ -44,11 +44,12 @@ TSPC_HID_2_14	False		Host : Support for sending
-> HCI_CONTROL with TSPC_HID_2_15	False		Host : Support for receiving
-> HCI_CONTROL with VIRTUAL_CABLE_UNPLUG (C.3)
->  ---------------------------------------------------------------------------
-> ---- -M.1: Mandatory to support IF (TSPC_HID_1_1) supported.
-> -C.1: Optional for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise Mandatory
-> -	for Host Role (TSPC_HID_1_1).
-> +C.1: Optional for Boot Mode Only Hosts (TSPC_HID_1_3); Mandatory for Host
-> Role +	(TSPC_HID_1_1); OTHERWISE Excluded.
->  C.2: Mandatory for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise Optional.
-> C.3: Optional IF (TSPC_HID_2_5) supported, otherwise excluded.
-> +C.4: Mandatory IF TSPC_HID_1_1 (Host, Report protocol) is supported,
-> otherwise +	Optional.
+> ---- -C.1: At least one of these features shall be supported.
+> +C.1: Mandatory to support if TSPC_SM_1_2 is NOT supported, otherwise
+> Optional +C.2: Optional IF ((4.0 OR 4.0+HS) AND TSPC_GAP_5_3) OR ((4.1 OR
+> 4.1+HS OR 4.2 +	OR 4.2+HS) AND (TSPC_GAP_5_3 OR TSPC_GAP_38_3)))
 >  ---------------------------------------------------------------------------
 > ----
 > 
 > 
-> @@ -57,15 +58,15 @@ C.3: Optional IF (TSPC_HID_2_5) supported, otherwise
-> excluded. Parameter Name	Selected	Description
+> @@ -26,8 +29,10 @@ TSPC_SM_2_1	True		Authenticated MITM protection 
+(O)
+>  TSPC_SM_2_2	True		Unauthenticated no MITM protection (C.1)
+>  TSPC_SM_2_3	True		No security requirements (M)
+>  TSPC_SM_2_4	False (*)	OOB supported (O)
+> +TSPC_SM_2_5	(^)		LE Secure Connections (C.2)
 >  ---------------------------------------------------------------------------
-> ---- TSPC_HID_3_1	False		Host : Data reports larger than host MTU on
-> -					Control channel (C.1)
-> +					Control channel (O)
->  TSPC_HID_3_2	True (*)	Host : Data reports larger than host MTU on
->  					Interrupt channel (C.1)
-> -TSPC_HID_3_3	True (*)	Host : Data reports to host (C.2)
-> -TSPC_HID_3_4	False		Host : Boot mode reports to host (O)
-> +TSPC_HID_3_3	True (*)	Host : Data reports to host (C.1)
-> +TSPC_HID_3_4	False		Host : Boot mode reports to host (C.2)
->  ---------------------------------------------------------------------------
-> ---- -C.1: Excluded for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise
-> Optional -C.2: Excluded for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise
-> Mandatory for -	Host Role (TSPC_HID_1_1)
-> +C.1: Excluded for Boot Mode Only Hosts (TSPC_HID_1_3); Mandatory IF
-> +	TSPC_HID_2_12 is supported, otherwise Optional.
-> +C.2: Mandatory IF TSPC_HID_1_3 is supported, otherwise Optional.
+> ---- C.1: If TSPC_SM_2_1 is supported then Mandatory, else Optional
+> +C.2: Optional IF Core 4.2 OR Core 4.2+HS are supported, otherwise Excluded
 >  ---------------------------------------------------------------------------
 > ----
 > 
 > 
-> @@ -97,9 +98,8 @@ TSPC_HID_5_4	False		Host : Get_Idle command (O)
->  TSPC_HID_5_5	False		Host : Set_Report command (C.2)
->  TSPC_HID_5_6	False		Host : Get_Report command (C.3)
+> @@ -47,8 +52,8 @@ TSPC_SM_4_1	True		Just Works (O)
+>  TSPC_SM_4_2	True		Passkey Entry (C.1)
+>  TSPC_SM_4_3	False (*)	Out of Band (C.1)
 >  ---------------------------------------------------------------------------
-> ---- -C.2: Mandatory IF (TSPC_HID_1_1) supported AND (TSPC_HID_2_13)
-> supported. C.1: Mandatory for Boot Mode Only Hosts (TSPC_HID_1_3);
-> otherwise Optional. -	If either Set_Protocol or Get_Protocol supported,
-> both are Mandatory. +C.2: Mandatory IF (TSPC_HID_1_1) supported AND
-> (TSPC_HID_2_13) supported. C.3: Mandatory IF (TSPC_HID_1_1) Supported AND
-> (TSPC_HID_2_12) Supported C.4: Mandatory to support TSPC_HID_5_1
-> (Set_Protocol command) AND TSPC_HID_5_2 (Get_Protocol command) IF one of
-> TSPC_HID_5_1 (Set_Protocol command) @@ -123,19 +123,19 @@
-> TSPC_HID_6_4	False		Host : Initiate pairing after connection
-> TSPC_HID_6_5	False		Host : Encryption (O)
->  TSPC_HID_6_6	False		Host : Initiate encryption (C.3)
->  TSPC_HID_6_7	False		Host : Accept encryption requests (C.3)
-> -TSPC_HID_6_8	True (*)	Host : Role switch (Master/Slave) (M.1)
-> -TSPC_HID_6_9	True (*)	Host : Request Master Slave switch (M.1)
-> -TSPC_HID_6_10	True (*)	Host : Accept Master Slave switch requests 
-(M.1)
-> +TSPC_HID_6_8	True (*)	Host : Role switch (Master/Slave) (C.4)
-> +TSPC_HID_6_9	True (*)	Host : Request Master Slave switch (C.4)
-> +TSPC_HID_6_10	True (*)	Host : Accept Master Slave switch requests 
-(C.4)
->  TSPC_HID_6_11	False		Host : Hold mode (O)
-> -TSPC_HID_6_12	True (*)	Host : Sniff mode (M.1)
-> +TSPC_HID_6_12	True (*)	Host : Sniff mode (C.4)
->  TSPC_HID_6_13	False		Host : Park mode (O)
->  ---------------------------------------------------------------------------
-> ---- -C.1: If Host Authentication supported, both (TSPC_HID_6_1) AND
-> (TSPC_HID_6_2) -	must be supported.
-> +C.1: Mandatory to support TSPC_HID_6_1 AND TSPC_HID_6_2 IF GAP 2/3
-> +	(Initiate LMP-Authentication) is supported, otherwise Excluded.
->  C.2: If Pairing supported both (TSPC_HID_6_3) AND (TSPC_HID_6_4) must
->  	be supported.
-> -M.1: Mandatory IF (TSPC_HID_1_1) supported.
->  C.3: Mandatory IF (TSPC_HID_6_5) encryption supported.
-> +C.4: Mandatory IF (TSPC_HID_1_1) supported, otherwise Excluded.
+> ---- -C.1: If TSPC_SM_2_1 is supported, at least one of these features shall
+> be -	supported.
+> +C.1: Mandatory to support at least one of the defined methods IF
+> TSPC_SM_2_1 is +	supported, otherwise Excluded.
 >  ---------------------------------------------------------------------------
 > ----
 > 
 > 
-> @@ -143,10 +143,10 @@ C.3: Mandatory IF (TSPC_HID_6_5) encryption supported.
+> @@ -63,7 +68,7 @@ TSPC_SM_5_4	True		Slave Initiated Security – Master
+> response(C.2)
 > ---------------------------------------------------------------------------
-> ---- Parameter Name	Selected	Description
->  ---------------------------------------------------------------------------
-> ---- -TSPC_HID_7_1	True (*)	Host : Supports inquiry, 79 channel (M.1)
-> +TSPC_HID_7_1	True (*)	Host : Supports inquiry, 79 channel (C.1)
->  TSPC_HID_7_2	False		Host : Supports inquiry scan, 79 channel (C.2)
->  ---------------------------------------------------------------------------
-> ---- -M.1: Mandatory to support IF (TSPC_HID_1_1) supported.
-> +C.1: Mandatory to support IF (TSPC_HID_1_1) supported, otherwise Excluded.
->  C.2: Feature should not be used by a Host, but can be supported in LM.
+> ---- C.1: Mandatory if TSPC_SM_1_2 is supported, otherwise Excluded
+>  C.2: Mandatory if TSPC_SM_1_1 is supported, otherwise Excluded
+> -C.3: Mandatory IF TSPC_SM_2_1 OR TSPC_SM_2_1 OR TSPC_SM_2_4 is supported,
+> +C.3: Mandatory IF TSPC_SM_2_1 OR TSPC_SM_2_2 OR TSPC_SM_2_4 is supported,
+>  	otherwise Excluded
 >  ---------------------------------------------------------------------------
 > ----
 > 
-> @@ -170,9 +170,9 @@ O.1: It is Mandatory to support One of these roles IF
-> (TSPC_HID_1_2) Parameter Name	Selected	Description
+> @@ -85,7 +90,7 @@ TSPC_SM_7_1	True		Encryption Key (C.1)
+>  TSPC_SM_7_2	True		Identity Key (C.2)
+>  TSPC_SM_7_3	True		Signing Key (C.3)
 >  ---------------------------------------------------------------------------
-> ---- TSPC_HID_9_1	False		Hid : Establish HID connection (O)
-> -TSPC_HID_9_2	False (*)	Hid : Accept HID connection (M.1)
-> +TSPC_HID_9_2	False (*)	Hid : Accept HID connection (M)
->  TSPC_HID_9_3	False		Hid : Terminate HID connection (O)
-> -TSPC_HID_9_4	False (*)	Hid : Accept Termination of HID connection (M.1)
-> +TSPC_HID_9_4	False (*)	Hid : Accept Termination of HID connection (M)
->  TSPC_HID_9_5	False		Hid : Support for virtual cables (O)
->  TSPC_HID_9_6	False		Hid : HID initiated reconnection (C.1)
->  TSPC_HID_9_7	False		Hid : Host initiated reconnection (C.1)
-> @@ -188,10 +188,9 @@ TSPC_HID_9_15	False		Hid : Support for sending
-> HCI_CONTROL with TSPC_HID_9_16	False		Hid : Support for receiving
-> HCI_CONTROL with VIRTUAL_CABLE_UNPLUG (C.5)
->  ---------------------------------------------------------------------------
-> ---- -M.1: Mandatory IF (TSPC_HID_1_2) supported.
->  C.1: One of these is Mandatory IF (TSPC_HID_9_5) is supported
->  	(SDP attribute 0x204=True)
-> -C.2: One of these is Mandatory.
-> +C.2: One of these is Mandatory if TSPC_HID_1_2 (HID Role) is supported.
->  C.3: Mandatory IF (TSPC_HID_8_1) OR (TSPC_HID_8_2) is selected
->  C.4: Mandatory IF (TSPC_HID_8_2) is supported (for status indicators)
->  C.5: Optional IF (TSPC_HID_9_5) supported, otherwise excluded.
-> diff --git a/android/pixit-hid.txt b/android/pixit-hid.txt
-> index 3c93fca..511957b 100644
-> --- a/android/pixit-hid.txt
-> +++ b/android/pixit-hid.txt
+> ---- -C.1: Mandatory if GAP (24/2 OR 42/6) is supported, ELSE Optional
+> -C.2: Mandatory if GAP (26/3) is supported, ELSE Optional
+> -C.3: Mandatory if GAP (25/6 OR 35/6) is supported, ELSE Optional
+> +C.1: Mandatory if TSPC_GAP_24_2 OR TSPC_GAP_42_6 is supported, ELSE
+> Optional +C.2: Mandatory if TSPC_GAP_26_3 is supported, ELSE Optional
+> +C.3: Mandatory if TSPC_GAP_25_6 OR TSPC_GAP_35_6 is supported, ELSE
+> Optional
+> ---------------------------------------------------------------------------
+> ---- diff --git a/android/pixit-sm.txt b/android/pixit-sm.txt
+> index 98e2ab5..6facbb8 100644
+> --- a/android/pixit-sm.txt
+> +++ b/android/pixit-sm.txt
 > @@ -1,6 +1,6 @@
->  HID PIXIT for the PTS tool.
+>  SM PIXIT for the PTS tool.
 > 
 > -PTS version: 6.0
 > +PTS version: 6.1
 > 
 >  * - different than PTS defaults
 >  & - should be set to IUT Bluetooth address
-> diff --git a/android/pts-hid.txt b/android/pts-hid.txt
-> index 7918650..80f11e8 100644
-> --- a/android/pts-hid.txt
-> +++ b/android/pts-hid.txt
-> @@ -1,8 +1,8 @@
->  PTS test results for HID
+> diff --git a/android/pts-sm.txt b/android/pts-sm.txt
+> index 91737cc..1fad305 100644
+> --- a/android/pts-sm.txt
+> +++ b/android/pts-sm.txt
+> @@ -1,9 +1,9 @@
+>  PTS test results for SM
 > 
 > -PTS version: 6.0
-> -Tested: 30-January-2015
+> -Tested: 11-February-2015
 > -Android version: 5.0
+> -kernel version: 3.20
 > +PTS version: 6.1
-> +Tested: 19-May-2015
+> +Tested: 04-May-2015
 > +Android version: 5.1
+> +kernel version: 4.1
 > 
 >  Results:
 >  PASS	test passed
-> @@ -14,7 +14,6 @@ N/A	test is disabled due to PICS setup
->  Test Name		Result	Notes
+> @@ -24,12 +24,7 @@ TC_JW_BV_02_C		PASS	btmgmt advertising on
+>  TC_JW_BV_05_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+>  TC_JW_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+>  TC_JW_BI_02_C		PASS	btmgmt pairable on
+> -TC_JW_BI_03_C		PASS	bluetoothd is NOT running
+> -				btmgmt power on
+> -				btmgmt le on
+> -				btmgmt connectable on
+> -				btmgmt pairable on
+> -				btmgmt discov on
+> +TC_JW_BI_03_C		PASS	btmgmt pairable on
+>  				btmgmt advertising on
+>  TC_JW_BI_04_C		PASS	btmgmt pairable off
+>  				btmgmg pair -c 0x03 -t 0x01 <addr>
+> @@ -38,8 +33,6 @@ TC_PKE_BV_01_C		PASS	btmgmt pairable off
+>  				Note: provide passkey to PTS
+>  TC_PKE_BV_02_C		PASS	btmgmt pairable off
+>  				btmgmt io-cap 0x04
+> -				btmgmt advertising on
+> -				btmgmt monitor
+>  				Note: provide passkey
+>  TC_PKE_BV_04_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
+>  TC_PKE_BV_05_C		PASS	btmgmt io-cap 0x04
+> @@ -50,7 +43,6 @@ TC_PKE_BI_02_C		PASS	btmgmt pair -c 0x04 -t 0x01 
+<addr>
+>  				Note: provide passkey
+>  TC_PKE_BI_03_C		PASS	btmgmt io-cap 0x04
+>  				btmgmt advertising on
+> -				btmgmt monitor
+>  				Note: Enter invalid passkey in PTS
+>  TC_OOB_BV_01_C		N/A
+>  TC_OOB_BV_02_C		N/A
+> @@ -59,12 +51,10 @@ TC_OOB_BV_04_C		N/A
+>  TC_OOB_BV_05_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
+>  				Note: Enter valid passkey in PTS
+>  TC_OOB_BV_06_C		PASS	btmgmt advertising on
+> -				btmgmt monitor
+>  				Note: Enter valid passkey in PTS
+>  TC_OOB_BV_07_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
+>  TC_OOB_BV_08_C		PASS	btmgmt advertising on
+> -				btmgmt monitor
+> -				Note: Accept pairing in btmgmt monitor
+> +				Note: Accept pairing in btmgmt
+>  TC_OOB_BV_09_C		N/A
+>  TC_OOB_BV_10_C		N/A
+>  TC_OOB_BI_01_C		N/A
+> @@ -72,10 +62,8 @@ TC_OOB_BI_02_C		N/A
+>  TC_EKS_BV_01_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
+>  				Note: Enter valid passkey in PTS
+>  TC_EKS_BV_02_C		PASS	btmgmt advertising on
+> -				btmgmt monitor
+> -				Note: Accept pairing in btmgmt monitor
+> -TC_EKS_BI_01_C		PASS	btmgmt io-cap 0x03
+> -				btmgmt pair -c 0x03 -t 0x01 <addr>
+> +				Note: Accept pairing in btmgmt
+> +TC_EKS_BI_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+>  TC_EKS_BI_02_C		PASS	btmgmt advertising on
+>  TC_SIGN_BV_01_C		INC	PTS issue #12305
+>  TC_SIGN_BV_03_C		PASS	haltest:
+> @@ -108,9 +96,7 @@ TC_KDU_BV_05_C		PASS	PTS issue #12302
+>  TC_KDU_BV_06_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+>  TC_KDU_BV_07_C		PASS	btmgmt pairable on
+>  TC_SIP_BV_01_C		PASS	btmgmt advertising on
+> -				btmgmt pair -c 0x03 -t 0x01 <addr>
+> -TC_SIP_BV_02_C		PASS	btmgmt advertising off
+> -				l2test -n -J4 -V le_public <addr>
+> -TC_SIE_BV_01_C		PASS	btmgmt advertising on
+> -				btmgmt pair -c 0x03 -t 0x01 <addr>
+> +TC_SIP_BV_02_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+> +TC_SIE_BV_01_C		PASS	btmgmt io-cap 0x03
+> +				btmgmt advertising on
 >  ---------------------------------------------------------------------------
-> ---- TC_HOS_HCE_BV_01_I	PASS
-> -TC_HOS_HCE_BV_02_I	PASS
->  TC_HOS_HCE_BV_03_I	PASS
->  TC_HOS_HCE_BV_04_I	PASS
->  TC_HOS_HCR_BV_01_I	PASS
+> ----
 
-Applying: android/pts: Update HID test results
-/home/janccszy/devel/bluez_korg/.git/rebase-apply/patch:106: trailing 
-whitespace.
-C.1: Mandatory to support TSPC_HID_6_1 AND TSPC_HID_6_2 IF GAP 2/3 
-fatal: 1 line adds whitespace errors.
-Patch failed at 0001 android/pts: Update HID test results
-
-Please fix and resend.
+Applied, thanks.
 
 -- 
 BR
