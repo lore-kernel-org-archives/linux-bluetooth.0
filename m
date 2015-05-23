@@ -1,267 +1,358 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v4 02/17] Bluetooth: hci_core: Introduce multi-adv inst list
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1430408000-17785-3-git-send-email-fgrandel@gmail.com>
-Date: Sat, 23 May 2015 23:25:57 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2FCCF3D0-C40F-472E-A2AB-58D1362445A0@holtmann.org>
-References: <1430408000-17785-1-git-send-email-fgrandel@gmail.com> <1428633041-18415-1-git-send-email-fgrandel@gmail.com> <1430408000-17785-3-git-send-email-fgrandel@gmail.com>
-To: Florian Grandel <fgrandel@gmail.com>
+Message-ID: <5560B724.7020404@gmail.com>
+Date: Sat, 23 May 2015 22:21:40 +0500
+From: Sergey Kondakov <virtuousfox@gmail.com>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Bug in sixaxis plugin: stick axises are "jumping" from bogus input
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="mNNuS69IDkkrwcIXc05STOOtT4I8p2ART"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Florian,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mNNuS69IDkkrwcIXc05STOOtT4I8p2ART
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> The current hci dev structure only supports a single advertising
-> instance. To support multi-instance advertising it is necessary to
-> introduce a linked list of advertising instances so that multiple
-> advertising instances can be dynamically added and/or removed.
-> 
-> In a first step, the existing adv_instance member of the hci_dev
-> struct is supplemented by a linked list of advertising instances.
-> This patch introduces the list and supporting list management
-> infrastructure. The list is not being used yet.
-> 
-> Signed-off-by: Florian Grandel <fgrandel@gmail.com>
-> ---
-> include/net/bluetooth/hci_core.h |  16 ++++++
-> net/bluetooth/hci_core.c         | 112 +++++++++++++++++++++++++++++++++++++++
-> net/bluetooth/mgmt.c             |  10 ++--
-> 3 files changed, 133 insertions(+), 5 deletions(-)
+Pretty much since update to Bluez-5 with its in-tree SixAxis/DS3 support
+I've been experiencing this strange bug: about every minute both axises
+of both sticks "jump" to their lowest position for one "frame" and then
+back to normal. It only behaves like that under bluez 5, connected
+wirelessly, and never under Windows=C2=AE or via USB.
 
-I dislike you intermixing userspace with kernel space patches. That makes it so hard to review. Keep them separate.
+Here's some data:
 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index a056c2b..36cc941 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -156,6 +156,9 @@ struct oob_data {
-> };
-> 
-> struct adv_info {
-> +	struct list_head list;
-> +	struct hci_dev *hdev;
+`sdl2-jstest` output:
+[ ~ ] % sdl2-jstest --event 0
+Joystick Name:     'PLAYSTATION(R)3 Controller'
+Joystick GUID:     050000004c0500006802000000010000
+Joystick Number:    0
+Number of Axes:     4
+Number of Buttons: 19
+Number of Hats:     0
+Number of Balls:    0
+GameController:
+  not a gamepad
 
-Why is the a copy of hci_dev needed here?
+Entering joystick test loop, press Ctrl-c to exit
+SDL_JOYDEVICEADDED which:0
+SDL_JOYAXISMOTION: joystick: 0 axis: 0 value: -32768
+SDL_JOYAXISMOTION: joystick: 0 axis: 1 value: -32768
+SDL_JOYAXISMOTION: joystick: 0 axis: 2 value: -32768
+SDL_JOYAXISMOTION: joystick: 0 axis: 3 value: -32768
+SDL_JOYAXISMOTION: joystick: 0 axis: 0 value: 0
+SDL_JOYAXISMOTION: joystick: 0 axis: 1 value: 0
+SDL_JOYAXISMOTION: joystick: 0 axis: 2 value: 0
+SDL_JOYAXISMOTION: joystick: 0 axis: 3 value: 0
 
-> +	bool pending;
+`evtest /dev/input/event15|grep ABS_X` output:
+Event: time 1415565008.363798, type 3 (EV_ABS), code 0 (ABS_X), value 130=
 
-What is this pending for. I do not see it being used in this patch.
+Event: time 1415565008.394811, type 3 (EV_ABS), code 0 (ABS_X), value 129=
 
-> 	struct delayed_work timeout_exp;
-> 	__u8	instance;
-> 	__u32	flags;
-> @@ -166,6 +169,8 @@ struct adv_info {
-> 	__u8	scan_rsp_data[HCI_MAX_AD_LENGTH];
-> };
-> 
-> +#define HCI_MAX_ADV_INSTANCES		1
-> +
-> #define HCI_MAX_SHORT_NAME_LENGTH	10
-> 
-> /* Default LE RPA expiry time, 15 minutes */
-> @@ -374,6 +379,9 @@ struct hci_dev {
-> 	__u8			scan_rsp_data_len;
-> 
-> 	struct adv_info		adv_instance;
-> +	struct list_head	adv_instances;
-> +	unsigned int		adv_instance_cnt;
-> +	__u8			cur_adv_instance;
-> 
-> 	__u8			irk[16];
-> 	__u32			rpa_timeout;
-> @@ -1007,6 +1015,14 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> 			       u8 bdaddr_type);
-> 
-> +void hci_adv_instances_clear(struct hci_dev *hdev);
-> +struct adv_info *hci_find_adv_instance(struct hci_dev *hdev, u8 instance);
-> +int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
-> +			 u16 adv_data_len, u8 *adv_data,
-> +			 u16 scan_rsp_len, u8 *scan_rsp_data,
-> +			 work_func_t timeout_work, u16 timeout);
-> +int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance);
-> +
-> void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
-> 
-> int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 476709b..de00e21 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2613,6 +2613,114 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> 	return 0;
-> }
-> 
-> +/* This function requires the caller holds hdev->lock */
-> +struct adv_info *hci_find_adv_instance(struct hci_dev *hdev, u8 instance)
-> +{
-> +	struct adv_info *adv_instance;
-> +
-> +	list_for_each_entry(adv_instance, &hdev->adv_instances, list) {
-> +		if (adv_instance->instance == instance)
-> +			return adv_instance;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +/* This function requires the caller holds hdev->lock */
-> +int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance)
-> +{
-> +	struct adv_info *adv_instance;
-> +
-> +	adv_instance = hci_find_adv_instance(hdev, instance);
-> +	if (!adv_instance)
-> +		return -ENOENT;
-> +
-> +	BT_DBG("%s removing %dMR", hdev->name, instance);
-> +
-> +	if (adv_instance->timeout)
-> +		cancel_delayed_work(&adv_instance->timeout_exp);
-> +
-> +	list_del(&adv_instance->list);
-> +	kfree(adv_instance);
-> +
-> +	hdev->adv_instance_cnt--;
-> +
-> +	return 0;
-> +}
-> +
-> +/* This function requires the caller holds hdev->lock */
-> +void hci_adv_instances_clear(struct hci_dev *hdev)
-> +{
-> +	struct adv_info *adv_instance, *n;
-> +
-> +	list_for_each_entry_safe(adv_instance, n, &hdev->adv_instances, list) {
-> +		if (adv_instance->timeout)
-> +			cancel_delayed_work(&adv_instance->timeout_exp);
-> +
-> +		list_del(&adv_instance->list);
-> +		kfree(adv_instance);
-> +	}
-> +
-> +	hdev->adv_instance_cnt = 0;
-> +}
-> +
-> +/* This function requires the caller holds hdev->lock */
-> +int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
-> +			 u16 adv_data_len, u8 *adv_data,
-> +			 u16 scan_rsp_len, u8 *scan_rsp_data,
-> +			 work_func_t timeout_work, u16 timeout)
-> +{
-> +	struct adv_info *adv_instance;
-> +
-> +	adv_instance = hci_find_adv_instance(hdev, instance);
-> +	if (adv_instance) {
-> +		if (adv_instance->timeout)
-> +			cancel_delayed_work(&adv_instance->timeout_exp);
-> +
-> +		memset(adv_instance->adv_data, 0,
-> +		       sizeof(adv_instance->adv_data));
-> +		memset(adv_instance->scan_rsp_data, 0,
-> +		       sizeof(adv_instance->scan_rsp_data));
-> +	} else {
-> +		if (hdev->adv_instance_cnt >= HCI_MAX_ADV_INSTANCES)
-> +			return -EOVERFLOW;
-> +
-> +		adv_instance = kmalloc(sizeof(*adv_instance), GFP_KERNEL);
-> +		if (!adv_instance)
-> +			return -ENOMEM;
-> +
-> +		memset(adv_instance, 0, sizeof(*adv_instance));
-> +		adv_instance->hdev = hdev;
-> +		adv_instance->pending = true;
-> +		INIT_DELAYED_WORK(&adv_instance->timeout_exp, timeout_work);
-> +		adv_instance->instance = instance;
-> +		list_add(&adv_instance->list, &hdev->adv_instances);
-> +		hdev->adv_instance_cnt++;
-> +	}
-> +
-> +	adv_instance->flags = flags;
-> +	adv_instance->adv_data_len = adv_data_len;
-> +	adv_instance->scan_rsp_len = scan_rsp_len;
-> +
-> +	if (adv_data_len)
-> +		memcpy(adv_instance->adv_data, adv_data, adv_data_len);
-> +
-> +	if (scan_rsp_len)
-> +		memcpy(adv_instance->scan_rsp_data,
-> +		       scan_rsp_data, scan_rsp_len);
-> +
-> +	adv_instance->timeout = timeout;
-> +
-> +	if (timeout)
-> +		queue_delayed_work(hdev->workqueue,
-> +				   &adv_instance->timeout_exp,
-> +				   msecs_to_jiffies(timeout * 1000));
-> +
-> +	BT_DBG("%s for %dMR", hdev->name, instance);
-> +
-> +	return 0;
-> +}
-> +
-> struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
-> 					 bdaddr_t *bdaddr, u8 type)
-> {
-> @@ -3016,6 +3124,8 @@ struct hci_dev *hci_alloc_dev(void)
-> 	hdev->manufacturer = 0xffff;	/* Default to internal use */
-> 	hdev->inq_tx_power = HCI_TX_POWER_INVALID;
-> 	hdev->adv_tx_power = HCI_TX_POWER_INVALID;
-> +	hdev->adv_instance_cnt = 0;
-> +	hdev->cur_adv_instance = 0x00;
-> 
-> 	hdev->sniff_max_interval = 800;
-> 	hdev->sniff_min_interval = 80;
-> @@ -3057,6 +3167,7 @@ struct hci_dev *hci_alloc_dev(void)
-> 	INIT_LIST_HEAD(&hdev->pend_le_conns);
-> 	INIT_LIST_HEAD(&hdev->pend_le_reports);
-> 	INIT_LIST_HEAD(&hdev->conn_hash.list);
-> +	INIT_LIST_HEAD(&hdev->adv_instances);
-> 
-> 	INIT_WORK(&hdev->rx_work, hci_rx_work);
-> 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
-> @@ -3250,6 +3361,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
-> 	hci_smp_ltks_clear(hdev);
-> 	hci_smp_irks_clear(hdev);
-> 	hci_remote_oob_data_clear(hdev);
-> +	hci_adv_instances_clear(hdev);
-> 	hci_bdaddr_list_clear(&hdev->le_white_list);
-> 	hci_conn_params_clear_all(hdev);
-> 	hci_discovery_filter_clear(hdev);
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 7fd87e7..ce25b6d 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -6813,7 +6813,7 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
-> 	rp->supported_flags = cpu_to_le32(supported_flags);
-> 	rp->max_adv_data_len = HCI_MAX_AD_LENGTH;
-> 	rp->max_scan_rsp_len = HCI_MAX_AD_LENGTH;
-> -	rp->max_instances = 1;
-> +	rp->max_instances = HCI_MAX_ADV_INSTANCES;
-> 
-> 	/* Currently only one instance is supported, so simply return the
-> 	 * current instance number.
-> @@ -6916,11 +6916,11 @@ unlock:
-> 
-> static void adv_timeout_expired(struct work_struct *work)
-> {
-> -	struct hci_dev *hdev = container_of(work, struct hci_dev,
-> -					    adv_instance.timeout_exp.work);
-> -
-> -	hdev->adv_instance.timeout = 0;
-> +	struct adv_info *adv_instance = container_of(work, struct adv_info,
-> +						     timeout_exp.work);
-> +	struct hci_dev *hdev = adv_instance->hdev;
-> 
-> +	adv_instance->timeout = 0;
-> 	hci_dev_lock(hdev);
-> 	clear_adv_instance(hdev);
-> 	hci_dev_unlock(hdev);
+Event: time 1415565008.498793, type 3 (EV_ABS), code 0 (ABS_X), value 0
+Event: time 1415565008.529810, type 3 (EV_ABS), code 0 (ABS_X), value 129=
 
-Regards
+Event: time 1415565008.734837, type 3 (EV_ABS), code 0 (ABS_X), value 130=
 
-Marcel
 
+`jstest` output:
+[ ~ ] % jstest --event /dev/input/js0| grep 'number 1'
+Event: type 129, time 72291033, number 1, value 0
+=2E..
+Event: type 2, time 72508989, number 1, value -32767
+Event: type 2, time 72509007, number 1, value 0
+Event: type 2, time 72567545, number 1, value -32767
+Event: type 2, time 72567577, number 1, value 0
+Event: type 2, time 72649514, number 1, value -32767
+Event: type 2, time 72649545, number 1, value 0
+
+`lsusb -vvv` output on BT USB dongle:
+Bus 007 Device 002: ID 1131:1004 Integrated System Solution Corp.
+Bluetooth Device
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass          224 Wireless
+  bDeviceSubClass         1 Radio Frequency
+  bDeviceProtocol         1 Bluetooth
+  bMaxPacketSize0        16
+  idVendor           0x1131 Integrated System Solution Corp.
+  idProduct          0x1004 Bluetooth Device
+  bcdDevice            3.73
+  iManufacturer           1 ISSC
+  iProduct                2 ISSCBTA
+  iSerial                 0
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength          186
+    bNumInterfaces          3
+    bConfigurationValue     1
+    iConfiguration          0
+    bmAttributes         0xc0
+      Self Powered
+    MaxPower                0mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           3
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0010  1x 16 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x02  EP 2 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0000  1x 0 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0000  1x 0 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       1
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0009  1x 9 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0009  1x 9 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       2
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0011  1x 17 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0011  1x 17 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       3
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0019  1x 25 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0019  1x 25 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       4
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0021  1x 33 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0021  1x 33 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       5
+      bNumEndpoints           2
+      bInterfaceClass       224 Wireless
+      bInterfaceSubClass      1 Radio Frequency
+      bInterfaceProtocol      1 Bluetooth
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0031  1x 49 bytes
+        bInterval               1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            1
+          Transfer Type            Isochronous
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0031  1x 49 bytes
+        bInterval               1
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        2
+      bAlternateSetting       0
+      bNumEndpoints           0
+      bInterfaceClass       254 Application Specific Interface
+      bInterfaceSubClass      1 Device Firmware Update
+      bInterfaceProtocol      0
+      iInterface              0
+Device Status:     0x0000
+  (Bus Powered)
+
+Surely I don't need to elaborate on how useless it makes the device.
+
+PS: Isn't its time already to get bluez a bugtracker ? It's unbelievable
+how much bullshit one has to hoop over just to officially complain on
+it. No wonder that bluez userspace always has been one of most broken,
+unfinished, unreliable, un-userfriendly pieces of FOSS code ever. Or
+maybe it's all inherited from Bluetooth=C2=AE mess of a standard and it's=
+
+destined to suck.
+
+
+--mNNuS69IDkkrwcIXc05STOOtT4I8p2ART
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iF4EAREIAAYFAlVgtyQACgkQrPLi+0dgLoawBwD+Nek8IPUMGT78fhB/DZmRUbQt
+gCxeg4u5FBV/bAyxybIA/i+uzNEm1d0diOqIdZ5HOONHbrU+MM6/9tep5N2zn6vP
+=3GUF
+-----END PGP SIGNATURE-----
+
+--mNNuS69IDkkrwcIXc05STOOtT4I8p2ART--
