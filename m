@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 03/16] Bluetooth: mgmt: multi adv for read_adv_features()
-Date: Mon, 25 May 2015 00:39:01 +0200
-Message-Id: <1432507154-22925-4-git-send-email-fgrandel@gmail.com>
+Subject: [PATCH v5 02/16] Bluetooth: mgmt: dry update_scan_rsp_data()
+Date: Mon, 25 May 2015 00:39:00 +0200
+Message-Id: <1432507154-22925-3-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1432507154-22925-1-git-send-email-fgrandel@gmail.com>
 References: <1432507154-22925-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
@@ -11,66 +11,80 @@ References: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The read_adv_features() method had a single instance identifier hard
-coded. Refer to the advertising instance list instead to return a
-dynamically generated list of instance identifiers.
+update_scan_rsp_data() duplicates code from get_current_adv_instance().
+This is being fixed by letting the former make use of the latter.
 
 Signed-off-by: Florian Grandel <fgrandel@gmail.com>
 ---
- net/bluetooth/mgmt.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+ net/bluetooth/mgmt.c | 41 +++++++++++++++--------------------------
+ 1 file changed, 15 insertions(+), 26 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9dc4905..9f5ac26 100644
+index ce25b6d..9dc4905 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -6770,8 +6770,9 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- {
- 	struct mgmt_rp_read_adv_features *rp;
- 	size_t rp_len;
--	int err;
-+	int err, i;
- 	bool instance;
-+	struct adv_info *adv_instance;
- 	u32 supported_flags;
+@@ -832,6 +832,20 @@ static struct mgmt_pending_cmd *pending_find_data(u16 opcode,
+ 	return mgmt_pending_find_data(HCI_CHANNEL_CONTROL, opcode, hdev, data);
+ }
  
- 	BT_DBG("%s", hdev->name);
-@@ -6784,12 +6785,9 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- 
- 	rp_len = sizeof(*rp);
- 
--	/* Currently only one instance is supported, so just add 1 to the
--	 * response length.
--	 */
- 	instance = hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE);
- 	if (instance)
--		rp_len++;
-+		rp_len += hdev->adv_instance_cnt;
- 
- 	rp = kmalloc(rp_len, GFP_ATOMIC);
- 	if (!rp) {
-@@ -6804,12 +6802,16 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- 	rp->max_scan_rsp_len = HCI_MAX_AD_LENGTH;
- 	rp->max_instances = HCI_MAX_ADV_INSTANCES;
- 
--	/* Currently only one instance is supported, so simply return the
--	 * current instance number.
--	 */
- 	if (instance) {
--		rp->num_instances = 1;
--		rp->instance[0] = 1;
-+		i = 0;
-+		list_for_each_entry(adv_instance, &hdev->adv_instances, list) {
-+			if (i >= hdev->adv_instance_cnt)
-+				break;
++static u8 get_current_adv_instance(struct hci_dev *hdev)
++{
++	/* The "Set Advertising" setting supersedes the "Add Advertising"
++	 * setting. Here we set the advertising data based on which
++	 * setting was set. When neither apply, default to the global settings,
++	 * represented by instance "0".
++	 */
++	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
++	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
++		return 0x01;
 +
-+			rp->instance[i] = adv_instance->instance;
-+			i++;
-+		}
-+		rp->num_instances = hdev->adv_instance_cnt;
- 	} else {
- 		rp->num_instances = 0;
- 	}
++	return 0x00;
++}
++
+ static u8 create_default_scan_rsp_data(struct hci_dev *hdev, u8 *ptr)
+ {
+ 	u8 ad_len = 0;
+@@ -901,18 +915,7 @@ static void update_scan_rsp_data_for_instance(struct hci_request *req,
+ static void update_scan_rsp_data(struct hci_request *req)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+-	u8 instance;
+-
+-	/* The "Set Advertising" setting supersedes the "Add Advertising"
+-	 * setting. Here we set the scan response data based on which
+-	 * setting was set. When neither apply, default to the global settings,
+-	 * represented by instance "0".
+-	 */
+-	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
+-	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
+-		instance = 0x01;
+-	else
+-		instance = 0x00;
++	u8 instance = get_current_adv_instance(hdev);
+ 
+ 	update_scan_rsp_data_for_instance(req, instance);
+ }
+@@ -941,20 +944,6 @@ static u8 get_adv_discov_flags(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
+-static u8 get_current_adv_instance(struct hci_dev *hdev)
+-{
+-	/* The "Set Advertising" setting supersedes the "Add Advertising"
+-	 * setting. Here we set the advertising data based on which
+-	 * setting was set. When neither apply, default to the global settings,
+-	 * represented by instance "0".
+-	 */
+-	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
+-	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
+-		return 0x01;
+-
+-	return 0x00;
+-}
+-
+ static bool get_connectable(struct hci_dev *hdev)
+ {
+ 	struct mgmt_pending_cmd *cmd;
 -- 
 1.9.1
 
