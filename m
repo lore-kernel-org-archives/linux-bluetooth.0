@@ -1,90 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 02/16] Bluetooth: mgmt: dry update_scan_rsp_data()
-Date: Mon, 25 May 2015 00:39:00 +0200
-Message-Id: <1432507154-22925-3-git-send-email-fgrandel@gmail.com>
-In-Reply-To: <1432507154-22925-1-git-send-email-fgrandel@gmail.com>
-References: <1432507154-22925-1-git-send-email-fgrandel@gmail.com>
+Subject: [PATCH v5 00/16] Bluetooth: Multi-advertising infrastructure
+Date: Mon, 25 May 2015 00:38:58 +0200
+Message-Id: <1432507154-22925-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
 References: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-update_scan_rsp_data() duplicates code from get_current_adv_instance().
-This is being fixed by letting the former make use of the latter.
+patch set introducing the infrastructure for multi-advertising
+capability to the HCI core and mgmt API.
 
-Signed-off-by: Florian Grandel <fgrandel@gmail.com>
----
- net/bluetooth/mgmt.c | 41 +++++++++++++++--------------------------
- 1 file changed, 15 insertions(+), 26 deletions(-)
+v1 -> v2:
+- add missing braces in read_adv_features()
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ce25b6d..9dc4905 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -832,6 +832,20 @@ static struct mgmt_pending_cmd *pending_find_data(u16 opcode,
- 	return mgmt_pending_find_data(HCI_CHANNEL_CONTROL, opcode, hdev, data);
- }
- 
-+static u8 get_current_adv_instance(struct hci_dev *hdev)
-+{
-+	/* The "Set Advertising" setting supersedes the "Add Advertising"
-+	 * setting. Here we set the advertising data based on which
-+	 * setting was set. When neither apply, default to the global settings,
-+	 * represented by instance "0".
-+	 */
-+	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
-+	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
-+		return 0x01;
-+
-+	return 0x00;
-+}
-+
- static u8 create_default_scan_rsp_data(struct hci_dev *hdev, u8 *ptr)
- {
- 	u8 ad_len = 0;
-@@ -901,18 +915,7 @@ static void update_scan_rsp_data_for_instance(struct hci_request *req,
- static void update_scan_rsp_data(struct hci_request *req)
- {
- 	struct hci_dev *hdev = req->hdev;
--	u8 instance;
--
--	/* The "Set Advertising" setting supersedes the "Add Advertising"
--	 * setting. Here we set the scan response data based on which
--	 * setting was set. When neither apply, default to the global settings,
--	 * represented by instance "0".
--	 */
--	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
--	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
--		instance = 0x01;
--	else
--		instance = 0x00;
-+	u8 instance = get_current_adv_instance(hdev);
- 
- 	update_scan_rsp_data_for_instance(req, instance);
- }
-@@ -941,20 +944,6 @@ static u8 get_adv_discov_flags(struct hci_dev *hdev)
- 	return 0;
- }
- 
--static u8 get_current_adv_instance(struct hci_dev *hdev)
--{
--	/* The "Set Advertising" setting supersedes the "Add Advertising"
--	 * setting. Here we set the advertising data based on which
--	 * setting was set. When neither apply, default to the global settings,
--	 * represented by instance "0".
--	 */
--	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
--	    !hci_dev_test_flag(hdev, HCI_ADVERTISING))
--		return 0x01;
--
--	return 0x00;
--}
--
- static bool get_connectable(struct hci_dev *hdev)
- {
- 	struct mgmt_pending_cmd *cmd;
+v2 -> v3:
+- split change-set into several patches
+- replace err == 0 by !err
+- fix coding style problems
+
+v3 -> v4:
+publicly visible change:
+- when calling remove_advertising with an instance value of zero (i.e.
+  remove all instances), the command response also returns an instance
+  value of zero now as it doesn't make sense to return a single instance
+  id when removing several instances
+
+refactoring and fixes (due to Arman's review):
+- splitting the change set into a much larger number of patches to
+  facilitate review
+- use HCI_MAX_ADV_INSTANCES in the same patch that introduces it
+- use adv_info->hdev in the same patch that introduces it
+- make the logic of hci_find_adv_instance() more readable
+- make sure that hci_find_adv_instance() is called while hci_dev is
+  locked
+- replace hci_num_adv_instances() by an instance counter in hci_dev
+- add inline comment in get_adv_instance_flags() explaining its return
+  value in the error case
+- generate zero-length adv data if the current instance identifier is
+  invalid
+- revert erroneous changes to the logic in clear_adv_instance()
+- use hci_adv_instances_clear() in clear_adv_instance() when removing
+  all advertising instances also removing a reduntant error check
+- inserting TODO messages to make sure that advertising will not be
+  switched off prematurely once we allow more than one advertising
+  instance
+- inserting TODO messages to make sure that multiple advertising
+  instances will be advertised in a round-robin fashion once we allow
+  for more than one advertising instance
+- identify peding advertising instances (just added but not yet
+  confirmed in add_advertising_complete) by a boolean flag in the
+  adv_info struct so that we can identify and remove them even when
+  the pending add_advertising command cannot be retrieved for some
+  reason - makes sure that we do not leak advertising instances in this
+  case
+- only send HCI commands to update advertising data when a new instance
+  has actually been added
+
+v4 -> v5 (fixes due to Marcel's review):
+- split into separate change sets for kernel and userspace
+- do not trust the adv instance list length when compiling the adv features
+  struct
+- introduce adv_info->pending in the same patch it's used for the first time
+
+
+Florian Grandel (16):
+  Bluetooth: hci_core: Introduce multi-adv inst list
+  Bluetooth: mgmt: dry update_scan_rsp_data()
+  Bluetooth: mgmt: multi adv for read_adv_features()
+  Bluetooth: mgmt: multi adv for get_current_adv_instance()
+  Bluetooth: mgmt: multi adv for get_adv_instance_flags()
+  Bluetooth: mgmt: improve get_adv_instance_flags() readability
+  Bluetooth: mgmt: multi adv for enable_advertising()
+  Bluetooth: mgmt: use current adv instance in set_advertising()
+  Bluetooth: mgmt: multi adv for create_instance_scan_rsp_data()
+  Bluetooth: mgmt: multi adv for create_instance_adv_data()
+  Bluetooth: mgmt: refactor update_*_data()
+  Bluetooth: mgmt: multi adv for set_advertising_complete()
+  Bluetooth: mgmt: multi adv for add_advertising()
+  Bluetooth: mgmt: multi adv for clear_adv_instances()
+  Bluetooth: mgmt: multi adv for remove_advertising()
+  Bluetooth: hci_core: remove obsolete adv_instance
+
+ include/net/bluetooth/hci_core.h |  22 ++-
+ net/bluetooth/hci_core.c         | 113 ++++++++++++-
+ net/bluetooth/mgmt.c             | 353 ++++++++++++++++++++++-----------------
+ 3 files changed, 331 insertions(+), 157 deletions(-)
+
 -- 
 1.9.1
 
