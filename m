@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 07/16] Bluetooth: mgmt: multi adv for enable_advertising()
-Date: Mon, 25 May 2015 00:39:05 +0200
-Message-Id: <1432507154-22925-8-git-send-email-fgrandel@gmail.com>
+Subject: [PATCH v5 06/16] Bluetooth: mgmt: improve get_adv_instance_flags() readability
+Date: Mon, 25 May 2015 00:39:04 +0200
+Message-Id: <1432507154-22925-7-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1432507154-22925-1-git-send-email-fgrandel@gmail.com>
 References: <1432507154-22925-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
@@ -11,58 +11,61 @@ References: <1430408000-17785-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously enable_advertising() would rely on
-get_adv_instance_scan_rsp_len() which checked for a hard coded instance
-identifier. This is being changed to check for the current advertising
-instance's scan response length instead. The function is renamed
-accordingly.
+Switch if and else conditions to replace a negative statement by a
+positive one which makes the condition more readable.
 
 Signed-off-by: Florian Grandel <fgrandel@gmail.com>
 ---
- net/bluetooth/mgmt.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ net/bluetooth/mgmt.c | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 80dd5db..94b49ed 100644
+index 5a531fd5..80dd5db 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -990,16 +990,23 @@ static u32 get_adv_instance_flags(struct hci_dev *hdev, u8 instance)
- 	return adv_instance->flags;
- }
+@@ -966,26 +966,28 @@ static u32 get_adv_instance_flags(struct hci_dev *hdev, u8 instance)
+ 	u32 flags;
+ 	struct adv_info *adv_instance;
  
--static u8 get_adv_instance_scan_rsp_len(struct hci_dev *hdev, u8 instance)
-+static u8 get_cur_adv_instance_scan_rsp_len(struct hci_dev *hdev)
- {
--	/* Ignore instance 0 and other unsupported instances */
--	if (instance != 0x01)
-+	u8 instance = get_current_adv_instance(hdev);
-+	struct adv_info *adv_instance;
-+
-+	/* Ignore instance 0 */
-+	if (instance == 0x00)
-+		return 0;
-+
+-	if (instance != 0x00) {
+-		adv_instance = hci_find_adv_instance(hdev, instance);
++	if (instance == 0x00) {
++		/* Instance 0 always manages the "Tx Power" and "Flags"
++		 * fields
++		 */
++		flags = MGMT_ADV_FLAG_TX_POWER | MGMT_ADV_FLAG_MANAGED_FLAGS;
+ 
+-		/* Return 0 when we got an invalid instance identifier. */
+-		if (!adv_instance)
+-			return 0;
++		/* For instance 0, the HCI_ADVERTISING_CONNECTABLE setting
++		 * corresponds to the "connectable" instance flag.
++		 */
++		if (hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE))
++			flags |= MGMT_ADV_FLAG_CONNECTABLE;
+ 
+-		return adv_instance->flags;
++		return flags;
+ 	}
+ 
+-	/* Instance 0 always manages the "Tx Power" and "Flags" fields */
+-	flags = MGMT_ADV_FLAG_TX_POWER | MGMT_ADV_FLAG_MANAGED_FLAGS;
 +	adv_instance = hci_find_adv_instance(hdev, instance);
-+	if (!adv_instance)
- 		return 0;
  
- 	/* TODO: Take into account the "appearance" and "local-name" flags here.
- 	 * These are currently being ignored as they are not supported.
- 	 */
--	return hdev->adv_instance.scan_rsp_len;
-+	return adv_instance->scan_rsp_len;
+-	/* For instance 0, the HCI_ADVERTISING_CONNECTABLE setting corresponds
+-	 * to the "connectable" instance flag.
+-	 */
+-	if (hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE))
+-		flags |= MGMT_ADV_FLAG_CONNECTABLE;
++	/* Return 0 when we got an invalid instance identifier. */
++	if (!adv_instance)
++		return 0;
+ 
+-	return flags;
++	return adv_instance->flags;
  }
  
- static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
-@@ -1273,7 +1280,7 @@ static void enable_advertising(struct hci_request *req)
- 
- 	if (connectable)
- 		cp.type = LE_ADV_IND;
--	else if (get_adv_instance_scan_rsp_len(hdev, instance))
-+	else if (get_cur_adv_instance_scan_rsp_len(hdev))
- 		cp.type = LE_ADV_SCAN_IND;
- 	else
- 		cp.type = LE_ADV_NONCONN_IND;
+ static u8 get_adv_instance_scan_rsp_len(struct hci_dev *hdev, u8 instance)
 -- 
 1.9.1
 
