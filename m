@@ -1,53 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 May 2015 05:47:58 +0000 (GMT)
-From: Nagaraj D R <nagaraj.dr@samsung.com>
-Subject: Fwd: Fwd: [PATCH 1/1] shared/gatt-client: Fix the
- "Find Information req" error
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	nagaraj.dr@samsung.com
-Reply-to: nagaraj.dr@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <2003620257.21641432532878807.JavaMail.weblogic@epmlwas09a>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH v5 00/16] Bluetooth: Multi-advertising infrastructure
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1432507154-22925-1-git-send-email-fgrandel@gmail.com>
+Date: Mon, 25 May 2015 02:52:57 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F21682C7-106D-4293-993D-D68087860A58@holtmann.org>
+References: <1430408000-17785-1-git-send-email-fgrandel@gmail.com> <1432507154-22925-1-git-send-email-fgrandel@gmail.com>
+To: Florian Grandel <fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-cGluZw0KDQotLS0tLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0tLS0tLQ0KU2VuZGVyIDogTmFnYXJh
-aiBEIFI8bmFnYXJhai5kckBzYW1zdW5nLmNvbT4gTGVhZCBFbmdpbmVlci9TUkktQmFuZ2Fsb3Jl
-LVN5c3RlbSAmIENvbm5lY3Rpdml0eS9TYW1zdW5nIEVsZWN0cm9uaWNzDQpEYXRlIDogTWF5IDE1
-LCAyMDE1IDExOjUwIChHTVQrMDU6MzApDQpUaXRsZSA6IEZ3ZDogW1BBVENIIDEvMV0gc2hhcmVk
-L2dhdHQtY2xpZW50OiBGaXggdGhlICJGaW5kIEluZm9ybWF0aW9uIHJlcSIgZXJyb3INCg0KcGlu
-Zw0KDQotLS0tLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0tLS0tLQ0KU2VuZGVyIDogTmFnYXJhaiBE
-IFIgTGVhZCBFbmdpbmVlci9TUkktQmFuZ2Fsb3JlLVN5c3RlbSAmIENvbm5lY3Rpdml0eS9TYW1z
-dW5nIEVsZWN0cm9uaWNzDQpEYXRlIDogTWF5IDEzLCAyMDE1IDE3OjA1IChHTVQrMDU6MzApDQpU
-aXRsZSA6IFtQQVRDSCAxLzFdIHNoYXJlZC9nYXR0LWNsaWVudDogRml4IHRoZSAiRmluZCBJbmZv
-cm1hdGlvbiByZXEiIGVycm9yDQoNCkZyb206ICJuYWdhcmFqLmRyIiANCg0KY2hhcmFjdGVyaXN0
-aWMgZGVzY3JpcHRvciBpcyBzZWFyY2hlZCBiL3cgdGhlDQpjaGFyYWN0ZXJpc3RpYyAidmFsdWVf
-aGFuZGxlICsgMSIgYW5kDQpjaGFyYWN0ZXJpc3RpYyAiZW5kX2hhbmRsZSIgdXNpbmcgIkZpbmQg
-SW5mb3JtYXRpb24gcmVxIg0KDQppZiByZW1vdGUgZGV2aWNlIGhhZCBkZWNsYXJlZCB0aGUgY2hh
-cmFjdGVyaXN0aWMgdmFsdWVfaGFuZGxlDQphdCAwWEZGRkYgKHdoaWNoIGFsc28gbWVhbnMgdGhl
-cmUgaXMgbm8gY2hhcmFjdGVyaXN0aWMgZGVzY3JpcHRvcnMpLHRoZW4NCnByZXNlbnQgY29kZSB3
-b3VsZCBtYWtlIHN0YXJ0X2hhbmRsZSBoYXMgMFgwMDAwKGJlY2F1c2Ugb2YgMTYgYml0DQppbnRl
-Z2VyIG92ZXJmbG93KSBmb3IgIkZpbmQgSW5mb3JtYXRpb24gcmVxIg0KDQpkZXNjX3N0YXJ0ID0g
-Y2hyY19kYXRhLT52YWx1ZV9oYW5kbGUgKyAxOw0KDQpDb25zZXF1ZW5jZTogIEJlbG93IHJlcXVl
-c3Qgd2lsbCBiZSBzZW50LA0KICAgICAgICBBVFQ6IEZpbmQgSW5mb3JtYXRpb24gcmVxICgweDA0
-KQ0KICAgICAgICBzdGFydCAweDAwMDAsIGVuZCAweGZmZmYNCg0KICAgICAgICBhbmQgYmVsb3cg
-d2lsbCBiZSB0aGUgcHJvcGVyIHJlc3BvbnNlIGZyb20gdGhlIHJlbW90ZSBkZXZpY2UNCiAgICAg
-ICAgQVRUOiBFcnJvciAoMHgwMSkNCiAgICAgICAgRXJyb3I6IEludmFsaWQgaGFuZGxlICgxKQ0K
-ICAgICAgICBGaW5kIEluZm9ybWF0aW9uIHJlcSAoMHgwNCkgb24gaGFuZGxlIDB4MDAwMA0KLS0t
-DQpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmMgfCAgICA2ICsrKy0tLQ0KMSBmaWxlIGNoYW5nZWQs
-IDMgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL3NyYy9zaGFy
-ZWQvZ2F0dC1jbGllbnQuYyBiL3NyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYw0KaW5kZXggN2JjM2I3
-MS4uOWI5NDRlZSAxMDA2NDQNCi0tLSBhL3NyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYw0KKysrIGIv
-c3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jDQpAQCAtNjAxLDEzICs2MDEsMTMgQEAgc3RhdGljIGJv
-b2wgZGlzY292ZXJfZGVzY3Moc3RydWN0IGRpc2NvdmVyeV9vcCAqb3AsIGJvb2wgKmRpc2NvdmVy
-aW5nKQ0KY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUpDQpnb3RvIGZhaWxlZDsNCg0KLSBkZXNjX3N0
-YXJ0ID0gY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUgKyAxOw0KLQ0KLSBpZiAoZGVzY19zdGFydCA+
-IGNocmNfZGF0YS0+ZW5kX2hhbmRsZSkgew0KKyBpZiAoY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUg
-Pj0gY2hyY19kYXRhLT5lbmRfaGFuZGxlKSB7DQpmcmVlKGNocmNfZGF0YSk7DQpjb250aW51ZTsN
-Cn0NCg0KKyBkZXNjX3N0YXJ0ID0gY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUgKyAxOw0KKw0KY2xp
-ZW50LT5kaXNjb3ZlcnlfcmVxID0gYnRfZ2F0dF9kaXNjb3Zlcl9kZXNjcmlwdG9ycygNCmNsaWVu
-dC0+YXR0LCBkZXNjX3N0YXJ0LA0KY2hyY19kYXRhLT5lbmRfaGFuZGxlLA0KLS0gDQoxLjcuOS41
+Hi Florian,
 
+> patch set introducing the infrastructure for multi-advertising
+> capability to the HCI core and mgmt API.
+
+the patch set is actually breaking functionality. If you want to overwrite the advertising data of an existing instance, then you can just do that by issuing another management command.
+
+	add-adv -u 180d 1
+	add-adv -u 180f 1
+
+This will first enable advertising with the heart rate UUID and then with the battery service UUID. With your patch set, this basic feature does not work anymore.
+
+I think first we need a lot more mgmt-tester commands that actually test this functionality.
+
+Regards
+
+Marcel
 
