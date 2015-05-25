@@ -1,25 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ankur Patel <ankur@embertec.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 26 May 2015 10:03:14 +0930
-Subject: RE: Support for Reconnection Address
-Message-ID: <BD5E516FF3711A41B93DC005170007BB010E5D9DFEA1@EMBSVR01.ember.local>
-References: <BD5E516FF3711A41B93DC005170007BB010E5D9DFBFF@EMBSVR01.ember.local>
- <3FF7A071-7E13-480B-B3AA-53D31D24E7D0@holtmann.org>
-In-Reply-To: <3FF7A071-7E13-480B-B3AA-53D31D24E7D0@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
+Sender: Larry Finger <larry.finger@gmail.com>
+Message-ID: <55638D99.5000704@lwfinger.net>
+Date: Mon, 25 May 2015 16:01:13 -0500
+From: Larry Finger <Larry.Finger@lwfinger.net>
 MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+CC: Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>
+Subject: Memory leak in btusb
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PiBIaSBBbmt1ciwNCj4gDQo+ID4gSSBqdXN0IHdvdWxkIGxpa2UgdG8ga25vdyBpZiBCbHVleiA1
-LjMwIGRvZXMgc3VwcG9ydCBSZWNvbm5lY3Rpb24gQWRkcmVzcw0KPiBDaGFyYWN0ZXJpc3RpYyB2
-YWx1ZSBvbiB0aGUgcGVyaXBoZXJhbCBhcyBub24tcmVzb2x2YWJsZSBwcml2YXRlIGFkZHJlc3M/
-IEFzIEkNCj4gZGlkbid0IGZpbmQgYW55IGluZm9ybWF0aW9uIGFib3V0IGl0IG9uIGRvYy4gQWxz
-byB3aGlsZSBicm93c2luZyB0aGUgc291cmNlLCBJDQo+IGZvdW5kIGNvbW1lbnQgIiAvKiBGSVhN
-RTogTWlzc2luZyBQcml2YWN5IGFuZCBSZWNvbm5lY3Rpb24gQWRkcmVzcyAqLyIgYXQNCj4gTGlu
-ZSMxNjM4IHVuZGVyIGdpdC9zcmMvYXR0cmliLXNlcnZlci5jLiBUaGlzIG1ha2VzIG1lIHdvbmRl
-cmluZyBpZiBCbHVleg0KPiBoYXMgdGhlIHN1cHBvcnQgb3Igbm90Lg0KPiANCj4gaGFzbuKAmXQg
-dGhhdCBjaGFyYWN0ZXJpc3RpYyBiZWVuIHJlbW92ZWQgaW4gQmx1ZXRvb3RoIDQuMSBzcGVjaWZp
-Y2F0aW9uPw0KPiANCj4gUmVnYXJkcw0KPiANCj4gTWFyY2VsDQpIZXJlIHlvdSBnbywgSSBnb3Qg
-bXkgQW5zd2VyLiBUaGFuayB5b3UgTWFyY2VsLg0K
+Hi,
+
+While using kmemleak to check for memory leaks in a wireless driver, I noticed 
+the following stack traceback for a leak in btusb:
+
+<ffffffff8160257e>] __alloc_skb+0x7e/0x2b0
+[<ffffffffa06029d6>] btusb_recv_intr+0x136/0x180 [btusb]
+[<ffffffffa0602ad8>] btusb_intr_complete+0xb8/0x150 [btusb]
+[<ffffffff8156ccb2>] __usb_hcd_giveback_urb+0x72/0x120
+
+To eliminate a false positive, I unloaded the driver and got the following for 
+the virtual address:
+
+[<ffffffff8160257e>] __alloc_skb+0x7e/0x2b0
+[<ffffffffa06029d6>] 0xffffffffa06029d6
+[<ffffffffa0602ad8>] 0xffffffffa0602ad8
+[<ffffffff8156ccb2>] __usb_hcd_giveback_urb+0x72/0x120
+
+The source is from wireless-drivers-next.git with pulls from bluetooth-next.git 
+and Torvalds mainline git repo that were done on May 25. The source includes 
+commit 04b8c8143d46453a443ac32bfcd76ec952605765 with the subject "Bluetooth: 
+btusb: fix Realtek suspend/resume".
+
+The Bluetooth device in use is made by Intel with USB ID 8087:07dc.
+
+Thanks,
+
+Larry
