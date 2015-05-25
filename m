@@ -1,80 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1432570112.3146.5.camel@gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: btusb: Support QCA61x4 ROME v2.0
-From: Chanyeol Park <chanyeol.park@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, Chan-yeol Park
- <chanyeol.park@samsung.com>
-Date: Tue, 26 May 2015 01:08:32 +0900
-In-Reply-To: <1432175067-3156-1-git-send-email-chanyeol.park@samsung.com>
-References: <1432175067-3156-1-git-send-email-chanyeol.park@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1432123788-12967-1-git-send-email-chanyeol.park@samsung.com>
+References: <1432123788-12967-1-git-send-email-chanyeol.park@samsung.com>
+Date: Mon, 25 May 2015 16:40:35 +0300
+Message-ID: <CABBYNZKLmcf-Q809BrFMHAXz1G8D=FHjccVoZZ4pMuFPjLgstw@mail.gmail.com>
+Subject: Re: [RFC BlueZ v4 1/2] audio/avdtp: Add a2dp vendor codec match callback
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Chan-yeol Park <chanyeol.park@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Marcel
+Hi Chan-yeol,
 
-On Thu, 2015-05-21 at 11:24 +0900, Chan-yeol Park wrote:
-> The previous commit(3267c88) missed QCA61x4 ROME v2.0 info on Samsung
-> so its BT is not activated and the below message is shown.
-> 
-> [    8.009638] usb 1-1: New USB device found, idVendor=0cf3, 
-> idProduct=e300
-> [    8.012637] usb 1-1: New USB device strings: Mfr=0, Product=0, 
-> SerialNumber=0
-> [    8.102901] Bluetooth: hci0: don't support firmware rome 0x200
-> 
-> This patch adds QCA61x4 ROME v2.0 info in qca_devices_table[], and is
-> verified on Samsung with the firmware provided by Kim, Ben Young Tae
-> <ytkim@qca.qualcomm.com>.
-> 
-> T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=e300 Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+On Wed, May 20, 2015 at 3:09 PM, Chan-yeol Park
+<chanyeol.park@samsung.com> wrote:
+> When matching remote SEP to local SEP avdtp does not compare vendor
+> codecs properly, i.e. neither vendor ID not codec ID are checked,
+> which may cause wrong endpoint to be selected in case there are more
+> that one endpoints using vendor codec on remote.
+>
+> This patch fixes it by adding a2dp codec match call back.
 > ---
->  drivers/bluetooth/btusb.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index b9f2821..c334620 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2382,6 +2382,7 @@ struct qca_device_info {
->  static const struct qca_device_info qca_devices_table[] = {
->       { 0x00000100, 20, 4, 10 }, /* Rome 1.0 */
->       { 0x00000101, 20, 4, 10 }, /* Rome 1.1 */
-> +     { 0x00000200, 28, 4, 18 }, /* Rome 2.0 */
->       { 0x00000201, 28, 4, 18 }, /* Rome 2.1 */
->       { 0x00000300, 28, 4, 18 }, /* Rome 3.0 */
->       { 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
+>  profiles/audio/a2dp.c  | 36 ++++++++++++++++++++++++++++++++++++
+>  profiles/audio/avdtp.c |  5 +++++
+>  profiles/audio/avdtp.h |  3 +++
+>  3 files changed, 44 insertions(+)
+>
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index 31c5086..3c5a8a2 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -447,6 +447,41 @@ static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
+>         auto_config(setup);
+>  }
+>
+> +static gboolean a2dp_codec_matched_ind(struct avdtp *session,
+> +                       struct avdtp_media_codec_capability *rcodec_data,
+> +                                               void *user_data)
+> +{
+> +       struct a2dp_sep *sep = user_data;
+> +       a2dp_vendor_codec_t *remote_codec;
+> +       a2dp_vendor_codec_t *local_codec;
+> +       uint8_t *capabilities;
+> +       size_t length;
+> +
+> +       if (rcodec_data->media_codec_type != A2DP_CODEC_VENDOR)
+> +               return TRUE;
+> +
+> +       if (sep->endpoint == NULL)
+> +               return FALSE;
+> +
+> +       length = sep->endpoint->get_capabilities(sep, &capabilities,
+> +                                                       sep->user_data);
+> +       if (length < sizeof(a2dp_vendor_codec_t))
+> +               return FALSE;
+> +
+> +       local_codec = (a2dp_vendor_codec_t *) capabilities;
+> +       remote_codec = (a2dp_vendor_codec_t *) rcodec_data->data;
+> +
+> +       if (remote_codec->vendor_id != local_codec->vendor_id)
+> +               return FALSE;
+> +
+> +       if (remote_codec->codec_id != local_codec->codec_id)
+> +               return FALSE;
+> +
+> +       DBG("vendor 0x%08x codec 0x%04x", btohl(remote_codec->vendor_id),
+> +                                               btohs(remote_codec->codec_id));
+> +       return TRUE;
+> +}
+> +
+>  static gboolean endpoint_setconf_ind(struct avdtp *session,
+>                                                 struct avdtp_local_sep *sep,
+>                                                 struct avdtp_stream *stream,
+> @@ -1114,6 +1149,7 @@ static struct avdtp_sep_cfm cfm = {
+>  };
+>
+>  static struct avdtp_sep_ind endpoint_ind = {
+> +       .codec_matched          = a2dp_codec_matched_ind,
+>         .get_capability         = endpoint_getcap_ind,
+>         .set_configuration      = endpoint_setconf_ind,
+>         .get_configuration      = getconf_ind,
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index f38188f..181658c 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -1226,6 +1226,11 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
+>                 if (codec_data->media_codec_type != lsep->codec)
+>                         continue;
+>
+> +               if (lsep->ind && lsep->ind->codec_matched)
+> +                       if (!lsep->ind->codec_matched(session, codec_data,
+> +                                                lsep->user_data))
+> +                               continue;
+> +
+>                 if (sep->stream == NULL)
+>                         return sep;
+>         }
+> diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+> index 1b02232..683be45 100644
+> --- a/profiles/audio/avdtp.h
+> +++ b/profiles/audio/avdtp.h
+> @@ -172,6 +172,9 @@ struct avdtp_sep_cfm {
+>  /* Callbacks for indicating when we received a new command. The return value
+>   * indicates whether the command should be rejected or accepted */
+>  struct avdtp_sep_ind {
+> +       gboolean (*codec_matched) (struct avdtp *session,
+> +                       struct avdtp_media_codec_capability *rcodec_data,
+> +                                       void *user_data);
+>         gboolean (*get_capability) (struct avdtp *session,
+>                                         struct avdtp_local_sep *sep,
+>                                         gboolean get_all,
+> --
+> 2.1.0
 
-I also verified this with fedora 22 on Samsung laptop today. Kindly
-could you review this? I would like to use the Bluetooth with upstream Kernel on my machine :).
+Applied, thanks.
 
-Thanks
-Chanyeol
+
+-- 
+Luiz Augusto von Dentz
