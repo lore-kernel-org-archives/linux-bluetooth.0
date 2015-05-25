@@ -1,130 +1,196 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v2] Bluetooth: Fix reporting incorrect EIR in device found mgmt event
+Subject: Re: [PATCH v3] Bluetooth: btusb: Add routine for applying Intel DDC parameters
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <2392277.yFK0Kh5x9r@athlon>
-Date: Mon, 25 May 2015 21:32:41 +0200
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <5DC302F4-91E8-45F7-A656-DAF0C579E697@holtmann.org>
-References: <1431600513-6793-1-git-send-email-szymon.janc@tieto.com> <59B793A7-A4A2-4F52-A942-B0DD9807D660@holtmann.org> <2392277.yFK0Kh5x9r@athlon>
-To: Szymon Janc <szymon.janc@gmail.com>
+In-Reply-To: <20150520140409.5a3317f5@tedd-fedora-vm>
+Date: Mon, 25 May 2015 21:31:47 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <37510C75-1090-4601-AC8F-AC46800753C1@holtmann.org>
+References: <20150520140409.5a3317f5@tedd-fedora-vm>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Tedd,
 
->>> Some remote devices (ie Gigaset G-Tag) misbehave with ADV data length.
->>> This can lead to incorrect EIR format in device found event when
->>> ADV_DATA and SCAN_RSP are merged (terminator field before SCAN_RSP
->>> part).
->>> 
->>> Fix this by inspecting ADV_DATA and correct its length if terminator
->>> is found.
->>> 
->>>> HCI Event: LE Meta Event (0x3e) plen 42              [hci0] 32.172182
->>>> 
->>>     LE Advertising Report (0x02)
->>> 
->>>       Num reports: 1
->>>       Event type: Connectable undirected - ADV_IND (0x00)
->>>       Address type: Public (0x00)
->>>       Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
->>>       Data length: 30
->>>       Flags: 0x06
->>> 
->>>         LE General Discoverable Mode
->>>         BR/EDR Not Supported
->>> 
->>>       Company: Gigaset Communications GmbH (384)
->>> 
->>>         Data: 021512348094975abbc5
->>> 
->>>       16-bit Service UUIDs (partial): 1 entry
->>> 
->>>         Battery Service (0x180f)
->>> 
->>>       RSSI: -65 dBm (0xbf)
->>>> 
->>>> HCI Event: LE Meta Event (0x3e) plen 27              [hci0] 32.172191
->>>> 
->>>     LE Advertising Report (0x02)
->>> 
->>>       Num reports: 1
->>>       Event type: Scan response - SCAN_RSP (0x04)
->>>       Address type: Public (0x00)
->>>       Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
->>>       Data length: 15
->>>       Name (complete): Gigaset G-tag
->>>       RSSI: -59 dBm (0xc5)
->>> 
->>> Note "Data length: 30" in ADV_DATA which results in 9 extra zero bytes
->>> after Battery Service UUID. Terminator field present in the middle of
->>> EIR in Device Found event resulted in userspace stop parsing EIR and
->>> skipping device name.
->>> 
->>> @ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
->>> 
->>>     02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
->>>     c5 03 02 0f 18 00 00 00 00 00 00 00 00 00 0e 09  ................
->>>     47 69 67 61 73 65 74 20 47 2d 74 61 67           Gigaset G-tag
->>> 
->>> With this fix EIR with merged ADV_DATA and SCAN_RSP in device found
->>> event is properly formatted:
->>> 
->>> @ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
->>> 
->>>     02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
->>>     c5 03 02 0f 18 0e 09 47 69 67 61 73 65 74 20 47  .......Gigaset G
->>>     2d 74 61 67                                      -tag
->>> 
->>> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
->>> ---
->>> v2: fixed build error due to use of non-upstream BT_ERR_RATELIMITED
->>> 
->>> net/bluetooth/hci_event.c | 17 +++++++++++++++++
->>> 1 file changed, 17 insertions(+)
->>> 
->>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>> index 7b61be7..0407324 100644
->>> --- a/net/bluetooth/hci_event.c
->>> +++ b/net/bluetooth/hci_event.c
->>> @@ -4711,6 +4711,23 @@ static void process_adv_report(struct hci_dev
->>> *hdev, u8 type, bdaddr_t *bdaddr,> 
->>> 	struct hci_conn *conn;
->>> 	bool match;
->>> 	u32 flags;
->>> 
->>> +	u8 *ptr, real_len;
->>> +
->>> +	/* Find the 'real' end of the data in case remote incorrectly
->>> +	 * set significant part length.
->> 
->> I do not understand this sentence. I assume what you want to say find the
->> end of the data in case the report contains padded zero bytes at the end
->> causing an invalid length value.
+> This patch adds the routine to apply the DDC parameter from device
+> specific ddc file.
 > 
-> Spec is says about significant and non-significant part of advertising (where 
-> length is length of significant part) but I can rephrase that.
+> Once the device is rest to operational mode, optionally, it can
+> download the device specific configration (DDC) parameters before
+> the BlueZ starts the stack initialization.
 > 
->>> +	 */
->>> +	for (ptr = data; ptr < data + len && *ptr; ptr += *ptr + 1) {
->>> +		if (ptr + 1 + *ptr > data + len)
->>> +			break;
->>> +	}
->> 
->> I am worried about the unchecked usage of *ptr here. That might let you jump
->> into some memory area. How are we protecting this against malicious
->> advertising data. And we should have mgnt-tester test cases for malicious
->> fields that are not valid data and would make you jump outside of the 31
->> bytes.
+> It opens the DDC file based on HW_VARIANT and send ID/Value with
+> HCI_Intel_Write_DDC command.
 > 
-> OK, I see now that data can be NULL in case of direct advertising report. I'll 
-> add check for that and provide mgmt-tester cases for this and for bogus 
-> advertising data as well.
+> Format of DDC file
+> DDC file consists of one or more number of DDC structure that has a
+> 'Length' field of one octet, DDC 'ID' field of two octets followed by
+> the array of DDC 'Value' that gives the value of parameters itself.
+> 'Length' contains the length of DDC 'ID' and DDC 'Value'.
+> 
+> +------------+----------+
+> | Size(byte) |    Name  |
+> +------------+----------+
+> |      1     | Length   |
+> +------------+----------+
+> |      2     | ID       |
+> +------------+----------+
+> | Length - 2 | Value    |
+> +------------+----------+
 
-I am missing an updated patch for this.
+I wonder if we should add some sort of header to this file structure.
+
+> In case of command failure, it returns the command complete with
+> parameter that contains the ID that failed to apply.
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> ---
+> drivers/bluetooth/btintel.h |  5 +++
+> drivers/bluetooth/btusb.c   | 75 +++++++++++++++++++++++++++++++++++++++++++++
+> 2 files changed, 80 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+> index 4bda6ab..affb216 100644
+> --- a/drivers/bluetooth/btintel.h
+> +++ b/drivers/bluetooth/btintel.h
+> @@ -69,6 +69,11 @@ struct intel_secure_send_result {
+> 	__u8     status;
+> } __packed;
+> 
+> +struct intel_write_ddc {
+> +	__u8	status;
+> +	__le16	failed_id;
+> +} __packed;
+> +
+> #if IS_ENABLED(CONFIG_BT_INTEL)
+> 
+> int btintel_check_bdaddr(struct hci_dev *hdev);
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 13b9969..bc3697f 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2318,6 +2318,66 @@ static void btusb_intel_version_info(struct hci_dev *hdev,
+> 		ver->fw_build_num, ver->fw_build_ww, 2000 + ver->fw_build_yy);
+> }
+> 
+> +static int btusb_apply_ddc_intel(struct hci_dev *hdev, u8 hw_variant)
+> +{
+> +	const struct firmware *fw;
+> +	const u8 *fw_ptr;
+> +	char fwname[64];
+> +	struct sk_buff *skb;
+> +	int err;
+> +
+> +	snprintf(fwname, sizeof(fwname), "intel/ibt-%d.ddc", hw_variant);
+
+Lets use intel/ibt-11-%u.ddc here.
+
+> +
+> +	/* Device can work without DDC parameters so even if it fails to load
+> +	 * the file, no need to fail the device setup.
+> +	 */
+> +	err = request_firmware_direct(&fw, fwname, &hdev->dev);
+> +	if (err < 0) {
+> +		BT_INFO("%s: WARNING: unable to load Intel DDC file: %s (%d)",
+> +			hdev->name, fwname, err);
+
+I think the warning notion is a bit too much. Honestly I think that not printing anything here is just fine.
+
+> +		return 0;
+> +	}
+> +
+> +	BT_INFO("%s: Intel DDC file opened: %s", hdev->name, fwname);
+> +
+> +	fw_ptr = fw->data;
+> +	while (fw->size > fw_ptr - fw->data) {
+> +		struct intel_write_ddc *wr_ddc;
+> +		u8 cmd_len = fw_ptr[0] + sizeof(u8);
+> +
+> +		skb = __hci_cmd_sync(hdev, 0xfc8b, cmd_len, fw_ptr,
+> +				     HCI_INIT_TIMEOUT);
+> +		if (IS_ERR(skb)) {
+> +			BT_ERR("%s: Failed to send Intel_Write_DDC (%ld)",
+> +			       hdev->name, PTR_ERR(skb));
+> +			release_firmware(fw);
+> +			return PTR_ERR(skb);
+
+I would assign err variable and then just use a done label at the end of the function.
+
+> +		}
+> +
+> +		wr_ddc = (struct intel_write_ddc *)skb->data;
+> +		if (wr_ddc->status) {
+
+The status check is no longer needed. __hci_cmd_sync will have done that for you.
+
+> +			BT_ERR("%s: Intel write ddc command failure (%02x)",
+> +			       hdev->name, wr_ddc->status);
+> +			BT_ERR("%s: Last failed DDC ID: %04x",
+> +			       hdev->name, wr_ddc->failed_id);
+> +			err = -bt_to_errno(wr_ddc->status);
+> +			release_firmware(fw);
+> +			kfree_skb(skb);
+> +			return err;
+
+Same as above. Assign err, free the skb and jump to the done label.
+
+> +		}
+> +
+> +		fw_ptr += cmd_len;
+> +
+> +		kfree_skb(skb);
+> +	}
+> +
+> +	release_firmware(fw);
+> +
+> +	BT_INFO("%s: Completed to apply Intel DDC parameters", hdev->name);
+> +
+> +	return 0;
+> +}
+> +
+> static int btusb_setup_intel_new(struct hci_dev *hdev)
+> {
+> 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
+> @@ -2331,6 +2391,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> 	char fwname[64];
+> 	ktime_t calltime, delta, rettime;
+> 	unsigned long long duration;
+> +	u8 hw_variant;
+> 	int err;
+> 
+> 	BT_DBG("%s", hdev->name);
+> @@ -2385,6 +2446,10 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> 		return -EINVAL;
+> 	}
+> 
+> +	/* Keep this variable for later use with DDC
+> +	 */
+> +	hw_variant = ver->hw_variant;
+> +
+> 	btusb_intel_version_info(hdev, ver);
+> 
+> 	/* The firmware variant determines if the device is in bootloader
+> @@ -2660,6 +2725,16 @@ done:
+> 
+> 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+> 
+> +	/* Once the device is running in operational mode, it needs to apply
+> +	 * the device configuration(DDC) parameters to the device.
+> +	 */
+> +	err = btusb_apply_ddc_intel(hdev, hw_variant);
+> +	if (err < 0) {
+> +		BT_ERR("%s: Failed to apply DDC parameters (%d)",
+> +		       hdev->name, err);
+> +		return err;
+> +	}
+> +
+
+Do you want to keep this in a separate function or just put it inline here. Inline might be a bit easier.
+
+> 	return 0;
+> }
 
 Regards
 
