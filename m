@@ -1,196 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add routine for applying Intel DDC parameters
+Subject: Re: [PATCH] Bluetooth: btusb: fix Realtek suspend/resume
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150520140409.5a3317f5@tedd-fedora-vm>
-Date: Mon, 25 May 2015 21:31:47 +0200
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <37510C75-1090-4601-AC8F-AC46800753C1@holtmann.org>
-References: <20150520140409.5a3317f5@tedd-fedora-vm>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
+In-Reply-To: <1432218230-11370-1-git-send-email-drake@endlessm.com>
+Date: Mon, 25 May 2015 21:07:10 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>, carlo@endlessm.com,
+	Larry.Finger@lwfinger.net, champion_chen@realsil.com.cn
+Message-Id: <4A0E5411-A69D-4FB5-B618-A4BECE282562@holtmann.org>
+References: <1432218230-11370-1-git-send-email-drake@endlessm.com>
+To: Daniel Drake <drake@endlessm.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
+Hi Daniel,
 
-> This patch adds the routine to apply the DDC parameter from device
-> specific ddc file.
+> Realtek btusb devices don't currently work after suspend/resume because
+> the updated firmware is quietly lost - the USB hub doesn't notice any
+> status change upon resume, but some kind of reset has definitely
+> happened as the LMP subversion has reverted to its original value.
 > 
-> Once the device is rest to operational mode, optionally, it can
-> download the device specific configration (DDC) parameters before
-> the BlueZ starts the stack initialization.
+> Set the reset_resume flag to trigger probe and upload the new firmware
+> again.
 > 
-> It opens the DDC file based on HW_VARIANT and send ID/Value with
-> HCI_Intel_Write_DDC command.
+> Like the vendor code, I assume this is not needed when the device is
+> selected as a wakeup source and hence will retain power during suspend.
+> On the 2 products I have to hand, when trying this configuration the
+> hardware seems unable to keep the device powered up during suspend.
+> The USB hub then detects a status change on resume and does a reset,
+> so we do not end up in broken state.
 > 
-> Format of DDC file
-> DDC file consists of one or more number of DDC structure that has a
-> 'Length' field of one octet, DDC 'ID' field of two octets followed by
-> the array of DDC 'Value' that gives the value of parameters itself.
-> 'Length' contains the length of DDC 'ID' and DDC 'Value'.
-> 
-> +------------+----------+
-> | Size(byte) |    Name  |
-> +------------+----------+
-> |      1     | Length   |
-> +------------+----------+
-> |      2     | ID       |
-> +------------+----------+
-> | Length - 2 | Value    |
-> +------------+----------+
-
-I wonder if we should add some sort of header to this file structure.
-
-> In case of command failure, it returns the command complete with
-> parameter that contains the ID that failed to apply.
-> 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> Signed-off-by: Daniel Drake <drake@endlessm.com>
 > ---
-> drivers/bluetooth/btintel.h |  5 +++
-> drivers/bluetooth/btusb.c   | 75 +++++++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 80 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index 4bda6ab..affb216 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -69,6 +69,11 @@ struct intel_secure_send_result {
-> 	__u8     status;
-> } __packed;
-> 
-> +struct intel_write_ddc {
-> +	__u8	status;
-> +	__le16	failed_id;
-> +} __packed;
-> +
-> #if IS_ENABLED(CONFIG_BT_INTEL)
-> 
-> int btintel_check_bdaddr(struct hci_dev *hdev);
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 13b9969..bc3697f 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2318,6 +2318,66 @@ static void btusb_intel_version_info(struct hci_dev *hdev,
-> 		ver->fw_build_num, ver->fw_build_ww, 2000 + ver->fw_build_yy);
-> }
-> 
-> +static int btusb_apply_ddc_intel(struct hci_dev *hdev, u8 hw_variant)
-> +{
-> +	const struct firmware *fw;
-> +	const u8 *fw_ptr;
-> +	char fwname[64];
-> +	struct sk_buff *skb;
-> +	int err;
-> +
-> +	snprintf(fwname, sizeof(fwname), "intel/ibt-%d.ddc", hw_variant);
+> drivers/bluetooth/btusb.c | 18 +++++++++++++++++-
+> 1 file changed, 17 insertions(+), 1 deletion(-)
 
-Lets use intel/ibt-11-%u.ddc here.
-
-> +
-> +	/* Device can work without DDC parameters so even if it fails to load
-> +	 * the file, no need to fail the device setup.
-> +	 */
-> +	err = request_firmware_direct(&fw, fwname, &hdev->dev);
-> +	if (err < 0) {
-> +		BT_INFO("%s: WARNING: unable to load Intel DDC file: %s (%d)",
-> +			hdev->name, fwname, err);
-
-I think the warning notion is a bit too much. Honestly I think that not printing anything here is just fine.
-
-> +		return 0;
-> +	}
-> +
-> +	BT_INFO("%s: Intel DDC file opened: %s", hdev->name, fwname);
-> +
-> +	fw_ptr = fw->data;
-> +	while (fw->size > fw_ptr - fw->data) {
-> +		struct intel_write_ddc *wr_ddc;
-> +		u8 cmd_len = fw_ptr[0] + sizeof(u8);
-> +
-> +		skb = __hci_cmd_sync(hdev, 0xfc8b, cmd_len, fw_ptr,
-> +				     HCI_INIT_TIMEOUT);
-> +		if (IS_ERR(skb)) {
-> +			BT_ERR("%s: Failed to send Intel_Write_DDC (%ld)",
-> +			       hdev->name, PTR_ERR(skb));
-> +			release_firmware(fw);
-> +			return PTR_ERR(skb);
-
-I would assign err variable and then just use a done label at the end of the function.
-
-> +		}
-> +
-> +		wr_ddc = (struct intel_write_ddc *)skb->data;
-> +		if (wr_ddc->status) {
-
-The status check is no longer needed. __hci_cmd_sync will have done that for you.
-
-> +			BT_ERR("%s: Intel write ddc command failure (%02x)",
-> +			       hdev->name, wr_ddc->status);
-> +			BT_ERR("%s: Last failed DDC ID: %04x",
-> +			       hdev->name, wr_ddc->failed_id);
-> +			err = -bt_to_errno(wr_ddc->status);
-> +			release_firmware(fw);
-> +			kfree_skb(skb);
-> +			return err;
-
-Same as above. Assign err, free the skb and jump to the done label.
-
-> +		}
-> +
-> +		fw_ptr += cmd_len;
-> +
-> +		kfree_skb(skb);
-> +	}
-> +
-> +	release_firmware(fw);
-> +
-> +	BT_INFO("%s: Completed to apply Intel DDC parameters", hdev->name);
-> +
-> +	return 0;
-> +}
-> +
-> static int btusb_setup_intel_new(struct hci_dev *hdev)
-> {
-> 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
-> @@ -2331,6 +2391,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
-> 	char fwname[64];
-> 	ktime_t calltime, delta, rettime;
-> 	unsigned long long duration;
-> +	u8 hw_variant;
-> 	int err;
-> 
-> 	BT_DBG("%s", hdev->name);
-> @@ -2385,6 +2446,10 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
-> 		return -EINVAL;
-> 	}
-> 
-> +	/* Keep this variable for later use with DDC
-> +	 */
-> +	hw_variant = ver->hw_variant;
-> +
-> 	btusb_intel_version_info(hdev, ver);
-> 
-> 	/* The firmware variant determines if the device is in bootloader
-> @@ -2660,6 +2725,16 @@ done:
-> 
-> 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
-> 
-> +	/* Once the device is running in operational mode, it needs to apply
-> +	 * the device configuration(DDC) parameters to the device.
-> +	 */
-> +	err = btusb_apply_ddc_intel(hdev, hw_variant);
-> +	if (err < 0) {
-> +		BT_ERR("%s: Failed to apply DDC parameters (%d)",
-> +		       hdev->name, err);
-> +		return err;
-> +	}
-> +
-
-Do you want to keep this in a separate function or just put it inline here. Inline might be a bit easier.
-
-> 	return 0;
-> }
+patch has been applied to bluetooth-next tree.
 
 Regards
 
