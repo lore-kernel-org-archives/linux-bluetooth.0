@@ -1,121 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1432123788-12967-1-git-send-email-chanyeol.park@samsung.com>
-References: <1432123788-12967-1-git-send-email-chanyeol.park@samsung.com>
-Date: Mon, 25 May 2015 16:40:35 +0300
-Message-ID: <CABBYNZKLmcf-Q809BrFMHAXz1G8D=FHjccVoZZ4pMuFPjLgstw@mail.gmail.com>
-Subject: Re: [RFC BlueZ v4 1/2] audio/avdtp: Add a2dp vendor codec match callback
+In-Reply-To: <BD5E516FF3711A41B93DC005170007BB010E5D9DFDFC@EMBSVR01.ember.local>
+References: <BD5E516FF3711A41B93DC005170007BB010E5D9DFBFD@EMBSVR01.ember.local>
+	<000701d096bf$1c0194d0$5404be70$@samsung.com>
+	<BD5E516FF3711A41B93DC005170007BB010E5D9DFDFC@EMBSVR01.ember.local>
+Date: Mon, 25 May 2015 11:31:32 +0300
+Message-ID: <CABBYNZK1yHMwVF7Fp3Ba+6xf4W=j7vqWt5AM-hRkmnXqcDwLbA@mail.gmail.com>
+Subject: Re: Issue Write Not Permitted Error Response not working
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Chan-yeol Park <chanyeol.park@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Ankur Patel <ankur@embertec.com>
+Cc: Gowtham Anandha Babu <gowtham.ab@samsung.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chan-yeol,
+Hi Ankur,
 
-On Wed, May 20, 2015 at 3:09 PM, Chan-yeol Park
-<chanyeol.park@samsung.com> wrote:
-> When matching remote SEP to local SEP avdtp does not compare vendor
-> codecs properly, i.e. neither vendor ID not codec ID are checked,
-> which may cause wrong endpoint to be selected in case there are more
-> that one endpoints using vendor codec on remote.
+On Mon, May 25, 2015 at 11:17 AM, Ankur Patel <ankur@embertec.com> wrote:
+> Thank you Gowtham Anandha Babu for brief & useful explanation. I understand your concern and my mistake. I did the same and now the Testcase is Passed. As you have mentioned, I am itself using tools/btgatt-server.c application and modifying it to pass the PTS/GATT testcases.
 >
-> This patch fixes it by adding a2dp codec match call back.
-> ---
->  profiles/audio/a2dp.c  | 36 ++++++++++++++++++++++++++++++++++++
->  profiles/audio/avdtp.c |  5 +++++
->  profiles/audio/avdtp.h |  3 +++
->  3 files changed, 44 insertions(+)
->
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index 31c5086..3c5a8a2 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -447,6 +447,41 @@ static void endpoint_setconf_cb(struct a2dp_setup *setup, gboolean ret)
->         auto_config(setup);
->  }
->
-> +static gboolean a2dp_codec_matched_ind(struct avdtp *session,
-> +                       struct avdtp_media_codec_capability *rcodec_data,
-> +                                               void *user_data)
-> +{
-> +       struct a2dp_sep *sep = user_data;
-> +       a2dp_vendor_codec_t *remote_codec;
-> +       a2dp_vendor_codec_t *local_codec;
-> +       uint8_t *capabilities;
-> +       size_t length;
-> +
-> +       if (rcodec_data->media_codec_type != A2DP_CODEC_VENDOR)
-> +               return TRUE;
-> +
-> +       if (sep->endpoint == NULL)
-> +               return FALSE;
-> +
-> +       length = sep->endpoint->get_capabilities(sep, &capabilities,
-> +                                                       sep->user_data);
-> +       if (length < sizeof(a2dp_vendor_codec_t))
-> +               return FALSE;
-> +
-> +       local_codec = (a2dp_vendor_codec_t *) capabilities;
-> +       remote_codec = (a2dp_vendor_codec_t *) rcodec_data->data;
-> +
-> +       if (remote_codec->vendor_id != local_codec->vendor_id)
-> +               return FALSE;
-> +
-> +       if (remote_codec->codec_id != local_codec->codec_id)
-> +               return FALSE;
-> +
-> +       DBG("vendor 0x%08x codec 0x%04x", btohl(remote_codec->vendor_id),
-> +                                               btohs(remote_codec->codec_id));
-> +       return TRUE;
-> +}
-> +
->  static gboolean endpoint_setconf_ind(struct avdtp *session,
->                                                 struct avdtp_local_sep *sep,
->                                                 struct avdtp_stream *stream,
-> @@ -1114,6 +1149,7 @@ static struct avdtp_sep_cfm cfm = {
->  };
->
->  static struct avdtp_sep_ind endpoint_ind = {
-> +       .codec_matched          = a2dp_codec_matched_ind,
->         .get_capability         = endpoint_getcap_ind,
->         .set_configuration      = endpoint_setconf_ind,
->         .get_configuration      = getconf_ind,
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index f38188f..181658c 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -1226,6 +1226,11 @@ struct avdtp_remote_sep *avdtp_find_remote_sep(struct avdtp *session,
->                 if (codec_data->media_codec_type != lsep->codec)
->                         continue;
->
-> +               if (lsep->ind && lsep->ind->codec_matched)
-> +                       if (!lsep->ind->codec_matched(session, codec_data,
-> +                                                lsep->user_data))
-> +                               continue;
-> +
->                 if (sep->stream == NULL)
->                         return sep;
->         }
-> diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-> index 1b02232..683be45 100644
-> --- a/profiles/audio/avdtp.h
-> +++ b/profiles/audio/avdtp.h
-> @@ -172,6 +172,9 @@ struct avdtp_sep_cfm {
->  /* Callbacks for indicating when we received a new command. The return value
->   * indicates whether the command should be rejected or accepted */
->  struct avdtp_sep_ind {
-> +       gboolean (*codec_matched) (struct avdtp *session,
-> +                       struct avdtp_media_codec_capability *rcodec_data,
-> +                                       void *user_data);
->         gboolean (*get_capability) (struct avdtp *session,
->                                         struct avdtp_local_sep *sep,
->                                         gboolean get_all,
-> --
-> 2.1.0
+> Once I am done, I would like to share modified btgatt-server.c on forum so that anyone wants to pass PTS/GATT testcases, it will be useful.
 
-Applied, thanks.
+That would be great, you can also document the PIC/PIXIT and commands
+necessary like we did for android, I guess this documents can go under
+doc.
 
 
 -- 
