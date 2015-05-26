@@ -1,61 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 26 May 2015 09:43:22 -0700
+Date: Tue, 26 May 2015 09:28:48 -0700
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add routine for applying Intel DDC
- parameters
-Message-ID: <20150526094322.763b217f@tedd-fedora-vm>
-In-Reply-To: <37510C75-1090-4601-AC8F-AC46800753C1@holtmann.org>
-References: <20150520140409.5a3317f5@tedd-fedora-vm>
-	<37510C75-1090-4601-AC8F-AC46800753C1@holtmann.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCH v2] Bluetooth: btusb: fixed command length alignment on
+ Intel 8260
+Message-ID: <20150526092848.7f73903d@tedd-fedora-vm>
+In-Reply-To: <20150518155207.31ce2835@tedd-fedora-vm>
+References: <20150518155207.31ce2835@tedd-fedora-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Mon, 25 May 2015 21:31:47 +0200
-Marcel Holtmann <marcel@holtmann.org> wrote:
+On Mon, 18 May 2015 15:52:07 -0700
+Tedd Ho-Jeong An <tedd.an@intel.com> wrote:
 
-> Hi Tedd,
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
 > 
-> > This patch adds the routine to apply the DDC parameter from device
-> > specific ddc file.
-> > 
-> > Once the device is rest to operational mode, optionally, it can
-> > download the device specific configration (DDC) parameters before
-> > the BlueZ starts the stack initialization.
-> > 
-> > It opens the DDC file based on HW_VARIANT and send ID/Value with
-> > HCI_Intel_Write_DDC command.
-> > 
-> > Format of DDC file
-> > DDC file consists of one or more number of DDC structure that has a
-> > 'Length' field of one octet, DDC 'ID' field of two octets followed by
-> > the array of DDC 'Value' that gives the value of parameters itself.
-> > 'Length' contains the length of DDC 'ID' and DDC 'Value'.
-> > 
-> > +------------+----------+
-> > | Size(byte) |    Name  |
-> > +------------+----------+
-> > |      1     | Length   |
-> > +------------+----------+
-> > |      2     | ID       |
-> > +------------+----------+
-> > | Length - 2 | Value    |
-> > +------------+----------+
+> This patch fixes the command length alignment issue for Intel Bluetooth
+> 8260.
 > 
-> I wonder if we should add some sort of header to this file structure.
+> The length of parameters in the firmware downloading command must be
+> multiplication of 4. If not, the command must append Intel_NOP command
+> with extra parameters, zeros, at the end, and the firmware file is
+> already included Intel_NOP command for alignment.
 > 
+> This patch checks the next command and if the next command is Intel_NOP
+> command, it reads the Intel_NOP command and send them together.
+> 
+> For example, if the data from the firmware file looks like this:
+> 8E FC 03 11 22 33 02 FC 03 00 00 00
+> 
+> Previously, btusb sends two commands:
+> 09 FC 06 8E FC 03 11 22 33
+> 09 FC 06 02 FC 03 00 00 00
+> 
+> This won't work because the length of parameters are 6 which violates
+> the 4 byte alignment.
+> 
+> This patch will append them together and send as one command:
+> 09 FC 0B 8E FC 03 11 22 33 02 FC 03 00 00 00
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> ---
+>  drivers/bluetooth/btusb.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index d21f3b4..13b9969 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2541,6 +2541,22 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+>  
+>  		cmd_len = sizeof(*cmd) + cmd->plen;
+>  
+> +		/* The parameter length of secure send command should be a
+> +		 * multiplication of 4. If it is not, it needs to append
+> +		 * Intel_NOP command with arbitrary number of parameters (zeros)
+> +		 * to meet the 4 byte alignment.
+> +		 * The FW file has already formatted with this. So if the next
+> +		 * command is Intel_NOP then send them together.
+> +		 */
+> +		cmd = (void *)(fw_ptr + cmd_len);
+> +		if (le16_to_cpu(cmd->opcode) == 0xfc02) {
+> +			BT_DBG("%s: Updated cmd to include Intel_NOP",
+> +			       hdev->name);
+> +			/* Update cmd_len to include the Intel_NOP command
+> +			 */
+> +			cmd_len += sizeof(*cmd) + cmd->plen;
+> +		}
+> +
+>  		/* Send each command from the firmware data buffer as
+>  		 * a single Data fragment.
+>  		 */
 
-Could you explain more about the "header"? DDC header is Length and ID.
-The DDC file can have more than one DDC. Do you mean the header for all DDC
-contents? Then it will be same as HCI plen.
-
-Also, how do you think about saving this file in ASCII format instead of binary?
-then I can add some comments that start with # and ignore the line like bash script.
-
+I just wonder if you had a chance to review this patch.
 
 Regards,
 Tedd
