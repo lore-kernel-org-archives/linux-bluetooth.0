@@ -1,44 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <5563C8E5.3010008@gmail.com>
+Date: Tue, 26 May 2015 03:14:13 +0200
 From: Florian Grandel <fgrandel@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v7 0/4] tools/mgmt-tester: multi-advertising additions
-Date: Tue, 26 May 2015 03:22:05 +0200
-Message-Id: <1432603329-12846-1-git-send-email-fgrandel@gmail.com>
-In-Reply-To: <1432600555-8008-1-git-send-email-fgrandel@gmail.com>
-References: <1432600555-8008-1-git-send-email-fgrandel@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+To: Arman Uguray <armansito@chromium.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>
+Subject: Test coverage for "add advertising" - timeouts, missing tests
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-patch set accompanying the introduction of a multi-advertising
-infrastructure in the kernel
+Hi Arman and Johan,
 
-v1 ... v4:
-- fix tests to test for correct behavior when removing all adv instances
-  by passing in the 0x00 instance identifier
+Marcel would like to see a test that covers an advertising instance 
+timeout to further reduce the potential for regressions caused by the 
+multi-advertising changes.
 
-v4 -> v5:
-- factored userland code changes into a separate change set for easier
-  review
+I may be mistaken but I think we do not have such a test in mgmt-tester, 
+yet.
 
-v5 -> v6:
-- documented add advertising test setup
-- renamed add advertising tests to make them more readable
-- added test to reproduce a bug found by Marcel (executing add-adv twice
-  for the same instance should override the adv data)
+(We do have tests that set a timeout in an add advertising call but the 
+timeout will not expire as the delayed work is canceled. This is 
+intended behavior - just not the test I would have to write.)
 
-v6 -> v7
-- correctly split mangled patches
+Today, Arman and I quickly discussed the possibility to test timeouts 
+and we first thought that the tester would support it. But then I 
+couldn't really find a hook to do so.
 
-Florian Grandel (4):
-  tools/mgmt_tester: expect 0 rp when removing all adv inst
-  tools/mgmt-tester: comment add adv test setup
-  tools/mgmt-tester: rename add adv tests
-  tools/mgmt-tester: add an additional add adv test
+So now I'm left with a few questions:
+- Did I overlook the hook to test timeouts?
+- If not: Should we introduce one?
+- If so: Is there a way to "simulate" the timeout in a way that doesn't 
+require us to actually wait for a second or even more? Otherwise timeout 
+tests would considerably slow down test execution.
 
- doc/test-coverage.txt |   4 +-
- tools/mgmt-tester.c   | 273 ++++++++++++++++++++++++++++++++++----------------
- 2 files changed, 189 insertions(+), 88 deletions(-)
+And somewhat related a different problem that I encountered today:
+- Is there a way to test that a given event is NOT being triggered by a 
+test case? Maybe there's a way to find out when no more events can be 
+expected so that we don't have to wait - which would considerably slow 
+down tests again and would not be reliable anyway?
 
--- 
-1.9.1
+Thanks for your help!
 
+Florian
