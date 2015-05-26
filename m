@@ -1,55 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5564A29D.1030002@qca.qualcomm.com>
-Date: Tue, 26 May 2015 09:43:09 -0700
-From: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+Date: Tue, 26 May 2015 09:43:22 -0700
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3] Bluetooth: btusb: Add routine for applying Intel DDC
+ parameters
+Message-ID: <20150526094322.763b217f@tedd-fedora-vm>
+In-Reply-To: <37510C75-1090-4601-AC8F-AC46800753C1@holtmann.org>
+References: <20150520140409.5a3317f5@tedd-fedora-vm>
+	<37510C75-1090-4601-AC8F-AC46800753C1@holtmann.org>
 MIME-Version: 1.0
-To: <linux-firmware@kernel.org>, <kyle@kernel.org>,
-	<kyle@infradead.org>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] qca: add BT firmware files for QCA61x4 series Bluetooth
-References: <555D29D1.6090700@qca.qualcomm.com>
-In-Reply-To: <555D29D1.6090700@qca.qualcomm.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kyle,
+Hi Marcel,
 
-On 05/20/15 17:41, Ben Young Tae Kim wrote:
-> Firmware files support QCA61x4 ROME family chips
->
-> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-> ---
->  WHENCE                        |  21 ++
->  qca/NOTICE.txt                | 506 ++++++++++++++++++++++++++++++++++++++++++
->  qca/nvm_00130300.bin          | Bin 0 -> 1937 bytes
->  qca/nvm_00130302.bin          | Bin 0 -> 1968 bytes
->  qca/nvm_usb_00000200.bin      | Bin 0 -> 1859 bytes
->  qca/nvm_usb_00000201.bin      | Bin 0 -> 1859 bytes
->  qca/nvm_usb_00000300.bin      | Bin 0 -> 1857 bytes
->  qca/nvm_usb_00000302.bin      | Bin 0 -> 1953 bytes
->  qca/rampatch_00130300.bin     | Bin 0 -> 65856 bytes
->  qca/rampatch_00130302.bin     | Bin 0 -> 26112 bytes
->  qca/rampatch_usb_00000200.bin | Bin 0 -> 54432 bytes
->  qca/rampatch_usb_00000201.bin | Bin 0 -> 54432 bytes
->  qca/rampatch_usb_00000300.bin | Bin 0 -> 53964 bytes
->  qca/rampatch_usb_00000302.bin | Bin 0 -> 27500 bytes
->  14 files changed, 527 insertions(+)
->  create mode 100644 qca/NOTICE.txt
->  create mode 100644 qca/nvm_00130300.bin
->  create mode 100644 qca/nvm_00130302.bin
->  create mode 100644 qca/nvm_usb_00000200.bin
->  create mode 100644 qca/nvm_usb_00000201.bin
->  create mode 100644 qca/nvm_usb_00000300.bin
->  create mode 100644 qca/nvm_usb_00000302.bin
->  create mode 100644 qca/rampatch_00130300.bin
->  create mode 100644 qca/rampatch_00130302.bin
->  create mode 100644 qca/rampatch_usb_00000200.bin
->  create mode 100644 qca/rampatch_usb_00000201.bin
->  create mode 100644 qca/rampatch_usb_00000300.bin
->  create mode 100644 qca/rampatch_usb_00000302.bin
+On Mon, 25 May 2015 21:31:47 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-I'm not sure you received this patch for QCA ROME BT firmware files. Can you review this and merge into the linux-firmware repository if those are okay?
+> Hi Tedd,
+> 
+> > This patch adds the routine to apply the DDC parameter from device
+> > specific ddc file.
+> > 
+> > Once the device is rest to operational mode, optionally, it can
+> > download the device specific configration (DDC) parameters before
+> > the BlueZ starts the stack initialization.
+> > 
+> > It opens the DDC file based on HW_VARIANT and send ID/Value with
+> > HCI_Intel_Write_DDC command.
+> > 
+> > Format of DDC file
+> > DDC file consists of one or more number of DDC structure that has a
+> > 'Length' field of one octet, DDC 'ID' field of two octets followed by
+> > the array of DDC 'Value' that gives the value of parameters itself.
+> > 'Length' contains the length of DDC 'ID' and DDC 'Value'.
+> > 
+> > +------------+----------+
+> > | Size(byte) |    Name  |
+> > +------------+----------+
+> > |      1     | Length   |
+> > +------------+----------+
+> > |      2     | ID       |
+> > +------------+----------+
+> > | Length - 2 | Value    |
+> > +------------+----------+
+> 
+> I wonder if we should add some sort of header to this file structure.
+> 
 
-Thanks
--- Ben Kim
+Could you explain more about the "header"? DDC header is Length and ID.
+The DDC file can have more than one DDC. Do you mean the header for all DDC
+contents? Then it will be same as HCI plen.
+
+Also, how do you think about saving this file in ASCII format instead of binary?
+then I can add some comments that start with # and ignore the line like bash script.
+
+
+Regards,
+Tedd
