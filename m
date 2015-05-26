@@ -1,58 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC] shared/tester: Allow to pass extra options
-Date: Tue, 26 May 2015 15:33:36 +0200
-Message-Id: <1432647216-11197-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <55646A17.10501@linux.intel.com>
+Date: Tue, 26 May 2015 14:41:59 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+To: Ilya Faenson <ifaenson@broadcom.com>,
+ Arend Van Spriel <arend@broadcom.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
+References: <1432136770-13328-1-git-send-email-frederic.danis@linux.intel.com> <1432136770-13328-5-git-send-email-frederic.danis@linux.intel.com> <555DE2BE.8000109@broadcom.com> <555F25F8.4080408@linux.intel.com> <555F2EB5.1080103@broadcom.com>,<555F33E8.8010703@linux.intel.com> <E0D3336E15B58B4294723AC879BA5E9425A61F@IRVEXCHMB15.corp.ad.broadcom.com>
+In-Reply-To: <E0D3336E15B58B4294723AC879BA5E9425A61F@IRVEXCHMB15.corp.ad.broadcom.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to pass custom GOptionEntry from tester. Will be useful
-if tester takes non-standard arguments. void* is used to not leak
-Glib API to tester API if extra options are not used.
----
- src/shared/tester.c | 8 ++++++++
- src/shared/tester.h | 1 +
- 2 files changed, 9 insertions(+)
+Hello Ilya,
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 30857e0..6922195 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -784,12 +784,20 @@ static GOptionEntry options[] = {
- 
- void tester_init(int *argc, char ***argv)
- {
-+	tester_init_extra(argc, argv, NULL);
-+}
-+
-+void tester_init_extra(int *argc, char ***argv, void *extra)
-+{
- 	GOptionContext *context;
- 	GError *error = NULL;
- 
- 	context = g_option_context_new(NULL);
- 	g_option_context_add_main_entries(context, options, NULL);
- 
-+	if (extra)
-+		g_option_context_add_main_entries(context, extra, NULL);
-+
- 	if (g_option_context_parse(context, argc, argv, &error) == FALSE) {
- 		if (error != NULL) {
- 			g_printerr("%s\n", error->message);
-diff --git a/src/shared/tester.h b/src/shared/tester.h
-index 83ef5de..89a04a2 100644
---- a/src/shared/tester.h
-+++ b/src/shared/tester.h
-@@ -23,6 +23,7 @@
- 
- #include <stdbool.h>
- 
-+void tester_init_extra(int *argc, char ***argv, void *extra);
- void tester_init(int *argc, char ***argv);
- int tester_run(void);
- 
--- 
-1.9.3
+On 22/05/2015 15:55, Ilya Faenson wrote:
+> Hi Fred,
+>
+> ________________________________________
+> From: Frederic Danis [frederic.danis@linux.intel.com]
+> Sent: Friday, May 22, 2015 9:49 AM
+> To: Arend Van Spriel
+> Cc: Marcel Holtmann; linux-bluetooth@vger.kernel.org; Ilya Faenson
+> Subject: Re: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
+>
+> On 22/05/2015 15:27, Arend van Spriel wrote:
+>> On 05/22/15 14:50, Frederic Danis wrote:
+>>> Hello Arend,
+>>>
+>>> On 21/05/2015 15:50, Arend van Spriel wrote:
+>>>> On 05/20/15 17:46, Frederic Danis wrote:
+>>>>> Use btbcm helpers to perform controller setup.
+>>>>> Perform host UART reset to init speed between btbcm_patchram() and
+>>>>> btbcm_finalize(). This may be need because firmware loading may have
+>>>>> reseted controller UART to init speed.
+>>>>>
+>>>>> Signed-off-by: Frederic Danis<frederic.danis@linux.intel.com>
+>>>>> ---
+>>>>> drivers/bluetooth/hci_bcm.c | 19 ++++++++++++++++++-
+>>>>> 1 file changed, 18 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>>>>> index 1ec0b4a..cede445 100644
+>>>>> --- a/drivers/bluetooth/hci_bcm.c
+>>>>> +++ b/drivers/bluetooth/hci_bcm.c
+>>>>> @@ -79,11 +79,28 @@ static int bcm_flush(struct hci_uart *hu)
+>>>>>
+>>>>> static int bcm_setup(struct hci_uart *hu)
+>>>>> {
+>>>>> + char fw_name[64];
+>>>>> + int err;
+>>>>> +
+>>>>> BT_DBG("hu %p", hu);
+>>>>>
+>>>>> hu->hdev->set_bdaddr = btbcm_set_bdaddr;
+>>>>>
+>>>>> - return btbcm_setup_patchram(hu->hdev);
+>>>>> + err = btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name));
+>>>>> + if (err)
+>>>>> + return err;
+>>>>> +
+>>>>> + err = btbcm_patchram(hu->hdev, fw_name);
+>>>>> + /* If there is no firmware (-ENOENT), discard the error and
+>>>>> continue */
+>>>>
+>>>> I guess -ENOENT means no firmware is required and not a
+>>>> request_firmware() failure. Not sure what is meant here.
+>>>>
+>>>> Regards,
+>>>> Arend
+>>>>
+>>>>> + if (err == -ENOENT)
+>>>>> + return 0;
+>>>>> +
+>>>>> + if (hu->proto->init_speed)
+>>>>> + hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>>>> +
+>>>>> + err = btbcm_finalize(hu->hdev);
+>>>>> +
+>>>>> + return err;
+>>>>> }
+>>>>>
+>>>>> static const struct h4_recv_pkt bcm_recv_pkts[] = {
+>>>
+>>> You're right, btbcm_patchram() return test does not work as I expected.
+>>>
+>>> I can change this by performing uart speed change only if it returns no
+>>> error.
+>>>
+>>> err = btbcm_patchram(hu->hdev, fw_name);
+>>> if (!err) {
+>>> /* Firmware loading may have reseted controller UART to init speed */
+>>> if (hu->proto->init_speed)
+>>> hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>> }
+>>>
+>>> err = btbcm_finalize(hu->hdev);
+>>>
+>>>
+>>> Or I can move request_firmware() out of btbcm_patchram() and test it
+>>> before calling btbcm_patchram(). This will imply to change
+>>> btbcm_patchram() to accept a firmware instead of firmware name.
+>>>
+>>> err = request_firmware(&fw, fw_name, &hu->hdev->dev);
+>>> if (err < 0) {
+>>> BT_INFO("%s: BCM: patch %s not found", hu->hdev->name, fw_name);
+>>> return 0;
+>>> }
+>>>
+>>> err = btbcm_patchram(hu->hdev, fw);
+>>> if (!err) {
+>>> /* Firmware loading may have reseted controller UART to init speed */
+>>> if (hu->proto->init_speed)
+>>> hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>> }
+>>>
+>>> err = btbcm_finalize(hu->hdev);
+>>>
+>>> Arend, Marcel, any advice regarding this ?
+>>
+>> Well, functionally it does not make a difference as the request_firmware
+>> is the first call done in btbcm_patchram(). So if it solves your problem
+>> I would go for option 2. Other question: is there a reason why the error
+>> code from request_firmware is not returned?
+>
+> If an error is returned it will stop Bluetooth setup.
+> So, when request_firmware() returns an error, the Bluetooth controller
+> will be used with current firmware and 0 is returned as bcm_setup is
+> completed.
+>
+> IF: There is generally no "current firmware" if the firmware download fails or not attempted. The device would run out of the ROM then which is not terribly useful if Bluetooth functionality is needed. Thanks, -Ilya
 
+The BCM4324B3 embedded in T100 is able to operate without firmware 
+loading, at least performing Bluetooth discovery.
+I think it is better to run without firmware loading than not allowing 
+to use Bluetooth controller at all.
+
+regards
+
+Fred
