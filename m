@@ -1,41 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <556412A0.4030004@samsung.com>
-Date: Tue, 26 May 2015 15:28:48 +0900
-From: Chan-yeol Park <chanyeol.park@samsung.com>
-MIME-version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC BlueZ 1/3] audio/a2dp: connect A2DP vendor codec if possible
-References: <1430925036-20245-1-git-send-email-chanyeol.park@samsung.com>
- <CABBYNZ+tM==j0Af=X93jCCQAqenspFbtbLRs6KqFrMuA8-niOg@mail.gmail.com>
-In-reply-to: <CABBYNZ+tM==j0Af=X93jCCQAqenspFbtbLRs6KqFrMuA8-niOg@mail.gmail.com>
-Content-type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] Bluetooth: mgmt: fix typos
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1432603869-19491-1-git-send-email-fgrandel@gmail.com>
+Date: Tue, 26 May 2015 03:59:03 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B6765B9A-3B63-4649-A58E-CCCDC17128A4@holtmann.org>
+References: <1432603869-19491-1-git-send-email-fgrandel@gmail.com>
+To: Florian Grandel <fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-On 05/07/2015 05:20 PM, Luiz Augusto von Dentz wrote:
-> Hi Chan-yeol,
->
-> On Wed, May 6, 2015 at 6:10 PM,  <chanyeol.park@samsung.com> wrote:
->> From: Chan-yeol Park <chanyeol.park@samsung.com>
->>
->> This patch gives the priority on vendor codec during A2DP codec
->> negotiation.
->
-> There is already a prioritization based on the sender and in the order
-> the endpoints are registered, so by doing this you would be breaking
-> the prioritization instead register the codecs in order of preference
-> that should have the same results.
->
+Hi Florian,
 
-Yes you're right. but most of phone(Android/iOS) register their SBC in 
-the first SEP to support compatibility because some of headset try to 
-connect first SEP without codec comparison. As a result I could not 
-register vendor codec in the first SEP. So without this patch vendor 
-codec establishment would not be made.
+> A few comments had minor typos. These are being fixed.
+> 
+> Signed-off-by: Florian Grandel <fgrandel@gmail.com>
+> ---
+> net/bluetooth/mgmt.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 
-I am not clear how to give the priority on vendor codec in this case.
+patch has been applied to bluetooth-next tree.
 
-Thanks
-Chanyeol
+Regards
+
+Marcel
+
