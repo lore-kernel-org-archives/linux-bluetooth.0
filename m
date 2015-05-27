@@ -1,83 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v6 00/16] Bluetooth: Multi-advertising infrastructure
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1432600463-7758-1-git-send-email-fgrandel@gmail.com>
-Date: Wed, 27 May 2015 21:23:14 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <064C8AD4-80B3-4E94-96E9-F40BDA0D38C7@holtmann.org>
-References: <1432507154-22925-1-git-send-email-fgrandel@gmail.com> <1432600463-7758-1-git-send-email-fgrandel@gmail.com>
-To: Florian Grandel <fgrandel@gmail.com>
+Message-ID: <53e48edc3040ae4a82e3beaf06c692e1.squirrel@mungewell.org>
+Date: Wed, 27 May 2015 11:32:40 -0400
+Subject: [Patch] bccmd - add ability to read ADC
+From: simon@mungewell.org
+To: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: multipart/mixed;boundary="----=_20150527113240_97385"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Florian,
+------=_20150527113240_97385
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8bit
 
-> patch set introducing the infrastructure for multi-advertising
-> capability to the HCI core and mgmt API.
-> 
-> v1 -> v2:
-> - add missing braces in read_adv_features()
-> 
-> v2 -> v3 (changes due to Johan's review):
-> - split change-set into several patches
-> - replace err == 0 by !err
-> - fix coding style problems
-> 
-> v3 -> v4 (changes due to Arman's review):
-> - bug fix: when calling remove_advertising with an instance value of
->  zero (i.e.  remove all instances), the command response also returns
->  an instance value of zero now as it doesn't make sense to return a
->  single instance id when removing several instances
-> - splitting the change set into a much larger number of patches to
->  facilitate review
-> - use HCI_MAX_ADV_INSTANCES in the same patch that introduces it
-> - use adv_info->hdev in the same patch that introduces it
-> - make the logic of hci_find_adv_instance() more readable
-> - make sure that hci_find_adv_instance() is called while hci_dev is
->  locked
-> - replace hci_num_adv_instances() by an instance counter in hci_dev
-> - add inline comment in get_adv_instance_flags() explaining its return
->  value in the error case
-> - generate zero-length adv data if the current instance identifier is
->  invalid
-> - revert erroneous changes to the logic in clear_adv_instance()
-> - use hci_adv_instances_clear() in clear_adv_instance() when removing
->  all advertising instances also removing a redundant error check
-> - inserting TODO messages to make sure that advertising will not be
->  switched off prematurely once we allow more than one advertising
->  instance
-> - inserting TODO messages to make sure that multiple advertising
->  instances will be advertised in a round-robin fashion once we allow
->  for more than one advertising instance
-> - identify peding advertising instances (just added but not yet
->  confirmed in add_advertising_complete) by a boolean flag in the
->  adv_info struct so that we can identify and remove them even when the
->  pending add_advertising command cannot be retrieved for some reason -
->  makes sure that we do not leak advertising instances in this case
-> - only send HCI commands to update advertising data when a new instance
->  has actually been added
-> 
-> v4 -> v5 (changes due to Marcel's review):
-> - split into separate change sets for kernel and userspace
-> - do not trust the adv instance list length when compiling the adv
->  features struct
-> - introduce adv_info->pending in the same patch it's used for the first
->  time
-> 
-> v5 -> v6 (changes due to Marcel's review):
-> - fix the add adv override bug
-> - fix "Using plain integer as NULL pointer" warning in
->  set_advertising_complete()
-> - reword the "remove adv instance" commit comment to make it clear that
->  an existing bug is being fixed
+Hi,
+Some BlueCore devices are equipped with an 'Analogue In' pin which is
+internally connected to a MUX and ADC. This patch adds the ability to
+control the MUX and read the ADC.
 
-so the max adv instances variable is still 1 after applying this patch set. So fundamentally nothing has changed. However when I set this to any other value, the feature does not really work. Doing a simple thing and adding multiple instances with a default duration value only keeps the last one active forever. It just never rotates. Also when I have two or more instances and remove instance 1, then advertising gets disabled and trying to remove the other instances return an error.
+The ADC is also connected internal to a temp sensor, which can also be
+read via this method.
 
-Are multiple instances suppose to work with this patch set?
+The (only) MUX values expected to be used are:
+1 Internal 1V25 reference
+16 BlueCore01b pin Test_A; BlueCore2-External pin AIO0
+17 BlueCore01b pin Test_B; BlueCore2-External pin AIO1
+36 Chip’s internal temperature (change) sensor. BlueCore2-ROM and later only.
 
-Regards
+The MUX can also select other (undocumented) test points.
 
-Marcel
+Example usage
+--
+# ./bccmd -t HCI -d hci1 adc 17
+ADC value from Mux 0x11 : 0x0054 (valid)
+# ./bccmd -t HCI -d hci1 adc 1
+ADC value from Mux 0x01 : 0x00b2 (valid)
+--
+
+Enjoy,
+Simon.
+------=_20150527113240_97385
+Content-Type: text/x-patch; name="bccmd_adc.patch"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: attachment; filename="bccmd_adc.patch"
+
+diff --git a/tools/bccmd.c b/tools/bccmd.c
+index 7cce426..64c5f56 100644
+--- a/tools/bccmd.c
++++ b/tools/bccmd.c
+@@ -1040,6 +1040,47 @@ static int cmd_pscheck(int transport, int argc, char *argv[])
+ 	return 0;
+ }
+ 
++static int cmd_adc(int transport, int argc, char *argv[])
++{
++	uint8_t array[8];
++	uint16_t mux, value;
++	int err;
++
++	OPT_HELP(1, NULL);
++
++	if (!strncasecmp(argv[0], "0x", 2))
++		mux = strtol(argv[0], NULL, 16);
++	else
++		mux = atoi(argv[0]);
++
++	// Request an ADC read from a particular mux'ed input
++	memset(array, 0, sizeof(array));
++	array[0] = mux & 0xff;
++	array[1] = mux >> 8;
++
++	err = transport_write(transport, CSR_VARID_ADC, array, 2);
++	if (err < 0) {
++		errno = -err;
++		return -1;
++	}
++
++	// sleep, then read result
++	usleep(50000);
++	err = transport_read(transport, CSR_VARID_ADC_RES, array, 8);
++	if (err < 0) {
++		errno = -err;
++		return -1;
++	}
++
++	mux = array[0] | (array[1] << 8);
++	value = array[4] | (array[5] << 8);
++
++	printf("ADC value from Mux 0x%02x : 0x%04x (%s)\n", mux, value,
++					array[2] == 1 ? "valid" : "invalid");
++
++	return 0;
++}
++
+ static struct {
+ 	char *str;
+ 	int (*func)(int transport, int argc, char *argv[]);
+@@ -1070,6 +1111,7 @@ static struct {
+ 	{ "psread",    cmd_psread,    NULL,                  "Read all PS keys"               },
+ 	{ "psload",    cmd_psload,    "<file>",              "Load all PS keys from PSR file" },
+ 	{ "pscheck",   cmd_pscheck,   "<file>",              "Check PSR file"                 },
++	{ "adc",       cmd_adc,       "<mux>",               "Read ADC value of <mux> input"  },
+ 	{ NULL }
+ };
+ 
+diff --git a/tools/csr.h b/tools/csr.h
+index 8b94d7b..cc245a5 100644
+--- a/tools/csr.h
++++ b/tools/csr.h
+@@ -39,6 +39,7 @@
+ #define CSR_VARID_BT_CLOCK			0x2c00	/* uint32 */
+ #define CSR_VARID_PS_NEXT			0x3005	/* complex */
+ #define CSR_VARID_PS_SIZE			0x3006	/* complex */
++#define CSR_VARID_ADC_RES			0x3007	/* complex */
+ #define CSR_VARID_CRYPT_KEY_LENGTH		0x3008	/* complex */
+ #define CSR_VARID_PICONET_INSTANCE		0x3009	/* complex */
+ #define CSR_VARID_GET_CLR_EVT			0x300a	/* complex */
+@@ -62,6 +63,7 @@
+ #define CSR_VARID_CANCEL_PAGE			0x4012	/* valueless */
+ #define CSR_VARID_PS_CLR			0x4818	/* uint16 */
+ #define CSR_VARID_MAP_SCO_PCM			0x481c	/* uint16 */
++#define CSR_VARID_ADC				0x4829	/* uint16 */
+ #define CSR_VARID_SINGLE_CHAN			0x482e	/* uint16 */
+ #define CSR_VARID_RADIOTEST			0x5004	/* complex */
+ #define CSR_VARID_PS_CLR_STORES			0x500c	/* complex */
+------=_20150527113240_97385--
+
 
