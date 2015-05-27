@@ -1,129 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53e48edc3040ae4a82e3beaf06c692e1.squirrel@mungewell.org>
-Date: Wed, 27 May 2015 11:32:40 -0400
-Subject: [Patch] bccmd - add ability to read ADC
-From: simon@mungewell.org
-To: linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: multipart/mixed;boundary="----=_20150527113240_97385"
+In-Reply-To: <01ff01d09869$a3ee35f0$ebcaa1d0$@samsung.com>
+References: <1427692567-631-1-git-send-email-bharat.panda@samsung.com>
+	<004101d06b73$9289a650$b79cf2f0$@samsung.com>
+	<CABBYNZ+wrVLJen3F1Wxx==syH325RwgUL9OcGc6ygtiwhceDkw@mail.gmail.com>
+	<01ff01d09869$a3ee35f0$ebcaa1d0$@samsung.com>
+Date: Wed, 27 May 2015 15:01:32 +0300
+Message-ID: <CABBYNZLXSgD6Uyofx_BAB5oQTon3T87MgXLu+FL82Cb7sMWLyQ@mail.gmail.com>
+Subject: Re: [PATCH v4] monitor: Add AVDTP support to btmon
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-------=_20150527113240_97385
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8bit
+Hi Bharat,
 
-Hi,
-Some BlueCore devices are equipped with an 'Analogue In' pin which is
-internally connected to a MUX and ADC. This patch adds the ability to
-control the MUX and read the ADC.
+On Wed, May 27, 2015 at 1:41 PM, Bharat Bhusan Panda
+<bharat.panda@samsung.com> wrote:
+> Hi Luiz,
+>
+>> -----Original Message-----
+>> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+>> Sent: Tuesday, March 31, 2015 6:57 PM
+>> To: Bharat Bhusan Panda
+>> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+>> Subject: Re: [PATCH v4] monitor: Add AVDTP support to btmon
+>>
+>> Hi Bharat,
+>>
+>> On Tue, Mar 31, 2015 at 8:28 AM, Bharat Bhusan Panda
+>> <bharat.panda@samsung.com> wrote:
+>> > ping
+>>
+>> Looks like it would be a problem for multiple devices connected since at
+>> assign_scid we don't have the information about the device just the psm?
+>> Did you try that?
+> Did you mean, multiple devices connected to same AVDTP case?
 
-The ADC is also connected internal to a temp sensor, which can also be
-read via this method.
-
-The (only) MUX values expected to be used are:
-1 Internal 1V25 reference
-16 BlueCore01b pin Test_A; BlueCore2-External pin AIO0
-17 BlueCore01b pin Test_B; BlueCore2-External pin AIO1
-36 Chip’s internal temperature (change) sensor. BlueCore2-ROM and later only.
-
-The MUX can also select other (undocumented) test points.
-
-Example usage
---
-# ./bccmd -t HCI -d hci1 adc 17
-ADC value from Mux 0x11 : 0x0054 (valid)
-# ./bccmd -t HCI -d hci1 adc 1
-ADC value from Mux 0x01 : 0x00b2 (valid)
---
-
-Enjoy,
-Simon.
-------=_20150527113240_97385
-Content-Type: text/x-patch; name="bccmd_adc.patch"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: attachment; filename="bccmd_adc.patch"
-
-diff --git a/tools/bccmd.c b/tools/bccmd.c
-index 7cce426..64c5f56 100644
---- a/tools/bccmd.c
-+++ b/tools/bccmd.c
-@@ -1040,6 +1040,47 @@ static int cmd_pscheck(int transport, int argc, char *argv[])
- 	return 0;
- }
- 
-+static int cmd_adc(int transport, int argc, char *argv[])
-+{
-+	uint8_t array[8];
-+	uint16_t mux, value;
-+	int err;
-+
-+	OPT_HELP(1, NULL);
-+
-+	if (!strncasecmp(argv[0], "0x", 2))
-+		mux = strtol(argv[0], NULL, 16);
-+	else
-+		mux = atoi(argv[0]);
-+
-+	// Request an ADC read from a particular mux'ed input
-+	memset(array, 0, sizeof(array));
-+	array[0] = mux & 0xff;
-+	array[1] = mux >> 8;
-+
-+	err = transport_write(transport, CSR_VARID_ADC, array, 2);
-+	if (err < 0) {
-+		errno = -err;
-+		return -1;
-+	}
-+
-+	// sleep, then read result
-+	usleep(50000);
-+	err = transport_read(transport, CSR_VARID_ADC_RES, array, 8);
-+	if (err < 0) {
-+		errno = -err;
-+		return -1;
-+	}
-+
-+	mux = array[0] | (array[1] << 8);
-+	value = array[4] | (array[5] << 8);
-+
-+	printf("ADC value from Mux 0x%02x : 0x%04x (%s)\n", mux, value,
-+					array[2] == 1 ? "valid" : "invalid");
-+
-+	return 0;
-+}
-+
- static struct {
- 	char *str;
- 	int (*func)(int transport, int argc, char *argv[]);
-@@ -1070,6 +1111,7 @@ static struct {
- 	{ "psread",    cmd_psread,    NULL,                  "Read all PS keys"               },
- 	{ "psload",    cmd_psload,    "<file>",              "Load all PS keys from PSR file" },
- 	{ "pscheck",   cmd_pscheck,   "<file>",              "Check PSR file"                 },
-+	{ "adc",       cmd_adc,       "<mux>",               "Read ADC value of <mux> input"  },
- 	{ NULL }
- };
- 
-diff --git a/tools/csr.h b/tools/csr.h
-index 8b94d7b..cc245a5 100644
---- a/tools/csr.h
-+++ b/tools/csr.h
-@@ -39,6 +39,7 @@
- #define CSR_VARID_BT_CLOCK			0x2c00	/* uint32 */
- #define CSR_VARID_PS_NEXT			0x3005	/* complex */
- #define CSR_VARID_PS_SIZE			0x3006	/* complex */
-+#define CSR_VARID_ADC_RES			0x3007	/* complex */
- #define CSR_VARID_CRYPT_KEY_LENGTH		0x3008	/* complex */
- #define CSR_VARID_PICONET_INSTANCE		0x3009	/* complex */
- #define CSR_VARID_GET_CLR_EVT			0x300a	/* complex */
-@@ -62,6 +63,7 @@
- #define CSR_VARID_CANCEL_PAGE			0x4012	/* valueless */
- #define CSR_VARID_PS_CLR			0x4818	/* uint16 */
- #define CSR_VARID_MAP_SCO_PCM			0x481c	/* uint16 */
-+#define CSR_VARID_ADC				0x4829	/* uint16 */
- #define CSR_VARID_SINGLE_CHAN			0x482e	/* uint16 */
- #define CSR_VARID_RADIOTEST			0x5004	/* complex */
- #define CSR_VARID_PS_CLR_STORES			0x500c	/* complex */
-------=_20150527113240_97385--
+Yep, if lets say a second device connects to AVDTP it would cause num
+to be increased since it is the same psm and that would break the
+parsing. If we want to track this properly we need to add the remote
+device to l2cap_frame so we only increment num if the device matches.
 
 
+-- 
+Luiz Augusto von Dentz
