@@ -1,48 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 0/6] Add baudrate management for Bluetooth UART
-Date: Thu, 28 May 2015 11:25:00 +0200
-Message-Id: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Ankur Patel <ankur@embertec.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Issue: Sending ATT Signed Write Command via btgatt-client
+Date: Thu, 28 May 2015 11:15:22 +0200
+Message-ID: <1611692.3irn0nrenv@leonov>
+In-Reply-To: <BD5E516FF3711A41B93DC005170007BB010E5DB57E91@EMBSVR01.ember.local>
+References: <BD5E516FF3711A41B93DC005170007BB010E5DB57E78@EMBSVR01.ember.local> <1831684.talzOfVBnx@leonov> <BD5E516FF3711A41B93DC005170007BB010E5DB57E91@EMBSVR01.ember.local>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set introduce baudrate management for Bluetooth UART
-Controller setup and a first implementation for Broadcom BCM4324B3
-used in Asus T100.
+Hi Ankur,
 
-v6 -> v7:
-- Fix setup when firmware is missing by moving
-  request/release_firmware() out of btbcm_patchram().
+On Thursday 28 of May 2015 18:07:48 Ankur Patel wrote:
+> > Hi Ankur,
+> > 
+> > On Thursday 28 of May 2015 16:47:09 Ankur Patel wrote:
+> > > Hello Folks,
+> > > 
+> > > I would like to Send Signed Write command to modify a characteristic
+> > > on the Host. It failed into the Error: Failed to initiate write
+> > > without response procedure
+> > > 
+> > > Information on Controller (May be helpful):
+> > > root@imx28evk:~# cat /proc/crypto
+> > > name         : ecb(aes)
+> > > driver       : ecb-aes-dcp
+> > > module       : kernel
+> > > priority     : 400
+> > > refcnt       : 1
+> > > selftest     : passed
+> > > type         : ablkcipher
+> > > async        : yes
+> > > blocksize    : 16
+> > > min keysize  : 16
+> > > max keysize  : 32
+> > > ivsize       : 0
+> > > geniv        : <default>
+> > > 
+> > > root@imx28evk:~# btmgmt info
+> > > Index list with 1 item
+> > > hci0:   Primary controller
+> > > 
+> > >         addr 1C:BA:8C:86:81:21 version 6 manufacturer 13 class 0x000000
+> > >         supported settings: powered connectable fast-connectable
+> > > 
+> > > discoverable bondable link-security ssp br/edr hs le advertising
+> > > debug-keys privacy current settings: powered connectable discoverable
+> > > bondable link-security br/edr le advertising name testbt
+> > > 
+> > >         short name
+> > > 
+> > > root@imx28evk:~/tools# btgatt-client -d 00:1B:DC:07:2E:85 Connecting
+> > > to device... Done Service Added - UUID:
+> > > 00001800-0000-1000-8000-00805f9b34fb start: 0x0001
+> > > end: 0x000d Service Added - UUID: 00001801-0000-1000-8000-00805f9b34fb
+> > > start: 0x0014 end: 0x0016 [GATT client]# GATT discovery procedures
+> > > complete [GATT client]# ...
+> > > [GATT client]# set-sign-key -c efcdab8967452301efcdab8967452301 [GATT
+> > > client]# write-value -s -w 0xd 01 Failed to initiate write without
+> > > response procedure
+> > > 
+> > > I tried to trace the error as:
+> > > bt_gatt_client_write_without_response(..) -> bt_att_send(..) ->
+> > > create_att_send_op(..) -> encode_pdu(..) -> bt_crypto_sign_att(..) ->
+> > > As
+> > > att->crypto is NULL it returns false.
+> > > 
+> > > I tried to check the reason for att->crypto to be NULL. Found that
+> > > while initialization of the btgatt-client, under bt_crypto_new() ->
+> > > crypto->ecb_aes = ecb_aes_setup();. It fails under ecb_aes_setup
+> > 
+> > function.
+> > 
+> > > From the output of /proc/crypto, the kernel has the support. I am
+> > > wondering how to enable the crypto?
+> > 
+> > Most likely following options are missing in your kernel configuration:
+> > CONFIG_CRYPTO_CMAC
+> > CONFIG_CRYPTO_USER_API
+> > CONFIG_CRYPTO_USER_API_HASH
+> > CONFIG_CRYPTO_USER_API_SKCIPHER
+> 
+> It Worked!!. Thank you Szymon for quick response.
+> 
+> Now I am able to send the Signed Write Command but without Authentication
+> Signature. If I understood it correctly, 1) Set the Signature using  [GATT
+> client]# set-sign-key -c efcdab8967452301efcdab8967452301 2) Execute
+> command: write-value -s -w 0xd 01  to send write command.
+> 
+>  I couldn't able to see the signature on the Sniffer.
+> In addition on the Controller I see below output of root@imx28evk:~#Btmon:
+> 
+> < ACL Data TX: Handle 1025 flags 0x00 dlen 20                               
+>                                                                            
+>                                                                            
+>               [hci0] 2394.331806 ATT: Signed Write Command (0xd2) len 15
+>         0d 00 01 03 00 00 00 47 8a ec df 50 fc a5 ba     .......G...P...
 
-v2 -> v6:
-- Fixes for __hci_cmd_sync() has been integrated (patch v5)
-- In btbcm_check_bdaddr(), merge controller address tests
-- Fix declaration of speeds to use "unsigned int" type
-- Rename default_speed to init_speed
-- Rename operational_speed to oper_speed
-- In case of error during vendor specific set_baudrate(), do not change
-  host baudrate and continue without changing speed
-- Discard changes to bcm_setup_patchram() and in btusb.c
-- Introduce helper functions btbcm_initialize() and btbcm_finalize() to
-  be used by the UART side of things.
+This looks OK to me.
+0d 00    01     03 00 00 00 47 8a ec df 50 fc a5 ba
+handle   data   signature
 
-Frederic Danis (6):
-  Bluetooth: btbcm: Move request/release_firmware()
-  Bluetooth: btbcm: Add BCM4324B3 UART device
-  Bluetooth: hci_uart: Support operational speed during setup
-  Bluetooth: btbcm: Add helper functions for UART setup
-  Bluetooth: hci_uart: Update Broadcom UART setup
-  Bluetooth: hci_uart: Add bcm_set_baudrate()
 
- drivers/bluetooth/btbcm.c     | 135 +++++++++++++++++++++++++++++++++---------
- drivers/bluetooth/btbcm.h     |  20 ++++++-
- drivers/bluetooth/hci_bcm.c   |  86 ++++++++++++++++++++++++++-
- drivers/bluetooth/hci_ldisc.c |  26 ++++++++
- drivers/bluetooth/hci_uart.h  |   4 ++
- 5 files changed, 240 insertions(+), 31 deletions(-)
+Check CoreSpec 4.2 Vol3, Part F, p. 3.4.5.4 (pdf page 2194) for details.
 
 -- 
-1.9.1
-
+BR
+Szymon Janc
