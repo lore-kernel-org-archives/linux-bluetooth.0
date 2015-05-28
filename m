@@ -1,66 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 2/6] Bluetooth: btbcm: Add BCM4324B3 UART device
-Date: Thu, 28 May 2015 11:25:02 +0200
-Message-Id: <1432805106-25719-3-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v7 3/6] Bluetooth: hci_uart: Support operational speed during setup
+Date: Thu, 28 May 2015 11:25:03 +0200
+Message-Id: <1432805106-25719-4-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add "waiting for configuration" address.
-Add lmp_subver and firmware name for BCM4324B3 controller.
+Add initial and operational speeds.
+Change to operational speed as soon as possible. If controller
+set_baudrate() fails, continue at initial speed.
 
 Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 ---
- drivers/bluetooth/btbcm.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ drivers/bluetooth/hci_ldisc.c | 26 ++++++++++++++++++++++++++
+ drivers/bluetooth/hci_uart.h  |  4 ++++
+ 2 files changed, 30 insertions(+)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index c7aec97..e90e6b8 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -33,6 +33,7 @@
- #define VERSION "0.1"
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 5c9a73f..a39e1ab 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -265,11 +265,37 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return 0;
+ }
  
- #define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
-+#define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
- 
- int btbcm_check_bdaddr(struct hci_dev *hdev)
++void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
++{
++	struct tty_struct *tty = hu->tty;
++	struct ktermios ktermios;
++
++	ktermios = tty->termios;
++	ktermios.c_cflag &= ~CBAUD;
++	ktermios.c_cflag |= BOTHER;
++	tty_termios_encode_baud_rate(&ktermios, speed, speed);
++
++	/* tty_set_termios() return not checked as it is always 0 */
++	tty_set_termios(tty, &ktermios);
++
++	BT_DBG("%s: New tty speed: %d", hu->hdev->name, tty->termios.c_ispeed);
++}
++
+ static int hci_uart_setup(struct hci_dev *hdev)
  {
-@@ -56,10 +57,11 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct hci_rp_read_local_version *ver;
+ 	struct sk_buff *skb;
++	int err;
++
++	if (hu->proto->init_speed)
++		hci_uart_set_baudrate(hu, hu->proto->init_speed);
++
++	if (hu->proto->set_baudrate && hu->proto->oper_speed) {
++		err = hu->proto->set_baudrate(hu, hu->proto->oper_speed);
++		if (!err)
++			hci_uart_set_baudrate(hu, hu->proto->oper_speed);
++	}
  
- 	bda = (struct hci_rp_read_bd_addr *)skb->data;
- 
--	/* The address 00:20:70:02:A0:00 indicates a BCM20702A0 controller
--	 * with no configured address.
-+	/* Check if the address indicates a controller with no configured
-+	 * address.
- 	 */
--	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0)) {
-+	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0) ||
-+	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3)) {
- 		BT_INFO("%s: BCM: Using default device address (%pMR)",
- 			hdev->name, &bda->bdaddr);
- 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-@@ -233,6 +235,7 @@ static const struct {
+ 	if (hu->proto->setup)
+ 		return hu->proto->setup(hu);
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index 72120a5..e9f970c 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -58,10 +58,13 @@ struct hci_uart;
+ struct hci_uart_proto {
+ 	unsigned int id;
  	const char *name;
- } bcm_uart_subver_table[] = {
- 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
-+	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
- 	{ }
- };
++	unsigned int init_speed;
++	unsigned int oper_speed;
+ 	int (*open)(struct hci_uart *hu);
+ 	int (*close)(struct hci_uart *hu);
+ 	int (*flush)(struct hci_uart *hu);
+ 	int (*setup)(struct hci_uart *hu);
++	int (*set_baudrate)(struct hci_uart *hu, unsigned int speed);
+ 	int (*recv)(struct hci_uart *hu, const void *data, int len);
+ 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
+ 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
+@@ -96,6 +99,7 @@ int hci_uart_register_proto(const struct hci_uart_proto *p);
+ int hci_uart_unregister_proto(const struct hci_uart_proto *p);
+ int hci_uart_tx_wakeup(struct hci_uart *hu);
+ int hci_uart_init_ready(struct hci_uart *hu);
++void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
  
-@@ -288,6 +291,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 
- 	switch ((rev & 0xf000) >> 12) {
- 	case 0:
-+	case 3:
- 		for (i = 0; bcm_uart_subver_table[i].name; i++) {
- 			if (subver == bcm_uart_subver_table[i].subver) {
- 				hw_name = bcm_uart_subver_table[i].name;
+ #ifdef CONFIG_BT_HCIUART_H4
+ int h4_init(void);
 -- 
 1.9.1
 
