@@ -1,56 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] monitor: Decode ATT Signed Write Command
-Date: Fri, 29 May 2015 00:13:44 +0200
-Message-Id: <1432851224-19550-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1432851224-19550-1-git-send-email-szymon.janc@tieto.com>
-References: <1432851224-19550-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CAD0=r8wfL1TYghMk2wHYrZFZ9D=sz49_1fNPVsPvgqOUVdbuCQ@mail.gmail.com>
+References: <CAD0=r8wfL1TYghMk2wHYrZFZ9D=sz49_1fNPVsPvgqOUVdbuCQ@mail.gmail.com>
+Date: Fri, 29 May 2015 00:32:07 +0300
+Message-ID: <CABBYNZ+JoqhDtH_ZN9bVafMnDYgyjsmwKnTssA8_QFJ1js9kQA@mail.gmail.com>
+Subject: Re: [RFC] Add new method to DBus API: DiscoverServiceByUUID
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed Write Command data is as follow:
-Attribute Handle (2 octets)
-Data (0 or more octets)
-Signature (12 octets).
+Hi Jakub,
 
-> ACL Data RX: Handle 64 flags 0x02 dlen 20
-      ATT: Signed Write Command (0xd2) len 15
-        Handle: 0x001f
-          Data: 00
-          Signature: 00000000df559de6549e1757
----
- monitor/l2cap.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+On Thu, May 28, 2015 at 11:44 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> Currently, calling org.bluez.Device1.Connect() on a new, never
+> connected before device, would cause automatic discovery of all
+> services.
+>
+> This is bad in some cases, because discovering all available services
+> might take a long time. Additionally some devices, i.e. iPhone have
+> built-in 0.5s delay between each "Find Information Response" packet,
+> which make discovery even longer.
+>
+>
+> I would like to propose following change:
+>
+> 1. Calling org.bluez.Device1.Connect() would work just like now,
+> except no "Find Information Request" would be issued (that means no
+> call to "device_browse_gatt").
+>
+> 2. Add two new methods: org.bluez.Device1.DiscoverServices(), and
+> org.bluez.Device1.DiscoverServiceByUUID(uuid). First one would just
+> call device_browse_gatt and make "Find Information Request" , the
+> second one would issue "Find By Type Value Request" to find just one
+> service.
 
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 409f5f4..725a156 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -2319,6 +2319,13 @@ static void att_write_command(const struct l2cap_frame *frame)
- 	print_hex_field("  Data", frame->data + 2, frame->size - 2);
- }
- 
-+static void att_signed_write_command(const struct l2cap_frame *frame)
-+{
-+	print_field("Handle: 0x%4.4x", get_le16(frame->data));
-+	print_hex_field("  Data", frame->data + 2, frame->size - 2 - 12);
-+	print_hex_field("  Signature", frame->data + frame->size - 12, 12);
-+}
-+
- struct att_opcode_data {
- 	uint8_t opcode;
- 	const char *str;
-@@ -2380,7 +2387,7 @@ static const struct att_opcode_data att_opcode_table[] = {
- 			att_handle_value_conf, 0, true },
- 	{ 0x52, "Write Command",
- 			att_write_command, 2, false },
--	{ 0xd2, "Signed Write Command"		},
-+	{ 0xd2, "Signed Write Command", att_signed_write_command, 14, false },
- 	{ }
- };
- 
+You are just changing one problem to another, or actually many other problems:
+
+1. Instead of just 1 method there is at least 2, but Connect depends
+on what has been discovered first so you are adding a D-Bus round
+trips.
+2. DiscoverServiceByUUID can only discover primary services if I
+remember correct, what about included? And if an application, or many,
+decide to discovery one by one every single UUID defined in the spec,
+how many more request that would be compared to Read by Group Type
+Request?
+3. We can't take advance of Service Changed Characteristic if
+DiscoverServiceByUUID, so at that point one would have to start
+polling if the remote server has capability to change its database.
+
+I guess the problem number 3 is actually what you did not consider,
+the whole point is that we discover only once and then let the server
+tell us what has changed, so reconnection should happens very fast
+because we already have the device database in cache.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
