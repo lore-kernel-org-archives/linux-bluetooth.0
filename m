@@ -1,128 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 1/6] Bluetooth: btbcm: Move request/release_firmware()
-Date: Thu, 28 May 2015 11:25:01 +0200
-Message-Id: <1432805106-25719-2-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v7 0/6] Add baudrate management for Bluetooth UART
+Date: Thu, 28 May 2015 11:25:00 +0200
+Message-Id: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Move request/release_firmware() out of btbcm_patchram().
-This allows a better error management, if request_firmware() returns an
-error then the controller will be used without firmware loading and 0 is
-returned.
-This will imply to change btbcm_patchram() to accept a firmware instead
-of firmware name.
+This patch set introduce baudrate management for Bluetooth UART
+Controller setup and a first implementation for Broadcom BCM4324B3
+used in Asus T100.
 
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
----
- drivers/bluetooth/btbcm.c | 26 ++++++++++++--------------
- drivers/bluetooth/btbcm.h |  6 ++++--
- 2 files changed, 16 insertions(+), 16 deletions(-)
+v6 -> v7:
+- Fix setup when firmware is missing by moving
+  request/release_firmware() out of btbcm_patchram().
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 728fce3..c7aec97 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -89,21 +89,14 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- }
- EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
- 
--int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
-+int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
- {
- 	const struct hci_command_hdr *cmd;
--	const struct firmware *fw;
- 	const u8 *fw_ptr;
- 	size_t fw_size;
- 	struct sk_buff *skb;
- 	u16 opcode;
--	int err;
--
--	err = request_firmware(&fw, firmware, &hdev->dev);
--	if (err < 0) {
--		BT_INFO("%s: BCM: Patch %s not found", hdev->name, firmware);
--		return err;
--	}
-+	int err = 0;
- 
- 	/* Start Download */
- 	skb = __hci_cmd_sync(hdev, 0xfc2e, 0, NULL, HCI_INIT_TIMEOUT);
-@@ -129,8 +122,7 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
- 		fw_size -= sizeof(*cmd);
- 
- 		if (fw_size < cmd->plen) {
--			BT_ERR("%s: BCM: Patch %s is corrupted", hdev->name,
--			       firmware);
-+			BT_ERR("%s: BCM: Patch is corrupted", hdev->name);
- 			err = -EINVAL;
- 			goto done;
- 		}
-@@ -156,7 +148,6 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
- 	msleep(250);
- 
- done:
--	release_firmware(fw);
- 	return err;
- }
- EXPORT_SYMBOL(btbcm_patchram);
-@@ -265,6 +256,7 @@ static const struct {
- int btbcm_setup_patchram(struct hci_dev *hdev)
- {
- 	char fw_name[64];
-+	const struct firmware *fw;
- 	u16 subver, rev, pid, vid;
- 	const char *hw_name = NULL;
- 	struct sk_buff *skb;
-@@ -335,9 +327,15 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 		hw_name ? : "BCM", (subver & 0x7000) >> 13,
- 		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
- 
--	err = btbcm_patchram(hdev, fw_name);
--	if (err == -ENOENT)
-+	err = request_firmware(&fw, fw_name, &hdev->dev);
-+	if (err < 0) {
-+		BT_INFO("%s: BCM: Patch %s not found", hdev->name, fw_name);
- 		return 0;
-+	}
-+
-+	btbcm_patchram(hdev, fw);
-+
-+	release_firmware(fw);
- 
- 	/* Reset */
- 	err = btbcm_reset(hdev);
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-index eb6ab5f..de11ace 100644
---- a/drivers/bluetooth/btbcm.h
-+++ b/drivers/bluetooth/btbcm.h
-@@ -21,11 +21,13 @@
-  *
-  */
- 
-+#include <linux/firmware.h>
-+
- #if IS_ENABLED(CONFIG_BT_BCM)
- 
- int btbcm_check_bdaddr(struct hci_dev *hdev);
- int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
--int btbcm_patchram(struct hci_dev *hdev, const char *firmware);
-+int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw);
- 
- int btbcm_setup_patchram(struct hci_dev *hdev);
- int btbcm_setup_apple(struct hci_dev *hdev);
-@@ -42,7 +44,7 @@ static inline int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- 	return -EOPNOTSUPP;
- }
- 
--static inline int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
-+static inline int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
- {
- 	return -EOPNOTSUPP;
- }
+v2 -> v6:
+- Fixes for __hci_cmd_sync() has been integrated (patch v5)
+- In btbcm_check_bdaddr(), merge controller address tests
+- Fix declaration of speeds to use "unsigned int" type
+- Rename default_speed to init_speed
+- Rename operational_speed to oper_speed
+- In case of error during vendor specific set_baudrate(), do not change
+  host baudrate and continue without changing speed
+- Discard changes to bcm_setup_patchram() and in btusb.c
+- Introduce helper functions btbcm_initialize() and btbcm_finalize() to
+  be used by the UART side of things.
+
+Frederic Danis (6):
+  Bluetooth: btbcm: Move request/release_firmware()
+  Bluetooth: btbcm: Add BCM4324B3 UART device
+  Bluetooth: hci_uart: Support operational speed during setup
+  Bluetooth: btbcm: Add helper functions for UART setup
+  Bluetooth: hci_uart: Update Broadcom UART setup
+  Bluetooth: hci_uart: Add bcm_set_baudrate()
+
+ drivers/bluetooth/btbcm.c     | 135 +++++++++++++++++++++++++++++++++---------
+ drivers/bluetooth/btbcm.h     |  20 ++++++-
+ drivers/bluetooth/hci_bcm.c   |  86 ++++++++++++++++++++++++++-
+ drivers/bluetooth/hci_ldisc.c |  26 ++++++++
+ drivers/bluetooth/hci_uart.h  |   4 ++
+ 5 files changed, 240 insertions(+), 31 deletions(-)
+
 -- 
 1.9.1
 
