@@ -1,93 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 3/6] Bluetooth: hci_uart: Support operational speed during setup
-Date: Thu, 28 May 2015 11:25:03 +0200
-Message-Id: <1432805106-25719-4-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v7 1/6] Bluetooth: btbcm: Move request/release_firmware()
+Date: Thu, 28 May 2015 11:25:01 +0200
+Message-Id: <1432805106-25719-2-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add initial and operational speeds.
-Change to operational speed as soon as possible. If controller
-set_baudrate() fails, continue at initial speed.
+Move request/release_firmware() out of btbcm_patchram().
+This allows a better error management, if request_firmware() returns an
+error then the controller will be used without firmware loading and 0 is
+returned.
+This will imply to change btbcm_patchram() to accept a firmware instead
+of firmware name.
 
 Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 26 ++++++++++++++++++++++++++
- drivers/bluetooth/hci_uart.h  |  4 ++++
- 2 files changed, 30 insertions(+)
+ drivers/bluetooth/btbcm.c | 26 ++++++++++++--------------
+ drivers/bluetooth/btbcm.h |  6 ++++--
+ 2 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 5c9a73f..a39e1ab 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -265,11 +265,37 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 728fce3..c7aec97 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -89,21 +89,14 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ }
+ EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
+ 
+-int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
++int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
+ {
+ 	const struct hci_command_hdr *cmd;
+-	const struct firmware *fw;
+ 	const u8 *fw_ptr;
+ 	size_t fw_size;
+ 	struct sk_buff *skb;
+ 	u16 opcode;
+-	int err;
+-
+-	err = request_firmware(&fw, firmware, &hdev->dev);
+-	if (err < 0) {
+-		BT_INFO("%s: BCM: Patch %s not found", hdev->name, firmware);
+-		return err;
+-	}
++	int err = 0;
+ 
+ 	/* Start Download */
+ 	skb = __hci_cmd_sync(hdev, 0xfc2e, 0, NULL, HCI_INIT_TIMEOUT);
+@@ -129,8 +122,7 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
+ 		fw_size -= sizeof(*cmd);
+ 
+ 		if (fw_size < cmd->plen) {
+-			BT_ERR("%s: BCM: Patch %s is corrupted", hdev->name,
+-			       firmware);
++			BT_ERR("%s: BCM: Patch is corrupted", hdev->name);
+ 			err = -EINVAL;
+ 			goto done;
+ 		}
+@@ -156,7 +148,6 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
+ 	msleep(250);
+ 
+ done:
+-	release_firmware(fw);
+ 	return err;
+ }
+ EXPORT_SYMBOL(btbcm_patchram);
+@@ -265,6 +256,7 @@ static const struct {
+ int btbcm_setup_patchram(struct hci_dev *hdev)
+ {
+ 	char fw_name[64];
++	const struct firmware *fw;
+ 	u16 subver, rev, pid, vid;
+ 	const char *hw_name = NULL;
+ 	struct sk_buff *skb;
+@@ -335,9 +327,15 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 		hw_name ? : "BCM", (subver & 0x7000) >> 13,
+ 		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
+ 
+-	err = btbcm_patchram(hdev, fw_name);
+-	if (err == -ENOENT)
++	err = request_firmware(&fw, fw_name, &hdev->dev);
++	if (err < 0) {
++		BT_INFO("%s: BCM: Patch %s not found", hdev->name, fw_name);
+ 		return 0;
++	}
++
++	btbcm_patchram(hdev, fw);
++
++	release_firmware(fw);
+ 
+ 	/* Reset */
+ 	err = btbcm_reset(hdev);
+diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
+index eb6ab5f..de11ace 100644
+--- a/drivers/bluetooth/btbcm.h
++++ b/drivers/bluetooth/btbcm.h
+@@ -21,11 +21,13 @@
+  *
+  */
+ 
++#include <linux/firmware.h>
++
+ #if IS_ENABLED(CONFIG_BT_BCM)
+ 
+ int btbcm_check_bdaddr(struct hci_dev *hdev);
+ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+-int btbcm_patchram(struct hci_dev *hdev, const char *firmware);
++int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw);
+ 
+ int btbcm_setup_patchram(struct hci_dev *hdev);
+ int btbcm_setup_apple(struct hci_dev *hdev);
+@@ -42,7 +44,7 @@ static inline int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ 	return -EOPNOTSUPP;
  }
  
-+void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
-+{
-+	struct tty_struct *tty = hu->tty;
-+	struct ktermios ktermios;
-+
-+	ktermios = tty->termios;
-+	ktermios.c_cflag &= ~CBAUD;
-+	ktermios.c_cflag |= BOTHER;
-+	tty_termios_encode_baud_rate(&ktermios, speed, speed);
-+
-+	/* tty_set_termios() return not checked as it is always 0 */
-+	tty_set_termios(tty, &ktermios);
-+
-+	BT_DBG("%s: New tty speed: %d", hu->hdev->name, tty->termios.c_ispeed);
-+}
-+
- static int hci_uart_setup(struct hci_dev *hdev)
+-static inline int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
++static inline int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
  {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct hci_rp_read_local_version *ver;
- 	struct sk_buff *skb;
-+	int err;
-+
-+	if (hu->proto->init_speed)
-+		hci_uart_set_baudrate(hu, hu->proto->init_speed);
-+
-+	if (hu->proto->set_baudrate && hu->proto->oper_speed) {
-+		err = hu->proto->set_baudrate(hu, hu->proto->oper_speed);
-+		if (!err)
-+			hci_uart_set_baudrate(hu, hu->proto->oper_speed);
-+	}
- 
- 	if (hu->proto->setup)
- 		return hu->proto->setup(hu);
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 72120a5..e9f970c 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -58,10 +58,13 @@ struct hci_uart;
- struct hci_uart_proto {
- 	unsigned int id;
- 	const char *name;
-+	unsigned int init_speed;
-+	unsigned int oper_speed;
- 	int (*open)(struct hci_uart *hu);
- 	int (*close)(struct hci_uart *hu);
- 	int (*flush)(struct hci_uart *hu);
- 	int (*setup)(struct hci_uart *hu);
-+	int (*set_baudrate)(struct hci_uart *hu, unsigned int speed);
- 	int (*recv)(struct hci_uart *hu, const void *data, int len);
- 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
- 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
-@@ -96,6 +99,7 @@ int hci_uart_register_proto(const struct hci_uart_proto *p);
- int hci_uart_unregister_proto(const struct hci_uart_proto *p);
- int hci_uart_tx_wakeup(struct hci_uart *hu);
- int hci_uart_init_ready(struct hci_uart *hu);
-+void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
- 
- #ifdef CONFIG_BT_HCIUART_H4
- int h4_init(void);
+ 	return -EOPNOTSUPP;
+ }
 -- 
 1.9.1
 
