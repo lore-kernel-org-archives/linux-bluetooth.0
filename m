@@ -1,73 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-To: Daniel Drake <drake@endlessm.com>
-CC: Larry Finger <Larry.Finger@lwfinger.net>,
-	Carlo Caione <carlo@endlessm.com>,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>,
-	"shaofu@realtek.com > shaofu" <shaofu@realtek.com>,
-	=?utf-8?B?5byg5b+X56Wl?= <askijerry_zhang@realsil.com.cn>,
-	=?utf-8?B?6ZmG5pyx5Lyf?= <alex_lu@realsil.com.cn>,
-	Chih-Hsiang Wang <wangchihhs@realtek.com>,
-	=?utf-8?B?5q+b5Li66ZSL?= <jason_mao@realsil.com.cn>,
-	"pkshih@realtek.com" <pkshih@realtek.com>
-Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IOetlOWkjTogUmVhbHRlayBVU0IgYmx1ZXRvb3Ro?= =?utf-8?Q?:_no_scan_results_when_wifi_is_connected?=
-Date: Thu, 28 May 2015 10:02:57 +0000
-Message-ID: <54F70642BAB21D4498E1AA3EFE3D519A4610F810@rsex2.realsil.com.cn>
-References: <CAD8Lp47=G8rFJtow9fn9WBg6FAyygopvYh7k0FNS0w8FgKXD6A@mail.gmail.com>
-	<554E804F.9090407@lwfinger.net>
-	<54F70642BAB21D4498E1AA3EFE3D519A461012DA@rsex2.realsil.com.cn>
-	<CAD8Lp472ZD=2RBHD3boAgenEe6D=eqGh3dZugUDHR=-AW18BxA@mail.gmail.com>
-	<54F70642BAB21D4498E1AA3EFE3D519A46101882@rsex2.realsil.com.cn>
- <CAD8Lp46p+UOS=usWpqhmPMW523Si36ZqTnogSki99Crg+=S0QQ@mail.gmail.com>
-In-Reply-To: <CAD8Lp46p+UOS=usWpqhmPMW523Si36ZqTnogSki99Crg+=S0QQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <1611692.3irn0nrenv@leonov>
+References: <BD5E516FF3711A41B93DC005170007BB010E5DB57E78@EMBSVR01.ember.local>
+	<1831684.talzOfVBnx@leonov>
+	<BD5E516FF3711A41B93DC005170007BB010E5DB57E91@EMBSVR01.ember.local>
+	<1611692.3irn0nrenv@leonov>
+Date: Thu, 28 May 2015 12:41:14 +0300
+Message-ID: <CABBYNZLwhyhhi=r-YrrKD92fdteQoh7qtUkaU-p7dmzR-XXruQ@mail.gmail.com>
+Subject: Re: Issue: Sending ATT Signed Write Command via btgatt-client
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Ankur Patel <ankur@embertec.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-RGVhciBEYW5pZWwsDQoJV2Ugd2FudCB0byBzaGFyZSBzb21lIGluZm9ybWF0aW9uIGJldHdlZW4g
-d2lmaSBkcml2ZXIgYW5kIGJ0IGRyaXZlciwgd2hhdCBydWxlcyBkbyB5b3UgcmVjb21tZW5kIGZv
-ciB0aGUgZm9sbG93aW5nIHNpdHVhdGlvbiA/DQoxLiBhdCBzeXN0ZW0gc3RhcnR1cCwgYmx1ZXRv
-b3RoIGRyaXZlciB3YW50IHRvIHJlYWQgc29tZSBpbmZvcm1hdGlvbiAoZWcgYW50ZW5uYSBzZXR0
-aW5ncykgdGhhdCBnZW5lcmF0ZWQgYnkgd2lmaSAsIHNoYWxsIHdlIHVzZSBmaWxlcyBvciAvcHJv
-Yy8gaW5mb3JtYXRpb24/IA0KMi4gd2hlbiB1c2VyIGlzIHVzaW5nIEJsdWV0b290aCwgYnQgZHJp
-dmVyIG1heSBub3RpZnkgd2lmaSBkcml2ZXIgdG8gcGVyZm9ybSBiZXR0ZXIsIHNoYWxsIHdlIHVz
-ZSBzb2NrZXQgdG8gY29tbXVuaWNhdGlvbj8NCg0KQ2hhbXBpb24NCkV4dDojNjMyNQ0KDQotLS0t
-LemCruS7tuWOn+S7ti0tLS0tDQrlj5Hku7bkuro6IERhbmllbCBEcmFrZSBbbWFpbHRvOmRyYWtl
-QGVuZGxlc3NtLmNvbV0gDQrlj5HpgIHml7bpl7Q6IDIwMTXlubQ15pyIMjHml6UgMjE6MzANCuaU
-tuS7tuS6ujog6ZmI6Imz6JCNDQrmioTpgIE6IExhcnJ5IEZpbmdlcjsgQ2FybG8gQ2Fpb25lOyBM
-aW51eCBCbHVldG9vdGggbWFpbGluZyBsaXN0OyBzaGFvZnVAcmVhbHRlay5jb20gPiBzaGFvZnU7
-IOW8oOW/l+elpTsg6ZmG5pyx5LyfOyBDaGloLUhzaWFuZyBXYW5nOyDmr5vkuLrplIs7IHBrc2hp
-aEByZWFsdGVrLmNvbQ0K5Li76aKYOiBSZTog562U5aSNOiDnrZTlpI06IFJlYWx0ZWsgVVNCIGJs
-dWV0b290aDogbm8gc2NhbiByZXN1bHRzIHdoZW4gd2lmaSBpcyBjb25uZWN0ZWQNCg0KSGksDQoN
-Ck9uIFR1ZSwgTWF5IDEyLCAyMDE1IGF0IDg6MzYgUE0sIOmZiOiJs+iQjSA8Y2hhbXBpb25fY2hl
-bkByZWFsc2lsLmNvbS5jbj4gd3JvdGU6DQo+IERlYXIgRGFuaWVsLA0KPiAgICAgICAgIEZvciAg
-ODcyM0JVLCAgICAgICBhbHdheXMgdXNlIENPTkZJR19TMF9BTlRURU5B77ybDQo+ICAgICAgICAg
-Rm9yICA4NzIzQkUg77yMIDEgYW50ZW5uYSBDT05GSUdfUzFfQU5UVEVOQTsgMiBhbnRlbm5hcyAN
-Cj4gQ09ORklHX1MwX0FOVFRFTkENCg0KDQpJIHRlc3RlZCB3aXRoIENPTkZJR19TMF9BTlRFTk5B
-IGFzIEkgYW0gdXNpbmcgYSA4NzIzQkUgd2l0aCAyIGFudGVubmFzLg0KDQpJIGJlbGlldmUgdGhp
-cyBjb25maWd1cmF0aW9uIGlzIGhhdmluZyBubyBlZmZlY3QuIEkgdGVzdGVkIGFzIGZvbGxvd3M6
-DQoNCkJ1aWx0IGtlcm5lbCB3aXRob3V0IHJ0bHdpZmkgc3VwcG9ydC4NCkJvb3RlZC4NCkRpc2Nv
-bm5lY3RlZCBib3RoIGFudGVubmFzLg0KTW92ZWQgcmVtb3RlIGJsdWV0b290aCBkZXZpY2UgMiBt
-ZXRyZXMgYXdheS4NClJhbiAiaGNpdG9vbCBzY2FuIiAtLT4gbm8gcmVzdWx0cy4gR29vZC4NCkNv
-bm5lY3RlZCBhbnRlbm5hIDEuIFNjYW4gLS0+IHJlbW90ZSBkZXZpY2UgY2FuIGJlIHNlZW4gRGlz
-Y29ubmVjdGVkIGFudGVubmEgMSwgY29ubmVjdGVkIGFudGVubmEgMi4gU2NhbiAtLT4gcmVtb3Rl
-IGRldmljZSBjYW4gYmUgc2Vlbg0KDQpJIHRoZW4gdHJpZWQgd2l0aCBDT05GSUdfUzFfQU5URU5O
-QSBhbmQgdGhlbiBhZ2FpbiB3aXRob3V0IGRvaW5nIHRoZQ0KUzAvUzEgYW50ZW5uYSBjb25maWcg
-YXQgYWxsLiBUaGUgcmVzdWx0cyBhcmUgYWx3YXlzIHRoZSBzYW1lLiBJdCBzZWVtcyBsaWtlIHRo
-ZSBibHVldG9vdGggaW50ZXJmYWNlIGlzIGFsd2F5cyB1c2luZyBib3RoIGFudGVubmFzIChoZW5j
-ZSBpdCBjYW4gd29yayBldmVuIGlmIG9uZSBvZiB0aGVtIGlzIGRpc2Nvbm5lY3RlZCkuDQoNCkFs
-c28sIGV2ZW4gd2l0aCB0aGlzIGFudGVubmEgY29uZmlnIGluIHBsYWNlLCB0aGVyZSBpcyBubyBh
-ZmZlY3Qgb24gdGhlIG9yaWdpbmFsIGlzc3VlOiBjb25uZWN0aW5nIHRvIHdpZmkgc3RpbGwgYnJl
-YWtzIHRoZSBibHVldG9vdGggc2NhbiBhZnRlciBhIHNob3J0IHdoaWxlLg0KDQpPbiBXZWQsIE1h
-eSAxMywgMjAxNSBhdCAxOjUxIEFNLCDpmYjoibPokI0gPGNoYW1waW9uX2NoZW5AcmVhbHNpbC5j
-b20uY24+IHdyb3RlOg0KPiBEZWFyIERhbmllbCwNCj4gUGxlYXNlIHRyeSB0byBjb21tZW50IHRo
-ZSBmb2xsb3dpbmcgY29kZSBpbiB3aWZpIGRyaXZlciANCj4gaGFsYnRjODcyM2IyYW50X2FjdGlv
-bl9idF9pbnF1aXJ5KCkNCj4gLyoNCj4gICAgICAgICAgICAgICAgIGNvZXhfZG0tPm5lZWRfcmVj
-b3ZlcjB4OTQ4ID0gdHJ1ZTsNCj4gICAgICAgICAgICAgICAgIGNvZXhfZG0tPmJhY2t1cDB4OTQ4
-ID0gDQo+IGJ0Y29leGlzdC0+YnRjX3JlYWRfNGJ5dGUoYnRjb2V4aXN0LCAweDk0OCk7DQo+DQo+
-ICAgICAgICAgICAgICAgICBoYWxidGM4NzIzYjJhbnRfc2V0X2FudF9wYXRoKGJ0Y29leGlzdCwg
-QlRDX0FOVF9XSUZJX0FUX0FVWCwgZmFsc2UsIGZhbHNlKTsNCj4gICAgICAgICAqLw0KDQpUaGlz
-IGFsc28gbWFrZXMgbm8gZGlmZmVyZW5jZSwgdGhlIGlzc3VlIGlzIHN0aWxsIHRoZXJlLg0KDQpU
-aGFua3MNCkRhbmllbA0K
+Hi,
+
+On Thu, May 28, 2015 at 12:15 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi Ankur,
+>
+> On Thursday 28 of May 2015 18:07:48 Ankur Patel wrote:
+>> > Hi Ankur,
+>> >
+>> > On Thursday 28 of May 2015 16:47:09 Ankur Patel wrote:
+>> > > Hello Folks,
+>> > >
+>> > > I would like to Send Signed Write command to modify a characteristic
+>> > > on the Host. It failed into the Error: Failed to initiate write
+>> > > without response procedure
+>> > >
+>> > > Information on Controller (May be helpful):
+>> > > root@imx28evk:~# cat /proc/crypto
+>> > > name         : ecb(aes)
+>> > > driver       : ecb-aes-dcp
+>> > > module       : kernel
+>> > > priority     : 400
+>> > > refcnt       : 1
+>> > > selftest     : passed
+>> > > type         : ablkcipher
+>> > > async        : yes
+>> > > blocksize    : 16
+>> > > min keysize  : 16
+>> > > max keysize  : 32
+>> > > ivsize       : 0
+>> > > geniv        : <default>
+>> > >
+>> > > root@imx28evk:~# btmgmt info
+>> > > Index list with 1 item
+>> > > hci0:   Primary controller
+>> > >
+>> > >         addr 1C:BA:8C:86:81:21 version 6 manufacturer 13 class 0x000000
+>> > >         supported settings: powered connectable fast-connectable
+>> > >
+>> > > discoverable bondable link-security ssp br/edr hs le advertising
+>> > > debug-keys privacy current settings: powered connectable discoverable
+>> > > bondable link-security br/edr le advertising name testbt
+>> > >
+>> > >         short name
+>> > >
+>> > > root@imx28evk:~/tools# btgatt-client -d 00:1B:DC:07:2E:85 Connecting
+>> > > to device... Done Service Added - UUID:
+>> > > 00001800-0000-1000-8000-00805f9b34fb start: 0x0001
+>> > > end: 0x000d Service Added - UUID: 00001801-0000-1000-8000-00805f9b34fb
+>> > > start: 0x0014 end: 0x0016 [GATT client]# GATT discovery procedures
+>> > > complete [GATT client]# ...
+>> > > [GATT client]# set-sign-key -c efcdab8967452301efcdab8967452301 [GATT
+>> > > client]# write-value -s -w 0xd 01 Failed to initiate write without
+>> > > response procedure
+>> > >
+>> > > I tried to trace the error as:
+>> > > bt_gatt_client_write_without_response(..) -> bt_att_send(..) ->
+>> > > create_att_send_op(..) -> encode_pdu(..) -> bt_crypto_sign_att(..) ->
+>> > > As
+>> > > att->crypto is NULL it returns false.
+>> > >
+>> > > I tried to check the reason for att->crypto to be NULL. Found that
+>> > > while initialization of the btgatt-client, under bt_crypto_new() ->
+>> > > crypto->ecb_aes = ecb_aes_setup();. It fails under ecb_aes_setup
+>> >
+>> > function.
+>> >
+>> > > From the output of /proc/crypto, the kernel has the support. I am
+>> > > wondering how to enable the crypto?
+>> >
+>> > Most likely following options are missing in your kernel configuration:
+>> > CONFIG_CRYPTO_CMAC
+>> > CONFIG_CRYPTO_USER_API
+>> > CONFIG_CRYPTO_USER_API_HASH
+>> > CONFIG_CRYPTO_USER_API_SKCIPHER
+>>
+>> It Worked!!. Thank you Szymon for quick response.
+>>
+>> Now I am able to send the Signed Write Command but without Authentication
+>> Signature. If I understood it correctly, 1) Set the Signature using  [GATT
+>> client]# set-sign-key -c efcdab8967452301efcdab8967452301 2) Execute
+>> command: write-value -s -w 0xd 01  to send write command.
+>>
+>>  I couldn't able to see the signature on the Sniffer.
+>> In addition on the Controller I see below output of root@imx28evk:~#Btmon:
+>>
+>> < ACL Data TX: Handle 1025 flags 0x00 dlen 20
+>>
+>>
+>>               [hci0] 2394.331806 ATT: Signed Write Command (0xd2) len 15
+>>         0d 00 01 03 00 00 00 47 8a ec df 50 fc a5 ba     .......G...P...
+>
+> This looks OK to me.
+> 0d 00    01     03 00 00 00 47 8a ec df 50 fc a5 ba
+> handle   data   signature
+>
+>
+> Check CoreSpec 4.2 Vol3, Part F, p. 3.4.5.4 (pdf page 2194) for details.
+
+We could probably improve btmon to print out the handle, data and
+signature separately.
+
+
+-- 
+Luiz Augusto von Dentz
