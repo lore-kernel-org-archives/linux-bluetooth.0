@@ -1,106 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Shaofu <shaofu@realtek.com>
-To: Larry Finger <Larry.Finger@lwfinger.net>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        Daniel Drake <drake@endlessm.com>
-CC: Champion_chen <champion_chen@realsil.com.cn>,
-        Carlo Caione
-	<carlo@endlessm.com>,
-        Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>,
-        askijerry_zhang
-	<askijerry_zhang@realsil.com.cn>,
-        alex_lu <alex_lu@realsil.com.cn>,
-        Chih-Hsiang Wang <wangchihhs@realtek.com>,
-        jason_mao
-	<jason_mao@realsil.com.cn>, Pkshih <pkshih@realtek.com>
-Subject: RE: Realtek USB bluetooth: no scan results when wifi is connected
-Date: Fri, 29 May 2015 08:17:44 +0000
-Message-ID: <72D8F8BA10DE0C4E808578817FAC1EE3D7C207@RTITMBSV05.realtek.com.tw>
-References: <CAD8Lp47=G8rFJtow9fn9WBg6FAyygopvYh7k0FNS0w8FgKXD6A@mail.gmail.com>
- <554E804F.9090407@lwfinger.net>
- <54F70642BAB21D4498E1AA3EFE3D519A461012DA@rsex2.realsil.com.cn>
- <CAD8Lp472ZD=2RBHD3boAgenEe6D=eqGh3dZugUDHR=-AW18BxA@mail.gmail.com>
- <54F70642BAB21D4498E1AA3EFE3D519A46101882@rsex2.realsil.com.cn>
- <CAD8Lp46p+UOS=usWpqhmPMW523Si36ZqTnogSki99Crg+=S0QQ@mail.gmail.com>
- <54F70642BAB21D4498E1AA3EFE3D519A4610F810@rsex2.realsil.com.cn>
- <C14314D4-41CF-4FCE-9C3F-F3352FDF0F6A@holtmann.org>
- <CAD8Lp44Au=AenfG9EnLAJJ8dw7kientAoKppEMh7U2wY73pSQg@mail.gmail.com>
- <6156899E-F971-46CC-A3D9-6DDDFA9FDC4B@holtmann.org>,<55673B25.1030801@lwfinger.net>
-In-Reply-To: <55673B25.1030801@lwfinger.net>
-Content-Type: text/plain; charset="big5"
-MIME-Version: 1.0
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] bnep: Fix using uninitialized variable
+Date: Fri, 29 May 2015 11:14:30 +0300
+Message-Id: <1432887270-17632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-RGVhciBhbGwsCgpBcyBNYXJjZWwgc2FpZCwgc29tZSBSZWFsdGVrIFdpRmkgKyBCVCBzb2x1dGlv
-biBhcmUgdHdvIGNoaXBzIHNvbHV0aW9uLgotIDEgY2hpcCBzb2x1dGlvbjogODcyM0JFLCA4ODIx
-QUUKLSAyIGNoaXBzIHNvbHV0aW9uOiA4ODEyQUUgKyA4NzYxQVUsIDgxOTJFRSArIDg3NjFBVQoK
-RXZlbiBpbiAyIGNoaXBzIHNvbHV0aW9uLCB0aGVyZSBhcmUgc29tZSBkaWZmZXJlbmNlOgotIEhh
-cmR3YXJlIGNvbm5lY3RlZCBpbiBtb2R1bGU6IDgxOTJFRSArIDg3NjFBVQotIEluZGVwZW5kZW50
-LCBuZWVkIFNXIGludm9sdmVkLCBldmVuIGluIHRoZSBzYW1lIG1vZHVsZTogODgxMkFFICsgODc2
-MUFVCgpJbiAxIGNoaXAgb3IgaGFyZHdhcmUgY29ubmVjdGVkIHNvbHV0aW9uLCBib3RoIGRyaXZl
-ciBkb24ndCBuZWVkIGNvbW11bmljYXRlLApCVGNvZXggZHJpdmVyIGtub3dzIGV2ZXJ5dGhpbmcg
-dmlhIEhXIGV2ZW50LCBhbmQgY29udHJvbCBldmVyeXRoaW5nIGl0IHdhbnRzLgoKSW4gMiBjaGlw
-cyBhbmQgaW5kZXBlbmRlbnQgc29sdXRpb24sIHllcywgaXRzIG91ciBwcm9ibGVtLiBJbiB0aGlz
-IGNhc2UsIHdlIG5lZWQgCnNvbWUgY29tbXVuaWNhdGlvbiBtZWNoYW5pc20gYmV0d2VlbiBkcml2
-ZXJzLiBUaGUgcmZyZXMgc3Vic3lzdGVtIHNlZW1zIApnb29kLCBidXQgaXQgdGFrZXMgdGltZS4g
-SWYgb3RoZXIgc2ltcGxlIG1ldGhvZHMgY2FuIGRvLCBwbGVhc2UgdGVsbCB1cy4KClRoYW5rcywK
-U2hhb2Z1CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCrFxOiBMYXJy
-eSBGaW5nZXIgW2xhcnJ5LmZpbmdlckBnbWFpbC5jb21dIKVOqu0gTGFycnkgRmluZ2VyIFtMYXJy
-eS5GaW5nZXJAbHdmaW5nZXIubmV0XQqxSKXzpOm0wTogMjAxNaZ+NaTrMjik6SCkVaTIIDExOjU4
-CqbcOiBNYXJjZWwgSG9sdG1hbm47IERhbmllbCBEcmFrZQqwxqW7OiBDaGFtcGlvbl9jaGVuOyBD
-YXJsbyBDYWlvbmU7IExpbnV4IEJsdWV0b290aCBtYWlsaW5nIGxpc3Q7IFNoYW9mdTsgYXNraWpl
-cnJ5X3poYW5nOyBhbGV4X2x1OyBDaGloLUhzaWFuZyBXYW5nOyBqYXNvbl9tYW87IFBrc2hpaDsg
-U2hhb2Z1CqVEpq46IFJlOiBSZWFsdGVrIFVTQiBibHVldG9vdGg6IG5vIHNjYW4gcmVzdWx0cyB3
-aGVuIHdpZmkgaXMgY29ubmVjdGVkCgpPbiAwNS8yOC8yMDE1IDEwOjEzIEFNLCBNYXJjZWwgSG9s
-dG1hbm4gd3JvdGU6Cj4gSGkgRGFuaWVsLAo+Cj4+Pj4gICAgICAgV2Ugd2FudCB0byBzaGFyZSBz
-b21lIGluZm9ybWF0aW9uIGJldHdlZW4gd2lmaSBkcml2ZXIgYW5kIGJ0IGRyaXZlciwgd2hhdCBy
-dWxlcyBkbyB5b3UgcmVjb21tZW5kIGZvciB0aGUgZm9sbG93aW5nIHNpdHVhdGlvbiA/Cj4+Pj4g
-MS4gYXQgc3lzdGVtIHN0YXJ0dXAsIGJsdWV0b290aCBkcml2ZXIgd2FudCB0byByZWFkIHNvbWUg
-aW5mb3JtYXRpb24gKGVnIGFudGVubmEgc2V0dGluZ3MpIHRoYXQgZ2VuZXJhdGVkIGJ5IHdpZmkg
-LCBzaGFsbCB3ZSB1c2UgZmlsZXMgb3IgL3Byb2MvIGluZm9ybWF0aW9uPwo+Pj4+IDIuIHdoZW4g
-dXNlciBpcyB1c2luZyBCbHVldG9vdGgsIGJ0IGRyaXZlciBtYXkgbm90aWZ5IHdpZmkgZHJpdmVy
-IHRvIHBlcmZvcm0gYmV0dGVyLCBzaGFsbCB3ZSB1c2Ugc29ja2V0IHRvIGNvbW11bmljYXRpb24/
-Cj4+Pgo+Pj4gdGhpcyBpcyB0aGUgQmx1ZXRvb3RoIHN1YnN5c3RlbSBjb21tdW5pY2F0aW5nIHdp
-dGggdGhlIFdpRmkgc3Vic3lzdGVtIChjZmc4MDIxMSkgYW5kIHZpY2UgdmVyc2EsIHRoZW4gdGhp
-cyBpcyBoYXBwZW5pbmcgaW5zaWRlIHRoZSBrZXJuZWwuIEkgZG8gbm90IHNlZSBhbnkgbmVlZCB0
-byBldmVuIHRyeSB0byBnbyB2aWEgdXNlcnNwYWNlIGF0IGFsbC4gU28gbmVpdGhlciAvcHJvYyBh
-bmQgbm8gc29ja2V0cyBmb3IgdGhpcy4KPj4KPj4gSSBhZ3JlZS4gQnV0IGNhbiB3ZSBnaXZlIG1v
-cmUgc3BlY2lmaWMgYWR2aWNlIG9uIGhvdyB0byBkbyB0aGlzIGluc2lkZQo+PiB0aGUga2VybmVs
-Pwo+PiBpLmUuIHNob3VsZCB0aGV5IGNyZWF0ZSBhIG5ldyBkcml2ZXIgdW5kZXIgZHJpdmVycy9t
-aXNjIHdoaWNoIGV4cG9zZXMKPj4gYSBzaGFyZWQgQVBJIHZpYSBFWFBPUlRfU1lNQk9MPwo+Cj4g
-SSB3YXMgYWN0dWFsbHkgdGhpbmtpbmcgYWJvdXQgY3JlYXRpbmcgYSByZnJlcyBzdWJzeXN0ZW0g
-d2hlcmUgZWFjaCByYWRpbyBzdWJzeXN0ZW0gY2FuIHJlZ2lzdGVyIHRoZWlyIGFudGVubmEgYW5k
-IGNoYW5uZWwgaW5mb3JtYXRpb24uIFRoYXQgd2h5IFdpRmkgZG9lcyBub3QgZGVwZW5kIG9uIEJs
-dWV0b290aCBvciB0aGF0IEJsdWV0b290aCBkZXBlbmQgb24gV2lGaS4gVGhpcyBjcm9zcyBkZXBl
-bmRlbmN5IGlzIHNvbWV0aGluZyBJIGxpa2UgdG8gYXZvaWQuCj4KPiBBbmQgd2l0aCByZnJlcyBz
-dWJzeXN0ZW0gaW4gcGxhY2UsIGVhY2ggc3Vic3lzdGVtIGNvdWxkIGFsc28gcmVnaXN0ZXIgZm9y
-IG5vdGlmaWNhdGlvbiBhbmQgYWRhcHQgaXRzIHJhZGlvIHVzYWdlIGlmIHBvc3NpYmxlLiBLZWVw
-IGluIG1pbmQgdGhhdCB3ZSBzdXBwb3J0IG11bHRpcGxlIEJsdWV0b290aCBhbmQgV2lGaSBjYXJk
-cyBpbiB0aGUgc3lzdGVtLiBTbyB0aGlzIGFsbCBuZWVkcyB0byBiZSBmdWxseSBnZW5lcmljLgo+
-Cj4+IFRoZSBvdGhlciBvcHRpb24gZm9yIFJlYWx0ZWsgdG8gY29uc2lkZXIgaXMgdG8gZG8gdGhp
-cyBpbgo+PiBoYXJkd2FyZS9maXJtd2FyZS4gSSBhbHJlYWR5IHNhdyB0aGF0IHRoZSBidGNvZXhp
-c3QgZHJpdmVyIGtub3dzCj4+IGV4YWN0bHkgd2hlbiB0aGUgd2lmaSBhbmQgQlQgc3RhcnQgYW5k
-IGZpbmlzaCBzY2FubmluZywgc28gdGhlcmUgaXMKPj4gY2xlYXJseSBhbHJlYWR5IGFuIGluZm9y
-bWF0aW9uLXBhc3NpbmcgbWVjaGFuaXNtIGJldHdlZW4gdGhlIHR3bwo+PiBpbnRlcmZhY2VzLiBJ
-IHdvbmRlciBpZiBhbiB1cGRhdGVkIGZpcm13YXJlIGNvdWxkIGV4dGVuZCB0aGF0IHRvCj4+IGlu
-Y2x1ZGUgdGhlIG5ldyBpbmZvcm1hdGlvbiB0aGF0IHlvdSB3aXNoIHRvIGFkZGl0aW9uYWxseSB0
-cmFuc2Zlci4KPgo+IFRoYXQgaXMgYW5vdGhlciBvcHRpb24gYW5kIGEgbG90IG9mIGNvbXBhbmll
-cyBoYXZlIGNob3NlbiB0byBkbyB0aGlzLiBJZiB0aGlzIGlzIGEgY2FyZCB0aGF0IGhhcyBXaUZp
-IGFuZCBCbHVldG9vdGggb24gdGhlIHNhbWUgaGFyZHdhcmUsIHRoZW4gbm9ybWFsbHkgYW4gaW50
-ZXJuYWwgYnVzIGV4aXN0cyBmb3IgY29tbXVuaWNhdGluZyBjb2V4aXN0ZW5jZSBpbmZvcm1hdGlv
-biBvdXQtb2YtYmFuZC4gVGhhdCBpcyB3aGF0IHdlIGFyZSBleHBlY3RpbmcgaW4gYSBsb3Qgb2Yg
-Y2FzZXMgdG8gaGFwcGVuIHdoZW4gbG9va2luZyBhdCBwbGF0Zm9ybXMuCj4KPiBPZiBjb3Vyc2Ug
-cmZyZXMgd2lsbCBiZSBoYXJkbHkgZG8gYSBiZXR0ZXIgam9iIHRoZW4gdGhlIGludGVybmFsIGNv
-bW11bmljYXRpb24gYmV0d2VlbiB0aGUgV2lGaSBhbmQgQmx1ZXRvb3RoIHBhcnRzIG9uIHRoZSBz
-YW1lIGNoaXAuIEl0IGNhbiBvbmx5IGhlbHAgd2hlbiB0aGUgdHdvIHBpZWNlcyBhcmUgaW5kZXBl
-bmRlbnQgb3Igd2hlbiB5b3UgaGF2ZSBtb3JlIHRoYW4gb25lIG9mIGVhY2ggaW5zdGFsbGVkLgoK
-SSBkbyBub3Qga25vdyBtdWNoIGFib3V0IHRoZSBpbnRlcm5hbCBzdHJ1Y3R1cmUgb2YgdGhlIFJl
-YWx0ZWsgZGV2aWNlcywgYW5kIEkKaGF2ZSBubyBpZGVhIGlmIHRoZSB0d28gcGFydHMgY2FuIGNv
-bW11bmljYXRlIG92ZXIgYW4gaW50ZXJuYWwgYnVzLiBGb3IgdGhhdApyZWFzb24sIEkgaGF2ZSBh
-ZGRlZCBTaGFvZnUsIHRoZSBsZWFkIGVuZ2luZWVyIG9uIHRoZSBQQ0llIHdpZmkgZHJpdmVyLgoK
-SXMgdGhlcmUgYSB0aW1lIGZyYW1lIGZvciByZnJlcz8gQWx0aG91Z2ggaXQgbWlnaHQgbm90IGRv
-IGEgYmV0dGVyIGpvYiBpbiBhbGwKY2FzZXMsIGl0cyBnZW5lcmFsaXR5IHdpbGwgYmUgdXNlZnVs
-LgoKTGFycnkKCgoKLS0tLS0tUGxlYXNlIGNvbnNpZGVyIHRoZSBlbnZpcm9ubWVudCBiZWZvcmUg
-cHJpbnRpbmcgdGhpcyBlLW1haWwuCg==
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+---
+ profiles/network/bnep.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 59599e4..8748d68 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -606,8 +606,8 @@ static int bnep_server_add_legacy(int sk, uint16_t dst, char *bridge,
+ 					char *iface, const bdaddr_t *addr,
+ 					uint8_t *setup_data, int len)
+ {
++	uint16_t rsp = BNEP_SUCCESS;
+ 	int err, n;
+-	uint16_t rsp;
+ 
+ 	n = read(sk, setup_data, len);
+ 	if (n != len) {
+-- 
+2.1.4
+
