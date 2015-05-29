@@ -1,47 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 31 May 2015 08:20:40 +0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Florian Grandel <fgrandel@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v6 00/16] Bluetooth: Multi-advertising infrastructure
-Message-ID: <20150531012040.GA20436@t440s>
-References: <1432507154-22925-1-git-send-email-fgrandel@gmail.com>
- <1432600463-7758-1-git-send-email-fgrandel@gmail.com>
- <064C8AD4-80B3-4E94-96E9-F40BDA0D38C7@holtmann.org>
- <55663161.2000508@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+Subject: Re: [PATCH ] unit: Use g_memdup replacing g_malloc0+memcpy
+Date: Fri, 29 May 2015 17:25:56 +0200
+Message-ID: <3694875.L2X9fu69MS@leonov>
+In-Reply-To: <02bd01d09a1f$ad982f40$08c88dc0$@samsung.com>
+References: <1432900090-20152-1-git-send-email-bharat.panda@samsung.com> <2675140.GJPQpNdFbz@leonov> <02bd01d09a1f$ad982f40$08c88dc0$@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <55663161.2000508@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Florian,
+Hi Bharat,
 
-On Wed, May 27, 2015, Florian Grandel wrote:
-> >Are multiple instances suppose to work with this patch set?
+On Friday 29 of May 2015 20:26:40 Bharat Bhusan Panda wrote:
+> Hi Szymon,
 > 
-> No. There are a few remaining TODOs (documented in the code) for actual
-> multi-advertising. I mention these in the commit messages where applicable.
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > owner@vger.kernel.org] On Behalf Of Szymon Janc
+> > Sent: Friday, May 29, 2015 8:10 PM
+> > To: Bharat Panda
+> > Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> > Subject: Re: [PATCH ] unit: Use g_memdup replacing g_malloc0+memcpy
+> > 
+> > Hi Bharat,
+> > 
+> > On Friday 29 of May 2015 17:18:10 Bharat Panda wrote:
+> > > Replace use of g_malloc0+memcpy with g_memdup.
+> > > ---
+> > > 
+> > >  unit/test-gattrib.c | 3 +--
+> > >  unit/test-sdp.c     | 4 +---
+> > >  2 files changed, 2 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c index
+> > > 416e596..d9c52d7 100644
+> > > --- a/unit/test-gattrib.c
+> > > +++ b/unit/test-gattrib.c
+> > > @@ -224,8 +224,7 @@ static void result_canary(guint8 status, const
+> > > guint8 *pdu, guint16 len, struct result_data *result = data;
+> > > 
+> > >  	result->status = status;
+> > > 
+> > > -	result->pdu = g_malloc0(len);
+> > > -	memcpy(result->pdu, pdu, len);
+> > > +	result->pdu = g_memdup(pdu, len);
+> > > 
+> > >  	result->len = len;
+> > >  	
+> > >  	if (g_test_verbose())
+> > > 
+> > > diff --git a/unit/test-sdp.c b/unit/test-sdp.c index b4ef4d1..58d90f8
+> > > 100644
+> > > --- a/unit/test-sdp.c
+> > > +++ b/unit/test-sdp.c
+> > > @@ -189,9 +189,7 @@ static gboolean send_pdu(gpointer user_data)
+> > > 
+> > >  	pdu_len = req_pdu->raw_size + context->cont_size;
+> > > 
+> > > -	buf = g_malloc0(pdu_len);
+> > > -
+> > > -	memcpy(buf, req_pdu->raw_data, req_pdu->raw_size);
+> > > +	buf = g_memdup(req_pdu->raw_data, req_pdu->raw_size);
+> > 
+> > This is not correct. If context->cont_size > 0 then you write after
 > 
-> The idea was to do the more complex changes in a functionally neutral
-> refactoring first as a safe starting point for functional changes (see my
-> conv. with Arman on the list).
+> allocated
 > 
-> Of course I'm prepared to resolve those remaining TODOs in a second patch
-> set. I just think it is a good idea if I go full cycle once to avoid those
-> beginner's errors during the next iteration.
+> > memory (see line below).
 > 
-> If you think that there are no more fundamental flaws in that first patch
-> set then I can start with the second one now. What do you think?
+> Below line is to copy the context->cont_data after req_pdu->raw_size length
+> of req_pdu->raw_data.
+> But in above lines, it was allocating pdu_len size then doing memcpy of
+> req_pdu->raw_data, which was replaced by the g_memdup.
 
-I was also under the impression that this set implemented the full
-multi-advertising feature (rather than being refactoring in preparation
-for it). I think a kernel release should contain the whole thing or
-nothing at all, which makes me now a bit doubtful of whether this can
-make it to 4.2.
+Yes. So instead of allocating pdu_len bytes you allocate only
+req_pdu->raw_size bytes. This is not enough if context->cont_size is greater 
+than zero. You have second memcpy just line below.
 
-How soon can you send the follow-up set? It will essentially validate
-the work of your first set, so it'd be good to see and test it as soon
-as possible.
+> > >  	if (context->cont_size > 0)
+> > >  	
+> > >  		memcpy(buf + req_pdu->raw_size, context->cont_data,
 
-Johan
+This will write after allocated memory.
+
+> 
+> --
+> Bharat
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+-- 
+BR
+Szymon Janc
