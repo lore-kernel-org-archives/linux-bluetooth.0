@@ -1,44 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] bnep: Fix using uninitialized variable
-Date: Fri, 29 May 2015 11:11:04 +0200
-Message-ID: <4038111.10QDuYn3KY@leonov>
-In-Reply-To: <1432887270-17632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1432887270-17632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] shared/att: Fix boolean check in handle_notify()
+Date: Fri, 29 May 2015 11:53:26 +0300
+Message-Id: <1432889606-3967-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <CABBYNZK+AnuQM+EoLDaEwbr4hZnjxjfHy9gGM1bH1PEG-G7faQ@mail.gmail.com>
+References: <CABBYNZK+AnuQM+EoLDaEwbr4hZnjxjfHy9gGM1bH1PEG-G7faQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Friday 29 of May 2015 11:14:30 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> ---
->  profiles/network/bnep.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-> index 59599e4..8748d68 100644
-> --- a/profiles/network/bnep.c
-> +++ b/profiles/network/bnep.c
-> @@ -606,8 +606,8 @@ static int bnep_server_add_legacy(int sk, uint16_t dst,
-> char *bridge, char *iface, const bdaddr_t *addr,
->  					uint8_t *setup_data, int len)
->  {
-> +	uint16_t rsp = BNEP_SUCCESS;
->  	int err, n;
-> -	uint16_t rsp;
-> 
->  	n = read(sk, setup_data, len);
->  	if (n != len) {
+ext_signed is boolean and shall be checked with logical op.
+---
+ src/shared/att.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'd prefer if this would be set only on success path ie. right before reply 
-label.
-
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 053aa47..f9a5817 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -733,7 +733,7 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 	const struct queue_entry *entry;
+ 	bool found;
+ 
+-	if (opcode & ATT_OP_SIGNED_MASK & !att->ext_signed) {
++	if ((opcode & ATT_OP_SIGNED_MASK) && !att->ext_signed) {
+ 		if (!handle_signed(att, opcode, pdu, pdu_len))
+ 			return;
+ 		pdu_len -= BT_ATT_SIGNATURE_LEN;
 -- 
-BR
-Szymon Janc
+2.1.4
+
