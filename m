@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bnep: Fix using uninitialized variable
-Date: Fri, 29 May 2015 11:14:30 +0300
-Message-Id: <1432887270-17632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] shared/att: Fix boolean check in handle_notify()
+Date: Fri, 29 May 2015 11:09:19 +0300
+Message-Id: <1432886959-17508-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+ext_signed is boolean and shall be checked with logical op.
 ---
- profiles/network/bnep.c | 2 +-
+ src/shared/att.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 59599e4..8748d68 100644
---- a/profiles/network/bnep.c
-+++ b/profiles/network/bnep.c
-@@ -606,8 +606,8 @@ static int bnep_server_add_legacy(int sk, uint16_t dst, char *bridge,
- 					char *iface, const bdaddr_t *addr,
- 					uint8_t *setup_data, int len)
- {
-+	uint16_t rsp = BNEP_SUCCESS;
- 	int err, n;
--	uint16_t rsp;
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 053aa47..a3d8f89 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -733,7 +733,7 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 	const struct queue_entry *entry;
+ 	bool found;
  
- 	n = read(sk, setup_data, len);
- 	if (n != len) {
+-	if (opcode & ATT_OP_SIGNED_MASK & !att->ext_signed) {
++	if (opcode & ATT_OP_SIGNED_MASK && !att->ext_signed) {
+ 		if (!handle_signed(att, opcode, pdu, pdu_len))
+ 			return;
+ 		pdu_len -= BT_ATT_SIGNATURE_LEN;
 -- 
 2.1.4
 
