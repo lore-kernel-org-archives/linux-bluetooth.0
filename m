@@ -1,34 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Kirill Elagin <kirelagin@gmail.com>
-Date: Sun, 31 May 2015 23:32:52 +0300
-Message-ID: <CABVT_gf4axUR4Z==m8JrWc6_DLeux_vakWOfNMCEETdWMkMQ7A@mail.gmail.com>
-Subject: Bluez killing Apple Magic Trackpads
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Date: Sat, 30 May 2015 23:27:15 -0700 (PDT)
+Message-Id: <20150530.232715.2163410957549351469.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2015-05-28
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20150528093143.GA22996@t440s.ger.corp.intel.com>
+References: <20150528093143.GA22996@t440s.ger.corp.intel.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 28 May 2015 12:31:43 +0300
 
-I like using an Apple Magic Trackpad instead of a mouse but there is a
-major inconvenience: they keep dying. Another one just died five
-minutes ago, and it is the third to die during the last 1.5 years.
-During this period of 1.5 years I switched a number of kernel versions
-(having 3.19.1 right now) and Bluez 5 versions (5.25 now). I’m not
-sure, it might be that the first one died while I was using Bluez 4.
+> Here's a set of patches intended for 4.2. The majority of the changes
+> are on the 802.15.4 side of things rather than Bluetooth related:
+> 
+>  - All sorts of cleanups & fixes to ieee802154 and related drivers
+>  - Rework of tx power support in ieee802154 and its drivers
+>  - Support for setting ieee802154 tx power through nl802154
+>  - New IDs for the btusb driver
+>  - Various cleanups & smaller fixes to btusb
+>  - New btrtl driver for Realtec devices
+>  - Fix suspend/resume for Realtek devices
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-The first one lasted for three months, the second one was working for
-almost a year, and this last one has been with me for a month or two.
-
-I am surprised that I couldn’t find anything about this in Google, so
-I decided to ask here, has anyone heard of such a problem? They die
-unexpectedly: one day I will try to connect it to my laptop or desktop
-and it won’t do anything, and will start blinking its LED in an
-unusual manner.
-
-That’s definitely Apple’s fault that their trackpads react this way to
-some probably unexpected event, but I just wonder, does anyone have an
-idea what might cause this? I don’t know how to diagnose the problem
-as they die after random periods of time and become absolutely
-unresponsive.
+Pulled, thanks Johan.
