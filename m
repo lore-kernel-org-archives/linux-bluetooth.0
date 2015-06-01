@@ -1,89 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Update MAP test results
+Date: Mon, 01 Jun 2015 14:57:45 +0200
+Message-ID: <1687874.CdDCX0jCxB@leonov>
+In-Reply-To: <1433155970-6476-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1433155970-6476-1-git-send-email-mariusz.skamra@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20150531025505.GA23991@t440s>
-References: <CAD0=r8wfL1TYghMk2wHYrZFZ9D=sz49_1fNPVsPvgqOUVdbuCQ@mail.gmail.com>
-	<CABBYNZ+JoqhDtH_ZN9bVafMnDYgyjsmwKnTssA8_QFJ1js9kQA@mail.gmail.com>
-	<CAD0=r8wDGKw4DRnEAsZqNvMc05CGnjz7HVFc6MTQZi74L9xC1Q@mail.gmail.com>
-	<20150531025505.GA23991@t440s>
-Date: Mon, 1 Jun 2015 10:25:09 -0700
-Message-ID: <CAD0=r8xVzep5nu5=J4Hz5FkpSTo03csYt2=wtXRF6vmydR6q1g@mail.gmail.com>
-Subject: Re: [RFC] Add new method to DBus API: DiscoverServiceByUUID
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Jakub Pawlowski <jpawlowski@google.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan, Luiz
+Hi Mariusz,
 
-On Sat, May 30, 2015 at 7:55 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jakub,
->
-> On Thu, May 28, 2015, Jakub Pawlowski wrote:
->> > 1. Instead of just 1 method there is at least 2, but Connect depends
->> > on what has been discovered first so you are adding a D-Bus round
->> > trips.
->>
->> Yes, I'm probably adding one round trip. It might hovewer be avoided.
->> To avoid additional roundtrip there should be two methods:
->> Connect() that just works right now, and ConnectToUUID(uuid) that
->> would connect, and then do "Find By Type Value Request". I think that
->> this solution wouldn't be that clean, and would be problematic to
->> discover rest of services.
->
-> We already have this "ConnectToUUID" method in the form of
-> Device1.ConnectProfile, don't we? It was originally designed for BR/EDR,
-> but seems to have at least some code for LE as well. If it's not working
-> as desired for LE it's probably something worth fixing.
->
+On Monday 01 of June 2015 12:52:50 Mariusz Skamra wrote:
+> PTS 6.1 and Android 5.1
+> ---
+>  android/pics-map.txt  |  2 +-
+>  android/pixit-map.txt |  2 +-
+>  android/pts-map.txt   | 11 ++++++-----
+>  3 files changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/android/pics-map.txt b/android/pics-map.txt
+> index 093aae1..b1346b6 100644
+> --- a/android/pics-map.txt
+> +++ b/android/pics-map.txt
+> @@ -1,6 +1,6 @@
+>  MAP PICS for the PTS tool.
+> 
+> -PTS version: 6.0
+> +PTS version: 6.1
+> 
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> diff --git a/android/pixit-map.txt b/android/pixit-map.txt
+> index a7626dd..90272cb 100644
+> --- a/android/pixit-map.txt
+> +++ b/android/pixit-map.txt
+> @@ -1,6 +1,6 @@
+>  MAP PIXIT for the PTS tool.
+> 
+> -PTS version: 6.0
+> +PTS version: 6.1
+> 
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-map.txt b/android/pts-map.txt
+> index 6ca984e..2be8db2 100644
+> --- a/android/pts-map.txt
+> +++ b/android/pts-map.txt
+> @@ -1,8 +1,8 @@
+>  PTS test results for MAP
+> 
+> -PTS version: 6.0
+> -Tested: 11-December-2014
+> -Android version: 5.0
+> +PTS version: 6.1
+> +Tested: 29-May-2015
+> +Android version: 5.1
+> 
+>  Results:
+>  PASS	test passed
+> @@ -71,9 +71,9 @@ TC_MSE_MMB_BV_14_I	PASS
+>  TC_MSE_MMB_BV_15_I	PASS
+>  TC_MSE_MMB_BV_16_I	PASS
+>  TC_MSE_MMD_BV_02_I	PASS
+> -TC_MSE_MMU_BV_02_I	PASS	At least one SMS must be present in inbox
+> +TC_MSE_MMU_BV_02_I	PASS
+>  TC_MSE_MMU_BV_03_I	PASS
+> -TC_MSE_MMN_BV_02_I	PASS
+> +TC_MSE_MMN_BV_02_I	INC	JIRA #BA-380
+>  TC_MSE_MMN_BV_04_I	N/A
+>  TC_MSE_MMI_BV_02_I	N/A
+>  TC_MSE_MFB_BV_02_I	N/A
+> @@ -83,6 +83,7 @@ TC_MSE_BC_BV_03_I	N/A
+>  TC_MSE_CON_BV_01_I	N/A
+>  TC_MSE_CON_BV_02_I	N/A
+>  TC_MSE_ROB_BV_01_I	N/A
+> +TC_MSE_ROB_BV_02_I	N/A
+>  TC_MSE_SRM_BI_02_I	N/A
+>  TC_MSE_SRM_BI_03_I	N/A
+>  TC_MSE_SRM_BI_05_I	N/A
 
-"ConnectToUUID" method is what I was looking for. It doesn't work for
-LE devices as far as I tested, so I'll fix it. It creates connection,
-but then stops (no MTU exchange, or service discovery).
+Patch applied. Thanks a lot for running all those tests!
 
-Here's merged (to show time order) output of btmon and bluetoothd
-together when calling ConnectToUUID right now:
-http://pastebin.com/s76bT3jx
-
-When I looked into source, it looks like it still want to do full
-service discvery, not just one service. Can I modify it to do ""Find
-By Type Value Request" for LE devices ?
-
-
-I modified bluez a little bit to test timing, and show why I want to
-have "Find By Type Value Request":
-
-Right after connecting and negotiating MTU, instead of doing Primary
-and Secondary Service Discovery, I made BlueZ do "Find By Type Value
-Request" for service with UUID "babe", and then auto discover it's
-included services, characteristics, descriptors.
-
-First I tested against Android phone with three Primary Services
-(GATT, GAP, and one with UUID "babe"), and total of 4 characteristic,
-one in "babe" service. MTU=517.
-Doing regular discovery took 2.38s from "Read By Group Type Request"
-to last request, http://pastebin.com/pgrfAJM9
-Doing just one service discovery took 0,84s from "Find By Type Value
-Request" to last request, http://pastebin.com/V1WZERfw
-
-Then I tested against iPhone with 5 services and total of 12
-characteristics (one with UUID "babe", having one characteristic).
-MTU=158. Sample iPhone app I used for tests started automatically
-discovering services on the laptop, which also impacted discovery
-time.
-Doing regular discovery took 9.7s from "Read By Group Type Request" to
-last request, http://pastebin.com/aycMWZ4w
-Doing just one service discovery took 2s from "Find By Type Value
-Request" to last request, http://pastebin.com/C9Jp28WM
-
-My use case is to quickly connect, and use one service, then
-disconnect. 2.3s vs 0.8s is big gain for me, not talking about 9.7 vs
-2s. Some controllers designed for coin-battery scenarios have MTU
-fixed on 23, which should also make all service discovery slow, and
-yield big difference.
-
-
-
-> Johan
+-- 
+BR
+Szymon Janc
