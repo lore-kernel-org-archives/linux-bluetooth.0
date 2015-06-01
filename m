@@ -1,57 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <556C4DD9.6050301@gmail.com>
-Date: Mon, 01 Jun 2015 14:19:37 +0200
-From: Florian Grandel <fgrandel@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] bnep: Fix using uninitialized variable
+Date: Mon, 01 Jun 2015 13:00:39 +0200
+Message-ID: <1547815.JPrmgbYs6B@leonov>
+In-Reply-To: <1432893859-32620-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1432893859-32620-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v6 00/16] Bluetooth: Multi-advertising infrastructure
-References: <1432507154-22925-1-git-send-email-fgrandel@gmail.com> <1432600463-7758-1-git-send-email-fgrandel@gmail.com> <064C8AD4-80B3-4E94-96E9-F40BDA0D38C7@holtmann.org> <55663161.2000508@gmail.com> <20150531012040.GA20436@t440s>
-In-Reply-To: <20150531012040.GA20436@t440s>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andrei,
 
-On 05/31/2015 03:20 AM, Johan Hedberg wrote:
-> Hi Florian,
->
-> On Wed, May 27, 2015, Florian Grandel wrote:
->>> Are multiple instances suppose to work with this patch set?
->>
->> No. There are a few remaining TODOs (documented in the code) for actual
->> multi-advertising. I mention these in the commit messages where applicable.
->>
->> The idea was to do the more complex changes in a functionally neutral
->> refactoring first as a safe starting point for functional changes (see my
->> conv. with Arman on the list).
->>
->> Of course I'm prepared to resolve those remaining TODOs in a second patch
->> set. I just think it is a good idea if I go full cycle once to avoid those
->> beginner's errors during the next iteration.
->>
->> If you think that there are no more fundamental flaws in that first patch
->> set then I can start with the second one now. What do you think?
->
-> I was also under the impression that this set implemented the full
-> multi-advertising feature (rather than being refactoring in preparation
-> for it). I think a kernel release should contain the whole thing or
-> nothing at all, which makes me now a bit doubtful of whether this can
-> make it to 4.2.
+On Friday 29 of May 2015 13:04:19 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  profiles/network/bnep.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+> index 59599e4..9bf0b18 100644
+> --- a/profiles/network/bnep.c
+> +++ b/profiles/network/bnep.c
+> @@ -634,8 +634,11 @@ static int bnep_server_add_legacy(int sk, uint16_t dst,
+> char *bridge, bnep_del_from_bridge(iface, bridge);
+>  		bnep_conndel(addr);
+>  		rsp = BNEP_CONN_NOT_ALLOWED;
+> +		goto reply;
+>  	}
+> 
+> +	rsp = BNEP_SUCCESS;
+> +
+>  reply:
+>  	if (bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp) < 0) {
+>  		err = -errno;
 
- From my pov: no problem. I prefer us to test this patch really well and 
-for everybody to really feel comfortable about its inclusion rather then 
-rushing this into the next release.
+Patch applied. Thanks.
 
-> How soon can you send the follow-up set? It will essentially validate
-> the work of your first set, so it'd be good to see and test it as soon
-> as possible.
-
-As I'm doing this in my spare time I cannot really give you a specific 
-date but I think I'll be able to provide a patch set with the remaining 
-functional changes for review within two weeks.
-
-Regards,
-
-Florian
+-- 
+BR
+Szymon Janc
