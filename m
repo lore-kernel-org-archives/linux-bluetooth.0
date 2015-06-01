@@ -1,80 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] android/pts: Update MAP test results
-Date: Mon,  1 Jun 2015 12:52:50 +0200
-Message-Id: <1433155970-6476-1-git-send-email-mariusz.skamra@tieto.com>
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: 'Szymon Janc' <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1433155474-29992-1-git-send-email-bharat.panda@samsung.com>
+ <1574967.CdNyU3mLK2@leonov>
+In-reply-to: <1574967.CdNyU3mLK2@leonov>
+Subject: RE: [PATCH v2] unit: Use g_memdup replacing g_malloc0+memcpy
+Date: Mon, 01 Jun 2015 16:24:38 +0530
+Message-id: <02e301d09c59$5ff99940$1feccbc0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PTS 6.1 and Android 5.1
----
- android/pics-map.txt  |  2 +-
- android/pixit-map.txt |  2 +-
- android/pts-map.txt   | 11 ++++++-----
- 3 files changed, 8 insertions(+), 7 deletions(-)
+Hi Szymon,
 
-diff --git a/android/pics-map.txt b/android/pics-map.txt
-index 093aae1..b1346b6 100644
---- a/android/pics-map.txt
-+++ b/android/pics-map.txt
-@@ -1,6 +1,6 @@
- MAP PICS for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-diff --git a/android/pixit-map.txt b/android/pixit-map.txt
-index a7626dd..90272cb 100644
---- a/android/pixit-map.txt
-+++ b/android/pixit-map.txt
-@@ -1,6 +1,6 @@
- MAP PIXIT for the PTS tool.
- 
--PTS version: 6.0
-+PTS version: 6.1
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-diff --git a/android/pts-map.txt b/android/pts-map.txt
-index 6ca984e..2be8db2 100644
---- a/android/pts-map.txt
-+++ b/android/pts-map.txt
-@@ -1,8 +1,8 @@
- PTS test results for MAP
- 
--PTS version: 6.0
--Tested: 11-December-2014
--Android version: 5.0
-+PTS version: 6.1
-+Tested: 29-May-2015
-+Android version: 5.1
- 
- Results:
- PASS	test passed
-@@ -71,9 +71,9 @@ TC_MSE_MMB_BV_14_I	PASS
- TC_MSE_MMB_BV_15_I	PASS
- TC_MSE_MMB_BV_16_I	PASS
- TC_MSE_MMD_BV_02_I	PASS
--TC_MSE_MMU_BV_02_I	PASS	At least one SMS must be present in inbox
-+TC_MSE_MMU_BV_02_I	PASS
- TC_MSE_MMU_BV_03_I	PASS
--TC_MSE_MMN_BV_02_I	PASS
-+TC_MSE_MMN_BV_02_I	INC	JIRA #BA-380
- TC_MSE_MMN_BV_04_I	N/A
- TC_MSE_MMI_BV_02_I	N/A
- TC_MSE_MFB_BV_02_I	N/A
-@@ -83,6 +83,7 @@ TC_MSE_BC_BV_03_I	N/A
- TC_MSE_CON_BV_01_I	N/A
- TC_MSE_CON_BV_02_I	N/A
- TC_MSE_ROB_BV_01_I	N/A
-+TC_MSE_ROB_BV_02_I	N/A
- TC_MSE_SRM_BI_02_I	N/A
- TC_MSE_SRM_BI_03_I	N/A
- TC_MSE_SRM_BI_05_I	N/A
--- 
-1.9.1
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Szymon Janc
+> Sent: Monday, June 01, 2015 4:13 PM
+> To: Bharat Panda
+> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> Subject: Re: [PATCH v2] unit: Use g_memdup replacing g_malloc0+memcpy
+> 
+> Hi Bharat,
+> 
+> On Monday 01 of June 2015 16:14:34 Bharat Panda wrote:
+> > Replace use of g_malloc0+memcpy with g_memdup.
+> > ---
+> >  unit/test-gattrib.c | 3 +--
+> >  unit/test-sdp.c     | 4 +---
+> >  2 files changed, 2 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c index
+> > 416e596..d9c52d7 100644
+> > --- a/unit/test-gattrib.c
+> > +++ b/unit/test-gattrib.c
+> > @@ -224,8 +224,7 @@ static void result_canary(guint8 status, const
+> > guint8 *pdu, guint16 len, struct result_data *result = data;
+> >
+> >  	result->status = status;
+> > -	result->pdu = g_malloc0(len);
+> > -	memcpy(result->pdu, pdu, len);
+> > +	result->pdu = g_memdup(pdu, len);
+> >  	result->len = len;
+> >
+> >  	if (g_test_verbose())
+> > diff --git a/unit/test-sdp.c b/unit/test-sdp.c index b4ef4d1..9d716d8
+> > 100644
+> > --- a/unit/test-sdp.c
+> > +++ b/unit/test-sdp.c
+> > @@ -189,9 +189,7 @@ static gboolean send_pdu(gpointer user_data)
+> >
+> >  	pdu_len = req_pdu->raw_size + context->cont_size;
+> >
+> > -	buf = g_malloc0(pdu_len);
+> > -
+> > -	memcpy(buf, req_pdu->raw_data, req_pdu->raw_size);
+> > +	buf = g_memdup(req_pdu->raw_data, pdu_len);
+> 
+> This is still not correct. If context->cont_size > 0 you will read from
+invalid
+> memory after req_pdu->raw_data buffer ends.
+> 
+> g_memdup just doesn't fit here.
+
+Yes, thanks. It really does not fit here. 
+I shall ignore this patch, or if test-gattrib part is considered, then I
+shall re-submit with that change only.
+
+> 
+> >
+> >  	if (context->cont_size > 0)
+> >  		memcpy(buf + req_pdu->raw_size, context->cont_data,
+> 
+> --
+> BR
+> Szymon Janc
+
+Best Regards,
+Bharat
+
 
