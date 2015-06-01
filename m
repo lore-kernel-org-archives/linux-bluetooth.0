@@ -1,81 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bharat Bhusan Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com
-References: <1432289879-13705-1-git-send-email-bharat.panda@samsung.com>
-In-reply-to: <1432289879-13705-1-git-send-email-bharat.panda@samsung.com>
-Subject: RE: [PATCH ] unit/sdp: Use update_db_timestamp() of sdpd-service
-Date: Mon, 01 Jun 2015 16:09:54 +0530
-Message-id: <02e201d09c57$4f4df020$ede9d060$@samsung.com>
+To: 'Szymon Janc' <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1432900090-20152-1-git-send-email-bharat.panda@samsung.com>
+ <2675140.GJPQpNdFbz@leonov> <02bd01d09a1f$ad982f40$08c88dc0$@samsung.com>
+ <3694875.L2X9fu69MS@leonov>
+In-reply-to: <3694875.L2X9fu69MS@leonov>
+Subject: RE: [PATCH ] unit: Use g_memdup replacing g_malloc0+memcpy
+Date: Mon, 01 Jun 2015 16:09:00 +0530
+Message-id: <02e101d09c57$3040b820$90c22860$@samsung.com>
 MIME-version: 1.0
 Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+Hi Szymon,
+
 
 > -----Original Message-----
 > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Bharat Panda
-> Sent: Friday, May 22, 2015 3:48 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: cpgs@samsung.com; Bharat Panda
-> Subject: [PATCH ] unit/sdp: Use update_db_timestamp() of sdpd-service
+> owner@vger.kernel.org] On Behalf Of Szymon Janc
+> Sent: Friday, May 29, 2015 8:56 PM
+> To: Bharat Bhusan Panda
+> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> Subject: Re: [PATCH ] unit: Use g_memdup replacing g_malloc0+memcpy
 > 
-> Make update_db_timestamp() as global to use in unit/test-sdp.c
-> ---
->  src/sdpd-service.c | 2 +-
->  src/sdpd.h         | 1 +
->  unit/test-sdp.c    | 4 ----
->  3 files changed, 2 insertions(+), 5 deletions(-)
+> Hi Bharat,
 > 
-> diff --git a/src/sdpd-service.c b/src/sdpd-service.c index
-c3ee3eb..df8af94
-> 100644
-> --- a/src/sdpd-service.c
-> +++ b/src/sdpd-service.c
-> @@ -308,7 +308,7 @@ uint32_t sdp_get_time(void)
->   * Set the SDP server DB. Simply a timestamp which is the marker
->   * when the DB was modified.
->   */
-> -static void update_db_timestamp(void)
-> +void update_db_timestamp(void)
->  {
->  	if (fixed_dbts) {
->  		sdp_data_t *d = sdp_data_alloc(SDP_UINT32, &fixed_dbts);
-> diff --git a/src/sdpd.h b/src/sdpd.h index 49cd98a..bcb6b07 100644
-> --- a/src/sdpd.h
-> +++ b/src/sdpd.h
-> @@ -45,6 +45,7 @@ typedef struct request {  void
-> handle_internal_request(int sk, int mtu, void *data, int len);  void
-> handle_request(int sk, uint8_t *data, int len);
+> On Friday 29 of May 2015 20:26:40 Bharat Bhusan Panda wrote:
+> > Hi Szymon,
+> >
+> > > -----Original Message-----
+> > > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > > owner@vger.kernel.org] On Behalf Of Szymon Janc
+> > > Sent: Friday, May 29, 2015 8:10 PM
+> > > To: Bharat Panda
+> > > Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> > > Subject: Re: [PATCH ] unit: Use g_memdup replacing g_malloc0+memcpy
+> > >
+> > > Hi Bharat,
+> > >
+> > > On Friday 29 of May 2015 17:18:10 Bharat Panda wrote:
+> > > > Replace use of g_malloc0+memcpy with g_memdup.
+> > > > ---
+> > > >
+> > > >  unit/test-gattrib.c | 3 +--
+> > > >  unit/test-sdp.c     | 4 +---
+> > > >  2 files changed, 2 insertions(+), 5 deletions(-)
+> > > >
+> > > > diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c index
+> > > > 416e596..d9c52d7 100644
+> > > > --- a/unit/test-gattrib.c
+> > > > +++ b/unit/test-gattrib.c
+> > > > @@ -224,8 +224,7 @@ static void result_canary(guint8 status, const
+> > > > guint8 *pdu, guint16 len, struct result_data *result = data;
+> > > >
+> > > >  	result->status = status;
+> > > >
+> > > > -	result->pdu = g_malloc0(len);
+> > > > -	memcpy(result->pdu, pdu, len);
+> > > > +	result->pdu = g_memdup(pdu, len);
+> > > >
+> > > >  	result->len = len;
+> > > >
+> > > >  	if (g_test_verbose())
+> > > >
+> > > > diff --git a/unit/test-sdp.c b/unit/test-sdp.c index
+> > > > b4ef4d1..58d90f8
+> > > > 100644
+> > > > --- a/unit/test-sdp.c
+> > > > +++ b/unit/test-sdp.c
+> > > > @@ -189,9 +189,7 @@ static gboolean send_pdu(gpointer user_data)
+> > > >
+> > > >  	pdu_len = req_pdu->raw_size + context->cont_size;
+> > > >
+> > > > -	buf = g_malloc0(pdu_len);
+> > > > -
+> > > > -	memcpy(buf, req_pdu->raw_data, req_pdu->raw_size);
+> > > > +	buf = g_memdup(req_pdu->raw_data, req_pdu->raw_size);
+> > >
+> > > This is not correct. If context->cont_size > 0 then you write after
+> >
+> > allocated
+> >
+> > > memory (see line below).
+> >
+> > Below line is to copy the context->cont_data after req_pdu->raw_size
+> > length of req_pdu->raw_data.
+> > But in above lines, it was allocating pdu_len size then doing memcpy
+> > of req_pdu->raw_data, which was replaced by the g_memdup.
 > 
-> +void update_db_timestamp(void);
->  void set_fixed_db_timestamp(uint32_t dbts);
+> Yes. So instead of allocating pdu_len bytes you allocate only req_pdu-
+> >raw_size bytes. This is not enough if context->cont_size is greater than
+> zero. You have second memcpy just line below.
 > 
->  int service_register_req(sdp_req_t *req, sdp_buf_t *rsp); diff --git
-> a/unit/test-sdp.c b/unit/test-sdp.c index b4ef4d1..fc4b083 100644
-> --- a/unit/test-sdp.c
-> +++ b/unit/test-sdp.c
-> @@ -257,10 +257,6 @@ static gboolean client_handler(GIOChannel
-> *channel, GIOCondition cond,
->  	return TRUE;
->  }
+> > > >  	if (context->cont_size > 0)
+> > > >
+> > > >  		memcpy(buf + req_pdu->raw_size, context->cont_data,
 > 
-> -static void update_db_timestamp(void)
-> -{
-> -}
-> -
->  static void register_serial_port(void)
->  {
->  	sdp_list_t *svclass_id, *apseq, *proto[2], *profiles, *root,
-*aproto;
-> --
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+> This will write after allocated memory.
+
+Yes correct. I have submitted v2 incorporating your comments.
+
+Thanks,
+Best Regards
+Bharat
+
 
