@@ -1,43 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1432851224-19550-1-git-send-email-szymon.janc@tieto.com>
-References: <1432851224-19550-1-git-send-email-szymon.janc@tieto.com>
-Date: Mon, 1 Jun 2015 13:56:04 +0300
-Message-ID: <CABBYNZLcj5vPEsCUHdq-MeW0eeAOmK9G7neoPrncNyv1DXGVYA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] monitor: Use black font for white background
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH] android/pts: Update MAP test results
+Date: Mon,  1 Jun 2015 12:52:50 +0200
+Message-Id: <1433155970-6476-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+PTS 6.1 and Android 5.1
+---
+ android/pics-map.txt  |  2 +-
+ android/pixit-map.txt |  2 +-
+ android/pts-map.txt   | 11 ++++++-----
+ 3 files changed, 8 insertions(+), 7 deletions(-)
 
-On Fri, May 29, 2015 at 1:13 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Make sure that font is always visible on white background.
-> ---
->  monitor/display.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/monitor/display.h b/monitor/display.h
-> index e627401..df08362 100644
-> --- a/monitor/display.h
-> +++ b/monitor/display.h
-> @@ -35,7 +35,7 @@ bool use_color(void);
->  #define COLOR_MAGENTA  "\x1B[0;35m"
->  #define COLOR_CYAN     "\x1B[0;36m"
->  #define COLOR_WHITE    "\x1B[0;37m"
-> -#define COLOR_WHITE_BG "\x1B[0;47m"
-> +#define COLOR_WHITE_BG "\x1B[0;47;30m"
->  #define COLOR_HIGHLIGHT        "\x1B[1;39m"
->
->  #define COLOR_ERROR    "\x1B[1;31m"
-> --
-> 1.9.3
-
-Applied, thanks/
-
-
+diff --git a/android/pics-map.txt b/android/pics-map.txt
+index 093aae1..b1346b6 100644
+--- a/android/pics-map.txt
++++ b/android/pics-map.txt
+@@ -1,6 +1,6 @@
+ MAP PICS for the PTS tool.
+ 
+-PTS version: 6.0
++PTS version: 6.1
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-map.txt b/android/pixit-map.txt
+index a7626dd..90272cb 100644
+--- a/android/pixit-map.txt
++++ b/android/pixit-map.txt
+@@ -1,6 +1,6 @@
+ MAP PIXIT for the PTS tool.
+ 
+-PTS version: 6.0
++PTS version: 6.1
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-map.txt b/android/pts-map.txt
+index 6ca984e..2be8db2 100644
+--- a/android/pts-map.txt
++++ b/android/pts-map.txt
+@@ -1,8 +1,8 @@
+ PTS test results for MAP
+ 
+-PTS version: 6.0
+-Tested: 11-December-2014
+-Android version: 5.0
++PTS version: 6.1
++Tested: 29-May-2015
++Android version: 5.1
+ 
+ Results:
+ PASS	test passed
+@@ -71,9 +71,9 @@ TC_MSE_MMB_BV_14_I	PASS
+ TC_MSE_MMB_BV_15_I	PASS
+ TC_MSE_MMB_BV_16_I	PASS
+ TC_MSE_MMD_BV_02_I	PASS
+-TC_MSE_MMU_BV_02_I	PASS	At least one SMS must be present in inbox
++TC_MSE_MMU_BV_02_I	PASS
+ TC_MSE_MMU_BV_03_I	PASS
+-TC_MSE_MMN_BV_02_I	PASS
++TC_MSE_MMN_BV_02_I	INC	JIRA #BA-380
+ TC_MSE_MMN_BV_04_I	N/A
+ TC_MSE_MMI_BV_02_I	N/A
+ TC_MSE_MFB_BV_02_I	N/A
+@@ -83,6 +83,7 @@ TC_MSE_BC_BV_03_I	N/A
+ TC_MSE_CON_BV_01_I	N/A
+ TC_MSE_CON_BV_02_I	N/A
+ TC_MSE_ROB_BV_01_I	N/A
++TC_MSE_ROB_BV_02_I	N/A
+ TC_MSE_SRM_BI_02_I	N/A
+ TC_MSE_SRM_BI_03_I	N/A
+ TC_MSE_SRM_BI_05_I	N/A
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
