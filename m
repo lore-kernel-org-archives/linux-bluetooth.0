@@ -1,45 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 1 Jun 2015 13:11:18 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] bnep: Fix using uninitialized variable
-Message-ID: <20150601101116.GA31534@comms>
-References: <1432893859-32620-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1432893859-32620-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v3] tools/l2test: Add -g option
+Date: Mon,  1 Jun 2015 11:42:22 +0200
+Message-Id: <1433151742-17932-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+This option allow to sleep before disconnecting socket.
+---
+ tools/l2test.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-On Fri, May 29, 2015 at 01:04:19PM +0300, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> ---
->  profiles/network/bnep.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-> index 59599e4..9bf0b18 100644
-> --- a/profiles/network/bnep.c
-> +++ b/profiles/network/bnep.c
-> @@ -634,8 +634,11 @@ static int bnep_server_add_legacy(int sk, uint16_t dst, char *bridge,
->  		bnep_del_from_bridge(iface, bridge);
->  		bnep_conndel(addr);
->  		rsp = BNEP_CONN_NOT_ALLOWED;
-> +		goto reply;
->  	}
->  
-> +	rsp = BNEP_SUCCESS;
-> +
->  reply:
->  	if (bnep_send_ctrl_rsp(sk, BNEP_SETUP_CONN_RSP, rsp) < 0) {
->  		err = -errno;
-> -- 
-> 2.1.4
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/tools/l2test.c b/tools/l2test.c
+index 55955d8..abe09c1 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -108,6 +108,9 @@ static unsigned long send_delay = 0;
+ /* Default delay before receiving */
+ static unsigned long recv_delay = 0;
+ 
++/* Default delay before disconnecting */
++static unsigned long disc_delay = 0;
++
+ /* Initial sequence value when sending frames */
+ static int seq_start = 0;
+ 
+@@ -1013,6 +1016,9 @@ static void send_mode(int sk)
+ {
+ 	do_send(sk);
+ 
++	if (disc_delay)
++		usleep(disc_delay);
++
+ 	syslog(LOG_INFO, "Closing channel ...");
+ 	if (shutdown(sk, SHUT_RDWR) < 0)
+ 		syslog(LOG_INFO, "Close failed: %m");
+@@ -1317,6 +1323,7 @@ static void usage(void)
+ 		"\t[-C num] send num frames before delay (default = 1)\n"
+ 		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
+ 		"\t[-K milliseconds] delay before receiving (default = 0)\n"
++		"\t[-g milliseconds] delay before disconnecting (default = 0)\n"
+ 		"\t[-X mode] l2cap mode (help for list, default = basic)\n"
+ 		"\t[-a policy] chan policy (help for list, default = bredr)\n"
+ 		"\t[-F fcs] use CRC16 check (default = 1)\n"
+@@ -1343,7 +1350,7 @@ int main(int argc, char *argv[])
+ 
+ 	bacpy(&bdaddr, BDADDR_ANY);
+ 
+-	while ((opt = getopt(argc, argv, "a:b:cde:i:mnpqrstuwxyz"
++	while ((opt = getopt(argc, argv, "a:b:cde:g:i:mnpqrstuwxyz"
+ 		"AB:C:D:EF:GH:I:J:K:L:MN:O:P:Q:RSTUV:W:X:Y:Z:")) != EOF) {
+ 		switch (opt) {
+ 		case 'r':
+@@ -1554,6 +1561,10 @@ int main(int argc, char *argv[])
+ 			seq_start = atoi(optarg);
+ 			break;
+ 
++		case 'g':
++			disc_delay = atoi(optarg) * 1000;
++			break;
++
+ 		default:
+ 			usage();
+ 			exit(1);
+-- 
+1.9.3
+
