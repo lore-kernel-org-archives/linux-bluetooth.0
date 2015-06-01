@@ -1,48 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
+Date: Mon, 1 Jun 2015 13:11:43 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH v2] unit: Use g_memdup replacing g_malloc0+memcpy
-Date: Mon, 01 Jun 2015 16:14:34 +0530
-Message-id: <1433155474-29992-1-git-send-email-bharat.panda@samsung.com>
+Subject: Re: [PATCHv2] shared/att: Fix boolean check in handle_notify()
+Message-ID: <20150601101141.GB31534@comms>
+References: <CABBYNZK+AnuQM+EoLDaEwbr4hZnjxjfHy9gGM1bH1PEG-G7faQ@mail.gmail.com>
+ <1432889606-3967-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1432889606-3967-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace use of g_malloc0+memcpy with g_memdup.
----
- unit/test-gattrib.c | 3 +--
- unit/test-sdp.c     | 4 +---
- 2 files changed, 2 insertions(+), 5 deletions(-)
+ping
 
-diff --git a/unit/test-gattrib.c b/unit/test-gattrib.c
-index 416e596..d9c52d7 100644
---- a/unit/test-gattrib.c
-+++ b/unit/test-gattrib.c
-@@ -224,8 +224,7 @@ static void result_canary(guint8 status, const guint8 *pdu, guint16 len,
- 	struct result_data *result = data;
- 
- 	result->status = status;
--	result->pdu = g_malloc0(len);
--	memcpy(result->pdu, pdu, len);
-+	result->pdu = g_memdup(pdu, len);
- 	result->len = len;
- 
- 	if (g_test_verbose())
-diff --git a/unit/test-sdp.c b/unit/test-sdp.c
-index b4ef4d1..9d716d8 100644
---- a/unit/test-sdp.c
-+++ b/unit/test-sdp.c
-@@ -189,9 +189,7 @@ static gboolean send_pdu(gpointer user_data)
- 
- 	pdu_len = req_pdu->raw_size + context->cont_size;
- 
--	buf = g_malloc0(pdu_len);
--
--	memcpy(buf, req_pdu->raw_data, req_pdu->raw_size);
-+	buf = g_memdup(req_pdu->raw_data, pdu_len);
- 
- 	if (context->cont_size > 0)
- 		memcpy(buf + req_pdu->raw_size, context->cont_data,
--- 
-1.9.1
-
+On Fri, May 29, 2015 at 11:53:26AM +0300, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ext_signed is boolean and shall be checked with logical op.
+> ---
+>  src/shared/att.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index 053aa47..f9a5817 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -733,7 +733,7 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+>  	const struct queue_entry *entry;
+>  	bool found;
+>  
+> -	if (opcode & ATT_OP_SIGNED_MASK & !att->ext_signed) {
+> +	if ((opcode & ATT_OP_SIGNED_MASK) && !att->ext_signed) {
+>  		if (!handle_signed(att, opcode, pdu, pdu_len))
+>  			return;
+>  		pdu_len -= BT_ATT_SIGNATURE_LEN;
+> -- 
+> 2.1.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
