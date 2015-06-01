@@ -1,110 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAD0=r8xVzep5nu5=J4Hz5FkpSTo03csYt2=wtXRF6vmydR6q1g@mail.gmail.com>
-References: <CAD0=r8wfL1TYghMk2wHYrZFZ9D=sz49_1fNPVsPvgqOUVdbuCQ@mail.gmail.com>
-	<CABBYNZ+JoqhDtH_ZN9bVafMnDYgyjsmwKnTssA8_QFJ1js9kQA@mail.gmail.com>
-	<CAD0=r8wDGKw4DRnEAsZqNvMc05CGnjz7HVFc6MTQZi74L9xC1Q@mail.gmail.com>
-	<20150531025505.GA23991@t440s>
-	<CAD0=r8xVzep5nu5=J4Hz5FkpSTo03csYt2=wtXRF6vmydR6q1g@mail.gmail.com>
-Date: Mon, 1 Jun 2015 21:22:32 +0300
-Message-ID: <CABBYNZKmaE2VMNxa4oNcByGmjS2FcH3UXLD1N0m3rsUce6GOeA@mail.gmail.com>
-Subject: Re: [RFC] Add new method to DBus API: DiscoverServiceByUUID
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH] client: main: add support for ConnectProfile
+Date: Mon,  1 Jun 2015 10:51:07 -0700
+Message-Id: <1433181067-31612-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+This patch adds set-connect-profile command to sample DBus client
+that might be used to modify how connect method behaves. Instead of
+using "Connect" DBus method, "ConnectProfile" would be used if
+set-connect-profile was set.
 
-On Mon, Jun 1, 2015 at 8:25 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> Hi Johan, Luiz
->
-> On Sat, May 30, 2015 at 7:55 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> Hi Jakub,
->>
->> On Thu, May 28, 2015, Jakub Pawlowski wrote:
->>> > 1. Instead of just 1 method there is at least 2, but Connect depends
->>> > on what has been discovered first so you are adding a D-Bus round
->>> > trips.
->>>
->>> Yes, I'm probably adding one round trip. It might hovewer be avoided.
->>> To avoid additional roundtrip there should be two methods:
->>> Connect() that just works right now, and ConnectToUUID(uuid) that
->>> would connect, and then do "Find By Type Value Request". I think that
->>> this solution wouldn't be that clean, and would be problematic to
->>> discover rest of services.
->>
->> We already have this "ConnectToUUID" method in the form of
->> Device1.ConnectProfile, don't we? It was originally designed for BR/EDR,
->> but seems to have at least some code for LE as well. If it's not working
->> as desired for LE it's probably something worth fixing.
->>
->
-> "ConnectToUUID" method is what I was looking for. It doesn't work for
-> LE devices as far as I tested, so I'll fix it. It creates connection,
-> but then stops (no MTU exchange, or service discovery).
->
-> Here's merged (to show time order) output of btmon and bluetoothd
-> together when calling ConnectToUUID right now:
-> http://pastebin.com/s76bT3jx
->
-> When I looked into source, it looks like it still want to do full
-> service discvery, not just one service. Can I modify it to do ""Find
-> By Type Value Request" for LE devices ?
->
->
-> I modified bluez a little bit to test timing, and show why I want to
-> have "Find By Type Value Request":
->
-> Right after connecting and negotiating MTU, instead of doing Primary
-> and Secondary Service Discovery, I made BlueZ do "Find By Type Value
-> Request" for service with UUID "babe", and then auto discover it's
-> included services, characteristics, descriptors.
->
-> First I tested against Android phone with three Primary Services
-> (GATT, GAP, and one with UUID "babe"), and total of 4 characteristic,
-> one in "babe" service. MTU=517.
-> Doing regular discovery took 2.38s from "Read By Group Type Request"
-> to last request, http://pastebin.com/pgrfAJM9
-> Doing just one service discovery took 0,84s from "Find By Type Value
-> Request" to last request, http://pastebin.com/V1WZERfw
+Sample output:
+[bluetooth]# set-connect-profile 0000babe-0000-1000-8000-00805f9b34fb
+Connect profile set to 0000babe-0000-1000-8000-00805f9b34fb
+[bluetooth]# connect 60:D3:7E:0C:F7:3E
+Attempting to connect to 60:D3:7E:0C:F7:3E to profile 0000babe-0000-1000-8000-00805f9b34fb
+[bluetooth]# set-connect-profile
+Connect profile cleared
+[bluetooth]# connect 60:D3:7E:0C:F7:3E
+Attempting to connect to 60:D3:7E:0C:F7:3E
+---
+ client/main.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-They are not doing the same thing, you are not looking for GAP, GATT
-and DIS services for example, so the device will not have any of these
-discovered, so no long names, no appearance, no service changed and no
-device information. Also Im not sure you got my point about the
-ConnectUUID, let say it is just discover the UUID requested, you will
-have to do it every single time you connnect because it cannot be
-cached without service changed, also this is per UUID, if the
-peripheral just have one being advertised that might work in favor of
-this but there could be many as well then doing ConnectUUID separately
-don't make any sense.
-
-> Then I tested against iPhone with 5 services and total of 12
-> characteristics (one with UUID "babe", having one characteristic).
-> MTU=158. Sample iPhone app I used for tests started automatically
-> discovering services on the laptop, which also impacted discovery
-> time.
-> Doing regular discovery took 9.7s from "Read By Group Type Request" to
-> last request, http://pastebin.com/aycMWZ4w
-> Doing just one service discovery took 2s from "Find By Type Value
-> Request" to last request, http://pastebin.com/C9Jp28WM
->
-> My use case is to quickly connect, and use one service, then
-> disconnect. 2.3s vs 0.8s is big gain for me, not talking about 9.7 vs
-> 2s. Some controllers designed for coin-battery scenarios have MTU
-> fixed on 23, which should also make all service discovery slow, and
-> yield big difference.
-
-Service changed, the lower is your requirement to reconnect the more
-it will be required, but you got to pair to make it persistent across
-reconnections but the first time you connect is always going to be
-time consuming since you got to discover so it does not matter much if
-the first time takes 9.7s to discover all services since the next time
-it would not spend any time doing it again, that is the only reason
-HoG can reconnect very fast.
-
+diff --git a/client/main.c b/client/main.c
+index 41e95b2..96b340d 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1345,6 +1345,31 @@ static void cmd_remove(const char *arg)
+ 	}
+ }
+ 
++static char *connect_profile;
++
++static void cmd_set_connect_profile(const char *arg)
++{
++	if (!arg || !strlen(arg)) {
++		if (connect_profile != NULL) {
++			g_free(connect_profile);
++			connect_profile = NULL;
++		}
++
++		rl_printf("Connect profile cleared\n");
++		return;
++	}
++
++	connect_profile = g_strdup(arg);
++	rl_printf("Connect profile set to %s\n", arg);
++}
++
++static void connect_profile_setup(DBusMessageIter *iter, void *user_data)
++{
++	const char *uuid = user_data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++}
++
+ static void connect_reply(DBusMessage *message, void *user_data)
+ {
+ 	GDBusProxy *proxy = user_data;
+@@ -1378,6 +1403,21 @@ static void cmd_connect(const char *arg)
+ 		return;
+ 	}
+ 
++	if (connect_profile != NULL) {
++		char *uuid = g_strdup(connect_profile);
++
++		if (g_dbus_proxy_method_call(proxy, "ConnectProfile",
++		connect_profile_setup, connect_reply, uuid, g_free) == FALSE) {
++			rl_printf("Failed to connect to profile\n");
++			g_free(uuid);
++			return;
++		}
++
++		rl_printf("Attempting to connect to %s to profile %s\n", arg,
++							      connect_profile);
++		return;
++	}
++
+ 	if (g_dbus_proxy_method_call(proxy, "Connect", NULL, connect_reply,
+ 							proxy, NULL) == FALSE) {
+ 		rl_printf("Failed to connect\n");
+@@ -1720,6 +1760,8 @@ static const struct {
+ 								dev_generator },
+ 	{ "remove",       "<dev>",    cmd_remove, "Remove device",
+ 							dev_generator },
++	{ "set-connect-profile", "<uuid>", cmd_set_connect_profile,
++				"Set profile to connect to",	dev_generator },
+ 	{ "connect",      "<dev>",    cmd_connect, "Connect device",
+ 							dev_generator },
+ 	{ "disconnect",   "[dev]",    cmd_disconn, "Disconnect device",
 -- 
-Luiz Augusto von Dentz
+2.2.0.rc0.207.ga3a616c
+
