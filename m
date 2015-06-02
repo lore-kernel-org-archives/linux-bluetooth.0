@@ -1,74 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH 1/2] Bluetooth: Add reset_resume function
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CA+5PVA6o2=dF5BrJQojhMjJhsAiM9vaADd_ix3SAvVEbLXkjCQ@mail.gmail.com>
-Date: Tue, 2 Jun 2015 17:07:25 +0200
-Cc: Laura Abbott <labbott@fedoraproject.org>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Takashi Iwai <tiwai@suse.de>, Oliver Neukum <oneukum@suse.com>,
-	Ming Lei <ming.lei@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	USB list <linux-usb@vger.kernel.org>,
-	netdev <netdev@vger.kernel.org>
-Message-Id: <1AD01E7E-4D71-444A-AB0F-F8261C925542@holtmann.org>
-References: <1433207682-15064-1-git-send-email-labbott@fedoraproject.org> <BB3BCC01-8BF0-4A17-B8E6-F17B875F1997@holtmann.org> <CA+5PVA6o2=dF5BrJQojhMjJhsAiM9vaADd_ix3SAvVEbLXkjCQ@mail.gmail.com>
-To: Josh Boyer <jwboyer@fedoraproject.org>
-Sender: linux-usb-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25TsFBte0TazmN6AeeWFQ2eQimVCsSDrV3JXGLNaJ3BYJA@mail.gmail.com>
+References: <CAD0=r8wfL1TYghMk2wHYrZFZ9D=sz49_1fNPVsPvgqOUVdbuCQ@mail.gmail.com>
+	<CABBYNZ+JoqhDtH_ZN9bVafMnDYgyjsmwKnTssA8_QFJ1js9kQA@mail.gmail.com>
+	<CAD0=r8wDGKw4DRnEAsZqNvMc05CGnjz7HVFc6MTQZi74L9xC1Q@mail.gmail.com>
+	<20150531025505.GA23991@t440s>
+	<CAD0=r8xVzep5nu5=J4Hz5FkpSTo03csYt2=wtXRF6vmydR6q1g@mail.gmail.com>
+	<CABBYNZKmaE2VMNxa4oNcByGmjS2FcH3UXLD1N0m3rsUce6GOeA@mail.gmail.com>
+	<CAHrH25TsFBte0TazmN6AeeWFQ2eQimVCsSDrV3JXGLNaJ3BYJA@mail.gmail.com>
+Date: Tue, 2 Jun 2015 17:51:01 +0300
+Message-ID: <CABBYNZKdVpaZtrv6GDMrFzWNRrhkOT4z9nBVmmi68FzPo015dg@mail.gmail.com>
+Subject: Re: [RFC] Add new method to DBus API: DiscoverServiceByUUID
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: Jakub Pawlowski <jpawlowski@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Josh,
+Hi Arman,
 
->>> Bluetooth devices off of some buses such as USB may lose power across
->>> suspend/resume. When this happens, drivers may need to have the setup
->>> function called again and behave differently than a cold power on.
->>> Add a reset_resume function for drivers to call. During the
->>> reset_resume case, the flag HCI_RESET_RESUME will be set to allow
->>> drivers to differentate.
->>> 
->>> Signed-off-by: Laura Abbott <labbott@fedoraproject.org>
->>> ---
->>> This matches with what hci_reset_dev does and also ensures
->>> the setup function gets called again.
->>> ---
->>> include/net/bluetooth/hci.h      |  1 +
->>> include/net/bluetooth/hci_core.h |  1 +
->>> net/bluetooth/hci_core.c         | 16 ++++++++++++++++
->>> 3 files changed, 18 insertions(+)
->>> 
->>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>> index d95da83..6285410 100644
->>> --- a/include/net/bluetooth/hci.h
->>> +++ b/include/net/bluetooth/hci.h
->>> @@ -185,6 +185,7 @@ enum {
->>>      HCI_RAW,
->>> 
->>>      HCI_RESET,
->>> +     HCI_RESET_RESUME,
->>> };
->> 
->> no more addition to this list of flags please. These are userspace exposed flags and with that ABI that we are never ever touching again. If you need flags on a per device basis, then use the second list.
-> 
-> It would be helpful for other developers if you added a comment to
-> that effect above the enum definition.  Otherwise you're going to wind
-> up repeating yourself over time.
+On Tue, Jun 2, 2015 at 12:42 AM, Arman Uguray <armansito@chromium.org> wrote:
+>> Service changed, the lower is your requirement to reconnect the more
+>> it will be required, but you got to pair to make it persistent across
+>> reconnections but the first time you connect is always going to be
+>> time consuming since you got to discover so it does not matter much if
+>> the first time takes 9.7s to discover all services since the next time
+>> it would not spend any time doing it again, that is the only reason
+>> HoG can reconnect very fast.
+>>
+>> --
+>> Luiz Augusto von Dentz
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> I'm late to the discussion, but wasn't this kind of functionality the
+> whole point behind adding the org.bluez.GattProfile1 interface defined
+> in doc/gatt-api.txt? Can't we do this through that?
 
-nobody has done that so far ;)
+Yes, that was my suggestion to give a list of UUID of interested so
+bt_gatt_client instance can skip discovery of characteristics and
+descriptor not in the list, but it is not so simple when this is
+dynamic as it is applications may come and go so we would have to
+cache not only the database but also what was discovered which
+complicate things.
 
-> Also, if they're exposed to userspace, should this file be using the
-> uapi mechanism?  I'm confused how they're exposed today, given that
-> they aren't installed via 'make headers_install'.  Is this manually
-> synced with some other .h file in a userspace package?
+Btw, the spec says the following about the service changed:
 
-This code is from 2.4.6 and with that pretty much ancient and predates UAPI. The BlueZ userspace library provides userspace versions of these defines etc.
+C1: Mandatory if service definitions on the server can be added,
+changed or removed;
+otherwise optional
 
-Regards
+So the following code should be optimized to return without clearing
+the database if service changed is not supported.
 
-Marcel
+if (device->le_state.bonded)
+  return;
 
+gatt_db_clear(device->db);
+device->gatt_cache_used = false;
+
+Futhermore Im not sure we need to clear the database like that, we
+could check if the service range match that probably means the service
+has not changed since the last connection as is very unlikely that
+service characteristics and descriptors would change even if the
+service was removed and added again in the exact same place.
+
+-- 
+Luiz Augusto von Dentz
