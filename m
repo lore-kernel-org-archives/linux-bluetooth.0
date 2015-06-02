@@ -1,64 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
+From: Ilya Faenson <ifaenson@broadcom.com>
+To: Rob Herring <robherring2@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "devicetree-spec@vger.kernel.org"
+	<devicetree-spec@vger.kernel.org>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, Arend Van Spriel <arend@broadcom.com>
+Subject: RE: [RFC v4 1/4] Broadcom Bluetooth UART Device Tree bindings
+Date: Tue, 2 Jun 2015 12:20:03 +0000
+Message-ID: <E0D3336E15B58B4294723AC879BA5E9425D49D@IRVEXCHMB15.corp.ad.broadcom.com>
+References: <1432325420-12782-1-git-send-email-ifaenson@broadcom.com>
+ <1432325420-12782-2-git-send-email-ifaenson@broadcom.com>
+ <CAL_JsqLO+g56KYUocpWLpz4dDTP0fEXTa4RjJzeRsPvYjCyF4A@mail.gmail.com>
+In-Reply-To: <CAL_JsqLO+g56KYUocpWLpz4dDTP0fEXTa4RjJzeRsPvYjCyF4A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Sender: jwboyer@gmail.com
-In-Reply-To: <BB3BCC01-8BF0-4A17-B8E6-F17B875F1997@holtmann.org>
-References: <1433207682-15064-1-git-send-email-labbott@fedoraproject.org>
-	<BB3BCC01-8BF0-4A17-B8E6-F17B875F1997@holtmann.org>
-Date: Tue, 2 Jun 2015 10:17:27 -0400
-Message-ID: <CA+5PVA6o2=dF5BrJQojhMjJhsAiM9vaADd_ix3SAvVEbLXkjCQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Add reset_resume function
-From: Josh Boyer <jwboyer@fedoraproject.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Laura Abbott <labbott@fedoraproject.org>, Alan Stern <stern@rowland.harvard.edu>,
-	Takashi Iwai <tiwai@suse.de>, Oliver Neukum <oneukum@suse.com>, Ming Lei <ming.lei@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, USB list <linux-usb@vger.kernel.org>,
-	netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jun 1, 2015 at 9:28 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Laura,
->
->> Bluetooth devices off of some buses such as USB may lose power across
->> suspend/resume. When this happens, drivers may need to have the setup
->> function called again and behave differently than a cold power on.
->> Add a reset_resume function for drivers to call. During the
->> reset_resume case, the flag HCI_RESET_RESUME will be set to allow
->> drivers to differentate.
->>
->> Signed-off-by: Laura Abbott <labbott@fedoraproject.org>
->> ---
->> This matches with what hci_reset_dev does and also ensures
->> the setup function gets called again.
->> ---
->> include/net/bluetooth/hci.h      |  1 +
->> include/net/bluetooth/hci_core.h |  1 +
->> net/bluetooth/hci_core.c         | 16 ++++++++++++++++
->> 3 files changed, 18 insertions(+)
->>
->> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->> index d95da83..6285410 100644
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -185,6 +185,7 @@ enum {
->>       HCI_RAW,
->>
->>       HCI_RESET,
->> +     HCI_RESET_RESUME,
->> };
->
-> no more addition to this list of flags please. These are userspace exposed flags and with that ABI that we are never ever touching again. If you need flags on a per device basis, then use the second list.
-
-It would be helpful for other developers if you added a comment to
-that effect above the enum definition.  Otherwise you're going to wind
-up repeating yourself over time.
-
-Also, if they're exposed to userspace, should this file be using the
-uapi mechanism?  I'm confused how they're exposed today, given that
-they aren't installed via 'make headers_install'.  Is this manually
-synced with some other .h file in a userspace package?
-
-josh
+SGkgUm9iLA0KDQpBcHByZWNpYXRlIHlvdXIgaW5zaWdodHMuDQoNCi0tLS0tT3JpZ2luYWwgTWVz
+c2FnZS0tLS0tDQpGcm9tOiBSb2IgSGVycmluZyBbbWFpbHRvOnJvYmhlcnJpbmcyQGdtYWlsLmNv
+bV0gDQpTZW50OiBNb25kYXksIEp1bmUgMDEsIDIwMTUgODoxOSBQTQ0KVG86IElseWEgRmFlbnNv
+bg0KQ2M6IE1hcmNlbCBIb2x0bWFubjsgbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsg
+ZGV2aWNldHJlZS1zcGVjQHZnZXIua2VybmVsLm9yZzsgZGV2aWNldHJlZUB2Z2VyLmtlcm5lbC5v
+cmcNClN1YmplY3Q6IFJlOiBbUkZDIHY0IDEvNF0gQnJvYWRjb20gQmx1ZXRvb3RoIFVBUlQgRGV2
+aWNlIFRyZWUgYmluZGluZ3MNCg0KT24gRnJpLCBNYXkgMjIsIDIwMTUgYXQgMzoxMCBQTSwgSWx5
+YSBGYWVuc29uIDxpZmFlbnNvbkBicm9hZGNvbS5jb20+IHdyb3RlOg0KPiBEZXZpY2UgVHJlZSBi
+aW5kaW5ncyB0byBjb25maWd1cmUgdGhlIEJyb2FkY29tIEJsdWV0b290aCBVQVJUIGRldmljZS4N
+Cj4NCj4gU2lnbmVkLW9mZi1ieTogSWx5YSBGYWVuc29uIDxpZmFlbnNvbkBicm9hZGNvbS5jb20+
+DQo+IC0tLQ0KPiAgLi4uL2RldmljZXRyZWUvYmluZGluZ3MvbmV0L2JsdWV0b290aC9idGJjbS50
+eHQgICAgfCA4MiArKysrKysrKysrKysrKysrKysrKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwgODIg
+aW5zZXJ0aW9ucygrKQ0KPiAgY3JlYXRlIG1vZGUgMTAwNjQ0IERvY3VtZW50YXRpb24vZGV2aWNl
+dHJlZS9iaW5kaW5ncy9uZXQvYmx1ZXRvb3RoL2J0YmNtLnR4dA0KPg0KPiBkaWZmIC0tZ2l0IGEv
+RG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9ibHVldG9vdGgvYnRiY20udHh0
+IGIvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9ibHVldG9vdGgvYnRiY20u
+dHh0DQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4IDAwMDAwMDAuLjk2ODQyMWINCj4g
+LS0tIC9kZXYvbnVsbA0KPiArKysgYi9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3Mv
+bmV0L2JsdWV0b290aC9idGJjbS50eHQNCj4gQEAgLTAsMCArMSw4MiBAQA0KPiArYnRiY20NCj4g
+Ky0tLS0tLQ0KPiArDQo+ICtSZXF1aXJlZCBwcm9wZXJ0aWVzOg0KPiArDQo+ICsgICAgICAgLSBj
+b21wYXRpYmxlIDogbXVzdCBiZSAiYnJjbSxicmNtLWJ0LXVhcnQiLg0KPiArICAgICAgIC0gdHR5
+IDogdHR5IGRldmljZSBjb25uZWN0ZWQgdG8gdGhpcyBCbHVldG9vdGggZGV2aWNlLg0KDQpOZWls
+IEJyb3duIGhhcyBiZWVuIHdvcmtpbmcgb24gZ2VuZXJpYyBiaW5kaW5ncyBmb3IgdHR5L1VBUlQg
+c2xhdmVzDQp3aGljaCBzaG91bGQgYmUgdXNlZCBoZXJlLg0KDQpJRjogSSBjZXJ0YWlubHkgbGlr
+ZSB3aGF0IGlzIGJlaW5nIGRldmVsb3BlZCBmb3IgdGhlIFVBUlQgY2hpbGQgZGV2aWNlcyBpbiB0
+aGUgRGV2aWNlVHJlZS4gSXQgd2lsbCBmaW5hbGx5IGNhdGNoIHVwIHdpdGggd2hhdCdzIGJlZW4g
+YXZhaWxhYmxlIGluIHRoZSBBQ1BJIGZvciB5ZWFycy4gSG93ZXZlciwgdG8gdGhlIGJlc3Qgb2Yg
+bXkgdW5kZXJzdGFuZGluZywgdGhhdCBlZmZvcnQgaXMgY3VycmVudGx5IG5vdCBpbiB0aGUgYmx1
+ZXRvb3RoLW5leHQgZ2l0IHJlcG8uIEFzIE1hcmNlbCB0b2xkIG1lIGVhcmxpZXIgdGhpcyB5ZWFy
+LCAiaWYgaXQgaXMgbm90IGluIHRoZSBibHVldG9vdGgtbmV4dCwgaXQgZG9lcyBub3QgZXhpc3Qi
+LiBJJ20gYWZyYWlkIEkgY2FuJ3QgdXNlIGl0IHRoZXJlZm9yZS4gQWxzbywgd2UgbmVlZCB0byBz
+aGlwIHRoaXMgZHJpdmVyIHNvb25lciByYXRoZXIgdGhhbiBsYXRlci4gVGhlIGludGVncmF0aW9u
+IHdpdGggdGhlIFVBUlQgc2xhdmUgZGV2aWNlcyBzb3VuZHMgbGlrZSBhIHdvcnRod2hpbGUgZnV0
+dXJlIGVuaGFuY2VtZW50IHRvIG1lLg0KDQo+ICsNCj4gK09wdGlvbmFsIHByb3BlcnRpZXM6DQo+
+ICsNCj4gKyAgLSBidC1ob3N0LXdha2UtZ3Bpb3MgOiBidC1ob3N0LXdha2UgaW5wdXQgR1BJTyB0
+byBiZSB1c2VkIGFzIGFuIGludGVycnVwdC4NCj4gKw0KPiArICAtIGJ0LXdha2UtZ3Bpb3MgOiBi
+dC13YWtlIG91dHB1dCBHUElPIHRvIGJlIHVzZWQgdG8gc3VzcGVuZCAvIHJlc3VtZSBkZXZpY2Uu
+DQo+ICsNCj4gKyAgLSBidC1yZWctb24tZ3Bpb3MgOiByZWctb24gb3V0cHV0IEdQSU8gdG8gYmUg
+dXNlZCB0byBwb3dlciBkZXZpY2Ugb24vb2ZmLg0KPiArDQo+ICsgIC0gYmF1ZC1yYXRlLWJlZm9y
+ZS1jb25maWctZG93bmxvYWQgOiBpbml0aWFsIEJsdWV0b290aCBkZXZpY2UgYmF1ZCByYXRlLg0K
+PiArICAgIERlZmF1bHQ6IDMwMDAwMDAuDQoNCldoYXQncyB0aGUgYmF1ZHJhdGUgYWZ0ZXIgZG93
+bmxvYWQ/IFdoeSBub3QganVzdCB1c2Ugc3RhbmRhcmQNCiJiYXVkLXJhdGUiIGlmIHlvdSBvbmx5
+IHNwZWNpZnkgb25lIHJhdGU/DQoNCklGOiBZb3UncmUgcmlnaHQ6IHRoaXMgZG9jIHVzZWQgdG8g
+bGlzdCB0d28gcmF0ZXMuIDotKSBUbyBiZSBjb21wYXRpYmxlIHdpdGggd2hhdCBJbnRlbCBpcyBk
+b2luZyBpbiB0aGUgc2FtZSBhcmVhLCBJIHdpbGwgY2FsbCBpdCAib3Blci1zcGVlZCIgaWYgeW91
+IGRvbid0IG1pbmQuDQoNCj4gKw0KPiArICAtIG1hbnVhbC1mYyA6IGZsb3cgY29udHJvbCBVQVJU
+IGluIHN1c3BlbmQgLyByZXN1bWUgc2NlbmFyaW9zLg0KPiArICAgIERlZmF1bHQ6IDAuDQo+ICsN
+Cj4gKyAgLSBjb25maWd1cmUtc2xlZXAgOiBjb25maWd1cmUgc3VzcGVuZCAvIHJlc3VtZSBmbGFn
+Lg0KPiArICAgIERlZmF1bHQ6IGZhbHNlLg0KPiArDQo+ICsgIC0gY29uZmlndXJlLWF1ZGlvIDog
+Y29uZmlndXJlIHBsYXRmb3JtIFBDTSBTQ08gZmxhZy4NCj4gKyAgICBEZWZhdWx0OiBmYWxzZS4N
+Cj4gKw0KPiArICAtIFBDTUNsb2NrTW9kZSA6IFBDTSBjbG9jayBtb2RlLiAwLXNsYXZlLCAxLW1h
+c3Rlci4NCj4gKyAgICBEZWZhdWx0OiAwLg0KPiArDQo+ICsgIC0gUENNRmlsbE1ldGhvZCA6IFBD
+TSBmaWxsIG1ldGhvZC4gMCB0byAzLg0KPiArICAgIERlZmF1bHQ6IDIuDQo+ICsNCj4gKyAgLSBQ
+Q01GaWxsTnVtIDogUENNIG51bWJlciBvZiBmaWxsIGJpdHMuIDAgdG8gMy4NCj4gKyAgICBEZWZh
+dWx0OiAwLg0KPiArDQo+ICsgIC0gUENNRmlsbFZhbHVlIDogUENNIGZpbGwgdmFsdWUuIDAgdG8g
+Ny4NCj4gKyAgICBEZWZhdWx0OiAzLg0KPiArDQo+ICsgIC0gUENNSW5DYWxsQml0Y2xvY2sgOiBQ
+Q00gaW50ZXJmYWNlIHJhdGUuIDAtMTI4S2JwcywgMS0yNTZLYnBzLCAyLTUxMkticHMsDQo+ICsg
+ICAgMy0xMDI0S2JwcywgNC0yMDQ4S2Jwcy4NCj4gKyAgICBEZWZhdWx0OiAwLg0KPiArDQo+ICsg
+IC0gUENNTFNCRmlyc3QgOiBQQ00gTFNCIGZpcnN0LiAwIG9yIDEuDQo+ICsgICAgRGVmYXVsdDog
+MC4NCj4gKw0KPiArICAtIFBDTVJpZ2h0SnVzdGlmeSA6IFBDTSBKdXN0aWZ5LiAwLWxlZnQsIDEt
+cmlnaHQuDQo+ICsgICAgRGVmYXVsdDogMC4NCj4gKw0KPiArICAtIFBDTVJvdXRpbmcgOiBQQ00g
+cm91dGluZy4gMC1QQ00sIDEtU0NPIG92ZXIgSENJLg0KPiArICAgIERlZmF1bHQ6IDAuDQo+ICsN
+Cj4gKyAgLSBQQ01TaG9ydEZyYW1lU3luYyA6IFBDTSBzeW5jLiAwLXNob3J0LCAxLWxvbmcuDQo+
+ICsgICAgRGVmYXVsdDogMC4NCj4gKw0KPiArICAtIFBDTVN5bmNNb2RlIDogUENNIHN5bmMgbW9k
+ZS4gMC1zbGF2ZSwgMS1tYXN0ZXIuDQoNClBsZWFzZSBubyBDYW1lbENhc2UuIFRoZXNlIG5lZWQg
+YmV0dGVyIGRlc2NyaXB0aW9ucy4NCg0KSUY6IEkgYW0gY2VydGFpbmx5IGF3YXJlIHRoYXQgdGhl
+IENhbWVsQ2FzZSBpcyBnZW5lcmFsbHkgbm90IHVzZWQgb24gTGludXguIFRoZSBCcm9hZGNvbSBo
+b3dldmVyIGhhdmUgYSBzcGVjIGRlc2NyaWJpbmcgd2hhdCBuZWVkcyB0byBiZSBkb25lIHRvIGlu
+dGVncmF0ZSB0aGVzZSBraW5kcyBvZiBjaGlwcyBvbiBoYXJkd2FyZSBwbGF0Zm9ybXMgKGZvciBX
+aW5kb3dzKS4gQW55Ym9keSB3aG8gd2lzaGVzIHRvIHVzZSBTQ08gUENNIGF1ZGlvIHdpbGwgbmVl
+ZCB0byByZWFkIHRoYXQgc3BlYy4gVGhlc2UgcGFyYW1ldGVyIG5hbWVzIGFyZSBmcm9tIHRoYXQg
+c3BlYy4gQSBsb3Qgb2YgYWRkaXRpb25hbCB0ZWNobmljYWwgaW5mbyBJcyB0aGVyZSwgYWxvbmcg
+d2l0aCB2YXJpb3VzIGRpYWdyYW1zLiBJdCBjYW4ndCBiZSBhbGwgcGxhY2VkIGluIHRoaXMgaGVs
+cCBmaWxlLiBPZiBjb3Vyc2UsIEkgY2FuIGNoYW5nZSB0aGVzZSBwYXJhbWV0ZXIgbmFtZXMgYnV0
+IGl0IHdvdWxkIG1ha2UgdGhpbmdzIGhhcmRlciBmb3IgdGhvc2Ugd2lzaGluZyB0byB1c2UgdGhl
+IGhhcmR3YXJlIGFzIHRoZXkgd291bGQgbm90IG1hdGNoIHRoZSBzcGVjLiBDb3VsZCB5b3UgbWFr
+ZSBhbiBleGNlcHRpb24/DQoNCj4gKyAgICBEZWZhdWx0OiAwLg0KPiArDQo+ICsNCj4gK0V4YW1w
+bGU6DQo+ICsNCj4gKyAgICAgICBicmNtNDM1NF9idF91YXJ0OiBicmNtNDM1NC1idC11YXJ0IHsN
+Cj4gKyAgICAgICAgICAgICAgIGNvbXBhdGlibGUgPSAiYnJjbSxicmNtLWJ0LXVhcnQiOw0KPiAr
+ICAgICAgICAgICAgICAgYnQtd2FrZS1ncGlvcyA9IDwmZ3BpbzQgMzAgR1BJT19BQ1RJVkVfSElH
+SD47DQo+ICsgICAgICAgICAgICAgICBidC1ob3N0LXdha2UtZ3Bpb3MgPSA8JmdwaW80IDMxIEdQ
+SU9fQUNUSVZFX0hJR0g+Ow0KPiArICAgICAgICAgICAgICAgdHR5ID0gInR0eVMwIjsNCj4gKyAg
+ICAgICAgICAgICAgIGJhdWQtcmF0ZS1iZWZvcmUtY29uZmlnLWRvd25sb2FkID0gPDMwMDAwMDA+
+Ow0KPiArICAgICAgICAgICAgICAgY29uZmlndXJlLXNsZWVwOw0KPiArICAgICAgICAgICAgICAg
+Y29uZmlndXJlLWF1ZGlvOw0KPiArICAgICAgICAgICAgICAgUENNQ2xvY2tNb2RlID0gPDA+Ow0K
+PiArICAgICAgICAgICAgICAgUENNRmlsbE1ldGhvZCA9IDwyPjsNCj4gKyAgICAgICAgICAgICAg
+IFBDTUZpbGxOdW0gPSA8MD47DQo+ICsgICAgICAgICAgICAgICBQQ01GaWxsVmFsdWUgPSA8Mz47
+DQo+ICsgICAgICAgICAgICAgICBQQ01JbkNhbGxCaXRjbG9jayA9IDwwPjsNCj4gKyAgICAgICAg
+ICAgICAgIFBDTUxTQkZpcnN0ID0gPDA+Ow0KPiArICAgICAgICAgICAgICAgUENNUmlnaHRKdXN0
+aWZ5ID0gPDA+Ow0KPiArICAgICAgICAgICAgICAgUENNUm91dGluZyA9IDwwPjsNCj4gKyAgICAg
+ICAgICAgICAgIFBDTVNob3J0RnJhbWVTeW5jID0gPDA+Ow0KPiArICAgICAgICAgICAgICAgUENN
+U3luY01vZGUgPSA8MD47DQo+ICsgICAgICAgfTsNCj4gKw0KPiAtLQ0KPiAxLjkuMQ0KPg0KPiAt
+LQ0KPiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJz
+Y3JpYmUgZGV2aWNldHJlZS1zcGVjIiBpbg0KPiB0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFq
+b3Jkb21vQHZnZXIua2VybmVsLm9yZw0KPiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8v
+dmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwNCg==
