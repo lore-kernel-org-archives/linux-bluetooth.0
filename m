@@ -2,196 +2,111 @@ Return-Path: <cyrus@holtmann.org>
 From: Ilya Faenson <ifaenson@broadcom.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 CC: <linux-bluetooth@vger.kernel.org>, Ilya Faenson <ifaenson@broadcom.com>
-Subject: [PATCH 2/5] Intel based H4 line discipline enhancements
-Date: Wed, 3 Jun 2015 17:01:41 -0400
-Message-ID: <1433365304-16707-3-git-send-email-ifaenson@broadcom.com>
+Subject: [PATCH 1/5] Broadcom Bluetooth UART Device Tree bindings
+Date: Wed, 3 Jun 2015 17:01:40 -0400
+Message-ID: <1433365304-16707-2-git-send-email-ifaenson@broadcom.com>
 In-Reply-To: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
 References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is largely enhancements implemented by Frederic Danis of Intel.
-I've also added the ability to flow control the UART and improved the
-UART baud rate setting some.
+Device Tree bindings to configure the Broadcom Bluetooth UART device.
+Updated not to use CamelCase and to use Intel style "oper-speed".
 
 Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 110 ++++++++++++++++++++++++++++++++++++++++--
- drivers/bluetooth/hci_uart.h  |   6 +++
- 2 files changed, 113 insertions(+), 3 deletions(-)
+ .../devicetree/bindings/net/bluetooth/btbcm.txt    | 82 ++++++++++++++++++++++
+ 1 file changed, 82 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 5c9a73f..58dcb24 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -1,4 +1,4 @@
--/*
-+/*_
-  *
-  *  Bluetooth HCI UART driver
-  *
-@@ -256,7 +256,8 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!test_bit(HCI_RUNNING, &hdev->flags))
- 		return -EBUSY;
- 
--	BT_DBG("%s: type %d len %d", hdev->name, bt_cb(skb)->pkt_type, skb->len);
-+	BT_DBG("%s: type %d len %d", hdev->name, bt_cb(skb)->pkt_type,
-+	       skb->len);
- 
- 	hu->proto->enqueue(hu, skb);
- 
-@@ -265,11 +266,114 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
- }
- 
-+void hci_uart_flow_control_device(struct hci_uart *hu)
-+{
-+	struct tty_struct *tty = hu->tty;
-+	struct ktermios ktermios;
-+	int status;
-+	unsigned int set = 0;
-+	unsigned int clear = 0;
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+new file mode 100644
+index 0000000..2679819
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+@@ -0,0 +1,82 @@
++btbcm
++------
 +
-+	/* Disable hardware flow control */
-+	ktermios = tty->termios;
-+	ktermios.c_cflag &= ~CRTSCTS;
-+	status = tty_set_termios(tty, &ktermios);
-+	if (status)
-+		BT_DBG("%s dis fc failure %d", __func__, status);
-+	else
-+		BT_DBG("%s hw fc disabled", __func__);
++Required properties:
 +
-+	/* Clear RTS to prevent the device from sending */
-+	/* (most PCs need OUT2 to enable interrupts)    */
-+	status = tty->driver->ops->tiocmget(tty);
-+	BT_DBG("%s cur tiocm 0x%x", __func__, status);
-+	set &= ~(TIOCM_OUT2 | TIOCM_RTS);
-+	clear = ~set;
-+	set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
-+		TIOCM_OUT2 | TIOCM_LOOP;
-+	clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
-+		TIOCM_OUT2 | TIOCM_LOOP;
-+	status = tty->driver->ops->tiocmset(tty, set, clear);
-+	if (status)
-+		BT_DBG("%s clr RTS fail %d", __func__, status);
-+	else
-+		BT_DBG("%s RTS cleared", __func__);
-+	status = tty->driver->ops->tiocmget(tty);
-+}
++	- compatible : must be "brcm,brcm-bt-uart".
++	- tty : tty device connected to this Bluetooth device.
 +
-+void hci_uart_unflow_control_device(struct hci_uart *hu)
-+{
-+	struct tty_struct *tty = hu->tty;
-+	struct ktermios ktermios;
-+	int status;
-+	unsigned int set = 0;
-+	unsigned int clear = 0;
++Optional properties:
 +
-+	status = tty->driver->ops->tiocmget(tty);
-+	BT_DBG("%s cur tiocm 0x%x", __func__, status);
-+	set |= (TIOCM_OUT2 | TIOCM_RTS);
-+	clear = ~set;
-+	set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
-+		TIOCM_OUT2 | TIOCM_LOOP;
-+	clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
-+		TIOCM_OUT2 | TIOCM_LOOP;
-+	status = tty->driver->ops->tiocmset(tty, set, clear);
-+	if (status)
-+		BT_DBG("%s set RTS fail %d", __func__, status);
-+	else
-+		BT_DBG("%s RTS set", __func__);
++  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an interrupt.
 +
-+	/* Re-enable hardware flow control */
-+	ktermios = tty->termios;
-+	ktermios.c_cflag |= CRTSCTS;
-+	status = tty_set_termios(tty, &ktermios);
-+	if (status)
-+		BT_DBG("%s enable fc fail %d", __func__, status);
-+	else
-+		BT_DBG("%s hw fc re-enabled", __func__);
-+}
++  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume device.
 +
-+void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
-+{
-+	struct tty_struct *tty = hu->tty;
-+	struct ktermios ktermios;
++  - bt-reg-on-gpios : reg-on output GPIO to be used to power device on/off.
 +
-+	/* Bring the UART into a known state with a given baud rate */
-+	ktermios = tty->termios;
-+	ktermios.c_cflag &= ~CBAUD;
-+	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
-+		| INLCR | IGNCR | ICRNL | IXON);
-+	ktermios.c_oflag &= ~OPOST;
-+	ktermios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-+	ktermios.c_cflag &= ~(CSIZE | PARENB | CBAUD);
-+	ktermios.c_cflag |= CS8;
-+	ktermios.c_cflag |= CRTSCTS;
-+	/* ktermios.c_cflag |= BOTHER; */
-+	tty_termios_encode_baud_rate(&ktermios, speed, speed);
++  - oper-speed : Bluetooth device operational baud rate.
++    Default: 3000000.
 +
-+	/* tty_set_termios() return not checked as it is always 0 */
-+	tty_set_termios(tty, &ktermios);
++  - manual-fc : flow control UART in suspend / resume scenarios.
++    Default: 0.
 +
-+	BT_DBG("%s: New tty speeds: %d/%d, cflag: 0x%x", hu->hdev->name,
-+	       tty->termios.c_ispeed, tty->termios.c_ospeed,
-+	       tty->termios.c_cflag);
-+}
++  - configure-sleep : configure suspend / resume flag.
++    Default: false.
 +
- static int hci_uart_setup(struct hci_dev *hdev)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct hci_rp_read_local_version *ver;
- 	struct sk_buff *skb;
-+	int err;
++  - configure-audio : configure platform PCM SCO flag.
++    Default: false.
 +
-+	if (hu->proto->init_speed)
-+		hci_uart_set_baudrate(hu, hu->proto->init_speed);
++  - pcm-clockmode : PCM clock mode. 0-slave, 1-master.
++    Default: 0.
 +
-+	if (hu->proto->set_baudrate && hu->proto->oper_speed) {
-+		err = hu->proto->set_baudrate(hu, hu->proto->oper_speed);
-+		if (!err)
-+			hci_uart_set_baudrate(hu, hu->proto->oper_speed);
-+	}
- 
- 	if (hu->proto->setup)
- 		return hu->proto->setup(hu);
-@@ -647,7 +751,7 @@ static int __init hci_uart_init(void)
- 
- 	/* Register the tty discipline */
- 
--	memset(&hci_uart_ldisc, 0, sizeof (hci_uart_ldisc));
-+	memset(&hci_uart_ldisc, 0, sizeof(hci_uart_ldisc));
- 	hci_uart_ldisc.magic		= TTY_LDISC_MAGIC;
- 	hci_uart_ldisc.name		= "n_hci";
- 	hci_uart_ldisc.open		= hci_uart_tty_open;
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 72120a5..2271cc0 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -58,10 +58,13 @@ struct hci_uart;
- struct hci_uart_proto {
- 	unsigned int id;
- 	const char *name;
-+	unsigned int init_speed;
-+	unsigned int oper_speed;
- 	int (*open)(struct hci_uart *hu);
- 	int (*close)(struct hci_uart *hu);
- 	int (*flush)(struct hci_uart *hu);
- 	int (*setup)(struct hci_uart *hu);
-+	int (*set_baudrate)(struct hci_uart *hu, unsigned int speed);
- 	int (*recv)(struct hci_uart *hu, const void *data, int len);
- 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
- 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
-@@ -96,6 +99,9 @@ int hci_uart_register_proto(const struct hci_uart_proto *p);
- int hci_uart_unregister_proto(const struct hci_uart_proto *p);
- int hci_uart_tx_wakeup(struct hci_uart *hu);
- int hci_uart_init_ready(struct hci_uart *hu);
-+void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
-+void hci_uart_flow_control_device(struct hci_uart *hu);
-+void hci_uart_unflow_control_device(struct hci_uart *hu);
- 
- #ifdef CONFIG_BT_HCIUART_H4
- int h4_init(void);
++  - pcm-fillmethod : PCM fill method. 0 to 3.
++    Default: 2.
++
++  - pcm-fillnum : PCM number of fill bits. 0 to 3.
++    Default: 0.
++
++  - pcm-fillvalue : PCM fill value. 0 to 7.
++    Default: 3.
++
++  - pcm-incallbitclock : PCM interface rate. 0-128Kbps, 1-256Kbps, 2-512Kbps,
++    3-1024Kbps, 4-2048Kbps.
++    Default: 0.
++
++  - pcm-lsbfirst : PCM LSB first. 0 or 1.
++    Default: 0.
++
++  - pcm-rightjustify : PCM Justify. 0-left, 1-right.
++    Default: 0.
++
++  - pcm-routing : PCM routing. 0-PCM, 1-SCO over HCI.
++    Default: 0.
++
++  - pcm-shortframesync : PCM sync. 0-short, 1-long.
++    Default: 0.
++
++  - pcmsyncmode : PCM sync mode. 0-slave, 1-master.
++    Default: 0.
++
++
++Example:
++
++	brcm4354_bt_uart: brcm4354-bt-uart {
++		compatible = "brcm,brcm-bt-uart";
++		bt-wake-gpios = <&gpio4 30 GPIO_ACTIVE_HIGH>;
++		bt-host-wake-gpios = <&gpio4 31 GPIO_ACTIVE_HIGH>;
++		tty = "ttyS0";
++		oper-speed = <3000000>;
++		configure-sleep;
++		configure-audio;
++		pcm-clockmode = <0>;
++		pcm-fillmethod = <2>;
++		pcm-fillnum = <0>;
++		pcm-fillvalue = <3>;
++		pcm-incallbitclock = <0>;
++		pcm-lsbfirst = <0>;
++		pcm-rightjustify = <0>;
++		pcm-routing = <0>;
++		pcm-shortframesync = <0>;
++		pcm-syncmode = <0>;
++	};
++
 -- 
 1.9.1
