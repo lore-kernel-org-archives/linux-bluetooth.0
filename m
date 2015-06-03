@@ -2,19 +2,18 @@ Return-Path: <cyrus@holtmann.org>
 From: "Wang, Arron" <arron.wang@intel.com>
 To: "marcel@holtmann.org" <marcel@holtmann.org>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH 2/2] Bluetooth: Add option to enable/disable A2MP module
-Date: Wed, 3 Jun 2015 09:22:48 +0000
-Message-ID: <3B8E4CEA2CC045459E7856C66B82CE931135CD03@SHSMSX103.ccr.corp.intel.com>
+Subject: RE: [PATCH 1/2] Bluetooth: Add option to enable/disable SCO support
+Date: Wed, 3 Jun 2015 09:21:54 +0000
+Message-ID: <3B8E4CEA2CC045459E7856C66B82CE931135CCEE@SHSMSX103.ccr.corp.intel.com>
 References: <1432274165-23569-1-git-send-email-arron.wang@intel.com>
- <1432274165-23569-2-git-send-email-arron.wang@intel.com>
- <669F121F-A1EE-47A7-8A15-27E1A2FAFF26@holtmann.org>
-In-Reply-To: <669F121F-A1EE-47A7-8A15-27E1A2FAFF26@holtmann.org>
+ <52052253-380D-48E9-A196-B97E1A3E83DB@holtmann.org>
+In-Reply-To: <52052253-380D-48E9-A196-B97E1A3E83DB@holtmann.org>
 Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
-	micalg=SHA1; boundary="----=_NextPart_000_0169_01D09E21.E839DD00"
+	micalg=SHA1; boundary="----=_NextPart_000_0165_01D09E21.C7BE9610"
 MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-------=_NextPart_000_0169_01D09E21.E839DD00
+------=_NextPart_000_0165_01D09E21.C7BE9610
 Content-Type: text/plain;
 	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
@@ -28,72 +27,159 @@ Holtmann
 >Sent: Tuesday, May 26, 2015 3:06 AM
 >To: Wang, Arron
 >Cc: linux-bluetooth@vger.kernel.org
->Subject: Re: [PATCH 2/2] Bluetooth: Add option to enable/disable A2MP =
-module
+>Subject: Re: [PATCH 1/2] Bluetooth: Add option to enable/disable SCO =
+support
 >
 >Hi Arron,
 >
->> Make Bluetooth 3.0 HS feature configurable
+>> Embedded device may need flexible option to reduce the code size and
+>> memory use
 >>
 >> Signed-off-by: Arron Wang <arron.wang@intel.com>
 >> ---
->> net/bluetooth/Kconfig          |    5 +
->> net/bluetooth/Makefile         |    3 +-
->> net/bluetooth/a2mp.h           |   19 +++
->> net/bluetooth/amp.h            |   11 ++
->> net/bluetooth/hci_event.c      |  260 =
-+-----------------------------------
->> net/bluetooth/hci_event_a2mp.c |  283
->++++++++++++++++++++++++++++++++++++++++
->> net/bluetooth/hci_event_a2mp.h |   91 +++++++++++++
->> 7 files changed, 412 insertions(+), 260 deletions(-) create mode
->> 100644 net/bluetooth/hci_event_a2mp.c create mode 100644
->> net/bluetooth/hci_event_a2mp.h
+>> include/net/bluetooth/bluetooth.h |   11 +++++++++++
+>> include/net/bluetooth/hci_core.h  |   13 +++++++++++++
+>> net/bluetooth/Kconfig             |   10 +++++++++-
+>> net/bluetooth/Makefile            |    3 ++-
+>> 4 files changed, 35 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/bluetooth.h
+>> b/include/net/bluetooth/bluetooth.h
+>> index 7dba805..f085ff14 100644
+>> --- a/include/net/bluetooth/bluetooth.h
+>> +++ b/include/net/bluetooth/bluetooth.h
+>> @@ -365,8 +365,19 @@ extern struct dentry *bt_debugfs; int
+>> l2cap_init(void); void l2cap_exit(void);
+>>
+>> +#if IS_ENABLED(CONFIG_BT_SCO)
+>> int sco_init(void);
+>> void sco_exit(void);
+>> +#else
+>> +static inline int sco_init(void)
+>> +{
+>> +	return 0;
+>> +}
+>> +
+>> +static inline void sco_exit(void)
+>> +{
+>> +}
+>> +#endif
+>>
+>> int mgmt_init(void);
+>> void mgmt_exit(void);
+>> diff --git a/include/net/bluetooth/hci_core.h
+>> b/include/net/bluetooth/hci_core.h
+>> index a056c2b..7c70034 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -532,8 +532,21 @@ int l2cap_connect_ind(struct hci_dev *hdev,
+>> bdaddr_t *bdaddr); int l2cap_disconn_ind(struct hci_conn *hcon); int
+>> l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16
+>> flags);
+>>
+>> +#if IS_ENABLED(CONFIG_BT_SCO)
+>> int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8
+>> *flags); int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff
+>> *skb);
+>> +#else
+>> +static inline int sco_connect_ind(struct hci_dev *hdev, bdaddr_t =
+*bdaddr,
+>> +				  __u8 *flags)
+>> +{
+>> +	return 0;
+>> +}
 >
->I don=E2=80=99t think this is the solution here. I think A2MP support =
-should be self
->contained and utilises the synchronous HCI command framework we have in =
-place
->and also use in mgmt.
+>shouldn=E2=80=99t this return an error?
 
-Yes, create a separate file for hci a2mp event maybe not suitable, but =
-there are many hci ops/events for different Bluetooth controller =
-BREDR/AMP/LE, add the macro to separate them in one file may not easy to =
-maintain, can we move these AMP releated hci ops/event function to file =
-amp.c?
+This function returns link mode value, default zero indicate no link =
+mode is chose and lead to hci reject the connection.
 
+>> +
+>> +static inline int sco_recv_scodata(struct hci_conn *hcon, struct
+>> +sk_buff *skb) {
+>> +	return 0;
+>
+>I wonder now why this is returning anything at all. Should we maybe =
+make this
+>void in the first place?
+
+Yes, my function just follow with the definition, I'll change them to =
+return void.
+
+>> +}
+>> +#endif
+>>
+>> /* ----- Inquiry cache ----- */
+>> #define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
 >> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig index
->> e7bca37..a558c66 100644
+>> b8c794b..e7bca37 100644
 >> --- a/net/bluetooth/Kconfig
 >> +++ b/net/bluetooth/Kconfig
->> @@ -27,6 +27,7 @@ menuconfig BT
+>> @@ -23,10 +23,10 @@ menuconfig BT
+>> 	  Linux Bluetooth subsystem consist of several layers:
+>> 	     Bluetooth Core
+>> 		HCI device and connection manager, scheduler
+>> -		SCO audio links
+>> 		L2CAP (Logical Link Control and Adaptation Protocol)
 >> 		SMP (Security Manager Protocol) on LE (Low Energy) links
 >> 	     HCI Device drivers (Interface to the hardware)
->> 	     SCO Module (SCO audio links)
->> +	     A2MP Module (AMP Manager Protocol)
+>> +	     SCO Module (SCO audio links)
 >> 	     RFCOMM Module (RFCOMM Protocol)
 >> 	     BNEP Module (Bluetooth Network Encapsulation Protocol)
->> 	     CMTP Module (CAPI Message Transport Protocol) @@ -53,6 +54,10 =
+>> 	     CMTP Module (CAPI Message Transport Protocol) @@ -45,6 +45,14 =
 @@
->> config BT_SCO
->> 	  SCO link provides voice transport over Bluetooth.  SCO support is
->> 	  required for voice applications like Headset and Audio.
+>> config BT_BREDR
+>> 	depends on BT
+>> 	default y
 >>
->> +config BT_A2MP
->> +	bool "Bluetooth Alternate MAC/PHY (AMP) features"
+>> +config BT_SCO
+>> +	bool "Bluetooth SCO support"
 >> +	depends on BT_BREDR
+>> +	default y
+>> +	help
+>> +	  SCO link provides voice transport over Bluetooth.  SCO support is
+>> +	  required for voice applications like Headset and Audio.
 >> +
 >
->The option name you are looking for for BT_HS for high speed support. =
-A2MP and
->AMP support should be hidden behind that config option.
+>This can be all hidden behind the BT_BREDR config option. No need to =
+create
+>another one. BR/EDR without SCO/eSCO support is a pretty useless offer. =
+And if
+>you do BR/EDR, then the little extra SCO socket handling is not big =
+overhead.
 
-Yes, I'll change them to BT_HS.
+Yes, I'll change them under BT_BREDR config option
+
+>> source "net/bluetooth/rfcomm/Kconfig"
+>>
+>> source "net/bluetooth/bnep/Kconfig"
+>> diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile index
+>> 9a8ea23..21fe57a 100644
+>> --- a/net/bluetooth/Makefile
+>> +++ b/net/bluetooth/Makefile
+>> @@ -12,9 +12,10 @@ obj-$(CONFIG_BT_6LOWPAN) +=3D bluetooth_6lowpan.o
+>> bluetooth_6lowpan-y :=3D 6lowpan.o
+>>
+>> bluetooth-y :=3D af_bluetooth.o hci_core.o hci_conn.o hci_event.o =
+mgmt.o \
+>> -	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o =
+\
+>> +	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+>> 	a2mp.o amp.o ecc.o hci_request.o mgmt_util.o
+>>
+>> +bluetooth-$(CONFIG_BT_SCO) +=3D sco.o
+>> bluetooth-$(CONFIG_BT_DEBUGFS) +=3D hci_debugfs.o
+>> bluetooth-$(CONFIG_BT_SELFTEST) +=3D selftest.o
+>
+>Regards
+>
+>Marcel
+>
 
 Thanks
 Arron
 
-------=_NextPart_000_0169_01D09E21.E839DD00
+------=_NextPart_000_0165_01D09E21.C7BE9610
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -217,8 +303,8 @@ s/O6xdip56Qxb2KONK31EQEZcopcJUVUsoyt7OKIipdbFTGCA9cwggPTAgEBMIGQMHkxCzAJBgNV
 BAYTAlVTMQswCQYDVQQIEwJDQTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExGjAYBgNVBAoTEUludGVs
 IENvcnBvcmF0aW9uMSswKQYDVQQDEyJJbnRlbCBFeHRlcm5hbCBCYXNpYyBJc3N1aW5nIENBIDRB
 AhMzAABfiV7bMPnhC/04AAAAAF+JMAkGBSsOAwIaBQCgggIbMBgGCSqGSIb3DQEJAzELBgkqhkiG
-9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE1MDYwMzA5MjI0NlowIwYJKoZIhvcNAQkEMRYEFNRzttu+
-7kMfl5Z3nhpHIGT/haGWMHIGCSqGSIb3DQEJDzFlMGMwCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQB
+9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE1MDYwMzA5MjE1MVowIwYJKoZIhvcNAQkEMRYEFBTs0fFR
+6I4KRrRYObCIlCOXdAg7MHIGCSqGSIb3DQEJDzFlMGMwCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQB
 FjAKBggqhkiG9w0DBzALBglghkgBZQMEAQIwBwYFKw4DAhowCwYJYIZIAWUDBAIDMAsGCWCGSAFl
 AwQCAjALBglghkgBZQMEAgEwgaEGCSsGAQQBgjcQBDGBkzCBkDB5MQswCQYDVQQGEwJVUzELMAkG
 A1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQKExFJbnRlbCBDb3Jwb3JhdGlv
@@ -226,11 +312,11 @@ bjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWluZyBDQSA0QgITMwAACNQ0VT2w
 mC4yAgAAAAAI1DCBowYLKoZIhvcNAQkQAgsxgZOggZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgT
 AkNBMRQwEgYDVQQHEwtTYW50YSBDbGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzAp
 BgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2ljIElzc3VpbmcgQ0EgNEICEzMAAAjUNFU9sJguMgIA
-AAAACNQwDQYJKoZIhvcNAQEBBQAEggEAQ35bA1Kp74orbPHzqn0cEBiIvEMyczJRQ3RcutoIjmyN
-Q1diixbIIadeeASZZ6BkCXgD9ZkSPiW90dFN7eSbU4vJp3r1JcHyoEDDAUgz1B1ew/PznfQnD9j/
-X1D77h+RjNJlDYm9WJFYR4CfNCBw7Uj5S4JkVv9WTsvDdUDAr4xG2zOTPS/59SXggDSnsIzDlyto
-fnGkYF6ZTjvRTsK8wLuLJl8M911bpKzkn1ODVFwkIjdJ5cBqBX53BEfB4G7YXS8xDHO+LL9KvceL
-S98V9+9X0qqWLY40zdSV7vWJ8xW1RoRIjsTiBSDqnGGhhRpYfOpLb+SwJKSpAZ2QE6bSCgAAAAAA
+AAAACNQwDQYJKoZIhvcNAQEBBQAEggEABjHjFll9vPNqaGkB7i8Rl8C9hVF4mBSpUU4UgKBKMn7O
+mEhWwwZVX0pTv5kcVF4FUtwYNPvB29BowCZcUI1/b2UExu6QSUmwPW49+4jDLg4Rh+Xz3TDPg9xq
+80BWSGFiapKDSNGBnx40BPNgmxDd9EYYOeO7U2b/mWhB8juusqVQx6Nn+6YayMP/BQ5p1DlQCF95
+Gbym9xITp0ymlQfAen0frlNhKZFfaNBMVfCyJVLUJ+Eu6Kw3JmB/M0e2VRF3u2TxR0ZGd8D2ZNIy
+pngsWa2RfbZDOScH6PCCUffqqa+NbS7RQPlF0/NRnTSVNTNAlAB3ZN5MwgtngKJdoDoR0QAAAAAA
 AA==
 
-------=_NextPart_000_0169_01D09E21.E839DD00--
+------=_NextPart_000_0165_01D09E21.C7BE9610--
