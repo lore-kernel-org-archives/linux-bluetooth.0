@@ -1,117 +1,236 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arron Wang <arron.wang@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arron Wang <arron.wang@intel.com>
-Subject: [PATCHv2] Bluetooth: Move SCO support under BT_BREDR config option
-Date: Wed,  3 Jun 2015 17:35:30 +0800
-Message-Id: <1433324130-3771-1-git-send-email-arron.wang@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Wang, Arron" <arron.wang@intel.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH 2/2] Bluetooth: Add option to enable/disable A2MP module
+Date: Wed, 3 Jun 2015 09:22:48 +0000
+Message-ID: <3B8E4CEA2CC045459E7856C66B82CE931135CD03@SHSMSX103.ccr.corp.intel.com>
+References: <1432274165-23569-1-git-send-email-arron.wang@intel.com>
+ <1432274165-23569-2-git-send-email-arron.wang@intel.com>
+ <669F121F-A1EE-47A7-8A15-27E1A2FAFF26@holtmann.org>
+In-Reply-To: <669F121F-A1EE-47A7-8A15-27E1A2FAFF26@holtmann.org>
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
+	micalg=SHA1; boundary="----=_NextPart_000_0169_01D09E21.E839DD00"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SCO/eSCO link is supported by BR/EDR controller, it is
-suitable to move them under BT_BREDR config option
+------=_NextPart_000_0169_01D09E21.E839DD00
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Arron Wang <arron.wang@intel.com>
----
- include/net/bluetooth/bluetooth.h |   11 +++++++++++
- include/net/bluetooth/hci_core.h  |   14 +++++++++++++-
- net/bluetooth/Makefile            |    3 ++-
- net/bluetooth/sco.c               |    5 ++---
- 4 files changed, 28 insertions(+), 5 deletions(-)
+Hi Marcel,
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 7dba805..38d8a34 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -365,8 +365,19 @@ extern struct dentry *bt_debugfs;
- int l2cap_init(void);
- void l2cap_exit(void);
- 
-+#if IS_ENABLED(CONFIG_BT_BREDR)
- int sco_init(void);
- void sco_exit(void);
-+#else
-+static inline int sco_init(void)
-+{
-+	return 0;
-+}
-+
-+static inline void sco_exit(void)
-+{
-+}
-+#endif
- 
- int mgmt_init(void);
- void mgmt_exit(void);
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a056c2b..387bbc3 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -532,8 +532,20 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
- int l2cap_disconn_ind(struct hci_conn *hcon);
- int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
- 
-+#if IS_ENABLED(CONFIG_BT_BREDR)
- int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags);
--int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
-+void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
-+#else
-+static inline int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+				  __u8 *flags)
-+{
-+	return 0;
-+}
-+
-+static inline void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
-+{
-+}
-+#endif
- 
- /* ----- Inquiry cache ----- */
- #define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index 9a8ea23..29c12ae 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -12,9 +12,10 @@ obj-$(CONFIG_BT_6LOWPAN) += bluetooth_6lowpan.o
- bluetooth_6lowpan-y := 6lowpan.o
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
--	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
-+	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
- 	a2mp.o amp.o ecc.o hci_request.o mgmt_util.o
- 
-+bluetooth-$(CONFIG_BT_BREDR) += sco.o
- bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
- bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
- 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 4322c83..f348383 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -1110,7 +1110,7 @@ static void sco_disconn_cfm(struct hci_conn *hcon, __u8 reason)
- 	sco_conn_del(hcon, bt_to_errno(reason));
- }
- 
--int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
-+void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
- {
- 	struct sco_conn *conn = hcon->sco_data;
- 
-@@ -1121,12 +1121,11 @@ int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
- 
- 	if (skb->len) {
- 		sco_recv_frame(conn, skb);
--		return 0;
-+		return;
- 	}
- 
- drop:
- 	kfree_skb(skb);
--	return 0;
- }
- 
- static struct hci_cb sco_cb = {
--- 
-1.7.9.5
+>-----Original Message-----
+>From: linux-bluetooth-owner@vger.kernel.org
+>[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Marcel =
+Holtmann
+>Sent: Tuesday, May 26, 2015 3:06 AM
+>To: Wang, Arron
+>Cc: linux-bluetooth@vger.kernel.org
+>Subject: Re: [PATCH 2/2] Bluetooth: Add option to enable/disable A2MP =
+module
+>
+>Hi Arron,
+>
+>> Make Bluetooth 3.0 HS feature configurable
+>>
+>> Signed-off-by: Arron Wang <arron.wang@intel.com>
+>> ---
+>> net/bluetooth/Kconfig          |    5 +
+>> net/bluetooth/Makefile         |    3 +-
+>> net/bluetooth/a2mp.h           |   19 +++
+>> net/bluetooth/amp.h            |   11 ++
+>> net/bluetooth/hci_event.c      |  260 =
++-----------------------------------
+>> net/bluetooth/hci_event_a2mp.c |  283
+>++++++++++++++++++++++++++++++++++++++++
+>> net/bluetooth/hci_event_a2mp.h |   91 +++++++++++++
+>> 7 files changed, 412 insertions(+), 260 deletions(-) create mode
+>> 100644 net/bluetooth/hci_event_a2mp.c create mode 100644
+>> net/bluetooth/hci_event_a2mp.h
+>
+>I don=E2=80=99t think this is the solution here. I think A2MP support =
+should be self
+>contained and utilises the synchronous HCI command framework we have in =
+place
+>and also use in mgmt.
 
+Yes, create a separate file for hci a2mp event maybe not suitable, but =
+there are many hci ops/events for different Bluetooth controller =
+BREDR/AMP/LE, add the macro to separate them in one file may not easy to =
+maintain, can we move these AMP releated hci ops/event function to file =
+amp.c?
+
+>> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig index
+>> e7bca37..a558c66 100644
+>> --- a/net/bluetooth/Kconfig
+>> +++ b/net/bluetooth/Kconfig
+>> @@ -27,6 +27,7 @@ menuconfig BT
+>> 		SMP (Security Manager Protocol) on LE (Low Energy) links
+>> 	     HCI Device drivers (Interface to the hardware)
+>> 	     SCO Module (SCO audio links)
+>> +	     A2MP Module (AMP Manager Protocol)
+>> 	     RFCOMM Module (RFCOMM Protocol)
+>> 	     BNEP Module (Bluetooth Network Encapsulation Protocol)
+>> 	     CMTP Module (CAPI Message Transport Protocol) @@ -53,6 +54,10 =
+@@
+>> config BT_SCO
+>> 	  SCO link provides voice transport over Bluetooth.  SCO support is
+>> 	  required for voice applications like Headset and Audio.
+>>
+>> +config BT_A2MP
+>> +	bool "Bluetooth Alternate MAC/PHY (AMP) features"
+>> +	depends on BT_BREDR
+>> +
+>
+>The option name you are looking for for BT_HS for high speed support. =
+A2MP and
+>AMP support should be hidden behind that config option.
+
+Yes, I'll change them to BT_HS.
+
+Thanks
+Arron
+
+------=_NextPart_000_0169_01D09E21.E839DD00
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+
+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
+VMv3yxHO8jex40LgMIIFtDCCBJygAwIBAgITMwAAX4le2zD54Qv9OAAAAABfiTANBgkqhkiG9w0B
+AQUFADB5MQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRow
+GAYDVQQKExFJbnRlbCBDb3Jwb3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMg
+SXNzdWluZyBDQSA0QTAeFw0xNDEwMjIwMDI2MzZaFw0xNzEwMDYwMDI2MzZaMDsxFDASBgNVBAMT
+C1dhbmcsIEFycm9uMSMwIQYJKoZIhvcNAQkBFhRhcnJvbi53YW5nQGludGVsLmNvbTCCASIwDQYJ
+KoZIhvcNAQEBBQADggEPADCCAQoCggEBAIp2DPMnUYAGFnnjHHQHXOT0PUPWAPPWJWlHmcB6YN5/
+1PWRH5jGKBmQMakAZLzLnREksomwY+jXeFgky22bs1L7/U0UlGvpzuGyKrJ4ZafKg5xXWrJqMdxC
+ZkjaA1idQN8GRVgi16Y0thlsANseGPWnML960oODNX+hM0esKFb6H7227ZIahaPyT3rNfZMAP/eL
+aVB2AqBnqXihO63OCZKQJCf+lOZ+O/cYPzpLFGcRuSSwMXw2c59D27QMXpCZ1Qu01GO4W/3a+fyZ
+V7NKVI96yQaQ95brtHzKug11o6lmRXb2omihgg7IcvrrusNWI13RdQ46rq2SKyVX8NBrkPMCAwEA
+AaOCAnEwggJtMEQGCSqGSIb3DQEJDwQ3MDUwDgYIKoZIhvcNAwICAgCAMA4GCCqGSIb3DQMEAgIA
+gDAHBgUrDgMCBzAKBggqhkiG9w0DBzAdBgNVHQ4EFgQUGjkTqg2vQY5JCa0Q3QwAl04xjTswCwYD
+VR0PBAQDAgeAMB8GA1UdIwQYMBaAFB5pKrTcKP5HGE4hCz+8rBEv8Jj1MGUGA1UdHwReMFwwWqBY
+oFaGVGh0dHA6Ly93d3cuaW50ZWwuY29tL3JlcG9zaXRvcnkvQ1JML0ludGVsJTIwRXh0ZXJuYWwl
+MjBCYXNpYyUyMElzc3VpbmclMjBDQSUyMDRBLmNybDCBnwYIKwYBBQUHAQEEgZIwgY8waQYIKwYB
+BQUHMAKGXWh0dHA6Ly93d3cuaW50ZWwuY29tL3JlcG9zaXRvcnkvY2VydGlmaWNhdGVzL0ludGVs
+JTIwRXh0ZXJuYWwlMjBCYXNpYyUyMElzc3VpbmclMjBDQSUyMDRBLmNydDAiBggrBgEFBQcwAYYW
+aHR0cDovL29jc3AuaW50ZWwuY29tLzA8BgkrBgEEAYI3FQcELzAtBiUrBgEEAYI3FQiGw4x1hJnl
+UYP9gSiFjp9TgpHACWeB3r05lfBDAgFkAgEIMB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3
+CgMMMCkGCSsGAQQBgjcVCgQcMBowCgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBFBgNVHREEPjA8
+oCQGCisGAQQBgjcUAgOgFgwUYXJyb24ud2FuZ0BpbnRlbC5jb22BFGFycm9uLndhbmdAaW50ZWwu
+Y29tMA0GCSqGSIb3DQEBBQUAA4IBAQC5WXyOvQf4uaZYY+cLIuZOyy5FKrCtOXdqSWbv3URr85mu
+oM1mGhTjq5J/6CRF3Ncb/35c66iEh1VkxTsvccMOLLvmPvSeN9TlKYDZ5THRwl3FILtSWpitXfgd
+u2Pxh0Ks5heGWgRu1yuXmdQufbnEi+1JrOFUjfSKp67KUUq38RALF0ms3y+p2Dlg79s8sWsN3T9R
+Q+Tot/NkJsOEtc+o8WtvwF91s9cZYI1bRvOzgIzntgKOOYs0gtj/+VTvOGB+10aV6n3G++TWPkgQ
+Zu6QIMDYEJduaSzgKw++qDOZLNQAVA5AkalcLQzaGYly87nGc0CejykfvTCAVxioeclZMIIFtTCC
+BJ2gAwIBAgITMwAACNQ0VT2wmC4yAgAAAAAI1DANBgkqhkiG9w0BAQUFADB5MQswCQYDVQQGEwJV
+UzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQKExFJbnRlbCBDb3Jw
+b3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWluZyBDQSA0QjAeFw0x
+NDEwMjIwMDI2NTlaFw0xNzEwMDYwMDI2NTlaMDsxFDASBgNVBAMTC1dhbmcsIEFycm9uMSMwIQYJ
+KoZIhvcNAQkBFhRhcnJvbi53YW5nQGludGVsLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBAMCBc7sZGTzt+lJ5qeDW7KV4Crxxf43Xttfs001pakIhcXfvQe5IFjPey/aJ1ZBRm6ce
+SJ61e17CM1+U6M0D4dQfn8VsIky2YJWavq+6s21uFsxekFaNhj7ErohSs3bFiEp5icdDVlBjxyyh
+gyDf+mpUkVkMDVk9FM8+lC9Avgg6iVEv2woUQnoJ4LWgZJOXxD9vZ7nKIIuBg0pcnobrphtNzDct
+GUcpmwGkmH9VoIa8SPWV/ZrBvBLuzR8at3/qq/17qN42RXLy5SYcbTQszodUxwiAZ54cQYv59xjw
+0AVDd5MdGf51VMvZkwDjeK8E/5204E79+iZudGifHIdrbq0CAwEAAaOCAnIwggJuMEQGCSqGSIb3
+DQEJDwQ3MDUwDgYIKoZIhvcNAwICAgCAMA4GCCqGSIb3DQMEAgIAgDAHBgUrDgMCBzAKBggqhkiG
+9w0DBzAdBgNVHQ4EFgQUlJx/5ddHMKhcOmUvBgLdndM4MZMwCwYDVR0PBAQDAgQwMB8GA1UdIwQY
+MBaAFNpBI5xaj3GvV4M+INPjZdsMywvbMGUGA1UdHwReMFwwWqBYoFaGVGh0dHA6Ly93d3cuaW50
+ZWwuY29tL3JlcG9zaXRvcnkvQ1JML0ludGVsJTIwRXh0ZXJuYWwlMjBCYXNpYyUyMElzc3Vpbmcl
+MjBDQSUyMDRCLmNybDCBnwYIKwYBBQUHAQEEgZIwgY8wIgYIKwYBBQUHMAGGFmh0dHA6Ly9vY3Nw
+LmludGVsLmNvbS8waQYIKwYBBQUHMAKGXWh0dHA6Ly93d3cuaW50ZWwuY29tL3JlcG9zaXRvcnkv
+Y2VydGlmaWNhdGVzL0ludGVsJTIwRXh0ZXJuYWwlMjBCYXNpYyUyMElzc3VpbmclMjBDQSUyMDRC
+LmNydDA9BgkrBgEEAYI3FQcEMDAuBiYrBgEEAYI3FQiGw4x1hJnlUYP9gSiFjp9TgpHACWeEudlB
+h4T/TgIBZAIBDTAfBgNVHSUEGDAWBggrBgEFBQcDBAYKKwYBBAGCNwoDBDApBgkrBgEEAYI3FQoE
+HDAaMAoGCCsGAQUFBwMEMAwGCisGAQQBgjcKAwQwRQYDVR0RBD4wPKAkBgorBgEEAYI3FAIDoBYM
+FGFycm9uLndhbmdAaW50ZWwuY29tgRRhcnJvbi53YW5nQGludGVsLmNvbTANBgkqhkiG9w0BAQUF
+AAOCAQEAE36Pwz8Su4NAcv+3th5UKSMuuwSTSzYqge1NvPNG+910YbA6a6v/U4ETegBUCq7we1RQ
+V/NVHuxmbo0We1NVQ5AwtoSNI46Go1PDITtk2JOhhGuecZlQP15FDNsPln+evOGWuK09nR2iSvme
+e+rNVjCFrWB5eSHG48dSzeiL9DPm56spHjoL6xFsVLfi3WJxCWhh/yLis/vk6IUZuMBC/cd8LK29
+4DG5i/X/txLaqQBzuHb+wsIgr9VzoW4WEGQA4j8my1MGqkp4+F/GoaMijlPdmrAZ5ogggex7W6Tu
+s/O6xdip56Qxb2KONK31EQEZcopcJUVUsoyt7OKIipdbFTGCA9cwggPTAgEBMIGQMHkxCzAJBgNV
+BAYTAlVTMQswCQYDVQQIEwJDQTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExGjAYBgNVBAoTEUludGVs
+IENvcnBvcmF0aW9uMSswKQYDVQQDEyJJbnRlbCBFeHRlcm5hbCBCYXNpYyBJc3N1aW5nIENBIDRB
+AhMzAABfiV7bMPnhC/04AAAAAF+JMAkGBSsOAwIaBQCgggIbMBgGCSqGSIb3DQEJAzELBgkqhkiG
+9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE1MDYwMzA5MjI0NlowIwYJKoZIhvcNAQkEMRYEFNRzttu+
+7kMfl5Z3nhpHIGT/haGWMHIGCSqGSIb3DQEJDzFlMGMwCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQB
+FjAKBggqhkiG9w0DBzALBglghkgBZQMEAQIwBwYFKw4DAhowCwYJYIZIAWUDBAIDMAsGCWCGSAFl
+AwQCAjALBglghkgBZQMEAgEwgaEGCSsGAQQBgjcQBDGBkzCBkDB5MQswCQYDVQQGEwJVUzELMAkG
+A1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQKExFJbnRlbCBDb3Jwb3JhdGlv
+bjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWluZyBDQSA0QgITMwAACNQ0VT2w
+mC4yAgAAAAAI1DCBowYLKoZIhvcNAQkQAgsxgZOggZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgT
+AkNBMRQwEgYDVQQHEwtTYW50YSBDbGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzAp
+BgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2ljIElzc3VpbmcgQ0EgNEICEzMAAAjUNFU9sJguMgIA
+AAAACNQwDQYJKoZIhvcNAQEBBQAEggEAQ35bA1Kp74orbPHzqn0cEBiIvEMyczJRQ3RcutoIjmyN
+Q1diixbIIadeeASZZ6BkCXgD9ZkSPiW90dFN7eSbU4vJp3r1JcHyoEDDAUgz1B1ew/PznfQnD9j/
+X1D77h+RjNJlDYm9WJFYR4CfNCBw7Uj5S4JkVv9WTsvDdUDAr4xG2zOTPS/59SXggDSnsIzDlyto
+fnGkYF6ZTjvRTsK8wLuLJl8M911bpKzkn1ODVFwkIjdJ5cBqBX53BEfB4G7YXS8xDHO+LL9KvceL
+S98V9+9X0qqWLY40zdSV7vWJ8xW1RoRIjsTiBSDqnGGhhRpYfOpLb+SwJKSpAZ2QE6bSCgAAAAAA
+AA==
+
+------=_NextPart_000_0169_01D09E21.E839DD00--
