@@ -1,591 +1,319 @@
 Return-Path: <cyrus@holtmann.org>
 From: Ilya Faenson <ifaenson@broadcom.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>, Ilya Faenson <ifaenson@broadcom.com>
-Subject: [PATCH 5/5] BlueZ Broadcom UART Protocol
-Date: Wed, 3 Jun 2015 17:01:44 -0400
-Message-ID: <1433365304-16707-6-git-send-email-ifaenson@broadcom.com>
+CC: <linux-bluetooth@vger.kernel.org>,
+	Ilya Faenson <ifaenson@broadcom.com>
+Subject: [PATCH 4/5] Broadcom Bluetooth protocol UART support
+Date: Wed, 3 Jun 2015 17:01:43 -0400
+Message-ID: <1433365304-16707-5-git-send-email-ifaenson@broadcom.com>
 In-Reply-To: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
 References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
 MIME-Version: 1.0
 Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Merge Broadcom protocol with the Intel implementation, providing
-for UART setup, firmware download and power management.
+Merge of the Broadcom logic into the Intel's btbcm implementation.
 
 Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
 ---
- drivers/bluetooth/hci_bcm.c | 481 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 466 insertions(+), 15 deletions(-)
+ drivers/bluetooth/btbcm.c | 142 ++++++++++++++++++++++++++++++++++++----------
+ drivers/bluetooth/btbcm.h |  21 ++++++-
+ 2 files changed, 132 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 1ec0b4a..2894253 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 728fce3..e1d5ad0 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
 @@ -3,6 +3,7 @@
-  *  Bluetooth HCI UART driver for Broadcom devices
+  *  Bluetooth support for Broadcom devices
   *
   *  Copyright (C) 2015  Intel Corporation
 + *  Copyright (C) 2015  Broadcom Corporation
   *
   *
   *  This program is free software; you can redistribute it and/or modify
-@@ -24,45 +25,355 @@
- #include <linux/kernel.h>
- #include <linux/errno.h>
- #include <linux/skbuff.h>
-+#include <linux/tty.h>
+@@ -32,7 +33,8 @@
  
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
+ #define VERSION "0.1"
  
- #include "btbcm.h"
- #include "hci_uart.h"
-+#include "btbcm_uart.h"
-+
-+#define BCM43XX_CLOCK_48 1
-+#define BCM43XX_CLOCK_24 2
+-#define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
++#define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00} })
++#define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43} })
  
- struct bcm_data {
- 	struct sk_buff *rx_skb;
- 	struct sk_buff_head txq;
-+	struct hci_uart *hu;
+ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ {
+@@ -43,6 +45,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 			     HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		int err = PTR_ERR(skb);
 +
-+	bool is_suspended; /* suspend/resume flag */
+ 		BT_ERR("%s: BCM: Reading device address failed (%d)",
+ 		       hdev->name, err);
+ 		return err;
+@@ -56,10 +59,11 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 
+ 	bda = (struct hci_rp_read_bd_addr *)skb->data;
+ 
+-	/* The address 00:20:70:02:A0:00 indicates a BCM20702A0 controller
+-	 * with no configured address.
++	/* Check if the address indicates a controller with no configured
++	 * address.
+ 	 */
+-	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0)) {
++	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0) ||
++	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3)) {
+ 		BT_INFO("%s: BCM: Using default device address (%pMR)",
+ 			hdev->name, &bda->bdaddr);
+ 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+@@ -89,21 +93,14 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ }
+ EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
+ 
+-int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
++int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
+ {
+ 	const struct hci_command_hdr *cmd;
+-	const struct firmware *fw;
+ 	const u8 *fw_ptr;
+ 	size_t fw_size;
+ 	struct sk_buff *skb;
+ 	u16 opcode;
+-	int err;
+-
+-	err = request_firmware(&fw, firmware, &hdev->dev);
+-	if (err < 0) {
+-		BT_INFO("%s: BCM: Patch %s not found", hdev->name, firmware);
+-		return err;
+-	}
++	int err = 0;
+ 
+ 	/* Start Download */
+ 	skb = __hci_cmd_sync(hdev, 0xfc2e, 0, NULL, HCI_INIT_TIMEOUT);
+@@ -129,8 +126,7 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
+ 		fw_size -= sizeof(*cmd);
+ 
+ 		if (fw_size < cmd->plen) {
+-			BT_ERR("%s: BCM: Patch %s is corrupted", hdev->name,
+-			       firmware);
++			BT_ERR("%s: BCM: Patch is corrupted", hdev->name);
+ 			err = -EINVAL;
+ 			goto done;
+ 		}
+@@ -156,7 +152,6 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
+ 	msleep(250);
+ 
+ done:
+-	release_firmware(fw);
+ 	return err;
+ }
+ EXPORT_SYMBOL(btbcm_patchram);
+@@ -168,6 +163,7 @@ static int btbcm_reset(struct hci_dev *hdev)
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		int err = PTR_ERR(skb);
 +
-+	struct timer_list timer; /* idle timer */
-+
-+	struct btbcm_uart_parameters pars; /* device parameters */
-+	void *device_context; /* ACPI/DT device context */
+ 		BT_ERR("%s: BCM: Reset failed (%d)", hdev->name, err);
+ 		return err;
+ 	}
+@@ -242,9 +238,101 @@ static const struct {
+ 	const char *name;
+ } bcm_uart_subver_table[] = {
+ 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
++	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
++	{ 0x610c, "BCM4354_003.001.012.0306.0659"}, /* 003.001.012 */
+ 	{ }
  };
  
-+/* Suspend/resume synchronization mutex */
-+static DEFINE_MUTEX(plock);
-+
-+/* Forward reference */
-+static struct hci_uart_proto bcm_proto;
-+
-+/*
-+ * Callbacks from the BCMBT_UART device
-+ */
-+
-+/*
-+ * The platform is suspending. Stop UART activity
-+ */
-+static void suspend_notification(void *context)
++int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len)
 +{
-+	struct hci_uart *hu = (struct hci_uart *)context;
-+	struct bcm_data *h4 = hu->priv;
-+
-+	BT_DBG("%s: is_suspended %d", __func__, h4->is_suspended);
-+
-+	if (!h4->pars.configure_sleep)
-+		return;
-+
-+	if (!h4->is_suspended) {
-+		if (h4->pars.manual_fc)
-+			hci_uart_flow_control_device(hu);
-+
-+		/* Once this callback returns, driver suspends BT via GPIO */
-+		h4->is_suspended = true;
-+	}
-+}
-+
-+/*
-+ * The platform is resuming. Resume UART activity.
-+ */
-+static void resume_notification(void *context)
-+{
-+	struct hci_uart *hu = (struct hci_uart *)context;
-+	struct bcm_data *h4 = hu->priv;
-+
-+	BT_DBG("%s: is_suspended %d", __func__, h4->is_suspended);
-+
-+	if (!h4->pars.configure_sleep)
-+		return;
-+
-+	/* When this callback executes, the device has woken up already */
-+	if (h4->is_suspended) {
-+		h4->is_suspended = false;
-+
-+		if (h4->pars.manual_fc)
-+			hci_uart_unflow_control_device(hu);
-+	}
-+
-+	/* If we're resumed, the idle timer must be running */
-+	mod_timer(&h4->timer, jiffies +
-+	    msecs_to_jiffies(h4->pars.idle_timeout_in_secs * 1000));
-+}
-+
-+/*
-+ * The BT device is resuming. Resume UART activity if suspended
-+ */
-+static void wakeup_notification(void *context)
-+{
-+	struct hci_uart *hu = (struct hci_uart *)context;
-+	struct bcm_data *h4 = hu->priv;
-+
-+	BT_DBG("%s: is_suspended %d", __func__, h4->is_suspended);
-+
-+	if (!h4->pars.configure_sleep)
-+		return;
-+
-+	if (h4->is_suspended) {
-+		if (h4->pars.manual_fc)
-+			hci_uart_unflow_control_device(hu);
-+
-+		h4->is_suspended = false;
-+	}
-+
-+	/* If we're resumed, the idle timer must be running */
-+	mod_timer(&h4->timer, jiffies + msecs_to_jiffies(
-+			   h4->pars.idle_timeout_in_secs * 1000));
-+}
-+
-+/*
-+ * Make sure we're awake
-+ * (called when the resumed state is required)
-+ */
-+static void bcm_ensure_wakeup(struct hci_uart *hu)
-+{
-+	struct bcm_data *h4 = hu->priv;
-+	int status;
-+
-+	if (!h4->pars.configure_sleep)
-+		return;
-+
-+	/* Suspend/resume operations are serialized */
-+	mutex_lock(&plock);
-+
-+	/* Nothing to do if resumed already */
-+	if (!h4->is_suspended) {
-+		mutex_unlock(&plock);
-+
-+		/* Just reset the timer */
-+		status = mod_timer(&h4->timer, jiffies + msecs_to_jiffies(
-+				   h4->pars.idle_timeout_in_secs * 1000));
-+		return;
-+	}
-+
-+	/* Wakeup the device */
-+	status = btbcm_uart_control(BTBCM_UART_ACTION_RESUME,
-+				    h4->device_context, NULL, NULL);
-+	if (status)
-+		BT_DBG("%s: failed to resume driver %d", __func__, status);
-+
-+	/* Unflow control the port if configured */
-+	resume_notification(hu);
-+
-+	mutex_unlock(&plock);
-+}
-+
-+/*
-+ * Idle timer callback
-+ */
-+static void bcm_idle_timeout(unsigned long arg)
-+{
-+	struct hci_uart *hu = (struct hci_uart *)arg;
-+	struct bcm_data *h4 = hu->priv;
-+	int status;
-+
-+	BT_DBG("%s: hu %p", __func__, hu);
-+
-+	/* Suspend/resume operations are serialized */
-+	mutex_lock(&plock);
-+
-+	if (!h4->is_suspended) {
-+		/* Flow control the port if configured */
-+		suspend_notification(hu);
-+
-+		/* Suspend the device */
-+		status = btbcm_uart_control(BTBCM_UART_ACTION_SUSPEND,
-+					    h4->device_context, NULL, NULL);
-+		if (status)
-+			BT_DBG("%s: failed to suspend device %d", __func__,
-+			       status);
-+	}
-+
-+	mutex_unlock(&plock);
-+}
-+
-+struct hci_cp_bcm_set_speed {
-+	__le16   dummy;
-+	__le32   speed;
-+} __packed;
-+
-+static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
-+{
-+	struct hci_dev *hdev = hu->hdev;
++	u16 subver, rev;
++	const char *hw_name = NULL;
 +	struct sk_buff *skb;
-+	struct hci_cp_bcm_set_speed param = { 0, cpu_to_le32(speed) };
++	struct hci_rp_read_local_version *ver;
++	int i, err;
 +
-+	if (speed > 3000000) {
-+		u8 clock = BCM43XX_CLOCK_48;
-+
-+		BT_DBG("%s: Set Controller clock (%d)", hdev->name, clock);
-+
-+		skb = __hci_cmd_sync(hdev, 0xfc45, 1, &clock, HCI_INIT_TIMEOUT);
-+		if (IS_ERR(skb)) {
-+			BT_ERR("%s: failed to write update clock command (%ld)",
-+			       hdev->name, PTR_ERR(skb));
-+			return PTR_ERR(skb);
-+		}
-+
-+		kfree_skb(skb);
-+	}
-+
-+	BT_DBG("%s: Set Controller UART speed to %d bit/s", hdev->name, speed);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc18, sizeof(param), &param,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: failed to write update baudrate command (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
- static int bcm_open(struct hci_uart *hu)
- {
--	struct bcm_data *bcm;
-+	struct btbcm_uart_callbacks callbacks;
-+	unsigned long callbacks_size = sizeof(callbacks);
-+	int status;
-+	struct bcm_data *h4;
-+	struct tty_struct *tty = hu->tty;
- 
--	BT_DBG("hu %p", hu);
-+	BT_DBG("bcm_open hu %p", hu);
- 
--	bcm = kzalloc(sizeof(*bcm), GFP_KERNEL);
--	if (!bcm)
-+	h4 = kzalloc(sizeof(*h4), GFP_KERNEL);
-+	if (!h4)
- 		return -ENOMEM;
- 
--	skb_queue_head_init(&bcm->txq);
-+	skb_queue_head_init(&h4->txq);
-+	hu->priv = h4;
-+	h4->hu = hu;
-+	h4->is_suspended = false;
-+
-+	/* Configure callbacks on the driver */
-+	callbacks.interface_version = BTBCM_UART_INTERFACE_VERSION;
-+	callbacks.context = hu;
-+	strcpy(callbacks.name, tty->name);
-+	callbacks.p_suspend = suspend_notification;
-+	callbacks.p_resume = resume_notification;
-+	callbacks.p_wakeup = wakeup_notification;
-+	status = btbcm_uart_control(BTBCM_UART_ACTION_CONFIGURE_CALLBACKS,
-+				    NULL, &callbacks, &callbacks_size);
-+	if (status) {
-+		BT_DBG("bcm_open failed to set driver callbacks %d", status);
-+		return status;
-+	}
-+	if (callbacks_size != sizeof(void *)) {
-+		BT_DBG("bcm_open got back %d bytes from callbacks?!",
-+		       (int)callbacks_size);
-+		return -EMSGSIZE;
-+	}
-+	memcpy(&h4->device_context, &callbacks, sizeof(void *));
-+	BT_DBG("bcm_open callbacks context %p", h4->device_context);
-+
-+	/* Retrieve device parameters */
-+	callbacks_size = sizeof(h4->pars);
-+	status = btbcm_uart_control(BTBCM_UART_ACTION_GET_PARAMETERS,
-+				    h4->device_context, &h4->pars,
-+				    &callbacks_size);
-+	if (status) {
-+		BT_DBG("bcm_open failed to get dev parameters %d", status);
-+		return status;
-+	}
-+	BT_DBG("Pars ver %d csleep %d dalow %d balow %d idle %d",
-+	       h4->pars.interface_version, h4->pars.configure_sleep,
-+	       h4->pars.dev_wake_active_low, h4->pars.bt_wake_active_low,
-+	       h4->pars.idle_timeout_in_secs);
-+	bcm_proto.oper_speed = h4->pars.oper_speed;
-+
-+	/* Cycle power to make sure the device is in the known state */
-+	status = btbcm_uart_control(BTBCM_UART_ACTION_POWER_OFF,
-+				    h4->device_context, NULL, NULL);
-+	if (status) {
-+		BT_DBG("bcm_open failed to power off %d", status);
-+	} else {
-+		status = btbcm_uart_control(BTBCM_UART_ACTION_POWER_ON,
-+					    h4->device_context, NULL, NULL);
-+		if (status)
-+			BT_DBG("bcm_open failed to power on %d", status);
-+	}
-+
-+	/* Start the idle timer */
-+	if (h4->pars.configure_sleep) {
-+		setup_timer(&h4->timer, bcm_idle_timeout, (unsigned long)hu);
-+		if (h4->pars.configure_sleep)
-+			mod_timer(&h4->timer, jiffies + msecs_to_jiffies(
-+				  h4->pars.idle_timeout_in_secs * 1000));
-+	}
- 
--	hu->priv = bcm;
- 	return 0;
- }
- 
- static int bcm_close(struct hci_uart *hu)
- {
--	struct bcm_data *bcm = hu->priv;
-+	struct btbcm_uart_callbacks callbacks;
-+	unsigned long callbacks_size = sizeof(callbacks);
-+	struct bcm_data *h4 = hu->priv;
-+	int status;
- 
--	BT_DBG("hu %p", hu);
-+	hu->priv = NULL;
- 
--	skb_queue_purge(&bcm->txq);
--	kfree_skb(bcm->rx_skb);
--	kfree(bcm);
-+	BT_DBG("bcm_close hu %p", hu);
-+
-+	/* If we're being closed, we must suspend */
-+	if (h4->pars.configure_sleep) {
-+		mutex_lock(&plock);
-+
-+		if (!h4->is_suspended) {
-+			/* Flow control the port */
-+			suspend_notification(hu);
-+
-+			/* Suspend the device */
-+			status = btbcm_uart_control(BTBCM_UART_ACTION_SUSPEND,
-+						    h4->device_context, NULL,
-+						    NULL);
-+			if (status) {
-+				BT_DBG("bcm_close suspend driver fail %d",
-+				       status);
-+			}
-+		}
-+
-+	mutex_unlock(&plock);
-+
-+	del_timer_sync(&h4->timer);
-+	}
-+
-+	/* Power off the device if possible */
-+	status = btbcm_uart_control(BTBCM_UART_ACTION_POWER_OFF,
-+				    h4->device_context, NULL, NULL);
-+	if (status)
-+		BT_DBG("bcm_close failed to power off %d", status);
-+
-+	/* de-configure callbacks on the driver */
-+	callbacks.interface_version = BTBCM_UART_INTERFACE_VERSION;
-+	callbacks.context = hu;
-+	callbacks.p_suspend = NULL;
-+	callbacks.p_resume = NULL;
-+	callbacks.p_wakeup = NULL;
-+	status = btbcm_uart_control(BTBCM_UART_ACTION_CONFIGURE_CALLBACKS,
-+				    h4->device_context, &callbacks,
-+				    &callbacks_size);
-+	if (status)
-+		BT_DBG("bcm_close failed to reset drv callbacks %d", status);
-+	skb_queue_purge(&h4->txq);
- 
- 	hu->priv = NULL;
-+	kfree(h4);
-+
- 	return 0;
- }
- 
-@@ -79,11 +390,139 @@ static int bcm_flush(struct hci_uart *hu)
- 
- static int bcm_setup(struct hci_uart *hu)
- {
--	BT_DBG("hu %p", hu);
-+	char fw_name[128];
-+	const struct firmware *fw;
-+	int err;
-+	struct sk_buff *skb;
-+	struct bcm_data *h4 = hu->priv;
-+	unsigned char sleep_pars[] = {
-+	0x01,       /* sleep mode 1=UART */
-+	0x02,       /* idle threshold HOST (value * 300ms) */
-+	0x02,       /* idle threshold HC   (value * 300ms) */
-+	0x01,       /* BT_WAKE active mode - 1=active high, 0 = active low */
-+	0x00,       /* HOST_WAKE active mode - 1=active high, 0 = active low */
-+	0x01,       /* Allow host sleep during SCO - FALSE */
-+	0x01,       /* combine sleep mode and LPM - 1 == TRUE */
-+	0x00,       /* enable tristate control of UART TX line - FALSE */
-+	0x00,       /* USB auto-sleep on USB SUSPEND */
-+	0x00,       /* USB USB RESUME timeout (seconds) */
-+	0x00,       /* Pulsed Host Wake */
-+	0x00        /* Enable Break To Host */
-+	};
-+	unsigned char pcm_int_pars[] = {
-+	0x00,       /* 0=PCM routing, 1=SCO over HCI */
-+	0x02,       /* 0=128Kbps,1=256Kbps,2=512Kbps,3=1024Kbps,4=2048Kbps */
-+	0x00,       /* short frame sync  0=short, 1=long */
-+	0x00,       /* sync mode         0=slave, 1=master */
-+	0x00        /* clock mode        0=slave, 1=master */
-+	};
-+	unsigned char pcm_format_pars[] = {
-+	0x00,       /* LSB_First 1=TRUE, 0=FALSE */
-+	0x00,       /* Fill_Value (use 0-7 for fill bits value) */
-+	0x02,       /* Fill_Method   (2=sign extended) */
-+	0x03,       /* Fill_Num      # of fill bits 0-3) */
-+	0x01        /* Right_Justify 1=TRUE, 0=FALSE */
-+	};
-+	unsigned char time_slot_number = 0;
-+
-+	BT_DBG("%s: hu %p", __func__, hu);
- 
- 	hu->hdev->set_bdaddr = btbcm_set_bdaddr;
- 
--	return btbcm_setup_patchram(hu->hdev);
-+	err = btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name));
++	/* Reset */
++	err = btbcm_reset(hdev);
 +	if (err)
 +		return err;
 +
-+	err = request_firmware(&fw, fw_name, &hu->hdev->dev);
-+	if (err < 0) {
-+		BT_INFO("%s: BCM: Patch %s not found", hu->hdev->name, fw_name);
++	/* Read Local Version Info */
++	skb = btbcm_read_local_version(hdev);
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
++
++	ver = (struct hci_rp_read_local_version *)skb->data;
++	rev = le16_to_cpu(ver->hci_rev);
++	subver = le16_to_cpu(ver->lmp_subver);
++	kfree_skb(skb);
++
++	/* Read Verbose Config Version Info */
++	skb = btbcm_read_verbose_config(hdev);
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
++
++	BT_INFO("%s: BCM: chip id %u", hdev->name, skb->data[1]);
++	kfree_skb(skb);
++
++	switch ((rev & 0xf000) >> 12) {
++	case 0:
++	case 1:
++	case 3:
++		for (i = 0; bcm_uart_subver_table[i].name; i++) {
++			if (subver == bcm_uart_subver_table[i].subver) {
++				hw_name = bcm_uart_subver_table[i].name;
++				break;
++			}
++		}
++
++		snprintf(fw_name, len, "brcm/%s.hcd", hw_name ? : "BCM");
++		break;
++	default:
 +		return 0;
 +	}
 +
-+	err = btbcm_patchram(hu->hdev, fw);
-+	if (err) {
-+		BT_INFO("%s: BCM: Patch failed (%d)", hu->hdev->name, err);
-+		goto finalize;
-+	}
++	BT_INFO("%s: %s (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
++		hw_name ? : "BCM", (subver & 0x7000) >> 13,
++		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
 +
-+	if (hu->proto->init_speed)
-+		hci_uart_set_baudrate(hu, hu->proto->init_speed);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btbcm_initialize);
 +
-+	if (hu->proto->oper_speed) {
-+		err = bcm_set_baudrate(hu, hu->proto->oper_speed);
-+		if (!err)
-+			/* hci_uart_set_baudrate() has no return value as
-+			   tty_set_termios() return is always 0 */
-+			hci_uart_set_baudrate(hu, hu->proto->oper_speed);
-+	}
++int btbcm_finalize(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	struct hci_rp_read_local_version *ver;
++	u16 subver, rev;
++	int err;
 +
-+	/* Configure SCO PCM parameters */
-+	if (h4->pars.configure_audio) {
-+		pcm_int_pars[0] = h4->pars.pcm_routing;
-+		pcm_int_pars[1] = h4->pars.pcm_incallbitclock;
-+		pcm_int_pars[2] = h4->pars.pcm_shortframesync;
-+		pcm_int_pars[3] = h4->pars.pcm_syncmode;
-+		pcm_int_pars[4] = h4->pars.pcm_clockmode;
-+		skb = __hci_cmd_sync(hu->hdev, 0xfc1c, sizeof(pcm_int_pars),
-+				     pcm_int_pars, HCI_INIT_TIMEOUT);
-+		if (IS_ERR(skb)) {
-+			err = PTR_ERR(skb);
-+			BT_ERR("bcm_setup pcm_ INT VSC failed (%d)", err);
-+			goto finalize;
-+		}
-+		kfree_skb(skb);
-+		BT_DBG("bcm_setup pcm_ INT Parameters VSC succeeded");
++	/* Reset */
++	err = btbcm_reset(hdev);
++	if (err)
++		return err;
 +
-+		pcm_format_pars[0] = h4->pars.pcm_lsbfirst;
-+		pcm_format_pars[1] = h4->pars.pcm_fillvalue;
-+		pcm_format_pars[2] = h4->pars.pcm_fillmethod;
-+		pcm_format_pars[3] = h4->pars.pcm_fillnum;
-+		pcm_format_pars[4] = h4->pars.pcm_rightjustify;
-+		skb = __hci_cmd_sync(hu->hdev, 0xfc1e, sizeof(pcm_format_pars),
-+				     pcm_format_pars, HCI_INIT_TIMEOUT);
-+		if (IS_ERR(skb)) {
-+			err = PTR_ERR(skb);
-+			BT_ERR("bcm_setup pcm_ Format VSC failed (%d)",
-+			       err);
-+			goto finalize;
-+		}
-+		kfree_skb(skb);
-+		BT_DBG("bcm_setup pcm_ Format VSC succeeded");
++	/* Read Local Version Info */
++	skb = btbcm_read_local_version(hdev);
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
 +
-+		skb = __hci_cmd_sync(hu->hdev, 0xfc22, sizeof(time_slot_number),
-+				     &time_slot_number, HCI_INIT_TIMEOUT);
-+		if (IS_ERR(skb)) {
-+			err = PTR_ERR(skb);
-+			BT_ERR("bcm_setup SCO Time Slot VSC failed (%d)",
-+			       err);
-+			goto finalize;
-+		}
-+		kfree_skb(skb);
-+		BT_DBG("bcm_setup SCO Time Slot VSC succeeded");
-+	}
++	ver = (struct hci_rp_read_local_version *)skb->data;
++	rev = le16_to_cpu(ver->hci_rev);
++	subver = le16_to_cpu(ver->lmp_subver);
++	kfree_skb(skb);
 +
-+	/* Configure device's suspend/resume operation */
-+	if (h4->pars.configure_sleep) {
-+		/* Override the default */
-+		sleep_pars[3] = (unsigned char)!h4->pars.bt_wake_active_low;
-+		sleep_pars[4] = (unsigned char)!h4->pars.dev_wake_active_low;
-+		skb = __hci_cmd_sync(hu->hdev, 0xfc27, sizeof(sleep_pars),
-+				     sleep_pars, HCI_INIT_TIMEOUT);
-+		if (IS_ERR(skb)) {
-+			err = PTR_ERR(skb);
-+			BT_ERR("bcm_setup Sleep VSC failed (%d)", err);
-+			goto finalize;
-+		}
-+		kfree_skb(skb);
-+		BT_DBG("bcm_setup Set Sleep Parameters VSC succeeded");
-+	}
++	BT_INFO("%s: BCM (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
++		(subver & 0x7000) >> 13, (subver & 0x1f00) >> 8,
++		(subver & 0x00ff), rev & 0x0fff);
 +
-+finalize:
-+	release_firmware(fw);
++	btbcm_check_bdaddr(hdev);
 +
-+	err = btbcm_finalize(hu->hdev);
++	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
 +
-+	return err;
- }
- 
- static const struct h4_recv_pkt bcm_recv_pkts[] = {
-@@ -99,10 +538,16 @@ static int bcm_recv(struct hci_uart *hu, const void *data, int count)
- 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
- 		return -EUNATCH;
- 
-+	BT_DBG("%s: %d bytes", __func__, count);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btbcm_finalize);
 +
-+	/* Make sure we're resumed */
-+	bcm_ensure_wakeup(hu);
-+
- 	bcm->rx_skb = h4_recv_buf(hu->hdev, bcm->rx_skb, data, count,
- 				  bcm_recv_pkts, ARRAY_SIZE(bcm_recv_pkts));
- 	if (IS_ERR(bcm->rx_skb)) {
- 		int err = PTR_ERR(bcm->rx_skb);
-+
- 		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
- 		return err;
- 	}
-@@ -114,7 +559,10 @@ static int bcm_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+ static const struct {
+ 	u16 subver;
+ 	const char *name;
+@@ -265,6 +353,7 @@ static const struct {
+ int btbcm_setup_patchram(struct hci_dev *hdev)
  {
- 	struct bcm_data *bcm = hu->priv;
+ 	char fw_name[64];
++	const struct firmware *fw;
+ 	u16 subver, rev, pid, vid;
+ 	const char *hw_name = NULL;
+ 	struct sk_buff *skb;
+@@ -295,17 +384,6 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 	kfree_skb(skb);
  
--	BT_DBG("hu %p skb %p", hu, skb);
-+	BT_DBG("%s: hu %p skb %p", __func__, hu, skb);
+ 	switch ((rev & 0xf000) >> 12) {
+-	case 0:
+-		for (i = 0; bcm_uart_subver_table[i].name; i++) {
+-			if (subver == bcm_uart_subver_table[i].subver) {
+-				hw_name = bcm_uart_subver_table[i].name;
+-				break;
+-			}
+-		}
+-
+-		snprintf(fw_name, sizeof(fw_name), "brcm/%s.hcd",
+-			 hw_name ? : "BCM");
+-		break;
+ 	case 1:
+ 	case 2:
+ 		/* Read USB Product Info */
+@@ -335,9 +413,15 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+ 		hw_name ? : "BCM", (subver & 0x7000) >> 13,
+ 		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
+ 
+-	err = btbcm_patchram(hdev, fw_name);
+-	if (err == -ENOENT)
++	err = request_firmware(&fw, fw_name, &hdev->dev);
++	if (err < 0) {
++		BT_INFO("%s: BCM: Patch %s not found", hdev->name, fw_name);
+ 		return 0;
++	}
 +
-+	/* Make sure we're resumed */
-+	bcm_ensure_wakeup(hu);
++	btbcm_patchram(hdev, fw);
++
++	release_firmware(fw);
  
- 	/* Prepend skb with frame type */
- 	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
-@@ -130,13 +578,16 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
- 	return skb_dequeue(&bcm->txq);
+ 	/* Reset */
+ 	err = btbcm_reset(hdev);
+diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
+index eb6ab5f..32599be 100644
+--- a/drivers/bluetooth/btbcm.h
++++ b/drivers/bluetooth/btbcm.h
+@@ -21,15 +21,20 @@
+  *
+  */
+ 
++#include <linux/firmware.h>
++
+ #if IS_ENABLED(CONFIG_BT_BCM)
+ 
+ int btbcm_check_bdaddr(struct hci_dev *hdev);
+ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+-int btbcm_patchram(struct hci_dev *hdev, const char *firmware);
++int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw);
+ 
+ int btbcm_setup_patchram(struct hci_dev *hdev);
+ int btbcm_setup_apple(struct hci_dev *hdev);
+ 
++int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len);
++int btbcm_finalize(struct hci_dev *hdev);
++
+ #else
+ 
+ static inline int btbcm_check_bdaddr(struct hci_dev *hdev)
+@@ -42,7 +47,8 @@ static inline int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ 	return -EOPNOTSUPP;
  }
  
--static const struct hci_uart_proto bcm_proto = {
-+static struct hci_uart_proto bcm_proto = {
- 	.id		= HCI_UART_BCM,
- 	.name		= "BCM",
-+	.init_speed	= 115200,
-+	.oper_speed	= 4000000,
- 	.open		= bcm_open,
- 	.close		= bcm_close,
- 	.flush		= bcm_flush,
- 	.setup		= bcm_setup,
-+	.set_baudrate	= bcm_set_baudrate,
- 	.recv		= bcm_recv,
- 	.enqueue	= bcm_enqueue,
- 	.dequeue	= bcm_dequeue,
+-static inline int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
++static inline int btbcm_patchram(struct hci_dev *hdev, const struct firmware
++	*fw)
+ {
+ 	return -EOPNOTSUPP;
+ }
+@@ -57,4 +63,15 @@ static inline int btbcm_setup_apple(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++static inline int btbcm_initialize(struct hci_dev *hdev, char *fw_name,
++				   size_t len)
++{
++	return 0;
++}
++
++static inline int btbcm_finalize(struct hci_dev *hdev)
++{
++	return 0;
++}
++
+ #endif
 -- 
 1.9.1
+
