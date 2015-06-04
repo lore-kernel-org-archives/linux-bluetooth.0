@@ -1,181 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <55707624.4070300@linux.intel.com>
+Date: Thu, 04 Jun 2015 18:00:36 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <34869CD2-5D62-426D-91CF-9EB4B43FC14B@holtmann.org>
-References: <1433353221-12338-1-git-send-email-jpawlowski@google.com>
-	<34869CD2-5D62-426D-91CF-9EB4B43FC14B@holtmann.org>
-Date: Thu, 4 Jun 2015 11:50:38 -0700
-Message-ID: <CAD0=r8wHqapF=4MGWE1vTLdG9V9c3a-_D-ZPxtznhVKKsUaWNA@mail.gmail.com>
-Subject: Re: [PATCH v1] core: Fix connection to already paired device.
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: Ilya Faenson <ifaenson@broadcom.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/5] Broadcom Bluetooth UART device driver
+References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
+In-Reply-To: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel, Luiz,
+Hello Ilya,
 
-On Thu, Jun 4, 2015 at 4:33 AM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
-> Hi Jakub,
+On 03/06/2015 23:01, Ilya Faenson wrote:
+> This is a merge of the Broadcom Bluetooth UART logic with
+> the latest line discipline and protocol enhancements implemented
+> by Frederic Danis of Intel.
 >
->> Currently, when BlueZ tries to connect to already paired device that
->> just rotated its RPA MAC address, it would use old address and fail
->> to connect. In order to fix that, "General Connection Establisment
->> Procedure" must be used. It is already implemented in kernel.
->>
->> This patch changes connection procedure behaviour for paired devices.
->> Instead of directly calling "connect" with last known RPA, it'll add
->> device to kernel whitelist and start scan. If advertisement is received,
->> it'll be compared against whitelist and then trigger connection if it
->> matches.
->>
->> le_connect_timeout field was added to btd_device. If it's set, device
->> was marked for autoconnect because someone tried to connect to it. When
->> the connection is succesully estabilished, or after timeout this field
->> is cleared, and device is removed from autoconnect whitelist. It's value
->> is handle to timeout timer. If device is not found for 10 seconds, we
->> cancel connection procedure.
+> Ilya Faenson (5):
+>    Broadcom Bluetooth UART Device Tree bindings
+>    Intel based H4 line discipline enhancements
+>    Broadcom Bluetooth UART Platform Driver
+>    Broadcom Bluetooth protocol UART support
+>    BlueZ Broadcom UART Protocol
 >
-> I have to admit, this is a neat trick in fixing the issue without having =
-to update the kernel. However the Add Device API is not meant for single sh=
-ot connection attempts. You should really use L2CAP socket connect() call f=
-or that. And we really need to get that one fixed to handle devices for whi=
-ch we have their IRK, but the RPA might be expired.
+>   .../devicetree/bindings/net/bluetooth/btbcm.txt    |  82 +++
+>   drivers/bluetooth/Kconfig                          |   9 +
+>   drivers/bluetooth/Makefile                         |   1 +
+>   drivers/bluetooth/btbcm.c                          | 142 ++++-
+>   drivers/bluetooth/btbcm.h                          |  21 +-
+>   drivers/bluetooth/btbcm_uart.c                     | 673 +++++++++++++++++++++
+>   drivers/bluetooth/btbcm_uart.h                     |  89 +++
+>   drivers/bluetooth/hci_bcm.c                        | 481 ++++++++++++++-
+>   drivers/bluetooth/hci_ldisc.c                      | 110 +++-
+>   drivers/bluetooth/hci_uart.h                       |   6 +
+>   10 files changed, 1565 insertions(+), 49 deletions(-)
+>   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+>   create mode 100755 drivers/bluetooth/btbcm_uart.c
+>   create mode 100755 drivers/bluetooth/btbcm_uart.h
 >
 
-If fixing it in kernel is the right way to go, let's not bother with
-doing it in user space. I started looking into kernel code, and will
-fix it there, should have a patch soon.
+I applied your patches on top of mines and test them on a T100, it did 
+not work as expected with following traces:
 
-> Keep in mind that in theory the kernel can have the IRK for a device, but=
- is actually not paired with that device. That is a valid mode of operation=
-. If you now base everything around the fact the bluetoothd considers a dev=
-ice paired, this really only fixes part of the problem.
->
->> ---
->> src/device.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++=
-+++-
->> 1 file changed, 57 insertions(+), 1 deletion(-)
->>
->> diff --git a/src/device.c b/src/device.c
->> index ce96ab5..3fe52e4 100644
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -78,6 +78,7 @@
->>
->> #define IO_CAPABILITY_NOINPUTNOOUTPUT 0x03
->>
->> +#define LE_CONNECT_TIMEOUT 10
->> #define DISCONNECT_TIMER      2
->> #define DISCOVERY_TIMER               1
->>
->> @@ -256,6 +257,8 @@ struct btd_device {
->>       gboolean        disable_auto_connect;
->>       gboolean        general_connect;
->>
->> +     guint           le_connect_timeout;
->> +
->>       bool            legacy;
->>       int8_t          rssi;
->>       int8_t          tx_power;
->> @@ -2392,6 +2395,19 @@ void device_add_connection(struct btd_device *dev=
-, uint8_t bdaddr_type)
->> {
->>       struct bearer_state *state =3D get_state(dev, bdaddr_type);
->>
->> +     if (dev->le_connect_timeout) {
->> +             g_source_remove(dev->le_connect_timeout);
->> +             dev->le_connect_timeout =3D 0;
->> +             device_set_auto_connect(dev, false);
->> +
->> +             if (dev->connect) {
->> +                     g_dbus_send_message(dbus_conn,
->> +                             dbus_message_new_method_return(dev->connec=
-t));
->> +                     dbus_message_unref(dev->connect);
->> +                     dev->connect =3D NULL;
->> +             }
->> +     }
->> +
->>       device_update_last_seen(dev, bdaddr_type);
->>
->>       if (state->connected) {
->> @@ -4459,6 +4475,37 @@ static void att_error_cb(const GError *gerr, gpoi=
-nter user_data)
->>       }
->> }
->>
->> +static gboolean le_connect_timeout(gpointer user_data)
->> +{
->> +     struct btd_device *dev =3D user_data;
->> +     char addr[18];
->> +
->> +     ba2str(&dev->bdaddr, addr);
->> +     DBG("Connection attempt to: %s was aborted after timeout", addr);
->> +
->> +     if (!dev->le_connect_timeout)
->> +             return FALSE;
->> +
->> +     dev->le_connect_timeout =3D 0;
->> +     device_set_auto_connect(dev, false);
->> +
->> +     if (!dev->connect)
->> +             return FALSE;
->> +
->> +     if (dbus_message_is_method_call(dev->connect, DEVICE_INTERFACE,
->> +                                                             "Connect")=
-) {
->> +             DBG("returning response to %s",
->> +                                     dbus_message_get_sender(dev->conne=
-ct));
->> +
->> +             g_dbus_send_message(dbus_conn,
->> +                             btd_error_failed(dev->connect, strerror(20=
-)));
->> +             dbus_message_unref(dev->connect);
->> +             dev->connect =3D NULL;
->> +     }
->> +
->> +     return FALSE;
->> +}
->> +
->> int device_connect_le(struct btd_device *dev)
->> {
->>       struct btd_adapter *adapter =3D dev->adapter;
->> @@ -4469,13 +4516,22 @@ int device_connect_le(struct btd_device *dev)
->>       char addr[18];
->>
->>       /* There is one connection attempt going on */
->> -     if (dev->att_io)
->> +     if ((dev->le_state.paired && dev->auto_connect) || dev->att_io)
->>               return -EALREADY;
->>
->>       ba2str(&dev->bdaddr, addr);
->>
->>       DBG("Connection attempt to: %s", addr);
->>
->> +     if (dev->le_state.paired) {
->> +             device_set_auto_connect(dev, true);
->
-> Using this function to toggle auto-connect on/off on a frequent basis (me=
-aning each connection attempt) worries me a bit. Fundamentally the function=
- does not provide you any feedback on if the device is connected or if some=
-thing else is in progress or even if the actual Add Device management comma=
-nd succeeded or not.
->
-> I think that in case it happens that you cause this to be called for a de=
-vice that in the meantime connected, then you trigger the timeout and wrong=
-ly thing that you did not connect while in reality you already were connect=
-ed. So at minimum that case needs to be now taken out of device_set_auto_co=
-nnect function since it has a side effect now.
->
-> And in general this function is for profiles to just set the auto-connect=
- flag and move on. Success or failure was not their concern. However if you=
- use it for active connection establishment, then this is your concern. May=
-be you need some extra refactoring to make this available for a) profiles j=
-ust setting the flag and b) the core doing one-shot connection attempts.
->
-> Regards
->
-> Marcel
->
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409680] Bluetooth: HCI UART 
+driver ver 2.3
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409688] Bluetooth: HCI UART 
+protocol H4 registered
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409691] Bluetooth: HCI UART 
+protocol BCSP registered
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409693] Bluetooth: HCI UART 
+protocol LL registered
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409696] Bluetooth: HCI UART 
+protocol ATH3K registered
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409698] Bluetooth: HCI UART 
+protocol Three-wire (H5) registered
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409701] Bluetooth: HCI UART 
+protocol BCM registered
+Jun  4 17:42:00 fdanis-T100TA kernel: [  142.130205] NET: Registered 
+protocol family 38
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397482] hci_uart_tty_open: 
+tty ffff880074900000
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397551] hci_uart_tty_ioctl:
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397556] hci_uart_tty_ioctl:
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397560] bcm_open: bcm_open 
+hu ffff880036683d80
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397567] btbcm_uart_control: 
+btbcm_uart_control - configure callbacks
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397572] btbcm_uart_control: 
+btbcm_uart_control - configure callbacks for ttyS4(ffff880036683d80)
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397575] btbcm_uart_control: 
+btbcm_uart_control - no device!
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397579] bcm_open: bcm_open 
+failed to set driver callbacks -2
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397801] hci_uart_tty_close: 
+tty ffff880074900000
+
+Regards
+
+Fred
+
+-- 
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
