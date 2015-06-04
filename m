@@ -1,101 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55715DD0.4080802@broadcom.com>
-Date: Fri, 5 Jun 2015 10:29:04 +0200
-From: Arend van Spriel <arend@broadcom.com>
+From: Ilya Faenson <ifaenson@broadcom.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Arend Van Spriel <arend@broadcom.com>
+Subject: RE: [PATCH 0/5] Broadcom Bluetooth UART device driver
+Date: Thu, 4 Jun 2015 23:46:11 +0000
+Message-ID: <E0D3336E15B58B4294723AC879BA5E9425F11D@IRVEXCHMB15.corp.ad.broadcom.com>
+References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
+ <55707624.4070300@linux.intel.com>
+In-Reply-To: <55707624.4070300@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: Jonas Thiem <jonasthiem@googlemail.com>
-CC: Jeremiah Mahler <jmmahler@gmail.com>, <linux-kernel@vger.kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>, "linux-wireless@vger.kernel.org"
-	<linux-wireless@vger.kernel.org>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, Kalle Valo <kvalo@codeaurora.org>
-Subject: Re: Interaction issue of intel wifi and broadcom bluetooth - it appears
- that nobody feels responsible for doing something
-References: <CAD7Z2ho6KbK3VfO1rJdEX0RN5-trK0=ufYtma_7tMpYKUSq9UQ@mail.gmail.com> <20150605044527.GA16107@hudson.localdomain> <55712FC7.5030603@googlemail.com>
-In-Reply-To: <55712FC7.5030603@googlemail.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-+ Marcel, wireless list, and bt list.
+Hi Fred,
 
-On 06/05/15 07:12, Jonas Thiem wrote:
-> Hi Jeremiah,
+Appreciate you giving this code a try.
+
+This code includes a platform device. It needs to be instantiated. My customer's platform is ARM so I configure a Device Tree binding to instantiate a device (see the first patch on how it should be done). The binding must have the compatible id that the driver lists. That binding should also have all the relevant device parameters including the tty it is configured on ("ttyS4" in your case). The tty is used to map the BlueZ protocol instance into the platform device instance. We would not need it if multiple BT UART devices were not to be supported. It is Marcel's requirement to support multiple devices however. Now, your platform may be ACPI so you would then need to instantiate a device on the ACPI device node. I don't have Linux running on the ACPI hardware at the moment so I've not tried adapting this code to ACPI. Would be great if you could help us with that. :-) You do know all the parameters for the device: I've specified them to you on a separate thread.
+
+Looking forward to further progress!
+ -Ilya
+
+-----Original Message-----
+From: Frederic Danis [mailto:frederic.danis@linux.intel.com] 
+Sent: Thursday, June 04, 2015 12:01 PM
+To: Ilya Faenson
+Cc: Marcel Holtmann; linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/5] Broadcom Bluetooth UART device driver
+
+Hello Ilya,
+
+On 03/06/2015 23:01, Ilya Faenson wrote:
+> This is a merge of the Broadcom Bluetooth UART logic with
+> the latest line discipline and protocol enhancements implemented
+> by Frederic Danis of Intel.
 >
-> thanks for responding!
+> Ilya Faenson (5):
+>    Broadcom Bluetooth UART Device Tree bindings
+>    Intel based H4 line discipline enhancements
+>    Broadcom Bluetooth UART Platform Driver
+>    Broadcom Bluetooth protocol UART support
+>    BlueZ Broadcom UART Protocol
 >
-> I did have my mobile phone very nearby also connected to the bluetooth
-> headphones while my laptop was still using 11n wifi. I didn't have any
-> noticeable issues with bluetooth there.
+>   .../devicetree/bindings/net/bluetooth/btbcm.txt    |  82 +++
+>   drivers/bluetooth/Kconfig                          |   9 +
+>   drivers/bluetooth/Makefile                         |   1 +
+>   drivers/bluetooth/btbcm.c                          | 142 ++++-
+>   drivers/bluetooth/btbcm.h                          |  21 +-
+>   drivers/bluetooth/btbcm_uart.c                     | 673 +++++++++++++++++++++
+>   drivers/bluetooth/btbcm_uart.h                     |  89 +++
+>   drivers/bluetooth/hci_bcm.c                        | 481 ++++++++++++++-
+>   drivers/bluetooth/hci_ldisc.c                      | 110 +++-
+>   drivers/bluetooth/hci_uart.h                       |   6 +
+>   10 files changed, 1565 insertions(+), 49 deletions(-)
+>   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+>   create mode 100755 drivers/bluetooth/btbcm_uart.c
+>   create mode 100755 drivers/bluetooth/btbcm_uart.h
 >
-> But I got the feeling that my phone's android drivers + hardware for
-> bluetooth are tuned better than the laptop ones, so maybe that just
-> means the phone is just better at jumping frequencies to avoid.
->
-> I guess the best test would be the same laptop model in direct
-> proximity, but sadly I only own that laptop once. ;)
->
-> I hope wireless interference wouldn't rule out that some driver work
-> would be considered to make it work better - after all, both chips are
-> in the same laptop and as per the intel comment, bluetooth is supposed
-> to work despite of wifi activity.
->
-> Regards,
-> Jonas Thiem
->
-> On 06/05/2015 06:45 AM, Jeremiah Mahler wrote:
->> Jonas,
->>
->> On Fri, Jun 05, 2015 at 01:00:32AM +0200, Jonas Thiem wrote:
->>> Hi *,
->>>
->>> this is my first post to this mailing list, sorry if it's not supposed
->>> to go here. (also CC in responses would be nice since I'm not
->>> subscribed)
->>>
->>> I filed a bug about an intel centrino wifi interaction with broadcom's BCM2045B:
->>> https://bugzilla.kernel.org/show_bug.cgi?id=97101
->>>
->> Those are some unhelpful replies :-(
 
-Indeed. Now my reply maybe of a similar nature as my knowledge of the 
-bluetooth part is next to nil.
+I applied your patches on top of mines and test them on a T100, it did 
+not work as expected with following traces:
 
->>> In short, the two seem to kinda fight over the wireless spectrum and
->>> both drop connections all the time - unless the 'iwlwifi' module is
->>> loaded with 11n_disabled=1.
->>>
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409680] Bluetooth: HCI UART 
+driver ver 2.3
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409688] Bluetooth: HCI UART 
+protocol H4 registered
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409691] Bluetooth: HCI UART 
+protocol BCSP registered
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409693] Bluetooth: HCI UART 
+protocol LL registered
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409696] Bluetooth: HCI UART 
+protocol ATH3K registered
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409698] Bluetooth: HCI UART 
+protocol Three-wire (H5) registered
+Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409701] Bluetooth: HCI UART 
+protocol BCM registered
+Jun  4 17:42:00 fdanis-T100TA kernel: [  142.130205] NET: Registered 
+protocol family 38
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397482] hci_uart_tty_open: 
+tty ffff880074900000
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397551] hci_uart_tty_ioctl:
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397556] hci_uart_tty_ioctl:
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397560] bcm_open: bcm_open 
+hu ffff880036683d80
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397567] btbcm_uart_control: 
+btbcm_uart_control - configure callbacks
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397572] btbcm_uart_control: 
+btbcm_uart_control - configure callbacks for ttyS4(ffff880036683d80)
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397575] btbcm_uart_control: 
+btbcm_uart_control - no device!
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397579] bcm_open: bcm_open 
+failed to set driver callbacks -2
+Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397801] hci_uart_tty_close: 
+tty ffff880074900000
 
-I guess you don't have a choice about the channel your access point is 
-operating on. If you can you might move wifi channel to 5GHz although 
-that will likely affect your range.
+Regards
 
-To get more info on your setup here a couple of questions.
+Fred
 
-What type of device are we talking about here?
-Bugzilla mentions Thinkpad X220, is that correct?
-Is your AP setup for 40MHz bandwidth?
+-- 
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
 
-I suppose both wifi and bt have their own antennas. When sharing 
-antennas it needs to be coordinated who is using the antennas. This is 
-called bt-coex. As said I don't think this is the case for your device, 
-but if so I think there is still major development task needed as I saw 
-email from Marcel about plans to develop a bt-coex subsystem in the 
-kernel. Not sure if that also covers the case where bt and wifi do not 
-share antennas.
-
-Regards,
-Arend
-
->> I don't have a solution but I think the problem is interesting.
->>
->> Both Bluetooth and 11n share the same frequency band near 2.4 GHz so it
->> is possible that they could conflict.  If you had two laptops, and you
->> ran just Bluetooth on one and just 11n on the other, would they
->> both have problems?  This would tell as whether it was something inside
->> the kernel or if it was really wireless interference.
->>
->> [...]
->>>
->>> Regards,
->>> Jonas Thiem
->>
->
