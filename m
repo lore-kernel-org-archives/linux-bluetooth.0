@@ -1,51 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: "An, Tedd" <tedd.an@intel.com>
-To: "Poulain, Loic" <loic.poulain@intel.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHv2] Bluetooth: btusb: Fix Intel controller hang after
- shutdown
-Date: Thu, 4 Jun 2015 19:55:32 +0000
-Message-ID: <41F028F6-E05E-4816-ACE8-3B0F121F2081@intel.com>
-References: <1432218957-3400-1-git-send-email-loic.poulain@intel.com>
- <69A96222-5518-4341-9F0B-32F3CEACCC35@holtmann.org>
- <55703D8F.6010602@intel.com>
-In-Reply-To: <55703D8F.6010602@intel.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Thu, 4 Jun 2015 21:06:26 +0200
+From: Mateusz Lemusisk <mrlemux@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] client: Display address if calling 'disconnect' without
+ arguments
+Message-ID: <20150604190626.GA6440@localhost.Belkin>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTG9pYw0KDQoNCg0KT24gNi80LzE1LCA0OjU5IEFNLCAiUG91bGFpbiwgTG9pYyIgPGxvaWMu
-cG91bGFpbkBpbnRlbC5jb20+IHdyb3RlOg0KDQo+SGkgdGVkZCwNCj4NCj5PbiAyMS8wNS8yMDE1
-IDIxOjU2LCBNYXJjZWwgSG9sdG1hbm4gd3JvdGU6DQo+PiBIaSBUZWRkLA0KPj4NCj4+PiBUaGUg
-dmVuZG9yIGNvbW1hbmQgKDB4ZmMzZikgaW4gYnR1c2Jfc2h1dGRvd25faW50ZWwgY2F1c2VzIGFu
-IGludGVybmFsDQo+Pj4gcmVzZXQgd2l0aCBvbGQgZmlybXdhcmUuIEFmdGVyIHRoYXQsIHVwY29t
-aW5nIEhDSSBjb21tYW5kIHdpbGwgaGFuZyBkdWUNCj4+PiB0byBhIGNvbnRyb2xsZXIgYnVnIHdp
-dGggdGhlIGZpcnN0IEhDSSBjb21tYW5kIHNlbnQgdG8gaXQuDQo+Pj4gVGhlIHdvcmthcm91bmQg
-aXMgdG8gc2VuZCBIQ0kgUmVzZXQgY29tbWFuZCBmaXJzdCB3aGljaCB3aWxsIHJlc2V0IHRoZQ0K
-Pj4+IG51bWJlciBvZiBjb21wbGV0ZWQgY29tbWFuZHMuDQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5
-OiBMb2ljIFBvdWxhaW4gPGxvaWMucG91bGFpbkBpbnRlbC5jb20+DQo+Pj4gLS0tDQo+Pj4gdjI6
-IFNlbmQgSENJIHJlc2V0IGZyb20gc2h1dGRvd24gaW5zdGVhZCBvZiB1c2luZyBIQ0lfUVVJUktf
-UkVTRVRfT05fQ0xPU0UNCj4+PiBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIHwgMTMgKysrKysr
-KysrKysrKw0KPj4+IDEgZmlsZSBjaGFuZ2VkLCAxMyBpbnNlcnRpb25zKCspDQo+Pj4NCj4+PiBk
-aWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3Ro
-L2J0dXNiLmMNCj4+PiBpbmRleCBkMjFmM2I0Li41ODlmMzBjIDEwMDY0NA0KPj4+IC0tLSBhL2Ry
-aXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4+PiArKysgYi9kcml2ZXJzL2JsdWV0b290aC9idHVz
-Yi5jDQo+Pj4gQEAgLTI3MDUsNiArMjcwNSwxOSBAQCBzdGF0aWMgaW50IGJ0dXNiX3NodXRkb3du
-X2ludGVsKHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0KPj4+IAl9DQo+Pj4gCWtmcmVlX3NrYihza2Ip
-Ow0KPj4+DQo+Pj4gKwkvKiBUaGUgMHhmYzNmIGNvbW1hbmQgY2F1c2VzIGFuIGludGVybmFsIHJl
-c2V0IHdpdGggb2xkIGZpcm13YXJlLg0KPj4+ICsJICogSW4gb3JkZXIgdG8gYXZvaWQgdGhlIEJ1
-ZyB3aXRoIHRoZSBmaXJzdCBIQ0kgY29tbWFuZCwgd2UgaGF2ZQ0KPj4+ICsJICogdG8gc2VuZCBh
-IEhDSSByZXNldCB3aGljaCB3aWxsIHJlc2V0IHRoZSBudW1iZXIgb2YgY29tcGxldGVkDQo+Pj4g
-KwkgKiBjb21tYW5kLg0KPj4+ICsJICovDQo+Pj4gKwlza2IgPSBfX2hjaV9jbWRfc3luYyhoZGV2
-LCBIQ0lfT1BfUkVTRVQsIDAsIE5VTEwsIEhDSV9JTklUX1RJTUVPVVQpOw0KPj4+ICsJaWYgKElT
-X0VSUihza2IpKSB7DQo+Pj4gKwkJQlRfRVJSKCIlczogU2h1dGRvd24gSENJIHJlc2V0IGNvbW1h
-bmQgZmFpbGVkICglbGQpIiwNCj4+PiArCQkJaGRldi0+bmFtZSwgUFRSX0VSUihza2IpKTsNCj4+
-PiArCQlyZXR1cm4gUFRSX0VSUihza2IpOw0KPj4+ICsJfQ0KPj4+ICsJa2ZyZWVfc2tiKHNrYik7
-DQo+Pj4gKw0KPj4gcGxlYXNlIHRlc3QgdGhpcyBjaGFuZ2UgYW5kIHNlZSBpZiBpdCBzdGlsbCBo
-YXMgdGhlIGRlc2lyZWQgZWZmZWN0LiBBQ0sgb3IgTkFDSyB0aGUgcGF0Y2ggYmFzZWQgb24geW91
-ciB0ZXN0aW5nLg0KPj4NCj4+IFJlZ2FyZHMNCj4+DQo+PiBNYXJjZWwNCj4+DQo+DQo+QW55IGNo
-YW5jZSB5b3UgdGVzdCB0aGlzIHBhdGNoPw0KDQpJIG1pc3NlZCB5b3VyIHBhdGNoIGFuZCBqdXN0
-IGdvdCBpdC4gSSB3aWxsIHJ1biB0aGlzIHRlc3QgYW5kIGxldCB5b3Uga25vdyB0aGUgcmVzdWx0
-Lg0KDQo+DQo+UmVnYXJkcywNCj5Mb2ljDQo+DQo+LS0gDQo+SW50ZWwgT3BlbiBTb3VyY2UgVGVj
-aG5vbG9neSBDZW50ZXINCj5odHRwOi8vb3NzLmludGVsLmNvbS8NCj4NCg==
+Before:
+
+[PHILIPS BTM2180]# disconnect
+Attempting to disconnect from
+Successful disconnected
+
+After:
+
+[PHILIPS BTM2180]# disconnect
+Attempting to disconnect from XX:XX:XX:XX:XX:XX
+Successful disconnected
+
+---
+ client/main.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/client/main.c b/client/main.c
+index 41e95b2..88ae5ed 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1422,7 +1422,19 @@ static void cmd_disconn(const char *arg)
+ 		return;
+ 	}
+ 
+-	rl_printf("Attempting to disconnect from %s\n", arg);
++	if (strlen(arg) == 0) {
++		const char *default_address;
++		DBusMessageIter iter;
++
++		if (g_dbus_proxy_get_property(proxy, "Address", &iter) == FALSE)
++			default_address = "";
++		else
++			dbus_message_iter_get_basic(&iter, &default_address);
++
++		rl_printf("Attempting to disconnect from %s\n", default_address);
++	} else {
++		rl_printf("Attempting to disconnect from %s\n", arg);
++	}
+ }
+ 
+ static void cmd_list_attributes(const char *arg)
+-- 
+2.4.2
+
