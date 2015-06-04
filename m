@@ -1,87 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55707624.4070300@linux.intel.com>
-Date: Thu, 04 Jun 2015 18:00:36 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
+Message-ID: <55703D8F.6010602@intel.com>
+Date: Thu, 04 Jun 2015 13:59:11 +0200
+From: Loic Poulain <loic.poulain@intel.com>
 MIME-Version: 1.0
-To: Ilya Faenson <ifaenson@broadcom.com>
+To: tedd.an@intel.com
 CC: Marcel Holtmann <marcel@holtmann.org>,
  linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/5] Broadcom Bluetooth UART device driver
-References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
-In-Reply-To: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
+Subject: Re: [PATCHv2] Bluetooth: btusb: Fix Intel controller hang after shutdown
+References: <1432218957-3400-1-git-send-email-loic.poulain@intel.com> <69A96222-5518-4341-9F0B-32F3CEACCC35@holtmann.org>
+In-Reply-To: <69A96222-5518-4341-9F0B-32F3CEACCC35@holtmann.org>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Ilya,
+Hi tedd,
 
-On 03/06/2015 23:01, Ilya Faenson wrote:
-> This is a merge of the Broadcom Bluetooth UART logic with
-> the latest line discipline and protocol enhancements implemented
-> by Frederic Danis of Intel.
+On 21/05/2015 21:56, Marcel Holtmann wrote:
+> Hi Tedd,
 >
-> Ilya Faenson (5):
->    Broadcom Bluetooth UART Device Tree bindings
->    Intel based H4 line discipline enhancements
->    Broadcom Bluetooth UART Platform Driver
->    Broadcom Bluetooth protocol UART support
->    BlueZ Broadcom UART Protocol
+>> The vendor command (0xfc3f) in btusb_shutdown_intel causes an internal
+>> reset with old firmware. After that, upcoming HCI command will hang due
+>> to a controller bug with the first HCI command sent to it.
+>> The workaround is to send HCI Reset command first which will reset the
+>> number of completed commands.
+>>
+>> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+>> ---
+>> v2: Send HCI reset from shutdown instead of using HCI_QUIRK_RESET_ON_CLOSE
+>> drivers/bluetooth/btusb.c | 13 +++++++++++++
+>> 1 file changed, 13 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index d21f3b4..589f30c 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -2705,6 +2705,19 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
+>> 	}
+>> 	kfree_skb(skb);
+>>
+>> +	/* The 0xfc3f command causes an internal reset with old firmware.
+>> +	 * In order to avoid the Bug with the first HCI command, we have
+>> +	 * to send a HCI reset which will reset the number of completed
+>> +	 * command.
+>> +	 */
+>> +	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+>> +	if (IS_ERR(skb)) {
+>> +		BT_ERR("%s: Shutdown HCI reset command failed (%ld)",
+>> +			hdev->name, PTR_ERR(skb));
+>> +		return PTR_ERR(skb);
+>> +	}
+>> +	kfree_skb(skb);
+>> +
+> please test this change and see if it still has the desired effect. ACK or NACK the patch based on your testing.
 >
->   .../devicetree/bindings/net/bluetooth/btbcm.txt    |  82 +++
->   drivers/bluetooth/Kconfig                          |   9 +
->   drivers/bluetooth/Makefile                         |   1 +
->   drivers/bluetooth/btbcm.c                          | 142 ++++-
->   drivers/bluetooth/btbcm.h                          |  21 +-
->   drivers/bluetooth/btbcm_uart.c                     | 673 +++++++++++++++++++++
->   drivers/bluetooth/btbcm_uart.h                     |  89 +++
->   drivers/bluetooth/hci_bcm.c                        | 481 ++++++++++++++-
->   drivers/bluetooth/hci_ldisc.c                      | 110 +++-
->   drivers/bluetooth/hci_uart.h                       |   6 +
->   10 files changed, 1565 insertions(+), 49 deletions(-)
->   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
->   create mode 100755 drivers/bluetooth/btbcm_uart.c
->   create mode 100755 drivers/bluetooth/btbcm_uart.h
+> Regards
+>
+> Marcel
 >
 
-I applied your patches on top of mines and test them on a T100, it did 
-not work as expected with following traces:
+Any chance you test this patch?
 
-Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409680] Bluetooth: HCI UART 
-driver ver 2.3
-Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409688] Bluetooth: HCI UART 
-protocol H4 registered
-Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409691] Bluetooth: HCI UART 
-protocol BCSP registered
-Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409693] Bluetooth: HCI UART 
-protocol LL registered
-Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409696] Bluetooth: HCI UART 
-protocol ATH3K registered
-Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409698] Bluetooth: HCI UART 
-protocol Three-wire (H5) registered
-Jun  4 17:41:43 fdanis-T100TA kernel: [  125.409701] Bluetooth: HCI UART 
-protocol BCM registered
-Jun  4 17:42:00 fdanis-T100TA kernel: [  142.130205] NET: Registered 
-protocol family 38
-Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397482] hci_uart_tty_open: 
-tty ffff880074900000
-Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397551] hci_uart_tty_ioctl:
-Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397556] hci_uart_tty_ioctl:
-Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397560] bcm_open: bcm_open 
-hu ffff880036683d80
-Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397567] btbcm_uart_control: 
-btbcm_uart_control - configure callbacks
-Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397572] btbcm_uart_control: 
-btbcm_uart_control - configure callbacks for ttyS4(ffff880036683d80)
-Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397575] btbcm_uart_control: 
-btbcm_uart_control - no device!
-Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397579] bcm_open: bcm_open 
-failed to set driver callbacks -2
-Jun  4 17:43:21 fdanis-T100TA kernel: [  223.397801] hci_uart_tty_close: 
-tty ffff880074900000
-
-Regards
-
-Fred
+Regards,
+Loic
 
 -- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
+Intel Open Source Technology Center
+http://oss.intel.com/
