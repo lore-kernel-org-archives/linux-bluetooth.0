@@ -1,56 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 4 Jun 2015 21:06:26 +0200
-From: Mateusz Lemusisk <mrlemux@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] client: Display address if calling 'disconnect' without
- arguments
-Message-ID: <20150604190626.GA6440@localhost.Belkin>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <34869CD2-5D62-426D-91CF-9EB4B43FC14B@holtmann.org>
+References: <1433353221-12338-1-git-send-email-jpawlowski@google.com>
+	<34869CD2-5D62-426D-91CF-9EB4B43FC14B@holtmann.org>
+Date: Thu, 4 Jun 2015 11:50:38 -0700
+Message-ID: <CAD0=r8wHqapF=4MGWE1vTLdG9V9c3a-_D-ZPxtznhVKKsUaWNA@mail.gmail.com>
+Subject: Re: [PATCH v1] core: Fix connection to already paired device.
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Before:
+Hi Marcel, Luiz,
 
-[PHILIPS BTM2180]# disconnect
-Attempting to disconnect from
-Successful disconnected
+On Thu, Jun 4, 2015 at 4:33 AM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+> Hi Jakub,
+>
+>> Currently, when BlueZ tries to connect to already paired device that
+>> just rotated its RPA MAC address, it would use old address and fail
+>> to connect. In order to fix that, "General Connection Establisment
+>> Procedure" must be used. It is already implemented in kernel.
+>>
+>> This patch changes connection procedure behaviour for paired devices.
+>> Instead of directly calling "connect" with last known RPA, it'll add
+>> device to kernel whitelist and start scan. If advertisement is received,
+>> it'll be compared against whitelist and then trigger connection if it
+>> matches.
+>>
+>> le_connect_timeout field was added to btd_device. If it's set, device
+>> was marked for autoconnect because someone tried to connect to it. When
+>> the connection is succesully estabilished, or after timeout this field
+>> is cleared, and device is removed from autoconnect whitelist. It's value
+>> is handle to timeout timer. If device is not found for 10 seconds, we
+>> cancel connection procedure.
+>
+> I have to admit, this is a neat trick in fixing the issue without having =
+to update the kernel. However the Add Device API is not meant for single sh=
+ot connection attempts. You should really use L2CAP socket connect() call f=
+or that. And we really need to get that one fixed to handle devices for whi=
+ch we have their IRK, but the RPA might be expired.
+>
 
-After:
+If fixing it in kernel is the right way to go, let's not bother with
+doing it in user space. I started looking into kernel code, and will
+fix it there, should have a patch soon.
 
-[PHILIPS BTM2180]# disconnect
-Attempting to disconnect from XX:XX:XX:XX:XX:XX
-Successful disconnected
-
----
- client/main.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/client/main.c b/client/main.c
-index 41e95b2..88ae5ed 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1422,7 +1422,19 @@ static void cmd_disconn(const char *arg)
- 		return;
- 	}
- 
--	rl_printf("Attempting to disconnect from %s\n", arg);
-+	if (strlen(arg) == 0) {
-+		const char *default_address;
-+		DBusMessageIter iter;
-+
-+		if (g_dbus_proxy_get_property(proxy, "Address", &iter) == FALSE)
-+			default_address = "";
-+		else
-+			dbus_message_iter_get_basic(&iter, &default_address);
-+
-+		rl_printf("Attempting to disconnect from %s\n", default_address);
-+	} else {
-+		rl_printf("Attempting to disconnect from %s\n", arg);
-+	}
- }
- 
- static void cmd_list_attributes(const char *arg)
--- 
-2.4.2
-
+> Keep in mind that in theory the kernel can have the IRK for a device, but=
+ is actually not paired with that device. That is a valid mode of operation=
+. If you now base everything around the fact the bluetoothd considers a dev=
+ice paired, this really only fixes part of the problem.
+>
+>> ---
+>> src/device.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++=
++++-
+>> 1 file changed, 57 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/src/device.c b/src/device.c
+>> index ce96ab5..3fe52e4 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -78,6 +78,7 @@
+>>
+>> #define IO_CAPABILITY_NOINPUTNOOUTPUT 0x03
+>>
+>> +#define LE_CONNECT_TIMEOUT 10
+>> #define DISCONNECT_TIMER      2
+>> #define DISCOVERY_TIMER               1
+>>
+>> @@ -256,6 +257,8 @@ struct btd_device {
+>>       gboolean        disable_auto_connect;
+>>       gboolean        general_connect;
+>>
+>> +     guint           le_connect_timeout;
+>> +
+>>       bool            legacy;
+>>       int8_t          rssi;
+>>       int8_t          tx_power;
+>> @@ -2392,6 +2395,19 @@ void device_add_connection(struct btd_device *dev=
+, uint8_t bdaddr_type)
+>> {
+>>       struct bearer_state *state =3D get_state(dev, bdaddr_type);
+>>
+>> +     if (dev->le_connect_timeout) {
+>> +             g_source_remove(dev->le_connect_timeout);
+>> +             dev->le_connect_timeout =3D 0;
+>> +             device_set_auto_connect(dev, false);
+>> +
+>> +             if (dev->connect) {
+>> +                     g_dbus_send_message(dbus_conn,
+>> +                             dbus_message_new_method_return(dev->connec=
+t));
+>> +                     dbus_message_unref(dev->connect);
+>> +                     dev->connect =3D NULL;
+>> +             }
+>> +     }
+>> +
+>>       device_update_last_seen(dev, bdaddr_type);
+>>
+>>       if (state->connected) {
+>> @@ -4459,6 +4475,37 @@ static void att_error_cb(const GError *gerr, gpoi=
+nter user_data)
+>>       }
+>> }
+>>
+>> +static gboolean le_connect_timeout(gpointer user_data)
+>> +{
+>> +     struct btd_device *dev =3D user_data;
+>> +     char addr[18];
+>> +
+>> +     ba2str(&dev->bdaddr, addr);
+>> +     DBG("Connection attempt to: %s was aborted after timeout", addr);
+>> +
+>> +     if (!dev->le_connect_timeout)
+>> +             return FALSE;
+>> +
+>> +     dev->le_connect_timeout =3D 0;
+>> +     device_set_auto_connect(dev, false);
+>> +
+>> +     if (!dev->connect)
+>> +             return FALSE;
+>> +
+>> +     if (dbus_message_is_method_call(dev->connect, DEVICE_INTERFACE,
+>> +                                                             "Connect")=
+) {
+>> +             DBG("returning response to %s",
+>> +                                     dbus_message_get_sender(dev->conne=
+ct));
+>> +
+>> +             g_dbus_send_message(dbus_conn,
+>> +                             btd_error_failed(dev->connect, strerror(20=
+)));
+>> +             dbus_message_unref(dev->connect);
+>> +             dev->connect =3D NULL;
+>> +     }
+>> +
+>> +     return FALSE;
+>> +}
+>> +
+>> int device_connect_le(struct btd_device *dev)
+>> {
+>>       struct btd_adapter *adapter =3D dev->adapter;
+>> @@ -4469,13 +4516,22 @@ int device_connect_le(struct btd_device *dev)
+>>       char addr[18];
+>>
+>>       /* There is one connection attempt going on */
+>> -     if (dev->att_io)
+>> +     if ((dev->le_state.paired && dev->auto_connect) || dev->att_io)
+>>               return -EALREADY;
+>>
+>>       ba2str(&dev->bdaddr, addr);
+>>
+>>       DBG("Connection attempt to: %s", addr);
+>>
+>> +     if (dev->le_state.paired) {
+>> +             device_set_auto_connect(dev, true);
+>
+> Using this function to toggle auto-connect on/off on a frequent basis (me=
+aning each connection attempt) worries me a bit. Fundamentally the function=
+ does not provide you any feedback on if the device is connected or if some=
+thing else is in progress or even if the actual Add Device management comma=
+nd succeeded or not.
+>
+> I think that in case it happens that you cause this to be called for a de=
+vice that in the meantime connected, then you trigger the timeout and wrong=
+ly thing that you did not connect while in reality you already were connect=
+ed. So at minimum that case needs to be now taken out of device_set_auto_co=
+nnect function since it has a side effect now.
+>
+> And in general this function is for profiles to just set the auto-connect=
+ flag and move on. Success or failure was not their concern. However if you=
+ use it for active connection establishment, then this is your concern. May=
+be you need some extra refactoring to make this available for a) profiles j=
+ust setting the flag and b) the core doing one-shot connection attempts.
+>
+> Regards
+>
+> Marcel
+>
