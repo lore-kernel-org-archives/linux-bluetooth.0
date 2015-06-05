@@ -1,148 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Marcel Holtmann' <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, bharat.panda@samsung.com
-References: <1433413568-26382-1-git-send-email-gowtham.ab@samsung.com>
- <1433413568-26382-2-git-send-email-gowtham.ab@samsung.com>
- <399E856C-28E8-4A5A-98AB-BFB037680906@holtmann.org>
-In-reply-to: <399E856C-28E8-4A5A-98AB-BFB037680906@holtmann.org>
-Subject: RE: [PATCH  2/2] emulator/le: Add LE test commands
-Date: Fri, 05 Jun 2015 17:45:18 +0530
-Message-id: <000601d09f89$58a9e6d0$09fdb470$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+From: Aleksey <info@dv2c.ru>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btusb: add one more device to fixed Invalid initialization bug for kernel since 3.x
+Date: Fri, 05 Jun 2015 15:12:50 +0300
+Message-ID: <4734021.0ryETfeH92@it1765>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+That patch correct typo in "Roper Class 1 Bluetooth Dongle" since 4.x kernel
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Marcel Holtmann
-> Sent: Thursday, June 04, 2015 4:29 PM
-> To: Gowtham Anandha Babu
-> Cc: linux-bluetooth@vger.kernel.org; bharat.panda@samsung.com
-> Subject: Re: [PATCH 2/2] emulator/le: Add LE test commands
-> 
-> Hi Gowtham,
-> 
-> > ---
-> > emulator/le.c | 45 ++++++++++++++++++++++++++++++++++++++++++--
-> -
-> > 1 file changed, 42 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/emulator/le.c b/emulator/le.c index dc51469..7f852a9
-> > 100644
-> > --- a/emulator/le.c
-> > +++ b/emulator/le.c
-> > @@ -258,9 +258,9 @@ static void reset_defaults(struct bt_le *hci)
-> > 	//hci->commands[28] |= 0x02;	/* LE Long Term Key Request Reply
-> */
-> > 	//hci->commands[28] |= 0x04;	/* LE Long Term Key Request
-> Negative Reply */
-> > 	hci->commands[28] |= 0x08;	/* LE Read Supported States */
-> > -	//hci->commands[28] |= 0x10;	/* LE Receiver Test */
-> > -	//hci->commands[28] |= 0x20;	/* LE Transmitter Test */
-> > -	//hci->commands[28] |= 0x40;	/* LE Test End */
-> > +	hci->commands[28] |= 0x10;	/* LE Receiver Test */
-> > +	hci->commands[28] |= 0x20;	/* LE Transmitter Test */
-> > +	hci->commands[28] |= 0x40;	/* LE Test End */
-> > 	//hci->commands[33] |= 0x10;	/* LE Remote Connection Parameter
-> Request Reply */
-> > 	//hci->commands[33] |= 0x20;	/* LE Remote Connection Parameter
-> Request Negative Reply */
-> > 	hci->commands[33] |= 0x40;	/* LE Set Data Length */
-> > @@ -1218,6 +1218,36 @@ static void
-> cmd_le_read_supported_states(struct bt_le *hci,
-> > 							&rsp, sizeof(rsp));
-> > }
-> >
-> > +static void cmd_le_receiver_test(struct bt_le *hci,
-> > +						const void *data, uint8_t
-size)
-> {
-> > +	uint8_t status;
-> > +
-> > +	status = BT_HCI_ERR_SUCCESS;
-> > +	cmd_complete(hci, BT_HCI_CMD_LE_RECEIVER_TEST,
-> > +					&status, sizeof(status));
-> > +}
-> > +
-> > +static void cmd_le_transmitter_test(struct bt_le *hci,
-> > +						const void *data, uint8_t
-size)
-> {
-> > +	uint8_t status;
-> > +
-> > +	status = BT_HCI_ERR_SUCCESS;
-> > +	cmd_complete(hci, BT_HCI_CMD_LE_TRANSMITTER_TEST,
-> > +					&status, sizeof(status));
-> > +}
-> > +
-> > +static void cmd_le_end_test(struct bt_le *hci, const void *data,
-> > +uint8_t size) {
-> > +	struct bt_hci_rsp_le_test_end lte;
-> > +
-> > +	lte.status = BT_HCI_ERR_SUCCESS;
-> > +	lte.num_packets = 0;
-> > +
-> > +	cmd_complete(hci, BT_HCI_CMD_LE_TEST_END, &lte, sizeof(lte)); }
-> > +
-> 
-> this is actually not enough. You need to put a bit of logic into this
-code. For
-> example it is either RX or TX test and not both at the same time. You need
-to
-> return proper errors. And the test end command you also return the correct
-> value for num_packets. So if you do a receiver test against a transmitter
-test
-> you are getting some useful values here. Otherwise there are just empty
-> stubs and we better not bother having them at all.
-> 
+Content /sys/kernel/debug/usb/devices for these dongle:
 
-Thanks for the quick review.
-Below are the assumptions that I want to clarify:
-1) Need to check  rx_chan and tx_chan are in 0x00 to 0x27 range, if not
-return BT_HCI_ERR_INVALID_PARAMETERS.
-
-2) Need to maintain a global variable (rx_test, tx_test) to track which test
-is going on. 
-
-3) When receiver test is called, a global variable (pkt_recv ) is
-incremented to track  num of packets received.
-
-Or Should I maintain a structure for (2) & (3) instead of maintaining
-globals?
-
-4) Finally while test end cmd,
-	If (tx_test)
-		num_packets = 0;
-	else if (rx_test) {
-		num_packets = pkt_recv;
-		pkt_recv = 0;
-	}
+T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=1310 ProdID=0001 Rev=15.00
+S:  Manufacturer=SiW
+S:  Product=SiW
+S:  SerialNumber=E7BB050D0B00
+C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr= 50mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
 
-Is there any tool to test the above commands?
-If not I can add these commands to any of the tools (hcitool, I guess) for
-testing (If it is worth to add in BlueZ, then I will send them as patches
-too).
 
-> The standalone LE emulation in btvirt is trying really hard to have proper
-and
-> correct error handling for LE only single mode controller.
-> 
-> Regards
-> 
-> Marcel
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Aleksei Volkov <info@dv2c.ru>
+---
+ drivers/bluetooth/btusb.c | 1+-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Best Regards,
-Gowtham Anandha Babu
-
-
+diff -up linux-4.0.0-gentoo/drivers/bluetooth/btusb.c.orig linux-4.0.0-
+gentoo/drivers/bluetooth/btusb.c 
+--- linux-4.0.0/drivers/bluetooth/btusb.c.orig	2015-05-01 12:06:59.000000000 
++0300
++++ linux-4.0.0/drivers/bluetooth/btusb.c	2015-05-07 22:22:13.000000000 
++0300
+@@ -254,6 +254,6 @@ static const struct usb_device_id blackl
+ 
+ 	/* Roper Class 1 Bluetooth Dongle (Silicon Wave based) */
+-	{ USB_DEVICE(0x1300, 0x0001), .driver_info = BTUSB_SWAVE },
++	{ USB_DEVICE(0x1310, 0x0001), .driver_info = BTUSB_SWAVE },
+ 
+ 	/* Digianswer devices */
+ 	{ USB_DEVICE(0x08fd, 0x0001), .driver_info = BTUSB_DIGIANSWER },
+-- 
