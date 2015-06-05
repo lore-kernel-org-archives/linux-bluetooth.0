@@ -1,83 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix race condition with user channel and setup stage
-Date: Sat,  6 Jun 2015 06:06:49 +0200
-Message-Id: <1433563609-75812-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Dean Jenkins <Dean_Jenkins@mentor.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <marcel@holtmann.org>, <gustavo@padovan.org>, <johan.hedberg@gmail.com>,
+	<Joshua_Frkuska@mentor.com>, Dean Jenkins <Dean_Jenkins@mentor.com>
+Subject: [PATCH v1 7/7] Bluetooth: __l2cap_wait_ack() limit max waiting time
+Date: Sat, 6 Jun 2015 00:11:16 +0100
+Message-ID: <1433545876-15800-8-git-send-email-Dean_Jenkins@mentor.com>
+In-Reply-To: <1433545876-15800-1-git-send-email-Dean_Jenkins@mentor.com>
+References: <1433545876-15800-1-git-send-email-Dean_Jenkins@mentor.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-During the initial setup stage of a controller, the low-level transport
-is actually active. This means that HCI_UP is true. To avoid toggling
-the transport off and back on again for normal operation the kernel
-holds a grace period with HCI_AUTO_OFF that will turn the low-level
-transport off in case no user is present.
+Add a limiter counter to prevent the do while loop
+running in an infinite loop. This ensures that the
+channel will be instructed to close within 10 seconds
+so prevents l2cap_sock_shutdown() getting stuck forever.
 
-The idea of the grace period is important to avoid having to initialize
-all of the controller twice. So legacy ioctl and the new management
-interface knows how to clear this grace period and then start normal
-operation.
+Returns -ENOLINK when the limit is reached as the channel
+will be subequently closed and not all data was ACK'ed.
 
-For the user channel operation this grace period has not been taken into
-account which results in the problem that HCI_UP and HCI_AUTO_OFF are
-set and the kernel will return EBUSY. However from a system point of
-view the controller is ready to be grabbed by either the ioctl, the
-management interface or the user channel.
-
-This patch brings the user channel to the same level as the other two
-entries for operating a controller.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Cc: stable@vger.kernel.org
+Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
 ---
- net/bluetooth/hci_sock.c | 26 +++++++++++++++++++-------
- 1 file changed, 19 insertions(+), 7 deletions(-)
+ net/bluetooth/l2cap_sock.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 5b14dcafcd08..e08c18c328bc 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -741,10 +741,11 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 			goto done;
- 		}
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 369ad0e..ee6531e 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1059,11 +1059,13 @@ static int __l2cap_wait_ack(struct sock *sk, struct l2cap_chan *chan)
+ 	DECLARE_WAITQUEUE(wait, current);
+ 	int err = 0;
+ 	int timeo = HZ/5;
++	int limiter = 10 * 5;	/* 10 seconds limit */
  
--		if (test_bit(HCI_UP, &hdev->flags) ||
--		    test_bit(HCI_INIT, &hdev->flags) ||
-+		if (test_bit(HCI_INIT, &hdev->flags) ||
- 		    hci_dev_test_flag(hdev, HCI_SETUP) ||
--		    hci_dev_test_flag(hdev, HCI_CONFIG)) {
-+		    hci_dev_test_flag(hdev, HCI_CONFIG) ||
-+		    (!hci_dev_test_flag(hdev, HCI_AUTO_OFF) &&
-+		     test_bit(HCI_UP, &hdev->flags))) {
- 			err = -EBUSY;
- 			hci_dev_put(hdev);
- 			goto done;
-@@ -760,10 +761,21 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 	add_wait_queue(sk_sleep(sk), &wait);
+ 	set_current_state(TASK_INTERRUPTIBLE);
+ 	do {
+-		BT_DBG("Waiting for %d ACKs", chan->unacked_frames);
++		BT_DBG("Waiting for %d ACKs, limiter %d",
++			chan->unacked_frames, limiter);
  
- 		err = hci_dev_open(hdev->id);
- 		if (err) {
--			hci_dev_clear_flag(hdev, HCI_USER_CHANNEL);
--			mgmt_index_added(hdev);
--			hci_dev_put(hdev);
--			goto done;
-+			if (err == -EALREADY) {
-+				/* In case the transport is already up and
-+				 * running, clear the error here.
-+				 *
-+				 * This can happen when opening an user
-+				 * channel and HCI_AUTO_OFF grace period
-+				 * is still active.
-+				 */
-+				err = 0;
-+			} else {
-+				hci_dev_clear_flag(hdev, HCI_USER_CHANNEL);
-+				mgmt_index_added(hdev);
-+				hci_dev_put(hdev);
-+				goto done;
-+			}
- 		}
+ 		if (!timeo)
+ 			timeo = HZ/5;
+@@ -1081,6 +1083,13 @@ static int __l2cap_wait_ack(struct sock *sk, struct l2cap_chan *chan)
+ 		err = sock_error(sk);
+ 		if (err)
+ 			break;
++
++		limiter--;
++		if (!limiter) {
++			err = -ENOLINK;
++			break;
++		}
++
+ 	} while (chan->unacked_frames > 0 &&
+ 		 chan->state == BT_CONNECTED);
  
- 		atomic_inc(&hdev->promisc);
 -- 
-2.4.2
-
+1.8.5.6
