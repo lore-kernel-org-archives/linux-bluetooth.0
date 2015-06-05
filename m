@@ -1,57 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAMPA5gfZg+7UGdKiwnumTHbeL6y32aYmo0DoHnoaRbDyj-S5SQ@mail.gmail.com>
-References: <D1972028.9E66%dacullen@cisco.com>
-	<CABBYNZ+6+KV4Arfr4wAVra4_GXk9WMQy7WPVrqEjyiF+Zz1WZw@mail.gmail.com>
-	<CAMPA5gfZg+7UGdKiwnumTHbeL6y32aYmo0DoHnoaRbDyj-S5SQ@mail.gmail.com>
-Date: Fri, 5 Jun 2015 14:07:03 -0400
-Message-ID: <CAMPA5gfd2hbGoekW1VCkSyXtjK8p2Czm5MsjBBUXGDf+19Q90w@mail.gmail.com>
-Subject: Re: Distro for Bluez Development
-From: Joshua Kramer <joskra42.list@gmail.com>
+From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
+Date: Fri, 05 Jun 2015 20:43:35 +0530
+Message-id: <1433517215-25516-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am working on an embedded device.  So, I have a custom-built image
-on my Raspberry Pi 2 that consists of RedSleeve Enterprise Linux 7 and
-a hard real-time kernel that I took from Emlid.  RedSleeve is a
-rebuild of RHEL for 32 bit ARM architectures; there is a version of
-both EL6 and EL7.
+Total Number of Tracks was not displayed, coz "Number of Tracks"
+was not handled in metadata parser.
+---
+ profiles/audio/media.c | 3 +++
+ tools/mpris-proxy.c    | 3 +++
+ 2 files changed, 6 insertions(+)
 
-I am not hacking the latest Bluez code.  And I'm not using the version
-that is included with the distro.  However, BlueZ 5.30 seems to work
-great with this combo.
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index f12569e..8e7e1a3 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -1510,6 +1510,9 @@ static gboolean parse_player_metadata(struct media_player *mp,
+ 		} else if (strcasecmp(key, "xesam:trackNumber") == 0) {
+ 			if (!parse_int32_metadata(mp, "TrackNumber", &var))
+ 				return FALSE;
++		} else if (strcasecmp(key, "xesam:totalTracks") == 0) {
++			if (!parse_int32_metadata(mp, "NumberOfTracks", &var))
++				return FALSE;
+ 		} else
+ 			DBG("%s not supported, ignoring", key);
+ 
+diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
+index 693055e..5749427 100644
+--- a/tools/mpris-proxy.c
++++ b/tools/mpris-proxy.c
+@@ -1261,6 +1261,9 @@ static int parse_track_entry(DBusMessageIter *entry, const char *key,
+ 	} else if (strcasecmp(key, "TrackNumber") == 0) {
+ 		if (!parse_int32_metadata(&var, "xesam:trackNumber", metadata))
+ 			return -EINVAL;
++	} else if (strcasecmp(key, "NumberOfTracks") == 0) {
++		if (!parse_int32_metadata(&var, "xesam:totalTracks", metadata))
++			return -EINVAL;
+ 	} else if (strcasecmp(key, "Item") == 0) {
+ 		if (!parse_path_metadata(&var, "mpris:trackid", metadata))
+ 			return -EINVAL;
+-- 
+1.9.1
 
-On Fri, Jun 5, 2015 at 2:05 PM, Joshua Kramer <joskra42.list@gmail.com> wrote:
-> I am working on an embedded device.  So, I have a custom-built image
-> on my Raspberry Pi 2 that consists of RedSleeve Enterprise Linux 7 and
-> a hard real-time kernel that I took from Emlid.  RedSleeve is a
-> rebuild of RHEL for 32 bit ARM architectures; there is a version of
-> both EL6 and EL7.
->
-> I am not hacking the latest Bluez code.  And I'm not using the version
-> that is included with the distro.  However, BlueZ 5.30 seems to work
-> great with this combo.
->
-> On Fri, Jun 5, 2015 at 10:13 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi David,
->>
->> On Fri, Jun 5, 2015 at 4:45 PM, David Cullen (dacullen)
->> <dacullen@cisco.com> wrote:
->>> Hello, Folks,
->>>
->>> What distros do people use for working with the latest bluez code?
->>
->> Im using fedora 21, but with custom kernel image, for the userspace
->> part the distro should not matter much since you can compile and run
->> directly from source.
->>
->>
->> --
->> Luiz Augusto von Dentz
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
