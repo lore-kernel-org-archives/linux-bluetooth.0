@@ -1,88 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dmitry Tunin <hanipouspilot@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ath3k: Add support of 0489:e076 AR3012 device
-Date: Sat,  6 Jun 2015 20:25:40 +0300
-Message-Id: <1433611540-30860-1-git-send-email-hanipouspilot@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH 2/5] Intel based H4 line discipline enhancements
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <55731471.6000806@broadcom.com>
+Date: Sat, 6 Jun 2015 18:39:10 +0200
+Cc: Ilya Faenson <ifaenson@broadcom.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <19D26D05-7156-4539-B89E-9402C2E62864@holtmann.org>
+References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com> <1433365304-16707-3-git-send-email-ifaenson@broadcom.com> <85C2DD1E-DD05-4F42-8739-23B208A615A0@holtmann.org> <E0D3336E15B58B4294723AC879BA5E9425F717@IRVEXCHMB15.corp.ad.broadcom.com> <55731471.6000806@broadcom.com>
+To: Arend van Spriel <arend@broadcom.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-BugLink: https://bugs.launchpad.net/bugs/1462614
+Hi Arend,
 
-This device requires new firmware files
- AthrBT_0x11020100.dfu and ramps_0x11020100_40.dfu added to
-/lib/firmware/ar3k/ that are not included in linux-firmware yet.
+>> Appreciate you applying Fred's patches. I will now put together and post similar patches against the bluetooth-next proper.
+>> 
+>> Sorry for many minor changes. I just happen to run the checkpatch script automatically prior to publishing the patches (Arend taught me good Linux practices :-)) and that results in those spaces getting deleted et al.
+> 
+> Actually, checkpatch by default only does the check and just tell you what is wrong. Normally, it would only warn about the thing your patch modified. Unless you ran checkpatch on source file.
 
-T: Bus=03 Lev=01 Prnt=01 Port=09 Cnt=06 Dev#= 7 Spd=12 MxCh= 0
-D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0489 ProdID=e076 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
-E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
-E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+personally it is even more important that people run make C=2 drivers/bluetooth/ to run the sparse and endian checks. Most of the coding style issues, I can spot in the email client before applying the patch. However sparse run happens only after I already have the patch applied. If something goes wrong there, that is really wasting my time. And 0day testing bot will find it eventually as well.
 
-Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-Cc: stable@vger.kernel.org
----
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- 2 files changed, 3 insertions(+)
+Regards
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 8c81af6..ee64764 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -80,6 +80,7 @@ static const struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe057) },
- 	{ USB_DEVICE(0x0489, 0xe056) },
- 	{ USB_DEVICE(0x0489, 0xe05f) },
-+	{ USB_DEVICE(0x0489, 0xe076) },
- 	{ USB_DEVICE(0x0489, 0xe078) },
- 	{ USB_DEVICE(0x04c5, 0x1330) },
- 	{ USB_DEVICE(0x04CA, 0x3004) },
-@@ -137,6 +138,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe076), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe078), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04c5, 0x1330), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 94c6c04..c9be776 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -179,6 +179,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe076), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe078), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04c5, 0x1330), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
--- 
-1.9.1
+Marcel
+
