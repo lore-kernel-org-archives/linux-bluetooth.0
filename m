@@ -1,52 +1,172 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v7 2/6] Bluetooth: btbcm: Add BCM4324B3 UART device
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1432805106-25719-3-git-send-email-frederic.danis@linux.intel.com>
-Date: Sat, 6 Jun 2015 07:41:45 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <864DBDBC-BB22-41A3-9382-BF04C11094FA@holtmann.org>
-References: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com> <1432805106-25719-3-git-send-email-frederic.danis@linux.intel.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1431588488-16666-1-git-send-email-jaganath.k@samsung.com>
+References: <1431588488-16666-1-git-send-email-jaganath.k@samsung.com>
+Date: Sat, 6 Jun 2015 11:07:27 +0530
+Message-ID: <CAJzH+boPOK9n_HscOQiHRYf-AGDwW2=4_b2mTcK_petYJfq-Dg@mail.gmail.com>
+Subject: Fwd: [PATCH v1] Bluetooth: Fix potential NULL dereference
+From: Jaganath K <jaganath.k.os@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: multipart/alternative; boundary=14dae9cc9492de68340517d2cd66
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+--14dae9cc9492de68340517d2cd66
+Content-Type: text/plain; charset=UTF-8
 
-> Add "waiting for configuration" address.
-> Add lmp_subver and firmware name for BCM4324B3 controller.
-> 
-> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
-> ---
-> drivers/bluetooth/btbcm.c | 10 +++++++---
-> 1 file changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index c7aec97..e90e6b8 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-> @@ -33,6 +33,7 @@
-> #define VERSION "0.1"
-> 
-> #define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
-> +#define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
-> 
-> int btbcm_check_bdaddr(struct hci_dev *hdev)
-> {
-> @@ -56,10 +57,11 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
-> 
-> 	bda = (struct hci_rp_read_bd_addr *)skb->data;
-> 
-> -	/* The address 00:20:70:02:A0:00 indicates a BCM20702A0 controller
-> -	 * with no configured address.
-> +	/* Check if the address indicates a controller with no configured
-> +	 * address.
-> 	 */
+addr can be NULL and it should not be dereferenced before NULL checking.
 
-I did like the comment that shows the address in human readable format. So I re-phrased this and mentioned both addresses. It is just a lot easier to grep for in case anybody ever wants to find this.
+Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+---
+ net/bluetooth/rfcomm/sock.c |   20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-Regards
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 825e8fb..f9e9a81 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -334,16 +334,19 @@ static int rfcomm_sock_create(struct net *net, struct
+socket *sock,
 
-Marcel
+ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr,
+int addr_len)
+ {
+-       struct sockaddr_rc *sa = (struct sockaddr_rc *) addr;
++       struct sockaddr_rc sa;
+        struct sock *sk = sock->sk;
+-       int chan = sa->rc_channel;
+-       int err = 0;
+-
+-       BT_DBG("sk %p %pMR", sk, &sa->rc_bdaddr);
++       int len, err = 0;
 
+        if (!addr || addr->sa_family != AF_BLUETOOTH)
+                return -EINVAL;
+
++       memset(&sa, 0, sizeof(sa));
++       len = min_t(unsigned int, sizeof(sa), addr_len);
++       memcpy(&sa, addr, len);
++
++       BT_DBG("sk %p %pMR", sk, &sa.rc_bdaddr);
++
+        lock_sock(sk);
+
+        if (sk->sk_state != BT_OPEN) {
+@@ -358,12 +361,13 @@ static int rfcomm_sock_bind(struct socket *sock,
+struct sockaddr *addr, int addr
+
+        write_lock(&rfcomm_sk_list.lock);
+
+-       if (chan && __rfcomm_get_listen_sock_by_addr(chan, &sa->rc_bdaddr))
+{
++       if (sa.rc_channel &&
++           __rfcomm_get_listen_sock_by_addr(sa.rc_channel, &sa.rc_bdaddr))
+{
+                err = -EADDRINUSE;
+        } else {
+                /* Save source address */
+-               bacpy(&rfcomm_pi(sk)->src, &sa->rc_bdaddr);
+-               rfcomm_pi(sk)->channel = chan;
++               bacpy(&rfcomm_pi(sk)->src, &sa.rc_bdaddr);
++               rfcomm_pi(sk)->channel = sa.rc_channel;
+                sk->sk_state = BT_BOUND;
+        }
+
+--
+1.7.9.5
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+--14dae9cc9492de68340517d2cd66
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div class=3D"gmail_quote">addr can be NULL and it should =
+not be dereferenced before NULL checking.<br>
+<br>
+Signed-off-by: Jaganath Kanakkassery &lt;<a href=3D"mailto:jaganath.k@samsu=
+ng.com">jaganath.k@samsung.com</a>&gt;<br>
+---<br>
+=C2=A0net/bluetooth/rfcomm/sock.c |=C2=A0 =C2=A020 ++++++++++++--------<br>
+=C2=A01 file changed, 12 insertions(+), 8 deletions(-)<br>
+<br>
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c<br>
+index 825e8fb..f9e9a81 100644<br>
+--- a/net/bluetooth/rfcomm/sock.c<br>
++++ b/net/bluetooth/rfcomm/sock.c<br>
+@@ -334,16 +334,19 @@ static int rfcomm_sock_create(struct net *net, struct=
+ socket *sock,<br>
+<br>
+=C2=A0static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *add=
+r, int addr_len)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0struct sockaddr_rc *sa =3D (struct sockaddr_rc =
+*) addr;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0struct sockaddr_rc sa;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct sock *sk =3D sock-&gt;sk;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0int chan =3D sa-&gt;rc_channel;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0int err =3D 0;<br>
+-<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0BT_DBG(&quot;sk %p %pMR&quot;, sk, &amp;sa-&gt;=
+rc_bdaddr);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0int len, err =3D 0;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!addr || addr-&gt;sa_family !=3D AF_BLUETOO=
+TH)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return -EINVAL;<br>
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0memset(&amp;sa, 0, sizeof(sa));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0len =3D min_t(unsigned int, sizeof(sa), addr_le=
+n);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy(&amp;sa, addr, len);<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0BT_DBG(&quot;sk %p %pMR&quot;, sk, &amp;sa.rc_b=
+daddr);<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 lock_sock(sk);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (sk-&gt;sk_state !=3D BT_OPEN) {<br>
+@@ -358,12 +361,13 @@ static int rfcomm_sock_bind(struct socket *sock, stru=
+ct sockaddr *addr, int addr<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 write_lock(&amp;rfcomm_sk_list.lock);<br>
+<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0if (chan &amp;&amp; __rfcomm_get_listen_sock_by=
+_addr(chan, &amp;sa-&gt;rc_bdaddr)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0if (sa.rc_channel &amp;&amp;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0__rfcomm_get_listen_sock_by_addr(=
+sa.rc_channel, &amp;sa.rc_bdaddr)) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 err =3D -EADDRINUSE=
+;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Save source addr=
+ess */<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0bacpy(&amp;rfcomm_p=
+i(sk)-&gt;src, &amp;sa-&gt;rc_bdaddr);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rfcomm_pi(sk)-&gt;c=
+hannel =3D chan;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0bacpy(&amp;rfcomm_p=
+i(sk)-&gt;src, &amp;sa.rc_bdaddr);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rfcomm_pi(sk)-&gt;c=
+hannel =3D sa.rc_channel;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 sk-&gt;sk_state =3D=
+ BT_BOUND;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+<span class=3D"HOEnZb"><font color=3D"#888888"><br>
+--<br>
+1.7.9.5<br>
+<br>
+--<br>
+To unsubscribe from this list: send the line &quot;unsubscribe linux-blueto=
+oth&quot; in<br>
+the body of a message to <a href=3D"mailto:majordomo@vger.kernel.org">major=
+domo@vger.kernel.org</a><br>
+More majordomo info at=C2=A0 <a href=3D"http://vger.kernel.org/majordomo-in=
+fo.html" target=3D"_blank">http://vger.kernel.org/majordomo-info.html</a><b=
+r>
+</font></span></div><br></div>
+
+--14dae9cc9492de68340517d2cd66--
