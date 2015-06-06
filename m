@@ -1,22 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] Bluetooth: Fix potential NULL dereference
+Subject: Re: Unable to re-connect paired LE device after MAC rotation
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJzH+bqxTdtCsSy4hsU0OEh_iyjwPWmb3F_nwiJ_FMY6w=poOA@mail.gmail.com>
-Date: Sat, 6 Jun 2015 07:02:36 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <D434F838-04B9-40AE-B5B5-2F72159AD533@holtmann.org>
-References: <449781348.237751431668266873.JavaMail.weblogic@ep2mlwas05d> <CAJzH+bqxTdtCsSy4hsU0OEh_iyjwPWmb3F_nwiJ_FMY6w=poOA@mail.gmail.com>
-To: Jaganath K <jaganath.k.os@gmail.com>
+In-Reply-To: <CAD0=r8xxJwCm-pcNueBAyVyyECQS8pn1OXq_jK=PAy0SanaVLw@mail.gmail.com>
+Date: Sat, 6 Jun 2015 06:58:52 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <AE436ACF-74B9-4681-B5B4-249AE3F37C07@holtmann.org>
+References: <CAD0=r8wrEw4zPxAxph1pGg3VGNxnQ8smh45qGn1YYbwmMQr8BQ@mail.gmail.com> <DEB8F453-F8E5-4DAD-AC7B-9303601173BA@holtmann.org> <CAD0=r8zOXHNxDogUCTUR=XW-Viv-AxE5YqTxQ2ZpRMMb-x5axw@mail.gmail.com> <837DB900-4EF4-4F3B-9C70-24868141DCDC@holtmann.org> <CAD0=r8xxJwCm-pcNueBAyVyyECQS8pn1OXq_jK=PAy0SanaVLw@mail.gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Jakub,
 
-> Ping.
+>>>>> 1. Have iPhone and Linux machine running latest BlueZ on latest
+>>>>> kernel. iPhone have random mac "ABC".
+>>>>> 2. Connect from BlueZ to iPhone, pair with PIN. iPhone real mac
+>>>>> address "XXX" is being shown right now. I can connect to it form
+>>>>> bluetoothctl using "XXX"  address, btmon shows it's random mac address
+>>>>> "ABC" in connect request.
+>>>>> 
+>>>>> 3. Restart bluetooth on iPhone. It's random mac is rotated to "BCD".
+>>>>> Try to connect from bluetoothctl using "XXX", btomon still shows old
+>>>>> mac address "ABC" in connect request, therefore it'll fail and will be
+>>>>> unable to connect.
+>>>>> 
+>>>>> That's a bug is, right ? BlueZ should be smart, and for paired device
+>>>>> it should start a "Selective Connection Establishment Procedure"
+>>>>> instead of "Auto Connection Establishment Procedure", as described in
+>>>>> BT spec 4.2 [Vol 3, Part C] 9.3.7 .
+>>>>> 
+>>>>> 
+>>>>> If I now manually start discovery before calling connect BlueZ would
+>>>>> pick new iPhone address, "BCD" and use it for connection if I try to
+>>>>> connect to "XXX".
+>>>>> 
+>>>>> Is that something that should be fixed ? If yes I'll spend some time on it.
+>>>> 
+>>>> I think the problem you see is that we call HCI LE Create Connection directly without doing a scan first. This has been long on the list that we should actually scan to find the device first and only then call HCI LE Create Connection.
+>>> 
+>>> Should scan happen before connecting only for paired devices using RPA
+>>> ? Scanning for non-paired devices won't really do nothing good, right
+>>> ?
+>> 
+>> it is required for devices using RPA. We can do a passive scan without the whitelist in that case. For all other cases it makes no difference, but it also doesn’t do any harm. Actually HCI LE Create Connection will scan as well. Most likely doing a passive scan and only trying to call HCI LE Create Connection when we actually saw the device gives us better latency when multiple LE connection attempt are requested at the same time. Right now calling HCI LE Create Connection is a big hammer that will make any other connection attempt wait. Normally that is not problematic if the device is in range and advertising. If it is not, then this might stall everybody else.
+> 
+> So I played with that, and it looks like adding non paired device to
+> kernel whitelist through "MGMT_ADD_DEVICE" doesn't work, so I fixed
+> that only for paired devices, would probably require kernel changes to
+> make it also work for non-paired devices.
 
-so we agreed to not apply this patch. I might have missed your other patch. So just resend that one.
+the kernel needs to know the IRK as well. It either gets that via Load Identity Resolving Keys or remembers it by itself after you paired. You could try to manually load the IRK and then will see that it starts working.
 
 Regards
 
