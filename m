@@ -1,153 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5572AC25.5020508@broadcom.com>
-Date: Sat, 6 Jun 2015 10:15:33 +0200
+Message-ID: <5572A904.60003@broadcom.com>
+Date: Sat, 6 Jun 2015 10:02:12 +0200
 From: Arend van Spriel <arend@broadcom.com>
 MIME-Version: 1.0
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: Ilya Faenson <ifaenson@broadcom.com>, <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 4/5] Broadcom Bluetooth protocol UART support
-References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com> <1433365304-16707-5-git-send-email-ifaenson@broadcom.com> <F9497027-7485-43C2-8D8D-8134798B300A@holtmann.org>
-In-Reply-To: <F9497027-7485-43C2-8D8D-8134798B300A@holtmann.org>
+CC: Ilya Faenson <ifaenson@broadcom.com>, Frederic Danis
+	<frederic.danis@linux.intel.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
+References: <1432136770-13328-1-git-send-email-frederic.danis@linux.intel.com> <1432136770-13328-5-git-send-email-frederic.danis@linux.intel.com> <555DE2BE.8000109@broadcom.com> <555F25F8.4080408@linux.intel.com> <555F2EB5.1080103@broadcom.com> <555F33E8.8010703@linux.intel.com> <E0D3336E15B58B4294723AC879BA5E9425A61F@IRVEXCHMB15.corp.ad.broadcom.com> <55646A17.10501@linux.intel.com> <E0D3336E15B58B4294723AC879BA5E9425ADE4@IRVEXCHMB15.corp.ad.broadcom.com> <D5EDC898-B451-4978-A13A-7BEBC9D093EB@holtmann.org> <55729D68.1050607@broadcom.com> <86D0B13B-814E-49C7-9A18-B459221201CC@holtmann.org>
+In-Reply-To: <86D0B13B-814E-49C7-9A18-B459221201CC@holtmann.org>
 Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 06/06/15 08:37, Marcel Holtmann wrote:
-> Hi Ilya,
+On 06/06/15 09:24, Marcel Holtmann wrote:
+> Hi Arend,
 >
->> Merge of the Broadcom logic into the Intel's btbcm implementation.
+>>>>>>>>> Use btbcm helpers to perform controller setup.
+>>>>>>>>> Perform host UART reset to init speed between btbcm_patchram() and
+>>>>>>>>> btbcm_finalize(). This may be need because firmware loading may have
+>>>>>>>>> reseted controller UART to init speed.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Frederic Danis<frederic.danis@linux.intel.com>
+>>>>>>>>> ---
+>>>>>>>>> drivers/bluetooth/hci_bcm.c | 19 ++++++++++++++++++-
+>>>>>>>>> 1 file changed, 18 insertions(+), 1 deletion(-)
+>>>>>>>>>
+>>>>>>>>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>>>>>>>>> index 1ec0b4a..cede445 100644
+>>>>>>>>> --- a/drivers/bluetooth/hci_bcm.c
+>>>>>>>>> +++ b/drivers/bluetooth/hci_bcm.c
+>>>>>>>>> @@ -79,11 +79,28 @@ static int bcm_flush(struct hci_uart *hu)
+>>>>>>>>>
+>>>>>>>>> static int bcm_setup(struct hci_uart *hu)
+>>>>>>>>> {
+>>>>>>>>> + char fw_name[64];
+>>>>>>>>> + int err;
+>>>>>>>>> +
+>>>>>>>>> BT_DBG("hu %p", hu);
+>>>>>>>>>
+>>>>>>>>> hu->hdev->set_bdaddr = btbcm_set_bdaddr;
+>>>>>>>>>
+>>>>>>>>> - return btbcm_setup_patchram(hu->hdev);
+>>>>>>>>> + err = btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name));
+>>>>>>>>> + if (err)
+>>>>>>>>> + return err;
+>>>>>>>>> +
+>>>>>>>>> + err = btbcm_patchram(hu->hdev, fw_name);
+>>>>>>>>> + /* If there is no firmware (-ENOENT), discard the error and
+>>>>>>>>> continue */
+>>>>>>>>
+>>>>>>>> I guess -ENOENT means no firmware is required and not a
+>>>>>>>> request_firmware() failure. Not sure what is meant here.
+>>>>>>>>
+>>>>>>>> Regards,
+>>>>>>>> Arend
+>>>>>>>>
+>>>>>>>>> + if (err == -ENOENT)
+>>>>>>>>> + return 0;
+>>>>>>>>> +
+>>>>>>>>> + if (hu->proto->init_speed)
+>>>>>>>>> + hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>>>>>>>> +
+>>>>>>>>> + err = btbcm_finalize(hu->hdev);
+>>>>>>>>> +
+>>>>>>>>> + return err;
+>>>>>>>>> }
+>>>>>>>>>
+>>>>>>>>> static const struct h4_recv_pkt bcm_recv_pkts[] = {
+>>>>>>>
+>>>>>>> You're right, btbcm_patchram() return test does not work as I expected.
+>>>>>>>
+>>>>>>> I can change this by performing uart speed change only if it returns no
+>>>>>>> error.
+>>>>>>>
+>>>>>>> err = btbcm_patchram(hu->hdev, fw_name);
+>>>>>>> if (!err) {
+>>>>>>> /* Firmware loading may have reseted controller UART to init speed */
+>>>>>>> if (hu->proto->init_speed)
+>>>>>>> hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>>>>>> }
+>>>>>>>
+>>>>>>> err = btbcm_finalize(hu->hdev);
+>>>>>>>
+>>>>>>>
+>>>>>>> Or I can move request_firmware() out of btbcm_patchram() and test it
+>>>>>>> before calling btbcm_patchram(). This will imply to change
+>>>>>>> btbcm_patchram() to accept a firmware instead of firmware name.
+>>>>>>>
+>>>>>>> err = request_firmware(&fw, fw_name,&hu->hdev->dev);
+>>>>>>> if (err<   0) {
+>>>>>>> BT_INFO("%s: BCM: patch %s not found", hu->hdev->name, fw_name);
+>>>>>>> return 0;
+>>>>>>> }
+>>>>>>>
+>>>>>>> err = btbcm_patchram(hu->hdev, fw);
+>>>>>>> if (!err) {
+>>>>>>> /* Firmware loading may have reseted controller UART to init speed */
+>>>>>>> if (hu->proto->init_speed)
+>>>>>>> hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>>>>>> }
+>>>>>>>
+>>>>>>> err = btbcm_finalize(hu->hdev);
+>>>>>>>
+>>>>>>> Arend, Marcel, any advice regarding this ?
+>>>>>>
+>>>>>> Well, functionally it does not make a difference as the request_firmware
+>>>>>> is the first call done in btbcm_patchram(). So if it solves your problem
+>>>>>> I would go for option 2. Other question: is there a reason why the error
+>>>>>> code from request_firmware is not returned?
+>>>>>
+>>>>> If an error is returned it will stop Bluetooth setup.
+>>>>> So, when request_firmware() returns an error, the Bluetooth controller
+>>>>> will be used with current firmware and 0 is returned as bcm_setup is
+>>>>> completed.
+>>>>>
+>>>>> IF: There is generally no "current firmware" if the firmware download fails or not attempted. The device would run out of the ROM then which is not terribly useful if Bluetooth functionality is needed. Thanks, -Ilya
+>>>>
+>>>> The BCM4324B3 embedded in T100 is able to operate without firmware
+>>>> loading, at least performing Bluetooth discovery.
+>>>> I think it is better to run without firmware loading than not allowing
+>>>> to use Bluetooth controller at all.
+>>>>
+>>>> IF: Broadcom software elsewhere generally fails device start in this case as every Bluetooth feature may or may not work afterwards, with no guarantees whatsoever. The decision here is obviously up to BlueZ maintainers.
+>>>
+>>> I am fine with actually doing exactly that once we have a bit better infrastructure in place. However this also requires a commitment from Broadcom to actually publish the firmware files in linux-firmware tree and maintain the manifest document I have been talking about.
 >>
->> Signed-off-by: Ilya Faenson<ifaenson@broadcom.com>
->> ---
->> drivers/bluetooth/btbcm.c | 142 ++++++++++++++++++++++++++++++++++++----------
->> drivers/bluetooth/btbcm.h |  21 ++++++-
->> 2 files changed, 132 insertions(+), 31 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
->> index 728fce3..e1d5ad0 100644
->> --- a/drivers/bluetooth/btbcm.c
->> +++ b/drivers/bluetooth/btbcm.c
->> @@ -3,6 +3,7 @@
->>   *  Bluetooth support for Broadcom devices
->>   *
->>   *  Copyright (C) 2015  Intel Corporation
->> + *  Copyright (C) 2015  Broadcom Corporation
->>   *
->>   *
->>   *  This program is free software; you can redistribute it and/or modify
->> @@ -32,7 +33,8 @@
->>
->> #define VERSION "0.1"
->>
->> -#define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
->> +#define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00} })
->> +#define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43} })
+>> What is the added value of having the manifest file? I can see it keeps mapping hardware info to firmware file out of the driver and as such keeps the driver from growing in size for new device support. Just wondering how big that issue is. It also poses other issues as it adds another interaction with the firmware api, which in my opinion is still a nasty api from driver perspective.
 >
-> something funky is going on with your editor that insist on fixing this ;)
+> so a recent version of the Broadcom Bluetooth driver for Windows contains 167+ firmware files. Which means there are plenty of different files. I count at least 100+ individual USB dongles listed. Inside the btusb.c driver we started to match these devices with interface specific information.
 >
->>
->> int btbcm_check_bdaddr(struct hci_dev *hdev)
->> {
->> @@ -43,6 +45,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
->> 			     HCI_INIT_TIMEOUT);
->> 	if (IS_ERR(skb)) {
->> 		int err = PTR_ERR(skb);
->> +
+>          /* Broadcom devices with vendor specific id */
+>          { USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01),
+>            .driver_info = BTUSB_BCM_PATCHRAM },
 >
-> In this specific case, please do not fix it. I like to keep the simple error path sections small.
+> Otherwise we would just go insane to attempt to update the driver for every new dongle manufacture that comes along. This way this is limited to a handful big ones.
 >
->> 		BT_ERR("%s: BCM: Reading device address failed (%d)",
->> 		       hdev->name, err);
->> 		return err;
->> @@ -56,10 +59,11 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
->>
->> 	bda = (struct hci_rp_read_bd_addr *)skb->data;
->>
->> -	/* The address 00:20:70:02:A0:00 indicates a BCM20702A0 controller
->> -	 * with no configured address.
->> +	/* Check if the address indicates a controller with no configured
->> +	 * address.
->> 	 */
->> -	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0)) {
->> +	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0) ||
->> +	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3)) {
->> 		BT_INFO("%s: BCM: Using default device address (%pMR)",
->> 			hdev->name,&bda->bdaddr);
->> 		set_bit(HCI_QUIRK_INVALID_BDADDR,&hdev->quirks);
->> @@ -89,21 +93,14 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
->> }
->> EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
->>
->> -int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
->> +int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
->> {
->> 	const struct hci_command_hdr *cmd;
->> -	const struct firmware *fw;
->> 	const u8 *fw_ptr;
->> 	size_t fw_size;
->> 	struct sk_buff *skb;
->> 	u16 opcode;
->> -	int err;
->> -
->> -	err = request_firmware(&fw, firmware,&hdev->dev);
->> -	if (err<  0) {
->> -		BT_INFO("%s: BCM: Patch %s not found", hdev->name, firmware);
->> -		return err;
->> -	}
->> +	int err = 0;
->>
->> 	/* Start Download */
->> 	skb = __hci_cmd_sync(hdev, 0xfc2e, 0, NULL, HCI_INIT_TIMEOUT);
->> @@ -129,8 +126,7 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
->> 		fw_size -= sizeof(*cmd);
->>
->> 		if (fw_size<  cmd->plen) {
->> -			BT_ERR("%s: BCM: Patch %s is corrupted", hdev->name,
->> -			       firmware);
->> +			BT_ERR("%s: BCM: Patch is corrupted", hdev->name);
->> 			err = -EINVAL;
->> 			goto done;
->> 		}
->> @@ -156,7 +152,6 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
->> 	msleep(250);
->>
->> done:
->> -	release_firmware(fw);
->> 	return err;
->> }
->> EXPORT_SYMBOL(btbcm_patchram);
->> @@ -168,6 +163,7 @@ static int btbcm_reset(struct hci_dev *hdev)
->> 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
->> 	if (IS_ERR(skb)) {
->> 		int err = PTR_ERR(skb);
->> +
->> 		BT_ERR("%s: BCM: Reset failed (%d)", hdev->name, err);
->> 		return err;
->> 	}
->> @@ -242,9 +238,101 @@ static const struct {
->> 	const char *name;
->> } bcm_uart_subver_table[] = {
->> 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
->> +	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
->> +	{ 0x610c, "BCM4354_003.001.012.0306.0659"}, /* 003.001.012 */
->
-> Please just BCM4354 here.
->
-> And I have initial patches for the manifest file to map modalias to firmware names. That will then hopefully solve all of these and we can just update this easily from userspace. I will send patches as soon as I have cleaned them up a bit.
+> The request_firmware() API allows to builtin the file into the kernel image. While I would not do that for the actual firmware file itself, but for the manifest it might make sense. However keeping it outside and allowing update via linux-firmware package update seems beneficial for everybody.
 
 Hi Marcel,
 
-Is using modalias sufficient. At least for our wifi chips it is not as 
-new chip revisions with same modalias require different firmware. Same 
-may be true for bt chips.
+I did not realize there were so many firmware variations in bluetooth. 
+That's justification enough and having the manifest file built-in sounds 
+like a viable plan. At least I like the idea and might explore it for 
+our wifi drivers (sorry for being a bit single-minded ;-) ).
 
-Regards,
+Thanks,
 Arend
-
-> Regards
->
-> Marcel
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
