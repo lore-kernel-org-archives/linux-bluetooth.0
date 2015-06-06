@@ -7,23 +7,43 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Dmitry Tunin <hanipouspilot@gmail.com>,
 	stable@vger.kernel.org
-Subject: [PATCH] ath3k: add support of 13d3:3474 AR3012 device
-Date: Sat,  6 Jun 2015 20:29:25 +0300
-Message-Id: <1433611765-31075-1-git-send-email-hanipouspilot@gmail.com>
+Subject: [PATCH] ath3k: Add support of 0489:e076 AR3012 device
+Date: Sat,  6 Jun 2015 20:25:40 +0300
+Message-Id: <1433611540-30860-1-git-send-email-hanipouspilot@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-BugLink: https://bugs.launchpad.net/bugs/1427680
+BugLink: https://bugs.launchpad.net/bugs/1462614
 
 This device requires new firmware files
  AthrBT_0x11020100.dfu and ramps_0x11020100_40.dfu added to
 /lib/firmware/ar3k/ that are not included in linux-firmware yet.
 
-T: Bus=01 Lev=01 Prnt=01 Port=04 Cnt=01 Dev#= 4 Spd=12 MxCh= 0
+T: Bus=03 Lev=01 Prnt=01 Port=09 Cnt=06 Dev#= 7 Spd=12 MxCh= 0
 D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=13d3 ProdID=3474 Rev=00.01
-C: #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I: If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I: If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+P: Vendor=0489 ProdID=e076 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
 
 Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
 Cc: stable@vger.kernel.org
@@ -33,36 +53,36 @@ Cc: stable@vger.kernel.org
  2 files changed, 3 insertions(+)
 
 diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 288547a..29f34c7 100644
+index 8c81af6..ee64764 100644
 --- a/drivers/bluetooth/ath3k.c
 +++ b/drivers/bluetooth/ath3k.c
-@@ -111,6 +111,7 @@ static const struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3408) },
- 	{ USB_DEVICE(0x13d3, 0x3423) },
- 	{ USB_DEVICE(0x13d3, 0x3432) },
-+	{ USB_DEVICE(0x13d3, 0x3474) },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -166,6 +167,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3423), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3474), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU22 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE036), .driver_info = BTUSB_ATH3012 },
+@@ -80,6 +80,7 @@ static const struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe057) },
+ 	{ USB_DEVICE(0x0489, 0xe056) },
+ 	{ USB_DEVICE(0x0489, 0xe05f) },
++	{ USB_DEVICE(0x0489, 0xe076) },
+ 	{ USB_DEVICE(0x0489, 0xe078) },
+ 	{ USB_DEVICE(0x04c5, 0x1330) },
+ 	{ USB_DEVICE(0x04CA, 0x3004) },
+@@ -137,6 +138,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0489, 0xe076), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe078), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04c5, 0x1330), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b9f2821..4103a8b 100644
+index 94c6c04..c9be776 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -210,6 +210,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3408), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3423), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3432), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x13d3, 0x3474), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+@@ -179,6 +179,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0489, 0xe076), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe078), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04c5, 0x1330), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
 -- 
 1.9.1
