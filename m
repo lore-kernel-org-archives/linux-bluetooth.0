@@ -1,57 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: Unable to re-connect paired LE device after MAC rotation
+Subject: Re: [PATCH 2/2] Bluetooth: Add option to enable/disable A2MP module
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAD0=r8xxJwCm-pcNueBAyVyyECQS8pn1OXq_jK=PAy0SanaVLw@mail.gmail.com>
-Date: Sat, 6 Jun 2015 06:58:52 +0200
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <AE436ACF-74B9-4681-B5B4-249AE3F37C07@holtmann.org>
-References: <CAD0=r8wrEw4zPxAxph1pGg3VGNxnQ8smh45qGn1YYbwmMQr8BQ@mail.gmail.com> <DEB8F453-F8E5-4DAD-AC7B-9303601173BA@holtmann.org> <CAD0=r8zOXHNxDogUCTUR=XW-Viv-AxE5YqTxQ2ZpRMMb-x5axw@mail.gmail.com> <837DB900-4EF4-4F3B-9C70-24868141DCDC@holtmann.org> <CAD0=r8xxJwCm-pcNueBAyVyyECQS8pn1OXq_jK=PAy0SanaVLw@mail.gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
+In-Reply-To: <3B8E4CEA2CC045459E7856C66B82CE931135CD03@SHSMSX103.ccr.corp.intel.com>
+Date: Sat, 6 Jun 2015 06:57:00 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <730F9DAC-E12D-4F00-A478-E0EC23216D2C@holtmann.org>
+References: <1432274165-23569-1-git-send-email-arron.wang@intel.com> <1432274165-23569-2-git-send-email-arron.wang@intel.com> <669F121F-A1EE-47A7-8A15-27E1A2FAFF26@holtmann.org> <3B8E4CEA2CC045459E7856C66B82CE931135CD03@SHSMSX103.ccr.corp.intel.com>
+To: "Wang, Arron" <arron.wang@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Arron,
 
->>>>> 1. Have iPhone and Linux machine running latest BlueZ on latest
->>>>> kernel. iPhone have random mac "ABC".
->>>>> 2. Connect from BlueZ to iPhone, pair with PIN. iPhone real mac
->>>>> address "XXX" is being shown right now. I can connect to it form
->>>>> bluetoothctl using "XXX"  address, btmon shows it's random mac address
->>>>> "ABC" in connect request.
->>>>> 
->>>>> 3. Restart bluetooth on iPhone. It's random mac is rotated to "BCD".
->>>>> Try to connect from bluetoothctl using "XXX", btomon still shows old
->>>>> mac address "ABC" in connect request, therefore it'll fail and will be
->>>>> unable to connect.
->>>>> 
->>>>> That's a bug is, right ? BlueZ should be smart, and for paired device
->>>>> it should start a "Selective Connection Establishment Procedure"
->>>>> instead of "Auto Connection Establishment Procedure", as described in
->>>>> BT spec 4.2 [Vol 3, Part C] 9.3.7 .
->>>>> 
->>>>> 
->>>>> If I now manually start discovery before calling connect BlueZ would
->>>>> pick new iPhone address, "BCD" and use it for connection if I try to
->>>>> connect to "XXX".
->>>>> 
->>>>> Is that something that should be fixed ? If yes I'll spend some time on it.
->>>> 
->>>> I think the problem you see is that we call HCI LE Create Connection directly without doing a scan first. This has been long on the list that we should actually scan to find the device first and only then call HCI LE Create Connection.
+>>> Make Bluetooth 3.0 HS feature configurable
 >>> 
->>> Should scan happen before connecting only for paired devices using RPA
->>> ? Scanning for non-paired devices won't really do nothing good, right
->>> ?
+>>> Signed-off-by: Arron Wang <arron.wang@intel.com>
+>>> ---
+>>> net/bluetooth/Kconfig          |    5 +
+>>> net/bluetooth/Makefile         |    3 +-
+>>> net/bluetooth/a2mp.h           |   19 +++
+>>> net/bluetooth/amp.h            |   11 ++
+>>> net/bluetooth/hci_event.c      |  260 +-----------------------------------
+>>> net/bluetooth/hci_event_a2mp.c |  283
+>> ++++++++++++++++++++++++++++++++++++++++
+>>> net/bluetooth/hci_event_a2mp.h |   91 +++++++++++++
+>>> 7 files changed, 412 insertions(+), 260 deletions(-) create mode
+>>> 100644 net/bluetooth/hci_event_a2mp.c create mode 100644
+>>> net/bluetooth/hci_event_a2mp.h
 >> 
->> it is required for devices using RPA. We can do a passive scan without the whitelist in that case. For all other cases it makes no difference, but it also doesn’t do any harm. Actually HCI LE Create Connection will scan as well. Most likely doing a passive scan and only trying to call HCI LE Create Connection when we actually saw the device gives us better latency when multiple LE connection attempt are requested at the same time. Right now calling HCI LE Create Connection is a big hammer that will make any other connection attempt wait. Normally that is not problematic if the device is in range and advertising. If it is not, then this might stall everybody else.
+>> I don’t think this is the solution here. I think A2MP support should be self
+>> contained and utilises the synchronous HCI command framework we have in place
+>> and also use in mgmt.
 > 
-> So I played with that, and it looks like adding non paired device to
-> kernel whitelist through "MGMT_ADD_DEVICE" doesn't work, so I fixed
-> that only for paired devices, would probably require kernel changes to
-> make it also work for non-paired devices.
+> Yes, create a separate file for hci a2mp event maybe not suitable, but there are many hci ops/events for different Bluetooth controller BREDR/AMP/LE, add the macro to separate them in one file may not easy to maintain, can we move these AMP releated hci ops/event function to file amp.c?
 
-the kernel needs to know the IRK as well. It either gets that via Load Identity Resolving Keys or remembers it by itself after you paired. You could try to manually load the IRK and then will see that it starts working.
+unless it has some complicated state machine impact, using the hci_request infrastructure should be preferred compared to go through callback handlers in hci_event.c. So first of all it needs to be investigated which of the A2MP HCI functions can be turned into using hci_request.
 
 Regards
 
