@@ -1,43 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH 1/2] Bluetooth: Don't call shutdown when leaving user channel
+Subject: Re: [PATCH 2/2] Bluetooth: Reorder HCI user channel socket release
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1432219601-3663-1-git-send-email-loic.poulain@intel.com>
-Date: Sat, 6 Jun 2015 20:51:24 +0200
+In-Reply-To: <1432219601-3663-2-git-send-email-loic.poulain@intel.com>
+Date: Sat, 6 Jun 2015 20:51:22 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <535AEF68-9F42-4E60-8E83-FB185F296060@holtmann.org>
-References: <1432219601-3663-1-git-send-email-loic.poulain@intel.com>
+Message-Id: <EE8E372F-A6AD-4003-848E-1095148CD2F6@holtmann.org>
+References: <1432219601-3663-1-git-send-email-loic.poulain@intel.com> <1432219601-3663-2-git-send-email-loic.poulain@intel.com>
 To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Loic,
 
-> Don't interfere with the user channel exclusive access.
+> The hci close method needs to know if we are in user channel context.
+> Only add the index to mgmt once close is performed.
 > 
 > Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 > ---
-> net/bluetooth/hci_core.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 476709b..5120fea 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1557,7 +1557,8 @@ static int hci_dev_do_close(struct hci_dev *hdev)
-> {
-> 	BT_DBG("%s %p", hdev->name, hdev);
-> 
-> -	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
-> +	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> +	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> net/bluetooth/hci_sock.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
 
-this will conflict with the extra check we added that the device is actually HCI_UP.
+patch has been applied to bluetooth-next tree.
 
-> 		/* Execute vendor specific shutdown routine */
-> 		if (hdev->shutdown)
-> 			hdev->shutdown(hdev);
+> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+> index 56f9edb..e1beb4e 100644
+> --- a/net/bluetooth/hci_sock.c
+> +++ b/net/bluetooth/hci_sock.c
+> @@ -503,9 +503,9 @@ static int hci_sock_release(struct socket *sock)
+> 
+> 	if (hdev) {
+> 		if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
+> -			mgmt_index_added(hdev);
+> -			hci_dev_clear_flag(hdev, HCI_USER_CHANNEL);
+> 			hci_dev_close(hdev->id);
+> +			hci_dev_clear_flag(hdev, HCI_USER_CHANNEL);
+> +			mgmt_index_added(hdev);
+
+However I still do not remember why I did it the other way around in the first place. Can someone please double check that this will not break anything. I do not trust my own judgment in this case. It feels suspicious.
 
 Regards
 
