@@ -1,109 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCHv2] Bluetooth: Move SCO support under BT_BREDR config option
+Subject: Re: [PATCH] bluetooth: hci_bcsp: Clean up code Fix
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1433324130-3771-1-git-send-email-arron.wang@intel.com>
-Date: Sat, 6 Jun 2015 06:54:18 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0F875A25-15B1-4296-95F9-1FD5720C9403@holtmann.org>
-References: <1433324130-3771-1-git-send-email-arron.wang@intel.com>
-To: Arron Wang <arron.wang@intel.com>
+In-Reply-To: <20150604070848.GA8533@ubuntu>
+Date: Sat, 6 Jun 2015 06:49:19 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <A1AA5BA0-D94C-46CF-BA06-3CF378C8B3D0@holtmann.org>
+References: <20150604070848.GA8533@ubuntu>
+To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arron,
+Hi Prasanna,
 
-> SCO/eSCO link is supported by BR/EDR controller, it is
-> suitable to move them under BT_BREDR config option
+> Fix for spaces prohibited around that '->' reported by checkpatch
+> and space prohibited between function name and open parenthesis '('
 > 
-> Signed-off-by: Arron Wang <arron.wang@intel.com>
+> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
 > ---
-> include/net/bluetooth/bluetooth.h |   11 +++++++++++
-> include/net/bluetooth/hci_core.h  |   14 +++++++++++++-
-> net/bluetooth/Makefile            |    3 ++-
-> net/bluetooth/sco.c               |    5 ++---
-> 4 files changed, 28 insertions(+), 5 deletions(-)
+> drivers/bluetooth/hci_bcsp.c |   28 ++++++++++++++--------------
+> 1 files changed, 14 insertions(+), 14 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 7dba805..38d8a34 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -365,8 +365,19 @@ extern struct dentry *bt_debugfs;
-> int l2cap_init(void);
-> void l2cap_exit(void);
-> 
-> +#if IS_ENABLED(CONFIG_BT_BREDR)
-> int sco_init(void);
-> void sco_exit(void);
-> +#else
-> +static inline int sco_init(void)
-> +{
-> +	return 0;
-> +}
+> diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+> index dc8e3d4..94e0046 100644
+> --- a/drivers/bluetooth/hci_bcsp.c
+> +++ b/drivers/bluetooth/hci_bcsp.c
+> @@ -285,7 +285,7 @@ static struct sk_buff *bcsp_dequeue(struct hci_uart *hu)
+> 	struct bcsp_struct *bcsp = hu->priv;
+> 	unsigned long flags;
+> 	struct sk_buff *skb;
+> -	
 > +
-> +static inline void sco_exit(void)
-> +{
-> +}
-> +#endif
+> 	/* First of all, check for unreliable messages in the queue,
+> 	   since they have priority */
 > 
-> int mgmt_init(void);
-> void mgmt_exit(void);
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index a056c2b..387bbc3 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -532,8 +532,20 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
-> int l2cap_disconn_ind(struct hci_conn *hcon);
-> int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
-> 
-> +#if IS_ENABLED(CONFIG_BT_BREDR)
-> int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags);
-> -int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
-> +void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
-> +#else
-> +static inline int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> +				  __u8 *flags)
-> +{
-> +	return 0;
-> +}
-> +
-> +static inline void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
-> +{
-> +}
-> +#endif
-> 
-> /* ----- Inquiry cache ----- */
-> #define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
-> diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-> index 9a8ea23..29c12ae 100644
-> --- a/net/bluetooth/Makefile
-> +++ b/net/bluetooth/Makefile
-> @@ -12,9 +12,10 @@ obj-$(CONFIG_BT_6LOWPAN) += bluetooth_6lowpan.o
-> bluetooth_6lowpan-y := 6lowpan.o
-> 
-> bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
-> -	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
-> +	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
-> 	a2mp.o amp.o ecc.o hci_request.o mgmt_util.o
-> 
-> +bluetooth-$(CONFIG_BT_BREDR) += sco.o
-> bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
-> bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
-> 
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index 4322c83..f348383 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -1110,7 +1110,7 @@ static void sco_disconn_cfm(struct hci_conn *hcon, __u8 reason)
-> 	sco_conn_del(hcon, bt_to_errno(reason));
-> }
-> 
-> -int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
-> +void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
-> {
+> @@ -436,7 +436,7 @@ static inline void bcsp_unslip_one_byte(struct bcsp_struct *bcsp, unsigned char
+> 			break;
+> 		default:
+> 			memcpy(skb_put(bcsp->rx_skb, 1), &byte, 1);
+> -			if ((bcsp->rx_skb-> data[0] & 0x40) != 0 && 
+> +			if ((bcsp->rx_skb->data[0] & 0x40) != 0 &&
+> 					bcsp->rx_state != BCSP_W4_CRC)
 
-I prefer that we do this change in a separate patch and do it for sco_recv_scodata and also l2cap_recv_acldata. Since both are in the same boat here and should be just fixed first.
+if you do this, then also adjust the indentation to follow the network subsystem style. This driver has most likely plenty of them. --strict for checkpatch in case you wonder.
 
 Regards
 
