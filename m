@@ -1,118 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH 1/5] Broadcom Bluetooth UART Device Tree bindings
+Subject: Re: [PATCH 4/5] Broadcom Bluetooth protocol UART support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5572A40F.9090206@broadcom.com>
-Date: Sat, 6 Jun 2015 10:33:18 +0200
+In-Reply-To: <5572AC25.5020508@broadcom.com>
+Date: Sat, 6 Jun 2015 10:31:44 +0200
 Cc: Ilya Faenson <ifaenson@broadcom.com>,
-	linux-bluetooth@vger.kernel.org, Jiri Slaby <jslaby@suse.cz>
-Message-Id: <2D4B4815-717F-4B21-A265-171D07E309B8@holtmann.org>
-References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com> <1433365304-16707-2-git-send-email-ifaenson@broadcom.com> <FC211E48-68D8-4C2E-9A1A-E89EDAA1B23F@holtmann.org> <5572A40F.9090206@broadcom.com>
+	linux-bluetooth@vger.kernel.org
+Message-Id: <D3C49FC0-74F0-4CCE-8FFC-A738375E33CD@holtmann.org>
+References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com> <1433365304-16707-5-git-send-email-ifaenson@broadcom.com> <F9497027-7485-43C2-8D8D-8134798B300A@holtmann.org> <5572AC25.5020508@broadcom.com>
 To: Arend van Spriel <arend@broadcom.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Arend,
 
->>> Device Tree bindings to configure the Broadcom Bluetooth UART device.
->>> Updated not to use CamelCase and to use Intel style "oper-speed".
+>>> Merge of the Broadcom logic into the Intel's btbcm implementation.
 >>> 
 >>> Signed-off-by: Ilya Faenson<ifaenson@broadcom.com>
 >>> ---
->>> .../devicetree/bindings/net/bluetooth/btbcm.txt    | 82 ++++++++++++++++++++++
->>> 1 file changed, 82 insertions(+)
->>> create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+>>> drivers/bluetooth/btbcm.c | 142 ++++++++++++++++++++++++++++++++++++----------
+>>> drivers/bluetooth/btbcm.h |  21 ++++++-
+>>> 2 files changed, 132 insertions(+), 31 deletions(-)
 >>> 
->>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
->>> new file mode 100644
->>> index 0000000..2679819
->>> --- /dev/null
->>> +++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
->>> @@ -0,0 +1,82 @@
->>> +btbcm
->>> +------
->>> +
->>> +Required properties:
->>> +
->>> +	- compatible : must be "brcm,brcm-bt-uart".
->>> +	- tty : tty device connected to this Bluetooth device.
->>> +
->>> +Optional properties:
->>> +
->>> +  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an interrupt.
->>> +
->>> +  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume device.
->>> +
->>> +  - bt-reg-on-gpios : reg-on output GPIO to be used to power device on/off.
->>> +
->>> +  - oper-speed : Bluetooth device operational baud rate.
->>> +    Default: 3000000.
->>> +
->>> +  - manual-fc : flow control UART in suspend / resume scenarios.
->>> +    Default: 0.
->>> +
->>> +  - configure-sleep : configure suspend / resume flag.
->>> +    Default: false.
->>> +
->>> +  - configure-audio : configure platform PCM SCO flag.
->>> +    Default: false.
->>> +
->>> +  - pcm-clockmode : PCM clock mode. 0-slave, 1-master.
->>> +    Default: 0.
->>> +
->>> +  - pcm-fillmethod : PCM fill method. 0 to 3.
->>> +    Default: 2.
->>> +
->>> +  - pcm-fillnum : PCM number of fill bits. 0 to 3.
->>> +    Default: 0.
->>> +
->>> +  - pcm-fillvalue : PCM fill value. 0 to 7.
->>> +    Default: 3.
->>> +
->>> +  - pcm-incallbitclock : PCM interface rate. 0-128Kbps, 1-256Kbps, 2-512Kbps,
->>> +    3-1024Kbps, 4-2048Kbps.
->>> +    Default: 0.
->>> +
->>> +  - pcm-lsbfirst : PCM LSB first. 0 or 1.
->>> +    Default: 0.
->>> +
->>> +  - pcm-rightjustify : PCM Justify. 0-left, 1-right.
->>> +    Default: 0.
->>> +
->>> +  - pcm-routing : PCM routing. 0-PCM, 1-SCO over HCI.
->>> +    Default: 0.
->>> +
->>> +  - pcm-shortframesync : PCM sync. 0-short, 1-long.
->>> +    Default: 0.
->>> +
->>> +  - pcmsyncmode : PCM sync mode. 0-slave, 1-master.
->>> +    Default: 0.
->>> +
->>> +
->>> +Example:
->>> +
->>> +	brcm4354_bt_uart: brcm4354-bt-uart {
+>>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+>>> index 728fce3..e1d5ad0 100644
+>>> --- a/drivers/bluetooth/btbcm.c
+>>> +++ b/drivers/bluetooth/btbcm.c
+>>> @@ -3,6 +3,7 @@
+>>>  *  Bluetooth support for Broadcom devices
+>>>  *
+>>>  *  Copyright (C) 2015  Intel Corporation
+>>> + *  Copyright (C) 2015  Broadcom Corporation
+>>>  *
+>>>  *
+>>>  *  This program is free software; you can redistribute it and/or modify
+>>> @@ -32,7 +33,8 @@
+>>> 
+>>> #define VERSION "0.1"
+>>> 
+>>> -#define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
+>>> +#define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00} })
+>>> +#define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43} })
 >> 
->> at some point you have to explain to me if Broadcom prefers BCM or BRCM. I can not make heads or tail out of it. My current explanation is the it is BCM for the Bluetooth guys and BRCM for the WiFi guys ;)
-> 
-> That's a nice explanation ;-) Maybe I can give it a shot. First, two facts: 1) BRCM is our stock symbol, and 2) our device names are prefixed by BCM. So in devicetree specifications we specified the vendor prefix as BRCM and (try to) stick to that. The above clearly refers to a device so it would probably be better to use bcm4354... there.
-> 
->>> +		compatible = "brcm,brcm-bt-uart";
-> 
-> The compatible string indeed starts with vendor prefix "brcm,".
-> 
->>> +		bt-wake-gpios =<&gpio4 30 GPIO_ACTIVE_HIGH>;
->>> +		bt-host-wake-gpios =<&gpio4 31 GPIO_ACTIVE_HIGH>;
->>> +		tty = "ttyS0”;
+>> something funky is going on with your editor that insist on fixing this ;)
 >> 
->> This tty one is the one we need to figure out. Could we reference by some node information instead of the assigned device name. If we can reference something in struct device that we know is more consistent, that would be perfect. I mean if the kernel for reason decides to enumerate things in a different order then this might be ttyS1 out of a sudden.
+>>> 
+>>> int btbcm_check_bdaddr(struct hci_dev *hdev)
+>>> {
+>>> @@ -43,6 +45,7 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+>>> 			     HCI_INIT_TIMEOUT);
+>>> 	if (IS_ERR(skb)) {
+>>> 		int err = PTR_ERR(skb);
+>>> +
+>> 
+>> In this specific case, please do not fix it. I like to keep the simple error path sections small.
+>> 
+>>> 		BT_ERR("%s: BCM: Reading device address failed (%d)",
+>>> 		       hdev->name, err);
+>>> 		return err;
+>>> @@ -56,10 +59,11 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+>>> 
+>>> 	bda = (struct hci_rp_read_bd_addr *)skb->data;
+>>> 
+>>> -	/* The address 00:20:70:02:A0:00 indicates a BCM20702A0 controller
+>>> -	 * with no configured address.
+>>> +	/* Check if the address indicates a controller with no configured
+>>> +	 * address.
+>>> 	 */
+>>> -	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0)) {
+>>> +	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0) ||
+>>> +	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3)) {
+>>> 		BT_INFO("%s: BCM: Using default device address (%pMR)",
+>>> 			hdev->name,&bda->bdaddr);
+>>> 		set_bit(HCI_QUIRK_INVALID_BDADDR,&hdev->quirks);
+>>> @@ -89,21 +93,14 @@ int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+>>> }
+>>> EXPORT_SYMBOL_GPL(btbcm_set_bdaddr);
+>>> 
+>>> -int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
+>>> +int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw)
+>>> {
+>>> 	const struct hci_command_hdr *cmd;
+>>> -	const struct firmware *fw;
+>>> 	const u8 *fw_ptr;
+>>> 	size_t fw_size;
+>>> 	struct sk_buff *skb;
+>>> 	u16 opcode;
+>>> -	int err;
+>>> -
+>>> -	err = request_firmware(&fw, firmware,&hdev->dev);
+>>> -	if (err<  0) {
+>>> -		BT_INFO("%s: BCM: Patch %s not found", hdev->name, firmware);
+>>> -		return err;
+>>> -	}
+>>> +	int err = 0;
+>>> 
+>>> 	/* Start Download */
+>>> 	skb = __hci_cmd_sync(hdev, 0xfc2e, 0, NULL, HCI_INIT_TIMEOUT);
+>>> @@ -129,8 +126,7 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
+>>> 		fw_size -= sizeof(*cmd);
+>>> 
+>>> 		if (fw_size<  cmd->plen) {
+>>> -			BT_ERR("%s: BCM: Patch %s is corrupted", hdev->name,
+>>> -			       firmware);
+>>> +			BT_ERR("%s: BCM: Patch is corrupted", hdev->name);
+>>> 			err = -EINVAL;
+>>> 			goto done;
+>>> 		}
+>>> @@ -156,7 +152,6 @@ int btbcm_patchram(struct hci_dev *hdev, const char *firmware)
+>>> 	msleep(250);
+>>> 
+>>> done:
+>>> -	release_firmware(fw);
+>>> 	return err;
+>>> }
+>>> EXPORT_SYMBOL(btbcm_patchram);
+>>> @@ -168,6 +163,7 @@ static int btbcm_reset(struct hci_dev *hdev)
+>>> 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+>>> 	if (IS_ERR(skb)) {
+>>> 		int err = PTR_ERR(skb);
+>>> +
+>>> 		BT_ERR("%s: BCM: Reset failed (%d)", hdev->name, err);
+>>> 		return err;
+>>> 	}
+>>> @@ -242,9 +238,101 @@ static const struct {
+>>> 	const char *name;
+>>> } bcm_uart_subver_table[] = {
+>>> 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
+>>> +	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
+>>> +	{ 0x610c, "BCM4354_003.001.012.0306.0659"}, /* 003.001.012 */
+>> 
+>> Please just BCM4354 here.
+>> 
+>> And I have initial patches for the manifest file to map modalias to firmware names. That will then hopefully solve all of these and we can just update this easily from userspace. I will send patches as soon as I have cleaned them up a bit.
 > 
-> I see your point, but not sure what to do here either. In devicetree you could reference the uart node, but I don't know if there is an api in the kernel to obtain tty associated with a uart port. I could not find it doing quick glance in include/linux/tty.h although the linkage is obviously there in the data types.
+> Is using modalias sufficient. At least for our wifi chips it is not as new chip revisions with same modalias require different firmware. Same may be true for bt chips.
 
-I wonder if we get this done via ACPI in the first place. However that is something for Fred to figure out.
+let me put it this way, the Windows driver maps the firmware based on USB VID/PID and thus that seems fine then. Also it seems that every ACPI based platform gets a proper ID assigned. So that makes sense as well there.
 
-For device tree, I bet we need to extend either the TTY subsystem or really start pushing towards the tty-slave idea that has been floating around.
+So there are plenty of USB dongles that share the same firmware, but it seems to be manual mapping based on who tested and certified a given firmware for a given piece of hardware. It is just too many that I really want to know. I rather have them all listed and then someone can update it from userspace instead of having to deal with it in the kernel.
 
 Regards
 
