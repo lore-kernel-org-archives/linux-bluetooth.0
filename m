@@ -1,42 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH 2/2] Bluetooth: Add option to enable/disable A2MP module
+Subject: Re: [PATCHv2] Bluetooth: Move SCO support under BT_BREDR config option
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <3B8E4CEA2CC045459E7856C66B82CE931135CD03@SHSMSX103.ccr.corp.intel.com>
-Date: Sat, 6 Jun 2015 06:57:00 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <730F9DAC-E12D-4F00-A478-E0EC23216D2C@holtmann.org>
-References: <1432274165-23569-1-git-send-email-arron.wang@intel.com> <1432274165-23569-2-git-send-email-arron.wang@intel.com> <669F121F-A1EE-47A7-8A15-27E1A2FAFF26@holtmann.org> <3B8E4CEA2CC045459E7856C66B82CE931135CD03@SHSMSX103.ccr.corp.intel.com>
-To: "Wang, Arron" <arron.wang@intel.com>
+In-Reply-To: <1433324130-3771-1-git-send-email-arron.wang@intel.com>
+Date: Sat, 6 Jun 2015 06:54:18 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <0F875A25-15B1-4296-95F9-1FD5720C9403@holtmann.org>
+References: <1433324130-3771-1-git-send-email-arron.wang@intel.com>
+To: Arron Wang <arron.wang@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Arron,
 
->>> Make Bluetooth 3.0 HS feature configurable
->>> 
->>> Signed-off-by: Arron Wang <arron.wang@intel.com>
->>> ---
->>> net/bluetooth/Kconfig          |    5 +
->>> net/bluetooth/Makefile         |    3 +-
->>> net/bluetooth/a2mp.h           |   19 +++
->>> net/bluetooth/amp.h            |   11 ++
->>> net/bluetooth/hci_event.c      |  260 +-----------------------------------
->>> net/bluetooth/hci_event_a2mp.c |  283
->> ++++++++++++++++++++++++++++++++++++++++
->>> net/bluetooth/hci_event_a2mp.h |   91 +++++++++++++
->>> 7 files changed, 412 insertions(+), 260 deletions(-) create mode
->>> 100644 net/bluetooth/hci_event_a2mp.c create mode 100644
->>> net/bluetooth/hci_event_a2mp.h
->> 
->> I don’t think this is the solution here. I think A2MP support should be self
->> contained and utilises the synchronous HCI command framework we have in place
->> and also use in mgmt.
+> SCO/eSCO link is supported by BR/EDR controller, it is
+> suitable to move them under BT_BREDR config option
 > 
-> Yes, create a separate file for hci a2mp event maybe not suitable, but there are many hci ops/events for different Bluetooth controller BREDR/AMP/LE, add the macro to separate them in one file may not easy to maintain, can we move these AMP releated hci ops/event function to file amp.c?
+> Signed-off-by: Arron Wang <arron.wang@intel.com>
+> ---
+> include/net/bluetooth/bluetooth.h |   11 +++++++++++
+> include/net/bluetooth/hci_core.h  |   14 +++++++++++++-
+> net/bluetooth/Makefile            |    3 ++-
+> net/bluetooth/sco.c               |    5 ++---
+> 4 files changed, 28 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 7dba805..38d8a34 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -365,8 +365,19 @@ extern struct dentry *bt_debugfs;
+> int l2cap_init(void);
+> void l2cap_exit(void);
+> 
+> +#if IS_ENABLED(CONFIG_BT_BREDR)
+> int sco_init(void);
+> void sco_exit(void);
+> +#else
+> +static inline int sco_init(void)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void sco_exit(void)
+> +{
+> +}
+> +#endif
+> 
+> int mgmt_init(void);
+> void mgmt_exit(void);
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index a056c2b..387bbc3 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -532,8 +532,20 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
+> int l2cap_disconn_ind(struct hci_conn *hcon);
+> int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
+> 
+> +#if IS_ENABLED(CONFIG_BT_BREDR)
+> int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags);
+> -int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
+> +void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb);
+> +#else
+> +static inline int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
+> +				  __u8 *flags)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
+> +{
+> +}
+> +#endif
+> 
+> /* ----- Inquiry cache ----- */
+> #define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
+> diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+> index 9a8ea23..29c12ae 100644
+> --- a/net/bluetooth/Makefile
+> +++ b/net/bluetooth/Makefile
+> @@ -12,9 +12,10 @@ obj-$(CONFIG_BT_6LOWPAN) += bluetooth_6lowpan.o
+> bluetooth_6lowpan-y := 6lowpan.o
+> 
+> bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+> -	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
+> +	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+> 	a2mp.o amp.o ecc.o hci_request.o mgmt_util.o
+> 
+> +bluetooth-$(CONFIG_BT_BREDR) += sco.o
+> bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+> bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
+> 
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 4322c83..f348383 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -1110,7 +1110,7 @@ static void sco_disconn_cfm(struct hci_conn *hcon, __u8 reason)
+> 	sco_conn_del(hcon, bt_to_errno(reason));
+> }
+> 
+> -int sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
+> +void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
+> {
 
-unless it has some complicated state machine impact, using the hci_request infrastructure should be preferred compared to go through callback handlers in hci_event.c. So first of all it needs to be investigated which of the A2MP HCI functions can be turned into using hci_request.
+I prefer that we do this change in a separate patch and do it for sco_recv_scodata and also l2cap_recv_acldata. Since both are in the same boat here and should be just fixed first.
 
 Regards
 
