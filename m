@@ -1,35 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: find out why the same usb bluetooth dongle that works on i686 x86_64, does not work on ppc (ibook g4)
+Subject: Re: [PATCH v1 7/7] Bluetooth: __l2cap_wait_ack() limit max waiting time
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAKrOiPRTfCWz+C3Z0BsD92PcgV1A3kGxw3xLMCXuBvOap+6-UQ@mail.gmail.com>
-Date: Sat, 6 Jun 2015 06:26:56 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <4174905F-4A66-45CD-B135-640881D480C3@holtmann.org>
-References: <CAKrOiPRTfCWz+C3Z0BsD92PcgV1A3kGxw3xLMCXuBvOap+6-UQ@mail.gmail.com>
-To: naruto canada <narutocanada@gmail.com>
+In-Reply-To: <1433545876-15800-8-git-send-email-Dean_Jenkins@mentor.com>
+Date: Sat, 6 Jun 2015 06:21:28 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Joshua_Frkuska@mentor.com
+Message-Id: <B5FA3BFD-DCAF-4493-BA35-2341AF79D034@holtmann.org>
+References: <1433545876-15800-1-git-send-email-Dean_Jenkins@mentor.com> <1433545876-15800-8-git-send-email-Dean_Jenkins@mentor.com>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Dean,
 
-> If anyone like to offer suggestion or help with finding out why the
-> same usb bluetooth dongle (cheap EDR 2.0) that works on i686 x86_64,
-> does not work on ppc (ibook g4). The three machines all run the same
-> software stack, same kernel version, gcc, bluez, dbus, python etc--
-> all the same version. kernel:3.4.107 gcc:4.9.2 bluez:5.23 dbus:1.8.16
-> python:2.7.10 I will give more details if needed. I have btmon log for
-> failed pairing on ppc with nokia phone and good pairing logs as well.
-> also python trace log (does not help much). it seems, on ppc, the
-> dongle always "omit" to send second "connect request", compared with
-> good pairings on x86_64 and i686. the ibook g4 internal usb bluetooth
-> dongle (which I manage to bring to hci mode) also failed with the same
-> sympton (same python error, but not sure about the exact reason).
-> buying another bt dongle may or may not solve the problem. I have
-> attached good pairing and bad pairing log from btmon.
+> Add a limiter counter to prevent the do while loop
+> running in an infinite loop. This ensures that the
+> channel will be instructed to close within 10 seconds
+> so prevents l2cap_sock_shutdown() getting stuck forever.
+> 
+> Returns -ENOLINK when the limit is reached as the channel
+> will be subequently closed and not all data was ACK'ed.
+> 
+> Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+> ---
+> net/bluetooth/l2cap_sock.c | 11 ++++++++++-
+> 1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 369ad0e..ee6531e 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1059,11 +1059,13 @@ static int __l2cap_wait_ack(struct sock *sk, struct l2cap_chan *chan)
+> 	DECLARE_WAITQUEUE(wait, current);
+> 	int err = 0;
+> 	int timeo = HZ/5;
+> +	int limiter = 10 * 5;	/* 10 seconds limit */
 
-how are you trying to pair this device? My first guess is the it is some endian bug in the tool that retrieves the RFCOMM channel and number and can not see that the SDP records are present.
+while reading this, should timeo not be using msecs_to_jiffies() in the first place.
+
+And with that, can we have a little bit better logic on how you get to 10 seconds. I had to scratch my head a bit to realise that this is 50 * 200 msec. It seems a bit error prone in case anyone ever changes something.
+
+> 
+> 	add_wait_queue(sk_sleep(sk), &wait);
+> 	set_current_state(TASK_INTERRUPTIBLE);
+> 	do {
+> -		BT_DBG("Waiting for %d ACKs", chan->unacked_frames);
+> +		BT_DBG("Waiting for %d ACKs, limiter %d",
+> +			chan->unacked_frames, limiter);
+> 
+> 		if (!timeo)
+> 			timeo = HZ/5;
+
+And with that, I have no idea why we are doing this check here. Seems rather pointless unless I misses something.
+
+I know these are not your bugs, but while we are at it, it might be better to really clean this out.
+
+> @@ -1081,6 +1083,13 @@ static int __l2cap_wait_ack(struct sock *sk, struct l2cap_chan *chan)
+> 		err = sock_error(sk);
+> 		if (err)
+> 			break;
+> +
+> +		limiter--;
+> +		if (!limiter) {
+> +			err = -ENOLINK;
+> +			break;
+> +		}
+> +
+> 	} while (chan->unacked_frames > 0 &&
+> 		 chan->state == BT_CONNECTED);
 
 Regards
 
