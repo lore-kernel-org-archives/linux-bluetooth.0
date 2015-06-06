@@ -1,122 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5572A40F.9090206@broadcom.com>
-Date: Sat, 6 Jun 2015 09:41:03 +0200
-From: Arend van Spriel <arend@broadcom.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Ilya Faenson <ifaenson@broadcom.com>, <linux-bluetooth@vger.kernel.org>,
-	Jiri Slaby <jslaby@suse.cz>
-Subject: Re: [PATCH 1/5] Broadcom Bluetooth UART Device Tree bindings
-References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com> <1433365304-16707-2-git-send-email-ifaenson@broadcom.com> <FC211E48-68D8-4C2E-9A1A-E89EDAA1B23F@holtmann.org>
-In-Reply-To: <FC211E48-68D8-4C2E-9A1A-E89EDAA1B23F@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <55729D68.1050607@broadcom.com>
+Date: Sat, 6 Jun 2015 09:24:25 +0200
+Cc: Ilya Faenson <ifaenson@broadcom.com>,
+	Frederic Danis <frederic.danis@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <86D0B13B-814E-49C7-9A18-B459221201CC@holtmann.org>
+References: <1432136770-13328-1-git-send-email-frederic.danis@linux.intel.com> <1432136770-13328-5-git-send-email-frederic.danis@linux.intel.com> <555DE2BE.8000109@broadcom.com> <555F25F8.4080408@linux.intel.com> <555F2EB5.1080103@broadcom.com> <555F33E8.8010703@linux.intel.com> <E0D3336E15B58B4294723AC879BA5E9425A61F@IRVEXCHMB15.corp.ad.broadcom.com> <55646A17.10501@linux.intel.com> <E0D3336E15B58B4294723AC879BA5E9425ADE4@IRVEXCHMB15.corp.ad.broadcom.com> <D5EDC898-B451-4978-A13A-7BEBC9D093EB@holtmann.org> <55729D68.1050607@broadcom.com>
+To: Arend van Spriel <arend@broadcom.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 06/06/15 08:40, Marcel Holtmann wrote:
-> Hi Ilya,
->
->> Device Tree bindings to configure the Broadcom Bluetooth UART device.
->> Updated not to use CamelCase and to use Intel style "oper-speed".
->>
->> Signed-off-by: Ilya Faenson<ifaenson@broadcom.com>
->> ---
->> .../devicetree/bindings/net/bluetooth/btbcm.txt    | 82 ++++++++++++++++++++++
->> 1 file changed, 82 insertions(+)
->> create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
->>
->> diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
->> new file mode 100644
->> index 0000000..2679819
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
->> @@ -0,0 +1,82 @@
->> +btbcm
->> +------
->> +
->> +Required properties:
->> +
->> +	- compatible : must be "brcm,brcm-bt-uart".
->> +	- tty : tty device connected to this Bluetooth device.
->> +
->> +Optional properties:
->> +
->> +  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an interrupt.
->> +
->> +  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume device.
->> +
->> +  - bt-reg-on-gpios : reg-on output GPIO to be used to power device on/off.
->> +
->> +  - oper-speed : Bluetooth device operational baud rate.
->> +    Default: 3000000.
->> +
->> +  - manual-fc : flow control UART in suspend / resume scenarios.
->> +    Default: 0.
->> +
->> +  - configure-sleep : configure suspend / resume flag.
->> +    Default: false.
->> +
->> +  - configure-audio : configure platform PCM SCO flag.
->> +    Default: false.
->> +
->> +  - pcm-clockmode : PCM clock mode. 0-slave, 1-master.
->> +    Default: 0.
->> +
->> +  - pcm-fillmethod : PCM fill method. 0 to 3.
->> +    Default: 2.
->> +
->> +  - pcm-fillnum : PCM number of fill bits. 0 to 3.
->> +    Default: 0.
->> +
->> +  - pcm-fillvalue : PCM fill value. 0 to 7.
->> +    Default: 3.
->> +
->> +  - pcm-incallbitclock : PCM interface rate. 0-128Kbps, 1-256Kbps, 2-512Kbps,
->> +    3-1024Kbps, 4-2048Kbps.
->> +    Default: 0.
->> +
->> +  - pcm-lsbfirst : PCM LSB first. 0 or 1.
->> +    Default: 0.
->> +
->> +  - pcm-rightjustify : PCM Justify. 0-left, 1-right.
->> +    Default: 0.
->> +
->> +  - pcm-routing : PCM routing. 0-PCM, 1-SCO over HCI.
->> +    Default: 0.
->> +
->> +  - pcm-shortframesync : PCM sync. 0-short, 1-long.
->> +    Default: 0.
->> +
->> +  - pcmsyncmode : PCM sync mode. 0-slave, 1-master.
->> +    Default: 0.
->> +
->> +
->> +Example:
->> +
->> +	brcm4354_bt_uart: brcm4354-bt-uart {
->
-> at some point you have to explain to me if Broadcom prefers BCM or BRCM. I can not make heads or tail out of it. My current explanation is the it is BCM for the Bluetooth guys and BRCM for the WiFi guys ;)
+Hi Arend,
 
-That's a nice explanation ;-) Maybe I can give it a shot. First, two 
-facts: 1) BRCM is our stock symbol, and 2) our device names are prefixed 
-by BCM. So in devicetree specifications we specified the vendor prefix 
-as BRCM and (try to) stick to that. The above clearly refers to a device 
-so it would probably be better to use bcm4354... there.
+>>>>>>>> Use btbcm helpers to perform controller setup.
+>>>>>>>> Perform host UART reset to init speed between btbcm_patchram() and
+>>>>>>>> btbcm_finalize(). This may be need because firmware loading may have
+>>>>>>>> reseted controller UART to init speed.
+>>>>>>>> 
+>>>>>>>> Signed-off-by: Frederic Danis<frederic.danis@linux.intel.com>
+>>>>>>>> ---
+>>>>>>>> drivers/bluetooth/hci_bcm.c | 19 ++++++++++++++++++-
+>>>>>>>> 1 file changed, 18 insertions(+), 1 deletion(-)
+>>>>>>>> 
+>>>>>>>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>>>>>>>> index 1ec0b4a..cede445 100644
+>>>>>>>> --- a/drivers/bluetooth/hci_bcm.c
+>>>>>>>> +++ b/drivers/bluetooth/hci_bcm.c
+>>>>>>>> @@ -79,11 +79,28 @@ static int bcm_flush(struct hci_uart *hu)
+>>>>>>>> 
+>>>>>>>> static int bcm_setup(struct hci_uart *hu)
+>>>>>>>> {
+>>>>>>>> + char fw_name[64];
+>>>>>>>> + int err;
+>>>>>>>> +
+>>>>>>>> BT_DBG("hu %p", hu);
+>>>>>>>> 
+>>>>>>>> hu->hdev->set_bdaddr = btbcm_set_bdaddr;
+>>>>>>>> 
+>>>>>>>> - return btbcm_setup_patchram(hu->hdev);
+>>>>>>>> + err = btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name));
+>>>>>>>> + if (err)
+>>>>>>>> + return err;
+>>>>>>>> +
+>>>>>>>> + err = btbcm_patchram(hu->hdev, fw_name);
+>>>>>>>> + /* If there is no firmware (-ENOENT), discard the error and
+>>>>>>>> continue */
+>>>>>>> 
+>>>>>>> I guess -ENOENT means no firmware is required and not a
+>>>>>>> request_firmware() failure. Not sure what is meant here.
+>>>>>>> 
+>>>>>>> Regards,
+>>>>>>> Arend
+>>>>>>> 
+>>>>>>>> + if (err == -ENOENT)
+>>>>>>>> + return 0;
+>>>>>>>> +
+>>>>>>>> + if (hu->proto->init_speed)
+>>>>>>>> + hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>>>>>>> +
+>>>>>>>> + err = btbcm_finalize(hu->hdev);
+>>>>>>>> +
+>>>>>>>> + return err;
+>>>>>>>> }
+>>>>>>>> 
+>>>>>>>> static const struct h4_recv_pkt bcm_recv_pkts[] = {
+>>>>>> 
+>>>>>> You're right, btbcm_patchram() return test does not work as I expected.
+>>>>>> 
+>>>>>> I can change this by performing uart speed change only if it returns no
+>>>>>> error.
+>>>>>> 
+>>>>>> err = btbcm_patchram(hu->hdev, fw_name);
+>>>>>> if (!err) {
+>>>>>> /* Firmware loading may have reseted controller UART to init speed */
+>>>>>> if (hu->proto->init_speed)
+>>>>>> hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>>>>> }
+>>>>>> 
+>>>>>> err = btbcm_finalize(hu->hdev);
+>>>>>> 
+>>>>>> 
+>>>>>> Or I can move request_firmware() out of btbcm_patchram() and test it
+>>>>>> before calling btbcm_patchram(). This will imply to change
+>>>>>> btbcm_patchram() to accept a firmware instead of firmware name.
+>>>>>> 
+>>>>>> err = request_firmware(&fw, fw_name,&hu->hdev->dev);
+>>>>>> if (err<  0) {
+>>>>>> BT_INFO("%s: BCM: patch %s not found", hu->hdev->name, fw_name);
+>>>>>> return 0;
+>>>>>> }
+>>>>>> 
+>>>>>> err = btbcm_patchram(hu->hdev, fw);
+>>>>>> if (!err) {
+>>>>>> /* Firmware loading may have reseted controller UART to init speed */
+>>>>>> if (hu->proto->init_speed)
+>>>>>> hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>>>>> }
+>>>>>> 
+>>>>>> err = btbcm_finalize(hu->hdev);
+>>>>>> 
+>>>>>> Arend, Marcel, any advice regarding this ?
+>>>>> 
+>>>>> Well, functionally it does not make a difference as the request_firmware
+>>>>> is the first call done in btbcm_patchram(). So if it solves your problem
+>>>>> I would go for option 2. Other question: is there a reason why the error
+>>>>> code from request_firmware is not returned?
+>>>> 
+>>>> If an error is returned it will stop Bluetooth setup.
+>>>> So, when request_firmware() returns an error, the Bluetooth controller
+>>>> will be used with current firmware and 0 is returned as bcm_setup is
+>>>> completed.
+>>>> 
+>>>> IF: There is generally no "current firmware" if the firmware download fails or not attempted. The device would run out of the ROM then which is not terribly useful if Bluetooth functionality is needed. Thanks, -Ilya
+>>> 
+>>> The BCM4324B3 embedded in T100 is able to operate without firmware
+>>> loading, at least performing Bluetooth discovery.
+>>> I think it is better to run without firmware loading than not allowing
+>>> to use Bluetooth controller at all.
+>>> 
+>>> IF: Broadcom software elsewhere generally fails device start in this case as every Bluetooth feature may or may not work afterwards, with no guarantees whatsoever. The decision here is obviously up to BlueZ maintainers.
+>> 
+>> I am fine with actually doing exactly that once we have a bit better infrastructure in place. However this also requires a commitment from Broadcom to actually publish the firmware files in linux-firmware tree and maintain the manifest document I have been talking about.
+> 
+> What is the added value of having the manifest file? I can see it keeps mapping hardware info to firmware file out of the driver and as such keeps the driver from growing in size for new device support. Just wondering how big that issue is. It also poses other issues as it adds another interaction with the firmware api, which in my opinion is still a nasty api from driver perspective.
 
->> +		compatible = "brcm,brcm-bt-uart";
+so a recent version of the Broadcom Bluetooth driver for Windows contains 167+ firmware files. Which means there are plenty of different files. I count at least 100+ individual USB dongles listed. Inside the btusb.c driver we started to match these devices with interface specific information.
 
-The compatible string indeed starts with vendor prefix "brcm,".
+        /* Broadcom devices with vendor specific id */
+        { USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01),
+          .driver_info = BTUSB_BCM_PATCHRAM },
 
->> +		bt-wake-gpios =<&gpio4 30 GPIO_ACTIVE_HIGH>;
->> +		bt-host-wake-gpios =<&gpio4 31 GPIO_ACTIVE_HIGH>;
->> +		tty = "ttyS0”;
->
-> This tty one is the one we need to figure out. Could we reference by some node information instead of the assigned device name. If we can reference something in struct device that we know is more consistent, that would be perfect. I mean if the kernel for reason decides to enumerate things in a different order then this might be ttyS1 out of a sudden.
+Otherwise we would just go insane to attempt to update the driver for every new dongle manufacture that comes along. This way this is limited to a handful big ones.
 
-I see your point, but not sure what to do here either. In devicetree you 
-could reference the uart node, but I don't know if there is an api in 
-the kernel to obtain tty associated with a uart port. I could not find 
-it doing quick glance in include/linux/tty.h although the linkage is 
-obviously there in the data types.
+The request_firmware() API allows to builtin the file into the kernel image. While I would not do that for the actual firmware file itself, but for the manifest it might make sense. However keeping it outside and allowing update via linux-firmware package update seems beneficial for everybody.
 
-Regards,
-Arend
+Regards
+
+Marcel
+
