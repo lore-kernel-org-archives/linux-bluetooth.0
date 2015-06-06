@@ -4,12 +4,12 @@ Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
 Subject: Re: Memory leak in btusb
 From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <55638D99.5000704@lwfinger.net>
-Date: Sat, 6 Jun 2015 08:23:17 +0200
+Date: Sat, 6 Jun 2015 08:20:03 +0200
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Linux Bluetooth mailing list
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <FEA49882-9F1E-463F-9253-AD9E6AF8A762@holtmann.org>
+Message-Id: <505B537A-8322-487F-8F49-4CC35BBAA775@holtmann.org>
 References: <55638D99.5000704@lwfinger.net>
 To: Larry Finger <Larry.Finger@lwfinger.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -35,23 +35,7 @@ Hi Larry,
 > 
 > The Bluetooth device in use is made by Intel with USB ID 8087:07dc.
 
-actually if this is only this device causing it, this might fix it:
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 94c6c048130f..e6815c678898 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1614,6 +1614,8 @@ static int btusb_setup_intel(struct hci_dev *hdev)
-        }
-        fw_ptr = fw->data;
- 
-+       kfree_skb(skb);
-+
-        /* This Intel specific command enables the manufacturer mode of the
-         * controller.
-         *
-
-Totally untested, but it seems we forget to free that SKB and it would explain if you only see this on Intel Wilkens Peak and Stone Peak controllers.
+does this only happen with the Intel device or with all Bluetooth USB dongles?
 
 Regards
 
