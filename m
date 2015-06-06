@@ -1,45 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Sender: Larry Finger <larry.finger@gmail.com>
+Message-ID: <557319CC.1080709@lwfinger.net>
+Date: Sat, 06 Jun 2015 11:03:24 -0500
+From: Larry Finger <Larry.Finger@lwfinger.net>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>
 Subject: Re: Memory leak in btusb
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <55638D99.5000704@lwfinger.net>
-Date: Sat, 6 Jun 2015 18:37:41 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <CF543FED-6CEE-4821-A0E1-9EC751026C24@holtmann.org>
-References: <55638D99.5000704@lwfinger.net>
-To: Larry Finger <Larry.Finger@lwfinger.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
+References: <55638D99.5000704@lwfinger.net> <FEA49882-9F1E-463F-9253-AD9E6AF8A762@holtmann.org>
+In-Reply-To: <FEA49882-9F1E-463F-9253-AD9E6AF8A762@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Larry,
+On 06/06/2015 01:23 AM, Marcel Holtmann wrote:
 
-> While using kmemleak to check for memory leaks in a wireless driver, I noticed the following stack traceback for a leak in btusb:
-> 
-> <ffffffff8160257e>] __alloc_skb+0x7e/0x2b0
-> [<ffffffffa06029d6>] btusb_recv_intr+0x136/0x180 [btusb]
-> [<ffffffffa0602ad8>] btusb_intr_complete+0xb8/0x150 [btusb]
-> [<ffffffff8156ccb2>] __usb_hcd_giveback_urb+0x72/0x120
-> 
-> To eliminate a false positive, I unloaded the driver and got the following for the virtual address:
-> 
-> [<ffffffff8160257e>] __alloc_skb+0x7e/0x2b0
-> [<ffffffffa06029d6>] 0xffffffffa06029d6
-> [<ffffffffa0602ad8>] 0xffffffffa0602ad8
-> [<ffffffff8156ccb2>] __usb_hcd_giveback_urb+0x72/0x120
+> actually if this is only this device causing it, this might fix it:
+>
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 94c6c048130f..e6815c678898 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1614,6 +1614,8 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+>          }
+>          fw_ptr = fw->data;
+>
+> +       kfree_skb(skb);
+> +
+>          /* This Intel specific command enables the manufacturer mode of the
+>           * controller.
+>           *
+>
+> Totally untested, but it seems we forget to free that SKB and it would explain if you only see this on Intel Wilkens Peak and Stone Peak controllers.
 
-if this is really an alloc_skb from btusb_recv_intr, then it is the HCI event reassembly handling. Meaning this is data->evt_skb since that is the only one that is ever allocated there.
+Marcel,
 
-All the SKBs allocated in that function are consumed by the core or later on freed by btusb_free_frags. Is this some rare case on suspend/resume where we forget to free the frags when we get disconnected and re-enumerate via probe?
+Thanks. My knowledge of btusb and the hci library is too meagre for me to find 
+leaks.
 
-When the core consumes this SKB via hci_recv_frame it really consumes it. If for some reason this function returns an error, it still frees the SKB. So for all intense in purposes it could be even void.
+I have tested this patch. To me, this looks like a real leak, particularly since 
+skb is overwritten a few lines down; however, the one I see is still present. My 
+device does load a firmware patch file. This patch may or may not be needed, but 
+it does no harm that I see.
 
-So I need some more info on what is causing this memory leak. The one in the Intel setup routine was obvious. If that does not fix it, then this is not obvious. You might need to check which alloc_skb this really is. As I said, if it is the one in btusb_recv_intr, then it is the data->evt_skb that is leaking in some corner case.
+For the record, my device loads patch file ibt-hw-37.7.10-fw-1.80.2.3.d.bseq.
 
-Regards
-
-Marcel
-
+Larry
