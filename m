@@ -1,42 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [Patch] bccmd - add ability to read ADC
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Content-Type: text/plain; charset=iso-8859-1
+Subject: Re: [PATCH v7 0/6] Add baudrate management for Bluetooth UART
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <53e48edc3040ae4a82e3beaf06c692e1.squirrel@mungewell.org>
-Date: Sat, 6 Jun 2015 07:49:37 +0200
+In-Reply-To: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com>
+Date: Sat, 6 Jun 2015 07:48:36 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <06F67222-BAF1-455D-A4B8-4560FE84EE69@holtmann.org>
-References: <53e48edc3040ae4a82e3beaf06c692e1.squirrel@mungewell.org>
-To: simon@mungewell.org
+Message-Id: <BFC52EE7-088F-4C85-B2DE-7955A3707EFF@holtmann.org>
+References: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Simon,
+Hi Fred,
 
-> Some BlueCore devices are equipped with an 'Analogue In' pin which is
-> internally connected to a MUX and ADC. This patch adds the ability to
-> control the MUX and read the ADC.
+> This patch set introduce baudrate management for Bluetooth UART
+> Controller setup and a first implementation for Broadcom BCM4324B3
+> used in Asus T100.
 > 
-> The ADC is also connected internal to a temp sensor, which can also be
-> read via this method.
+> v6 -> v7:
+> - Fix setup when firmware is missing by moving
+>  request/release_firmware() out of btbcm_patchram().
 > 
-> The (only) MUX values expected to be used are:
-> 1 Internal 1V25 reference
-> 16 BlueCore01b pin Test_A; BlueCore2-External pin AIO0
-> 17 BlueCore01b pin Test_B; BlueCore2-External pin AIO1
-> 36 Chip’s internal temperature (change) sensor. BlueCore2-ROM and later only.
+> v2 -> v6:
+> - Fixes for __hci_cmd_sync() has been integrated (patch v5)
+> - In btbcm_check_bdaddr(), merge controller address tests
+> - Fix declaration of speeds to use "unsigned int" type
+> - Rename default_speed to init_speed
+> - Rename operational_speed to oper_speed
+> - In case of error during vendor specific set_baudrate(), do not change
+>  host baudrate and continue without changing speed
+> - Discard changes to bcm_setup_patchram() and in btusb.c
+> - Introduce helper functions btbcm_initialize() and btbcm_finalize() to
+>  be used by the UART side of things.
 > 
-> The MUX can also select other (undocumented) test points.
+> Frederic Danis (6):
+>  Bluetooth: btbcm: Move request/release_firmware()
+>  Bluetooth: btbcm: Add BCM4324B3 UART device
+>  Bluetooth: hci_uart: Support operational speed during setup
+>  Bluetooth: btbcm: Add helper functions for UART setup
+>  Bluetooth: hci_uart: Update Broadcom UART setup
+>  Bluetooth: hci_uart: Add bcm_set_baudrate()
 > 
-> Example usage
-> --
-> # ./bccmd -t HCI -d hci1 adc 17
-> ADC value from Mux 0x11 : 0x0054 (valid)
-> # ./bccmd -t HCI -d hci1 adc 1
-> ADC value from Mux 0x01 : 0x00b2 (valid)
+> drivers/bluetooth/btbcm.c     | 135 +++++++++++++++++++++++++++++++++---------
+> drivers/bluetooth/btbcm.h     |  20 ++++++-
+> drivers/bluetooth/hci_bcm.c   |  86 ++++++++++++++++++++++++++-
+> drivers/bluetooth/hci_ldisc.c |  26 ++++++++
+> drivers/bluetooth/hci_uart.h  |   4 ++
+> 5 files changed, 240 insertions(+), 31 deletions(-)
 
-please send a patch created via git format-patch.
+patches 1-5 have been applied to bluetooth-next tree.
+
+However I did a few minor modifications as mentioned in the separate emails. They were mainly cosmetic and easy to do inline so that you do not have to worry about redoing the whole series. However patch 6 needs a bit of extra work.
 
 Regards
 
