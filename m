@@ -1,75 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Larry Finger <larry.finger@gmail.com>
-Message-ID: <5573669B.1080606@lwfinger.net>
-Date: Sat, 06 Jun 2015 16:31:07 -0500
-From: Larry Finger <Larry.Finger@lwfinger.net>
+Message-ID: <55735901.9050303@gmail.com>
+Date: Sat, 06 Jun 2015 23:33:05 +0300
+From: Dmitry Tunin <hanipouspilot@gmail.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>
-Subject: Re: Memory leak in btusb
-References: <55638D99.5000704@lwfinger.net> <CF543FED-6CEE-4821-A0E1-9EC751026C24@holtmann.org> <55733607.30108@lwfinger.net> <C04EFF03-5661-4BFC-893F-4BFFB99CAD03@holtmann.org>
-In-Reply-To: <C04EFF03-5661-4BFC-893F-4BFFB99CAD03@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+CC: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] ath3k: Add support of 0489:e076 AR3012 device
+References: <1433611540-30860-1-git-send-email-hanipouspilot@gmail.com>
+In-Reply-To: <1433611540-30860-1-git-send-email-hanipouspilot@gmail.com>
+Content-Type: text/plain; charset=windows-1251; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 06/06/2015 01:31 PM, Marcel Holtmann wrote:
-> Hi Larry,
->
-> since the interrupt endpoint is only used for HCI events, you do not even need connections. This could be anything simple like HCI command complete event.
->
-> Now I wonder if this is something odd where the HCI event fits completely into a single interrupt URB or something special like that. If you get get the content of that URB, then I might be able to track this down. Or do you have a chance to run btmon and correlate the timestamps.
 
-Synchronizing the timing between kmemleak and btmon is a little difficult as the 
-former reports time only in jiffies and seconds before present. I will keep 
-looking, but I think the leaked allocation happened at roughly 16:17:52. The 
-only things that btmon logged are
 
- > HCI Event: Number of Completed Packets (0x13) plen 5 
-                                      [hci0] 8
-         Num handles: 1
-         Handle: 256
-         Count: 1
- > ACL Data RX: Handle 256 flags 0x02 dlen 12 
-                                      [hci0] 16:18:49.598733
-       L2CAP: Disconnection Response (0x07) ident 4 len 4
-         Destination CID: 65
-         Source CID: 64
-< HCI Command: Read Clock Offset (0x01|0x001f) plen 2 
-                                     [hci0] 16:18:51.601920
-         Handle: 256
- > HCI Event: Command Status (0x0f) plen 4 
-                                      [hci0] 16:18:51.602808
-       Read Clock Offset (0x01|0x001f) ncmd 1
-         Status: Success (0x00)
-< HCI Command: Disconnect (0x01|0x0006) plen 3 
-                                     [hci0] 16:18:51.603069
-         Handle: 256
-         Reason: Remote User Terminated Connection (0x13)
- > HCI Event: Command Status (0x0f) plen 4 
-                                      [hci0] 16:18:51.603750
-       Disconnect (0x01|0x0006) ncmd 1
-         Status: Success (0x00)
- > HCI Event: Read Clock Offset Complete (0x1c) plen 5 
-                                      [hci0] 16:18:51.606847
-         Status: Success (0x00)
-         Handle: 256
-         Clock offset: 0x4568
- > HCI Event: Disconnect Complete (0x05) plen 4 
-                                      [hci0] 16:18:51.687885
-         Status: Success (0x00)
-         Handle: 256
-         Reason: Connection Terminated By Local Host (0x16)
-@ Device Disconnected: 00:26:5F:D4:27:72 (0) reason 2
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1 
-                                     [hci0] 16:18:51.701737
-         Scan enable: Page Scan (0x02)
- > HCI Event: Command Complete (0x0e) plen 4 
-                                      [hci0] 16:18:51.702749
-       Write Scan Enable (0x03|0x001a) ncmd 2
-         Status: Success (0x00)
-@ Device Removed: 00:26:5F:D4:27:72 (0)
-< HCI Command: Write Scan Enable (0x03|0x001a) plen 1 
-                                     [hci0] 16:19:04.771489
-         Scan enable: No Scans (0x00)
+06.06.2015 20:25, Dmitry Tunin пишет:
+> BugLink: https://bugs.launchpad.net/bugs/1462614
+>
+> This device requires new firmware files
+>   AthrBT_0x11020100.dfu and ramps_0x11020100_40.dfu added to
+> /lib/firmware/ar3k/ that are not included in linux-firmware yet.
+>
+> T: Bus=03 Lev=01 Prnt=01 Port=09 Cnt=06 Dev#= 7 Spd=12 MxCh= 0
+> D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+> P: Vendor=0489 ProdID=e076 Rev= 0.01
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+> E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+>
+> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+> Cc: stable@vger.kernel.org
+> ---
+>   drivers/bluetooth/ath3k.c | 2 ++
+>   drivers/bluetooth/btusb.c | 1 +
+>   2 files changed, 3 insertions(+)
+>
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index 8c81af6..ee64764 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -80,6 +80,7 @@ static const struct usb_device_id ath3k_table[] = {
+>   	{ USB_DEVICE(0x0489, 0xe057) },
+>   	{ USB_DEVICE(0x0489, 0xe056) },
+>   	{ USB_DEVICE(0x0489, 0xe05f) },
+> +	{ USB_DEVICE(0x0489, 0xe076) },
+>   	{ USB_DEVICE(0x0489, 0xe078) },
+>   	{ USB_DEVICE(0x04c5, 0x1330) },
+>   	{ USB_DEVICE(0x04CA, 0x3004) },
+> @@ -137,6 +138,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+>   	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
+> +	{ USB_DEVICE(0x0489, 0xe076), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0489, 0xe078), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x04c5, 0x1330), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 94c6c04..c9be776 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -179,6 +179,7 @@ static const struct usb_device_id blacklist_table[] = {
+>   	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
+> +	{ USB_DEVICE(0x0489, 0xe076), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0489, 0xe078), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x04c5, 0x1330), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x04ca, 0x3004), .driver_info = BTUSB_ATH3012 },
+I added /sys/kernel/debug/usb/devices when firmware was not loaded.
+When I added firmware files it shows
+
+T: Bus=03 Lev=01 Prnt=01 Port=09 Cnt=05 Dev#= 5 Spd=12 MxCh= 0
+D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=0489 ProdID=e076 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+
+Shall I change the commit message, or is it OK?
