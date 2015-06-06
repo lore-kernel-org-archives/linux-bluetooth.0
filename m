@@ -1,164 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Arend Van Spriel" <arend@broadcom.com>
-Subject: RE: [PATCH 2/5] Intel based H4 line discipline enhancements
-Date: Sat, 6 Jun 2015 15:33:16 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E9425F717@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
- <1433365304-16707-3-git-send-email-ifaenson@broadcom.com>
- <85C2DD1E-DD05-4F42-8739-23B208A615A0@holtmann.org>
-In-Reply-To: <85C2DD1E-DD05-4F42-8739-23B208A615A0@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <5572D8E0.4010408@broadcom.com>
+Date: Sat, 6 Jun 2015 13:26:24 +0200
+From: Arend van Spriel <arend@broadcom.com>
 MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Ilya Faenson <ifaenson@broadcom.com>, <linux-bluetooth@vger.kernel.org>,
+	Jiri Slaby <jslaby@suse.cz>
+Subject: Re: [PATCH 1/5] Broadcom Bluetooth UART Device Tree bindings
+References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com> <1433365304-16707-2-git-send-email-ifaenson@broadcom.com> <FC211E48-68D8-4C2E-9A1A-E89EDAA1B23F@holtmann.org> <5572A40F.9090206@broadcom.com> <2D4B4815-717F-4B21-A265-171D07E309B8@holtmann.org>
+In-Reply-To: <2D4B4815-717F-4B21-A265-171D07E309B8@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQpBcHByZWNpYXRlIHlvdSBhcHBseWluZyBGcmVkJ3MgcGF0Y2hlcy4gSSB3
-aWxsIG5vdyBwdXQgdG9nZXRoZXIgYW5kIHBvc3Qgc2ltaWxhciBwYXRjaGVzIGFnYWluc3QgdGhl
-IGJsdWV0b290aC1uZXh0IHByb3Blci4NCg0KU29ycnkgZm9yIG1hbnkgbWlub3IgY2hhbmdlcy4g
-SSBqdXN0IGhhcHBlbiB0byBydW4gdGhlIGNoZWNrcGF0Y2ggc2NyaXB0IGF1dG9tYXRpY2FsbHkg
-cHJpb3IgdG8gcHVibGlzaGluZyB0aGUgcGF0Y2hlcyAoQXJlbmQgdGF1Z2h0IG1lIGdvb2QgTGlu
-dXggcHJhY3RpY2VzIDotKSkgYW5kIHRoYXQgcmVzdWx0cyBpbiB0aG9zZSBzcGFjZXMgZ2V0dGlu
-ZyBkZWxldGVkIGV0IGFsLg0KDQpUaGFua3MsDQogLUlseWENCg0KLS0tLS1PcmlnaW5hbCBNZXNz
-YWdlLS0tLS0NCkZyb206IE1hcmNlbCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5v
-cmddIA0KU2VudDogU2F0dXJkYXksIEp1bmUgMDYsIDIwMTUgMjozNyBBTQ0KVG86IElseWEgRmFl
-bnNvbg0KQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBb
-UEFUQ0ggMi81XSBJbnRlbCBiYXNlZCBINCBsaW5lIGRpc2NpcGxpbmUgZW5oYW5jZW1lbnRzDQoN
-CkhpIElseWEsDQoNCj4gVGhpcyBpcyBsYXJnZWx5IGVuaGFuY2VtZW50cyBpbXBsZW1lbnRlZCBi
-eSBGcmVkZXJpYyBEYW5pcyBvZiBJbnRlbC4NCj4gSSd2ZSBhbHNvIGFkZGVkIHRoZSBhYmlsaXR5
-IHRvIGZsb3cgY29udHJvbCB0aGUgVUFSVCBhbmQgaW1wcm92ZWQgdGhlDQo+IFVBUlQgYmF1ZCBy
-YXRlIHNldHRpbmcgc29tZS4NCg0KSSBhcHBsaWVkIHBhcnRzIG9mIEZyZWTigJlzIHBhdGNoZXMg
-YW5kIHNvIHBsZWFzZSByZWJhc2Ugb24gdG9wIG9mIHRoZW0uIE1ha2VzIGl0IGEgbG90IGVhc2ll
-ciBmb3IgbWUgdG8gcmV2aWV3IGNoYW5nZXMgaW5zdGVhZCBvZiBmaWd1cmluZyBvdXQgd2hhdCBj
-b21lcyBmcm9tIHlvdSBhbmQgd2hhdCBjb21lcyBmcm9tIEZyZWQuDQoNCj4gDQo+IFNpZ25lZC1v
-ZmYtYnk6IElseWEgRmFlbnNvbiA8aWZhZW5zb25AYnJvYWRjb20uY29tPg0KPiAtLS0NCj4gZHJp
-dmVycy9ibHVldG9vdGgvaGNpX2xkaXNjLmMgfCAxMTAgKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKy0tDQo+IGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV91YXJ0LmggIHwgICA2
-ICsrKw0KPiAyIGZpbGVzIGNoYW5nZWQsIDExMyBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygt
-KQ0KPiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2hjaV9sZGlzYy5jIGIvZHJp
-dmVycy9ibHVldG9vdGgvaGNpX2xkaXNjLmMNCj4gaW5kZXggNWM5YTczZi4uNThkY2IyNCAxMDA2
-NDQNCj4gLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvaGNpX2xkaXNjLmMNCj4gKysrIGIvZHJpdmVy
-cy9ibHVldG9vdGgvaGNpX2xkaXNjLmMNCj4gQEAgLTEsNCArMSw0IEBADQo+IC0vKg0KPiArLypf
-DQoNCkZ1bmt5IGNoYW5nZSA7KQ0KDQo+ICAqDQo+ICAqICBCbHVldG9vdGggSENJIFVBUlQgZHJp
-dmVyDQo+ICAqDQo+IEBAIC0yNTYsNyArMjU2LDggQEAgc3RhdGljIGludCBoY2lfdWFydF9zZW5k
-X2ZyYW1lKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiKQ0KPiAJaWYg
-KCF0ZXN0X2JpdChIQ0lfUlVOTklORywgJmhkZXYtPmZsYWdzKSkNCj4gCQlyZXR1cm4gLUVCVVNZ
-Ow0KPiANCj4gLQlCVF9EQkcoIiVzOiB0eXBlICVkIGxlbiAlZCIsIGhkZXYtPm5hbWUsIGJ0X2Ni
-KHNrYiktPnBrdF90eXBlLCBza2ItPmxlbik7DQo+ICsJQlRfREJHKCIlczogdHlwZSAlZCBsZW4g
-JWQiLCBoZGV2LT5uYW1lLCBidF9jYihza2IpLT5wa3RfdHlwZSwNCj4gKwkgICAgICAgc2tiLT5s
-ZW4pOw0KDQpJbiBjYXNlIHlvdSBzcG90IGNvZGluZyBzdHlsZSBlcnJvcnMsIHBsZWFzZSBqdXN0
-IHNlbmQgdGhlbSBhcyB0aW55IGNsZWFudXAgcGF0Y2hlcy4gSSBjYW4gZWFzaWx5IGFwcGx5IHRo
-ZW0gb3V0IG9mIG9yZGVyIGFuZCB3ZSBnZXQgb2YgdGhpcy4gTWFrZXMgcmV2aWV3IGEgbG90IGVh
-c2llci4NCg0KPiANCj4gCWh1LT5wcm90by0+ZW5xdWV1ZShodSwgc2tiKTsNCj4gDQo+IEBAIC0y
-NjUsMTEgKzI2NiwxMTQgQEAgc3RhdGljIGludCBoY2lfdWFydF9zZW5kX2ZyYW1lKHN0cnVjdCBo
-Y2lfZGV2ICpoZGV2LCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiKQ0KPiAJcmV0dXJuIDA7DQo+IH0NCj4g
-DQo+ICt2b2lkIGhjaV91YXJ0X2Zsb3dfY29udHJvbF9kZXZpY2Uoc3RydWN0IGhjaV91YXJ0ICpo
-dSkNCj4gK3sNCj4gKwlzdHJ1Y3QgdHR5X3N0cnVjdCAqdHR5ID0gaHUtPnR0eTsNCj4gKwlzdHJ1
-Y3Qga3Rlcm1pb3Mga3Rlcm1pb3M7DQo+ICsJaW50IHN0YXR1czsNCj4gKwl1bnNpZ25lZCBpbnQg
-c2V0ID0gMDsNCj4gKwl1bnNpZ25lZCBpbnQgY2xlYXIgPSAwOw0KPiArDQo+ICsJLyogRGlzYWJs
-ZSBoYXJkd2FyZSBmbG93IGNvbnRyb2wgKi8NCj4gKwlrdGVybWlvcyA9IHR0eS0+dGVybWlvczsN
-Cj4gKwlrdGVybWlvcy5jX2NmbGFnICY9IH5DUlRTQ1RTOw0KPiArCXN0YXR1cyA9IHR0eV9zZXRf
-dGVybWlvcyh0dHksICZrdGVybWlvcyk7DQo+ICsJaWYgKHN0YXR1cykNCj4gKwkJQlRfREJHKCIl
-cyBkaXMgZmMgZmFpbHVyZSAlZCIsIF9fZnVuY19fLCBzdGF0dXMpOw0KPiArCWVsc2UNCj4gKwkJ
-QlRfREJHKCIlcyBodyBmYyBkaXNhYmxlZCIsIF9fZnVuY19fKTsNCg0KTGV0cyBkbyBpdCBsaWtl
-IHRoaXM6DQoNCglCVF9EQkco4oCcRGlzYWJsaW5nIGhhcmR3YXJlIGZsb3cgY29udHJvbDogJXPi
-gJ0sIHN0YXR1cyA/IOKAnGZhaWxlZOKAnSA6IOKAnHN1Y2Nlc3PigJ0pOw0KDQo+ICsNCj4gKwkv
-KiBDbGVhciBSVFMgdG8gcHJldmVudCB0aGUgZGV2aWNlIGZyb20gc2VuZGluZyAqLw0KPiArCS8q
-IChtb3N0IFBDcyBuZWVkIE9VVDIgdG8gZW5hYmxlIGludGVycnVwdHMpICAgICovDQoNClBsZWFz
-ZSB1c2UgdGhlIG5ldHdvcmsgc3Vic3lzdGVtIGNvbW1lbnQgc3R5bGUuDQoNCj4gKwlzdGF0dXMg
-PSB0dHktPmRyaXZlci0+b3BzLT50aW9jbWdldCh0dHkpOw0KPiArCUJUX0RCRygiJXMgY3VyIHRp
-b2NtIDB4JXgiLCBfX2Z1bmNfXywgc3RhdHVzKTsNCg0KCVNwZWxsIGN1cnJlbnQgb3V0IGhlcmUg
-YW5kIGdldCByaWQgb2YgX19mdW5jX18NCg0KSSB3b3VsZCBhbHNvIGFkZCBhbiBleHRyYSBlbXB0
-eSBsaW5lIGhlcmUgdG8gbWFrZSBpdCBhIGJpdCBtb3JlIHJlYWRhYmxlLg0KDQo+ICsJc2V0ICY9
-IH4oVElPQ01fT1VUMiB8IFRJT0NNX1JUUyk7DQo+ICsJY2xlYXIgPSB+c2V0Ow0KPiArCXNldCAm
-PSBUSU9DTV9EVFIgfCBUSU9DTV9SVFMgfCBUSU9DTV9PVVQxIHwNCj4gKwkJVElPQ01fT1VUMiB8
-IFRJT0NNX0xPT1A7DQo+ICsJY2xlYXIgJj0gVElPQ01fRFRSIHwgVElPQ01fUlRTIHwgVElPQ01f
-T1VUMSB8DQo+ICsJCVRJT0NNX09VVDIgfCBUSU9DTV9MT09QOw0KDQpZb3UgbmVlZCB0byBhbGln
-biB0aGUgc2Vjb25kIGxpbmVzIGNvcnJlY3RseS4NCg0KPiArCXN0YXR1cyA9IHR0eS0+ZHJpdmVy
-LT5vcHMtPnRpb2Ntc2V0KHR0eSwgc2V0LCBjbGVhcik7DQo+ICsJaWYgKHN0YXR1cykNCj4gKwkJ
-QlRfREJHKCIlcyBjbHIgUlRTIGZhaWwgJWQiLCBfX2Z1bmNfXywgc3RhdHVzKTsNCj4gKwllbHNl
-DQo+ICsJCUJUX0RCRygiJXMgUlRTIGNsZWFyZWQiLCBfX2Z1bmNfXyk7DQoNClNpbWlsYXIgY2hh
-bmdlIGFzIGFib3ZlLg0KDQo+ICsJc3RhdHVzID0gdHR5LT5kcml2ZXItPm9wcy0+dGlvY21nZXQo
-dHR5KTsNCg0KV2h5IGlzIHRoaXMgbmVlZGVkPw0KDQo+ICt9DQo+ICsNCj4gK3ZvaWQgaGNpX3Vh
-cnRfdW5mbG93X2NvbnRyb2xfZGV2aWNlKHN0cnVjdCBoY2lfdWFydCAqaHUpDQo+ICt7DQo+ICsJ
-c3RydWN0IHR0eV9zdHJ1Y3QgKnR0eSA9IGh1LT50dHk7DQo+ICsJc3RydWN0IGt0ZXJtaW9zIGt0
-ZXJtaW9zOw0KPiArCWludCBzdGF0dXM7DQo+ICsJdW5zaWduZWQgaW50IHNldCA9IDA7DQo+ICsJ
-dW5zaWduZWQgaW50IGNsZWFyID0gMDsNCj4gKw0KPiArCXN0YXR1cyA9IHR0eS0+ZHJpdmVyLT5v
-cHMtPnRpb2NtZ2V0KHR0eSk7DQo+ICsJQlRfREJHKCIlcyBjdXIgdGlvY20gMHgleCIsIF9fZnVu
-Y19fLCBzdGF0dXMpOw0KPiArCXNldCB8PSAoVElPQ01fT1VUMiB8IFRJT0NNX1JUUyk7DQo+ICsJ
-Y2xlYXIgPSB+c2V0Ow0KPiArCXNldCAmPSBUSU9DTV9EVFIgfCBUSU9DTV9SVFMgfCBUSU9DTV9P
-VVQxIHwNCj4gKwkJVElPQ01fT1VUMiB8IFRJT0NNX0xPT1A7DQo+ICsJY2xlYXIgJj0gVElPQ01f
-RFRSIHwgVElPQ01fUlRTIHwgVElPQ01fT1VUMSB8DQo+ICsJCVRJT0NNX09VVDIgfCBUSU9DTV9M
-T09QOw0KPiArCXN0YXR1cyA9IHR0eS0+ZHJpdmVyLT5vcHMtPnRpb2Ntc2V0KHR0eSwgc2V0LCBj
-bGVhcik7DQo+ICsJaWYgKHN0YXR1cykNCj4gKwkJQlRfREJHKCIlcyBzZXQgUlRTIGZhaWwgJWQi
-LCBfX2Z1bmNfXywgc3RhdHVzKTsNCj4gKwllbHNlDQo+ICsJCUJUX0RCRygiJXMgUlRTIHNldCIs
-IF9fZnVuY19fKTsNCj4gKw0KPiArCS8qIFJlLWVuYWJsZSBoYXJkd2FyZSBmbG93IGNvbnRyb2wg
-Ki8NCj4gKwlrdGVybWlvcyA9IHR0eS0+dGVybWlvczsNCj4gKwlrdGVybWlvcy5jX2NmbGFnIHw9
-IENSVFNDVFM7DQo+ICsJc3RhdHVzID0gdHR5X3NldF90ZXJtaW9zKHR0eSwgJmt0ZXJtaW9zKTsN
-Cj4gKwlpZiAoc3RhdHVzKQ0KPiArCQlCVF9EQkcoIiVzIGVuYWJsZSBmYyBmYWlsICVkIiwgX19m
-dW5jX18sIHN0YXR1cyk7DQo+ICsJZWxzZQ0KPiArCQlCVF9EQkcoIiVzIGh3IGZjIHJlLWVuYWJs
-ZWQiLCBfX2Z1bmNfXyk7DQo+ICt9DQoNClByZXR0eSBtdWNoIHNhbWUgbW9kaWZpY2F0aW9ucyBh
-cyBmb3IgdGhlIG90aGVyIGZ1bmN0aW9uLg0KDQo+ICsNCj4gK3ZvaWQgaGNpX3VhcnRfc2V0X2Jh
-dWRyYXRlKHN0cnVjdCBoY2lfdWFydCAqaHUsIHVuc2lnbmVkIGludCBzcGVlZCkNCj4gK3sNCj4g
-KwlzdHJ1Y3QgdHR5X3N0cnVjdCAqdHR5ID0gaHUtPnR0eTsNCj4gKwlzdHJ1Y3Qga3Rlcm1pb3Mg
-a3Rlcm1pb3M7DQo+ICsNCj4gKwkvKiBCcmluZyB0aGUgVUFSVCBpbnRvIGEga25vd24gc3RhdGUg
-d2l0aCBhIGdpdmVuIGJhdWQgcmF0ZSAqLw0KPiArCWt0ZXJtaW9zID0gdHR5LT50ZXJtaW9zOw0K
-PiArCWt0ZXJtaW9zLmNfY2ZsYWcgJj0gfkNCQVVEOw0KPiArCWt0ZXJtaW9zLmNfaWZsYWcgJj0g
-fihJR05CUksgfCBCUktJTlQgfCBQQVJNUksgfCBJU1RSSVANCj4gKwkJfCBJTkxDUiB8IElHTkNS
-IHwgSUNSTkwgfCBJWE9OKTsNCg0KRml4IHRoZSBhbGlnbm1lbnQgaGVyZS4NCg0KPiArCWt0ZXJt
-aW9zLmNfb2ZsYWcgJj0gfk9QT1NUOw0KPiArCWt0ZXJtaW9zLmNfbGZsYWcgJj0gfihFQ0hPIHwg
-RUNIT05MIHwgSUNBTk9OIHwgSVNJRyB8IElFWFRFTik7DQo+ICsJa3Rlcm1pb3MuY19jZmxhZyAm
-PSB+KENTSVpFIHwgUEFSRU5CIHwgQ0JBVUQpOw0KPiArCWt0ZXJtaW9zLmNfY2ZsYWcgfD0gQ1M4
-Ow0KPiArCWt0ZXJtaW9zLmNfY2ZsYWcgfD0gQ1JUU0NUUzsNCj4gKwkvKiBrdGVybWlvcy5jX2Nm
-bGFnIHw9IEJPVEhFUjsgKi8NCg0KRG9u4oCZdCBsaWtlIHVuY29tbWVudGVkIGNvZGUuIEJldHRl
-ciB0byBqdXN0IHJlbW92ZSBpdC4NCg0KPiArCXR0eV90ZXJtaW9zX2VuY29kZV9iYXVkX3JhdGUo
-Jmt0ZXJtaW9zLCBzcGVlZCwgc3BlZWQpOw0KPiArDQo+ICsJLyogdHR5X3NldF90ZXJtaW9zKCkg
-cmV0dXJuIG5vdCBjaGVja2VkIGFzIGl0IGlzIGFsd2F5cyAwICovDQo+ICsJdHR5X3NldF90ZXJt
-aW9zKHR0eSwgJmt0ZXJtaW9zKTsNCj4gKw0KPiArCUJUX0RCRygiJXM6IE5ldyB0dHkgc3BlZWRz
-OiAlZC8lZCwgY2ZsYWc6IDB4JXgiLCBodS0+aGRldi0+bmFtZSwNCj4gKwkgICAgICAgdHR5LT50
-ZXJtaW9zLmNfaXNwZWVkLCB0dHktPnRlcm1pb3MuY19vc3BlZWQsDQo+ICsJICAgICAgIHR0eS0+
-dGVybWlvcy5jX2NmbGFnKTsNCj4gK30NCj4gKw0KPiBzdGF0aWMgaW50IGhjaV91YXJ0X3NldHVw
-KHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0KPiB7DQo+IAlzdHJ1Y3QgaGNpX3VhcnQgKmh1ID0gaGNp
-X2dldF9kcnZkYXRhKGhkZXYpOw0KPiAJc3RydWN0IGhjaV9ycF9yZWFkX2xvY2FsX3ZlcnNpb24g
-KnZlcjsNCj4gCXN0cnVjdCBza19idWZmICpza2I7DQo+ICsJaW50IGVycjsNCj4gKw0KPiArCWlm
-IChodS0+cHJvdG8tPmluaXRfc3BlZWQpDQo+ICsJCWhjaV91YXJ0X3NldF9iYXVkcmF0ZShodSwg
-aHUtPnByb3RvLT5pbml0X3NwZWVkKTsNCj4gKw0KPiArCWlmIChodS0+cHJvdG8tPnNldF9iYXVk
-cmF0ZSAmJiBodS0+cHJvdG8tPm9wZXJfc3BlZWQpIHsNCj4gKwkJZXJyID0gaHUtPnByb3RvLT5z
-ZXRfYmF1ZHJhdGUoaHUsIGh1LT5wcm90by0+b3Blcl9zcGVlZCk7DQo+ICsJCWlmICghZXJyKQ0K
-PiArCQkJaGNpX3VhcnRfc2V0X2JhdWRyYXRlKGh1LCBodS0+cHJvdG8tPm9wZXJfc3BlZWQpOw0K
-PiArCX0NCj4gDQo+IAlpZiAoaHUtPnByb3RvLT5zZXR1cCkNCj4gCQlyZXR1cm4gaHUtPnByb3Rv
-LT5zZXR1cChodSk7DQo+IEBAIC02NDcsNyArNzUxLDcgQEAgc3RhdGljIGludCBfX2luaXQgaGNp
-X3VhcnRfaW5pdCh2b2lkKQ0KPiANCj4gCS8qIFJlZ2lzdGVyIHRoZSB0dHkgZGlzY2lwbGluZSAq
-Lw0KPiANCj4gLQltZW1zZXQoJmhjaV91YXJ0X2xkaXNjLCAwLCBzaXplb2YgKGhjaV91YXJ0X2xk
-aXNjKSk7DQo+ICsJbWVtc2V0KCZoY2lfdWFydF9sZGlzYywgMCwgc2l6ZW9mKGhjaV91YXJ0X2xk
-aXNjKSk7DQoNCklmIHRoaXMgaXMgd3JvbmcgaW4gZXhpc3RpbmcgY29kZSwgcGxlYXNlIHNlbmQg
-YSBjbGVhbnVwIHBhdGNoIGZvciBpdC4gRWFzeSB0byBhcHBseS4NCg0KPiAJaGNpX3VhcnRfbGRp
-c2MubWFnaWMJCT0gVFRZX0xESVNDX01BR0lDOw0KPiAJaGNpX3VhcnRfbGRpc2MubmFtZQkJPSAi
-bl9oY2kiOw0KPiAJaGNpX3VhcnRfbGRpc2Mub3BlbgkJPSBoY2lfdWFydF90dHlfb3BlbjsNCj4g
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2hjaV91YXJ0LmggYi9kcml2ZXJzL2JsdWV0
-b290aC9oY2lfdWFydC5oDQo+IGluZGV4IDcyMTIwYTUuLjIyNzFjYzAgMTAwNjQ0DQo+IC0tLSBh
-L2RyaXZlcnMvYmx1ZXRvb3RoL2hjaV91YXJ0LmgNCj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgv
-aGNpX3VhcnQuaA0KPiBAQCAtNTgsMTAgKzU4LDEzIEBAIHN0cnVjdCBoY2lfdWFydDsNCj4gc3Ry
-dWN0IGhjaV91YXJ0X3Byb3RvIHsNCj4gCXVuc2lnbmVkIGludCBpZDsNCj4gCWNvbnN0IGNoYXIg
-Km5hbWU7DQo+ICsJdW5zaWduZWQgaW50IGluaXRfc3BlZWQ7DQo+ICsJdW5zaWduZWQgaW50IG9w
-ZXJfc3BlZWQ7DQo+IAlpbnQgKCpvcGVuKShzdHJ1Y3QgaGNpX3VhcnQgKmh1KTsNCj4gCWludCAo
-KmNsb3NlKShzdHJ1Y3QgaGNpX3VhcnQgKmh1KTsNCj4gCWludCAoKmZsdXNoKShzdHJ1Y3QgaGNp
-X3VhcnQgKmh1KTsNCj4gCWludCAoKnNldHVwKShzdHJ1Y3QgaGNpX3VhcnQgKmh1KTsNCj4gKwlp
-bnQgKCpzZXRfYmF1ZHJhdGUpKHN0cnVjdCBoY2lfdWFydCAqaHUsIHVuc2lnbmVkIGludCBzcGVl
-ZCk7DQo+IAlpbnQgKCpyZWN2KShzdHJ1Y3QgaGNpX3VhcnQgKmh1LCBjb25zdCB2b2lkICpkYXRh
-LCBpbnQgbGVuKTsNCj4gCWludCAoKmVucXVldWUpKHN0cnVjdCBoY2lfdWFydCAqaHUsIHN0cnVj
-dCBza19idWZmICpza2IpOw0KPiAJc3RydWN0IHNrX2J1ZmYgKigqZGVxdWV1ZSkoc3RydWN0IGhj
-aV91YXJ0ICpodSk7DQo+IEBAIC05Niw2ICs5OSw5IEBAIGludCBoY2lfdWFydF9yZWdpc3Rlcl9w
-cm90byhjb25zdCBzdHJ1Y3QgaGNpX3VhcnRfcHJvdG8gKnApOw0KPiBpbnQgaGNpX3VhcnRfdW5y
-ZWdpc3Rlcl9wcm90byhjb25zdCBzdHJ1Y3QgaGNpX3VhcnRfcHJvdG8gKnApOw0KPiBpbnQgaGNp
-X3VhcnRfdHhfd2FrZXVwKHN0cnVjdCBoY2lfdWFydCAqaHUpOw0KPiBpbnQgaGNpX3VhcnRfaW5p
-dF9yZWFkeShzdHJ1Y3QgaGNpX3VhcnQgKmh1KTsNCj4gK3ZvaWQgaGNpX3VhcnRfc2V0X2JhdWRy
-YXRlKHN0cnVjdCBoY2lfdWFydCAqaHUsIHVuc2lnbmVkIGludCBzcGVlZCk7DQo+ICt2b2lkIGhj
-aV91YXJ0X2Zsb3dfY29udHJvbF9kZXZpY2Uoc3RydWN0IGhjaV91YXJ0ICpodSk7DQo+ICt2b2lk
-IGhjaV91YXJ0X3VuZmxvd19jb250cm9sX2RldmljZShzdHJ1Y3QgaGNpX3VhcnQgKmh1KTsNCg0K
-SSBhY3R1YWxseSBkaXNsaWtlIHRoaXMga2luZCBvZiBuYW1pbmcuIFdoYXQgYWJvdXQgc2ltcGxl
-IHN0dWZmIGxpa2U6DQoNCgloY2lfdWFydF9lbmFibGVfZGV2aWNlKCkNCgloY2lfdWFydF9kaXNh
-YmxlX2RldmljZSgpDQoNCk9yIHNvbWV0aGluZyB3aXRoIGEgYm9vbGVhbiBmb3IgdGhlIHN0YXRl
-Og0KDQoJaGNpX3VhcnRfc2V0X2Zsb3dfY29udHJvbChzdHJ1Y3QgaGNpX3VhcnQgKmh1LCBib29s
-IGVuYWJsZSkNCg0KUmVnYXJkcw0KDQpNYXJjZWwNCg0K
+On 06/06/15 10:33, Marcel Holtmann wrote:
+> Hi Arend,
+>
+>>>> Device Tree bindings to configure the Broadcom Bluetooth UART device.
+>>>> Updated not to use CamelCase and to use Intel style "oper-speed".
+>>>>
+>>>> Signed-off-by: Ilya Faenson<ifaenson@broadcom.com>
+>>>> ---
+>>>> .../devicetree/bindings/net/bluetooth/btbcm.txt    | 82 ++++++++++++++++++++++
+>>>> 1 file changed, 82 insertions(+)
+>>>> create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+>>>>
+>>>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+>>>> new file mode 100644
+>>>> index 0000000..2679819
+>>>> --- /dev/null
+>>>> +++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+>>>> @@ -0,0 +1,82 @@
+>>>> +btbcm
+>>>> +------
+>>>> +
+>>>> +Required properties:
+>>>> +
+>>>> +	- compatible : must be "brcm,brcm-bt-uart".
+>>>> +	- tty : tty device connected to this Bluetooth device.
+>>>> +
+>>>> +Optional properties:
+>>>> +
+>>>> +  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an interrupt.
+>>>> +
+>>>> +  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume device.
+>>>> +
+>>>> +  - bt-reg-on-gpios : reg-on output GPIO to be used to power device on/off.
+>>>> +
+>>>> +  - oper-speed : Bluetooth device operational baud rate.
+>>>> +    Default: 3000000.
+>>>> +
+>>>> +  - manual-fc : flow control UART in suspend / resume scenarios.
+>>>> +    Default: 0.
+>>>> +
+>>>> +  - configure-sleep : configure suspend / resume flag.
+>>>> +    Default: false.
+>>>> +
+>>>> +  - configure-audio : configure platform PCM SCO flag.
+>>>> +    Default: false.
+>>>> +
+>>>> +  - pcm-clockmode : PCM clock mode. 0-slave, 1-master.
+>>>> +    Default: 0.
+>>>> +
+>>>> +  - pcm-fillmethod : PCM fill method. 0 to 3.
+>>>> +    Default: 2.
+>>>> +
+>>>> +  - pcm-fillnum : PCM number of fill bits. 0 to 3.
+>>>> +    Default: 0.
+>>>> +
+>>>> +  - pcm-fillvalue : PCM fill value. 0 to 7.
+>>>> +    Default: 3.
+>>>> +
+>>>> +  - pcm-incallbitclock : PCM interface rate. 0-128Kbps, 1-256Kbps, 2-512Kbps,
+>>>> +    3-1024Kbps, 4-2048Kbps.
+>>>> +    Default: 0.
+>>>> +
+>>>> +  - pcm-lsbfirst : PCM LSB first. 0 or 1.
+>>>> +    Default: 0.
+>>>> +
+>>>> +  - pcm-rightjustify : PCM Justify. 0-left, 1-right.
+>>>> +    Default: 0.
+>>>> +
+>>>> +  - pcm-routing : PCM routing. 0-PCM, 1-SCO over HCI.
+>>>> +    Default: 0.
+>>>> +
+>>>> +  - pcm-shortframesync : PCM sync. 0-short, 1-long.
+>>>> +    Default: 0.
+>>>> +
+>>>> +  - pcmsyncmode : PCM sync mode. 0-slave, 1-master.
+>>>> +    Default: 0.
+>>>> +
+>>>> +
+>>>> +Example:
+>>>> +
+>>>> +	brcm4354_bt_uart: brcm4354-bt-uart {
+>>>
+>>> at some point you have to explain to me if Broadcom prefers BCM or BRCM. I can not make heads or tail out of it. My current explanation is the it is BCM for the Bluetooth guys and BRCM for the WiFi guys ;)
+>>
+>> That's a nice explanation ;-) Maybe I can give it a shot. First, two facts: 1) BRCM is our stock symbol, and 2) our device names are prefixed by BCM. So in devicetree specifications we specified the vendor prefix as BRCM and (try to) stick to that. The above clearly refers to a device so it would probably be better to use bcm4354... there.
+>>
+>>>> +		compatible = "brcm,brcm-bt-uart";
+>>
+>> The compatible string indeed starts with vendor prefix "brcm,".
+>>
+>>>> +		bt-wake-gpios =<&gpio4 30 GPIO_ACTIVE_HIGH>;
+>>>> +		bt-host-wake-gpios =<&gpio4 31 GPIO_ACTIVE_HIGH>;
+>>>> +		tty = "ttyS0”;
+>>>
+>>> This tty one is the one we need to figure out. Could we reference by some node information instead of the assigned device name. If we can reference something in struct device that we know is more consistent, that would be perfect. I mean if the kernel for reason decides to enumerate things in a different order then this might be ttyS1 out of a sudden.
+>>
+>> I see your point, but not sure what to do here either. In devicetree you could reference the uart node, but I don't know if there is an api in the kernel to obtain tty associated with a uart port. I could not find it doing quick glance in include/linux/tty.h although the linkage is obviously there in the data types.
+>
+> I wonder if we get this done via ACPI in the first place. However that is something for Fred to figure out.
+>
+> For device tree, I bet we need to extend either the TTY subsystem or really start pushing towards the tty-slave idea that has been floating around.
+
+The tty-slave idea popped up already in review comments. We are 
+wondering if it is still floating or whether things are starting to 
+settle in that area. Specially for the devicetree spec, which is 
+supposed to be a stable ABI, we probably need to take that into account 
+if that is indeed the way things are moving.
+
+Ilya, this is the most recent thing I found:
+
+http://thread.gmane.org/gmane.linux.kernel/1949724
+
+The uart-slave idea seems to sit between tty and uart dealing with 
+powering the device. Not sure how that fits our need. It mentions 
+something about being able to intervene in any tty-uart interaction so 
+there could bt stuff that could be done in those hooks.
+
+Regards,
+Arend
+
+> Regards
+>
+> Marcel
+>
