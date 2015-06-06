@@ -1,51 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: Memory leak in btusb
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <55733607.30108@lwfinger.net>
-Date: Sat, 6 Jun 2015 20:31:24 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <C04EFF03-5661-4BFC-893F-4BFFB99CAD03@holtmann.org>
-References: <55638D99.5000704@lwfinger.net> <CF543FED-6CEE-4821-A0E1-9EC751026C24@holtmann.org> <55733607.30108@lwfinger.net>
-To: Larry Finger <Larry.Finger@lwfinger.net>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Ilya Faenson <ifaenson@broadcom.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Arend Van Spriel" <arend@broadcom.com>
+Subject: RE: [PATCH 2/5] Intel based H4 line discipline enhancements
+Date: Sat, 6 Jun 2015 18:25:41 +0000
+Message-ID: <E0D3336E15B58B4294723AC879BA5E9425F87B@IRVEXCHMB15.corp.ad.broadcom.com>
+References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com>
+ <1433365304-16707-3-git-send-email-ifaenson@broadcom.com>
+ <85C2DD1E-DD05-4F42-8739-23B208A615A0@holtmann.org>
+ <E0D3336E15B58B4294723AC879BA5E9425F717@IRVEXCHMB15.corp.ad.broadcom.com>
+ <DF1E4B46-0AC1-4373-AA82-57EF64672992@holtmann.org>
+In-Reply-To: <DF1E4B46-0AC1-4373-AA82-57EF64672992@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Larry,
+Hi Marcel,
 
->>> While using kmemleak to check for memory leaks in a wireless driver, I noticed the following stack traceback for a leak in btusb:
->>> 
->>> <ffffffff8160257e>] __alloc_skb+0x7e/0x2b0
->>> [<ffffffffa06029d6>] btusb_recv_intr+0x136/0x180 [btusb]
->>> [<ffffffffa0602ad8>] btusb_intr_complete+0xb8/0x150 [btusb]
->>> [<ffffffff8156ccb2>] __usb_hcd_giveback_urb+0x72/0x120
->>> 
->>> To eliminate a false positive, I unloaded the driver and got the following for the virtual address:
->>> 
->>> [<ffffffff8160257e>] __alloc_skb+0x7e/0x2b0
->>> [<ffffffffa06029d6>] 0xffffffffa06029d6
->>> [<ffffffffa0602ad8>] 0xffffffffa0602ad8
->>> [<ffffffff8156ccb2>] __usb_hcd_giveback_urb+0x72/0x120
->> 
->> if this is really an alloc_skb from btusb_recv_intr, then it is the HCI event reassembly handling. Meaning this is data->evt_skb since that is the only one that is ever allocated there.
->> 
->> All the SKBs allocated in that function are consumed by the core or later on freed by btusb_free_frags. Is this some rare case on suspend/resume where we forget to free the frags when we get disconnected and re-enumerate via probe?
->> 
->> When the core consumes this SKB via hci_recv_frame it really consumes it. If for some reason this function returns an error, it still frees the SKB. So for all intense in purposes it could be even void.
->> 
->> So I need some more info on what is causing this memory leak. The one in the Intel setup routine was obvious. If that does not fix it, then this is not obvious. You might need to check which alloc_skb this really is. As I said, if it is the one in btusb_recv_intr, then it is the data->evt_skb that is leaking in some corner case.
-> 
-> Yes, it is the alloc_skb from btusb_recv_intr() and data->evt_skb is leaking, but it is not due to a suspend/resume. I have no clue as to what corner case I might be triggering. I have two Bluetooth mice, but neither appears to be working. To test, I have connected to a cell phone, but that does not allow for much data exchange. Even so, I now have 5 of these leaks from btusb_recv_intr(). As before, all of them are real leaks.
+-----Original Message-----
+From: Marcel Holtmann [mailto:marcel@holtmann.org]=20
+Sent: Saturday, June 06, 2015 11:51 AM
+To: Ilya Faenson
+Cc: linux-bluetooth@vger.kernel.org; Arend Van Spriel
+Subject: Re: [PATCH 2/5] Intel based H4 line discipline enhancements
 
-since the interrupt endpoint is only used for HCI events, you do not even need connections. This could be anything simple like HCI command complete event.
+Hi Ilya,
 
-Now I wonder if this is something odd where the HCI event fits completely into a single interrupt URB or something special like that. If you get get the content of that URB, then I might be able to track this down. Or do you have a chance to run btmon and correlate the timestamps.
+the mailing list has a strict policy of no top-posting. So please adhere to=
+ that. I know it is hard with corporate email systems, but for mailing list=
+ emails I am policing this.
+
+IF: Will do, thanks.
+
+> Appreciate you applying Fred's patches. I will now put together and post =
+similar patches against the bluetooth-next proper.
+>=20
+> Sorry for many minor changes. I just happen to run the checkpatch script =
+automatically prior to publishing the patches (Arend taught me good Linux p=
+ractices :-)) and that results in those spaces getting deleted et al.
+
+Please keep in that you need --strict actually. We have to adhere to the ne=
+twork subsystem rules. Also some of the driver code is pretty old. You will=
+ find violations. Feel free to fix them, but please do it in a separate pat=
+ch before your changes.
+
+IF: Understood, thanks.
 
 Regards
 
 Marcel
-
