@@ -1,148 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v7 6/6] Bluetooth: hci_uart: Add bcm_set_baudrate()
+Subject: Re: [PATCH v7 4/6] Bluetooth: btbcm: Add helper functions for UART setup
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1432805106-25719-7-git-send-email-frederic.danis@linux.intel.com>
-Date: Sat, 6 Jun 2015 07:47:11 +0200
+In-Reply-To: <1432805106-25719-5-git-send-email-frederic.danis@linux.intel.com>
+Date: Sat, 6 Jun 2015 07:41:48 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2DB4BA5D-A211-40C5-9F59-577843F885A6@holtmann.org>
-References: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com> <1432805106-25719-7-git-send-email-frederic.danis@linux.intel.com>
+Message-Id: <0B0AF92F-2965-4BA3-8509-92D5348CCD78@holtmann.org>
+References: <1432805106-25719-1-git-send-email-frederic.danis@linux.intel.com> <1432805106-25719-5-git-send-email-frederic.danis@linux.intel.com>
 To: Frederic Danis <frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
-> Add vendor specific command to change controller device speed.
+> Firmware loading may reset the controller UART speed and needs to set
+> host UART speed back to init speed.
+> 
+> UART drivers setup is split in 3 parts:
+> - btbcm_initialize() resets the controller and returns the firmware
+>  name based on controller revision and sub_version.
+> - btbtcm_patchram() (already existing and public), which takes the
+>  firmware name as parameter, requests the firmware and loads it to
+>  the controller.
+> - btbcm_finalize() which resets the controller, reads local version
+>  and checks if the controller address is a default one or not.
+> 
+> Remove firmware name retrieval for UART controllers from
+> btbcm_setup_patchram().
 > 
 > Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 > ---
-> drivers/bluetooth/hci_bcm.c | 56 +++++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 56 insertions(+)
+> drivers/bluetooth/btbcm.c | 101 ++++++++++++++++++++++++++++++++++++++++------
+> drivers/bluetooth/btbcm.h |  14 +++++++
+> 2 files changed, 103 insertions(+), 12 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index 6c34135..0cbf9d4 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -24,6 +24,7 @@
-> #include <linux/kernel.h>
-> #include <linux/errno.h>
-> #include <linux/skbuff.h>
-> +#include <linux/tty.h>
-> 
-> #include <net/bluetooth/bluetooth.h>
-> #include <net/bluetooth/hci_core.h>
-> @@ -31,11 +32,55 @@
-> #include "btbcm.h"
-> #include "hci_uart.h"
-> 
-> +#define BCM43XX_CLOCK_48 1
-> +#define BCM43XX_CLOCK_24 2
-> +
-> struct bcm_data {
-> 	struct sk_buff *rx_skb;
-> 	struct sk_buff_head txq;
+> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> index e90e6b8..d16878e 100644
+> --- a/drivers/bluetooth/btbcm.c
+> +++ b/drivers/bluetooth/btbcm.c
+> @@ -239,6 +239,95 @@ static const struct {
+> 	{ }
 > };
 > 
-> +struct hci_cp_bcm_set_speed {
-> +	__le16   dummy;
-> +	__le32   speed;
-> +} __packed;
-
-I think this data structure should go into btbcm.h with a little bit better name. This should be similar to the btintel.h where I am slowly trying to get the proper data structures put in place.
-
-
-
-> +
-> +static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
+> +int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len)
 > +{
-> +	struct hci_dev *hdev = hu->hdev;
+> +	u16 subver, rev;
+> +	const char *hw_name = NULL;
 > +	struct sk_buff *skb;
-> +	struct hci_cp_bcm_set_speed param = { 0, cpu_to_le32(speed) };
-
-I would prefer if we assign this one by one and use cpu_lo_le16(0) here as well. Just to remember that the value is actually in little endian.
-
+> +	struct hci_rp_read_local_version *ver;
+> +	int i, err;
 > +
-> +	if (speed > 3000000) {
-> +		u8 clock = BCM43XX_CLOCK_48;
+> +	/* Reset */
+> +	err = btbcm_reset(hdev);
+> +	if (err)
+> +		return err;
 > +
-> +		BT_DBG("%s: Set Controller clock (%d)", hdev->name, clock);
+> +	/* Read Local Version Info */
+> +	skb = btbcm_read_local_version(hdev);
+> +	if (IS_ERR(skb))
+> +		return PTR_ERR(skb);
 > +
-
-I prefer having a comment above the vendor commands explain on what they do and why this is correct. That is as close as it gets for someone with the proper documentation to figure out why we are doing things. I think the Intel support is a good example on how far I have gone with this.
-
-> +		skb = __hci_cmd_sync(hdev, 0xfc45, 1, &clock, HCI_INIT_TIMEOUT);
-> +		if (IS_ERR(skb)) {
-> +			BT_ERR("%s: failed to write update clock command (%ld)”,
-
-Lets try to be a bit consistent with the error messages. I think we prefixed most of it with BCM: as well. Overall, I try to make this really consistent.
-
-> +			       hdev->name, PTR_ERR(skb));
-> +			return PTR_ERR(skb);
+> +	ver = (struct hci_rp_read_local_version *)skb->data;
+> +	rev = le16_to_cpu(ver->hci_rev);
+> +	subver = le16_to_cpu(ver->lmp_subver);
+> +	kfree_skb(skb);
+> +
+> +	/* Read Verbose Config Version Info */
+> +	skb = btbcm_read_verbose_config(hdev);
+> +	if (IS_ERR(skb))
+> +		return PTR_ERR(skb);
+> +
+> +	BT_INFO("%s: BCM: chip id %u", hdev->name, skb->data[1]);
+> +	kfree_skb(skb);
+> +
+> +	switch ((rev & 0xf000) >> 12) {
+> +	case 0:
+> +	case 3:
+> +		for (i = 0; bcm_uart_subver_table[i].name; i++) {
+> +			if (subver == bcm_uart_subver_table[i].subver) {
+> +				hw_name = bcm_uart_subver_table[i].name;
+> +				break;
+> +			}
 > +		}
 > +
-> +		kfree_skb(skb);
+> +		snprintf(fw_name, len, "brcm/%s.hcd", hw_name ? : "BCM");
+> +		break;
+> +	default:
+> +		return 0;
 > +	}
 > +
-> +	BT_DBG("%s: Set Controller UART speed to %d bit/s", hdev->name, speed);
-> +
-
-Same here. Comments should be put above and assignment of the values to param maybe better places above here so you know exactly where they are coming from.
-
-> +	skb = __hci_cmd_sync(hdev, 0xfc18, sizeof(param), &param,
-> +			     HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		BT_ERR("%s: failed to write update baudrate command (%ld)”,
-
-Same as the comment above with the BCM: prefix.
-
-> +		       hdev->name, PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +
-> +	kfree_skb(skb);
+> +	BT_INFO("%s: %s (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
+> +		hw_name ? : "BCM", (subver & 0x7000) >> 13,
+> +		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
 > +
 > +	return 0;
 > +}
+> +EXPORT_SYMBOL_GPL(btbcm_initialize);
 > +
-> static int bcm_open(struct hci_uart *hu)
-> {
-> 	struct bcm_data *bcm;
-> @@ -106,6 +151,14 @@ static int bcm_setup(struct hci_uart *hu)
-> 	if (hu->proto->init_speed)
-> 		hci_uart_set_baudrate(hu, hu->proto->init_speed);
-> 
-> +	if (hu->proto->oper_speed) {
-> +		err = bcm_set_baudrate(hu, hu->proto->oper_speed);
-> +		if (!err)
-> +			/* hci_uart_set_baudrate() has no return value as
-> +			   tty_set_termios() return is always 0 */
-
-This comment is just duplicating it. Especially since above you do not comment it. So in this case I would remove it.
-
-> +			hci_uart_set_baudrate(hu, hu->proto->oper_speed);
-> +	}
+> +int btbcm_finalize(struct hci_dev *hdev)
+> +{
+> +	struct sk_buff *skb;
+> +	struct hci_rp_read_local_version *ver;
+> +	u16 subver, rev;
+> +	int err;
 > +
-> finalize:
-> 	release_firmware(fw);
+> +	/* Reset */
+> +	err = btbcm_reset(hdev);
+> +	if (err)
+> +		return err;
+> +
+> +	/* Read Local Version Info */
+> +	skb = btbcm_read_local_version(hdev);
+> +	if (IS_ERR(skb))
+> +		return PTR_ERR(skb);
+> +
+> +	ver = (struct hci_rp_read_local_version *)skb->data;
+> +	rev = le16_to_cpu(ver->hci_rev);
+> +	subver = le16_to_cpu(ver->lmp_subver);
+> +	kfree_skb(skb);
+> +
+> +	BT_INFO("%s: BCM (%3.3u.%3.3u.%3.3u) build %4.4u", hdev->name,
+> +		(subver & 0x7000) >> 13, (subver & 0x1f00) >> 8,
+> +		(subver & 0x00ff), rev & 0x0fff);
+> +
+> +	btbcm_check_bdaddr(hdev);
+> +
+> +	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(btbcm_finalize);
+> +
+> static const struct {
+> 	u16 subver;
+> 	const char *name;
+> @@ -290,18 +379,6 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
+> 	kfree_skb(skb);
 > 
-> @@ -161,10 +214,13 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
-> static const struct hci_uart_proto bcm_proto = {
-> 	.id		= HCI_UART_BCM,
-> 	.name		= "BCM",
-> +	.init_speed	= 115200,
-> +	.oper_speed	= 4000000,
-> 	.open		= bcm_open,
-> 	.close		= bcm_close,
-> 	.flush		= bcm_flush,
-> 	.setup		= bcm_setup,
-> +	.set_baudrate	= bcm_set_baudrate,
-> 	.recv		= bcm_recv,
-> 	.enqueue	= bcm_enqueue,
-> 	.dequeue	= bcm_dequeue,
+> 	switch ((rev & 0xf000) >> 12) {
+> -	case 0:
+> -	case 3:
+> -		for (i = 0; bcm_uart_subver_table[i].name; i++) {
+> -			if (subver == bcm_uart_subver_table[i].subver) {
+> -				hw_name = bcm_uart_subver_table[i].name;
+> -				break;
+> -			}
+> -		}
+> -
+> -		snprintf(fw_name, sizeof(fw_name), "brcm/%s.hcd",
+> -			 hw_name ? : "BCM");
+> -		break;
+
+I took this hunk out since I am pretty sure I found an USB dongle that has this gotten wrong. Long term we will move over to a manifest file that will list modalias and firmware name. That way this becomes a detail of the linux-firmware tree and no longer a driver problem.
 
 Regards
 
 Marcel
+
 
