@@ -1,60 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <4174905F-4A66-45CD-B135-640881D480C3@holtmann.org>
-References: <CAKrOiPRTfCWz+C3Z0BsD92PcgV1A3kGxw3xLMCXuBvOap+6-UQ@mail.gmail.com>
-	<4174905F-4A66-45CD-B135-640881D480C3@holtmann.org>
-Date: Sun, 7 Jun 2015 11:40:20 +0000
-Message-ID: <CAKrOiPRSUyWZ+Kx22=+PhU0VC+Kr2bDuB7TSpJchg+uQvGE2kQ@mail.gmail.com>
-Subject: Re: find out why the same usb bluetooth dongle that works on i686
- x86_64, does not work on ppc (ibook g4)
-From: naruto canada <narutocanada@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: btusb: Remove unneeded btusb_read_local_version function
+Date: Sun,  7 Jun 2015 10:01:02 +0200
+Message-Id: <1433664062-37464-2-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jun 6, 2015 at 4:26 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi,
->
->> If anyone like to offer suggestion or help with finding out why the
->> same usb bluetooth dongle (cheap EDR 2.0) that works on i686 x86_64,
->> does not work on ppc (ibook g4). The three machines all run the same
->> software stack, same kernel version, gcc, bluez, dbus, python etc--
->> all the same version. kernel:3.4.107 gcc:4.9.2 bluez:5.23 dbus:1.8.16
->> python:2.7.10 I will give more details if needed. I have btmon log for
->> failed pairing on ppc with nokia phone and good pairing logs as well.
->> also python trace log (does not help much). it seems, on ppc, the
->> dongle always "omit" to send second "connect request", compared with
->> good pairings on x86_64 and i686. the ibook g4 internal usb bluetooth
->> dongle (which I manage to bring to hci mode) also failed with the same
->> sympton (same python error, but not sure about the exact reason).
->> buying another bt dongle may or may not solve the problem. I have
->> attached good pairing and bad pairing log from btmon.
->
-> how are you trying to pair this device? My first guess is the it is some endian bug in the tool that retrieves the RFCOMM channel and number and can not see that the SDP records are present.
+The btusb_read_local_version function has only a single user and with
+that just move its functionality in place where it belongs.
 
-hi
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btusb.c | 38 +++++++++++++-------------------------
+ 1 file changed, 13 insertions(+), 25 deletions(-)
 
-I managed to get the dongle paired with nokia phone, after changing
-port number to big endian in python. I am not sure which package is
-responsible (kernel, libc, bluez, python, dbus ?) for converting back
-and forth between network and host. In any case, here is the python
-code that works with ppc:
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f71050d36fd9..8acda277ace1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1302,28 +1302,6 @@ static void btusb_waker(struct work_struct *work)
+ 	usb_autopm_put_interface(data->intf);
+ }
+ 
+-static struct sk_buff *btusb_read_local_version(struct hci_dev *hdev)
+-{
+-	struct sk_buff *skb;
+-
+-	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
+-			     HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
+-		return skb;
+-	}
+-
+-	if (skb->len != sizeof(struct hci_rp_read_local_version)) {
+-		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
+-		       hdev->name);
+-		kfree_skb(skb);
+-		return ERR_PTR(-EIO);
+-	}
+-
+-	return skb;
+-}
+-
+ static int btusb_setup_bcm92035(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -1347,9 +1325,19 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+-	skb = btusb_read_local_version(hdev);
+-	if (IS_ERR(skb))
+-		return -PTR_ERR(skb);
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		int err = PTR_ERR(skb);
++		BT_ERR("%s: CSR: Local version failed (%d)", hdev->name, err);
++		return err;
++	}
++
++	if (skb->len != sizeof(struct hci_rp_read_local_version)) {
++		BT_ERR("%s: CSR: Local version length mismatch", hdev->name);
++		kfree_skb(skb);
++		return -EIO;
++	}
+ 
+ 	rp = (struct hci_rp_read_local_version *)skb->data;
+ 
+-- 
+2.4.2
 
-#!/usr/bin/env python
-from PyOBEX.client import BrowserClient
-import sys
-address = sys.argv[1]
-channel=10 # OBEX File Transfer
-# client = BrowserClient(address, channel) # this works with
-little-endian machines
-client = BrowserClient(address, int("0x0a000000", 0)) # works with
-big-endian machine
-client.connect()
-client.put('test.txt', sys.argv[2])
-client.disconnect()
-
-> Regards
->
-> Marcel
->
