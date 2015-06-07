@@ -1,93 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ge, Ethan" <ethan.ge@intel.com>
-To: "An, Tedd" <tedd.an@intel.com>, "Poulain, Loic" <loic.poulain@intel.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCHv2] Bluetooth: btusb: Fix Intel controller hang after
- shutdown
-Date: Mon, 8 Jun 2015 07:42:25 +0000
-Message-ID: <86D221DC0B85F94D9B05B97827669A3403CA5E7F@PGSMSX106.gar.corp.intel.com>
-References: <1432218957-3400-1-git-send-email-loic.poulain@intel.com>
- <69A96222-5518-4341-9F0B-32F3CEACCC35@holtmann.org>
- <55703D8F.6010602@intel.com> <41F028F6-E05E-4816-ACE8-3B0F121F2081@intel.com>
-In-Reply-To: <41F028F6-E05E-4816-ACE8-3B0F121F2081@intel.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <4174905F-4A66-45CD-B135-640881D480C3@holtmann.org>
+References: <CAKrOiPRTfCWz+C3Z0BsD92PcgV1A3kGxw3xLMCXuBvOap+6-UQ@mail.gmail.com>
+	<4174905F-4A66-45CD-B135-640881D480C3@holtmann.org>
+Date: Sun, 7 Jun 2015 11:40:20 +0000
+Message-ID: <CAKrOiPRSUyWZ+Kx22=+PhU0VC+Kr2bDuB7TSpJchg+uQvGE2kQ@mail.gmail.com>
+Subject: Re: find out why the same usb bluetooth dongle that works on i686
+ x86_64, does not work on ppc (ibook g4)
+From: naruto canada <narutocanada@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTG9naWMsDQoNCkkgYW0gaGVscGluZyBUZWRkIHRvIHRlc3QgdGhpcyBwYXRjaCBub3csIGJ1
-dCBJIGhhdmUgYSBxdWVzdGlvbiBhYm91dCB0aGlzIHBhdGNoLiANCg0KRm9yIHlvdXIgY29tbWVu
-dCBJdCBsb29rcyBsaWtlIHlvdSB3YW50IHRvIHNlbmQgSENJIFJFU0VUIGNvbW1hbmQgdG8gY29u
-dHJvbGxlciBmaXJzdCB3aGVuIEJUIGVuYWJsZWQsIHRoZW4gSSBmb3VuZCBiZWxvdyBwYXRjaCBh
-bHNvIGRvIHNhbWUgdGhpbmcgYXMgeW91ciBwYXRjaC4gTWF5IEkga25vdyBhbnkgZGlmZmVyZW5j
-ZSBmb3IgeW91ciBwYXRjaD8gVGhhbmtzLg0KDQpjb21taXQgZGZmZDMwZWU5NjE5Y2NkNzE1M2Yx
-ODYxYmEwNDM2YmJjNDQwMGYzNg0KQXV0aG9yOiBUZWRkIEhvLUplb25nIEFuIDx0ZWRkLmFuQGlu
-dGVsLmNvbT4NCkRhdGU6ICAgRnJpIEFwciAxOSAwOTo1Nzo0MyAyMDEzIC0wNzAwDQoNCiAgICBC
-bHVldG9vdGg6IEFkZCBzdXBwb3J0IGZvciBJbnRlbCBCbHVldG9vdGggZGV2aWNlIFs4MDg3OjA3
-ZGNdDQogICAgDQogICAgVGhpcyBwYXRjaCBhZGRzIHN1cHBvcnQgZm9yIEludGVsIEJsdWV0b290
-aCBkZXZpY2UgYnkgYWRkaW5nDQogICAgYnR1c2Jfc2V0dXBfaW50ZWwoKSByb3V0aW5lIHRoYXQg
-dXBkYXRlIHRoZSBkZXZpY2Ugd2l0aCBST00gcGF0Y2guDQoNCi4uLg0KLi4NCg0KK3N0YXRpYyBp
-bnQgYnR1c2Jfc2V0dXBfaW50ZWwoc3RydWN0IGhjaV9kZXYgKmhkZXYpDQorew0KKyAgICAgICBz
-dHJ1Y3Qgc2tfYnVmZiAqc2tiOw0KKyAgICAgICBjb25zdCBzdHJ1Y3QgZmlybXdhcmUgKmZ3Ow0K
-KyAgICAgICBjb25zdCB1OCAqZndfcHRyOw0KKyAgICAgICBpbnQgZGlzYWJsZV9wYXRjaDsNCisg
-ICAgICAgc3RydWN0IGludGVsX3ZlcnNpb24gKnZlcjsNCisNCisgICAgICAgY29uc3QgdTggbWZn
-X2VuYWJsZVtdID0geyAweDAxLCAweDAwIH07DQorICAgICAgIGNvbnN0IHU4IG1mZ19kaXNhYmxl
-W10gPSB7IDB4MDAsIDB4MDAgfTsNCisgICAgICAgY29uc3QgdTggbWZnX3Jlc2V0X2RlYWN0aXZh
-dGVbXSA9IHsgMHgwMCwgMHgwMSB9Ow0KKyAgICAgICBjb25zdCB1OCBtZmdfcmVzZXRfYWN0aXZh
-dGVbXSA9IHsgMHgwMCwgMHgwMiB9Ow0KKw0KKyAgICAgICBCVF9EQkcoIiVzIiwgaGRldi0+bmFt
-ZSk7DQorDQorICAgICAgIC8qIFRoZSBjb250cm9sbGVyIGhhcyBhIGJ1ZyB3aXRoIHRoZSBmaXJz
-dCBIQ0kgY29tbWFuZCBzZW50IHRvIGl0DQorICAgICAgICAqIHJldHVybmluZyBudW1iZXIgb2Yg
-Y29tcGxldGVkIGNvbW1hbmRzIGFzIHplcm8uIFRoaXMgd291bGQgc3RhbGwgdGhlDQorICAgICAg
-ICAqIGNvbW1hbmQgcHJvY2Vzc2luZyBpbiB0aGUgQmx1ZXRvb3RoIGNvcmUuDQorICAgICAgICAq
-DQorICAgICAgICAqIEFzIGEgd29ya2Fyb3VuZCwgc2VuZCBIQ0kgUmVzZXQgY29tbWFuZCBmaXJz
-dCB3aGljaCB3aWxsIHJlc2V0IHRoZQ0KKyAgICAgICAgKiBudW1iZXIgb2YgY29tcGxldGVkIGNv
-bW1hbmRzIGFuZCBhbGxvdyBub3JtYWwgY29tbWFuZCBwcm9jZXNzaW5nDQorICAgICAgICAqIGZy
-b20gbm93IG9uLg0KKyAgICAgICAgKi8NCisgICAgICAgc2tiID0gX19oY2lfY21kX3N5bmMoaGRl
-diwgSENJX09QX1JFU0VULCAwLCBOVUxMLCBIQ0lfSU5JVF9USU1FT1VUKTsNCisgICAgICAgaWYg
-KElTX0VSUihza2IpKSB7DQorICAgICAgICAgICAgICAgQlRfRVJSKCIlcyBzZW5kaW5nIGluaXRp
-YWwgSENJIHJlc2V0IGNvbW1hbmQgZmFpbGVkICglbGQpIiwNCisgICAgICAgICAgICAgICAgICAg
-ICAgaGRldi0+bmFtZSwgUFRSX0VSUihza2IpKTsNCisgICAgICAgICAgICAgICByZXR1cm4gLVBU
-Ul9FUlIoc2tiKTsNCisgICAgICAgfQ0KKyAgICAgICBrZnJlZV9za2Ioc2tiKTsNCg0KDQpSZWdh
-cmRzLA0KRXRoYW4NCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBsaW51eC1ibHVl
-dG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3RoLW93bmVy
-QHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEFuLCBUZWRkDQpTZW50OiBGcmlkYXksIEp1
-bmUgMDUsIDIwMTUgMzo1NiBBTQ0KVG86IFBvdWxhaW4sIExvaWMNCkNjOiBNYXJjZWwgSG9sdG1h
-bm47IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBbUEFUQ0h2
-Ml0gQmx1ZXRvb3RoOiBidHVzYjogRml4IEludGVsIGNvbnRyb2xsZXIgaGFuZyBhZnRlciBzaHV0
-ZG93bg0KDQpIaSBMb2ljDQoNCg0KDQpPbiA2LzQvMTUsIDQ6NTkgQU0sICJQb3VsYWluLCBMb2lj
-IiA8bG9pYy5wb3VsYWluQGludGVsLmNvbT4gd3JvdGU6DQoNCj5IaSB0ZWRkLA0KPg0KPk9uIDIx
-LzA1LzIwMTUgMjE6NTYsIE1hcmNlbCBIb2x0bWFubiB3cm90ZToNCj4+IEhpIFRlZGQsDQo+Pg0K
-Pj4+IFRoZSB2ZW5kb3IgY29tbWFuZCAoMHhmYzNmKSBpbiBidHVzYl9zaHV0ZG93bl9pbnRlbCBj
-YXVzZXMgYW4gDQo+Pj4gaW50ZXJuYWwgcmVzZXQgd2l0aCBvbGQgZmlybXdhcmUuIEFmdGVyIHRo
-YXQsIHVwY29taW5nIEhDSSBjb21tYW5kIA0KPj4+IHdpbGwgaGFuZyBkdWUgdG8gYSBjb250cm9s
-bGVyIGJ1ZyB3aXRoIHRoZSBmaXJzdCBIQ0kgY29tbWFuZCBzZW50IHRvIGl0Lg0KPj4+IFRoZSB3
-b3JrYXJvdW5kIGlzIHRvIHNlbmQgSENJIFJlc2V0IGNvbW1hbmQgZmlyc3Qgd2hpY2ggd2lsbCBy
-ZXNldCANCj4+PiB0aGUgbnVtYmVyIG9mIGNvbXBsZXRlZCBjb21tYW5kcy4NCj4+Pg0KPj4+IFNp
-Z25lZC1vZmYtYnk6IExvaWMgUG91bGFpbiA8bG9pYy5wb3VsYWluQGludGVsLmNvbT4NCj4+PiAt
-LS0NCj4+PiB2MjogU2VuZCBIQ0kgcmVzZXQgZnJvbSBzaHV0ZG93biBpbnN0ZWFkIG9mIHVzaW5n
-IA0KPj4+IEhDSV9RVUlSS19SRVNFVF9PTl9DTE9TRSBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5j
-IHwgMTMgDQo+Pj4gKysrKysrKysrKysrKw0KPj4+IDEgZmlsZSBjaGFuZ2VkLCAxMyBpbnNlcnRp
-b25zKCspDQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyBi
-L2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgDQo+Pj4gaW5kZXggZDIxZjNiNC4uNTg5ZjMwYyAx
-MDA2NDQNCj4+PiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+Pj4gKysrIGIvZHJp
-dmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPj4+IEBAIC0yNzA1LDYgKzI3MDUsMTkgQEAgc3RhdGlj
-IGludCBidHVzYl9zaHV0ZG93bl9pbnRlbChzdHJ1Y3QgaGNpX2RldiAqaGRldikNCj4+PiAJfQ0K
-Pj4+IAlrZnJlZV9za2Ioc2tiKTsNCj4+Pg0KPj4+ICsJLyogVGhlIDB4ZmMzZiBjb21tYW5kIGNh
-dXNlcyBhbiBpbnRlcm5hbCByZXNldCB3aXRoIG9sZCBmaXJtd2FyZS4NCj4+PiArCSAqIEluIG9y
-ZGVyIHRvIGF2b2lkIHRoZSBCdWcgd2l0aCB0aGUgZmlyc3QgSENJIGNvbW1hbmQsIHdlIGhhdmUN
-Cj4+PiArCSAqIHRvIHNlbmQgYSBIQ0kgcmVzZXQgd2hpY2ggd2lsbCByZXNldCB0aGUgbnVtYmVy
-IG9mIGNvbXBsZXRlZA0KPj4+ICsJICogY29tbWFuZC4NCj4+PiArCSAqLw0KPj4+ICsJc2tiID0g
-X19oY2lfY21kX3N5bmMoaGRldiwgSENJX09QX1JFU0VULCAwLCBOVUxMLCBIQ0lfSU5JVF9USU1F
-T1VUKTsNCj4+PiArCWlmIChJU19FUlIoc2tiKSkgew0KPj4+ICsJCUJUX0VSUigiJXM6IFNodXRk
-b3duIEhDSSByZXNldCBjb21tYW5kIGZhaWxlZCAoJWxkKSIsDQo+Pj4gKwkJCWhkZXYtPm5hbWUs
-IFBUUl9FUlIoc2tiKSk7DQo+Pj4gKwkJcmV0dXJuIFBUUl9FUlIoc2tiKTsNCj4+PiArCX0NCj4+
-PiArCWtmcmVlX3NrYihza2IpOw0KPj4+ICsNCj4+IHBsZWFzZSB0ZXN0IHRoaXMgY2hhbmdlIGFu
-ZCBzZWUgaWYgaXQgc3RpbGwgaGFzIHRoZSBkZXNpcmVkIGVmZmVjdC4gQUNLIG9yIE5BQ0sgdGhl
-IHBhdGNoIGJhc2VkIG9uIHlvdXIgdGVzdGluZy4NCj4+DQo+PiBSZWdhcmRzDQo+Pg0KPj4gTWFy
-Y2VsDQo+Pg0KPg0KPkFueSBjaGFuY2UgeW91IHRlc3QgdGhpcyBwYXRjaD8NCg0KSSBtaXNzZWQg
-eW91ciBwYXRjaCBhbmQganVzdCBnb3QgaXQuIEkgd2lsbCBydW4gdGhpcyB0ZXN0IGFuZCBsZXQg
-eW91IGtub3cgdGhlIHJlc3VsdC4NCg0KPg0KPlJlZ2FyZHMsDQo+TG9pYw0KPg0KPi0tDQo+SW50
-ZWwgT3BlbiBTb3VyY2UgVGVjaG5vbG9neSBDZW50ZXINCj5odHRwOi8vb3NzLmludGVsLmNvbS8N
-Cj4NCgQgey5uICsgICAgICAgKyUgIGx6d20gIGIg66eyICByICB6WCAgFiAgaCAgYiAgXm4gciAg
-IHogGiAgaCAgICAmICAeIEcgICBoIAMoIOmajiDdomoiICAaIBttICAgICB6IN6WICAgZiAgIGgg
-ICB+IG0gDQo=
+On Sat, Jun 6, 2015 at 4:26 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi,
+>
+>> If anyone like to offer suggestion or help with finding out why the
+>> same usb bluetooth dongle (cheap EDR 2.0) that works on i686 x86_64,
+>> does not work on ppc (ibook g4). The three machines all run the same
+>> software stack, same kernel version, gcc, bluez, dbus, python etc--
+>> all the same version. kernel:3.4.107 gcc:4.9.2 bluez:5.23 dbus:1.8.16
+>> python:2.7.10 I will give more details if needed. I have btmon log for
+>> failed pairing on ppc with nokia phone and good pairing logs as well.
+>> also python trace log (does not help much). it seems, on ppc, the
+>> dongle always "omit" to send second "connect request", compared with
+>> good pairings on x86_64 and i686. the ibook g4 internal usb bluetooth
+>> dongle (which I manage to bring to hci mode) also failed with the same
+>> sympton (same python error, but not sure about the exact reason).
+>> buying another bt dongle may or may not solve the problem. I have
+>> attached good pairing and bad pairing log from btmon.
+>
+> how are you trying to pair this device? My first guess is the it is some endian bug in the tool that retrieves the RFCOMM channel and number and can not see that the SDP records are present.
+
+hi
+
+I managed to get the dongle paired with nokia phone, after changing
+port number to big endian in python. I am not sure which package is
+responsible (kernel, libc, bluez, python, dbus ?) for converting back
+and forth between network and host. In any case, here is the python
+code that works with ppc:
+
+#!/usr/bin/env python
+from PyOBEX.client import BrowserClient
+import sys
+address = sys.argv[1]
+channel=10 # OBEX File Transfer
+# client = BrowserClient(address, channel) # this works with
+little-endian machines
+client = BrowserClient(address, int("0x0a000000", 0)) # works with
+big-endian machine
+client.connect()
+client.put('test.txt', sys.argv[2])
+client.disconnect()
+
+> Regards
+>
+> Marcel
+>
