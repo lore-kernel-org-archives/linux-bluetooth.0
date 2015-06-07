@@ -1,134 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH 1/5] Broadcom Bluetooth UART Device Tree bindings
+Subject: Re: [PATCH] ath3k: Add support of 0489:e076 AR3012 device
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5572D8E0.4010408@broadcom.com>
-Date: Sun, 7 Jun 2015 09:39:18 +0200
-Cc: Ilya Faenson <ifaenson@broadcom.com>,
-	linux-bluetooth@vger.kernel.org, Jiri Slaby <jslaby@suse.cz>
-Message-Id: <8F440869-6309-421B-8EF2-D9A26DDA50C7@holtmann.org>
-References: <1433365304-16707-1-git-send-email-ifaenson@broadcom.com> <1433365304-16707-2-git-send-email-ifaenson@broadcom.com> <FC211E48-68D8-4C2E-9A1A-E89EDAA1B23F@holtmann.org> <5572A40F.9090206@broadcom.com> <2D4B4815-717F-4B21-A265-171D07E309B8@holtmann.org> <5572D8E0.4010408@broadcom.com>
-To: Arend van Spriel <arend@broadcom.com>
+In-Reply-To: <1433611540-30860-1-git-send-email-hanipouspilot@gmail.com>
+Date: Sun, 7 Jun 2015 09:33:30 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Linux Bluetooth mailing list
+	<linux-bluetooth@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	stable@vger.kernel.org
+Message-Id: <29C5310D-1972-48DB-A17A-3E6934B72FB0@holtmann.org>
+References: <1433611540-30860-1-git-send-email-hanipouspilot@gmail.com>
+To: Dmitry Tunin <hanipouspilot@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arend,
+Hi Dmitry,
 
->>>>> Device Tree bindings to configure the Broadcom Bluetooth UART device.
->>>>> Updated not to use CamelCase and to use Intel style "oper-speed".
->>>>> 
->>>>> Signed-off-by: Ilya Faenson<ifaenson@broadcom.com>
->>>>> ---
->>>>> .../devicetree/bindings/net/bluetooth/btbcm.txt    | 82 ++++++++++++++++++++++
->>>>> 1 file changed, 82 insertions(+)
->>>>> create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
->>>>> 
->>>>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
->>>>> new file mode 100644
->>>>> index 0000000..2679819
->>>>> --- /dev/null
->>>>> +++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
->>>>> @@ -0,0 +1,82 @@
->>>>> +btbcm
->>>>> +------
->>>>> +
->>>>> +Required properties:
->>>>> +
->>>>> +	- compatible : must be "brcm,brcm-bt-uart".
->>>>> +	- tty : tty device connected to this Bluetooth device.
->>>>> +
->>>>> +Optional properties:
->>>>> +
->>>>> +  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an interrupt.
->>>>> +
->>>>> +  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume device.
->>>>> +
->>>>> +  - bt-reg-on-gpios : reg-on output GPIO to be used to power device on/off.
->>>>> +
->>>>> +  - oper-speed : Bluetooth device operational baud rate.
->>>>> +    Default: 3000000.
->>>>> +
->>>>> +  - manual-fc : flow control UART in suspend / resume scenarios.
->>>>> +    Default: 0.
->>>>> +
->>>>> +  - configure-sleep : configure suspend / resume flag.
->>>>> +    Default: false.
->>>>> +
->>>>> +  - configure-audio : configure platform PCM SCO flag.
->>>>> +    Default: false.
->>>>> +
->>>>> +  - pcm-clockmode : PCM clock mode. 0-slave, 1-master.
->>>>> +    Default: 0.
->>>>> +
->>>>> +  - pcm-fillmethod : PCM fill method. 0 to 3.
->>>>> +    Default: 2.
->>>>> +
->>>>> +  - pcm-fillnum : PCM number of fill bits. 0 to 3.
->>>>> +    Default: 0.
->>>>> +
->>>>> +  - pcm-fillvalue : PCM fill value. 0 to 7.
->>>>> +    Default: 3.
->>>>> +
->>>>> +  - pcm-incallbitclock : PCM interface rate. 0-128Kbps, 1-256Kbps, 2-512Kbps,
->>>>> +    3-1024Kbps, 4-2048Kbps.
->>>>> +    Default: 0.
->>>>> +
->>>>> +  - pcm-lsbfirst : PCM LSB first. 0 or 1.
->>>>> +    Default: 0.
->>>>> +
->>>>> +  - pcm-rightjustify : PCM Justify. 0-left, 1-right.
->>>>> +    Default: 0.
->>>>> +
->>>>> +  - pcm-routing : PCM routing. 0-PCM, 1-SCO over HCI.
->>>>> +    Default: 0.
->>>>> +
->>>>> +  - pcm-shortframesync : PCM sync. 0-short, 1-long.
->>>>> +    Default: 0.
->>>>> +
->>>>> +  - pcmsyncmode : PCM sync mode. 0-slave, 1-master.
->>>>> +    Default: 0.
->>>>> +
->>>>> +
->>>>> +Example:
->>>>> +
->>>>> +	brcm4354_bt_uart: brcm4354-bt-uart {
->>>> 
->>>> at some point you have to explain to me if Broadcom prefers BCM or BRCM. I can not make heads or tail out of it. My current explanation is the it is BCM for the Bluetooth guys and BRCM for the WiFi guys ;)
->>> 
->>> That's a nice explanation ;-) Maybe I can give it a shot. First, two facts: 1) BRCM is our stock symbol, and 2) our device names are prefixed by BCM. So in devicetree specifications we specified the vendor prefix as BRCM and (try to) stick to that. The above clearly refers to a device so it would probably be better to use bcm4354... there.
->>> 
->>>>> +		compatible = "brcm,brcm-bt-uart";
->>> 
->>> The compatible string indeed starts with vendor prefix "brcm,".
->>> 
->>>>> +		bt-wake-gpios =<&gpio4 30 GPIO_ACTIVE_HIGH>;
->>>>> +		bt-host-wake-gpios =<&gpio4 31 GPIO_ACTIVE_HIGH>;
->>>>> +		tty = "ttyS0”;
->>>> 
->>>> This tty one is the one we need to figure out. Could we reference by some node information instead of the assigned device name. If we can reference something in struct device that we know is more consistent, that would be perfect. I mean if the kernel for reason decides to enumerate things in a different order then this might be ttyS1 out of a sudden.
->>> 
->>> I see your point, but not sure what to do here either. In devicetree you could reference the uart node, but I don't know if there is an api in the kernel to obtain tty associated with a uart port. I could not find it doing quick glance in include/linux/tty.h although the linkage is obviously there in the data types.
->> 
->> I wonder if we get this done via ACPI in the first place. However that is something for Fred to figure out.
->> 
->> For device tree, I bet we need to extend either the TTY subsystem or really start pushing towards the tty-slave idea that has been floating around.
+> BugLink: https://bugs.launchpad.net/bugs/1462614
 > 
-> The tty-slave idea popped up already in review comments. We are wondering if it is still floating or whether things are starting to settle in that area. Specially for the devicetree spec, which is supposed to be a stable ABI, we probably need to take that into account if that is indeed the way things are moving.
+> This device requires new firmware files
+> AthrBT_0x11020100.dfu and ramps_0x11020100_40.dfu added to
+> /lib/firmware/ar3k/ that are not included in linux-firmware yet.
 > 
-> Ilya, this is the most recent thing I found:
+> T: Bus=03 Lev=01 Prnt=01 Port=09 Cnt=06 Dev#= 7 Spd=12 MxCh= 0
+> D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+> P: Vendor=0489 ProdID=e076 Rev= 0.01
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+> E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
 > 
-> http://thread.gmane.org/gmane.linux.kernel/1949724
-> 
-> The uart-slave idea seems to sit between tty and uart dealing with powering the device. Not sure how that fits our need. It mentions something about being able to intervene in any tty-uart interaction so there could bt stuff that could be done in those hooks.
+> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+> Cc: stable@vger.kernel.org
+> ---
+> drivers/bluetooth/ath3k.c | 2 ++
+> drivers/bluetooth/btusb.c | 1 +
+> 2 files changed, 3 insertions(+)
 
-it would be actually nice if it also considers ACPI from the start. There seems to be enough description in the ACPI tables that it could just work.
-
-The way I see it is that having a vendor specific driver that facilitates the power handling seems like a nice and clean design. However right now it is limited to TTY open/close operations. Do we need extra runtime power handling that the UART slave should also be able to facilitate.
-
-The GPS case seems to be easy. You open and close the TTY and then get NMEA sentences or not. That is an easy mapping from userspace and makes total sense. For Bluetooth however the open normally happens when you enable Bluetooth. Meaning that it can only facility the master switch of on and off. The runtime aspects should be considered as well.
-
-That said, the master switch for on/off would be a huge step into dealing with chips hidden behind UARTs.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
