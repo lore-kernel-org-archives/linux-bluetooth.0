@@ -1,83 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] Bluetooth: Fix encryption key size handling for LTKs
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1433758095-3583-1-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 8 Jun 2015 16:29:24 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <74CABAA8-2FD0-443E-A26A-5DEA2B2FFBB3@holtmann.org>
-References: <1433758095-3583-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] shared/gatt-client: Don't discovery secondaries if there is no primary
+Date: Mon,  8 Jun 2015 16:35:45 +0300
+Message-Id: <1433770545-14938-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1433770545-14938-1-git-send-email-luiz.dentz@gmail.com>
+References: <1433770545-14938-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> The encryption key size for LTKs is supposed to be applied only at the
-> moment of encryption. When generating a Link Key (using LE SC) from
-> the LTK the full non-shortened value should be used. This patch
-> modifies the code to always keep the full value around and only apply
-> the key size when passing the value to HCI.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci_core.h |  2 +-
-> net/bluetooth/hci_conn.c         |  4 ++--
-> net/bluetooth/hci_event.c        |  2 +-
-> net/bluetooth/smp.c              | 15 +++------------
-> 4 files changed, 7 insertions(+), 16 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index a056c2bfeb81..24c0e4577a93 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1408,7 +1408,7 @@ void mgmt_smp_complete(struct hci_conn *conn, bool complete);
-> u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
-> 		      u16 to_multiplier);
-> void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
-> -							__u8 ltk[16]);
-> +		      __u8 ltk[16], __u8 key_size);
-> 
-> void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> 			       u8 *bdaddr_type);
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index ee5e59839b02..2c48bf0b5afb 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -276,7 +276,7 @@ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
-> }
-> 
-> void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
-> -		      __u8 ltk[16])
-> +		      __u8 ltk[16], __u8 key_size)
-> {
-> 	struct hci_dev *hdev = conn->hdev;
-> 	struct hci_cp_le_start_enc cp;
-> @@ -288,7 +288,7 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
-> 	cp.handle = cpu_to_le16(conn->handle);
-> 	cp.rand = rand;
-> 	cp.ediv = ediv;
-> -	memcpy(cp.ltk, ltk, sizeof(cp.ltk));
-> +	memcpy(cp.ltk, ltk, key_size);
-> 
-> 	hci_send_cmd(hdev, HCI_OP_LE_START_ENC, sizeof(cp), &cp);
-> }
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 7b61be73650f..8ba29ce92b60 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -4955,7 +4955,7 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> 			goto not_found;
-> 	}
-> 
-> -	memcpy(cp.ltk, ltk->val, sizeof(ltk->val));
-> +	memcpy(cp.ltk, ltk->val, ltk->enc_size);
-> 	cp.handle = cpu_to_le16(conn->handle);
+The spec state that a secondary needs to referenced by at least one
+primary, Version 4.2 [Vol 1, Part A] page 101:
 
-this is actually leaking data and might cause wrong LTK data to be used. We are missing the memset of the rest of key length to zero.
+  'A secondary service is a service that provides auxiliary
+  functionality of a device and is referenced from at least one
+  primary service on the device.'
+---
+ src/shared/gatt-client.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Regards
-
-Marcel
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 724fc53..7e9d550 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1009,6 +1009,15 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
+ 	}
+ 
+ secondary:
++	/*
++	 * Version 4.2 [Vol 1, Part A] page 101:
++	 * A secondary service is a service that provides auxiliary
++	 * functionality of a device and is referenced from at least one
++	 * primary service on the device.
++	 */
++	if (queue_isempty(op->pending_svcs))
++		goto done;
++
+ 	/* Discover secondary services */
+ 	client->discovery_req = bt_gatt_discover_secondary_services(client->att,
+ 						NULL, op->start, op->end,
+-- 
+2.1.0
 
