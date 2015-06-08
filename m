@@ -1,35 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 8 Jun 2015 12:56:17 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: btusb: Remove double error check from
+ local version command
+Message-ID: <20150608095617.GA31930@t440s.lan>
+References: <1433664062-37464-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMPA5gdJPQPidhNo0gja5ohH_9Y1XXaG-ydT8bBripTaJCnL0g@mail.gmail.com>
-References: <CAMPA5gdJPQPidhNo0gja5ohH_9Y1XXaG-ydT8bBripTaJCnL0g@mail.gmail.com>
-Date: Mon, 8 Jun 2015 13:03:47 +0300
-Message-ID: <CABBYNZLRe_WW6844OXKATwCk9NMzVxUkRquyYwjJbDGeSOqTFg@mail.gmail.com>
-Subject: Re: Are there any simple GATT examples?
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Joshua Kramer <joskra42.list@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1433664062-37464-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joshua,
+Hi Marcel,
 
-On Sun, Jun 7, 2015 at 4:22 AM, Joshua Kramer <joskra42.list@gmail.com> wrote:
-> Hello-
->
-> Is there an example of a GATT server that implements a simple
-> socket-type connection?  I am creating a device based on Raspberry Pi
-> that needs to be controlled via an Android app.  I am using bluez on
-> the Pi side.
+On Sun, Jun 07, 2015, Marcel Holtmann wrote:
+> The __hci_cmd_sync function already handles the command status and
+> command complete errors. No need to check the status field again.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btusb.c | 26 ++++++++++----------------
+>  1 file changed, 10 insertions(+), 16 deletions(-)
 
-Well a GATT service/attribute alone cannot do socket-type connection,
-what you can do is to use write and read/notifications to emulate it
-but the proper way would be to use connection oriented channels if
-Android support it (which I don't think it does).
+Both patches in this set have been applied to bluetooth-next. Thanks.
 
-If you are just after a generic example there is one in BlueZ source
-tree: https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/example-gatt-server
-
-
--- 
-Luiz Augusto von Dentz
+Johan
