@@ -1,65 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Aleksei Volkov <info@dv2c.ru>
-To: linux-bluetooth@vger.kernel.org
-Cc: Aleksei Volkov <info@dv2c.ru>
-Subject: [PATCH v3] Correct typo in "Roper Class 1 Bluetooth Dongle" for 4.x kernel
-Date: Mon,  8 Jun 2015 12:02:10 +0300
-Message-Id: <1433754130-6269-1-git-send-email-info@dv2c.ru>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <55755617.8080302@intel.com>
+Date: Mon, 08 Jun 2015 10:45:11 +0200
+From: Loic Poulain <loic.poulain@intel.com>
+MIME-Version: 1.0
+To: "Ge, Ethan" <ethan.ge@intel.com>, "An, Tedd" <tedd.an@intel.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCHv2] Bluetooth: btusb: Fix Intel controller hang after shutdown
+References: <1432218957-3400-1-git-send-email-loic.poulain@intel.com> <69A96222-5518-4341-9F0B-32F3CEACCC35@holtmann.org> <55703D8F.6010602@intel.com> <41F028F6-E05E-4816-ACE8-3B0F121F2081@intel.com> <86D221DC0B85F94D9B05B97827669A3403CA5E7F@PGSMSX106.gar.corp.intel.com> <86D221DC0B85F94D9B05B97827669A3403CA6EA0@PGSMSX106.gar.corp.intel.com>
+In-Reply-To: <86D221DC0B85F94D9B05B97827669A3403CA6EA0@PGSMSX106.gar.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-That patch correct typo in usb vendor id for "Roper Class 1 Bluetooth Dongle". Problem with typo present since 4.0 kernel.
+Hi Ethan,
 
-Content /sys/kernel/debug/usb/devices for these dongle:
+> I am helping Tedd to test this patch now, but I have a question about this patch.
+>
+> For your comment It looks like you want to send HCI RESET command to controller first when BT enabled, then I found below patch also do same thing as your patch. May I know any difference for your patch? Thanks.
 
-T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=1310 ProdID=0001 Rev=15.00
-S:  Manufacturer=SiW
-S:  Product=SiW
-S:  SerialNumber=E7BB050D0B00
-C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr= 50mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> commit dffd30ee9619ccd7153f1861ba0436bbc4400f36
+> Author: Tedd Ho-Jeong An <tedd.an@intel.com>
+> Date:   Fri Apr 19 09:57:43 2013 -0700
+>
+>      Bluetooth: Add support for Intel Bluetooth device [8087:07dc]
 
-Signed-off-by: Aleksei Volkov <info@dv2c.ru>
----
- drivers/bluetooth/btusb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+setup is only called for the first open/up to initialize the device.
+shutdown is called before each regular HCI close/down to perform vendor 
+HCI epilog.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c956250..41aa2ac 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -268,7 +268,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0e5e, 0x6622), .driver_info = BTUSB_BROKEN_ISOC },
- 
- 	/* Roper Class 1 Bluetooth Dongle (Silicon Wave based) */
--	{ USB_DEVICE(0x1300, 0x0001), .driver_info = BTUSB_SWAVE },
-+	{ USB_DEVICE(0x1310, 0x0001), .driver_info = BTUSB_SWAVE },
- 
- 	/* Digianswer devices */
- 	{ USB_DEVICE(0x08fd, 0x0001), .driver_info = BTUSB_DIGIANSWER },
+The Intel shutdown procedure consist in sending the 0xfc3f command which 
+seems
+to cause an internal reset with old firmwares (LED off with new one).
+So, we need to HCI reset the controller before any other command in 
+order to avoid
+the "number of completed commands" issue.
+To be sure that this HCI reset will be perform, I just put the HCI reset 
+after the 0xfc3f
+in the shutdown callback.
+
+Since I only have old version, I can only test that the problem is fixed 
+for me but not that
+no regression is caused with the new fw/hw version.
+So we need feedback, to know if the expected behavior (LED OFF on 
+shutdown) is preserved.
+
+Regards,
+Loic
+
 -- 
-2.1.4
-
+Intel Open Source Technology Center
+http://oss.intel.com/
