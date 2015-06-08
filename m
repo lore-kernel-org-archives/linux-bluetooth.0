@@ -1,14 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Jun 2015 11:57:44 -0700
+Date: Mon, 8 Jun 2015 11:55:34 -0700
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2] Bluetooth: btusb: fixed command length alignment on
- Intel 8260
-Message-ID: <20150608115744.587187f5@tedd-fedora-vm>
-In-Reply-To: <2A1B843F-9398-4FEA-98FA-B3D028FECAE9@holtmann.org>
-References: <20150518155207.31ce2835@tedd-fedora-vm>
-	<2A1B843F-9398-4FEA-98FA-B3D028FECAE9@holtmann.org>
+Cc: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC untested] Bluetooth: btusb: Fix secure send command length
+ alignment on Intel 8260
+Message-ID: <20150608115534.26c5eaf1@tedd-fedora-vm>
+In-Reply-To: <1433663228-30253-1-git-send-email-marcel@holtmann.org>
+References: <1433663228-30253-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,106 +15,104 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Sat, 6 Jun 2015 08:15:01 +0200
+On Sun, 7 Jun 2015 09:47:08 +0200
 Marcel Holtmann <marcel@holtmann.org> wrote:
 
-> Hi Tedd,
+> This patch fixes the command length alignment issue for Intel Bluetooth
+> 8260.
 > 
-> > This patch fixes the command length alignment issue for Intel Bluetooth
-> > 8260.
-> > 
-> > The length of parameters in the firmware downloading command must be
-> > multiplication of 4. If not, the command must append Intel_NOP command
-> > with extra parameters, zeros, at the end, and the firmware file is
-> > already included Intel_NOP command for alignment.
-> > 
-> > This patch checks the next command and if the next command is Intel_NOP
-> > command, it reads the Intel_NOP command and send them together.
-> > 
-> > For example, if the data from the firmware file looks like this:
-> > 8E FC 03 11 22 33 02 FC 03 00 00 00
-> > 
-> > Previously, btusb sends two commands:
-> > 09 FC 06 8E FC 03 11 22 33
-> > 09 FC 06 02 FC 03 00 00 00
-> > 
-> > This won't work because the length of parameters are 6 which violates
-> > the 4 byte alignment.
-> > 
-> > This patch will append them together and send as one command:
-> > 09 FC 0B 8E FC 03 11 22 33 02 FC 03 00 00 00
+> The length of parameters in the firmware downloading command must be
+> multiplication of 4. If not, the command must append Intel_NOP command
+> with extra parameters, zeros, at the end, and the firmware file is
+> already included Intel_NOP command for alignment.
 > 
-> I assume this should be 09 FC 0C to indicate 12 bytes of payload.
+> This patch checks the next command and if the next command is Intel_NOP
+> command, it reads the Intel_NOP command and send them together.
 > 
-> > Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> > ---
-> > drivers/bluetooth/btusb.c | 16 ++++++++++++++++
-> > 1 file changed, 16 insertions(+)
-> > 
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index d21f3b4..13b9969 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -2541,6 +2541,22 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
-> > 
-> > 		cmd_len = sizeof(*cmd) + cmd->plen;
-> > 
-> > +		/* The parameter length of secure send command should be a
-> > +		 * multiplication of 4. If it is not, it needs to append
-> > +		 * Intel_NOP command with arbitrary number of parameters (zeros)
-> > +		 * to meet the 4 byte alignment.
-> > +		 * The FW file has already formatted with this. So if the next
-> > +		 * command is Intel_NOP then send them together.
-> > +		 */
-> > +		cmd = (void *)(fw_ptr + cmd_len);
-> > +		if (le16_to_cpu(cmd->opcode) == 0xfc02) {
-> > +			BT_DBG("%s: Updated cmd to include Intel_NOP",
-> > +			       hdev->name);
-> > +			/* Update cmd_len to include the Intel_NOP command
-> > +			 */
-> > +			cmd_len += sizeof(*cmd) + cmd->plen;
-> > +		}
-> > +
+> For example, if the data from the firmware file looks like this:
+> 8E FC 03 11 22 33 02 FC 03 00 00 00
 > 
-> I might have sent you down the wrong patch when looking for the Intel_NOP as next command. After starring at this problem for a bit longer, I think this might be the smarter approach to this.
+> Previously, btusb sends two commands:
+> 09 FC 06 8E FC 03 11 22 33
+> 09 FC 06 02 FC 03 00 00 00
 > 
->         fw_ptr = fw->data + 644;
->         frag_len = 0;
+> This won't work because the length of parameters are 6 which violates
+> the 4 byte alignment.
 > 
->         while (fw_ptr - fw->data < fw->size) {
->                 struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
+> This patch will append them together and send as one command:
+> 09 FC 0C 8E FC 03 11 22 33 02 FC 03 00 00 00
 > 
->                 frag_len += sizeof(*cmd) + cmd->plen;
+> Based on previous work from Tedd Ho-Jeong An <tedd.an@intel.com>
 > 
->                 /* The paramter length of the secure send command requires
->                  * a 4 byte alignment. It happens so that the firmware file
->                  * contains proper Intel_NOP commands to align the fragments
->                  * as needed.
->                  *
->                  * Send set of commands with 4 byte alignment from the
->                  * firmware data buffer as a single Data fragement.
->                  */
->                 if (!(frag_len % 4)) {
->                         err = btusb_intel_secure_send(hdev, 0x01, frag_len,
->                                                       fw_ptr);
->                         if (err < 0) {
->                                 BT_ERR("%s: Failed to send firmware data (%d)",
->                                        hdev->name, err);
->                                 goto done;
->                         }
+> Reported-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Cc: stable@vger.kernel.org
+> ---
+>  drivers/bluetooth/btusb.c | 34 ++++++++++++++++++++++------------
+>  1 file changed, 22 insertions(+), 12 deletions(-)
 > 
->                         fw_ptr += frag_len;
->                         frag_len = 0;
->                 }
->         }
-> 
-> I know this compiles, but I have not had a chance to actually test it with real hardware. So if this works, then I would prefer to go this route instead. Please give a try and update your patch. Thanks.
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 7f936db169f5..945f04b80275 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1950,6 +1950,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+>  	struct intel_boot_params *params;
+>  	const struct firmware *fw;
+>  	const u8 *fw_ptr;
+> +	u32 frag_len;
+>  	char fwname[64];
+>  	ktime_t calltime, delta, rettime;
+>  	unsigned long long duration;
+> @@ -2142,24 +2143,33 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+>  	}
+>  
+>  	fw_ptr = fw->data + 644;
+> +	frag_len = 0;
+>  
+>  	while (fw_ptr - fw->data < fw->size) {
+> -		struct hci_command_hdr *cmd = (void *)fw_ptr;
+> -		u8 cmd_len;
+> +		struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
+>  
+> -		cmd_len = sizeof(*cmd) + cmd->plen;
+> +		frag_len += sizeof(*cmd) + cmd->plen;
+>  
+> -		/* Send each command from the firmware data buffer as
+> -		 * a single Data fragment.
+> +		/* The paramter length of the secure send command requires
+> +		 * a 4 byte alignment. It happens so that the firmware file
+> +		 * contains proper Intel_NOP commands to align the fragments
+> +		 * as needed.
+> +		 *
+> +		 * Send set of commands with 4 byte alignment from the
+> +		 * firmware data buffer as a single Data fragement.
+>  		 */
+> -		err = btusb_intel_secure_send(hdev, 0x01, cmd_len, fw_ptr);
+> -		if (err < 0) {
+> -			BT_ERR("%s: Failed to send firmware data (%d)",
+> -			       hdev->name, err);
+> -			goto done;
+> -		}
+> +		if (!(frag_len % 4)) {
+> +			err = btusb_intel_secure_send(hdev, 0x01, frag_len,
+> +						      fw_ptr);
+> +			if (err < 0) {
+> +				BT_ERR("%s: Failed to send firmware data (%d)",
+> +				       hdev->name, err);
+> +				goto done;
+> +			}
+>  
+> -		fw_ptr += cmd_len;
+> +			fw_ptr += frag_len;
+> +			frag_len = 0;
+> +		}
+>  	}
+>  
+>  	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
 
-I found your RFC and tested with REL182 fw which had alignment issue. Please see my response to that email. Bottom line is that it worked well.
+I tested this patch and it worked as expected. I confirmed that the alignment
+issue was handled properly and could load the firmware that used to have 
+alignment issue.
 
-> 
-> Regards
-> 
-> Marcel
-> 
-
+Regards,
+Tedd
