@@ -1,124 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-From: Simon Wood <simon@mungewell.org>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: simon@mungewell.org,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] bccmd - add ability to read ADC
-Date: Mon,  8 Jun 2015 12:04:20 -0600
-Message-Id: <1433786660-2169-1-git-send-email-simon@mungewell.org>
-In-Reply-To: <06F67222-BAF1-455D-A4B8-4560FE84EE69@holtmann.org>
-References: <06F67222-BAF1-455D-A4B8-4560FE84EE69@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v2] Bluetooth: Fix encryption key size handling for LTKs
+Date: Mon,  8 Jun 2015 18:14:39 +0300
+Message-Id: <1433776479-20712-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some BlueCore devices are equipped with an 'Analogue In' pin which is
-internally connected to a MUX and ADC. This patch adds the ability to
-control the MUX and read the ADC.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-The ADC is also connected internal to a temp sensor, which can also be
-read via this method.
+The encryption key size for LTKs is supposed to be applied only at the
+moment of encryption. When generating a Link Key (using LE SC) from
+the LTK the full non-shortened value should be used. This patch
+modifies the code to always keep the full value around and only apply
+the key size when passing the value to HCI.
 
-The (only) MUX values expected to be used are:
-1  Internal 1V25 reference
-16 BlueCore01b pin Test_A; BlueCore2-External pin AIO0
-17 BlueCore01b pin Test_B; BlueCore2-External pin AIO1
-36 Chip’s internal temperature (change) sensor. BlueCore2-ROM and later only.
-
-The MUX can also select other (undocumented) test points.
-
-Example usage
---
-$ ./bccmd -t HCI -d hci1 adc 17
-ADC value from Mux 0x11 : 0x0054 (valid)
-$ ./bccmd -t HCI -d hci1 adc 1
-ADC value from Mux 0x01 : 0x00b2 (valid)
-
-Signed-off-by: Simon Wood <simon@mungewell.org>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- tools/bccmd.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- tools/csr.h   |  2 ++
- 2 files changed, 44 insertions(+)
+ include/net/bluetooth/hci_core.h |  2 +-
+ net/bluetooth/hci_conn.c         |  4 ++--
+ net/bluetooth/hci_event.c        |  3 ++-
+ net/bluetooth/smp.c              | 15 +++------------
+ 4 files changed, 8 insertions(+), 16 deletions(-)
 
-diff --git a/tools/bccmd.c b/tools/bccmd.c
-index 7cce426..64c5f56 100644
---- a/tools/bccmd.c
-+++ b/tools/bccmd.c
-@@ -1040,6 +1040,47 @@ static int cmd_pscheck(int transport, int argc, char *argv[])
- 	return 0;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a056c2bfeb81..24c0e4577a93 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1408,7 +1408,7 @@ void mgmt_smp_complete(struct hci_conn *conn, bool complete);
+ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
+ 		      u16 to_multiplier);
+ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
+-							__u8 ltk[16]);
++		      __u8 ltk[16], __u8 key_size);
+ 
+ void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			       u8 *bdaddr_type);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ee5e59839b02..2c48bf0b5afb 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -276,7 +276,7 @@ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
  }
  
-+static int cmd_adc(int transport, int argc, char *argv[])
-+{
-+	uint8_t array[8];
-+	uint16_t mux, value;
-+	int err;
-+
-+	OPT_HELP(1, NULL);
-+
-+	if (!strncasecmp(argv[0], "0x", 2))
-+		mux = strtol(argv[0], NULL, 16);
-+	else
-+		mux = atoi(argv[0]);
-+
-+	// Request an ADC read from a particular mux'ed input
-+	memset(array, 0, sizeof(array));
-+	array[0] = mux & 0xff;
-+	array[1] = mux >> 8;
-+
-+	err = transport_write(transport, CSR_VARID_ADC, array, 2);
-+	if (err < 0) {
-+		errno = -err;
-+		return -1;
-+	}
-+
-+	// sleep, then read result
-+	usleep(50000);
-+	err = transport_read(transport, CSR_VARID_ADC_RES, array, 8);
-+	if (err < 0) {
-+		errno = -err;
-+		return -1;
-+	}
-+
-+	mux = array[0] | (array[1] << 8);
-+	value = array[4] | (array[5] << 8);
-+
-+	printf("ADC value from Mux 0x%02x : 0x%04x (%s)\n", mux, value,
-+					array[2] == 1 ? "valid" : "invalid");
-+
-+	return 0;
-+}
-+
- static struct {
- 	char *str;
- 	int (*func)(int transport, int argc, char *argv[]);
-@@ -1070,6 +1111,7 @@ static struct {
- 	{ "psread",    cmd_psread,    NULL,                  "Read all PS keys"               },
- 	{ "psload",    cmd_psload,    "<file>",              "Load all PS keys from PSR file" },
- 	{ "pscheck",   cmd_pscheck,   "<file>",              "Check PSR file"                 },
-+	{ "adc",       cmd_adc,       "<mux>",               "Read ADC value of <mux> input"  },
- 	{ NULL }
- };
+ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
+-		      __u8 ltk[16])
++		      __u8 ltk[16], __u8 key_size)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_cp_le_start_enc cp;
+@@ -288,7 +288,7 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
+ 	cp.handle = cpu_to_le16(conn->handle);
+ 	cp.rand = rand;
+ 	cp.ediv = ediv;
+-	memcpy(cp.ltk, ltk, sizeof(cp.ltk));
++	memcpy(cp.ltk, ltk, key_size);
  
-diff --git a/tools/csr.h b/tools/csr.h
-index 8b94d7b..cc245a5 100644
---- a/tools/csr.h
-+++ b/tools/csr.h
-@@ -39,6 +39,7 @@
- #define CSR_VARID_BT_CLOCK			0x2c00	/* uint32 */
- #define CSR_VARID_PS_NEXT			0x3005	/* complex */
- #define CSR_VARID_PS_SIZE			0x3006	/* complex */
-+#define CSR_VARID_ADC_RES			0x3007	/* complex */
- #define CSR_VARID_CRYPT_KEY_LENGTH		0x3008	/* complex */
- #define CSR_VARID_PICONET_INSTANCE		0x3009	/* complex */
- #define CSR_VARID_GET_CLR_EVT			0x300a	/* complex */
-@@ -62,6 +63,7 @@
- #define CSR_VARID_CANCEL_PAGE			0x4012	/* valueless */
- #define CSR_VARID_PS_CLR			0x4818	/* uint16 */
- #define CSR_VARID_MAP_SCO_PCM			0x481c	/* uint16 */
-+#define CSR_VARID_ADC				0x4829	/* uint16 */
- #define CSR_VARID_SINGLE_CHAN			0x482e	/* uint16 */
- #define CSR_VARID_RADIOTEST			0x5004	/* complex */
- #define CSR_VARID_PS_CLR_STORES			0x500c	/* complex */
+ 	hci_send_cmd(hdev, HCI_OP_LE_START_ENC, sizeof(cp), &cp);
+ }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7b61be73650f..fcbfa4138eb1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4955,7 +4955,8 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 			goto not_found;
+ 	}
+ 
+-	memcpy(cp.ltk, ltk->val, sizeof(ltk->val));
++	memcpy(cp.ltk, ltk->val, ltk->enc_size);
++	memset(cp.ltk + ltk->enc_size, 0, sizeof(cp.ltk) - ltk->enc_size);
+ 	cp.handle = cpu_to_le16(conn->handle);
+ 
+ 	conn->pending_sec_level = smp_ltk_sec_level(ltk);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 659371af39e4..3921cba056d3 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -997,13 +997,10 @@ static u8 smp_random(struct smp_chan *smp)
+ 
+ 		smp_s1(smp->tfm_aes, smp->tk, smp->rrnd, smp->prnd, stk);
+ 
+-		memset(stk + smp->enc_key_size, 0,
+-		       SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
+-
+ 		if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags))
+ 			return SMP_UNSPECIFIED;
+ 
+-		hci_le_start_enc(hcon, ediv, rand, stk);
++		hci_le_start_enc(hcon, ediv, rand, stk, smp->enc_key_size);
+ 		hcon->enc_key_size = smp->enc_key_size;
+ 		set_bit(HCI_CONN_STK_ENCRYPT, &hcon->flags);
+ 	} else {
+@@ -1016,9 +1013,6 @@ static u8 smp_random(struct smp_chan *smp)
+ 
+ 		smp_s1(smp->tfm_aes, smp->tk, smp->prnd, smp->rrnd, stk);
+ 
+-		memset(stk + smp->enc_key_size, 0,
+-		       SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
+-
+ 		if (hcon->pending_sec_level == BT_SECURITY_HIGH)
+ 			auth = 1;
+ 		else
+@@ -1156,9 +1150,6 @@ static void sc_add_ltk(struct smp_chan *smp)
+ 	else
+ 		auth = 0;
+ 
+-	memset(smp->tk + smp->enc_key_size, 0,
+-	       SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
+-
+ 	smp->ltk = hci_add_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
+ 			       key_type, auth, smp->tk, smp->enc_key_size,
+ 			       0, 0);
+@@ -2202,7 +2193,7 @@ static bool smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
+ 	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags))
+ 		return true;
+ 
+-	hci_le_start_enc(hcon, key->ediv, key->rand, key->val);
++	hci_le_start_enc(hcon, key->ediv, key->rand, key->val, key->enc_size);
+ 	hcon->enc_key_size = key->enc_size;
+ 
+ 	/* We never store STKs for master role, so clear this flag */
+@@ -2750,7 +2741,7 @@ static int smp_cmd_dhkey_check(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	sc_add_ltk(smp);
+ 
+ 	if (hcon->out) {
+-		hci_le_start_enc(hcon, 0, 0, smp->tk);
++		hci_le_start_enc(hcon, 0, 0, smp->tk, smp->enc_key_size);
+ 		hcon->enc_key_size = smp->enc_key_size;
+ 	}
+ 
 -- 
-2.1.4
+2.4.2
+
