@@ -1,84 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v2] Bluetooth: Fix encryption key size handling for LTKs
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1433776479-20712-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 9 Jun 2015 00:20:37 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <CC159BEB-80C3-4ED9-BD3A-64D5C5E78669@holtmann.org>
-References: <1433776479-20712-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Mon, 8 Jun 2015 11:57:44 -0700
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v2] Bluetooth: btusb: fixed command length alignment on
+ Intel 8260
+Message-ID: <20150608115744.587187f5@tedd-fedora-vm>
+In-Reply-To: <2A1B843F-9398-4FEA-98FA-B3D028FECAE9@holtmann.org>
+References: <20150518155207.31ce2835@tedd-fedora-vm>
+	<2A1B843F-9398-4FEA-98FA-B3D028FECAE9@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> The encryption key size for LTKs is supposed to be applied only at the
-> moment of encryption. When generating a Link Key (using LE SC) from
-> the LTK the full non-shortened value should be used. This patch
-> modifies the code to always keep the full value around and only apply
-> the key size when passing the value to HCI.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci_core.h |  2 +-
-> net/bluetooth/hci_conn.c         |  4 ++--
-> net/bluetooth/hci_event.c        |  3 ++-
-> net/bluetooth/smp.c              | 15 +++------------
-> 4 files changed, 8 insertions(+), 16 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index a056c2bfeb81..24c0e4577a93 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1408,7 +1408,7 @@ void mgmt_smp_complete(struct hci_conn *conn, bool complete);
-> u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
-> 		      u16 to_multiplier);
-> void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
-> -							__u8 ltk[16]);
-> +		      __u8 ltk[16], __u8 key_size);
-> 
-> void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> 			       u8 *bdaddr_type);
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index ee5e59839b02..2c48bf0b5afb 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -276,7 +276,7 @@ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
-> }
-> 
-> void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
-> -		      __u8 ltk[16])
-> +		      __u8 ltk[16], __u8 key_size)
-> {
-> 	struct hci_dev *hdev = conn->hdev;
-> 	struct hci_cp_le_start_enc cp;
-> @@ -288,7 +288,7 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
-> 	cp.handle = cpu_to_le16(conn->handle);
-> 	cp.rand = rand;
-> 	cp.ediv = ediv;
-> -	memcpy(cp.ltk, ltk, sizeof(cp.ltk));
-> +	memcpy(cp.ltk, ltk, key_size);
-> 
-> 	hci_send_cmd(hdev, HCI_OP_LE_START_ENC, sizeof(cp), &cp);
-> }
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 7b61be73650f..fcbfa4138eb1 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -4955,7 +4955,8 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> 			goto not_found;
-> 	}
-> 
-> -	memcpy(cp.ltk, ltk->val, sizeof(ltk->val));
-> +	memcpy(cp.ltk, ltk->val, ltk->enc_size);
-> +	memset(cp.ltk + ltk->enc_size, 0, sizeof(cp.ltk) - ltk->enc_size);
-> 	cp.handle = cpu_to_le16(conn->handle);
+On Sat, 6 Jun 2015 08:15:01 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-you did test that a size of 16 - 16 = 0 is not causing memset to go bezerk and crash?
+> Hi Tedd,
+> 
+> > This patch fixes the command length alignment issue for Intel Bluetooth
+> > 8260.
+> > 
+> > The length of parameters in the firmware downloading command must be
+> > multiplication of 4. If not, the command must append Intel_NOP command
+> > with extra parameters, zeros, at the end, and the firmware file is
+> > already included Intel_NOP command for alignment.
+> > 
+> > This patch checks the next command and if the next command is Intel_NOP
+> > command, it reads the Intel_NOP command and send them together.
+> > 
+> > For example, if the data from the firmware file looks like this:
+> > 8E FC 03 11 22 33 02 FC 03 00 00 00
+> > 
+> > Previously, btusb sends two commands:
+> > 09 FC 06 8E FC 03 11 22 33
+> > 09 FC 06 02 FC 03 00 00 00
+> > 
+> > This won't work because the length of parameters are 6 which violates
+> > the 4 byte alignment.
+> > 
+> > This patch will append them together and send as one command:
+> > 09 FC 0B 8E FC 03 11 22 33 02 FC 03 00 00 00
+> 
+> I assume this should be 09 FC 0C to indicate 12 bytes of payload.
+> 
+> > Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> > ---
+> > drivers/bluetooth/btusb.c | 16 ++++++++++++++++
+> > 1 file changed, 16 insertions(+)
+> > 
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index d21f3b4..13b9969 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -2541,6 +2541,22 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> > 
+> > 		cmd_len = sizeof(*cmd) + cmd->plen;
+> > 
+> > +		/* The parameter length of secure send command should be a
+> > +		 * multiplication of 4. If it is not, it needs to append
+> > +		 * Intel_NOP command with arbitrary number of parameters (zeros)
+> > +		 * to meet the 4 byte alignment.
+> > +		 * The FW file has already formatted with this. So if the next
+> > +		 * command is Intel_NOP then send them together.
+> > +		 */
+> > +		cmd = (void *)(fw_ptr + cmd_len);
+> > +		if (le16_to_cpu(cmd->opcode) == 0xfc02) {
+> > +			BT_DBG("%s: Updated cmd to include Intel_NOP",
+> > +			       hdev->name);
+> > +			/* Update cmd_len to include the Intel_NOP command
+> > +			 */
+> > +			cmd_len += sizeof(*cmd) + cmd->plen;
+> > +		}
+> > +
+> 
+> I might have sent you down the wrong patch when looking for the Intel_NOP as next command. After starring at this problem for a bit longer, I think this might be the smarter approach to this.
+> 
+>         fw_ptr = fw->data + 644;
+>         frag_len = 0;
+> 
+>         while (fw_ptr - fw->data < fw->size) {
+>                 struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
+> 
+>                 frag_len += sizeof(*cmd) + cmd->plen;
+> 
+>                 /* The paramter length of the secure send command requires
+>                  * a 4 byte alignment. It happens so that the firmware file
+>                  * contains proper Intel_NOP commands to align the fragments
+>                  * as needed.
+>                  *
+>                  * Send set of commands with 4 byte alignment from the
+>                  * firmware data buffer as a single Data fragement.
+>                  */
+>                 if (!(frag_len % 4)) {
+>                         err = btusb_intel_secure_send(hdev, 0x01, frag_len,
+>                                                       fw_ptr);
+>                         if (err < 0) {
+>                                 BT_ERR("%s: Failed to send firmware data (%d)",
+>                                        hdev->name, err);
+>                                 goto done;
+>                         }
+> 
+>                         fw_ptr += frag_len;
+>                         frag_len = 0;
+>                 }
+>         }
+> 
+> I know this compiles, but I have not had a chance to actually test it with real hardware. So if this works, then I would prefer to go this route instead. Please give a try and update your patch. Thanks.
 
-Regards
+I found your RFC and tested with REL182 fw which had alignment issue. Please see my response to that email. Bottom line is that it worked well.
 
-Marcel
+> 
+> Regards
+> 
+> Marcel
+> 
 
