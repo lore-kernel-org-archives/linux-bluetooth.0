@@ -1,32 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v3 1/2] Bluetooth: Make l2cap_recv_acldata() and sco_recv_scodata() return void
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1433843243-11668-1-git-send-email-arron.wang@intel.com>
-Date: Tue, 9 Jun 2015 13:43:18 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <9B9BF494-89E9-4CC3-A919-91444F0F80A9@holtmann.org>
-References: <1433843243-11668-1-git-send-email-arron.wang@intel.com>
-To: Arron Wang <arron.wang@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
+	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCHv2] bluetooth: hci_bcsp: Clean up code Fix
+Date: Tue, 9 Jun 2015 11:42:24 +0000
+Message-ID: <20150609114203.GA19310@ubuntu>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arron,
+From: Prasanna Karthik <mkarthi3@visteon.com>
 
-> The return value of l2cap_recv_acldata() and sco_recv_scodata()
-> are not used, then change it to return void
-> 
-> Signed-off-by: Arron Wang <arron.wang@intel.com>
-> ---
-> include/net/bluetooth/hci_core.h |    4 ++--
-> net/bluetooth/l2cap_core.c       |    5 ++---
-> net/bluetooth/sco.c              |    5 ++---
-> 3 files changed, 6 insertions(+), 8 deletions(-)
+Fix for spaces prohibited around that '->' reported by checkpatch and space=
+ prohibited
+between function name and open parenthesis '('
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
 
-Regards
+---
+V2: Reverted back Indentation,Now patch only has above fix
+---
+---
+ drivers/bluetooth/hci_bcsp.c |   16 ++++++++--------
+ 1 files changed, 8 insertions(+), 8 deletions(-)
 
-Marcel
-
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index dc8e3d4..764939d 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -436,7 +436,7 @@ static inline void bcsp_unslip_one_byte(struct bcsp_str=
+uct *bcsp, unsigned char
+ 			break;
+ 		default:
+ 			memcpy(skb_put(bcsp->rx_skb, 1), &byte, 1);
+-			if ((bcsp->rx_skb-> data[0] & 0x40) !=3D 0 &&=20
++			if ((bcsp->rx_skb->data[0] & 0x40) !=3D 0 &&=20
+ 					bcsp->rx_state !=3D BCSP_W4_CRC)
+ 				bcsp_crc_update(&bcsp->message_crc, byte);
+ 			bcsp->rx_count--;
+@@ -447,24 +447,24 @@ static inline void bcsp_unslip_one_byte(struct bcsp_s=
+truct *bcsp, unsigned char
+ 		switch (byte) {
+ 		case 0xdc:
+ 			memcpy(skb_put(bcsp->rx_skb, 1), &c0, 1);
+-			if ((bcsp->rx_skb-> data[0] & 0x40) !=3D 0 &&=20
++			if ((bcsp->rx_skb->data[0] & 0x40) !=3D 0 &&=20
+ 					bcsp->rx_state !=3D BCSP_W4_CRC)
+-				bcsp_crc_update(&bcsp-> message_crc, 0xc0);
++				bcsp_crc_update(&bcsp->message_crc, 0xc0);
+ 			bcsp->rx_esc_state =3D BCSP_ESCSTATE_NOESC;
+ 			bcsp->rx_count--;
+ 			break;
+=20
+ 		case 0xdd:
+ 			memcpy(skb_put(bcsp->rx_skb, 1), &db, 1);
+-			if ((bcsp->rx_skb-> data[0] & 0x40) !=3D 0 &&=20
++			if ((bcsp->rx_skb->data[0] & 0x40) !=3D 0 &&=20
+ 					bcsp->rx_state !=3D BCSP_W4_CRC)=20
+-				bcsp_crc_update(&bcsp-> message_crc, 0xdb);
++				bcsp_crc_update(&bcsp->message_crc, 0xdb);
+ 			bcsp->rx_esc_state =3D BCSP_ESCSTATE_NOESC;
+ 			bcsp->rx_count--;
+ 			break;
+=20
+ 		default:
+-			BT_ERR ("Invalid byte %02x after esc byte", byte);
++			BT_ERR("Invalid byte %02x after esc byte", byte);
+ 			kfree_skb(bcsp->rx_skb);
+ 			bcsp->rx_skb =3D NULL;
+ 			bcsp->rx_state =3D BCSP_W4_PKT_DELIMITER;
+@@ -527,7 +527,7 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
+=20
+ 				hci_recv_frame(hu->hdev, bcsp->rx_skb);
+ 			} else {
+-				BT_ERR ("Packet for unknown channel (%u %s)",
++				BT_ERR("Packet for unknown channel (%u %s)",
+ 					bcsp->rx_skb->data[1] & 0x0f,
+ 					bcsp->rx_skb->data[0] & 0x80 ?=20
+ 					"reliable" : "unreliable");
+@@ -587,7 +587,7 @@ static int bcsp_recv(struct hci_uart *hu, const void *d=
+ata, int count)
+ 			}
+ 			if (bcsp->rx_skb->data[0] & 0x80	/* reliable pkt */
+ 			    		&& (bcsp->rx_skb->data[0] & 0x07) !=3D bcsp->rxseq_txack) {
+-				BT_ERR ("Out-of-order packet arrived, got %u expected %u",
++				BT_ERR("Out-of-order packet arrived, got %u expected %u",
+ 					bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
+=20
+ 				kfree_skb(bcsp->rx_skb);
+--=20
+1.7.0.4
