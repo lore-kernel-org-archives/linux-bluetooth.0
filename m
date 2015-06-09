@@ -1,109 +1,175 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Dean Jenkins <Dean_Jenkins@mentor.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com, Joshua_Frkuska@mentor.com
-Subject: Re: [PATCH v1 3/7] Bluetooth: Unwind l2cap_sock_shutdown()
-Date: Tue, 09 Jun 2015 11:55:40 +0200
-Message-ID: <3313217.oq1TWQmj1d@leonov>
-In-Reply-To: <1433545876-15800-4-git-send-email-Dean_Jenkins@mentor.com>
-References: <1433545876-15800-1-git-send-email-Dean_Jenkins@mentor.com> <1433545876-15800-4-git-send-email-Dean_Jenkins@mentor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Arron Wang <arron.wang@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arron Wang <arron.wang@intel.com>
+Subject: [PATCH] Bluetooth: Add BT_HS config option
+Date: Tue,  9 Jun 2015 17:49:59 +0800
+Message-Id: <1433843399-11729-1-git-send-email-arron.wang@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dean,
+Move A2MP Module under BT_HS config option and allow
+the user have flexible option to choose the feature only
+they need
 
-On Saturday 06 of June 2015 00:11:12 Dean Jenkins wrote:
-> l2cap_sock_shutdown() is designed to only action shutdown
-> of the channel when shutdown is not already in progress.
-> Therefore, reorganise the code flow by adding a goto
-> to jump to the end of function handling when shutdown is
-> already being actioned. This removes one level of code
-> indentation and make the code more readable.
-> 
-> Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
-> ---
->  net/bluetooth/l2cap_sock.c | 44
-> ++++++++++++++++++++++++-------------------- 1 file changed, 24
-> insertions(+), 20 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index c909f45..8550886 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -1099,6 +1099,13 @@ static int l2cap_sock_shutdown(struct socket *sock,
-> int how) if (!sk)
->  		return 0;
-> 
-> +	lock_sock(sk);
-> +
-> +	if (sk->sk_shutdown)
-> +		goto shutdown_already;
-> +
-> +	sk->sk_shutdown = SHUTDOWN_MASK;
-> +
->  	/* prevent sk structure from being freed whilst unlocked */
->  	sock_hold(sk);
-> 
-> @@ -1113,30 +1120,21 @@ static int l2cap_sock_shutdown(struct socket *sock,
-> int how) mutex_lock(&conn->chan_lock);
-> 
->  	l2cap_chan_lock(chan);
-> -	lock_sock(sk);
-> 
-> -	if (!sk->sk_shutdown) {
-> -		if (chan->mode == L2CAP_MODE_ERTM &&
-> -		    chan->unacked_frames > 0 &&
-> -		    chan->state == BT_CONNECTED)
-> -			err = __l2cap_wait_ack(sk, chan);
-> +	if (chan->mode == L2CAP_MODE_ERTM &&
-> +	    chan->unacked_frames > 0 &&
-> +	    chan->state == BT_CONNECTED)
-> +		err = __l2cap_wait_ack(sk, chan);
-> 
-> -		sk->sk_shutdown = SHUTDOWN_MASK;
-> -
-> -		release_sock(sk);
-> -		l2cap_chan_close(chan, 0);
-> -		lock_sock(sk);
-> -
-> -		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
-> -		    !(current->flags & PF_EXITING))
-> -			err = bt_sock_wait_state(sk, BT_CLOSED,
-> -						 sk->sk_lingertime);
-> -	}
-> +	release_sock(sk);
-> +	l2cap_chan_close(chan, 0);
-> +	lock_sock(sk);
-> 
-> -	if (!err && sk->sk_err)
-> -		err = -sk->sk_err;
-> +	if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
-> +	    !(current->flags & PF_EXITING))
-> +		err = bt_sock_wait_state(sk, BT_CLOSED,
-> +					 sk->sk_lingertime);
-> 
-> -	release_sock(sk);
->  	l2cap_chan_unlock(chan);
-> 
->  	if (conn)
-> @@ -1146,6 +1144,12 @@ static int l2cap_sock_shutdown(struct socket *sock,
-> int how) l2cap_chan_put(chan);
->  	sock_put(sk);
+Signed-off-by: Arron Wang <arron.wang@intel.com>
+---
+ net/bluetooth/Kconfig  |    5 +++++
+ net/bluetooth/Makefile |    3 ++-
+ net/bluetooth/a2mp.h   |   32 ++++++++++++++++++++++++++++++++
+ net/bluetooth/amp.h    |   48 ++++++++++++++++++++++++++++++++++++++++++++----
+ 4 files changed, 83 insertions(+), 5 deletions(-)
 
-Isn't it possible that sk will be freed here? (at least this is what comment 
-from patch 1 suggests).
-
-> 
-> +shutdown_already:
-> +	if (!err && sk->sk_err)
-> +		err = -sk->sk_err;
-> +
-> +	release_sock(sk);
-> +
->  	return err;
->  }
-
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index b8c794b..a4d83f9 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -45,6 +45,11 @@ config BT_BREDR
+ 	depends on BT
+ 	default y
+ 
++config BT_HS
++	bool "Bluetooth High Speed (AMP) features"
++	depends on BT_BREDR
++	default y
++
+ source "net/bluetooth/rfcomm/Kconfig"
+ 
+ source "net/bluetooth/bnep/Kconfig"
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index 29c12ae..2b15ae8 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -13,9 +13,10 @@ bluetooth_6lowpan-y := 6lowpan.o
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+-	a2mp.o amp.o ecc.o hci_request.o mgmt_util.o
++	ecc.o hci_request.o mgmt_util.o
+ 
+ bluetooth-$(CONFIG_BT_BREDR) += sco.o
++bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+ bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
+ bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
+ 
+diff --git a/net/bluetooth/a2mp.h b/net/bluetooth/a2mp.h
+index 296f665..6343fd0 100644
+--- a/net/bluetooth/a2mp.h
++++ b/net/bluetooth/a2mp.h
+@@ -130,6 +130,8 @@ struct a2mp_physlink_rsp {
+ #define A2MP_STATUS_SECURITY_VIOLATION		0x06
+ 
+ struct amp_mgr *amp_mgr_get(struct amp_mgr *mgr);
++
++#if IS_ENABLED(CONFIG_BT_HS)
+ int amp_mgr_put(struct amp_mgr *mgr);
+ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
+ 				       struct sk_buff *skb);
+@@ -137,6 +139,36 @@ void a2mp_discover_amp(struct l2cap_chan *chan);
+ void a2mp_send_getinfo_rsp(struct hci_dev *hdev);
+ void a2mp_send_getampassoc_rsp(struct hci_dev *hdev, u8 status);
+ void a2mp_send_create_phy_link_req(struct hci_dev *hdev, u8 status);
++#else
++static inline int amp_mgr_put(struct amp_mgr *mgr)
++{
++	return 0;
++}
++
++static inline struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
++						     struct sk_buff *skb)
++{
++	return NULL;
++}
++
++static inline void a2mp_discover_amp(struct l2cap_chan *chan)
++{
++}
++
++static inline void a2mp_send_getinfo_rsp(struct hci_dev *hdev)
++{
++}
++
++static inline void a2mp_send_getampassoc_rsp(struct hci_dev *hdev, u8 status)
++{
++}
++
++static inline void a2mp_send_create_phy_link_req(struct hci_dev *hdev,
++						 u8 status)
++{
++}
++#endif
++
+ void a2mp_send_create_phy_link_rsp(struct hci_dev *hdev, u8 status);
+ 
+ #endif /* __A2MP_H */
+diff --git a/net/bluetooth/amp.h b/net/bluetooth/amp.h
+index 7ea3db7..de63335 100644
+--- a/net/bluetooth/amp.h
++++ b/net/bluetooth/amp.h
+@@ -36,19 +36,59 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
+ int phylink_gen_key(struct hci_conn *hcon, u8 *data, u8 *len, u8 *type);
+ 
+ void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
+-void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
+ void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
+-void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
+-				   struct hci_conn *hcon);
+ void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon);
+ void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
+ 			struct hci_conn *hcon);
++
++#if IS_ENABLED(CONFIG_BT_HS)
++void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
++void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
++				   struct hci_conn *hcon);
++void amp_create_logical_link(struct l2cap_chan *chan);
++void amp_disconnect_logical_link(struct hci_chan *hchan);
+ void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
+ void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
+ void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon);
++void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
++#else
++static inline void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle)
++{
++}
++
++static inline void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
++						 struct hci_conn *hcon)
++{
++}
++
++static inline void amp_create_logical_link(struct l2cap_chan *chan)
++{
++}
++
++static inline void amp_disconnect_logical_link(struct hci_chan *hchan)
++{
++}
++
++static inline void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle)
++{
++}
++
++static inline void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle)
++{
++}
++
++static inline void amp_physical_cfm(struct hci_conn *bredr_hcon,
++				    struct hci_conn *hs_hcon)
++{
++}
++
++static inline void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason)
++{
++}
++#endif
++
+ void amp_create_logical_link(struct l2cap_chan *chan);
+ void amp_disconnect_logical_link(struct hci_chan *hchan);
+-void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
+ 
+ #endif /* __AMP_H */
 -- 
-BR
-Szymon Janc
+1.7.9.5
+
