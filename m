@@ -1,146 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v6 4/5] Bluetooth: hci_uart: Update Broadcom UART setup
+Subject: Re: find out why the same usb bluetooth dongle that works on i686 x86_64, does not work on ppc (ibook g4)
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5572A904.60003@broadcom.com>
-Date: Tue, 9 Jun 2015 09:40:09 +0200
-Cc: Ilya Faenson <ifaenson@broadcom.com>,
-	Frederic Danis <frederic.danis@linux.intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <2C52A121-013B-4C50-BF78-7E112DC1C301@holtmann.org>
-References: <1432136770-13328-1-git-send-email-frederic.danis@linux.intel.com> <1432136770-13328-5-git-send-email-frederic.danis@linux.intel.com> <555DE2BE.8000109@broadcom.com> <555F25F8.4080408@linux.intel.com> <555F2EB5.1080103@broadcom.com> <555F33E8.8010703@linux.intel.com> <E0D3336E15B58B4294723AC879BA5E9425A61F@IRVEXCHMB15.corp.ad.broadcom.com> <55646A17.10501@linux.intel.com> <E0D3336E15B58B4294723AC879BA5E9425ADE4@IRVEXCHMB15.corp.ad.broadcom.com> <D5EDC898-B451-4978-A13A-7BEBC9D093EB@holtmann.org> <55729D68.1050607@broadcom.com> <86D0B13B-814E-49C7-9A18-B459221201CC@holtmann.org> <5572A904.60003@broadcom.com>
-To: Arend Van Spriel <arend@broadcom.com>
+In-Reply-To: <CAKrOiPRSUyWZ+Kx22=+PhU0VC+Kr2bDuB7TSpJchg+uQvGE2kQ@mail.gmail.com>
+Date: Tue, 9 Jun 2015 09:37:24 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B9453039-6E2D-483F-9B1A-716531B94FD6@holtmann.org>
+References: <CAKrOiPRTfCWz+C3Z0BsD92PcgV1A3kGxw3xLMCXuBvOap+6-UQ@mail.gmail.com> <4174905F-4A66-45CD-B135-640881D480C3@holtmann.org> <CAKrOiPRSUyWZ+Kx22=+PhU0VC+Kr2bDuB7TSpJchg+uQvGE2kQ@mail.gmail.com>
+To: naruto canada <narutocanada@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arend,
+Hi Naruto,
 
->>>>>>>>>> Use btbcm helpers to perform controller setup.
->>>>>>>>>> Perform host UART reset to init speed between btbcm_patchram() and
->>>>>>>>>> btbcm_finalize(). This may be need because firmware loading may have
->>>>>>>>>> reseted controller UART to init speed.
->>>>>>>>>> 
->>>>>>>>>> Signed-off-by: Frederic Danis<frederic.danis@linux.intel.com>
->>>>>>>>>> ---
->>>>>>>>>> drivers/bluetooth/hci_bcm.c | 19 ++++++++++++++++++-
->>>>>>>>>> 1 file changed, 18 insertions(+), 1 deletion(-)
->>>>>>>>>> 
->>>>>>>>>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->>>>>>>>>> index 1ec0b4a..cede445 100644
->>>>>>>>>> --- a/drivers/bluetooth/hci_bcm.c
->>>>>>>>>> +++ b/drivers/bluetooth/hci_bcm.c
->>>>>>>>>> @@ -79,11 +79,28 @@ static int bcm_flush(struct hci_uart *hu)
->>>>>>>>>> 
->>>>>>>>>> static int bcm_setup(struct hci_uart *hu)
->>>>>>>>>> {
->>>>>>>>>> + char fw_name[64];
->>>>>>>>>> + int err;
->>>>>>>>>> +
->>>>>>>>>> BT_DBG("hu %p", hu);
->>>>>>>>>> 
->>>>>>>>>> hu->hdev->set_bdaddr = btbcm_set_bdaddr;
->>>>>>>>>> 
->>>>>>>>>> - return btbcm_setup_patchram(hu->hdev);
->>>>>>>>>> + err = btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name));
->>>>>>>>>> + if (err)
->>>>>>>>>> + return err;
->>>>>>>>>> +
->>>>>>>>>> + err = btbcm_patchram(hu->hdev, fw_name);
->>>>>>>>>> + /* If there is no firmware (-ENOENT), discard the error and
->>>>>>>>>> continue */
->>>>>>>>> 
->>>>>>>>> I guess -ENOENT means no firmware is required and not a
->>>>>>>>> request_firmware() failure. Not sure what is meant here.
->>>>>>>>> 
->>>>>>>>> Regards,
->>>>>>>>> Arend
->>>>>>>>> 
->>>>>>>>>> + if (err == -ENOENT)
->>>>>>>>>> + return 0;
->>>>>>>>>> +
->>>>>>>>>> + if (hu->proto->init_speed)
->>>>>>>>>> + hci_uart_set_baudrate(hu, hu->proto->init_speed);
->>>>>>>>>> +
->>>>>>>>>> + err = btbcm_finalize(hu->hdev);
->>>>>>>>>> +
->>>>>>>>>> + return err;
->>>>>>>>>> }
->>>>>>>>>> 
->>>>>>>>>> static const struct h4_recv_pkt bcm_recv_pkts[] = {
->>>>>>>> 
->>>>>>>> You're right, btbcm_patchram() return test does not work as I expected.
->>>>>>>> 
->>>>>>>> I can change this by performing uart speed change only if it returns no
->>>>>>>> error.
->>>>>>>> 
->>>>>>>> err = btbcm_patchram(hu->hdev, fw_name);
->>>>>>>> if (!err) {
->>>>>>>> /* Firmware loading may have reseted controller UART to init speed */
->>>>>>>> if (hu->proto->init_speed)
->>>>>>>> hci_uart_set_baudrate(hu, hu->proto->init_speed);
->>>>>>>> }
->>>>>>>> 
->>>>>>>> err = btbcm_finalize(hu->hdev);
->>>>>>>> 
->>>>>>>> 
->>>>>>>> Or I can move request_firmware() out of btbcm_patchram() and test it
->>>>>>>> before calling btbcm_patchram(). This will imply to change
->>>>>>>> btbcm_patchram() to accept a firmware instead of firmware name.
->>>>>>>> 
->>>>>>>> err = request_firmware(&fw, fw_name,&hu->hdev->dev);
->>>>>>>> if (err<   0) {
->>>>>>>> BT_INFO("%s: BCM: patch %s not found", hu->hdev->name, fw_name);
->>>>>>>> return 0;
->>>>>>>> }
->>>>>>>> 
->>>>>>>> err = btbcm_patchram(hu->hdev, fw);
->>>>>>>> if (!err) {
->>>>>>>> /* Firmware loading may have reseted controller UART to init speed */
->>>>>>>> if (hu->proto->init_speed)
->>>>>>>> hci_uart_set_baudrate(hu, hu->proto->init_speed);
->>>>>>>> }
->>>>>>>> 
->>>>>>>> err = btbcm_finalize(hu->hdev);
->>>>>>>> 
->>>>>>>> Arend, Marcel, any advice regarding this ?
->>>>>>> 
->>>>>>> Well, functionally it does not make a difference as the request_firmware
->>>>>>> is the first call done in btbcm_patchram(). So if it solves your problem
->>>>>>> I would go for option 2. Other question: is there a reason why the error
->>>>>>> code from request_firmware is not returned?
->>>>>> 
->>>>>> If an error is returned it will stop Bluetooth setup.
->>>>>> So, when request_firmware() returns an error, the Bluetooth controller
->>>>>> will be used with current firmware and 0 is returned as bcm_setup is
->>>>>> completed.
->>>>>> 
->>>>>> IF: There is generally no "current firmware" if the firmware download fails or not attempted. The device would run out of the ROM then which is not terribly useful if Bluetooth functionality is needed. Thanks, -Ilya
->>>>> 
->>>>> The BCM4324B3 embedded in T100 is able to operate without firmware
->>>>> loading, at least performing Bluetooth discovery.
->>>>> I think it is better to run without firmware loading than not allowing
->>>>> to use Bluetooth controller at all.
->>>>> 
->>>>> IF: Broadcom software elsewhere generally fails device start in this case as every Bluetooth feature may or may not work afterwards, with no guarantees whatsoever. The decision here is obviously up to BlueZ maintainers.
->>>> 
->>>> I am fine with actually doing exactly that once we have a bit better infrastructure in place. However this also requires a commitment from Broadcom to actually publish the firmware files in linux-firmware tree and maintain the manifest document I have been talking about.
->>> 
->>> What is the added value of having the manifest file? I can see it keeps mapping hardware info to firmware file out of the driver and as such keeps the driver from growing in size for new device support. Just wondering how big that issue is. It also poses other issues as it adds another interaction with the firmware api, which in my opinion is still a nasty api from driver perspective.
+>>> If anyone like to offer suggestion or help with finding out why the
+>>> same usb bluetooth dongle (cheap EDR 2.0) that works on i686 x86_64,
+>>> does not work on ppc (ibook g4). The three machines all run the same
+>>> software stack, same kernel version, gcc, bluez, dbus, python etc--
+>>> all the same version. kernel:3.4.107 gcc:4.9.2 bluez:5.23 dbus:1.8.16
+>>> python:2.7.10 I will give more details if needed. I have btmon log for
+>>> failed pairing on ppc with nokia phone and good pairing logs as well.
+>>> also python trace log (does not help much). it seems, on ppc, the
+>>> dongle always "omit" to send second "connect request", compared with
+>>> good pairings on x86_64 and i686. the ibook g4 internal usb bluetooth
+>>> dongle (which I manage to bring to hci mode) also failed with the same
+>>> sympton (same python error, but not sure about the exact reason).
+>>> buying another bt dongle may or may not solve the problem. I have
+>>> attached good pairing and bad pairing log from btmon.
 >> 
->> so a recent version of the Broadcom Bluetooth driver for Windows contains 167+ firmware files. Which means there are plenty of different files. I count at least 100+ individual USB dongles listed. Inside the btusb.c driver we started to match these devices with interface specific information.
->> 
->>         /* Broadcom devices with vendor specific id */
->>         { USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01),
->>           .driver_info = BTUSB_BCM_PATCHRAM },
->> 
->> Otherwise we would just go insane to attempt to update the driver for every new dongle manufacture that comes along. This way this is limited to a handful big ones.
->> 
->> The request_firmware() API allows to builtin the file into the kernel image. While I would not do that for the actual firmware file itself, but for the manifest it might make sense. However keeping it outside and allowing update via linux-firmware package update seems beneficial for everybody.
+>> how are you trying to pair this device? My first guess is the it is some endian bug in the tool that retrieves the RFCOMM channel and number and can not see that the SDP records are present.
 > 
-> I did not realize there were so many firmware variations in bluetooth. That's justification enough and having the manifest file built-in sounds like a viable plan. At least I like the idea and might explore it for our wifi drivers (sorry for being a bit single-minded ;-) ).
+> hi
+> 
+> I managed to get the dongle paired with nokia phone, after changing
+> port number to big endian in python. I am not sure which package is
+> responsible (kernel, libc, bluez, python, dbus ?) for converting back
+> and forth between network and host. In any case, here is the python
+> code that works with ppc:
+> 
+> #!/usr/bin/env python
+> from PyOBEX.client import BrowserClient
+> import sys
+> address = sys.argv[1]
+> channel=10 # OBEX File Transfer
+> # client = BrowserClient(address, channel) # this works with
+> little-endian machines
+> client = BrowserClient(address, int("0x0a000000", 0)) # works with
+> big-endian machine
+> client.connect()
+> client.put('test.txt', sys.argv[2])
+> client.disconnect()
 
-actually keep in mind that in Bluetooth in most cases it is never a full firmware image. Only a few chips load a full firmware. A lot these chips are just patching their ROM. So for that obvious reason you have to pick the right firmware patch that matches your ROM.
+the RFCOMM channels are single byte. So there should be no issue. So this sounds like a bug in the Python code of BrowserClient.
+
+Unless there is an endian bug in our obexd D-Bus code. Luiz could look into that.
 
 Regards
 
