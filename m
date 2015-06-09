@@ -1,55 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v9] Add baudrate management for Bluetooth UART
-Date: Tue,  9 Jun 2015 16:15:36 +0200
-Message-Id: <1433859337-2398-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH 2/2] Bluetooth: Add option to enable/disable A2MP module
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <3B8E4CEA2CC045459E7856C66B82CE931135E538@SHSMSX103.ccr.corp.intel.com>
+Date: Tue, 9 Jun 2015 14:04:02 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <FF397646-7072-458C-8FA2-44C36ABC4FC5@holtmann.org>
+References: <1432274165-23569-1-git-send-email-arron.wang@intel.com> <1432274165-23569-2-git-send-email-arron.wang@intel.com> <669F121F-A1EE-47A7-8A15-27E1A2FAFF26@holtmann.org> <3B8E4CEA2CC045459E7856C66B82CE931135CD03@SHSMSX103.ccr.corp.intel.com> <730F9DAC-E12D-4F00-A478-E0EC23216D2C@holtmann.org> <3B8E4CEA2CC045459E7856C66B82CE931135E538@SHSMSX103.ccr.corp.intel.com>
+To: "Wang, Arron" <arron.wang@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set introduce baudrate management for Bluetooth UART
-Controller setup and a first implementation for Broadcom BCM4324B3
-used in Asus T100.
+Hi Arron,
 
-v8 -> v9:
-- Rename "struct bcm_set_speed"
-- Move BCM_UART_CLOCK_* to btbcm.h
-- add struct for UART clock setting in btbcm.h
-- Re-work BT_ERR blocks
+>>>>> Make Bluetooth 3.0 HS feature configurable
+>>>>> 
+>>>>> Signed-off-by: Arron Wang <arron.wang@intel.com>
+>>>>> ---
+>>>>> net/bluetooth/Kconfig          |    5 +
+>>>>> net/bluetooth/Makefile         |    3 +-
+>>>>> net/bluetooth/a2mp.h           |   19 +++
+>>>>> net/bluetooth/amp.h            |   11 ++
+>>>>> net/bluetooth/hci_event.c      |  260 +-----------------------------------
+>>>>> net/bluetooth/hci_event_a2mp.c |  283
+>>>> ++++++++++++++++++++++++++++++++++++++++
+>>>>> net/bluetooth/hci_event_a2mp.h |   91 +++++++++++++
+>>>>> 7 files changed, 412 insertions(+), 260 deletions(-) create mode
+>>>>> 100644 net/bluetooth/hci_event_a2mp.c create mode 100644
+>>>>> net/bluetooth/hci_event_a2mp.h
+>>>> 
+>>>> I don’t think this is the solution here. I think A2MP support should
+>>>> be self contained and utilises the synchronous HCI command framework
+>>>> we have in place and also use in mgmt.
+>>> 
+>>> Yes, create a separate file for hci a2mp event maybe not suitable, but there are
+>> many hci ops/events for different Bluetooth controller BREDR/AMP/LE, add the
+>> macro to separate them in one file may not easy to maintain, can we move these
+>> AMP releated hci ops/event function to file amp.c?
+>> 
+>> unless it has some complicated state machine impact, using the hci_request
+>> infrastructure should be preferred compared to go through callback handlers in
+>> hci_event.c. So first of all it needs to be investigated which of the A2MP HCI
+>> functions can be turned into using hci_request.
+> 
+> I found the current A2MP functions already use hci_request send command to hci subsystem, in hci_event.c they just invoke these functions, we can define these functions as inline but I not sure whether we also should put A2MP related events under BT_HS config option.
 
-v7 -> v8:
-- Patches 1 to 5 has been integrated
-- Rename "struct hci_cp_bcm_set_speed" to "struct bcm_set_speed" and
-  move it to btbcm.h
-- Rename parameter "dummy" to "zero" in "struct bcm_set_speed"
-- Add comments above vendor commands
-- Add "BCM: " in BT_ERR strings
-- Assign value of "param" variable above related vendor command
+I am actually seeing hci_send_cmd being used a lot in amp.c.
 
-v6 -> v7:
-- Fix setup when firmware is missing by moving
-  request/release_firmware() out of btbcm_patchram().
+Regards
 
-v2 -> v6:
-- Fixes for __hci_cmd_sync() has been integrated (patch v5)
-- In btbcm_check_bdaddr(), merge controller address tests
-- Fix declaration of speeds to use "unsigned int" type
-- Rename default_speed to init_speed
-- Rename operational_speed to oper_speed
-- In case of error during vendor specific set_baudrate(), do not change
-  host baudrate and continue without changing speed
-- Discard changes to bcm_setup_patchram() and in btusb.c
-- Introduce helper functions btbcm_initialize() and btbcm_finalize() to
-  be used by the UART side of things.
-
-Frederic Danis (1):
-  Bluetooth: hci_uart: Add bcm_set_baudrate()
-
- drivers/bluetooth/btbcm.h   | 12 ++++++++++
- drivers/bluetooth/hci_bcm.c | 58 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 70 insertions(+)
-
--- 
-1.9.1
+Marcel
 
