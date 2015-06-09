@@ -1,133 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v9] Bluetooth: hci_uart: Add bcm_set_baudrate()
-Date: Tue,  9 Jun 2015 16:15:37 +0200
-Message-Id: <1433859337-2398-2-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1433859337-2398-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1433859337-2398-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v9] Add baudrate management for Bluetooth UART
+Date: Tue,  9 Jun 2015 16:15:36 +0200
+Message-Id: <1433859337-2398-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add vendor specific command to change controller device speed.
+This patch set introduce baudrate management for Bluetooth UART
+Controller setup and a first implementation for Broadcom BCM4324B3
+used in Asus T100.
 
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
----
+v8 -> v9:
+- Rename "struct bcm_set_speed"
+- Move BCM_UART_CLOCK_* to btbcm.h
+- add struct for UART clock setting in btbcm.h
+- Re-work BT_ERR blocks
+
+v7 -> v8:
+- Patches 1 to 5 has been integrated
+- Rename "struct hci_cp_bcm_set_speed" to "struct bcm_set_speed" and
+  move it to btbcm.h
+- Rename parameter "dummy" to "zero" in "struct bcm_set_speed"
+- Add comments above vendor commands
+- Add "BCM: " in BT_ERR strings
+- Assign value of "param" variable above related vendor command
+
+v6 -> v7:
+- Fix setup when firmware is missing by moving
+  request/release_firmware() out of btbcm_patchram().
+
+v2 -> v6:
+- Fixes for __hci_cmd_sync() has been integrated (patch v5)
+- In btbcm_check_bdaddr(), merge controller address tests
+- Fix declaration of speeds to use "unsigned int" type
+- Rename default_speed to init_speed
+- Rename operational_speed to oper_speed
+- In case of error during vendor specific set_baudrate(), do not change
+  host baudrate and continue without changing speed
+- Discard changes to bcm_setup_patchram() and in btusb.c
+- Introduce helper functions btbcm_initialize() and btbcm_finalize() to
+  be used by the UART side of things.
+
+Frederic Danis (1):
+  Bluetooth: hci_uart: Add bcm_set_baudrate()
+
  drivers/bluetooth/btbcm.h   | 12 ++++++++++
  drivers/bluetooth/hci_bcm.c | 58 +++++++++++++++++++++++++++++++++++++++++++++
  2 files changed, 70 insertions(+)
 
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-index f405f84..02f5f96 100644
---- a/drivers/bluetooth/btbcm.h
-+++ b/drivers/bluetooth/btbcm.h
-@@ -21,6 +21,18 @@
-  *
-  */
- 
-+#define BCM_UART_CLOCK_48MHZ	0x01
-+#define BCM_UART_CLOCK_24MHZ	0x02
-+
-+struct bcm_update_uart_baud_rate {
-+	__le16 zero;
-+	__le32 baud_rate;
-+} __packed;
-+
-+struct bcm_write_uart_clock_setting {
-+	__u8 type;
-+} __packed;
-+
- #if IS_ENABLED(CONFIG_BT_BCM)
- 
- int btbcm_check_bdaddr(struct hci_dev *hdev);
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 0704522..e4d66b6 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -37,6 +37,55 @@ struct bcm_data {
- 	struct sk_buff_head txq;
- };
- 
-+static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
-+{
-+	struct hci_dev *hdev = hu->hdev;
-+	struct sk_buff *skb;
-+	struct bcm_update_uart_baud_rate param;
-+
-+	if (speed > 3000000) {
-+		struct bcm_write_uart_clock_setting clock;
-+
-+		clock.type = BCM_UART_CLOCK_48MHZ;
-+
-+		BT_DBG("%s: Set Controller clock (%d)", hdev->name, clock.type);
-+
-+		/* This Broadcom specific command changes the UART's controller
-+		 * clock for baud rate > 3000000.
-+		 */
-+		skb = __hci_cmd_sync(hdev, 0xfc45, 1, &clock, HCI_INIT_TIMEOUT);
-+		if (IS_ERR(skb)) {
-+			int err = PTR_ERR(skb);
-+			BT_ERR("%s: BCM: failed to write clock command (%d)",
-+			       hdev->name, err);
-+			return err;
-+		}
-+
-+		kfree_skb(skb);
-+	}
-+
-+	BT_DBG("%s: Set Controller UART speed to %d bit/s", hdev->name, speed);
-+
-+	param.zero = cpu_to_le16(0);
-+	param.baud_rate = cpu_to_le32(speed);
-+
-+	/* This Broadcom specific command changes the UART's controller baud
-+	 * rate.
-+	 */
-+	skb = __hci_cmd_sync(hdev, 0xfc18, sizeof(param), &param,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		int err = PTR_ERR(skb);
-+		BT_ERR("%s: BCM: failed to write update baudrate command (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
- static int bcm_open(struct hci_uart *hu)
- {
- 	struct bcm_data *bcm;
-@@ -107,6 +156,12 @@ static int bcm_setup(struct hci_uart *hu)
- 	if (hu->proto->init_speed)
- 		hci_uart_set_baudrate(hu, hu->proto->init_speed);
- 
-+	if (hu->proto->oper_speed) {
-+		err = bcm_set_baudrate(hu, hu->proto->oper_speed);
-+		if (!err)
-+			hci_uart_set_baudrate(hu, hu->proto->oper_speed);
-+	}
-+
- finalize:
- 	release_firmware(fw);
- 
-@@ -162,10 +217,13 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
- static const struct hci_uart_proto bcm_proto = {
- 	.id		= HCI_UART_BCM,
- 	.name		= "BCM",
-+	.init_speed	= 115200,
-+	.oper_speed	= 4000000,
- 	.open		= bcm_open,
- 	.close		= bcm_close,
- 	.flush		= bcm_flush,
- 	.setup		= bcm_setup,
-+	.set_baudrate	= bcm_set_baudrate,
- 	.recv		= bcm_recv,
- 	.enqueue	= bcm_enqueue,
- 	.dequeue	= bcm_dequeue,
 -- 
 1.9.1
 
