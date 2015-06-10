@@ -1,190 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] Bluetooth: Add BT_HS config option
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1433843399-11729-1-git-send-email-arron.wang@intel.com>
-Date: Wed, 10 Jun 2015 09:36:33 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <219ECD87-AE70-4F55-83E9-571E2DFE414F@holtmann.org>
-References: <1433843399-11729-1-git-send-email-arron.wang@intel.com>
-To: Arron Wang <arron.wang@intel.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: bharat.panda@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH ] tools/obexctl: Add support for pull Vobjects
+Date: Wed, 10 Jun 2015 12:06:56 +0530
+Message-id: <1433918216-19017-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arron,
+PullBusinessCard from remote push server.
 
-> Move A2MP Module under BT_HS config option and allow
-> the user have flexible option to choose the feature only
-> they need
-> 
-> Signed-off-by: Arron Wang <arron.wang@intel.com>
-> ---
-> net/bluetooth/Kconfig  |    5 +++++
-> net/bluetooth/Makefile |    3 ++-
-> net/bluetooth/a2mp.h   |   32 ++++++++++++++++++++++++++++++++
-> net/bluetooth/amp.h    |   48 ++++++++++++++++++++++++++++++++++++++++++++----
-> 4 files changed, 83 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-> index b8c794b..a4d83f9 100644
-> --- a/net/bluetooth/Kconfig
-> +++ b/net/bluetooth/Kconfig
-> @@ -45,6 +45,11 @@ config BT_BREDR
-> 	depends on BT
-> 	default y
-> 
-> +config BT_HS
-> +	bool "Bluetooth High Speed (AMP) features"
+[obex]# connect 00:1B:DC:07:33:4E 00001105-0000-1000-8000-00805f9b34fb
+Attempting to connect to 00:1B:DC:07:33:4E
+[NEW] Session /org/bluez/obex/client/session0 [default]
+[NEW] ObjectPush /org/bluez/obex/client/session0
+Connection successful
+[00:1B:DC:07:33:4E]# pull /home/vcard.vcf
+Attempting to pull /home/vcard.vcf from /org/bluez/obex/client/session0
+[NEW] Transfer /org/bluez/obex/client/session0/transfer0
+Transfer /org/bluez/obex/client/session0/transfer0
+	Status: queued
+	Size: 0
+	Filename: /home/vcard.vcf
+	Session: /org/bluez/obex/client/session0
+[CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: complete
+[DEL] Transfer /org/bluez/obex/client/session0/transfer0
+[DEL] Session /org/bluez/obex/client/session0 [default]
+[DEL] ObjectPush /org/bluez/obex/client/session0
+---
+ tools/obexctl.c | 36 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
 
-this is (HS) and not not (AMP).
-
-> +	depends on BT_BREDR
-> +	default y
-> +
-
-Also move this just before BT_LE. You want to be able to list the BR/EDR specific layers before selecting HS.
-
-> source "net/bluetooth/rfcomm/Kconfig"
-> 
-> source "net/bluetooth/bnep/Kconfig"
-> diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-> index 29c12ae..2b15ae8 100644
-> --- a/net/bluetooth/Makefile
-> +++ b/net/bluetooth/Makefile
-> @@ -13,9 +13,10 @@ bluetooth_6lowpan-y := 6lowpan.o
-> 
-> bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
-> 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
-> -	a2mp.o amp.o ecc.o hci_request.o mgmt_util.o
-> +	ecc.o hci_request.o mgmt_util.o
-> 
-> bluetooth-$(CONFIG_BT_BREDR) += sco.o
-> +bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
-> bluetooth-$(CONFIG_BT_DEBUGFS) += hci_debugfs.o
-> bluetooth-$(CONFIG_BT_SELFTEST) += selftest.o
-> 
-> diff --git a/net/bluetooth/a2mp.h b/net/bluetooth/a2mp.h
-> index 296f665..6343fd0 100644
-> --- a/net/bluetooth/a2mp.h
-> +++ b/net/bluetooth/a2mp.h
-> @@ -130,6 +130,8 @@ struct a2mp_physlink_rsp {
-> #define A2MP_STATUS_SECURITY_VIOLATION		0x06
-> 
-> struct amp_mgr *amp_mgr_get(struct amp_mgr *mgr);
-> +
-> +#if IS_ENABLED(CONFIG_BT_HS)
-> int amp_mgr_put(struct amp_mgr *mgr);
-> struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
-> 				       struct sk_buff *skb);
-> @@ -137,6 +139,36 @@ void a2mp_discover_amp(struct l2cap_chan *chan);
-> void a2mp_send_getinfo_rsp(struct hci_dev *hdev);
-> void a2mp_send_getampassoc_rsp(struct hci_dev *hdev, u8 status);
-> void a2mp_send_create_phy_link_req(struct hci_dev *hdev, u8 status);
-> +#else
-> +static inline int amp_mgr_put(struct amp_mgr *mgr)
-> +{
-> +	return 0;
-> +}
-> +
-> +static inline struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
-> +						     struct sk_buff *skb)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static inline void a2mp_discover_amp(struct l2cap_chan *chan)
-> +{
-> +}
-> +
-> +static inline void a2mp_send_getinfo_rsp(struct hci_dev *hdev)
-> +{
-> +}
-> +
-> +static inline void a2mp_send_getampassoc_rsp(struct hci_dev *hdev, u8 status)
-> +{
-> +}
-> +
-> +static inline void a2mp_send_create_phy_link_req(struct hci_dev *hdev,
-> +						 u8 status)
-> +{
-> +}
-> +#endif
-> +
-> void a2mp_send_create_phy_link_rsp(struct hci_dev *hdev, u8 status);
-> 
-> #endif /* __A2MP_H */
-
-The right approach here would be to convert A2MP support for l2cap_ops. Look at SMP or 6LoWPAN which already have been converted to use l2cap_ops. Once that is done, the whole hookup into l2cap_core.c should be gone and none of this needed. Meaning it will be conditional on A2MP init/exit hooks.
-
-> diff --git a/net/bluetooth/amp.h b/net/bluetooth/amp.h
-> index 7ea3db7..de63335 100644
-> --- a/net/bluetooth/amp.h
-> +++ b/net/bluetooth/amp.h
-> @@ -36,19 +36,59 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
-> int phylink_gen_key(struct hci_conn *hcon, u8 *data, u8 *len, u8 *type);
-> 
-> void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
-> -void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
-> void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
-> -void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
-> -				   struct hci_conn *hcon);
-
-The reading of the local assoc information can be clearly done via hci_req_run and that should avoid hooks from hci_event.c. Any command complete based information should be retrieved via hci_req_run. This will reduce the number of callbacks here.
-
-> void amp_create_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
-> 			struct hci_conn *hcon);
-> void amp_accept_phylink(struct hci_dev *hdev, struct amp_mgr *mgr,
-> 			struct hci_conn *hcon);
-> +
-> +#if IS_ENABLED(CONFIG_BT_HS)
-> +void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
-> +void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
-> +				   struct hci_conn *hcon);
-> +void amp_create_logical_link(struct l2cap_chan *chan);
-> +void amp_disconnect_logical_link(struct hci_chan *hchan);
-> void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle);
-> void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle);
-> void amp_physical_cfm(struct hci_conn *bredr_hcon, struct hci_conn *hs_hcon);
-> +void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason);
-> +#else
-> +static inline void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle)
-> +{
-> +}
-> +
-> +static inline void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
-> +						 struct hci_conn *hcon)
-> +{
-> +}
-> +
-> +static inline void amp_create_logical_link(struct l2cap_chan *chan)
-> +{
-> +}
-> +
-> +static inline void amp_disconnect_logical_link(struct hci_chan *hchan)
-> +{
-> +}
-> +
-> +static inline void amp_write_remote_assoc(struct hci_dev *hdev, u8 handle)
-> +{
-> +}
-> +
-> +static inline void amp_write_rem_assoc_continue(struct hci_dev *hdev, u8 handle)
-> +{
-> +}
-> +
-> +static inline void amp_physical_cfm(struct hci_conn *bredr_hcon,
-> +				    struct hci_conn *hs_hcon)
-> +{
-> +}
-> +
-> +static inline void amp_destroy_logical_link(struct hci_chan *hchan, u8 reason)
-> +{
-> +}
-> +#endif
-> +
-
-Regards
-
-Marcel
+diff --git a/tools/obexctl.c b/tools/obexctl.c
+index 4faff6b..79c0821 100644
+--- a/tools/obexctl.c
++++ b/tools/obexctl.c
+@@ -758,7 +758,7 @@ static void send_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		rl_printf("Failed to send: %s\n", error.name);
++		rl_printf("Failed to send/pull: %s\n", error.name);
+ 		dbus_error_free(&error);
+ 		return;
+ 	}
+@@ -792,6 +792,23 @@ static void opp_send(GDBusProxy *proxy, int argc, char *argv[])
+ 						g_dbus_proxy_get_path(proxy));
+ }
+ 
++static void opp_pull(GDBusProxy *proxy, int argc, char *argv[])
++{
++	if (argc < 2) {
++		rl_printf("Missing file argument\n");
++		return;
++	}
++
++	if (g_dbus_proxy_method_call(proxy, "PullBusinessCard", send_setup, send_reply,
++					g_strdup(argv[1]), g_free) == FALSE) {
++		rl_printf("Failed to pull\n");
++		return;
++	}
++
++	rl_printf("Attempting to pull %s from %s\n", argv[1],
++						g_dbus_proxy_get_path(proxy));
++}
++
+ static void push_reply(DBusMessage *message, void *user_data)
+ {
+ 	DBusMessageIter iter;
+@@ -869,6 +886,22 @@ static void cmd_send(int argc, char *argv[])
+ 	rl_printf("Command not supported\n");
+ }
+ 
++static void cmd_pull(int argc, char *argv[])
++{
++	GDBusProxy *proxy;
++
++	if (!check_default_session())
++		return;
++
++	proxy = find_opp(g_dbus_proxy_get_path(default_session));
++	if (proxy) {
++		opp_pull(proxy, argc, argv);
++		return;
++	}
++
++	rl_printf("Command not supported\n");
++}
++
+ static void change_folder_reply(DBusMessage *message, void *user_data)
+ {
+ 	DBusError error;
+@@ -1979,6 +2012,7 @@ static const struct {
+ 	{ "suspend",      "<transfer>", cmd_suspend, "Suspend transfer" },
+ 	{ "resume",       "<transfer>", cmd_resume, "Resume transfer" },
+ 	{ "send",         "<file>",   cmd_send, "Send file" },
++	{ "pull",	  "<file>",   cmd_pull, "Pull Vobject & store in file" },
+ 	{ "cd",           "<path>",   cmd_cd, "Change current folder" },
+ 	{ "ls",           "<options>", cmd_ls, "List current folder" },
+ 	{ "cp",          "<source file> <destination file>",   cmd_cp,
+-- 
+1.9.1
 
