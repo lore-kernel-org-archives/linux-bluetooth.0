@@ -1,39 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>, Arend van Spriel <arend@broadcom.com>,
-	Ilya Faenson <ifaenson@broadcom.com>
-Subject: [PATCH v2 0/5] Broadcom Bluetooth UART device driver
-Date: Wed, 10 Jun 2015 16:05:15 -0400
-Message-ID: <1433966720-17482-1-git-send-email-ifaenson@broadcom.com>
+Date: Wed, 10 Jun 2015 20:28:33 +0300
+From: Alexey Dobriyan <adobriyan@gmail.com>
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] bluetooth: stop sabotaging list poisoning
+Message-ID: <20150610172832.GA8898@p183.telecom.by>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v2 - Release upon the acceptance of Fred's updates,
-	updated as per the latest comments from Marcel.
-v1 - Original release against the Fred Danis' updates.
+list_del() poisons pointers with special values, no need to overwrite them.
 
-Ilya Faenson (5):
-  Broadcom Bluetooth UART Device Tree bindings
-  H4 line discipline enhancements
-  Broadcom Bluetooth UART Platform Driver
-  Support the BCM4354 Bluetooth UART device
-  BlueZ Broadcom UART Protocol
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+---
 
- .../devicetree/bindings/net/bluetooth/btbcm.txt    |  82 +++
- drivers/bluetooth/Kconfig                          |   9 +
- drivers/bluetooth/Makefile                         |   1 +
- drivers/bluetooth/btbcm.c                          |   2 +
- drivers/bluetooth/btbcm_uart.c                     | 673 +++++++++++++++++++++
- drivers/bluetooth/btbcm_uart.h                     |  89 +++
- drivers/bluetooth/hci_bcm.c                        | 400 +++++++++++-
- drivers/bluetooth/hci_ldisc.c                      |  66 +-
- drivers/bluetooth/hci_uart.h                       |   1 +
- 9 files changed, 1305 insertions(+), 18 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
- create mode 100644 drivers/bluetooth/btbcm_uart.c
- create mode 100644 drivers/bluetooth/btbcm_uart.h
+ net/bluetooth/l2cap_core.c |    8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
--- 
-1.9.1
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1601,7 +1601,7 @@ int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user)
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (user->list.next || user->list.prev) {
++	if (!list_empty(&user->list)) {
+ 		ret = -EINVAL;
+ 		goto out_unlock;
+ 	}
+@@ -1631,12 +1631,10 @@ void l2cap_unregister_user(struct l2cap_conn *conn, struct l2cap_user *user)
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (!user->list.next || !user->list.prev)
++	if (list_empty(&user->list))
+ 		goto out_unlock;
+ 
+ 	list_del(&user->list);
+-	user->list.next = NULL;
+-	user->list.prev = NULL;
+ 	user->remove(conn, user);
+ 
+ out_unlock:
+@@ -1651,8 +1649,6 @@ static void l2cap_unregister_all_users(struct l2cap_conn *conn)
+ 	while (!list_empty(&conn->users)) {
+ 		user = list_first_entry(&conn->users, struct l2cap_user, list);
+ 		list_del(&user->list);
+-		user->list.next = NULL;
+-		user->list.prev = NULL;
+ 		user->remove(conn, user);
+ 	}
+ }
