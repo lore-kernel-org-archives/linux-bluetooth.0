@@ -1,52 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Jun 2015 04:09:37 +0000 (GMT)
-From: Nagaraj D R <nagaraj.dr@samsung.com>
-Subject: Fwd: Fwd: Fwd: [PATCH 1/1] shared/gatt-client: Fix the
- "Find Information req" error
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-to: nagaraj.dr@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <977231783.859501433995777721.JavaMail.weblogic@epmlwas05b>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] bluetooth: stop sabotaging list poisoning
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150610172832.GA8898@p183.telecom.by>
+Date: Thu, 11 Jun 2015 01:24:33 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <976A7858-68B4-4412-9BCF-546C71986645@holtmann.org>
+References: <20150610172832.GA8898@p183.telecom.by>
+To: Alexey Dobriyan <adobriyan@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-cGluZw0KDQotLS0tLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0tLS0tLQ0KU2VuZGVyIDogTmFnYXJh
-aiBEIFIgTGVhZCBFbmdpbmVlci9TUkktQmFuZ2Fsb3JlLVN5c3RlbSAmIENvbm5lY3Rpdml0eS9T
-YW1zdW5nIEVsZWN0cm9uaWNzDQpEYXRlIDogTWF5IDE1LCAyMDE1IDExOjUwIChHTVQrMDU6MzAp
-DQpUaXRsZSA6IEZ3ZDogW1BBVENIIDEvMV0gc2hhcmVkL2dhdHQtY2xpZW50OiBGaXggdGhlICJG
-aW5kIEluZm9ybWF0aW9uIHJlcSIgZXJyb3INCg0KcGluZw0KDQotLS0tLS0tIE9yaWdpbmFsIE1l
-c3NhZ2UgLS0tLS0tLQ0KU2VuZGVyIDogTmFnYXJhaiBEIFIgTGVhZCBFbmdpbmVlci9TUkktQmFu
-Z2Fsb3JlLVN5c3RlbSAmIENvbm5lY3Rpdml0eS9TYW1zdW5nIEVsZWN0cm9uaWNzDQpEYXRlIDog
-TWF5IDEzLCAyMDE1IDE3OjA1IChHTVQrMDU6MzApDQpUaXRsZSA6IFtQQVRDSCAxLzFdIHNoYXJl
-ZC9nYXR0LWNsaWVudDogRml4IHRoZSAiRmluZCBJbmZvcm1hdGlvbiByZXEiIGVycm9yDQoNCkZy
-b206ICJuYWdhcmFqLmRyIiANCg0KY2hhcmFjdGVyaXN0aWMgZGVzY3JpcHRvciBpcyBzZWFyY2hl
-ZCBiL3cgdGhlDQpjaGFyYWN0ZXJpc3RpYyAidmFsdWVfaGFuZGxlICsgMSIgYW5kDQpjaGFyYWN0
-ZXJpc3RpYyAiZW5kX2hhbmRsZSIgdXNpbmcgIkZpbmQgSW5mb3JtYXRpb24gcmVxIg0KDQppZiBy
-ZW1vdGUgZGV2aWNlIGhhZCBkZWNsYXJlZCB0aGUgY2hhcmFjdGVyaXN0aWMgdmFsdWVfaGFuZGxl
-DQphdCAwWEZGRkYgKHdoaWNoIGFsc28gbWVhbnMgdGhlcmUgaXMgbm8gY2hhcmFjdGVyaXN0aWMg
-ZGVzY3JpcHRvcnMpLHRoZW4NCnByZXNlbnQgY29kZSB3b3VsZCBtYWtlIHN0YXJ0X2hhbmRsZSBo
-YXMgMFgwMDAwKGJlY2F1c2Ugb2YgMTYgYml0DQppbnRlZ2VyIG92ZXJmbG93KSBmb3IgIkZpbmQg
-SW5mb3JtYXRpb24gcmVxIg0KDQpkZXNjX3N0YXJ0ID0gY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUg
-KyAxOw0KDQpDb25zZXF1ZW5jZTogIEJlbG93IHJlcXVlc3Qgd2lsbCBiZSBzZW50LA0KICAgICAg
-ICBBVFQ6IEZpbmQgSW5mb3JtYXRpb24gcmVxICgweDA0KQ0KICAgICAgICBzdGFydCAweDAwMDAs
-IGVuZCAweGZmZmYNCg0KICAgICAgICBhbmQgYmVsb3cgd2lsbCBiZSB0aGUgcHJvcGVyIHJlc3Bv
-bnNlIGZyb20gdGhlIHJlbW90ZSBkZXZpY2UNCiAgICAgICAgQVRUOiBFcnJvciAoMHgwMSkNCiAg
-ICAgICAgRXJyb3I6IEludmFsaWQgaGFuZGxlICgxKQ0KICAgICAgICBGaW5kIEluZm9ybWF0aW9u
-IHJlcSAoMHgwNCkgb24gaGFuZGxlIDB4MDAwMA0KLS0tDQpzcmMvc2hhcmVkL2dhdHQtY2xpZW50
-LmMgfCAgICA2ICsrKy0tLQ0KMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMyBkZWxl
-dGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL3NyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYyBiL3NyYy9z
-aGFyZWQvZ2F0dC1jbGllbnQuYw0KaW5kZXggN2JjM2I3MS4uOWI5NDRlZSAxMDA2NDQNCi0tLSBh
-L3NyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYw0KKysrIGIvc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5j
-DQpAQCAtNjAxLDEzICs2MDEsMTMgQEAgc3RhdGljIGJvb2wgZGlzY292ZXJfZGVzY3Moc3RydWN0
-IGRpc2NvdmVyeV9vcCAqb3AsIGJvb2wgKmRpc2NvdmVyaW5nKQ0KY2hyY19kYXRhLT52YWx1ZV9o
-YW5kbGUpDQpnb3RvIGZhaWxlZDsNCg0KLSBkZXNjX3N0YXJ0ID0gY2hyY19kYXRhLT52YWx1ZV9o
-YW5kbGUgKyAxOw0KLQ0KLSBpZiAoZGVzY19zdGFydCA+IGNocmNfZGF0YS0+ZW5kX2hhbmRsZSkg
-ew0KKyBpZiAoY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUgPj0gY2hyY19kYXRhLT5lbmRfaGFuZGxl
-KSB7DQpmcmVlKGNocmNfZGF0YSk7DQpjb250aW51ZTsNCn0NCg0KKyBkZXNjX3N0YXJ0ID0gY2hy
-Y19kYXRhLT52YWx1ZV9oYW5kbGUgKyAxOw0KKw0KY2xpZW50LT5kaXNjb3ZlcnlfcmVxID0gYnRf
-Z2F0dF9kaXNjb3Zlcl9kZXNjcmlwdG9ycygNCmNsaWVudC0+YXR0LCBkZXNjX3N0YXJ0LA0KY2hy
-Y19kYXRhLT5lbmRfaGFuZGxlLA0KLS0gDQoxLjcuOS41
+Hi Alexey,
 
+> list_del() poisons pointers with special values, no need to overwrite them.
+> 
+> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+> ---
+> 
+> net/bluetooth/l2cap_core.c |    8 ++------
+> 1 file changed, 2 insertions(+), 6 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
