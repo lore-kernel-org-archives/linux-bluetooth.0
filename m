@@ -1,105 +1,320 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH ] tools/obexctl: Add support for pull Vobjects
-Date: Wed, 10 Jun 2015 12:06:56 +0530
-Message-id: <1433918216-19017-1-git-send-email-gowtham.ab@samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] Bluetooth: Fix connection to already paired device.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1433882287-14503-1-git-send-email-jpawlowski@google.com>
+Date: Wed, 10 Jun 2015 08:35:45 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <26AB874B-9CA2-4EDC-BD19-68F2E4583D96@holtmann.org>
+References: <1433882287-14503-1-git-send-email-jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PullBusinessCard from remote push server.
+Hi Jakub,
 
-[obex]# connect 00:1B:DC:07:33:4E 00001105-0000-1000-8000-00805f9b34fb
-Attempting to connect to 00:1B:DC:07:33:4E
-[NEW] Session /org/bluez/obex/client/session0 [default]
-[NEW] ObjectPush /org/bluez/obex/client/session0
-Connection successful
-[00:1B:DC:07:33:4E]# pull /home/vcard.vcf
-Attempting to pull /home/vcard.vcf from /org/bluez/obex/client/session0
-[NEW] Transfer /org/bluez/obex/client/session0/transfer0
-Transfer /org/bluez/obex/client/session0/transfer0
-	Status: queued
-	Size: 0
-	Filename: /home/vcard.vcf
-	Session: /org/bluez/obex/client/session0
-[CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: complete
-[DEL] Transfer /org/bluez/obex/client/session0/transfer0
-[DEL] Session /org/bluez/obex/client/session0 [default]
-[DEL] ObjectPush /org/bluez/obex/client/session0
----
- tools/obexctl.c | 36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+> Currently, when trying to connect to already paired device that just
+> rotated its RPA MAC address, old address would be used and connection
+> would fail. In order to fix that, kernel must scan and receive
+> advertisement with fresh RPA before connecting.
+> 
+> This patch changes connection procedure behaviour for devices that
+> have IRK. Instead of directly calling "connect" with last known RPA,
+> it'll add device to kernel whitelist and start scan. If advertisement
+> is received, it'll be compared against whitelist and then trigger
+> connection if it matches.
+> 
+> auto_connect_for_connect field was added to hci_conn_params struct.
+> If it's set, params are marked for autoconnect because someone tried to
+> given address. When the connection is succesully estabilished, or after
+> timeout this params will be deleted, and device is removed from
+> autoconnect whitelist.
+> 
+> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+> ---
+> include/net/bluetooth/hci_core.h | 27 +++++++++++++++++-
+> net/bluetooth/hci_conn.c         | 61 +++++++++++++++++++++++++++-------------
+> net/bluetooth/hci_event.c        | 16 +++++++++--
+> net/bluetooth/l2cap_core.c       |  2 +-
+> net/bluetooth/mgmt.c             | 22 +++++++++++----
+> 5 files changed, 98 insertions(+), 30 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 3fbb793..bedc6be 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -504,6 +504,8 @@ struct hci_conn_params {
+> 		HCI_AUTO_CONN_LINK_LOSS,
+> 	} auto_connect;
+> 
+> +	bool auto_connect_for_connect;
+> +
 
-diff --git a/tools/obexctl.c b/tools/obexctl.c
-index 4faff6b..79c0821 100644
---- a/tools/obexctl.c
-+++ b/tools/obexctl.c
-@@ -758,7 +758,7 @@ static void send_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to send: %s\n", error.name);
-+		rl_printf("Failed to send/pull: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return;
- 	}
-@@ -792,6 +792,23 @@ static void opp_send(GDBusProxy *proxy, int argc, char *argv[])
- 						g_dbus_proxy_get_path(proxy));
- }
- 
-+static void opp_pull(GDBusProxy *proxy, int argc, char *argv[])
-+{
-+	if (argc < 2) {
-+		rl_printf("Missing file argument\n");
-+		return;
-+	}
-+
-+	if (g_dbus_proxy_method_call(proxy, "PullBusinessCard", send_setup, send_reply,
-+					g_strdup(argv[1]), g_free) == FALSE) {
-+		rl_printf("Failed to pull\n");
-+		return;
-+	}
-+
-+	rl_printf("Attempting to pull %s from %s\n", argv[1],
-+						g_dbus_proxy_get_path(proxy));
-+}
-+
- static void push_reply(DBusMessage *message, void *user_data)
- {
- 	DBusMessageIter iter;
-@@ -869,6 +886,22 @@ static void cmd_send(int argc, char *argv[])
- 	rl_printf("Command not supported\n");
- }
- 
-+static void cmd_pull(int argc, char *argv[])
-+{
-+	GDBusProxy *proxy;
-+
-+	if (!check_default_session())
-+		return;
-+
-+	proxy = find_opp(g_dbus_proxy_get_path(default_session));
-+	if (proxy) {
-+		opp_pull(proxy, argc, argv);
-+		return;
-+	}
-+
-+	rl_printf("Command not supported\n");
-+}
-+
- static void change_folder_reply(DBusMessage *message, void *user_data)
- {
- 	DBusError error;
-@@ -1979,6 +2012,7 @@ static const struct {
- 	{ "suspend",      "<transfer>", cmd_suspend, "Suspend transfer" },
- 	{ "resume",       "<transfer>", cmd_resume, "Resume transfer" },
- 	{ "send",         "<file>",   cmd_send, "Send file" },
-+	{ "pull",	  "<file>",   cmd_pull, "Pull Vobject & store in file" },
- 	{ "cd",           "<path>",   cmd_cd, "Change current folder" },
- 	{ "ls",           "<options>", cmd_ls, "List current folder" },
- 	{ "cp",          "<source file> <destination file>",   cmd_cp,
--- 
-1.9.1
+the name is pretty unclear and we need a bit better overall structure to facility the L2CAP connect() request. It might be well that we are no connecting to device from Add Device or L2CAP connect(). And actually the connect() takes precedence since otherwise it would go through accept().
+
+> 	struct hci_conn *conn;
+> };
+> 
+> @@ -820,7 +822,7 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
+> 
+> struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+> 				u8 dst_type, u8 sec_level, u16 conn_timeout,
+> -				u8 role);
+> +				u8 role, bool fresh_dst_addr);
+
+Why do you need this? We know the address type and we can lookup if the identity address has an IRK attached to it.
+
+In addition, I do not think it makes a difference if you are an RPA or not. Just run through our background scanning for all connection attempts. This has the advantage that now simultaneous connection attempts via L2CAP connect() would not have to wait for each other.
+
+> struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+> 				 u8 sec_level, u8 auth_type);
+> struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+> @@ -875,12 +877,21 @@ static inline void hci_conn_hold(struct hci_conn *conn)
+> 	cancel_delayed_work(&conn->disc_work);
+> }
+> 
+> +
+> +struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+> +					       bdaddr_t *addr, u8 addr_type);
+> +void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+> +
+> +
+
+Since on one hand we are using hci_connect_le, then we should most likely also introduce a special function to cancel that action. It should than internally do the right thing.
+
+> static inline void hci_conn_drop(struct hci_conn *conn)
+> {
+> 	BT_DBG("hcon %p orig refcnt %d", conn, atomic_read(&conn->refcnt));
+> 
+> 	if (atomic_dec_and_test(&conn->refcnt)) {
+> 		unsigned long timeo;
+> +		struct hci_conn_params *params =
+> +				hci_conn_params_lookup(conn->hdev, &conn->dst,
+> +								conn->dst_type);
+> 
+> 		switch (conn->type) {
+> 		case ACL_LINK:
+> @@ -904,6 +915,16 @@ static inline void hci_conn_drop(struct hci_conn *conn)
+> 			break;
+> 		}
+> 
+> +		/* If the connection attempt was doing scan for new RPA, and is
+> +		 * still stuck in scann phase, then stop the scan.
+> +		 */
+> +		if (params && params->auto_connect_for_connect &&
+> +						conn->state == BT_OPEN) {
+> +			hci_conn_params_del(conn->hdev, &conn->dst,
+> +								conn->dst_type);
+> +			hci_conn_hash_del(conn->hdev, conn);
+> +		}
+> +
+> 		cancel_delayed_work(&conn->disc_work);
+> 		queue_delayed_work(conn->hdev->workqueue,
+> 				   &conn->disc_work, timeo);
+> @@ -976,6 +997,10 @@ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+> 					       bdaddr_t *addr, u8 addr_type);
+> struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+> 					    bdaddr_t *addr, u8 addr_type);
+> +
+> +struct hci_request;
+> +int hci_conn_params_set(struct hci_request *req, bdaddr_t *addr,
+> +			       u8 addr_type, u8 auto_connect, bool for_connect);
+
+This is not a good idea. We need to make sure we do not have to layer it like this. It might mean there is some code reshuffling needed to make this all work.
+
+> void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+> void hci_conn_params_clear_all(struct hci_dev *hdev);
+> void hci_conn_params_clear_disabled(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 2c48bf0..e670c91 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -612,21 +612,17 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+> 		hci_conn_put(params->conn);
+> 		params->conn = NULL;
+> 	}
+> -
+> 	conn->state = BT_CLOSED;
+> 
+> 	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
+> 			    status);
+> 
+> 	hci_connect_cfm(conn, status);
+> -
+> 	hci_conn_del(conn);
+> -
+> 	/* Since we may have temporarily stopped the background scanning in
+> 	 * favor of connection establishment, we should restart it.
+> 	 */
+> 	hci_update_background_scan(hdev);
+> -
+
+These are cosmetic updates and I do not even agree with them. Nevertheless they should be in a separate patch.
+
+> 	/* Re-enable advertising in case this was a failed connection
+> 	 * attempt as a peripheral.
+> 	 */
+> @@ -725,14 +721,13 @@ static void hci_req_directed_advertising(struct hci_request *req,
+> 
+> struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+> 				u8 dst_type, u8 sec_level, u16 conn_timeout,
+> -				u8 role)
+> +				u8 role, bool fresh_dst_addr)
+> {
+> 	struct hci_conn_params *params;
+> -	struct hci_conn *conn;
+> +	struct hci_conn *conn, *conn_unfinished;
+> 	struct smp_irk *irk;
+> 	struct hci_request req;
+> 	int err;
+> -
+
+This one in clearly wrong and would fail checkpatch.pl. Maybe you editor is playing cruel tricks on you and you might want to check that.
+
+> 	/* Let's make sure that le is enabled.*/
+> 	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
+> 		if (lmp_le_capable(hdev))
+> @@ -740,7 +735,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+> 
+> 		return ERR_PTR(-EOPNOTSUPP);
+> 	}
+> -
+
+The next line is a comment and thus do not remove the empty above it.
+
+> 	/* Some devices send ATT messages as soon as the physical link is
+> 	 * established. To be able to handle these ATT messages, the user-
+> 	 * space first establishes the connection and then starts the pairing
+> @@ -751,9 +745,15 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+> 	 * and return the object found.
+> 	 */
+> 	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+> +	conn_unfinished = NULL;
+> 	if (conn) {
+> 		conn->pending_sec_level = sec_level;
+> -		goto done;
+> +		if (conn->state == BT_OPEN) {
+> +			BT_DBG("will coninue unfinished conn %pMR", dst);
+> +			conn_unfinished = conn;
+> +		} else {
+> +			goto done;
+> +		}
+> 	}
+> 
+> 	/* Since the controller supports only one LE connection attempt at a
+> @@ -765,24 +765,44 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+> 
+> 	/* When given an identity address with existing identity
+> 	 * resolving key, the connection needs to be established
+> -	 * to a resolvable random address.
+> +	 * to a Resolvable Private Address (RPA).
+
+I have no problem changing this, but if we do, then it needs to be consistent and not just in one comment. So this is a cleanup patch that should come first.
+
+> 	 *
+> -	 * This uses the cached random resolvable address from
+> -	 * a previous scan. When no cached address is available,
+> -	 * try connecting to the identity address instead.
+> +	 * If RPA is not fresh, start scan and try to find current
+> +	 * value before trying to connect. If advertisement with new
+> +	 * RPA is received, this method will be called again and
+> +	 * connection estabilishment will continue.
+
+You need to forget about the concept of fresh. The RPA is never fresh. As soon as you disconnect, you have to consider it rotated. While the specification gives a good value on the refresh timeout, the other side never knows it. So we have to always scan for devices using RPA. The freshness has nothing to do with it.
+
+> 	 *
+> -	 * Storing the resolvable random address is required here
+> -	 * to handle connection failures. The address will later
+> -	 * be resolved back into the original identity address
+> -	 * from the connect request.
+> +	 * Storing the RPA is required here to handle connection
+> +	 * failures. The address will later be resolved back into
+> +	 * the original identity address from the connect request.
+> 	 */
+> 	irk = hci_find_irk_by_addr(hdev, dst, dst_type);
+> -	if (irk && bacmp(&irk->rpa, BDADDR_ANY)) {
+> +	if (irk && !fresh_dst_addr) {
+> +		struct hci_request req;
+> +
+> +		BT_DBG("Requesting refresh of dst_addr.");
+> +		hci_req_init(&req, hdev);
+> +
+> +		if (hci_conn_params_set(&req, dst, dst_type,
+> +					HCI_AUTO_CONN_ALWAYS, true) < 0) {
+> +			return ERR_PTR(-EBUSY);
+> +		}
+> +
+> +		err = hci_req_run(&req, NULL);
+> +		if (err)
+> +			return ERR_PTR(err);
+> +	} else if (irk && bacmp(&irk->rpa, BDADDR_ANY)) {
+> 		dst = &irk->rpa;
+> 		dst_type = ADDR_LE_DEV_RANDOM;
+> 	}
+> 
+> -	conn = hci_conn_add(hdev, LE_LINK, dst, role);
+> +	if (conn_unfinished) {
+> +		conn = conn_unfinished;
+> +		bacpy(&conn->dst, dst);
+> +	} else {
+> +		conn = hci_conn_add(hdev, LE_LINK, dst, role);
+> +	}
+> +
+> 	if (!conn)
+> 		return ERR_PTR(-ENOMEM);
+> 
+> @@ -791,6 +811,9 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+> 	conn->pending_sec_level = sec_level;
+> 	conn->conn_timeout = conn_timeout;
+> 
+> +	if (irk && !fresh_dst_addr)
+> +		goto done;
+> +
+> 	hci_req_init(&req, hdev);
+> 
+> 	/* Disable advertising if we're active. For master role
+
+My thinking really is that we need to just start background scanning (if not already active) instead of calling HCI LE Create Connection. And that is about it. So this is essentially doing the same thing as Add Device.
+
+The extra handling comes into play when either the device is found and we now need to connect, or when a timeout happened and we might need to take this device back out of the whitelist.
+
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index fcbfa41..1300d4a 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4674,15 +4674,25 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
+> 	}
+> 
+> 	conn = hci_connect_le(hdev, addr, addr_type, BT_SECURITY_LOW,
+> -			      HCI_LE_AUTOCONN_TIMEOUT, HCI_ROLE_MASTER);
+> +			      HCI_LE_AUTOCONN_TIMEOUT, HCI_ROLE_MASTER, true);
+> 	if (!IS_ERR(conn)) {
+> -		/* Store the pointer since we don't really have any
+> +		/* If auto_connect_for_connect is set, conn is already
+> +		 * owned by socket that tried to connect, if no then
+> +		 * store the pointer since we don't really have any
+> 		 * other owner of the object besides the params that
+> 		 * triggered it. This way we can abort the connection if
+> 		 * the parameters get removed and keep the reference
+> 		 * count consistent once the connection is established.
+> 		 */
+> -		params->conn = hci_conn_get(conn);
+> +
+> +		if (params->auto_connect_for_connect) {
+> +			BT_DBG("removing %pMR params", addr);
+> +			/* Params were needed only to refresh the RPA.*/
+> +			hci_conn_params_del(hdev, addr, addr_type);
+> +		} else {
+> +			params->conn = hci_conn_get(conn);
+> +		}
+> +
+
+I think this whole handling will become pretty interesting now. We would not need any of this since we can just add the device to our background connection list and wait until it gets connected. The only difference is that the result is the success of connect() or accept(). There is the problem with having an underlying hci_conn struct that needs to be solved. However fundamentally the connection handling in LE is totally different from BR/EDR in this case. So pending LE connection are just device that we are still scanning for and haven't found yet.
+
+It might also a good idea to check if we have enough l2cap-tester and mgmt-tester test cases to cover the interaction of L2CAP accept() and connect() and Add Device. We do want to make sure that we do not regress.
+
+Regards
+
+Marcel
 
