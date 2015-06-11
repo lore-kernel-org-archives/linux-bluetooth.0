@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/5] Bluetooth: Move SC-only check outside of BT_CONFIG branch
-Date: Thu, 11 Jun 2015 13:52:28 +0300
-Message-Id: <1434019950-24959-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/5] Bluetooth: Add debugfs support for min LE encryption key size
+Date: Thu, 11 Jun 2015 13:52:27 +0300
+Message-Id: <1434019950-24959-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1434019950-24959-1-git-send-email-johan.hedberg@gmail.com>
 References: <1434019950-24959-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,54 +11,106 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Checking for SC-only mode requirements when we get an encrypt change
-event shouldn't be limited to the BT_CONFIG state but done any time
-encryption changes.
+This patch adds a debugfs control to set a different minimum LE
+encryption key size. This is useful for testing that implementation of
+the encryption key size handling is behaving correctly (e.g. that we
+get appropriate 'Encryption Key Size' error responses when necessary).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ net/bluetooth/smp.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 50 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index fcbfa4138eb1..62934151431b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2650,22 +2650,22 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		goto unlock;
- 	}
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index d0220fb76dc0..d9ed5e8ee6a0 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -84,6 +84,7 @@ struct smp_dev {
+ 	u8			local_rand[16];
+ 	bool			debug_key;
  
-+	/* In Secure Connections Only mode, do not allow any connections
-+	 * that are not encrypted with AES-CCM using a P-256 authenticated
-+	 * combination key.
-+	 */
-+	if (hci_dev_test_flag(hdev, HCI_SC_ONLY) &&
-+	    (!test_bit(HCI_CONN_AES_CCM, &conn->flags) ||
-+	     conn->key_type != HCI_LK_AUTH_COMBINATION_P256)) {
-+		hci_connect_cfm(conn, HCI_ERROR_AUTH_FAILURE);
-+		hci_conn_drop(conn);
-+		goto unlock;
-+	}
++	u8			min_key_size;
+ 	u8			max_key_size;
+ 
+ 	struct crypto_blkcipher	*tfm_aes;
+@@ -3136,6 +3137,7 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
+ 
+ 	smp->tfm_aes = tfm_aes;
+ 	smp->tfm_cmac = tfm_cmac;
++	smp->min_key_size = SMP_MIN_ENC_KEY_SIZE;
+ 	smp->max_key_size = SMP_MAX_ENC_KEY_SIZE;
+ 
+ create_chan:
+@@ -3259,6 +3261,50 @@ static const struct file_operations force_bredr_smp_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
++static ssize_t le_min_key_size_read(struct file *file,
++				     char __user *user_buf,
++				     size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[4];
 +
- 	if (conn->state == BT_CONFIG) {
- 		if (!ev->status)
- 			conn->state = BT_CONNECTED;
++	snprintf(buf, sizeof(buf), "%2u\n", SMP_DEV(hdev)->min_key_size);
++
++	return simple_read_from_buffer(user_buf, count, ppos, buf, strlen(buf));
++}
++
++static ssize_t le_min_key_size_write(struct file *file,
++				      const char __user *user_buf,
++				      size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[32];
++	size_t buf_size = min(count, (sizeof(buf) - 1));
++	u8 key_size;
++
++	if (copy_from_user(buf, user_buf, buf_size))
++		return -EFAULT;
++
++	buf[buf_size] = '\0';
++
++	sscanf(buf, "%hhu", &key_size);
++
++	if (key_size > SMP_DEV(hdev)->max_key_size ||
++	    key_size < SMP_MIN_ENC_KEY_SIZE)
++		return -EINVAL;
++
++	SMP_DEV(hdev)->min_key_size = key_size;
++
++	return count;
++}
++
++static const struct file_operations le_min_key_size_fops = {
++	.open		= simple_open,
++	.read		= le_min_key_size_read,
++	.write		= le_min_key_size_write,
++	.llseek		= default_llseek,
++};
++
+ static ssize_t le_max_key_size_read(struct file *file,
+ 				     char __user *user_buf,
+ 				     size_t count, loff_t *ppos)
+@@ -3287,7 +3333,8 @@ static ssize_t le_max_key_size_write(struct file *file,
  
--		/* In Secure Connections Only mode, do not allow any
--		 * connections that are not encrypted with AES-CCM
--		 * using a P-256 authenticated combination key.
--		 */
--		if (hci_dev_test_flag(hdev, HCI_SC_ONLY) &&
--		    (!test_bit(HCI_CONN_AES_CCM, &conn->flags) ||
--		     conn->key_type != HCI_LK_AUTH_COMBINATION_P256)) {
--			hci_connect_cfm(conn, HCI_ERROR_AUTH_FAILURE);
--			hci_conn_drop(conn);
--			goto unlock;
--		}
--
- 		hci_connect_cfm(conn, ev->status);
- 		hci_conn_drop(conn);
- 	} else
+ 	sscanf(buf, "%hhu", &key_size);
+ 
+-	if (key_size > SMP_MAX_ENC_KEY_SIZE || key_size < SMP_MIN_ENC_KEY_SIZE)
++	if (key_size > SMP_MAX_ENC_KEY_SIZE ||
++	    key_size < SMP_DEV(hdev)->min_key_size)
+ 		return -EINVAL;
+ 
+ 	SMP_DEV(hdev)->max_key_size = key_size;
+@@ -3326,6 +3373,8 @@ int smp_register(struct hci_dev *hdev)
+ 
+ 	hdev->smp_data = chan;
+ 
++	debugfs_create_file("le_min_key_size", 0644, hdev->debugfs, hdev,
++			    &le_min_key_size_fops);
+ 	debugfs_create_file("le_max_key_size", 0644, hdev->debugfs, hdev,
+ 			    &le_max_key_size_fops);
+ 
 -- 
 2.4.3
 
