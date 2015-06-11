@@ -1,136 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v2 2/5] H4 line discipline enhancements
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1433966720-17482-3-git-send-email-ifaenson@broadcom.com>
-Date: Thu, 11 Jun 2015 12:05:29 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-	Arend van Spriel <arend@broadcom.com>
-Message-Id: <25BD16D3-E014-4C70-AE58-0742CD2A3DF6@holtmann.org>
-References: <1433966720-17482-1-git-send-email-ifaenson@broadcom.com> <1433966720-17482-3-git-send-email-ifaenson@broadcom.com>
-To: Ilya Faenson <ifaenson@broadcom.com>
+MIME-Version: 1.0
+In-Reply-To: <977231783.859501433995777721.JavaMail.weblogic@epmlwas05b>
+References: <977231783.859501433995777721.JavaMail.weblogic@epmlwas05b>
+Date: Thu, 11 Jun 2015 12:54:48 +0300
+Message-ID: <CABBYNZK1R6SuXu9wa02kPNB3_=epTCbiXfGvEJDAN5Ck8RY9HQ@mail.gmail.com>
+Subject: Re: Fwd: Fwd: [PATCH 1/1] shared/gatt-client: Fix the "Find
+ Information req" error
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: nagaraj.dr@samsung.com
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilya,
+Hi Nagaraj,
 
-> Added the ability to flow control the UART and improved the
-> UART baud rate setting.
-> 
-> Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
+On Thu, Jun 11, 2015 at 7:09 AM, Nagaraj D R <nagaraj.dr@samsung.com> wrote:
+> ping
+>
+> ------- Original Message -------
+> Sender : Nagaraj D R Lead Engineer/SRI-Bangalore-System & Connectivity/Samsung Electronics
+> Date : May 15, 2015 11:50 (GMT+05:30)
+> Title : Fwd: [PATCH 1/1] shared/gatt-client: Fix the "Find Information req" error
+>
+> ping
+>
+> ------- Original Message -------
+> Sender : Nagaraj D R Lead Engineer/SRI-Bangalore-System & Connectivity/Samsung Electronics
+> Date : May 13, 2015 17:05 (GMT+05:30)
+> Title : [PATCH 1/1] shared/gatt-client: Fix the "Find Information req" error
+>
+> From: "nagaraj.dr"
+>
+> characteristic descriptor is searched b/w the
+> characteristic "value_handle + 1" and
+> characteristic "end_handle" using "Find Information req"
+>
+> if remote device had declared the characteristic value_handle
+> at 0XFFFF (which also means there is no characteristic descriptors),then
+> present code would make start_handle has 0X0000(because of 16 bit
+> integer overflow) for "Find Information req"
+>
+> desc_start = chrc_data->value_handle + 1;
+>
+> Consequence:  Below request will be sent,
+>         ATT: Find Information req (0x04)
+>         start 0x0000, end 0xffff
+>
+>         and below will be the proper response from the remote device
+>         ATT: Error (0x01)
+>         Error: Invalid handle (1)
+>         Find Information req (0x04) on handle 0x0000
 > ---
-> drivers/bluetooth/hci_ldisc.c | 66 +++++++++++++++++++++++++++++++++++++++++--
-> drivers/bluetooth/hci_uart.h  |  1 +
-> 2 files changed, 65 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index ac87346..f86e973 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -266,20 +266,82 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
-> 	return 0;
-> }
-> 
-> +/* Flow control or un-flow control the device */
-> +void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
-> +{
-> +	struct tty_struct *tty = hu->tty;
-> +	struct ktermios ktermios;
-> +	int status;
-> +	unsigned int set = 0;
-> +	unsigned int clear = 0;
-> +
-> +	if (enable) {
-> +		/* Disable hardware flow control */
-> +		ktermios = tty->termios;
-> +		ktermios.c_cflag &= ~CRTSCTS;
-> +		status = tty_set_termios(tty, &ktermios);
-> +		BT_DBG("Disabling hardware flow control: %s", status ?
-> +		       "failed" : "success");
-> +
-> +		/* Clear RTS to prevent the device from sending */
-> +		/* Most UARTs need OUT2 to enable interrupts */
-> +		status = tty->driver->ops->tiocmget(tty);
-> +		BT_DBG("Current tiocm 0x%x", status);
-> +
-> +		set &= ~(TIOCM_OUT2 | TIOCM_RTS);
-> +		clear = ~set;
-> +		set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
-> +		       TIOCM_OUT2 | TIOCM_LOOP;
-> +		clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
-> +			 TIOCM_OUT2 | TIOCM_LOOP;
-> +		status = tty->driver->ops->tiocmset(tty, set, clear);
-> +		BT_DBG("Clearing RTS: %s", status ? "failed" : "success");
-> +	} else {
-> +		/* Set RTS to allow the device to send again */
-> +		status = tty->driver->ops->tiocmget(tty);
-> +		BT_DBG("Current tiocm 0x%x", status);
-> +
-> +		set |= (TIOCM_OUT2 | TIOCM_RTS);
-> +		clear = ~set;
-> +		set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
-> +		       TIOCM_OUT2 | TIOCM_LOOP;
-> +		clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
-> +			 TIOCM_OUT2 | TIOCM_LOOP;
-> +		status = tty->driver->ops->tiocmset(tty, set, clear);
-> +		BT_DBG("Setting RTS: %s", status ? "failed" : "success");
-> +
-> +		/* Re-enable hardware flow control */
-> +		ktermios = tty->termios;
-> +		ktermios.c_cflag |= CRTSCTS;
-> +		status = tty_set_termios(tty, &ktermios);
-> +		BT_DBG("Enabling hardware flow control: %s", status ?
-> +		       "failed" : "success");
-> +	}
-> +}
-> +
-> void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
-> {
-> 	struct tty_struct *tty = hu->tty;
-> 	struct ktermios ktermios;
-> 
-> +	/* Bring the UART into a known state with a given baud rate */
-> 	ktermios = tty->termios;
-> 	ktermios.c_cflag &= ~CBAUD;
-> -	ktermios.c_cflag |= BOTHER;
-> +	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
-> +			    | INLCR | IGNCR | ICRNL | IXON);
+> src/shared/gatt-client.c |    6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 7bc3b71..9b944ee 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -601,13 +601,13 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
+> chrc_data->value_handle)
+> goto failed;
 
-can we put the | at the end of the previous line and keep IGNBRK and INLCR aligned.
+Actually this check should happen in
+gatt_db_service_insert_characteristic which is probably creating
+something with handle 0 in the database which is wrong, actually
+perhaps it should just fail to create a characteristic in 0xffff,
+characteristics shall always have a value descriptor:
 
-Honestly I have no idea what the absolute 100% correct coding style rules are here, but at least lets try to be consistent. So referring to the code above, the | should be at the end.
+3.3.2 Characteristic Value Declaration
+The Characteristic Value declaration contains the value of the
+characteristic. It
+is the first Attribute after the characteristic declaration. All characteristic
+definitions shall have a Characteristic Value declaration.
 
-> +	ktermios.c_oflag &= ~OPOST;
-> +	ktermios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-> +	ktermios.c_cflag &= ~(CSIZE | PARENB | CBAUD);
-> +	ktermios.c_cflag |= CS8;
-> +	ktermios.c_cflag |= CRTSCTS;
-> 	tty_termios_encode_baud_rate(&ktermios, speed, speed);
-> 
-> 	/* tty_set_termios() return not checked as it is always 0 */
-> 	tty_set_termios(tty, &ktermios);
-> 
-> -	BT_DBG("%s: New tty speed: %d", hu->hdev->name, tty->termios.c_ispeed);
-> +	BT_DBG("%s: New tty speeds: %d/%d, cflag: 0x%x", hu->hdev->name,
-> +	       tty->termios.c_ispeed, tty->termios.c_ospeed,
-> +	       tty->termios.c_cflag);
-> }
-> 
-> static int hci_uart_setup(struct hci_dev *hdev)
-> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-> index e9f970c..8ef1881 100644
-> --- a/drivers/bluetooth/hci_uart.h
-> +++ b/drivers/bluetooth/hci_uart.h
-> @@ -100,6 +100,7 @@ int hci_uart_unregister_proto(const struct hci_uart_proto *p);
-> int hci_uart_tx_wakeup(struct hci_uart *hu);
-> int hci_uart_init_ready(struct hci_uart *hu);
-> void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
-> +void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
+So I would suggest something like this:
 
-The rest looks good.
+iff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 5e1537e..7f863ef 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -706,6 +706,18 @@ service_insert_characteristic(struct
+gatt_db_service *service,
+        if (handle && handle <= service->attributes[0]->handle)
+                return NULL;
 
-Regards
++       /*
++        * It is not possible to allocate last handle for a Characteristic
++        * since it would not have space for its value:
++        * 3.3.2 Characteristic Value Declaration
++        * The Characteristic Value declaration contains the value of the
++        * characteristic. It is the first Attribute after the characteristic
++        * declaration. All characteristic definitions shall have a
++        * Characteristic Value declaration.
++        */
++       if (handle == UINT16_MAX)
++               return NULL;
++
+        i = get_attribute_index(service, 1);
+        if (!i)
+                return NULL;
 
-Marcel
-
+-- 
+Luiz Augusto von Dentz
