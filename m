@@ -1,95 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Jun 2015 10:16:49 +0000 (GMT)
-From: Nagaraj D R <nagaraj.dr@samsung.com>
-Subject: Re: Re: Fwd: Fwd: [PATCH 1/1] shared/gatt-client: Fix the
- "Find Information req" error
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-to: nagaraj.dr@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <421377746.888861434017808756.JavaMail.weblogic@epmlwas05b>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH v2 2/5] H4 line discipline enhancements
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1433966720-17482-3-git-send-email-ifaenson@broadcom.com>
+Date: Thu, 11 Jun 2015 12:05:29 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+	Arend van Spriel <arend@broadcom.com>
+Message-Id: <25BD16D3-E014-4C70-AE58-0742CD2A3DF6@holtmann.org>
+References: <1433966720-17482-1-git-send-email-ifaenson@broadcom.com> <1433966720-17482-3-git-send-email-ifaenson@broadcom.com>
+To: Ilya Faenson <ifaenson@broadcom.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGVsbG8gTHVpeiwNClRoZSBwcm9ibGVtIHRoYXQgSSB3YXMgdHJ5aW5nIHRvIGFkZHJlc3MgaXMg
-Zm9yIHRoZSBjaGFyYWN0ZXJpc3RpYyBhdHRyaWJ1dGUgYXQgMFhmZmZlIGFuZCBjaGFyYWN0ZXJp
-c3RpYyB2YWx1ZSBkZWNsYXJhdGlvbiBhdCBveGZmZmYuDQpUaGlzIGlzIGEgdmFsaWQgc2NlbmFy
-aW8uIENoYXJhY3RlcmlzdGljIG5lZWQgdG8gaGF2ZSBhIGNoYXJhY3RlcmlzdGljIHZhbHVlIGRl
-Y2xhcmF0aW9uIGJ1dCBuZWVkIG5vdCBoYXZlIGNoYXJhY3RlcmlzdGljIGRlc2NyaXB0b3JzLg0K
-DQpTaW5jZSBwcmVzZW50IGRlc2lnbiBzZWFyY2ggdGhlIGRlc2NyaXB0b3JzIGIvdyB0aGUgY2hh
-cmFjdGVyaXN0aWMgdmFsdWUgZGVjbGFyYXRpb24gYW5kIHNlcnZpY2UgZW5kIGhhbmRsZSwNCmlm
-IHNlcnZpY2UgZW5kIGhhbmRsZSBhbmQgY2hhcmFjdGVyaXN0aWMgdmFsdWUgZGVjbGFyYXRpb24g
-ZW5kIGhhbmRsZSBhcmUgc2FtZSAoaS5lIDB4ZmZmZiBpbiBhIHBhcnRpY3VsYXIgY2FzZSkNCnRo
-ZW4gZGVzY3JpcHRvciBzZWFyY2ggaGFuZGxlIHdpbGwgYmUgaW5pdGlhbGl6ZWQgdG8gMFgwMDAg
-KGkuZSBieSBpbmNyZW1lbnRpbmcgY2hhcmFjdGVyaXN0aWMgdmFsdWUgaGFuZGxlICgweGZmZmYp
-ICkNCjB4MDAwMCBoYW5kbGUgaXMgcmVzZXJ2ZWQgaGFuZGxlICsgaW50ZW50aW9uIG9mIHNlYXJj
-aGluZyBkZXNjcmlwdG9yIHdpbGwgbm90IGJlIGFjaGlldmVkLg0KDQpSZWdhcmRzDQpOYWdhcmFq
-IEQgUg0KDQotLS0tLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0tLS0tLQ0KU2VuZGVyIDogTHVpeiBB
-dWd1c3RvIHZvbiBEZW50ejxsdWl6LmRlbnR6QGdtYWlsLmNvbT4NCkRhdGUgOiBKdW4gMTEsIDIw
-MTUgMTU6MjQgKEdNVCswNTozMCkNClRpdGxlIDogUmU6IEZ3ZDogRndkOiBbUEFUQ0ggMS8xXSBz
-aGFyZWQvZ2F0dC1jbGllbnQ6IEZpeCB0aGUgIkZpbmQgSW5mb3JtYXRpb24gcmVxIiBlcnJvcg0K
-DQpIaSBOYWdhcmFqLA0KDQpPbiBUaHUsIEp1biAxMSwgMjAxNSBhdCA3OjA5IEFNLCBOYWdhcmFq
-IEQgUiB3cm90ZToNCj4gcGluZw0KPg0KPiAtLS0tLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0tLS0t
-LQ0KPiBTZW5kZXIgOiBOYWdhcmFqIEQgUiBMZWFkIEVuZ2luZWVyL1NSSS1CYW5nYWxvcmUtU3lz
-dGVtICYgQ29ubmVjdGl2aXR5L1NhbXN1bmcgRWxlY3Ryb25pY3MNCj4gRGF0ZSA6IE1heSAxNSwg
-MjAxNSAxMTo1MCAoR01UKzA1OjMwKQ0KPiBUaXRsZSA6IEZ3ZDogW1BBVENIIDEvMV0gc2hhcmVk
-L2dhdHQtY2xpZW50OiBGaXggdGhlICJGaW5kIEluZm9ybWF0aW9uIHJlcSIgZXJyb3INCj4NCj4g
-cGluZw0KPg0KPiAtLS0tLS0tIE9yaWdpbmFsIE1lc3NhZ2UgLS0tLS0tLQ0KPiBTZW5kZXIgOiBO
-YWdhcmFqIEQgUiBMZWFkIEVuZ2luZWVyL1NSSS1CYW5nYWxvcmUtU3lzdGVtICYgQ29ubmVjdGl2
-aXR5L1NhbXN1bmcgRWxlY3Ryb25pY3MNCj4gRGF0ZSA6IE1heSAxMywgMjAxNSAxNzowNSAoR01U
-KzA1OjMwKQ0KPiBUaXRsZSA6IFtQQVRDSCAxLzFdIHNoYXJlZC9nYXR0LWNsaWVudDogRml4IHRo
-ZSAiRmluZCBJbmZvcm1hdGlvbiByZXEiIGVycm9yDQo+DQo+IEZyb206ICJuYWdhcmFqLmRyIg0K
-Pg0KPiBjaGFyYWN0ZXJpc3RpYyBkZXNjcmlwdG9yIGlzIHNlYXJjaGVkIGIvdyB0aGUNCj4gY2hh
-cmFjdGVyaXN0aWMgInZhbHVlX2hhbmRsZSArIDEiIGFuZA0KPiBjaGFyYWN0ZXJpc3RpYyAiZW5k
-X2hhbmRsZSIgdXNpbmcgIkZpbmQgSW5mb3JtYXRpb24gcmVxIg0KPg0KPiBpZiByZW1vdGUgZGV2
-aWNlIGhhZCBkZWNsYXJlZCB0aGUgY2hhcmFjdGVyaXN0aWMgdmFsdWVfaGFuZGxlDQo+IGF0IDBY
-RkZGRiAod2hpY2ggYWxzbyBtZWFucyB0aGVyZSBpcyBubyBjaGFyYWN0ZXJpc3RpYyBkZXNjcmlw
-dG9ycyksdGhlbg0KPiBwcmVzZW50IGNvZGUgd291bGQgbWFrZSBzdGFydF9oYW5kbGUgaGFzIDBY
-MDAwMChiZWNhdXNlIG9mIDE2IGJpdA0KPiBpbnRlZ2VyIG92ZXJmbG93KSBmb3IgIkZpbmQgSW5m
-b3JtYXRpb24gcmVxIg0KPg0KPiBkZXNjX3N0YXJ0ID0gY2hyY19kYXRhLT52YWx1ZV9oYW5kbGUg
-KyAxOw0KPg0KPiBDb25zZXF1ZW5jZTogIEJlbG93IHJlcXVlc3Qgd2lsbCBiZSBzZW50LA0KPiAg
-ICAgICAgIEFUVDogRmluZCBJbmZvcm1hdGlvbiByZXEgKDB4MDQpDQo+ICAgICAgICAgc3RhcnQg
-MHgwMDAwLCBlbmQgMHhmZmZmDQo+DQo+ICAgICAgICAgYW5kIGJlbG93IHdpbGwgYmUgdGhlIHBy
-b3BlciByZXNwb25zZSBmcm9tIHRoZSByZW1vdGUgZGV2aWNlDQo+ICAgICAgICAgQVRUOiBFcnJv
-ciAoMHgwMSkNCj4gICAgICAgICBFcnJvcjogSW52YWxpZCBoYW5kbGUgKDEpDQo+ICAgICAgICAg
-RmluZCBJbmZvcm1hdGlvbiByZXEgKDB4MDQpIG9uIGhhbmRsZSAweDAwMDANCj4gLS0tDQo+IHNy
-Yy9zaGFyZWQvZ2F0dC1jbGllbnQuYyB8ICAgIDYgKysrLS0tDQo+IDEgZmlsZSBjaGFuZ2VkLCAz
-IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9zcmMvc2hh
-cmVkL2dhdHQtY2xpZW50LmMgYi9zcmMvc2hhcmVkL2dhdHQtY2xpZW50LmMNCj4gaW5kZXggN2Jj
-M2I3MS4uOWI5NDRlZSAxMDA2NDQNCj4gLS0tIGEvc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jDQo+
-ICsrKyBiL3NyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYw0KPiBAQCAtNjAxLDEzICs2MDEsMTMgQEAg
-c3RhdGljIGJvb2wgZGlzY292ZXJfZGVzY3Moc3RydWN0IGRpc2NvdmVyeV9vcCAqb3AsIGJvb2wg
-KmRpc2NvdmVyaW5nKQ0KPiBjaHJjX2RhdGEtPnZhbHVlX2hhbmRsZSkNCj4gZ290byBmYWlsZWQ7
-DQoNCkFjdHVhbGx5IHRoaXMgY2hlY2sgc2hvdWxkIGhhcHBlbiBpbg0KZ2F0dF9kYl9zZXJ2aWNl
-X2luc2VydF9jaGFyYWN0ZXJpc3RpYyB3aGljaCBpcyBwcm9iYWJseSBjcmVhdGluZw0Kc29tZXRo
-aW5nIHdpdGggaGFuZGxlIDAgaW4gdGhlIGRhdGFiYXNlIHdoaWNoIGlzIHdyb25nLCBhY3R1YWxs
-eQ0KcGVyaGFwcyBpdCBzaG91bGQganVzdCBmYWlsIHRvIGNyZWF0ZSBhIGNoYXJhY3RlcmlzdGlj
-IGluIDB4ZmZmZiwNCmNoYXJhY3RlcmlzdGljcyBzaGFsbCBhbHdheXMgaGF2ZSBhIHZhbHVlIGRl
-c2NyaXB0b3I6DQoNCjMuMy4yIENoYXJhY3RlcmlzdGljIFZhbHVlIERlY2xhcmF0aW9uDQpUaGUg
-Q2hhcmFjdGVyaXN0aWMgVmFsdWUgZGVjbGFyYXRpb24gY29udGFpbnMgdGhlIHZhbHVlIG9mIHRo
-ZQ0KY2hhcmFjdGVyaXN0aWMuIEl0DQppcyB0aGUgZmlyc3QgQXR0cmlidXRlIGFmdGVyIHRoZSBj
-aGFyYWN0ZXJpc3RpYyBkZWNsYXJhdGlvbi4gQWxsIGNoYXJhY3RlcmlzdGljDQpkZWZpbml0aW9u
-cyBzaGFsbCBoYXZlIGEgQ2hhcmFjdGVyaXN0aWMgVmFsdWUgZGVjbGFyYXRpb24uDQoNClNvIEkg
-d291bGQgc3VnZ2VzdCBzb21ldGhpbmcgbGlrZSB0aGlzOg0KDQppZmYgLS1naXQgYS9zcmMvc2hh
-cmVkL2dhdHQtZGIuYyBiL3NyYy9zaGFyZWQvZ2F0dC1kYi5jDQppbmRleCA1ZTE1MzdlLi43Zjg2
-M2VmIDEwMDY0NA0KLS0tIGEvc3JjL3NoYXJlZC9nYXR0LWRiLmMNCisrKyBiL3NyYy9zaGFyZWQv
-Z2F0dC1kYi5jDQpAQCAtNzA2LDYgKzcwNiwxOCBAQCBzZXJ2aWNlX2luc2VydF9jaGFyYWN0ZXJp
-c3RpYyhzdHJ1Y3QNCmdhdHRfZGJfc2VydmljZSAqc2VydmljZSwNCiAgICAgICAgaWYgKGhhbmRs
-ZSAmJiBoYW5kbGUgPD0gc2VydmljZS0+YXR0cmlidXRlc1swXS0+aGFuZGxlKQ0KICAgICAgICAg
-ICAgICAgIHJldHVybiBOVUxMOw0KDQorICAgICAgIC8qDQorICAgICAgICAqIEl0IGlzIG5vdCBw
-b3NzaWJsZSB0byBhbGxvY2F0ZSBsYXN0IGhhbmRsZSBmb3IgYSBDaGFyYWN0ZXJpc3RpYw0KKyAg
-ICAgICAgKiBzaW5jZSBpdCB3b3VsZCBub3QgaGF2ZSBzcGFjZSBmb3IgaXRzIHZhbHVlOg0KKyAg
-ICAgICAgKiAzLjMuMiBDaGFyYWN0ZXJpc3RpYyBWYWx1ZSBEZWNsYXJhdGlvbg0KKyAgICAgICAg
-KiBUaGUgQ2hhcmFjdGVyaXN0aWMgVmFsdWUgZGVjbGFyYXRpb24gY29udGFpbnMgdGhlIHZhbHVl
-IG9mIHRoZQ0KKyAgICAgICAgKiBjaGFyYWN0ZXJpc3RpYy4gSXQgaXMgdGhlIGZpcnN0IEF0dHJp
-YnV0ZSBhZnRlciB0aGUgY2hhcmFjdGVyaXN0aWMNCisgICAgICAgICogZGVjbGFyYXRpb24uIEFs
-bCBjaGFyYWN0ZXJpc3RpYyBkZWZpbml0aW9ucyBzaGFsbCBoYXZlIGENCisgICAgICAgICogQ2hh
-cmFjdGVyaXN0aWMgVmFsdWUgZGVjbGFyYXRpb24uDQorICAgICAgICAqLw0KKyAgICAgICBpZiAo
-aGFuZGxlID09IFVJTlQxNl9NQVgpDQorICAgICAgICAgICAgICAgcmV0dXJuIE5VTEw7DQorDQog
-ICAgICAgIGkgPSBnZXRfYXR0cmlidXRlX2luZGV4KHNlcnZpY2UsIDEpOw0KICAgICAgICBpZiAo
-IWkpDQogICAgICAgICAgICAgICAgcmV0dXJuIE5VTEw7DQoNCi0tIA0KTHVpeiBBdWd1c3RvIHZv
-biBEZW50eg==
+Hi Ilya,
 
+> Added the ability to flow control the UART and improved the
+> UART baud rate setting.
+> 
+> Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
+> ---
+> drivers/bluetooth/hci_ldisc.c | 66 +++++++++++++++++++++++++++++++++++++++++--
+> drivers/bluetooth/hci_uart.h  |  1 +
+> 2 files changed, 65 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index ac87346..f86e973 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -266,20 +266,82 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+> 	return 0;
+> }
+> 
+> +/* Flow control or un-flow control the device */
+> +void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+> +{
+> +	struct tty_struct *tty = hu->tty;
+> +	struct ktermios ktermios;
+> +	int status;
+> +	unsigned int set = 0;
+> +	unsigned int clear = 0;
+> +
+> +	if (enable) {
+> +		/* Disable hardware flow control */
+> +		ktermios = tty->termios;
+> +		ktermios.c_cflag &= ~CRTSCTS;
+> +		status = tty_set_termios(tty, &ktermios);
+> +		BT_DBG("Disabling hardware flow control: %s", status ?
+> +		       "failed" : "success");
+> +
+> +		/* Clear RTS to prevent the device from sending */
+> +		/* Most UARTs need OUT2 to enable interrupts */
+> +		status = tty->driver->ops->tiocmget(tty);
+> +		BT_DBG("Current tiocm 0x%x", status);
+> +
+> +		set &= ~(TIOCM_OUT2 | TIOCM_RTS);
+> +		clear = ~set;
+> +		set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
+> +		       TIOCM_OUT2 | TIOCM_LOOP;
+> +		clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
+> +			 TIOCM_OUT2 | TIOCM_LOOP;
+> +		status = tty->driver->ops->tiocmset(tty, set, clear);
+> +		BT_DBG("Clearing RTS: %s", status ? "failed" : "success");
+> +	} else {
+> +		/* Set RTS to allow the device to send again */
+> +		status = tty->driver->ops->tiocmget(tty);
+> +		BT_DBG("Current tiocm 0x%x", status);
+> +
+> +		set |= (TIOCM_OUT2 | TIOCM_RTS);
+> +		clear = ~set;
+> +		set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
+> +		       TIOCM_OUT2 | TIOCM_LOOP;
+> +		clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
+> +			 TIOCM_OUT2 | TIOCM_LOOP;
+> +		status = tty->driver->ops->tiocmset(tty, set, clear);
+> +		BT_DBG("Setting RTS: %s", status ? "failed" : "success");
+> +
+> +		/* Re-enable hardware flow control */
+> +		ktermios = tty->termios;
+> +		ktermios.c_cflag |= CRTSCTS;
+> +		status = tty_set_termios(tty, &ktermios);
+> +		BT_DBG("Enabling hardware flow control: %s", status ?
+> +		       "failed" : "success");
+> +	}
+> +}
+> +
+> void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
+> {
+> 	struct tty_struct *tty = hu->tty;
+> 	struct ktermios ktermios;
+> 
+> +	/* Bring the UART into a known state with a given baud rate */
+> 	ktermios = tty->termios;
+> 	ktermios.c_cflag &= ~CBAUD;
+> -	ktermios.c_cflag |= BOTHER;
+> +	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
+> +			    | INLCR | IGNCR | ICRNL | IXON);
+
+can we put the | at the end of the previous line and keep IGNBRK and INLCR aligned.
+
+Honestly I have no idea what the absolute 100% correct coding style rules are here, but at least lets try to be consistent. So referring to the code above, the | should be at the end.
+
+> +	ktermios.c_oflag &= ~OPOST;
+> +	ktermios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+> +	ktermios.c_cflag &= ~(CSIZE | PARENB | CBAUD);
+> +	ktermios.c_cflag |= CS8;
+> +	ktermios.c_cflag |= CRTSCTS;
+> 	tty_termios_encode_baud_rate(&ktermios, speed, speed);
+> 
+> 	/* tty_set_termios() return not checked as it is always 0 */
+> 	tty_set_termios(tty, &ktermios);
+> 
+> -	BT_DBG("%s: New tty speed: %d", hu->hdev->name, tty->termios.c_ispeed);
+> +	BT_DBG("%s: New tty speeds: %d/%d, cflag: 0x%x", hu->hdev->name,
+> +	       tty->termios.c_ispeed, tty->termios.c_ospeed,
+> +	       tty->termios.c_cflag);
+> }
+> 
+> static int hci_uart_setup(struct hci_dev *hdev)
+> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> index e9f970c..8ef1881 100644
+> --- a/drivers/bluetooth/hci_uart.h
+> +++ b/drivers/bluetooth/hci_uart.h
+> @@ -100,6 +100,7 @@ int hci_uart_unregister_proto(const struct hci_uart_proto *p);
+> int hci_uart_tx_wakeup(struct hci_uart *hu);
+> int hci_uart_init_ready(struct hci_uart *hu);
+> void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
+> +void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
+
+The rest looks good.
+
+Regards
+
+Marcel
 
