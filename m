@@ -1,71 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLEs8YyPUTYkJXMw9W=xdy-gtDTp+C5g+eQR=eQ2VgULQ@mail.gmail.com>
-References: <CAGnek1nNmfJUWJVJ+J45_9eCDd=cC-7mhJ8wN3ujtV-LpLfC0w@mail.gmail.com>
-	<CABBYNZLEs8YyPUTYkJXMw9W=xdy-gtDTp+C5g+eQR=eQ2VgULQ@mail.gmail.com>
-Date: Fri, 12 Jun 2015 14:36:57 -0700
-Message-ID: <CAGnek1kYAp9p0KCZMq6t8nA97pgRLeqvViAe9_FAP2L6OPyWyg@mail.gmail.com>
-Subject: Re: [PATCH] profiles/hog: enable report notifications if ccc handle
- is valid
-From: Austin Foxley <austinf@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 12 Jun 2015 11:02:45 -0700
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v4] Bluetooth: btusb: Add routine for applying Intel DDC
+ parameters
+Message-ID: <20150612110245.3f216445@tedd-fedora-vm>
+In-Reply-To: <8903C22A-6194-40CA-A787-D7E79A67322A@holtmann.org>
+References: <20150610150156.7522ed3f@tedd-fedora-vm>
+	<8903C22A-6194-40CA-A787-D7E79A67322A@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jun 12, 2015 at 4:00 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Austin,
->
-> On Fri, Jun 12, 2015 at 3:27 AM, Austin Foxley <austinf@gmail.com> wrote:
->> profiles/hog: enable report notifications if ccc handle is valid
->>
->> This fixes an issue where hog report notifications weren't
->> getting processed after a device disconnected then reconnected
->> a short while later without being removed.
->
-> If you have the traces of this problem please add the relevant part to
-> the description.
->
->> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
->> index 4be9fd2..a61d0e7 100644
->> --- a/profiles/input/hog.c
->> +++ b/profiles/input/hog.c
->> @@ -858,7 +858,7 @@ static void attio_connected_cb(GAttrib *attrib,
->> gpointer user_data)
->>         for (l = hogdev->reports; l; l = l->next) {
->>                 struct report *r = l->data;
->>
->> -               enable_report_notifications(r, false);
->> +               enable_report_notifications(r, r->ccc_handle != 0);
->
-> We are doing false here because the CCC should be remembered by the
-> device so doing ccc_handle != 0 might sent this every time causing
-> extra round trips which can add latency on reconnect, perhaps the
-> problem is either your device don't remember CCC was already
-> configured which is a bug since HoG mandates pairing thus CCC should
-> be valid across connections, or we did disconnect before CCC was
-> written then perhaps we need to set a flag when CCC write operation
-> has been completed.
+Hi Marcel,
 
-That explains it then, as my test involved pulling the battery from my
-device. On reconnection notifications were not re-enabled as the
-device was powercycled and wouldn't remember CCC. Not sure how to best
-handle this case as without this patch a restart of bluez is needed to
-get it working again.
+On Fri, 12 Jun 2015 11:36:16 +0200
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
->
->>         }
->>  }
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
+> Hi Tedd,
+> 
+> > @@ -2244,7 +2248,66 @@ done:
+> > 
+> > 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+> > 
+> > +	/* Once the device is running in operational mode, it needs to apply
+> > +	 * the device configuration(DDC) parameters to the device.
+> > +	 */
+> > +	snprintf(fwname, sizeof(fwname), "intel/ibt-11-%u.ddc", dev_revid);
+> 
+> I would actually just move creating the DDC filename above instead of bothering to introduce a new dev_revid variable.
+> 
+> > +
+> > +	/* Device can work without DDC parameters so even if it fails to load
+> > +	 * the file, no need to fail the setup.
+> > +	 */
+> > +	err = request_firmware_direct(&fw, fwname, &hdev->dev);
+> 
+> Why _direct compared to the other one?
 
--Austin
+If the DDC file doesn't exist, then request_firmware() displays the following extra message:
+
+[ 2193.141256] bluetooth hci0: Direct firmware load for intel/ibt-11-5.ddc failed with error -2
+
+I thought its not necessary to display and give a negative impression since the device can work without DDC file.
+
+The request_firmware_direct() suppress the error message and this is the comment from the function says it is useful for optional firmware. 
+
+ * This function works pretty much like request_firmware(), but this doesn't
+ * fall back to usermode helper even if the firmware couldn't be loaded
+ * directly from fs.  Hence it's useful for loading optional firmwares, which
+ * aren't always present, without extra long timeouts of udev.
+
+Functionally, both works fine.
+
+> 
+> > +	if (err < 0) {
+> > +		BT_ERR("failed to open the ddc file: %s", fwname);
+> > +		return 0;
+> > +	}
+> > +
+> > +	BT_INFO("%s: Intel DDC file opened: %s", hdev->name, fwname);
+> > +
+> > +	fw_ptr = fw->data;
+> > +
+> > +	/* DDC file contains DDC parameters in HCI Command format. */
+> 
+> Did we agree on that? I think we did not. We just want the plain DDC parameters. We might have crossed our messages here. I prefer plain DDC key value pairs in the file.
+> 
+
+Thanks for clarification. :)
+
+> > 
+> 
+> Regards
+> 
+> Marcel
+> 
+
+Regards,
+Tedd
