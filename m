@@ -1,37 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove redundant check for ACL_LINK
-Date: Fri, 12 Jun 2015 13:04:47 +0300
-Message-Id: <1434103487-9296-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH 0/5] Bluetooth: Encryption Key Size fixes & improvements
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1434019950-24959-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 12 Jun 2015 11:41:18 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C07D0734-A59F-4DC8-96F3-6F297D3DB4EA@holtmann.org>
+References: <1434019950-24959-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-The encryption key size is read only for BR/EDR (ACL_LINK) connections
-so there's no need to check for it in the read_enc_key_size_complete()
-callback.
+> This set of patches:
+> 
+> - adds greater control of the LE Encryption Key Size through debugfs
+> - adds reading of the encryption key size for BR/EDR connections and
+>   uses the result appropriately for generating LTKs with SMP over
+>   BR/EDR
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (5):
+>      Bluetooth: Add debugfs support for max LE encryption key size
+>      Bluetooth: Add debugfs support for min LE encryption key size
+>      Bluetooth: Move SC-only check outside of BT_CONFIG branch
+>      Bluetooth: Read encryption key size for BR/EDR connections
+>      Bluetooth: Use actual encryption key size for SMP over BR/EDR
+> 
+> include/net/bluetooth/hci.h |  10 ++++
+> net/bluetooth/hci_event.c   | 111 ++++++++++++++++++++++++++++++++++++-----
+> net/bluetooth/smp.c         | 114 ++++++++++++++++++++++++++++++++++++++++---
+> 3 files changed, 217 insertions(+), 18 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+all 5 patches have been applied to bluetooth-next tree.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 88c57b12a222..32363c2b7f83 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2648,8 +2648,7 @@ static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
- 
- 		if (!test_bit(HCI_CONN_ENCRYPT, &conn->flags))
- 			encrypt = 0x00;
--		else if (conn->type == ACL_LINK &&
--			 test_bit(HCI_CONN_AES_CCM, &conn->flags))
-+		else if (test_bit(HCI_CONN_AES_CCM, &conn->flags))
- 			encrypt = 0x02;
- 		else
- 			encrypt = 0x01;
--- 
-2.4.3
+Regards
+
+Marcel
 
