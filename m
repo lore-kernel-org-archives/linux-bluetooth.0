@@ -1,44 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <557A9808.1090206@intel.com>
-Date: Fri, 12 Jun 2015 10:27:52 +0200
-From: Loic Poulain <loic.poulain@intel.com>
-MIME-Version: 1.0
-To: Ilya Faenson <ifaenson@broadcom.com>,
- Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org,
- Arend van Spriel <arend@broadcom.com>
-Subject: Re: [PATCH v2 0/5] Broadcom Bluetooth UART device driver
-References: <1433966720-17482-1-git-send-email-ifaenson@broadcom.com>
-In-Reply-To: <1433966720-17482-1-git-send-email-ifaenson@broadcom.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+From: Nagaraj D R <nagaraj.dr@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Nagaraj D R <nagaraj.dr@samsung.com>
+Subject: [PATCH v2 1/1] shared/gatt-client: Fix the "Find Information req" error
+Date: Fri, 12 Jun 2015 12:09:39 +0530
+Message-id: <1434091179-7578-1-git-send-email-nagaraj.dr@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilya,
+In a particular case where remote device has the characteristic
+declaration b/w 0XFFFE and 0XFFFF. i.e characteristic handle at
+0XFFFE and value_handle at 0XFFFF, which implies there is no
+characteristic descriptors associated.
 
-On 10/06/2015 22:05, Ilya Faenson wrote:
-> v2 - Release upon the acceptance of Fred's updates,
-> 	updated as per the latest comments from Marcel.
-> v1 - Original release against the Fred Danis' updates.
->
-> Ilya Faenson (5):
->    Broadcom Bluetooth UART Device Tree bindings
->    H4 line discipline enhancements
->    Broadcom Bluetooth UART Platform Driver
->    Support the BCM4354 Bluetooth UART device
->    BlueZ Broadcom UART Protocol
+Since present design search the descriptors b/w the characteristic_value
+declaration and characteristic end handle, In the above stated case,
+descriptor search handle will be initialized to 0X0000 (i.e by
+incrementing characteristic value handle (0xffff) ). 0X0000 handle
+is reserved handle, and also intention of searching descriptors will
+not be achieved.
 
-I think that the bcm line discipline proto should work even if there is
-no bcm platform device (due to missing DT/ACPI entry).
-If there is no matching plat device -> just don't use this platform 
-driver to manage pm.
-This is for hardware backward compatibility. Moreover we should be able 
-to use an
-external bcm device over serial/FTDI (dev board/simulator...) which is 
-not a plat device.
+ Consequence:  Below request will be sent,
+        ATT: Find Information req (0x04)
+        start 0x0000, end 0xffff
 
-Regards,
-Loic
+        and below will be the proper response from the remote device
+        ATT: Error (0x01)
+        Error: Invalid handle (1)
+        Find Information req (0x04) on handle 0x0000
+---
+ v1 -> Initial version.
+ v2 -> incorporated Luiz comment about inline comment & commit msg changes.
 
+ src/shared/gatt-client.c |   10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 7e9d550..0bd306c 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -601,12 +601,16 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
+ 							chrc_data->value_handle)
+ 			goto failed;
+ 
+-		desc_start = chrc_data->value_handle + 1;
+-
+-		if (desc_start > chrc_data->end_handle) {
++		/*
++		 * check for descriptors presence, before initializing the
++		 * desc_handle and avoid integer overflow during desc_handle
++		 * intialization.
++		 */
++		if (chrc_data->value_handle >= chrc_data->end_handle) {
+ 			free(chrc_data);
+ 			continue;
+ 		}
++		desc_start = chrc_data->value_handle + 1;
+ 
+ 		client->discovery_req = bt_gatt_discover_descriptors(
+ 							client->att, desc_start,
 -- 
-Intel Open Source Technology Center
-http://oss.intel.com/
+1.7.9.5
+
