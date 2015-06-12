@@ -1,83 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 12 Jun 2015 11:02:45 -0700
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+From: Ilya Faenson <ifaenson@broadcom.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v4] Bluetooth: btusb: Add routine for applying Intel DDC
- parameters
-Message-ID: <20150612110245.3f216445@tedd-fedora-vm>
-In-Reply-To: <8903C22A-6194-40CA-A787-D7E79A67322A@holtmann.org>
-References: <20150610150156.7522ed3f@tedd-fedora-vm>
-	<8903C22A-6194-40CA-A787-D7E79A67322A@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Arend Van Spriel" <arend@broadcom.com>
+Subject: RE: [PATCH v2 1/5] Broadcom Bluetooth UART Device Tree bindings
+Date: Fri, 12 Jun 2015 16:51:01 +0000
+Message-ID: <E0D3336E15B58B4294723AC879BA5E9426167F@IRVEXCHMB15.corp.ad.broadcom.com>
+References: <1433966720-17482-1-git-send-email-ifaenson@broadcom.com>
+ <1433966720-17482-2-git-send-email-ifaenson@broadcom.com>
+ <ED07E6FA-6063-4B60-AD61-A4CA8EDB608C@holtmann.org>
+ <E0D3336E15B58B4294723AC879BA5E9426152D@IRVEXCHMB15.corp.ad.broadcom.com>
+ <4C76A9C6-BF09-4099-A4C6-BB5E54FEA31F@holtmann.org>
+In-Reply-To: <4C76A9C6-BF09-4099-A4C6-BB5E54FEA31F@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Fri, 12 Jun 2015 11:36:16 +0200
-Marcel Holtmann <marcel@holtmann.org> wrote:
+-----Original Message-----
+From: Marcel Holtmann [mailto:marcel@holtmann.org]=20
+Sent: Friday, June 12, 2015 11:39 AM
+To: Ilya Faenson
+Cc: linux-bluetooth@vger.kernel.org; Arend Van Spriel
+Subject: Re: [PATCH v2 1/5] Broadcom Bluetooth UART Device Tree bindings
 
-> Hi Tedd,
-> 
-> > @@ -2244,7 +2248,66 @@ done:
-> > 
-> > 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
-> > 
-> > +	/* Once the device is running in operational mode, it needs to apply
-> > +	 * the device configuration(DDC) parameters to the device.
-> > +	 */
-> > +	snprintf(fwname, sizeof(fwname), "intel/ibt-11-%u.ddc", dev_revid);
-> 
-> I would actually just move creating the DDC filename above instead of bothering to introduce a new dev_revid variable.
-> 
-> > +
-> > +	/* Device can work without DDC parameters so even if it fails to load
-> > +	 * the file, no need to fail the setup.
-> > +	 */
-> > +	err = request_firmware_direct(&fw, fwname, &hdev->dev);
-> 
-> Why _direct compared to the other one?
+Hi Ilya,
 
-If the DDC file doesn't exist, then request_firmware() displays the following extra message:
+>> Device Tree bindings to configure the Broadcom Bluetooth UART device.
+>>=20
+>> Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
+>> ---
+>> .../devicetree/bindings/net/bluetooth/btbcm.txt    | 82 ++++++++++++++++=
+++++++
+>> 1 file changed, 82 insertions(+)
+>> create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm=
+.txt
+>>=20
+>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b=
+/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+>> new file mode 100644
+>> index 0000000..2679819
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+>> @@ -0,0 +1,82 @@
+>> +btbcm
+>> +------
+>> +
+>> +Required properties:
+>> +
+>> +	- compatible : must be "brcm,brcm-bt-uart".
+>> +	- tty : tty device connected to this Bluetooth device.
+>> +
+>> +Optional properties:
+>> +
+>> +  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an inter=
+rupt.
+>> +
+>> +  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume =
+device.
+>> +
+>> +  - bt-reg-on-gpios : reg-on output GPIO to be used to power device on/=
+off.
+>> +
+>> +  - oper-speed : Bluetooth device operational baud rate.
+>> +    Default: 3000000.
+>> +
+>> +  - manual-fc : flow control UART in suspend / resume scenarios.
+>> +    Default: 0.
+>> +
+>> +  - configure-sleep : configure suspend / resume flag.
+>> +    Default: false.
+>> +
+>> +  - configure-audio : configure platform PCM SCO flag.
+>> +    Default: false.
+>> +
+>> +  - pcm-clockmode : PCM clock mode. 0-slave, 1-master.
+>> +    Default: 0.
+>> +
+>> +  - pcm-fillmethod : PCM fill method. 0 to 3.
+>> +    Default: 2.
+>> +
+>> +  - pcm-fillnum : PCM number of fill bits. 0 to 3.
+>> +    Default: 0.
+>> +
+>> +  - pcm-fillvalue : PCM fill value. 0 to 7.
+>> +    Default: 3.
+>> +
+>> +  - pcm-incallbitclock : PCM interface rate. 0-128Kbps, 1-256Kbps, 2-51=
+2Kbps,
+>> +    3-1024Kbps, 4-2048Kbps.
+>> +    Default: 0.
+>> +
+>> +  - pcm-lsbfirst : PCM LSB first. 0 or 1.
+>> +    Default: 0.
+>> +
+>> +  - pcm-rightjustify : PCM Justify. 0-left, 1-right.
+>> +    Default: 0.
+>> +
+>> +  - pcm-routing : PCM routing. 0-PCM, 1-SCO over HCI.
+>> +    Default: 0.
+>> +
+>> +  - pcm-shortframesync : PCM sync. 0-short, 1-long.
+>> +    Default: 0.
+>> +
+>> +  - pcmsyncmode : PCM sync mode. 0-slave, 1-master.
+>> +    Default: 0.
+>=20
+> I think you meant pcm-syncmode here.
+>=20
+> IF: That's right, will change.
+>> +
+>> +
+>> +Example:
+>> +
+>> +	brcm4354_bt_uart: brcm4354-bt-uart {
+>=20
+> Since in general the chips and firmware name refer to BCM4354, it might b=
+e a really good idea to use bcm4354 here and not confuse people further. I =
+am just trying to avoid confusion here.
+>=20
+> IF: You're right, the chip name is BCM4354 but we must use the "brcm" pre=
+fix in the device tree bindings. Alright, I will change these to start from=
+ the "bcm" but will keep the "brcm" in the "compatible" strings. That would=
+ also be somewhat confusing but possibly not as confusing as now.
 
-[ 2193.141256] bluetooth hci0: Direct firmware load for intel/ibt-11-5.ddc failed with error -2
+I think Arend had a good proposal there. If I remember correctly then when =
+it refers to Broadcom as generic DT identifier, then it is brcm. If it is d=
+evice specific use the actual name bcm1234. SO things like brcm,bcm1234 mad=
+e sense to at least me.
 
-I thought its not necessary to display and give a negative impression since the device can work without DDC file.
+IF: Agreed.
 
-The request_firmware_direct() suppress the error message and this is the comment from the function says it is useful for optional firmware. 
+Regards
 
- * This function works pretty much like request_firmware(), but this doesn't
- * fall back to usermode helper even if the firmware couldn't be loaded
- * directly from fs.  Hence it's useful for loading optional firmwares, which
- * aren't always present, without extra long timeouts of udev.
-
-Functionally, both works fine.
-
-> 
-> > +	if (err < 0) {
-> > +		BT_ERR("failed to open the ddc file: %s", fwname);
-> > +		return 0;
-> > +	}
-> > +
-> > +	BT_INFO("%s: Intel DDC file opened: %s", hdev->name, fwname);
-> > +
-> > +	fw_ptr = fw->data;
-> > +
-> > +	/* DDC file contains DDC parameters in HCI Command format. */
-> 
-> Did we agree on that? I think we did not. We just want the plain DDC parameters. We might have crossed our messages here. I prefer plain DDC key value pairs in the file.
-> 
-
-Thanks for clarification. :)
-
-> > 
-> 
-> Regards
-> 
-> Marcel
-> 
-
-Regards,
-Tedd
+Marcel
