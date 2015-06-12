@@ -1,108 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: Florian Grandel <fgrandel@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 00/20] Bluetooth: Multi-advertising
-Date: Sat, 13 Jun 2015 05:40:53 +0200
-Message-Id: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
-In-Reply-To: <1432600463-7758-1-git-send-email-fgrandel@gmail.com>
-References: <1432600463-7758-1-git-send-email-fgrandel@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 12 Jun 2015 16:20:05 -0700
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann
+ <marcel@holtmann.org>
+Cc: "An, Tedd" <tedd.an@intel.com>
+Subject: [PATCH v5] Bluetooth: btusb: Add routine for applying Intel DDC
+ parameters
+Message-ID: <20150612162005.75849a3b@tedd-fedora-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-patch set introducing the infrastructure for multi-advertising
-capability to the HCI core and mgmt API.
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-v1 -> v2:
-- add missing braces in read_adv_features()
+This patch adds the routine to apply the DDC parameter from device
+specific ddc file.
 
-v2 -> v3 (changes due to Johan's review):
-- split change-set into several patches
-- replace err == 0 by !err
-- fix coding style problems
+Once the device is rest to operational mode, optionally, it can
+download the device specific configration (DDC) parameters before
+the BlueZ starts the stack initialization.
 
-v3 -> v4 (changes due to Arman's review):
-- bug fix: when calling remove_advertising with an instance value of
-  zero (i.e.  remove all instances), the command response also returns
-  an instance value of zero now as it doesn't make sense to return a
-  single instance id when removing several instances
-- splitting the change set into a much larger number of patches to
-  facilitate review
-- use HCI_MAX_ADV_INSTANCES in the same patch that introduces it
-- use adv_info->hdev in the same patch that introduces it
-- make the logic of hci_find_adv_instance() more readable
-- make sure that hci_find_adv_instance() is called while hci_dev is
-  locked
-- replace hci_num_adv_instances() by an instance counter in hci_dev
-- add inline comment in get_adv_instance_flags() explaining its return
-  value in the error case
-- generate zero-length adv data if the current instance identifier is
-  invalid
-- revert erroneous changes to the logic in clear_adv_instance()
-- use hci_adv_instances_clear() in clear_adv_instance() when removing
-  all advertising instances also removing a redundant error check
-- inserting TODO messages to make sure that advertising will not be
-  switched off prematurely once we allow more than one advertising
-  instance
-- inserting TODO messages to make sure that multiple advertising
-  instances will be advertised in a round-robin fashion once we allow
-  for more than one advertising instance
-- identify pending advertising instances (just added but not yet
-  confirmed in add_advertising_complete) by a boolean flag in the
-  adv_info struct so that we can identify and remove them even when the
-  pending add_advertising command cannot be retrieved for some reason -
-  makes sure that we do not leak advertising instances in this case
-- only send HCI commands to update advertising data when a new instance
-  has actually been added
+It opens the DDC file based on HW_VARIANT and DEV_REVISION and
+send ID/Value with HCI_Intel_Write_DDC command.
 
-v4 -> v5 (changes due to Marcel's review):
-- split into separate change sets for kernel and userspace
-- do not trust the adv instance list length when compiling the adv
-  features struct
-- introduce adv_info->pending in the same patch it's used for the first
-  time
+Format of DDC file
+DDC file contains one or more number of DDC structure.
 
-v5 -> v6 (changes due to Marcel's review):
-- fix the add adv override bug
-- fix "Using plain integer as NULL pointer" warning in
-  set_advertising_complete()
-- reword the "remove adv instance" commit comment to make it clear that
-  an existing bug is being fixed
+DDC Structure
+It has 'Length' field of one octet, DDC 'ID' field of
+two octets followed by the array of DDC 'Value' that gives
+the value of parameters itself.
+'Length' contains the length of DDC 'ID' and DDC 'Value'.
 
-v6 -> v7:
-- so far the patch set only contained a functionally neutral refactoring
-  to provide the basic infrastructure for multi-advertising. It has been
-  decided, though, that the patch set should provide the whole package
-  at once, including actual multi-advertising functionality. This has
-  been implemented and tested in the latest version of the patch set.
++------------+----------+
+| Size(byte) |    Name  |
++------------+----------+
+|      1     | Length   |
++------------+----------+
+|      2     | ID       |
++------------+----------+
+| Length - 2 | Value    |
++------------+----------+
 
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btusb.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-Florian Grandel (20):
-  Bluetooth: hci_core/mgmt: Introduce multi-adv list
-  Bluetooth: hci_core/mgmt: move adv timeout to hdev
-  Bluetooth: mgmt: dry update_scan_rsp_data()
-  Bluetooth: mgmt: rename update_*_data_for_instance()
-  Bluetooth: mgmt: multi adv for read_adv_features()
-  Bluetooth: mgmt: multi adv for get_current_adv_instance()
-  Bluetooth: mgmt: multi adv for get_adv_instance_flags()
-  Bluetooth: mgmt: improve get_adv_instance_flags() readability
-  Bluetooth: mgmt: multi adv for enable_advertising()
-  Bluetooth: mgmt: multi adv for create_instance_scan_rsp_data()
-  Bluetooth: mgmt: multi adv for create_instance_adv_data()
-  Bluetooth: mgmt: multi adv for set_advertising*()
-  Bluetooth: mgmt: multi adv for clear_adv_instances()
-  Bluetooth: mgmt/hci_core: multi-adv for add_advertising*()
-  Bluetooth: mgmt: multi adv for remove_advertising*()
-  Bluetooth: mgmt: program multi-adv on power on
-  Bluetooth: mgmt: multi-adv for trigger_le_scan()
-  Bluetooth: mgmt: multi-adv for mgmt_reenable_advertising()
-  Bluetooth: hci_core: remove obsolete adv_instance
-  Bluetooth: hci_core: increase max adv inst
-
- include/net/bluetooth/hci_core.h |  29 ++-
- net/bluetooth/hci_core.c         | 148 ++++++++++-
- net/bluetooth/mgmt.c             | 532 +++++++++++++++++++++++++++------------
- 3 files changed, 534 insertions(+), 175 deletions(-)
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index e97d036..3a526f1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2083,6 +2083,12 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 
+ 	BT_INFO("%s: Found device firmware: %s", hdev->name, fwname);
+ 
++	/* Save the DDC file name for later use to apply once the firmware
++	 * downloadindg is done
++	 */
++	snprintf(fwname, sizeof(fwname), "intel/ibt-11-%u.ddc",
++		 le16_to_cpu(params->dev_revid));
++
+ 	kfree_skb(skb);
+ 
+ 	if (fw->size < 644) {
+@@ -2244,6 +2250,42 @@ done:
+ 
+ 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+ 
++	/* Once the device is running in operational mode, it needs to apply
++	 * the device configuration(DDC) parameters to the device.
++	 * Device can work without DDC parameters so even if it fails to load
++	 * the file, no need to fail the setup.
++	 */
++	err = request_firmware_direct(&fw, fwname, &hdev->dev);
++	if (err < 0)
++		return 0;
++
++	BT_INFO("%s: Intel DDC file opened: %s", hdev->name, fwname);
++
++	fw_ptr = fw->data;
++
++	/* DDC file contains one or more DDC structure which has
++	 * Length (1 byte), DDC ID (2 bytes), and DDC value (Length - 2)
++	 */
++	while (fw->size > fw_ptr - fw->data) {
++		u8 cmd_plen = fw_ptr[0] + sizeof(u8);
++
++		skb = __hci_cmd_sync(hdev, 0xfc8b, cmd_plen, fw_ptr,
++				     HCI_INIT_TIMEOUT);
++		if (IS_ERR(skb)) {
++			BT_ERR("%s: Failed to send Intel_Write_DDC (%ld)",
++			       hdev->name, PTR_ERR(skb));
++			release_firmware(fw);
++			return PTR_ERR(skb);
++		}
++
++		fw_ptr += cmd_plen;
++		kfree_skb(skb);
++	}
++
++	release_firmware(fw);
++
++	BT_INFO("%s: Completed to apply Intel DDC parameters", hdev->name);
++
+ 	return 0;
+ }
+ 
 -- 
-1.9.1
-
+2.1.0
