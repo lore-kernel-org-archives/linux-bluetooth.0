@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 19/20] Bluetooth: hci_core: remove obsolete adv_instance
-Date: Sat, 13 Jun 2015 05:41:12 +0200
-Message-Id: <1434166873-21595-20-git-send-email-fgrandel@gmail.com>
+Subject: [PATCH v7 18/20] Bluetooth: mgmt: multi-adv for mgmt_reenable_advertising()
+Date: Sat, 13 Jun 2015 05:41:11 +0200
+Message-Id: <1434166873-21595-19-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
 References: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1432600463-7758-1-git-send-email-fgrandel@gmail.com>
@@ -11,51 +11,46 @@ References: <1432600463-7758-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now that the obsolete adv_instance is no longer being referenced
-anywhere in the code it can be removed without breaking the build.
+During service discovery, advertising will be disabled. This patch
+ensures that it is correctly being re-enabled, both for configuration
+made via set advertising and add advertising, once the scanning
+times out.
 
 Signed-off-by: Florian Grandel <fgrandel@gmail.com>
 ---
- include/net/bluetooth/hci_core.h | 6 ------
- net/bluetooth/hci_core.c         | 1 -
- 2 files changed, 7 deletions(-)
+ net/bluetooth/mgmt.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4f58a0e..a6cec6d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -379,7 +379,6 @@ struct hci_dev {
- 	__u8			scan_rsp_data[HCI_MAX_AD_LENGTH];
- 	__u8			scan_rsp_data_len;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index e2a0766..5ab7ed5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8579,13 +8579,24 @@ static void adv_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ void mgmt_reenable_advertising(struct hci_dev *hdev)
+ {
+ 	struct hci_request req;
++	u8 instance;
  
--	struct adv_info		adv_instance;
- 	struct list_head	adv_instances;
- 	unsigned int		adv_instance_cnt;
- 	__u8			cur_adv_instance;
-@@ -584,11 +583,6 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
- 	hdev->discovery.scan_duration = 0;
+ 	if (!hci_dev_test_flag(hdev, HCI_ADVERTISING) &&
+ 	    !hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE))
+ 		return;
+ 
++	instance = get_current_adv_instance(hdev);
++
+ 	hci_req_init(&req, hdev);
+-	enable_advertising(&req);
++
++	if (instance) {
++		schedule_adv_instance(&req, instance, true);
++	} else {
++		update_adv_data(&req);
++		update_scan_rsp_data(&req);
++		enable_advertising(&req);
++	}
++
+ 	hci_req_run(&req, adv_enable_complete);
  }
  
--static inline void adv_info_init(struct hci_dev *hdev)
--{
--	memset(&hdev->adv_instance, 0, sizeof(struct adv_info));
--}
--
- bool hci_discovery_active(struct hci_dev *hdev);
- 
- void hci_discovery_set_state(struct hci_dev *hdev, int state);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e50f7c3..86ed44e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3224,7 +3224,6 @@ struct hci_dev *hci_alloc_dev(void)
- 
- 	hci_init_sysfs(hdev);
- 	discovery_init(hdev);
--	adv_info_init(hdev);
- 
- 	return hdev;
- }
 -- 
 1.9.1
 
