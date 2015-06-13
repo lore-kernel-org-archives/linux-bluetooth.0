@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v8 14/15] tools/mgmt-tester: fix duplicate code
-Date: Sat, 13 Jun 2015 05:42:58 +0200
-Message-Id: <1434166979-21824-15-git-send-email-fgrandel@gmail.com>
+Subject: [BlueZ v8 13/15] tools/mgmt-tester: test le off
+Date: Sat, 13 Jun 2015 05:42:57 +0200
+Message-Id: <1434166979-21824-14-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
 References: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1432603329-12846-1-git-send-email-fgrandel@gmail.com>
@@ -11,130 +11,81 @@ References: <1432603329-12846-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The definition of the test advertising instance was duplicated in
-several places. This patch refactors the duplicate code into a
-common subroutine.
+Test that advertising instances will be removed when disabling the le
+capability of a brle bluetooth device.
 ---
- tools/mgmt-tester.c | 68 ++++++++++++++---------------------------------------
- 1 file changed, 18 insertions(+), 50 deletions(-)
+ doc/test-coverage.txt |  4 ++--
+ tools/mgmt-tester.c   | 21 +++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 2 deletions(-)
 
+diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+index 9c8b9bc..50e29b5 100644
+--- a/doc/test-coverage.txt
++++ b/doc/test-coverage.txt
+@@ -39,7 +39,7 @@ Automated end-to-end testing
+ 
+ Application		Count	Description
+ -------------------------------------------
+-mgmt-tester		 298	Kernel management interface testing
++mgmt-tester		 299	Kernel management interface testing
+ l2cap-tester		  27	Kernel L2CAP implementation testing
+ rfcomm-tester		   9	Kernel RFCOMM implementation testing
+ bnep-tester		   1	Kernel BNEP implementation testing
+@@ -49,7 +49,7 @@ gap-tester		   1	Daemon D-Bus API testing
+ hci-tester		  14	Controller hardware testing
+ userchan-tester		   3	Kernel HCI User Channel testting
+ 			-----
+-			 369
++			 370
+ 
+ 
+ Android end-to-end testing
 diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 315c326..465ad42 100644
+index 581fde6..315c326 100644
 --- a/tools/mgmt-tester.c
 +++ b/tools/mgmt-tester.c
-@@ -5025,18 +5025,9 @@ static void setup_add_advertising_callback(uint8_t status, uint16_t length,
- 	setup_bthost();
- }
+@@ -1550,6 +1550,7 @@ static const struct generic_data set_hs_on_invalid_index_test = {
+ static uint16_t settings_le[] = { MGMT_OP_SET_LE, 0 };
  
--static void setup_add_advertising_not_powered(const void *test_data)
-+static void setup_add_adv_param(struct mgmt_cp_add_advertising *cp)
- {
--	struct test_data *data = tester_get_data();
--	struct mgmt_cp_add_advertising *cp;
--	unsigned char adv_param[sizeof(*cp) + 6];
--	unsigned char param[] = { 0x01 };
--
--	tester_print("Adding advertising instance while unpowered");
--
--	cp = (struct mgmt_cp_add_advertising *) adv_param;
- 	memset(cp, 0, sizeof(*cp));
--
- 	cp->instance = 1;
- 	cp->adv_data_len = 6;
- 	cp->data[0] = 0x05; /* AD len */
-@@ -5045,6 +5036,19 @@ static void setup_add_advertising_not_powered(const void *test_data)
- 	cp->data[3] = 'e';
- 	cp->data[4] = 's';
- 	cp->data[5] = 't';
-+}
+ static const char set_le_on_param[] = { 0x01 };
++static const char set_le_off_param[] = { 0x00 };
+ static const char set_le_invalid_param[] = { 0x02 };
+ static const char set_le_garbage_param[] = { 0x01, 0x00 };
+ static const char set_le_settings_param_1[] = { 0x80, 0x02, 0x00, 0x00 };
+@@ -4513,6 +4514,20 @@ static const struct generic_data add_advertising_power_off = {
+ 	.expect_alt_ev_len = sizeof(advertising_instance1_param),
+ };
+ 
++static const char set_le_settings_param_off[] = { 0x81, 0x00, 0x00, 0x00 };
 +
-+static void setup_add_advertising_not_powered(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct mgmt_cp_add_advertising *cp;
-+	unsigned char adv_param[sizeof(*cp) + 6];
-+	unsigned char param[] = { 0x01 };
++static const struct generic_data add_advertising_le_off = {
++	.send_opcode = MGMT_OP_SET_LE,
++	.send_param = set_le_off_param,
++	.send_len = sizeof(set_le_off_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = set_le_settings_param_off,
++	.expect_len = sizeof(set_le_settings_param_off),
++	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
++	.expect_alt_ev_param = advertising_instance1_param,
++	.expect_alt_ev_len = sizeof(advertising_instance1_param),
++};
 +
-+	tester_print("Adding advertising instance while unpowered");
+ static const struct generic_data add_advertising_success_18 = {
+ 	.send_opcode = MGMT_OP_ADD_ADVERTISING,
+ 	.send_param = add_advertising_param_uuid,
+@@ -6687,6 +6702,12 @@ int main(int argc, char *argv[])
+ 					&add_advertising_timeout_expired,
+ 					setup_add_advertising_timeout,
+ 					test_command_generic, 3);
++	/* Test that le off will clear (remove) all instances */
++	test_bredrle("Add Advertising - Success 21 (LE -> off, Remove)",
++					&add_advertising_le_off,
++					setup_add_advertising,
++					test_command_generic);
 +
-+	cp = (struct mgmt_cp_add_advertising *) adv_param;
-+	setup_add_adv_param(cp);
  
- 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
- 						sizeof(param), &param,
-@@ -5066,16 +5070,7 @@ static void setup_add_advertising(const void *test_data)
- 	tester_print("Adding advertising instance while powered");
- 
- 	cp = (struct mgmt_cp_add_advertising *) adv_param;
--	memset(cp, 0, sizeof(*cp));
--
--	cp->instance = 1;
--	cp->adv_data_len = 6;
--	cp->data[0] = 0x05; /* AD len */
--	cp->data[1] = 0x08; /* AD type: shortened local name */
--	cp->data[2] = 't';  /* adv data ... */
--	cp->data[3] = 'e';
--	cp->data[4] = 's';
--	cp->data[5] = 't';
-+	setup_add_adv_param(cp);
- 
- 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
- 						sizeof(param), &param,
-@@ -5101,16 +5096,7 @@ static void setup_add_advertising_connectable(const void *test_data)
- 	tester_print("Adding advertising instance while connectable");
- 
- 	cp = (struct mgmt_cp_add_advertising *) adv_param;
--	memset(cp, 0, sizeof(*cp));
--
--	cp->instance = 1;
--	cp->adv_data_len = 6;
--	cp->data[0] = 0x05; /* AD len */
--	cp->data[1] = 0x08; /* AD type: shortened local name */
--	cp->data[2] = 't';  /* adv data ... */
--	cp->data[3] = 'e';
--	cp->data[4] = 's';
--	cp->data[5] = 't';
-+	setup_add_adv_param(cp);
- 
- 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
- 						sizeof(param), &param,
-@@ -5140,17 +5126,8 @@ static void setup_add_advertising_timeout(const void *test_data)
- 	tester_print("Adding advertising instance with timeout");
- 
- 	cp = (struct mgmt_cp_add_advertising *) adv_param;
--	memset(cp, 0, sizeof(*cp));
--
--	cp->instance = 1;
-+	setup_add_adv_param(cp);
- 	cp->timeout = 1;
--	cp->adv_data_len = 6;
--	cp->data[0] = 0x05; /* AD len */
--	cp->data[1] = 0x08; /* AD type: shortened local name */
--	cp->data[2] = 't';  /* adv data ... */
--	cp->data[3] = 'e';
--	cp->data[4] = 's';
--	cp->data[5] = 't';
- 
- 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
- 						sizeof(param), &param,
-@@ -5176,16 +5153,7 @@ static void setup_set_and_add_advertising(const void *test_data)
- 	tester_print("Set and add advertising instance");
- 
- 	cp = (struct mgmt_cp_add_advertising *) adv_param;
--	memset(cp, 0, sizeof(*cp));
--
--	cp->instance = 1;
--	cp->adv_data_len = 6;
--	cp->data[0] = 0x05; /* AD len */
--	cp->data[1] = 0x08; /* AD type: shortened local name */
--	cp->data[2] = 't';  /* adv data ... */
--	cp->data[3] = 'e';
--	cp->data[4] = 's';
--	cp->data[5] = 't';
-+	setup_add_adv_param(cp);
- 
- 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
- 						sizeof(param), &param,
+ 	test_bredrle("Remove Advertising - Invalid Params 1",
+ 					&remove_advertising_fail_1,
 -- 
 1.9.1
 
