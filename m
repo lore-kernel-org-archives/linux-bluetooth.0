@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 13/20] Bluetooth: mgmt: multi adv for clear_adv_instances()
-Date: Sat, 13 Jun 2015 05:41:06 +0200
-Message-Id: <1434166873-21595-14-git-send-email-fgrandel@gmail.com>
+Subject: [PATCH v7 12/20] Bluetooth: mgmt: multi adv for set_advertising*()
+Date: Sat, 13 Jun 2015 05:41:05 +0200
+Message-Id: <1434166873-21595-13-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
 References: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1432600463-7758-1-git-send-email-fgrandel@gmail.com>
@@ -11,148 +11,161 @@ References: <1432600463-7758-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The clear_adv_instance() function could not clean up multiple
-advertising instances previously. It is being changed to provide both, a
-means to clean up a single instance and cleaning up all instances at
-once.
+The set_advertising() and set_advertising_complete() methods rely on
+the now obsolete hci_dev->adv_instance structure. We replace this
+reference by an equivalent access to the newly introduced dynamic
+advertising instance list.
 
-An additional instance parameter is being introduced to achieve this.
-Passing in 0x00 to this parameter signifies that all instances should be
-cleaned up. This semantics has been chosen similarly to the semantics of
-the instance parameter in the remove_advertising() function.
-
-When removing a single instance the method also ensures that another
-instance will be scheduled if available. When the currently advertising
-method is being removed, it will be canceled immediately.
+This patch introduces a helper function that schedules an advertising
+instance correctly calculating advertising timing based on the timeout
+and duration settings of the instance. Scheduling is factored into
+its own function for readability and code sharing.
 
 Signed-off-by: Florian Grandel <fgrandel@gmail.com>
 ---
- net/bluetooth/mgmt.c | 80 +++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 64 insertions(+), 16 deletions(-)
+ net/bluetooth/mgmt.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 94 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a85b80f..cbcc8d9 100644
+index 04efc56..a85b80f 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1538,27 +1538,57 @@ static void cancel_adv_timeout(struct hci_dev *hdev)
- 	}
+@@ -1471,6 +1471,73 @@ static void advertising_removed(struct sock *sk, struct hci_dev *hdev,
+ 	mgmt_event(MGMT_EV_ADVERTISING_REMOVED, hdev, &ev, sizeof(ev), sk);
  }
  
--static void clear_adv_instance(struct hci_dev *hdev)
-+static void clear_adv_instance(struct hci_dev *hdev, struct hci_request *req,
-+			       u8 instance, bool force)
++static int schedule_adv_instance(struct hci_request *req, u8 instance,
++				 bool force) {
++	struct hci_dev *hdev = req->hdev;
++	struct adv_info *adv_instance = NULL;
++	u16 timeout;
++
++	if (hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
++	    !hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE))
++		return -EPERM;
++
++	if (hdev->adv_instance_timeout)
++		return -EBUSY;
++
++	adv_instance = hci_find_adv_instance(hdev, instance);
++	if (!adv_instance)
++		return -ENOENT;
++
++	/* A zero timeout means unlimited advertising. As long as there is
++	 * only one instance duration should be ignored. We still set a timeout,
++	 * though, in case further instances are being added later on.
++	 *
++	 * If the remaining lifetime of the instance is more than the duration
++	 * then the timeout corresponds to the duration, otherwise it will be
++	 * reduced to the remaining instance lifetime.
++	 */
++	if (adv_instance->timeout == 0 ||
++	    adv_instance->duration <= adv_instance->remaining_time)
++		timeout = adv_instance->duration;
++	else
++		timeout = adv_instance->remaining_time;
++
++	/* The remaining time is being reduced unless the instance is being
++	 * advertised without time limit.
++	 */
++	if (adv_instance->timeout)
++		adv_instance->remaining_time =
++				adv_instance->remaining_time - timeout;
++
++	hdev->adv_instance_timeout = timeout;
++	queue_delayed_work(hdev->workqueue,
++			   &hdev->adv_instance_expire,
++			   msecs_to_jiffies(timeout * 1000));
++
++	/* If we're just re-scheduling the same instance again then do not
++	 * execute any HCI commands. This happens when a single instance is
++	 * being advertised.
++	 */
++	if (!force && hdev->cur_adv_instance == instance &&
++	    hci_dev_test_flag(hdev, HCI_LE_ADV))
++		return 0;
++
++	hdev->cur_adv_instance = instance;
++	update_adv_data(req);
++	update_scan_rsp_data(req);
++	enable_advertising(req);
++
++	return 0;
++}
++
++static void cancel_adv_timeout(struct hci_dev *hdev)
++{
++	if (hdev->adv_instance_timeout) {
++		hdev->adv_instance_timeout = 0;
++		cancel_delayed_work(&hdev->adv_instance_expire);
++	}
++}
++
+ static void clear_adv_instance(struct hci_dev *hdev)
  {
--	struct hci_request req;
-+	struct adv_info *adv_instance, *next_instance = NULL;
+ 	struct hci_request req;
+@@ -4681,6 +4748,9 @@ static void set_advertising_complete(struct hci_dev *hdev, u8 status,
+ {
+ 	struct cmd_lookup match = { NULL, hdev };
+ 	struct hci_request req;
++	u8 instance;
++	struct adv_info *adv_instance;
 +	int err;
  
--	if (!hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE))
--		return;
-+	/* An instance value of 0 indicates that all instances
-+	 * should be removed and advertising should be disabled.
-+	 */
-+	if (!instance || hdev->cur_adv_instance == instance)
-+		cancel_adv_timeout(hdev);
- 
--	if (hdev->adv_instance_timeout)
--		cancel_delayed_work(&hdev->adv_instance_expire);
-+	/* Get the next instance to advertise BEFORE we remove
-+	 * the current one. This can be the same instance again
-+	 * if there is only one instance.
-+	 */
-+	if (instance && hdev->cur_adv_instance == instance)
-+		next_instance = hci_get_next_instance(hdev, instance);
- 
--	memset(&hdev->adv_instance, 0, sizeof(hdev->adv_instance));
--	advertising_removed(NULL, hdev, 1);
--	hci_dev_clear_flag(hdev, HCI_ADVERTISING_INSTANCE);
-+	if (instance == 0x00) {
-+		list_for_each_entry(adv_instance, &hdev->adv_instances, list) {
-+			advertising_removed(NULL, hdev, adv_instance->instance);
-+		}
-+		hci_adv_instances_clear(hdev);
-+	} else {
-+		adv_instance = hci_find_adv_instance(hdev, instance);
- 
--	if (!hdev_is_powered(hdev) ||
-+		if (force || (adv_instance && adv_instance->timeout &&
-+			      !adv_instance->remaining_time)) {
-+			/* Don't advertise a removed instance. */
-+			if (next_instance &&
-+			    next_instance->instance == instance)
-+				next_instance = NULL;
-+
-+			err = hci_remove_adv_instance(hdev, instance);
-+			if (!err)
-+				advertising_removed(NULL, hdev, instance);
-+		}
-+	}
-+
-+	if (list_empty(&hdev->adv_instances)) {
-+		hdev->cur_adv_instance = 0x00;
-+		hci_dev_clear_flag(hdev, HCI_ADVERTISING_INSTANCE);
-+	}
-+
-+	if (!req || !hdev_is_powered(hdev) ||
- 	    hci_dev_test_flag(hdev, HCI_ADVERTISING))
- 		return;
- 
--	hci_req_init(&req, hdev);
--	disable_advertising(&req);
--	hci_req_run(&req, NULL);
-+	if (next_instance)
-+		schedule_adv_instance(req, next_instance->instance, false);
- }
- 
- static int clean_up_hci_state(struct hci_dev *hdev)
-@@ -1576,8 +1606,7 @@ static int clean_up_hci_state(struct hci_dev *hdev)
- 		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
- 	}
- 
--	if (hdev->adv_instance_timeout)
--		clear_adv_instance(hdev);
-+	clear_adv_instance(hdev, NULL, 0x00, true);
- 
- 	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
- 		disable_advertising(&req);
-@@ -2532,6 +2561,9 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 	val = !!cp->val;
- 	enabled = lmp_host_le_capable(hdev);
- 
-+	if (!val)
-+		clear_adv_instance(hdev, NULL, 0x00, true);
-+
- 	if (!hdev_is_powered(hdev) || val == enabled) {
- 		bool changed = false;
- 
-@@ -7018,10 +7050,26 @@ unlock:
- 
- void mgmt_adv_timeout_expired(struct hci_dev *hdev)
- {
-+	u8 instance;
-+	struct hci_request req;
-+
- 	hdev->adv_instance_timeout = 0;
- 
-+	instance = get_current_adv_instance(hdev);
-+	if (instance == 0x00)
-+		return;
-+
  	hci_dev_lock(hdev);
--	clear_adv_instance(hdev);
-+	hci_req_init(&req, hdev);
-+
-+	clear_adv_instance(hdev, &req, instance, false);
-+
-+	if (list_empty(&hdev->adv_instances))
-+		disable_advertising(&req);
-+
-+	if (!skb_queue_empty(&req.cmd_q))
-+		hci_req_run(&req, NULL);
-+
- 	hci_dev_unlock(hdev);
- }
  
+@@ -4706,18 +4776,31 @@ static void set_advertising_complete(struct hci_dev *hdev, u8 status,
+ 		sock_put(match.sk);
+ 
+ 	/* If "Set Advertising" was just disabled and instance advertising was
+-	 * set up earlier, then enable the advertising instance.
++	 * set up earlier, then re-enable multi-instance advertising.
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
+-	    !hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE))
++	    !hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) ||
++	    list_empty(&hdev->adv_instances))
+ 		goto unlock;
+ 
++	instance = hdev->cur_adv_instance;
++	if (!instance) {
++		adv_instance = list_first_entry_or_null(&hdev->adv_instances,
++							struct adv_info, list);
++		if (!adv_instance)
++			goto unlock;
++
++		instance = adv_instance->instance;
++	}
++
+ 	hci_req_init(&req, hdev);
+ 
+-	update_adv_data(&req);
+-	enable_advertising(&req);
++	err = schedule_adv_instance(&req, instance, true);
++
++	if (!err)
++		err = hci_req_run(&req, enable_advertising_instance);
+ 
+-	if (hci_req_run(&req, enable_advertising_instance) < 0)
++	if (err)
+ 		BT_ERR("Failed to re-configure advertising");
+ 
+ unlock:
+@@ -4802,8 +4885,13 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	else
+ 		hci_dev_clear_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
+ 
++	cancel_adv_timeout(hdev);
++
+ 	if (val) {
+-		/* Switch to instance "0" for the Set Advertising setting. */
++		/* Switch to instance "0" for the Set Advertising setting.
++		 * We cannot use update_[adv|scan_rsp]_data() here as the
++		 * HCI_ADVERTISING flag is not yet set.
++		 */
+ 		update_inst_adv_data(&req, 0x00);
+ 		update_inst_scan_rsp_data(&req, 0x00);
+ 		enable_advertising(&req);
 -- 
 1.9.1
 
