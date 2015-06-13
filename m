@@ -1,71 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <557C1E7B.1020800@peakwork.de>
-Date: Sat, 13 Jun 2015 14:13:47 +0200
-From: Markus Pfau <markus.pfau@peakwork.de>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: High CPU load when turning off BT keyboard
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH v2 3/5] Broadcom Bluetooth UART Platform Driver
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <E0D3336E15B58B4294723AC879BA5E942615DC@IRVEXCHMB15.corp.ad.broadcom.com>
+Date: Sat, 13 Jun 2015 10:04:14 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Arend Van Spriel <arend@broadcom.com>
+Message-Id: <AAF7B29B-7BE0-49D9-BA84-4DA4DBC3E784@holtmann.org>
+References: <1433966720-17482-1-git-send-email-ifaenson@broadcom.com> <1433966720-17482-4-git-send-email-ifaenson@broadcom.com> <187EFB2B-BD56-46BB-A022-6507A8F8AE66@holtmann.org> <E0D3336E15B58B4294723AC879BA5E942615DC@IRVEXCHMB15.corp.ad.broadcom.com>
+To: Ilya Faenson <ifaenson@broadcom.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Ilya,
 
-google searches regarding CPU load after switching off an bluetooth 
-input device can be found a lot.
-Unfortunately they usually finish with "not reproducable"
+>> Introduce the device tree enumerated Broadcom Bluetooth UART driver.
+>> 
+>> Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
+>> ---
+>> drivers/bluetooth/Kconfig      |   9 +
+>> drivers/bluetooth/Makefile     |   1 +
+>> drivers/bluetooth/btbcm_uart.c | 673 +++++++++++++++++++++++++++++++++++++++++
+>> drivers/bluetooth/btbcm_uart.h |  89 ++++++
+>> 4 files changed, 772 insertions(+)
+>> create mode 100644 drivers/bluetooth/btbcm_uart.c
+>> create mode 100644 drivers/bluetooth/btbcm_uart.h
+>> 
+>> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+>> index 2e77707..5eee3ed 100644
+>> --- a/drivers/bluetooth/Kconfig
+>> +++ b/drivers/bluetooth/Kconfig
+>> @@ -143,6 +143,7 @@ config BT_HCIUART_BCM
+>> 	bool "Broadcom protocol support"
+>> 	depends on BT_HCIUART
+>> 	select BT_HCIUART_H4
+>> +	select BT_UART_BCM
+>> 	select BT_BCM
+>> 	help
+>> 	  The Broadcom protocol support enables Bluetooth HCI over serial
+>> @@ -150,6 +151,14 @@ config BT_HCIUART_BCM
+>> 
+>> 	  Say Y here to compile support for Broadcom protocol.
+>> 
+>> +config BT_UART_BCM
+> 
+> if we follow our new naming that we have pushed since a few years now for new modules, then this should be BT_BCM_UART actually.
+> 
+> IF: Okay, will change.
+> 
+>> +	tristate "Broadcom BT UART driver"
+>> +	depends on BT_HCIUART_H4 && TTY
+> 
+> So I am thinking that we do not even make this an user visible option. This should be just automatically selected from BT_HCIUART_BCM and that is it.
+> 
+> Meaning this is will be enough in the end:
+> 
+> 	config BT_BCM_UART
+> 		tristate
+> 
+> And I would just put it directly under the BT_BCM entry we already have.
+> 
+> IF: As per today's Loic's comment, the platform driver should be optional. I agree. I think it should be configured separately as well.
 
-I have now such an device:
+I am fine with that in the long run. However to not over-engineer it from the start, lets do it simple with not exposing the menu item for selection. We can always change that later and give the option. I prefer that we get things merged and then go on refining them. Turning this back into a user selectable option is pretty easy.
 
-Jun 13 01:06:11 odroid kernel: [ 2496.403746] [c6] input: BT 
-Touchpad_keyboard as 
-/devices/12110000.usb/usb1/1-1/1-1.5/1-1.5:1.0/bluetooth/hci0/hci0:71/input1
-Jun 13 01:06:11 odroid kernel: [ 2496.407206] [c6] hid-generic 
-0005:099A:0500.0001: input,hidraw0: BLUETOOTH HID v1.1b Mouse [BT 
-Touchpad_keyboard] on 00:1a:7d:da:71:12
+If we go this way, then for me I do not have to think about it too much at the moment. Even the side where the Broadcom device is exposed via ACPI will need something and that something is still not there. And I am also expecting that UART slaves will come around eventually and we have to start thinking about some details as well.
 
-and it was very good reproducable.
+>> +	help
+>> +	  This driver supports the HCI_UART_BT protocol.
+>> +
+>> +	  It manages Bluetooth UART device properties and GPIOs.
+>> +
+> 
+> This is something we have to figure out from a design point of view. Do we want to keep this as a separate module or not. My initial thinking here is that the platform driver should be just registered from bcm_init in hci_bcm.c.
+> 
+> I mean wouldn't it be a lot simpler if we can match up the BT HCI UART bcm_proto driver to the platform driver? I have no objection to make this a separate module, but I want to make sure that we looked at these two options.
+> 
+> If we ever get to UART slave drivers, then this would be essentially the UART slave driver, correct?
+> 
+> IF: The platform and ACPI (in the future) are logically separate drivers. I would not want to see them both within a BlueZ protocol. Sharing a module will not make mapping a protocol instance into a driver instance any easier. They would still need to exchange the identifying info. They are logically two completely different entities in my opinion. UART slave driver, to the best of my limited current understanding, will just introduce one more layer into the already fairly complicated picture. The platform and ACPI drivers may still be needed to manage GPIOs and wakeup interrupts. Also, BlueZ protocol resides above the tty line discipline while UART slave is below so having them in a single module would be very confusing in my opinion.
 
-- Linux Ubuntu 15.05
-- Odroid XU3 Board
-- Latest Bluez version (5.30) compiled from source
+We could do it as a compile time option where either one or both are compiled into the driver. That is how hci_uart driver actually does it today. So there are many options in this area. Lets keep them separated for now. I have no problem with that. We are not set in stone here anyway. This can easily change later.
 
-What I did:
-- Start bluetoothd
-- Power On
-- Switch On BT Keyboard, wait for connect
-- Switch BT keyboard off
-- bluetoothd runs with 100% CPU and stays there regardless what I do
+Regards
 
-The cause is, that one eventhandler in device is not freed and the 
-System eventloop seems to call this event without sync.
-For any reason the BT device is not detected as "reconnectable", after 
-disconnection void input_device_enter_reconnect_mode is called but there 
-is nothing to do:
+Marcel
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index a494ea2..aacf3a7 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -1204,7 +1204,12 @@ static void 
-input_device_enter_reconnect_mode(struct input_device *idev)
-          */
-         if (idev->reconnect_mode != RECONNECT_ANY &&
-                                 idev->reconnect_mode != RECONNECT_HOST)
--               return;
-+       {
-+          if (idev->sec_watch > 0)
-+                g_source_remove(idev->sec_watch);
-+         idev->sec_watch=0;
-+         return;
-+       }
-
-Freeing idev->sec_watch in this case results to an clean disconnect and 
-no CPU load appears.
-
-I have noticed the CPU load issue also with older Bluez versions (e.g. 
-4.101), I think this problem has never fixed.
-
-Can you pls verify / apply  this patch?
-
-Thanks, Markus
