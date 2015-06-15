@@ -1,106 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH v2] tools/obexctl: Add support for pull Vobjects
-Date: Mon, 15 Jun 2015 17:42:45 +0530
-Message-id: <1434370365-17573-1-git-send-email-gowtham.ab@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Prabhu Chawandi <foss.chaws@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: bluez/android
+Date: Mon, 15 Jun 2015 14:12:47 +0200
+Message-ID: <4720167.a4B9p9nNG6@leonov>
+In-Reply-To: <CAKafyqq_RN9syQgA3o8z0Wx_DN8O83i4A2S5Ns8N4-SWNyE4Mg@mail.gmail.com>
+References: <CAKafyqq_RN9syQgA3o8z0Wx_DN8O83i4A2S5Ns8N4-SWNyE4Mg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PullBusinessCard from remote push server.
+Hi Prabhu,
 
-[obex]# connect 00:1B:DC:07:33:4E 00001105-0000-1000-8000-00805f9b34fb
-Attempting to connect to 00:1B:DC:07:33:4E
-[NEW] Session /org/bluez/obex/client/session0 [default]
-[NEW] ObjectPush /org/bluez/obex/client/session0
-Connection successful
-[00:1B:DC:07:33:4E]# pull /home/vcard.vcf
-Attempting to pull /home/vcard.vcf from /org/bluez/obex/client/session0
-[NEW] Transfer /org/bluez/obex/client/session0/transfer0
-Transfer /org/bluez/obex/client/session0/transfer0
-        Status: queued
-        Size: 0
-        Filename: /home/vcard.vcf
-        Session: /org/bluez/obex/client/session0
-[CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: complete
-[DEL] Transfer /org/bluez/obex/client/session0/transfer0
-[DEL] Session /org/bluez/obex/client/session0 [default]
-[DEL] ObjectPush /org/bluez/obex/client/session0
----
- tools/obexctl.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+On Monday 15 of June 2015 17:06:41 Prabhu Chawandi wrote:
+>  This is with respect to HFP profile.
+> 
+> While I pressed the Button on my HF device, service level connection
+> is happening - BTHF_STATE_CONNECTED is coming.
+> 
+> But next callbacks are not coming on pressing of buttons - like voice
+> recognition.
+> 
+> Can any body help me
 
-diff --git a/tools/obexctl.c b/tools/obexctl.c
-index 4faff6b..86c81d5 100644
---- a/tools/obexctl.c
-+++ b/tools/obexctl.c
-@@ -758,7 +758,7 @@ static void send_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == TRUE) {
--		rl_printf("Failed to send: %s\n", error.name);
-+		rl_printf("Failed to send/pull: %s\n", error.name);
- 		dbus_error_free(&error);
- 		return;
- 	}
-@@ -792,6 +792,23 @@ static void opp_send(GDBusProxy *proxy, int argc, char *argv[])
- 						g_dbus_proxy_get_path(proxy));
- }
- 
-+static void opp_pull(GDBusProxy *proxy, int argc, char *argv[])
-+{
-+	if (argc < 2) {
-+		rl_printf("Missing file argument\n");
-+		return;
-+	}
-+
-+	if (g_dbus_proxy_method_call(proxy, "PullBusinessCard", send_setup,
-+			send_reply, g_strdup(argv[1]), g_free) == FALSE) {
-+		rl_printf("Failed to pull\n");
-+		return;
-+	}
-+
-+	rl_printf("Attempting to pull %s from %s\n", argv[1],
-+						g_dbus_proxy_get_path(proxy));
-+}
-+
- static void push_reply(DBusMessage *message, void *user_data)
- {
- 	DBusMessageIter iter;
-@@ -869,6 +886,22 @@ static void cmd_send(int argc, char *argv[])
- 	rl_printf("Command not supported\n");
- }
- 
-+static void cmd_pull(int argc, char *argv[])
-+{
-+	GDBusProxy *proxy;
-+
-+	if (!check_default_session())
-+		return;
-+
-+	proxy = find_opp(g_dbus_proxy_get_path(default_session));
-+	if (proxy) {
-+		opp_pull(proxy, argc, argv);
-+		return;
-+	}
-+
-+	rl_printf("Command not supported\n");
-+}
-+
- static void change_folder_reply(DBusMessage *message, void *user_data)
- {
- 	DBusError error;
-@@ -1979,6 +2012,8 @@ static const struct {
- 	{ "suspend",      "<transfer>", cmd_suspend, "Suspend transfer" },
- 	{ "resume",       "<transfer>", cmd_resume, "Resume transfer" },
- 	{ "send",         "<file>",   cmd_send, "Send file" },
-+	{ "pull",	  "<file>",   cmd_pull,
-+					"Pull Vobject & stores in file" },
- 	{ "cd",           "<path>",   cmd_cd, "Change current folder" },
- 	{ "ls",           "<options>", cmd_ls, "List current folder" },
- 	{ "cp",          "<source file> <destination file>",   cmd_cp,
+HFP is a bit special since BfA provides only part of the implementation and 
+rest is implemented in Android Framework. When HF device is connected SLC 
+creation must happen. Most likely your HF device is sending some AT commands 
+and you must response to those as per HFP specification. Only when all 
+required SLC AT commands are handled state will be set to 
+BTHF_STATE_SCL_CONNECTED. This is normally handled by Android Framework but if 
+you are using haltest you must handle those on your own.
+
+For details on how to setup SLC I recommend HFP specification lecture.
+
 -- 
-1.9.1
-
+BR
+Szymon Janc
