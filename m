@@ -1,59 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Veseli Veseljko <veseljko75@gmail.com>, Alex Gal <a.gal@miip.ca>,
-	Laurence Brown <linux-bluetooth@protazoa.com>,
-	Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 0/5] sixaxis: Improved support for DualShock 3 clones
-Date: Mon, 15 Jun 2015 20:28:25 +0200
-Message-Id: <1434392910-31648-1-git-send-email-szymon.janc@gmail.com>
+Message-ID: <557F1609.6050102@qca.qualcomm.com>
+Date: Mon, 15 Jun 2015 11:14:33 -0700
+From: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+MIME-Version: 1.0
+To: Kyle McMartin <kyle@infradead.org>
+CC: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] qca: add BT firmware files for QCA61x4 series Bluetooth
+References: <555D29D1.6090700@qca.qualcomm.com> <5564A29D.1030002@qca.qualcomm.com> <20150529004430.GE5093@merlin.infradead.org>
+In-Reply-To: <20150529004430.GE5093@merlin.infradead.org>
+Content-Type: text/plain; charset="windows-1252"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Kyle,
 
-This is improved version of sixaxis patches. Comparing to RFCv2 this
-doesn't regress with Navigation Controller and DS4.
+On 05/28/15 17:44, Kyle McMartin wrote:
+> On Tue, May 26, 2015 at 09:43:09AM -0700, Ben Young Tae Kim wrote:
+>> I'm not sure you received this patch for QCA ROME BT firmware files. Can you review this and merge into the linux-firmware repository if those are okay?
+>>
+> Sorry, I've been busy & travelling. I'll try to get around to
+> it before the weekend.
+>
+> regards, ---Kyle
 
-Sixaxis specific code needs to be left in input code for DS4 support.
+I've updated you latest firmware patch files today including some bug fixes. If you haven't merged this file; looks like not, please use today's patches and merge into your tree.
 
-If people report that this works for them I'll push those patches.
-
-
->From RFCv2 cover letter:
-Some DualShock3 clones (eg ShanWan) were reported to not provide valid SDP
-record required by HID profile. Due to this those failed to work with
-current BlueZ sixaxis code (ie no input device were created).
-
-This small serie is an attempt to extend DS3 support also with those
-misbehaving clones. Idea is that we can provide fixed SDP recrod for devices
-that use valid PID/VID and skip SDP search.
-
-In this version SDP is kept in sixaxis plugin and provided via
-btd_device_set_record instead of SDP search. Nice addition is that
-sixaxis specific code is no longer needed in input server.
-
-This makes code similar to how original Fedora sixaxis plugin worked
-as suggested in previous review round.
-
-I tested this with genuine DS3 and it seems to work OK. Testing with
-clones is stil required though.
-
-
-Szymon Janc (5):
-  sixaxis: Fix PID for Navigation Controller
-  core/device: Add support for setting SDP record
-  sixaxis: Provide DualShock 3 SDP record while adding new device
-  profiles/input: Remove not needed sixaxis checks
-  sixaxis: Fix multi-line comments style
-
- Makefile.plugins        |   1 +
- plugins/sixaxis.c       | 195 ++++++++++++++++++++++++++++++++++++++++++++++--
- profiles/input/server.c |   8 --
- src/device.c            |  31 ++++++++
- src/device.h            |   3 +
- 5 files changed, 224 insertions(+), 14 deletions(-)
-
--- 
-2.1.4
-
+Thanks
+-- Ben Kim
