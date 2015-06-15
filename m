@@ -1,52 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] BlueZ line discipline baud rate setting update
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1434387007-3666-2-git-send-email-ifaenson@broadcom.com>
-Date: Mon, 15 Jun 2015 23:40:46 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <3176FE9D-3C12-4448-B7FB-D876F9DE3911@holtmann.org>
-References: <1434387007-3666-1-git-send-email-ifaenson@broadcom.com> <1434387007-3666-2-git-send-email-ifaenson@broadcom.com>
-To: Ilya Faenson <ifaenson@broadcom.com>
+Message-ID: <6dd76c85325eecb245178246ff563563.squirrel@mungewell.org>
+In-Reply-To: <1690931.rDxa1ayEBf@athlon>
+References: <1434392910-31648-1-git-send-email-szymon.janc@gmail.com>
+    <1434392910-31648-2-git-send-email-szymon.janc@gmail.com>
+    <467bb868b4b5b8120da0818a969eb054.squirrel@mungewell.org>
+    <1690931.rDxa1ayEBf@athlon>
+Date: Mon, 15 Jun 2015 16:36:21 -0400
+Subject: Re: [PATCH 1/5] sixaxis: Fix PID for Navigation Controller
+From: simon@mungewell.org
+To: "Szymon Janc" <szymon.janc@gmail.com>
+Cc: simon@mungewell.org, linux-bluetooth@vger.kernel.org,
+	"Veseli Veseljko" <veseljko75@gmail.com>,
+	"Alex Gal" <a.gal@miip.ca>,
+	"Laurence Brown" <linux-bluetooth@protazoa.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ilya,
 
-> Bring the tty into a known 8 bits, 1 start bit, 1 stop bit,
-> hardware flow control state with a given baud rate.
-> 
-> Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
-> ---
-> drivers/bluetooth/hci_ldisc.c | 9 ++++++++-
-> 1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index ac87346..606cc5a 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -271,9 +271,16 @@ void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
-> 	struct tty_struct *tty = hu->tty;
-> 	struct ktermios ktermios;
-> 
-> +	/* Bring the UART into a known state with a given baud rate */
-> 	ktermios = tty->termios;
-> 	ktermios.c_cflag &= ~CBAUD;
-> -	ktermios.c_cflag |= BOTHER;
-> +	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR |
-> +			    IGNCR | ICRNL | IXON);
-> +	ktermios.c_oflag &= ~OPOST;
-> +	ktermios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-> +	ktermios.c_cflag &= ~(CSIZE | PARENB | CBAUD);
+>> I don't have a good way on initiating the pairing, instead used a
+>> hacked-up 'psmovepair' from PSMoveAPI guys. Followed by some hand
+>> editing
+>> of '/var/lib/bluetooth/<my-mac>/*' files.
+>
+> Sixaxis plugin should work for setting up Navigation.
 
-I just realize that we are clearing CBAUD twice here. I think the one above BOTHER should also be removed.
+You make the assumption that I'm on a recent version of Bluez ;-), which
+perhaps I should be... being on Xubuntu means that by default I'm at 4.101
+- with the occasional dip to something newer (breaks package manager
+horribly).
 
-> +	ktermios.c_cflag |= CS8;
-> +	ktermios.c_cflag |= CRTSCTS;
-> 	tty_termios_encode_baud_rate(&ktermios, speed, speed);
+I'll give a recent Bluez a go during the week.
 
-Regards
+> So, I'm not sure how to handle this. At least for me it looks like
+> Navigation
+> works just fine if setup as 0x0268 even if connects as 0x042f. The
+> opposite
+> doesn't work.
+>
+> Any thoughts?
 
-Marcel
+There's not really much difference in behaviour. For me the advantage of
+having 0x042f is that I can identify correctly and only enable 1-LED and
+no rumble. I also patch the HID descriptor so that unused/randomly
+changing Axis are masked.
+
+Simon
 
