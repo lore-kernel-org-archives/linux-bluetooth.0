@@ -1,87 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <2870599.ZBzDzverey@leonov>
-References: <CAKafyqq_RN9syQgA3o8z0Wx_DN8O83i4A2S5Ns8N4-SWNyE4Mg@mail.gmail.com>
-	<4720167.a4B9p9nNG6@leonov>
-	<CAKafyqqT54fvu_fFMGKKmngwnt7RPgC9gSR6rU3TqY_Zavqr9A@mail.gmail.com>
-	<2870599.ZBzDzverey@leonov>
-Date: Mon, 15 Jun 2015 20:29:25 +0530
-Message-ID: <CAKafyqoqW9H1d0FBGFJGsbwSqAVpNAAYG8pHPEAUTLOXYRWwnw@mail.gmail.com>
-Subject: Re: bluez/android
-From: Prabhu Chawandi <foss.chaws@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: Build error -in -next due to 'Bluetooth: hci_uart: Support operational speed during setup'
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <E0D3336E15B58B4294723AC879BA5E94262266@IRVEXCHMB15.corp.ad.broadcom.com>
+Date: Mon, 15 Jun 2015 16:43:00 +0200
+Cc: Guenter Roeck <linux@roeck-us.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Frederic Danis <frederic.danis@linux.intel.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>
+Message-Id: <7F15059F-B180-4722-8167-864C4A24CE9B@holtmann.org>
+References: <557ED81D.7090908@roeck-us.net> <7CF3D545-DAE4-4510-9726-5D40740DDC5D@holtmann.org> <557EE045.2090503@roeck-us.net> <E0D3336E15B58B4294723AC879BA5E94262266@IRVEXCHMB15.corp.ad.broadcom.com>
+To: Ilya Faenson <ifaenson@broadcom.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Ilya,
 
- Sorry for posting with ML, my mistake.
+>>> alpha:allmodconfig fails to build in -next with
+>>> 
+>>> drivers/bluetooth/hci_ldisc.c: In function 'hci_uart_set_baudrate':
+>>> drivers/bluetooth/hci_ldisc.c:276:22: error: 'BOTHER' undeclared
+>>> 
+>>> BOTHER is not defined for all architectures and otherwise only
+>>> used with '#ifdef BOTHER'.
+>> 
+>> thanks for the report. Is this something that should be #ifdef at the using side or maybe just fixed for the other architectures.
+>> 
+> 
+> So far it has been fixed with #ifdef, and this is the first code which
+> uses it outside drivers/tty. So my first tendency would be to fix it
+> on the user side.
+> 
+> However, looking into it, I think only alpha and avr32 are affected.
+> Let me submit patches against those and see where it goes.
+> 
+> IF: The BOTHER flag should not be involved in setting the baud rate at all. I've published a patch last week that implements the hci_uart_set_baudrate properly (in my opinion).
 
-Thanks for the information.  Again, I was trying to find where the
-unknown AT Commands are coming;
-I tried to catch @ static void at_cmd_unknown(const char *command,
-void *user_data);
-But, no luck, no AT commands are caught there.  If you can let me
-know, where all the AT commands will be handled would be of great help
-( unknown - so that I can handle then)
+can you extract this and just submit that version. We might just take that into hci_ldisc.c right away.
 
-ManYThanks
-Prabhu
+However fixing the #ifdef around BOTHER is useful as well since they look unneeded. At least I can not see a reason why a platform would not define them.
 
-On Mon, Jun 15, 2015 at 7:45 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Prabhu,
->
-> On Monday 15 of June 2015 19:11:32 Prabhu Chawandi wrote:
->> Hi Szymon,
->>
->>    Thanks for your reply. I was debugging further, I noticed that
->> while connecting at service level, there is CIND callback
->> (cind_cmd_cb) is coming which is for Call Indicator AT CMD.
->> I am curious to know, how it is happening, which can help me to
->> understand and  try for other call backs.
->
-> Please don't top-post on ML.
->
-> As for your question: HFP HAL has methods that should be called as a reply for
-> some callbacks ie for cind that would be cind_response. You can check
-> "android/hardware/bt_hf.h".
->
-> Yet, Android HAL is rather lowlevel interface not recommended for direct use.
-> If for whatever reason you are stuck with it I suggest checking Android
-> Framework source code as this (and header comments) is the only documentation
-> you get for it.
->
->> On Mon, Jun 15, 2015 at 5:42 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
->> > Hi Prabhu,
->> >
->> > On Monday 15 of June 2015 17:06:41 Prabhu Chawandi wrote:
->> >>  This is with respect to HFP profile.
->> >>
->> >> While I pressed the Button on my HF device, service level connection
->> >> is happening - BTHF_STATE_CONNECTED is coming.
->> >>
->> >> But next callbacks are not coming on pressing of buttons - like voice
->> >> recognition.
->> >>
->> >> Can any body help me
->> >
->> > HFP is a bit special since BfA provides only part of the implementation
->> > and
->> > rest is implemented in Android Framework. When HF device is connected SLC
->> > creation must happen. Most likely your HF device is sending some AT
->> > commands and you must response to those as per HFP specification. Only
->> > when all required SLC AT commands are handled state will be set to
->> > BTHF_STATE_SCL_CONNECTED. This is normally handled by Android Framework
->> > but if you are using haltest you must handle those on your own.
->> >
->> > For details on how to setup SLC I recommend HFP specification lecture.
->> >
->> > --
->> > BR
->> > Szymon Janc
->
-> --
-> BR
-> Szymon Janc
+Regards
+
+Marcel
+
