@@ -1,68 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Prabhu Chawandi <foss.chaws@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: bluez/android
-Date: Mon, 15 Jun 2015 16:15:50 +0200
-Message-ID: <2870599.ZBzDzverey@leonov>
-In-Reply-To: <CAKafyqqT54fvu_fFMGKKmngwnt7RPgC9gSR6rU3TqY_Zavqr9A@mail.gmail.com>
-References: <CAKafyqq_RN9syQgA3o8z0Wx_DN8O83i4A2S5Ns8N4-SWNyE4Mg@mail.gmail.com> <4720167.a4B9p9nNG6@leonov> <CAKafyqqT54fvu_fFMGKKmngwnt7RPgC9gSR6rU3TqY_Zavqr9A@mail.gmail.com>
+Message-ID: <557EDA1B.3050700@albus.fr>
+Date: Mon, 15 Jun 2015 15:58:51 +0200
+From: =?UTF-8?B?SsOpcsOpbWllIFNjaGVlcg==?= <j.scheer@albus.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+To: Boris Passerat de La Chapelle <boris.passerat@davidson.fr>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Error on executing compiled bluetoothd with plugins
+References: <557AFA18.1060305@albus.fr> <028001d0a527$d798fe60$86cafb20$@davidson.fr> <557E96FC.4080202@albus.fr> <557E998C.6080300@albus.fr>
+In-Reply-To: <557E998C.6080300@albus.fr>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prabhu,
+I finally found the answer to my problem : it is due to the fact that 
+most of the plugins and profiles uses src/attrib-server.h, that is 
+deprecated, instead of the new src/gatt-database.c. So all plugins that 
+still use attrib-server.h don't function anymore.
 
-On Monday 15 of June 2015 19:11:32 Prabhu Chawandi wrote:
-> Hi Szymon,
-> 
->    Thanks for your reply. I was debugging further, I noticed that
-> while connecting at service level, there is CIND callback
-> (cind_cmd_cb) is coming which is for Call Indicator AT CMD.
-> I am curious to know, how it is happening, which can help me to
-> understand and  try for other call backs.
+But there is one tool that can be used as an example : 
+tools/btgatt-server.c.
 
-Please don't top-post on ML.
+Jérémie
 
-As for your question: HFP HAL has methods that should be called as a reply for 
-some callbacks ie for cind that would be cind_response. You can check 
-"android/hardware/bt_hf.h". 
+Le 15/06/2015 11:23, Jérémie Scheer a écrit :
+>
+>
+> Le 15/06/2015 11:12, Jérémie Scheer a écrit :
+>> Hi Boris,
+>>
+>> Le 12/06/2015 17:52, Boris Passerat de La Chapelle a écrit :
+>>> Hi Jérémie
+>>>
+>>> -----Message d'origine-----
+>>> De : linux-bluetooth-owner@vger.kernel.org 
+>>> [mailto:linux-bluetooth-owner@vger.kernel.org] De la part de Jérémie 
+>>> Scheer
+>>> Envoyé : vendredi 12 juin 2015 17:26
+>>> À : linux-bluetooth@vger.kernel.org
+>>> Objet : Error on executing compiled >bluetoothd with plugins
+>>>
+>>>> Hello,
+>>>>
+>>>> I downloaded Bluez 5.30 sources and compiled it against a Debian 
+>>>> Jessie (Linux 3.16).
+>>>>
+>>>> When I try to execute it, I receive the following errors :
+>>>> bluetoothd[819]: Bluetooth daemon 5.30
+>>>> bluetoothd[819]: Starting SDP server
+>>>> bluetoothd[819]: Ignoring (cli) hostname
+>>>> bluetoothd[819]: Ignoring (cli) wiimote
+>>>> bluetoothd[819]: Ignoring (cli) autopair
+>>>> bluetoothd[819]: Ignoring (cli) policy
+>>>> bluetoothd[819]: Ignoring (cli) gatt_example
+>>>> bluetoothd[819]: Ignoring (cli) neard
+>>>> bluetoothd[819]: Ignoring (cli) sap
+>>>> bluetoothd[819]: Ignoring (cli) a2dp
+>>>> bluetoothd[819]: Ignoring (cli) avrcp
+>>>> bluetoothd[819]: Ignoring (cli) network
+>>>> bluetoothd[819]: Ignoring (cli) input
+>>>> bluetoothd[819]: Ignoring (cli) hog
+>>>> bluetoothd[819]: Ignoring (cli) health
+>>>> bluetoothd[819]: Ignoring (cli) gap
+>>>> bluetoothd[819]: Ignoring (cli) scanparam
+>>>> bluetoothd[819]: Ignoring (cli) deviceinfo
+>>>> bluetoothd[819]: Ignoring (cli) alert
+>>>> bluetoothd[819]: Ignoring (cli) proximity
+>>>> bluetoothd[819]: Ignoring (cli) thermometer
+>>>> bluetoothd[819]: Ignoring (cli) heartrate
+>>>> bluetoothd[819]: Ignoring (cli) cyclingspeed
+>>>> bluetoothd[819]: Ignoring (cli) external_dummy
+>>>> bluetoothd[819]: Bluetooth management interface 1.6 initialized
+>>>> bluetoothd[819]: Failed to obtain handles for "Service Changed"
+>>>> characteristic
+>>>> bluetoothd[819]: Failed to register org.bluez.LEAdvertisingManager1
+>>>> bluetoothd[819]: Failed to register LEAdvertisingManager1 interface 
+>>>> for adapter
+>>>> bluetoothd[819]: Not enough free handles to register service
+>>>> bluetoothd[819]: Current Time Service could not be registered
+>>>> bluetoothd[819]: gatt-time-server: Input/output error (5)
+>>>> bluetoothd[819]: hci0 Load Connection Parameters failed: Unknown 
+>>>> Command
+>>>> (0x01)
+>>>> So when I reset my Bluetooth device hci0 and try to advertise LE, I 
+>>>> can't see nothing on an iPad for instance.
+>>>> When compiling Bluez, I configured it with this command :
+>>>> ./configure CFLAGS="$CFLAGS --Wno-sign-compare" --disable-udev 
+>>>> --prefix=$PWD --enable-experimental ->-enable-maintainer-mode
+>>>> Is there something I missed ?
+>>>> Jérémie
+>>> I had the same issue after activating all plugins. You can disable 
+>>> plugin started with bluetoothd with the option --noplugin= hostname, 
+>>> wiimote... and then it should work !
+>> In fact I would like to activate time plugin or another one to be 
+>> able to create my own peripheral from an existing plugin.
+>>
+>> But now I've another problem : there are always the same error 
+>> messages but when I advertise Bluetooth LE with "hciconfig hci0 
+>> leadv", and after the client is connected and has discover services, 
+>> bluetoothd tells me that :
+>> Can't store info for private addressed device 
+>> /org/bluez/hci0/dev_59_57_7C_B6_E5_5F
+>> Can't store services for private addressed device 
+>> /org/bluez/hci0/dev_59_57_7C_B6_E5_5F
+>> Unable to register GATT service with handle 0x0001 for device 
+>> 59_57_7C_B6_E5_5F
+>> Unable to register GATT service with handle 0x0006 for device 
+>> 59_57_7C_B6_E5_5F
+>> Unable to register GATT service with handle 0x000a for device 
+>> 59_57_7C_B6_E5_5F
+>> ....
+> In fact it happens just after the client has been connected to my 
+> peripheral, before he even tries to discover services. So when he 
+> tries to discover services, there is nothing for him to discover.
+>>
+>> So the client doesn't see any services or characteristics.
+>>
+>> I tried to run bluetoothd with these commands :
+>> ./src/bluetoothd --plugin=time -n
+>> ./src/bluetoothd -n
+>>>
+>>> Boris
+>>>
+>>> -- 
+>>> To unsubscribe from this list: send the line "unsubscribe 
+>>> linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at http://vger.kernel.org/majordomo-info.html
+>>>
+>>
+>
+> -- 
+> To unsubscribe from this list: send the line "unsubscribe 
+> linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-Yet, Android HAL is rather lowlevel interface not recommended for direct use.
-If for whatever reason you are stuck with it I suggest checking Android 
-Framework source code as this (and header comments) is the only documentation 
-you get for it.
-
-> On Mon, Jun 15, 2015 at 5:42 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> > Hi Prabhu,
-> > 
-> > On Monday 15 of June 2015 17:06:41 Prabhu Chawandi wrote:
-> >>  This is with respect to HFP profile.
-> >> 
-> >> While I pressed the Button on my HF device, service level connection
-> >> is happening - BTHF_STATE_CONNECTED is coming.
-> >> 
-> >> But next callbacks are not coming on pressing of buttons - like voice
-> >> recognition.
-> >> 
-> >> Can any body help me
-> > 
-> > HFP is a bit special since BfA provides only part of the implementation
-> > and
-> > rest is implemented in Android Framework. When HF device is connected SLC
-> > creation must happen. Most likely your HF device is sending some AT
-> > commands and you must response to those as per HFP specification. Only
-> > when all required SLC AT commands are handled state will be set to
-> > BTHF_STATE_SCL_CONNECTED. This is normally handled by Android Framework
-> > but if you are using haltest you must handle those on your own.
-> > 
-> > For details on how to setup SLC I recommend HFP specification lecture.
-> > 
-> > --
-> > BR
-> > Szymon Janc
-
--- 
-BR
-Szymon Janc
