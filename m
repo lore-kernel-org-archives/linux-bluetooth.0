@@ -1,47 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <2005698380.1007611434358558988.JavaMail.weblogic@epmlwas03a>
-References: <2005698380.1007611434358558988.JavaMail.weblogic@epmlwas03a>
-Date: Mon, 15 Jun 2015 14:42:26 +0300
-Message-ID: <CABBYNZKWtMh2WDGD-Y-Od_FFFiQp1ywyW_9Z-sUv2AxuXhEuwA@mail.gmail.com>
-Subject: Re: Re: Re: Re: Fwd: Fwd: [PATCH 1/1] shared/gatt-client: Fix the
- "Find Information req" error
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: nagaraj.dr@samsung.com
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 15 Jun 2015 17:06:41 +0530
+Message-ID: <CAKafyqq_RN9syQgA3o8z0Wx_DN8O83i4A2S5Ns8N4-SWNyE4Mg@mail.gmail.com>
+Subject: bluez/android
+From: Prabhu Chawandi <foss.chaws@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nagaraj,
-
-On Mon, Jun 15, 2015 at 11:55 AM, Nagaraj D R <nagaraj.dr@samsung.com> wrote:
-> Hello Luiz,
->
->>On Thu, Jun 11, 2015 at 1:23 PM, Nagaraj D R wrote:
->>> ++correction
->>> Descriptors are searched between Characteristic value declaration and characteristic definition end handle
->
->>No Top posting on this mailing list please.
->>
->>> Hello Luiz,
->>> The problem that I was trying to address is for the characteristic attribute at 0Xfffe and characteristic value declaration at oxffff.
->>> This is a valid scenario. Characteristic need to have a characteristic value declaration but need not have characteristic descriptors.
->>>
->>> Since present design search the descriptors b/w the characteristic value declaration and service end handle,
->>> if service end handle and characteristic value declaration end handle are same (i.e 0xffff in a particular case)
->>> then descriptor search handle will be initialized to 0X000 (i.e by incrementing characteristic value handle (0xffff) )
->>> 0x0000 handle is reserved handle + intention of searching descriptor will not be achieved.
->
->>Sound like a different problem than I thought, anyway it is valid so
->>could you please add this explanation to the patch description and
->>perhaps a comment to the code so we have it crystal clear why it is
->>necessary.
->
-> I have raised v2 with the changes you suggested, please check it.
-
-Pushed, thanks.
+Hi,
 
 
--- 
-Luiz Augusto von Dentz
+ This is with respect to HFP profile.
+
+While I pressed the Button on my HF device, service level connection
+is happening - BTHF_STATE_CONNECTED is coming.
+
+But next callbacks are not coming on pressing of buttons - like voice
+recognition.
+
+Can any body help me
+ManyThanks,
+Prabhu
