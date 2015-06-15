@@ -1,167 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <557E9C39.7020107@linux.intel.com>
-Date: Mon, 15 Jun 2015 11:34:49 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
+Message-ID: <557E998C.6080300@albus.fr>
+Date: Mon, 15 Jun 2015 11:23:24 +0200
+From: =?UTF-8?B?SsOpcsOpbWllIFNjaGVlcg==?= <j.scheer@albus.fr>
 MIME-Version: 1.0
-To: Ilya Faenson <ifaenson@broadcom.com>,
- Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- Arend Van Spriel <arend@broadcom.com>
-Subject: Re: [PATCH v2 5/5] BlueZ Broadcom UART Protocol
-References: <1433966720-17482-1-git-send-email-ifaenson@broadcom.com> <1433966720-17482-6-git-send-email-ifaenson@broadcom.com> <10D46DDD-5B79-4D9C-92E8-0440A66CB45C@holtmann.org> <E0D3336E15B58B4294723AC879BA5E9426163D@IRVEXCHMB15.corp.ad.broadcom.com> <61600B60-2B7F-43E8-86AE-B6A31D54FE10@holtmann.org> <E0D3336E15B58B4294723AC879BA5E94261E6A@IRVEXCHMB15.corp.ad.broadcom.com>
-In-Reply-To: <E0D3336E15B58B4294723AC879BA5E94261E6A@IRVEXCHMB15.corp.ad.broadcom.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+To: Boris Passerat de La Chapelle <boris.passerat@davidson.fr>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Error on executing compiled bluetoothd with plugins
+References: <557AFA18.1060305@albus.fr> <028001d0a527$d798fe60$86cafb20$@davidson.fr> <557E96FC.4080202@albus.fr>
+In-Reply-To: <557E96FC.4080202@albus.fr>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel and Ilya,
 
-On 13/06/2015 16:10, Ilya Faenson wrote:
-> Hi Marcel,
->
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> Sent: Saturday, June 13, 2015 3:54 AM
-> To: Ilya Faenson
-> Cc: linux-bluetooth@vger.kernel.org; Arend Van Spriel
-> Subject: Re: [PATCH v2 5/5] BlueZ Broadcom UART Protocol
->
-> Hi Ilya,
->
-> >> Merge Broadcom protocol with the existing implementation, providing
-> >> for UART setup, firmware download and power management.
-> >>
-> >> Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
-> >> ---
-> >> drivers/bluetooth/hci_bcm.c | 400 
-> ++++++++++++++++++++++++++++++++++++++++++--
-> >> 1 file changed, 384 insertions(+), 16 deletions(-)
-> >>
-> >> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> >> index e4d66b6..5ff35b7 100644
-> >> --- a/drivers/bluetooth/hci_bcm.c
-> >> +++ b/drivers/bluetooth/hci_bcm.c
-> >> @@ -3,6 +3,7 @@
-> >> *  Bluetooth HCI UART driver for Broadcom devices
-> >> *
-> >> *  Copyright (C) 2015  Intel Corporation
-> >> + *  Copyright (C) 2015  Broadcom Corporation
-> >> *
-> >> *
-> >> *  This program is free software; you can redistribute it and/or modify
-> >> @@ -24,6 +25,7 @@
-> >> #include <linux/kernel.h>
-> >> #include <linux/errno.h>
-> >> #include <linux/skbuff.h>
-> >> +#include <linux/tty.h>
-> >> #include <linux/firmware.h>
-> >>
-> >> #include <net/bluetooth/bluetooth.h>
-> >> @@ -31,12 +33,170 @@
-> >>
-> >> #include "btbcm.h"
-> >> #include "hci_uart.h"
-> >> +#include "btbcm_uart.h"
-> >>
-> >> struct bcm_data {
-> >>     struct sk_buff *rx_skb;
-> >>     struct sk_buff_head txq;
-> >> +    struct hci_uart *hu;
-> >> +
-> >> +    bool is_suspended; /* suspend/resume flag */
-> >> +
-> >> +    struct timer_list timer; /* idle timer */
-> >
-> > I prefer not to use timers if we can use delayed work instead.
-> >
-> > IF: Could you clarify how you want me to use the delayed work for 
-> the frequently refreshed 5 second timer? It would essentially be an 
-> extra thread running most of the time with us having to synchronize it 
-> with the device stops etc. Clear invite for race conditions in my opinion.
->
-> refreshed means re-armed? I wonder how delayed work is different then? 
-> Maybe I need to understand a bit more than first.
->
-> IF: Every time a new packet comes from either direction, the idle 
-> timer needs to be re-armed to fire in 5 seconds regardless of the 
-> current state of this timer. Hope that clarifies the logic.
->
-> >
-> >> +
-> >> +    struct btbcm_uart_parameters pars; /* device parameters */
-> >
-> > btbcm_uart_params and params please. No pars and not point in 
-> spelling out parameters in a struct name.
-> >
-> > IF: Okay.
-> >
-> >> +    void *device_context; /* ACPI/DT device context */
-> >> };
-> >>
-> >> +/* Suspend/resume synchronization mutex */
-> >> +static DEFINE_MUTEX(plock);
-> >
-> > Please use a more descriptive name than plock. That is too generic 
-> for a global variable.
-> >
-> > IF: Okay.
-> >
-> >> +
-> >> +/* Forward reference */
-> >> +static struct hci_uart_proto bcm_proto;
-> >
-> > Why do we need this? I am generally not in favor of having forward 
-> reference until really really needed.
-> >
-> > IF: That is needed to set the oper-speed in this structure once the 
-> device parameters are available. Intel patch has hard-coded it to a 
-> single value for all Broadcom devices which is not acceptable.
->
-> So for Broadcom devices, I think in the static table, no oper-speed 
-> should be set. That means it has to come by other means. Either ACPI 
-> or DT. But as I mentioned in the other part, that table has to stay const.
->
-> IF: The oper_speed comes from DT in my current code already. The BlueZ 
-> line discipline currently acts on the oper_speed for all 
-> manufacturers. Do you want an exception for Broadcom there? If not, 
-> the oper-speed changes should apply to everybody.
 
-<snip>
-> >> -static const struct hci_uart_proto bcm_proto = {
-> >> +/* This structure may not be const as speed may change at runtime */
-> >
-> > No. This struct is const. These are the value that a protocol driver 
-> sets.
-> >
-> > If values are dynamic and change based on DT, then left them zero 
-> here and provide a method for overwriting them internally in hci_uart. 
-> Please do not hack this in. There are simple UART drivers that we want 
-> to enable in a really simple way.
-> >
-> > IF: As I said above, I've inherited the need to change the speed(s) 
-> from the recent Intel patches. Will try fixing that.
+Le 15/06/2015 11:12, Jérémie Scheer a écrit :
+> Hi Boris,
 >
-> I get where you are coming from. And for Broadcom the table will not 
-> contain an oper-speed. That will come from ACPI or DT. So you action 
-> should be to remove it here and introduce a variable in bcm_data that 
-> has it and that can be used instead. I have not figured out all the 
-> details, but that is the general idea. I leave the details up to you.
+> Le 12/06/2015 17:52, Boris Passerat de La Chapelle a écrit :
+>> Hi Jérémie
+>>
+>> -----Message d'origine-----
+>> De : linux-bluetooth-owner@vger.kernel.org 
+>> [mailto:linux-bluetooth-owner@vger.kernel.org] De la part de Jérémie 
+>> Scheer
+>> Envoyé : vendredi 12 juin 2015 17:26
+>> À : linux-bluetooth@vger.kernel.org
+>> Objet : Error on executing compiled >bluetoothd with plugins
+>>
+>>> Hello,
+>>>
+>>> I downloaded Bluez 5.30 sources and compiled it against a Debian 
+>>> Jessie (Linux 3.16).
+>>>
+>>> When I try to execute it, I receive the following errors :
+>>> bluetoothd[819]: Bluetooth daemon 5.30
+>>> bluetoothd[819]: Starting SDP server
+>>> bluetoothd[819]: Ignoring (cli) hostname
+>>> bluetoothd[819]: Ignoring (cli) wiimote
+>>> bluetoothd[819]: Ignoring (cli) autopair
+>>> bluetoothd[819]: Ignoring (cli) policy
+>>> bluetoothd[819]: Ignoring (cli) gatt_example
+>>> bluetoothd[819]: Ignoring (cli) neard
+>>> bluetoothd[819]: Ignoring (cli) sap
+>>> bluetoothd[819]: Ignoring (cli) a2dp
+>>> bluetoothd[819]: Ignoring (cli) avrcp
+>>> bluetoothd[819]: Ignoring (cli) network
+>>> bluetoothd[819]: Ignoring (cli) input
+>>> bluetoothd[819]: Ignoring (cli) hog
+>>> bluetoothd[819]: Ignoring (cli) health
+>>> bluetoothd[819]: Ignoring (cli) gap
+>>> bluetoothd[819]: Ignoring (cli) scanparam
+>>> bluetoothd[819]: Ignoring (cli) deviceinfo
+>>> bluetoothd[819]: Ignoring (cli) alert
+>>> bluetoothd[819]: Ignoring (cli) proximity
+>>> bluetoothd[819]: Ignoring (cli) thermometer
+>>> bluetoothd[819]: Ignoring (cli) heartrate
+>>> bluetoothd[819]: Ignoring (cli) cyclingspeed
+>>> bluetoothd[819]: Ignoring (cli) external_dummy
+>>> bluetoothd[819]: Bluetooth management interface 1.6 initialized
+>>> bluetoothd[819]: Failed to obtain handles for "Service Changed"
+>>> characteristic
+>>> bluetoothd[819]: Failed to register org.bluez.LEAdvertisingManager1
+>>> bluetoothd[819]: Failed to register LEAdvertisingManager1 interface 
+>>> for adapter
+>>> bluetoothd[819]: Not enough free handles to register service
+>>> bluetoothd[819]: Current Time Service could not be registered
+>>> bluetoothd[819]: gatt-time-server: Input/output error (5)
+>>> bluetoothd[819]: hci0 Load Connection Parameters failed: Unknown 
+>>> Command
+>>> (0x01)
+>>> So when I reset my Bluetooth device hci0 and try to advertise LE, I 
+>>> can't see nothing on an iPad for instance.
+>>> When compiling Bluez, I configured it with this command :
+>>> ./configure CFLAGS="$CFLAGS --Wno-sign-compare" --disable-udev 
+>>> --prefix=$PWD --enable-experimental ->-enable-maintainer-mode
+>>> Is there something I missed ?
+>>> Jérémie
+>> I had the same issue after activating all plugins. You can disable 
+>> plugin started with bluetoothd with the option --noplugin= hostname, 
+>> wiimote... and then it should work !
+> In fact I would like to activate time plugin or another one to be able 
+> to create my own peripheral from an existing plugin.
 >
-> IF: As I said above, this is slightly more complicated as the 
-> oper_speed is used by the BlueZ line discipline for all manufacturers. 
-> And any manufacturer with the oper-speed changeable among the devices 
-> will be affected. Since the oper-speed used is largely defined by the 
-> UART rather than BT device capabilities, I'm afraid it should be 
-> configurable and not reside in a const structure for all.
+> But now I've another problem : there are always the same error 
+> messages but when I advertise Bluetooth LE with "hciconfig hci0 
+> leadv", and after the client is connected and has discover services, 
+> bluetoothd tells me that :
+> Can't store info for private addressed device 
+> /org/bluez/hci0/dev_59_57_7C_B6_E5_5F
+> Can't store services for private addressed device 
+> /org/bluez/hci0/dev_59_57_7C_B6_E5_5F
+> Unable to register GATT service with handle 0x0001 for device 
+> 59_57_7C_B6_E5_5F
+> Unable to register GATT service with handle 0x0006 for device 
+> 59_57_7C_B6_E5_5F
+> Unable to register GATT service with handle 0x000a for device 
+> 59_57_7C_B6_E5_5F
+> ....
+In fact it happens just after the client has been connected to my 
+peripheral, before he even tries to discover services. So when he tries 
+to discover services, there is nothing for him to discover.
+>
+> So the client doesn't see any services or characteristics.
+>
+> I tried to run bluetoothd with these commands :
+> ./src/bluetoothd --plugin=time -n
+> ./src/bluetoothd -n
+>>
+>> Boris
+>>
+>> -- 
+>> To unsubscribe from this list: send the line "unsubscribe 
+>> linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at http://vger.kernel.org/majordomo-info.html
+>>
+>
 
-FYI, the oper_speed is not available in ACPI table of T100.
-Depending on device, even the init_speed may not be available.
-
-So, I agree with Ilya these values should be configurable.
-
-Regards
-
-Fred
-
--- 
-Frederic Danis Open Source Technology Center
-frederic.danis@intel.com Intel Corporation
