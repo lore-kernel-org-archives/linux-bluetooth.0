@@ -1,167 +1,154 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [BlueZ v8 01/15] doc/mgmt-api: multi-adv implementation details
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1434166979-21824-2-git-send-email-fgrandel@gmail.com>
-Date: Mon, 15 Jun 2015 13:33:51 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D6DBB2BF-8FB6-4BF0-83C4-2B4B8B6C0BE3@holtmann.org>
-References: <1434166979-21824-1-git-send-email-fgrandel@gmail.com> <1432603329-12846-1-git-send-email-fgrandel@gmail.com> <1434166979-21824-2-git-send-email-fgrandel@gmail.com>
-To: Florian Grandel <fgrandel@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <002101d0a501$df117d00$9d347700$@samsung.com>
+References: <1433918216-19017-1-git-send-email-gowtham.ab@samsung.com>
+	<002101d0a501$df117d00$9d347700$@samsung.com>
+Date: Mon, 15 Jun 2015 13:34:09 +0300
+Message-ID: <CABBYNZ+sN_io5bx_zOW-1wY61OU6=Wr5CgFxxSQnj-=VV6iROw@mail.gmail.com>
+Subject: Re: [PATCH ] tools/obexctl: Add support for pull Vobjects
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Floran,
+Hi Gowtham,
 
-> A few additional decisions have been made while implementing the
-> multi-advertising feature where the mgmt api spec was leaving room for
-> interpretation. These changes are being documented in this patch.
-> ---
-> doc/mgmt-api.txt | 66 +++++++++++++++++++++++++++++++++++++++++++++-----------
-> 1 file changed, 54 insertions(+), 12 deletions(-)
-> 
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 4b97aad..0ac8267 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -305,6 +305,14 @@ Set Powered Command
-> 	switching the controller off will expire this timeout and
-> 	disable discoverable.
-> 
-> +	Settings programmed via Set Advertising and Add/Remove
-> +	Advertising while the controller was powered off will be activated
-> +	when powering the controller on.
-> +
-> +	Switching the controller off will permanently cancel and remove
-> +	all configured advertising instances, i.e. advertising instances
-> +	are not being remembered across power cycles.
-> +
+On Fri, Jun 12, 2015 at 2:20 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Ping.
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Gowtham Anandha Babu
+>> Sent: Wednesday, June 10, 2015 12:07 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: bharat.panda@samsung.com; Gowtham Anandha Babu
+>> Subject: [PATCH ] tools/obexctl: Add support for pull Vobjects
+>>
+>> PullBusinessCard from remote push server.
+>>
+>> [obex]# connect 00:1B:DC:07:33:4E 00001105-0000-1000-8000-00805f9b34fb
+>> Attempting to connect to 00:1B:DC:07:33:4E [NEW] Session
+>> /org/bluez/obex/client/session0 [default] [NEW] ObjectPush
+>> /org/bluez/obex/client/session0 Connection successful [00:1B:DC:07:33:4E]#
+>> pull /home/vcard.vcf Attempting to pull /home/vcard.vcf from
+>> /org/bluez/obex/client/session0 [NEW] Transfer
+>> /org/bluez/obex/client/session0/transfer0
+>> Transfer /org/bluez/obex/client/session0/transfer0
+>>       Status: queued
+>>       Size: 0
+>>       Filename: /home/vcard.vcf
+>>       Session: /org/bluez/obex/client/session0 [CHG] Transfer
+>> /org/bluez/obex/client/session0/transfer0 Status: complete [DEL] Transfer
+>> /org/bluez/obex/client/session0/transfer0
+>> [DEL] Session /org/bluez/obex/client/session0 [default] [DEL] ObjectPush
+>> /org/bluez/obex/client/session0
+>> ---
+>>  tools/obexctl.c | 36 +++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 35 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tools/obexctl.c b/tools/obexctl.c index 4faff6b..79c0821
+> 100644
+>> --- a/tools/obexctl.c
+>> +++ b/tools/obexctl.c
+>> @@ -758,7 +758,7 @@ static void send_reply(DBusMessage *message, void
+>> *user_data)
+>>       dbus_error_init(&error);
+>>
+>>       if (dbus_set_error_from_message(&error, message) == TRUE) {
+>> -             rl_printf("Failed to send: %s\n", error.name);
+>> +             rl_printf("Failed to send/pull: %s\n", error.name);
+>>               dbus_error_free(&error);
+>>               return;
+>>       }
+>> @@ -792,6 +792,23 @@ static void opp_send(GDBusProxy *proxy, int argc,
+>> char *argv[])
+>>
+>>       g_dbus_proxy_get_path(proxy));
+>>  }
+>>
+>> +static void opp_pull(GDBusProxy *proxy, int argc, char *argv[]) {
+>> +     if (argc < 2) {
+>> +             rl_printf("Missing file argument\n");
+>> +             return;
+>> +     }
+>> +
+>> +     if (g_dbus_proxy_method_call(proxy, "PullBusinessCard",
+>> send_setup, send_reply,
+>> +                                     g_strdup(argv[1]), g_free) == FALSE)
+>> {
+>> +             rl_printf("Failed to pull\n");
+>> +             return;
+>> +     }
+>> +
+>> +     rl_printf("Attempting to pull %s from %s\n", argv[1],
+>> +
+>>       g_dbus_proxy_get_path(proxy));
+>> +}
+>> +
+>>  static void push_reply(DBusMessage *message, void *user_data)  {
+>>       DBusMessageIter iter;
+>> @@ -869,6 +886,22 @@ static void cmd_send(int argc, char *argv[])
+>>       rl_printf("Command not supported\n");
+>>  }
+>>
+>> +static void cmd_pull(int argc, char *argv[]) {
+>> +     GDBusProxy *proxy;
+>> +
+>> +     if (!check_default_session())
+>> +             return;
+>> +
+>> +     proxy = find_opp(g_dbus_proxy_get_path(default_session));
+>> +     if (proxy) {
+>> +             opp_pull(proxy, argc, argv);
+>> +             return;
+>> +     }
+>> +
+>> +     rl_printf("Command not supported\n");
+>> +}
+>> +
+>>  static void change_folder_reply(DBusMessage *message, void *user_data)
+>> {
+>>       DBusError error;
+>> @@ -1979,6 +2012,7 @@ static const struct {
+>>       { "suspend",      "<transfer>", cmd_suspend, "Suspend transfer" },
+>>       { "resume",       "<transfer>", cmd_resume, "Resume transfer" },
+>>       { "send",         "<file>",   cmd_send, "Send file" },
+>> +     { "pull",         "<file>",   cmd_pull, "Pull Vobject & store in
+> file" },
+>>       { "cd",           "<path>",   cmd_cd, "Change current folder" },
+>>       { "ls",           "<options>", cmd_ls, "List current folder" },
+>>       { "cp",          "<source file> <destination file>",   cmd_cp,
+>> --
+>> 1.9.1
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+>> the body of a message to majordomo@vger.kernel.org More majordomo
+>> info at  http://vger.kernel.org/majordomo-info.html
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-actually only the ones with a duration will be cancelled. The ones not having a duration should survive a power cycle. That is how we have done it currently and that is also how discoverable and limited discoverable works.
+Applying: tools/obexctl: Add support for pull Vobjects
+WARNING:LONG_LINE: line over 80 characters
+#25: FILE: tools/obexctl.c:802:
++ if (g_dbus_proxy_method_call(proxy, "PullBusinessCard", send_setup,
+send_reply,
 
-> 	This command generates a Command Complete event on success or
-> 	a Command Status event on failure.
-> 
-> @@ -585,6 +593,10 @@ Set Low Energy Command
-> 	In case the kernel subsystem does not support Low Energy or the
-> 	controller does not either, the command will fail regardless.
-> 
-> +	Disabling LE support will permanently disable and remove all
-> +	advertising instances configured with the Add Advertising
-> +	command.
-> +
+WARNING:LONG_LINE: line over 80 characters
+#65: FILE: tools/obexctl.c:2015:
++ { "pull",  "<file>",   cmd_pull, "Pull Vobject & store in file" },
 
-This something I am actually fine with. As long as we send the correct events to inform that the advertising setting are removed. This should then also apply to everything added via Add Device. In in similar regards apply to disabling BR/EDR.
+total: 0 errors, 2 warnings, 60 lines checked
 
-> 	This command generates a Command Complete event on success or
-> 	a Command Status event on failure.
-> 
-> @@ -1594,6 +1606,10 @@ Set Advertising Command
-> 
-> 	Using this command will temporarily deactive any configuration
-> 	made by the Add Advertising command. This command takes precedence.
-> +	Once a Set Advertising command with value 0x00 is issued any
-> +	previously made configurations via Add/Remove Advertising, including
-> +	such changes made while Set Advertising was active, will be re-
-> +	enabled, though.
+Please fix these.
 
-I assumed this was clear, but I am fine with adding an extra note about this. Just remove the "though" in the text since that does not read well.
-
-> 
-> 	A pre-requisite is that LE is already enabled, otherwise this
-> 	command will return a "rejected" response.
-> @@ -2548,9 +2564,11 @@ Add Advertising Command
-> 	can be used to switch a Bluetooth Low Energy controller into
-> 	advertising mode.
-> 
-> -	Added advertising information with this command will be ignored
-> -	when using the Set Advertising command to enable advertising. The
-> -	usage of Set Advertising command take precedence over this command.
-> +	Added advertising information with this command will be ignored as
-> +	long as advertising is enabled via the Set Advertising command. The
-> +	usage of the Set Advertising command takes precedence over this
-> +	command. Instance information is stored, though, and will be
-> +	advertised once advertising via Set Advertising has been disabled.
-
-No "though" please in the text. Smaller sentences with clear details make this easier to read.
-
-> 
-> 	The Instance identifier is a value between 1 and the number of
-> 	supported instances. The value 0 is reserved.
-> @@ -2593,13 +2611,13 @@ Add Advertising Command
-> 	broadcaster role.
-> 
-> 	The Duration parameter configures the length of an Instance. The
-> -	value is in seconds and a value of 0 indicates an automatic choice
-> -	for the Duration. If only one advertising Instance has been added,
-> -	then the Duration value will be ignored. It only applies for the
-> -	case where multiple Instances are configured. In that case every
-> -	Instance will be available for the Duration time and after that
-> -	it switches to the next one. This is a simple round-robin based
-> -	approach.
-> +	value is in seconds and a value of 0 indicates a default value
-> +	(currently 2 seconds) will be chosen for the Duration. If only
-> +	one advertising Instance has been added, then the Duration value
-> +	will be ignored. It only applies for the case where multiple
-> +	Instances are configured. In that case every Instance will be
-> +	available for the Duration time and after that it switches to
-> +	the next one. This is a simple round-robin based approach.
-
-Just add a separate paragraph that talks about the default of 2 seconds. And we really need to figure out the best value here.
-
-> 
-> 	The Timeout parameter configures the life-time of an Instance. In
-> 	case the value 0 is used it indicates no expiration time. If a
-> @@ -2611,8 +2629,21 @@ Add Advertising Command
-> 
-> 	When a Timeout is provided, then the Duration substracts from
-> 	the actual Timeout value of that Instance. For example an Instance
-> -	with Timeout of 6 and Duration of 2 will be scheduled exactly 3
-> -	times. Other Instances have no influence on the Timeout.
-> +	with Timeout of 5 and Duration of 2 will be scheduled exactly 3
-> +	times, twice with 2 seconds and once with one second. Other
-> +	Instances have no influence on the Timeout.
-> +
-> +	Re-adding an already existing instance (i.e. issuing the Add
-> +	Advertising command with an Instance identifier of an existing
-> +	instance) will update that instance's configuration.
-> +
-> +	An instance being added or changed while another instance is
-> +	being advertised will not be visible immediately but only when
-> +	the new/changed instance is being scheduled by the round robin
-> +	advertising algorithm. Changes to an instance that is currently
-> +	being advertised will be visible right away, i.e. the previous
-> +	configuration will be canceled immediately and the new
-> +	one activated.
-
-Actually that is not fully correct. I think modifying an existing instance will stop it right away and go to the next instance. In case that only a single instance is active, then it will actually change right away.
-
-> 
-> 	A pre-requisite is that LE is already enabled, otherwise this
-> 	command will return a "rejected" response.
-> @@ -2645,6 +2676,17 @@ Remove Advertising Command
-> 	When the Instance parameter is zero, then all previously added
-> 	advertising Instances will be removed.
-> 
-> +	Removing advertising information with this command will be ignored
-> +	as long as advertising is enabled via the Set Advertising command.
-> +	The usage of the Set Advertising command takes precedence over this
-> +	command. Changes to Instance information are stored, though, and
-> +	will be advertised once advertising via Set Advertising has been
-> +	disabled.
-
-This is bogus. The instance will be removed. However it will not change the current active advertising, but it really means that instance is gone.
-
-> +
-> +	Removing an instance while it is being advertised will immediately
-> +	cancel the instance, even when it has been advertised less then its
-> +	configured Timeout or Duration.
-> +
-> 	This command can be used when the controller is not powered and
-> 	all settings will be programmed once powered.
-
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
