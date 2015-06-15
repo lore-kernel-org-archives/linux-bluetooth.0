@@ -4,77 +4,62 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Veseli Veseljko <veseljko75@gmail.com>, Alex Gal <a.gal@miip.ca>,
 	Laurence Brown <linux-bluetooth@protazoa.com>,
 	Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 2/5] core/device: Add support for setting SDP record
-Date: Mon, 15 Jun 2015 20:28:27 +0200
-Message-Id: <1434392910-31648-3-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 1/5] sixaxis: Fix PID for Navigation Controller
+Date: Mon, 15 Jun 2015 20:28:26 +0200
+Message-Id: <1434392910-31648-2-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1434392910-31648-1-git-send-email-szymon.janc@gmail.com>
 References: <1434392910-31648-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to set SDP record for device without resolving services
-over SDP. After SDP is provided profiles are probed.
+Navigation Controller is using PID 0x042f over USB but PID 0x0268
+(same as Dualshock 3) over BT.
 ---
- src/device.c | 31 +++++++++++++++++++++++++++++++
- src/device.h |  3 +++
- 2 files changed, 34 insertions(+)
+ plugins/sixaxis.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 3ef0340..859aa3c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5542,6 +5542,37 @@ static sdp_list_t *read_device_records(struct btd_device *device)
- 	return recs;
- }
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index fcc93bc..50db6c1 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -54,6 +54,7 @@ static const struct {
+ 	uint16_t vid;
+ 	uint16_t pid;
+ 	uint16_t version;
++	uint16_t bt_pid;
+ } devices[] = {
+ 	{
+ 		.name = "PLAYSTATION(R)3 Controller",
+@@ -68,6 +69,7 @@ static const struct {
+ 		.vid = 0x054c,
+ 		.pid = 0x042f,
+ 		.version = 0x0000,
++		.bt_pid = 0x0268,
+ 	},
+ };
  
-+void btd_device_set_record(struct btd_device *device, const char *uuid,
-+							sdp_record_t *rec)
-+{
-+	/* This API is only used for BR/EDR */
-+	struct bearer_state *state = &device->bredr_state;
-+	struct browse_req *req;
-+	sdp_list_t *recs = NULL;
+@@ -300,8 +302,19 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
+ 	info("sixaxis: setting up new device");
+ 
+ 	btd_device_device_set_name(device, devices[index].name);
+-	btd_device_set_pnpid(device, devices[index].source, devices[index].vid,
+-				devices[index].pid, devices[index].version);
 +
-+	if (!rec)
-+		return;
++	/* if device reports different pid/vid on BT prefer those over USB */
++	if (devices[index].bt_pid)
++		btd_device_set_pnpid(device, devices[index].source,
++					devices[index].vid,
++					devices[index].bt_pid,
++					devices[index].version);
++	else
++		btd_device_set_pnpid(device, devices[index].source,
++					devices[index].vid,
++					devices[index].pid,
++					devices[index].version);
 +
-+	req = browse_request_new(device, NULL);
-+	if (!req)
-+		return;
-+
-+	recs = sdp_list_append(recs, rec);
-+	update_bredr_services(req, recs);
-+	sdp_list_free(recs, NULL);
-+
-+	device->svc_refreshed = true;
-+	state->svc_resolved = true;
-+
-+	device_probe_profiles(device, req->profiles_added);
-+
-+	/* Propagate services changes */
-+	g_dbus_emit_property_changed(dbus_conn, req->device->path,
-+						DEVICE_INTERFACE, "UUIDs");
-+
-+	device_svc_resolved(device, device->bdaddr_type, 0);
-+}
-+
- const sdp_record_t *btd_device_get_record(struct btd_device *device,
- 							const char *uuid)
- {
-diff --git a/src/device.h b/src/device.h
-index 1955f54..aee677a 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -62,6 +62,9 @@ struct device_addr_type {
- int device_addr_type_cmp(gconstpointer a, gconstpointer b);
- GSList *btd_device_get_uuids(struct btd_device *device);
- void device_probe_profiles(struct btd_device *device, GSList *profiles);
-+
-+void btd_device_set_record(struct btd_device *device, const char *uuid,
-+							sdp_record_t *rec);
- const sdp_record_t *btd_device_get_record(struct btd_device *device,
- 						const char *uuid);
- struct gatt_primary *btd_device_get_primary(struct btd_device *device,
+ 	btd_device_set_temporary(device, false);
+ 
+ 	return true;
 -- 
 2.1.4
 
