@@ -1,36 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <467bb868b4b5b8120da0818a969eb054.squirrel@mungewell.org>
-In-Reply-To: <1434392910-31648-2-git-send-email-szymon.janc@gmail.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Veseli Veseljko <veseljko75@gmail.com>, Alex Gal <a.gal@miip.ca>,
+	Laurence Brown <linux-bluetooth@protazoa.com>,
+	Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH 5/5] sixaxis: Fix multi-line comments style
+Date: Mon, 15 Jun 2015 20:28:30 +0200
+Message-Id: <1434392910-31648-6-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1434392910-31648-1-git-send-email-szymon.janc@gmail.com>
 References: <1434392910-31648-1-git-send-email-szymon.janc@gmail.com>
-    <1434392910-31648-2-git-send-email-szymon.janc@gmail.com>
-Date: Mon, 15 Jun 2015 14:45:39 -0400
-Subject: Re: [PATCH 1/5] sixaxis: Fix PID for Navigation Controller
-From: simon@mungewell.org
-To: "Szymon Janc" <szymon.janc@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	"Veseli Veseljko" <veseljko75@gmail.com>,
-	"Alex Gal" <a.gal@miip.ca>,
-	"Laurence Brown" <linux-bluetooth@protazoa.com>,
-	"Szymon Janc" <szymon.janc@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Navigation Controller is using PID 0x042f over USB but PID 0x0268
-> (same as Dualshock 3) over BT.
+---
+ plugins/sixaxis.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-Hi,
-I'm in the process of fixing the hid-sony driver to support the
-Navigation, and I'm seeing that it connects with 0x042f over BT. I did see
-at least once when it used the 0x0268, so it must be switching into an
-emulation mode at some times.
-
-I don't have a good way on initiating the pairing, instead used a
-hacked-up 'psmovepair' from PSMoveAPI guys. Followed by some hand editing
-of '/var/lib/bluetooth/<my-mac>/*' files.
-
-Happy to share files/info with you,
-Simon.
-
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 782a89f..9b6cad4 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -435,9 +435,11 @@ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
+ 	if (get_master_bdaddr(fd, &master_bdaddr) < 0)
+ 		return false;
+ 
+-	/* This can happen if controller was plugged while already connected
++	/*
++	 * This can happen if controller was plugged while already connected
+ 	 * eg. to charge up battery.
+-	 * Don't set LEDs in that case, hence return false */
++	 * Don't set LEDs in that case, hence return false
++	 */
+ 	device = btd_adapter_find_device(adapter, &device_bdaddr,
+ 							BDADDR_BREDR);
+ 	if (device && btd_device_is_connected(device))
+@@ -533,8 +535,10 @@ static int get_js_number(struct udev_device *udevice)
+ 		if (!input_parent)
+ 			goto next;
+ 
+-		/* check if this is the joystick relative to the hidraw device
+-		 * above */
++		/*
++		 * check if this is the joystick relative to the hidraw device
++		 * above
++		 */
+ 		input_id = udev_device_get_sysattr_value(input_parent, "uniq");
+ 
+ 		/*
+-- 
+2.1.4
 
