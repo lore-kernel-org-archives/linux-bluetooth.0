@@ -1,74 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] BlueZ line discipline baud rate setting update
-Date: Tue, 16 Jun 2015 12:19:49 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E942627D7@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1434387007-3666-1-git-send-email-ifaenson@broadcom.com>
- <1434387007-3666-2-git-send-email-ifaenson@broadcom.com>
- <5A718AB3-958E-415A-B60E-4BC4827DB583@holtmann.org>,<557FE1C9.6020001@linux.intel.com>
-In-Reply-To: <557FE1C9.6020001@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <043001d0a36c$5e8b3040$1ba190c0$@samsung.com>
+References: <041c01d0a35e$eedcb780$cc962680$@samsung.com>
+	<043001d0a36c$5e8b3040$1ba190c0$@samsung.com>
+Date: Tue, 16 Jun 2015 15:15:44 +0300
+Message-ID: <CABBYNZJXOsj8SrVQvtJc03_QqXcPNAgczvxpeG5rJ75T33kKZw@mail.gmail.com>
+Subject: Re: Query on AVRCP PTS testing
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+Hi Bharat,
 
-________________________________________
-From: Frederic Danis [frederic.danis@linux.intel.com]
-Sent: Tuesday, June 16, 2015 4:43 AM
-To: Marcel Holtmann; Ilya Faenson
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] BlueZ line discipline baud rate setting update
-
-Hello Marcel and Ilya,
-
-On 15/06/2015 19:35, Marcel Holtmann wrote:
-> Hi Ilya,
+On Wed, Jun 10, 2015 at 1:58 PM, Bharat Bhusan Panda
+<bharat.panda@samsung.com> wrote:
+> Hi Luiz,
 >
->> Bring the tty into a known 8 bits, 1 start bit, 1 stop bit,
->> hardware flow control state with a given baud rate.
->>
->> Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
->> ---
->> drivers/bluetooth/hci_ldisc.c | 9 ++++++++-
->> 1 file changed, 8 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
->> index ac87346..606cc5a 100644
->> --- a/drivers/bluetooth/hci_ldisc.c
->> +++ b/drivers/bluetooth/hci_ldisc.c
->> @@ -271,9 +271,16 @@ void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
->>      struct tty_struct *tty = hu->tty;
->>      struct ktermios ktermios;
->>
->> +    /* Bring the UART into a known state with a given baud rate */
->>      ktermios = tty->termios;
->>      ktermios.c_cflag &= ~CBAUD;
->> -    ktermios.c_cflag |= BOTHER;
->> +    ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR |
->> +                        IGNCR | ICRNL | IXON);
+> Please find below logs with valgrind,
 >
-> I think this one needs to align like this:
->
->                       &= ~(IGNBRK | .. |
->                            IGNCR | ..);
->
-> However I can fix that one easily inline. So no worries.
->
-> Fred, can you test this patch so I can add a Tested-by line.
+> ==19866== Invalid read of size 8
+> ==19866==    at 0x426817: avrcp_handle_event (avrcp.c:3102)
+> ==19866==    by 0x4208B3: session_cb (avctp.c:831)
+> ==19866==    by 0x4E7FCE4: g_main_context_dispatch (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+> ==19866==    by 0x4E80047: g_main_context_iterate.isra.24 (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+> ==19866==    by 0x4E80309: g_main_loop_run (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+> ==19866==    by 0x40B2AE: main (main.c:661)
+> ==19866==  Address 0x50 is not stack'd, malloc'd or (recently) free'd
 
-OK, I will test it.
+It seems session->controller is not initialized but we did have a fix
+for this no long ago:
 
-Btw, I thought that this function should only change the UART speed.
-For other UART parameters, I thought they should be set by btattach,
-ACPI or DT part.
+commit f58d61e7fdfc2c60aa3054d4a9467aa5e2627650
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Wed Mar 18 11:25:09 2015 +0200
 
-IF: UART parameters should be fully configured in kernel space in my opinion. I don't set any UART parameters from user space in my testing. As far as the DT/ACPI are concerned, none of the current ACPI DSL BT nodes configure UART parameters yet. I've introduced the oper-speed parameter for DT and that's the only UART parameter there for now. If we decide to add more, we'll have to change the line discipline configuration accordingly. Not sure it is needed though as all the BT UART-connected devices I've ever worked with in the last 10 years or so (including test devices connected via the FTDI-based USB boards) always worked fine with 8 bits, 1 start bit, 1 stop bit, no parity, hardware flow control.
+    audio/avrcp: Fix crash when acting as TG
 
-Regards
+    When acting as TG the code may end up using GetCapabilities to figure
+    out if volume changed event is supported, this cause crashes with
+    remote devices that don't support TG themselves because
+    session->controller is not initialized.
 
-Fred
+    Note that to pass AVRCP qualification when volume changed is supported
+    the device has to support TG as well as CT record, this is because PTS
+    will attempt to fetch the TG record for any test that it is sending
+    commands so devices where this crash happen most likely don't have
+    volume control feature enabled.
+
+-- 
+Luiz Augusto von Dentz
