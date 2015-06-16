@@ -1,58 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] BlueZ line discipline baud rate setting update
+Subject: Re: [PATCH 2/2] Bluetooth: hci_uart: Fix dereferencing of ERR_PTR
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <557FE1C9.6020001@linux.intel.com>
-Date: Tue, 16 Jun 2015 16:36:44 +0200
-Cc: Ilya Faenson <ifaenson@broadcom.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <F66F136D-CF57-471B-8E5B-1050F16DCE4E@holtmann.org>
-References: <1434387007-3666-1-git-send-email-ifaenson@broadcom.com> <1434387007-3666-2-git-send-email-ifaenson@broadcom.com> <5A718AB3-958E-415A-B60E-4BC4827DB583@holtmann.org> <557FE1C9.6020001@linux.intel.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
+In-Reply-To: <1434459321-20281-2-git-send-email-chanyeol.park@samsung.com>
+Date: Tue, 16 Jun 2015 16:29:27 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <98B3DE38-46E4-44F7-8AA5-774A96C521BE@holtmann.org>
+References: <1434459321-20281-1-git-send-email-chanyeol.park@samsung.com> <1434459321-20281-2-git-send-email-chanyeol.park@samsung.com>
+To: Chan-yeol Park <chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+Hi Chan-yeol,
 
->>> Bring the tty into a known 8 bits, 1 start bit, 1 stop bit,
->>> hardware flow control state with a given baud rate.
->>> 
->>> Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
->>> ---
->>> drivers/bluetooth/hci_ldisc.c | 9 ++++++++-
->>> 1 file changed, 8 insertions(+), 1 deletion(-)
->>> 
->>> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
->>> index ac87346..606cc5a 100644
->>> --- a/drivers/bluetooth/hci_ldisc.c
->>> +++ b/drivers/bluetooth/hci_ldisc.c
->>> @@ -271,9 +271,16 @@ void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
->>> 	struct tty_struct *tty = hu->tty;
->>> 	struct ktermios ktermios;
->>> 
->>> +	/* Bring the UART into a known state with a given baud rate */
->>> 	ktermios = tty->termios;
->>> 	ktermios.c_cflag &= ~CBAUD;
->>> -	ktermios.c_cflag |= BOTHER;
->>> +	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR |
->>> +			    IGNCR | ICRNL | IXON);
->> 
->> I think this one needs to align like this:
->> 
->> 			&= ~(IGNBRK | .. |
->> 			     IGNCR | ..);
->> 
->> However I can fix that one easily inline. So no worries.
->> 
->> Fred, can you test this patch so I can add a Tested-by line.
-> 
-> OK, I will test it.
-> 
-> Btw, I thought that this function should only change the UART speed.
-> For other UART parameters, I thought they should be set by btattach, ACPI or DT part.
+> If h4_recv() return ERR_PTR instead sk_buff pointer, it should be
+> cleared once dereference is completed for the further reference such as
+> h4_recv(), or h4_close().
 
-do you think we want this split out into one hci_uart_reset_termios or something and one that actually changes the baud rate. That seems fair to me as well so then the individual vendor code can pick and choose what they want to do.
+I have no idea what the h4_close has to do with it? Can you explain.
+
+> 
+> Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+> ---
+> drivers/bluetooth/hci_h4.c | 2 ++
+> 1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+> index f7190f0..a8acd99 100644
+> --- a/drivers/bluetooth/hci_h4.c
+> +++ b/drivers/bluetooth/hci_h4.c
+> @@ -133,6 +133,7 @@ static int h4_recv(struct hci_uart *hu, const void *data, int count)
+> 	if (IS_ERR(h4->rx_skb)) {
+> 		int err = PTR_ERR(h4->rx_skb);
+> 		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
+> +		h4->rx_skb = NULL;
+> 		return err;
+> 	}
+
+Isn't this better fixed in h4_recv_buf directly:
+
+@@ -173,7 +173,7 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+        while (count) {
+                int i, len;
+ 
+-               if (!skb) {
++               if (IS_ERR_OR_NULL(skb)) {
+                        for (i = 0; i < pkts_count; i++) {
+                                if (buffer[0] != (&pkts[i])->type)
+                                        continue;
+
+> 
+> @@ -248,6 +249,7 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+> 				break;
+> 			default:
+> 				/* Unsupported variable length */
+> +
+
+This change seems totally unrelated.
+
+> 				kfree_skb(skb);
+> 				return ERR_PTR(-EILSEQ);
+> 			}
 
 Regards
 
