@@ -1,92 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <3302faf9afa43a1657c93dff45656631.squirrel@mungewell.org>
-In-Reply-To: <1690931.rDxa1ayEBf@athlon>
-References: <1434392910-31648-1-git-send-email-szymon.janc@gmail.com>
-    <1434392910-31648-2-git-send-email-szymon.janc@gmail.com>
-    <467bb868b4b5b8120da0818a969eb054.squirrel@mungewell.org>
-    <1690931.rDxa1ayEBf@athlon>
-Date: Tue, 16 Jun 2015 23:30:04 -0400
-Subject: Re: [PATCH 1/5] sixaxis: Fix PID for Navigation Controller
-From: simon@mungewell.org
-To: "Szymon Janc" <szymon.janc@gmail.com>
-Cc: simon@mungewell.org, linux-bluetooth@vger.kernel.org,
-	"Veseli Veseljko" <veseljko75@gmail.com>,
-	"Alex Gal" <a.gal@miip.ca>,
-	"Laurence Brown" <linux-bluetooth@protazoa.com>
+Message-ID: <55808CAB.3020205@qca.qualcomm.com>
+Date: Tue, 16 Jun 2015 13:52:59 -0700
+From: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Sumit's Mailing Lists <lists@battlepenguin.com>, Marcel Holtmann
+	<marcel@holtmann.org>, "Huang, Rick" <rickh@qti.qualcomm.com>
+CC: <linux-bluetooth@vger.kernel.org>
+Subject: Re: ath3k Bluetooth adapter not loading: [0cf3:3004] Atheros Communications,
+ Inc. AR3012 Bluetooth 4.0
+References: <556486B0.1020104@battlepenguin.com> <EEAFDBFC-C252-4843-A9E0-3E74EA21B665@holtmann.org> <557EBF98.2000701@battlepenguin.com> <A93AF220-83E9-4FC3-BC07-18B285E5FA3D@holtmann.org> <557EDE40.7070006@battlepenguin.com> <557F03E2.3000001@qca.qualcomm.com> <557F0FD2.7000000@battlepenguin.com>
+In-Reply-To: <557F0FD2.7000000@battlepenguin.com>
+Content-Type: text/plain; charset="windows-1252"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Sumit,
 
->> I don't have a good way on initiating the pairing, instead used a
->> hacked-up 'psmovepair' from PSMoveAPI guys. Followed by some hand
->> editing
->> of '/var/lib/bluetooth/<my-mac>/*' files.
+On 06/15/15 10:48, Sumit's Mailing Lists wrote:
+> On 16/06/15 00:57, Ben Young Tae Kim wrote:
+>> Hi Sumit,
+>>
+>>
+>> On 06/15/15 07:16, Sumit's Mailing Lists wrote:
+>>> On 15/06/15 21:55, Marcel Holtmann wrote:
+>>>> Hi Smuit,
+>>>>
+>>>>>>> I'm currently using an MSI WS60 laptop which contains the following
+>>>>>>> Bluetooth controller (from lsusb):
+>>>>>>>
+>>>>>>> Bus 003 Device 003: ID 0cf3:3004 Atheros Communications, Inc. AR3012
+>>>>>>> Bluetooth 4.0
+>>>>>> assuming that the firmware is present, this is most likely just missing the right VID/PID additions in the drivers. Please prepare a patch for that.
+>>>>>>
+>>>>>>> and the more detailed version:
+>>>>>>>
+>>>>>>> Bus 003 Device 003: ID 0cf3:3004 Atheros Communications, Inc. AR3012
+>>>>>>> Bluetooth 4.0
+>>>>>>> Device Descriptor:
+>>>>>>> bLength                18
+>>>>>>> bDescriptorType         1
+>>>>>>> bcdUSB               1.10
+>>>>>>> bDeviceClass          224 Wireless
+>>>>>>> bDeviceSubClass         1 Radio Frequency
+>>>>>>> bDeviceProtocol         1 Bluetooth
+>>>>>>> bMaxPacketSize0        64
+>>>>>>> idVendor           0x0cf3 Atheros Communications, Inc.
+>>>>>>> idProduct          0x3004 AR3012 Bluetooth 4.0
+>>>>>>> bcdDevice            0.01
+>>>>>>> iManufacturer           0
+>>>>>>> iProduct                0
+>>>>>>> iSerial                 0
+>>>>>>> bNumConfigurations      1
+>>>>>>> Configuration Descriptor:
+>>>>>> I actually prefer /sys/kernel/debug/usb/devices output for the devices.
+>>>>>>
+>>>>>> Regards
+>>>>>>
+>>>>>> Marcel
+>>>>>>
+>>>>> Here is the output from /sys/kernel/debug/usb/devices for my ath3k (also
+>>>>> added it to the kernel bugzilla):
+>>>>>
+>>>>> T:  Bus=03 Lev=02 Prnt=02 Port=02 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+>>>>> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+>>>>> P:  Vendor=0cf3 ProdID=3004 Rev= 0.01
+>>>>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+>>>>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+>>>>> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+>>>>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>>>>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+>>>>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+>>>>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+>>>>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+>>>>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+>>>>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+>>>>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+>>>>>
+>>>>> and the firmware the kernel is trying to load:
+>>>>>
+>>>>> [  762.729370] usb 3-1.3: Direct firmware load for
+>>>>> ar3k/AthrBT_0x00000200.dfu failed with error -2
+>>>>> [  762.729373] Bluetooth: Patch file not found ar3k/AthrBT_0x00000200.dfu
+>>>>> [  762.729374] Bluetooth: Loading patch file failed
+>>>>> [  762.729381] ath3k: probe of 3-1.3:1.0 failed with error -2
+>>>>> [  762.729411] usbcore: registered new interface driver ath3k
+>>>> I fail to see that firmware in linux-firmware tree. However this up to Atheros / Qualcomm to submit there. I can not do much about this.
+>>>>
+>>>> Regards
+>>>>
+>>>> Marcel
+>>>>
+>>> Marcel,
+>>>
+>>> So it's pulling the right firmware file for my device, but It just
+>>> hasn't been released yet?
+>>>
+>>> I know with the Wi-Fi firmware, the ath10k devs had python scripts to
+>>> extract the firmware binaries from the Windows drivers (mentioned in
+>>> here https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1383184). Has
+>>> anyone done that before with the bluetooth firmware, or do you typically
+>>> just wait for atheros/qualcom to release official ones?
+>> Where did you get your atheros board/card since I couldn't find that board here. Is it a laptop? The BT firmware driver was trying to load AthrBT_0x00000200.dfu file and it got failed because no firmware file was present. But 0x00000200 means fw_version.rom_version which coming from controller chip, however, I haven't seen this version on Atheros chipset.
+>>
+>> I'm adding my friend - Rick Huang here. He may help you out
+>>
+>> Hi Rick,
+>>
+>> Have you seen rom_version as 0x00000200?
+>>
+>>> Sumit
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> Thanks
+>> -- Ben Kim
+>>
+> Yes, It's an MSI WS-60 Laptop, purchased two months ago in Australia. Is
+> there any other debugging information I need to pull for you?
 >
-> Sixaxis plugin should work for setting up Navigation.
+> Sumit
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Hi,
-I tried with current Bluez git and can get a connection established, but
-as you noted before it's connecting with PID 0x0268 (Sixaxis), rather than
-it's native 0x042f.
+According to my colleague, it is not AR chip but QCA ROME core inside even though they're sharing same VID/PID with AR/QCA ROME(version 2). That's why you cannot bring up your card with ath3k driver. I knew it was not a good idea as it was early stage to develop the card so that next version of ROME USB card(v3.0 or v3.2) will use different PID/VID as you can see below.
 
-Controller was told about PC with hacked version of sixpair (just changed
-PID at start) whilst connected with USB.
+Can you follow up these instructions to see whether or not it can be addressed on your setup?
 
 --
-[bluetooth]# agent on
-Agent registered
-[bluetooth]# default-agent
-Default agent request successful
-[NEW] Device 00:26:43:C9:C7:49 Navigation Controller
-[CHG] Device 00:26:43:C9:C7:49 Class: 0x000508
-[CHG] Device 00:26:43:C9:C7:49 Icon: input-gaming
-[CHG] Device 00:26:43:C9:C7:49 Connected: yes
-[CHG] Device 00:26:43:C9:C7:49 Modalias: usb:v054Cp0268d0100 <----- note
-here!!!
-[CHG] Device 00:26:43:C9:C7:49 UUIDs: 00001124-0000-1000-8000-00805f9b34fb
-[CHG] Device 00:26:43:C9:C7:49 UUIDs: 00001200-0000-1000-8000-00805f9b34fb
-[CHG] Device 00:26:43:C9:C7:49 Connected: no
-[CHG] Device 00:26:43:C9:C7:49 Connected: yes
-[CHG] Device 00:26:43:C9:C7:49 Connected: no
-[CHG] Device 00:26:43:C9:C7:49 Connected: yes
-[CHG] Device 00:26:43:C9:C7:49 Connected: no
-[CHG] Device 00:26:43:C9:C7:49 Connected: yes
-[CHG] Device 00:26:43:C9:C7:49 Connected: no
-[CHG] Device 00:26:43:C9:C7:49 Connected: yes
-[CHG] Device 00:26:43:C9:C7:49 Connected: no
-[CHG] Device 00:26:43:C9:C7:49 Connected: yes
-[CHG] Device 00:26:43:C9:C7:49 Connected: no
-[CHG] Device 00:26:43:C9:C7:49 Connected: yes
-[CHG] Device 00:26:43:C9:C7:49 Connected: no
-[CHG] Device 00:26:43:C9:C7:49 Connected: yes
-[CHG] Device 00:26:43:C9:C7:49 Connected: no
-[CHG] Device 00:26:43:C9:C7:49 Connected: yes
-[CHG] Device 00:26:43:C9:C7:49 Connected: no
-[bluetooth]# trust 00:26:43:C9:C7:49
-[CHG] Device 00:26:43:C9:C7:49 Trusted: yes
-Changing 00:26:43:C9:C7:49 trust succeeded
-[CHG] Device 00:26:43:C9:C7:49 Connected: yes
---
-[bluetooth]# devices
-Device 00:26:43:C9:C7:49 Navigation Controller
-[bluetooth]# info 00:26:43:C9:C7:49
-Device 00:26:43:C9:C7:49
-	Name: Navigation Controller
-	Alias: Navigation Controller
-	Class: 0x000508
-	Icon: input-gaming
-	Paired: no
-	Trusted: yes
-	Blocked: no
-	Connected: no
-	LegacyPairing: no
-	UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34fb)
-	UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
-	Modalias: usb:v054Cp0268d0100
+1. put this code in drivers/bluetooth/btusb.c
+
+static const struct usb_device_id blacklist_table[] = {
+...
+    /* QCA ROME chipset */
+    { USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
+    { USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
+    { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_QCA_ROME }, // <-- add new VID/PID here
+...
+
+2. Copy firmware files into /lib/firmware/qca
+ - nvm_usb_00000200.bin
+ - rampatch_usb_00000200.bin
+Those FW files won't be available on linux-firmware.git til today but it it will be available soon I believe.
 --
 
-Is there something I have to do to change this behaviour?
-Simon.
+Thanks
+-- Ben Kim
 
+ 
