@@ -1,28 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Arend Van Spriel <arend@broadcom.com>
-Subject: RE: [PATCH v4 2/4] hci_uart: line discipline enhancements
-Date: Wed, 17 Jun 2015 21:53:54 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E94263438@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1434576658-20730-1-git-send-email-ifaenson@broadcom.com>
- <1434576658-20730-3-git-send-email-ifaenson@broadcom.com>
- <EC2420F4-9F0F-47DB-A5E5-713E763E3E26@holtmann.org>
-In-Reply-To: <EC2420F4-9F0F-47DB-A5E5-713E763E3E26@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH v4 2/4] hci_uart: line discipline enhancements
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1434576658-20730-3-git-send-email-ifaenson@broadcom.com>
+Date: Wed, 17 Jun 2015 23:50:31 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Arend van Spriel <arend@broadcom.com>
+Message-Id: <EC2420F4-9F0F-47DB-A5E5-713E763E3E26@holtmann.org>
+References: <1434576658-20730-1-git-send-email-ifaenson@broadcom.com> <1434576658-20730-3-git-send-email-ifaenson@broadcom.com>
+To: Ilya Faenson <ifaenson@broadcom.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Thanks a lot, Marcel.
-
------Original Message-----
-From: Marcel Holtmann [mailto:marcel@holtmann.org] 
-Sent: Wednesday, June 17, 2015 5:51 PM
-To: Ilya Faenson
-Cc: BlueZ development; Arend Van Spriel
-Subject: Re: [PATCH v4 2/4] hci_uart: line discipline enhancements
 
 Hi Ilya,
 
