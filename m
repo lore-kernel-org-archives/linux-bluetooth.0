@@ -1,140 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: ath3k Bluetooth adapter not loading: [0cf3:3004] Atheros Communications, Inc. AR3012 Bluetooth 4.0
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <55808CAB.3020205@qca.qualcomm.com>
-Date: Wed, 17 Jun 2015 11:36:06 +0200
-Cc: Sumit's Mailing Lists <lists@battlepenguin.com>,
-	"Huang, Rick" <rickh@qti.qualcomm.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <209B4F64-8B24-4A70-A9F3-C42342A4786B@holtmann.org>
-References: <556486B0.1020104@battlepenguin.com> <EEAFDBFC-C252-4843-A9E0-3E74EA21B665@holtmann.org> <557EBF98.2000701@battlepenguin.com> <A93AF220-83E9-4FC3-BC07-18B285E5FA3D@holtmann.org> <557EDE40.7070006@battlepenguin.com> <557F03E2.3000001@qca.qualcomm.com> <557F0FD2.7000000@battlepenguin.com> <55808CAB.3020205@qca.qualcomm.com>
-To: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+From: Chan-yeol Park <chanyeol.park@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 2/2] Bluetooth: hci_uart: Fix dereferencing of ERR_PTR
+Date: Wed, 17 Jun 2015 13:59:09 +0900
+Message-id: <1434517149-1728-2-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1434517149-1728-1-git-send-email-chanyeol.park@samsung.com>
+References: <1434517149-1728-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ben,
+If h4_recv_buff() return ERR_PTR, h4->rx_skb should not be dereferenced.
 
->>>>>>>> I'm currently using an MSI WS60 laptop which contains the following
->>>>>>>> Bluetooth controller (from lsusb):
->>>>>>>> 
->>>>>>>> Bus 003 Device 003: ID 0cf3:3004 Atheros Communications, Inc. AR3012
->>>>>>>> Bluetooth 4.0
->>>>>>> assuming that the firmware is present, this is most likely just missing the right VID/PID additions in the drivers. Please prepare a patch for that.
->>>>>>> 
->>>>>>>> and the more detailed version:
->>>>>>>> 
->>>>>>>> Bus 003 Device 003: ID 0cf3:3004 Atheros Communications, Inc. AR3012
->>>>>>>> Bluetooth 4.0
->>>>>>>> Device Descriptor:
->>>>>>>> bLength                18
->>>>>>>> bDescriptorType         1
->>>>>>>> bcdUSB               1.10
->>>>>>>> bDeviceClass          224 Wireless
->>>>>>>> bDeviceSubClass         1 Radio Frequency
->>>>>>>> bDeviceProtocol         1 Bluetooth
->>>>>>>> bMaxPacketSize0        64
->>>>>>>> idVendor           0x0cf3 Atheros Communications, Inc.
->>>>>>>> idProduct          0x3004 AR3012 Bluetooth 4.0
->>>>>>>> bcdDevice            0.01
->>>>>>>> iManufacturer           0
->>>>>>>> iProduct                0
->>>>>>>> iSerial                 0
->>>>>>>> bNumConfigurations      1
->>>>>>>> Configuration Descriptor:
->>>>>>> I actually prefer /sys/kernel/debug/usb/devices output for the devices.
->>>>>>> 
->>>>>>> Regards
->>>>>>> 
->>>>>>> Marcel
->>>>>>> 
->>>>>> Here is the output from /sys/kernel/debug/usb/devices for my ath3k (also
->>>>>> added it to the kernel bugzilla):
->>>>>> 
->>>>>> T:  Bus=03 Lev=02 Prnt=02 Port=02 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
->>>>>> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
->>>>>> P:  Vendor=0cf3 ProdID=3004 Rev= 0.01
->>>>>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
->>>>>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
->>>>>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->>>>>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->>>>>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->>>>>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->>>>>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->>>>>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->>>>>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->>>>>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->>>>>> 
->>>>>> and the firmware the kernel is trying to load:
->>>>>> 
->>>>>> [  762.729370] usb 3-1.3: Direct firmware load for
->>>>>> ar3k/AthrBT_0x00000200.dfu failed with error -2
->>>>>> [  762.729373] Bluetooth: Patch file not found ar3k/AthrBT_0x00000200.dfu
->>>>>> [  762.729374] Bluetooth: Loading patch file failed
->>>>>> [  762.729381] ath3k: probe of 3-1.3:1.0 failed with error -2
->>>>>> [  762.729411] usbcore: registered new interface driver ath3k
->>>>> I fail to see that firmware in linux-firmware tree. However this up to Atheros / Qualcomm to submit there. I can not do much about this.
->>>>> 
->>>>> Regards
->>>>> 
->>>>> Marcel
->>>>> 
->>>> Marcel,
->>>> 
->>>> So it's pulling the right firmware file for my device, but It just
->>>> hasn't been released yet?
->>>> 
->>>> I know with the Wi-Fi firmware, the ath10k devs had python scripts to
->>>> extract the firmware binaries from the Windows drivers (mentioned in
->>>> here https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1383184). Has
->>>> anyone done that before with the bluetooth firmware, or do you typically
->>>> just wait for atheros/qualcom to release official ones?
->>> Where did you get your atheros board/card since I couldn't find that board here. Is it a laptop? The BT firmware driver was trying to load AthrBT_0x00000200.dfu file and it got failed because no firmware file was present. But 0x00000200 means fw_version.rom_version which coming from controller chip, however, I haven't seen this version on Atheros chipset.
->>> 
->>> I'm adding my friend - Rick Huang here. He may help you out
->>> 
->>> Hi Rick,
->>> 
->>> Have you seen rom_version as 0x00000200?
->>> 
->>>> Sumit
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>> Thanks
->>> -- Ben Kim
->>> 
->> Yes, It's an MSI WS-60 Laptop, purchased two months ago in Australia. Is
->> there any other debugging information I need to pull for you?
->> 
->> Sumit
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> According to my colleague, it is not AR chip but QCA ROME core inside even though they're sharing same VID/PID with AR/QCA ROME(version 2). That's why you cannot bring up your card with ath3k driver. I knew it was not a good idea as it was early stage to develop the card so that next version of ROME USB card(v3.0 or v3.2) will use different PID/VID as you can see below.
+Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+---
+ drivers/bluetooth/hci_h4.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-I would really prefer if companies pay more attention when releasing hardware that the USB product ID is unique. Is there any other identifying detail in the USB descriptors that could be used to check which version it is?
-
-So you can not just walk away and say bad luck here. You released this mishap and now have to figure out on how we can make both hardware versions work. Otherwise I will take the other working one out as well and level the playing field here.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index f7190f0..54116464 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -92,7 +92,8 @@ static int h4_close(struct hci_uart *hu)
+ 
+ 	skb_queue_purge(&h4->txq);
+ 
+-	kfree_skb(h4->rx_skb);
++	if (!IS_ERR(h4->rx_skb))
++		kfree_skb(h4->rx_skb);
+ 
+ 	hu->priv = NULL;
+ 	kfree(h4);
+@@ -173,7 +174,7 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+ 	while (count) {
+ 		int i, len;
+ 
+-		if (!skb) {
++		if (IS_ERR_OR_NULL(skb)) {
+ 			for (i = 0; i < pkts_count; i++) {
+ 				if (buffer[0] != (&pkts[i])->type)
+ 					continue;
+-- 
+2.1.4
 
