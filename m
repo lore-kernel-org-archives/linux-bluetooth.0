@@ -3,668 +3,190 @@ From: Ilya Faenson <ifaenson@broadcom.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 CC: <linux-bluetooth@vger.kernel.org>, Arend van Spriel <arend@broadcom.com>,
 	Ilya Faenson <ifaenson@broadcom.com>
-Subject: [PATCH v4 3/4] btbcm_uart: Broadcom UART Platform Driver
-Date: Wed, 17 Jun 2015 17:30:57 -0400
-Message-ID: <1434576658-20730-4-git-send-email-ifaenson@broadcom.com>
+Subject: [PATCH v4 2/4] hci_uart: line discipline enhancements
+Date: Wed, 17 Jun 2015 17:30:56 -0400
+Message-ID: <1434576658-20730-3-git-send-email-ifaenson@broadcom.com>
 In-Reply-To: <1434576658-20730-1-git-send-email-ifaenson@broadcom.com>
 References: <1434576658-20730-1-git-send-email-ifaenson@broadcom.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Introduce the device tree enumerated Broadcom Bluetooth UART driver:
-	Retrieves the device parameters from the node
-	Manages the device's power on/off and suspend/resume GPIOs
-	Processes wakeup interrupts
-	Maintains the list of bluetooth UART devices
-	Maps device instances to BlueZ protocol instances
-	Manages the device upon platform suspend/resume actions
-	Provides the interface for the BlueZ protocol actions
+Added the ability to flow control the UART, improved the UART baud
+rate setting, transferred the speeds into line discipline from the
+protocol and introduced the tty init function.
 
 Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
 ---
- drivers/bluetooth/Makefile     |   1 +
- drivers/bluetooth/btbcm_uart.c | 538 +++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btbcm_uart.h |  74 ++++++
- 3 files changed, 613 insertions(+)
- create mode 100644 drivers/bluetooth/btbcm_uart.c
- create mode 100644 drivers/bluetooth/btbcm_uart.h
+ drivers/bluetooth/hci_ldisc.c | 106 +++++++++++++++++++++++++++++++++++++++---
+ drivers/bluetooth/hci_uart.h  |   7 +++
+ 2 files changed, 106 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index f40e194..7947abb 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -21,6 +21,7 @@ obj-$(CONFIG_BT_MRVL)		+= btmrvl.o
- obj-$(CONFIG_BT_MRVL_SDIO)	+= btmrvl_sdio.o
- obj-$(CONFIG_BT_WILINK)		+= btwilink.o
- obj-$(CONFIG_BT_BCM)		+= btbcm.o
-+obj-$(CONFIG_BT_BCM)		+= btbcm_uart.o
- obj-$(CONFIG_BT_RTL)		+= btrtl.o
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index ac87346..959dd64 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -266,6 +266,85 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return 0;
+ }
  
- btmrvl-y			:= btmrvl_main.o
-diff --git a/drivers/bluetooth/btbcm_uart.c b/drivers/bluetooth/btbcm_uart.c
-new file mode 100644
-index 0000000..e77eb1d
---- /dev/null
-+++ b/drivers/bluetooth/btbcm_uart.c
-@@ -0,0 +1,538 @@
-+/*
-+ *  Bluetooth BCM UART Driver
-+ *
-+ *  Copyright (c) 2015 Broadcom Corporation
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ */
-+
-+#include <linux/module.h>
-+
-+#include <linux/kernel.h>
-+#include <linux/init.h>
-+#include <linux/types.h>
-+#include <linux/fcntl.h>
-+#include <linux/interrupt.h>
-+#include <linux/ptrace.h>
-+#include <linux/poll.h>
-+
-+#include <linux/slab.h>
-+#include <linux/tty.h>
-+#include <linux/errno.h>
-+#include <linux/string.h>
-+#include <linux/signal.h>
-+#include <linux/ioctl.h>
-+#include <linux/skbuff.h>
-+#include <linux/list.h>
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+#include <linux/gpio/consumer.h>
-+#include <linux/of.h>
-+#include <linux/of_gpio.h>
-+#include <linux/of_platform.h>
-+
-+#include "btbcm_uart.h"
-+
-+/* Device context */
-+struct bcm_device {
-+	struct list_head list;
-+
-+	struct platform_device *pdev;
-+	struct gpio_desc *bt_wake_gpio;
-+	struct gpio_desc *dev_wake_gpio;
-+	struct gpio_desc *reg_on_gpio;
-+	int bt_wake_irq;
-+	int dev_wake_active_low;
-+	int reg_on_active_low;
-+	int bt_wake_active_low;
-+	bool configure_sleep;
-+	u32 idle_timeout;
-+	u32 manual_fc;
-+	u32 oper_speed;
-+	bool configure_audio;
-+	u32 pcm_clockmode;
-+	u32 pcm_fillmethod;
-+	u32 pcm_fillnum;
-+	u32 pcm_fillvalue;
-+	u32 pcm_incallbitclock;
-+	u32 pcm_lsbfirst;
-+	u32 pcm_rightjustify;
-+	u32 pcm_routing;
-+	u32 pcm_shortframesync;
-+	u32 pcm_syncmode;
-+
-+	char tty_name[64];
-+
-+	struct btbcm_uart_callbacks callbacks;
-+	struct work_struct wakeup_work;
-+};
-+
-+/* List of BCM BT UART devices */
-+static DEFINE_SPINLOCK(device_list_lock);
-+static LIST_HEAD(device_list);
-+
-+/* Calling the BCM protocol at lower execution priority */
-+static void bcm_wakeup_task(struct work_struct *work)
++/* Flow control or un-flow control the device */
++void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
 +{
-+	struct bcm_device *dev = container_of(work, struct bcm_device,
-+					      wakeup_work);
-+	int gpio_value;
++	struct tty_struct *tty = hu->tty;
++	struct ktermios ktermios;
++	int status;
++	unsigned int set = 0;
++	unsigned int clear = 0;
 +
-+	/* Make sure the device is resumed */
-+	gpio_value = !dev->dev_wake_active_low;
-+	if (dev->dev_wake_gpio) {
-+		gpiod_set_value(dev->dev_wake_gpio, gpio_value);
-+		BT_DBG("wakeup_task - resume %d written, delaying 15 ms",
-+		       gpio_value);
-+		mdelay(15);
-+	}
++	if (enable) {
++		/* Disable hardware flow control */
++		ktermios = tty->termios;
++		ktermios.c_cflag &= ~CRTSCTS;
++		status = tty_set_termios(tty, &ktermios);
++		BT_DBG("Disabling hardware flow control: %s", status ?
++		       "failed" : "success");
 +
-+	/* Let the protocol know it's time to wake up */
-+	if (dev->callbacks.wakeup)
-+		dev->callbacks.wakeup(dev->callbacks.context);
-+}
++		/* Clear RTS to prevent the device from sending */
++		/* Most UARTs need OUT2 to enable interrupts */
++		status = tty->driver->ops->tiocmget(tty);
++		BT_DBG("Current tiocm 0x%x", status);
 +
-+/* Interrupt routine for the wake from the device */
-+static irqreturn_t bcm_uart_isr(int irq, void *context)
-+{
-+	unsigned int bt_wake;
-+	struct bcm_device *p = (struct bcm_device *)context;
-+
-+	bt_wake = gpiod_get_value(p->bt_wake_gpio);
-+	BT_DBG("isr with bt_wake of %d (active_low %d), req bh",
-+	       bt_wake, p->bt_wake_active_low);
-+
-+	/* Defer the actual processing to the platform work queue */
-+	schedule_work(&p->wakeup_work);
-+	return IRQ_HANDLED;
-+}
-+
-+/* Device instance startup */
-+static int bcm_uart_probe(struct platform_device *pdev)
-+{
-+	struct device_node *np = pdev->dev.of_node;
-+	const char *tty_name;
-+	int ret;
-+	struct bcm_device *dev;
-+
-+	dev = devm_kzalloc(&pdev->dev, sizeof(*dev), GFP_KERNEL);
-+	if (!dev)
-+		return -ENOMEM;
-+
-+	dev->pdev = pdev;
-+
-+	/* Get dev wake GPIO */
-+	dev->dev_wake_gpio = gpiod_get(&pdev->dev, "bt-wake");
-+	if (IS_ERR(dev->dev_wake_gpio)) {
-+		ret = PTR_ERR(dev->dev_wake_gpio);
-+		if (ret != -ENOENT)
-+			dev_err(&pdev->dev, "probe - dev_wake GPIO: %d\n", ret);
-+		dev->dev_wake_gpio = NULL;
++		set &= ~(TIOCM_OUT2 | TIOCM_RTS);
++		clear = ~set;
++		set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
++		       TIOCM_OUT2 | TIOCM_LOOP;
++		clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
++			 TIOCM_OUT2 | TIOCM_LOOP;
++		status = tty->driver->ops->tiocmset(tty, set, clear);
++		BT_DBG("Clearing RTS: %s", status ? "failed" : "success");
 +	} else {
-+		int gpio_value;
++		/* Set RTS to allow the device to send again */
++		status = tty->driver->ops->tiocmget(tty);
++		BT_DBG("Current tiocm 0x%x", status);
 +
-+		dev->dev_wake_active_low = gpiod_is_active_low
-+			(dev->dev_wake_gpio);
-+		BT_DBG("probe - dev_wake %p a-low is %d (cans %d)",
-+		       dev->dev_wake_gpio, dev->dev_wake_active_low,
-+		       gpiod_cansleep(dev->dev_wake_gpio));
++		set |= (TIOCM_OUT2 | TIOCM_RTS);
++		clear = ~set;
++		set &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
++		       TIOCM_OUT2 | TIOCM_LOOP;
++		clear &= TIOCM_DTR | TIOCM_RTS | TIOCM_OUT1 |
++			 TIOCM_OUT2 | TIOCM_LOOP;
++		status = tty->driver->ops->tiocmset(tty, set, clear);
++		BT_DBG("Setting RTS: %s", status ? "failed" : "success");
 +
-+		/* configure dev_wake as output with init resumed state */
-+		gpio_value = !dev->dev_wake_active_low;
-+		ret = gpiod_direction_output(dev->dev_wake_gpio, gpio_value);
-+		if (ret < 0) {
-+			dev_err(&pdev->dev,
-+				"probe - output dev_wake GPIO: %d\n", ret);
-+			gpiod_put(dev->dev_wake_gpio);
-+			dev->dev_wake_gpio = NULL;
-+			goto end;
-+		}
++		/* Re-enable hardware flow control */
++		ktermios = tty->termios;
++		ktermios.c_cflag |= CRTSCTS;
++		status = tty_set_termios(tty, &ktermios);
++		BT_DBG("Enabling hardware flow control: %s", status ?
++		       "failed" : "success");
 +	}
-+
-+	/* Get power on/off GPIO */
-+	dev->reg_on_gpio = gpiod_get(&pdev->dev, "bt-reg-on");
-+	if (IS_ERR(dev->reg_on_gpio)) {
-+		ret = PTR_ERR(dev->reg_on_gpio);
-+		if (ret != -ENOENT)
-+			dev_err(&pdev->dev, "probe - reg_on GPIO: %d\n", ret);
-+		dev->reg_on_gpio = NULL;
-+	} else {
-+		int poweron_flag;
-+
-+		dev->reg_on_active_low = gpiod_is_active_low(dev->reg_on_gpio);
-+		BT_DBG("probe - reg_on %p a-low is %d (cansleep %d)",
-+		       dev->reg_on_gpio, dev->reg_on_active_low,
-+		       gpiod_cansleep(dev->reg_on_gpio));
-+
-+		/* configure reg_on as output with init on state */
-+		poweron_flag = !dev->reg_on_active_low;
-+		ret = gpiod_direction_output(dev->reg_on_gpio, poweron_flag);
-+		if (ret < 0) {
-+			dev_err(&pdev->dev,
-+				"probe - set reg_on GPIO: %d\n", ret);
-+			gpiod_put(dev->reg_on_gpio);
-+			dev->reg_on_gpio = NULL;
-+		}
-+	}
-+
-+	platform_set_drvdata(pdev, dev);
-+	/* Must be done before interrupt is requested */
-+	INIT_WORK(&dev->wakeup_work, bcm_wakeup_task);
-+
-+	/* Get bt host wake GPIO */
-+	dev->bt_wake_gpio = gpiod_get(&pdev->dev, "bt-host-wake");
-+	if (IS_ERR(dev->bt_wake_gpio)) {
-+		ret = PTR_ERR(dev->bt_wake_gpio);
-+		if (ret != -ENOENT)
-+			dev_err(&pdev->dev, "probe - bt_wake GPIO: %d\n", ret);
-+		dev->bt_wake_gpio = NULL;
-+	} else {
-+		/* configure bt_wake as input */
-+		ret = gpiod_direction_input(dev->bt_wake_gpio);
-+		if (ret < 0) {
-+			dev_err(&pdev->dev,
-+				"probe - set bt_wake GPIO: %d\n", ret);
-+			gpiod_put(dev->bt_wake_gpio);
-+			dev->bt_wake_gpio = NULL;
-+		} else {
-+			dev->bt_wake_active_low = gpiod_is_active_low
-+				(dev->bt_wake_gpio);
-+			BT_DBG("probe - bt_wake %p a-low is %d(cansleep %d)",
-+			       dev->bt_wake_gpio, dev->bt_wake_active_low,
-+			       gpiod_cansleep(dev->bt_wake_gpio));
-+			dev->bt_wake_irq = gpiod_to_irq(dev->bt_wake_gpio);
-+			if (dev->bt_wake_irq >= 0) {
-+				unsigned long intflags = IRQF_TRIGGER_RISING;
-+
-+				if (dev->bt_wake_active_low)
-+					intflags = IRQF_TRIGGER_FALLING;
-+				ret = request_irq(dev->bt_wake_irq,
-+						  bcm_uart_isr, intflags,
-+						  "bt_host_wake", dev);
-+				if (ret < 0)
-+					dev_err(&pdev->dev,
-+						"probe - failed IRQ %d: %d",
-+						dev->bt_wake_irq, ret);
-+				else
-+					BT_DBG("probe - IRQ %d",
-+					       dev->bt_wake_irq);
-+			}
-+		}
-+	}
-+
-+	dev->configure_sleep = of_property_read_bool(np, "configure-sleep");
-+	dev->idle_timeout = 5;
-+	of_property_read_u32(np, "idle-timeout", &dev->idle_timeout);
-+	dev->manual_fc = 0;
-+	of_property_read_u32(np, "manual-fc", &dev->manual_fc);
-+	dev->oper_speed = 3000000;
-+	of_property_read_u32(np, "oper-speed", &dev->oper_speed);
-+	dev->configure_audio = of_property_read_bool(np, "configure-audio");
-+	BT_DBG("conf-sleep %d, tout %d, manual-fc %d, speed %d, conf-audio %d",
-+	       dev->configure_sleep, dev->idle_timeout, dev->manual_fc,
-+	       dev->oper_speed, dev->configure_audio);
-+
-+	if (dev->configure_audio) {
-+		/* Defaults for audio */
-+		dev->pcm_clockmode = 0;
-+		dev->pcm_fillmethod = 2;
-+		dev->pcm_fillnum = 0;
-+		dev->pcm_fillvalue = 3;
-+		dev->pcm_incallbitclock = 0;
-+		dev->pcm_lsbfirst = 0;
-+		dev->pcm_rightjustify = 0;
-+		dev->pcm_routing = 0;
-+		dev->pcm_shortframesync = 0;
-+		dev->pcm_syncmode = 0;
-+
-+		of_property_read_u32(np, "pcm-clockmode", &dev->pcm_clockmode);
-+		of_property_read_u32(np, "pcm-fillmethod",
-+				     &dev->pcm_fillmethod);
-+		of_property_read_u32(np, "pcm-fillnum", &dev->pcm_fillnum);
-+		of_property_read_u32(np, "pcm-fillvalue", &dev->pcm_fillvalue);
-+		of_property_read_u32(np, "pcm-incallbitclock",
-+				     &dev->pcm_incallbitclock);
-+		BT_DBG("pcm-clockmode %d, method %d, num %d, value %d, bit %d",
-+		       dev->pcm_clockmode, dev->pcm_fillmethod,
-+		       dev->pcm_fillnum, dev->pcm_fillvalue,
-+		       dev->pcm_incallbitclock);
-+
-+		of_property_read_u32(np, "pcm-lsbfirst", &dev->pcm_lsbfirst);
-+		of_property_read_u32(np, "pcm-rightjustify",
-+				     &dev->pcm_rightjustify);
-+		of_property_read_u32(np, "pcm-routing", &dev->pcm_routing);
-+		of_property_read_u32(np, "pcm-shortframesync",
-+				     &dev->pcm_shortframesync);
-+		of_property_read_u32(np, "pcm-syncmode", &dev->pcm_syncmode);
-+		BT_DBG("pcm-lsb %d, right %d, routing %d, short %d, sync %d",
-+		       dev->pcm_lsbfirst, dev->pcm_rightjustify,
-+		       dev->pcm_routing, dev->pcm_shortframesync,
-+		       dev->pcm_syncmode);
-+	}
-+
-+	if (!of_property_read_string(np, "tty", &tty_name)) {
-+		strcpy(dev->tty_name, tty_name);
-+		BT_DBG("tty name read as %s", dev->tty_name);
-+	}
-+
-+	ret = 0;  /* If we made it here, we're fine */
-+
-+	/* Place this instance on the device list */
-+	spin_lock(&device_list_lock);
-+	list_add_tail(&dev->list, &device_list);
-+	spin_unlock(&device_list_lock);
-+
-+end:
-+	if (ret) {
-+		if (dev->reg_on_gpio) {
-+			gpiod_put(dev->reg_on_gpio);
-+			dev->reg_on_gpio = NULL;
-+		}
-+		if (dev->bt_wake_gpio) {
-+			gpiod_put(dev->bt_wake_gpio);
-+			dev->bt_wake_gpio = NULL;
-+		}
-+		if (dev->dev_wake_gpio) {
-+			gpiod_put(dev->dev_wake_gpio);
-+			dev->dev_wake_gpio = NULL;
-+		}
-+	}
-+
-+	return ret;
 +}
 +
-+/* Device instance removal */
-+static int bcm_uart_remove(struct platform_device *pdev)
++void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
++			 unsigned int oper_speed)
 +{
-+	struct bcm_device *dev = platform_get_drvdata(pdev);
-+
-+	spin_lock(&device_list_lock);
-+	list_del(&dev->list);
-+	spin_unlock(&device_list_lock);
-+
-+	BT_DBG("remove %p - freeing interrupt %d", dev, dev->bt_wake_irq);
-+	free_irq(dev->bt_wake_irq, dev);
-+
-+	if (dev->reg_on_gpio) {
-+		BT_DBG("remove - releasing reg_on_gpio");
-+		gpiod_put(dev->reg_on_gpio);
-+		dev->reg_on_gpio = NULL;
-+	}
-+
-+	if (dev->dev_wake_gpio) {
-+		BT_DBG("remove - releasing dev_wake_gpio");
-+		gpiod_put(dev->dev_wake_gpio);
-+		dev->dev_wake_gpio = NULL;
-+	}
-+
-+	if (dev->bt_wake_gpio) {
-+		BT_DBG("remove - releasing bt_wake_gpio");
-+		gpiod_put(dev->bt_wake_gpio);
-+		dev->bt_wake_gpio = NULL;
-+	}
-+
-+	BT_DBG("remove - %p done", dev);
-+	return 0;
++	hu->init_speed = init_speed;
++	hu->oper_speed = oper_speed;
 +}
 +
-+/* Platform resume callback */
-+static int bcm_uart_resume(struct device *pdev)
++void hci_uart_init_tty(struct hci_uart *hu)
 +{
-+	struct bcm_device *dev = platform_get_drvdata(
-+		to_platform_device(pdev));
-+	int gpio_value;
++	struct tty_struct *tty = hu->tty;
++	struct ktermios ktermios;
 +
-+	BT_DBG("resume %p", dev);
++	/* Bring the UART into a known 8 bits no parity hw fc state */
++	ktermios = tty->termios;
++	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
++			    | INLCR | IGNCR | ICRNL | IXON);
++	ktermios.c_oflag &= ~OPOST;
++	ktermios.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
++	ktermios.c_cflag &= ~(CSIZE | PARENB);
++	ktermios.c_cflag |= CS8;
++	ktermios.c_cflag |= CRTSCTS;
 +
-+	gpio_value = !dev->dev_wake_active_low;
-+	if (dev->dev_wake_gpio) {
-+		gpiod_set_value(dev->dev_wake_gpio, gpio_value);
-+		BT_DBG("resume - %d written, delaying 15 ms", gpio_value);
-+		mdelay(15);
-+	}
-+
-+	/* Let the protocol know the platform is resuming */
-+	if (dev->callbacks.resume)
-+		dev->callbacks.resume(dev->callbacks.context);
-+
-+	return 0;
++	/* tty_set_termios() return not checked as it is always 0 */
++	tty_set_termios(tty, &ktermios);
 +}
 +
-+/* Platform suspend callback */
-+static int bcm_uart_suspend(struct device *pdev)
-+{
-+	struct bcm_device *dev = platform_get_drvdata(
-+		to_platform_device(pdev));
-+	int gpio_value;
+ void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ {
+ 	struct tty_struct *tty = hu->tty;
+@@ -273,13 +352,13 @@ void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ 
+ 	ktermios = tty->termios;
+ 	ktermios.c_cflag &= ~CBAUD;
+-	ktermios.c_cflag |= BOTHER;
+ 	tty_termios_encode_baud_rate(&ktermios, speed, speed);
+ 
+ 	/* tty_set_termios() return not checked as it is always 0 */
+ 	tty_set_termios(tty, &ktermios);
+ 
+-	BT_DBG("%s: New tty speed: %d", hu->hdev->name, tty->termios.c_ispeed);
++	BT_DBG("%s: New tty speeds: %d/%d", hu->hdev->name,
++	       tty->termios.c_ispeed, tty->termios.c_ospeed);
+ }
+ 
+ static int hci_uart_setup(struct hci_dev *hdev)
+@@ -287,15 +366,28 @@ static int hci_uart_setup(struct hci_dev *hdev)
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct hci_rp_read_local_version *ver;
+ 	struct sk_buff *skb;
++	unsigned int speed;
+ 	int err;
+ 
++	/* Init speed if any */
++	speed = 0;
+ 	if (hu->proto->init_speed)
+-		hci_uart_set_baudrate(hu, hu->proto->init_speed);
+-
+-	if (hu->proto->set_baudrate && hu->proto->oper_speed) {
+-		err = hu->proto->set_baudrate(hu, hu->proto->oper_speed);
++		speed = hu->proto->init_speed;
++	else if (hu->init_speed)
++		speed = hu->init_speed;
++	if (speed)
++		hci_uart_set_baudrate(hu, speed);
 +
-+	BT_DBG("suspend - %p", dev);
++	/* Operational speed if any */
++	speed = 0;
++	if (hu->proto->oper_speed)
++		speed = hu->proto->oper_speed;
++	else if (hu->oper_speed)
++		speed = hu->oper_speed;
++	if (hu->proto->set_baudrate && speed) {
++		err = hu->proto->set_baudrate(hu, speed);
+ 		if (!err)
+-			hci_uart_set_baudrate(hu, hu->proto->oper_speed);
++			hci_uart_set_baudrate(hu, speed);
+ 	}
+ 
+ 	if (hu->proto->setup)
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index e9f970c..ce9c670 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -85,6 +85,9 @@ struct hci_uart {
+ 	struct sk_buff		*tx_skb;
+ 	unsigned long		tx_state;
+ 	spinlock_t		rx_lock;
 +
-+	/* Let the protocol know the platform is suspending */
-+	if (dev->callbacks.suspend)
-+		dev->callbacks.suspend(dev->callbacks.context);
-+
-+	/* Suspend the device */
-+	if (dev->dev_wake_gpio) {
-+		gpio_value = !!dev->dev_wake_active_low;
-+		gpiod_set_value(dev->dev_wake_gpio, gpio_value);
-+		BT_DBG("suspend - %d written, delaying 15 ms", gpio_value);
-+		mdelay(15);
-+	}
-+
-+	return 0;
-+}
-+
-+/* Entry point for calls from the protocol */
-+void *btbcm_uart_set_callbacks(struct btbcm_uart_callbacks *pc)
-+{
-+	struct bcm_device *dev = NULL;
-+	bool is_found = false;
-+	struct list_head *ptr;
-+
-+	BT_DBG("set_callbacks for %s(%p)", pc->name, pc->context);
-+
-+	spin_lock(&device_list_lock);
-+	list_for_each(ptr, &device_list) {
-+		dev = list_entry(ptr, struct bcm_device, list);
-+		if (!strcmp(dev->tty_name, pc->name)) {
-+			is_found = true;
-+			break;
-+		}
-+	}
-+	spin_unlock(&device_list_lock);
-+
-+	if (!is_found) {
-+		BT_DBG("set_callbacks - no device!");
-+		return NULL;
-+	}
-+
-+	dev->callbacks = *pc;
-+	return dev;
-+}
-+EXPORT_SYMBOL_GPL(btbcm_uart_set_callbacks);
-+
-+void btbcm_uart_reset_callbacks(void *device_context)
-+{
-+	struct bcm_device *dev = device_context;
-+
-+	memset(&dev->callbacks, 0, sizeof(dev->callbacks));
-+}
-+EXPORT_SYMBOL_GPL(btbcm_uart_reset_callbacks);
-+
-+void btbcm_uart_poweron(void *device_context)
-+{
-+	struct bcm_device *dev = device_context;
-+	int poweron_flag;
-+
-+	if (dev->reg_on_gpio) {
-+		poweron_flag = !dev->reg_on_active_low;
-+		gpiod_set_value(dev->reg_on_gpio, poweron_flag);
-+		BT_DBG("poweron %d, delay 15 ms", poweron_flag);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(btbcm_uart_poweron);
-+
-+void btbcm_uart_poweroff(void *device_context)
-+{
-+	struct bcm_device *dev = device_context;
-+	int poweron_flag;
-+
-+	if (dev->reg_on_gpio) {
-+		poweron_flag = dev->reg_on_active_low;
-+		gpiod_set_value(dev->reg_on_gpio, poweron_flag);
-+		BT_DBG("poweroff %d, delay 15 ms", poweron_flag);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(btbcm_uart_poweroff);
-+
-+void btbcm_uart_suspend(void *device_context)
-+{
-+	struct bcm_device *dev = device_context;
-+	int gpio_value;
-+
-+	if (dev->dev_wake_gpio) {
-+		gpio_value = !!dev->dev_wake_active_low;
-+		gpiod_set_value(dev->dev_wake_gpio, gpio_value);
-+		BT_DBG("suspend %d, delay 15ms", gpio_value);
-+		mdelay(15);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(btbcm_uart_suspend);
-+
-+void btbcm_uart_resume(void *device_context)
-+{
-+	struct bcm_device *dev = device_context;
-+	int gpio_value;
-+
-+	if (dev->dev_wake_gpio) {
-+		gpio_value = !dev->dev_wake_active_low;
-+		gpiod_set_value(dev->dev_wake_gpio, gpio_value);
-+		BT_DBG("resume %d, delay 15ms", gpio_value);
-+		mdelay(15);
-+	}
-+}
-+EXPORT_SYMBOL_GPL(btbcm_uart_resume);
-+
-+void btbcm_uart_get_params(void *device_context, struct btbcm_uart_params *pp)
-+{
-+	struct bcm_device *dev = device_context;
-+
-+	memset(pp, 0, sizeof(struct btbcm_uart_params));
-+	pp->configure_sleep = dev->configure_sleep;
-+	pp->manual_fc = dev->manual_fc;
-+	pp->dev_wake_active_low = dev->dev_wake_active_low;
-+	pp->bt_wake_active_low = dev->bt_wake_active_low;
-+	pp->idle_timeout_in_secs = dev->idle_timeout;
-+	pp->oper_speed = dev->oper_speed;
-+	pp->configure_audio = dev->configure_audio;
-+	pp->pcm_clockmode = dev->pcm_clockmode;
-+	pp->pcm_fillmethod = dev->pcm_fillmethod;
-+	pp->pcm_fillnum = dev->pcm_fillnum;
-+	pp->pcm_fillvalue = dev->pcm_fillvalue;
-+	pp->pcm_incallbitclock = dev->pcm_incallbitclock;
-+	pp->pcm_lsbfirst = dev->pcm_lsbfirst;
-+	pp->pcm_rightjustify = dev->pcm_rightjustify;
-+	pp->pcm_routing = dev->pcm_routing;
-+	pp->pcm_shortframesync = dev->pcm_shortframesync;
-+	pp->pcm_syncmode = dev->pcm_syncmode;
-+}
-+EXPORT_SYMBOL_GPL(btbcm_uart_get_params);
-+
-+/* Platform susp and resume callbacks */
-+static SIMPLE_DEV_PM_OPS(bcm_uart_pm_ops, bcm_uart_suspend, bcm_uart_resume);
-+
-+/* Driver match table */
-+static const struct of_device_id bcm_uart_table[] = {
-+	{ .compatible = "brcm,brcm-bt-uart" },
-+	{}
-+};
-+
-+/* Driver configuration */
-+static struct platform_driver bcm_uart_driver = {
-+	.probe = bcm_uart_probe,
-+	.remove = bcm_uart_remove,
-+	.driver = {
-+		.name = "btbcm_uart",
-+		.of_match_table = of_match_ptr(bcm_uart_table),
-+		.owner = THIS_MODULE,
-+		.pm = &bcm_uart_pm_ops,
-+	},
-+};
-+
-+module_platform_driver(bcm_uart_driver);
-+
-+MODULE_AUTHOR("Ilya Faenson <ifaenson@broadcom.com>");
-+MODULE_DESCRIPTION("Broadcom Bluetooth UART Driver");
-+MODULE_LICENSE("GPL");
-+
-diff --git a/drivers/bluetooth/btbcm_uart.h b/drivers/bluetooth/btbcm_uart.h
-new file mode 100644
-index 0000000..4274fd5
---- /dev/null
-+++ b/drivers/bluetooth/btbcm_uart.h
-@@ -0,0 +1,74 @@
-+/*
-+ *  Bluetooth BCM UART Driver Header
-+ *
-+ *  Copyright (c) 2015 Broadcom Corporation
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ */
-+
-+/* Callbacks from the driver into the protocol */
-+struct btbcm_uart_callbacks {
-+	void *context;	/* protocol instance context */
-+	char name[64];	/* protocol tty device, for example, ttyS0 */
-+
-+	/* client callbacks */
-+	void (*suspend)(void *context);
-+	void (*resume)(void *context);
-+	void (*wakeup)(void *context);
-+};
-+
-+/* Driver parameters retrieved from the DT or ACPI */
-+struct btbcm_uart_params {
-+	bool configure_sleep;
-+	int manual_fc;
-+	int dev_wake_active_low;
-+	int bt_wake_active_low;
-+	int idle_timeout_in_secs;
-+	int oper_speed;
-+	bool configure_audio;
-+	int pcm_clockmode;
-+	int pcm_fillmethod;
-+	int pcm_fillnum;
-+	int pcm_fillvalue;
-+	int pcm_incallbitclock;
-+	int pcm_lsbfirst;
-+	int pcm_rightjustify;
-+	int pcm_routing;
-+	int pcm_shortframesync;
-+	int pcm_syncmode;
-+};
-+
-+/* Actions on the BTBCM_UART driver
-+ */
-+
-+/* Configure protocol callbacks */
-+void *btbcm_uart_set_callbacks(struct btbcm_uart_callbacks *pc);
-+
-+/* Reset protocol callbacks */
-+void btbcm_uart_reset_callbacks(void *device_context);
-+
-+/* Retrieve BT device parameters */
-+void btbcm_uart_get_params(void *device_context,
-+			   struct btbcm_uart_params *pp);
-+
-+/* Resume the BT device via GPIO */
-+void btbcm_uart_resume(void *device_context);
-+
-+/* Suspend the BT device via GPIO */
-+void btbcm_uart_suspend(void *device_context);
-+
-+/* Power the BT device off via GPIO */
-+void btbcm_uart_poweroff(void *device_context);
-+
-+/* Power the BT device on via GPIO */
-+void btbcm_uart_poweron(void *device_context);
-+
++	unsigned int init_speed;
++	unsigned int oper_speed;
+ };
+ 
+ /* HCI_UART proto flag bits */
+@@ -99,7 +102,11 @@ int hci_uart_register_proto(const struct hci_uart_proto *p);
+ int hci_uart_unregister_proto(const struct hci_uart_proto *p);
+ int hci_uart_tx_wakeup(struct hci_uart *hu);
+ int hci_uart_init_ready(struct hci_uart *hu);
++void hci_uart_init_tty(struct hci_uart *hu);
+ void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
++void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
++void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
++			 unsigned int oper_speed);
+ 
+ #ifdef CONFIG_BT_HCIUART_H4
+ int h4_init(void);
 -- 
 1.9.1
