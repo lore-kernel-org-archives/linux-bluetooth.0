@@ -1,65 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
+Message-id: <5580FD7A.1090609@samsung.com>
+Date: Wed, 17 Jun 2015 13:54:18 +0900
 From: Chan-yeol Park <chanyeol.park@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: hci_uart: Include vendor struct if required
-Date: Wed, 17 Jun 2015 13:59:08 +0900
-Message-id: <1434517149-1728-1-git-send-email-chanyeol.park@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: hci_uart: Include vendor headers if required
+References: <1434459321-20281-1-git-send-email-chanyeol.park@samsung.com>
+ <360D4EF5-34F8-476F-B8CF-A5C98F1481D1@holtmann.org>
+In-reply-to: <360D4EF5-34F8-476F-B8CF-A5C98F1481D1@holtmann.org>
+Content-type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Vendor specific structs should be included only when enabled because
-hci_uart does not need it always.
+Hi Marcel,
 
-Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
----
- drivers/bluetooth/btbcm.h   | 4 ++--
- drivers/bluetooth/btintel.h | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+On 06/16/2015 11:21 PM, Marcel Holtmann wrote:
+> Hi Chan-yeol,
+>
+>> Vendor specific headers should be included only when enabled because
+>> hci_uart does not need it always.
+>>
+>> Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+>> ---
+>> drivers/bluetooth/hci_ldisc.c | 4 ++++
+>> 1 file changed, 4 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+>> index ac87346..231c622 100644
+>> --- a/drivers/bluetooth/hci_ldisc.c
+>> +++ b/drivers/bluetooth/hci_ldisc.c
+>> @@ -45,8 +45,12 @@
+>> #include <net/bluetooth/bluetooth.h>
+>> #include <net/bluetooth/hci_core.h>
+>>
+>> +#ifdef CONFIG_BT_HCIUART_INTEL
+>> #include "btintel.h"
+>> +#endif
+>
+> empty lines here,
+>
+>> +#ifdef CONFIG_BT_HCIUART_BCM
+>> #include "btbcm.h"
+>> +#endif
+>
+> And another empty line here.
+>
+>> #include "hci_uart.h"
+>>
+>
+> However is this really needed? I did not do this since it essentially results into an empty include which will be optimized out. And it just makes the including code more complex.
+>
+> If we worry about the extra structs, then we can just move them down into the IS_ENABLED section into the header itself. I did not worry since my assumption is that compiler optimizes unused structs.
+>
+As you explained, I check my compiler remove unused structure.
 
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-index 02f5f96..ce6e15c 100644
---- a/drivers/bluetooth/btbcm.h
-+++ b/drivers/bluetooth/btbcm.h
-@@ -21,6 +21,8 @@
-  *
-  */
- 
-+#if IS_ENABLED(CONFIG_BT_BCM)
-+
- #define BCM_UART_CLOCK_48MHZ	0x01
- #define BCM_UART_CLOCK_24MHZ	0x02
- 
-@@ -33,8 +35,6 @@ struct bcm_write_uart_clock_setting {
- 	__u8 type;
- } __packed;
- 
--#if IS_ENABLED(CONFIG_BT_BCM)
--
- int btbcm_check_bdaddr(struct hci_dev *hdev);
- int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 4bda6ab..f92a9cf 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -21,6 +21,8 @@
-  *
-  */
- 
-+#if IS_ENABLED(CONFIG_BT_INTEL)
-+
- struct intel_version {
- 	u8 status;
- 	u8 hw_platform;
-@@ -69,8 +71,6 @@ struct intel_secure_send_result {
- 	__u8     status;
- } __packed;
- 
--#if IS_ENABLED(CONFIG_BT_INTEL)
--
- int btintel_check_bdaddr(struct hci_dev *hdev);
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- 
--- 
-2.1.4
-
+Personally I think it's recommended to move extra structs into the 
+IS_ENABLED section because it make clear.
+> Regards
+>
+> Marcel
+>
+>
+>
+Thanks
+Chanyeol
