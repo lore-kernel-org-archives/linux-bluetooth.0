@@ -1,53 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>, Arend van Spriel <arend@broadcom.com>,
-	Ilya Faenson <ifaenson@broadcom.com>
-Subject: [PATCH v3 0/5] Broadcom Bluetooth UART device driver
-Date: Wed, 17 Jun 2015 11:42:42 -0400
-Message-ID: <1434555767-18234-1-git-send-email-ifaenson@broadcom.com>
+Message-ID: <15a4d3c6ac84009c192c73e3e2e88066.squirrel@mungewell.org>
+In-Reply-To: <20150617124842.GA17715@t440s.P-661HNU-F1>
+References: <06F67222-BAF1-455D-A4B8-4560FE84EE69@holtmann.org>
+    <1433786660-2169-1-git-send-email-simon@mungewell.org>
+    <20150617124842.GA17715@t440s.P-661HNU-F1>
+Date: Wed, 17 Jun 2015 11:16:21 -0400
+Subject: Re: [PATCH] bccmd - add ability to read ADC
+From: simon@mungewell.org
+To: linux-bluetooth@vger.kernel.org,
+	"Marcel Holtmann" <marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain;charset=iso-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v3 -	Renamed brcm device into bcm.
-	Allowed for the Broadcom protocol running without Broadcom device
-		at the request of Loic Poulain.
-	Introduced structure definitions for vendor specific commands.
-	Transferred init-speed and oper-speed from protocol into the
-		line discipline as they are configurable.
-	Introduced hci_uart_init_tty function.
-	Removed driver specific Kconfig menu option.
-	Introduced protocol timer helper function.
-	Converted single driver control dispatch routine into individual
-		action routines & removed interface versioning.
-	Eliminated specific firmware file name.
-	Removed excessive tracing.
-	Took care of numerous other comments from Marcel.
-v2 -	Release upon the acceptance of Fred's updates, updated as per
-		the latest comments from Marcel.
-v1 -	Original release against the Fred Danis' updates.
 
-Ilya Faenson (5):
-  Broadcom Bluetooth UART Device Tree bindings
-  H4 line discipline enhancements
-  Broadcom Bluetooth UART Platform Driver
-  Support the BCM4354 Bluetooth UART device
-  BlueZ Broadcom UART Protocol
+> And the patch doesn't actually compile:
+>
+> tools/bccmd.c:1068:2: error: implicit declaration of function ‘usleep’
+> [-Werror=implicit-function-declaration]
+>   usleep(50000);
 
- .../devicetree/bindings/net/bluetooth/btbcm.txt    |  82 +++
- drivers/bluetooth/Makefile                         |   1 +
- drivers/bluetooth/btbcm.c                          |   2 +
- drivers/bluetooth/btbcm.h                          |  31 ++
- drivers/bluetooth/btbcm_uart.c                     | 580 +++++++++++++++++++++
- drivers/bluetooth/btbcm_uart.h                     |  74 +++
- drivers/bluetooth/hci_bcm.c                        | 340 +++++++++++-
- drivers/bluetooth/hci_ldisc.c                      |  93 +++-
- drivers/bluetooth/hci_uart.h                       |   9 +-
- 9 files changed, 1195 insertions(+), 17 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
- create mode 100644 drivers/bluetooth/btbcm_uart.c
- create mode 100644 drivers/bluetooth/btbcm_uart.h
+Huh, builds on Xubuntu 14.10...
+--
+simon@LinuxBuild:~/bluez-git$ make
+make --no-print-directory all-am
+  CC       tools/bccmd.o
+  CCLD     tools/bccmd
+simon@LinuxBuild:~/bluez-git$ grep  ADC tools/bccmd.c
+	// Request an ADC read from a particular mux'ed input
+	err = transport_write(transport, CSR_VARID_ADC, array, 2);
+	err = transport_read(transport, CSR_VARID_ADC_RES, array, 8);
+	printf("ADC value from Mux 0x%02x : 0x%04x (%s)\n", mux, value,
+	{ "adc",       cmd_adc,       "<mux>",               "Read ADC value of
+<mux> input"  },
+--
 
--- 
-1.9.1
+Anyhow, will fix and re-submit. Thanks,
+Simon.
+
