@@ -1,151 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5581BD9B.8050105@qca.qualcomm.com>
-Date: Wed, 17 Jun 2015 11:34:03 -0700
-From: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+From: Simon Wood <simon@mungewell.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: simon@mungewell.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: [Patch-V2] bccmd - add ability to read ADC
+Date: Wed, 17 Jun 2015 12:12:41 -0600
+Message-Id: <1434564761-6282-1-git-send-email-simon@mungewell.org>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>,
-	"Huang, Rick" <rickh@qti.qualcomm.com>
-CC: Sumit's Mailing Lists <lists@battlepenguin.com>,
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: ath3k Bluetooth adapter not loading: [0cf3:3004] Atheros Communications,
- Inc. AR3012 Bluetooth 4.0
-References: <556486B0.1020104@battlepenguin.com> <EEAFDBFC-C252-4843-A9E0-3E74EA21B665@holtmann.org> <557EBF98.2000701@battlepenguin.com> <A93AF220-83E9-4FC3-BC07-18B285E5FA3D@holtmann.org> <557EDE40.7070006@battlepenguin.com> <557F03E2.3000001@qca.qualcomm.com> <557F0FD2.7000000@battlepenguin.com> <55808CAB.3020205@qca.qualcomm.com> <209B4F64-8B24-4A70-A9F3-C42342A4786B@holtmann.org>
-In-Reply-To: <209B4F64-8B24-4A70-A9F3-C42342A4786B@holtmann.org>
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Some BlueCore devices are equipped with an 'Analogue In' pin which is
+internally connected to a MUX and ADC. This patch adds the ability to
+control the MUX and read the ADC.
 
-On 06/17/15 02:36, Marcel Holtmann wrote:
-> Hi Ben,
->
->>>>>>>>> I'm currently using an MSI WS60 laptop which contains the following
->>>>>>>>> Bluetooth controller (from lsusb):
->>>>>>>>>
->>>>>>>>> Bus 003 Device 003: ID 0cf3:3004 Atheros Communications, Inc. AR3012
->>>>>>>>> Bluetooth 4.0
->>>>>>>> assuming that the firmware is present, this is most likely just missing the right VID/PID additions in the drivers. Please prepare a patch for that.
->>>>>>>>
->>>>>>>>> and the more detailed version:
->>>>>>>>>
->>>>>>>>> Bus 003 Device 003: ID 0cf3:3004 Atheros Communications, Inc. AR3012
->>>>>>>>> Bluetooth 4.0
->>>>>>>>> Device Descriptor:
->>>>>>>>> bLength                18
->>>>>>>>> bDescriptorType         1
->>>>>>>>> bcdUSB               1.10
->>>>>>>>> bDeviceClass          224 Wireless
->>>>>>>>> bDeviceSubClass         1 Radio Frequency
->>>>>>>>> bDeviceProtocol         1 Bluetooth
->>>>>>>>> bMaxPacketSize0        64
->>>>>>>>> idVendor           0x0cf3 Atheros Communications, Inc.
->>>>>>>>> idProduct          0x3004 AR3012 Bluetooth 4.0
->>>>>>>>> bcdDevice            0.01
->>>>>>>>> iManufacturer           0
->>>>>>>>> iProduct                0
->>>>>>>>> iSerial                 0
->>>>>>>>> bNumConfigurations      1
->>>>>>>>> Configuration Descriptor:
->>>>>>>> I actually prefer /sys/kernel/debug/usb/devices output for the devices.
->>>>>>>>
->>>>>>>> Regards
->>>>>>>>
->>>>>>>> Marcel
->>>>>>>>
->>>>>>> Here is the output from /sys/kernel/debug/usb/devices for my ath3k (also
->>>>>>> added it to the kernel bugzilla):
->>>>>>>
->>>>>>> T:  Bus=03 Lev=02 Prnt=02 Port=02 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
->>>>>>> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
->>>>>>> P:  Vendor=0cf3 ProdID=3004 Rev= 0.01
->>>>>>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
->>>>>>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
->>>>>>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->>>>>>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->>>>>>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->>>>>>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->>>>>>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->>>>>>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->>>>>>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->>>>>>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->>>>>>>
->>>>>>> and the firmware the kernel is trying to load:
->>>>>>>
->>>>>>> [  762.729370] usb 3-1.3: Direct firmware load for
->>>>>>> ar3k/AthrBT_0x00000200.dfu failed with error -2
->>>>>>> [  762.729373] Bluetooth: Patch file not found ar3k/AthrBT_0x00000200.dfu
->>>>>>> [  762.729374] Bluetooth: Loading patch file failed
->>>>>>> [  762.729381] ath3k: probe of 3-1.3:1.0 failed with error -2
->>>>>>> [  762.729411] usbcore: registered new interface driver ath3k
->>>>>> I fail to see that firmware in linux-firmware tree. However this up to Atheros / Qualcomm to submit there. I can not do much about this.
->>>>>>
->>>>>> Regards
->>>>>>
->>>>>> Marcel
->>>>>>
->>>>> Marcel,
->>>>>
->>>>> So it's pulling the right firmware file for my device, but It just
->>>>> hasn't been released yet?
->>>>>
->>>>> I know with the Wi-Fi firmware, the ath10k devs had python scripts to
->>>>> extract the firmware binaries from the Windows drivers (mentioned in
->>>>> here https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1383184). Has
->>>>> anyone done that before with the bluetooth firmware, or do you typically
->>>>> just wait for atheros/qualcom to release official ones?
->>>> Where did you get your atheros board/card since I couldn't find that board here. Is it a laptop? The BT firmware driver was trying to load AthrBT_0x00000200.dfu file and it got failed because no firmware file was present. But 0x00000200 means fw_version.rom_version which coming from controller chip, however, I haven't seen this version on Atheros chipset.
->>>>
->>>> I'm adding my friend - Rick Huang here. He may help you out
->>>>
->>>> Hi Rick,
->>>>
->>>> Have you seen rom_version as 0x00000200?
->>>>
->>>>> Sumit
->>>>> --
->>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>>> the body of a message to majordomo@vger.kernel.org
->>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>> Thanks
->>>> -- Ben Kim
->>>>
->>> Yes, It's an MSI WS-60 Laptop, purchased two months ago in Australia. Is
->>> there any other debugging information I need to pull for you?
->>>
->>> Sumit
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> According to my colleague, it is not AR chip but QCA ROME core inside even though they're sharing same VID/PID with AR/QCA ROME(version 2). That's why you cannot bring up your card with ath3k driver. I knew it was not a good idea as it was early stage to develop the card so that next version of ROME USB card(v3.0 or v3.2) will use different PID/VID as you can see below.
-> I would really prefer if companies pay more attention when releasing hardware that the USB product ID is unique. Is there any other identifying detail in the USB descriptors that could be used to check which version it is?
->
-> So you can not just walk away and say bad luck here. You released this mishap and now have to figure out on how we can make both hardware versions work. Otherwise I will take the other working one out as well and level the playing field here.
->
-> Regards
->
-> Marcel
->
+The ADC is also connected internal to a temp sensor, which can also be
+read via this method.
 
-Yes, I agree with you. I would say upcoming other product which has built a version of ROME including v2.0/v2.1/v3.0/v3.2 is going to use different PID but I hadn't recognized MSI has a QCA ROME of same PID with AR3012 until I got reported.
+The (only) MUX values expected to be used are:
+1  Internal 1V25 reference
+16 BlueCore01b pin Test_A; BlueCore2-External pin AIO0
+17 BlueCore01b pin Test_B; BlueCore2-External pin AIO1
+36 Chip’s internal temperature (change) sensor. BlueCore2-ROM and later only.
 
-Hi Rick,
+The MUX can also select other (undocumented) test points.
 
-Is there any other way to detect AR/ROME chips sharing with same VID/PID except sending command to controller even though they're reporting same PID?
+Example usage
+--
+$ ./bccmd -t HCI -d hci1 adc 17
+ADC value from Mux 0x11 : 0x0054 (valid)
+$ ./bccmd -t HCI -d hci1 adc 1
+ADC value from Mux 0x01 : 0x00b2 (valid)
+---
+ tools/bccmd.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ tools/csr.h   |  2 ++
+ 2 files changed, 45 insertions(+)
 
-Thanks
--- Ben Kim
+diff --git a/tools/bccmd.c b/tools/bccmd.c
+index 7cce426..4d15f3f 100644
+--- a/tools/bccmd.c
++++ b/tools/bccmd.c
+@@ -30,6 +30,7 @@
+ #include <stdlib.h>
+ #include <getopt.h>
+ #include <sys/socket.h>
++#include <unistd.h>
+ 
+ #include "lib/bluetooth.h"
+ #include "lib/hci.h"
+@@ -1040,6 +1041,47 @@ static int cmd_pscheck(int transport, int argc, char *argv[])
+ 	return 0;
+ }
+ 
++static int cmd_adc(int transport, int argc, char *argv[])
++{
++	uint8_t array[8];
++	uint16_t mux, value;
++	int err;
++
++	OPT_HELP(1, NULL);
++
++	if (!strncasecmp(argv[0], "0x", 2))
++		mux = strtol(argv[0], NULL, 16);
++	else
++		mux = atoi(argv[0]);
++
++	/* Request an ADC read from a particular mux'ed input */
++	memset(array, 0, sizeof(array));
++	array[0] = mux & 0xff;
++	array[1] = mux >> 8;
++
++	err = transport_write(transport, CSR_VARID_ADC, array, 2);
++	if (err < 0) {
++		errno = -err;
++		return -1;
++	}
++
++	/* have to wait a short while, then read result */
++	usleep(50000);
++	err = transport_read(transport, CSR_VARID_ADC_RES, array, 8);
++	if (err < 0) {
++		errno = -err;
++		return -1;
++	}
++
++	mux = array[0] | (array[1] << 8);
++	value = array[4] | (array[5] << 8);
++
++	printf("ADC value from Mux 0x%02x : 0x%04x (%s)\n", mux, value,
++					array[2] == 1 ? "valid" : "invalid");
++
++	return 0;
++}
++
+ static struct {
+ 	char *str;
+ 	int (*func)(int transport, int argc, char *argv[]);
+@@ -1070,6 +1112,7 @@ static struct {
+ 	{ "psread",    cmd_psread,    NULL,                  "Read all PS keys"               },
+ 	{ "psload",    cmd_psload,    "<file>",              "Load all PS keys from PSR file" },
+ 	{ "pscheck",   cmd_pscheck,   "<file>",              "Check PSR file"                 },
++	{ "adc",       cmd_adc,       "<mux>",               "Read ADC value of <mux> input"  },
+ 	{ NULL }
+ };
+ 
+diff --git a/tools/csr.h b/tools/csr.h
+index 8b94d7b..cc245a5 100644
+--- a/tools/csr.h
++++ b/tools/csr.h
+@@ -39,6 +39,7 @@
+ #define CSR_VARID_BT_CLOCK			0x2c00	/* uint32 */
+ #define CSR_VARID_PS_NEXT			0x3005	/* complex */
+ #define CSR_VARID_PS_SIZE			0x3006	/* complex */
++#define CSR_VARID_ADC_RES			0x3007	/* complex */
+ #define CSR_VARID_CRYPT_KEY_LENGTH		0x3008	/* complex */
+ #define CSR_VARID_PICONET_INSTANCE		0x3009	/* complex */
+ #define CSR_VARID_GET_CLR_EVT			0x300a	/* complex */
+@@ -62,6 +63,7 @@
+ #define CSR_VARID_CANCEL_PAGE			0x4012	/* valueless */
+ #define CSR_VARID_PS_CLR			0x4818	/* uint16 */
+ #define CSR_VARID_MAP_SCO_PCM			0x481c	/* uint16 */
++#define CSR_VARID_ADC				0x4829	/* uint16 */
+ #define CSR_VARID_SINGLE_CHAN			0x482e	/* uint16 */
+ #define CSR_VARID_RADIOTEST			0x5004	/* complex */
+ #define CSR_VARID_PS_CLR_STORES			0x500c	/* complex */
+-- 
+2.1.4
+
