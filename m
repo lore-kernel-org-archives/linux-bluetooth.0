@@ -1,57 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-To: <marcel@holtmann.org>
-CC: <jukka.rissanen@linux.intel.com>, <lukasz.duda@nordicsemi.no>,
-	<linux-bluetooth@vger.kernel.org>
-Subject: [PATCH 2/5] Bluetooth: 6lowpan: Rename ambiguous variable
-Date: Wed, 17 Jun 2015 07:32:24 -0700
-Message-ID: <1434551547-11210-3-git-send-email-glenn.ruben.bakke@nordicsemi.no>
-In-Reply-To: <1434551547-11210-1-git-send-email-glenn.ruben.bakke@nordicsemi.no>
-References: <1434551547-11210-1-git-send-email-glenn.ruben.bakke@nordicsemi.no>
 MIME-Version: 1.0
-Content-Type: text/plain
+Date: Wed, 17 Jun 2015 19:44:26 +0530
+Message-ID: <CAKafyqp10Sy-MoOt+SmB1z3=zw+NcwkRWo2BstqGdcd7zRAZVA@mail.gmail.com>
+Subject: bluez/android HFP auto connect
+From: Prabhu Chawandi <foss.chaws@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch renames the variable used to trigger scheduling of
-delete_netdev. Changed to infinitiv in order to describe the action
-to be done.
+Hi,
 
-Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
-Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
----
- net/bluetooth/6lowpan.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+  I am working with bluez-5.30.
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 3edc731..7ee591a 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -937,7 +937,7 @@ static void chan_close_cb(struct l2cap_chan *chan)
- 	struct lowpan_dev *dev = NULL;
- 	struct lowpan_peer *peer;
- 	int err = -ENOENT;
--	bool last = false, removed = true;
-+	bool last = false, remove = true;
- 
- 	BT_DBG("chan %p conn %p", chan, chan->conn);
- 
-@@ -948,7 +948,7 @@ static void chan_close_cb(struct l2cap_chan *chan)
- 		/* If conn is set, then the netdev is also there and we should
- 		 * not remove it.
- 		 */
--		removed = false;
-+		remove = false;
- 	}
- 
- 	spin_lock(&devices_lock);
-@@ -977,7 +977,7 @@ static void chan_close_cb(struct l2cap_chan *chan)
- 
- 		ifdown(dev->netdev);
- 
--		if (removed) {
-+		if (remove) {
- 			INIT_WORK(&entry->delete_netdev, delete_netdev);
- 			schedule_work(&entry->delete_netdev);
- 		}
--- 
-2.1.4
+I have two systems, after pairing with one linux system Fedora 20,
+when press call button connection establishes and AT commands are
+coming. Everything seems fine.
+
+Where I have other system - after paring, when I hold call button no
+handsfree is connection request come. But When I manually connect AT
+commands come, again for VOICE recognition if I hold button AT+BVRA is
+not coming.
+
+Both are loaded with same 5.30, is there any kernel configuration I
+particularly need to enable.
+
+manyThanks,
+Prabhu
