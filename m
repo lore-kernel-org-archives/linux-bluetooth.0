@@ -1,61 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Chan-yeol Park <chanyeol.park@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/2] Bluetooth: hci_uart: Fix dereferencing of ERR_PTR
-Date: Wed, 17 Jun 2015 21:10:39 +0900
-Message-id: <1434543039-5494-2-git-send-email-chanyeol.park@samsung.com>
-In-reply-to: <1434543039-5494-1-git-send-email-chanyeol.park@samsung.com>
-References: <1434543039-5494-1-git-send-email-chanyeol.park@samsung.com>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH 2/2] Bluetooth: hci_uart: Fix dereferencing of ERR_PTR
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5580F9E7.1000902@samsung.com>
+Date: Wed, 17 Jun 2015 11:37:58 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <D18C0514-53EB-43A5-A41C-99A1610D9186@holtmann.org>
+References: <1434459321-20281-1-git-send-email-chanyeol.park@samsung.com> <1434459321-20281-2-git-send-email-chanyeol.park@samsung.com> <98B3DE38-46E4-44F7-8AA5-774A96C521BE@holtmann.org> <5580F9E7.1000902@samsung.com>
+To: Chan-yeol Park <chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If h4_recv_buf() return ERR_PTR instead sk_buff pointer, it should be
-cleared once PTR_ERR is completed for the further dereference such as
-h4_recv(), or h4_close().
+Hi Chan-yeol,
 
-Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
----
- drivers/bluetooth/hci_ath.c | 1 +
- drivers/bluetooth/hci_bcm.c | 1 +
- drivers/bluetooth/hci_h4.c  | 1 +
- 3 files changed, 3 insertions(+)
+>>> If h4_recv() return ERR_PTR instead sk_buff pointer, it should be
+>>> cleared once dereference is completed for the further reference such as
+>>> h4_recv(), or h4_close().
+>> 
+>> I have no idea what the h4_close has to do with it? Can you explain.
+> If h4->rx_skb has ERR_PTR , kfree_skb() would dereference of ERR_PTR. This is easily reproduced on my board when I turn off BT.
 
-diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-index ec8fa0e..6da5e4c 100644
---- a/drivers/bluetooth/hci_ath.c
-+++ b/drivers/bluetooth/hci_ath.c
-@@ -192,6 +192,7 @@ static int ath_recv(struct hci_uart *hu, const void *data, int count)
- 	if (IS_ERR(ath->rx_skb)) {
- 		int err = PTR_ERR(ath->rx_skb);
- 		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
-+		ath->rx_skb = NULL;
- 		return err;
- 	}
- 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index e4d66b6..aa3c9ac 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -188,6 +188,7 @@ static int bcm_recv(struct hci_uart *hu, const void *data, int count)
- 	if (IS_ERR(bcm->rx_skb)) {
- 		int err = PTR_ERR(bcm->rx_skb);
- 		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
-+		bcm->rx_skb = NULL;
- 		return err;
- 	}
- 
-diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-index f7190f0..57faddc 100644
---- a/drivers/bluetooth/hci_h4.c
-+++ b/drivers/bluetooth/hci_h4.c
-@@ -133,6 +133,7 @@ static int h4_recv(struct hci_uart *hu, const void *data, int count)
- 	if (IS_ERR(h4->rx_skb)) {
- 		int err = PTR_ERR(h4->rx_skb);
- 		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
-+		h4->rx_skb = NULL;
- 		return err;
- 	}
- 
--- 
-2.1.4
+I see. kfree_skb is not smart enough.
+
+>> 
+>>> 
+>>> Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+>>> ---
+>>> drivers/bluetooth/hci_h4.c | 2 ++
+>>> 1 file changed, 2 insertions(+)
+>>> 
+>>> diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+>>> index f7190f0..a8acd99 100644
+>>> --- a/drivers/bluetooth/hci_h4.c
+>>> +++ b/drivers/bluetooth/hci_h4.c
+>>> @@ -133,6 +133,7 @@ static int h4_recv(struct hci_uart *hu, const void *data, int count)
+>>> 	if (IS_ERR(h4->rx_skb)) {
+>>> 		int err = PTR_ERR(h4->rx_skb);
+>>> 		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
+>>> +		h4->rx_skb = NULL;
+>>> 		return err;
+>>> 	}
+
+actually lets go with this fix. It is cleaner since you do not need to touch the close functions. However this issue exists in all drivers. So we need to fix all of them.
+
+Regards
+
+Marcel
 
