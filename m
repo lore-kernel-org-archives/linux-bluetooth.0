@@ -3,20 +3,19 @@ From: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
 To: <marcel@holtmann.org>
 CC: <jukka.rissanen@linux.intel.com>, <lukasz.duda@nordicsemi.no>,
 	<linux-bluetooth@vger.kernel.org>
-Subject: [PATCH 3/5] Bluetooth: 6lowpan: Move netdev sysfs device reference
-Date: Wed, 17 Jun 2015 07:32:25 -0700
-Message-ID: <1434551547-11210-4-git-send-email-glenn.ruben.bakke@nordicsemi.no>
+Subject: [PATCH 1/5] Bluetooth: 6lowpan: Enable delete_netdev to be scheduled when last peer is deleted
+Date: Wed, 17 Jun 2015 07:32:23 -0700
+Message-ID: <1434551547-11210-2-git-send-email-glenn.ruben.bakke@nordicsemi.no>
 In-Reply-To: <1434551547-11210-1-git-send-email-glenn.ruben.bakke@nordicsemi.no>
 References: <1434551547-11210-1-git-send-email-glenn.ruben.bakke@nordicsemi.no>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves the sysfs device used by the netdev from the device of
-the first connected peer to the hci sysfs device. Using the sysfs device
-of hci instead of the first connected device fixes this issue such that
-the sysfs group of tx-0 and bt0 kobject are still present after the last
-peer has been deleted and all sysfs entries can be removed.
+This patch fixes an issue with the netdev not being unregistered when
+the last peer is deleted. Removing the logical negation operator on the
+boolean solves this issue. If the last peer is removed the condition
+will be true, and the delete_netdev() is scheduled.
 
 Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
 Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
@@ -25,17 +24,17 @@ Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 7ee591a..bc105a9 100644
+index f3d6046..3edc731 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -856,7 +856,7 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
- 	set_dev_addr(netdev, &chan->src, chan->src_type);
+@@ -977,7 +977,7 @@ static void chan_close_cb(struct l2cap_chan *chan)
  
- 	netdev->netdev_ops = &netdev_ops;
--	SET_NETDEV_DEV(netdev, &chan->conn->hcon->dev);
-+	SET_NETDEV_DEV(netdev, &chan->conn->hcon->hdev->dev);
- 	SET_NETDEV_DEVTYPE(netdev, &bt_type);
+ 		ifdown(dev->netdev);
  
- 	err = register_netdev(netdev);
+-		if (!removed) {
++		if (removed) {
+ 			INIT_WORK(&entry->delete_netdev, delete_netdev);
+ 			schedule_work(&entry->delete_netdev);
+ 		}
 -- 
 2.1.4
