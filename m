@@ -1,32 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH v3 4/5] Support the BCM4354 Bluetooth UART device
+Subject: Re: [PATCH v3 1/5] Broadcom Bluetooth UART Device Tree bindings
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1434555767-18234-5-git-send-email-ifaenson@broadcom.com>
-Date: Wed, 17 Jun 2015 18:59:11 +0200
+In-Reply-To: <1434555767-18234-2-git-send-email-ifaenson@broadcom.com>
+Date: Wed, 17 Jun 2015 18:55:56 +0200
 Cc: linux-bluetooth@vger.kernel.org,
 	Arend van Spriel <arend@broadcom.com>
-Message-Id: <80E1797C-1834-405B-A432-D3DD984CC31C@holtmann.org>
-References: <1434555767-18234-1-git-send-email-ifaenson@broadcom.com> <1434555767-18234-5-git-send-email-ifaenson@broadcom.com>
+Message-Id: <BCACD307-6706-414E-B5F9-24EBBE1DBDE6@holtmann.org>
+References: <1434555767-18234-1-git-send-email-ifaenson@broadcom.com> <1434555767-18234-2-git-send-email-ifaenson@broadcom.com>
 To: Ilya Faenson <ifaenson@broadcom.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Ilya,
 
-> Support the BCM4354 chip and introduce vendor specific command
-> parameter definitions.
+> Device Tree bindings to configure the Broadcom Bluetooth UART device.
 > 
 > Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
 > ---
-> drivers/bluetooth/btbcm.c |  2 ++
-> drivers/bluetooth/btbcm.h | 31 +++++++++++++++++++++++++++++++
-> 2 files changed, 33 insertions(+)
+> .../devicetree/bindings/net/bluetooth/btbcm.txt    | 82 ++++++++++++++++++++++
+> 1 file changed, 82 insertions(+)
+> create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+> new file mode 100644
+> index 0000000..c2cf93a
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+> @@ -0,0 +1,82 @@
+> +btbcm
+> +------
+> +
+> +Required properties:
+> +
+> +	- compatible : must be "brcm,brcm-bt-uart".
+> +	- tty : tty device connected to this Bluetooth device.
 
-patch has been applied to bluetooth-next tree.
-
-I decide to apply this one since it is self-contained and causes no harm to be applied ahead of time. However I had fix up the subject line. You want to prefix this with Bluetooth: btbcm: or similar in the future. If in doubt look at what the last patches touching some of the files have used as prefix.
+since I am not the DT expert, can we get a few Acks on this patch so that I can take it through the bluetooth-next tree.
 
 Regards
 
