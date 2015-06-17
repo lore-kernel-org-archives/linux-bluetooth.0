@@ -1,112 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-From: Florian Grandel <fgrandel@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 00/20] Multi-advertising
-Date: Thu, 18 Jun 2015 03:16:33 +0200
-Message-Id: <1434590213-26599-1-git-send-email-fgrandel@gmail.com>
-In-Reply-To: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
-References: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Ilya Faenson <ifaenson@broadcom.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, Arend Van Spriel
+	<arend@broadcom.com>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, "devicetree-spec@vger.kernel.org"
+	<devicetree-spec@vger.kernel.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: FW: [PATCH v4 1/4] Broadcom Bluetooth UART Device Tree bindings
+Date: Wed, 17 Jun 2015 23:11:07 +0000
+Message-ID: <E0D3336E15B58B4294723AC879BA5E942634F2@IRVEXCHMB15.corp.ad.broadcom.com>
+References: <1434576658-20730-1-git-send-email-ifaenson@broadcom.com>
+ <1434576658-20730-2-git-send-email-ifaenson@broadcom.com>
+In-Reply-To: <1434576658-20730-2-git-send-email-ifaenson@broadcom.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-patch set introducing the infrastructure for multi-advertising
-capability to the HCI core and mgmt API.
++ devicetree lists
 
-v1 -> v2:
-- add missing braces in read_adv_features()
+-----Original Message-----
+From: Ilya Faenson [mailto:ifaenson@broadcom.com]=20
+Sent: Wednesday, June 17, 2015 5:31 PM
+To: Marcel Holtmann
+Cc: linux-bluetooth@vger.kernel.org; Arend Van Spriel; Ilya Faenson
+Subject: [PATCH v4 1/4] Broadcom Bluetooth UART Device Tree bindings
 
-v2 -> v3 (changes due to Johan's review):
-- split change-set into several patches
-- replace err == 0 by !err
-- fix coding style problems
+Device Tree bindings to configure the Broadcom Bluetooth UART device.
 
-v3 -> v4 (changes due to Arman's review):
-- bug fix: when calling remove_advertising with an instance value of
-  zero (i.e.  remove all instances), the command response also returns
-  an instance value of zero now as it doesn't make sense to return a
-  single instance id when removing several instances
-- splitting the change set into a much larger number of patches to
-  facilitate review
-- use HCI_MAX_ADV_INSTANCES in the same patch that introduces it
-- use adv_info->hdev in the same patch that introduces it
-- make the logic of hci_find_adv_instance() more readable
-- make sure that hci_find_adv_instance() is called while hci_dev is
-  locked
-- replace hci_num_adv_instances() by an instance counter in hci_dev
-- add inline comment in get_adv_instance_flags() explaining its return
-  value in the error case
-- generate zero-length adv data if the current instance identifier is
-  invalid
-- revert erroneous changes to the logic in clear_adv_instance()
-- use hci_adv_instances_clear() in clear_adv_instance() when removing
-  all advertising instances also removing a redundant error check
-- inserting TODO messages to make sure that advertising will not be
-  switched off prematurely once we allow more than one advertising
-  instance
-- inserting TODO messages to make sure that multiple advertising
-  instances will be advertised in a round-robin fashion once we allow
-  for more than one advertising instance
-- identify pending advertising instances (just added but not yet
-  confirmed in add_advertising_complete) by a boolean flag in the
-  adv_info struct so that we can identify and remove them even when the
-  pending add_advertising command cannot be retrieved for some reason -
-  makes sure that we do not leak advertising instances in this case
-- only send HCI commands to update advertising data when a new instance
-  has actually been added
+Signed-off-by: Ilya Faenson <ifaenson@broadcom.com>
+---
+ .../devicetree/bindings/net/bluetooth/btbcm.txt    | 86 ++++++++++++++++++=
+++++
+ 1 file changed, 86 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/btbcm.t=
+xt
 
-v4 -> v5 (changes due to Marcel's review):
-- split into separate change sets for kernel and userspace
-- do not trust the adv instance list length when compiling the adv
-  features struct
-- introduce adv_info->pending in the same patch it's used for the first
-  time
-
-v5 -> v6 (changes due to Marcel's review):
-- fix the add adv override bug
-- fix "Using plain integer as NULL pointer" warning in
-  set_advertising_complete()
-- reword the "remove adv instance" commit comment to make it clear that
-  an existing bug is being fixed
-
-v6 -> v7:
-- so far the patch set only contained a functionally neutral refactoring
-  to provide the basic infrastructure for multi-advertising. It has been
-  decided, though, that the patch set should provide the whole package
-  at once, including actual multi-advertising functionality. This has
-  been implemented and tested in the latest version of the patch set.
-
-v7 -> v8 (changes due to Marcel's review):
-- switch to next instance when updating the currently advertised
-  instance
-- keep instances without timeout during power cycles
-
-Florian Grandel (20):
-  Bluetooth: hci_core/mgmt: Introduce multi-adv list
-  Bluetooth: hci_core/mgmt: move adv timeout to hdev
-  Bluetooth: mgmt: dry update_scan_rsp_data()
-  Bluetooth: mgmt: rename update_*_data_for_instance()
-  Bluetooth: mgmt: multi adv for read_adv_features()
-  Bluetooth: mgmt: multi adv for get_current_adv_instance()
-  Bluetooth: mgmt: multi adv for get_adv_instance_flags()
-  Bluetooth: mgmt: improve get_adv_instance_flags() readability
-  Bluetooth: mgmt: multi adv for enable_advertising()
-  Bluetooth: mgmt: multi adv for create_instance_scan_rsp_data()
-  Bluetooth: mgmt: multi adv for create_instance_adv_data()
-  Bluetooth: mgmt: multi adv for set_advertising*()
-  Bluetooth: mgmt: multi adv for clear_adv_instances()
-  Bluetooth: mgmt/hci_core: multi-adv for add_advertising*()
-  Bluetooth: mgmt: multi adv for remove_advertising*()
-  Bluetooth: mgmt: program multi-adv on power on
-  Bluetooth: mgmt: multi-adv for trigger_le_scan()
-  Bluetooth: mgmt: multi-adv for mgmt_reenable_advertising()
-  Bluetooth: hci_core: remove obsolete adv_instance
-  Bluetooth: hci_core: increase max adv inst
-
- include/net/bluetooth/hci_core.h |  29 +-
- net/bluetooth/hci_core.c         | 148 +++++++++-
- net/bluetooth/mgmt.c             | 563 +++++++++++++++++++++++++++------------
- 3 files changed, 565 insertions(+), 175 deletions(-)
-
--- 
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt b/Do=
+cumentation/devicetree/bindings/net/bluetooth/btbcm.txt
+new file mode 100644
+index 0000000..5dbcd57
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/bluetooth/btbcm.txt
+@@ -0,0 +1,86 @@
++btbcm
++------
++
++Required properties:
++
++	- compatible : must be "brcm,brcm-bt-uart".
++	- tty : tty device connected to this Bluetooth device.
++
++Optional properties:
++
++  - bt-host-wake-gpios : bt-host-wake input GPIO to be used as an interrup=
+t.
++
++  - bt-wake-gpios : bt-wake output GPIO to be used to suspend / resume dev=
+ice.
++
++  - bt-reg-on-gpios : reg-on output GPIO to be used to power device on/off=
+.
++
++  - oper-speed : Bluetooth device operational baud rate.
++    Default: 3000000.
++
++  - manual-fc : flow control UART in suspend / resume scenarios.
++    Default: 0.
++
++  - configure-sleep : configure suspend / resume flag.
++    Default: false.
++
++  - idle-timeout : Number of seconds of inactivity before suspending.
++    Default: 5.
++
++  - configure-audio : configure platform PCM SCO flag.
++    Default: false.
++
++  - pcm-clockmode : PCM clock mode. 0-slave, 1-master.
++    Default: 0.
++
++  - pcm-fillmethod : PCM fill method. 0 to 3.
++    Default: 2.
++
++  - pcm-fillnum : PCM number of fill bits. 0 to 3.
++    Default: 0.
++
++  - pcm-fillvalue : PCM fill value. 0 to 7.
++    Default: 3.
++
++  - pcm-incallbitclock : PCM interface rate. 0-128Kbps, 1-256Kbps, 2-512Kb=
+ps,
++    3-1024Kbps, 4-2048Kbps.
++    Default: 0.
++
++  - pcm-lsbfirst : PCM LSB first. 0 or 1.
++    Default: 0.
++
++  - pcm-rightjustify : PCM Justify. 0-left, 1-right.
++    Default: 0.
++
++  - pcm-routing : PCM routing. 0-PCM, 1-SCO over HCI.
++    Default: 0.
++
++  - pcm-shortframesync : PCM sync. 0-short, 1-long.
++    Default: 0.
++
++  - pcm-syncmode : PCM sync mode. 0-slave, 1-master.
++    Default: 0.
++
++
++Example:
++
++	bcm4354_bt_uart: bcm4354-bt-uart {
++		compatible =3D "brcm,brcm-bt-uart";
++		bt-wake-gpios =3D <&gpio4 30 GPIO_ACTIVE_HIGH>;
++		bt-host-wake-gpios =3D <&gpio4 31 GPIO_ACTIVE_HIGH>;
++		tty =3D "ttyS0";
++		oper-speed =3D <3000000>;
++		configure-sleep;
++		idle-timeout =3D <5>;
++		configure-audio;
++		pcm-clockmode =3D <0>;
++		pcm-fillmethod =3D <2>;
++		pcm-fillnum =3D <0>;
++		pcm-fillvalue =3D <3>;
++		pcm-incallbitclock =3D <0>;
++		pcm-lsbfirst =3D <0>;
++		pcm-rightjustify =3D <0>;
++		pcm-routing =3D <0>;
++		pcm-shortframesync =3D <0>;
++		pcm-syncmode =3D <0>;
++	};
++
+--=20
 1.9.1
-
