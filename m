@@ -1,64 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 1/2] Bluetooth: hci_uart: Include vendor struct if required
-Date: Wed, 17 Jun 2015 21:10:38 +0900
-Message-id: <1434543039-5494-1-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH v3 2/2] Bluetooth: hci_uart: Fix dereferencing of ERR_PTR
+Date: Wed, 17 Jun 2015 21:10:39 +0900
+Message-id: <1434543039-5494-2-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1434543039-5494-1-git-send-email-chanyeol.park@samsung.com>
+References: <1434543039-5494-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Vendor specific structs should be included only when enabled because
-hci_uart does not need it always.
+If h4_recv_buf() return ERR_PTR instead sk_buff pointer, it should be
+cleared once PTR_ERR is completed for the further dereference such as
+h4_recv(), or h4_close().
 
 Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
 ---
- drivers/bluetooth/btbcm.h   | 4 ++--
- drivers/bluetooth/btintel.h | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/bluetooth/hci_ath.c | 1 +
+ drivers/bluetooth/hci_bcm.c | 1 +
+ drivers/bluetooth/hci_h4.c  | 1 +
+ 3 files changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-index 02f5f96..ce6e15c 100644
---- a/drivers/bluetooth/btbcm.h
-+++ b/drivers/bluetooth/btbcm.h
-@@ -21,6 +21,8 @@
-  *
-  */
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+index ec8fa0e..6da5e4c 100644
+--- a/drivers/bluetooth/hci_ath.c
++++ b/drivers/bluetooth/hci_ath.c
+@@ -192,6 +192,7 @@ static int ath_recv(struct hci_uart *hu, const void *data, int count)
+ 	if (IS_ERR(ath->rx_skb)) {
+ 		int err = PTR_ERR(ath->rx_skb);
+ 		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
++		ath->rx_skb = NULL;
+ 		return err;
+ 	}
  
-+#if IS_ENABLED(CONFIG_BT_BCM)
-+
- #define BCM_UART_CLOCK_48MHZ	0x01
- #define BCM_UART_CLOCK_24MHZ	0x02
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index e4d66b6..aa3c9ac 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -188,6 +188,7 @@ static int bcm_recv(struct hci_uart *hu, const void *data, int count)
+ 	if (IS_ERR(bcm->rx_skb)) {
+ 		int err = PTR_ERR(bcm->rx_skb);
+ 		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
++		bcm->rx_skb = NULL;
+ 		return err;
+ 	}
  
-@@ -33,8 +35,6 @@ struct bcm_write_uart_clock_setting {
- 	__u8 type;
- } __packed;
- 
--#if IS_ENABLED(CONFIG_BT_BCM)
--
- int btbcm_check_bdaddr(struct hci_dev *hdev);
- int btbcm_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 4bda6ab..f92a9cf 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -21,6 +21,8 @@
-  *
-  */
- 
-+#if IS_ENABLED(CONFIG_BT_INTEL)
-+
- struct intel_version {
- 	u8 status;
- 	u8 hw_platform;
-@@ -69,8 +71,6 @@ struct intel_secure_send_result {
- 	__u8     status;
- } __packed;
- 
--#if IS_ENABLED(CONFIG_BT_INTEL)
--
- int btintel_check_bdaddr(struct hci_dev *hdev);
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index f7190f0..57faddc 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -133,6 +133,7 @@ static int h4_recv(struct hci_uart *hu, const void *data, int count)
+ 	if (IS_ERR(h4->rx_skb)) {
+ 		int err = PTR_ERR(h4->rx_skb);
+ 		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
++		h4->rx_skb = NULL;
+ 		return err;
+ 	}
  
 -- 
 2.1.4
