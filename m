@@ -1,55 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1434609317.2794.18.camel@linux.intel.com>
-Subject: Re: [PATCH 3/5] Bluetooth: 6lowpan: Move netdev sysfs device
- reference
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-Cc: lukasz.duda@nordicsemi.no, linux-bluetooth@vger.kernel.org
-Date: Thu, 18 Jun 2015 09:35:17 +0300
-In-Reply-To: <1434551547-11210-4-git-send-email-glenn.ruben.bakke@nordicsemi.no>
-References: <1434551547-11210-1-git-send-email-glenn.ruben.bakke@nordicsemi.no>
-	 <1434551547-11210-4-git-send-email-glenn.ruben.bakke@nordicsemi.no>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Thu, 18 Jun 2015 08:55:52 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Florian Grandel <fgrandel@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [BlueZ v9 00/16] Multi-advertising
+Message-ID: <20150618055552.GA11172@t440s.P-661HNU-F1>
+References: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
+ <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Glenn,
+Hi Florian,
 
-On ke, 2015-06-17 at 07:32 -0700, Glenn Ruben Bakke wrote:
-> This patch moves the sysfs device used by the netdev from the device of
-> the first connected peer to the hci sysfs device. Using the sysfs device
-> of hci instead of the first connected device fixes this issue such that
-> the sysfs group of tx-0 and bt0 kobject are still present after the last
-> peer has been deleted and all sysfs entries can be removed.
+On Thu, Jun 18, 2015, Florian Grandel wrote:
+> Florian Grandel (16):
+>   doc/mgmt-api: multi-adv implementation details
+>   doc/mgmt-api: fix typos
+>   tools/btmgmt: make inst duration configurable
+>   tools/mgmt-tester: error message when unexp params
+>   tools/mgmt-tester: expect 0 rp when removing all adv inst
+>   tools/mgmt-tester: comment add adv test setup
+>   tools/mgmt-tester: rename add adv tests
+>   tools/mgmt-tester: increase max adv inst
+>   tools/mgmt-tester: keep instances on power cycle
+>   tools/mgmt-tester: test adv inst override
+>   tools/mgmt-tester: make test timeout configurable
+>   tools/mgmt-tester: allow for event-only tests
+>   tools/mgmt-tester: test advertising timeout
+>   tools/mgmt-tester: test le off
+>   tools/mgmt-tester: fix duplicate code
+>   tools/mgmt-tester: test multi-adv
 > 
-> Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
-> Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-> ---
->  net/bluetooth/6lowpan.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 7ee591a..bc105a9 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -856,7 +856,7 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
->  	set_dev_addr(netdev, &chan->src, chan->src_type);
->  
->  	netdev->netdev_ops = &netdev_ops;
-> -	SET_NETDEV_DEV(netdev, &chan->conn->hcon->dev);
-> +	SET_NETDEV_DEV(netdev, &chan->conn->hcon->hdev->dev);
->  	SET_NETDEV_DEVTYPE(netdev, &bt_type);
->  
->  	err = register_netdev(netdev);
+>  doc/mgmt-api.txt      | 105 +++++--
+>  doc/test-coverage.txt |   4 +-
+>  tools/btmgmt.c        |  28 +-
+>  tools/mgmt-tester.c   | 838 +++++++++++++++++++++++++++++++++++---------------
+>  4 files changed, 681 insertions(+), 294 deletions(-)
 
-you had a very nice analysis of the patches in the cover letter.
+I've been running mgmt-tester with your latest kernel and user space
+patch sets, and there are four tests either failing or not getting run:
 
-I have seen the sysfs_remove_group error myself but did never had time
-to investigate this fully. Thanks for your hard efforts to nail this
-bug!
+Read Advertising Features - Success 1 (No instance)  Failed       0.019 seconds
+Read Advertising Features - Success 2 (One instance) Failed       0.025 seconds
+Multi Advertising - Success 1 (Instance Switch)      Not Run
+Multi Advertising - Success 2 (Add Second Inst)      Failed       0.030 seconds
 
-Cheers,
-Jukka
+Are these passing for you?
 
+The detailed failures look like this:
 
+Read Advertising Features - Success 1 (No instance) - run
+  Sending command 0x003d
+  Test condition added, total 1
+  Command 0x003d finished with status 0x00
+  Unexpected cmd response parameter value
+Read Advertising Features - Success 1 (No instance) - test failed
+
+Read Advertising Features - Success 2 (One instance) - run
+  Sending command 0x003d
+  Test condition added, total 1
+  Command 0x003d finished with status 0x00
+  Unexpected cmd response parameter value
+Read Advertising Features - Success 2 (One instance) - test failed
+
+Multi Advertising - Success 1 (Instance Switch) - setup
+  Adding two instances with timeout 1 and duration 1
+  Add Advertising setup complete (instance 1)
+Multi Advertising - Success 1 (Instance Switch) - setup failed
+
+Multi Advertising - Success 2 (Add Second Inst) - run
+  Registering Advertising Added notification
+  Test condition added, total 1
+  Registering HCI command callback
+  Test condition added, total 2
+  Sending command 0x003e
+  Test condition added, total 3
+  Command 0x003e finished with status 0x03
+Multi Advertising - Success 2 (Add Second Inst) - test failed
+
+Do these failures indicate a kernel bug or a test case having a bug or
+otherwise needing updating (e.g. to match your latest changes)?
+
+Johan
