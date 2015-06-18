@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v9 05/16] tools/mgmt-tester: expect 0 rp when removing all adv inst
-Date: Thu, 18 Jun 2015 03:17:35 +0200
-Message-Id: <1434590266-26744-6-git-send-email-fgrandel@gmail.com>
+Subject: [BlueZ v9 04/16] tools/mgmt-tester: error message when unexp params
+Date: Thu, 18 Jun 2015 03:17:34 +0200
+Message-Id: <1434590266-26744-5-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
 References: <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
@@ -11,33 +11,33 @@ References: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The kernel would previously return a hard coded instance value of 0x01
-even when removing multiple advertising instances. The correct behavior,
-though, would be to return zero when multiple instances have been
-removed. This corresponds to the semantics of the mgmt API call made in
-the first place.
-
-A fix for this problem has been introduced in the kernel. Now the
-corresponding test is updated to reflect that logic.
+The tester already issues debug messages for unexpected HCI commands but
+not for unexpected mgmt command return values. To facilitate test
+debugging this patch adds a debug message for unexpected mgmt command
+return values, too.
 ---
- tools/mgmt-tester.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/mgmt-tester.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index b581514..be0f09a 100644
+index 0145435..b581514 100644
 --- a/tools/mgmt-tester.c
 +++ b/tools/mgmt-tester.c
-@@ -4460,8 +4460,8 @@ static const struct generic_data remove_advertising_success_2 = {
- 	.send_param = remove_advertising_param_2,
- 	.send_len = sizeof(remove_advertising_param_2),
- 	.expect_status = MGMT_STATUS_SUCCESS,
--	.expect_param = remove_advertising_param_1,
--	.expect_len = sizeof(remove_advertising_param_1),
-+	.expect_param = remove_advertising_param_2,
-+	.expect_len = sizeof(remove_advertising_param_2),
- 	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
- 	.expect_alt_ev_param = advertising_instance_param,
- 	.expect_alt_ev_len = sizeof(advertising_instance_param),
+@@ -5389,12 +5389,14 @@ static void command_generic_callback(uint8_t status, uint16_t length,
+ 			expect_param = test->expect_func(&expect_len);
+ 
+ 		if (length != expect_len) {
++			tester_warn("Invalid cmd response parameter size");
+ 			tester_test_failed();
+ 			return;
+ 		}
+ 
+ 		if (expect_param && expect_len > 0 &&
+ 					memcmp(param, expect_param, length)) {
++			tester_warn("Unexpected cmd response parameter value");
+ 			tester_test_failed();
+ 			return;
+ 		}
 -- 
 1.9.1
 
