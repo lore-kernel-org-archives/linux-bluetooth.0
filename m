@@ -1,104 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_uart: Fix speed selection
-Date: Thu, 18 Jun 2015 12:43:27 +0200
-Message-Id: <1434624207-393-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Thu, 18 Jun 2015 13:19:25 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Florian Grandel <fgrandel@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [BlueZ v9 00/16] Multi-advertising
+Message-ID: <20150618101925.GA23178@t440s.lan>
+References: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
+ <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hu->proto->*speed will always be used for all device where it is set.
-But hu->*speed should be used if exist, so the test should be swapped.
+Hi Florian,
 
-The equivalent change is needed in bcm_setup() of hci_bcm.c.
+On Thu, Jun 18, 2015, Florian Grandel wrote:
+> patch set accompanying the introduction of a multi-advertising
+> infrastructure in the kernel
+> 
+> v1 ... v4:
+> - fix tests to test for correct behavior when removing all adv instances
+>   by passing in the 0x00 instance identifier
+> 
+> v4 -> v5:
+> - factored userland code changes into a separate change set for easier
+>   review
+> 
+> v5 -> v6:
+> - documented add advertising test setup
+> - renamed add advertising tests to make them more readable
+> - added test to reproduce a bug found by Marcel (executing add-adv twice
+>   for the same instance should override the adv data)
+> 
+> v6 -> v7:
+> - correctly split mangled patches
+> 
+> v7 -> v8:
+> - several additional test documentation improvements
+> - documenting multi-adv implementation details in the mgmt api doc
+> - made the debugging of cmd response messages easier
+> - made the duration parameter accessible via btmgmt
+> - provided test infrastructure for timed tests
+> - fix duplicate code
+> - fix a few typos
+> - added test for advertising timeout
+> - added test for le off
+> - added multi-adv tests
+> 
+> v8 -> v9 (due to Marcel's review):
+> - improved and fixed changes to mgmt-api.txt
+> - added a test that guarantees that instances without a timeout survive
+>   a power cycle
+> 
+> Florian Grandel (16):
+>   doc/mgmt-api: multi-adv implementation details
+>   doc/mgmt-api: fix typos
+>   tools/btmgmt: make inst duration configurable
+>   tools/mgmt-tester: error message when unexp params
+>   tools/mgmt-tester: expect 0 rp when removing all adv inst
+>   tools/mgmt-tester: comment add adv test setup
+>   tools/mgmt-tester: rename add adv tests
+>   tools/mgmt-tester: increase max adv inst
+>   tools/mgmt-tester: keep instances on power cycle
+>   tools/mgmt-tester: test adv inst override
+>   tools/mgmt-tester: make test timeout configurable
+>   tools/mgmt-tester: allow for event-only tests
+>   tools/mgmt-tester: test advertising timeout
+>   tools/mgmt-tester: test le off
+>   tools/mgmt-tester: fix duplicate code
+>   tools/mgmt-tester: test multi-adv
+> 
+>  doc/mgmt-api.txt      | 105 +++++--
+>  doc/test-coverage.txt |   4 +-
+>  tools/btmgmt.c        |  28 +-
+>  tools/mgmt-tester.c   | 838 +++++++++++++++++++++++++++++++++++---------------
+>  4 files changed, 681 insertions(+), 294 deletions(-)
 
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
----
- drivers/bluetooth/hci_bcm.c   | 29 +++++++++++++++++++++++------
- drivers/bluetooth/hci_ldisc.c | 12 ++++++------
- 2 files changed, 29 insertions(+), 12 deletions(-)
+All patches in this set have been applied. Thanks!
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index aa3c9ac..23523e1 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -131,6 +131,7 @@ static int bcm_setup(struct hci_uart *hu)
- {
- 	char fw_name[64];
- 	const struct firmware *fw;
-+	unsigned int speed;
- 	int err;
- 
- 	BT_DBG("hu %p", hu);
-@@ -153,13 +154,29 @@ static int bcm_setup(struct hci_uart *hu)
- 		goto finalize;
- 	}
- 
--	if (hu->proto->init_speed)
--		hci_uart_set_baudrate(hu, hu->proto->init_speed);
--
--	if (hu->proto->oper_speed) {
--		err = bcm_set_baudrate(hu, hu->proto->oper_speed);
-+	/* Init speed if any */
-+	if (hu->init_speed)
-+		speed = hu->init_speed;
-+	else if (hu->proto->init_speed)
-+		speed = hu->proto->init_speed;
-+	else
-+		speed = 0;
-+
-+	if (speed)
-+		hci_uart_set_baudrate(hu, speed);
-+
-+	/* Operational speed if any */
-+	if (hu->oper_speed)
-+		speed = hu->oper_speed;
-+	else if (hu->proto->oper_speed)
-+		speed = hu->proto->oper_speed;
-+	else
-+		speed = 0;
-+
-+	if (speed) {
-+		err = bcm_set_baudrate(hu, speed);
- 		if (!err)
--			hci_uart_set_baudrate(hu, hu->proto->oper_speed);
-+			hci_uart_set_baudrate(hu, speed);
- 	}
- 
- finalize:
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 590bd8e..177dd69 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -370,10 +370,10 @@ static int hci_uart_setup(struct hci_dev *hdev)
- 	int err;
- 
- 	/* Init speed if any */
--	if (hu->proto->init_speed)
--		speed = hu->proto->init_speed;
--	else if (hu->init_speed)
-+	if (hu->init_speed)
- 		speed = hu->init_speed;
-+	else if (hu->proto->init_speed)
-+		speed = hu->proto->init_speed;
- 	else
- 		speed = 0;
- 
-@@ -381,10 +381,10 @@ static int hci_uart_setup(struct hci_dev *hdev)
- 		hci_uart_set_baudrate(hu, speed);
- 
- 	/* Operational speed if any */
--	if (hu->proto->oper_speed)
--		speed = hu->proto->oper_speed;
--	else if (hu->oper_speed)
-+	if (hu->oper_speed)
- 		speed = hu->oper_speed;
-+	else if (hu->proto->oper_speed)
-+		speed = hu->proto->oper_speed;
- 	else
- 		speed = 0;
- 
--- 
-1.9.1
-
+Johan
