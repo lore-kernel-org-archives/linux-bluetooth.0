@@ -1,42 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use zalloc when possible
-Date: Thu, 18 Jun 2015 20:50:08 +0300
-Message-Id: <1434649808-17543-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH]  ath3k: Add support of 04ca:300d AR3012 device
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1434649311-17272-1-git-send-email-hanipouspilot@gmail.com>
+Date: Thu, 18 Jun 2015 19:47:10 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Message-Id: <E39D480C-1F76-46ED-A994-78EB46586F58@holtmann.org>
+References: <1434649311-17272-1-git-send-email-hanipouspilot@gmail.com>
+To: Dmitry Tunin <hanipouspilot@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Dmitry,
 
-Use zallog for adv_instance allocation instead of kmalloc + memset.
-This also fixes the following coccinelle warning:
+> BugLink: https://bugs.launchpad.net/bugs/1394368
+> 
+> This device requires new firmware files
+> AthrBT_0x11020100.dfu and ramps_0x11020100_40.dfu added to
+> /lib/firmware/ar3k/ that are not included in linux-firmware yet.
+> 
+> T: Bus=02 Lev=01 Prnt=01 Port=04 Cnt=03 Dev#= 5 Spd=12 MxCh= 0
+> D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+> P: Vendor=04ca ProdID=300d Rev= 0.01
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+> E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+> 
+> Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+> Cc: stable@vger.kernel.org
+> ---
+> drivers/bluetooth/ath3k.c | 2 ++
+> drivers/bluetooth/btusb.c | 1 +
+> 2 files changed, 3 insertions(+)
 
->> net/bluetooth/hci_core.c:2693:17-24: WARNING: kzalloc should be
-used for adv_instance, instead of kmalloc/memset
+patch has been applied to bluetooth-next tree.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Regards
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 86ed44e39649..2f8fb33067e1 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2716,11 +2716,10 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
- 		    instance < 1 || instance > HCI_MAX_ADV_INSTANCES)
- 			return -EOVERFLOW;
- 
--		adv_instance = kmalloc(sizeof(*adv_instance), GFP_KERNEL);
-+		adv_instance = kzalloc(sizeof(*adv_instance), GFP_KERNEL);
- 		if (!adv_instance)
- 			return -ENOMEM;
- 
--		memset(adv_instance, 0, sizeof(*adv_instance));
- 		adv_instance->pending = true;
- 		adv_instance->instance = instance;
- 		list_add(&adv_instance->list, &hdev->adv_instances);
--- 
-2.4.3
+Marcel
 
