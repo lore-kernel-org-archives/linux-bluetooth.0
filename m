@@ -1,32 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] Bluetooth: bt3c_cs: Fix coding style -- clean up
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150618135102.GA12844@ubuntu>
-Date: Thu, 18 Jun 2015 16:07:10 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <980D46B3-FFD2-4F24-B4FB-5F77CBEC6DE2@holtmann.org>
-References: <20150618135102.GA12844@ubuntu>
-To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
+	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth: bt3c_cs: Fix coding style -- clean up
+Date: Thu, 18 Jun 2015 13:51:11 +0000
+Message-ID: <20150618135102.GA12844@ubuntu>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prasanna,
+From: Prasanna Karthik <mkarthi3@visteon.com>
 
-> Fix for braces {} are not necessary for single statement blocks
-> reported by checkpatch
-> 
-> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
-> ---
-> drivers/bluetooth/bt3c_cs.c |    3 +--
-> 1 files changed, 1 insertions(+), 2 deletions(-)
+Fix for braces {} are not necessary for single statement blocks
+reported by checkpatch
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+---
+ drivers/bluetooth/bt3c_cs.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
+index 6de97b3..3c18233 100644
+--- a/drivers/bluetooth/bt3c_cs.c
++++ b/drivers/bluetooth/bt3c_cs.c
+@@ -202,9 +202,8 @@ static void bt3c_write_wakeup(struct bt3c_info *info)
+ 		/* Send frame */
+ 		len =3D bt3c_write(iobase, 256, skb->data, skb->len);
+=20
+-		if (len !=3D skb->len) {
++		if (len !=3D skb->len)
+ 			BT_ERR("Very strange");
+-		}
+=20
+ 		kfree_skb(skb);
+=20
+--=20
+1.7.0.4
