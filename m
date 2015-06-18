@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 01/20] Bluetooth: hci_core/mgmt: Introduce multi-adv list
-Date: Thu, 18 Jun 2015 03:16:34 +0200
-Message-Id: <1434590213-26599-2-git-send-email-fgrandel@gmail.com>
+Subject: [PATCH v8 02/20] Bluetooth: hci_core/mgmt: move adv timeout to hdev
+Date: Thu, 18 Jun 2015 03:16:35 +0200
+Message-Id: <1434590213-26599-3-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434590213-26599-1-git-send-email-fgrandel@gmail.com>
 References: <1434590213-26599-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
@@ -11,236 +11,217 @@ References: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The current hci dev structure only supports a single advertising
-instance. To support multi-instance advertising it is necessary to
-introduce a linked list of advertising instances so that multiple
-advertising instances can be dynamically added and/or removed.
+Currently the delayed work managing advertising duration and timeout is
+part of the advertising instance structure. This is not correct as only
+a single instance can be advertised at any given time. To implement
+round robin advertising a single delayed work structure is needed.
 
-In a first step, the existing adv_instance member of the hci_dev
-struct is supplemented by a linked list of advertising instances.
-This patch introduces the list and supporting list management
-infrastructure. The list is not being used yet.
+To fix this the delayed work structure is being moved to the hci_dev
+structure. The instance specific variable is renamed to "remaining_time"
+to make it clear that this is the remaining lifetime of the instance and
+not the current advertising timeout.
 
 Signed-off-by: Florian Grandel <fgrandel@gmail.com>
 ---
- include/net/bluetooth/hci_core.h |  17 ++++++
- net/bluetooth/hci_core.c         | 117 +++++++++++++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c             |   2 +-
- 3 files changed, 135 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |  5 ++++-
+ net/bluetooth/hci_core.c         | 29 +++++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c             | 27 +++++++++++----------------
+ 3 files changed, 44 insertions(+), 17 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3fbb793..4242dbf 100644
+index 4242dbf..b53e1b1 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -157,15 +157,20 @@ struct oob_data {
+@@ -156,11 +156,11 @@ struct oob_data {
+ };
  
  struct adv_info {
- 	struct delayed_work timeout_exp;
-+	struct list_head list;
+-	struct delayed_work timeout_exp;
+ 	struct list_head list;
  	__u8	instance;
  	__u32	flags;
  	__u16	timeout;
-+	__u16	duration;
++	__u16	remaining_time;
+ 	__u16	duration;
  	__u16	adv_data_len;
  	__u8	adv_data[HCI_MAX_AD_LENGTH];
- 	__u16	scan_rsp_len;
- 	__u8	scan_rsp_data[HCI_MAX_AD_LENGTH];
- };
- 
-+#define HCI_MAX_ADV_INSTANCES		1
-+#define HCI_DEFAULT_ADV_DURATION	2
-+
- #define HCI_MAX_SHORT_NAME_LENGTH	10
- 
- /* Default LE RPA expiry time, 15 minutes */
-@@ -374,6 +379,9 @@ struct hci_dev {
- 	__u8			scan_rsp_data_len;
- 
- 	struct adv_info		adv_instance;
-+	struct list_head	adv_instances;
-+	unsigned int		adv_instance_cnt;
-+	__u8			cur_adv_instance;
+@@ -382,6 +382,8 @@ struct hci_dev {
+ 	struct list_head	adv_instances;
+ 	unsigned int		adv_instance_cnt;
+ 	__u8			cur_adv_instance;
++	__u16			adv_instance_timeout;
++	struct delayed_work	adv_instance_expire;
  
  	__u8			irk[16];
  	__u32			rpa_timeout;
-@@ -1019,6 +1027,15 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
- int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			       u8 bdaddr_type);
- 
-+void hci_adv_instances_clear(struct hci_dev *hdev);
-+struct adv_info *hci_find_adv_instance(struct hci_dev *hdev, u8 instance);
-+struct adv_info *hci_get_next_instance(struct hci_dev *hdev, u8 instance);
-+int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
-+			 u16 adv_data_len, u8 *adv_data,
-+			 u16 scan_rsp_len, u8 *scan_rsp_data,
-+			 u16 timeout, u16 duration);
-+int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance);
-+
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
- 
- int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb);
+@@ -1379,6 +1381,7 @@ void mgmt_set_powered_failed(struct hci_dev *hdev, int err);
+ int mgmt_powered(struct hci_dev *hdev, u8 powered);
+ int mgmt_update_adv_data(struct hci_dev *hdev);
+ void mgmt_discoverable_timeout(struct hci_dev *hdev);
++void mgmt_adv_timeout_expired(struct hci_dev *hdev);
+ void mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
+ 		       bool persistent);
+ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 573711c..ebf37eb 100644
+index ebf37eb..d1110db 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2610,6 +2610,119 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	return 0;
+@@ -1591,6 +1591,11 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	if (hci_dev_test_flag(hdev, HCI_MGMT))
+ 		cancel_delayed_work_sync(&hdev->rpa_expired);
+ 
++	if (hdev->adv_instance_timeout) {
++		cancel_delayed_work_sync(&hdev->adv_instance_expire);
++		hdev->adv_instance_timeout = 0;
++	}
++
+ 	/* Avoid potential lockdep warnings from the *_flush() calls by
+ 	 * ensuring the workqueue is empty up front.
+ 	 */
+@@ -2147,6 +2152,17 @@ static void hci_discov_off(struct work_struct *work)
+ 	mgmt_discoverable_timeout(hdev);
  }
  
-+/* This function requires the caller holds hdev->lock */
-+struct adv_info *hci_find_adv_instance(struct hci_dev *hdev, u8 instance)
++static void hci_adv_timeout_expire(struct work_struct *work)
 +{
-+	struct adv_info *adv_instance;
++	struct hci_dev *hdev;
 +
-+	list_for_each_entry(adv_instance, &hdev->adv_instances, list) {
-+		if (adv_instance->instance == instance)
-+			return adv_instance;
-+	}
++	hdev = container_of(work, struct hci_dev, adv_instance_expire.work);
 +
-+	return NULL;
++	BT_DBG("%s", hdev->name);
++
++	mgmt_adv_timeout_expired(hdev);
 +}
 +
-+/* This function requires the caller holds hdev->lock */
-+struct adv_info *hci_get_next_instance(struct hci_dev *hdev, u8 instance) {
-+	struct adv_info *cur_instance;
-+
-+	cur_instance = hci_find_adv_instance(hdev, instance);
-+	if (!cur_instance)
-+		return NULL;
-+
-+	if (cur_instance == list_last_entry(&hdev->adv_instances,
-+					    struct adv_info, list))
-+		return list_first_entry(&hdev->adv_instances,
-+						 struct adv_info, list);
-+	else
-+		return list_next_entry(cur_instance, list);
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance)
-+{
-+	struct adv_info *adv_instance;
-+
-+	adv_instance = hci_find_adv_instance(hdev, instance);
-+	if (!adv_instance)
-+		return -ENOENT;
-+
-+	BT_DBG("%s removing %dMR", hdev->name, instance);
-+
-+	list_del(&adv_instance->list);
-+	kfree(adv_instance);
-+
-+	hdev->adv_instance_cnt--;
-+
-+	return 0;
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+void hci_adv_instances_clear(struct hci_dev *hdev)
-+{
-+	struct adv_info *adv_instance, *n;
-+
-+	list_for_each_entry_safe(adv_instance, n, &hdev->adv_instances, list) {
-+		list_del(&adv_instance->list);
-+		kfree(adv_instance);
-+	}
-+
-+	hdev->adv_instance_cnt = 0;
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
-+			 u16 adv_data_len, u8 *adv_data,
-+			 u16 scan_rsp_len, u8 *scan_rsp_data,
-+			 u16 timeout, u16 duration)
-+{
-+	struct adv_info *adv_instance;
-+
-+	adv_instance = hci_find_adv_instance(hdev, instance);
-+	if (adv_instance) {
-+		memset(adv_instance->adv_data, 0,
-+		       sizeof(adv_instance->adv_data));
-+		memset(adv_instance->scan_rsp_data, 0,
-+		       sizeof(adv_instance->scan_rsp_data));
-+	} else {
-+		if (hdev->adv_instance_cnt >= HCI_MAX_ADV_INSTANCES ||
-+		    instance < 1 || instance > HCI_MAX_ADV_INSTANCES)
-+			return -EOVERFLOW;
-+
-+		adv_instance = kmalloc(sizeof(*adv_instance), GFP_KERNEL);
-+		if (!adv_instance)
-+			return -ENOMEM;
-+
-+		memset(adv_instance, 0, sizeof(*adv_instance));
-+		adv_instance->instance = instance;
-+		list_add(&adv_instance->list, &hdev->adv_instances);
-+		hdev->adv_instance_cnt++;
-+	}
-+
-+	adv_instance->flags = flags;
-+	adv_instance->adv_data_len = adv_data_len;
-+	adv_instance->scan_rsp_len = scan_rsp_len;
-+
-+	if (adv_data_len)
-+		memcpy(adv_instance->adv_data, adv_data, adv_data_len);
-+
-+	if (scan_rsp_len)
-+		memcpy(adv_instance->scan_rsp_data,
-+		       scan_rsp_data, scan_rsp_len);
-+
-+	adv_instance->timeout = timeout;
-+
-+	if (duration == 0)
-+		adv_instance->duration = HCI_DEFAULT_ADV_DURATION;
-+	else
-+		adv_instance->duration = duration;
-+
-+	BT_DBG("%s for %dMR", hdev->name, instance);
-+
-+	return 0;
-+}
-+
- struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
- 					 bdaddr_t *bdaddr, u8 type)
+ void hci_uuids_clear(struct hci_dev *hdev)
  {
-@@ -3015,6 +3128,8 @@ struct hci_dev *hci_alloc_dev(void)
- 	hdev->manufacturer = 0xffff;	/* Default to internal use */
- 	hdev->inq_tx_power = HCI_TX_POWER_INVALID;
+ 	struct bt_uuid *uuid, *tmp;
+@@ -2650,6 +2666,11 @@ int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance)
+ 
+ 	BT_DBG("%s removing %dMR", hdev->name, instance);
+ 
++	if (hdev->cur_adv_instance == instance && hdev->adv_instance_timeout) {
++		cancel_delayed_work(&hdev->adv_instance_expire);
++		hdev->adv_instance_timeout = 0;
++	}
++
+ 	list_del(&adv_instance->list);
+ 	kfree(adv_instance);
+ 
+@@ -2663,6 +2684,11 @@ void hci_adv_instances_clear(struct hci_dev *hdev)
+ {
+ 	struct adv_info *adv_instance, *n;
+ 
++	if (hdev->adv_instance_timeout) {
++		cancel_delayed_work(&hdev->adv_instance_expire);
++		hdev->adv_instance_timeout = 0;
++	}
++
+ 	list_for_each_entry_safe(adv_instance, n, &hdev->adv_instances, list) {
+ 		list_del(&adv_instance->list);
+ 		kfree(adv_instance);
+@@ -2712,6 +2738,7 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+ 		       scan_rsp_data, scan_rsp_len);
+ 
+ 	adv_instance->timeout = timeout;
++	adv_instance->remaining_time = timeout;
+ 
+ 	if (duration == 0)
+ 		adv_instance->duration = HCI_DEFAULT_ADV_DURATION;
+@@ -3130,6 +3157,7 @@ struct hci_dev *hci_alloc_dev(void)
  	hdev->adv_tx_power = HCI_TX_POWER_INVALID;
-+	hdev->adv_instance_cnt = 0;
-+	hdev->cur_adv_instance = 0x00;
+ 	hdev->adv_instance_cnt = 0;
+ 	hdev->cur_adv_instance = 0x00;
++	hdev->adv_instance_timeout = 0;
  
  	hdev->sniff_max_interval = 800;
  	hdev->sniff_min_interval = 80;
-@@ -3056,6 +3171,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_LIST_HEAD(&hdev->pend_le_conns);
- 	INIT_LIST_HEAD(&hdev->pend_le_reports);
- 	INIT_LIST_HEAD(&hdev->conn_hash.list);
-+	INIT_LIST_HEAD(&hdev->adv_instances);
+@@ -3183,6 +3211,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
++	INIT_DELAYED_WORK(&hdev->adv_instance_expire, hci_adv_timeout_expire);
  
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
-@@ -3249,6 +3365,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_smp_ltks_clear(hdev);
- 	hci_smp_irks_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
-+	hci_adv_instances_clear(hdev);
- 	hci_bdaddr_list_clear(&hdev->le_white_list);
- 	hci_conn_params_clear_all(hdev);
- 	hci_discovery_filter_clear(hdev);
+ 	skb_queue_head_init(&hdev->rx_q);
+ 	skb_queue_head_init(&hdev->cmd_q);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e41bbe2..92c50a1 100644
+index 92c50a1..a8319f6 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -6813,7 +6813,7 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- 	rp->supported_flags = cpu_to_le32(supported_flags);
- 	rp->max_adv_data_len = HCI_MAX_AD_LENGTH;
- 	rp->max_scan_rsp_len = HCI_MAX_AD_LENGTH;
--	rp->max_instances = 1;
-+	rp->max_instances = HCI_MAX_ADV_INSTANCES;
+@@ -1466,8 +1466,8 @@ static void clear_adv_instance(struct hci_dev *hdev)
+ 	if (!hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE))
+ 		return;
  
- 	/* Currently only one instance is supported, so simply return the
- 	 * current instance number.
+-	if (hdev->adv_instance.timeout)
+-		cancel_delayed_work(&hdev->adv_instance.timeout_exp);
++	if (hdev->adv_instance_timeout)
++		cancel_delayed_work(&hdev->adv_instance_expire);
+ 
+ 	memset(&hdev->adv_instance, 0, sizeof(hdev->adv_instance));
+ 	advertising_removed(NULL, hdev, 1);
+@@ -1497,7 +1497,7 @@ static int clean_up_hci_state(struct hci_dev *hdev)
+ 		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+ 	}
+ 
+-	if (hdev->adv_instance.timeout)
++	if (hdev->adv_instance_timeout)
+ 		clear_adv_instance(hdev);
+ 
+ 	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+@@ -6914,12 +6914,9 @@ unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static void adv_timeout_expired(struct work_struct *work)
++void mgmt_adv_timeout_expired(struct hci_dev *hdev)
+ {
+-	struct hci_dev *hdev = container_of(work, struct hci_dev,
+-					    adv_instance.timeout_exp.work);
+-
+-	hdev->adv_instance.timeout = 0;
++	hdev->adv_instance_timeout = 0;
+ 
+ 	hci_dev_lock(hdev);
+ 	clear_adv_instance(hdev);
+@@ -6981,8 +6978,6 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
+-	INIT_DELAYED_WORK(&hdev->adv_instance.timeout_exp, adv_timeout_expired);
+-
+ 	hdev->adv_instance.flags = flags;
+ 	hdev->adv_instance.adv_data_len = cp->adv_data_len;
+ 	hdev->adv_instance.scan_rsp_len = cp->scan_rsp_len;
+@@ -6994,14 +6989,14 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		memcpy(hdev->adv_instance.scan_rsp_data,
+ 		       cp->data + cp->adv_data_len, cp->scan_rsp_len);
+ 
+-	if (hdev->adv_instance.timeout)
+-		cancel_delayed_work(&hdev->adv_instance.timeout_exp);
++	if (hdev->adv_instance_timeout)
++		cancel_delayed_work(&hdev->adv_instance_expire);
+ 
+-	hdev->adv_instance.timeout = timeout;
++	hdev->adv_instance_timeout = timeout;
+ 
+ 	if (timeout)
+ 		queue_delayed_work(hdev->workqueue,
+-				   &hdev->adv_instance.timeout_exp,
++				   &hdev->adv_instance_expire,
+ 				   msecs_to_jiffies(timeout * 1000));
+ 
+ 	if (!hci_dev_test_and_set_flag(hdev, HCI_ADVERTISING_INSTANCE))
+@@ -7106,8 +7101,8 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
+-	if (hdev->adv_instance.timeout)
+-		cancel_delayed_work(&hdev->adv_instance.timeout_exp);
++	if (hdev->adv_instance_timeout)
++		cancel_delayed_work(&hdev->adv_instance_expire);
+ 
+ 	memset(&hdev->adv_instance, 0, sizeof(hdev->adv_instance));
+ 
 -- 
 1.9.1
 
