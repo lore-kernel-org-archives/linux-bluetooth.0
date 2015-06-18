@@ -1,96 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v9 03/16] tools/btmgmt: make inst duration configurable
-Date: Thu, 18 Jun 2015 03:17:33 +0200
-Message-Id: <1434590266-26744-4-git-send-email-fgrandel@gmail.com>
+Subject: [BlueZ v9 02/16] doc/mgmt-api: fix typos
+Date: Thu, 18 Jun 2015 03:17:32 +0200
+Message-Id: <1434590266-26744-3-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
 References: <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
 References: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now that the kernel actually does respect the instance's duration
-parameter it should be accessible via btmgmt. An additional parameter
-for the add-adv command is therefore being introduced.
+This patch fixes a few minor typos and grammar errors in the mgmt api
+spec.
 ---
- tools/btmgmt.c | 28 +++++++++++++++++-----------
- 1 file changed, 17 insertions(+), 11 deletions(-)
+ doc/mgmt-api.txt | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 8f8bca1..a100f53 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -3890,15 +3890,16 @@ static void add_adv_rsp(uint8_t status, uint16_t len, const void *param,
- static void add_adv_usage(void)
- {
- 	print("Usage: add-adv [options] <instance_id>\nOptions:\n"
--		"\t -u, --uuid <uuid>        Service UUID\n"
--		"\t -d, --adv-data <data>    Advertising Data bytes\n"
--		"\t -s, --scan-rsp <data>    Scan Response Data bytes\n"
--		"\t -t, --timeout <timeout>  Timeout in seconds\n"
--		"\t -c, --connectable        \"connectable\" flag\n"
--		"\t -g, --general-discov     \"general-discoverable\" flag\n"
--		"\t -l, --limited-discov     \"limited-discoverable\" flag\n"
--		"\t -m, --managed-flags      \"managed-flags\" flag\n"
--		"\t -p, --tx-power           \"tx-power\" flag\n"
-+		"\t -u, --uuid <uuid>         Service UUID\n"
-+		"\t -d, --adv-data <data>     Advertising Data bytes\n"
-+		"\t -s, --scan-rsp <data>     Scan Response Data bytes\n"
-+		"\t -t, --timeout <timeout>   Timeout in seconds\n"
-+		"\t -D, --duration <duration> Duration in seconds\n"
-+		"\t -c, --connectable         \"connectable\" flag\n"
-+		"\t -g, --general-discov      \"general-discoverable\" flag\n"
-+		"\t -l, --limited-discov      \"limited-discoverable\" flag\n"
-+		"\t -m, --managed-flags       \"managed-flags\" flag\n"
-+		"\t -p, --tx-power            \"tx-power\" flag\n"
- 		"e.g.:\n"
- 		"\tadd-adv -u 180d -u 180f -d 080954657374204C45 1");
- }
-@@ -3909,6 +3910,7 @@ static struct option add_adv_options[] = {
- 	{ "adv-data",		1, 0, 'd' },
- 	{ "scan-rsp",		1, 0, 's' },
- 	{ "timeout",		1, 0, 't' },
-+	{ "duration",		1, 0, 'D' },
- 	{ "connectable",	0, 0, 'c' },
- 	{ "general-discov",	0, 0, 'g' },
- 	{ "limited-discov",	0, 0, 'l' },
-@@ -3970,14 +3972,14 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
- 	uint8_t uuids[MAX_AD_UUID_BYTES];
- 	size_t uuid_bytes = 0;
- 	uint8_t uuid_type = 0;
--	uint16_t timeout = 0;
-+	uint16_t timeout = 0, duration = 0;
- 	uint8_t instance;
- 	uuid_t uuid;
- 	bool success = false;
- 	bool quit = true;
- 	uint32_t flags = 0;
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index ffa774d..18d7db1 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -386,7 +386,7 @@ Set Connectable Command
+ 	and for LE controllers it changes the advertising type. For
+ 	dual mode controllers it affects both settings.
  
--	while ((opt = getopt_long(argc, argv, "+u:d:s:t:cglmph",
-+	while ((opt = getopt_long(argc, argv, "+u:d:s:t:D:cglmph",
- 						add_adv_options, NULL)) != -1) {
- 		switch (opt) {
- 		case 'u':
-@@ -4038,6 +4040,9 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
- 		case 't':
- 			timeout = strtol(optarg, NULL, 0);
- 			break;
-+		case 'D':
-+			duration = strtol(optarg, NULL, 0);
-+			break;
- 		case 'c':
- 			flags |= MGMT_ADV_FLAG_CONNECTABLE;
- 			break;
-@@ -4086,6 +4091,7 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
- 	cp->instance = instance;
- 	put_le32(flags, &cp->flags);
- 	put_le16(timeout, &cp->timeout);
-+	put_le16(duration, &cp->duration);
- 	cp->adv_data_len = adv_len + uuid_bytes;
- 	cp->scan_rsp_len = scan_rsp_len;
+-	For LE capable controllers the connectable setting takes affect
++	For LE capable controllers the connectable setting takes effect
+ 	when advertising is enabled (peripheral) or when directed
+ 	advertising events are received (central).
  
+@@ -887,7 +887,7 @@ Get Connections Command
+ 				Address2 { }
+ 				...
+ 
+-	This command is used to retreive a list of currently connected
++	This command is used to retrieve a list of currently connected
+ 	devices.
+ 
+ 	Possible values for the Address_Type parameter:
+@@ -1039,7 +1039,7 @@ Pair Device Command
+ 
+ 	To allow tracking of which resolvable random address changed
+ 	into which identity address, the New Identity Resolving Key
+-	event will be send before receiving Command Complete event
++	event will be sent before receiving Command Complete event
+ 	for this command.
+ 
+ 	This command can only be used when the controller is powered.
+@@ -1480,7 +1480,7 @@ Block Device Command
+ 				Address_Type (1 Octet)
+ 
+ 	This command is used to add a device to the list of devices
+-	which should be blocked from being connect to the local
++	which should be blocked from being connected to the local
+ 	controller.
+ 
+ 	Possible values for the Address_Type parameter:
+@@ -1488,7 +1488,7 @@ Block Device Command
+ 		1	LE Public
+ 		2	LE Random
+ 
+-	For Low Energy devices, the blocking of a device take presedence
++	For Low Energy devices, the blocking of a device takes precedence
+ 	over auto-connection actions provided by Add Device. Blocked
+ 	devices will not be auto-connected or even reported when found
+ 	during background scanning. If the controller is connectable
+@@ -1558,9 +1558,9 @@ Set Device ID Command
+ 		0x0001	Bluetooth SIG
+ 		0x0002	USB Implementer’s Forum
+ 
+-	The information are put into the EIR data. If the controller does
++	The information is put into the EIR data. If the controller does
+ 	not support EIR or if SSP is disabled, this command will still
+-	succeed. The information are stored for later use and will survive
++	succeed. The information is stored for later use and will survive
+ 	toggling SSP on and off.
+ 
+ 	This command generates a Command Complete event on success or
+@@ -1605,7 +1605,7 @@ Set Advertising Command
+ 	The value 0x02 should be the preferred mode of operation when
+ 	implementing peripheral mode.
+ 
+-	Using this command will temporarily deactive any configuration
++	Using this command will temporarily deactivate any configuration
+ 	made by the Add Advertising command. This command takes precedence.
+ 	Once a Set Advertising command with value 0x00 is issued any
+ 	previously made configurations via Add/Remove Advertising, including
+@@ -1979,17 +1979,17 @@ Add Device Command
+ 		2	Auto-connect remote device
+ 
+ 	With the Action 0, when the device is found, a new Device Found
+-	event will be send indicating this device is available. This
++	event will be sent indicating this device is available. This
+ 	action is only valid for LE Public and LE Random address types.
+ 
+ 	With the Action 1, the device is allowed to connect. For BR/EDR
+ 	address type this means an incoming connection. For LE Public
+ 	and LE Random address types, a connection will be established
+ 	to devices using directed advertising. If successful a Device
+-	Connected event will be send.
++	Connected event will be sent.
+ 
+ 	With the Action 2, when the device is found, it will be connected
+-	and if successful a Device Connected event will be send. This
++	and if successful a Device Connected event will be sent. This
+ 	action is only valid for LE Public and LE Random address types.
+ 
+ 	When a device is blocked using Block Device command, then it is
+@@ -2220,8 +2220,8 @@ Set Public Address Command
+ 
+ 	For a fully configured controller, the current controller index
+ 	will become invalid and an Unconfigured Index Removed event will
+-	be send. Once the address has been successfully changed an Index
+-	Added event will be send. There is no guarantee that the controller
++	be sent. Once the address has been successfully changed an Index
++	Added event will be sent. There is no guarantee that the controller
+ 	index stays the same.
+ 
+ 	All previous configured parameters and settings are lost when
+@@ -2536,7 +2536,7 @@ Read Advertising Features Command
+ 	however might decrease the actual available length in these
+ 	data fields.
+ 
+-	With Num_Instances and Instance array the current occupied
++	With Num_Instances and Instance array the currently occupied
+ 	Instance identifiers can be retrieved.
+ 
+ 	This command generates a Command Complete event on success or
+@@ -2625,13 +2625,13 @@ Add Advertising Command
+ 
+ 	The Timeout parameter configures the life-time of an Instance. In
+ 	case the value 0 is used it indicates no expiration time. If a
+-	timeout value is provided, then the advertising Instace will be
++	timeout value is provided, then the advertising Instance will be
+ 	automatically removed when the timeout passes. The value for the
+ 	timeout is in seconds. Powering down a controller will invalidate
+ 	all advertising Instances and it is not possible to add a new
+ 	Instance with a timeout when the controller is powered down.
+ 
+-	When a Timeout is provided, then the Duration substracts from
++	When a Timeout is provided, then the Duration subtracts from
+ 	the actual Timeout value of that Instance. For example an Instance
+ 	with Timeout of 5 and Duration of 2 will be scheduled exactly 3
+ 	times, twice with 2 seconds and once with one second. Other
 -- 
 1.9.1
 
