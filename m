@@ -1,34 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] Bluetooth: Fix warning of uninitialized adv_instance variable
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1434648391-13789-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 18 Jun 2015 19:44:31 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <053B3B62-5573-46AF-935C-DDDC4AAC1420@holtmann.org>
-References: <1434648391-13789-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Dmitry Tunin <hanipouspilot@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH]  ath3k: Add support of 04ca:300d AR3012 device
+Date: Thu, 18 Jun 2015 20:41:51 +0300
+Message-Id: <1434649311-17272-1-git-send-email-hanipouspilot@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+BugLink: https://bugs.launchpad.net/bugs/1394368
 
-> Some static checkers may cause the following (false positive) warning:
-> 
->>> net/bluetooth/mgmt.c:7294:29: warning: 'adv_instance' may be used
-> uninitialized in this function [-Wuninitialized]
-> 
-> Fix it by ensuring adv_instance always gets set to a known value.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
+This device requires new firmware files
+ AthrBT_0x11020100.dfu and ramps_0x11020100_40.dfu added to
+/lib/firmware/ar3k/ that are not included in linux-firmware yet.
 
-patch has been applied to bluetooth-next tree.
+T: Bus=02 Lev=01 Prnt=01 Port=04 Cnt=03 Dev#= 5 Spd=12 MxCh= 0
+D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=04ca ProdID=300d Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
 
-Regards
+Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-Marcel
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 2fa6588..e527a3e 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -89,6 +89,7 @@ static const struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x04CA, 0x3007) },
+ 	{ USB_DEVICE(0x04CA, 0x3008) },
+ 	{ USB_DEVICE(0x04CA, 0x300b) },
++	{ USB_DEVICE(0x04CA, 0x300d) },
+ 	{ USB_DEVICE(0x04CA, 0x300f) },
+ 	{ USB_DEVICE(0x04CA, 0x3010) },
+ 	{ USB_DEVICE(0x0930, 0x0219) },
+@@ -148,6 +149,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x04ca, 0x3007), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x300d), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x300f), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3010), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3970224..b4cf8d9 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -188,6 +188,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x04ca, 0x3007), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x300d), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x300f), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3010), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+-- 
+1.9.1
