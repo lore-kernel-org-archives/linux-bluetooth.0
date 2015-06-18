@@ -1,14 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Zheng, Wu" <wu.zheng@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Fail to test advertisement
+Date: Thu, 18 Jun 2015 07:23:17 +0000
+Message-ID: <2CF57A644018A745B8FE029C7223E16E11A31EAD@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Date: Thu, 18 Jun 2015 10:24:10 +0200
-Message-ID: <CANzaTi4s93PcjitnF-HWEo02SkYj+Z8rY5uNb9cjiySVnE1MiQ@mail.gmail.com>
-Subject: Detect client connection using dbus api
-From: dogan yazar <doganyazar@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I use gatt-api to register my services but then could not find a way
-to detect that a client is connected and discovering my services.
-Any ideas?
+Hi all,
+
+I try to test the feature advertisement of bluez.
+
+Environment: 
+The kernel is 3.19.
+The bluez is the latest git version.
+
+The process is the following points:
+
+Hciconfig hci0 up.
+
+then run "Bluetooth -Edn" for testing advertisement.
+
+I can get the log info: 
+
+Src/advertising.c:btd_advertising_manager_new() LE Advertising Manger cretated for adapter: /org/bluez/hci0
+Failed to read advertising features: Unknown Command (0x01)
+
+Bluez failed to create LE Advertising Manager.
+
+And try to run "ibeacon" to check "read advertising features". It works well.
+
+What's suggestion? Any step is wrong? Thanks.
+
+Best Regards
+Zheng Wu
