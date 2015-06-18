@@ -1,182 +1,287 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Rob Herring <robherring2@gmail.com>
-CC: "marcel@holtmann.org" <marcel@holtmann.org>, Arend Van Spriel
-	<arend@broadcom.com>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>
-Subject: RE: FW: [PATCH v4 1/4] Broadcom Bluetooth UART Device Tree bindings
-Date: Thu, 18 Jun 2015 20:37:06 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E942640A3@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1434576658-20730-1-git-send-email-ifaenson@broadcom.com>
- <1434576658-20730-2-git-send-email-ifaenson@broadcom.com>
- <E0D3336E15B58B4294723AC879BA5E942634F2@IRVEXCHMB15.corp.ad.broadcom.com>
- <CAL_JsqK9kup3sm3qgDLqtT8ajrN1ee6zfXwOoZqoq9cXQNwE_w@mail.gmail.com>
- <E0D3336E15B58B4294723AC879BA5E94263E58@IRVEXCHMB15.corp.ad.broadcom.com>
- <CAL_JsqJAUTjNehtr_Af93k71mdSREb9pLMoSyDTm1S42VkA2sQ@mail.gmail.com>
-In-Reply-To: <CAL_JsqJAUTjNehtr_Af93k71mdSREb9pLMoSyDTm1S42VkA2sQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <1433770545-14938-1-git-send-email-luiz.dentz@gmail.com>
+References: <1433770545-14938-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 18 Jun 2015 12:46:27 -0700
+Message-ID: <CAHrH25R=877NMEO2x_FGzv58JxMp_2cMucDS8EDXsasK_yeJgQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/4] shared/gatt-client: Speed up discovery
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgUm9iLg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogbGludXgtYmx1ZXRv
-b3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC1vd25lckB2
-Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBSb2IgSGVycmluZw0KU2VudDogVGh1cnNkYXks
-IEp1bmUgMTgsIDIwMTUgMzo0MSBQTQ0KVG86IElseWEgRmFlbnNvbg0KQ2M6IG1hcmNlbEBob2x0
-bWFubi5vcmc7IEFyZW5kIFZhbiBTcHJpZWw7IGRldmljZXRyZWVAdmdlci5rZXJuZWwub3JnOyBs
-aW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogRlc6IFtQQVRDSCB2
-NCAxLzRdIEJyb2FkY29tIEJsdWV0b290aCBVQVJUIERldmljZSBUcmVlIGJpbmRpbmdzDQoNCk9u
-IFRodSwgSnVuIDE4LCAyMDE1IGF0IDE6NTQgUE0sIElseWEgRmFlbnNvbiA8aWZhZW5zb25AYnJv
-YWRjb20uY29tPiB3cm90ZToNCj4gSGkgUm9iLA0KDQpZb3VyIGVtYWlscyBhcmUgYmFzZTY0IGVu
-Y29kZWQuIFRoZXkgc2hvdWxkIGJlIHBsYWluIHRleHQgZm9yIHRoZSBsaXN0Lg0KDQpJRjogVGhl
-IE91dGxvb2sgaXMgY29uZmlndXJlZCB0byByZXNwb25kIGluIHRoZSBzZW5kZXIncyBmb3JtYXQu
-IEkgdGhlcmVmb3JlIHJlc3BvbmQgaW4gdGhlIGVuY29kaW5nIHlvdSd2ZSB1c2VkLg0KDQo+IC0t
-LS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFJvYiBIZXJyaW5nIFttYWlsdG86cm9i
-aGVycmluZzJAZ21haWwuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgSnVuZSAxOCwgMjAxNSAxMTow
-MyBBTQ0KPiBUbzogSWx5YSBGYWVuc29uDQo+IENjOiBtYXJjZWxAaG9sdG1hbm4ub3JnOyBBcmVu
-ZCBWYW4gU3ByaWVsOyBkZXZpY2V0cmVlQHZnZXIua2VybmVsLm9yZzsgbGludXgtYmx1ZXRvb3Ro
-QHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogRlc6IFtQQVRDSCB2NCAxLzRdIEJyb2Fk
-Y29tIEJsdWV0b290aCBVQVJUIERldmljZSBUcmVlIGJpbmRpbmdzDQo+DQo+IE9uIFdlZCwgSnVu
-IDE3LCAyMDE1IGF0IDY6MTEgUE0sIElseWEgRmFlbnNvbiA8aWZhZW5zb25AYnJvYWRjb20uY29t
-PiB3cm90ZToNCj4+ICsgZGV2aWNldHJlZSBsaXN0cw0KDQpbLi4uXQ0KDQo+PiBkaWZmIC0tZ2l0
-IGEvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9ibHVldG9vdGgvYnRiY20u
-dHh0IGIvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9ibHVldG9vdGgvYnRi
-Y20udHh0DQo+PiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0KPj4gaW5kZXggMDAwMDAwMC4uNWRiY2Q1
-Nw0KPj4gLS0tIC9kZXYvbnVsbA0KPj4gKysrIGIvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2Jp
-bmRpbmdzL25ldC9ibHVldG9vdGgvYnRiY20udHh0DQo+PiBAQCAtMCwwICsxLDg2IEBADQo+PiAr
-YnRiY20NCj4+ICstLS0tLS0NCj4+ICsNCj4+ICtSZXF1aXJlZCBwcm9wZXJ0aWVzOg0KPj4gKw0K
-Pj4gKyAgICAgICAtIGNvbXBhdGlibGUgOiBtdXN0IGJlICJicmNtLGJyY20tYnQtdWFydCIuDQo+
-DQo+IFlvdSBuZWVkIHRvIGRlc2NyaWJlIHRoZSBjaGlwLCBub3QgdGhlIGludGVyZmFjZS4NCj4N
-Cj4gSUY6IFRoaXMgZHJpdmVyIGlzIGZvciBhbGwgQnJvYWRjb20gQmx1ZXRvb3RoIFVBUlQgYmFz
-ZWQgY2hpcHMuDQoNCkJUIG9ubHkgY2hpcHM/IE1vc3QvbWFueSBCcm9hZGNvbSBjaGlwcyBhcmUg
-Y29tYm8gY2hpcHMuIEkgdW5kZXJzdGFuZA0KdGhlIGRyaXZlciBmb3IgQlQgaXMgKm1vc3RseSog
-c2VwYXJhdGUgZnJvbSBvdGhlciBjaGlwIGZ1bmN0aW9ucyBsaWtlDQpXaUZpLCBHUFMgYW5kIE5G
-QywgYnV0IHRoZSBoL3cgaXMgYSBzaW5nbGUgY2hpcC4gSSBzYXkgbW9zdCBiZWNhdXNlDQpsaWtl
-bHkgdGhlcmUgYXJlIHNvbWUgcGFydHMgc2hhcmVkOiBhIHZvbHRhZ2UgcmFpbCwgcmVzZXQgbGlu
-ZSwgb3INCnBvd2VyIGRvd24gbGluZS4gSSB0aGluayBzb21lIGNhbiBkbyBCVCBvdmVyIHRoZSBT
-RElPIGludGVyZmFjZSB0b28sDQpzbyB0aGUgaW50ZXJmYWNlIG1heSBiZSBzaGFyZWQuIFRoZSBE
-VCBpcyBhIGRlc2NyaXB0aW9uIG9mIHRoZSBoL3cNCihpLmUuIHdoYXQgcGFydCAjIGZvciBhIGNo
-aXApIGFuZCBub3QgYSBkcml2ZXIgZGF0YSBzdHJ1Y3R1cmUuIFlvdQ0KbmVlZCB0byBkZXNjcmli
-ZSB0aGUgd2hvbGUgY2hpcCBpbiB0aGUgYmluZGluZy4gSXQgaXMgYSBMaW51eCBwcm9ibGVtDQpp
-ZiB0aGVyZSBuZWVkcyB0byBiZSBtdWx0aXBsZSBzZXBhcmF0ZSBkcml2ZXJzLg0KDQpJRjogRGVm
-aW5pbmcgY29tcGxldGUgRFQgZGVzY3JpcHRpb24gZm9yIHRoZSBCcm9hZGNvbSBjb21ibyBjaGlw
-cyBmb3IgbXVsdGlwbGUgaW50ZXJmYWNlcyBpcyB3ZWxsIGJleW9uZCB0aGUgc2NvcGUgb2Ygd2hh
-dCBJIGFtIGRvaW5nLiBJIGp1c3QgbmVlZCB0byBkZWZpbmUgYSBEVCBub2RlIGZvciB0aGUgaW5w
-dXQgYW5kIG91dHB1dCBHUElPcyBjb25uZWN0ZWQgdG8gdGhlIEJUIFVBUlQgY2hpcC4gQlQgbWF5
-IG9yIG1heSBub3QgYmUgcGFydCBvZiB0aGUgY29tYm8gY2hpcDogaXQgZG9lcyBub3QgcmVhbGx5
-IG1hdHRlciBmb3IgdGhpcyBleGVyY2lzZS4gSSB0aG91Z2h0IEkgd291bGQgdGFrZSB0aGlzIG9w
-cG9ydHVuaXR5IHRvIHBsYWNlIHNvbWUgQlQgZGV2aWNlIHBhcmFtZXRlcnMgaW50byB0aGF0IG5v
-ZGUgYXMgd2VsbC4gSWYgeW91J3JlIG5vdCBjb21mb3J0YWJsZSB3aXRoIHRoaXMsIEkgY291bGQg
-anVzdCBjYWxsIGl0IGEgIkdQSU8gc2V0IiB0byBhdm9pZCBtZW50aW9uaW5nIEJUIGFuZCBVQVJU
-IGF0IGFsbCBidXQgaXQgd291bGQgbWFrZSBsaXR0bGUgc2Vuc2UuIFN0aWxsLCBJIGNvdWxkIGNv
-bnNpZGVyIGl0LiBXb3VsZCB5b3UgaGF2ZSAiR1BJTyBzZXQiIHJlY29tbWVuZGF0aW9ucz8gQWx0
-ZXJuYXRpdmVseSwgTkZDIE1hcnZlbGwgY29kZSB5b3UncmUgcmVmZXJyaW5nIHRvIGhhcyBwYXJh
-bWV0ZXJzIGNvbmZpZ3VyZWQgYXMgTGludXggbW9kdWxlIHBhcmFtZXRlcnMuIEkgY291bGQgZG8g
-dGhlIHNhbWUgdG9vLCBhdm9pZGluZyB0aGlzIGRldmljZSB0cmVlIGRpc2N1c3Npb24uIExldCBt
-ZSBrbm93Lg0KDQpHZW5lcmFsbHkgc3BlYWtpbmcgKHBvbnRpZmljYXRpb24gaGF0IG9uIDotKSks
-IHdoYXQgeW91J3JlIHRyeWluZyB0byBkbyAoZGVzY3JpcHRpb24gb2YgdGhlIHdob2xlIGNoaXAp
-IGlzIHdlbGwgYmV5b25kIHdoYXQgc2F5IEFDUEkgaGFzIGRvbmUgKEkgd2FzIGludm9sdmVkIHNv
-bWUgaW4gdGhlIEJUIEFDUEkgZXhlcmNpc2UgYSBmZXcgeWVhcnMgYWdvKS4gQlQgVUFSVCBpbnRl
-cmZhY2UgaXMgZGVzY3JpYmVkIGluIEFDUEkgaW5kZXBlbmRlbnRseSBvZiBvdGhlciBwYXJ0cyBv
-ZiB0aGUgc2FtZSBjb21ibyBjaGlwLiBSZXF1aXJlbWVudHMgbGlrZSB0aGF0IHNsb3cgZG93biB0
-aGUgRFQgZGV2ZWxvcG1lbnQgaW4gbXkgb3BpbmlvbiBhcyBjb21wYW5pZXMgYXJlIHVuZGVyc3Rh
-bmRhYmx5IHJlbHVjdGFudCB0byB3b3JrIHdpdGggdW5yZWFsaXN0aWMgZ29hbHMuIEVuZCBvZiBw
-b250aWZpY2F0aW9uLiA6LSkNCg0KPg0KPj4gKyAgICAgICAtIHR0eSA6IHR0eSBkZXZpY2UgY29u
-bmVjdGVkIHRvIHRoaXMgQmx1ZXRvb3RoIGRldmljZS4NCj4NCj4gInR0eSIgaXMgYSBiaXQgb2Yg
-YSBMaW51eGlzbSBhbmQgInR0eVMwIiBjZXJ0YWlubHkgaXMuIEZ1cnRoZXIsIHRoZXJlDQo+IGlz
-IG5vIGd1YXJhbnRlZSB3aGljaCB1YXJ0IGlzIGFzc2lnbmVkIHR0eVMwLg0KPg0KPiBUaGlzIHNo
-b3VsZCBiZSBhIHBoYW5kbGUgdG8gdGhlIGNvbm5lY3RlZCB1YXJ0IGlmIG5vdCBhIHN1YiBub2Rl
-IG9mDQo+IHRoZSB1YXJ0LiBUaGlzIGlzIGNvbXBsaWNhdGVkIHNpbmNlIHRoZXNlIGNoaXBzIGhh
-dmUgbXVsdGlwbGUgaG9zdA0KPiBjb25uZWN0aW9ucy4gSXQgbmVlZHMgdG8gZ28gdW5kZXIgZWl0
-aGVyIHVhcnQgb3IgU0RJTyBob3N0IGFuZCBoYXZlIGENCj4gcmVmZXJlbmNlIGJhY2sgdG8gdGhl
-IG9uZSBpdCBpcyBub3QgdW5kZXIuIEdpdmVuIHRoZSBTRElPIGludGVyZmFjZSBpcw0KPiBkaXNj
-b3ZlcmFibGUgKGFsdGhvdWdoIHNpZGViYW5kIGdwaW9zIGFuZCByZWd1bGF0b3JzIGFyZSBub3Qp
-LCBJIHdvdWxkDQo+IHB1dCB0aGlzIHVuZGVyIHRoZSB1YXJ0IG5vZGUgYXMgdGhhdCBpcyBuZXZl
-ciBkaXNjb3ZlcmFibGUuDQo+DQo+IEFzIEkndmUgbWVudGlvbmVkIHByZXZpb3VzbHksIHRoZXJl
-J3Mgc2V2ZXJhbCBjYXNlcyBvZiBiaW5kaW5ncyBmb3INCj4gVUFSVCBzbGF2ZSBkZXZpY2VzIGJl
-aW5nIHBvc3RlZC4gVGhpcyBhbGwgbmVlZHMgdG8gYmUgY29vcmRpbmF0ZWQgdG8NCj4gdXNlIGEg
-Y29tbW9uIHN0cnVjdHVyZS4NCj4NCj4gSUY6IFRoaXMgZHJpdmVyIGRvZXMgbm90IHJlYWxseSBh
-Y2Nlc3MgdGhlIFVBUlQuIElmIGp1c3QgbmVlZHMgdG8gaGF2ZSBhIHN0cmluZyBvZiBzb21lIHNv
-cnQgdG8gbWFwIGluc3RhbmNlcyBvZiB0aGUgQmx1ZVogcHJvdG9jb2wgaW50byBwbGF0Zm9ybSBk
-ZXZpY2VzIHRvIGVtcGxveSB0aGUgcmlnaHQgR1BJT3MgYW5kIGludGVycnVwdHMuIEkgY291bGQg
-dXNlIGFueXRoaW5nIHlvdSByZWNvbW1lbmQgYXZhaWxhYmxlIHRocm91Z2ggdGhlIHR0eV9zdHJ1
-Y3QgY29taW5nIHRvIHRoZSBwcm90b2NvbCBmcm9tIHRoZSBCbHVlWiBsaW5lIGRpc2NpcGxpbmUu
-IE1vcmVvdmVyLCBldmVyeSBlbmQgdXNlciBwbGF0Zm9ybSBJJ3ZlIGV2ZXIgZGVhbHQgd2l0aCBp
-biAxNiB5ZWFycyBvZiB3b3JraW5nIHdpdGggQmx1ZXRvb3RoIGhhZCBhIHNpbmdsZSBCVCBVQVJU
-IGRldmljZS4gU28gdGhlc2UgYXJlIHJlYWxseSByYXJlICh0eXBpY2FsbHkgdGVzdCBwbGF0Zm9y
-bXMpIGNhc2VzIG9ubHkuIFRoZSBtYXBwaW5nIGlzIG5vdCBuZWVkZWQgZm9yIG1vc3QgcGxhdGZv
-cm1zIGF0IGFsbC4gSSBzdXNwZWN0IHRoZSByaWdodCB0aGluZyB0byBkbyB3b3VsZCBiZSB0byBt
-YWtlIHRoaXMgcGFyYW1ldGVyIG9wdGlvbmFsLiBUaGUgbWFwcGluZyB3b3VsZCBiZSBkb25lIG9u
-bHkgaWYgdGhlIHBhcmFtZXRlciBpcyBwcmVzZW50LiBJIHdpbGwgdXNlIGFueXRoaW5nIHR0eV9z
-dHJ1Y3QgZGVyaXZlZCB5b3Ugc3BlY2lmeS4gTWFrZXMgc2Vuc2U/DQoNCg0KWW91J3ZlIG1pc3Nl
-ZCBteSBwb2ludC4gSSdtIG5vdCB0YWxraW5nIGFib3V0IGNvbm5lY3RpbmcgbXVsdGlwbGUNCmRl
-dmljZXMgdG8gYSBVQVJUIGF0IG9uY2UuIFRoZXJlIGFyZSBzZXZlcmFsIGluc3RhbmNlcyBvZiBw
-ZW9wbGUNCnRyeWluZyB0byBhZGQgVUFSVCBjb25uZWN0ZWQgZGV2aWNlcyBpbnRvIERUWzFdWzJd
-LiBNeSBwb2ludCBpcyB0aGVzZQ0KZGV2aWNlcyBhbGwgbmVlZCB0byBoYXZlIHRoZSBEVCBiaW5k
-aW5nIGRvbmUgaW4gYSBjb21tb24gd2F5IGFjcm9zcw0KZGlmZmVyZW50IHBsYXRmb3Jtcy4gT3Ro
-ZXJ3aXNlLCB3ZSBjYW4gbm90IGhhdmUgY29tbW9uIGNvZGUgdG8gcGFyc2UNCnRoZSBEVCBhbmQg
-ZmluZCBkZXZpY2VzIGF0dGFjaGVkIHRvIGEgVUFSVC4NCg0KSUY6IENoYW5jZXMgYXJlIEkgd2Fz
-IG5vdCBjbGVhciBlbm91Z2guIEkgd2FzIG5vdCB0YWxraW5nIGFib3V0IGNvbm5lY3RpbmcgbXVs
-dGlwbGUgZGV2aWNlcyB0byBhIFVBUlQuIEkgd2FzIHRhbGtpbmcgYWJvdXQgY29ubmVjdGluZyBv
-bmUgQnJvYWRjb20gQlQgZGV2aWNlIHRvIG9uZSBzZXJpYWwgcG9ydCBhbmQgYW5vdGhlciBCcm9h
-ZGNvbSBCVCBkZXZpY2UgdG8gYW5vdGhlciBzZXJpYWwgcG9ydCAocmFyZSBlbm91Z2ggc2V0dXAp
-LiBJIGRvIHVuZGVyc3RhbmQgeW91ciBnb2FscyB0aG91Z2guIEkgd291bGQgYmUgaGFwcHkgdG8g
-cGFydGljaXBhdGUgaW4gdGhhdCBleGVyY2lzZSAoc3ViamVjdCB0byB0aGUgbWFuYWdlbWVudCBh
-cHByb3ZhbCkgb25jZSBEVCBoYXMgcHVibGlzaGVkIHRoZSBVQVJUIGRldmljZSBwYXJhbWV0ZXJz
-IGFuZCB0aGUgTGludXggYmx1ZXRvb3RoLW5leHQgaGFzIHN1cHBvcnQgZm9yIERUIGVudW1lcmF0
-ZWQgZGV2aWNlcy4gSSBkb27igJl0IHNlZSBpdCBoYXBwZW5pbmcgc29vbiB0aG91Z2guIE1hcnZl
-bGwgZXhhbXBsZSB5b3UndmUgcmVmZXJyZWQgbWUgdG8gaGFzIG5vdGhpbmcgb2YgdGhlIHNvcnQu
-IFdoYXQgZG8geW91IHRoaW5rIG9mIGFsbG93aW5nIHVzIHNvbWV0aGluZyB0byBzaGlwIG5vdyB3
-aXRoIGFuIHVuZGVyc3RhbmRpbmcgdGhhdCB3ZSB3b3VsZCBzdXBwb3J0IHlvdXIgVUFSVCBlbnVt
-ZXJhdGVkIGRldmljZXMgb25jZSB0aGV5IGFyZSBwdWJsaXNoZWQ/DQo+DQo+PiArDQo+PiArT3B0
-aW9uYWwgcHJvcGVydGllczoNCj4+ICsNCj4+ICsgIC0gYnQtaG9zdC13YWtlLWdwaW9zIDogYnQt
-aG9zdC13YWtlIGlucHV0IEdQSU8gdG8gYmUgdXNlZCBhcyBhbiBpbnRlcnJ1cHQuDQo+PiArDQo+
-PiArICAtIGJ0LXdha2UtZ3Bpb3MgOiBidC13YWtlIG91dHB1dCBHUElPIHRvIGJlIHVzZWQgdG8g
-c3VzcGVuZCAvIHJlc3VtZSBkZXZpY2UuDQo+PiArDQo+PiArICAtIGJ0LXJlZy1vbi1ncGlvcyA6
-IHJlZy1vbiBvdXRwdXQgR1BJTyB0byBiZSB1c2VkIHRvIHBvd2VyIGRldmljZSBvbi9vZmYuDQo+
-PiArDQo+PiArICAtIG9wZXItc3BlZWQgOiBCbHVldG9vdGggZGV2aWNlIG9wZXJhdGlvbmFsIGJh
-dWQgcmF0ZS4NCj4+ICsgICAgRGVmYXVsdDogMzAwMDAwMC4NCj4+ICsNCj4+ICsgIC0gbWFudWFs
-LWZjIDogZmxvdyBjb250cm9sIFVBUlQgaW4gc3VzcGVuZCAvIHJlc3VtZSBzY2VuYXJpb3MuDQo+
-PiArICAgIERlZmF1bHQ6IDAuDQo+DQo+IENhbiBiZSBib29sZWFuPw0KPg0KPiBJIGRvbid0IHJl
-YWxseSBmb2xsb3cgdGhlIGRlc2NyaXB0aW9uLg0KPg0KPiBJRjogT2theSwgSSB3aWxsIG1ha2Ug
-aXQgYm9vbGVhbi4gVG8gY2xhcmlmeSB0aGUgZGVzY3JpcHRpb24sIGl0IGNvbnRyb2xzIHdoZXRo
-ZXIgdGhlIEJsdWVaIHByb3RvY29sIG5lZWRzIHRvIGZsb3cgY29udHJvbCB0aGUgVUFSVCB3aGVu
-IHRoZSBCVCBkZXZpY2UgaXMgc3VzcGVuZGVkIGFuZCB1bi1mbG93IGNvbnRyb2wgaXQgd2hlbiB0
-aGUgZGV2aWNlIGlzIHJlc3VtZWQuDQoNCk9rYXkuIERpc2N1c3Npb24gb2YgQmx1ZVogaXMgbm90
-IHJlbGV2YW50IHRvIGJpbmRpbmdzLiBJIHdvdWxkIHNheQ0Kc29tZXRoaW5nIGxpa2UgIlRoZSBo
-YXJkd2FyZSByZXF1aXJlcyB0aGUgaG9zdCBVQVJUIGZsb3ctY29udHJvbCB0byBiZQ0KZGUtYXNz
-ZXJ0ZWQgZHVyaW5nIHN1c3BlbmQuIg0KDQpJRjogT2theS4NCg0KWy4uLl0NCg0KPj4gKyAgLSBj
-b25maWd1cmUtYXVkaW8gOiBjb25maWd1cmUgcGxhdGZvcm0gUENNIFNDTyBmbGFnLg0KPj4gKyAg
-ICBEZWZhdWx0OiBmYWxzZS4NCj4NCj4gU28gaWdub3JlIHRoZSByZXN0IG9mIHRoZSBzZXR0aW5n
-cyBpZiBub3Qgc2V0PyBQZXJoYXBzIGNvbWJpbmUgd2l0aCBwY20tcm91dGluZzoNCj4NCj4gPGJs
-YW5rPiAtIG5vIGF1ZGlvDQo+IGF1ZGlvLW1vZGUgPSAicGNtIjsNCj4gYXVkaW8tbW9kZSA9ICJo
-Y2kiOyAob3IgInNjby1oY2kiPykNCj4NCj4gSUY6IFRoYXQncyByaWdodDogdGhlIHJlc3Qgb2Yg
-dGhlIHBhcmFtZXRlcnMgYXJlIG5vdCBuZWVkZWQgaWYgY29uZmlndXJlLWF1ZGlvIGlzIGZhbHNl
-LiBUYWxraW5nIGFib3V0IHlvdXIgc3VnZ2VzdGlvbnMsIHRoaXMgZHJpdmVyIGRvZXMgbm90aGlu
-ZyBpZiB0aGUgYXVkaW8gaXMgZWl0aGVyIHNlbnQgaW5ib3VuZCBvciBub3QgdXNlZCBhdCBhbGwu
-IFdvdWxkIHlvdSBhZ3JlZSB0byBzb21ldGhpbmcgbGlrZSB0aGUgY29uZmlndXJlLXBjbS1hdWRp
-byBmbGFnPw0KDQpTbyB3aHkgbm90IGNvbWJpbmUgd2l0aCBwY20tcm91dGluZz8NCg0KSUY6IE9r
-YXksIEkgY2FuIGRlcml2ZSBvbmUgZnJvbSBhbm90aGVyLg0KDQpbLi4uXQ0KDQo+IFVzZSB0aGUg
-YWN0dWFsIHJhdGUgcmF0aGVyIHRoYW4gYW4gZW51bWVyYXRpb24uIEl0IGlzIGEgc2ltcGxlIGRp
-diBieQ0KPiAxMjhrIGFuZCBsb2cyIHRvIGNvbnZlcnQgaW4gdGhlIGRyaXZlci4gVGhpcyBtYWtl
-cyB0aGUgcHJvcGVydHkgbW9yZQ0KPiBjb21wYXRpYmxlIHdpdGggb3RoZXIgY2hpcHMuDQo+DQo+
-IElGOiBUaGVzZSByYXRlcyBhcmUgc3ViamVjdCB0byBjaGFuZ2UgaW4gZnV0dXJlIGNoaXBzIHdp
-dGggbm8gZ3VhcmFudGVlcyBvZiB0aGUgcGF0dGVybiBob2xkaW5nLiBJIHdvdWxkIHByZWZlciB0
-byB1c2UgdGhlIGFjdHVhbCB2YWx1ZSBleHBlY3RlZCBieSB0aGUgZmlybXdhcmUgaWYgeW91IGRv
-bid0IG1pbmQgdG8gYXZvaWQgbWFpbnRhaW5pbmcgdGhlIGV4dHJhIGRyaXZlciBjb2RlLg0KDQpF
-eGFjdGx5IG15IHBvaW50LiBJZiB0aGUgbmV4dCBjaGlwIGhhcyAwLTY0aywgMS0yNTZrLCAyLTIw
-NDhrLCB5b3VyDQpiaW5kaW5nIGlzIGJyb2tlbi4gSnVzdCBwdXQgdGhlIGJpdCByYXRlIGluIHRo
-ZSBiaW5kaW5nIGFuZCBkbyB0aGUNCm1hcHBpbmcgdG8gcmVnaXN0ZXIgdmFsdWUgaW4gdGhlIGRy
-aXZlci4NCg0KSUY6IE9rYXksIHdpbGwgaW1wbGVtZW50Lg0KDQo+IFdoYXQgZG9lcyBpbmNhbGwg
-bWVhbj8gV2hhdCBpcyB0aGUgYml0IHJhdGUgd2hlbiBub3QgaW4gYSBjYWxsPw0KPg0KPiBJRjog
-VGhhdCdzIHRoZSBuYW1lIGdpdmVuIHRvIG1lIGJ5IHRoZSBoYXJkd2FyZSBndXlzLiBXaGF0IGRv
-IHlvdSB0aGluayBhYm91dCB0aGUgInBjbS1pbnRlcmZhY2UtcmF0ZSIgaW5zdGVhZD8NCg0KVGhh
-dCdzIHNvbWV3aGF0IGFtYmlndW91cy4gSXMgdGhhdCB0aGUgY2xvY2ssIHNhbXBsZSByYXRlLCBv
-ciBiaXQgcmF0ZQ0KKHNhbXBsZSByYXRlICogc2FtcGxlIHNpemUgKiBjaGFubmVscykuDQoNCklG
-OiBPa2F5LCB3aWxsIHVzZSB0aGUgb3JpZ2luYWwgbmFtZS4NCg0KUm9iDQoNClsxXSBodHRwczov
-L2x3bi5uZXQvQXJ0aWNsZXMvNjQzODc4Lw0KWzJdIGh0dHA6Ly93d3cuc3Bpbmljcy5uZXQvbGlz
-dHMvZGV2aWNldHJlZS9tc2c4MzU5Ni5odG1sDQotLQ0KVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlz
-IGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWJsdWV0b290aCIgaW4NCnRo
-ZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnDQpNb3JlIG1h
-am9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0
-bWwNCg==
+Hi Luiz,
+
+> On Mon, Jun 8, 2015 at 6:35 AM, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This tune the discovery to take advantage of the cached database whenever
+> possible, so instead of clearing the whole db if the device is not paired
+> the code now make the remote services active once they are discovered
+> and with that bt_gatt_client can then skip discovering characteristics
+> and descriptors of services that have not changed since last connection
+> which improves the reconnecting speed for any device regardless if the
+> device was paired or not.
+
+IIRC there's no guarantee that the client will receive a Service
+Changed indication on reconnection if the devices are not bonded. How
+does this guarantee that the service doesn't need re-discovery?
+
+> ---
+>  src/device.c             | 18 +++++++-----------
+>  src/gatt-client.c        | 17 +++++------------
+>  src/shared/gatt-client.c | 44 ++++++++++++++++++++++++++++----------------
+>  src/shared/gatt-db.c     | 33 +++++++++++++++++++++++++++------
+>  4 files changed, 67 insertions(+), 45 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index ce96ab5..3ef0340 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -541,17 +541,6 @@ static void gatt_client_cleanup(struct btd_device *device)
+>         bt_gatt_client_set_ready_handler(device->client, NULL, NULL, NULL);
+>         bt_gatt_client_unref(device->client);
+>         device->client = NULL;
+> -
+> -       /*
+> -        * TODO: Once GATT over BR/EDR is properly supported, we should check
+> -        * the bonding state for the correct bearer based on the transport over
+> -        * which GATT is being done.
+> -        */
+> -       if (device->le_state.bonded)
+> -               return;
+> -
+> -       gatt_db_clear(device->db);
+> -       device->gatt_cache_used = false;
+>  }
+>
+>  static void gatt_server_cleanup(struct btd_device *device)
+> @@ -2862,6 +2851,9 @@ static void dev_probe_gatt(struct btd_profile *p, void *user_data)
+>                 return;
+>         }
+>
+> +       /* Mark service as active to skip discovering it again */
+> +       gatt_db_service_set_active(data->cur_attr, true);
+> +
+>         /* Mark service as claimed */
+>         gatt_db_service_set_claimed(data->cur_attr, true);
+>
+> @@ -2890,6 +2882,8 @@ static void dev_probe_gatt_profile(struct gatt_db_attribute *attr,
+>
+>         /* Don't probe the profiles if a matching service already exists. */
+>         if (find_service_with_uuid(data->dev->services, data->cur_uuid)) {
+> +               /* Mark service as active to skip discovering it again */
+> +               gatt_db_service_set_active(data->cur_attr, true);
+>                 /* Mark the service as claimed by the existing profile. */
+>                 gatt_db_service_set_claimed(data->cur_attr, true);
+>                 return;
+> @@ -4181,6 +4175,8 @@ static void register_gatt_services(struct btd_device *device)
+>         device_svc_resolved(device, device->bdaddr_type, 0);
+>  }
+>
+> +static void gatt_client_init(struct btd_device *device);
+> +
+>  static void gatt_client_ready_cb(bool success, uint8_t att_ecode,
+>                                                                 void *user_data)
+>  {
+> diff --git a/src/gatt-client.c b/src/gatt-client.c
+> index 162bcac..3356ee4 100644
+> --- a/src/gatt-client.c
+> +++ b/src/gatt-client.c
+> @@ -1535,6 +1535,9 @@ static struct service *service_create(struct gatt_db_attribute *attr,
+>
+>         DBG("Exported GATT service: %s", service->path);
+>
+> +       /* Set service active so we can skip discovering next time */
+> +       gatt_db_service_set_active(attr, true);
+> +
+>         return service;
+>  }
+>
+> @@ -1941,22 +1944,12 @@ void btd_gatt_client_disconnected(struct btd_gatt_client *client)
+>         DBG("Device disconnected. Cleaning up.");
+>
+>         /*
+> -        * Remove all services. We'll recreate them when a new bt_gatt_client
+> -        * becomes ready. Leave the services around if the device is bonded.
+>          * TODO: Once GATT over BR/EDR is properly supported, we should pass the
+>          * correct bdaddr_type based on the transport over which GATT is being
+>          * done.
+>          */
+> -       if (!device_is_bonded(client->device, BDADDR_LE_PUBLIC)) {
+> -               DBG("Device not bonded. Removing exported services.");
+> -               queue_remove_all(client->services, NULL, NULL,
+> -                                                       unregister_service);
+> -       } else {
+> -               DBG("Device is bonded. Keeping exported services up.");
+> -               queue_foreach(client->all_notify_clients, clear_notify_id,
+> -                                                                       NULL);
+> -               queue_foreach(client->services, cancel_ops, client->gatt);
+> -       }
+> +       queue_foreach(client->all_notify_clients, clear_notify_id, NULL);
+> +       queue_foreach(client->services, cancel_ops, client->gatt);
+>
+>         bt_gatt_client_unref(client->gatt);
+>         client->gatt = NULL;
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 7bc3b71..feb30f6 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -892,13 +892,21 @@ static void discover_secondary_cb(bool success, uint8_t att_ecode,
+>                 attr = gatt_db_insert_service(client->db, start, &uuid, false,
+>                                                         end - start + 1);
+>                 if (!attr) {
+> -                       util_debug(client->debug_callback, client->debug_data,
+> -                                               "Failed to create service");
+> -                       success = false;
+> -                       goto done;
+> +                       gatt_db_clear_range(client->db, start, end);
+> +                       attr = gatt_db_insert_service(client->db, start, &uuid,
+> +                                                       false, end - start + 1);
+> +                       if (!attr) {
+> +                               util_debug(client->debug_callback,
+> +                                               client->debug_data,
+> +                                               "Failed to store service");
+> +                               success = false;
+> +                               goto done;
+> +                       }
+>                 }
+>
+> -               queue_push_tail(op->pending_svcs, attr);
+> +               /* Skip if service already active */
+> +               if (!gatt_db_service_get_active(attr))
+> +                       queue_push_tail(op->pending_svcs, attr);
+>         }
+>
+>  next:
+> @@ -906,8 +914,10 @@ next:
+>         attr = queue_pop_head(op->pending_svcs);
+>
+>         /* Complete with success if queue is empty */
+> -       if (!attr)
+> +       if (!attr) {
+> +               success = true;
+>                 goto done;
+> +       }
+>
+>         /*
+>          * Store the service in the tmp queue to be reused during
+> @@ -981,13 +991,21 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
+>                 attr = gatt_db_insert_service(client->db, start, &uuid, true,
+>                                                         end - start + 1);
+>                 if (!attr) {
+> -                       util_debug(client->debug_callback, client->debug_data,
+> +                       gatt_db_clear_range(client->db, start, end);
+> +                       attr = gatt_db_insert_service(client->db, start, &uuid,
+> +                                                       true, end - start + 1);
+> +                       if (!attr) {
+> +                               util_debug(client->debug_callback,
+> +                                               client->debug_data,
+>                                                 "Failed to store service");
+> -                       success = false;
+> -                       goto done;
+> +                               success = false;
+> +                               goto done;
+> +                       }
+>                 }
+>
+> -               queue_push_tail(op->pending_svcs, attr);
+> +               /* Skip if service already active */
+> +               if (!gatt_db_service_get_active(attr))
+> +                       queue_push_tail(op->pending_svcs, attr);
+>         }
+>
+>  secondary:
+> @@ -1044,12 +1062,6 @@ static void exchange_mtu_cb(bool success, uint8_t att_ecode, void *user_data)
+>                                         "MTU exchange complete, with MTU: %u",
+>                                         bt_att_get_mtu(client->att));
+>
+> -       /* Don't do discovery if the database was pre-populated */
+> -       if (!gatt_db_isempty(client->db)) {
+> -               op->complete_func(op, true, 0);
+> -               return;
+> -       }
+> -
+>         client->discovery_req = bt_gatt_discover_all_primary_services(
+>                                                         client->att, NULL,
+>                                                         discover_primary_cb,
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 2b2090c..5e1537e 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -486,7 +486,8 @@ bool gatt_db_clear_range(struct gatt_db *db, uint16_t start_handle,
+>         return true;
+>  }
+>
+> -static bool find_insert_loc(struct gatt_db *db, uint16_t start, uint16_t end,
+> +static struct gatt_db_service *find_insert_loc(struct gatt_db *db,
+> +                                               uint16_t start, uint16_t end,
+>                                                 struct gatt_db_service **after)
+>  {
+>         const struct queue_entry *services_entry;
+> @@ -503,19 +504,19 @@ static bool find_insert_loc(struct gatt_db *db, uint16_t start, uint16_t end,
+>                 gatt_db_service_get_handles(service, &cur_start, &cur_end);
+>
+>                 if (start >= cur_start && start <= cur_end)
+> -                       return false;
+> +                       return service;
+>
+>                 if (end >= cur_start && end <= cur_end)
+> -                       return false;
+> +                       return service;
+>
+>                 if (end < cur_start)
+> -                       return true;
+> +                       return NULL;
+>
+>                 *after = service;
+>                 services_entry = services_entry->next;
+>         }
+>
+> -       return true;
+> +       return NULL;
+>  }
+>
+>  struct gatt_db_attribute *gatt_db_insert_service(struct gatt_db *db,
+> @@ -534,8 +535,28 @@ struct gatt_db_attribute *gatt_db_insert_service(struct gatt_db *db,
+>         if (num_handles < 1 || (handle + num_handles - 1) > UINT16_MAX)
+>                 return NULL;
+>
+> -       if (!find_insert_loc(db, handle, handle + num_handles - 1, &after))
+> +       service = find_insert_loc(db, handle, handle + num_handles - 1, &after);
+> +       if (service) {
+> +               const bt_uuid_t *type;
+> +               bt_uuid_t value;
+> +
+> +               if (primary)
+> +                       type = &primary_service_uuid;
+> +               else
+> +                       type = &secondary_service_uuid;
+> +
+> +               gatt_db_attribute_get_service_uuid(service->attributes[0],
+> +                                                                       &value);
+> +
+> +               /* Check if service match */
+> +               if (!bt_uuid_cmp(&service->attributes[0]->uuid, type) &&
+> +                               !bt_uuid_cmp(&value, uuid) &&
+> +                               service->num_handles == num_handles &&
+> +                               service->attributes[0]->handle == handle)
+> +                       return service->attributes[0];
+> +
+>                 return NULL;
+> +       }
+>
+>         service = gatt_db_service_create(uuid, handle, primary, num_handles);
+>
+> --
+> 2.1.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Thanks,
+Arman
