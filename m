@@ -1,297 +1,421 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55822E92.60609@battlepenguin.com>
-Date: Thu, 18 Jun 2015 10:36:02 +0800
-From: Sumit's Mailing Lists <lists@battlepenguin.com>
-MIME-Version: 1.0
-To: Ben Young Tae Kim <ytkim@qca.qualcomm.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- "Huang, Rick" <rickh@qti.qualcomm.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: ath3k Bluetooth adapter not loading: [0cf3:3004] Atheros Communications,
- Inc. AR3012 Bluetooth 4.0
-References: <556486B0.1020104@battlepenguin.com> <EEAFDBFC-C252-4843-A9E0-3E74EA21B665@holtmann.org> <557EBF98.2000701@battlepenguin.com> <A93AF220-83E9-4FC3-BC07-18B285E5FA3D@holtmann.org> <557EDE40.7070006@battlepenguin.com> <557F03E2.3000001@qca.qualcomm.com> <557F0FD2.7000000@battlepenguin.com> <55808CAB.3020205@qca.qualcomm.com> <55816C31.3050008@battlepenguin.com> <55816F6D.3030706@battlepenguin.com> <5581C269.5020401@qca.qualcomm.com>
-In-Reply-To: <5581C269.5020401@qca.qualcomm.com>
-Content-Type: text/plain; charset=windows-1252
+From: Florian Grandel <fgrandel@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [BlueZ v9 16/16] tools/mgmt-tester: test multi-adv
+Date: Thu, 18 Jun 2015 03:17:46 +0200
+Message-Id: <1434590266-26744-17-git-send-email-fgrandel@gmail.com>
+In-Reply-To: <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
+References: <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
+In-Reply-To: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
+References: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 18/06/15 02:54, Ben Young Tae Kim wrote:
-> Hi Sumit,
->
-> On 06/17/15 06:00, Sumit Khanna wrote:
->> On 17/06/15 20:46, Sumit's Mailing Lists wrote:
->>> On 17/06/15 04:52, Ben Young Tae Kim wrote:
->>>> Hi Sumit,
->>>>
->>>> On 06/15/15 10:48, Sumit's Mailing Lists wrote:
->>>>> On 16/06/15 00:57, Ben Young Tae Kim wrote:
->>>>>> Hi Sumit,
->>>>>>
->>>>>>
->>>>>> On 06/15/15 07:16, Sumit's Mailing Lists wrote:
->>>>>>> On 15/06/15 21:55, Marcel Holtmann wrote:
->>>>>>>> Hi Smuit,
->>>>>>>>
->>>>>>>>>>> I'm currently using an MSI WS60 laptop which contains the following
->>>>>>>>>>> Bluetooth controller (from lsusb):
->>>>>>>>>>>
->>>>>>>>>>> Bus 003 Device 003: ID 0cf3:3004 Atheros Communications, Inc. AR3012
->>>>>>>>>>> Bluetooth 4.0
->>>>>>>>>> assuming that the firmware is present, this is most likely just missing the right VID/PID additions in the drivers. Please prepare a patch for that.
->>>>>>>>>>
->>>>>>>>>>> and the more detailed version:
->>>>>>>>>>>
->>>>>>>>>>> Bus 003 Device 003: ID 0cf3:3004 Atheros Communications, Inc. AR3012
->>>>>>>>>>> Bluetooth 4.0
->>>>>>>>>>> Device Descriptor:
->>>>>>>>>>> bLength                18
->>>>>>>>>>> bDescriptorType         1
->>>>>>>>>>> bcdUSB               1.10
->>>>>>>>>>> bDeviceClass          224 Wireless
->>>>>>>>>>> bDeviceSubClass         1 Radio Frequency
->>>>>>>>>>> bDeviceProtocol         1 Bluetooth
->>>>>>>>>>> bMaxPacketSize0        64
->>>>>>>>>>> idVendor           0x0cf3 Atheros Communications, Inc.
->>>>>>>>>>> idProduct          0x3004 AR3012 Bluetooth 4.0
->>>>>>>>>>> bcdDevice            0.01
->>>>>>>>>>> iManufacturer           0
->>>>>>>>>>> iProduct                0
->>>>>>>>>>> iSerial                 0
->>>>>>>>>>> bNumConfigurations      1
->>>>>>>>>>> Configuration Descriptor:
->>>>>>>>>> I actually prefer /sys/kernel/debug/usb/devices output for the devices.
->>>>>>>>>>
->>>>>>>>>> Regards
->>>>>>>>>>
->>>>>>>>>> Marcel
->>>>>>>>>>
->>>>>>>>> Here is the output from /sys/kernel/debug/usb/devices for my ath3k (also
->>>>>>>>> added it to the kernel bugzilla):
->>>>>>>>>
->>>>>>>>> T:  Bus=03 Lev=02 Prnt=02 Port=02 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
->>>>>>>>> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
->>>>>>>>> P:  Vendor=0cf3 ProdID=3004 Rev= 0.01
->>>>>>>>> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
->>>>>>>>> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>>>> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
->>>>>>>>> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->>>>>>>>> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
->>>>>>>>> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->>>>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
->>>>>>>>> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->>>>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
->>>>>>>>> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->>>>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
->>>>>>>>> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->>>>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
->>>>>>>>> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->>>>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
->>>>>>>>> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
->>>>>>>>> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->>>>>>>>> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
->>>>>>>>>
->>>>>>>>> and the firmware the kernel is trying to load:
->>>>>>>>>
->>>>>>>>> [  762.729370] usb 3-1.3: Direct firmware load for
->>>>>>>>> ar3k/AthrBT_0x00000200.dfu failed with error -2
->>>>>>>>> [  762.729373] Bluetooth: Patch file not found ar3k/AthrBT_0x00000200.dfu
->>>>>>>>> [  762.729374] Bluetooth: Loading patch file failed
->>>>>>>>> [  762.729381] ath3k: probe of 3-1.3:1.0 failed with error -2
->>>>>>>>> [  762.729411] usbcore: registered new interface driver ath3k
->>>>>>>> I fail to see that firmware in linux-firmware tree. However this up to Atheros / Qualcomm to submit there. I can not do much about this.
->>>>>>>>
->>>>>>>> Regards
->>>>>>>>
->>>>>>>> Marcel
->>>>>>>>
->>>>>>> Marcel,
->>>>>>>
->>>>>>> So it's pulling the right firmware file for my device, but It just
->>>>>>> hasn't been released yet?
->>>>>>>
->>>>>>> I know with the Wi-Fi firmware, the ath10k devs had python scripts to
->>>>>>> extract the firmware binaries from the Windows drivers (mentioned in
->>>>>>> here https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1383184). Has
->>>>>>> anyone done that before with the bluetooth firmware, or do you typically
->>>>>>> just wait for atheros/qualcom to release official ones?
->>>>>> Where did you get your atheros board/card since I couldn't find that board here. Is it a laptop? The BT firmware driver was trying to load AthrBT_0x00000200.dfu file and it got failed because no firmware file was present. But 0x00000200 means fw_version.rom_version which coming from controller chip, however, I haven't seen this version on Atheros chipset.
->>>>>>
->>>>>> I'm adding my friend - Rick Huang here. He may help you out
->>>>>>
->>>>>> Hi Rick,
->>>>>>
->>>>>> Have you seen rom_version as 0x00000200?
->>>>>>
->>>>>>> Sumit
->>>>>>> --
->>>>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>>>>> the body of a message to majordomo@vger.kernel.org
->>>>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>>> Thanks
->>>>>> -- Ben Kim
->>>>>>
->>>>> Yes, It's an MSI WS-60 Laptop, purchased two months ago in Australia. Is
->>>>> there any other debugging information I need to pull for you?
->>>>>
->>>>> Sumit
->>>>> --
->>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>>> the body of a message to majordomo@vger.kernel.org
->>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>> According to my colleague, it is not AR chip but QCA ROME core inside even though they're sharing same VID/PID with AR/QCA ROME(version 2). That's why you cannot bring up your card with ath3k driver. I knew it was not a good idea as it was early stage to develop the card so that next version of ROME USB card(v3.0 or v3.2) will use different PID/VID as you can see below.
->>>>
->>>> Can you follow up these instructions to see whether or not it can be addressed on your setup?
->>>>
->>>> --
->>>> 1. put this code in drivers/bluetooth/btusb.c
->>>>
->>>> static const struct usb_device_id blacklist_table[] = {
->>>> ...
->>>>     /* QCA ROME chipset */
->>>>     { USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
->>>>     { USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
->>>>     { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_QCA_ROME }, // <-- add new VID/PID here
->>>> ...
->>>>
->>>> 2. Copy firmware files into /lib/firmware/qca
->>>>  - nvm_usb_00000200.bin
->>>>  - rampatch_usb_00000200.bin
->>>> Those FW files won't be available on linux-firmware.git til today but it it will be available soon I believe.
->>>> --
->>>>
->>>> Thanks
->>>> -- Ben Kim
->>>>
->>>>  
->>>>
->>> Hi Ben,
->>>
->>> I added that line to my btusb.c; did a mrpropery, copied my .config back
->>> into the source tree, disabled ATH3K in menucofnig, made the bzImage and
->>> rebooted. The firmware you attached is in /lib/firmware/qca.
->>>
->>> I enabled debugging (FLAGS_btusb.o := -DDEBUG in the Makefile) so I
->>> could get some more info, and discovered I also have to delete this line
->>> or it will match the ath first:
->>>
->>> { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 }
->>>
->>> So then I saw
->>>
->>> [    1.263991] usb 3-1.3: new full-speed USB device number 3 using ehci-pci
->>> [    1.277022] usb 4-1.8: new full-speed USB device number 3 using ehci-pci
->>> [    1.350050] usb 3-1.3: New USB device found, idVendor=0cf3,
->>> idProduct=3004
->>> [    1.350051] usb 3-1.3: New USB device strings: Mfr=0, Product=0,
->>> SerialNumber=0
->>> [    1.350461] intf ffff88041bf62400 id ffffffff81d83bc0
->>> [    1.350462] BT Device Info 0
->>> [    1.350463] BT Device Info (after matching) 32768
->>> [    1.350466] In Rome Block
->>> [    1.350546] input: ETPS/2 Elantech Touchpad as
->>> /devices/platform/i8042/serio1/input/input10
->>> [    1.350671] hci0
->>> [    1.350879] Bluetooth: hci0: don't support firmware rome 0x200
->>> [    1.364795] usb 4-1.8: New USB device found, idVendor=1770,
->>> idProduct=ff00
->>> [    1.364797] usb 4-1.8: New USB device strings: Mfr=1, Product=1,
->>> SerialNumber=1
->>> [    1.364798] usb 4-1.8: Product: MSI EPF USB
->>> [    1.364799] usb 4-1.8: Manufacturer: MSI EPF USB
->>> [    1.364800] usb 4-1.8: SerialNumber: MSI EPF USB
->>>
->>> So those BT Device Info statements I added in the probe function. "In
->>> Rome Block" I added right after "if (id->driver_info & BTUSB_QCA_ROME) "
->>> and you can see where that error comes from.
->>>
->>> And that comes from...oh it checks another table...okay so I added the
->>> following to qca_device_info
->>>
->>>         { 0x00000200, 28, 4, 18 },
->>>
->>> and now I get;
->>>
->>> [    1.357942] intf ffff88041ba5bc00 id ffffffff81d83bc0
->>> [    1.357943] BT Device Info 0
->>> [    1.357944] BT Device Info (after matching) 32768
->>> [    1.357946] In Rome Block
->>> [    1.358113] hci0
->>> [    1.358516] bluetooth hci0: Direct firmware load for
->>> qca/rampatch_usb_00000200.bin failed with error -2
->>> [    1.358517] Bluetooth: hci0: failed to request rampatch file:
->>> qca/rampatch_usb_00000200.bin (-2)
->>>
->>> So progress. It's attempting to load the firmware and failing. Are those
->>> the right numbers for the device_info block?
->>>
->>> Sumit
->> Just remembered -2 is when it can't even find the firmware. But I think
->> I have it installed right. Is this correct:
->>
->> catelyn linux # ls /lib/firmware/qca/ -l
->> total 60
->> -rw-r--r-- 1 root root  1859 Jun 17 18:07 nvm_usb_00000200.bin
->> -rw-r--r-- 1 root root 54432 Jun 17 18:07 rampatch_usb_00000200.bin
->>
->> catelyn linux # sha256sum /lib/firmware/qca/*
->> 50cddc73c1a7c90bb3338941785d46088374b2aebf5dd1679c23145e39ad5087 
->> /lib/firmware/qca/nvm_usb_00000200.bin
->> 7551fc3a01fe46514d4da265095aabf07371cf17418a9f238e51b0fc4e83cfc5 
->> /lib/firmware/qca/rampatch_usb_00000200.bin
->>
-> You did right thing. I cannot understand why driver couldn't access firmware file which is in /lib/firmware/qca. Did you check each folder has right permission to access?
->
-> Thanks
-> -- Ben Kim
->
+This patch adds tests and required test infrastructure for multi
+advertising tests.
+---
+ doc/test-coverage.txt |   4 +-
+ tools/mgmt-tester.c   | 215 +++++++++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 190 insertions(+), 29 deletions(-)
 
-Ah I'm dumb. I'm using an initrd. :) So I've recompiled btusb as a
-module and it loads the firmware! :)
+diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+index 3e1c759..819ac50 100644
+--- a/doc/test-coverage.txt
++++ b/doc/test-coverage.txt
+@@ -39,7 +39,7 @@ Automated end-to-end testing
+ 
+ Application		Count	Description
+ -------------------------------------------
+-mgmt-tester		 300	Kernel management interface testing
++mgmt-tester		 302	Kernel management interface testing
+ l2cap-tester		  27	Kernel L2CAP implementation testing
+ rfcomm-tester		   9	Kernel RFCOMM implementation testing
+ bnep-tester		   1	Kernel BNEP implementation testing
+@@ -49,7 +49,7 @@ gap-tester		   1	Daemon D-Bus API testing
+ hci-tester		  14	Controller hardware testing
+ userchan-tester		   3	Kernel HCI User Channel testting
+ 			-----
+-			 371
++			 373
+ 
+ 
+ Android end-to-end testing
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index e8333de..46b088c 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -3990,10 +3990,28 @@ static const uint8_t add_advertising_param_txpwr[] = {
+ 	0x03, 0x02, 0x0d, 0x18, 0x04, 0xff, 0x01, 0x02, 0x03,
+ };
+ 
++/* add advertising command for a second instance */
++static const uint8_t add_advertising_param_test2[] = {
++	0x02,				/* adv instance */
++	0x00, 0x00, 0x00, 0x00,		/* flags: none */
++	0x00, 0x00,			/* duration: default */
++	0x01, 0x00,			/* timeout: 1 second */
++	0x07,				/* adv data len */
++	0x00,				/* scan rsp len */
++	/* adv data: */
++	0x06,				/* AD len */
++	0x08,				/* AD type: shortened local name */
++	0x74, 0x65, 0x73, 0x74, 0x32,	/* "test2" */
++};
++
+ static const uint8_t advertising_instance1_param[] = {
+ 	0x01,
+ };
+ 
++static const uint8_t advertising_instance2_param[] = {
++	0x02,
++};
++
+ static const uint8_t set_adv_data_uuid[] = {
+ 	/* adv data len */
+ 	0x09,
+@@ -4005,15 +4023,26 @@ static const uint8_t set_adv_data_uuid[] = {
+ 	0x00, 0x00,
+ };
+ 
+-static const uint8_t set_adv_data_test[] = {
+-	0x06,			/* adv data len */
+-	0x05,			/* AD len */
+-	0x08,			/* AD type: shortened local name */
+-	0x74, 0x65, 0x73, 0x74,	/* "test" */
++static const uint8_t set_adv_data_test1[] = {
++	0x07,				/* adv data len */
++	0x06,				/* AD len */
++	0x08,				/* AD type: shortened local name */
++	0x74, 0x65, 0x73, 0x74, 0x31,	/* "test1" */
+ 	/* padding */
+ 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+ 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-	0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00,
++};
++
++static const uint8_t set_adv_data_test2[] = {
++	0x07,				/* adv data len */
++	0x06,				/* AD len */
++	0x08,				/* AD type: shortened local name */
++	0x74, 0x65, 0x73, 0x74, 0x32,	/* "test2" */
++	/* padding */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00,
+ };
+ 
+ static const uint8_t set_adv_data_txpwr[] = {
+@@ -4277,8 +4306,8 @@ static const struct generic_data add_advertising_success_pwron_data = {
+ 	.expect_param = set_powered_adv_instance_settings_param,
+ 	.expect_len = sizeof(set_powered_adv_instance_settings_param),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_ADV_DATA,
+-	.expect_hci_param = set_adv_data_test,
+-	.expect_hci_len = sizeof(set_adv_data_test),
++	.expect_hci_param = set_adv_data_test1,
++	.expect_hci_len = sizeof(set_adv_data_test1),
+ };
+ 
+ static const struct generic_data add_advertising_success_pwron_enabled = {
+@@ -4315,8 +4344,8 @@ static const struct generic_data add_advertising_success_5 = {
+ 	.expect_param = set_powered_adv_instance_settings_param,
+ 	.expect_len = sizeof(set_powered_adv_instance_settings_param),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_ADV_DATA,
+-	.expect_hci_param = set_adv_data_test,
+-	.expect_hci_len = sizeof(set_adv_data_test),
++	.expect_hci_param = set_adv_data_test1,
++	.expect_hci_len = sizeof(set_adv_data_test1),
+ };
+ 
+ static const struct generic_data add_advertising_success_6 = {
+@@ -4595,6 +4624,31 @@ static const struct generic_data remove_advertising_success_2 = {
+ 	.expect_hci_len = sizeof(set_adv_off_param),
+ };
+ 
++static const struct generic_data multi_advertising_switch = {
++	.send_opcode = TESTER_NOOP_OPCODE,
++	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
++	.expect_alt_ev_param = advertising_instance1_param,
++	.expect_alt_ev_len = sizeof(advertising_instance1_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_ADV_DATA,
++	.expect_hci_param = set_adv_data_test2,
++	.expect_hci_len = sizeof(set_adv_data_test2),
++};
++
++static const struct generic_data multi_advertising_add_second = {
++	.send_opcode = MGMT_OP_ADD_ADVERTISING,
++	.send_param = add_advertising_param_test2,
++	.send_len = sizeof(add_advertising_param_test2),
++	.expect_param = advertising_instance2_param,
++	.expect_len = sizeof(advertising_instance2_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_alt_ev = MGMT_EV_ADVERTISING_ADDED,
++	.expect_alt_ev_param = advertising_instance2_param,
++	.expect_alt_ev_len = sizeof(advertising_instance2_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_ADV_DATA,
++	.expect_hci_param = set_adv_data_test2,
++	.expect_hci_len = sizeof(set_adv_data_test2),
++};
++
+ /* based on G-Tag ADV_DATA */
+ static const uint8_t adv_data_invalid_significant_len[] = { 0x02, 0x01, 0x06,
+ 		0x0d, 0xff, 0x80, 0x01, 0x02, 0x15, 0x12, 0x34, 0x80, 0x91,
+@@ -5015,40 +5069,48 @@ static void setup_add_device(const void *test_data)
+ static void setup_add_advertising_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
++	struct mgmt_rp_add_advertising *rp =
++				(struct mgmt_rp_add_advertising *) param;
++
+ 	if (status != MGMT_STATUS_SUCCESS) {
+ 		tester_setup_failed();
+ 		return;
+ 	}
+ 
+-	tester_print("Add Advertising setup complete");
++	tester_print("Add Advertising setup complete (instance %d)",
++								rp->instance);
+ 
+ 	setup_bthost();
+ }
+ 
+-static void setup_add_adv_param(struct mgmt_cp_add_advertising *cp)
++#define TESTER_ADD_ADV_DATA_LEN 7
++
++static void setup_add_adv_param(struct mgmt_cp_add_advertising *cp,
++							uint8_t instance)
+ {
+ 	memset(cp, 0, sizeof(*cp));
+-	cp->instance = 1;
+-	cp->adv_data_len = 6;
+-	cp->data[0] = 0x05; /* AD len */
++	cp->instance = instance;
++	cp->adv_data_len = TESTER_ADD_ADV_DATA_LEN;
++	cp->data[0] = TESTER_ADD_ADV_DATA_LEN - 1; /* AD len */
+ 	cp->data[1] = 0x08; /* AD type: shortened local name */
+ 	cp->data[2] = 't';  /* adv data ... */
+ 	cp->data[3] = 'e';
+ 	cp->data[4] = 's';
+ 	cp->data[5] = 't';
++	cp->data[6] = '0' + instance;
+ }
+ 
+ static void setup_add_advertising_not_powered(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	struct mgmt_cp_add_advertising *cp;
+-	unsigned char adv_param[sizeof(*cp) + 6];
++	unsigned char adv_param[sizeof(*cp) + TESTER_ADD_ADV_DATA_LEN];
+ 	unsigned char param[] = { 0x01 };
+ 
+ 	tester_print("Adding advertising instance while unpowered");
+ 
+ 	cp = (struct mgmt_cp_add_advertising *) adv_param;
+-	setup_add_adv_param(cp);
++	setup_add_adv_param(cp, 1);
+ 
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
+ 						sizeof(param), &param,
+@@ -5064,13 +5126,13 @@ static void setup_add_advertising(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	struct mgmt_cp_add_advertising *cp;
+-	unsigned char adv_param[sizeof(*cp) + 6];
++	unsigned char adv_param[sizeof(*cp) + TESTER_ADD_ADV_DATA_LEN];
+ 	unsigned char param[] = { 0x01 };
+ 
+ 	tester_print("Adding advertising instance while powered");
+ 
+ 	cp = (struct mgmt_cp_add_advertising *) adv_param;
+-	setup_add_adv_param(cp);
++	setup_add_adv_param(cp, 1);
+ 
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
+ 						sizeof(param), &param,
+@@ -5090,13 +5152,13 @@ static void setup_add_advertising_connectable(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	struct mgmt_cp_add_advertising *cp;
+-	unsigned char adv_param[sizeof(*cp) + 6];
++	unsigned char adv_param[sizeof(*cp) + TESTER_ADD_ADV_DATA_LEN];
+ 	unsigned char param[] = { 0x01 };
+ 
+ 	tester_print("Adding advertising instance while connectable");
+ 
+ 	cp = (struct mgmt_cp_add_advertising *) adv_param;
+-	setup_add_adv_param(cp);
++	setup_add_adv_param(cp, 1);
+ 
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
+ 						sizeof(param), &param,
+@@ -5120,13 +5182,13 @@ static void setup_add_advertising_timeout(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	struct mgmt_cp_add_advertising *cp;
+-	unsigned char adv_param[sizeof(*cp) + 6];
++	unsigned char adv_param[sizeof(*cp) + TESTER_ADD_ADV_DATA_LEN];
+ 	unsigned char param[] = { 0x01 };
+ 
+ 	tester_print("Adding advertising instance with timeout");
+ 
+ 	cp = (struct mgmt_cp_add_advertising *) adv_param;
+-	setup_add_adv_param(cp);
++	setup_add_adv_param(cp, 1);
+ 	cp->timeout = 1;
+ 
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
+@@ -5143,6 +5205,34 @@ static void setup_add_advertising_timeout(const void *test_data)
+ 						NULL, NULL);
+ }
+ 
++static void setup_add_advertising_duration(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	struct mgmt_cp_add_advertising *cp;
++	unsigned char adv_param[sizeof(*cp) + TESTER_ADD_ADV_DATA_LEN];
++	unsigned char param[] = { 0x01 };
++
++	tester_print("Adding instance with long timeout/short duration");
++
++	cp = (struct mgmt_cp_add_advertising *) adv_param;
++	setup_add_adv_param(cp, 1);
++	cp->duration = 1;
++	cp->timeout = 30;
++
++	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
++						sizeof(param), &param,
++						NULL, NULL, NULL);
++
++	mgmt_send(data->mgmt, MGMT_OP_SET_POWERED, data->mgmt_index,
++						sizeof(param), &param,
++						NULL, NULL, NULL);
++
++	mgmt_send(data->mgmt, MGMT_OP_ADD_ADVERTISING, data->mgmt_index,
++						sizeof(adv_param), adv_param,
++						setup_add_advertising_callback,
++						NULL, NULL);
++}
++
+ static void setup_power_cycle_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -5165,13 +5255,13 @@ static void setup_add_advertising_power_cycle(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	struct mgmt_cp_add_advertising *cp;
+-	unsigned char adv_param[sizeof(*cp) + 6];
++	unsigned char adv_param[sizeof(*cp) + TESTER_ADD_ADV_DATA_LEN];
+ 	unsigned char param_on[] = { 0x01 };
+ 
+ 	tester_print("Adding instance without timeout and power cycle");
+ 
+ 	cp = (struct mgmt_cp_add_advertising *) adv_param;
+-	setup_add_adv_param(cp);
++	setup_add_adv_param(cp, 1);
+ 
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
+ 						sizeof(param_on), &param_on,
+@@ -5191,13 +5281,13 @@ static void setup_set_and_add_advertising(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	struct mgmt_cp_add_advertising *cp;
+-	unsigned char adv_param[sizeof(*cp) + 6];
++	unsigned char adv_param[sizeof(*cp) + TESTER_ADD_ADV_DATA_LEN];
+ 	unsigned char param[] = { 0x01 };
+ 
+ 	tester_print("Set and add advertising instance");
+ 
+ 	cp = (struct mgmt_cp_add_advertising *) adv_param;
+-	setup_add_adv_param(cp);
++	setup_add_adv_param(cp, 1);
+ 
+ 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
+ 						sizeof(param), &param,
+@@ -5217,6 +5307,61 @@ static void setup_set_and_add_advertising(const void *test_data)
+ 						NULL, NULL);
+ }
+ 
++static void setup_multi_adv_second_instance(uint8_t status, uint16_t length,
++		const void *param, void *user_data) {
++	struct mgmt_rp_add_advertising *rp =
++				(struct mgmt_rp_add_advertising *) param;
++	struct test_data *data = tester_get_data();
++	struct mgmt_cp_add_advertising *cp;
++	unsigned char adv_param[sizeof(*cp) + TESTER_ADD_ADV_DATA_LEN];
++
++	if (status != MGMT_STATUS_SUCCESS) {
++		tester_setup_failed();
++		return;
++	}
++
++	tester_print("Add Advertising setup complete (instance %d)",
++								rp->instance);
++
++	cp = (struct mgmt_cp_add_advertising *) adv_param;
++	setup_add_adv_param(cp, 2);
++	cp->timeout = 1;
++	cp->duration = 1;
++
++	mgmt_send(data->mgmt, MGMT_OP_ADD_ADVERTISING, data->mgmt_index,
++						sizeof(adv_param), adv_param,
++						setup_add_advertising_callback,
++						NULL, NULL);
++}
++
++static void setup_multi_adv(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	struct mgmt_cp_add_advertising *cp;
++	unsigned char adv_param[sizeof(*cp) + TESTER_ADD_ADV_DATA_LEN];
++	unsigned char param[] = { 0x01 };
++
++	tester_print("Adding two instances with timeout 1 and duration 1");
++
++	cp = (struct mgmt_cp_add_advertising *) adv_param;
++	setup_add_adv_param(cp, 1);
++	cp->timeout = 1;
++	cp->duration = 1;
++
++	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
++						sizeof(param), &param,
++						NULL, NULL, NULL);
++
++	mgmt_send(data->mgmt, MGMT_OP_SET_POWERED, data->mgmt_index,
++						sizeof(param), &param,
++						NULL, NULL, NULL);
++
++	mgmt_send(data->mgmt, MGMT_OP_ADD_ADVERTISING, data->mgmt_index,
++						sizeof(adv_param), adv_param,
++						setup_multi_adv_second_instance,
++						NULL, NULL);
++}
++
+ static void setup_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -6740,6 +6885,22 @@ int main(int argc, char *argv[])
+ 						setup_add_advertising,
+ 						test_command_generic);
+ 
++	/* When advertising two instances, the instances should be
++	 * advertised in a round-robin fashion.
++	 */
++	test_bredrle("Multi Advertising - Success 1 (Instance Switch)",
++					&multi_advertising_switch,
++					setup_multi_adv,
++					test_command_generic);
++	/* Adding a new instance when one is already being advertised
++	 * will switch to the new instance after the first has reached
++	 * its duration. A long timeout has been set to
++	 */
++	test_bredrle_full("Multi Advertising - Success 2 (Add Second Inst)",
++					&multi_advertising_add_second,
++					setup_add_advertising_duration,
++					test_command_generic, 3);
++
+ 	test_bredrle("Read Local OOB Data - Not powered",
+ 				&read_local_oob_not_powered_test,
+ 				NULL, test_command_generic);
+-- 
+1.9.1
 
-[  108.599370] intf ffff8800c9d2b800 id ffffffffa0005f50
-[  108.599733] usbcore: registered new interface driver btusb
-[  108.599769] hci0
-[  108.602907] Bluetooth: hci0: using rampatch file:
-qca/rampatch_usb_00000200.bin
-[  108.602909] Bluetooth: hci0: QCA: patch rome 0x200 build 0x299,
-firmware rome 0x200 build 0x111
-[  108.658716] Bluetooth: hci0: using NVM file: qca/nvm_usb_00000200.bin
-
-and I checked rfkill to make sure I wasn't soft/hard blocked:
-
-sudo rfkill list
-0: msi-bluetooth: Bluetooth
-    Soft blocked: no
-    Hard blocked: no
-1: msi-wlan: Wireless LAN
-    Soft blocked: no
-    Hard blocked: no
-2: hci0: Bluetooth
-    Soft blocked: no
-    Hard blocked: no
-3: phy0: Wireless LAN
-    Soft blocked: no
-    Hard blocked: no
-
-Sumit
-
-
-
-However, upon attempting to turn on bluetooth, either via the blueman
-applet or the bluetoothctl command line like so:
-
-bluetoothctl
-[NEW] Controller 2C:33:7A:00:05:DA BlueZ 5.25 [default]
-[bluetooth]# select 2C:33:7A:00:05:DA
-[bluetooth]# power on
-Failed to set power on: org.bluez.Error.Failed
-[bluetooth]#
-
-I get the following kernel error:
-
-[ 1172.484075] hci0
-[ 1172.484097] Bluetooth: hci0: Failed to access otp area (-108)
