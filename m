@@ -1,82 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Jun 2015 13:19:25 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Florian Grandel <fgrandel@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [BlueZ v9 00/16] Multi-advertising
-Message-ID: <20150618101925.GA23178@t440s.lan>
-References: <1434166979-21824-1-git-send-email-fgrandel@gmail.com>
- <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1434590266-26744-1-git-send-email-fgrandel@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH v4 2/4] hci_uart: line discipline enhancements
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5582935B.1030100@linux.intel.com>
+Date: Thu, 18 Jun 2015 12:17:48 +0200
+Cc: Ilya Faenson <ifaenson@broadcom.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Arend Van Spriel <arend@broadcom.com>
+Message-Id: <821D0EAE-A2FA-4E18-8A6C-165EEA91A957@holtmann.org>
+References: <1434576658-20730-1-git-send-email-ifaenson@broadcom.com> <1434576658-20730-3-git-send-email-ifaenson@broadcom.com> <EC2420F4-9F0F-47DB-A5E5-713E763E3E26@holtmann.org> <E0D3336E15B58B4294723AC879BA5E94263438@IRVEXCHMB15.corp.ad.broadcom.com> <5582935B.1030100@linux.intel.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Florian,
+Hi Fred,
 
-On Thu, Jun 18, 2015, Florian Grandel wrote:
-> patch set accompanying the introduction of a multi-advertising
-> infrastructure in the kernel
+> <snip>
+>>> @@ -287,15 +366,28 @@ static int hci_uart_setup(struct hci_dev *hdev)
+>>> 	struct hci_uart *hu = hci_get_drvdata(hdev);
+>>> 	struct hci_rp_read_local_version *ver;
+>>> 	struct sk_buff *skb;
+>>> +	unsigned int speed;
+>>> 	int err;
+>>> 
+>>> +	/* Init speed if any */
+>>> +	speed = 0;
+>>> 	if (hu->proto->init_speed)
+>>> -		hci_uart_set_baudrate(hu, hu->proto->init_speed);
+>>> -
+>>> -	if (hu->proto->set_baudrate && hu->proto->oper_speed) {
+>>> -		err = hu->proto->set_baudrate(hu, hu->proto->oper_speed);
+>>> +		speed = hu->proto->init_speed;
+>>> +	else if (hu->init_speed)
+>>> +		speed = hu->init_speed;
+>> 
+>> I added the speed assignment as else statement
+>> 
+>> 	else
+>> 		speed = 0;
 > 
-> v1 ... v4:
-> - fix tests to test for correct behavior when removing all adv instances
->   by passing in the 0x00 instance identifier
+> Afaiu, with this change hu->proto->*speed will always be used for all bcm device.
+> I think hu->*speed should be used if exist or hu->proto->*speed, so the test should be swapped.
 > 
-> v4 -> v5:
-> - factored userland code changes into a separate change set for easier
->   review
+> The equivalent change is needed in bcm_setup() of hci_bcm.c.
 > 
-> v5 -> v6:
-> - documented add advertising test setup
-> - renamed add advertising tests to make them more readable
-> - added test to reproduce a bug found by Marcel (executing add-adv twice
->   for the same instance should override the adv data)
-> 
-> v6 -> v7:
-> - correctly split mangled patches
-> 
-> v7 -> v8:
-> - several additional test documentation improvements
-> - documenting multi-adv implementation details in the mgmt api doc
-> - made the debugging of cmd response messages easier
-> - made the duration parameter accessible via btmgmt
-> - provided test infrastructure for timed tests
-> - fix duplicate code
-> - fix a few typos
-> - added test for advertising timeout
-> - added test for le off
-> - added multi-adv tests
-> 
-> v8 -> v9 (due to Marcel's review):
-> - improved and fixed changes to mgmt-api.txt
-> - added a test that guarantees that instances without a timeout survive
->   a power cycle
-> 
-> Florian Grandel (16):
->   doc/mgmt-api: multi-adv implementation details
->   doc/mgmt-api: fix typos
->   tools/btmgmt: make inst duration configurable
->   tools/mgmt-tester: error message when unexp params
->   tools/mgmt-tester: expect 0 rp when removing all adv inst
->   tools/mgmt-tester: comment add adv test setup
->   tools/mgmt-tester: rename add adv tests
->   tools/mgmt-tester: increase max adv inst
->   tools/mgmt-tester: keep instances on power cycle
->   tools/mgmt-tester: test adv inst override
->   tools/mgmt-tester: make test timeout configurable
->   tools/mgmt-tester: allow for event-only tests
->   tools/mgmt-tester: test advertising timeout
->   tools/mgmt-tester: test le off
->   tools/mgmt-tester: fix duplicate code
->   tools/mgmt-tester: test multi-adv
-> 
->  doc/mgmt-api.txt      | 105 +++++--
->  doc/test-coverage.txt |   4 +-
->  tools/btmgmt.c        |  28 +-
->  tools/mgmt-tester.c   | 838 +++++++++++++++++++++++++++++++++++---------------
->  4 files changed, 681 insertions(+), 294 deletions(-)
+> Ilya, do you want to do it or should I send a patch ?
 
-All patches in this set have been applied. Thanks!
+if I screwed this up, then please send a patch right away.
 
-Johan
+Regards
+
+Marcel
+
