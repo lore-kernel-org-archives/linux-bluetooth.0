@@ -1,22 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Prabhu Chawandi <foss.chaws@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: bluez/android: Building Only BfA
+Date: Thu, 18 Jun 2015 16:36:28 +0200
+Message-ID: <2713825.isxcMZJaLO@leonov>
+In-Reply-To: <CAKafyqpwc+H+XRVOF807gacpEvuPiD1wPYYWof=ycdSKaBxrnQ@mail.gmail.com>
+References: <CAKafyqpwc+H+XRVOF807gacpEvuPiD1wPYYWof=ycdSKaBxrnQ@mail.gmail.com>
 MIME-Version: 1.0
-Date: Thu, 18 Jun 2015 20:09:21 +0530
-Message-ID: <CAKafyqoTVzbVv1Wk21wRSjxyH68bL+gCT_0qF9fvmUWnqkgEeg@mail.gmail.com>
-Subject: Bluez-Android: L2CAP Socket Communication over
-From: Prabhu Chawandi <foss.chaws@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Prabhu,
 
-  Currently, I see only rfcomm sockets, I want L2CAP socket
-communication for my use case.
+On Thursday 18 of June 2015 20:00:08 Prabhu Chawandi wrote:
+> Hi,
+> 
+>   How can I build only BfA, currently when I  --enable-android,
+> desktop bluez also gets built.
+> 
+> Anyway to build BfA alone?
+> 
+> Share me if you have any information.
 
-I am looking to add this support.  Share me your views on this.
+No, there is no option to build only BfA if you are building for Linux.
 
-Any information will be helpful.
-
-ManyThanks,
-Prabhu
+-- 
+BR
+Szymon Janc
