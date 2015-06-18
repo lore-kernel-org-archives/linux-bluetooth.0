@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Florian Grandel <fgrandel@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 18/20] Bluetooth: mgmt: multi-adv for mgmt_reenable_advertising()
-Date: Thu, 18 Jun 2015 03:16:51 +0200
-Message-Id: <1434590213-26599-19-git-send-email-fgrandel@gmail.com>
+Subject: [PATCH v8 15/20] Bluetooth: mgmt: multi adv for remove_advertising*()
+Date: Thu, 18 Jun 2015 03:16:48 +0200
+Message-Id: <1434590213-26599-16-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434590213-26599-1-git-send-email-fgrandel@gmail.com>
 References: <1434590213-26599-1-git-send-email-fgrandel@gmail.com>
 In-Reply-To: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
@@ -11,46 +11,128 @@ References: <1434166873-21595-1-git-send-email-fgrandel@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-During service discovery, advertising will be disabled. This patch
-ensures that it is correctly being re-enabled, both for configuration
-made via set advertising and add advertising, once the scanning
-times out.
+The remove_advertising() and remove_advertising_complete() functions
+had instance identifiers hard coded. Notably, when passing in 0x00 as
+an instance identifier to signal that all instances should be removed
+then the mgmt API would return a hard coded 0x01 rather than returning
+the expected value 0x00. This bug is being fixed by always referencing
+the instance identifier from the management API call instead.
+
+remove_advertising() is refactored to use the new dynamic advertising
+instance list. The logic is being changed to make multi-instance
+advertising actually work, notably the schedule_adv_instance() method is
+being referenced to make sure that other instances will continue to
+advertise even if one instance is being removed.
+
+The code is made more readable by factoring advertising instance
+management and initialization into the low-level
+hci_remove_adv_instance() and hci_adv_instances_clear() functions.
+
+The method now references the clear_adv_instance() helper method to
+remove duplicate logic and code.
 
 Signed-off-by: Florian Grandel <fgrandel@gmail.com>
 ---
- net/bluetooth/mgmt.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt.c | 45 ++++++++++++++++++++++++---------------------
+ 1 file changed, 24 insertions(+), 21 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f44c6e3..b132032 100644
+index 0cc6854..c8ed16d 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -8610,13 +8610,24 @@ static void adv_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
- void mgmt_reenable_advertising(struct hci_dev *hdev)
+@@ -7248,6 +7248,7 @@ static void remove_advertising_complete(struct hci_dev *hdev, u8 status,
+ 					u16 opcode)
  {
+ 	struct mgmt_pending_cmd *cmd;
++	struct mgmt_cp_remove_advertising *cp;
+ 	struct mgmt_rp_remove_advertising rp;
+ 
+ 	BT_DBG("status %d", status);
+@@ -7262,7 +7263,8 @@ static void remove_advertising_complete(struct hci_dev *hdev, u8 status,
+ 	if (!cmd)
+ 		goto unlock;
+ 
+-	rp.instance = 1;
++	cp = cmd->param;
++	rp.instance = cp->instance;
+ 
+ 	mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, MGMT_STATUS_SUCCESS,
+ 			  &rp, sizeof(rp));
+@@ -7277,21 +7279,25 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
+ {
+ 	struct mgmt_cp_remove_advertising *cp = data;
+ 	struct mgmt_rp_remove_advertising rp;
++	struct adv_info *adv_instance;
+ 	int err;
+ 	struct mgmt_pending_cmd *cmd;
  	struct hci_request req;
-+	u8 instance;
  
- 	if (!hci_dev_test_flag(hdev, HCI_ADVERTISING) &&
- 	    !hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE))
- 		return;
+ 	BT_DBG("%s", hdev->name);
  
-+	instance = get_current_adv_instance(hdev);
+-	/* The current implementation only allows modifying instance no 1. A
+-	 * value of 0 indicates that all instances should be cleared.
+-	 */
+-	if (cp->instance > 1)
+-		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_REMOVE_ADVERTISING,
+-				       MGMT_STATUS_INVALID_PARAMS);
+-
+ 	hci_dev_lock(hdev);
+ 
++	if (cp->instance)
++		adv_instance = hci_find_adv_instance(hdev, cp->instance);
 +
- 	hci_req_init(&req, hdev);
--	enable_advertising(&req);
-+
-+	if (instance) {
-+		schedule_adv_instance(&req, instance, true);
-+	} else {
-+		update_adv_data(&req);
-+		update_scan_rsp_data(&req);
-+		enable_advertising(&req);
++	if (!(cp->instance == 0x00 || adv_instance)) {
++		err = mgmt_cmd_status(sk, hdev->id,
++				      MGMT_OP_REMOVE_ADVERTISING,
++				      MGMT_STATUS_INVALID_PARAMS);
++		goto unlock;
 +	}
 +
- 	hci_req_run(&req, adv_enable_complete);
- }
+ 	if (pending_find(MGMT_OP_ADD_ADVERTISING, hdev) ||
+ 	    pending_find(MGMT_OP_REMOVE_ADVERTISING, hdev) ||
+ 	    pending_find(MGMT_OP_SET_LE, hdev)) {
+@@ -7306,21 +7312,21 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
  
+-	if (hdev->adv_instance_timeout)
+-		cancel_delayed_work(&hdev->adv_instance_expire);
+-
+-	memset(&hdev->adv_instance, 0, sizeof(hdev->adv_instance));
++	hci_req_init(&req, hdev);
+ 
+-	advertising_removed(sk, hdev, 1);
++	clear_adv_instance(hdev, &req, cp->instance, true);
+ 
+-	hci_dev_clear_flag(hdev, HCI_ADVERTISING_INSTANCE);
++	if (list_empty(&hdev->adv_instances))
++		disable_advertising(&req);
+ 
+-	/* If the HCI_ADVERTISING flag is set or the device isn't powered then
+-	 * we have no HCI communication to make. Simply return.
++	/* If no HCI commands have been collected so far or the HCI_ADVERTISING
++	 * flag is set or the device isn't powered then we have no HCI
++	 * communication to make. Simply return.
+ 	 */
+-	if (!hdev_is_powered(hdev) ||
++	if (skb_queue_empty(&req.cmd_q) ||
++	    !hdev_is_powered(hdev) ||
+ 	    hci_dev_test_flag(hdev, HCI_ADVERTISING)) {
+-		rp.instance = 1;
++		rp.instance = cp->instance;
+ 		err = mgmt_cmd_complete(sk, hdev->id,
+ 					MGMT_OP_REMOVE_ADVERTISING,
+ 					MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
+@@ -7334,9 +7340,6 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
+ 
+-	hci_req_init(&req, hdev);
+-	disable_advertising(&req);
+-
+ 	err = hci_req_run(&req, remove_advertising_complete);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
 -- 
 1.9.1
 
