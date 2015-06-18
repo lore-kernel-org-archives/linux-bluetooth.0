@@ -1,42 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 18 Jun 2015 20:12:31 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix warning of uninitialized adv_instance variable
-Date: Thu, 18 Jun 2015 20:26:31 +0300
-Message-Id: <1434648391-13789-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Increment management interface revision
+Message-ID: <20150618171231.GA5055@t440s.P-661HNU-F1>
+References: <1434646683-91348-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1434646683-91348-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcel,
 
-Some static checkers may cause the following (false positive) warning:
+On Thu, Jun 18, 2015, Marcel Holtmann wrote:
+> This patch increments the management interface revision due to
+> introduction of new multi-advertising feature and various bug fixes.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/mgmt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
->> net/bluetooth/mgmt.c:7294:29: warning: 'adv_instance' may be used
-uninitialized in this function [-Wuninitialized]
+Applied to bluetooth-next. Thanks.
 
-Fix it by ensuring adv_instance always gets set to a known value.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 2fe6f3bfc579..2b3411136d68 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7291,8 +7291,10 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
- 
- 	if (cp->instance)
- 		adv_instance = hci_find_adv_instance(hdev, cp->instance);
-+	else
-+		adv_instance = NULL;
- 
--	if (!(cp->instance == 0x00 || adv_instance)) {
-+	if (!adv_instance) {
- 		err = mgmt_cmd_status(sk, hdev->id,
- 				      MGMT_OP_REMOVE_ADVERTISING,
- 				      MGMT_STATUS_INVALID_PARAMS);
--- 
-2.4.3
-
+Johan
