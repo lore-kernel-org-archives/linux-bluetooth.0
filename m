@@ -1,45 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: Fail to test advertisement
+Subject: Re: Bluez-Android: L2CAP Socket Communication over
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <2CF57A644018A745B8FE029C7223E16E11A31EAD@SHSMSX104.ccr.corp.intel.com>
-Date: Fri, 19 Jun 2015 02:51:42 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <5FC3FEC4-261B-4EA6-84A5-552824A36401@holtmann.org>
-References: <2CF57A644018A745B8FE029C7223E16E11A31EAD@SHSMSX104.ccr.corp.intel.com>
-To: "Zheng, Wu" <wu.zheng@intel.com>
+In-Reply-To: <CAKafyqoTVzbVv1Wk21wRSjxyH68bL+gCT_0qF9fvmUWnqkgEeg@mail.gmail.com>
+Date: Fri, 19 Jun 2015 02:49:58 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <CDAF57F8-C541-42AF-8FEE-47A5221DF63A@holtmann.org>
+References: <CAKafyqoTVzbVv1Wk21wRSjxyH68bL+gCT_0qF9fvmUWnqkgEeg@mail.gmail.com>
+To: Prabhu Chawandi <foss.chaws@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Zheng,
+Hi Prabhu,
 
-> I try to test the feature advertisement of bluez.
+>  Currently, I see only rfcomm sockets, I want L2CAP socket
+> communication for my use case.
 > 
-> Environment: 
-> The kernel is 3.19.
-> The bluez is the latest git version.
-> 
-> The process is the following points:
-> 
-> Hciconfig hci0 up.
-> 
-> then run "Bluetooth -Edn" for testing advertisement.
-> 
-> I can get the log info: 
-> 
-> Src/advertising.c:btd_advertising_manager_new() LE Advertising Manger cretated for adapter: /org/bluez/hci0
-> Failed to read advertising features: Unknown Command (0x01)
-> 
-> Bluez failed to create LE Advertising Manager.
-> 
-> And try to run "ibeacon" to check "read advertising features". It works well.
-> 
-> What's suggestion? Any step is wrong? Thanks.
+> I am looking to add this support.  Share me your views on this.
 
-the kernel you have it not supporting advertising in a form that is needed for LE Advertising Manager. You need at least 4.1 kernel.
-
-And the ibeacon test tool uses HCI User Channel and thus raw access to the hardware. You are looking for the mgmt interface for advertising. Check doc/mgmt-api.txt.
+should be pretty straight forward to add to BfA. However getting support into Bluetooth Service into AOSP might be a bit more trickier. Native application of course can always open the L2CAP socket directly.
 
 Regards
 
