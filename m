@@ -1,32 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH] Bluetooth: dtl1_cs: Fix coding style -- clean up
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150619084607.GA20912@ubuntu>
-Date: Fri, 19 Jun 2015 11:20:35 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <49A913C8-7FB9-4046-B3E2-E9B4DCF49BB1@holtmann.org>
-References: <20150619084607.GA20912@ubuntu>
-To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
+	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth: dtl1_cs: Fix coding style -- clean up
+Date: Fri, 19 Jun 2015 08:46:15 +0000
+Message-ID: <20150619084607.GA20912@ubuntu>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prasanna,
+From: Prasanna Karthik <mkarthi3@visteon.com>
 
-> Braces {} are not necessary for single statement blocks reported by
-> checkpatch
-> 
-> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
-> ---
-> drivers/bluetooth/dtl1_cs.c |    4 ++--
-> 1 files changed, 2 insertions(+), 2 deletions(-)
+Braces {} are not necessary for single statement blocks reported by
+checkpatch
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+---
+ drivers/bluetooth/dtl1_cs.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
+index 78e10f0..01a967f 100644
+--- a/drivers/bluetooth/dtl1_cs.c
++++ b/drivers/bluetooth/dtl1_cs.c
+@@ -182,9 +182,9 @@ static void dtl1_control(struct dtl1_info *info, struct=
+ sk_buff *skb)
+ 	int i;
+=20
+ 	printk(KERN_INFO "Bluetooth: Nokia control data =3D");
+-	for (i =3D 0; i < skb->len; i++) {
++	for (i =3D 0; i < skb->len; i++)
+ 		printk(" %02x", skb->data[i]);
+-	}
++
+ 	printk("\n");
+=20
+ 	/* transition to active state */
+--=20
+1.7.0.4
