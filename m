@@ -1,31 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: Query on how to use btmon/hcidump regarding FM packets on TI WiLink7 Driver
+Subject: Re: Fail to test advertisement
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <55817325.8070100@samsung.com>
-Date: Fri, 19 Jun 2015 02:56:02 +0200
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Message-Id: <177C9158-C9E3-4D00-9081-732BB72D9402@holtmann.org>
-References: <55817325.8070100@samsung.com>
-To: Chan-yeol Park <chanyeol.park@samsung.com>
+In-Reply-To: <2CF57A644018A745B8FE029C7223E16E11A31EAD@SHSMSX104.ccr.corp.intel.com>
+Date: Fri, 19 Jun 2015 02:51:42 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <5FC3FEC4-261B-4EA6-84A5-552824A36401@holtmann.org>
+References: <2CF57A644018A745B8FE029C7223E16E11A31EAD@SHSMSX104.ccr.corp.intel.com>
+To: "Zheng, Wu" <wu.zheng@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chan-yeol,
+Hi Zheng,
 
-> May I ask how to use btmon/hcidump when FM packet is over HCI uart in
-> Texas Instruments WiLink7 driver?
+> I try to test the feature advertisement of bluez.
 > 
-> As far as I understand FM command and events are not captured in btmon/hcidump.
+> Environment: 
+> The kernel is 3.19.
+> The bluez is the latest git version.
 > 
-> I think RX is simple because FM packet could be copied to hci_core.c. but I am not clear about TX.
+> The process is the following points:
+> 
+> Hciconfig hci0 up.
+> 
+> then run "Bluetooth -Edn" for testing advertisement.
+> 
+> I can get the log info: 
+> 
+> Src/advertising.c:btd_advertising_manager_new() LE Advertising Manger cretated for adapter: /org/bluez/hci0
+> Failed to read advertising features: Unknown Command (0x01)
+> 
+> Bluez failed to create LE Advertising Manager.
+> 
+> And try to run "ibeacon" to check "read advertising features". It works well.
+> 
+> What's suggestion? Any step is wrong? Thanks.
 
-that is because of this crappy "shared transport" design. It is a design that should have never gotten upstream since it hacks things together. Instead of addressing the problem of FM over HCI, the guys from TI hacked around it.
+the kernel you have it not supporting advertising in a form that is needed for LE Advertising Manager. You need at least 4.1 kernel.
 
-Fundamentally they put a layer in between instead of making FM a slave platform device of the Bluetooth controller as it is suppose to be. Which means they require to stack line disciplines and implement another HCI processing engine for no apparent reasons.
-
-Feel free to fix this for the WiLink7 driver. I am accepting patches for this since we will do exactly the same for the Intel chips as well. The FM side of things will be platform devices exposed by the Bluetooth driver.
+And the ibeacon test tool uses HCI User Channel and thus raw access to the hardware. You are looking for the mgmt interface for advertising. Check doc/mgmt-api.txt.
 
 Regards
 
