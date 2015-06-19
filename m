@@ -1,55 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 20 Jun 2015 15:21:39 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth:hci_bcsp:Fix coding style -- Clean up
-Message-ID: <20150620122139.GA7520@t440s.P-661HNU-F1>
-References: <20150619051510.GA14012@ubuntu>
- <FBA67A82-D119-445B-A90A-B06F3D5A2E94@holtmann.org>
- <20150619095503.GA21667@ubuntu>
+From: Ilya Faenson <ifaenson@broadcom.com>
+To: Fabio Estevam <festevam@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, Arend Van Spriel <arend@broadcom.com>
+Subject: RE: [PATCH v4 1/4] Broadcom Bluetooth UART Device Tree bindings
+Date: Fri, 19 Jun 2015 20:40:14 +0000
+Message-ID: <E0D3336E15B58B4294723AC879BA5E9426488B@IRVEXCHMB15.corp.ad.broadcom.com>
+References: <1434576658-20730-1-git-send-email-ifaenson@broadcom.com>
+	<1434576658-20730-2-git-send-email-ifaenson@broadcom.com>
+ <CAOMZO5BrLeqW=dDJbyqkQGKe68dfGduLNE0ab2KpL9C1qS6unQ@mail.gmail.com>
+In-Reply-To: <CAOMZO5BrLeqW=dDJbyqkQGKe68dfGduLNE0ab2KpL9C1qS6unQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20150619095503.GA21667@ubuntu>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prasanna,
-
-On Fri, Jun 19, 2015, Mutharaju, Prasanna (P.) wrote:
-> On Fri, Jun 19, 2015 at 11:20:43AM +0200, Marcel Holtmann wrote:
-> > Hi Prasanna,
-> > 
-> > > Space prohibited between function name and open parenthesis '('
-> > > reported by Checkpatch
-> > > 
-> > > Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
-> > > ---
-> > > drivers/bluetooth/hci_bcsp.c |    8 ++++----
-> > > 1 files changed, 4 insertions(+), 4 deletions(-)
-> > 
-> > I got a malformed patch on my side. I can not apply it with git am.
-> > 
-> > Regards
-> > 
-> > Marcel
-> > 
-> Hey Marcel,
-> 
-> I see git am applies fine on my branch. Actually, Fix is for Space warning and not 
-> intended for lines > 80 chars. Any suggestions ?
-
-No direct suggestions, but there is definitely something wrong with the
-patch since I'm unable to apply it as well:
-
-Applying: Bluetooth:hci_bcsp:Fix coding style -- Clean up
-/home/jh/src/linux/.git/rebase-apply/patch:25: trailing whitespace.
-					bcsp->rx_skb->data[0] & 0x80 ? 
-/home/jh/src/linux/.git/rebase-apply/patch:30: space before tab in indent.
-			    		&& (bcsp->rx_skb->data[0] & 0x07) != bcsp->rxseq_txack) {
-error: patch failed: drivers/bluetooth/hci_bcsp.c:464
-error: drivers/bluetooth/hci_bcsp.c: patch does not apply
-Patch failed at 0001 Bluetooth:hci_bcsp:Fix coding style -- Clean up
-
-Johan
+SGkgRmFiaW8sDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBGYWJpbyBFc3Rl
+dmFtIFttYWlsdG86ZmVzdGV2YW1AZ21haWwuY29tXSANClNlbnQ6IEZyaWRheSwgSnVuZSAxOSwg
+MjAxNSAzOjIzIFBNDQpUbzogSWx5YSBGYWVuc29uDQpDYzogTWFyY2VsIEhvbHRtYW5uOyBsaW51
+eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnOyBBcmVuZCBWYW4gU3ByaWVsDQpTdWJqZWN0OiBS
+ZTogW1BBVENIIHY0IDEvNF0gQnJvYWRjb20gQmx1ZXRvb3RoIFVBUlQgRGV2aWNlIFRyZWUgYmlu
+ZGluZ3MNCg0KT24gV2VkLCBKdW4gMTcsIDIwMTUgYXQgNjozMCBQTSwgSWx5YSBGYWVuc29uIDxp
+ZmFlbnNvbkBicm9hZGNvbS5jb20+IHdyb3RlOg0KDQo+ICtPcHRpb25hbCBwcm9wZXJ0aWVzOg0K
+PiArDQo+ICsgIC0gYnQtaG9zdC13YWtlLWdwaW9zIDogYnQtaG9zdC13YWtlIGlucHV0IEdQSU8g
+dG8gYmUgdXNlZCBhcyBhbiBpbnRlcnJ1cHQuDQo+ICsNCj4gKyAgLSBidC13YWtlLWdwaW9zIDog
+YnQtd2FrZSBvdXRwdXQgR1BJTyB0byBiZSB1c2VkIHRvIHN1c3BlbmQgLyByZXN1bWUgZGV2aWNl
+Lg0KPiArDQo+ICsgIC0gYnQtcmVnLW9uLWdwaW9zIDogcmVnLW9uIG91dHB1dCBHUElPIHRvIGJl
+IHVzZWQgdG8gcG93ZXIgZGV2aWNlIG9uL29mZi4NCg0KU2hvdWxkbid0IHRoaXMgYmUgbW9kZWxs
+ZWQgYXMgYSByZWd1bGF0b3IgaW5zdGVhZD8gV2hhdCBpZiB0aGUgYm9hcmQNCmRyaXZlcyBhIFBN
+SUMgb3V0cHV0IHRvIHByb3ZpZGUgcG93ZXIgdG8gdGhlIEJUIGludGVyZmFjZT8NCg0KSUY6IEkg
+dGhpbmsgdGhlIHJlZ3VsYXRvciB3b3VsZCBpbmRlZWQgYmUgYSBiZXR0ZXIgbmFtZSBmb3IgdGhl
+ICJHUElPIHNldCIgaWRlYSBJIG1lbnRpb25lZCBpbiBhIHNlcGFyYXRlIG1lc3NhZ2UgdG8gUm9i
+IEhlcnJpbmcuIDotKQ0KDQo=
