@@ -1,83 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com
-References: <1433517215-25516-1-git-send-email-bharat.panda@samsung.com>
-In-reply-to: 
-Subject: RE: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
-Date: Fri, 19 Jun 2015 15:15:28 +0530
-Message-id: <011401d0aa74$b1661550$14323ff0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] audio/avrcp: Handle "Available Players Changed"
+Date: Fri, 19 Jun 2015 15:21:13 +0530
+Message-id: <1434707473-16294-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+Add support for AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED notification.
 
-> -----Original Message-----
-> From: Bharat Bhusan Panda [mailto:bharat.panda@samsung.com]
-> Sent: Thursday, June 11, 2015 11:14 AM
-> To: 'linux-bluetooth@vger.kernel.org'
-> Cc: 'cpgs@samsung.com'
-> Subject: RE: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
-> 
-> ping
-> 
-> > -----Original Message-----
-> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> > owner@vger.kernel.org] On Behalf Of Bharat Panda
-> > Sent: Friday, June 05, 2015 8:44 PM
-> > To: linux-bluetooth@vger.kernel.org
-> > Cc: cpgs@samsung.com; Bharat Panda
-> > Subject: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
-> >
-> > Total Number of Tracks was not displayed, coz "Number of Tracks"
-> > was not handled in metadata parser.
-> > ---
-> >  profiles/audio/media.c | 3 +++
-> >  tools/mpris-proxy.c    | 3 +++
-> >  2 files changed, 6 insertions(+)
-> >
-> > diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
-> > f12569e..8e7e1a3 100644
-> > --- a/profiles/audio/media.c
-> > +++ b/profiles/audio/media.c
-> > @@ -1510,6 +1510,9 @@ static gboolean parse_player_metadata(struct
-> > media_player *mp,
-> >  		} else if (strcasecmp(key, "xesam:trackNumber") == 0) {
-> >  			if (!parse_int32_metadata(mp, "TrackNumber",
-> > &var))
-> >  				return FALSE;
-> > +		} else if (strcasecmp(key, "xesam:totalTracks") == 0) {
-> > +			if (!parse_int32_metadata(mp, "NumberOfTracks",
-> > &var))
-> > +				return FALSE;
-> >  		} else
-> >  			DBG("%s not supported, ignoring", key);
-> >
-> > diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c index
-> > 693055e..5749427
-> > 100644
-> > --- a/tools/mpris-proxy.c
-> > +++ b/tools/mpris-proxy.c
-> > @@ -1261,6 +1261,9 @@ static int parse_track_entry(DBusMessageIter
-> > *entry, const char *key,
-> >  	} else if (strcasecmp(key, "TrackNumber") == 0) {
-> >  		if (!parse_int32_metadata(&var, "xesam:trackNumber",
-> > metadata))
-> >  			return -EINVAL;
-> > +	} else if (strcasecmp(key, "NumberOfTracks") == 0) {
-> > +		if (!parse_int32_metadata(&var, "xesam:totalTracks",
-> > metadata))
-> > +			return -EINVAL;
-> >  	} else if (strcasecmp(key, "Item") == 0) {
-> >  		if (!parse_path_metadata(&var, "mpris:trackid", metadata))
-> >  			return -EINVAL;
-> > --
-> > 1.9.1
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe
-> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+- Register notification for "Avalable Players Changed"
+- Send interim and final response on change in available players.
+As per AVRCP 1.5 specification,
+The interim and final responses of available players changed
+notification shall not contain any parameters.
+---
+ profiles/audio/avrcp.c | 7 +++++++
+ profiles/audio/media.c | 6 ++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 60f8cbf..b22f2fe 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -673,6 +673,9 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
+ 		pdu->params[size++] = attr;
+ 		pdu->params[size++] = val;
+ 		break;
++	case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
++		size = 1;
++		break;
+ 	default:
+ 		error("Unknown event %u", id);
+ 		return;
+@@ -1490,6 +1493,9 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 		}
+ 
+ 		break;
++	case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
++		len = 1;
++		break;
+ 	case AVRCP_EVENT_VOLUME_CHANGED:
+ 		pdu->params[1] = media_transport_get_device_volume(dev);
+ 		if (pdu->params[1] > 127)
+@@ -3435,6 +3441,7 @@ static void target_init(struct avrcp *session)
+ 				(1 << AVRCP_EVENT_TRACK_CHANGED) |
+ 				(1 << AVRCP_EVENT_TRACK_REACHED_START) |
+ 				(1 << AVRCP_EVENT_TRACK_REACHED_END) |
++				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED) |
+ 				(1 << AVRCP_EVENT_SETTINGS_CHANGED);
+ 
+ 	if (target->version < 0x0104)
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index f12569e..8150948 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -987,6 +987,9 @@ static void media_player_remove(struct media_player *mp)
+ {
+ 	info("Player unregistered: sender=%s path=%s", mp->sender, mp->path);
+ 
++	avrcp_player_event(mp->player,
++				AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
++
+ 	media_player_destroy(mp);
+ }
+ 
+@@ -1793,6 +1796,9 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
+ 			return btd_error_invalid_args(msg);
+ 	}
+ 
++	avrcp_player_event(mp->player,
++				AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
++
+ 	if (parse_player_properties(mp, &args) == FALSE) {
+ 		media_player_destroy(mp);
+ 		return btd_error_invalid_args(msg);
+-- 
+1.9.1
 
