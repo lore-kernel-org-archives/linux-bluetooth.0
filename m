@@ -1,54 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BLU436-SMTP489DFA77355813D75F34209EA30@phx.gbl>
-From: Xi Ruoyao <xry111@outlook.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-CC: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daniel Drake <drake@endlessm.com>,
-	Larry Finger <Larry.Finger@lwfinger.net>,
-	Xi Ruoyao <xry111@outlook.com>
-Subject: [PATCH] Bluetooth: btusb: Add Realtek devices into module device table
-Date: Sun, 21 Jun 2015 05:53:45 +0800
+Date: Sat, 20 Jun 2015 15:21:39 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth:hci_bcsp:Fix coding style -- Clean up
+Message-ID: <20150620122139.GA7520@t440s.P-661HNU-F1>
+References: <20150619051510.GA14012@ubuntu>
+ <FBA67A82-D119-445B-A90A-B06F3D5A2E94@holtmann.org>
+ <20150619095503.GA21667@ubuntu>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20150619095503.GA21667@ubuntu>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In 'commit a2698a9bf9b0 ("Bluetooth: btusb: Add Realtek
-8723A/8723B/8761A/8821A support"), support of some Realtek
-devices was added to the Generic Bluetooth USB driver in kernel.
-However, these devices are not in the module device table of 
-btusb.ko, so the kernel wouldn't probe them at all.
+Hi Prasanna,
 
-To fix this, add four entries in the device table btusb_table,
-based on code from <https://github.com/lwfinger/rtl8723au_bt>
-('new' branch).
+On Fri, Jun 19, 2015, Mutharaju, Prasanna (P.) wrote:
+> On Fri, Jun 19, 2015 at 11:20:43AM +0200, Marcel Holtmann wrote:
+> > Hi Prasanna,
+> > 
+> > > Space prohibited between function name and open parenthesis '('
+> > > reported by Checkpatch
+> > > 
+> > > Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+> > > ---
+> > > drivers/bluetooth/hci_bcsp.c |    8 ++++----
+> > > 1 files changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > I got a malformed patch on my side. I can not apply it with git am.
+> > 
+> > Regards
+> > 
+> > Marcel
+> > 
+> Hey Marcel,
+> 
+> I see git am applies fine on my branch. Actually, Fix is for Space warning and not 
+> intended for lines > 80 chars. Any suggestions ?
 
-This enables bluetooth support in the Lenovo Ideapad Yoga 13
-which has RTL8723AU USB device, with product ID 0bda:1724.
+No direct suggestions, but there is definitely something wrong with the
+patch since I'm unable to apply it as well:
 
-Signed-off-by: Xi Ruoyao <xry111@outlook.com>
----
- drivers/bluetooth/btusb.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Applying: Bluetooth:hci_bcsp:Fix coding style -- Clean up
+/home/jh/src/linux/.git/rebase-apply/patch:25: trailing whitespace.
+					bcsp->rx_skb->data[0] & 0x80 ? 
+/home/jh/src/linux/.git/rebase-apply/patch:30: space before tab in indent.
+			    		&& (bcsp->rx_skb->data[0] & 0x07) != bcsp->rxseq_txack) {
+error: patch failed: drivers/bluetooth/hci_bcsp.c:464
+error: drivers/bluetooth/hci_bcsp.c: patch does not apply
+Patch failed at 0001 Bluetooth:hci_bcsp:Fix coding style -- Clean up
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3c10d4d..dd87623 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -148,6 +148,12 @@ static const struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x8087, 0x0a5a),
- 	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
- 
-+	/* Realtek Bluetooth  */
-+	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01) },
-+	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bd5, 0xe0, 0x01, 0x01) },
-+	{ USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xe0, 0x01, 0x01) },
-+	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xe0, 0x01, 0x01) },
-+
- 	{ }	/* Terminating entry */
- };
- 
--- 
-1.9.1
+Johan
