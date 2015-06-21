@@ -1,69 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <BLU437-SMTP44837733D3166775F376EA9EA20@phx.gbl>
+Date: Sun, 21 Jun 2015 12:23:07 +0800
+From: Xi Ruoyao <xry111@outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <1434392910-31648-1-git-send-email-szymon.janc@gmail.com>
-References: <1434392910-31648-1-git-send-email-szymon.janc@gmail.com>
-Date: Sun, 21 Jun 2015 07:25:48 +0100
-Message-ID: <CAG_J7JXhGp5JxzFscN1rGsE=QUq4fGv3HZpjMCrK+fariPwZow@mail.gmail.com>
-Subject: Re: [PATCH 0/5] sixaxis: Improved support for DualShock 3 clones
-From: Laurence Brown <linux-bluetooth@protazoa.com>
-To: Szymon Janc <szymon.janc@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Veseli Veseljko <veseljko75@gmail.com>,
-	Alex Gal <a.gal@miip.ca>,
-	Laurence Brown <linux-bluetooth@protazoa.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Larry Finger <Larry.Finger@lwfinger.net>,
+ Marcel Holtmann <marcel@holtmann.org>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Linux Bluetooth Maillist <linux-bluetooth@vger.kernel.org>,
+ Linux Kernel Maillist <linux-kernel@vger.kernel.org>,
+ Daniel Drake <drake@endlessm.com>, Xi Ruoyao <xry111@outlook.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add Realtek devices into module device
+ table
+References: <BLU436-SMTP489DFA77355813D75F34209EA30@phx.gbl> <C825257E-3CD1-4037-BC23-12D48F680EF9@holtmann.org> <55860F8C.4050205@lwfinger.net> <BLU436-SMTP903B6DC30173A3FB30B6389EA20@phx.gbl>
+In-Reply-To: <BLU436-SMTP903B6DC30173A3FB30B6389EA20@phx.gbl>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have tested this patch with ShanWan controller, seems to be working perfectly
 
-On 15 June 2015 at 19:28, Szymon Janc <szymon.janc@gmail.com> wrote:
-> Hi,
+
+On 06/21/2015 12:11 PM, Xi Ruoyao wrote:
+> On 06/21/2015 09:12 AM, Larry Finger wrote:
+>> On 06/20/2015 04:58 PM, Marcel Holtmann wrote:
+>>> Hi Xi,
+>>>
+>>>> In 'commit a2698a9bf9b0 ("Bluetooth: btusb: Add Realtek
+>>>> 8723A/8723B/8761A/8821A support"), support of some Realtek
+>>>> devices was added to the Generic Bluetooth USB driver in kernel.
+>>>> However, these devices are not in the module device table of
+>>>> btusb.ko, so the kernel wouldn't probe them at all.
+>>>>
+>>>> To fix this, add four entries in the device table btusb_table,
+>>>> based on code from <https://github.com/lwfinger/rtl8723au_bt>
+>>>> ('new' branch).
+>>>>
+>>>> This enables bluetooth support in the Lenovo Ideapad Yoga 13
+>>>> which has RTL8723AU USB device, with product ID 0bda:1724.
+>>>>
+>>>> Signed-off-by: Xi Ruoyao <xry111@outlook.com>
+>>>> ---
+>>>> drivers/bluetooth/btusb.c | 6 ++++++
+>>>> 1 file changed, 6 insertions(+)
+>>>>
+>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>> index 3c10d4d..dd87623 100644
+>>>> --- a/drivers/bluetooth/btusb.c
+>>>> +++ b/drivers/bluetooth/btusb.c
+>>>> @@ -148,6 +148,12 @@ static const struct usb_device_id 
+>>>> btusb_table[] = {
+>>>>     { USB_DEVICE(0x8087, 0x0a5a),
+>>>>       .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
+>>>>
+>>>> +    /* Realtek Bluetooth  */
+>>>> +    { USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01) },
+>>>> +    { USB_VENDOR_AND_INTERFACE_INFO(0x0bd5, 0xe0, 0x01, 0x01) },
+>>>> +    { USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xe0, 0x01, 0x01) },
+>>>> +    { USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xe0, 0x01, 0x01) },
+>>>> +
+>>>
+>>> I highly doubt these are needed. There is a generic entry for an USB 
+>>> transport that is already covering these.
+>>
+>> Something changed in recent kernels, and the generic USB transport 
+>> entries do not seem to be recognized in the case where a wifi and BT 
+>> device share a single USB ID. As the OP's tablet has such a case, I 
+>> suggest that 0bda line be accepted, but not the others. If I had a 
+>> computer with an RTL8723AU, I would have a chance at debugging what 
+>> changed, but sadly, that is not the case.
+>>
+>> Larry
+>>
 >
-> This is improved version of sixaxis patches. Comparing to RFCv2 this
-> doesn't regress with Navigation Controller and DS4.
+> I viewed the output of 'lsusb -d 0bda:1724 -v | less', and I found 
+> that my RTL8723AU has 'bDeviceClass' 239 (0xef, means 'Miscellaneous 
+> Device')
+> but 'bInterfaceClass' 224 (0xe0, means 'Wireless').
 >
-> Sixaxis specific code needs to be left in input code for DS4 support.
+> So maybe the Generic Bluetooth USB device entry should be
+> '{ USB_INTERFACE_INFO(0xe0, 0x01, 0x01) },'
+> instead of
+> '{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },'
 >
-> If people report that this works for them I'll push those patches.
+> Now I'm compiling this.
 >
->
-> From RFCv2 cover letter:
-> Some DualShock3 clones (eg ShanWan) were reported to not provide valid SDP
-> record required by HID profile. Due to this those failed to work with
-> current BlueZ sixaxis code (ie no input device were created).
->
-> This small serie is an attempt to extend DS3 support also with those
-> misbehaving clones. Idea is that we can provide fixed SDP recrod for devices
-> that use valid PID/VID and skip SDP search.
->
-> In this version SDP is kept in sixaxis plugin and provided via
-> btd_device_set_record instead of SDP search. Nice addition is that
-> sixaxis specific code is no longer needed in input server.
->
-> This makes code similar to how original Fedora sixaxis plugin worked
-> as suggested in previous review round.
->
-> I tested this with genuine DS3 and it seems to work OK. Testing with
-> clones is stil required though.
->
->
-> Szymon Janc (5):
->   sixaxis: Fix PID for Navigation Controller
->   core/device: Add support for setting SDP record
->   sixaxis: Provide DualShock 3 SDP record while adding new device
->   profiles/input: Remove not needed sixaxis checks
->   sixaxis: Fix multi-line comments style
->
->  Makefile.plugins        |   1 +
->  plugins/sixaxis.c       | 195 ++++++++++++++++++++++++++++++++++++++++++++++--
->  profiles/input/server.c |   8 --
->  src/device.c            |  31 ++++++++
->  src/device.h            |   3 +
->  5 files changed, 224 insertions(+), 14 deletions(-)
->
-> --
-> 2.1.4
->
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+This approach works well on my tablet. So, which way is better, edit 
+Generic Bluetooth USB device entry, or add a new 0bda entry?
+And below the Generic Bluetooth USB device entry there is Generic 
+Bluetooth AMP device entry. Should we use USB_INTERFACE_INFO on this too?
+
+-- 
+Xi Ruoyao
+School of Aerospace Science and Technology
+Xidian University, Xi'an, China
