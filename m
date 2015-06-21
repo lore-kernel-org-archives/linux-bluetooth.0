@@ -1,41 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	jukka.rissanen@linux.intel.com,
-	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next] 6lowpan: add request for ipv6 module
-Date: Sun, 21 Jun 2015 17:11:19 +0200
-Message-Id: <1434899479-22310-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+From: Mateusz Lemusisk <mrlemux@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mateusz Lemusisk <mrlemux@gmail.com>
+Subject: [PATCH v2] client: Display address if calling 'disconnect' without arguments
+Date: Sun, 21 Jun 2015 17:08:52 +0200
+Message-Id: <1434899332-5208-1-git-send-email-mrlemux@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The iphc module depends on CONFIG_IPV6, because it's not very useful to
-build the module without IPv6 support. Recently an user reported about
-issues for setting an IPv6 address to a 6LoWPAN interface. The issues
-was solved by modprobe the ipv6 module before. To avoid such user issues
-we try to request the ipv6 module when the 6LoWPAN module is loaded.
-
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+Simplified the patch
 ---
- net/6lowpan/iphc.c | 2 ++
- 1 file changed, 2 insertions(+)
+ client/main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 94a375c..9055d7b 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -613,6 +613,8 @@ EXPORT_SYMBOL_GPL(lowpan_header_compress);
+diff --git a/client/main.c b/client/main.c
+index 41e95b2..f1a600f 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1421,7 +1421,12 @@ static void cmd_disconn(const char *arg)
+ 		rl_printf("Failed to disconnect\n");
+ 		return;
+ 	}
++	if (strlen(arg) == 0) {
++		DBusMessageIter iter;
  
- static int __init lowpan_module_init(void)
- {
-+	request_module_nowait("ipv6");
-+
- 	request_module_nowait("nhc_dest");
- 	request_module_nowait("nhc_fragment");
- 	request_module_nowait("nhc_hop");
++		if (g_dbus_proxy_get_property(proxy, "Address", &iter) == TRUE)
++		    dbus_message_iter_get_basic(&iter, &arg);
++	}
+ 	rl_printf("Attempting to disconnect from %s\n", arg);
+ }
+ 
 -- 
-2.4.1
+2.4.2
 
 --
-To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
