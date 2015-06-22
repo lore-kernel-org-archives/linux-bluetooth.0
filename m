@@ -1,45 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <BLU436-SMTP271CCFFC79A0620E44589B9EA10@phx.gbl>
+Message-ID: <BLU436-SMTP201A57BDC3B1920726D87E59EA10@phx.gbl>
+Date: Mon, 22 Jun 2015 23:01:21 +0800
 From: Xi Ruoyao <xry111@outlook.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Larry Finger <Larry.Finger@lwfinger.net>
-CC: Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Xi Ruoyao <xry111@outlook.com>
-Subject: [PATCH] Bluetooth: btusb: Modify entry to support misc devices with BT interface
-Date: Mon, 22 Jun 2015 23:28:49 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
+To: Larry Finger <Larry.Finger@lwfinger.net>,
+ Marcel Holtmann <marcel@holtmann.org>
+CC: xry111@outlook.com, "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Daniel Drake <drake@endlessm.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add Realtek devices into module device
+ table
+References: <BLU436-SMTP489DFA77355813D75F34209EA30@phx.gbl> <C825257E-3CD1-4037-BC23-12D48F680EF9@holtmann.org> <55860F8C.4050205@lwfinger.net> <B0BB2A08-47CF-405D-9ACE-528550DF8337@holtmann.org> <55881A78.7060203@lwfinger.net>
+In-Reply-To: <55881A78.7060203@lwfinger.net>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In the USB device table in btusb driver, the code specify a generic Bluetooth
-device by matching Device Descriptor. However, some devices with BT interface
-are classified as "Miscellaneous Device" and have different Device Descriptor,
-such as Realtek RTL8723AU. Then btusb wouldn't probe them.
+On 06/22/2015 10:23 PM, Larry Finger wrote
+> I hope that Xi's posting of the /sys file will help. Unfortunately, I 
+> do not have ready access to one of these devices, but I'm making 
+> arrangements to gain ssh access tomorrow so that I can test any 
+> suggested patches.
+Beside my earlier patch, I'll send a patch which would modify the 
+generic USB BT device
+entry in the device table to resolve this. You can choose one of the two 
+patches since
+they both make the BT works at least on my tablet.
 
-To resolve this, specify generic Bluetooth device in the USB device table by
-matching Interface Descriptor, to probe all devices with Bluetooth interface
-including these "Miscellaneous" ones.
+If there are other alternate patches, I can help to test them.
 
-Signed-off-by: Xi Ruoyao <xry111@outlook.com>
----
- drivers/bluetooth/btusb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3c10d4d..beb6b23 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -62,7 +62,7 @@ static struct usb_driver btusb_driver;
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
--	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
-+	{ USB_INTERFACE_INFO(0xe0, 0x01, 0x01) },
- 
- 	/* Generic Bluetooth AMP device */
- 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x04), .driver_info = BTUSB_AMP },
 -- 
-1.9.1
+Xi Ruoyao
+School of Aerospace Science and Technology
+Xidian University, Xi'an, China
