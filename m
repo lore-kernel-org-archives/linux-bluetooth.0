@@ -1,46 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH] core/advertising: Fix memory leak on
- btd_advertising_manager_destroy
-Date: Mon, 22 Jun 2015 19:21:06 +0530
-Message-id: <1434981066-20836-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <670FEC00-5331-47B5-8434-7642D67779DC@holtmann.org>
+References: <CANzaTi7NSBf8iuTC41jBA=732PCZUYkzw_ZTywGM-xNQt68qbw@mail.gmail.com>
+	<670FEC00-5331-47B5-8434-7642D67779DC@holtmann.org>
+Date: Mon, 22 Jun 2015 14:51:24 +0200
+Message-ID: <CANzaTi4pWpho3OfSLGvnZLpiBe==OHXdavypgs=zFsZ_hA4dDQ@mail.gmail.com>
+Subject: Re: BLE Advertise and Scan at the same time?
+From: dogan yazar <doganyazar@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When creating an adv_manager using advertising_manager_create(),
-it should be properly freed using advertising_manager_destroy().
+Thanks for the answer Marcel. I tried this by enabling advertisement
+(hciconfig hci0 leadv) and then "btmgmt find" but then hci adapter got
+into some weird state. Was not possible to disable scanning anymore.
+Same problem when I did bluetoothctl scan on. Probably my chip does
+not support it.
 
-==19916== 64 (32 direct, 32 indirect) bytes in 1 blocks are definitely lost in loss record 167 of 234
-==19916==    at 0x4C2CC70: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==19916==    by 0x45B0D0: btd_advertising_manager_new (advertising.c:764)
-==19916==    by 0x468DF9: read_info_complete (adapter.c:7353)
-==19916==    by 0x48E3A5: request_complete (mgmt.c:242)
-==19916==    by 0x48ED1C: can_read_data (mgmt.c:321)
-==19916==    by 0x49A504: watch_callback (io-glib.c:170)
-==19916==    by 0x4E7FCE4: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==19916==    by 0x4E80047: g_main_context_iterate.isra.24 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==19916==    by 0x4E80309: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==19916==    by 0x40B2AE: main (main.c:661)
----
- src/advertising.c | 2 ++
- 1 file changed, 2 insertions(+)
+I also tried "btmgmt advertising on" rather than hciconfig leadv but
+it did not do anything at all. Is "hciconfig hci0 leadv" only way to
+enable advertising until we move to kernel 4.1 and do it via DBUS api?
 
-diff --git a/src/advertising.c b/src/advertising.c
-index d6ab084..421a5e9 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -818,4 +818,6 @@ void btd_advertising_manager_destroy(struct btd_advertising *manager)
- 	g_dbus_unregister_interface(btd_get_dbus_connection(),
- 					adapter_get_path(manager->adapter),
- 					LE_ADVERTISING_MGR_IFACE);
-+
-+	advertising_manager_destroy(manager);
- }
--- 
-1.9.1
+And lastly, still I seem to need hcitool to be able to set the
+advertisement data otherwise android ble clients refuse to connect
+(they think it is a classic bluetooth I think). It is no longer a
+issue after I set GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED via hcitool cmd
+i.e. hcitool -i hci0 cmd 0x08 0x0008 3 02 01 05
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+On Mon, Jun 22, 2015 at 12:22 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Dogan,
+>
+>> Is it possible to advertise (leadv) and scan (scan on) using the same
+>> ble adaper?
+>> The moment that I enable scanning (scan on) with bluetoothctl, leadv
+>> is disabled.
+>
+> that depends on the Bluetooth chip you are using. Inside the kernel we cu=
+rrently play it safe and disable one when we start the other. It will be ho=
+wever re-enabled when the scan finished. You need to use btmgmt and not hci=
+tool. Using hcitool messes with raw HCI packets. The kernel logic will alwa=
+ys overwrite these as it sees fit.
+>
+> To allow simultaneous states, someone would have to work on that and figu=
+re out which chips support what. Once that is done, there is no problem in =
+lifting some of the restrictions we imposed.
+>
+>> The reason I want is to have a GATT client and server at the same time.
+>
+> Actually that has never been a problem. You can have a GATT client and se=
+rver at the same time and most likely you do already anyway. The question y=
+ou are asking is if you can be in central and peripheral role at the same t=
+ime.
+>
+> Regards
+>
+> Marcel
+>
