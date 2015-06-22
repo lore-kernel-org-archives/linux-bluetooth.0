@@ -1,36 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH bluetooth-next] 6lowpan: add request for ipv6 module
+Subject: Re: BLE Advertise and Scan at the same time?
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1434899479-22310-1-git-send-email-alex.aring@gmail.com>
-Date: Mon, 22 Jun 2015 12:24:24 +0200
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	kernel@pengutronix.de, jukka.rissanen@linux.intel.com
-Message-Id: <F69F1152-4ECB-426D-AD28-E05E1BB28BB2@holtmann.org>
-References: <1434899479-22310-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <CANzaTi7NSBf8iuTC41jBA=732PCZUYkzw_ZTywGM-xNQt68qbw@mail.gmail.com>
+Date: Mon, 22 Jun 2015 12:22:10 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <670FEC00-5331-47B5-8434-7642D67779DC@holtmann.org>
+References: <CANzaTi7NSBf8iuTC41jBA=732PCZUYkzw_ZTywGM-xNQt68qbw@mail.gmail.com>
+To: dogan yazar <doganyazar@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Dogan,
 
-> The iphc module depends on CONFIG_IPV6, because it's not very useful to
-> build the module without IPv6 support. Recently an user reported about
-> issues for setting an IPv6 address to a 6LoWPAN interface. The issues
-> was solved by modprobe the ipv6 module before. To avoid such user issues
-> we try to request the ipv6 module when the 6LoWPAN module is loaded.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> net/6lowpan/iphc.c | 2 ++
-> 1 file changed, 2 insertions(+)
+> Is it possible to advertise (leadv) and scan (scan on) using the same
+> ble adaper?
+> The moment that I enable scanning (scan on) with bluetoothctl, leadv
+> is disabled.
 
-patch has been applied to bluetooth-next tree.
+that depends on the Bluetooth chip you are using. Inside the kernel we currently play it safe and disable one when we start the other. It will be however re-enabled when the scan finished. You need to use btmgmt and not hcitool. Using hcitool messes with raw HCI packets. The kernel logic will always overwrite these as it sees fit.
+
+To allow simultaneous states, someone would have to work on that and figure out which chips support what. Once that is done, there is no problem in lifting some of the restrictions we imposed.
+
+> The reason I want is to have a GATT client and server at the same time.
+
+Actually that has never been a problem. You can have a GATT client and server at the same time and most likely you do already anyway. The question you are asking is if you can be in central and peripheral role at the same time.
 
 Regards
 
 Marcel
 
 --
-To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
