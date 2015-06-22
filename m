@@ -1,34 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Larry Finger <larry.finger@gmail.com>
-Message-ID: <55881A78.7060203@lwfinger.net>
-Date: Mon, 22 Jun 2015 09:23:52 -0500
-From: Larry Finger <Larry.Finger@lwfinger.net>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Xi Ruoyao <xry111@outlook.com>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- Daniel Drake <drake@endlessm.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Add Realtek devices into module device
- table
-References: <BLU436-SMTP489DFA77355813D75F34209EA30@phx.gbl> <C825257E-3CD1-4037-BC23-12D48F680EF9@holtmann.org> <55860F8C.4050205@lwfinger.net> <B0BB2A08-47CF-405D-9ACE-528550DF8337@holtmann.org>
-In-Reply-To: <B0BB2A08-47CF-405D-9ACE-528550DF8337@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: bharat.panda@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH] core/advertising: Fix memory leak on
+ btd_advertising_manager_destroy
+Date: Mon, 22 Jun 2015 19:21:06 +0530
+Message-id: <1434981066-20836-1-git-send-email-gowtham.ab@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 06/22/2015 05:33 AM, Marcel Holtmann wrote:
+When creating an adv_manager using advertising_manager_create(),
+it should be properly freed using advertising_manager_destroy().
 
-Marcel,
+==19916== 64 (32 direct, 32 indirect) bytes in 1 blocks are definitely lost in loss record 167 of 234
+==19916==    at 0x4C2CC70: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==19916==    by 0x45B0D0: btd_advertising_manager_new (advertising.c:764)
+==19916==    by 0x468DF9: read_info_complete (adapter.c:7353)
+==19916==    by 0x48E3A5: request_complete (mgmt.c:242)
+==19916==    by 0x48ED1C: can_read_data (mgmt.c:321)
+==19916==    by 0x49A504: watch_callback (io-glib.c:170)
+==19916==    by 0x4E7FCE4: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+==19916==    by 0x4E80047: g_main_context_iterate.isra.24 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+==19916==    by 0x4E80309: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+==19916==    by 0x40B2AE: main (main.c:661)
+---
+ src/advertising.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> these Realtek devices are causing the most messy setup in a generic driver. And Bluetooth USB support has been really clean and simple for the last 10 years. I really wonder how many ways this gets done wrong before someone gets a clue and gets this right. At the end of the day this USB transport is 15 years old.
->
-> Anyway, for obvious reasons the content of /sys/kernel/debug/usb/devices should be included here so that someone can actually look at how the USB endpoints are configured.
+diff --git a/src/advertising.c b/src/advertising.c
+index d6ab084..421a5e9 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -818,4 +818,6 @@ void btd_advertising_manager_destroy(struct btd_advertising *manager)
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(),
+ 					adapter_get_path(manager->adapter),
+ 					LE_ADVERTISING_MGR_IFACE);
++
++	advertising_manager_destroy(manager);
+ }
+-- 
+1.9.1
 
-I cannot disagree about the messiness of the Realtek setup.
-
-I hope that Xi's posting of the /sys file will help. Unfortunately, I do not 
-have ready access to one of these devices, but I'm making arrangements to gain 
-ssh access tomorrow so that I can test any suggested patches.
-
-Larry
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
