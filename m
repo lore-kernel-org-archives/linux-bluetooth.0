@@ -1,108 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABKPALo_wHz4LifYPH7vmHabJ50fKmYRvF5VWzBQh=TVWEFXeQ@mail.gmail.com>
-References: <CABKPALo_wHz4LifYPH7vmHabJ50fKmYRvF5VWzBQh=TVWEFXeQ@mail.gmail.com>
-Date: Tue, 23 Jun 2015 11:48:01 +0300
-Message-ID: <CABBYNZK5pVgLRbAZQF=Z7mJAMWO7TAVEo2SvdHnkB0AQ7HZmjg@mail.gmail.com>
-Subject: Re: SeviceData PropertiesChanged
+In-Reply-To: <011401d0aa74$b1661550$14323ff0$@samsung.com>
+References: <1433517215-25516-1-git-send-email-bharat.panda@samsung.com>
+	<011401d0aa74$b1661550$14323ff0$@samsung.com>
+Date: Tue, 23 Jun 2015 11:39:16 +0300
+Message-ID: <CABBYNZJ4f_g+cr=FfwU+1awY4xnKSm3upUvAMYLywCODFzqC9A@mail.gmail.com>
+Subject: Re: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Neil Martin <neil@vnp.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Neil,
+Hi Bharat,
 
-On Tue, Jun 23, 2015 at 2:59 AM, Neil Martin <neil@vnp.com> wrote:
-> I’ve just installed 5.31 and started looking at the new advertising
-> data that's been added to Device1.  I'm seeing odd behavior for
-> ServiceData.  I live within range of a large number of bluetooth
-> devices and for one of them, I'm getting PropertiesChanged signals for
-> ServiceData that get fired multiple times each minute. Each time the
-> dictionary contains another entry for the same key and all the data
-> entries are identical.  Here are the first two signals from
-> dbus-monitor:
+On Fri, Jun 19, 2015 at 12:45 PM, Bharat Bhusan Panda
+<bharat.panda@samsung.com> wrote:
+> ping
 >
->
-> signal sender=:1.0 -> dest=(null destination) serial=43
-> path=/org/bluez/hci0/dev_C2_A9_8A_AE_A5_28;
-> interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
->    string "org.bluez.Device1"
->    array [
->       dict entry(
->          string "ServiceData"
->          variant             array [
->                dict entry(
->                   string "180a"
->                   variant                      array of bytes [
->                         02 37 28 a5 ae 8a a9 c2 5a 00 00 00 03 13 00 02
->                      ]
->                )
->                dict entry(
->                   string "180a"
->                   variant                      array of bytes [
->                         02 37 28 a5 ae 8a a9 c2 5a 00 00 00 03 13 00 02
->                      ]
->                )
->             ]
->       )
->    ]
->    array [
->    ]
->
->
-> signal sender=:1.0 -> dest=(null destination) serial=50
-> path=/org/bluez/hci0/dev_C2_A9_8A_AE_A5_28;
-> interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
->    string "org.bluez.Device1"
->    array [
->       dict entry(
->          string "ServiceData"
->          variant             array [
->                dict entry(
->                   string "180a"
->                   variant                      array of bytes [
->                         02 37 28 a5 ae 8a a9 c2 5a 00 00 00 03 13 00 02
->                      ]
->                )
->                dict entry(
->                   string "180a"
->                   variant                      array of bytes [
->                         02 37 28 a5 ae 8a a9 c2 5a 00 00 00 03 13 00 02
->                      ]
->                )
->                dict entry(
->                   string "180a"
->                   variant                      array of bytes [
->                         02 37 28 a5 ae 8a a9 c2 5a 00 00 00 03 13 00 02
->                      ]
->                )
->             ]
->       )
->    ]
->    array [
->    ]
->
-> These signals keep coming and every time there is one more “dict
-> entry”.  Can anyone explain what I’m seeing?
+>> -----Original Message-----
+>> From: Bharat Bhusan Panda [mailto:bharat.panda@samsung.com]
+>> Sent: Thursday, June 11, 2015 11:14 AM
+>> To: 'linux-bluetooth@vger.kernel.org'
+>> Cc: 'cpgs@samsung.com'
+>> Subject: RE: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
+>>
+>> ping
+>>
+>> > -----Original Message-----
+>> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> > owner@vger.kernel.org] On Behalf Of Bharat Panda
+>> > Sent: Friday, June 05, 2015 8:44 PM
+>> > To: linux-bluetooth@vger.kernel.org
+>> > Cc: cpgs@samsung.com; Bharat Panda
+>> > Subject: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
+>> >
+>> > Total Number of Tracks was not displayed, coz "Number of Tracks"
+>> > was not handled in metadata parser.
+>> > ---
+>> >  profiles/audio/media.c | 3 +++
+>> >  tools/mpris-proxy.c    | 3 +++
+>> >  2 files changed, 6 insertions(+)
+>> >
+>> > diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
+>> > f12569e..8e7e1a3 100644
+>> > --- a/profiles/audio/media.c
+>> > +++ b/profiles/audio/media.c
+>> > @@ -1510,6 +1510,9 @@ static gboolean parse_player_metadata(struct
+>> > media_player *mp,
+>> >             } else if (strcasecmp(key, "xesam:trackNumber") == 0) {
+>> >                     if (!parse_int32_metadata(mp, "TrackNumber",
+>> > &var))
+>> >                             return FALSE;
+>> > +           } else if (strcasecmp(key, "xesam:totalTracks") == 0) {
+>> > +                   if (!parse_int32_metadata(mp, "NumberOfTracks",
+>> > &var))
+>> > +                           return FALSE;
+>> >             } else
+>> >                     DBG("%s not supported, ignoring", key);
+>> >
+>> > diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c index
+>> > 693055e..5749427
+>> > 100644
+>> > --- a/tools/mpris-proxy.c
+>> > +++ b/tools/mpris-proxy.c
+>> > @@ -1261,6 +1261,9 @@ static int parse_track_entry(DBusMessageIter
+>> > *entry, const char *key,
+>> >     } else if (strcasecmp(key, "TrackNumber") == 0) {
+>> >             if (!parse_int32_metadata(&var, "xesam:trackNumber",
+>> > metadata))
+>> >                     return -EINVAL;
+>> > +   } else if (strcasecmp(key, "NumberOfTracks") == 0) {
+>> > +           if (!parse_int32_metadata(&var, "xesam:totalTracks",
+>> > metadata))
+>> > +                   return -EINVAL;
 
-There is a bug in the code detecting the data was previously found,
-the following patch should fix it:
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index e841d1d..485bd7b 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -590,7 +590,7 @@ bool bt_ad_add_service_data(struct bt_ad *ad,
-const bt_uuid_t *uuid, void *data,
-        if (len > (MAX_ADV_DATA_LEN - 2 - (size_t)bt_uuid_len(uuid)))
-                return false;
+I remember not finding any documentation for xesam:totalTracks do you
+have a link for it? If you could you please add to the description.
 
--       new_data = queue_find(ad->service_uuids, service_uuid_match, uuid);
-+       new_data = queue_find(ad->service_data, service_uuid_match, uuid);
-        if (new_data) {
-                if (new_data->len == len && !memcmp(new_data->data, data, len))
-                        return false;
+>> >     } else if (strcasecmp(key, "Item") == 0) {
+>> >             if (!parse_path_metadata(&var, "mpris:trackid", metadata))
+>> >                     return -EINVAL;
+>> > --
+>> > 1.9.1
+>> >
+>> > --
+>> > To unsubscribe from this list: send the line "unsubscribe
+>> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+>> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 
 
 -- 
