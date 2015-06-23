@@ -1,72 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <016c01d0ada8$a28a0690$e79e13b0$@samsung.com>
+References: <1433517215-25516-1-git-send-email-bharat.panda@samsung.com>
+	<011401d0aa74$b1661550$14323ff0$@samsung.com>
+	<CABBYNZJ4f_g+cr=FfwU+1awY4xnKSm3upUvAMYLywCODFzqC9A@mail.gmail.com>
+	<016c01d0ada8$a28a0690$e79e13b0$@samsung.com>
+Date: Tue, 23 Jun 2015 15:53:15 +0300
+Message-ID: <CABBYNZJz9M-30w64nVwX+gergm2cxihVwWGxcbjEEQD2NzzrZw@mail.gmail.com>
+Subject: Re: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 02/11] shared/att: Add BT_ATT_SECURITY_AUTO
-Date: Tue, 23 Jun 2015 15:53:28 +0300
-Message-Id: <1435064017-8178-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1435064017-8178-1-git-send-email-luiz.dentz@gmail.com>
-References: <1435064017-8178-1-git-send-email-luiz.dentz@gmail.com>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Bharat,
 
-This security level enables auto elevation (on by default), this would be
-useful for unit tests since it can now control this behavior (default for
-non L2CAP transport is BT_ATT_SECURITY_LOW).
----
- src/shared/att-types.h |  2 +-
- src/shared/att.c       | 10 +++++-----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+On Tue, Jun 23, 2015 at 2:34 PM, Bharat Bhusan Panda
+<bharat.panda@samsung.com> wrote:
+> Hi Luiz,
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+>> Sent: Tuesday, June 23, 2015 2:09 PM
+>> To: Bharat Bhusan Panda
+>> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+>> Subject: Re: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
+>>
+>> Hi Bharat,
+>>
+>> On Fri, Jun 19, 2015 at 12:45 PM, Bharat Bhusan Panda
+>> <bharat.panda@samsung.com> wrote:
+>> > ping
+>> >
+>> >> -----Original Message-----
+>> >> From: Bharat Bhusan Panda [mailto:bharat.panda@samsung.com]
+>> >> Sent: Thursday, June 11, 2015 11:14 AM
+>> >> To: 'linux-bluetooth@vger.kernel.org'
+>> >> Cc: 'cpgs@samsung.com'
+>> >> Subject: RE: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
+>> >>
+>> >> ping
+>> >>
+>> >> > -----Original Message-----
+>> >> > From: linux-bluetooth-owner@vger.kernel.org
+>> >> > [mailto:linux-bluetooth- owner@vger.kernel.org] On Behalf Of Bharat
+>> >> > Panda
+>> >> > Sent: Friday, June 05, 2015 8:44 PM
+>> >> > To: linux-bluetooth@vger.kernel.org
+>> >> > Cc: cpgs@samsung.com; Bharat Panda
+>> >> > Subject: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
+>> >> >
+>> >> > Total Number of Tracks was not displayed, coz "Number of Tracks"
+>> >> > was not handled in metadata parser.
+>> >> > ---
+>> >> >  profiles/audio/media.c | 3 +++
+>> >> >  tools/mpris-proxy.c    | 3 +++
+>> >> >  2 files changed, 6 insertions(+)
+>> >> >
+>> >> > diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
+>> >> > f12569e..8e7e1a3 100644
+>> >> > --- a/profiles/audio/media.c
+>> >> > +++ b/profiles/audio/media.c
+>> >> > @@ -1510,6 +1510,9 @@ static gboolean parse_player_metadata(struct
+>> >> > media_player *mp,
+>> >> >             } else if (strcasecmp(key, "xesam:trackNumber") == 0) {
+>> >> >                     if (!parse_int32_metadata(mp, "TrackNumber",
+>> >> > &var))
+>> >> >                             return FALSE;
+>> >> > +           } else if (strcasecmp(key, "xesam:totalTracks") == 0) {
+>> >> > +                   if (!parse_int32_metadata(mp, "NumberOfTracks",
+>> >> > &var))
+>> >> > +                           return FALSE;
+>> >> >             } else
+>> >> >                     DBG("%s not supported, ignoring", key);
+>> >> >
+>> >> > diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c index
+>> >> > 693055e..5749427
+>> >> > 100644
+>> >> > --- a/tools/mpris-proxy.c
+>> >> > +++ b/tools/mpris-proxy.c
+>> >> > @@ -1261,6 +1261,9 @@ static int parse_track_entry(DBusMessageIter
+>> >> > *entry, const char *key,
+>> >> >     } else if (strcasecmp(key, "TrackNumber") == 0) {
+>> >> >             if (!parse_int32_metadata(&var, "xesam:trackNumber",
+>> >> > metadata))
+>> >> >                     return -EINVAL;
+>> >> > +   } else if (strcasecmp(key, "NumberOfTracks") == 0) {
+>> >> > +           if (!parse_int32_metadata(&var, "xesam:totalTracks",
+>> >> > metadata))
+>> >> > +                   return -EINVAL;
+>>
+>> I remember not finding any documentation for xesam:totalTracks do you
+>> have a link for it? If you could you please add to the description.
+> I don’t have any xesam or freedesktop reference for "xesam:totalTracks ", but I tried with "xesam:totalTracks" to get NumberOfTracks parsed and it works well to get it displayed.
 
-diff --git a/src/shared/att-types.h b/src/shared/att-types.h
-index ee20992..d474495 100644
---- a/src/shared/att-types.h
-+++ b/src/shared/att-types.h
-@@ -27,7 +27,7 @@
- #define __packed __attribute__((packed))
- #endif
- 
--#define BT_ATT_SECURITY_NONE	0
-+#define BT_ATT_SECURITY_AUTO	0
- #define BT_ATT_SECURITY_LOW	1
- #define BT_ATT_SECURITY_MEDIUM	2
- #define BT_ATT_SECURITY_HIGH	3
-diff --git a/src/shared/att.c b/src/shared/att.c
-index e8be4cc..70f5d72 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -581,6 +581,9 @@ static bool change_security(struct bt_att *att, uint8_t ecode)
- 	int security;
- 
- 	security = bt_att_get_security(att);
-+	if (security != BT_ATT_SECURITY_AUTO)
-+		return false;
-+
- 	if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
- 					security < BT_ATT_SECURITY_MEDIUM)
- 		security = BT_ATT_SECURITY_MEDIUM;
-@@ -608,10 +611,6 @@ static bool handle_error_rsp(struct bt_att *att, uint8_t *pdu,
- 
- 	*opcode = rsp->opcode;
- 
--	/* Only try to change security on L2CAP */
--	if (!att->io_on_l2cap)
--		return false;
--
- 	/* Attempt to change security */
- 	if (!change_security(att, rsp->ecode))
- 		return false;
-@@ -1416,7 +1415,8 @@ bool bt_att_set_security(struct bt_att *att, int level)
- {
- 	struct bt_security sec;
- 
--	if (!att || level < BT_ATT_SECURITY_LOW || level > BT_ATT_SECURITY_HIGH)
-+	if (!att || level < BT_ATT_SECURITY_AUTO ||
-+						level > BT_ATT_SECURITY_HIGH)
- 		return false;
- 
- 	if (!att->io_on_l2cap) {
+That is not my argument, my concern is that we should not make it
+xesam: if that doesn't exist, instead it should be bluetooth:/avrcp:
+if we are to create a new one that does not exist already.
+
+>>
+>> >> >     } else if (strcasecmp(key, "Item") == 0) {
+>> >> >             if (!parse_path_metadata(&var, "mpris:trackid", metadata))
+>> >> >                     return -EINVAL;
+>> >> > --
+>> >> > 1.9.1
+>> >> >
+>> >> > --
+>> >> > To unsubscribe from this list: send the line "unsubscribe
+>> >> > linux-bluetooth" in the body of a message to
+>> >> > majordomo@vger.kernel.org More majordomo info at
+>> >> > http://vger.kernel.org/majordomo-info.html
+>> >
+>> > --
+>> > To unsubscribe from this list: send the line "unsubscribe
+>> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+>> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org More majordomo
+>> info at  http://vger.kernel.org/majordomo-info.html
+>
+> --
+> Regards
+> Bharat
+>
+
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
