@@ -1,35 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anupam Roy <anupam.r@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: sachin.dev@samsung.com, Anupam Roy <anupam.r@samsung.com>
-Subject: [PATCH] android/client/if-hl.c:Handle failure from malloc() request
-Date: Tue, 23 Jun 2015 08:04:18 -0400
-Message-id: <1435061058-9114-1-git-send-email-anupam.r@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2015-06-18
+To: Marcel Holtmann <marcel@holtmann.org>
+References: <20150618184311.GA30772@t440s.P-661HNU-F1>
+ <20150623.032255.394457596589182499.davem@davemloft.net>
+ <558939EE.10206@peakwork.de>
+ <F6D7F62D-3444-496B-BB43-0844129A4738@holtmann.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Network Development <netdev@vger.kernel.org>, linux-bluetooth@vger.kernel.org
+From: Markus Pfau <markus.pfau@peakwork.de>
+Message-ID: <558948B6.5040904@peakwork.de>
+Date: Tue, 23 Jun 2015 13:53:26 +0200
+MIME-Version: 1.0
+In-Reply-To: <F6D7F62D-3444-496B-BB43-0844129A4738@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case malloc() request fails, just print error message
-and return. Dereferencing reg.mdep_cfg in case of failure
-can lead to crash.
----
- android/client/if-hl.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Hi Marcel and Johan,
 
-diff --git a/android/client/if-hl.c b/android/client/if-hl.c
-index e0818ba..bd05671 100644
---- a/android/client/if-hl.c
-+++ b/android/client/if-hl.c
-@@ -201,6 +201,10 @@ static void register_application_p(int argc, const char **argv)
- 	reg.number_of_mdeps = atoi(argv[6]);
- 
- 	reg.mdep_cfg = malloc(reg.number_of_mdeps * sizeof(bthl_mdep_cfg_t));
-+	if (!reg.mdep_cfg) {
-+		haltest_error("malloc failed\n");
-+		return;
-+	}
- 	mdep_argc_init = 7;
- 
- 	for (i = 0; i < reg.number_of_mdeps; i++) {
--- 
-1.9.1
+> Hi Markus,
+>
+>>>> Here's the final bluetooth-next pull request for 4.2.
+>>>>
+>>>>   - Cleanups & fixes to 802.15.4 code and related drivers
+>>>>   - Fix btusb driver memory leak
+>>>>   - New USB IDs for Atheros controllers
+>>>>   - Support for BCM4324B3 UART based Broadcom controller
+>>>>   - Fix for Bluetooth encryption key size handling
+>>>>   - Broadcom controller initialization fixes
+>>>>   - Support for Intel controller DDC parameters
+>>>>   - Support for multiple Bluetooth LE advertising instances
+>>>>   - Fix for HCI user channel cleanup path
+>>>>
+>>>> Please let me know if there are any issues pulling. Thanks.
+>>> Pulled, thanks Johan,
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> Hi David,
+>>
+>> I didn't get any response to my issue "High CPU load when turning off BT keyboard" from 2015-06-15.
+>> Is it already fixed in "Fix for HCI user channel cleanup path" ?
+>
+> your issue is an userspace daemon issue and not a kernel issue. This pull request is for the kernel side of the Bluetooth subsystem. None of these have anything to do with the userspace daemon.
+>
+> I am sorry that your email has not yet been answered. However it is only 10 days old and I bet one of the maintainers for the userspace code will have a look at it soon. If not, then you can always resend it to get their attention.
+>
+> Regards
+>
+> Marcel
+>
+Thank you for your prompt reply!
+I'll post it like Johan suggests to the correct group!
 
+Regards,
+Markus
