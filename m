@@ -1,140 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <016c01d0ada8$a28a0690$e79e13b0$@samsung.com>
-References: <1433517215-25516-1-git-send-email-bharat.panda@samsung.com>
-	<011401d0aa74$b1661550$14323ff0$@samsung.com>
-	<CABBYNZJ4f_g+cr=FfwU+1awY4xnKSm3upUvAMYLywCODFzqC9A@mail.gmail.com>
-	<016c01d0ada8$a28a0690$e79e13b0$@samsung.com>
-Date: Tue, 23 Jun 2015 15:53:15 +0300
-Message-ID: <CABBYNZJz9M-30w64nVwX+gergm2cxihVwWGxcbjEEQD2NzzrZw@mail.gmail.com>
-Subject: Re: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Bhusan Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Anupam Roy <anupam.r@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com, Anupam Roy <anupam.r@samsung.com>
+Subject: [PATCH] android/client/if-hl.c:Handle failure from malloc() request
+Date: Tue, 23 Jun 2015 08:04:18 -0400
+Message-id: <1435061058-9114-1-git-send-email-anupam.r@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+In case malloc() request fails, just print error message
+and return. Dereferencing reg.mdep_cfg in case of failure
+can lead to crash.
+---
+ android/client/if-hl.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-On Tue, Jun 23, 2015 at 2:34 PM, Bharat Bhusan Panda
-<bharat.panda@samsung.com> wrote:
-> Hi Luiz,
->
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
->> Sent: Tuesday, June 23, 2015 2:09 PM
->> To: Bharat Bhusan Panda
->> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
->> Subject: Re: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
->>
->> Hi Bharat,
->>
->> On Fri, Jun 19, 2015 at 12:45 PM, Bharat Bhusan Panda
->> <bharat.panda@samsung.com> wrote:
->> > ping
->> >
->> >> -----Original Message-----
->> >> From: Bharat Bhusan Panda [mailto:bharat.panda@samsung.com]
->> >> Sent: Thursday, June 11, 2015 11:14 AM
->> >> To: 'linux-bluetooth@vger.kernel.org'
->> >> Cc: 'cpgs@samsung.com'
->> >> Subject: RE: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
->> >>
->> >> ping
->> >>
->> >> > -----Original Message-----
->> >> > From: linux-bluetooth-owner@vger.kernel.org
->> >> > [mailto:linux-bluetooth- owner@vger.kernel.org] On Behalf Of Bharat
->> >> > Panda
->> >> > Sent: Friday, June 05, 2015 8:44 PM
->> >> > To: linux-bluetooth@vger.kernel.org
->> >> > Cc: cpgs@samsung.com; Bharat Panda
->> >> > Subject: [PATCH ] AVRCP: Handle Total Number Of Tracks metadata
->> >> >
->> >> > Total Number of Tracks was not displayed, coz "Number of Tracks"
->> >> > was not handled in metadata parser.
->> >> > ---
->> >> >  profiles/audio/media.c | 3 +++
->> >> >  tools/mpris-proxy.c    | 3 +++
->> >> >  2 files changed, 6 insertions(+)
->> >> >
->> >> > diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
->> >> > f12569e..8e7e1a3 100644
->> >> > --- a/profiles/audio/media.c
->> >> > +++ b/profiles/audio/media.c
->> >> > @@ -1510,6 +1510,9 @@ static gboolean parse_player_metadata(struct
->> >> > media_player *mp,
->> >> >             } else if (strcasecmp(key, "xesam:trackNumber") == 0) {
->> >> >                     if (!parse_int32_metadata(mp, "TrackNumber",
->> >> > &var))
->> >> >                             return FALSE;
->> >> > +           } else if (strcasecmp(key, "xesam:totalTracks") == 0) {
->> >> > +                   if (!parse_int32_metadata(mp, "NumberOfTracks",
->> >> > &var))
->> >> > +                           return FALSE;
->> >> >             } else
->> >> >                     DBG("%s not supported, ignoring", key);
->> >> >
->> >> > diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c index
->> >> > 693055e..5749427
->> >> > 100644
->> >> > --- a/tools/mpris-proxy.c
->> >> > +++ b/tools/mpris-proxy.c
->> >> > @@ -1261,6 +1261,9 @@ static int parse_track_entry(DBusMessageIter
->> >> > *entry, const char *key,
->> >> >     } else if (strcasecmp(key, "TrackNumber") == 0) {
->> >> >             if (!parse_int32_metadata(&var, "xesam:trackNumber",
->> >> > metadata))
->> >> >                     return -EINVAL;
->> >> > +   } else if (strcasecmp(key, "NumberOfTracks") == 0) {
->> >> > +           if (!parse_int32_metadata(&var, "xesam:totalTracks",
->> >> > metadata))
->> >> > +                   return -EINVAL;
->>
->> I remember not finding any documentation for xesam:totalTracks do you
->> have a link for it? If you could you please add to the description.
-> I don’t have any xesam or freedesktop reference for "xesam:totalTracks ", but I tried with "xesam:totalTracks" to get NumberOfTracks parsed and it works well to get it displayed.
-
-That is not my argument, my concern is that we should not make it
-xesam: if that doesn't exist, instead it should be bluetooth:/avrcp:
-if we are to create a new one that does not exist already.
-
->>
->> >> >     } else if (strcasecmp(key, "Item") == 0) {
->> >> >             if (!parse_path_metadata(&var, "mpris:trackid", metadata))
->> >> >                     return -EINVAL;
->> >> > --
->> >> > 1.9.1
->> >> >
->> >> > --
->> >> > To unsubscribe from this list: send the line "unsubscribe
->> >> > linux-bluetooth" in the body of a message to
->> >> > majordomo@vger.kernel.org More majordomo info at
->> >> > http://vger.kernel.org/majordomo-info.html
->> >
->> > --
->> > To unsubscribe from this list: send the line "unsubscribe
->> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
->> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org More majordomo
->> info at  http://vger.kernel.org/majordomo-info.html
->
-> --
-> Regards
-> Bharat
->
-
-
-
+diff --git a/android/client/if-hl.c b/android/client/if-hl.c
+index e0818ba..bd05671 100644
+--- a/android/client/if-hl.c
++++ b/android/client/if-hl.c
+@@ -201,6 +201,10 @@ static void register_application_p(int argc, const char **argv)
+ 	reg.number_of_mdeps = atoi(argv[6]);
+ 
+ 	reg.mdep_cfg = malloc(reg.number_of_mdeps * sizeof(bthl_mdep_cfg_t));
++	if (!reg.mdep_cfg) {
++		haltest_error("malloc failed\n");
++		return;
++	}
+ 	mdep_argc_init = 7;
+ 
+ 	for (i = 0; i < reg.number_of_mdeps; i++) {
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
