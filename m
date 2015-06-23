@@ -1,97 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1434707473-16294-1-git-send-email-bharat.panda@samsung.com>
-References: <1434707473-16294-1-git-send-email-bharat.panda@samsung.com>
-Date: Tue, 23 Jun 2015 11:37:38 +0300
-Message-ID: <CABBYNZLz7K0w4vxQNGu9c-waM2fF+5knnbFsMcqOJ1F1zb2KOw@mail.gmail.com>
-Subject: Re: [PATCH ] audio/avrcp: Handle "Available Players Changed"
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Atul Rai <a.rai@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com, anupam.r@samsung.com,
+	Atul Rai <a.rai@samsung.com>
+Subject: [PATCH] android/client/if-bt.c: Fix memory leak while using realloc()
+Date: Tue, 23 Jun 2015 13:38:46 +0530
+Message-id: <1435046926-15622-1-git-send-email-a.rai@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+While reallocating space to store additional "remote device set" using
+realloc, if realloc() fails, the original block is left untouched but
+reference to that block is lost as NULL is assigned to remote_devices.
+The original block needs to be freed before return.
 
-On Fri, Jun 19, 2015 at 12:51 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Add support for AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED notification.
->
-> - Register notification for "Avalable Players Changed"
-> - Send interim and final response on change in available players.
-> As per AVRCP 1.5 specification,
-> The interim and final responses of available players changed
-> notification shall not contain any parameters.
-> ---
->  profiles/audio/avrcp.c | 7 +++++++
->  profiles/audio/media.c | 6 ++++++
->  2 files changed, 13 insertions(+)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 60f8cbf..b22f2fe 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -673,6 +673,9 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
->                 pdu->params[size++] = attr;
->                 pdu->params[size++] = val;
->                 break;
-> +       case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
-> +               size = 1;
-> +               break;
->         default:
->                 error("Unknown event %u", id);
->                 return;
-> @@ -1490,6 +1493,9 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
->                 }
->
->                 break;
-> +       case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
-> +               len = 1;
-> +               break;
->         case AVRCP_EVENT_VOLUME_CHANGED:
->                 pdu->params[1] = media_transport_get_device_volume(dev);
->                 if (pdu->params[1] > 127)
-> @@ -3435,6 +3441,7 @@ static void target_init(struct avrcp *session)
->                                 (1 << AVRCP_EVENT_TRACK_CHANGED) |
->                                 (1 << AVRCP_EVENT_TRACK_REACHED_START) |
->                                 (1 << AVRCP_EVENT_TRACK_REACHED_END) |
-> +                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED) |
->                                 (1 << AVRCP_EVENT_SETTINGS_CHANGED);
->
->         if (target->version < 0x0104)
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index f12569e..8150948 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -987,6 +987,9 @@ static void media_player_remove(struct media_player *mp)
->  {
->         info("Player unregistered: sender=%s path=%s", mp->sender, mp->path);
->
-> +       avrcp_player_event(mp->player,
-> +                               AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
-> +
->         media_player_destroy(mp);
->  }
->
-> @@ -1793,6 +1796,9 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
->                         return btd_error_invalid_args(msg);
->         }
->
-> +       avrcp_player_event(mp->player,
-> +                               AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
-> +
->         if (parse_player_properties(mp, &args) == FALSE) {
->                 media_player_destroy(mp);
->                 return btd_error_invalid_args(msg);
+Signed-off-by: Atul Rai <a.rai@samsung.com>
+---
+ android/client/if-bt.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-I guess the event should be sent only after we parse player the
-properties otherwise you will send multiple event in a row, but
-perhaps we can make avrcp_register_player to handle this internally in
-that case I would use g_idle_add and in case it gets destroyed abort
-the event.
-
-
-
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 4723024..4f0c2e9 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -94,6 +94,7 @@ static int remote_devices_capacity = 0;
+ void add_remote_device(const bt_bdaddr_t *addr)
+ {
+ 	int i;
++	bt_bdaddr_t *tmp = NULL;
+ 
+ 	if (remote_devices == NULL) {
+ 		remote_devices = malloc(4 * sizeof(bt_bdaddr_t));
+@@ -119,9 +120,17 @@ void add_remote_device(const bt_bdaddr_t *addr)
+ 	/* Realloc space if needed */
+ 	if (remote_devices_cnt >= remote_devices_capacity) {
+ 		remote_devices_capacity *= 2;
++		/*
++		 * Save reference to previously allocated memory block so that
++		 * it can be freed in case realloc fails.
++		 */
++		tmp = remote_devices;
++
+ 		remote_devices = realloc(remote_devices, sizeof(bt_bdaddr_t) *
+ 						remote_devices_capacity);
+ 		if (remote_devices == NULL) {
++			if (NULL != tmp)
++				free(tmp);
+ 			remote_devices_capacity = 0;
+ 			remote_devices_cnt = 0;
+ 			return;
 -- 
-Luiz Augusto von Dentz
+2.1.4
+
