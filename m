@@ -2,184 +2,66 @@ Return-Path: <cyrus@holtmann.org>
 From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH  1/3] audio/avrcp: Add AVRCP GetTotalNumOfItems support
-Date: Wed, 24 Jun 2015 14:41:30 +0530
-Message-id: <1435137092-19300-2-git-send-email-bharat.panda@samsung.com>
+Subject: [PATCH  2/3] audio/player: Add TotalNumberOfItems DBUS method
+Date: Wed, 24 Jun 2015 14:41:31 +0530
+Message-id: <1435137092-19300-3-git-send-email-bharat.panda@samsung.com>
 In-reply-to: <1435137092-19300-1-git-send-email-bharat.panda@samsung.com>
 References: <1435137092-19300-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added support for AVRCP GetTotalNumOfItems browsing command
-to retrieve the number of items in a folder(with given scope)
-prior to calling GetFolderItems to retrieve a listing of the
-contents of the folder.
+Adds support for TotalNumberOfItems DBUS method on
+org.bluez.MediaFolder1 interface.
 ---
- profiles/audio/avrcp.c  | 77 +++++++++++++++++++++++++++++++++++++++++++++++++
- profiles/audio/player.c | 25 ++++++++++++++++
- profiles/audio/player.h |  4 +++
- 3 files changed, 106 insertions(+)
+ profiles/audio/player.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 60f8cbf..ebb3af9 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -108,6 +108,7 @@
- #define AVRCP_CHANGE_PATH		0x72
- #define AVRCP_GET_ITEM_ATTRIBUTES	0x73
- #define AVRCP_PLAY_ITEM			0x74
-+#define AVRCP_GET_TOTAL_NUMBER_OF_ITEMS	0x75
- #define AVRCP_SEARCH			0x80
- #define AVRCP_ADD_TO_NOW_PLAYING	0x90
- #define AVRCP_GENERAL_REJECT		0xA0
-@@ -2821,6 +2822,81 @@ static int ct_add_to_nowplaying(struct media_player *mp, const char *name,
- 	return 0;
- }
- 
-+static gboolean avrcp_get_total_numberofitems_rsp(struct avctp *conn,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data)
-+{
-+	struct avrcp_browsing_header *pdu = (void *) operands;
-+	struct avrcp *session = user_data;
-+	struct avrcp_player *player = session->controller->player;
-+	struct media_player *mp = player->user_data;
-+	int ret = 0;
-+
-+	if (pdu == NULL) {
-+		ret = -ETIMEDOUT;
-+		goto done;
-+	}
-+
-+	if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 7) {
-+		ret = -EINVAL;
-+		goto done;
-+	}
-+
-+	if (pdu->params[0] == AVRCP_STATUS_OUT_OF_BOUNDS)
-+		goto done;
-+
-+	player->uid_counter = get_be16(&pdu->params[1]);
-+	ret = get_be32(&pdu->params[3]);
-+
-+done:
-+	media_player_get_number_of_items_complete(mp, ret);
-+
-+	return FALSE;
-+}
-+
-+static void avrcp_get_total_numberofitems(struct avrcp *session)
-+{
-+	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 7];
-+	struct avrcp_player *player = session->controller->player;
-+	struct avrcp_browsing_header *pdu = (void *) buf;
-+	uint16_t length = AVRCP_BROWSING_HEADER_LENGTH + 7;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	pdu->pdu_id = AVRCP_GET_TOTAL_NUMBER_OF_ITEMS;
-+	pdu->param_len = htons(7 + sizeof(uint32_t));
-+
-+	pdu->params[0] = player->scope;
-+
-+	length += sizeof(uint32_t);
-+
-+	avctp_send_browsing_req(session->conn, buf, length,
-+				avrcp_get_total_numberofitems_rsp, session);
-+}
-+
-+static int ct_get_total_numberofitems(struct media_player *mp, const char *name,
-+						void *user_data)
-+{
-+	struct avrcp_player *player = user_data;
-+	struct avrcp *session;
-+
-+	if (player->p != NULL)
-+		return -EBUSY;
-+
-+	session = player->sessions->data;
-+
-+	if (g_str_has_prefix(name, "/NowPlaying"))
-+		player->scope = 0x03;
-+	else if (g_str_has_suffix(name, "/search"))
-+		player->scope = 0x02;
-+	else
-+		player->scope = 0x01;
-+
-+	avrcp_get_total_numberofitems(session);
-+
-+	return 0;
-+}
-+
- static const struct media_player_callback ct_cbs = {
- 	.set_setting	= ct_set_setting,
- 	.play		= ct_play,
-@@ -2835,6 +2911,7 @@ static const struct media_player_callback ct_cbs = {
- 	.search		= ct_search,
- 	.play_item	= ct_play_item,
- 	.add_to_nowplaying = ct_add_to_nowplaying,
-+	.total_items = ct_get_total_numberofitems,
- };
- 
- static struct avrcp_player *create_ct_player(struct avrcp *session,
 diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 94eb2eb..b7f7b60 100644
+index b7f7b60..c8e10e1 100644
 --- a/profiles/audio/player.c
 +++ b/profiles/audio/player.c
-@@ -702,6 +702,31 @@ done:
- 	folder->msg = NULL;
+@@ -877,6 +877,30 @@ static DBusMessage *media_folder_list_items(DBusConnection *conn,
+ 	return NULL;
  }
  
-+void media_player_get_number_of_items_complete(struct media_player *mp, int ret)
++static DBusMessage *media_folder_total_items(DBusConnection *conn,
++						DBusMessage *msg, void *data)
 +{
++	struct media_player *mp = data;
 +	struct media_folder *folder = mp->scope;
-+	DBusMessage *reply;
++	struct player_callback *cb = mp->cb;
++	int err;
 +
-+	if (folder == NULL || folder->msg == NULL)
-+		return;
++	if (cb->cbs->list_items == NULL)
++		return btd_error_not_supported(msg);
 +
-+	if (ret < 0) {
-+		reply = btd_error_failed(folder->msg, strerror(-ret));
-+		goto done;
-+	}
++	if (folder->msg != NULL)
++		return btd_error_failed(msg, strerror(EBUSY));
 +
-+	folder->number_of_items = ret;
++	err = cb->cbs->total_items(mp, folder->item->name,
++							cb->user_data);
++	if (err < 0)
++		return btd_error_failed(msg, strerror(-err));
 +
-+	reply = g_dbus_create_reply(folder->msg,
-+				DBUS_TYPE_INT32, &folder->number_of_items,
-+				DBUS_TYPE_INVALID);
++	folder->msg = dbus_message_ref(msg);
 +
-+done:
-+	g_dbus_send_message(btd_get_dbus_connection(), reply);
-+	dbus_message_unref(folder->msg);
-+	folder->msg = NULL;
++	return NULL;
 +}
 +
- static const GDBusMethodTable media_player_methods[] = {
- 	{ GDBUS_METHOD("Play", NULL, NULL, media_player_play) },
- 	{ GDBUS_METHOD("Pause", NULL, NULL, media_player_pause) },
-diff --git a/profiles/audio/player.h b/profiles/audio/player.h
-index ac2a3da..bc9fa57 100644
---- a/profiles/audio/player.h
-+++ b/profiles/audio/player.h
-@@ -64,6 +64,8 @@ struct media_player_callback {
- 					uint64_t uid, void *user_data);
- 	int (*add_to_nowplaying) (struct media_player *mp, const char *name,
- 					uint64_t uid, void *user_data);
-+	int (*total_items) (struct media_player *mp, const char *name,
-+						void *user_data);
- };
- 
- struct media_player *media_player_controller_create(const char *path,
-@@ -104,6 +106,8 @@ void media_player_list_complete(struct media_player *mp, GSList *items,
- void media_player_change_folder_complete(struct media_player *player,
- 						const char *path, int ret);
- void media_player_search_complete(struct media_player *mp, int ret);
-+void media_player_get_number_of_items_complete(struct media_player *mp,
-+						int ret);
- 
- void media_player_set_callbacks(struct media_player *mp,
- 				const struct media_player_callback *cbs,
+ static void media_item_free(struct media_item *item)
+ {
+ 	if (item->metadata != NULL)
+@@ -1091,6 +1115,10 @@ static const GDBusMethodTable media_folder_methods[] = {
+ 			GDBUS_ARGS({ "filter", "a{sv}" }),
+ 			GDBUS_ARGS({ "items", "a{oa{sv}}" }),
+ 			media_folder_list_items) },
++	{ GDBUS_ASYNC_METHOD("TotalNumberOfItems",
++			NULL,
++			GDBUS_ARGS({ "totalitems", "u" }),
++			media_folder_total_items) },
+ 	{ GDBUS_ASYNC_METHOD("ChangeFolder",
+ 			GDBUS_ARGS({ "folder", "o" }), NULL,
+ 			media_folder_change_folder) },
 -- 
 1.9.1
 
