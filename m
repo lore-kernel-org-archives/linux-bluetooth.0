@@ -1,82 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>, root <root@google.com>
-Subject: [PATCH v1 1/2] Bluetooth: Move address type check for hci_conn_params
-Date: Wed, 24 Jun 2015 16:32:09 -0700
-Message-Id: <1435188730-14151-1-git-send-email-jpawlowski@google.com>
+MIME-Version: 1.0
+In-Reply-To: <1435064017-8178-1-git-send-email-luiz.dentz@gmail.com>
+References: <1435064017-8178-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 24 Jun 2015 15:09:11 +0300
+Message-ID: <CABBYNZJMW3+KuuoU1H2Sj_z4wMB0=joHMiNQnq_tza=956XgFQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 01/11] shared/att: Auto retry if request fails
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When using "add device" mgmt command to add devices to whitelist, only
-identity addresses are allowed. This restriction is enforced in methods
-manipulating hci_conn_params. This patch removes those checks, and
-instead add a check inside "add device" command implementation.
+Hi,
 
-Reason behind that is hci_conn_params structure will be internally used
-for other addresses in upcoming patches modifying connection procedure.
+On Tue, Jun 23, 2015 at 3:53 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds auto retry logic to requests when a security error happen,
+> it will first attempt to elevate the security to match the requirement
+> and then retry sending the request once again.
+> ---
+>  src/shared/att.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 54 insertions(+), 4 deletions(-)
+>
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index f9a5817..e8be4cc 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -576,6 +576,55 @@ static bool disconnect_cb(struct io *io, void *user_data)
+>         return false;
+>  }
+>
+> +static bool change_security(struct bt_att *att, uint8_t ecode)
+> +{
+> +       int security;
+> +
+> +       security = bt_att_get_security(att);
+> +       if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
+> +                                       security < BT_ATT_SECURITY_MEDIUM)
+> +               security = BT_ATT_SECURITY_MEDIUM;
+> +       else if (ecode == BT_ATT_ERROR_AUTHENTICATION &&
+> +                                       security < BT_ATT_SECURITY_HIGH)
+> +               security = BT_ATT_SECURITY_HIGH;
+> +       else
+> +               return false;
+> +
+> +       return bt_att_set_security(att, security);
+> +}
+> +
+> +static bool handle_error_rsp(struct bt_att *att, uint8_t *pdu,
+> +                                       ssize_t pdu_len, uint8_t *opcode)
+> +{
+> +       const struct bt_att_pdu_error_rsp *rsp;
+> +       struct att_send_op *op = att->pending_req;
+> +
+> +       if (pdu_len != sizeof(*rsp)) {
+> +               *opcode = 0;
+> +               return false;
+> +       }
+> +
+> +       rsp = (void *) pdu;
+> +
+> +       *opcode = rsp->opcode;
+> +
+> +       /* Only try to change security on L2CAP */
+> +       if (!att->io_on_l2cap)
+> +               return false;
+> +
+> +       /* Attempt to change security */
+> +       if (!change_security(att, rsp->ecode))
+> +               return false;
+> +
+> +       util_debug(att->debug_callback, att->debug_data,
+> +                                               "Retrying operation %p", op);
+> +
+> +       att->pending_req = NULL;
+> +
+> +       /* Push operation back to request queue */
+> +       return queue_push_head(att->req_queue, op);
+> +}
+> +
+>  static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+>                                                                 ssize_t pdu_len)
+>  {
+> @@ -601,10 +650,11 @@ static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+>          * the request is malformed, end the current request with failure.
+>          */
+>         if (opcode == BT_ATT_OP_ERROR_RSP) {
+> -               if (pdu_len != 4)
+> -                       goto fail;
+> -
+> -               req_opcode = pdu[0];
+> +               /* Return if error response cause a retry */
+> +               if (handle_error_rsp(att, pdu, pdu_len, &req_opcode)) {
+> +                       wakeup_writer(att);
+> +                       return;
+> +               }
+>         } else if (!(req_opcode = get_req_opcode(opcode)))
+>                 goto fail;
+>
+> --
+> 2.1.0
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-Signed-off-by: root <root@google.com>
----
- net/bluetooth/hci_core.c | 11 -----------
- net/bluetooth/mgmt.c     |  7 +++++++
- 2 files changed, 7 insertions(+), 11 deletions(-)
+Applied.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2f8fb33..bc43b64 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2822,10 +2822,6 @@ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
- {
- 	struct hci_conn_params *params;
- 
--	/* The conn params list only contains identity addresses */
--	if (!hci_is_identity_address(addr, addr_type))
--		return NULL;
--
- 	list_for_each_entry(params, &hdev->le_conn_params, list) {
- 		if (bacmp(&params->addr, addr) == 0 &&
- 		    params->addr_type == addr_type) {
-@@ -2842,10 +2838,6 @@ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
- {
- 	struct hci_conn_params *param;
- 
--	/* The list only contains identity addresses */
--	if (!hci_is_identity_address(addr, addr_type))
--		return NULL;
--
- 	list_for_each_entry(param, list, action) {
- 		if (bacmp(&param->addr, addr) == 0 &&
- 		    param->addr_type == addr_type)
-@@ -2861,9 +2853,6 @@ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
- {
- 	struct hci_conn_params *params;
- 
--	if (!hci_is_identity_address(addr, addr_type))
--		return NULL;
--
- 	params = hci_conn_params_lookup(hdev, addr, addr_type);
- 	if (params)
- 		return params;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7998fb2..a7d1b33 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6226,6 +6226,13 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 	else
- 		auto_conn = HCI_AUTO_CONN_REPORT;
- 
-+	/* Allow only identity addresses */
-+	if (!hci_is_identity_address(&cp->addr.bdaddr, addr_type)) {
-+		err = cmd->cmd_complete(cmd, MGMT_STATUS_FAILED);
-+		mgmt_pending_remove(cmd);
-+		goto unlock;
-+	}
-+
- 	/* If the connection parameters don't exist for this device,
- 	 * they will be created and configured with defaults.
- 	 */
+
 -- 
-2.4.3.573.g4eafbef
-
+Luiz Augusto von Dentz
