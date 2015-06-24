@@ -1,110 +1,185 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1435064017-8178-1-git-send-email-luiz.dentz@gmail.com>
-References: <1435064017-8178-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 24 Jun 2015 15:09:11 +0300
-Message-ID: <CABBYNZJMW3+KuuoU1H2Sj_z4wMB0=joHMiNQnq_tza=956XgFQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 01/11] shared/att: Auto retry if request fails
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bharat Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH  1/3] audio/avrcp: Add AVRCP GetTotalNumOfItems support
+Date: Wed, 24 Jun 2015 14:41:30 +0530
+Message-id: <1435137092-19300-2-git-send-email-bharat.panda@samsung.com>
+In-reply-to: <1435137092-19300-1-git-send-email-bharat.panda@samsung.com>
+References: <1435137092-19300-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Added support for AVRCP GetTotalNumOfItems browsing command
+to retrieve the number of items in a folder(with given scope)
+prior to calling GetFolderItems to retrieve a listing of the
+contents of the folder.
+---
+ profiles/audio/avrcp.c  | 77 +++++++++++++++++++++++++++++++++++++++++++++++++
+ profiles/audio/player.c | 25 ++++++++++++++++
+ profiles/audio/player.h |  4 +++
+ 3 files changed, 106 insertions(+)
 
-On Tue, Jun 23, 2015 at 3:53 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds auto retry logic to requests when a security error happen,
-> it will first attempt to elevate the security to match the requirement
-> and then retry sending the request once again.
-> ---
->  src/shared/att.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 54 insertions(+), 4 deletions(-)
->
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index f9a5817..e8be4cc 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -576,6 +576,55 @@ static bool disconnect_cb(struct io *io, void *user_data)
->         return false;
->  }
->
-> +static bool change_security(struct bt_att *att, uint8_t ecode)
-> +{
-> +       int security;
-> +
-> +       security = bt_att_get_security(att);
-> +       if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
-> +                                       security < BT_ATT_SECURITY_MEDIUM)
-> +               security = BT_ATT_SECURITY_MEDIUM;
-> +       else if (ecode == BT_ATT_ERROR_AUTHENTICATION &&
-> +                                       security < BT_ATT_SECURITY_HIGH)
-> +               security = BT_ATT_SECURITY_HIGH;
-> +       else
-> +               return false;
-> +
-> +       return bt_att_set_security(att, security);
-> +}
-> +
-> +static bool handle_error_rsp(struct bt_att *att, uint8_t *pdu,
-> +                                       ssize_t pdu_len, uint8_t *opcode)
-> +{
-> +       const struct bt_att_pdu_error_rsp *rsp;
-> +       struct att_send_op *op = att->pending_req;
-> +
-> +       if (pdu_len != sizeof(*rsp)) {
-> +               *opcode = 0;
-> +               return false;
-> +       }
-> +
-> +       rsp = (void *) pdu;
-> +
-> +       *opcode = rsp->opcode;
-> +
-> +       /* Only try to change security on L2CAP */
-> +       if (!att->io_on_l2cap)
-> +               return false;
-> +
-> +       /* Attempt to change security */
-> +       if (!change_security(att, rsp->ecode))
-> +               return false;
-> +
-> +       util_debug(att->debug_callback, att->debug_data,
-> +                                               "Retrying operation %p", op);
-> +
-> +       att->pending_req = NULL;
-> +
-> +       /* Push operation back to request queue */
-> +       return queue_push_head(att->req_queue, op);
-> +}
-> +
->  static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
->                                                                 ssize_t pdu_len)
->  {
-> @@ -601,10 +650,11 @@ static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
->          * the request is malformed, end the current request with failure.
->          */
->         if (opcode == BT_ATT_OP_ERROR_RSP) {
-> -               if (pdu_len != 4)
-> -                       goto fail;
-> -
-> -               req_opcode = pdu[0];
-> +               /* Return if error response cause a retry */
-> +               if (handle_error_rsp(att, pdu, pdu_len, &req_opcode)) {
-> +                       wakeup_writer(att);
-> +                       return;
-> +               }
->         } else if (!(req_opcode = get_req_opcode(opcode)))
->                 goto fail;
->
-> --
-> 2.1.0
-
-Applied.
-
-
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 60f8cbf..ebb3af9 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -108,6 +108,7 @@
+ #define AVRCP_CHANGE_PATH		0x72
+ #define AVRCP_GET_ITEM_ATTRIBUTES	0x73
+ #define AVRCP_PLAY_ITEM			0x74
++#define AVRCP_GET_TOTAL_NUMBER_OF_ITEMS	0x75
+ #define AVRCP_SEARCH			0x80
+ #define AVRCP_ADD_TO_NOW_PLAYING	0x90
+ #define AVRCP_GENERAL_REJECT		0xA0
+@@ -2821,6 +2822,81 @@ static int ct_add_to_nowplaying(struct media_player *mp, const char *name,
+ 	return 0;
+ }
+ 
++static gboolean avrcp_get_total_numberofitems_rsp(struct avctp *conn,
++					uint8_t *operands, size_t operand_count,
++					void *user_data)
++{
++	struct avrcp_browsing_header *pdu = (void *) operands;
++	struct avrcp *session = user_data;
++	struct avrcp_player *player = session->controller->player;
++	struct media_player *mp = player->user_data;
++	int ret = 0;
++
++	if (pdu == NULL) {
++		ret = -ETIMEDOUT;
++		goto done;
++	}
++
++	if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 7) {
++		ret = -EINVAL;
++		goto done;
++	}
++
++	if (pdu->params[0] == AVRCP_STATUS_OUT_OF_BOUNDS)
++		goto done;
++
++	player->uid_counter = get_be16(&pdu->params[1]);
++	ret = get_be32(&pdu->params[3]);
++
++done:
++	media_player_get_number_of_items_complete(mp, ret);
++
++	return FALSE;
++}
++
++static void avrcp_get_total_numberofitems(struct avrcp *session)
++{
++	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 7];
++	struct avrcp_player *player = session->controller->player;
++	struct avrcp_browsing_header *pdu = (void *) buf;
++	uint16_t length = AVRCP_BROWSING_HEADER_LENGTH + 7;
++
++	memset(buf, 0, sizeof(buf));
++
++	pdu->pdu_id = AVRCP_GET_TOTAL_NUMBER_OF_ITEMS;
++	pdu->param_len = htons(7 + sizeof(uint32_t));
++
++	pdu->params[0] = player->scope;
++
++	length += sizeof(uint32_t);
++
++	avctp_send_browsing_req(session->conn, buf, length,
++				avrcp_get_total_numberofitems_rsp, session);
++}
++
++static int ct_get_total_numberofitems(struct media_player *mp, const char *name,
++						void *user_data)
++{
++	struct avrcp_player *player = user_data;
++	struct avrcp *session;
++
++	if (player->p != NULL)
++		return -EBUSY;
++
++	session = player->sessions->data;
++
++	if (g_str_has_prefix(name, "/NowPlaying"))
++		player->scope = 0x03;
++	else if (g_str_has_suffix(name, "/search"))
++		player->scope = 0x02;
++	else
++		player->scope = 0x01;
++
++	avrcp_get_total_numberofitems(session);
++
++	return 0;
++}
++
+ static const struct media_player_callback ct_cbs = {
+ 	.set_setting	= ct_set_setting,
+ 	.play		= ct_play,
+@@ -2835,6 +2911,7 @@ static const struct media_player_callback ct_cbs = {
+ 	.search		= ct_search,
+ 	.play_item	= ct_play_item,
+ 	.add_to_nowplaying = ct_add_to_nowplaying,
++	.total_items = ct_get_total_numberofitems,
+ };
+ 
+ static struct avrcp_player *create_ct_player(struct avrcp *session,
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index 94eb2eb..b7f7b60 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -702,6 +702,31 @@ done:
+ 	folder->msg = NULL;
+ }
+ 
++void media_player_get_number_of_items_complete(struct media_player *mp, int ret)
++{
++	struct media_folder *folder = mp->scope;
++	DBusMessage *reply;
++
++	if (folder == NULL || folder->msg == NULL)
++		return;
++
++	if (ret < 0) {
++		reply = btd_error_failed(folder->msg, strerror(-ret));
++		goto done;
++	}
++
++	folder->number_of_items = ret;
++
++	reply = g_dbus_create_reply(folder->msg,
++				DBUS_TYPE_INT32, &folder->number_of_items,
++				DBUS_TYPE_INVALID);
++
++done:
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++	dbus_message_unref(folder->msg);
++	folder->msg = NULL;
++}
++
+ static const GDBusMethodTable media_player_methods[] = {
+ 	{ GDBUS_METHOD("Play", NULL, NULL, media_player_play) },
+ 	{ GDBUS_METHOD("Pause", NULL, NULL, media_player_pause) },
+diff --git a/profiles/audio/player.h b/profiles/audio/player.h
+index ac2a3da..bc9fa57 100644
+--- a/profiles/audio/player.h
++++ b/profiles/audio/player.h
+@@ -64,6 +64,8 @@ struct media_player_callback {
+ 					uint64_t uid, void *user_data);
+ 	int (*add_to_nowplaying) (struct media_player *mp, const char *name,
+ 					uint64_t uid, void *user_data);
++	int (*total_items) (struct media_player *mp, const char *name,
++						void *user_data);
+ };
+ 
+ struct media_player *media_player_controller_create(const char *path,
+@@ -104,6 +106,8 @@ void media_player_list_complete(struct media_player *mp, GSList *items,
+ void media_player_change_folder_complete(struct media_player *player,
+ 						const char *path, int ret);
+ void media_player_search_complete(struct media_player *mp, int ret);
++void media_player_get_number_of_items_complete(struct media_player *mp,
++						int ret);
+ 
+ void media_player_set_callbacks(struct media_player *mp,
+ 				const struct media_player_callback *cbs,
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
