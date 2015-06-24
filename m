@@ -2,66 +2,78 @@ Return-Path: <cyrus@holtmann.org>
 From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH  2/3] audio/player: Add TotalNumberOfItems DBUS method
-Date: Wed, 24 Jun 2015 14:41:31 +0530
-Message-id: <1435137092-19300-3-git-send-email-bharat.panda@samsung.com>
+Subject: [PATCH  3/3] tools: Add total-items command for GetTotalNumOfItems
+Date: Wed, 24 Jun 2015 14:41:32 +0530
+Message-id: <1435137092-19300-4-git-send-email-bharat.panda@samsung.com>
 In-reply-to: <1435137092-19300-1-git-send-email-bharat.panda@samsung.com>
 References: <1435137092-19300-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds support for TotalNumberOfItems DBUS method on
-org.bluez.MediaFolder1 interface.
+Added command "total-items" to send request for
+"GetTotalNumOfItems".
 ---
- profiles/audio/player.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ tools/bluetooth-player.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index b7f7b60..c8e10e1 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -877,6 +877,30 @@ static DBusMessage *media_folder_list_items(DBusConnection *conn,
- 	return NULL;
+diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+index 9e19997..66303a7 100644
+--- a/tools/bluetooth-player.c
++++ b/tools/bluetooth-player.c
+@@ -891,6 +891,44 @@ done:
+ 	rl_printf("Attempting to list items\n");
  }
  
-+static DBusMessage *media_folder_total_items(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
++static void total_items_reply(DBusMessage *message, void *user_data)
 +{
-+	struct media_player *mp = data;
-+	struct media_folder *folder = mp->scope;
-+	struct player_callback *cb = mp->cb;
-+	int err;
++	DBusError error;
 +
-+	if (cb->cbs->list_items == NULL)
-+		return btd_error_not_supported(msg);
++	dbus_error_init(&error);
 +
-+	if (folder->msg != NULL)
-+		return btd_error_failed(msg, strerror(EBUSY));
++	if (dbus_set_error_from_message(&error, message) == TRUE) {
++		rl_printf("Failed to get total number of items: %s\n",
++					error.name);
++		dbus_error_free(&error);
++		return;
++	}
 +
-+	err = cb->cbs->total_items(mp, folder->item->name,
-+							cb->user_data);
-+	if (err < 0)
-+		return btd_error_failed(msg, strerror(-err));
-+
-+	folder->msg = dbus_message_ref(msg);
-+
-+	return NULL;
++	rl_printf("TotalItems successful\n");
 +}
 +
- static void media_item_free(struct media_item *item)
++static void cmd_total_items(int argc, char *argv[])
++{
++	GDBusProxy *proxy;
++
++	if (check_default_player() == FALSE)
++		return;
++
++	proxy = find_folder(g_dbus_proxy_get_path(default_player));
++	if (proxy == NULL) {
++		rl_printf("Operation not supported\n");
++		return;
++	}
++
++	if (g_dbus_proxy_method_call(proxy, "TotalNumberOfItems", NULL,
++				total_items_reply, NULL, g_free) == FALSE) {
++		rl_printf("Failed to get total number of items\n");
++		return;
++	}
++
++	rl_printf("Attempting to list items\n");
++}
++
+ static void search_setup(DBusMessageIter *iter, void *user_data)
  {
- 	if (item->metadata != NULL)
-@@ -1091,6 +1115,10 @@ static const GDBusMethodTable media_folder_methods[] = {
- 			GDBUS_ARGS({ "filter", "a{sv}" }),
- 			GDBUS_ARGS({ "items", "a{oa{sv}}" }),
- 			media_folder_list_items) },
-+	{ GDBUS_ASYNC_METHOD("TotalNumberOfItems",
-+			NULL,
-+			GDBUS_ARGS({ "totalitems", "u" }),
-+			media_folder_total_items) },
- 	{ GDBUS_ASYNC_METHOD("ChangeFolder",
- 			GDBUS_ARGS({ "folder", "o" }), NULL,
- 			media_folder_change_folder) },
+ 	char *string = user_data;
+@@ -1025,6 +1063,8 @@ static const struct {
+ 					"List items of current folder" },
+ 	{ "search",     "string",     cmd_search,
+ 					"Search items containing string" },
++	{ "total-items", NULL, cmd_total_items,
++					"Get total number of items" },
+ 	{ "queue",       "<item>",    cmd_queue, "Add item to playlist queue" },
+ 	{ "show-item",   "<item>",    cmd_show_item, "Show item information" },
+ 	{ "quit",         NULL,       cmd_quit, "Quit program" },
 -- 
 1.9.1
 
