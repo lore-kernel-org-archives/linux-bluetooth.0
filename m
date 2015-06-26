@@ -1,67 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CADDKRnCAj1BrmZzO6ys3zXmPJgaFnppARjU6VvVJf9Aiox7+Ww@mail.gmail.com>
-References: <CADDKRnA4-h61=Tp90Cgj7GsAOZhBX6Dr0ka_CncrCrHDbWLcvw@mail.gmail.com>
-	<986DE56C-2E79-4CAD-9D32-89DAED9B449A@holtmann.org>
-	<CADDKRnCAj1BrmZzO6ys3zXmPJgaFnppARjU6VvVJf9Aiox7+Ww@mail.gmail.com>
-Date: Fri, 26 Jun 2015 16:28:24 +0200
-Message-ID: <CADDKRnDchGURbrxt=herCnLiLfcqrRt=s_wMoBpuG25Ae32WYg@mail.gmail.com>
-Subject: Re: [4.1.0-07254-gc13c810] Regression: Bluetooth not working.
-From: =?UTF-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Alexey Dobriyan <adobriyan@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-	inux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset=UTF-8
+From: Anupam Roy <anupam.r@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com, Anupam Roy <anupam.r@samsung.com>
+Subject: [PATCH] tools/obex-client-tool.c: Fix memory leak in obex-client-tool
+Date: Fri, 26 Jun 2015 09:05:17 -0400
+Message-id: <1435323917-13127-1-git-send-email-anupam.r@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2015-06-26 12:03 GMT+02:00 J=C3=B6rg Otte <jrg.otte@gmail.com>:
-> 2015-06-26 11:37 GMT+02:00 Marcel Holtmann <marcel@holtmann.org>:
->> Hi Joerg,
->>
->>> Bluetooth is inoperable in current Linus tree and the
->>> first bad commit is:
->>>
->>> 835a6a2f8603237a3e6cded5a6765090ecb06ea5 is the first bad commit
->>> commit 835a6a2f8603237a3e6cded5a6765090ecb06ea5
->>> Author: Alexey Dobriyan <adobriyan@gmail.com>
->>> Date:   Wed Jun 10 20:28:33 2015 +0300
->>>
->>>    Bluetooth: Stop sabotaging list poisoning
->>>
->>>    list_del() poisons pointers with special values, no need to overwrit=
-e them.
->>>
->>>    Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
->>>    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->>>
->>> My BT adapter is an intel 8087:07da
->>> I reverted that commit and this fixed the problem for me.
->>
->> today we had a patch from Tedd fixing the list initialization in the HID=
-P code.
->>
->> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
->> index 9070dfd6b4ad..f1a117f8cad2 100644
->> --- a/net/bluetooth/hidp/core.c
->> +++ b/net/bluetooth/hidp/core.c
->> @@ -915,6 +915,7 @@ static int hidp_session_new(struct hidp_session **ou=
-t, const bdaddr_t *bdaddr,
->>         session->conn =3D l2cap_conn_get(conn);
->>         session->user.probe =3D hidp_session_probe;
->>         session->user.remove =3D hidp_session_remove;
->> +       INIT_LIST_HEAD(&session->user.list);
->>         session->ctrl_sock =3D ctrl_sock;
->>         session->intr_sock =3D intr_sock;
->>         skb_queue_head_init(&session->ctrl_transmit);
->>
->> Could this be fixing it for you as well?
->>
-> I will check this when I am at home in the
-> afternoon.
->
+GOptionContext object should be freed in case socket connection
+fails and program execution is terminated.
 
-The patch works for me too.
+==12968== HEAP SUMMARY:
+==12968==     in use at exit: 2,895 bytes in 14 blocks
+==12968==   total heap usage: 23 allocs, 9 frees, 36,669 bytes allocated
+==12968==
+==12968== 624 (88 direct, 536 indirect) bytes in 1 blocks are definitely lost in loss record 13 of 14
+==12968==    at 0x4C2CC70: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==12968==    by 0x4E85668: g_malloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+==12968==    by 0x4E89D22: g_option_context_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
+==12968==    by 0x402BAB: main (obex-client-tool.c:428)
+==12968==
+==12968== LEAK SUMMARY:
+==12968==    definitely lost: 88 bytes in 1 blocks
+==12968==    indirectly lost: 536 bytes in 2 blocks
+==12968==      possibly lost: 0 bytes in 0 blocks
+==12968==    still reachable: 2,271 bytes in 11 blocks
+==12968==         suppressed: 0 bytes in 0 blocks
+---
+ tools/obex-client-tool.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Thanks, J=C3=B6rg
+diff --git a/tools/obex-client-tool.c b/tools/obex-client-tool.c
+index 4f931f6..d0ba8a6 100644
+--- a/tools/obex-client-tool.c
++++ b/tools/obex-client-tool.c
+@@ -432,6 +432,7 @@ int main(int argc, char *argv[])
+ 	if (err != NULL) {
+ 		g_printerr("%s\n", err->message);
+ 		g_error_free(err);
++		g_option_context_free(context);
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
+@@ -445,8 +446,10 @@ int main(int argc, char *argv[])
+ 	else
+ 		io = unix_connect(transport);
+ 
+-	if (io == NULL)
++	if (io == NULL) {
++		g_option_context_free(context);
+ 		exit(EXIT_FAILURE);
++	}
+ 
+ 	memset(&sa, 0, sizeof(sa));
+ 	sa.sa_handler = sig_term;
+-- 
+1.9.1
+
