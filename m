@@ -1,34 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 26 Jun 2015 09:53:13 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: paras kumar <paras.kumar@samsung.com>
+Cc: jukka.rissanen@linux.intel.com, marcel@holtmann.org,
+	johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Subject: Re: Re: Query regarding IPv6 address configuration for BT 6lowpan
+ device/interface
+Message-ID: <20150626075309.GA959@omega>
+References: <037401d0a9a4$b5f9c4c0$21ed4e40$@samsung.com>
+ <20150618090842.GA4544@omega>
+ <022a01d0afcc$b9936c20$2cba4460$@samsung.com>
 MIME-Version: 1.0
-Date: Fri, 26 Jun 2015 11:27:41 +0200
-Message-ID: <CADDKRnA4-h61=Tp90Cgj7GsAOZhBX6Dr0ka_CncrCrHDbWLcvw@mail.gmail.com>
-Subject: [4.1.0-07254-gc13c810] Regression: Bluetooth not working.
-From: =?UTF-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>
-To: Alexey Dobriyan <adobriyan@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-	inux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <022a01d0afcc$b9936c20$2cba4460$@samsung.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bluetooth is inoperable in current Linus tree and the
-first bad commit is:
+Hi,
 
-835a6a2f8603237a3e6cded5a6765090ecb06ea5 is the first bad commit
-commit 835a6a2f8603237a3e6cded5a6765090ecb06ea5
-Author: Alexey Dobriyan <adobriyan@gmail.com>
-Date:   Wed Jun 10 20:28:33 2015 +0300
+On Fri, Jun 26, 2015 at 10:28:10AM +0530, paras kumar wrote:
+> Hello All,
+> 
+> Please help me to understand below queries.
+> 
 
-    Bluetooth: Stop sabotaging list poisoning
+sorry, I don't help you to making backports. I am currently busy with
+other things which are related to mainline work. I can't help you.
 
-    list_del() poisons pointers with special values, no need to overwrite t=
-hem.
+The missing ARPHRF_6LOWPAN in addrconf was just a shoot into the dark,
+because you don't have the stateless autoconfiguration and this needed to
+be there for that. I really have no idea about the following panic and
+why it occurs, maybe providing the stacktrace would be nice that I have
+more information. But I think it's more work than just copying the files
+to kernel version 3.10.
 
-    Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
-    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+I also don't know if somebody did a backport to earlier kernel versions.
+Otherwise I would mentioned that here, but you are the first one.
 
-My BT adapter is an intel 8087:07da
-I reverted that commit and this fixed the problem for me.
-
-Thanks, J=C3=B6rg
+- Alex
