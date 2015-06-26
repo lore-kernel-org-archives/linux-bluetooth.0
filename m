@@ -1,41 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKLS-9pLxNLCJfb2OnapcX1rCqHgGoRg9gvkjnR0YcNHw@mail.gmail.com>
-References: <CAPyD+=CwiwARGqT-tKomaJ+o9O6tAiMJ25TiqxFuT2DDS+VKxQ@mail.gmail.com>
-	<20150625111827.6196924d@tedd-fedora-vm>
-	<CAPyD+=Ao6bc4o=sDDxZ9sb4hbVShXtWTfVFzOChw4k4iGoBSJQ@mail.gmail.com>
-	<CABBYNZKLS-9pLxNLCJfb2OnapcX1rCqHgGoRg9gvkjnR0YcNHw@mail.gmail.com>
-Date: Fri, 26 Jun 2015 14:11:46 -0700
-Message-ID: <CAPyD+=CdfYGVZHsbQvjRHTz27-nKLasOdNRpN-DoBdsNgUcWpQ@mail.gmail.com>
-Subject: Re: Unreliable LE advertisement registration through BlueZ
- advertising API
-From: "Othman, Ossama" <ossama.othman@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Tedd Ho-Jeong An <tedd.an@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAPyD+=CichTsAGNKRO14L2pXhGxdVnk27+qZZc1B-tAr2M7c1w@mail.gmail.com>
+References: <1435320003-14720-1-git-send-email-luiz.dentz@gmail.com>
+	<CAPyD+=CichTsAGNKRO14L2pXhGxdVnk27+qZZc1B-tAr2M7c1w@mail.gmail.com>
+Date: Fri, 26 Jun 2015 22:33:33 +0300
+Message-ID: <CABBYNZKfisRUPncZFU4Xa5cns8TvEFLTaYhu1S5mdUPi=ovJng@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core/advertising: Fix using wrong instance id
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Othman, Ossama" <ossama.othman@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Ossama,
 
-On Fri, Jun 26, 2015 at 4:13 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Perhaps he is talking about missing policy, bluetooth.conf should
-> contain the following:
+On Fri, Jun 26, 2015 at 9:08 PM, Othman, Ossama <ossama.othman@intel.com> wrote:
+> Hi Luiz,
 >
->     <allow send_interface="org.bluez.GattCharacteristic1"/>
->     <allow send_interface="org.bluez.GattDescriptor1"/>
->     <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
->     <allow send_interface="org.freedesktop.DBus.Properties"/>
+> On Fri, Jun 26, 2015 at 5:00 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> The instance id shall be limited to the number of instance the kernel
+>> support, and since this will probably be quite small the ids should be
+>> reused once the client unregistered.
+>> ---
+>>  src/advertising.c | 12 +++++++-----
+>>  1 file changed, 7 insertions(+), 5 deletions(-)
+>> ...
 >
->
-> If it doesn't please update it and reload D-Bus service.
+> This patch appears to address the problem I was seeing with the failed
+> advertisement registration.  With it in place I'm able to repeatedly
+> register/unregister my advertisement without problem.
 
-My bluetooth.conf was indeed out-of-date.  I didn't notice that the
-bootstrap-configure script disabled data files by default, so they
-didn't get installed with the rest of BlueZ.  With the correct
-bluetooth.conf file in place I'm able to run example-advertisement.
+I will probably apply it tomorrow to give people some time to try it,
+but Im quite sure this will be the final version.
 
-Thanks!
--Ossama
+
+-- 
+Luiz Augusto von Dentz
