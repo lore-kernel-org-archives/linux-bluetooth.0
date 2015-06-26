@@ -1,34 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1435320003-14720-1-git-send-email-luiz.dentz@gmail.com>
-References: <1435320003-14720-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 26 Jun 2015 11:08:12 -0700
-Message-ID: <CAPyD+=CichTsAGNKRO14L2pXhGxdVnk27+qZZc1B-tAr2M7c1w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/advertising: Fix using wrong instance id
-From: "Othman, Ossama" <ossama.othman@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CADDKRnCAj1BrmZzO6ys3zXmPJgaFnppARjU6VvVJf9Aiox7+Ww@mail.gmail.com>
+References: <CADDKRnA4-h61=Tp90Cgj7GsAOZhBX6Dr0ka_CncrCrHDbWLcvw@mail.gmail.com>
+	<986DE56C-2E79-4CAD-9D32-89DAED9B449A@holtmann.org>
+	<CADDKRnCAj1BrmZzO6ys3zXmPJgaFnppARjU6VvVJf9Aiox7+Ww@mail.gmail.com>
+Date: Fri, 26 Jun 2015 16:28:24 +0200
+Message-ID: <CADDKRnDchGURbrxt=herCnLiLfcqrRt=s_wMoBpuG25Ae32WYg@mail.gmail.com>
+Subject: Re: [4.1.0-07254-gc13c810] Regression: Bluetooth not working.
+From: =?UTF-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Alexey Dobriyan <adobriyan@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	inux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Fri, Jun 26, 2015 at 5:00 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+2015-06-26 12:03 GMT+02:00 J=C3=B6rg Otte <jrg.otte@gmail.com>:
+> 2015-06-26 11:37 GMT+02:00 Marcel Holtmann <marcel@holtmann.org>:
+>> Hi Joerg,
+>>
+>>> Bluetooth is inoperable in current Linus tree and the
+>>> first bad commit is:
+>>>
+>>> 835a6a2f8603237a3e6cded5a6765090ecb06ea5 is the first bad commit
+>>> commit 835a6a2f8603237a3e6cded5a6765090ecb06ea5
+>>> Author: Alexey Dobriyan <adobriyan@gmail.com>
+>>> Date:   Wed Jun 10 20:28:33 2015 +0300
+>>>
+>>>    Bluetooth: Stop sabotaging list poisoning
+>>>
+>>>    list_del() poisons pointers with special values, no need to overwrit=
+e them.
+>>>
+>>>    Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+>>>    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>>
+>>> My BT adapter is an intel 8087:07da
+>>> I reverted that commit and this fixed the problem for me.
+>>
+>> today we had a patch from Tedd fixing the list initialization in the HID=
+P code.
+>>
+>> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+>> index 9070dfd6b4ad..f1a117f8cad2 100644
+>> --- a/net/bluetooth/hidp/core.c
+>> +++ b/net/bluetooth/hidp/core.c
+>> @@ -915,6 +915,7 @@ static int hidp_session_new(struct hidp_session **ou=
+t, const bdaddr_t *bdaddr,
+>>         session->conn =3D l2cap_conn_get(conn);
+>>         session->user.probe =3D hidp_session_probe;
+>>         session->user.remove =3D hidp_session_remove;
+>> +       INIT_LIST_HEAD(&session->user.list);
+>>         session->ctrl_sock =3D ctrl_sock;
+>>         session->intr_sock =3D intr_sock;
+>>         skb_queue_head_init(&session->ctrl_transmit);
+>>
+>> Could this be fixing it for you as well?
+>>
+> I will check this when I am at home in the
+> afternoon.
 >
-> The instance id shall be limited to the number of instance the kernel
-> support, and since this will probably be quite small the ids should be
-> reused once the client unregistered.
-> ---
->  src/advertising.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> ...
 
-This patch appears to address the problem I was seeing with the failed
-advertisement registration.  With it in place I'm able to repeatedly
-register/unregister my advertisement without problem.
+The patch works for me too.
 
-Thanks!
--Ossama
+Thanks, J=C3=B6rg
