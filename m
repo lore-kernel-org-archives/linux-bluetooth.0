@@ -1,60 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anchit Narang <anchit.n@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: sachin.dev@samsung.com, anupam.r@samsung.com,
-	Anchit Narang <anchit.n@samsung.com>
-Subject: [PATCH] android/tester-gatt.c:Fixed Memory leak
-Date: Fri, 26 Jun 2015 16:13:49 +0530
-Message-id: <1435315429-24836-1-git-send-email-anchit.n@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CADDKRnCAj1BrmZzO6ys3zXmPJgaFnppARjU6VvVJf9Aiox7+Ww@mail.gmail.com>
+References: <CADDKRnA4-h61=Tp90Cgj7GsAOZhBX6Dr0ka_CncrCrHDbWLcvw@mail.gmail.com>
+	<986DE56C-2E79-4CAD-9D32-89DAED9B449A@holtmann.org>
+	<CADDKRnCAj1BrmZzO6ys3zXmPJgaFnppARjU6VvVJf9Aiox7+Ww@mail.gmail.com>
+Date: Fri, 26 Jun 2015 13:27:23 +0300
+Message-ID: <CACVxJT9kTRZC2G3cKsH8ccsP_B8r+7dKXNrz55u6yr9D41QOQA@mail.gmail.com>
+Subject: Re: [4.1.0-07254-gc13c810] Regression: Bluetooth not working.
+From: Alexey Dobriyan <adobriyan@gmail.com>
+To: =?UTF-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	inux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes memory leak issues in various functions
-by allocating memory to  structure step only after intial
-checks are performed as control was returning from these
-checks without freeing memory allocated to it.
----
- android/tester-gatt.c |    8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+On Fri, Jun 26, 2015 at 1:03 PM, J=C3=B6rg Otte <jrg.otte@gmail.com> wrote:
+> 2015-06-26 11:37 GMT+02:00 Marcel Holtmann <marcel@holtmann.org>:
 
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index b8b088b..7083ac6 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -1140,13 +1140,15 @@ static void gatt_client_register_action(void)
- 	struct test_data *data = tester_get_data();
- 	struct step *current_data_step = queue_peek_head(data->steps);
- 	bt_uuid_t *app_uuid = current_data_step->set_data;
--	struct step *step = g_new0(struct step, 1);
-+	struct step *step;
- 
- 	if (!app_uuid) {
- 		tester_warn("No app uuid provided for register action.");
- 		return;
- 	}
- 
-+	step = g_new0(struct step, 1);
-+
- 	step->action_status = data->if_gatt->client->register_client(app_uuid);
- 
- 	schedule_action_verification(step);
-@@ -1392,13 +1394,15 @@ static void gatt_server_register_action(void)
- 	struct test_data *data = tester_get_data();
- 	struct step *current_data_step = queue_peek_head(data->steps);
- 	bt_uuid_t *app_uuid = current_data_step->set_data;
--	struct step *step = g_new0(struct step, 1);
-+	struct step *step;
- 
- 	if (!app_uuid) {
- 		tester_warn("No app uuid provided for register action.");
- 		return;
- 	}
- 
-+	step = g_new0(struct step, 1);
-+
- 	step->action_status = data->if_gatt->server->register_server(app_uuid);
- 
- 	schedule_action_verification(step);
--- 
-1.7.9.5
+>> --- a/net/bluetooth/hidp/core.c
+>> +++ b/net/bluetooth/hidp/core.c
+>> @@ -915,6 +915,7 @@ static int hidp_session_new(struct hidp_session **ou=
+t, const bdaddr_t *bdaddr,
+>>         session->conn =3D l2cap_conn_get(conn);
+>>         session->user.probe =3D hidp_session_probe;
+>>         session->user.remove =3D hidp_session_remove;
+>> +       INIT_LIST_HEAD(&session->user.list);
 
+Heh, I checked every list.next/prev instance except init bit.
+Sorry for the breakage.
+
+  Alexey
