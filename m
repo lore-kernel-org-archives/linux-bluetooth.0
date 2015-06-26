@@ -1,62 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <558DE8B3.3060102@gmail.com>
-Date: Sat, 27 Jun 2015 02:05:07 +0200
-From: Florian Grandel <fgrandel@gmail.com>
 MIME-Version: 1.0
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Szymon Janc <Szymon.Janc@tieto.com>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Peripheral role support for android
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CABBYNZKLS-9pLxNLCJfb2OnapcX1rCqHgGoRg9gvkjnR0YcNHw@mail.gmail.com>
+References: <CAPyD+=CwiwARGqT-tKomaJ+o9O6tAiMJ25TiqxFuT2DDS+VKxQ@mail.gmail.com>
+	<20150625111827.6196924d@tedd-fedora-vm>
+	<CAPyD+=Ao6bc4o=sDDxZ9sb4hbVShXtWTfVFzOChw4k4iGoBSJQ@mail.gmail.com>
+	<CABBYNZKLS-9pLxNLCJfb2OnapcX1rCqHgGoRg9gvkjnR0YcNHw@mail.gmail.com>
+Date: Fri, 26 Jun 2015 14:11:46 -0700
+Message-ID: <CAPyD+=CdfYGVZHsbQvjRHTz27-nKLasOdNRpN-DoBdsNgUcWpQ@mail.gmail.com>
+Subject: Re: Unreliable LE advertisement registration through BlueZ
+ advertising API
+From: "Othman, Ossama" <ossama.othman@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Tedd Ho-Jeong An <tedd.an@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi guys,
+Hi Luiz,
 
-the whole point of adding the multi adv feature to the kernel was trying 
-to support the peripheral role on my nexus 4.
+On Fri, Jun 26, 2015 at 4:13 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Perhaps he is talking about missing policy, bluetooth.conf should
+> contain the following:
+>
+>     <allow send_interface="org.bluez.GattCharacteristic1"/>
+>     <allow send_interface="org.bluez.GattDescriptor1"/>
+>     <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
+>     <allow send_interface="org.freedesktop.DBus.Properties"/>
+>
+>
+> If it doesn't please update it and reload D-Bus service.
 
-Now that multi adv made it into the kernel, I'd like to add the missing 
-pieces to the android userspace sub-project in bluez.
+My bluetooth.conf was indeed out-of-date.  I didn't notice that the
+bootstrap-configure script disabled data files by default, so they
+didn't get installed with the rest of BlueZ.  With the correct
+bluetooth.conf file in place I'm able to run example-advertisement.
 
-Here are the todos I identified so far:
-
-1) kernel backports: provide patches necessary to support the current 
-linux-next master (I did this already... - patches all supplied to the 
-backports project and msm kernel + modules compiled on my machine)
-
-2) android/bluetooth: implement bt_le_read_adv_features() to retrieve 
-num supported instances from the kernel
-
-3) android/bluetooth: change prepare_le_features() to retrieve the max 
-number of adv instances from the kernel and save it to the adapter 
-struct - will use bt_le_read_adv_features()
-
-4) android/gatt: change [un]register_app() to correctly manage app ids 
-(aka instance ids) in the permitted range including appropriate error 
-handling when the max number of instances is reached
-
-5) android/bluetooth: implement bt_le_{add|remove}_advertising() to 
-support the new multi-adv features in the kernel
-
-6) android/gatt: implement the handle*multi_adv*() methods using 
-bt_le_{add|remove}_advertising()
-
-7) android/tester-{bluetooth|gatt}: write supporting tests
-
-Do you agree that this should suffice to support basic advertising 
-features in Lollipop? Is there anything important missing?
-
-AFAICS there is (at least) one catch: the kernel does not support 
-setting custom values for min/max adv interval, channel map, tx power, 
-etc. while the HAL API seems to expect per-instance setup of these 
-values. How should we deal with this? Should we ignore these values? Or 
-should we error out with a NOT_SUPPORTED error if they are different 
-from the kernel defaults?
-
-Please let me know whether you agree to that roadmap and what you think 
-about the unsupported features. Is it ok if I try to tackle these todos? 
-Or is someone working on this already?
-
-Florian
+Thanks!
+-Ossama
