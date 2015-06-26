@@ -1,70 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAD0=r8wkU8NZ6zfQ=Aq0aSvPAnPN=nwmz6NHLygd1UiV3ScyPQ@mail.gmail.com>
-References: <CABKPALpbGG8vXj+10MuG97wZaHoDJBhj5MtrKjfJQhQ_xbpp1Q@mail.gmail.com>
-	<CAD0=r8wkU8NZ6zfQ=Aq0aSvPAnPN=nwmz6NHLygd1UiV3ScyPQ@mail.gmail.com>
-Date: Fri, 26 Jun 2015 07:34:30 -0500
-Message-ID: <CABKPALoH6oOFEzHpA4DMtsZSqGUdg88ODQWdJ_1uLEOkQc5u=Q@mail.gmail.com>
-Subject: Re: Another PropertiesChanged observation
-From: Neil Martin <neil@vnp.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <558D4404.6020500@gmail.com>
+References: <CAPyD+=CwiwARGqT-tKomaJ+o9O6tAiMJ25TiqxFuT2DDS+VKxQ@mail.gmail.com>
+	<20150625111827.6196924d@tedd-fedora-vm>
+	<CAPyD+=Ao6bc4o=sDDxZ9sb4hbVShXtWTfVFzOChw4k4iGoBSJQ@mail.gmail.com>
+	<CABBYNZKLS-9pLxNLCJfb2OnapcX1rCqHgGoRg9gvkjnR0YcNHw@mail.gmail.com>
+	<558D4404.6020500@gmail.com>
+Date: Fri, 26 Jun 2015 15:28:12 +0300
+Message-ID: <CABBYNZJWbtVT30M0EN6mScZQvkzU6JcoHTNPRQoTaR1URnX9vA@mail.gmail.com>
+Subject: Re: Unreliable LE advertisement registration through BlueZ
+ advertising API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "jerico.dev" <jerico.dev@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Florian,
 
-Thanks for the response.  That makes sense - I'll give that a try.
+On Fri, Jun 26, 2015 at 3:22 PM, jerico.dev <jerico.dev@gmail.com> wrote:
+> Hi Luiz,
+>
+>>>> Any way, once I run the example-advertisement script, I cannot run it
+>>>> again until I restart the bleutooth daemon.
+>>>> This is known issue.
+>>>
+>>>
+>>> Okay, I'll keep digging.
+>>
+>>
+>> That is something in the kernel Im afraid, it doesn't seems to remove
+>> the instances properly.
+>
+>
+> is it possible to reproduce this bad behavior with the btmgmt tool? I'd like
+> to have a look at it to find out the reason.
 
-I'm running this on a Raspberry Pi with a Medialink USB adapter which
-(I believe) has a Broadcom chipset.
+Check the patch I just sent.
 
-Neil
 
-On Thu, Jun 25, 2015 at 9:30 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> Hi Neil,
->
-> On Thu, Jun 25, 2015 at 2:53 PM, Neil Martin <neil@vnp.com> wrote:
->> Hi,
->>
->> I've noticed that the bluetoothd console output shows a steady stream
->> of RSSI updates, yet only a fraction of these seem to translate into a
->> DBus PropertiesChanged signal.
->>
->> I've just seen 50 or so messages from bluetoothd of the form:
->>
->> bluetoothd[3867]: src/adapter.c:device_found_callback() hci0 addr
->> D0:4F:7E:2B:74:31, rssi -91 flags 0x0000 eir_len 15
->>
->> while only seeing a single PropertiesChanged signal from dbus-monitor
->> with an RSSI update.
->
-> That's because by default there is a threshold of 8db:
->
-> #define RSSI_THRESHOLD 8
->
-> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/src/device.c#n88
->
-> So if RSSI is changed less than 8dB you don't get any updates through D-Bus.
->
-> If you want to get updates through D-Bus, you should call
-> SetDiscoveryFilter first, see doc:
-> "If one or more discovery filters have been set, the RSSI
-> delta-threshold, that is imposed by StartDiscovery by default, will
-> not be applied."
-> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/adapter-api.txt#n48
->
->
-> Can I ask what kind of controller do you use ? Some just don't do
-> packet deduplication during scan, and would report all  packets
-> received, that would explain flow of events from kernel.
->
-> Jakub
->
->>
->> Neil
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-- 
+Luiz Augusto von Dentz
