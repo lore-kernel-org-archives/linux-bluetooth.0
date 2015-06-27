@@ -1,38 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
-	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, Jiri Kosina
-	<trivial@kernel.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth:bt3c_cs: Fix trivial coding style
-Date: Sat, 27 Jun 2015 10:38:02 +0000
-Message-ID: <20150627103752.GA24421@developmental>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <558DE8B3.3060102@gmail.com>
+Date: Sat, 27 Jun 2015 02:05:07 +0200
+From: Florian Grandel <fgrandel@gmail.com>
 MIME-Version: 1.0
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Szymon Janc <Szymon.Janc@tieto.com>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Peripheral role support for android
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Prasanna Karthik <mkarthi3@visteon.com>
+Hi guys,
 
-Remove semicolon in switch statement, reported by coccinelle
+the whole point of adding the multi adv feature to the kernel was trying 
+to support the peripheral role on my nexus 4.
 
-Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
----
- drivers/bluetooth/bt3c_cs.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Now that multi adv made it into the kernel, I'd like to add the missing 
+pieces to the android userspace sub-project in bluez.
 
-diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
-index 7aab654..a00bb82 100644
---- a/drivers/bluetooth/bt3c_cs.c
-+++ b/drivers/bluetooth/bt3c_cs.c
-@@ -427,7 +427,7 @@ static int bt3c_hci_send_frame(struct hci_dev *hdev, st=
-ruct sk_buff *skb)
- 	case HCI_SCODATA_PKT:
- 		hdev->stat.sco_tx++;
- 		break;
--	};
-+	}
-=20
- 	/* Prepend skb with frame type */
- 	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
---=20
-1.7.9.5
+Here are the todos I identified so far:
+
+1) kernel backports: provide patches necessary to support the current 
+linux-next master (I did this already... - patches all supplied to the 
+backports project and msm kernel + modules compiled on my machine)
+
+2) android/bluetooth: implement bt_le_read_adv_features() to retrieve 
+num supported instances from the kernel
+
+3) android/bluetooth: change prepare_le_features() to retrieve the max 
+number of adv instances from the kernel and save it to the adapter 
+struct - will use bt_le_read_adv_features()
+
+4) android/gatt: change [un]register_app() to correctly manage app ids 
+(aka instance ids) in the permitted range including appropriate error 
+handling when the max number of instances is reached
+
+5) android/bluetooth: implement bt_le_{add|remove}_advertising() to 
+support the new multi-adv features in the kernel
+
+6) android/gatt: implement the handle*multi_adv*() methods using 
+bt_le_{add|remove}_advertising()
+
+7) android/tester-{bluetooth|gatt}: write supporting tests
+
+Do you agree that this should suffice to support basic advertising 
+features in Lollipop? Is there anything important missing?
+
+AFAICS there is (at least) one catch: the kernel does not support 
+setting custom values for min/max adv interval, channel map, tx power, 
+etc. while the HAL API seems to expect per-instance setup of these 
+values. How should we deal with this? Should we ignore these values? Or 
+should we error out with a NOT_SUPPORTED error if they are different 
+from the kernel defaults?
+
+Please let me know whether you agree to that roadmap and what you think 
+about the unsupported features. Is it ok if I try to tackle these todos? 
+Or is someone working on this already?
+
+Florian
