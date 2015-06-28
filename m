@@ -1,118 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <BLU436-SMTP4499391DA658335C8089499EAB0@phx.gbl>
+From: Xi Ruoyao <xry111@outlook.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Larry Finger <Larry.Finger@lwfinger.net>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Xi Ruoyao <xry111@outlook.com>
+Subject: [PATCH RESEND] Bluetooth: btusb: Modify entry to support misc devices with BT interface
+Date: Mon, 29 Jun 2015 05:49:32 +0800
 MIME-Version: 1.0
-In-Reply-To: <CABKPALpNgv90zkCpAu+GDfzJy95m71p1spD-0qMfDJ-9TOOGXw@mail.gmail.com>
-References: <CABKPALpbGG8vXj+10MuG97wZaHoDJBhj5MtrKjfJQhQ_xbpp1Q@mail.gmail.com>
-	<CAD0=r8wkU8NZ6zfQ=Aq0aSvPAnPN=nwmz6NHLygd1UiV3ScyPQ@mail.gmail.com>
-	<CABKPALoH6oOFEzHpA4DMtsZSqGUdg88ODQWdJ_1uLEOkQc5u=Q@mail.gmail.com>
-	<CABKPALpNgv90zkCpAu+GDfzJy95m71p1spD-0qMfDJ-9TOOGXw@mail.gmail.com>
-Date: Mon, 29 Jun 2015 01:16:04 +0300
-Message-ID: <CABBYNZLaS3C6pP57mOFRsE+ifRdWfzvUeJhcQTGL38rJODjgdA@mail.gmail.com>
-Subject: Re: Another PropertiesChanged observation
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Neil Martin <neil@vnp.com>
-Cc: Jakub Pawlowski <jpawlowski@google.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Neil,
+In the USB device table in btusb driver, the code specify a generic Bluetooth
+device by matching Device Descriptor. However, some devices with BT interface
+are classified as "Miscellaneous Device" and have different Device Descriptor,
+such as Realtek RTL8723AU. Then btusb wouldn't probe them.
 
-On Sat, Jun 27, 2015 at 4:44 PM, Neil Martin <neil@vnp.com> wrote:
-> Now I've had a chance to try this, I'm not sure I'm able to do what I
-> want, if I'm reading the docs correctly.  The docs seem to imply that
-> RSSI filtering only works when UUIDs are set.  In my case, the devices
-> aren't advertising services.  I did try setting RSSI by itself, but
-> the result was that I got no PropertiesChanged signals at all.  Am I
-> missing something?
->
-> As a general comment, I'd say that the hardcoded 8db delta is a bad
-> idea.  Firstly, 8 is an arbitrary choice.  Also, it seems to me that
-> it would be desirable to have two values settable through the filter
-> for RSSI - 1) the delta and 2) the absolute threshold.  That would
-> make this feature a lot more flexible.  It also seems desirable to be
-> able to filter independent of UUIDs, but maybe I'm misinterpreting the
-> docs.
+To resolve this, specify generic Bluetooth device in the USB device table by
+matching Interface Descriptor, to probe all devices with Bluetooth interface
+including these "Miscellaneous" ones.
 
-No top posting on this list please.
+Signed-off-by: Xi Ruoyao <xry111@outlook.com>
+---
+The Bluetooth USB driver changed a lot since 4.1 released. However this problem
+still exists now, so I think I should resend this patch.
 
-Afaik 8 was chosen just to reduce the verbosity since normally this
-would cause the UI to perhaps jump too frequently if filtering by
-RSSI, making it slow and spamming other processes connected to the
-bus, also note that the RSSI alone is not meaningful either, you need
-the transmission power to calculate the path loss, etc, if you want to
-calculate the distance. That said Ive experimented with RSSI results a
-few times and different controllers do report different values, you
-can do that even simultaneously with BlueZ with 2 Bluetooth dongles
-plugged, so the RSSI shall only be used relative to the other results
-with the same controller, which if I recall is something we already
-take into account so if the RSSI change would cause a device to change
-its position relative to the other devices found we emit a signal.
+After apply this patch, my RTL8723AU works well. This is the info of the RTL8723AU
+USB device:
 
-> Neil
->
-> On Fri, Jun 26, 2015 at 7:34 AM, Neil Martin <neil@vnp.com> wrote:
->> Hi Jakub,
->>
->> Thanks for the response.  That makes sense - I'll give that a try.
->>
->> I'm running this on a Raspberry Pi with a Medialink USB adapter which
->> (I believe) has a Broadcom chipset.
->>
->> Neil
->>
->> On Thu, Jun 25, 2015 at 9:30 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->>> Hi Neil,
->>>
->>> On Thu, Jun 25, 2015 at 2:53 PM, Neil Martin <neil@vnp.com> wrote:
->>>> Hi,
->>>>
->>>> I've noticed that the bluetoothd console output shows a steady stream
->>>> of RSSI updates, yet only a fraction of these seem to translate into a
->>>> DBus PropertiesChanged signal.
->>>>
->>>> I've just seen 50 or so messages from bluetoothd of the form:
->>>>
->>>> bluetoothd[3867]: src/adapter.c:device_found_callback() hci0 addr
->>>> D0:4F:7E:2B:74:31, rssi -91 flags 0x0000 eir_len 15
->>>>
->>>> while only seeing a single PropertiesChanged signal from dbus-monitor
->>>> with an RSSI update.
->>>
->>> That's because by default there is a threshold of 8db:
->>>
->>> #define RSSI_THRESHOLD 8
->>>
->>> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/src/device.c#n88
->>>
->>> So if RSSI is changed less than 8dB you don't get any updates through D-Bus.
->>>
->>> If you want to get updates through D-Bus, you should call
->>> SetDiscoveryFilter first, see doc:
->>> "If one or more discovery filters have been set, the RSSI
->>> delta-threshold, that is imposed by StartDiscovery by default, will
->>> not be applied."
->>> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/adapter-api.txt#n48
->>>
->>>
->>> Can I ask what kind of controller do you use ? Some just don't do
->>> packet deduplication during scan, and would report all  packets
->>> received, that would explain flow of events from kernel.
->>>
->>> Jakub
->>>
->>>>
->>>> Neil
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+T:  Bus=03 Lev=02 Prnt=02 Port=03 Cnt=03 Dev#=  5 Spd=480  MxCh= 0
+D:  Ver= 2.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bda ProdID=1724 Rev= 2.00
+S:  Manufacturer=Realtek
+S:  Product=802.11n WLAN Adapter
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=500mA
+A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
+ drivers/bluetooth/btusb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b4cf8d9..950afda 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -63,7 +63,7 @@ static struct usb_driver btusb_driver;
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+-	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
++	{ USB_INTERFACE_INFO(0xe0, 0x01, 0x01) },
+ 
+ 	/* Generic Bluetooth AMP device */
+ 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x04), .driver_info = BTUSB_AMP },
 -- 
-Luiz Augusto von Dentz
+1.9.1
