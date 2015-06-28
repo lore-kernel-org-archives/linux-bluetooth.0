@@ -3,8 +3,8 @@ From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 81821] btusb logs error drivers/base/firmware_class.c:1105
  _request_firmware+0x431/0x7b0()
-Date: Sun, 28 Jun 2015 21:22:34 +0000
-Message-ID: <bug-81821-62941-AoEDvtqxvw@https.bugzilla.kernel.org/>
+Date: Sun, 28 Jun 2015 21:21:24 +0000
+Message-ID: <bug-81821-62941-iL3qB56yS9@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-81821-62941@https.bugzilla.kernel.org/>
 References: <bug-81821-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -18,8 +18,8 @@ am1 <alexander.meinhardt+forum@gmail.com> changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
- Attachment #181211|text/plain                  |application/octet-stream
-          mime type|                            |
+ Attachment #181211|1                           |0
+           is patch|                            |
 
 -- 
 You are receiving this mail because:
