@@ -1,119 +1,407 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CACVxJT9JLjghmayrkA+0X0Bi4iKmiyy6Xf58ABNjXSaOR+ZRDw@mail.gmail.com>
-References: <CADDKRnA4-h61=Tp90Cgj7GsAOZhBX6Dr0ka_CncrCrHDbWLcvw@mail.gmail.com>
-	<986DE56C-2E79-4CAD-9D32-89DAED9B449A@holtmann.org>
-	<CADDKRnCAj1BrmZzO6ys3zXmPJgaFnppARjU6VvVJf9Aiox7+Ww@mail.gmail.com>
-	<CADDKRnDchGURbrxt=herCnLiLfcqrRt=s_wMoBpuG25Ae32WYg@mail.gmail.com>
-	<CADDKRnCx4AM9jnf5HfbkB0iNQqxsyLCTozCrasF2c8e7V2K_gw@mail.gmail.com>
-	<20150628160930.GA1663@p183.telecom.by>
-	<CADDKRnAfsqY-9fVs_TRvuJMRi5=ByrMGtbytKDJadSSckcQ-fw@mail.gmail.com>
-	<CACVxJT9JLjghmayrkA+0X0Bi4iKmiyy6Xf58ABNjXSaOR+ZRDw@mail.gmail.com>
-Date: Mon, 29 Jun 2015 16:37:32 +0200
-Message-ID: <CADDKRnB6eXTSB6jCrDjLRqbJJsBkP0CqJDRd3V==N7tGiuYXtw@mail.gmail.com>
-Subject: Re: [4.1.0-07254-gc13c810] Regression: Bluetooth not working.
-From: =?UTF-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>
-To: Alexey Dobriyan <adobriyan@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-	inux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [RFC v3] doc: Add initial Network Management API definition
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1434962366-10791-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 29 Jun 2015 16:24:17 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <AAEF3A5A-CAFE-4C19-AFA6-A3BC9A8527B3@holtmann.org>
+References: <1434962366-10791-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2015-06-29 12:30 GMT+02:00 Alexey Dobriyan <adobriyan@gmail.com>:
-> On Mon, Jun 29, 2015 at 12:00 PM, J=C3=B6rg Otte <jrg.otte@gmail.com> wro=
-te:
->> 2015-06-28 18:09 GMT+02:00 Alexey Dobriyan <adobriyan@gmail.com>:
->>> On Sun, Jun 28, 2015 at 05:36:04PM +0200, J=C3=B6rg Otte wrote:
->>>> 2015-06-26 16:28 GMT+02:00 J=C3=B6rg Otte <jrg.otte@gmail.com>:
->>>> > 2015-06-26 12:03 GMT+02:00 J=C3=B6rg Otte <jrg.otte@gmail.com>:
->>>> >> 2015-06-26 11:37 GMT+02:00 Marcel Holtmann <marcel@holtmann.org>:
->>>> >>> Hi Joerg,
->>>> >>>
->>>> >>>> Bluetooth is inoperable in current Linus tree and the
->>>> >>>> first bad commit is:
->>>> >>>>
->>>> >>>> 835a6a2f8603237a3e6cded5a6765090ecb06ea5 is the first bad commit
->>>> >>>> commit 835a6a2f8603237a3e6cded5a6765090ecb06ea5
->>>> >>>> Author: Alexey Dobriyan <adobriyan@gmail.com>
->>>> >>>> Date:   Wed Jun 10 20:28:33 2015 +0300
->>>> >>>>
->>>> >>>>    Bluetooth: Stop sabotaging list poisoning
->>>> >>>>
->>>> >>>>    list_del() poisons pointers with special values, no need to ov=
-erwrite them.
->>>> >>>>
->>>> >>>>    Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
->>>> >>>>    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->>>> >>>>
->>>> >>>> My BT adapter is an intel 8087:07da
->>>> >>>> I reverted that commit and this fixed the problem for me.
->>>> >>>
->>>> >>> today we had a patch from Tedd fixing the list initialization in t=
-he HIDP code.
->>>> >>>
->>>> >>> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
->>>> >>> index 9070dfd6b4ad..f1a117f8cad2 100644
->>>> >>> --- a/net/bluetooth/hidp/core.c
->>>> >>> +++ b/net/bluetooth/hidp/core.c
->>>> >>> @@ -915,6 +915,7 @@ static int hidp_session_new(struct hidp_sessio=
-n **out, const bdaddr_t *bdaddr,
->>>> >>>         session->conn =3D l2cap_conn_get(conn);
->>>> >>>         session->user.probe =3D hidp_session_probe;
->>>> >>>         session->user.remove =3D hidp_session_remove;
->>>> >>> +       INIT_LIST_HEAD(&session->user.list);
->>>> >>>         session->ctrl_sock =3D ctrl_sock;
->>>> >>>         session->intr_sock =3D intr_sock;
->>>> >>>         skb_queue_head_init(&session->ctrl_transmit);
->>>> >>>
->>>> >>> Could this be fixing it for you as well?
->>>> >>>
->>>> >> I will check this when I am at home in the
->>>> >> afternoon.
->>>> >>
->>>> >
->>>> > The patch works for me too.
->>>> >
->>>> Ok, this was a little bit hasty!
->>>> I now see the following additional problems:
->>>>
->>>> - System freeze on resume (occures always).
->>>> - System freeze on shutdown (occures sometimes)
->>>> - System freeze when BT-mouse is connecting (occures sometimes).
->>>>
->>>> Then I can't do anything except power off.
->>>>
->>>> This happens only if Bluetooth AND BT-mouse is activated.
->>>
->>> OK, what happens if you just revert only list_del patch?
->>
->> I have applied this patch:
->>
->> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
->> index 9070dfd6b4ad..f1a117f8cad2 100644
->> --- a/net/bluetooth/hidp/core.c
->> +++ b/net/bluetooth/hidp/core.c
->> @@ -915,6 +915,7 @@ static int hidp_session_new(struct hidp_session
->> **out, const bdaddr_t *bdaddr,
->>         session->conn =3D l2cap_conn_get(conn);
->>         session->user.probe =3D hidp_session_probe;
->>         session->user.remove =3D hidp_session_remove;
->> +       INIT_LIST_HEAD(&session->user.list);
->>         session->ctrl_sock =3D ctrl_sock;
->>         session->intr_sock =3D intr_sock;
->>         skb_queue_head_init(&session->ctrl_transmit);
->>
->> without this patch bluetooth doesn't work at all for me.
->
-> Sure.
->
-> Please drop this patch, and do
->
->   git-revert 835a6a2f8603237a3e6cded5a6765090ecb06ea5
->
-> Maybe it's some other changes causing hangs.
+Hi Johan,
 
-Looks good so far. The system freeze on resume is gone.
+> This was formerly known as "doc: Add initial 6LoWPAN API definition".
+> It now has a more generic name so that other Networking profiles could
+> potentially be included behind the same channel in the future. I've
+> skipped event code 0x03 ("HW Error") since we couldn't reach concensus
+> there. So 0x03 is effectively a "reserved" value for now.
+> 
+> Makefile.am              |   2 +-
+> doc/network-mgmt-api.txt | 326 +++++++++++++++++++++++++++++++++++++++++++++++
+> 2 files changed, 327 insertions(+), 1 deletion(-)
+> create mode 100644 doc/network-mgmt-api.txt
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index 76d17239783f..d322117dabec 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -243,7 +243,7 @@ EXTRA_DIST += doc/assigned-numbers.txt doc/supported-features.txt \
+> 				doc/test-runner.txt \
+> 				doc/settings-storage.txt
+> 
+> -EXTRA_DIST += doc/mgmt-api.txt \
+> +EXTRA_DIST += doc/mgmt-api.txt doc/network-mgmt-api.txt \
+> 		doc/adapter-api.txt doc/device-api.txt \
+> 		doc/agent-api.txt doc/profile-api.txt \
+> 		doc/network-api.txt doc/media-api.txt \
+> diff --git a/doc/network-mgmt-api.txt b/doc/network-mgmt-api.txt
+> new file mode 100644
+> index 000000000000..29e506c8283b
+> --- /dev/null
+> +++ b/doc/network-mgmt-api.txt
+> @@ -0,0 +1,326 @@
+> +Network Management API
+> +**********************
+> +
+> +Copyright (C) 2015  Intel Corporation
+> +
+> +
+> +Overview
+> +========
+> +
+> +The Network Management API follows largely the same principles as the main
+> +Bluetooth Management API described in mgmt-api.txt. The main difference is
+> +a separate namespace for command and event codes, distinguished by using
+> +HCI_CHANNEL_NETWORK rather than HCI_CHANNEL_CONTROL when creating the mgmt
+> +socket.
+> +
+> +
+> +Read Version Information Command
+> +================================
+> +
+> +	Command Code:		0x0001
+> +	Controller Index:	<non-controller>
+> +	Command Parameters:
+> +	Return Parameters:	Version (1 Octets)
+> +				Revision (2 Octets)
+> +
+> +	This command returns the Network Management version and
+> +	revision. In addition to being informational the information can
+> +	be used to determine whether certain behavior has changed or
+> +	bugs fixed when interacting with the kernel.
+> +
+> +	This command generates a Command Complete event on success or
+> +	a Command Status event on failure.
+> +
+> +
+> +Read Supported Commands Command
+> +===============================
+> +
+> +	Command Code:		0x0002
+> +	Controller Index:	<non-controller>
+> +	Command Parameters:
+> +	Return Parameters:	Num_Of_Commands (2 Octets)
+> +				Num_Of_Events (2 Octets)
+> +				Command1 (2 Octets)
+> +				Command2 (2 Octets)
+> +				...
+> +				Event1 (2 Octets)
+> +				Event2 (2 Octets)
+> +				...
+> +
+> +	This command returns the list of supported Network commands
+> +	and events.
+> +
+> +	The commands Read Version Information and Read Supported
+> +	Commands are not included in this list. Both commands are always
+> +	supported and mandatory.
+> +
+> +	The events Command Status and Command Complete are not included
+> +	in this list. Both are implicit and mandatory.
+> +
+> +	This command generates a Command Complete event on success or
+> +	a Command Status event on failure.
+> +
+> +
+> +Read Controller Index List Command
+> +==================================
+> +
+> +	Command Code:		0x0003
+> +	Controller Index:	<non-controller>
+> +	Command Parameters:
+> +	Return Parameters:	Num_Controllers (2 Octets)
+> +				Controller_Index[i] (2 Octets)
+> +
+> +	This command returns the list of currently known controllers
+> +	that can be used for Network connections. Controllers added or
+> +	removed after calling this command can be monitored using the
+> +	Index Added and Index Removed events.
+> +
+> +	This command generates a Command Complete event on success or
+> +	a Command Status event on failure.
+> +
+> +
+> +Read Controller Information Command
+> +===================================
+> +
+> +	Command Code:		0x0004
+> +	Controller Index:	<controller id>
+> +	Command Parameters:
+> +	Return Parameters:	Address (6 Octets)
+> +				Address_Type (6 Octets)
+> +				Supported_Settings (4 Octets)
+> +				Current_Settings (4 Octets)
+> +				6LoWPAN_Interface_Index (4 Octets)
+> +
+> +	This command is used to retreive the current state and basic
+> +	information of a controller. It is typically used right after
+> +	getting the response to the Read Controller Index List command
+> +	or an Index Added event.
+> +
+> +	Current_Settings and Supported_Settings is a bitmask with
+> +	currently the following available bits:
+> +
+> +		0	6LoWPAN
+> +		1	6LoWPAN Server (Node)
+> +
+> +	The 6LoWPAN_Interface_Index parameter value is only valid if the
+> +	6LoWPAN settings bit is set in the Current_Settings, otherwise
+> +	it should be ignored.
 
-Thanks, J=C3=B6rg
+I have no idea what this is going to do. I wonder if should really have this in this command. Especially since the index might be even there if it is not enabled yet. This sound more like a parameter that should be returned by an individual command or when enabling the 6LoWPAN support.
+
+On a site note, we might need to stay away from calling this 6LoWPAN since the IETF is not even sure how they want to name stuff. Some comments say that 6LoWPAN is for 802.15.4 and 6LoBTLE or similar will be for LE. So it might be better to start using generic terms like 6lo, IPv6 and IPSP.
+
+> +	This command generates a Command Complete event on success or
+> +	a Command Status event on failure.
+> +
+> +	Possible errors:	Invalid Parameters
+> +				Invalid Index
+> +
+> +
+> +Connect 6LoWPAN Command
+> +=======================
+> +
+> +	Command Code:		0x0005
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +	Return Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +
+> +	This command is used to connect to a remote 6LoWPAN Node.
+
+Same as above, we might better just call this IPSP or Connect Internet Protocol.
+
+One additional thing could be that we just return the interface index this new connection is using. I think that could be beneficial. Especially if we would actually create the 6lo interface for each controller on demand. Which might makes sense in case we only ever have client connections.
+
+> +
+> +	Possible values for the Address_Type parameter:
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	This command generates a Command Complete event on success
+> +	or failure.
+> +
+> +	Possible errors:	Busy
+> +				Refused
+> +				Invalid Parameters
+> +				Not Powered
+> +				Invalid Index
+
+Don't we miss an already connected error here?
+
+> +
+> +
+> +Disconnect 6LoWPAN Command
+> +==========================
+> +
+> +	Command Code:		0x0006
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +	Return Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +
+> +	This command is used to disconnect from a remote 6LoWPAN device.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	This command generates a Command Complete event on success
+> +	or failure.
+> +
+> +	Possible errors:	Busy
+> +				Not Connected
+> +				Invalid Parameters
+> +				Not Powered
+> +				Invalid Index
+> +
+> +
+> +Get 6LoWPAN Connections Command
+> +===============================
+> +
+> +	Command Code:		0x0007
+> +	Controller Index:	<controller id>
+> +	Command Parameters:
+> +	Return Parameters:	Connection_Count (2 Octets)
+> +				Address1 {
+> +					Address (6 Octets)
+> +					Address_Type (1 Octet)
+> +				}
+> +				Address2 { }
+> +				...
+
+We could include the interface index here. Since you really want to know the interface index and what connections belong to it.
+
+> +
+> +	This command is used to retrieve a list of currently connected
+> +	6LoWPAN devices.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	For devices using resolvable random addresses with a known
+> +	identity resolving key, the Address and Address_Type will
+> +	contain the identity information.
+> +
+> +	This command can only be used when the controller is powered.
+> +
+> +	This command generates a Command Complete event on success or
+> +	a Command Status event on failure.
+> +
+> +	Possible errors:	Invalid Parameters
+> +				Not Powered
+> +				Invalid Index
+> +
+> +
+> +Enable 6LoWPAN Server Command
+> +=============================
+> +
+> +	Command Code:		0x0008
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Enable (1 Octet)
+> +	Return Parameters:	Current_Settings (4 Octets)
+
+As mentioned above, I might have included the interface index here.
+
+> +
+> +	This command is used start a 6LoWPAN Server (Node rols) on a
+> +	specified controller.
+> +
+> +	This command generates a Command Complete event on success or
+> +	a Command Status event on failure.
+> +
+> +	Possible errors:	Busy
+> +				Invalid Index
+
+Since this does enable and disable, I think this should be rather called Set Internet Protocol Gateway or something similar. I am even fine with using the terms client and server.
+
+I think we also want this command to start advertising. So it should grab an instance in the multi-advertising feature and add the IPSP service. Might be also an option to the command to selective choose if it advertises. Maybe as 0x02 option.
+
+> +
+> +
+> +Command Complete Event
+> +======================
+> +
+> +	Event Code:		0x0001
+> +	Controller Index:	<controller id> or <non-controller>
+> +	Event Parameters:	Command_Opcode (2 Octets)
+> +				Status (1 Octet)
+> +				Return_Parameters
+> +
+> +	This event is an indication that a command has completed. The
+> +	fixed set of parameters includes the opcode to identify the
+> +	command that completed as well as a status value to indicate
+> +	success or failure. The rest of the parameters are command
+> +	specific and documented in the section for each command
+> +	separately.
+> +
+> +
+> +Command Status Event
+> +====================
+> +
+> +	Event Code:		0x0002
+> +	Controller Index:	<controller id> or <non-controller>
+> +	Event Parameters:	Command_Opcode (2 Octets)
+> +				Status (1 Octet)
+> +
+> +	The command status event is used to indicate an early status for
+> +	a pending command. In the case that the status indicates failure
+> +	(anything else except success status) this also means that the
+> +	command has finished executing.
+> +
+> +
+> +Index Added Event
+> +=================
+> +
+> +	Event Code:		0x0004
+> +	Controller Index:	<controller id>
+> +	Event Parameters:
+> +
+> +	This event indicates that a new Networking capable controller
+> +	has been added to the system. It is usually followed by a Read
+> +	Controller Information command.
+> +
+> +
+> +Index Removed Event
+> +===================
+> +
+> +	Event Code:		0x0005
+> +	Controller Index:	<controller id>
+> +	Event Parameters:
+> +
+> +	This event indicates that a Network-capable controller has been
+> +	removed from the system.
+> +
+> +
+> +New Settings Event
+> +==================
+> +
+> +	Event Code:		0x0006
+> +	Controller Index:	<controller id>
+> +	Event Parameters:	Current_Settings (4 Octets)
+> +
+> +	This event indicates that one or more of the settings for a
+> +	controller has changed.
+> +
+> +
+> +6LoWPAN Connected Event
+> +=======================
+> +
+> +	Event Code:		0x0007
+> +	Controller Index:	<controller id>
+> +	Event Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +
+> +	This event indicates that a successful 6LoWPAN connection has
+> +	been created to the remote device.
+> +
+> +	For devices using resolvable random addresses with a known
+> +	identity resolving key, the Address and Address_Type will
+> +	contain the identity information.
+
+This would also be a good candidate for including the interface index.
+
+> +
+> +
+> +6LoWPAN Disconnected Event
+> +==========================
+> +
+> +	Event Code:		0x0008
+> +	Controller Index:	<controller id>
+> +	Event Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +				Reason (1 Octet)
+> +
+> +	This event indicates that the 6LoWPAN connection was lost to a
+> +	remote device.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	For devices using resolvable random addresses with a known
+> +	identity resolving key, the Address and Address_Type will
+> +	contain the identity information.
+> +
+> +	Possible values for the Reason parameter:
+> +		0	Unspecified
+> +		1	Connection timeout
+> +		2	Connection terminated by local host
+> +		3	Connection terminated by remote host
+
+I wonder what we are doing with this reason. The core API had some good uses for this. I am not sure this one is a good one.
+
+The way I am seeing this is that we should have an automatic mode to connect to all IPSP service we find. Which of course means we keep scanning in the background. And another one where the kernel scans and connects to known device. So something similar to Add Device where userspace that includes known devices and then the kernel will connect them when found. We could include a limited to only connect to n device. So by default only 1 IPSP device and when disconnected, it tries to find another one.
+
+Regards
+
+Marcel
+
