@@ -1,113 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Zheng, Wu" <wu.zheng@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: how to use "example-gatt-server" test gatt?
+Date: Mon, 29 Jun 2015 09:00:31 +0000
+Message-ID: <2CF57A644018A745B8FE029C7223E16E11A34AE9@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <CADDKRnAfsqY-9fVs_TRvuJMRi5=ByrMGtbytKDJadSSckcQ-fw@mail.gmail.com>
-References: <CADDKRnA4-h61=Tp90Cgj7GsAOZhBX6Dr0ka_CncrCrHDbWLcvw@mail.gmail.com>
-	<986DE56C-2E79-4CAD-9D32-89DAED9B449A@holtmann.org>
-	<CADDKRnCAj1BrmZzO6ys3zXmPJgaFnppARjU6VvVJf9Aiox7+Ww@mail.gmail.com>
-	<CADDKRnDchGURbrxt=herCnLiLfcqrRt=s_wMoBpuG25Ae32WYg@mail.gmail.com>
-	<CADDKRnCx4AM9jnf5HfbkB0iNQqxsyLCTozCrasF2c8e7V2K_gw@mail.gmail.com>
-	<20150628160930.GA1663@p183.telecom.by>
-	<CADDKRnAfsqY-9fVs_TRvuJMRi5=ByrMGtbytKDJadSSckcQ-fw@mail.gmail.com>
-Date: Mon, 29 Jun 2015 13:30:32 +0300
-Message-ID: <CACVxJT9JLjghmayrkA+0X0Bi4iKmiyy6Xf58ABNjXSaOR+ZRDw@mail.gmail.com>
-Subject: Re: [4.1.0-07254-gc13c810] Regression: Bluetooth not working.
-From: Alexey Dobriyan <adobriyan@gmail.com>
-To: =?UTF-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-	inux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jun 29, 2015 at 12:00 PM, J=C3=B6rg Otte <jrg.otte@gmail.com> wrote=
-:
-> 2015-06-28 18:09 GMT+02:00 Alexey Dobriyan <adobriyan@gmail.com>:
->> On Sun, Jun 28, 2015 at 05:36:04PM +0200, J=C3=B6rg Otte wrote:
->>> 2015-06-26 16:28 GMT+02:00 J=C3=B6rg Otte <jrg.otte@gmail.com>:
->>> > 2015-06-26 12:03 GMT+02:00 J=C3=B6rg Otte <jrg.otte@gmail.com>:
->>> >> 2015-06-26 11:37 GMT+02:00 Marcel Holtmann <marcel@holtmann.org>:
->>> >>> Hi Joerg,
->>> >>>
->>> >>>> Bluetooth is inoperable in current Linus tree and the
->>> >>>> first bad commit is:
->>> >>>>
->>> >>>> 835a6a2f8603237a3e6cded5a6765090ecb06ea5 is the first bad commit
->>> >>>> commit 835a6a2f8603237a3e6cded5a6765090ecb06ea5
->>> >>>> Author: Alexey Dobriyan <adobriyan@gmail.com>
->>> >>>> Date:   Wed Jun 10 20:28:33 2015 +0300
->>> >>>>
->>> >>>>    Bluetooth: Stop sabotaging list poisoning
->>> >>>>
->>> >>>>    list_del() poisons pointers with special values, no need to ove=
-rwrite them.
->>> >>>>
->>> >>>>    Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
->>> >>>>    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->>> >>>>
->>> >>>> My BT adapter is an intel 8087:07da
->>> >>>> I reverted that commit and this fixed the problem for me.
->>> >>>
->>> >>> today we had a patch from Tedd fixing the list initialization in th=
-e HIDP code.
->>> >>>
->>> >>> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
->>> >>> index 9070dfd6b4ad..f1a117f8cad2 100644
->>> >>> --- a/net/bluetooth/hidp/core.c
->>> >>> +++ b/net/bluetooth/hidp/core.c
->>> >>> @@ -915,6 +915,7 @@ static int hidp_session_new(struct hidp_session=
- **out, const bdaddr_t *bdaddr,
->>> >>>         session->conn =3D l2cap_conn_get(conn);
->>> >>>         session->user.probe =3D hidp_session_probe;
->>> >>>         session->user.remove =3D hidp_session_remove;
->>> >>> +       INIT_LIST_HEAD(&session->user.list);
->>> >>>         session->ctrl_sock =3D ctrl_sock;
->>> >>>         session->intr_sock =3D intr_sock;
->>> >>>         skb_queue_head_init(&session->ctrl_transmit);
->>> >>>
->>> >>> Could this be fixing it for you as well?
->>> >>>
->>> >> I will check this when I am at home in the
->>> >> afternoon.
->>> >>
->>> >
->>> > The patch works for me too.
->>> >
->>> Ok, this was a little bit hasty!
->>> I now see the following additional problems:
->>>
->>> - System freeze on resume (occures always).
->>> - System freeze on shutdown (occures sometimes)
->>> - System freeze when BT-mouse is connecting (occures sometimes).
->>>
->>> Then I can't do anything except power off.
->>>
->>> This happens only if Bluetooth AND BT-mouse is activated.
->>
->> OK, what happens if you just revert only list_del patch?
->
-> I have applied this patch:
->
-> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> index 9070dfd6b4ad..f1a117f8cad2 100644
-> --- a/net/bluetooth/hidp/core.c
-> +++ b/net/bluetooth/hidp/core.c
-> @@ -915,6 +915,7 @@ static int hidp_session_new(struct hidp_session
-> **out, const bdaddr_t *bdaddr,
->         session->conn =3D l2cap_conn_get(conn);
->         session->user.probe =3D hidp_session_probe;
->         session->user.remove =3D hidp_session_remove;
-> +       INIT_LIST_HEAD(&session->user.list);
->         session->ctrl_sock =3D ctrl_sock;
->         session->intr_sock =3D intr_sock;
->         skb_queue_head_init(&session->ctrl_transmit);
->
-> without this patch bluetooth doesn't work at all for me.
+Hi all,
 
-Sure.
+1. I use the latest version of Bluez and run as "bluetoothd  -Edn" to test gatt.
 
-Please drop this patch, and do
+2. I try to use example-gatt-server to test it.
 
-  git-revert 835a6a2f8603237a3e6cded5a6765090ecb06ea5
+However, it failed. Please check the following log.
 
-Maybe it's some other changes causing hangs.
+Run "Bluetooth -Edn"
+"
+bluetoothd[17456]: src/gatt-database.c:manager_register_service() Registering service - path: /org/bluez/example/service0
+bluetoothd[17456]: src/gatt-database.c:manager_register_service() Registering service - path: /org/bluez/example/service1
+bluetoothd[17456]: src/gatt-database.c:manager_register_service() Registering service - path: /org/bluez/example/service2
+bluetoothd[17456]: src/gatt-database.c:client_disconnect_cb() Client disconnected
+bluetoothd[17456]: src/gatt-database.c:client_disconnect_cb() Client disconnected
+bluetoothd[17456]: src/gatt-database.c:client_disconnect_cb() Client disconnected
+"
+
+Then Run "./example-gatt-server"
+"
+./example-gatt-server 
+Battery Level drained: 98
+Battery Level drained: 96
+Battery Level drained: 94
+Battery Level drained: 92
+Failed to register service: org.freedesktop.DBus.Error.NoReply: Did not receive a reply. Possible causes include: the remote application did not send a reply, the message bus security policy blocked the reply, the reply timeout expired, or the network connection was broken. 
+"
+
+After checked the source code, I find that "RegisterService" not return the dbus message and only after invoking client_ready_cb, the dbus message is returned.
+
+I missed some steps to test it? Please help. Thanks.
+
+Best Regards
+Zheng Wu
