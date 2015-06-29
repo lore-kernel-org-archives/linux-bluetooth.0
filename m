@@ -1,668 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <FC4BEED9-8DB3-474D-923A-425076101D1C@holtmann.org>
-References: <1435188850-14969-1-git-send-email-jpawlowski@google.com>
-	<1435188850-14969-2-git-send-email-jpawlowski@google.com>
-	<FC4BEED9-8DB3-474D-923A-425076101D1C@holtmann.org>
-Date: Mon, 29 Jun 2015 11:05:01 -0700
-Message-ID: <CAD0=r8yJ-5KXRAL7K8eK7eoJAtXeCoijn1UdVFgqv1KayCQJTw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] Bluetooth: Fix connection to already paired device.
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CACVxJT9JLjghmayrkA+0X0Bi4iKmiyy6Xf58ABNjXSaOR+ZRDw@mail.gmail.com>
+References: <CADDKRnA4-h61=Tp90Cgj7GsAOZhBX6Dr0ka_CncrCrHDbWLcvw@mail.gmail.com>
+	<986DE56C-2E79-4CAD-9D32-89DAED9B449A@holtmann.org>
+	<CADDKRnCAj1BrmZzO6ys3zXmPJgaFnppARjU6VvVJf9Aiox7+Ww@mail.gmail.com>
+	<CADDKRnDchGURbrxt=herCnLiLfcqrRt=s_wMoBpuG25Ae32WYg@mail.gmail.com>
+	<CADDKRnCx4AM9jnf5HfbkB0iNQqxsyLCTozCrasF2c8e7V2K_gw@mail.gmail.com>
+	<20150628160930.GA1663@p183.telecom.by>
+	<CADDKRnAfsqY-9fVs_TRvuJMRi5=ByrMGtbytKDJadSSckcQ-fw@mail.gmail.com>
+	<CACVxJT9JLjghmayrkA+0X0Bi4iKmiyy6Xf58ABNjXSaOR+ZRDw@mail.gmail.com>
+Date: Mon, 29 Jun 2015 16:37:32 +0200
+Message-ID: <CADDKRnB6eXTSB6jCrDjLRqbJJsBkP0CqJDRd3V==N7tGiuYXtw@mail.gmail.com>
+Subject: Re: [4.1.0-07254-gc13c810] Regression: Bluetooth not working.
+From: =?UTF-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>
+To: Alexey Dobriyan <adobriyan@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	inux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jun 26, 2015 at 11:57 AM, Marcel Holtmann <marcel@holtmann.org> wro=
+2015-06-29 12:30 GMT+02:00 Alexey Dobriyan <adobriyan@gmail.com>:
+> On Mon, Jun 29, 2015 at 12:00 PM, J=C3=B6rg Otte <jrg.otte@gmail.com> wro=
 te:
-> Hi Jakub,
+>> 2015-06-28 18:09 GMT+02:00 Alexey Dobriyan <adobriyan@gmail.com>:
+>>> On Sun, Jun 28, 2015 at 05:36:04PM +0200, J=C3=B6rg Otte wrote:
+>>>> 2015-06-26 16:28 GMT+02:00 J=C3=B6rg Otte <jrg.otte@gmail.com>:
+>>>> > 2015-06-26 12:03 GMT+02:00 J=C3=B6rg Otte <jrg.otte@gmail.com>:
+>>>> >> 2015-06-26 11:37 GMT+02:00 Marcel Holtmann <marcel@holtmann.org>:
+>>>> >>> Hi Joerg,
+>>>> >>>
+>>>> >>>> Bluetooth is inoperable in current Linus tree and the
+>>>> >>>> first bad commit is:
+>>>> >>>>
+>>>> >>>> 835a6a2f8603237a3e6cded5a6765090ecb06ea5 is the first bad commit
+>>>> >>>> commit 835a6a2f8603237a3e6cded5a6765090ecb06ea5
+>>>> >>>> Author: Alexey Dobriyan <adobriyan@gmail.com>
+>>>> >>>> Date:   Wed Jun 10 20:28:33 2015 +0300
+>>>> >>>>
+>>>> >>>>    Bluetooth: Stop sabotaging list poisoning
+>>>> >>>>
+>>>> >>>>    list_del() poisons pointers with special values, no need to ov=
+erwrite them.
+>>>> >>>>
+>>>> >>>>    Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+>>>> >>>>    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>>> >>>>
+>>>> >>>> My BT adapter is an intel 8087:07da
+>>>> >>>> I reverted that commit and this fixed the problem for me.
+>>>> >>>
+>>>> >>> today we had a patch from Tedd fixing the list initialization in t=
+he HIDP code.
+>>>> >>>
+>>>> >>> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+>>>> >>> index 9070dfd6b4ad..f1a117f8cad2 100644
+>>>> >>> --- a/net/bluetooth/hidp/core.c
+>>>> >>> +++ b/net/bluetooth/hidp/core.c
+>>>> >>> @@ -915,6 +915,7 @@ static int hidp_session_new(struct hidp_sessio=
+n **out, const bdaddr_t *bdaddr,
+>>>> >>>         session->conn =3D l2cap_conn_get(conn);
+>>>> >>>         session->user.probe =3D hidp_session_probe;
+>>>> >>>         session->user.remove =3D hidp_session_remove;
+>>>> >>> +       INIT_LIST_HEAD(&session->user.list);
+>>>> >>>         session->ctrl_sock =3D ctrl_sock;
+>>>> >>>         session->intr_sock =3D intr_sock;
+>>>> >>>         skb_queue_head_init(&session->ctrl_transmit);
+>>>> >>>
+>>>> >>> Could this be fixing it for you as well?
+>>>> >>>
+>>>> >> I will check this when I am at home in the
+>>>> >> afternoon.
+>>>> >>
+>>>> >
+>>>> > The patch works for me too.
+>>>> >
+>>>> Ok, this was a little bit hasty!
+>>>> I now see the following additional problems:
+>>>>
+>>>> - System freeze on resume (occures always).
+>>>> - System freeze on shutdown (occures sometimes)
+>>>> - System freeze when BT-mouse is connecting (occures sometimes).
+>>>>
+>>>> Then I can't do anything except power off.
+>>>>
+>>>> This happens only if Bluetooth AND BT-mouse is activated.
+>>>
+>>> OK, what happens if you just revert only list_del patch?
+>>
+>> I have applied this patch:
+>>
+>> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+>> index 9070dfd6b4ad..f1a117f8cad2 100644
+>> --- a/net/bluetooth/hidp/core.c
+>> +++ b/net/bluetooth/hidp/core.c
+>> @@ -915,6 +915,7 @@ static int hidp_session_new(struct hidp_session
+>> **out, const bdaddr_t *bdaddr,
+>>         session->conn =3D l2cap_conn_get(conn);
+>>         session->user.probe =3D hidp_session_probe;
+>>         session->user.remove =3D hidp_session_remove;
+>> +       INIT_LIST_HEAD(&session->user.list);
+>>         session->ctrl_sock =3D ctrl_sock;
+>>         session->intr_sock =3D intr_sock;
+>>         skb_queue_head_init(&session->ctrl_transmit);
+>>
+>> without this patch bluetooth doesn't work at all for me.
 >
->> Currently, when trying to connect to already paired device that just
->> rotated its RPA MAC address, old address would be used and connection
->> would fail. In order to fix that, kernel must scan and receive
->> advertisement with fresh RPA before connecting.
->>
->> This patch changes connection procedure behaviour for all devices.
->> Instead of just sending HCI_OP_LE_CREATE_CONN to controller, "connect"
->> will add device to kernel whitelist and start scan. If advertisement is
->> received, it'll be compared against whitelist and then trigger connectio=
-n
->> if it matches. That fixes mentioned reconnect issue for  already paired
->> devices. It also make whole connection procedure more robust. We can try
->> to connect to multiple devices at same time now, even though controller
->> allow only one.
->>
->> pend_le_conn_reqs field was added to hci_dev struct. It is list of all
->> devices that we try to connect to. When the connection is succesully
->> estabilished, or after timeout params will be removed from this list or
->> deleted, i.e. if params structure is not used for autoconnect.
->>
->> HCI_AUTO_CONN_JUST_ONCE value was added to hci_conn_params. It is used t=
-o
->> mark hci_conn_params that are to be used to connect to device only once,
->> and be removed after sending connect request.
->>
->> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
->> ---
->> include/net/bluetooth/hci_core.h |  11 ++++
->> net/bluetooth/hci_conn.c         | 139 +++++++++++++++++++++++++++++++++=
-+++---
->> net/bluetooth/hci_core.c         |  30 +++++++++
->> net/bluetooth/hci_event.c        |  70 +++++++++++++-------
->> net/bluetooth/hci_request.c      |  32 ++++++++-
->> net/bluetooth/l2cap_core.c       |   5 +-
->> net/bluetooth/mgmt.c             |   7 +-
->> 7 files changed, 255 insertions(+), 39 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hc=
-i_core.h
->> index 3bd618d..95d78ad 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -357,6 +357,7 @@ struct hci_dev {
->>       struct list_head        le_conn_params;
->>       struct list_head        pend_le_conns;
->>       struct list_head        pend_le_reports;
->> +     struct list_head        pend_le_conn_reqs;
+> Sure.
 >
-> is this really needed? This might be better a question for Johan actually=
- since he originally wrote most of the background scanning code.
+> Please drop this patch, and do
+>
+>   git-revert 835a6a2f8603237a3e6cded5a6765090ecb06ea5
+>
+> Maybe it's some other changes causing hangs.
 
-I think it's needed, if I reuse pend_le_conns, then removing device
-from whitelist or changing auto connect mode might break the socket
-connection. I would also have to remember state before connecting
-socket and restore it after successfull connection, and what if
-someone modifies auto_connect during connection attempt... So I
-decided that socket connect is separate enough to add separate list
-for it. I'll change the name to pend_le_sock_conn, would be more
-meaningfull.
+Looks good so far. The system freeze on resume is gone.
 
-
->
->>
->>       struct hci_dev_stats    stat;
->>
->> @@ -497,6 +498,7 @@ struct hci_chan {
->> struct hci_conn_params {
->>       struct list_head list;
->>       struct list_head action;
->> +     struct list_head conn_action;
->
-> What are we using this one for?
->
->>       bdaddr_t addr;
->>       u8 addr_type;
->> @@ -512,6 +514,7 @@ struct hci_conn_params {
->>               HCI_AUTO_CONN_DIRECT,
->>               HCI_AUTO_CONN_ALWAYS,
->>               HCI_AUTO_CONN_LINK_LOSS,
->> +             HCI_AUTO_CONN_JUST_ONCE,
->
-> Actually I think this is HCI_AUTO_CONN_SOCKET since that is how it is use=
-d from.
->
->>       } auto_connect;
->>
->>       struct hci_conn *conn;
->> @@ -823,6 +826,10 @@ void hci_chan_del(struct hci_chan *chan);
->> void hci_chan_list_flush(struct hci_conn *conn);
->> struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 hand=
-le);
->>
->> +struct hci_conn *hci_add_to_connect_whitelist(struct hci_dev *hdev,
->> +                             bdaddr_t *dst, u8 dst_type, u8 sec_level,
->> +                             u16 conn_timeout, u8 role);
->> +void hci_remove_from_conect_whitelist(struct hci_conn *conn);
->
-> These names are a bit confusing. I would try to clearly name these that t=
-hey are triggered from socket actions.
->
-> On a side note, it is connect and not conect ;)
->
->> struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
->>                               u8 dst_type, u8 sec_level, u16 conn_timeou=
-t,
->>                               u8 role);
->> @@ -909,6 +916,8 @@ static inline void hci_conn_drop(struct hci_conn *co=
-nn)
->>                       break;
->>               }
->>
->> +             hci_remove_from_conect_whitelist(conn);
->> +
->>               cancel_delayed_work(&conn->disc_work);
->>               queue_delayed_work(conn->hdev->workqueue,
->>                                  &conn->disc_work, timeo);
->> @@ -988,6 +997,8 @@ void hci_conn_params_clear_disabled(struct hci_dev *=
-hdev);
->> struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list=
-,
->>                                                 bdaddr_t *addr,
->>                                                 u8 addr_type);
->> +struct hci_conn_params *hci_pend_le_conn_action_lookup(struct list_head=
- *list,
->> +                                               bdaddr_t *addr, u8 addr_=
-type);
->>
->
-> I wonder if we can avoid this or split this into something specific for s=
-ocket handling.
->
->> void hci_uuids_clear(struct hci_dev *hdev);
->>
->> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> index 2c48bf0..d86b64f 100644
->> --- a/net/bluetooth/hci_conn.c
->> +++ b/net/bluetooth/hci_conn.c
->> @@ -723,16 +723,130 @@ static void hci_req_directed_advertising(struct h=
-ci_request *req,
->>       conn->state =3D BT_CONNECT;
->> }
->>
->> +void hci_remove_from_conect_whitelist(struct hci_conn *conn)
->> +{
->> +     struct hci_conn_params *params =3D hci_pend_le_conn_action_lookup(
->> +                                             &conn->hdev->pend_le_conn_=
-reqs,
->> +                                             &conn->dst, conn->dst_type=
-);
->> +     if (!params)
->> +             return;
->> +
->> +     /* The connection attempt was doing scan for new RPA, and is still
->> +      * stuck in scan phase. If params are not associated with any othe=
-r
->> +      * autoconnect action, remove them completely. If they are, just u=
-nmark
->> +      * them as awaiting for connection, by clearing conn_action field.
->> +      */
->> +     if (params->auto_connect =3D=3D HCI_AUTO_CONN_JUST_ONCE)
->> +             hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type=
-);
->> +     else
->> +             list_del_init(&params->conn_action);
->> +
->> +     /* if connection didn't really happened, remove hash. */
->> +     if (conn->state =3D=3D BT_OPEN)
->> +             hci_conn_hash_del(conn->hdev, conn);
->> +}
->> +
->> +static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
->> +{
->> +     struct hci_conn *conn;
->> +
->> +     conn =3D hci_conn_hash_lookup_ba(hdev, LE_LINK, addr);
->> +     if (!conn)
->> +             return false;
->> +
->> +     if (conn->dst_type !=3D type)
->> +             return false;
->> +
->> +     if (conn->state !=3D BT_CONNECTED)
->> +             return false;
->> +
->> +     return true;
->> +}
->> +
->> +/* This function requires the caller holds hdev->lock */
->> +int hci_onetime_conn_params_set(struct hci_request *req, bdaddr_t *addr=
-,
->> +                             u8 addr_type)
->> +{
->> +     struct hci_dev *hdev =3D req->hdev;
->> +     struct hci_conn_params *params;
->> +     bool is_new;
->> +
->> +     if (is_connected(hdev, addr, addr_type))
->> +             return -EISCONN;
->> +
->> +     is_new =3D false;
->> +     params =3D hci_conn_params_lookup(hdev, addr, addr_type);
->> +     if (params)
->> +             is_new =3D true;
->> +
->> +     params =3D hci_conn_params_add(hdev, addr, addr_type);
->> +     if (!params)
->> +             return -EIO;
->> +
->> +     /* if we created new params, mark them to be used just once to con=
-nect
->> +      */
->> +     if (is_new)
->> +             params->auto_connect =3D HCI_AUTO_CONN_JUST_ONCE;
->> +
->> +     list_del_init(&params->conn_action);
->> +     list_add(&params->conn_action, &hdev->pend_le_conn_reqs);
->> +     __hci_update_background_scan(req);
->> +
->> +     BT_INFO("addr %pMR (type %u) auto_connect %u", addr, addr_type,
->> +             params->auto_connect);
->> +
->> +     return 0;
->> +}
->> +
->> +/* This function requires the caller holds hdev->lock */
->> +struct hci_conn *hci_add_to_connect_whitelist(struct hci_dev *hdev,
->> +                                           bdaddr_t *dst, u8 dst_type,
->> +                                           u8 sec_level, u16 conn_timeo=
-ut,
->> +                                           u8 role) {
->> +     struct hci_conn *conn;
->> +     struct hci_request req;
->> +     int err;
->> +
->> +     /* Let's make sure that le is enabled.*/
->> +     if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
->> +             if (lmp_le_capable(hdev))
->> +                     return ERR_PTR(-ECONNREFUSED);
->> +
->> +             return ERR_PTR(-EOPNOTSUPP);
->> +     }
->> +
->> +     conn =3D hci_conn_add(hdev, LE_LINK, dst, role);
->> +     if (!conn)
->> +             return ERR_PTR(-ENOMEM);
->> +
->> +     BT_DBG("requesting refresh of dst_addr.");
->> +     hci_req_init(&req, hdev);
->> +
->> +     if (hci_onetime_conn_params_set(&req, dst, dst_type) < 0)
->> +             return ERR_PTR(-EBUSY);
->> +
->> +     err =3D hci_req_run(&req, NULL);
->> +     if (err)
->> +             return ERR_PTR(err);
->> +
->> +     conn->dst_type =3D dst_type;
->> +     conn->sec_level =3D BT_SECURITY_LOW;
->> +     conn->pending_sec_level =3D sec_level;
->> +     conn->conn_timeout =3D conn_timeout;
->> +
->> +     hci_conn_hold(conn);
->> +     return conn;
->> +}
->> +
->> struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
->>                               u8 dst_type, u8 sec_level, u16 conn_timeou=
-t,
->>                               u8 role)
->> {
->>       struct hci_conn_params *params;
->> -     struct hci_conn *conn;
->> +     struct hci_conn *conn, *conn_unfinished;
->>       struct smp_irk *irk;
->>       struct hci_request req;
->>       int err;
->> -
->>       /* Let's make sure that le is enabled.*/
->>       if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
->>               if (lmp_le_capable(hdev))
->> @@ -740,7 +854,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev=
-, bdaddr_t *dst,
->>
->>               return ERR_PTR(-EOPNOTSUPP);
->>       }
->> -
->>       /* Some devices send ATT messages as soon as the physical link is
->>        * established. To be able to handle these ATT messages, the user-
->>        * space first establishes the connection and then starts the pair=
-ing
->> @@ -751,9 +864,15 @@ struct hci_conn *hci_connect_le(struct hci_dev *hde=
-v, bdaddr_t *dst,
->>        * and return the object found.
->>        */
->>       conn =3D hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
->> +     conn_unfinished =3D NULL;
->>       if (conn) {
->>               conn->pending_sec_level =3D sec_level;
->> -             goto done;
->> +             if (conn->state =3D=3D BT_OPEN) {
->> +                     BT_DBG("will coninue unfinished conn %pMR", dst);
->> +                     conn_unfinished =3D conn;
->> +             } else {
->> +                     goto done;
->> +             }
->>       }
->>
->>       /* Since the controller supports only one LE connection attempt at=
- a
->> @@ -767,10 +886,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hde=
-v, bdaddr_t *dst,
->>        * resolving key, the connection needs to be established
->>        * to a resolvable random address.
->>        *
->> -      * This uses the cached random resolvable address from
->> -      * a previous scan. When no cached address is available,
->> -      * try connecting to the identity address instead.
->> -      *
->>        * Storing the resolvable random address is required here
->>        * to handle connection failures. The address will later
->>        * be resolved back into the original identity address
->> @@ -782,7 +897,13 @@ struct hci_conn *hci_connect_le(struct hci_dev *hde=
-v, bdaddr_t *dst,
->>               dst_type =3D ADDR_LE_DEV_RANDOM;
->>       }
->>
->> -     conn =3D hci_conn_add(hdev, LE_LINK, dst, role);
->> +     if (conn_unfinished) {
->> +             conn =3D conn_unfinished;
->> +             bacpy(&conn->dst, dst);
->> +     } else {
->> +             conn =3D hci_conn_add(hdev, LE_LINK, dst, role);
->> +     }
->> +
->>       if (!conn)
->>               return ERR_PTR(-ENOMEM);
->>
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index bc43b64..4b21085 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -2848,6 +2848,22 @@ struct hci_conn_params *hci_pend_le_action_lookup=
-(struct list_head *list,
->> }
->>
->> /* This function requires the caller holds hdev->lock */
->> +struct hci_conn_params *hci_pend_le_conn_action_lookup(struct list_head=
- *list,
->> +                                                    bdaddr_t *addr,
->> +                                                    u8 addr_type)
->> +{
->> +     struct hci_conn_params *param;
->> +
->> +     list_for_each_entry(param, list, conn_action) {
->> +             if (bacmp(&param->addr, addr) =3D=3D 0 &&
->> +                 param->addr_type =3D=3D addr_type)
->> +                     return param;
->> +     }
->> +
->> +     return NULL;
->> +}
->> +
->> +/* This function requires the caller holds hdev->lock */
->> struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
->>                                           bdaddr_t *addr, u8 addr_type)
->> {
->> @@ -2868,6 +2884,7 @@ struct hci_conn_params *hci_conn_params_add(struct=
- hci_dev *hdev,
->>
->>       list_add(&params->list, &hdev->le_conn_params);
->>       INIT_LIST_HEAD(&params->action);
->> +     INIT_LIST_HEAD(&params->conn_action);
->>
->>       params->conn_min_interval =3D hdev->le_conn_min_interval;
->>       params->conn_max_interval =3D hdev->le_conn_max_interval;
->> @@ -2888,6 +2905,7 @@ static void hci_conn_params_free(struct hci_conn_p=
-arams *params)
->>       }
->>
->>       list_del(&params->action);
->> +     list_del(&params->conn_action);
->>       list_del(&params->list);
->>       kfree(params);
->> }
->> @@ -2916,6 +2934,17 @@ void hci_conn_params_clear_disabled(struct hci_de=
-v *hdev)
->>       list_for_each_entry_safe(params, tmp, &hdev->le_conn_params, list)=
- {
->>               if (params->auto_connect !=3D HCI_AUTO_CONN_DISABLED)
->>                       continue;
->> +
->> +             /* If trying to estabilish one time connection to disabled
->> +              * device, leave the params, but mark them as just once.
->> +              */
->> +             if (hci_pend_le_conn_action_lookup(&hdev->pend_le_conn_req=
-s,
->> +                                                &params->addr,
->> +                                                params->addr_type)) {
->> +                     params->auto_connect =3D HCI_AUTO_CONN_JUST_ONCE;
->> +                     continue;
->> +             }
->> +
->>               list_del(&params->list);
->>               kfree(params);
->>       }
->> @@ -3187,6 +3216,7 @@ struct hci_dev *hci_alloc_dev(void)
->>       INIT_LIST_HEAD(&hdev->le_conn_params);
->>       INIT_LIST_HEAD(&hdev->pend_le_conns);
->>       INIT_LIST_HEAD(&hdev->pend_le_reports);
->> +     INIT_LIST_HEAD(&hdev->pend_le_conn_reqs);
->>       INIT_LIST_HEAD(&hdev->conn_hash.list);
->>       INIT_LIST_HEAD(&hdev->adv_instances);
->>
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 32363c2..9c2bf60 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -4715,6 +4715,7 @@ static struct hci_conn *check_pending_le_conn(stru=
-ct hci_dev *hdev,
->> {
->>       struct hci_conn *conn;
->>       struct hci_conn_params *params;
->> +     bool only_connect;
->>
->>       /* If the event is not connectable don't proceed further */
->>       if (adv_type !=3D LE_ADV_IND && adv_type !=3D LE_ADV_DIRECT_IND)
->> @@ -4731,44 +4732,67 @@ static struct hci_conn *check_pending_le_conn(st=
-ruct hci_dev *hdev,
->>               return NULL;
->>
->>       /* If we're not connectable only connect devices that we have in
->> -      * our pend_le_conns list.
->> +      * our pend_le_conns or pend_le_conn_reqs list.
->>        */
->>       params =3D hci_pend_le_action_lookup(&hdev->pend_le_conns,
->>                                          addr, addr_type);
->> -     if (!params)
->> -             return NULL;
->>
->> -     switch (params->auto_connect) {
->> -     case HCI_AUTO_CONN_DIRECT:
->> -             /* Only devices advertising with ADV_DIRECT_IND are
->> -              * triggering a connection attempt. This is allowing
->> -              * incoming connections from slave devices.
->> -              */
->> -             if (adv_type !=3D LE_ADV_DIRECT_IND)
->> +     only_connect =3D false;
->> +     if (!params) {
->> +             params =3D hci_pend_le_conn_action_lookup(
->> +                                                   &hdev->pend_le_conn_=
-reqs,
->> +                                                   addr, addr_type);
->> +             if (!params)
->>                       return NULL;
->> -             break;
->> -     case HCI_AUTO_CONN_ALWAYS:
->> -             /* Devices advertising with ADV_IND or ADV_DIRECT_IND
->> -              * are triggering a connection attempt. This means
->> -              * that incoming connectioms from slave device are
->> -              * accepted and also outgoing connections to slave
->> -              * devices are established when found.
->> -              */
->> -             break;
->> -     default:
->> -             return NULL;
->> +
->> +             only_connect =3D true;
->> +     }
->> +
->> +     if (!only_connect) {
->> +             switch (params->auto_connect) {
->> +             case HCI_AUTO_CONN_DIRECT:
->> +                     /* Only devices advertising with ADV_DIRECT_IND ar=
-e
->> +                      * triggering a connection attempt. This is allowi=
-ng
->> +                      * incoming connections from slave devices.
->> +                      */
->> +                     if (adv_type !=3D LE_ADV_DIRECT_IND)
->> +                             return NULL;
->> +                     break;
->> +             case HCI_AUTO_CONN_ALWAYS:
->> +                     /* Devices advertising with ADV_IND or ADV_DIRECT_=
-IND
->> +                      * are triggering a connection attempt. This means
->> +                      * that incoming connectioms from slave device are
->> +                      * accepted and also outgoing connections to slave
->> +                      * devices are established when found.
->> +                      */
->> +                     break;
->> +             default:
->> +                     return NULL;
->> +             }
->>       }
->>
->>       conn =3D hci_connect_le(hdev, addr, addr_type, BT_SECURITY_LOW,
->>                             HCI_LE_AUTOCONN_TIMEOUT, HCI_ROLE_MASTER);
->>       if (!IS_ERR(conn)) {
->> -             /* Store the pointer since we don't really have any
->> +             /* If only_connect is set, conn is already
->> +              * owned by socket that tried to connect, if no then
->> +              * store the pointer since we don't really have any
->>                * other owner of the object besides the params that
->>                * triggered it. This way we can abort the connection if
->>                * the parameters get removed and keep the reference
->>                * count consistent once the connection is established.
->>                */
->> -             params->conn =3D hci_conn_get(conn);
->> +
->> +             if (only_connect) {
->> +                     list_del_init(&params->conn_action);
->> +
->> +                     /* Params were needed only to refresh the RPA.*/
->> +                     if (params->auto_connect =3D=3D HCI_AUTO_CONN_JUST=
-_ONCE)
->> +                             hci_conn_params_del(hdev, addr, addr_type)=
-;
->> +             } else {
->> +                     params->conn =3D hci_conn_get(conn);
->> +             }
->> +
->>               return conn;
->>       }
->>
->> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
->> index d6025d6..e8616be 100644
->> --- a/net/bluetooth/hci_request.c
->> +++ b/net/bluetooth/hci_request.c
->> @@ -180,7 +180,10 @@ static u8 update_white_list(struct hci_request *req=
-)
->>               if (hci_pend_le_action_lookup(&hdev->pend_le_conns,
->>                                             &b->bdaddr, b->bdaddr_type) =
-||
->>                   hci_pend_le_action_lookup(&hdev->pend_le_reports,
->> -                                           &b->bdaddr, b->bdaddr_type))=
- {
->> +                                           &b->bdaddr, b->bdaddr_type) =
-||
->> +                 hci_pend_le_conn_action_lookup(&hdev->pend_le_conn_req=
-s,
->> +                                                &b->bdaddr,
->> +                                                b->bdaddr_type)) {
->>                       white_list_entries++;
->>                       continue;
->>               }
->> @@ -246,6 +249,30 @@ static u8 update_white_list(struct hci_request *req=
-)
->>               add_to_white_list(req, params);
->>       }
->>
->> +     /* After adding all new pending connections, and pending reports w=
-alk
->> +      * through the list of connection requests and also add these to t=
-he
->> +      * white list if there is still space.
->> +      */
->> +     list_for_each_entry(params, &hdev->pend_le_conn_reqs, conn_action)=
- {
->> +             if (hci_bdaddr_list_lookup(&hdev->le_white_list,
->> +                                        &params->addr, params->addr_typ=
-e))
->> +                     continue;
->> +
->> +             if (white_list_entries >=3D hdev->le_white_list_size) {
->> +                     /* Select filter policy to accept all advertising =
-*/
->> +                     return 0x00;
->> +             }
->> +
->> +             if (hci_find_irk_by_addr(hdev, &params->addr,
->> +                                      params->addr_type)) {
->> +                     /* White list can not be used with RPAs */
->> +                     return 0x00;
->> +             }
->> +
->> +             white_list_entries++;
->> +             add_to_white_list(req, params);
->> +     }
->> +
->>       /* Select filter policy to use white list */
->>       return 0x01;
->> }
->> @@ -507,7 +534,8 @@ void __hci_update_background_scan(struct hci_request=
- *req)
->>       hci_discovery_filter_clear(hdev);
->>
->>       if (list_empty(&hdev->pend_le_conns) &&
->> -         list_empty(&hdev->pend_le_reports)) {
->> +         list_empty(&hdev->pend_le_reports) &&
->> +         list_empty(&hdev->pend_le_conn_reqs)) {
->>               /* If there is no pending LE connections or devices
->>                * to be scanned for, we should stop the background
->>                * scanning.
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index 51594fb..3219654 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -7113,8 +7113,9 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __=
-le16 psm, u16 cid,
->>               else
->>                       role =3D HCI_ROLE_MASTER;
->>
->> -             hcon =3D hci_connect_le(hdev, dst, dst_type, chan->sec_lev=
-el,
->> -                                   HCI_LE_CONN_TIMEOUT, role);
->> +             hcon =3D hci_add_to_connect_whitelist(hdev, dst, dst_type,
->> +                                                 chan->sec_level,
->> +                                                 HCI_LE_CONN_TIMEOUT, r=
-ole);
->>       } else {
->>               u8 auth_type =3D l2cap_get_auth_type(chan);
->>               hcon =3D hci_connect_acl(hdev, dst, chan->sec_level, auth_=
-type);
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index a7d1b33..e300b05 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -3564,9 +3564,10 @@ static int pair_device(struct sock *sk, struct hc=
-i_dev *hdev, void *data,
->>                */
->>               hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
->>
->> -             conn =3D hci_connect_le(hdev, &cp->addr.bdaddr, addr_type,
->> -                                   sec_level, HCI_LE_CONN_TIMEOUT,
->> -                                   HCI_ROLE_MASTER);
->> +             conn =3D hci_add_to_connect_whitelist(hdev, &cp->addr.bdad=
-dr,
->> +                                                 addr_type, sec_level,
->> +                                                 HCI_LE_CONN_TIMEOUT,
->> +                                                 HCI_ROLE_MASTER);
->>       }
->
-> Since the API from L2CAP does not really change, lets make sure we can al=
-so split this into two patches. One that put the infrastructure in place an=
-d another one that enables it actually.
->
-> We also need to ensure that when socket triggered connect happens, that w=
-hen the socket gets closed and connection is in progress that we a) cancel =
-the scan if it is still on going and also b) cancel the create connection i=
-f it has been issued. Same applies to the timeout handling.
->
-> I would like also to see a set of l2cap-tester test cases for ensuring th=
-at we do not break things. Especially when we have multiple simultaneous L2=
-CAP connection attempts.
->
-> Regards
->
-> Marcel
->
+Thanks, J=C3=B6rg
