@@ -1,50 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1435319940-13943-1-git-send-email-luiz.dentz@gmail.com>
-References: <1435319940-13943-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 29 Jun 2015 10:59:20 +0300
-Message-ID: <CABBYNZK30mjyMmbcCsjGVrAeiFK8unfb4wdHCz8bcx3QBja5GA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] core: Print store_hint in new_link_key_callback
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Atul Rai <a.rai@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com
+Subject: [PATCH] android/hal-bluetooth: Fix NULL ptr dereference
+Date: Mon, 29 Jun 2015 12:14:13 +0530
+Message-id: <1435560253-5511-1-git-send-email-a.rai@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Add NULL check on malloc return to fix NULL pointer dereference
+in case malloc fails.
+---
+ android/hal-bluetooth.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-On Fri, Jun 26, 2015 at 2:58 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This is useful information when debugging because that indicates
-> no-bonding was used so device will remain temporary even though it is
-> paired.
-> ---
->  src/adapter.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 95b5349..531f276 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -6696,8 +6696,9 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
->
->         ba2str(&addr->bdaddr, dst);
->
-> -       DBG("hci%u new key for %s type %u pin_len %u", adapter->dev_id,
-> -                                       dst, ev->key.type, ev->key.pin_len);
-> +       DBG("hci%u new key for %s type %u pin_len %u store_hint %u",
-> +               adapter->dev_id, dst, ev->key.type, ev->key.pin_len,
-> +               ev->store_hint);
->
->         if (ev->key.pin_len > 16) {
->                 error("Invalid PIN length (%u) in new_key event",
-> --
-> 2.1.0
-
-Applied.
-
-
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index e24f7d2..66f4a37 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -19,6 +19,7 @@
+ #include <stdlib.h>
+ #include <stdbool.h>
+ #include <string.h>
++#include <errno.h>
+ 
+ #include <cutils/properties.h>
+ 
+@@ -1103,6 +1104,11 @@ static int open_bluetooth(const struct hw_module_t *module, char const *name,
+ 
+ 	DBG("");
+ 
++	if (!dev) {
++		error("Failed to allocate memory for device");
++		return -ENOMEM;
++	}
++
+ 	memset(dev, 0, sizeof(bluetooth_device_t));
+ 	dev->common.tag = HARDWARE_DEVICE_TAG;
+ 	dev->common.version = 0;
 -- 
-Luiz Augusto von Dentz
+2.1.4
+
