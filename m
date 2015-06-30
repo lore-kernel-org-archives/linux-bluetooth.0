@@ -1,47 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Jun 2015 14:55:55 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v1 1/2] Bluetooth: Move address type check for
- hci_conn_params
-Message-ID: <20150630115555.GA29126@t440s.lan>
-References: <1435188850-14969-1-git-send-email-jpawlowski@google.com>
+From: Lukasz Duda <lukasz.duda@nordicsemi.no>
+To: <alex.aring@gmail.com>
+CC: <jukka.rissanen@linux.intel.com>,
+	<linux-bluetooth@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
+	Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+Subject: [PATCH] 6lowpan: Fix extraction of flow label field
+Date: Tue, 30 Jun 2015 03:24:52 -0700
+Message-ID: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1435188850-14969-1-git-send-email-jpawlowski@google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+The lowpan_fetch_skb function is used to fetch the first byte,
+which also increments the data pointer in skb structure,
+making subsequent array lookup of byte 0 actually being byte 1.
 
-On Wed, Jun 24, 2015, Jakub Pawlowski wrote:
-> @@ -2822,10 +2822,6 @@ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
->  {
->  	struct hci_conn_params *params;
->  
-> -	/* The conn params list only contains identity addresses */
-> -	if (!hci_is_identity_address(addr, addr_type))
-> -		return NULL;
-> -
->  	list_for_each_entry(params, &hdev->le_conn_params, list) {
->  		if (bacmp(&params->addr, addr) == 0 &&
->  		    params->addr_type == addr_type) {
-> @@ -2842,10 +2838,6 @@ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
->  {
->  	struct hci_conn_params *param;
->  
-> -	/* The list only contains identity addresses */
-> -	if (!hci_is_identity_address(addr, addr_type))
-> -		return NULL;
-> -
->  	list_for_each_entry(param, list, action) {
->  		if (bacmp(&param->addr, addr) == 0 &&
->  		    param->addr_type == addr_type)
+To decompress the first byte of the Flow Label when the TF flag is
+set to 0x01, the second half of the first byte is needed.
 
-Both of the above could be called for HCI events related to non-paired
-devices that use private addresses. In such a case these identity
-address checks would prevent unnecessary iteration of the (potentially
-long) list. Do we really want to remove them?
+The patch fixes the extraction of the Flow Label field.
 
-Johan
+Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
+Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+---
+ net/6lowpan/iphc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 9055d7b..74e56d7 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -284,7 +284,7 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
+ 		if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)))
+ 			return -EINVAL;
+ 
+-		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
++		hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
+ 		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
+ 		skb_pull(skb, 2);
+ 		break;
+-- 
+2.1.4
+
