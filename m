@@ -1,69 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Jun 2015 23:22:12 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Lukasz Duda <lukasz.duda@nordicsemi.no>
-Cc: jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
-	Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-Subject: Re: [PATCH] 6lowpan: Fix extraction of flow label field
-Message-ID: <20150630212208.GA733@omega>
-References: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
-Sender: linux-wpan-owner@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH] Bluetooth: Reinitialize the list after deletion for session user list
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150630114340.260dca22@tedd-fedora-vm>
+Date: Tue, 30 Jun 2015 21:48:18 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Alexey Dobriyan <adobriyan@gmail.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	=?utf-8?Q?J=C3=B6rg_Otte?= <jrg.otte@gmail.com>
+Message-Id: <ECF72DD2-A24C-433A-9B18-B0D7FAA04442@holtmann.org>
+References: <20150630114340.260dca22@tedd-fedora-vm>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jun 30, 2015 at 03:24:52AM -0700, Lukasz Duda wrote:
-> The lowpan_fetch_skb function is used to fetch the first byte,
-> which also increments the data pointer in skb structure,
-> making subsequent array lookup of byte 0 actually being byte 1.
-> 
-> To decompress the first byte of the Flow Label when the TF flag is
-> set to 0x01, the second half of the first byte is needed.
-> 
-> The patch fixes the extraction of the Flow Label field.
-> 
-> Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
-> Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+Hi Tedd,
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
-
+> If the user->list is deleted with list_del(), it doesn't initialize the
+> entry which can cause the issue with list_empty(). According to the
+> comment from the list.h, list_empty() returns false even if the list is
+> empty and put the entry in an undefined state.
+> 
+> /**
+> * list_del - deletes entry from list.
+> * @entry: the element to delete from the list.
+> * Note: list_empty() on entry does not return true after this, the entry is
+> * in an undefined state.
+> */
+> 
+> Because of this behavior, list_empty() returns false even if list is empty
+> when the device is reconnected.
+> 
+> So, user->list needs to be re-initialized after list_del(). list.h already
+> have a macro list_del_init() which deletes the entry and initailze it again.
+> 
+> Tested-by: Jörg Otte <jrg.otte@gmail.com>
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 > ---
->  net/6lowpan/iphc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 9055d7b..74e56d7 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -284,7 +284,7 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
->  		if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)))
->  			return -EINVAL;
->  
-> -		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
-> +		hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
->  		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
->  		skb_pull(skb, 2);
->  		break;
+> net/bluetooth/l2cap_core.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This code part is really hard to decrypt/understand. Nevertheless for
-some historical(contiki) reasons we have this situation mainline now
-and I had no time to cleanup this code. Actual it remembers me on the
-early state of the iphc code.
+patch has been applied to bluetooth-stable tree.
 
-I would recommended to cleanup the whole traffic flow decompress/compress
-part (Maybe also with some magic numbers defines which is used on both sides
-and some static inline functions). Really don't like the actually stuff there.
-Anyway thank you for dig into this issue now.
+Regards
 
-One reason why definitly something goes wrong there is that skb->data[0]
-information is used for hdr.flow_lbl[1] and hdr.flow_lbl[0] which can't
-be. I didn't test it yet and trust you that this will do the right
-behaviour for now. I also have no time that I can write really a testcase
-for that. What I can say currently is that something is wrong here
-and your good looks fine for me and makes more sense than the current behaviour.
+Marcel
 
-Thanks.
-
-- Alex
