@@ -1,76 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 2 Jul 2015 10:30:38 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth 2015-07-02
-Message-ID: <20150702073038.GA25214@t440s.lan>
+Date: Wed, 1 Jul 2015 18:22:52 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Lukasz Duda <lukasz.duda@nordicsemi.no>
+Cc: jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
+	linux-wpan@vger.kernel.org,
+	Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+Subject: Re: [PATCH] 6lowpan: Fix extraction of flow label field
+Message-ID: <20150701162251.GA9015@omega>
+References: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="DocE+STaALJfprDB"
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---DocE+STaALJfprDB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Tue, Jun 30, 2015 at 03:24:52AM -0700, Lukasz Duda wrote:
+...
+> ---
+>  net/6lowpan/iphc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 9055d7b..74e56d7 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -284,7 +284,7 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
+>  		if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)))
+>  			return -EINVAL;
+>  
+> -		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
+> +		hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
+>  		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
+>  		skb_pull(skb, 2);
 
-Hi Dave,
+Additional note what I see in this code segment. We don't check if we
+_can_ pull from the skb. We should here use lowpan_fetch_skb and check
+for error like above instead of memcpy and skb_pull.
 
-A couple of regressions crept in because of a patch to use proper list
-APIs rather than manually reading & writing the next/prev pointers
-(commit 835a6a2f8603237a3e6cded5a6765090ecb06ea5). Turns out this was
-masking a few bugs: a missing INIT_LIST_HEAD() call and incorrectly
-using list_del() rather than list_del_init(). The two patches in this
-set fix these, and it'd be nice they could still make it to 4.2-rc1 to
-avoid new bug reports from users.
+Maybe simple do the following:
 
-Please let me know if there are any issues pulling. Thanks.
+if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)) ||
+    lowpan_fetch_skb(skb, &hdr.flow_lbl[1], 2)
+	return -EINVAL;
 
-Johan
+hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
+hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
 
---
-The following changes since commit 011cb197a84ed547c2b6b12a86adbeec1be0fdaf:
 
-  Merge branch 'bnx2x' (2015-06-25 06:30:43 -0700)
+The issue is that we don't look at:
 
-are available in the git repository at:
+memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+if &skb->data[0] data has room of 2 bytes to read from it.
 
-for you to fetch changes up to ab944c83f6690df0c7f67e6bcc29fc0c82ef6021:
+In case of 802.15.4 6LoWPAN, some drivers allocs the exact len value of
+the frame (which is even a bad behaviour, they should alloc the MTU
+size), somebody could send a 802.15.4 6LoWPAN packet and the frame
+looks _at_ _first_ like a 6LoWPAN frame but the lengths field was too
+small that an 6LoWPAN frame with this inline data fits in. Means
+somebody generated a 6LoWPAN frame that the behaviour occurs to read out
+of buffer of skb->data[0].
 
-  Bluetooth: Reinitialize the list after deletion for session user list (2015-06-30 21:46:19 +0200)
+A good 6LoWPAN stack should not send such frames, but it is possible for
+everybody to send something like that which ends in this bad
+behaviour in our side.
 
-----------------------------------------------------------------
-Tedd Ho-Jeong An (2):
-      Bluetooth: hidp: Initialize list header of hidp session user
-      Bluetooth: Reinitialize the list after deletion for session user list
+In case of bluetooth: I have no idea, how skb room is allocated in
+bluetooth.
 
- net/bluetooth/hidp/core.c  | 1 +
- net/bluetooth/l2cap_core.c | 4 ++--
- 2 files changed, 3 insertions(+), 2 deletions(-)
 
---DocE+STaALJfprDB
-Content-Type: application/pgp-signature
+To be sure we need to check if the &skb->data[0] has the buffer length
+before to read the amount of bytes (in this case: 2). This is what
+lowpan_fetch_skb does by calling the "pskb_may_pull" function before.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+-> So I am really not happy about the current solution about this
+function. I hope it was understandable what I think we need to do in
+this code segment that the stack is more robust to something like that.
 
-iQIcBAEBAgAGBQJVlOieAAoJECQj9vv5qNQSiiYP/1osk3CxItxSgCxN2Obq7Xlf
-0/fXWb3P1r+cbZP2REyBU7wZWlmN7imAZ9j3Zr1MUqJIf3+fmtrPARg7yEe+/sal
-ry4VS01OJDFdI4DKAMFEhtC/YdIqQ2Kbfucq2wqe4CrMVhkWIyo5qkMZ2Kha79oM
-gYcuHoWzDmLnHxcK7lGyaM5qdJxhk6FUUFiAwAZLTrfSfn5+atxzfsWZZRwZqBq1
-bygCkII3QEeTkjWFLGUCA9s/GttcQI8DMEiZoKrDlSJCF+ePTBG4h20+9YGBK3K9
-lYcOpWEEbYvQv3MohJXh4tysNbPanZBZa4tx4vOAyM+F1TE9SFVCOmvjmxTKKT9S
-tQLiRae+SwkRqpBeiN5c30atzltBsStRRQ6mIZeomqJR3uwILtMhgaodBRXitAME
-kCEF3+wfzyxIBLe4qWNUSB5cq3UYFHSEC6BfSk7sd+DpHV3CmBD7JuWDkeYzvHAn
-v7IVpITlEXdgek2cBw7DR/xaE96HhgNpDB9upEhuPvSsAjEkgWc/XCxG9cF9becx
-q0+H4kHyT9pui9j0u4XOW7BjFImFDR3QQklwq0luiY2GC9e/aW2lpyGHDpFpkDWo
-jCd5Pajz4gPfal2fHwd0dnz8Pjl5OxzkYY1ms8UyllsL8QkEsLVSVZXQHO++oJOr
-Vu1PlTAal8qUypnf+P2I
-=b/ol
------END PGP SIGNATURE-----
+I did never touch the flow_lbl code, but I already changed the most code
+that we use lowpan_fetch_skb, but there are still some lacks like in this
+case. Would be very happy if somebody sends patches for this and should
+be part of the cleanup of flow_lbl compression/decompression. :-/
 
---DocE+STaALJfprDB--
+- Alex
