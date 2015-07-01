@@ -1,87 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 1 Jul 2015 18:22:52 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Lukasz Duda <lukasz.duda@nordicsemi.no>
-Cc: jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
-	Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-Subject: Re: [PATCH] 6lowpan: Fix extraction of flow label field
-Message-ID: <20150701162251.GA9015@omega>
-References: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
+Message-ID: <5593ED9E.4040907@gmail.com>
+Date: Wed, 01 Jul 2015 15:39:42 +0200
+From: Florian Grandel <fgrandel@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Szymon Janc <Szymon.Janc@tieto.com>,
+ BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: Peripheral role support for android
+References: <558DE8B3.3060102@gmail.com> <650B748F-76F8-4031-9397-E65D18AD01A4@holtmann.org>
+In-Reply-To: <650B748F-76F8-4031-9397-E65D18AD01A4@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+>> AFAICS there is (at least) one catch: the kernel does not support setting custom values for min/max adv interval, channel map, tx power, etc. while the HAL API seems to expect per-instance setup of these values. How should we deal with this? Should we ignore these values? Or should we error out with a NOT_SUPPORTED error if they are different from the kernel defaults?
+>
+> We never exposed the channel map since that is pretty much stupid. I would just ignore that parameter. Just accept whatever it asks of and see okay, I will do it, even if you don't in the end.
+>
+> The TX power you could set whatever you want, but I would advise against it. Just accept the TX power you get from the HAL and then set Include TX Power flag. I mean the best you can do is check if TX Power is included or not. And allow the advertising data to reflect this.
+>
+> And min/max advertising interval is also something you should ignore. Actually that is something an application should never be in control of anyway. Choosing bad parameters might cause the controller to make a choice between BR/EDR and LE in its schedule. And for obvious reasons, the application has not knowledge of the BR/EDR state. So just accept them and go on with it.
+>
+>> Please let me know whether you agree to that roadmap and what you think about the unsupported features. Is it ok if I try to tackle these todos? Or is someone working on this already?
+>
+> Go ahead.
+>
+> Regards
+>
+> Marcel
 
-On Tue, Jun 30, 2015 at 03:24:52AM -0700, Lukasz Duda wrote:
-...
-> ---
->  net/6lowpan/iphc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 9055d7b..74e56d7 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -284,7 +284,7 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
->  		if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)))
->  			return -EINVAL;
->  
-> -		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
-> +		hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
->  		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
->  		skb_pull(skb, 2);
+Thanks Marcel! All questions answered. :-)
 
-Additional note what I see in this code segment. We don't check if we
-_can_ pull from the skb. We should here use lowpan_fetch_skb and check
-for error like above instead of memcpy and skb_pull.
-
-Maybe simple do the following:
-
-if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)) ||
-    lowpan_fetch_skb(skb, &hdr.flow_lbl[1], 2)
-	return -EINVAL;
-
-hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
-hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
-
-
-The issue is that we don't look at:
-
-memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
-
-if &skb->data[0] data has room of 2 bytes to read from it.
-
-In case of 802.15.4 6LoWPAN, some drivers allocs the exact len value of
-the frame (which is even a bad behaviour, they should alloc the MTU
-size), somebody could send a 802.15.4 6LoWPAN packet and the frame
-looks _at_ _first_ like a 6LoWPAN frame but the lengths field was too
-small that an 6LoWPAN frame with this inline data fits in. Means
-somebody generated a 6LoWPAN frame that the behaviour occurs to read out
-of buffer of skb->data[0].
-
-A good 6LoWPAN stack should not send such frames, but it is possible for
-everybody to send something like that which ends in this bad
-behaviour in our side.
-
-In case of bluetooth: I have no idea, how skb room is allocated in
-bluetooth.
-
-
-To be sure we need to check if the &skb->data[0] has the buffer length
-before to read the amount of bytes (in this case: 2). This is what
-lowpan_fetch_skb does by calling the "pskb_may_pull" function before.
-
--> So I am really not happy about the current solution about this
-function. I hope it was understandable what I think we need to do in
-this code segment that the stack is more robust to something like that.
-
-I did never touch the flow_lbl code, but I already changed the most code
-that we use lowpan_fetch_skb, but there are still some lacks like in this
-case. Would be very happy if somebody sends patches for this and should
-be part of the cleanup of flow_lbl compression/decompression. :-/
-
-- Alex
+Florian
