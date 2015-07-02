@@ -2,89 +2,70 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vcgomes@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
-Subject: [RFC BlueZ 00/13] Introducing Soletta peripheral node-type
-Date: Thu,  2 Jul 2015 11:33:41 -0300
-Message-Id: <1435847634-22831-1-git-send-email-vcgomes@gmail.com>
+Subject: [RFC BlueZ 01/13] build: Add configure-time checks for soletta
+Date: Thu,  2 Jul 2015 11:33:42 -0300
+Message-Id: <1435847634-22831-2-git-send-email-vcgomes@gmail.com>
+In-Reply-To: <1435847634-22831-1-git-send-email-vcgomes@gmail.com>
+References: <1435847634-22831-1-git-send-email-vcgomes@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-We have been working on Soletta[1] for a few months and now that it has
-been open sourced, it makes sense to show what it can do using
-BlueZ. This implements a very simple node type that behaves as a Heart
-Rate Sensor in the peripheral mode.
-
-Just a overview about Soletta, it provides a way to write IoT
-applications targeting a broad range of devices (from the smallest
-edge to the smarttest hub).
-
-You would express your application logic using a Flow Based language
-to connect various nodes, write your custom node types using the
-libsolleta C API. And the Soletta developers would worry about porting
-the libsoletta library to the multitude of targets and providing a
-useful collection of node types.
-
-Using the support we already have in BlueZ for the Bluetooth LE
-peripheral mode, writing a Soletta node type for the Heartrate Sensor
-role seems a very good match. And it brings some very interesting use
-cases with the linux-micro target.
-
-The way I thought best about integrating BlueZ with Soletta was to add
-another mainloop backend using libsoletta so every event would be
-handled consistently. See patch 02/13.
-
-Most of the changes not related to either adding the mainloop support,
-or adding the node type code are related to some lack of
-configurability to the peripheral code, perhaps having a way to the
-callback that will register the service to have a say in some
-parameters?
-
-The most important question is: is BlueZ the right place to have this code?
-
-What do you say?
-
-Any questions about the project, we are hanging out in #soletta @ freenode.net.
-
-Cheers,
+The idea will be to re-use the work done in peripheral/ so we can easily
+export node types for common Bluetooth profiles (the focus right now is
+GATT profiles).
 
 [1] https://github.com/solettaproject/soletta
+---
+ configure.ac | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-Vinicius Costa Gomes (13):
-  build: Add configure-time checks for soletta
-  shared: Add a mainloop implementation using soletta
-  peripheral/gatt: Fix usage of mainloop_ functions
-  peripheral/gatt: Add a way to external services to register services
-  peripheral/gap: Fix missing includes
-  peripheral/gap: Init the gatt_server
-  peripheral: Disable support for static random addresses
-  peripheral/gap: Set the discoverable flag in the advertising
-  peripheral/gatt: Use LOW security level
-  soletta/heartrate: Add a node-type for the Heartrate profile
-  .gitignore: Ignore soletta generated files
-  build: Add heartrate soletta node type to the build system
-  soletta: Add a sample flow using the heartrate node
-
- .gitignore                   |   4 +
- Makefile.am                  |   7 +-
- Makefile.tools               |  20 +++
- configure.ac                 |  38 ++++++
- peripheral/gap.c             |  12 +-
- peripheral/gatt.c            | 124 ++++++++++++-----
- peripheral/gatt.h            |   6 +
- soletta/heartrate-src.json   |  30 +++++
- soletta/heartrate.c          | 298 ++++++++++++++++++++++++++++++++++++++++
- soletta/heartrate.fbp        |   1 +
- soletta/sol-flow.conf        |   2 +
- src/shared/io-soletta.c      | 315 +++++++++++++++++++++++++++++++++++++++++++
- src/shared/timeout-soletta.c | 112 +++++++++++++++
- 13 files changed, 934 insertions(+), 35 deletions(-)
- create mode 100644 soletta/heartrate-src.json
- create mode 100644 soletta/heartrate.c
- create mode 100644 soletta/heartrate.fbp
- create mode 100644 soletta/sol-flow.conf
- create mode 100644 src/shared/io-soletta.c
- create mode 100644 src/shared/timeout-soletta.c
-
---
+diff --git a/configure.ac b/configure.ac
+index c65d19a..5c3f832 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -283,4 +283,42 @@ fi
+ AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
+ 			[Directory for the Android daemon storage files])
+ 
++AC_ARG_ENABLE(soletta, AC_HELP_STRING([--enable-soletta],
++			[enable building BlueZ soletta nodes]),
++					[enable_soletta=${enableval}])
++AM_CONDITIONAL(SOLETTA, test "${enable_soletta}" = "yes")
++
++if (test "${enable_soletta}" = "yes"); then
++	PKG_CHECK_MODULES(SOLETTA, soletta, dummy=yes,
++					AC_MSG_ERROR(soletta is required))
++	AC_SUBST(SOLETTA_CFLAGS)
++	AC_SUBST(SOLETTA_LIBS)
++	solettaprefix="`$PKG_CONFIG --variable=prefix soletta`"
++	AC_SUBST(SOLETTA_PREFIX, [${solettaprefix}])
++fi
++
++AC_ARG_WITH([solettamodulesdir], AC_HELP_STRING([--with-solettamodulesdir=DIR],
++			[path to soletta modules directory]), [path_solettamodulesdir=${withval}])
++if (test "${enable_soletta}" != "no" && test -z "${path_solettamodulesdir}"); then
++	AC_MSG_CHECKING([soletta modules directory])
++	path_solettamodulesdir="`$PKG_CONFIG --variable=modulesdir soletta`"
++	if (test -z "${path_solettamodulesdir=}"); then
++		AC_MSG_ERROR([soletta modules directory is required])
++	fi
++	AC_MSG_RESULT([${path_solettamodulesdir}])
++fi
++AC_SUBST(SOLETTA_MODULESDIR, [${path_solettamodulesdir}])
++
++AC_ARG_WITH([solettadescdir], AC_HELP_STRING([--with-solettadescdir=DIR],
++			[path to soletta node type descriptions directory]), [path_solettadescdir=${withval}])
++if (test "${enable_soletta}" != "no" && test -z "${path_solettadescdir}"); then
++	AC_MSG_CHECKING([soletta modules directory])
++	path_solettadescdir="`$PKG_CONFIG --variable=pkgdatadir soletta`"
++	if (test -z "${path_solettadescdir=}"); then
++		AC_MSG_ERROR([soletta descriptions directory is required])
++	fi
++	AC_MSG_RESULT([${path_solettadescdir}])
++fi
++AC_SUBST(SOLETTA_DESCDIR, [${path_solettadescdir}])
++
+ AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+-- 
 2.4.5
+
