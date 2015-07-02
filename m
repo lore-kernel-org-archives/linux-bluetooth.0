@@ -1,71 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vcgomes@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
-Subject: [RFC BlueZ 01/13] build: Add configure-time checks for soletta
-Date: Thu,  2 Jul 2015 11:33:42 -0300
-Message-Id: <1435847634-22831-2-git-send-email-vcgomes@gmail.com>
-In-Reply-To: <1435847634-22831-1-git-send-email-vcgomes@gmail.com>
-References: <1435847634-22831-1-git-send-email-vcgomes@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1435137092-19300-4-git-send-email-bharat.panda@samsung.com>
+References: <1435137092-19300-1-git-send-email-bharat.panda@samsung.com>
+	<1435137092-19300-4-git-send-email-bharat.panda@samsung.com>
+Date: Thu, 2 Jul 2015 11:19:03 +0300
+Message-ID: <CABBYNZ+38NbUzydMZ73gbCiew4L_eKU_yuS36OMHJouEEp+oCQ@mail.gmail.com>
+Subject: Re: [PATCH 3/3] tools: Add total-items command for GetTotalNumOfItems
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The idea will be to re-use the work done in peripheral/ so we can easily
-export node types for common Bluetooth profiles (the focus right now is
-GATT profiles).
+Hi Bharat,
 
-[1] https://github.com/solettaproject/soletta
----
- configure.ac | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+On Wed, Jun 24, 2015 at 12:11 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Added command "total-items" to send request for
+> "GetTotalNumOfItems".
+> ---
+>  tools/bluetooth-player.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+>
+> diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+> index 9e19997..66303a7 100644
+> --- a/tools/bluetooth-player.c
+> +++ b/tools/bluetooth-player.c
+> @@ -891,6 +891,44 @@ done:
+>         rl_printf("Attempting to list items\n");
+>  }
+>
+> +static void total_items_reply(DBusMessage *message, void *user_data)
+> +{
+> +       DBusError error;
+> +
+> +       dbus_error_init(&error);
+> +
+> +       if (dbus_set_error_from_message(&error, message) == TRUE) {
+> +               rl_printf("Failed to get total number of items: %s\n",
+> +                                       error.name);
+> +               dbus_error_free(&error);
+> +               return;
+> +       }
+> +
+> +       rl_printf("TotalItems successful\n");
+> +}
+> +
+> +static void cmd_total_items(int argc, char *argv[])
+> +{
+> +       GDBusProxy *proxy;
+> +
+> +       if (check_default_player() == FALSE)
+> +               return;
+> +
+> +       proxy = find_folder(g_dbus_proxy_get_path(default_player));
+> +       if (proxy == NULL) {
+> +               rl_printf("Operation not supported\n");
+> +               return;
+> +       }
+> +
+> +       if (g_dbus_proxy_method_call(proxy, "TotalNumberOfItems", NULL,
+> +                               total_items_reply, NULL, g_free) == FALSE) {
+> +               rl_printf("Failed to get total number of items\n");
+> +               return;
+> +       }
+> +
+> +       rl_printf("Attempting to list items\n");
+> +}
+> +
+>  static void search_setup(DBusMessageIter *iter, void *user_data)
+>  {
+>         char *string = user_data;
+> @@ -1025,6 +1063,8 @@ static const struct {
+>                                         "List items of current folder" },
+>         { "search",     "string",     cmd_search,
+>                                         "Search items containing string" },
+> +       { "total-items", NULL, cmd_total_items,
+> +                                       "Get total number of items" },
+>         { "queue",       "<item>",    cmd_queue, "Add item to playlist queue" },
+>         { "show-item",   "<item>",    cmd_show_item, "Show item information" },
+>         { "quit",         NULL,       cmd_quit, "Quit program" },
+> --
+> 1.9.1
 
-diff --git a/configure.ac b/configure.ac
-index c65d19a..5c3f832 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -283,4 +283,42 @@ fi
- AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
- 			[Directory for the Android daemon storage files])
- 
-+AC_ARG_ENABLE(soletta, AC_HELP_STRING([--enable-soletta],
-+			[enable building BlueZ soletta nodes]),
-+					[enable_soletta=${enableval}])
-+AM_CONDITIONAL(SOLETTA, test "${enable_soletta}" = "yes")
-+
-+if (test "${enable_soletta}" = "yes"); then
-+	PKG_CHECK_MODULES(SOLETTA, soletta, dummy=yes,
-+					AC_MSG_ERROR(soletta is required))
-+	AC_SUBST(SOLETTA_CFLAGS)
-+	AC_SUBST(SOLETTA_LIBS)
-+	solettaprefix="`$PKG_CONFIG --variable=prefix soletta`"
-+	AC_SUBST(SOLETTA_PREFIX, [${solettaprefix}])
-+fi
-+
-+AC_ARG_WITH([solettamodulesdir], AC_HELP_STRING([--with-solettamodulesdir=DIR],
-+			[path to soletta modules directory]), [path_solettamodulesdir=${withval}])
-+if (test "${enable_soletta}" != "no" && test -z "${path_solettamodulesdir}"); then
-+	AC_MSG_CHECKING([soletta modules directory])
-+	path_solettamodulesdir="`$PKG_CONFIG --variable=modulesdir soletta`"
-+	if (test -z "${path_solettamodulesdir=}"); then
-+		AC_MSG_ERROR([soletta modules directory is required])
-+	fi
-+	AC_MSG_RESULT([${path_solettamodulesdir}])
-+fi
-+AC_SUBST(SOLETTA_MODULESDIR, [${path_solettamodulesdir}])
-+
-+AC_ARG_WITH([solettadescdir], AC_HELP_STRING([--with-solettadescdir=DIR],
-+			[path to soletta node type descriptions directory]), [path_solettadescdir=${withval}])
-+if (test "${enable_soletta}" != "no" && test -z "${path_solettadescdir}"); then
-+	AC_MSG_CHECKING([soletta modules directory])
-+	path_solettadescdir="`$PKG_CONFIG --variable=pkgdatadir soletta`"
-+	if (test -z "${path_solettadescdir=}"); then
-+		AC_MSG_ERROR([soletta descriptions directory is required])
-+	fi
-+	AC_MSG_RESULT([${path_solettadescdir}])
-+fi
-+AC_SUBST(SOLETTA_DESCDIR, [${path_solettadescdir}])
-+
- AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+This entire patch should not be necessary if we just update
+NumberOfItems property.
+
+
 -- 
-2.4.5
-
+Luiz Augusto von Dentz
