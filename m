@@ -1,25 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 2 Jul 2015 14:22:14 -0500
-Message-ID: <CABKPALrTMqgvxRgu7TmUw+1MrTCL10FAGGzyphb1oAAyFGOBNQ@mail.gmail.com>
-Subject: Trying to run example-advertisement
-From: Neil Martin <neil@vnp.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Date: Thu, 02 Jul 2015 12:18:21 -0700 (PDT)
+Message-Id: <20150702.121821.1272949529563088472.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth 2015-07-02
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20150702073038.GA25214@t440s.lan>
+References: <20150702073038.GA25214@t440s.lan>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I was having trouble using the advertising api in my own code, so
-decided to run the example-advertisement python test to rule out
-errors in my code.  This doesn't work either - I get the following
-error message:
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 2 Jul 2015 10:30:38 +0300
 
-LEAdvertisingManager1 interface not found
+> A couple of regressions crept in because of a patch to use proper list
+> APIs rather than manually reading & writing the next/prev pointers
+> (commit 835a6a2f8603237a3e6cded5a6765090ecb06ea5). Turns out this was
+> masking a few bugs: a missing INIT_LIST_HEAD() call and incorrectly
+> using list_del() rather than list_del_init(). The two patches in this
+> set fix these, and it'd be nice they could still make it to 4.2-rc1 to
+> avoid new bug reports from users.
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-I know the advertising api is experimental.  My bluez was built with
---enable-experimental  and I'm running bluetoothd with the -E flag.
-It seems like this is an environment issue, but I don't find any
-suggestions when I try googling for help.  Is there anything obvious
-that I'm missing?
-
-Neil
+Pulled, thanks Johan.
