@@ -1,73 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Duda <lukasz.duda@nordicsemi.no>
-To: <alex.aring@gmail.com>
-CC: <linux-wpan@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
-Subject: [RFC 0/2] Adding stateful compression to IPHC
-Date: Fri, 3 Jul 2015 15:23:36 +0200
-Message-ID: <1435929818-6044-1-git-send-email-lukasz.duda@nordicsemi.no>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-wpan-owner@vger.kernel.org
+From: Frederic Danis <frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: hci_uart: Retrieve UART speed from ACPI
+Date: Fri,  3 Jul 2015 15:22:31 +0200
+Message-Id: <1435929751-26831-3-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1435929751-26831-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1435929751-26831-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Parse platform_device's ACPI to retrieve UART init speed.
+When BCM device is open, check if its TTY has same parent as one of the
+platform devices saved. If yes, use platform_device's init speed.
 
-The following patches introduce support for stateful compression in IPHC.
- 
-Patch #1: Adding stateful compression to 6lowpan module.
-Patch #2: Enabling use of stateful compression in bluetooth_6lowpan module.
- 
-Usage of stateful compression is described in Patch #1.
- 
-Limitations
-===========
- 
-- Temporarly use of debugfs to be able to add context table entries.
-- Current module does not support context time-outs.
-- No support for multicast addresses stateful compression.
- 
-Discussion: Idea on how to make the 6lowpan context tables out of debug mode
-============================================================================
- 
-The patch provided here is just a temporary solution where the contexts are
-manually added. The proper way of adding/removing contexts would be to make
-ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
-packets with 6CO option (for example from RADVD) will be handled in the
-ndisc_router_discovery function.
- 
-Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need to
-be handled in the ipv6 module in order to do it in a neat way.
-Potentially the RFC6775 extensions could potentially also be used by other
-protocols than BLE and 802.15.4.
- 
-There is a need for parsing the 6CO option in ndisc.c which parses Router
-Advertisement messages. Today the function calls to IPHC (6lowpan module) are
-quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
-module will be loaded or not. It would make sense to build 6lowpan module
-as in-build part of IPv6. The features could be compiled in by using #defines.
- 
-What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
-to handled 6LoWPAN specific options? Do you see any other solution to make sure
-that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
+Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+---
+ drivers/bluetooth/hci_bcm.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-Best regards,
-Lukasz Duda
-
-Lukasz Duda (2):
-  6lowpan: Add stateful compression for IPHC
-  Bluetooth: 6lowpan: Enable stateful compression for bluetooth_6lowpan
-    module
-
- include/net/6lowpan.h   |  37 ++++
- net/6lowpan/Makefile    |   2 +-
- net/6lowpan/context.c   | 523 ++++++++++++++++++++++++++++++++++++++++++++++++
- net/6lowpan/context.h   |  13 ++
- net/6lowpan/iphc.c      | 259 ++++++++++++++++++++----
- net/bluetooth/6lowpan.c |   4 +
- 6 files changed, 795 insertions(+), 43 deletions(-)
- create mode 100644 net/6lowpan/context.c
- create mode 100644 net/6lowpan/context.h
-
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 856cb48..ac64bc1 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -49,6 +49,8 @@ struct bcm_device {
+ 
+ 	struct clk		*clk;
+ 	bool			clk_enabled;
++
++	u32			init_speed;
+ };
+ 
+ struct bcm_data {
+@@ -149,6 +151,7 @@ static int bcm_open(struct hci_uart *hu)
+ 		dev = list_entry(ptr, struct bcm_device, list);
+ 		if (hu->tty->dev->parent == dev->pdev->dev.parent) {
+ 			bcm->dev = dev;
++			hu->init_speed = dev->init_speed;
+ 			break;
+ 		}
+ 	}
+@@ -302,11 +305,29 @@ static const struct acpi_gpio_mapping acpi_bcm_default_gpios[] = {
+ 	{ },
+ };
+ 
++static int bcm_resource(struct acpi_resource *ares, void *data)
++{
++	struct bcm_device *dev = data;
++
++	if (ares->type == ACPI_RESOURCE_TYPE_SERIAL_BUS) {
++		struct acpi_resource_uart_serialbus *sb;
++
++		sb = &ares->data.uart_serial_bus;
++		if (sb->type == ACPI_RESOURCE_SERIAL_TYPE_UART)
++			dev->init_speed = sb->default_baud_rate;
++	}
++
++	/* Always tell the ACPI core to skip this resource */
++	return 1;
++}
++
+ static int bcm_acpi_probe(struct bcm_device *dev)
+ {
+ 	struct platform_device *pdev = dev->pdev;
+ 	const struct acpi_device_id *id;
+ 	struct gpio_desc *gpio;
++	struct acpi_device *adev;
++	LIST_HEAD(resources);
+ 	int ret;
+ 
+ 	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
+@@ -346,6 +367,13 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ 		return -EINVAL;
+ 	}
+ 
++	/* Retrieve UART ACPI info */
++	adev = ACPI_COMPANION(&dev->pdev->dev);
++	if (!adev)
++		return 0;
++
++	acpi_dev_get_resources(adev, &resources, bcm_resource, dev);
++
+ 	return 0;
+ }
+ 
 -- 
-2.1.4
+1.9.1
 
