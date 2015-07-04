@@ -1,89 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: btintel: Add generic function for handling hardware errors
-Date: Sat,  4 Jul 2015 15:15:21 +0200
-Message-Id: <1436015723-43145-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/3] Bluetooth: btusb: Use hardware error handler from Intel module
+Date: Sat,  4 Jul 2015 15:15:22 +0200
+Message-Id: <1436015723-43145-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The handling of hardware error has support for providing a vendor
-specific callback to deal with the error. Move the Intel specific
-function out of the USB driver into the generic module so that it
-can also be utilized by the UART driver.
+The Intel specific Bluetooth module provides now an exported function
+for the hardware error. Use that instead of duplicating it inside the
+driver.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btintel.c | 34 ++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  5 +++++
- 2 files changed, 39 insertions(+)
+ drivers/bluetooth/btusb.c | 35 +----------------------------------
+ 1 file changed, 1 insertion(+), 34 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 828f2f8d1568..8b160858f7e8 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -89,6 +89,40 @@ int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- }
- EXPORT_SYMBOL_GPL(btintel_set_bdaddr);
- 
-+void btintel_hw_error(struct hci_dev *hdev, u8 code)
-+{
-+	struct sk_buff *skb;
-+	u8 type = 0x00;
-+
-+	BT_ERR("%s: Hardware error 0x%2.2x", hdev->name, code);
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Reset after hardware error failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return;
-+	}
-+	kfree_skb(skb);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc22, 1, &type, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Retrieving Intel exception info failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return;
-+	}
-+
-+	if (skb->len != 13) {
-+		BT_ERR("%s: Exception info size mismatch", hdev->name);
-+		kfree_skb(skb);
-+		return;
-+	}
-+
-+	BT_ERR("%s: Exception info %s", hdev->name, (char *)(skb->data + 1));
-+
-+	kfree_skb(skb);
-+}
-+EXPORT_SYMBOL_GPL(btintel_hw_error);
-+
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 4bda6ab34f60..c4680cd44011 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -73,6 +73,7 @@ struct intel_secure_send_result {
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-+void btintel_hw_error(struct hci_dev *hdev, u8 code);
- 
- #else
- 
-@@ -86,4 +87,8 @@ static inline int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdadd
- 	return -EOPNOTSUPP;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b4cf8d9c9dac..21bdb89da6eb 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2291,39 +2291,6 @@ done:
+ 	return 0;
  }
  
-+static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
-+{
-+}
-+
- #endif
+-static void btusb_hw_error_intel(struct hci_dev *hdev, u8 code)
+-{
+-	struct sk_buff *skb;
+-	u8 type = 0x00;
+-
+-	BT_ERR("%s: Hardware error 0x%2.2x", hdev->name, code);
+-
+-	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		BT_ERR("%s: Reset after hardware error failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
+-		return;
+-	}
+-	kfree_skb(skb);
+-
+-	skb = __hci_cmd_sync(hdev, 0xfc22, 1, &type, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		BT_ERR("%s: Retrieving Intel exception info failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
+-		return;
+-	}
+-
+-	if (skb->len != 13) {
+-		BT_ERR("%s: Exception info size mismatch", hdev->name);
+-		kfree_skb(skb);
+-		return;
+-	}
+-
+-	BT_ERR("%s: Exception info %s", hdev->name, (char *)(skb->data + 1));
+-
+-	kfree_skb(skb);
+-}
+-
+ static int btusb_shutdown_intel(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -2783,7 +2750,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_INTEL_NEW) {
+ 		hdev->send = btusb_send_frame_intel;
+ 		hdev->setup = btusb_setup_intel_new;
+-		hdev->hw_error = btusb_hw_error_intel;
++		hdev->hw_error = btintel_hw_error;
+ 		hdev->set_bdaddr = btintel_set_bdaddr;
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 	}
 -- 
 2.4.3
 
