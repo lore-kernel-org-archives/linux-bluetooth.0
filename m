@@ -1,89 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/3] Bluetooth: btintel: Add generic function for handling hardware errors
-Date: Sun,  5 Jul 2015 14:37:38 +0200
-Message-Id: <1436099860-77732-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth:dtl1_cs: Fixed coding style
+Date: Sun, 5 Jul 2015 09:56:36 +0000
+Message-ID: <20150705095631.GA16694@developmental>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The handling of hardware error has support for providing a vendor
-specific callback to deal with the error. Move the Intel specific
-function out of the USB driver into the generic module so that it
-can also be utilized by the UART driver.
+From: Prasanna Karthik <mkarthi3@visteon.com>
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Removed semicolon at end of switch statement,error reported by Coccinelle
+
+Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
 ---
- drivers/bluetooth/btintel.c | 34 ++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  5 +++++
- 2 files changed, 39 insertions(+)
+ drivers/bluetooth/dtl1_cs.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 828f2f8d1568..8b160858f7e8 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -89,6 +89,40 @@ int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- }
- EXPORT_SYMBOL_GPL(btintel_set_bdaddr);
- 
-+void btintel_hw_error(struct hci_dev *hdev, u8 code)
-+{
-+	struct sk_buff *skb;
-+	u8 type = 0x00;
-+
-+	BT_ERR("%s: Hardware error 0x%2.2x", hdev->name, code);
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Reset after hardware error failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return;
+diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
+index 09c130d..84135c5 100644
+--- a/drivers/bluetooth/dtl1_cs.c
++++ b/drivers/bluetooth/dtl1_cs.c
+@@ -406,7 +406,7 @@ static int dtl1_hci_send_frame(struct hci_dev *hdev, st=
+ruct sk_buff *skb)
+ 		break;
+ 	default:
+ 		return -EILSEQ;
+-	};
 +	}
-+	kfree_skb(skb);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc22, 1, &type, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Retrieving Intel exception info failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return;
-+	}
-+
-+	if (skb->len != 13) {
-+		BT_ERR("%s: Exception info size mismatch", hdev->name);
-+		kfree_skb(skb);
-+		return;
-+	}
-+
-+	BT_ERR("%s: Exception info %s", hdev->name, (char *)(skb->data + 1));
-+
-+	kfree_skb(skb);
-+}
-+EXPORT_SYMBOL_GPL(btintel_hw_error);
-+
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 4bda6ab34f60..c4680cd44011 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -73,6 +73,7 @@ struct intel_secure_send_result {
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-+void btintel_hw_error(struct hci_dev *hdev, u8 code);
- 
- #else
- 
-@@ -86,4 +87,8 @@ static inline int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdadd
- 	return -EOPNOTSUPP;
- }
- 
-+static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
-+{
-+}
-+
- #endif
--- 
-2.4.3
-
+=20
+ 	nsh.zero =3D 0;
+ 	nsh.len =3D skb->len;
+--=20
+1.7.9.5
