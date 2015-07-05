@@ -1,37 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
-	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth: bt3c_cs.c: Fix coding style
-Date: Mon, 6 Jul 2015 05:40:16 +0000
-Message-ID: <20150706053935.GA2416@ubuntu>
-Content-Type: text/plain; charset="us-ascii"
+Date: Sun, 5 Jul 2015 17:07:35 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btintel: Create common function for Intel
+ version info
+Message-ID: <20150705140735.GC22814@t440s.P-661HNU-F1>
+References: <1436101327-97285-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1436101327-97285-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Prasanna Karthik <mkarthi3@visteon.com>
+Hi Marcel,
 
-Remove semicolon in switch statement, reported by coccinelle
+On Sun, Jul 05, 2015, Marcel Holtmann wrote:
+> The Intel version information is shared between USB and UART drivers
+> and with that move it into a generic function of the Intel module.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btintel.c   | 21 +++++++++++++++++++++
+>  drivers/bluetooth/btintel.h   |  5 +++++
+>  drivers/bluetooth/btusb.c     | 23 +----------------------
+>  drivers/bluetooth/hci_intel.c | 23 +----------------------
+>  4 files changed, 28 insertions(+), 44 deletions(-)
 
-Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
----
- drivers/bluetooth/bt3c_cs.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Applied to bluetooth-next. Thanks.
 
-diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
-index 7aab654..a00bb82 100644
---- a/drivers/bluetooth/bt3c_cs.c
-+++ b/drivers/bluetooth/bt3c_cs.c
-@@ -427,7 +427,7 @@ static int bt3c_hci_send_frame(struct hci_dev *hdev, st=
-ruct sk_buff *skb)
- 	case HCI_SCODATA_PKT:
- 		hdev->stat.sco_tx++;
- 		break;
--	};
-+	}
-=20
- 	/* Prepend skb with frame type */
- 	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
---=20
-1.7.0.4
+Johan
