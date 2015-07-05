@@ -1,31 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 5 Jul 2015 17:07:05 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] Bluetooth: btintel: Add generic function for
- handling hardware errors
-Message-ID: <20150705140705.GA22814@t440s.P-661HNU-F1>
-References: <1436099860-77732-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1436099860-77732-1-git-send-email-marcel@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
+Subject: Re: [PATCH] Bluetooth:dtl1_cs: Fixed coding style
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150705095631.GA16694@developmental>
+Date: Sun, 5 Jul 2015 15:13:55 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <32FB93D8-BAA8-44B7-83D5-0A5E61E9E5E7@holtmann.org>
+References: <20150705095631.GA16694@developmental>
+To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Prasanna,
 
-On Sun, Jul 05, 2015, Marcel Holtmann wrote:
-> The handling of hardware error has support for providing a vendor
-> specific callback to deal with the error. Move the Intel specific
-> function out of the USB driver into the generic module so that it
-> can also be utilized by the UART driver.
+> Removed semicolon at end of switch statement,error reported by Coccinelle
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
 > ---
->  drivers/bluetooth/btintel.c | 34 ++++++++++++++++++++++++++++++++++
->  drivers/bluetooth/btintel.h |  5 +++++
->  2 files changed, 39 insertions(+)
+> drivers/bluetooth/dtl1_cs.c |    2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-All three patches have been applied to bluetooth-next. Thanks.
+patch has been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
