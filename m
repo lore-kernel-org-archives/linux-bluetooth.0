@@ -1,34 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1436188651.26954.9.camel@hadess.net>
-Subject: Why doesn't plugins/sixaxis.c set devices as Trusted?
-From: Bastien Nocera <hadess@hadess.net>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Date: Mon, 06 Jul 2015 15:17:31 +0200
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <559A3918.803@intel.com>
+Date: Mon, 06 Jul 2015 10:15:20 +0200
+From: Loic Poulain <loic.poulain@intel.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Johan Hedberg <johan.hedberg@gmail.com>,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_uart: Introduce Intel HCI UART driver
+References: <1435746026-1024-1-git-send-email-loic.poulain@intel.com> <188DA073-D50B-4173-B879-0AFD8A0C7915@holtmann.org>
+In-Reply-To: <188DA073-D50B-4173-B879-0AFD8A0C7915@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey,
+Hi Marcel,
 
-I don't understand the reason why plugins/sixaxis.c doesn't set the
-device as trusted when plugged in.
+> I did apply this patch to bluetooth-next tree, but I had to fix a bunch of coding style mistakes.
+>
+> Initially I was going to send this back, but in the end they were so easy to fix inline that it would have just delayed the process for getting larger exposure of this patch. However please review these since there were obvious coding style mistakes.
 
-I would expect the Sixaxis plugin to do that, because there's no way to
-assert, in the UI, where the device information is coming from to trust
-it automatically, and I don't really want to show a "Do you want to
-allow device X to connect as a HID device" for devices which weren't
-setup in the UI.
+Thanks for the reviewing, fixing and testing of this patch.
+It's obvious that my commit message was too poor, sorry for that.
 
-For example, I could create a program on another computer with similar
-characteristics (same name, class and service UUIDs) which would make
-it indistinguishable from the device that was plugged in.
+> In addition, I did a test run on one of my development boards and having to wait almost 1 minute for the firmware to load is impressive. Seems we really want to add the higher speed UART support.
 
-If security was a problem, we probably shouldn't be setting the master
-BD address on the pad unless there's a running agent.
+Regarding firmware download, with the 115200 default speed, I obtain the 
+same result (>1min)
+Patch is ongoing to use the final speed. Using 3M, firmware download 
+takes about 4s.
 
-So, do we stop setup_device() early if there's no agent running and set
-as trusted, or simply always set as trusted?
+> [171933.957748] Bluetooth: hci0: Bootloader revision 0.0 build 2 week 34 2014
+> [171933.969914] Bluetooth: hci0: Device revision is 5
+> [171933.969916] Bluetooth: hci0: Secure boot is enabled
+> [171933.969918] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+> [171933.969918] Bluetooth: hci0: No device address configured
+> [171933.975503] Bluetooth: hci0: Found device firmware: intel/ibt-11-5.sfi
+> [171988.683798] Bluetooth: hci0: Waiting for firmware download to complete
+> [171988.683801] Bluetooth: hci0: Firmware loaded in 53497399 usecs
+> [171988.683886] Bluetooth: hci0: Waiting for device to boot
+> [171988.696706] Bluetooth: hci0: Device booted in 12593 usecs
+> [171988.714708] Bluetooth: hci0 hardware error 0x0e
 
-Cheers
+I don't know why you get this hardware error, maybe a Intel reset param 
+issue with your device.
+
+
+Thanks & Regards,
+Loic
+
+-- 
+Intel Open Source Technology Center
+http://oss.intel.com/
