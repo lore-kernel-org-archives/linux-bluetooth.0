@@ -1,34 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <559B5633.8000102@ahsoftware.de>
-Date: Tue, 07 Jul 2015 06:31:47 +0200
-From: Alexander Holler <holler@ahsoftware.de>
-MIME-Version: 1.0
-To: Bastien Nocera <hadess@hadess.net>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: Re: Why doesn't plugins/sixaxis.c set devices as Trusted?
-References: <1436188651.26954.9.camel@hadess.net>
-In-Reply-To: <1436188651.26954.9.camel@hadess.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Message-ID: <1436188651.26954.9.camel@hadess.net>
+Subject: Why doesn't plugins/sixaxis.c set devices as Trusted?
+From: Bastien Nocera <hadess@hadess.net>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Date: Mon, 06 Jul 2015 15:17:31 +0200
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 06.07.2015 um 15:17 schrieb Bastien Nocera:
-> Hey,
->
-> I don't understand the reason why plugins/sixaxis.c doesn't set the
-> device as trusted when plugged in.
+Hey,
 
-It's because of security. If you trust a bluetooth device on Linux, 
-you're trusting it for all services. In case of the sixaxis it means 
-you're not only trusting it (the BT-MAC) as an input device, but also as 
-a network device.
+I don't understand the reason why plugins/sixaxis.c doesn't set the
+device as trusted when plugged in.
 
-Now if you trust any plugged in device which says it's a sixaxis, I 
-would tell my arduino to say it's an sixaxis with a MAC from one of my 
-BT-dongles to get a magic device which gives me wireless remote access 
-on every linux box with BT when I plug it in once.
+I would expect the Sixaxis plugin to do that, because there's no way to
+assert, in the UI, where the device information is coming from to trust
+it automatically, and I don't really want to show a "Do you want to
+allow device X to connect as a HID device" for devices which weren't
+setup in the UI.
 
-That means you want user interaction, besides just plugging in a device.
+For example, I could create a program on another computer with similar
+characteristics (same name, class and service UUIDs) which would make
+it indistinguishable from the device that was plugged in.
 
-Alexander Holler
+If security was a problem, we probably shouldn't be setting the master
+BD address on the pad unless there's a running agent.
+
+So, do we stop setup_device() early if there's no agent running and set
+as trusted, or simply always set as trusted?
+
+Cheers
