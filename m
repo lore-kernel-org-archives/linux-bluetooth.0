@@ -1,133 +1,169 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1436278440.26954.30.camel@hadess.net>
-Subject: [PATCH 1/2 v3] adapter: Add
- btd_request_authorization_cable_configured()
+Message-ID: <1436277455.26954.28.camel@hadess.net>
+Subject: [PATCH 2/2 v2] sixaxis: Ask user whether cable configuration should
+ be allowed
 From: Bastien Nocera <hadess@hadess.net>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 07 Jul 2015 16:14:00 +0200
+Date: Tue, 07 Jul 2015 15:57:35 +0200
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add btd_request_authorization_cable_configured() function to allow
-cable configured devices to ask the user straight away about whether the
-device should be allowed to connect to the computer.
+Previously, users doing cable configuration of Sixaxis PS3 controllers
+would only get asked whether a device was allowed to connect to the
+computer when switching it to Bluetooth mode: unplugging it, and
+pressing the PS button.
 
-This allows us to ask the user at the time of the USB connection and
-initial setup, rather than when the first Bluetooth connection is made.
+Instead, we should ask the user straight away, through the agent,
+whether the pad should be allowed to connect.
+
+This makes it easier to setup those devices, while keeping security.
 ---
- src/adapter.c | 42 ++++++++++++++++++++++++++++++++++++------
- src/adapter.h |  2 ++
- 2 files changed, 38 insertions(+), 6 deletions(-)
+ plugins/sixaxis.c | 80 +++++++++++++++++++++++++++++++++++++++++++----
+--------
+ 1 file changed, 63 insertions(+), 17 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 95b5349..cf09d4b 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -262,6 +262,11 @@ struct btd_adapter {
- 	bool is_default;		/* true if adapter is default one */
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index fcc93bc..032ff62 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -44,6 +44,7 @@
+ 
+ #include "src/adapter.h"
+ #include "src/device.h"
++#include "src/agent.h"
+ #include "src/plugin.h"
+ #include "src/log.h"
+ #include "src/shared/util.h"
+@@ -71,6 +72,13 @@ static const struct {
+ 	},
  };
  
-+typedef enum {
-+	ADAPTER_AUTHORIZE_DISCONNECTED = 0,
-+	ADAPTER_AUTHORIZE_CHECK_CONNECTED
-+} adapter_authorize_type;
-+
- static struct btd_adapter *btd_adapter_lookup(uint16_t index)
- {
- 	GList *list;
-@@ -5814,8 +5819,9 @@ static void svc_complete(struct btd_device *dev, int err, void *user_data)
- }
- 
- static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
--					const char *uuid, service_auth_cb cb,
--					void *user_data)
-+					const char *uuid,
-+					adapter_authorize_type check_for_connection,
-+					service_auth_cb cb, void *user_data)
- {
- 	struct service_auth *auth;
- 	struct btd_device *device;
-@@ -5826,7 +5832,7 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
- 		return 0;
- 
- 	/* Device connected? */
--	if (!g_slist_find(adapter->connections, device))
-+	if (check_for_connection && !g_slist_find(adapter->connections, device))
- 		error("Authorization request for non-connected device!?");
- 
- 	auth = g_try_new0(struct service_auth, 1);
-@@ -5839,7 +5845,12 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
- 	auth->device = device;
- 	auth->adapter = adapter;
- 	auth->id = ++id;
--	auth->svc_id = device_wait_for_svc_complete(device, svc_complete, auth);
-+	if (check_for_connection)
-+		auth->svc_id = device_wait_for_svc_complete(device, svc_complete, auth);
-+	else {
-+		if (adapter->auth_idle_id == 0)
-+			adapter->auth_idle_id = g_idle_add(process_auth_queue, adapter);
-+	}
- 
- 	g_queue_push_tail(adapter->auths, auth);
- 
-@@ -5858,7 +5869,8 @@ guint btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
- 		if (!adapter)
- 			return 0;
- 
--		return adapter_authorize(adapter, dst, uuid, cb, user_data);
-+		return adapter_authorize(adapter, dst, uuid,
-+				ADAPTER_AUTHORIZE_CHECK_CONNECTED, cb, user_data);
- 	}
- 
- 	for (l = adapters; l != NULL; l = g_slist_next(l)) {
-@@ -5866,7 +5878,8 @@ guint btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
- 
- 		adapter = l->data;
- 
--		id = adapter_authorize(adapter, dst, uuid, cb, user_data);
-+		id = adapter_authorize(adapter, dst, uuid,
-+				ADAPTER_AUTHORIZE_CHECK_CONNECTED, cb, user_data);
- 		if (id != 0)
- 			return id;
- 	}
-@@ -5874,6 +5887,23 @@ guint btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
- 	return 0;
- }
- 
-+guint btd_request_authorization_cable_configured(const bdaddr_t *src, const bdaddr_t *dst,
-+						const char *uuid, service_auth_cb cb,
-+						void *user_data)
-+{
++struct authentication_closure {
 +	struct btd_adapter *adapter;
++	struct btd_device *device;
++	int fd;
++	char device_addr[18];
++};
 +
-+	if (bacmp(src, BDADDR_ANY) == 0)
-+		return 0;
+ struct leds_data {
+ 	char *syspath_prefix;
+ 	uint8_t bitmap;
+@@ -255,19 +263,55 @@ out:
+ 	return FALSE;
+ }
+ 
++static void agent_auth_cb(DBusError *derr,
++				void *user_data)
++{
++	struct authentication_closure *closure = user_data;
++	char master_addr[18], adapter_addr[18];
++	bdaddr_t master_bdaddr;
++	const bdaddr_t *adapter_bdaddr;
 +
-+	adapter = adapter_find(src);
-+	if (!adapter)
-+		return 0;
++	if (derr != NULL) {
++		DBG("Agent replied negatively, removing temporary
+device");
++		goto error;
++	}
 +
-+	return adapter_authorize(adapter, dst, uuid,
-+			ADAPTER_AUTHORIZE_DISCONNECTED, cb, user_data);
++	btd_device_set_temporary(closure->device, false);
++
++	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
++		goto error;
++
++	adapter_bdaddr = btd_adapter_get_address(closure->adapter);
++	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
++		if (set_master_bdaddr(closure->fd, adapter_bdaddr) <
+0)
++			goto error;
++	}
++
++	ba2str(&master_bdaddr, master_addr);
++	ba2str(adapter_bdaddr, adapter_addr);
++	DBG("remote %s old_master %s new_master %s",
++				closure->device_addr, master_addr,
+adapter_addr);
++
++	g_free(closure);
++
++	return;
++
++error:
++	btd_adapter_remove_device(closure->adapter, closure->device);
++	g_free(closure);
 +}
 +
- static struct service_auth *find_authorization(guint id)
+ static bool setup_device(int fd, int index, struct btd_adapter
+*adapter)
  {
- 	GSList *l;
-diff --git a/src/adapter.h b/src/adapter.h
-index 0c95f5d..b9da6cf 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -119,6 +119,8 @@ int btd_register_adapter_driver(struct btd_adapter_driver *driver);
- void btd_unregister_adapter_driver(struct btd_adapter_driver *driver);
- guint btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
- 		const char *uuid, service_auth_cb cb, void *user_data);
-+guint btd_request_authorization_cable_configured(const bdaddr_t *src, const bdaddr_t *dst,
-+		const char *uuid, service_auth_cb cb, void *user_data);
- int btd_cancel_authorization(guint id);
+-	char device_addr[18], master_addr[18], adapter_addr[18];
+-	bdaddr_t device_bdaddr, master_bdaddr;
++	char device_addr[18];
++	bdaddr_t device_bdaddr;
+ 	const bdaddr_t *adapter_bdaddr;
+ 	struct btd_device *device;
++	struct authentication_closure *closure;
  
- int btd_adapter_restore_powered(struct btd_adapter *adapter);
+ 	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
+ 		return false;
+ 
+-	if (get_master_bdaddr(fd, &master_bdaddr) < 0)
+-		return false;
+-
+ 	/* This can happen if controller was plugged while already
+connected
+ 	 * eg. to charge up battery.
+ 	 * Don't set LEDs in that case, hence return false */
+@@ -276,18 +320,7 @@ static bool setup_device(int fd, int index, struct
+btd_adapter *adapter)
+ 	if (device && btd_device_is_connected(device))
+ 		return false;
+ 
+-	adapter_bdaddr = btd_adapter_get_address(adapter);
+-
+-	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
+-		if (set_master_bdaddr(fd, adapter_bdaddr) < 0)
+-			return false;
+-	}
+-
+ 	ba2str(&device_bdaddr, device_addr);
+-	ba2str(&master_bdaddr, master_addr);
+-	ba2str(adapter_bdaddr, adapter_addr);
+-	DBG("remote %s old_master %s new_master %s",
+-				device_addr, master_addr,
+adapter_addr);
+ 
+ 	device = btd_adapter_get_device(adapter, &device_bdaddr,
+BDADDR_BREDR);
+ 
+@@ -302,7 +335,20 @@ static bool setup_device(int fd, int index, struct
+btd_adapter *adapter)
+ 	btd_device_device_set_name(device, devices[index].name);
+ 	btd_device_set_pnpid(device, devices[index].source,
+devices[index].vid,
+ 				devices[index].pid,
+devices[index].version);
+-	btd_device_set_temporary(device, false);
++	btd_device_set_temporary(device, true);
++
++	closure = g_try_new0(struct authentication_closure, 1);
++	if (!closure) {
++		btd_adapter_remove_device(adapter, device);
++		return false;
++	}
++	closure->adapter = adapter;
++	closure->device = device;
++	closure->fd = fd;
++	memcpy(&closure->device_addr, device_addr,
+sizeof(device_addr));
++	adapter_bdaddr = btd_adapter_get_address(adapter);
++	btd_request_authorization_cable_configured(adapter_bdaddr,
+&device_bdaddr,
++				HID_UUID, agent_auth_cb, closure);
+ 
+ 	return true;
+ }
 -- 
 2.4.3
