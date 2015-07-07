@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1436277455.26954.28.camel@hadess.net>
-Subject: [PATCH 2/2 v2] sixaxis: Ask user whether cable configuration should
- be allowed
+Message-ID: <1436276887.26954.26.camel@hadess.net>
+Subject: [PATCH 2/2] sixaxis: Ask user whether cable configuration should be
+ allowed
 From: Bastien Nocera <hadess@hadess.net>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Tue, 07 Jul 2015 15:57:35 +0200
+Date: Tue, 07 Jul 2015 15:48:07 +0200
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -25,7 +25,7 @@ This makes it easier to setup those devices, while keeping security.
  1 file changed, 63 insertions(+), 17 deletions(-)
 
 diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-index fcc93bc..032ff62 100644
+index fcc93bc..8b9c19f 100644
 --- a/plugins/sixaxis.c
 +++ b/plugins/sixaxis.c
 @@ -44,6 +44,7 @@
@@ -36,7 +36,7 @@ index fcc93bc..032ff62 100644
  #include "src/plugin.h"
  #include "src/log.h"
  #include "src/shared/util.h"
-@@ -71,6 +72,13 @@ static const struct {
+@@ -71,6 +72,12 @@ static const struct {
  	},
  };
  
@@ -44,13 +44,12 @@ index fcc93bc..032ff62 100644
 +	struct btd_adapter *adapter;
 +	struct btd_device *device;
 +	int fd;
-+	char device_addr[18];
 +};
 +
  struct leds_data {
  	char *syspath_prefix;
  	uint8_t bitmap;
-@@ -255,19 +263,55 @@ out:
+@@ -255,19 +262,57 @@ out:
  	return FALSE;
  }
  
@@ -58,37 +57,41 @@ index fcc93bc..032ff62 100644
 +				void *user_data)
 +{
 +	struct authentication_closure *closure = user_data;
-+	char master_addr[18], adapter_addr[18];
-+	bdaddr_t master_bdaddr;
-+	const bdaddr_t *adapter_bdaddr;
 +
 +	if (derr != NULL) {
 +		DBG("Agent replied negatively, removing temporary
 device");
 +		goto error;
-+	}
++	} else {
++		char master_addr[18], adapter_addr[18];
++		bdaddr_t master_bdaddr;
++		const bdaddr_t *adapter_bdaddr;
++		const char *device_addr = "FIXME";
 +
-+	btd_device_set_temporary(closure->device, false);
++		btd_device_set_temporary(closure->device, false);
 +
-+	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
-+		goto error;
-+
-+	adapter_bdaddr = btd_adapter_get_address(closure->adapter);
-+	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
-+		if (set_master_bdaddr(closure->fd, adapter_bdaddr) <
++		if (get_master_bdaddr(closure->fd, &master_bdaddr) <
 0)
 +			goto error;
-+	}
 +
-+	ba2str(&master_bdaddr, master_addr);
-+	ba2str(adapter_bdaddr, adapter_addr);
-+	DBG("remote %s old_master %s new_master %s",
-+				closure->device_addr, master_addr,
++		adapter_bdaddr = btd_adapter_get_address(closure
+->adapter);
++		if (bacmp(adapter_bdaddr, &master_bdaddr)) {
++			if (set_master_bdaddr(closure->fd,
+adapter_bdaddr) < 0)
++				goto error;
++		}
++
++		ba2str(&master_bdaddr, master_addr);
++		ba2str(adapter_bdaddr, adapter_addr);
++		DBG("remote %s old_master %s new_master %s",
++					device_addr, master_addr,
 adapter_addr);
 +
-+	g_free(closure);
++		g_free(closure);
 +
-+	return;
++		return;
++	}
 +
 +error:
 +	btd_adapter_remove_device(closure->adapter, closure->device);
@@ -116,7 +119,7 @@ adapter_addr);
 connected
  	 * eg. to charge up battery.
  	 * Don't set LEDs in that case, hence return false */
-@@ -276,18 +320,7 @@ static bool setup_device(int fd, int index, struct
+@@ -276,18 +321,7 @@ static bool setup_device(int fd, int index, struct
 btd_adapter *adapter)
  	if (device && btd_device_is_connected(device))
  		return false;
@@ -138,7 +141,7 @@ adapter_addr);
  	device = btd_adapter_get_device(adapter, &device_bdaddr,
 BDADDR_BREDR);
  
-@@ -302,7 +335,20 @@ static bool setup_device(int fd, int index, struct
+@@ -302,7 +336,19 @@ static bool setup_device(int fd, int index, struct
 btd_adapter *adapter)
  	btd_device_device_set_name(device, devices[index].name);
  	btd_device_set_pnpid(device, devices[index].source,
@@ -156,8 +159,6 @@ devices[index].version);
 +	closure->adapter = adapter;
 +	closure->device = device;
 +	closure->fd = fd;
-+	memcpy(&closure->device_addr, device_addr,
-sizeof(device_addr));
 +	adapter_bdaddr = btd_adapter_get_address(adapter);
 +	btd_request_authorization_cable_configured(adapter_bdaddr,
 &device_bdaddr,
