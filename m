@@ -1,41 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core/profiles: Fix not handling disconnections properly
-Date: Tue,  7 Jul 2015 13:40:50 +0300
-Message-Id: <1436265650-6157-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <559B7680.5040004@ahsoftware.de>
+Date: Tue, 07 Jul 2015 08:49:36 +0200
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Bastien Nocera <hadess@hadess.net>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: Re: Why doesn't plugins/sixaxis.c set devices as Trusted?
+References: <1436188651.26954.9.camel@hadess.net>	 <559B5633.8000102@ahsoftware.de> <1436245912.26954.15.camel@hadess.net> <559B64FA.2070200@ahsoftware.de>
+In-Reply-To: <559B64FA.2070200@ahsoftware.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Am 07.07.2015 um 07:34 schrieb Alexander Holler:
+> Am 07.07.2015 um 07:11 schrieb Bastien Nocera:
+>> On Tue, 2015-07-07 at 06:31 +0200, Alexander Holler wrote:
+>>> Am 06.07.2015 um 15:17 schrieb Bastien Nocera:
+>>>> Hey,
+>>>>
+>>>> I don't understand the reason why plugins/sixaxis.c doesn't set the
+>>>> device as trusted when plugged in.
+>>>
+>>> It's because of security. If you trust a bluetooth device on Linux,
+>>> you're trusting it for all services. In case of the sixaxis it means
+>>> you're not only trusting it (the BT-MAC) as an input device, but also
+>>> as
+>>> a network device.
+>>>
+>>> Now if you trust any plugged in device which says it's a sixaxis, I
+>>> would tell my arduino to say it's an sixaxis with a MAC from one of
+>>> my
+>>> BT-dongles to get a magic device which gives me wireless remote
+>>> access
+>>> on every linux box with BT when I plug it in once.
+>>>
+>>> That means you want user interaction, besides just plugging in a
+>>> device.
+>>
+>> What should the pairing process look like then? Because the current
+>> workflow is absolutely dreadful.
+>
+> Pairing is something different than trusting a bluetooth device.
+>
+> No idea what's your problem. If you remove the necessary user
+> interaction to trust a device, you remove the security. Just plugging in
+> an (anonymous) usb-device isn't usable as trust.
+>
+> If Sony decided that's ok for the PS3 (a game console), it's one thing.
+>
+> But you don't want a wireless remote connected second keyboard or even a
+> network device if some just plugged in an anonymous usb-device which
+> might even look totally different than as what it presents itself to the
+> system.
 
-If a profiles disconnects while in connecting state but ext_connect has
-already been called the state is never updated since ext_io_disconnected
-always calls btd_service_disconnecting_complete.
----
- src/profile.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+Just to say it in more clear words. The trust you wanted to give 
+automatically does not disappear when the the plugged in device will be 
+removed. And furthermore the trust is for a different, wireless 
+connected, device, you don't see if you examine the computer.
 
-diff --git a/src/profile.c b/src/profile.c
-index 4e68afc..7c707a6 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -797,8 +797,13 @@ static gboolean ext_io_disconnected(GIOChannel *io, GIOCondition cond,
- 
- 	DBG("%s disconnected from %s", ext->name, addr);
- drop:
--	if (conn->service)
--		btd_service_disconnecting_complete(conn->service, 0);
-+	if (conn->service) {
-+		if (btd_service_get_state(conn->service) ==
-+						BTD_SERVICE_STATE_CONNECTING)
-+			bt_service_connection_complete(conn->service, -EIO);
-+		else
-+			btd_service_disconnecting_complete(conn->service, 0);
-+	}
- 
- 	ext->conns = g_slist_remove(ext->conns, conn);
- 	ext_io_destroy(conn);
--- 
-2.1.0
+That's why there is absolutely a need to make the user aware that he is 
+going to trust a wireless device.
 
+Alexander Holler
