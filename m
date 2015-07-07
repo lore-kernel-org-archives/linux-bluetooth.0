@@ -1,53 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zheng, Wu" <wu.zheng@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: how to use "example-gatt-server" test gatt?
-Date: Wed, 8 Jul 2015 02:48:22 +0000
-Message-ID: <2CF57A644018A745B8FE029C7223E16E11A37D8E@SHSMSX104.ccr.corp.intel.com>
-References: <2CF57A644018A745B8FE029C7223E16E11A34AE9@SHSMSX104.ccr.corp.intel.com>
- <CABBYNZLxnf4ToXGnkfQzjcn75ZE_t0qXR2Dkd3vAZWDmnaTt1g@mail.gmail.com>
-In-Reply-To: <CABBYNZLxnf4ToXGnkfQzjcn75ZE_t0qXR2Dkd3vAZWDmnaTt1g@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <559BDF20.9090905@hschmitt.de>
+Date: Tue, 07 Jul 2015 16:16:00 +0200
+From: Harald Schmitt <linux@hschmitt.de>
 MIME-Version: 1.0
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Why doesn't plugins/sixaxis.c set devices as Trusted?
+References: <1436188651.26954.9.camel@hadess.net> <559B5633.8000102@ahsoftware.de>
+In-Reply-To: <559B5633.8000102@ahsoftware.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeiwNCg0KVGhhbmtzLiBJdCB3b3JrIHdlbGwuDQoNCkJlc3QgUmVnYXJkcw0KWmhlbmcg
-V3UNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEx1aXogQXVndXN0byB2b24g
-RGVudHogW21haWx0bzpsdWl6LmRlbnR6QGdtYWlsLmNvbV0gDQpTZW50OiBNb25kYXksIEp1bmUg
-MjksIDIwMTUgNzozMyBQTQ0KVG86IFpoZW5nLCBXdQ0KQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2Vy
-Lmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBob3cgdG8gdXNlICJleGFtcGxlLWdhdHQtc2VydmVy
-IiB0ZXN0IGdhdHQ/DQoNCkhpLA0KDQpPbiBNb24sIEp1biAyOSwgMjAxNSBhdCAxMjowMCBQTSwg
-WmhlbmcsIFd1IDx3dS56aGVuZ0BpbnRlbC5jb20+IHdyb3RlOg0KPiBIaSBhbGwsDQo+DQo+IDEu
-IEkgdXNlIHRoZSBsYXRlc3QgdmVyc2lvbiBvZiBCbHVleiBhbmQgcnVuIGFzICJibHVldG9vdGhk
-ICAtRWRuIiB0byB0ZXN0IGdhdHQuDQo+DQo+IDIuIEkgdHJ5IHRvIHVzZSBleGFtcGxlLWdhdHQt
-c2VydmVyIHRvIHRlc3QgaXQuDQo+DQo+IEhvd2V2ZXIsIGl0IGZhaWxlZC4gUGxlYXNlIGNoZWNr
-IHRoZSBmb2xsb3dpbmcgbG9nLg0KPg0KPiBSdW4gIkJsdWV0b290aCAtRWRuIg0KPiAiDQo+IGJs
-dWV0b290aGRbMTc0NTZdOiBzcmMvZ2F0dC1kYXRhYmFzZS5jOm1hbmFnZXJfcmVnaXN0ZXJfc2Vy
-dmljZSgpIA0KPiBSZWdpc3RlcmluZyBzZXJ2aWNlIC0gcGF0aDogL29yZy9ibHVlei9leGFtcGxl
-L3NlcnZpY2UwDQo+IGJsdWV0b290aGRbMTc0NTZdOiBzcmMvZ2F0dC1kYXRhYmFzZS5jOm1hbmFn
-ZXJfcmVnaXN0ZXJfc2VydmljZSgpIA0KPiBSZWdpc3RlcmluZyBzZXJ2aWNlIC0gcGF0aDogL29y
-Zy9ibHVlei9leGFtcGxlL3NlcnZpY2UxDQo+IGJsdWV0b290aGRbMTc0NTZdOiBzcmMvZ2F0dC1k
-YXRhYmFzZS5jOm1hbmFnZXJfcmVnaXN0ZXJfc2VydmljZSgpIA0KPiBSZWdpc3RlcmluZyBzZXJ2
-aWNlIC0gcGF0aDogL29yZy9ibHVlei9leGFtcGxlL3NlcnZpY2UyDQo+IGJsdWV0b290aGRbMTc0
-NTZdOiBzcmMvZ2F0dC1kYXRhYmFzZS5jOmNsaWVudF9kaXNjb25uZWN0X2NiKCkgQ2xpZW50IA0K
-PiBkaXNjb25uZWN0ZWQNCj4gYmx1ZXRvb3RoZFsxNzQ1Nl06IHNyYy9nYXR0LWRhdGFiYXNlLmM6
-Y2xpZW50X2Rpc2Nvbm5lY3RfY2IoKSBDbGllbnQgDQo+IGRpc2Nvbm5lY3RlZA0KPiBibHVldG9v
-dGhkWzE3NDU2XTogc3JjL2dhdHQtZGF0YWJhc2UuYzpjbGllbnRfZGlzY29ubmVjdF9jYigpIENs
-aWVudCANCj4gZGlzY29ubmVjdGVkICINCj4NCj4gVGhlbiBSdW4gIi4vZXhhbXBsZS1nYXR0LXNl
-cnZlciINCj4gIg0KPiAuL2V4YW1wbGUtZ2F0dC1zZXJ2ZXINCj4gQmF0dGVyeSBMZXZlbCBkcmFp
-bmVkOiA5OA0KPiBCYXR0ZXJ5IExldmVsIGRyYWluZWQ6IDk2DQo+IEJhdHRlcnkgTGV2ZWwgZHJh
-aW5lZDogOTQNCj4gQmF0dGVyeSBMZXZlbCBkcmFpbmVkOiA5Mg0KPiBGYWlsZWQgdG8gcmVnaXN0
-ZXIgc2VydmljZTogb3JnLmZyZWVkZXNrdG9wLkRCdXMuRXJyb3IuTm9SZXBseTogRGlkIG5vdCBy
-ZWNlaXZlIGEgcmVwbHkuIFBvc3NpYmxlIGNhdXNlcyBpbmNsdWRlOiB0aGUgcmVtb3RlIGFwcGxp
-Y2F0aW9uIGRpZCBub3Qgc2VuZCBhIHJlcGx5LCB0aGUgbWVzc2FnZSBidXMgc2VjdXJpdHkgcG9s
-aWN5IGJsb2NrZWQgdGhlIHJlcGx5LCB0aGUgcmVwbHkgdGltZW91dCBleHBpcmVkLCBvciB0aGUg
-bmV0d29yayBjb25uZWN0aW9uIHdhcyBicm9rZW4uDQo+ICINCj4NCj4gQWZ0ZXIgY2hlY2tlZCB0
-aGUgc291cmNlIGNvZGUsIEkgZmluZCB0aGF0ICJSZWdpc3RlclNlcnZpY2UiIG5vdCByZXR1cm4g
-dGhlIGRidXMgbWVzc2FnZSBhbmQgb25seSBhZnRlciBpbnZva2luZyBjbGllbnRfcmVhZHlfY2Is
-IHRoZSBkYnVzIG1lc3NhZ2UgaXMgcmV0dXJuZWQuDQo+DQo+IEkgbWlzc2VkIHNvbWUgc3RlcHMg
-dG8gdGVzdCBpdD8gUGxlYXNlIGhlbHAuIFRoYW5rcy4NCg0KQ2hlY2sgaWYgeW91IGhhZCB1cGRh
-dGUgdGhlIEQtQnVzIHBvbGljeSBmaWxlLCB3ZSB3aWxsIHRyeSB0byBhY2Nlc3MgdGhlIGNsaWVu
-dHMgc2VydmljZXMgdmlhIE9iamVjdE1hbmFnZXIgZXRjLCBzbyB5b3UgbmVlZCB0aGUgcG9saWN5
-IHRvIGVuYWJsZSB0aGF0Lg0KDQoNCi0tDQpMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQo=
+Am 07.07.2015 um 06:31 schrieb Alexander Holler:
+> Am 06.07.2015 um 15:17 schrieb Bastien Nocera:
+>> Hey,
+>>
+>> I don't understand the reason why plugins/sixaxis.c doesn't set the
+>> device as trusted when plugged in.
+>
+> It's because of security. If you trust a bluetooth device on Linux,
+> you're trusting it for all services.
+Just as a side note: This is not a good security rule. Why should I 
+trust a game controller on any other service then controlling my game moves?
+
+
+Best regrads,
+Harald
