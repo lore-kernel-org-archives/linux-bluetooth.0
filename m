@@ -1,65 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [RFC 0/2] Adding stateful compression to IPHC
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1435929818-6044-1-git-send-email-lukasz.duda@nordicsemi.no>
-Date: Thu, 9 Jul 2015 12:03:28 +0200
-Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <A69B5B08-9C5E-432A-9F2F-330F5065B6DD@holtmann.org>
-References: <1435929818-6044-1-git-send-email-lukasz.duda@nordicsemi.no>
-To: Lukasz Duda <lukasz.duda@nordicsemi.no>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <559E45C2.70406@mentor.com>
+Date: Thu, 9 Jul 2015 10:58:26 +0100
+From: Dean Jenkins <Dean_Jenkins@mentor.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>,
+	<Joshua_Frkuska@mentor.com>
+Subject: Re: [PATCH v2 0/8] Avoid L2CAP ERTM shutdown hung tasks
+References: <1435078779-4436-1-git-send-email-Dean_Jenkins@mentor.com> <8070DCD7-709D-4B34-BD44-12D68DD71E21@holtmann.org> <20150709093626.GA19545@t440s.ger.corp.intel.com>
+In-Reply-To: <20150709093626.GA19545@t440s.ger.corp.intel.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Johan,
 
-> The following patches introduce support for stateful compression in IPHC.
-> 
-> Patch #1: Adding stateful compression to 6lowpan module.
-> Patch #2: Enabling use of stateful compression in bluetooth_6lowpan module.
-> 
-> Usage of stateful compression is described in Patch #1.
-> 
-> Limitations
-> ===========
-> 
-> - Temporarly use of debugfs to be able to add context table entries.
-> - Current module does not support context time-outs.
-> - No support for multicast addresses stateful compression.
-> 
-> Discussion: Idea on how to make the 6lowpan context tables out of debug mode
-> ============================================================================
-> 
-> The patch provided here is just a temporary solution where the contexts are
-> manually added. The proper way of adding/removing contexts would be to make
-> ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
-> packets with 6CO option (for example from RADVD) will be handled in the
-> ndisc_router_discovery function.
-> 
-> Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need to
-> be handled in the ipv6 module in order to do it in a neat way.
-> Potentially the RFC6775 extensions could potentially also be used by other
-> protocols than BLE and 802.15.4.
-> 
-> There is a need for parsing the 6CO option in ndisc.c which parses Router
-> Advertisement messages. Today the function calls to IPHC (6lowpan module) are
-> quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
-> module will be loaded or not. It would make sense to build 6lowpan module
-> as in-build part of IPv6. The features could be compiled in by using #defines.
-> 
-> What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
-> to handled 6LoWPAN specific options? Do you see any other solution to make sure
-> that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
+Please can you point to me to some details on how to use the 
+l2cap-tester tool so that I can attempt to look into this issue.
 
-I am not sure that 6LoWPAN long-term should be a compile time option of IPv6. However that is certainly a possibility. If we want to discuss that, then it needs to be a discussion on the netdev mailing list with the netdev folks.
+Thanks,
 
-Initially the direction was to go for net/6lowpan/ and make 6LoWPAN a subsystem of its own. Making it part of IPv6 would mean this has to move into net/core/ and that needs convincing of the netdev folks.
+Regards,
+Dean
 
-My viewpoint of 6LoWPAN subsystem was always that besides compression, it actually becomes a full net_device abstraction. So instead of BLE and 802.15.4 allocating net_device on its own, we have something like lowpan_netdev that gets allocated by each subsystem. And then you just provide the framing functions that take the encapsulated frames and transport it over the bearer. Right now we are doing a lot of duplication in each subsystem to support 6LoWPAN. The less it takes to hook up 6LoWPAN to new bearers, the better. Moving the compression into a separate module was just the first step.
+On 09/07/15 10:36, Johan Hedberg wrote:
+> Hi,
+>
+> On Thu, Jul 09, 2015, Marcel Holtmann wrote:
+>>> Dean Jenkins (8):
+>>>   Bluetooth: L2CAP ERTM shutdown protect sk and chan
+>>>   Bluetooth: Make __l2cap_wait_ack more efficient
+>>>   Bluetooth: Unwind l2cap_sock_shutdown()
+>>>   Bluetooth: l2cap_sock_shutdown() remove mutex_lock calls
+>>>   Bluetooth: l2cap_sock_shutdown() reduce scope of chan locking
+>>>   Bluetooth: Add BT_DBG to l2cap_sock_shutdown()
+>>>   Bluetooth: __l2cap_wait_ack() use msecs_to_jiffies()
+>>>   Bluetooth: __l2cap_wait_ack() add defensive timeout
+>>>
+>>> include/net/bluetooth/l2cap.h |  2 ++
+>>> net/bluetooth/l2cap_sock.c    | 74 +++++++++++++++++++++++++++----------------
+>>> 2 files changed, 49 insertions(+), 27 deletions(-)
+>> all 8 patches have been applied to bluetooth-next tree.
+> I'm getting the following now when running our l2cap-tester tool:
+>
+> [Jul 9 12:34] ======================================================
+> [  +0.000298] [ INFO: possible circular locking dependency detected ]
+> [  +0.000298] 4.1.0-rc4+ #1356 Not tainted
+> [  +0.000165] -------------------------------------------------------
+> [  +0.000288] l2cap-tester/10613 is trying to acquire lock:
+> [  +0.000000]  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+...}, at: [<f942807e>] lock_sock+0xa/0xc [bluetooth]
+> [  +0.000336]
+>                but task is already holding lock:
+> [  +0.000000]  (&chan->lock/1){+.+...}, at: [<f94283b6>] l2cap_chan_lock+0x13/0x15 [bluetooth]
+> [  +0.000000]
+>                which lock already depends on the new lock.
+>
+> [  +0.000000]
+>                the existing dependency chain (in reverse order) is:
+> [  +0.000000]
+>                -> #1 (&chan->lock/1){+.+...}:
+> [  +0.000000]        [<c1064917>] lock_acquire+0xdd/0x14f
+> [  +0.000000]        [<c13ff419>] mutex_lock_nested+0x54/0x393
+> [  +0.000000]        [<f94283b6>] l2cap_chan_lock+0x13/0x15 [bluetooth]
+> [  +0.000000]        [<f9428ec1>] l2cap_sock_shutdown+0x28c/0x327 [bluetooth]
+> [  +0.000000]        [<f942937a>] l2cap_sock_release+0x57/0xa5 [bluetooth]
+> [  +0.000000]        [<c1318032>] sock_release+0x19/0x6b
+> [  +0.000000]        [<c1318094>] sock_close+0x10/0x14
+> [  +0.000000]        [<c10e808a>] __fput+0xd6/0x162
+> [  +0.000000]        [<c10e8146>] ____fput+0xd/0xf
+> [  +0.000000]        [<c1049bc8>] task_work_run+0x7e/0xa4
+> [  +0.000000]        [<c1001d1e>] do_notify_resume+0x3c/0x3f
+> [  +0.000000]        [<c1402730>] work_notifysig+0x29/0x31
+> [  +0.000000]
+>                -> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+...}:
+> [  +0.000000]        [<c1064396>] __lock_acquire+0x98c/0xbfb
+> [  +0.000000]        [<c1064917>] lock_acquire+0xdd/0x14f
+> [  +0.000000]        [<c131cb86>] lock_sock_nested+0x63/0x7d
+> [  +0.000000]        [<f942807e>] lock_sock+0xa/0xc [bluetooth]
+> [  +0.000000]        [<f9428ed9>] l2cap_sock_shutdown+0x2a4/0x327 [bluetooth]
+> [  +0.000000]        [<f942937a>] l2cap_sock_release+0x57/0xa5 [bluetooth]
+> [  +0.000000]        [<c1318032>] sock_release+0x19/0x6b
+> [  +0.000000]        [<c1318094>] sock_close+0x10/0x14
+> [  +0.000000]        [<c10e808a>] __fput+0xd6/0x162
+> [  +0.000000]        [<c10e8146>] ____fput+0xd/0xf
+> [  +0.000000]        [<c1049bc8>] task_work_run+0x7e/0xa4
+> [  +0.000000]        [<c1001d1e>] do_notify_resume+0x3c/0x3f
+> [  +0.000000]        [<c1402730>] work_notifysig+0x29/0x31
+> [  +0.000000]
+>                other info that might help us debug this:
+>
+> [  +0.000000]  Possible unsafe locking scenario:
+>
+> [  +0.000000]        CPU0                    CPU1
+> [  +0.000000]        ----                    ----
+> [  +0.000000]   lock(&chan->lock/1);
+> [  +0.000000]                                lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
+> [  +0.000000]                                lock(&chan->lock/1);
+> [  +0.000000]   lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
+> [  +0.000000]
+>                 *** DEADLOCK ***
+>
+> [  +0.000000] 1 lock held by l2cap-tester/10613:
+> [  +0.000000]  #0:  (&chan->lock/1){+.+...}, at: [<f94283b6>] l2cap_chan_lock+0x13/0x15 [bluetooth]
+> [  +0.000000]
+>                stack backtrace:
+> [  +0.000000] CPU: 1 PID: 10613 Comm: l2cap-tester Not tainted 4.1.0-rc4+ #1356
+> [  +0.000000] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.8.1-20150318_183358- 04/01/2014
+> [  +0.000000]  00000000 00000000 f1acbde4 c13fd7f8 c1c2d760 f1acbe14 c1062c61 c15f5534
+> [  +0.000000]  c15f5427 c15f53ef c15f5410 c15f53ef f1acbe48 f537f380 f537f7fc f537f380
+> [  +0.000000]  f537f814 f1acbe78 c1064396 f537f7fc 00000000 00000000 c1c2ffc0 00000000
+> [  +0.000000] Call Trace:
+> [  +0.000000]  [<c13fd7f8>] dump_stack+0x49/0x73
+> [  +0.000000]  [<c1062c61>] print_circular_bug+0x190/0x19d
+> [  +0.000000]  [<c1064396>] __lock_acquire+0x98c/0xbfb
+> [  +0.000000]  [<c1064917>] lock_acquire+0xdd/0x14f
+> [  +0.000000]  [<f942807e>] ? lock_sock+0xa/0xc [bluetooth]
+> [  +0.000000]  [<c131cb86>] lock_sock_nested+0x63/0x7d
+> [  +0.000000]  [<f942807e>] ? lock_sock+0xa/0xc [bluetooth]
+> [  +0.000000]  [<f942807e>] lock_sock+0xa/0xc [bluetooth]
+> [  +0.000000]  [<f9428ed9>] l2cap_sock_shutdown+0x2a4/0x327 [bluetooth]
+> [  +0.000000]  [<f9401112>] ? bt_sock_unlink+0x16/0x54 [bluetooth]
+> [  +0.000000]  [<c1402276>] ? _raw_write_unlock+0x2c/0x3e
+> [  +0.000000]  [<f942937a>] l2cap_sock_release+0x57/0xa5 [bluetooth]
+> [  +0.000000]  [<f942937a>] ? l2cap_sock_release+0x57/0xa5 [bluetooth]
+> [  +0.000000]  [<c1318032>] sock_release+0x19/0x6b
+> [  +0.000000]  [<c1318032>] ? sock_release+0x19/0x6b
+> [  +0.000000]  [<c1318094>] sock_close+0x10/0x14
+> [  +0.000000]  [<c10e808a>] __fput+0xd6/0x162
+> [  +0.000000]  [<c10e8146>] ____fput+0xd/0xf
+> [  +0.000000]  [<c1049bc8>] task_work_run+0x7e/0xa4
+> [  +0.000000]  [<c1001d1e>] do_notify_resume+0x3c/0x3f
+> [  +0.000000]  [<c1402730>] work_notifysig+0x29/0x31
+>
+> Johan
 
-Regards
 
-Marcel
-
+-- 
+Dean Jenkins
+Embedded Software Engineer
+Linux Transportation Solutions
+Mentor Embedded Software Division
+Mentor Graphics (UK) Ltd.
