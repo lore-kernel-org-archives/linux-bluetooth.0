@@ -1,30 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH v2 0/8] Avoid L2CAP ERTM shutdown hung tasks
+Subject: Re: [RFC 0/2] Adding stateful compression to IPHC
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <559E45C2.70406@mentor.com>
-Date: Thu, 9 Jul 2015 12:06:57 +0200
-Cc: linux-bluetooth@vger.kernel.org, Joshua_Frkuska@mentor.com
-Message-Id: <9DD0F167-008E-4819-8DE2-9739CEB4AB53@holtmann.org>
-References: <1435078779-4436-1-git-send-email-Dean_Jenkins@mentor.com> <8070DCD7-709D-4B34-BD44-12D68DD71E21@holtmann.org> <20150709093626.GA19545@t440s.ger.corp.intel.com> <559E45C2.70406@mentor.com>
-To: Dean Jenkins <Dean_Jenkins@mentor.com>
+In-Reply-To: <1435929818-6044-1-git-send-email-lukasz.duda@nordicsemi.no>
+Date: Thu, 9 Jul 2015 12:03:28 +0200
+Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <A69B5B08-9C5E-432A-9F2F-330F5065B6DD@holtmann.org>
+References: <1435929818-6044-1-git-send-email-lukasz.duda@nordicsemi.no>
+To: Lukasz Duda <lukasz.duda@nordicsemi.no>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dean,
+Hi Lukasz,
 
-please refrain from top-posting on this mailing list.
+> The following patches introduce support for stateful compression in IPHC.
+> 
+> Patch #1: Adding stateful compression to 6lowpan module.
+> Patch #2: Enabling use of stateful compression in bluetooth_6lowpan module.
+> 
+> Usage of stateful compression is described in Patch #1.
+> 
+> Limitations
+> ===========
+> 
+> - Temporarly use of debugfs to be able to add context table entries.
+> - Current module does not support context time-outs.
+> - No support for multicast addresses stateful compression.
+> 
+> Discussion: Idea on how to make the 6lowpan context tables out of debug mode
+> ============================================================================
+> 
+> The patch provided here is just a temporary solution where the contexts are
+> manually added. The proper way of adding/removing contexts would be to make
+> ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
+> packets with 6CO option (for example from RADVD) will be handled in the
+> ndisc_router_discovery function.
+> 
+> Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need to
+> be handled in the ipv6 module in order to do it in a neat way.
+> Potentially the RFC6775 extensions could potentially also be used by other
+> protocols than BLE and 802.15.4.
+> 
+> There is a need for parsing the 6CO option in ndisc.c which parses Router
+> Advertisement messages. Today the function calls to IPHC (6lowpan module) are
+> quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
+> module will be loaded or not. It would make sense to build 6lowpan module
+> as in-build part of IPv6. The features could be compiled in by using #defines.
+> 
+> What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
+> to handled 6LoWPAN specific options? Do you see any other solution to make sure
+> that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
 
-> Please can you point to me to some details on how to use the l2cap-tester tool so that I can attempt to look into this issue.
+I am not sure that 6LoWPAN long-term should be a compile time option of IPv6. However that is certainly a possibility. If we want to discuss that, then it needs to be a discussion on the netdev mailing list with the netdev folks.
 
-And the easiest way to run this for testing is this way:
+Initially the direction was to go for net/6lowpan/ and make 6LoWPAN a subsystem of its own. Making it part of IPv6 would mean this has to move into net/core/ and that needs convincing of the netdev folks.
 
-	./tools/test-runner --kernel bzImage -- ./tools/l2cap-tester
-
-If you have qemu installed. If available it should use KVM, but that would mean some sort of x86 based system ;)
-
-In case you are on a target machine, just run ./tools/l2cap-tester.
+My viewpoint of 6LoWPAN subsystem was always that besides compression, it actually becomes a full net_device abstraction. So instead of BLE and 802.15.4 allocating net_device on its own, we have something like lowpan_netdev that gets allocated by each subsystem. And then you just provide the framing functions that take the encapsulated frames and transport it over the bearer. Right now we are doing a lot of duplication in each subsystem to support 6LoWPAN. The less it takes to hook up 6LoWPAN to new bearers, the better. Moving the compression into a separate module was just the first step.
 
 Regards
 
