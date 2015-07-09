@@ -1,51 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: Justinas Vilimas <justinas@tableair.com>
-Content-Type: text/plain; charset=utf-8
-Subject: Cannot retrieve GATT services to Android >=5.0
-Date: Thu, 9 Jul 2015 11:12:54 +0300
-References: <C48F2B83-538D-4437-857A-0180CCF1A630@tableair.com>
+Date: Thu, 09 Jul 2015 06:46:40 +0000 (GMT)
+From: Nagaraj D R <nagaraj.dr@samsung.com>
+Subject: [Request] Clarification related to pairing in a particular scenario
 To: linux-bluetooth@vger.kernel.org
-Message-Id: <DE009F0F-05F3-494C-89B6-B6F8689CEE90@tableair.com>
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3059\))
+Cc: "s.syam@samsung.com" <s.syam@samsung.com>,
+	"rakesh.mk@samsung.com" <rakesh.mk@samsung.com>
+Reply-to: nagaraj.dr@samsung.com
+MIME-version: 1.0
+Content-type: text/plain; charset=windows-1252
+MIME-version: 1.0
+Message-id: <1286560591.507561436424400764.JavaMail.weblogic@ep2mlwas08a>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everyone,
+SGVsbG8gYWxsLApjb3VsZCBzb21lb25lIHBsZWFzZSBjbGFyaWZ5IG15IGRvdWJ0IHJlbGF0ZWQg
+dG8gdGhlIGNvbmNlcHQgb2YgcGFpcmluZyBpbiBhIHBhcnRpY3VsYXIgc2NlbmFyaW8KCklmIGEg
+cmVtb3RlIGRldmljZSBoYXZpbmcgbm8gSS9PIGNhcGFiaWxpdHkgKGFsc28gYXV0aGVudGljYXRp
+b24gOiBnZW5lcmFsIGJvbmRpbmcsIGFuZCAgTm8gTUlUTSBwcm90ZWN0aW9uKQpzZW50IGEgcGFp
+cmluZyByZXF1ZXN0IHRvIG91ciBsb2NhbCBkZXZpY2UoRFVUIHJ1bm5pbmcgd2l0aCB0aGUgYmx1
+ZXogc3RhY2spLCBsb2NhbCBkZXZpY2Ugc3RhY2sgYXV0byBhY2NlcHQKdGhlIHBhaXJpbmcgcmVx
+dWVzdCBldmVuIHRob3VnaCBsb2NhbCBkZXZpY2UgaGFzIEkvTyBjYXBhYmlsaXR5CgpJcyB0aGUg
+QmVoYXZpb3Igb2YgYXV0by1hY2NlcHRpbmcgdGhlIHBhaXJpbmcgcmVxdWVzdCBqdXN0aWZpZWQ/
+Ci0tIEFjY29yZGluZyB0byB0aGUgc3BlY2lmaWNhdGlvbiAiRnJvbSB0aGUgQmx1ZXRvb3RoIENv
+cmUgU3BlY2lmaWNhdGlvbiA0LjEgcGFnZSAxOTU4OgogImlmIGJvdGggZGV2aWNlcyBoYXZlIHNl
+dCB0aGUgQXV0aGVudGljYXRpb25fUmVxdWlyZW1lbnRzIHBhcmFtZXRlciB0byBvbmUgb2YgdGhl
+IE1JVE0KICBQcm90ZWN0aW9uIE5vdCBSZXF1aXJlZCBvcHRpb25zLCBhdXRoZW50aWNhdGlvbiBz
+dGFnZSAxIHNoYWxsIGZ1bmN0aW9uIGFzIGlmIGJvdGggZGV2aWNlcwogIHNldCB0aGVpciBJTyBj
+YXBhYmlsaXRpZXMgdG8gIERpc3BsYXlPbmx5IChlLmcuLCBOdW1lcmljIGNvbXBhcmlzb24gd2l0
+aCBhdXRvbWF0aWMgY29uZmlybWF0aW9uIG9uIGJvdGggZGV2aWNlcykiCiAKIExvY2FsIGRldmlj
+ZSBoYWQgc2V0IHRoZSAiTk8gTUlUTSBwcm90ZWN0aW9uIHJlcXVpcmVkIiBiYXNlZCBvbiB0aGUg
+cmVtb3RlIGF1dGhlbnRpY2F0aW9uIGFuZCBjYXBhYmlsaXRpZXMuCiAgSXMgdGhlIGJlaGF2aW9y
+IG9mIG92ZXItcmlkaW5nIGxvY2FsIGRldmljZSBNSVRNIGNhcGFiaWxpdHkgbmVjZXNzYXJ5PwoK
+SW4gY2FzZSBvZiBsb2NhbCBkZXZpY2UgaW5pdGlhdGluZyBhIGNvbm5lY3Rpb24gdG8gdGhlIHJl
+bW90ZSBkZXZpY2UsIGF1dG8gYWNjZXB0IGZyb20gdGhlIHN0YWNrIGlzIGFjY2VwdGFibGUKYnV0
+IGluIGNhc2Ugb2YgcmVtb3RlIGluaXRpYXRlZCBjb25uZWN0aW9uLCBhdXRvLWFjY2VwdCB3aWxs
+IGNhdXNlIHVzZXIgaW5jb252ZW5pZW5jZSwgSXNuJ3QgaXQ/CgpJIGhhdmUgdGVzdGVkIHRoZSBz
+aW1pbGFyIHNjZW5hcmlvIHdpdGggdGhlIGRldmljZSBoYXZpbmcgYmx1ZWRyb2lkIHN0YWNrLCBo
+ZXJlIHdlIGdldCBhIGF1dGhvcml6YXRpb24gcG9wdXAsCmFjdGlvbiBvbiB3aGljaCB3aWxsIGNv
+bXBsZXRlIHRoZSBwYWlyaW5nIGFuZCBjb25uZWN0aW9uLiBpLmUgYXV0by1wYWlyaW5nIGlzIG5v
+dCBkb25lIGluIHN0YWNrCgpNYXkgYmUgd2UgYWxsIGhhdmUgdGhlIGZvbGxvd2luZyBxdWVyeSwK
+SG93IGRvZXMgcmVtb3RlLWRldmljZSBzZW50IHBhaXJpbmcgcmVxdWVzdCB0byBMb2NhbCBkZXZp
+Y2UsIHdoZW4gaXQgZG9lc24ndCBoYXZlICJOb0lucHV0Tm9PdXRwdXQiIGNhcGFiaWxpdHk/CkFu
+czogUmVtb3RlIGRldmljZSB3YXMgcGFpcmVkIGFuZCBjb25uZWN0ZWQgYnkgbG9jYWwgZGV2aWNl
+IGZpcnN0IGFuZCB0aGVuIGRpc2Nvbm5lY3RlZCBhbmQgbGluayBrZXkgaXMgcmVtb3ZlZCBpbiB0
+aGUgbG9jYWwgZGV2aWNlLgogICAgICAgIFdoZW4gcmVtb3RlIGRldmljZSBpcyByZXN0YXJ0ZWQs
+IGl0IGlzIGF0dGVtcHRpbmcgdG8gY29ubmVjdCB0byB0aGUgbG9jYWwgZGV2aWNlLiBXaGVuIGxp
+bmsta2V5IHZhbGlkYXRpb24gZmFpbGVkLCBpdCBhdHRlbXB0ZWQgcGFpcmluZwoKUmVtb3RlIGRl
+dmljZSA6IEknbSB1c2luZyBNb3Rvcm9sYSBSb2Fkc3RlciAyCkxvY2FsIGRldmljZSA6IERVVCBy
+dW5uaW5nIHdpdGggbGF0ZXN0IGJsdWV6IHN0YWNrCgoKSENJX0R1bXAgc25pcHBldCB3aGVuIHJl
+bW90ZSBkZXZpY2UgaW5pdGlhdGVkIHRoZSBjb25uZWN0aW9uIHRvIGxvY2FsIGRldmljZShEVVQp
+Cj4gSENJIEV2ZW50OiBMaW5rIEtleSBSZXF1ZXN0ICgweDE3KSBwbGVuIDYKICAgIGJkYWRkciAw
+MDoyNDoxQzpENjo2RjoxQgo8IEhDSSBDb21tYW5kOiBMaW5rIEtleSBSZXF1ZXN0IE5lZ2F0aXZl
+IFJlcGx5ICgweDAxfDB4MDAwYykgcGxlbiA2CiAgICBiZGFkZHIgMDA6MjQ6MUM6RDY6NkY6MUIK
+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4gMTAKICAgIExpbmsgS2V5
+IFJlcXVlc3QgTmVnYXRpdmUgUmVwbHkgKDB4MDF8MHgwMDBjKSBuY21kIDEKICAgIHN0YXR1cyAw
+eDAwIGJkYWRkciAwMDoyNDoxQzpENjo2RjoxQgo+IEhDSSBFdmVudDogSU8gQ2FwYWJpbGl0eSBS
+ZXNwb25zZSAoMHgzMikgcGxlbiA5CiAgICBiZGFkZHIgMDA6MjQ6MUM6RDY6NkY6MUIgY2FwYWJp
+bGl0eSAweDAzIG9vYiAweDAwIGF1dGggMHgwNAogICAgQ2FwYWJpbGl0eTogTm9JbnB1dE5vT3V0
+cHV0IChPT0IgZGF0YSBub3QgcHJlc2VudCkKICAgIEF1dGhlbnRpY2F0aW9uOiBHZW5lcmFsIEJv
+bmRpbmcgKE5vIE1JVE0gUHJvdGVjdGlvbikKPiBIQ0kgRXZlbnQ6IElPIENhcGFiaWxpdHkgUmVx
+dWVzdCAoMHgzMSkgcGxlbiA2CiAgICBiZGFkZHIgMDA6MjQ6MUM6RDY6NkY6MUIKPCBIQ0kgQ29t
+bWFuZDogSU8gQ2FwYWJpbGl0eSBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAyYikgcGxlbiA5CiAg
+ICBiZGFkZHIgMDA6MjQ6MUM6RDY6NkY6MUIgY2FwYWJpbGl0eSAweDAxIG9vYiAweDAwIGF1dGgg
+MHgwNAogICAgQ2FwYWJpbGl0eTogRGlzcGxheVllc05vIChPT0IgZGF0YSBub3QgcHJlc2VudCkK
+ICAgIEF1dGhlbnRpY2F0aW9uOiBHZW5lcmFsIEJvbmRpbmcgKE5vIE1JVE0gUHJvdGVjdGlvbikK
+PiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4gMTAKICAgIElPIENhcGFi
+aWxpdHkgUmVxdWVzdCBSZXBseSAoMHgwMXwweDAwMmIpIG5jbWQgMQogICAgc3RhdHVzIDB4MDAg
+YmRhZGRyIDAwOjI0OjFDOkQ2OjZGOjFCCj4gSENJIEV2ZW50OiBVc2VyIENvbmZpcm1hdGlvbiBS
+ZXF1ZXN0ICgweDMzKSBwbGVuIDEwCiAgICBiZGFkZHIgMDA6MjQ6MUM6RDY6NkY6MUIgcGFzc2tl
+eSAyOTc1ODcKPCBIQ0kgQ29tbWFuZDogVXNlciBDb25maXJtYXRpb24gUmVxdWVzdCBSZXBseSAo
+MHgwMXwweDAwMmMpIHBsZW4gNgogICAgYmRhZGRyIDAwOjI0OjFDOkQ2OjZGOjFCCj4gSENJIEV2
+ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDEwCiAgICBVc2VyIENvbmZpcm1hdGlv
+biBSZXF1ZXN0IFJlcGx5ICgweDAxfDB4MDAyYykgbmNtZCAxCiAgICBzdGF0dXMgMHgwMCBiZGFk
+ZHIgMDA6MjQ6MUM6RDY6NkY6MUIKPiBIQ0kgRXZlbnQ6IFNpbXBsZSBQYWlyaW5nIENvbXBsZXRl
+ICgweDM2KSBwbGVuIDcKICAgIHN0YXR1cyAweDAwIGJkYWRkciAwMDoyNDoxQzpENjo2RjoxQgo+
+IEhDSSBFdmVudDogTGluayBLZXkgTm90aWZpY2F0aW9uICgweDE4KSBwbGVuIDIzCiAgICBiZGFk
+ZHIgMDA6MjQ6MUM6RDY6NkY6MUIga2V5IDFGOUE3RTk0MTFFNDM1RUE0REYwNUExMEU2REVFNDUx
+IHR5cGUgNAogICAgVHlwZTogVW5hdXRoZW50aWNhdGVkIENvbWJpbmF0aW9uIEtleQoKCgpSZWdh
+cmRzCk5hZ2FyYWogRCBS
 
-I am having trouble on retrieving GATT services with Android >=5.0 devices. GATT services are hosted on a RaspberryPi B+ (with a Bluetooth 4.0 dongle ASUS BT-400). 
-
-I have tested with numerous configurations using different BlueZ versions, kernels and phone models with no success. Android <5.0 and iOS devices work perfectly fine.
-
-Current latest setup I use is 4.1.1+ kernel and 5.32 BlueZ build with experimental enabled.
-
-The whole procedure is as follows:
-1. I start the hci0 device and then launch the 5.32 bluetoothd with -nEd params.
-
-2. I initially set the advertising data with this command:
-sudo hcitool -i hci0 cmd 0x08 0x0008 14 02 01 02 02 0A A0 0D 09 54 61 62 6C 65 41 69 72 54 56 53 57 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-
-3. And enable advertising with the command: sudo ./hciconfig hci0 leadv 0
-
-4. Also I start the sample ‘example-gatt-server’ from the test folder in the BlueZ repository.
-
-The bluetoothd seems to accept the sample gatt services and add it to the gatt-database.
-
-When trying to connect to the RPi, Android device successfully discovers the peripheral and successfully connects to it. The device also retrieves initial 1800 and 1801 services, but no additional services from the ‘example-gatt-server'. Whereas Android <5.0 and all tested iOS devices successfully retrieves all GATT services and is able to read or write the discovered characteristics.
-
-I noticed in the bluetoothd log that Android 5.0 fails to perform the MTU exchange:
-bluetoothd[11618]: src/adapter.c:connected_callback() hci0 device 48:59:29:61:F0:54 connected eir_len 14
-bluetoothd[11618]: src/adapter.c:new_link_key_callback() hci0 new key for 48:59:29:61:F0:54 type 4 pin_len 0 store_hint 0
-bluetoothd[11618]: src/device.c:device_bonding_complete() bonding (nil) status 0x00
-bluetoothd[11618]: src/adapter.c:resume_discovery() 
-bluetoothd[11618]: src/gatt-database.c:connect_cb() New incoming LE ATT connection
-bluetoothd[11618]: attrib/gattrib.c:g_attrib_ref() 0x16233d8: g_attrib_ref=1 
-bluetoothd[11618]: src/device.c:gatt_debug() MTU Exchange failed. ATT ECODE: 0x06
-bluetoothd[11618]: src/device.c:gatt_client_ready_cb() status: failed, error: 6
-
-How is Android >=5.0 different from older versions and iOS when talking with GATT server? Is there any way to solve this?
-
-Help is greatly appreciated, thanks!
-
-Best wishes,
-Justinas Vilimas
 
