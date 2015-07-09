@@ -1,49 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Jul 2015 13:14:42 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Dean Jenkins <Dean_Jenkins@mentor.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	Joshua_Frkuska@mentor.com
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
 Subject: Re: [PATCH v2 0/8] Avoid L2CAP ERTM shutdown hung tasks
-Message-ID: <20150709101442.GA22988@t440s.lan>
-References: <1435078779-4436-1-git-send-email-Dean_Jenkins@mentor.com>
- <8070DCD7-709D-4B34-BD44-12D68DD71E21@holtmann.org>
- <20150709093626.GA19545@t440s.ger.corp.intel.com>
- <559E45C2.70406@mentor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <559E45C2.70406@mentor.com>
+Date: Thu, 9 Jul 2015 12:06:57 +0200
+Cc: linux-bluetooth@vger.kernel.org, Joshua_Frkuska@mentor.com
+Message-Id: <9DD0F167-008E-4819-8DE2-9739CEB4AB53@holtmann.org>
+References: <1435078779-4436-1-git-send-email-Dean_Jenkins@mentor.com> <8070DCD7-709D-4B34-BD44-12D68DD71E21@holtmann.org> <20150709093626.GA19545@t440s.ger.corp.intel.com> <559E45C2.70406@mentor.com>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Dean,
 
-On Thu, Jul 09, 2015, Dean Jenkins wrote:
-> Please can you point to me to some details on how to use the l2cap-tester
-> tool so that I can attempt to look into this issue.
+please refrain from top-posting on this mailing list.
 
-First of all, please avoid top-posting on this list.
+> Please can you point to me to some details on how to use the l2cap-tester tool so that I can attempt to look into this issue.
 
-Regarding l2cap-tester, there's really nothing special needed except for
-the hci_vhci module and running the tool as root. However, as I pointed
-out what was causing this you shouldn't even need l2cap-tester, but just
-create an L2CAP socket with any tool. The more important thing is to
-have the right config options in the kernel. I've got at least the
-following:
+And the easiest way to run this for testing is this way:
 
-CONFIG_LOCKDEP_SUPPORT=y
-CONFIG_DEBUG_SPINLOCK=y
-CONFIG_DEBUG_LOCK_ALLOC=y
-CONFIG_PROVE_LOCKING=y
-CONFIG_LOCKDEP=y
-CONFIG_DEBUG_MUTEXES=y
+	./tools/test-runner --kernel bzImage -- ./tools/l2cap-tester
 
-I'd guess only the "LOCKDEP" ones are really needed, but not completely
-sure about it.
+If you have qemu installed. If available it should use KVM, but that would mean some sort of x86 based system ;)
 
-I was kind of half expecting you to already be familiar with
-l2cap-tester since you were submitting patches to L2CAP, but I guess
-it's never too late :) Either way it'd be good if you could also look
-into adding new test cases to the tool that specifically exercise the
-code paths that you were fixing.
+In case you are on a target machine, just run ./tools/l2cap-tester.
 
-Johan
+Regards
+
+Marcel
+
