@@ -1,40 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <559ED8FF.2000800@ahsoftware.de>
-Date: Thu, 09 Jul 2015 22:26:39 +0200
-From: Alexander Holler <holler@ahsoftware.de>
-MIME-Version: 1.0
-To: Harald Schmitt <linux@hschmitt.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Why doesn't plugins/sixaxis.c set devices as Trusted?
-References: <1436188651.26954.9.camel@hadess.net> <559B5633.8000102@ahsoftware.de> <559BDF20.9090905@hschmitt.de>
-In-Reply-To: <559BDF20.9090905@hschmitt.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Message-ID: <1436456267.26457.24.camel@redhat.com>
+Subject: GATT service DBus interface violates DBus spec
+From: Nathaniel McCallum <npmccallum@redhat.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 09 Jul 2015 11:37:47 -0400
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 07.07.2015 um 16:16 schrieb Harald Schmitt:
-> Am 07.07.2015 um 06:31 schrieb Alexander Holler:
->> Am 06.07.2015 um 15:17 schrieb Bastien Nocera:
->>> Hey,
->>>
->>> I don't understand the reason why plugins/sixaxis.c doesn't set the
->>> device as trusted when plugged in.
->>
->> It's because of security. If you trust a bluetooth device on Linux,
->> you're trusting it for all services.
-> Just as a side note: This is not a good security rule. Why should I
-> trust a game controller on any other service then controlling my game
-> moves?
+The GATT service DBus interface currently requires that services
+implement the following interfaces:
+- org.freedesktop.DBus.ObjectManager
+- org.freedesktop.DBus.Properties
+- org.bluez.GattService1
 
-Also differentiating a network service from an input service wouldn't be 
-that hard (at least at OS level), it won't help much in regard to the 
-topic because you can't really differentiate a gamepad from a keyboard 
-(both are HID input devices).
+An unwritten expectation is that the ObjectManager's GetManagedObjects
+method should include the object itself in its return value. However,
+the spec for GetManagedObjects states otherwise.
 
-And you just don't want to automatically enable (trust) a (wireless) 
-remote input (especially a keyboard) if someone managed it to plug in 
-some USB device into your Linux box without any user interaction.
+This currently works only because gdbus violates the spec.[1] Until
+today, systemd's sd-bus library was compliant with the spec and thus
+behaved differently from gdbus, making it impossible to use sd-bus with
+bluez.[2]
 
-Regards,
+I agree with Lennart's proposal that the best course of action is to
+fix the spec, not the implementations. This would mean that no change
+is needed for bluez (other than perhaps some documentation). However, I
+wanted to raise awareness of this problem in case:
+1. there is strong opposition to this proposal
+2. others run into the same problem I did
 
-Alexander Holler
+[1] https://bugs.freedesktop.org/show_bug.cgi?id=91283
+[2] https://github.com/systemd/systemd/commit/92d16a53e385781a55d9231d9
+f8f89c1747ab0e4
