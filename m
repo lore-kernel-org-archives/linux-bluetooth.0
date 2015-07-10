@@ -1,45 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: sy39.ju@samsung.com
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Seungyoun Ju <sy39.ju@samsung.com>
-Subject: [PATCH] Bluetooth: hci_check_conn_params() check proper range
-Date: Mon, 13 Jul 2015 17:28:13 +0900
-Message-Id: <1436776093-12090-1-git-send-email-sy39.ju@samsung.com>
+Cc: bharat.panda@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [RFC 1/3] doc/obex-agent-api: Add AuthorizeGet method
+Date: Fri, 10 Jul 2015 20:41:50 +0530
+Message-id: <1436541112-21844-2-git-send-email-gowtham.ab@samsung.com>
+In-reply-to: <1436541112-21844-1-git-send-email-gowtham.ab@samsung.com>
+References: <1436541112-21844-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Seungyoun Ju <sy39.ju@samsung.com>
-
-Slave latency range has been changed in Core Spec. 4.2 by Erratum 5419
-of ESR08_V1.0.0. And it should be applied to Core Spec. 4.0 and 4.1.
-
-Before:
-   connSlaveLatency <= ((connSupervisionTimeout / connIntervalMax) - 1)
-
-After:
-   connSlaveLatency <= ((connSupervisionTimeout / (connIntervalMax*2)) - 1)
-
-This patch makes hci_check_conn_params() check the allowable slave
-latency range using the changed way.
-
-Signed-off-by: Seungyoun Ju <sy39.ju@samsung.com>
+This patch introduces the AuthorizeGet method to authorize
+incoming opp get request from opp clients.
 ---
- include/net/bluetooth/hci_core.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ doc/obex-agent-api.txt | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3bd618d..2a6b091 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1297,7 +1297,7 @@ static inline int hci_check_conn_params(u16 min, u16 max, u16 latency,
- 	if (max >= to_multiplier * 8)
- 		return -EINVAL;
- 
--	max_latency = (to_multiplier * 8 / max) - 1;
-+	max_latency = (to_multiplier * 4 / max) - 1;
- 	if (latency > 499 || latency > max_latency)
- 		return -EINVAL;
- 
+diff --git a/doc/obex-agent-api.txt b/doc/obex-agent-api.txt
+index 3923da6..ee27ba6 100644
+--- a/doc/obex-agent-api.txt
++++ b/doc/obex-agent-api.txt
+@@ -59,3 +59,33 @@ Methods		void Release()
+ 			This method gets called to indicate that the agent
+ 			request failed before a reply was returned. It cancels
+ 			the previous request.
++
++Service		unique name
++Interface	org.bluez.obex.Agent2
++Object path	freely definable
++
++Methods		void Release()
++
++			This method gets called when the service daemon
++			unregisters the agent. An agent can use it to do
++			cleanup tasks. There is no need to unregister the
++			agent, because when this method gets called it has
++			already been unregistered.
++
++		string AuthorizeGet()
++
++			This method gets called when the service daemon
++			needs to accept/reject a Bluetooth object get request.
++			It request user the complete path of the local file.
++
++			Returns the full path (including the filename) where
++			the local file exists.
++
++			Possible errors: org.bluez.obex.Error.Rejected
++			                 org.bluez.obex.Error.Canceled
++
++		void Cancel()
++
++			This method gets called to indicate that the agent
++			request failed before a reply was returned. It cancels
++			the previous request.
 -- 
-2.1.0
+1.9.1
 
