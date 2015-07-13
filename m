@@ -1,58 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: sy39.ju@samsung.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH 1/2] tools/mgmt-tester: Add RPA Add Device test case
-Date: Mon, 13 Jul 2015 11:26:03 +0200
-Message-Id: <1436779564-2955-1-git-send-email-jpawlowski@google.com>
+Cc: Seungyoun Ju <sy39.ju@samsung.com>
+Subject: [PATCH] Bluetooth: hci_check_conn_params() check proper range
+Date: Mon, 13 Jul 2015 17:28:13 +0900
+Message-Id: <1436776093-12090-1-git-send-email-sy39.ju@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test verify if kernel correctly responds with error to
-Add Device command with Resolvable Private Address.
----
- tools/mgmt-tester.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+From: Seungyoun Ju <sy39.ju@samsung.com>
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 46b088c..f12b55c 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -3665,6 +3665,24 @@ static const struct generic_data add_device_fail_3 = {
- 	.expect_status = MGMT_STATUS_INVALID_PARAMS,
- };
+Slave latency range has been changed in Core Spec. 4.2 by Erratum 5419
+of ESR08_V1.0.0. And it should be applied to Core Spec. 4.0 and 4.1.
+
+Before:
+   connSlaveLatency <= ((connSupervisionTimeout / connIntervalMax) - 1)
+
+After:
+   connSlaveLatency <= ((connSupervisionTimeout / (connIntervalMax*2)) - 1)
+
+This patch makes hci_check_conn_params() check the allowable slave
+latency range using the changed way.
+
+Signed-off-by: Seungyoun Ju <sy39.ju@samsung.com>
+---
+ include/net/bluetooth/hci_core.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 3bd618d..2a6b091 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1297,7 +1297,7 @@ static inline int hci_check_conn_params(u16 min, u16 max, u16 latency,
+ 	if (max >= to_multiplier * 8)
+ 		return -EINVAL;
  
-+static const uint8_t add_device_nval_4[] = {
-+					0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,
-+					0x02,
-+					0x02,
-+};
-+static const uint8_t add_device_rsp_4[] =  {
-+					0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,
-+					0x02,
-+};
-+static const struct generic_data add_device_fail_4 = {
-+	.send_opcode = MGMT_OP_ADD_DEVICE,
-+	.send_param = add_device_nval_4,
-+	.send_len = sizeof(add_device_nval_4),
-+	.expect_param = add_device_rsp_4,
-+	.expect_len = sizeof(add_device_rsp_4),
-+	.expect_status = MGMT_STATUS_FAILED,
-+};
-+
- static const uint8_t add_device_success_param_1[] = {
- 					0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,
- 					0x00,
-@@ -6696,6 +6714,9 @@ int main(int argc, char *argv[])
- 	test_bredrle("Add Device - Invalid Params 3",
- 				&add_device_fail_3,
- 				NULL, test_command_generic);
-+	test_bredrle("Add Device - Invalid Params 4",
-+				&add_device_fail_4,
-+				NULL, test_command_generic);
- 	test_bredrle("Add Device - Success 1",
- 				&add_device_success_1,
- 				NULL, test_command_generic);
+-	max_latency = (to_multiplier * 8 / max) - 1;
++	max_latency = (to_multiplier * 4 / max) - 1;
+ 	if (latency > 499 || latency > max_latency)
+ 		return -EINVAL;
+ 
 -- 
-2.1.4
+2.1.0
 
