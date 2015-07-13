@@ -1,89 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Duda <lukasz.duda@nordicsemi.no>
-To: <alex.aring@gmail.com>
-CC: <linux-wpan@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
-Subject: [RFC v2 0/4] Adding stateful compression to IPHC 
-Date: Mon, 13 Jul 2015 13:50:29 +0200
-Message-ID: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
+Date: Mon, 13 Jul 2015 14:49:26 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] tools/mgmt-tester: Add RPA Add Device test case
+Message-ID: <20150713114926.GA25400@t440s.lan>
+References: <1436779564-2955-1-git-send-email-jpawlowski@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-wpan-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1436779564-2955-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Jakub,
 
-Resending the RFC patch set after some clean up.
+On Mon, Jul 13, 2015, Jakub Pawlowski wrote:
+> +static const uint8_t add_device_nval_4[] = {
+> +					0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,
+> +					0x02,
+> +					0x02,
+> +};
+> +static const uint8_t add_device_rsp_4[] =  {
+> +					0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,
+> +					0x02,
+> +};
+> +static const struct generic_data add_device_fail_4 = {
+> +	.send_opcode = MGMT_OP_ADD_DEVICE,
+> +	.send_param = add_device_nval_4,
+> +	.send_len = sizeof(add_device_nval_4),
+> +	.expect_param = add_device_rsp_4,
+> +	.expect_len = sizeof(add_device_rsp_4),
+> +	.expect_status = MGMT_STATUS_FAILED,
 
-The following patches introduce support for stateful compression in IPHC.
+Why is the kernel returning FAILED here? Wouldn't INVALID_PARAMS be a
+more accurate error (since you're passing invalid parameters to the mgmt
+command).
 
-Patch #1: Introduce debugfs entry for 6lowpan module
-Patch #2: Add stateful compression component of 6lowpan module
-Patch #3: Add stateful compression support for iphc.c
-Patch #4: Enable stateful compression in bluetooth_6lowpan
+If I got this right it's the hci_conn_params_set() call that's failing
+and mapping to FAILED? You might want to update that function to use
+a ERR_PTR() return and then look at the returned value to decide what
+mgmt error to send.
 
-Usage of stateful compression is described in Patch #2.
-
-Notes
-=====
-
-RFC v2:
-    - Splitting patch into smaller incremental patches
-    - Moving debugfs logic from iphc.c into context.c
-    - Updating patch set to align with style and coding guideline
-    
-RFC v1:
-    - Initial patch set: http://www.spinics.net/lists/linux-bluetooth/msg62930.html
-
-Limitations
-===========
-
-- Temporarly use of debugfs to be able to add context table entries.
-- Current module does not support context time-outs.
-- No support for multicast addresses stateful compression.
-
-Discussion: Idea on how to make the 6lowpan context tables out of debug mode
-============================================================================
-
-The patch provided here is just a temporary solution where the contexts are
-manually added. The proper way of adding/removing contexts would be to make
-ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
-packets with 6CO option (for example from RADVD) will be handled in the
-ndisc_router_discovery function.
-
-Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need
-to be handled in the ipv6 module in order to do it in a neat way.
-Potentially the RFC6775 extensions could also be used by other protocols
-than BLE and 802.15.4.
-
-There is a need for parsing the 6CO option in ndisc.c which parses Router
-Advertisement messages. Today the function calls to IPHC (6lowpan module) are
-quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
-module will be loaded or not. It would make sense to build 6lowpan module
-as in-build part of IPv6. The features could be compiled in by using #defines.
-
-What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
-to handled 6LoWPAN specific options? Do you see any other solution to make sure
-that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
-
-Best regards,
-Lukasz Duda
-
-Lukasz Duda (4):
-  6lowpan: Introduce debugfs entry for 6lowpan module
-  6lowpan: Add stateful compression component of 6lowpan module
-  6lowpan: Add stateful compression support for iphc.c
-  Bluetooth: 6lowpan: Enable stateful compression in bluetooth_6lowpan
-
- include/net/6lowpan.h   |  37 ++++
- net/6lowpan/Makefile    |   2 +-
- net/6lowpan/context.c   | 551 ++++++++++++++++++++++++++++++++++++++++++++++++
- net/6lowpan/context.h   |   7 +
- net/6lowpan/iphc.c      | 245 +++++++++++++++++----
- net/bluetooth/6lowpan.c |   4 +
- 6 files changed, 809 insertions(+), 37 deletions(-)
- create mode 100644 net/6lowpan/context.c
- create mode 100644 net/6lowpan/context.h
-
--- 
-2.1.4
-
+Johan
