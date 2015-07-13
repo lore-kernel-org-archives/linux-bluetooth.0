@@ -1,55 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sergey Kondakov <virtuousfox@gmail.com>
-Subject: Reaching out again for serious bug in sixaxis plugin
+From: =?UTF-8?q?I=C3=B1aki=20Arenaza?= <iarenaza@mondragon.edu>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>,
-	Antonio Ospite <ospite@studenti.unina.it>,
-	Szymon Janc <szymon.janc@gmail.com>
-Message-ID: <55A4BA19.6030109@gmail.com>
-Date: Tue, 14 Jul 2015 12:28:25 +0500
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="MOUpLaIhNS94S37NmLhVCK5vVlH4UWlPl"
+Cc: =?utf-8?q?I=C3=B1aki=20Arenaza?= <iarenaza@mondragon.edu>
+Subject: [PATCH 1/1] device: Some devices send HSP UUIDs in the wrong order
+Date: Mon, 13 Jul 2015 23:32:49 +0200
+Message-Id: <1436823169-32164-2-git-send-email-iarenaza@mondragon.edu>
+In-Reply-To: <1436823169-32164-1-git-send-email-iarenaza@mondragon.edu>
+References: <1436823169-32164-1-git-send-email-iarenaza@mondragon.edu>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MOUpLaIhNS94S37NmLhVCK5vVlH4UWlPl
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Some devices behave contrary to what Erratum #3507 [1] says for the
+v1.2 Headset Profile (HSP). They report HEADSET_HS_UUID as the first
+value of the ServiceClassIDList attribute, and HSP_HS_UUID as the
+second one. One of those devices is the Energy Wireles BT 3 Ruby Red
+(from Energy Sistem)
 
-Since both my attempts, in kernel bugzilla and here, were ignored and
-you still don't have your own bugtracker I repeat my plea from
-previously with plugin's authors CCed in hope that bug's existence at
-least would be acknowledged.
+[1] See section 6.15 of
+https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=231555
+---
+ lib/uuid.h   |  1 +
+ src/device.c | 17 +++++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-Details are in http://article.gmane.org/gmane.linux.bluez.kernel/62305
-Moreover, this livecd is almost identical to my running system which is
-based on it, so it may be used to reproduce the glitch (antimicro,
-jstest and evtest should help):
-http://sourceforge.net/projects/hackeurs-sans-frontieres/files/0.8.1%20-%=
-20The%20White%20Devil/Linux%20Live%20-%20HSF%20-%200.8.1_20150708.iso/dow=
-nload
-If it could not be reproduce I'm afraid it may be a bug in handling my
-BT controller.
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 2dcfe9e..c2e12bb 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -35,6 +35,7 @@ extern "C" {
+ 
+ #define HSP_HS_UUID		"00001108-0000-1000-8000-00805f9b34fb"
+ #define HSP_AG_UUID		"00001112-0000-1000-8000-00805f9b34fb"
++#define HEADSET_HS_UUID		"00001131-0000-1000-8000-00805f9b34fb"
+ 
+ #define HFP_HS_UUID		"0000111e-0000-1000-8000-00805f9b34fb"
+ #define HFP_AG_UUID		"0000111f-0000-1000-8000-00805f9b34fb"
+diff --git a/src/device.c b/src/device.c
+index debe201..4e03780 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3880,6 +3880,23 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
+ 			continue;
+ 		}
+ 
++		/* Fix devices that report HEADSET_HS_UUID before HSP_HS_UUID,
++		 * contrary to what Erratum #3507 says.
++		 */
++		if ((bt_uuid_strcmp(profile_uuid, HEADSET_HS_UUID) == 0)) {
++			if (svcclass->next != NULL) {
++				char *uuid;
++
++				uuid = bt_uuid2string(svcclass->next->data);
++				if (bt_uuid_strcmp(uuid, HSP_HS_UUID) == 0) {
++					free(profile_uuid);
++					profile_uuid = uuid;
++				} else {
++					free(uuid);
++				}
++			}
++		}
++
+ 		if (bt_uuid_strcmp(profile_uuid, PNP_UUID) == 0) {
+ 			uint16_t source, vendor, product, version;
+ 			sdp_data_t *pdlist;
+-- 
+2.1.4
 
-Also, this kernel patch or a better alternative still hasn't been
-applied and that's no good: https://patchwork.kernel.org/patch/1075972/
-
-
---MOUpLaIhNS94S37NmLhVCK5vVlH4UWlPl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iF4EAREIAAYFAlWkuhkACgkQrPLi+0dgLoYf4QD9EYIVOO/IyUcyIDUa6f4gSj0l
-PJzCKXLMIFZF71JAbE4BAI1WwlCMkb+n5cWVSJPAfSvfDFYNKGKVO46F2oajtYgr
-=dRx1
------END PGP SIGNATURE-----
-
---MOUpLaIhNS94S37NmLhVCK5vVlH4UWlPl--
