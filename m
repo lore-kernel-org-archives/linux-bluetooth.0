@@ -1,83 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1436792982.2896.32.camel@linux.intel.com>
-Subject: Re: [RFC v2 0/4] Adding stateful compression to IPHC
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Lukasz Duda <lukasz.duda@nordicsemi.no>
-Cc: alex.aring@gmail.com, linux-wpan@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Date: Mon, 13 Jul 2015 16:09:42 +0300
-In-Reply-To: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
-References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-wpan-owner@vger.kernel.org
+From: Rakesh M K <rakesh.mk@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Rakesh M K <rakesh.mk@samsung.com>
+Subject: [PATCH] Audio/Media: Fix incorrect value dereference
+Date: Mon, 13 Jul 2015 18:20:00 +0530
+Message-id: <1436791800-1939-1-git-send-email-rakesh.mk@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+parameter value passed to the config_cb is a pointer to the
+gbooloean. dereferencing the value rather than address leads
+to mismatch in handling the return value.
 
-On ma, 2015-07-13 at 13:50 +0200, Lukasz Duda wrote:
-> Hi all,
-> 
-> Resending the RFC patch set after some clean up.
-> 
-> The following patches introduce support for stateful compression in IPHC.
-> 
-> Patch #1: Introduce debugfs entry for 6lowpan module
-> Patch #2: Add stateful compression component of 6lowpan module
-> Patch #3: Add stateful compression support for iphc.c
-> Patch #4: Enable stateful compression in bluetooth_6lowpan
-> 
-> Usage of stateful compression is described in Patch #2.
-> 
-> Notes
-> =====
-> 
-> RFC v2:
->     - Splitting patch into smaller incremental patches
->     - Moving debugfs logic from iphc.c into context.c
->     - Updating patch set to align with style and coding guideline
->     
-> RFC v1:
->     - Initial patch set: http://www.spinics.net/lists/linux-bluetooth/msg62930.html
-> 
-> Limitations
-> ===========
-> 
-> - Temporarly use of debugfs to be able to add context table entries.
-> - Current module does not support context time-outs.
-> - No support for multicast addresses stateful compression.
-> 
-> Discussion: Idea on how to make the 6lowpan context tables out of debug mode
-> ============================================================================
-> 
-> The patch provided here is just a temporary solution where the contexts are
-> manually added. The proper way of adding/removing contexts would be to make
-> ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
-> packets with 6CO option (for example from RADVD) will be handled in the
-> ndisc_router_discovery function.
-> 
-> Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need
-> to be handled in the ipv6 module in order to do it in a neat way.
-> Potentially the RFC6775 extensions could also be used by other protocols
-> than BLE and 802.15.4.
-> 
-> There is a need for parsing the 6CO option in ndisc.c which parses Router
-> Advertisement messages. Today the function calls to IPHC (6lowpan module) are
-> quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
-> module will be loaded or not. It would make sense to build 6lowpan module
-> as in-build part of IPv6. The features could be compiled in by using #defines.
-> 
-> What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
-> to handled 6LoWPAN specific options? Do you see any other solution to make sure
-> that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
+avdtp.c:avdtp_parse_cmd() Received SET_CONFIGURATION_CMD
+a2dp.c:endpoint_setconf_ind() Source 0xb7d49ef8: Set_Configuration_Ind
+a2dp.c:setup_ref() 0xb7d53b98: ref=2
+media.c:media_adapter_get_player()
+media.c:media_set_sink_callback()
+media.c:media_endpoint_async_call() Calling SetConfiguration: name = :1.37 path = /MediaEndpoint/A2DPSource
 
-Have you considered that 6lowpan module could register a callback in
-ipv6 module. When needed, ipv6 could then call the 6lowpan callback if
-needed. This way there would be no need to embed 6lowpan functionality
-to ipv6 module.
+*#0  0xb6cea184 in __libc_free (mem=0xbead3ae4) at malloc.c:3736
+*#1  0xb6e33468 in g_free () from /usr/lib/libglib-2.0.so.0
+*#2  0xb6f25db0 in auto_config (data=0xb7d53b98) at profiles/audio/a2dp.c:430
+*#3  0xb6f2ad76 in config_cb (endpoint=<value optimized out>,
+*    ret=<value optimized out>, size=<value optimized out>,
+*    user_data=<value optimized out>) at profiles/audio/media.c:707
+*#4  0xb6f2cc4a in endpoint_reply (call=<value optimized out>,
+*    user_data=0xb7d516b0) at profiles/audio/media.c:357
+*#5  0xb6ddce96 in _dbus_pending_call_complete (pending=0xb7d53bc8)
+*    at dbus-pending-call.c:216
+*#6  0xb6dcfe82 in complete_pending_call_and_unlock (connection=0xb7d44b40,
+*    pending=0xb7d53bc8, message=<value optimized out>)
+*    at dbus-connection.c:2331
+---
+ profiles/audio/media.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-
-Cheers,
-Jukka
-
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index f12569e..ed441d0 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -532,8 +532,9 @@ static void config_cb(struct media_endpoint *endpoint, void *ret, int size,
+ 							void *user_data)
+ {
+ 	struct a2dp_config_data *data = user_data;
++	gboolean *ret_value = ret;
+ 
+-	data->cb(data->setup, ret ? TRUE : FALSE);
++	data->cb(data->setup, *ret_value ? TRUE : FALSE);
+ }
+ 
+ static int set_config(struct a2dp_sep *sep, uint8_t *configuration,
+-- 
+1.7.9.5
 
