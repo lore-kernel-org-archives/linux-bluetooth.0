@@ -1,36 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Mike Purvis <mpurvis@clearpathrobotics.com>
-Date: Mon, 13 Jul 2015 12:43:24 -0400
-Message-ID: <CACsJT9N+saPgDKjXFGkr7fn=M=8s_h2fTSmPCznwahC7f6eeOQ@mail.gmail.com>
-Subject: UsermodeHID uncertainty
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Michael Richardson <mcr@sandelman.ca>
+To: Lukasz Duda <lukasz.duda@nordicsemi.no>
+cc: alex.aring@gmail.com, linux-wpan@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v2 0/4] Adding stateful compression to IPHC
+In-Reply-To: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
+References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
+Date: Mon, 13 Jul 2015 10:15:08 -0400
+Message-ID: <4784.1436796908@sandelman.ca>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
 
-I'm struggling to understand what the UsermodeHID option in BlueZ
-does, and I'm not finding a good source of documentation on it. I
-understand that using this option has the kernel pass raw HID traffic
-to a usermode process for interpretation, rather than doing this
-directly in the kernel, and this has advantages as far as
-debuggability, pluggability, fault isolation, etc.
+Lukasz Duda <lukasz.duda@nordicsemi.no> wrote:
+    > There is a need for parsing the 6CO option in ndisc.c which parses Router
+    > Advertisement messages. Today the function calls to IPHC (6lowpan module) are
+    > quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
+    > module will be loaded or not. It would make sense to build 6lowpan module
+    > as in-build part of IPv6. The features could be compiled in by using #defines.
 
-However, my questions—
+    > What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
+    > to handled 6LoWPAN specific options? Do you see any other solution to make sure
+    > that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
 
-- What is the usermode process? Do I have to start it somehow, or does
-it start on its own? Is it an already running daemon?
-- What is the communication channel between the kernel and user
-process, and how can I listen in on the traffic?
-- Is the usermode process directly managing things like devfs nodes
-(eg, /dev/input/js0), or does it communicate back to the kernel for
-that?
-- As a user, what are my options for swapping out the usermode process
-if I want to modify its behaviour? For example, handling disconnects
-or pairing in a different manner than the default?
+What about if ndisc.c accepted non-exclusive registrations for ND type codes?
+Then 6lowpan could register itself as handler for RAs, and could process the
+6CO options, ABROs, etc.
+(BTW: 6tisch contemplates extending ABROs as well: there is more to come)
 
-Thanks for any pointers or thoughts,
+--
+]               Never tell me the odds!                 | ipv6 mesh networks [
+]   Michael Richardson, Sandelman Software Works        | network architect  [
+]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
 
-Mike
+
