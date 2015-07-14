@@ -1,48 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <a59e2e07885f3ee4bcb02cf370b3ff4c.squirrel@mungewell.org>
-In-Reply-To: <1436873556.20249.50.camel@hadess.net>
-References: <55A4BA19.6030109@gmail.com>
-    <1436873556.20249.50.camel@hadess.net>
-Date: Tue, 14 Jul 2015 12:54:37 -0400
-Subject: Re: Reaching out again for serious bug in sixaxis plugin
-From: simon@mungewell.org
-To: "Bastien Nocera" <hadess@hadess.net>
-Cc: "Sergey Kondakov" <virtuousfox@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	"Antonio Ospite" <ospite@studenti.unina.it>,
-	"Szymon Janc" <szymon.janc@gmail.com>
+From: <iarenaza@mondragon.edu> (=?utf-8?Q?I=C3=B1aki?= Arenaza)
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth\@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/1] device: Some devices send HSP UUIDs in the wrong order
+References: <1436823169-32164-1-git-send-email-iarenaza@mondragon.edu>
+	<1436823169-32164-2-git-send-email-iarenaza@mondragon.edu>
+	<CABBYNZL=y8K34DBsQJ3onFxFXNDUZ-6Qt_PWz_ok34e74C1=cA@mail.gmail.com>
+Date: Tue, 14 Jul 2015 14:28:09 +0200
+In-Reply-To: <CABBYNZL=y8K34DBsQJ3onFxFXNDUZ-6Qt_PWz_ok34e74C1=cA@mail.gmail.com>
+	(Luiz Augusto von Dentz's message of "Tue, 14 Jul 2015 15:17:27
+	+0300")
+Message-ID: <87y4iily92.fsf@osgiliath.escomposlinux.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Tue, Jul 14 2015, Luiz Augusto von Dentz wrote:
 
->> Details are in
->> http://article.gmane.org/gmane.linux.bluez.kernel/62305
+Hi Luiz,
 
-> The device is connected correctly via Bluetooth. Then the bug is in the
-> device's input driver, which you could probably also see when it's
-> connected via USB. The right forum for this is the linux-input mailing
+>> +               /* Fix devices that report HEADSET_HS_UUID before HSP_HS_UUID,
+>> +                * contrary to what Erratum #3507 says.
+>> +                */
+>> +               if ((bt_uuid_strcmp(profile_uuid, HEADSET_HS_UUID) == 0)) {
+>
+> I guess we could stop right here and just assume it should be
+> HSP_HS_UUID instead so you just have to free and use assign
+> g_strdup(HSP_HS_UUID) to profile_uuid.
 
-As the original poster stated that this DOES NOT occur with a USB
-connection, it does kind of point to a Bluetooth problem (or maybe with
-device itself). Has anyone been able to replicate?
+That was exactly what I did in my first (private) version of the
+patch. But I wanted to play safe and make sure HSP_HS_UUID was also
+there.
 
-My suggestion would be to display/capture the hidraw interface and see if
-the missing data is present there. This can be done as root with
---
-$ hexdump -v -e '49/1 "%02x " "\n"' < /dev/hidraw0
---
+Frankly, I don't know how broken other devices are, as I don't deal with
+Bluetooth on a regular basis. So I fully trust your judgement on this
+:-)
 
-The '49' is the byte count, and might be wrong (working from memory).
+Best regards,
 
+-- 
+Iñaki Arenaza
 
->> Also, this kernel patch or a better alternative still hasn't been
->> applied and that's no good:
->> https://patchwork.kernel.org/patch/1075972/
-
-The multi-touch/many-axis stuff is a pain, but the linux-input list is the
-place to discuss that...
-Simon
-
-
+Electronics and Computing Department
+Mondragon University – Faculty of Engineering
+http://www.mondragon.edu/
+Goiru kalea 2, 20500 Arrasate-Mondragon (Spain)
+Tel: +34 647503750 (direct) / +34 943794700 (pbx)
