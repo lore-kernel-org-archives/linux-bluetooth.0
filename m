@@ -1,75 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Jul 2015 15:16:12 -0400
-From: Chris Mason <clm@fb.com>
-To: <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] I have no idea what I'm doing
-Message-ID: <20150714191612.GA27622@ret.masoncoding.com>
+Message-ID: <a59e2e07885f3ee4bcb02cf370b3ff4c.squirrel@mungewell.org>
+In-Reply-To: <1436873556.20249.50.camel@hadess.net>
+References: <55A4BA19.6030109@gmail.com>
+    <1436873556.20249.50.camel@hadess.net>
+Date: Tue, 14 Jul 2015 12:54:37 -0400
+Subject: Re: Reaching out again for serious bug in sixaxis plugin
+From: simon@mungewell.org
+To: "Bastien Nocera" <hadess@hadess.net>
+Cc: "Sergey Kondakov" <virtuousfox@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	"Antonio Ospite" <ospite@studenti.unina.it>,
+	"Szymon Janc" <szymon.janc@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-I upgraded my macbook from 4.0.2 to 4.1.2, and now I get
-messages similar to this bugzilla:
+>> Details are in
+>> http://article.gmane.org/gmane.linux.bluez.kernel/62305
 
-https://bugzilla.kernel.org/show_bug.cgi?id=100651
+> The device is connected correctly via Bluetooth. Then the bug is in the
+> device's input driver, which you could probably also see when it's
+> connected via USB. The right forum for this is the linux-input mailing
 
-and this one:
+As the original poster stated that this DOES NOT occur with a USB
+connection, it does kind of point to a Bluetooth problem (or maybe with
+device itself). Has anyone been able to replicate?
 
-https://bugzilla.kernel.org/show_bug.cgi?id=101171
+My suggestion would be to display/capture the hidraw interface and see if
+the missing data is present there. This can be done as root with
+--
+$ hexdump -v -e '49/1 "%02x " "\n"' < /dev/hidraw0
+--
 
-[21552.711888] Bluetooth: hci0: BCM: Read verbose config info failed (-16)
-[21728.019676] Bluetooth: hci0: BCM: Read verbose config info failed (-16)
+The '49' is the byte count, and might be wrong (working from memory).
 
-A little poking around shows you recently added this check, and from
-what I can tell with grep and friends the btbcm_read_verbose_config()
-function is completely new?  I don't see similar reads being done by
-older kernels.
 
-So, I pushed some code around.  It does compile, but printk proves that
-only the second hunk is happening on my box, so testing is somewhat
-light.
+>> Also, this kernel patch or a better alternative still hasn't been
+>> applied and that's no good:
+>> https://patchwork.kernel.org/patch/1075972/
 
-With this applied, I'm able to use bluetooth again.
+The multi-touch/many-axis stuff is a pain, but the linux-input list is the
+place to discuss that...
+Simon
 
-Signed-off-by: Chris Mason <clm@fb.com>
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 4bba866..90e7099 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -294,11 +294,10 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 
- 	/* Read Verbose Config Version Info */
- 	skb = btbcm_read_verbose_config(hdev);
--	if (IS_ERR(skb))
--		return PTR_ERR(skb);
--
--	BT_INFO("%s: BCM: chip id %u", hdev->name, skb->data[1]);
--	kfree_skb(skb);
-+	if (!IS_ERR(skb)) {
-+		BT_INFO("%s: BCM: chip id %u", hdev->name, skb->data[1]);
-+		kfree_skb(skb);
-+	}
- 
- 	switch ((rev & 0xf000) >> 12) {
- 	case 0:
-@@ -378,12 +377,11 @@ int btbcm_setup_apple(struct hci_dev *hdev)
- 
- 	/* Read Verbose Config Version Info */
- 	skb = btbcm_read_verbose_config(hdev);
--	if (IS_ERR(skb))
--		return PTR_ERR(skb);
--
--	BT_INFO("%s: BCM: chip id %u build %4.4u", hdev->name, skb->data[1],
--		get_unaligned_le16(skb->data + 5));
--	kfree_skb(skb);
-+	if (!IS_ERR(skb)) {
-+		BT_INFO("%s: BCM: chip id %u build %4.4u", hdev->name, skb->data[1],
-+			get_unaligned_le16(skb->data + 5));
-+		kfree_skb(skb);
-+	}
- 
- 	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
- 
