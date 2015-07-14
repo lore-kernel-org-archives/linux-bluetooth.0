@@ -1,37 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH] I have no idea what I'm doing
+Subject: Re: [PATCH v2] Bluetooth: btbcm: allow btbcm_read_verbose_config to fail on Apple
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150714205339.GE27622@ret.masoncoding.com>
-Date: Tue, 14 Jul 2015 22:58:50 +0200
+In-Reply-To: <20150714202530.GD27622@ret.masoncoding.com>
+Date: Tue, 14 Jul 2015 22:56:23 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2C969CCF-92B3-4835-B9F5-550A9DEC4FF2@holtmann.org>
-References: <20150714191612.GA27622@ret.masoncoding.com> <47D2BE08-D7D0-4B1A-8B5B-17C99E0A3CF7@holtmann.org> <20150714195929.GB27622@ret.masoncoding.com> <06F4677F-AFFD-4728-AF99-ACCC1B602AEB@holtmann.org> <20150714205339.GE27622@ret.masoncoding.com>
+Message-Id: <723246B0-5D93-41E8-ACE4-9700E4F7B754@holtmann.org>
+References: <20150714202530.GD27622@ret.masoncoding.com>
 To: Chris Mason <clm@fb.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Chris,
 
->>>> Actually can you run something like "hciconfig hci0 version" and see
->>>> if it really is a Broadcom chip in there or if Apple switched vendors
->>>> and we are accidentally assuming it is Broadcom while in reality it is
->>>> not. If it is not then the quirk might actually not apply either
->>>> anymore.
->>> 
->>> mason@ret ~> hciconfig hci0 version
->>> hci0:	Type: BR/EDR  Bus: USB
->>> 	BD Address: 60:03:08:8D:0D:A9  ACL MTU: 1021:8  SCO MTU: 64:1
->>> 	HCI Version: 4.0 (0x6)  Revision: 0x21ae
->>> 	LMP Version: 4.0 (0x6)  Subversion: 0x414e
->>> 	Manufacturer: Broadcom Corporation (15)
->> 
->> so it is a Broadcom. What MacBook is this anyway?
+> Commit 1c8ba6d013 moved around the setup code for broadcomm chips,
+> and also added btbcm_read_verbose_config() to read extra information
+> about the hardware.  It's returning errors on some macbooks:
 > 
-> macbookpro 13" from 2013 (newer model in '13)
+> Bluetooth: hci0: BCM: Read verbose config info failed (-16)
+> 
+> Which makes us error out of the setup function.  Since this
+> probe isn't critical to operate the chip, this patch just changes
+> things to carry on when it fails.
+> 
+> Signed-off-by: Chris Mason <clm@fb.com>
+> cc: stable@vger.kernel.org # v4.1
 
-besides having that Bluetooth module for testing, I also have that actual Macbook. And I did test this. It worked fine for me. Maybe some OS X update messed with the firmware. Worth while checking.
+patch has been applied to bluetooth-stable tree.
 
 Regards
 
