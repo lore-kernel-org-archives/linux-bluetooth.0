@@ -1,34 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Jul 2015 16:53:06 -0400
-From: Kyle McMartin <kyle@infradead.org>
-To: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-Cc: Kyle McMartin <kyle@infradead.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] qca: add BT firmware files for QCA61x4 series Bluetooth
-Message-ID: <20150714205306.GR13281@merlin.infradead.org>
-References: <555D29D1.6090700@qca.qualcomm.com>
- <5564A29D.1030002@qca.qualcomm.com>
- <20150529004430.GE5093@merlin.infradead.org>
- <557F1609.6050102@qca.qualcomm.com>
+Date: Tue, 14 Jul 2015 16:53:39 -0400
+From: Chris Mason <clm@fb.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] I have no idea what I'm doing
+Message-ID: <20150714205339.GE27622@ret.masoncoding.com>
+References: <20150714191612.GA27622@ret.masoncoding.com>
+ <47D2BE08-D7D0-4B1A-8B5B-17C99E0A3CF7@holtmann.org>
+ <20150714195929.GB27622@ret.masoncoding.com>
+ <06F4677F-AFFD-4728-AF99-ACCC1B602AEB@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <557F1609.6050102@qca.qualcomm.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <06F4677F-AFFD-4728-AF99-ACCC1B602AEB@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jun 15, 2015 at 11:14:33AM -0700, Ben Young Tae Kim wrote:
-> Hi Kyle,
+On Tue, Jul 14, 2015 at 10:49:00PM +0200, Marcel Holtmann wrote:
+> Hi Chris,
+> >> 
+> >> Actually can you run something like "hciconfig hci0 version" and see
+> >> if it really is a Broadcom chip in there or if Apple switched vendors
+> >> and we are accidentally assuming it is Broadcom while in reality it is
+> >> not. If it is not then the quirk might actually not apply either
+> >> anymore.
+> > 
+> > mason@ret ~> hciconfig hci0 version
+> > hci0:	Type: BR/EDR  Bus: USB
+> > 	BD Address: 60:03:08:8D:0D:A9  ACL MTU: 1021:8  SCO MTU: 64:1
+> > 	HCI Version: 4.0 (0x6)  Revision: 0x21ae
+> > 	LMP Version: 4.0 (0x6)  Subversion: 0x414e
+> > 	Manufacturer: Broadcom Corporation (15)
 > 
-> On 05/28/15 17:44, Kyle McMartin wrote:
-> > On Tue, May 26, 2015 at 09:43:09AM -0700, Ben Young Tae Kim wrote:
-> >> I'm not sure you received this patch for QCA ROME BT firmware files. Can you review this and merge into the linux-firmware repository if those are okay?
-> >>
-> > Sorry, I've been busy & travelling. I'll try to get around to
-> > it before the weekend.
-> >
-> > regards, ---Kyle
+> so it is a Broadcom. What MacBook is this anyway?
+
+macbookpro 13" from 2013 (newer model in '13)
+
 > 
-> I've updated you latest firmware patch files today including some bug fixes. If you haven't merged this file; looks like not, please use today's patches and merge into your tree.
+> > One of the threads I saw when I was googling claimed it worked if
+> > you rebooted from 4.0 into 4.1 but not 4.1 into 4.1.
+> 
+> I think that is just someone getting confused. It should always fail
+> if you boot 4.1. No matter what you had running before.
+> 
 
-okie dokie, sorry for the delay.
+That's my experience.
 
---kyle
+-chris
