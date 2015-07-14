@@ -1,41 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dohyun Pyun <re20sfree@gmail.com>
+From: Sergey Kondakov <virtuousfox@gmail.com>
+Subject: Reaching out again for serious bug in sixaxis plugin
 To: linux-bluetooth@vger.kernel.org
-Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>
-Subject: [PATCH Bluez] tools/l2test: Fix potention double close
-Date: Tue, 14 Jul 2015 16:39:17 +0900
-Message-Id: <1436859557-16153-1-git-send-email-dh79.pyun@samsung.com>
+Cc: Bastien Nocera <hadess@hadess.net>,
+	Antonio Ospite <ospite@studenti.unina.it>,
+	Szymon Janc <szymon.janc@gmail.com>
+Message-ID: <55A4BA19.6030109@gmail.com>
+Date: Tue, 14 Jul 2015 12:28:25 +0500
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="MOUpLaIhNS94S37NmLhVCK5vVlH4UWlPl"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: DoHyun Pyun <dh79.pyun@samsung.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MOUpLaIhNS94S37NmLhVCK5vVlH4UWlPl
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-If the test gets an error after close the socket, the socket sk
-will be closed again. This patch prevents the double close case.
----
- tools/l2test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Since both my attempts, in kernel bugzilla and here, were ignored and
+you still don't have your own bugtracker I repeat my plea from
+previously with plugin's authors CCed in hope that bug's existence at
+least would be acknowledged.
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index abe09c1..1d458c4 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -644,7 +644,6 @@ static void do_listen(void (*handler)(int sk))
- 			continue;
- 		}
- 		/* Child */
--		close(sk);
- 
- 		/* Set receive buffer size */
- 		if (rcvbuf && setsockopt(nsk, SOL_SOCKET, SO_RCVBUF, &rcvbuf,
-@@ -769,6 +768,7 @@ static void do_listen(void (*handler)(int sk))
- 		}
- 
- 		handler(nsk);
-+		close(sk);
- 
- 		syslog(LOG_INFO, "Disconnect: %m");
- 		exit(0);
--- 
-1.8.1.2
+Details are in http://article.gmane.org/gmane.linux.bluez.kernel/62305
+Moreover, this livecd is almost identical to my running system which is
+based on it, so it may be used to reproduce the glitch (antimicro,
+jstest and evtest should help):
+http://sourceforge.net/projects/hackeurs-sans-frontieres/files/0.8.1%20-%=
+20The%20White%20Devil/Linux%20Live%20-%20HSF%20-%200.8.1_20150708.iso/dow=
+nload
+If it could not be reproduce I'm afraid it may be a bug in handling my
+BT controller.
 
+Also, this kernel patch or a better alternative still hasn't been
+applied and that's no good: https://patchwork.kernel.org/patch/1075972/
+
+
+--MOUpLaIhNS94S37NmLhVCK5vVlH4UWlPl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iF4EAREIAAYFAlWkuhkACgkQrPLi+0dgLoYf4QD9EYIVOO/IyUcyIDUa6f4gSj0l
+PJzCKXLMIFZF71JAbE4BAI1WwlCMkb+n5cWVSJPAfSvfDFYNKGKVO46F2oajtYgr
+=dRx1
+-----END PGP SIGNATURE-----
+
+--MOUpLaIhNS94S37NmLhVCK5vVlH4UWlPl--
