@@ -1,35 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 14 Jul 2015 16:53:06 -0400
+From: Kyle McMartin <kyle@infradead.org>
+To: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+Cc: Kyle McMartin <kyle@infradead.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] qca: add BT firmware files for QCA61x4 series Bluetooth
+Message-ID: <20150714205306.GR13281@merlin.infradead.org>
+References: <555D29D1.6090700@qca.qualcomm.com>
+ <5564A29D.1030002@qca.qualcomm.com>
+ <20150529004430.GE5093@merlin.infradead.org>
+ <557F1609.6050102@qca.qualcomm.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH v2] Bluetooth: btbcm: allow btbcm_read_verbose_config to fail on Apple
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150714202530.GD27622@ret.masoncoding.com>
-Date: Tue, 14 Jul 2015 22:56:23 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <723246B0-5D93-41E8-ACE4-9700E4F7B754@holtmann.org>
-References: <20150714202530.GD27622@ret.masoncoding.com>
-To: Chris Mason <clm@fb.com>
+In-Reply-To: <557F1609.6050102@qca.qualcomm.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chris,
-
-> Commit 1c8ba6d013 moved around the setup code for broadcomm chips,
-> and also added btbcm_read_verbose_config() to read extra information
-> about the hardware.  It's returning errors on some macbooks:
+On Mon, Jun 15, 2015 at 11:14:33AM -0700, Ben Young Tae Kim wrote:
+> Hi Kyle,
 > 
-> Bluetooth: hci0: BCM: Read verbose config info failed (-16)
+> On 05/28/15 17:44, Kyle McMartin wrote:
+> > On Tue, May 26, 2015 at 09:43:09AM -0700, Ben Young Tae Kim wrote:
+> >> I'm not sure you received this patch for QCA ROME BT firmware files. Can you review this and merge into the linux-firmware repository if those are okay?
+> >>
+> > Sorry, I've been busy & travelling. I'll try to get around to
+> > it before the weekend.
+> >
+> > regards, ---Kyle
 > 
-> Which makes us error out of the setup function.  Since this
-> probe isn't critical to operate the chip, this patch just changes
-> things to carry on when it fails.
-> 
-> Signed-off-by: Chris Mason <clm@fb.com>
-> cc: stable@vger.kernel.org # v4.1
+> I've updated you latest firmware patch files today including some bug fixes. If you haven't merged this file; looks like not, please use today's patches and merge into your tree.
 
-patch has been applied to bluetooth-stable tree.
+okie dokie, sorry for the delay.
 
-Regards
-
-Marcel
-
+--kyle
