@@ -1,37 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 15 Jul 2015 08:53:38 +1000
-Message-ID: <CAPcThSGd9RO=8aK0ALkyWzSa7zLpr=8o7qMpT5sNex=LWu_XtQ@mail.gmail.com>
-Subject: How to write a C program to be paired asynchronously?
-From: Qingtao Cao <qingtao.cao.au@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
+Subject: Re: [PATCH] I have no idea what I'm doing
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150714210107.GF27622@ret.masoncoding.com>
+Date: Tue, 14 Jul 2015 23:11:54 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <9BF6D314-DB44-4ABA-88E3-F8F7652E7CDF@holtmann.org>
+References: <20150714191612.GA27622@ret.masoncoding.com> <47D2BE08-D7D0-4B1A-8B5B-17C99E0A3CF7@holtmann.org> <20150714195929.GB27622@ret.masoncoding.com> <06F4677F-AFFD-4728-AF99-ACCC1B602AEB@holtmann.org> <20150714205339.GE27622@ret.masoncoding.com> <2C969CCF-92B3-4835-B9F5-550A9DEC4FF2@holtmann.org> <20150714210107.GF27622@ret.masoncoding.com>
+To: Chris Mason <clm@fb.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear bluetooth community,
+Hi Chris,
 
-I am a rookie to bluez internals. After "fixing" a potential defect in
-one of blueman's script
-(http://ubuntuforums.org/showthread.php?t=2286664) I can pair the HCI
-adapter on my laptop from my mobile phone.
+>>>>>> Actually can you run something like "hciconfig hci0 version" and see
+>>>>>> if it really is a Broadcom chip in there or if Apple switched vendors
+>>>>>> and we are accidentally assuming it is Broadcom while in reality it is
+>>>>>> not. If it is not then the quirk might actually not apply either
+>>>>>> anymore.
+>>>>> 
+>>>>> mason@ret ~> hciconfig hci0 version
+>>>>> hci0:	Type: BR/EDR  Bus: USB
+>>>>> 	BD Address: 60:03:08:8D:0D:A9  ACL MTU: 1021:8  SCO MTU: 64:1
+>>>>> 	HCI Version: 4.0 (0x6)  Revision: 0x21ae
+>>>>> 	LMP Version: 4.0 (0x6)  Subversion: 0x414e
+>>>>> 	Manufacturer: Broadcom Corporation (15)
+>>>> 
+>>>> so it is a Broadcom. What MacBook is this anyway?
+>>> 
+>>> macbookpro 13" from 2013 (newer model in '13)
+>> 
+>> besides having that Bluetooth module for testing, I also have that actual Macbook. And I did test this. It worked fine for me. Maybe some OS X update messed with the firmware. Worth while checking.
+> 
+> This only runs linux, I don't dual boot.
 
-Now I would like to come up with a C program for the same purpose, it
-will manipulate the dbus APIs to capture the messages emitted from
-bluetoothd when receiving async pairing request and consult the end
-user whether to accept it.
+if you never ran any OS X or OS X update, then this might have been a bogus firmware when the hardware shipped and by now they have all been updated. That would make some sense at least.
 
-I can use dbus-monitor --system "sender='org.bluez'" command to
-monitor all potential messages sent from bluetoothd during this
-process, however, they all seem to be the PropertyChanged signal when
-populating the newly created object /org/bluez/<pid>/hciX/dev_xx with
-new properties. I am still clueless about relevant method_calls
-blueman may have captured for pairing purpose, and am wondering if I
-can do something similar for the same purpose but in C directly.
+Regards
 
-Any suggestions or comments or references to bluez's work flow during
-pairing process would be highly appreciated.
+Marcel
 
-Thanks!
-
-Harry
