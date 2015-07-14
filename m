@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Jul 2015 16:25:30 -0400
+Date: Tue, 14 Jul 2015 16:15:07 -0400
 From: Chris Mason <clm@fb.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v2] Bluetooth: btbcm: allow btbcm_read_verbose_config to fail
- on Apple
-Message-ID: <20150714202530.GD27622@ret.masoncoding.com>
+Subject: [PATCH] Bluetooth: btbcm: allow btbcm_read_verbose_config to fail on
+ Apple
+Message-ID: <20150714201507.GC27622@ret.masoncoding.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -21,10 +21,7 @@ probe isn't critical to operate the chip, this patch just changes
 things to carry on when it fails.
 
 Signed-off-by: Chris Mason <clm@fb.com>
-cc: stable@vger.kernel.org # v4.1
-
 ---
- v2 Add stable cc
  drivers/bluetooth/btbcm.c | 11 +++++------
  1 file changed, 5 insertions(+), 6 deletions(-)
 
