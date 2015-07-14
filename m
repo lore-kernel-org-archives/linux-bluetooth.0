@@ -1,46 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1436873556.20249.50.camel@hadess.net>
-Subject: Re: Reaching out again for serious bug in sixaxis plugin
-From: Bastien Nocera <hadess@hadess.net>
-To: Sergey Kondakov <virtuousfox@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: Antonio Ospite <ospite@studenti.unina.it>,
-	Szymon Janc <szymon.janc@gmail.com>
-Date: Tue, 14 Jul 2015 13:32:36 +0200
-In-Reply-To: <55A4BA19.6030109@gmail.com>
-References: <55A4BA19.6030109@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 14 Jul 2015 13:47:56 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	Joshua_Frkuska@mentor.com
+Subject: Re: [PATCH v2 3/8] Bluetooth: Unwind l2cap_sock_shutdown()
+Message-ID: <20150714104756.GA13886@t440s.lan>
+References: <1435078779-4436-1-git-send-email-Dean_Jenkins@mentor.com>
+ <1435078779-4436-4-git-send-email-Dean_Jenkins@mentor.com>
+ <20150713110731.GA21598@t440s.lan>
+ <55A3F5F8.4070800@mentor.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <55A3F5F8.4070800@mentor.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2015-07-14 at 12:28 +0500, Sergey Kondakov wrote:
-> Since both my attempts, in kernel bugzilla and here, were ignored and
-> you still don't have your own bugtracker I repeat my plea from
-> previously with plugin's authors CCed in hope that bug's existence at
-> least would be acknowledged.
+Hi Dean,
 
-Did you re-read your original mail? Are you genuinely still wondering
-why you didn't receive an answer?
-
-> Details are in 
-> http://article.gmane.org/gmane.linux.bluez.kernel/62305
-> Moreover, this livecd is almost identical to my running system which 
-> is
-> based on it, so it may be used to reproduce the glitch (antimicro,
-> jstest and evtest should help):
-> http://sourceforge.net/projects/hackeurs-sans
-> -frontieres/files/0.8.1%20-%20The%20White%20Devil/Linux%20Live%20
-> -%20HSF%20-%200.8.1_20150708.iso/download
-> If it could not be reproduce I'm afraid it may be a bug in handling 
-> my
-> BT controller.
+On Mon, Jul 13, 2015, Dean Jenkins wrote:
+> The use of the
 > 
-> Also, this kernel patch or a better alternative still hasn't been
-> applied and that's no good: 
-> https://patchwork.kernel.org/patch/1075972/
+> mutex_lock(&conn->chan_lock)
+> 
+> is troublesome because the underlying conn connection can disappear whilst
+> waiting for acks, that is why I eliminated the conn variable and used
+> chan->state instead. Is there an atomic method to check conn and take the
+> lock ?
 
-The device is connected correctly via Bluetooth. Then the bug is in the
-device's input driver, which you could probably also see when it's
-connected via USB. The right forum for this is the linux-input mailing
--list.
+There might be some more elegant way to solve this whole issue (maybe
+with RCU helpers or something like that), but at least the following
+could work, I think:
+
+static struct l2cap_conn *lock_conn(struct l2cap_chan *chan)
+{
+	struct l2cap_conn *conn;
+
+	l2cap_chan_lock(chan);
+
+	if (chan->conn)
+		conn = l2cap_conn_get(chan->conn);
+	else
+		conn = NULL;
+
+	l2cap_chan_unlock(chan);
+
+	if (conn)
+		mutex_lock(&conn->chan_lock);
+
+	return conn;
+}
+
+static void unlock_conn(struct l2cap_conn *conn)
+{
+	if (conn) {
+		mutex_unlock(&conn->chan_lock);
+		l2cap_conn_put(conn);
+	}
+}
+
+{
+	...
+
+	conn = lock_conn(chan);
+	l2cap_chan_lock(chan);
+
+	l2cap_chan_close(chan, 0);
+
+	l2cap_chan_unlock(chan);
+	unlock_conn(conn);
+
+	...
+}
+
+Johan
