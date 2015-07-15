@@ -1,87 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
-To: "marcel@holtmann.org" <marcel@holtmann.org>
-CC: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"alex.aring@gmail.com" <alex.aring@gmail.com>
-Subject: RE: [RFC v2 0/4] Adding stateful compression to IPHC 
-Date: Wed, 15 Jul 2015 09:55:01 +0000
-Message-ID: <AB80DA35A7B64E4E98291794926897D9741DE538@MBX03.nvlsi.no>
-References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
-In-Reply-To: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
-Content-Type: text/plain; charset="iso-8859-2"
 MIME-Version: 1.0
+In-Reply-To: <B268BBF2-7D56-456F-957C-6B4B77A1DAE0@holtmann.org>
+References: <CAB512Gt-cdR_QT-Sed2W9Avp1SbtsC7eiKY+KL6gXjZeB+A86g@mail.gmail.com>
+ <B268BBF2-7D56-456F-957C-6B4B77A1DAE0@holtmann.org>
+From: Seungyoun Ju <sy39.ju@samsung.com>
+Date: Wed, 15 Jul 2015 17:54:42 +0900
+Message-ID: <CAB512GvJ0fz_Tvade+FRorr+Oi2wWLfPq5fjLqAETHzwP9oD4w@mail.gmail.com>
+Subject: Re: New interface to change LE connection parameters
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hello, Marcel.
 
-Marcel Holtmann <marcel@holtmann.org> wrote:
-> I am not sure that 6LoWPAN long-term should be a compile time option of
-> IPv6. However that is certainly a possibility. If we want to discuss that=
-, then it
-> needs to be a discussion on the netdev mailing list with the netdev folks=
-.
->=20
-> Initially the direction was to go for net/6lowpan/ and make 6LoWPAN a
-> subsystem of its own. Making it part of IPv6 would mean this has to move =
-into
-> net/core/ and that needs convincing of the netdev folks.
->=20
-> My viewpoint of 6LoWPAN subsystem was always that besides compression, it
-> actually becomes a full net_device abstraction. So instead of BLE and 802=
-.15.4
-> allocating net_device on its own, we have something like lowpan_netdev th=
-at
-> gets allocated by each subsystem. And then you just provide the framing
-> functions that take the encapsulated frames and transport it over the bea=
-rer.
-> Right now we are doing a lot of duplication in each subsystem to support
-> 6LoWPAN. The less it takes to hook up 6LoWPAN to new bearers, the better.
-> Moving the compression into a separate module was just the first step.
->=20
+2015-07-15 14:12 GMT+09:00 Marcel Holtmann <marcel@holtmann.org>:
+> Hi Seungyoun,
+>
+>> I plan to provide the kernel interface which is used by user space's
+>> bluez to change LE connection parameters.
+>>
+>> This is my first trial to implement new feature so I need help.
+>> Would you please give me a comment ?
+>> Are there any better ways ?
+>>
+>> < Why this is required >
+>> When the LE connection is in idle state (e.g. no traffic),
+>> it is better to increase a connection interval for power saving reason.
+>> Or it needs to reduce a connection interval for a fast response time.
+>> And it may need to change a supervision timeout to detect link loss
+>> faster or looser.
+>>
+>> It is better to control these kind of things as per application's needs.
+>> So I want to provide the interface to change LE connection parameters.
+>>
+>> < Current state >
+>> There is no interface to change LE connection parameters for already
+>> connected link.
+>>
+>> And LE connection parameter is only configured by remote device like bel=
+ow ways.
+>> - remote device(slave) requests a change using l2cap connection
+>> parameter request.
+>> - remote device(master) sends HCI_OP_LE_CONN_UPDATE.
+>> - If above configured parameters are loaded during adapter init.,
+>>   those are automatically applied during connection setup.
+>>
+>> < How to implement >
+>> When I roughly thought, below ways are possible.
+>>
+>> 1. Add new MGMT (e.g. MGMT_OP_UPDATE_CONN_PARAM)
+>>   In mgmt handler, based on the role and local / remote LE features,
+>>   do connection parameter update procedure as follows.
+>>   - If remote and local devices both support "HCI_LE_CONN_PARAM_REQ_PROC=
+",
+>>   send HCI_OP_LE_CONN_UPDATE
+>>   - If either the remote or local or both do not support
+>> "HCI_LE_CONN_PARAM_REQ_PROC",
+>>     - if local is master,
+>>     send HCI_OP_LE_CONN_UPDATE.
+>>     - if local is slave,
+>>     send L2CAP_CONN_PARAM_UPDATE_REQ via l2cap signal channel.
+>>   =3D> Main concern of this way is that it is possible to access l2cap f=
+rom mgmt.
+>>
+>> 2. Add new MGMT and L2CAP socket option
+>>   - user space's bluez should know own role
+>>   - user space's bluez may know remote / local le features.
+>>     Or, based on the le features, net/core's l2cap may select a procedur=
+e.
+>>
+>> 3. Add new MGMT and send L2CAP command from user space's bluez
+>>   - user space's bluez should know own role
+>>   - user space's bluez may know remote / local le features.
+>>     Or, based on the le features, net/core's l2cap may select a procedur=
+e.
+>
+> actually LE connection parameters should only be a L2CAP socket option. E=
+ither you are using a fixed channel for ATT or you are using a LE connectio=
+n oriented L2CAP channel. In both cases the natural fit is L2CAP socket as =
+an entry point for setting different connection parameters.
+>
+
+Thank you for a valuable comment.
+
+> Also what is set from userspace can only be a suggestion. The kernel woul=
+d have to make the final call on what parameters it configures with the rem=
+ote device. Especially with LE connection oriented L2CAP you can have multi=
+ple connections which each device. So the most demanding one should have it=
+s parameters applied to the link.
+>
+> And the difference between using the 4.0 method via L2CAP (which is perip=
+heral triggered only) and the 4.1 method for doing this directly via LL is =
+an implementation detail that will be hidden in the kernel. Userspace shoul=
+d just tell the kernel what parameters it prefers. And if possible, the ker=
+nel will accommodate it.
+>
+> That all said, make a proposal for L2CAP socket options to read and confi=
+gure the connection parameters.
+>
+
+This is my proposal based on your comment.
+Can I go forward with this way ?
+
+---
+ include/net/bluetooth/bluetooth.h | 8 ++++++++
+ net/bluetooth/l2cap_sock.c        | 6 ++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/include/net/bluetooth/bluetooth.h
+b/include/net/bluetooth/bluetooth.h
+index 38d8a34..c81c749 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -119,6 +119,14 @@ struct bt_voice {
+ #define BT_SNDMTU 12
+ #define BT_RCVMTU 13
+
++#define BT_CONNECTION_PARAMS 14
++struct bt_connection_params {
++ __u16 min_interval;
++ __u16 max_interval;
++ __u16 slave_latency;
++ __u16 supv_timeout;
++};
++
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 6061876..5557438 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -602,6 +602,9 @@ static int l2cap_sock_getsockopt(struct socket
+*sock, int level, int optname,
+  err =3D -EFAULT;
+  break;
+
++ case BT_CONNECTION_PARAMS:
++ break;
++
+  default:
+  err =3D -ENOPROTOOPT;
+  break;
+@@ -935,6 +938,9 @@ static int l2cap_sock_setsockopt(struct socket
+*sock, int level, int optname,
+  chan->imtu =3D opt;
+  break;
+
++ case BT_CONNECTION_PARAMS:
++ break;
++
+  default:
+  err =3D -ENOPROTOOPT;
+  break;
+--=20
+
 > Regards
->=20
+>
 > Marcel
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Thanks a lot for your feedback and valuable comments.=20
-
-I hope it is okay that I am responding using the new mail thread.
-As you might have noticed I have resubmitted the RFC patch after
-addressing your comments in a new thread, and split the patch
-into smaller parts.
-
-The idea of making an abstraction of lowpan_dev sounds like a good idea,
-but I'm not sure if I'm grasping the details involved. Could you please
-elaborate a bit more on you proposal?
-
-Is the structure like below something you had in mind for lowpan_dev?
-struct lowpan_dev { // Struct build-in /net/core like wpan_dev
-    net_device * net_dev;   // Pointer to net device
-    FUNC_PTR tx_xmit;       // Transmit function in the subsystem
-                               (assigned on the registration of a=20
-                               lowpan_dev)
-    FUNC_PTR decompress;    // Is called after receive of new data from
-                               the subsystem. But how to deliver such data,
-                               for example by creating lowpan_dev_rx() API?
-    FUNC_PTR compress;      // Is called when net_device sends packet to
-                               lowpan_dev (xmit).
-    FUNC_PTR handle_ra;     // Is called when ndisc.c finds lowpan options
-                               e.g. 6CO.
-}
-
-struct net_device {
-    ...
-    lowpan_dev  * lowpan_dev_ptr;
-    ...
-}
-
-For now 6CO is the only flag that I am currently interested in, but with
-such structure, it could easily be extended to handle other message types.
-
-Having the pointers to compress/decompress and to act upon lowpan options,
-allow us to keep 6lowpan as a module in /net/6lowpan. Could this work?=20
-Or you are proposing to completely move IP Header compression mechanism to
-lowpan_dev implementation (built-in - /net/core)?
-
-Best regards,
-=A3ukasz Duda
+Thanks and Regards,
+Seungyoun Ju.
