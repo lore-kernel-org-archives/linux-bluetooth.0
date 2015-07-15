@@ -1,110 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Reaching out again for serious bug in sixaxis plugin & generic
- wireless transport with userspace daemon idea
-References: <55A4BA19.6030109@gmail.com>
- <1436873556.20249.50.camel@hadess.net>
- <a59e2e07885f3ee4bcb02cf370b3ff4c.squirrel@mungewell.org>
- <55A5733E.3020207@gmail.com> <1436938182.20249.59.camel@hadess.net>
-From: Sergey Kondakov <virtuousfox@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-To: simon@mungewell.org, Bastien Nocera <hadess@hadess.net>
-Message-ID: <55A6119C.3020507@gmail.com>
-Date: Wed, 15 Jul 2015 12:54:04 +0500
+Message-ID: <271e0890aa8b7c3d71c72d8d2a053476.squirrel@mungewell.org>
+Date: Wed, 15 Jul 2015 01:52:21 -0400
+Subject: Re: Reaching out again for serious bug in sixaxis plugin
+From: simon@mungewell.org
+To: "Sergey Kondakov" <virtuousfox@gmail.com>
+Cc: "Bastien Nocera" <hadess@hadess.net>,
+	linux-bluetooth@vger.kernel.org,
+	"Antonio Ospite" <ospite@studenti.unina.it>,
+	"Szymon Janc" <szymon.janc@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1436938182.20249.59.camel@hadess.net>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9Fvb1mdO6XpGrpvAiBS25HTxpHqpwDd8x"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9Fvb1mdO6XpGrpvAiBS25HTxpHqpwDd8x
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+>> My suggestion would be to display/capture the hidraw interface and see if
+>> the missing data is present there. This can be done as root with --
+>> $ hexdump -v -e '49/1 "%02x " "\n"' < /dev/hidraw0
+>> --
+>> The '49' is the byte count, and might be wrong (working from memory).
+> Now that's the real answer !
+> I tried that and seen this one odd line in the middle about the time
+that stick axises have spiked with bogus values:
+> 01 00 00 00 00 00 79 7f 7b 7f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 03 05 16 ff be 00 1b 33 af 77 01 c0 00 02 ea 01 90 01 e6
+01
+> 01 00 00 00 00 00 79 7f 7b 7f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 03 05 16 ff be 00 1b 33 af 77 01 c0 00 02 e9 01 90 01 e7
+01
+> 01 ff 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00
+> 01 00 00 00 00 00 79 7f 7b 7f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 03 05 16 ff be 00 1b 33 af 77 01 c0 00 02 e9 01 8f 01 e7
+01
+> 01 00 00 00 00 00 79 7f 7b 7f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 03 05 16 ff be 00 1b 33 af 77 01 c0 00 02 ea 01 90 01 e6
+01
+> No idea what that means.
 
-On 15.07.2015 10:52, simon@mungewell.org wrote:
-> Oddly (or perhaps not) these 'funny' packets show up more frequently if=
- I
-> exercise the LEDs
-> --
-> root@blind-fury:/sys/class/leds/0005:054C:0268.0002::sony1#
-> echo heartbeat > trigger
+This is the raw HID data from the device, it contains a bit field for the
+buttons and values for the analogue sticks/buttons. You can see which is
+which by pressing/wiggling them.
 
-Tried that but with usb-host instead of heartbeat (which I don't have)
-and wiggling mouse (which triggers the led). At first it's gone crazy
-with 2-4 the frequency but when I tried to repeat it latter it was about
-the same as always... still pretty frequent, every 10-30 seconds.
-Sometimes 2 in short burst (1-5 seconds) with bigger pause.
+The line starting '01 ff' is peculiar as it is not normal output. I do not
+know the significance of the 'ff', where the rest of the lines start '01
+00'.
 
-> For reference this is seen with Bluez git, kernel 4.1rc7 on Xubuntu 15.=
-04.
-> I am unable to use 4.2 as there's another bug affecting me.
-> I did not see this on 3.19 (stock kernel for system), but will recheck =
-later.
-> Simon
+I did see a few occurrences of similar behavior
+--
+root@blind-fury:/home/simon# hexdump -v -e '49/1 "%02x " "\n"' <
+/dev/hidraw1 | grep -e '01 ff' -B 1 -A 1
+01 00 00 00 00 00 79 01 93 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 03 05 16 ff cc 00 00 33 bf 77 00 40 fe 01 ef 01 8e 01 02 00
+01 ff 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+01 00 00 00 00 00 11 1c bf 75 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 03 05 16 ff cc 00 00 33 bf 77 00 40 ff 01 f0 01 8f 01 02 00
+--
 
-For me it was no less than entirety of bluez5 and kernel 3.x series, if
-I recall.
+The same 'funny' data (recorded at same time as above) is seen with hcidump.
+[Byte order for Accelerometers is swapped by hid-sony module]
+--
+$ hcidump -x
+...
+> ACL data: handle 11 flags 0x02 dlen 54
+    L2CAP(d): cid 0x0041 len 50 [psm 0]
+      A1 01 00 00 00 00 00 79 01 93 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 03 05 16 FF CC 00 00 33 BF 77
+      00 40 01 FE 01 EF 01 8E 00 02
+> ACL data: handle 11 flags 0x02 dlen 54
+    L2CAP(d): cid 0x0041 len 50 [psm 0]
+      A1 01 FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00
+> ACL data: handle 11 flags 0x02 dlen 54
+    L2CAP(d): cid 0x0041 len 50 [psm 0]
+      A1 01 00 00 00 00 00 11 1C BF 75 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 03 05 16 FF CC 00 00 33 BF 77
+      00 40 01 FF 01 F0 01 8F 00 02
+--
 
-On 15.07.2015 10:29, Bastien Nocera wrote:
-> On Wed, 2015-07-15 at 01:38 +0500, Sergey Kondakov wrote:
-> ...
->=20
-> I skipped over the "technically accurate, all information provided
-> technical description" to the "who gives a crap what this guy says, I'm=
+Oddly (or perhaps not) these 'funny' packets show up more frequently if I
+exercise the LEDs
+--
+root@blind-fury:/sys/class/leds/0005:054C:0268.0002::sony1# echo heartbeat
+> trigger
+--
 
-> not going to help him anyway".
->=20
-> Which I didn't read, maybe?
+For reference this is seen with Bluez git, kernel 4.1rc7 on Xubuntu 15.04.
+I am unable to use 4.2 as there's another bug affecting me.
 
-Which illustrates my point exactly.
-
-> Whatever contributions you might have made in the past, or will in the
-> future, insulting people's work will only get you so far.
->=20
-
-Ignoring glitches will diminish your work, hurt all users and make it
-look for everyone precisely in a way that I described.
-
-Imagine what happened when distributions started to move (openSUSE at
-least) bluez4->bluez5 while it didn't have any GUI whatsoever and was
-still quite new... with no place to even properly complain (of course
-distributions would send you to upstream and do nothing themselves).
-"Wanna use some BT ? Better tech-up and go on a quest !"
-Some (again, openSUSE) even still disable sixaxis plugin in their
-packages. And properly rebuilding packages for binary distributions is a
-pain. "Wanna play some games ? Screw you !"
-BT support in all OSes seem to be treated with afterthought. Windows
-even didn't have its own bluetooth stack until recently, I think. I
-applaud any efforts to do it properly for Linux but your own attitude
-don't exactly make it any easier either.
-
-And BT standard itself is a mess that breaks OSI, you can't deny that.
-Actually, seeing how any serious wireless devices use a helper device
-(usually USB transponder with direct USB connection emulation) for
-transporting their data (gaming mouses, pro-headphones, "hdmi video
-transmitters") makes me think that if someone would come up with
-userspace drivers that would replace usual USB emulation methods for
-those and allow getting and sending data directly from user's wifi card
-in a secure, defined and standardized (preferably by IEEE) way then BT
-may go obsolete altogether. Such implementation may even be completely
-data link (or even network) neutral for compatibility with any
-underlying networking type.
+I did not see this on 3.19 (stock kernel for system), but will recheck later.
+Simon
 
 
---9Fvb1mdO6XpGrpvAiBS25HTxpHqpwDd8x
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iF4EAREIAAYFAlWmEZwACgkQrPLi+0dgLobouQD/VyZu3Yd9dOnWnXY1LiUtkeTM
-5iGuopSPdeuKS0MWhCAA/jDuepztKYkPaSgfGiE2Py8GElLBJ+4u/pMcoqC/pxR4
-=G7gE
------END PGP SIGNATURE-----
-
---9Fvb1mdO6XpGrpvAiBS25HTxpHqpwDd8x--
