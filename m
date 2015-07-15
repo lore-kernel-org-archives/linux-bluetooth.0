@@ -1,170 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 15 Jul 2015 11:43:55 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth 2015-07-15
+Message-ID: <20150715084355.GA13429@t440s.lan>
 MIME-Version: 1.0
-In-Reply-To: <B268BBF2-7D56-456F-957C-6B4B77A1DAE0@holtmann.org>
-References: <CAB512Gt-cdR_QT-Sed2W9Avp1SbtsC7eiKY+KL6gXjZeB+A86g@mail.gmail.com>
- <B268BBF2-7D56-456F-957C-6B4B77A1DAE0@holtmann.org>
-From: Seungyoun Ju <sy39.ju@samsung.com>
-Date: Wed, 15 Jul 2015 17:54:42 +0900
-Message-ID: <CAB512GvJ0fz_Tvade+FRorr+Oi2wWLfPq5fjLqAETHzwP9oD4w@mail.gmail.com>
-Subject: Re: New interface to change LE connection parameters
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="oyUTqETQ0mS9luUI"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello, Marcel.
 
-2015-07-15 14:12 GMT+09:00 Marcel Holtmann <marcel@holtmann.org>:
-> Hi Seungyoun,
->
->> I plan to provide the kernel interface which is used by user space's
->> bluez to change LE connection parameters.
->>
->> This is my first trial to implement new feature so I need help.
->> Would you please give me a comment ?
->> Are there any better ways ?
->>
->> < Why this is required >
->> When the LE connection is in idle state (e.g. no traffic),
->> it is better to increase a connection interval for power saving reason.
->> Or it needs to reduce a connection interval for a fast response time.
->> And it may need to change a supervision timeout to detect link loss
->> faster or looser.
->>
->> It is better to control these kind of things as per application's needs.
->> So I want to provide the interface to change LE connection parameters.
->>
->> < Current state >
->> There is no interface to change LE connection parameters for already
->> connected link.
->>
->> And LE connection parameter is only configured by remote device like bel=
-ow ways.
->> - remote device(slave) requests a change using l2cap connection
->> parameter request.
->> - remote device(master) sends HCI_OP_LE_CONN_UPDATE.
->> - If above configured parameters are loaded during adapter init.,
->>   those are automatically applied during connection setup.
->>
->> < How to implement >
->> When I roughly thought, below ways are possible.
->>
->> 1. Add new MGMT (e.g. MGMT_OP_UPDATE_CONN_PARAM)
->>   In mgmt handler, based on the role and local / remote LE features,
->>   do connection parameter update procedure as follows.
->>   - If remote and local devices both support "HCI_LE_CONN_PARAM_REQ_PROC=
-",
->>   send HCI_OP_LE_CONN_UPDATE
->>   - If either the remote or local or both do not support
->> "HCI_LE_CONN_PARAM_REQ_PROC",
->>     - if local is master,
->>     send HCI_OP_LE_CONN_UPDATE.
->>     - if local is slave,
->>     send L2CAP_CONN_PARAM_UPDATE_REQ via l2cap signal channel.
->>   =3D> Main concern of this way is that it is possible to access l2cap f=
-rom mgmt.
->>
->> 2. Add new MGMT and L2CAP socket option
->>   - user space's bluez should know own role
->>   - user space's bluez may know remote / local le features.
->>     Or, based on the le features, net/core's l2cap may select a procedur=
-e.
->>
->> 3. Add new MGMT and send L2CAP command from user space's bluez
->>   - user space's bluez should know own role
->>   - user space's bluez may know remote / local le features.
->>     Or, based on the le features, net/core's l2cap may select a procedur=
-e.
->
-> actually LE connection parameters should only be a L2CAP socket option. E=
-ither you are using a fixed channel for ATT or you are using a LE connectio=
-n oriented L2CAP channel. In both cases the natural fit is L2CAP socket as =
-an entry point for setting different connection parameters.
->
+--oyUTqETQ0mS9luUI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thank you for a valuable comment.
+Hi Dave,
 
-> Also what is set from userspace can only be a suggestion. The kernel woul=
-d have to make the final call on what parameters it configures with the rem=
-ote device. Especially with LE connection oriented L2CAP you can have multi=
-ple connections which each device. So the most demanding one should have it=
-s parameters applied to the link.
->
-> And the difference between using the 4.0 method via L2CAP (which is perip=
-heral triggered only) and the 4.1 method for doing this directly via LL is =
-an implementation detail that will be hidden in the kernel. Userspace shoul=
-d just tell the kernel what parameters it prefers. And if possible, the ker=
-nel will accommodate it.
->
-> That all said, make a proposal for L2CAP socket options to read and confi=
-gure the connection parameters.
->
+Here's a regression fix for Broadcom Bluetooth adapters found at least
+in certain Apple laptops. The issue was introduced in 4.1 so there's the
+appropriate "Cc: stable" entry for it.
 
-This is my proposal based on your comment.
-Can I go forward with this way ?
+Let me know if there are any issues pulling. Thanks.
+
+Johan
 
 ---
- include/net/bluetooth/bluetooth.h | 8 ++++++++
- net/bluetooth/l2cap_sock.c        | 6 ++++++
- 2 files changed, 14 insertions(+)
+The following changes since commit f760b87f8f12eb262f14603e65042996fe03720e:
 
-diff --git a/include/net/bluetooth/bluetooth.h
-b/include/net/bluetooth/bluetooth.h
-index 38d8a34..c81c749 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -119,6 +119,14 @@ struct bt_voice {
- #define BT_SNDMTU 12
- #define BT_RCVMTU 13
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net (2015-07-13 11:18:25 -0700)
 
-+#define BT_CONNECTION_PARAMS 14
-+struct bt_connection_params {
-+ __u16 min_interval;
-+ __u16 max_interval;
-+ __u16 slave_latency;
-+ __u16 supv_timeout;
-+};
-+
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
- __printf(1, 2)
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 6061876..5557438 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -602,6 +602,9 @@ static int l2cap_sock_getsockopt(struct socket
-*sock, int level, int optname,
-  err =3D -EFAULT;
-  break;
+are available in the git repository at:
 
-+ case BT_CONNECTION_PARAMS:
-+ break;
-+
-  default:
-  err =3D -ENOPROTOOPT;
-  break;
-@@ -935,6 +938,9 @@ static int l2cap_sock_setsockopt(struct socket
-*sock, int level, int optname,
-  chan->imtu =3D opt;
-  break;
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
 
-+ case BT_CONNECTION_PARAMS:
-+ break;
-+
-  default:
-  err =3D -ENOPROTOOPT;
-  break;
---=20
+for you to fetch changes up to 7bee8b08c428b63aa4a3765bb907602e36355378:
 
-> Regards
->
-> Marcel
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+  Bluetooth: btbcm: allow btbcm_read_verbose_config to fail on Apple (2015-07-14 22:54:55 +0200)
 
-Thanks and Regards,
-Seungyoun Ju.
+----------------------------------------------------------------
+Chris Mason (1):
+      Bluetooth: btbcm: allow btbcm_read_verbose_config to fail on Apple
+
+ drivers/bluetooth/btbcm.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+
+--oyUTqETQ0mS9luUI
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJVph1LAAoJECQj9vv5qNQSPzAP/RRFl+oyNaQIU6TjTO+mIled
+lZQxIT1YmTRZ73P7LAACOe13zNqHgi8voFLoDKucMnvii4vQWdX0Mvb9I74rUMZN
+KOFyBIFNGEHOtxqkz2QjfoLsNhwBhCAHJssUqi6mDGvouF6deO3VCvPBsPj+lxu2
+D5DMLGDa5aK48KmyG1ZI2V1C/p/rgijdw+YhJPBjEfjYrmEQFX1ctsg+GUqKJQsH
+DGEXMM18W3rpRBqxTwETh937bNk7EZoPVyqRqRO9V4Si/n9HvhB2/43cDTUvhBd4
+C0cKdeDkgrP6TJZ7QiYm20Mo8B3nuoEyJXfGSkRCRS7TFJPgZfuCV098qAoraw/o
+fLB6bsxw5qA99BTShb35k8Lek3pxUqU1lnAlbLI+Nq0we04erUTyeNEV0rreEnzo
+jxtlnMEnE+z/X6b0WNx8ZlF6oRsIFIO/Dx5/3d366hJw9cJlJzICAqOOnx/K8ZjJ
+rnogZI+cdI9ukrXR7JAAvPl/Jw667BQhw/nz7J0JcsRjzFQnp2gpyxdUfPE1GLdT
+A6Ix97L6fdR73qQ64fzv95jqv2tjjnWplf4kFlF3ExchzX6JK6YTscNabTImv5QS
+/JiGYFJqlV8I1GyuYQFgtMnzIpzeYzo6lfGu0QDmxZclK7t8+iDxIlX5uOkkcRHs
+CE4dB8w6chQ7liIzWEsI
+=iB/i
+-----END PGP SIGNATURE-----
+
+--oyUTqETQ0mS9luUI--
