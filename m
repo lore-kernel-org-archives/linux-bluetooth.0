@@ -1,24 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 15 Jul 2015 21:59:46 -0700 (PDT)
-Message-Id: <20150715.215946.1783281432851121337.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth 2015-07-15
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20150715084355.GA13429@t440s.lan>
-References: <20150715084355.GA13429@t440s.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+In-Reply-To: <CACsJT9N+saPgDKjXFGkr7fn=M=8s_h2fTSmPCznwahC7f6eeOQ@mail.gmail.com>
+References: <CACsJT9N+saPgDKjXFGkr7fn=M=8s_h2fTSmPCznwahC7f6eeOQ@mail.gmail.com>
+From: Mike Purvis <mpurvis@clearpathrobotics.com>
+Date: Wed, 15 Jul 2015 11:10:45 -0400
+Message-ID: <CACsJT9NNM2FvBRkP_DWD3Om6RC_xx3MBH2Er5dbUSyOmPcoyHg@mail.gmail.com>
+Subject: Re: UsermodeHID uncertainty
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Wed, 15 Jul 2015 11:43:55 +0300
+> - What is the usermode process? Do I have to start it somehow, or does
+> it start on its own? Is it an already running daemon?
+> - What is the communication channel between the kernel and user
+> process, and how can I listen in on the traffic?
+> - Is the usermode process directly managing things like devfs nodes
+> (eg, /dev/input/js0), or does it communicate back to the kernel for
+> that?
+> - As a user, what are my options for swapping out the usermode process
+> if I want to modify its behaviour? For example, handling disconnects
+> or pairing in a different manner than the default?
 
-> Here's a regression fix for Broadcom Bluetooth adapters found at least
-> in certain Apple laptops. The issue was introduced in 4.1 so there's the
-> appropriate "Cc: stable" entry for it.
-> 
-> Let me know if there are any issues pulling. Thanks.
-
-Pulled, thanks.
+Any thoughts on these questions?
