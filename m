@@ -1,50 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 16 Jul 2015 13:59:37 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: dogan yazar <doganyazar@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Advertising API, possible to set LE only?
+Message-ID: <20150716105937.GA18341@t440s.lan>
+References: <CANzaTi6_OF9C6DjPeRqaoUBKqdJZSQ+0k0cJLodWS3o5LzTsbw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <55A65C71.8010800@hanno.de>
-References: <55A65C71.8010800@hanno.de>
-Date: Thu, 16 Jul 2015 15:25:33 +0300
-Message-ID: <CABBYNZKMYGr1+ADcDORoQ2docOg0dKePTnMqruaoF2UXio=p5g@mail.gmail.com>
-Subject: Re: Motorola RZ100: How to add support for a new device?
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Hanno Zulla <abos@hanno.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CANzaTi6_OF9C6DjPeRqaoUBKqdJZSQ+0k0cJLodWS3o5LzTsbw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hanno,
+Hi dogan,
 
-On Wed, Jul 15, 2015 at 4:13 PM, Hanno Zulla <abos@hanno.de> wrote:
-> Hi,
->
-> who can help me add support for the following device?
->
-> Being fairly ignorant of Bluetooth, I'm hoping for someone to guide me
-> through this, alternatively I'm willing to borrow my device to any
-> competent developer wanting to tackle this.
->
->
-> The "Motorola Smart Controller RZ100" is a combined telephony headset
-> and HID touchpad with four Android-specific buttons. It is designed to
-> work as a remote control for Motorola Android devices.
->
-> <https://motorola-global-portal.custhelp.com/app/product_page/faqs/p/1422,7975,8227>
->
-> <http://www.amazon.com/Motorola-Bluetooth-Smart-Controller-Android/dp/B0060EKFYG>
->
-> It is possible to pair this device with non-Motorola devices, but it
-> doesn't work there. When paired with a Moto G Android phone, it worked
-> out of the box.
->
-> <https://code.google.com/p/android/issues/detail?id=180029>
->
-> You can also check out the one-star reviews at Amazon (above) for a
-> bunch of non-Moto-users complaining about this.
+On Thu, Jul 16, 2015, dogan yazar wrote:
+> In the Advertising API, org.bluez.LEAdvertisement1 has Type field
+> which can be "broadcast" or "peripheral".
+> When I set it to be peripheral, the outgoing advertisement packets has
+> the advertisement flags:
+> 0x02 (BLE_GAP_ADV_FLAG_LE_GENERAL_DISC_MODE) and I guess that is why
+> when I try to connect the peripheral from my Android, I get a pairing
+> request back.
+> 
+> Is there a way to set BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED on the
+> flags as well to show I only support LE and so I can also skip the
+> pairing requests.
 
-It might be missing a HID driver, but we can't help with Android since
-it doesn't use BlueZ anymore except if you are flashing with BlueZ for
-Android?
+You could try setting ControllerMode=le in the [General] section of
+/etc/bluetooth/main.conf and restart bluetoothd. Another option is to
+disable BR/EDR manually with btmgmt ("btmgmt bredr off").
 
-
--- 
-Luiz Augusto von Dentz
+Johan
