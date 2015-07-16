@@ -1,153 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1437031525.2896.69.camel@linux.intel.com>
-Subject: Re: [RFC v2 0/4] Adding stateful compression to IPHC
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
-Cc: "alex.aring@gmail.com" <alex.aring@gmail.com>,
-	"linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 16 Jul 2015 10:25:25 +0300
-In-Reply-To: <AB80DA35A7B64E4E98291794926897D9741DE5B8@MBX03.nvlsi.no>
-References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
-	 <1436792982.2896.32.camel@linux.intel.com>
-	 <AB80DA35A7B64E4E98291794926897D9741DE5B8@MBX03.nvlsi.no>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-wpan-owner@vger.kernel.org
+Date: Thu, 16 Jul 2015 06:06:14 +0000 (GMT)
+From: Nagaraj D R <nagaraj.dr@samsung.com>
+Subject: Re: Re: [Request] Clarification related to pairing in a particular
+ scenario
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	johan.hedberg@gmail.com
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	SYAM SIDHARDHAN <s.syam@samsung.com>,
+	RAKESH MK <rakesh.mk@samsung.com>, chanyeol.park@samsung.com
+Reply-to: nagaraj.dr@samsung.com
+MIME-version: 1.0
+Content-type: text/plain; charset=windows-1252
+MIME-version: 1.0
+Message-id: <394090105.824821437026772897.JavaMail.weblogic@ep2mlwas03a>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
-
-On ke, 2015-07-15 at 13:42 +0000, Duda, Lukasz wrote:
-> Hi Jukka,
-> 
-> > Hi Lukasz,
-> > 
-> > On ma, 2015-07-13 at 13:50 +0200, Lukasz Duda wrote:
-> > > Hi all,
-> > >
-> > > Resending the RFC patch set after some clean up.
-> > >
-> > > The following patches introduce support for stateful compression in IPHC.
-> > >
-> > > Patch #1: Introduce debugfs entry for 6lowpan module
-> > > Patch #2: Add stateful compression component of 6lowpan module
-> > > Patch #3: Add stateful compression support for iphc.c
-> > > Patch #4: Enable stateful compression in bluetooth_6lowpan
-> > >
-> > > Usage of stateful compression is described in Patch #2.
-> > >
-> > > Notes
-> > > =====
-> > >
-> > > RFC v2:
-> > >     - Splitting patch into smaller incremental patches
-> > >     - Moving debugfs logic from iphc.c into context.c
-> > >     - Updating patch set to align with style and coding guideline
-> > >
-> > > RFC v1:
-> > >     - Initial patch set: http://www.spinics.net/lists/linux-
-> > bluetooth/msg62930.html
-> > >
-> > > Limitations
-> > > ===========
-> > >
-> > > - Temporarly use of debugfs to be able to add context table entries.
-> > > - Current module does not support context time-outs.
-> > > - No support for multicast addresses stateful compression.
-> > >
-> > > Discussion: Idea on how to make the 6lowpan context tables out of debug
-> > mode
-> > >
-> > ============================================================
-> > ================
-> > >
-> > > The patch provided here is just a temporary solution where the contexts are
-> > > manually added. The proper way of adding/removing contexts would be to
-> > make
-> > > ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
-> > > packets with 6CO option (for example from RADVD) will be handled in the
-> > > ndisc_router_discovery function.
-> > >
-> > > Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need
-> > > to be handled in the ipv6 module in order to do it in a neat way.
-> > > Potentially the RFC6775 extensions could also be used by other protocols
-> > > than BLE and 802.15.4.
-> > >
-> > > There is a need for parsing the 6CO option in ndisc.c which parses Router
-> > > Advertisement messages. Today the function calls to IPHC (6lowpan module)
-> > are
-> > > quite hard to implement in ndisc.c, as there is no guarantee that the
-> > 6lowpan
-> > > module will be loaded or not. It would make sense to build 6lowpan module
-> > > as in-build part of IPv6. The features could be compiled in by using #defines.
-> > >
-> > > What do you think about moving 6lowpan as a component of IPv6 and
-> > modify ndisc.c
-> > > to handled 6LoWPAN specific options? Do you see any other solution to
-> > make sure
-> > > that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone
-> > module?
-> > 
-> > Have you considered that 6lowpan module could register a callback in
-> > ipv6 module. When needed, ipv6 could then call the 6lowpan callback if
-> > needed. This way there would be no need to embed 6lowpan functionality
-> > to ipv6 module.
-> > 
-> > 
-> > Cheers,
-> > Jukka
-> > 
-> 
-> I did consider that solution but I assume you think about the way of 
-> registration  used for NHC callbacks (for example nhc_udp.c) in the 6lowpan
-> module.
-
-I was thinking more something like the notifier API. Perhaps it can be
-utilized to send information about received ndisc events.
-
-So in 6lowpan module you would just do
-
-static struct notifier_block ndisc_notifier = {
-	.notifier_call = ndisc_event,
-};
-
-and register the notifier handler, and then in ndisc.c:ndisc_rcv() could
-then just send information about RAs etc.
-
-> 
-> This could imply a new API for ndisc.c for example
-> ndisc_register_lowpan_callback(). This callback can be issued from the
-> 6lowpan module in order to register a callback.
-> When an RA message comes, the registered callback will be issued.
-> Should this be called only when a specific option is detected, or for all RA
-> messages in general?
-
-Perhaps more general solution would be preferable instead of being
-specific to 6lowpan needs.
-
-> 
-> How do you see a way of handling all RFC6775 options like ARO,DAR,DAC etc.
-> Should this be extended in ndisc.c itself, or should it be handled within
-> the 6lowpan module (e.g. by using this registered lowpan callback). 
-> Because when receiving NS with ARO it is expected to answer with NA that
-> contains ARO option with reply status.
-
-If the options are specific to 6lowpan, then I would say the 6lowpan
-module needs to deal with them.
-
-> 
-> I believe that using callbacks like this could be used for parsing 6CO 
-> very well which does not need any interaction. However, would there be 
-> any chance of getting such dynamic registration of callbacks into ipv6 
-> module? Is there any example that implements such solution to see how
-> it works.
-
-I do not know and we are just pondering different ideas here. Could you
-ask the gurus in netdev mailing list their opinion/guidance?
-
-
-Cheers,
-Jukka
+SGVsbG8gTHVpeiwNCg0KPkhpLA0KDQo+T24gVGh1LCBKdWwgOSwgMjAxNSBhdCA5OjQ2IEFNLCBO
+YWdhcmFqIEQgUiB3cm90ZToNCj4+IEhlbGxvIGFsbCwNCj4+IGNvdWxkIHNvbWVvbmUgcGxlYXNl
+IGNsYXJpZnkgbXkgZG91YnQgcmVsYXRlZCB0byB0aGUgY29uY2VwdCBvZiBwYWlyaW5nIGluIGEg
+cGFydGljdWxhciBzY2VuYXJpbw0KPj4NCj4+IElmIGEgcmVtb3RlIGRldmljZSBoYXZpbmcgbm8g
+SS9PIGNhcGFiaWxpdHkgKGFsc28gYXV0aGVudGljYXRpb24gOiBnZW5lcmFsIGJvbmRpbmcsIGFu
+ZCAgTm8gTUlUTSBwcm90ZWN0aW9uKQ0KPj5zZW50IGEgcGFpcmluZyByZXF1ZXN0IHRvIG91ciBs
+b2NhbCBkZXZpY2UoRFVUIHJ1bm5pbmcgd2l0aCB0aGUgYmx1ZXogc3RhY2spLCBsb2NhbCBkZXZp
+Y2Ugc3RhY2sgYXV0byBhY2NlcHQNCj4+IHRoZSBwYWlyaW5nIHJlcXVlc3QgZXZlbiB0aG91Z2gg
+bG9jYWwgZGV2aWNlIGhhcyBJL08gY2FwYWJpbGl0eQ0KPj4NCj4+IElzIHRoZSBCZWhhdmlvciBv
+ZiBhdXRvLWFjY2VwdGluZyB0aGUgcGFpcmluZyByZXF1ZXN0IGp1c3RpZmllZD8NCj4+IC0tIEFj
+Y29yZGluZyB0byB0aGUgc3BlY2lmaWNhdGlvbiAiRnJvbSB0aGUgQmx1ZXRvb3RoIENvcmUgU3Bl
+Y2lmaWNhdGlvbiA0LjEgcGFnZSAxOTU4Og0KPj4gICJpZiBib3RoIGRldmljZXMgaGF2ZSBzZXQg
+dGhlIEF1dGhlbnRpY2F0aW9uX1JlcXVpcmVtZW50cyBwYXJhbWV0ZXIgdG8gb25lIG9mIHRoZSBN
+SVRNDQo+PiAgIFByb3RlY3Rpb24gTm90IFJlcXVpcmVkIG9wdGlvbnMsIGF1dGhlbnRpY2F0aW9u
+IHN0YWdlIDEgc2hhbGwgZnVuY3Rpb24gYXMgaWYgYm90aCBkZXZpY2VzDQo+PiAgIHNldCB0aGVp
+ciBJTyBjYXBhYmlsaXRpZXMgdG8gIERpc3BsYXlPbmx5IChlLmcuLCBOdW1lcmljIGNvbXBhcmlz
+b24gd2l0aCBhdXRvbWF0aWMgY29uZmlybWF0aW9uIG9uIGJvdGggZGV2aWNlcykiDQo+DQo+VGhl
+cmUgaXMgYSBtb3JlIHByZWNpc2UgYW5zd2VyIHRvIHRoaXMgaW46DQo+DQo+QkxVRVRPT1RIIFNQ
+RUNJRklDQVRJT04gVmVyc2lvbiA0LjIgW1ZvbCAzLCBQYXJ0IENdDQo+cGFnZSAzMjMgVGFibGUg
+NS43OiBJTyBDYXBhYmlsaXR5IE1hcHBpbmcgdG8gQXV0aGVudGljYXRpb24gU3RhZ2UgMQ0KPg0K
+PlNvIGlmIHdlIHJ1bGUgTm8gTUlUTSBzaGFsbCBiZSB0cmVhdGVkIGFzIERpc3BsYXlPbmx5IGl0
+IHdvdWxkIGZhbGwNCj5pbnRvIHRoZSB2ZXJ5IGZpcnN0IGNhc2UgZGVzY3JpYmVkIGluIHRoYXQg
+dGFibGU6DQo+DQo+J051bWVyaWMgQ29tcGFyaXNvbiB3aXRoIGF1dG9tYXRpYyBjb25maXJtYXRp
+b24gb24gYm90aCBkZXZpY2VzJy4NClllcywgdGhpcyB3b3VsZCBiZSB0aGUgY2FzZSB3aGVuICJi
+b3RoIHRoZSBkZXZpY2UiIGFubm91bmNlIE5PIE1JVE0gUHJvdGVjdGlvbi4NCkJ1dCBteSBxdWVz
+dGlvbiBpcyAid2h5IGRvZXMgdGhlIGxvY2FsIGRldmljZSAoYmx1ZXopIHNldHMgdGhlIExvY2Fs
+IE1JVE0gdG8gIk5PIE1JVE0iIGV2ZW4gdGhvdWdoIGxvY2FsIGRldmljZSBoYXMgDQpjYXBhYmls
+aXR5IG9mIGNhcnJ5aW5nIG91dCBNSVRNIHByb3RlY3Rpb24uIEV4YW1wbGUgUGhvbmUuDQpUaGUg
+cG9pbnQgSSdtIGdldHRpbmcgYXQgaXMsICJGb3IgYW55IGhhY2tpbmcgZGV2aWNlLCBpdCBpcyBl
+YXN5IHRvIGdldCBwYWlyZWQgd2l0aCBsb2NhbCBkZXZpY2UgYnkgc2V0dGluZyBpdHMgSS9PIGNh
+cGFiaWxpdHkNCnRvIE5PX0lOUFVUX09VVFBVVCBhbmQgTUlUTSBmbGFnIHNldCB0byBOT19NSVRN
+X1BST1RFQ1RJT04uIg0KRXhhbXBsZSBpcyA6IERVVCAoUGhvbmUgcnVubmluZyB3aXRoIGJsdWV6
+IHN0YWNrKSBoYXMgaG9zdGVkIGEgSEZQLUFHIGFuZCBBMkRQLVNPVVJDRSBwcm9maWxlcy4gSWYg
+YSByZW1vdGUNCmRldmljZSAoYW4gSGVhZHNldCB3aGljaCBpcyB0cnlpbmcgdG8gY29ubmVjdCB0
+byBwcmV2aW91c2x5IGNvbm5lY3RlZCBkZXZpY2UsIGkuZSBvdXIgbG9jYWwgZGV2aWNlIERVVCkg
+ZG9lcyBwYWlyaW5nIGF0dGVtcHQNCmJlY2F1c2UgcHJldmlvdXMgbGluayBrZXkgaXMgcmVtb3Zl
+ZCBpbiBEVVQuIERVVCB3aWxsIGdldCBwYWlyZWQgc2lsZW50bHkgd2l0aG91dCBub3RpZnlpbmcg
+dXNlci1zcGFjZS9hcHBsaWNhdGlvbiBhbmQgDQpyZW1vdGUgZGV2aWNlIHdpbGwgZ2V0IGFjY2Vz
+cyB0byBIRlAgYW5kIEEyRFAgcHJvZmlsZXMNCg0KSG93IGFib3V0IGdpdmluZyBVc2VyX3NwYWNl
+IGEgY2hhbmNlIHRvIGNvbmZpcm0gdGhlIHBhaXJpbmcsIGlmIGxvY2FsIGRldmljZSBjYXBhYmls
+aXR5IGlzIGF0IGxlYXN0IG9uZSBvZiB0aGUgDQoib3V0cHV0IG9ubHkiICJJbnB1dCBvbmx5IiBv
+ciAiSW5wdXRPdXRwdXQiIGlycmVzcGVjdGl2ZSBvZiB0aGUgcmVtb3RlIE1JVE0gYW5kIEkvTyBj
+YXBhYmlsaXR5Pw0KUmVhc29uIGJlaW5nLCB1c2VyX3NwYWNlIGFwcGxpY2F0aW9uIGdldHMgdGhl
+IGZsZXhpYmlsaXR5IG9mIGF1dG8gYWNjZXB0aW5nIG9yIG5vdGlmeWluZyB0aGUgdXNlciAoZm9y
+IGNvbmZpcm1hdGlvbikgYWJvdXQgb25nb2luZyBwYWlyaW5nDQpyZXF1ZXN0Lg0KSW4gdGhlIGNh
+c2Ugb2YgIm91dHB1dCBvbmx5IiA6IHVzZXJfc3BjYWUgYXBwbGljYXRpb24gd2lsbCBnZXQgZmxl
+eGliaWxpdHkgaW4gZW5mb3JjaW5nIHBhaXJpbmcgdG8gdGhvc2UgZGV2aWNlIHdoaWNoIGlzIGVp
+dGhlciAiSW5wdXRPbmx5IiBvciAiSW5wdXRPdXRwdXQiDQpJbiB0aGUgY2FzZSBvZiAiSW5wdXQg
+b25seSIgOiB1c2VyX3NwYWNlIGFwcGxpY2F0aW9uIHdpbGwgZ2V0IGZsZXhpYmlsaXR5IGluIGVu
+Zm9yY2luZyBwYWlyaW5nIHRvIHRob3NlIGRldmljZSB3aGljaCBpcyAiZGlzcGxheW9ubHkiIG9y
+ICJJbnB1dE91dHB1dCINCkluIHRoZSBjYXNlIG9mICJJbnB1dE91dHB1dCIgOiB1c2VyX3NwYWNl
+IGFwcGxpY2F0aW9uIHdpbGwgZ2V0IGZsZXhpYmlsaXR5IGluIGluY2x1ZGluZyAidXNlciBhY3Rp
+b24iIGZvciBhY2NlcHRpbmcgdGhlIHBhaXJpbmcuDQoNCklmIHRoaXMgdmlvbGF0ZXMgc3BlYyBp
+biBhbnkgY2FzZSwgdGhlbiB3ZSBzaGFsbCBwcm9wb3NlIGNvcnJlY3Rpb24gaW4gc3BlYyBhcyB3
+ZWxsLg0KDQo+PiAgTG9jYWwgZGV2aWNlIGhhZCBzZXQgdGhlICJOTyBNSVRNIHByb3RlY3Rpb24g
+cmVxdWlyZWQiIGJhc2VkIG9uIHRoZSByZW1vdGUgYXV0aGVudGljYXRpb24gYW5kIGNhcGFiaWxp
+dGllcy4NCj4+ICAgSXMgdGhlIGJlaGF2aW9yIG9mIG92ZXItcmlkaW5nIGxvY2FsIGRldmljZSBN
+SVRNIGNhcGFiaWxpdHkgbmVjZXNzYXJ5Pw0KPj4NCj4+IEluIGNhc2Ugb2YgbG9jYWwgZGV2aWNl
+IGluaXRpYXRpbmcgYSBjb25uZWN0aW9uIHRvIHRoZSByZW1vdGUgZGV2aWNlLCBhdXRvIGFjY2Vw
+dCBmcm9tIHRoZSBzdGFjayBpcyBhY2NlcHRhYmxlDQo+PiBidXQgaW4gY2FzZSBvZiByZW1vdGUg
+aW5pdGlhdGVkIGNvbm5lY3Rpb24sIGF1dG8tYWNjZXB0IHdpbGwgY2F1c2UgdXNlciBpbmNvbnZl
+bmllbmNlLCBJc24ndCBpdD8NCj4+DQo+PiBJIGhhdmUgdGVzdGVkIHRoZSBzaW1pbGFyIHNjZW5h
+cmlvIHdpdGggdGhlIGRldmljZSBoYXZpbmcgYmx1ZWRyb2lkIHN0YWNrLCBoZXJlIHdlIGdldCBh
+IGF1dGhvcml6YXRpb24gcG9wdXAsDQo+PiBhY3Rpb24gb24gd2hpY2ggd2lsbCBjb21wbGV0ZSB0
+aGUgcGFpcmluZyBhbmQgY29ubmVjdGlvbi4gaS5lIGF1dG8tcGFpcmluZyBpcyBub3QgZG9uZSBp
+biBzdGFjaw0KPg0KPkkgZ3Vlc3MgaXQgaXMgYmVjYXVzZSBpdCBkb2VzIG5vdCB0YWtlIGludG8g
+YWNjb3VudCB0aGF0IE5vIE1JVE0gc2hhbGwNCj5iZSB0cmVhdGVkIGFzIERpc3BsYXlPbmx5Lg0K
+Pg0KPj4gTWF5IGJlIHdlIGFsbCBoYXZlIHRoZSBmb2xsb3dpbmcgcXVlcnksDQo+Pg0KPj4NCj4g
+PlJlZ2FyZHMNCj4+IE5hZ2FyYWogRCBSDQo+DQotLSANCj5MdWl6IEF1Z3VzdG8gdm9uIERlbnR6
+DQoNClJlZ2FyZHMNCk5hZ2FyYWogRCBS
 
 
