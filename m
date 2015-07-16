@@ -1,124 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <394090105.824821437026772897.JavaMail.weblogic@ep2mlwas03a>
-References: <394090105.824821437026772897.JavaMail.weblogic@ep2mlwas03a>
-Date: Thu, 16 Jul 2015 11:07:14 +0300
-Message-ID: <CABBYNZKADu_hB2cSUJeYzbSESj3Fw8EbqA++tXe4=X3B_kCMng@mail.gmail.com>
-Subject: Re: Re: [Request] Clarification related to pairing in a particular scenario
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: nagaraj.dr@samsung.com
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	SYAM SIDHARDHAN <s.syam@samsung.com>,
-	RAKESH MK <rakesh.mk@samsung.com>,
-	Chan-yeol Park <chanyeol.park@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1437031525.2896.69.camel@linux.intel.com>
+Subject: Re: [RFC v2 0/4] Adding stateful compression to IPHC
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
+Cc: "alex.aring@gmail.com" <alex.aring@gmail.com>,
+	"linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 16 Jul 2015 10:25:25 +0300
+In-Reply-To: <AB80DA35A7B64E4E98291794926897D9741DE5B8@MBX03.nvlsi.no>
+References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
+	 <1436792982.2896.32.camel@linux.intel.com>
+	 <AB80DA35A7B64E4E98291794926897D9741DE5B8@MBX03.nvlsi.no>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lukasz,
 
-On Thu, Jul 16, 2015 at 9:06 AM, Nagaraj D R <nagaraj.dr@samsung.com> wrote:
-> Hello Luiz,
->
->>Hi,
->
->>On Thu, Jul 9, 2015 at 9:46 AM, Nagaraj D R wrote:
->>> Hello all,
->>> could someone please clarify my doubt related to the concept of pairing in a particular scenario
->>>
->>> If a remote device having no I/O capability (also authentication : general bonding, and  No MITM protection)
->>>sent a pairing request to our local device(DUT running with the bluez stack), local device stack auto accept
->>> the pairing request even though local device has I/O capability
->>>
->>> Is the Behavior of auto-accepting the pairing request justified?
->>> -- According to the specification "From the Bluetooth Core Specification 4.1 page 1958:
->>>  "if both devices have set the Authentication_Requirements parameter to one of the MITM
->>>   Protection Not Required options, authentication stage 1 shall function as if both devices
->>>   set their IO capabilities to  DisplayOnly (e.g., Numeric comparison with automatic confirmation on both devices)"
->>
->>There is a more precise answer to this in:
->>
->>BLUETOOTH SPECIFICATION Version 4.2 [Vol 3, Part C]
->>page 323 Table 5.7: IO Capability Mapping to Authentication Stage 1
->>
->>So if we rule No MITM shall be treated as DisplayOnly it would fall
->>into the very first case described in that table:
->>
->>'Numeric Comparison with automatic confirmation on both devices'.
-> Yes, this would be the case when "both the device" announce NO MITM Protection.
-> But my question is "why does the local device (bluez) sets the Local MITM to "NO MITM" even though local device has
-> capability of carrying out MITM protection. Example Phone.
+On ke, 2015-07-15 at 13:42 +0000, Duda, Lukasz wrote:
+> Hi Jukka,
+> 
+> > Hi Lukasz,
+> > 
+> > On ma, 2015-07-13 at 13:50 +0200, Lukasz Duda wrote:
+> > > Hi all,
+> > >
+> > > Resending the RFC patch set after some clean up.
+> > >
+> > > The following patches introduce support for stateful compression in IPHC.
+> > >
+> > > Patch #1: Introduce debugfs entry for 6lowpan module
+> > > Patch #2: Add stateful compression component of 6lowpan module
+> > > Patch #3: Add stateful compression support for iphc.c
+> > > Patch #4: Enable stateful compression in bluetooth_6lowpan
+> > >
+> > > Usage of stateful compression is described in Patch #2.
+> > >
+> > > Notes
+> > > =====
+> > >
+> > > RFC v2:
+> > >     - Splitting patch into smaller incremental patches
+> > >     - Moving debugfs logic from iphc.c into context.c
+> > >     - Updating patch set to align with style and coding guideline
+> > >
+> > > RFC v1:
+> > >     - Initial patch set: http://www.spinics.net/lists/linux-
+> > bluetooth/msg62930.html
+> > >
+> > > Limitations
+> > > ===========
+> > >
+> > > - Temporarly use of debugfs to be able to add context table entries.
+> > > - Current module does not support context time-outs.
+> > > - No support for multicast addresses stateful compression.
+> > >
+> > > Discussion: Idea on how to make the 6lowpan context tables out of debug
+> > mode
+> > >
+> > ============================================================
+> > ================
+> > >
+> > > The patch provided here is just a temporary solution where the contexts are
+> > > manually added. The proper way of adding/removing contexts would be to
+> > make
+> > > ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
+> > > packets with 6CO option (for example from RADVD) will be handled in the
+> > > ndisc_router_discovery function.
+> > >
+> > > Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need
+> > > to be handled in the ipv6 module in order to do it in a neat way.
+> > > Potentially the RFC6775 extensions could also be used by other protocols
+> > > than BLE and 802.15.4.
+> > >
+> > > There is a need for parsing the 6CO option in ndisc.c which parses Router
+> > > Advertisement messages. Today the function calls to IPHC (6lowpan module)
+> > are
+> > > quite hard to implement in ndisc.c, as there is no guarantee that the
+> > 6lowpan
+> > > module will be loaded or not. It would make sense to build 6lowpan module
+> > > as in-build part of IPv6. The features could be compiled in by using #defines.
+> > >
+> > > What do you think about moving 6lowpan as a component of IPv6 and
+> > modify ndisc.c
+> > > to handled 6LoWPAN specific options? Do you see any other solution to
+> > make sure
+> > > that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone
+> > module?
+> > 
+> > Have you considered that 6lowpan module could register a callback in
+> > ipv6 module. When needed, ipv6 could then call the 6lowpan callback if
+> > needed. This way there would be no need to embed 6lowpan functionality
+> > to ipv6 module.
+> > 
+> > 
+> > Cheers,
+> > Jukka
+> > 
+> 
+> I did consider that solution but I assume you think about the way of 
+> registration  used for NHC callbacks (for example nhc_udp.c) in the 6lowpan
+> module.
 
-Because MITM requirement cannot be meet with NoInputNoOutput, also
-both A2DP and HFP do not required MITM thus we proceed without it.
+I was thinking more something like the notifier API. Perhaps it can be
+utilized to send information about received ndisc events.
 
-> The point I'm getting at is, "For any hacking device, it is easy to get paired with local device by setting its I/O capability
-> to NO_INPUT_OUTPUT and MITM flag set to NO_MITM_PROTECTION."
-> Example is : DUT (Phone running with bluez stack) has hosted a HFP-AG and A2DP-SOURCE profiles. If a remote
-> device (an Headset which is trying to connect to previously connected device, i.e our local device DUT) does pairing attempt
-> because previous link key is removed in DUT. DUT will get paired silently without notifying user-space/application and
-> remote device will get access to HFP and A2DP profiles
+So in 6lowpan module you would just do
 
-In order to be able to do this you need the following:
+static struct notifier_block ndisc_notifier = {
+	.notifier_call = ndisc_event,
+};
 
-- Be discoverable otherwise the remote device can't even connect to you.
-- Automatically trust any device that is paired thus any connection
-from the device is automatically authorized.
+and register the notifier handler, and then in ndisc.c:ndisc_rcv() could
+then just send information about RAs etc.
 
-Your argument perhaps would work in case of existing device gets
-repaired without letting the user know, in that case we could have
-malicious attacker that pretend to be some device overwriting and
-existing link-key and gain access to the any profile if trusted flag
-was set. For new devices this will not be the case because they are
-not trusted by default so the user will need to authorize it first
-before it gain access to anything.
+> 
+> This could imply a new API for ndisc.c for example
+> ndisc_register_lowpan_callback(). This callback can be issued from the
+> 6lowpan module in order to register a callback.
+> When an RA message comes, the registered callback will be issued.
+> Should this be called only when a specific option is detected, or for all RA
+> messages in general?
 
-> How about giving User_space a chance to confirm the pairing, if local device capability is at least one of the
-> "output only" "Input only" or "InputOutput" irrespective of the remote MITM and I/O capability?
-> Reason being, user_space application gets the flexibility of auto accepting or notifying the user (for confirmation) about ongoing pairing
-> request.
-> In the case of "output only" : user_spcae application will get flexibility in enforcing pairing to those device which is either "InputOnly" or "InputOutput"
-> In the case of "Input only" : user_space application will get flexibility in enforcing pairing to those device which is "displayonly" or "InputOutput"
-> In the case of "InputOutput" : user_space application will get flexibility in including "user action" for accepting the pairing.
->
-> If this violates spec in any case, then we shall propose correction in spec as well.
+Perhaps more general solution would be preferable instead of being
+specific to 6lowpan needs.
 
-I guess you want to disregard DisplayOnly for No MITM protection, but
-I think this is a fundamental for using Just Works pairing since
-otherwise you will end up one side authentication being triggered but
-not used just to inform the user of a new pairing. Also note that by
-the time pairing happens we still have no idea what profiles the
-remote device supports so it is perhaps too soon to warn the user
-about a new pairing, you should instead use the authorization for that
-and give the user the option to trust/block the device in the first
-connection.
+> 
+> How do you see a way of handling all RFC6775 options like ARO,DAR,DAC etc.
+> Should this be extended in ndisc.c itself, or should it be handled within
+> the 6lowpan module (e.g. by using this registered lowpan callback). 
+> Because when receiving NS with ARO it is expected to answer with NA that
+> contains ARO option with reply status.
 
->>>  Local device had set the "NO MITM protection required" based on the remote authentication and capabilities.
->>>   Is the behavior of over-riding local device MITM capability necessary?
->>>
->>> In case of local device initiating a connection to the remote device, auto accept from the stack is acceptable
->>> but in case of remote initiated connection, auto-accept will cause user inconvenience, Isn't it?
->>>
->>> I have tested the similar scenario with the device having bluedroid stack, here we get a authorization popup,
->>> action on which will complete the pairing and connection. i.e auto-pairing is not done in stack
->>
->>I guess it is because it does not take into account that No MITM shall
->>be treated as DisplayOnly.
->>
->>> May be we all have the following query,
->>>
->>>
->> >Regards
->>> Nagaraj D R
->>
-> --
->>Luiz Augusto von Dentz
->
-> Regards
-> Nagaraj D R
+If the options are specific to 6lowpan, then I would say the 6lowpan
+module needs to deal with them.
+
+> 
+> I believe that using callbacks like this could be used for parsing 6CO 
+> very well which does not need any interaction. However, would there be 
+> any chance of getting such dynamic registration of callbacks into ipv6 
+> module? Is there any example that implements such solution to see how
+> it works.
+
+I do not know and we are just pondering different ideas here. Could you
+ask the gurus in netdev mailing list their opinion/guidance?
 
 
+Cheers,
+Jukka
 
--- 
-Luiz Augusto von Dentz
+
