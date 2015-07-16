@@ -1,183 +1,288 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Arend Van Spriel <arend@broadcom.com>
-Subject: RE: [PATCH 1/3] Bluetooth: hci_uart: Add PM for BCM2E39
-Date: Thu, 16 Jul 2015 18:54:39 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E9426DDF7@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1435929751-26831-1-git-send-email-frederic.danis@linux.intel.com>
- <55A7D771.9020705@linux.intel.com>
-In-Reply-To: <55A7D771.9020705@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <55A7D771.9020705@linux.intel.com>
+Date: Thu, 16 Jul 2015 18:10:25 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: hci_uart: Add PM for BCM2E39
+References: <1435929751-26831-1-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1435929751-26831-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgRnJlZCwNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0
-b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJA
-dmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgRnJlZGVyaWMgRGFuaXMNClNlbnQ6IFRodXJz
-ZGF5LCBKdWx5IDE2LCAyMDE1IDEyOjEwIFBNDQpUbzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2Vy
-bmVsLm9yZw0KU3ViamVjdDogUmU6IFtQQVRDSCAxLzNdIEJsdWV0b290aDogaGNpX3VhcnQ6IEFk
-ZCBQTSBmb3IgQkNNMkUzOQ0KDQpQaW5nID8NCg0KT24gMDMvMDcvMjAxNSAxNToyMiwgRnJlZGVy
-aWMgRGFuaXMgd3JvdGU6DQo+IFJldHJpZXZlICJzaHV0ZG93biIgYW5kICJkZXZpY2Vfd2FrZXVw
-IiBHUElPcyBmcm9tIEFDUEkuDQo+IFNldCBkZXZpY2Ugb2ZmIGR1cmluZyBwbGF0Zm9ybSBkZXZp
-Y2UgZW51bWVyYXRpb24uDQo+IFNldCBkZXZpY2Ugb24gb25seSB3aGVuIGl0IGlzIGF0dGFjaGVk
-Lg0KDQpJRjogU29ycnkgZm9yIHRoZSBkZWxheSBpbiByZXNwb25kaW5nLiBJIGFtIG5vdCBhY3Rp
-dmVseSB3b3JraW5nIG9uIHRoZSBzaW1pbGFyIERUIGRyaXZlciBhdCB0aGUgbW9tZW50IGFzIHdl
-IGhhdmUgaGl0IGEgRFQgbWFpbnRhaW5lciByb2FkYmxvY2sgZm9yIGl0cyBkZXZlbG9wbWVudC4g
-SSBkbyBub3QgcmVhZCB0aGlzIGJ1bGxldGluIGJvYXJkIG11Y2ggdGhlcmVmb3JlLiBHcmVhdCBz
-ZWVpbmcgYSBmaXJzdCB0YWtlIG9uIHRoZSBCcm9hZGNvbSBCVCBVQVJUIEFDUEkgZHJpdmVyISBM
-b29rcyBsaWtlIGEgZ29vZCBzdGFydCB0byBtZS4gQSBmZXcgY29tbWVudHM6DQppZjAxLiBJIHdv
-dWxkIHR1cm4gdGhlIGRldmljZSBvbiB3aGVuIHRoZSBCQ00gcHJvdG9jb2wgaXMgb3BlbmVkIGFu
-ZCB0dXJuIHRoZSBkZXZpY2Ugb2ZmIHdoZW4gdGhlIHByb3RvY29sIGlzIGNsb3NlZC4NCmlmMDIu
-IEkgd291bGQgc3Ryb25nbHkgZW5jb3VyYWdlIHlvdSB0byBzdGFydCBzdXBwb3J0aW5nIHRoZSBy
-dW50aW1lIHN1c3BlbmQgdXBvbiBhIHBlcmlvZCBvZiBpbmFjdGl2aXR5LCByZXN1bWUgYW5kIHRo
-ZSBpbnRlcnJ1cHQtdHJpZ2dlcmVkIHdha2UgYXMgcmVsYXRlZCBwb3dlciBzYXZpbmdzIGFyZSBz
-aWduaWZpY2FudC4gWW91IHdvdWxkIG9idmlvdXNseSBuZWVkIHRvIHNldCByZWFzb25hYmxlIHNs
-ZWVwIHBhcmFtZXRlcnMgdmlhIHRoZSBWU0MgdGhlbi4gT2YgY291cnNlLCB3ZSB3b3VsZCBhbHNv
-IHdhbnQgdG8gZmxvdyBjb250cm9sIHRoZSBkZXZpY2UgaW4gc3VzcGVuZCB0aW1lIHRvIGF2b2lk
-IGNoYXJhY3RlciBsb3NzLiBTZWUgbXkgRFQgcGF0Y2hlcyBmb3IgdGhlIFZTQyBhbmQgVUFSVCBm
-bG93IGNvbnRyb2wgcGFydGljdWxhcnMuDQppZjAzLiBXZSB3b3VsZCBhbHNvIHdhbnQgYXQgbGVh
-c3QgdG8gc3VzcGVuZCBhbmQgcmVzdW1lIHRoZSBkZXZpY2Ugd2hlbiB0aGUgcGxhdGZvcm0gc3Vz
-cGVuZHMvcmVzdW1lcyBhcyBhIHdob2xlLg0KaWYwNC4gQSBncmVhdCBlbmhhbmNlbWVudCB3b3Vs
-ZCBoYXZlIGFsc28gYmVlbiB0byBtYWtlIGEgZGVjaXNpb24gd2hldGhlciB0byBzdXNwZW5kIG9y
-IHR1cm4gb2ZmIHRoZSBkZXZpY2UgYXQgdGhlIHRpbWUgb2YgdGhlIHBsYXRmb3JtIHN1c3BlbmQu
-IFRoYXQgd291bGQgcmVxdWlyZSBCVCBrbm93bGVkZ2Ugb2Ygd2hhdCdzIHBhaXJlZCBldGMuIFdl
-IHdvdWxkIG9idmlvdXNseSBuZWVkIHRvIHJlc3VtZSBvciB0dXJuIGl0IGJhY2sgb24gYXQgdGhl
-IHBsYXRmb3JtIHJlc3VtZSB0aW1lIGFjY29yZGluZ2x5Lg0KaWYwNS4gV2Ugc2hvdWxkIGlkZWFs
-bHkgc3VwcG9ydCBydW5uaW5nIG9uIHRoZSBCcm9hZGNvbSBCVCBVQVJUIEFDUEkgbm9kZSBhcyBp
-dCBzaGlwcyBub3cgaW4gaHVuZHJlZHMgb2YgbGFwdG9wL3RhYmxldC9waG9uZSBtb2RlbHMgd2hp
-bGUgeW91IGFwcGFyZW50bHkgcmVseSBvbiBMaW51eCBzcGVjaWZpYyBlbmhhbmNlbWVudHMgdG8g
-dGhpcyBleHRlbnQuIFdlIHdhbnQgdG8gbGV0IHVzZXJzIGR1YWwgYm9vdCB3aXRoIEJUIHdvcmtp
-bmcgZmluZSBpbiBlaXRoZXIgb3BlcmF0aW5nIHN5c3RlbS4gV291bGQgeW91IHB1Ymxpc2ggYSBy
-ZWxldmFudCBEU0wgc25pcHBldCBvZiB3aGF0IHlvdSd2ZSBkb25lIGluIHRoZSBBQ1BJIG9uIHlv
-dXIgdGVzdCBwbGF0Zm9ybT8NCg0KVGhhbmtzLA0KIC1JbHlhDQoNCj4NCj4gU2lnbmVkLW9mZi1i
-eTogRnJlZGVyaWMgRGFuaXMgPGZyZWRlcmljLmRhbmlzQGxpbnV4LmludGVsLmNvbT4NCj4gLS0t
-DQo+ICAgZHJpdmVycy9ibHVldG9vdGgvaGNpX2JjbS5jIHwgMTkxICsrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKystDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDE4OSBpbnNl
-cnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVl
-dG9vdGgvaGNpX2JjbS5jIGIvZHJpdmVycy9ibHVldG9vdGgvaGNpX2JjbS5jDQo+IGluZGV4IDIz
-NTIzZTEuLjg1NmNiNDggMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2hjaV9iY20u
-Yw0KPiArKysgYi9kcml2ZXJzL2JsdWV0b290aC9oY2lfYmNtLmMNCj4gQEAgLTI1LDYgKzI1LDEy
-IEBADQo+ICAgI2luY2x1ZGUgPGxpbnV4L2Vycm5vLmg+DQo+ICAgI2luY2x1ZGUgPGxpbnV4L3Nr
-YnVmZi5oPg0KPiAgICNpbmNsdWRlIDxsaW51eC9maXJtd2FyZS5oPg0KPiArI2luY2x1ZGUgPGxp
-bnV4L21vZHVsZS5oPg0KPiArI2luY2x1ZGUgPGxpbnV4L2FjcGkuaD4NCj4gKyNpbmNsdWRlIDxs
-aW51eC9wbGF0Zm9ybV9kZXZpY2UuaD4NCj4gKyNpbmNsdWRlIDxsaW51eC9jbGsuaD4NCj4gKyNp
-bmNsdWRlIDxsaW51eC9ncGlvL2NvbnN1bWVyLmg+DQo+ICsjaW5jbHVkZSA8bGludXgvdHR5Lmg+
-DQo+DQo+ICAgI2luY2x1ZGUgPG5ldC9ibHVldG9vdGgvYmx1ZXRvb3RoLmg+DQo+ICAgI2luY2x1
-ZGUgPG5ldC9ibHVldG9vdGgvaGNpX2NvcmUuaD4NCj4gQEAgLTMyLDExICszOCwzMCBAQA0KPiAg
-ICNpbmNsdWRlICJidGJjbS5oIg0KPiAgICNpbmNsdWRlICJoY2lfdWFydC5oIg0KPg0KPiArc3Ry
-dWN0IGJjbV9kZXZpY2Ugew0KPiArCXN0cnVjdCBsaXN0X2hlYWQJbGlzdDsNCj4gKw0KPiArCXN0
-cnVjdCBwbGF0Zm9ybV9kZXZpY2UJKnBkZXY7DQo+ICsNCj4gKwljb25zdCBjaGFyCQkqbmFtZTsN
-Cj4gKwlzdHJ1Y3QgZ3Bpb19kZXNjCSpkZXZpY2Vfd2FrZXVwOw0KPiArCXN0cnVjdCBncGlvX2Rl
-c2MJKnNodXRkb3duOw0KPiArDQo+ICsJc3RydWN0IGNsawkJKmNsazsNCj4gKwlib29sCQkJY2xr
-X2VuYWJsZWQ7DQo+ICt9Ow0KPiArDQo+ICAgc3RydWN0IGJjbV9kYXRhIHsNCj4gLQlzdHJ1Y3Qg
-c2tfYnVmZiAqcnhfc2tiOw0KPiAtCXN0cnVjdCBza19idWZmX2hlYWQgdHhxOw0KPiArCXN0cnVj
-dCBza19idWZmCQkqcnhfc2tiOw0KPiArCXN0cnVjdCBza19idWZmX2hlYWQJdHhxOw0KPiArDQo+
-ICsJc3RydWN0IGJjbV9kZXZpY2UJKmRldjsNCj4gICB9Ow0KPg0KPiArLyogTGlzdCBvZiBCQ00g
-QlQgVUFSVCBkZXZpY2VzICovDQo+ICtzdGF0aWMgREVGSU5FX1NQSU5MT0NLKGRldmljZV9saXN0
-X2xvY2spOw0KPiArc3RhdGljIExJU1RfSEVBRChkZXZpY2VfbGlzdCk7DQo+ICsNCj4gICBzdGF0
-aWMgaW50IGJjbV9zZXRfYmF1ZHJhdGUoc3RydWN0IGhjaV91YXJ0ICpodSwgdW5zaWduZWQgaW50
-IHNwZWVkKQ0KPiAgIHsNCj4gICAJc3RydWN0IGhjaV9kZXYgKmhkZXYgPSBodS0+aGRldjsNCj4g
-QEAgLTg2LDkgKzExMSwyNiBAQCBzdGF0aWMgaW50IGJjbV9zZXRfYmF1ZHJhdGUoc3RydWN0IGhj
-aV91YXJ0ICpodSwgdW5zaWduZWQgaW50IHNwZWVkKQ0KPiAgIAlyZXR1cm4gMDsNCj4gICB9DQo+
-DQo+ICtzdGF0aWMgaW50IGJjbV9ncGlvX3NldF9wb3dlcihzdHJ1Y3QgYmNtX2RldmljZSAqZGV2
-LCBib29sIHBvd2VyZWQpDQo+ICt7DQo+ICsJaWYgKHBvd2VyZWQgJiYgIUlTX0VSUihkZXYtPmNs
-aykgJiYgIWRldi0+Y2xrX2VuYWJsZWQpDQo+ICsJCWNsa19lbmFibGUoZGV2LT5jbGspOw0KPiAr
-DQo+ICsJZ3Bpb2Rfc2V0X3ZhbHVlX2NhbnNsZWVwKGRldi0+c2h1dGRvd24sIHBvd2VyZWQpOw0K
-PiArCWdwaW9kX3NldF92YWx1ZV9jYW5zbGVlcChkZXYtPmRldmljZV93YWtldXAsIHBvd2VyZWQp
-Ow0KPiArDQo+ICsJaWYgKCFwb3dlcmVkICYmICFJU19FUlIoZGV2LT5jbGspICYmIGRldi0+Y2xr
-X2VuYWJsZWQpDQo+ICsJCWNsa19kaXNhYmxlKGRldi0+Y2xrKTsNCj4gKw0KPiArCWRldi0+Y2xr
-X2VuYWJsZWQgPSBwb3dlcmVkOw0KPiArDQo+ICsJcmV0dXJuIDA7DQo+ICt9DQo+ICsNCj4gICBz
-dGF0aWMgaW50IGJjbV9vcGVuKHN0cnVjdCBoY2lfdWFydCAqaHUpDQo+ICAgew0KPiAgIAlzdHJ1
-Y3QgYmNtX2RhdGEgKmJjbTsNCj4gKwlzdHJ1Y3QgbGlzdF9oZWFkICpwdHI7DQo+DQo+ICAgCUJU
-X0RCRygiaHUgJXAiLCBodSk7DQo+DQo+IEBAIC05OSw2ICsxNDEsMjIgQEAgc3RhdGljIGludCBi
-Y21fb3BlbihzdHJ1Y3QgaGNpX3VhcnQgKmh1KQ0KPiAgIAlza2JfcXVldWVfaGVhZF9pbml0KCZi
-Y20tPnR4cSk7DQo+DQo+ICAgCWh1LT5wcml2ID0gYmNtOw0KPiArDQo+ICsJc3Bpbl9sb2NrKCZk
-ZXZpY2VfbGlzdF9sb2NrKTsNCj4gKwlsaXN0X2Zvcl9lYWNoKHB0ciwgJmRldmljZV9saXN0KSB7
-DQo+ICsJCXN0cnVjdCBiY21fZGV2aWNlICpkZXY7DQo+ICsNCj4gKwkJZGV2ID0gbGlzdF9lbnRy
-eShwdHIsIHN0cnVjdCBiY21fZGV2aWNlLCBsaXN0KTsNCj4gKwkJaWYgKGh1LT50dHktPmRldi0+
-cGFyZW50ID09IGRldi0+cGRldi0+ZGV2LnBhcmVudCkgew0KPiArCQkJYmNtLT5kZXYgPSBkZXY7
-DQo+ICsJCQlicmVhazsNCj4gKwkJfQ0KPiArCX0NCj4gKwlzcGluX3VubG9jaygmZGV2aWNlX2xp
-c3RfbG9jayk7DQo+ICsNCj4gKwlpZiAoYmNtLT5kZXYpDQo+ICsJCWJjbV9ncGlvX3NldF9wb3dl
-cihiY20tPmRldiwgdHJ1ZSk7DQo+ICsNCj4gICAJcmV0dXJuIDA7DQo+ICAgfQ0KPg0KPiBAQCAt
-MTA4LDYgKzE2Niw5IEBAIHN0YXRpYyBpbnQgYmNtX2Nsb3NlKHN0cnVjdCBoY2lfdWFydCAqaHUp
-DQo+DQo+ICAgCUJUX0RCRygiaHUgJXAiLCBodSk7DQo+DQo+ICsJaWYgKGJjbS0+ZGV2KQ0KPiAr
-CQliY21fZ3Bpb19zZXRfcG93ZXIoYmNtLT5kZXYsIGZhbHNlKTsNCj4gKw0KPiAgIAlza2JfcXVl
-dWVfcHVyZ2UoJmJjbS0+dHhxKTsNCj4gICAJa2ZyZWVfc2tiKGJjbS0+cnhfc2tiKTsNCj4gICAJ
-a2ZyZWUoYmNtKTsNCj4gQEAgLTIzMiw2ICsyOTMsMTExIEBAIHN0YXRpYyBzdHJ1Y3Qgc2tfYnVm
-ZiAqYmNtX2RlcXVldWUoc3RydWN0IGhjaV91YXJ0ICpodSkNCj4gICAJcmV0dXJuIHNrYl9kZXF1
-ZXVlKCZiY20tPnR4cSk7DQo+ICAgfQ0KPg0KPiArc3RhdGljIGNvbnN0IHN0cnVjdCBhY3BpX2dw
-aW9fcGFyYW1zIGRldmljZV93YWtldXBfZ3Bpb3MgPSB7IDAsIDAsIGZhbHNlIH07DQo+ICtzdGF0
-aWMgY29uc3Qgc3RydWN0IGFjcGlfZ3Bpb19wYXJhbXMgc2h1dGRvd25fZ3Bpb3MgPSB7IDEsIDAs
-IGZhbHNlIH07DQo+ICsNCj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgYWNwaV9ncGlvX21hcHBpbmcg
-YWNwaV9iY21fZGVmYXVsdF9ncGlvc1tdID0gew0KPiArCXsgImRldmljZS13YWtldXAtZ3Bpb3Mi
-LCAmZGV2aWNlX3dha2V1cF9ncGlvcywgMSB9LA0KPiArCXsgInNodXRkb3duLWdwaW9zIiwgJnNo
-dXRkb3duX2dwaW9zLCAxIH0sDQo+ICsJeyB9LA0KPiArfTsNCj4gKw0KPiArc3RhdGljIGludCBi
-Y21fYWNwaV9wcm9iZShzdHJ1Y3QgYmNtX2RldmljZSAqZGV2KQ0KPiArew0KPiArCXN0cnVjdCBw
-bGF0Zm9ybV9kZXZpY2UgKnBkZXYgPSBkZXYtPnBkZXY7DQo+ICsJY29uc3Qgc3RydWN0IGFjcGlf
-ZGV2aWNlX2lkICppZDsNCj4gKwlzdHJ1Y3QgZ3Bpb19kZXNjICpncGlvOw0KPiArCWludCByZXQ7
-DQo+ICsNCj4gKwlpZCA9IGFjcGlfbWF0Y2hfZGV2aWNlKHBkZXYtPmRldi5kcml2ZXItPmFjcGlf
-bWF0Y2hfdGFibGUsICZwZGV2LT5kZXYpOw0KPiArCWlmICghaWQpDQo+ICsJCXJldHVybiAtRU5P
-REVWOw0KPiArDQo+ICsJLyogUmV0cmlldmUgR1BJTyBkYXRhICovDQo+ICsJZGV2LT5uYW1lID0g
-ZGV2X25hbWUoJnBkZXYtPmRldik7DQo+ICsJcmV0ID0gYWNwaV9kZXZfYWRkX2RyaXZlcl9ncGlv
-cyhBQ1BJX0NPTVBBTklPTigmcGRldi0+ZGV2KSwNCj4gKwkJCQkJIGFjcGlfYmNtX2RlZmF1bHRf
-Z3Bpb3MpOw0KPiArCWlmIChyZXQpDQo+ICsJCXJldHVybiByZXQ7DQo+ICsNCj4gKwlkZXYtPmNs
-ayA9IGRldm1fY2xrX2dldCgmcGRldi0+ZGV2LCBOVUxMKTsNCj4gKw0KPiArCWdwaW8gPSBkZXZt
-X2dwaW9kX2dldCgmcGRldi0+ZGV2LCAiZGV2aWNlLXdha2V1cCIpOw0KPiArCWlmICghSVNfRVJS
-KGdwaW8pKSB7DQo+ICsJCXJldCA9IGdwaW9kX2RpcmVjdGlvbl9vdXRwdXQoZ3BpbywgMCk7DQo+
-ICsJCWlmIChyZXQpDQo+ICsJCQlyZXR1cm4gcmV0Ow0KPiArCQlkZXYtPmRldmljZV93YWtldXAg
-PSBncGlvOw0KPiArCX0NCj4gKw0KPiArCWdwaW8gPSBkZXZtX2dwaW9kX2dldCgmcGRldi0+ZGV2
-LCAic2h1dGRvd24iKTsNCj4gKwlpZiAoIUlTX0VSUihncGlvKSkgew0KPiArCQlyZXQgPSBncGlv
-ZF9kaXJlY3Rpb25fb3V0cHV0KGdwaW8sIDApOw0KPiArCQlpZiAocmV0KQ0KPiArCQkJcmV0dXJu
-IHJldDsNCj4gKwkJZGV2LT5zaHV0ZG93biA9IGdwaW87DQo+ICsJfQ0KPiArDQo+ICsJLyogTWFr
-ZSBzdXJlIGF0LWxlYXN0IG9uZSBvZiB0aGUgR1BJTyBpcyBkZWZpbmVkIGFuZCB0aGF0DQo+ICsJ
-ICogYSBuYW1lIGlzIHNwZWNpZmllZCBmb3IgdGhpcyBpbnN0YW5jZQ0KPiArCSAqLw0KPiArCWlm
-ICgoIWRldi0+ZGV2aWNlX3dha2V1cCAmJiAhZGV2LT5zaHV0ZG93bikgfHwgIWRldi0+bmFtZSkg
-ew0KPiArCQlkZXZfZXJyKCZwZGV2LT5kZXYsICJpbnZhbGlkIHBsYXRmb3JtIGRhdGFcbiIpOw0K
-PiArCQlyZXR1cm4gLUVJTlZBTDsNCj4gKwl9DQo+ICsNCj4gKwlyZXR1cm4gMDsNCj4gK30NCj4g
-Kw0KPiArc3RhdGljIGludCBiY21fcHJvYmUoc3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikN
-Cj4gK3sNCj4gKwlzdHJ1Y3QgYmNtX2RldmljZSAqZGV2Ow0KPiArCXN0cnVjdCBhY3BpX2Rldmlj
-ZV9pZCAqcGRhdGEgPSBwZGV2LT5kZXYucGxhdGZvcm1fZGF0YTsNCj4gKwlpbnQgcmV0Ow0KPiAr
-DQo+ICsJZGV2ID0gZGV2bV9remFsbG9jKCZwZGV2LT5kZXYsIHNpemVvZigqZGV2KSwgR0ZQX0tF
-Uk5FTCk7DQo+ICsJaWYgKCFkZXYpDQo+ICsJCXJldHVybiAtRU5PTUVNOw0KPiArDQo+ICsJZGV2
-LT5wZGV2ID0gcGRldjsNCj4gKw0KPiArCWlmIChBQ1BJX0hBTkRMRSgmcGRldi0+ZGV2KSkgew0K
-PiArCQlyZXQgPSBiY21fYWNwaV9wcm9iZShkZXYpOw0KPiArCQlpZiAocmV0KQ0KPiArCQkJcmV0
-dXJuIHJldDsNCj4gKwl9IGVsc2UgaWYgKHBkYXRhKSB7DQo+ICsJCWRldi0+bmFtZSA9IHBkYXRh
-LT5pZDsNCj4gKwl9IGVsc2Ugew0KPiArCQlyZXR1cm4gLUVOT0RFVjsNCj4gKwl9DQo+ICsNCj4g
-KwlwbGF0Zm9ybV9zZXRfZHJ2ZGF0YShwZGV2LCBkZXYpOw0KPiArDQo+ICsJZGV2X2luZm8oJnBk
-ZXYtPmRldiwgIiVzIGRldmljZSByZWdpc3RlcmVkLlxuIiwgZGV2LT5uYW1lKTsNCj4gKw0KPiAr
-CS8qIFBsYWNlIHRoaXMgaW5zdGFuY2Ugb24gdGhlIGRldmljZSBsaXN0ICovDQo+ICsJc3Bpbl9s
-b2NrKCZkZXZpY2VfbGlzdF9sb2NrKTsNCj4gKwlsaXN0X2FkZF90YWlsKCZkZXYtPmxpc3QsICZk
-ZXZpY2VfbGlzdCk7DQo+ICsJc3Bpbl91bmxvY2soJmRldmljZV9saXN0X2xvY2spOw0KPiArDQo+
-ICsJYmNtX2dwaW9fc2V0X3Bvd2VyKGRldiwgZmFsc2UpOw0KPiArDQo+ICsJcmV0dXJuIDA7DQo+
-ICt9DQo+ICsNCj4gK3N0YXRpYyBpbnQgYmNtX3JlbW92ZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNl
-ICpwZGV2KQ0KPiArew0KPiArCXN0cnVjdCBiY21fZGV2aWNlICpkZXYgPSBwbGF0Zm9ybV9nZXRf
-ZHJ2ZGF0YShwZGV2KTsNCj4gKw0KPiArCXNwaW5fbG9jaygmZGV2aWNlX2xpc3RfbG9jayk7DQo+
-ICsJbGlzdF9kZWwoJmRldi0+bGlzdCk7DQo+ICsJc3Bpbl91bmxvY2soJmRldmljZV9saXN0X2xv
-Y2spOw0KPiArDQo+ICsJYWNwaV9kZXZfcmVtb3ZlX2RyaXZlcl9ncGlvcyhBQ1BJX0NPTVBBTklP
-TigmcGRldi0+ZGV2KSk7DQo+ICsNCj4gKwlyZXR1cm4gMDsNCj4gK30NCj4gKw0KPiAgIHN0YXRp
-YyBjb25zdCBzdHJ1Y3QgaGNpX3VhcnRfcHJvdG8gYmNtX3Byb3RvID0gew0KPiAgIAkuaWQJCT0g
-SENJX1VBUlRfQkNNLA0KPiAgIAkubmFtZQkJPSAiQkNNIiwNCj4gQEAgLTI0NywxMiArNDEzLDMz
-IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgaGNpX3VhcnRfcHJvdG8gYmNtX3Byb3RvID0gew0KPiAg
-IAkuZGVxdWV1ZQk9IGJjbV9kZXF1ZXVlLA0KPiAgIH07DQo+DQo+ICsjaWZkZWYgQ09ORklHX0FD
-UEkNCj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgYWNwaV9kZXZpY2VfaWQgYmNtX2FjcGlfbWF0Y2hb
-XSA9IHsNCj4gKwl7ICJCQ00yRTM5IiwgMCB9LA0KPiArCXsgfSwNCj4gK307DQo+ICtNT0RVTEVf
-REVWSUNFX1RBQkxFKGFjcGksIGJjbV9hY3BpX21hdGNoKTsNCj4gKyNlbmRpZg0KPiArDQo+ICtz
-dGF0aWMgc3RydWN0IHBsYXRmb3JtX2RyaXZlciBiY21fZHJpdmVyID0gew0KPiArCS5wcm9iZSA9
-IGJjbV9wcm9iZSwNCj4gKwkucmVtb3ZlID0gYmNtX3JlbW92ZSwNCj4gKwkuZHJpdmVyID0gew0K
-PiArCQkubmFtZSA9ICJoY2lfYmNtIiwNCj4gKwkJLmFjcGlfbWF0Y2hfdGFibGUgPSBBQ1BJX1BU
-UihiY21fYWNwaV9tYXRjaCksDQo+ICsJfSwNCj4gK307DQo+ICsNCj4gICBpbnQgX19pbml0IGJj
-bV9pbml0KHZvaWQpDQo+ICAgew0KPiArCXBsYXRmb3JtX2RyaXZlcl9yZWdpc3RlcigmYmNtX2Ry
-aXZlcik7DQo+ICsNCj4gICAJcmV0dXJuIGhjaV91YXJ0X3JlZ2lzdGVyX3Byb3RvKCZiY21fcHJv
-dG8pOw0KPiAgIH0NCj4NCj4gICBpbnQgX19leGl0IGJjbV9kZWluaXQodm9pZCkNCj4gICB7DQo+
-ICsJcGxhdGZvcm1fZHJpdmVyX3VucmVnaXN0ZXIoJmJjbV9kcml2ZXIpOw0KPiArDQo+ICAgCXJl
-dHVybiBoY2lfdWFydF91bnJlZ2lzdGVyX3Byb3RvKCZiY21fcHJvdG8pOw0KPiAgIH0NCj4NCg0K
-DQotLSANCkZyZWRlcmljIERhbmlzICAgICAgICAgICAgICAgICAgICAgICAgICAgIE9wZW4gU291
-cmNlIFRlY2hub2xvZ3kgQ2VudGVyDQpmcmVkZXJpYy5kYW5pc0BpbnRlbC5jb20gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBJbnRlbCBDb3Jwb3JhdGlvbg0KDQotLQ0KVG8gdW5zdWJzY3Jp
-YmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIGxpbnV4LWJsdWV0
-b290aCIgaW4NCnRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwu
-b3JnDQpNb3JlIG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9y
-ZG9tby1pbmZvLmh0bWwNCg==
+Ping ?
+
+On 03/07/2015 15:22, Frederic Danis wrote:
+> Retrieve "shutdown" and "device_wakeup" GPIOs from ACPI.
+> Set device off during platform device enumeration.
+> Set device on only when it is attached.
+>
+> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+> ---
+>   drivers/bluetooth/hci_bcm.c | 191 +++++++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 189 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index 23523e1..856cb48 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -25,6 +25,12 @@
+>   #include <linux/errno.h>
+>   #include <linux/skbuff.h>
+>   #include <linux/firmware.h>
+> +#include <linux/module.h>
+> +#include <linux/acpi.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/clk.h>
+> +#include <linux/gpio/consumer.h>
+> +#include <linux/tty.h>
+>
+>   #include <net/bluetooth/bluetooth.h>
+>   #include <net/bluetooth/hci_core.h>
+> @@ -32,11 +38,30 @@
+>   #include "btbcm.h"
+>   #include "hci_uart.h"
+>
+> +struct bcm_device {
+> +	struct list_head	list;
+> +
+> +	struct platform_device	*pdev;
+> +
+> +	const char		*name;
+> +	struct gpio_desc	*device_wakeup;
+> +	struct gpio_desc	*shutdown;
+> +
+> +	struct clk		*clk;
+> +	bool			clk_enabled;
+> +};
+> +
+>   struct bcm_data {
+> -	struct sk_buff *rx_skb;
+> -	struct sk_buff_head txq;
+> +	struct sk_buff		*rx_skb;
+> +	struct sk_buff_head	txq;
+> +
+> +	struct bcm_device	*dev;
+>   };
+>
+> +/* List of BCM BT UART devices */
+> +static DEFINE_SPINLOCK(device_list_lock);
+> +static LIST_HEAD(device_list);
+> +
+>   static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
+>   {
+>   	struct hci_dev *hdev = hu->hdev;
+> @@ -86,9 +111,26 @@ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
+>   	return 0;
+>   }
+>
+> +static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+> +{
+> +	if (powered && !IS_ERR(dev->clk) && !dev->clk_enabled)
+> +		clk_enable(dev->clk);
+> +
+> +	gpiod_set_value_cansleep(dev->shutdown, powered);
+> +	gpiod_set_value_cansleep(dev->device_wakeup, powered);
+> +
+> +	if (!powered && !IS_ERR(dev->clk) && dev->clk_enabled)
+> +		clk_disable(dev->clk);
+> +
+> +	dev->clk_enabled = powered;
+> +
+> +	return 0;
+> +}
+> +
+>   static int bcm_open(struct hci_uart *hu)
+>   {
+>   	struct bcm_data *bcm;
+> +	struct list_head *ptr;
+>
+>   	BT_DBG("hu %p", hu);
+>
+> @@ -99,6 +141,22 @@ static int bcm_open(struct hci_uart *hu)
+>   	skb_queue_head_init(&bcm->txq);
+>
+>   	hu->priv = bcm;
+> +
+> +	spin_lock(&device_list_lock);
+> +	list_for_each(ptr, &device_list) {
+> +		struct bcm_device *dev;
+> +
+> +		dev = list_entry(ptr, struct bcm_device, list);
+> +		if (hu->tty->dev->parent == dev->pdev->dev.parent) {
+> +			bcm->dev = dev;
+> +			break;
+> +		}
+> +	}
+> +	spin_unlock(&device_list_lock);
+> +
+> +	if (bcm->dev)
+> +		bcm_gpio_set_power(bcm->dev, true);
+> +
+>   	return 0;
+>   }
+>
+> @@ -108,6 +166,9 @@ static int bcm_close(struct hci_uart *hu)
+>
+>   	BT_DBG("hu %p", hu);
+>
+> +	if (bcm->dev)
+> +		bcm_gpio_set_power(bcm->dev, false);
+> +
+>   	skb_queue_purge(&bcm->txq);
+>   	kfree_skb(bcm->rx_skb);
+>   	kfree(bcm);
+> @@ -232,6 +293,111 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
+>   	return skb_dequeue(&bcm->txq);
+>   }
+>
+> +static const struct acpi_gpio_params device_wakeup_gpios = { 0, 0, false };
+> +static const struct acpi_gpio_params shutdown_gpios = { 1, 0, false };
+> +
+> +static const struct acpi_gpio_mapping acpi_bcm_default_gpios[] = {
+> +	{ "device-wakeup-gpios", &device_wakeup_gpios, 1 },
+> +	{ "shutdown-gpios", &shutdown_gpios, 1 },
+> +	{ },
+> +};
+> +
+> +static int bcm_acpi_probe(struct bcm_device *dev)
+> +{
+> +	struct platform_device *pdev = dev->pdev;
+> +	const struct acpi_device_id *id;
+> +	struct gpio_desc *gpio;
+> +	int ret;
+> +
+> +	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
+> +	if (!id)
+> +		return -ENODEV;
+> +
+> +	/* Retrieve GPIO data */
+> +	dev->name = dev_name(&pdev->dev);
+> +	ret = acpi_dev_add_driver_gpios(ACPI_COMPANION(&pdev->dev),
+> +					 acpi_bcm_default_gpios);
+> +	if (ret)
+> +		return ret;
+> +
+> +	dev->clk = devm_clk_get(&pdev->dev, NULL);
+> +
+> +	gpio = devm_gpiod_get(&pdev->dev, "device-wakeup");
+> +	if (!IS_ERR(gpio)) {
+> +		ret = gpiod_direction_output(gpio, 0);
+> +		if (ret)
+> +			return ret;
+> +		dev->device_wakeup = gpio;
+> +	}
+> +
+> +	gpio = devm_gpiod_get(&pdev->dev, "shutdown");
+> +	if (!IS_ERR(gpio)) {
+> +		ret = gpiod_direction_output(gpio, 0);
+> +		if (ret)
+> +			return ret;
+> +		dev->shutdown = gpio;
+> +	}
+> +
+> +	/* Make sure at-least one of the GPIO is defined and that
+> +	 * a name is specified for this instance
+> +	 */
+> +	if ((!dev->device_wakeup && !dev->shutdown) || !dev->name) {
+> +		dev_err(&pdev->dev, "invalid platform data\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int bcm_probe(struct platform_device *pdev)
+> +{
+> +	struct bcm_device *dev;
+> +	struct acpi_device_id *pdata = pdev->dev.platform_data;
+> +	int ret;
+> +
+> +	dev = devm_kzalloc(&pdev->dev, sizeof(*dev), GFP_KERNEL);
+> +	if (!dev)
+> +		return -ENOMEM;
+> +
+> +	dev->pdev = pdev;
+> +
+> +	if (ACPI_HANDLE(&pdev->dev)) {
+> +		ret = bcm_acpi_probe(dev);
+> +		if (ret)
+> +			return ret;
+> +	} else if (pdata) {
+> +		dev->name = pdata->id;
+> +	} else {
+> +		return -ENODEV;
+> +	}
+> +
+> +	platform_set_drvdata(pdev, dev);
+> +
+> +	dev_info(&pdev->dev, "%s device registered.\n", dev->name);
+> +
+> +	/* Place this instance on the device list */
+> +	spin_lock(&device_list_lock);
+> +	list_add_tail(&dev->list, &device_list);
+> +	spin_unlock(&device_list_lock);
+> +
+> +	bcm_gpio_set_power(dev, false);
+> +
+> +	return 0;
+> +}
+> +
+> +static int bcm_remove(struct platform_device *pdev)
+> +{
+> +	struct bcm_device *dev = platform_get_drvdata(pdev);
+> +
+> +	spin_lock(&device_list_lock);
+> +	list_del(&dev->list);
+> +	spin_unlock(&device_list_lock);
+> +
+> +	acpi_dev_remove_driver_gpios(ACPI_COMPANION(&pdev->dev));
+> +
+> +	return 0;
+> +}
+> +
+>   static const struct hci_uart_proto bcm_proto = {
+>   	.id		= HCI_UART_BCM,
+>   	.name		= "BCM",
+> @@ -247,12 +413,33 @@ static const struct hci_uart_proto bcm_proto = {
+>   	.dequeue	= bcm_dequeue,
+>   };
+>
+> +#ifdef CONFIG_ACPI
+> +static const struct acpi_device_id bcm_acpi_match[] = {
+> +	{ "BCM2E39", 0 },
+> +	{ },
+> +};
+> +MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
+> +#endif
+> +
+> +static struct platform_driver bcm_driver = {
+> +	.probe = bcm_probe,
+> +	.remove = bcm_remove,
+> +	.driver = {
+> +		.name = "hci_bcm",
+> +		.acpi_match_table = ACPI_PTR(bcm_acpi_match),
+> +	},
+> +};
+> +
+>   int __init bcm_init(void)
+>   {
+> +	platform_driver_register(&bcm_driver);
+> +
+>   	return hci_uart_register_proto(&bcm_proto);
+>   }
+>
+>   int __exit bcm_deinit(void)
+>   {
+> +	platform_driver_unregister(&bcm_driver);
+> +
+>   	return hci_uart_unregister_proto(&bcm_proto);
+>   }
+>
+
+
+-- 
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
+
