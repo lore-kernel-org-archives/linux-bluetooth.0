@@ -1,45 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1437051905.20249.82.camel@hadess.net>
-Subject: Re: Motorola RZ100: How to add support for a new device?
-From: Bastien Nocera <hadess@hadess.net>
-To: Hanno Zulla <abos@hanno.de>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 16 Jul 2015 15:05:05 +0200
-In-Reply-To: <55A7A70C.5030909@hanno.de>
-References: <55A65C71.8010800@hanno.de>
-	 <CABBYNZKMYGr1+ADcDORoQ2docOg0dKePTnMqruaoF2UXio=p5g@mail.gmail.com>
-	 <55A7A70C.5030909@hanno.de>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20150716105937.GA18341@t440s.lan>
+References: <CANzaTi6_OF9C6DjPeRqaoUBKqdJZSQ+0k0cJLodWS3o5LzTsbw@mail.gmail.com>
+	<20150716105937.GA18341@t440s.lan>
+Date: Thu, 16 Jul 2015 14:49:09 +0200
+Message-ID: <CANzaTi5gK457ZJP5V_ty6ufSzm2LmX6wsfVracqR0MwDZS6jyg@mail.gmail.com>
+Subject: Re: Advertising API, possible to set LE only?
+From: dogan yazar <doganyazar@gmail.com>
+To: dogan yazar <doganyazar@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2015-07-16 at 14:43 +0200, Hanno Zulla wrote:
-> Hi,
-> 
-> > It might be missing a HID driver, but we can't help with Android 
-> > since
-> > it doesn't use BlueZ anymore except if you are flashing with BlueZ 
-> > for
-> > Android?
-> 
-> I don't mind. While it'd be nice to nudge Google towards adding this
-> driver to Android, I want to make it work with Linux desktop 
-> machines,
-> as well.
+Thanks a lot for the answer. That is exactly what I need.  However
+putting in the main.conf did not really make any reference and trying
+the btmgmt returns "Rejected"
+[mgmt]# bredr off
+Set BR/EDR for hci0 failed with status 0x0b (Rejected)
 
-If it's handled through the "normal" HIDP stack on Android, it should
-at least create a hidraw device in stock Linux (which you can check for
-in the dmesg output).
+Any idea why? Is it controller related?
 
-You can then use hid-recorder to get the information from the device:
-http://bentiss.github.io/hid-replay-docs/
-
-And start a discussion on the linux-input list about adding support for
-it. Given the price of the device, you could always offer to buy one of
-the linux-input developers one of them, I found that it's usually a
-pretty good incentive :)
-
-Cheers
-
+On Thu, Jul 16, 2015 at 12:59 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi dogan,
+>
+> On Thu, Jul 16, 2015, dogan yazar wrote:
+>> In the Advertising API, org.bluez.LEAdvertisement1 has Type field
+>> which can be "broadcast" or "peripheral".
+>> When I set it to be peripheral, the outgoing advertisement packets has
+>> the advertisement flags:
+>> 0x02 (BLE_GAP_ADV_FLAG_LE_GENERAL_DISC_MODE) and I guess that is why
+>> when I try to connect the peripheral from my Android, I get a pairing
+>> request back.
+>>
+>> Is there a way to set BLE_GAP_ADV_FLAG_BR_EDR_NOT_SUPPORTED on the
+>> flags as well to show I only support LE and so I can also skip the
+>> pairing requests.
+>
+> You could try setting ControllerMode=le in the [General] section of
+> /etc/bluetooth/main.conf and restart bluetoothd. Another option is to
+> disable BR/EDR manually with btmgmt ("btmgmt bredr off").
+>
+> Johan
