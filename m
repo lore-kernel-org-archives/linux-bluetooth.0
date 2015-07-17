@@ -1,53 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 17 Jul 2015 18:46:27 +0800
-Message-ID: <CAKc24n3nLkHG8q7SfgUU--xfyx1hHqz8E2sVyXcVaKnpZ6setA@mail.gmail.com>
-Subject: Android-x86 Bluez integration
-From: Chih-Wei Huang <cwhuang@android-x86.org>
-To: Android-x86 <android-x86@googlegroups.com>
-Cc: linux-bluetooth@vger.kernel.org
+From: Romain Izard <romain.izard.pro@gmail.com>
+Date: Fri, 17 Jul 2015 12:24:38 +0200
+Message-ID: <CAGkQfmNSWjD_S+fMHqn2SxcSxz0ru86jirOq3Atu75jz97RwQw@mail.gmail.com>
+Subject: Declaring the ICS to test & certify a product using BlueZ
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-As you have probably noticed, the Bluez 5.32 was
-integrated to kitkat-x86 to replace bluedroid stack
-as a part of the Android-x86 4.4-r3 release.
-Many thanks to the Bluez team to make this possible
-and Povilas Staniulis / cheatman pointed me
-the direction.
+Hello,
 
-I've tested all the devices with Bluetooth chip I have.
-Almost all of them work nice.
-It's much more stable and usable than before.
-I'm very satisfied with the status.
+To pass the Bluetooth certification, it is necessary to describe the
+behaviour of the certified product in a set of documents called
+Implementation Conformance Statements (ICS). These documents describe
+a list of features existing in the Bluetooth specification, that can
+be mandatory, optional or prohibited, as well as logic rules to
+combine those features.
 
-If you have HCI USB based chip with
-correct linux driver and firmware,
-the 4.4-r3 release should just work for you.
-If not, show me the output of
-dmesg, lsmod, logcat and hciconfig.
+I'm trying to certify a product based on a Texas Instruments WL1831
+chip, using the latest BlueZ userspace and the kernel module from the
+TI backport environment for its R8.5 WiFi driver package (based on
+Linux 3.12.10). The kernel itself is a based on a 2.6.32 vendor tree.
+The userspace component is based on bluetoothd, and its DBus API. As
+TI provides this chip with a pre-certified close-source bluetooth
+stack when using Sitara chips (not my case), there is little
+information regarding stack certification.
 
-If you have HCI UART bluetooth device,
-you may need to configure the UART port
-by hciattach or similar tool.
-Read the init_hal_bluetooth function of
-device/generic/x86/init.sh and see the
-T10*TA section as an example.
-Send me a patch if you have configured it
-successfully.
+The good point is that this setup works, and I'm able work in both
+BR/EDR and LE modes. Unfortunately, as I am only integrating all those
+pieces, I do not know very well how to fill the ICS documents. Many
+questions are quite low level, and I do not know how BlueZ beheaves,
+nor even how to look for this behaviour.
 
-Known issues:
-* Bluetooth in ASUS T100 is still unstable:
-  Sometimes can't scan any device.
-  Can pair a Bluetooth speaker but can't play audio.
-  Probably a driver or firmware issue?
+I can try to rely on some already existing information. The "android"
+directory has a set of "pics-*.txt" files, but those may not be valid
+when using bluetoothd. The Bluetooth certified composant database
+contains a list of BlueZ stacks certified in the past, and it is
+possible to get their ICS. But the ICS format evolves with the current
+certification, so it's difficult to reuse an old one. Moreover, I
+believe that it is possible that the correct ICS information depends
+from configuration options for the stack, either at compilation time
+or at runtime.
 
-I'll update the lollipop-x86 for the
-Bluez integration later.
+For those of you who have already passed a Bluetooth certification,
+how did choose your ICS parameters ? What are the settings you know
+that correspond to ICS parameters ?
 
+The ICS parameters lead to a long list of tests to be run in the
+Profile Tuning Suite. What needs to run on the tested device to pass
+those tests ? Should bluetoothd be launched, and is it required to
+configure it in a special way ?
+
+
+Best regards,
 -- 
-Chih-Wei
-Android-x86 project
-http://www.android-x86.org
+Romain Izard
