@@ -1,32 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 17 Jul 2015 18:30:00 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: dogan yazar <doganyazar@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: Advertising API, possible to set LE only?
-Message-ID: <20150717153000.GA18208@t440s.P-661HNU-F1>
-References: <CANzaTi6_OF9C6DjPeRqaoUBKqdJZSQ+0k0cJLodWS3o5LzTsbw@mail.gmail.com>
- <20150716105937.GA18341@t440s.lan>
- <CANzaTi5gK457ZJP5V_ty6ufSzm2LmX6wsfVracqR0MwDZS6jyg@mail.gmail.com>
- <20150716131004.GA28916@t440s.P-661HNU-F1>
- <C1E229B1-274F-4B5B-81EA-A546488B07DD@holtmann.org>
- <CANzaTi6s3W1Q4sPZW9U32-oV8qmqDYYTdcDD8yNEohuH1PND7A@mail.gmail.com>
+Message-ID: <0e8e81b360e2f3c5ff9fc6c26b447462.squirrel@mungewell.org>
+In-Reply-To: <55A93A10.3060201@redhat.com>
+References: <a48f30f621c508955ba989117690fe73.squirrel@mungewell.org>
+    <dcf4c0f809904c54f453fe781e30adfe.squirrel@mungewell.org>
+    <8297c42b69d89cb9326b938a9adaa997.squirrel@mungewell.org>
+    <913a160c809900ee52e7c83350b4162f.squirrel@mungewell.org>
+    <55A8AA15.2050802@ti.com>
+    <d51df2e1e321efc18d74f3cc33bd4106.squirrel@mungewell.org>
+    <55A93A10.3060201@redhat.com>
+Date: Fri, 17 Jul 2015 13:40:44 -0400
+Subject: Re: Kernel Oops: btusb: 4.2rc1 System lockup with BT dongle insert -
+ log attached
+From: simon@mungewell.org
+To: "Laura Abbott" <labbott@redhat.com>,
+	"Shuah Khan" <shuahkh@osg.samsung.com>
+Cc: "Kim, Milo" <milo.kim@ti.com>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CANzaTi6s3W1Q4sPZW9U32-oV8qmqDYYTdcDD8yNEohuH1PND7A@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi dogan,
+> On 07/17/2015 08:14 AM, simon@mungewell.org wrote:
+>>
+>>>> So in summary this problem is showing up now as the 'User Helper
+>>>> Fallback'
+>>>> is now forced on, obviously the underlying problem needs to be fixed -
+>>>> but
+>>>> I don't know when it crept in.
+>>>>
+>>>
+>>> The 'CONFIG_FW_LOADER_USER_HELPER_FALLBACK' enables to load firmware
+>>> data manually by accessing /sys/class/firmware/<name>/data. It runs in
+>>> case the firmware file is missing.
+>>> This user helper fallback will be enabled if one of LP55xx driver is
+>>> included in your dot config. Please see my patch below.
+>>>
+>>> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/drivers/leds?id=b67893206fc0a0e8af87130e67f3d8ae553fc87c
+>>>
+>>> However, I'm not sure why this affects your system lockup. Can I have
+>>> more details?
+>>
+>> Hi Milo,
+>> I'm not suggesting that your patch is the cause, just that it is an
+>> 'enabler' and and explains why the problem (system lockup when I plug
+>> USB
+>> Bluetooth dongle in) appears now.
+>>
+>> A full Oops log is further back in this thread:
+>> http://www.spinics.net/lists/linux-bluetooth/msg63090.html
+>>
+>>
+>>>> Will try building 4.1 with this option to see if it fails.
+>>
+>> A very quick test as I was leaving the house this morning shows that 4.1
+>> with 'CONFIG_FW_LOADER_USER_HELPER_FALLBACK' does not show the problem.
+>>
+>> So at least we know the 'real' problem is a recent change to the code.
+>> Simon
+>>
+>
+> I think this was reported and fixed
+>
+> https://lkml.org/lkml/2015/7/8/858
+> https://lkml.org/lkml/2015/7/8/1199
+> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=6f957724b94cb19f5c1c97efd01dd4df8ced323c
+>
 
-On Fri, Jul 17, 2015, dogan yazar wrote:
-> Thanks! This worked well. Any hints for me to track down why
-> "ControllerMode=le in the [General] section of
-> /etc/bluetooth/main.conf" did not work fine? Running a shell command
-> from our software is not a very neat solution.
+Certainly looks like a plausible solution, will build kernel tonight to
+confirm.
 
-Enable bluetoothd debug logs (-d command line switch) and check if
-there's anything suspicious when you start bluetoothd. Btw, which BlueZ
-version do you have? The ControllerMode option was first introduced in
-BlueZ 5.25.
+If  Shuah is still looking for the trigger, see above note regarding
+'CONFIG_FW_LOADER_USER_HELPER_FALLBACK'.
 
-Johan
+Thanks, and have an awesome weekend. :-)
+Simon
+
