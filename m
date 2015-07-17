@@ -2,82 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v2 3/6] emulator: add support for checking le scan state
-Date: Fri, 17 Jul 2015 22:51:37 +0200
-Message-Id: <1437166300-14633-3-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v2 2/6] tools/mgmt-tester: Add RPA Remove Device test case
+Date: Fri, 17 Jul 2015 22:51:36 +0200
+Message-Id: <1437166300-14633-2-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1437166300-14633-1-git-send-email-jpawlowski@google.com>
 References: <1437166300-14633-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This test verify if kernel correctly responds with error to
+Remove Device command with Resolvable Private Address.
 ---
- emulator/btdev.c  | 5 +++++
- emulator/btdev.h  | 2 ++
- emulator/hciemu.c | 8 ++++++++
- emulator/hciemu.h | 2 ++
- 4 files changed, 17 insertions(+)
+ tools/mgmt-tester.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index cd211ef..526f97a 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -660,6 +660,11 @@ uint8_t *btdev_get_features(struct btdev *btdev)
- 	return btdev->features;
- }
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 9b71156..9ace20a 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -3797,6 +3797,19 @@ static const struct generic_data remove_device_fail_2 = {
+ 	.expect_status = MGMT_STATUS_INVALID_PARAMS,
+ };
  
-+bool btdev_is_le_scan_enabled(struct btdev *btdev)
-+{
-+	return btdev->le_scan_enable;
-+}
++static const uint8_t remove_device_param_3[] = {
++					0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc,
++					0x02,
++};
++static const struct generic_data remove_device_fail_3 = {
++	.send_opcode = MGMT_OP_REMOVE_DEVICE,
++	.send_param = remove_device_param_3,
++	.send_len = sizeof(remove_device_param_3),
++	.expect_param = remove_device_param_3,
++	.expect_len = sizeof(remove_device_param_3),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
 +
- static bool use_ssp(struct btdev *btdev1, struct btdev *btdev2)
- {
- 	if (btdev1->auth_enable || btdev2->auth_enable)
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index 4b724a7..8b116e4 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -80,6 +80,8 @@ void btdev_destroy(struct btdev *btdev);
- const uint8_t *btdev_get_bdaddr(struct btdev *btdev);
- uint8_t *btdev_get_features(struct btdev *btdev);
- 
-+bool btdev_is_le_scan_enabled(struct btdev *btdev);
-+
- void btdev_set_command_handler(struct btdev *btdev, btdev_command_func handler,
- 							void *user_data);
- 
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index 4881a24..c04aa6d 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -427,6 +427,14 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu)
- 	return btdev_get_bdaddr(hciemu->client_dev);
- }
- 
-+const bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu)
-+{
-+	if (!hciemu || !hciemu->master_dev)
-+		return NULL;
-+
-+	return btdev_is_le_scan_enabled(hciemu->master_dev);
-+}
-+
- bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
- 			hciemu_command_func_t function, void *user_data)
- {
-diff --git a/emulator/hciemu.h b/emulator/hciemu.h
-index 41ca3fc..a526d8c 100644
---- a/emulator/hciemu.h
-+++ b/emulator/hciemu.h
-@@ -53,6 +53,8 @@ uint8_t *hciemu_get_features(struct hciemu *hciemu);
- const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu);
- const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
- 
-+const bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu);
-+
- typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
- 						uint8_t len, void *user_data);
- 
+ static const struct generic_data remove_device_success_1 = {
+ 	.send_opcode = MGMT_OP_REMOVE_DEVICE,
+ 	.send_param = remove_device_param_1,
+@@ -6739,6 +6752,9 @@ int main(int argc, char *argv[])
+ 	test_bredrle("Remove Device - Invalid Params 2",
+ 				&remove_device_fail_2,
+ 				NULL, test_command_generic);
++	test_bredrle("Remove Device - Invalid Params 3",
++				&remove_device_fail_3,
++				NULL, test_command_generic);
+ 	test_bredrle("Remove Device - Success 1",
+ 				&remove_device_success_1,
+ 				setup_add_device, test_command_generic);
 -- 
 2.1.4
 
