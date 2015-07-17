@@ -1,55 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <d51df2e1e321efc18d74f3cc33bd4106.squirrel@mungewell.org>
-In-Reply-To: <55A8AA15.2050802@ti.com>
-References: <a48f30f621c508955ba989117690fe73.squirrel@mungewell.org>
-    <dcf4c0f809904c54f453fe781e30adfe.squirrel@mungewell.org>
-    <8297c42b69d89cb9326b938a9adaa997.squirrel@mungewell.org>
-    <913a160c809900ee52e7c83350b4162f.squirrel@mungewell.org>
-    <55A8AA15.2050802@ti.com>
-Date: Fri, 17 Jul 2015 11:14:37 -0400
-Subject: Re: Kernel Oops: btusb: 4.2rc1 System lockup with BT dongle insert -
- log attached
-From: simon@mungewell.org
-To: "Kim, Milo" <milo.kim@ti.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <C1E229B1-274F-4B5B-81EA-A546488B07DD@holtmann.org>
+References: <CANzaTi6_OF9C6DjPeRqaoUBKqdJZSQ+0k0cJLodWS3o5LzTsbw@mail.gmail.com>
+	<20150716105937.GA18341@t440s.lan>
+	<CANzaTi5gK457ZJP5V_ty6ufSzm2LmX6wsfVracqR0MwDZS6jyg@mail.gmail.com>
+	<20150716131004.GA28916@t440s.P-661HNU-F1>
+	<C1E229B1-274F-4B5B-81EA-A546488B07DD@holtmann.org>
+Date: Fri, 17 Jul 2015 17:03:33 +0200
+Message-ID: <CANzaTi6s3W1Q4sPZW9U32-oV8qmqDYYTdcDD8yNEohuH1PND7A@mail.gmail.com>
+Subject: Re: Advertising API, possible to set LE only?
+From: dogan yazar <doganyazar@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
->> So in summary this problem is showing up now as the 'User Helper
->> Fallback'
->> is now forced on, obviously the underlying problem needs to be fixed -
->> but
->> I don't know when it crept in.
+On Thu, Jul 16, 2015 at 10:39 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Johan,
+>
+>>> Thanks a lot for the answer. That is exactly what I need.  However
+>>> putting in the main.conf did not really make any reference and trying
+>>> the btmgmt returns "Rejected"
+>>> [mgmt]# bredr off
+>>> Set BR/EDR for hci0 failed with status 0x0b (Rejected)
+>>>
+>>> Any idea why? Is it controller related?
 >>
+>> First of all, please don't top-post on this list. I think you need to
+>> power off the adapter before you can disable BR/EDR, i.e. "btmgmt power
+>> off".
+
+Thanks! This worked well. Any hints for me to track down why
+"ControllerMode=le in the [General] section of
+/etc/bluetooth/main.conf" did not work fine? Running a shell command
+from our software is not a very neat solution.
+
+
 >
-> The 'CONFIG_FW_LOADER_USER_HELPER_FALLBACK' enables to load firmware
-> data manually by accessing /sys/class/firmware/<name>/data. It runs in
-> case the firmware file is missing.
-> This user helper fallback will be enabled if one of LP55xx driver is
-> included in your dot config. Please see my patch below.
+> actually you need to power off the controller, enable LE and only then you can turn off BR/EDR. Of course you require a dual-mode BR/EDR + LE controller in the first place to do this.
+
+This is also good to know. Thanks! LE was enabled by default so did
+not need it this time.
+
 >
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/drivers/leds?id=b67893206fc0a0e8af87130e67f3d8ae553fc87c
+> Regards
 >
-> However, I'm not sure why this affects your system lockup. Can I have
-> more details?
-
-Hi Milo,
-I'm not suggesting that your patch is the cause, just that it is an
-'enabler' and and explains why the problem (system lockup when I plug USB
-Bluetooth dongle in) appears now.
-
-A full Oops log is further back in this thread:
-http://www.spinics.net/lists/linux-bluetooth/msg63090.html
-
-
->> Will try building 4.1 with this option to see if it fails.
-
-A very quick test as I was leaving the house this morning shows that 4.1
-with 'CONFIG_FW_LOADER_USER_HELPER_FALLBACK' does not show the problem.
-
-So at least we know the 'real' problem is a recent change to the code.
-Simon
-
+> Marcel
+>
