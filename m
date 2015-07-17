@@ -1,60 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Loic Poulain <loic.poulain@intel.com>, Frederic Danis
-	<frederic.danis@linux.intel.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-CC: Arend Van Spriel <arend@broadcom.com>
-Subject: RE: [PATCH 1/3] Bluetooth: hci_uart: Add PM for BCM2E39
-Date: Fri, 17 Jul 2015 18:33:49 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E9426E30E@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1435929751-26831-1-git-send-email-frederic.danis@linux.intel.com>
- <55A7D771.9020705@linux.intel.com>
- <E0D3336E15B58B4294723AC879BA5E9426DDF7@IRVEXCHMB15.corp.ad.broadcom.com>
- <55A8FF10.2090108@intel.com>
-In-Reply-To: <55A8FF10.2090108@intel.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Fri, 17 Jul 2015 18:30:00 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: dogan yazar <doganyazar@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: Advertising API, possible to set LE only?
+Message-ID: <20150717153000.GA18208@t440s.P-661HNU-F1>
+References: <CANzaTi6_OF9C6DjPeRqaoUBKqdJZSQ+0k0cJLodWS3o5LzTsbw@mail.gmail.com>
+ <20150716105937.GA18341@t440s.lan>
+ <CANzaTi5gK457ZJP5V_ty6ufSzm2LmX6wsfVracqR0MwDZS6jyg@mail.gmail.com>
+ <20150716131004.GA28916@t440s.P-661HNU-F1>
+ <C1E229B1-274F-4B5B-81EA-A546488B07DD@holtmann.org>
+ <CANzaTi6s3W1Q4sPZW9U32-oV8qmqDYYTdcDD8yNEohuH1PND7A@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CANzaTi6s3W1Q4sPZW9U32-oV8qmqDYYTdcDD8yNEohuH1PND7A@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTG9pYywNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IGxpbnV4LWJsdWV0
-b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgtb3duZXJA
-dmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgTG9pYyBQb3VsYWluDQpTZW50OiBGcmlkYXks
-IEp1bHkgMTcsIDIwMTUgOToxMiBBTQ0KVG86IElseWEgRmFlbnNvbjsgRnJlZGVyaWMgRGFuaXM7
-IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc7IE1hcmNlbCBIb2x0bWFubg0KQ2M6IEFy
-ZW5kIFZhbiBTcHJpZWwNClN1YmplY3Q6IFJlOiBbUEFUQ0ggMS8zXSBCbHVldG9vdGg6IGhjaV91
-YXJ0OiBBZGQgUE0gZm9yIEJDTTJFMzkNCg0KSGkgSWx5YSwNCj4gSUY6IFNvcnJ5IGZvciB0aGUg
-ZGVsYXkgaW4gcmVzcG9uZGluZy4gSSBhbSBub3QgYWN0aXZlbHkgd29ya2luZyBvbiB0aGUgc2lt
-aWxhciBEVCBkcml2ZXIgYXQgdGhlIG1vbWVudCBhcyB3ZSBoYXZlIGhpdCBhIERUIG1haW50YWlu
-ZXIgcm9hZGJsb2NrIGZvciBpdHMgZGV2ZWxvcG1lbnQuIEkgZG8gbm90IHJlYWQgdGhpcyBidWxs
-ZXRpbiBib2FyZCBtdWNoIHRoZXJlZm9yZS4gR3JlYXQgc2VlaW5nIGEgZmlyc3QgdGFrZSBvbiB0
-aGUgQnJvYWRjb20gQlQgVUFSVCBBQ1BJIGRyaXZlciEgTG9va3MgbGlrZSBhIGdvb2Qgc3RhcnQg
-dG8gbWUuIEEgZmV3IGNvbW1lbnRzOg0KPg0KDQpNb3N0IG9mIEJsdWV0b290aCBVQVJUIGNoaXBz
-IGhhdmUgc29tZSBleHRyYSBjb25maWd1cmF0aW9uIChQQ00sIEkyUywgDQpMUE0uLi4pDQp3aXRo
-IHNwZWNpZmljIHZlbmRvciBjb21tYW5kcy4gU2luY2UgaXQgbG9va3MgaGFyZCB0byBpbmNsdWRl
-IHRoaXMgDQppbmZvcm1hdGlvbg0KaW50byBEVCBhbmQgbXVjaCBtb3JlIGRpZmZpY3VsdCBpbnRv
-IEFDUEksIEkgc3VnZ2VzdCB0byBpbXBsZW1lbnQgYSANCmNvbW1vbiB3YXkNCnRvIHRoYXQgd2l0
-aCBhIGdlbmVyaWMgYnRjb25mIGZpbGUuIFRoaXMgZmlsZSBjb3VsZCBiZSByZXRyaWV2ZWQgdmlh
-IA0KcmVxdWVzdF9maXJtd2FyZQ0KYW5kIGZpbGxlZCB3aXRoIGEgbGlzdCBvZiBIQ0kgY29tbWFu
-ZHMgZm9yIHZlbmRvciBjb25maWcuIFRoaXMgDQpjb25maWd1cmF0aW9uIHNob3VsZA0KaGFwcGVu
-IGFmdGVyIGZpcm13YXJlIGRvd25sb2FkLiBJZiBubyBjb25mIGZpbGUgZm91bmQsIHlvdSBjYW4g
-YXBwbHkgYSANCmRlZmF1bHQNCmNvbmZpZ3VyYXRpb24gb3IganVzdCBpZ25vcmUgaXQuDQoNCkl0
-J3MganVzdCBhIHByb3Bvc2FsLCBJIGRvbid0IGtub3cgaWYgaXQgZG9lcyBjb21wbGV0ZWx5IG1h
-dGNoIHlvdXIgDQpyZXF1aXJlbWVudHMuDQoNCklGOiBHb29kIGlkZWFzLCBMb2ljLiBJIHBlcnNv
-bmFsbHkgd291bGQgbm90IHdhbnQgdG8gc2VlIGp1c3QgdGhlIHZlbmRvciBzcGVjaWZpYyBjb21t
-YW5kcyBpbiB0aGUgY29uZmlndXJhdGlvbi4gSSB3b3VsZCB3YW50IHRvIHNlZSBwYXJhbWV0ZXJz
-IHdoaWNoIHdvdWxkIGJlIHVwIHRvIGEgc3BlY2lmaWMgSUhWIGRyaXZlciB0byBpbnRlcnByZXQu
-IEhvdyBkbyB5b3UgY29uZmlndXJlIHNheSBhIG51bWJlciBvZiBpZGxlIHNlY29uZHMgdG8gd2Fp
-dCBiZWZvcmUgc3VzcGVuZGluZyB2aWEgVlNDLCBmb3IgZXhhbXBsZT8gQ2VydGFpbiBwYXJhbWV0
-ZXJzIG1hbnkgY29udGFpbiBWU0NzIGlmIG9uZSB3aXNoZXMgb2YgY291cnNlLiBGcmVlIGZvcm0g
-cGFyYW1ldGVycyB3b3VsZCBiZSBtb3JlIGZsZXhpYmxlIGluIG15IG9waW5pb24uIEZpcm13YXJl
-IGZpbGUgbmFtZSBtYXkgYmUgb25lIG9mIHRoZW0gdG9vLiBTb21ldGhpbmcgbGlrZSBhbiBYTUwg
-ZmlsZSB3b3VsZCBmaXQgdGhlIGJpbGwgaW4gbXkgb3Bpbmlvbi4gSSB0aGluayBNYXJjZWwgaXMg
-YWxyZWFkeSB3b3JraW5nIG9uIHRoZSBkZXZpY2UgIm1hbmlmZXN0IGZpbGVzIi4gSGUncyBtZW50
-aW9uZWQgdGhlbSBpbiBhIGNvbnRleHQgb2YgdGhlIGZpcm13YXJlIGZpbGUgY29uZmlndXJhdGlv
-biBidXQgSSBhc3N1bWUgaXQgd2lsbCBiZSBleHBhbmRhYmxlLiBIb3BlIGhlIGhhcyBhIGNoYW5j
-ZSB0byBjbGFyaWZ5IHRoZSBhcHByb2FjaCBoZSdzIHRha2luZy4NCg0KUmVnYXJkcywNCkxvaWMN
-Cg0KLS0gDQpJbnRlbCBPcGVuIFNvdXJjZSBUZWNobm9sb2d5IENlbnRlcg0KaHR0cDovL29zcy5p
-bnRlbC5jb20vDQoNCi0tDQpUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUg
-bGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbg0KdGhlIGJvZHkgb2YgYSBtZXNz
-YWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCk1vcmUgbWFqb3Jkb21vIGluZm8gYXQg
-IGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0K
+Hi dogan,
+
+On Fri, Jul 17, 2015, dogan yazar wrote:
+> Thanks! This worked well. Any hints for me to track down why
+> "ControllerMode=le in the [General] section of
+> /etc/bluetooth/main.conf" did not work fine? Running a shell command
+> from our software is not a very neat solution.
+
+Enable bluetoothd debug logs (-d command line switch) and check if
+there's anything suspicious when you start bluetoothd. Btw, which BlueZ
+version do you have? The ControllerMode option was first introduced in
+BlueZ 5.25.
+
+Johan
