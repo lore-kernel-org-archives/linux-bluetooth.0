@@ -1,58 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
+Subject: Re: Kernel Oops: btusb: 4.2rc1 System lockup with BT dongle insert -
+ log attached
+To: <simon@mungewell.org>
+References: <a48f30f621c508955ba989117690fe73.squirrel@mungewell.org>
+ <dcf4c0f809904c54f453fe781e30adfe.squirrel@mungewell.org>
+ <8297c42b69d89cb9326b938a9adaa997.squirrel@mungewell.org>
+ <913a160c809900ee52e7c83350b4162f.squirrel@mungewell.org>
+CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+From: "Kim, Milo" <milo.kim@ti.com>
+Message-ID: <55A8AA15.2050802@ti.com>
+Date: Fri, 17 Jul 2015 16:09:09 +0900
 MIME-Version: 1.0
-From: Romain Izard <romain.izard.pro@gmail.com>
-Date: Fri, 17 Jul 2015 12:24:38 +0200
-Message-ID: <CAGkQfmNSWjD_S+fMHqn2SxcSxz0ru86jirOq3Atu75jz97RwQw@mail.gmail.com>
-Subject: Declaring the ICS to test & certify a product using BlueZ
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <913a160c809900ee52e7c83350b4162f.squirrel@mungewell.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Simon,
 
-To pass the Bluetooth certification, it is necessary to describe the
-behaviour of the certified product in a set of documents called
-Implementation Conformance Statements (ICS). These documents describe
-a list of features existing in the Bluetooth specification, that can
-be mandatory, optional or prohibited, as well as logic rules to
-combine those features.
+On 7/17/2015 3:14 PM, simon@mungewell.org wrote:
+>
+>> It looks like the firmware 'opt_flags' must be different, so this may be a
+>> contributing factor.
+>
+> Plot thickens.... kernel config has changed since I built 4.1.0rc7, but I
+> don't recall doing it or starting a fresh.
+>
+> /boot/config-4.1.0-rc7+
+> --
+> CONFIG_PREVENT_FIRMWARE_BUILD=y
+> CONFIG_FW_LOADER=y
+> CONFIG_FIRMWARE_IN_KERNEL=y
+> CONFIG_EXTRA_FIRMWARE=""
+> CONFIG_FW_LOADER_USER_HELPER=y
+> # CONFIG_FW_LOADER_USER_HELPER_FALLBACK is not set
+> CONFIG_WANT_DEV_COREDUMP=y
+> CONFIG_ALLOW_DEV_COREDUMP=y
+> CONFIG_DEV_COREDUMP=y
+> --
+>
+> /boot/config-4.2.0-rc1+
+> --
+> CONFIG_PREVENT_FIRMWARE_BUILD=y
+> CONFIG_FW_LOADER=y
+> CONFIG_FIRMWARE_IN_KERNEL=y
+> CONFIG_EXTRA_FIRMWARE=""
+> CONFIG_FW_LOADER_USER_HELPER=y
+> CONFIG_FW_LOADER_USER_HELPER_FALLBACK=y   <------------!!!
+> CONFIG_WANT_DEV_COREDUMP=y
+> CONFIG_ALLOW_DEV_COREDUMP=y
+> CONFIG_DEV_COREDUMP=y
+> --
+>
+>
+> Has a kconfig forced a change?.... Grrr
+> --
+> $ git blame ./drivers/leds/Kconfig
+> --
+> c93d08fa7 (Milo(Woogyom) Kim         2013-02-05 18:01:23 +0900 228) config
+> LEDS_LP55XX_COMMON
+> 33b3a561f (Kim, Milo                 2013-07-09 02:11:37 -0700 229)
+> tristate "Common Driver for TI/National LP5521/5523/55231/5562/8501"
+> 33b3a561f (Kim, Milo                 2013-07-09 02:11:37 -0700 230)
+> depends on LEDS_LP5521 || LEDS_LP5523 || LEDS_LP5562 || LEDS_LP8501
+> 10c06d178 (Milo(Woogyom) Kim         2013-02-05 19:17:20 +0900 231)
+> select FW_LOADER
+> b67893206 (Milo Kim                  2015-06-28 17:39:14 -0700 232)
+> select FW_LOADER_USER_HELPER_FALLBACK
+> <-----!!!!
+> c93d08fa7 (Milo(Woogyom) Kim         2013-02-05 18:01:23 +0900 233)     help
+> 33b3a561f (Kim, Milo                 2013-07-09 02:11:37 -0700 234)
+> This option supports common operations for LP5521/5523/55231/5562/8501
+> c93d08fa7 (Milo(Woogyom) Kim         2013-02-05 18:01:23 +0900 235)
+> devices.
+> --
+>
+> So in summary this problem is showing up now as the 'User Helper Fallback'
+> is now forced on, obviously the underlying problem needs to be fixed - but
+> I don't know when it crept in.
+>
 
-I'm trying to certify a product based on a Texas Instruments WL1831
-chip, using the latest BlueZ userspace and the kernel module from the
-TI backport environment for its R8.5 WiFi driver package (based on
-Linux 3.12.10). The kernel itself is a based on a 2.6.32 vendor tree.
-The userspace component is based on bluetoothd, and its DBus API. As
-TI provides this chip with a pre-certified close-source bluetooth
-stack when using Sitara chips (not my case), there is little
-information regarding stack certification.
+The 'CONFIG_FW_LOADER_USER_HELPER_FALLBACK' enables to load firmware 
+data manually by accessing /sys/class/firmware/<name>/data. It runs in 
+case the firmware file is missing.
+This user helper fallback will be enabled if one of LP55xx driver is 
+included in your dot config. Please see my patch below.
 
-The good point is that this setup works, and I'm able work in both
-BR/EDR and LE modes. Unfortunately, as I am only integrating all those
-pieces, I do not know very well how to fill the ICS documents. Many
-questions are quite low level, and I do not know how BlueZ beheaves,
-nor even how to look for this behaviour.
+https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/drivers/leds?id=b67893206fc0a0e8af87130e67f3d8ae553fc87c
 
-I can try to rely on some already existing information. The "android"
-directory has a set of "pics-*.txt" files, but those may not be valid
-when using bluetoothd. The Bluetooth certified composant database
-contains a list of BlueZ stacks certified in the past, and it is
-possible to get their ICS. But the ICS format evolves with the current
-certification, so it's difficult to reuse an old one. Moreover, I
-believe that it is possible that the correct ICS information depends
-from configuration options for the stack, either at compilation time
-or at runtime.
-
-For those of you who have already passed a Bluetooth certification,
-how did choose your ICS parameters ? What are the settings you know
-that correspond to ICS parameters ?
-
-The ICS parameters lead to a long list of tests to be run in the
-Profile Tuning Suite. What needs to run on the tested device to pass
-those tests ? Should bluetoothd be launched, and is it required to
-configure it in a special way ?
-
+However, I'm not sure why this affects your system lockup. Can I have 
+more details?
 
 Best regards,
--- 
-Romain Izard
+Milo
