@@ -1,68 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Kernel Oops: btusb: 4.2rc1 System lockup with BT dongle insert -
- log attached
-To: simon@mungewell.org, "Kim, Milo" <milo.kim@ti.com>
-References: <a48f30f621c508955ba989117690fe73.squirrel@mungewell.org>
- <dcf4c0f809904c54f453fe781e30adfe.squirrel@mungewell.org>
- <8297c42b69d89cb9326b938a9adaa997.squirrel@mungewell.org>
- <913a160c809900ee52e7c83350b4162f.squirrel@mungewell.org>
- <55A8AA15.2050802@ti.com>
- <d51df2e1e321efc18d74f3cc33bd4106.squirrel@mungewell.org>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-From: Laura Abbott <labbott@redhat.com>
-Message-ID: <55A93A10.3060201@redhat.com>
-Date: Fri, 17 Jul 2015 10:23:28 -0700
-MIME-Version: 1.0
-In-Reply-To: <d51df2e1e321efc18d74f3cc33bd4106.squirrel@mungewell.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-kernel-owner@vger.kernel.org
+From: Daniel Drake <drake@endlessm.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	larry.finger@lwfinger.net,
+	sjoerd.simons@collabora.co.uk,
+	xry111@outlook.com,
+	linux-usb@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: match generic class code in interface descriptor
+Date: Fri, 17 Jul 2015 11:12:25 -0600
+Message-Id: <1437153145-5387-1-git-send-email-drake@endlessm.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 07/17/2015 08:14 AM, simon@mungewell.org wrote:
->
->>> So in summary this problem is showing up now as the 'User Helper
->>> Fallback'
->>> is now forced on, obviously the underlying problem needs to be fixed -
->>> but
->>> I don't know when it crept in.
->>>
->>
->> The 'CONFIG_FW_LOADER_USER_HELPER_FALLBACK' enables to load firmware
->> data manually by accessing /sys/class/firmware/<name>/data. It runs in
->> case the firmware file is missing.
->> This user helper fallback will be enabled if one of LP55xx driver is
->> included in your dot config. Please see my patch below.
->>
->> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/drivers/leds?id=b67893206fc0a0e8af87130e67f3d8ae553fc87c
->>
->> However, I'm not sure why this affects your system lockup. Can I have
->> more details?
->
-> Hi Milo,
-> I'm not suggesting that your patch is the cause, just that it is an
-> 'enabler' and and explains why the problem (system lockup when I plug USB
-> Bluetooth dongle in) appears now.
->
-> A full Oops log is further back in this thread:
-> http://www.spinics.net/lists/linux-bluetooth/msg63090.html
->
->
->>> Will try building 4.1 with this option to see if it fails.
->
-> A very quick test as I was leaving the house this morning shows that 4.1
-> with 'CONFIG_FW_LOADER_USER_HELPER_FALLBACK' does not show the problem.
->
-> So at least we know the 'real' problem is a recent change to the code.
-> Simon
->
+btusb currently has a generic match on USB device descriptors:
+        { USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
 
-I think this was reported and fixed
+However, http://www.usb.org/developers/defined_class states:
 
-https://lkml.org/lkml/2015/7/8/858
-https://lkml.org/lkml/2015/7/8/1199
-https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=6f957724b94cb19f5c1c97efd01dd4df8ced323c
+  Base Class E0h (Wireless Controller)
+  This base class is defined for devices that are Wireless controllers.
+  Values not shown in the table below are reserved. These class codes are
+  to be used in Interface Descriptors, with the exception of the Bluetooth
+  class code which can also be used in a Device Descriptor.
 
-Thanks,
-Laura
+Add a match on the interface descriptors accordingly.
 
+This fixes compatibility with the RTL8723AU device shown below.
+This device conforms to the USB Interface Association Descriptor
+specification, which requires the device to have class ef/02/01.
+The extra IAD descriptor then specifies that interfaces 0 and 1
+belong to the same function/driver, which is true. Provided that
+the Bluetooth device class spec accepts use of the IAD, I imagine that
+technically, all btusb devices should be configured like this.
 
+T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=480  MxCh= 0
+D:  Ver= 2.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bda ProdID=0724 Rev= 2.00
+S:  Manufacturer=Realtek
+S:  Product=802.11n WLAN Adapter
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=500mA
+A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 4 Cls=ff(vend.) Sub=ff Prot=ff Driver=rtl8723au
+E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=03(Int.) MxPS=  64 Ivl=500us
+
+Signed-off-by: Daniel Drake <drake@endlessm.com>
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+This replaces/obsoletes:
+  [PATCH] Bluetooth: btusb: Recognize Realtek shared wifi/bluetooth devices
+  [PATCH] Bluetooth: btusb: Add Realtek devices into module device table
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 93339a4..9874aac 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -64,6 +64,7 @@ static struct usb_driver btusb_driver;
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+ 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
++	{ USB_INTERFACE_INFO(0xe0, 0x01, 0x01) },
+ 
+ 	/* Generic Bluetooth AMP device */
+ 	{ USB_DEVICE_INFO(0xe0, 0x01, 0x04), .driver_info = BTUSB_AMP },
+-- 
+2.1.4
