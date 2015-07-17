@@ -1,74 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sjoerd Simons <sjoerd.simons@collabora.co.uk>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daniel Drake <drake@endlessm.com>,
-	Larry Finger <Larry.Finger@lwfinger.net>
-Subject: [PATCH] Bluetooth: btusb: Recognize Realtek shared wifi/bluetooth devices
-Date: Fri, 17 Jul 2015 16:55:05 +0200
-Message-Id: <1437144905-3482-1-git-send-email-sjoerd.simons@collabora.co.uk>
+Message-ID: <55A8FF10.2090108@intel.com>
+Date: Fri, 17 Jul 2015 15:11:44 +0200
+From: Loic Poulain <loic.poulain@intel.com>
+MIME-Version: 1.0
+To: Ilya Faenson <ifaenson@broadcom.com>,
+	Frederic Danis <frederic.danis@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+CC: Arend Van Spriel <arend@broadcom.com>
+Subject: Re: [PATCH 1/3] Bluetooth: hci_uart: Add PM for BCM2E39
+References: <1435929751-26831-1-git-send-email-frederic.danis@linux.intel.com> <55A7D771.9020705@linux.intel.com> <E0D3336E15B58B4294723AC879BA5E9426DDF7@IRVEXCHMB15.corp.ad.broadcom.com>
+In-Reply-To: <E0D3336E15B58B4294723AC879BA5E9426DDF7@IRVEXCHMB15.corp.ad.broadcom.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Recognize Realtek devices which share wifi and bluetooth such as the
-rtl8723AU by vendor and interface.
+Hi Ilya,
+> IF: Sorry for the delay in responding. I am not actively working on the similar DT driver at the moment as we have hit a DT maintainer roadblock for its development. I do not read this bulletin board much therefore. Great seeing a first take on the Broadcom BT UART ACPI driver! Looks like a good start to me. A few comments:
+>
 
-T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=480  MxCh= 0
-D:  Ver= 2.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0bda ProdID=0724 Rev= 2.00
-S:  Manufacturer=Realtek
-S:  Product=802.11n WLAN Adapter
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=500mA
-A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 4 Cls=ff(vend.) Sub=ff Prot=ff Driver=rtl8723au
-E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=87(I) Atr=03(Int.) MxPS=  64 Ivl=500us
+Most of Bluetooth UART chips have some extra configuration (PCM, I2S, 
+LPM...)
+with specific vendor commands. Since it looks hard to include this 
+information
+into DT and much more difficult into ACPI, I suggest to implement a 
+common way
+to that with a generic btconf file. This file could be retrieved via 
+request_firmware
+and filled with a list of HCI commands for vendor config. This 
+configuration should
+happen after firmware download. If no conf file found, you can apply a 
+default
+configuration or just ignore it.
 
-Signed-off-by: Sjoerd Simons <sjoerd.simons@collabora.co.uk>
----
- drivers/bluetooth/btusb.c | 4 ++++
- 1 file changed, 4 insertions(+)
+It's just a proposal, I don't know if it does completely match your 
+requirements.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 93339a4..3324c91 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -149,6 +149,10 @@ static const struct usb_device_id btusb_table[] = {
- 	{ USB_DEVICE(0x8087, 0x0a5a),
- 	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
- 
-+	/* Realtek devices sharing Bluetooth and Wifi*/
-+	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
-+	  .driver_info = BTUSB_REALTEK },
-+
- 	{ }	/* Terminating entry */
- };
- 
+Regards,
+Loic
+
 -- 
-2.1.4
+Intel Open Source Technology Center
+http://oss.intel.com/
+
