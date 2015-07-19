@@ -1,38 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51dad0b8500cb7904dbe3438b15c5a7c.squirrel@mungewell.org>
-In-Reply-To: <0e8e81b360e2f3c5ff9fc6c26b447462.squirrel@mungewell.org>
-References: <a48f30f621c508955ba989117690fe73.squirrel@mungewell.org>
-    <dcf4c0f809904c54f453fe781e30adfe.squirrel@mungewell.org>
-    <8297c42b69d89cb9326b938a9adaa997.squirrel@mungewell.org>
-    <913a160c809900ee52e7c83350b4162f.squirrel@mungewell.org>
-    <55A8AA15.2050802@ti.com>
-    <d51df2e1e321efc18d74f3cc33bd4106.squirrel@mungewell.org>
-    <55A93A10.3060201@redhat.com>
-    <0e8e81b360e2f3c5ff9fc6c26b447462.squirrel@mungewell.org>
-Date: Sun, 19 Jul 2015 21:48:22 -0400
-Subject: Re: Kernel Oops: btusb: 4.2rc1 System lockup with BT dongle insert -
- log attached
-From: simon@mungewell.org
-To: simon@mungewell.org
-Cc: "Laura Abbott" <labbott@redhat.com>,
-	"Shuah Khan" <shuahkh@osg.samsung.com>,
-	"Kim, Milo" <milo.kim@ti.com>, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+Message-ID: <55AC27E5.5010509@gmail.com>
+Date: Mon, 20 Jul 2015 00:42:45 +0200
+From: Florian Grandel <fgrandel@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Szymon Janc <Szymon.Janc@tieto.com>,
+ BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: Peripheral role support for android
+References: <558DE8B3.3060102@gmail.com> <650B748F-76F8-4031-9397-E65D18AD01A4@holtmann.org>
+In-Reply-To: <650B748F-76F8-4031-9397-E65D18AD01A4@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi guys,
 
->> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=6f957724b94cb19f5c1c97efd01dd4df8ced323c
->>
->
-> Certainly looks like a plausible solution, will build kernel tonight to
-> confirm.
+just a quick update from my side so that you know, I'm still active.
 
-Just to confirm; 4.2rc1 + above patch, and 4.2rc2 both function correctly
-and I no longer see the lock up/Oops.
+Done:
+1) kernel backports: provide patches necessary to support the current 
+linux-next master
+2) android/bluetooth: implement bt_le_read_adv_features() to retrieve 
+num supported instances from the kernel
+3) android/bluetooth: change prepare_le_features() to retrieve the max 
+number of adv instances from the kernel and save it to the adapter 
+struct - will use bt_le_read_adv_features()
+4) android/gatt: change [un]register_app() to correctly manage app ids 
+(aka instance ids) in the permitted range including appropriate error 
+handling when the max number of instances is reached
+5) android/bluetooth: implement bt_le_{add|remove}_advertising() to 
+support the new multi-adv features in the kernel
+6) android/gatt: implement the handle*multi_adv*() methods using 
+bt_le_{add|remove}_advertising()
 
-Thanks to all who helped out,
-Simon.
+Currently working on:
+7) android/tester-{bluetooth|gatt}: write supporting tests
 
+Florian
