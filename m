@@ -1,119 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dohyun Pyun <re20sfree@gmail.com>
+From: =?UTF-8?q?I=C3=B1aki=20Arenaza?= <iarenaza@mondragon.edu>
 To: linux-bluetooth@vger.kernel.org
-Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>
-Subject: [PATCH BLUEZ 0/4] Modify Health profile signals for ObjectManager
-Date: Mon, 20 Jul 2015 00:31:07 +0900
-Message-Id: <1437319871-3004-1-git-send-email-dh79.pyun@samsung.com>
+Cc: =?utf-8?q?I=C3=B1aki=20Arenaza?= <iarenaza@mondragon.edu>
+Subject: [PATCH v2 1/1] device: Some devices send HSP UUIDs in the wrong order
+Date: Sun, 19 Jul 2015 16:57:28 +0200
+Message-Id: <1437317848-29508-2-git-send-email-iarenaza@mondragon.edu>
+In-Reply-To: <1436823169-32164-1-git-send-email-iarenaza@mondragon.edu>
+References: <1436823169-32164-1-git-send-email-iarenaza@mondragon.edu>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: DoHyun Pyun <dh79.pyun@samsung.com>
+Some devices behave contrary to what Erratum #3507 [1] says for the
+v1.2 Headset Profile (HSP). They report HEADSET_HS_UUID as the first
+value of the ServiceClassIDList attribute, and HSP_HS_UUID as the
+second one. At leat one of those devices is the Energy Wireles BT 3
+Ruby Red (from Energy Sistem).
 
-Since BlueZ has ObjectManager interface, ChannelConnected and ChannelDeleted
-Signals of HealthDevice interface was not available. ObjectManager reports the
-HealthChannel D-Bus interface when g_dbus_emit_signal function is called,
-and generates "InterfaceAdded" signal. But ChannelConnected and ChannelDeleted
-Siganls was not generated. If health-api document contains these signals,
-application or service using Bluez Dbus API will get the unexpected result.
+[1] See section 6.15 of
+https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=231555
+---
+ lib/uuid.h   |  1 +
+ src/device.c | 12 ++++++++++++
+ 2 files changed, 13 insertions(+)
 
-If we just remove g_dbus_emit_signal for ChannelConnected and ChannelDeleted,
-InterfaceAdded signal will not sent. Because InterfaceAdded signal is pending
-before sending a dbus signal. These patches include new property in HealthChannel
-interfacem, and this PropertiesChanged signal can be used to replace the previous
-ChannelConnected and ChannelDeleted signals.
-
-Connected signal:
-
-signal sender=:1.140 -> dest=(null destination) serial=280 path=/; interface=org.freedesktop.DBus.ObjectManager; member=InterfacesAdded
-   object path "/org/bluez/hci0/dev_00_09_1F_80_3B_76/chan65279"
-   array [
-      dict entry(
-         string "org.freedesktop.DBus.Introspectable"
-         array [
-         ]
-      )
-      dict entry(
-         string "org.bluez.HealthChannel1"
-         array [
-            dict entry(
-               string "Device"
-               variant                   object path "/org/bluez/hci0/dev_00_09_1F_80_3B_76"
-            )
-            dict entry(
-               string "Application"
-               variant                   object path "/org/bluez/health_app_2"
-            )
-            dict entry(
-               string "Type"
-               variant                   string "reliable"
-            )
-            dict entry(
-               string "Connected"
-               variant                   boolean false
-            )
-         ]
-      )
-      dict entry(
-         string "org.freedesktop.DBus.Properties"
-         array [
-         ]
-      )
-   ]
-signal sender=:1.140 -> dest=(null destination) serial=281 path=/org/bluez/hci0/dev_00_09_1F_80_3B_76/chan65279; interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
-   string "org.bluez.HealthChannel1"
-   array [
-      dict entry(
-         string "Connected"
-         variant             boolean true
-      )
-   ]
-   array [
-   ]
-signal sender=:1.140 -> dest=(null destination) serial=282 path=/org/bluez/hci0/dev_00_09_1F_80_3B_76; interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
-   string "org.bluez.HealthDevice1"
-   array [
-      dict entry(
-         string "MainChannel"
-         variant             object path "/org/bluez/hci0/dev_00_09_1F_80_3B_76/chan65279"
-      )
-   ]
-   array [
-   ]
-
-
-Disconnected signal:
-
-signal sender=:1.50 -> dest=(null destination) serial=284 path=/org/bluez/hci0/dev_00_09_1F_80_3B_76/chan65279; interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
-   string "org.bluez.HealthChannel1"
-   array [
-      dict entry(
-         string "Connected"
-         variant             boolean false
-      )
-   ]
-   array [
-   ]
-signal sender=:1.50 -> dest=(null destination) serial=285 path=/; interface=org.freedesktop.DBus.ObjectManager; member=InterfacesRemoved
-   object path "/org/bluez/hci0/dev_00_09_1F_80_3B_76/chan65279"
-   array [
-      string "org.freedesktop.DBus.Properties"
-      string "org.freedesktop.DBus.Introspectable"
-      string "org.bluez.HealthChannel1"
-   ]
-
-
-Dohyun Pyun (4):
-  doc/health-api: Add Connected property to HealthChannel
-  profiles/health: Implement connected property in HealthChannel
-  doc/health-api: Remove ChannelConnected and ChannelDeleted signals
-  profiles/health: Remove HealthDevice signals
-
- doc/health-api.txt          |  19 +++-----
- profiles/health/hdp.c       | 108 ++++++++++++++++++++++++++++----------------
- profiles/health/hdp_types.h |   1 +
- 3 files changed, 75 insertions(+), 53 deletions(-)
-
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 2dcfe9e..c2e12bb 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -35,6 +35,7 @@ extern "C" {
+ 
+ #define HSP_HS_UUID		"00001108-0000-1000-8000-00805f9b34fb"
+ #define HSP_AG_UUID		"00001112-0000-1000-8000-00805f9b34fb"
++#define HEADSET_HS_UUID		"00001131-0000-1000-8000-00805f9b34fb"
+ 
+ #define HFP_HS_UUID		"0000111e-0000-1000-8000-00805f9b34fb"
+ #define HFP_AG_UUID		"0000111f-0000-1000-8000-00805f9b34fb"
+diff --git a/src/device.c b/src/device.c
+index debe201..ced59e4 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3880,6 +3880,18 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
+ 			continue;
+ 		}
+ 
++		/* Fix devices that report HEADSET_HS_UUID before HSP_HS_UUID,
++		 * contrary to what Erratum #3507 says.
++		 */
++		if ((bt_uuid_strcmp(profile_uuid, HEADSET_HS_UUID) == 0)) {
++			free(profile_uuid);
++			profile_uuid = g_strdup(HSP_HS_UUID);
++			if (!profile_uuid) {
++				sdp_list_free(svcclass, free);
++				continue;
++			}
++		}
++
+ 		if (bt_uuid_strcmp(profile_uuid, PNP_UUID) == 0) {
+ 			uint16_t source, vendor, product, version;
+ 			sdp_data_t *pdlist;
 -- 
-1.8.1.2
+2.1.4
 
