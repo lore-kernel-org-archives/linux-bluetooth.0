@@ -1,32 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Jul 2015 14:56:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3] Bluetooth: Move irk checking logic in preparation to
- new connect method
-Message-ID: <20150720115644.GA16837@t440s.lan>
-References: <1437390769-6115-1-git-send-email-jpawlowski@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1437390769-6115-1-git-send-email-jpawlowski@google.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v3] Bluetooth: Move irk checking logic in preparation to new connect method
+Date: Mon, 20 Jul 2015 13:12:49 +0200
+Message-Id: <1437390769-6115-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Move irk checking logic in preparation to new connect method. Also
+make sure that MGMT_STATUS_INVALID_PARAMS is returned when non identity
+address is passed to ADD_DEVICE. Right now MGMT_STATUS_FAILED is
+returned, which might be misleading.
 
-On Mon, Jul 20, 2015, Jakub Pawlowski wrote:
-> Move irk checking logic in preparation to new connect method. Also
-> make sure that MGMT_STATUS_INVALID_PARAMS is returned when non identity
-> address is passed to ADD_DEVICE. Right now MGMT_STATUS_FAILED is
-> returned, which might be misleading.
-> 
-> Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
-> ---
->  net/bluetooth/hci_core.c | 11 -----------
->  net/bluetooth/mgmt.c     | 22 ++++++++++++++++++++++
->  2 files changed, 22 insertions(+), 11 deletions(-)
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ net/bluetooth/hci_core.c | 11 -----------
+ net/bluetooth/mgmt.c     | 22 ++++++++++++++++++++++
+ 2 files changed, 22 insertions(+), 11 deletions(-)
 
-Applied (with a couple of cosmetic fixes) to bluetooth-next. Thanks.
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 2f8fb33..bc43b64 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2822,10 +2822,6 @@ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ {
+ 	struct hci_conn_params *params;
+ 
+-	/* The conn params list only contains identity addresses */
+-	if (!hci_is_identity_address(addr, addr_type))
+-		return NULL;
+-
+ 	list_for_each_entry(params, &hdev->le_conn_params, list) {
+ 		if (bacmp(&params->addr, addr) == 0 &&
+ 		    params->addr_type == addr_type) {
+@@ -2842,10 +2838,6 @@ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
+ {
+ 	struct hci_conn_params *param;
+ 
+-	/* The list only contains identity addresses */
+-	if (!hci_is_identity_address(addr, addr_type))
+-		return NULL;
+-
+ 	list_for_each_entry(param, list, action) {
+ 		if (bacmp(&param->addr, addr) == 0 &&
+ 		    param->addr_type == addr_type)
+@@ -2861,9 +2853,6 @@ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+ {
+ 	struct hci_conn_params *params;
+ 
+-	if (!hci_is_identity_address(addr, addr_type))
+-		return NULL;
+-
+ 	params = hci_conn_params_lookup(hdev, addr, addr_type);
+ 	if (params)
+ 		return params;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 7998fb2..9a736b5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6226,6 +6226,17 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 	else
+ 		auto_conn = HCI_AUTO_CONN_REPORT;
+ 
++	/* Kernel internally uses conn_params with resolvable private
++	 * address, but Add Device allows only identity addresses.
++	 * Make sure it is enforced before calling
++	 * hci_conn_params_lookup.
++	 */
++	if (!hci_is_identity_address(&cp->addr.bdaddr, addr_type)) {
++		err = cmd->cmd_complete(cmd, MGMT_STATUS_INVALID_PARAMS);
++		mgmt_pending_remove(cmd);
++		goto unlock;
++	}
++
+ 	/* If the connection parameters don't exist for this device,
+ 	 * they will be created and configured with defaults.
+ 	 */
+@@ -6340,6 +6351,17 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 		else
+ 			addr_type = ADDR_LE_DEV_RANDOM;
+ 
++		/* Kernel internally uses conn_params with resolvable private
++		 * address, but Remove Device allows only identity addresses.
++		 * Make sure it is enforced before calling
++		 * hci_conn_params_lookup.
++		 */
++		if (!hci_is_identity_address(&cp->addr.bdaddr, addr_type)) {
++			err = cmd->cmd_complete(cmd,
++						MGMT_STATUS_INVALID_PARAMS);
++			mgmt_pending_remove(cmd);
++			goto unlock;
++		}
+ 		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
+ 						addr_type);
+ 		if (!params) {
+-- 
+2.1.4
 
-Johan
