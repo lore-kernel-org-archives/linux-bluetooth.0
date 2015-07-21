@@ -1,278 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] Bluetooth: hci_uart: Add Intel baudrate configuration support
-Date: Tue, 21 Jul 2015 11:58:14 +0200
-Message-Id: <1437472694-4805-1-git-send-email-loic.poulain@intel.com>
+Date: Tue, 21 Jul 2015 09:01:41 +0000 (GMT)
+From: RAKESH MK <rakesh.mk@samsung.com>
+Subject: Re: [PATCH] Audio/Media: Fix incorrect value dereference
+To: RAKESH MK <rakesh.mk@samsung.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Reply-to: rakesh.mk@samsung.com
+MIME-version: 1.0
+Content-type: text/plain; charset=windows-1252
+MIME-version: 1.0
+Message-id: <1510231309.185311437469301265.JavaMail.weblogic@epmlwas05c>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implement the set_baudrate callback for hci_intel:
-  - Controller requires a read Intel version command before updating its
-    baudrate.
-  - Host sends the change speed command at initial speed and controller
-    replies with the command complete at targeted speed.
+DQoNCi0tLS0tLS0gT3JpZ2luYWwgTWVzc2FnZSAtLS0tLS0tDQpTZW5kZXIgOiBSQUtFU0ggTUs8
+cmFrZXNoLm1rQHNhbXN1bmcuY29tPiBUZWNobmljYWwgTGVhZC9TUkktQmFuZ2Fsb3JlLVN5c3Rl
+bSAmIENvbm5lY3Rpdml0eS9TYW1zdW5nIEVsZWN0cm9uaWNzDQpEYXRlIDogSnVsIDEzLCAyMDE1
+IDE4OjIwIChHTVQrMDU6MzApDQpUaXRsZSA6IFtQQVRDSF0gQXVkaW8vTWVkaWE6IEZpeCBpbmNv
+cnJlY3QgdmFsdWUgZGVyZWZlcmVuY2UNCg0KcGFyYW1ldGVyIHZhbHVlIHBhc3NlZCB0byB0aGUg
+Y29uZmlnX2NiIGlzIGEgcG9pbnRlciB0byB0aGUNCmdib29sb2Vhbi4gZGVyZWZlcmVuY2luZyB0
+aGUgdmFsdWUgcmF0aGVyIHRoYW4gYWRkcmVzcyBsZWFkcw0KdG8gbWlzbWF0Y2ggaW4gaGFuZGxp
+bmcgdGhlIHJldHVybiB2YWx1ZS4NCg0KYXZkdHAuYzphdmR0cF9wYXJzZV9jbWQoKSBSZWNlaXZl
+ZCBTRVRfQ09ORklHVVJBVElPTl9DTUQNCmEyZHAuYzplbmRwb2ludF9zZXRjb25mX2luZCgpIFNv
+dXJjZSAweGI3ZDQ5ZWY4OiBTZXRfQ29uZmlndXJhdGlvbl9JbmQNCmEyZHAuYzpzZXR1cF9yZWYo
+KSAweGI3ZDUzYjk4OiByZWY9Mg0KbWVkaWEuYzptZWRpYV9hZGFwdGVyX2dldF9wbGF5ZXIoKQ0K
+bWVkaWEuYzptZWRpYV9zZXRfc2lua19jYWxsYmFjaygpDQptZWRpYS5jOm1lZGlhX2VuZHBvaW50
+X2FzeW5jX2NhbGwoKSBDYWxsaW5nIFNldENvbmZpZ3VyYXRpb246IG5hbWUgPSA6MS4zNyBwYXRo
+ID0gL01lZGlhRW5kcG9pbnQvQTJEUFNvdXJjZQ0KDQoqIzAgIDB4YjZjZWExODQgaW4gX19saWJj
+X2ZyZWUgKG1lbT0weGJlYWQzYWU0KSBhdCBtYWxsb2MuYzozNzM2DQoqIzEgIDB4YjZlMzM0Njgg
+aW4gZ19mcmVlICgpIGZyb20gL3Vzci9saWIvbGliZ2xpYi0yLjAuc28uMA0KKiMyICAweGI2ZjI1
+ZGIwIGluIGF1dG9fY29uZmlnIChkYXRhPTB4YjdkNTNiOTgpIGF0IHByb2ZpbGVzL2F1ZGlvL2Ey
+ZHAuYzo0MzANCiojMyAgMHhiNmYyYWQ3NiBpbiBjb25maWdfY2IgKGVuZHBvaW50PSwNCiogICAg
+cmV0PSwgc2l6ZT0sDQoqICAgIHVzZXJfZGF0YT0pIGF0IHByb2ZpbGVzL2F1ZGlvL21lZGlhLmM6
+NzA3DQoqIzQgIDB4YjZmMmNjNGEgaW4gZW5kcG9pbnRfcmVwbHkgKGNhbGw9LA0KKiAgICB1c2Vy
+X2RhdGE9MHhiN2Q1MTZiMCkgYXQgcHJvZmlsZXMvYXVkaW8vbWVkaWEuYzozNTcNCiojNSAgMHhi
+NmRkY2U5NiBpbiBfZGJ1c19wZW5kaW5nX2NhbGxfY29tcGxldGUgKHBlbmRpbmc9MHhiN2Q1M2Jj
+OCkNCiogICAgYXQgZGJ1cy1wZW5kaW5nLWNhbGwuYzoyMTYNCiojNiAgMHhiNmRjZmU4MiBpbiBj
+b21wbGV0ZV9wZW5kaW5nX2NhbGxfYW5kX3VubG9jayAoY29ubmVjdGlvbj0weGI3ZDQ0YjQwLA0K
+KiAgICBwZW5kaW5nPTB4YjdkNTNiYzgsIG1lc3NhZ2U9KQ0KKiAgICBhdCBkYnVzLWNvbm5lY3Rp
+b24uYzoyMzMxDQotLS0NCnByb2ZpbGVzL2F1ZGlvL21lZGlhLmMgfCAgICAzICsrLQ0KMSBmaWxl
+IGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KDQpkaWZmIC0tZ2l0IGEv
+cHJvZmlsZXMvYXVkaW8vbWVkaWEuYyBiL3Byb2ZpbGVzL2F1ZGlvL21lZGlhLmMNCmluZGV4IGYx
+MjU2OWUuLmVkNDQxZDAgMTAwNjQ0DQotLS0gYS9wcm9maWxlcy9hdWRpby9tZWRpYS5jDQorKysg
+Yi9wcm9maWxlcy9hdWRpby9tZWRpYS5jDQpAQCAtNTMyLDggKzUzMiw5IEBAIHN0YXRpYyB2b2lk
+IGNvbmZpZ19jYihzdHJ1Y3QgbWVkaWFfZW5kcG9pbnQgKmVuZHBvaW50LCB2b2lkICpyZXQsIGlu
+dCBzaXplLA0Kdm9pZCAqdXNlcl9kYXRhKQ0Kew0Kc3RydWN0IGEyZHBfY29uZmlnX2RhdGEgKmRh
+dGEgPSB1c2VyX2RhdGE7DQorIGdib29sZWFuICpyZXRfdmFsdWUgPSByZXQ7DQoNCi0gZGF0YS0+
+Y2IoZGF0YS0+c2V0dXAsIHJldCA/IFRSVUUgOiBGQUxTRSk7DQorIGRhdGEtPmNiKGRhdGEtPnNl
+dHVwLCAqcmV0X3ZhbHVlID8gVFJVRSA6IEZBTFNFKTsNCn0NCg0Kc3RhdGljIGludCBzZXRfY29u
+ZmlnKHN0cnVjdCBhMmRwX3NlcCAqc2VwLCB1aW50OF90ICpjb25maWd1cmF0aW9uLA0KLS0gDQox
+LjcuOS41DQoNCitQaW5n
 
-In the setup function, we need to reset the baudrate to initial speed
-after the firmware upload and restore the operational speed once
-controller has booted on the new firmware.
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- drivers/bluetooth/hci_intel.c | 161 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 159 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 21dfa89..682da32 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -38,6 +38,7 @@
- #define STATE_FIRMWARE_LOADED	2
- #define STATE_FIRMWARE_FAILED	3
- #define STATE_BOOTING		4
-+#define STATE_SPEED_CHANGING	5
- 
- struct intel_data {
- 	struct sk_buff *rx_skb;
-@@ -45,6 +46,38 @@ struct intel_data {
- 	unsigned long flags;
- };
- 
-+static u8 intel_convert_speed(unsigned int speed)
-+{
-+	switch (speed) {
-+	case 9600:
-+		return 0x00;
-+	case 19200:
-+		return 0x01;
-+	case 38400:
-+		return 0x02;
-+	case 57600:
-+		return 0x03;
-+	case 115200:
-+		return 0x04;
-+	case 230400:
-+		return 0x05;
-+	case 460800:
-+		return 0x06;
-+	case 921600:
-+		return 0x07;
-+	case 1843200:
-+		return 0x08;
-+	case 3250000:
-+		return 0x09;
-+	case 2000000:
-+		return 0x0a;
-+	case 3000000:
-+		return 0x0b;
-+	default:
-+		return 0xff;
-+	}
-+}
-+
- static int intel_open(struct hci_uart *hu)
- {
- 	struct intel_data *intel;
-@@ -111,6 +144,76 @@ static int inject_cmd_complete(struct hci_dev *hdev, __u16 opcode)
- 	return hci_recv_frame(hdev, skb);
- }
- 
-+static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
-+{
-+	struct intel_data *intel = hu->priv;
-+	struct hci_dev *hdev = hu->hdev;
-+	u8 intel_speed;
-+	struct sk_buff *skb;
-+	int err;
-+
-+	BT_INFO("%s: Change device speed to %d", hdev->name, speed);
-+
-+	/* Device will not accept speed change if Intel version has not been
-+	 * previously requested.
-+	 */
-+	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Reading Intel version information failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	intel_speed = intel_convert_speed(speed);
-+	if (intel_speed == 0xff) {
-+		BT_ERR("%s: Unsupported speed", hdev->name);
-+		return -EINVAL;
-+	}
-+
-+	set_bit(STATE_SPEED_CHANGING, &intel->flags);
-+
-+	hci_uart_set_flow_control(hu, 1);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc06, 1, &intel_speed, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Changing Intel speed failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	/* Be sure change speed packet has been flushed to the phy before
-+	 * changing host speed.
-+	 */
-+	msleep(10);
-+	hci_uart_set_baudrate(hu, speed);
-+
-+	hci_uart_set_flow_control(hu, 0);
-+
-+	/* Previous change speed command complete has been virtually injected.
-+	 * Wait for this event now we both are at targeted speed.
-+	 */
-+	err = wait_on_bit_timeout(&intel->flags, STATE_SPEED_CHANGING,
-+				  TASK_INTERRUPTIBLE,
-+				  msecs_to_jiffies(100));
-+	if (err == 1) {
-+		BT_ERR("%s: Changing speed interrupted", hdev->name);
-+		return -EINTR;
-+	}
-+
-+	if (err) {
-+		/* Some hardwares seem buggy and don't return the cmd complete.
-+		 * Just ignore timeout.
-+		 */
-+		BT_ERR("%s: Changing speed timeout, continue...", hdev->name);
-+	}
-+
-+	return 0;
-+}
-+
- static int intel_setup(struct hci_uart *hu)
- {
- 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
-@@ -126,6 +229,8 @@ static int intel_setup(struct hci_uart *hu)
- 	u32 frag_len;
- 	ktime_t calltime, delta, rettime;
- 	unsigned long long duration;
-+	unsigned int init_speed, oper_speed;
-+	int speed_change = 0;
- 	int err;
- 
- 	BT_DBG("%s", hdev->name);
-@@ -134,6 +239,19 @@ static int intel_setup(struct hci_uart *hu)
- 
- 	calltime = ktime_get();
- 
-+	if (hu->init_speed)
-+		init_speed = hu->init_speed;
-+	else
-+		init_speed = hu->proto->init_speed;
-+
-+	if (hu->oper_speed)
-+		oper_speed = hu->oper_speed;
-+	else
-+		oper_speed = hu->proto->oper_speed;
-+
-+	if (oper_speed && init_speed && oper_speed != init_speed)
-+		speed_change = 1;
-+
- 	set_bit(STATE_BOOTLOADER, &intel->flags);
- 
- 	/* Read the Intel version information to determine if the device
-@@ -420,6 +538,10 @@ done:
- 
- 	set_bit(STATE_BOOTING, &intel->flags);
- 
-+	/* We need to restore the default speed before Intel reset */
-+	if (speed_change)
-+		intel_set_baudrate(hu, init_speed);
-+
- 	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param), reset_param,
- 			     HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb))
-@@ -456,6 +578,18 @@ done:
- 
- 	BT_INFO("%s: Device booted in %llu usecs", hdev->name, duration);
- 
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+
-+	kfree_skb(skb);
-+
-+	if (speed_change) {
-+		err = intel_set_baudrate(hu, oper_speed);
-+		if (err)
-+			hci_uart_set_baudrate(hu, init_speed);
-+	}
-+
- 	clear_bit(STATE_BOOTLOADER, &intel->flags);
- 
- 	return 0;
-@@ -467,7 +601,8 @@ static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 	struct intel_data *intel = hu->priv;
- 	struct hci_event_hdr *hdr;
- 
--	if (!test_bit(STATE_BOOTLOADER, &intel->flags))
-+	if (!test_bit(STATE_BOOTLOADER, &intel->flags) &&
-+	    !test_bit(STATE_SPEED_CHANGING, &intel->flags))
- 		goto recv;
- 
- 	hdr = (void *)skb->data;
-@@ -497,7 +632,18 @@ static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 			smp_mb__after_atomic();
- 			wake_up_bit(&intel->flags, STATE_BOOTING);
- 		}
-+
-+	/* When the firmware change speed completes the device sends
-+	 * the command complete event from the new baudrate.
-+	 */
-+	} else if (skb->len >= 5 && hdr->evt == HCI_EV_CMD_COMPLETE &&
-+		   skb->data[3] == 0x06 && skb->data[4] == 0xfc) {
-+		if (test_and_clear_bit(STATE_SPEED_CHANGING, &intel->flags)) {
-+			smp_mb__after_atomic();
-+			wake_up_bit(&intel->flags, STATE_SPEED_CHANGING);
-+		}
- 	}
-+
- recv:
- 	return hci_recv_frame(hdev, skb);
- }
-@@ -548,7 +694,9 @@ static struct sk_buff *intel_dequeue(struct hci_uart *hu)
- 	if (!skb)
- 		return skb;
- 
--	if (test_bit(STATE_BOOTLOADER, &intel->flags) &&
-+	/* Inject cmd complete pkt for async commands */
-+	if ((test_bit(STATE_BOOTLOADER, &intel->flags) ||
-+	    test_bit(STATE_SPEED_CHANGING, &intel->flags)) &&
- 	    (bt_cb(skb)->pkt_type == HCI_COMMAND_PKT)) {
- 		struct hci_command_hdr *cmd = (void *)skb->data;
- 		__u16 opcode = le16_to_cpu(cmd->opcode);
-@@ -560,6 +708,14 @@ static struct sk_buff *intel_dequeue(struct hci_uart *hu)
- 		 */
- 		if (opcode == 0xfc01)
- 			inject_cmd_complete(hu->hdev, opcode);
-+
-+		/* When the 0xfc06 command is issued to change the
-+		 * speed, device will send the command complete event
-+		 * only at the targeted speed. Host needs to change its
-+		 * own baudrate before being able to receive the response.
-+		 */
-+		if (opcode == 0xfc06)
-+			inject_cmd_complete(hu->hdev, opcode);
- 	}
- 
- 	/* Prepend skb with frame type */
-@@ -572,6 +728,7 @@ static const struct hci_uart_proto intel_proto = {
- 	.id		= HCI_UART_INTEL,
- 	.name		= "Intel",
- 	.init_speed	= 115200,
-+	.oper_speed	= 3000000,
- 	.open		= intel_open,
- 	.close		= intel_close,
- 	.flush		= intel_flush,
--- 
-1.9.1
