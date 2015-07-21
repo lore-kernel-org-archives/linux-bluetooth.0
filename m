@@ -1,79 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anupam Roy <anupam.r@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: sachin.dev@samsung.com, Anupam Roy <anupam.r@samsung.com>
-Subject: [PATCH] MyPAtch
-Date: Tue, 21 Jul 2015 07:14:39 -0400
-Message-id: <1437477279-23335-1-git-send-email-anupam.r@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1510231309.185311437469301265.JavaMail.weblogic@epmlwas05c>
+References: <1510231309.185311437469301265.JavaMail.weblogic@epmlwas05c>
+Date: Tue, 21 Jul 2015 13:34:25 +0300
+Message-ID: <CABBYNZ+faE2ZzsWS0eSQvUOWuyTs=pnaKdnGLdPWd_bq7JZHLA@mail.gmail.com>
+Subject: Re: [PATCH] Audio/Media: Fix incorrect value dereference
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Rakesh M K <rakesh.mk@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Anupam Roy <anupam.r@samsung.com>
----
- file.patch | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
- create mode 100644 file.patch
+Hi Rakesh,
 
-diff --git a/file.patch b/file.patch
-new file mode 100644
-index 0000000..f689afe
---- /dev/null
-+++ b/file.patch
-@@ -0,0 +1,54 @@
-+>------- Original Message -------
-+>Sender : Anupam Roy<anupam.r@samsung.com> Chief Engineer/SRI-Delhi-SWC Group/Samsung Electronics
-+>Date : Jun 26, 2015 22:05 (GMT+09:00)
-+>Title : [PATCH] tools/obex-client-tool.c: Fix memory leak in obex-client-tool
-+>
-+>GOptionContext object should be freed in case socket connection
-+>fails and program execution is terminated.
-+>
-+>==12968== HEAP SUMMARY:
-+>==12968==     in use at exit: 2,895 bytes in 14 blocks
-+>==12968==   total heap usage: 23 allocs, 9 frees, 36,669 bytes allocated
-+>==12968==
-+>==12968== 624 (88 direct, 536 indirect) bytes in 1 blocks are definitely lost in loss record 13 of 14
-+>==12968==    at 0x4C2CC70: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-+>==12968==    by 0x4E85668: g_malloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-+>==12968==    by 0x4E89D22: g_option_context_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-+>==12968==    by 0x402BAB: main (obex-client-tool.c:428)
-+>==12968==
-+>==12968== LEAK SUMMARY:
-+>==12968==    definitely lost: 88 bytes in 1 blocks
-+>==12968==    indirectly lost: 536 bytes in 2 blocks
-+>==12968==      possibly lost: 0 bytes in 0 blocks
-+>==12968==    still reachable: 2,271 bytes in 11 blocks
-+>==12968==         suppressed: 0 bytes in 0 blocks
-+>---
-+>tools/obex-client-tool.c | 5 ++++-
-+>1 file changed, 4 insertions(+), 1 deletion(-)
-+>
-+>diff --git a/tools/obex-client-tool.c b/tools/obex-client-tool.c
-+>index 4f931f6..d0ba8a6 100644
-+>--- a/tools/obex-client-tool.c
-+>+++ b/tools/obex-client-tool.c
-+>@@ -432,6 +432,7 @@ int main(int argc, char *argv[])
-+>if (err != NULL) {
-+>g_printerr("%s\n", err->message);
-+>g_error_free(err);
-+>+ g_option_context_free(context);
-+>exit(EXIT_FAILURE);
-+>}
-+>
-+>@@ -445,8 +446,10 @@ int main(int argc, char *argv[])
-+>else
-+>io = unix_connect(transport);
-+>
-+>- if (io == NULL)
-+>+ if (io == NULL) {
-+>+ g_option_context_free(context);
-+>exit(EXIT_FAILURE);
-+>+ }
-+>
-+>memset(&sa, 0, sizeof(sa));
-+>sa.sa_handler = sig_term;
-+>-- 
-+>1.9.1
+On Tue, Jul 21, 2015 at 12:01 PM, RAKESH MK <rakesh.mk@samsung.com> wrote:
+>
+>
+> ------- Original Message -------
+> Sender : RAKESH MK<rakesh.mk@samsung.com> Technical Lead/SRI-Bangalore-System & Connectivity/Samsung Electronics
+> Date : Jul 13, 2015 18:20 (GMT+05:30)
+> Title : [PATCH] Audio/Media: Fix incorrect value dereference
+>
+> parameter value passed to the config_cb is a pointer to the
+> gbooloean. dereferencing the value rather than address leads
+> to mismatch in handling the return value.
+>
+> avdtp.c:avdtp_parse_cmd() Received SET_CONFIGURATION_CMD
+> a2dp.c:endpoint_setconf_ind() Source 0xb7d49ef8: Set_Configuration_Ind
+> a2dp.c:setup_ref() 0xb7d53b98: ref=2
+> media.c:media_adapter_get_player()
+> media.c:media_set_sink_callback()
+> media.c:media_endpoint_async_call() Calling SetConfiguration: name = :1.37 path = /MediaEndpoint/A2DPSource
+>
+> *#0  0xb6cea184 in __libc_free (mem=0xbead3ae4) at malloc.c:3736
+> *#1  0xb6e33468 in g_free () from /usr/lib/libglib-2.0.so.0
+> *#2  0xb6f25db0 in auto_config (data=0xb7d53b98) at profiles/audio/a2dp.c:430
+> *#3  0xb6f2ad76 in config_cb (endpoint=,
+> *    ret=, size=,
+> *    user_data=) at profiles/audio/media.c:707
+> *#4  0xb6f2cc4a in endpoint_reply (call=,
+> *    user_data=0xb7d516b0) at profiles/audio/media.c:357
+> *#5  0xb6ddce96 in _dbus_pending_call_complete (pending=0xb7d53bc8)
+> *    at dbus-pending-call.c:216
+> *#6  0xb6dcfe82 in complete_pending_call_and_unlock (connection=0xb7d44b40,
+> *    pending=0xb7d53bc8, message=)
+> *    at dbus-connection.c:2331
+> ---
+> profiles/audio/media.c |    3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> index f12569e..ed441d0 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -532,8 +532,9 @@ static void config_cb(struct media_endpoint *endpoint, void *ret, int size,
+> void *user_data)
+> {
+> struct a2dp_config_data *data = user_data;
+> + gboolean *ret_value = ret;
+>
+> - data->cb(data->setup, ret ? TRUE : FALSE);
+> + data->cb(data->setup, *ret_value ? TRUE : FALSE);
+> }
+>
+> static int set_config(struct a2dp_sep *sep, uint8_t *configuration,
+> --
+> 1.7.9.5
+>
+> +Ping
+
+Applied, thanks.
+
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
