@@ -1,53 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 Jul 2015 09:01:41 +0000 (GMT)
-From: RAKESH MK <rakesh.mk@samsung.com>
-Subject: Re: [PATCH] Audio/Media: Fix incorrect value dereference
-To: RAKESH MK <rakesh.mk@samsung.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-to: rakesh.mk@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <1510231309.185311437469301265.JavaMail.weblogic@epmlwas05c>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1437459289.10315.78.camel@collabora.co.uk>
+Subject: Re: [PATCH] Bluetooth: btusb: match generic class code in interface
+ descriptor
+From: Sjoerd Simons <sjoerd.simons@collabora.co.uk>
+To: Daniel Drake <drake@endlessm.com>, marcel@holtmann.org,
+ gustavo@padovan.org,  johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, larry.finger@lwfinger.net,
+	xry111@outlook.com, linux-usb@vger.kernel.org
+Date: Tue, 21 Jul 2015 08:14:49 +0200
+In-Reply-To: <1437153145-5387-1-git-send-email-drake@endlessm.com>
+References: <1437153145-5387-1-git-send-email-drake@endlessm.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQoNCi0tLS0tLS0gT3JpZ2luYWwgTWVzc2FnZSAtLS0tLS0tDQpTZW5kZXIgOiBSQUtFU0ggTUs8
-cmFrZXNoLm1rQHNhbXN1bmcuY29tPiBUZWNobmljYWwgTGVhZC9TUkktQmFuZ2Fsb3JlLVN5c3Rl
-bSAmIENvbm5lY3Rpdml0eS9TYW1zdW5nIEVsZWN0cm9uaWNzDQpEYXRlIDogSnVsIDEzLCAyMDE1
-IDE4OjIwIChHTVQrMDU6MzApDQpUaXRsZSA6IFtQQVRDSF0gQXVkaW8vTWVkaWE6IEZpeCBpbmNv
-cnJlY3QgdmFsdWUgZGVyZWZlcmVuY2UNCg0KcGFyYW1ldGVyIHZhbHVlIHBhc3NlZCB0byB0aGUg
-Y29uZmlnX2NiIGlzIGEgcG9pbnRlciB0byB0aGUNCmdib29sb2Vhbi4gZGVyZWZlcmVuY2luZyB0
-aGUgdmFsdWUgcmF0aGVyIHRoYW4gYWRkcmVzcyBsZWFkcw0KdG8gbWlzbWF0Y2ggaW4gaGFuZGxp
-bmcgdGhlIHJldHVybiB2YWx1ZS4NCg0KYXZkdHAuYzphdmR0cF9wYXJzZV9jbWQoKSBSZWNlaXZl
-ZCBTRVRfQ09ORklHVVJBVElPTl9DTUQNCmEyZHAuYzplbmRwb2ludF9zZXRjb25mX2luZCgpIFNv
-dXJjZSAweGI3ZDQ5ZWY4OiBTZXRfQ29uZmlndXJhdGlvbl9JbmQNCmEyZHAuYzpzZXR1cF9yZWYo
-KSAweGI3ZDUzYjk4OiByZWY9Mg0KbWVkaWEuYzptZWRpYV9hZGFwdGVyX2dldF9wbGF5ZXIoKQ0K
-bWVkaWEuYzptZWRpYV9zZXRfc2lua19jYWxsYmFjaygpDQptZWRpYS5jOm1lZGlhX2VuZHBvaW50
-X2FzeW5jX2NhbGwoKSBDYWxsaW5nIFNldENvbmZpZ3VyYXRpb246IG5hbWUgPSA6MS4zNyBwYXRo
-ID0gL01lZGlhRW5kcG9pbnQvQTJEUFNvdXJjZQ0KDQoqIzAgIDB4YjZjZWExODQgaW4gX19saWJj
-X2ZyZWUgKG1lbT0weGJlYWQzYWU0KSBhdCBtYWxsb2MuYzozNzM2DQoqIzEgIDB4YjZlMzM0Njgg
-aW4gZ19mcmVlICgpIGZyb20gL3Vzci9saWIvbGliZ2xpYi0yLjAuc28uMA0KKiMyICAweGI2ZjI1
-ZGIwIGluIGF1dG9fY29uZmlnIChkYXRhPTB4YjdkNTNiOTgpIGF0IHByb2ZpbGVzL2F1ZGlvL2Ey
-ZHAuYzo0MzANCiojMyAgMHhiNmYyYWQ3NiBpbiBjb25maWdfY2IgKGVuZHBvaW50PSwNCiogICAg
-cmV0PSwgc2l6ZT0sDQoqICAgIHVzZXJfZGF0YT0pIGF0IHByb2ZpbGVzL2F1ZGlvL21lZGlhLmM6
-NzA3DQoqIzQgIDB4YjZmMmNjNGEgaW4gZW5kcG9pbnRfcmVwbHkgKGNhbGw9LA0KKiAgICB1c2Vy
-X2RhdGE9MHhiN2Q1MTZiMCkgYXQgcHJvZmlsZXMvYXVkaW8vbWVkaWEuYzozNTcNCiojNSAgMHhi
-NmRkY2U5NiBpbiBfZGJ1c19wZW5kaW5nX2NhbGxfY29tcGxldGUgKHBlbmRpbmc9MHhiN2Q1M2Jj
-OCkNCiogICAgYXQgZGJ1cy1wZW5kaW5nLWNhbGwuYzoyMTYNCiojNiAgMHhiNmRjZmU4MiBpbiBj
-b21wbGV0ZV9wZW5kaW5nX2NhbGxfYW5kX3VubG9jayAoY29ubmVjdGlvbj0weGI3ZDQ0YjQwLA0K
-KiAgICBwZW5kaW5nPTB4YjdkNTNiYzgsIG1lc3NhZ2U9KQ0KKiAgICBhdCBkYnVzLWNvbm5lY3Rp
-b24uYzoyMzMxDQotLS0NCnByb2ZpbGVzL2F1ZGlvL21lZGlhLmMgfCAgICAzICsrLQ0KMSBmaWxl
-IGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KDQpkaWZmIC0tZ2l0IGEv
-cHJvZmlsZXMvYXVkaW8vbWVkaWEuYyBiL3Byb2ZpbGVzL2F1ZGlvL21lZGlhLmMNCmluZGV4IGYx
-MjU2OWUuLmVkNDQxZDAgMTAwNjQ0DQotLS0gYS9wcm9maWxlcy9hdWRpby9tZWRpYS5jDQorKysg
-Yi9wcm9maWxlcy9hdWRpby9tZWRpYS5jDQpAQCAtNTMyLDggKzUzMiw5IEBAIHN0YXRpYyB2b2lk
-IGNvbmZpZ19jYihzdHJ1Y3QgbWVkaWFfZW5kcG9pbnQgKmVuZHBvaW50LCB2b2lkICpyZXQsIGlu
-dCBzaXplLA0Kdm9pZCAqdXNlcl9kYXRhKQ0Kew0Kc3RydWN0IGEyZHBfY29uZmlnX2RhdGEgKmRh
-dGEgPSB1c2VyX2RhdGE7DQorIGdib29sZWFuICpyZXRfdmFsdWUgPSByZXQ7DQoNCi0gZGF0YS0+
-Y2IoZGF0YS0+c2V0dXAsIHJldCA/IFRSVUUgOiBGQUxTRSk7DQorIGRhdGEtPmNiKGRhdGEtPnNl
-dHVwLCAqcmV0X3ZhbHVlID8gVFJVRSA6IEZBTFNFKTsNCn0NCg0Kc3RhdGljIGludCBzZXRfY29u
-ZmlnKHN0cnVjdCBhMmRwX3NlcCAqc2VwLCB1aW50OF90ICpjb25maWd1cmF0aW9uLA0KLS0gDQox
-LjcuOS41DQoNCitQaW5n
+On Fri, 2015-07-17 at 11:12 -0600, Daniel Drake wrote:
+> btusb currently has a generic match on USB device descriptors:
+>         { USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
+>=20
+> However, http://www.usb.org/developers/defined_class states:
+>=20
+>   Base Class E0h (Wireless Controller)
+>   This base class is defined for devices that are Wireless=20
+> controllers.
+>   Values not shown in the table below are reserved. These class codes=20
+> are
+>   to be used in Interface Descriptors, with the exception of the=20
+> Bluetooth
+>   class code which can also be used in a Device Descriptor.
+>=20
+> Add a match on the interface descriptors accordingly.
 
+> This fixes compatibility with the RTL8723AU device shown below.
+> This device conforms to the USB Interface Association Descriptor
+> specification, which requires the device to have class ef/02/01.
+> The extra IAD descriptor then specifies that interfaces 0 and 1
+> belong to the same function/driver, which is true. Provided that
+> the Bluetooth device class spec accepts use of the IAD, I imagine=20
+> that
+> technically, all btusb devices should be configured like this.
 
+Great, i didn't know whether was allowed hence using the more
+conservative _VENDOR_AND_INTERFACE in my patch, but this solution is de
+finately nicer.
+
+Tested with a RTL8723AU device on a Radxa Rock Pro board
+
+Reviewed-By: Sjoerd Simons <sjoerd.simons@collabora.co.uk>
+Tested-By: Sjoerd Simons <sjoerd.simons@collabora.co.uk>
+
+> T:  Bus=3D01 Lev=3D02 Prnt=3D02 Port=3D00 Cnt=3D01 Dev#=3D  3 Spd=3D480  =
+MxCh=3D 0
+> D:  Ver=3D 2.00 Cls=3Def(misc ) Sub=3D02 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
+> P:  Vendor=3D0bda ProdID=3D0724 Rev=3D 2.00
+> S:  Manufacturer=3DRealtek
+> S:  Product=3D802.11n WLAN Adapter
+> S:  SerialNumber=3D00e04c000001
+> C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3De0 MxPwr=3D500mA
+> A:  FirstIf#=3D 0 IfCount=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01
+> I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
+> E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+> I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+> I:* If#=3D 2 Alt=3D 0 #EPs=3D 4 Cls=3Dff(vend.) Sub=3Dff Prot=3Dff=20
+> Driver=3Drtl8723au
+> E:  Ad=3D84(I) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> E:  Ad=3D05(O) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> E:  Ad=3D06(O) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+> E:  Ad=3D87(I) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D500us
+>=20
+> Signed-off-by: Daniel Drake <drake@endlessm.com>
+> ---
+>  drivers/bluetooth/btusb.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> This replaces/obsoletes:
+>   [PATCH] Bluetooth: btusb: Recognize Realtek shared wifi/bluetooth=20
+> devices
+>   [PATCH] Bluetooth: btusb: Add Realtek devices into module device=20
+> table
+>=20
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 93339a4..9874aac 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -64,6 +64,7 @@ static struct usb_driver btusb_driver;
+>  static const struct usb_device_id btusb_table[] =3D {
+>  	/* Generic Bluetooth USB device */
+>  	{ USB_DEVICE_INFO(0xe0, 0x01, 0x01) },
+> +	{ USB_INTERFACE_INFO(0xe0, 0x01, 0x01) },
+> =20
+>  	/* Generic Bluetooth AMP device */
+>  	{ USB_DEVICE_INFO(0xe0, 0x01, 0x04), .driver_info =3D=20
+> BTUSB_AMP },
+
+--=20
+Sjoerd Simons <sjoerd.simons@collabora.co.uk>
+Collabora Ltd.
