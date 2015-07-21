@@ -2,51 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vcgomes@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
-Subject: [PATCH BlueZ v1 13/15] soletta: Add a sample flow using the heartrate node
-Date: Tue, 21 Jul 2015 20:16:46 -0300
-Message-Id: <1437520608-22444-14-git-send-email-vcgomes@gmail.com>
+Subject: [PATCH BlueZ v1 12/15] build: Add heartrate soletta node type to the build system
+Date: Tue, 21 Jul 2015 20:16:45 -0300
+Message-Id: <1437520608-22444-13-git-send-email-vcgomes@gmail.com>
 In-Reply-To: <1437520608-22444-1-git-send-email-vcgomes@gmail.com>
 References: <1437520608-22444-1-git-send-email-vcgomes@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The flow and associated conffile, defines a very simple flow using the
-heartrate node.
-
-With soletta already installed you just run it, something like this:
-
-$ sol-fbp-runner heartrate.fbp
-
-It will look for the sol-flow.conf (which would define options for the
-nodes) in the current directory.
 ---
- peripheral/soletta/heartrate.fbp | 1 +
- peripheral/soletta/sol-flow.json | 8 ++++++++
- 2 files changed, 9 insertions(+)
- create mode 100644 peripheral/soletta/heartrate.fbp
- create mode 100644 peripheral/soletta/sol-flow.json
+ Makefile.tools | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/peripheral/soletta/heartrate.fbp b/peripheral/soletta/heartrate.fbp
-new file mode 100644
-index 0000000..63185c4
---- /dev/null
-+++ b/peripheral/soletta/heartrate.fbp
-@@ -0,0 +1 @@
-+Timer(timer:interval=1000) OUT -> IN Heartrate(heartrate)
-diff --git a/peripheral/soletta/sol-flow.json b/peripheral/soletta/sol-flow.json
-new file mode 100644
-index 0000000..c1f8fca
---- /dev/null
-+++ b/peripheral/soletta/sol-flow.json
-@@ -0,0 +1,8 @@
-+{
-+ "nodetypes": [
-+  {
-+   "name": "Heartrate",
-+   "type": "heartrate"
-+  }
-+ ]
-+}
+diff --git a/Makefile.tools b/Makefile.tools
+index 1899fcb..4e5d645 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -73,6 +73,26 @@ peripheral_btsensor_SOURCES = peripheral/main.c \
+ peripheral_btsensor_LDADD = src/libshared-mainloop.la \
+ 				lib/libbluetooth-internal.la
+ 
++if SOLETTA
++soletta_descdir = @SOLETTA_DESCDIR@/flow/descriptions/
++soletta_desc_DATA = peripheral/soletta/heartrate.json
++solettamodulesdir = @SOLETTA_MODULESDIR@/flow
++solettamodules_LTLIBRARIES = peripheral/soletta/heartrate.la
++peripheral_soletta_heartrate_la_SOURCES = peripheral/soletta/heartrate.c peripheral/gap.h peripheral/gap.c \
++				peripheral/gatt.h peripheral/gatt.c
++peripheral_soletta_heartrate_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version
++peripheral_soletta_heartrate_la_LIBADD = src/libshared-soletta.la \
++			lib/libbluetooth-internal.la \
++			@SOLETTA_LIBS@
++peripheral_soletta_heartrate_la_CFLAGS = $(AM_CFLAGS) @SOLETTA_CFLAGS@ -DSOL_FLOW_NODE_TYPE_MODULE_EXTERNAL
++
++peripheral/soletta/%-gen.c peripheral/soletta/%-gen.h: peripheral/soletta/heartrate-genspec.json
++		$(AM_V_GEN)$(PYTHON) @SOLETTA_PREFIX@/bin/sol-flow-node-type-gen.py $< peripheral/soletta/$*-gen.h peripheral/soletta/$*-gen.c peripheral/soletta/heartrate.json
++
++BUILT_SOURCES += peripheral/soletta/heartrate-gen.c peripheral/soletta/heartrate-gen.h
++
++endif
++
+ tools_3dsp_SOURCES = tools/3dsp.c monitor/bt.h
+ tools_3dsp_LDADD = src/libshared-mainloop.la
+ 
 -- 
 2.4.6
 
