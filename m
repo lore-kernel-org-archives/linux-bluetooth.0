@@ -1,68 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vcgomes@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
-Subject: [PATCH BlueZ v1 00/15] Introducing Soletta peripheral node-type
-Date: Tue, 21 Jul 2015 20:16:33 -0300
-Message-Id: <1437520608-22444-1-git-send-email-vcgomes@gmail.com>
+From: "Cukier, Johnas" <Johnas_Cukier@bose.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Spotted minor bug in btgatt-client.c
+Date: Tue, 21 Jul 2015 20:25:06 +0000
+Message-ID: <SN1PR0801MB1582A043B013B75D8A3D3149E3840@SN1PR0801MB1582.namprd08.prod.outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-Sorry for the delay, Soletta is now using kbuild as a build system,
-the format of the configuration files changed and a few other changes,
-so it was needed some time for the dust to settle.
+I have the BlueZ v. 5.32 release distribution. I was trying to use the BTLE GATT client in the tools subdirectory. All worked fine until I tried to send bytes to the GATT server. Using the "write-value" command, I'm able to send data to a particular handle. However, the data bytes are restricted to two-digit decimals. So, if I try to send 100 (ASCII 'd'), I get an error message. I spotted the problem in lines 728 - 742 (listed below):
 
-Changes from the RFC:
- - Added a README;
- - Added a sample Makefile for building an binary implementing the
-   behaviour expressed in the .fbp file;
+728: for (i = 1; i < argc; i++) {
+729: if (strlen(argv[i]) != 2) {
+730: printf("Invalid value byte: %s\n",
+731: argv[i]);
+732: goto done;
+733: }
+734:
+735: value[i-1] = strtol(argv[i], &endptr, 0);
+736: if (endptr == argv[i] || *endptr != '\0'
+737: || errno == ERANGE) {
+738: printf("Invalid value byte: %s\n",
+739: argv[i]);
+740: goto done;
+741: }
+742: }
 
+In line 729, the data byte is restricted to a string length of two. In line 735, the byte is converted to a decimal number. Since, the string is restricted to length 2, the byte cannot be prefixed by "0x". So, the strtol() function always converts the byte to decimal. My quick solution was to modify line 735 to read as follows:
 
-Cheers,
+735: value[i-1] = strtol(argv[i], &endptr, 16);
 
-Vinicius Costa Gomes (15):
-  build: Add configure-time checks for soletta
-  shared: Add a mainloop implementation using soletta
-  peripheral/gatt: Fix usage of mainloop_ functions
-  peripheral/gatt: Add a way to external services to register services
-  peripheral/gap: Fix missing includes
-  peripheral/gap: Init the gatt_server
-  peripheral: Disable support for static random addresses
-  peripheral/gap: Set the discoverable flag in the advertising
-  peripheral/gatt: Use LOW security level
-  soletta/heartrate: Add a node-type for the Heartrate profile
-  .gitignore: Ignore soletta generated files
-  build: Add heartrate soletta node type to the build system
-  soletta: Add a sample flow using the heartrate node
-  peripheral: Add a README for the Soletta support
-  peripheral: Add a Makefile for building a binary using soletta
+This makes the assumption that all data bytes are in hexadecimal (without the "0x" prefix). This may be confusing to the user since the handle needs the "0x" prefix for it to be interpreted as a hex number. As I said, this is a quick fix that I implemented in my version.
 
- .gitignore                                |   5 +
- Makefile.am                               |   8 +-
- Makefile.tools                            |  20 ++
- configure.ac                              |  38 ++++
- peripheral/gap.c                          |  12 +-
- peripheral/gatt.c                         | 124 +++++++++---
- peripheral/gatt.h                         |   6 +
- peripheral/soletta/Makefile               |  22 +++
- peripheral/soletta/README                 | 140 +++++++++++++
- peripheral/soletta/heartrate-genspec.json |  31 +++
- peripheral/soletta/heartrate.c            | 270 +++++++++++++++++++++++++
- peripheral/soletta/heartrate.fbp          |   1 +
- peripheral/soletta/sol-flow.json          |   8 +
- src/shared/io-soletta.c                   | 317 ++++++++++++++++++++++++++++++
- src/shared/timeout-soletta.c              | 111 +++++++++++
- 15 files changed, 1078 insertions(+), 35 deletions(-)
- create mode 100644 peripheral/soletta/Makefile
- create mode 100644 peripheral/soletta/README
- create mode 100644 peripheral/soletta/heartrate-genspec.json
- create mode 100644 peripheral/soletta/heartrate.c
- create mode 100644 peripheral/soletta/heartrate.fbp
- create mode 100644 peripheral/soletta/sol-flow.json
- create mode 100644 src/shared/io-soletta.c
- create mode 100644 src/shared/timeout-soletta.c
+I've tested this solution and it works now.
 
---
-2.4.6
+  
+ Johnas Cukier
+ Bose Corporation
+ (508)766-9097
+ Johnas_Cukier@bose.com
+    
