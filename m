@@ -1,47 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <55AFD75C.3090004@ubnt.com>
+Date: Wed, 22 Jul 2015 20:48:12 +0300
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
 MIME-Version: 1.0
-Date: Wed, 22 Jul 2015 17:20:55 -0600
-Message-ID: <CAASrBQ=8icxs8ZyW56CXObZH7DFuPf0XDGz=uQPXB1SsQsuimw@mail.gmail.com>
-Subject: bluetoothctl list-attributes command
-From: Mark Rages <markrages@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+To: jamuraa@chromium.org, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: BUG: LE adv manager may miss DBus client disconnection
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I am trying to interact with a low-energy device using bluetoothctl:
+	LE adv manager is supposed to clear advertisements when the DBus client, which did the registration, is disconnected. However, client_disconnect_cb() from advertising.c is not called if DBus client calls RegisterAdvertisement DBus method and then immediately exits (like exit(0)). Next time, the client gets "Maximum advertisements reached" error and is unable to register advertisements until bluetooth daemon is restarted. Obviously, it shouldn't matter for BlueZ daemon whether client terminates gracefully or not. It might be related to some mistake in refcount handling of DBusClient in advertisement code, but I'm not really sure.
+	Bluez 5.32 + Linux 4.1.2 used.
 
-$ bluetoothctl
-[NEW] Controller 00:02:72:C8:B1:AD qountdown-0 [default]
-[NEW] Device F1:4A:78:BD:9C:9F DfuTarg
-[bluetooth]# connect F1:4A:78:BD:9C:9F
-Attempting to connect to F1:4A:78:BD:9C:9F
-[CHG] Device F1:4A:78:BD:9C:9F Connected: yes
-Connection successful
-[DfuTarg]# info
-Device F1:4A:78:BD:9C:9F
-    Name: DfuTarg
-    Alias: DfuTarg
-    Paired: no
-    Trusted: no
-    Blocked: no
-    Connected: yes
-    LegacyPairing: no
-    UUID: Vendor specific           (00001530-1212-efde-1523-785feabcd123)
-    UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
-    UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-    RSSI: -57
-[DfuTarg]# list-attributes
-(hangs forever)
-
-Is list-attributes meant to do something here?
-
-Alternately, can anyone supply an example of select-attribute that
-would allow me to interact with an attribute on this device?  I was
-hoping the output of "list-attributes" would be the clue I need.
--- 
-Regards,
-Mark
-markrages@gmail
+BR, Andrey
