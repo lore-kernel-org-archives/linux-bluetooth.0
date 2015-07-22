@@ -1,40 +1,240 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1437319871-3004-1-git-send-email-dh79.pyun@samsung.com>
-References: <1437319871-3004-1-git-send-email-dh79.pyun@samsung.com>
-Date: Wed, 22 Jul 2015 15:50:19 +0300
-Message-ID: <CABBYNZJ58=w_A6KULNO9n8VWCmnbyPOj2w1OAJbQRhWX5BexVA@mail.gmail.com>
-Subject: Re: [PATCH BLUEZ 0/4] Modify Health profile signals for ObjectManager
+In-Reply-To: <1437558653-30489-1-git-send-email-bharat.panda@samsung.com>
+References: <1437558653-30489-1-git-send-email-bharat.panda@samsung.com>
+Date: Wed, 22 Jul 2015 15:36:47 +0300
+Message-ID: <CABBYNZJJ5_z=yUak7+QEeSOzjWMPmSHrT1gzWmRas22914-o0w@mail.gmail.com>
+Subject: Re: [PATCH v2] audio/avrcp: Add support for GetTotalNumberOfItems
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Dohyun Pyun <re20sfree@gmail.com>
+To: Bharat Panda <bharat.panda@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>
+	cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dohyun,
+Hi Bharat,
 
-On Sun, Jul 19, 2015 at 6:31 PM, Dohyun Pyun <re20sfree@gmail.com> wrote:
-> From: DoHyun Pyun <dh79.pyun@samsung.com>
+On Wed, Jul 22, 2015 at 12:50 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Added support for AVRCP GetTotalNumberOfItems command to get
+> total num of items in a folder(with a given scope) prior calling
+> GetFolderItems to retrieve the content of the folder.
 >
-> Since BlueZ has ObjectManager interface, ChannelConnected and ChannelDeleted
-> Signals of HealthDevice interface was not available. ObjectManager reports the
-> HealthChannel D-Bus interface when g_dbus_emit_signal function is called,
-> and generates "InterfaceAdded" signal. But ChannelConnected and ChannelDeleted
-> Siganls was not generated. If health-api document contains these signals,
-> application or service using Bluez Dbus API will get the unexpected result.
+> On response, emit PropertyChanged for "NumberOfItems" property on
+> MediaPlayer1 interface.
+> ---
+>  profiles/audio/avrcp.c  | 75 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  profiles/audio/player.c | 27 ++++++++++++++++--
+>  profiles/audio/player.h |  4 +++
+>  3 files changed, 104 insertions(+), 2 deletions(-)
 >
-> If we just remove g_dbus_emit_signal for ChannelConnected and ChannelDeleted,
-> InterfaceAdded signal will not sent. Because InterfaceAdded signal is pending
-> before sending a dbus signal. These patches include new property in HealthChannel
-> interfacem, and this PropertiesChanged signal can be used to replace the previous
-> ChannelConnected and ChannelDeleted signals.
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 60f8cbf..90e11a3 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -108,6 +108,7 @@
+>  #define AVRCP_CHANGE_PATH              0x72
+>  #define AVRCP_GET_ITEM_ATTRIBUTES      0x73
+>  #define AVRCP_PLAY_ITEM                        0x74
+> +#define AVRCP_GET_TOTAL_NUMBER_OF_ITEMS        0x75
+>  #define AVRCP_SEARCH                   0x80
+>  #define AVRCP_ADD_TO_NOW_PLAYING       0x90
+>  #define AVRCP_GENERAL_REJECT           0xA0
+> @@ -2821,6 +2822,79 @@ static int ct_add_to_nowplaying(struct media_player *mp, const char *name,
+>         return 0;
+>  }
+>
+> +static gboolean avrcp_get_total_numberofitems_rsp(struct avctp *conn,
+> +                                       uint8_t *operands, size_t operand_count,
+> +                                       void *user_data)
+> +{
+> +       struct avrcp_browsing_header *pdu = (void *) operands;
+> +       struct avrcp *session = user_data;
+> +       struct avrcp_player *player = session->controller->player;
+> +       struct media_player *mp = player->user_data;
+> +       int num_of_items;
+> +
+> +       if (pdu == NULL)
+> +               return -ETIMEDOUT;
+> +
+> +       if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 7)
+> +               return -EINVAL;
+> +
+> +       if (pdu->params[0] == AVRCP_STATUS_OUT_OF_BOUNDS)
+> +               goto done;
+> +
+> +       player->uid_counter = get_be16(&pdu->params[1]);
+> +       num_of_items = get_be32(&pdu->params[3]);
+> +
+> +       if (num_of_items < 0)
+> +               return -EINVAL;
+> +
+> +done:
+> +       media_player_get_number_of_items_complete(mp, num_of_items);
+> +       return FALSE;
+> +}
+> +
+> +static void avrcp_get_total_numberofitems(struct avrcp *session)
+> +{
+> +       uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 7];
+> +       struct avrcp_player *player = session->controller->player;
+> +       struct avrcp_browsing_header *pdu = (void *) buf;
+> +       uint16_t length = AVRCP_BROWSING_HEADER_LENGTH + 7;
+> +
+> +       memset(buf, 0, sizeof(buf));
+> +
+> +       pdu->pdu_id = AVRCP_GET_TOTAL_NUMBER_OF_ITEMS;
+> +       pdu->param_len = htons(7 + sizeof(uint32_t));
+> +
+> +       pdu->params[0] = player->scope;
+> +
+> +       length += sizeof(uint32_t);
 
-Seems like a good idea, but from the logs it looks like the channel
-lifetime is tied with the connection in that case
-InterfacesAdded/InterfacesRemoved can be used directly instead of
-having another property or Im missing something?
+Im confused, what this uint32_t for?
+
+> +       avctp_send_browsing_req(session->conn, buf, sizeof(buf),
+> +                               avrcp_get_total_numberofitems_rsp, session);
+> +}
+> +
+> +static int ct_get_total_numberofitems(struct media_player *mp, const char *name,
+> +                                               void *user_data)
+> +{
+> +       struct avrcp_player *player = user_data;
+> +       struct avrcp *session;
+> +
+> +       if (player->p != NULL)
+> +               return -EBUSY;
+
+What is check above doing? The commands are queued in avctp.c  and you
+don't really use player->p for anything so I wonder why you decided to
+return busy here?
+
+> +       session = player->sessions->data;
+> +
+> +       if (g_str_has_prefix(name, "/NowPlaying"))
+> +               player->scope = 0x03;
+> +       else if (g_str_has_suffix(name, "/search"))
+> +               player->scope = 0x02;
+> +       else
+> +               player->scope = 0x01;
+> +
+> +       avrcp_get_total_numberofitems(session);
+> +
+> +       return 0;
+> +}
+> +
+>  static const struct media_player_callback ct_cbs = {
+>         .set_setting    = ct_set_setting,
+>         .play           = ct_play,
+> @@ -2835,6 +2909,7 @@ static const struct media_player_callback ct_cbs = {
+>         .search         = ct_search,
+>         .play_item      = ct_play_item,
+>         .add_to_nowplaying = ct_add_to_nowplaying,
+> +       .total_items = ct_get_total_numberofitems,
+>  };
+>
+>  static struct avrcp_player *create_ct_player(struct avrcp *session,
+> diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+> index 94eb2eb..e87f073 100644
+> --- a/profiles/audio/player.c
+> +++ b/profiles/audio/player.c
+> @@ -702,6 +702,20 @@ done:
+>         folder->msg = NULL;
+>  }
+>
+> +void media_player_get_number_of_items_complete(struct media_player *mp,
+> +                                                               int num_of_items)
+> +{
+> +       struct media_folder *folder = mp->scope;
+> +
+> +       if (folder == NULL || folder->msg == NULL)
+> +               return;
+> +
+> +       folder->number_of_items = num_of_items;
+
+Check if the value has changed before emitting anything.
+
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(), mp->path,
+> +                               MEDIA_FOLDER_INTERFACE, "NumberOfItems");
+> +}
+> +
+>  static const GDBusMethodTable media_player_methods[] = {
+>         { GDBUS_METHOD("Play", NULL, NULL, media_player_play) },
+>         { GDBUS_METHOD("Pause", NULL, NULL, media_player_pause) },
+> @@ -891,6 +905,9 @@ static void media_folder_destroy(void *data)
+>  static void media_player_change_scope(struct media_player *mp,
+>                                                 struct media_folder *folder)
+>  {
+> +       struct player_callback *cb = mp->cb;
+> +       int err;
+> +
+>         if (mp->scope == folder)
+>                 return;
+>
+> @@ -918,12 +935,18 @@ cleanup:
+>         }
+>
+>  done:
+> +       if (cb->cbs->total_items == NULL)
+> +               DBG("ERROR: Not Supported");
+
+This doesn't look very good, you check for the callback but then even
+if it is NULL you still call it, Id prefer you do the following:
+
+if (cb->cbs->total_items) {...
+
+> +       err = cb->cbs->total_items(mp, folder->item->name,
+> +                                                       cb->user_data);
+> +       if (err < 0)
+> +               DBG("Failed to get total num of items");
+> +
+>         mp->scope = folder;
+>
+>         g_dbus_emit_property_changed(btd_get_dbus_connection(), mp->path,
+>                                 MEDIA_FOLDER_INTERFACE, "Name");
+
+If total_items is not supported then we shall continue emitting
+NumberOfItems directly here.
+
+> -       g_dbus_emit_property_changed(btd_get_dbus_connection(), mp->path,
+> -                               MEDIA_FOLDER_INTERFACE, "NumberOfItems");
+>  }
+>
+>  static struct media_folder *find_folder(GSList *folders, const char *pattern)
+> diff --git a/profiles/audio/player.h b/profiles/audio/player.h
+> index ac2a3da..f1a8fa0 100644
+> --- a/profiles/audio/player.h
+> +++ b/profiles/audio/player.h
+> @@ -64,6 +64,8 @@ struct media_player_callback {
+>                                         uint64_t uid, void *user_data);
+>         int (*add_to_nowplaying) (struct media_player *mp, const char *name,
+>                                         uint64_t uid, void *user_data);
+> +       int (*total_items) (struct media_player *mp, const char *name,
+> +                                               void *user_data);
+>  };
+>
+>  struct media_player *media_player_controller_create(const char *path,
+> @@ -104,6 +106,8 @@ void media_player_list_complete(struct media_player *mp, GSList *items,
+>  void media_player_change_folder_complete(struct media_player *player,
+>                                                 const char *path, int ret);
+>  void media_player_search_complete(struct media_player *mp, int ret);
+> +void media_player_get_number_of_items_complete(struct media_player *mp,
+> +                        int num_of_items);
+
+Be consistent, if the callback is called total_items then the function
+shall be media_player_total_items_complete or rename the callback to
+get_number_of_items.
+
+>  void media_player_set_callbacks(struct media_player *mp,
+>                                 const struct media_player_callback *cbs,
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 
 
 -- 
