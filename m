@@ -1,38 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CDAF57F8-C541-42AF-8FEE-47A5221DF63A@holtmann.org>
-References: <CAKafyqoTVzbVv1Wk21wRSjxyH68bL+gCT_0qF9fvmUWnqkgEeg@mail.gmail.com>
-	<CDAF57F8-C541-42AF-8FEE-47A5221DF63A@holtmann.org>
-Date: Wed, 22 Jul 2015 11:28:17 +0530
-Message-ID: <CAKafyqrhmNKOX258_cH_iYiOi=ALVTVzvxfEd4_HXGJrnHrpuQ@mail.gmail.com>
-Subject: Re: Bluez-Android: L2CAP Socket Communication over
-From: Prabhu Chawandi <foss.chaws@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Anchit Narang <anchit.n@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com, anupam.r@smsung.com
+Subject: [PATCH] android/tester-main.c:Fixed Memory leak
+Date: Wed, 22 Jul 2015 09:57:23 +0530
+Message-id: <1437539243-20709-1-git-send-email-anchit.n@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mercel,
+This patch fixes memory leak issues in various functions
+by allocating memory to  structure step only after intial
+checks are performed as control was returning from these
+checks without freeing memory allocated to it.
+---
+ android/tester-main.c |   36 +++++++++++++++++++++++++++---------
+ 1 file changed, 27 insertions(+), 9 deletions(-)
 
-   I am not looking to add it to AOSP. Could you please add some more
-information If I want to add it for native application.
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 19400fc..3a55792 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -329,7 +329,7 @@ static void mgmt_debug(const char *str, void *user_data)
+ static bool hciemu_post_encr_hook(const void *data, uint16_t len,
+ 							void *user_data)
+ {
+-	struct step *step = g_new0(struct step, 1);
++	struct step *step;
+ 
+ 	/*
+ 	 * Expected data: status (1 octet) + conn. handle (2 octets) +
+@@ -338,6 +338,8 @@ static bool hciemu_post_encr_hook(const void *data, uint16_t len,
+ 	if (len < 4)
+ 		return true;
+ 
++	step = g_new0(struct step, 1);
++
+ 	step->callback = ((uint8_t *)data)[3] ? CB_EMU_ENCRYPTION_ENABLED :
+ 						CB_EMU_ENCRYPTION_DISABLED;
+ 
+@@ -2961,13 +2963,15 @@ void emu_add_rfcomm_server_action(void)
+ 	struct step *current_data_step = queue_peek_head(data->steps);
+ 	struct bt_action_data *rfcomm_data = current_data_step->set_data;
+ 	struct bthost *bthost;
+-	struct step *step = g_new0(struct step, 1);
++	struct step *step;
+ 
+ 	if (!rfcomm_data) {
+ 		tester_warn("Invalid l2cap_data params");
+ 		return;
+ 	}
+ 
++	step = g_new0(struct step, 1);
++
+ 	bthost = hciemu_client_get_host(data->hciemu);
+ 
+ 	bthost_add_rfcomm_server(bthost, rfcomm_data->channel,
+@@ -3010,7 +3014,7 @@ void bluetooth_disable_action(void)
+ void bt_set_property_action(void)
+ {
+ 	struct test_data *data = tester_get_data();
+-	struct step *step = g_new0(struct step, 1);
++	struct step *step;
+ 	struct step *current_data_step = queue_peek_head(data->steps);
+ 	bt_property_t *prop;
+ 
+@@ -3020,6 +3024,8 @@ void bt_set_property_action(void)
+ 		return;
+ 	}
+ 
++	step = g_new0(struct step, 1);
++
+ 	prop = (bt_property_t *)current_data_step->set_data;
+ 
+ 	step->action_status = data->if_bluetooth->set_adapter_property(prop);
+@@ -3030,7 +3036,7 @@ void bt_set_property_action(void)
+ void bt_get_property_action(void)
+ {
+ 	struct test_data *data = tester_get_data();
+-	struct step *step = g_new0(struct step, 1);
++	struct step *step;
+ 	struct step *current_data_step = queue_peek_head(data->steps);
+ 	bt_property_t *prop;
+ 
+@@ -3040,6 +3046,8 @@ void bt_get_property_action(void)
+ 		return;
+ 	}
+ 
++	step = g_new0(struct step, 1);
++
+ 	prop = (bt_property_t *)current_data_step->set_data;
+ 
+ 	step->action_status = data->if_bluetooth->get_adapter_property(
+@@ -3072,7 +3080,7 @@ void bt_get_device_props_action(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	struct step *current_data_step = queue_peek_head(data->steps);
+-	struct step *step = g_new0(struct step, 1);
++	struct step *step;
+ 
+ 	if (!current_data_step->set_data) {
+ 		tester_debug("bdaddr not defined");
+@@ -3080,6 +3088,8 @@ void bt_get_device_props_action(void)
+ 		return;
+ 	}
+ 
++	step = g_new0(struct step, 1);
++
+ 	step->action_status =
+ 		data->if_bluetooth->get_remote_device_properties(
+ 						current_data_step->set_data);
+@@ -3092,7 +3102,7 @@ void bt_get_device_prop_action(void)
+ 	struct test_data *data = tester_get_data();
+ 	struct step *current_data_step = queue_peek_head(data->steps);
+ 	struct bt_action_data *action_data = current_data_step->set_data;
+-	struct step *step = g_new0(struct step, 1);
++	struct step *step;
+ 
+ 	if (!action_data) {
+ 		tester_warn("No arguments for 'get remote device prop' req.");
+@@ -3100,6 +3110,8 @@ void bt_get_device_prop_action(void)
+ 		return;
+ 	}
+ 
++	step = g_new0(struct step, 1);
++
+ 	step->action_status = data->if_bluetooth->get_remote_device_property(
+ 							action_data->addr,
+ 							action_data->prop_type);
+@@ -3112,7 +3124,7 @@ void bt_set_device_prop_action(void)
+ 	struct test_data *data = tester_get_data();
+ 	struct step *current_data_step = queue_peek_head(data->steps);
+ 	struct bt_action_data *action_data = current_data_step->set_data;
+-	struct step *step = g_new0(struct step, 1);
++	struct step *step;
+ 
+ 	if (!action_data) {
+ 		tester_warn("No arguments for 'set remote device prop' req.");
+@@ -3120,6 +3132,8 @@ void bt_set_device_prop_action(void)
+ 		return;
+ 	}
+ 
++	step = g_new0(struct step, 1);
++
+ 	step->action_status = data->if_bluetooth->set_remote_device_property(
+ 							action_data->addr,
+ 							action_data->prop);
+@@ -3132,7 +3146,7 @@ void bt_create_bond_action(void)
+ 	struct test_data *data = tester_get_data();
+ 	struct step *current_data_step = queue_peek_head(data->steps);
+ 	struct bt_action_data *action_data = current_data_step->set_data;
+-	struct step *step = g_new0(struct step, 1);
++	struct step *step;
+ 
+ 	if (!action_data || !action_data->addr) {
+ 		tester_warn("Bad arguments for 'create bond' req.");
+@@ -3140,6 +3154,8 @@ void bt_create_bond_action(void)
+ 		return;
+ 	}
+ 
++	step = g_new0(struct step, 1);
++
+ 	step->action_status =
+ 			data->if_bluetooth->create_bond(action_data->addr,
+ 						action_data->transport_type ?
+@@ -3154,7 +3170,7 @@ void bt_pin_reply_accept_action(void)
+ 	struct test_data *data = tester_get_data();
+ 	struct step *current_data_step = queue_peek_head(data->steps);
+ 	struct bt_action_data *action_data = current_data_step->set_data;
+-	struct step *step = g_new0(struct step, 1);
++	struct step *step;
+ 
+ 	if (!action_data || !action_data->addr || !action_data->pin) {
+ 		tester_warn("Bad arguments for 'pin reply' req.");
+@@ -3162,6 +3178,8 @@ void bt_pin_reply_accept_action(void)
+ 		return;
+ 	}
+ 
++	step = g_new0(struct step, 1);
++
+ 	step->action_status = data->if_bluetooth->pin_reply(action_data->addr,
+ 							TRUE,
+ 							action_data->pin_len,
+-- 
+1.7.9.5
 
-Thanks for your inputs ..
-
-ManyThanks,
-Prabhu
-
-On Fri, Jun 19, 2015 at 6:19 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Prabhu,
->
->>  Currently, I see only rfcomm sockets, I want L2CAP socket
->> communication for my use case.
->>
->> I am looking to add this support.  Share me your views on this.
->
-> should be pretty straight forward to add to BfA. However getting support into Bluetooth Service into AOSP might be a bit more trickier. Native application of course can always open the L2CAP socket directly.
->
-> Regards
->
-> Marcel
->
