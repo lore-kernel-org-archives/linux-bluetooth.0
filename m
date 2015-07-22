@@ -1,241 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1437558653-30489-1-git-send-email-bharat.panda@samsung.com>
-References: <1437558653-30489-1-git-send-email-bharat.panda@samsung.com>
-Date: Wed, 22 Jul 2015 15:36:47 +0300
-Message-ID: <CABBYNZJJ5_z=yUak7+QEeSOzjWMPmSHrT1gzWmRas22914-o0w@mail.gmail.com>
-Subject: Re: [PATCH v2] audio/avrcp: Add support for GetTotalNumberOfItems
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v3 2/2] Bluetooth: Enable new connection establishment procedure.
+Date: Wed, 22 Jul 2015 13:29:37 +0200
+Message-Id: <1437564577-4207-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1437564577-4207-1-git-send-email-jpawlowski@google.com>
+References: <1437564577-4207-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+Currently, when trying to connect to already paired device that just
+rotated its RPA MAC address, old address would be used and connection
+would fail. In order to fix that, kernel must scan and receive
+advertisement with fresh RPA before connecting.
 
-On Wed, Jul 22, 2015 at 12:50 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Added support for AVRCP GetTotalNumberOfItems command to get
-> total num of items in a folder(with a given scope) prior calling
-> GetFolderItems to retrieve the content of the folder.
->
-> On response, emit PropertyChanged for "NumberOfItems" property on
-> MediaPlayer1 interface.
-> ---
->  profiles/audio/avrcp.c  | 75 +++++++++++++++++++++++++++++++++++++++++++++++++
->  profiles/audio/player.c | 27 ++++++++++++++++--
->  profiles/audio/player.h |  4 +++
->  3 files changed, 104 insertions(+), 2 deletions(-)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 60f8cbf..90e11a3 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -108,6 +108,7 @@
->  #define AVRCP_CHANGE_PATH              0x72
->  #define AVRCP_GET_ITEM_ATTRIBUTES      0x73
->  #define AVRCP_PLAY_ITEM                        0x74
-> +#define AVRCP_GET_TOTAL_NUMBER_OF_ITEMS        0x75
->  #define AVRCP_SEARCH                   0x80
->  #define AVRCP_ADD_TO_NOW_PLAYING       0x90
->  #define AVRCP_GENERAL_REJECT           0xA0
-> @@ -2821,6 +2822,79 @@ static int ct_add_to_nowplaying(struct media_player *mp, const char *name,
->         return 0;
->  }
->
-> +static gboolean avrcp_get_total_numberofitems_rsp(struct avctp *conn,
-> +                                       uint8_t *operands, size_t operand_count,
-> +                                       void *user_data)
-> +{
-> +       struct avrcp_browsing_header *pdu = (void *) operands;
-> +       struct avrcp *session = user_data;
-> +       struct avrcp_player *player = session->controller->player;
-> +       struct media_player *mp = player->user_data;
-> +       int num_of_items;
-> +
-> +       if (pdu == NULL)
-> +               return -ETIMEDOUT;
-> +
-> +       if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 7)
-> +               return -EINVAL;
-> +
-> +       if (pdu->params[0] == AVRCP_STATUS_OUT_OF_BOUNDS)
-> +               goto done;
-> +
-> +       player->uid_counter = get_be16(&pdu->params[1]);
-> +       num_of_items = get_be32(&pdu->params[3]);
-> +
-> +       if (num_of_items < 0)
-> +               return -EINVAL;
-> +
-> +done:
-> +       media_player_get_number_of_items_complete(mp, num_of_items);
-> +       return FALSE;
-> +}
-> +
-> +static void avrcp_get_total_numberofitems(struct avrcp *session)
-> +{
-> +       uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 7];
-> +       struct avrcp_player *player = session->controller->player;
-> +       struct avrcp_browsing_header *pdu = (void *) buf;
-> +       uint16_t length = AVRCP_BROWSING_HEADER_LENGTH + 7;
-> +
-> +       memset(buf, 0, sizeof(buf));
-> +
-> +       pdu->pdu_id = AVRCP_GET_TOTAL_NUMBER_OF_ITEMS;
-> +       pdu->param_len = htons(7 + sizeof(uint32_t));
-> +
-> +       pdu->params[0] = player->scope;
-> +
-> +       length += sizeof(uint32_t);
+This patch enables new connection establishment procedure. Instead of just
+sending HCI_OP_LE_CREATE_CONN to controller, "connect" will add device to
+kernel whitelist and start scan. If advertisement is received, it'll be
+compared against whitelist and then trigger connection if it matches.
+That fixes mentioned reconnect issue for  already paired devices. It also
+make whole connection procedure more robust. We can try to connect to
+multiple devices at same time now, even though controller allow only one.
 
-Im confused, what this uint32_t for?
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ net/bluetooth/l2cap_core.c | 6 ++++--
+ net/bluetooth/mgmt.c       | 7 ++++---
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-> +       avctp_send_browsing_req(session->conn, buf, sizeof(buf),
-> +                               avrcp_get_total_numberofitems_rsp, session);
-> +}
-> +
-> +static int ct_get_total_numberofitems(struct media_player *mp, const char *name,
-> +                                               void *user_data)
-> +{
-> +       struct avrcp_player *player = user_data;
-> +       struct avrcp *session;
-> +
-> +       if (player->p != NULL)
-> +               return -EBUSY;
-
-What is check above doing? The commands are queued in avctp.c  and you
-don't really use player->p for anything so I wonder why you decided to
-return busy here?
-
-> +       session = player->sessions->data;
-> +
-> +       if (g_str_has_prefix(name, "/NowPlaying"))
-> +               player->scope = 0x03;
-> +       else if (g_str_has_suffix(name, "/search"))
-> +               player->scope = 0x02;
-> +       else
-> +               player->scope = 0x01;
-> +
-> +       avrcp_get_total_numberofitems(session);
-> +
-> +       return 0;
-> +}
-> +
->  static const struct media_player_callback ct_cbs = {
->         .set_setting    = ct_set_setting,
->         .play           = ct_play,
-> @@ -2835,6 +2909,7 @@ static const struct media_player_callback ct_cbs = {
->         .search         = ct_search,
->         .play_item      = ct_play_item,
->         .add_to_nowplaying = ct_add_to_nowplaying,
-> +       .total_items = ct_get_total_numberofitems,
->  };
->
->  static struct avrcp_player *create_ct_player(struct avrcp *session,
-> diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-> index 94eb2eb..e87f073 100644
-> --- a/profiles/audio/player.c
-> +++ b/profiles/audio/player.c
-> @@ -702,6 +702,20 @@ done:
->         folder->msg = NULL;
->  }
->
-> +void media_player_get_number_of_items_complete(struct media_player *mp,
-> +                                                               int num_of_items)
-> +{
-> +       struct media_folder *folder = mp->scope;
-> +
-> +       if (folder == NULL || folder->msg == NULL)
-> +               return;
-> +
-> +       folder->number_of_items = num_of_items;
-
-Check if the value has changed before emitting anything.
-
-> +       g_dbus_emit_property_changed(btd_get_dbus_connection(), mp->path,
-> +                               MEDIA_FOLDER_INTERFACE, "NumberOfItems");
-> +}
-> +
->  static const GDBusMethodTable media_player_methods[] = {
->         { GDBUS_METHOD("Play", NULL, NULL, media_player_play) },
->         { GDBUS_METHOD("Pause", NULL, NULL, media_player_pause) },
-> @@ -891,6 +905,9 @@ static void media_folder_destroy(void *data)
->  static void media_player_change_scope(struct media_player *mp,
->                                                 struct media_folder *folder)
->  {
-> +       struct player_callback *cb = mp->cb;
-> +       int err;
-> +
->         if (mp->scope == folder)
->                 return;
->
-> @@ -918,12 +935,18 @@ cleanup:
->         }
->
->  done:
-> +       if (cb->cbs->total_items == NULL)
-> +               DBG("ERROR: Not Supported");
-
-This doesn't look very good, you check for the callback but then even
-if it is NULL you still call it, Id prefer you do the following:
-
-if (cb->cbs->total_items) {...
-
-> +       err = cb->cbs->total_items(mp, folder->item->name,
-> +                                                       cb->user_data);
-> +       if (err < 0)
-> +               DBG("Failed to get total num of items");
-> +
->         mp->scope = folder;
->
->         g_dbus_emit_property_changed(btd_get_dbus_connection(), mp->path,
->                                 MEDIA_FOLDER_INTERFACE, "Name");
-
-If total_items is not supported then we shall continue emitting
-NumberOfItems directly here.
-
-> -       g_dbus_emit_property_changed(btd_get_dbus_connection(), mp->path,
-> -                               MEDIA_FOLDER_INTERFACE, "NumberOfItems");
->  }
->
->  static struct media_folder *find_folder(GSList *folders, const char *pattern)
-> diff --git a/profiles/audio/player.h b/profiles/audio/player.h
-> index ac2a3da..f1a8fa0 100644
-> --- a/profiles/audio/player.h
-> +++ b/profiles/audio/player.h
-> @@ -64,6 +64,8 @@ struct media_player_callback {
->                                         uint64_t uid, void *user_data);
->         int (*add_to_nowplaying) (struct media_player *mp, const char *name,
->                                         uint64_t uid, void *user_data);
-> +       int (*total_items) (struct media_player *mp, const char *name,
-> +                                               void *user_data);
->  };
->
->  struct media_player *media_player_controller_create(const char *path,
-> @@ -104,6 +106,8 @@ void media_player_list_complete(struct media_player *mp, GSList *items,
->  void media_player_change_folder_complete(struct media_player *player,
->                                                 const char *path, int ret);
->  void media_player_search_complete(struct media_player *mp, int ret);
-> +void media_player_get_number_of_items_complete(struct media_player *mp,
-> +                        int num_of_items);
-
-Be consistent, if the callback is called total_items then the function
-shall be media_player_total_items_complete or rename the callback to
-get_number_of_items.
-
->  void media_player_set_callbacks(struct media_player *mp,
->                                 const struct media_player_callback *cbs,
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 45fffa4..121d039 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7113,8 +7113,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		else
+ 			role = HCI_ROLE_MASTER;
+ 
+-		hcon = hci_connect_le(hdev, dst, dst_type, chan->sec_level,
+-				      HCI_LE_CONN_TIMEOUT, role);
++		hcon = hci_add_to_sock_conn_whitelist(hdev, dst, dst_type,
++						      chan->sec_level,
++						      HCI_LE_CONN_TIMEOUT,
++						      role);
+ 	} else {
+ 		u8 auth_type = l2cap_get_auth_type(chan);
+ 		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ce403ff..f803abf 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3564,9 +3564,10 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		 */
+ 		hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
+ 
+-		conn = hci_connect_le(hdev, &cp->addr.bdaddr, addr_type,
+-				      sec_level, HCI_LE_CONN_TIMEOUT,
+-				      HCI_ROLE_MASTER);
++		conn = hci_add_to_sock_conn_whitelist(hdev, &cp->addr.bdaddr,
++						      addr_type, sec_level,
++						      HCI_LE_CONN_TIMEOUT,
++						      HCI_ROLE_MASTER);
+ 	}
+ 
+ 	if (IS_ERR(conn)) {
 -- 
-Luiz Augusto von Dentz
+2.1.4
+
