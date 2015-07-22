@@ -2,49 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Atul Rai <a.rai@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: sachin.dev@samsung.com
-Subject: [PATCH] android/hal-bluetooth: Fix NULL ptr dereference
-Date: Wed, 22 Jul 2015 14:35:33 +0530
-Message-id: <1437555933-11333-1-git-send-email-a.rai@samsung.com>
+Subject: [PATCH] android/client: Fix memory leak while using realloc()
+Date: Wed, 22 Jul 2015 14:03:03 +0530
+Message-id: <1437553983-11102-1-git-send-email-a.rai@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+While reallocating space to store additional "remote device set" using
+realloc, if realloc() fails, the original block is left untouched but
+reference to that block is lost as NULL is assigned to remote_devices.
+The original block needs to be freed before return.
+---
+ android/client/if-bt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-> ------- Original Message -------
-> Sender : Atul Kumar Rai<a.rai@samsung.com> Lead Engineer (1)/SRI-Delhi-SWC Group/Samsung Electronics
-> Date : Jun 29, 2015 12:14 (GMT+05:30)
-> Title : [PATCH] android/hal-bluetooth: Fix NULL ptr dereference
->
-> Add NULL check on malloc return to fix NULL pointer dereference
-> in case malloc fails.
-> ---
->  android/hal-bluetooth.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-> index e24f7d2..66f4a37 100644
-> --- a/android/hal-bluetooth.c
-> +++ b/android/hal-bluetooth.c
-> @@ -19,6 +19,7 @@
->  #include <stdlib.h>
->  #include <stdbool.h>
->  #include <string.h>
-> +#include <errno.h>
->  
->  #include <cutils/properties.h>
->  
-> @@ -1103,6 +1104,11 @@ static int open_bluetooth(const struct hw_module_t *module, char const *name,
->  
->  	DBG("");
->  
-> +	if (!dev) {
-> +		error("Failed to allocate memory for device");
-> +		return -ENOMEM;
-> +	}
-> +
->  	memset(dev, 0, sizeof(bluetooth_device_t));
->  	dev->common.tag = HARDWARE_DEVICE_TAG;
->  	dev->common.version = 0;
-> -- 
-> 2.1.4
-> 
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 4723024..4249f78 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -94,6 +94,7 @@ static int remote_devices_capacity = 0;
+ void add_remote_device(const bt_bdaddr_t *addr)
+ {
+ 	int i;
++	bt_bdaddr_t *tmp;
+ 
+ 	if (remote_devices == NULL) {
+ 		remote_devices = malloc(4 * sizeof(bt_bdaddr_t));
+@@ -119,9 +120,16 @@ void add_remote_device(const bt_bdaddr_t *addr)
+ 	/* Realloc space if needed */
+ 	if (remote_devices_cnt >= remote_devices_capacity) {
+ 		remote_devices_capacity *= 2;
++		/*
++		 * Save reference to previously allocated memory block so that
++		 * it can be freed in case realloc fails.
++		 */
++		tmp = remote_devices;
++
+ 		remote_devices = realloc(remote_devices, sizeof(bt_bdaddr_t) *
+ 						remote_devices_capacity);
+ 		if (remote_devices == NULL) {
++			free(tmp);
+ 			remote_devices_capacity = 0;
+ 			remote_devices_cnt = 0;
+ 			return;
+-- 
+2.1.4
+
