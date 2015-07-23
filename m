@@ -1,71 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Jul 2015 18:17:22 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth 2015-07-23
-Message-ID: <20150723151722.GA20850@t440s.ger.corp.intel.com>
+Message-ID: <55B1022F.8080602@linux.intel.com>
+Date: Thu, 23 Jul 2015 17:03:11 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="TB36FDmn/VVEgNH/"
+To: Ilya Faenson <ifaenson@broadcom.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Arend Van Spriel <arend@broadcom.com>
+Subject: Re: [PATCH 1/3] Bluetooth: hci_uart: Add PM for BCM2E39
+References: <1435929751-26831-1-git-send-email-frederic.danis@linux.intel.com> <55A7D771.9020705@linux.intel.com> <E0D3336E15B58B4294723AC879BA5E9426DDF7@IRVEXCHMB15.corp.ad.broadcom.com>
+In-Reply-To: <E0D3336E15B58B4294723AC879BA5E9426DDF7@IRVEXCHMB15.corp.ad.broadcom.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hello Ilya,
 
---TB36FDmn/VVEgNH/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 16/07/2015 20:54, Ilya Faenson wrote:
+> Hi Fred,
+>
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org
+> [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Frederic Danis
+> Sent: Thursday, July 16, 2015 12:10 PM
+> To: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH 1/3] Bluetooth: hci_uart: Add PM for BCM2E39
+>
+> Ping ?
+>
+> On 03/07/2015 15:22, Frederic Danis wrote:
+> > Retrieve "shutdown" and "device_wakeup" GPIOs from ACPI.
+> > Set device off during platform device enumeration.
+> > Set device on only when it is attached.
+>
+> IF: Sorry for the delay in responding. I am not actively working on
+> the similar DT driver at the moment as we have hit a DT maintainer
+> roadblock for its development. I do not read this bulletin board much
+> therefore. Great seeing a first take on the Broadcom BT UART ACPI
+> driver! Looks like a good start to me. A few comments:
+> if01. I would turn the device on when the BCM protocol is opened and
+> turn the device off when the protocol is closed.
 
-Hi Dave,
+This is what I try to said by "Set device on only when it is attached.".
 
-Here's another one-patch pull request for 4.2 which targets a potential
-NULL pointer dereference in the LE Security Manager code that can be
-triggered by using older user space tools. The issue has been there
-since 4.0 so there's the appropriate "Cc: stable" in place.
+> if02. I would strongly encourage you to start supporting the runtime
+> suspend upon a period of inactivity, resume and the
+> interrupt-triggered wake as related power savings are significant. You
+> would obviously need to set reasonable sleep parameters via the VSC
+> then. Of course, we would also want to flow control the device in
+> suspend time to avoid character loss. See my DT patches for the VSC
+> and UART flow control particulars.
 
-Let me know if there are any issues pulling. Thanks.
+This is in my todo list.
 
-Johan
+> if03. We would also want at least to suspend and resume the device
+> when the platform suspends/resumes as a whole.
+> if04. A great enhancement would have also been to make a decision
+> whether to suspend or turn off the device at the time of the platform
+> suspend. That would require BT knowledge of what's paired etc. We
+> would obviously need to resume or turn it back on at the platform
+> resume time accordingly.
+> if05. We should ideally support running on the Broadcom BT UART ACPI
+> node as it ships now in hundreds of laptop/tablet/phone models while
+> you apparently rely on Linux specific enhancements to this extent. We
+> want to let users dual boot with BT working fine in either operating
+> system. Would you publish a relevant DSL snippet of what you've done
+> in the ACPI on your test platform?
 
----
-The following changes since commit c5dfd654d0ec0a28fe81e7bd4d4fd984a9855e09:
+I did not change anything in the ACPI table of the T100.
+Here is what I extracted from T100 related to BCM2E39 :
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net (2015-07-22 14:45:25 -0700)
+     Scope (_SB.URT1)
+     {
+         Device (BTH0)
+         {
+             Name (_HID, "BCM2E39")  // _HID: Hardware ID
+             Name (_DEP, Package (0x03)  // _DEP: Dependencies
+             {
+                 GPO0,
+                 GPO2,
+                 URT1
+             })
+             Method (_STA, 0, NotSerialized)  // _STA: Status
+             {
+                 Return (0x0F)
+             }
 
-are available in the git repository at:
+             Method (_CRS, 0, NotSerialized)  // _CRS: Current Resource 
+Settings
+             {
+                 Name (UBUF, ResourceTemplate ()
+                 {
+                     UartSerialBus (0x0001C200, DataBitsEight, StopBitsOne,
+                         0xFC, LittleEndian, ParityTypeNone, 
+FlowControlHardware,
+                         0x0020, 0x0020, "\\_SB.URT1",
+                         0x00, ResourceConsumer, ,
+                         )
+                     Interrupt (ResourceConsumer, Edge, ActiveHigh, 
+ExclusiveAndWake, ,, )
+                     {
+                         0x00000046,
+                     }
+                     GpioIo (Exclusive, PullDefault, 0x0000, 0x0000, 
+IoRestrictionOutputOnly,
+                         "\\_SB.GPO0", 0x00, ResourceConsumer, ,
+                         )
+                         {   // Pin list
+                             0x0034
+                         }
+                     GpioIo (Exclusive, PullDefault, 0x0000, 0x0000, 
+IoRestrictionOutputOnly,
+                         "\\_SB.GPO2", 0x00, ResourceConsumer, ,
+                         )
+                         {   // Pin list
+                             0x0009
+                         }
+                 })
+                 Name (PBUF, ResourceTemplate ()
+                 {
+                     UartSerialBus (0x0001C200, DataBitsEight, StopBitsOne,
+                         0xFC, LittleEndian, ParityTypeNone, 
+FlowControlNone,
+                         0x0020, 0x0020, "\\_SB.URT1",
+                         0x00, ResourceConsumer, ,
+                         )
+                     Interrupt (ResourceConsumer, Edge, ActiveHigh, 
+ExclusiveAndWake, ,, )
+                     {
+                         0x00000046,
+                     }
+                     GpioIo (Exclusive, PullDefault, 0x0000, 0x0000, 
+IoRestrictionOutputOnly,
+                         "\\_SB.GPO2", 0x00, ResourceConsumer, ,
+                         )
+                         {   // Pin list
+                             0x0009
+                         }
+                     GpioIo (Exclusive, PullDefault, 0x0000, 0x0000, 
+IoRestrictionOutputOnly,
+                         "\\_SB.GPO0", 0x00, ResourceConsumer, ,
+                         )
+                         {   // Pin list
+                             0x0034
+                         }
+                 })
+                 Return (UBUF)
+             }
+         }
+     }
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
 
-for you to fetch changes up to 25ba265390c09b0a2b2f3fd9ba82e37248b7a371:
 
-  Bluetooth: Fix NULL pointer dereference in smp_conn_security (2015-07-23 16:41:24 +0200)
+Regards
 
-----------------------------------------------------------------
-Johan Hedberg (1):
-      Bluetooth: Fix NULL pointer dereference in smp_conn_security
+Fred
 
- net/bluetooth/smp.c | 4 ++++
- 1 file changed, 4 insertions(+)
+-- 
+Frederic Danis Open Source Technology Center
+frederic.danis@intel.com Intel Corporation
 
---TB36FDmn/VVEgNH/
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJVsQWCAAoJECQj9vv5qNQSNYEP/jdc48d4zP0vnFEpD47SBuIn
-7KhEr3qAiCkLFUgV8efW0MWcePLhTQZywKZBlszsURKd4eeGuLaUXo8eAjsm+683
-f672H4iVcBuQfMFbE1pNbSknX55zpHBD2wlW54FJ6QC5nVxcJzFmUBNCcA4aFHct
-nT9SOZOaMU41ZJy7BVhCbW74OB2H3siEftR3aKYE7ol2KEL/vB0Eh0xDZ1zs7CEg
-KWtPBQ/5t0SqGnsMeb1CBspsfc8WceSDG1q2JMUGYiX+vhEZO/4Zk5ZXWQuPq1tH
-U36S0SnSVjiLqYOleyLvB+R93mdT9eZvZdmw8+AJA6LZH4uhnlpqPraLuZ3iUtcv
-AiCGievtSeeom8NvlZTjy3DQRWVvGok4Ubbw8J1fgzD90laNYTL/0PcfA9SpoFt3
-YA9cxqP+wdPRZUJ/jbHKpq+CIEl7wANDngSXtwmqVi0lAn/GRIxxPvzPgSCrC4xz
-ecxe2fnlNAKs3Mk9i+Vo1I0Ckx7CmjfiAc5F41kqRgyTv021dp466O/ZMxgFlFDX
-UhVm09iTtr1wYjfjrbBqBqQfGvuc4G3LGFgtGTq0/dyAA2ut1q2RVjBtefQ9w15/
-BMwDTub1h/VzQLxbBcUZ5H/kblzN0x6m5uawdVVxvzRKS9E2SkmLoi5htQbFbH/d
-yUGgJXa+kGDePdaHHR89
-=T1UA
------END PGP SIGNATURE-----
-
---TB36FDmn/VVEgNH/--
