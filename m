@@ -1,68 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
+To: Alexander Aring <alex.aring@gmail.com>
+CC: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Bakke, Glenn Ruben" <Glenn.Ruben.Bakke@nordicsemi.no>
+Subject: RE: [RFC v2 4/4] Bluetooth: 6lowpan: Enable stateful compression in
+ bluetooth_6lowpan
+Date: Thu, 23 Jul 2015 08:09:39 +0000
+Message-ID: <AB80DA35A7B64E4E98291794926897D9D1D317E1@mbx04.nvlsi.no>
+References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
+ <1436788233-13960-5-git-send-email-lukasz.duda@nordicsemi.no>
+ <20150723075523.GA19536@omega>
+In-Reply-To: <20150723075523.GA19536@omega>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <CAASrBQ=8icxs8ZyW56CXObZH7DFuPf0XDGz=uQPXB1SsQsuimw@mail.gmail.com>
-References: <CAASrBQ=8icxs8ZyW56CXObZH7DFuPf0XDGz=uQPXB1SsQsuimw@mail.gmail.com>
-Date: Thu, 23 Jul 2015 11:11:15 +0300
-Message-ID: <CABBYNZL7x4GpgC+JRU=owGmOfs5JdVRHaiCXOe_5oC+oY9BbNg@mail.gmail.com>
-Subject: Re: bluetoothctl list-attributes command
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mark Rages <markrages@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mark,
-
-On Thu, Jul 23, 2015 at 2:20 AM, Mark Rages <markrages@gmail.com> wrote:
-> Hi,
->
-> I am trying to interact with a low-energy device using bluetoothctl:
->
-> $ bluetoothctl
-> [NEW] Controller 00:02:72:C8:B1:AD qountdown-0 [default]
-> [NEW] Device F1:4A:78:BD:9C:9F DfuTarg
-> [bluetooth]# connect F1:4A:78:BD:9C:9F
-> Attempting to connect to F1:4A:78:BD:9C:9F
-> [CHG] Device F1:4A:78:BD:9C:9F Connected: yes
-> Connection successful
-> [DfuTarg]# info
-> Device F1:4A:78:BD:9C:9F
->     Name: DfuTarg
->     Alias: DfuTarg
->     Paired: no
->     Trusted: no
->     Blocked: no
->     Connected: yes
->     LegacyPairing: no
->     UUID: Vendor specific           (00001530-1212-efde-1523-785feabcd123)
->     UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
->     UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
->     RSSI: -57
-> [DfuTarg]# list-attributes
-> (hangs forever)
-
-Does it hangs or just doesn't print anything?
-
-> Is list-attributes meant to do something here?
->
-> Alternately, can anyone supply an example of select-attribute that
-> would allow me to interact with an attribute on this device?  I was
-> hoping the output of "list-attributes" would be the clue I need.
-
-I suspect something else is going on, perhaps bluetoothd could not
-find any attributes or maybe it is connected over classic?
-
-> --
-> Regards,
-> Mark
-> markrages@gmail
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+SGkgQXJpbmcsDQoNCj4gT24gTW9uLCBKdWwgMTMsIDIwMTUgYXQgMDE6NTA6MzNQTSArMDIwMCwg
+THVrYXN6IER1ZGEgd3JvdGU6DQo+ID4gQWxsb2NhdGluZyBjb250ZXh0IHRhYmxlIGZvciBzdGF0
+ZWZ1bCBjb21wcmVzc2lvbiB3aGVuIGludGVyZmFjZSBpcw0KPiA+IHNldCB1cC4gUmVtb3Zpbmcg
+Y29udGV4dCB0YWJsZSB3aGVuIGludGVyZmFjZSBpcyBiZWluZyB1bnJlZ2lzdGVyZWQuDQo+ID4N
+Cj4gPiBTaWduZWQtb2ZmLWJ5OiBMdWthc3ogRHVkYSA8bHVrYXN6LmR1ZGFAbm9yZGljc2VtaS5u
+bz4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBHbGVubiBSdWJlbiBCYWtrZSA8Z2xlbm4ucnViZW4uYmFr
+a2VAbm9yZGljc2VtaS5ubz4NCj4gPiAtLS0NCj4gPiAgbmV0L2JsdWV0b290aC82bG93cGFuLmMg
+fCA0ICsrKysNCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKQ0KPiA+DQo+ID4g
+ZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvNmxvd3Bhbi5jIGIvbmV0L2JsdWV0b290aC82bG93
+cGFuLmMgaW5kZXgNCj4gPiAyZmI3YjMwLi42MGM3ZTgwIDEwMDY0NA0KPiA+IC0tLSBhL25ldC9i
+bHVldG9vdGgvNmxvd3Bhbi5jDQo+ID4gKysrIGIvbmV0L2JsdWV0b290aC82bG93cGFuLmMNCj4g
+PiBAQCAtODcxLDYgKzg3MSw5IEBAIHN0YXRpYyBpbnQgc2V0dXBfbmV0ZGV2KHN0cnVjdCBsMmNh
+cF9jaGFuICpjaGFuLA0KPiBzdHJ1Y3QgbG93cGFuX2RldiAqKmRldikNCj4gPiAgCSAgICAgICAm
+Y2hhbi0+c3JjLCBjaGFuLT5zcmNfdHlwZSk7DQo+ID4gIAlzZXRfYml0KF9fTElOS19TVEFURV9Q
+UkVTRU5ULCAmbmV0ZGV2LT5zdGF0ZSk7DQo+ID4NCj4gPiArCS8qIEFsbG9jYXRlIGNvbnRleHQg
+dGFibGUgZm9yIHN0YXRlZnVsIGNvbXByZXNzaW9uLiAqLw0KPiA+ICsJbG93cGFuX2NvbnRleHRf
+dGFibGVfYWxsb2MobmV0ZGV2KTsNCj4gPiArDQo+ID4gIAkqZGV2ID0gbmV0ZGV2X3ByaXYobmV0
+ZGV2KTsNCj4gPiAgCSgqZGV2KS0+bmV0ZGV2ID0gbmV0ZGV2Ow0KPiA+ICAJKCpkZXYpLT5oZGV2
+ID0gY2hhbi0+Y29ubi0+aGNvbi0+aGRldjsgQEAgLTE0MTUsNiArMTQxOCw3IEBADQo+IHN0YXRp
+Yw0KPiA+IGludCBkZXZpY2VfZXZlbnQoc3RydWN0IG5vdGlmaWVyX2Jsb2NrICp1bnVzZWQsDQo+
+ID4gIAkJCWlmIChlbnRyeS0+bmV0ZGV2ID09IG5ldGRldikgew0KPiA+ICAJCQkJQlRfREJHKCJV
+bnJlZ2lzdGVyZWQgbmV0ZGV2ICVzICVwIiwNCj4gPiAgCQkJCSAgICAgICBuZXRkZXYtPm5hbWUs
+IG5ldGRldik7DQo+ID4gKwkJCQlsb3dwYW5fY29udGV4dF90YWJsZV9mcmVlKG5ldGRldik7DQo+
+ID4gIAkJCQlsaXN0X2RlbCgmZW50cnktPmxpc3QpOw0KPiA+ICAJCQkJYnJlYWs7DQo+ID4gIAkJ
+CX0NCj4gDQo+IERvbid0IHdlIG5lZWQgc2ltaWxhciBhbGxvY2F0aW9uIGluIG5ldC9pZWVlODAy
+MTU0LzZsb3dwYW4vY29yZS5jID8NCj4gDQo+IC0gQWxleA0KDQpZZXMgd2UgbmVlZCB0aGUgc2Ft
+ZSBmb3IgSUVFRTgwMi4xNS40LiBTaW5jZSBJIGNhbiB0ZXN0IHN0YXRlZnVsIGNvbXByZXNzaW9u
+IGZlYXR1cmUgb25seSB3aXRoIEJULUxFIHJpZ2h0IG5vdywgDQpJIGRlY2lkZWQgdG8gbm90IHRv
+dWNoIHRoaXMgcGFydC4gSG93ZXZlciB0aGlzIGlzIGFuIG9idmlvdXMgZ29hbCB0byBjcmVhdGUg
+Z2VuZXJpYyBzdGF0ZWZ1bCBjb21wcmVzc2lvbiBmb3IgYWxsDQpzZXQgb2YgNkxvV1BBTiBwcm90
+b2NvbHMuDQoNClJlZ2FyZHMsDQrFgXVrYXN6DQo=
