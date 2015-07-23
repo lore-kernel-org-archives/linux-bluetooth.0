@@ -1,31 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Dohyun Pyun <re20sfree@gmail.com>, linux-bluetooth@vger.kernel.org
-Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>
-Subject: Re: [PATCH Bluez] tools/l2test: Fix potention double close
-In-Reply-To: <1436859557-16153-1-git-send-email-dh79.pyun@samsung.com>
-References: <1436859557-16153-1-git-send-email-dh79.pyun@samsung.com>
-Date: Thu, 23 Jul 2015 18:23:32 -0300
-Message-ID: <87a8um6017.fsf@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAASrBQmkn3L1MhJbJ9NCGUQz1QJ1YAt6WSnBp-gT7Cn3Ti1YWA@mail.gmail.com>
+References: <CAASrBQ=8icxs8ZyW56CXObZH7DFuPf0XDGz=uQPXB1SsQsuimw@mail.gmail.com>
+	<CABBYNZL7x4GpgC+JRU=owGmOfs5JdVRHaiCXOe_5oC+oY9BbNg@mail.gmail.com>
+	<CAASrBQmkn3L1MhJbJ9NCGUQz1QJ1YAt6WSnBp-gT7Cn3Ti1YWA@mail.gmail.com>
+Date: Thu, 23 Jul 2015 22:27:42 +0300
+Message-ID: <CABBYNZLVdcNQTAaXFqdHp_Me4LjuT0ZuauJ2YU1PsROihmsrVA@mail.gmail.com>
+Subject: Re: bluetoothctl list-attributes command
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mark Rages <markrages@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mark,
 
-Dohyun Pyun <re20sfree@gmail.com> writes:
-
-> From: DoHyun Pyun <dh79.pyun@samsung.com>
+On Thu, Jul 23, 2015 at 9:57 PM, Mark Rages <markrages@gmail.com> wrote:
+> On Thu, Jul 23, 2015 at 2:11 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
 >
-> If the test gets an error after close the socket, the socket sk
-> will be closed again. This patch prevents the double close case.
+>>> [DfuTarg]# list-attributes
+>>> (hangs forever)
+>>
+>> Does it hangs or just doesn't print anything?
+>>
+>
+> Doesn't print anything.  The prompt is still "live".
+>
+>>
+>> I suspect something else is going on, perhaps bluetoothd could not
+>> find any attributes or maybe it is connected over classic?
+>
+> It is the nRF51822 firmware update example, so I'm sure it's not
+> connected over classic.
 
-minor: typo on the subject: s/potention/potencial/.
+Take the log then, bluetoothd and HCI using btmon should show us what
+is happening.
 
-The code looks good.
 
-
-Cheers,
---
-Vinicius
+-- 
+Luiz Augusto von Dentz
