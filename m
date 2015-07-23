@@ -1,40 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Jul 2015 11:17:50 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] Bluetooth: Enable new connection establishment
- procedure.
-Message-ID: <20150723081750.GA7358@t440s.lan>
-References: <1437564577-4207-1-git-send-email-jpawlowski@google.com>
- <1437564577-4207-2-git-send-email-jpawlowski@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1437564577-4207-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <CAASrBQ=8icxs8ZyW56CXObZH7DFuPf0XDGz=uQPXB1SsQsuimw@mail.gmail.com>
+References: <CAASrBQ=8icxs8ZyW56CXObZH7DFuPf0XDGz=uQPXB1SsQsuimw@mail.gmail.com>
+Date: Thu, 23 Jul 2015 11:11:15 +0300
+Message-ID: <CABBYNZL7x4GpgC+JRU=owGmOfs5JdVRHaiCXOe_5oC+oY9BbNg@mail.gmail.com>
+Subject: Re: bluetoothctl list-attributes command
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mark Rages <markrages@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Mark,
 
-On Wed, Jul 22, 2015, Jakub Pawlowski wrote:
-> @@ -3564,9 +3564,10 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
->  		 */
->  		hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
->  
-> -		conn = hci_connect_le(hdev, &cp->addr.bdaddr, addr_type,
-> -				      sec_level, HCI_LE_CONN_TIMEOUT,
-> -				      HCI_ROLE_MASTER);
-> +		conn = hci_add_to_sock_conn_whitelist(hdev, &cp->addr.bdaddr,
-> +						      addr_type, sec_level,
-> +						      HCI_LE_CONN_TIMEOUT,
-> +						      HCI_ROLE_MASTER);
+On Thu, Jul 23, 2015 at 2:20 AM, Mark Rages <markrages@gmail.com> wrote:
+> Hi,
+>
+> I am trying to interact with a low-energy device using bluetoothctl:
+>
+> $ bluetoothctl
+> [NEW] Controller 00:02:72:C8:B1:AD qountdown-0 [default]
+> [NEW] Device F1:4A:78:BD:9C:9F DfuTarg
+> [bluetooth]# connect F1:4A:78:BD:9C:9F
+> Attempting to connect to F1:4A:78:BD:9C:9F
+> [CHG] Device F1:4A:78:BD:9C:9F Connected: yes
+> Connection successful
+> [DfuTarg]# info
+> Device F1:4A:78:BD:9C:9F
+>     Name: DfuTarg
+>     Alias: DfuTarg
+>     Paired: no
+>     Trusted: no
+>     Blocked: no
+>     Connected: yes
+>     LegacyPairing: no
+>     UUID: Vendor specific           (00001530-1212-efde-1523-785feabcd123)
+>     UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+>     UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+>     RSSI: -57
+> [DfuTarg]# list-attributes
+> (hangs forever)
 
-The purpose we're introducing this passive scanning functionality is so
-that we have a fresh RPA for the remote device. The way we know that a
-new RPA matches the remote device is by checking against an IRK. If the
-user is calling pair_device it means we don't have an IRK, so in this
-case it seems pointless to me to start passive scanning (not to mention
-that typically paired device is called straight after stopping an active
-scan).
+Does it hangs or just doesn't print anything?
 
-Johan
+> Is list-attributes meant to do something here?
+>
+> Alternately, can anyone supply an example of select-attribute that
+> would allow me to interact with an attribute on this device?  I was
+> hoping the output of "list-attributes" would be the clue I need.
+
+I suspect something else is going on, perhaps bluetoothd could not
+find any attributes or maybe it is connected over classic?
+
+> --
+> Regards,
+> Mark
+> markrages@gmail
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
