@@ -1,53 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 Jul 2015 09:55:24 +0200
+Date: Thu, 23 Jul 2015 09:48:39 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 To: Lukasz Duda <lukasz.duda@nordicsemi.no>
 Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-Subject: Re: [RFC v2 4/4] Bluetooth: 6lowpan: Enable stateful compression in
- bluetooth_6lowpan
-Message-ID: <20150723075523.GA19536@omega>
+Subject: Re: [RFC v2 3/4] 6lowpan: Add stateful compression support for iphc.c
+Message-ID: <20150723074835.GA18161@omega>
 References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
- <1436788233-13960-5-git-send-email-lukasz.duda@nordicsemi.no>
+ <1436788233-13960-4-git-send-email-lukasz.duda@nordicsemi.no>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1436788233-13960-5-git-send-email-lukasz.duda@nordicsemi.no>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1436788233-13960-4-git-send-email-lukasz.duda@nordicsemi.no>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jul 13, 2015 at 01:50:33PM +0200, Lukasz Duda wrote:
-> Allocating context table for stateful compression when interface is set
-> up. Removing context table when interface is being unregistered.
-> 
-> Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
-> Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-> ---
->  net/bluetooth/6lowpan.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 2fb7b30..60c7e80 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -871,6 +871,9 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
->  	       &chan->src, chan->src_type);
->  	set_bit(__LINK_STATE_PRESENT, &netdev->state);
+On Mon, Jul 13, 2015 at 01:50:32PM +0200, Lukasz Duda wrote:
+...
+>  		} else {
+>  			pr_debug("dest address unicast %pI6c\n", &hdr->daddr);
+>  			lowpan_push_hc_data(&hc_ptr, hdr->daddr.s6_addr, 16);
+> @@ -619,6 +774,9 @@ static int __init lowpan_module_init(void)
+>  {
+>  	lowpan_debugfs = debugfs_create_dir("6lowpan", NULL);
 >  
-> +	/* Allocate context table for stateful compression. */
-> +	lowpan_context_table_alloc(netdev);
+> +	/* Initialize stateful compression. */
+> +	lowpan_context_init();
 > +
->  	*dev = netdev_priv(netdev);
->  	(*dev)->netdev = netdev;
->  	(*dev)->hdev = chan->conn->hcon->hdev;
-> @@ -1415,6 +1418,7 @@ static int device_event(struct notifier_block *unused,
->  			if (entry->netdev == netdev) {
->  				BT_DBG("Unregistered netdev %s %p",
->  				       netdev->name, netdev);
-> +				lowpan_context_table_free(netdev);
->  				list_del(&entry->list);
->  				break;
->  			}
 
-Don't we need similar allocation in net/ieee802154/6lowpan/core.c ?
+Error handling here, too. You need to change lowpan_context_init for
+returning return value from debugfs_create_file then.
+
+The rest will I review when I get it running. :-)
 
 - Alex
