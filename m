@@ -1,99 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <55B0BC2D.6050202@hanno.de>
+Date: Thu, 23 Jul 2015 12:04:29 +0200
+From: Hanno Zulla <abos@hanno.de>
 MIME-Version: 1.0
-In-Reply-To: <1437560362-31152-1-git-send-email-bharat.panda@samsung.com>
-References: <1437560362-31152-1-git-send-email-bharat.panda@samsung.com>
-Date: Thu, 23 Jul 2015 13:18:06 +0300
-Message-ID: <CABBYNZL07SVr7PGopeEAwdEBRprTe8fF=1gHPJ8MVxLE=QftCg@mail.gmail.com>
-Subject: Re: [PATCH v2] audio/avrcp: Handle Available Players Changed
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+To: Bastien Nocera <hadess@hadess.net>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Motorola RZ100: How to add support for a new device?
+References: <55A65C71.8010800@hanno.de>	 <CABBYNZKMYGr1+ADcDORoQ2docOg0dKePTnMqruaoF2UXio=p5g@mail.gmail.com>	 <55A7A70C.5030909@hanno.de> <1437051905.20249.82.camel@hadess.net>
+In-Reply-To: <1437051905.20249.82.camel@hadess.net>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+Hi,
 
-On Wed, Jul 22, 2015 at 1:19 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Add support to handle AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED
-> notification.
-> - Register notification for "Available Players Changed"
-> - Send interim and final responses on change in available palyers.
+> If it's handled through the "normal" HIDP stack on Android, it should
+> at least create a hidraw device in stock Linux (which you can check for
+> in the dmesg output).
+> 
+> You can then use hid-recorder to get the information from the device:
+> http://bentiss.github.io/hid-replay-docs/
+> 
+> And start a discussion on the linux-input list about adding support for
+> it.
 
-Could you please add the HCI traces of these events, also there a typo
-in the line above, it should players.
+Thanks a lot, that helped!
 
-> ---
->  profiles/audio/avrcp.c | 7 +++++++
->  profiles/audio/media.c | 6 ++++++
->  2 files changed, 13 insertions(+)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 60f8cbf..b22f2fe 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -673,6 +673,9 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
->                 pdu->params[size++] = attr;
->                 pdu->params[size++] = val;
->                 break;
-> +       case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
-> +               size = 1;
-> +               break;
->         default:
->                 error("Unknown event %u", id);
->                 return;
-> @@ -1490,6 +1493,9 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
->                 }
->
->                 break;
-> +       case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
-> +               len = 1;
-> +               break;
->         case AVRCP_EVENT_VOLUME_CHANGED:
->                 pdu->params[1] = media_transport_get_device_volume(dev);
->                 if (pdu->params[1] > 127)
-> @@ -3435,6 +3441,7 @@ static void target_init(struct avrcp *session)
->                                 (1 << AVRCP_EVENT_TRACK_CHANGED) |
->                                 (1 << AVRCP_EVENT_TRACK_REACHED_START) |
->                                 (1 << AVRCP_EVENT_TRACK_REACHED_END) |
-> +                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED) |
->                                 (1 << AVRCP_EVENT_SETTINGS_CHANGED);
->
->         if (target->version < 0x0104)
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index ed441d0..83a9a10 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -988,6 +988,9 @@ static void media_player_remove(struct media_player *mp)
->  {
->         info("Player unregistered: sender=%s path=%s", mp->sender, mp->path);
->
-> +       avrcp_player_event(mp->player,
-> +                               AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
-> +
->         media_player_destroy(mp);
->  }
->
-> @@ -1799,6 +1802,9 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
->                 return btd_error_invalid_args(msg);
->         }
->
-> +       avrcp_player_event(mp->player,
-> +                               AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
-> +
->         return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
->  }
->
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+hid-recorder does indeed catch events for it.
 
+I'll go to linux-input with it.
 
+Regards,
 
--- 
-Luiz Augusto von Dentz
+Hanno
