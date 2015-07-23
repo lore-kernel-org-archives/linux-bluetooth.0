@@ -1,50 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
-To: Alexander Aring <alex.aring@gmail.com>
-CC: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Bakke, Glenn Ruben" <Glenn.Ruben.Bakke@nordicsemi.no>
-Subject: RE: [RFC v2 4/4] Bluetooth: 6lowpan: Enable stateful compression in
- bluetooth_6lowpan
-Date: Thu, 23 Jul 2015 08:09:39 +0000
-Message-ID: <AB80DA35A7B64E4E98291794926897D9D1D317E1@mbx04.nvlsi.no>
-References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
- <1436788233-13960-5-git-send-email-lukasz.duda@nordicsemi.no>
- <20150723075523.GA19536@omega>
-In-Reply-To: <20150723075523.GA19536@omega>
-Content-Type: text/plain; charset="utf-8"
+Date: Thu, 23 Jul 2015 11:04:39 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] Bluetooth: Fix connection to already paired
+ device.
+Message-ID: <20150723080439.GA4104@t440s.lan>
+References: <1437564577-4207-1-git-send-email-jpawlowski@google.com>
 MIME-Version: 1.0
-Sender: linux-wpan-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1437564577-4207-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQXJpbmcsDQoNCj4gT24gTW9uLCBKdWwgMTMsIDIwMTUgYXQgMDE6NTA6MzNQTSArMDIwMCwg
-THVrYXN6IER1ZGEgd3JvdGU6DQo+ID4gQWxsb2NhdGluZyBjb250ZXh0IHRhYmxlIGZvciBzdGF0
-ZWZ1bCBjb21wcmVzc2lvbiB3aGVuIGludGVyZmFjZSBpcw0KPiA+IHNldCB1cC4gUmVtb3Zpbmcg
-Y29udGV4dCB0YWJsZSB3aGVuIGludGVyZmFjZSBpcyBiZWluZyB1bnJlZ2lzdGVyZWQuDQo+ID4N
-Cj4gPiBTaWduZWQtb2ZmLWJ5OiBMdWthc3ogRHVkYSA8bHVrYXN6LmR1ZGFAbm9yZGljc2VtaS5u
-bz4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBHbGVubiBSdWJlbiBCYWtrZSA8Z2xlbm4ucnViZW4uYmFr
-a2VAbm9yZGljc2VtaS5ubz4NCj4gPiAtLS0NCj4gPiAgbmV0L2JsdWV0b290aC82bG93cGFuLmMg
-fCA0ICsrKysNCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKQ0KPiA+DQo+ID4g
-ZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvNmxvd3Bhbi5jIGIvbmV0L2JsdWV0b290aC82bG93
-cGFuLmMgaW5kZXgNCj4gPiAyZmI3YjMwLi42MGM3ZTgwIDEwMDY0NA0KPiA+IC0tLSBhL25ldC9i
-bHVldG9vdGgvNmxvd3Bhbi5jDQo+ID4gKysrIGIvbmV0L2JsdWV0b290aC82bG93cGFuLmMNCj4g
-PiBAQCAtODcxLDYgKzg3MSw5IEBAIHN0YXRpYyBpbnQgc2V0dXBfbmV0ZGV2KHN0cnVjdCBsMmNh
-cF9jaGFuICpjaGFuLA0KPiBzdHJ1Y3QgbG93cGFuX2RldiAqKmRldikNCj4gPiAgCSAgICAgICAm
-Y2hhbi0+c3JjLCBjaGFuLT5zcmNfdHlwZSk7DQo+ID4gIAlzZXRfYml0KF9fTElOS19TVEFURV9Q
-UkVTRU5ULCAmbmV0ZGV2LT5zdGF0ZSk7DQo+ID4NCj4gPiArCS8qIEFsbG9jYXRlIGNvbnRleHQg
-dGFibGUgZm9yIHN0YXRlZnVsIGNvbXByZXNzaW9uLiAqLw0KPiA+ICsJbG93cGFuX2NvbnRleHRf
-dGFibGVfYWxsb2MobmV0ZGV2KTsNCj4gPiArDQo+ID4gIAkqZGV2ID0gbmV0ZGV2X3ByaXYobmV0
-ZGV2KTsNCj4gPiAgCSgqZGV2KS0+bmV0ZGV2ID0gbmV0ZGV2Ow0KPiA+ICAJKCpkZXYpLT5oZGV2
-ID0gY2hhbi0+Y29ubi0+aGNvbi0+aGRldjsgQEAgLTE0MTUsNiArMTQxOCw3IEBADQo+IHN0YXRp
-Yw0KPiA+IGludCBkZXZpY2VfZXZlbnQoc3RydWN0IG5vdGlmaWVyX2Jsb2NrICp1bnVzZWQsDQo+
-ID4gIAkJCWlmIChlbnRyeS0+bmV0ZGV2ID09IG5ldGRldikgew0KPiA+ICAJCQkJQlRfREJHKCJV
-bnJlZ2lzdGVyZWQgbmV0ZGV2ICVzICVwIiwNCj4gPiAgCQkJCSAgICAgICBuZXRkZXYtPm5hbWUs
-IG5ldGRldik7DQo+ID4gKwkJCQlsb3dwYW5fY29udGV4dF90YWJsZV9mcmVlKG5ldGRldik7DQo+
-ID4gIAkJCQlsaXN0X2RlbCgmZW50cnktPmxpc3QpOw0KPiA+ICAJCQkJYnJlYWs7DQo+ID4gIAkJ
-CX0NCj4gDQo+IERvbid0IHdlIG5lZWQgc2ltaWxhciBhbGxvY2F0aW9uIGluIG5ldC9pZWVlODAy
-MTU0LzZsb3dwYW4vY29yZS5jID8NCj4gDQo+IC0gQWxleA0KDQpZZXMgd2UgbmVlZCB0aGUgc2Ft
-ZSBmb3IgSUVFRTgwMi4xNS40LiBTaW5jZSBJIGNhbiB0ZXN0IHN0YXRlZnVsIGNvbXByZXNzaW9u
-IGZlYXR1cmUgb25seSB3aXRoIEJULUxFIHJpZ2h0IG5vdywgDQpJIGRlY2lkZWQgdG8gbm90IHRv
-dWNoIHRoaXMgcGFydC4gSG93ZXZlciB0aGlzIGlzIGFuIG9idmlvdXMgZ29hbCB0byBjcmVhdGUg
-Z2VuZXJpYyBzdGF0ZWZ1bCBjb21wcmVzc2lvbiBmb3IgYWxsDQpzZXQgb2YgNkxvV1BBTiBwcm90
-b2NvbHMuDQoNClJlZ2FyZHMsDQrFgXVrYXN6DQo=
+Hi Jakub,
+
+On Wed, Jul 22, 2015, Jakub Pawlowski wrote:
+> Currently, when trying to connect to already paired device that just
+> rotated its RPA MAC address, old address would be used and connection
+> would fail. In order to fix that, kernel must scan and receive
+> advertisement with fresh RPA before connecting.
+> 
+> This patch adds infrastructure for future changes in connection
+> estabilishment procedure behaviour for all devices. Instead of just
+> sending HCI_OP_LE_CREATE_CONN to controller, "connect" will add device to
+> kernel whitelist and start scan. If advertisement is received, it'll be
+> compared against whitelist and then trigger connection if it matches.
+> That fixes mentioned reconnect issue for  already paired devices. It also
+> make whole connection procedure more robust. We can try to connect to
+> multiple devices at same time now, even though controller allow only one.
+> 
+> HCI_AUTO_CONN_JUST_ONCE value was added to hci_conn_params. It is used to
+
+I don't see HCI_AUTO_CONN_JUST_ONCE anywhere in the patch. Have you
+forgotten to update the commit message?
+
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -512,9 +512,11 @@ struct hci_conn_params {
+>  		HCI_AUTO_CONN_DIRECT,
+>  		HCI_AUTO_CONN_ALWAYS,
+>  		HCI_AUTO_CONN_LINK_LOSS,
+> +		HCI_AUTO_CONN_SOCK,
+>  	} auto_connect;
+>  
+>  	struct hci_conn *conn;
+> +	bool is_sock_conn;
+>  };
+
+I still don't like having the term "sock" anywhere in the HCI core. The
+fact that a higher layer is implemented through sockets is something the
+HCI core shouldn't need to care or know about imo.
+
+Could we perhaps make all of this completely generic and simpler through
+adding reference counting the hci_conn_params struct? The socket based
+attempt would own its own reference and drop it after the attempt
+completes (either in success or failure). Likewise the mgmt based Add
+Device would add its own reference which would get dropped once Remove
+Device is called. This way the HCI core wouldn't need to care about any
+other details of the lifetime of the parameters.
+
+> +/* This function requires the caller holds hdev->lock */
+> +void hci_remove_from_sock_conn_whitelist(struct hci_conn *conn)
+> +{
+> +	struct hci_request req;
+> +	struct hci_conn_params *params = hci_pend_le_sock_action_lookup(
+> +						conn->hdev, &conn->dst,
+> +						conn->dst_type);
+> +	if (!params)
+> +		return;
+
+Call hci_pend_le_sock_action_lookup() here separate from the 'params'
+variable declaration, and remember that there should be an empty line
+between the variable declarations and the rest of the function.
+
+> +	hci_req_init(&req, conn->hdev);
+> +	__hci_update_background_scan(&req);
+> +	hci_req_run(&req, NULL);
+
+Can't you just use hci_update_background_scan() instead of these three
+function calls?
+
+As a general comment I think this patch is quite big and it'd be good if
+you could try to find ways to split it up into smaller pieces.
+
+Johan
