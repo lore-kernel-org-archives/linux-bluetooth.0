@@ -1,93 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arron Wang <arron.wang@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arron Wang <arron.wang@intel.com>
-Subject: [PATCH 1/3] Bluetooth: Move get info completed callback to a2mp.c
-Date: Fri, 24 Jul 2015 17:10:16 +0800
-Message-Id: <1437729016-16715-1-git-send-email-arron.wang@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <877fpq5z3d.fsf@intel.com>
+References: <CAPcThSGd9RO=8aK0ALkyWzSa7zLpr=8o7qMpT5sNex=LWu_XtQ@mail.gmail.com>
+	<CABBYNZLLd-dS0u39roqCrin=MpYy7WNiL4MEYDik0o-0G84JDA@mail.gmail.com>
+	<CAPcThSHpPpV8f=WeEEFySrWP9sHCfzqs+n5U+n+=wohwg0=g-g@mail.gmail.com>
+	<877fpq5z3d.fsf@intel.com>
+Date: Fri, 24 Jul 2015 09:40:38 +1000
+Message-ID: <CAPcThSHxq_Ax23H0VuqQF6z+7GoXHTL8L5RdL_jg5pjv2Q_mkQ@mail.gmail.com>
+Subject: Re: How to write a C program to be paired asynchronously?
+From: Qingtao Cao <qingtao.cao.au@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-To avoid a2mp module hooks from hci_event.c and send
-getinfo response operation only required by a2mp module,
-we can move this callback to a2mp.c
+Hello Vinicius,
 
-Signed-off-by: Arron Wang <arron.wang@intel.com>
----
- net/bluetooth/a2mp.c      |   17 ++++++++++++++++-
- net/bluetooth/hci_event.c |    5 +----
- 2 files changed, 17 insertions(+), 5 deletions(-)
+Many thanks for your kind reply!
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 5a04eb1..5f123c3 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -16,6 +16,7 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
- 
-+#include "hci_request.h"
- #include "a2mp.h"
- #include "amp.h"
- 
-@@ -286,11 +287,21 @@ static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
- 	return 0;
- }
- 
-+static void read_local_amp_info_complete(struct hci_dev *hdev, u8 status,
-+					 u16 opcode)
-+{
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	a2mp_send_getinfo_rsp(hdev);
-+}
-+
- static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 			    struct a2mp_cmd *hdr)
- {
- 	struct a2mp_info_req *req  = (void *) skb->data;
- 	struct hci_dev *hdev;
-+	struct hci_request hreq;
-+	int err = 0;
- 
- 	if (le16_to_cpu(hdr->len) < sizeof(*req))
- 		return -EINVAL;
-@@ -311,7 +322,11 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	}
- 
- 	set_bit(READ_LOC_AMP_INFO, &mgr->state);
--	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
-+	hci_req_init(&hreq, hdev);
-+	hci_req_add(&hreq, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
-+	err = hci_req_run(&hreq, read_local_amp_info_complete);
-+	if (err < 0)
-+		a2mp_send_getinfo_rsp(hdev);
- 
- done:
- 	if (hdev)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 32363c2..3f81cb4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -823,7 +823,7 @@ static void hci_cc_read_local_amp_info(struct hci_dev *hdev,
- 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
- 
- 	if (rp->status)
--		goto a2mp_rsp;
-+		return;
- 
- 	hdev->amp_status = rp->amp_status;
- 	hdev->amp_total_bw = __le32_to_cpu(rp->total_bw);
-@@ -835,9 +835,6 @@ static void hci_cc_read_local_amp_info(struct hci_dev *hdev,
- 	hdev->amp_assoc_size = __le16_to_cpu(rp->max_assoc_size);
- 	hdev->amp_be_flush_to = __le32_to_cpu(rp->be_flush_to);
- 	hdev->amp_max_flush_to = __le32_to_cpu(rp->max_flush_to);
--
--a2mp_rsp:
--	a2mp_send_getinfo_rsp(hdev);
- }
- 
- static void hci_cc_read_local_amp_assoc(struct hci_dev *hdev,
--- 
-1.7.9.5
+Well, I am using the latest Ubuntu 15.04 and bluez-4.101 is its
+supported bluez version that's why I am using it :-)
 
+As for the trick to set agent_path as "/", well, I did more test and
+it didn't seem to make a difference than a more specific one such as
+"/test/bluez/agent_<pid>". Firstly I will always register an object to
+the agent_path with the interface supported, then what really matters
+is whether to RegisterAdapter such agent_path or not.
+
+For outgoing pairing requests (actively pairing another remote device
+from my program), if such object path is registered via
+RegisterAdapter, then dbus-monitor reveals no message emitted from
+org.bluez sender at all. Only when the step to invoke RegisterAdapter
+is skipped over, will the RequestConfirmation callback is called to
+generate a random pincode to be sent to the remote device for
+confirmation.
+
+For incoming pairing requests (being paired by remote devices), if
+such object path is registered via RegisterAdapter, then could
+RequestConfirmation be invoked. Otherwise, strangely, the pairing
+requests initiated from remote device will always be silently and
+automatically accepted, without RequestConfirmation being invoked at
+all, nor will the remote device popped out some dialogue message to
+ask for confirmation.
+
+BTW, the test/agent.c in bluez-4.101 source seems to adopt the same
+logic as abstracted below:
+
+    if (device) {
+        if (create_paired_device(conn, adapter_path, agent_path,
+                        capabilities, device) < 0) {
+            dbus_connection_unref(conn);
+            exit(1);
+        }
+    } else {
+        if (register_agent(conn, adapter_path, agent_path,
+                            capabilities) < 0) {
+            dbus_connection_unref(conn);
+            exit(1);
+        }
+    }
+
+Where device is the parameter of the remote device to pair with, that
+is to say, register_agent() is only invoked for incoming pairing
+requests but skipped over for outgoing pairing attempts.
+
+Lastly, as for your suggestion to capability, you are right that
+bluez-simple-agent has manipulated KeyboardDisplay capability and all
+possible callbacks used by bluez so as to pair with all sorts of
+devices.
+
+Thanks again!
+
+Harry
+
+
+On Fri, Jul 24, 2015 at 7:43 AM, Vinicius Costa Gomes
+<vinicius.gomes@intel.com> wrote:
+> Hi Harry,
+>
+> Qingtao Cao <qingtao.cao.au@gmail.com> writes:
+>
+>> Hi Luiz,
+>>
+>> Many thanks for your comments! I sure will try to navigate through the
+>> source code to find a concrete answer.
+>>
+>> I did some progress today but had a further related question about the
+>> agent in the pairing process.
+>>
+>> Previously I have manipulated bluez's dbus APIs to pair a given remote
+>> device successfully, turns out before invoking the
+>> CreatePairedDevice() method on the org.bluez.Adapter interface, I only
+>> need to register the handler of the RequestConfirmation() message on
+>> the org.bluez.Agent interface (although no object existed to register
+>> it in the first place) to reply an empty reply and the pairing attempt
+>> launched by remote device can succeed.
+>>
+>> Later today I found that in order to handle async pairing request from
+>> remote device successfully, aside from the handler of the same
+>> RequestConfirmation() message, the missing piece seems to be using the
+>> RegisterAgent() method on the org.bluez.Adapter interface, without
+>> which the bluetoothd seems won't throw out the RequestConfirmation()
+>> message at all.
+>>
+>> Now what puzzles me is that if I register an agent before invoking the
+>> CreatePairedDevice() method and passing it the discretionary object
+>> path of the agent registered,  the RequestConfirmation() won't be
+>> called at all in the first scenario. Also the doc/adapter-api.txt says
+>> that during CreatePairedDevice() invocation it's not necessary to
+>> register an agent, but it didn't prohibit it. By contrast, an agent
+>> would have to be registered in the second scenario.
+>
+> If you pass "/" as the agent path to CreatePairedDevice() it should use
+> the agent that was registered for that Adapter.
+>
+> (You are asking about BlueZ 4.XX, which was released some time ago, I
+> may have forgotten how it used to work ;-)
+>
+>>
+>> So, how should I use an agent consistently regardless of whether it is
+>> incoming or outgoing pairing request?
+>
+> That "/" trick should do the job.
+>
+>>
+>> Moreover, different agent capability such as KeyboardDisplay or
+>> NoInputNoOutput will make a difference in terms of agent APIs invoked
+>> by bluetoothd during pairing, how should I assign a proper capability
+>> for my agent, if needed, for different devices such as mobile, headset
+>> or keyboard?
+>
+> Usually you don't have all the information necessary at the point when
+> CreatePairedDevice() to choose, only when the bonding procedure is started,
+> and both devices exchange their capabilities you have that kind of
+> information. So, my suggestion is, implement all the callbacks, so you
+> can pair with all kinds of devices, inform the most sofisticated
+> capability and leave the kernel to do the negotiation.
+>
+>
+> Cheers,
+> --
+> Vinicius
