@@ -1,34 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH] Bluetooth: Fix NULL pointer dereference in smp_conn_security
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1437413485-1180-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 23 Jul 2015 16:44:12 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D92C276D-BFD5-47E8-BF83-94AE7DD530E3@holtmann.org>
-References: <1437413485-1180-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v4 2/2] Bluetooth: Enable new connection establishment procedure.
+Date: Thu, 23 Jul 2015 16:30:15 +0200
+Message-Id: <1437661815-17324-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1437661815-17324-1-git-send-email-jpawlowski@google.com>
+References: <1437661815-17324-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Currently, when trying to connect to already paired device that just
+rotated its RPA MAC address, old address would be used and connection
+would fail. In order to fix that, kernel must scan and receive
+advertisement with fresh RPA before connecting.
 
-> The l2cap_conn->smp pointer may be NULL for various valid reasons where SMP has
-> failed to initialize properly. One such scenario is when crypto support is
-> missing, another when the adapter has been powered on through a legacy method.
-> The smp_conn_security() function should have the appropriate check for this
-> situation to avoid NULL pointer dereferences.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> Cc: stable@vger.kernel.org # 4.0+
-> ---
-> net/bluetooth/smp.c | 4 ++++
-> 1 file changed, 4 insertions(+)
+This patch enables new connection establishment procedure. Instead of just
+sending HCI_OP_LE_CREATE_CONN to controller, "connect" will add device to
+kernel whitelist and start scan. If advertisement is received, it'll be
+compared against whitelist and then trigger connection if it matches.
+That fixes mentioned reconnect issue for  already paired devices. It also
+make whole connection procedure more robust. We can try to connect to
+multiple devices at same time now, even though controller allow only one.
 
-patch has been applied to bluetooth-stable tree.
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ net/bluetooth/l2cap_core.c | 6 ++++--
+ net/bluetooth/mgmt.c       | 7 ++++---
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 45fffa4..2652f38 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7113,8 +7113,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		else
+ 			role = HCI_ROLE_MASTER;
+ 
+-		hcon = hci_connect_le(hdev, dst, dst_type, chan->sec_level,
+-				      HCI_LE_CONN_TIMEOUT, role);
++		hcon = hci_add_to_explicit_connect(hdev, dst, dst_type,
++						   chan->sec_level,
++						   HCI_LE_CONN_TIMEOUT,
++						   role);
+ 	} else {
+ 		u8 auth_type = l2cap_get_auth_type(chan);
+ 		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 62220a9..c38eed5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3564,9 +3564,10 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		 */
+ 		hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
+ 
+-		conn = hci_connect_le(hdev, &cp->addr.bdaddr, addr_type,
+-				      sec_level, HCI_LE_CONN_TIMEOUT,
+-				      HCI_ROLE_MASTER);
++		conn = hci_add_to_explicit_connect(hdev, &cp->addr.bdaddr,
++						   addr_type, sec_level,
++						   HCI_LE_CONN_TIMEOUT,
++						   HCI_ROLE_MASTER);
+ 	}
+ 
+ 	if (IS_ERR(conn)) {
+-- 
+2.1.4
 
