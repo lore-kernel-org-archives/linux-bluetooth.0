@@ -1,145 +1,184 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 2/2 v3] sixaxis: Ask user whether cable configuration should be allowed
+Date: Fri, 24 Jul 2015 00:33:06 +0200
+Message-ID: <359424171.AW1qIKcMiD@athlon>
+In-Reply-To: <1436278465.26954.32.camel@hadess.net>
+References: <1436278465.26954.32.camel@hadess.net>
 MIME-Version: 1.0
-In-Reply-To: <877fpq5z3d.fsf@intel.com>
-References: <CAPcThSGd9RO=8aK0ALkyWzSa7zLpr=8o7qMpT5sNex=LWu_XtQ@mail.gmail.com>
-	<CABBYNZLLd-dS0u39roqCrin=MpYy7WNiL4MEYDik0o-0G84JDA@mail.gmail.com>
-	<CAPcThSHpPpV8f=WeEEFySrWP9sHCfzqs+n5U+n+=wohwg0=g-g@mail.gmail.com>
-	<877fpq5z3d.fsf@intel.com>
-Date: Fri, 24 Jul 2015 09:40:38 +1000
-Message-ID: <CAPcThSHxq_Ax23H0VuqQF6z+7GoXHTL8L5RdL_jg5pjv2Q_mkQ@mail.gmail.com>
-Subject: Re: How to write a C program to be paired asynchronously?
-From: Qingtao Cao <qingtao.cao.au@gmail.com>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Vinicius,
+Hi Bastien,
 
-Many thanks for your kind reply!
+On Tuesday 07 July 2015 16:14:25 Bastien Nocera wrote:
+> Previously, users doing cable configuration of Sixaxis PS3 controllers
+> would only get asked whether a device was allowed to connect to the
+> computer when switching it to Bluetooth mode: unplugging it, and
+> pressing the PS button.
+> 
+> Instead, we should ask the user straight away, through the agent,
+> whether the pad should be allowed to connect.
+> 
+> This makes it easier to setup those devices, while keeping security.
 
-Well, I am using the latest Ubuntu 15.04 and bluez-4.101 is its
-supported bluez version that's why I am using it :-)
+Wouldn't this confuse user so that he may think device is already connected 
+over BT? Also what would happen if user remove this from usb before 
+confirming? And if PS button is pressed then, second authorization request for 
+same UUID would be send?
 
-As for the trick to set agent_path as "/", well, I did more test and
-it didn't seem to make a difference than a more specific one such as
-"/test/bluez/agent_<pid>". Firstly I will always register an object to
-the agent_path with the interface supported, then what really matters
-is whether to RegisterAdapter such agent_path or not.
+Since this change plugin behavior in end user visible way this needs to be 
+carefully thought out. It looks like people have different requirements for 
+sixaxis security... so maybe it should have a sort of policy settings in 
+config file? Opinions?
 
-For outgoing pairing requests (actively pairing another remote device
-from my program), if such object path is registered via
-RegisterAdapter, then dbus-monitor reveals no message emitted from
-org.bluez sender at all. Only when the step to invoke RegisterAdapter
-is skipped over, will the RequestConfirmation callback is called to
-generate a random pincode to be sent to the remote device for
-confirmation.
+> ---
+>  plugins/sixaxis.c | 80
+> +++++++++++++++++++++++++++++++++++++++++++------------ 1 file changed, 63
+> insertions(+), 17 deletions(-)
+> 
+> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+> index fcc93bc..032ff62 100644
+> --- a/plugins/sixaxis.c
+> +++ b/plugins/sixaxis.c
+> @@ -44,6 +44,7 @@
+> 
+>  #include "src/adapter.h"
+>  #include "src/device.h"
+> +#include "src/agent.h"
+>  #include "src/plugin.h"
+>  #include "src/log.h"
+>  #include "src/shared/util.h"
+> @@ -71,6 +72,13 @@ static const struct {
+>  	},
+>  };
+> 
+> +struct authentication_closure {
+> +	struct btd_adapter *adapter;
+> +	struct btd_device *device;
 
-For incoming pairing requests (being paired by remote devices), if
-such object path is registered via RegisterAdapter, then could
-RequestConfirmation be invoked. Otherwise, strangely, the pairing
-requests initiated from remote device will always be silently and
-automatically accepted, without RequestConfirmation being invoked at
-all, nor will the remote device popped out some dialogue message to
-ask for confirmation.
+You can get adapter from device, no need to store both.
 
-BTW, the test/agent.c in bluez-4.101 source seems to adopt the same
-logic as abstracted below:
+> +	int fd;
+> +	char device_addr[18];
 
-    if (device) {
-        if (create_paired_device(conn, adapter_path, agent_path,
-                        capabilities, device) < 0) {
-            dbus_connection_unref(conn);
-            exit(1);
-        }
-    } else {
-        if (register_agent(conn, adapter_path, agent_path,
-                            capabilities) < 0) {
-            dbus_connection_unref(conn);
-            exit(1);
-        }
-    }
+Why is device_addr needed for? If only for logs then I'd just convert bdaddr 
+to string where needed.
 
-Where device is the parameter of the remote device to pair with, that
-is to say, register_agent() is only invoked for incoming pairing
-requests but skipped over for outgoing pairing attempts.
+> +};
+> +
+>  struct leds_data {
+>  	char *syspath_prefix;
+>  	uint8_t bitmap;
+> @@ -255,19 +263,55 @@ out:
+>  	return FALSE;
+>  }
+> 
+> +static void agent_auth_cb(DBusError *derr,
+> +				void *user_data)
+> +{
+> +	struct authentication_closure *closure = user_data;
+> +	char master_addr[18], adapter_addr[18];
+> +	bdaddr_t master_bdaddr;
+> +	const bdaddr_t *adapter_bdaddr;
+> +
+> +	if (derr != NULL) {
+> +		DBG("Agent replied negatively, removing temporary device");
+> +		goto error;
+> +	}
+> +
+> +	btd_device_set_temporary(closure->device, false);
+> +
+> +	if (get_master_bdaddr(closure->fd, &master_bdaddr) < 0)
+> +		goto error;
+> +
+> +	adapter_bdaddr = btd_adapter_get_address(closure->adapter);
+> +	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
+> +		if (set_master_bdaddr(closure->fd, adapter_bdaddr) < 0)
+> +			goto error;
+> +	}
+> +
+> +	ba2str(&master_bdaddr, master_addr);
+> +	ba2str(adapter_bdaddr, adapter_addr);
+> +	DBG("remote %s old_master %s new_master %s",
+> +				closure->device_addr, master_addr, adapter_addr);
+> +
+> +	g_free(closure);
+> +
+> +	return;
+> +
+> +error:
+> +	btd_adapter_remove_device(closure->adapter, closure->device);
+> +	g_free(closure);
+> +}
+> +
+>  static bool setup_device(int fd, int index, struct btd_adapter *adapter)
+>  {
+> -	char device_addr[18], master_addr[18], adapter_addr[18];
+> -	bdaddr_t device_bdaddr, master_bdaddr;
+> +	char device_addr[18];
+> +	bdaddr_t device_bdaddr;
+>  	const bdaddr_t *adapter_bdaddr;
+>  	struct btd_device *device;
+> +	struct authentication_closure *closure;
+> 
+>  	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
+>  		return false;
+> 
+> -	if (get_master_bdaddr(fd, &master_bdaddr) < 0)
+> -		return false;
+> -
+>  	/* This can happen if controller was plugged while already connected
+>  	 * eg. to charge up battery.
+>  	 * Don't set LEDs in that case, hence return false */
+> @@ -276,18 +320,7 @@ static bool setup_device(int fd, int index, struct
+> btd_adapter *adapter) if (device && btd_device_is_connected(device))
+>  		return false;
+> 
+> -	adapter_bdaddr = btd_adapter_get_address(adapter);
+> -
+> -	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
+> -		if (set_master_bdaddr(fd, adapter_bdaddr) < 0)
+> -			return false;
+> -	}
+> -
+>  	ba2str(&device_bdaddr, device_addr);
+> -	ba2str(&master_bdaddr, master_addr);
+> -	ba2str(adapter_bdaddr, adapter_addr);
+> -	DBG("remote %s old_master %s new_master %s",
+> -				device_addr, master_addr, adapter_addr);
+> 
+>  	device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
+> 
+> @@ -302,7 +335,20 @@ static bool setup_device(int fd, int index, struct
+> btd_adapter *adapter) btd_device_device_set_name(device,
+> devices[index].name);
+>  	btd_device_set_pnpid(device, devices[index].source, devices[index].vid,
+>  				devices[index].pid, devices[index].version);
+> -	btd_device_set_temporary(device, false);
+> +	btd_device_set_temporary(device, true);
+> +
+> +	closure = g_try_new0(struct authentication_closure, 1);
+> +	if (!closure) {
+> +		btd_adapter_remove_device(adapter, device);
+> +		return false;
+> +	}
+> +	closure->adapter = adapter;
+> +	closure->device = device;
+> +	closure->fd = fd;
+> +	memcpy(&closure->device_addr, device_addr, sizeof(device_addr));
+> +	adapter_bdaddr = btd_adapter_get_address(adapter);
+> +	btd_request_authorization_cable_configured(adapter_bdaddr, &device_bdaddr,
+> +				HID_UUID, agent_auth_cb, closure);
+> 
+>  	return true;
+>  }
 
-Lastly, as for your suggestion to capability, you are right that
-bluez-simple-agent has manipulated KeyboardDisplay capability and all
-possible callbacks used by bluez so as to pair with all sorts of
-devices.
-
-Thanks again!
-
-Harry
 
 
-On Fri, Jul 24, 2015 at 7:43 AM, Vinicius Costa Gomes
-<vinicius.gomes@intel.com> wrote:
-> Hi Harry,
->
-> Qingtao Cao <qingtao.cao.au@gmail.com> writes:
->
->> Hi Luiz,
->>
->> Many thanks for your comments! I sure will try to navigate through the
->> source code to find a concrete answer.
->>
->> I did some progress today but had a further related question about the
->> agent in the pairing process.
->>
->> Previously I have manipulated bluez's dbus APIs to pair a given remote
->> device successfully, turns out before invoking the
->> CreatePairedDevice() method on the org.bluez.Adapter interface, I only
->> need to register the handler of the RequestConfirmation() message on
->> the org.bluez.Agent interface (although no object existed to register
->> it in the first place) to reply an empty reply and the pairing attempt
->> launched by remote device can succeed.
->>
->> Later today I found that in order to handle async pairing request from
->> remote device successfully, aside from the handler of the same
->> RequestConfirmation() message, the missing piece seems to be using the
->> RegisterAgent() method on the org.bluez.Adapter interface, without
->> which the bluetoothd seems won't throw out the RequestConfirmation()
->> message at all.
->>
->> Now what puzzles me is that if I register an agent before invoking the
->> CreatePairedDevice() method and passing it the discretionary object
->> path of the agent registered,  the RequestConfirmation() won't be
->> called at all in the first scenario. Also the doc/adapter-api.txt says
->> that during CreatePairedDevice() invocation it's not necessary to
->> register an agent, but it didn't prohibit it. By contrast, an agent
->> would have to be registered in the second scenario.
->
-> If you pass "/" as the agent path to CreatePairedDevice() it should use
-> the agent that was registered for that Adapter.
->
-> (You are asking about BlueZ 4.XX, which was released some time ago, I
-> may have forgotten how it used to work ;-)
->
->>
->> So, how should I use an agent consistently regardless of whether it is
->> incoming or outgoing pairing request?
->
-> That "/" trick should do the job.
->
->>
->> Moreover, different agent capability such as KeyboardDisplay or
->> NoInputNoOutput will make a difference in terms of agent APIs invoked
->> by bluetoothd during pairing, how should I assign a proper capability
->> for my agent, if needed, for different devices such as mobile, headset
->> or keyboard?
->
-> Usually you don't have all the information necessary at the point when
-> CreatePairedDevice() to choose, only when the bonding procedure is started,
-> and both devices exchange their capabilities you have that kind of
-> information. So, my suggestion is, implement all the callbacks, so you
-> can pair with all kinds of devices, inform the most sofisticated
-> capability and leave the kernel to do the negotiation.
->
->
-> Cheers,
-> --
-> Vinicius
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
