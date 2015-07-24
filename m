@@ -1,84 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
+From: abhirup.ghosh@intel.com
 To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH v4] audio/avrcp: Handle Available Players Changed
-Date: Fri, 24 Jul 2015 16:47:03 +0530
-Message-id: <1437736623-27428-1-git-send-email-bharat.panda@samsung.com>
+Cc: Abhirup Ghosh <abhirup.ghosh@intel.com>
+Subject: [PATCH] Add support for ACL data transfer in emulator
+Date: Fri, 24 Jul 2015 14:45:50 +0530
+Message-Id: <1437729350-8852-1-git-send-email-abhirup.ghosh@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support to handle AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED
-notification.
-- Register notification for "Available Players Changed"
-- Send interim and final responses on change in available players.
+From: Abhirup Ghosh <abhirup.ghosh@intel.com>
 
-< ACL data: handle 70 flags 0x00 dlen 18
-    L2CAP(d): cid 0x0041 len 14 [psm 23]
-      AVCTP Control: Response : pt 0x00 transaction 13 pid 0x110e
-        AV/C: Changed: address 0x48 opcode 0x00
-          Subunit: Panel
-          Opcode: Vendor Dependent
-          Company ID: 0x001958
-          AVRCP: RegisterNotification: pt Single len 0x0001
-            EventID: 0x0a (EVENT_AVAILABLE_PLAYERS_CHANGED)
 ---
- profiles/audio/avrcp.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ emulator/server.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 60f8cbf..5e25cd3 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -673,6 +673,9 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
- 		pdu->params[size++] = attr;
- 		pdu->params[size++] = val;
- 		break;
-+	case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
-+		size = 1;
-+		break;
- 	default:
- 		error("Unknown event %u", id);
- 		return;
-@@ -1490,6 +1493,9 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
- 		}
+diff --git a/emulator/server.c b/emulator/server.c
+index 76998d9..c28b15e 100644
+--- a/emulator/server.c
++++ b/emulator/server.c
+@@ -130,6 +130,7 @@ again:
  
- 		break;
-+	case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
-+		len = 1;
-+		break;
- 	case AVRCP_EVENT_VOLUME_CHANGED:
- 		pdu->params[1] = media_transport_get_device_volume(dev);
- 		if (pdu->params[1] > 127)
-@@ -3440,6 +3446,9 @@ static void target_init(struct avrcp *session)
- 	if (target->version < 0x0104)
- 		return;
+ 	while (count > 0) {
+ 		hci_command_hdr *cmd_hdr;
++		hci_acl_hdr *acl_hdr;
  
-+	session->supported_events |=
-+				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED);
-+
- 	/* Only check capabilities if controller is not supported */
- 	if (session->controller == NULL)
- 		avrcp_get_capabilities(session);
-@@ -3719,6 +3728,9 @@ struct avrcp_player *avrcp_register_player(struct btd_adapter *adapter,
- 		}
- 	}
- 
-+	avrcp_player_event(player,
-+				AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
-+
- 	return player;
- }
- 
-@@ -3742,6 +3754,8 @@ void avrcp_unregister_player(struct avrcp_player *player)
- 	}
- 
- 	player_destroy(player);
-+	avrcp_player_event(player,
-+				AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
- }
- 
- static gboolean avrcp_handle_set_volume(struct avctp *conn,
+ 		if (!client->pkt_data) {
+ 			client->pkt_type = ptr[0];
+@@ -146,6 +147,12 @@ again:
+ 				client->pkt_data = malloc(client->pkt_expect);
+ 				client->pkt_len = 0;
+ 				break;
++			case HCI_ACLDATA_PKT:
++				acl_hdr = (hci_acl_hdr*)(ptr + 1);
++				client->pkt_expect = HCI_ACL_HDR_SIZE + acl_hdr->dlen + 1;
++				client->pkt_data = malloc(client->pkt_expect);
++				client->pkt_len = 0;
++				break;
+ 			default:
+ 				printf("packet error\n");
+ 				return;
 -- 
 1.9.1
 
