@@ -1,69 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1437735960.2863.20.camel@hadess.net>
-Subject: Re: [PATCH 2/2 v3] sixaxis: Ask user whether cable configuration
- should be allowed
+Message-ID: <1437736167.2863.24.camel@hadess.net>
+Subject: Re: [PATCH 1/2 v3] adapter: Add
+ btd_request_authorization_cable_configured()
 From: Bastien Nocera <hadess@hadess.net>
 To: Szymon Janc <szymon.janc@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 24 Jul 2015 13:06:00 +0200
-In-Reply-To: <359424171.AW1qIKcMiD@athlon>
-References: <1436278465.26954.32.camel@hadess.net>
-	 <359424171.AW1qIKcMiD@athlon>
+Date: Fri, 24 Jul 2015 13:09:27 +0200
+In-Reply-To: <1530933.8bMTNVp5s8@athlon>
+References: <1436278440.26954.30.camel@hadess.net>
+	 <1530933.8bMTNVp5s8@athlon>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2015-07-24 at 00:33 +0200, Szymon Janc wrote:
+On Fri, 2015-07-24 at 00:32 +0200, Szymon Janc wrote:
 > Hi Bastien,
 > 
-> On Tuesday 07 July 2015 16:14:25 Bastien Nocera wrote:
-> > Previously, users doing cable configuration of Sixaxis PS3 
-> > controllers
-> > would only get asked whether a device was allowed to connect to the
-> > computer when switching it to Bluetooth mode: unplugging it, and
-> > pressing the PS button.
+> On Tuesday 07 July 2015 16:14:00 Bastien Nocera wrote:
+> > Add btd_request_authorization_cable_configured() function to allow
+> > cable configured devices to ask the user straight away about 
+> > whether the
+> > device should be allowed to connect to the computer.
 > > 
-> > Instead, we should ask the user straight away, through the agent,
-> > whether the pad should be allowed to connect.
-> > 
-> > This makes it easier to setup those devices, while keeping 
-> > security.
+> > This allows us to ask the user at the time of the USB connection 
+> > and
+> > initial setup, rather than when the first Bluetooth connection is 
+> > made.
 > 
-> Wouldn't this confuse user so that he may think device is already 
-> connected 
-> over BT?
+> I'd also add a note to doc/agent-api.txt that this can be called also 
+> for not 
+> connected devices under some circumstances (and see how it fits).
 
-No, because either:
-- you don't want to pair the device with your computer, which is
-impossible to do right now, and you can now do if you don't have an
-agent, or reject the association
-- you do want to be able to use it via Bluetooth, and we can have the
-association happen in one go, instead of being 2 separate actions.
+As I mentioned on IRC, I'm happy to do that if the rest of the patch is
+deemed fine.
 
->  Also what would happen if user remove this from usb before 
-> confirming?
+> What bothers me is that now bluetoothd will send AuthorizeService 
+> request for 
+> device that is not connected (and authorizing will not result in 
+> connection). 
 
-I didn't implement this, but we should cancel the existing
-authentication request indeed.
+That's not what that patch does though, this patch just adds wiring to
+do that...
 
->  And if PS button is pressed then, second authorization request for 
-> same UUID would be send?
+> And this was explicitly checked against before this patch.
 
-It wouldn't do anything, as there's already an auth request in flux.
+It's still checked, just not through the sixaxis plugin. That's the
+only entry point that disables that check.
+<snip>
+> 
+> Also in general I'd prefer to use sixaxis instead of cable in names. 
+> Mainly 
+> for consistency with other core sixaxis specific code.
 
-> Since this change plugin behavior in end user visible way this needs 
-> to be 
-> carefully thought out. It looks like people have different 
-> requirements for 
-> sixaxis security...
+It's not sixaxis specific, and could be used by any cable pairing,
+where the device is useful both when plugged in and then through BT.
 
-This is actually more secure than what came before, and it's also far
-more predictable. It's the same security as before, but requires an
-agent to be available when the device is plugged in.
-
->  so maybe it should have a sort of policy settings in 
-> config file? Opinions?
-
-What would the other policy be? I don't see a difference between the
-current security behaviour, and the one set out in this patch.
+Johan is the one that preferred cable rather than sixaxis, as the
+method isn't specific to sixaxis but could be used for other devices
+too.
