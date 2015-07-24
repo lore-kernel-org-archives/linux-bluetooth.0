@@ -1,33 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 24 Jul 2015 11:50:24 -0700
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Shraddha Barke <shraddha.6596@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
+From: Shraddha Barke <shraddha.6596@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2318/2318] Staging : bluetooth Fix coding style issues
-Message-ID: <20150724185024.GA14117@kroah.com>
-References: <1437762098-13261-1-git-send-email-shraddha.6596@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1437762098-13261-1-git-send-email-shraddha.6596@gmail.com>
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shraddha Barke <shraddha.6596@gmail.com>
+Subject: [PATCH 2318/2318] Staging : bluetooth Fix coding style issues
+Date: Fri, 24 Jul 2015 23:51:38 +0530
+Message-Id: <1437762098-13261-1-git-send-email-shraddha.6596@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jul 24, 2015 at 11:51:38PM +0530, Shraddha Barke wrote:
-> This patch adds a space after the '}' brackets
-> 
-> Signed-off-by: Shraddha Barke <shraddha.6596@gmail.com>
+This patch adds a space after the '}' brackets
 
-Where are the other 2318 patches?
+Signed-off-by: Shraddha Barke <shraddha.6596@gmail.com>
+---
+ drivers/bluetooth/btbcm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> ---
->  drivers/bluetooth/btbcm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index 1e1a432..cf7c81d 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-
-Why are you sending this to me?  I'm not listed as a maintainer of this
-file...
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 1e1a432..cf7c81d 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -32,8 +32,8 @@
+ 
+ #define VERSION "0.1"
+ 
+-#define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
+-#define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
++#define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00 } })
++#define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43 } })
+ 
+ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ {
+-- 
+2.1.0
