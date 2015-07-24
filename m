@@ -1,36 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Shraddha Barke <shraddha.6596@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shraddha Barke <shraddha.6596@gmail.com>
-Subject: [PATCH 2317/2317] Staging : bluetooth Trailing whitespaces
-Date: Fri, 24 Jul 2015 23:20:46 +0530
-Message-Id: <1437760246-12177-1-git-send-email-shraddha.6596@gmail.com>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Atul Rai <a.rai@samsung.com>, linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com
+Subject: Re: [PATCH] android/hal-bluetooth: Fix NULL ptr dereference
+In-Reply-To: <1437555933-11333-1-git-send-email-a.rai@samsung.com>
+References: <1437555933-11333-1-git-send-email-a.rai@samsung.com>
+Date: Fri, 24 Jul 2015 14:38:11 -0300
+Message-ID: <87si8d4fss.fsf@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes trailing whitespaces in the file bfusb.c
+Hi,
 
-Signed-off-by: Shraddha Barke <shraddha.6596@gmail.com>
----
- drivers/bluetooth/bfusb.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Atul Rai <a.rai@samsung.com> writes:
 
-diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-index fcfb72e..68c2717 100644
---- a/drivers/bluetooth/bfusb.c
-+++ b/drivers/bluetooth/bfusb.c
-@@ -148,8 +148,7 @@ static int bfusb_send_bulk(struct bfusb_data *data, struct sk_buff *skb)
- 
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err) {
--		BT_ERR("%s bulk tx submit failed urb %p err %d", 
--					data->hdev->name, urb, err);
-+		BT_ERR("%s bulk tx submit failed urb %p err %d", data->hdev->name, urb, err);
- 		skb_unlink(skb, &data->pending_q);
- 		usb_free_urb(urb);
- 	} else
--- 
-2.1.0
+> ping
+>
+
+I didn't get the original email.
+
+
+>> ------- Original Message -------
+>> Sender : Atul Kumar Rai<a.rai@samsung.com> Lead Engineer (1)/SRI-Delhi-SWC Group/Samsung Electronics
+>> Date : Jun 29, 2015 12:14 (GMT+05:30)
+>> Title : [PATCH] android/hal-bluetooth: Fix NULL ptr dereference
+>>
+>> Add NULL check on malloc return to fix NULL pointer dereference
+>> in case malloc fails.
+>> ---
+>>  android/hal-bluetooth.c | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+>> index e24f7d2..66f4a37 100644
+>> --- a/android/hal-bluetooth.c
+>> +++ b/android/hal-bluetooth.c
+>> @@ -19,6 +19,7 @@
+>>  #include <stdlib.h>
+>>  #include <stdbool.h>
+>>  #include <string.h>
+>> +#include <errno.h>
+>>
+>>  #include <cutils/properties.h>
+>>
+>> @@ -1103,6 +1104,11 @@ static int open_bluetooth(const struct hw_module_t *module, char const *name,
+>>
+>>  	DBG("");
+>>
+>> +	if (!dev) {
+>> +		error("Failed to allocate memory for device");
+>> +		return -ENOMEM;
+>> +	}
+>> +
+
+Looks OK. Just wondering why it is not using calloc() instead of
+'malloc() + sizeof()'.
+
+
+Cheers,
+--
+Vinicius
