@@ -1,61 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v4 1/5] Bluetooth: preparation for new connect procedure
-Date: Fri, 24 Jul 2015 19:37:01 +0200
-Message-Id: <1437759425-20109-1-git-send-email-jpawlowski@google.com>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Atul Rai <a.rai@samsung.com>, linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com
+Subject: Re: [PATCH] android/client: Fix memory leak while using realloc()
+In-Reply-To: <1437553983-11102-1-git-send-email-a.rai@samsung.com>
+References: <1437553983-11102-1-git-send-email-a.rai@samsung.com>
+Date: Fri, 24 Jul 2015 14:07:27 -0300
+Message-ID: <87vbd94h80.fsf@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently, when trying to connect to already paired device that just
-rotated its RPA MAC address, old address would be used and connection
-would fail. In order to fix that, kernel must scan and receive
-advertisement with fresh RPA before connecting.
+Hi,
 
-This patch adds some fields to hci_conn_params, in preparation to new
-connect procedure.
+Atul Rai <a.rai@samsung.com> writes:
 
-explicit_connect will be used to override any current auto_connect action,
-and connect to device when ad is received.
+> While reallocating space to store additional "remote device set" using
+> realloc, if realloc() fails, the original block is left untouched but
+> reference to that block is lost as NULL is assigned to remote_devices.
+> The original block needs to be freed before return.
+> ---
+>  android/client/if-bt.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+> index 4723024..4249f78 100644
+> --- a/android/client/if-bt.c
+> +++ b/android/client/if-bt.c
+> @@ -94,6 +94,7 @@ static int remote_devices_capacity = 0;
+>  void add_remote_device(const bt_bdaddr_t *addr)
+>  {
+>  	int i;
+> +	bt_bdaddr_t *tmp;
+>
+>  	if (remote_devices == NULL) {
+>  		remote_devices = malloc(4 * sizeof(bt_bdaddr_t));
+> @@ -119,9 +120,16 @@ void add_remote_device(const bt_bdaddr_t *addr)
+>  	/* Realloc space if needed */
+>  	if (remote_devices_cnt >= remote_devices_capacity) {
 
-HCI_AUTO_CONN_EXPLICIT was added to auto_connect enum. When this value
-will be used, explicit connect is the only action, and params can be
-removed after successful connection.
+I would move 'tmp' declaration here. Makes it clear that it is only used
+in this context.
 
-HCI_CONN_SCANNING is added to hci_conn flags. When it's set, connect is
-scan phase. It gets cleared when advertisement is received, and
-HCI_OP_LE_CREATE_CONN is sent.
+Apart from that, looks OK.
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
----
- include/net/bluetooth/hci_core.h | 3 +++
- 1 file changed, 3 insertions(+)
+>  		remote_devices_capacity *= 2;
+> +		/*
+> +		 * Save reference to previously allocated memory block so that
+> +		 * it can be freed in case realloc fails.
+> +		 */
+> +		tmp = remote_devices;
+> +
+>  		remote_devices = realloc(remote_devices, sizeof(bt_bdaddr_t) *
+>  						remote_devices_capacity);
+>  		if (remote_devices == NULL) {
+> +			free(tmp);
+>  			remote_devices_capacity = 0;
+>  			remote_devices_cnt = 0;
+>  			return;
+> --
+> 2.1.4
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3bd618d..357dd28 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -512,9 +512,11 @@ struct hci_conn_params {
- 		HCI_AUTO_CONN_DIRECT,
- 		HCI_AUTO_CONN_ALWAYS,
- 		HCI_AUTO_CONN_LINK_LOSS,
-+		HCI_AUTO_CONN_EXPLICIT,
- 	} auto_connect;
- 
- 	struct hci_conn *conn;
-+	bool explicit_connect;
- };
- 
- extern struct list_head hci_dev_list;
-@@ -639,6 +641,7 @@ enum {
- 	HCI_CONN_DROP,
- 	HCI_CONN_PARAM_REMOVAL_PEND,
- 	HCI_CONN_NEW_LINK_KEY,
-+	HCI_CONN_SCANNING,
- };
- 
- static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
--- 
-2.1.4
 
+Cheers,
+--
+Vinicius
