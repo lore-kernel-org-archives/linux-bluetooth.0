@@ -1,46 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Andrejs Hanins <andrejs.hanins@ubnt.com>,
-	"linux-bluetooth\@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] core/advertising: Fix byte order for MGMT_OP_ADD_ADVERTISING flags
-In-Reply-To: <55AF7668.7030903@ubnt.com>
-References: <55AF7668.7030903@ubnt.com>
-Date: Fri, 24 Jul 2015 14:55:46 -0300
-Message-ID: <87pp3h4ezh.fsf@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Shraddha Barke <shraddha.6596@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shraddha Barke <shraddha.6596@gmail.com>
+Subject: [PATCH 2317/2317] Staging : bluetooth Trailing whitespaces
+Date: Fri, 24 Jul 2015 23:20:46 +0530
+Message-Id: <1437760246-12177-1-git-send-email-shraddha.6596@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch removes trailing whitespaces in the file bfusb.c
 
-Andrejs Hanins <andrejs.hanins@ubnt.com> writes:
+Signed-off-by: Shraddha Barke <shraddha.6596@gmail.com>
+---
+ drivers/bluetooth/bfusb.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> Fix byte order for MGMT_OP_ADD_ADVERTISING flags
-> ---
->  src/advertising.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-
-Looks good.
-
-> diff --git a/src/advertising.c b/src/advertising.c
-> index d56b7a2..8c249d1 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -500,7 +500,7 @@ static DBusMessage *refresh_advertisement(struct advertisement *ad)
->  		return btd_error_failed(ad->reg, "Failed");
->  	}
->
-> -	cp->flags = flags;
-> +	cp->flags = htobl(flags);
->  	cp->instance = ad->instance;
->  	cp->adv_data_len = adv_data_len;
->  	memcpy(cp->data, adv_data, adv_data_len);
-> --
-> 1.9.1
-
-
-Cheers,
---
-Vinicius
+diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
+index fcfb72e..68c2717 100644
+--- a/drivers/bluetooth/bfusb.c
++++ b/drivers/bluetooth/bfusb.c
+@@ -148,8 +148,7 @@ static int bfusb_send_bulk(struct bfusb_data *data, struct sk_buff *skb)
+ 
+ 	err = usb_submit_urb(urb, GFP_ATOMIC);
+ 	if (err) {
+-		BT_ERR("%s bulk tx submit failed urb %p err %d", 
+-					data->hdev->name, urb, err);
++		BT_ERR("%s bulk tx submit failed urb %p err %d", data->hdev->name, urb, err);
+ 		skb_unlink(skb, &data->pending_q);
+ 		usb_free_urb(urb);
+ 	} else
+-- 
+2.1.0
