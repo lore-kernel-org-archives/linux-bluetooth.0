@@ -1,80 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anupam Roy <anupam.r@samsung.com>
-To: szymon.janc@tieto.com
-Cc: sachin.dev@samsung.com, linux-bluetooth@vger.kernel.org
-Subject: RE: RE: [PATCH] android/client/if-hl.c:Handle failure from malloc()
- request
-Date: Fri, 24 Jul 2015 07:52:50 -0400
-Message-id: <1437738770-13840-1-git-send-email-anupam.r@samsung.com>
+Message-ID: <1437735960.2863.20.camel@hadess.net>
+Subject: Re: [PATCH 2/2 v3] sixaxis: Ask user whether cable configuration
+ should be allowed
+From: Bastien Nocera <hadess@hadess.net>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 24 Jul 2015 13:06:00 +0200
+In-Reply-To: <359424171.AW1qIKcMiD@athlon>
+References: <1436278465.26954.32.camel@hadess.net>
+	 <359424171.AW1qIKcMiD@athlon>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+On Fri, 2015-07-24 at 00:33 +0200, Szymon Janc wrote:
+> Hi Bastien,
+> 
+> On Tuesday 07 July 2015 16:14:25 Bastien Nocera wrote:
+> > Previously, users doing cable configuration of Sixaxis PS3 
+> > controllers
+> > would only get asked whether a device was allowed to connect to the
+> > computer when switching it to Bluetooth mode: unplugging it, and
+> > pressing the PS button.
+> > 
+> > Instead, we should ask the user straight away, through the agent,
+> > whether the pad should be allowed to connect.
+> > 
+> > This makes it easier to setup those devices, while keeping 
+> > security.
+> 
+> Wouldn't this confuse user so that he may think device is already 
+> connected 
+> over BT?
 
->------- Original Message -------
->Sender : Szymon Janc<szymon.janc@tieto.com>
->Date : Jul 21, 2015 22:22 (GMT+09:00)
->Title : Re: [PATCH] android/client/if-hl.c:Handle failure from malloc() request
->
->Hi Anupam,
->
->On Tuesday 21 of July 2015 09:01:17 Anupam Roy wrote:
->> Ping
->
->I looks like I never got the original patch. Could you resend it?
->(seems like you hit timeframe when my gmail was experiencing issues with vger 
->server and I had to resubscribe to mailing list)
->
-Yes sure, I have re-sent the same patch. Kindly have a look. Thanks.
-http://thread.gmane.org/gmane.linux.bluez.kernel/63442
+No, because either:
+- you don't want to pair the device with your computer, which is
+impossible to do right now, and you can now do if you don't have an
+agent, or reject the association
+- you do want to be able to use it via Bluetooth, and we can have the
+association happen in one go, instead of being 2 separate actions.
 
->> > -----Original Message-----
->> >
->> >From: Anupam Roy 
->> >To: linux-bluetooth@vger.kernel.org
->> >Cc:sachin.dev@samsung.com; anupam.r@samsung.com
->> >Date : Jun 23, 2015 21:04 (GMT+09:00)
->> >Title : [PATCH] android/client/if-hl.c:Handle failure from malloc() request
->> >
->> >
->> >In case malloc() request fails, just print error message
->> >and return. Dereferencing reg.mdep_cfg in case of failure
->> >can lead to crash.
->> >---
->> >
->> > android/client/if-hl.c | 4 ++++
->> > 1 file changed, 4 insertions(+)
->> >
->> >diff --git a/android/client/if-hl.c b/android/client/if-hl.c
->> >index e0818ba..bd05671 100644
->> >--- a/android/client/if-hl.c
->> >+++ b/android/client/if-hl.c
->> >@@ -201,6 +201,10 @@ static void register_application_p(int argc, const
->> >char **argv)>
->> > reg.number_of_mdeps = atoi(argv[6]);
->> > 
->> > reg.mdep_cfg = malloc(reg.number_of_mdeps * sizeof(bthl_mdep_cfg_t));
->> >
->> >+ if (!reg.mdep_cfg) {
->> >+ haltest_error("malloc failed ");
->> >+ return;
->> >+ }
->> >
->> > mdep_argc_init = 7;
->> > 
->> > for (i = 0; i < reg.number_of_mdeps; i++) {
->> 
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->> in the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->-- 
->BR
->Szymon Janc
->
-BR,
--Anupam Roy
+>  Also what would happen if user remove this from usb before 
+> confirming?
 
+I didn't implement this, but we should cancel the existing
+authentication request indeed.
 
+>  And if PS button is pressed then, second authorization request for 
+> same UUID would be send?
 
+It wouldn't do anything, as there's already an auth request in flux.
+
+> Since this change plugin behavior in end user visible way this needs 
+> to be 
+> carefully thought out. It looks like people have different 
+> requirements for 
+> sixaxis security...
+
+This is actually more secure than what came before, and it's also far
+more predictable. It's the same security as before, but requires an
+agent to be available when the device is plugged in.
+
+>  so maybe it should have a sort of policy settings in 
+> config file? Opinions?
+
+What would the other policy be? I don't see a difference between the
+current security behaviour, and the one set out in this patch.
