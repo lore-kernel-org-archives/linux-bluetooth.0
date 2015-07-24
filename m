@@ -2,13 +2,13 @@ Return-Path: <cyrus@holtmann.org>
 From: Shraddha Barke <shraddha.6596@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+	Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Shraddha Barke <shraddha.6596@gmail.com>
 Subject: [PATCH 2318/2318] Staging : bluetooth Fix coding style issues
-Date: Fri, 24 Jul 2015 23:51:38 +0530
-Message-Id: <1437762098-13261-1-git-send-email-shraddha.6596@gmail.com>
+Date: Fri, 24 Jul 2015 23:38:04 +0530
+Message-Id: <1437761284-12798-1-git-send-email-shraddha.6596@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This patch adds a space after the '}' brackets
