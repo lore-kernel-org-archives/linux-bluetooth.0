@@ -1,64 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Atul Rai <a.rai@samsung.com>, linux-bluetooth@vger.kernel.org
-Cc: sachin.dev@samsung.com
-Subject: Re: [PATCH] android/hal-bluetooth: Fix NULL ptr dereference
-In-Reply-To: <1437555933-11333-1-git-send-email-a.rai@samsung.com>
-References: <1437555933-11333-1-git-send-email-a.rai@samsung.com>
-Date: Fri, 24 Jul 2015 14:38:11 -0300
-Message-ID: <87si8d4fss.fsf@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v4 5/5] Bluetooth: Enable new connection establishment procedure.
+Date: Fri, 24 Jul 2015 19:37:05 +0200
+Message-Id: <1437759425-20109-5-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1437759425-20109-1-git-send-email-jpawlowski@google.com>
+References: <1437759425-20109-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Currently, when trying to connect to already paired device that just
+rotated its RPA MAC address, old address would be used and connection
+would fail. In order to fix that, kernel must scan and receive
+advertisement with fresh RPA before connecting.
 
-Atul Rai <a.rai@samsung.com> writes:
+This patch enables new connection establishment procedure. Instead of just
+sending HCI_OP_LE_CREATE_CONN to controller, "connect" will add device to
+kernel whitelist and start scan. If advertisement is received, it'll be
+compared against whitelist and then trigger connection if it matches.
+That fixes mentioned reconnect issue for  already paired devices. It also
+make whole connection procedure more robust. We can try to connect to
+multiple devices at same time now, even though controller allow only one.
 
-> ping
->
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+---
+ net/bluetooth/l2cap_core.c | 6 ++++--
+ net/bluetooth/mgmt.c       | 7 ++++---
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-I didn't get the original email.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 45fffa4..2652f38 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7113,8 +7113,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		else
+ 			role = HCI_ROLE_MASTER;
+ 
+-		hcon = hci_connect_le(hdev, dst, dst_type, chan->sec_level,
+-				      HCI_LE_CONN_TIMEOUT, role);
++		hcon = hci_add_to_explicit_connect(hdev, dst, dst_type,
++						   chan->sec_level,
++						   HCI_LE_CONN_TIMEOUT,
++						   role);
+ 	} else {
+ 		u8 auth_type = l2cap_get_auth_type(chan);
+ 		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 083bb81..fa4e860 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3564,9 +3564,10 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		 */
+ 		hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
+ 
+-		conn = hci_connect_le(hdev, &cp->addr.bdaddr, addr_type,
+-				      sec_level, HCI_LE_CONN_TIMEOUT,
+-				      HCI_ROLE_MASTER);
++		conn = hci_add_to_explicit_connect(hdev, &cp->addr.bdaddr,
++						   addr_type, sec_level,
++						   HCI_LE_CONN_TIMEOUT,
++						   HCI_ROLE_MASTER);
+ 	}
+ 
+ 	if (IS_ERR(conn)) {
+-- 
+2.1.4
 
-
->> ------- Original Message -------
->> Sender : Atul Kumar Rai<a.rai@samsung.com> Lead Engineer (1)/SRI-Delhi-SWC Group/Samsung Electronics
->> Date : Jun 29, 2015 12:14 (GMT+05:30)
->> Title : [PATCH] android/hal-bluetooth: Fix NULL ptr dereference
->>
->> Add NULL check on malloc return to fix NULL pointer dereference
->> in case malloc fails.
->> ---
->>  android/hal-bluetooth.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
->> index e24f7d2..66f4a37 100644
->> --- a/android/hal-bluetooth.c
->> +++ b/android/hal-bluetooth.c
->> @@ -19,6 +19,7 @@
->>  #include <stdlib.h>
->>  #include <stdbool.h>
->>  #include <string.h>
->> +#include <errno.h>
->>
->>  #include <cutils/properties.h>
->>
->> @@ -1103,6 +1104,11 @@ static int open_bluetooth(const struct hw_module_t *module, char const *name,
->>
->>  	DBG("");
->>
->> +	if (!dev) {
->> +		error("Failed to allocate memory for device");
->> +		return -ENOMEM;
->> +	}
->> +
-
-Looks OK. Just wondering why it is not using calloc() instead of
-'malloc() + sizeof()'.
-
-
-Cheers,
---
-Vinicius
