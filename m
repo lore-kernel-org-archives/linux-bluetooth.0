@@ -1,61 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anupam Roy <anupam.r@samsung.com>
-To: vinicius.gomes@intel.com
-Cc: linux-bluetooth@vger.kernel.org, sachin.dev@samsung.com
-Subject: [PATCH RESEND] tools/obex-client-tool.c: Fix memory leak in
- obex-client-tool
-Date: Fri, 24 Jul 2015 11:01:46 -0400
-Message-id: <1437750106-16261-1-git-send-email-anupam.r@samsung.com>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: "Cukier\, Johnas" <Johnas_Cukier@bose.com>,
+	"linux-bluetooth\@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Spotted minor bug in btgatt-client.c
+In-Reply-To: <SN1PR0801MB1582A043B013B75D8A3D3149E3840@SN1PR0801MB1582.namprd08.prod.outlook.com>
+References: <SN1PR0801MB1582A043B013B75D8A3D3149E3840@SN1PR0801MB1582.namprd08.prod.outlook.com>
+Date: Fri, 24 Jul 2015 11:47:23 -0300
+Message-ID: <871tfx629w.fsf@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GOptionContext object should be freed in case socket connection
-fails and program execution is terminated.
+Hi Johnas,
 
-==12968== HEAP SUMMARY:
-==12968==     in use at exit: 2,895 bytes in 14 blocks
-==12968==   total heap usage: 23 allocs, 9 frees, 36,669 bytes allocated
-==12968==
-==12968== 624 (88 direct, 536 indirect) bytes in 1 blocks are definitely lost in loss record 13 of 14
-==12968==    at 0x4C2CC70: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==12968==    by 0x4E85668: g_malloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==12968==    by 0x4E89D22: g_option_context_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4002.0)
-==12968==    by 0x402BAB: main (obex-client-tool.c:428)
-==12968==
-==12968== LEAK SUMMARY:
-==12968==    definitely lost: 88 bytes in 1 blocks
-==12968==    indirectly lost: 536 bytes in 2 blocks
-==12968==      possibly lost: 0 bytes in 0 blocks
-==12968==    still reachable: 2,271 bytes in 11 blocks
-==12968==         suppressed: 0 bytes in 0 blocks
----
- tools/obex-client-tool.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+"Cukier, Johnas" <Johnas_Cukier@bose.com> writes:
 
-diff --git a/tools/obex-client-tool.c b/tools/obex-client-tool.c
-index 4f931f6..d0ba8a6 100644
---- a/tools/obex-client-tool.c
-+++ b/tools/obex-client-tool.c
-@@ -432,6 +432,7 @@ int main(int argc, char *argv[])
- 	if (err != NULL) {
- 		g_printerr("%s\n", err->message);
- 		g_error_free(err);
-+		g_option_context_free(context);
- 		exit(EXIT_FAILURE);
- 	}
- 
-@@ -445,8 +446,10 @@ int main(int argc, char *argv[])
- 	else
- 		io = unix_connect(transport);
- 
--	if (io == NULL)
-+	if (io == NULL) {
-+		g_option_context_free(context);
- 		exit(EXIT_FAILURE);
-+	}
- 
- 	memset(&sa, 0, sizeof(sa));
- 	sa.sa_handler = sig_term;
--- 
-1.9.1
+> I have the BlueZ v. 5.32 release distribution. I was trying to use the BTLE GATT client in the tools subdirectory. All worked fine until I tried to send bytes to the GATT server. Using the "write-value" command, I'm able to send data to a particular handle. However, the data bytes are restricted to two-digit decimals. So, if I try to send 100 (ASCII 'd'), I get an error message. I spotted the problem in lines 728 - 742 (listed below):
+>
+> 728: for (i = 1; i < argc; i++) {
+> 729: if (strlen(argv[i]) != 2) {
+> 730: printf("Invalid value byte: %s\n",
+> 731: argv[i]);
+> 732: goto done;
+> 733: }
+> 734:
+> 735: value[i-1] = strtol(argv[i], &endptr, 0);
+> 736: if (endptr == argv[i] || *endptr != '\0'
+> 737: || errno == ERANGE) {
+> 738: printf("Invalid value byte: %s\n",
+> 739: argv[i]);
+> 740: goto done;
+> 741: }
+> 742: }
+>
+> In line 729, the data byte is restricted to a string length of two. In line 735, the byte is converted to a decimal number. Since, the string is restricted to length 2, the byte cannot be prefixed by "0x". So, the strtol() function always converts the byte to decimal. My quick solution was to modify line 735 to read as follows:
+>
+> 735: value[i-1] = strtol(argv[i], &endptr, 16);
+>
+> This makes the assumption that all data bytes are in hexadecimal (without the "0x" prefix). This may be confusing to the user since the handle needs the "0x" prefix for it to be interpreted as a hex number. As I said, this is a quick fix that I implemented in my version.
+>
 
+Thanks for spotting this bug.
+
+Looking at how the "read-value" displays the value (hexadecimal without
+the 0x prefix), your quick solution seems at least consistent.
+
+Could you send a patch for this?
+
+
+Cheers,
+--
+Vinicius
