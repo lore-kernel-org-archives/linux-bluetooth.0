@@ -1,43 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dohyun Pyun <dh79.pyun@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: DoHyun Pyun <dh79.pyun@samsung.com>
-Subject: [PATCH v2 BLUEZ] tools/l2test: Fix potential double close
-Date: Mon, 27 Jul 2015 17:02:22 +0900
-Message-id: <1437984142-3701-1-git-send-email-dh79.pyun@samsung.com>
-In-reply-to: <1437546336-10105-1-git-send-email-dh79.pyun@samsung.com>
-References: <1437546336-10105-1-git-send-email-dh79.pyun@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 27 Jul 2015 10:32:21 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth:hci_h5: Cleaned up coding style warnings
+Message-ID: <20150727073221.GE29130@t440s>
+References: <20150723112248.GA6546@ubuntu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20150723112248.GA6546@ubuntu>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: DoHyun Pyun <dh79.pyun@samsung.com>
+Hi Prasanna,
 
-If the test gets an error after close the socket, the socket sk
-will be closed again. This patch prevents the double close case.
----
- tools/l2test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Jul 23, 2015, Mutharaju, Prasanna (P.) wrote:
+> From: Prasanna Karthik <mkarthi3@visteon.com>
+> 
+> Cleanedup "Unnecessary space before function pointer arguments" warning
+> reported by Checkpatch
+> 
+> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+> ---
+>  drivers/bluetooth/hci_h5.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index abe09c1..1d458c4 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -644,7 +644,6 @@ static void do_listen(void (*handler)(int sk))
- 			continue;
- 		}
- 		/* Child */
--		close(sk);
- 
- 		/* Set receive buffer size */
- 		if (rcvbuf && setsockopt(nsk, SOL_SOCKET, SO_RCVBUF, &rcvbuf,
-@@ -769,6 +768,7 @@ static void do_listen(void (*handler)(int sk))
- 		}
- 
- 		handler(nsk);
-+		close(sk);
- 
- 		syslog(LOG_INFO, "Disconnect: %m");
- 		exit(0);
--- 
-1.8.1.2
+Applied to bluetooth-next. Thanks.
 
+Johan
