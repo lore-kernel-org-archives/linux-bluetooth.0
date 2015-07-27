@@ -2,52 +2,66 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Atul Rai <a.rai@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org, sachin.dev@samsung.com
-Subject: Re: [PATCH] android/hal-bluetooth: Fix NULL ptr dereference
-Date: Mon, 27 Jul 2015 21:21:59 +0200
-Message-ID: <1916606.IEpI44LjIf@leonov>
-In-Reply-To: <1435560253-5511-1-git-send-email-a.rai@samsung.com>
-References: <1435560253-5511-1-git-send-email-a.rai@samsung.com>
+Subject: Re: [PATCH v2] android/client: Fix memory leak while using realloc()
+Date: Mon, 27 Jul 2015 21:18:25 +0200
+Message-ID: <2255750.trinXVBJIG@leonov>
+In-Reply-To: <1437970480-2619-1-git-send-email-a.rai@samsung.com>
+References: <1437970480-2619-1-git-send-email-a.rai@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Atul,
 
-On Monday 29 of June 2015 12:14:13 Atul Rai wrote:
-> Add NULL check on malloc return to fix NULL pointer dereference
-> in case malloc fails.
+On Monday 27 of July 2015 09:44:40 Atul Rai wrote:
+> While reallocating space to store additional "remote device set" using
+> realloc, if realloc() fails, the original block is left untouched but
+> reference to that block is lost as NULL is assigned to remote_devices.
+> The original block needs to be freed before return.
 > ---
->  android/hal-bluetooth.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  android/client/if-bt.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 > 
-> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-> index e24f7d2..66f4a37 100644
-> --- a/android/hal-bluetooth.c
-> +++ b/android/hal-bluetooth.c
-> @@ -19,6 +19,7 @@
->  #include <stdlib.h>
->  #include <stdbool.h>
->  #include <string.h>
-> +#include <errno.h>
-> 
->  #include <cutils/properties.h>
-> 
-> @@ -1103,6 +1104,11 @@ static int open_bluetooth(const struct hw_module_t
-> *module, char const *name,
-> 
->  	DBG("");
-> 
-> +	if (!dev) {
-> +		error("Failed to allocate memory for device");
-> +		return -ENOMEM;
-> +	}
+> diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+> index 4723024..34611b9 100644
+> --- a/android/client/if-bt.c
+> +++ b/android/client/if-bt.c
+> @@ -119,9 +119,18 @@ void add_remote_device(const bt_bdaddr_t *addr)
+>  	/* Realloc space if needed */
+>  	if (remote_devices_cnt >= remote_devices_capacity) {
+>  		remote_devices_capacity *= 2;
+> +		bt_bdaddr_t *tmp;
 > +
->  	memset(dev, 0, sizeof(bluetooth_device_t));
->  	dev->common.tag = HARDWARE_DEVICE_TAG;
->  	dev->common.version = 0;
+> +		/*
+> +		 * Save reference to previously allocated memory block so that
+> +		 * it can be freed in case realloc fails.
+> +		 */
+> +		tmp = remote_devices;
+> +
+>  		remote_devices = realloc(remote_devices, sizeof(bt_bdaddr_t) *
+>  						remote_devices_capacity);
+>  		if (remote_devices == NULL) {
+> +			free(tmp);
+>  			remote_devices_capacity = 0;
+>  			remote_devices_cnt = 0;
+>  			return;
 
-Patch applied, thanks.
+
+This doesn't compile cleanly:
+
+  CC       android/client/android_haltest-if-hf-client.o
+android/client/if-bt.c: In function ‘add_remote_device’:
+android/client/if-bt.c:122:3: error: ISO C90 forbids mixed declarations and 
+code [-Werror=declaration-after-statement]
+   bt_bdaddr_t *tmp;
+   ^
+cc1: all warnings being treated as errors
+Makefile:6171: recipe for target 'android/client/android_haltest-if-bt.o' 
+failed
+
+You can use ./boostrap-configure;make for testing patches as this enables 
+extra compiler flags.
 
 -- 
 BR
