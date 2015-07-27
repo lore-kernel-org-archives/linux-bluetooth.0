@@ -1,31 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55B5E896.4000707@intel.com>
-Date: Mon, 27 Jul 2015 10:15:18 +0200
-From: Loic Poulain <loic.poulain@intel.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_uart: Add Intel baudrate configuration
- support
-References: <1437472694-4805-1-git-send-email-loic.poulain@intel.com> <B70087AE-159E-4483-B599-11A4DD3D4538@holtmann.org>
-In-Reply-To: <B70087AE-159E-4483-B599-11A4DD3D4538@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+From: Dohyun Pyun <dh79.pyun@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: DoHyun Pyun <dh79.pyun@samsung.com>
+Subject: [PATCH v2 BLUEZ] tools/l2test: Fix potential double close
+Date: Mon, 27 Jul 2015 17:02:22 +0900
+Message-id: <1437984142-3701-1-git-send-email-dh79.pyun@samsung.com>
+In-reply-to: <1437546336-10105-1-git-send-email-dh79.pyun@samsung.com>
+References: <1437546336-10105-1-git-send-email-dh79.pyun@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: DoHyun Pyun <dh79.pyun@samsung.com>
 
->
-> this is a really bad behavior from our firmware then. We would actually like to get the cmd status or cmd complete on the current baud rate and once that has been confirmed, we switch to the new baud rate. I remember that there are actually two different baud rate change commands for the Intel controllers. Are you using the right one?
+If the test gets an error after close the socket, the socket sk
+will be closed again. This patch prevents the double close case.
+---
+ tools/l2test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I don't know about a second vendor command to change the baudrate.
-I use the same one used in hciattach_intel where the behavior seems 
-identical.
-
-
-Regards,
-Loic
-
+diff --git a/tools/l2test.c b/tools/l2test.c
+index abe09c1..1d458c4 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -644,7 +644,6 @@ static void do_listen(void (*handler)(int sk))
+ 			continue;
+ 		}
+ 		/* Child */
+-		close(sk);
+ 
+ 		/* Set receive buffer size */
+ 		if (rcvbuf && setsockopt(nsk, SOL_SOCKET, SO_RCVBUF, &rcvbuf,
+@@ -769,6 +768,7 @@ static void do_listen(void (*handler)(int sk))
+ 		}
+ 
+ 		handler(nsk);
++		close(sk);
+ 
+ 		syslog(LOG_INFO, "Disconnect: %m");
+ 		exit(0);
 -- 
-Intel Open Source Technology Center
-http://oss.intel.com/
+1.8.1.2
+
