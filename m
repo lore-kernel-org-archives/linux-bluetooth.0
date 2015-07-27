@@ -1,25 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 26 Jul 2015 21:54:42 -0700 (PDT)
-Message-Id: <20150726.215442.695531626290691136.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth 2015-07-23
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20150723151722.GA20850@t440s.ger.corp.intel.com>
-References: <20150723151722.GA20850@t440s.ger.corp.intel.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+From: Atul Rai <a.rai@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com
+Subject: [PATCH v2] android/client: Fix memory leak while using realloc()
+Date: Mon, 27 Jul 2015 09:44:40 +0530
+Message-id: <1437970480-2619-1-git-send-email-a.rai@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Thu, 23 Jul 2015 18:17:22 +0300
+While reallocating space to store additional "remote device set" using
+realloc, if realloc() fails, the original block is left untouched but
+reference to that block is lost as NULL is assigned to remote_devices.
+The original block needs to be freed before return.
+---
+ android/client/if-bt.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-> Here's another one-patch pull request for 4.2 which targets a potential
-> NULL pointer dereference in the LE Security Manager code that can be
-> triggered by using older user space tools. The issue has been there
-> since 4.0 so there's the appropriate "Cc: stable" in place.
-> 
-> Let me know if there are any issues pulling. Thanks.
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 4723024..34611b9 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -119,9 +119,18 @@ void add_remote_device(const bt_bdaddr_t *addr)
+ 	/* Realloc space if needed */
+ 	if (remote_devices_cnt >= remote_devices_capacity) {
+ 		remote_devices_capacity *= 2;
++		bt_bdaddr_t *tmp;
++
++		/*
++		 * Save reference to previously allocated memory block so that
++		 * it can be freed in case realloc fails.
++		 */
++		tmp = remote_devices;
++
+ 		remote_devices = realloc(remote_devices, sizeof(bt_bdaddr_t) *
+ 						remote_devices_capacity);
+ 		if (remote_devices == NULL) {
++			free(tmp);
+ 			remote_devices_capacity = 0;
+ 			remote_devices_cnt = 0;
+ 			return;
+-- 
+2.1.4
 
-Pulled, thanks Johan.
