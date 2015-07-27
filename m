@@ -1,29 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Jul 2015 10:21:47 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anchit Narang <anchit.n@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, sachin.dev@samsung.com,
-	anupam.r@smsung.com
-Subject: Re: [PATCH] android/tester-main.c:Fixed Memory leak
-Message-ID: <20150727072147.GA29130@t440s>
-References: <1437539243-20709-1-git-send-email-anchit.n@samsung.com>
+From: Tobias Preclik <linux-bluetooth@tobias.preclik.de>
+Subject: Invalid file descriptor gatttool of bluez 5.32
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <55B5DA6E.9060100@tobias.preclik.de>
+Date: Mon, 27 Jul 2015 09:14:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1437539243-20709-1-git-send-email-anchit.n@samsung.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anchit,
+Hello,
 
-On Wed, Jul 22, 2015, Anchit Narang wrote:
-> This patch fixes memory leak issues in various functions
-> by allocating memory to  structure step only after intial
-> checks are performed as control was returning from these
-> checks without freeing memory allocated to it.
-> ---
->  android/tester-main.c |   36 +++++++++++++++++++++++++++---------
->  1 file changed, 27 insertions(+), 9 deletions(-)
+it seems the cleanup process when disconnecting from a bluetooth LE 
+device changed in bluez 5.32 but gatttool 
+(attrib/interactive.c:disconnect_io) wasn't updated.
 
-Applied. Thanks.
+$ ./gatttool -I
+[                 ][LE]> connect FF:A7:8C:98:46:B6 random
+Attempting to connect to FF:A7:8C:98:46:B6
+Connection successful
+[FF:A7:8C:98:46:B6][LE]> disconnect
 
-Johan
+(gatttool:20949): GLib-WARNING **: Invalid file descriptor.
+
+[FF:A7:8C:98:46:B6][LE]> exit
+
+What's the right way to do it in gatttool/bluez 5.32?
+
+Best regards,
+Tobias
