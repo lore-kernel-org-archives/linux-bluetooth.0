@@ -1,87 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Cukier, Johnas" <Johnas_Cukier@bose.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Spotted minor bug in btgatt-client.c
-Date: Mon, 27 Jul 2015 14:07:29 +0000
-Message-ID: <SN1PR0801MB1582B88CF24A85E82721DAA4E38E0@SN1PR0801MB1582.namprd08.prod.outlook.com>
-References: <SN1PR0801MB1582A043B013B75D8A3D3149E3840@SN1PR0801MB1582.namprd08.prod.outlook.com>
-	<871tfx629w.fsf@intel.com>,<CABBYNZJ3mwB-tYhEXK5ZdkgUdLMVkBpujPg+OC8g-LWVasyf7Q@mail.gmail.com>
-In-Reply-To: <CABBYNZJ3mwB-tYhEXK5ZdkgUdLMVkBpujPg+OC8g-LWVasyf7Q@mail.gmail.com>
-Content-Type: text/plain; charset=US-ASCII
-MIME-Version: 1.0
+From: Frederic Danis <frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: btbcm: Add BCM4330B1 UART device
+Date: Mon, 27 Jul 2015 16:00:39 +0200
+Message-Id: <1438005639-3838-2-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1438005639-3838-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1438005639-3838-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Add "waiting for configuration" address.
+Add lmp_subver and firmware name for BCM4330B1 controller.
 
-That is one option. However, I noticed that my "quick fix" seems to be consistent with what is done in other areas of the code. I sent a patch file to Vinicius with my fix. Whatever you guys decide to do is fine with me. I'm just trying to help. 
+Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+---
+ drivers/bluetooth/btbcm.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-By the way, I'm also trying to characterize the code in the "src/shared" directory which seems to be the non-DBus, direct function call code. I'm using a tool called "PlantUML" to help in the characterization of this part of the code. I'm creating a class diagram that gives a big picture of the code base. Even though the code is written in C, it is very C++-like in style. So, I'm treating it more like a C++ code base. Right now, it's preliminary, but it's giving me a much better understanding of what is going on. I hope to move to the DBus part of the code later.
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 9d699dd..2fbbbea 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -34,6 +34,7 @@
+ 
+ #define BDADDR_BCM20702A0 (&(bdaddr_t){ {0x00, 0xa0, 0x02, 0x70, 0x20, 0x00} })
+ #define BDADDR_BCM4324B3 (&(bdaddr_t){ {0x00, 0x00, 0x00, 0xb3, 0x24, 0x43} })
++#define BDADDR_BCM4330B1 (&(bdaddr_t){ {0x00, 0x00, 0x00, 0xb1, 0x30, 0x43} })
+ 
+ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ {
+@@ -66,9 +67,13 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	 *
+ 	 * The address 43:24:B3:00:00:00 indicates a BCM4324B3 controller
+ 	 * with waiting for configuration state.
++	 *
++	 * The address 43:30:B1:00:00:00 indicates a BCM4330B1 controller
++	 * with waiting for configuration state.
+ 	 */
+ 	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0) ||
+-	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3)) {
++	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3) ||
++	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1)) {
+ 		BT_INFO("%s: BCM: Using default device address (%pMR)",
+ 			hdev->name, &bda->bdaddr);
+ 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+@@ -241,6 +246,7 @@ static const struct {
+ 	u16 subver;
+ 	const char *name;
+ } bcm_uart_subver_table[] = {
++	{ 0x4103, "BCM4330B1"	},	/* 002.001.003 */
+ 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
+ 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
+ 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
+-- 
+1.9.1
 
-Let me know if you guys want a copy. 
-
-Johnas Cukier
-
-Bose Corporation
-
-(508)766-9097
-
-Johnas_Cukier@bose.com
-
-________________________________________
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Sent: Monday, July 27, 2015 4:32 AM
-To: Vinicius Costa Gomes
-Cc: Cukier, Johnas; linux-bluetooth@vger.kernel.org
-Subject: Re: Spotted minor bug in btgatt-client.c
-
-HI Johnas,
-
-On Fri, Jul 24, 2015 at 5:47 PM, Vinicius Costa Gomes
-<vinicius.gomes@intel.com> wrote:
-> Hi Johnas,
->
-> "Cukier, Johnas" <Johnas_Cukier@bose.com> writes:
->
->> I have the BlueZ v. 5.32 release distribution. I was trying to use the BTLE GATT client in the tools subdirectory. All worked fine until I tried to send bytes to the GATT server. Using the "write-value" command, I'm able to send data to a particular handle. However, the data bytes are restricted to two-digit decimals. So, if I try to send 100 (ASCII 'd'), I get an error message. I spotted the problem in lines 728 - 742 (listed below):
->>
->> 728: for (i = 1; i < argc; i++) {
->> 729: if (strlen(argv[i]) != 2) {
->> 730: printf("Invalid value byte: %s\n",
->> 731: argv[i]);
->> 732: goto done;
->> 733: }
->> 734:
->> 735: value[i-1] = strtol(argv[i], &endptr, 0);
->> 736: if (endptr == argv[i] || *endptr != '\0'
->> 737: || errno == ERANGE) {
->> 738: printf("Invalid value byte: %s\n",
->> 739: argv[i]);
->> 740: goto done;
->> 741: }
->> 742: }
->>
->> In line 729, the data byte is restricted to a string length of two. In line 735, the byte is converted to a decimal number. Since, the string is restricted to length 2, the byte cannot be prefixed by "0x". So, the strtol() function always converts the byte to decimal. My quick solution was to modify line 735 to read as follows:
->>
->> 735: value[i-1] = strtol(argv[i], &endptr, 16);
->>
->> This makes the assumption that all data bytes are in hexadecimal (without the "0x" prefix). This may be confusing to the user since the handle needs the "0x" prefix for it to be interpreted as a hex number. As I said, this is a quick fix that I implemented in my version.
->>
->
-> Thanks for spotting this bug.
->
-> Looking at how the "read-value" displays the value (hexadecimal without
-> the 0x prefix), your quick solution seems at least consistent.
->
-> Could you send a patch for this?
-
-Well we using base 0 so it could auto detect the base, but then
-limiting the input to only 2 digits makes it impossible to use 0x to
-trigger hexadecimals conversions. Maybe we could allow any arbitrary
-number of digits.
-
-
---
-Luiz Augusto von Dentz
