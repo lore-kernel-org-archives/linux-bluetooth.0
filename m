@@ -1,20 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Jul 2015 11:46:39 +0200
-From: Alexis Ballier <aballier@gentoo.org>
+From: Anchit Narang <anchit.n@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix build with experimental enabled but no readline.
-Message-ID: <20150727114639.381b7c64@gentoo.org>
-In-Reply-To: <1435668000-26875-1-git-send-email-aballier@gentoo.org>
-References: <1435668000-26875-1-git-send-email-aballier@gentoo.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Cc: sachin.dev@samsung.com
+Subject: [PATCH] tools/hciconfig:Fixed Memory Leak
+Date: Mon, 27 Jul 2015 15:06:39 +0530
+Message-id: <1437989799-17394-1-git-send-email-anchit.n@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-[...]
+Freed memory allocated to structure hci_dev_list_req to avoid memory leak
+---
+ tools/hciconfig.c |    7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Hi,
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index 6397e71..0738b53 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -69,6 +69,10 @@ static void print_dev_list(int ctl, int flags)
+ 
+ 	if (ioctl(ctl, HCIGETDEVLIST, (void *) dl) < 0) {
+ 		perror("Can't get device list");
++
++		if (dl)
++		    free(dl);
++
+ 		exit(1);
+ 	}
+ 
+@@ -78,6 +82,9 @@ static void print_dev_list(int ctl, int flags)
+ 			continue;
+ 		print_dev_info(ctl, &di);
+ 	}
++
++	if (dl)
++	    free(dl);
+ }
+ 
+ static void print_pkt_type(struct hci_dev_info *di)
+-- 
+1.7.9.5
 
-Is this the proper ml to send bluez patches ?
-
-Alexis.
