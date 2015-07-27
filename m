@@ -1,68 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Atul Rai <a.rai@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, sachin.dev@samsung.com
-Subject: Re: [PATCH v2] android/client: Fix memory leak while using realloc()
-Date: Mon, 27 Jul 2015 21:18:25 +0200
-Message-ID: <2255750.trinXVBJIG@leonov>
-In-Reply-To: <1437970480-2619-1-git-send-email-a.rai@samsung.com>
-References: <1437970480-2619-1-git-send-email-a.rai@samsung.com>
-MIME-Version: 1.0
+From: Frederic Danis <frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btbcm: Add BCM4330B1 UART device
+Date: Mon, 27 Jul 2015 18:02:25 +0200
+Message-Id: <1438012945-9549-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Atul,
+Add "waiting for configuration" address.
+Add lmp_subver and firmware name for BCM4330B1 controller.
 
-On Monday 27 of July 2015 09:44:40 Atul Rai wrote:
-> While reallocating space to store additional "remote device set" using
-> realloc, if realloc() fails, the original block is left untouched but
-> reference to that block is lost as NULL is assigned to remote_devices.
-> The original block needs to be freed before return.
-> ---
->  android/client/if-bt.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-> index 4723024..34611b9 100644
-> --- a/android/client/if-bt.c
-> +++ b/android/client/if-bt.c
-> @@ -119,9 +119,18 @@ void add_remote_device(const bt_bdaddr_t *addr)
->  	/* Realloc space if needed */
->  	if (remote_devices_cnt >= remote_devices_capacity) {
->  		remote_devices_capacity *= 2;
-> +		bt_bdaddr_t *tmp;
-> +
-> +		/*
-> +		 * Save reference to previously allocated memory block so that
-> +		 * it can be freed in case realloc fails.
-> +		 */
-> +		tmp = remote_devices;
-> +
->  		remote_devices = realloc(remote_devices, sizeof(bt_bdaddr_t) *
->  						remote_devices_capacity);
->  		if (remote_devices == NULL) {
-> +			free(tmp);
->  			remote_devices_capacity = 0;
->  			remote_devices_cnt = 0;
->  			return;
+Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+---
+ drivers/bluetooth/btbcm.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-
-This doesn't compile cleanly:
-
-  CC       android/client/android_haltest-if-hf-client.o
-android/client/if-bt.c: In function ‘add_remote_device’:
-android/client/if-bt.c:122:3: error: ISO C90 forbids mixed declarations and 
-code [-Werror=declaration-after-statement]
-   bt_bdaddr_t *tmp;
-   ^
-cc1: all warnings being treated as errors
-Makefile:6171: recipe for target 'android/client/android_haltest-if-bt.o' 
-failed
-
-You can use ./boostrap-configure;make for testing patches as this enables 
-extra compiler flags.
-
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 9ceb8ac..02ed816 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -34,6 +34,7 @@
+ 
+ #define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
+ #define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
++#define BDADDR_BCM4330B1 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb1, 0x30, 0x43}})
+ 
+ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ {
+@@ -66,9 +67,13 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	 *
+ 	 * The address 43:24:B3:00:00:00 indicates a BCM4324B3 controller
+ 	 * with waiting for configuration state.
++	 *
++	 * The address 43:30:B1:00:00:00 indicates a BCM4330B1 controller
++	 * with waiting for configuration state.
+ 	 */
+ 	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0) ||
+-	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3)) {
++	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3) ||
++	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1)) {
+ 		BT_INFO("%s: BCM: Using default device address (%pMR)",
+ 			hdev->name, &bda->bdaddr);
+ 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+@@ -241,6 +246,7 @@ static const struct {
+ 	u16 subver;
+ 	const char *name;
+ } bcm_uart_subver_table[] = {
++	{ 0x4103, "BCM4330B1"	},	/* 002.001.003 */
+ 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
+ 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
+ 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
 -- 
-BR
-Szymon Janc
+1.9.1
+
