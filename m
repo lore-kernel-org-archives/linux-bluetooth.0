@@ -1,31 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tobias Preclik <linux-bluetooth@tobias.preclik.de>
-Subject: Invalid file descriptor gatttool of bluez 5.32
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <55B5DA6E.9060100@tobias.preclik.de>
-Date: Mon, 27 Jul 2015 09:14:54 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Date: Sun, 26 Jul 2015 21:54:42 -0700 (PDT)
+Message-Id: <20150726.215442.695531626290691136.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth 2015-07-23
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20150723151722.GA20850@t440s.ger.corp.intel.com>
+References: <20150723151722.GA20850@t440s.ger.corp.intel.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 23 Jul 2015 18:17:22 +0300
 
-it seems the cleanup process when disconnecting from a bluetooth LE 
-device changed in bluez 5.32 but gatttool 
-(attrib/interactive.c:disconnect_io) wasn't updated.
+> Here's another one-patch pull request for 4.2 which targets a potential
+> NULL pointer dereference in the LE Security Manager code that can be
+> triggered by using older user space tools. The issue has been there
+> since 4.0 so there's the appropriate "Cc: stable" in place.
+> 
+> Let me know if there are any issues pulling. Thanks.
 
-$ ./gatttool -I
-[                 ][LE]> connect FF:A7:8C:98:46:B6 random
-Attempting to connect to FF:A7:8C:98:46:B6
-Connection successful
-[FF:A7:8C:98:46:B6][LE]> disconnect
-
-(gatttool:20949): GLib-WARNING **: Invalid file descriptor.
-
-[FF:A7:8C:98:46:B6][LE]> exit
-
-What's the right way to do it in gatttool/bluez 5.32?
-
-Best regards,
-Tobias
+Pulled, thanks Johan.
