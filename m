@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1437747466-30230-1-git-send-email-bharat.panda@samsung.com>
-References: <1437747466-30230-1-git-send-email-bharat.panda@samsung.com>
-Date: Mon, 27 Jul 2015 14:06:33 +0300
-Message-ID: <CABBYNZ+E7VQqfvjYcqni6uOW_NhkVv-KaemEkuzkbJ26z4xaLg@mail.gmail.com>
-Subject: Re: [PATCH ] monitor: Add support for GetTotalNumOfItems
+In-Reply-To: <1437736623-27428-1-git-send-email-bharat.panda@samsung.com>
+References: <1437736623-27428-1-git-send-email-bharat.panda@samsung.com>
+Date: Mon, 27 Jul 2015 14:05:14 +0300
+Message-ID: <CABBYNZ+VBuuuZzEWatgHE0a9nx7cRdy6+i92gsf_Pf9_P=iXGw@mail.gmail.com>
+Subject: Re: [PATCH v4] audio/avrcp: Handle Available Players Changed
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Bharat Panda <bharat.panda@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
@@ -15,112 +15,78 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Bharat,
 
-On Fri, Jul 24, 2015 at 5:17 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Support for AVRCP Get Total NUmber Of Items added to btmon.
+On Fri, Jul 24, 2015 at 2:17 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Add support to handle AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED
+> notification.
+> - Register notification for "Available Players Changed"
+> - Send interim and final responses on change in available players.
 >
->       Channel: 66 len 17 ctrl 0x060c [PSM 27 mode 3] {chan 2}
->       I-frame: Unsegmented TxSeq 6 ReqSeq 6
->       AVCTP Browsing: Command: type 0x00 label 6 PID 0x110e
->         AVRCP: GetTotalNumOfItems: len 0x000b
->               Scope: 0x01 (Media Player Virtual Filesystem)
->
->       Channel: 66 len 17 ctrl 0x070c [PSM 27 mode 3] {chan 2}
->       I-frame: Unsegmented TxSeq 6 ReqSeq 7
->       AVCTP Browsing: Response: type 0x00 label 6 PID 0x110e
->         AVRCP: GetTotalNumOfItems: len 0x0007
->           Status: 0x04 (Success)
->           UIDCounter: 0x332e (13102)
->           Number of Items: 0x0001 (1)
+> < ACL data: handle 70 flags 0x00 dlen 18
+>     L2CAP(d): cid 0x0041 len 14 [psm 23]
+>       AVCTP Control: Response : pt 0x00 transaction 13 pid 0x110e
+>         AV/C: Changed: address 0x48 opcode 0x00
+>           Subunit: Panel
+>           Opcode: Vendor Dependent
+>           Company ID: 0x001958
+>           AVRCP: RegisterNotification: pt Single len 0x0001
+>             EventID: 0x0a (EVENT_AVAILABLE_PLAYERS_CHANGED)
 > ---
->  monitor/avctp.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 54 insertions(+)
+>  profiles/audio/avrcp.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
 >
-> diff --git a/monitor/avctp.c b/monitor/avctp.c
-> index 556320c..a54b051 100644
-> --- a/monitor/avctp.c
-> +++ b/monitor/avctp.c
-> @@ -141,6 +141,7 @@
->  #define AVRCP_CHANGE_PATH              0x72
->  #define AVRCP_GET_ITEM_ATTRIBUTES      0x73
->  #define AVRCP_PLAY_ITEM                        0x74
-> +#define AVRCP_GET_TOTAL_NUMBER_OF_ITEMS        0x75
->  #define AVRCP_SEARCH                   0x80
->  #define AVRCP_ADD_TO_NOW_PLAYING       0x90
->  #define AVRCP_GENERAL_REJECT           0xA0
-> @@ -440,6 +441,8 @@ static const char *pdu2str(uint8_t pduid)
->                 return "GetItemAttributes";
->         case AVRCP_PLAY_ITEM:
->                 return "PlayItem";
-> +       case AVRCP_GET_TOTAL_NUMBER_OF_ITEMS:
-> +               return "GetTotalNumOfItems";
->         case AVRCP_SEARCH:
->                 return "Search";
->         case AVRCP_ADD_TO_NOW_PLAYING:
-> @@ -2045,6 +2048,54 @@ response:
->         return true;
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 60f8cbf..5e25cd3 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -673,6 +673,9 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
+>                 pdu->params[size++] = attr;
+>                 pdu->params[size++] = val;
+>                 break;
+> +       case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
+> +               size = 1;
+> +               break;
+>         default:
+>                 error("Unknown event %u", id);
+>                 return;
+> @@ -1490,6 +1493,9 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+>                 }
+>
+>                 break;
+> +       case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
+> +               len = 1;
+> +               break;
+>         case AVRCP_EVENT_VOLUME_CHANGED:
+>                 pdu->params[1] = media_transport_get_device_volume(dev);
+>                 if (pdu->params[1] > 127)
+> @@ -3440,6 +3446,9 @@ static void target_init(struct avrcp *session)
+>         if (target->version < 0x0104)
+>                 return;
+>
+> +       session->supported_events |=
+> +                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED);
+> +
+>         /* Only check capabilities if controller is not supported */
+>         if (session->controller == NULL)
+>                 avrcp_get_capabilities(session);
+> @@ -3719,6 +3728,9 @@ struct avrcp_player *avrcp_register_player(struct btd_adapter *adapter,
+>                 }
+>         }
+>
+> +       avrcp_player_event(player,
+> +                               AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
+> +
+>         return player;
 >  }
 >
-> +static bool avrcp_get_total_number_of_items(struct avctp_frame *avctp_frame)
-> +{
-> +       struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
-> +       uint32_t num_of_items;
-> +       uint16_t uidcounter;
-> +       uint8_t scope, status, indent = 2;
-> +
-> +       if (avctp_frame->hdr & 0x02)
-> +               goto response;
-> +
-> +       if (frame->size < 4) {
-> +               printf("PDU Malformed\n");
-> +               packet_hexdump(frame->data, frame->size);
-> +               return false;
-> +       }
-> +
-> +       if (!l2cap_frame_get_u8(frame, &scope))
-> +               return false;
-> +
-> +       print_field("%*cScope: 0x%02x (%s)", (indent - 8), ' ',
-> +                                               scope, scope2str(scope));
-> +
-> +       return true;
-> +
-> +response:
-> +       if (!l2cap_frame_get_u8(frame, &status))
-> +               return false;
-> +
-> +       print_field("%*cStatus: 0x%02x (%s)", indent, ' ',
-> +                               status, error2str(status));
-> +
-> +       if (frame->size == 1)
-> +               return false;
-> +
-> +       if (!l2cap_frame_get_be16(frame, &uidcounter))
-> +               return false;
-> +
-> +       print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ',
-> +                               uidcounter, uidcounter);
-> +
-> +       if (!l2cap_frame_get_be32(frame, &num_of_items))
-> +               return false;
-> +
-> +       print_field("%*cNumber of Items: 0x%04x (%u)", indent, ' ',
-> +                               num_of_items, num_of_items);
-> +
-> +       return true;
-> +}
+> @@ -3742,6 +3754,8 @@ void avrcp_unregister_player(struct avrcp_player *player)
+>         }
 >
->  static bool avrcp_search_item(struct avctp_frame *avctp_frame)
->  {
-> @@ -2374,6 +2425,9 @@ static bool avrcp_browsing_packet(struct avctp_frame *avctp_frame)
->         case AVRCP_GET_ITEM_ATTRIBUTES:
->                 avrcp_get_item_attributes(avctp_frame);
->                 break;
-> +       case AVRCP_GET_TOTAL_NUMBER_OF_ITEMS:
-> +               avrcp_get_total_number_of_items(avctp_frame);
-> +               break;
->         case AVRCP_SEARCH:
->                 avrcp_search_item(avctp_frame);
->                 break;
+>         player_destroy(player);
+> +       avrcp_player_event(player,
+> +                               AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
+>  }
+>
+>  static gboolean avrcp_handle_set_volume(struct avctp *conn,
 > --
 > 1.9.1
 
