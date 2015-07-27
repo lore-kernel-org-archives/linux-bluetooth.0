@@ -1,43 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 27 Jul 2015 11:23:13 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Dohyun Pyun <dh79.pyun@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 BLUEZ] tools/l2test: Fix potential double close
+Message-ID: <20150727082313.GA6501@t440s.lan>
+References: <1437546336-10105-1-git-send-email-dh79.pyun@samsung.com>
+ <1437984142-3701-1-git-send-email-dh79.pyun@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <55B5DA6E.9060100@tobias.preclik.de>
-References: <55B5DA6E.9060100@tobias.preclik.de>
-Date: Mon, 27 Jul 2015 11:27:14 +0300
-Message-ID: <CABBYNZ+XERxap9yH0avT_QtxcJ8hYwFBpWqqinJzODADNmcAGA@mail.gmail.com>
-Subject: Re: Invalid file descriptor gatttool of bluez 5.32
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Tobias Preclik <linux-bluetooth@tobias.preclik.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1437984142-3701-1-git-send-email-dh79.pyun@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tobias,
+Hi Pyun,
 
-On Mon, Jul 27, 2015 at 10:14 AM, Tobias Preclik
-<linux-bluetooth@tobias.preclik.de> wrote:
-> Hello,
->
-> it seems the cleanup process when disconnecting from a bluetooth LE device
-> changed in bluez 5.32 but gatttool (attrib/interactive.c:disconnect_io)
-> wasn't updated.
->
-> $ ./gatttool -I
-> [                 ][LE]> connect FF:A7:8C:98:46:B6 random
-> Attempting to connect to FF:A7:8C:98:46:B6
-> Connection successful
-> [FF:A7:8C:98:46:B6][LE]> disconnect
->
-> (gatttool:20949): GLib-WARNING **: Invalid file descriptor.
->
-> [FF:A7:8C:98:46:B6][LE]> exit
->
-> What's the right way to do it in gatttool/bluez 5.32?
+On Mon, Jul 27, 2015, Dohyun Pyun wrote:
+> From: DoHyun Pyun <dh79.pyun@samsung.com>
+> 
+> If the test gets an error after close the socket, the socket sk
+> will be closed again. This patch prevents the double close case.
+> ---
+>  tools/l2test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-There are new tools to use with GATT, bluetoothctl/bluetoothd is the
-preferred since with that you have GAP, etc, but if want to use a
-stand alone tool then I suggest you use btgatt-client.
+Applied. Thanks.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
