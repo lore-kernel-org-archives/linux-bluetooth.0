@@ -1,49 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dohyun Pyun <dh79.pyun@samsung.com>
+Date: Tue, 28 Jul 2015 17:16:47 +0200
+From: Arthur LAMBERT <lambertarthur22@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: steve.jun@samsung.com, Dohyun Pyun <dh79.pyun@samsung.com>
-Subject: [PATCH BLUEZ v2 1/2] doc/health-api: Remove ChannelConnected and
- ChannelDeleted signals
-Date: Wed, 29 Jul 2015 10:23:17 +0900
-Message-id: <1438132998-13784-2-git-send-email-dh79.pyun@samsung.com>
-In-reply-to: <1438132998-13784-1-git-send-email-dh79.pyun@samsung.com>
-References: <1438132998-13784-1-git-send-email-dh79.pyun@samsung.com>
-In-reply-to: <1437319871-3004-1-git-send-email-dh79.pyun () samsung ! com>
-References: <1437319871-3004-1-git-send-email-dh79.pyun () samsung ! com>
+Subject: compile gatt server outside bluez source
+Message-ID: <20150728151647.GA17994@arthur-dreem>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These signals are no longer available since BlueZ uses ObjectManager
-interface. Instead of these signals InterfaceAdded and InterfaceRemoved
-signals(org.bluez.HealthChannel1 interface) can be used.
----
- doc/health-api.txt | 13 -------------
- 1 file changed, 13 deletions(-)
+Hi all,
 
-diff --git a/doc/health-api.txt b/doc/health-api.txt
-index 2c48ff2..f7af4f2 100644
---- a/doc/health-api.txt
-+++ b/doc/health-api.txt
-@@ -87,19 +87,6 @@ Methods		boolean Echo()
- 					 org.bluez.Error.NotFound
- 				         org.bluez.Error.NotAllowed
- 
--Signals		void ChannelConnected(object channel)
--
--			This signal is launched when a new data channel is
--			created or when a known data channel is reconnected.
--
--		void ChannelDeleted(object channel)
--
--			This signal is launched when a data channel is deleted.
--
--			After this signal the data channel path will not be
--			valid and its path can be reused for future data
--			channels.
--
- Properties	object MainChannel [readonly]
- 
- 			The first reliable channel opened. It is needed by
--- 
-1.8.1.2
+I am currently implementing a gatt server with custom profile, charac, ....
+I am inspired from bluez sources (last stable version source package 5.32). My
+model is : bluez-5.32/tools/btgatt-server.c
 
+Problem is that I am not able to build my own gatt server out of bluez tree.
+Indeed I am not able to find gatt api in headers and library installed by 'make
+install' from bluez package.
+
+Do I am using the wrong API ? Do I have miss something ?
+
+Thanks,
+Arthur.
