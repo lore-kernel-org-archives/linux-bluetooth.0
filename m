@@ -1,25 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Jul 2015 17:16:47 +0200
-From: Arthur LAMBERT <lambertarthur22@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: compile gatt server outside bluez source
-Message-ID: <20150728151647.GA17994@arthur-dreem>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Date: Tue, 28 Jul 2015 17:01:53 +0200
+Message-ID: <CANzaTi4UOpyNbUw=8-HTd+oM6_soOgf25hPW_FgruH_jCUYGMw@mail.gmail.com>
+Subject: Advertising api - local name missing
+From: dogan yazar <doganyazar@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Advertising api does not have a field to set shortened or complete
+local name. Daemon sets the local name (bluetoothd[828]:
+src/adapter.c:local_name_changed_callback() Current alias: foo)
+but when I run test/example-advertisement the local name is not sent
+in the advertisement.
+Is this a deliberate design choice, or a bug or just a low priority
+feature to be implemented later?
 
-I am currently implementing a gatt server with custom profile, charac, ....
-I am inspired from bluez sources (last stable version source package 5.32). My
-model is : bluez-5.32/tools/btgatt-server.c
-
-Problem is that I am not able to build my own gatt server out of bluez tree.
-Indeed I am not able to find gatt api in headers and library installed by 'make
-install' from bluez package.
-
-Do I am using the wrong API ? Do I have miss something ?
-
-Thanks,
-Arthur.
+Thanks
+Dogan
