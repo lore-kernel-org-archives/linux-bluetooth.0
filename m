@@ -1,48 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anchit Narang <anchit.n@samsung.com>
+From: Atul Rai <a.rai@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: sachin.dev@samsung.com
-Subject: [PATCH] tools/l2test:Fixed memory leak
-Date: Tue, 28 Jul 2015 16:12:10 +0530
-Message-id: <1438080130-445-1-git-send-email-anchit.n@samsung.com>
+Subject: [PATCH] tools/sdptool: Remove unnecessary typecasts
+Date: Tue, 28 Jul 2015 15:29:29 +0530
+Message-id: <1438077569-8272-1-git-send-email-a.rai@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Freed memory allocated to filename before exiting.
-Closed file before returning from do_send function.
+Fixed unnecessary typecasts of malloc return values.
 ---
- tools/l2test.c |    4 ++++
- 1 file changed, 4 insertions(+)
+ tools/sdptool.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 1d458c4..a2e6d5d 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -961,6 +961,7 @@ static void do_send(int sk)
- 		if (fd < 0) {
- 			syslog(LOG_ERR, "Open failed: %s (%d)",
- 							strerror(errno), errno);
-+			free(filename);
- 			exit(1);
- 		}
+diff --git a/tools/sdptool.c b/tools/sdptool.c
+index cd8bfb6..cbe8814 100644
+--- a/tools/sdptool.c
++++ b/tools/sdptool.c
+@@ -921,9 +921,9 @@ static int set_attribseq(sdp_session_t *session, uint32_t handle, uint16_t attri
+ 	}
  
-@@ -974,6 +975,8 @@ static void do_send(int sk)
- 			sent += len;
- 			size -= len;
- 		}
-+
-+		close(fd);
- 		return;
- 	} else {
- 		for (i = 6; i < data_size; i++)
-@@ -999,6 +1002,7 @@ static void do_send(int sk)
- 			if (len < 0 || len != buflen) {
- 				syslog(LOG_ERR, "Send failed: %s (%d)",
- 							strerror(errno), errno);
-+				free(filename);
- 				exit(1);
- 			}
+ 	/* Create arrays */
+-	dtdArray = (void **)malloc(argc * sizeof(void *));
+-	valueArray = (void **)malloc(argc * sizeof(void *));
+-	allocArray = (void **)malloc(argc * sizeof(void *));
++	dtdArray = malloc(argc * sizeof(void *));
++	valueArray = malloc(argc * sizeof(void *));
++	allocArray = malloc(argc * sizeof(void *));
  
+ 	if (!dtdArray || !valueArray || !allocArray) {
+ 		ret = -ENOMEM;
+@@ -936,7 +936,7 @@ static int set_attribseq(sdp_session_t *session, uint32_t handle, uint16_t attri
+ 		if (!strncasecmp(argv[i], "u0x", 3)) {
+ 			/* UUID16 */
+ 			uint16_t value_int = strtoul((argv[i]) + 3, NULL, 16);
+-			uuid_t *value_uuid = (uuid_t *) malloc(sizeof(uuid_t));
++			uuid_t *value_uuid = malloc(sizeof(uuid_t));
+ 			if (!value_uuid) {
+ 				ret = -ENOMEM;
+ 				goto cleanup;
+@@ -950,7 +950,7 @@ static int set_attribseq(sdp_session_t *session, uint32_t handle, uint16_t attri
+ 			valueArray[i] = &value_uuid->value.uuid16;
+ 		} else if (!strncasecmp(argv[i], "0x", 2)) {
+ 			/* Int */
+-			uint32_t *value_int = (uint32_t *) malloc(sizeof(int));
++			uint32_t *value_int = malloc(sizeof(int));
+ 			if (!value_int) {
+ 				ret = -ENOMEM;
+ 				goto cleanup;
 -- 
-1.7.9.5
+2.1.4
 
