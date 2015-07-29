@@ -1,44 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 29 Jul 2015 00:29:01 -0700 (PDT)
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Dohyun Pyun <dh79.pyun@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, steve.jun@samsung.com
-Subject: Re: [PATCH BLUEZ] android/pan: Fix not NULL terminating parsed string
-Date: Wed, 29 Jul 2015 09:29:33 +0200
-Message-ID: <3434204.zRI1YPC0Rc@leonov>
-In-Reply-To: <1438151088-26152-1-git-send-email-dh79.pyun@samsung.com>
-References: <1438151088-26152-1-git-send-email-dh79.pyun@samsung.com>
+To: Atul Rai <a.rai@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, sachin.dev@samsung.com
+Subject: Re: [PATCH v3] android/client: Fix memory leak while using realloc()
+Message-ID: <32687193.BbdPDPfzcv@leonov>
+In-Reply-To: <1438057250-17977-1-git-send-email-a.rai@samsung.com>
+References: <1438057250-17977-1-git-send-email-a.rai@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dohyun Pyun,
+Hi Atul,
 
-On Wednesday 29 of July 2015 15:24:48 Dohyun Pyun wrote:
-> From: DoHyun Pyun <dh79.pyun@samsung.com>
-> 
-> This patch prevents the possible not NULL terminating problem.
-> ifr_name's array size is IFNAMSIZ. So If BNEP_BRIDGE has IFNAMSIZ size,
-> the name string will be not NULL terminating.
+On Tuesday 28 of July 2015 09:50:50 Atul Rai wrote:
+> While reallocating space to store additional "remote device set" using
+> realloc, if realloc() fails, the original block is left untouched but
+> reference to that block is lost as NULL is assigned to remote_devices.
+> The original block needs to be freed before return.
 > ---
->  android/pan.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  android/client/if-bt.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 > 
-> diff --git a/android/pan.c b/android/pan.c
-> index 0bb576e..c40a6d3 100644
-> --- a/android/pan.c
-> +++ b/android/pan.c
-> @@ -88,7 +88,7 @@ static int set_forward_delay(int sk)
->  	struct ifreq ifr;
+> diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+> index 4723024..c9acf6c 100644
+> --- a/android/client/if-bt.c
+> +++ b/android/client/if-bt.c
+> @@ -118,10 +118,19 @@ void add_remote_device(const bt_bdaddr_t *addr)
 > 
->  	memset(&ifr, 0, sizeof(ifr));
-> -	strncpy(ifr.ifr_name, BNEP_BRIDGE, IFNAMSIZ);
-> +	strncpy(ifr.ifr_name, BNEP_BRIDGE, IFNAMSIZ - 1);
->  	ifr.ifr_data = (char *) args;
-> 
->  	if (ioctl(sk, SIOCDEVPRIVATE, &ifr) < 0) {
+>  	/* Realloc space if needed */
+>  	if (remote_devices_cnt >= remote_devices_capacity) {
+> +		bt_bdaddr_t *tmp;
+> +
+>  		remote_devices_capacity *= 2;
+> +		/*
+> +		 * Save reference to previously allocated memory block so that
+> +		 * it can be freed in case realloc fails.
+> +		 */
+> +		tmp = remote_devices;
+> +
+>  		remote_devices = realloc(remote_devices, sizeof(bt_bdaddr_t) *
+>  						remote_devices_capacity);
+>  		if (remote_devices == NULL) {
+> +			free(tmp);
+>  			remote_devices_capacity = 0;
+>  			remote_devices_cnt = 0;
+>  			return;
 
-Patch applied, thanks.
+Applied, thanks.
 
 -- 
 BR
