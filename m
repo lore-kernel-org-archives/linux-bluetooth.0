@@ -1,34 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 29 Jul 2015 20:52:27 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Alexis Ballier <aballier@gentoo.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix build with experimental enabled but no readline.
+Message-ID: <20150729175227.GC3234@t440s.P-661HNU-F1>
+References: <1435668000-26875-1-git-send-email-aballier@gentoo.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLVdcNQTAaXFqdHp_Me4LjuT0ZuauJ2YU1PsROihmsrVA@mail.gmail.com>
-References: <CAASrBQ=8icxs8ZyW56CXObZH7DFuPf0XDGz=uQPXB1SsQsuimw@mail.gmail.com>
-	<CABBYNZL7x4GpgC+JRU=owGmOfs5JdVRHaiCXOe_5oC+oY9BbNg@mail.gmail.com>
-	<CAASrBQmkn3L1MhJbJ9NCGUQz1QJ1YAt6WSnBp-gT7Cn3Ti1YWA@mail.gmail.com>
-	<CABBYNZLVdcNQTAaXFqdHp_Me4LjuT0ZuauJ2YU1PsROihmsrVA@mail.gmail.com>
-Date: Wed, 29 Jul 2015 17:08:01 -0600
-Message-ID: <CAASrBQmtpSUZiE2PHrE2z4vi7JX9+Q1C9zV55QPU404cyY-afA@mail.gmail.com>
-Subject: Re: bluetoothctl list-attributes command
-From: Mark Rages <markrages@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1435668000-26875-1-git-send-email-aballier@gentoo.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jul 23, 2015 at 1:27 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Take the log then, bluetoothd and HCI using btmon should show us what
-> is happening.
->
+Hi Alexis,
 
-I solved my problem.
+On Tue, Jun 30, 2015, Alexis Ballier wrote:
+> btmgmt requires readline. Protect it under if READLINE.
+> ---
+>  Makefile.tools | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-I was not starting bluetoothd with the -E (experimental) option.
+Applied, however I moved this to the common section for other READLINE
+binaries in Makefile.tools.
 
-Once I did that, I could list attributes after connecting.
-
--- 
-Regards,
-Mark
-markrages@gmail
+Johan
