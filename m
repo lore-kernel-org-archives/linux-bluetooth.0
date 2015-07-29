@@ -1,40 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: Advertising api - local name missing
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <3899290.gRdBhv36Rn@leonov>
-Date: Wed, 29 Jul 2015 15:49:01 +0200
-Cc: dogan yazar <doganyazar@gmail.com>, linux-bluetooth@vger.kernel.org
-Message-Id: <574E465E-380B-4680-97B1-2FAB9E11D947@holtmann.org>
-References: <CANzaTi4UOpyNbUw=8-HTd+oM6_soOgf25hPW_FgruH_jCUYGMw@mail.gmail.com> <3899290.gRdBhv36Rn@leonov>
-To: Szymon Janc <szymon.janc@tieto.com>
+Message-ID: <1438174313.2896.211.camel@linux.intel.com>
+Subject: Re: btle 6lowpan races
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de
+Date: Wed, 29 Jul 2015 15:51:53 +0300
+In-Reply-To: <20150729123802.GA31129@omega>
+References: <20150729123802.GA31129@omega>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Alex,
 
->> Advertising api does not have a field to set shortened or complete
->> local name. Daemon sets the local name (bluetoothd[828]:
->> src/adapter.c:local_name_changed_callback() Current alias: foo)
->> but when I run test/example-advertisement the local name is not sent
->> in the advertisement.
->> Is this a deliberate design choice, or a bug or just a low priority
->> feature to be implemented later?
+On ke, 2015-07-29 at 14:38 +0200, Alexander Aring wrote:
+> Hi Jukka,
 > 
-> Name and appearance would be placed in scan response. Kernel already allows to 
-> set flags for this but for some reason this is not exposed in D-Bus.
-> This is similar to TX Power which is exposed in D-Bus API so you may look at 
-> this if you are willing to add support for name.
+> I think it's bad for filling data for btle lowpan private data at point [0].
+> This is called after register_netdev and the rtnl_lock isn't hold after
+> calling "register_netdev" anymore which ends in a possible interface up
+> between register and filling lowpan_dev information. The result would be
+> that lowpan_dev is readed somewhere where it isn't filled.
 > 
-> Also note that first instance controller by kernel should already have local 
-> name included in scan response.
+> The solution would be simple move the filling between alloc and register of
+> netdev.
 
-have you checked the supported advertising flags by the kernel. I think we do not support the name inclusion by the kernel. Meaning bluetoothd would have to do that for us and manually put it in the scan response data.
+Yes, that makes sense.
 
-This is something that could be added to the kernel. It is specified by mgmt-api.txt, but not implemented yet.
+> 
+> If you like I can prepare patches for that.
 
-Regards
+Sure, patches are welcome.
 
-Marcel
+> 
+> Any thoughts on this?
+> 
+> - Alex
+> 
+> [0] http://lxr.free-electrons.com/source/net/bluetooth/6lowpan.c#L874
+
+
+Cheers,
+Jukka
+
 
