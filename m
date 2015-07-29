@@ -1,43 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <e18cf1d1-eb13-489e-aeb2-2b264542ba4d@googlegroups.com>
-References: <CAKc24n3nLkHG8q7SfgUU--xfyx1hHqz8E2sVyXcVaKnpZ6setA@mail.gmail.com>
-	<e18cf1d1-eb13-489e-aeb2-2b264542ba4d@googlegroups.com>
-Date: Wed, 29 Jul 2015 14:52:32 +0800
-Message-ID: <CAKc24n2udeiG3eSP98kmyJ-Z9FRfidbiBJ2SziSgUwrcuj2ZcA@mail.gmail.com>
-Subject: Re: Android-x86 Bluez integration
-From: Chih-Wei Huang <cwhuang@android-x86.org>
-To: Mario Holzinger <sandman01xda@gmail.com>
-Cc: Android-x86 <android-x86@googlegroups.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: Dohyun Pyun <dh79.pyun@samsung.com>
+To: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
+Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>
+Subject: [PATCH BLUEZ] android/pan: Fix not NULL terminating parsed string
+Date: Wed, 29 Jul 2015 15:24:48 +0900
+Message-id: <1438151088-26152-1-git-send-email-dh79.pyun@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2015-07-29 14:41 GMT+08:00 Mario Holzinger <sandman01xda@gmail.com>:
->> Hi All!
->
->
-> I have successfully compiled a current version of kitkat with working
-> bluetooth on my Microsoft Surface Pro 2.
-> many thanks for that.
->
-> did someone work also on the lollipop branch?
-> did you expect that it is difficult to port or should it be only the change
-> of the repository to BlueZ and maybe minor adjustments
+From: DoHyun Pyun <dh79.pyun@samsung.com>
 
-No, there should no particular issue to
-integrate bluez into the lollipop branch.
-I just have no time to do it yet.
+This patch prevents the possible not NULL terminating problem.
+ifr_name's array size is IFNAMSIZ. So If BNEP_BRIDGE has IFNAMSIZ size,
+the name string will be not NULL terminating.
+---
+ android/pan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> I will begin porting and look how far I come.
-> However any hint would help me to avoid problems
-
-Read http://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/README
-
-
-
+diff --git a/android/pan.c b/android/pan.c
+index 0bb576e..c40a6d3 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -88,7 +88,7 @@ static int set_forward_delay(int sk)
+ 	struct ifreq ifr;
+ 
+ 	memset(&ifr, 0, sizeof(ifr));
+-	strncpy(ifr.ifr_name, BNEP_BRIDGE, IFNAMSIZ);
++	strncpy(ifr.ifr_name, BNEP_BRIDGE, IFNAMSIZ - 1);
+ 	ifr.ifr_data = (char *) args;
+ 
+ 	if (ioctl(sk, SIOCDEVPRIVATE, &ifr) < 0) {
 -- 
-Chih-Wei
-Android-x86 project
-http://www.android-x86.org
+1.8.1.2
+
