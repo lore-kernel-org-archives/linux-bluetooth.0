@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: dogan yazar <doganyazar@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Advertising api - local name missing
-Date: Wed, 29 Jul 2015 09:14:25 +0200
-Message-ID: <3899290.gRdBhv36Rn@leonov>
-In-Reply-To: <CANzaTi4UOpyNbUw=8-HTd+oM6_soOgf25hPW_FgruH_jCUYGMw@mail.gmail.com>
-References: <CANzaTi4UOpyNbUw=8-HTd+oM6_soOgf25hPW_FgruH_jCUYGMw@mail.gmail.com>
+Date: Wed, 29 Jul 2015 10:13:10 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anchit Narang <anchit.n@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, sachin.dev@samsung.com
+Subject: Re: [PATCH] tools/l2test:Fixed memory leak
+Message-ID: <20150729071310.GC7699@t440s.lan>
+References: <1438080130-445-1-git-send-email-anchit.n@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1438080130-445-1-git-send-email-anchit.n@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dogan,
+Hi Anchit,
 
-On Tuesday 28 of July 2015 17:01:53 dogan yazar wrote:
-> Advertising api does not have a field to set shortened or complete
-> local name. Daemon sets the local name (bluetoothd[828]:
-> src/adapter.c:local_name_changed_callback() Current alias: foo)
-> but when I run test/example-advertisement the local name is not sent
-> in the advertisement.
-> Is this a deliberate design choice, or a bug or just a low priority
-> feature to be implemented later?
+On Tue, Jul 28, 2015, Anchit Narang wrote:
+> Freed memory allocated to filename before exiting.
+> Closed file before returning from do_send function.
+> ---
+>  tools/l2test.c |    4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/tools/l2test.c b/tools/l2test.c
+> index 1d458c4..a2e6d5d 100644
+> --- a/tools/l2test.c
+> +++ b/tools/l2test.c
+> @@ -961,6 +961,7 @@ static void do_send(int sk)
+>  		if (fd < 0) {
+>  			syslog(LOG_ERR, "Open failed: %s (%d)",
+>  							strerror(errno), errno);
+> +			free(filename);
+>  			exit(1);
+>  		}
 
-Name and appearance would be placed in scan response. Kernel already allows to 
-set flags for this but for some reason this is not exposed in D-Bus.
-This is similar to TX Power which is exposed in D-Bus API so you may look at 
-this if you are willing to add support for name.
+It's a bit awkward to go freeing up global variables here that were
+allocated in the main() function. A cleaner way could be to use an
+atexit() handler, but in this case I wonder if the extra allocation is
+necessary at all, can't we just make 'filename' point at the right argv
+element since that should be valid throughout the entire lifetime of the
+process, i.e. instead of filename = strdup(optarg) it should be possible
+to do filename = optarg (and change filename to const char *).
 
-Also note that first instance controller by kernel should already have local 
-name included in scan response.
-
--- 
-BR
-Szymon Janc
+Johan
