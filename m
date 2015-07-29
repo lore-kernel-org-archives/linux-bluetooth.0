@@ -1,26 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 29 Jul 2015 10:07:43 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Atul Rai <a.rai@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, sachin.dev@samsung.com
-Subject: Re: [PATCH v3] tools/sdptool: Fix NULL pointer dereference
-Message-ID: <20150729070743.GA7699@t440s.lan>
-References: <1438074761-28359-1-git-send-email-a.rai@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1438074761-28359-1-git-send-email-a.rai@samsung.com>
+In-Reply-To: <e18cf1d1-eb13-489e-aeb2-2b264542ba4d@googlegroups.com>
+References: <CAKc24n3nLkHG8q7SfgUU--xfyx1hHqz8E2sVyXcVaKnpZ6setA@mail.gmail.com>
+	<e18cf1d1-eb13-489e-aeb2-2b264542ba4d@googlegroups.com>
+Date: Wed, 29 Jul 2015 14:52:32 +0800
+Message-ID: <CAKc24n2udeiG3eSP98kmyJ-Z9FRfidbiBJ2SziSgUwrcuj2ZcA@mail.gmail.com>
+Subject: Re: Android-x86 Bluez integration
+From: Chih-Wei Huang <cwhuang@android-x86.org>
+To: Mario Holzinger <sandman01xda@gmail.com>
+Cc: Android-x86 <android-x86@googlegroups.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Atul,
+2015-07-29 14:41 GMT+08:00 Mario Holzinger <sandman01xda@gmail.com>:
+>> Hi All!
+>
+>
+> I have successfully compiled a current version of kitkat with working
+> bluetooth on my Microsoft Surface Pro 2.
+> many thanks for that.
+>
+> did someone work also on the lollipop branch?
+> did you expect that it is difficult to port or should it be only the change
+> of the repository to BlueZ and maybe minor adjustments
 
-On Tue, Jul 28, 2015, Atul Rai wrote:
-> This patch fixes NULL pointer dereferences in case malloc fails
-> and returns NULL.
-> ---
->  tools/sdptool.c | 22 +++++++++++++++++++++-
->  1 file changed, 21 insertions(+), 1 deletion(-)
+No, there should no particular issue to
+integrate bluez into the lollipop branch.
+I just have no time to do it yet.
 
-Applied. Thanks.
+> I will begin porting and look how far I come.
+> However any hint would help me to avoid problems
 
-Johan
+Read http://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/README
+
+
+
+-- 
+Chih-Wei
+Android-x86 project
+http://www.android-x86.org
