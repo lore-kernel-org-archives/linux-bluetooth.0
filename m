@@ -1,26 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 29 Jul 2015 20:52:27 +0300
+Date: Wed, 29 Jul 2015 20:49:03 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alexis Ballier <aballier@gentoo.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix build with experimental enabled but no readline.
-Message-ID: <20150729175227.GC3234@t440s.P-661HNU-F1>
-References: <1435668000-26875-1-git-send-email-aballier@gentoo.org>
+To: Anchit Narang <anchit.n@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, sachin.dev@samsung.com
+Subject: Re: [PATCH v2] tools/hciconfig:Fixed Memory Leak
+Message-ID: <20150729174903.GB3234@t440s.P-661HNU-F1>
+References: <1437994586-19180-1-git-send-email-anchit.n@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1435668000-26875-1-git-send-email-aballier@gentoo.org>
+In-Reply-To: <1437994586-19180-1-git-send-email-anchit.n@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexis,
+Hi Anchit,
 
-On Tue, Jun 30, 2015, Alexis Ballier wrote:
-> btmgmt requires readline. Protect it under if READLINE.
+On Mon, Jul 27, 2015, Anchit Narang wrote:
+> Freed memory allocated to structure hci_dev_list_req to avoid memory leak
 > ---
->  Makefile.tools | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  tools/hciconfig.c |    3 +++
+>  1 file changed, 3 insertions(+)
 
-Applied, however I moved this to the common section for other READLINE
-binaries in Makefile.tools.
+Applied. Thanks.
 
 Johan
