@@ -1,37 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] shared/gatt-client: Fix error when no service could be found
-Date: Wed, 29 Jul 2015 10:58:52 +0300
-Message-Id: <1438156733-3258-1-git-send-email-luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Dohyun Pyun <dh79.pyun@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, grzegorz.kolodziejczyk@tieto.com,
+	steve.jun@samsung.com
+Subject: Re: [PATCH BLUEZ] tools/bneptest: Fix not NULL terminating parsed string
+Date: Wed, 29 Jul 2015 09:29:50 +0200
+Message-ID: <1549921.uu7jjHlb6V@leonov>
+In-Reply-To: <1438150734-25746-1-git-send-email-dh79.pyun@samsung.com>
+References: <1438150734-25746-1-git-send-email-dh79.pyun@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Dohyun Pyun,
 
-In case the remote device has no services available ready callback would
-be called with success set to false but in fact it has succeeded it just
-did not find anything.
----
- src/shared/gatt-client.c | 5 +++++
- 1 file changed, 5 insertions(+)
+On Wednesday 29 of July 2015 15:18:54 Dohyun Pyun wrote:
+> From: DoHyun Pyun <dh79.pyun@samsung.com>
+> 
+> This patch prevents the possible not NULL terminating problem.
+> ifr_name's array size is IFNAMSIZ. So If bridge has IFNAMSIZ size,
+> the name string will be not NULL terminating.
+> ---
+>  tools/bneptest.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/bneptest.c b/tools/bneptest.c
+> index a7d5815..1404252 100644
+> --- a/tools/bneptest.c
+> +++ b/tools/bneptest.c
+> @@ -89,7 +89,7 @@ static int set_forward_delay(int sk)
+>  	struct ifreq ifr;
+> 
+>  	memset(&ifr, 0, sizeof(ifr));
+> -	strncpy(ifr.ifr_name, bridge, IFNAMSIZ);
+> +	strncpy(ifr.ifr_name, bridge, IFNAMSIZ - 1);
+>  	ifr.ifr_data = (char *) args;
+> 
+>  	if (ioctl(sk, SIOCDEVPRIVATE, &ifr) < 0) {
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 24aef18..903afa7 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -971,6 +971,11 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
- 		util_debug(client->debug_callback, client->debug_data,
- 					"Primary service discovery failed."
- 					" ATT ECODE: 0x%02x", att_ecode);
-+		/* Reset error in case of not found */
-+		if (BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
-+			success = true;
-+			att_ecode = 0;
-+		}
- 		goto secondary;
- 	}
- 
+Applied, thanks.
+
 -- 
-2.1.0
-
+BR
+Szymon Janc
