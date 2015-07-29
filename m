@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v6 4/6] Bluetooth: advertisement handling in new connect procedure
-Date: Wed, 29 Jul 2015 17:17:40 +0200
-Message-Id: <1438183062-3265-4-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v6 5/6] Bluetooth: timeout handling in new connect procedure
+Date: Wed, 29 Jul 2015 17:17:41 +0200
+Message-Id: <1438183062-3265-5-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1438183062-3265-1-git-send-email-jpawlowski@google.com>
 References: <1438183062-3265-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,204 +15,34 @@ rotated its RPA MAC address, old address would be used and connection
 would fail. In order to fix that, kernel must scan and receive
 advertisement with fresh RPA before connecting.
 
-This path makes sure that after advertisement is received from device that
-we try to connect to, it is properly handled in check_pending_le_conn and
-trigger connect attempt.
-
-It also modifies hci_le_connect to make sure that connect attempt will be
-properly continued.
+This patch makes sure that when new procedure is in use, and we're stuck
+in scan phase because no advertisement was received and timeout happened,
+or app decided to close socket, scan whitelist gets properly cleaned up.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- net/bluetooth/hci_conn.c  | 37 ++++++++++++++++++++++++----------
- net/bluetooth/hci_event.c | 51 +++++++++++++++++++++++++++--------------------
- net/bluetooth/mgmt.c      |  6 ++++++
- 3 files changed, 62 insertions(+), 32 deletions(-)
+ net/bluetooth/hci_conn.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 2bd3f54..43ecb52 100644
+index 43ecb52..5be0566 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -715,6 +715,7 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
- 	hci_req_add(req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
- 
- 	conn->state = BT_CONNECT;
-+	clear_bit(HCI_CONN_SCANNING, &conn->flags);
- }
- 
- static void hci_req_directed_advertising(struct hci_request *req,
-@@ -758,7 +759,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 				u8 role)
- {
- 	struct hci_conn_params *params;
--	struct hci_conn *conn;
-+	struct hci_conn *conn, *conn_unfinished;
- 	struct smp_irk *irk;
- 	struct hci_request req;
- 	int err;
-@@ -781,9 +782,17 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	 * and return the object found.
- 	 */
- 	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
-+	conn_unfinished = NULL;
- 	if (conn) {
--		conn->pending_sec_level = sec_level;
--		goto done;
-+		if (conn->state == BT_CONNECT &&
-+		    test_bit(HCI_CONN_SCANNING, &conn->flags)) {
-+			BT_DBG("will coninue unfinished conn %pMR", dst);
-+			conn_unfinished = conn;
-+		} else {
-+			if (conn->pending_sec_level < sec_level)
-+				conn->pending_sec_level = sec_level;
-+			goto done;
-+		}
- 	}
- 
- 	/* Since the controller supports only one LE connection attempt at a
-@@ -796,10 +805,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	 * resolving key, the connection needs to be established
- 	 * to a resolvable random address.
- 	 *
--	 * This uses the cached random resolvable address from
--	 * a previous scan. When no cached address is available,
--	 * try connecting to the identity address instead.
--	 *
- 	 * Storing the resolvable random address is required here
- 	 * to handle connection failures. The address will later
- 	 * be resolved back into the original identity address
-@@ -811,15 +816,23 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 		dst_type = ADDR_LE_DEV_RANDOM;
- 	}
- 
--	conn = hci_conn_add(hdev, LE_LINK, dst, role);
-+	if (conn_unfinished) {
-+		conn = conn_unfinished;
-+		bacpy(&conn->dst, dst);
-+	} else {
-+		conn = hci_conn_add(hdev, LE_LINK, dst, role);
-+	}
-+
- 	if (!conn)
- 		return ERR_PTR(-ENOMEM);
- 
- 	conn->dst_type = dst_type;
- 	conn->sec_level = BT_SECURITY_LOW;
--	conn->pending_sec_level = sec_level;
- 	conn->conn_timeout = conn_timeout;
- 
-+	if (!conn_unfinished)
-+		conn->pending_sec_level = sec_level;
-+
- 	hci_req_init(&req, hdev);
- 
- 	/* Disable advertising if we're active. For master role
-@@ -884,7 +897,11 @@ create_conn:
- 	}
- 
- done:
--	hci_conn_hold(conn);
-+	if (conn_unfinished)
-+		hci_connect_le_scan_cleanup(conn);
-+	else
-+		hci_conn_hold(conn);
-+
- 	return conn;
- }
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 18fccf8..5dcf52a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4737,42 +4737,49 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
- 	/* If we're not connectable only connect devices that we have in
- 	 * our pend_le_conns list.
- 	 */
--	params = hci_pend_le_action_lookup(&hdev->pend_le_conns,
--					   addr, addr_type);
-+	params = hci_explicit_connect_lookup(hdev, addr, addr_type);
-+
- 	if (!params)
- 		return NULL;
- 
--	switch (params->auto_connect) {
--	case HCI_AUTO_CONN_DIRECT:
--		/* Only devices advertising with ADV_DIRECT_IND are
--		 * triggering a connection attempt. This is allowing
--		 * incoming connections from slave devices.
--		 */
--		if (adv_type != LE_ADV_DIRECT_IND)
-+	if (!params->explicit_connect) {
-+		switch (params->auto_connect) {
-+		case HCI_AUTO_CONN_DIRECT:
-+			/* Only devices advertising with ADV_DIRECT_IND are
-+			 * triggering a connection attempt. This is allowing
-+			 * incoming connections from slave devices.
-+			 */
-+			if (adv_type != LE_ADV_DIRECT_IND)
-+				return NULL;
-+			break;
-+		case HCI_AUTO_CONN_ALWAYS:
-+			/* Devices advertising with ADV_IND or ADV_DIRECT_IND
-+			 * are triggering a connection attempt. This means
-+			 * that incoming connectioms from slave device are
-+			 * accepted and also outgoing connections to slave
-+			 * devices are established when found.
-+			 */
-+			break;
-+		default:
- 			return NULL;
--		break;
--	case HCI_AUTO_CONN_ALWAYS:
--		/* Devices advertising with ADV_IND or ADV_DIRECT_IND
--		 * are triggering a connection attempt. This means
--		 * that incoming connectioms from slave device are
--		 * accepted and also outgoing connections to slave
--		 * devices are established when found.
--		 */
--		break;
--	default:
--		return NULL;
-+		}
- 	}
- 
- 	conn = hci_connect_le(hdev, addr, addr_type, BT_SECURITY_LOW,
- 			      HCI_LE_AUTOCONN_TIMEOUT, HCI_ROLE_MASTER);
- 	if (!IS_ERR(conn)) {
--		/* Store the pointer since we don't really have any
-+		/* If HCI_AUTO_CONN_EXPLICIT is set, conn is already owned
-+		 * by higher layer that tried to connect, if no then
-+		 * store the pointer since we don't really have any
- 		 * other owner of the object besides the params that
- 		 * triggered it. This way we can abort the connection if
- 		 * the parameters get removed and keep the reference
- 		 * count consistent once the connection is established.
- 		 */
--		params->conn = hci_conn_get(conn);
-+
-+		if (!params->explicit_connect)
-+			params->conn = hci_conn_get(conn);
-+
- 		return conn;
- 	}
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c35d671..fac6582 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6107,6 +6107,12 @@ static int hci_conn_params_set(struct hci_request *req, bdaddr_t *addr,
- 	switch (auto_connect) {
- 	case HCI_AUTO_CONN_DISABLED:
- 	case HCI_AUTO_CONN_LINK_LOSS:
-+		/* If auto connect is being disabled when we're trying to
-+		 * connect to device, keep connecting.
-+		 */
-+		if (params->explicit_connect)
-+			list_add(&params->action, &hdev->pend_le_conns);
-+
- 		__hci_update_background_scan(req);
- 		break;
- 	case HCI_AUTO_CONN_REPORT:
+@@ -370,8 +370,12 @@ static void hci_conn_timeout(struct work_struct *work)
+ 		if (conn->out) {
+ 			if (conn->type == ACL_LINK)
+ 				hci_acl_create_connection_cancel(conn);
+-			else if (conn->type == LE_LINK)
+-				hci_le_create_connection_cancel(conn);
++			else if (conn->type == LE_LINK) {
++				if (test_bit(HCI_CONN_SCANNING, &conn->flags))
++					hci_connect_le_scan_remove(conn);
++				else
++					hci_le_create_connection_cancel(conn);
++			}
+ 		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
+ 			hci_reject_sco(conn);
+ 		}
 -- 
 2.1.4
 
