@@ -1,79 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55B83614.8090702@gmail.com>
-Date: Wed, 29 Jul 2015 04:10:28 +0200
-From: Florian Grandel <fgrandel@gmail.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>,
- Szymon Janc <Szymon.Janc@tieto.com>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Problems with incoming connection request on Nexus 4
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Dohyun Pyun <dh79.pyun@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>
+Subject: [PATCH BLUEZ v2 0/2] Remove Health device signals for ObjectManager
+Date: Wed, 29 Jul 2015 10:23:16 +0900
+Message-id: <1438132998-13784-1-git-send-email-dh79.pyun@samsung.com>
+In-reply-to: <1437319871-3004-1-git-send-email-dh79.pyun () samsung ! com>
+References: <1437319871-3004-1-git-send-email-dh79.pyun () samsung ! com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel and Szymon,
+From: DoHyun Pyun <dh79.pyun@samsung.com>
 
-I'm currently testing my code on my Nexus 4 device. Multi-Advertising 
-works nicely but I can't get the device to accept incoming connection 
-requests while in peripheral mode. I'm using Nordic's nRF Master Control 
-app on my Samsung S4 in the central role for testing.
+Since BlueZ has ObjectManager interface, ChannelConnected and ChannelDeleted
+Signals of HealthDevice interface was not available. Instead of these signals
+objectManager generates "InterfaceAdded" and "InterfaceRemoved" signals for
+org.bluez.HealthChannel1 interface. If health-api document contains these
+signals, application or service using Bluez Dbus API will get the unexpected
+result.
 
-Here some sample debug output. When launching the connection request I get:
+Notes
+====
 
-07-29 03:14:36.816  16843-16843/? I/bluetoothd﹕
-mgmt_if: > 0b 00 00 00 1e 00 05 46 ab c2 01 94 00 00 00 00
-.......F........
+PATCH v2
+  - Only including patches to remove health device signals
 
-07-29 03:14:36.816  16843-16843/? I/bluetoothd﹕
-mgmt_if:   00 11 00 0b 09 66 67 2d 73 61 6d 73 75 6e 67 04
-.....fg-samsung.
+PATCH v1
+  -  Initial patchset
 
-07-29 03:14:36.816  16843-16843/? I/bluetoothd﹕
-mgmt_if:   0d 0c 02 5a
-...Z
+Dohyun Pyun (2):
+  doc/health-api: Remove ChannelConnected and ChannelDeleted signals
+  profiles/health: Remove HealthDevice signals
 
-07-29 03:14:36.816  16843-16843/? I/bluetoothd﹕
-mgmt_if: [0x0000] event 0x000b
+ doc/health-api.txt    | 13 -------------
+ profiles/health/hdp.c | 48 +-----------------------------------------------
+ 2 files changed, 1 insertion(+), 60 deletions(-)
 
-07-29 03:14:36.816  16843-16843/? D/bluetoothd﹕
-external/bluetooth/bluez/android/bluetooth.c:mgmt_device_connected_event() 
-94:01:C2:AB:46:05 type 0
+-- 
+1.8.1.2
 
-07-29 03:14:36.829  16817-16875/com.android.bluetooth D/BlueZ﹕ 
-external/bluetooth/bluez/android/hal-bluetooth.c:handle_acl_state_changed() 
-state 0
-
-07-29 03:14:37.100  16843-16843/? D/bluetoothd﹕ 
-external/bluetooth/bluez/android/gatt.c:connect_confirm()
-
-07-29 03:14:37.100  16843-16843/? D/bluetoothd﹕ 
-external/bluetooth/bluez/android/gatt.c:device_set_state() gatt: Device 
-94:01:C2:AB:46:05 state changed DISCONNECTED -> CONNECT READY
-
-
-And then after the timeout:
-
-07-29 03:15:07.083  16843-16843/? D/bluetoothd﹕ 
-external/bluetooth/bluez/android/gatt.c:connect_cb()
-
-07-29 03:15:07.083  16843-16843/? E/bluetoothd﹕ gatt: connection failed 
-HUP or ERR on socket: Connection reset by peer (104)
-
-07-29 03:15:07.083  16843-16843/? D/bluetoothd﹕ 
-external/bluetooth/bluez/android/gatt.c:device_set_state() gatt: Device 
-94:01:C2:AB:46:05 state changed CONNECT READY -> DISCONNECTED
-
-
-Symptoms:
-- The connection request times out.
-- bt_io_accept() is being called but the accept_cb (=connect_cb) only 
-gets called when the request times out.
-- the device is stuck in the CONNECT READY state and never reaches the 
-CONNECTED state
-
-
-Any ideas how I could analyze/solve that problem? I'm stuck on this for 
-many hours already...
-
-Thanks!
-
-Florian
