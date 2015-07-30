@@ -2,107 +2,595 @@ Return-Path: <cyrus@holtmann.org>
 To: <linux-bluetooth@vger.kernel.org>
 CC: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
 From: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-Subject: [PATCH 2/2] Bluetooth: hciuart: Add to support QCA ROME configuration
-Message-ID: <55B97ECE.7020307@qca.qualcomm.com>
-Date: Wed, 29 Jul 2015 18:33:02 -0700
+Subject: [PATCH 1/2] Bluetooth: btqca: Introduce generic QCA ROME support
+Message-ID: <55B97E71.7000204@qca.qualcomm.com>
+Date: Wed, 29 Jul 2015 18:31:29 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-QCA ROME has supported sleep feature using In-Band-Sleep commands
-to enable sleep feature based on H4 protocol. After sending
-patch/nvm configuration is done, IBS mode will be up and running
+This is for supporting BT for QCA ROME with specific vendor
+specific HCI commands and initialization. This will have USB/UART
+implementation both, but for now, adding UART vendor specific
+commands to patch downloading and set BDaddress using VS command.
 
 Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
 ---
- drivers/bluetooth/Kconfig       |   12 +
- drivers/bluetooth/Makefile      |    1 +
- drivers/bluetooth/hci_ldisc.c   |    6 +
- drivers/bluetooth/hci_qcarome.c | 1027 +++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/hci_uart.h    |    8 +-
- 5 files changed, 1053 insertions(+), 1 deletion(-)
- create mode 100644 drivers/bluetooth/hci_qcarome.c
+ drivers/bluetooth/Kconfig  |   4 +
+ drivers/bluetooth/Makefile |   1 +
+ drivers/bluetooth/btqca.c  | 523 +++++++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btqca.h  | 156 ++++++++++++++
+ 4 files changed, 684 insertions(+)
+ create mode 100644 drivers/bluetooth/btqca.c
+ create mode 100644 drivers/bluetooth/btqca.h
 
 diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index f580334..426819d 100644
+index 79e8234..f580334 100644
 --- a/drivers/bluetooth/Kconfig
 +++ b/drivers/bluetooth/Kconfig
-@@ -155,6 +155,18 @@ config BT_HCIUART_BCM
+@@ -13,6 +13,10 @@ config BT_RTL
+     tristate
+     select FW_LOADER
  
-       Say Y here to compile support for Broadcom protocol.
- 
-+config BT_HCIUART_QCAROME
-+    bool "Qualcomm Atheros protocol support"
-+    depends on BT_HCIUART
-+    select BT_QCA
-+    help
-+      The Qualcomm Atheros protocol supports HCI In-Band Sleep feature
-+      over serial port interface(H4) between controller and host.
-+      This protocol is required for UART clock control for QCA Bluetooth
-+      devices.
++config BT_QCA
++    tristate
++    select FW_LOADER
 +
-+      Say Y here to compile support for QCA protocol.
-+
- config BT_HCIBCM203X
-     tristate "HCI BCM203x USB driver"
+ config BT_HCIBTUSB
+     tristate "HCI USB driver"
      depends on USB
 diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index 15a0d1d..eae2046 100644
+index f40e194..15a0d1d 100644
 --- a/drivers/bluetooth/Makefile
 +++ b/drivers/bluetooth/Makefile
-@@ -35,6 +35,7 @@ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)    += hci_ath.o
- hci_uart-$(CONFIG_BT_HCIUART_3WIRE)    += hci_h5.o
- hci_uart-$(CONFIG_BT_HCIUART_INTEL)    += hci_intel.o
- hci_uart-$(CONFIG_BT_HCIUART_BCM)    += hci_bcm.o
-+hci_uart-$(CONFIG_BT_HCIUART_QCAROME)    += hci_qcarome.o
- hci_uart-objs                := $(hci_uart-y)
+@@ -22,6 +22,7 @@ obj-$(CONFIG_BT_MRVL_SDIO)    += btmrvl_sdio.o
+ obj-$(CONFIG_BT_WILINK)        += btwilink.o
+ obj-$(CONFIG_BT_BCM)        += btbcm.o
+ obj-$(CONFIG_BT_RTL)        += btrtl.o
++obj-$(CONFIG_BT_QCA)        += btqca.o
  
- ccflags-y += -D__CHECK_ENDIAN__
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 20c2ac1..d3c1c5e 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -810,6 +810,9 @@ static int __init hci_uart_init(void)
- #ifdef CONFIG_BT_HCIUART_BCM
-     bcm_init();
- #endif
-+#ifdef CONFIG_BT_HCIUART_QCAROME
-+    rome_init();
-+#endif
- 
-     return 0;
- }
-@@ -839,6 +842,9 @@ static void __exit hci_uart_exit(void)
- #ifdef CONFIG_BT_HCIUART_BCM
-     bcm_deinit();
- #endif
-+#ifdef CONFIG_BT_HCIUART_QCAROME
-+    rome_deinit();
-+#endif
- 
-     /* Release tty registration of line discipline */
-     err = tty_unregister_ldisc(N_HCI);
-diff --git a/drivers/bluetooth/hci_qcarome.c b/drivers/bluetooth/hci_qcarome.c
+ btmrvl-y            := btmrvl_main.o
+ btmrvl-$(CONFIG_DEBUG_FS)    += btmrvl_debugfs.o
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
 new file mode 100644
-index 0000000..5b752a1
+index 0000000..9c1ae6b
 --- /dev/null
-+++ b/drivers/bluetooth/hci_qcarome.c
-@@ -0,0 +1,1027 @@
++++ b/drivers/bluetooth/btqca.c
+@@ -0,0 +1,523 @@
 +/*
-+ *  Bluetooth Software UART Qualcomm protocol
++ *  Bluetooth supports for Qualcomm Atheros chips
 + *
-+ *  HCI_IBS (HCI In-Band Sleep) is Qualcomm's power management
-+ *  protocol extension to H4.
++ *  Copyright (c) 2015 The Linux Foundation. All rights reserved.
 + *
-+ *  Copyright (C) 2007 Texas Instruments, Inc.
-+ *  Copyright (c) 2010, 2012 The Linux Foundation. All rights reserved.
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2
++ *  as published by the Free Software Foundation
 + *
-+ *  Acknowledgements:
-+ *  This file is based on hci_ll.c, which was...
-+ *  Written by Ohad Ben-Cohen <ohad@bencohen.org>
-+ *  which was in turn based on hci_h4.c, which was written
-+ *  by Maxim Krasnyansky and Marcel Holtmann.
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ */
++#include <linux/module.h>
++#include <linux/firmware.h>
++#include <asm/unaligned.h>
++#include <stdbool.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++
++#include "hci_uart.h"
++#include "btqca.h"
++
++#define VERSION "0.1"
++
++static uint8_t g_qca_user_baud_rate = QCA_BAUDRATE_115200;
++
++static int rome_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
++{
++    struct sk_buff *skb;
++    struct edl_event_hdr *edl;
++    struct rome_version *ver;
++    char cmd;
++    int ret = 0;
++
++    BT_DBG("%s: ROME Patch Version Request", hdev->name);
++
++    cmd = EDL_PATCH_VER_REQ_CMD;
++    skb = __hci_cmd_sync(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
++                 &cmd, HCI_INIT_TIMEOUT);
++    if (IS_ERR(skb)) {
++        ret = PTR_ERR(skb);
++        BT_ERR("%s: Failed to read version of ROME (%d)", hdev->name,
++               ret);
++        return ret;
++    }
++
++    if (skb->len != sizeof(*edl) + sizeof(*ver)) {
++        BT_ERR("%s: version size mismatch len %d", hdev->name,
++               skb->len);
++        ret = -EILSEQ;
++        goto out;
++    }
++
++    edl = (struct edl_event_hdr *)(skb->data);
++    if (!edl || edl->data == NULL) {
++        BT_ERR("%s: tlv no hdr or no data", hdev->name);
++        ret = -EILSEQ;
++        goto out;
++    }
++
++    if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
++        edl->rtype != EDL_APP_VER_RES_EVT) {
++        BT_ERR("%s: wrong packet received %d %d", hdev->name,
++               edl->cresp, edl->rtype);
++        ret = -EIO;
++        goto out;
++    }
++
++    ver = (struct rome_version *)(edl->data);
++
++    BT_DBG("%s:Product:0x%08x", hdev->name, le32_to_cpu(ver->product_id));
++    BT_DBG("%s:Patch  :0x%08x", hdev->name, le16_to_cpu(ver->patch_ver));
++    BT_DBG("%s:ROM    :0x%08x", hdev->name, le16_to_cpu(ver->rome_ver));
++    BT_DBG("%s:SOC    :0x%08x", hdev->name, le32_to_cpu(ver->soc_id));
++
++    /* ROME chipset Version can be decided by patch and SOC
++     * Version, combination with upper 2 bytes from soc
++     * and lower 2 bytes from patch will be used
++     */
++    *rome_version = (le32_to_cpu(ver->soc_id) << 16) |
++                (le16_to_cpu(ver->rome_ver) & 0x0000ffff);
++
++out:
++    kfree_skb(skb);
++
++    return ret;
++}
++
++static int rome_reset(struct hci_dev *hdev)
++{
++    struct sk_buff *skb;
++    int err;
++
++    BT_DBG("%s: ROME HCI_RESET", hdev->name);
++
++    skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++    if (IS_ERR(skb)) {
++        err = PTR_ERR(skb);
++        BT_ERR("%s: BCM: Reset failed (%d)", hdev->name, err);
++        return err;
++    }
++    kfree_skb(skb);
++
++    return 0;
++}
++
++static void rome_tlv_check_data(u8 type, const struct firmware *fw)
++{
++    const u8 *data;
++    u32 type_len;
++    u16 tag_id, tag_len;
++    int idx, length;
++    struct tlv_type_hdr *tlv;
++    struct tlv_type_patch *tlv_patch;
++    struct tlv_type_nvm *tlv_nvm;
++
++    tlv = (struct tlv_type_hdr*)fw->data;
++
++    type_len = le32_to_cpu(tlv->type_len);
++
++    BT_INFO("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
++    length = (type_len >> 8) & 0x00ffffff;
++    BT_INFO("Length\t\t : %d bytes", length);
++
++    switch (type) {
++    case TLV_TYPE_PATCH:
++        tlv_patch = (struct tlv_type_patch *)tlv->data;
++        BT_INFO("Total Length\t\t : %d bytes",
++            le32_to_cpu(tlv_patch->total_size));
++        BT_INFO("Patch Data Length\t : %d bytes",
++            le32_to_cpu(tlv_patch->data_length));
++        BT_INFO("Signing Format Version : 0x%x",
++            tlv_patch->format_version);
++        BT_INFO("Signature Algorithm\t : 0x%x",
++            tlv_patch->signature);
++        BT_INFO("Reserved\t\t : 0x%x",
++            le16_to_cpu(tlv_patch->reserved1));
++        BT_INFO("Product ID\t\t : 0x%04x",
++            le16_to_cpu(tlv_patch->product_id));
++        BT_INFO("Rom Build Version\t : 0x%04x",
++            le16_to_cpu(tlv_patch->rom_build));
++        BT_INFO("Patch Version\t\t : 0x%04x",
++            le16_to_cpu(tlv_patch->patch_version));
++        BT_INFO("Reserved\t\t : 0x%x",
++            le16_to_cpu(tlv_patch->reserved2));
++        BT_INFO("Patch Entry Address\t : 0x%x",
++            le32_to_cpu(tlv_patch->entry));
++        break;
++
++    case TLV_TYPE_NVM:
++        idx = 0;
++        data = (void*) tlv->data;
++        do {
++            tlv_nvm = (struct tlv_type_nvm *)(data+idx);
++
++            tag_id = le16_to_cpu(tlv_nvm->tag_id);
++            tag_len = le16_to_cpu(tlv_nvm->tag_len);
++
++            BT_DBG("TAG ID\t\t : %d", tag_id);
++            BT_DBG("TAG Length\t\t : %d", tag_len);
++            BT_DBG("TAG Data\t\t : ");
++
++            /* Update NVM tags as needed */
++            switch (tag_id) {
++            case 17:
++            #ifndef QCA_FEATURE_UART_IN_BAND_SLEEP
++                /* HCI transport layer parameters
++                 * disabling software inband sleep
++                 * until hci driver supports IBS
++                 */
++                tlv_nvm->data[0] &= ~0x80;
++            #endif
++                /* UART Baud Rate */
++                tlv_nvm->data[2] = g_qca_user_baud_rate;
++                break;
++
++            #ifndef QCA_FEATURE_DEEP_SLEEP
++            case 27:
++                /* Sleep enable mask
++                 * disabling deep_sleep until IBS driver is up
++                 */
++                tlv_nvm->data[0] &= ~0x01;
++            #endif
++
++                break;
++            }
++
++            rome_debug_dump(tlv_nvm->data, tag_len, true);
++
++            idx += (sizeof(u16) + sizeof(u16) + 8 + tag_len);
++        } while (idx < length);
++        break;
++
++    default:
++        BT_INFO("unknown TLV type %d", type);
++        break;
++    }
++
++    return;
++}
++
++static int rome_tlv_send_segment(struct hci_dev *hdev, int idx, int seg_size,
++                 u8 *data)
++{
++    struct sk_buff *skb;
++    struct edl_event_hdr *edl;
++    struct tlv_seg_resp *tlv_resp;
++    u8 cmd[MAX_SIZE_PER_TLV_SEGMENT+2];
++    int ret = 0;
++
++    BT_DBG("%s: Download segment #%d size %d", hdev->name, idx, seg_size);
++
++    cmd[0] = EDL_PATCH_TLV_REQ_CMD;
++    cmd[1] = seg_size;
++    memcpy(cmd+2, data, seg_size);
++
++    skb = __hci_cmd_sync(hdev, EDL_PATCH_CMD_OPCODE, seg_size+2, cmd,
++                 HCI_INIT_TIMEOUT);
++    if (IS_ERR(skb)) {
++        ret = PTR_ERR(skb);
++        BT_ERR("%s: Failed to send TLV segment(%d)", hdev->name, ret);
++        return ret;
++    }
++
++    if (skb->len != sizeof(*edl)+sizeof(*tlv_resp)) {
++        BT_ERR("%s: tlv response size mismatch", hdev->name);
++        ret = -EILSEQ;
++        goto out;
++    }
++
++    edl = (struct edl_event_hdr *)(skb->data);
++    if (!edl || edl->data == NULL) {
++        BT_ERR("%s: tlv no hdr or no data", hdev->name);
++        ret = -EILSEQ;
++        goto out;
++    }
++
++    tlv_resp = (struct tlv_seg_resp *)(edl->data);
++
++    if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
++        edl->rtype != EDL_TVL_DNLD_RES_EVT || tlv_resp->result != 0x00) {
++        BT_ERR("%s: tlv error stat 0x%x rtype 0x%x (0x%x)", hdev->name,
++               edl->cresp, edl->rtype, tlv_resp->result);
++        ret = -EIO;
++    }
++
++out:
++    kfree_skb(skb);
++
++    return ret;
++}
++
++static int rome_tlv_download_request(struct hci_dev *hdev,
++                     const struct firmware *fw)
++{
++    int total_segment, remain_size;
++    int ret, i;
++    u8 *buffer, *data;
++
++    if (!fw || !fw->data)
++        return -EINVAL;
++
++    total_segment = fw->size / MAX_SIZE_PER_TLV_SEGMENT;
++    remain_size = (fw->size < MAX_SIZE_PER_TLV_SEGMENT)? fw->size:
++              fw->size % MAX_SIZE_PER_TLV_SEGMENT;
++
++    BT_DBG("%s: Total size %ld, total segment num %d, remain size %d",
++           hdev->name, fw->size, total_segment, remain_size);
++
++    data = (u8 *)fw->data;
++    for (i = 0; i < total_segment; i++) {
++        buffer = data + i*MAX_SIZE_PER_TLV_SEGMENT;
++        ret = rome_tlv_send_segment(hdev, i, MAX_SIZE_PER_TLV_SEGMENT,
++                        buffer);
++        if (ret < 0)
++            return -EIO;
++    }
++
++    if (remain_size) {
++        buffer = data + total_segment * MAX_SIZE_PER_TLV_SEGMENT;
++        ret = rome_tlv_send_segment(hdev, total_segment, remain_size,
++                        buffer);
++        if (ret < 0)
++            return -EIO;
++    }
++
++    return 0;
++}
++
++static int rome_download_firmware_file(struct hci_dev *hdev, u8 type,
++                       char *fwname)
++{
++    const struct firmware *fw;
++    int ret;
++
++    BT_INFO("%s: ROME Downloading %s", hdev->name, fwname);
++
++    ret = request_firmware(&fw, fwname, &hdev->dev);
++    if (ret) {
++        BT_ERR("%s: failed to request file: %s (%d)", hdev->name,
++               fwname, ret);
++        return ret;
++    }
++
++    rome_tlv_check_data(type, fw);
++
++    ret = rome_tlv_download_request(hdev, fw);
++    if (ret) {
++        BT_ERR("%s: fail to download file: %s (%d)", hdev->name,
++               fwname, ret);
++    }
++
++    release_firmware(fw);
++
++    return ret;
++}
++
++static int rome_inject_cmd_complete(struct hci_dev *hdev, __u16 opcode,
++                    u8 result, void *params, int len)
++{
++    struct sk_buff *skb;
++    struct hci_event_hdr *hdr;
++    struct hci_ev_cmd_complete *evt;
++
++    skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1 + len, GFP_ATOMIC);
++    if (!skb)
++        return -ENOMEM;
++
++    hdr = (struct hci_event_hdr *)skb_put(skb, sizeof(*hdr));
++    hdr->evt = HCI_EV_CMD_COMPLETE;
++    hdr->plen = sizeof(*evt) + 1 + len;
++
++    evt = (struct hci_ev_cmd_complete *)skb_put(skb, sizeof(*evt));
++    evt->ncmd = 0x01;
++    evt->opcode = cpu_to_le16(opcode);
++
++    memcpy(skb_put(skb, 1), &result, 1);
++    memcpy(skb_put(skb, len), params, len);
++
++    bt_cb(skb)->pkt_type = HCI_EVENT_PKT;
++
++    return hci_recv_frame(hdev, skb);
++}
++
++void rome_debug_dump(const u8 *cmd, int size, bool outbound)
++{
++#ifdef QCA_FEATURE_DEBUG
++    int i;
++    char printout[150], hex[10];
++
++    if (outbound)
++        snprintf(printout, 150, "SEND -> ");
++    else
++        snprintf(printout, 150, "RECV <- ");
++
++    for (i = 0; i < size && i < 30; i++) {
++        snprintf(hex, sizeof(hex), " %02x", cmd[i]);
++        strncat(printout, hex, 150);
++    }
++
++    BT_INFO("%s", printout);
++#else
++    return;
++#endif
++}
++EXPORT_SYMBOL_GPL(rome_debug_dump);
++
++int rome_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++    struct sk_buff *skb;
++    u8 cmd[9];
++    int err;
++
++    cmd[0] = EDL_NVM_ACCESS_SET_REQ_CMD;
++    cmd[1] = 0x02;             /* TAG ID */
++    cmd[2] = sizeof(bdaddr_t);    /* size */
++    memcpy(cmd + 3, bdaddr, sizeof(bdaddr_t));
++
++    skb = __hci_cmd_sync(hdev, EDL_NVM_ACCESS_OPCODE, sizeof(cmd), cmd,
++                 HCI_INIT_TIMEOUT);
++    if (IS_ERR(skb)) {
++        err = PTR_ERR(skb);
++        BT_ERR("%s: Change address command failed (%d)",
++               hdev->name, err);
++        return err;
++    }
++    kfree_skb(skb);
++
++    /* apply NVM changes to the controller */
++    rome_reset(hdev);
++
++    return 0;
++}
++EXPORT_SYMBOL_GPL(rome_set_bdaddr);
++
++uint8_t rome_get_baudrate(int speed)
++{
++    switch(speed) {
++    case 9600:
++        return QCA_BAUDRATE_9600;
++    case 19200:
++        return QCA_BAUDRATE_19200;
++    case 38400:
++        return QCA_BAUDRATE_38400;
++    case 57600:
++        return QCA_BAUDRATE_57600;
++    case 115200:
++        return QCA_BAUDRATE_115200;
++    case 230400:
++        return QCA_BAUDRATE_230400;
++    case 460800:
++        return QCA_BAUDRATE_460800;
++    case 500000:
++        return QCA_BAUDRATE_500000;
++    case 921600:
++        return QCA_BAUDRATE_921600;
++    case 1000000:
++        return QCA_BAUDRATE_1000000;
++    case 2000000:
++        return QCA_BAUDRATE_2000000;
++    case 3000000:
++        return QCA_BAUDRATE_3000000;
++    case 3500000:
++        return QCA_BAUDRATE_3500000;
++    default:
++        return QCA_BAUDRATE_115200;
++    }
++}
++EXPORT_SYMBOL_GPL(rome_get_baudrate);
++
++int rome_uart_setup(struct hci_dev *hdev, int uart_speed)
++{
++    u32 rome_ver = 0;
++    char fwname[64];
++    int err;
++
++    BT_DBG("%s: rome_uart_setup", hdev->name);
++
++    g_qca_user_baud_rate = rome_get_baudrate(uart_speed);
++
++    /* get ROME version information */
++    err = rome_patch_ver_req(hdev, &rome_ver);
++    if (err < 0 || rome_ver == 0) {
++        BT_ERR("%s: Fail to get ROME version 0x%x",hdev->name, err);
++        return err;
++    }
++
++    BT_INFO("%s: ROME controller version 0x%08x", hdev->name, rome_ver);
++
++    /* download rampatch file */
++    snprintf(fwname, sizeof(fwname), "qca/rampatch_%08x.bin", rome_ver);
++    err = rome_download_firmware_file(hdev, TLV_TYPE_PATCH, fwname);
++    if (err < 0) {
++        BT_ERR("%s: can't download rampatch (%d)", hdev->name, err);
++        return err;
++    }
++
++    /* download NVM configuration */
++    snprintf(fwname, sizeof(fwname), "qca/nvm_%08x.bin", rome_ver);
++    err = rome_download_firmware_file(hdev, TLV_TYPE_NVM, fwname);
++    if (err < 0) {
++        BT_ERR("%s: can't download NVM file (%d)", hdev->name, err);
++        return err;
++    }
++
++    /* perform HCI reset */
++    err = rome_reset(hdev);
++    if (err < 0) {
++        BT_ERR("%s: can't run HCI_RESET (%d)", hdev->name, err);
++        return err;
++    }
++
++    BT_INFO("%s: ROME uart setup is completed", hdev->name);
++
++    return 0;
++}
++EXPORT_SYMBOL_GPL(rome_uart_setup);
++
++int rome_vendor_frame(struct hci_dev *hdev, struct sk_buff *skb)
++{
++    struct hci_event_hdr *hdr = (void*)skb->data;
++
++    if (hdr->evt == EVT_VENDOR) {
++        u16 opcode = 0x00;
++        u8 *packet;
++        int len;
++
++        /* Change vendor event to command complete event with
++         * coresponding data which will help us unblock
++         * __hci_cmd_sync() calls
++         */
++        packet = skb->data+sizeof(*hdr);
++        len = skb->len-sizeof(*hdr);
++
++        if (hdev->sent_cmd != NULL) {
++            struct hci_command_hdr *sent;
++            sent = (void*)hdev->sent_cmd->data;
++            opcode = __le16_to_cpu(sent->opcode);
++        }
++
++        rome_inject_cmd_complete(hdev, opcode, 0x00, packet, len);
++
++        kfree_skb(skb);
++
++        return true;
++    }
++
++    return false;
++}
++EXPORT_SYMBOL_GPL(rome_vendor_frame);
++
++MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
++MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver " VERSION);
++MODULE_VERSION(VERSION);
++MODULE_LICENSE("GPL");
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+new file mode 100644
+index 0000000..49ed9e3
+--- /dev/null
++++ b/drivers/bluetooth/btqca.h
+@@ -0,0 +1,156 @@
++/*
++ *  Bluetooth supports for Qualcomm Atheros ROME chips
++ *
++ *  Copyright (c) 2015 The Linux Foundation. All rights reserved.
 + *
 + *  This program is free software; you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License version 2
@@ -119,1032 +607,142 @@ index 0000000..5b752a1
 + *
 + */
 +
-+#include <linux/module.h>
-+#include <linux/kernel.h>
++#define QCA_FEATURE_UART_IN_BAND_SLEEP
++#define QCA_FEATURE_DEEP_SLEEP
++//#define QCA_FEATURE_DEBUG
 +
-+#include <linux/init.h>
-+#include <linux/sched.h>
-+#include <linux/types.h>
-+#include <linux/fcntl.h>
-+#include <linux/interrupt.h>
-+#include <linux/ptrace.h>
-+#include <linux/poll.h>
++#define QCA_ROME_BAUDRATE_3M        (0x0E)
++#define EDL_PATCH_BAUDRATE        (0xFC48)
++#define EDL_PATCH_CMD_OPCODE        (0xFC00)
++#define EDL_NVM_ACCESS_OPCODE        (0xFC0B)
++#define EDL_PATCH_CMD_LEN        (1)
++#define EDL_PATCH_VER_REQ_CMD        (0x19)
++#define EDL_PATCH_TLV_REQ_CMD        (0x1E)
++#define EDL_NVM_ACCESS_SET_REQ_CMD    (0x01)
++#define MAX_SIZE_PER_TLV_SEGMENT    (243)
 +
-+#include <linux/slab.h>
-+#include <linux/tty.h>
-+#include <linux/errno.h>
-+#include <linux/string.h>
-+#include <linux/signal.h>
-+#include <linux/ioctl.h>
-+#include <linux/timer.h>
-+#include <linux/skbuff.h>
-+#include <linux/serial_core.h>
++#define EDL_CMD_REQ_RES_EVT        (0x00)
++#define EDL_PATCH_VER_RES_EVT        (0x19)
++#define EDL_APP_VER_RES_EVT        (0x02)
++#define EDL_TVL_DNLD_RES_EVT        (0x04)
++#define EDL_CMD_EXE_STATUS_EVT        (0x00)
++#define EDL_SET_BAUDRATE_RSP_EVT    (0x92)
++#define EDL_NVM_ACCESS_CODE_EVT        (0x0B)
 +
-+#ifdef CONFIG_SERIAL_MSM_HS
-+#include <linux/platform_data/msm_serial_hs.h>
-+#endif
++#define EVT_VENDOR            (0xff)
 +
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+#include "hci_uart.h"
-+#include "btqca.h"
-+
-+/* HCI_IBS protocol messages */
-+#define HCI_IBS_SLEEP_IND    0xFE
-+#define HCI_IBS_WAKE_IND    0xFD
-+#define HCI_IBS_WAKE_ACK    0xFC
-+
-+/* HCI_IBS receiver States */
-+#define HCI_IBS_W4_PACKET_TYPE    0
-+#define HCI_IBS_W4_EVENT_HDR    1
-+#define HCI_IBS_W4_ACL_HDR    2
-+#define HCI_IBS_W4_SCO_HDR    3
-+#define HCI_IBS_W4_DATA        4
-+
-+/* Controller states */
-+#define STATE_IN_BAND_SLEEP_ENABLED    1
-+
-+/* HCI_IBS transmit side sleep protocol states */
-+enum tx_ibs_states_e {
-+    HCI_IBS_TX_ASLEEP,
-+    HCI_IBS_TX_WAKING,
-+    HCI_IBS_TX_AWAKE,
++enum qca_bardrate_type {
++    QCA_BAUDRATE_115200     = 0,
++    QCA_BAUDRATE_57600,
++    QCA_BAUDRATE_38400,
++    QCA_BAUDRATE_19200,
++    QCA_BAUDRATE_9600,
++    QCA_BAUDRATE_230400,
++    QCA_BAUDRATE_250000,
++    QCA_BAUDRATE_460800,
++    QCA_BAUDRATE_500000,
++    QCA_BAUDRATE_720000,
++    QCA_BAUDRATE_921600,
++    QCA_BAUDRATE_1000000,
++    QCA_BAUDRATE_1250000,
++    QCA_BAUDRATE_2000000,
++    QCA_BAUDRATE_3000000,
++    QCA_BAUDRATE_4000000,
++    QCA_BAUDRATE_1600000,
++    QCA_BAUDRATE_3200000,
++    QCA_BAUDRATE_3500000,
++    QCA_BAUDRATE_AUTO     = 0xFE,
++    QCA_BAUDRATE_RESERVED
 +};
 +
-+/* HCI_IBS receive side sleep protocol states */
-+enum rx_states_e {
-+    HCI_IBS_RX_ASLEEP,
-+    HCI_IBS_RX_AWAKE,
++enum rome_tlv_type {
++    TLV_TYPE_PATCH = 1,
++    TLV_TYPE_NVM
 +};
 +
-+/* HCI_IBS transmit and receive side clock state vote */
-+enum hci_ibs_clock_state_vote_e {
-+    HCI_IBS_VOTE_STATS_UPDATE,
-+    HCI_IBS_TX_VOTE_CLOCK_ON,
-+    HCI_IBS_TX_VOTE_CLOCK_OFF,
-+    HCI_IBS_RX_VOTE_CLOCK_ON,
-+    HCI_IBS_RX_VOTE_CLOCK_OFF,
-+};
++struct edl_event_hdr {
++    __u8    state;
++    __u8    cresp;
++    __u8    rtype;
++    __u8    data[0];
++} __packed;
 +
-+static unsigned long wake_retrans = 1*100;
-+static unsigned long tx_idle_delay = (HZ * 2);
++struct rome_version {
++    __le32 product_id;
++    __le16 patch_ver;
++    __le16 rome_ver;
++    __le32 soc_id;
++} __packed;
 +
-+struct hci_ibs_cmd {
-+    u8 cmd;
-+} __attribute__((packed));
++struct tlv_seg_resp {
++    __u8 result;
++} __packed;
 +
-+struct rome_data {
-+    unsigned long rx_state;
-+    unsigned long rx_count;
-+    struct sk_buff *rx_skb;
-+    struct sk_buff_head txq;
-+    struct sk_buff_head tx_wait_q;    /* HCI_IBS wait queue    */
-+    spinlock_t hci_ibs_lock;    /* HCI_IBS state lock    */
-+    unsigned long tx_ibs_state;    /* HCI_IBS transmit side power state*/
-+    unsigned long rx_ibs_state;    /* HCI_IBS receive side power state */
-+    unsigned long tx_vote;        /* clock must be on for TX */
-+    unsigned long rx_vote;        /* clock must be on for RX */
-+    struct    timer_list tx_idle_timer;
-+    struct    timer_list wake_retrans_timer;
-+    struct    workqueue_struct *workqueue;
-+    struct    work_struct ws_awake_rx;
-+    struct    work_struct ws_awake_device;
-+    struct    work_struct ws_rx_vote_off;
-+    struct    work_struct ws_tx_vote_off;
-+    unsigned long flags;
-+    void *hci_uart; /* keeps the hci_uart pointer for reference */
-+
-+    /* debug */
-+    unsigned long ibs_sent_wacks;
-+    unsigned long ibs_sent_slps;
-+    unsigned long ibs_sent_wakes;
-+    unsigned long ibs_recv_wacks;
-+    unsigned long ibs_recv_slps;
-+    unsigned long ibs_recv_wakes;
-+    unsigned long vote_last_jif;
-+    unsigned long vote_on_ticks;
-+    unsigned long vote_off_ticks;
-+    unsigned long tx_votes_on;
-+    unsigned long rx_votes_on;
-+    unsigned long tx_votes_off;
-+    unsigned long rx_votes_off;
-+    unsigned long votes_on;
-+    unsigned long votes_off;
-+};
-+
-+static inline void __serial_clock_on(struct tty_struct *tty)
++struct tlv_type_patch
 +{
-+#ifdef CONFIG_SERIAL_MSM_HS
-+    struct uart_state *state = tty->driver_data;
-+    struct uart_port *port = state->uart_port;
++    __le32 total_size;
++    __le32 data_length;
++    __u8 format_version;
++    __u8 signature;
++    __le16 reserved1;
++    __le16 product_id;
++    __le16 rom_build;
++    __le16 patch_version;
++    __le16 reserved2;
++    __le32 entry;
++} __packed;
 +
-+    msm_hs_request_clock_on(port);
-+#endif
++struct tlv_type_nvm
++{
++    __le16 tag_id;
++    __le16 tag_len;
++    __le32 reserve1;
++    __le32 reserve2;
++    __u8 data[0];
++} __packed;
++
++struct tlv_type_hdr
++{
++    __le32 type_len;
++    __u8 data[0];
++} __packed;
++
++#if IS_ENABLED(CONFIG_BT_QCA)
++
++uint8_t rome_get_baudrate(int speed);
++int rome_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
++int rome_uart_setup(struct hci_dev *hdev, int speed);
++int rome_vendor_frame(struct hci_dev *hdev, struct sk_buff *skb);
++void rome_debug_dump(const u8 *cmd, int size, bool outbound);
++
++#else
++
++static inline uint8_t rome_get_baudrate(int speed)
++{
++    return -EOPNOTSUPP;
 +}
 +
-+static inline void __serial_clock_request_off(struct tty_struct *tty)
++static inline int rome_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
 +{
-+#ifdef CONFIG_SERIAL_MSM_HS
-+    struct uart_state *state = tty->driver_data;
-+    struct uart_port *port = state->uart_port;
-+
-+    msm_hs_request_clock_off(port);
-+#endif
++    return -EOPNOTSUPP;
 +}
 +
-+/* clock_vote needs to be called with the ibs lock held */
-+static void serial_clock_vote(unsigned long vote, struct hci_uart *hu)
++static inline int rome_uart_setup(struct hci_dev *hdev, int speed)
 +{
-+    struct rome_data *rome = hu->priv;
-+
-+    unsigned long old_vote = (rome->tx_vote | rome->rx_vote);
-+    unsigned long new_vote;
-+
-+    switch (vote) {
-+    case HCI_IBS_VOTE_STATS_UPDATE:
-+        if (old_vote)
-+            rome->vote_off_ticks += (jiffies-rome->vote_last_jif);
-+        else
-+            rome->vote_on_ticks += (jiffies-rome->vote_last_jif);
-+        return;
-+
-+    case HCI_IBS_TX_VOTE_CLOCK_ON:
-+        rome->tx_vote = 1;
-+        rome->tx_votes_on++;
-+        new_vote = 1;
-+        break;
-+
-+    case HCI_IBS_RX_VOTE_CLOCK_ON:
-+        rome->rx_vote = 1;
-+        rome->rx_votes_on++;
-+        new_vote = 1;
-+        break;
-+
-+    case HCI_IBS_TX_VOTE_CLOCK_OFF:
-+        rome->tx_vote = 0;
-+        rome->tx_votes_off++;
-+        new_vote = rome->rx_vote | rome->tx_vote;
-+        break;
-+
-+    case HCI_IBS_RX_VOTE_CLOCK_OFF:
-+        rome->rx_vote = 0;
-+        rome->rx_votes_off++;
-+        new_vote = rome->rx_vote | rome->tx_vote;
-+        break;
-+
-+    default: /* error */
-+        BT_ERR("voting irregularity");
-+        return;
-+    }
-+
-+    if (new_vote != old_vote) {
-+        if (new_vote)
-+            __serial_clock_on(hu->tty);
-+        else
-+            __serial_clock_request_off(hu->tty);
-+
-+        BT_DBG("HCIUART_IBS: vote serial_hs clock %lu(%lu)",
-+               new_vote, vote);
-+
-+        /* debug */
-+        if (new_vote) {
-+            rome->votes_on++;
-+            rome->vote_off_ticks += (jiffies-rome->vote_last_jif);
-+        } else {
-+            rome->votes_off++;
-+            rome->vote_on_ticks += (jiffies-rome->vote_last_jif);
-+        }
-+        rome->vote_last_jif = jiffies;
-+    }
++    return -EOPNOTSUPP;
 +}
 +
-+/*
-+ * Builds and sends an HCI_IBS command packet.
-+ * These are very simple packets with only 1 cmd byte
-+ */
-+static int send_hci_ibs_cmd(u8 cmd, struct hci_uart *hu)
++static inline int rome_vendor_frame(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+    int err = 0;
-+    struct sk_buff *skb = NULL;
-+    struct rome_data *rome = hu->priv;
-+    struct hci_ibs_cmd *hci_ibs_packet;
-+
-+    BT_DBG("hu %p send hci ibs cmd 0x%x", hu, cmd);
-+
-+    /* allocate packet */
-+    skb = bt_skb_alloc(1, GFP_ATOMIC);
-+    if (!skb) {
-+        BT_ERR("cannot allocate memory for HCI_IBS packet");
-+        err = -ENOMEM;
-+        goto out;
-+    }
-+
-+    /* prepare packet */
-+    hci_ibs_packet = (struct hci_ibs_cmd *) skb_put(skb, 1);
-+    hci_ibs_packet->cmd = cmd;
-+    skb->dev = (void *) hu->hdev;
-+
-+    /* send packet */
-+    skb_queue_tail(&rome->txq, skb);
-+out:
-+    return err;
++    return -EOPNOTSUPP;
 +}
 +
-+static void rome_wq_awake_device(struct work_struct *work)
++static inline static void rome_debug_dump(const u8 *cmd, int size, bool outbound)
 +{
-+    struct rome_data *rome = container_of(work, struct rome_data,
-+                          ws_awake_device);
-+    struct hci_uart *hu = (struct hci_uart *)rome->hci_uart;
-+
-+    BT_DBG(" %p wq awake device", hu);
-+
-+    /* Vote for serial clock */
-+    serial_clock_vote(HCI_IBS_TX_VOTE_CLOCK_ON, hu);
-+
-+    spin_lock(&rome->hci_ibs_lock);
-+
-+    /* send wake indication to device */
-+    if (send_hci_ibs_cmd(HCI_IBS_WAKE_IND, hu) < 0)
-+        BT_ERR("cannot send WAKE to device");
-+
-+    rome->ibs_sent_wakes++; /* debug */
-+
-+    /* start retransmit timer */
-+    mod_timer(&rome->wake_retrans_timer, jiffies + wake_retrans);
-+
-+    spin_unlock(&rome->hci_ibs_lock);
-+
-+    /* actually send the packets */
-+    hci_uart_tx_wakeup(hu);
++    return -EOPNOTSUPP;
 +}
 +
-+static void rome_wq_awake_rx(struct work_struct *work)
-+{
-+    struct rome_data *rome = container_of(work, struct rome_data,
-+                          ws_awake_rx);
-+    struct hci_uart *hu = (struct hci_uart *)rome->hci_uart;
-+
-+    BT_DBG(" %p wq awake rx", hu);
-+
-+    serial_clock_vote(HCI_IBS_RX_VOTE_CLOCK_ON, hu);
-+
-+    spin_lock(&rome->hci_ibs_lock);
-+    rome->rx_ibs_state = HCI_IBS_RX_AWAKE;
-+
-+    /* Always acknowledge device wake up,
-+     * sending IBS message doesn't count as TX ON
-+     */
-+    if (send_hci_ibs_cmd(HCI_IBS_WAKE_ACK, hu) < 0)
-+        BT_ERR("cannot acknowledge device wake up");
-+
-+    rome->ibs_sent_wacks++; /* debug */
-+
-+    spin_unlock(&rome->hci_ibs_lock);
-+
-+    /* actually send the packets */
-+    hci_uart_tx_wakeup(hu);
-+}
-+
-+static void rome_wq_serial_rx_clock_vote_off(struct work_struct *work)
-+{
-+    struct rome_data *rome = container_of(work, struct rome_data,
-+                          ws_rx_vote_off);
-+    struct hci_uart *hu = (struct hci_uart *)rome->hci_uart;
-+
-+    BT_DBG("hu %p rx clock vote off", hu);
-+
-+    serial_clock_vote(HCI_IBS_RX_VOTE_CLOCK_OFF, hu);
-+}
-+
-+static void rome_wq_serial_tx_clock_vote_off(struct work_struct *work)
-+{
-+    struct rome_data *rome = container_of(work, struct rome_data,
-+                          ws_tx_vote_off);
-+    struct hci_uart *hu = (struct hci_uart *)rome->hci_uart;
-+
-+    BT_DBG("hu %p tx clock vote off", hu);
-+
-+    hci_uart_tx_wakeup(hu);  /* run HCI tx handling unlocked */
-+
-+    /* now that message queued to tty driver, vote for tty clocks off
-+     * It is up to the tty driver to pend the clocks off until tx done.
-+     */
-+    serial_clock_vote(HCI_IBS_TX_VOTE_CLOCK_OFF, hu);
-+}
-+
-+static void hci_ibs_tx_idle_timeout(unsigned long arg)
-+{
-+    struct hci_uart *hu = (struct hci_uart *) arg;
-+    struct rome_data *rome = hu->priv;
-+    unsigned long flags;
-+
-+    BT_DBG("hu %p idle timeout in %lu state", hu, rome->tx_ibs_state);
-+
-+    spin_lock_irqsave_nested(&rome->hci_ibs_lock,
-+                 flags, SINGLE_DEPTH_NESTING);
-+
-+    switch (rome->tx_ibs_state) {
-+    case HCI_IBS_TX_AWAKE: /* TX_IDLE, go to SLEEP */
-+        if (send_hci_ibs_cmd(HCI_IBS_SLEEP_IND, hu) < 0) {
-+            BT_ERR("cannot send SLEEP to device");
-+            goto out;
-+        }
-+        rome->tx_ibs_state = HCI_IBS_TX_ASLEEP;
-+        rome->ibs_sent_slps++; /* debug */
-+        break;
-+
-+    case HCI_IBS_TX_ASLEEP:
-+    case HCI_IBS_TX_WAKING:
-+    default:
-+        BT_ERR("spurrious timeout in tx state %ld", rome->tx_ibs_state);
-+        goto out;
-+    }
-+
-+    queue_work(rome->workqueue, &rome->ws_tx_vote_off);
-+
-+out:
-+    spin_unlock_irqrestore(&rome->hci_ibs_lock, flags);
-+}
-+
-+static void hci_ibs_wake_retrans_timeout(unsigned long arg)
-+{
-+    struct hci_uart *hu = (struct hci_uart *) arg;
-+    struct rome_data *rome = hu->priv;
-+    unsigned long flags;
-+    unsigned long retransmit = 0;
-+
-+    BT_DBG("hu %p wake retransmit timeout in %lu state",
-+        hu, rome->tx_ibs_state);
-+
-+    spin_lock_irqsave_nested(&rome->hci_ibs_lock,
-+                 flags, SINGLE_DEPTH_NESTING);
-+
-+    switch (rome->tx_ibs_state) {
-+    case HCI_IBS_TX_WAKING: /* No WAKE_ACK, retransmit WAKE */
-+        retransmit = 1;
-+        if (send_hci_ibs_cmd(HCI_IBS_WAKE_IND, hu) < 0) {
-+            BT_ERR("cannot acknowledge device wake up");
-+            goto out;
-+        }
-+        rome->ibs_sent_wakes++; /* debug */
-+        mod_timer(&rome->wake_retrans_timer, jiffies + wake_retrans);
-+        break;
-+
-+    case HCI_IBS_TX_ASLEEP:
-+    case HCI_IBS_TX_AWAKE:
-+    default:
-+        BT_ERR("spurrious timeout tx state %ld", rome->tx_ibs_state);
-+        break;
-+    }
-+
-+out:
-+    spin_unlock_irqrestore(&rome->hci_ibs_lock, flags);
-+    if (retransmit)
-+        hci_uart_tx_wakeup(hu);
-+}
-+
-+/* Initialize protocol */
-+static int rome_open(struct hci_uart *hu)
-+{
-+    struct rome_data *rome;
-+
-+    BT_DBG("hu %p rome_open", hu);
-+
-+    rome = kzalloc(sizeof(struct rome_data), GFP_ATOMIC);
-+    if (!rome)
-+        return -ENOMEM;
-+
-+    skb_queue_head_init(&rome->txq);
-+    skb_queue_head_init(&rome->tx_wait_q);
-+    spin_lock_init(&rome->hci_ibs_lock);
-+    rome->workqueue = create_singlethread_workqueue("rome_wq");
-+    if (!rome->workqueue) {
-+        BT_ERR("ROME Workqueue not initialized properly");
-+        kfree(rome);
-+        return -ENOMEM;
-+    }
-+
-+    INIT_WORK(&rome->ws_awake_rx, rome_wq_awake_rx);
-+    INIT_WORK(&rome->ws_awake_device, rome_wq_awake_device);
-+    INIT_WORK(&rome->ws_rx_vote_off, rome_wq_serial_rx_clock_vote_off);
-+    INIT_WORK(&rome->ws_tx_vote_off, rome_wq_serial_tx_clock_vote_off);
-+
-+    rome->hci_uart = (void *)hu;
-+
-+    /* Assume we start with both sides asleep -- extra wakes OK */
-+    rome->tx_ibs_state = HCI_IBS_TX_ASLEEP;
-+    rome->rx_ibs_state = HCI_IBS_RX_ASLEEP;
-+    /* clocks actually on, but we start votes off */
-+    rome->tx_vote = 0;
-+    rome->rx_vote = 0;
-+    rome->flags = 0;
-+
-+    /* debug */
-+    rome->ibs_sent_wacks = 0;
-+    rome->ibs_sent_slps = 0;
-+    rome->ibs_sent_wakes = 0;
-+    rome->ibs_recv_wacks = 0;
-+    rome->ibs_recv_slps = 0;
-+    rome->ibs_recv_wakes = 0;
-+    rome->vote_last_jif = jiffies;
-+    rome->vote_on_ticks = 0;
-+    rome->vote_off_ticks = 0;
-+    rome->votes_on = 0;
-+    rome->votes_off = 0;
-+    rome->tx_votes_on = 0;
-+    rome->tx_votes_off = 0;
-+    rome->rx_votes_on = 0;
-+    rome->rx_votes_off = 0;
-+
-+    hu->priv = rome;
-+
-+    init_timer(&rome->wake_retrans_timer);
-+    rome->wake_retrans_timer.function = hci_ibs_wake_retrans_timeout;
-+    rome->wake_retrans_timer.data     = (u_long) hu;
-+
-+    init_timer(&rome->tx_idle_timer);
-+    rome->tx_idle_timer.function = hci_ibs_tx_idle_timeout;
-+    rome->tx_idle_timer.data     = (u_long) hu;
-+
-+    BT_INFO("HCI_UART_ROME open, tx_idle_delay=%lu, wake_retrans=%lu",
-+        tx_idle_delay, wake_retrans);
-+
-+    return 0;
-+}
-+
-+static void ibs_log_local_stats(struct rome_data *rome)
-+{
-+    BT_INFO("HCI_UART_ROME stats: tx_idle_delay=%lu, wake_retrans=%lu",
-+        tx_idle_delay, wake_retrans);
-+
-+    BT_INFO("HCI_UART_ROME stats: tx_ibs_state=%lu, rx_ibs_state=%lu",
-+        rome->tx_ibs_state, rome->rx_ibs_state);
-+    BT_INFO("HCI_UART_ROME stats: sent: sleep=%lu, wake=%lu, wake_ack=%lu",
-+        rome->ibs_sent_slps,rome->ibs_sent_wakes,rome->ibs_sent_wacks);
-+    BT_INFO("HCI_UART_ROME stats: recv: sleep=%lu, wake=%lu, wake_ack=%lu",
-+        rome->ibs_recv_slps,rome->ibs_recv_wakes,rome->ibs_recv_wacks);
-+
-+    BT_INFO("HCI_UART_ROME stats: queues: txq=%s, txwaitq=%s",
-+        skb_queue_empty(&(rome->txq)) ? "empty" : "full",
-+        skb_queue_empty(&(rome->tx_wait_q)) ? "empty" : "full");
-+
-+    BT_INFO("HCI_UART_ROME stats: vote state: tx=%lu, rx=%lu",
-+        rome->tx_vote, rome->rx_vote);
-+    BT_INFO("HCI_UART_ROME stats: tx votes cast: on=%lu, off=%lu",
-+        rome->tx_votes_on, rome->tx_votes_off);
-+    BT_INFO("HCI_UART_ROME stats: rx votes cast: on=%lu, off=%lu",
-+        rome->rx_votes_on, rome->rx_votes_off);
-+    BT_INFO("HCI_UART_ROME stats: msm_clock votes cast: on=%lu, off=%lu",
-+        rome->votes_on, rome->votes_off);
-+    BT_INFO("HCI_UART_ROME stats: vote ticks: on=%lu, off=%lu",
-+        rome->vote_on_ticks, rome->vote_off_ticks);
-+}
-+
-+/* Flush protocol data */
-+static int rome_flush(struct hci_uart *hu)
-+{
-+    struct rome_data *rome = hu->priv;
-+
-+    BT_DBG("hu %p rome flush", hu);
-+
-+    skb_queue_purge(&rome->tx_wait_q);
-+    skb_queue_purge(&rome->txq);
-+
-+    return 0;
-+}
-+
-+/* Close protocol */
-+static int rome_close(struct hci_uart *hu)
-+{
-+    struct rome_data *rome = hu->priv;
-+
-+    BT_DBG("hu %p rome close", hu);
-+
-+    serial_clock_vote(HCI_IBS_VOTE_STATS_UPDATE, hu);
-+    ibs_log_local_stats(rome);
-+
-+    skb_queue_purge(&rome->tx_wait_q);
-+    skb_queue_purge(&rome->txq);
-+    del_timer(&rome->tx_idle_timer);
-+    del_timer(&rome->wake_retrans_timer);
-+    destroy_workqueue(rome->workqueue);
-+    rome->hci_uart = NULL;
-+
-+    kfree_skb(rome->rx_skb);
-+
-+    hu->priv = NULL;
-+
-+    kfree(rome);
-+
-+    return 0;
-+}
-+
-+/*
-+ * Called upon a wake-up-indication from the device
-+ */
-+static void device_want_to_wakeup(struct hci_uart *hu)
-+{
-+    unsigned long flags;
-+    struct rome_data *rome = hu->priv;
-+
-+    BT_DBG("hu %p want to wake up", hu);
-+
-+    spin_lock_irqsave(&rome->hci_ibs_lock, flags);
-+
-+    /* debug */
-+    rome->ibs_recv_wakes++;
-+
-+    switch (rome->rx_ibs_state) {
-+    case HCI_IBS_RX_ASLEEP:
-+        /* Make sure clock is on - we may have turned clock off since
-+         * receiving the wake up indicator
-+         */
-+        /* awake rx clock */
-+        queue_work(rome->workqueue, &rome->ws_awake_rx);
-+        spin_unlock_irqrestore(&rome->hci_ibs_lock, flags);
-+        return;
-+
-+    case HCI_IBS_RX_AWAKE:
-+        /* Always acknowledge device wake up,
-+         * sending IBS message doesn't count as TX ON.
-+         */
-+        if (send_hci_ibs_cmd(HCI_IBS_WAKE_ACK, hu) < 0) {
-+            BT_ERR("cannot acknowledge device wake up");
-+            goto out;
-+        }
-+        rome->ibs_sent_wacks++; /* debug */
-+        break;
-+
-+    default:
-+        /* any other state is illegal */
-+        BT_ERR("received HCI_IBS_WAKE_IND in rx state %ld",
-+            rome->rx_ibs_state);
-+        break;
-+    }
-+
-+out:
-+    spin_unlock_irqrestore(&rome->hci_ibs_lock, flags);
-+
-+    /* actually send the packets */
-+    hci_uart_tx_wakeup(hu);
-+}
-+
-+/*
-+ * Called upon a sleep-indication from the device
-+ */
-+static void device_want_to_sleep(struct hci_uart *hu)
-+{
-+    unsigned long flags;
-+    struct rome_data *rome = hu->priv;
-+
-+    BT_DBG("hu %p want to sleep", hu);
-+
-+    spin_lock_irqsave(&rome->hci_ibs_lock, flags);
-+
-+    /* debug */
-+    rome->ibs_recv_slps++;
-+
-+    switch (rome->rx_ibs_state) {
-+    case HCI_IBS_RX_AWAKE:
-+        /* update state */
-+        rome->rx_ibs_state = HCI_IBS_RX_ASLEEP;
-+        /* vote off rx clock under workqueue */
-+        queue_work(rome->workqueue, &rome->ws_rx_vote_off);
-+        break;
-+
-+    case HCI_IBS_RX_ASLEEP:
-+        /* deliberate fall-through */
-+    default:
-+        /* any other state is illegal */
-+        BT_ERR("received HCI_IBS_SLEEP_IND in rx state %ld",
-+            rome->rx_ibs_state);
-+        break;
-+    }
-+
-+    spin_unlock_irqrestore(&rome->hci_ibs_lock, flags);
-+}
-+
-+/*
-+ * Called upon wake-up-acknowledgement from the device
-+ */
-+static void device_woke_up(struct hci_uart *hu)
-+{
-+    unsigned long flags;
-+    struct rome_data *rome = hu->priv;
-+    struct sk_buff *skb = NULL;
-+
-+    BT_DBG("hu %p woke up", hu);
-+
-+    spin_lock_irqsave(&rome->hci_ibs_lock, flags);
-+
-+    /* debug */
-+    rome->ibs_recv_wacks++;
-+
-+    switch (rome->tx_ibs_state) {
-+    case HCI_IBS_TX_AWAKE:
-+        /* expect one if we send 2 WAKEs */
-+        BT_DBG("received HCI_IBS_WAKE_ACK in tx state %ld",
-+            rome->tx_ibs_state);
-+        break;
-+
-+    case HCI_IBS_TX_WAKING:
-+        /* send pending packets */
-+        while ((skb = skb_dequeue(&rome->tx_wait_q)))
-+            skb_queue_tail(&rome->txq, skb);
-+
-+        /* switch timers and change state to HCI_IBS_TX_AWAKE */
-+        del_timer(&rome->wake_retrans_timer);
-+        mod_timer(&rome->tx_idle_timer, jiffies + tx_idle_delay);
-+        rome->tx_ibs_state = HCI_IBS_TX_AWAKE;
-+        break;
-+
-+    case HCI_IBS_TX_ASLEEP:
-+        /* This could be spurrious rx wake on the BT chip.
-+         * Send it another SLEEP othwise it will stay awake. */
-+    default:
-+        BT_ERR("received HCI_IBS_WAKE_ACK in tx state %ld",
-+            rome->tx_ibs_state);
-+        break;
-+    }
-+
-+    spin_unlock_irqrestore(&rome->hci_ibs_lock, flags);
-+
-+    /* actually send the packets */
-+    hci_uart_tx_wakeup(hu);
-+}
-+
-+/* Enqueue frame for transmittion (padding, crc, etc) */
-+/* may be called from two simultaneous tasklets */
-+static int rome_enqueue(struct hci_uart *hu, struct sk_buff *skb)
-+{
-+    unsigned long flags = 0;
-+    struct rome_data *rome = hu->priv;
-+
-+    BT_DBG("hu %p rome enq skb %p tx_ibs_state %ld", hu, skb,
-+           rome->tx_ibs_state);
-+
-+    /* Prepend skb with frame type */
-+    memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
-+
-+    /* don't go to sleep in middle of patch download or
-+     * Out-Of-Band(GPIOs control) sleep is selected
-+     */
-+    if (!test_bit(STATE_IN_BAND_SLEEP_ENABLED, &rome->flags)) {
-+        skb_queue_tail(&rome->txq, skb);
-+        return 0;
-+    }
-+
-+    spin_lock_irqsave(&rome->hci_ibs_lock, flags);
-+
-+    /* act according to current state */
-+    switch (rome->tx_ibs_state) {
-+    case HCI_IBS_TX_AWAKE:
-+        BT_DBG("device awake, sending normally");
-+        skb_queue_tail(&rome->txq, skb);
-+        mod_timer(&rome->tx_idle_timer, jiffies + tx_idle_delay);
-+        break;
-+
-+    case HCI_IBS_TX_ASLEEP:
-+        BT_DBG("device asleep, waking up and queueing packet");
-+        /* save packet for later */
-+        skb_queue_tail(&rome->tx_wait_q, skb);
-+
-+        rome->tx_ibs_state = HCI_IBS_TX_WAKING;
-+        /* schedule a work queue to wake up device */
-+        queue_work(rome->workqueue, &rome->ws_awake_device);
-+        break;
-+
-+    case HCI_IBS_TX_WAKING:
-+        BT_DBG("device waking up, queueing packet");
-+        /* transient state; just keep packet for later */
-+        skb_queue_tail(&rome->tx_wait_q, skb);
-+        break;
-+
-+    default:
-+        BT_ERR("illegal tx state: %ld (losing packet)",
-+               rome->tx_ibs_state);
-+        kfree_skb(skb);
-+        break;
-+    }
-+
-+    spin_unlock_irqrestore(&rome->hci_ibs_lock, flags);
-+
-+    return 0;
-+}
-+
-+static inline int check_data_len(struct hci_dev *hdev, struct rome_data *rome,
-+                 int len)
-+{
-+    register int room = skb_tailroom(rome->rx_skb);
-+
-+    BT_DBG("len %d room %d", len, room);
-+
-+    if (!len) {
-+        hci_recv_frame(hdev, rome->rx_skb);
-+        goto out;
-+    }
-+
-+    if (len > room) {
-+        BT_ERR("Data length is too large");
-+        kfree_skb(rome->rx_skb);
-+        goto out;
-+    }
-+
-+    rome->rx_state = HCI_IBS_W4_DATA;
-+    rome->rx_count = len;
-+    return len;
-+
-+out:
-+    rome->rx_state = HCI_IBS_W4_PACKET_TYPE;
-+    rome->rx_skb   = NULL;
-+    rome->rx_count = 0;
-+
-+    return 0;
-+}
-+
-+/* Recv data */
-+static int rome_recv(struct hci_uart *hu, const void *data, int count)
-+{
-+    struct rome_data *rome = hu->priv;
-+    struct sk_buff *skb;
-+    const uint8_t *ptr;
-+    struct hci_event_hdr *eh;
-+    struct hci_acl_hdr   *ah;
-+    struct hci_sco_hdr   *sh;
-+    register int len, type, dlen;
-+    int ret;
-+
-+    BT_DBG("hu %p rome_recv count %d rx_state %ld rx_count %ld",
-+           hu, count, rome->rx_state, rome->rx_count);
-+
-+    ptr = (const uint8_t*)data;
-+    while (count) {
-+        if (rome->rx_count) {
-+            len = min_t(unsigned int, rome->rx_count, count);
-+            memcpy(skb_put(rome->rx_skb, len), ptr, len);
-+            rome->rx_count -= len; count -= len; ptr += len;
-+
-+            if (rome->rx_count)
-+                continue;
-+
-+            switch (rome->rx_state) {
-+            case HCI_IBS_W4_DATA:
-+                BT_DBG("Complete data");
-+                skb = rome->rx_skb;
-+                rome_debug_dump(skb->data, skb->len, false);
-+                ret = rome_vendor_frame(hu->hdev, skb);
-+                if (!ret)
-+                    ret = hci_recv_frame(hu->hdev, skb);
-+
-+                rome->rx_state = HCI_IBS_W4_PACKET_TYPE;
-+                rome->rx_skb = NULL;
-+                continue;
-+
-+            case HCI_IBS_W4_EVENT_HDR:
-+                eh = (struct hci_event_hdr *)rome->rx_skb->data;
-+
-+                BT_DBG("Event header: evt 0x%2.2x plen %d",
-+                    eh->evt, eh->plen);
-+
-+                check_data_len(hu->hdev, rome, eh->plen);
-+                continue;
-+
-+            case HCI_IBS_W4_ACL_HDR:
-+                ah = (struct hci_acl_hdr *)rome->rx_skb->data;
-+                dlen = le16_to_cpu(ah->dlen);
-+
-+                BT_DBG("ACL header: dlen %d", dlen);
-+
-+                check_data_len(hu->hdev, rome, dlen);
-+                continue;
-+
-+            case HCI_IBS_W4_SCO_HDR:
-+                sh = (struct hci_sco_hdr *)rome->rx_skb->data;
-+
-+                BT_DBG("SCO header: dlen %d", sh->dlen);
-+
-+                check_data_len(hu->hdev, rome, sh->dlen);
-+                continue;
-+            }
-+        }
-+
-+        switch (*ptr) {
-+        case HCI_EVENT_PKT:
-+            BT_DBG("Event packet");
-+            rome->rx_state = HCI_IBS_W4_EVENT_HDR;
-+            rome->rx_count = HCI_EVENT_HDR_SIZE;
-+            type = HCI_EVENT_PKT;
-+            break;
-+
-+        case HCI_ACLDATA_PKT:
-+            BT_DBG("ACL packet");
-+            rome->rx_state = HCI_IBS_W4_ACL_HDR;
-+            rome->rx_count = HCI_ACL_HDR_SIZE;
-+            type = HCI_ACLDATA_PKT;
-+            break;
-+
-+        case HCI_SCODATA_PKT:
-+            BT_DBG("SCO packet");
-+            rome->rx_state = HCI_IBS_W4_SCO_HDR;
-+            rome->rx_count = HCI_SCO_HDR_SIZE;
-+            type = HCI_SCODATA_PKT;
-+            break;
-+
-+        /* HCI_IBS signals */
-+        case HCI_IBS_SLEEP_IND:
-+            BT_DBG("HCI_IBS_SLEEP_IND packet");
-+            rome_debug_dump(ptr, 1, false);
-+            device_want_to_sleep(hu);
-+            ptr++; count--;
-+            continue;
-+
-+        case HCI_IBS_WAKE_IND:
-+            BT_DBG("HCI_IBS_WAKE_IND packet");
-+            rome_debug_dump(ptr, 1, false);
-+            device_want_to_wakeup(hu);
-+            ptr++; count--;
-+            continue;
-+
-+        case HCI_IBS_WAKE_ACK:
-+            BT_DBG("HCI_IBS_WAKE_ACK packet");
-+            rome_debug_dump(ptr, 1, false);
-+            device_woke_up(hu);
-+            ptr++; count--;
-+            continue;
-+
-+        default:
-+            BT_ERR("Unknown HCI packet type %2.2x", (__u8)*ptr);
-+            hu->hdev->stat.err_rx++;
-+            ptr++; count--;
-+            continue;
-+        };
-+
-+        ptr++; count--;
-+
-+        /* Allocate packet */
-+        rome->rx_skb = bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
-+        if (!rome->rx_skb) {
-+            BT_ERR("Can't allocate mem for new packet");
-+            rome->rx_state = HCI_IBS_W4_PACKET_TYPE;
-+            rome->rx_count = 0;
-+            return 0;
-+        }
-+
-+        rome->rx_skb->dev = (void *) hu->hdev;
-+        bt_cb(rome->rx_skb)->pkt_type = type;
-+    }
-+
-+    return count;
-+}
-+
-+static struct sk_buff *rome_dequeue(struct hci_uart *hu)
-+{
-+    struct rome_data *rome = hu->priv;
-+    struct sk_buff *skb;
-+
-+    skb = skb_dequeue(&rome->txq);
-+    if (skb) {
-+        rome_debug_dump(skb->data, skb->len, true);
-+    }
-+
-+    return skb;
-+}
-+
-+static int rome_set_baudrate(struct hci_dev *hdev, unsigned int speed)
-+{
-+    struct sk_buff *skb;
-+    uint8_t baudrate;
-+
-+    if (speed > 3000000)
-+        return -EINVAL;
-+
-+    BT_INFO("%s: Set controller UART speed to %d", hdev->name, speed);
-+
-+    baudrate = rome_get_baudrate(speed);
-+    skb = __hci_cmd_sync(hdev, EDL_PATCH_BAUDRATE, 1, &baudrate,
-+                 msecs_to_jiffies(100));
-+    if (IS_ERR(skb)) {
-+        if (PTR_ERR(skb) == -ETIMEDOUT)
-+            return 0;
-+
-+        return PTR_ERR(skb);
-+    }
-+
-+    kfree_skb(skb);
-+    return 0;
-+}
-+
-+static int rome_setup(struct hci_uart *hu)
-+{
-+    struct hci_dev *hdev = hu->hdev;
-+    struct rome_data *rome = hu->priv;
-+    unsigned int speed;
-+    int ret;
-+
-+    BT_INFO("%s: ROME setup", hdev->name);
-+
-+    /* Patch downloading has to be done without IBS mode */
-+    clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &rome->flags);
-+
-+    /* setup initial baudrate */
-+    speed = 0;
-+    if (hu->init_speed)
-+        speed = hu->init_speed;
-+    else if (hu->proto->init_speed)
-+        speed = hu->proto->init_speed;
-+
-+    if (speed)
-+        hci_uart_set_baudrate(hu, speed);
-+
-+    /* setup user speed if needed */
-+    speed = 0;
-+    if (hu->oper_speed)
-+        speed = hu->oper_speed;
-+    else if (hu->proto->oper_speed)
-+        speed = hu->proto->oper_speed;
-+
-+    if (speed) {
-+        ret = rome_set_baudrate(hdev, speed);
-+        if (ret) {
-+            BT_ERR("%s: can't change the baud rate (%d)",
-+                   hdev->name, ret);
-+            return ret;
-+        }
-+        hci_uart_set_baudrate(hu, speed);
-+    }
-+
-+    /* setup patch / nvm configurations */
-+    ret = rome_uart_setup(hdev, speed);
-+#ifdef QCA_FEATURE_UART_IN_BAND_SLEEP
-+    if (!ret)
-+        set_bit(STATE_IN_BAND_SLEEP_ENABLED, &rome->flags);
-+#endif
-+
-+    /* setup bdaddr */
-+    hu->hdev->set_bdaddr = rome_set_bdaddr;
-+
-+    return ret;
-+}
-+
-+static struct hci_uart_proto rome_p = {
-+    .id        = HCI_UART_ROME,
-+    .name        = "ROME",
-+    .open        = rome_open,
-+    .init_speed    = 115200,
-+    .oper_speed    = 3000000,
-+    .close        = rome_close,
-+    .recv        = rome_recv,
-+    .enqueue    = rome_enqueue,
-+    .dequeue    = rome_dequeue,
-+    .flush        = rome_flush,
-+    .setup        = rome_setup,
-+};
-+
-+int __init rome_init(void)
-+{
-+    return hci_uart_register_proto(&rome_p);
-+}
-+
-+int __exit rome_deinit(void)
-+{
-+    return hci_uart_unregister_proto(&rome_p);
-+}
-+
-+module_param(wake_retrans, ulong, 0644);
-+MODULE_PARM_DESC(wake_retrans, "Delay (1/HZ) to retransmit WAKE_IND");
-+
-+module_param(tx_idle_delay, ulong, 0644);
-+MODULE_PARM_DESC(tx_idle_delay, "Delay (1/HZ) since last tx for SLEEP_IND");
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 496587a..dfdde8b 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -35,7 +35,7 @@
- #define HCIUARTGETFLAGS        _IOR('U', 204, int)
- 
- /* UART protocols */
--#define HCI_UART_MAX_PROTO    8
-+#define HCI_UART_MAX_PROTO    9
- 
- #define HCI_UART_H4    0
- #define HCI_UART_BCSP    1
-@@ -45,6 +45,7 @@
- #define HCI_UART_ATH3K    5
- #define HCI_UART_INTEL    6
- #define HCI_UART_BCM    7
-+#define HCI_UART_ROME     8
- 
- #define HCI_UART_RAW_DEVICE    0
- #define HCI_UART_RESET_ON_INIT    1
-@@ -176,3 +177,8 @@ int intel_deinit(void);
- int bcm_init(void);
- int bcm_deinit(void);
- #endif
-+
-+#ifdef CONFIG_BT_HCIUART_QCAROME
-+int rome_init(void);
-+int rome_deinit(void);
 +#endif
 -- 
 2.0.5
+
