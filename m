@@ -1,25 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 Jul 2015 10:54:50 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anchit Narang <anchit.n@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, sachin.dev@samsung.com
-Subject: Re: [PATCH] tools/rctest: Closed File to fix memory leak
-Message-ID: <20150730075450.GA32115@t440s.P-661HNU-F1>
-References: <1438239003-30647-1-git-send-email-anchit.n@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1438239003-30647-1-git-send-email-anchit.n@samsung.com>
+In-Reply-To: <1438156733-3258-1-git-send-email-luiz.dentz@gmail.com>
+References: <1438156733-3258-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 30 Jul 2015 10:40:51 +0300
+Message-ID: <CABBYNZLF2t9ypG-yyfDmCvmM3AgdHvjF7WkGE4UejJGZ2dLs=A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] shared/gatt-client: Fix error when no service
+ could be found
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anchit,
+Hi,
 
-On Thu, Jul 30, 2015, Anchit Narang wrote:
-> Closed the file  before returning from do_send function.
+On Wed, Jul 29, 2015 at 10:58 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> In case the remote device has no services available ready callback would
+> be called with success set to false but in fact it has succeeded it just
+> did not find anything.
 > ---
->  tools/rctest.c |    1 +
->  1 file changed, 1 insertion(+)
+>  src/shared/gatt-client.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 24aef18..903afa7 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -971,6 +971,11 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
+>                 util_debug(client->debug_callback, client->debug_data,
+>                                         "Primary service discovery failed."
+>                                         " ATT ECODE: 0x%02x", att_ecode);
+> +               /* Reset error in case of not found */
+> +               if (BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
+> +                       success = true;
+> +                       att_ecode = 0;
+> +               }
+>                 goto secondary;
+>         }
+>
+> --
+> 2.1.0
 
-Applied. Thanks.
+Applied.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
