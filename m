@@ -1,34 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH v2 3/8] Bluetooth: Unwind l2cap_sock_shutdown()
+Subject: Re: [PATCH] Bluetooth: cmtp: Do not use list_for_each_safe when not needed
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <55A76D51.6000607@mentor.com>
-Date: Thu, 30 Jul 2015 13:51:55 +0200
-Cc: linux-bluetooth@vger.kernel.org, Joshua_Frkuska@mentor.com
-Message-Id: <D45D17F0-3869-4F54-AE6B-B5AF1192695E@holtmann.org>
-References: <1435078779-4436-1-git-send-email-Dean_Jenkins@mentor.com> <1435078779-4436-4-git-send-email-Dean_Jenkins@mentor.com> <20150713110731.GA21598@t440s.lan> <55A3F5F8.4070800@mentor.com> <20150716080840.GA28234@t440s.lan> <55A76D51.6000607@mentor.com>
-To: Dean Jenkins <Dean_Jenkins@mentor.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <7a32b5e113be6344c436791e5ce7c17e8f2b4e68.1437077656.git.christophe.jaillet@wanadoo.fr>
+Date: Thu, 30 Jul 2015 13:51:20 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Message-Id: <F6E17164-28FF-436C-900A-EFC1DF3D5749@holtmann.org>
+References: <7a32b5e113be6344c436791e5ce7c17e8f2b4e68.1437077656.git.christophe.jaillet@wanadoo.fr>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dean,
+Hi Christophe,
 
->>>> Do you think you'll be able to fix this as well as the missing
->>>> mutex_lock(&conn->chan_lock) issue this week? Otherwise we'll need to
->>>> consider reverting your patches since it's quite clear we can't make any
->>>> bluetooth-next pull requests with the current state of the tree.
->>> I think it would be wise to revert the changes as I am unable to guarantee
->>> that I get time to propose a fix during this week. I will try to work on a
->>> v3 patchset based on your feedback.
->> I went ahead and pushed a rebased tree with your patches 3/8, 4/8 and
->> 5/8 removed. The other five were either harmless or good fixes. So
->> if/when you have new patches please base them against the new tree.
->> 
->> 
-> Thanks for the information. I shall endeavour to fix the locking issues but it will take me some days.
+> There is no need to use the safe version of list_for_each here.
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> net/bluetooth/cmtp/capi.c | 8 ++++----
+> 1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/cmtp/capi.c b/net/bluetooth/cmtp/capi.c
+> index b0c6c6a..4c5e3e0 100644
+> --- a/net/bluetooth/cmtp/capi.c
+> +++ b/net/bluetooth/cmtp/capi.c
+> @@ -100,9 +100,9 @@ static void cmtp_application_del(struct cmtp_session *session, struct cmtp_appli
+> static struct cmtp_application *cmtp_application_get(struct cmtp_session *session, int pattern, __u16 value)
+> {
+> 	struct cmtp_application *app;
+> -	struct list_head *p, *n;
+> +	struct list_head *p;
+> 
+> -	list_for_each_safe(p, n, &session->applications) {
+> +	list_for_each(p, &session->applications) {
+> 		app = list_entry(p, struct cmtp_application, list);
+> 		switch (pattern) {
+> 		case CMTP_MSGNUM:
+> @@ -511,13 +511,13 @@ static int cmtp_proc_show(struct seq_file *m, void *v)
+> 	struct capi_ctr *ctrl = m->private;
+> 	struct cmtp_session *session = ctrl->driverdata;
+> 	struct cmtp_application *app;
+> -	struct list_head *p, *n;
+> +	struct list_head *p;
+> 
+> 	seq_printf(m, "%s\n\n", cmtp_procinfo(ctrl));
+> 	seq_printf(m, "addr %s\n", session->name);
+> 	seq_printf(m, "ctrl %d\n", session->num);
+> 
+> -	list_for_each_safe(p, n, &session->applications) {
+> +	list_for_each(p,  &session->applications) {
 
-any updates?
+you have two spaces here. I fixed that and applied the patch.
 
 Regards
 
