@@ -1,25 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: Bluez-Android: L2CAP Socket Communication over
+Subject: Re: [PATCH 1/3] Bluetooth: Move get info completed callback to a2mp.c
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAKafyqrhmNKOX258_cH_iYiOi=ALVTVzvxfEd4_HXGJrnHrpuQ@mail.gmail.com>
-Date: Thu, 30 Jul 2015 13:40:16 +0200
+In-Reply-To: <1437729016-16715-1-git-send-email-arron.wang@intel.com>
+Date: Thu, 30 Jul 2015 13:38:09 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <173ED163-67CB-46E0-B38D-CE5F9B8A5638@holtmann.org>
-References: <CAKafyqoTVzbVv1Wk21wRSjxyH68bL+gCT_0qF9fvmUWnqkgEeg@mail.gmail.com> <CDAF57F8-C541-42AF-8FEE-47A5221DF63A@holtmann.org> <CAKafyqrhmNKOX258_cH_iYiOi=ALVTVzvxfEd4_HXGJrnHrpuQ@mail.gmail.com>
-To: Prabhu Chawandi <foss.chaws@gmail.com>
+Message-Id: <BBDCBDA4-2BC8-430E-9350-5C65395AC8EB@holtmann.org>
+References: <1437729016-16715-1-git-send-email-arron.wang@intel.com>
+To: Arron Wang <arron.wang@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prabhu,
+Hi Arron,
 
-please do not top post on this mailing list.
+> To avoid a2mp module hooks from hci_event.c and send
+> getinfo response operation only required by a2mp module,
+> we can move this callback to a2mp.c
+> 
+> Signed-off-by: Arron Wang <arron.wang@intel.com>
+> ---
+> net/bluetooth/a2mp.c      |   17 ++++++++++++++++-
+> net/bluetooth/hci_event.c |    5 +----
+> 2 files changed, 17 insertions(+), 5 deletions(-)
 
->   I am not looking to add it to AOSP. Could you please add some more
-> information If I want to add it for native application.
-
-For L2CAP socket information, you can look at l2test.c on how to do that. It has plenty of examples in there.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
