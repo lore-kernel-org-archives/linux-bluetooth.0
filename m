@@ -1,59 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 31 Jul 2015 00:15:50 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	linux-bluetooth@vger.kernel.org, lukasz.duda@nordicsemi.no
-Subject: Re: [RFC bluetooth-next 1/2] bluetooth: 6lowpan: change netdev_priv
- to lowpan_dev
-Message-ID: <20150730221549.GA1037@omega>
-References: <1438172674-31028-1-git-send-email-alex.aring@gmail.com>
- <1438172674-31028-2-git-send-email-alex.aring@gmail.com>
- <55BA7CB5.7030605@osg.samsung.com>
- <55BA7D65.40202@osg.samsung.com>
+Subject: Re: [PATCH 2/2] Bluetooth: hciuart: Add to support QCA ROME
+ configuration
+To: Marcel Holtmann <marcel@holtmann.org>
+References: <55B97ECE.7020307@qca.qualcomm.com>
+ <DD3468DA-08F6-429B-AF85-9D7FC5BD3876@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>
+From: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+Message-ID: <55BA9FBE.8080300@qca.qualcomm.com>
+Date: Thu, 30 Jul 2015 15:05:50 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <55BA7D65.40202@osg.samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <DD3468DA-08F6-429B-AF85-9D7FC5BD3876@holtmann.org>
+Content-Type: text/plain; charset="windows-1252"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jul 30, 2015 at 09:39:17PM +0200, Stefan Schmidt wrote:
-> Hello.
-> 
-> On 30/07/15 21:36, Stefan Schmidt wrote:
-> >Hello.
-> >
-> >On 29/07/15 14:24, Alexander Aring wrote:
-> >>The usually way to get the btle lowpan private data is to use the
-> >>introduced lowpan_dev inline function. This patch will cleanup by using
-> >>lowpan_dev consequently.
-> >>
-> >>Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> >>---
-> >>  net/bluetooth/6lowpan.c | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >>diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> >>index 2fb7b30..93c6ba0 100644
-> >>--- a/net/bluetooth/6lowpan.c
-> >>+++ b/net/bluetooth/6lowpan.c
-> >>@@ -871,7 +871,7 @@ static int setup_netdev(struct l2cap_chan *chan,
-> >>struct lowpan_dev **dev)
-> >>             &chan->src, chan->src_type);
-> >>      set_bit(__LINK_STATE_PRESENT, &netdev->state);
-> >>  -    *dev = netdev_priv(netdev);
-> >>+    *dev = lowpan_dev(netdev);
-> >>      (*dev)->netdev = netdev;
-> >>      (*dev)->hdev = chan->conn->hcon->hdev;
-> >>      INIT_LIST_HEAD(&(*dev)->peers);
-> >
-> >This patch does no longer apply. There have been 5 patches to the 6lowpan
-> >file in bluetooth from Gleen. You need to rebase this one.
-> >
-> Looking at it in more detail its actually your own patch which makes the
-> rebase necessary. The one fixing a possible race.
-> 
+Hi Marcel,
 
-yes, I know. I will send a v2 in the next 24 hours.
+On 07/30/15 04:16, Marcel Holtmann wrote:
+> +
+> +#ifdef CONFIG_SERIAL_MSM_HS
+> +#include <linux/platform_data/msm_serial_hs.h>
+> +#endif
+> I do not like platform data. Why can't this be done with device tree?
 
-- Alex
+This is specific code for MSM UART HighSpeed code which is not upstreamed yet. The MSM device tree has already defined this config_serial_msm_hs. I'd like to move this part to btqca.c module since it is for vendor specific implementation.
+
+>> +static int rome_set_baudrate(struct hci_dev *hdev, unsigned int speed)
+>> +{
+>> +    struct sk_buff *skb;
+>> +    uint8_t baudrate;
+>> +
+>> +    if (speed > 3000000)
+>> +        return -EINVAL;
+>> +
+>> +    BT_INFO("%s: Set controller UART speed to %d", hdev->name, speed);
+>> +
+>> +    baudrate = rome_get_baudrate(speed);
+>> +    skb = __hci_cmd_sync(hdev, EDL_PATCH_BAUDRATE, 1, &baudrate,
+>> +                 msecs_to_jiffies(100));
+> Introduce proper constant defines for timeout or use HCI_INIT_TIMEOUT.
+>
+>> +    if (IS_ERR(skb)) {
+>> +        if (PTR_ERR(skb) == -ETIMEDOUT)
+>> +            return 0;
+> Why return success when it times out?
+>
+
+QCA ROME doesn't return cc event after recieving baudrate command changed because it triggers HCI_RESET right away and set to new baudrate to communicate with host. Hence timeout can be handled as succeed case. If something goes wrong after changing baudrate, commands follow-ed won't be delivered to controller.
+
+>> +
+>> #define HCI_UART_H4    0
+>> #define HCI_UART_BCSP    1
+>> @@ -45,6 +45,7 @@
+>> #define HCI_UART_ATH3K    5
+>> #define HCI_UART_INTEL    6
+>> #define HCI_UART_BCM    7
+>> +#define HCI_UART_ROME     8
+> Can we just name these HCI_UART_QCA instead. The ROME thing is a bit confusing since it is more a product name than a vendor name.
+>
+>> #define HCI_UART_RAW_DEVICE    0
+>> #define HCI_UART_RESET_ON_INIT    1
+>> @@ -176,3 +177,8 @@ int intel_deinit(void);
+>> int bcm_init(void);
+>> int bcm_deinit(void);
+>> #endif
+>> +
+>> +#ifdef CONFIG_BT_HCIUART_QCAROME
+>> +int rome_init(void);
+>> +int rome_deinit(void);
+>> +#endif
+> Same here. I rather have this qca_init etc.
+>
+> Regards
+>
+> Marcel
+>
+
+Thanks for your code review. I'll submit new patches to address all your suggestions.
+
+Thanks
+-- Ben Kim
