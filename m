@@ -1,51 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1438156733-3258-1-git-send-email-luiz.dentz@gmail.com>
-References: <1438156733-3258-1-git-send-email-luiz.dentz@gmail.com>
-Date: Thu, 30 Jul 2015 10:40:51 +0300
-Message-ID: <CABBYNZLF2t9ypG-yyfDmCvmM3AgdHvjF7WkGE4UejJGZ2dLs=A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] shared/gatt-client: Fix error when no service
- could be found
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alexander Aring <alex.aring@gmail.com>
+To: jukka.rissanen@linux.intel.com
+Cc: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	kernel@pengutronix.de,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next] bluetooth: 6lowpan: fix possible race
+Date: Thu, 30 Jul 2015 09:40:53 +0200
+Message-Id: <1438242053-15380-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch fix a possible race after calling register_netdev. After
+calling netdev_register it could be possible that netdev_ops callbacks
+use the uninitialized private data of lowpan_dev. By moving the
+initialization of this data before netdev_register we can be sure that
+initialized private data is be used after netdev_register.
 
-On Wed, Jul 29, 2015 at 10:58 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> In case the remote device has no services available ready callback would
-> be called with success set to false but in fact it has succeeded it just
-> did not find anything.
-> ---
->  src/shared/gatt-client.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 24aef18..903afa7 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -971,6 +971,11 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
->                 util_debug(client->debug_callback, client->debug_data,
->                                         "Primary service discovery failed."
->                                         " ATT ECODE: 0x%02x", att_ecode);
-> +               /* Reset error in case of not found */
-> +               if (BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND) {
-> +                       success = true;
-> +                       att_ecode = 0;
-> +               }
->                 goto secondary;
->         }
->
-> --
-> 2.1.0
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/bluetooth/6lowpan.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-Applied.
-
-
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 2fb7b30..0ffe2e2 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -859,9 +859,22 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
+ 	SET_NETDEV_DEV(netdev, &chan->conn->hcon->hdev->dev);
+ 	SET_NETDEV_DEVTYPE(netdev, &bt_type);
+ 
++	*dev = netdev_priv(netdev);
++	(*dev)->netdev = netdev;
++	(*dev)->hdev = chan->conn->hcon->hdev;
++	INIT_LIST_HEAD(&(*dev)->peers);
++
++	spin_lock(&devices_lock);
++	INIT_LIST_HEAD(&(*dev)->list);
++	list_add_rcu(&(*dev)->list, &bt_6lowpan_devices);
++	spin_unlock(&devices_lock);
++
+ 	err = register_netdev(netdev);
+ 	if (err < 0) {
+ 		BT_INFO("register_netdev failed %d", err);
++		spin_lock(&devices_lock);
++		list_del_rcu(&(*dev)->list);
++		spin_unlock(&devices_lock);
+ 		free_netdev(netdev);
+ 		goto out;
+ 	}
+@@ -871,16 +884,6 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
+ 	       &chan->src, chan->src_type);
+ 	set_bit(__LINK_STATE_PRESENT, &netdev->state);
+ 
+-	*dev = netdev_priv(netdev);
+-	(*dev)->netdev = netdev;
+-	(*dev)->hdev = chan->conn->hcon->hdev;
+-	INIT_LIST_HEAD(&(*dev)->peers);
+-
+-	spin_lock(&devices_lock);
+-	INIT_LIST_HEAD(&(*dev)->list);
+-	list_add_rcu(&(*dev)->list, &bt_6lowpan_devices);
+-	spin_unlock(&devices_lock);
+-
+ 	return 0;
+ 
+ out:
 -- 
-Luiz Augusto von Dentz
+2.5.0
