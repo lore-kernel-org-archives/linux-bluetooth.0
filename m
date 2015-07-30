@@ -1,32 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 30 Jul 2015 09:15:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anchit Narang <anchit.n@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, sachin.dev@samsung.com
+Subject: Re: [PATCH] tools/rctest: Fixed memory leak
+Message-ID: <20150730061529.GA23791@t440s.P-661HNU-F1>
+References: <1438234207-7374-1-git-send-email-anchit.n@samsung.com>
 MIME-Version: 1.0
-From: "Arun K. Singh" <arunkat@gmail.com>
-Date: Thu, 30 Jul 2015 15:29:37 +0900
-Message-ID: <CAOnmHE9V9iJjbtTLvfS+pFYCaZGmSj4Z6ZK28-ER0K=CZH4TLQ@mail.gmail.com>
-Subject: Enabling continuous LE Active scan in 5.32?
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1438234207-7374-1-git-send-email-anchit.n@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Anchit,
 
-I am trying to enable continuous LE active scan in Bluez 5.32.
-Platform is Raspberry Pi with kernel 3.18.7+. I find no param in
-adapter-api.txt, to set LE scan interval/window. btmgmt offers some
-respite but setting scan window and interval to same value(via
-scan-params) it still it takes around ~2 sec to trigger next scan.
-Thoughr BT specs says that if scan interval and scan window are same,
-it should trigger continuous scan.
+On Thu, Jul 30, 2015, Anchit Narang wrote:
+> Removed dynamic allocation of filename and savefile by strdup.
+> Instead filename and savefile are directly pointing to the argv element.
+> Closed the file  before returning from do_send function.
+> ---
+>  tools/rctest.c |    9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 
-Checking adapter.c, adapter->no_scan_restart_delay parameter looks
-promising if set to true. Still same result - next scan delay ~ 2 sec.
-Not sure if such delay is intentional or platform performance related
-My question is :- Is there a neat way to trigger continuous active LE
-scan even though it may sound power-wise inefficient. Tried to grep
-archives but couldn't find much help.
+I know I let it slip last time, but in principle independent fixes
+should be in separate patches. So please split the fd leak to a separate
+patch.
 
-Any cues would be helpful.
-
-Thanks,
--Arun
+Johan
