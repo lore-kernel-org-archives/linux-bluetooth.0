@@ -1,78 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 31 Jul 2015 00:23:56 +0200
+Date: Fri, 31 Jul 2015 00:15:50 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: Lukasz Duda <lukasz.duda@nordicsemi.no>, jukka.rissanen@linux.intel.com,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>,
-	marcel@holtmann.org
-Subject: Re: [PATCH] 6lowpan: Fix extraction of flow label field
-Message-ID: <20150730222353.GB1037@omega>
-References: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
- <55BA8319.2000208@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+	linux-bluetooth@vger.kernel.org, lukasz.duda@nordicsemi.no
+Subject: Re: [RFC bluetooth-next 1/2] bluetooth: 6lowpan: change netdev_priv
+ to lowpan_dev
+Message-ID: <20150730221549.GA1037@omega>
+References: <1438172674-31028-1-git-send-email-alex.aring@gmail.com>
+ <1438172674-31028-2-git-send-email-alex.aring@gmail.com>
+ <55BA7CB5.7030605@osg.samsung.com>
+ <55BA7D65.40202@osg.samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <55BA8319.2000208@osg.samsung.com>
+In-Reply-To: <55BA7D65.40202@osg.samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jul 30, 2015 at 10:03:37PM +0200, Stefan Schmidt wrote:
+On Thu, Jul 30, 2015 at 09:39:17PM +0200, Stefan Schmidt wrote:
 > Hello.
 > 
-> On 30/06/15 12:24, Lukasz Duda wrote:
-> >The lowpan_fetch_skb function is used to fetch the first byte,
-> >which also increments the data pointer in skb structure,
-> >making subsequent array lookup of byte 0 actually being byte 1.
+> On 30/07/15 21:36, Stefan Schmidt wrote:
+> >Hello.
 > >
-> >To decompress the first byte of the Flow Label when the TF flag is
-> >set to 0x01, the second half of the first byte is needed.
+> >On 29/07/15 14:24, Alexander Aring wrote:
+> >>The usually way to get the btle lowpan private data is to use the
+> >>introduced lowpan_dev inline function. This patch will cleanup by using
+> >>lowpan_dev consequently.
+> >>
+> >>Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> >>---
+> >>  net/bluetooth/6lowpan.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >>diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> >>index 2fb7b30..93c6ba0 100644
+> >>--- a/net/bluetooth/6lowpan.c
+> >>+++ b/net/bluetooth/6lowpan.c
+> >>@@ -871,7 +871,7 @@ static int setup_netdev(struct l2cap_chan *chan,
+> >>struct lowpan_dev **dev)
+> >>             &chan->src, chan->src_type);
+> >>      set_bit(__LINK_STATE_PRESENT, &netdev->state);
+> >>  -    *dev = netdev_priv(netdev);
+> >>+    *dev = lowpan_dev(netdev);
+> >>      (*dev)->netdev = netdev;
+> >>      (*dev)->hdev = chan->conn->hcon->hdev;
+> >>      INIT_LIST_HEAD(&(*dev)->peers);
 > >
-> >The patch fixes the extraction of the Flow Label field.
+> >This patch does no longer apply. There have been 5 patches to the 6lowpan
+> >file in bluetooth from Gleen. You need to rebase this one.
 > >
-> >Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
-> >Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-> >---
-> >  net/6lowpan/iphc.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> >diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> >index 9055d7b..74e56d7 100644
-> >--- a/net/6lowpan/iphc.c
-> >+++ b/net/6lowpan/iphc.c
-> >@@ -284,7 +284,7 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
-> >  		if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)))
-> >  			return -EINVAL;
-> >-		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
-> >+		hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
-> >  		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
-> >  		skb_pull(skb, 2);
-> >  		break;
-> 
-> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-> 
-> Alex, I agree that this area needs some improvements. I would still like to
-> see this simple and obvious bug fix to go in now even if it gets changed
-> with a refactor later on. Better have this bug fixed now. :) You acked it
-
-I need to admit, I refactor this function multiple times and never had
-time (or maybe I simple not did it, don't know why) to sending patches
-for it. There is too also much things which can be optimized in the whole
-iphc code. :-/
-
-Also I remember 2-3 workarounds which we have inside IEEE 802.15.4
-6LoWPAN, also having inside my queue 802.15.4 security layer and such
-things. At the moment not a good idea to deal with all at the same time.
-
-> already so I think it is fine to go in? Marcel did not apply it yet.
+> Looking at it in more detail its actually your own patch which makes the
+> rebase necessary. The one fixing a possible race.
 > 
 
-Yes, I forget that patch and Marcel asked me today what's inside the
-queue. So the pull request for net-next is already out, but I think we
-can live to having this patch in the next one.
-
-Marcel can you please apply this patch?
-
-Jukka you are also fine with this patch? Please send your Acked-by then.
-
-Thanks.
+yes, I know. I will send a v2 in the next 24 hours.
 
 - Alex
