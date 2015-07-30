@@ -1,48 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anchit Narang <anchit.n@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: sachin.dev@samsung.com
-Subject: [PATCH] tools/rctest: Fixed memory leak
-Date: Thu, 30 Jul 2015 12:01:59 +0530
-Message-id: <1438237920-26001-1-git-send-email-anchit.n@samsung.com>
+MIME-Version: 1.0
+From: "Arun K. Singh" <arunkat@gmail.com>
+Date: Thu, 30 Jul 2015 15:29:37 +0900
+Message-ID: <CAOnmHE9V9iJjbtTLvfS+pFYCaZGmSj4Z6ZK28-ER0K=CZH4TLQ@mail.gmail.com>
+Subject: Enabling continuous LE Active scan in 5.32?
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Removed dynamic allocation of filename and savefile by strdup.
-Instead filename and savefile are directly pointing to the argv element.
----
- tools/rctest.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Hi all,
 
-diff --git a/tools/rctest.c b/tools/rctest.c
-index bdc1eb5..383d165 100644
---- a/tools/rctest.c
-+++ b/tools/rctest.c
-@@ -80,8 +80,8 @@ static bdaddr_t auto_bdaddr;
- static uint16_t uuid = 0x0000;
- static uint8_t channel = 10;
- 
--static char *filename = NULL;
--static char *savefile = NULL;
-+static const char *filename = NULL;
-+static const char *savefile = NULL;
- static int save_fd = -1;
- 
- static int master = 0;
-@@ -798,11 +798,11 @@ int main(int argc, char *argv[])
- 			break;
- 
- 		case 'B':
--			filename = strdup(optarg);
-+			filename = optarg;
- 			break;
- 
- 		case 'O':
--			savefile = strdup(optarg);
-+			savefile = optarg;
- 			break;
- 
- 		case 'N':
--- 
-1.7.9.5
+I am trying to enable continuous LE active scan in Bluez 5.32.
+Platform is Raspberry Pi with kernel 3.18.7+. I find no param in
+adapter-api.txt, to set LE scan interval/window. btmgmt offers some
+respite but setting scan window and interval to same value(via
+scan-params) it still it takes around ~2 sec to trigger next scan.
+Thoughr BT specs says that if scan interval and scan window are same,
+it should trigger continuous scan.
 
+Checking adapter.c, adapter->no_scan_restart_delay parameter looks
+promising if set to true. Still same result - next scan delay ~ 2 sec.
+Not sure if such delay is intentional or platform performance related
+My question is :- Is there a neat way to trigger continuous active LE
+scan even though it may sound power-wise inefficient. Tried to grep
+archives but couldn't find much help.
+
+Any cues would be helpful.
+
+Thanks,
+-Arun
