@@ -1,81 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH 2/2] Bluetooth: hciuart: Add to support QCA ROME
- configuration
-To: Marcel Holtmann <marcel@holtmann.org>
-References: <55B97ECE.7020307@qca.qualcomm.com>
- <DD3468DA-08F6-429B-AF85-9D7FC5BD3876@holtmann.org>
-CC: <linux-bluetooth@vger.kernel.org>
-From: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-Message-ID: <55BA9FBE.8080300@qca.qualcomm.com>
-Date: Thu, 30 Jul 2015 15:05:50 -0700
+Subject: Re: [PATCH] 6lowpan: Fix extraction of flow label field
+To: Lukasz Duda <lukasz.duda@nordicsemi.no>, alex.aring@gmail.com
+References: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
+Cc: jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
+	linux-wpan@vger.kernel.org,
+	Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <55BA8319.2000208@osg.samsung.com>
+Date: Thu, 30 Jul 2015 22:03:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <DD3468DA-08F6-429B-AF85-9D7FC5BD3876@holtmann.org>
-Content-Type: text/plain; charset="windows-1252"
+In-Reply-To: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hello.
 
-On 07/30/15 04:16, Marcel Holtmann wrote:
-> +
-> +#ifdef CONFIG_SERIAL_MSM_HS
-> +#include <linux/platform_data/msm_serial_hs.h>
-> +#endif
-> I do not like platform data. Why can't this be done with device tree?
-
-This is specific code for MSM UART HighSpeed code which is not upstreamed yet. The MSM device tree has already defined this config_serial_msm_hs. I'd like to move this part to btqca.c module since it is for vendor specific implementation.
-
->> +static int rome_set_baudrate(struct hci_dev *hdev, unsigned int speed)
->> +{
->> +    struct sk_buff *skb;
->> +    uint8_t baudrate;
->> +
->> +    if (speed > 3000000)
->> +        return -EINVAL;
->> +
->> +    BT_INFO("%s: Set controller UART speed to %d", hdev->name, speed);
->> +
->> +    baudrate = rome_get_baudrate(speed);
->> +    skb = __hci_cmd_sync(hdev, EDL_PATCH_BAUDRATE, 1, &baudrate,
->> +                 msecs_to_jiffies(100));
-> Introduce proper constant defines for timeout or use HCI_INIT_TIMEOUT.
+On 30/06/15 12:24, Lukasz Duda wrote:
+> The lowpan_fetch_skb function is used to fetch the first byte,
+> which also increments the data pointer in skb structure,
+> making subsequent array lookup of byte 0 actually being byte 1.
 >
->> +    if (IS_ERR(skb)) {
->> +        if (PTR_ERR(skb) == -ETIMEDOUT)
->> +            return 0;
-> Why return success when it times out?
+> To decompress the first byte of the Flow Label when the TF flag is
+> set to 0x01, the second half of the first byte is needed.
 >
+> The patch fixes the extraction of the Flow Label field.
+>
+> Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
+> Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+> ---
+>   net/6lowpan/iphc.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 9055d7b..74e56d7 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -284,7 +284,7 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
+>   		if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)))
+>   			return -EINVAL;
+>   
+> -		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
+> +		hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
+>   		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
+>   		skb_pull(skb, 2);
+>   		break;
 
-QCA ROME doesn't return cc event after recieving baudrate command changed because it triggers HCI_RESET right away and set to new baudrate to communicate with host. Hence timeout can be handled as succeed case. If something goes wrong after changing baudrate, commands follow-ed won't be delivered to controller.
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 
->> +
->> #define HCI_UART_H4    0
->> #define HCI_UART_BCSP    1
->> @@ -45,6 +45,7 @@
->> #define HCI_UART_ATH3K    5
->> #define HCI_UART_INTEL    6
->> #define HCI_UART_BCM    7
->> +#define HCI_UART_ROME     8
-> Can we just name these HCI_UART_QCA instead. The ROME thing is a bit confusing since it is more a product name than a vendor name.
->
->> #define HCI_UART_RAW_DEVICE    0
->> #define HCI_UART_RESET_ON_INIT    1
->> @@ -176,3 +177,8 @@ int intel_deinit(void);
->> int bcm_init(void);
->> int bcm_deinit(void);
->> #endif
->> +
->> +#ifdef CONFIG_BT_HCIUART_QCAROME
->> +int rome_init(void);
->> +int rome_deinit(void);
->> +#endif
-> Same here. I rather have this qca_init etc.
->
-> Regards
->
-> Marcel
->
+Alex, I agree that this area needs some improvements. I would still like 
+to see this simple and obvious bug fix to go in now even if it gets 
+changed with a refactor later on. Better have this bug fixed now. :) You 
+acked it already so I think it is fine to go in? Marcel did not apply it 
+yet.
 
-Thanks for your code review. I'll submit new patches to address all your suggestions.
-
-Thanks
--- Ben Kim
+regards
+Stefan Schmidt
