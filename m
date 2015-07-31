@@ -1,55 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 31 Jul 2015 09:29:13 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+	linux-bluetooth@vger.kernel.org, lukasz.duda@nordicsemi.no
+Subject: Re: [RFC bluetooth-next 0/2] 6lowpan: introduce generic 6lowpan
+ private data
+Message-ID: <20150731072908.GA1125@omega>
+References: <1438172674-31028-1-git-send-email-alex.aring@gmail.com>
+ <55BA7BAF.50404@osg.samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOnmHE-pXQyzeLCwbWrrEdFOQ7A6pSGAh86kFHyrccG9mDF4DA@mail.gmail.com>
-References: <CAOnmHE9V9iJjbtTLvfS+pFYCaZGmSj4Z6ZK28-ER0K=CZH4TLQ@mail.gmail.com>
-	<CAD0=r8xirf3TOwgbZAyVG6oU1W-cWoxLMhojjqBg38Di4Z19bQ@mail.gmail.com>
-	<CAOnmHE-pXQyzeLCwbWrrEdFOQ7A6pSGAh86kFHyrccG9mDF4DA@mail.gmail.com>
-Date: Fri, 31 Jul 2015 10:05:10 +0200
-Message-ID: <CAD0=r8yFWU_fJFBEMbG-mBF3Jz8k=JqQC_RwP=Y9h_r5hGOfHw@mail.gmail.com>
-Subject: Re: Enabling continuous LE Active scan in 5.32?
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: "Arun K. Singh" <arunkat@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <55BA7BAF.50404@osg.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jul 31, 2015 at 8:06 AM, Arun K. Singh <arunkat@gmail.com> wrote:
-> Hi Jakub,
->
->>> Checking adapter.c, adapter->no_scan_restart_delay parameter looks
->>> promising if set to true. Still same result - next scan delay ~ 2 sec.
->>> Not sure if such delay is intentional or platform performance related
->>> My question is :- Is there a neat way to trigger continuous active LE
->>> scan even though it may sound power-wise inefficient. Tried to grep
->>> archives but couldn't find much help.
->> So there is something like that, but you'll probably have to update
->> your kernel (I think this feature is all in 4.0, or 4.1)
->> Recently kernel patch landed that enables simultaneous discovery, but
->> that works only for some controllers, you'll have to check wether your
->> controller have this quirk set: HCI_QUIRK_SIMULTANEOUS_DISCOVERY
->> http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tree/include/net/bluetooth/hci.h#n164
->> What this does is: previously there was 5s le scan, then 5s classic
->> scan, then 5s break, now it's simulteanous le and br/edr scan.
->
-> Thanks for the insight. But I am more interested in reducing the 5s
-> break aka IDLE_DISCOV_TIMEOUT to zero.
-> It is when I reduce this to zero or set adapter->no_scan_restart_delay
-> parameter to True that I still find few
-> seconds delay to restart scan. I have taken care of interleaved stuff
-> by setting my device  to "le" only in main.conf.
-> So all my scans are "le only" for 10 seconds.  Do you think it is
-> entire possible to make scan continuous for say a minute'
-> without any restart delay.
+On Thu, Jul 30, 2015 at 09:31:59PM +0200, Stefan Schmidt wrote:
+> Hello.
+> 
+> On 29/07/15 14:24, Alexander Aring wrote:
+> >Hi,
+> >
+> >I already thought many times to introduce something like that. Here is a draft
+> >for introducing the generic 6lowpan private data into each lowpan interface.
+> >For the beginning I introduced the enum "l2_type" which contains the L2 type of
+> >a lowpan interface.
+> >
+> >Use cases for such feature (L2 types):
+> >
+> >  - If we do in upper layers (6LoWPAN/IPv6) a evaluation of dev->type then
+> >    the value is on all lowpan interfaces "APRHRD_6LOWPAN". If we checked on
+> >    "dev->type" and it's ARPHRD_6LOWPAN we can safe use lowpan_priv to get
+> >    6LoWPAN generic private data. With this data we can check the L2 type which
+> >    can be currently BTLE or IEEE802154. This could be useful to make different
+> >    handling in iphc compress/decompress and evaluating L2 private data of skb
+> >    control block "skb->cb".
+> 
+> And there is more to come. Power line, low power wifi, dect, etc. For all of
+> them some 6lowpan adaptiona re on the way. Which of them really makes it to
+> a full RFC is to be seen but having a L2 type here is a good idea.
 
-It sounds like a bug, maybe something platform or controller
-dependent. It's working fine for me now on x64 platform with intel or
-CSR controllers and latest kernel. Can you try running bluetoothd with
--nd flags (show debugging output + stay running in console) to gather
-some logs ?
-Also runing monitor/btmon at same time might be useful to see what's
-going to controller.
+In short the use case would be "casting private data corretly":
 
->
-> Thanks,
-> Arun
+We have currently the situation that lowpan interfaces uses
+ARPHRD_6LOWPAN which is correct for me.
+
+Usually to get the netdev_priv in generic upper layers is:
+
+switch (dev->type) {
+case ARPHRD_6LOWPAN:
+	my_private_data_struct = netdev_priv(dev);
+	/* do great stuff which is ARPHRD_6LOWPAN related */
+	break;
+case ARPHRD_FOOBAR:
+	my_private_data_struct = netdev_priv(dev);
+	/* do great stuff which is ARPHRD_FOOBAR related */
+	break;
+case ...
+	...
+	break;
+}
+
+with the lowpan_priv struct we have a private data room for 6LoWPAN
+generic layer which is allocated per interface (We don't have the option
+to make such behaviour above because currently each lowpan interface do
+their own link layer stuff in netdev_priv and their share the same
+ARPHRD).
+
+What we introduce now is a 6LoWPAN generic + linklayer private data room.
+
+In case of generic 6LoWPAN handling we can do now:
+
+switch (dev->type) {
+case ARPHRD_6LOWPAN:
+	lowpan_data_struct = lowpan_priv(dev);
+	/* do great stuff which is ARPHRD_6LOWPAN related */
+	break;
+...
+}
+
+In case of special linklayer handling (e.g. address handling in
+802.15.4) we can do the following now:
+
+switch (dev->type) {
+case ARPHRD_6LOWPAN:
+	lowpan_data_struct = lowpan_priv(dev);
+	/* do great stuff which is ARPHRD_6LOWPAN related */
+	switch (lowpan_data_struct->ll_type)
+	case LOWPAN_LL_TYPE_IEEE802154:
+		lowpan_802154_data struct = (great cast *)lowpan_priv(dev)->priv;
+		/* do 802.15.4 6LoWPAN handling here */
+		break;
+	....
+	}
+	break;
+...
+}
+
+
+So we have actually the same mechanism like "switch (dev->type)" ->
+"casting private data" for "switch (lowpan_priv(dev)->ll_type)" ->
+"casting 6LoWPAN LL private data".
+
+In my opinion we definitely need such behaviour and some "net/6lowpan"
+code parts looks already weird because we don't have such mechanism.
+
+It's just some struct hierarchy where we introduce now a private data
+for the ARPHRD_6LOWPAN type.
+
+- Alex
