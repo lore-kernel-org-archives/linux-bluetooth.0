@@ -1,59 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
 From: Adam Moore <adam.moore@savantsystems.com>
-To: "Othman, Ossama" <ossama.othman@intel.com>,
-	Adam Moore <adam.moore@savantsystems.com>
-CC: Nathaniel McCallum <npmccallum@redhat.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: GATT service DBus interface violates DBus spec
-Date: Fri, 31 Jul 2015 18:00:24 +0000
-Message-ID: <D1E10436.AD77%adam.moore@savant.com>
-References: <1436456267.26457.24.camel@redhat.com>
- <1539455180.3160545.1438363138455.JavaMail.zimbra@redhat.com>
- <D1E0FD51.AD61%adam.moore@savant.com>
- <CAPyD+=BTGLzEKanLSS7kV8bz7mr7BL5ed0GHuXEKxCJYuTpPVg@mail.gmail.com>
-In-Reply-To: <CAPyD+=BTGLzEKanLSS7kV8bz7mr7BL5ed0GHuXEKxCJYuTpPVg@mail.gmail.com>
-Content-Type: text/plain; charset="Windows-1252"
+To: <linux-bluetooth@vger.kernel.org>
+CC: Adam Moore <adam.moore@savantsystems.com>
+Subject: [PATCH] gatt-database: allow GattService anywhere in ObjectManager tree
+Date: Fri, 31 Jul 2015 10:42:45 -0700
+Message-ID: <1438364565-24642-1-git-send-email-adam.moore@savantsystems.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ossama, thanks for sharing - I didn¹t have the heart to go down that path
-:)  Nice to have that solution available too.
+Relaxes the requirement that object provide ObjectManager AND
+GattService interfaces.
 
-Just a thought - since the Characteristic objects must provide their
-service path via DBus Property, forcing their paths to be children of the
-service path may be redundant, unless some logic is planned to be based on
-the structure of the OM tree in the future.
+Maintains check that GattService and GattCharacteristics are
+children of ObjectManager, but loses the check that
+GattCharacteristics are children of GattService. Therefore,
+meant as a temporary workaround.
+---
+ src/gatt-database.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-On 7/31/15, 10:47 AM, "Othman, Ossama" <ossama.othman@intel.com> wrote:
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 69a814d..e82165c 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -85,6 +85,7 @@ struct external_service {
+        bool failed;
+        char *owner;
+        char *path;     /* Path to GattService1 */
++       char *manager_path;     /* Path to ObjectManager */
+        DBusMessage *reg;
+        GDBusClient *client;
+        GDBusProxy *proxy;
+@@ -372,6 +373,7 @@ static void service_free(void *data)
 
->On Fri, Jul 31, 2015 at 10:30 AM, Adam Moore
-><adam.moore@savantsystems.com> wrote:
->> I ran into this as well when trying to build a an external service with
->> GLibžs GDBusObjectManagerServer.  As I was highly motivated not to
->>rewrite
->> what I had, I have a little patch that relaxes the unwritten
->>expectation,
->> but it comes at the expense of being unable to enforce that
->> characteristics reside under the service object.  (I think the proxy
->> callback orderings are not guaranteed)  However, it does allow the
->>service
->> and characteristics to reside anywhere in the ObjectManager hierarchy.
->>
->> Ižll pass it along in case it helps accelerate a real fix, and perhaps
->>it
->> can unblock someone in the meantime.
->
->I ran into a similar problem with GLib, and ended up reluctantly
->replacing my use of GDBusObjectManagerServer with a hand-coded
->implementation (except for the signals) of the ObjectManager interface
->that was exported on the same object path as the
->org.bluez.GattService1 skeleton via
->g_dbus_interface_skeleton_export():
->https://git.iotivity.org/cgit/iotivity/tree/resource/csdk/connectivity/src
->/bt_le_adapter/linux/service.c#n213
->
->-Ossama
+        g_free(service->owner);
+        g_free(service->path);
++       g_free(service->manager_path);
+
+        free(service);
+ }
+@@ -1042,7 +1044,7 @@ static bool match_service(const void *a, const void *b)
+        const struct external_service *service = a;
+        const struct svc_match_data *data = b;
+
+-       return g_strcmp0(service->path, data->path) == 0 &&
++       return g_strcmp0(service->manager_path, data->path) == 0 &&
+                                g_strcmp0(service->owner, data->sender) == 0;
+ }
+
+@@ -1321,7 +1323,7 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
+        iface = g_dbus_proxy_get_interface(proxy);
+        path = g_dbus_proxy_get_path(proxy);
+
+-       if (!g_str_has_prefix(path, service->path))
++       if (!g_str_has_prefix(path, service->manager_path))
+                return;
+
+        if (g_strcmp0(iface, GATT_SERVICE_IFACE) == 0) {
+@@ -1332,12 +1334,20 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
+                 * TODO: We may want to support adding included services in a
+                 * single hierarchy.
+                 */
+-               if (g_strcmp0(path, service->path) != 0) {
++               if (service->path != NULL) {
+                        error("Multiple services added within hierarchy");
+                        service->failed = true;
+                        return;
+                }
+
++               // Set service path now that we've found a service
++               service->path = g_strdup(path);
++               if (!service->path) {
++                       error("Failed to allocate service path");
++                       service->failed = true;
++                       return;
++               }
++
+                /* Add 1 for the service declaration */
+                if (!incr_attr_count(service, 1)) {
+                        error("Failed to increment attribute count");
+@@ -2171,8 +2181,8 @@ static struct external_service *service_create(DBusConnection *conn,
+        if (!service->owner)
+                goto fail;
+
+-       service->path = g_strdup(path);
+-       if (!service->path)
++       service->manager_path = g_strdup(path);
++       if (!service->manager_path)
+                goto fail;
+
+        service->chrcs = queue_new();
+--
+2.4.6
 
 
 Statement of Confidentiality
