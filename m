@@ -1,124 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <2C03C1D8-0784-4DA4-93AF-FC8A1C874681@holtmann.org>
-References: <55B83614.8090702@gmail.com>
-	<BC4DBE9E-8369-4B20-BBE5-F175DD4C5626@holtmann.org>
-	<55BA16BA.5060302@gmail.com>
-	<F5B83C8F-6BD0-49C8-96C9-F13DF68CEECE@holtmann.org>
-	<55BA2290.8090308@gmail.com>
-	<2C03C1D8-0784-4DA4-93AF-FC8A1C874681@holtmann.org>
-Date: Fri, 31 Jul 2015 21:47:09 +0200
-Message-ID: <CAN_7+YaBFZqhCUF1m_5nNnCbn9inJmKJ6tXVmJ=Ks09A4_6utA@mail.gmail.com>
-Subject: Re: Problems with incoming connection request on Nexus 4
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Florian Grandel <fgrandel@gmail.com>, Szymon Janc <Szymon.Janc@tieto.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <D1E10436.AD77%adam.moore@savant.com>
+References: <1436456267.26457.24.camel@redhat.com>
+	<1539455180.3160545.1438363138455.JavaMail.zimbra@redhat.com>
+	<D1E0FD51.AD61%adam.moore@savant.com>
+	<CAPyD+=BTGLzEKanLSS7kV8bz7mr7BL5ed0GHuXEKxCJYuTpPVg@mail.gmail.com>
+	<D1E10436.AD77%adam.moore@savant.com>
+Date: Fri, 31 Jul 2015 12:45:31 -0700
+Message-ID: <CAPyD+=DRdXnT_PBvd6C-KKTB3qmak5hmg97auubhc+x0CNzz_g@mail.gmail.com>
+Subject: Re: GATT service DBus interface violates DBus spec
+From: "Othman, Ossama" <ossama.othman@intel.com>
+To: Adam Moore <adam.moore@savantsystems.com>
+Cc: Nathaniel McCallum <npmccallum@redhat.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Florian,
+Hi Adam,
 
-On Thu, Jul 30, 2015 at 6:00 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
->
-> Hi Florian,
->
-> >>>>> Symptoms:
-> >>>>> - The connection request times out.
-> >>>>> - bt_io_accept() is being called but the accept_cb (=3Dconnect_cb) =
-only gets called when the request times out.
-> >>>>> - the device is stuck in the CONNECT READY state and never reaches =
-the CONNECTED state
-> >>>>>
-> >>>>>
-> >>>>> Any ideas how I could analyze/solve that problem? I'm stuck on this=
- for many hours already...
-> >>>>
-> >>>> what does btmon actually tell you about what is going on with HCI.
-> >>>
-> >>> =3D New Index: 10:68:3F:56:AD:35 (BR/EDR,UNKNOWN,hci0)            [hc=
-i0] 0.629837
-> >>> @ Advertising Added: 1
-> >>> < HCI Command: LE Set Advertising Para.. (0x08|0x0006) plen 15  [hci0=
-] 4.398493
-> >>>        Min advertising interval: 1280.000 msec (0x0800)
-> >>>        Max advertising interval: 1280.000 msec (0x0800)
-> >>>        Type: Connectable undirected - ADV_IND (0x00)
-> >>>        Own address type: Public (0x00)
-> >>>        Direct address type: Public (0x00)
-> >>>        Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
-> >>>        Channel map: 37, 38, 39 (0x07)
-> >>>        Filter policy: Allow Scan Request from Any, Allow Connect Requ=
-est from Any (0x00)
-> >>>> HCI Event: Command Complete (0x0e) plen 4                     [hci0]=
- 4.401392
-> >>>      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
-> >>>        Status: Success (0x00)
-> >>> < HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1     [hci0=
-] 4.401484
-> >>>        Advertising: Enabled (0x01)
-> >>>> HCI Event: Command Complete (0x0e) plen 4                     [hci0]=
- 4.402277
-> >>>      LE Set Advertise Enable (0x08|0x000a) ncmd 1
-> >>>        Status: Success (0x00)
-> >>>
-> >>> There is no connection related HCI activity going on at all on the Ne=
-xus 4 side. You can see from the debug logs that I sent before, that the co=
-nnection is being initiated correctly. The bt_io_accept() call does return =
-without error, just the accept callback never gets called. To me it seems a=
-s if the Nexus4 was not responding to the incoming connect request.
-> >>
-> >> we are advertising now. If the HCI traffic stays this way, then we are=
- basically waiting for the central to connect to us. It is up to your Nexus=
- 4 to connect.
-> >>
-> >> If it would connect, then you would see an LE Connect Complete event i=
-ndicated that the connection has been established.
+On Fri, Jul 31, 2015 at 11:00 AM, Adam Moore
+<adam.moore@savantsystems.com> wrote:
+> Ossama, thanks for sharing - I didn¹t have the heart to go down that path
+> :)  Nice to have that solution available too.
 
+Ha!  Believe you me, I preferred not going down this path since it
+basically reinvents the wheel. but I didn't have much choice at the
+time since I needed to get something out the door that didn't rely too
+heavily on upstream patches being merged.
 
-Actually I recall  that we face the same on Nexus 4 being in
-peripheral role some time ago. That time our analyzes shows that it is
-chip or firmware issue. Unfortunately I don't remember if we got rid
-of it or not. If you have latest firmware and issue is still there,
-that's a bad luck.
+> Just a thought - since the Characteristic objects must provide their
+> service path via DBus Property, forcing their paths to be children of the
+> service path may be redundant, unless some logic is planned to be based on
+> the structure of the OM tree in the future.
 
->
-> >
-> > Sorry, I left out the actual connection part the first time. Here it is=
-:
-> >
-> > =3D New Index: 10:68:3F:56:AD:35 (BR/EDR,UNKNOWN,hci0)            [hci0=
-] 0.248759
-> > > HCI Event: Connect Request (0x04) plen 10                     [hci0] =
-9.147279
-> >        Address: 94:01:C2:AB:46:05 (OUI 94-01-C2)
-> >        Class: 0x5a020c
-> >          Major class: Phone (cellular, cordless, payphone, modem)
-> >          Minor class: Smart phone
-> >          Networking (LAN, Ad hoc)
-> >          Capturing (Scanner, Microphone)
-> >          Object Transfer (v-Inbox, v-Folder)
-> >          Telephony (Cordless telephony, Modem, Headset)
-> >        Link type: ACL (0x01)
->
-> this is a BR/EDR connection. So it seems even while it sees you advertise=
- on LE, it then connects using BR/EDR. Since Bluetooth 4.0 did not allow BR=
-/EDR and LE at the same time. Only Bluetooth 4.1 relaxed this.
->
-> But it is hilarious that your phone stack sees an LE advertising and then=
- connects to you over BR/EDR.
->
-> Regards
->
-> Marcel
->
+Agreed.  In this case, I just followed the convention found in the
+example hierarchy described in the "GATT Manager Hierarchy" section in
+the BlueZ doc/gatt-api.txt document, as well as the hierarchy found in
+the BlueZ test/example-gatt-server Python code.  Going with this
+hierarchy also mimics the GATT service hierarchy described in the
+Bluetooth spec.
 
-=C5=81ukasz
-
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Thanks!
+-Ossama
