@@ -1,60 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH 2/2] Bluetooth: hciuart: Add to support QCA ROME configuration
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <55BA9FBE.8080300@qca.qualcomm.com>
-Date: Fri, 31 Jul 2015 17:54:41 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C202B61F-0E39-47AB-942A-52A6E58336EF@holtmann.org>
-References: <55B97ECE.7020307@qca.qualcomm.com> <DD3468DA-08F6-429B-AF85-9D7FC5BD3876@holtmann.org> <55BA9FBE.8080300@qca.qualcomm.com>
-To: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+From: Alexander Aring <alex.aring@gmail.com>
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
+	lukasz.duda@nordicsemi.no, jukka.rissanen@linux.intel.com,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [RFCv2 bluetooth-next 2/2] 6lowpan: add generic 6lowpan netdev private data
+Date: Fri, 31 Jul 2015 14:38:08 +0200
+Message-Id: <1438346288-14546-3-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1438346288-14546-1-git-send-email-alex.aring@gmail.com>
+References: <1438346288-14546-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ben,
+This patch introduced the 6lowpan netdev private data struct. We name it
+lowpan_priv and it's placed at the beginning of netdev private data. All
+lowpan interfaces should allocate this room at first of netdev private
+data. 6LoWPAN LL private data can be allocate by additional netdev private
+data, e.g. dev->priv_size should be "sizeof(struct lowpan_priv) +
+sizeof(LL_LOWPAN_PRIVATE_DATA)".
 
->> +
->> +#ifdef CONFIG_SERIAL_MSM_HS
->> +#include <linux/platform_data/msm_serial_hs.h>
->> +#endif
->> I do not like platform data. Why can't this be done with device tree?
-> 
-> This is specific code for MSM UART HighSpeed code which is not upstreamed yet. The MSM device tree has already defined this config_serial_msm_hs. I'd like to move this part to btqca.c module since it is for vendor specific implementation.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ include/net/6lowpan.h              | 18 ++++++++++++++++++
+ net/bluetooth/6lowpan.c            |  7 +++++--
+ net/ieee802154/6lowpan/6lowpan_i.h |  3 ++-
+ net/ieee802154/6lowpan/core.c      |  5 ++++-
+ 4 files changed, 29 insertions(+), 4 deletions(-)
 
-if the MSM UART HS code is not upstream yet, then please do not try to add hooks into the Bluetooth code. Submit patches without this and add the support later when the other code makes it upstream.
-
-I am not taking dead code. None of the kernel maintainers does.
-
-> 
->>> +static int rome_set_baudrate(struct hci_dev *hdev, unsigned int speed)
->>> +{
->>> +    struct sk_buff *skb;
->>> +    uint8_t baudrate;
->>> +
->>> +    if (speed > 3000000)
->>> +        return -EINVAL;
->>> +
->>> +    BT_INFO("%s: Set controller UART speed to %d", hdev->name, speed);
->>> +
->>> +    baudrate = rome_get_baudrate(speed);
->>> +    skb = __hci_cmd_sync(hdev, EDL_PATCH_BAUDRATE, 1, &baudrate,
->>> +                 msecs_to_jiffies(100));
->> Introduce proper constant defines for timeout or use HCI_INIT_TIMEOUT.
->> 
->>> +    if (IS_ERR(skb)) {
->>> +        if (PTR_ERR(skb) == -ETIMEDOUT)
->>> +            return 0;
->> Why return success when it times out?
->> 
-> 
-> QCA ROME doesn't return cc event after recieving baudrate command changed because it triggers HCI_RESET right away and set to new baudrate to communicate with host. Hence timeout can be handled as succeed case. If something goes wrong after changing baudrate, commands follow-ed won't be delivered to controller.
-
-I think what we actually want simple hci_cmd_send that allows us to just send the command and not bother with command status or command complete. It seems that has come up a bit more often lately. We have something like this, but I do not think it is exposed via EXPORT_SYMBOL correct. So this should be done first.
-
-I however do not understand the HCI_Reset. Who triggers that. The UART baud rate change command in the background. So you are waiting for some event or UART line change to indicate the controller is back up?
-
-Regards
-
-Marcel
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index dc03d77..a955be2 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -197,6 +197,24 @@
+ #define LOWPAN_NHC_UDP_CS_P_11	0xF3 /* source & dest = 0xF0B + 4bit inline */
+ #define LOWPAN_NHC_UDP_CS_C	0x04 /* checksum elided */
+ 
++enum lowpan_ll_types {
++	LOWPAN_LL_TYPE_BTLE,
++	LOWPAN_LL_TYPE_IEEE802154,
++};
++
++struct lowpan_priv {
++	enum lowpan_ll_types ll_type;
++
++	/* must be last */
++	u8 priv[0] __aligned(sizeof(void *));
++};
++
++static inline
++struct lowpan_priv *lowpan_priv(const struct net_device *dev)
++{
++	return netdev_priv(dev);
++}
++
+ #ifdef DEBUG
+ /* print data in line */
+ static inline void raw_dump_inline(const char *caller, char *msg,
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 24ed5b0..eb61121 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -85,7 +85,7 @@ struct lowpan_dev {
+ 
+ static inline struct lowpan_dev *lowpan_dev(const struct net_device *netdev)
+ {
+-	return netdev_priv(netdev);
++	return (struct lowpan_dev *)lowpan_priv(netdev)->priv;
+ }
+ 
+ static inline void peer_add(struct lowpan_dev *dev, struct lowpan_peer *peer)
+@@ -848,7 +848,8 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
+ 	struct net_device *netdev;
+ 	int err = 0;
+ 
+-	netdev = alloc_netdev(sizeof(struct lowpan_dev), IFACE_NAME_TEMPLATE,
++	netdev = alloc_netdev(sizeof(struct lowpan_priv) +
++			      sizeof(struct lowpan_dev), IFACE_NAME_TEMPLATE,
+ 			      NET_NAME_UNKNOWN, netdev_setup);
+ 	if (!netdev)
+ 		return -ENOMEM;
+@@ -869,6 +870,8 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
+ 	list_add_rcu(&(*dev)->list, &bt_6lowpan_devices);
+ 	spin_unlock(&devices_lock);
+ 
++	lowpan_priv(netdev)->ll_type = LOWPAN_LL_TYPE_BTLE;
++
+ 	err = register_netdev(netdev);
+ 	if (err < 0) {
+ 		BT_INFO("register_netdev failed %d", err);
+diff --git a/net/ieee802154/6lowpan/6lowpan_i.h b/net/ieee802154/6lowpan/6lowpan_i.h
+index e50f69d..0dd4e46 100644
+--- a/net/ieee802154/6lowpan/6lowpan_i.h
++++ b/net/ieee802154/6lowpan/6lowpan_i.h
+@@ -5,6 +5,7 @@
+ 
+ #include <net/ieee802154_netdev.h>
+ #include <net/inet_frag.h>
++#include <net/6lowpan.h>
+ 
+ struct lowpan_create_arg {
+ 	u16 tag;
+@@ -52,7 +53,7 @@ struct lowpan_dev_info {
+ static inline struct
+ lowpan_dev_info *lowpan_dev_info(const struct net_device *dev)
+ {
+-	return netdev_priv(dev);
++	return (struct lowpan_dev_info *)lowpan_priv(dev)->priv;
+ }
+ 
+ extern struct list_head lowpan_devices;
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index f20a387..ede602c 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -153,6 +153,8 @@ static int lowpan_newlink(struct net *src_net, struct net_device *dev,
+ 	list_add_tail(&entry->list, &lowpan_devices);
+ 	mutex_unlock(&lowpan_dev_info(dev)->dev_list_mtx);
+ 
++	lowpan_priv(dev)->ll_type = LOWPAN_LL_TYPE_IEEE802154;
++
+ 	ret = register_netdevice(dev);
+ 	if (ret >= 0) {
+ 		if (!lowpan_open_count)
+@@ -193,7 +195,8 @@ static void lowpan_dellink(struct net_device *dev, struct list_head *head)
+ 
+ static struct rtnl_link_ops lowpan_link_ops __read_mostly = {
+ 	.kind		= "lowpan",
+-	.priv_size	= sizeof(struct lowpan_dev_info),
++	.priv_size	= sizeof(struct lowpan_priv) +
++			  sizeof(struct lowpan_dev_info),
+ 	.setup		= lowpan_setup,
+ 	.newlink	= lowpan_newlink,
+ 	.dellink	= lowpan_dellink,
+-- 
+2.5.0
 
