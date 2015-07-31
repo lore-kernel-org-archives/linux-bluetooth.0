@@ -1,80 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1438324310.2896.220.camel@linux.intel.com>
-Subject: Re: [PATCH] 6lowpan: Fix extraction of flow label field
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: Lukasz Duda <lukasz.duda@nordicsemi.no>,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-Date: Fri, 31 Jul 2015 09:31:50 +0300
-In-Reply-To: <20150630212208.GA733@omega>
-References: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
-	 <20150630212208.GA733@omega>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-wpan-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAD0=r8xirf3TOwgbZAyVG6oU1W-cWoxLMhojjqBg38Di4Z19bQ@mail.gmail.com>
+References: <CAOnmHE9V9iJjbtTLvfS+pFYCaZGmSj4Z6ZK28-ER0K=CZH4TLQ@mail.gmail.com>
+ <CAD0=r8xirf3TOwgbZAyVG6oU1W-cWoxLMhojjqBg38Di4Z19bQ@mail.gmail.com>
+From: "Arun K. Singh" <arunkat@gmail.com>
+Date: Fri, 31 Jul 2015 15:06:49 +0900
+Message-ID: <CAOnmHE-pXQyzeLCwbWrrEdFOQ7A6pSGAh86kFHyrccG9mDF4DA@mail.gmail.com>
+Subject: Re: Enabling continuous LE Active scan in 5.32?
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On ti, 2015-06-30 at 23:22 +0200, Alexander Aring wrote:
-> On Tue, Jun 30, 2015 at 03:24:52AM -0700, Lukasz Duda wrote:
-> > The lowpan_fetch_skb function is used to fetch the first byte,
-> > which also increments the data pointer in skb structure,
-> > making subsequent array lookup of byte 0 actually being byte 1.
-> > 
-> > To decompress the first byte of the Flow Label when the TF flag is
-> > set to 0x01, the second half of the first byte is needed.
-> > 
-> > The patch fixes the extraction of the Flow Label field.
-> > 
-> > Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
-> > Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
-> 
-> Acked-by: Alexander Aring <alex.aring@gmail.com>
+Hi Jakub,
 
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+>> Checking adapter.c, adapter->no_scan_restart_delay parameter looks
+>> promising if set to true. Still same result - next scan delay ~ 2 sec.
+>> Not sure if such delay is intentional or platform performance related
+>> My question is :- Is there a neat way to trigger continuous active LE
+>> scan even though it may sound power-wise inefficient. Tried to grep
+>> archives but couldn't find much help.
+> So there is something like that, but you'll probably have to update
+> your kernel (I think this feature is all in 4.0, or 4.1)
+> Recently kernel patch landed that enables simultaneous discovery, but
+> that works only for some controllers, you'll have to check wether your
+> controller have this quirk set: HCI_QUIRK_SIMULTANEOUS_DISCOVERY
+> http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tree/include/net/bluetooth/hci.h#n164
+> What this does is: previously there was 5s le scan, then 5s classic
+> scan, then 5s break, now it's simulteanous le and br/edr scan.
 
-> 
-> > ---
-> >  net/6lowpan/iphc.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> > index 9055d7b..74e56d7 100644
-> > --- a/net/6lowpan/iphc.c
-> > +++ b/net/6lowpan/iphc.c
-> > @@ -284,7 +284,7 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
-> >  		if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)))
-> >  			return -EINVAL;
-> >  
-> > -		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
-> > +		hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
-> >  		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
-> >  		skb_pull(skb, 2);
-> >  		break;
-> 
-> This code part is really hard to decrypt/understand. Nevertheless for
-> some historical(contiki) reasons we have this situation mainline now
-> and I had no time to cleanup this code. Actual it remembers me on the
-> early state of the iphc code.
-> 
-> I would recommended to cleanup the whole traffic flow decompress/compress
-> part (Maybe also with some magic numbers defines which is used on both sides
-> and some static inline functions). Really don't like the actually stuff there.
-> Anyway thank you for dig into this issue now.
-> 
-> One reason why definitly something goes wrong there is that skb->data[0]
-> information is used for hdr.flow_lbl[1] and hdr.flow_lbl[0] which can't
-> be. I didn't test it yet and trust you that this will do the right
-> behaviour for now. I also have no time that I can write really a testcase
-> for that. What I can say currently is that something is wrong here
-> and your good looks fine for me and makes more sense than the current behaviour.
-> 
-> Thanks.
-> 
-> - Alex
+Thanks for the insight. But I am more interested in reducing the 5s
+break aka IDLE_DISCOV_TIMEOUT to zero.
+It is when I reduce this to zero or set adapter->no_scan_restart_delay
+parameter to True that I still find few
+seconds delay to restart scan. I have taken care of interleaved stuff
+by setting my device  to "le" only in main.conf.
+So all my scans are "le only" for 10 seconds.  Do you think it is
+entire possible to make scan continuous for say a minute'
+without any restart delay.
 
-
-Cheers,
-Jukka
-
-
+Thanks,
+Arun
