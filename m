@@ -1,111 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 31 Jul 2015 09:29:13 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	linux-bluetooth@vger.kernel.org, lukasz.duda@nordicsemi.no
-Subject: Re: [RFC bluetooth-next 0/2] 6lowpan: introduce generic 6lowpan
- private data
-Message-ID: <20150731072908.GA1125@omega>
-References: <1438172674-31028-1-git-send-email-alex.aring@gmail.com>
- <55BA7BAF.50404@osg.samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <55BA7BAF.50404@osg.samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1438324310.2896.220.camel@linux.intel.com>
+Subject: Re: [PATCH] 6lowpan: Fix extraction of flow label field
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: Lukasz Duda <lukasz.duda@nordicsemi.no>,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+Date: Fri, 31 Jul 2015 09:31:50 +0300
+In-Reply-To: <20150630212208.GA733@omega>
+References: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
+	 <20150630212208.GA733@omega>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jul 30, 2015 at 09:31:59PM +0200, Stefan Schmidt wrote:
-> Hello.
+On ti, 2015-06-30 at 23:22 +0200, Alexander Aring wrote:
+> On Tue, Jun 30, 2015 at 03:24:52AM -0700, Lukasz Duda wrote:
+> > The lowpan_fetch_skb function is used to fetch the first byte,
+> > which also increments the data pointer in skb structure,
+> > making subsequent array lookup of byte 0 actually being byte 1.
+> > 
+> > To decompress the first byte of the Flow Label when the TF flag is
+> > set to 0x01, the second half of the first byte is needed.
+> > 
+> > The patch fixes the extraction of the Flow Label field.
+> > 
+> > Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
+> > Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
 > 
-> On 29/07/15 14:24, Alexander Aring wrote:
-> >Hi,
-> >
-> >I already thought many times to introduce something like that. Here is a draft
-> >for introducing the generic 6lowpan private data into each lowpan interface.
-> >For the beginning I introduced the enum "l2_type" which contains the L2 type of
-> >a lowpan interface.
-> >
-> >Use cases for such feature (L2 types):
-> >
-> >  - If we do in upper layers (6LoWPAN/IPv6) a evaluation of dev->type then
-> >    the value is on all lowpan interfaces "APRHRD_6LOWPAN". If we checked on
-> >    "dev->type" and it's ARPHRD_6LOWPAN we can safe use lowpan_priv to get
-> >    6LoWPAN generic private data. With this data we can check the L2 type which
-> >    can be currently BTLE or IEEE802154. This could be useful to make different
-> >    handling in iphc compress/decompress and evaluating L2 private data of skb
-> >    control block "skb->cb".
+> Acked-by: Alexander Aring <alex.aring@gmail.com>
+
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+
 > 
-> And there is more to come. Power line, low power wifi, dect, etc. For all of
-> them some 6lowpan adaptiona re on the way. Which of them really makes it to
-> a full RFC is to be seen but having a L2 type here is a good idea.
-
-In short the use case would be "casting private data corretly":
-
-We have currently the situation that lowpan interfaces uses
-ARPHRD_6LOWPAN which is correct for me.
-
-Usually to get the netdev_priv in generic upper layers is:
-
-switch (dev->type) {
-case ARPHRD_6LOWPAN:
-	my_private_data_struct = netdev_priv(dev);
-	/* do great stuff which is ARPHRD_6LOWPAN related */
-	break;
-case ARPHRD_FOOBAR:
-	my_private_data_struct = netdev_priv(dev);
-	/* do great stuff which is ARPHRD_FOOBAR related */
-	break;
-case ...
-	...
-	break;
-}
-
-with the lowpan_priv struct we have a private data room for 6LoWPAN
-generic layer which is allocated per interface (We don't have the option
-to make such behaviour above because currently each lowpan interface do
-their own link layer stuff in netdev_priv and their share the same
-ARPHRD).
-
-What we introduce now is a 6LoWPAN generic + linklayer private data room.
-
-In case of generic 6LoWPAN handling we can do now:
-
-switch (dev->type) {
-case ARPHRD_6LOWPAN:
-	lowpan_data_struct = lowpan_priv(dev);
-	/* do great stuff which is ARPHRD_6LOWPAN related */
-	break;
-...
-}
-
-In case of special linklayer handling (e.g. address handling in
-802.15.4) we can do the following now:
-
-switch (dev->type) {
-case ARPHRD_6LOWPAN:
-	lowpan_data_struct = lowpan_priv(dev);
-	/* do great stuff which is ARPHRD_6LOWPAN related */
-	switch (lowpan_data_struct->ll_type)
-	case LOWPAN_LL_TYPE_IEEE802154:
-		lowpan_802154_data struct = (great cast *)lowpan_priv(dev)->priv;
-		/* do 802.15.4 6LoWPAN handling here */
-		break;
-	....
-	}
-	break;
-...
-}
+> > ---
+> >  net/6lowpan/iphc.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> > index 9055d7b..74e56d7 100644
+> > --- a/net/6lowpan/iphc.c
+> > +++ b/net/6lowpan/iphc.c
+> > @@ -284,7 +284,7 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
+> >  		if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)))
+> >  			return -EINVAL;
+> >  
+> > -		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
+> > +		hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
+> >  		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
+> >  		skb_pull(skb, 2);
+> >  		break;
+> 
+> This code part is really hard to decrypt/understand. Nevertheless for
+> some historical(contiki) reasons we have this situation mainline now
+> and I had no time to cleanup this code. Actual it remembers me on the
+> early state of the iphc code.
+> 
+> I would recommended to cleanup the whole traffic flow decompress/compress
+> part (Maybe also with some magic numbers defines which is used on both sides
+> and some static inline functions). Really don't like the actually stuff there.
+> Anyway thank you for dig into this issue now.
+> 
+> One reason why definitly something goes wrong there is that skb->data[0]
+> information is used for hdr.flow_lbl[1] and hdr.flow_lbl[0] which can't
+> be. I didn't test it yet and trust you that this will do the right
+> behaviour for now. I also have no time that I can write really a testcase
+> for that. What I can say currently is that something is wrong here
+> and your good looks fine for me and makes more sense than the current behaviour.
+> 
+> Thanks.
+> 
+> - Alex
 
 
-So we have actually the same mechanism like "switch (dev->type)" ->
-"casting private data" for "switch (lowpan_priv(dev)->ll_type)" ->
-"casting 6LoWPAN LL private data".
+Cheers,
+Jukka
 
-In my opinion we definitely need such behaviour and some "net/6lowpan"
-code parts looks already weird because we don't have such mechanism.
 
-It's just some struct hierarchy where we introduce now a private data
-for the ARPHRD_6LOWPAN type.
-
-- Alex
