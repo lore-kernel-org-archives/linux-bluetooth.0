@@ -1,160 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Adam Moore <adam.moore@savantsystems.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>, Marcel Holtmann
-	<marcel@holtmann.org>
-CC: Florian Grandel <fgrandel@gmail.com>, Szymon Janc <Szymon.Janc@tieto.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: Problems with incoming connection request on Nexus 4
-Date: Fri, 31 Jul 2015 22:41:18 +0000
-Message-ID: <D1E1442B.ADA2%adam.moore@savant.com>
-References: <55B83614.8090702@gmail.com>
- <BC4DBE9E-8369-4B20-BBE5-F175DD4C5626@holtmann.org>
- <55BA16BA.5060302@gmail.com>
- <F5B83C8F-6BD0-49C8-96C9-F13DF68CEECE@holtmann.org>
- <55BA2290.8090308@gmail.com>
- <2C03C1D8-0784-4DA4-93AF-FC8A1C874681@holtmann.org>
- <CAN_7+YaBFZqhCUF1m_5nNnCbn9inJmKJ6tXVmJ=Ks09A4_6utA@mail.gmail.com>
-In-Reply-To: <CAN_7+YaBFZqhCUF1m_5nNnCbn9inJmKJ6tXVmJ=Ks09A4_6utA@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-2"
+To: "Othman, Ossama" <ossama.othman@intel.com>,
+	Adam Moore <adam.moore@savantsystems.com>
+CC: Nathaniel McCallum <npmccallum@redhat.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: GATT service DBus interface violates DBus spec
+Date: Fri, 31 Jul 2015 19:50:49 +0000
+Message-ID: <D1E11ED1.AD8E%adam.moore@savant.com>
+References: <1436456267.26457.24.camel@redhat.com>
+ <1539455180.3160545.1438363138455.JavaMail.zimbra@redhat.com>
+ <D1E0FD51.AD61%adam.moore@savant.com>
+ <CAPyD+=BTGLzEKanLSS7kV8bz7mr7BL5ed0GHuXEKxCJYuTpPVg@mail.gmail.com>
+ <D1E10436.AD77%adam.moore@savant.com>
+ <CAPyD+=DRdXnT_PBvd6C-KKTB3qmak5hmg97auubhc+x0CNzz_g@mail.gmail.com>
+In-Reply-To: <CAPyD+=DRdXnT_PBvd6C-KKTB3qmak5hmg97auubhc+x0CNzz_g@mail.gmail.com>
+Content-Type: text/plain; charset="euc-kr"
 MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I just saw this happen on a Nexus 9 (running build LMY47X/5.1.1) when it
-successfully established a BR/EDR connection to my peripheral running
-Linux 3.14 and BlueZ 5.32.
-
-After restarting BT from Settings I started getting LE connections.
-
-I have also have the BR/EDR Not Supported bit set in the peripheral's
-advertising flags.
-
-I'll keep an eye on this too.
-
-On 7/31/15, 12:47 PM, "linux-bluetooth-owner@vger.kernel.org on behalf of
-Lukasz Rymanowski" <linux-bluetooth-owner@vger.kernel.org on behalf of
-lukasz.rymanowski@gmail.com> wrote:
-
->Hi Florian,
->
->On Thu, Jul 30, 2015 at 6:00 PM, Marcel Holtmann <marcel@holtmann.org>
->wrote:
->>
->> Hi Florian,
->>
->> >>>>> Symptoms:
->> >>>>> - The connection request times out.
->> >>>>> - bt_io_accept() is being called but the accept_cb (=3Dconnect_cb)
->>only gets called when the request times out.
->> >>>>> - the device is stuck in the CONNECT READY state and never
->>reaches the CONNECTED state
->> >>>>>
->> >>>>>
->> >>>>> Any ideas how I could analyze/solve that problem? I'm stuck on
->>this for many hours already...
->> >>>>
->> >>>> what does btmon actually tell you about what is going on with HCI.
->> >>>
->> >>> =3D New Index: 10:68:3F:56:AD:35 (BR/EDR,UNKNOWN,hci0)
->>[hci0] 0.629837
->> >>> @ Advertising Added: 1
->> >>> < HCI Command: LE Set Advertising Para.. (0x08|0x0006) plen 15
->>[hci0] 4.398493
->> >>>        Min advertising interval: 1280.000 msec (0x0800)
->> >>>        Max advertising interval: 1280.000 msec (0x0800)
->> >>>        Type: Connectable undirected - ADV_IND (0x00)
->> >>>        Own address type: Public (0x00)
->> >>>        Direct address type: Public (0x00)
->> >>>        Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
->> >>>        Channel map: 37, 38, 39 (0x07)
->> >>>        Filter policy: Allow Scan Request from Any, Allow Connect
->>Request from Any (0x00)
->> >>>> HCI Event: Command Complete (0x0e) plen 4
->>[hci0] 4.401392
->> >>>      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
->> >>>        Status: Success (0x00)
->> >>> < HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1
->>[hci0] 4.401484
->> >>>        Advertising: Enabled (0x01)
->> >>>> HCI Event: Command Complete (0x0e) plen 4
->>[hci0] 4.402277
->> >>>      LE Set Advertise Enable (0x08|0x000a) ncmd 1
->> >>>        Status: Success (0x00)
->> >>>
->> >>> There is no connection related HCI activity going on at all on the
->>Nexus 4 side. You can see from the debug logs that I sent before, that
->>the connection is being initiated correctly. The bt_io_accept() call
->>does return without error, just the accept callback never gets called.
->>To me it seems as if the Nexus4 was not responding to the incoming
->>connect request.
->> >>
->> >> we are advertising now. If the HCI traffic stays this way, then we
->>are basically waiting for the central to connect to us. It is up to your
->>Nexus 4 to connect.
->> >>
->> >> If it would connect, then you would see an LE Connect Complete event
->>indicated that the connection has been established.
->
->
->Actually I recall  that we face the same on Nexus 4 being in
->peripheral role some time ago. That time our analyzes shows that it is
->chip or firmware issue. Unfortunately I don't remember if we got rid
->of it or not. If you have latest firmware and issue is still there,
->that's a bad luck.
->
->>
->> >
->> > Sorry, I left out the actual connection part the first time. Here it
->>is:
->> >
->> > =3D New Index: 10:68:3F:56:AD:35 (BR/EDR,UNKNOWN,hci0)
->>[hci0] 0.248759
->> > > HCI Event: Connect Request (0x04) plen 10
->>[hci0] 9.147279
->> >        Address: 94:01:C2:AB:46:05 (OUI 94-01-C2)
->> >        Class: 0x5a020c
->> >          Major class: Phone (cellular, cordless, payphone, modem)
->> >          Minor class: Smart phone
->> >          Networking (LAN, Ad hoc)
->> >          Capturing (Scanner, Microphone)
->> >          Object Transfer (v-Inbox, v-Folder)
->> >          Telephony (Cordless telephony, Modem, Headset)
->> >        Link type: ACL (0x01)
->>
->> this is a BR/EDR connection. So it seems even while it sees you
->>advertise on LE, it then connects using BR/EDR. Since Bluetooth 4.0 did
->>not allow BR/EDR and LE at the same time. Only Bluetooth 4.1 relaxed
->>this.
->>
->> But it is hilarious that your phone stack sees an LE advertising and
->>then connects to you over BR/EDR.
->>
->> Regards
->>
->> Marcel
->>
->
->=A3ukasz
->
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe
->>linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->--
->To unsubscribe from this list: send the line "unsubscribe
->linux-bluetooth" in
->the body of a message to majordomo@vger.kernel.org
->More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Statement of Confidentiality
-
-The contents of this e-mail message and any attachments are confidential an=
-d are intended solely for the addressee. The information may also be legall=
-y privileged. This transmission is sent in trust, and the sole purpose of d=
-elivery to the intended recipient. If you have received this transmission i=
-n error, any use, reproduction or dissemination of this transmission is str=
-ictly prohibited. If you are not the intended recipient, please immediately=
- notify the sender by reply e-mail or at 508.683.2500 and delete this messa=
-ge and its attachments, if any.
+DQoNCk9uIDcvMzEvMTUsIDEyOjQ1IFBNLCAiT3RobWFuLCBPc3NhbWEiIDxvc3NhbWEub3RobWFu
+QGludGVsLmNvbT4gd3JvdGU6DQoNCj5IaSBBZGFtLA0KPg0KPk9uIEZyaSwgSnVsIDMxLCAyMDE1
+IGF0IDExOjAwIEFNLCBBZGFtIE1vb3JlDQo+PGFkYW0ubW9vcmVAc2F2YW50c3lzdGVtcy5jb20+
+IHdyb3RlOg0KPj4gT3NzYW1hLCB0aGFua3MgZm9yIHNoYXJpbmcgLSBJIGRpZG6p9nQgaGF2ZSB0
+aGUgaGVhcnQgdG8gZ28gZG93biB0aGF0DQo+PnBhdGgNCj4+IDopICBOaWNlIHRvIGhhdmUgdGhh
+dCBzb2x1dGlvbiBhdmFpbGFibGUgdG9vLg0KPg0KPkhhISAgQmVsaWV2ZSB5b3UgbWUsIEkgcHJl
+ZmVycmVkIG5vdCBnb2luZyBkb3duIHRoaXMgcGF0aCBzaW5jZSBpdA0KPmJhc2ljYWxseSByZWlu
+dmVudHMgdGhlIHdoZWVsLiBidXQgSSBkaWRuJ3QgaGF2ZSBtdWNoIGNob2ljZSBhdCB0aGUNCj50
+aW1lIHNpbmNlIEkgbmVlZGVkIHRvIGdldCBzb21ldGhpbmcgb3V0IHRoZSBkb29yIHRoYXQgZGlk
+bid0IHJlbHkgdG9vDQo+aGVhdmlseSBvbiB1cHN0cmVhbSBwYXRjaGVzIGJlaW5nIG1lcmdlZC4N
+Cj4NCj4+IEp1c3QgYSB0aG91Z2h0IC0gc2luY2UgdGhlIENoYXJhY3RlcmlzdGljIG9iamVjdHMg
+bXVzdCBwcm92aWRlIHRoZWlyDQo+PiBzZXJ2aWNlIHBhdGggdmlhIERCdXMgUHJvcGVydHksIGZv
+cmNpbmcgdGhlaXIgcGF0aHMgdG8gYmUgY2hpbGRyZW4gb2YNCj4+dGhlDQo+PiBzZXJ2aWNlIHBh
+dGggbWF5IGJlIHJlZHVuZGFudCwgdW5sZXNzIHNvbWUgbG9naWMgaXMgcGxhbm5lZCB0byBiZSBi
+YXNlZA0KPj5vbg0KPj4gdGhlIHN0cnVjdHVyZSBvZiB0aGUgT00gdHJlZSBpbiB0aGUgZnV0dXJl
+Lg0KPg0KPkFncmVlZC4gIEluIHRoaXMgY2FzZSwgSSBqdXN0IGZvbGxvd2VkIHRoZSBjb252ZW50
+aW9uIGZvdW5kIGluIHRoZQ0KPmV4YW1wbGUgaGllcmFyY2h5IGRlc2NyaWJlZCBpbiB0aGUgIkdB
+VFQgTWFuYWdlciBIaWVyYXJjaHkiIHNlY3Rpb24gaW4NCj50aGUgQmx1ZVogZG9jL2dhdHQtYXBp
+LnR4dCBkb2N1bWVudCwgYXMgd2VsbCBhcyB0aGUgaGllcmFyY2h5IGZvdW5kIGluDQo+dGhlIEJs
+dWVaIHRlc3QvZXhhbXBsZS1nYXR0LXNlcnZlciBQeXRob24gY29kZS4gIEdvaW5nIHdpdGggdGhp
+cw0KPmhpZXJhcmNoeSBhbHNvIG1pbWljcyB0aGUgR0FUVCBzZXJ2aWNlIGhpZXJhcmNoeSBkZXNj
+cmliZWQgaW4gdGhlDQo+Qmx1ZXRvb3RoIHNwZWMuDQoNClllYWgsIEkgdXNlZCB0aGUgc2FtZSBz
+dHJ1Y3R1cmUgaW4gbXkgaW1wbGVtZW50YXRpb24gLSB0aGF0IHdhcyByZWFsbHkNCm1vcmUgb2Yg
+YSBub3RlIGZvciB0aGUgbWFpbnRhaW5lcnMgdGhhdCBpZiB3ZSBjYW4gbGl2ZSB3aXRob3V0IGEg
+c3RyaWN0DQpzdHJ1Y3R1cmUsIGl0IG1pZ2h0IHNpbXBsaWZ5IHRoZSBmaW5hbCBmaXguDQoNCj4N
+Cj5UaGFua3MhDQo+LU9zc2FtYQ0KDQoNClN0YXRlbWVudCBvZiBDb25maWRlbnRpYWxpdHkNCg0K
+VGhlIGNvbnRlbnRzIG9mIHRoaXMgZS1tYWlsIG1lc3NhZ2UgYW5kIGFueSBhdHRhY2htZW50cyBh
+cmUgY29uZmlkZW50aWFsIGFuZCBhcmUgaW50ZW5kZWQgc29sZWx5IGZvciB0aGUgYWRkcmVzc2Vl
+LiBUaGUgaW5mb3JtYXRpb24gbWF5IGFsc28gYmUgbGVnYWxseSBwcml2aWxlZ2VkLiBUaGlzIHRy
+YW5zbWlzc2lvbiBpcyBzZW50IGluIHRydXN0LCBhbmQgdGhlIHNvbGUgcHVycG9zZSBvZiBkZWxp
+dmVyeSB0byB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LiBJZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlz
+IHRyYW5zbWlzc2lvbiBpbiBlcnJvciwgYW55IHVzZSwgcmVwcm9kdWN0aW9uIG9yIGRpc3NlbWlu
+YXRpb24gb2YgdGhpcyB0cmFuc21pc3Npb24gaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4gSWYgeW91
+IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgcGxlYXNlIGltbWVkaWF0ZWx5IG5vdGlm
+eSB0aGUgc2VuZGVyIGJ5IHJlcGx5IGUtbWFpbCBvciBhdCA1MDguNjgzLjI1MDAgYW5kIGRlbGV0
+ZSB0aGlzIG1lc3NhZ2UgYW5kIGl0cyBhdHRhY2htZW50cywgaWYgYW55Lg0KDQo=
