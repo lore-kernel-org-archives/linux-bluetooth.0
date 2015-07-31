@@ -1,98 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
-	lukasz.duda@nordicsemi.no, jukka.rissanen@linux.intel.com,
-	Alexander Aring <alex.aring@gmail.com>
-Subject: [RFCv2 bluetooth-next 0/2] 6lowpan: introduce generic 6lowpan private data
-Date: Fri, 31 Jul 2015 14:38:06 +0200
-Message-Id: <1438346288-14546-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAOnmHE-pXQyzeLCwbWrrEdFOQ7A6pSGAh86kFHyrccG9mDF4DA@mail.gmail.com>
+References: <CAOnmHE9V9iJjbtTLvfS+pFYCaZGmSj4Z6ZK28-ER0K=CZH4TLQ@mail.gmail.com>
+	<CAD0=r8xirf3TOwgbZAyVG6oU1W-cWoxLMhojjqBg38Di4Z19bQ@mail.gmail.com>
+	<CAOnmHE-pXQyzeLCwbWrrEdFOQ7A6pSGAh86kFHyrccG9mDF4DA@mail.gmail.com>
+Date: Fri, 31 Jul 2015 10:05:10 +0200
+Message-ID: <CAD0=r8yFWU_fJFBEMbG-mBF3Jz8k=JqQC_RwP=Y9h_r5hGOfHw@mail.gmail.com>
+Subject: Re: Enabling continuous LE Active scan in 5.32?
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: "Arun K. Singh" <arunkat@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Fri, Jul 31, 2015 at 8:06 AM, Arun K. Singh <arunkat@gmail.com> wrote:
+> Hi Jakub,
+>
+>>> Checking adapter.c, adapter->no_scan_restart_delay parameter looks
+>>> promising if set to true. Still same result - next scan delay ~ 2 sec.
+>>> Not sure if such delay is intentional or platform performance related
+>>> My question is :- Is there a neat way to trigger continuous active LE
+>>> scan even though it may sound power-wise inefficient. Tried to grep
+>>> archives but couldn't find much help.
+>> So there is something like that, but you'll probably have to update
+>> your kernel (I think this feature is all in 4.0, or 4.1)
+>> Recently kernel patch landed that enables simultaneous discovery, but
+>> that works only for some controllers, you'll have to check wether your
+>> controller have this quirk set: HCI_QUIRK_SIMULTANEOUS_DISCOVERY
+>> http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tree/include/net/bluetooth/hci.h#n164
+>> What this does is: previously there was 5s le scan, then 5s classic
+>> scan, then 5s break, now it's simulteanous le and br/edr scan.
+>
+> Thanks for the insight. But I am more interested in reducing the 5s
+> break aka IDLE_DISCOV_TIMEOUT to zero.
+> It is when I reduce this to zero or set adapter->no_scan_restart_delay
+> parameter to True that I still find few
+> seconds delay to restart scan. I have taken care of interleaved stuff
+> by setting my device  to "le" only in main.conf.
+> So all my scans are "le only" for 10 seconds.  Do you think it is
+> entire possible to make scan continuous for say a minute'
+> without any restart delay.
 
-I already thought many times to introduce something like that. Here is a draft
-for introducing the generic 6lowpan private data into each lowpan interface.
-For the beginning I introduced the enum "ll_type" which contains the LL type of
-a lowpan interface.
+It sounds like a bug, maybe something platform or controller
+dependent. It's working fine for me now on x64 platform with intel or
+CSR controllers and latest kernel. Can you try running bluetoothd with
+-nd flags (show debugging output + stay running in console) to gather
+some logs ?
+Also runing monitor/btmon at same time might be useful to see what's
+going to controller.
 
-Use cases for such feature (LL types):
-
- - If we do in upper layers (6LoWPAN/IPv6) a evaluation of dev->type then
-   the value is on all lowpan interfaces "APRHRD_6LOWPAN". If we checked on
-   "dev->type" and it's ARPHRD_6LOWPAN we can safe use lowpan_priv to get
-   6LoWPAN generic private data. With this data we can check the LL type which
-   can be currently BTLE or IEEE802154. This could be useful to make different
-   handling in iphc compress/decompress and evaluating LL private data of skb
-   control block "skb->cb".
-
-   Example (802.15.4 has different address handling functionality):
-
-   switch (lowpan_priv(dev)->ll_type) {
-   case LOWPAN_LL_TYPE_BTLE:
-        /* do EUI64 btle handling */
-        break;
-   case LOWPAN_LL_TYPE_IEEE802154:
-        /* do complicated short/extended address handling */
-        /* we can surely call skb->cb to some other private data from LL
-           which was set before iphc compress/decompress function call */
-        break;
-   }
-
-   The handling is currently for 802.15.4 is in generic 6lowpan code currently
-   not quite. This should be handled by private data. At the moment btle use
-   the same handling like for 802.15.4 extended address. Nevertheless is we can
-   cleanup some handling then in generic iphc functionality.
-
-   This also possible in layers like IPv6, just doing a check on APRHRD_6LOWPAN
-   before calling lowpan_priv(dev)->ll_type, then we are sure that the private
-   data of the interface is a 6LoWPAN interface and we can cast it to lowpan_priv.
-   Then we can do 6LoWPAN generic stuff OR 6lowpan specific LL stuff.
-
- - In Lukasz Duda RFC for introducing stateful address compression, I saw
-   some behaviour which such functionality is also useful. Currently we don't
-   have a allocated space for a 6LoWPAN generic space which is assigned to a
-   lowpan interface. When LL layers (BTLE, IEEE802154) calls iphc
-   compress/decompress Lukasz had no change to access some room which is needed
-   for storing the context information into a table. The workaround for this
-   feature was to add allocate a static data room for the table and doing a
-   lookup/match of netdev name. Which a generic 6lowpan private data room per each
-   lowpan interface we can put this table according to the netdev private room,
-   which means in short: no lookup is needed anymore, just dereferencing lowpan_priv.
-
-   In upper layer like IPv6 Lukasz could use that to get the stateful context
-   table information as an example for doing 6LoWPAN generic stuff in upper
-   layers.
-
-
-Note about the implementation for LL 6LoWPAN private pointer:
-
-I stole some mechanism from wireless for that. See [0], the vif struct is part
-of sdata which is also part of private data of a wireless interface (mac80211).
-I hope I can just adapt this behaviour.
-
-- Alex
-
-[0] http://lxr.free-electrons.com/source/include/net/mac80211.h#L1366
-
-changes since v2:
- - rename L2/l2 to LL/ll. I think the usually word in ietf for L2 is
-   LL which means "link layer". Also ipv6 stack use ll for variables like
-   lladdr -> link layer address.
- - rebase to current bluetooth-next/master
- - remove some brackets in function lowpan_priv.
-
-Alexander Aring (2):
-  bluetooth: 6lowpan: change netdev_priv to lowpan_dev
-  6lowpan: add generic 6lowpan netdev private data
-
- include/net/6lowpan.h              | 18 ++++++++++++++++++
- net/bluetooth/6lowpan.c            |  9 ++++++---
- net/ieee802154/6lowpan/6lowpan_i.h |  3 ++-
- net/ieee802154/6lowpan/core.c      |  5 ++++-
- 4 files changed, 30 insertions(+), 5 deletions(-)
-
--- 
-2.5.0
-
+>
+> Thanks,
+> Arun
