@@ -1,93 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLNzU50vr3WtfOL=-JNkMz8ouqMgpyNAAeqFj8bZ4KzTg@mail.gmail.com>
-References: <CAASrBQk2_QYYKAFoMvTUAbmHvAFW12O2yHjx-J1D1+JyNCJNFA@mail.gmail.com>
-	<CAASrBQkPyee_J+cMHL+t+YCq=8QBiEnuhgB9aEdkgKQ1RM+vYA@mail.gmail.com>
-	<CABBYNZLNzU50vr3WtfOL=-JNkMz8ouqMgpyNAAeqFj8bZ4KzTg@mail.gmail.com>
-Date: Sun, 2 Aug 2015 17:00:57 -0600
-Message-ID: <CAASrBQkrKVrbT4Rcv9eGtf_+yQoMGcSvPUF7uNGsYeEHUDyUOg@mail.gmail.com>
-Subject: Re: bluetoothctl list-attributes command
-From: Mark Rages <markrages@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <1438364565-24642-1-git-send-email-adam.moore@savantsystems.com>
+References: <1438364565-24642-1-git-send-email-adam.moore@savantsystems.com>
+Date: Sun, 2 Aug 2015 12:04:41 +0300
+Message-ID: <CABBYNZLWpbr36dvPP-QsSTtMjW=zZqU7ZfK7KW8SohBeeTtvbg@mail.gmail.com>
+Subject: Re: [PATCH] gatt-database: allow GattService anywhere in
+ ObjectManager tree
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Adam Moore <adam.moore@savantsystems.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Aug 2, 2015 at 2:48 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Mark,
->
-> On Sun, Aug 2, 2015 at 2:24 AM, Mark Rages <markrages@gmail.com> wrote:
->> On Wed, Jul 29, 2015 at 5:22 PM, Mark Rages <markrages@gmail.com> wrote:
->>> I solved my previous problem with list-attributes, but now I face another one.
->>>
->>> I am trying to interact with the heart rate monitor strap
->>> 'CB:D7:A0:40:C4:01' using bluetoothctl:
->>>
->>> $ bluetoothctl
->>> [NEW] Controller 00:02:72:C8:B1:AD qountdown [default]
->>> [NEW] Device CB:D7:A0:40:C4:01 mar
->>> [NEW] Service /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0023 Vendor
->>> specific (Primary)
->>> [NEW] Characteristic
->>> /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0023/char0026 Vendor
->>> specific
->>> [NEW] Characteristic
->>> /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0023/char0024 Vendor
->>> specific
->>> [NEW] Service /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0012
->>> Battery Service (Primary)
->>> [NEW] Characteristic
->>> /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0012/char0013 Battery
->>> Level
->>> [NEW] Descriptor
->>> /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0012/char0013/desc0015
->>> Client Characteristic Configuration
->>> [bluetooth]# connect CB:D7:A0:40:C4:01
->>> Attempting to connect to CB:D7:A0:40:C4:01
->>> Connection successful
->>> [mar]# list-attributes
->>> Service /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0023 Vendor
->>> specific (Primary)
->>> Characteristic /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0023/char0026
->>> Vendor specific
->>> Characteristic /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0023/char0024
->>> Vendor specific
->>> Service /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0012 Battery
->>> Service (Primary)
->>> Characteristic /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0012/char0013
->>> Battery Level
->>> Descriptor /org/bluez/hci0/dev_CB_D7_A0_40_C4_01/service0012/char0013/desc0015
->>> Client Characteristic Configuration
->>> [mar]#
->>>
->>> So only two services are listed.
->>>
->>> But according to the Nordic Semiconductor "Master Control Panel" app,
->>> this device offers six services:
->>>
->>> Generic Access (0x1800)
->>> Generic Attribute (0x1801)
->>> Heart Rate (0x180d)
->>> Battery (0x180f)
->>> Device Information (0x180a)
->>> Unknown (0x4001-ceed)
->>>
->>> list-attributes only lists the Battery and 0x4001 services.
->>>
->>> Why is list-attributes only showing two services?  How can I connect
->>> to the Heart Rate (0x180d) service?
->>
->> Is it possible to connect to subscribe to notifications on the heart
->> rate service?
->
-> Try > notify on on the characteristic you want to receive notification.
->
+Hi Adam,
 
-Neither the heart rate service nor the characteristics within are
-listed on the dbus.  So how can I subscribe to notification on them?
+On Fri, Jul 31, 2015 at 8:42 PM, Adam Moore
+<adam.moore@savantsystems.com> wrote:
+> Relaxes the requirement that object provide ObjectManager AND
+> GattService interfaces.
+>
+> Maintains check that GattService and GattCharacteristics are
+> children of ObjectManager, but loses the check that
+> GattCharacteristics are children of GattService. Therefore,
+> meant as a temporary workaround.
+> ---
+>  src/gatt-database.c | 20 +++++++++++++++-----
+>  1 file changed, 15 insertions(+), 5 deletions(-)
+>
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index 69a814d..e82165c 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -85,6 +85,7 @@ struct external_service {
+>         bool failed;
+>         char *owner;
+>         char *path;     /* Path to GattService1 */
+> +       char *manager_path;     /* Path to ObjectManager */
+>         DBusMessage *reg;
+>         GDBusClient *client;
+>         GDBusProxy *proxy;
+> @@ -372,6 +373,7 @@ static void service_free(void *data)
+>
+>         g_free(service->owner);
+>         g_free(service->path);
+> +       g_free(service->manager_path);
+>
+>         free(service);
+>  }
+> @@ -1042,7 +1044,7 @@ static bool match_service(const void *a, const void *b)
+>         const struct external_service *service = a;
+>         const struct svc_match_data *data = b;
+>
+> -       return g_strcmp0(service->path, data->path) == 0 &&
+> +       return g_strcmp0(service->manager_path, data->path) == 0 &&
+>                                 g_strcmp0(service->owner, data->sender) == 0;
+>  }
+>
+> @@ -1321,7 +1323,7 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
+>         iface = g_dbus_proxy_get_interface(proxy);
+>         path = g_dbus_proxy_get_path(proxy);
+>
+> -       if (!g_str_has_prefix(path, service->path))
+> +       if (!g_str_has_prefix(path, service->manager_path))
+>                 return;
+>
+>         if (g_strcmp0(iface, GATT_SERVICE_IFACE) == 0) {
+> @@ -1332,12 +1334,20 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
+>                  * TODO: We may want to support adding included services in a
+>                  * single hierarchy.
+>                  */
+> -               if (g_strcmp0(path, service->path) != 0) {
+> +               if (service->path != NULL) {
+>                         error("Multiple services added within hierarchy");
+>                         service->failed = true;
+>                         return;
+>                 }
+>
+> +               // Set service path now that we've found a service
+> +               service->path = g_strdup(path);
+> +               if (!service->path) {
+> +                       error("Failed to allocate service path");
+> +                       service->failed = true;
+> +                       return;
+> +               }
+> +
+>                 /* Add 1 for the service declaration */
+>                 if (!incr_attr_count(service, 1)) {
+>                         error("Failed to increment attribute count");
+> @@ -2171,8 +2181,8 @@ static struct external_service *service_create(DBusConnection *conn,
+>         if (!service->owner)
+>                 goto fail;
+>
+> -       service->path = g_strdup(path);
+> -       if (!service->path)
+> +       service->manager_path = g_strdup(path);
+> +       if (!service->manager_path)
+>                 goto fail;
+>
+>         service->chrcs = queue_new();
+> --
+> 2.4.6
 
-Regards,
-Mark
-markrages@gmail
+Well if we are doing to do that then perhaps we should list all the
+services under the path ObjectManager path not only one.
+
+
+-- 
+Luiz Augusto von Dentz
