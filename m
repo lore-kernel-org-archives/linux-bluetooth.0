@@ -1,41 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 73081] Fail to setup Bluetooth on Dell Venue 11 Pro
-Date: Mon, 03 Aug 2015 20:06:03 +0000
-Message-ID: <bug-73081-62941-uxaG34jEzk@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-73081-62941@https.bugzilla.kernel.org/>
-References: <bug-73081-62941@https.bugzilla.kernel.org/>
+Message-ID: <1438610043.2896.226.camel@linux.intel.com>
+Subject: Re: [RFCv2 bluetooth-next 0/2] 6lowpan: introduce generic 6lowpan
+ private data
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+	linux-bluetooth@vger.kernel.org
+Date: Mon, 03 Aug 2015 16:54:03 +0300
+In-Reply-To: <20150803133913.GA30530@omega>
+References: <1438346288-14546-1-git-send-email-alex.aring@gmail.com>
+	 <1438590118.2896.224.camel@linux.intel.com> <20150803133913.GA30530@omega>
 Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Mime-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=73081
+On ma, 2015-08-03 at 15:39 +0200, Alexander Aring wrote:
+> On Mon, Aug 03, 2015 at 11:21:58AM +0300, Jukka Rissanen wrote:
+> > Hi Alex,
+> > 
+> > On pe, 2015-07-31 at 14:38 +0200, Alexander Aring wrote:
+> > > Hi,
+> > > 
+> > > I already thought many times to introduce something like that. Here is a draft
+> > > for introducing the generic 6lowpan private data into each lowpan interface.
+> > > For the beginning I introduced the enum "ll_type" which contains the LL type of
+> > > a lowpan interface.
+> > 
+> > Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> > 
+> > 
+> > BTW, did you document the description below somewhere, it looks very
+> > useful.
+> > 
+> 
+> no, maybe we can create a "Documentation/networking/6lowpan.txt" for
+> this?
 
-Dmitry Khromov <icechrome@gmail.com> changed:
+You read my mind, I was thinking exactly that :)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |icechrome@gmail.com
 
---- Comment #1 from Dmitry Khromov <icechrome@gmail.com> ---
-Same here, on Venue 8 Pro.
-Actually, the protocol Windows is using is H4, nevertheless, it doesn't work
-also.
-This snippet from DSDT table (BTH0 entry, DLAC3002) specifies the UART settings
-that Windows (supposedly) uses:
-UartSerialBus (0x0001C200, DataBitsEight, StopBitsOne, 0xC0, LittleEndian,
-ParityTypeNone, FlowControlHardware, 0x0020, 0x0020, "\\_SB.URT1", 0x00,
-ResourceConsumer, ,)
-URT1 is /dev/ttyS4 in my config, the interesting thing is that there's no bytes
-inbound at all - looks like the BT module is simply unpowered, no matter if I
-attach an rfkill-gpio (like Jin above), or drive GPIOs manually (via
-/sys/bus/gpio).
-So, it's unlikely a kernel bug (and may be closed as such).
+Cheers,
+Jukka
 
-Jin. had you ever succeed in getting this piece working?
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
