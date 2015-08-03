@@ -1,168 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anchit Narang <anchit.n@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: sachin.dev@samsung.com
-Subject: [PATCH] tools/l2test: Fix memory leak
-Date: Mon, 03 Aug 2015 17:27:32 +0530
-Message-id: <1438603053-4865-1-git-send-email-anchit.n@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1438590118.2896.224.camel@linux.intel.com>
+Subject: Re: [RFCv2 bluetooth-next 0/2] 6lowpan: introduce generic 6lowpan
+ private data
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+	linux-bluetooth@vger.kernel.org
+Date: Mon, 03 Aug 2015 11:21:58 +0300
+In-Reply-To: <1438346288-14546-1-git-send-email-alex.aring@gmail.com>
+References: <1438346288-14546-1-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The code to exit from program is changed.
-Rather than directly calling exit(), memory allocated to buf is released
-to gracefully exit.
----
- tools/l2test.c |   55 ++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 36 insertions(+), 19 deletions(-)
+Hi Alex,
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 386823f..973edd3 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -1348,7 +1348,7 @@ static void usage(void)
- int main(int argc, char *argv[])
- {
- 	struct sigaction sa;
--	int opt, sk, mode = RECV, need_addr = 0;
-+	int opt, sk, mode = RECV, need_addr = 0, error = 0;
- 
- 	bacpy(&bdaddr, BDADDR_ANY);
- 
-@@ -1476,7 +1476,8 @@ int main(int argc, char *argv[])
- 			if (rfcmode == -1) {
- 				print_lookup_values(l2cap_modes,
- 						"List L2CAP modes:");
--				exit(1);
-+				error = -1;
-+				goto done;
- 			}
- 
- 			break;
-@@ -1487,7 +1488,8 @@ int main(int argc, char *argv[])
- 			if (chan_policy == -1) {
- 				print_lookup_values(chan_policies,
- 						"List L2CAP chan policies:");
--				exit(1);
-+				error = -1;
-+				goto done;
- 			}
- 
- 			break;
-@@ -1554,7 +1556,8 @@ int main(int argc, char *argv[])
- 			if (bdaddr_type == -1) {
- 				print_lookup_values(bdaddr_types,
- 						"List Address types:");
--				exit(1);
-+				error = -1;
-+				goto done;
- 			}
- 
- 			break;
-@@ -1569,7 +1572,8 @@ int main(int argc, char *argv[])
- 
- 		default:
- 			usage();
--			exit(1);
-+			error = -1;
-+			goto done;
- 		}
- 	}
- 
-@@ -1582,7 +1586,8 @@ int main(int argc, char *argv[])
- 
- 	if (need_addr && !(argc - optind)) {
- 		usage();
--		exit(1);
-+		error = -1;
-+		goto done;
- 	}
- 
- 	if (data_size < 0)
-@@ -1592,7 +1597,8 @@ int main(int argc, char *argv[])
- 
- 	if (!(buf = malloc(buffer_size))) {
- 		perror("Can't allocate data buffer");
--		exit(1);
-+		error = -1;
-+		goto done;
- 	}
- 
- 	memset(&sa, 0, sizeof(sa));
-@@ -1609,8 +1615,10 @@ int main(int argc, char *argv[])
- 
- 		case CRECV:
- 			sk = do_connect(argv[optind]);
--			if (sk < 0)
--				exit(1);
-+			if (sk < 0) {
-+				error = -1;
-+				goto done;
-+			}
- 			recv_mode(sk);
- 			break;
- 
-@@ -1620,8 +1628,10 @@ int main(int argc, char *argv[])
- 
- 		case SEND:
- 			sk = do_connect(argv[optind]);
--			if (sk < 0)
--				exit(1);
-+			if (sk < 0) {
-+				error = -1;
-+				goto done;
-+			}
- 			send_mode(sk);
- 			break;
- 
-@@ -1643,8 +1653,10 @@ int main(int argc, char *argv[])
- 
- 		case SENDDUMP:
- 			sk = do_connect(argv[optind]);
--			if (sk < 0)
--				exit(1);
-+			if (sk < 0) {
-+				error = -1;
-+				goto done;
-+			}
- 			senddump_mode(sk);
- 			break;
- 
-@@ -1658,24 +1670,29 @@ int main(int argc, char *argv[])
- 
- 		case CSENDRECV:
- 			sk = do_connect(argv[optind]);
--			if (sk < 0)
--				exit(1);
--
-+			if (sk < 0) {
-+				error = -1;
-+				goto done;
-+			}
- 			send_and_recv_mode(sk);
- 			break;
- 
- 		case INFOREQ:
- 			info_request(argv[optind]);
--			exit(0);
-+			goto done;
- 
- 		case PAIRING:
- 			do_pairing(argv[optind]);
--			exit(0);
-+			goto done;
- 	}
- 
-+/* gracefully exiting */
-+done:
-+	free(buf);
- 	syslog(LOG_INFO, "Exit");
--
- 	closelog();
-+	if (error == -1)
-+		return 1;
- 
- 	return 0;
- }
--- 
-1.7.9.5
+On pe, 2015-07-31 at 14:38 +0200, Alexander Aring wrote:
+> Hi,
+> 
+> I already thought many times to introduce something like that. Here is a draft
+> for introducing the generic 6lowpan private data into each lowpan interface.
+> For the beginning I introduced the enum "ll_type" which contains the LL type of
+> a lowpan interface.
+
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+
+
+BTW, did you document the description below somewhere, it looks very
+useful.
+
+
+> Use cases for such feature (LL types):
+> 
+>  - If we do in upper layers (6LoWPAN/IPv6) a evaluation of dev->type then
+>    the value is on all lowpan interfaces "APRHRD_6LOWPAN". If we checked on
+>    "dev->type" and it's ARPHRD_6LOWPAN we can safe use lowpan_priv to get
+>    6LoWPAN generic private data. With this data we can check the LL type which
+>    can be currently BTLE or IEEE802154. This could be useful to make different
+>    handling in iphc compress/decompress and evaluating LL private data of skb
+>    control block "skb->cb".
+> 
+>    Example (802.15.4 has different address handling functionality):
+> 
+>    switch (lowpan_priv(dev)->ll_type) {
+>    case LOWPAN_LL_TYPE_BTLE:
+>         /* do EUI64 btle handling */
+>         break;
+>    case LOWPAN_LL_TYPE_IEEE802154:
+>         /* do complicated short/extended address handling */
+>         /* we can surely call skb->cb to some other private data from LL
+>            which was set before iphc compress/decompress function call */
+>         break;
+>    }
+> 
+>    The handling is currently for 802.15.4 is in generic 6lowpan code currently
+>    not quite. This should be handled by private data. At the moment btle use
+>    the same handling like for 802.15.4 extended address. Nevertheless is we can
+>    cleanup some handling then in generic iphc functionality.
+> 
+>    This also possible in layers like IPv6, just doing a check on APRHRD_6LOWPAN
+>    before calling lowpan_priv(dev)->ll_type, then we are sure that the private
+>    data of the interface is a 6LoWPAN interface and we can cast it to lowpan_priv.
+>    Then we can do 6LoWPAN generic stuff OR 6lowpan specific LL stuff.
+> 
+>  - In Lukasz Duda RFC for introducing stateful address compression, I saw
+>    some behaviour which such functionality is also useful. Currently we don't
+>    have a allocated space for a 6LoWPAN generic space which is assigned to a
+>    lowpan interface. When LL layers (BTLE, IEEE802154) calls iphc
+>    compress/decompress Lukasz had no change to access some room which is needed
+>    for storing the context information into a table. The workaround for this
+>    feature was to add allocate a static data room for the table and doing a
+>    lookup/match of netdev name. Which a generic 6lowpan private data room per each
+>    lowpan interface we can put this table according to the netdev private room,
+>    which means in short: no lookup is needed anymore, just dereferencing lowpan_priv.
+> 
+>    In upper layer like IPv6 Lukasz could use that to get the stateful context
+>    table information as an example for doing 6LoWPAN generic stuff in upper
+>    layers.
+> 
+> 
+> Note about the implementation for LL 6LoWPAN private pointer:
+> 
+> I stole some mechanism from wireless for that. See [0], the vif struct is part
+> of sdata which is also part of private data of a wireless interface (mac80211).
+> I hope I can just adapt this behaviour.
+> 
+> - Alex
+> 
+> [0] http://lxr.free-electrons.com/source/include/net/mac80211.h#L1366
+> 
+> changes since v2:
+>  - rename L2/l2 to LL/ll. I think the usually word in ietf for L2 is
+>    LL which means "link layer". Also ipv6 stack use ll for variables like
+>    lladdr -> link layer address.
+>  - rebase to current bluetooth-next/master
+>  - remove some brackets in function lowpan_priv.
+> 
+> Alexander Aring (2):
+>   bluetooth: 6lowpan: change netdev_priv to lowpan_dev
+>   6lowpan: add generic 6lowpan netdev private data
+> 
+>  include/net/6lowpan.h              | 18 ++++++++++++++++++
+>  net/bluetooth/6lowpan.c            |  9 ++++++---
+>  net/ieee802154/6lowpan/6lowpan_i.h |  3 ++-
+>  net/ieee802154/6lowpan/core.c      |  5 ++++-
+>  4 files changed, 30 insertions(+), 5 deletions(-)
+> 
+
+
+Cheers,
+Jukka
+
+
+
 
