@@ -2,155 +2,192 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v3 5/8] tools/l2cap-tester: Two socket connect test
-Date: Tue,  4 Aug 2015 15:20:08 +0200
-Message-Id: <1438694411-6080-5-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v3 7/8] emulator/hciemu: add second client
+Date: Tue,  4 Aug 2015 15:20:10 +0200
+Message-Id: <1438694411-6080-7-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1438694411-6080-1-git-send-email-jpawlowski@google.com>
 References: <1438694411-6080-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test tries to open two sockets to same address, to make sure
-both would succeed.
+This patch adds second client in preparation for test that would try to
+connect to two devices at same time.
 ---
- tools/l2cap-tester.c | 103 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 103 insertions(+)
+ emulator/hciemu.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+ emulator/hciemu.h |  2 ++
+ 2 files changed, 66 insertions(+), 4 deletions(-)
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 1b7ee94..5e56934 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -54,6 +54,7 @@ struct test_data {
- 	uint16_t scid;
- 	uint16_t dcid;
- 	int sk;
-+	int sk2;
+diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+index 2e57b1f..7e35b00 100644
+--- a/emulator/hciemu.c
++++ b/emulator/hciemu.c
+@@ -49,12 +49,17 @@
+ struct hciemu {
+ 	int ref_count;
+ 	enum btdev_type btdev_type;
++	enum btdev_type btdev_2_type;
+ 	struct bthost *host_stack;
++	struct bthost *host_2_stack;
+ 	struct btdev *master_dev;
+ 	struct btdev *client_dev;
++	struct btdev *client_2_dev;
+ 	guint host_source;
++	guint host_2_source;
+ 	guint master_source;
+ 	guint client_source;
++	guint client_2_source;
+ 	struct queue *post_command_hooks;
+ 	char bdaddr_str[18];
  };
+@@ -252,7 +257,6 @@ static bool create_vhci(struct hciemu *hciemu)
+ 	}
  
- struct l2cap_data {
-@@ -465,6 +466,12 @@ static const struct l2cap_data le_client_close_socket_test_2 = {
- 	.server_not_advertising = true,
- };
+ 	hciemu->master_dev = btdev;
+-
+ 	hciemu->master_source = create_source_btdev(fd, btdev);
  
-+static const struct l2cap_data le_client_two_sockets_same_client = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.server_not_advertising = true,
-+};
-+
- static const struct l2cap_data le_client_connect_nval_psm_test = {
- 	.client_psm = 0x0080,
- 	.expect_err = ECONNREFUSED,
-@@ -1360,6 +1367,97 @@ static void test_close_socket(const void *test_data)
- 	connect_socket(client_bdaddr, &data->sk, NULL);
+ 	return true;
+@@ -266,37 +270,80 @@ struct bthost *hciemu_client_get_host(struct hciemu *hciemu)
+ 	return hciemu->host_stack;
  }
  
-+static uint8_t test_two_sockets_connect_cb_cnt;
-+static gboolean test_two_sockets_connect_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
++struct bthost *hciemu_client_2_get_host(struct hciemu *hciemu)
 +{
-+	struct test_data *data = tester_get_data();
-+	const struct l2cap_data *l2data = data->test_data;
-+	int err, sk_err, sk;
-+	socklen_t len = sizeof(sk_err);
++	if (!hciemu)
++		return NULL;
 +
-+	data->io_id = 0;
-+
-+	sk = g_io_channel_unix_get_fd(io);
-+
-+	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &sk_err, &len) < 0)
-+		err = -errno;
-+	else
-+		err = -sk_err;
-+
-+	if (err < 0) {
-+		tester_warn("Connect failed: %s (%d)", strerror(-err), -err);
-+		tester_test_failed();
-+		return FALSE;
-+	}
-+
-+	tester_print("Successfully connected");
-+	test_two_sockets_connect_cb_cnt++;
-+
-+	if (test_two_sockets_connect_cb_cnt == 2) {
-+		close(data->sk);
-+		close(data->sk2);
-+		tester_test_passed();
-+	}
-+
-+	return FALSE;
++	return hciemu->host_2_stack;
 +}
 +
-+static gboolean enable_advertising(gpointer args)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+
-+	bthost_set_adv_enable(bthost, 0x01);
-+}
-+
-+void test_connect_two_sockets_part_2(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct l2cap_data *l2data = data->test_data;
-+	const uint8_t *client_bdaddr;
-+
-+	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
-+	connect_socket(client_bdaddr, &data->sk2, test_two_sockets_connect_cb);
-+
-+	g_idle_add(enable_advertising, NULL);
-+}
-+
-+static void test_connect_two_sockets_router(uint16_t opcode, const void *param,
-+					uint8_t length, void *user_data)
-+{
-+	const struct bt_hci_cmd_le_set_scan_enable *scan_params = param;
-+
-+	tester_print("HCI Command 0x%04x length %u", opcode, length);
-+	if (opcode == BT_HCI_CMD_LE_SET_SCAN_ENABLE &&
-+						scan_params->enable == true) {
-+		test_connect_two_sockets_part_2();
-+	}
-+}
-+
-+static void test_connect_two_sockets(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct l2cap_data *l2data = data->test_data;
-+	const uint8_t *client_bdaddr;
-+
-+	test_two_sockets_connect_cb_cnt = 0;
-+
-+	hciemu_add_master_post_command_hook(data->hciemu,
-+				test_connect_two_sockets_router, data);
-+
-+	if (l2data->server_psm) {
-+		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+
-+		if (!l2data->data_len)
-+			bthost_add_l2cap_server(bthost, l2data->server_psm,
-+						NULL, NULL);
-+	}
-+
-+	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
-+	connect_socket(client_bdaddr, &data->sk, test_two_sockets_connect_cb);
-+}
-+
- static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
+ static bool create_stack(struct hciemu *hciemu)
  {
-@@ -1686,6 +1784,11 @@ int main(int argc, char *argv[])
- 				setup_powered_client,
- 				test_close_socket);
+-	struct btdev *btdev;
+-	struct bthost *bthost;
+-	int sv[2];
++	struct btdev *btdev, *btdev_2;
++	struct bthost *bthost, *bthost_2;
++	int sv[2], sv2[2];
  
-+	test_l2cap_le("L2CAP LE Client - Open two sockets",
-+				&le_client_two_sockets_same_client,
-+				setup_powered_client,
-+				test_connect_two_sockets);
+ 	btdev = btdev_create(hciemu->btdev_type, 0x00);
+ 	if (!btdev)
+ 		return false;
+ 
 +
- 	test_l2cap_le("L2CAP LE Client - Invalid PSM",
- 					&le_client_connect_nval_psm_test,
- 					setup_powered_client, test_connect);
++	btdev_2 = btdev_create(hciemu->btdev_2_type, 0x01);
++	if (!btdev_2) {
++		btdev_destroy(btdev);
++		return false;
++	}
++
+ 	bthost = bthost_create();
+ 	if (!bthost) {
+ 		btdev_destroy(btdev);
++		btdev_destroy(btdev_2);
++		return false;
++	}
++
++	bthost_2 = bthost_create();
++	if (!bthost_2) {
++		bthost_destroy(bthost);
++		btdev_destroy(btdev);
++		btdev_destroy(btdev_2);
+ 		return false;
+ 	}
+ 
+ 	btdev_set_command_handler(btdev, client_command_callback, hciemu);
++	btdev_set_command_handler(btdev_2, client_command_callback, hciemu);
+ 
+ 	if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC,
+ 								0, sv) < 0) {
+ 		bthost_destroy(bthost);
++		bthost_destroy(bthost_2);
+ 		btdev_destroy(btdev);
++		btdev_destroy(btdev_2);
++		return false;
++	}
++
++	if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC,
++								0, sv2) < 0) {
++		bthost_destroy(bthost);
++		bthost_destroy(bthost_2);
++		btdev_destroy(btdev);
++		btdev_destroy(btdev_2);
++		close(sv[0]);
++		close(sv[1]);
+ 		return false;
+ 	}
+ 
+ 	hciemu->client_dev = btdev;
++	hciemu->client_2_dev = btdev_2;
+ 	hciemu->host_stack = bthost;
++	hciemu->host_2_stack = bthost_2;
+ 
+ 	hciemu->client_source = create_source_btdev(sv[0], btdev);
+ 	hciemu->host_source = create_source_bthost(sv[1], bthost);
+ 
++	hciemu->client_2_source = create_source_btdev(sv2[0], btdev_2);
++	hciemu->host_2_source = create_source_bthost(sv2[1], bthost_2);
++
+ 	return true;
+ }
+ 
+@@ -305,6 +352,7 @@ static gboolean start_stack(gpointer user_data)
+ 	struct hciemu *hciemu = user_data;
+ 
+ 	bthost_start(hciemu->host_stack);
++	bthost_start(hciemu->host_2_stack);
+ 
+ 	return FALSE;
+ }
+@@ -381,10 +429,14 @@ void hciemu_unref(struct hciemu *hciemu)
+ 
+ 	g_source_remove(hciemu->host_source);
+ 	g_source_remove(hciemu->client_source);
++	g_source_remove(hciemu->host_2_source);
++	g_source_remove(hciemu->client_2_source);
+ 	g_source_remove(hciemu->master_source);
+ 
+ 	bthost_destroy(hciemu->host_stack);
++	bthost_destroy(hciemu->host_2_stack);
+ 	btdev_destroy(hciemu->client_dev);
++	btdev_destroy(hciemu->client_2_dev);
+ 	btdev_destroy(hciemu->master_dev);
+ 
+ 	free(hciemu);
+@@ -427,6 +479,14 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu)
+ 	return btdev_get_bdaddr(hciemu->client_dev);
+ }
+ 
++const uint8_t *hciemu_get_client_2_bdaddr(struct hciemu *hciemu)
++{
++	if (!hciemu || !hciemu->client_2_dev)
++		return NULL;
++
++	return btdev_get_bdaddr(hciemu->client_2_dev);
++}
++
+ const bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu)
+ {
+ 	if (!hciemu || !hciemu->master_dev)
+diff --git a/emulator/hciemu.h b/emulator/hciemu.h
+index 3c2d098..525215d 100644
+--- a/emulator/hciemu.h
++++ b/emulator/hciemu.h
+@@ -46,12 +46,14 @@ struct hciemu *hciemu_ref(struct hciemu *hciemu);
+ void hciemu_unref(struct hciemu *hciemu);
+ 
+ struct bthost *hciemu_client_get_host(struct hciemu *hciemu);
++struct bthost *hciemu_client_2_get_host(struct hciemu *hciemu);
+ 
+ const char *hciemu_get_address(struct hciemu *hciemu);
+ uint8_t *hciemu_get_features(struct hciemu *hciemu);
+ 
+ const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu);
+ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
++const uint8_t *hciemu_get_client_2_bdaddr(struct hciemu *hciemu);
+ 
+ const bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu);
+ 
 -- 
 2.1.4
 
