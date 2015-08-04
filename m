@@ -1,497 +1,689 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: 'Szymon Janc' <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, bharat.panda@samsung.com
-References: <1438250888-23321-1-git-send-email-gowtham.ab@samsung.com>
- <5013264.ZtudNsXG1n@leonov>
-In-reply-to: <5013264.ZtudNsXG1n@leonov>
-Subject: RE: [PATCH] doc/pts: Add OPP PTS 6.2 results for Linux
-Date: Tue, 04 Aug 2015 12:56:42 +0530
-Message-id: <003e01d0ce86$f39433e0$dabc9ba0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+From: Atul Rai <a.rai@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com
+Subject: [PATCH BlueZ] tools/hcitool: Fix memory leak before exit
+Date: Tue, 04 Aug 2015 11:29:35 +0530
+Message-id: <1438667975-14580-1-git-send-email-a.rai@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+In case of failure, before exiting, free dynamically allocated
+memory as well as remove reference to opened device.
+---
+ tools/hcitool.c | 226 +++++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 174 insertions(+), 52 deletions(-)
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Szymon Janc
-> Sent: Thursday, July 30, 2015 8:12 PM
-> To: Gowtham Anandha Babu
-> Cc: linux-bluetooth@vger.kernel.org; bharat.panda@samsung.com
-> Subject: Re: [PATCH] doc/pts: Add OPP PTS 6.2 results for Linux
-> 
-> Hi Gowtham,
-> 
-> On Thursday 30 of July 2015 15:38:08 Gowtham Anandha Babu wrote:
-> > This patch adds test case list and results for OPP profile tested
-> > against Linux-kernel-4.1.0.
-> > ---
-> >  doc/pics-opp.txt  | 187
-> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> doc/pixit-opp.t
-> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++ xt |
-> > 27 ++++++++
-> >  doc/pts-opp.txt   | 120 +++++++++++++++++++++++++++++++++++
-> >  3 files changed, 334 insertions(+)
-> >  create mode 100644 doc/pics-opp.txt
-> >  create mode 100644 doc/pixit-opp.txt
-> >  create mode 100644 doc/pts-opp.txt
-> 
-> As mentioned on IRC, those files should be added to EXTRA_DIST in
-> Makefile.am.
-> 
-
-I have raised v1 for the same. Please have a look at it.
-
-> >
-> > diff --git a/doc/pics-opp.txt b/doc/pics-opp.txt new file mode 100644
-> > index 0000000..f3bd0aa
-> > --- /dev/null
-> > +++ b/doc/pics-opp.txt
-> > @@ -0,0 +1,187 @@
-> > +OPP PICS for the PTS tool.
-> > +
-> > +PTS version: 6.2.0
-> > +
-> > +* - different than PTS defaults
-> > +# - not yet implemented/supported
-> > +
-> > +M - mandatory
-> > +O - optional
-> > +
-> > +		Roles
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +Parameter Name	Selected	Description
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +TSPC_OPP_1_1	True (*)	Role: Object Push Client (C.1)
-> > +TSPC_OPP_1_2	True (*)	Role: Object Push Server (C.1)
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +C.1: Mandatory to support at least one of the defined roles.
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +
-> > +
-> > +		Client Profile Version
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +Parameter Name	Selected	Description
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +TSPC_OPP_1b_1	False		Client supports OPP version
-> 1.1. (C.1)
-> > +TSPC_OPP_1b_2	True (*)	Client supports OPP version 1.2.
-(C.1)
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +C.1: It is mandatory to support at least one of the profile
-versions.
-> > +---------------------------------------------------------------------
-> > +-----
-> > ----- +
-> > +
-> > +		Client Application Features
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +Parameter Name	Selected	Description
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +TSPC_OPP_2_1	True		Client: Perform Service Discovery
-> request
-> (M)
-> > +TSPC_OPP_2_2	True		Client: Authentication/PIN exchange
-> supported.
-> > +					(M)
-> > +TSPC_OPP_2_2a	True (*)	Client: Require Authentication/PIN
-by
-> default.
-> > +					(O)
-> > +TSPC_OPP_2_3	True		Client: Object Push (M)
-> > +TSPC_OPP_2_4	True (*)	Client: vCard 2.1 (C.3)
-> > +TSPC_OPP_2_5	False		Client: vCalender 1.0 (O)
-> > +TSPC_OPP_2_6	False		Client: vMsg as defined in IrMC 1.1
-> (O)
-> > +TSPC_OPP_2_7	False		Client: vNote as defined in IrMC 1.1
-> (O)
-> > +TSPC_OPP_2_8	True (*)	Client: Support content formats
-other
-> than those
-> > +					declared in TSPC_OPP_2_4 through
-> > +					TSPC_OPP_2_7. (O)
-> > +TSPC_OPP_2_8a	False		Client: Support specific set of
-other
-> content
-> > +					formats. (C.4)
-> > +TSPC_OPP_2_8b	True (*)	Client: Support all content formats.
-> (C.4)
-> > +TSPC_OPP_2_9	True (*)	Client: Push multiple vCard objects.
-> (O)
-> > +TSPC_OPP_2_9a	True (*)	Client: Push multiple vCard objects
-> using
-> > +					different PUT operations. (C.5)
-> > +TSPC_OPP_2_9b	False		Client: Push multiple vCard objects
-> using the
-> > +					same PUT operation. (C.5)
-> > +TSPC_OPP_2_10	True (*)	Client: Push multiple vCalender
-> objects. (O)
-> > +TSPC_OPP_2_10a	True		Client: Push multiple vCalendar
-> objects using
-> > +					different PUT operations. (C.6)
-> > +TSPC_OPP_2_10b	False		Client: Push multiple vCalendar
-> objects using
-> > +					the same PUT operation. (C.6)
-> > +TSPC_OPP_2_11	True (*)	Client: Push multiple vMsg objects.
-> (O)
-> > +TSPC_OPP_2_11a	True (*)	Client: Push multiple vMsg objects
-> using
-> > +					different PUT operations. (C.7)
-> > +TSPC_OPP_2_11b	False		Client: Push multiple vMsg objects
-> using the
-> > +					same PUT operation. (C.7)
-> > +TSPC_OPP_2_12	True (*)	Client: Push multiple vNote objects.
-> (O)
-> > +TSPC_OPP_2_12a	True (*)	Client: Push multiple vNote objects
-> using
-> > +					different PUT operations. (C.8)
-> > +TSPC_OPP_2_12b	False		Client: Push multiple vNote objects
-> using the
-> > +					same PUT operation. (C.8)
-> > +TSPC_OPP_2_13	True (*)	Client: Pull business card (O)
-> > +TSPC_OPP_2_14	True (*)	Client: vCard 2.1 (C.1)
-> > +TSPC_OPP_2_15	True (*)	Client: Exchange business card (O)
-> > +TSPC_OPP_2_16	False		Client: vCard 2.1 (C.2)
-> > +TSPC_OPP_2_17	True (*)	GOEP v2 (C.9)
-> > +TSPC_OPP_2_18	True (*)	GOEP v2 Backward Compability (C.9)
-> > +TSPC_OPP_2_19	True (*)	OBEX over L2CAP (C.9)
-> > +TSPC_OPP_2_20	False		OBEX Reliable Session (C.10)
-> > +TSPC_OPP_2_21	False		OBEX SRM (C.10)
-> > +TSPC_OPP_2_22	False		Send OBEX SRMP header (C.10)
-> > +TSPC_OPP_2_23	False		Receive OBEX SRMP header (C.11)
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +C.1: Mandatory to Support IF (TSPC_OPP_2_13) Business Card Pull
-> > is supported. +C.2: Mandatory to Support IF (TSPC_OPP_2_15) Business
-> Card
-> > Exchange is +	supported.
-> > +C.3: vCard 2.1 support is required for devices containing phonebook
-> > +	applications. vCard 2.1 support optional for other devices.
-> > +C.4: Mandatory to support one of TSPC_OPP_2_8a or TSPC_OPP_2_8b if
-> > TSPC_OPP_2_8 +	is supported. Otherwise, both items are excluded.
-> > +C.5: Mandatory to support at least one of TSPC_OPP_2_9a and
-> > +TSPC_OPP_2_9b
-> > if +	TSPC_OPP_2_9 is supported. Otherwise, both items are
-excluded.
-> > +C.6: Mandatory to support at least one of TSPC_OPP_2_10a and
-> > +TSPC_OPP_2_10b
-> > if +	TSPC_OPP_2_10 is supported. Otherwise, both items are
-excluded.
-> > +C.7: Mandatory to support at least one of TSPC_OPP_2_11a and
-> > +TSPC_OPP_2_11b
-> > if +	TSPC_OPP_2_11 is supported. Otherwise, both items are
-excluded.
-> > +C.8: Mandatory to support at least one of TSPC_OPP_2_12a and
-> > +TSPC_OPP_2_12b
-> > if +	TSPC_OPP_2_12 is supported. Otherwise, both items are
-excluded.
-> > +C.9: Mandatory if TSPC_OPP_1b_2 supported.
-> > +C.10: Optional to support if TSPC_OPP_1b_2 supported else excluded.
-> > +C.11: Mandatory if TSPC_OPP_17 and TSPC_OPP_21 supported else
-> excluded.
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +
-> > +
-> > +		Server Profile Version
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +Parameter Name	Selected	Description
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +TSPC_OPP_2b_1	False		Server supports OPP version
-> 1.1.
-> > +TSPC_OPP_2b_2	True (*)	Server supports OPP version 1.2.
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +C.1: It is mandatory to support at least one of the profile
-versions.
-> > +---------------------------------------------------------------------
-> > +-----
-> > ----- +
-> > +
-> > +		Server Application Features
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +Parameter Name	Selected	Description
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +TSPC_OPP_3_1	True		Server: Provide information on
-> supported
-> > +					contents type on service discovery
-> > +					request. (M)
-> > +TSPC_OPP_3_2	True		Server: Authentication/PIN exchange
-> supported.
-> > +					(M)
-> > +TSPC_OPP_3_3	True		Server: Object Push (M)
-> > +TSPC_OPP_3_3a	True (*)	Server: Receive multiple objects in
-> the same
-> > +					PUT operation. (O)
-> > +TSPC_OPP_3_4	True (*)	Server: vCard 2.1 (C.3)
-> > +TSPC_OPP_3_5	False		Server: vCalender 1.0 format (O)
-> > +TSPC_OPP_3_6	False		Server: vMsg as defined in IrMC 1.1
-> (O)
-> > +TSPC_OPP_3_7	False		Server: vNote as defined in IrMC 1.1
-> (O)
-> > +TSPC_OPP_3_8	True (*)	Server: Support content formats
-> other than those
-> > +					declared in TSPC_OPP_3_4 through
-> > +					TSPC_OPP_3_7. (O)
-> > +TSPC_OPP_3_8a	False		Server: Support specific set of
-other
-> content
-> > +					formats. (C.4)
-> > +TSPC_OPP_3_8b	True (*)	Server: Support all content formats.
-> (C.4)
-> > +TSPC_OPP_3_9	True (*)	Server: Object Push vCard reject.
-(O)
-> > +TSPC_OPP_3_10	True (*)	Server: Object Push vCal reject. (O)
-> > +TSPC_OPP_3_11	True (*)	Server: Object Push vMsg reject. (O)
-> > +TSPC_OPP_3_12	True (*)	Server: Object Push vNote reject.
-(O)
-> > +TSPC_OPP_3_13	True (*)	Server: Business card pull (O.1)
-> > +TSPC_OPP_3_14	True (*)	Server: vCard 2.1 (C.1)
-> > +TSPC_OPP_3_15	True (*)	Server: Business card pull reject.
-(O)
-> > +TSPC_OPP_3_16	True (*)	Server: Business card exchange (O.2)
-> > +TSPC_OPP_3_17	True (*)	Server: vCard 2.1 (C.2)
-> > +TSPC_OPP_3_18	True (*)	Server: Business card exchange
-> reject. (O)
-> > +TSPC_OPP_3_19	True (*)	GOEP v2 (C.5)
-> > +TSPC_OPP_3_20	True (*)	GOEP v2 Backward Compability (C.5)
-> > +TSPC_OPP_3_21	True (*)	OBEX over L2CAP (C.5)
-> > +TSPC_OPP_3_22	False		OBEX Reliable Session (C.16)
-> > +TSPC_OPP_3_23	False		OBEX SRM (C.6)
-> > +TSPC_OPP_3_24	False		Send OBEX SRMP header (C.6)
-> > +TSPC_OPP_3_25	False		Receive OBEX SRMP header (C.7)
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +O.1: IF NOT Supported, an error message must be sent on request
-for
-> > Business +	Card Pull.
-> > +O.2: IF NOT Supported, an error message must be sent on request for
-> > Business +	Card Exchange.
-> > +C.1: Mandatory to Support IF (TSPC_OPP_3_13) Business Card Pull is
-> > supported. +C.2: Mandatory to Support IF (TSPC_OPP_3_16) Business Card
-> > Exchange is +	supported.
-> > +C.3: vCard 2.1 support is required for devices containing phonebook
-> > +	applications. vCard 2.1 support optional for other devices.
-> > +C.4: Mandatory to support one of TSPC_OPP_3_8a or TSPC_OPP_3_8b if
-> > TSPC_OPP_3_8 +	is supported. Otherwise, both items are excluded.
-> > +C.5: Mandatory if TSPC_OPP_2b_2 supported.
-> > +C.6: Optional to support if TSPC_OPP_2b_2 supported, else excluded.
-> > +C.7: Mandatory if TSPC_OPP_3_19 and TSPC_OPP_3_23 supported else
-> excluded.
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +
-> > +
-> > +		Additional OPP Capabilities
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +Parameter Name	Selected	Description
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +TSPC_OPP_4_1	False		Abort-Push Operation (O)
-> > +TSPC_OPP_4_2	False		Intentionally Left Blank (N/A)
-> > +TSPC_OPP_4_3	True (*)	Multiple vCards transferred as a
-> single vObject
-> > +					(C.1)
-> > +TSPC_OPP_4_4	True (*)	Multiple vCards transfer (C.1)
-> > +TSPC_OPP_4_5	True (*)	vCards with multiple Phone Number
-> Fields (C.1)
-> > +TSPC_OPP_4_6	True (*)	Push vCal to Different Time Zone
-> Server (C.1)
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +C.1: Optional if TSPC_OPP_1_2 is supported, otherwise excluded.
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- diff --git a/doc/pixit-opp.txt b/doc/pixit-opp.txt new file mode
-> > 100644 index 0000000..b7461d6
-> > --- /dev/null
-> > +++ b/doc/pixit-opp.txt
-> > @@ -0,0 +1,27 @@
-> > +OPP PIXIT for the PTS tool.
-> > +
-> > +PTS version: 6.2.0
-> > +
-> > +* - different than PTS defaults
-> > +& - should be set to IUT Bluetooth address
-> > +
-> > +		Required PIXIT settings
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +Parameter Name
-Value
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +TSPX_supported_extension				bmp
-> > +TSPX_unsupported_extension				pts
-> > +TSPX_client_class_of_device				100104
-> > +TSPX_server_class_of_device				100104
-> > +TSPX_auth_password					0000
-> > +TSPX_auth_user_id					PTS
-> > +TSPX_l2cap_psm						1003
-> > +TSPX_rfcomm_channel					8
-> > +TSPX_no_confirmations					FALSE
-> > +TSPX_bd_addr_iut					112233445566 (*&)
-> > +TSPX_delete_link_key					FALSE
-> > +TSPX_pin_code						0000
-> > +TSPX_security_enabled					FALSE
-> > +TSPX_time_guard						300000
-> > +TSPX_use_implicit_send					TRUE
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- diff --git a/doc/pts-opp.txt b/doc/pts-opp.txt new file mode
-> > 100644 index 0000000..211e37f
-> > --- /dev/null
-> > +++ b/doc/pts-opp.txt
-> > @@ -0,0 +1,120 @@
-> > +PTS test results for OPP
-> > +
-> > +PTS version: 6.2.0
-> > +Tested: 30-Jul-2015
-> > +Kernel version: 4.1.0
-> > +
-> > +Results:
-> > +PASS	test passed
-> > +FAIL	test failed
-> > +INC	test is inconclusive
-> > +N/A	test is disabled due to PICS setup
-> > +NONE	test result is none
-> > +
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +Test Name		Result	Notes
-> > +---------------------------------------------------------------------
-> > +------
-> > ---- +TC_CLIENT_BC_BV_02_I	PASS
-> > +TC_CLIENT_BC_BV_04_I	PASS
-> > +TC_CLIENT_BCE_BV_01_I   PASS
-> > +TC_CLIENT_BCE_BV_03_I   N/A
-> > +TC_CLIENT_BCE_BV_04_I   PASS
-> > +TC_CLIENT_BCE_BV_05_I   PASS
-> > +TC_CLIENT_BCE_BV_06_I   PASS
-> > +TC_CLIENT_BCE_BV_07_I   PASS
-> > +TC_CLIENT_BCP_BV_01_I   PASS
-> > +TC_CLIENT_BCP_BV_02_I   PASS
-> > +TC_CLIENT_BCP_BV_03_I   N/A
-> > +TC_CLIENT_BCP_BV_04_I   PASS
-> > +TC_CLIENT_BCP_BV_05_I   PASS
-> > +TC_CLIENT_CON_BV_01_C	PASS
-> > +TC_CLIENT_OPH_BI_01_C	PASS
-> > +TC_CLIENT_OPH_BV_01_I	PASS
-> > +TC_CLIENT_OPH_BV_02_I	N/A
-> > +TC_CLIENT_OPH_BV_03_I	PASS
-> > +TC_CLIENT_OPH_BV_04_I	PASS
-> > +TC_CLIENT_OPH_BV_05_I	PASS
-> > +TC_CLIENT_OPH_BV_07_I	N/A
-> > +TC_CLIENT_OPH_BV_08_I	PASS
-> > +TC_CLIENT_OPH_BV_09_I	N/A
-> > +TC_CLIENT_OPH_BV_10_I	N/A
-> > +TC_CLIENT_OPH_BV_11_I	N/A
-> > +TC_CLIENT_OPH_BV_12_I	PASS
-> > +TC_CLIENT_OPH_BV_13_I	N/A
-> > +TC_CLIENT_OPH_BV_14_I	N/A
-> > +TC_CLIENT_OPH_BV_15_I	N/A
-> > +TC_CLIENT_OPH_BV_16_I	PASS
-> > +TC_CLIENT_OPH_BV_17_I	N/A
-> > +TC_CLIENT_OPH_BV_18_I	N/A
-> > +TC_CLIENT_OPH_BV_19_I	PASS	Send file other than vCard
-> > +TC_CLIENT_OPH_BV_20_I	PASS
-> > +TC_CLIENT_OPH_BV_22_I	PASS	Send file greater than 2 MB
-> > +TC_CLIENT_OPH_BV_23_I	N/A
-> > +TC_CLIENT_OPH_BV_24_I	N/A
-> > +TC_CLIENT_OPH_BV_25_I	N/A
-> > +TC_CLIENT_OPH_BV_26_I	N/A
-> > +TC_CLIENT_SRM_BV_01_C	N/A
-> > +TC_CLIENT_SRM_BV_03_C	N/A
-> > +TC_CLIENT_SRM_BV_05_C	N/A
-> > +TC_CLIENT_SRM_BV_07_C	N/A
-> > +TC_CLIENT_SRMP_BI_01_C	N/A
-> > +TC_CLIENT_SRMP_BV_01_C	N/A
-> > +TC_CLIENT_SRMP_BV_04_C	N/A
-> > +TC_CLIENT_SRMP_BV_05_C	N/A
-> > +TC_CLIENT_SRMP_BV_06_C	N/A
-> > +TC_SERVER_BC_BV_01_I	PASS
-> > +TC_SERVER_BC_BV_03_I	PASS
-> > +TC_SERVER_BCE_BV_01_I	PASS
-> > +TC_SERVER_BCE_BV_03_I	PASS
-> > +TC_SERVER_BCE_BV_04_I	PASS
-> > +TC_SERVER_BCE_BV_05_I	PASS
-> > +TC_SERVER_BCE_BV_06_I	PASS
-> > +TC_SERVER_BCE_BV_07_I	PASS
-> > +TC_SERVER_BCP_BV_01_I	PASS
-> > +TC_SERVER_BCP_BV_02_I	N/A
-> > +TC_SERVER_BCP_BV_03_I	PASS
-> > +TC_SERVER_BCP_BV_04_I	PASS
-> > +TC_SERVER_BCP_BV_05_I	PASS
-> > +TC_SERVER_CON_BV_02_C	PASS
-> > +TC_SERVER_OPH_BV_01_I	PASS
-> > +TC_SERVER_OPH_BV_02_I	PASS
-> > +TC_SERVER_OPH_BV_03_I	PASS
-> > +TC_SERVER_OPH_BV_04_I	PASS
-> > +TC_SERVER_OPH_BV_05_I	PASS
-> > +TC_SERVER_OPH_BV_07_I	N/A
-> > +TC_SERVER_OPH_BV_08_I	N/A
-> > +TC_SERVER_OPH_BV_09_I	PASS
-> > +TC_SERVER_OPH_BV_10_I	PASS
-> > +TC_SERVER_OPH_BV_11_I	N/A
-> > +TC_SERVER_OPH_BV_12_I	N/A
-> > +TC_SERVER_OPH_BV_13_I	PASS
-> > +TC_SERVER_OPH_BV_14_I	PASS
-> > +TC_SERVER_OPH_BV_15_I	N/A
-> > +TC_SERVER_OPH_BV_16_I	N/A
-> > +TC_SERVER_OPH_BV_17_I	PASS
-> > +TC_SERVER_OPH_BV_18_I	PASS
-> > +TC_SERVER_OPH_BV_19_I	INC	PTS issue #13842
-> > +TC_SERVER_OPH_BV_21_I	N/A
-> > +TC_SERVER_OPH_BV_22_I	INC	PTS issue #13842
-> > +TC_SERVER_OPH_BV_23_I	PASS
-> > +TC_SERVER_OPH_BV_24_I	N/A
-> > +TC_SERVER_OPH_BV_25_I	N/A
-> > +TC_SERVER_OPH_BV_26_I	N/A
-> > +TC_SERVER_ROB_BV_01_C	PASS
-> > +TC_SERVER_ROB_BV_02_C	PASS
-> > +TC_SERVER_SRM_BI_02_C	N/A
-> > +TC_SERVER_SRM_BI_03_C	PASS
-> > +TC_SERVER_SRM_BI_05_C	N/A
-> > +TC_SERVER_SRM_BV_04_C	N/A
-> > +TC_SERVER_SRM_BV_08_C	N/A
-> > +TC_SERVER_SRMP_BV_02_C	N/A
-> > +TC_SERVER_SRMP_BV_03_C	N/A
-> > +TC_CLIENT_OPH_BV_27_I	N/A
-> > +TC_CLIENT_OPH_BV_34_I	PASS
-> > +TC_SERVER_OPH_BV_27_I	N/A
-> > +TC_SERVER_OPH_BV_30_I	PASS
-> > +TC_SERVER_OPH_BV_31_I	PASS
-> > +TC_SERVER_OPH_BV_32_I	PASS
-> > +TC_SERVER_OPH_BV_33_I	N/A
-> > +TC_SERVER_OPH_BV_34_I	PASS
-> > +---------------------------------------------------------------------
-> > +------
-> > ----
-> 
-> --
-> BR
-> Szymon Janc
-> --
-
-Regards,
-Gowtham Anandha Babu
-
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index 02c4ebe..a420e4d 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -166,7 +166,7 @@ static int conn_list(int s, int dev_id, long arg)
+ 
+ 	if (ioctl(s, HCIGETCONNLIST, (void *) cl)) {
+ 		perror("Can't get connection list");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	for (i = 0; i < cl->conn_num; i++, ci++) {
+@@ -182,6 +182,10 @@ static int conn_list(int s, int dev_id, long arg)
+ 
+ 	free(cl);
+ 	return 0;
++
++failure:
++	free(cl);
++	exit(EXIT_FAILURE);
+ }
+ 
+ static int find_conn(int s, int dev_id, long arg)
+@@ -200,7 +204,7 @@ static int find_conn(int s, int dev_id, long arg)
+ 
+ 	if (ioctl(s, HCIGETCONNLIST, (void *) cl)) {
+ 		perror("Can't get connection list");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	for (i = 0; i < cl->conn_num; i++, ci++)
+@@ -211,6 +215,10 @@ static int find_conn(int s, int dev_id, long arg)
+ 
+ 	free(cl);
+ 	return 0;
++
++failure:
++	free(cl);
++	exit(EXIT_FAILURE);
+ }
+ 
+ static void hex_dump(char *pref, int width, unsigned char *buf, int len)
+@@ -1325,14 +1333,14 @@ static void cmd_dc(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	if (hci_disconnect(dd, htobs(cr->conn_info->handle),
+@@ -1342,6 +1350,13 @@ static void cmd_dc(int dev_id, int argc, char **argv)
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Role switch */
+@@ -1399,10 +1414,15 @@ static void cmd_sr(int dev_id, int argc, char **argv)
+ 
+ 	if (hci_switch_role(dd, &bdaddr, role, 10000) < 0) {
+ 		perror("Switch role request failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	hci_close_dev(dd);
++	return;
++
++failure:
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Read RSSI */
+@@ -1451,19 +1471,19 @@ static void cmd_rssi(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	if (hci_read_rssi(dd, htobs(cr->conn_info->handle), &rssi, 1000) < 0) {
+ 		perror("Read RSSI failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	printf("RSSI return value: %d\n", rssi);
+@@ -1471,6 +1491,13 @@ static void cmd_rssi(int dev_id, int argc, char **argv)
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Get link quality */
+@@ -1519,19 +1546,19 @@ static void cmd_lq(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	if (hci_read_link_quality(dd, htobs(cr->conn_info->handle), &lq, 1000) < 0) {
+ 		perror("HCI read_link_quality request failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	printf("Link quality: %d\n", lq);
+@@ -1539,6 +1566,13 @@ static void cmd_lq(int dev_id, int argc, char **argv)
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Get transmit power level */
+@@ -1589,19 +1623,19 @@ static void cmd_tpl(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	if (hci_read_transmit_power_level(dd, htobs(cr->conn_info->handle), type, &level, 1000) < 0) {
+ 		perror("HCI read transmit power level request failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	printf("%s transmit power level: %d\n",
+@@ -1610,6 +1644,13 @@ static void cmd_tpl(int dev_id, int argc, char **argv)
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Get AFH channel map */
+@@ -1659,21 +1700,21 @@ static void cmd_afh(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	handle = htobs(cr->conn_info->handle);
+ 
+ 	if (hci_read_afh_map(dd, handle, &mode, map, 1000) < 0) {
+ 		perror("HCI read AFH map request failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	if (mode == 0x01) {
+@@ -1688,6 +1729,13 @@ static void cmd_afh(int dev_id, int argc, char **argv)
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Set connection packet type */
+@@ -1740,14 +1788,14 @@ static void cmd_cpt(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	cp.handle   = htobs(cr->conn_info->handle);
+@@ -1764,12 +1812,19 @@ static void cmd_cpt(int dev_id, int argc, char **argv)
+ 
+ 	if (hci_send_req(dd, &rq, 100) < 0) {
+ 		perror("Packet type change failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Get/Set link policy settings */
+@@ -1818,14 +1873,14 @@ static void cmd_lp(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	if (argc == 1) {
+@@ -1833,7 +1888,7 @@ static void cmd_lp(int dev_id, int argc, char **argv)
+ 		if (hci_read_link_policy(dd, htobs(cr->conn_info->handle),
+ 							&policy, 1000) < 0) {
+ 			perror("HCI read_link_policy_settings request failed");
+-			exit(1);
++			goto failure;
+ 		}
+ 
+ 		policy = btohs(policy);
+@@ -1843,26 +1898,33 @@ static void cmd_lp(int dev_id, int argc, char **argv)
+ 			bt_free(str);
+ 		} else {
+ 			fprintf(stderr, "Invalig settings\n");
+-			exit(1);
++			goto failure;
+ 		}
+ 	} else {
+ 		unsigned int val;
+ 		if (hci_strtolp(argv[1], &val) < 0) {
+ 			fprintf(stderr, "Invalig arguments\n");
+-			exit(1);
++			goto failure;
+ 		}
+ 		policy = val;
+ 
+ 		if (hci_write_link_policy(dd, htobs(cr->conn_info->handle),
+ 						htobs(policy), 1000) < 0) {
+ 			perror("HCI write_link_policy_settings request failed");
+-			exit(1);
++			goto failure;
+ 		}
+ 	}
+ 
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Get/Set link supervision timeout */
+@@ -1911,21 +1973,21 @@ static void cmd_lst(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	if (argc == 1) {
+ 		if (hci_read_link_supervision_timeout(dd, htobs(cr->conn_info->handle),
+ 							&timeout, 1000) < 0) {
+ 			perror("HCI read_link_supervision_timeout request failed");
+-			exit(1);
++			goto failure;
+ 		}
+ 
+ 		timeout = btohs(timeout);
+@@ -1941,13 +2003,20 @@ static void cmd_lst(int dev_id, int argc, char **argv)
+ 		if (hci_write_link_supervision_timeout(dd, htobs(cr->conn_info->handle),
+ 							htobs(timeout), 1000) < 0) {
+ 			perror("HCI write_link_supervision_timeout request failed");
+-			exit(1);
++			goto failure;
+ 		}
+ 	}
+ 
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Request authentication */
+@@ -1995,24 +2064,31 @@ static void cmd_auth(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	if (hci_authenticate_link(dd, htobs(cr->conn_info->handle), 25000) < 0) {
+ 		perror("HCI authentication request failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Activate encryption */
+@@ -2061,26 +2137,33 @@ static void cmd_enc(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	encrypt = (argc > 1) ? atoi(argv[1]) : 1;
+ 
+ 	if (hci_encrypt_link(dd, htobs(cr->conn_info->handle), encrypt, 25000) < 0) {
+ 		perror("HCI set encryption request failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Change connection link key */
+@@ -2128,24 +2211,31 @@ static void cmd_key(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	if (hci_change_link_key(dd, htobs(cr->conn_info->handle), 25000) < 0) {
+ 		perror("Changing link key failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Read clock offset */
+@@ -2194,19 +2284,19 @@ static void cmd_clkoff(int dev_id, int argc, char **argv)
+ 	cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 	if (!cr) {
+ 		perror("Can't allocate memory");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	bacpy(&cr->bdaddr, &bdaddr);
+ 	cr->type = ACL_LINK;
+ 	if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 		perror("Get connection info failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	if (hci_read_clock_offset(dd, htobs(cr->conn_info->handle), &offset, 1000) < 0) {
+ 		perror("Reading clock offset failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	printf("Clock offset: 0x%4.4x\n", btohs(offset));
+@@ -2214,6 +2304,13 @@ static void cmd_clkoff(int dev_id, int argc, char **argv)
+ 	free(cr);
+ 
+ 	hci_close_dev(dd);
++
++	return;
++
++failure:
++	free(cr);
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ /* Read clock */
+@@ -2271,7 +2368,7 @@ static void cmd_clock(int dev_id, int argc, char **argv)
+ 		cr = malloc(sizeof(*cr) + sizeof(struct hci_conn_info));
+ 		if (!cr) {
+ 			perror("Can't allocate memory");
+-			exit(1);
++			goto failure;
+ 		}
+ 
+ 		bacpy(&cr->bdaddr, &bdaddr);
+@@ -2279,7 +2376,7 @@ static void cmd_clock(int dev_id, int argc, char **argv)
+ 		if (ioctl(dd, HCIGETCONNINFO, (unsigned long) cr) < 0) {
+ 			perror("Get connection info failed");
+ 			free(cr);
+-			exit(1);
++			goto failure;
+ 		}
+ 
+ 		handle = htobs(cr->conn_info->handle);
+@@ -2293,7 +2390,7 @@ static void cmd_clock(int dev_id, int argc, char **argv)
+ 
+ 	if (hci_read_clock(dd, handle, which, &clock, &accuracy, 1000) < 0) {
+ 		perror("Reading clock failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	accuracy = btohs(accuracy);
+@@ -2302,6 +2399,11 @@ static void cmd_clock(int dev_id, int argc, char **argv)
+ 	printf("Accuracy: %.2f msec\n", (float) accuracy * 0.3125);
+ 
+ 	hci_close_dev(dd);
++	return;
++
++failure:
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ static int read_flags(uint8_t *flags, const uint8_t *data, size_t size)
+@@ -2559,13 +2661,13 @@ static void cmd_lescan(int dev_id, int argc, char **argv)
+ 						own_type, filter_policy, 10000);
+ 	if (err < 0) {
+ 		perror("Set scan parameters failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	err = hci_le_set_scan_enable(dd, 0x01, filter_dup, 10000);
+ 	if (err < 0) {
+ 		perror("Enable scan failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	printf("LE Scan ...\n");
+@@ -2573,16 +2675,21 @@ static void cmd_lescan(int dev_id, int argc, char **argv)
+ 	err = print_advertising_devices(dd, filter_type);
+ 	if (err < 0) {
+ 		perror("Could not receive advertising events");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	err = hci_le_set_scan_enable(dd, 0x00, filter_dup, 10000);
+ 	if (err < 0) {
+ 		perror("Disable scan failed");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	hci_close_dev(dd);
++	return;
++
++failure:
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ static struct option leinfo_options[] = {
+@@ -2654,7 +2761,7 @@ static void cmd_leinfo(int dev_id, int argc, char **argv)
+ 			min_ce_length, max_ce_length, &handle, 25000);
+ 	if (err < 0) {
+ 		perror("Could not create connection");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	printf("\tHandle: %d (0x%04x)\n", handle, handle);
+@@ -2684,6 +2791,11 @@ static void cmd_leinfo(int dev_id, int argc, char **argv)
+ 	hci_disconnect(dd, handle, HCI_OE_USER_ENDED_CONNECTION, 10000);
+ 
+ 	hci_close_dev(dd);
++	return;
++
++failure:
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ static struct option lecc_options[] = {
+@@ -2757,12 +2869,17 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
+ 			min_ce_length, max_ce_length, &handle, 25000);
+ 	if (err < 0) {
+ 		perror("Could not create connection");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	printf("Connection handle %d\n", handle);
+ 
+ 	hci_close_dev(dd);
++	return;
++
++failure:
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ static struct option lewladd_options[] = {
+@@ -3276,10 +3393,15 @@ static void cmd_ledc(int dev_id, int argc, char **argv)
+ 	err = hci_disconnect(dd, handle, reason, 10000);
+ 	if (err < 0) {
+ 		perror("Could not disconnect");
+-		exit(1);
++		goto failure;
+ 	}
+ 
+ 	hci_close_dev(dd);
++	return;
++
++failure:
++	hci_close_dev(dd);
++	exit(EXIT_FAILURE);
+ }
+ 
+ static struct option lecup_options[] = {
+-- 
+2.1.4
 
