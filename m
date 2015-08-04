@@ -1,206 +1,173 @@
 Return-Path: <cyrus@holtmann.org>
-From: Adam Moore <adam.moore@savantsystems.com>
-To: Florian Grandel <fgrandel@gmail.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: Problems with incoming connection request on Nexus 4
-Date: Wed, 5 Aug 2015 00:07:38 +0000
-Message-ID: <D1E69F17.AEFC%adam.moore@savant.com>
-References: <55B83614.8090702@gmail.com>
- <BC4DBE9E-8369-4B20-BBE5-F175DD4C5626@holtmann.org>
- <55BA16BA.5060302@gmail.com>
- <F5B83C8F-6BD0-49C8-96C9-F13DF68CEECE@holtmann.org>
- <55BA2290.8090308@gmail.com>
- <2C03C1D8-0784-4DA4-93AF-FC8A1C874681@holtmann.org>
- <CAN_7+YaBFZqhCUF1m_5nNnCbn9inJmKJ6tXVmJ=Ks09A4_6utA@mail.gmail.com>
- <D1E1442B.ADA2%adam.moore@savant.com> <55BD1603.9020301@gmail.com>
-In-Reply-To: <55BD1603.9020301@gmail.com>
-Content-Type: text/plain; charset="iso-8859-2"
-MIME-Version: 1.0
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v3 3/8] emulator: add BT_HCI_CMD_LE_CREATE_CONN_CANCEL handling
+Date: Tue,  4 Aug 2015 15:20:06 +0200
+Message-Id: <1438694411-6080-3-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1438694411-6080-1-git-send-email-jpawlowski@google.com>
+References: <1438694411-6080-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For some reason, my 5.28 devices were defaulting to LE mode even though I
-didn't have a main.conf.  Being happy with this, I didn't ask questions
-and likely incorrectly assumed it was because of what I was setting the
-correct bits in the advertising data.
+This patch adds handling of BT_HCI_CMD_LE_CREATE_CONN_CANCEL command.
 
-After updating to 5.32, my devices are defaulting to dual mode, according
-to 'btmgmt info'.
+If btdev_set_le_noresp_conn_request is called on btdev, other devices that
+try to connect to it will stuck on BT_HCI_CMD_LE_CREATE_CONN, by not
+sending bt_hci_evt_le_conn_complete event back. Thanks to that,
+BT_HCI_CMD_LE_CREATE_CONN_CANCEL can be triggered to cancel connect
+attempt.
+---
+ emulator/btdev.c  | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ emulator/btdev.h  |  2 ++
+ emulator/hciemu.c |  8 ++++++++
+ emulator/hciemu.h |  3 +++
+ 4 files changed, 58 insertions(+)
 
-After creating a main.conf and setting ControllerMode = le, my 5.32
-devices are now seen as LE only.  This was probably the cause of my issue.
- Would like to know how I was able to get away without a main.conf before
-though.
-
-Will let you know if I figure that out.
-
-
-
-On 8/1/15, 11:54 AM, "Florian Grandel" <fgrandel@gmail.com> wrote:
-
->Hi Adam and Lukasz,
->
->thanks for your feedback and insight. I'll let you know when I make
->progress.
->
->Florian
->
->On 08/01/2015 12:41 AM, Adam Moore wrote:
->> I just saw this happen on a Nexus 9 (running build LMY47X/5.1.1) when it
->> successfully established a BR/EDR connection to my peripheral running
->> Linux 3.14 and BlueZ 5.32.
->>
->> After restarting BT from Settings I started getting LE connections.
->>
->> I have also have the BR/EDR Not Supported bit set in the peripheral's
->> advertising flags.
->>
->> I'll keep an eye on this too.
->>
->> On 7/31/15, 12:47 PM, "linux-bluetooth-owner@vger.kernel.org on behalf
->>of
->> Lukasz Rymanowski" <linux-bluetooth-owner@vger.kernel.org on behalf of
->> lukasz.rymanowski@gmail.com> wrote:
->>
->>> Hi Florian,
->>>
->>> On Thu, Jul 30, 2015 at 6:00 PM, Marcel Holtmann <marcel@holtmann.org>
->>> wrote:
->>>>
->>>> Hi Florian,
->>>>
->>>>>>>>> Symptoms:
->>>>>>>>> - The connection request times out.
->>>>>>>>> - bt_io_accept() is being called but the accept_cb (=connect_cb)
->>>> only gets called when the request times out.
->>>>>>>>> - the device is stuck in the CONNECT READY state and never
->>>> reaches the CONNECTED state
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> Any ideas how I could analyze/solve that problem? I'm stuck on
->>>> this for many hours already...
->>>>>>>>
->>>>>>>> what does btmon actually tell you about what is going on with HCI.
->>>>>>>
->>>>>>> = New Index: 10:68:3F:56:AD:35 (BR/EDR,UNKNOWN,hci0)
->>>> [hci0] 0.629837
->>>>>>> @ Advertising Added: 1
->>>>>>> < HCI Command: LE Set Advertising Para.. (0x08|0x0006) plen 15
->>>> [hci0] 4.398493
->>>>>>>         Min advertising interval: 1280.000 msec (0x0800)
->>>>>>>         Max advertising interval: 1280.000 msec (0x0800)
->>>>>>>         Type: Connectable undirected - ADV_IND (0x00)
->>>>>>>         Own address type: Public (0x00)
->>>>>>>         Direct address type: Public (0x00)
->>>>>>>         Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
->>>>>>>         Channel map: 37, 38, 39 (0x07)
->>>>>>>         Filter policy: Allow Scan Request from Any, Allow Connect
->>>> Request from Any (0x00)
->>>>>>>> HCI Event: Command Complete (0x0e) plen 4
->>>> [hci0] 4.401392
->>>>>>>       LE Set Advertising Parameters (0x08|0x0006) ncmd 1
->>>>>>>         Status: Success (0x00)
->>>>>>> < HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1
->>>> [hci0] 4.401484
->>>>>>>         Advertising: Enabled (0x01)
->>>>>>>> HCI Event: Command Complete (0x0e) plen 4
->>>> [hci0] 4.402277
->>>>>>>       LE Set Advertise Enable (0x08|0x000a) ncmd 1
->>>>>>>         Status: Success (0x00)
->>>>>>>
->>>>>>> There is no connection related HCI activity going on at all on the
->>>> Nexus 4 side. You can see from the debug logs that I sent before, that
->>>> the connection is being initiated correctly. The bt_io_accept() call
->>>> does return without error, just the accept callback never gets called.
->>>> To me it seems as if the Nexus4 was not responding to the incoming
->>>> connect request.
->>>>>>
->>>>>> we are advertising now. If the HCI traffic stays this way, then we
->>>> are basically waiting for the central to connect to us. It is up to
->>>>your
->>>> Nexus 4 to connect.
->>>>>>
->>>>>> If it would connect, then you would see an LE Connect Complete event
->>>> indicated that the connection has been established.
->>>
->>>
->>> Actually I recall  that we face the same on Nexus 4 being in
->>> peripheral role some time ago. That time our analyzes shows that it is
->>> chip or firmware issue. Unfortunately I don't remember if we got rid
->>> of it or not. If you have latest firmware and issue is still there,
->>> that's a bad luck.
->>>
->>>>
->>>>>
->>>>> Sorry, I left out the actual connection part the first time. Here it
->>>> is:
->>>>>
->>>>> = New Index: 10:68:3F:56:AD:35 (BR/EDR,UNKNOWN,hci0)
->>>> [hci0] 0.248759
->>>>>> HCI Event: Connect Request (0x04) plen 10
->>>> [hci0] 9.147279
->>>>>         Address: 94:01:C2:AB:46:05 (OUI 94-01-C2)
->>>>>         Class: 0x5a020c
->>>>>           Major class: Phone (cellular, cordless, payphone, modem)
->>>>>           Minor class: Smart phone
->>>>>           Networking (LAN, Ad hoc)
->>>>>           Capturing (Scanner, Microphone)
->>>>>           Object Transfer (v-Inbox, v-Folder)
->>>>>           Telephony (Cordless telephony, Modem, Headset)
->>>>>         Link type: ACL (0x01)
->>>>
->>>> this is a BR/EDR connection. So it seems even while it sees you
->>>> advertise on LE, it then connects using BR/EDR. Since Bluetooth 4.0
->>>>did
->>>> not allow BR/EDR and LE at the same time. Only Bluetooth 4.1 relaxed
->>>> this.
->>>>
->>>> But it is hilarious that your phone stack sees an LE advertising and
->>>> then connects to you over BR/EDR.
->>>>
->>>> Regards
->>>>
->>>> Marcel
->>>>
->>>
->>> £ukasz
->>>
->>>>
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe
->>>> linux-bluetooth" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe
->>> linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->> Statement of Confidentiality
->>
->> The contents of this e-mail message and any attachments are
->>confidential and are intended solely for the addressee. The information
->>may also be legally privileged. This transmission is sent in trust, and
->>the sole purpose of delivery to the intended recipient. If you have
->>received this transmission in error, any use, reproduction or
->>dissemination of this transmission is strictly prohibited. If you are
->>not the intended recipient, please immediately notify the sender by
->>reply e-mail or at 508.683.2500 and delete this message and its
->>attachments, if any.
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe
->>linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->
-
-
-Statement of Confidentiality
-
-The contents of this e-mail message and any attachments are confidential and are intended solely for the addressee. The information may also be legally privileged. This transmission is sent in trust, and the sole purpose of delivery to the intended recipient. If you have received this transmission in error, any use, reproduction or dissemination of this transmission is strictly prohibited. If you are not the intended recipient, please immediately notify the sender by reply e-mail or at 508.683.2500 and delete this message and its attachments, if any.
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 526f97a..8ea0b93 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -145,6 +145,11 @@ struct btdev {
+ 	uint16_t sync_train_interval;
+ 	uint32_t sync_train_timeout;
+ 	uint8_t  sync_train_service_data;
++
++	bool     le_noresp_conn_request;
++	bool     pending_le_conn;
++	uint8_t  pending_le_conn_addr[6];
++	uint8_t  pending_le_conn_addr_type;
+ };
+ 
+ struct inquiry_data {
+@@ -665,6 +670,11 @@ bool btdev_is_le_scan_enabled(struct btdev *btdev)
+ 	return btdev->le_scan_enable;
+ }
+ 
++void btdev_set_le_noresp_conn_request(struct btdev *btdev, bool value)
++{
++	btdev->le_noresp_conn_request = value;
++}
++
+ static bool use_ssp(struct btdev *btdev1, struct btdev *btdev2)
+ {
+ 	if (btdev1->auth_enable || btdev2->auth_enable)
+@@ -1125,6 +1135,9 @@ static void le_conn_complete(struct btdev *btdev,
+ 		cc->handle = cpu_to_le16(42);
+ 	}
+ 
++	if (btdev->pending_le_conn)
++		btdev->pending_le_conn = false;
++
+ 	cc->status = status;
+ 	cc->peer_addr_type = bdaddr_type;
+ 	memcpy(cc->peer_addr, bdaddr, 6);
+@@ -1174,6 +1187,13 @@ static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
+ {
+ 	struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr, bdaddr_type);
+ 
++	if (remote && remote->le_noresp_conn_request) {
++		btdev->pending_le_conn = true;
++		memcpy(btdev->pending_le_conn_addr, bdaddr, 6);
++		btdev->pending_le_conn_addr_type = bdaddr_type;
++		return;
++	}
++
+ 	if (remote && adv_connectable(remote) && adv_match(btdev, remote) &&
+ 					remote->le_adv_own_addr == bdaddr_type)
+ 		le_conn_complete(btdev, bdaddr, bdaddr_type, 0);
+@@ -1182,6 +1202,14 @@ static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
+ 					BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH);
+ }
+ 
++static void le_conn_cancel_request(struct btdev *btdev)
++{
++	if (btdev->pending_le_conn)
++		le_conn_complete(btdev, btdev->pending_le_conn_addr,
++					btdev->pending_le_conn_addr_type,
++					BT_HCI_ERR_UNKNOWN_CONN_ID);
++}
++
+ static void conn_request(struct btdev *btdev, const uint8_t *bdaddr)
+ {
+ 	struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
+@@ -2954,6 +2982,17 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
+ 		break;
+ 
++	case BT_HCI_CMD_LE_CREATE_CONN_CANCEL:
++		if (btdev->type == BTDEV_TYPE_BREDR)
++			goto unsupported;
++
++		if (btdev->pending_le_conn)
++			cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
++		else
++			cmd_status(btdev, BT_HCI_ERR_COMMAND_DISALLOWED,
++								opcode);
++		break;
++
+ 	case BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE:
+ 		if (btdev->type == BTDEV_TYPE_BREDR)
+ 			goto unsupported;
+@@ -3322,6 +3361,12 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
+ 		le_conn_request(btdev, lecc->peer_addr, lecc->peer_addr_type);
+ 		break;
+ 
++	case BT_HCI_CMD_LE_CREATE_CONN_CANCEL:
++		if (btdev->type == BTDEV_TYPE_BREDR)
++			return;
++		le_conn_cancel_request(btdev);
++		break;
++
+ 	case BT_HCI_CMD_LE_CONN_UPDATE:
+ 		if (btdev->type == BTDEV_TYPE_BREDR)
+ 			return;
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index 8b116e4..e0e9f15 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -82,6 +82,8 @@ uint8_t *btdev_get_features(struct btdev *btdev);
+ 
+ bool btdev_is_le_scan_enabled(struct btdev *btdev);
+ 
++void btdev_set_le_noresp_conn_request(struct btdev *btdev, bool value);
++
+ void btdev_set_command_handler(struct btdev *btdev, btdev_command_func handler,
+ 							void *user_data);
+ 
+diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+index c04aa6d..2e57b1f 100644
+--- a/emulator/hciemu.c
++++ b/emulator/hciemu.c
+@@ -435,6 +435,14 @@ const bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu)
+ 	return btdev_is_le_scan_enabled(hciemu->master_dev);
+ }
+ 
++void hciemu_set_client_le_noresp_conn_request(struct hciemu *hciemu, bool value)
++{
++	if (!hciemu || !hciemu->client_dev)
++		return;
++
++	btdev_set_le_noresp_conn_request(hciemu->client_dev, value);
++}
++
+ bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
+ 			hciemu_command_func_t function, void *user_data)
+ {
+diff --git a/emulator/hciemu.h b/emulator/hciemu.h
+index a526d8c..3c2d098 100644
+--- a/emulator/hciemu.h
++++ b/emulator/hciemu.h
+@@ -55,6 +55,9 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
+ 
+ const bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu);
+ 
++void hciemu_set_client_le_noresp_conn_request(struct hciemu *hciemu,
++								bool value);
++
+ typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
+ 						uint8_t len, void *user_data);
+ 
+-- 
+2.1.4
 
