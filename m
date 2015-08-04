@@ -2,264 +2,184 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v3 8/8] tools/l2cap-tester: Connect to two devices test.
-Date: Tue,  4 Aug 2015 15:20:11 +0200
-Message-Id: <1438694411-6080-8-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v3 4/8] tools/l2cap-tester: Disconnect during connect attempt test
+Date: Tue,  4 Aug 2015 15:20:07 +0200
+Message-Id: <1438694411-6080-4-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1438694411-6080-1-git-send-email-jpawlowski@google.com>
 References: <1438694411-6080-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test tries to connect to two devices at same device, and makes sure
-that both connections are successfull.
+This patch adds test that checks folowing:
+1. Try to connect to existing BLE device that is not advertising.
+2. Internally in kernel this adds this device to whitelist and enable scan.
+3. Make the device advertise once. That would stop the scan, and trigger
+   connect attempt to device.
+4. Close socket. This should stop the connect attempt, by sending
+   BT_HCI_CMD_LE_CREATE_CONN_CANCEL.
 ---
- tools/l2cap-tester.c | 129 +++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 125 insertions(+), 4 deletions(-)
+ tools/l2cap-tester.c | 103 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 97 insertions(+), 6 deletions(-)
 
 diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 46913d2..4f96494 100644
+index bca7f75..1b7ee94 100644
 --- a/tools/l2cap-tester.c
 +++ b/tools/l2cap-tester.c
-@@ -57,6 +57,13 @@ struct test_data {
- 	int sk2;
- };
+@@ -88,6 +88,7 @@ struct l2cap_data {
+ 	uint8_t addr_type;
  
-+/* values of second_socket_dest */
-+enum {
-+	CLIENT_1,
-+	CLIENT_2,
-+	UNKNOWN_HOST
-+};
-+
- struct l2cap_data {
- 	uint16_t client_psm;
- 	uint16_t server_psm;
-@@ -91,6 +98,7 @@ struct l2cap_data {
  	uint8_t *client_bdaddr;
- 	bool server_not_advertising;
- 	bool close_one_socket;
-+	uint8_t second_socket_dest;
++	bool server_not_advertising;
  };
  
  static void mgmt_debug(const char *str, void *user_data)
-@@ -471,6 +479,14 @@ static const struct l2cap_data le_client_two_sockets_same_client = {
- 	.client_psm = 0x0080,
- 	.server_psm = 0x0080,
- 	.server_not_advertising = true,
-+	.second_socket_dest = CLIENT_1,
+@@ -459,6 +460,11 @@ static const struct l2cap_data le_client_close_socket_test_1 = {
+ 	.client_bdaddr = nonexisting_bdaddr,
+ };
+ 
++static const struct l2cap_data le_client_close_socket_test_2 = {
++	.client_psm = 0x0080,
++	.server_not_advertising = true,
 +};
 +
-+static const struct l2cap_data le_client_two_sockets_2 = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.server_not_advertising = true,
-+	.second_socket_dest = CLIENT_2,
- };
- 
- static const struct l2cap_data le_client_two_sockets_close_one = {
-@@ -478,6 +494,7 @@ static const struct l2cap_data le_client_two_sockets_close_one = {
- 	.server_psm = 0x0080,
- 	.server_not_advertising = true,
- 	.close_one_socket = true,
-+	.second_socket_dest = CLIENT_1,
- };
- 
  static const struct l2cap_data le_client_connect_nval_psm_test = {
-@@ -542,6 +559,39 @@ static void client_cmd_complete(uint16_t opcode, uint8_t status,
- 		tester_setup_complete();
- }
- 
-+static void client_2_cmd_complete(uint16_t opcode, uint8_t status,
-+					const void *param, uint8_t len,
-+					void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct l2cap_data *test = data->test_data;
-+	struct bthost *bthost;
-+
-+	bthost = hciemu_client_2_get_host(data->hciemu);
-+
-+	switch (opcode) {
-+	case BT_HCI_CMD_WRITE_SCAN_ENABLE:
-+	case BT_HCI_CMD_LE_SET_ADV_ENABLE:
-+		tester_print("Client 2 set connectable status 0x%02x", status);
-+		if (!status && test && test->enable_ssp) {
-+			bthost_write_ssp_mode(bthost, 0x01);
-+			return;
-+		}
-+		break;
-+	case BT_HCI_CMD_WRITE_SIMPLE_PAIRING_MODE:
-+		tester_print("Client enable SSP status 0x%02x", status);
-+		break;
-+	default:
-+		return;
-+	}
-+
-+
-+	if (status)
-+		tester_setup_failed();
-+	else
-+		tester_setup_complete();
-+}
-+
- static void server_cmd_complete(uint16_t opcode, uint8_t status,
- 					const void *param, uint8_t len,
- 					void *user_data)
-@@ -565,7 +615,7 @@ static void setup_powered_client_callback(uint8_t status, uint16_t length,
+ 	.client_psm = 0x0080,
+ 	.expect_err = ECONNREFUSED,
+@@ -543,6 +549,7 @@ static void setup_powered_client_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
  	struct test_data *data = tester_get_data();
- 	const struct l2cap_data *l2data = data->test_data;
--	struct bthost *bthost;
-+	struct bthost *bthost, *bthost_2;
++	const struct l2cap_data *l2data = data->test_data;
+ 	struct bthost *bthost;
  
  	if (status != MGMT_STATUS_SUCCESS) {
- 		tester_setup_failed();
-@@ -577,6 +627,9 @@ static void setup_powered_client_callback(uint8_t status, uint16_t length,
+@@ -554,10 +561,15 @@ static void setup_powered_client_callback(uint8_t status, uint16_t length,
+ 
  	bthost = hciemu_client_get_host(data->hciemu);
  	bthost_set_cmd_complete_cb(bthost, client_cmd_complete, user_data);
- 
-+	bthost_2 = hciemu_client_2_get_host(data->hciemu);
-+	bthost_set_cmd_complete_cb(bthost_2, client_2_cmd_complete, user_data);
+-	if (data->hciemu_type == HCIEMU_TYPE_LE)
+-		bthost_set_adv_enable(bthost, 0x01);
+-	else
 +
- 	if (data->hciemu_type == HCIEMU_TYPE_LE) {
- 		if (!l2data || !l2data->server_not_advertising)
- 			bthost_set_adv_enable(bthost, 0x01);
-@@ -702,6 +755,50 @@ static void send_rsp_new_conn(uint16_t handle, void *user_data)
- 						bthost_send_rsp, NULL);
++	if (data->hciemu_type == HCIEMU_TYPE_LE) {
++		if (!l2data || !l2data->server_not_advertising)
++			bthost_set_adv_enable(bthost, 0x01);
++		else
++			tester_setup_complete();
++	} else {
+ 		bthost_write_scan_enable(bthost, 0x03);
++	}
  }
  
-+static void bthost_send_rsp_2(const void *buf, uint16_t len, void *user_data)
+ static void setup_powered_server_callback(uint8_t status, uint16_t length,
+@@ -1242,18 +1254,92 @@ static gboolean test_close_socket_1_part_2(gpointer args)
+ 	return FALSE;
+ }
+ 
++static gboolean test_close_socket_2_part_3(gpointer arg)
++{
++	struct test_data *data = tester_get_data();
++	int sk = data->sk;
++	int err;
++
++	/* Scan should be already over, we're trying to create connection */
++	if (hciemu_is_master_le_scan_enabled(data->hciemu)) {
++		tester_print("Error - should no longer scan");
++		tester_test_failed();
++		return FALSE;
++	}
++
++	/* Calling close() should eventually cause CMD_LE_CREATE_CONN_CANCEL */
++	err = close(sk);
++	if (err < 0) {
++		tester_print("Error when closing socket");
++		tester_test_failed();
++		return FALSE;
++	}
++
++	/* CMD_LE_CREATE_CONN_CANCEL will trigger test pass. */
++	return FALSE;
++}
++
++static gboolean test_close_socket_2_part_2(gpointer arg)
++{
++	struct test_data *data = tester_get_data();
++	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++
++	/* Make sure CMD_LE_CREATE_CONN will not immediately result in
++	 * BT_HCI_EVT_CONN_COMPLETE.
++	 */
++	hciemu_set_client_le_noresp_conn_request(data->hciemu, true);
++
++	/* Advertise once. After that, kernel should stop scanning, and trigger
++	 * BT_HCI_CMD_LE_CREATE_CONN_CANCEL.
++	 */
++	bthost_set_adv_enable(bthost, 0x01);
++	bthost_set_adv_enable(bthost, 0x00);
++}
++
++static void test_close_socket_scan_enabled(void)
 +{
 +	struct test_data *data = tester_get_data();
 +	const struct l2cap_data *l2data = data->test_data;
-+	struct bthost *bthost;
 +
-+	if (l2data->expect_cmd_len && len != l2data->expect_cmd_len) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	if (l2data->expect_cmd && memcmp(buf, l2data->expect_cmd,
-+						l2data->expect_cmd_len)) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	if (!l2data->send_cmd)
-+		return;
-+
-+	bthost = hciemu_client_2_get_host(data->hciemu);
-+	bthost_send_cid(bthost, data->handle, data->dcid,
-+				l2data->send_cmd, l2data->send_cmd_len);
++	if (l2data == &le_client_close_socket_test_1)
++		g_idle_add(test_close_socket_1_part_2, NULL);
++	else if (l2data == &le_client_close_socket_test_2)
++		g_idle_add(test_close_socket_2_part_2, NULL);
 +}
 +
-+static void send_rsp_new_conn_2(uint16_t handle, void *user_data)
++static void test_close_socket_scan_disabled(void)
 +{
-+	struct test_data *data = user_data;
-+	struct bthost *bthost;
++	struct test_data *data = tester_get_data();
++	const struct l2cap_data *l2data = data->test_data;
 +
-+	tester_print("New connection with handle 0x%04x", handle);
-+
-+	data->handle = handle;
-+
-+	if (data->hciemu_type == HCIEMU_TYPE_LE)
-+		data->dcid = 0x0005;
-+	else
-+		data->dcid = 0x0001;
-+
-+	bthost = hciemu_client_2_get_host(data->hciemu);
-+	bthost_add_cid_hook(bthost, data->handle, data->dcid,
-+						bthost_send_rsp_2, NULL);
++	if (l2data == &le_client_close_socket_test_1)
++		g_idle_add(test_close_socket_1_part_3, NULL);
++	else if (l2data == &le_client_close_socket_test_2)
++		g_idle_add(test_close_socket_2_part_3, NULL);
 +}
 +
- static void setup_powered_common(void)
++static void test_close_socket_conn_cancel(void)
++{
++	struct test_data *data = tester_get_data();
++	const struct l2cap_data *l2data = data->test_data;
++
++	if (l2data == &le_client_close_socket_test_2)
++		tester_test_passed();
++}
++
+ static void test_close_socket_router(uint16_t opcode, const void *param,
+ 					uint8_t length, void *user_data)
  {
- 	struct test_data *data = tester_get_data();
-@@ -750,8 +847,13 @@ static void setup_powered_client(const void *test_data)
- 	tester_print("Powering on controller");
+ 	/* tester_print("HCI Command 0x%04x length %u", opcode, length); */
+-
+ 	if (opcode == BT_HCI_CMD_LE_SET_SCAN_ENABLE) {
+ 		const struct bt_hci_cmd_le_set_scan_enable *scan_params = param;
  
- 	if (test && (test->expect_cmd || test->send_cmd)) {
--		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+		struct bthost *bthost, *bthost_2;
-+
-+		bthost = hciemu_client_get_host(data->hciemu);
-+		bthost_2 = hciemu_client_2_get_host(data->hciemu);
-+
- 		bthost_set_connect_cb(bthost, send_rsp_new_conn, data);
-+		bthost_set_connect_cb(bthost_2, send_rsp_new_conn_2, data);
+ 		if (scan_params->enable == true)
+-			g_idle_add(test_close_socket_1_part_2, NULL);
++			test_close_socket_scan_enabled();
+ 		else
+-			g_idle_add(test_close_socket_1_part_3, NULL);
++			test_close_socket_scan_disabled();
++	} else if (opcode == BT_HCI_CMD_LE_CREATE_CONN_CANCEL) {
++		test_close_socket_conn_cancel();
  	}
- 
- 	mgmt_send(data->mgmt, MGMT_OP_SET_POWERED, data->mgmt_index,
-@@ -1388,6 +1490,8 @@ static gboolean test_two_sockets_connect_cb(GIOChannel *io, GIOCondition cond,
- 
- 	sk = g_io_channel_unix_get_fd(io);
- 
-+	tester_print("test_two_sockets_connect_cb *******************\n");
-+
- 	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &sk_err, &len) < 0)
- 		err = -errno;
- 	else
-@@ -1420,8 +1524,10 @@ static gboolean enable_advertising(gpointer args)
- {
- 	struct test_data *data = tester_get_data();
- 	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+	struct bthost *bthost_2 = hciemu_client_2_get_host(data->hciemu);
- 
- 	bthost_set_adv_enable(bthost, 0x01);
-+	bthost_set_adv_enable(bthost_2, 0x01);
  }
  
- void test_connect_two_sockets_part_2(void)
-@@ -1431,6 +1537,11 @@ void test_connect_two_sockets_part_2(void)
- 	const uint8_t *client_bdaddr;
- 
- 	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
-+	if (l2data->second_socket_dest == CLIENT_1)
-+		client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
-+	else if (l2data->second_socket_dest == CLIENT_2)
-+		client_bdaddr = hciemu_get_client_2_bdaddr(data->hciemu);
-+
- 	connect_socket(client_bdaddr, &data->sk2, test_two_sockets_connect_cb);
- 
- 	if (l2data->close_one_socket) {
-@@ -1438,7 +1549,8 @@ void test_connect_two_sockets_part_2(void)
- 		close(data->sk);
- 	}
- 
--	g_idle_add(enable_advertising, NULL);
-+	if (l2data->second_socket_dest == CLIENT_1)
-+		g_idle_add(enable_advertising, NULL);
- }
- 
- static uint8_t test_scan_enable_counter;
-@@ -1472,10 +1584,14 @@ static void test_connect_two_sockets(const void *test_data)
- 
- 	if (l2data->server_psm) {
- 		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+		struct bthost *bthost_2 = hciemu_client_get_host(data->hciemu);
- 
--		if (!l2data->data_len)
-+		if (!l2data->data_len) {
- 			bthost_add_l2cap_server(bthost, l2data->server_psm,
- 						NULL, NULL);
-+			bthost_add_l2cap_server(bthost_2, l2data->server_psm,
-+						NULL, NULL);
-+		}
- 	}
- 
- 	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
-@@ -1817,6 +1933,11 @@ int main(int argc, char *argv[])
+@@ -1595,6 +1681,11 @@ int main(int argc, char *argv[])
  				setup_powered_client,
- 				test_connect_two_sockets);
+ 				test_close_socket);
  
-+	test_l2cap_le("L2CAP LE Client - Open two sockets 2",
-+				&le_client_two_sockets_2,
++	test_l2cap_le("L2CAP LE Client - Close socket 2",
++				&le_client_close_socket_test_2,
 +				setup_powered_client,
-+				test_connect_two_sockets);
++				test_close_socket);
 +
- 	test_l2cap_le("L2CAP LE Client - Open two sockets close one",
- 				&le_client_two_sockets_close_one,
- 				setup_powered_client,
+ 	test_l2cap_le("L2CAP LE Client - Invalid PSM",
+ 					&le_client_connect_nval_psm_test,
+ 					setup_powered_client, test_connect);
 -- 
 2.1.4
 
