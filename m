@@ -2,184 +2,80 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v3 4/8] tools/l2cap-tester: Disconnect during connect attempt test
-Date: Tue,  4 Aug 2015 15:20:07 +0200
-Message-Id: <1438694411-6080-4-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1438694411-6080-1-git-send-email-jpawlowski@google.com>
-References: <1438694411-6080-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v3 1/8] emulator: add support for checking le scan state
+Date: Tue,  4 Aug 2015 15:20:04 +0200
+Message-Id: <1438694411-6080-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds test that checks folowing:
-1. Try to connect to existing BLE device that is not advertising.
-2. Internally in kernel this adds this device to whitelist and enable scan.
-3. Make the device advertise once. That would stop the scan, and trigger
-   connect attempt to device.
-4. Close socket. This should stop the connect attempt, by sending
-   BT_HCI_CMD_LE_CREATE_CONN_CANCEL.
 ---
- tools/l2cap-tester.c | 103 ++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 97 insertions(+), 6 deletions(-)
+ emulator/btdev.c  | 5 +++++
+ emulator/btdev.h  | 2 ++
+ emulator/hciemu.c | 8 ++++++++
+ emulator/hciemu.h | 2 ++
+ 4 files changed, 17 insertions(+)
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index bca7f75..1b7ee94 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -88,6 +88,7 @@ struct l2cap_data {
- 	uint8_t addr_type;
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index cd211ef..526f97a 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -660,6 +660,11 @@ uint8_t *btdev_get_features(struct btdev *btdev)
+ 	return btdev->features;
+ }
  
- 	uint8_t *client_bdaddr;
-+	bool server_not_advertising;
- };
- 
- static void mgmt_debug(const char *str, void *user_data)
-@@ -459,6 +460,11 @@ static const struct l2cap_data le_client_close_socket_test_1 = {
- 	.client_bdaddr = nonexisting_bdaddr,
- };
- 
-+static const struct l2cap_data le_client_close_socket_test_2 = {
-+	.client_psm = 0x0080,
-+	.server_not_advertising = true,
-+};
++bool btdev_is_le_scan_enabled(struct btdev *btdev)
++{
++	return btdev->le_scan_enable;
++}
 +
- static const struct l2cap_data le_client_connect_nval_psm_test = {
- 	.client_psm = 0x0080,
- 	.expect_err = ECONNREFUSED,
-@@ -543,6 +549,7 @@ static void setup_powered_client_callback(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
+ static bool use_ssp(struct btdev *btdev1, struct btdev *btdev2)
  {
- 	struct test_data *data = tester_get_data();
-+	const struct l2cap_data *l2data = data->test_data;
- 	struct bthost *bthost;
+ 	if (btdev1->auth_enable || btdev2->auth_enable)
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index 4b724a7..8b116e4 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -80,6 +80,8 @@ void btdev_destroy(struct btdev *btdev);
+ const uint8_t *btdev_get_bdaddr(struct btdev *btdev);
+ uint8_t *btdev_get_features(struct btdev *btdev);
  
- 	if (status != MGMT_STATUS_SUCCESS) {
-@@ -554,10 +561,15 @@ static void setup_powered_client_callback(uint8_t status, uint16_t length,
- 
- 	bthost = hciemu_client_get_host(data->hciemu);
- 	bthost_set_cmd_complete_cb(bthost, client_cmd_complete, user_data);
--	if (data->hciemu_type == HCIEMU_TYPE_LE)
--		bthost_set_adv_enable(bthost, 0x01);
--	else
++bool btdev_is_le_scan_enabled(struct btdev *btdev);
 +
-+	if (data->hciemu_type == HCIEMU_TYPE_LE) {
-+		if (!l2data || !l2data->server_not_advertising)
-+			bthost_set_adv_enable(bthost, 0x01);
-+		else
-+			tester_setup_complete();
-+	} else {
- 		bthost_write_scan_enable(bthost, 0x03);
-+	}
+ void btdev_set_command_handler(struct btdev *btdev, btdev_command_func handler,
+ 							void *user_data);
+ 
+diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+index 4881a24..c04aa6d 100644
+--- a/emulator/hciemu.c
++++ b/emulator/hciemu.c
+@@ -427,6 +427,14 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu)
+ 	return btdev_get_bdaddr(hciemu->client_dev);
  }
  
- static void setup_powered_server_callback(uint8_t status, uint16_t length,
-@@ -1242,18 +1254,92 @@ static gboolean test_close_socket_1_part_2(gpointer args)
- 	return FALSE;
- }
- 
-+static gboolean test_close_socket_2_part_3(gpointer arg)
++const bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu)
 +{
-+	struct test_data *data = tester_get_data();
-+	int sk = data->sk;
-+	int err;
++	if (!hciemu || !hciemu->master_dev)
++		return NULL;
 +
-+	/* Scan should be already over, we're trying to create connection */
-+	if (hciemu_is_master_le_scan_enabled(data->hciemu)) {
-+		tester_print("Error - should no longer scan");
-+		tester_test_failed();
-+		return FALSE;
-+	}
-+
-+	/* Calling close() should eventually cause CMD_LE_CREATE_CONN_CANCEL */
-+	err = close(sk);
-+	if (err < 0) {
-+		tester_print("Error when closing socket");
-+		tester_test_failed();
-+		return FALSE;
-+	}
-+
-+	/* CMD_LE_CREATE_CONN_CANCEL will trigger test pass. */
-+	return FALSE;
++	return btdev_is_le_scan_enabled(hciemu->master_dev);
 +}
 +
-+static gboolean test_close_socket_2_part_2(gpointer arg)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+
-+	/* Make sure CMD_LE_CREATE_CONN will not immediately result in
-+	 * BT_HCI_EVT_CONN_COMPLETE.
-+	 */
-+	hciemu_set_client_le_noresp_conn_request(data->hciemu, true);
-+
-+	/* Advertise once. After that, kernel should stop scanning, and trigger
-+	 * BT_HCI_CMD_LE_CREATE_CONN_CANCEL.
-+	 */
-+	bthost_set_adv_enable(bthost, 0x01);
-+	bthost_set_adv_enable(bthost, 0x00);
-+}
-+
-+static void test_close_socket_scan_enabled(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct l2cap_data *l2data = data->test_data;
-+
-+	if (l2data == &le_client_close_socket_test_1)
-+		g_idle_add(test_close_socket_1_part_2, NULL);
-+	else if (l2data == &le_client_close_socket_test_2)
-+		g_idle_add(test_close_socket_2_part_2, NULL);
-+}
-+
-+static void test_close_socket_scan_disabled(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct l2cap_data *l2data = data->test_data;
-+
-+	if (l2data == &le_client_close_socket_test_1)
-+		g_idle_add(test_close_socket_1_part_3, NULL);
-+	else if (l2data == &le_client_close_socket_test_2)
-+		g_idle_add(test_close_socket_2_part_3, NULL);
-+}
-+
-+static void test_close_socket_conn_cancel(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct l2cap_data *l2data = data->test_data;
-+
-+	if (l2data == &le_client_close_socket_test_2)
-+		tester_test_passed();
-+}
-+
- static void test_close_socket_router(uint16_t opcode, const void *param,
- 					uint8_t length, void *user_data)
+ bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
+ 			hciemu_command_func_t function, void *user_data)
  {
- 	/* tester_print("HCI Command 0x%04x length %u", opcode, length); */
--
- 	if (opcode == BT_HCI_CMD_LE_SET_SCAN_ENABLE) {
- 		const struct bt_hci_cmd_le_set_scan_enable *scan_params = param;
+diff --git a/emulator/hciemu.h b/emulator/hciemu.h
+index 41ca3fc..a526d8c 100644
+--- a/emulator/hciemu.h
++++ b/emulator/hciemu.h
+@@ -53,6 +53,8 @@ uint8_t *hciemu_get_features(struct hciemu *hciemu);
+ const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu);
+ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
  
- 		if (scan_params->enable == true)
--			g_idle_add(test_close_socket_1_part_2, NULL);
-+			test_close_socket_scan_enabled();
- 		else
--			g_idle_add(test_close_socket_1_part_3, NULL);
-+			test_close_socket_scan_disabled();
-+	} else if (opcode == BT_HCI_CMD_LE_CREATE_CONN_CANCEL) {
-+		test_close_socket_conn_cancel();
- 	}
- }
- 
-@@ -1595,6 +1681,11 @@ int main(int argc, char *argv[])
- 				setup_powered_client,
- 				test_close_socket);
- 
-+	test_l2cap_le("L2CAP LE Client - Close socket 2",
-+				&le_client_close_socket_test_2,
-+				setup_powered_client,
-+				test_close_socket);
++const bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu);
 +
- 	test_l2cap_le("L2CAP LE Client - Invalid PSM",
- 					&le_client_connect_nval_psm_test,
- 					setup_powered_client, test_connect);
+ typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
+ 						uint8_t len, void *user_data);
+ 
 -- 
 2.1.4
 
