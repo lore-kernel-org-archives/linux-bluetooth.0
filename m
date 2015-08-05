@@ -2,16 +2,14 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v1] Bluetooth: fix MGMT_EV_NEW_LONG_TERM_KEY event
-Date: Wed,  5 Aug 2015 23:16:29 +0200
-Message-Id: <1438809389-4230-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH] Bluetooth: fix MGMT_EV_NEW_LONG_TERM_KEY event
+Date: Wed,  5 Aug 2015 18:25:50 +0200
+Message-Id: <1438791950-2497-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This patch fixes how MGMT_EV_NEW_LONG_TERM_KEY event is build. Right now
-val vield is filled with only 1 byte, instead of whole value. This bug
-was introduced in
-commit 1fc62c526a57 ("Bluetooth: Fix exposing full value of shortened LTKs")
+val vield is filled with only 1 byte, instead of whole value.
 
 Before that patch, if you paired with device using bluetoothd using simple
 pairing, and then restarted bluetoothd, you would be able to re-connect,
