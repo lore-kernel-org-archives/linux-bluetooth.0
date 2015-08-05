@@ -1,61 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v9 1/6] Bluetooth: preparation for new connect procedure
-Date: Wed,  5 Aug 2015 16:51:53 +0200
-Message-Id: <1438786318-6725-1-git-send-email-jpawlowski@google.com>
+Cc: bharat.panda@samsung.com,
+	Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Subject: [PATCH] src/profile: Add GoepL2CapPsm in SDP record
+Date: Wed, 05 Aug 2015 18:26:15 +0530
+Message-id: <1438779375-12187-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently, when trying to connect to already paired device that just
-rotated its RPA MAC address, old address would be used and connection
-would fail. In order to fix that, kernel must scan and receive
-advertisement with fresh RPA before connecting.
+As per the MAP & PBAP v1.2 SDP table, it should contain the GoepL2CapPsm
+in its SDP record. This patch adds the same.
 
-This patch adds some fields to hci_conn_params, in preparation to new
-connect procedure.
-
-explicit_connect will be used to override any current auto_connect action,
-and connect to device when ad is received.
-
-HCI_AUTO_CONN_EXPLICIT was added to auto_connect enum. When this value
-will be used, explicit connect is the only action, and params can be
-removed after successful connection.
-
-HCI_CONN_SCANNING is added to hci_conn flags. When it's set, connect is
-scan phase. It gets cleared when advertisement is received, and
-HCI_OP_LE_CREATE_CONN is sent.
-
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+The below test cases verifies the presence of GoepL2CapPsm attribute is
+in SDP record.
+TC_PSE_CON_BV_02_C - PASS
+TC_MSE_CON_BV_02_C - PASS
 ---
- include/net/bluetooth/hci_core.h | 3 +++
- 1 file changed, 3 insertions(+)
+ src/profile.c | 38 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 31 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2a6b091..c8d2b5a 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -512,9 +512,11 @@ struct hci_conn_params {
- 		HCI_AUTO_CONN_DIRECT,
- 		HCI_AUTO_CONN_ALWAYS,
- 		HCI_AUTO_CONN_LINK_LOSS,
-+		HCI_AUTO_CONN_EXPLICIT,
- 	} auto_connect;
+diff --git a/src/profile.c b/src/profile.c
+index 4b73026..f54749e 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -435,6 +435,9 @@
+ 		<attribute id=\"0x0317\">				\
+ 			<uint32 value=\"0x00000003\"/>			\
+ 		</attribute>						\
++		<attribute id=\"0x0200\">				\
++			<uint16 value=\"%u\" name=\"psm\"/>		\
++		</attribute>						\
+ 	</record>"
  
- 	struct hci_conn *conn;
-+	bool explicit_connect;
- };
+ #define MAS_RECORD							\
+@@ -484,6 +487,9 @@
+ 		<attribute id=\"0x0317\">				\
+ 			<uint32 value=\"0x0000007f\"/>			\
+ 		</attribute>						\
++		<attribute id=\"0x0200\">				\
++			<uint16 value=\"%u\" name=\"psm\"/>		\
++		</attribute>						\
+ 	</record>"
  
- extern struct list_head hci_dev_list;
-@@ -639,6 +641,7 @@ enum {
- 	HCI_CONN_DROP,
- 	HCI_CONN_PARAM_REMOVAL_PEND,
- 	HCI_CONN_NEW_LINK_KEY,
-+	HCI_CONN_SCANNING,
- };
+ #define MNS_RECORD							\
+@@ -524,12 +530,12 @@
+ 		<attribute id=\"0x0100\">				\
+ 			<text value=\"%s\"/>				\
+ 		</attribute>						\
+-		<attribute id=\"0x0200\">				\
+-			<uint16 value=\"%u\" name=\"psm\"/>		\
+-		</attribute>						\
+ 		<attribute id=\"0x0317\">				\
+ 			<uint32 value=\"0x0000007f\"/>			\
+ 		</attribute>						\
++		<attribute id=\"0x0200\">				\
++			<uint16 value=\"%u\" name=\"psm\"/>		\
++		</attribute>						\
+ 	</record>"
  
- static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+ #define SYNC_RECORD							\
+@@ -1792,15 +1798,29 @@ static char *get_pce_record(struct ext_profile *ext, struct ext_io *l2cap,
+ static char *get_pse_record(struct ext_profile *ext, struct ext_io *l2cap,
+ 							struct ext_io *rfcomm)
+ {
+-	return g_strdup_printf(PSE_RECORD, rfcomm->chan, ext->version,
+-								ext->name);
++	uint16_t psm = 0;
++	uint8_t chan = 0;
++
++	if (l2cap)
++		psm = l2cap->psm;
++	if (rfcomm)
++		chan = rfcomm->chan;
++
++	return g_strdup_printf(PSE_RECORD, chan, ext->version, ext->name, psm);
+ }
+ 
+ static char *get_mas_record(struct ext_profile *ext, struct ext_io *l2cap,
+ 							struct ext_io *rfcomm)
+ {
+-	return g_strdup_printf(MAS_RECORD, rfcomm->chan, ext->version,
+-								ext->name);
++	uint16_t psm = 0;
++	uint8_t chan = 0;
++
++	if (l2cap)
++		psm = l2cap->psm;
++	if (rfcomm)
++		chan = rfcomm->chan;
++
++	return g_strdup_printf(MAS_RECORD, chan, ext->version, ext->name, psm);
+ }
+ 
+ static char *get_mns_record(struct ext_profile *ext, struct ext_io *l2cap,
+@@ -2001,6 +2021,8 @@ static struct default_settings {
+ 		.uuid		= OBEX_PSE_UUID,
+ 		.name		= "Phone Book Access",
+ 		.channel	= PBAP_DEFAULT_CHANNEL,
++		.psm		= BTD_PROFILE_PSM_AUTO,
++		.mode		= BT_IO_MODE_ERTM,
+ 		.authorize	= true,
+ 		.get_record	= get_pse_record,
+ 		.version	= 0x0101,
+@@ -2015,6 +2037,8 @@ static struct default_settings {
+ 		.uuid		= OBEX_MAS_UUID,
+ 		.name		= "Message Access",
+ 		.channel	= MAS_DEFAULT_CHANNEL,
++		.psm		= BTD_PROFILE_PSM_AUTO,
++		.mode		= BT_IO_MODE_ERTM,
+ 		.authorize	= true,
+ 		.get_record	= get_mas_record,
+ 		.version	= 0x0100
 -- 
-2.1.4
+1.9.1
 
