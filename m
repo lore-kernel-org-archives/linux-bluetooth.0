@@ -2,243 +2,146 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v8 4/6] Bluetooth: advertisement handling in new connect procedure
-Date: Wed,  5 Aug 2015 11:56:12 +0200
-Message-Id: <1438768574-9280-4-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v8 2/6] Bluetooth: add hci_lookup_le_connect
+Date: Wed,  5 Aug 2015 11:56:10 +0200
+Message-Id: <1438768574-9280-2-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1438768574-9280-1-git-send-email-jpawlowski@google.com>
 References: <1438768574-9280-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently, when trying to connect to already paired device that just
-rotated its RPA MAC address, old address would be used and connection
-would fail. In order to fix that, kernel must scan and receive
-advertisement with fresh RPA before connecting.
-
-This path makes sure that after advertisement is received from device that
-we try to connect to, it is properly handled in check_pending_le_conn and
-trigger connect attempt.
-
-It also modifies hci_le_connect to make sure that connect attempt will be
-properly continued.
+This patch adds hci_lookup_le_connect method, that will be used to check
+wether outgoing le connection attempt is in progress.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- net/bluetooth/hci_conn.c  | 52 +++++++++++++++++++++++++++++++++--------------
- net/bluetooth/hci_event.c | 51 ++++++++++++++++++++++++++--------------------
- net/bluetooth/mgmt.c      |  6 ++++++
- 3 files changed, 72 insertions(+), 37 deletions(-)
+ include/net/bluetooth/hci_core.h | 20 ++++++++++++++++++++
+ net/bluetooth/hci_conn.c         |  5 ++---
+ net/bluetooth/hci_event.c        |  4 ++--
+ net/bluetooth/hci_request.c      |  6 ++----
+ net/bluetooth/mgmt.c             |  2 +-
+ 5 files changed, 27 insertions(+), 10 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c8d2b5a..f0a9fc1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -811,6 +811,26 @@ static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
+ 	return NULL;
+ }
+ 
++static inline struct hci_conn *hci_lookup_le_connect(struct hci_dev *hdev)
++{
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct hci_conn  *c;
++
++	rcu_read_lock();
++
++	list_for_each_entry_rcu(c, &h->list, list) {
++		if (c->type == LE_LINK && c->state == BT_CONNECT &&
++		    !test_bit(HCI_CONN_SCANNING, &c->flags)) {
++			rcu_read_unlock();
++			return c;
++		}
++	}
++
++	rcu_read_unlock();
++
++	return NULL;
++}
++
+ int hci_disconnect(struct hci_conn *conn, __u8 reason);
+ bool hci_setup_sync(struct hci_conn *conn, __u16 handle);
+ void hci_sco_setup(struct hci_conn *conn, __u8 status);
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index e404f88..9847412 100644
+index 2c48bf0..0b4d919 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -667,15 +667,18 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
- {
- 	struct hci_conn *conn;
+@@ -645,7 +645,7 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
  
--	if (status == 0)
--		return;
-+	hci_dev_lock(hdev);
-+
+ 	hci_dev_lock(hdev);
+ 
+-	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
 +	conn = hci_lookup_le_connect(hdev);
-+
-+	if (!status) {
-+		hci_connect_le_scan_cleanup(conn);
-+		goto done;
-+	}
- 
- 	BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
- 	       status);
- 
--	hci_dev_lock(hdev);
--
--	conn = hci_lookup_le_connect(hdev);
  	if (!conn)
  		goto done;
  
-@@ -715,6 +718,7 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
- 	hci_req_add(req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
- 
- 	conn->state = BT_CONNECT;
-+	clear_bit(HCI_CONN_SCANNING, &conn->flags);
- }
- 
- static void hci_req_directed_advertising(struct hci_request *req,
-@@ -758,7 +762,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 				u8 role)
- {
- 	struct hci_conn_params *params;
--	struct hci_conn *conn;
-+	struct hci_conn *conn, *conn_unfinished;
- 	struct smp_irk *irk;
- 	struct hci_request req;
- 	int err;
-@@ -781,9 +785,17 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	 * and return the object found.
- 	 */
- 	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
-+	conn_unfinished = NULL;
- 	if (conn) {
--		conn->pending_sec_level = sec_level;
--		goto done;
-+		if (conn->state == BT_CONNECT &&
-+		    test_bit(HCI_CONN_SCANNING, &conn->flags)) {
-+			BT_DBG("will continue unfinished conn %pMR", dst);
-+			conn_unfinished = conn;
-+		} else {
-+			if (conn->pending_sec_level < sec_level)
-+				conn->pending_sec_level = sec_level;
-+			goto done;
-+		}
- 	}
- 
+@@ -759,8 +759,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
  	/* Since the controller supports only one LE connection attempt at a
-@@ -796,10 +808,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	 * resolving key, the connection needs to be established
- 	 * to a resolvable random address.
- 	 *
--	 * This uses the cached random resolvable address from
--	 * a previous scan. When no cached address is available,
--	 * try connecting to the identity address instead.
--	 *
- 	 * Storing the resolvable random address is required here
- 	 * to handle connection failures. The address will later
- 	 * be resolved back into the original identity address
-@@ -811,15 +819,23 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 		dst_type = ADDR_LE_DEV_RANDOM;
- 	}
+ 	 * time, we return -EBUSY if there is any connection attempt running.
+ 	 */
+-	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+-	if (conn)
++	if (hci_lookup_le_connect(hdev))
+ 		return ERR_PTR(-EBUSY);
  
--	conn = hci_conn_add(hdev, LE_LINK, dst, role);
-+	if (conn_unfinished) {
-+		conn = conn_unfinished;
-+		bacpy(&conn->dst, dst);
-+	} else {
-+		conn = hci_conn_add(hdev, LE_LINK, dst, role);
-+	}
-+
- 	if (!conn)
- 		return ERR_PTR(-ENOMEM);
- 
- 	conn->dst_type = dst_type;
- 	conn->sec_level = BT_SECURITY_LOW;
--	conn->pending_sec_level = sec_level;
- 	conn->conn_timeout = conn_timeout;
- 
-+	if (!conn_unfinished)
-+		conn->pending_sec_level = sec_level;
-+
- 	hci_req_init(&req, hdev);
- 
- 	/* Disable advertising if we're active. For master role
-@@ -884,7 +900,13 @@ create_conn:
- 	}
- 
- done:
--	hci_conn_hold(conn);
-+	/* If this is continuation of connect started by hci_connect_le_scan,
-+	 * it already called hci_conn_hold and calling it again would mess the
-+	 * counter.
-+	 */
-+	if (!conn_unfinished)
-+		hci_conn_hold(conn);
-+
- 	return conn;
- }
- 
+ 	/* When given an identity address with existing identity
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 128c5b7..7ba35a9 100644
+index 218d7df..128c5b7 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -4640,42 +4640,49 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
- 	/* If we're not connectable only connect devices that we have in
- 	 * our pend_le_conns list.
+@@ -1059,7 +1059,7 @@ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 		hci_dev_set_flag(hdev, HCI_LE_ADV);
+ 
+-		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
++		conn = hci_lookup_le_connect(hdev);
+ 		if (conn)
+ 			queue_delayed_work(hdev->workqueue,
+ 					   &conn->le_conn_timeout,
+@@ -4447,7 +4447,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  	 */
--	params = hci_pend_le_action_lookup(&hdev->pend_le_conns,
--					   addr, addr_type);
-+	params = hci_explicit_connect_lookup(hdev, addr, addr_type);
-+
- 	if (!params)
- 		return NULL;
+ 	hci_dev_clear_flag(hdev, HCI_LE_ADV);
  
--	switch (params->auto_connect) {
--	case HCI_AUTO_CONN_DIRECT:
--		/* Only devices advertising with ADV_DIRECT_IND are
--		 * triggering a connection attempt. This is allowing
--		 * incoming connections from slave devices.
--		 */
--		if (adv_type != LE_ADV_DIRECT_IND)
-+	if (!params->explicit_connect) {
-+		switch (params->auto_connect) {
-+		case HCI_AUTO_CONN_DIRECT:
-+			/* Only devices advertising with ADV_DIRECT_IND are
-+			 * triggering a connection attempt. This is allowing
-+			 * incoming connections from slave devices.
-+			 */
-+			if (adv_type != LE_ADV_DIRECT_IND)
-+				return NULL;
-+			break;
-+		case HCI_AUTO_CONN_ALWAYS:
-+			/* Devices advertising with ADV_IND or ADV_DIRECT_IND
-+			 * are triggering a connection attempt. This means
-+			 * that incoming connectioms from slave device are
-+			 * accepted and also outgoing connections to slave
-+			 * devices are established when found.
-+			 */
-+			break;
-+		default:
- 			return NULL;
--		break;
--	case HCI_AUTO_CONN_ALWAYS:
--		/* Devices advertising with ADV_IND or ADV_DIRECT_IND
--		 * are triggering a connection attempt. This means
--		 * that incoming connectioms from slave device are
--		 * accepted and also outgoing connections to slave
--		 * devices are established when found.
--		 */
--		break;
--	default:
--		return NULL;
-+		}
- 	}
+-	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
++	conn = hci_lookup_le_connect(hdev);
+ 	if (!conn) {
+ 		conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr, ev->role);
+ 		if (!conn) {
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index d6025d6..b736922 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -317,7 +317,7 @@ static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
+ 	 * address be updated at the next cycle.
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_LE_ADV) ||
+-	    hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT)) {
++	    hci_lookup_le_connect(hdev)) {
+ 		BT_DBG("Deferring random address update");
+ 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
+ 		return;
+@@ -479,7 +479,6 @@ void hci_update_page_scan(struct hci_dev *hdev)
+ void __hci_update_background_scan(struct hci_request *req)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+-	struct hci_conn *conn;
  
- 	conn = hci_connect_le(hdev, addr, addr_type, BT_SECURITY_LOW,
- 			      HCI_LE_AUTOCONN_TIMEOUT, HCI_ROLE_MASTER);
- 	if (!IS_ERR(conn)) {
--		/* Store the pointer since we don't really have any
-+		/* If HCI_AUTO_CONN_EXPLICIT is set, conn is already owned
-+		 * by higher layer that tried to connect, if no then
-+		 * store the pointer since we don't really have any
- 		 * other owner of the object besides the params that
- 		 * triggered it. This way we can abort the connection if
- 		 * the parameters get removed and keep the reference
- 		 * count consistent once the connection is established.
+ 	if (!test_bit(HCI_UP, &hdev->flags) ||
+ 	    test_bit(HCI_INIT, &hdev->flags) ||
+@@ -529,8 +528,7 @@ void __hci_update_background_scan(struct hci_request *req)
+ 		 * since some controllers are not able to scan and connect at
+ 		 * the same time.
  		 */
--		params->conn = hci_conn_get(conn);
-+
-+		if (!params->explicit_connect)
-+			params->conn = hci_conn_get(conn);
-+
- 		return conn;
- 	}
+-		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+-		if (conn)
++		if (hci_lookup_le_connect(hdev))
+ 			return;
  
+ 		/* If controller is currently scanning, we stop it to ensure we
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 35418bb..5f5d785 100644
+index 7ab1915..35418bb 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -6107,6 +6107,12 @@ static int hci_conn_params_set(struct hci_request *req, bdaddr_t *addr,
- 	switch (auto_connect) {
- 	case HCI_AUTO_CONN_DISABLED:
- 	case HCI_AUTO_CONN_LINK_LOSS:
-+		/* If auto connect is being disabled when we're trying to
-+		 * connect to device, keep connecting.
-+		 */
-+		if (params->explicit_connect)
-+			list_add(&params->action, &hdev->pend_le_conns);
-+
- 		__hci_update_background_scan(req);
- 		break;
- 	case HCI_AUTO_CONN_REPORT:
+@@ -4210,7 +4210,7 @@ static bool trigger_le_scan(struct hci_request *req, u16 interval, u8 *status)
+ 		/* Don't let discovery abort an outgoing connection attempt
+ 		 * that's using directed advertising.
+ 		 */
+-		if (hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT)) {
++		if (hci_lookup_le_connect(hdev)) {
+ 			*status = MGMT_STATUS_REJECTED;
+ 			return false;
+ 		}
 -- 
 2.1.4
 
