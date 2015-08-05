@@ -1,100 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1438843403.19625.7.camel@dlenski-ultra>
-Subject: setting BLE connection interval from an unprivileged program?
-From: Daniel Lenski <dlenski@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Date: Wed, 05 Aug 2015 23:43:23 -0700
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] Bluetooth: hciuart: Add support QCA chipset for
+ UART
+To: Marcel Holtmann <marcel@holtmann.org>
+References: <55BAB444.8070306@qca.qualcomm.com>
+ <C0463D0B-A1C3-400A-B842-873F49AA72F1@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>
+From: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+Message-ID: <55C28766.3080001@qca.qualcomm.com>
+Date: Wed, 5 Aug 2015 15:00:06 -0700
+MIME-Version: 1.0
+In-Reply-To: <C0463D0B-A1C3-400A-B842-873F49AA72F1@holtmann.org>
+Content-Type: text/plain; charset="windows-1252"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm working on Linux tools to communicate with the TomTom's GPS sport
-watches over Bluetooth LE. I've figured out all the relevant details
-of the protocol by snooping on traffic with the official Android app
-[1], and have some working code in C to communicate with the devices
-by creating L2CAP sockets and bit-banging ATT packets.
+Hi Marcel,
 
-These devices transfer GPS activity files to the host, and an activity
-file for an hour-long run or ride will be about 200 KiB in size. Using
-default settings for an L2CAP socket, data transfer is *extremely*
-slow, about 300 B/s of user data.
+On 07/31/15 09:42, Marcel Holtmann wrote:
+>
+>> +	unsigned long flags;
+>> +	void *hci_uart; /* keeps the hci_uart pointer for reference */
+> I do not like this. I need to see if this can not be done better with private data or other accessor functions.
 
-The BLE connection interval directly impacts the transfer rate [2],
-and the minimum (7.5 msec) should be specified to maximize the data
-transfer rate, but the L2CAP socket interface doesn't clearly give a
-way to do this.
+I will use struct hci_uart* type instead of void*. But we still need this because workqueue handler is using hci_uart pointer
 
-Wireshark shows that when the L2CAP connection is created to the
-watch, the host (Linux 3.19) proposes a connection interval of 50-70
-msec:
++}
++
++static void qca_wq_awake_rx(struct work_struct *work)
++{
++	struct qca_data *qca = container_of(work, struct qca_data,
++					    ws_awake_rx);
++	struct hci_uart *hu = (struct hci_uart *)qca->hci_uart;
++
++	BT_DBG(" %p wq awake rx", hu);
++
++	serial_clock_vote(HCI_IBS_RX_VOTE_CLOCK_ON, hu);
++
++	spin_lock(&qca->hci_ibs_lock);
++	qca->rx_ibs_state = HCI_IBS_RX_AWAKE;
++
++	/* Always acknowledge device wake up,
++	 * sending IBS message doesn't count as TX ON
++	 */
++	if (send_hci_ibs_cmd(HCI_IBS_WAKE_ACK, hu) < 0)
++		BT_ERR("cannot acknowledge device wake up");
++
++	qca->ibs_sent_wacks++; /* debug */
++
++	spin_unlock(&qca->hci_ibs_lock);
++
++	/* actually send the packets */
++	hci_uart_tx_wakeup(hu);
++}
++
++static void qca_wq_serial_rx_clock_vote_off(struct work_struct *work)
++{
++	struct qca_data *qca = container_of(work, struct qca_data,
++					    ws_rx_vote_off);
++	struct hci_uart *hu = (struct hci_uart *)qca->hci_uart;
 
-    Bluetooth HCI Command - LE Create Connection
-        Connection Interval Min: 40 (50 msec)
-        Connection Interval Max: 56 (70 msec)
-        Connection Latency: 0 (number events)
-        Supervision Timeout: 42 (0.42 sec)
-        Min CE Length: 0 (0 msec)
-        Max CE Length: 0 (0 msec)
+> I am not really convinced this is a good idea. I think the serial stuff should be abstracted in the serial driver or via some common stuff.
 
-I have found a couple ways to force a shorter connection interval, and
-indeed I get about a 6x speedup in data transfer rate at the minimum
-connection interval, but these use "raw" HCI sockets and require
-elevated privileges [3].
+Yeah but in workqueue structure, it is only way to access hci_uart pointer in work queue handler. I can find similar code on hci_ath.c code to have a hci_uart pointer in ath_data and use it on workqueue handler.
 
-1) Create an HCI socket first, selecting the desired connection
-   interval, and then an L2CAP socket. I'm don't actually know *why*
-   this works... does every l2cap socket to a given remote device
-   actually use the same underlying HCI connection?
+>> +
+>> +}
+>> +
+>> +/* Initialize protocol */
+>> +static int qca_open(struct hci_uart *hu)
+>> +{
+>> +	struct qca_data *qca;
+>> +
+>> +	BT_DBG("hu %p qca_open", hu);
+>> +
+>> +	qca = kzalloc(sizeof(struct qca_data), GFP_ATOMIC);
+>> +	if (!qca)
+>> +		return -ENOMEM;
+>> +
+>> +	skb_queue_head_init(&qca->txq);
+>> +	skb_queue_head_init(&qca->tx_wait_q);
+>> +	spin_lock_init(&qca->hci_ibs_lock);
+>> +	qca->workqueue = create_singlethread_workqueue("qca_wq");
+>> +	if (!qca->workqueue) {
+>> +		BT_ERR("QCA Workqueue not initialized properly");
+>> +		kfree(qca);
+>> +		return -ENOMEM;
+>> +	}
+> Explain to me why you need your own work queue?
 
-    did = hci_get_route(NULL);
-    dd = hci_open_dev(did);
+Ths is for sleep control to trigger 0xFE/0xFC packet to controller. if there is NO activity on the hci_qca driver during 2s, it should trigger 0xFE packet to controller going to the sleep and controller will send us back 0xFC as acknowledge. Controller does use same sequences / packets. If want to wake up the host/controller, 0xFD is triggered. In order to invoke this IBS command, workqueue is needed.
+  
+>> +
+>> +static int qca_event_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>> +{
+>> +	int ret;
+>> +
+>> +	rome_debug_dump(skb->data, skb->len, false);
+>> +	ret = rome_vendor_frame(hdev, skb);
+>> +	if (!ret)
+>> +		ret = hci_recv_frame(hdev, skb);
+>> +
+> I think all the vendor hacking around and making this a proper cmd complete event should go here. Or we just start creating some new __hci_cmd_sync. Have you actually looked at using __hci_cmd_sync_ev since that should allow you to wait for a specific event.
 
-    uint16_t hci_handle;
-    result = hci_le_create_conn(dd,
-        htobs(0x0004), htobs(0x0004), 0,
-        LE_RANDOM_ADDRESS, dst_addr, LE_PUBLIC_ADDRESS,
-        htobs(0x0006) /*min_interval*/, htobs(0x0006) /*max_interval*/,
-        htobs(0) /*latency*/, htobs(200) /*supervision_timeout*/,
-        htobs(0x0001), htobs(0x0001), &hci_handle, 25000);
+I think __hci_cmd_sync_ev() would be fine. I'll use this function.
 
-    // L2CAP socket (uses the already-created HCI connection?)
-    fd = l2cap_le_att_connect(&src_addr, &dst_addr, dst_type, sec);
-
-2) Create a L2CAP socket with default settings, then use
-   hci_le_conn_update() to update the connection parameters. This
-   seems suboptimal since it requires negotiating the connection
-   settings twice, but allows me to avoid redundantly specifying some
-   of the other HCI details:
-
-    // create L2CAP socket first, then get HCI handle
-    fd = l2cap_le_att_connect(&src_addr, &dst_addr, dst_type, sec);
-    
-    struct l2cap_conninfo l2cci;
-    int length = sizeof l2cci;
-    int result = getsockopt(fd, SOL_L2CAP, L2CAP_CONNINFO, &l2cci,
-        &length);
-    
-    result = hci_le_conn_update(dd, l2cci.hci_handle,
-        0x0006 /* min_interval */, 0x0006 /* max_interval */,
-        0 /* latency */, 200 /* supervision_timeout */, 2000);
-
-Questions:
-
-* Is there a better way to accomplish this in an unprivileged program?
-  Is there some L2CAP socket option which I can use to set the LE
-  connection interval parameters?
-* Why does the Linux kernel default to a needlessly long minimum
-  connection interval when creating a L2CAP socket?
+>
+>
+> Regards
+>
+> Marcel
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 Thanks
-Dan Lenski
-
-[1]: TomTom BLE protocol documentation in progress:
-http://github.com/dlenski/ttblue/blob/master/tt_bluetooth.md
-[2]:
-http://www.safaribooksonline.com/library/view/getting-started-with/9781491900550/ch01.html#_data_throughput
-[3]:
-http://unix.stackexchange.com/questions/96106/bluetooth-le-scan-as-non-root
-
-
+-- Ben Kim
