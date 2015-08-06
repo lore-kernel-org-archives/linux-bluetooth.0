@@ -1,23 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55C3D220.1040803@ubnt.com>
-Date: Fri, 07 Aug 2015 00:31:12 +0300
-From: Andrejs Hanins <andrejs.hanins@ubnt.com>
-MIME-Version: 1.0
+Date: Thu, 6 Aug 2015 12:48:24 -0700
+From: "Mark A. Haun" <haunma@keteu.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: Notifications and CCC descriptor handling for Gatt server
-Content-Type: text/plain; charset=utf-8
+Subject: IdleTimeout behavior for fake-HID device in Bluez 5?
+Message-ID: <20150806124824.683e2a6e@angwin.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+I've successfully attached a PS3 bluetooth remote to a Debian Jessie
+system running bluez 5.23.  In bluetoothctl it appears as
 
-	I have a Gatt server over D-Bus with "notify" characteristic exported and I listen to Start/StopNotify methods. But I can't get my head around the logic of Start/StopNotify methods in case of multiple Gatt clients connecting to the service (not in the same time, of course):
-	1. Client A connects and enables notifications, StartNotify is called - this is fine.
-	2. Client B connects and enables notifications, then StartNotify is called again - is it expected? Does it mean notifications state is per-client and external Gatt server needs to know the currently connected client and associate some state with it?
-	3. Client A connects again and disables notifications, StopNotify is not called. This is strange and goes against the logic in item 2.
-	4. Client B connects and disables notifications, StopNotify is called.
+Device 00:21:4F:48:D1:D2
+        Name: BD Remote Control
+        Alias: BD Remote Control
+        Class: 0x00250c
+        Paired: no
+        Trusted: yes
+        Blocked: no
+        Connected: yes
+        LegacyPairing: no
+        UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34fb)
+        UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+        Modalias: usb:v054Cp0306d0100
 
-	So, how is it supposed to work? Maybe there is a bug somewhere?
-	BlueZ 5.32 used.
+(Note that it is not paired.  From what I can tell based on outdated
+how-tos, this is the normal, operational state, even though everyone
+refers to the setup process as "pairing."  See e.g.
+https://www.mythtv.org/wiki/Sony_PS3_BD_Remote)
 
-BR, Andrey
+Upon first connection, an input device is created:
+
+[87044.559923] input: BD Remote Control as /devices/soc0/7d004000.usb/usb1/1-1/1-1:1.0/bluetooth/hci0/hci0:256/0005:054C:0306.0005/input/input7
+[87044.573409] sony 0005:054C:0306.0005: input,hidraw1: BLUETOOTH HID v1.00 Gamepad [BD Remote Control] on ac:fd:ce:76:f2:4a
+
+and I can watch keypresses using evemu-record.
+
+I have set IdleTimeout=1 in /etc/bluetooth/input.conf.  There is scant
+documentation but my understanding is that this should disconnect from the
+remote after one minute of inactivity.  What I find, however, is that after
+exactly one minute, the *input device* disappears (i.e. no longer listed
+in /proc/bus/input/devices) but the connection to the remote remains
+active.  Ten or twenty minutes later, it still shows as "Connected" in
+bluetoothctl or hcitool con:
+
+Connections:
+        > ACL 00:21:4F:48:D1:D2 handle 256 state 1 lm MASTER 
+
+Pressing buttons on the remote at this stage does not bring back the input
+device, although hciconfig shows that packets are being received.  If I
+forcibly disconnect (hcitool dc 00:21:4F:48:D1:D2), and then press a
+button on the remote, the connection is automatically re-established,
+along with the input device, and input events are available until the
+next timeout.
+
+Automatic disconnect is important due to limited battery life in the
+remote.  How can I achieve this?  My recollection is that this worked in
+older bluez releases (pre-5).  For a long time there were patches floating
+around, but I thought those found their way back to the mainline.
