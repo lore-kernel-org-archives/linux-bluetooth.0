@@ -1,37 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/4] net: rfkill: gpio: Make BCM2E39 support optional
-Date: Fri,  7 Aug 2015 17:00:38 +0200
-Message-Id: <1438959640-15476-3-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1438959640-15476-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1438959640-15476-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [PATCH v3 1/2] Bluetooth: btqca: Introduce generic QCA ROME
+ support
+To: Marcel Holtmann <marcel@holtmann.org>
+References: <55C407B2.3090105@qca.qualcomm.com>
+ <85898275-32E8-4A8F-BEDD-A24F258C936E@holtmann.org>
+CC: <linux-bluetooth@vger.kernel.org>
+From: "Kim, Ben Young Tae" <ytkim@qca.qualcomm.com>
+Message-ID: <55C426D7.6060604@qca.qualcomm.com>
+Date: Thu, 6 Aug 2015 20:32:39 -0700
+MIME-Version: 1.0
+In-Reply-To: <85898275-32E8-4A8F-BEDD-A24F258C936E@holtmann.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case of kernel configured to build Bluetooth BCM UART driver, do not
-support BCM2E39 in rfkill-gpio.
+Hi Marcel,
 
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
----
- net/rfkill/rfkill-gpio.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/net/rfkill/rfkill-gpio.c b/net/rfkill/rfkill-gpio.c
-index d5d58d9..16d7a3a 100644
---- a/net/rfkill/rfkill-gpio.c
-+++ b/net/rfkill/rfkill-gpio.c
-@@ -164,7 +164,9 @@ static int rfkill_gpio_remove(struct platform_device *pdev)
- #ifdef CONFIG_ACPI
- static const struct acpi_device_id rfkill_acpi_match[] = {
- 	{ "BCM2E1A", RFKILL_TYPE_BLUETOOTH },
-+#ifndef CONFIG_BT_HCIUART_BCM
- 	{ "BCM2E39", RFKILL_TYPE_BLUETOOTH },
-+#endif
- 	{ "BCM2E3D", RFKILL_TYPE_BLUETOOTH },
- 	{ "BCM2E40", RFKILL_TYPE_BLUETOOTH },
- 	{ "BCM2E64", RFKILL_TYPE_BLUETOOTH },
--- 
-1.9.1
+On 8/6/2015 8:05 PM, Marcel Holtmann wrote:
+> Hi Ben,
+>
+>> This is for supporting BT for QCA ROME with specific vendor specific HCI commands and initialization. This will have USB/UART implementation both, but for now, adding UART vendor specific commands to patch downloading and set BDaddress using VS command. Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com> --- drivers/bluetooth/Kconfig | 4 + drivers/bluetooth/Makefile | 1 + drivers/bluetooth/btqca.c | 395 +++++++++++++++++++++++++++++++++++++++++++++ drivers/bluetooth/btqca.h | 136 ++++++++++++++++ 4 files changed, 536 insertions(+) create mode 100644 drivers/bluetooth/btqca.c create mode 100644 drivers/bluetooth/btqca.h diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig index 79e8234..f580334 100644 --- a/drivers/bluetooth/Kconfig +++ b/drivers/bluetooth/Kconfig @@ -13,6 +13,10 @@ config BT_RTL tristate select FW_LOADER +config BT_QCA + tristate + select FW_LOADER + config BT_HCIBTUSB tristate "HCI USB driver" depends on USB diff --git
+>> a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile index f40e194..15a0d1d 100644 --- a/drivers/bluetooth/Makefile +++ b/drivers/bluetooth/Makefile @@ -22,6 +22,7 @@ obj-$(CONFIG_BT_MRVL_SDIO) += btmrvl_sdio.o obj-$(CONFIG_BT_WILINK) += btwilink.o obj-$(CONFIG_BT_BCM) += btbcm.o obj-$(CONFIG_BT_RTL) += btrtl.o +obj-$(CONFIG_BT_QCA) += btqca.o btmrvl-y := btmrvl_main.o btmrvl-$(CONFIG_DEBUG_FS) += btmrvl_debugfs.o diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c new file mode 100644 index 0000000..863cceb --- /dev/null +++ b/drivers/bluetooth/btqca.c @@ -0,0 +1,395 @@ +/* + * Bluetooth supports for Qualcomm Atheros chips + * + * Copyright
+> something went really wrong here ;)
+
+Something meshed up on my email account. You can find another one which is no issue with same subject title. Sorry for your confusion.
+
+
+>
+> Regards
+>
+> Marcel
+>
+
+Thanks
+
+Ben Kim
+
 
