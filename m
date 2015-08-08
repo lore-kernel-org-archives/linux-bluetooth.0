@@ -1,295 +1,1230 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55C6F858.5080808@web.de>
-Date: Sun, 09 Aug 2015 08:51:04 +0200
-From: Norbert Holze <norbert.holze@web.de>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: btusb regression / 0a12:0001 CSR
-Content-Type: multipart/mixed;
- boundary="------------090209040805080401080805"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
+Subject: Re: [PATCH v4 2/2] Bluetooth: hciuart: Add support QCA chipset for UART
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <55C53E7D.7020308@qca.qualcomm.com>
+Date: Sat, 8 Aug 2015 12:53:48 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <3C19CEC7-00B7-4D87-BD3F-21D186E65D9B@holtmann.org>
+References: <55C53E7D.7020308@qca.qualcomm.com>
+To: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------090209040805080401080805
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Hi Ben,
 
-Hello,
- 
-My bluetooth usb-stick worked fine with kernel up to 3.19. With 4.x
-there is no hci device found.
+> QCA61x4 chips have supported sleep feature using In-Band-Sleep commands
+> to enable sleep feature based on H4 protocol. After sending
+> patch/nvm configuration is done, IBS mode will be up and running
+> 
+> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+> ---
+> drivers/bluetooth/Kconfig     |   13 +
+> drivers/bluetooth/Makefile    |    1 +
+> drivers/bluetooth/hci_ldisc.c |    6 +
+> drivers/bluetooth/hci_qca.c   | 1002 +++++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/hci_uart.h  |    8 +-
+> 5 files changed, 1029 insertions(+), 1 deletion(-)
+> create mode 100644 drivers/bluetooth/hci_qca.c
+> 
+> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> index f580334..0bd88c9 100644
+> --- a/drivers/bluetooth/Kconfig
+> +++ b/drivers/bluetooth/Kconfig
+> @@ -155,6 +155,19 @@ config BT_HCIUART_BCM
+> 
+> 	  Say Y here to compile support for Broadcom protocol.
+> 
+> +config BT_HCIUART_QCA
+> +	bool "Qualcomm Atheros protocol support"
+> +	depends on BT_HCIUART
+> +	select BT_HCIUART_H4
+> +	select BT_QCA
+> +	help
+> +	  The Qualcomm Atheros protocol supports HCI In-Band Sleep feature
+> +	  over serial port interface(H4) between controller and host.
+> +	  This protocol is required for UART clock control for QCA Bluetooth
+> +	  devices.
+> +
+> +	  Say Y here to compile support for QCA protocol.
+> +
+> config BT_HCIBCM203X
+> 	tristate "HCI BCM203x USB driver"
+> 	depends on USB
+> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+> index 15a0d1d..07c9cf3 100644
+> --- a/drivers/bluetooth/Makefile
+> +++ b/drivers/bluetooth/Makefile
+> @@ -35,6 +35,7 @@ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
+> hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
+> hci_uart-$(CONFIG_BT_HCIUART_INTEL)	+= hci_intel.o
+> hci_uart-$(CONFIG_BT_HCIUART_BCM)	+= hci_bcm.o
+> +hci_uart-$(CONFIG_BT_HCIUART_QCA)	+= hci_qca.o
+> hci_uart-objs				:= $(hci_uart-y)
+> 
+> ccflags-y += -D__CHECK_ENDIAN__
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index 20c2ac1..0d5a05a 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -810,6 +810,9 @@ static int __init hci_uart_init(void)
+> #ifdef CONFIG_BT_HCIUART_BCM
+> 	bcm_init();
+> #endif
+> +#ifdef CONFIG_BT_HCIUART_QCA
+> +	qca_init();
+> +#endif
+> 
+> 	return 0;
+> }
+> @@ -839,6 +842,9 @@ static void __exit hci_uart_exit(void)
+> #ifdef CONFIG_BT_HCIUART_BCM
+> 	bcm_deinit();
+> #endif
+> +#ifdef CONFIG_BT_HCIUART_QCA
+> +	qca_deinit();
+> +#endif
+> 
+> 	/* Release tty registration of line discipline */
+> 	err = tty_unregister_ldisc(N_HCI);
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> new file mode 100644
+> index 0000000..9dd5dad
+> --- /dev/null
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -0,0 +1,1002 @@
+> +/*
+> + *  Bluetooth Software UART Qualcomm protocol
+> + *
+> + *  HCI_IBS (HCI In-Band Sleep) is Qualcomm's power management
+> + *  protocol extension to H4.
+> + *
+> + *  Copyright (C) 2007 Texas Instruments, Inc.
+> + *  Copyright (c) 2010, 2012 The Linux Foundation. All rights reserved.
+> + *
+> + *  Acknowledgements:
+> + *  This file is based on hci_ll.c, which was...
+> + *  Written by Ohad Ben-Cohen <ohad@bencohen.org>
+> + *  which was in turn based on hci_h4.c, which was written
+> + *  by Maxim Krasnyansky and Marcel Holtmann.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License version 2
+> + *  as published by the Free Software Foundation
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+> + *
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/kernel.h>
+> +
+> +#include <linux/init.h>
+> +#include <linux/sched.h>
+> +#include <linux/types.h>
+> +#include <linux/fcntl.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/ptrace.h>
+> +#include <linux/poll.h>
+> +
+> +#include <linux/slab.h>
+> +#include <linux/tty.h>
+> +#include <linux/errno.h>
+> +#include <linux/string.h>
+> +#include <linux/signal.h>
+> +#include <linux/ioctl.h>
+> +#include <linux/timer.h>
+> +#include <linux/skbuff.h>
+> +#include <linux/serial_core.h>
+> +#include <linux/debugfs.h>
 
-lsusb
-Bus 004 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
-Dongle (HCI mode)
+Are you sure you need all of these includes? I mean ioctl, signal, string, errno, fcntl, poll, interrupt, ptrace?
 
-hcitool dev
-Devices:
+This list looks pretty wrong to me. Please only include headers that are actually needed.
 
-sudo hciconfig
-hci0: Type: BR/EDR Bus: USB
-BD Address: 00:15:83:15:A3:0B ACL MTU: 672:4 SCO MTU: 48:1
-DOWN
-RX bytes:890 acl:0 sco:0 events:30 errors:0
-TX bytes:126 acl:0 sco:0 commands:30 errors:0
+> +
+> +#include <net/bluetooth/bluetooth.h>
+> +#include <net/bluetooth/hci_core.h>
+> +
+> +#include "hci_uart.h"
+> +#include "btqca.h"
+> +
+> +/* HCI_IBS protocol messages */
+> +#define HCI_IBS_SLEEP_IND	0xFE
+> +#define HCI_IBS_WAKE_IND	0xFD
+> +#define HCI_IBS_WAKE_ACK	0xFC
+> +#define HCI_MAX_IBS_SIZE 	10
+> +
+> +/* Controller states */
+> +#define STATE_IN_BAND_SLEEP_ENABLED	1
+> +
+> +#define IBS_WAKE_RETRANS_TIMEOUT 	100
+> +#define IBS_TX_IDLE_TIMEOUT 		2000
+> +#define BAUDRATE_SETTLE_TIMEOUT		300
 
-sudo hciconfig hci0 up
-Can't init device hci0: Operation not supported (95)
+If they are used with msecs_to_jiffies anyway, then we include that conversion right in the define. Makes the resulting code easier to read.
 
-rfkill list
-0: hci0: Bluetooth
-Soft blocked: no
-Hard blocked: no
-1: phy0: Wireless LAN
-Soft blocked: no
-Hard blocked: no
+> +
+> +/* HCI_IBS transmit side sleep protocol states */
+> +enum tx_ibs_states_e {
+> +	HCI_IBS_TX_ASLEEP,
+> +	HCI_IBS_TX_WAKING,
+> +	HCI_IBS_TX_AWAKE,
+> +};
+> +
+> +/* HCI_IBS receive side sleep protocol states */
+> +enum rx_states_e {
+> +	HCI_IBS_RX_ASLEEP,
+> +	HCI_IBS_RX_AWAKE,
+> +};
+> +
+> +/* HCI_IBS transmit and receive side clock state vote */
+> +enum hci_ibs_clock_state_vote_e {
+> +	HCI_IBS_VOTE_STATS_UPDATE,
+> +	HCI_IBS_TX_VOTE_CLOCK_ON,
+> +	HCI_IBS_TX_VOTE_CLOCK_OFF,
+> +	HCI_IBS_RX_VOTE_CLOCK_ON,
+> +	HCI_IBS_RX_VOTE_CLOCK_OFF,
+> +};
 
-Is this a regression. Or does it work in different way with 4.x?
+Seems I missed the tiny _e at the end. Git rid of that since that is not in the coding style.
 
-Regards,
+> +
+> +struct qca_data {
+> +	struct hci_uart *hu;
+> +	struct sk_buff *rx_skb;
+> +	struct sk_buff_head txq;
+> +	struct sk_buff_head tx_wait_q;	/* HCI_IBS wait queue	*/
+> +	spinlock_t hci_ibs_lock;	/* HCI_IBS state lock	*/
+> +	u8 tx_ibs_state;	/* HCI_IBS transmit side power state*/
+> +	u8 rx_ibs_state;	/* HCI_IBS receive side power state */
+> +	bool tx_vote;		/* clock must be on for TX */
+> +	bool rx_vote;		/* clock must be on for RX */
+> +	struct timer_list tx_idle_timer;
+> +	u32 tx_idle_delay;
+> +	struct timer_list wake_retrans_timer;
+> +	u32 wake_retrans;
+> +	struct workqueue_struct *workqueue;
+> +	struct work_struct ws_awake_rx;
+> +	struct work_struct ws_awake_device;
+> +	struct work_struct ws_rx_vote_off;
+> +	struct work_struct ws_tx_vote_off;
+> +	struct dentry *ibs_dir;
 
-Norbert
+Actually you do not need to keep the dentry for debugfs. It will clean itself up when the hci_dev gets removed.
 
---------------090209040805080401080805
-Content-Type: text/plain; charset=UTF-8;
- name="btmon.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="btmon.txt"
+> +	unsigned long flags;
+> +
+> +	/* for debugging purpose */
+> +	u64 ibs_sent_wacks;
+> +	u64 ibs_sent_slps;
+> +	u64 ibs_sent_wakes;
+> +	u64 ibs_recv_wacks;
+> +	u64 ibs_recv_slps;
+> +	u64 ibs_recv_wakes;
+> +	u64 vote_last_jif;
+> +	u32 vote_on_ms;
+> +	u32 vote_off_ms;
+> +	u64 tx_votes_on;
+> +	u64 rx_votes_on;
+> +	u64 tx_votes_off;
+> +	u64 rx_votes_off;
+> +	u64 votes_on;
+> +	u64 votes_off;
+> +};
+> +
+> +static void __serial_clock_on(struct tty_struct *tty)
+> +{
+> +	/* TODO: Some chipset requires to enable UART clock on client
+> +	 * side to save power consumption or manual work is required.
+> +	 * Please put your code to control UART clock here if needed
+> +	 */
+> +}
+> +
+> +static void __serial_clock_off(struct tty_struct *tty)
+> +{
+> +	/* TODO: Some chipset requires to disable UART clock on client
+> +	 * side to save power consumption or manual work is required.
+> +	 * Please put your code to control UART clock off here if needed
+> +	 */
+> +}
+> +
+> +/* clock_vote needs to be called with the ibs lock held */
+> +static void serial_clock_vote(unsigned long vote, struct hci_uart *hu)
+> +{
+> +	struct qca_data *qca = hu->priv;
+> +	unsigned int diff;
+> +
+> +	bool old_vote = (qca->tx_vote | qca->rx_vote);
+> +	bool new_vote;
+> +
+> +	switch (vote) {
+> +	case HCI_IBS_VOTE_STATS_UPDATE:
+> +		diff = jiffies_to_msecs(jiffies - qca->vote_last_jif);
+> +
+> +		if (old_vote)
+> +			qca->vote_off_ms += diff;
+> +		else
+> +			qca->vote_on_ms += diff;
+> +		return;
+> +
+> +	case HCI_IBS_TX_VOTE_CLOCK_ON:
+> +		qca->tx_vote = true;
+> +		qca->tx_votes_on++;
+> +		new_vote = true;
+> +		break;
+> +
+> +	case HCI_IBS_RX_VOTE_CLOCK_ON:
+> +		qca->rx_vote = true;
+> +		qca->rx_votes_on++;
+> +		new_vote = true;
+> +		break;
+> +
+> +	case HCI_IBS_TX_VOTE_CLOCK_OFF:
+> +		qca->tx_vote = false;
+> +		qca->tx_votes_off++;
+> +		new_vote = qca->rx_vote | qca->tx_vote;
+> +		break;
+> +
+> +	case HCI_IBS_RX_VOTE_CLOCK_OFF:
+> +		qca->rx_vote = false;
+> +		qca->rx_votes_off++;
+> +		new_vote = qca->rx_vote | qca->tx_vote;
+> +		break;
+> +
+> +	default:
+> +		BT_ERR("voting irregularity");
 
-Qmx1ZXRvb3RoIG1vbml0b3IgdmVyIDUuMzMKPSBOZXcgSW5kZXg6IDAwOjAwOjAwOjAwOjAw
-OjAwIChCUi9FRFIsVVNCLGhjaTApICAgICAgICAgICAgICAgIFtoY2kwXSAwLjI1MzY5OAo8
-IEhDSSBDb21tYW5kOiBSZXNldCAoMHgwM3wweDAwMDMpIHBsZW4gMCAgICAgICAgICAgICAg
-ICAgICAgICAgW2hjaTBdIDAuMjUzOTczCj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRl
-ICgweDBlKSBwbGVuIDQgICAgICAgICAgICAgICAgICAgICBbaGNpMF0gMC4zMTMyMDQKICAg
-ICAgUmVzZXQgKDB4MDN8MHgwMDAzKSBuY21kIDEKICAgICAgICBTdGF0dXM6IFN1Y2Nlc3Mg
-KDB4MDApCjwgSENJIENvbW1hbmQ6IFJlYWQgTG9jYWwgU3VwcG9ydGVkIEZlYS4uICgweDA0
-fDB4MDAwMykgcGxlbiAwICBbaGNpMF0gMC4zMTMyNjIKPiBIQ0kgRXZlbnQ6IENvbW1hbmQg
-Q29tcGxldGUgKDB4MGUpIHBsZW4gMTIgICAgICAgICAgICAgICAgICAgIFtoY2kwXSAwLjMx
-NjE5NwogICAgICBSZWFkIExvY2FsIFN1cHBvcnRlZCBGZWF0dXJlcyAoMHgwNHwweDAwMDMp
-IG5jbWQgMQogICAgICAgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkKICAgICAgICBGZWF0dXJl
-czogMHhmZiAweDNlIDB4ODUgMHgzOCAweDE4IDB4MTggMHgwMCAweDAwCiAgICAgICAgICAz
-IHNsb3QgcGFja2V0cwogICAgICAgICAgNSBzbG90IHBhY2tldHMKICAgICAgICAgIEVuY3J5
-cHRpb24KICAgICAgICAgIFNsb3Qgb2Zmc2V0CiAgICAgICAgICBUaW1pbmcgYWNjdXJhY3kK
-ICAgICAgICAgIFJvbGUgc3dpdGNoCiAgICAgICAgICBIb2xkIG1vZGUKICAgICAgICAgIFNu
-aWZmIG1vZGUKICAgICAgICAgIFBvd2VyIGNvbnRyb2wgcmVxdWVzdHMKICAgICAgICAgIENo
-YW5uZWwgcXVhbGl0eSBkcml2ZW4gZGF0YSByYXRlIChDUUREUikKICAgICAgICAgIFNDTyBs
-aW5rCiAgICAgICAgICBIVjIgcGFja2V0cwogICAgICAgICAgSFYzIHBhY2tldHMKICAgICAg
-ICAgIENWU0Qgc3luY2hyb25vdXMgZGF0YQogICAgICAgICAgUG93ZXIgY29udHJvbAogICAg
-ICAgICAgQnJvYWRjYXN0IEVuY3J5cHRpb24KICAgICAgICAgIEVuaGFuY2VkIGlucXVpcnkg
-c2NhbgogICAgICAgICAgSW50ZXJsYWNlZCBpbnF1aXJ5IHNjYW4KICAgICAgICAgIEludGVy
-bGFjZWQgcGFnZSBzY2FuCiAgICAgICAgICBBRkggY2FwYWJsZSBzbGF2ZQogICAgICAgICAg
-QUZIIGNsYXNzaWZpY2F0aW9uIHNsYXZlCiAgICAgICAgICBBRkggY2FwYWJsZSBtYXN0ZXIK
-ICAgICAgICAgIEFGSCBjbGFzc2lmaWNhdGlvbiBtYXN0ZXIKPCBIQ0kgQ29tbWFuZDogUmVh
-ZCBMb2NhbCBWZXJzaW9uIEluZm9yLi4gKDB4MDR8MHgwMDAxKSBwbGVuIDAgIFtoY2kwXSAw
-LjMxNjI0MQo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiAxMiAg
-ICAgICAgICAgICAgICAgICAgW2hjaTBdIDAuMzE5MTk2CiAgICAgIFJlYWQgTG9jYWwgVmVy
-c2lvbiBJbmZvcm1hdGlvbiAoMHgwNHwweDAwMDEpIG5jbWQgMQogICAgICAgIFN0YXR1czog
-U3VjY2VzcyAoMHgwMCkKICAgICAgICBIQ0kgdmVyc2lvbjogQmx1ZXRvb3RoIDIuMCAoMHgw
-MykgLSBSZXZpc2lvbiAzMTY0ICgweDBjNWMpCiAgICAgICAgTE1QIHZlcnNpb246IEJsdWV0
-b290aCAyLjAgKDB4MDMpIC0gU3VidmVyc2lvbiAzMTY0ICgweDBjNWMpCiAgICAgICAgTWFu
-dWZhY3R1cmVyOiBDYW1icmlkZ2UgU2lsaWNvbiBSYWRpbyAoMTApCjwgSENJIENvbW1hbmQ6
-IFJlYWQgQkQgQUREUiAoMHgwNHwweDAwMDkpIHBsZW4gMCAgICAgICAgICAgICAgICBbaGNp
-MF0gMC4zMTkyMzgKPiBIQ0kgRXZlbnQ6IENvbW1hbmQgQ29tcGxldGUgKDB4MGUpIHBsZW4g
-MTAgICAgICAgICAgICAgICAgICAgIFtoY2kwXSAwLjMyMjE5NQogICAgICBSZWFkIEJEIEFE
-RFIgKDB4MDR8MHgwMDA5KSBuY21kIDEKICAgICAgICBTdGF0dXM6IFN1Y2Nlc3MgKDB4MDAp
-CiAgICAgICAgQWRkcmVzczogMDA6MTU6ODM6MTU6QTM6MEIgKElWVCBjb3Jwb3JhdGlvbikK
-PCBIQ0kgQ29tbWFuZDogUmVhZCBCdWZmZXIgU2l6ZSAoMHgwNHwweDAwMDUpIHBsZW4gMCAg
-ICAgICAgICAgIFtoY2kwXSAwLjMyMjI3NAo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0
-ZSAoMHgwZSkgcGxlbiAxMSAgICAgICAgICAgICAgICAgICAgW2hjaTBdIDAuMzI1MTk2CiAg
-ICAgIFJlYWQgQnVmZmVyIFNpemUgKDB4MDR8MHgwMDA1KSBuY21kIDEKICAgICAgICBTdGF0
-dXM6IFN1Y2Nlc3MgKDB4MDApCiAgICAgICAgQUNMIE1UVTogNjcyICBBQ0wgbWF4IHBhY2tl
-dDogNAogICAgICAgIFNDTyBNVFU6IDQ4ICAgU0NPIG1heCBwYWNrZXQ6IDEKPCBIQ0kgQ29t
-bWFuZDogUmVhZCBDbGFzcyBvZiBEZXZpY2UgKDB4MDN8MHgwMDIzKSBwbGVuIDAgICAgICAg
-IFtoY2kwXSAwLjMyNTI0Mwo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkg
-cGxlbiA3ICAgICAgICAgICAgICAgICAgICAgW2hjaTBdIDAuMzI4MTk1CiAgICAgIFJlYWQg
-Q2xhc3Mgb2YgRGV2aWNlICgweDAzfDB4MDAyMykgbmNtZCAxCiAgICAgICAgU3RhdHVzOiBT
-dWNjZXNzICgweDAwKQogICAgICAgIENsYXNzOiAweDAwMDEwNAogICAgICAgICAgTWFqb3Ig
-Y2xhc3M6IENvbXB1dGVyIChkZXNrdG9wLCBub3RlYm9vaywgUERBLCBvcmdhbml6ZXJzKQog
-ICAgICAgICAgTWlub3IgY2xhc3M6IERlc2t0b3Agd29ya3N0YXRpb24KPCBIQ0kgQ29tbWFu
-ZDogUmVhZCBMb2NhbCBOYW1lICgweDAzfDB4MDAxNCkgcGxlbiAwICAgICAgICAgICAgIFto
-Y2kwXSAwLjMyODIzNAo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxl
-biAyNTIgICAgICAgICAgICAgICAgICAgW2hjaTBdIDAuMzQ4MTk4CiAgICAgIFJlYWQgTG9j
-YWwgTmFtZSAoMHgwM3wweDAwMTQpIG5jbWQgMQogICAgICAgIFN0YXR1czogU3VjY2VzcyAo
-MHgwMCkKICAgICAgICBOYW1lOiAKPCBIQ0kgQ29tbWFuZDogUmVhZCBWb2ljZSBTZXR0aW5n
-ICgweDAzfDB4MDAyNSkgcGxlbiAwICAgICAgICAgIFtoY2kwXSAwLjM0ODI0Nwo+IEhDSSBF
-dmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA2ICAgICAgICAgICAgICAgICAg
-ICAgW2hjaTBdIDAuMzUxMTk1CiAgICAgIFJlYWQgVm9pY2UgU2V0dGluZyAoMHgwM3wweDAw
-MjUpIG5jbWQgMQogICAgICAgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkKICAgICAgICBTZXR0
-aW5nOiAweDAwNjAKICAgICAgICAgIElucHV0IENvZGluZzogTGluZWFyCiAgICAgICAgICBJ
-bnB1dCBEYXRhIEZvcm1hdDogMidzIGNvbXBsZW1lbnQKICAgICAgICAgIElucHV0IFNhbXBs
-ZSBTaXplOiAxNi1iaXQKICAgICAgICAgICMgb2YgYml0cyBwYWRkaW5nIGF0IE1TQjogMAog
-ICAgICAgICAgQWlyIENvZGluZyBGb3JtYXQ6IENWU0QKPCBIQ0kgQ29tbWFuZDogUmVhZCBO
-dW1iZXIgb2YgU3VwcG9ydGVkLi4gKDB4MDN8MHgwMDM4KSBwbGVuIDAgIFtoY2kwXSAwLjM1
-MTIzNQo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxlbiA1ICAgICAg
-ICAgICAgICAgICAgICAgW2hjaTBdIDAuMzU0MTk5CiAgICAgIFJlYWQgTnVtYmVyIG9mIFN1
-cHBvcnRlZCBJQUMgKDB4MDN8MHgwMDM4KSBuY21kIDEKICAgICAgICBTdGF0dXM6IFN1Y2Nl
-c3MgKDB4MDApCiAgICAgICAgTnVtYmVyIG9mIElBQzogMgo8IEhDSSBDb21tYW5kOiBSZWFk
-IEN1cnJlbnQgSUFDIExBUCAoMHgwM3wweDAwMzkpIHBsZW4gMCAgICAgICAgW2hjaTBdIDAu
-MzU0MjU0Cj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDggICAg
-ICAgICAgICAgICAgICAgICBbaGNpMF0gMC4zNTcxOTYKICAgICAgUmVhZCBDdXJyZW50IElB
-QyBMQVAgKDB4MDN8MHgwMDM5KSBuY21kIDEKICAgICAgICBTdGF0dXM6IFN1Y2Nlc3MgKDB4
-MDApCiAgICAgICAgTnVtYmVyIG9mIElBQzogMQogICAgICAgIEFjY2VzcyBjb2RlOiAweDll
-OGIzMyAoR2VuZXJhbCBJbnF1aXJ5KQo8IEhDSSBDb21tYW5kOiBTZXQgRXZlbnQgRmlsdGVy
-ICgweDAzfDB4MDAwNSkgcGxlbiAxICAgICAgICAgICAgW2hjaTBdIDAuMzU3MjQ1CiAgICAg
-ICAgVHlwZTogQ2xlYXIgQWxsIEZpbHRlcnMgKDB4MDApCj4gSENJIEV2ZW50OiBDb21tYW5k
-IENvbXBsZXRlICgweDBlKSBwbGVuIDQgICAgICAgICAgICAgICAgICAgICBbaGNpMF0gMC4z
-NjAyMDEKICAgICAgU2V0IEV2ZW50IEZpbHRlciAoMHgwM3wweDAwMDUpIG5jbWQgMQogICAg
-ICAgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkKPCBIQ0kgQ29tbWFuZDogV3JpdGUgQ29ubmVj
-dGlvbiBBY2NlcHQuLi4gKDB4MDN8MHgwMDE2KSBwbGVuIDIgIFtoY2kwXSAwLjM2MDI0OAog
-ICAgICAgIFRpbWVvdXQ6IDIwMDAwLjAwMCBtc2VjICgweDdkMDApCj4gSENJIEV2ZW50OiBD
-b21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDQgICAgICAgICAgICAgICAgICAgICBbaGNp
-MF0gMC4zNjMxOTQKICAgICAgV3JpdGUgQ29ubmVjdGlvbiBBY2NlcHQgVGltZW91dCAoMHgw
-M3wweDAwMTYpIG5jbWQgMQogICAgICAgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkKPCBIQ0kg
-Q29tbWFuZDogUmVhZCBMb2NhbCBTdXBwb3J0ZWQgQ29tLi4gKDB4MDR8MHgwMDAyKSBwbGVu
-IDAgIFtoY2kwXSAwLjM2MzIzMwo+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgw
-ZSkgcGxlbiA2OCAgICAgICAgICAgICAgICAgICAgW2hjaTBdIDAuMzcxMTk0CiAgICAgIFJl
-YWQgTG9jYWwgU3VwcG9ydGVkIENvbW1hbmRzICgweDA0fDB4MDAwMikgbmNtZCAxCiAgICAg
-ICAgU3RhdHVzOiBTdWNjZXNzICgweDAwKQogICAgICAgIENvbW1hbmRzOiAxMTQgZW50cmll
-cwogICAgICAgICAgSW5xdWlyeSAoT2N0ZXQgMCAtIEJpdCAwKQogICAgICAgICAgSW5xdWly
-eSBDYW5jZWwgKE9jdGV0IDAgLSBCaXQgMSkKICAgICAgICAgIFBlcmlvZGljIElucXVpcnkg
-TW9kZSAoT2N0ZXQgMCAtIEJpdCAyKQogICAgICAgICAgRXhpdCBQZXJpb2RpYyBJbnF1aXJ5
-IE1vZGUgKE9jdGV0IDAgLSBCaXQgMykKICAgICAgICAgIENyZWF0ZSBDb25uZWN0aW9uIChP
-Y3RldCAwIC0gQml0IDQpCiAgICAgICAgICBEaXNjb25uZWN0IChPY3RldCAwIC0gQml0IDUp
-CiAgICAgICAgICBBZGQgU0NPIENvbm5lY3Rpb24gKE9jdGV0IDAgLSBCaXQgNikKICAgICAg
-ICAgIENyZWF0ZSBDb25uZWN0aW9uIENhbmNlbCAoT2N0ZXQgMCAtIEJpdCA3KQogICAgICAg
-ICAgQWNjZXB0IENvbm5lY3Rpb24gUmVxdWVzdCAoT2N0ZXQgMSAtIEJpdCAwKQogICAgICAg
-ICAgUmVqZWN0IENvbm5lY3Rpb24gUmVxdWVzdCAoT2N0ZXQgMSAtIEJpdCAxKQogICAgICAg
-ICAgTGluayBLZXkgUmVxdWVzdCBSZXBseSAoT2N0ZXQgMSAtIEJpdCAyKQogICAgICAgICAg
-TGluayBLZXkgUmVxdWVzdCBOZWdhdGl2ZSBSZXBseSAoT2N0ZXQgMSAtIEJpdCAzKQogICAg
-ICAgICAgUElOIENvZGUgUmVxdWVzdCBSZXBseSAoT2N0ZXQgMSAtIEJpdCA0KQogICAgICAg
-ICAgUElOIENvZGUgUmVxdWVzdCBOZWdhdGl2ZSBSZXBseSAoT2N0ZXQgMSAtIEJpdCA1KQog
-ICAgICAgICAgQ2hhbmdlIENvbm5lY3Rpb24gUGFja2V0IFR5cGUgKE9jdGV0IDEgLSBCaXQg
-NikKICAgICAgICAgIEF1dGhlbnRpY2F0aW9uIFJlcXVlc3RlZCAoT2N0ZXQgMSAtIEJpdCA3
-KQogICAgICAgICAgU2V0IENvbm5lY3Rpb24gRW5jcnlwdGlvbiAoT2N0ZXQgMiAtIEJpdCAw
-KQogICAgICAgICAgQ2hhbmdlIENvbm5lY3Rpb24gTGluayBLZXkgKE9jdGV0IDIgLSBCaXQg
-MSkKICAgICAgICAgIE1hc3RlciBMaW5rIEtleSAoT2N0ZXQgMiAtIEJpdCAyKQogICAgICAg
-ICAgUmVtb3RlIE5hbWUgUmVxdWVzdCAoT2N0ZXQgMiAtIEJpdCAzKQogICAgICAgICAgUmVt
-b3RlIE5hbWUgUmVxdWVzdCBDYW5jZWwgKE9jdGV0IDIgLSBCaXQgNCkKICAgICAgICAgIFJl
-YWQgUmVtb3RlIFN1cHBvcnRlZCBGZWF0dXJlcyAoT2N0ZXQgMiAtIEJpdCA1KQogICAgICAg
-ICAgUmVhZCBSZW1vdGUgRXh0ZW5kZWQgRmVhdHVyZXMgKE9jdGV0IDIgLSBCaXQgNikKICAg
-ICAgICAgIFJlYWQgUmVtb3RlIFZlcnNpb24gSW5mb3JtYXRpb24gKE9jdGV0IDIgLSBCaXQg
-NykKICAgICAgICAgIFJlYWQgQ2xvY2sgT2Zmc2V0IChPY3RldCAzIC0gQml0IDApCiAgICAg
-ICAgICBSZWFkIExNUCBIYW5kbGUgKE9jdGV0IDMgLSBCaXQgMSkKICAgICAgICAgIEhvbGQg
-TW9kZSAoT2N0ZXQgNCAtIEJpdCAxKQogICAgICAgICAgU25pZmYgTW9kZSAoT2N0ZXQgNCAt
-IEJpdCAyKQogICAgICAgICAgRXhpdCBTbmlmZiBNb2RlIChPY3RldCA0IC0gQml0IDMpCiAg
-ICAgICAgICBRb1MgU2V0dXAgKE9jdGV0IDQgLSBCaXQgNikKICAgICAgICAgIFJvbGUgRGlz
-Y292ZXJ5IChPY3RldCA0IC0gQml0IDcpCiAgICAgICAgICBTd2l0Y2ggUm9sZSAoT2N0ZXQg
-NSAtIEJpdCAwKQogICAgICAgICAgUmVhZCBMaW5rIFBvbGljeSBTZXR0aW5ncyAoT2N0ZXQg
-NSAtIEJpdCAxKQogICAgICAgICAgV3JpdGUgTGluayBQb2xpY3kgU2V0dGluZ3MgKE9jdGV0
-IDUgLSBCaXQgMikKICAgICAgICAgIFJlYWQgRGVmYXVsdCBMaW5rIFBvbGljeSBTZXR0aW5n
-cyAoT2N0ZXQgNSAtIEJpdCAzKQogICAgICAgICAgV3JpdGUgRGVmYXVsdCBMaW5rIFBvbGlj
-eSBTZXR0aW5ncyAoT2N0ZXQgNSAtIEJpdCA0KQogICAgICAgICAgU2V0IEV2ZW50IE1hc2sg
-KE9jdGV0IDUgLSBCaXQgNikKICAgICAgICAgIFJlc2V0IChPY3RldCA1IC0gQml0IDcpCiAg
-ICAgICAgICBTZXQgRXZlbnQgRmlsdGVyIChPY3RldCA2IC0gQml0IDApCiAgICAgICAgICBG
-bHVzaCAoT2N0ZXQgNiAtIEJpdCAxKQogICAgICAgICAgUmVhZCBQSU4gVHlwZSAoT2N0ZXQg
-NiAtIEJpdCAyKQogICAgICAgICAgV3JpdGUgUElOIFR5cGUgKE9jdGV0IDYgLSBCaXQgMykK
-ICAgICAgICAgIENyZWF0ZSBOZXcgVW5pdCBLZXkgKE9jdGV0IDYgLSBCaXQgNCkKICAgICAg
-ICAgIFJlYWQgU3RvcmVkIExpbmsgS2V5IChPY3RldCA2IC0gQml0IDUpCiAgICAgICAgICBX
-cml0ZSBTdG9yZWQgTGluayBLZXkgKE9jdGV0IDYgLSBCaXQgNikKICAgICAgICAgIERlbGV0
-ZSBTdG9yZWQgTGluayBLZXkgKE9jdGV0IDYgLSBCaXQgNykKICAgICAgICAgIFdyaXRlIExv
-Y2FsIE5hbWUgKE9jdGV0IDcgLSBCaXQgMCkKICAgICAgICAgIFJlYWQgTG9jYWwgTmFtZSAo
-T2N0ZXQgNyAtIEJpdCAxKQogICAgICAgICAgUmVhZCBDb25uZWN0aW9uIEFjY2VwdCBUaW1l
-b3V0IChPY3RldCA3IC0gQml0IDIpCiAgICAgICAgICBXcml0ZSBDb25uZWN0aW9uIEFjY2Vw
-dCBUaW1lb3V0IChPY3RldCA3IC0gQml0IDMpCiAgICAgICAgICBSZWFkIFBhZ2UgVGltZW91
-dCAoT2N0ZXQgNyAtIEJpdCA0KQogICAgICAgICAgV3JpdGUgUGFnZSBUaW1lb3V0IChPY3Rl
-dCA3IC0gQml0IDUpCiAgICAgICAgICBSZWFkIFNjYW4gRW5hYmxlIChPY3RldCA3IC0gQml0
-IDYpCiAgICAgICAgICBXcml0ZSBTY2FuIEVuYWJsZSAoT2N0ZXQgNyAtIEJpdCA3KQogICAg
-ICAgICAgUmVhZCBQYWdlIFNjYW4gQWN0aXZpdHkgKE9jdGV0IDggLSBCaXQgMCkKICAgICAg
-ICAgIFdyaXRlIFBhZ2UgU2NhbiBBY3Rpdml0eSAoT2N0ZXQgOCAtIEJpdCAxKQogICAgICAg
-ICAgUmVhZCBJbnF1aXJ5IFNjYW4gQWN0aXZpdHkgKE9jdGV0IDggLSBCaXQgMikKICAgICAg
-ICAgIFdyaXRlIElucXVpcnkgU2NhbiBBY3Rpdml0eSAoT2N0ZXQgOCAtIEJpdCAzKQogICAg
-ICAgICAgUmVhZCBBdXRoZW50aWNhdGlvbiBFbmFibGUgKE9jdGV0IDggLSBCaXQgNCkKICAg
-ICAgICAgIFdyaXRlIEF1dGhlbnRpY2F0aW9uIEVuYWJsZSAoT2N0ZXQgOCAtIEJpdCA1KQog
-ICAgICAgICAgUmVhZCBFbmNyeXB0aW9uIE1vZGUgKE9jdGV0IDggLSBCaXQgNikKICAgICAg
-ICAgIFdyaXRlIEVuY3J5cHRpb24gTW9kZSAoT2N0ZXQgOCAtIEJpdCA3KQogICAgICAgICAg
-UmVhZCBDbGFzcyBvZiBEZXZpY2UgKE9jdGV0IDkgLSBCaXQgMCkKICAgICAgICAgIFdyaXRl
-IENsYXNzIG9mIERldmljZSAoT2N0ZXQgOSAtIEJpdCAxKQogICAgICAgICAgUmVhZCBWb2lj
-ZSBTZXR0aW5nIChPY3RldCA5IC0gQml0IDIpCiAgICAgICAgICBXcml0ZSBWb2ljZSBTZXR0
-aW5nIChPY3RldCA5IC0gQml0IDMpCiAgICAgICAgICBSZWFkIEF1dG9tYXRpYyBGbHVzaCBU
-aW1lb3V0IChPY3RldCA5IC0gQml0IDQpCiAgICAgICAgICBXcml0ZSBBdXRvbWF0aWMgRmx1
-c2ggVGltZW91dCAoT2N0ZXQgOSAtIEJpdCA1KQogICAgICAgICAgUmVhZCBOdW0gQnJvYWRj
-YXN0IFJldHJhbnNtaXNzaW9ucyAoT2N0ZXQgOSAtIEJpdCA2KQogICAgICAgICAgV3JpdGUg
-TnVtIEJyb2FkY2FzdCBSZXRyYW5zbWlzc2lvbnMgKE9jdGV0IDkgLSBCaXQgNykKICAgICAg
-ICAgIFJlYWQgSG9sZCBNb2RlIEFjdGl2aXR5IChPY3RldCAxMCAtIEJpdCAwKQogICAgICAg
-ICAgV3JpdGUgSG9sZCBNb2RlIEFjdGl2aXR5IChPY3RldCAxMCAtIEJpdCAxKQogICAgICAg
-ICAgUmVhZCBUcmFuc21pdCBQb3dlciBMZXZlbCAoT2N0ZXQgMTAgLSBCaXQgMikKICAgICAg
-ICAgIFJlYWQgU3luYyBGbG93IENvbnRyb2wgRW5hYmxlIChPY3RldCAxMCAtIEJpdCAzKQog
-ICAgICAgICAgV3JpdGUgU3luYyBGbG93IENvbnRyb2wgRW5hYmxlIChPY3RldCAxMCAtIEJp
-dCA0KQogICAgICAgICAgU2V0IENvbnRyb2xsZXIgVG8gSG9zdCBGbG93IENvbnRyb2wgKE9j
-dGV0IDEwIC0gQml0IDUpCiAgICAgICAgICBIb3N0IEJ1ZmZlciBTaXplIChPY3RldCAxMCAt
-IEJpdCA2KQogICAgICAgICAgSG9zdCBOdW1iZXIgb2YgQ29tcGxldGVkIFBhY2tldHMgKE9j
-dGV0IDEwIC0gQml0IDcpCiAgICAgICAgICBSZWFkIExpbmsgU3VwZXJ2aXNpb24gVGltZW91
-dCAoT2N0ZXQgMTEgLSBCaXQgMCkKICAgICAgICAgIFdyaXRlIExpbmsgU3VwZXJ2aXNpb24g
-VGltZW91dCAoT2N0ZXQgMTEgLSBCaXQgMSkKICAgICAgICAgIFJlYWQgTnVtYmVyIG9mIFN1
-cHBvcnRlZCBJQUMgKE9jdGV0IDExIC0gQml0IDIpCiAgICAgICAgICBSZWFkIEN1cnJlbnQg
-SUFDIExBUCAoT2N0ZXQgMTEgLSBCaXQgMykKICAgICAgICAgIFdyaXRlIEN1cnJlbnQgSUFD
-IExBUCAoT2N0ZXQgMTEgLSBCaXQgNCkKICAgICAgICAgIFJlYWQgUGFnZSBTY2FuIFBlcmlv
-ZCBNb2RlIChPY3RldCAxMSAtIEJpdCA1KQogICAgICAgICAgV3JpdGUgUGFnZSBTY2FuIFBl
-cmlvZCBNb2RlIChPY3RldCAxMSAtIEJpdCA2KQogICAgICAgICAgUmVhZCBQYWdlIFNjYW4g
-TW9kZSAoT2N0ZXQgMTEgLSBCaXQgNykKICAgICAgICAgIFdyaXRlIFBhZ2UgU2NhbiBNb2Rl
-IChPY3RldCAxMiAtIEJpdCAwKQogICAgICAgICAgU2V0IEFGSCBIb3N0IENoYW5uZWwgQ2xh
-c3NpZmljYXRpb24gKE9jdGV0IDEyIC0gQml0IDEpCiAgICAgICAgICBSZWFkIElucXVpcnkg
-U2NhbiBUeXBlIChPY3RldCAxMiAtIEJpdCA0KQogICAgICAgICAgV3JpdGUgSW5xdWlyeSBT
-Y2FuIFR5cGUgKE9jdGV0IDEyIC0gQml0IDUpCiAgICAgICAgICBSZWFkIElucXVpcnkgTW9k
-ZSAoT2N0ZXQgMTIgLSBCaXQgNikKICAgICAgICAgIFdyaXRlIElucXVpcnkgTW9kZSAoT2N0
-ZXQgMTIgLSBCaXQgNykKICAgICAgICAgIFJlYWQgUGFnZSBTY2FuIFR5cGUgKE9jdGV0IDEz
-IC0gQml0IDApCiAgICAgICAgICBXcml0ZSBQYWdlIFNjYW4gVHlwZSAoT2N0ZXQgMTMgLSBC
-aXQgMSkKICAgICAgICAgIFJlYWQgQUZIIENoYW5uZWwgQXNzZXNzbWVudCBNb2RlIChPY3Rl
-dCAxMyAtIEJpdCAyKQogICAgICAgICAgV3JpdGUgQUZIIENoYW5uZWwgQXNzZXNzbWVudCBN
-b2RlIChPY3RldCAxMyAtIEJpdCAzKQogICAgICAgICAgUmVhZCBMb2NhbCBWZXJzaW9uIElu
-Zm9ybWF0aW9uIChPY3RldCAxNCAtIEJpdCAzKQogICAgICAgICAgUmVhZCBMb2NhbCBTdXBw
-b3J0ZWQgRmVhdHVyZXMgKE9jdGV0IDE0IC0gQml0IDUpCiAgICAgICAgICBSZWFkIExvY2Fs
-IEV4dGVuZGVkIEZlYXR1cmVzIChPY3RldCAxNCAtIEJpdCA2KQogICAgICAgICAgUmVhZCBC
-dWZmZXIgU2l6ZSAoT2N0ZXQgMTQgLSBCaXQgNykKICAgICAgICAgIFJlYWQgQ291bnRyeSBD
-b2RlIChPY3RldCAxNSAtIEJpdCAwKQogICAgICAgICAgUmVhZCBCRCBBRERSIChPY3RldCAx
-NSAtIEJpdCAxKQogICAgICAgICAgUmVhZCBGYWlsZWQgQ29udGFjdCBDb3VudGVyIChPY3Rl
-dCAxNSAtIEJpdCAyKQogICAgICAgICAgUmVzZXQgRmFpbGVkIENvbnRhY3QgQ291bnRlciAo
-T2N0ZXQgMTUgLSBCaXQgMykKICAgICAgICAgIFJlYWQgTGluayBRdWFsaXR5IChPY3RldCAx
-NSAtIEJpdCA0KQogICAgICAgICAgUmVhZCBSU1NJIChPY3RldCAxNSAtIEJpdCA1KQogICAg
-ICAgICAgUmVhZCBBRkggQ2hhbm5lbCBNYXAgKE9jdGV0IDE1IC0gQml0IDYpCiAgICAgICAg
-ICBSZWFkIENsb2NrIChPY3RldCAxNSAtIEJpdCA3KQogICAgICAgICAgUmVhZCBMb29wYmFj
-ayBNb2RlIChPY3RldCAxNiAtIEJpdCAwKQogICAgICAgICAgV3JpdGUgTG9vcGJhY2sgTW9k
-ZSAoT2N0ZXQgMTYgLSBCaXQgMSkKICAgICAgICAgIEVuYWJsZSBEZXZpY2UgVW5kZXIgVGVz
-dCBNb2RlIChPY3RldCAxNiAtIEJpdCAyKQogICAgICAgICAgU2V0dXAgU3luY2hyb25vdXMg
-Q29ubmVjdGlvbiAoT2N0ZXQgMTYgLSBCaXQgMykKICAgICAgICAgIEFjY2VwdCBTeW5jaHJv
-bm91cyBDb25uZWN0aW9uIFJlcXVlc3QgKE9jdGV0IDE2IC0gQml0IDQpCiAgICAgICAgICBS
-ZWplY3QgU3luY2hyb25vdXMgQ29ubmVjdGlvbiBSZXF1ZXN0IChPY3RldCAxNiAtIEJpdCA1
-KQo8IEhDSSBDb21tYW5kOiBTZXQgRXZlbnQgTWFzayAoMHgwM3wweDAwMDEpIHBsZW4gOCAg
-ICAgICAgICAgICAgW2hjaTBdIDAuMzcxMjcxCiAgICAgICAgTWFzazogMHgwMDAwMTgwN2Zm
-ZmJmZmZmCiAgICAgICAgICBJbnF1aXJ5IENvbXBsZXRlCiAgICAgICAgICBJbnF1aXJ5IFJl
-c3VsdAogICAgICAgICAgQ29ubmVjdGlvbiBDb21wbGV0ZQogICAgICAgICAgQ29ubmVjdGlv
-biBSZXF1ZXN0CiAgICAgICAgICBEaXNjb25uZWN0aW9uIENvbXBsZXRlCiAgICAgICAgICBB
-dXRoZW50aWNhdGlvbiBDb21wbGV0ZQogICAgICAgICAgUmVtb3RlIE5hbWUgUmVxdWVzdCBD
-b21wbGV0ZQogICAgICAgICAgRW5jcnlwdGlvbiBDaGFuZ2UKICAgICAgICAgIENoYW5nZSBD
-b25uZWN0aW9uIExpbmsgS2V5IENvbXBsZXRlCiAgICAgICAgICBNYXN0ZXIgTGluayBLZXkg
-Q29tcGxldGUKICAgICAgICAgIFJlYWQgUmVtb3RlIFN1cHBvcnRlZCBGZWF0dXJlcyBDb21w
-bGV0ZQogICAgICAgICAgUmVhZCBSZW1vdGUgVmVyc2lvbiBJbmZvcm1hdGlvbiBDb21wbGV0
-ZQogICAgICAgICAgUW9TIFNldHVwIENvbXBsZXRlCiAgICAgICAgICBDb21tYW5kIENvbXBs
-ZXRlCiAgICAgICAgICBDb21tYW5kIFN0YXR1cwogICAgICAgICAgSGFyZHdhcmUgRXJyb3IK
-ICAgICAgICAgIEZsdXNoIE9jY3VycmVkCiAgICAgICAgICBSb2xlIENoYW5nZQogICAgICAg
-ICAgTW9kZSBDaGFuZ2UKICAgICAgICAgIFJldHVybiBMaW5rIEtleXMKICAgICAgICAgIFBJ
-TiBDb2RlIFJlcXVlc3QKICAgICAgICAgIExpbmsgS2V5IFJlcXVlc3QKICAgICAgICAgIExp
-bmsgS2V5IE5vdGlmaWNhdGlvbgogICAgICAgICAgTG9vcGJhY2sgQ29tbWFuZAogICAgICAg
-ICAgRGF0YSBCdWZmZXIgT3ZlcmZsb3cKICAgICAgICAgIE1heCBTbG90cyBDaGFuZ2UKICAg
-ICAgICAgIFJlYWQgQ2xvY2sgT2Zmc2V0IENvbXBsZXRlCiAgICAgICAgICBDb25uZWN0aW9u
-IFBhY2tldCBUeXBlIENoYW5nZWQKICAgICAgICAgIFFvUyBWaW9sYXRpb24KICAgICAgICAg
-IFBhZ2UgU2NhbiBNb2RlIENoYW5nZQogICAgICAgICAgUGFnZSBTY2FuIFJlcGV0aXRpb24g
-TW9kZSBDaGFuZ2UKICAgICAgICAgIEZsb3cgU3BlY2lmaWNhdGlvbiBDb21wbGV0ZQogICAg
-ICAgICAgSW5xdWlyeSBSZXN1bHQgd2l0aCBSU1NJCiAgICAgICAgICBSZWFkIFJlbW90ZSBF
-eHRlbmRlZCBGZWF0dXJlcyBDb21wbGV0ZQogICAgICAgICAgU3luY2hyb25vdXMgQ29ubmVj
-dGlvbiBDb21wbGV0ZQogICAgICAgICAgU3luY2hyb25vdXMgQ29ubmVjdGlvbiBDaGFuZ2Vk
-Cj4gSENJIEV2ZW50OiBDb21tYW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDQgICAgICAgICAg
-ICAgICAgICAgICBbaGNpMF0gMC4zNzQyMDEKICAgICAgU2V0IEV2ZW50IE1hc2sgKDB4MDN8
-MHgwMDAxKSBuY21kIDEKICAgICAgICBTdGF0dXM6IFN1Y2Nlc3MgKDB4MDApCjwgSENJIENv
-bW1hbmQ6IFJlYWQgU3RvcmVkIExpbmsgS2V5ICgweDAzfDB4MDAwZCkgcGxlbiA3ICAgICAg
-ICBbaGNpMF0gMC4zNzQyNDEKICAgICAgICBBZGRyZXNzOiAwMDowMDowMDowMDowMDowMCAo
-T1VJIDAwLTAwLTAwKQogICAgICAgIFJlYWQgYWxsOiAweDAxCj4gSENJIEV2ZW50OiBDb21t
-YW5kIENvbXBsZXRlICgweDBlKSBwbGVuIDggICAgICAgICAgICAgICAgICAgICBbaGNpMF0g
-MC4zNzcxOTgKICAgICAgUmVhZCBTdG9yZWQgTGluayBLZXkgKDB4MDN8MHgwMDBkKSBuY21k
-IDEKICAgICAgICBTdGF0dXM6IFVuc3VwcG9ydGVkIEZlYXR1cmUgb3IgUGFyYW1ldGVyIFZh
-bHVlICgweDExKQogICAgICAgIE1heCBudW0ga2V5czogMAogICAgICAgIE51bSBrZXlzOiAw
-Cj0gRGVsZXRlIEluZGV4OiAwMDowMDowMDowMDowMDowMCAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBbaGNpMF0gNS40MzM0OTEK
---------------090209040805080401080805--
+Lets use "Voting" here.
+
+> +		return;
+> +	}
+> +
+> +	if (new_vote != old_vote) {
+> +		if (new_vote)
+> +			__serial_clock_on(hu->tty);
+> +		else
+> +			__serial_clock_off(hu->tty);
+> +
+> +		BT_DBG("HCIUART_IBS: vote serial clock %s(%s)",
+> +		       new_vote? "true" : "false",
+> +		       vote? "true" : "false");
+
+No need to prefix it with HCIUART_IBS. Dynamic debug lets you print file and function names.
+
+Lets start with "Vote".
+
+> +
+> +		diff = jiffies_to_msecs(jiffies - qca->vote_last_jif);
+> +
+> +		if (new_vote) {
+> +			qca->votes_on++;
+> +			qca->vote_off_ms += diff;
+> +		} else {
+> +			qca->votes_off++;
+> +			qca->vote_on_ms += diff;
+> +		}
+> +		qca->vote_last_jif = jiffies;
+> +	}
+> +}
+> +
+> +/*
+> + * Builds and sends an HCI_IBS command packet.
+> + * These are very simple packets with only 1 cmd byte
+> + */
+
+Comment style is this:
+
+	/* Foo
+	 * Bar
+	 */
+
+> +static int send_hci_ibs_cmd(u8 cmd, struct hci_uart *hu)
+> +{
+> +	int err = 0;
+> +	struct sk_buff *skb = NULL;
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	BT_DBG("hu %p send hci ibs cmd 0x%x", hu, cmd);
+> +
+> +	/* allocate packet */
+
+Scrap this comment. It is pretty clear what you are doing.
+
+> +	skb = bt_skb_alloc(1, GFP_ATOMIC);
+> +	if (!skb) {
+> +		BT_ERR("cannot allocate memory for HCI_IBS packet");
+
+Use "Failed" instead of "cannot" here.
+
+> +		return -ENOMEM;
+> +	}
+> +
+> +	/* prepare packet */
+
+Use a proper comment "Assign HCI_IBS command type" or something similar that makes sense.
+
+> +	*skb_put(skb, 1) = cmd;
+> +
+> +	/* send packet */
+
+Actually this comment is wrong. It will not send the packet it will just queue. For simplicity just delete this comment since it is obvious what queue_tail does.
+
+> +	skb_queue_tail(&qca->txq, skb);
+> +
+> +	return err;
+> +}
+> +
+> +static void qca_wq_awake_device(struct work_struct *work)
+> +{
+> +	struct qca_data *qca = container_of(work, struct qca_data,
+> +					    ws_awake_device);
+> +	struct hci_uart *hu = qca->hu;
+> +	unsigned long retrans_delay;
+> +
+> +	BT_DBG(" %p wq awake device", hu);
+
+You start with a space in the string. Why?
+
+> +
+> +	/* Vote for serial clock */
+> +	serial_clock_vote(HCI_IBS_TX_VOTE_CLOCK_ON, hu);
+> +
+> +	spin_lock(&qca->hci_ibs_lock);
+> +
+> +	/* send wake indication to device */
+> +	if (send_hci_ibs_cmd(HCI_IBS_WAKE_IND, hu) < 0)
+> +		BT_ERR("cannot send WAKE to device");
+
+Please start comments with uppercase letters. And fix that for all the other ones as well.
+
+> +
+> +	qca->ibs_sent_wakes++;
+> +
+> +	/* start retransmit timer */
+> +	retrans_delay = msecs_to_jiffies(qca->wake_retrans);
+> +	mod_timer(&qca->wake_retrans_timer, jiffies + retrans_delay);
+> +
+> +	spin_unlock(&qca->hci_ibs_lock);
+> +
+> +	/* actually send the packets */
+> +	hci_uart_tx_wakeup(hu);
+> +}
+> +
+> +static void qca_wq_awake_rx(struct work_struct *work)
+> +{
+> +	struct qca_data *qca = container_of(work, struct qca_data,
+> +					    ws_awake_rx);
+> +	struct hci_uart *hu = qca->hu;
+> +
+> +	BT_DBG(" %p wq awake rx", hu);
+
+Same as above. Starts with a space?
+
+> +
+> +	serial_clock_vote(HCI_IBS_RX_VOTE_CLOCK_ON, hu);
+> +
+> +	spin_lock(&qca->hci_ibs_lock);
+> +	qca->rx_ibs_state = HCI_IBS_RX_AWAKE;
+> +
+> +	/* Always acknowledge device wake up,
+> +	 * sending IBS message doesn't count as TX ON
+> +	 */
+> +	if (send_hci_ibs_cmd(HCI_IBS_WAKE_ACK, hu) < 0)
+> +		BT_ERR("cannot acknowledge device wake up");
+> +
+> +	qca->ibs_sent_wacks++;
+> +
+> +	spin_unlock(&qca->hci_ibs_lock);
+> +
+> +	/* actually send the packets */
+> +	hci_uart_tx_wakeup(hu);
+> +}
+> +
+> +static void qca_wq_serial_rx_clock_vote_off(struct work_struct *work)
+> +{
+> +	struct qca_data *qca = container_of(work, struct qca_data,
+> +					    ws_rx_vote_off);
+> +	struct hci_uart *hu = qca->hu;
+> +
+> +	BT_DBG("hu %p rx clock vote off", hu);
+> +
+> +	serial_clock_vote(HCI_IBS_RX_VOTE_CLOCK_OFF, hu);
+> +}
+> +
+> +static void qca_wq_serial_tx_clock_vote_off(struct work_struct *work)
+> +{
+> +	struct qca_data *qca = container_of(work, struct qca_data,
+> +					    ws_tx_vote_off);
+> +	struct hci_uart *hu = qca->hu;
+> +
+> +	BT_DBG("hu %p tx clock vote off", hu);
+> +
+> +	/* run HCI tx handling unlocked */
+> +	hci_uart_tx_wakeup(hu);
+> +
+> +	/* now that message queued to tty driver, vote for tty clocks off
+> +	 * It is up to the tty driver to pend the clocks off until tx done.
+> +	 */
+> +	serial_clock_vote(HCI_IBS_TX_VOTE_CLOCK_OFF, hu);
+> +}
+> +
+> +static void hci_ibs_tx_idle_timeout(unsigned long arg)
+> +{
+> +	struct hci_uart *hu = (struct hci_uart *)arg;
+> +	struct qca_data *qca = hu->priv;
+> +	unsigned long flags;
+> +
+> +	BT_DBG("hu %p idle timeout in %d state", hu, qca->tx_ibs_state);
+> +
+> +	spin_lock_irqsave_nested(&qca->hci_ibs_lock,
+> +				 flags, SINGLE_DEPTH_NESTING);
+> +
+> +	switch (qca->tx_ibs_state) {
+> +	case HCI_IBS_TX_AWAKE:
+> +		/* TX_IDLE, go to SLEEP */
+> +		if (send_hci_ibs_cmd(HCI_IBS_SLEEP_IND, hu) < 0) {
+> +			BT_ERR("cannot send SLEEP to device");
+> +			break;
+> +		}
+> +		qca->tx_ibs_state = HCI_IBS_TX_ASLEEP;
+> +		qca->ibs_sent_slps++;
+> +		queue_work(qca->workqueue, &qca->ws_tx_vote_off);
+> +		break;
+> +
+> +	case HCI_IBS_TX_ASLEEP:
+> +	case HCI_IBS_TX_WAKING:
+> +		/* fall through */
+
+Extra empty line here.
+
+> +	default:
+> +		BT_ERR("spurious timeout in tx state %d", qca->tx_ibs_state);
+> +		break;
+> +	}
+> +
+> +	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+> +}
+> +
+> +static void hci_ibs_wake_retrans_timeout(unsigned long arg)
+> +{
+> +	struct hci_uart *hu = (struct hci_uart *)arg;
+> +	struct qca_data *qca = hu->priv;
+> +	unsigned long flags, retrans_delay;
+> +	unsigned long retransmit = 0;
+> +
+> +	BT_DBG("hu %p wake retransmit timeout in %d state",
+> +		hu, qca->tx_ibs_state);
+> +
+> +	spin_lock_irqsave_nested(&qca->hci_ibs_lock,
+> +				 flags, SINGLE_DEPTH_NESTING);
+> +
+> +	switch (qca->tx_ibs_state) {
+> +	case HCI_IBS_TX_WAKING:
+> +		/* No WAKE_ACK, retransmit WAKE */
+> +		retransmit = 1;
+> +		if (send_hci_ibs_cmd(HCI_IBS_WAKE_IND, hu) < 0) {
+> +			BT_ERR("cannot acknowledge device wake up");
+> +			break;
+> +		}
+> +		qca->ibs_sent_wakes++;
+> +		retrans_delay = msecs_to_jiffies(qca->wake_retrans);
+> +		mod_timer(&qca->wake_retrans_timer, jiffies + retrans_delay);
+> +		break;
+> +
+> +	case HCI_IBS_TX_ASLEEP:
+> +	case HCI_IBS_TX_AWAKE:
+
+Add /* fall through */ comment here.
+
+> +
+> +	default:
+> +		BT_ERR("spurrious timeout tx state %d", qca->tx_ibs_state);
+> +		break;
+> +	}
+> +
+> +	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+> +
+> +	if (retransmit)
+> +		hci_uart_tx_wakeup(hu);
+> +}
+> +
+> +/* Initialize protocol */
+> +static int qca_open(struct hci_uart *hu)
+> +{
+> +	struct qca_data *qca;
+> +
+> +	BT_DBG("hu %p qca_open", hu);
+> +
+> +	qca = kzalloc(sizeof(struct qca_data), GFP_ATOMIC);
+> +	if (!qca)
+> +		return -ENOMEM;
+> +
+> +	skb_queue_head_init(&qca->txq);
+> +	skb_queue_head_init(&qca->tx_wait_q);
+> +	spin_lock_init(&qca->hci_ibs_lock);
+> +	qca->workqueue = create_singlethread_workqueue("qca_wq");
+> +	if (!qca->workqueue) {
+> +		BT_ERR("QCA Workqueue not initialized properly");
+> +		kfree(qca);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	INIT_WORK(&qca->ws_awake_rx, qca_wq_awake_rx);
+> +	INIT_WORK(&qca->ws_awake_device, qca_wq_awake_device);
+> +	INIT_WORK(&qca->ws_rx_vote_off, qca_wq_serial_rx_clock_vote_off);
+> +	INIT_WORK(&qca->ws_tx_vote_off, qca_wq_serial_tx_clock_vote_off);
+> +
+> +	qca->hu = hu;
+> +
+> +	/* Assume we start with both sides asleep -- extra wakes OK */
+> +	qca->tx_ibs_state = HCI_IBS_TX_ASLEEP;
+> +	qca->rx_ibs_state = HCI_IBS_RX_ASLEEP;
+> +	/* clocks actually on, but we start votes off */
+> +	qca->tx_vote = false;
+> +	qca->rx_vote = false;
+> +	qca->flags = 0;
+> +
+> +	qca->ibs_sent_wacks = 0;
+> +	qca->ibs_sent_slps = 0;
+> +	qca->ibs_sent_wakes = 0;
+> +	qca->ibs_recv_wacks = 0;
+> +	qca->ibs_recv_slps = 0;
+> +	qca->ibs_recv_wakes = 0;
+> +	qca->vote_last_jif = jiffies;
+> +	qca->vote_on_ms = 0;
+> +	qca->vote_off_ms = 0;
+> +	qca->votes_on = 0;
+> +	qca->votes_off = 0;
+> +	qca->tx_votes_on = 0;
+> +	qca->tx_votes_off = 0;
+> +	qca->rx_votes_on = 0;
+> +	qca->rx_votes_off = 0;
+> +
+> +	hu->priv = qca;
+> +
+> +	init_timer(&qca->wake_retrans_timer);
+> +	qca->wake_retrans_timer.function = hci_ibs_wake_retrans_timeout;
+> +	qca->wake_retrans_timer.data = (u_long)hu;
+> +	qca->wake_retrans = IBS_WAKE_RETRANS_TIMEOUT;
+> +
+> +	init_timer(&qca->tx_idle_timer);
+> +	qca->tx_idle_timer.function = hci_ibs_tx_idle_timeout;
+> +	qca->tx_idle_timer.data = (u_long)hu;
+> +	qca->tx_idle_delay = IBS_TX_IDLE_TIMEOUT;
+> +
+> +	BT_DBG("HCI_UART_QCA open, tx_idle_delay=%u, wake_retrans=%u",
+> +		qca->tx_idle_delay, qca->wake_retrans);
+> +
+> +	return 0;
+> +}
+> +
+> +static void qca_debugfs_init(struct hci_dev *hdev)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	struct qca_data *qca = hu->priv;
+> +	umode_t mode;
+> +
+> +	if (!hdev->debugfs)
+> +		return;
+> +
+> +	qca->ibs_dir = debugfs_create_dir("ibs", hdev->debugfs);
+> +
+> +	/* read only */
+> +	mode = S_IRUGO;
+> +	debugfs_create_u8("tx_ibs_state", mode, qca->ibs_dir,
+> +			  &qca->tx_ibs_state);
+> +	debugfs_create_u8("rx_ibs_state", mode, qca->ibs_dir,
+> +			  &qca->rx_ibs_state);
+> +	debugfs_create_u64("ibs_sent_sleeps", mode, qca->ibs_dir,
+> +			   &qca->ibs_sent_slps);
+> +	debugfs_create_u64("ibs_sent_wakes", mode, qca->ibs_dir,
+> +			   &qca->ibs_sent_wakes);
+> +	debugfs_create_u64("ibs_sent_wake_acks", mode, qca->ibs_dir,
+> +			   &qca->ibs_sent_wacks);
+> +	debugfs_create_u64("ibs_recv_sleeps", mode, qca->ibs_dir,
+> +			   &qca->ibs_recv_slps);
+> +	debugfs_create_u64("ibs_recv_wakes", mode, qca->ibs_dir,
+> +			   &qca->ibs_recv_wakes);
+> +	debugfs_create_u64("ibs_recv_wake_acks", mode, qca->ibs_dir,
+> +			   &qca->ibs_recv_wacks);
+> +	debugfs_create_bool("tx_vote", mode, qca->ibs_dir,
+> +			    (u32 *)&qca->tx_vote);
+> +	debugfs_create_u64("tx_votes_on", mode, qca->ibs_dir,
+> +			   &qca->tx_votes_on);
+> +	debugfs_create_u64("tx_votes_off", mode, qca->ibs_dir,
+> +			   &qca->tx_votes_off);
+> +	debugfs_create_bool("rx_vote", mode, qca->ibs_dir,
+> +			    (u32 *)&qca->rx_vote);
+> +	debugfs_create_u64("rx_votes_on", mode, qca->ibs_dir,
+> +			   &qca->rx_votes_on);
+> +	debugfs_create_u64("rx_votes_off", mode, qca->ibs_dir,
+> +			   &qca->rx_votes_off);
+> +	debugfs_create_u64("votes_on", mode, qca->ibs_dir, &qca->votes_on);
+> +	debugfs_create_u64("votes_off", mode, qca->ibs_dir, &qca->votes_off);
+> +	debugfs_create_u32("vote_on_ms", mode, qca->ibs_dir,
+> +			   &qca->vote_on_ms);
+> +	debugfs_create_u32("vote_off_ms", mode, qca->ibs_dir,
+> +			   &qca->vote_off_ms);
+> +
+> +	/* read/write */
+> +	mode = S_IRUGO | S_IWUSR;
+> +	debugfs_create_u32("wake_retrans", mode, qca->ibs_dir,
+> +			   &qca->wake_retrans);
+> +	debugfs_create_u32("tx_idle_delay", mode, qca->ibs_dir,
+> +			   &qca->tx_idle_delay);
+> +}
+> +
+> +/* Flush protocol data */
+> +static int qca_flush(struct hci_uart *hu)
+> +{
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	BT_DBG("hu %p qca flush", hu);
+> +
+> +	skb_queue_purge(&qca->tx_wait_q);
+> +	skb_queue_purge(&qca->txq);
+> +
+> +	return 0;
+> +}
+> +
+> +/* Close protocol */
+> +static int qca_close(struct hci_uart *hu)
+> +{
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	BT_DBG("hu %p qca close", hu);
+> +
+> +	serial_clock_vote(HCI_IBS_VOTE_STATS_UPDATE, hu);
+> +
+> +	skb_queue_purge(&qca->tx_wait_q);
+> +	skb_queue_purge(&qca->txq);
+> +	del_timer(&qca->tx_idle_timer);
+> +	del_timer(&qca->wake_retrans_timer);
+> +	destroy_workqueue(qca->workqueue);
+> +	qca->hu = NULL;
+> +
+> +	kfree_skb(qca->rx_skb);
+> +
+> +	hu->priv = NULL;
+> +
+> +	kfree(qca);
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Called upon a wake-up-indication from the device
+> + */
+> +static void device_want_to_wakeup(struct hci_uart *hu)
+> +{
+> +	unsigned long flags;
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	BT_DBG("hu %p want to wake up", hu);
+> +
+> +	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+> +
+> +	qca->ibs_recv_wakes++;
+> +
+> +	switch (qca->rx_ibs_state) {
+> +	case HCI_IBS_RX_ASLEEP:
+> +		/* Make sure clock is on - we may have turned clock off since
+> +		 * receiving the wake up indicator
+> +		 * awake rx clock
+
+Wouldn't this fit into two lines?
+
+> +		 */
+> +		queue_work(qca->workqueue, &qca->ws_awake_rx);
+> +		spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+> +		return;
+> +
+> +	case HCI_IBS_RX_AWAKE:
+> +		/* Always acknowledge device wake up,
+> +		 * sending IBS message doesn't count as TX ON.
+> +		 */
+> +		if (send_hci_ibs_cmd(HCI_IBS_WAKE_ACK, hu) < 0) {
+> +			BT_ERR("cannot acknowledge device wake up");
+> +			break;
+> +		}
+> +		qca->ibs_sent_wacks++;
+> +		break;
+> +
+> +	default:
+> +		/* any other state is illegal */
+> +		BT_ERR("received HCI_IBS_WAKE_IND in rx state %d",
+> +		       qca->rx_ibs_state);
+> +		break;
+> +	}
+> +
+> +	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+> +
+> +	/* actually send the packets */
+> +	hci_uart_tx_wakeup(hu);
+> +}
+> +
+> +/*
+> + * Called upon a sleep-indication from the device
+> + */
+
+Comment style cleanup please.
+
+> +static void device_want_to_sleep(struct hci_uart *hu)
+> +{
+> +	unsigned long flags;
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	BT_DBG("hu %p want to sleep", hu);
+> +
+> +	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+> +
+> +	qca->ibs_recv_slps++;
+> +
+> +	switch (qca->rx_ibs_state) {
+> +	case HCI_IBS_RX_AWAKE:
+> +		/* update state */
+> +		qca->rx_ibs_state = HCI_IBS_RX_ASLEEP;
+> +		/* vote off rx clock under workqueue */
+> +		queue_work(qca->workqueue, &qca->ws_rx_vote_off);
+> +		break;
+> +
+> +	case HCI_IBS_RX_ASLEEP:
+> +		/* fall-through */
+
+Extra empty line here please.
+
+> +	default:
+> +		/* any other state is illegal */
+> +		BT_ERR("received HCI_IBS_SLEEP_IND in rx state %d",
+> +		       qca->rx_ibs_state);
+> +		break;
+> +	}
+> +
+> +	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+> +}
+> +
+> +/*
+> + * Called upon wake-up-acknowledgement from the device
+> + */
+
+Comment style fixup.
+
+> +static void device_woke_up(struct hci_uart *hu)
+> +{
+> +	unsigned long flags, idle_delay;
+> +	struct qca_data *qca = hu->priv;
+> +	struct sk_buff *skb = NULL;
+> +
+> +	BT_DBG("hu %p woke up", hu);
+> +
+> +	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+> +
+> +	qca->ibs_recv_wacks++;
+> +
+> +	switch (qca->tx_ibs_state) {
+> +	case HCI_IBS_TX_AWAKE:
+> +		/* expect one if we send 2 WAKEs */
+> +		BT_DBG("received HCI_IBS_WAKE_ACK in tx state %d",
+> +		       qca->tx_ibs_state);
+> +		break;
+> +
+> +	case HCI_IBS_TX_WAKING:
+> +		/* send pending packets */
+> +		while ((skb = skb_dequeue(&qca->tx_wait_q)))
+> +			skb_queue_tail(&qca->txq, skb);
+> +
+> +		/* switch timers and change state to HCI_IBS_TX_AWAKE */
+> +		del_timer(&qca->wake_retrans_timer);
+> +		idle_delay = msecs_to_jiffies(qca->tx_idle_delay);
+> +		mod_timer(&qca->tx_idle_timer, jiffies + idle_delay);
+> +		qca->tx_ibs_state = HCI_IBS_TX_AWAKE;
+> +		break;
+> +
+> +	case HCI_IBS_TX_ASLEEP:
+> +		/* fall through */
+
+Extra empty line here.
+
+> +	default:
+> +		BT_ERR("received HCI_IBS_WAKE_ACK in tx state %d",
+> +		       qca->tx_ibs_state);
+> +		break;
+> +	}
+> +
+> +	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+> +
+> +	/* actually send the packets */
+> +	hci_uart_tx_wakeup(hu);
+> +}
+> +
+> +/* Enqueue frame for transmittion (padding, crc, etc) */
+> +/* may be called from two simultaneous tasklets */
+
+	/* Foo
+	 * Bar 
+	 */
+
+> +static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+> +{
+> +	unsigned long flags = 0, idle_delay;
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	BT_DBG("hu %p qca enq skb %p tx_ibs_state %d", hu, skb,
+> +	       qca->tx_ibs_state);
+> +
+> +	/* Prepend skb with frame type */
+> +	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
+> +
+> +	/* don't go to sleep in middle of patch download or
+> +	 * Out-Of-Band(GPIOs control) sleep is selected
+> +	 */
+> +	if (!test_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
+> +		skb_queue_tail(&qca->txq, skb);
+> +		return 0;
+> +	}
+> +
+> +	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+> +
+> +	/* act according to current state */
+> +	switch (qca->tx_ibs_state) {
+> +	case HCI_IBS_TX_AWAKE:
+> +		BT_DBG("device awake, sending normally");
+> +		skb_queue_tail(&qca->txq, skb);
+> +		idle_delay = msecs_to_jiffies(qca->tx_idle_delay);
+> +		mod_timer(&qca->tx_idle_timer, jiffies + idle_delay);
+> +		break;
+> +
+> +	case HCI_IBS_TX_ASLEEP:
+> +		BT_DBG("device asleep, waking up and queueing packet");
+> +		/* save packet for later */
+> +		skb_queue_tail(&qca->tx_wait_q, skb);
+> +
+> +		qca->tx_ibs_state = HCI_IBS_TX_WAKING;
+> +		/* schedule a work queue to wake up device */
+> +		queue_work(qca->workqueue, &qca->ws_awake_device);
+> +		break;
+> +
+> +	case HCI_IBS_TX_WAKING:
+> +		BT_DBG("device waking up, queueing packet");
+> +		/* transient state; just keep packet for later */
+> +		skb_queue_tail(&qca->tx_wait_q, skb);
+> +		break;
+> +
+> +	default:
+> +		BT_ERR("illegal tx state: %d (losing packet)",
+> +		       qca->tx_ibs_state);
+> +		kfree_skb(skb);
+> +		break;
+> +	}
+> +
+> +	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+> +
+> +	return 0;
+> +}
+> +
+> +#define QCA_IBS_SLEEP_IND_EVENT \
+> +	.type = HCI_IBS_SLEEP_IND, \
+> +	.hlen = 0, \
+> +	.loff = 0, \
+> +	.lsize = 0, \
+> +	.maxlen = HCI_MAX_IBS_SIZE
+> +
+> +static int qca_ibs_sleep_ind(struct hci_dev *hdev, struct sk_buff *skb)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +
+> +	BT_DBG("hu %p recv hci ibs cmd 0x%x", hu, HCI_IBS_SLEEP_IND);
+> +
+> +	device_want_to_sleep(hu);
+> +
+> +	kfree_skb(skb);
+> +	return 0;
+> +}
+> +
+> +#define QCA_IBS_WAKE_IND_EVENT \
+> +	.type = HCI_IBS_WAKE_IND, \
+> +	.hlen = 0, \
+> +	.loff = 0, \
+> +	.lsize = 0, \
+> +	.maxlen = HCI_MAX_IBS_SIZE
+> +
+> +static int qca_ibs_wake_ind(struct hci_dev *hdev, struct sk_buff *skb)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	BT_DBG("hu %p recv hci ibs cmd 0x%x", hu, HCI_IBS_WAKE_IND);
+> +
+> +	device_want_to_wakeup(hu);
+> +
+> +	kfree_skb(skb);
+> +	return 0;
+> +}
+> +
+> +#define QCA_IBS_WAKE_ACK_EVENT \
+> +	.type = HCI_IBS_WAKE_ACK, \
+> +	.hlen = 0, \
+> +	.loff = 0, \
+> +	.lsize = 0, \
+> +	.maxlen = HCI_MAX_IBS_SIZE
+> +
+> +static int qca_ibs_wake_ack(struct hci_dev *hdev, struct sk_buff *skb)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +
+> +	BT_DBG("hu %p recv hci ibs cmd 0x%x", hu, HCI_IBS_WAKE_ACK);
+> +
+> +	device_woke_up(hu);
+> +
+> +	kfree_skb(skb);
+> +	return 0;
+> +}
+
+Move the functions all above the defines. The order should be
+
+	1) Functions
+	2) Defines
+	3) Struct
+
+> +
+> +static const struct h4_recv_pkt qca_recv_pkts[] = {
+> +	{ H4_RECV_ACL,             .recv = hci_recv_frame    },
+> +	{ H4_RECV_SCO,             .recv = hci_recv_frame    },
+> +	{ H4_RECV_EVENT,           .recv = hci_recv_frame    },
+> +	{ QCA_IBS_WAKE_IND_EVENT,  .recv = qca_ibs_wake_ind  },
+> +	{ QCA_IBS_WAKE_ACK_EVENT,  .recv = qca_ibs_wake_ack  },
+> +	{ QCA_IBS_SLEEP_IND_EVENT, .recv = qca_ibs_sleep_ind },
+> +};
+> +
+> +static int qca_recv(struct hci_uart *hu, const void *data, int count)
+> +{
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
+> +		return -EUNATCH;
+> +
+> +	qca->rx_skb = h4_recv_buf(hu->hdev, qca->rx_skb, data, count,
+> +				  qca_recv_pkts, ARRAY_SIZE(qca_recv_pkts));
+> +	if (IS_ERR(qca->rx_skb)) {
+> +		int err = PTR_ERR(qca->rx_skb);
+> +		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
+> +		qca->rx_skb = NULL;
+> +		return err;
+> +	}
+> +
+> +	return count;
+> +}
+> +
+> +static struct sk_buff *qca_dequeue(struct hci_uart *hu)
+> +{
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	return skb_dequeue(&qca->txq);
+> +}
+> +
+> +static uint8_t qca_get_baudrate_value(int speed)
+> +{
+> +	switch(speed) {
+> +	case 9600:
+> +		return QCA_BAUDRATE_9600;
+> +	case 19200:
+> +		return QCA_BAUDRATE_19200;
+> +	case 38400:
+> +		return QCA_BAUDRATE_38400;
+> +	case 57600:
+> +		return QCA_BAUDRATE_57600;
+> +	case 115200:
+> +		return QCA_BAUDRATE_115200;
+> +	case 230400:
+> +		return QCA_BAUDRATE_230400;
+> +	case 460800:
+> +		return QCA_BAUDRATE_460800;
+> +	case 500000:
+> +		return QCA_BAUDRATE_500000;
+> +	case 921600:
+> +		return QCA_BAUDRATE_921600;
+> +	case 1000000:
+> +		return QCA_BAUDRATE_1000000;
+> +	case 2000000:
+> +		return QCA_BAUDRATE_2000000;
+> +	case 3000000:
+> +		return QCA_BAUDRATE_3000000;
+> +	case 3500000:
+> +		return QCA_BAUDRATE_3500000;
+> +	default:
+> +		return QCA_BAUDRATE_115200;
+> +	}
+> +}
+> +
+> +static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	struct qca_data *qca = hu->priv;
+> +	struct sk_buff *skb;
+> +	u8 cmd[] = {0x01, 0x48, 0xFC, 0x01, 0x00};
+
+	{[:space:]0x00, 0x01, 0x02[:space:]}
+
+> +
+> +	if (baudrate > QCA_BAUDRATE_3000000)
+> +		return -EINVAL;
+> +
+> +	cmd[4] = baudrate;
+> +
+> +	/* allocate packet */
+> +	skb = bt_skb_alloc(sizeof(cmd), GFP_ATOMIC);
+> +	if (!skb) {
+> +		BT_ERR("cannot allocate memory for baudrate packet");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	/* prepare packet */
+> +	memcpy(skb_put(skb, sizeof(cmd)), cmd, sizeof(cmd));
+> +	bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
+> +
+> +	/* send packet */
+> +	skb_queue_tail(&qca->txq, skb);
+> +	hci_uart_tx_wakeup(hu);
+> +
+> +	/* wait 300ms to change new baudrate on controller side
+> +	 * controller will come back after they receive this HCI command
+> +	 * then host can communicate with new baudrate to controller
+> +	 */
+> +	set_current_state(TASK_UNINTERRUPTIBLE);
+> +	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT));
+> +	set_current_state(TASK_INTERRUPTIBLE);
+> +
+> +	return 0;
+> +}
+> +
+> +static int qca_setup(struct hci_uart *hu)
+> +{
+> +	struct hci_dev *hdev = hu->hdev;
+> +	struct qca_data *qca = hu->priv;
+> +	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+> +	int ret;
+> +
+> +	BT_INFO("%s: ROME setup", hdev->name);
+> +
+> +	/* Patch downloading has to be done without IBS mode */
+> +	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+> +
+> +	/* setup initial baudrate */
+> +	speed = 0;
+> +	if (hu->init_speed)
+> +		speed = hu->init_speed;
+> +	else if (hu->proto->init_speed)
+> +		speed = hu->proto->init_speed;
+> +
+> +	if (speed)
+> +		hci_uart_set_baudrate(hu, speed);
+> +
+> +	/* setup user speed if needed */
+> +	speed = 0;
+> +	if (hu->oper_speed)
+> +		speed = hu->oper_speed;
+> +	else if (hu->proto->oper_speed)
+> +		speed = hu->proto->oper_speed;
+> +
+> +	if (speed) {
+> +		qca_baudrate = qca_get_baudrate_value(speed);
+> +
+> +		BT_INFO("%s: Set UART speed to %d", hdev->name, speed);
+> +		ret = qca_set_baudrate(hdev, qca_baudrate);
+> +		if (ret) {
+> +			BT_ERR("%s: can't change the baud rate (%d)",
+> +			       hdev->name, ret);
+> +			return ret;
+> +		}
+> +		hci_uart_set_baudrate(hu, speed);
+> +	}
+> +
+> +	/* setup patch / nvm configurations */
+> +	ret = qca_uart_setup_rome(hdev, qca_baudrate);
+> +	if (!ret) {
+> +		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+> +		qca_debugfs_init(hdev);
+> +	}
+> +
+> +	/* setup bdaddr */
+> +	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+> +
+> +	return ret;
+> +}
+> +
+> +static struct hci_uart_proto qca_p = {
+
+Name this qca_proto like the other drivers do.
+
+> +	.id		= HCI_UART_QCA,
+> +	.name		= "QCA",
+> +	.open		= qca_open,
+
+Move the .open down just before .close.
+
+> +	.init_speed	= 115200,
+> +	.oper_speed	= 3000000,
+> +	.close		= qca_close,
+> +	.recv		= qca_recv,
+> +	.enqueue	= qca_enqueue,
+> +	.dequeue	= qca_dequeue,
+> +	.flush		= qca_flush,
+> +	.setup		= qca_setup,
+> +};
+
+I am a big fan of consistency. Please order them like hci_bcm.c and hci_intel.c does.
+
+> +
+> +int __init qca_init(void)
+> +{
+> +	return hci_uart_register_proto(&qca_p);
+> +}
+> +
+> +int __exit qca_deinit(void)
+> +{
+> +	return hci_uart_unregister_proto(&qca_p);
+> +}
+> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> index 496587a..495b9ef 100644
+> --- a/drivers/bluetooth/hci_uart.h
+> +++ b/drivers/bluetooth/hci_uart.h
+> @@ -35,7 +35,7 @@
+> #define HCIUARTGETFLAGS		_IOR('U', 204, int)
+> 
+> /* UART protocols */
+> -#define HCI_UART_MAX_PROTO	8
+> +#define HCI_UART_MAX_PROTO	9
+> 
+> #define HCI_UART_H4	0
+> #define HCI_UART_BCSP	1
+> @@ -45,6 +45,7 @@
+> #define HCI_UART_ATH3K	5
+> #define HCI_UART_INTEL	6
+> #define HCI_UART_BCM	7
+> +#define HCI_UART_QCA	8
+> 
+> #define HCI_UART_RAW_DEVICE	0
+> #define HCI_UART_RESET_ON_INIT	1
+> @@ -176,3 +177,8 @@ int intel_deinit(void);
+> int bcm_init(void);
+> int bcm_deinit(void);
+> #endif
+> +
+> +#ifdef CONFIG_BT_HCIUART_QCA
+> +int qca_init(void);
+> +int qca_deinit(void);
+> +#endif
+
+Minor cosmetic changes left. The rest looks good.
+
+Regards
+
+Marcel
+
