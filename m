@@ -1,227 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAOw_LSHQupEKuNkMw3mWw5one+s_vV=baiRnEnOOosgtSdxo7g@mail.gmail.com>
+References: <1438843403.19625.7.camel@dlenski-ultra> <CABBYNZL6vGkzZ-aEObSK+5YASOD_s3n+7JNoBG+p33c5F4mbgw@mail.gmail.com>
+ <CAOw_LSHQupEKuNkMw3mWw5one+s_vV=baiRnEnOOosgtSdxo7g@mail.gmail.com>
+From: Daniel Lenski <dlenski@gmail.com>
+Date: Sun, 9 Aug 2015 19:23:05 -0700
+Message-ID: <CAOw_LSHbHb81c5zooZz5e8pUx1aaEr=kLVS_NViU92UwE9fxLQ@mail.gmail.com>
+Subject: Fwd: setting BLE connection interval from an unprivileged program?
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] audio/avrcp: Fix not handling Addressed Player Changed error
-Date: Mon, 10 Aug 2015 10:50:43 +0300
-Message-Id: <1439193043-16574-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-Some notification are completed in case the addressed player changes:
+On Sun, Aug 9, 2015 at 8:44 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>> * Is there a better way to accomplish this in an unprivileged program?
+>
+> It depends what you are planning to do, for GATT/ATT there is probably
+> no way to share the socket since there could be other application
+> trying to access other profiles. There is always the possibility to
+> write a plugin to provide the settings per profile but we are still
+> discussing an API to inform this to the kernel so it can select what
+> settings shall be used based on the requested values.
 
-  'On completion of the Addressed Player Changed notification the TG
-  shall complete all player specific notifications with AV/C C-Type
-  REJECTED with error code Addressed Player Changed.'
+Thanks. Trying to make sure I understand this...
 
-Because reject only has the error code not the event it is necessary to
-lookup by transaction to find out which event was completed thus the
-transaction needs to be added to the avctp_rsp_cb callback.
----
- profiles/audio/avctp.c | 20 ++++++++++--------
- profiles/audio/avctp.h |  5 +++--
- profiles/audio/avrcp.c | 56 +++++++++++++++++++++++++++++++++++---------------
- 3 files changed, 53 insertions(+), 28 deletions(-)
+Are you saying that there could be another application which depends
+on the HCI socket being configured with a different connection
+interval for the same peripheral? If the peripheral isn't part of a
+known profile, as with this device, then I don't see how this could
+possibly be true, since it's totally up to userspace to interact with
+the peripheral.
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 22bf35b..2a43d32 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -293,8 +293,9 @@ static GSList *servers = NULL;
- static void auth_cb(DBusError *derr, void *user_data);
- static gboolean process_queue(gpointer user_data);
- static gboolean avctp_passthrough_rsp(struct avctp *session, uint8_t code,
--					uint8_t subunit, uint8_t *operands,
--					size_t operand_count, void *user_data);
-+					uint8_t subunit, uint8_t transaction,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data);
- 
- static int send_event(int fd, uint16_t type, uint16_t code, int32_t value)
- {
-@@ -706,8 +707,8 @@ static void control_req_destroy(void *data)
- 	if (p->err == 0 || req->func == NULL)
- 		goto done;
- 
--	req->func(session, AVC_CTYPE_REJECTED, req->subunit, NULL, 0,
--							req->user_data);
-+	req->func(session, AVC_CTYPE_REJECTED, req->subunit, p->transaction,
-+						NULL, 0, req->user_data);
- 
- done:
- 	g_free(req->operands);
-@@ -829,9 +830,9 @@ static void control_response(struct avctp_channel *control,
- 			continue;
- 
- 		if (req->func && req->func(control->session, avc->code,
--						avc->subunit_type,
--						operands, operand_count,
--						req->user_data))
-+					avc->subunit_type, p->transaction,
-+					operands, operand_count,
-+					req->user_data))
- 			return;
- 
- 		control->processed = g_slist_remove(control->processed, p);
-@@ -1724,8 +1725,9 @@ static bool set_pressed(struct avctp *session, uint8_t op)
- }
- 
- static gboolean avctp_passthrough_rsp(struct avctp *session, uint8_t code,
--					uint8_t subunit, uint8_t *operands,
--					size_t operand_count, void *user_data)
-+					uint8_t subunit, uint8_t transaction,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data)
- {
- 	if (code != AVC_CTYPE_ACCEPTED)
- 		return FALSE;
-diff --git a/profiles/audio/avctp.h b/profiles/audio/avctp.h
-index 6c19ce4..68a2735 100644
---- a/profiles/audio/avctp.h
-+++ b/profiles/audio/avctp.h
-@@ -132,8 +132,9 @@ typedef size_t (*avctp_control_pdu_cb) (struct avctp *session,
- 					uint8_t *subunit, uint8_t *operands,
- 					size_t operand_count, void *user_data);
- typedef gboolean (*avctp_rsp_cb) (struct avctp *session, uint8_t code,
--					uint8_t subunit, uint8_t *operands,
--					size_t operand_count, void *user_data);
-+					uint8_t subunit, uint8_t transaction,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data);
- typedef gboolean (*avctp_browsing_rsp_cb) (struct avctp *session,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data);
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index d66f670..f24cb91 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1802,8 +1802,8 @@ static const char *status_to_string(uint8_t status)
- 	}
- }
- 
--static gboolean avrcp_get_play_status_rsp(struct avctp *conn,
--					uint8_t code, uint8_t subunit,
-+static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t code,
-+					uint8_t subunit, uint8_t transaction,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
- {
-@@ -1866,8 +1866,8 @@ static const char *status_to_str(uint8_t status)
- 	}
- }
- 
--static gboolean avrcp_player_value_rsp(struct avctp *conn,
--					uint8_t code, uint8_t subunit,
-+static gboolean avrcp_player_value_rsp(struct avctp *conn, uint8_t code,
-+					uint8_t subunit, uint8_t transaction,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
- {
-@@ -1936,8 +1936,8 @@ static void avrcp_get_current_player_value(struct avrcp *session,
- 
- static gboolean avrcp_list_player_attributes_rsp(struct avctp *conn,
- 					uint8_t code, uint8_t subunit,
--					uint8_t *operands, size_t operand_count,
--					void *user_data)
-+					uint8_t transaction, uint8_t *operands,
-+					size_t operand_count, void *user_data)
- {
- 	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
- 	struct avrcp *session = user_data;
-@@ -2023,6 +2023,7 @@ static void avrcp_parse_attribute_list(struct avrcp_player *player,
- 
- static gboolean avrcp_get_element_attributes_rsp(struct avctp *conn,
- 						uint8_t code, uint8_t subunit,
-+						uint8_t transaction,
- 						uint8_t *operands,
- 						size_t operand_count,
- 						void *user_data)
-@@ -3237,8 +3238,8 @@ static void avrcp_uids_changed(struct avrcp *session, struct avrcp_header *pdu)
- 	player->uid_counter = get_be16(&pdu->params[1]);
- }
- 
--static gboolean avrcp_handle_event(struct avctp *conn,
--					uint8_t code, uint8_t subunit,
-+static gboolean avrcp_handle_event(struct avctp *conn, uint8_t code,
-+					uint8_t subunit, uint8_t transaction,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
- {
-@@ -3246,16 +3247,30 @@ static gboolean avrcp_handle_event(struct avctp *conn,
- 	struct avrcp_header *pdu = (void *) operands;
- 	uint8_t event;
- 
--	if ((code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED) ||
--								pdu == NULL)
-+	if (!pdu)
-+		return FALSE;
-+
-+	if ((code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)) {
-+		if (pdu->params[0] == AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED &&
-+				code == AVC_CTYPE_REJECTED) {
-+			int i;
-+
-+			/* Lookup event by transaction */
-+			for (i = 0; i <= AVRCP_EVENT_LAST; i++) {
-+				if (session->transaction_events[i] ==
-+								transaction) {
-+					event = i;
-+					goto changed;
-+				}
-+			}
-+		}
- 		return FALSE;
-+	}
- 
- 	event = pdu->params[0];
- 
- 	if (code == AVC_CTYPE_CHANGED) {
--		session->registered_events ^= (1 << event);
--		avrcp_register_notification(session, event);
--		return FALSE;
-+		goto changed;
- 	}
- 
- 	switch (event) {
-@@ -3286,8 +3301,15 @@ static gboolean avrcp_handle_event(struct avctp *conn,
- 	}
- 
- 	session->registered_events |= (1 << event);
-+	session->transaction_events[event] = transaction;
- 
- 	return TRUE;
-+
-+changed:
-+	session->registered_events ^= (1 << event);
-+	session->transaction_events[event] = 0;
-+	avrcp_register_notification(session, event);
-+	return FALSE;
- }
- 
- static void avrcp_register_notification(struct avrcp *session, uint8_t event)
-@@ -3319,8 +3341,8 @@ static void avrcp_register_notification(struct avrcp *session, uint8_t event)
- 					avrcp_handle_event, session);
- }
- 
--static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
--					uint8_t code, uint8_t subunit,
-+static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
-+					uint8_t subunit, uint8_t transaction,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
- {
-@@ -3832,8 +3854,8 @@ void avrcp_unregister_player(struct avrcp_player *player)
- 				AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);
- }
- 
--static gboolean avrcp_handle_set_volume(struct avctp *conn,
--					uint8_t code, uint8_t subunit,
-+static gboolean avrcp_handle_set_volume(struct avctp *conn, uint8_t code,
-+					uint8_t subunit, uint8_t transaction,
- 					uint8_t *operands, size_t operand_count,
- 					void *user_data)
- {
--- 
-2.1.0
+>>   Is there some L2CAP socket option which I can use to set the LE
+>>   connection interval parameters?
+>
+> Currently no, but there are people currently working on adding socket
+> options for these, but then again if this is GATT/ATT socket it will
+> probably be controlled by bluetoothd.
 
+Is it already possible to configure bluetoothd to use a specific
+connection interval for a specific LE device? (I couldn't find
+anything in the docs.)
+
+>> * Why does the Linux kernel default to a needlessly long minimum
+>>   connection interval when creating a L2CAP socket?
+>
+> I guess it is the defaults from the spec, but in case the peripheral
+> updates it the kernel will remember next time it connects, so I guess
+> the peripheral don't bother to change anything that the central
+> requests?
+
+Yeah, the problem in my case is that the peripheral never requests a
+shorter connection interval, and in fact it picks the shorter option
+among those offered by the central. The peripheral's firmware is
+stupid about this, since it can support a shorter interval and
+transfers data much faster in that case.
+
+I guess I'm trying to figure out the least-intrusive way for a
+userspace program to demand a shorter connection interval for a device
+that benefits from it, but is too stupid to ask for it itself :-)
+
+Dan
