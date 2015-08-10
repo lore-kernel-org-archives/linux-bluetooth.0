@@ -1,99 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Adam Moore <adam.moore@savantsystems.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Adam Moore <adam.moore@savantsystems.com>
-CC: "Othman, Ossama" <ossama.othman@intel.com>,
-	Nathaniel McCallum <npmccallum@redhat.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: GATT service DBus interface violates DBus spec
-Date: Mon, 10 Aug 2015 22:55:47 +0000
-Message-ID: <D1EE6FAF.B535%adam.moore@savant.com>
-References: <1436456267.26457.24.camel@redhat.com>
- <1539455180.3160545.1438363138455.JavaMail.zimbra@redhat.com>
- <D1E0FD51.AD61%adam.moore@savant.com>
- <CAPyD+=BTGLzEKanLSS7kV8bz7mr7BL5ed0GHuXEKxCJYuTpPVg@mail.gmail.com>
- <D1E10436.AD77%adam.moore@savant.com>
- <CAPyD+=DRdXnT_PBvd6C-KKTB3qmak5hmg97auubhc+x0CNzz_g@mail.gmail.com>
- <D1E11ED1.AD8E%adam.moore@savant.com>
- <CABBYNZ+5hWF42bNYh-zpqNXKu1Wi2PZQJ_i9634umgD-TMFtNw@mail.gmail.com>
-In-Reply-To: <CABBYNZ+5hWF42bNYh-zpqNXKu1Wi2PZQJ_i9634umgD-TMFtNw@mail.gmail.com>
-Content-Type: text/plain; charset="euc-kr"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
+Subject: Re: [PATCH v5 1/2] Bluetooth: btqca: Introduce generic QCA ROME support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <55C9167C.7050707@qca.qualcomm.com>
+Date: Mon, 10 Aug 2015 14:57:37 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C8084DB2-D2CD-4C60-99F9-4CBE3657892C@holtmann.org>
+References: <55C9167C.7050707@qca.qualcomm.com>
+To: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DQoNCk9uIDgvMi8xNSwgMTo1NyBBTSwgIkx1aXogQXVndXN0byB2b24gRGVudHoiIDxsdWl6LmRl
-bnR6QGdtYWlsLmNvbT4gd3JvdGU6DQoNCj5IaSwNCj4NCj5PbiBGcmksIEp1bCAzMSwgMjAxNSBh
-dCAxMDo1MCBQTSwgQWRhbSBNb29yZQ0KPjxhZGFtLm1vb3JlQHNhdmFudHN5c3RlbXMuY29tPiB3
-cm90ZToNCj4+DQo+Pg0KPj4gT24gNy8zMS8xNSwgMTI6NDUgUE0sICJPdGhtYW4sIE9zc2FtYSIg
-PG9zc2FtYS5vdGhtYW5AaW50ZWwuY29tPiB3cm90ZToNCj4+DQo+Pj5IaSBBZGFtLA0KPj4+DQo+
-Pj5PbiBGcmksIEp1bCAzMSwgMjAxNSBhdCAxMTowMCBBTSwgQWRhbSBNb29yZQ0KPj4+PGFkYW0u
-bW9vcmVAc2F2YW50c3lzdGVtcy5jb20+IHdyb3RlOg0KPj4+PiBPc3NhbWEsIHRoYW5rcyBmb3Ig
-c2hhcmluZyAtIEkgZGlkbqn2dCBoYXZlIHRoZSBoZWFydCB0byBnbyBkb3duIHRoYXQNCj4+Pj5w
-YXRoDQo+Pj4+IDopICBOaWNlIHRvIGhhdmUgdGhhdCBzb2x1dGlvbiBhdmFpbGFibGUgdG9vLg0K
-Pj4+DQo+Pj5IYSEgIEJlbGlldmUgeW91IG1lLCBJIHByZWZlcnJlZCBub3QgZ29pbmcgZG93biB0
-aGlzIHBhdGggc2luY2UgaXQNCj4+PmJhc2ljYWxseSByZWludmVudHMgdGhlIHdoZWVsLiBidXQg
-SSBkaWRuJ3QgaGF2ZSBtdWNoIGNob2ljZSBhdCB0aGUNCj4+PnRpbWUgc2luY2UgSSBuZWVkZWQg
-dG8gZ2V0IHNvbWV0aGluZyBvdXQgdGhlIGRvb3IgdGhhdCBkaWRuJ3QgcmVseSB0b28NCj4+Pmhl
-YXZpbHkgb24gdXBzdHJlYW0gcGF0Y2hlcyBiZWluZyBtZXJnZWQuDQo+Pj4NCj4+Pj4gSnVzdCBh
-IHRob3VnaHQgLSBzaW5jZSB0aGUgQ2hhcmFjdGVyaXN0aWMgb2JqZWN0cyBtdXN0IHByb3ZpZGUg
-dGhlaXINCj4+Pj4gc2VydmljZSBwYXRoIHZpYSBEQnVzIFByb3BlcnR5LCBmb3JjaW5nIHRoZWly
-IHBhdGhzIHRvIGJlIGNoaWxkcmVuIG9mDQo+Pj4+dGhlDQo+Pj4+IHNlcnZpY2UgcGF0aCBtYXkg
-YmUgcmVkdW5kYW50LCB1bmxlc3Mgc29tZSBsb2dpYyBpcyBwbGFubmVkIHRvIGJlDQo+Pj4+YmFz
-ZWQNCj4+Pj5vbg0KPj4+PiB0aGUgc3RydWN0dXJlIG9mIHRoZSBPTSB0cmVlIGluIHRoZSBmdXR1
-cmUuDQo+Pj4NCj4+PkFncmVlZC4gIEluIHRoaXMgY2FzZSwgSSBqdXN0IGZvbGxvd2VkIHRoZSBj
-b252ZW50aW9uIGZvdW5kIGluIHRoZQ0KPj4+ZXhhbXBsZSBoaWVyYXJjaHkgZGVzY3JpYmVkIGlu
-IHRoZSAiR0FUVCBNYW5hZ2VyIEhpZXJhcmNoeSIgc2VjdGlvbiBpbg0KPj4+dGhlIEJsdWVaIGRv
-Yy9nYXR0LWFwaS50eHQgZG9jdW1lbnQsIGFzIHdlbGwgYXMgdGhlIGhpZXJhcmNoeSBmb3VuZCBp
-bg0KPj4+dGhlIEJsdWVaIHRlc3QvZXhhbXBsZS1nYXR0LXNlcnZlciBQeXRob24gY29kZS4gIEdv
-aW5nIHdpdGggdGhpcw0KPj4+aGllcmFyY2h5IGFsc28gbWltaWNzIHRoZSBHQVRUIHNlcnZpY2Ug
-aGllcmFyY2h5IGRlc2NyaWJlZCBpbiB0aGUNCj4+PkJsdWV0b290aCBzcGVjLg0KPj4NCj4+IFll
-YWgsIEkgdXNlZCB0aGUgc2FtZSBzdHJ1Y3R1cmUgaW4gbXkgaW1wbGVtZW50YXRpb24gLSB0aGF0
-IHdhcyByZWFsbHkNCj4+IG1vcmUgb2YgYSBub3RlIGZvciB0aGUgbWFpbnRhaW5lcnMgdGhhdCBp
-ZiB3ZSBjYW4gbGl2ZSB3aXRob3V0IGEgc3RyaWN0DQo+PiBzdHJ1Y3R1cmUsIGl0IG1pZ2h0IHNp
-bXBsaWZ5IHRoZSBmaW5hbCBmaXguDQo+Pg0KPj4+DQo+Pj5UaGFua3MhDQo+Pj4tT3NzYW1hDQo+
-DQo+SXQgc2VlbXMgdGhlIGlzc3VlIHdhcyBjbG9zZWQgY2F1c2VkIEdEQnVzIGFuZCBvdGhlciBi
-aW5kaW5ncyBmb2xsb3cNCj50aGUgRC1CdXMgc3BlYyB0byB0aGUgd29yZCwgYnV0IGhvdyBvbmUg
-d291bGQgbGlzdCBpbnRlcmZhY2VzIGluIHRoZQ0KPnJvb3QgJy8nPyBTbyBlaXRoZXIgJy8nIHNo
-YWxsIGJlY29tZSBzcGVjaWFsIGFuZCBubyBvdGhlciBpbnRlcmZhY2UNCj5zaGFsbCBiZSByZWdp
-c3RlcmVkIHRoZXJlIG9yIHRoZSBzcGVjIHNob3VsZCBiZSByZXdvcmRlZCB0byBpbmNsdWRlDQo+
-dGhlIGluaXRpYWwgcGF0aCwgYnV0IHRoZSBmb3JtZXIgaXMgcHJvYmFibHkgbm90IGJhY2t3YXJk
-IGNvbXBhdGlibGUNCj5zaW5jZSBhZmFpayBtb3N0IGJpbmRpbmdzIGFsbG93IGN1c3RvbSBpbnRl
-cmZhY2VzIGluICcvJyBwYXRoLg0KDQpIaSBMdWl6LA0KDQpTaW5jZSB0aGVyZSBhcmUgYXQgbGVh
-c3Qgc29tZSBiaW5kaW5ncyAobGlrZSBHbGliIEdEQnVzT2JqZWN0TWFuYWdlcikgdGhhdA0KZG8g
-bm90IGFsbG93IGN1c3RvbSBpbnRlcmZhY2VzIGluIHRoZSBPYmplY3RNYW5hZ2VyIG9iamVjdCwg
-d2UNCmNvdWxkIHRyeSB0byBhbGxvdyB0aGUgb2JqZWN0IGhvc3RpbmcgdGhlIE9iamVjdE1hbmFn
-ZXIgaW50ZXJmYWNlIHRvDQphbHNvIGhvc3QgdGhlIEdhdHRTZXJ2aWNlIGludGVyZmFjZSwgYnV0
-IG5vdCByZXF1aXJlIGl0Lg0KDQpGb3IgZXhhbXBsZSwgc29tZXRoaW5nIGxpa2UgdGhpcyBjb3Vs
-ZCBhbHNvIGJlIGFjY2VwdGVkIGFzIHZhbGlkOg0KDQotPiAvY29tL2V4YW1wbGUNCnwNCi0+IC9j
-b20vZXhhbXBsZS9oZWFydHJhdGUNCnwgfCAtIG9yZy5mcmVlZGVza3RvcC5EQnVzLk9iamVjdE1h
-bmFnZXINCnwgfCAtIG9yZy5mcmVlZGVza3RvcC5EQnVzLlByb3BlcnRpZXMNCnwgfA0KfCAtPiAv
-Y29tL2V4YW1wbGUvaGVhcnRyYXRlL3NlcnZpY2UNCnwgICB8IC0gb3JnLmZyZWVkZXNrdG9wLkRC
-dXMuUHJvcGVydGllcw0KfCAgIHwgLSBvcmcuYmx1ZXouR2F0dFNlcnZpY2UxDQp8ICAgfA0KfCAg
-IC0+IC9jb20vZXhhbXBsZS9oZWFydHJhdGUvc2VydmljZS9jaGFyMA0KfCAgICAgfCAtIG9yZy5m
-cmVlZGVza3RvcC5EQnVzLlByb3BlcnRpZXMNCnwgICAgIHwgLSBvcmcuYmx1ZXouR2F0dENoYXJh
-Y3RlcmlzdGljMQ0KfCAgICAgfA0KfCAgIC0+IC9jb20vZXhhbXBsZS9oZWFydHJhdGUvc2Vydmlj
-ZS9jaGFyMQ0KfCAgICAgfCAtIG9yZy5mcmVlZGVza3RvcC5EQnVzLlByb3BlcnRpZXMNCnwgICAg
-IHwgLSBvcmcuYmx1ZXouR2F0dENoYXJhY3RlcmlzdGljMQ0KfCAgICAgfA0KfCAgICAgLT4gL2Nv
-bS9leGFtcGxlL2hlYXJ0cmF0ZS9zZXJ2aWNlL2NoYXIxL2Rlc2MwDQp8ICAgICAgIHwgLSBvcmcu
-ZnJlZWRlc2t0b3AuREJ1cy5Qcm9wZXJ0aWVzDQp8ICAgICAgIHwgLSBvcmcuYmx1ZXouR2F0dERl
-c2NyaXB0b3IxDQoNCklmIHdlIGNhbm5vdCBsaXZlIHdpdGggYWxsb3dpbmcgdGhlIHR3byBzdHJ1
-Y3R1cmVzLCBpdCBtaWdodCBiZSBiZXR0ZXINCih0aG91Z2ggcGFpbmZ1bCkgdG8gYnJlYWsNCmJh
-Y2t3YXJkIGNvbXBhdGliaWxpdHkgd2hpbGUgZXhwZXJpbWVudGFsIGZsYWcgaXMgc3RpbGwgZmx5
-aW5nLCBhcw0KYmluZGluZ3MgdGhhdA0KZG8gYWxsb3cgY3VzdG9tIGludGVyZmFjZXMgY2FuIHN0
-aWxsIGRvIHRoZSBhYm92ZSB3aXRoIGEgc21hbGwgY2hhbmdlLA0Kd2hlcmVhcyB0aGUgb3RoZXIg
-YmluZGluZ3MNCmNhbm5vdCBpbXBsZW1lbnQgd2hhdCBpcyBjdXJyZW50bHkgZG9jdW1lbnRlZC4N
-Cg0KUmVnYXJkaW5nIHlvdXIgc3BlYyByZXdvcmRpbmcgYWx0ZXJuYXRpdmUsIHdoaWNoIGluaXRp
-YWwgcGF0aCBhcmUgeW91DQpyZWZlcnJpbmcgdG8/DQoNClRoYW5rcywNCi1BZGFtDQoNCg0KPg0K
-Pg0KPi0tDQo+THVpeiBBdWd1c3RvIHZvbiBEZW50eg0KDQoNClN0YXRlbWVudCBvZiBDb25maWRl
-bnRpYWxpdHkNCg0KVGhlIGNvbnRlbnRzIG9mIHRoaXMgZS1tYWlsIG1lc3NhZ2UgYW5kIGFueSBh
-dHRhY2htZW50cyBhcmUgY29uZmlkZW50aWFsIGFuZCBhcmUgaW50ZW5kZWQgc29sZWx5IGZvciB0
-aGUgYWRkcmVzc2VlLiBUaGUgaW5mb3JtYXRpb24gbWF5IGFsc28gYmUgbGVnYWxseSBwcml2aWxl
-Z2VkLiBUaGlzIHRyYW5zbWlzc2lvbiBpcyBzZW50IGluIHRydXN0LCBhbmQgdGhlIHNvbGUgcHVy
-cG9zZSBvZiBkZWxpdmVyeSB0byB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LiBJZiB5b3UgaGF2ZSBy
-ZWNlaXZlZCB0aGlzIHRyYW5zbWlzc2lvbiBpbiBlcnJvciwgYW55IHVzZSwgcmVwcm9kdWN0aW9u
-IG9yIGRpc3NlbWluYXRpb24gb2YgdGhpcyB0cmFuc21pc3Npb24gaXMgc3RyaWN0bHkgcHJvaGli
-aXRlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgcGxlYXNlIGltbWVk
-aWF0ZWx5IG5vdGlmeSB0aGUgc2VuZGVyIGJ5IHJlcGx5IGUtbWFpbCBvciBhdCA1MDguNjgzLjI1
-MDAgYW5kIGRlbGV0ZSB0aGlzIG1lc3NhZ2UgYW5kIGl0cyBhdHRhY2htZW50cywgaWYgYW55Lg0K
-DQo=
+Hi Ben,
+
+> This is for supporting BT for QCA ROME with vendor specific
+> HCI commands and initialization on the chip. This will have
+> USB/UART implementation both, but for now, adding UART vendor
+> specific commands to patch downloading and set Bluetooth device
+> address using vendor specific command.
+> 
+> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+> ---
+> drivers/bluetooth/Kconfig  |   4 +
+> drivers/bluetooth/Makefile |   1 +
+> drivers/bluetooth/btqca.c  | 392 +++++++++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btqca.h  | 135 ++++++++++++++++
+> 4 files changed, 532 insertions(+)
+> create mode 100644 drivers/bluetooth/btqca.c
+> create mode 100644 drivers/bluetooth/btqca.h
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
