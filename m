@@ -1,34 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55C8C843.8040606@linux.intel.com>
-Date: Mon, 10 Aug 2015 17:50:27 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
+Date: Mon, 10 Aug 2015 23:07:12 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+To: Norbert Holze <norbert.holze@web.de>
+Cc: lkp@lists.01.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [LKP] btusb regression / 0a12:0001 CSR
+Message-ID: <20150810150712.GA7341@wfg-t540p.sh.intel.com>
+References: <55C5B3F6.8070701@web.de>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] Bluetooth: hci_bcm: Add ACPI and PM support
-References: <1438959640-15476-1-git-send-email-frederic.danis@linux.intel.com> <A785406E-6D37-404C-B535-2CAD31496F0E@holtmann.org>
-In-Reply-To: <A785406E-6D37-404C-B535-2CAD31496F0E@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <55C5B3F6.8070701@web.de>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel,
+CC bluetooth mailing list.
 
-On 07/08/2015 18:45, Marcel Holtmann wrote:
-> Hi Fred,
->
->> These patches move PM support from rfkill-gpio to hci_uart module.
->> On, off, suspend and resume functions are supported.
->> They also parse the ACPI entry to find initial UART baud rate.
->>
->> v1->v2:
->> - Add BCM2E67 device in acpi_device_id table
->> - Add suspend/resume functions
->
-> looks pretty good. My only concern is the race between bcm_data and bcm_device. Is that a valid concern from my side or can that never happen? Meaning do we need to protect against removal / unbinding of the platform device while the line discipline is active.
-
-I do not found a way to protect against device unbinding, so I will 
-check if bcm_device is still in bsm_device_list before using it.
-
-Regards
-
-Fred
+On Sat, Aug 08, 2015 at 09:47:02AM +0200, Norbert Holze wrote:
+> Hello mailing list,
+> 
+> my bluetooth usb-stick worked fine with kernel up to 3.19. With 4.x
+> there is no hci device found.
+> 
+> lsusb
+> Bus 004 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
+> Dongle (HCI mode)
+> 
+> hcitool dev
+> Devices:
+> 
+> sudo hciconfig
+> hci0:	Type: BR/EDR  Bus: USB
+> 	BD Address: 00:15:83:15:A3:0B  ACL MTU: 672:4  SCO MTU: 48:1
+> 	DOWN
+> 	RX bytes:890 acl:0 sco:0 events:30 errors:0
+> 	TX bytes:126 acl:0 sco:0 commands:30 errors:0
+> 
+> sudo hciconfig hci0 up
+> Can't init device hci0: Operation not supported (95)
+> 
+> rfkill list
+> 0: hci0: Bluetooth
+> 	Soft blocked: no
+> 	Hard blocked: no
+> 1: phy0: Wireless LAN
+> 	Soft blocked: no
+> 	Hard blocked: no
+> 
+> 
+> Is this a regression. Or does it work in different way with 4.x?
+> 
+> Regards,
+> 
+> Norbert
+> _______________________________________________
+> LKP mailing list
+> LKP@lists.01.org
+> https://lists.01.org/mailman/listinfo/lkp
