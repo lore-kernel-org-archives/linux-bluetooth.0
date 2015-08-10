@@ -1,122 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH  1/2] audio/avrcp: Add support for SetAddressedPlayer
-Date: Mon, 10 Aug 2015 16:37:40 +0530
-Message-id: <1439204861-4716-1-git-send-email-bharat.panda@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <1438779375-12187-1-git-send-email-gowtham.ab@samsung.com>
+References: <1438779375-12187-1-git-send-email-gowtham.ab@samsung.com>
+Date: Mon, 10 Aug 2015 13:49:53 +0300
+Message-ID: <CABBYNZLCDv4gXcVpbSRYgaZS4JNgRjeYufNXkTem2XZL=Dx5Ew@mail.gmail.com>
+Subject: Re: [PATCH] src/profile: Add GoepL2CapPsm in SDP record
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Supprot added to handle SetAddressedPlayer(0x60) command PDU
-in AVRCP TG.
+Hi Gowtham,
 
-  AVCTP Control: Command: type 0x00 label 12 PID 0x110e
-    AV/C: Control: address 0x48 opcode 0x00
-      Subunit: Panel
-      Opcode: Vendor Dependent
-      Company ID: 0x001958
-      AVRCP: SetAddressedPlayer pt Single len 0x0002
-        PlayerID: 0xffff (65535)
+On Wed, Aug 5, 2015 at 3:56 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> As per the MAP & PBAP v1.2 SDP table, it should contain the GoepL2CapPsm
+> in its SDP record. This patch adds the same.
+>
+> The below test cases verifies the presence of GoepL2CapPsm attribute is
+> in SDP record.
+> TC_PSE_CON_BV_02_C - PASS
+> TC_MSE_CON_BV_02_C - PASS
+> ---
+>  src/profile.c | 38 +++++++++++++++++++++++++++++++-------
+>  1 file changed, 31 insertions(+), 7 deletions(-)
+>
+> diff --git a/src/profile.c b/src/profile.c
+> index 4b73026..f54749e 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -435,6 +435,9 @@
+>                 <attribute id=\"0x0317\">                               \
+>                         <uint32 value=\"0x00000003\"/>                  \
+>                 </attribute>                                            \
+> +               <attribute id=\"0x0200\">                               \
+> +                       <uint16 value=\"%u\" name=\"psm\"/>             \
+> +               </attribute>                                            \
+>         </record>"
+>
+>  #define MAS_RECORD                                                     \
+> @@ -484,6 +487,9 @@
+>                 <attribute id=\"0x0317\">                               \
+>                         <uint32 value=\"0x0000007f\"/>                  \
+>                 </attribute>                                            \
+> +               <attribute id=\"0x0200\">                               \
+> +                       <uint16 value=\"%u\" name=\"psm\"/>             \
+> +               </attribute>                                            \
+>         </record>"
+>
+>  #define MNS_RECORD                                                     \
+> @@ -524,12 +530,12 @@
+>                 <attribute id=\"0x0100\">                               \
+>                         <text value=\"%s\"/>                            \
+>                 </attribute>                                            \
+> -               <attribute id=\"0x0200\">                               \
+> -                       <uint16 value=\"%u\" name=\"psm\"/>             \
+> -               </attribute>                                            \
+>                 <attribute id=\"0x0317\">                               \
+>                         <uint32 value=\"0x0000007f\"/>                  \
+>                 </attribute>                                            \
+> +               <attribute id=\"0x0200\">                               \
+> +                       <uint16 value=\"%u\" name=\"psm\"/>             \
+> +               </attribute>                                            \
+>         </record>"
+>
+>  #define SYNC_RECORD                                                    \
+> @@ -1792,15 +1798,29 @@ static char *get_pce_record(struct ext_profile *ext, struct ext_io *l2cap,
+>  static char *get_pse_record(struct ext_profile *ext, struct ext_io *l2cap,
+>                                                         struct ext_io *rfcomm)
+>  {
+> -       return g_strdup_printf(PSE_RECORD, rfcomm->chan, ext->version,
+> -                                                               ext->name);
+> +       uint16_t psm = 0;
+> +       uint8_t chan = 0;
+> +
+> +       if (l2cap)
+> +               psm = l2cap->psm;
+> +       if (rfcomm)
+> +               chan = rfcomm->chan;
+> +
+> +       return g_strdup_printf(PSE_RECORD, chan, ext->version, ext->name, psm);
+>  }
+>
+>  static char *get_mas_record(struct ext_profile *ext, struct ext_io *l2cap,
+>                                                         struct ext_io *rfcomm)
+>  {
+> -       return g_strdup_printf(MAS_RECORD, rfcomm->chan, ext->version,
+> -                                                               ext->name);
+> +       uint16_t psm = 0;
+> +       uint8_t chan = 0;
+> +
+> +       if (l2cap)
+> +               psm = l2cap->psm;
+> +       if (rfcomm)
+> +               chan = rfcomm->chan;
+> +
+> +       return g_strdup_printf(MAS_RECORD, chan, ext->version, ext->name, psm);
+>  }
+>
+>  static char *get_mns_record(struct ext_profile *ext, struct ext_io *l2cap,
+> @@ -2001,6 +2021,8 @@ static struct default_settings {
+>                 .uuid           = OBEX_PSE_UUID,
+>                 .name           = "Phone Book Access",
+>                 .channel        = PBAP_DEFAULT_CHANNEL,
+> +               .psm            = BTD_PROFILE_PSM_AUTO,
+> +               .mode           = BT_IO_MODE_ERTM,
+>                 .authorize      = true,
+>                 .get_record     = get_pse_record,
+>                 .version        = 0x0101,
+> @@ -2015,6 +2037,8 @@ static struct default_settings {
+>                 .uuid           = OBEX_MAS_UUID,
+>                 .name           = "Message Access",
+>                 .channel        = MAS_DEFAULT_CHANNEL,
+> +               .psm            = BTD_PROFILE_PSM_AUTO,
+> +               .mode           = BT_IO_MODE_ERTM,
+>                 .authorize      = true,
+>                 .get_record     = get_mas_record,
+>                 .version        = 0x0100
+> --
+> 1.9.1
 
-  AVCTP Control: Response: type 0x00 label 12 PID 0x110e
-    AV/C: Rejected: address 0x48 opcode 0x00
-      Subunit: Panel
-      Opcode: Vendor Dependent
-      Company ID: 0x001958
-      AVRCP: SetAddressedPlayer pt Single len 0x0001
-        Error: 0x11 (Invalid Player ID)
----
- profiles/audio/avrcp.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+Applied, thanks.
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index d66f670..003e978 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -103,6 +103,7 @@
- #define AVRCP_REQUEST_CONTINUING	0x40
- #define AVRCP_ABORT_CONTINUING		0x41
- #define AVRCP_SET_ABSOLUTE_VOLUME	0x50
-+#define AVRCP_SET_ADDRESSED_PLAYER	0x60
- #define AVRCP_SET_BROWSED_PLAYER	0x70
- #define AVRCP_GET_FOLDER_ITEMS		0x71
- #define AVRCP_CHANGE_PATH		0x72
-@@ -204,6 +205,7 @@ struct avrcp_player {
- 	uint64_t uid;
- 	uint16_t uid_counter;
- 	bool browsed;
-+	bool addressed;
- 	uint8_t *features;
- 	char *path;
- 
-@@ -1617,6 +1619,57 @@ err:
- 	return AVC_CTYPE_REJECTED;
- }
- 
-+static struct avrcp_player *find_tg_player(struct avrcp *session, uint16_t id)
-+{
-+	struct avrcp_server *server = session->server;
-+	GSList *l;
-+
-+	for (l = server->players; l; l = l->next) {
-+		struct avrcp_player *player = l->data;
-+
-+		if (player->id == id)
-+			return player;
-+	}
-+
-+	return NULL;
-+}
-+
-+static uint8_t avrcp_handle_set_addressed_player(struct avrcp *session,
-+						struct avrcp_header *pdu,
-+						uint8_t transaction)
-+{
-+	struct avrcp_player *player;
-+	uint16_t len = ntohs(pdu->params_len);
-+	uint16_t player_id = 0;
-+	uint8_t status;
-+
-+	if (len < 1) {
-+		status = AVRCP_STATUS_INVALID_PARAM;
-+		goto err;
-+	}
-+
-+	player_id = ntohs(pdu->params);
-+	player = find_tg_player(session, player_id);
-+	pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
-+
-+	if (player) {
-+		player->addressed = true;
-+		status = AVRCP_STATUS_SUCCESS;
-+		pdu->params_len = htons(len);
-+		pdu->params[0] = status;
-+	} else {
-+		status = AVRCP_STATUS_INVALID_PLAYER_ID;
-+		goto err;
-+	}
-+
-+	return AVC_CTYPE_ACCEPTED;
-+
-+err:
-+	pdu->params_len = htons(sizeof(status));
-+	pdu->params[0] = status;
-+	return AVC_CTYPE_REJECTED;
-+}
-+
- static const struct control_pdu_handler control_handlers[] = {
- 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
- 					avrcp_handle_get_capabilities },
-@@ -1648,6 +1701,8 @@ static const struct control_pdu_handler control_handlers[] = {
- 					avrcp_handle_request_continuing },
- 		{ AVRCP_ABORT_CONTINUING, AVC_CTYPE_CONTROL,
- 					avrcp_handle_abort_continuing },
-+		{ AVRCP_SET_ADDRESSED_PLAYER, AVC_CTYPE_CONTROL,
-+					avrcp_handle_set_addressed_player },
- 		{ },
- };
- 
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
