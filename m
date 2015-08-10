@@ -1,15 +1,16 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-References: <1439193043-16574-1-git-send-email-luiz.dentz@gmail.com>
-In-reply-to: <1439193043-16574-1-git-send-email-luiz.dentz@gmail.com>
-Subject: RE: [PATCH BlueZ] audio/avrcp: Fix not handling Addressed Player
- Changed error
-Date: Mon, 10 Aug 2015 16:51:48 +0530
-Message-id: <021301d0d35e$cc06ab00$64140100$@samsung.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Bharat Panda' <bharat.panda@samsung.com>
+References: <1438581391-24176-1-git-send-email-gowtham.ab@samsung.com>
+ <CABBYNZL7wTfYL8stECiJ1f38Tvu2mFau9T_=OG6=9fOzsFLceg@mail.gmail.com>
+In-reply-to: <CABBYNZL7wTfYL8stECiJ1f38Tvu2mFau9T_=OG6=9fOzsFLceg@mail.gmail.com>
+Subject: RE: [PATCH v1] doc/pts: Add OPP PTS 6.2 results for Linux
+Date: Mon, 10 Aug 2015 16:27:37 +0530
+Message-id: <001401d0d35b$71547730$53fd6590$@samsung.com>
 MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -18,275 +19,448 @@ Hi Luiz,
 > -----Original Message-----
 > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
 > owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-> Sent: Monday, August 10, 2015 1:21 PM
-> To: linux-bluetooth@vger.kernel.org
-> Subject: [PATCH BlueZ] audio/avrcp: Fix not handling Addressed Player
-> Changed error
+> Sent: Monday, August 10, 2015 4:19 PM
+> To: Gowtham Anandha Babu
+> Cc: linux-bluetooth@vger.kernel.org; Bharat Panda
+> Subject: Re: [PATCH v1] doc/pts: Add OPP PTS 6.2 results for Linux
 > 
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Hi Gowtham,
 > 
-> Some notification are completed in case the addressed player changes:
+> On Mon, Aug 3, 2015 at 8:56 AM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> > This patch adds test case list and results for OPP profile tested
+> > against Linux-kernel-4.1 (Ubuntu 14.04).
+> > ---
+> >  Makefile.am       |   3 +
+> >  doc/pics-opp.txt  | 187
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  doc/pixit-opp.txt |  27 ++++++++
+> >  doc/pts-opp.txt   | 119 ++++++++++++++++++++++++++++++++++
+> >  4 files changed, 336 insertions(+)
+> >  create mode 100644 doc/pics-opp.txt
+> >  create mode 100644 doc/pixit-opp.txt
+> >  create mode 100644 doc/pts-opp.txt
+> >
+> > diff --git a/Makefile.am b/Makefile.am index ad4a9ae..3df694c 100644
+> > --- a/Makefile.am
+> > +++ b/Makefile.am
+> > @@ -257,6 +257,9 @@ EXTRA_DIST += doc/alert-api.txt \
+> >
+> >  EXTRA_DIST += doc/obex-api.txt doc/obex-agent-api.txt
+> >
+> > +EXTRA_DIST += doc/pics-opp.txt doc/pixit-opp.txt \
+> > +               doc/pts-opp.txt
+> > +
+> >  EXTRA_DIST += tools/magic.btsnoop
+> >
+> >  AM_CFLAGS += @DBUS_CFLAGS@ @GLIB_CFLAGS@ diff --git
+> > a/doc/pics-opp.txt b/doc/pics-opp.txt new file mode 100644 index
+> > 0000000..f3bd0aa
+> > --- /dev/null
+> > +++ b/doc/pics-opp.txt
+> > @@ -0,0 +1,187 @@
+> > +OPP PICS for the PTS tool.
+> > +
+> > +PTS version: 6.2.0
+> > +
+> > +* - different than PTS defaults
+> > +# - not yet implemented/supported
+> > +
+> > +M - mandatory
+> > +O - optional
+> > +
+> > +               Roles
+> > +-------------------------------------------------------------------------------
+> > +Parameter Name Selected        Description
+> > +-------------------------------------------------------------------------------
+> > +TSPC_OPP_1_1   True (*)        Role: Object Push Client (C.1)
+> > +TSPC_OPP_1_2   True (*)        Role: Object Push Server (C.1)
+> > +---------------------------------------------------------------------
+> > +----------
+> > +C.1: Mandatory to support at least one of the defined roles.
+> > +---------------------------------------------------------------------
+> > +----------
+> > +
+> > +
+> > +               Client Profile Version
+> > +-------------------------------------------------------------------------------
+> > +Parameter Name Selected        Description
+> > +-------------------------------------------------------------------------------
+> > +TSPC_OPP_1b_1  False           Client supports OPP version 1.1. (C.1)
+> > +TSPC_OPP_1b_2  True (*)        Client supports OPP version 1.2. (C.1)
+> > +---------------------------------------------------------------------
+> > +----------
+> > +C.1: It is mandatory to support at least one of the profile versions.
+> > +---------------------------------------------------------------------
+> > +----------
+> > +
+> > +
+> > +               Client Application Features
+> > +-------------------------------------------------------------------------------
+> > +Parameter Name Selected        Description
+> > +-------------------------------------------------------------------------------
+> > +TSPC_OPP_2_1   True            Client: Perform Service Discovery request (M)
+> > +TSPC_OPP_2_2   True            Client: Authentication/PIN exchange
+> supported.
+> > +                                       (M)
+> > +TSPC_OPP_2_2a  True (*)        Client: Require Authentication/PIN by
+> default.
+> > +                                       (O)
+> > +TSPC_OPP_2_3   True            Client: Object Push (M)
+> > +TSPC_OPP_2_4   True (*)        Client: vCard 2.1 (C.3)
+> > +TSPC_OPP_2_5   False           Client: vCalender 1.0 (O)
+> > +TSPC_OPP_2_6   False           Client: vMsg as defined in IrMC 1.1 (O)
+> > +TSPC_OPP_2_7   False           Client: vNote as defined in IrMC 1.1 (O)
+> > +TSPC_OPP_2_8   True (*)        Client: Support content formats other than
+> those
+> > +                                       declared in TSPC_OPP_2_4 through
+> > +                                       TSPC_OPP_2_7. (O)
+> > +TSPC_OPP_2_8a  False           Client: Support specific set of other content
+> > +                                       formats. (C.4)
+> > +TSPC_OPP_2_8b  True (*)        Client: Support all content formats. (C.4)
+> > +TSPC_OPP_2_9   True (*)        Client: Push multiple vCard objects. (O)
+> > +TSPC_OPP_2_9a  True (*)        Client: Push multiple vCard objects using
+> > +                                       different PUT operations. (C.5)
+> > +TSPC_OPP_2_9b  False           Client: Push multiple vCard objects using the
+> > +                                       same PUT operation. (C.5)
+> > +TSPC_OPP_2_10  True (*)        Client: Push multiple vCalender objects. (O)
+> > +TSPC_OPP_2_10a True            Client: Push multiple vCalendar objects using
+> > +                                       different PUT operations. (C.6)
+> > +TSPC_OPP_2_10b False           Client: Push multiple vCalendar objects using
+> > +                                       the same PUT operation. (C.6)
+> > +TSPC_OPP_2_11  True (*)        Client: Push multiple vMsg objects. (O)
+> > +TSPC_OPP_2_11a True (*)        Client: Push multiple vMsg objects using
+> > +                                       different PUT operations. (C.7)
+> > +TSPC_OPP_2_11b False           Client: Push multiple vMsg objects using the
+> > +                                       same PUT operation. (C.7)
+> > +TSPC_OPP_2_12  True (*)        Client: Push multiple vNote objects. (O)
+> > +TSPC_OPP_2_12a True (*)        Client: Push multiple vNote objects using
+> > +                                       different PUT operations. (C.8)
+> > +TSPC_OPP_2_12b False           Client: Push multiple vNote objects using the
+> > +                                       same PUT operation. (C.8)
+> > +TSPC_OPP_2_13  True (*)        Client: Pull business card (O)
+> > +TSPC_OPP_2_14  True (*)        Client: vCard 2.1 (C.1)
+> > +TSPC_OPP_2_15  True (*)        Client: Exchange business card (O)
+> > +TSPC_OPP_2_16  False           Client: vCard 2.1 (C.2)
+> > +TSPC_OPP_2_17  True (*)        GOEP v2 (C.9)
+> > +TSPC_OPP_2_18  True (*)        GOEP v2 Backward Compability (C.9)
+> > +TSPC_OPP_2_19  True (*)        OBEX over L2CAP (C.9)
+> > +TSPC_OPP_2_20  False           OBEX Reliable Session (C.10)
+> > +TSPC_OPP_2_21  False           OBEX SRM (C.10)
+> > +TSPC_OPP_2_22  False           Send OBEX SRMP header (C.10)
+> > +TSPC_OPP_2_23  False           Receive OBEX SRMP header (C.11)
+> > +---------------------------------------------------------------------
+> > +----------
+> > +C.1: Mandatory to Support IF (TSPC_OPP_2_13) Business Card Pull is
+> supported.
+> > +C.2: Mandatory to Support IF (TSPC_OPP_2_15) Business Card Exchange is
+> > +       supported.
+> > +C.3: vCard 2.1 support is required for devices containing phonebook
+> > +       applications. vCard 2.1 support optional for other devices.
+> > +C.4: Mandatory to support one of TSPC_OPP_2_8a or TSPC_OPP_2_8b if
+> TSPC_OPP_2_8
+> > +       is supported. Otherwise, both items are excluded.
+> > +C.5: Mandatory to support at least one of TSPC_OPP_2_9a and
+> TSPC_OPP_2_9b if
+> > +       TSPC_OPP_2_9 is supported. Otherwise, both items are excluded.
+> > +C.6: Mandatory to support at least one of TSPC_OPP_2_10a and
+> TSPC_OPP_2_10b if
+> > +       TSPC_OPP_2_10 is supported. Otherwise, both items are excluded.
+> > +C.7: Mandatory to support at least one of TSPC_OPP_2_11a and
+> TSPC_OPP_2_11b if
+> > +       TSPC_OPP_2_11 is supported. Otherwise, both items are excluded.
+> > +C.8: Mandatory to support at least one of TSPC_OPP_2_12a and
+> TSPC_OPP_2_12b if
+> > +       TSPC_OPP_2_12 is supported. Otherwise, both items are excluded.
+> > +C.9: Mandatory if TSPC_OPP_1b_2 supported.
+> > +C.10: Optional to support if TSPC_OPP_1b_2 supported else excluded.
+> > +C.11: Mandatory if TSPC_OPP_17 and TSPC_OPP_21 supported else
+> excluded.
+> > +---------------------------------------------------------------------
+> > +----------
+> > +
+> > +
+> > +               Server Profile Version
+> > +-------------------------------------------------------------------------------
+> > +Parameter Name Selected        Description
+> > +-------------------------------------------------------------------------------
+> > +TSPC_OPP_2b_1  False           Server supports OPP version 1.1.
+> > +TSPC_OPP_2b_2  True (*)        Server supports OPP version 1.2.
+> > +---------------------------------------------------------------------
+> > +----------
+> > +C.1: It is mandatory to support at least one of the profile versions.
+> > +---------------------------------------------------------------------
+> > +----------
+> > +
+> > +
+> > +               Server Application Features
+> > +-------------------------------------------------------------------------------
+> > +Parameter Name Selected        Description
+> > +-------------------------------------------------------------------------------
+> > +TSPC_OPP_3_1   True            Server: Provide information on supported
+> > +                                       contents type on service discovery
+> > +                                       request. (M)
+> > +TSPC_OPP_3_2   True            Server: Authentication/PIN exchange
+> supported.
+> > +                                       (M)
+> > +TSPC_OPP_3_3   True            Server: Object Push (M)
+> > +TSPC_OPP_3_3a  True (*)        Server: Receive multiple objects in the same
+> > +                                       PUT operation. (O)
+> > +TSPC_OPP_3_4   True (*)        Server: vCard 2.1 (C.3)
+> > +TSPC_OPP_3_5   False           Server: vCalender 1.0 format (O)
+> > +TSPC_OPP_3_6   False           Server: vMsg as defined in IrMC 1.1 (O)
+> > +TSPC_OPP_3_7   False           Server: vNote as defined in IrMC 1.1 (O)
+> > +TSPC_OPP_3_8   True (*)        Server: Support content formats other than
+> those
+> > +                                       declared in TSPC_OPP_3_4 through
+> > +                                       TSPC_OPP_3_7. (O)
+> > +TSPC_OPP_3_8a  False           Server: Support specific set of other content
+> > +                                       formats. (C.4)
+> > +TSPC_OPP_3_8b  True (*)        Server: Support all content formats. (C.4)
+> > +TSPC_OPP_3_9   True (*)        Server: Object Push vCard reject. (O)
+> > +TSPC_OPP_3_10  True (*)        Server: Object Push vCal reject. (O)
+> > +TSPC_OPP_3_11  True (*)        Server: Object Push vMsg reject. (O)
+> > +TSPC_OPP_3_12  True (*)        Server: Object Push vNote reject. (O)
+> > +TSPC_OPP_3_13  True (*)        Server: Business card pull (O.1)
+> > +TSPC_OPP_3_14  True (*)        Server: vCard 2.1 (C.1)
+> > +TSPC_OPP_3_15  True (*)        Server: Business card pull reject. (O)
+> > +TSPC_OPP_3_16  True (*)        Server: Business card exchange (O.2)
+> > +TSPC_OPP_3_17  True (*)        Server: vCard 2.1 (C.2)
+> > +TSPC_OPP_3_18  True (*)        Server: Business card exchange reject. (O)
+> > +TSPC_OPP_3_19  True (*)        GOEP v2 (C.5)
+> > +TSPC_OPP_3_20  True (*)        GOEP v2 Backward Compability (C.5)
+> > +TSPC_OPP_3_21  True (*)        OBEX over L2CAP (C.5)
+> > +TSPC_OPP_3_22  False           OBEX Reliable Session (C.16)
+> > +TSPC_OPP_3_23  False           OBEX SRM (C.6)
+> > +TSPC_OPP_3_24  False           Send OBEX SRMP header (C.6)
+> > +TSPC_OPP_3_25  False           Receive OBEX SRMP header (C.7)
+> > +---------------------------------------------------------------------
+> > +----------
+> > +O.1: IF NOT Supported, an error message must be sent on request for
+> Business
+> > +       Card Pull.
+> > +O.2: IF NOT Supported, an error message must be sent on request for
+> Business
+> > +       Card Exchange.
+> > +C.1: Mandatory to Support IF (TSPC_OPP_3_13) Business Card Pull is
+> supported.
+> > +C.2: Mandatory to Support IF (TSPC_OPP_3_16) Business Card Exchange is
+> > +       supported.
+> > +C.3: vCard 2.1 support is required for devices containing phonebook
+> > +       applications. vCard 2.1 support optional for other devices.
+> > +C.4: Mandatory to support one of TSPC_OPP_3_8a or TSPC_OPP_3_8b if
+> TSPC_OPP_3_8
+> > +       is supported. Otherwise, both items are excluded.
+> > +C.5: Mandatory if TSPC_OPP_2b_2 supported.
+> > +C.6: Optional to support if TSPC_OPP_2b_2 supported, else excluded.
+> > +C.7: Mandatory if TSPC_OPP_3_19 and TSPC_OPP_3_23 supported else
+> excluded.
+> > +---------------------------------------------------------------------
+> > +----------
+> > +
+> > +
+> > +               Additional OPP Capabilities
+> > +-------------------------------------------------------------------------------
+> > +Parameter Name Selected        Description
+> > +-------------------------------------------------------------------------------
+> > +TSPC_OPP_4_1   False           Abort-Push Operation (O)
+> > +TSPC_OPP_4_2   False           Intentionally Left Blank (N/A)
+> > +TSPC_OPP_4_3   True (*)        Multiple vCards transferred as a single
+> vObject
+> > +                                       (C.1)
+> > +TSPC_OPP_4_4   True (*)        Multiple vCards transfer (C.1)
+> > +TSPC_OPP_4_5   True (*)        vCards with multiple Phone Number Fields
+> (C.1)
+> > +TSPC_OPP_4_6   True (*)        Push vCal to Different Time Zone Server (C.1)
+> > +---------------------------------------------------------------------
+> > +----------
+> > +C.1: Optional if TSPC_OPP_1_2 is supported, otherwise excluded.
+> > +---------------------------------------------------------------------
+> > +----------
+> > diff --git a/doc/pixit-opp.txt b/doc/pixit-opp.txt new file mode
+> > 100644 index 0000000..b7461d6
+> > --- /dev/null
+> > +++ b/doc/pixit-opp.txt
+> > @@ -0,0 +1,27 @@
+> > +OPP PIXIT for the PTS tool.
+> > +
+> > +PTS version: 6.2.0
+> > +
+> > +* - different than PTS defaults
+> > +& - should be set to IUT Bluetooth address
+> > +
+> > +               Required PIXIT settings
+> > +-------------------------------------------------------------------------------
+> > +Parameter Name                                         Value
+> > +-------------------------------------------------------------------------------
+> > +TSPX_supported_extension                               bmp
+> > +TSPX_unsupported_extension                             pts
+> > +TSPX_client_class_of_device                            100104
+> > +TSPX_server_class_of_device                            100104
+> > +TSPX_auth_password                                     0000
+> > +TSPX_auth_user_id                                      PTS
+> > +TSPX_l2cap_psm                                         1003
+> > +TSPX_rfcomm_channel                                    8
+> > +TSPX_no_confirmations                                  FALSE
+> > +TSPX_bd_addr_iut                                       112233445566 (*&)
+> > +TSPX_delete_link_key                                   FALSE
+> > +TSPX_pin_code                                          0000
+> > +TSPX_security_enabled                                  FALSE
+> > +TSPX_time_guard                                                300000
+> > +TSPX_use_implicit_send                                 TRUE
+> > +---------------------------------------------------------------------
+> > +----------
+> > diff --git a/doc/pts-opp.txt b/doc/pts-opp.txt new file mode 100644
+> > index 0000000..ae1bb7c
+> > --- /dev/null
+> > +++ b/doc/pts-opp.txt
+> > @@ -0,0 +1,119 @@
+> > +PTS test results for OPP
+> > +
+> > +PTS version: 6.2.0
+> > +Tested: 30-Jul-2015
+> > +
+> > +Results:
+> > +PASS   test passed
+> > +FAIL   test failed
+> > +INC    test is inconclusive
+> > +N/A    test is disabled due to PICS setup
+> > +NONE   test result is none
+> > +
+> > +-------------------------------------------------------------------------------
+> > +Test Name              Result  Notes
+> > +-------------------------------------------------------------------------------
+> > +TC_CLIENT_BC_BV_02_I   PASS
+> > +TC_CLIENT_BC_BV_04_I   PASS
+> > +TC_CLIENT_BCE_BV_01_I   PASS
+> > +TC_CLIENT_BCE_BV_03_I   N/A
+> > +TC_CLIENT_BCE_BV_04_I   PASS
+> > +TC_CLIENT_BCE_BV_05_I   PASS
+> > +TC_CLIENT_BCE_BV_06_I   PASS
+> > +TC_CLIENT_BCE_BV_07_I   PASS
+> > +TC_CLIENT_BCP_BV_01_I   PASS
+> > +TC_CLIENT_BCP_BV_02_I   PASS
+> > +TC_CLIENT_BCP_BV_03_I   N/A
+> > +TC_CLIENT_BCP_BV_04_I   PASS
+> > +TC_CLIENT_BCP_BV_05_I   PASS
+> > +TC_CLIENT_CON_BV_01_C  PASS
+> > +TC_CLIENT_OPH_BI_01_C  PASS
+> > +TC_CLIENT_OPH_BV_01_I  PASS
+> > +TC_CLIENT_OPH_BV_02_I  N/A
+> > +TC_CLIENT_OPH_BV_03_I  PASS
+> > +TC_CLIENT_OPH_BV_04_I  PASS
+> > +TC_CLIENT_OPH_BV_05_I  PASS
+> > +TC_CLIENT_OPH_BV_07_I  N/A
+> > +TC_CLIENT_OPH_BV_08_I  PASS
+> > +TC_CLIENT_OPH_BV_09_I  N/A
+> > +TC_CLIENT_OPH_BV_10_I  N/A
+> > +TC_CLIENT_OPH_BV_11_I  N/A
+> > +TC_CLIENT_OPH_BV_12_I  PASS
+> > +TC_CLIENT_OPH_BV_13_I  N/A
+> > +TC_CLIENT_OPH_BV_14_I  N/A
+> > +TC_CLIENT_OPH_BV_15_I  N/A
+> > +TC_CLIENT_OPH_BV_16_I  PASS
+> > +TC_CLIENT_OPH_BV_17_I  N/A
+> > +TC_CLIENT_OPH_BV_18_I  N/A
+> > +TC_CLIENT_OPH_BV_19_I  PASS    Send file other than vCard
+> > +TC_CLIENT_OPH_BV_20_I  PASS
+> > +TC_CLIENT_OPH_BV_22_I  PASS    Send file greater than 2 MB
+> > +TC_CLIENT_OPH_BV_23_I  N/A
+> > +TC_CLIENT_OPH_BV_24_I  N/A
+> > +TC_CLIENT_OPH_BV_25_I  N/A
+> > +TC_CLIENT_OPH_BV_26_I  N/A
+> > +TC_CLIENT_SRM_BV_01_C  N/A
+> > +TC_CLIENT_SRM_BV_03_C  N/A
+> > +TC_CLIENT_SRM_BV_05_C  N/A
+> > +TC_CLIENT_SRM_BV_07_C  N/A
+> > +TC_CLIENT_SRMP_BI_01_C N/A
+> > +TC_CLIENT_SRMP_BV_01_C N/A
+> > +TC_CLIENT_SRMP_BV_04_C N/A
+> > +TC_CLIENT_SRMP_BV_05_C N/A
+> > +TC_CLIENT_SRMP_BV_06_C N/A
+> > +TC_SERVER_BC_BV_01_I   PASS
+> > +TC_SERVER_BC_BV_03_I   PASS
+> > +TC_SERVER_BCE_BV_01_I  PASS
+> > +TC_SERVER_BCE_BV_03_I  PASS
+> > +TC_SERVER_BCE_BV_04_I  PASS
+> > +TC_SERVER_BCE_BV_05_I  PASS
+> > +TC_SERVER_BCE_BV_06_I  PASS
+> > +TC_SERVER_BCE_BV_07_I  PASS
+> > +TC_SERVER_BCP_BV_01_I  PASS
+> > +TC_SERVER_BCP_BV_02_I  N/A
+> > +TC_SERVER_BCP_BV_03_I  PASS
+> > +TC_SERVER_BCP_BV_04_I  PASS
+> > +TC_SERVER_BCP_BV_05_I  PASS
+> > +TC_SERVER_CON_BV_02_C  PASS
+> > +TC_SERVER_OPH_BV_01_I  PASS
+> > +TC_SERVER_OPH_BV_02_I  PASS
+> > +TC_SERVER_OPH_BV_03_I  PASS
+> > +TC_SERVER_OPH_BV_04_I  PASS
+> > +TC_SERVER_OPH_BV_05_I  PASS
+> > +TC_SERVER_OPH_BV_07_I  N/A
+> > +TC_SERVER_OPH_BV_08_I  N/A
+> > +TC_SERVER_OPH_BV_09_I  PASS
+> > +TC_SERVER_OPH_BV_10_I  PASS
+> > +TC_SERVER_OPH_BV_11_I  N/A
+> > +TC_SERVER_OPH_BV_12_I  N/A
+> > +TC_SERVER_OPH_BV_13_I  PASS
+> > +TC_SERVER_OPH_BV_14_I  PASS
+> > +TC_SERVER_OPH_BV_15_I  N/A
+> > +TC_SERVER_OPH_BV_16_I  N/A
+> > +TC_SERVER_OPH_BV_17_I  PASS
+> > +TC_SERVER_OPH_BV_18_I  PASS
+> > +TC_SERVER_OPH_BV_19_I  INC     PTS issue #13842
+> > +TC_SERVER_OPH_BV_21_I  N/A
+> > +TC_SERVER_OPH_BV_22_I  INC     PTS issue #13842
+> > +TC_SERVER_OPH_BV_23_I  PASS
+> > +TC_SERVER_OPH_BV_24_I  N/A
+> > +TC_SERVER_OPH_BV_25_I  N/A
+> > +TC_SERVER_OPH_BV_26_I  N/A
+> > +TC_SERVER_ROB_BV_01_C  PASS
+> > +TC_SERVER_ROB_BV_02_C  PASS
+> > +TC_SERVER_SRM_BI_02_C  N/A
+> > +TC_SERVER_SRM_BI_03_C  PASS
+> > +TC_SERVER_SRM_BI_05_C  N/A
+> > +TC_SERVER_SRM_BV_04_C  N/A
+> > +TC_SERVER_SRM_BV_08_C  N/A
+> > +TC_SERVER_SRMP_BV_02_C N/A
+> > +TC_SERVER_SRMP_BV_03_C N/A
+> > +TC_CLIENT_OPH_BV_27_I  N/A
+> > +TC_CLIENT_OPH_BV_34_I  PASS
+> > +TC_SERVER_OPH_BV_27_I  N/A
+> > +TC_SERVER_OPH_BV_30_I  PASS
+> > +TC_SERVER_OPH_BV_31_I  PASS
+> > +TC_SERVER_OPH_BV_32_I  PASS
+> > +TC_SERVER_OPH_BV_33_I  N/A
+> > +TC_SERVER_OPH_BV_34_I  PASS
+> > +---------------------------------------------------------------------
+> > +----------
+> > --
+> > 1.9.1
 > 
->   'On completion of the Addressed Player Changed notification the TG
->   shall complete all player specific notifications with AV/C C-Type
->   REJECTED with error code Addressed Player Changed.'
+> Applied, thanks.
 > 
-> Because reject only has the error code not the event it is necessary to
-lookup
-> by transaction to find out which event was completed thus the transaction
-> needs to be added to the avctp_rsp_cb callback.
-> ---
->  profiles/audio/avctp.c | 20 ++++++++++--------  profiles/audio/avctp.h |
-5
-> +++--  profiles/audio/avrcp.c | 56
-> +++++++++++++++++++++++++++++++++++---------------
->  3 files changed, 53 insertions(+), 28 deletions(-)
+> Note: I did fix the following spelling errors:
 > 
-> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c index
-> 22bf35b..2a43d32 100644
-> --- a/profiles/audio/avctp.c
-> +++ b/profiles/audio/avctp.c
-> @@ -293,8 +293,9 @@ static GSList *servers = NULL;  static void
-> auth_cb(DBusError *derr, void *user_data);  static gboolean
-> process_queue(gpointer user_data);  static gboolean
-> avctp_passthrough_rsp(struct avctp *session, uint8_t code,
-> -					uint8_t subunit, uint8_t *operands,
-> -					size_t operand_count, void
-> *user_data);
-> +					uint8_t subunit, uint8_t
-transaction,
-> +					uint8_t *operands, size_t
-> operand_count,
-> +					void *user_data);
+
+Thanks for correcting the errors.
+
+> WARNING:TYPO_SPELLING: 'Compability' may be misspelled - perhaps
+> 'Compatibility'?
+> #98: FILE: doc/pics-opp.txt:78:
+> +TSPC_OPP_2_18 True (*) GOEP v2 Backward Compability (C.9)
 > 
->  static int send_event(int fd, uint16_t type, uint16_t code, int32_t
-value)  {
-> @@ -706,8 +707,8 @@ static void control_req_destroy(void *data)
->  	if (p->err == 0 || req->func == NULL)
->  		goto done;
+> WARNING:TYPO_SPELLING: 'Compability' may be misspelled - perhaps
+> 'Compatibility'?
+> #170: FILE: doc/pics-opp.txt:150:
+> +TSPC_OPP_3_20 True (*) GOEP v2 Backward Compability (C.5)
 > 
-> -	req->func(session, AVC_CTYPE_REJECTED, req->subunit, NULL, 0,
-> -							req->user_data);
-> +	req->func(session, AVC_CTYPE_REJECTED, req->subunit, p-
-> >transaction,
-> +						NULL, 0, req->user_data);
+> total: 0 errors, 2 warnings, 342 lines checked
 > 
->  done:
->  	g_free(req->operands);
-> @@ -829,9 +830,9 @@ static void control_response(struct avctp_channel
-> *control,
->  			continue;
 > 
->  		if (req->func && req->func(control->session, avc->code,
-> -						avc->subunit_type,
-> -						operands, operand_count,
-> -						req->user_data))
-> +					avc->subunit_type, p->transaction,
-> +					operands, operand_count,
-> +					req->user_data))
->  			return;
-> 
->  		control->processed = g_slist_remove(control->processed,
-> p); @@ -1724,8 +1725,9 @@ static bool set_pressed(struct avctp *session,
-> uint8_t op)  }
-> 
->  static gboolean avctp_passthrough_rsp(struct avctp *session, uint8_t
-code,
-> -					uint8_t subunit, uint8_t *operands,
-> -					size_t operand_count, void
-> *user_data)
-> +					uint8_t subunit, uint8_t
-transaction,
-> +					uint8_t *operands, size_t
-> operand_count,
-> +					void *user_data)
->  {
->  	if (code != AVC_CTYPE_ACCEPTED)
->  		return FALSE;
-> diff --git a/profiles/audio/avctp.h b/profiles/audio/avctp.h index
-> 6c19ce4..68a2735 100644
-> --- a/profiles/audio/avctp.h
-> +++ b/profiles/audio/avctp.h
-> @@ -132,8 +132,9 @@ typedef size_t (*avctp_control_pdu_cb) (struct avctp
-> *session,
->  					uint8_t *subunit, uint8_t *operands,
->  					size_t operand_count, void
-> *user_data);  typedef gboolean (*avctp_rsp_cb) (struct avctp *session,
-> uint8_t code,
-> -					uint8_t subunit, uint8_t *operands,
-> -					size_t operand_count, void
-> *user_data);
-> +					uint8_t subunit, uint8_t
-transaction,
-> +					uint8_t *operands, size_t
-> operand_count,
-> +					void *user_data);
->  typedef gboolean (*avctp_browsing_rsp_cb) (struct avctp *session,
->  					uint8_t *operands, size_t
-> operand_count,
->  					void *user_data);
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c index
-> d66f670..f24cb91 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -1802,8 +1802,8 @@ static const char *status_to_string(uint8_t status)
->  	}
->  }
-> 
-> -static gboolean avrcp_get_play_status_rsp(struct avctp *conn,
-> -					uint8_t code, uint8_t subunit,
-> +static gboolean avrcp_get_play_status_rsp(struct avctp *conn, uint8_t
-> code,
-> +					uint8_t subunit, uint8_t
-transaction,
->  					uint8_t *operands, size_t
-> operand_count,
->  					void *user_data)
->  {
-> @@ -1866,8 +1866,8 @@ static const char *status_to_str(uint8_t status)
->  	}
->  }
-> 
-> -static gboolean avrcp_player_value_rsp(struct avctp *conn,
-> -					uint8_t code, uint8_t subunit,
-> +static gboolean avrcp_player_value_rsp(struct avctp *conn, uint8_t code,
-> +					uint8_t subunit, uint8_t
-transaction,
->  					uint8_t *operands, size_t
-> operand_count,
->  					void *user_data)
->  {
-> @@ -1936,8 +1936,8 @@ static void avrcp_get_current_player_value(struct
-> avrcp *session,
-> 
->  static gboolean avrcp_list_player_attributes_rsp(struct avctp *conn,
->  					uint8_t code, uint8_t subunit,
-> -					uint8_t *operands, size_t
-> operand_count,
-> -					void *user_data)
-> +					uint8_t transaction, uint8_t
-> *operands,
-> +					size_t operand_count, void
-> *user_data)
->  {
->  	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
->  	struct avrcp *session = user_data;
-> @@ -2023,6 +2023,7 @@ static void avrcp_parse_attribute_list(struct
-> avrcp_player *player,
-> 
->  static gboolean avrcp_get_element_attributes_rsp(struct avctp *conn,
->  						uint8_t code, uint8_t
-subunit,
-> +						uint8_t transaction,
->  						uint8_t *operands,
->  						size_t operand_count,
->  						void *user_data)
-> @@ -3237,8 +3238,8 @@ static void avrcp_uids_changed(struct avrcp
-> *session, struct avrcp_header *pdu)
->  	player->uid_counter = get_be16(&pdu->params[1]);  }
-> 
-> -static gboolean avrcp_handle_event(struct avctp *conn,
-> -					uint8_t code, uint8_t subunit,
-> +static gboolean avrcp_handle_event(struct avctp *conn, uint8_t code,
-> +					uint8_t subunit, uint8_t
-transaction,
->  					uint8_t *operands, size_t
-> operand_count,
->  					void *user_data)
->  {
-> @@ -3246,16 +3247,30 @@ static gboolean avrcp_handle_event(struct avctp
-> *conn,
->  	struct avrcp_header *pdu = (void *) operands;
->  	uint8_t event;
-> 
-> -	if ((code != AVC_CTYPE_INTERIM && code !=
-> AVC_CTYPE_CHANGED) ||
-> -								pdu == NULL)
-> +	if (!pdu)
-> +		return FALSE;
-> +
-> +	if ((code != AVC_CTYPE_INTERIM && code !=
-> AVC_CTYPE_CHANGED)) {
-> +		if (pdu->params[0] ==
-> AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED &&
-> +				code == AVC_CTYPE_REJECTED) {
-> +			int i;
-> +
-> +			/* Lookup event by transaction */
-Here it should look for only player specific events, instead all supported
-events, as mentioned in addressed player changed procedure.
-> +			for (i = 0; i <= AVRCP_EVENT_LAST; i++) {
-> +				if (session->transaction_events[i] ==
-> +								transaction)
-{
-> +					event = i;
-> +					goto changed;
-> +				}
-> +			}
-> +		}
->  		return FALSE;
-> +	}
-> 
->  	event = pdu->params[0];
-> 
->  	if (code == AVC_CTYPE_CHANGED) {
-> -		session->registered_events ^= (1 << event);
-> -		avrcp_register_notification(session, event);
-> -		return FALSE;
-> +		goto changed;
->  	}
-> 
->  	switch (event) {
-> @@ -3286,8 +3301,15 @@ static gboolean avrcp_handle_event(struct avctp
-> *conn,
->  	}
-> 
->  	session->registered_events |= (1 << event);
-> +	session->transaction_events[event] = transaction;
-> 
->  	return TRUE;
-> +
-> +changed:
-> +	session->registered_events ^= (1 << event);
-> +	session->transaction_events[event] = 0;
-> +	avrcp_register_notification(session, event);
-> +	return FALSE;
->  }
-> 
->  static void avrcp_register_notification(struct avrcp *session, uint8_t
-event)
-> @@ -3319,8 +3341,8 @@ static void avrcp_register_notification(struct avrcp
-> *session, uint8_t event)
->  					avrcp_handle_event, session);
->  }
-> 
-> -static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
-> -					uint8_t code, uint8_t subunit,
-> +static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t
-> code,
-> +					uint8_t subunit, uint8_t
-transaction,
->  					uint8_t *operands, size_t
-> operand_count,
->  					void *user_data)
->  {
-> @@ -3832,8 +3854,8 @@ void avrcp_unregister_player(struct avrcp_player
-> *player)
-> 
-> 	AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED, NULL);  }
-> 
-> -static gboolean avrcp_handle_set_volume(struct avctp *conn,
-> -					uint8_t code, uint8_t subunit,
-> +static gboolean avrcp_handle_set_volume(struct avctp *conn, uint8_t
-> code,
-> +					uint8_t subunit, uint8_t
-transaction,
->  					uint8_t *operands, size_t
-> operand_count,
->  					void *user_data)
->  {
-> -- 
---
-Best Regards,
-Bharat
+> --
+> Luiz Augusto von Dentz
+
+Regards,
+Gowtham Anandha Babu
 
