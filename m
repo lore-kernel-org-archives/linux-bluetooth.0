@@ -1,47 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1438748450-20284-1-git-send-email-dh79.pyun@samsung.com>
+References: <1438748450-20284-1-git-send-email-dh79.pyun@samsung.com>
+Date: Mon, 10 Aug 2015 11:39:25 +0300
+Message-ID: <CABBYNZJ8-9FmBE7jiWHt+a=s9GgYY09OHtgs2POrj=+xMNq6QQ@mail.gmail.com>
+Subject: Re: [PATCH BLUEZ] core/adapter: Fix local oob data reading fail when
+ SC is disabled
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] audio/avdtp: Fix suspending only the first SEID
-Date: Mon, 10 Aug 2015 13:24:24 +0300
-Message-Id: <1439202265-24485-1-git-send-email-luiz.dentz@gmail.com>
+To: Dohyun Pyun <dh79.pyun@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	steve.jun@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-AVDTP_Suspend can contain several Stream Endpoing IDs to be suspended.
----
- android/avdtp.c        | 2 +-
- profiles/audio/avdtp.c | 3 +--
- 2 files changed, 2 insertions(+), 3 deletions(-)
+On Wed, Aug 5, 2015 at 7:20 AM, Dohyun Pyun <dh79.pyun@samsung.com> wrote:
+> From: DoHyun Pyun <dh79.pyun@samsung.com>
+>
+> If SC is not enabled, MGMT_OP_READ_LOCAL_OOB_DATA command does not
+> get the local oob extended data. And the length is smaller than
+> rp size. This patch removes the size checking logic, so will not
+> return the error for the normal case. We can handle the exception
+> case when the status is not MGMT_STATUS_SUCCESS.
+>
+> < HCI Command: Read Local OOB Data (0x03|0x0057) plen 0         [hci0] 7.628820
+>> HCI Event: Command Complete (0x0e) plen 36                    [hci0] 7.632616
+>       Read Local OOB Data (0x03|0x0057) ncmd 1
+>         Status: Success (0x00)
+>         Hash C from P-192: 150780594affab7c117efa6cb64918f3
+>         Randomizer R with P-192: c75821e0b60e070ba5f4534606ebcb01
+>
+> bluetoothd[3348]: src/adapter.c:btd_adapter_read_local_oob_data() hci0
+> bluetoothd[3348]: Too small read local OOB data response
+> ---
+>  src/adapter.c | 3 ---
+>  1 file changed, 3 deletions(-)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 59c90d2..07bf7b4 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -7199,9 +7199,6 @@ static void read_local_oob_data_complete(uint8_t status, uint16_t length,
+>                                                 mgmt_errstr(status), status);
+>                 hash = NULL;
+>                 randomizer = NULL;
+> -       } else if (length < sizeof(*rp)) {
+> -               error("Too small read local OOB data response");
+> -               return;
 
-diff --git a/android/avdtp.c b/android/avdtp.c
-index 7e61280..1f79e74 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -1678,7 +1678,7 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
- 	for (i = 0; i < seid_count; i++, seid++) {
- 		failed_seid = seid->seid;
- 
--		sep = find_local_sep_by_seid(session, req->first_seid.seid);
-+		sep = find_local_sep_by_seid(session, seid->seid);
- 		if (!sep || !sep->stream) {
- 			err = AVDTP_BAD_ACP_SEID;
- 			goto failed;
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 37f7a59..9c33373 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -1822,8 +1822,7 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
- 	for (i = 0; i < seid_count; i++, seid++) {
- 		failed_seid = seid->seid;
- 
--		sep = find_local_sep_by_seid(session,
--					req->first_seid.seid);
-+		sep = find_local_sep_by_seid(session, seid->seid);
- 		if (!sep || !sep->stream) {
- 			err = AVDTP_BAD_ACP_SEID;
- 			goto failed;
+Perhaps we should have 2 different structs then
+mgmt_rp_read_local_oob_data and mgmt_rp_read_local_oob_data_ext so we
+can still do the length check. Anyway the 256 bit values don't seem to
+be used anywhere so I suppose only the non-extended version currently
+matters but we might extend the oob_handler to include the 256 bit
+values.
+
+>         } else {
+>                 hash = rp->hash192;
+>                 randomizer = rp->rand192;
+> --
+> 1.8.1.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.1.0
-
+Luiz Augusto von Dentz
