@@ -2,146 +2,98 @@ Return-Path: <cyrus@holtmann.org>
 From: Adam Moore <adam.moore@savantsystems.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Adam Moore <adam.moore@savantsystems.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] gatt-database: allow GattService anywhere in
- ObjectManager tree
-Date: Mon, 10 Aug 2015 23:27:14 +0000
-Message-ID: <D1EE7DB0.B607%adam.moore@savant.com>
-References: <1438364565-24642-1-git-send-email-adam.moore@savantsystems.com>
- <CABBYNZLWpbr36dvPP-QsSTtMjW=zZqU7ZfK7KW8SohBeeTtvbg@mail.gmail.com>
-In-Reply-To: <CABBYNZLWpbr36dvPP-QsSTtMjW=zZqU7ZfK7KW8SohBeeTtvbg@mail.gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
+CC: "Othman, Ossama" <ossama.othman@intel.com>,
+	Nathaniel McCallum <npmccallum@redhat.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: GATT service DBus interface violates DBus spec
+Date: Mon, 10 Aug 2015 22:55:47 +0000
+Message-ID: <D1EE6FAF.B535%adam.moore@savant.com>
+References: <1436456267.26457.24.camel@redhat.com>
+ <1539455180.3160545.1438363138455.JavaMail.zimbra@redhat.com>
+ <D1E0FD51.AD61%adam.moore@savant.com>
+ <CAPyD+=BTGLzEKanLSS7kV8bz7mr7BL5ed0GHuXEKxCJYuTpPVg@mail.gmail.com>
+ <D1E10436.AD77%adam.moore@savant.com>
+ <CAPyD+=DRdXnT_PBvd6C-KKTB3qmak5hmg97auubhc+x0CNzz_g@mail.gmail.com>
+ <D1E11ED1.AD8E%adam.moore@savant.com>
+ <CABBYNZ+5hWF42bNYh-zpqNXKu1Wi2PZQJ_i9634umgD-TMFtNw@mail.gmail.com>
+In-Reply-To: <CABBYNZ+5hWF42bNYh-zpqNXKu1Wi2PZQJ_i9634umgD-TMFtNw@mail.gmail.com>
+Content-Type: text/plain; charset="euc-kr"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-
-On 8/2/15, 2:04 AM, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com> wrote:
-
->Hi Adam,
->
->On Fri, Jul 31, 2015 at 8:42 PM, Adam Moore
-><adam.moore@savantsystems.com> wrote:
->> Relaxes the requirement that object provide ObjectManager AND
->> GattService interfaces.
->>
->> Maintains check that GattService and GattCharacteristics are
->> children of ObjectManager, but loses the check that
->> GattCharacteristics are children of GattService. Therefore,
->> meant as a temporary workaround.
->> ---
->>  src/gatt-database.c | 20 +++++++++++++++-----
->>  1 file changed, 15 insertions(+), 5 deletions(-)
->>
->> diff --git a/src/gatt-database.c b/src/gatt-database.c
->> index 69a814d..e82165c 100644
->> --- a/src/gatt-database.c
->> +++ b/src/gatt-database.c
->> @@ -85,6 +85,7 @@ struct external_service {
->>         bool failed;
->>         char *owner;
->>         char *path;     /* Path to GattService1 */
->> +       char *manager_path;     /* Path to ObjectManager */
->>         DBusMessage *reg;
->>         GDBusClient *client;
->>         GDBusProxy *proxy;
->> @@ -372,6 +373,7 @@ static void service_free(void *data)
->>
->>         g_free(service->owner);
->>         g_free(service->path);
->> +       g_free(service->manager_path);
->>
->>         free(service);
->>  }
->> @@ -1042,7 +1044,7 @@ static bool match_service(const void *a, const
->>void *b)
->>         const struct external_service *service = a;
->>         const struct svc_match_data *data = b;
->>
->> -       return g_strcmp0(service->path, data->path) == 0 &&
->> +       return g_strcmp0(service->manager_path, data->path) == 0 &&
->>                                 g_strcmp0(service->owner, data->sender)
->>== 0;
->>  }
->>
->> @@ -1321,7 +1323,7 @@ static void proxy_added_cb(GDBusProxy *proxy,
->>void *user_data)
->>         iface = g_dbus_proxy_get_interface(proxy);
->>         path = g_dbus_proxy_get_path(proxy);
->>
->> -       if (!g_str_has_prefix(path, service->path))
->> +       if (!g_str_has_prefix(path, service->manager_path))
->>                 return;
->>
->>         if (g_strcmp0(iface, GATT_SERVICE_IFACE) == 0) {
->> @@ -1332,12 +1334,20 @@ static void proxy_added_cb(GDBusProxy *proxy,
->>void *user_data)
->>                  * TODO: We may want to support adding included
->>services in a
->>                  * single hierarchy.
->>                  */
->> -               if (g_strcmp0(path, service->path) != 0) {
->> +               if (service->path != NULL) {
->>                         error("Multiple services added within
->>hierarchy");
->>                         service->failed = true;
->>                         return;
->>                 }
->>
->> +               // Set service path now that we've found a service
->> +               service->path = g_strdup(path);
->> +               if (!service->path) {
->> +                       error("Failed to allocate service path");
->> +                       service->failed = true;
->> +                       return;
->> +               }
->> +
->>                 /* Add 1 for the service declaration */
->>                 if (!incr_attr_count(service, 1)) {
->>                         error("Failed to increment attribute count");
->> @@ -2171,8 +2181,8 @@ static struct external_service
->>*service_create(DBusConnection *conn,
->>         if (!service->owner)
->>                 goto fail;
->>
->> -       service->path = g_strdup(path);
->> -       if (!service->path)
->> +       service->manager_path = g_strdup(path);
->> +       if (!service->manager_path)
->>                 goto fail;
->>
->>         service->chrcs = queue_new();
->> --
->> 2.4.6
->
->Well if we are doing to do that then perhaps we should list all the
->services under the path ObjectManager path not only one.
-
-Hi Luiz,
-
-You are right - though I still like the initial design of having one
-service per ObjectManager, as it makes it easier to cleanup or restart (or
-D-Bus export/unexport) an individual service at the ObjectManager API
-level.
-
-I only added the pointer to manager_path because it was better to test
-that for that prefix than it was to not do any checking.  I couldn¹t do
-the stronger test for the GattService path because there is no guaranteed
-order to the proxy callbacks.
-
-How strict do you think we need to be here in validating the parent/child
-relationships in the object tree?
-
--Adam
-
->
->
->--
->Luiz Augusto von Dentz
-
-
-Statement of Confidentiality
-
-The contents of this e-mail message and any attachments are confidential and are intended solely for the addressee. The information may also be legally privileged. This transmission is sent in trust, and the sole purpose of delivery to the intended recipient. If you have received this transmission in error, any use, reproduction or dissemination of this transmission is strictly prohibited. If you are not the intended recipient, please immediately notify the sender by reply e-mail or at 508.683.2500 and delete this message and its attachments, if any.
-
+DQoNCk9uIDgvMi8xNSwgMTo1NyBBTSwgIkx1aXogQXVndXN0byB2b24gRGVudHoiIDxsdWl6LmRl
+bnR6QGdtYWlsLmNvbT4gd3JvdGU6DQoNCj5IaSwNCj4NCj5PbiBGcmksIEp1bCAzMSwgMjAxNSBh
+dCAxMDo1MCBQTSwgQWRhbSBNb29yZQ0KPjxhZGFtLm1vb3JlQHNhdmFudHN5c3RlbXMuY29tPiB3
+cm90ZToNCj4+DQo+Pg0KPj4gT24gNy8zMS8xNSwgMTI6NDUgUE0sICJPdGhtYW4sIE9zc2FtYSIg
+PG9zc2FtYS5vdGhtYW5AaW50ZWwuY29tPiB3cm90ZToNCj4+DQo+Pj5IaSBBZGFtLA0KPj4+DQo+
+Pj5PbiBGcmksIEp1bCAzMSwgMjAxNSBhdCAxMTowMCBBTSwgQWRhbSBNb29yZQ0KPj4+PGFkYW0u
+bW9vcmVAc2F2YW50c3lzdGVtcy5jb20+IHdyb3RlOg0KPj4+PiBPc3NhbWEsIHRoYW5rcyBmb3Ig
+c2hhcmluZyAtIEkgZGlkbqn2dCBoYXZlIHRoZSBoZWFydCB0byBnbyBkb3duIHRoYXQNCj4+Pj5w
+YXRoDQo+Pj4+IDopICBOaWNlIHRvIGhhdmUgdGhhdCBzb2x1dGlvbiBhdmFpbGFibGUgdG9vLg0K
+Pj4+DQo+Pj5IYSEgIEJlbGlldmUgeW91IG1lLCBJIHByZWZlcnJlZCBub3QgZ29pbmcgZG93biB0
+aGlzIHBhdGggc2luY2UgaXQNCj4+PmJhc2ljYWxseSByZWludmVudHMgdGhlIHdoZWVsLiBidXQg
+SSBkaWRuJ3QgaGF2ZSBtdWNoIGNob2ljZSBhdCB0aGUNCj4+PnRpbWUgc2luY2UgSSBuZWVkZWQg
+dG8gZ2V0IHNvbWV0aGluZyBvdXQgdGhlIGRvb3IgdGhhdCBkaWRuJ3QgcmVseSB0b28NCj4+Pmhl
+YXZpbHkgb24gdXBzdHJlYW0gcGF0Y2hlcyBiZWluZyBtZXJnZWQuDQo+Pj4NCj4+Pj4gSnVzdCBh
+IHRob3VnaHQgLSBzaW5jZSB0aGUgQ2hhcmFjdGVyaXN0aWMgb2JqZWN0cyBtdXN0IHByb3ZpZGUg
+dGhlaXINCj4+Pj4gc2VydmljZSBwYXRoIHZpYSBEQnVzIFByb3BlcnR5LCBmb3JjaW5nIHRoZWly
+IHBhdGhzIHRvIGJlIGNoaWxkcmVuIG9mDQo+Pj4+dGhlDQo+Pj4+IHNlcnZpY2UgcGF0aCBtYXkg
+YmUgcmVkdW5kYW50LCB1bmxlc3Mgc29tZSBsb2dpYyBpcyBwbGFubmVkIHRvIGJlDQo+Pj4+YmFz
+ZWQNCj4+Pj5vbg0KPj4+PiB0aGUgc3RydWN0dXJlIG9mIHRoZSBPTSB0cmVlIGluIHRoZSBmdXR1
+cmUuDQo+Pj4NCj4+PkFncmVlZC4gIEluIHRoaXMgY2FzZSwgSSBqdXN0IGZvbGxvd2VkIHRoZSBj
+b252ZW50aW9uIGZvdW5kIGluIHRoZQ0KPj4+ZXhhbXBsZSBoaWVyYXJjaHkgZGVzY3JpYmVkIGlu
+IHRoZSAiR0FUVCBNYW5hZ2VyIEhpZXJhcmNoeSIgc2VjdGlvbiBpbg0KPj4+dGhlIEJsdWVaIGRv
+Yy9nYXR0LWFwaS50eHQgZG9jdW1lbnQsIGFzIHdlbGwgYXMgdGhlIGhpZXJhcmNoeSBmb3VuZCBp
+bg0KPj4+dGhlIEJsdWVaIHRlc3QvZXhhbXBsZS1nYXR0LXNlcnZlciBQeXRob24gY29kZS4gIEdv
+aW5nIHdpdGggdGhpcw0KPj4+aGllcmFyY2h5IGFsc28gbWltaWNzIHRoZSBHQVRUIHNlcnZpY2Ug
+aGllcmFyY2h5IGRlc2NyaWJlZCBpbiB0aGUNCj4+PkJsdWV0b290aCBzcGVjLg0KPj4NCj4+IFll
+YWgsIEkgdXNlZCB0aGUgc2FtZSBzdHJ1Y3R1cmUgaW4gbXkgaW1wbGVtZW50YXRpb24gLSB0aGF0
+IHdhcyByZWFsbHkNCj4+IG1vcmUgb2YgYSBub3RlIGZvciB0aGUgbWFpbnRhaW5lcnMgdGhhdCBp
+ZiB3ZSBjYW4gbGl2ZSB3aXRob3V0IGEgc3RyaWN0DQo+PiBzdHJ1Y3R1cmUsIGl0IG1pZ2h0IHNp
+bXBsaWZ5IHRoZSBmaW5hbCBmaXguDQo+Pg0KPj4+DQo+Pj5UaGFua3MhDQo+Pj4tT3NzYW1hDQo+
+DQo+SXQgc2VlbXMgdGhlIGlzc3VlIHdhcyBjbG9zZWQgY2F1c2VkIEdEQnVzIGFuZCBvdGhlciBi
+aW5kaW5ncyBmb2xsb3cNCj50aGUgRC1CdXMgc3BlYyB0byB0aGUgd29yZCwgYnV0IGhvdyBvbmUg
+d291bGQgbGlzdCBpbnRlcmZhY2VzIGluIHRoZQ0KPnJvb3QgJy8nPyBTbyBlaXRoZXIgJy8nIHNo
+YWxsIGJlY29tZSBzcGVjaWFsIGFuZCBubyBvdGhlciBpbnRlcmZhY2UNCj5zaGFsbCBiZSByZWdp
+c3RlcmVkIHRoZXJlIG9yIHRoZSBzcGVjIHNob3VsZCBiZSByZXdvcmRlZCB0byBpbmNsdWRlDQo+
+dGhlIGluaXRpYWwgcGF0aCwgYnV0IHRoZSBmb3JtZXIgaXMgcHJvYmFibHkgbm90IGJhY2t3YXJk
+IGNvbXBhdGlibGUNCj5zaW5jZSBhZmFpayBtb3N0IGJpbmRpbmdzIGFsbG93IGN1c3RvbSBpbnRl
+cmZhY2VzIGluICcvJyBwYXRoLg0KDQpIaSBMdWl6LA0KDQpTaW5jZSB0aGVyZSBhcmUgYXQgbGVh
+c3Qgc29tZSBiaW5kaW5ncyAobGlrZSBHbGliIEdEQnVzT2JqZWN0TWFuYWdlcikgdGhhdA0KZG8g
+bm90IGFsbG93IGN1c3RvbSBpbnRlcmZhY2VzIGluIHRoZSBPYmplY3RNYW5hZ2VyIG9iamVjdCwg
+d2UNCmNvdWxkIHRyeSB0byBhbGxvdyB0aGUgb2JqZWN0IGhvc3RpbmcgdGhlIE9iamVjdE1hbmFn
+ZXIgaW50ZXJmYWNlIHRvDQphbHNvIGhvc3QgdGhlIEdhdHRTZXJ2aWNlIGludGVyZmFjZSwgYnV0
+IG5vdCByZXF1aXJlIGl0Lg0KDQpGb3IgZXhhbXBsZSwgc29tZXRoaW5nIGxpa2UgdGhpcyBjb3Vs
+ZCBhbHNvIGJlIGFjY2VwdGVkIGFzIHZhbGlkOg0KDQotPiAvY29tL2V4YW1wbGUNCnwNCi0+IC9j
+b20vZXhhbXBsZS9oZWFydHJhdGUNCnwgfCAtIG9yZy5mcmVlZGVza3RvcC5EQnVzLk9iamVjdE1h
+bmFnZXINCnwgfCAtIG9yZy5mcmVlZGVza3RvcC5EQnVzLlByb3BlcnRpZXMNCnwgfA0KfCAtPiAv
+Y29tL2V4YW1wbGUvaGVhcnRyYXRlL3NlcnZpY2UNCnwgICB8IC0gb3JnLmZyZWVkZXNrdG9wLkRC
+dXMuUHJvcGVydGllcw0KfCAgIHwgLSBvcmcuYmx1ZXouR2F0dFNlcnZpY2UxDQp8ICAgfA0KfCAg
+IC0+IC9jb20vZXhhbXBsZS9oZWFydHJhdGUvc2VydmljZS9jaGFyMA0KfCAgICAgfCAtIG9yZy5m
+cmVlZGVza3RvcC5EQnVzLlByb3BlcnRpZXMNCnwgICAgIHwgLSBvcmcuYmx1ZXouR2F0dENoYXJh
+Y3RlcmlzdGljMQ0KfCAgICAgfA0KfCAgIC0+IC9jb20vZXhhbXBsZS9oZWFydHJhdGUvc2Vydmlj
+ZS9jaGFyMQ0KfCAgICAgfCAtIG9yZy5mcmVlZGVza3RvcC5EQnVzLlByb3BlcnRpZXMNCnwgICAg
+IHwgLSBvcmcuYmx1ZXouR2F0dENoYXJhY3RlcmlzdGljMQ0KfCAgICAgfA0KfCAgICAgLT4gL2Nv
+bS9leGFtcGxlL2hlYXJ0cmF0ZS9zZXJ2aWNlL2NoYXIxL2Rlc2MwDQp8ICAgICAgIHwgLSBvcmcu
+ZnJlZWRlc2t0b3AuREJ1cy5Qcm9wZXJ0aWVzDQp8ICAgICAgIHwgLSBvcmcuYmx1ZXouR2F0dERl
+c2NyaXB0b3IxDQoNCklmIHdlIGNhbm5vdCBsaXZlIHdpdGggYWxsb3dpbmcgdGhlIHR3byBzdHJ1
+Y3R1cmVzLCBpdCBtaWdodCBiZSBiZXR0ZXINCih0aG91Z2ggcGFpbmZ1bCkgdG8gYnJlYWsNCmJh
+Y2t3YXJkIGNvbXBhdGliaWxpdHkgd2hpbGUgZXhwZXJpbWVudGFsIGZsYWcgaXMgc3RpbGwgZmx5
+aW5nLCBhcw0KYmluZGluZ3MgdGhhdA0KZG8gYWxsb3cgY3VzdG9tIGludGVyZmFjZXMgY2FuIHN0
+aWxsIGRvIHRoZSBhYm92ZSB3aXRoIGEgc21hbGwgY2hhbmdlLA0Kd2hlcmVhcyB0aGUgb3RoZXIg
+YmluZGluZ3MNCmNhbm5vdCBpbXBsZW1lbnQgd2hhdCBpcyBjdXJyZW50bHkgZG9jdW1lbnRlZC4N
+Cg0KUmVnYXJkaW5nIHlvdXIgc3BlYyByZXdvcmRpbmcgYWx0ZXJuYXRpdmUsIHdoaWNoIGluaXRp
+YWwgcGF0aCBhcmUgeW91DQpyZWZlcnJpbmcgdG8/DQoNClRoYW5rcywNCi1BZGFtDQoNCg0KPg0K
+Pg0KPi0tDQo+THVpeiBBdWd1c3RvIHZvbiBEZW50eg0KDQoNClN0YXRlbWVudCBvZiBDb25maWRl
+bnRpYWxpdHkNCg0KVGhlIGNvbnRlbnRzIG9mIHRoaXMgZS1tYWlsIG1lc3NhZ2UgYW5kIGFueSBh
+dHRhY2htZW50cyBhcmUgY29uZmlkZW50aWFsIGFuZCBhcmUgaW50ZW5kZWQgc29sZWx5IGZvciB0
+aGUgYWRkcmVzc2VlLiBUaGUgaW5mb3JtYXRpb24gbWF5IGFsc28gYmUgbGVnYWxseSBwcml2aWxl
+Z2VkLiBUaGlzIHRyYW5zbWlzc2lvbiBpcyBzZW50IGluIHRydXN0LCBhbmQgdGhlIHNvbGUgcHVy
+cG9zZSBvZiBkZWxpdmVyeSB0byB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LiBJZiB5b3UgaGF2ZSBy
+ZWNlaXZlZCB0aGlzIHRyYW5zbWlzc2lvbiBpbiBlcnJvciwgYW55IHVzZSwgcmVwcm9kdWN0aW9u
+IG9yIGRpc3NlbWluYXRpb24gb2YgdGhpcyB0cmFuc21pc3Npb24gaXMgc3RyaWN0bHkgcHJvaGli
+aXRlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVuZGVkIHJlY2lwaWVudCwgcGxlYXNlIGltbWVk
+aWF0ZWx5IG5vdGlmeSB0aGUgc2VuZGVyIGJ5IHJlcGx5IGUtbWFpbCBvciBhdCA1MDguNjgzLjI1
+MDAgYW5kIGRlbGV0ZSB0aGlzIG1lc3NhZ2UgYW5kIGl0cyBhdHRhY2htZW50cywgaWYgYW55Lg0K
+DQo=
