@@ -1,61 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1439202265-24485-1-git-send-email-luiz.dentz@gmail.com>
-References: <1439202265-24485-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 11 Aug 2015 13:34:26 +0300
-Message-ID: <CABBYNZLVag6UOGxrf8+SQGDwpXHs4nXYbrXAM6ma_0yvy1+d8A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] audio/avdtp: Fix suspending only the first SEID
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Frederic Danis <frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4 4/4] Bluetooth: hci_bcm: Add suspend/resume PM functions
+Date: Tue, 11 Aug 2015 12:12:13 +0200
+Message-Id: <1439287933-21069-5-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1439287933-21069-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1439287933-21069-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Add reference to hci_uart structure to bcm_device.
+This allows suspend/resume callbacks to manage UART flow control.
 
-On Mon, Aug 10, 2015 at 1:24 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> AVDTP_Suspend can contain several Stream Endpoing IDs to be suspended.
-> ---
->  android/avdtp.c        | 2 +-
->  profiles/audio/avdtp.c | 3 +--
->  2 files changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/android/avdtp.c b/android/avdtp.c
-> index 7e61280..1f79e74 100644
-> --- a/android/avdtp.c
-> +++ b/android/avdtp.c
-> @@ -1678,7 +1678,7 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
->         for (i = 0; i < seid_count; i++, seid++) {
->                 failed_seid = seid->seid;
->
-> -               sep = find_local_sep_by_seid(session, req->first_seid.seid);
-> +               sep = find_local_sep_by_seid(session, seid->seid);
->                 if (!sep || !sep->stream) {
->                         err = AVDTP_BAD_ACP_SEID;
->                         goto failed;
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 37f7a59..9c33373 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -1822,8 +1822,7 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
->         for (i = 0; i < seid_count; i++, seid++) {
->                 failed_seid = seid->seid;
->
-> -               sep = find_local_sep_by_seid(session,
-> -                                       req->first_seid.seid);
-> +               sep = find_local_sep_by_seid(session, seid->seid);
->                 if (!sep || !sep->stream) {
->                         err = AVDTP_BAD_ACP_SEID;
->                         goto failed;
-> --
-> 2.1.0
+Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+---
+ drivers/bluetooth/hci_bcm.c | 61 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 60 insertions(+), 1 deletion(-)
 
-Applied.
-
-
-
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 12490eb..11782fa 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -51,6 +51,9 @@ struct bcm_device {
+ 	bool			clk_enabled;
+ 
+ 	u32			init_speed;
++
++	struct hci_uart		*hu;
++	bool			is_suspended; /* suspend/resume flag */
+ };
+ 
+ struct bcm_data {
+@@ -170,6 +173,7 @@ static int bcm_open(struct hci_uart *hu)
+ 		if (hu->tty->dev->parent == dev->pdev->dev.parent) {
+ 			bcm->dev = dev;
+ 			hu->init_speed = dev->init_speed;
++			dev->hu = hu;
+ 			break;
+ 		}
+ 	}
+@@ -190,8 +194,10 @@ static int bcm_close(struct hci_uart *hu)
+ 
+ 	/* Protect bcm->dev against removal of the device or driver */
+ 	spin_lock(&bcm_device_list_lock);
+-	if (bcm_device_exists(bcm->dev))
++	if (bcm_device_exists(bcm->dev)) {
+ 		bcm_gpio_set_power(bcm->dev, false);
++		bcm->dev->hu = NULL;
++	}
+ 	spin_unlock(&bcm_device_list_lock);
+ 
+ 	skb_queue_purge(&bcm->txq);
+@@ -318,6 +324,53 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
+ 	return skb_dequeue(&bcm->txq);
+ }
+ 
++/* Platform suspend callback */
++static int bcm_suspend(struct device *pdev)
++{
++	struct bcm_device *dev = platform_get_drvdata(to_platform_device(pdev));
++
++	BT_DBG("suspend (%p): is_suspended %d", dev, dev->is_suspended);
++
++	if (!dev->is_suspended) {
++		hci_uart_set_flow_control(dev->hu, true);
++
++		/* Once this callback returns, driver suspends BT via GPIO */
++		dev->is_suspended = true;
++	}
++
++	/* Suspend the device */
++	if (dev->device_wakeup) {
++		gpiod_set_value(dev->device_wakeup, false);
++		BT_DBG("suspend, delaying 15 ms");
++		mdelay(15);
++	}
++
++	return 0;
++}
++
++/* Platform resume callback */
++static int bcm_resume(struct device *pdev)
++{
++	struct bcm_device *dev = platform_get_drvdata(to_platform_device(pdev));
++
++	BT_DBG("resume (%p): is_suspended %d", dev, dev->is_suspended);
++
++	if (dev->device_wakeup) {
++		gpiod_set_value(dev->device_wakeup, true);
++		BT_DBG("resume, delaying 15 ms");
++		mdelay(15);
++	}
++
++	/* When this callback executes, the device has woken up already */
++	if (dev->is_suspended) {
++		dev->is_suspended = false;
++
++		hci_uart_set_flow_control(dev->hu, false);
++	}
++
++	return 0;
++}
++
+ static const struct acpi_gpio_params device_wakeup_gpios = { 0, 0, false };
+ static const struct acpi_gpio_params shutdown_gpios = { 1, 0, false };
+ 
+@@ -474,12 +527,18 @@ static const struct acpi_device_id bcm_acpi_match[] = {
+ MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
+ #endif
+ 
++/* Platform suspend and resume callbacks */
++static const struct dev_pm_ops bcm_pm_ops = {
++	SET_SYSTEM_SLEEP_PM_OPS(bcm_suspend, bcm_resume)
++};
++
+ static struct platform_driver bcm_driver = {
+ 	.probe = bcm_probe,
+ 	.remove = bcm_remove,
+ 	.driver = {
+ 		.name = "hci_bcm",
+ 		.acpi_match_table = ACPI_PTR(bcm_acpi_match),
++		.pm = &bcm_pm_ops,
+ 	},
+ };
+ 
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
