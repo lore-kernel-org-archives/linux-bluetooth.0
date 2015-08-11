@@ -1,34 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH] ath3k: Revert 7e730c7f3d1f39c25cf5f7cf70c0ff4c28d7bec7
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1439290229-6937-1-git-send-email-hanipouspilot@gmail.com>
-Date: Tue, 11 Aug 2015 12:23:29 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Message-Id: <96FCB7AC-6E4C-4ED1-8048-87843978A63B@holtmann.org>
-References: <1439290229-6937-1-git-send-email-hanipouspilot@gmail.com>
-To: Dmitry Tunin <hanipouspilot@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Frederic Danis <frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v5 4/4] Bluetooth: hci_bcm: Add suspend/resume PM functions
+Date: Tue, 11 Aug 2015 16:35:38 +0200
+Message-Id: <1439303738-24231-5-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1439303738-24231-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1439303738-24231-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dmitry,
+Add reference to hci_uart structure to bcm_device.
+This allows suspend/resume callbacks to manage UART flow control.
 
-> This patch causes infinite loop on loading firmware on Acer Aspire
-> V3è371-31KW and probably other laptops.
-> 
-> This is a serious regression, because system becomes unresponsive.
-> 
-> This should be reverted until the firmware loading issue is sorted out.
+Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+---
+ drivers/bluetooth/hci_bcm.c | 61 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 60 insertions(+), 1 deletion(-)
 
-this needs a lot more explanation on why I am suppose to revert this now.
-
-And now I am really reluctant to have any ath3k patches marked as stable. If things are not tested properly, then please refrain from adding stable tags since these are clearly more than just VID/PID additions.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 12490eb..38c1204 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -51,6 +51,9 @@ struct bcm_device {
+ 	bool			clk_enabled;
+ 
+ 	u32			init_speed;
++
++	struct hci_uart		*hu;
++	bool			is_suspended; /* suspend/resume flag */
+ };
+ 
+ struct bcm_data {
+@@ -170,6 +173,7 @@ static int bcm_open(struct hci_uart *hu)
+ 		if (hu->tty->dev->parent == dev->pdev->dev.parent) {
+ 			bcm->dev = dev;
+ 			hu->init_speed = dev->init_speed;
++			dev->hu = hu;
+ 			break;
+ 		}
+ 	}
+@@ -190,8 +194,10 @@ static int bcm_close(struct hci_uart *hu)
+ 
+ 	/* Protect bcm->dev against removal of the device or driver */
+ 	spin_lock(&bcm_device_list_lock);
+-	if (bcm_device_exists(bcm->dev))
++	if (bcm_device_exists(bcm->dev)) {
+ 		bcm_gpio_set_power(bcm->dev, false);
++		bcm->dev->hu = NULL;
++	}
+ 	spin_unlock(&bcm_device_list_lock);
+ 
+ 	skb_queue_purge(&bcm->txq);
+@@ -318,6 +324,53 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
+ 	return skb_dequeue(&bcm->txq);
+ }
+ 
++/* Platform suspend callback */
++static int bcm_suspend(struct device *dev)
++{
++	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
++
++	BT_DBG("suspend (%p): is_suspended %d", bdev, bdev->is_suspended);
++
++	if (!bdev->is_suspended) {
++		hci_uart_set_flow_control(bdev->hu, true);
++
++		/* Once this callback returns, driver suspends BT via GPIO */
++		bdev->is_suspended = true;
++	}
++
++	/* Suspend the device */
++	if (bdev->device_wakeup) {
++		gpiod_set_value(bdev->device_wakeup, false);
++		BT_DBG("suspend, delaying 15 ms");
++		mdelay(15);
++	}
++
++	return 0;
++}
++
++/* Platform resume callback */
++static int bcm_resume(struct device *dev)
++{
++	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
++
++	BT_DBG("resume (%p): is_suspended %d", bdev, bdev->is_suspended);
++
++	if (bdev->device_wakeup) {
++		gpiod_set_value(bdev->device_wakeup, true);
++		BT_DBG("resume, delaying 15 ms");
++		mdelay(15);
++	}
++
++	/* When this callback executes, the device has woken up already */
++	if (bdev->is_suspended) {
++		bdev->is_suspended = false;
++
++		hci_uart_set_flow_control(bdev->hu, false);
++	}
++
++	return 0;
++}
++
+ static const struct acpi_gpio_params device_wakeup_gpios = { 0, 0, false };
+ static const struct acpi_gpio_params shutdown_gpios = { 1, 0, false };
+ 
+@@ -474,12 +527,18 @@ static const struct acpi_device_id bcm_acpi_match[] = {
+ MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
+ #endif
+ 
++/* Platform suspend and resume callbacks */
++static const struct dev_pm_ops bcm_pm_ops = {
++	SET_SYSTEM_SLEEP_PM_OPS(bcm_suspend, bcm_resume)
++};
++
+ static struct platform_driver bcm_driver = {
+ 	.probe = bcm_probe,
+ 	.remove = bcm_remove,
+ 	.driver = {
+ 		.name = "hci_bcm",
+ 		.acpi_match_table = ACPI_PTR(bcm_acpi_match),
++		.pm = &bcm_pm_ops,
+ 	},
+ };
+ 
+-- 
+1.9.1
 
