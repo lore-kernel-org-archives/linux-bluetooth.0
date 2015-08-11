@@ -1,129 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH bluetooth-next 0/4] 6lowpan: introduce generic 6lowpan private data
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1439322250-32039-1-git-send-email-alex.aring@gmail.com>
-Date: Tue, 11 Aug 2015 13:10:33 -0700
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Lukasz Duda <lukasz.duda@nordicsemi.no>,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-Message-Id: <34FDA339-16FF-43A5-B1DD-18DC93BBCAC3@holtmann.org>
-References: <1439322250-32039-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 11 Aug 2015 23:04:06 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth 2015-08-11
+Message-ID: <20150811200406.GA6173@t440s.P-661HNU-F1>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="r5Pyd7+fXNt84Ff3"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
 
-> I already thought many times to introduce something like that. Here is a draft
-> for introducing the generic 6lowpan private data into each lowpan interface.
-> For the beginning I introduced the enum "lltype" which contains the LL type of
-> a lowpan interface.
-> 
-> Use cases for such feature (LL types):
-> 
-> - If we do in upper layers (6LoWPAN/IPv6) a evaluation of dev->type then
->   the value is on all lowpan interfaces "APRHRD_6LOWPAN". If we checked on
->   "dev->type" and it's ARPHRD_6LOWPAN we can safe use lowpan_priv to get
->   6LoWPAN generic private data. With this data we can check the LL type which
->   can be currently BTLE or IEEE802154. This could be useful to make different
->   handling in iphc compress/decompress and evaluating LL private data of skb
->   control block "skb->cb".
-> 
->   Example (802.15.4 has different address handling functionality):
-> 
->   switch (lowpan_priv(dev)->lltype) {
->   case LOWPAN_LLTYPE_BTLE:
->        /* do EUI64 btle handling */
->        break;
->   case LOWPAN_LLTYPE_IEEE802154:
->        /* do complicated short/extended address handling */
->        /* we can surely call skb->cb to some other private data from LL
->           which was set before iphc compress/decompress function call */
->        break;
->   }
-> 
->   The handling is currently for 802.15.4 is in generic 6lowpan code currently
->   not quite. This should be handled by private data. At the moment btle use
->   the same handling like for 802.15.4 extended address. Nevertheless is we can
->   cleanup some handling then in generic iphc functionality.
-> 
->   This also possible in layers like IPv6, just doing a check on APRHRD_6LOWPAN
->   before calling lowpan_priv(dev)->lltype, then we are sure that the private
->   data of the interface is a 6LoWPAN interface and we can cast it to lowpan_priv.
->   Then we can do 6LoWPAN generic stuff OR 6lowpan specific LL stuff.
-> 
-> - In Lukasz Duda RFC for introducing stateful address compression, I saw
->   some behaviour which such functionality is also useful. Currently we don't
->   have a allocated space for a 6LoWPAN generic space which is assigned to a
->   lowpan interface. When LL layers (BTLE, IEEE802154) calls iphc
->   compress/decompress Lukasz had no change to access some room which is needed
->   for storing the context information into a table. The workaround for this
->   feature was to add allocate a static data room for the table and doing a
->   lookup/match of netdev name. Which a generic 6lowpan private data room per each
->   lowpan interface we can put this table according to the netdev private room,
->   which means in short: no lookup is needed anymore, just dereferencing lowpan_priv.
-> 
->   In upper layer like IPv6 Lukasz could use that to get the stateful context
->   table information as an example for doing 6LoWPAN generic stuff in upper
->   layers.
-> 
-> 
-> Note about the implementation for LL 6LoWPAN private pointer:
-> 
-> I stole some mechanism from wireless for that. See [0], the vif struct is part
-> of sdata which is also part of private data of a wireless interface (mac80211).
-> I hope I can just adapt this behaviour.
-> 
-> - Alex
-> 
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: linux-doc@vger.kernel.org
-> 
-> [0] http://lxr.free-electrons.com/source/include/net/mac80211.h#L1366
-> 
-> changes since PATCH (was RFC before):
-> - rename ll_type,ll_foo to lltype, llfoo
-> - add documentation for generic 6lowpan interfaces API
-> - add net/6lowpan/core.c for core functionality, like setup or cleanup
->   lowpan netdev interfaces, which is necessary e.g. heap allocation/free
-> - add LOWPAN_PRIV_SIZE for provide API functionality to calculate
->   private data
-> - rebase to current bluetooth-next/master
-> - add documentation in cc for the Documentation branch
-> 
-> changes since v2:
-> - rename L2/l2 to LL/ll. I think the usually word in ietf for L2 is
->   LL which means "link layer". Also ipv6 stack use ll for variables like
->   lladdr -> link layer address.
-> - rebase to current bluetooth-next/master
-> - remove some brackets in function lowpan_priv.
-> 
-> Alexander Aring (4):
->  Bluetooth: 6lowpan: change netdev_priv to lowpan_dev
->  6lowpan: add generic 6lowpan netdev private data
->  6lowpan: move module_init into core functionality
->  documentation: networking: add 6lowpan documentation
-> 
-> Documentation/networking/6lowpan.txt | 51 ++++++++++++++++++++++++++++++++++++
-> MAINTAINERS                          |  1 +
-> include/net/6lowpan.h                | 23 ++++++++++++++++
-> net/6lowpan/Makefile                 |  2 +-
-> net/6lowpan/core.c                   | 40 ++++++++++++++++++++++++++++
-> net/6lowpan/iphc.c                   | 19 --------------
-> net/bluetooth/6lowpan.c              | 11 +++++---
-> net/ieee802154/6lowpan/6lowpan_i.h   |  3 ++-
-> net/ieee802154/6lowpan/core.c        |  4 ++-
-> 9 files changed, 128 insertions(+), 26 deletions(-)
-> create mode 100644 Documentation/networking/6lowpan.txt
-> create mode 100644 net/6lowpan/core.c
+--r5Pyd7+fXNt84Ff3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I went ahead and applied all 4 patches to bluetooth-next tree. That way they get exposure.
+Hi Dave,
 
-Regards
+Here's an important regression fix for the 4.2-rc series that ensures
+user space isn't given invalid LTK values. The bug essentially prevents
+the encryption of subsequent LE connections, i.e. makes it impossible to
+pair devices over LE.
 
-Marcel
+Let me know if there are any issues pulling. Thanks.
 
+Johan
+
+---
+The following changes since commit 2475b22526d70234ecfe4a1ff88aed69badefba9:
+
+  xen-netback: Allocate fraglist early to avoid complex rollback (2015-08-03 22:23:03 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to cb92205bad2e4dd630b884142dd707b72504c200:
+
+  Bluetooth: fix MGMT_EV_NEW_LONG_TERM_KEY event (2015-08-06 16:36:03 +0200)
+
+----------------------------------------------------------------
+Jakub Pawlowski (1):
+      Bluetooth: fix MGMT_EV_NEW_LONG_TERM_KEY event
+
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--r5Pyd7+fXNt84Ff3
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJVylU2AAoJECQj9vv5qNQSZNAP/3iJySx+Jg7An9YGVQlrP+yA
+vEfOMN5PDbaSae/KHRBhE1hWfPIyLx6gVfXAgJqGUPg8ApsPE6pMCBCOgB3ySR3w
+m6/dAmm64jMsO8h5SocKPY4/GCcrA7nMNN/jro2F6OXHMsokXmAZvJhd5HrNwiwL
+UOwRxJ/YR5zVuvQURzY9YYepzVUoVtpKbLTF8qoEyyMgBCxrFYniSOOt/bhhQCvd
+ld6uBNoZSt2IM/fnMc1aWZSOe5eBgggXcxHbtRoH7xsykSX/8M4fCBmLjZh66e8T
+U70FN63zSz4HF78o5xLuXjwbNetm+xS/P68drdA5DmkSm23DOo9ePuES3zJ0ERHX
+MmwsqRw7hp052swi5BKsWOO7Y7QnR0mi96QWVrIiM7UP44AdYsTk0C7aLGoQsezM
++tbO7KoDm5ZgvHMw0fWFZsvLeqAXFoh/yzc9ISK5btSIgJLkUTUgbnJqnZPVKWA4
+0xmD02X5/ut1Cbt7u4TxI773qX8TCriTbr4E6MMSUbB/z/uapyonfp/uaByNDccS
+vJfuF2JNiCU9E3G+wqRctVACIWpVHCIHL03iw2cRS0jyVEmB5+liZrdXM/G3NLUN
+c1GFr91mRTmopcW/+fdl2d1ZsU+YcJqRiJKD40mV88lcEeEOd8lM4KCw7btCY2Sl
+5kIGdkYOzdPyf0LO5ArN
+=bm7P
+-----END PGP SIGNATURE-----
+
+--r5Pyd7+fXNt84Ff3--
