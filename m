@@ -4,97 +4,37 @@ To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
 	lukasz.duda@nordicsemi.no, jukka.rissanen@linux.intel.com,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 3/4] 6lowpan: move module_init into core functionality
-Date: Tue, 11 Aug 2015 21:44:09 +0200
-Message-Id: <1439322250-32039-4-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 1/4] Bluetooth: 6lowpan: change netdev_priv to lowpan_dev
+Date: Tue, 11 Aug 2015 21:44:07 +0200
+Message-Id: <1439322250-32039-2-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1439322250-32039-1-git-send-email-alex.aring@gmail.com>
 References: <1439322250-32039-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves module_init of 6lowpan module into core functionality
-of 6lowpan module. To load the ipv6 module at probing of the 6lowpan
-module should be core functionality. Loading next header compression
-modules is iphc specific. Nevertheless we only support IPHC for the
-generic 6LoWPAN branch right now so we can put it into the core
-functionality. If possible new compression formats are introduced nhc
-should load only when iphc is build.
+The usually way to get the btle lowpan private data is to use the
+introduced lowpan_dev inline function. This patch will cleanup by using
+lowpan_dev consequently.
 
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/6lowpan/core.c | 20 ++++++++++++++++++++
- net/6lowpan/iphc.c | 19 -------------------
- 2 files changed, 20 insertions(+), 19 deletions(-)
+ net/bluetooth/6lowpan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index ed0eec9..ae1896f 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -11,6 +11,8 @@
-  * (C) 2015 Pengutronix, Alexander Aring <aar@pengutronix.de>
-  */
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 0ffe2e2..24ed5b0 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -859,7 +859,7 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
+ 	SET_NETDEV_DEV(netdev, &chan->conn->hcon->hdev->dev);
+ 	SET_NETDEV_DEVTYPE(netdev, &bt_type);
  
-+#include <linux/module.h>
-+
- #include <net/6lowpan.h>
- 
- void lowpan_netdev_setup(struct net_device *dev, enum lowpan_lltypes lltype)
-@@ -18,3 +20,21 @@ void lowpan_netdev_setup(struct net_device *dev, enum lowpan_lltypes lltype)
- 	lowpan_priv(dev)->lltype = lltype;
- }
- EXPORT_SYMBOL(lowpan_netdev_setup);
-+
-+static int __init lowpan_module_init(void)
-+{
-+	request_module_nowait("ipv6");
-+
-+	request_module_nowait("nhc_dest");
-+	request_module_nowait("nhc_fragment");
-+	request_module_nowait("nhc_hop");
-+	request_module_nowait("nhc_ipv6");
-+	request_module_nowait("nhc_mobility");
-+	request_module_nowait("nhc_routing");
-+	request_module_nowait("nhc_udp");
-+
-+	return 0;
-+}
-+module_init(lowpan_module_init);
-+
-+MODULE_LICENSE("GPL");
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 74e56d7..1e0071f 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -48,7 +48,6 @@
- 
- #include <linux/bitops.h>
- #include <linux/if_arp.h>
--#include <linux/module.h>
- #include <linux/netdevice.h>
- #include <net/6lowpan.h>
- #include <net/ipv6.h>
-@@ -610,21 +609,3 @@ int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(lowpan_header_compress);
--
--static int __init lowpan_module_init(void)
--{
--	request_module_nowait("ipv6");
--
--	request_module_nowait("nhc_dest");
--	request_module_nowait("nhc_fragment");
--	request_module_nowait("nhc_hop");
--	request_module_nowait("nhc_ipv6");
--	request_module_nowait("nhc_mobility");
--	request_module_nowait("nhc_routing");
--	request_module_nowait("nhc_udp");
--
--	return 0;
--}
--module_init(lowpan_module_init);
--
--MODULE_LICENSE("GPL");
+-	*dev = netdev_priv(netdev);
++	*dev = lowpan_dev(netdev);
+ 	(*dev)->netdev = netdev;
+ 	(*dev)->hdev = chan->conn->hcon->hdev;
+ 	INIT_LIST_HEAD(&(*dev)->peers);
 -- 
 2.5.0
 
