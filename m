@@ -1,71 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 Aug 2015 23:04:06 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth 2015-08-11
-Message-ID: <20150811200406.GA6173@t440s.P-661HNU-F1>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="r5Pyd7+fXNt84Ff3"
-Sender: netdev-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
+Subject: Re: [PATCH v5 0/4] Bluetooth: hci_bcm: Add ACPI and PM support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1439303738-24231-1-git-send-email-frederic.danis@linux.intel.com>
+Date: Tue, 11 Aug 2015 13:01:24 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <0A4F240D-9BD5-4F4B-88C4-E93884BEBF84@holtmann.org>
+References: <1439303738-24231-1-git-send-email-frederic.danis@linux.intel.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Fred,
 
---r5Pyd7+fXNt84Ff3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> These patches move PM support from rfkill-gpio to hci_uart module.
+> On, off, suspend and resume functions are supported.
+> They also parse the ACPI entry to find initial UART baud rate.
+> 
+> v4->v5:
+> - Rename parameter and variable of bcm_suspend and bcm_resume
+> 
+> v3->v4:
+> - Fix commit message of rfkill-gpio patch
+> 
+> v2->v3:
+> - Add bcm_device existance check as driver can be unbound and reference in
+>  bcm_data may be invalid
+> - Add explanation of retrieval of bcm_device corresponding to tty in use
+> - Rename variables : ptr -> p, device_list -> bcm_device_list,
+>                     device_list_lock -> bcm_device_list_lock
+> - Remove BCM2E39 in rfkill-gpio.c instead of making it conditional
+> 
+> v1->v2:
+> - Add BCM2E67 device in acpi_device_id table
+> - Add suspend/resume functions
+> 
+> Frederic Danis (4):
+>  Bluetooth: hci_bcm: Add PM for BCM devices
+>  net: rfkill: gpio: Remove BCM2E39 support
+>  Bluetooth: hci_bcm: Retrieve UART speed from ACPI
+>  Bluetooth: hci_bcm: Add suspend/resume PM functions
+> 
+> drivers/bluetooth/hci_bcm.c | 303 +++++++++++++++++++++++++++++++++++++++++++-
+> net/rfkill/rfkill-gpio.c    |   1 -
+> 2 files changed, 301 insertions(+), 3 deletions(-)
 
-Hi Dave,
+all 4 patches have been applied to bluetooth-next tree.
 
-Here's an important regression fix for the 4.2-rc series that ensures
-user space isn't given invalid LTK values. The bug essentially prevents
-the encryption of subsequent LE connections, i.e. makes it impossible to
-pair devices over LE.
+However I had to add missing CONFIG_PM_SLEEP #ifdef around PM code. Please keep an eye on that next time.
 
-Let me know if there are any issues pulling. Thanks.
+Regards
 
-Johan
+Marcel
 
----
-The following changes since commit 2475b22526d70234ecfe4a1ff88aed69badefba9:
-
-  xen-netback: Allocate fraglist early to avoid complex rollback (2015-08-03 22:23:03 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to cb92205bad2e4dd630b884142dd707b72504c200:
-
-  Bluetooth: fix MGMT_EV_NEW_LONG_TERM_KEY event (2015-08-06 16:36:03 +0200)
-
-----------------------------------------------------------------
-Jakub Pawlowski (1):
-      Bluetooth: fix MGMT_EV_NEW_LONG_TERM_KEY event
-
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---r5Pyd7+fXNt84Ff3
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJVylU2AAoJECQj9vv5qNQSZNAP/3iJySx+Jg7An9YGVQlrP+yA
-vEfOMN5PDbaSae/KHRBhE1hWfPIyLx6gVfXAgJqGUPg8ApsPE6pMCBCOgB3ySR3w
-m6/dAmm64jMsO8h5SocKPY4/GCcrA7nMNN/jro2F6OXHMsokXmAZvJhd5HrNwiwL
-UOwRxJ/YR5zVuvQURzY9YYepzVUoVtpKbLTF8qoEyyMgBCxrFYniSOOt/bhhQCvd
-ld6uBNoZSt2IM/fnMc1aWZSOe5eBgggXcxHbtRoH7xsykSX/8M4fCBmLjZh66e8T
-U70FN63zSz4HF78o5xLuXjwbNetm+xS/P68drdA5DmkSm23DOo9ePuES3zJ0ERHX
-MmwsqRw7hp052swi5BKsWOO7Y7QnR0mi96QWVrIiM7UP44AdYsTk0C7aLGoQsezM
-+tbO7KoDm5ZgvHMw0fWFZsvLeqAXFoh/yzc9ISK5btSIgJLkUTUgbnJqnZPVKWA4
-0xmD02X5/ut1Cbt7u4TxI773qX8TCriTbr4E6MMSUbB/z/uapyonfp/uaByNDccS
-vJfuF2JNiCU9E3G+wqRctVACIWpVHCIHL03iw2cRS0jyVEmB5+liZrdXM/G3NLUN
-c1GFr91mRTmopcW/+fdl2d1ZsU+YcJqRiJKD40mV88lcEeEOd8lM4KCw7btCY2Sl
-5kIGdkYOzdPyf0LO5ArN
-=bm7P
------END PGP SIGNATURE-----
-
---r5Pyd7+fXNt84Ff3--
