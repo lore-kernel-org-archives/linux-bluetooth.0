@@ -1,121 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
-	lukasz.duda@nordicsemi.no, jukka.rissanen@linux.intel.com,
-	Alexander Aring <alex.aring@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-Subject: [PATCH bluetooth-next 0/4] 6lowpan: introduce generic 6lowpan private data
-Date: Tue, 11 Aug 2015 21:44:06 +0200
-Message-Id: <1439322250-32039-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <55CA507F.9000205@gmail.com>
+Date: Tue, 11 Aug 2015 22:43:59 +0300
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] ath3k: Revert 7e730c7f3d1f39c25cf5f7cf70c0ff4c28d7bec7
+References: <1439290229-6937-1-git-send-email-hanipouspilot@gmail.com> <96FCB7AC-6E4C-4ED1-8048-87843978A63B@holtmann.org>
+In-Reply-To: <96FCB7AC-6E4C-4ED1-8048-87843978A63B@holtmann.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-I already thought many times to introduce something like that. Here is a draft
-for introducing the generic 6lowpan private data into each lowpan interface.
-For the beginning I introduced the enum "lltype" which contains the LL type of
-a lowpan interface.
-
-Use cases for such feature (LL types):
-
- - If we do in upper layers (6LoWPAN/IPv6) a evaluation of dev->type then
-   the value is on all lowpan interfaces "APRHRD_6LOWPAN". If we checked on
-   "dev->type" and it's ARPHRD_6LOWPAN we can safe use lowpan_priv to get
-   6LoWPAN generic private data. With this data we can check the LL type which
-   can be currently BTLE or IEEE802154. This could be useful to make different
-   handling in iphc compress/decompress and evaluating LL private data of skb
-   control block "skb->cb".
-
-   Example (802.15.4 has different address handling functionality):
-
-   switch (lowpan_priv(dev)->lltype) {
-   case LOWPAN_LLTYPE_BTLE:
-        /* do EUI64 btle handling */
-        break;
-   case LOWPAN_LLTYPE_IEEE802154:
-        /* do complicated short/extended address handling */
-        /* we can surely call skb->cb to some other private data from LL
-           which was set before iphc compress/decompress function call */
-        break;
-   }
-
-   The handling is currently for 802.15.4 is in generic 6lowpan code currently
-   not quite. This should be handled by private data. At the moment btle use
-   the same handling like for 802.15.4 extended address. Nevertheless is we can
-   cleanup some handling then in generic iphc functionality.
-
-   This also possible in layers like IPv6, just doing a check on APRHRD_6LOWPAN
-   before calling lowpan_priv(dev)->lltype, then we are sure that the private
-   data of the interface is a 6LoWPAN interface and we can cast it to lowpan_priv.
-   Then we can do 6LoWPAN generic stuff OR 6lowpan specific LL stuff.
-
- - In Lukasz Duda RFC for introducing stateful address compression, I saw
-   some behaviour which such functionality is also useful. Currently we don't
-   have a allocated space for a 6LoWPAN generic space which is assigned to a
-   lowpan interface. When LL layers (BTLE, IEEE802154) calls iphc
-   compress/decompress Lukasz had no change to access some room which is needed
-   for storing the context information into a table. The workaround for this
-   feature was to add allocate a static data room for the table and doing a
-   lookup/match of netdev name. Which a generic 6lowpan private data room per each
-   lowpan interface we can put this table according to the netdev private room,
-   which means in short: no lookup is needed anymore, just dereferencing lowpan_priv.
-
-   In upper layer like IPv6 Lukasz could use that to get the stateful context
-   table information as an example for doing 6LoWPAN generic stuff in upper
-   layers.
 
 
-Note about the implementation for LL 6LoWPAN private pointer:
+11.08.2015 22:23, Marcel Holtmann пишет:
+> Hi Dmitry,
+> 
+>> This patch causes infinite loop on loading firmware on Acer Aspire
+>> V3è371-31KW and probably other laptops.
+>>
+>> This is a serious regression, because system becomes unresponsive.
+>>
+>> This should be reverted until the firmware loading issue is sorted out.
+> 
+> this needs a lot more explanation on why I am suppose to revert this now.
+> 
+> And now I am really reluctant to have any ath3k patches marked as stable. If things are not tested properly, then please refrain from adding stable tags since these are clearly more than just VID/PID additions.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-I stole some mechanism from wireless for that. See [0], the vif struct is part
-of sdata which is also part of private data of a wireless interface (mac80211).
-I hope I can just adapt this behaviour.
+Here is the explanation.
 
-- Alex
+This is a report I got from a user. He tried to write you too, but did not get a response.
 
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: linux-doc@vger.kernel.org
+------------------------------quote-----------------------------
 
-[0] http://lxr.free-electrons.com/source/include/net/mac80211.h#L1366
+However, the same patch makes the same device enter a disconnect /
+reconnect infinite loop in my specific laptop model (Acer Aspire
+V3è371-31KW). The original poster of the duplicate, #1397885, also has
+an Acer Aspire and might be affected by the same issue (not sure about
+it). Sorry about commenting the duplicate if it was wrong.
 
-changes since PATCH (was RFC before):
- - rename ll_type,ll_foo to lltype, llfoo
- - add documentation for generic 6lowpan interfaces API
- - add net/6lowpan/core.c for core functionality, like setup or cleanup
-   lowpan netdev interfaces, which is necessary e.g. heap allocation/free
- - add LOWPAN_PRIV_SIZE for provide API functionality to calculate
-   private data
- - rebase to current bluetooth-next/master
- - add documentation in cc for the Documentation branch
+On my laptop, the patch makes the firmware load into the device and it
+begins an infinite disconnect/reconnect cycle. The boot makes ages,
+lsusb freezes.
 
-changes since v2:
- - rename L2/l2 to LL/ll. I think the usually word in ietf for L2 is
-   LL which means "link layer". Also ipv6 stack use ll for variables like
-   lladdr -> link layer address.
- - rebase to current bluetooth-next/master
- - remove some brackets in function lowpan_priv.
+Under your kernel, the whole computer runs unstable. the login manager
+and X won't always start, the system takes ages to start, lsusb feezes
+and I get a log of the following with journalctl -xe.
 
-Alexander Aring (4):
-  Bluetooth: 6lowpan: change netdev_priv to lowpan_dev
-  6lowpan: add generic 6lowpan netdev private data
-  6lowpan: move module_init into core functionality
-  documentation: networking: add 6lowpan documentation
+  mai 02 19:21:00 white kernel: usb 1-5: new full-speed USB device
+number 49 using xhci_hcd
+mai 02 19:21:01 white kernel: usb 1-5: New USB device found,
+idVendor=04ca, idProduct=300d
+mai 02 19:21:01 white kernel: usb 1-5: New USB device strings: Mfr=0,
+Product=0, SerialNumber=0
+mai 02 19:21:01 white kernel: usb 1-5: USB disconnect, device number 49
+mai 02 19:21:01 white kernel: usb 1-5: new full-speed USB device number
+50 using xhci_hcd
+mai 02 19:21:01 white kernel: usb 1-5: New USB device found,
+idVendor=04ca, idProduct=300d
+mai 02 19:21:01 white kernel: usb 1-5: New USB device strings: Mfr=0,
+Product=0, SerialNumber=0
+mai 02 19:21:01 white kernel: usb 1-5: USB disconnect, device number 50
+mai 02 19:21:01 white kernel: usb 1-5: new full-speed USB device number
+51 using xhci_hcd
+mai 02 19:21:02 white kernel: usb 1-5: New USB device found,
+idVendor=04ca, idProduct=300d
+mai 02 19:21:02 white kernel: usb 1-5: New USB device strings: Mfr=0,
+Product=0, SerialNumber=0
+mai 02 19:21:02 white kernel: usb 1-5: USB disconnect, device number 51
+mai 02 19:21:02 white kernel: usb 1-5: new full-speed USB device number
+52 using xhci_hcd
+mai 02 19:21:02 white kernel: usb 1-5: New USB device found,
+idVendor=04ca, idProduct=300d
+mai 02 19:21:02 white kernel: usb 1-5: New USB device strings: Mfr=0,
+Product=0, SerialNumber=0
+mai 02 19:21:02 white kernel: usb 1-5: USB disconnect, device number 52
+mai 02 19:21:03 white kernel: usb 1-5: new full-speed USB device number
+53 using xhci_hcd
+mai 02 19:21:03 white kernel: usb 1-5: New USB device found,
+idVendor=04ca, idProduct=300d
+mai 02 19:21:03 white kernel: usb 1-5: New USB device strings: Mfr=0,
+Product=0, SerialNumber=0
+mai 02 19:21:03 white kernel: usb 1-5: USB disconnect, device number 53
+mai 02 19:21:03 white kernel: usb 1-5: new full-speed USB device number
+54 using xhci_hcd
+mai 02 19:21:03 white kernel: usb 1-5: New USB device found,
+idVendor=04ca, idProduct=300d
+mai 02 19:21:03 white kernel: usb 1-5: New USB device strings: Mfr=0,
+Product=0, SerialNumber=0"
 
- Documentation/networking/6lowpan.txt | 51 ++++++++++++++++++++++++++++++++++++
- MAINTAINERS                          |  1 +
- include/net/6lowpan.h                | 23 ++++++++++++++++
- net/6lowpan/Makefile                 |  2 +-
- net/6lowpan/core.c                   | 40 ++++++++++++++++++++++++++++
- net/6lowpan/iphc.c                   | 19 --------------
- net/bluetooth/6lowpan.c              | 11 +++++---
- net/ieee802154/6lowpan/6lowpan_i.h   |  3 ++-
- net/ieee802154/6lowpan/core.c        |  4 ++-
- 9 files changed, 128 insertions(+), 26 deletions(-)
- create mode 100644 Documentation/networking/6lowpan.txt
- create mode 100644 net/6lowpan/core.c
+I made a workaround which makes the device work by loading the patched
+modules, unload them and load the unpatched ones. The firmware being
+loaded, the unpatched modules are able to drive the device.
 
--- 
-2.5.0
+I sent a mail to the Bluetooth maintainer's mailing list last month, but
+for some reasons, it might have been unnoticed, I didn't received any reply.
 
+I'm concerned for unexperienced users of this computer getting trouble
+with new kernels. If I can help, don't hesitate to ask me any
+information about by laptop.
+
+Cheers,
+Raphaël.
+
+----------------------end of quote----------------------------------
+
+I told him to write directly to maintainers and it seem that he has done it.
+
+Before I got responses that the patch worked well. I sent it to you when it was tested by two users.
+
+This issue is really weird, because it appears only on some laptops.
+Maybe it is related to the new Atheros firmware files, that can't be loaded properly in certain cases.
+
+It's up to you to decide if marking for stable is appropriate, but before all AR devices ran smoothly and there seemed to be no 
+reason not to add them for stable.
+
+I suggest a compromise. Not to add those devices that require the new firmware, because its loading really is not tested well.
+If some older devices are discovered, it is very unlikely that there may be any troubles.
+
+I know that it is a pain in the ass to revert it from stable.
+
+Another option is to leave it there, because probably if the firmware is not added, ath3k will just fail to find it and will not cause any trouble.
+The new firmware has not been added to linux-firmware yet.
+
+But in this case any time the regression may appear as soon as they add it there. It seems not to be a good idea either.
+
+Regards,
+
+Dmitry
