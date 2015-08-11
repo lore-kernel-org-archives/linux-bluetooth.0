@@ -1,64 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Dmitry Tunin <hanipouspilot@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ath3k: Revert 7e730c7f3d1f39c25cf5f7cf70c0ff4c28d7bec7
-Date: Tue, 11 Aug 2015 13:50:29 +0300
-Message-Id: <1439290229-6937-1-git-send-email-hanipouspilot@gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <1439202265-24485-1-git-send-email-luiz.dentz@gmail.com>
+References: <1439202265-24485-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 11 Aug 2015 13:34:26 +0300
+Message-ID: <CABBYNZLVag6UOGxrf8+SQGDwpXHs4nXYbrXAM6ma_0yvy1+d8A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] audio/avdtp: Fix suspending only the first SEID
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch causes infinite loop on loading firmware on Acer Aspire
-V3è371-31KW and probably other laptops.
+Hi,
 
-This is a serious regression, because system becomes unresponsive.
+On Mon, Aug 10, 2015 at 1:24 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> AVDTP_Suspend can contain several Stream Endpoing IDs to be suspended.
+> ---
+>  android/avdtp.c        | 2 +-
+>  profiles/audio/avdtp.c | 3 +--
+>  2 files changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/android/avdtp.c b/android/avdtp.c
+> index 7e61280..1f79e74 100644
+> --- a/android/avdtp.c
+> +++ b/android/avdtp.c
+> @@ -1678,7 +1678,7 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
+>         for (i = 0; i < seid_count; i++, seid++) {
+>                 failed_seid = seid->seid;
+>
+> -               sep = find_local_sep_by_seid(session, req->first_seid.seid);
+> +               sep = find_local_sep_by_seid(session, seid->seid);
+>                 if (!sep || !sep->stream) {
+>                         err = AVDTP_BAD_ACP_SEID;
+>                         goto failed;
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index 37f7a59..9c33373 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -1822,8 +1822,7 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
+>         for (i = 0; i < seid_count; i++, seid++) {
+>                 failed_seid = seid->seid;
+>
+> -               sep = find_local_sep_by_seid(session,
+> -                                       req->first_seid.seid);
+> +               sep = find_local_sep_by_seid(session, seid->seid);
+>                 if (!sep || !sep->stream) {
+>                         err = AVDTP_BAD_ACP_SEID;
+>                         goto failed;
+> --
+> 2.1.0
 
-This should be reverted until the firmware loading issue is sorted out.
+Applied.
 
-Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-Cc: stable@vger.kernel.org
----
- drivers/bluetooth/ath3k.c | 2 --
- drivers/bluetooth/btusb.c | 1 -
- 2 files changed, 3 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index e527a3e..2fa6588 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -89,7 +89,6 @@ static const struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x04CA, 0x3007) },
- 	{ USB_DEVICE(0x04CA, 0x3008) },
- 	{ USB_DEVICE(0x04CA, 0x300b) },
--	{ USB_DEVICE(0x04CA, 0x300d) },
- 	{ USB_DEVICE(0x04CA, 0x300f) },
- 	{ USB_DEVICE(0x04CA, 0x3010) },
- 	{ USB_DEVICE(0x0930, 0x0219) },
-@@ -149,7 +148,6 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x04ca, 0x3007), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
--	{ USB_DEVICE(0x04ca, 0x300d), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x300f), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3010), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index cc92b0f..73e3b7c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -191,7 +191,6 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x04ca, 0x3007), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
--	{ USB_DEVICE(0x04ca, 0x300d), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x300f), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3010), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+
 -- 
-1.9.1
+Luiz Augusto von Dentz
