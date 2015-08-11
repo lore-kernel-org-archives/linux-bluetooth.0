@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 0/4] Bluetooth: hci_bcm: Add ACPI and PM support
-Date: Tue, 11 Aug 2015 12:12:09 +0200
-Message-Id: <1439287933-21069-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v3 0/4] Bluetooth: hci_bcm: Add ACPI and PM support
+Date: Tue, 11 Aug 2015 11:05:17 +0200
+Message-Id: <1439283921-25090-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -11,9 +11,6 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 These patches move PM support from rfkill-gpio to hci_uart module.
 On, off, suspend and resume functions are supported.
 They also parse the ACPI entry to find initial UART baud rate.
-
-v3->v4:
-- Fix commit message of rfkill-gpio patch
 
 v2->v3:
 - Add bcm_device existance check as driver can be unbound and reference in
@@ -29,7 +26,7 @@ v1->v2:
 
 Frederic Danis (4):
   Bluetooth: hci_bcm: Add PM for BCM devices
-  net: rfkill: gpio: Remove BCM2E39 support
+  net: rfkill: gpio: Make BCM2E39 support optional
   Bluetooth: hci_bcm: Retrieve UART speed from ACPI
   Bluetooth: hci_bcm: Add suspend/resume PM functions
 
