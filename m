@@ -1,47 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH] Bluetooth: hci_bcm: improve use of gpios API
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1439364056-8564-1-git-send-email-u.kleine-koenig@pengutronix.de>
-Date: Wed, 12 Aug 2015 07:39:31 -0700
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Frederic Danis <frederic.danis@linux.intel.com>,
-	linux-next@vger.kernel.org,
-	inux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org, kernel@pengutronix.de
-Message-Id: <342A6333-EC23-4743-8BD2-FC220A2F8B82@holtmann.org>
-References: <20150812165949.0d66f2be@canb.auug.org.au> <1439364056-8564-1-git-send-email-u.kleine-koenig@pengutronix.de>
-To: =?utf-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Sender: linux-kernel-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CACjvawmEeUSjJNSmvZE=tFFUtOUPBAdweLLf+R9KeUgN1PB_rA@mail.gmail.com>
+References: <CACjvawmBmmMfaQZSZLOxWz1dJt2_B-QkF=oTZ8-VLYqKsCi6Qg@mail.gmail.com>
+	<CACjvawkPj2uZz+pWUJaofumq8CBadVs5WM5ig3Jy+o4+DGX2eA@mail.gmail.com>
+	<CACjvawmEeUSjJNSmvZE=tFFUtOUPBAdweLLf+R9KeUgN1PB_rA@mail.gmail.com>
+Date: Wed, 12 Aug 2015 18:14:30 +0600
+Message-ID: <CACjvawmWdvVtj2q4Gn69bBT=8C+ZY4EqY2PC_RJwmc3xZNNszw@mail.gmail.com>
+Subject: Inconsistent behavior while getting manufacture data through dbus-api
+From: Nazmul Alam <fadedreamz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Uwe,
+Hello everybody.
+I am seeing inconsistent behavior while fetching manufacture data
+through dbus-api.
 
-> devm_gpiod_get currently has an optional parameter to set initial
-> direction and value for the requested gpio. Make use of this to simplify
-> the driver and make it not fail to build when this parameter is made
-> mandatory (which is scheduled for 4.3-rc1).
-> 
-> Moreover use the _optional variant of devm_gpiod_get to simplify error
-> handling (which also gets more strict for free).
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
-> Hello,
-> 
-> this is needed on top of commit 0395ffc1ee05 ("Bluetooth: hci_bcm: Add
-> PM for BCM devices") incombination with b17d1bf16cc7 ("gpio: make flags
-> mandatory for gpiod_get functions") which is currently sitting in next.
-> 
-> Stephen fixed it up with a simpler patch, which works fine, but doesn't
-> benefit from the nice things devm_gpiod_get et al offer.
+I have a mobile device reporting adv data and scan response. Both
+having manufacture data. which I am trying to get from another device
+running bluez-5.31.
 
-patch has been applied to bluetooth-next tree.
+The api is working as expected when I am using ubuntu. I can see
+manufacture data from adv data and scan response in an interleaved
+manner.
 
-Regards
+But when I change to raspberry pi I can only see scan response. And
+seldom get adv data. After checking the issue with btmgmt, I see that
+"find -l" command is reporting eir length of 62 (probably they are
+aggregated). But dbus-api is reporting only one manufacture data.
 
-Marcel
+What might be the cause of this inconsistency? Also is there any way
+to make bluez to not aggregate those two into a single eir?
 
+My kernel version for ubuntu is 3.13.0 and 4.1.4 for raspberry pi
+(running raspbian).
+
+Thanks in advance.
