@@ -1,33 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arkadiusz Lichwa <arkadiusz.lichwa@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] emulator: Swap max and min interval
-Date: Wed, 12 Aug 2015 16:40:08 +0200
-Message-Id: <1439390408-537-1-git-send-email-arkadiusz.lichwa@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
+Subject: Re: [PATCH] Bluetooth: hci_bcm: improve use of gpios API
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1439364056-8564-1-git-send-email-u.kleine-koenig@pengutronix.de>
+Date: Wed, 12 Aug 2015 07:39:31 -0700
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Frederic Danis <frederic.danis@linux.intel.com>,
+	linux-next@vger.kernel.org,
+	inux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org, kernel@pengutronix.de
+Message-Id: <342A6333-EC23-4743-8BD2-FC220A2F8B82@holtmann.org>
+References: <20150812165949.0d66f2be@canb.auug.org.au> <1439364056-8564-1-git-send-email-u.kleine-koenig@pengutronix.de>
+To: =?utf-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixes btdev controller bits when assigning actual parameters,
-max and min interval, in LE Meta event for LE Connection Update to be sent 
-to host.
----
- emulator/btdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Uwe,
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index cd211ef..57e51a0 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -3322,8 +3322,8 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 			return;
- 		lecu = data;
- 		le_conn_update(btdev, le16_to_cpu(lecu->handle),
--				le16_to_cpu(lecu->min_interval),
- 				le16_to_cpu(lecu->max_interval),
-+				le16_to_cpu(lecu->min_interval),
- 				le16_to_cpu(lecu->latency),
- 				le16_to_cpu(lecu->supv_timeout),
- 				le16_to_cpu(lecu->min_length),
--- 
-1.8.2.2
+> devm_gpiod_get currently has an optional parameter to set initial
+> direction and value for the requested gpio. Make use of this to simplify
+> the driver and make it not fail to build when this parameter is made
+> mandatory (which is scheduled for 4.3-rc1).
+> 
+> Moreover use the _optional variant of devm_gpiod_get to simplify error
+> handling (which also gets more strict for free).
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> ---
+> Hello,
+> 
+> this is needed on top of commit 0395ffc1ee05 ("Bluetooth: hci_bcm: Add
+> PM for BCM devices") incombination with b17d1bf16cc7 ("gpio: make flags
+> mandatory for gpiod_get functions") which is currently sitting in next.
+> 
+> Stephen fixed it up with a simpler patch, which works fine, but doesn't
+> benefit from the nice things devm_gpiod_get et al offer.
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
