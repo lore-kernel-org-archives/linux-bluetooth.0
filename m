@@ -1,54 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 12 Aug 2015 18:19:05 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@pengutronix.de>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Gustavo Padovan
- <gustavo@padovan.org>, Frederic Danis <frederic.danis@linux.intel.com>,
- Marcel Holtmann <marcel@holtmann.org>, linux-next@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- kernel@pengutronix.de
-Subject: Re: [PATCH] Bluetooth: hci_bcm: improve use of gpios API
-Message-ID: <20150812181905.78ade990@canb.auug.org.au>
-In-Reply-To: <1439364056-8564-1-git-send-email-u.kleine-koenig@pengutronix.de>
-References: <20150812165949.0d66f2be@canb.auug.org.au>
-	<1439364056-8564-1-git-send-email-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
+In-Reply-To: <1439366568-17371-1-git-send-email-anupam.r@samsung.com>
+References: <1439366568-17371-1-git-send-email-anupam.r@samsung.com>
+Date: Wed, 12 Aug 2015 11:18:50 +0300
+Message-ID: <CABBYNZJre46YUKDg=EGA+t60g=KVkyx2gbXgRffOknfOtJNMpw@mail.gmail.com>
+Subject: Re: Registering a GATT service via DBus
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Anupam Roy <anupam.r@samsung.com>,
+	Edmund <edmund.urbani@lilandit.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	sachin.dev@samsung.com
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Uwe,
+Hi Edmund, Anupam,
 
-On Wed, 12 Aug 2015 09:20:56 +0200 Uwe Kleine-K=C3=B6nig <u.kleine-koenig@p=
-engutronix.de> wrote:
+On Wed, Aug 12, 2015 at 11:02 AM, Anupam Roy <anupam.r@samsung.com> wrote:
+> Hi Edmund,
 >
-> devm_gpiod_get currently has an optional parameter to set initial
-> direction and value for the requested gpio. Make use of this to simplify
-> the driver and make it not fail to build when this parameter is made
-> mandatory (which is scheduled for 4.3-rc1).
->=20
-> Moreover use the _optional variant of devm_gpiod_get to simplify error
-> handling (which also gets more strict for free).
->=20
-> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
-> ---
-> Hello,
->=20
-> this is needed on top of commit 0395ffc1ee05 ("Bluetooth: hci_bcm: Add
-> PM for BCM devices") incombination with b17d1bf16cc7 ("gpio: make flags
-> mandatory for gpiod_get functions") which is currently sitting in next.
->=20
-> Stephen fixed it up with a simpler patch, which works fine, but doesn't
-> benefit from the nice things devm_gpiod_get et al offer.
->=20
-> Best regards
-> Uwe
->=20
->  drivers/bluetooth/hci_bcm.c | 24 +++++++++---------------
->  1 file changed, 9 insertions(+), 15 deletions(-)
+>>Hello,
+>>
+>>my attempts to register a GATT service via DBus from Java have so far
+>>been unsuccessful. The GattManager1.RegisterService method does not
+>>return any reply, instead I simply get this timeout exception:
+>>Exception in thread "main" org.freedesktop.DBus$Error$
+>>NoReply: No reply within specified time
+>>
+> As I understand, RegisterService DBUS method in gatt-database replies back to
+> client only when client is fully ready. It happens when service is successfully created
+> by gatt-database and all managed objects are successfully retrieved from client
+> service and parsed by gdbus/client.c.
+>
+>>Also, all I see in the logs is the registration attempt, but no error:
+>>Aug 11 14:42:02 raspberrypi bluetoothd[5466]:
+>>src/gatt-database.c:manager_register_service() Registering service -
+>>path: /com/lilandit/iventcloud/skg/service
+>>
+> This print only only suggests that external service is created by gatt-database
+>
+>>Introspection of the service (with mdbus2 tool) shows this info (which
+>>matches the specs as far as a DBus noob like I can tell):
+>>[METHOD]   org.bluez.GattService1.GetPrimary() -> (b:arg_0)
+>>[METHOD]   org.bluez.GattService1.GetDevice() -> (o:arg_0)
+>>[METHOD]   org.bluez.GattService1.GetUUID() -> (s:arg_0)
+>>[METHOD]   org.bluez.GattService1.GetCharacteristics() -> (ao:arg_0)
+>>[METHOD]   org.bluez.GattService1.GetIncludes() -> (ao:arg_0)
+>>[METHOD]   org.freedesktop.DBus.Introspectable.Introspect() -> (s:arg_0)
+>>[METHOD]   org.freedesktop.DBus.Peer.Ping() -> ()
+>>
+>>The implementation of the service is incomplete (same applies to the
+>>ObjectManager registered at "/"), however I was expecting to at least
+>>get some feedback on registration and possibly see some of the service
+>>methods being called at this point. Instead I get nothing.
+>>
+>>Any ideas what may be wrong or where I should be looking for the cause?
+>>
+> According to GATT API doc, client service should export ObjectManager interface
+> on its client root path. If this is not done, then I think
+> GetManagedObjects call from gdbus/client will fail and client ready
+> will not be invoked and possibly DBUS timeout occurs.
+>
+> Is your service exporting ObjectManager interface on service root path?
 
-I will use this instead of my simple patch tomorrow if the bluetooth
-maintainer has not applied it.
+We are currently discussing if the service interface shall be exposed
+in the root path give, ObjectManager documentation has been documented
+saying that only child path interfaces shall be returned. That said
+the problem here is that GetManagedObjects probably never returns,
+thus the request times out.
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
+
+-- 
+Luiz Augusto von Dentz
