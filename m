@@ -1,39 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Urbani, Edmund" <edmund.urbani@lilandit.com>
+Subject: Re: Registering a GATT service via DBus
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <1439366568-17371-1-git-send-email-anupam.r@samsung.com>
+ <55CB0ED4.1000004@LilandIT.com>
+ <CABBYNZ+ZaPSKQ6SmFW3hdpT33c3zwAK-z3TAGuyUdxQ7mzqfFQ@mail.gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-ID: <55CB2EDD.3060200@LilandIT.com>
+Date: Wed, 12 Aug 2015 13:32:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <CACjvawmEeUSjJNSmvZE=tFFUtOUPBAdweLLf+R9KeUgN1PB_rA@mail.gmail.com>
-References: <CACjvawmBmmMfaQZSZLOxWz1dJt2_B-QkF=oTZ8-VLYqKsCi6Qg@mail.gmail.com>
-	<CACjvawkPj2uZz+pWUJaofumq8CBadVs5WM5ig3Jy+o4+DGX2eA@mail.gmail.com>
-	<CACjvawmEeUSjJNSmvZE=tFFUtOUPBAdweLLf+R9KeUgN1PB_rA@mail.gmail.com>
-Date: Wed, 12 Aug 2015 18:14:30 +0600
-Message-ID: <CACjvawmWdvVtj2q4Gn69bBT=8C+ZY4EqY2PC_RJwmc3xZNNszw@mail.gmail.com>
-Subject: Inconsistent behavior while getting manufacture data through dbus-api
-From: Nazmul Alam <fadedreamz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CABBYNZ+ZaPSKQ6SmFW3hdpT33c3zwAK-z3TAGuyUdxQ7mzqfFQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everybody.
-I am seeing inconsistent behavior while fetching manufacture data
-through dbus-api.
+On 08/12/2015 01:24 PM, Luiz Augusto von Dentz wrote:
+> Hi Edmund,
+>
+> On Wed, Aug 12, 2015 at 12:16 PM, Urbani, Edmund
+> <edmund.urbani@lilandit.com> wrote:
+>> On 08/12/2015 10:02 AM, Anupam Roy wrote:
+>>> Hi Edmund,
+>>>
+>>>> Hello,
+>>>>
+>>>> my attempts to register a GATT service via DBus from Java have so far
+>>>> been unsuccessful. The GattManager1.RegisterService method does not
+>>>> return any reply, instead I simply get this timeout exception:
+>>>> Exception in thread "main" org.freedesktop.DBus$Error$
+>>>> NoReply: No reply within specified time
+>>>>
+>>> As I understand, RegisterService DBUS method in gatt-database replies back
+>>> to
+>>> client only when client is fully ready. It happens when service is
+>>> successfully created
+>>> by gatt-database and all managed objects are successfully retrieved from
+>>> client
+>>> service and parsed by gdbus/client.c.
+>>>
+>>>> Also, all I see in the logs is the registration attempt, but no error:
+>>>> Aug 11 14:42:02 raspberrypi bluetoothd[5466]:
+>>>> src/gatt-database.c:manager_register_service() Registering service -
+>>>> path: /com/lilandit/iventcloud/skg/service
+>>>>
+>>> This print only only suggests that external service is created by
+>>> gatt-database
+>>>
+>>>> Introspection of the service (with mdbus2 tool) shows this info (which
+>>>> matches the specs as far as a DBus noob like I can tell):
+>>>> [METHOD]   org.bluez.GattService1.GetPrimary() -> (b:arg_0)
+>>>> [METHOD]   org.bluez.GattService1.GetDevice() -> (o:arg_0)
+>>>> [METHOD]   org.bluez.GattService1.GetUUID() -> (s:arg_0)
+>>>> [METHOD]   org.bluez.GattService1.GetCharacteristics() -> (ao:arg_0)
+>>>> [METHOD]   org.bluez.GattService1.GetIncludes() -> (ao:arg_0)
+>>>> [METHOD]   org.freedesktop.DBus.Introspectable.Introspect() -> (s:arg_0)
+>>>> [METHOD]   org.freedesktop.DBus.Peer.Ping() -> ()
+>>>>
+>>>> The implementation of the service is incomplete (same applies to the
+>>>> ObjectManager registered at "/"), however I was expecting to at least
+>>>> get some feedback on registration and possibly see some of the service
+>>>> methods being called at this point. Instead I get nothing.
+>>>>
+>>>> Any ideas what may be wrong or where I should be looking for the cause?
+>>>>
+>>> According to GATT API doc, client service should export ObjectManager
+>>> interface
+>>> on its client root path. If this is not done, then I think
+>>> GetManagedObjects call from gdbus/client will fail and client ready
+>>> will not be invoked and possibly DBUS timeout occurs.
+>>>
+>>> Is your service exporting ObjectManager interface on service root path?
+>>>
+>>>> Kind regards,
+>>>> Edmund
+>>>>
+>>>> PS: I'm using BlueZ 5.32
+>>>
+>> I think I need to clarify that I have exported two objects. The
+>> ObjectManager (path "/" with interface org.freedesktop.DBus.ObjectManager),
+>> and the GattService (path "/com/lilandit/iventcloud/skg/service" with
+>> interface org.bluez.GattService1). Is this OK, or should I have one object
+>> that implements both interfaces?
+> We expect ObjectManager to be in the path where the GattService is in in '/'.
+>
+>> Note that GetManagedObjects is never called (nor are any other methods I
+>> implemented, each of which has a log statement right there in the first
+>> line).
+> Because ObjectManager interface is in a different path which
+> bluetoothd has no idea of.
+>
+>
 
-I have a mobile device reporting adv data and scan response. Both
-having manufacture data. which I am trying to get from another device
-running bluez-5.31.
+I am now making some progress with one class implementing both interfaces. At 
+last, I am receiving method calls.
 
-The api is working as expected when I am using ubuntu. I can see
-manufacture data from adv data and scan response in an interleaved
-manner.
+Thanks!
 
-But when I change to raspberry pi I can only see scan response. And
-seldom get adv data. After checking the issue with btmgmt, I see that
-"find -l" command is reporting eir length of 62 (probably they are
-aggregated). But dbus-api is reporting only one manufacture data.
-
-What might be the cause of this inconsistency? Also is there any way
-to make bluez to not aggregate those two into a single eir?
-
-My kernel version for ubuntu is 3.13.0 and 4.1.4 for raspberry pi
-(running raspbian).
-
-Thanks in advance.
+Kind regards,
+  Edmund
