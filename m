@@ -1,62 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anupam Roy <anupam.r@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: sachin.dev@samsung.com
-Subject: Re: Registering a GATT service via DBus
-Date: Wed, 12 Aug 2015 04:02:48 -0400
-Message-id: <1439366568-17371-1-git-send-email-anupam.r@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Frederic Danis <frederic.danis@linux.intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-next@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH] Bluetooth: hci_bcm: improve use of gpios API
+Date: Wed, 12 Aug 2015 09:20:56 +0200
+Message-Id: <1439364056-8564-1-git-send-email-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20150812165949.0d66f2be@canb.auug.org.au>
+References: <20150812165949.0d66f2be@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Edmund,
+devm_gpiod_get currently has an optional parameter to set initial
+direction and value for the requested gpio. Make use of this to simplify
+the driver and make it not fail to build when this parameter is made
+mandatory (which is scheduled for 4.3-rc1).
+
+Moreover use the _optional variant of devm_gpiod_get to simplify error
+handling (which also gets more strict for free).
+
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+Hello,
+
+this is needed on top of commit 0395ffc1ee05 ("Bluetooth: hci_bcm: Add
+PM for BCM devices") incombination with b17d1bf16cc7 ("gpio: make flags
+mandatory for gpiod_get functions") which is currently sitting in next.
+
+Stephen fixed it up with a simpler patch, which works fine, but doesn't
+benefit from the nice things devm_gpiod_get et al offer.
+
+Best regards
+Uwe
+
+ drivers/bluetooth/hci_bcm.c | 24 +++++++++---------------
+ 1 file changed, 9 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index cb7fe837f7d9..6070303418d8 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -408,7 +408,6 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ {
+ 	struct platform_device *pdev = dev->pdev;
+ 	const struct acpi_device_id *id;
+-	struct gpio_desc *gpio;
+ 	struct acpi_device *adev;
+ 	LIST_HEAD(resources);
+ 	int ret;
+@@ -426,21 +425,16 @@ static int bcm_acpi_probe(struct bcm_device *dev)
  
->Hello,
->
->my attempts to register a GATT service via DBus from Java have so far
->been unsuccessful. The GattManager1.RegisterService method does not
->return any reply, instead I simply get this timeout exception:
->Exception in thread "main" org.freedesktop.DBus$Error$
->NoReply: No reply within specified time
->
-As I understand, RegisterService DBUS method in gatt-database replies back to
-client only when client is fully ready. It happens when service is successfully created
-by gatt-database and all managed objects are successfully retrieved from client
-service and parsed by gdbus/client.c.
-
->Also, all I see in the logs is the registration attempt, but no error:
->Aug 11 14:42:02 raspberrypi bluetoothd[5466]:
->src/gatt-database.c:manager_register_service() Registering service -
->path: /com/lilandit/iventcloud/skg/service
->
-This print only only suggests that external service is created by gatt-database
-
->Introspection of the service (with mdbus2 tool) shows this info (which
->matches the specs as far as a DBus noob like I can tell):
->[METHOD]   org.bluez.GattService1.GetPrimary() -> (b:arg_0)
->[METHOD]   org.bluez.GattService1.GetDevice() -> (o:arg_0)
->[METHOD]   org.bluez.GattService1.GetUUID() -> (s:arg_0)
->[METHOD]   org.bluez.GattService1.GetCharacteristics() -> (ao:arg_0)
->[METHOD]   org.bluez.GattService1.GetIncludes() -> (ao:arg_0)
->[METHOD]   org.freedesktop.DBus.Introspectable.Introspect() -> (s:arg_0)
->[METHOD]   org.freedesktop.DBus.Peer.Ping() -> ()
->
->The implementation of the service is incomplete (same applies to the
->ObjectManager registered at "/"), however I was expecting to at least
->get some feedback on registration and possibly see some of the service
->methods being called at this point. Instead I get nothing.
->
->Any ideas what may be wrong or where I should be looking for the cause?
->
-According to GATT API doc, client service should export ObjectManager interface
-on its client root path. If this is not done, then I think 
-GetManagedObjects call from gdbus/client will fail and client ready
-will not be invoked and possibly DBUS timeout occurs.
-
-Is your service exporting ObjectManager interface on service root path?
-
->Kind regards,
-> Edmund
->
->PS: I'm using BlueZ 5.32
-
-
+ 	dev->clk = devm_clk_get(&pdev->dev, NULL);
+ 
+-	gpio = devm_gpiod_get(&pdev->dev, "device-wakeup");
+-	if (!IS_ERR(gpio)) {
+-		ret = gpiod_direction_output(gpio, 0);
+-		if (ret)
+-			return ret;
+-		dev->device_wakeup = gpio;
+-	}
++	dev->device_wakeup = devm_gpiod_get_optional(&pdev->dev,
++						     "device-wakeup",
++						     GPIOD_OUT_LOW);
++	if (IS_ERR(dev->device_wakeup))
++		return PTR_ERR(dev->device_wakeup);
+ 
+-	gpio = devm_gpiod_get(&pdev->dev, "shutdown");
+-	if (!IS_ERR(gpio)) {
+-		ret = gpiod_direction_output(gpio, 0);
+-		if (ret)
+-			return ret;
+-		dev->shutdown = gpio;
+-	}
++	dev->shutdown = devm_gpiod_get_optional(&pdev->dev, "shutdown",
++						GPIOD_OUT_LOW);
++	if (IS_ERR(dev->shutdown))
++		return PTR_ERR(dev->shutdown);
+ 
+ 	/* Make sure at-least one of the GPIO is defined and that
+ 	 * a name is specified for this instance
+-- 
+2.4.6
