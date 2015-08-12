@@ -1,61 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/7] tools/rctest: Fix resource leaks
-Date: Wed, 12 Aug 2015 18:07:08 +0300
-Message-Id: <1439392033-11822-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1439392033-11822-1-git-send-email-luiz.dentz@gmail.com>
-References: <1439392033-11822-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/7] tools/hciconfig: Add missing hci_close_dev
+Date: Wed, 12 Aug 2015 18:07:07 +0300
+Message-Id: <1439392033-11822-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Add hci_close_dev for commands using hci_open_dev, this is mostly to be
+consistent with other commands that do cleanup but in practice makes no
+difference since hciconfig will exit anyway.
 ---
- tools/rctest.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ tools/hciconfig.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/tools/rctest.c b/tools/rctest.c
-index 9169e3c..6d84e07 100644
---- a/tools/rctest.c
-+++ b/tools/rctest.c
-@@ -102,7 +102,7 @@ static float tv2fl(struct timeval tv)
- static uint8_t get_channel(const char *svr, uint16_t uuid)
- {
- 	sdp_session_t *sdp;
--	sdp_list_t *srch, *attrs, *rsp;
-+	sdp_list_t *srch, *attrs, *rsp, *protos;
- 	uuid_t svclass;
- 	uint16_t attr;
- 	bdaddr_t dst;
-@@ -128,7 +128,6 @@ static uint8_t get_channel(const char *svr, uint16_t uuid)
- 
- 	for (; rsp; rsp = rsp->next) {
- 		sdp_record_t *rec = (sdp_record_t *) rsp->data;
--		sdp_list_t *protos;
- 
- 		if (!sdp_get_access_protos(rec, &protos)) {
- 			channel = sdp_get_proto_port(protos, RFCOMM_UUID);
-@@ -137,7 +136,11 @@ static uint8_t get_channel(const char *svr, uint16_t uuid)
- 		}
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index 0e0b790..eac96b0 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -963,6 +963,8 @@ static void cmd_class(int ctl, int hdev, char *opt)
+ 			printf("%s, %s\n", major_devices[cls[1] & 0x1f],
+ 				get_minor_device_name(cls[1] & 0x1f, cls[0] >> 2));
  	}
- 
-+	sdp_list_free(protos, NULL);
 +
- done:
-+	sdp_list_free(srch, NULL);
-+	sdp_list_free(attrs, NULL);
- 	sdp_close(sdp);
- 
- 	return channel;
-@@ -593,6 +596,7 @@ static void send_mode(int sk)
- 		syslog(LOG_INFO, "Close failed: %m");
- 	else
- 		syslog(LOG_INFO, "Done");
-+	close(sk);
++	hci_close_dev(hdev);
  }
  
- static void reconnect_mode(char *svr)
+ static void cmd_voice(int ctl, int hdev, char *opt)
+@@ -1023,6 +1025,8 @@ static void cmd_voice(int ctl, int hdev, char *opt)
+ 		}
+ 		printf("\tAir Coding Format: %s\n", acf[vs & 0x03]);
+ 	}
++
++	hci_close_dev(s);
+ }
+ 
+ static void cmd_delkey(int ctl, int hdev, char *opt)
+@@ -1462,6 +1466,8 @@ static void cmd_inq_parms(int ctl, int hdev, char *opt)
+ 		printf("\tInquiry interval: %u slots (%.2f ms), window: %u slots (%.2f ms)\n",
+ 				interval, (float)interval * 0.625, window, (float)window * 0.625);
+ 	}
++
++	hci_close_dev(s);
+ }
+ 
+ static void cmd_page_parms(int ctl, int hdev, char *opt)
+@@ -1533,6 +1539,8 @@ static void cmd_page_parms(int ctl, int hdev, char *opt)
+ 			interval, (float)interval * 0.625,
+ 			window, (float)window * 0.625);
+ 	}
++
++	hci_close_dev(s);
+ }
+ 
+ static void cmd_page_to(int ctl, int hdev, char *opt)
+@@ -1597,6 +1605,8 @@ static void cmd_page_to(int ctl, int hdev, char *opt)
+ 		printf("\tPage timeout: %u slots (%.2f ms)\n",
+ 				timeout, (float)timeout * 0.625);
+ 	}
++
++	hci_close_dev(s);
+ }
+ 
+ static void cmd_afh_mode(int ctl, int hdev, char *opt)
+@@ -1630,6 +1640,8 @@ static void cmd_afh_mode(int ctl, int hdev, char *opt)
+ 		print_dev_hdr(&di);
+ 		printf("\tAFH mode: %s\n", mode == 1 ? "Enabled" : "Disabled");
+ 	}
++
++	hci_close_dev(dd);
+ }
+ 
+ static void cmd_ssp_mode(int ctl, int hdev, char *opt)
+@@ -1664,6 +1676,8 @@ static void cmd_ssp_mode(int ctl, int hdev, char *opt)
+ 		printf("\tSimple Pairing mode: %s\n",
+ 			mode == 1 ? "Enabled" : "Disabled");
+ 	}
++
++	hci_close_dev(dd);
+ }
+ 
+ static void print_rev_ericsson(int dd)
+@@ -1790,6 +1804,9 @@ static void cmd_revision(int ctl, int hdev, char *opt)
+ 		printf("\tUnsupported manufacturer\n");
+ 		break;
+ 	}
++
++	hci_close_dev(dd);
++
+ 	return;
+ }
+ 
 -- 
 2.4.3
 
