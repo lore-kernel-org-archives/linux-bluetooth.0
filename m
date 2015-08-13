@@ -1,53 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-To: <linux-bluetooth@vger.kernel.org>
+Subject: Re: Bluetooth: hciuart: Add support QCA chipset for UART
+To: Dan Carpenter <dan.carpenter@oracle.com>
+References: <20150813205655.GA30361@mwanda> <55CD1158.10508@qca.qualcomm.com>
+CC: <linux-bluetooth@vger.kernel.org>
 From: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
-Subject: Bluetooth: hciuart: Fix to use boolean flag with u32 type
-Message-ID: <55CD22F8.3060006@qca.qualcomm.com>
-Date: Thu, 13 Aug 2015 16:06:32 -0700
+Message-ID: <55CD1342.9090705@qca.qualcomm.com>
+Date: Thu, 13 Aug 2015 14:59:30 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <55CD1158.10508@qca.qualcomm.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-debugfs_create_bool is asking to put u32 type pointer instead of bool
-so that passing bool type with u32* cast will cause memory corruption
-to read that value since it is handled by 4 bytes instead of 1 byte
-inside.
+Hi Dan,
 
-Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
----
-  drivers/bluetooth/hci_qca.c | 8 ++++----
-  1 file changed, 4 insertions(+), 4 deletions(-)
+On 08/13/15 14:51, Ben Young Tae Kim wrote:
+> Hi Dan,
+>
+> On 08/13/15 13:59, Dan Carpenter wrote:
+>> Hello Ben Young Tae Kim,
+>>
+>> The patch 0ff252c1976d: "Bluetooth: hciuart: Add support QCA chipset
+>> for UART" from Aug 10, 2015, leads to the following static checker
+>> warning:
+>>
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 62e45ff..6b9b912 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -80,8 +80,8 @@ struct qca_data {
-  	spinlock_t hci_ibs_lock;	/* HCI_IBS state lock	*/
-  	u8 tx_ibs_state;	/* HCI_IBS transmit side power state*/
-  	u8 rx_ibs_state;	/* HCI_IBS receive side power state */
--	bool tx_vote;		/* Clock must be on for TX */
--	bool rx_vote;		/* Clock must be on for RX */
-+	u32 tx_vote;		/* Clock must be on for TX */
-+	u32 rx_vote;		/* Clock must be on for RX */
-  	struct timer_list tx_idle_timer;
-  	u32 tx_idle_delay;
-  	struct timer_list wake_retrans_timer;
-@@ -482,10 +482,10 @@ static void qca_debugfs_init(struct hci_dev *hdev)
-  			   &qca->ibs_recv_wakes);
-  	debugfs_create_u64("ibs_recv_wake_acks", mode, ibs_dir,
-  			   &qca->ibs_recv_wacks);
--	debugfs_create_bool("tx_vote", mode, ibs_dir, (u32 *)&qca->tx_vote);
-+	debugfs_create_bool("tx_vote", mode, ibs_dir, &qca->tx_vote);
-  	debugfs_create_u64("tx_votes_on", mode, ibs_dir, &qca->tx_votes_on);
-  	debugfs_create_u64("tx_votes_off", mode, ibs_dir, &qca->tx_votes_off);
--	debugfs_create_bool("rx_vote", mode, ibs_dir, (u32 *)&qca->rx_vote);
-+	debugfs_create_bool("rx_vote", mode, ibs_dir, &qca->rx_vote);
-  	debugfs_create_u64("rx_votes_on", mode, ibs_dir, &qca->rx_votes_on);
-  	debugfs_create_u64("rx_votes_off", mode, ibs_dir, &qca->rx_votes_off);
-  	debugfs_create_u64("votes_on", mode, ibs_dir, &qca->votes_on);
--- 
-2.0.5
+BTW, which tool are you using to detect static warning? Can you 
+recommend me some tool so that I could prevent same error to the 
+upcoming patches?
 
-
+Thanks
+-- Ben Kim
