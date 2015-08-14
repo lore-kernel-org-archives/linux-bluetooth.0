@@ -1,250 +1,332 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCHv2] Bluetooth: hci_uart: Add Intel baudrate configuration support
-Date: Fri, 14 Aug 2015 15:18:03 +0200
-Message-Id: <1439558283-6388-1-git-send-email-loic.poulain@intel.com>
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1439479210-30881-1-git-send-email-bharat.panda@samsung.com>
+ <CABBYNZJwk0FsiUtyN8Sm6bvT1iL_mY88-eKi6Vp=MTNRVh0hTQ@mail.gmail.com>
+ <CABBYNZKZTzoiX7wcgJJnzVOZFUH8AHL9qodd4U=svzfa9Mo2Yg@mail.gmail.com>
+In-reply-to: <CABBYNZKZTzoiX7wcgJJnzVOZFUH8AHL9qodd4U=svzfa9Mo2Yg@mail.gmail.com>
+Subject: RE: [PATCH v1] audio/avrcp: Add Set Addressed Player support
+Date: Fri, 14 Aug 2015 18:21:19 +0530
+Message-id: <02d201d0d68f$ff7e0260$fe7a0720$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implement the set_baudrate callback for hci_intel.
- - Controller requires a read Intel version command before being able
-   to change its baudrate.
- - Inject the change speed command complete since controller does not
-   respond at the same speed.
- - Wait 100ms to let the controller change its baudrate.
+Hi Luiz,
 
-Manage speed change in the setup function, we need to restore the oper
-speed once chip has booted on patched firmware.
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Friday, August 14, 2015 6:15 PM
+> To: Bharat Panda
+> Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> Subject: Re: [PATCH v1] audio/avrcp: Add Set Addressed Player support
+> 
+> Hi Bharat,
+> 
+> On Fri, Aug 14, 2015 at 3:30 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > Hi Bharat,
+> >
+> > On Thu, Aug 13, 2015 at 6:20 PM, Bharat Panda
+> <bharat.panda@samsung.com> wrote:
+> >> Support added to handle Set Addressed Player PDU in TG role.
+> >> Send EVENT_ADDRESSED_PLAYER_CHANGED on SetAddressedPlayer
+> SUCCESS and
+> >> follow procedure to reject all player specific events currently
+> >> registered with the player.
+> >>
+> >>       Channel: 64 len 15 [PSM 23 mode 0] {chan 0}
+> >>       AVCTP Control: Command: type 0x00 label 0 PID 0x110e
+> >>         AV/C: Control: address 0x48 opcode 0x00
+> >>           Subunit: Panel
+> >>           Opcode: Vendor Dependent
+> >>           Company ID: 0x001958
+> >>           AVRCP: SetAddressedPlayer pt Single len 0x0002
+> >>             PlayerID: 0x0000 (0)
+> >>
+> >>       Channel: 64 len 15 [PSM 23 mode 0] {chan 0}
+> >>       AVCTP Control: Response: type 0x00 label 0 PID 0x110e
+> >>         AV/C: Accepted: address 0x48 opcode 0x00
+> >>           Subunit: Panel
+> >>           Opcode: Vendor Dependent
+> >>           Company ID: 0x001958
+> >>           AVRCP: SetAddressedPlayer pt Single len 0x0002
+> >>             Status: 0x04 (Success)
+> >>
+> >>       Channel: 64 len 18 [PSM 23 mode 0] {chan 0}
+> >>       AVCTP Control: Response: type 0x00 label 0 PID 0x110e
+> >>         AV/C: Changed: address 0x48 opcode 0x00
+> >>           Subunit: Panel
+> >>           Opcode: Vendor Dependent
+> >>           Company ID: 0x001958
+> >>           AVRCP: RegisterNotification pt Single len 0x0005
+> >>             EventID: 0x0b (EVENT_ADDRESSED_PLAYER_CHANGED)
+> >>             PlayerID: 0x0000 (0)
+> >>             UIDCounter: 0x0000 (0)
+> >> ---
+> >>  profiles/audio/avrcp.c | 131
+> >> +++++++++++++++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 131 insertions(+)
+> >>
+> >> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c index
+> >> d66f670..61d91ea 100644
+> >> --- a/profiles/audio/avrcp.c
+> >> +++ b/profiles/audio/avrcp.c
+> >> @@ -103,6 +103,7 @@
+> >>  #define AVRCP_REQUEST_CONTINUING       0x40
+> >>  #define AVRCP_ABORT_CONTINUING         0x41
+> >>  #define AVRCP_SET_ABSOLUTE_VOLUME      0x50
+> >> +#define AVRCP_SET_ADDRESSED_PLAYER     0x60
+> >>  #define AVRCP_SET_BROWSED_PLAYER       0x70
+> >>  #define AVRCP_GET_FOLDER_ITEMS         0x71
+> >>  #define AVRCP_CHANGE_PATH              0x72
+> >> @@ -204,8 +205,10 @@ struct avrcp_player {
+> >>         uint64_t uid;
+> >>         uint16_t uid_counter;
+> >>         bool browsed;
+> >> +       bool addressed;
+> >>         uint8_t *features;
+> >>         char *path;
+> >> +       guint notify_id;
+> >>
+> >>         struct pending_list_items *p;
+> >>         char *change_path;
+> >> @@ -631,6 +634,7 @@ void avrcp_player_event(struct avrcp_player
+> *player, uint8_t id,
+> >>         GSList *l;
+> >>         int attr;
+> >>         int val;
+> >> +       bool player_changed = false;
+> >>
+> >>         if (player->sessions == NULL)
+> >>                 return;
+> >> @@ -674,6 +678,12 @@ void avrcp_player_event(struct avrcp_player
+> *player, uint8_t id,
+> >>                 pdu->params[size++] = attr;
+> >>                 pdu->params[size++] = val;
+> >>                 break;
+> >> +       case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+> >> +               size = 5;
+> >> +               memcpy(&pdu->params[1], &player->id, sizeof(uint16_t));
+> >> +               memcpy(&pdu->params[3], &player->uid_counter,
+> sizeof(uint16_t));
+> >> +               player_changed = true;
+> >> +               break;
+> >>         case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
+> >>                 size = 1;
+> >>                 break;
+> >> @@ -695,6 +705,7 @@ void avrcp_player_event(struct avrcp_player
+> *player, uint8_t id,
+> >>                                         session->transaction_events[id],
+> >>                                         AVC_CTYPE_CHANGED, AVC_SUBUNIT_PANEL,
+> >>                                         buf, size +
+> >> AVRCP_HEADER_LENGTH);
+> >> +
+> >>                 if (err < 0)
+> >>                         continue;
+> >>
+> >> @@ -702,6 +713,52 @@ void avrcp_player_event(struct avrcp_player
+> *player, uint8_t id,
+> >>                 session->registered_events ^= 1 << id;
+> >>         }
+> >>
+> >> +       if (player_changed) {
+> >> +               uint8_t player_events[6] = {
+> >> +                                       AVRCP_EVENT_STATUS_CHANGED,
+> >> +                                       AVRCP_EVENT_TRACK_CHANGED,
+> >> +                                       AVRCP_EVENT_TRACK_REACHED_START,
+> >> +                                       AVRCP_EVENT_TRACK_REACHED_END,
+> >> +                                       AVRCP_EVENT_SETTINGS_CHANGED,
+> >> +                                       AVRCP_EVENT_PLAYBACK_POS_CHANGED
+> >> +                                       };
+> >> +
+> >> +               for (l = player->sessions; l; l = l->next) {
+> >> +                       struct avrcp *session = l->data;
+> >> +                       int err;
+> >> +                       int i;
+> >> +
+> >> +                       for (i = 0; i < 6; i++) {
+> >
+> > Check with i < sizeof(player_events) so in case we need to add some
+> > new event we don't need to always keep changing this.
+> >
+> >> +                               if (!(session->registered_events &
+> >> +                                               (1 << player_events[i])))
+> >> +                                       continue;
+> >> +
+> >> +                               if (session->registered_events &
+> >> +                                               (1 << player_events[i])) {
+> >> +                                       session->registered_events &=
+> >> +                                               ~(1 << player_events[i]);
+> >> +                               /*
+> >> +                                * TG shall complete all player specific
+> >> +                                * notifications with AV/C C-Type REJECTED
+> >> +                                * with error code as Addressed Player Changed.
+> >> +                                */
+> >> +
+> >> +                               pdu->params[0] =
+> >> +                                       AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED;
+> >> +                               pdu->params_len = htons(1);
+> >> +                               err = avctp_send_vendordep(session->conn,
+> >> +                                       session->transaction_events[player_events[i]],
+> >> +                                       AVC_CTYPE_REJECTED, AVC_SUBUNIT_PANEL,
+> >> +                                       buf, 1 + AVRCP_HEADER_LENGTH);
+> >> +                               }
+> >> +                       }
+> >> +
+> >> +                       if (err < 0)
+> >> +                               continue;
+> >> +
+> >> +               }
+> >> +       }
+> >> +
+> >>         return;
+> >>  }
+> >>
+> >> @@ -1494,6 +1551,11 @@ static uint8_t
+> avrcp_handle_register_notification(struct avrcp *session,
+> >>                 }
+> >>
+> >>                 break;
+> >> +       case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+> >> +               len = 5;
+> >> +               memcpy(&pdu->params[1], &player->id, sizeof(uint16_t));
+> >> +               memcpy(&pdu->params[3], &player->uid_counter,
+> sizeof(uint16_t));
+> >> +               break;
+> >>         case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
+> >>                 len = 1;
+> >>                 break;
+> >> @@ -1617,6 +1679,72 @@ err:
+> >>         return AVC_CTYPE_REJECTED;
+> >>  }
+> >>
+> >> +static struct avrcp_player *find_tg_player(struct avrcp *session,
+> >> +uint16_t id) {
+> >> +       struct avrcp_server *server = session->server;
+> >> +       GSList *l;
+> >> +
+> >> +       for (l = server->players; l; l = l->next) {
+> >> +               struct avrcp_player *player = l->data;
+> >> +
+> >> +               if (player->id == id)
+> >> +                       return player;
+> >> +       }
+> >> +
+> >> +       return NULL;
+> >> +}
+> >> +
+> >> +static gboolean notify_addressed_player_changed(gpointer user_data)
+> >> +{
+> >> +       struct avrcp_player *player = user_data;
+> >> +
+> >> +       avrcp_player_event(player,
+> >> +                               AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED, NULL);
+> >> +       g_source_remove(player->notify_id);
+> >
+> > Removing the source wouldn't be necessary if you return FALSE or
+> > G_SOURCE_REMOVE if we want to more gnomish, furthermore notify_id
+> > shall be set to 0 either way and the call to g_source_remove shall be
+> > move to where the player freed so we stop the callback to be called if
+> > the player is unregistered.
+> 
+> Actually don't use G_SOURCE_REMOVE since it was introduced in 2.32 and
+> we depend on 2.28 or later.
+Ok, so here we should return only FALSE and upon unregister_player, will remove source using g_source_remove(player->notify_id) will be enough then.
+> 
+> >
+> >> +
+> >> +       return TRUE;
+> >> +}
+> >> +
+> >> +static uint8_t avrcp_handle_set_addressed_player(struct avrcp
+> *session,
+> >> +                                               struct avrcp_header *pdu,
+> >> +                                               uint8_t transaction)
+> >> +{
+> >> +       struct avrcp_player *player;
+> >> +       uint16_t len = ntohs(pdu->params_len);
+> >> +       uint16_t player_id = 0;
+> >> +       uint8_t status;
+> >> +
+> >> +       if (len < 1) {
+> >> +               status = AVRCP_STATUS_INVALID_PARAM;
+> >> +               goto err;
+> >> +       }
+> >> +
+> >> +       player_id = bt_get_be16(&pdu->params[0]);
+> >> +       player = find_tg_player(session, player_id);
+> >> +       pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
+> >> +
+> >> +       if (player) {
+> >> +               player->addressed = true;
+> >> +               status = AVRCP_STATUS_SUCCESS;
+> >> +               pdu->params_len = htons(len);
+> >> +               pdu->params[0] = status;
+> >> +       } else {
+> >> +               status = AVRCP_STATUS_INVALID_PLAYER_ID;
+> >> +               goto err;
+> >> +       }
+> >> +
+> >> +       player->notify_id =
+> >> +
+> g_idle_add((GSourceFunc)notify_addressed_player_changed,
+> >> +                       player);
+> >> +
+> >> +       return AVC_CTYPE_ACCEPTED;
+> >> +
+> >> +err:
+> >> +       pdu->params_len = htons(sizeof(status));
+> >> +       pdu->params[0] = status;
+> >> +       return AVC_CTYPE_REJECTED;
+> >> +}
+> >> +
+> >>  static const struct control_pdu_handler control_handlers[] = {
+> >>                 { AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+> >>                                         avrcp_handle_get_capabilities
+> >> }, @@ -1648,6 +1776,8 @@ static const struct control_pdu_handler
+> control_handlers[] = {
+> >>                                         avrcp_handle_request_continuing },
+> >>                 { AVRCP_ABORT_CONTINUING, AVC_CTYPE_CONTROL,
+> >>                                         avrcp_handle_abort_continuing
+> >> },
+> >> +               { AVRCP_SET_ADDRESSED_PLAYER, AVC_CTYPE_CONTROL,
+> >> +
+> >> + avrcp_handle_set_addressed_player },
+> >>                 { },
+> >>  };
+> >>
+> >> @@ -3521,6 +3651,7 @@ static void target_init(struct avrcp *session)
+> >>                 return;
+> >>
+> >>         session->supported_events |=
+> >> +                               (1 <<
+> >> + AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
+> >>                                 (1 <<
+> >> AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED);
+> >>
+> >>         /* Only check capabilities if controller is not supported */
+> >> --
+> >> 1.9.1
+> >>
+> >> --
+> >> To unsubscribe from this list: send the line "unsubscribe
+> >> linux-bluetooth" in the body of a message to
+> >> majordomo@vger.kernel.org More majordomo info at
+> >> http://vger.kernel.org/majordomo-info.html
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+> 
+> 
+> 
+> --
+> Luiz Augusto von Dentz
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- v2: simplify baudrate change, update commit message,
-     set missing set_baudrate callback.
+Regards,
+Bharat
 
- drivers/bluetooth/hci_intel.c | 135 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 134 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 21dfa89..318c146 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -38,6 +38,7 @@
- #define STATE_FIRMWARE_LOADED	2
- #define STATE_FIRMWARE_FAILED	3
- #define STATE_BOOTING		4
-+#define STATE_SPEED_CHANGING	5
- 
- struct intel_data {
- 	struct sk_buff *rx_skb;
-@@ -45,6 +46,38 @@ struct intel_data {
- 	unsigned long flags;
- };
- 
-+static u8 intel_convert_speed(unsigned int speed)
-+{
-+	switch (speed) {
-+	case 9600:
-+		return 0x00;
-+	case 19200:
-+		return 0x01;
-+	case 38400:
-+		return 0x02;
-+	case 57600:
-+		return 0x03;
-+	case 115200:
-+		return 0x04;
-+	case 230400:
-+		return 0x05;
-+	case 460800:
-+		return 0x06;
-+	case 921600:
-+		return 0x07;
-+	case 1843200:
-+		return 0x08;
-+	case 3250000:
-+		return 0x09;
-+	case 2000000:
-+		return 0x0a;
-+	case 3000000:
-+		return 0x0b;
-+	default:
-+		return 0xff;
-+	}
-+}
-+
- static int intel_open(struct hci_uart *hu)
- {
- 	struct intel_data *intel;
-@@ -111,6 +144,54 @@ static int inject_cmd_complete(struct hci_dev *hdev, __u16 opcode)
- 	return hci_recv_frame(hdev, skb);
- }
- 
-+static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
-+{
-+	struct intel_data *intel = hu->priv;
-+	struct hci_dev *hdev = hu->hdev;
-+	u8 intel_speed;
-+	struct sk_buff *skb;
-+	int err;
-+
-+	BT_INFO("%s: Change controller speed to %d", hdev->name, speed);
-+
-+	/* Device will not accept speed change if Intel version has not been
-+	 * previously requested.
-+	 */
-+	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Reading Intel version information failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	intel_speed = intel_convert_speed(speed);
-+	if (intel_speed == 0xff) {
-+		BT_ERR("%s: Unsupported speed", hdev->name);
-+		return -EINVAL;
-+	}
-+
-+	set_bit(STATE_SPEED_CHANGING, &intel->flags);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc06, 1, &intel_speed, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Changing Intel speed failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		clear_bit(STATE_SPEED_CHANGING, &intel->flags);
-+		return PTR_ERR(skb);
-+	}
-+
-+	kfree_skb(skb);
-+
-+	/* wait 100ms to change baudrate on controller side */
-+	msleep(100);
-+
-+	clear_bit(STATE_SPEED_CHANGING, &intel->flags);
-+
-+	return 0;
-+}
-+
- static int intel_setup(struct hci_uart *hu)
- {
- 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
-@@ -126,6 +207,8 @@ static int intel_setup(struct hci_uart *hu)
- 	u32 frag_len;
- 	ktime_t calltime, delta, rettime;
- 	unsigned long long duration;
-+	unsigned int init_speed, oper_speed;
-+	int speed_change = 0;
- 	int err;
- 
- 	BT_DBG("%s", hdev->name);
-@@ -134,6 +217,19 @@ static int intel_setup(struct hci_uart *hu)
- 
- 	calltime = ktime_get();
- 
-+	if (hu->init_speed)
-+		init_speed = hu->init_speed;
-+	else
-+		init_speed = hu->proto->init_speed;
-+
-+	if (hu->oper_speed)
-+		oper_speed = hu->oper_speed;
-+	else
-+		oper_speed = hu->proto->oper_speed;
-+
-+	if (oper_speed && init_speed && oper_speed != init_speed)
-+		speed_change = 1;
-+
- 	set_bit(STATE_BOOTLOADER, &intel->flags);
- 
- 	/* Read the Intel version information to determine if the device
-@@ -420,6 +516,14 @@ done:
- 
- 	set_bit(STATE_BOOTING, &intel->flags);
- 
-+	/* We need to restore the default speed before Intel reset */
-+	if (speed_change) {
-+		err = intel_set_baudrate(hu, init_speed);
-+		if (err)
-+			return err;
-+		hci_uart_set_baudrate(hu, init_speed);
-+	}
-+
- 	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param), reset_param,
- 			     HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb))
-@@ -456,6 +560,19 @@ done:
- 
- 	BT_INFO("%s: Device booted in %llu usecs", hdev->name, duration);
- 
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+
-+	kfree_skb(skb);
-+
-+	if (speed_change) {
-+		err = intel_set_baudrate(hu, oper_speed);
-+		if (err)
-+			return err;
-+		hci_uart_set_baudrate(hu, oper_speed);
-+	}
-+
- 	clear_bit(STATE_BOOTLOADER, &intel->flags);
- 
- 	return 0;
-@@ -515,6 +632,10 @@ static int intel_recv(struct hci_uart *hu, const void *data, int count)
- 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
- 		return -EUNATCH;
- 
-+	/* Ignore unexpected non-sync data during speed change */
-+	if (test_bit(STATE_SPEED_CHANGING, &intel->flags))
-+		return count;
-+
- 	intel->rx_skb = h4_recv_buf(hu->hdev, intel->rx_skb, data, count,
- 				    intel_recv_pkts,
- 				    ARRAY_SIZE(intel_recv_pkts));
-@@ -548,7 +669,9 @@ static struct sk_buff *intel_dequeue(struct hci_uart *hu)
- 	if (!skb)
- 		return skb;
- 
--	if (test_bit(STATE_BOOTLOADER, &intel->flags) &&
-+	/* Inject cmd complete pkt for async commands */
-+	if ((test_bit(STATE_BOOTLOADER, &intel->flags) ||
-+	    test_bit(STATE_SPEED_CHANGING, &intel->flags)) &&
- 	    (bt_cb(skb)->pkt_type == HCI_COMMAND_PKT)) {
- 		struct hci_command_hdr *cmd = (void *)skb->data;
- 		__u16 opcode = le16_to_cpu(cmd->opcode);
-@@ -560,6 +683,14 @@ static struct sk_buff *intel_dequeue(struct hci_uart *hu)
- 		 */
- 		if (opcode == 0xfc01)
- 			inject_cmd_complete(hu->hdev, opcode);
-+
-+		/* When the 0xfc06 command is issued to change the
-+		 * speed, device will send the command complete event
-+		 * only at the targeted speed. Host needs to change its
-+		 * own baudrate before being able to receive the response.
-+		 */
-+		if (opcode == 0xfc06)
-+			inject_cmd_complete(hu->hdev, opcode);
- 	}
- 
- 	/* Prepend skb with frame type */
-@@ -572,10 +703,12 @@ static const struct hci_uart_proto intel_proto = {
- 	.id		= HCI_UART_INTEL,
- 	.name		= "Intel",
- 	.init_speed	= 115200,
-+	.oper_speed	= 3000000,
- 	.open		= intel_open,
- 	.close		= intel_close,
- 	.flush		= intel_flush,
- 	.setup		= intel_setup,
-+	.set_baudrate	= intel_set_baudrate,
- 	.recv		= intel_recv,
- 	.enqueue	= intel_enqueue,
- 	.dequeue	= intel_dequeue,
--- 
-1.9.1
