@@ -1,45 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 14 Aug 2015 08:40:58 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Arkadiusz Lichwa <arkadiusz.lichwa@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] emulator: Swap max and min interval
-Message-ID: <20150814054058.GA26140@t440s.P-661HNU-F1>
-References: <1439390408-537-1-git-send-email-arkadiusz.lichwa@tieto.com>
+From: Ben YoungTae Kim <ytkim@qca.qualcomm.com>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v1] Bluetooth: hciuart: Fix to use boolean flag with u32 type
+Message-ID: <55CD7816.8090305@qualcomm.com>
+Date: Thu, 13 Aug 2015 22:09:42 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1439390408-537-1-git-send-email-arkadiusz.lichwa@tieto.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arek,
+debugfs_create_bool is asking to put u32 type pointer instead of bool
+so that passing bool type with u32* cast will cause memory corruption
+to read that value since it is handled by 4 bytes instead of 1 byte
+inside.
 
-On Wed, Aug 12, 2015, Arkadiusz Lichwa wrote:
-> Fixes btdev controller bits when assigning actual parameters,
-> max and min interval, in LE Meta event for LE Connection Update to be sent 
-> to host.
-> ---
->  emulator/btdev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/emulator/btdev.c b/emulator/btdev.c
-> index cd211ef..57e51a0 100644
-> --- a/emulator/btdev.c
-> +++ b/emulator/btdev.c
-> @@ -3322,8 +3322,8 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
->  			return;
->  		lecu = data;
->  		le_conn_update(btdev, le16_to_cpu(lecu->handle),
-> -				le16_to_cpu(lecu->min_interval),
->  				le16_to_cpu(lecu->max_interval),
-> +				le16_to_cpu(lecu->min_interval),
->  				le16_to_cpu(lecu->latency),
->  				le16_to_cpu(lecu->supv_timeout),
->  				le16_to_cpu(lecu->min_length),
+Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+---
+ drivers/bluetooth/hci_qca.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Good catch, but I think it makes more sense to keep the order as min,
-max since that's how it is in HCI as well. Since this is such a trivial
-thing I went ahead and fixed is myself (i.e. swapped the order in the
-function instead of the caller).
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 62e45ff..6b9b912 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -80,8 +80,8 @@ struct qca_data {
+ 	spinlock_t hci_ibs_lock;	/* HCI_IBS state lock	*/
+ 	u8 tx_ibs_state;	/* HCI_IBS transmit side power state*/
+ 	u8 rx_ibs_state;	/* HCI_IBS receive side power state */
+-	bool tx_vote;		/* Clock must be on for TX */
+-	bool rx_vote;		/* Clock must be on for RX */
++	u32 tx_vote;		/* Clock must be on for TX */
++	u32 rx_vote;		/* Clock must be on for RX */
+ 	struct timer_list tx_idle_timer;
+ 	u32 tx_idle_delay;
+ 	struct timer_list wake_retrans_timer;
+@@ -482,10 +482,10 @@ static void qca_debugfs_init(struct hci_dev *hdev)
+ 			   &qca->ibs_recv_wakes);
+ 	debugfs_create_u64("ibs_recv_wake_acks", mode, ibs_dir,
+ 			   &qca->ibs_recv_wacks);
+-	debugfs_create_bool("tx_vote", mode, ibs_dir, (u32 *)&qca->tx_vote);
++	debugfs_create_bool("tx_vote", mode, ibs_dir, &qca->tx_vote);
+ 	debugfs_create_u64("tx_votes_on", mode, ibs_dir, &qca->tx_votes_on);
+ 	debugfs_create_u64("tx_votes_off", mode, ibs_dir, &qca->tx_votes_off);
+-	debugfs_create_bool("rx_vote", mode, ibs_dir, (u32 *)&qca->rx_vote);
++	debugfs_create_bool("rx_vote", mode, ibs_dir, &qca->rx_vote);
+ 	debugfs_create_u64("rx_votes_on", mode, ibs_dir, &qca->rx_votes_on);
+ 	debugfs_create_u64("rx_votes_off", mode, ibs_dir, &qca->rx_votes_off);
+ 	debugfs_create_u64("votes_on", mode, ibs_dir, &qca->votes_on);
+-- 
+2.0.5
 
-Johan
+
