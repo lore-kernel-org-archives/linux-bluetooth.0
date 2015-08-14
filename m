@@ -1,32 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH v1] Bluetooth: hciuart: Fix to use boolean flag with u32 type
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <55CD7816.8090305@qualcomm.com>
-Date: Thu, 13 Aug 2015 23:56:24 -0700
+Date: Fri, 14 Aug 2015 08:40:58 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Arkadiusz Lichwa <arkadiusz.lichwa@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C0630B95-E63D-4154-879D-522007A9404C@holtmann.org>
-References: <55CD7816.8090305@qualcomm.com>
-To: Ben YoungTae Kim <ytkim@qca.qualcomm.com>
+Subject: Re: [PATCH] emulator: Swap max and min interval
+Message-ID: <20150814054058.GA26140@t440s.P-661HNU-F1>
+References: <1439390408-537-1-git-send-email-arkadiusz.lichwa@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1439390408-537-1-git-send-email-arkadiusz.lichwa@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ben,
+Hi Arek,
 
-> debugfs_create_bool is asking to put u32 type pointer instead of bool
-> so that passing bool type with u32* cast will cause memory corruption
-> to read that value since it is handled by 4 bytes instead of 1 byte
-> inside.
-> 
-> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+On Wed, Aug 12, 2015, Arkadiusz Lichwa wrote:
+> Fixes btdev controller bits when assigning actual parameters,
+> max and min interval, in LE Meta event for LE Connection Update to be sent 
+> to host.
 > ---
-> drivers/bluetooth/hci_qca.c | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
+>  emulator/btdev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/emulator/btdev.c b/emulator/btdev.c
+> index cd211ef..57e51a0 100644
+> --- a/emulator/btdev.c
+> +++ b/emulator/btdev.c
+> @@ -3322,8 +3322,8 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
+>  			return;
+>  		lecu = data;
+>  		le_conn_update(btdev, le16_to_cpu(lecu->handle),
+> -				le16_to_cpu(lecu->min_interval),
+>  				le16_to_cpu(lecu->max_interval),
+> +				le16_to_cpu(lecu->min_interval),
+>  				le16_to_cpu(lecu->latency),
+>  				le16_to_cpu(lecu->supv_timeout),
+>  				le16_to_cpu(lecu->min_length),
 
-patch has been applied to bluetooth-next tree.
+Good catch, but I think it makes more sense to keep the order as min,
+max since that's how it is in HCI as well. Since this is such a trivial
+thing I went ahead and fixed is myself (i.e. swapped the order in the
+function instead of the caller).
 
-Regards
-
-Marcel
-
+Johan
