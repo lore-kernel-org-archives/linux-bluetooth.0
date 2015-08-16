@@ -1,206 +1,175 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sun, 16 Aug 2015 09:05:28 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next 2015-08-16
+Message-ID: <20150816060528.GA13052@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-In-Reply-To: <1439559396-12265-1-git-send-email-bharat.panda@samsung.com>
-References: <1439559396-12265-1-git-send-email-bharat.panda@samsung.com>
-Date: Mon, 17 Aug 2015 15:14:40 +0300
-Message-ID: <CABBYNZ+zvUZFeSzLZ2KA9k918jsNqQ=TYWJY6iBL9GfviQ0WrA@mail.gmail.com>
-Subject: Re: [PATCH v2] audio/avrcp: Add Set Addressed Player support
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: multipart/mixed; boundary=001a11c23818f4f307051d80be17
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="gKMricLos+KVdGMg"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a11c23818f4f307051d80be17
-Content-Type: text/plain; charset=UTF-8
 
-Hi Bharat,
+--gKMricLos+KVdGMg
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 14, 2015 at 4:36 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Support added to handle Set Addressed Player PDU in TG role.
-> Send EVENT_ADDRESSED_PLAYER_CHANGED on SetAddressedPlayer
-> SUCCESS and follow procedure to reject all player specific events
-> currently registered with the player.
->
->       Channel: 64 len 15 [PSM 23 mode 0] {chan 0}
->       AVCTP Control: Command: type 0x00 label 0 PID 0x110e
->         AV/C: Control: address 0x48 opcode 0x00
->           Subunit: Panel
->           Opcode: Vendor Dependent
->           Company ID: 0x001958
->           AVRCP: SetAddressedPlayer pt Single len 0x0002
->             PlayerID: 0x0000 (0)
->
->       Channel: 64 len 15 [PSM 23 mode 0] {chan 0}
->       AVCTP Control: Response: type 0x00 label 0 PID 0x110e
->         AV/C: Accepted: address 0x48 opcode 0x00
->           Subunit: Panel
->           Opcode: Vendor Dependent
->           Company ID: 0x001958
->           AVRCP: SetAddressedPlayer pt Single len 0x0002
->             Status: 0x04 (Success)
->
->       Channel: 64 len 18 [PSM 23 mode 0] {chan 0}
->       AVCTP Control: Response: type 0x00 label 0 PID 0x110e
->         AV/C: Changed: address 0x48 opcode 0x00
->           Subunit: Panel
->           Opcode: Vendor Dependent
->           Company ID: 0x001958
->           AVRCP: RegisterNotification pt Single len 0x0005
->             EventID: 0x0b (EVENT_ADDRESSED_PLAYER_CHANGED)
->             PlayerID: 0x0000 (0)
->             UIDCounter: 0x0000 (0)
-> ---
+Hi Dave,
 
-I went ahead and made some changes to make the code look simpler and
-reuse avrcp_player_event, please check if it still work as before.
+Here's what's likely the last bluetooth-next pull request for 4.3:
 
--- 
-Luiz Augusto von Dentz
+ - 6lowpan/802.15.4 refactoring, cleanups & fixes
+ - Document 6lowpan netdev usage in Documentation/networking/6lowpan.txt
+ - Support for UART based QCA Bluetooth controllers
+ - Power management support for Broeadcom Bluetooth controllers
+ - Change LE connection initiation to always use passive scanning first
+ - Support for new Silicon Wave USB ID
 
---001a11c23818f4f307051d80be17
-Content-Type: text/x-patch; charset=US-ASCII;
-	name="0001-audio-avrcp-Add-Set-Addressed-Player-support.patch"
-Content-Disposition: attachment;
-	filename="0001-audio-avrcp-Add-Set-Addressed-Player-support.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_idfvu6mx0
+Please let me know if there are any issues pulling. Thanks.
 
-RnJvbSBkMmNkZGQwYTZkOTE5NjQ5ZDFkMzk2ZDI0OWYzMDZlOTMxZWE2MDliIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBCaGFyYXQgUGFuZGEgPGJoYXJhdC5wYW5kYUBzYW1zdW5nLmNv
-bT4KRGF0ZTogRnJpLCAxNCBBdWcgMjAxNSAxOTowNjozNiArMDUzMApTdWJqZWN0OiBbUEFUQ0gg
-Qmx1ZVpdIGF1ZGlvL2F2cmNwOiBBZGQgU2V0IEFkZHJlc3NlZCBQbGF5ZXIgc3VwcG9ydAoKU3Vw
-cG9ydCBhZGRlZCB0byBoYW5kbGUgU2V0IEFkZHJlc3NlZCBQbGF5ZXIgUERVIGluIFRHIHJvbGUu
-ClNlbmQgRVZFTlRfQUREUkVTU0VEX1BMQVlFUl9DSEFOR0VEIG9uIFNldEFkZHJlc3NlZFBsYXll
-cgpTVUNDRVNTIGFuZCBmb2xsb3cgcHJvY2VkdXJlIHRvIHJlamVjdCBhbGwgcGxheWVyIHNwZWNp
-ZmljIGV2ZW50cwpjdXJyZW50bHkgcmVnaXN0ZXJlZCB3aXRoIHRoZSBwbGF5ZXIuCgogICAgICBD
-aGFubmVsOiA2NCBsZW4gMTUgW1BTTSAyMyBtb2RlIDBdIHtjaGFuIDB9CiAgICAgIEFWQ1RQIENv
-bnRyb2w6IENvbW1hbmQ6IHR5cGUgMHgwMCBsYWJlbCAwIFBJRCAweDExMGUKICAgICAgICBBVi9D
-OiBDb250cm9sOiBhZGRyZXNzIDB4NDggb3Bjb2RlIDB4MDAKICAgICAgICAgIFN1YnVuaXQ6IFBh
-bmVsCiAgICAgICAgICBPcGNvZGU6IFZlbmRvciBEZXBlbmRlbnQKICAgICAgICAgIENvbXBhbnkg
-SUQ6IDB4MDAxOTU4CiAgICAgICAgICBBVlJDUDogU2V0QWRkcmVzc2VkUGxheWVyIHB0IFNpbmds
-ZSBsZW4gMHgwMDAyCiAgICAgICAgICAgIFBsYXllcklEOiAweDAwMDAgKDApCgogICAgICBDaGFu
-bmVsOiA2NCBsZW4gMTUgW1BTTSAyMyBtb2RlIDBdIHtjaGFuIDB9CiAgICAgIEFWQ1RQIENvbnRy
-b2w6IFJlc3BvbnNlOiB0eXBlIDB4MDAgbGFiZWwgMCBQSUQgMHgxMTBlCiAgICAgICAgQVYvQzog
-QWNjZXB0ZWQ6IGFkZHJlc3MgMHg0OCBvcGNvZGUgMHgwMAogICAgICAgICAgU3VidW5pdDogUGFu
-ZWwKICAgICAgICAgIE9wY29kZTogVmVuZG9yIERlcGVuZGVudAogICAgICAgICAgQ29tcGFueSBJ
-RDogMHgwMDE5NTgKICAgICAgICAgIEFWUkNQOiBTZXRBZGRyZXNzZWRQbGF5ZXIgcHQgU2luZ2xl
-IGxlbiAweDAwMDIKICAgICAgICAgICAgU3RhdHVzOiAweDA0IChTdWNjZXNzKQoKICAgICAgQ2hh
-bm5lbDogNjQgbGVuIDE4IFtQU00gMjMgbW9kZSAwXSB7Y2hhbiAwfQogICAgICBBVkNUUCBDb250
-cm9sOiBSZXNwb25zZTogdHlwZSAweDAwIGxhYmVsIDAgUElEIDB4MTEwZQogICAgICAgIEFWL0M6
-IENoYW5nZWQ6IGFkZHJlc3MgMHg0OCBvcGNvZGUgMHgwMAogICAgICAgICAgU3VidW5pdDogUGFu
-ZWwKICAgICAgICAgIE9wY29kZTogVmVuZG9yIERlcGVuZGVudAogICAgICAgICAgQ29tcGFueSBJ
-RDogMHgwMDE5NTgKICAgICAgICAgIEFWUkNQOiBSZWdpc3Rlck5vdGlmaWNhdGlvbiBwdCBTaW5n
-bGUgbGVuIDB4MDAwNQogICAgICAgICAgICBFdmVudElEOiAweDBiIChFVkVOVF9BRERSRVNTRURf
-UExBWUVSX0NIQU5HRUQpCiAgICAgICAgICAgIFBsYXllcklEOiAweDAwMDAgKDApCiAgICAgICAg
-ICAgIFVJRENvdW50ZXI6IDB4MDAwMCAoMCkKLS0tCiBwcm9maWxlcy9hdWRpby9hdnJjcC5jIHwg
-MTE5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0KIDEg
-ZmlsZSBjaGFuZ2VkLCAxMTcgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1n
-aXQgYS9wcm9maWxlcy9hdWRpby9hdnJjcC5jIGIvcHJvZmlsZXMvYXVkaW8vYXZyY3AuYwppbmRl
-eCBkNjZmNjcwLi43NmU4OWFmIDEwMDY0NAotLS0gYS9wcm9maWxlcy9hdWRpby9hdnJjcC5jCisr
-KyBiL3Byb2ZpbGVzL2F1ZGlvL2F2cmNwLmMKQEAgLTEwMyw2ICsxMDMsNyBAQAogI2RlZmluZSBB
-VlJDUF9SRVFVRVNUX0NPTlRJTlVJTkcJMHg0MAogI2RlZmluZSBBVlJDUF9BQk9SVF9DT05USU5V
-SU5HCQkweDQxCiAjZGVmaW5lIEFWUkNQX1NFVF9BQlNPTFVURV9WT0xVTUUJMHg1MAorI2RlZmlu
-ZSBBVlJDUF9TRVRfQUREUkVTU0VEX1BMQVlFUgkweDYwCiAjZGVmaW5lIEFWUkNQX1NFVF9CUk9X
-U0VEX1BMQVlFUgkweDcwCiAjZGVmaW5lIEFWUkNQX0dFVF9GT0xERVJfSVRFTVMJCTB4NzEKICNk
-ZWZpbmUgQVZSQ1BfQ0hBTkdFX1BBVEgJCTB4NzIKQEAgLTIwNCw4ICsyMDUsMTAgQEAgc3RydWN0
-IGF2cmNwX3BsYXllciB7CiAJdWludDY0X3QgdWlkOwogCXVpbnQxNl90IHVpZF9jb3VudGVyOwog
-CWJvb2wgYnJvd3NlZDsKKwlib29sIGFkZHJlc3NlZDsKIAl1aW50OF90ICpmZWF0dXJlczsKIAlj
-aGFyICpwYXRoOworCWd1aW50IGNoYW5nZWRfaWQ7CiAKIAlzdHJ1Y3QgcGVuZGluZ19saXN0X2l0
-ZW1zICpwOwogCWNoYXIgKmNoYW5nZV9wYXRoOwpAQCAtNjI3LDYgKzYzMCw3IEBAIHZvaWQgYXZy
-Y3BfcGxheWVyX2V2ZW50KHN0cnVjdCBhdnJjcF9wbGF5ZXIgKnBsYXllciwgdWludDhfdCBpZCwK
-IHsKIAl1aW50OF90IGJ1ZltBVlJDUF9IRUFERVJfTEVOR1RIICsgOV07CiAJc3RydWN0IGF2cmNw
-X2hlYWRlciAqcGR1ID0gKHZvaWQgKikgYnVmOworCXVpbnQ4X3QgY29kZTsKIAl1aW50MTZfdCBz
-aXplOwogCUdTTGlzdCAqbDsKIAlpbnQgYXR0cjsKQEAgLTY0MCwxMCArNjQ0LDE5IEBAIHZvaWQg
-YXZyY3BfcGxheWVyX2V2ZW50KHN0cnVjdCBhdnJjcF9wbGF5ZXIgKnBsYXllciwgdWludDhfdCBp
-ZCwKIAlzZXRfY29tcGFueV9pZChwZHUtPmNvbXBhbnlfaWQsIElFRUVJRF9CVFNJRyk7CiAKIAlw
-ZHUtPnBkdV9pZCA9IEFWUkNQX1JFR0lTVEVSX05PVElGSUNBVElPTjsKLQlwZHUtPnBhcmFtc1sw
-XSA9IGlkOwogCiAJREJHKCJpZD0ldSIsIGlkKTsKIAorCWlmIChpZCAhPSBBVlJDUF9FVkVOVF9B
-RERSRVNTRURfUExBWUVSX0NIQU5HRUQgJiYgcGxheWVyLT5jaGFuZ2VkX2lkKSB7CisJCWNvZGUg
-PSBBVkNfQ1RZUEVfUkVKRUNURUQ7CisJCXNpemUgPSAxOworCQlwZHUtPnBhcmFtc1swXSA9IEFW
-UkNQX1NUQVRVU19BRERSRVNTRURfUExBWUVSX0NIQU5HRUQ7CisJCWdvdG8gZG9uZTsKKwl9CisK
-Kwljb2RlID0gQVZDX0NUWVBFX0NIQU5HRUQ7CisJcGR1LT5wYXJhbXNbMF0gPSBpZDsKKwogCXN3
-aXRjaCAoaWQpIHsKIAljYXNlIEFWUkNQX0VWRU5UX1NUQVRVU19DSEFOR0VEOgogCQlzaXplID0g
-MjsKQEAgLTY3NCw2ICs2ODcsMTEgQEAgdm9pZCBhdnJjcF9wbGF5ZXJfZXZlbnQoc3RydWN0IGF2
-cmNwX3BsYXllciAqcGxheWVyLCB1aW50OF90IGlkLAogCQlwZHUtPnBhcmFtc1tzaXplKytdID0g
-YXR0cjsKIAkJcGR1LT5wYXJhbXNbc2l6ZSsrXSA9IHZhbDsKIAkJYnJlYWs7CisJY2FzZSBBVlJD
-UF9FVkVOVF9BRERSRVNTRURfUExBWUVSX0NIQU5HRUQ6CisJCXNpemUgPSA1OworCQltZW1jcHko
-JnBkdS0+cGFyYW1zWzFdLCAmcGxheWVyLT5pZCwgc2l6ZW9mKHVpbnQxNl90KSk7CisJCW1lbWNw
-eSgmcGR1LT5wYXJhbXNbM10sICZwbGF5ZXItPnVpZF9jb3VudGVyLCBzaXplb2YodWludDE2X3Qp
-KTsKKwkJYnJlYWs7CiAJY2FzZSBBVlJDUF9FVkVOVF9BVkFJTEFCTEVfUExBWUVSU19DSEFOR0VE
-OgogCQlzaXplID0gMTsKIAkJYnJlYWs7CkBAIC02ODIsNiArNzAwLDcgQEAgdm9pZCBhdnJjcF9w
-bGF5ZXJfZXZlbnQoc3RydWN0IGF2cmNwX3BsYXllciAqcGxheWVyLCB1aW50OF90IGlkLAogCQly
-ZXR1cm47CiAJfQogCitkb25lOgogCXBkdS0+cGFyYW1zX2xlbiA9IGh0b25zKHNpemUpOwogCiAJ
-Zm9yIChsID0gcGxheWVyLT5zZXNzaW9uczsgbDsgbCA9IGwtPm5leHQpIHsKQEAgLTY5Myw4ICs3
-MTIsOSBAQCB2b2lkIGF2cmNwX3BsYXllcl9ldmVudChzdHJ1Y3QgYXZyY3BfcGxheWVyICpwbGF5
-ZXIsIHVpbnQ4X3QgaWQsCiAKIAkJZXJyID0gYXZjdHBfc2VuZF92ZW5kb3JkZXAoc2Vzc2lvbi0+
-Y29ubiwKIAkJCQkJc2Vzc2lvbi0+dHJhbnNhY3Rpb25fZXZlbnRzW2lkXSwKLQkJCQkJQVZDX0NU
-WVBFX0NIQU5HRUQsIEFWQ19TVUJVTklUX1BBTkVMLAorCQkJCQljb2RlLCBBVkNfU1VCVU5JVF9Q
-QU5FTCwKIAkJCQkJYnVmLCBzaXplICsgQVZSQ1BfSEVBREVSX0xFTkdUSCk7CisKIAkJaWYgKGVy
-ciA8IDApCiAJCQljb250aW51ZTsKIApAQCAtMTQ5NCw2ICsxNTE0LDExIEBAIHN0YXRpYyB1aW50
-OF90IGF2cmNwX2hhbmRsZV9yZWdpc3Rlcl9ub3RpZmljYXRpb24oc3RydWN0IGF2cmNwICpzZXNz
-aW9uLAogCQl9CiAKIAkJYnJlYWs7CisJY2FzZSBBVlJDUF9FVkVOVF9BRERSRVNTRURfUExBWUVS
-X0NIQU5HRUQ6CisJCWxlbiA9IDU7CisJCW1lbWNweSgmcGR1LT5wYXJhbXNbMV0sICZwbGF5ZXIt
-PmlkLCBzaXplb2YodWludDE2X3QpKTsKKwkJbWVtY3B5KCZwZHUtPnBhcmFtc1szXSwgJnBsYXll
-ci0+dWlkX2NvdW50ZXIsIHNpemVvZih1aW50MTZfdCkpOworCQlicmVhazsKIAljYXNlIEFWUkNQ
-X0VWRU5UX0FWQUlMQUJMRV9QTEFZRVJTX0NIQU5HRUQ6CiAJCWxlbiA9IDE7CiAJCWJyZWFrOwpA
-QCAtMTYxNyw2ICsxNjQyLDkwIEBAIGVycjoKIAlyZXR1cm4gQVZDX0NUWVBFX1JFSkVDVEVEOwog
-fQogCitzdGF0aWMgc3RydWN0IGF2cmNwX3BsYXllciAqZmluZF90Z19wbGF5ZXIoc3RydWN0IGF2
-cmNwICpzZXNzaW9uLCB1aW50MTZfdCBpZCkKK3sKKwlzdHJ1Y3QgYXZyY3Bfc2VydmVyICpzZXJ2
-ZXIgPSBzZXNzaW9uLT5zZXJ2ZXI7CisJR1NMaXN0ICpsOworCisJZm9yIChsID0gc2VydmVyLT5w
-bGF5ZXJzOyBsOyBsID0gbC0+bmV4dCkgeworCQlzdHJ1Y3QgYXZyY3BfcGxheWVyICpwbGF5ZXIg
-PSBsLT5kYXRhOworCisJCWlmIChwbGF5ZXItPmlkID09IGlkKQorCQkJcmV0dXJuIHBsYXllcjsK
-Kwl9CisKKwlyZXR1cm4gTlVMTDsKK30KKworc3RhdGljIGdib29sZWFuIG5vdGlmeV9hZGRyZXNz
-ZWRfcGxheWVyX2NoYW5nZWQoZ3BvaW50ZXIgdXNlcl9kYXRhKQoreworCXN0cnVjdCBhdnJjcF9w
-bGF5ZXIgKnBsYXllciA9IHVzZXJfZGF0YTsKKwl1aW50OF90IGV2ZW50c1s2XSA9IHsgQVZSQ1Bf
-RVZFTlRfU1RBVFVTX0NIQU5HRUQsCisJCQkJCUFWUkNQX0VWRU5UX1RSQUNLX0NIQU5HRUQsCisJ
-CQkJCUFWUkNQX0VWRU5UX1RSQUNLX1JFQUNIRURfU1RBUlQsCisJCQkJCUFWUkNQX0VWRU5UX1RS
-QUNLX1JFQUNIRURfRU5ELAorCQkJCQlBVlJDUF9FVkVOVF9TRVRUSU5HU19DSEFOR0VELAorCQkJ
-CQlBVlJDUF9FVkVOVF9QTEFZQkFDS19QT1NfQ0hBTkdFRAorCQkJCX07CisJdWludDhfdCBpOwor
-CisJYXZyY3BfcGxheWVyX2V2ZW50KHBsYXllciwgQVZSQ1BfRVZFTlRfQUREUkVTU0VEX1BMQVlF
-Ul9DSEFOR0VELCBOVUxMKTsKKworCS8qCisJICogVEcgc2hhbGwgY29tcGxldGUgYWxsIHBsYXll
-ciBzcGVjaWZpYworCSAqIG5vdGlmaWNhdGlvbnMgd2l0aCBBVi9DIEMtVHlwZSBSRUpFQ1RFRAor
-CSAqIHdpdGggZXJyb3IgY29kZSBhcyBBZGRyZXNzZWQgUGxheWVyIENoYW5nZWQuCisJICovCisJ
-Zm9yIChpID0gMDsgaSA8IHNpemVvZihldmVudHMpOyBpKyspCisJCWF2cmNwX3BsYXllcl9ldmVu
-dChwbGF5ZXIsIGV2ZW50c1tpXSwgTlVMTCk7CisKKwlwbGF5ZXItPmNoYW5nZWRfaWQgPSAwOwor
-CisJcmV0dXJuIEZBTFNFOworfQorCitzdGF0aWMgdWludDhfdCBhdnJjcF9oYW5kbGVfc2V0X2Fk
-ZHJlc3NlZF9wbGF5ZXIoc3RydWN0IGF2cmNwICpzZXNzaW9uLAorCQkJCQkJc3RydWN0IGF2cmNw
-X2hlYWRlciAqcGR1LAorCQkJCQkJdWludDhfdCB0cmFuc2FjdGlvbikKK3sKKwlzdHJ1Y3QgYXZy
-Y3BfcGxheWVyICpwbGF5ZXI7CisJdWludDE2X3QgbGVuID0gbnRvaHMocGR1LT5wYXJhbXNfbGVu
-KTsKKwl1aW50MTZfdCBwbGF5ZXJfaWQgPSAwOworCXVpbnQ4X3Qgc3RhdHVzOworCisJaWYgKGxl
-biA8IDEpIHsKKwkJc3RhdHVzID0gQVZSQ1BfU1RBVFVTX0lOVkFMSURfUEFSQU07CisJCWdvdG8g
-ZXJyOworCX0KKworCXBsYXllcl9pZCA9IGJ0X2dldF9iZTE2KCZwZHUtPnBhcmFtc1swXSk7CisJ
-cGxheWVyID0gZmluZF90Z19wbGF5ZXIoc2Vzc2lvbiwgcGxheWVyX2lkKTsKKwlwZHUtPnBhY2tl
-dF90eXBlID0gQVZSQ1BfUEFDS0VUX1RZUEVfU0lOR0xFOworCisJaWYgKHBsYXllcikgeworCQlw
-bGF5ZXItPmFkZHJlc3NlZCA9IHRydWU7CisJCXN0YXR1cyA9IEFWUkNQX1NUQVRVU19TVUNDRVNT
-OworCQlwZHUtPnBhcmFtc19sZW4gPSBodG9ucyhsZW4pOworCQlwZHUtPnBhcmFtc1swXSA9IHN0
-YXR1czsKKwl9IGVsc2UgeworCQlzdGF0dXMgPSBBVlJDUF9TVEFUVVNfSU5WQUxJRF9QTEFZRVJf
-SUQ7CisJCWdvdG8gZXJyOworCX0KKworCS8qIERvbid0IGVtaXQgcGxheWVyIGNoYW5nZWQgaW1t
-ZWRpYXRlbHkgc2luY2UgUFRTIGV4cGVjdCB0aGUKKwkgKiByZXNwb25zZSBvZiBTZXRBZGRyZXNz
-ZWRQbGF5ZXIgYmVmb3JlIHRoZSBldmVudC4KKwkgKi8KKwlwbGF5ZXItPmNoYW5nZWRfaWQgPSBn
-X2lkbGVfYWRkKG5vdGlmeV9hZGRyZXNzZWRfcGxheWVyX2NoYW5nZWQsCisJCQkJCQkJCXBsYXll
-cik7CisKKwlyZXR1cm4gQVZDX0NUWVBFX0FDQ0VQVEVEOworCitlcnI6CisJcGR1LT5wYXJhbXNf
-bGVuID0gaHRvbnMoc2l6ZW9mKHN0YXR1cykpOworCXBkdS0+cGFyYW1zWzBdID0gc3RhdHVzOwor
-CXJldHVybiBBVkNfQ1RZUEVfUkVKRUNURUQ7Cit9CisKIHN0YXRpYyBjb25zdCBzdHJ1Y3QgY29u
-dHJvbF9wZHVfaGFuZGxlciBjb250cm9sX2hhbmRsZXJzW10gPSB7CiAJCXsgQVZSQ1BfR0VUX0NB
-UEFCSUxJVElFUywgQVZDX0NUWVBFX1NUQVRVUywKIAkJCQkJYXZyY3BfaGFuZGxlX2dldF9jYXBh
-YmlsaXRpZXMgfSwKQEAgLTE2NDgsNiArMTc1Nyw4IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgY29u
-dHJvbF9wZHVfaGFuZGxlciBjb250cm9sX2hhbmRsZXJzW10gPSB7CiAJCQkJCWF2cmNwX2hhbmRs
-ZV9yZXF1ZXN0X2NvbnRpbnVpbmcgfSwKIAkJeyBBVlJDUF9BQk9SVF9DT05USU5VSU5HLCBBVkNf
-Q1RZUEVfQ09OVFJPTCwKIAkJCQkJYXZyY3BfaGFuZGxlX2Fib3J0X2NvbnRpbnVpbmcgfSwKKwkJ
-eyBBVlJDUF9TRVRfQUREUkVTU0VEX1BMQVlFUiwgQVZDX0NUWVBFX0NPTlRST0wsCisJCQkJCWF2
-cmNwX2hhbmRsZV9zZXRfYWRkcmVzc2VkX3BsYXllciB9LAogCQl7IH0sCiB9OwogCkBAIC0zMDI5
-LDYgKzMxNDAsOSBAQCBzdGF0aWMgdm9pZCBwbGF5ZXJfZGVzdHJveShncG9pbnRlciBkYXRhKQog
-CWlmIChwbGF5ZXItPmRlc3Ryb3kpCiAJCXBsYXllci0+ZGVzdHJveShwbGF5ZXItPnVzZXJfZGF0
-YSk7CiAKKwlpZiAocGxheWVyLT5jaGFuZ2VkX2lkID4gMCkKKwkJZ19zb3VyY2VfcmVtb3ZlKHBs
-YXllci0+Y2hhbmdlZF9pZCk7CisKIAlnX3NsaXN0X2ZyZWUocGxheWVyLT5zZXNzaW9ucyk7CiAJ
-Z19mcmVlKHBsYXllci0+cGF0aCk7CiAJZ19mcmVlKHBsYXllci0+Y2hhbmdlX3BhdGgpOwpAQCAt
-MzUyMSw2ICszNjM1LDcgQEAgc3RhdGljIHZvaWQgdGFyZ2V0X2luaXQoc3RydWN0IGF2cmNwICpz
-ZXNzaW9uKQogCQlyZXR1cm47CiAKIAlzZXNzaW9uLT5zdXBwb3J0ZWRfZXZlbnRzIHw9CisJCQkJ
-KDEgPDwgQVZSQ1BfRVZFTlRfQUREUkVTU0VEX1BMQVlFUl9DSEFOR0VEKSB8CiAJCQkJKDEgPDwg
-QVZSQ1BfRVZFTlRfQVZBSUxBQkxFX1BMQVlFUlNfQ0hBTkdFRCk7CiAKIAkvKiBPbmx5IGNoZWNr
-IGNhcGFiaWxpdGllcyBpZiBjb250cm9sbGVyIGlzIG5vdCBzdXBwb3J0ZWQgKi8KLS0gCjIuNC4z
-Cgo=
---001a11c23818f4f307051d80be17--
+Johan
+
+---
+The following changes since commit 2cf1b5ce16b61259e3633fb61e6fedaad6e25fc5:
+
+  Merge branch 'mlxsw-fixes' (2015-08-09 22:54:31 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t for-upstream
+
+for you to fetch changes up to c0015bf3a34961342a27b021672049e535ab36a1:
+
+  ieee802154: 6lowpan: fix non-lowpan wpan interfaces (2015-08-15 23:28:09 =
++0200)
+
+----------------------------------------------------------------
+Alexander Aring (13):
+      ieee802154: 6lowpan: remove multiple lowpan per wpan support
+      mac802154: fix wpan mac setting while lowpan is there
+      mac802154: cfg: remove test and set checks
+      mac802154: change frame_retries behaviour
+      at86rf230: use STATE_TX_ARET mode only
+      ieee802154: add ack request default handling
+      ieee802154: 6lowpan: fix error frag handling
+      Bluetooth: 6lowpan: change netdev_priv to lowpan_dev
+      6lowpan: add generic 6lowpan netdev private data
+      6lowpan: move module_init into core functionality
+      documentation: networking: add 6lowpan documentation
+      ieee802154: 6lowpan: fix packet layer registration
+      ieee802154: 6lowpan: fix non-lowpan wpan interfaces
+
+Aniket Nagarnaik (1):
+      Bluetooth: btmrvl: release sdio bus after firmware is up
+
+Ben Young Tae Kim (2):
+      Bluetooth: btqca: Introduce generic QCA ROME support
+      Bluetooth: hciuart: Add support QCA chipset for UART
+
+Ben YoungTae Kim (1):
+      Bluetooth: hciuart: Fix to use boolean flag with u32 type
+
+Dan Carpenter (1):
+      Bluetooth: Fix breakage in amp_write_rem_assoc_frag()
+
+Frederic Danis (5):
+      Bluetooth: hci_bcm: Add PM for BCM devices
+      net: rfkill: gpio: Remove BCM2E39 support
+      Bluetooth: hci_bcm: Retrieve UART speed from ACPI
+      Bluetooth: hci_bcm: Add suspend/resume PM functions
+      Bluetooth: hci_bcm: Fix "implicit declaration"
+
+Jakub Pawlowski (6):
+      Bluetooth: preparation for new connect procedure
+      Bluetooth: add hci_lookup_le_connect
+      Bluetooth: add hci_connect_le_scan
+      Bluetooth: advertisement handling in new connect procedure
+      Bluetooth: timeout handling in new connect procedure
+      Bluetooth: Enable new connection establishment procedure.
+
+Lukasz Duda (1):
+      6lowpan: Fix extraction of flow label field
+
+Peter Poklop (1):
+      Bluetooth: btusb: mark 0c10:0000 devices with BTUSB_SWAVE
+
+Uwe Kleine-K=F6nig (1):
+      Bluetooth: hci_bcm: improve use of gpios API
+
+Yong Li (1):
+      cc2520: set the default fifo pin value from platform data
+
+ Documentation/networking/6lowpan.txt |  50 ++
+ MAINTAINERS                          |   1 +
+ drivers/bluetooth/Kconfig            |  17 +
+ drivers/bluetooth/Makefile           |   2 +
+ drivers/bluetooth/btmrvl_sdio.c      |   4 +-
+ drivers/bluetooth/btqca.c            | 392 ++++++++++++++
+ drivers/bluetooth/btqca.h            | 135 +++++
+ drivers/bluetooth/btusb.c            |   3 +
+ drivers/bluetooth/hci_bcm.c          | 310 ++++++++++-
+ drivers/bluetooth/hci_ldisc.c        |   6 +
+ drivers/bluetooth/hci_qca.c          | 969 +++++++++++++++++++++++++++++++=
++++
+ drivers/bluetooth/hci_uart.h         |   8 +-
+ drivers/net/ieee802154/at86rf230.c   |  52 +-
+ drivers/net/ieee802154/cc2520.c      |   1 +
+ include/net/6lowpan.h                |  23 +
+ include/net/bluetooth/hci_core.h     |  29 +
+ include/net/cfg802154.h              |   8 +
+ include/net/nl802154.h               |   4 +
+ net/6lowpan/Makefile                 |   2 +-
+ net/6lowpan/core.c                   |  40 ++
+ net/6lowpan/iphc.c                   |  21 +-
+ net/bluetooth/6lowpan.c              |  11 +-
+ net/bluetooth/amp.c                  |   2 +-
+ net/bluetooth/hci_conn.c             | 235 ++++++++-
+ net/bluetooth/hci_core.c             |  33 ++
+ net/bluetooth/hci_event.c            |  55 +-
+ net/bluetooth/hci_request.c          |   6 +-
+ net/bluetooth/l2cap_core.c           |   6 +-
+ net/bluetooth/mgmt.c                 |  15 +-
+ net/ieee802154/6lowpan/6lowpan_i.h   |  11 +-
+ net/ieee802154/6lowpan/core.c        |  79 ++-
+ net/ieee802154/6lowpan/rx.c          |  45 +-
+ net/ieee802154/6lowpan/tx.c          |   4 +-
+ net/ieee802154/nl802154.c            |  33 ++
+ net/ieee802154/rdev-ops.h            |  13 +
+ net/ieee802154/trace.h               |  19 +
+ net/mac802154/cfg.c                  |  27 +-
+ net/mac802154/iface.c                |  18 +-
+ net/mac802154/main.c                 |   9 +-
+ net/rfkill/rfkill-gpio.c             |   1 -
+ 40 files changed, 2462 insertions(+), 237 deletions(-)
+ create mode 100644 Documentation/networking/6lowpan.txt
+ create mode 100644 drivers/bluetooth/btqca.c
+ create mode 100644 drivers/bluetooth/btqca.h
+ create mode 100644 drivers/bluetooth/hci_qca.c
+ create mode 100644 net/6lowpan/core.c
+
+--gKMricLos+KVdGMg
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJV0CgoAAoJECQj9vv5qNQSy/oP/RhlqiEmIet8xTgMkTpKfS18
+jXCIr9yfNqjcvyWETeuq1VMuyIq5KHRnvW3fDf7E5DqCZEwvwqyQ0eNZq/VgQeb8
+oplY4Mz3qiYxWhfn8f0YWXCN48glhljf4LR2n14JX5XPxysUBl4HfS4q0gH8NrFa
+bbIVbJ1RId+hpqalDOXmLQ7IxfjonitoMIng3nkTgsR/2NiRbrOznRimug7To7uE
+cFDmbzVhNuVxzOJSfKAEp5ij60CAmAn3RMvMiFKcnqVO+hEQ4V8q2u7t8u2Megh2
+j+qDE/lVngWLsONP/6I8z6nEUheN/gVg+8BOZbSNiBlh8+746229YsTgyfdmsNNP
+Ge923DraA0Cuv8A188rK9jHn1IjZ1SvtFhsMHJltGgw320OObGnHRci554Xljste
+Udsor2AlDSLrrRoFzwWBbOoxNtYDYNTCfN8HpPurC/BUcChw2B27hX5V/geC0lum
+8+yLkgzs797YfzzUWVOT6+zx7S4vNXI52O9bAdQwJxHmjrWFqKXtqUo8JRVGj8TH
+Sh4fb1r8Y8xcVF2ADhzSfwz31DQprgb/QXzSbSWqBSf13Ch9/sKT6Pd9SyrUS6zI
+Xe2uic9U1rS4P1O/fnKEiR0Q88M0Q+tht5yzePo7L5IU3kAiGmwE7MIJnwO6QE5n
+hFrwnpNiW9DbX8h1T9gi
+=a69x
+-----END PGP SIGNATURE-----
+
+--gKMricLos+KVdGMg--
