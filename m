@@ -1,31 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Use non-sleep version of gpio_set_value
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1439820021-24802-1-git-send-email-loic.poulain@intel.com>
-Date: Mon, 17 Aug 2015 16:00:18 -0700
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <E1579C00-8BC7-474F-A510-EB3289390638@holtmann.org>
-References: <1439820021-24802-1-git-send-email-loic.poulain@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
+Date: Mon, 17 Aug 2015 15:41:38 -0700 (PDT)
+Message-Id: <20150817.154138.1969837298406715589.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2015-08-16
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20150816060528.GA13052@t440s.P-661HNU-F1>
+References: <20150816060528.GA13052@t440s.P-661HNU-F1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Sun, 16 Aug 2015 09:05:28 +0300
 
-> We should not sleep while holding a spinlock.
-> bcm_gpio_set_power is called while holding the bcm_device_list lock.
+> Here's what's likely the last bluetooth-next pull request for 4.3:
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
-> ---
-> drivers/bluetooth/hci_bcm.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+>  - 6lowpan/802.15.4 refactoring, cleanups & fixes
+>  - Document 6lowpan netdev usage in Documentation/networking/6lowpan.txt
+>  - Support for UART based QCA Bluetooth controllers
+>  - Power management support for Broeadcom Bluetooth controllers
+>  - Change LE connection initiation to always use passive scanning first
+>  - Support for new Silicon Wave USB ID
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
-
+Pulled, thanks Johan.
