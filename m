@@ -1,68 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 17 Aug 2015 10:36:22 -0500
+From: Seth Forshee <seth.forshee@canonical.com>
+To: Kalle Valo <kvalo@qca.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Missing firmware for AR3012 devices
+Message-ID: <20150817153622.GA2976@ubuntu-xps13>
+References: <20150810211649.GB60315@ubuntu-hedt>
+ <87io8ef5a5.fsf@kamboji.qca.qualcomm.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKXOA3kNXQHbdJMah4JS1OGPE8Au9xNFg6V=W_2JP1SWQ@mail.gmail.com>
-References: <1439404612-2346-1-git-send-email-jpawlowski@google.com>
-	<CABBYNZKXOA3kNXQHbdJMah4JS1OGPE8Au9xNFg6V=W_2JP1SWQ@mail.gmail.com>
-Date: Mon, 17 Aug 2015 19:17:13 +0200
-Message-ID: <CAD0=r8xdPOiasvH6J8+M2k5gYoSWp6jbH2A8FZLvsV8KjdepYg@mail.gmail.com>
-Subject: Re: [BlueZ RFC] src/device: gatt database persistence
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <87io8ef5a5.fsf@kamboji.qca.qualcomm.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Aug 13, 2015 at 9:51 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Jakub,
->
-> On Wed, Aug 12, 2015 at 9:36 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->> This patch changes how gatt database for paired devices is stored between
->> restarts of bluetoothd. Right now only definition of services is stored.
->> After applying this patch whole gatt database will be stored/restored.
->>
->> Storing whole database can have big impact on reconnection time for paired
->> devices, because full discovery can take up to 10 seconds.
->
-> There is a TODO for this but it seems that the documentation under
-> doc/settings-storage.txt outdated. I believe the preferred way to
-> store is a binary format under cache so the attributes can be
-> persisted even if the device info is not stored which is the same
-> design we use for SDP records,
+On Mon, Aug 17, 2015 at 03:50:10PM +0300, Kalle Valo wrote:
+> Hi Seth,
+> 
+> Seth Forshee <seth.forshee@canonical.com> writes:
+> 
+> > I'm hitting you up because it looks like you've supplied some firmware
+> > for ath3k devices in the past.
+> >
+> > Some new ath3k devices were recently enabled in the kernel [1], however
+> > it looks like there's no firmware available under a license which would
+> > allow distros to redistribute it. According to users at [2] the files
+> > should be named AthrBT_0x11020100.dfu and ramps_0x11020100_40.dfu. Any
+> > chance you or someone else at QCA could help get this into
+> > linux-firmware?
+> 
+> I pinged our bluetooth team about this. Remind me again later if the
+> firmware is still not yet released.
 
-Current policy for LE devices is to store only Service definitions for
-ONLY paired devices.
-I think that storing GATT database for unpaired devices, especially
-ones that have rotating MAC address doesn't really benefit too much,
-it'll change every 15 minutes and have to be re-discovered leaving
-unnecessary mess in cache. Is keeping cache for paired devices only
-fine for you ?
+Great, thanks Kalle.
 
-Also when it comes to format for storing data, I'd like to use
-functions from shared/gatt_db to restore GATT
-gatt_db_insert_service
-gatt_db_service_add_included
-gatt_db_service_insert_characteristic
-gatt_db_service_insert_descriptor
-just to make sure everything will get wired properly, and will work
-fine if implementation of those methods change (I also don't want to
-reimplement what they already do).  I'll change implementation to
-store properties and uuids in binary format, but I'd prefer not to
-implement serialization to make one line per attribute. Will that be
-fine?
-
-
-> note that the code will perform a Read
-> By Group Type regardless if the database is empty or not to validate
-> the services on every connection so we need to update the cache every
-> time an attribute changes.
-
-Yes, I'm aware of that. That's actually good for devices that have
-"Service Changed" characteristic badly implemented, or when something
-just goes wrong.
-
->
->
-> --
-> Luiz Augusto von Dentz
+Seth
