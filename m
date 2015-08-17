@@ -1,28 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1438603053-4865-1-git-send-email-anchit.n@samsung.com>
-References: <1438603053-4865-1-git-send-email-anchit.n@samsung.com>
-Date: Tue, 18 Aug 2015 11:06:53 +0300
-Message-ID: <CABBYNZ+of+pkV5Gm1M4T6TiHSvnAaer+O6s0K=HkzObYnQ+X7w@mail.gmail.com>
-Subject: Re: [PATCH] tools/l2test: Fix memory leak
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Anchit Narang <anchit.n@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	sachin.dev@samsung.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Use non-sleep version of gpio_set_value
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1439820021-24802-1-git-send-email-loic.poulain@intel.com>
+Date: Mon, 17 Aug 2015 16:00:18 -0700
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <E1579C00-8BC7-474F-A510-EB3289390638@holtmann.org>
+References: <1439820021-24802-1-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anchit,
+Hi Loic,
 
-On Mon, Aug 3, 2015 at 2:57 PM, Anchit Narang <anchit.n@samsung.com> wrote:
-> The code to exit from program is changed.
-> Rather than directly calling exit(), memory allocated to buf is released
-> to gracefully exit.
+> We should not sleep while holding a spinlock.
+> bcm_gpio_set_power is called while holding the bcm_device_list lock.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> ---
+> drivers/bluetooth/hci_bcm.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
 
-These cases I considered false positives, calling exit should cause
-the process to be terminated and any resource allocated to it will be
-freed anyway.
+patch has been applied to bluetooth-next tree.
 
--- 
-Luiz Augusto von Dentz
+Regards
+
+Marcel
+
