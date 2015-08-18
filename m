@@ -1,53 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nicholas Krause <xerofoify@gmail.com>
-To: marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] bluetooth:Fix variable assignment for switch case in the function a2mp_chan_recv_cb
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1439912990-15773-1-git-send-email-xerofoify@gmail.com>
+Date: Tue, 18 Aug 2015 10:43:24 -0700
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] bluetooth:Fix locking issues in the function l2cap_connect_cfm
-Date: Tue, 18 Aug 2015 15:08:22 -0400
-Message-Id: <1439924902-13408-1-git-send-email-xerofoify@gmail.com>
+Message-Id: <B1F382FE-91DF-41CE-901D-06226E833FDA@holtmann.org>
+References: <1439912990-15773-1-git-send-email-xerofoify@gmail.com>
+To: Nicholas Krause <xerofoify@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes a locking issue in the function l2cap_connect_cfm for
-not locking the mutex lock for channels on the l2cap_conn structure
-pointer conn before calling __l2cap_get_chan_by_dcid as all callers
-need to lock and unlock this mutex before calling this function due
-to issues with either concurrent users or race conditions arising
-if this mutex is not locked before these calls.
+Hi Nicholas,
 
-Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
----
- net/bluetooth/l2cap_core.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+> This fixes the issue with not assigning the variable err to the return
+> value of the call to the function a2mp_command_rej for the switch case
+> A2MP_COMMAND_REJ as this function call can fail and thus callers of
+> a2mp_chan_recv_cb should be signaled when this internal function call
+> fails in order for them to handle this failure when calling the function
+> a2mp_chan_recv_cb.
+> 
+> Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
+> ---
+> net/bluetooth/a2mp.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 45fffa4..fcee783 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7285,9 +7285,11 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 		struct l2cap_chan *chan, *next;
- 
- 		/* Client fixed channels should override server ones */
-+		mutex_lock(&conn->chan_lock);
- 		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
- 			goto next;
--
-+
-+		mutex_unlock(&conn->chan_lock);
- 		l2cap_chan_lock(pchan);
- 		chan = pchan->ops->new_connection(pchan);
- 		if (chan) {
-@@ -7301,6 +7303,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 
- 		l2cap_chan_unlock(pchan);
- next:
-+		mutex_unlock(&conn->chan_lock);
- 		next = l2cap_global_fixed_chan(pchan, hcon);
- 		l2cap_chan_put(pchan);
- 		pchan = next;
--- 
-2.1.4
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
