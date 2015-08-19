@@ -1,45 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nicholas Krause <xerofoify@gmail.com>
-To: marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] bluetooth:Fix error checking in the function hci_disconn_complete_evt
-Date: Wed, 19 Aug 2015 10:05:29 -0400
-Message-Id: <1439993129-27049-1-git-send-email-xerofoify@gmail.com>
+From: Anchit Narang <anchit.n@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com
+Subject: RE:[PATCH] android/tester-gatt.c:Fixed Memory leak
+Date: Wed, 19 Aug 2015 16:38:48 +0530
+Message-id: <1439982528-12642-1-git-send-email-anchit.n@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes error checking in the function hci_disconn_complete_evt
-to properly check if it's call to the function hci_remove_link_key
-returns NULL to signal it has not correctly removed the link key
-on the passed hci_dev structure pointer and if so jump to the goto
-label unlock to unlock the caller's passed hci_dev structure pointer
-as this function cannot continue its intended work after this failed
+Ping
 
-Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
----
- net/bluetooth/hci_event.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+>------- Original Message -------
+>Sender : Anchit Narang<anchit.n@samsung.com> Senior Software Engineer (2)/SRI-Delhi-SWC Group/Samsung Electronics
+>Date : Jun 26, 2015 16:13 (GMT+05:30)
+>Title : [PATCH] android/tester-gatt:Fixed Memory leak
+>
+>This patch fixes memory leak issues in various functions
+>by allocating memory to  structure step only after intial
+>checks are performed as control was returning from these
+>checks without freeing memory allocated to it.
+>---
+> android/tester-gatt.c |    8 ++++++--
+> 1 file changed, 6 insertions(+), 2 deletions(-)
+>
+>diff --git a/android/tester-gatt.c b/android/tester-gatt.c
+>index b8b088b..7083ac6 100644
+>--- a/android/tester-gatt.c
+>+++ b/android/tester-gatt.c
+>@@ -1140,13 +1140,15 @@ static void gatt_client_register_action(void)
+> 	struct test_data *data = tester_get_data();
+> 	struct step *current_data_step = queue_peek_head(data->steps);
+> 	bt_uuid_t *app_uuid = current_data_step->set_data;
+>-	struct step *step = g_new0(struct step, 1);
+>+	struct step *step;
+> 
+> 	if (!app_uuid) {
+> 		tester_warn("No app uuid provided for register action.");
+> 		return;
+> 	}
+> 
+>+	step = g_new0(struct step, 1);
+>+
+> 	step->action_status = data->if_gatt->client->register_client(app_uuid);
+> 
+> 	schedule_action_verification(step);
+>@@ -1392,13 +1394,15 @@ static void gatt_server_register_action(void)
+> 	struct test_data *data = tester_get_data();
+> 	struct step *current_data_step = queue_peek_head(data->steps);
+> 	bt_uuid_t *app_uuid = current_data_step->set_data;
+>-	struct step *step = g_new0(struct step, 1);
+>+	struct step *step;
+> 
+> 	if (!app_uuid) {
+> 		tester_warn("No app uuid provided for register action.");
+> 		return;
+> 	}
+> 
+>+	step = g_new0(struct step, 1);
+>+
+> 	step->action_status = data->if_gatt->server->register_server(app_uuid);
+> 
+> 	schedule_action_verification(step);
+>-- 
+>1.7.9.5
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 32363c2..5174649 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2448,8 +2448,10 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 				reason, mgmt_connected);
- 
- 	if (conn->type == ACL_LINK) {
--		if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
--			hci_remove_link_key(hdev, &conn->dst);
-+		if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags)) {
-+			if (!hci_remove_link_key(hdev, &conn->dst))
-+				goto unlock;
-+		}
- 
- 		hci_update_page_scan(hdev);
- 	}
--- 
-2.1.4
