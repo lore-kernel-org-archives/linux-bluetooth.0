@@ -1,31 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55D4834E.9080705@convergeddevices.net>
-Date: Wed, 19 Aug 2015 14:23:26 +0100
-From: tony <tony.makkiel@convergeddevices.net>
-MIME-Version: 1.0
-To: <linux-bluetooth@vger.kernel.org>
-Subject: SEC SEM BV 09, MITM + No Bonding
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Nicholas Krause <xerofoify@gmail.com>
+To: marcel@holtmann.org
+Cc: gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] bluetooth:Fix NULL pointer deference issue in the function load_irks
+Date: Wed, 19 Aug 2015 10:25:30 -0400
+Message-Id: <1439994330-27508-1-git-send-email-xerofoify@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
-            I am going through Bluez 4.101 qualification process and am 
-stuck with second part of test case SEC SEM BV 09. The test case needs 
-BlueZ to connect to Tester with Authentication requirement 0 (MITM not 
-required + No Bonding). Then have to trigger another L2CAP connection 
-with Authentication requirement 1 (MITM required + No Bonding).
+This fixes a possible NULL pointer deference issue in the function
+load_irks if the call to the function hci_add_link fails and returns
+NULL by instead checking if this return value occurs before returning
+-ENOMEM to the function load_irks caller as the function hci_add_link
+only fails due to a memory allocation error therfore due to this we
+only need to return the error -ENOMEM directly to the function load_irks
 
-We managed to get through the first part using l2test
-l2test -n -P 1 -E
-But the second part always does general bonding (Authentication 
-Requirement 5).
-l2test -n -S -P 17 -J 2
+Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
+---
+ net/bluetooth/mgmt.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Can somebody please advise on how to force blueZ to initiate connection 
-with authentication requirement 1 (MITM required + No Bonding)? From the 
-blueZ code, I noticed it follows lead from the remote device. But 
-couldn't find anything obvious when initiating connection.
-
-Many Thanks,
-Tony
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 92720f3..e286d63 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -5602,8 +5602,9 @@ static int load_irks(struct sock *sk, struct hci_dev *hdev, void *cp_data,
+ 		else
+ 			addr_type = ADDR_LE_DEV_RANDOM;
+ 
+-		hci_add_irk(hdev, &irk->addr.bdaddr, addr_type, irk->val,
+-			    BDADDR_ANY);
++		if (!hci_add_irk(hdev, &irk->addr.bdaddr, addr_type, irk->val,
++				 BDADDR_ANY))
++			return -ENOMEM;
+ 	}
+ 
+ 	hci_dev_set_flag(hdev, HCI_RPA_RESOLVING);
+-- 
+2.1.4
