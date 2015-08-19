@@ -1,32 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH] Bluetooth: btmrvl: change device pointer passed to dev_coredumpv
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1439979139-15930-1-git-send-email-akarwar@marvell.com>
-Date: Wed, 19 Aug 2015 16:07:30 -0700
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Shengzhen Li <szli@marvell.com>
-Message-Id: <DC28FCCA-AAF2-415E-BAD3-4B956C6C3DD4@holtmann.org>
-References: <1439979139-15930-1-git-send-email-akarwar@marvell.com>
-To: Amitkumar Karwar <akarwar@marvell.com>
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Jamin Collins <jamin.collins@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Bluetooth related possible system hard lockups
+In-Reply-To: <CAG7CpCj5o6Z6zPXmotVu+tTsW8BQeRFNM8Re1MUDv-US4LUaeg@mail.gmail.com>
+References: <CAG7CpCj5o6Z6zPXmotVu+tTsW8BQeRFNM8Re1MUDv-US4LUaeg@mail.gmail.com>
+Date: Wed, 19 Aug 2015 19:54:05 -0300
+Message-ID: <87twrurisy.fsf@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Amitkumar,
+Hi Jamin,
 
-> This change ensures we will get driver name as 'btmrvl_sdio'
-> in udev event.
-> 
-> Signed-off-by: Shengzhen Li <szli@marvell.com>
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> ---
-> drivers/bluetooth/btmrvl_sdio.c | 3 +--
-> 1 file changed, 1 insertion(+), 2 deletions(-)
+Jamin Collins <jamin.collins@gmail.com> writes:
 
-patch has been applied to bluetooth-next tree.
+> I've recently started experiencing what appear to be hard lockups on
+> what has otherwise been a very solid system (Lenovo W530 Thinkpad).
+> I'm running a fully updated Arch Linux install on it, and have been
+> for a few months (since roughly April of this year).  Just before
+> experiencing these lockups I started using a bluetooth mouse.
+>
+> When the apparent lockup occurs:
+> - the laptop screen seems to be off (no display)
+> - the CPU fan is running at a moderate speed (not the slowest, and not
+> the fastest)
+> - no apparent disk activity
+> - nothing in journalctl (when I hard reset I find only a gap, last
+> entry hours before)
+> - unresponsive to network requests (ping, etc)
+>
+> The only way I've found to recover the system thus far is a hard reset
+> (hold power for 4+ seconds).
+>
 
-Regards
+Without more information (the backtrace of the crash, from the kernel
+logs or even a picture of the screen showing the crash dump), it is hard
+to be sure. I can only guess.
 
-Marcel
+This looks like this issue (for one colleague on a very similar setup as
+yours, it was the case):
 
+http://thread.gmane.org/gmane.linux.kernel.input/45023
+
+I just checked, that patch is in the stable queue, and for little it
+missed the 4.1.6 deadline, but it should appear on 4.1.7 (if it is
+released) or 4.2 (for sure).
+
+You can also apply that patch locally and see if solves your problem,
+or you can give the input subsystem kernel tree a try:
+
+https://git.kernel.org/cgit/linux/kernel/git/jikos/hid.git
+
+
+Cheers,
+--
+Vinicius
