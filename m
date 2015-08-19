@@ -1,72 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Loic Poulain <loic.poulain@intel.com>, "marcel@holtmann.org"
-	<marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: hci_intel: Add platform driver
-Date: Wed, 19 Aug 2015 21:17:47 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E94282DE5@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1440004303-27509-1-git-send-email-loic.poulain@intel.com>
- <55D4B948.8030400@intel.com>
-In-Reply-To: <55D4B948.8030400@intel.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <CAG7CpCj5o6Z6zPXmotVu+tTsW8BQeRFNM8Re1MUDv-US4LUaeg@mail.gmail.com>
+References: <CAG7CpCj5o6Z6zPXmotVu+tTsW8BQeRFNM8Re1MUDv-US4LUaeg@mail.gmail.com>
+Date: Wed, 19 Aug 2015 14:09:01 -0700
+Message-ID: <CAG7CpCjOFxnO3UhMszmbuDXB6m2aF16p4rNAbhmkhrzcakyBjw@mail.gmail.com>
+Subject: Re: Bluetooth related possible system hard lockups
+From: Jamin Collins <jamin.collins@gmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Issue Update
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@v=
-ger.kernel.org] On Behalf Of Loic Poulain
-Sent: Wednesday, August 19, 2015 1:14 PM
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_intel: Add platform driver
+I have not been successful in reproducing the issue *without*
+connecting a bluetooth device at least once.
 
+I have however actually witnessed the lockup now:
+- the screen does *not* turn off as part of the lockup
+- initially the keyboard was non-responsive
+- after a few seconds of use the jmouse stopped responding
+- was able to momentarily reconnect the bluetooth mouse and then it
+too stopped responding
 
-On 19/08/2015 19:11, Loic Poulain wrote:
-> A platform device can be used to provide some specific resources in
-> order to manage the controller. In this first patch we retrieve the
-> reset gpio which is used to power on/off the controller.
-
-Is there a patch with the DT documentation? It would be interesting to see =
-what DT maintainers think of this approach.
-
+On Wed, Aug 19, 2015 at 1:04 PM, Jamin Collins <jamin.collins@gmail.com> wrote:
+> I've recently started experiencing what appear to be hard lockups on
+> what has otherwise been a very solid system (Lenovo W530 Thinkpad).
+> I'm running a fully updated Arch Linux install on it, and have been
+> for a few months (since roughly April of this year).  Just before
+> experiencing these lockups I started using a bluetooth mouse.
 >
-> The main issue is to match the current tty with the correct pdev.
-> In case of ACPI, we can easily find the right tty/pdev pair because
-> they are both child of the same UART port.
-> In case of device tree, there is currently nothing to link the pdev
-> with its tty. So, we just match the first available pdev.
-
-That allows you to run with a single device per platform only. Meanwhile, y=
-ou could have something in the DT parameters identifying the UART. You woul=
-d then be able to retrieve that parameter and match it against the tty in t=
-he BT protocol. Multiple devices per platform would then be supported.
-
-Thanks,
- -Ilya
-
+> When the apparent lockup occurs:
+> - the laptop screen seems to be off (no display)
+> - the CPU fan is running at a moderate speed (not the slowest, and not
+> the fastest)
+> - no apparent disk activity
+> - nothing in journalctl (when I hard reset I find only a gap, last
+> entry hours before)
+> - unresponsive to network requests (ping, etc)
 >
-> If controller is powered-on from the driver, we need to wait for a
-> HCI boot event before being able to send any command.
+> The only way I've found to recover the system thus far is a hard reset
+> (hold power for 4+ seconds).
 >
-> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
-> ---
->   drivers/bluetooth/hci_intel.c | 275 +++++++++++++++++++++++++++++++++++=
-++++---
->   1 file changed, 255 insertions(+), 20 deletions(-)
-Apply over: Bluetooth: hci_uart: Add Intel baudrate configuration support
-
-Regards,
-Loic
-
---=20
-Intel Open Source Technology Center
-http://oss.intel.com/
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" =
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> I know it involves bluetooth being on, possibly requires having
+> connected a device, and then some indeterminate amount of time away
+> from the system (lack of user interaction).  I'm currently testing
+> with bluetooth on, but no device connected to see if the issue occurs.
+>
+> The kernel in question:
+> Linux version 4.1.5-1-ARCH (builduser@tobias) (gcc version 5.2.0 (GCC)
+> ) #1 SMP PREEMPT Tue Aug 11 15:41:14 CEST 2015
+>
+> Bluetooth:
+> Bluetooth daemon 5.33
+>
+> The bluetooth device I've been using is a Thinkpad Bluetooth Laser Mouse:
+> ThinkPad Bluetooth Laser Mouse as
+> /devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.4/1-1.4:1.0/bluetooth/hci0/hci0:11/0005:17EF:6002.0001/input/input19
+>
+> I'm not subscribed to this list, so please CC me on replies.
