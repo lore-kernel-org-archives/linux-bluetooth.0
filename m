@@ -1,32 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH] bluetooth:Make the function sco_conn_del have a return type of void
+Subject: Re: [PATCH] Bluetooth: btmrvl: change device pointer passed to dev_coredumpv
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1439947381-11251-1-git-send-email-xerofoify@gmail.com>
-Date: Wed, 19 Aug 2015 16:09:53 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Message-Id: <8A2DFDCC-6061-4342-A5EA-4564AE362E9A@holtmann.org>
-References: <1439947381-11251-1-git-send-email-xerofoify@gmail.com>
-To: Nicholas Krause <xerofoify@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1439979139-15930-1-git-send-email-akarwar@marvell.com>
+Date: Wed, 19 Aug 2015 16:07:30 -0700
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Shengzhen Li <szli@marvell.com>
+Message-Id: <DC28FCCA-AAF2-415E-BAD3-4B956C6C3DD4@holtmann.org>
+References: <1439979139-15930-1-git-send-email-akarwar@marvell.com>
+To: Amitkumar Karwar <akarwar@marvell.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nicholas,
+Hi Amitkumar,
 
-> This makes the function sco_conn_del have a return type of void now
-> due to this function always running successfully and thus never
-> needing to signal its caller when a non recoverable internal failure
-> occurs by returning a error code to its respective caller.
+> This change ensures we will get driver name as 'btmrvl_sdio'
+> in udev event.
 > 
-> Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
+> Signed-off-by: Shengzhen Li <szli@marvell.com>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 > ---
-> net/bluetooth/sco.c | 5 ++---
-> 1 file changed, 2 insertions(+), 3 deletions(-)
+> drivers/bluetooth/btmrvl_sdio.c | 3 +--
+> 1 file changed, 1 insertion(+), 2 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
