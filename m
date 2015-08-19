@@ -2,8 +2,8 @@ Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 In-Reply-To: <20150818220604.05b7a862@angwin.home>
 References: <20150818220604.05b7a862@angwin.home>
-Date: Wed, 19 Aug 2015 13:10:14 +0300
-Message-ID: <CABBYNZLJQchUh7z1xCfmmuVq1Nexx3RYLB0AUq+DWUFpo-=gnw@mail.gmail.com>
+Date: Wed, 19 Aug 2015 13:10:12 +0300
+Message-ID: <CABBYNZ+CDeLAMDQqhog1MHCvMsEMHTCCspNCF7zowjQa1VWX7g@mail.gmail.com>
 Subject: Re: IdleTimeout behavior for Sony PS3 remote in Bluez 5
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: "Mark A. Haun" <haunma@keteu.org>
