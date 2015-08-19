@@ -7,36 +7,48 @@ Cc: gustavo@padovan.org,
 	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] bluetooth:Fix error checking in the function sc_dhkey_check
-Date: Tue, 18 Aug 2015 21:47:55 -0400
-Message-Id: <1439948875-19807-1-git-send-email-xerofoify@gmail.com>
+Subject: [PATCH] bluetooth:Make the function sco_conn_del have a return type of void
+Date: Tue, 18 Aug 2015 21:23:01 -0400
+Message-Id: <1439947381-11251-1-git-send-email-xerofoify@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes error checking  in the function sc_dhkey_check by
-properly checking if the internal call to the function smp_f6
-has failed by returning a error code as we must return to the
-caller immediately if this internal call fails as we cannot
+This makes the function sco_conn_del have a return type of void now
+due to this function always running successfully and thus never
+needing to signal its caller when a non recoverable internal failure
+occurs by returning a error code to its respective caller.
 
 Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
 ---
- net/bluetooth/smp.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ net/bluetooth/sco.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index ad82324..05d9814 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -1460,8 +1460,9 @@ static void sc_dhkey_check(struct smp_chan *smp)
- 	if (smp->method == REQ_OOB)
- 		memcpy(r, smp->rr, 16);
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 688a040..f315c8d 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -154,13 +154,13 @@ static void sco_chan_del(struct sock *sk, int err)
+ 	sock_set_flag(sk, SOCK_ZAPPED);
+ }
  
--	smp_f6(smp->tfm_cmac, smp->mackey, smp->prnd, smp->rrnd, r, io_cap,
--	       local_addr, remote_addr, check.e);
-+	if (smp_f6(smp->tfm_cmac, smp->mackey, smp->prnd, smp->rrnd, r, io_cap,
-+		   local_addr, remote_addr, check.e))
+-static int sco_conn_del(struct hci_conn *hcon, int err)
++static void sco_conn_del(struct hci_conn *hcon, int err)
+ {
+ 	struct sco_conn *conn = hcon->sco_data;
+ 	struct sock *sk;
+ 
+ 	if (!conn)
+-		return 0;
 +		return;
  
- 	smp_send_cmd(smp->conn, SMP_CMD_DHKEY_CHECK, sizeof(check), &check);
+ 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
+ 
+@@ -179,7 +179,6 @@ static int sco_conn_del(struct hci_conn *hcon, int err)
+ 
+ 	hcon->sco_data = NULL;
+ 	kfree(conn);
+-	return 0;
  }
+ 
+ static void __sco_chan_add(struct sco_conn *conn, struct sock *sk, struct sock *parent)
 -- 
 2.1.4
