@@ -1,59 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Jamin Collins <jamin.collins@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Bluetooth related possible system hard lockups
-In-Reply-To: <CAG7CpCj5o6Z6zPXmotVu+tTsW8BQeRFNM8Re1MUDv-US4LUaeg@mail.gmail.com>
-References: <CAG7CpCj5o6Z6zPXmotVu+tTsW8BQeRFNM8Re1MUDv-US4LUaeg@mail.gmail.com>
-Date: Wed, 19 Aug 2015 19:54:05 -0300
-Message-ID: <87twrurisy.fsf@intel.com>
+From: Ilya Faenson <ifaenson@broadcom.com>
+To: Loic Poulain <loic.poulain@intel.com>, "marcel@holtmann.org"
+	<marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth: hci_intel: Add platform driver
+Date: Wed, 19 Aug 2015 21:17:47 +0000
+Message-ID: <E0D3336E15B58B4294723AC879BA5E94282DE5@IRVEXCHMB15.corp.ad.broadcom.com>
+References: <1440004303-27509-1-git-send-email-loic.poulain@intel.com>
+ <55D4B948.8030400@intel.com>
+In-Reply-To: <55D4B948.8030400@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jamin,
+Hi Loic,
 
-Jamin Collins <jamin.collins@gmail.com> writes:
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@v=
+ger.kernel.org] On Behalf Of Loic Poulain
+Sent: Wednesday, August 19, 2015 1:14 PM
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_intel: Add platform driver
 
-> I've recently started experiencing what appear to be hard lockups on
-> what has otherwise been a very solid system (Lenovo W530 Thinkpad).
-> I'm running a fully updated Arch Linux install on it, and have been
-> for a few months (since roughly April of this year).  Just before
-> experiencing these lockups I started using a bluetooth mouse.
+
+On 19/08/2015 19:11, Loic Poulain wrote:
+> A platform device can be used to provide some specific resources in
+> order to manage the controller. In this first patch we retrieve the
+> reset gpio which is used to power on/off the controller.
+
+Is there a patch with the DT documentation? It would be interesting to see =
+what DT maintainers think of this approach.
+
 >
-> When the apparent lockup occurs:
-> - the laptop screen seems to be off (no display)
-> - the CPU fan is running at a moderate speed (not the slowest, and not
-> the fastest)
-> - no apparent disk activity
-> - nothing in journalctl (when I hard reset I find only a gap, last
-> entry hours before)
-> - unresponsive to network requests (ping, etc)
+> The main issue is to match the current tty with the correct pdev.
+> In case of ACPI, we can easily find the right tty/pdev pair because
+> they are both child of the same UART port.
+> In case of device tree, there is currently nothing to link the pdev
+> with its tty. So, we just match the first available pdev.
+
+That allows you to run with a single device per platform only. Meanwhile, y=
+ou could have something in the DT parameters identifying the UART. You woul=
+d then be able to retrieve that parameter and match it against the tty in t=
+he BT protocol. Multiple devices per platform would then be supported.
+
+Thanks,
+ -Ilya
+
 >
-> The only way I've found to recover the system thus far is a hard reset
-> (hold power for 4+ seconds).
+> If controller is powered-on from the driver, we need to wait for a
+> HCI boot event before being able to send any command.
 >
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> ---
+>   drivers/bluetooth/hci_intel.c | 275 +++++++++++++++++++++++++++++++++++=
+++++---
+>   1 file changed, 255 insertions(+), 20 deletions(-)
+Apply over: Bluetooth: hci_uart: Add Intel baudrate configuration support
 
-Without more information (the backtrace of the crash, from the kernel
-logs or even a picture of the screen showing the crash dump), it is hard
-to be sure. I can only guess.
+Regards,
+Loic
 
-This looks like this issue (for one colleague on a very similar setup as
-yours, it was the case):
+--=20
+Intel Open Source Technology Center
+http://oss.intel.com/
 
-http://thread.gmane.org/gmane.linux.kernel.input/45023
-
-I just checked, that patch is in the stable queue, and for little it
-missed the 4.1.6 deadline, but it should appear on 4.1.7 (if it is
-released) or 4.2 (for sure).
-
-You can also apply that patch locally and see if solves your problem,
-or you can give the input subsystem kernel tree a try:
-
-https://git.kernel.org/cgit/linux/kernel/git/jikos/hid.git
-
-
-Cheers,
 --
-Vinicius
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" =
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
