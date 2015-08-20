@@ -1,95 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nicholas Krause <xerofoify@gmail.com>
-To: marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] bluetooth:Fix variable assignment for internal function returns in the function l2cap_bredr_sig_cmd
-Date: Thu, 20 Aug 2015 18:03:52 -0400
-Message-Id: <1440108232-22865-1-git-send-email-xerofoify@gmail.com>
+Message-ID: <55D5FC4B.6070003@broadcom.com>
+Date: Thu, 20 Aug 2015 18:11:55 +0200
+From: Arend van Spriel <arend@broadcom.com>
+MIME-Version: 1.0
+To: Ilya Faenson <ifaenson@broadcom.com>, Loic Poulain
+	<loic.poulain@intel.com>, "marcel@holtmann.org" <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: hci_intel: Add platform driver
+References: <1440004303-27509-1-git-send-email-loic.poulain@intel.com> <55D4B948.8030400@intel.com> <E0D3336E15B58B4294723AC879BA5E94282DE5@IRVEXCHMB15.corp.ad.broadcom.com> <55D596A9.5090303@intel.com> <E0D3336E15B58B4294723AC879BA5E94282F3E@IRVEXCHMB15.corp.ad.broadcom.com>
+In-Reply-To: <E0D3336E15B58B4294723AC879BA5E94282F3E@IRVEXCHMB15.corp.ad.broadcom.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes all internal functions that can return a error code to
-properly signal this to the caller of the function l2cap_bredr_sig_cmd
-by making their return value equal to the variable err before returning
-to the caller of the function l2cap_bredr_sig_cmd with this value
-as to allow us to correctly signal when a failure has occurred when
-calling this particular function.
+On 08/20/2015 02:42 PM, Ilya Faenson wrote:
+> Hi Loic,
+>
+> -----Original Message-----
+> From: Loic Poulain [mailto:loic.poulain@intel.com]
+> Sent: Thursday, August 20, 2015 4:58 AM
+> To: Ilya Faenson; marcel@holtmann.org
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH] Bluetooth: hci_intel: Add platform driver
+>
+> Thanks Ilya,
+>
+>> Is there a patch with the DT documentation? It would be interesting to see what DT maintainers think of this approach.
+> I don't have any documentation for now.
+>
+>> That allows you to run with a single device per platform only. Meanwhile, you could have something in the DT parameters identifying the UART. You would then be able to retrieve that parameter and match it against the tty in the BT protocol. Multiple devices per platform would then be supported.
+> Actually It supports multiple chips but takes them in the registered order.
+> But, I agree, it's not a correct way to do that.
+> I'm not a DT expert but I think we can do this match in the same way as
+> acpi.
+> It just requires to make the Bluetooth entry a child of the serial port
+> entry.
+>
+> for example:
+>
+> In dtsi you could have the usual uart description:
+> uart1: serial@1 {
+>           compatible = "vendor,vendor-uart";
+>           reg = <0x4806a000 0x100>;
+>           interrupts = <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>;
+>           clock-frequency = <48000000>;
+>           ...
+> };
+>
+> And in the dts overlay, just add the device as a child node:
+> uart1: serial@1 {
+>           bt-vendor {
+>                   compatible = "vendor,bt-vendor";
+>                   reset-gpio = <&pmx_gpio 77 0 >;
+>                   interrupts = < 2 VENDOR_IRQ_TYPE_EDGE_FALLING >;
+>                   ...
+>           }
+> }
+>
+> I think it's a good way to link the tty with the pdev and there is no
+> specific label to add and document.
+>
+> What do you think about this?
+>
+> I'm not specially against adding a parameter (vendor,tty = "ttys1").
+> But it means that you need to be sure that your serial will be always
+> named "ttys1", if someone remove/disable/add a serial port in a dts/dtsi, it
+> can shift the tty number assigned by the driver.
+>
+> IF: All good ideas, Loic. I initially wanted BT DT configuration to be "like ACPI" too. The response from the DT maintainer was "DT's not ACPI". He essentially wanted us to describe the whole combo chip as a device with BT being one of the sub-devices. The point was that BT/WiFi/GPS/NFC/FM/whatever are dependent on each other and on some properties of the whole chip, say on power or clock. There is some truth to that but I believe the BT relationship to the UART is of more relevance to its driver than to the rest of the overall chip. In any case, we were not able to find common ground (no response to my last couple of messages) resulting in a customer not using bluetooth-next for that BT device integration. I guess DT has its own interests and seems to care little about BlueZ. I hope therefore that the second similar request from the major hardware vendor (you guys) will make DT more cooperative. All hardware vendors will then be able to benefit from whatever scheme gets ac
+ cepted. T
+o
+>    make a long story short, I encourage you to start including DT in your patches. :-)
 
-Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
----
- net/bluetooth/l2cap_core.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Hi Ilya,
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 45fffa4..23a885d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5319,7 +5319,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 
- 	switch (cmd->code) {
- 	case L2CAP_COMMAND_REJ:
--		l2cap_command_rej(conn, cmd, cmd_len, data);
-+		err = l2cap_command_rej(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_CONN_REQ:
-@@ -5328,7 +5328,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 
- 	case L2CAP_CONN_RSP:
- 	case L2CAP_CREATE_CHAN_RSP:
--		l2cap_connect_create_rsp(conn, cmd, cmd_len, data);
-+		err = l2cap_connect_create_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_CONF_REQ:
-@@ -5336,7 +5336,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_CONF_RSP:
--		l2cap_config_rsp(conn, cmd, cmd_len, data);
-+		err = l2cap_config_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_DISCONN_REQ:
-@@ -5344,7 +5344,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_DISCONN_RSP:
--		l2cap_disconnect_rsp(conn, cmd, cmd_len, data);
-+		err = l2cap_disconnect_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_ECHO_REQ:
-@@ -5359,7 +5359,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_INFO_RSP:
--		l2cap_information_rsp(conn, cmd, cmd_len, data);
-+		err =  l2cap_information_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_CREATE_CHAN_REQ:
-@@ -5371,7 +5371,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_MOVE_CHAN_RSP:
--		l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
-+		err = l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_MOVE_CHAN_CFM:
-@@ -5379,7 +5379,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_MOVE_CHAN_CFM_RSP:
--		l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
-+		err = l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	default:
--- 
-2.1.4
+Based on DT maintainer (Rob Herring?) I sent a couple of proposals after 
+which we ended up with the second option as shown above or at least that 
+was my understanding (see [1]).
+
+Regards,
+Arend
+
+[1] http://article.gmane.org/gmane.linux.bluez.kernel/63216
+
+> Regards,
+> Loic
+>
