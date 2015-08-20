@@ -1,97 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Loic Poulain <loic.poulain@intel.com>, "marcel@holtmann.org"
-	<marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: hci_intel: Add platform driver
-Date: Thu, 20 Aug 2015 12:42:30 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E94282F3E@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1440004303-27509-1-git-send-email-loic.poulain@intel.com>
- <55D4B948.8030400@intel.com>
- <E0D3336E15B58B4294723AC879BA5E94282DE5@IRVEXCHMB15.corp.ad.broadcom.com>
- <55D596A9.5090303@intel.com>
-In-Reply-To: <55D596A9.5090303@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Date: Thu, 20 Aug 2015 12:32:57 +0200
+From: Antonio Ospite <ao2@ao2.it>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "Mark A. Haun" <haunma@keteu.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	David Herrmann <dh.herrmann@googlemail.com>
+Subject: Re: IdleTimeout behavior for Sony PS3 remote in Bluez 5
+Message-Id: <20150820123257.9da221075f808f322b02dce8@ao2.it>
+In-Reply-To: <CABBYNZ+w2EiecMLp-NjA59u=LVsSD4TxCqLZB-zmWXFsaDi=pw@mail.gmail.com>
+References: <20150818220604.05b7a862@angwin.home>
+	<CABBYNZLJQchUh7z1xCfmmuVq1Nexx3RYLB0AUq+DWUFpo-=gnw@mail.gmail.com>
+	<CABBYNZ+qjOtB4=qba6DF+KY5wiYnhCFcMX4fPSrHRrVDx0R04w@mail.gmail.com>
+	<20150819161441.GA8142@hau.nz>
+	<CABBYNZK_Vy+o_XN9RSGrMVbnEMt=BHAkmpoyFmv5bK0PwCnXJw@mail.gmail.com>
+	<20150819220231.58a3b14f@angwin.home>
+	<CABBYNZ+w2EiecMLp-NjA59u=LVsSD4TxCqLZB-zmWXFsaDi=pw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi,
 
------Original Message-----
-From: Loic Poulain [mailto:loic.poulain@intel.com]=20
-Sent: Thursday, August 20, 2015 4:58 AM
-To: Ilya Faenson; marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_intel: Add platform driver
+I helped with the kernel HID driver, but I do not know much about the
+bluetooth side of the story, some comments below tho.
 
-Thanks Ilya,
+On Thu, 20 Aug 2015 11:52:02 +0300
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 
-> Is there a patch with the DT documentation? It would be interesting to se=
-e what DT maintainers think of this approach.
-I don't have any documentation for now.
+> Hi Mark,
+> 
+> On Thu, Aug 20, 2015 at 8:02 AM, Mark A. Haun <haunma@keteu.org> wrote:
+> > Hi Luiz and the group,
+> >
+> > I captured a debug log from bluetoothd while testing the PS3 remote.  I'm not
+> > sure it sheds any light on what is happening though.  When the timeout occurs
+> > and the input device goes away, there is no log output from bluetoothd or the
+> > kernel.
+> >
+> > Here is the same test sequence as in my original post, with the bluetoothd
+> > lots interspersed:
+> >
+> > Press a key (or two) on the remote when it is not connected:
+> >
+> > Aug 19 21:04:13 kolonia bluetoothd[11186]: src/adapter.c:connected_callback() hci0 device 00:21:4F:48:D1:D2 connected eir_len 5
+> > Aug 19 21:04:13 kolonia bluetoothd[11186]: profiles/input/server.c:connect_event_cb() Incoming connection from 00:21:4F:48:D1:D2 on PSM 17
+> > Aug 19 21:04:13 kolonia bluetoothd[11186]: profiles/input/device.c:input_device_set_channel() idev 0x7ff49ff8 psm 17
+> > Aug 19 21:04:13 kolonia bluetoothd[11186]: profiles/input/server.c:confirm_event_cb()
+> > Aug 19 21:04:13 kolonia bluetoothd[11186]: profiles/input/server.c:connect_event_cb() Incoming connection from 00:21:4F:48:D1:D2 on PSM 19
+> > Aug 19 21:04:13 kolonia bluetoothd[11186]: profiles/input/device.c:input_device_set_channel() idev 0x7ff49ff8 psm 19
+> > Aug 19 21:04:13 kolonia bluetoothd[11186]: src/service.c:change_state() 0x7ff484a8: device 00:21:4F:48:D1:D2 profile input-hid state changed: disconnected -> connected (0)
+> > Aug 19 21:04:13 kolonia bluetoothd[11186]: src/service.c:btd_service_ref() 0x7ff484a8: ref=3
+> > Aug 19 21:04:13 kolonia bluetoothd[11186]: plugins/policy.c:service_cb() Added input-hid reconnect 0
+> > Aug 19 21:04:13 kolonia kernel: [1244066.144277] input: BD Remote Control as /devices/soc0/7d004000.usb/usb1/1-1/1-1:1.0/bluetooth/hci0/hci0:256/0005:054C:0306.0006/input/input8
+> > Aug 19 21:04:13 kolonia kernel: [1244066.158238] sony 0005:054C:0306.0006: input,hidraw1: BLUETOOTH HID v1.00 Gamepad [BD Remote Control] on ac:fd:ce:76:f2:4a
+> >
+> > Input device is created; can run evemu-record and watch keypress events on
+> > the remote.  After one minute of inactivity, the remote is still sending
+> > packets (which can be seen in the hciconfig packet counter), but the kernel
+> > input device has gone away.  No new messages in dmesg or in the bluetoothd
+> > log at this time :(
+> >
+> > <Time passes...>
+> >
+> > Remote is still connected.  Forcibly disconnect using "hcitool dc 00:21:4f:48:d1:d2":
+>
 
-> That allows you to run with a single device per platform only. Meanwhile,=
- you could have something in the DT parameters identifying the UART. You wo=
-uld then be able to retrieve that parameter and match it against the tty in=
- the BT protocol. Multiple devices per platform would then be supported.
-Actually It supports multiple chips but takes them in the registered order.
-But, I agree, it's not a correct way to do that.
-I'm not a DT expert but I think we can do this match in the same way as=20
-acpi.
-It just requires to make the Bluetooth entry a child of the serial port=20
-entry.
+This makes me think that a udev rule can detect the kernel input device
+disconnection, and then force the bluetooth disconnection.
 
-for example:
+[...]
+> > and we can again see keypresses in evemu-record, until the next timeout.
+> >
+> > About your other questions,
+> >
+> >> > The PS3 remote is definitely one of those broken devices.  During
+> >> > bluez 4.xx there were a set of unofficial patches maintained at
+> >> > kitlaan.twinaxis.com (now defunct).
+> >>
+> >> Patches to what exactly, BlueZ userspace, kernel?
+> >
+> > They were patches to the bluez userspace distribution.  Much of it was
+> > non-essential: timeout in seconds rather than minutes, and key-code
+> > mapping for ease of integration with media software.  Details here:
+> > https://www.mythtv.org/wiki/Sony_PS3_BD_Remote
+> >
+> >> Note that using IdleTimeout affects every single HID that you connect
+> >> over Bluetooth, which is why I think this is in the wrong place, it
+> >> should probably be up to the PS3 remote driver to implement such
+> >> policy to disconnect on idle. Either way I don't see another option
+> >> other then to set the socket err so userspace can cleanup it own
+> >> reference to the socket.
+> >
+> > By "PS3 remote driver" you mean adding an exception for the Sony remote
+> > in the evdev driver?  Because I don't think there is a PS3 remote driver
+> > per se.  It's just a generic HID.
+> 
+> I think we might have a driver for PS3 after all, you can see from
+> dmesg that it is detected as a Gamepad [BD Remote Control] or is that
+> just the game of the device?
+>
 
-In dtsi you could have the usual uart description:
-uart1: serial@1 {
-         compatible =3D "vendor,vendor-uart";
-         reg =3D <0x4806a000 0x100>;
-         interrupts =3D <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>;
-         clock-frequency =3D <48000000>;
-         ...
-};
+There is a HID driver, because the original descriptor had to be
+overridden in order to get useful events, but it's just HID, no
+explicit dependencies on input or bluetooth.
 
-And in the dts overlay, just add the device as a child node:
-uart1: serial@1 {
-         bt-vendor {
-                 compatible =3D "vendor,bt-vendor";
-                 reset-gpio =3D <&pmx_gpio 77 0 >;
-                 interrupts =3D < 2 VENDOR_IRQ_TYPE_EDGE_FALLING >;
-                 ...
-         }
-}
+[...]
+> > I don't know enough to understand what this was doing, but I see that
+> > the source was heavily reworked in kernel 3.10...  If someone could
+> > craft a patch against recent kernels (4.2) I would be happy to test
+> > it.  As bluez 5 rolls out to more distros, I imagine there will be
+> > more users wanting to know why their remote is broken :)
+> 
+> Well you are the first one to complain, so either people are stuck
+> with very only kernel or they don't care if the controller stay always
+> connected.
+>
 
-I think it's a good way to link the tty with the pdev and there is no
-specific label to add and document.
+Or they just remove the batteries when not using the remote, and are
+even thinking about adding a physical ON/OFF switch to the remote...
 
-What do you think about this?
+Ciao,
+   Antonio
 
-I'm not specially against adding a parameter (vendor,tty =3D "ttys1").
-But it means that you need to be sure that your serial will be always
-named "ttys1", if someone remove/disable/add a serial port in a dts/dtsi, i=
-t
-can shift the tty number assigned by the driver.
+-- 
+Antonio Ospite
+http://ao2.it
 
-IF: All good ideas, Loic. I initially wanted BT DT configuration to be "lik=
-e ACPI" too. The response from the DT maintainer was "DT's not ACPI". He es=
-sentially wanted us to describe the whole combo chip as a device with BT be=
-ing one of the sub-devices. The point was that BT/WiFi/GPS/NFC/FM/whatever =
-are dependent on each other and on some properties of the whole chip, say o=
-n power or clock. There is some truth to that but I believe the BT relation=
-ship to the UART is of more relevance to its driver than to the rest of the=
- overall chip. In any case, we were not able to find common ground (no resp=
-onse to my last couple of messages) resulting in a customer not using bluet=
-ooth-next for that BT device integration. I guess DT has its own interests =
-and seems to care little about BlueZ. I hope therefore that the second simi=
-lar request from the major hardware vendor (you guys) will make DT more coo=
-perative. All hardware vendors will then be able to benefit from whatever s=
-cheme gets accepted. To make a long story short, I encourage you to start i=
-ncluding DT in your patches. :-)
-
-Regards,
-Loic
-
---=20
-Intel Open Source Technology Center
-http://oss.intel.com/
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
