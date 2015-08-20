@@ -1,116 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH ] monitor/avctp: Fix GetFolderItems field values
-Date: Thu, 20 Aug 2015 14:32:05 +0530
-Message-id: <1440061325-32588-1-git-send-email-bharat.panda@samsung.com>
+From: "Ge, Ethan" <ethan.ge@intel.com>
+To: "Mark A. Haun" <haunma@keteu.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: Intel 7260 spontaneous USB disconnect/reconnect every 23h18m07s
+Date: Thu, 20 Aug 2015 07:57:28 +0000
+Message-ID: <86D221DC0B85F94D9B05B97827669A34064C4EF7@PGSMSX106.gar.corp.intel.com>
+References: <20150819222049.15ca98f0@angwin.home>
+In-Reply-To: <20150819222049.15ca98f0@angwin.home>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replaced field names for GetFolderItems response with
-correct names, values and fix allignments.
+Hi Mark,
 
-      AVCTP Browsing: Response: type 0x00 label 0 PID 0x110e
-        AVRCP: GetFolderItems: len 0x0030
-          Status: 0x04 (Success)
-          UIDCounter: 0x0000 (0)
-          NumOfItems: 0x0001 (1)
-          Item: 0x01 (Media Player)
-          Length: 0x0028 (40)
-          PlayerID: 0x0000 (0)
-          PlayerType: 0x0001 (Audio)
-          PlayerSubType: 0x00000001 (Audio Book)
-          PlayStatus: 0x01 (PLAYING)
-          Features: 0x0000000000b701ef0200000000000000
-          CharsetID: 0x006a (UTF-8)
-          NameLength: 0x000c (12)
-          Name: SimplePlayer
----
- monitor/avctp.c | 28 +++++++++++++++++-----------
- 1 file changed, 17 insertions(+), 11 deletions(-)
+Your Intel FW version hci0: read Intel version: 3707100180012d0d06, it's too old. Please try latest Intel WP2 FW Ibt-hw-37.7.10-fw-1.80.1.2d.d.bseq in linux-firmware/intel.
 
-diff --git a/monitor/avctp.c b/monitor/avctp.c
-index a54b051..d06640e 100644
---- a/monitor/avctp.c
-+++ b/monitor/avctp.c
-@@ -1818,9 +1818,9 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
- {
- 	struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
- 	uint16_t id, charset, namelen;
--	uint8_t type, status;
-+	uint8_t type, status, i;
- 	uint32_t subtype;
--	uint64_t features[2];
-+	uint8_t features[16];
- 
- 	if (!l2cap_frame_get_be16(frame, &id))
- 		return false;
-@@ -1830,26 +1830,31 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
- 	if (!l2cap_frame_get_u8(frame, &type))
- 		return false;
- 
--	print_field("%*cPlayerID: 0x%04x (%s)", indent, ' ',
-+	print_field("%*cPlayerType: 0x%04x (%s)", indent, ' ',
- 						type, playertype2str(type));
- 
- 	if (!l2cap_frame_get_be32(frame, &subtype))
- 		return false;
- 
--	print_field("%*cPlayerID: 0x%08x (%s)", indent, ' ',
-+	print_field("%*cPlayerSubType: 0x%08x (%s)", indent, ' ',
- 					subtype, playersubtype2str(subtype));
- 
- 	if (!l2cap_frame_get_u8(frame, &status))
- 		return false;
- 
--	print_field("%*cPlayerID: 0x%02x (%s)", indent, ' ',
-+	print_field("%*cPlayStatus: 0x%02x (%s)", indent, ' ',
- 						status, playstatus2str(status));
- 
--	if (!l2cap_frame_get_be128(frame, &features[0], &features[1]))
--		return false;
-+	printf("%*cFeatures: 0x", indent+8, ' ');
-+
-+	for (i = 0; i < 16; i++) {
-+		if (!l2cap_frame_get_u8(frame, &features[i]))
-+			return false;
- 
--	print_field("%*cFeatures: 0x%16" PRIx64 "%16" PRIx64, indent, ' ',
--						features[1], features[0]);
-+		printf("%02x", features[i]);
-+	}
-+
-+	printf("\n");
- 
- 	if (!l2cap_frame_get_be16(frame, &charset))
- 		return false;
-@@ -1863,7 +1868,7 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
- 	print_field("%*cNameLength: 0x%04x (%u)", indent, ' ',
- 						namelen, namelen);
- 
--	printf("%*cName: ", indent, ' ');
-+	printf("%*cName: ", indent+8, ' ');
- 	for (; namelen > 0; namelen--) {
- 		uint8_t c;
- 
-@@ -1871,6 +1876,7 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
- 			return false;
- 		printf("%1c", isprint(c) ? c : '.');
- 	}
-+	printf("\n");
- 
- 	return true;
- }
-@@ -2296,7 +2302,7 @@ response:
- 	if (!l2cap_frame_get_be16(frame, &num))
- 		return false;
- 
--	print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ', num, num);
-+	print_field("%*cNumOfItems: 0x%04x (%u)", indent, ' ', num, num);
- 
- 	for (; num > 0; num--) {
- 		uint8_t type;
--- 
-1.9.1
+Ethan
+-----Original Message-----
+From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Mark A. Haun
+Sent: Thursday, August 20, 2015 1:21 PM
+To: linux-bluetooth@vger.kernel.org
+Subject: Intel 7260 spontaneous USB disconnect/reconnect every 23h18m07s
 
+I have a late-model Intel 7260 wifi/bluetooth mini-PCIE card plugged into my Nvidia Jetson board.  Bluetooth is basically working, but I've noticed the following odd pattern in my logs:
+
+(previous 12 days omitted for brevity; pattern is same as below)
+
+[...]
+
+Aug 16 03:33:00 kolonia kernel: [921790.543197] usb 1-1: USB disconnect, device number 12 Aug 16 03:33:00 kolonia kernel: [921790.761151] usb 1-1: new full-speed USB device number 13 using tegra-ehci Aug 16 03:33:00 kolonia kernel: [921790.889599] usb 1-1: New USB device found, idVendor=8087, idProduct=07dc Aug 16 03:33:00 kolonia kernel: [921790.896428] usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0 Aug 16 03:33:00 kolonia kernel: [921790.922681] Bluetooth: hci0: read Intel version: 3707100180012d0d06 Aug 16 03:33:00 kolonia kernel: [921790.929091] Bluetooth: hci0: Intel device is already patched. patch num: 06 Aug 16 03:33:00 kolonia bluetoothd[1888]: Sap driver initialization failed.
+Aug 16 03:33:00 kolonia bluetoothd[1888]: sap-server: Operation not permitted (1) Aug 16 03:33:00 kolonia bluetoothd[1888]: Failed to set mode: Busy (0x0a)
+
+[...]
+
+Aug 18 02:09:13 kolonia kernel: [1089565.056222] usb 1-1: USB disconnect, device number 13 Aug 18 02:09:13 kolonia kernel: [1089565.271214] usb 1-1: new full-speed USB device number 14 using tegra-ehci Aug 18 02:09:13 kolonia kernel: [1089565.400011] usb 1-1: New USB device found, idVendor=8087, idProduct=07dc Aug 18 02:09:13 kolonia kernel: [1089565.406942] usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0 Aug 18 02:09:13 kolonia kernel: [1089565.431982] Bluetooth: hci0: read Intel version: 3707100180012d0d06 Aug 18 02:09:13 kolonia kernel: [1089565.438483] Bluetooth: hci0: Intel device is already patched. patch num: 06 Aug 18 02:09:13 kolonia bluetoothd[1888]: Sap driver initialization failed.
+Aug 18 02:09:13 kolonia bluetoothd[1888]: sap-server: Operation not permitted (1) Aug 18 02:09:13 kolonia bluetoothd[1888]: Failed to set mode: Busy (0x0a)
+
+[...]
+
+Aug 19 01:27:20 kolonia kernel: [1173452.517103] usb 1-1: USB disconnect, device number 14 Aug 19 01:27:20 kolonia kernel: [1173452.734122] usb 1-1: new full-speed USB device number 15 using tegra-ehci Aug 19 01:27:20 kolonia kernel: [1173452.865078] usb 1-1: New USB device found, idVendor=8087, idProduct=07dc Aug 19 01:27:20 kolonia kernel: [1173452.872018] usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0 Aug 19 01:27:20 kolonia kernel: [1173452.899169] Bluetooth: hci0: read Intel version: 3707100180012d0d06 Aug 19 01:27:20 kolonia kernel: [1173452.905689] Bluetooth: hci0: Intel device is already patched. patch num: 06 Aug 19 01:27:20 kolonia bluetoothd[1888]: Sap driver initialization failed.
+Aug 19 01:27:20 kolonia bluetoothd[1888]: sap-server: Operation not permitted (1) Aug 19 01:27:20 kolonia bluetoothd[1888]: Failed to set mode: Busy (0x0a)
+
+The interval is very consistent at 23 hours, 18 minutes, and 7 seconds, plus or minus a second.  This happens almost every day, but you can see it skipped August 17th for some reason.  In that case the interval was exactly 2x, i.e.
+the pattern continues.
+
+Any idea why this would be happening?  It doesn't seem to have any adverse effects, but I like a good mystery.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in the body of a message to majordomo@vger.kernel.org More majordomo info at  http://vger.kernel.org/majordomo-info.html
