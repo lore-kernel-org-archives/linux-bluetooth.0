@@ -1,127 +1,150 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH  2/2] audio/avrcp: Set Media Player Properties
-Date: Thu, 20 Aug 2015 14:33:10 +0530
-Message-id: <1440061390-32664-2-git-send-email-bharat.panda@samsung.com>
-In-reply-to: <1440061390-32664-1-git-send-email-bharat.panda@samsung.com>
-References: <1440061390-32664-1-git-send-email-bharat.panda@samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <20150819220231.58a3b14f@angwin.home>
+References: <20150818220604.05b7a862@angwin.home>
+	<CABBYNZLJQchUh7z1xCfmmuVq1Nexx3RYLB0AUq+DWUFpo-=gnw@mail.gmail.com>
+	<CABBYNZ+qjOtB4=qba6DF+KY5wiYnhCFcMX4fPSrHRrVDx0R04w@mail.gmail.com>
+	<20150819161441.GA8142@hau.nz>
+	<CABBYNZK_Vy+o_XN9RSGrMVbnEMt=BHAkmpoyFmv5bK0PwCnXJw@mail.gmail.com>
+	<20150819220231.58a3b14f@angwin.home>
+Date: Thu, 20 Aug 2015 11:52:02 +0300
+Message-ID: <CABBYNZ+w2EiecMLp-NjA59u=LVsSD4TxCqLZB-zmWXFsaDi=pw@mail.gmail.com>
+Subject: Re: IdleTimeout behavior for Sony PS3 remote in Bluez 5
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Mark A. Haun" <haunma@keteu.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	David Herrmann <dh.herrmann@googlemail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add methods to set missing media player properties value, like
-player name, type, sub-type and features.
----
- profiles/audio/media.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 81 insertions(+)
+Hi Mark,
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index ed441d0..f55ecc1 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -112,6 +112,10 @@ struct media_player {
- 	bool			next;
- 	bool			previous;
- 	bool			control;
-+	char			*name;
-+	char			*type;
-+	char			*subtype;
-+	unsigned int		features[16];
- };
- 
- static GSList *adapters = NULL;
-@@ -1607,6 +1611,71 @@ static gboolean set_flag(struct media_player *mp, DBusMessageIter *iter,
- 	return TRUE;
- }
- 
-+static gboolean set_name(struct media_player *mp, DBusMessageIter *iter)
-+{
-+	const char *value;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
-+
-+	if (g_strcmp0(mp->name, value) == 0)
-+		return TRUE;
-+
-+	mp->name = g_strdup(value);
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_type(struct media_player *mp, DBusMessageIter *iter)
-+{
-+	const char *value;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
-+
-+	mp->type = g_strdup(value);
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_features(struct media_player *mp, DBusMessageIter *iter)
-+{
-+	const char *value;
-+	uint8_t i = 0;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
-+
-+	memset(&mp->features, 0x00, 16);
-+
-+	while ((i < (strlen(value)/2))) {
-+		sscanf(value+(2*i), "%02x", &mp->features[i]);
-+		i++;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean set_subtype(struct media_player *mp, DBusMessageIter *iter)
-+{
-+	const char *value;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
-+
-+	mp->subtype = g_strdup(value);
-+
-+	return TRUE;
-+}
-+
- static gboolean set_player_property(struct media_player *mp, const char *key,
- 							DBusMessageIter *entry)
- {
-@@ -1647,6 +1716,18 @@ static gboolean set_player_property(struct media_player *mp, const char *key,
- 	if (strcasecmp(key, "CanControl") == 0)
- 		return set_flag(mp, &var, &mp->control);
- 
-+	if (strcasecmp(key, "DisplayName") == 0)
-+		return set_name(mp, &var);
-+
-+	if (strcasecmp(key, "Type") == 0)
-+		return set_type(mp, &var);
-+
-+	if (strcasecmp(key, "SubType") == 0)
-+		return set_subtype(mp, &var);
-+
-+	if (strcasecmp(key, "Features") == 0)
-+		return set_features(mp, &var);
-+
- 	DBG("%s not supported, ignoring", key);
- 
- 	return TRUE;
+On Thu, Aug 20, 2015 at 8:02 AM, Mark A. Haun <haunma@keteu.org> wrote:
+> Hi Luiz and the group,
+>
+> I captured a debug log from bluetoothd while testing the PS3 remote.  I'm not
+> sure it sheds any light on what is happening though.  When the timeout occurs
+> and the input device goes away, there is no log output from bluetoothd or the
+> kernel.
+>
+> Here is the same test sequence as in my original post, with the bluetoothd
+> lots interspersed:
+>
+> Press a key (or two) on the remote when it is not connected:
+>
+> Aug 19 21:04:13 kolonia bluetoothd[11186]: src/adapter.c:connected_callback() hci0 device 00:21:4F:48:D1:D2 connected eir_len 5
+> Aug 19 21:04:13 kolonia bluetoothd[11186]: profiles/input/server.c:connect_event_cb() Incoming connection from 00:21:4F:48:D1:D2 on PSM 17
+> Aug 19 21:04:13 kolonia bluetoothd[11186]: profiles/input/device.c:input_device_set_channel() idev 0x7ff49ff8 psm 17
+> Aug 19 21:04:13 kolonia bluetoothd[11186]: profiles/input/server.c:confirm_event_cb()
+> Aug 19 21:04:13 kolonia bluetoothd[11186]: profiles/input/server.c:connect_event_cb() Incoming connection from 00:21:4F:48:D1:D2 on PSM 19
+> Aug 19 21:04:13 kolonia bluetoothd[11186]: profiles/input/device.c:input_device_set_channel() idev 0x7ff49ff8 psm 19
+> Aug 19 21:04:13 kolonia bluetoothd[11186]: src/service.c:change_state() 0x7ff484a8: device 00:21:4F:48:D1:D2 profile input-hid state changed: disconnected -> connected (0)
+> Aug 19 21:04:13 kolonia bluetoothd[11186]: src/service.c:btd_service_ref() 0x7ff484a8: ref=3
+> Aug 19 21:04:13 kolonia bluetoothd[11186]: plugins/policy.c:service_cb() Added input-hid reconnect 0
+> Aug 19 21:04:13 kolonia kernel: [1244066.144277] input: BD Remote Control as /devices/soc0/7d004000.usb/usb1/1-1/1-1:1.0/bluetooth/hci0/hci0:256/0005:054C:0306.0006/input/input8
+> Aug 19 21:04:13 kolonia kernel: [1244066.158238] sony 0005:054C:0306.0006: input,hidraw1: BLUETOOTH HID v1.00 Gamepad [BD Remote Control] on ac:fd:ce:76:f2:4a
+>
+> Input device is created; can run evemu-record and watch keypress events on
+> the remote.  After one minute of inactivity, the remote is still sending
+> packets (which can be seen in the hciconfig packet counter), but the kernel
+> input device has gone away.  No new messages in dmesg or in the bluetoothd
+> log at this time :(
+>
+> <Time passes...>
+>
+> Remote is still connected.  Forcibly disconnect using "hcitool dc 00:21:4f:48:d1:d2":
+
+So userspace doesn't notice anything until you disconnect, right?
+
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: src/adapter.c:dev_disconnected() Device 00:21:4F:48:D1:D2 disconnected, reason 2
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: src/adapter.c:adapter_remove_connection()
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: plugins/policy.c:disconnect_cb() reason 2
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr 00:21:4F:48:D1:D2 type 0 status 0xe
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: src/device.c:device_bonding_complete() bonding (nil) status 0x0e
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: src/device.c:device_bonding_failed() status 14
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: src/adapter.c:resume_discovery()
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: profiles/input/device.c:ctrl_watch_cb() Device 00:21:4F:48:D1:D2 disconnected
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: profiles/input/device.c:intr_watch_cb() Device 00:21:4F:48:D1:D2 disconnected
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: src/service.c:change_state() 0x7ff484a8: device 00:21:4F:48:D1:D2 profile input-hid state changed: connected -> disconnected (0)
+> Aug 19 21:17:46 kolonia bluetoothd[11186]: profiles/input/device.c:input_device_enter_reconnect_mode() path=/org/bluez/hci0/dev_00_21_4F_48_D1_D2 reconnect_mode=device
+>
+> Now press keys on the remote, and it reconnects again:
+>
+> Aug 19 21:19:22 kolonia bluetoothd[11186]: src/adapter.c:connected_callback() hci0 device 00:21:4F:48:D1:D2 connected eir_len 5
+> Aug 19 21:19:22 kolonia bluetoothd[11186]: profiles/input/server.c:connect_event_cb() Incoming connection from 00:21:4F:48:D1:D2 on PSM 17
+> Aug 19 21:19:22 kolonia bluetoothd[11186]: profiles/input/device.c:input_device_set_channel() idev 0x7ff49ff8 psm 17
+> Aug 19 21:19:22 kolonia bluetoothd[11186]: profiles/input/server.c:confirm_event_cb()
+> Aug 19 21:19:22 kolonia bluetoothd[11186]: profiles/input/server.c:connect_event_cb() Incoming connection from 00:21:4F:48:D1:D2 on PSM 19
+> Aug 19 21:19:22 kolonia bluetoothd[11186]: profiles/input/device.c:input_device_set_channel() idev 0x7ff49ff8 psm 19
+> Aug 19 21:19:22 kolonia bluetoothd[11186]: src/service.c:change_state() 0x7ff484a8: device 00:21:4F:48:D1:D2 profile input-hid state changed: disconnected -> connected (0)
+> Aug 19 21:19:22 kolonia bluetoothd[11186]: plugins/policy.c:service_cb() Added input-hid reconnect 0
+> Aug 19 21:19:22 kolonia kernel: [1244975.379906] input: BD Remote Control as /devices/soc0/7d004000.usb/usb1/1-1/1-1:1.0/bluetooth/hci0/hci0:256/0005:054C:0306.0007/input/input9
+> Aug 19 21:19:22 kolonia kernel: [1244975.393392] sony 0005:054C:0306.0007: input,hidraw1: BLUETOOTH HID v1.00 Gamepad [BD Remote Control] on ac:fd:ce:76:f2:4a
+>
+> and we can again see keypresses in evemu-record, until the next timeout.
+>
+> About your other questions,
+>
+>> > The PS3 remote is definitely one of those broken devices.  During
+>> > bluez 4.xx there were a set of unofficial patches maintained at
+>> > kitlaan.twinaxis.com (now defunct).
+>>
+>> Patches to what exactly, BlueZ userspace, kernel?
+>
+> They were patches to the bluez userspace distribution.  Much of it was
+> non-essential: timeout in seconds rather than minutes, and key-code
+> mapping for ease of integration with media software.  Details here:
+> https://www.mythtv.org/wiki/Sony_PS3_BD_Remote
+>
+>> Note that using IdleTimeout affects every single HID that you connect
+>> over Bluetooth, which is why I think this is in the wrong place, it
+>> should probably be up to the PS3 remote driver to implement such
+>> policy to disconnect on idle. Either way I don't see another option
+>> other then to set the socket err so userspace can cleanup it own
+>> reference to the socket.
+>
+> By "PS3 remote driver" you mean adding an exception for the Sony remote
+> in the evdev driver?  Because I don't think there is a PS3 remote driver
+> per se.  It's just a generic HID.
+
+I think we might have a driver for PS3 after all, you can see from
+dmesg that it is detected as a Gamepad [BD Remote Control] or is that
+just the game of the device?
+
+> I agree that the blanket timeout is not a great solution but in my case
+> it would be sufficient, *if* it worked.  (I don't have any other
+> bluetooth HIDs to worry about.)
+>
+>> >> Apparently the following lines were removed in the commit
+>> >> 5205185d461d5902325e457ca80bd421127b7308:
+>> >>
+>> >> -       /* Wakeup user-space polling for socket errors */
+>> >> -       session->intr_sock->sk->sk_err = EUNATCH;
+>> >> -       session->ctrl_sock->sk->sk_err = EUNATCH;
+>> >>
+>> >> Without this I doubt the userspace will realize that it should
+>> >> release the sockets which means this as been broken for over 2
+>> >> years and probably nobody realized up until today, it is probably
+>> >> only useful when IdleTimeout is set since it is the only case
+>> >> where the module itself device to remove the device and disconnect.
+>
+> I don't know enough to understand what this was doing, but I see that
+> the source was heavily reworked in kernel 3.10...  If someone could
+> craft a patch against recent kernels (4.2) I would be happy to test
+> it.  As bluez 5 rolls out to more distros, I imagine there will be
+> more users wanting to know why their remote is broken :)
+
+Well you are the first one to complain, so either people are stuck
+with very only kernel or they don't care if the controller stay always
+connected.
+
+@David: Since apparently you was the author of the patch the remove
+setting EUNATCH to sk_err can you tell if that was intentional or you
+did not know that it could affect the timeout implementation? Btw, it
+would nice if you could comment regarding moving the timeout policy to
+the HID driver.
+
+
 -- 
-1.9.1
-
+Luiz Augusto von Dentz
