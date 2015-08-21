@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] shared/tester: Add valgrind support
-Date: Fri, 21 Aug 2015 16:51:43 +0300
-Message-Id: <1440165103-25042-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/3] build: Add support for running make check with valgrind
+Date: Fri, 21 Aug 2015 16:51:42 +0300
+Message-Id: <1440165103-25042-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1440165103-25042-1-git-send-email-luiz.dentz@gmail.com>
 References: <1440165103-25042-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,69 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This add a call to VALGRIND_DO_ADDED_LEAK_CHECK at the end of each test.
+This check if valgrind tool is available adding it to be run with make
+check.
 ---
- src/shared/tester.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ Makefile.am   |  6 ++++++
+ configure.ac  |  3 +++
+ valgrind.supp | 14 ++++++++++++++
+ 3 files changed, 23 insertions(+)
+ create mode 100644 valgrind.supp
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 30857e0..c3120fb 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -35,6 +35,10 @@
+diff --git a/Makefile.am b/Makefile.am
+index 3df694c..90e1209 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -428,6 +428,12 @@ if DBUS_RUN_SESSION
+ AM_TESTS_ENVIRONMENT += dbus-run-session --
+ endif
  
- #include <glib.h>
- 
-+#ifdef HAVE_VALGRIND_MEMCHECK_H
-+#include <valgrind/memcheck.h>
-+#endif
++if VALGRIND
++LOG_COMPILER = valgrind --error-exitcode=1 --num-callers=30
++LOG_FLAGS = --trace-children=yes --leak-check=full --show-reachable=no \
++		--suppressions=$(srcdir)/valgrind.supp --quiet
++endif
 +
- #include "src/shared/util.h"
- #include "src/shared/tester.h"
+ pkgconfigdir = $(libdir)/pkgconfig
  
-@@ -339,6 +343,10 @@ static gboolean teardown_callback(gpointer user_data)
- 	print_progress(test->name, COLOR_MAGENTA, "teardown");
- 	test->teardown_func(test->test_data);
+ if LIBRARY
+diff --git a/configure.ac b/configure.ac
+index 8ea503c..9b766fc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -35,9 +35,12 @@ AC_PROG_LIBTOOL
+ if (test "$USE_MAINTAINER_MODE" = "yes"); then
+ 	AC_CHECK_PROG(enable_coverage, [lcov], [yes], [no])
+ 	AC_CHECK_PROG(enable_dbus_run_session, [dbus-run-session], [yes])
++	AC_CHECK_PROG(enable_valgrind, [valgrind], [yes])
++	AC_CHECK_HEADERS(valgrind/memcheck.h)
+ fi
+ AM_CONDITIONAL(COVERAGE, test "${enable_coverage}" = "yes")
+ AM_CONDITIONAL(DBUS_RUN_SESSION, test "${enable_dbus_run_session}" = "yes")
++AM_CONDITIONAL(VALGRIND, test "${enable_dbus_run_session}" = "yes")
  
-+#ifdef HAVE_VALGRIND_MEMCHECK_H
-+	VALGRIND_DO_ADDED_LEAK_CHECK;
-+#endif
-+
- 	return FALSE;
- }
+ MISC_FLAGS
  
+diff --git a/valgrind.supp b/valgrind.supp
+new file mode 100644
+index 0000000..bf28bcd
+--- /dev/null
++++ b/valgrind.supp
+@@ -0,0 +1,14 @@
++{
++   ecb_bind
++   Memcheck:Param
++   socketcall.bind(my_addr.sa_data)
++   fun:bind
++   fun:ecb_aes_setup
++}
++{
++   cmac_bind
++   Memcheck:Param
++   socketcall.bind(my_addr.sa_data)
++   fun:bind
++   fun:cmac_aes_setup
++}
 -- 
 2.4.3
 
