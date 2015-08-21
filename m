@@ -1,49 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] unit/test-gdbus-client: Fix memory leak
-Date: Fri, 21 Aug 2015 16:51:41 +0300
-Message-Id: <1440165103-25042-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+w2EiecMLp-NjA59u=LVsSD4TxCqLZB-zmWXFsaDi=pw@mail.gmail.com>
+References: <20150818220604.05b7a862@angwin.home>
+	<CABBYNZLJQchUh7z1xCfmmuVq1Nexx3RYLB0AUq+DWUFpo-=gnw@mail.gmail.com>
+	<CABBYNZ+qjOtB4=qba6DF+KY5wiYnhCFcMX4fPSrHRrVDx0R04w@mail.gmail.com>
+	<20150819161441.GA8142@hau.nz>
+	<CABBYNZK_Vy+o_XN9RSGrMVbnEMt=BHAkmpoyFmv5bK0PwCnXJw@mail.gmail.com>
+	<20150819220231.58a3b14f@angwin.home>
+	<CABBYNZ+w2EiecMLp-NjA59u=LVsSD4TxCqLZB-zmWXFsaDi=pw@mail.gmail.com>
+Date: Fri, 21 Aug 2015 11:03:51 +0200
+Message-ID: <CANq1E4TY+yzuzbkO4+h2wnEvE1dJ9u8w2V3hy_4Kk3C4YaP=Sw@mail.gmail.com>
+Subject: Re: IdleTimeout behavior for Sony PS3 remote in Bluez 5
+From: David Herrmann <dh.herrmann@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "Mark A. Haun" <haunma@keteu.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	David Herrmann <dh.herrmann@googlemail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hey
 
-The following memory leak is causes if not all interfaces are freed
-once closing the connecting:
+On Thu, Aug 20, 2015 at 10:52 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> @David: Since apparently you was the author of the patch the remove
+> setting EUNATCH to sk_err can you tell if that was intentional or you
+> did not know that it could affect the timeout implementation? Btw, it
+> would nice if you could comment regarding moving the timeout policy to
+> the HID driver.
 
-7,738 (232 direct, 7,506 indirect) bytes in 1 blocks are definitely lost in loss record 302 of 302
-       at 0x4C2A9C7: calloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-       by 0x519517F: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
-       by 0x519EF8E: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
-       by 0x519F462: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
-       by 0x5193419: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
-       by 0x517E6AE: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
-       by 0x517A06B: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
-       by 0x4076B9: g_dbus_setup_private (mainloop.c:314)
-       by 0x404B8C: client_force_disconnect (test-gdbus-client.c:882)
-       by 0x410B52: run_callback (tester.c:417)
-       by 0x4E7EA89: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4400.1)
-       by 0x4E7EE1F: ??? (in /usr/lib64/libglib-2.0.so.0.4400.1)
----
- unit/test-gdbus-client.c | 4 ++++
- 1 file changed, 4 insertions(+)
+This sounds like an oversight. From a quick look,
+hidp_session_terminate() should set these errors properly. I can try
+to craft a patch on Monday.
 
-diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
-index b25289f..dd17c00 100644
---- a/unit/test-gdbus-client.c
-+++ b/unit/test-gdbus-client.c
-@@ -861,6 +861,10 @@ static void proxy_force_disconnect(GDBusProxy *proxy, void *user_data)
- 	context->timeout_source = g_timeout_add_seconds(2, timeout_test,
- 								context);
- 
-+	g_dbus_detach_object_manager(conn);
-+
-+	g_dbus_unregister_interface(conn, SERVICE_PATH, SERVICE_NAME1);
-+
- 	dbus_connection_flush(conn);
- 	dbus_connection_close(conn);
- 	dbus_connection_unref(conn);
--- 
-2.4.3
-
+Thanks
+David
