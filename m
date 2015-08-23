@@ -1,48 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Subject: Re: [PATCH v2 1/4] Bluetooth: hci_bcm: Add PM for BCM devices
+To: Frederic Danis <frederic.danis@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+References: <1438959640-15476-1-git-send-email-frederic.danis@linux.intel.com>
+ <1438959640-15476-2-git-send-email-frederic.danis@linux.intel.com>
+ <55C85A37.2030103@bazdara.com> <55C8BBD0.6010706@linux.intel.com>
+From: Luka Karinja <lk@bazdara.com>
+Message-ID: <55D9A428.4050904@bazdara.com>
+Date: Sun, 23 Aug 2015 12:44:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <CANq1E4TY+yzuzbkO4+h2wnEvE1dJ9u8w2V3hy_4Kk3C4YaP=Sw@mail.gmail.com>
-References: <20150818220604.05b7a862@angwin.home>
-	<CABBYNZLJQchUh7z1xCfmmuVq1Nexx3RYLB0AUq+DWUFpo-=gnw@mail.gmail.com>
-	<CABBYNZ+qjOtB4=qba6DF+KY5wiYnhCFcMX4fPSrHRrVDx0R04w@mail.gmail.com>
-	<20150819161441.GA8142@hau.nz>
-	<CABBYNZK_Vy+o_XN9RSGrMVbnEMt=BHAkmpoyFmv5bK0PwCnXJw@mail.gmail.com>
-	<20150819220231.58a3b14f@angwin.home>
-	<CABBYNZ+w2EiecMLp-NjA59u=LVsSD4TxCqLZB-zmWXFsaDi=pw@mail.gmail.com>
-	<CANq1E4TY+yzuzbkO4+h2wnEvE1dJ9u8w2V3hy_4Kk3C4YaP=Sw@mail.gmail.com>
-Date: Mon, 24 Aug 2015 11:12:50 +0300
-Message-ID: <CABBYNZLYdt=aeA4V0GosjygEU7hnNRc3rArpr5uMf0ZBLC-NjQ@mail.gmail.com>
-Subject: Re: IdleTimeout behavior for Sony PS3 remote in Bluez 5
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: David Herrmann <dh.herrmann@gmail.com>
-Cc: "Mark A. Haun" <haunma@keteu.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	David Herrmann <dh.herrmann@googlemail.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <55C8BBD0.6010706@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hey Frederic.
 
-On Fri, Aug 21, 2015 at 12:03 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
-> Hey
+> In addition to this, bcm_uart_subver_table, btbcm_initialize() and 
+> btbcm_check_bdaddr() may need to be patched to support new device.
+> All is located in btbcm.c file.
 >
-> On Thu, Aug 20, 2015 at 10:52 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> @David: Since apparently you was the author of the patch the remove
->> setting EUNATCH to sk_err can you tell if that was intentional or you
->> did not know that it could affect the timeout implementation? Btw, it
->> would nice if you could comment regarding moving the timeout policy to
->> the HID driver.
->
-> This sounds like an oversight. From a quick look,
-> hidp_session_terminate() should set these errors properly. I can try
-> to craft a patch on Monday.
 
-I wonder if it isn't better to just call kernel_sock_shutdown directly
-since either way we want to disconnect and the userspace is not really
-doing anything special with EUNATCH either, it just see there is an
-error and close its reference which happens to be the last one causing
-it disconnect.
+Could you give me some pointers of how to find those values for my 
+device? the chip is a BCM43341
 
--- 
-Luiz Augusto von Dentz
+Thanks
