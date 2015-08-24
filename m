@@ -1,39 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Aug 2015 20:07:35 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Nicholas Krause <xerofoify@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] bluetooth:Fix locking issues in the function
- l2cap_connect_cfm
-Message-ID: <20150824170735.GA25004@t440s.P-661HNU-F1>
-References: <1440429299-23798-1-git-send-email-xerofoify@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1440429299-23798-1-git-send-email-xerofoify@gmail.com>
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org, johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH] Bluetooth: hci_h4: Fix zero len data packet reception issue
+Date: Mon, 24 Aug 2015 18:57:57 +0200
+Message-Id: <1440435477-25188-1-git-send-email-loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nicholas,
+Packets with a variable len equal to zero were not received.
+Since no more data expected (and input buffer entirely consumed), we
+need to complete/forward the packet immediately instead of waiting for
+more data.
 
-On Mon, Aug 24, 2015, Nicholas Krause wrote:
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -7285,6 +7285,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
->  		struct l2cap_chan *chan, *next;
->  
->  		/* Client fixed channels should override server ones */
-> +		mutex_lock(&conn->chan_lock);
->  		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
->  			goto next;
->  
-> @@ -7301,6 +7302,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
->  
->  		l2cap_chan_unlock(pchan);
->  next:
-> +		mutex_lock(&conn->chan_lock);
+Fix this by completing the packet on !dlen.
+happening if two cases:
+    - no variable data len
+    - variable data len is zero.
 
-Shouldn't this be unlock? Btw, It'd be easier to trac the revisions of
-your patches if you versioned them properly, e.g. in this case with
-"[PATCH v2} Bluetooth: ...".
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+---
+ drivers/bluetooth/hci_h4.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Johan
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 57faddc..5bd8301 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -223,8 +223,7 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+ 			switch ((&pkts[i])->lsize) {
+ 			case 0:
+ 				/* No variable data length */
+-				(&pkts[i])->recv(hdev, skb);
+-				skb = NULL;
++				dlen = 0;
+ 				break;
+ 			case 1:
+ 				/* Single octet variable length */
+@@ -252,6 +251,12 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+ 				kfree_skb(skb);
+ 				return ERR_PTR(-EILSEQ);
+ 			}
++
++			if (!dlen) {
++				/* no more data, complete frame */
++				(&pkts[i])->recv(hdev, skb);
++				skb = NULL;
++			}
+ 		} else {
+ 			/* Complete frame */
+ 			(&pkts[i])->recv(hdev, skb);
+-- 
+1.9.1
+
