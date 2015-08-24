@@ -1,43 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55DC22C4.8070302@intel.com>
-Date: Tue, 25 Aug 2015 10:09:40 +0200
-From: Loic Poulain <loic.poulain@intel.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_h4: Fix zero len data packet reception
- issue
-References: <1440435477-25188-1-git-send-email-loic.poulain@intel.com> <6CD3A286-2B0E-4D93-A31B-49336A8AC37C@holtmann.org>
-In-Reply-To: <6CD3A286-2B0E-4D93-A31B-49336A8AC37C@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <65E45719-1EA7-4EE0-A77D-5CFBD4A424F5@holtmann.org>
+References: <CAOw_LSH1_BjH28+Kn2vwxTrrF+4WBgXCn3FM27rubmCYximR0Q@mail.gmail.com>
+ <20150824083059.GA504@t440s.lan> <CAOw_LSH=yftdH7wNAfjOcDdq=76DsxwY544eZRXv0AxRTTaO7g@mail.gmail.com>
+ <65E45719-1EA7-4EE0-A77D-5CFBD4A424F5@holtmann.org>
+From: Daniel Lenski <dlenski@gmail.com>
+Date: Mon, 24 Aug 2015 14:11:46 -0700
+Message-ID: <CAOw_LSHt=zuBsf03cUX-6KOTMCu+R8t_Crm7843J=ZHjVg0LhA@mail.gmail.com>
+Subject: Re: detecting BLE compatibility of an adapter?
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-
-> please give me an example of such a packet. I am currently failing to see what is wrong with the code and how this patch would actually help.
+On Mon, Aug 24, 2015 at 11:09 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>>> Does Bluez provide a way to detect the compatibility of a Bluetooth
+>>>> adapter with Bluetooth 4.0/Low Energy?
+>>>
+>>> That would be the mgmt settings bit number 9 (see doc/mgmt-api.txt).
+>>> bluetoothd keeps track of this (and enables it automatically if
+>>> available) and you should also be able to see it e.g. with "btmgmt
+>>> info". The mgmt interface tells you both whether it's supported as well
+>>> as whether it's enabled.
+>>>
+>>
+>> Thank you!
+>>
+>> In the meantime, I found another way to do it, using
+>> hci_read_local_features() and checking for the appropriate bit from
+>> lmp_features_map, specifically features[4]&0x40.
+>>
+>> Is there any reason I should prefer one approach over the other?
 >
-> Is this for vendor packet types or does this actually happen with standard H:4 packet types?
+> raw HCI access is a bad idea. Do not do that. The btmgmt info command is what gives you most information.
+>
+> Index list with 1 item
+> hci0:   Primary controller
+>         addr 98:58:8A:xx:xx:xx version 6 manufacturer 15 class 0x000000
+>         supported settings: powered connectable fast-connectable discoverable bondable link-security ssp br/edr hs le advertising secure-conn debug-keys privacy configuration static-addr
+>         current settings: powered bondable ssp br/edr le secure-conn
+>         name BlueZ
+>         short name
+> hci0:   Configuration options
+>         supported options: public-address
+>         missing options:
+>
+> It will easily tell you if LE is supported and also if it has been enabled.
 
+Actually, I already need raw HCI access because the devices I am
+communicating with request a LE connection interval that is
+unnecessarily long, and there doesn't seem to be another way to
+override this (http://thread.gmane.org/gmane.linux.bluez.kernel/63778/focus=63819).
 
-Yes, this is for some vendor specific packets.
-For example, I have to deal with LPM packet with the following format:
+> The raw features are exposed via /sys/kernel/debug/bluetooth/hci0/features file. However that is not a stable API. That is for manual debugging.
 
-|0xf1|opcode|dlen|data|
+Got it. I'll use the mgmt_* calls for feature detection if they're more stable.
 
-This kind of packet can be easily added to the h4_recv_pkt list.
-However, some of these packets don't have any data (just PM ack packet):
-0xf1|0x03|0x00
-
-If we receive this packet, the h4_recv_buf function will retrieve the 
-dlen (0) and just wait for more data. As long as there is not new data 
-received (new packet), the LPM packet is not transmitted to the bt core.
-
-Regards,
-Loic
-
-
--- 
-Intel Open Source Technology Center
-http://oss.intel.com/
+Thanks,
+Dan
