@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANq1E4QqgZsFCqC50MCrsUhAD7f_E90oHDUOSYo4172nQjbKig@mail.gmail.com>
+In-Reply-To: <CABBYNZLYdt=aeA4V0GosjygEU7hnNRc3rArpr5uMf0ZBLC-NjQ@mail.gmail.com>
 References: <20150818220604.05b7a862@angwin.home>
 	<CABBYNZLJQchUh7z1xCfmmuVq1Nexx3RYLB0AUq+DWUFpo-=gnw@mail.gmail.com>
 	<CABBYNZ+qjOtB4=qba6DF+KY5wiYnhCFcMX4fPSrHRrVDx0R04w@mail.gmail.com>
@@ -10,12 +10,11 @@ References: <20150818220604.05b7a862@angwin.home>
 	<CABBYNZ+w2EiecMLp-NjA59u=LVsSD4TxCqLZB-zmWXFsaDi=pw@mail.gmail.com>
 	<CANq1E4TY+yzuzbkO4+h2wnEvE1dJ9u8w2V3hy_4Kk3C4YaP=Sw@mail.gmail.com>
 	<CABBYNZLYdt=aeA4V0GosjygEU7hnNRc3rArpr5uMf0ZBLC-NjQ@mail.gmail.com>
-	<CANq1E4QqgZsFCqC50MCrsUhAD7f_E90oHDUOSYo4172nQjbKig@mail.gmail.com>
-Date: Mon, 24 Aug 2015 13:48:24 +0300
-Message-ID: <CABBYNZ+By-csPgZrmykN29W_sRK=v_MAC_4nZZaLU5v6n7_VUg@mail.gmail.com>
+Date: Mon, 24 Aug 2015 12:40:00 +0200
+Message-ID: <CANq1E4QqgZsFCqC50MCrsUhAD7f_E90oHDUOSYo4172nQjbKig@mail.gmail.com>
 Subject: Re: IdleTimeout behavior for Sony PS3 remote in Bluez 5
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: David Herrmann <dh.herrmann@gmail.com>
+From: David Herrmann <dh.herrmann@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "Mark A. Haun" <haunma@keteu.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	David Herrmann <dh.herrmann@googlemail.com>
@@ -23,44 +22,38 @@ Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi
 
-On Mon, Aug 24, 2015 at 1:40 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
-> Hi
+On Mon, Aug 24, 2015 at 10:12 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi David,
 >
-> On Mon, Aug 24, 2015 at 10:12 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi David,
+> On Fri, Aug 21, 2015 at 12:03 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
+>> Hey
 >>
->> On Fri, Aug 21, 2015 at 12:03 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
->>> Hey
->>>
->>> On Thu, Aug 20, 2015 at 10:52 AM, Luiz Augusto von Dentz
->>> <luiz.dentz@gmail.com> wrote:
->>>> @David: Since apparently you was the author of the patch the remove
->>>> setting EUNATCH to sk_err can you tell if that was intentional or you
->>>> did not know that it could affect the timeout implementation? Btw, it
->>>> would nice if you could comment regarding moving the timeout policy to
->>>> the HID driver.
->>>
->>> This sounds like an oversight. From a quick look,
->>> hidp_session_terminate() should set these errors properly. I can try
->>> to craft a patch on Monday.
+>> On Thu, Aug 20, 2015 at 10:52 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> @David: Since apparently you was the author of the patch the remove
+>>> setting EUNATCH to sk_err can you tell if that was intentional or you
+>>> did not know that it could affect the timeout implementation? Btw, it
+>>> would nice if you could comment regarding moving the timeout policy to
+>>> the HID driver.
 >>
->> I wonder if it isn't better to just call kernel_sock_shutdown directly
->> since either way we want to disconnect and the userspace is not really
->> doing anything special with EUNATCH either, it just see there is an
->> error and close its reference which happens to be the last one causing
->> it disconnect.
+>> This sounds like an oversight. From a quick look,
+>> hidp_session_terminate() should set these errors properly. I can try
+>> to craft a patch on Monday.
 >
-> I'm not very comfortable with -net internals, so not sure what
-> behavior you want. Calling kernel_sock_shutdown() sounds fine, but
-> that cannot be done from hidp_session_terminate(). Instead, you must
-> call it from hidp_session_thread() somewhere near hidp_del_timer(),
-> before hidp_session_put().
+> I wonder if it isn't better to just call kernel_sock_shutdown directly
+> since either way we want to disconnect and the userspace is not really
+> doing anything special with EUNATCH either, it just see there is an
+> error and close its reference which happens to be the last one causing
+> it disconnect.
 
-Then lets keep it simple and just set EUNATCH as it was before.
+I'm not very comfortable with -net internals, so not sure what
+behavior you want. Calling kernel_sock_shutdown() sounds fine, but
+that cannot be done from hidp_session_terminate(). Instead, you must
+call it from hidp_session_thread() somewhere near hidp_del_timer(),
+before hidp_session_put().
 
-
--- 
-Luiz Augusto von Dentz
+Thanks
+David
