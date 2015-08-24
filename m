@@ -1,381 +1,274 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH v4 2/2] Bluetooth: hci_intel: Add platform driver
+Subject: Re: [PATCH v4 1/2] Bluetooth: hci_intel: Add Intel baudrate configuration support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1440165583-23245-2-git-send-email-loic.poulain@intel.com>
-Date: Mon, 24 Aug 2015 11:43:27 -0700
+In-Reply-To: <1440165583-23245-1-git-send-email-loic.poulain@intel.com>
+Date: Mon, 24 Aug 2015 11:31:23 -0700
 Cc: Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Message-Id: <6E6F721F-FC4B-4AA7-A1A3-39323E3FAD80@holtmann.org>
-References: <1440165583-23245-1-git-send-email-loic.poulain@intel.com> <1440165583-23245-2-git-send-email-loic.poulain@intel.com>
+Message-Id: <5D898BFA-B6C2-47DC-9DC4-DB3EDECA2E23@holtmann.org>
+References: <1440165583-23245-1-git-send-email-loic.poulain@intel.com>
 To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Loic,
 
-> A platform device can be used to provide some specific resources in
-> order to manage the controller. In this first patch we retrieve the
-> reset gpio which is used to power on/off the controller.
+> Implement the set_baudrate callback for hci_intel.
+> - Controller requires a read Intel version command before updating
+>   its baudrate.
+> - Inject the change speed command complete since controller does not
+>   respond at the same speed.
+> - Wait 100ms to let the controller change its baudrate.
 > 
-> The main issue is to match the current tty with the correct pdev.
-> In case of ACPI, we can easily find the right tty/pdev pair because
-> they are both child of the same UART port.
+> Manage speed change in the setup function, we need to restore the oper
+> speed once chip has booted on patched firmware.
 > 
-> If controller is powered-on from the driver, we need to wait for a
-> HCI boot event before being able to send any command.
-
-long term we need to look into the proposed UART Slave feature and see how we can drive that upstream. Reason is that we can not add the same code to every different vendor. The basic GPIO pieces will be most likely the same for all ACPI based Intel systems.
-
 > Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 > ---
-> v2: v3: none, align patch version with patch 1/2 "Intel baudrate" patch
-> v4: remove device tree support, will be part of a different patch
+> v2: simplify baudrate change, update commit message,
+>     set missing set_baudrate callback.
+> v3: Remove unused 'err' variable in intel_set_baudrate
+> v4: Move set_bit STATE_BOOTING after speed changing in setup
+>     change patch title, hci_uart->hci_intel
 > 
-> drivers/bluetooth/hci_intel.c | 232 +++++++++++++++++++++++++++++++++++++++---
-> 1 file changed, 216 insertions(+), 16 deletions(-)
+> drivers/bluetooth/hci_intel.c | 134 +++++++++++++++++++++++++++++++++++++++++-
+> 1 file changed, 133 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-> index 080e794..cd66282 100644
+> index 21dfa89..080e794 100644
 > --- a/drivers/bluetooth/hci_intel.c
 > +++ b/drivers/bluetooth/hci_intel.c
-> @@ -26,6 +26,10 @@
-> #include <linux/skbuff.h>
-> #include <linux/firmware.h>
-> #include <linux/wait.h>
-> +#include <linux/tty.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/gpio/consumer.h>
-> +#include <linux/acpi.h>
-> 
-> #include <net/bluetooth/bluetooth.h>
-> #include <net/bluetooth/hci_core.h>
-> @@ -40,10 +44,20 @@
+> @@ -38,6 +38,7 @@
+> #define STATE_FIRMWARE_LOADED	2
+> #define STATE_FIRMWARE_FAILED	3
 > #define STATE_BOOTING		4
-> #define STATE_SPEED_CHANGING	5
+> +#define STATE_SPEED_CHANGING	5
 > 
-> +struct intel_device {
-> +	struct list_head list;
-> +	struct platform_device *pdev;
-> +	struct gpio_desc *reset;
-> +	struct hci_uart *hu;
-> +};
-> +LIST_HEAD(intel_device_list);
-> +DEFINE_SPINLOCK(intel_device_list_lock);
-
-Why is this not static?
-
-> +
 > struct intel_data {
 > 	struct sk_buff *rx_skb;
-> 	struct sk_buff_head txq;
+> @@ -45,6 +46,38 @@ struct intel_data {
 > 	unsigned long flags;
-> +	struct intel_device *idev;
 > };
 > 
-> static u8 intel_convert_speed(unsigned int speed)
-> @@ -78,6 +92,111 @@ static u8 intel_convert_speed(unsigned int speed)
-> 	}
-> }
-> 
-> +static int intel_device_lock(struct intel_device *idev)
+> +static u8 intel_convert_speed(unsigned int speed)
 > +{
-> +	struct list_head *p;
-> +
-> +	spin_lock(&intel_device_list_lock);
-> +
-> +	list_for_each(p, &intel_device_list) {
-> +		struct intel_device *dev = list_entry(p, struct intel_device,
-> +						      list);
-> +		if (dev == idev)
-> +			return 0;
+> +	switch (speed) {
+> +	case 9600:
+> +		return 0x00;
+> +	case 19200:
+> +		return 0x01;
+> +	case 38400:
+> +		return 0x02;
+> +	case 57600:
+> +		return 0x03;
+> +	case 115200:
+> +		return 0x04;
+> +	case 230400:
+> +		return 0x05;
+> +	case 460800:
+> +		return 0x06;
+> +	case 921600:
+> +		return 0x07;
+> +	case 1843200:
+> +		return 0x08;
+> +	case 3250000:
+> +		return 0x09;
+> +	case 2000000:
+> +		return 0x0a;
+> +	case 3000000:
+> +		return 0x0b;
+> +	default:
+> +		return 0xff;
 > +	}
-> +
-> +	spin_unlock(&intel_device_list_lock);
-> +
-> +	return -ENODEV;
-> +}
-> +
-> +static void intel_device_unlock(struct intel_device *idev)
-> +{
-> +	spin_unlock(&intel_device_list_lock);
-> +}
-
-I do not like this lock/unlock helpers. They are not symmetric in any form or shape. We can not have that. The above is actually a try_lock. I have the feeling that manually coding this would make this actually easier to read.
-
-So just grab the lock and run the list manually in each cases.
-
-> +
-> +static int intel_set_power(struct hci_uart *hu, bool powered)
-> +{
-> +	struct intel_data *intel = hu->priv;
-> +	struct intel_device *idev = intel->idev;
-> +
-> +	if (intel_device_lock(idev))
-> +		return -ENODEV;
-> +
-> +	if (!idev->reset) {
-> +		intel_device_unlock(idev);
-> +		return -EINVAL;
-> +	}
-> +
-> +	BT_DBG("%s: set power %d", hu->hdev->name, powered);
-> +
-> +	gpiod_set_value(idev->reset, powered);
-> +
-> +	intel_device_unlock(idev);
-> +
-> +	return 0;
-> +}
-> +
-> +static struct intel_device *intel_get_idev(struct hci_uart *hu)
-> +{
-> +	struct list_head *p;
-> +	struct intel_device *idev_match = NULL;
-> +
-> +	spin_lock(&intel_device_list_lock);
-> +	list_for_each(p, &intel_device_list) {
-> +		struct intel_device *idev;
-> +
-> +		idev = list_entry(p, struct intel_device, list);
-> +
-> +		/* tty device and pdev device should share the same parent
-> +		 * which is the UART port.
-> +		 */
-> +		if (hu->tty->dev->parent == idev->pdev->dev.parent) {
-> +			idev_match = idev;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (idev_match) {
-> +		idev_match->hu = hu;
-> +		BT_INFO("hu %p, Found compatible pm device (%s)", hu,
-> +			dev_name(&idev_match->pdev->dev));
-> +	}
-> +	spin_unlock(&intel_device_list_lock);
-> +
-> +	return idev_match;
-> +}
-> +
-> +static int intel_boot_wait(struct hci_uart *hu)
-> +{
-> +	struct intel_data *intel = hu->priv;
-> +	struct hci_dev *hdev = hu->hdev;
-> +	int err;
-> +
-> +	if (!test_bit(STATE_BOOTING, &intel->flags))
-> +		return 0;
-> +
-> +	BT_INFO("%s: Waiting for device to boot", hdev->name);
-> +
-> +	err = wait_on_bit_timeout(&intel->flags, STATE_BOOTING,
-> +				  TASK_INTERRUPTIBLE,
-> +				  msecs_to_jiffies(1000));
-> +
-> +	if (err == 1) {
-> +		BT_ERR("%s: Device boot interrupted", hdev->name);
-> +		clear_bit(STATE_BOOTING, &intel->flags);
-> +		return -EINTR;
-> +	}
-> +
-> +	if (err) {
-> +		BT_ERR("%s: Device boot timeout", hdev->name);
-> +		clear_bit(STATE_BOOTING, &intel->flags);
-> +		return -ETIMEDOUT;
-> +	}
-> +
-> +	return 0;
 > +}
 > +
 > static int intel_open(struct hci_uart *hu)
 > {
 > 	struct intel_data *intel;
-> @@ -91,6 +210,12 @@ static int intel_open(struct hci_uart *hu)
-> 	skb_queue_head_init(&intel->txq);
-> 
-> 	hu->priv = intel;
-> +
-> +	intel->idev = intel_get_idev(hu);
-> +
-> +	if (!intel_set_power(hu, true))
-> +		set_bit(STATE_BOOTING, &intel->flags);
-> +
-> 	return 0;
+> @@ -111,6 +144,53 @@ static int inject_cmd_complete(struct hci_dev *hdev, __u16 opcode)
+> 	return hci_recv_frame(hdev, skb);
 > }
 > 
-> @@ -100,6 +225,13 @@ static int intel_close(struct hci_uart *hu)
-> 
-> 	BT_DBG("hu %p", hu);
-> 
-> +	intel_set_power(hu, false);
+> +static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
+> +{
+> +	struct intel_data *intel = hu->priv;
+> +	struct hci_dev *hdev = hu->hdev;
+> +	u8 intel_speed;
+> +	struct sk_buff *skb;
 > +
-> +	if (!intel_device_lock(intel->idev)) {
-> +		intel->idev->hu = NULL;
-> +		intel_device_unlock(intel->idev);
+> +	BT_INFO("%s: Change controller speed to %d", hdev->name, speed);
+> +
+> +	/* Device will not accept speed change if Intel version has not been
+> +	 * previously requested.
+> +	 */
+> +	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		BT_ERR("%s: Reading Intel version information failed (%ld)",
+> +		       hdev->name, PTR_ERR(skb));
+> +		return PTR_ERR(skb);
 > +	}
 > +
-> 	skb_queue_purge(&intel->txq);
-> 	kfree_skb(intel->rx_skb);
-> 	kfree(intel);
-> @@ -151,6 +283,8 @@ static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
-> 	u8 intel_speed;
-> 	struct sk_buff *skb;
-> 
-> +	intel_boot_wait(hu);
+
+This empty line can be removed. In case we do not do anything with the return value, then just free the skb right after it. So we are creating a nice and easy readable block.
+
+> +	kfree_skb(skb);
 > +
-> 	BT_INFO("%s: Change controller speed to %d", hdev->name, speed);
+> +	intel_speed = intel_convert_speed(speed);
+> +	if (intel_speed == 0xff) {
+> +		BT_ERR("%s: Unsupported speed", hdev->name);
+> +		return -EINVAL;
+> +	}
+
+I would move this conversion to the top of the function. So that the version only gets read if we have a correct baud rate in the first place.
+
+> +
+> +	set_bit(STATE_SPEED_CHANGING, &intel->flags);
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfc06, 1, &intel_speed, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		BT_ERR("%s: Changing Intel speed failed (%ld)",
+> +		       hdev->name, PTR_ERR(skb));
+> +		clear_bit(STATE_SPEED_CHANGING, &intel->flags);
+> +		return PTR_ERR(skb);
+> +	}
+
+I think this approach is wrong. It is not that the controller sends no HCI Command Complete. It is just that it sends it later and we have to change the baud rate in between.
+
+This is different from the case where the controller swallows the HCI Command Complete event altogether. So instead of trying to hack around this, why not just insert the HCI command into the queue like the QCA guys did. We have no chance of checking that it worked anyway.
+
+> +
+> +	kfree_skb(skb);
+> +
+> +	/* wait 100ms to change baudrate on controller side */
+> +	msleep(100);
+> +
+> +	clear_bit(STATE_SPEED_CHANGING, &intel->flags);
+
+If we just inject the command into the local queue and wakeup the processing, then the speed change state tracking for sending should go away. However we could keep it for waiting for the HCI Command Complete that indicates the success. And then continue. The msleep would then not be needed.
+
+> +
+> +	return 0;
+> +}
+> +
+> static int intel_setup(struct hci_uart *hu)
+> {
+> 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
+> @@ -126,6 +206,8 @@ static int intel_setup(struct hci_uart *hu)
+> 	u32 frag_len;
+> 	ktime_t calltime, delta, rettime;
+> 	unsigned long long duration;
+> +	unsigned int init_speed, oper_speed;
+> +	int speed_change = 0;
+> 	int err;
 > 
-> 	/* Device will not accept speed change if Intel version has not been
-> @@ -229,6 +363,8 @@ static int intel_setup(struct hci_uart *hu)
-> 	if (oper_speed && init_speed && oper_speed != init_speed)
-> 		speed_change = 1;
+> 	BT_DBG("%s", hdev->name);
+> @@ -134,6 +216,19 @@ static int intel_setup(struct hci_uart *hu)
 > 
-> +	intel_boot_wait(hu);
+> 	calltime = ktime_get();
+> 
+> +	if (hu->init_speed)
+> +		init_speed = hu->init_speed;
+> +	else
+> +		init_speed = hu->proto->init_speed;
+> +
+> +	if (hu->oper_speed)
+> +		oper_speed = hu->oper_speed;
+> +	else
+> +		oper_speed = hu->proto->oper_speed;
+> +
+> +	if (oper_speed && init_speed && oper_speed != init_speed)
+> +		speed_change = 1;
 > +
 > 	set_bit(STATE_BOOTLOADER, &intel->flags);
 > 
 > 	/* Read the Intel version information to determine if the device
-> @@ -537,21 +673,9 @@ done:
-> 	 * 1 second. However if that happens, then just fail the setup
-> 	 * since something went wrong.
-> 	 */
-> -	BT_INFO("%s: Waiting for device to boot", hdev->name);
-> -
-> -	err = wait_on_bit_timeout(&intel->flags, STATE_BOOTING,
-> -				  TASK_INTERRUPTIBLE,
-> -				  msecs_to_jiffies(1000));
-> -
-> -	if (err == 1) {
-> -		BT_ERR("%s: Device boot interrupted", hdev->name);
-> -		return -EINTR;
-> -	}
-> -
-> -	if (err) {
-> -		BT_ERR("%s: Device boot timeout", hdev->name);
-> -		return -ETIMEDOUT;
-> -	}
-> +	err = intel_boot_wait(hu);
-> +	if (err)
-> +		return err;
-
-If you are moving existing code out into a separate function, then that should go into a separate patch. So we can clearly see why you are doing this moving around.
-
+> @@ -416,6 +511,14 @@ done:
+> 	if (err < 0)
+> 		return err;
 > 
-> 	rettime = ktime_get();
-> 	delta = ktime_sub(rettime, calltime);
-> @@ -583,7 +707,8 @@ static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
-> 	struct intel_data *intel = hu->priv;
-> 	struct hci_event_hdr *hdr;
+> +	/* We need to restore the default speed before Intel reset */
+> +	if (speed_change) {
+> +		err = intel_set_baudrate(hu, init_speed);
+> +		if (err)
+> +			return err;
+> +		hci_uart_set_baudrate(hu, init_speed);
+> +	}
+> +
+> 	calltime = ktime_get();
 > 
-> -	if (!test_bit(STATE_BOOTLOADER, &intel->flags))
-> +	if (!test_bit(STATE_BOOTLOADER, &intel->flags) &&
-> +	    !test_bit(STATE_BOOTING, &intel->flags))
-> 		goto recv;
+> 	set_bit(STATE_BOOTING, &intel->flags);
+> @@ -456,6 +559,19 @@ done:
 > 
-> 	hdr = (void *)skb->data;
-> @@ -713,12 +838,87 @@ static const struct hci_uart_proto intel_proto = {
+> 	BT_INFO("%s: Device booted in %llu usecs", hdev->name, duration);
+> 
+> +	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
+> +	if (IS_ERR(skb))
+> +		return PTR_ERR(skb);
+> +
+> +	kfree_skb(skb);
+> +
+> +	if (speed_change) {
+> +		err = intel_set_baudrate(hu, oper_speed);
+> +		if (err)
+> +			return err;
+> +		hci_uart_set_baudrate(hu, oper_speed);
+> +	}
+> +
+> 	clear_bit(STATE_BOOTLOADER, &intel->flags);
+> 
+> 	return 0;
+> @@ -515,6 +631,10 @@ static int intel_recv(struct hci_uart *hu, const void *data, int count)
+> 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
+> 		return -EUNATCH;
+> 
+> +	/* Ignore unexpected non-sync data during speed change */
+> +	if (test_bit(STATE_SPEED_CHANGING, &intel->flags))
+> +		return count;
+> +
+> 	intel->rx_skb = h4_recv_buf(hu->hdev, intel->rx_skb, data, count,
+> 				    intel_recv_pkts,
+> 				    ARRAY_SIZE(intel_recv_pkts));
+> @@ -548,7 +668,9 @@ static struct sk_buff *intel_dequeue(struct hci_uart *hu)
+> 	if (!skb)
+> 		return skb;
+> 
+> -	if (test_bit(STATE_BOOTLOADER, &intel->flags) &&
+> +	/* Inject cmd complete pkt for async commands */
+> +	if ((test_bit(STATE_BOOTLOADER, &intel->flags) ||
+> +	    test_bit(STATE_SPEED_CHANGING, &intel->flags)) &&
+> 	    (bt_cb(skb)->pkt_type == HCI_COMMAND_PKT)) {
+> 		struct hci_command_hdr *cmd = (void *)skb->data;
+> 		__u16 opcode = le16_to_cpu(cmd->opcode);
+> @@ -560,6 +682,14 @@ static struct sk_buff *intel_dequeue(struct hci_uart *hu)
+> 		 */
+> 		if (opcode == 0xfc01)
+> 			inject_cmd_complete(hu->hdev, opcode);
+> +
+> +		/* When the 0xfc06 command is issued to change the
+> +		 * speed, device will send the command complete event
+> +		 * only at the targeted speed. Host needs to change its
+> +		 * own baudrate before being able to receive the response.
+> +		 */
+> +		if (opcode == 0xfc06)
+> +			inject_cmd_complete(hu->hdev, opcode);
+> 	}
+> 
+> 	/* Prepend skb with frame type */
+> @@ -572,10 +702,12 @@ static const struct hci_uart_proto intel_proto = {
+> 	.id		= HCI_UART_INTEL,
+> 	.name		= "Intel",
+> 	.init_speed	= 115200,
+> +	.oper_speed	= 3000000,
+> 	.open		= intel_open,
+> 	.close		= intel_close,
+> 	.flush		= intel_flush,
+> 	.setup		= intel_setup,
+> +	.set_baudrate	= intel_set_baudrate,
+> 	.recv		= intel_recv,
+> 	.enqueue	= intel_enqueue,
 > 	.dequeue	= intel_dequeue,
-> };
-> 
-> +#ifdef CONFIG_ACPI
-> +static const struct acpi_device_id intel_bt_acpi_match[] = {
-
-Just call this intel_acpi_match. Keep it consistent in how we call things in hci_bcm.c.
-
-> +	{ "INT33E1", 0 },
-> +	{ },
-> +};
-> +#endif
-
-While this is okay for now, I think what you also want to work on is a DECLARE helper that allows us to avoid the CONFIG_ACPI crap.
-
-Something that turns the thing into nothing when ACPI is off.
-
-> +
-> +static int intel_probe(struct platform_device *pdev)
-> +{
-> +	struct intel_device *idev;
-> +
-> +	idev = devm_kzalloc(&pdev->dev, sizeof(*idev), GFP_KERNEL);
-> +	if (!idev)
-> +		return -ENOMEM;
-> +
-> +	idev->pdev = pdev;
-> +
-> +	if (ACPI_HANDLE(&pdev->dev)) {
-> +#ifdef CONFIG_ACPI
-> +		const struct acpi_device_id *id;
-> +
-> +		id = acpi_match_device(intel_bt_acpi_match, &pdev->dev);
-> +		if (!id)
-> +			return -ENODEV;
-> +#endif
-
-Do this the same as what Fred did in the hci_bcm.c.
-
-Or can we actually get acpi_match_device fixed to become a no operation that always returns ENODEV when CONFIG_ACPI=n. I would prefer the latter actually since all this CONFIG_ACPI hackery is annoying.
-
-> +	} else {
-> +		return -ENODEV;
-> +	}
-> +
-> +	idev->reset = devm_gpiod_get_optional(&pdev->dev, "reset",
-> +					      GPIOD_OUT_LOW);
-> +	if (IS_ERR(idev->reset)) {
-> +		dev_err(&pdev->dev, "Unable to retrieve gpio\n");
-> +		return PTR_ERR(idev->reset);
-> +	}
-> +
-> +	platform_set_drvdata(pdev, idev);
-> +
-> +	/* Place this instance on the device list */
-> +	spin_lock(&intel_device_list_lock);
-> +	list_add_tail(&idev->list, &intel_device_list);
-> +	spin_unlock(&intel_device_list_lock);
-> +
-> +	dev_info(&pdev->dev, "registered.\n");
-> +
-> +	return 0;
-> +}
-> +
-> +static int intel_remove(struct platform_device *pdev)
-> +{
-> +	struct intel_device *idev = platform_get_drvdata(pdev);
-> +
-> +	spin_lock(&intel_device_list_lock);
-> +	list_del(&idev->list);
-> +	spin_unlock(&intel_device_list_lock);
-> +
-> +	dev_info(&pdev->dev, "unregistered.\n");
-> +
-> +	return 0;
-> +}
-> +
-> +static struct platform_driver intel_driver = {
-> +	.probe = intel_probe,
-> +	.remove = intel_remove,
-> +	.driver = {
-> +		.name = "hci_intel",
-> +		.acpi_match_table = ACPI_PTR(intel_bt_acpi_match),
-> +		.owner = THIS_MODULE,
-> +	},
-> +};
-> +
-> int __init intel_init(void)
-> {
-> +	platform_driver_register(&intel_driver);
-> +
-> 	return hci_uart_register_proto(&intel_proto);
-> }
-> 
-> int __exit intel_deinit(void)
-> {
-> +	platform_driver_unregister(&intel_driver);
-> +
-> 	return hci_uart_unregister_proto(&intel_proto);
-> }
 
 Regards
 
