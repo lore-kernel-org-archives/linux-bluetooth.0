@@ -1,59 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 24 Aug 2015 13:23:35 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Nicholas Krause <xerofoify@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetooth:Fix locking issues in the function
+ l2cap_connect_cfm
+Message-ID: <20150824102335.GF6958@t440s.lan>
+References: <1439924902-13408-1-git-send-email-xerofoify@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLYdt=aeA4V0GosjygEU7hnNRc3rArpr5uMf0ZBLC-NjQ@mail.gmail.com>
-References: <20150818220604.05b7a862@angwin.home>
-	<CABBYNZLJQchUh7z1xCfmmuVq1Nexx3RYLB0AUq+DWUFpo-=gnw@mail.gmail.com>
-	<CABBYNZ+qjOtB4=qba6DF+KY5wiYnhCFcMX4fPSrHRrVDx0R04w@mail.gmail.com>
-	<20150819161441.GA8142@hau.nz>
-	<CABBYNZK_Vy+o_XN9RSGrMVbnEMt=BHAkmpoyFmv5bK0PwCnXJw@mail.gmail.com>
-	<20150819220231.58a3b14f@angwin.home>
-	<CABBYNZ+w2EiecMLp-NjA59u=LVsSD4TxCqLZB-zmWXFsaDi=pw@mail.gmail.com>
-	<CANq1E4TY+yzuzbkO4+h2wnEvE1dJ9u8w2V3hy_4Kk3C4YaP=Sw@mail.gmail.com>
-	<CABBYNZLYdt=aeA4V0GosjygEU7hnNRc3rArpr5uMf0ZBLC-NjQ@mail.gmail.com>
-Date: Mon, 24 Aug 2015 12:40:00 +0200
-Message-ID: <CANq1E4QqgZsFCqC50MCrsUhAD7f_E90oHDUOSYo4172nQjbKig@mail.gmail.com>
-Subject: Re: IdleTimeout behavior for Sony PS3 remote in Bluez 5
-From: David Herrmann <dh.herrmann@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "Mark A. Haun" <haunma@keteu.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	David Herrmann <dh.herrmann@googlemail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1439924902-13408-1-git-send-email-xerofoify@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hi Nicholas,
 
-On Mon, Aug 24, 2015 at 10:12 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi David,
->
-> On Fri, Aug 21, 2015 at 12:03 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
->> Hey
->>
->> On Thu, Aug 20, 2015 at 10:52 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> @David: Since apparently you was the author of the patch the remove
->>> setting EUNATCH to sk_err can you tell if that was intentional or you
->>> did not know that it could affect the timeout implementation? Btw, it
->>> would nice if you could comment regarding moving the timeout policy to
->>> the HID driver.
->>
->> This sounds like an oversight. From a quick look,
->> hidp_session_terminate() should set these errors properly. I can try
->> to craft a patch on Monday.
->
-> I wonder if it isn't better to just call kernel_sock_shutdown directly
-> since either way we want to disconnect and the userspace is not really
-> doing anything special with EUNATCH either, it just see there is an
-> error and close its reference which happens to be the last one causing
-> it disconnect.
+On Tue, Aug 18, 2015, Nicholas Krause wrote:
+> This fixes a locking issue in the function l2cap_connect_cfm for
+> not locking the mutex lock for channels on the l2cap_conn structure
+> pointer conn before calling __l2cap_get_chan_by_dcid as all callers
+> need to lock and unlock this mutex before calling this function due
+> to issues with either concurrent users or race conditions arising
+> if this mutex is not locked before these calls.
+> 
+> Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
+> ---
+>  net/bluetooth/l2cap_core.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 45fffa4..fcee783 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -7285,9 +7285,11 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+>  		struct l2cap_chan *chan, *next;
+>  
+>  		/* Client fixed channels should override server ones */
+> +		mutex_lock(&conn->chan_lock);
+>  		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
+>  			goto next;
+> -
+> +
+> +		mutex_unlock(&conn->chan_lock);
+>  		l2cap_chan_lock(pchan);
+>  		chan = pchan->ops->new_connection(pchan);
+>  		if (chan) {
+> @@ -7301,6 +7303,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+>  
+>  		l2cap_chan_unlock(pchan);
+>  next:
+> +		mutex_unlock(&conn->chan_lock);
+>  		next = l2cap_global_fixed_chan(pchan, hcon);
+>  		l2cap_chan_put(pchan);
+>  		pchan = next;
 
-I'm not very comfortable with -net internals, so not sure what
-behavior you want. Calling kernel_sock_shutdown() sounds fine, but
-that cannot be done from hidp_session_terminate(). Instead, you must
-call it from hidp_session_thread() somewhere near hidp_del_timer(),
-before hidp_session_put().
+This looks broken to me. If __l2cap_get_chan_by_dcid() returns NULL
+(i.e. the jump to 'next' is *not* taken then the code will end up
+calling mutex_unlock(&conn->chan_lock) twice. We can probably take the
+penalty of keeping the lock a bit longer, i.e. you should be able to
+drop your first unlock() call. In fact you *have* to keep the lock
+longer since __l2cap_chan_add() requires it.
 
-Thanks
-David
+Johan
