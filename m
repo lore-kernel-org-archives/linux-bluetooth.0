@@ -1,27 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Aug 2015 11:30:59 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel Lenski <dlenski@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: detecting BLE compatibility of an adapter?
-Message-ID: <20150824083059.GA504@t440s.lan>
-References: <CAOw_LSH1_BjH28+Kn2vwxTrrF+4WBgXCn3FM27rubmCYximR0Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAOw_LSH1_BjH28+Kn2vwxTrrF+4WBgXCn3FM27rubmCYximR0Q@mail.gmail.com>
+In-Reply-To: <CANq1E4TY+yzuzbkO4+h2wnEvE1dJ9u8w2V3hy_4Kk3C4YaP=Sw@mail.gmail.com>
+References: <20150818220604.05b7a862@angwin.home>
+	<CABBYNZLJQchUh7z1xCfmmuVq1Nexx3RYLB0AUq+DWUFpo-=gnw@mail.gmail.com>
+	<CABBYNZ+qjOtB4=qba6DF+KY5wiYnhCFcMX4fPSrHRrVDx0R04w@mail.gmail.com>
+	<20150819161441.GA8142@hau.nz>
+	<CABBYNZK_Vy+o_XN9RSGrMVbnEMt=BHAkmpoyFmv5bK0PwCnXJw@mail.gmail.com>
+	<20150819220231.58a3b14f@angwin.home>
+	<CABBYNZ+w2EiecMLp-NjA59u=LVsSD4TxCqLZB-zmWXFsaDi=pw@mail.gmail.com>
+	<CANq1E4TY+yzuzbkO4+h2wnEvE1dJ9u8w2V3hy_4Kk3C4YaP=Sw@mail.gmail.com>
+Date: Mon, 24 Aug 2015 11:12:50 +0300
+Message-ID: <CABBYNZLYdt=aeA4V0GosjygEU7hnNRc3rArpr5uMf0ZBLC-NjQ@mail.gmail.com>
+Subject: Re: IdleTimeout behavior for Sony PS3 remote in Bluez 5
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: David Herrmann <dh.herrmann@gmail.com>
+Cc: "Mark A. Haun" <haunma@keteu.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	David Herrmann <dh.herrmann@googlemail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+Hi David,
 
-On Sat, Aug 22, 2015, Daniel Lenski wrote:
-> Does Bluez provide a way to detect the compatibility of a Bluetooth
-> adapter with Bluetooth 4.0/Low Energy?
+On Fri, Aug 21, 2015 at 12:03 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
+> Hey
+>
+> On Thu, Aug 20, 2015 at 10:52 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> @David: Since apparently you was the author of the patch the remove
+>> setting EUNATCH to sk_err can you tell if that was intentional or you
+>> did not know that it could affect the timeout implementation? Btw, it
+>> would nice if you could comment regarding moving the timeout policy to
+>> the HID driver.
+>
+> This sounds like an oversight. From a quick look,
+> hidp_session_terminate() should set these errors properly. I can try
+> to craft a patch on Monday.
 
-That would be the mgmt settings bit number 9 (see doc/mgmt-api.txt).
-bluetoothd keeps track of this (and enables it automatically if
-available) and you should also be able to see it e.g. with "btmgmt
-info". The mgmt interface tells you both whether it's supported as well
-as whether it's enabled.
+I wonder if it isn't better to just call kernel_sock_shutdown directly
+since either way we want to disconnect and the userspace is not really
+doing anything special with EUNATCH either, it just see there is an
+error and close its reference which happens to be the last one causing
+it disconnect.
 
-Johan
+-- 
+Luiz Augusto von Dentz
