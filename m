@@ -1,47 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nicholas Krause <johan.hedberg@gmail.com>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] bluetooth:Fix locking issues in the function l2cap_connect_cfm
-Date: Mon, 24 Aug 2015 13:23:46 -0400
-Message-Id: <1440437026-21271-1-git-send-email-xerofoify@gmail.com>
+Message-ID: <55DB58B7.5080101@web.de>
+Date: Mon, 24 Aug 2015 19:47:35 +0200
+From: Norbert Holze <norbert.holze@web.de>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+CC: Marcel Holtmann <marcel@holtmann.org>
+Subject: Aw: Re: btusb regression / 0a12:0001 CSR
+References: <55C6F858.5080808@web.de> <BC6C2463-83DF-4825-95FC-A55A5B825B0A@holtmann.org>, <55C7947A.6050605@web.de>
+In-Reply-To: <55C7947A.6050605@web.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes a locking issue in the function l2cap_connect_cfm for
-not locking the mutex lock for channels on the l2cap_conn structure
-pointer conn before calling __l2cap_get_chan_by_dcid as all callers
-need to lock and unlock this mutex before calling this function due
-to issues with either concurrent users or race conditions arising
-if this mutex is not locked before these calls.
-v3 Fix double locking of mutex lock on goto next label to instead correctly
-unlock the channel mutex
-v2 Remove unneeded mutex_unlock for channels as the unlock was due early
-for adding correct protection for all functions that have requirements
-for this mutex lock needing to be locked before calling them.
-Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
----
- net/bluetooth/l2cap_core.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hello!
+ 
+Is it possible to add a quirk or something else?
+ 
+Regrads,
+ 
+Norbert
+ 
+*Gesendet:* Sonntag, 09. August 2015 um 19:57 Uhr
+*Von:* "Norbert Holze" <norbert.holze@web.de>
+*An:* "Marcel Holtmann" <marcel@holtmann.org>
+*Cc:* linux-bluetooth@vger.kernel.org
+*Betreff:* Re: btusb regression / 0a12:0001 CSR
+Hello Marcel,
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 45fffa4..20d3909 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7285,6 +7285,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 		struct l2cap_chan *chan, *next;
+thanks for the fast reply.
+
+Am 09.08.2015 um 19:44 schrieb Marcel Holtmann:
+
+> Please report the section from /sys/kernel/debug/usb/devices that
+corresponds to your device.
+
+T: Bus=04 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 3 Spd=12 MxCh= 0
+D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=16 #Cfgs= 1
+P: Vendor=0a12 ProdID=0001 Rev= 1.34
+C:* #Ifs= 2 Cfg#= 1 Atr=80 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+
+Regards,
+
+Norbert
  
- 		/* Client fixed channels should override server ones */
-+		mutex_lock(&conn->chan_lock);
- 		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
- 			goto next;
- 
-@@ -7301,6 +7302,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 
- 		l2cap_chan_unlock(pchan);
- next:
-+		mutex_unlock(&conn->chan_lock);
- 		next = l2cap_global_fixed_chan(pchan, hcon);
- 		l2cap_chan_put(pchan);
- 		pchan = next;
--- 
-2.1.4
