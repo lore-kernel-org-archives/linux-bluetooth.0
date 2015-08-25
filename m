@@ -1,35 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Date: Tue, 25 Aug 2015 09:52:38 -0700
+From: Mark Haun <haunma@keteu.org>
+To: "Ge, Ethan" <ethan.ge@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: Re: Intel 7260 spontaneous USB disconnect/reconnect every 23h18m07s
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150825165238.GA28893@hau.nz>
-Date: Tue, 25 Aug 2015 10:06:27 -0700
-Cc: "Ge, Ethan" <ethan.ge@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <E5BA38C2-48F1-41C8-9C43-D2C077EBB44B@holtmann.org>
-References: <20150819222049.15ca98f0@angwin.home> <86D221DC0B85F94D9B05B97827669A34064C4EF7@PGSMSX106.gar.corp.intel.com> <20150825165238.GA28893@hau.nz>
-To: Mark Haun <haunma@keteu.org>
+Message-ID: <20150825165238.GA28893@hau.nz>
+References: <20150819222049.15ca98f0@angwin.home>
+ <86D221DC0B85F94D9B05B97827669A34064C4EF7@PGSMSX106.gar.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <86D221DC0B85F94D9B05B97827669A34064C4EF7@PGSMSX106.gar.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mark,
+Hi Ethan,
 
->> Your Intel FW version hci0: read Intel version: 3707100180012d0d06, it's
->> too old.  Please try latest Intel WP2 FW
->> Ibt-hw-37.7.10-fw-1.80.1.2d.d.bseq in linux-firmware/intel.
-> 
-> So I tried this before going away for the weekend, rebooted, and then
-> checked dmesg when I got back.  The issue is still there, spontaneous
-> disconnect/reconnect every 23h18m07s like clockwork.
+Ge, Ethan [ethan.ge@intel.com] wrote:
+> Your Intel FW version hci0: read Intel version: 3707100180012d0d06, it's
+> too old.  Please try latest Intel WP2 FW
+> Ibt-hw-37.7.10-fw-1.80.1.2d.d.bseq in linux-firmware/intel.
 
-this sounds suspiciously like the validity of the encryption key. I assume your connection is encrypted.
+So I tried this before going away for the weekend, rebooted, and then
+checked dmesg when I got back.  The issue is still there, spontaneous
+disconnect/reconnect every 23h18m07s like clockwork.
 
-Please provide the btmon output for the section where you see the disconnect + reconnect. I need to check what the firmware is telling us. And please include the initial connection setup as well. I need to see the features of the remote device.
+I am starting to second-guess myself a little, though, because I am confused
+about the firmware naming.  The firmware or microcode files I am familiar
+with (iwlwifi for instance) have the firmware version as part of the file
+name.  The ibt-hw-* firmwares, on the other hand, appear to keep the *same*
+filename when new versions come out; only the increased file size indicates
+that the contents have changed.  So I am guessing that the filename refers
+to the hardware revision it is intended for, rather than the
+firmware/microcode revision?  Either that, or debian is not distributing the
+same firmware files as the ones in git!
 
-However in theory the firmware should be using using encryption pause and resume to renew the encryption key prior to it expiring. We might need the LMP details in that case. You can use bluemoon -T to enable them (and that tool will also decode firmware version for you). Decoding the LMP vendor events will not be possible since we have not added support for it to btmon yet.
+In any case, the dmesg output with the [presumed correct] firmware is
+precisely the same as before:
 
-Regards
+Bluetooth: hci0: read Intel version: 3707100180012d0d06
+Bluetooth: hci0: Intel device is already patched. patch num: 06
 
-Marcel
+The size of the file "ibt-hw-37.7.10-fw-1.80.1.2d.d.bseq" is now 17310
+bytes.  That is larger than the one it overwrote, but I didn't write down
+the old size.
 
+Kernel version is 4.2.0-rc4.
+
+Mark
