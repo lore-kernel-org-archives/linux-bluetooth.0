@@ -1,58 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: Intel 7260 spontaneous USB disconnect/reconnect every 23h18m07s
+Subject: Re: [PATCH v6 1/2] Bluetooth: hci_intel: Add Intel baudrate configuration support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150825171647.GB28893@hau.nz>
-Date: Tue, 25 Aug 2015 10:23:21 -0700
-Cc: "Ge, Ethan" <ethan.ge@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <DE828595-3ADE-4F8F-8B24-4426C19A8DFF@holtmann.org>
-References: <20150819222049.15ca98f0@angwin.home> <86D221DC0B85F94D9B05B97827669A34064C4EF7@PGSMSX106.gar.corp.intel.com> <20150825165238.GA28893@hau.nz> <E5BA38C2-48F1-41C8-9C43-D2C077EBB44B@holtmann.org> <20150825171647.GB28893@hau.nz>
-To: Mark Haun <haunma@keteu.org>
+In-Reply-To: <1440518144-14709-1-git-send-email-loic.poulain@intel.com>
+Date: Tue, 25 Aug 2015 10:18:28 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <260DEC3C-5AB5-4575-8040-65DF1515C53C@holtmann.org>
+References: <1440518144-14709-1-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mark,
+Hi Loic,
 
->>> So I tried this before going away for the weekend, rebooted, and then
->>> checked dmesg when I got back.  The issue is still there, spontaneous
->>> disconnect/reconnect every 23h18m07s like clockwork.
->> 
->> this sounds suspiciously like the validity of the encryption key. I assume
->> your connection is encrypted.
+> Implement the set_baudrate callback for hci_intel.
+> - Controller requires a read Intel version command before updating
+>   its baudrate.
+> - The operation consists in an async cmd since the controller does
+>   not respond at the same speed.
+> - Wait 100ms to let the controller change its baudrate.
+> - Clear RTS until we change our own UART speed
 > 
-> Sorry, I should have re-iterated in the message, that this is a *USB*
-> disconnect/reconnect.  There is actually no bluetooth activity or
-> connections at all during this time---bluetoothd is running, but that's it
-> (although I am eager to test an IdleTimeout patch when it's available).
+> Manage speed change in the setup function, we need to restore the oper
+> speed once chip has booted on patched firmware.
 > 
-> I snipped the dmesg output from earlier in the thread; it looked like this:
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> ---
+> v2: simplify baudrate change, update commit message,
+>     set missing set_baudrate callback.
+> v3: Remove unused 'err' variable in intel_set_baudrate
+> v4: Move set_bit STATE_BOOTING after speed changing in setup
+>     change patch title, hci_uart->hci_intel
+> v5: Direclty enqueue speed cmd instead of hacking hci_cmd_sync
+>     intel_set_baudrate refactoring.
+>     keep STATE_SPEED_CHANGING flag in order to ignore incoming packet
+>     during transition. Could be used later to indicate cmd complete,
+>     avoiding msleep usage.
+> v6: use hci_uart_set_flow_control to clear RTS during speed transition
+>     dont need STATE_SPEED_CHANGING flag anymore
 > 
-> [83894.699185] usb 1-1: USB disconnect, device number 2
-> [83894.914720] usb 1-1: new full-speed USB device number 3 using tegra-ehci
-> [83895.044528] usb 1-1: New USB device found, idVendor=8087, idProduct=07dc
-> [83895.051304] usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-> [83895.076633] Bluetooth: hci0: read Intel version: 3707100180012d0d06
-> [83895.082944] Bluetooth: hci0: Intel device is already patched. patch num: 06
-> [167782.187624] usb 1-1: USB disconnect, device number 3
-> [167782.403343] usb 1-1: new full-speed USB device number 4 using tegra-ehci
-> [167782.532645] usb 1-1: New USB device found, idVendor=8087, idProduct=07dc
-> [167782.539504] usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-> [167782.564803] Bluetooth: hci0: read Intel version: 3707100180012d0d06
-> [167782.571242] Bluetooth: hci0: Intel device is already patched. patch num: 06
-> ...
-> 
-> So, strictly a hardware driver/firmware issue of some kind.  Either that, or
-> something quite strange happening on my system which I've not figured out
-> yet.  (I do have other USB devices attached, which are not cycling like
-> this.)
+> drivers/bluetooth/hci_intel.c | 119 ++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 119 insertions(+)
 
-please run bluemoon -T to enable the LMP tracing feature and then see if you happen to catch the messages before the controller jumps off the bus. I wonder which side initiates the key refresh. Also what is the remote device. You can try hcitool info <bdaddr> to get its features.
+patch has been applied to bluetooth-next tree.
 
-As I said before, just running bluemoon should decode the firmware version for you. No need to wildly guess.
-
-In general if the device gets kicked off the USB bus, then something bad happened. The firmware might has crashed or something like that. The fact that the interval is consistent and pretty much the validity period of the encryption key, I bet that something goes wrong with the key refresh procedure.
+Just a heads up that the patch 2/2 never made it to the mailing list.
 
 Regards
 
