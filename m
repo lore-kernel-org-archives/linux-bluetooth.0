@@ -1,219 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH v6 1/2] Bluetooth: hci_intel: Add Intel baudrate configuration support
-Date: Tue, 25 Aug 2015 17:55:44 +0200
-Message-Id: <1440518144-14709-1-git-send-email-loic.poulain@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH v4 1/2] Bluetooth: hci_intel: Add Intel baudrate configuration support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <55DC87EB.2050104@intel.com>
+Date: Tue, 25 Aug 2015 08:39:01 -0700
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <7CA7C1A2-FAD5-4371-8502-96A81247D37D@holtmann.org>
+References: <1440165583-23245-1-git-send-email-loic.poulain@intel.com> <5D898BFA-B6C2-47DC-9DC4-DB3EDECA2E23@holtmann.org> <55DC2ABE.7090107@intel.com> <FC07D45C-7D4E-466A-A16B-B7DE84CF01B3@holtmann.org> <55DC87EB.2050104@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implement the set_baudrate callback for hci_intel.
- - Controller requires a read Intel version command before updating
-   its baudrate.
- - The operation consists in an async cmd since the controller does
-   not respond at the same speed.
- - Wait 100ms to let the controller change its baudrate.
- - Clear RTS until we change our own UART speed
+Hi Loic,
 
-Manage speed change in the setup function, we need to restore the oper
-speed once chip has booted on patched firmware.
+>>>>> +
+>>>>> +	set_bit(STATE_SPEED_CHANGING, &intel->flags);
+>>>>> +
+>>>>> +	skb = __hci_cmd_sync(hdev, 0xfc06, 1, &intel_speed, HCI_INIT_TIMEOUT);
+>>>>> +	if (IS_ERR(skb)) {
+>>>>> +		BT_ERR("%s: Changing Intel speed failed (%ld)",
+>>>>> +		       hdev->name, PTR_ERR(skb));
+>>>>> +		clear_bit(STATE_SPEED_CHANGING, &intel->flags);
+>>>>> +		return PTR_ERR(skb);
+>>>>> +	}
+>>>> 
+>>>> I think this approach is wrong. It is not that the controller sends no HCI Command Complete. It is just that it sends it later and we have to change the baud rate in between.
+>>>> 
+>>>> This is different from the case where the controller swallows the HCI Command Complete event altogether. So instead of trying to hack around this, why not just insert the HCI command into the queue like the QCA guys did. We have no chance of checking that it worked anyway.
+>>> 
+>>> I sent the speed command with hci_cmd_sync so that it pass through the hci core and can be monitored (btmon/hcidump). But I'm ok for directly enqueueing the packet.
+>> 
+>> lets enqueue in manually first. And then we need to add a __hci_cmd_send that just sends a packet without waiting for its command status/complete. Then we fix the Intel driver and the Qualcomm driver.
+>> 
+>>>>> +
+>>>>> +	kfree_skb(skb);
+>>>>> +
+>>>>> +	/* wait 100ms to change baudrate on controller side */
+>>>>> +	msleep(100);
+>>>>> +
+>>>>> +	clear_bit(STATE_SPEED_CHANGING, &intel->flags);
+>>>> 
+>>>> If we just inject the command into the local queue and wakeup the processing, then the speed change state tracking for sending should go away. However we could keep it for waiting for the HCI Command Complete that indicates the success. And then continue. The msleep would then not be needed.
+>>> 
+>>> I also use this flag to ignore incoming data during speed transition.
+>>> It avoids to retrieve unexpected/corrupted data.
+>>> I agree that we should manage the response, however it requires some play with CTS/RTS and hci_uart_set_baudrate. I will keep it simple for now, having the same solution as QCA.
+>> 
+>> We are required to change UART settings anyway. At least that is what I remember from the vendor specification here. If we get corrupted data, then that is pretty bad.
+> 
+> Sure, but the question is how do you know that command has been fully transmitted on the UART PHY (from hci_intel)?
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- v2: simplify baudrate change, update commit message,
-     set missing set_baudrate callback.
- v3: Remove unused 'err' variable in intel_set_baudrate
- v4: Move set_bit STATE_BOOTING after speed changing in setup
-     change patch title, hci_uart->hci_intel
- v5: Direclty enqueue speed cmd instead of hacking hci_cmd_sync
-     intel_set_baudrate refactoring.
-     keep STATE_SPEED_CHANGING flag in order to ignore incoming packet
-     during transition. Could be used later to indicate cmd complete,
-     avoiding msleep usage.
- v6: use hci_uart_set_flow_control to clear RTS during speed transition
-     dont need STATE_SPEED_CHANGING flag anymore
- 
- drivers/bluetooth/hci_intel.c | 119 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
+I think that is where a new __hci_cmd_send should come into play. It should only return if the command has left the Bluetooth core.
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 21dfa89..da3192a 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -45,6 +45,38 @@ struct intel_data {
- 	unsigned long flags;
- };
- 
-+static u8 intel_convert_speed(unsigned int speed)
-+{
-+	switch (speed) {
-+	case 9600:
-+		return 0x00;
-+	case 19200:
-+		return 0x01;
-+	case 38400:
-+		return 0x02;
-+	case 57600:
-+		return 0x03;
-+	case 115200:
-+		return 0x04;
-+	case 230400:
-+		return 0x05;
-+	case 460800:
-+		return 0x06;
-+	case 921600:
-+		return 0x07;
-+	case 1843200:
-+		return 0x08;
-+	case 3250000:
-+		return 0x09;
-+	case 2000000:
-+		return 0x0a;
-+	case 3000000:
-+		return 0x0b;
-+	default:
-+		return 0xff;
-+	}
-+}
-+
- static int intel_open(struct hci_uart *hu)
- {
- 	struct intel_data *intel;
-@@ -111,6 +143,56 @@ static int inject_cmd_complete(struct hci_dev *hdev, __u16 opcode)
- 	return hci_recv_frame(hdev, skb);
- }
- 
-+static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
-+{
-+	struct intel_data *intel = hu->priv;
-+	struct hci_dev *hdev = hu->hdev;
-+	u8 speed_cmd[] = { 0x06, 0xfc, 0x01, 0x00 };
-+	struct sk_buff *skb;
-+
-+	BT_INFO("%s: Change controller speed to %d", hdev->name, speed);
-+
-+	speed_cmd[3] = intel_convert_speed(speed);
-+	if (speed_cmd[3] == 0xff) {
-+		BT_ERR("%s: Unsupported speed", hdev->name);
-+		return -EINVAL;
-+	}
-+
-+	/* Device will not accept speed change if Intel version has not been
-+	 * previously requested.
-+	 */
-+	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: Reading Intel version information failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	skb = bt_skb_alloc(sizeof(speed_cmd), GFP_KERNEL);
-+	if (!skb) {
-+		BT_ERR("%s: Failed to allocate memory for baudrate packet",
-+		       hdev->name);
-+		return -ENOMEM;
-+	}
-+
-+	memcpy(skb_put(skb, sizeof(speed_cmd)), speed_cmd, sizeof(speed_cmd));
-+	bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
-+
-+	hci_uart_set_flow_control(hu, true);
-+
-+	skb_queue_tail(&intel->txq, skb);
-+	hci_uart_tx_wakeup(hu);
-+
-+	/* wait 100ms to change baudrate on controller side */
-+	msleep(100);
-+
-+	hci_uart_set_baudrate(hu, speed);
-+	hci_uart_set_flow_control(hu, false);
-+
-+	return 0;
-+}
-+
- static int intel_setup(struct hci_uart *hu)
- {
- 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
-@@ -126,6 +208,8 @@ static int intel_setup(struct hci_uart *hu)
- 	u32 frag_len;
- 	ktime_t calltime, delta, rettime;
- 	unsigned long long duration;
-+	unsigned int init_speed, oper_speed;
-+	int speed_change = 0;
- 	int err;
- 
- 	BT_DBG("%s", hdev->name);
-@@ -134,6 +218,19 @@ static int intel_setup(struct hci_uart *hu)
- 
- 	calltime = ktime_get();
- 
-+	if (hu->init_speed)
-+		init_speed = hu->init_speed;
-+	else
-+		init_speed = hu->proto->init_speed;
-+
-+	if (hu->oper_speed)
-+		oper_speed = hu->oper_speed;
-+	else
-+		oper_speed = hu->proto->oper_speed;
-+
-+	if (oper_speed && init_speed && oper_speed != init_speed)
-+		speed_change = 1;
-+
- 	set_bit(STATE_BOOTLOADER, &intel->flags);
- 
- 	/* Read the Intel version information to determine if the device
-@@ -416,6 +513,13 @@ done:
- 	if (err < 0)
- 		return err;
- 
-+	/* We need to restore the default speed before Intel reset */
-+	if (speed_change) {
-+		err = intel_set_baudrate(hu, init_speed);
-+		if (err)
-+			return err;
-+	}
-+
- 	calltime = ktime_get();
- 
- 	set_bit(STATE_BOOTING, &intel->flags);
-@@ -456,6 +560,19 @@ done:
- 
- 	BT_INFO("%s: Device booted in %llu usecs", hdev->name, duration);
- 
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+	kfree_skb(skb);
-+
-+	if (speed_change) {
-+		err = intel_set_baudrate(hu, oper_speed);
-+		if (err)
-+			return err;
-+	}
-+
-+	BT_INFO("%s: Setup complete", hdev->name);
-+
- 	clear_bit(STATE_BOOTLOADER, &intel->flags);
- 
- 	return 0;
-@@ -572,10 +689,12 @@ static const struct hci_uart_proto intel_proto = {
- 	.id		= HCI_UART_INTEL,
- 	.name		= "Intel",
- 	.init_speed	= 115200,
-+	.oper_speed	= 3000000,
- 	.open		= intel_open,
- 	.close		= intel_close,
- 	.flush		= intel_flush,
- 	.setup		= intel_setup,
-+	.set_baudrate	= intel_set_baudrate,
- 	.recv		= intel_recv,
- 	.enqueue	= intel_enqueue,
- 	.dequeue	= intel_dequeue,
--- 
-1.9.1
+Regards
+
+Marcel
 
