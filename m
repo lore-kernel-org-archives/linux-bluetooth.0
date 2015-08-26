@@ -1,130 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1440583195-11541-2-git-send-email-gowtham.ab@samsung.com>
-References: <1440583195-11541-1-git-send-email-gowtham.ab@samsung.com>
-	<1440583195-11541-2-git-send-email-gowtham.ab@samsung.com>
-Date: Wed, 26 Aug 2015 13:18:20 +0300
-Message-ID: <CABBYNZ+fP=WA4PhuZFMvYnLxXWhZf7aWWS=C_aKJroxEDnvKWg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] tools/btgatt-server: Handle Charc Value Indication
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>
-Content-Type: text/plain; charset=UTF-8
+From: Hsin-Yu Chao <hychao@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: armansito@chromium.org, luiz.dentz@gmail.com,
+	Hsin-Yu Chao <hychao@chromium.org>
+Subject: [PATCH] audio/media - Fix crash at deferencing NULL pointer
+Date: Wed, 26 Aug 2015 18:05:15 +0800
+Message-Id: <1440583515-30033-1-git-send-email-hychao@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+The boolean pointer passed in to config_cb could be NULL
+in media_endpoint_cancel(). In that case we should not
+derefence it but pass FALSE instead to indicate error.
 
-On Wed, Aug 26, 2015 at 12:59 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> This patch verifies that a Generic Attribute Profile server can
-> send a Characteristic Value Indication.
-> TC_GAI_SR_BV_01_C - PASS
-> ---
->  tools/btgatt-server.c | 30 +++++++++++++++++++++++++-----
->  1 file changed, 25 insertions(+), 5 deletions(-)
->
-> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-> index 292b584..5b38d47 100644
-> --- a/tools/btgatt-server.c
-> +++ b/tools/btgatt-server.c
-> @@ -94,6 +94,8 @@ struct server {
->         bool hr_msrmt_enabled;
->         int hr_ee_count;
->         unsigned int hr_timeout_id;
-> +
-> +       bool indicate;
->  };
->
->  static void print_prompt(void)
-> @@ -285,6 +287,11 @@ static void hr_msrmt_ccc_read_cb(struct gatt_db_attribute *attrib,
->         gatt_db_attribute_read_result(attrib, id, 0, value, 2);
->  }
->
-> +static void conf_callback(void *user_data)
-> +{
-> +       PRLOG("GATT server received confirmation\n");
-> +}
-> +
->  static bool hr_msrmt_cb(void *user_data)
->  {
->         struct server *server = user_data;
-> @@ -302,11 +309,15 @@ static bool hr_msrmt_cb(void *user_data)
->                 len += 2;
->         }
->
-> -       bt_gatt_server_send_notification(server->gatt,
-> +       if (server->indicate)
-> +               bt_gatt_server_send_indication(server->gatt,
-> +                                       server->hr_msrmt_handle,
-> +                                       pdu, len, conf_callback, NULL, NULL);
-> +       else
-> +               bt_gatt_server_send_notification(server->gatt,
->                                                 server->hr_msrmt_handle,
->                                                 pdu, len);
->
-> -
->         cur_ee = server->hr_energy_expended;
->         server->hr_energy_expended = MIN(UINT16_MAX, cur_ee + 10);
->         server->hr_ee_count++;
-> @@ -350,7 +361,14 @@ static void hr_msrmt_ccc_write_cb(struct gatt_db_attribute *attrib,
->                         PRLOG("HR Measurement Already Enabled\n");
->                         goto done;
->                 }
-> -
-> +               server->hr_msrmt_enabled = true;
-> +       }
-> +       else if (value[0] == 0x02) {
-> +               if (server->hr_msrmt_enabled) {
-> +                       PRLOG("HR Measurement Already Enabled\n");
-> +                       goto done;
-> +               }
-> +               server->indicate = true;
->                 server->hr_msrmt_enabled = true;
->         } else
->                 ecode = 0x80;
-> @@ -494,7 +512,8 @@ static void populate_hr_service(struct server *server)
->         bt_uuid16_create(&uuid, UUID_HEART_RATE_MSRMT);
->         hr_msrmt = gatt_db_service_add_characteristic(service, &uuid,
->                                                 BT_ATT_PERM_NONE,
-> -                                               BT_GATT_CHRC_PROP_NOTIFY,
-> +                                               BT_GATT_CHRC_PROP_NOTIFY |
-> +                                               BT_GATT_CHRC_PROP_INDICATE,
->                                                 NULL, NULL, NULL);
+Below is the core dump to demonstrate the crash:
 
-I would have added a different characteristic for this, afaik HR does
-not use indications.
+config_cb (endpoint=0xb814ff40, ret=0x0, size=-1,
+    user_data=0xb8157758) at profiles/audio/media.c:537
+0xb6eb7ba4 in media_endpoint_cancel (request=0xb815b4d0)
+    at profiles/audio/media.c:141
+0xb6eb7c98 in media_endpoint_cancel_all (endpoint=0xb814ff40)
+    at profiles/audio/media.c:149
+clear_endpoint (endpoint=endpoint@entry=0xb814ff40)
+    at profiles/audio/media.c:250
+0xb6eb7e74 in endpoint_reply (call=<optimized out>, user_data=0xb815b4d0)
+    at profiles/audio/media.c:277
+0xb6d50336 in ?? () from /usr/lib/libdbus-1.so.3
+---
+ profiles/audio/media.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->         server->hr_msrmt_handle = gatt_db_attribute_get_handle(hr_msrmt);
->
-> @@ -533,8 +552,8 @@ static void populate_hr_service(struct server *server)
->  static void populate_db(struct server *server)
->  {
->         populate_gap_service(server);
-> -       populate_gatt_service(server);
->         populate_hr_service(server);
-> +       populate_gatt_service(server);
->  }
->
->  static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
-> @@ -589,6 +608,7 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
->         }
->
->         server->hr_visible = hr_visible;
-> +       server->indicate = false;
->
->         if (verbose) {
->                 bt_att_set_debug(server->att, att_debug_cb, "att: ", NULL);
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index ed441d0..cad9cce 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -534,7 +534,7 @@ static void config_cb(struct media_endpoint *endpoint, void *ret, int size,
+ 	struct a2dp_config_data *data = user_data;
+ 	gboolean *ret_value = ret;
+ 
+-	data->cb(data->setup, *ret_value ? TRUE : FALSE);
++	data->cb(data->setup, ret_value ? *ret_value : FALSE);
+ }
+ 
+ static int set_config(struct a2dp_sep *sep, uint8_t *configuration,
 -- 
-Luiz Augusto von Dentz
+2.5.0.457.gab17608
+
