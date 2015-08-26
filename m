@@ -1,61 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1440165704-6885-1-git-send-email-luiz.dentz@gmail.com>
-References: <1440165704-6885-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 26 Aug 2015 14:31:38 +0300
-Message-ID: <CABBYNZK9DsC2Cvj+eduK=U7Qk3DPDjhqaQFYKwhMugqcCgRO-A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] unit/test-gdbus-client: Fix memory leak
+In-Reply-To: <1440061390-32664-2-git-send-email-bharat.panda@samsung.com>
+References: <1440061390-32664-1-git-send-email-bharat.panda@samsung.com>
+	<1440061390-32664-2-git-send-email-bharat.panda@samsung.com>
+Date: Wed, 26 Aug 2015 13:40:45 +0300
+Message-ID: <CABBYNZKEPaHp-OU7fV3CvFcKOUoX6mEFjqq4OB84fqOKe7Cbfw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] audio/avrcp: Set Media Player Properties
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bharat,
 
-On Fri, Aug 21, 2015 at 5:01 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> The following memory leak is causes if not all interfaces are freed
-> once closing the connecting:
->
-> 7,738 (232 direct, 7,506 indirect) bytes in 1 blocks are definitely lost in loss record 302 of 302
->        at 0x4C2A9C7: calloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
->        by 0x519517F: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
->        by 0x519EF8E: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
->        by 0x519F462: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
->        by 0x5193419: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
->        by 0x517E6AE: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
->        by 0x517A06B: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
->        by 0x4076B9: g_dbus_setup_private (mainloop.c:314)
->        by 0x404B8C: client_force_disconnect (test-gdbus-client.c:882)
->        by 0x410B52: run_callback (tester.c:417)
->        by 0x4E7EA89: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4400.1)
->        by 0x4E7EE1F: ??? (in /usr/lib64/libglib-2.0.so.0.4400.1)
+On Thu, Aug 20, 2015 at 12:03 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Add methods to set missing media player properties value, like
+> player name, type, sub-type and features.
 > ---
->  unit/test-gdbus-client.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  profiles/audio/media.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 81 insertions(+)
 >
-> diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
-> index b25289f..dd17c00 100644
-> --- a/unit/test-gdbus-client.c
-> +++ b/unit/test-gdbus-client.c
-> @@ -861,6 +861,10 @@ static void proxy_force_disconnect(GDBusProxy *proxy, void *user_data)
->         context->timeout_source = g_timeout_add_seconds(2, timeout_test,
->                                                                 context);
->
-> +       g_dbus_detach_object_manager(conn);
-> +
-> +       g_dbus_unregister_interface(conn, SERVICE_PATH, SERVICE_NAME1);
-> +
->         dbus_connection_flush(conn);
->         dbus_connection_close(conn);
->         dbus_connection_unref(conn);
-> --
-> 2.4.3
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> index ed441d0..f55ecc1 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -112,6 +112,10 @@ struct media_player {
+>         bool                    next;
+>         bool                    previous;
+>         bool                    control;
+> +       char                    *name;
+> +       char                    *type;
+> +       char                    *subtype;
+> +       unsigned int            features[16];
+>  };
 
-Applied.
+To start with I would like to just have the passed to, for the rest we
+can assume some values and disable all the features that require the
+browsing command.
+
+>  static GSList *adapters = NULL;
+> @@ -1607,6 +1611,71 @@ static gboolean set_flag(struct media_player *mp, DBusMessageIter *iter,
+>         return TRUE;
+>  }
+>
+> +static gboolean set_name(struct media_player *mp, DBusMessageIter *iter)
+> +{
+> +       const char *value;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
+> +               return FALSE;
+> +
+> +       dbus_message_iter_get_basic(iter, &value);
+> +
+> +       if (g_strcmp0(mp->name, value) == 0)
+> +               return TRUE;
+> +
+> +       mp->name = g_strdup(value);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean set_type(struct media_player *mp, DBusMessageIter *iter)
+> +{
+> +       const char *value;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
+> +               return FALSE;
+> +
+> +       dbus_message_iter_get_basic(iter, &value);
+> +
+> +       mp->type = g_strdup(value);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean set_features(struct media_player *mp, DBusMessageIter *iter)
+> +{
+> +       const char *value;
+> +       uint8_t i = 0;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
+> +               return FALSE;
+> +
+> +       dbus_message_iter_get_basic(iter, &value);
+> +
+> +       memset(&mp->features, 0x00, 16);
+> +
+> +       while ((i < (strlen(value)/2))) {
+> +               sscanf(value+(2*i), "%02x", &mp->features[i]);
+> +               i++;
+> +       }
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean set_subtype(struct media_player *mp, DBusMessageIter *iter)
+> +{
+> +       const char *value;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
+> +               return FALSE;
+> +
+> +       dbus_message_iter_get_basic(iter, &value);
+> +
+> +       mp->subtype = g_strdup(value);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static gboolean set_player_property(struct media_player *mp, const char *key,
+>                                                         DBusMessageIter *entry)
+>  {
+> @@ -1647,6 +1716,18 @@ static gboolean set_player_property(struct media_player *mp, const char *key,
+>         if (strcasecmp(key, "CanControl") == 0)
+>                 return set_flag(mp, &var, &mp->control);
+>
+> +       if (strcasecmp(key, "DisplayName") == 0)
+> +               return set_name(mp, &var);
+> +
+> +       if (strcasecmp(key, "Type") == 0)
+> +               return set_type(mp, &var);
+> +
+> +       if (strcasecmp(key, "SubType") == 0)
+> +               return set_subtype(mp, &var);
+> +
+> +       if (strcasecmp(key, "Features") == 0)
+> +               return set_features(mp, &var);
+> +
+>         DBG("%s not supported, ignoring", key);
+>
+>         return TRUE;
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 
 
 -- 
