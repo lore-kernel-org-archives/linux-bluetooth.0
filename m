@@ -1,128 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1440061325-32588-1-git-send-email-bharat.panda@samsung.com>
-References: <1440061325-32588-1-git-send-email-bharat.panda@samsung.com>
-Date: Wed, 26 Aug 2015 13:37:14 +0300
-Message-ID: <CABBYNZJ0WxH29RY-DXZGNsFB-DmL6JwNjtEX0JYNqUCybhO=MQ@mail.gmail.com>
-Subject: Re: [PATCH ] monitor/avctp: Fix GetFolderItems field values
+In-Reply-To: <1440583195-11541-2-git-send-email-gowtham.ab@samsung.com>
+References: <1440583195-11541-1-git-send-email-gowtham.ab@samsung.com>
+	<1440583195-11541-2-git-send-email-gowtham.ab@samsung.com>
+Date: Wed, 26 Aug 2015 13:18:20 +0300
+Message-ID: <CABBYNZ+fP=WA4PhuZFMvYnLxXWhZf7aWWS=C_aKJroxEDnvKWg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] tools/btgatt-server: Handle Charc Value Indication
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
+	Bharat Panda <bharat.panda@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+Hi Gowtham,
 
-On Thu, Aug 20, 2015 at 12:02 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Replaced field names for GetFolderItems response with
-> correct names, values and fix allignments.
->
->       AVCTP Browsing: Response: type 0x00 label 0 PID 0x110e
->         AVRCP: GetFolderItems: len 0x0030
->           Status: 0x04 (Success)
->           UIDCounter: 0x0000 (0)
->           NumOfItems: 0x0001 (1)
->           Item: 0x01 (Media Player)
->           Length: 0x0028 (40)
->           PlayerID: 0x0000 (0)
->           PlayerType: 0x0001 (Audio)
->           PlayerSubType: 0x00000001 (Audio Book)
->           PlayStatus: 0x01 (PLAYING)
->           Features: 0x0000000000b701ef0200000000000000
->           CharsetID: 0x006a (UTF-8)
->           NameLength: 0x000c (12)
->           Name: SimplePlayer
+On Wed, Aug 26, 2015 at 12:59 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> This patch verifies that a Generic Attribute Profile server can
+> send a Characteristic Value Indication.
+> TC_GAI_SR_BV_01_C - PASS
 > ---
->  monitor/avctp.c | 28 +++++++++++++++++-----------
->  1 file changed, 17 insertions(+), 11 deletions(-)
+>  tools/btgatt-server.c | 30 +++++++++++++++++++++++++-----
+>  1 file changed, 25 insertions(+), 5 deletions(-)
 >
-> diff --git a/monitor/avctp.c b/monitor/avctp.c
-> index a54b051..d06640e 100644
-> --- a/monitor/avctp.c
-> +++ b/monitor/avctp.c
-> @@ -1818,9 +1818,9 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
->  {
->         struct l2cap_frame *frame = &avctp_frame->l2cap_frame;
->         uint16_t id, charset, namelen;
-> -       uint8_t type, status;
-> +       uint8_t type, status, i;
->         uint32_t subtype;
-> -       uint64_t features[2];
-> +       uint8_t features[16];
->
->         if (!l2cap_frame_get_be16(frame, &id))
->                 return false;
-> @@ -1830,26 +1830,31 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
->         if (!l2cap_frame_get_u8(frame, &type))
->                 return false;
->
-> -       print_field("%*cPlayerID: 0x%04x (%s)", indent, ' ',
-> +       print_field("%*cPlayerType: 0x%04x (%s)", indent, ' ',
->                                                 type, playertype2str(type));
->
->         if (!l2cap_frame_get_be32(frame, &subtype))
->                 return false;
->
-> -       print_field("%*cPlayerID: 0x%08x (%s)", indent, ' ',
-> +       print_field("%*cPlayerSubType: 0x%08x (%s)", indent, ' ',
->                                         subtype, playersubtype2str(subtype));
->
->         if (!l2cap_frame_get_u8(frame, &status))
->                 return false;
->
-> -       print_field("%*cPlayerID: 0x%02x (%s)", indent, ' ',
-> +       print_field("%*cPlayStatus: 0x%02x (%s)", indent, ' ',
->                                                 status, playstatus2str(status));
->
-> -       if (!l2cap_frame_get_be128(frame, &features[0], &features[1]))
-> -               return false;
-> +       printf("%*cFeatures: 0x", indent+8, ' ');
+> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+> index 292b584..5b38d47 100644
+> --- a/tools/btgatt-server.c
+> +++ b/tools/btgatt-server.c
+> @@ -94,6 +94,8 @@ struct server {
+>         bool hr_msrmt_enabled;
+>         int hr_ee_count;
+>         unsigned int hr_timeout_id;
 > +
-> +       for (i = 0; i < 16; i++) {
-> +               if (!l2cap_frame_get_u8(frame, &features[i]))
-> +                       return false;
+> +       bool indicate;
+>  };
 >
-> -       print_field("%*cFeatures: 0x%16" PRIx64 "%16" PRIx64, indent, ' ',
-> -                                               features[1], features[0]);
-> +               printf("%02x", features[i]);
-> +       }
-> +
-> +       printf("\n");
->
->         if (!l2cap_frame_get_be16(frame, &charset))
->                 return false;
-> @@ -1863,7 +1868,7 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
->         print_field("%*cNameLength: 0x%04x (%u)", indent, ' ',
->                                                 namelen, namelen);
->
-> -       printf("%*cName: ", indent, ' ');
-> +       printf("%*cName: ", indent+8, ' ');
->         for (; namelen > 0; namelen--) {
->                 uint8_t c;
->
-> @@ -1871,6 +1876,7 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
->                         return false;
->                 printf("%1c", isprint(c) ? c : '.');
->         }
-> +       printf("\n");
->
->         return true;
+>  static void print_prompt(void)
+> @@ -285,6 +287,11 @@ static void hr_msrmt_ccc_read_cb(struct gatt_db_attribute *attrib,
+>         gatt_db_attribute_read_result(attrib, id, 0, value, 2);
 >  }
-> @@ -2296,7 +2302,7 @@ response:
->         if (!l2cap_frame_get_be16(frame, &num))
->                 return false;
 >
-> -       print_field("%*cUIDCounter: 0x%04x (%u)", indent, ' ', num, num);
-> +       print_field("%*cNumOfItems: 0x%04x (%u)", indent, ' ', num, num);
+> +static void conf_callback(void *user_data)
+> +{
+> +       PRLOG("GATT server received confirmation\n");
+> +}
+> +
+>  static bool hr_msrmt_cb(void *user_data)
+>  {
+>         struct server *server = user_data;
+> @@ -302,11 +309,15 @@ static bool hr_msrmt_cb(void *user_data)
+>                 len += 2;
+>         }
 >
->         for (; num > 0; num--) {
->                 uint8_t type;
+> -       bt_gatt_server_send_notification(server->gatt,
+> +       if (server->indicate)
+> +               bt_gatt_server_send_indication(server->gatt,
+> +                                       server->hr_msrmt_handle,
+> +                                       pdu, len, conf_callback, NULL, NULL);
+> +       else
+> +               bt_gatt_server_send_notification(server->gatt,
+>                                                 server->hr_msrmt_handle,
+>                                                 pdu, len);
+>
+> -
+>         cur_ee = server->hr_energy_expended;
+>         server->hr_energy_expended = MIN(UINT16_MAX, cur_ee + 10);
+>         server->hr_ee_count++;
+> @@ -350,7 +361,14 @@ static void hr_msrmt_ccc_write_cb(struct gatt_db_attribute *attrib,
+>                         PRLOG("HR Measurement Already Enabled\n");
+>                         goto done;
+>                 }
+> -
+> +               server->hr_msrmt_enabled = true;
+> +       }
+> +       else if (value[0] == 0x02) {
+> +               if (server->hr_msrmt_enabled) {
+> +                       PRLOG("HR Measurement Already Enabled\n");
+> +                       goto done;
+> +               }
+> +               server->indicate = true;
+>                 server->hr_msrmt_enabled = true;
+>         } else
+>                 ecode = 0x80;
+> @@ -494,7 +512,8 @@ static void populate_hr_service(struct server *server)
+>         bt_uuid16_create(&uuid, UUID_HEART_RATE_MSRMT);
+>         hr_msrmt = gatt_db_service_add_characteristic(service, &uuid,
+>                                                 BT_ATT_PERM_NONE,
+> -                                               BT_GATT_CHRC_PROP_NOTIFY,
+> +                                               BT_GATT_CHRC_PROP_NOTIFY |
+> +                                               BT_GATT_CHRC_PROP_INDICATE,
+>                                                 NULL, NULL, NULL);
+
+I would have added a different characteristic for this, afaik HR does
+not use indications.
+
+>         server->hr_msrmt_handle = gatt_db_attribute_get_handle(hr_msrmt);
+>
+> @@ -533,8 +552,8 @@ static void populate_hr_service(struct server *server)
+>  static void populate_db(struct server *server)
+>  {
+>         populate_gap_service(server);
+> -       populate_gatt_service(server);
+>         populate_hr_service(server);
+> +       populate_gatt_service(server);
+>  }
+>
+>  static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
+> @@ -589,6 +608,7 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
+>         }
+>
+>         server->hr_visible = hr_visible;
+> +       server->indicate = false;
+>
+>         if (verbose) {
+>                 bt_att_set_debug(server->att, att_debug_cb, "att: ", NULL);
 > --
 > 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-It seems I forgot to mention this has been applied.
 
 
 -- 
