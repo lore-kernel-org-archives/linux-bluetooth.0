@@ -1,58 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1440583195-11541-1-git-send-email-gowtham.ab@samsung.com>
-References: <1440583195-11541-1-git-send-email-gowtham.ab@samsung.com>
-Date: Wed, 26 Aug 2015 16:49:51 +0300
-Message-ID: <CABBYNZL6TUjjM2zTs6XtnMfL58mWLZRbL2T0d__WAFB_JpX3pw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] doc/pts: Update OPP PTS test results
+In-Reply-To: <1440165704-6885-1-git-send-email-luiz.dentz@gmail.com>
+References: <1440165704-6885-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 26 Aug 2015 14:31:38 +0300
+Message-ID: <CABBYNZK9DsC2Cvj+eduK=U7Qk3DPDjhqaQFYKwhMugqcCgRO-A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] unit/test-gdbus-client: Fix memory leak
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Bharat Panda <bharat.panda@samsung.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi,
 
-On Wed, Aug 26, 2015 at 12:59 PM, Gowtham Anandha Babu
-<gowtham.ab@samsung.com> wrote:
-> PTS issues got resolved after updating the ETS file attached in
-> https://www.bluetooth.org/pts/issues/view_issue.cfm?id=13842,
-> which will be updated in next PTS release.
+On Fri, Aug 21, 2015 at 5:01 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> The following memory leak is causes if not all interfaces are freed
+> once closing the connecting:
+>
+> 7,738 (232 direct, 7,506 indirect) bytes in 1 blocks are definitely lost in loss record 302 of 302
+>        at 0x4C2A9C7: calloc (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+>        by 0x519517F: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
+>        by 0x519EF8E: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
+>        by 0x519F462: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
+>        by 0x5193419: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
+>        by 0x517E6AE: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
+>        by 0x517A06B: ??? (in /usr/lib64/libdbus-1.so.3.8.13)
+>        by 0x4076B9: g_dbus_setup_private (mainloop.c:314)
+>        by 0x404B8C: client_force_disconnect (test-gdbus-client.c:882)
+>        by 0x410B52: run_callback (tester.c:417)
+>        by 0x4E7EA89: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4400.1)
+>        by 0x4E7EE1F: ??? (in /usr/lib64/libglib-2.0.so.0.4400.1)
 > ---
->  doc/pts-opp.txt | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  unit/test-gdbus-client.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
-> diff --git a/doc/pts-opp.txt b/doc/pts-opp.txt
-> index ae1bb7c..832028c 100644
-> --- a/doc/pts-opp.txt
-> +++ b/doc/pts-opp.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for OPP
+> diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
+> index b25289f..dd17c00 100644
+> --- a/unit/test-gdbus-client.c
+> +++ b/unit/test-gdbus-client.c
+> @@ -861,6 +861,10 @@ static void proxy_force_disconnect(GDBusProxy *proxy, void *user_data)
+>         context->timeout_source = g_timeout_add_seconds(2, timeout_test,
+>                                                                 context);
 >
->  PTS version: 6.2.0
-> -Tested: 30-Jul-2015
-> +Tested: 26-Aug-2015
->
->  Results:
->  PASS   test passed
-> @@ -92,9 +92,9 @@ TC_SERVER_OPH_BV_15_I N/A
->  TC_SERVER_OPH_BV_16_I  N/A
->  TC_SERVER_OPH_BV_17_I  PASS
->  TC_SERVER_OPH_BV_18_I  PASS
-> -TC_SERVER_OPH_BV_19_I  INC     PTS issue #13842
-> +TC_SERVER_OPH_BV_19_I  PASS
->  TC_SERVER_OPH_BV_21_I  N/A
-> -TC_SERVER_OPH_BV_22_I  INC     PTS issue #13842
-> +TC_SERVER_OPH_BV_22_I  PASS
->  TC_SERVER_OPH_BV_23_I  PASS
->  TC_SERVER_OPH_BV_24_I  N/A
->  TC_SERVER_OPH_BV_25_I  N/A
+> +       g_dbus_detach_object_manager(conn);
+> +
+> +       g_dbus_unregister_interface(conn, SERVICE_PATH, SERVICE_NAME1);
+> +
+>         dbus_connection_flush(conn);
+>         dbus_connection_close(conn);
+>         dbus_connection_unref(conn);
 > --
-> 1.9.1
+> 2.4.3
 
-I went ahead and applied this one.
+Applied.
 
 
 -- 
