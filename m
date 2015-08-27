@@ -1,30 +1,17 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ilya Faenson <ifaenson@broadcom.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Loic Poulain <loic.poulain@intel.com>,
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH v2] Bluetooth: hci_intel: Add support for platform driver
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <E0D3336E15B58B4294723AC879BA5E94286DBA@IRVEXCHMB15.corp.ad.broadcom.com>
+Date: Thu, 27 Aug 2015 11:28:05 -0700
+Cc: Loic Poulain <loic.poulain@intel.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH v2] Bluetooth: hci_intel: Add support for platform driver
-Date: Thu, 27 Aug 2015 18:35:07 +0000
-Message-ID: <E0D3336E15B58B4294723AC879BA5E94286E13@IRVEXCHMB15.corp.ad.broadcom.com>
-References: <1440652911-39717-1-git-send-email-marcel@holtmann.org>
- <55DECF9E.9040302@intel.com>
- <95579268-3455-4C1E-96E6-89C6D93A05D3@holtmann.org>
- <E0D3336E15B58B4294723AC879BA5E94286DBA@IRVEXCHMB15.corp.ad.broadcom.com>
- <8A9FC576-0B81-4AC0-8BA5-9042A29AB088@holtmann.org>
-In-Reply-To: <8A9FC576-0B81-4AC0-8BA5-9042A29AB088@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Message-Id: <8A9FC576-0B81-4AC0-8BA5-9042A29AB088@holtmann.org>
+References: <1440652911-39717-1-git-send-email-marcel@holtmann.org> <55DECF9E.9040302@intel.com> <95579268-3455-4C1E-96E6-89C6D93A05D3@holtmann.org> <E0D3336E15B58B4294723AC879BA5E94286DBA@IRVEXCHMB15.corp.ad.broadcom.com>
+To: Ilya Faenson <ifaenson@broadcom.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Hi Marcel,
-
------Original Message-----
-From: Marcel Holtmann [mailto:marcel@holtmann.org] 
-Sent: Thursday, August 27, 2015 2:28 PM
-To: Ilya Faenson
-Cc: Loic Poulain; linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: hci_intel: Add support for platform driver
 
 Hi Ilya,
 
@@ -54,8 +41,6 @@ Hi Ilya,
 these are ACPI devices where we have a clear tree of parent devices. I accepted also the Broadcom version for ACPI. Within ACPI the relationship between TTY and its GPIO etc. is expressed.
 
 That is the part that is missing within DT. And the DT folks should be signing off on that. In that case DT is defining the standard on how to express these relations. For ACPI based devices this is already expressed in shipping devices.
-
-IF: Appreciate the clarifications. Last time I looked, Loic's code has supported both ACPI and DT though. So just the ACPI part has been applied to the bluetooth-next?
 
 Regards
 
