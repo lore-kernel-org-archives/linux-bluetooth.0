@@ -2,30 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 5/5] emulator: Enable Slave-initiated Features Exchange feature
-Date: Thu, 27 Aug 2015 17:54:53 +0200
-Message-Id: <1440690893-30384-5-git-send-email-mariusz.skamra@tieto.com>
+Subject: [PATCH 3/5] emulator: Remove duplicated assignment
+Date: Thu, 27 Aug 2015 17:54:51 +0200
+Message-Id: <1440690893-30384-3-git-send-email-mariusz.skamra@tieto.com>
 In-Reply-To: <1440690893-30384-1-git-send-email-mariusz.skamra@tieto.com>
 References: <1440690893-30384-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Connection handle has been already assigned few lines earlier.
 ---
- emulator/btdev.c | 1 +
- 1 file changed, 1 insertion(+)
+ emulator/btdev.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 1de0956..c00d71a 100644
+index b285b2a..1f8aa44 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -567,6 +567,7 @@ static void set_le_features(struct btdev *btdev)
+@@ -1130,8 +1130,6 @@ static void le_conn_complete(struct btdev *btdev, const void *cmd,
+ 		cc->supv_timeout = lecc->supv_timeout;
  
- 	btdev->le_features[0] |= 0x01;	/* LE Encryption */
- 	btdev->le_features[0] |= 0x02;	/* Connection Parameters Request */
-+	btdev->le_features[0] |= 0x08;	/* Slave-initiated Features Exchange */
- }
+ 		send_event(remote, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
+-
+-		cc->handle = cpu_to_le16(42);
+ 	}
  
- static void set_amp_features(struct btdev *btdev)
+ 	cc->status = status;
 -- 
 2.4.3
 
