@@ -2,47 +2,106 @@ Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 2/5] emulator: Update LE supported commands
-Date: Thu, 27 Aug 2015 17:54:50 +0200
-Message-Id: <1440690893-30384-2-git-send-email-mariusz.skamra@tieto.com>
-In-Reply-To: <1440690893-30384-1-git-send-email-mariusz.skamra@tieto.com>
-References: <1440690893-30384-1-git-send-email-mariusz.skamra@tieto.com>
+Subject: [PATCH 1/5] emulator: Fix LE Connection Complete Event data
+Date: Thu, 27 Aug 2015 17:54:49 +0200
+Message-Id: <1440690893-30384-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This sets LE Connection Complete Event paramaters based on parameters
+from LE Create Connection command.
+Event parameters like Conn_Interval and Supervision_Timeout
+shouldn't be set to 0.
 ---
- emulator/btdev.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ emulator/btdev.c | 34 ++++++++++++++++++++--------------
+ 1 file changed, 20 insertions(+), 14 deletions(-)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 319d434..b285b2a 100644
+index e4c85f8..319d434 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -420,15 +420,24 @@ static void set_le_commands(struct btdev *btdev)
- 	btdev->commands[25] |= 0x01;	/* LE Set Event Mask */
- 	btdev->commands[25] |= 0x02;	/* LE Read Buffer Size */
- 	btdev->commands[25] |= 0x04;	/* LE Read Local Features */
-+	btdev->commands[25] |= 0x10;	/* LE Set Random Address */
- 	btdev->commands[25] |= 0x20;	/* LE Set Adv Parameters */
- 	btdev->commands[25] |= 0x40;	/* LE Read Adv TX Power */
- 	btdev->commands[25] |= 0x80;	/* LE Set Adv Data */
-+	btdev->commands[26] |= 0x01;	/* LE Set Scan Response Data */
- 	btdev->commands[26] |= 0x02;	/* LE Set Adv Enable */
- 	btdev->commands[26] |= 0x04;	/* LE Set Scan Parameters */
- 	btdev->commands[26] |= 0x08;	/* LE Set Scan Enable */
-+	btdev->commands[26] |= 0x10;	/* LE Create Connection */
- 	btdev->commands[26] |= 0x40;	/* LE Read White List Size */
-+	btdev->commands[26] |= 0x80;	/* LE Clear White List */
-+	btdev->commands[27] |= 0x04;	/* LE Connection Update */
-+	btdev->commands[27] |= 0x20;	/* LE Read Remote Used Features */
- 	btdev->commands[27] |= 0x40;	/* LE Encrypt */
- 	btdev->commands[27] |= 0x80;	/* LE Rand */
-+	btdev->commands[28] |= 0x01;	/* LE Start Encryption */
-+	btdev->commands[28] |= 0x02;	/* LE Long Term Key Request Reply */
-+	btdev->commands[28] |= 0x04;	/* LE Long Term Key Request Neg Reply */
- 	btdev->commands[28] |= 0x08;	/* LE Read Supported States */
- 	btdev->commands[28] |= 0x10;	/* LE Receiver Test */
- 	btdev->commands[28] |= 0x20;	/* LE Transmitter Test */
+@@ -1085,20 +1085,22 @@ static void sco_conn_complete(struct btdev *btdev, uint8_t status)
+ 	send_event(btdev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
+ }
+ 
+-static void le_conn_complete(struct btdev *btdev,
+-					const uint8_t *bdaddr, uint8_t bdaddr_type,
+-					uint8_t status)
++static void le_conn_complete(struct btdev *btdev, const void *cmd,
++								uint8_t status)
+ {
+ 	char buf[1 + sizeof(struct bt_hci_evt_le_conn_complete)];
+ 	struct bt_hci_evt_le_conn_complete *cc = (void *) &buf[1];
++	const struct bt_hci_cmd_le_create_conn *lecc = cmd;
+ 
+ 	memset(buf, 0, sizeof(buf));
+ 
+ 	buf[0] = BT_HCI_EVT_LE_CONN_COMPLETE;
+ 
+ 	if (!status) {
+-		struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr,
+-								bdaddr_type);
++		struct btdev *remote;
++
++		remote = find_btdev_by_bdaddr_type(lecc->peer_addr,
++							lecc->peer_addr_type);
+ 
+ 		btdev->conn = remote;
+ 		btdev->le_adv_enable = 0;
+@@ -1114,6 +1116,9 @@ static void le_conn_complete(struct btdev *btdev,
+ 
+ 		cc->role = 0x01;
+ 		cc->handle = cpu_to_le16(42);
++		cc->interval = lecc->max_interval;
++		cc->latency = lecc->latency;
++		cc->supv_timeout = lecc->supv_timeout;
+ 
+ 		send_event(remote, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
+ 
+@@ -1121,8 +1126,8 @@ static void le_conn_complete(struct btdev *btdev,
+ 	}
+ 
+ 	cc->status = status;
+-	cc->peer_addr_type = bdaddr_type;
+-	memcpy(cc->peer_addr, bdaddr, 6);
++	cc->peer_addr_type = lecc->peer_addr_type;
++	memcpy(cc->peer_addr, lecc->peer_addr, 6);
+ 	cc->role = 0x00;
+ 
+ 	send_event(btdev, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
+@@ -1164,16 +1169,17 @@ static bool adv_connectable(struct btdev *btdev)
+ 	return btdev->le_adv_type != 0x03;
+ }
+ 
+-static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
+-							uint8_t bdaddr_type)
++static void le_conn_request(struct btdev *btdev, const void *cmd)
+ {
+-	struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr, bdaddr_type);
++	const struct bt_hci_cmd_le_create_conn *lecc = cmd;
++	struct btdev *remote = find_btdev_by_bdaddr_type(lecc->peer_addr,
++							lecc->peer_addr_type);
+ 
+ 	if (remote && adv_connectable(remote) && adv_match(btdev, remote) &&
+-					remote->le_adv_own_addr == bdaddr_type)
+-		le_conn_complete(btdev, bdaddr, bdaddr_type, 0);
++				remote->le_adv_own_addr == lecc->peer_addr_type)
++		le_conn_complete(btdev, lecc, 0);
+ 	else
+-		le_conn_complete(btdev, bdaddr, bdaddr_type,
++		le_conn_complete(btdev, lecc,
+ 					BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH);
+ }
+ 
+@@ -3314,7 +3320,7 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
+ 			return;
+ 		lecc = data;
+ 		btdev->le_scan_own_addr_type = lecc->own_addr_type;
+-		le_conn_request(btdev, lecc->peer_addr, lecc->peer_addr_type);
++		le_conn_request(btdev, lecc);
+ 		break;
+ 
+ 	case BT_HCI_CMD_LE_CONN_UPDATE:
 -- 
 2.4.3
 
