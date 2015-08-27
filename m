@@ -1,122 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH 1/5] Bluetooth: hci_intel: Retrieve host-wake IRQ
+Subject: Re: [PATCH 3/5] Bluetooth: hci_intel: Introduce LPM support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1440689946-13576-1-git-send-email-loic.poulain@intel.com>
-Date: Thu, 27 Aug 2015 09:18:44 -0700
+In-Reply-To: <1440689946-13576-3-git-send-email-loic.poulain@intel.com>
+Date: Thu, 27 Aug 2015 09:16:27 -0700
 Cc: linux-bluetooth@vger.kernel.org, gaetan.prin@intel.com
-Message-Id: <94E2FA7D-93BE-48A5-8A23-FB35EECE009D@holtmann.org>
-References: <1440689946-13576-1-git-send-email-loic.poulain@intel.com>
+Message-Id: <C3AB6F28-9EB2-4D37-9A3F-22159042E59B@holtmann.org>
+References: <1440689946-13576-1-git-send-email-loic.poulain@intel.com> <1440689946-13576-3-git-send-email-loic.poulain@intel.com>
 To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Loic,
 
-> An IRQ can be retrieved from the pdev resources. This irq will be used
-> in case of LPM suspend mode to wake-up the host and resume the link.
-> This resource can be declared as a GPIO-Interrupt which requires to be
-> converted into IRQ.
+> Enable controller Low-Power-Mode if we have a pdev to manage host
+> wake-up. Once LPM is enabled, controller notifies its TX status via
+> a vendor specific packet (tx_idle/tx_active).
+> tx_active means that there is more data upcoming from controller.
+> tx_idle means that controller can be put in suspended state.
 > 
 > Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 > ---
-> drivers/bluetooth/hci_intel.c | 45 ++++++++++++++++++++++++++++++++++++++++++-
-> 1 file changed, 44 insertions(+), 1 deletion(-)
+> drivers/bluetooth/hci_intel.c | 76 ++++++++++++++++++++++++++++++++++++++++++-
+> 1 file changed, 75 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-> index 46426ff..934b5a7 100644
+> index 26a1314..f855515 100644
 > --- a/drivers/bluetooth/hci_intel.c
 > +++ b/drivers/bluetooth/hci_intel.c
-> @@ -31,6 +31,7 @@
-> #include <linux/platform_device.h>
-> #include <linux/gpio/consumer.h>
-> #include <linux/acpi.h>
-> +#include <linux/interrupt.h>
+> @@ -44,6 +44,25 @@
+> #define STATE_FIRMWARE_LOADED	2
+> #define STATE_FIRMWARE_FAILED	3
+> #define STATE_BOOTING		4
+> +#define STATE_TX_ACTIVE		5
+> +
+> +#define HCI_LPM_PKT 0xf1
+> +#define HCI_LPM_MAX_SIZE 10
+> +#define HCI_LPM_HDR_SIZE HCI_EVENT_HDR_SIZE
+> +#define H4_RECV_LPM \
+> +	.type = HCI_LPM_PKT, \
+> +	.hlen = HCI_LPM_HDR_SIZE, \
+> +	.loff = 1, \
+> +	.lsize = 1, \
+> +	.maxlen = HCI_LPM_MAX_SIZE
+
+lets name this INTEL_RECV_LPM and please put this one above intel_recv_pkts struct. Similar to what has been done in hci_qca.c.
+
+> +
+> +#define LPM_OP_TX_NOTIFY 0x00
+> +
+> +struct hci_lpm_pkt {
+> +	__u8 opcode;
+> +	__u8 dlen;
+> +	__u8 data[0];
+> +} __packed;
 > 
-> #include <net/bluetooth/bluetooth.h>
-> #include <net/bluetooth/hci_core.h>
-> @@ -48,6 +49,7 @@ struct intel_device {
+> struct intel_device {
 > 	struct list_head list;
-> 	struct platform_device *pdev;
-> 	struct gpio_desc *reset;
-> +	int irq;
-> };
+> @@ -141,9 +160,10 @@ static int intel_set_power(struct hci_uart *hu, bool powered)
+> 	spin_lock(&intel_device_list_lock);
 > 
-> static LIST_HEAD(intel_device_list);
-> @@ -789,6 +791,15 @@ static const struct hci_uart_proto intel_proto = {
-> 	.dequeue	= intel_dequeue,
-> };
+> 	idev = intel_device_get(hu);
+> -	if (!idev)
+> +	if (!idev) {
+> 		err = -ENODEV;
+> 		goto done;
+> +	}
 > 
-> +static irqreturn_t intel_irq(int irq, void *dev_id)
+> 	if (!idev->reset) {
+> 		err = -ENOTSUPP;
+> @@ -299,7 +319,9 @@ static int intel_setup(struct hci_uart *hu)
+> {
+> 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
+> 					  0x00, 0x08, 0x04, 0x00 };
+> +	static const u8 lpm_param[] = {0x03, 0x07, 0x01, 0x0b};
+
+Coding style.
+
+> 	struct intel_data *intel = hu->priv;
+> +	struct intel_device *idev;
+> 	struct hci_dev *hdev = hu->hdev;
+> 	struct sk_buff *skb;
+> 	struct intel_version *ver;
+> @@ -663,6 +685,25 @@ done:
+> 
+> 	BT_INFO("%s: Device booted in %llu usecs", hdev->name, duration);
+> 
+> +	spin_lock(&intel_device_list_lock);
+> +	idev = intel_device_get(hu);
+> +	if (!idev || !device_may_wakeup(&idev->pdev->dev)) {
+> +		spin_unlock(&intel_device_list_lock);
+> +		goto no_lpm;
+> +	}
+> +	spin_unlock(&intel_device_list_lock);
+
+I really dislike having multiple unlock. This code needs to be restructured to become readable and easy to understand without having to think too much that it is correct.
+
+> +
+> +	BT_INFO("%s: Enabling LPM", hdev->name);
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfc8b, sizeof(lpm_param), lpm_param,
+> +			     HCI_CMD_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		BT_ERR("%s: Failed to enable LPM", hdev->name);
+> +		goto no_lpm;
+> +	}
+> +	kfree_skb(skb);
+> +
+> +no_lpm:
+> 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
+> 	if (IS_ERR(skb))
+> 		return PTR_ERR(skb);
+> @@ -723,10 +764,43 @@ recv:
+> 	return hci_recv_frame(hdev, skb);
+> }
+> 
+> +static void intel_recv_lpm_notification(struct hci_dev *hdev, int value)
 > +{
-> +	struct intel_device *idev = dev_id;
+
+Shorten this name to ..notify instead of ..notification.
+
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	struct intel_data *intel = hu->priv;
 > +
-> +	dev_info(&idev->pdev->dev, "hci_intel irq\n");
+> +	BT_DBG("%s: TX idle notification (%d)", hdev->name, value);
 > +
-> +	return IRQ_HANDLED;
+> +	if (value)
+> +		set_bit(STATE_TX_ACTIVE, &intel->flags);
+> +	else
+> +		clear_bit(STATE_TX_ACTIVE, &intel->flags);
 > +}
 > +
-> #ifdef CONFIG_ACPI
-> static const struct acpi_device_id intel_acpi_match[] = {
-> 	{ "INT33E1", 0 },
-> @@ -816,6 +827,7 @@ static int intel_acpi_probe(struct intel_device *idev)
-> static int intel_probe(struct platform_device *pdev)
-> {
-> 	struct intel_device *idev;
-> +	int err;
-> 
-> 	idev = devm_kzalloc(&pdev->dev, sizeof(*idev), GFP_KERNEL);
-> 	if (!idev)
-> @@ -838,6 +850,36 @@ static int intel_probe(struct platform_device *pdev)
-> 		return PTR_ERR(idev->reset);
-> 	}
-> 
-> +	idev->irq = platform_get_irq(pdev, 0);
-> +	if (idev->irq < 0) {
-> +		struct gpio_desc *host_wake;
+> +static int intel_recv_lpm(struct hci_dev *hdev, struct sk_buff *skb)
+> +{
+> +	struct hci_lpm_pkt *lpm = (void *)skb->data;
 > +
-> +		dev_err(&pdev->dev, "No IRQ, falling back to gpio-irq\n");
-> +
-> +		host_wake = devm_gpiod_get_optional(&pdev->dev, "host-wake",
-> +						    GPIOD_IN);
-> +		if (IS_ERR(host_wake)) {
-> +			dev_err(&pdev->dev, "Unable to retrieve IRQ\n");
-> +			goto no_irq;
-> +		}
-> +
-> +		idev->irq = gpiod_to_irq(host_wake);
-> +		if (idev->irq < 0) {
-> +			dev_err(&pdev->dev, "No corresponding irq for gpio\n");
-> +			goto no_irq;
-> +		}
+> +	switch (lpm->opcode) {
+> +	case LPM_OP_TX_NOTIFY:
+> +		if (lpm->dlen)
+> +			intel_recv_lpm_notification(hdev, lpm->data[0]);
+> +		break;
+> +	default:
+> +		BT_ERR("%s: unknown LPM opcode (%02x)", hdev->name,
+> +		       lpm->opcode);
+
+We even have break; here.
+
 > +	}
 > +
-> +	err = devm_request_threaded_irq(&pdev->dev, idev->irq, NULL, intel_irq,
-> +					IRQF_ONESHOT, "bt-host-wake", idev);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "unable to allocate irq\n");
-> +		return err;
-> +	}
+> +	kfree_skb(skb);
 > +
-> +	device_init_wakeup(&pdev->dev, true);
-
-do you really want to do this in probe? Meaning that as soon as we boot, we claim this interrupt. Isn't it better to do this when the line discipline gets attached.
-
+> +	return 0;
+> +}
 > +
-> +no_irq:
-> 	platform_set_drvdata(pdev, idev);
+> static const struct h4_recv_pkt intel_recv_pkts[] = {
+> 	{ H4_RECV_ACL,   .recv = hci_recv_frame },
+> 	{ H4_RECV_SCO,   .recv = hci_recv_frame },
+> 	{ H4_RECV_EVENT, .recv = intel_recv_event },
+> +	{ H4_RECV_LPM,   .recv = intel_recv_lpm },
+> };
 > 
-> 	/* Place this instance on the device list */
-> @@ -845,7 +887,8 @@ static int intel_probe(struct platform_device *pdev)
-> 	list_add_tail(&idev->list, &intel_device_list);
-> 	spin_unlock(&intel_device_list_lock);
-> 
-> -	dev_info(&pdev->dev, "registered.\n");
-> +	dev_info(&pdev->dev, "registered, gpio(%d)/irq(%d).\n",
-> +		 desc_to_gpio(idev->reset), idev->irq);
-> 
-> 	return 0;
+> static int intel_recv(struct hci_uart *hu, const void *data, int count)
 
 Regards
 
