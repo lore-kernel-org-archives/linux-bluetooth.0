@@ -1,53 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH 4/5] Bluetooth: hci_intel: Add intel_data_list
+Subject: Re: [PATCH 1/5] Bluetooth: hci_intel: Retrieve host-wake IRQ
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <55DF4B1A.60005@intel.com>
-Date: Thu, 27 Aug 2015 10:48:25 -0700
+In-Reply-To: <55DF4899.9000907@intel.com>
+Date: Thu, 27 Aug 2015 10:47:29 -0700
 Cc: linux-bluetooth@vger.kernel.org, gaetan.prin@intel.com
-Message-Id: <19C3A7A8-47C9-4123-8843-DC21179B467F@holtmann.org>
-References: <1440689946-13576-1-git-send-email-loic.poulain@intel.com> <1440689946-13576-4-git-send-email-loic.poulain@intel.com> <4C16D0EB-E539-4934-B26E-38166403217A@holtmann.org> <55DF4B1A.60005@intel.com>
+Message-Id: <B4697A1C-E912-44CE-A748-858E23A84256@holtmann.org>
+References: <1440689946-13576-1-git-send-email-loic.poulain@intel.com> <94E2FA7D-93BE-48A5-8A23-FB35EECE009D@holtmann.org> <55DF4899.9000907@intel.com>
 To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Loic,
 
->>> struct intel_data {
->>> +	struct list_head list;
->> 
->> this is the private data associated with the hci_uart. I am not turning this into a list.
-> 
->>> +static struct intel_data *intel_data_get(struct intel_device *idev)
->>> +{
->>> +	struct list_head *p;
+>>> +	idev->irq = platform_get_irq(pdev, 0);
+>>> +	if (idev->irq < 0) {
+>>> +		struct gpio_desc *host_wake;
 >>> +
->>> +	list_for_each(p, &intel_data_list) {
->>> +		struct intel_data *intel = list_entry(p, struct intel_data,
->>> +						      list);
+>>> +		dev_err(&pdev->dev, "No IRQ, falling back to gpio-irq\n");
 >>> +
->>> +		/* tty device and pdev device should share the same parent
->>> +		 * which is the UART port.
->>> +		 */
->>> +		if (intel->hu->tty->dev->parent == idev->pdev->dev.parent)
->>> +			return intel;
+>>> +		host_wake = devm_gpiod_get_optional(&pdev->dev, "host-wake",
+>>> +						    GPIOD_IN);
+>>> +		if (IS_ERR(host_wake)) {
+>>> +			dev_err(&pdev->dev, "Unable to retrieve IRQ\n");
+>>> +			goto no_irq;
+>>> +		}
+>>> +
+>>> +		idev->irq = gpiod_to_irq(host_wake);
+>>> +		if (idev->irq < 0) {
+>>> +			dev_err(&pdev->dev, "No corresponding irq for gpio\n");
+>>> +			goto no_irq;
+>>> +		}
 >>> +	}
 >>> +
->>> +	return NULL;
->>> +}
+>>> +	err = devm_request_threaded_irq(&pdev->dev, idev->irq, NULL, intel_irq,
+>>> +					IRQF_ONESHOT, "bt-host-wake", idev);
+>>> +	if (err) {
+>>> +		dev_err(&pdev->dev, "unable to allocate irq\n");
+>>> +		return err;
+>>> +	}
 >>> +
+>>> +	device_init_wakeup(&pdev->dev, true);
 >> 
->> You really need to come up with something else. intel_data is not a list. It is private data for hci_uart.
->> 
+>> do you really want to do this in probe? Meaning that as soon as we boot, we claim this interrupt. Isn't it better to do this when the line discipline gets attached.
 > 
-> Do you mean having an other simple list:
-> struct intel_hu {
-> 	struct list_head list;
-> 	struct hci_uart *hu;
-> }
+> 
+> Is it ok to move the irq request/free in intel_set_power?
 
-this doesn't make it any better. I rather not have this in a list at all. I get the feeling that we really should look into getting UART Slave concept upstream. So the power part can become its own driver.
+I would assume so.
 
 Regards
 
