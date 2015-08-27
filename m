@@ -1,67 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Will Wang <wiwang@mozilla.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, Will Wang <wiwang@mozilla.com>
-Subject: [PATCH 2/3] android/hal-handsfree: Fix missing HFP WBS callback
-Date: Thu, 27 Aug 2015 20:02:01 +0800
-Message-Id: <1440676922-29249-3-git-send-email-wiwang@mozilla.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	Will Wang <wiwang@mozilla.com>
+Subject: [PATCH 1/3] android/hal-ipc-api: Fix missing HFP WBS callback
+Date: Thu, 27 Aug 2015 20:02:00 +0800
+Message-Id: <1440676922-29249-2-git-send-email-wiwang@mozilla.com>
 In-Reply-To: <1440676922-29249-1-git-send-email-wiwang@mozilla.com>
 References: <1440676922-29249-1-git-send-email-wiwang@mozilla.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Add definition of HFP WBS Command notification
 ---
- android/hal-handsfree.c | 12 ++++++++++++
- android/hal-msg.h       |  6 ++++++
- 2 files changed, 18 insertions(+)
+ android/hal-ipc-api.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 279b26a..9ab04c5 100644
---- a/android/hal-handsfree.c
-+++ b/android/hal-handsfree.c
-@@ -153,6 +153,16 @@ static void handle_nrec(void *buf, uint16_t len, int fd)
- #endif
- }
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index 503b47a..e3b7798 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -1068,6 +1068,14 @@ Notifications:
  
-+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
-+static void handle_wbs(void *buf, uint16_t len, int fd)
-+{
-+	struct hal_ev_handsfree_wbs *ev = buf;
-+
-+	if (cbs->wbs_cb)
-+		cbs->wbs_cb(ev->wbs, (bt_bdaddr_t *) (ev->bdaddr));
-+}
-+#endif
-+
- static void handle_chld(void *buf, uint16_t len, int fd)
- {
- 	struct hal_ev_handsfree_chld *ev = buf;
-@@ -289,6 +299,8 @@ static const struct hal_ipc_handler ev_handlers[] = {
- 	/* HAL_EV_HANDSFREE_HSP_KEY_PRESS */
- 	{ handle_hsp_key_press, false,
- 				sizeof(struct hal_ev_handsfree_hsp_key_press) },
-+	/* HAL_EV_HANDSFREE_WBS */
-+	{ handle_wbs, false, sizeof(struct hal_ev_handsfree_wbs) },
- };
+ 		Notification parameters: Remote address (6 octets)
  
- static uint8_t get_mode(void)
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 698f45a..ea79fa7 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -1638,6 +1638,12 @@ struct hal_ev_handsfree_hsp_key_press {
- 	uint8_t bdaddr[6];
- } __attribute__((packed));
- 
-+#define HAL_EV_HANDSFREE_WBS		0x91
-+struct hal_ev_handsfree_wbs {
-+	uint8_t wbs;
-+	uint8_t bdaddr[6];
-+} __attribute__((packed));
++	Opcode 0x91 - WBS Command notification
 +
- #define HAL_AVRCP_FEATURE_NONE			0x00
- #define HAL_AVRCP_FEATURE_METADATA		0x01
- #define HAL_AVRCP_FEATURE_ABSOLUTE_VOLUME	0x02
++		Notification parameters: WBS types (1 octet)
++		                         Remote address (6 octets)
++
++		Valid WBS types: 0x00 = None
++		                 0x01 = No
++		                 0x02 = Yes
+ 
+ Bluetooth Advanced Audio HAL (ID 6)
+ Bluetooth Advanced Audio Sink HAL (ID 13)
 -- 
 1.9.1
-
