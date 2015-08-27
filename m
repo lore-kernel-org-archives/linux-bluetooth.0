@@ -1,44 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Will Wang <wiwang@mozilla.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, Will Wang <wiwang@mozilla.com>
-Subject: [PATCH 0/3] Fix missing HFP WBS callback
-Date: Thu, 27 Aug 2015 20:01:59 +0800
-Message-Id: <1440676922-29249-1-git-send-email-wiwang@mozilla.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 27 Aug 2015 13:27:11 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Norbert Holze <norbert.holze@web.de>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: btusb regression / 0a12:0001 CSR
+Message-ID: <20150827102711.GA28958@t440s.lan>
+References: <55C6F858.5080808@web.de>
+ <BC6C2463-83DF-4825-95FC-A55A5B825B0A@holtmann.org>
+ <55C7947A.6050605@web.de>
+ <55DB58B7.5080101@web.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <55DB58B7.5080101@web.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Norbert,
 
-This set of patches:
-- adds HFP Wideband speech(WBS) callback function for Android.
-- adds a new opcode 0x91 for WBS Command notification.
+On Mon, Aug 24, 2015, Norbert Holze wrote:
+> Is it possible to add a quirk or something else?
 
-The patches has been tested on Nexus 5 with Android 5.0.1 Lollipop,
-and passed the PTS test "TC_AG_ACC_BI_12_I", the Android framework
-outputs log such as:
+This was reported in the kernel.org bug tracker as well. Could you try
+the patch proposal that I've attached there:
 
-08-20 18:29:39.932 E/BluetoothHeadsetServiceJni( 1442): mozzz: wbs_callback
-...
-08-20 18:29:39.933 D/HeadsetStateMachine( 1442): EVENT_TYPE_WBS codec is 1
-08-20 18:29:39.935 D/HeadsetStateMachine( 1442): AudioManager.setParameters bt_wbs=off for PTS-HFP-MOZILLA-TPE-PC - 00:1B:DC:07:2F:9A
-08-20 18:29:39.936 D/audio_hw_primary(  215): adev_set_parameters: enter: bt_wbs=off
+https://bugzilla.kernel.org/show_bug.cgi?id=103451
 
-Thanks Szymon Janc(:sjanc)'s speedy reply of the patch process questions
-on IRC, and Shawn Huang(:shawnjohnjr)'s technical support.
+In the bug report it's just a single patch but I'll probably split it
+into two for the final upstream submission.
 
-
-Will Wang (3):
-  android/hal-ipc-api: Fix missing HFP WBS callback
-  android/hal-handsfree: Fix missing HFP WBS callback
-  android/handsfree: Fix missing HFP WBS callback
-
- android/hal-handsfree.c | 12 ++++++++++++
- android/hal-ipc-api.txt |  8 ++++++++
- android/hal-msg.h       |  6 ++++++
- android/handsfree.c     |  8 ++++++++
- 4 files changed, 34 insertions(+)
-
--- 
-1.9.1
-
+Johan
