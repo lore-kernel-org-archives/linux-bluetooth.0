@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_intel: Add support for platform driver
-Date: Thu, 27 Aug 2015 07:21:51 +0200
-Message-Id: <1440652911-39717-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: hci_intel: Add support for platform driver
+Date: Thu, 27 Aug 2015 07:14:46 +0200
+Message-Id: <1440652486-35130-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -23,18 +23,16 @@ HCI boot event before being able to send any command.
 Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/hci_intel.c | 203 +++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 190 insertions(+), 13 deletions(-)
+ drivers/bluetooth/hci_intel.c | 201 +++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 188 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index da3192aee5e1..46426ff1c7c1 100644
+index da3192aee5e1..1ca0d8553de1 100644
 --- a/drivers/bluetooth/hci_intel.c
 +++ b/drivers/bluetooth/hci_intel.c
-@@ -25,7 +25,12 @@
- #include <linux/errno.h>
+@@ -26,6 +26,10 @@
  #include <linux/skbuff.h>
  #include <linux/firmware.h>
-+#include <linux/module.h>
  #include <linux/wait.h>
 +#include <linux/tty.h>
 +#include <linux/platform_device.h>
@@ -43,7 +41,7 @@ index da3192aee5e1..46426ff1c7c1 100644
  
  #include <net/bluetooth/bluetooth.h>
  #include <net/bluetooth/hci_core.h>
-@@ -39,6 +44,15 @@
+@@ -39,6 +43,15 @@
  #define STATE_FIRMWARE_FAILED	3
  #define STATE_BOOTING		4
  
@@ -59,7 +57,7 @@ index da3192aee5e1..46426ff1c7c1 100644
  struct intel_data {
  	struct sk_buff *rx_skb;
  	struct sk_buff_head txq;
-@@ -77,6 +91,61 @@ static u8 intel_convert_speed(unsigned int speed)
+@@ -77,6 +90,61 @@ static u8 intel_convert_speed(unsigned int speed)
  	}
  }
  
@@ -121,7 +119,7 @@ index da3192aee5e1..46426ff1c7c1 100644
  static int intel_open(struct hci_uart *hu)
  {
  	struct intel_data *intel;
-@@ -90,6 +159,10 @@ static int intel_open(struct hci_uart *hu)
+@@ -90,6 +158,10 @@ static int intel_open(struct hci_uart *hu)
  	skb_queue_head_init(&intel->txq);
  
  	hu->priv = intel;
@@ -132,7 +130,7 @@ index da3192aee5e1..46426ff1c7c1 100644
  	return 0;
  }
  
-@@ -99,6 +172,8 @@ static int intel_close(struct hci_uart *hu)
+@@ -99,6 +171,8 @@ static int intel_close(struct hci_uart *hu)
  
  	BT_DBG("hu %p", hu);
  
@@ -141,7 +139,7 @@ index da3192aee5e1..46426ff1c7c1 100644
  	skb_queue_purge(&intel->txq);
  	kfree_skb(intel->rx_skb);
  	kfree(intel);
-@@ -149,6 +224,18 @@ static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
+@@ -149,6 +223,18 @@ static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
  	struct hci_dev *hdev = hu->hdev;
  	u8 speed_cmd[] = { 0x06, 0xfc, 0x01, 0x00 };
  	struct sk_buff *skb;
@@ -160,7 +158,7 @@ index da3192aee5e1..46426ff1c7c1 100644
  
  	BT_INFO("%s: Change controller speed to %d", hdev->name, speed);
  
-@@ -231,6 +318,15 @@ static int intel_setup(struct hci_uart *hu)
+@@ -231,6 +317,15 @@ static int intel_setup(struct hci_uart *hu)
  	if (oper_speed && init_speed && oper_speed != init_speed)
  		speed_change = 1;
  
@@ -176,7 +174,7 @@ index da3192aee5e1..46426ff1c7c1 100644
  	set_bit(STATE_BOOTLOADER, &intel->flags);
  
  	/* Read the Intel version information to determine if the device
-@@ -540,19 +636,11 @@ done:
+@@ -540,19 +635,11 @@ done:
  	 */
  	BT_INFO("%s: Waiting for device to boot", hdev->name);
  
@@ -200,7 +198,7 @@ index da3192aee5e1..46426ff1c7c1 100644
  
  	rettime = ktime_get();
  	delta = ktime_sub(rettime, calltime);
-@@ -584,7 +672,8 @@ static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -584,7 +671,8 @@ static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
  	struct intel_data *intel = hu->priv;
  	struct hci_event_hdr *hdr;
  
@@ -210,7 +208,7 @@ index da3192aee5e1..46426ff1c7c1 100644
  		goto recv;
  
  	hdr = (void *)skb->data;
-@@ -700,12 +789,100 @@ static const struct hci_uart_proto intel_proto = {
+@@ -700,12 +788,99 @@ static const struct hci_uart_proto intel_proto = {
  	.dequeue	= intel_dequeue,
  };
  
@@ -219,7 +217,6 @@ index da3192aee5e1..46426ff1c7c1 100644
 +	{ "INT33E1", 0 },
 +	{ },
 +};
-+MODULE_DEVICE_TABLE(acpi, intel_acpi_match);
 +
 +static int intel_acpi_probe(struct intel_device *idev)
 +{
