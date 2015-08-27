@@ -1,37 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Thu, 27 Aug 2015 10:34:58 +0200
-Message-ID: <CAEZxfGP=P-5J_CFkwN6u=b+au7FcELCbXU_SSzomraFCC6UK9w@mail.gmail.com>
-Subject: Bluez 5.33 won't connect to advertising Nexus 6
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH] Bluetooth: btintel: Add MODULE_FIRMWARE entries for iBT 3.0 controllers
+Date: Thu, 27 Aug 2015 08:57:39 +0200
+Message-Id: <1440658659-101531-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello!
+The iBT 3.0 controllers need intel/ibt-11-5.sfi and intel/ibt-11-5.ddc
+firmware files from linux-firmware repository.
 
-Bluez 5.33 allows me to connect to my Nexus 6 on chromebook A but not
-chromebook B. Here's the full steps to reproduce the issue:
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btintel.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-1. Install https://play.google.com/store/apps/details?id=io.github.webbluetoothcg.bletestperipheral
-on Nexus 6
-2. Run it and advertise Battery Service
-3. Open Chrome OS Shell bluetooth console [Ctrl] + [Alt] + T and:
-crosh> bt_console
-4. Scan for devices until Nexus 6 appears and turn it off.
-[bluetooth]# scan on
-[bluetooth]# scan off
-5. Connect to Nexus 6 wit the appropriate BT address:
-[bluetooth]# connect 63:7B:C2:07:EF:AD
-Attempting to connect to 63:7B:C2:07:EF:AD
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 1ce4ac16c7fa..048423fd83bf 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -173,3 +173,5 @@ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
+ MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
++MODULE_FIRMWARE("intel/ibt-11-5.sfi");
++MODULE_FIRMWARE("intel/ibt-11-5.ddc");
+-- 
+2.4.3
 
-If you're lucky, you'll see "Connection successful".
-If not, you'll get "Failed to connect: org.bluez.Error.Failed"
-
-More background at
-https://code.google.com/p/chromium/issues/detail?id=508541#c15
-
-I'd like to figure out what is happening behind the scenes there.
-Here's a btsnoop.log file in case it
-helps:https://www.cloudshark.org/captures/dcb775e24f91
