@@ -1,76 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [BlueZ v3 1/2] doc/settings-storage: describe gatt attributes storage format
-Date: Thu, 27 Aug 2015 13:48:57 -0700
-Message-Id: <1440708538-3596-1-git-send-email-jpawlowski@google.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: Bluez 5.33 won't connect to advertising Nexus 6
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAEZxfGP=P-5J_CFkwN6u=b+au7FcELCbXU_SSzomraFCC6UK9w@mail.gmail.com>
+Date: Thu, 27 Aug 2015 12:55:27 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <7D13E5DD-914F-4E8B-8724-0E40B604DD36@holtmann.org>
+References: <CAEZxfGP=P-5J_CFkwN6u=b+au7FcELCbXU_SSzomraFCC6UK9w@mail.gmail.com>
+To: =?utf-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/settings-storage.txt | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+Hi Francois,
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index 6c9f058..aea50a6 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -139,11 +139,15 @@ Cache directory file format
- ============================
- 
- Each file, named by remote device address, may includes multiple groups
--(General and ServiceRecords).
-+(General, ServiceRecords, Attributes).
- 
- In ServiceRecords, SDP records are stored using their handle as key
- (hexadecimal format).
- 
-+In "Attributes" group GATT database is stored using attribute handle as key
-+(hexadecimal format). Value associated with this handle is serialized form of
-+all data required to re-create given attribute. ":" is used to separate fields.
-+
- [General] group contains:
- 
-   Name		String		Remote device friendly name
-@@ -155,6 +159,37 @@ In ServiceRecords, SDP records are stored using their handle as key
-   <0x...>	String		SDP record as hexadecimal encoded
- 				string
- 
-+In [Attributes] group value always starts with attribute type, that determines
-+how to interpret rest of value:
-+
-+  Primary service:
-+    2800:end_handle:uuid
-+
-+  Secondary service:
-+    2801:end_handle:uuid
-+
-+  Included service:
-+    2802:start_handle:end_handle:uuid
-+
-+  Characteristic:
-+    2803:value_handle:properties:uuid
-+
-+  Descriptor:
-+    uuid
-+
-+Sample Attributes section:
-+  [Attributes]
-+  0001=2800:0005:1801
-+  0002=2803:0003:20:2a05
-+  0014=2800:001c:1800
-+  0015=2803:0016:02:2a00
-+  0017=2803:0018:02:2a01
-+  0019=2803:001a:02:2aa6
-+  0028=2800:ffff:0000180d-0000-1000-8000-00805f9b34fb
-+  0029=2803:002a:10:00002a37-0000-1000-8000-00805f9b34fb
-+  002b=2803:002c:02:00002a38-0000-1000-8000-00805f9b34fb
-+  002d=2803:002e:08:00002a39-0000-1000-8000-00805f9b34fb
-+
- 
- Info file format
- ================
--- 
-2.1.4
+> Bluez 5.33 allows me to connect to my Nexus 6 on chromebook A but not
+> chromebook B. Here's the full steps to reproduce the issue:
+> 
+> 1. Install https://play.google.com/store/apps/details?id=io.github.webbluetoothcg.bletestperipheral
+> on Nexus 6
+> 2. Run it and advertise Battery Service
+> 3. Open Chrome OS Shell bluetooth console [Ctrl] + [Alt] + T and:
+> crosh> bt_console
+> 4. Scan for devices until Nexus 6 appears and turn it off.
+> [bluetooth]# scan on
+> [bluetooth]# scan off
+> 5. Connect to Nexus 6 wit the appropriate BT address:
+> [bluetooth]# connect 63:7B:C2:07:EF:AD
+> Attempting to connect to 63:7B:C2:07:EF:AD
+> 
+> If you're lucky, you'll see "Connection successful".
+> If not, you'll get "Failed to connect: org.bluez.Error.Failed"
+> 
+> More background at
+> https://code.google.com/p/chromium/issues/detail?id=508541#c15
+> 
+> I'd like to figure out what is happening behind the scenes there.
+> Here's a btsnoop.log file in case it
+> helps:https://www.cloudshark.org/captures/dcb775e24f91
+
+try an info on the bluetooth console and it should tell you what chip you have locally on your Chromebook and compare them with each other. If you want to do that in a real terminal, hciconfig -a please.
+
+For me this looks pretty much like a firmware issue. You could use an over-air-analyzer like Ellisys to really see why the connection does not establish.
+
+However since you are running this against the Nexus 6 with multi-advertising Broadcom specific vendor feature, you are moving into territory that is actually not covered by a Bluetooth standard and its qualification testing. So I would blame whoever insisted on relying on vendor stuff for Android LE peripheral mode.
+
+It could be also if this is really Broadcom vs Broadcom on both sides, that the firmware tries to outsmart itself ;)
+
+Regards
+
+Marcel
 
