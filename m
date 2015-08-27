@@ -1,169 +1,235 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH 3/5] Bluetooth: hci_intel: Introduce LPM support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1440689946-13576-3-git-send-email-loic.poulain@intel.com>
-Date: Thu, 27 Aug 2015 09:16:27 -0700
-Cc: linux-bluetooth@vger.kernel.org, gaetan.prin@intel.com
-Message-Id: <C3AB6F28-9EB2-4D37-9A3F-22159042E59B@holtmann.org>
-References: <1440689946-13576-1-git-send-email-loic.poulain@intel.com> <1440689946-13576-3-git-send-email-loic.poulain@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
+From: Mariusz Skamra <mariusz.skamra@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
+Subject: [PATCH 4/5] emulator: Add support for LE Remote Connection Parameter Request Reply
+Date: Thu, 27 Aug 2015 17:54:52 +0200
+Message-Id: <1440690893-30384-4-git-send-email-mariusz.skamra@tieto.com>
+In-Reply-To: <1440690893-30384-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1440690893-30384-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+< HCI Command: LE Connection Update (0x08|0x0013) plen 14
+		                          [hci0] 92750.079447
+        Handle: 42
+        Min connection interval: 50.00 msec (0x0028)
+        Max connection interval: 70.00 msec (0x0038)
+        Connection latency: 0x0000
+        Supervision timeout: 420 msec (0x002a)
+        Min connection length: 0.000 msec (0x0000)
+        Max connection length: 0.000 msec (0x0000)
+> HCI Event: Command Status (0x0f) plen 4
+	                                  [hci0] 92750.079459
+      LE Connection Update (0x08|0x0013) ncmd 1
+        Status: Success (0x00)
+> HCI Event: LE Meta Event (0x3e) plen 11
+                                          [hci1] 92750.079462
+      LE Remote Connection Parameter Request (0x06)
+        Handle: 42
+        Min connection interval: 50.00 msec (0x0028)
+        Max connection interval: 70.00 msec (0x0038)
+        Connection latency: 0x0000
+        Supervision timeout: 420 msec (0x002a)
+< HCI Command: LE Remote Connection Parameter Request Reply
+(0x08|0x0020) plen 14			  [hci1] 92750.079476
+        Handle: 42
+        Min connection interval: 50.00 msec (0x0028)
+        Max connection interval: 70.00 msec (0x0038)
+        Connection latency: 0x0000
+        Supervision timeout: 420 msec (0x002a)
+        Min connection length: 0.000 msec (0x0000)
+        Max connection length: 0.000 msec (0x0000)
+> HCI Event: Command Complete (0x0e) plen 6
+					  [hci1] 92750.079507
+      LE Remote Connection Parameter Request Reply (0x08|0x0020)
+							ncmd 1
+        Status: Success (0x00)
+        Handle: 42
+> HCI Event: LE Meta Event (0x3e) plen 10
+                                          [hci0] 92750.079510
+      LE Connection Update Complete (0x03)
+        Status: Success (0x00)
+        Handle: 42
+        Connection interval: 50.00 msec (0x0028)
+        Connection latency: 0.00 msec (0x0000)
+        Supervision timeout: 420 msec (0x002a)
+> HCI Event: LE Meta Event (0x3e) plen 10
+                                          [hci1] 92750.079509
+      LE Connection Update Complete (0x03)
+        Status: Success (0x00)
+        Handle: 42
+        Connection interval: 50.00 msec (0x0028)
+        Connection latency: 0.00 msec (0x0000)
+        Supervision timeout: 420 msec (0x002a)
+@ New Conn Param: 00:AA:01:00:00:23 (1) hint 0 min 0x0028 max 0x0038
+					latency 0x0000 timeout 0x002a
+---
+ emulator/btdev.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 95 insertions(+), 7 deletions(-)
 
-> Enable controller Low-Power-Mode if we have a pdev to manage host
-> wake-up. Once LPM is enabled, controller notifies its TX status via
-> a vendor specific packet (tx_idle/tx_active).
-> tx_active means that there is more data upcoming from controller.
-> tx_idle means that controller can be put in suspended state.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
-> ---
-> drivers/bluetooth/hci_intel.c | 76 ++++++++++++++++++++++++++++++++++++++++++-
-> 1 file changed, 75 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-> index 26a1314..f855515 100644
-> --- a/drivers/bluetooth/hci_intel.c
-> +++ b/drivers/bluetooth/hci_intel.c
-> @@ -44,6 +44,25 @@
-> #define STATE_FIRMWARE_LOADED	2
-> #define STATE_FIRMWARE_FAILED	3
-> #define STATE_BOOTING		4
-> +#define STATE_TX_ACTIVE		5
-> +
-> +#define HCI_LPM_PKT 0xf1
-> +#define HCI_LPM_MAX_SIZE 10
-> +#define HCI_LPM_HDR_SIZE HCI_EVENT_HDR_SIZE
-> +#define H4_RECV_LPM \
-> +	.type = HCI_LPM_PKT, \
-> +	.hlen = HCI_LPM_HDR_SIZE, \
-> +	.loff = 1, \
-> +	.lsize = 1, \
-> +	.maxlen = HCI_LPM_MAX_SIZE
-
-lets name this INTEL_RECV_LPM and please put this one above intel_recv_pkts struct. Similar to what has been done in hci_qca.c.
-
-> +
-> +#define LPM_OP_TX_NOTIFY 0x00
-> +
-> +struct hci_lpm_pkt {
-> +	__u8 opcode;
-> +	__u8 dlen;
-> +	__u8 data[0];
-> +} __packed;
-> 
-> struct intel_device {
-> 	struct list_head list;
-> @@ -141,9 +160,10 @@ static int intel_set_power(struct hci_uart *hu, bool powered)
-> 	spin_lock(&intel_device_list_lock);
-> 
-> 	idev = intel_device_get(hu);
-> -	if (!idev)
-> +	if (!idev) {
-> 		err = -ENODEV;
-> 		goto done;
-> +	}
-> 
-> 	if (!idev->reset) {
-> 		err = -ENOTSUPP;
-> @@ -299,7 +319,9 @@ static int intel_setup(struct hci_uart *hu)
-> {
-> 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
-> 					  0x00, 0x08, 0x04, 0x00 };
-> +	static const u8 lpm_param[] = {0x03, 0x07, 0x01, 0x0b};
-
-Coding style.
-
-> 	struct intel_data *intel = hu->priv;
-> +	struct intel_device *idev;
-> 	struct hci_dev *hdev = hu->hdev;
-> 	struct sk_buff *skb;
-> 	struct intel_version *ver;
-> @@ -663,6 +685,25 @@ done:
-> 
-> 	BT_INFO("%s: Device booted in %llu usecs", hdev->name, duration);
-> 
-> +	spin_lock(&intel_device_list_lock);
-> +	idev = intel_device_get(hu);
-> +	if (!idev || !device_may_wakeup(&idev->pdev->dev)) {
-> +		spin_unlock(&intel_device_list_lock);
-> +		goto no_lpm;
-> +	}
-> +	spin_unlock(&intel_device_list_lock);
-
-I really dislike having multiple unlock. This code needs to be restructured to become readable and easy to understand without having to think too much that it is correct.
-
-> +
-> +	BT_INFO("%s: Enabling LPM", hdev->name);
-> +
-> +	skb = __hci_cmd_sync(hdev, 0xfc8b, sizeof(lpm_param), lpm_param,
-> +			     HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		BT_ERR("%s: Failed to enable LPM", hdev->name);
-> +		goto no_lpm;
-> +	}
-> +	kfree_skb(skb);
-> +
-> +no_lpm:
-> 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
-> 	if (IS_ERR(skb))
-> 		return PTR_ERR(skb);
-> @@ -723,10 +764,43 @@ recv:
-> 	return hci_recv_frame(hdev, skb);
-> }
-> 
-> +static void intel_recv_lpm_notification(struct hci_dev *hdev, int value)
-> +{
-
-Shorten this name to ..notify instead of ..notification.
-
-> +	struct hci_uart *hu = hci_get_drvdata(hdev);
-> +	struct intel_data *intel = hu->priv;
-> +
-> +	BT_DBG("%s: TX idle notification (%d)", hdev->name, value);
-> +
-> +	if (value)
-> +		set_bit(STATE_TX_ACTIVE, &intel->flags);
-> +	else
-> +		clear_bit(STATE_TX_ACTIVE, &intel->flags);
-> +}
-> +
-> +static int intel_recv_lpm(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +	struct hci_lpm_pkt *lpm = (void *)skb->data;
-> +
-> +	switch (lpm->opcode) {
-> +	case LPM_OP_TX_NOTIFY:
-> +		if (lpm->dlen)
-> +			intel_recv_lpm_notification(hdev, lpm->data[0]);
-> +		break;
-> +	default:
-> +		BT_ERR("%s: unknown LPM opcode (%02x)", hdev->name,
-> +		       lpm->opcode);
-
-We even have break; here.
-
-> +	}
-> +
-> +	kfree_skb(skb);
-> +
-> +	return 0;
-> +}
-> +
-> static const struct h4_recv_pkt intel_recv_pkts[] = {
-> 	{ H4_RECV_ACL,   .recv = hci_recv_frame },
-> 	{ H4_RECV_SCO,   .recv = hci_recv_frame },
-> 	{ H4_RECV_EVENT, .recv = intel_recv_event },
-> +	{ H4_RECV_LPM,   .recv = intel_recv_lpm },
-> };
-> 
-> static int intel_recv(struct hci_uart *hu, const void *data, int count)
-
-Regards
-
-Marcel
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 1f8aa44..1de0956 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -443,6 +443,10 @@ static void set_le_commands(struct btdev *btdev)
+ 	btdev->commands[28] |= 0x20;	/* LE Transmitter Test */
+ 	btdev->commands[28] |= 0x40;	/* LE Test End */
+ 
++	/* Extra LE commands for >= 4.1 adapters */
++	btdev->commands[33] |= 0x10;	/* LE Remote Conn Param Req Reply */
++	btdev->commands[33] |= 0x20;	/* LE Remote Conn Param Req Neg Reply */
++
+ 	/* Extra LE commands for >= 4.2 adapters */
+ 	btdev->commands[34] |= 0x02;	/* LE Read Local P-256 Public Key */
+ 	btdev->commands[34] |= 0x04;	/* LE Generate DHKey */
+@@ -562,6 +566,7 @@ static void set_le_features(struct btdev *btdev)
+ 	btdev->max_page = 1;
+ 
+ 	btdev->le_features[0] |= 0x01;	/* LE Encryption */
++	btdev->le_features[0] |= 0x02;	/* Connection Parameters Request */
+ }
+ 
+ static void set_amp_features(struct btdev *btdev)
+@@ -1235,6 +1240,49 @@ static void le_conn_update(struct btdev *btdev, uint16_t handle,
+ 		send_event(remote, BT_HCI_EVT_LE_META_EVENT, &ev, sizeof(ev));
+ }
+ 
++static void rej_le_conn_update(struct btdev *btdev, uint16_t handle,
++								uint8_t reason)
++{
++	struct btdev *remote = btdev->conn;
++	struct __packed {
++		uint8_t subevent;
++		struct bt_hci_evt_le_conn_update_complete ev;
++	} ev;
++
++	if (!remote)
++		return;
++
++	ev.subevent = BT_HCI_EVT_LE_CONN_UPDATE_COMPLETE;
++	ev.ev.handle = cpu_to_le16(handle);
++	ev.ev.status = cpu_to_le16(reason);
++
++	send_event(remote, BT_HCI_EVT_LE_META_EVENT, &ev, sizeof(ev));
++}
++
++static void le_conn_param_req(struct btdev *btdev, uint16_t handle,
++				uint16_t min_interval, uint16_t max_interval,
++				uint16_t latency, uint16_t supv_timeout,
++				uint16_t min_length, uint16_t max_length)
++{
++	struct btdev *remote = btdev->conn;
++	struct __packed {
++		uint8_t subevent;
++		struct bt_hci_evt_le_conn_param_request ev;
++	} ev;
++
++	if (!remote)
++		return;
++
++	ev.subevent = BT_HCI_EVT_LE_CONN_PARAM_REQUEST;
++	ev.ev.handle = cpu_to_le16(handle);
++	ev.ev.min_interval = cpu_to_le16(min_interval);
++	ev.ev.max_interval = cpu_to_le16(max_interval);
++	ev.ev.latency = cpu_to_le16(latency);
++	ev.ev.supv_timeout = cpu_to_le16(supv_timeout);
++
++	send_event(remote, BT_HCI_EVT_LE_META_EVENT, &ev, sizeof(ev));
++}
++
+ static void disconnect_complete(struct btdev *btdev, uint16_t handle,
+ 							uint8_t reason)
+ {
+@@ -2004,6 +2052,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 	const struct bt_hci_cmd_le_ltk_req_reply *llrr;
+ 	const struct bt_hci_cmd_le_encrypt *lenc_cmd;
+ 	const struct bt_hci_cmd_le_generate_dhkey *dh;
++	const struct bt_hci_cmd_le_conn_param_req_reply *lcprr_cmd;
+ 	const struct bt_hci_cmd_read_local_amp_assoc *rlaa_cmd;
+ 	const struct bt_hci_cmd_read_rssi *rrssi;
+ 	const struct bt_hci_cmd_read_tx_power *rtxp;
+@@ -2045,6 +2094,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 	struct bt_hci_rsp_read_local_amp_info rlai;
+ 	struct bt_hci_rsp_read_local_amp_assoc rlaa_rsp;
+ 	struct bt_hci_rsp_get_mws_transport_config *gmtc;
++	struct bt_hci_rsp_le_conn_param_req_reply lcprr_rsp;
+ 	struct bt_hci_rsp_le_read_buffer_size lrbs;
+ 	struct bt_hci_rsp_le_read_local_features lrlf;
+ 	struct bt_hci_rsp_le_read_adv_tx_power lratp;
+@@ -3149,6 +3199,14 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 		cmd_complete(btdev, opcode, &lte, sizeof(lte));
+ 		break;
+ 
++	case BT_HCI_CMD_LE_CONN_PARAM_REQ_REPLY:
++		if (btdev->type == BTDEV_TYPE_BREDR)
++			goto unsupported;
++		lcprr_cmd = data;
++		lcprr_rsp.handle = lcprr_cmd->handle;
++		lcprr_rsp.status = BT_HCI_ERR_SUCCESS;
++		cmd_complete(btdev, opcode, &lcprr_rsp, sizeof(lcprr_rsp));
++		break;
+ 	default:
+ 		goto unsupported;
+ 	}
+@@ -3183,6 +3241,8 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
+ 	const struct bt_hci_cmd_read_clock_offset *rco;
+ 	const struct bt_hci_cmd_le_create_conn *lecc;
+ 	const struct bt_hci_cmd_le_conn_update *lecu;
++	const struct bt_hci_cmd_le_conn_param_req_reply *lcprr;
++	const struct bt_hci_cmd_le_conn_param_req_neg_reply *lcprnr;
+ 
+ 	switch (opcode) {
+ 	case BT_HCI_CMD_INQUIRY:
+@@ -3334,13 +3394,41 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
+ 		if (btdev->type == BTDEV_TYPE_BREDR)
+ 			return;
+ 		lecu = data;
+-		le_conn_update(btdev, le16_to_cpu(lecu->handle),
+-				le16_to_cpu(lecu->min_interval),
+-				le16_to_cpu(lecu->max_interval),
+-				le16_to_cpu(lecu->latency),
+-				le16_to_cpu(lecu->supv_timeout),
+-				le16_to_cpu(lecu->min_length),
+-				le16_to_cpu(lecu->max_length));
++		if (btdev->le_features[0] & 0x02)
++			le_conn_param_req(btdev, le16_to_cpu(lecu->handle),
++					le16_to_cpu(lecu->min_interval),
++					le16_to_cpu(lecu->max_interval),
++					le16_to_cpu(lecu->latency),
++					le16_to_cpu(lecu->supv_timeout),
++					le16_to_cpu(lecu->min_length),
++					le16_to_cpu(lecu->max_length));
++		else
++			le_conn_update(btdev, le16_to_cpu(lecu->handle),
++					le16_to_cpu(lecu->min_interval),
++					le16_to_cpu(lecu->max_interval),
++					le16_to_cpu(lecu->latency),
++					le16_to_cpu(lecu->supv_timeout),
++					le16_to_cpu(lecu->min_length),
++					le16_to_cpu(lecu->max_length));
++		break;
++	case BT_HCI_CMD_LE_CONN_PARAM_REQ_REPLY:
++		if (btdev->type == BTDEV_TYPE_BREDR)
++			return;
++		lcprr = data;
++		le_conn_update(btdev, le16_to_cpu(lcprr->handle),
++					le16_to_cpu(lcprr->min_interval),
++					le16_to_cpu(lcprr->max_interval),
++					le16_to_cpu(lcprr->latency),
++					le16_to_cpu(lcprr->supv_timeout),
++					le16_to_cpu(lcprr->min_length),
++					le16_to_cpu(lcprr->max_length));
++		break;
++	case BT_HCI_CMD_LE_CONN_PARAM_REQ_NEG_REPLY:
++		if (btdev->type == BTDEV_TYPE_BREDR)
++			return;
++		lcprnr = data;
++		rej_le_conn_update(btdev, le16_to_cpu(lcprnr->handle),
++						le16_to_cpu(lcprnr->reason));
+ 		break;
+ 	}
+ }
+-- 
+2.4.3
 
