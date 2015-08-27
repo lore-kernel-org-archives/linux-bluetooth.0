@@ -1,107 +1,261 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH 1/5] emulator: Fix LE Connection Complete Event data
-Date: Thu, 27 Aug 2015 17:54:49 +0200
-Message-Id: <1440690893-30384-1-git-send-email-mariusz.skamra@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	gaetan.prin@intel.com,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH 5/5] Bluetooth: hci_intel: Implement suspend/resume
+Date: Thu, 27 Aug 2015 17:39:06 +0200
+Message-Id: <1440689946-13576-5-git-send-email-loic.poulain@intel.com>
+In-Reply-To: <1440689946-13576-1-git-send-email-loic.poulain@intel.com>
+References: <1440689946-13576-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This sets LE Connection Complete Event paramaters based on parameters
-from LE Create Connection command.
-Event parameters like Conn_Interval and Supervision_Timeout
-shouldn't be set to 0.
+Add platform PM suspend/resume callbacks.
+Chip can be suspended/resumed via specific vendor commands which need
+to be acked by the controller.
+Enable the IRQ wake capability in order to let the controller wake the
+host in case of available data.
+
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 ---
- emulator/btdev.c | 34 ++++++++++++++++++++--------------
- 1 file changed, 20 insertions(+), 14 deletions(-)
+ drivers/bluetooth/hci_intel.c | 176 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 176 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index e4c85f8..319d434 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -1085,20 +1085,22 @@ static void sco_conn_complete(struct btdev *btdev, uint8_t status)
- 	send_event(btdev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
- }
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index 99f1307..4fdcb5d 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -45,6 +45,10 @@
+ #define STATE_FIRMWARE_FAILED	3
+ #define STATE_BOOTING		4
+ #define STATE_TX_ACTIVE		5
++#define STATE_SUSPENDED		7
++#define STATE_SUSPENDING	8
++#define STATE_RESUMING		9
++#define STATE_LPM_ENABLED	10
  
--static void le_conn_complete(struct btdev *btdev,
--					const uint8_t *bdaddr, uint8_t bdaddr_type,
--					uint8_t status)
-+static void le_conn_complete(struct btdev *btdev, const void *cmd,
-+								uint8_t status)
- {
- 	char buf[1 + sizeof(struct bt_hci_evt_le_conn_complete)];
- 	struct bt_hci_evt_le_conn_complete *cc = (void *) &buf[1];
-+	const struct bt_hci_cmd_le_create_conn *lecc = cmd;
+ #define HCI_LPM_PKT 0xf1
+ #define HCI_LPM_MAX_SIZE 10
+@@ -57,6 +61,8 @@
+ 	.maxlen = HCI_LPM_MAX_SIZE
  
- 	memset(buf, 0, sizeof(buf));
+ #define LPM_OP_TX_NOTIFY 0x00
++#define LPM_OP_SUSPEND_ACK 0x02
++#define LPM_OP_RESUME_ACK 0x03
  
- 	buf[0] = BT_HCI_EVT_LE_CONN_COMPLETE;
- 
- 	if (!status) {
--		struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr,
--								bdaddr_type);
-+		struct btdev *remote;
-+
-+		remote = find_btdev_by_bdaddr_type(lecc->peer_addr,
-+							lecc->peer_addr_type);
- 
- 		btdev->conn = remote;
- 		btdev->le_adv_enable = 0;
-@@ -1114,6 +1116,9 @@ static void le_conn_complete(struct btdev *btdev,
- 
- 		cc->role = 0x01;
- 		cc->handle = cpu_to_le16(42);
-+		cc->interval = lecc->max_interval;
-+		cc->latency = lecc->latency;
-+		cc->supv_timeout = lecc->supv_timeout;
- 
- 		send_event(remote, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
- 
-@@ -1121,8 +1126,8 @@ static void le_conn_complete(struct btdev *btdev,
+ struct hci_lpm_pkt {
+ 	__u8 opcode;
+@@ -735,6 +741,8 @@ done:
  	}
+ 	kfree_skb(skb);
  
- 	cc->status = status;
--	cc->peer_addr_type = bdaddr_type;
--	memcpy(cc->peer_addr, bdaddr, 6);
-+	cc->peer_addr_type = lecc->peer_addr_type;
-+	memcpy(cc->peer_addr, lecc->peer_addr, 6);
- 	cc->role = 0x00;
- 
- 	send_event(btdev, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
-@@ -1164,16 +1169,17 @@ static bool adv_connectable(struct btdev *btdev)
- 	return btdev->le_adv_type != 0x03;
- }
- 
--static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
--							uint8_t bdaddr_type)
-+static void le_conn_request(struct btdev *btdev, const void *cmd)
++	set_bit(STATE_LPM_ENABLED, &intel->flags);
++
+ no_lpm:
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
+ 	if (IS_ERR(skb))
+@@ -812,12 +820,28 @@ static void intel_recv_lpm_notification(struct hci_dev *hdev, int value)
+ static int intel_recv_lpm(struct hci_dev *hdev, struct sk_buff *skb)
  {
--	struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr, bdaddr_type);
-+	const struct bt_hci_cmd_le_create_conn *lecc = cmd;
-+	struct btdev *remote = find_btdev_by_bdaddr_type(lecc->peer_addr,
-+							lecc->peer_addr_type);
+ 	struct hci_lpm_pkt *lpm = (void *)skb->data;
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct intel_data *intel = hu->priv;
  
- 	if (remote && adv_connectable(remote) && adv_match(btdev, remote) &&
--					remote->le_adv_own_addr == bdaddr_type)
--		le_conn_complete(btdev, bdaddr, bdaddr_type, 0);
-+				remote->le_adv_own_addr == lecc->peer_addr_type)
-+		le_conn_complete(btdev, lecc, 0);
- 	else
--		le_conn_complete(btdev, bdaddr, bdaddr_type,
-+		le_conn_complete(btdev, lecc,
- 					BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH);
+ 	switch (lpm->opcode) {
+ 	case LPM_OP_TX_NOTIFY:
+ 		if (lpm->dlen)
+ 			intel_recv_lpm_notification(hdev, lpm->data[0]);
+ 		break;
++	case LPM_OP_SUSPEND_ACK:
++		set_bit(STATE_SUSPENDED, &intel->flags);
++		if (test_and_clear_bit(STATE_SUSPENDING, &intel->flags)) {
++			smp_mb__after_atomic();
++			wake_up_bit(&intel->flags, STATE_SUSPENDING);
++		}
++		break;
++	case LPM_OP_RESUME_ACK:
++		clear_bit(STATE_SUSPENDED, &intel->flags);
++		if (test_and_clear_bit(STATE_RESUMING, &intel->flags)) {
++			smp_mb__after_atomic();
++			wake_up_bit(&intel->flags, STATE_SUSPENDING);
++		}
++		break;
+ 	default:
+ 		BT_ERR("%s: unknown LPM opcode (%02x)", hdev->name,
+ 		       lpm->opcode);
+@@ -895,6 +919,111 @@ static struct sk_buff *intel_dequeue(struct hci_uart *hu)
+ 	return skb;
  }
  
-@@ -3314,7 +3320,7 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 			return;
- 		lecc = data;
- 		btdev->le_scan_own_addr_type = lecc->own_addr_type;
--		le_conn_request(btdev, lecc->peer_addr, lecc->peer_addr_type);
-+		le_conn_request(btdev, lecc);
- 		break;
++static int intel_lpm_suspend(struct hci_uart *hu)
++{
++	static const u8 suspend[] = {0x01, 0x01, 0x01};
++	struct intel_data *intel = hu->priv;
++	struct sk_buff *skb;
++	int err;
++
++	if (!test_bit(STATE_LPM_ENABLED, &intel->flags) ||
++	    test_bit(STATE_SUSPENDED, &intel->flags))
++		return 0;
++
++	if (test_bit(STATE_TX_ACTIVE, &intel->flags))
++		return -EAGAIN;
++
++	BT_DBG("%s: suspending", hu->hdev->name);
++
++	skb = bt_skb_alloc(sizeof(suspend), GFP_KERNEL);
++	if (!skb) {
++		BT_ERR("Failed to allocate memory for suspend packet");
++		return -ENOMEM;
++	}
++
++	memcpy(skb_put(skb, sizeof(suspend)), suspend, sizeof(suspend));
++	bt_cb(skb)->pkt_type = HCI_LPM_PKT;
++
++	set_bit(STATE_SUSPENDING, &intel->flags);
++
++	skb_queue_tail(&intel->txq, skb);
++	hci_uart_tx_wakeup(hu);
++
++	err = wait_on_bit_timeout(&intel->flags, STATE_SUSPENDING,
++				  TASK_INTERRUPTIBLE,
++				  msecs_to_jiffies(1000));
++	if (err == 1) {
++		BT_ERR("%s: Device suspend interrupted", hu->hdev->name);
++		clear_bit(STATE_SUSPENDING, &intel->flags);
++		return -EINTR;
++	}
++
++	if (err) {
++		BT_ERR("%s: Device suspend timeout", hu->hdev->name);
++		clear_bit(STATE_SUSPENDING, &intel->flags);
++		return -ETIMEDOUT;
++	}
++
++	if (!test_bit(STATE_SUSPENDED, &intel->flags)) {
++		BT_ERR("%s: Device suspend error", hu->hdev->name);
++		return -EINVAL;
++	}
++
++	BT_DBG("%s: suspended", hu->hdev->name);
++
++	return 0;
++}
++
++static int intel_lpm_resume(struct hci_uart *hu)
++{
++	struct intel_data *intel = hu->priv;
++	struct sk_buff *skb;
++	int err;
++
++	if (!test_bit(STATE_LPM_ENABLED, &intel->flags) ||
++	    !test_bit(STATE_SUSPENDED, &intel->flags))
++		return 0;
++
++	BT_DBG("%s: resuming", hu->hdev->name);
++
++	skb = bt_skb_alloc(0, GFP_KERNEL);
++	if (!skb) {
++		BT_ERR("Failed to allocate memory for resume packet");
++		return -ENOMEM;
++	}
++
++	bt_cb(skb)->pkt_type = 0xf0;
++
++	set_bit(STATE_RESUMING, &intel->flags);
++
++	skb_queue_tail(&intel->txq, skb);
++	hci_uart_tx_wakeup(hu);
++
++	err = wait_on_bit_timeout(&intel->flags, STATE_RESUMING,
++				  TASK_INTERRUPTIBLE,
++				  msecs_to_jiffies(1000));
++	if (err == 1) {
++		BT_ERR("%s: Device resume interrupted", hu->hdev->name);
++		clear_bit(STATE_RESUMING, &intel->flags);
++		return -EINTR;
++	}
++
++	if (err) {
++		BT_ERR("%s: Device resume timeout", hu->hdev->name);
++		clear_bit(STATE_RESUMING, &intel->flags);
++		return -ETIMEDOUT;
++	}
++
++	if (test_bit(STATE_SUSPENDED, &intel->flags)) {
++		BT_ERR("%s: Device resume error", hu->hdev->name);
++		return -EINVAL;
++	}
++
++	BT_DBG("%s: resumed", hu->hdev->name);
++
++	return 0;
++}
++
+ static const struct hci_uart_proto intel_proto = {
+ 	.id		= HCI_UART_INTEL,
+ 	.name		= "Intel",
+@@ -1025,6 +1154,52 @@ static int intel_remove(struct platform_device *pdev)
+ 	return 0;
+ }
  
- 	case BT_HCI_CMD_LE_CONN_UPDATE:
++static int intel_suspend(struct device *dev)
++{
++	struct intel_device *idev = dev_get_drvdata(dev);
++	struct intel_data *intel;
++
++	dev_dbg(dev, "intel_suspend\n");
++
++	if ((idev->irq < 0) || !device_may_wakeup(dev))
++		return 0;
++
++	mutex_lock(&intel_data_list_lock);
++	intel = intel_data_get(idev);
++	if (intel)
++		intel_lpm_suspend(intel->hu);
++	mutex_unlock(&intel_data_list_lock);
++
++	enable_irq_wake(idev->irq);
++
++	return 0;
++}
++
++static int intel_resume(struct device *dev)
++{
++	struct intel_device *idev = dev_get_drvdata(dev);
++	struct intel_data *intel;
++
++	dev_dbg(dev, "intel_resume\n");
++
++	if ((idev->irq < 0) || !device_may_wakeup(dev))
++		return 0;
++
++	disable_irq_wake(idev->irq);
++
++	mutex_lock(&intel_data_list_lock);
++	intel = intel_data_get(idev);
++	if (intel)
++		intel_lpm_resume(intel->hu);
++	mutex_unlock(&intel_data_list_lock);
++
++	return 0;
++}
++
++static const struct dev_pm_ops intel_pm_ops = {
++	SET_SYSTEM_SLEEP_PM_OPS(intel_suspend, intel_resume)
++};
++
+ static struct platform_driver intel_driver = {
+ 	.probe = intel_probe,
+ 	.remove = intel_remove,
+@@ -1032,6 +1207,7 @@ static struct platform_driver intel_driver = {
+ 		.name = "hci_intel",
+ 		.acpi_match_table = ACPI_PTR(intel_acpi_match),
+ 		.owner = THIS_MODULE,
++		.pm = &intel_pm_ops,
+ 	},
+ };
+ 
 -- 
-2.4.3
-
+1.9.1
