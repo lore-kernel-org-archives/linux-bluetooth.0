@@ -1,53 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: Bluez 5.33 won't connect to advertising Nexus 6
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAEZxfGP=P-5J_CFkwN6u=b+au7FcELCbXU_SSzomraFCC6UK9w@mail.gmail.com>
-Date: Thu, 27 Aug 2015 12:55:27 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <7D13E5DD-914F-4E8B-8724-0E40B604DD36@holtmann.org>
-References: <CAEZxfGP=P-5J_CFkwN6u=b+au7FcELCbXU_SSzomraFCC6UK9w@mail.gmail.com>
-To: =?utf-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Will Wang <wiwang@mozilla.com>
+Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/3] android/hal-handsfree: Fix missing HFP WBS callback
+Date: Thu, 27 Aug 2015 21:47:27 +0200
+Message-ID: <3863916.JczJmVLfSE@athlon>
+In-Reply-To: <1440676922-29249-3-git-send-email-wiwang@mozilla.com>
+References: <1440676922-29249-1-git-send-email-wiwang@mozilla.com> <1440676922-29249-3-git-send-email-wiwang@mozilla.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Francois,
+Hi Will,
 
-> Bluez 5.33 allows me to connect to my Nexus 6 on chromebook A but not
-> chromebook B. Here's the full steps to reproduce the issue:
+On Thursday 27 August 2015 20:02:01 Will Wang wrote:
+> ---
+>  android/hal-handsfree.c | 12 ++++++++++++
+>  android/hal-msg.h       |  6 ++++++
+>  2 files changed, 18 insertions(+)
 > 
-> 1. Install https://play.google.com/store/apps/details?id=io.github.webbluetoothcg.bletestperipheral
-> on Nexus 6
-> 2. Run it and advertise Battery Service
-> 3. Open Chrome OS Shell bluetooth console [Ctrl] + [Alt] + T and:
-> crosh> bt_console
-> 4. Scan for devices until Nexus 6 appears and turn it off.
-> [bluetooth]# scan on
-> [bluetooth]# scan off
-> 5. Connect to Nexus 6 wit the appropriate BT address:
-> [bluetooth]# connect 63:7B:C2:07:EF:AD
-> Attempting to connect to 63:7B:C2:07:EF:AD
+> diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
+> index 279b26a..9ab04c5 100644
+> --- a/android/hal-handsfree.c
+> +++ b/android/hal-handsfree.c
+> @@ -153,6 +153,16 @@ static void handle_nrec(void *buf, uint16_t len, int
+> fd) #endif
+>  }
 > 
-> If you're lucky, you'll see "Connection successful".
-> If not, you'll get "Failed to connect: org.bluez.Error.Failed"
+> +#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+> +static void handle_wbs(void *buf, uint16_t len, int fd)
+> +{
+> +	struct hal_ev_handsfree_wbs *ev = buf;
+> +
+> +	if (cbs->wbs_cb)
+> +		cbs->wbs_cb(ev->wbs, (bt_bdaddr_t *) (ev->bdaddr));
+> +}
+> +#endif
+> +
+
+This will not compile on Android KitKat (we still support it). Since daemon is 
+version independent we need to have empty handler on hal. So #ifdefs should be 
+inside function like:
+
+static void handle_wbs(void *buf, uint16_t len, int fd)
+{
+#if ANDROID_VERSION >= PLATFORM_VER(5, 0, 0)
+...
+#endif
+}
+
+>  static void handle_chld(void *buf, uint16_t len, int fd)
+>  {
+>  	struct hal_ev_handsfree_chld *ev = buf;
+> @@ -289,6 +299,8 @@ static const struct hal_ipc_handler ev_handlers[] = {
+>  	/* HAL_EV_HANDSFREE_HSP_KEY_PRESS */
+>  	{ handle_hsp_key_press, false,
+>  				sizeof(struct hal_ev_handsfree_hsp_key_press) },
+> +	/* HAL_EV_HANDSFREE_WBS */
+> +	{ handle_wbs, false, sizeof(struct hal_ev_handsfree_wbs) },
+>  };
 > 
-> More background at
-> https://code.google.com/p/chromium/issues/detail?id=508541#c15
+>  static uint8_t get_mode(void)
+> diff --git a/android/hal-msg.h b/android/hal-msg.h
+> index 698f45a..ea79fa7 100644
+> --- a/android/hal-msg.h
+> +++ b/android/hal-msg.h
+> @@ -1638,6 +1638,12 @@ struct hal_ev_handsfree_hsp_key_press {
+>  	uint8_t bdaddr[6];
+>  } __attribute__((packed));
 > 
-> I'd like to figure out what is happening behind the scenes there.
-> Here's a btsnoop.log file in case it
-> helps:https://www.cloudshark.org/captures/dcb775e24f91
+> +#define HAL_EV_HANDSFREE_WBS		0x91
+> +struct hal_ev_handsfree_wbs {
+> +	uint8_t wbs;
+> +	uint8_t bdaddr[6];
+> +} __attribute__((packed));
+> +
+>  #define HAL_AVRCP_FEATURE_NONE			0x00
+>  #define HAL_AVRCP_FEATURE_METADATA		0x01
+>  #define HAL_AVRCP_FEATURE_ABSOLUTE_VOLUME	0x02
 
-try an info on the bluetooth console and it should tell you what chip you have locally on your Chromebook and compare them with each other. If you want to do that in a real terminal, hciconfig -a please.
-
-For me this looks pretty much like a firmware issue. You could use an over-air-analyzer like Ellisys to really see why the connection does not establish.
-
-However since you are running this against the Nexus 6 with multi-advertising Broadcom specific vendor feature, you are moving into territory that is actually not covered by a Bluetooth standard and its qualification testing. So I would blame whoever insisted on relying on vendor stuff for Android LE peripheral mode.
-
-It could be also if this is really Broadcom vs Broadcom on both sides, that the firmware tries to outsmart itself ;)
-
-Regards
-
-Marcel
-
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
