@@ -1,62 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Aug 2015 14:16:05 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Simon Fels <simon.fels@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: bring device down when closing
- HCI_CHANNEL_USER socket
-Message-ID: <20150828111605.GA30700@t440s.lan>
+From: Simon Fels <simon.fels@canonical.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Simon Fels <simon.fels@canonical.com>
+Subject: [PATCH] Bluetooth: bring device down when closing HCI_CHANNEL_USER socket
+Date: Fri, 28 Aug 2015 12:54:30 +0200
+Message-Id: <1440759270-23099-2-git-send-email-simon.fels@canonical.com>
+In-Reply-To: <1440759270-23099-1-git-send-email-simon.fels@canonical.com>
 References: <1440759270-23099-1-git-send-email-simon.fels@canonical.com>
- <1440759270-23099-2-git-send-email-simon.fels@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1440759270-23099-2-git-send-email-simon.fels@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Simon,
+When a HCI_CHANNEL_USER socket is open and should be closed we first try to close the
+device which will fail as hci_dev_close checks for HCI_CHANNEL_USER being set and if it is
+it just fails to close the device. Clearing the HCI_CHANNEL_USER flag first before trying
+to close the device fixes this.
 
-On Fri, Aug 28, 2015, Simon Fels wrote:
-> When a HCI_CHANNEL_USER socket is open and should be closed we first
-> try to close the device which will fail as hci_dev_close checks for
-> HCI_CHANNEL_USER being set and if it is it just fails to close the
-> device. Clearing the HCI_CHANNEL_USER flag first before trying to
-> close the device fixes this.
-> 
-> Signed-off-by: Simon Fels <simon.fels@canonical.com>
-> ---
->  backports/net/bluetooth/hci_sock.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/backports/net/bluetooth/hci_sock.c b/backports/net/bluetooth/hci_sock.c
-> index 9a2732f..c84c13e 100644
-> --- a/backports/net/bluetooth/hci_sock.c
-> +++ b/backports/net/bluetooth/hci_sock.c
-> @@ -503,8 +503,8 @@ static int hci_sock_release(struct socket *sock)
->  
->  	if (hdev) {
->  		if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
-> -			hci_dev_close(hdev->id);
->  			hci_dev_clear_flag(hdev, HCI_USER_CHANNEL);
-> +			hci_dev_close(hdev->id);
->  			mgmt_index_added(hdev);
->  		}
+Signed-off-by: Simon Fels <simon.fels@canonical.com>
+---
+ backports/net/bluetooth/hci_sock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks for catching this and coming up with a patch proposal!
+diff --git a/backports/net/bluetooth/hci_sock.c b/backports/net/bluetooth/hci_sock.c
+index 9a2732f..c84c13e 100644
+--- a/backports/net/bluetooth/hci_sock.c
++++ b/backports/net/bluetooth/hci_sock.c
+@@ -503,8 +503,8 @@ static int hci_sock_release(struct socket *sock)
+ 
+ 	if (hdev) {
+ 		if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
+-			hci_dev_close(hdev->id);
+ 			hci_dev_clear_flag(hdev, HCI_USER_CHANNEL);
++			hci_dev_close(hdev->id);
+ 			mgmt_index_added(hdev);
+ 		}
+ 
+-- 
+2.1.4
 
-My main concern is that there's code within the hci_dev_close() path
-that assumes HCI_USER_CHANNEL may be set. E.g. this in
-hci_dev_do_close() (which hci_dev_close calls):
-
-	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-	    test_bit(HCI_UP, &hdev->flags)) {
-		/* Execute vendor specific shutdown routine */
-		if (hdev->shutdown)
-			hdev->shutdown(hdev);
-	}
-
-With your change the hdev->shutdown() callback would get called which
-seems to be what the above if-statement tries to protect against.
-
-Johan
