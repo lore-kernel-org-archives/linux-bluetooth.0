@@ -1,148 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
+Message-ID: <237bbd312054ce6433af002f5e1213c7.squirrel@iwavesystems.com>
+Date: Fri, 28 Aug 2015 09:31:40 -0400
+Subject: USB  BT gives problem If device plugged during boot to platform.
+From: krishnaks@iwavesystems.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_bcm: Fix crash on suspend
-Date: Fri, 28 Aug 2015 15:44:00 +0200
-Message-Id: <1440769440-17959-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If bcm_suspend is called whithout device opened there is a crash as
-it tries to use bdev->hu which is NULL.
-Rename bcm_device_list_lock to bcm_device_lock as it does not only apply
-to bcm_device_list.
+Hi,
 
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
----
- drivers/bluetooth/hci_bcm.c | 36 ++++++++++++++++++++++++++----------
- 1 file changed, 26 insertions(+), 10 deletions(-)
+I am porting bluez 5.33 to android kitkat 4.4.3.I am using USB based
+Bluetooth device. I referred instruction in
+http://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/README and
+able to build.
+After botting Android image with USB dongle connected and type "hciconfig
+hci0 up" on console, It is throwing following error.
+Can't init device hci0: Unknown error 132 (132)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 33ec097..835bfab 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -66,7 +66,7 @@ struct bcm_data {
- };
- 
- /* List of BCM BT UART devices */
--static DEFINE_SPINLOCK(bcm_device_list_lock);
-+static DEFINE_SPINLOCK(bcm_device_lock);
- static LIST_HEAD(bcm_device_list);
- 
- static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
-@@ -118,7 +118,7 @@ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
- 	return 0;
- }
- 
--/* bcm_device_exists should be protected by bcm_device_list_lock */
-+/* bcm_device_exists should be protected by bcm_device_lock */
- static bool bcm_device_exists(struct bcm_device *device)
- {
- 	struct list_head *p;
-@@ -164,7 +164,7 @@ static int bcm_open(struct hci_uart *hu)
- 
- 	hu->priv = bcm;
- 
--	spin_lock(&bcm_device_list_lock);
-+	spin_lock(&bcm_device_lock);
- 	list_for_each(p, &bcm_device_list) {
- 		struct bcm_device *dev = list_entry(p, struct bcm_device, list);
- 
-@@ -185,7 +185,7 @@ static int bcm_open(struct hci_uart *hu)
- 	if (bcm->dev)
- 		bcm_gpio_set_power(bcm->dev, true);
- 
--	spin_unlock(&bcm_device_list_lock);
-+	spin_unlock(&bcm_device_lock);
- 
- 	return 0;
- }
-@@ -197,14 +197,14 @@ static int bcm_close(struct hci_uart *hu)
- 	BT_DBG("hu %p", hu);
- 
- 	/* Protect bcm->dev against removal of the device or driver */
--	spin_lock(&bcm_device_list_lock);
-+	spin_lock(&bcm_device_lock);
- 	if (bcm_device_exists(bcm->dev)) {
- 		bcm_gpio_set_power(bcm->dev, false);
- #ifdef CONFIG_PM_SLEEP
- 		bcm->dev->hu = NULL;
- #endif
- 	}
--	spin_unlock(&bcm_device_list_lock);
-+	spin_unlock(&bcm_device_lock);
- 
- 	skb_queue_purge(&bcm->txq);
- 	kfree_skb(bcm->rx_skb);
-@@ -338,6 +338,11 @@ static int bcm_suspend(struct device *dev)
- 
- 	BT_DBG("suspend (%p): is_suspended %d", bdev, bdev->is_suspended);
- 
-+	spin_lock(&bcm_device_lock);
-+
-+	if (!bdev->hu)
-+		goto unlock;
-+
- 	if (!bdev->is_suspended) {
- 		hci_uart_set_flow_control(bdev->hu, true);
- 
-@@ -352,6 +357,9 @@ static int bcm_suspend(struct device *dev)
- 		mdelay(15);
- 	}
- 
-+unlock:
-+	spin_unlock(&bcm_device_lock);
-+
- 	return 0;
- }
- 
-@@ -362,6 +370,11 @@ static int bcm_resume(struct device *dev)
- 
- 	BT_DBG("resume (%p): is_suspended %d", bdev, bdev->is_suspended);
- 
-+	spin_lock(&bcm_device_lock);
-+
-+	if (!bdev->hu)
-+		goto unlock;
-+
- 	if (bdev->device_wakeup) {
- 		gpiod_set_value(bdev->device_wakeup, true);
- 		BT_DBG("resume, delaying 15 ms");
-@@ -375,6 +388,9 @@ static int bcm_resume(struct device *dev)
- 		hci_uart_set_flow_control(bdev->hu, false);
- 	}
- 
-+unlock:
-+	spin_unlock(&bcm_device_lock);
-+
- 	return 0;
- }
- #endif
-@@ -488,9 +504,9 @@ static int bcm_probe(struct platform_device *pdev)
- 	dev_info(&pdev->dev, "%s device registered.\n", dev->name);
- 
- 	/* Place this instance on the device list */
--	spin_lock(&bcm_device_list_lock);
-+	spin_lock(&bcm_device_lock);
- 	list_add_tail(&dev->list, &bcm_device_list);
--	spin_unlock(&bcm_device_list_lock);
-+	spin_unlock(&bcm_device_lock);
- 
- 	bcm_gpio_set_power(dev, false);
- 
-@@ -501,9 +517,9 @@ static int bcm_remove(struct platform_device *pdev)
- {
- 	struct bcm_device *dev = platform_get_drvdata(pdev);
- 
--	spin_lock(&bcm_device_list_lock);
-+	spin_lock(&bcm_device_lock);
- 	list_del(&dev->list);
--	spin_unlock(&bcm_device_list_lock);
-+	spin_unlock(&bcm_device_lock);
- 
- 	acpi_dev_remove_driver_gpios(ACPI_COMPANION(&pdev->dev));
- 
--- 
-1.9.1
+If I Type hciconfig -a . It gives following.
+hci0:   Type: BR/EDR  Bus: USB
+        BD Address: 5C:F3:70:6C:5E:FB  ACL MTU: 1021:8  SCO MTU: 64:1
+        DOWN
+        RX bytes:547 acl:0 sco:0 events:27 errors:0
+        TX bytes:384 acl:0 sco:0 commands:27 errors:0
+        Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH SNIFF
+        Link mode: SLAVE ACCEPT
+
+
+
+But If I unplug and plug USB dongle, and then try same command (hciconfig
+hci0 up), It works. Even "hcitool scan" command also working after that.
+
+Why 1st time not working when USB dongle is connected?
+Also when I check Bluez debug log in logcat.
+I am getting one error log when USB dongle connected during boot.
+E/bluetoothd(  841): Failed to set mode: Blocked through rfkill (0x12).
+
+Please let me know If I missed any settings
+
+Thanks in advance,
+
 
