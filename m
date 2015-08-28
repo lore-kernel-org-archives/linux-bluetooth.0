@@ -1,62 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [Patch v2] Bluetooth: Fix SCO link type change handling on connection complete
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1440763522-12399-1-git-send-email-kubax.t.pawlak@intel.com>
-Date: Fri, 28 Aug 2015 12:04:33 -0700
+Date: Fri, 28 Aug 2015 09:58:10 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+ <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <DA8A0401-1FDF-491C-BAB7-5B65C4E7C3BC@holtmann.org>
-References: <1440763522-12399-1-git-send-email-kubax.t.pawlak@intel.com>
-To: Kuba Pawlak <kubax.t.pawlak@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Fw: [Bug 103671] New: systemd throws Bluetooth: hci0 hardware error
+ 0x37, but bluetooth works fine
+Message-ID: <20150828095810.5974a39e@urahara>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kuba,
 
-> Synchronous connections are initially created with type eSCO.
-> Link manager may reject proposed link parameters, which triggers
-> connection setup retry with a different set. Link type embedded
-> in responses should be disregarded until Synchronous Connect Complete
-> returns Success (0x00). Current code updates link type every time
-> which creates an issue when link type changes to SCO and back to eSCO
-> on further attepts.
-> 
-> Issue happens with BlackBerry 9100 and 9700 with Intel WilkinsPeak
-> on third connection setup attept
-> 
-> 2015-05-18 01:27:57.332242 < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
->    handle 256 voice setting 0x0060 ptype 0x0380
-> 2015-05-18 01:27:57.333604 > HCI Event: Command Status (0x0f) plen 4
->    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
-> 2015-05-18 01:27:57.334614 > HCI Event: Synchronous Connect Complete (0x2c) plen 17
->    status 0x1a handle 0 bdaddr 30:7C:30:B3:A8:86 type SCO
->    Error: Unsupported Remote Feature / Unsupported LMP Feature
-> 2015-05-18 01:27:57.334895 < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
->    handle 256 voice setting 0x0060 ptype 0x0380
-> 2015-05-18 01:27:57.335601 > HCI Event: Command Status (0x0f) plen 4
->    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
-> 2015-05-18 01:27:57.336610 > HCI Event: Synchronous Connect Complete (0x2c) plen 17
->    status 0x1a handle 0 bdaddr 30:7C:30:B3:A8:86 type SCO
->    Error: Unsupported Remote Feature / Unsupported LMP Feature
-> 2015-05-18 01:27:57.336685 < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
->    handle 256 voice setting 0x0060 ptype 0x03c8
-> 2015-05-18 01:27:57.337603 > HCI Event: Command Status (0x0f) plen 4
->    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
-> 2015-05-18 01:27:57.342608 > HCI Event: Max Slots Change (0x1b) plen 3
->    handle 256 slots 1
-> 2015-05-18 01:27:57.377631 > HCI Event: Synchronous Connect Complete (0x2c) plen 17
->    status 0x00 handle 257 bdaddr 30:7C:30:B3:A8:86 type eSCO
->    Air mode: CVSD
-> 
-> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
-> ---
-> net/bluetooth/hci_event.c | 12 ++++++++++--
-> 1 file changed, 10 insertions(+), 2 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+Begin forwarded message:
 
-Regards
+Date: Fri, 28 Aug 2015 16:05:20 +0000
+From: "bugzilla-daemon@bugzilla.kernel.org" <bugzilla-daemon@bugzilla.kernel.org>
+To: "shemminger@linux-foundation.org" <shemminger@linux-foundation.org>
+Subject: [Bug 103671] New: systemd throws Bluetooth: hci0 hardware error 0x37, but bluetooth works fine
 
-Marcel
 
+https://bugzilla.kernel.org/show_bug.cgi?id=103671
+
+            Bug ID: 103671
+           Summary: systemd throws Bluetooth: hci0 hardware error 0x37,
+                    but bluetooth works fine
+           Product: Networking
+           Version: 2.5
+    Kernel Version: 4.1.6
+          Hardware: x86-64
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: low
+          Priority: P1
+         Component: Other
+          Assignee: shemminger@linux-foundation.org
+          Reporter: 44gala@gmx.com
+        Regression: No
+
+On every boot it throws 
+
+Bluetooth: hci0 hardware error 0x37
+
+But bluetooth funcitonality is not impacted with blueman.
+
+Adapter is 2-in-1 Wireless and Bluetooth:
+
+gala [ ~ ]$ lspci | grep Network
+02:00.0 Network controller: Ralink corp. RT3090 Wireless 802.11n 1T/1R PCIe
+
+gala [ ~ ]$ lsmod | grep blue
+bluetooth             458752  32 bnep,btbcm,btusb,rfcomm,btintel
+rfkill                 24576  6 cfg80211,hp_wmi,bluetooth
+crc16                  16384  2 ext4,bluetooth
+gala [ ~ ]$ lsmod | grep rt  
+rt2800pci              16384  0
+rt2800mmio             20480  1 rt2800pci
+rt2800lib              86016  2 rt2800pci,rt2800mmio
+rt2x00pci              16384  1 rt2800pci
+rt2x00mmio             16384  2 rt2800pci,rt2800mmio
+rt2x00lib              49152  5
+rt2x00pci,rt2800lib,rt2800pci,rt2800mmio,rt2x00mmio
+led_class              16384  1 rt2x00lib
+mac80211              667648  3 rt2x00lib,rt2x00pci,rt2800lib
+cfg80211              483328  2 mac80211,rt2x00lib
+eeprom_93cx6           16384  1 rt2800pci
+crc_ccitt              16384  1 rt2800lib
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
