@@ -1,48 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Will Wang <wiwang@mozilla.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, Will Wang <wiwang@mozilla.com>
-Subject: [PATCH v2 0/3] Fix missing HFP WBS callback
-Date: Fri, 28 Aug 2015 18:40:27 +0800
-Message-Id: <1440758430-24935-1-git-send-email-wiwang@mozilla.com>
+Date: Fri, 28 Aug 2015 10:54:48 +0200 (CEST)
+From: Maxime Chevallier <maxime.chevallier@openwide.fr>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <1926580325.138210.1440752088084.JavaMail.zimbra@openwide.fr>
+Subject: Bluez 5.31 PAN cannot setup GN master role
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi everyone,
 
-This set of patches:
-- Add HFP Wideband speech(WBS) callback function for Android.
-- Add a new opcode 0x91 for WBS Command notification.
+I currently have to test PAN on an embedded linux platform, running 
+linux 3.10.17, bluez5.31 with a marvell 8887 chip.
 
-v1->v2:
-- Move #if into function to avoid breaking compilation
-  on Android KitKat.
+Please forgive my mistakes, I am not a native english speaker.
 
-The patches has been tested on Nexus 5 with Android 5.0.1 Lollipop,
-and passed the PTS test "TC_AG_ACC_BI_12_I", the Android framework
-outputs log such as:
+My goal is to successfully setup a PAN network with NAP and GN roles 
+with my board as a master. I successfully setup a NAP using the test-nap
+script given as an example, having setup a bridge manually beforehand, 
+but I cannot manage to setup a GN network.
 
-08-20 18:29:39.932 E/BluetoothHeadsetServiceJni( 1442): mozzz: wbs_callback
-...
-08-20 18:29:39.933 D/HeadsetStateMachine( 1442): EVENT_TYPE_WBS codec is 1
-08-20 18:29:39.935 D/HeadsetStateMachine( 1442): AudioManager.setParameters bt_wbs=off for PTS-HFP-MOZILLA-TPE-PC - 00:1B:DC:07:2F:9A
-08-20 18:29:39.936 D/audio_hw_primary(  215): adev_set_parameters: enter: bt_wbs=off
+After having a look at the API, it seems to me that setting-up a GN role
+should be very similar to NAP, so I made a test-gn script from test-nap,
+only changing the 'UUID' parameter from 'nap' to 'gn'. 
+Unfortunately, this does not work, I get a 'connection refused(111)' 
+error upon trying to join the network.
 
-Thanks Szymon Janc(:sjanc)'s speedy reply of the patch process questions
-on IRC, and Shawn Huang(:shawnjohnjr)'s technical support.
+I can see the 'GN' record correctly added to the SDP server.
 
+Currently, what I am doing is : 
 
-Will Wang (3):
-  android/hal-ipc-api: Fix missing HFP WBS callback
-  android/hal-handsfree: Fix missing HFP WBS callback
-  android/handsfree: Fix missing HFP WBS callback
+# Setup the bridge
 
- android/hal-handsfree.c | 12 ++++++++++++
- android/hal-ipc-api.txt |  8 ++++++++
- android/hal-msg.h       |  6 ++++++
- android/handsfree.c     |  8 ++++++++
- 4 files changed, 34 insertions(+)
+brctl addbr bnep0
+brctl setfd bnep0 0
+brctl stp bnep0 off
+ip addr add 192.168.0.1/24 dev bnep0
+ip link set bnep0 up
 
--- 
-1.9.1
+dnsmasq --interface=bnep0 --except-interface=lo --bind-interfaces --dhcp-range=192.168.0.2,192.168.0.10,12h --conf-file=/dev/null
 
+# launch GN server
+
+/usr/lib/bluez/test/test-gn
+
+which gives me :
+Server for gn registered for bnep0
+Press CTRL-C to disconnect
+
+And then try to connect from my laptop, running ubuntu 15.04, 
+with bluez 4.101 :
+
+pand --connect 98:F1:70:6E:90:BC
+
+which outputs in logs :
+
+Bluetooth PAN daemon version 4.101
+Connecting to 98:F1:70:6E:90:BC
+Connect to 98:F1:70:6E:90:BC failed. Connection refused(111)
+
+After quite some time researching on the web, I struggle to find relevant
+informations to help me solve this, the vast majority of resources 
+recommend using 'pand', which is not available anymore.
+
+I might be taking the wrong approach here, but currently I can see no 
+other way of setting-up a GN master, since it is impossible with
+raw dbus-send, and utils like connman does not allow me to register a GN
+server ( though using NAP with 'connmanctl tether bluetooth on' 
+works fine ).
+
+I made sure that the correct bluetooth.conf dbus policy file was used.
+
+I would be very grateful if someone would point me to the right direction,
+I think that I came to a dead-end trying to solve this with my own skills.
+
+Thank you for your time,
+
+Maxime Chevallier
