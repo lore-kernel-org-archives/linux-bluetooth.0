@@ -1,25 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: hcidump does not show all traffic
+Subject: Re: [Patch v2] Bluetooth: Fix SCO link type change handling on connection complete
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <16191327.qpDB01f2sL@eik132.beelaertsict.nl>
-Date: Fri, 28 Aug 2015 12:05:29 -0700
+In-Reply-To: <1440763522-12399-1-git-send-email-kubax.t.pawlak@intel.com>
+Date: Fri, 28 Aug 2015 12:04:33 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <9EAE4CF9-7F4F-4DD8-A983-B9393DFFD339@holtmann.org>
-References: <16191327.qpDB01f2sL@eik132.beelaertsict.nl>
-To: Freek de Kruijf <f.de.kruijf@gmail.com>
+Message-Id: <DA8A0401-1FDF-491C-BAB7-5B65C4E7C3BC@holtmann.org>
+References: <1440763522-12399-1-git-send-email-kubax.t.pawlak@intel.com>
+To: Kuba Pawlak <kubax.t.pawlak@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Freek,
+Hi Kuba,
 
-> I am trying to monitor the traffic between my linux system and an external 
-> bluetooth system using the command "hcidump -i hci0 -w filename". I only catch 
-> some traffic from the host to the external device, but nothing from the device 
-> to the host. I analyze the file using wireshark.
+> Synchronous connections are initially created with type eSCO.
+> Link manager may reject proposed link parameters, which triggers
+> connection setup retry with a different set. Link type embedded
+> in responses should be disregarded until Synchronous Connect Complete
+> returns Success (0x00). Current code updates link type every time
+> which creates an issue when link type changes to SCO and back to eSCO
+> on further attepts.
+> 
+> Issue happens with BlackBerry 9100 and 9700 with Intel WilkinsPeak
+> on third connection setup attept
+> 
+> 2015-05-18 01:27:57.332242 < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+>    handle 256 voice setting 0x0060 ptype 0x0380
+> 2015-05-18 01:27:57.333604 > HCI Event: Command Status (0x0f) plen 4
+>    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
+> 2015-05-18 01:27:57.334614 > HCI Event: Synchronous Connect Complete (0x2c) plen 17
+>    status 0x1a handle 0 bdaddr 30:7C:30:B3:A8:86 type SCO
+>    Error: Unsupported Remote Feature / Unsupported LMP Feature
+> 2015-05-18 01:27:57.334895 < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+>    handle 256 voice setting 0x0060 ptype 0x0380
+> 2015-05-18 01:27:57.335601 > HCI Event: Command Status (0x0f) plen 4
+>    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
+> 2015-05-18 01:27:57.336610 > HCI Event: Synchronous Connect Complete (0x2c) plen 17
+>    status 0x1a handle 0 bdaddr 30:7C:30:B3:A8:86 type SCO
+>    Error: Unsupported Remote Feature / Unsupported LMP Feature
+> 2015-05-18 01:27:57.336685 < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+>    handle 256 voice setting 0x0060 ptype 0x03c8
+> 2015-05-18 01:27:57.337603 > HCI Event: Command Status (0x0f) plen 4
+>    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
+> 2015-05-18 01:27:57.342608 > HCI Event: Max Slots Change (0x1b) plen 3
+>    handle 256 slots 1
+> 2015-05-18 01:27:57.377631 > HCI Event: Synchronous Connect Complete (0x2c) plen 17
+>    status 0x00 handle 257 bdaddr 30:7C:30:B3:A8:86 type eSCO
+>    Air mode: CVSD
+> 
+> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
+> ---
+> net/bluetooth/hci_event.c | 12 ++++++++++--
+> 1 file changed, 10 insertions(+), 2 deletions(-)
 
-you need a newer Wireshark version. I remember it had some issues with correctly decoding the base packet types. Double check with btmon or hcidump that all traffic is actually in the file.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
