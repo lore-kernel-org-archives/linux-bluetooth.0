@@ -1,80 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Simon Fels <simon.fels@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Closing HCI_CHANNEL_USER socket doesn't close HCI device
-Date: Fri, 28 Aug 2015 12:54:29 +0200
-Message-Id: <1440759270-23099-1-git-send-email-simon.fels@canonical.com>
+From: Will Wang <wiwang@mozilla.com>
+To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, Will Wang <wiwang@mozilla.com>
+Subject: [PATCH v2 3/3] android/handsfree: Fix missing HFP WBS callback
+Date: Fri, 28 Aug 2015 18:40:30 +0800
+Message-Id: <1440758430-24935-4-git-send-email-wiwang@mozilla.com>
+In-Reply-To: <1440758430-24935-1-git-send-email-wiwang@mozilla.com>
+References: <1440758430-24935-1-git-send-email-wiwang@mozilla.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey all,
+---
+ android/handsfree.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-I just had a discussion with Johan Hedberg on IRC about problems I am experiencing with
-the hci-tester tool.
-
-Basically what I do is:
-
-$ sudo stop bluetooth
-$ sudo hciconfig hci0 down
-
-Verifying hci0 device is down
-
-$ sudo hciconfig -a
-
-Now running the hci-tester and getting
-
-$ sudo ./hci-tester
-
-Reset - init
-Reset - setup
-Reset - setup complete
-Reset - run
-Reset - test passed
-Reset - teardown
-Reset - teardown complete
-Reset - done
-
-Read Local Version Information - init
-Failed to setup upper tester user channel
-Read Local Version Information - pre setup failed
-Read Local Version Information - done
-
-Read Local Supported Commands - init
-Failed to setup upper tester user channel
-Read Local Supported Commands - pre setup failed
-Read Local Supported Commands - done
-
-Read Local Supported Features - init
-Failed to setup upper tester user channel
-Read Local Supported Features - pre setup failed
-Read Local Supported Features - done
-
-Read Local Extended Features - init
-Failed to setup upper tester user channel
-Read Local Extended Features - pre setup failed
-Read Local Extended Features - done
-
-Read Buffer Size - init
-Failed to setup upper tester user channel
-Read Buffer Size - pre setup failed
-Read Buffer Size - done
-
-[...]
-
-I stripped all the last lines of the output. More detailed is at
-http://paste.ubuntu.com/12213127/. The problem here seems to be
-that after running the first test the HCI device stays up even
-when the HCI_CHANNEL_USER socket gets closed.
-
-Johan pointed out that the problem seems to be that the
-HCI_CHANNEL_USER flag doesn't get cleared before calling hci_dev_close
-which actively checks for this one being set and if it is it fails
-right away to bring down the device.
-
-I am proposing the attached patch here with keeping in mind that
-this might still introduce problems somewhere else but wanted to
-put this out for discussion.
-
-regards,
-Simon
+diff --git a/android/handsfree.c b/android/handsfree.c
+index f297926..919728e 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -1067,6 +1067,7 @@ static void at_cmd_bcs(struct hfp_context *result, enum hfp_gw_cmd_type type,
+ 								void *user_data)
+ {
+ 	struct hf_device *dev = user_data;
++	struct hal_ev_handsfree_wbs ev;
+ 	unsigned int val;
+ 
+ 	DBG("");
+@@ -1085,6 +1086,13 @@ static void at_cmd_bcs(struct hfp_context *result, enum hfp_gw_cmd_type type,
+ 			break;
+ 		}
+ 
++		ev.wbs = val;
++		bdaddr2android(&dev->bdaddr, ev.bdaddr);
++
++		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
++					HAL_EV_HANDSFREE_WBS, sizeof(ev), &ev);
++
++
+ 		dev->proposed_codec = 0;
+ 		dev->negotiated_codec = val;
+ 
+-- 
+1.9.1
 
