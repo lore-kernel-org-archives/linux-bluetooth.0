@@ -1,39 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] Bluetooth: Add bt_dev logging macros
-Date: Sun, 30 Aug 2015 18:16:55 +0200
-Message-Id: <1440951415-4076-1-git-send-email-loic.poulain@intel.com>
+Date: Sat, 29 Aug 2015 13:15:47 -0700 (PDT)
+Message-Id: <20150829.131547.849266323871527475.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2015-08-28
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20150828201351.GA29774@t440s.P-661HNU-F1>
+References: <20150828201351.GA29774@t440s.P-661HNU-F1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add specific bluetooth device logging macros since hci device name is
-repeatedly referred in bluetooth subsystem logs.
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Fri, 28 Aug 2015 23:13:51 +0300
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- include/net/bluetooth/bluetooth.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+> One more bunch of Bluetooth patches for 4.3:
+> 
+>  - Crash fix for hci_bcm driver
+>  - Enhancements to hci_intel driver (e.g. baudrate configuration)
+>  - Fix for SCO link type after multiple connect attempts
+>  - Cleanups & minor fixes in a few other places
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 38d8a34..fcf2ae7 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -128,6 +128,13 @@ void bt_err(const char *fmt, ...);
- #define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
- #define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
- 
-+#define bt_dev_info(hdev, fmt, ...)				\
-+	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-+#define bt_dev_err(hdev, fmt, ...)				\
-+	BT_ERR("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-+#define bt_dev_dbg(hdev, fmt, ...)				\
-+	BT_DBG("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-+
- /* Connection and socket states */
- enum {
- 	BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
--- 
-1.9.1
+Pulled, thanks Johan.
