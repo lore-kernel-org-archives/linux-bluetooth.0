@@ -3,138 +3,159 @@ From: Loic Poulain <loic.poulain@intel.com>
 To: marcel@holtmann.org
 Cc: linux-bluetooth@vger.kernel.org,
 	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH v3 1/2] Bluetooth: hci_intel: Retrieve host-wake IRQ
-Date: Sat, 29 Aug 2015 13:38:18 +0200
-Message-Id: <1440848299-856-1-git-send-email-loic.poulain@intel.com>
+Subject: [PATCH 2/2] Bluetooth: hci_intel: Introduce LPM support
+Date: Sat, 29 Aug 2015 13:38:19 +0200
+Message-Id: <1440848299-856-2-git-send-email-loic.poulain@intel.com>
+In-Reply-To: <1440848299-856-1-git-send-email-loic.poulain@intel.com>
+References: <1440848299-856-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-An IRQ can be retrieved from the pdev resources. This irq will be used
-in case of LPM suspend mode to wake-up the host and resume the link.
-This resource can be declared as a GPIO-Interrupt which requires to be
-converted into IRQ.
+Enable controller Low-Power-Mode if we have a pdev to manage host
+wake-up. Once LPM is enabled, controller notifies its TX status via
+a vendor specific packet (tx_idle/tx_active).
+tx_active means that there is more data upcoming from controller.
+tx_idle means that controller can be put in suspended state.
 
 Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 ---
- v2: move irq claim into set_power
- v3: Remove unused variable 'err' in intel_probe
+ v2: coding style, spin_lock restructuring
+ v3: rebase
 
- drivers/bluetooth/hci_intel.c | 62 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 61 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_intel.c | 95 +++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 92 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 46426ff..1ec2205 100644
+index 1ec2205..30dce61 100644
 --- a/drivers/bluetooth/hci_intel.c
 +++ b/drivers/bluetooth/hci_intel.c
-@@ -31,6 +31,7 @@
- #include <linux/platform_device.h>
- #include <linux/gpio/consumer.h>
- #include <linux/acpi.h>
-+#include <linux/interrupt.h>
+@@ -44,6 +44,20 @@
+ #define STATE_FIRMWARE_LOADED	2
+ #define STATE_FIRMWARE_FAILED	3
+ #define STATE_BOOTING		4
++#define STATE_LPM_ENABLED	5
++#define STATE_TX_ACTIVE		6
++
++#define HCI_LPM_PKT 0xf1
++#define HCI_LPM_MAX_SIZE 10
++#define HCI_LPM_HDR_SIZE HCI_EVENT_HDR_SIZE
++
++#define LPM_OP_TX_NOTIFY 0x00
++
++struct hci_lpm_pkt {
++	__u8 opcode;
++	__u8 dlen;
++	__u8 data[0];
++} __packed;
  
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -48,6 +49,7 @@ struct intel_device {
+ struct intel_device {
  	struct list_head list;
- 	struct platform_device *pdev;
- 	struct gpio_desc *reset;
-+	int irq;
- };
+@@ -316,11 +330,14 @@ static int intel_setup(struct hci_uart *hu)
+ {
+ 	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
+ 					  0x00, 0x08, 0x04, 0x00 };
++	static const u8 lpm_param[] = { 0x03, 0x07, 0x01, 0x0b };
+ 	struct intel_data *intel = hu->priv;
++	struct intel_device *idev = NULL;
+ 	struct hci_dev *hdev = hu->hdev;
+ 	struct sk_buff *skb;
+ 	struct intel_version *ver;
+ 	struct intel_boot_params *params;
++	struct list_head *p;
+ 	const struct firmware *fw;
+ 	const u8 *fw_ptr;
+ 	char fwname[64];
+@@ -680,6 +697,37 @@ done:
  
- static LIST_HEAD(intel_device_list);
-@@ -113,6 +115,15 @@ static int intel_wait_booting(struct hci_uart *hu)
- 	return err;
+ 	BT_INFO("%s: Device booted in %llu usecs", hdev->name, duration);
+ 
++	/* Enable LPM if matching pdev with wakeup enabled */
++	spin_lock(&intel_device_list_lock);
++	list_for_each(p, &intel_device_list) {
++		struct intel_device *dev = list_entry(p, struct intel_device,
++						      list);
++		if (hu->tty->dev->parent != dev->pdev->dev.parent)
++			continue;
++
++		if (device_may_wakeup(&dev->pdev->dev))
++			idev = dev;
++
++		break;
++	}
++	spin_unlock(&intel_device_list_lock);
++
++	if (!idev)
++		goto no_lpm;
++
++	BT_INFO("%s: Enabling LPM", hdev->name);
++
++	skb = __hci_cmd_sync(hdev, 0xfc8b, sizeof(lpm_param), lpm_param,
++			     HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		BT_ERR("%s: Failed to enable LPM", hdev->name);
++		goto no_lpm;
++	}
++	kfree_skb(skb);
++
++	set_bit(STATE_LPM_ENABLED, &intel->flags);
++
++no_lpm:
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+@@ -740,10 +788,51 @@ recv:
+ 	return hci_recv_frame(hdev, skb);
  }
  
-+static irqreturn_t intel_irq(int irq, void *dev_id)
++static void intel_recv_lpm_notify(struct hci_dev *hdev, int value)
 +{
-+	struct intel_device *idev = dev_id;
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct intel_data *intel = hu->priv;
 +
-+	dev_info(&idev->pdev->dev, "hci_intel irq\n");
++	BT_DBG("%s: TX idle notification (%d)", hdev->name, value);
 +
-+	return IRQ_HANDLED;
++	if (value)
++		set_bit(STATE_TX_ACTIVE, &intel->flags);
++	else
++		clear_bit(STATE_TX_ACTIVE, &intel->flags);
 +}
 +
- static int intel_set_power(struct hci_uart *hu, bool powered)
- {
- 	struct list_head *p;
-@@ -139,6 +150,27 @@ static int intel_set_power(struct hci_uart *hu, bool powered)
- 			hu, dev_name(&idev->pdev->dev), powered);
- 
- 		gpiod_set_value(idev->reset, powered);
++static int intel_recv_lpm(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_lpm_pkt *lpm = (void *)skb->data;
 +
-+		if (idev->irq < 0)
-+			break;
-+
-+		if (powered && device_can_wakeup(&idev->pdev->dev)) {
-+			err = devm_request_threaded_irq(&idev->pdev->dev,
-+							idev->irq, NULL,
-+							intel_irq,
-+							IRQF_ONESHOT,
-+							"bt-host-wake", idev);
-+			if (err) {
-+				BT_ERR("hu %p, unable to allocate irq-%d",
-+				       hu, idev->irq);
-+				break;
-+			}
-+
-+			device_wakeup_enable(&idev->pdev->dev);
-+		} else if (!powered && device_may_wakeup(&idev->pdev->dev)) {
-+			devm_free_irq(&idev->pdev->dev, idev->irq, idev);
-+			device_wakeup_disable(&idev->pdev->dev);
-+		}
- 	}
- 
- 	spin_unlock(&intel_device_list_lock);
-@@ -838,6 +870,31 @@ static int intel_probe(struct platform_device *pdev)
- 		return PTR_ERR(idev->reset);
- 	}
- 
-+	idev->irq = platform_get_irq(pdev, 0);
-+	if (idev->irq < 0) {
-+		struct gpio_desc *host_wake;
-+
-+		dev_err(&pdev->dev, "No IRQ, falling back to gpio-irq\n");
-+
-+		host_wake = devm_gpiod_get_optional(&pdev->dev, "host-wake",
-+						    GPIOD_IN);
-+		if (IS_ERR(host_wake)) {
-+			dev_err(&pdev->dev, "Unable to retrieve IRQ\n");
-+			goto no_irq;
-+		}
-+
-+		idev->irq = gpiod_to_irq(host_wake);
-+		if (idev->irq < 0) {
-+			dev_err(&pdev->dev, "No corresponding irq for gpio\n");
-+			goto no_irq;
-+		}
++	switch (lpm->opcode) {
++	case LPM_OP_TX_NOTIFY:
++		if (lpm->dlen)
++			intel_recv_lpm_notify(hdev, lpm->data[0]);
++		break;
++	default:
++		BT_ERR("%s: unknown LPM opcode (%02x)", hdev->name,
++		       lpm->opcode);
++		break;
 +	}
 +
-+	/* Only enable wake-up/irq when controller is powered */
-+	device_set_wakeup_capable(&pdev->dev, true);
-+	device_wakeup_disable(&pdev->dev);
++	kfree_skb(skb);
 +
-+no_irq:
- 	platform_set_drvdata(pdev, idev);
- 
- 	/* Place this instance on the device list */
-@@ -845,7 +902,8 @@ static int intel_probe(struct platform_device *pdev)
- 	list_add_tail(&idev->list, &intel_device_list);
- 	spin_unlock(&intel_device_list_lock);
- 
--	dev_info(&pdev->dev, "registered.\n");
-+	dev_info(&pdev->dev, "registered, gpio(%d)/irq(%d).\n",
-+		 desc_to_gpio(idev->reset), idev->irq);
- 
- 	return 0;
- }
-@@ -854,6 +912,8 @@ static int intel_remove(struct platform_device *pdev)
- {
- 	struct intel_device *idev = platform_get_drvdata(pdev);
- 
-+	device_wakeup_disable(&pdev->dev);
++	return 0;
++}
 +
- 	spin_lock(&intel_device_list_lock);
- 	list_del(&idev->list);
- 	spin_unlock(&intel_device_list_lock);
++#define INTEL_RECV_LPM \
++	.type = HCI_LPM_PKT, \
++	.hlen = HCI_LPM_HDR_SIZE, \
++	.loff = 1, \
++	.lsize = 1, \
++	.maxlen = HCI_LPM_MAX_SIZE
++
+ static const struct h4_recv_pkt intel_recv_pkts[] = {
+-	{ H4_RECV_ACL,   .recv = hci_recv_frame },
+-	{ H4_RECV_SCO,   .recv = hci_recv_frame },
+-	{ H4_RECV_EVENT, .recv = intel_recv_event },
++	{ H4_RECV_ACL,    .recv = hci_recv_frame },
++	{ H4_RECV_SCO,    .recv = hci_recv_frame },
++	{ H4_RECV_EVENT,  .recv = intel_recv_event },
++	{ INTEL_RECV_LPM, .recv = intel_recv_lpm },
+ };
+ 
+ static int intel_recv(struct hci_uart *hu, const void *data, int count)
 -- 
 1.9.1
