@@ -1,39 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH 1/2] Bluetooth: Use BROKEN_STORED_LINK_KEY quirk for HCI_Read_Stored_Link_Key
+Subject: Re: [PATCH 2/2] Bluetooth: btusb: Detect new kind of counterfeit CSR controllers
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1440960441-31324-1-git-send-email-johan.hedberg@gmail.com>
-Date: Sun, 30 Aug 2015 13:51:20 -0700
+In-Reply-To: <1440960441-31324-2-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 30 Aug 2015 13:51:18 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <51149276-A120-4E5A-BF5A-10F8995D390C@holtmann.org>
-References: <1440960441-31324-1-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <42A0FEB5-3225-416E-8AB4-4CA145E10F3C@holtmann.org>
+References: <1440960441-31324-1-git-send-email-johan.hedberg@gmail.com> <1440960441-31324-2-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> Some counterfeit CSR controllers also have broken behavior with the
-> HCI_Read_Stored_Link_Key command:
+> Controllers claiming to be CSR with LMP subversion 0x0c5c don't
+> actually seem to be authentic CSR controllers. They also don't have
+> their USB bcdDevice value matching the LMP subversion like all other
+> CSR controllers:
 > 
-> < HCI Command: Read Stored Link Key (0x03|0x000d) plen 7
->        Address: 00:00:00:00:00:00 (OUI 00-00-00)
->        Read all: 0x01
->> HCI Event: Command Complete (0x0e) plen 8
->      Read Stored Link Key (0x03|0x000d) ncmd 1
->        Status: Unsupported Feature or Parameter Value (0x11)
->        Max num keys: 0
->        Num keys: 0
+> HCI:
 > 
-> Extend the existing HCI_QUIRK_BROKEN_STORED_LINK_KEY to be also used
-> for this HCI command.
+>> HCI Event: Command Complete (0x0e) plen 12
+>      Read Local Version Information (0x04|0x0001) ncmd 1
+>        Status: Success (0x00)
+>        HCI version: Bluetooth 2.0 (0x03) - Revision 3164 (0x0c5c)
+>        LMP version: Bluetooth 2.0 (0x03) - Subversion 3164 (0x0c5c)
+>        Manufacturer: Cambridge Silicon Radio (10)
+> 
+> USB:
+> 
+> T: Bus=04 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 3 Spd=12 MxCh= 0
+> D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=16 #Cfgs= 1
+> P: Vendor=0a12 ProdID=0001 Rev= 1.34
+> C:* #Ifs= 2 Cfg#= 1 Atr=80 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+> E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> 
+> These controllers also have the HCI_Read_Stored_Link_Key command
+> broken so it's important the right quirk is set for them.
 > 
 > Reported-and-tested-by: Rhobison Alves Pereira <rhobison@hotmail.com>
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/hci_core.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+> drivers/bluetooth/btusb.c | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
