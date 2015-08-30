@@ -1,83 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: btusb: Detect new kind of counterfeit CSR controllers
-Date: Sun, 30 Aug 2015 21:47:21 +0300
-Message-Id: <1440960441-31324-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1440960441-31324-1-git-send-email-johan.hedberg@gmail.com>
-References: <1440960441-31324-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Use BROKEN_STORED_LINK_KEY quirk for HCI_Read_Stored_Link_Key
+Date: Sun, 30 Aug 2015 21:47:20 +0300
+Message-Id: <1440960441-31324-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Controllers claiming to be CSR with LMP subversion 0x0c5c don't
-actually seem to be authentic CSR controllers. They also don't have
-their USB bcdDevice value matching the LMP subversion like all other
-CSR controllers:
+Some counterfeit CSR controllers also have broken behavior with the
+HCI_Read_Stored_Link_Key command:
 
-HCI:
+< HCI Command: Read Stored Link Key (0x03|0x000d) plen 7
+        Address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Read all: 0x01
+> HCI Event: Command Complete (0x0e) plen 8
+      Read Stored Link Key (0x03|0x000d) ncmd 1
+        Status: Unsupported Feature or Parameter Value (0x11)
+        Max num keys: 0
+        Num keys: 0
 
-> HCI Event: Command Complete (0x0e) plen 12
-      Read Local Version Information (0x04|0x0001) ncmd 1
-        Status: Success (0x00)
-        HCI version: Bluetooth 2.0 (0x03) - Revision 3164 (0x0c5c)
-        LMP version: Bluetooth 2.0 (0x03) - Subversion 3164 (0x0c5c)
-        Manufacturer: Cambridge Silicon Radio (10)
-
-USB:
-
-T: Bus=04 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 3 Spd=12 MxCh= 0
-D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=16 #Cfgs= 1
-P: Vendor=0a12 ProdID=0001 Rev= 1.34
-C:* #Ifs= 2 Cfg#= 1 Atr=80 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
-E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-
-These controllers also have the HCI_Read_Stored_Link_Key command
-broken so it's important the right quirk is set for them.
+Extend the existing HCI_QUIRK_BROKEN_STORED_LINK_KEY to be also used
+for this HCI command.
 
 Reported-and-tested-by: Rhobison Alves Pereira <rhobison@hotmail.com>
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/btusb.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b6aceaf82aa8..eeff7ca76344 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1348,7 +1348,9 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index adcbc74c2432..5a3602046a8b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -693,7 +693,8 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
  
- 	rp = (struct hci_rp_read_local_version *)skb->data;
+ 	hci_setup_event_mask(req);
  
--	if (le16_to_cpu(rp->manufacturer) != 10) {
-+	/* Detect controllers which aren't real CSR ones. */
-+	if (le16_to_cpu(rp->manufacturer) != 10 ||
-+	    le16_to_cpu(rp->lmp_subver) == 0x0c5c) {
- 		/* Clear the reset quirk since this is not an actual
- 		 * early Bluetooth 1.1 device from CSR.
- 		 */
-@@ -2782,7 +2784,7 @@ static int btusb_probe(struct usb_interface *intf,
- 			set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+-	if (hdev->commands[6] & 0x20) {
++	if (hdev->commands[6] & 0x20 &&
++	    !test_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks)) {
+ 		struct hci_cp_read_stored_link_key cp;
  
- 		/* Fake CSR devices with broken commands */
--		if (bcdDevice <= 0x100)
-+		if (bcdDevice <= 0x100 || bcdDevice == 0x134)
- 			hdev->setup = btusb_setup_csr;
- 
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 		bacpy(&cp.bdaddr, BDADDR_ANY);
 -- 
 2.4.3
 
