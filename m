@@ -1,76 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <f54f638b59f83f0b17e6e2e358c36e93.squirrel@iwavesystems.com>
-In-Reply-To: <FEE7B28F-3BB4-4AC4-8EEC-962B8C1D192F@holtmann.org>
-References: <237bbd312054ce6433af002f5e1213c7.squirrel@iwavesystems.com>
-    <FEE7B28F-3BB4-4AC4-8EEC-962B8C1D192F@holtmann.org>
-Date: Mon, 31 Aug 2015 03:13:37 -0400
-Subject: Re: USB  BT gives problem If device plugged during boot to
- platform.
-From: krishnaks@iwavesystems.com
-To: "Marcel Holtmann" <marcel@holtmann.org>
-Cc: krishnaks@iwavesystems.com,
- linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+From: "Arun K. Singh" <arunkat@gmail.com>
+Date: Mon, 31 Aug 2015 15:51:25 +0900
+Message-ID: <CAOnmHE88hWsMD2Tx99nbQTcvMWNDcMgo4UWofzjPjDgErYrXhg@mail.gmail.com>
+Subject: Re: BLE Advertise and Scan at the same time?
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hi,
->
->> I am porting bluez 5.33 to android kitkat 4.4.3.I am using USB based
->> Bluetooth device. I referred instruction in
->> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/README and
->> able to build.
->> After botting Android image with USB dongle connected and type
->> "hciconfig
->> hci0 up" on console, It is throwing following error.
->> Can't init device hci0: Unknown error 132 (132)
->>
->> If I Type hciconfig -a . It gives following.
->> hci0:   Type: BR/EDR  Bus: USB
->>        BD Address: 5C:F3:70:6C:5E:FB  ACL MTU: 1021:8  SCO MTU: 64:1
->>        DOWN
->>        RX bytes:547 acl:0 sco:0 events:27 errors:0
->>        TX bytes:384 acl:0 sco:0 commands:27 errors:0
->>        Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
->>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->>        Link policy: RSWITCH SNIFF
->>        Link mode: SLAVE ACCEPT
->>
->>
->>
->> But If I unplug and plug USB dongle, and then try same command
->> (hciconfig
->> hci0 up), It works. Even "hcitool scan" command also working after that.
->>
->> Why 1st time not working when USB dongle is connected?
->> Also when I check Bluez debug log in logcat.
->> I am getting one error log when USB dongle connected during boot.
->> E/bluetoothd(  841): Failed to set mode: Blocked through rfkill (0x12).
->
-> I think that blocked through rfkill is pretty obvious. Check with the
-> rfkill tool on what the current settings are. For some reason it seems
-> Bluetooth is blocked by default. And I remember there were some kernel
-> patches for this. Just do not remember the details.
->
-> Regards
->
-> Marcel
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+Hi Marcel,
 
-Hi,
+>> Is it possible to advertise (leadv) and scan (scan on) using the same
+>> ble adaper?
+>> The moment that I enable scanning (scan on) with bluetoothctl, leadv
+>> is disabled.
 
-Thanks for the reply.
+>that depends on the Bluetooth chip you are using. Inside the kernel we currently play it safe and >disable one when we start the other. It will be however re-enabled when the scan finished. You >need to use btmgmt and not hcitool. Using hcitool messes with raw HCI packets. The kernel logic >will always overwrite these as it sees fit.
 
-In my busybox utils rfkill is not enabled. If I enable it and try "rfkill
-unblock" is that will be enough? or I need to search for Kernel patch that
-fixes this rfkill block issue?
+>To allow simultaneous states, someone would have to work on that and figure out which chips >support what. Once that is done, there is no problem in lifting some of the restrictions we imposed.
 
+May I know what these restrictions are? I have a CSR8510 based USB
+dongle which seems to support simultaneous BLE scan/adv. My only
+problem would be to get rid of these restrictions in kernel to achieve
+a simultaneous BLE adv/scan operation.
 
-Regards,
-KP
+Thanks,
+-Arun
