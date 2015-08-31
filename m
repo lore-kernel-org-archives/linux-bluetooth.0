@@ -1,93 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com, Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCH] emulator: Improve le set scan enable command handler
-Date: Mon, 31 Aug 2015 12:09:05 +0200
-Message-Id: <1441015750-22650-1-git-send-email-mariusz.skamra@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <f54f638b59f83f0b17e6e2e358c36e93.squirrel@iwavesystems.com>
+In-Reply-To: <FEE7B28F-3BB4-4AC4-8EEC-962B8C1D192F@holtmann.org>
+References: <237bbd312054ce6433af002f5e1213c7.squirrel@iwavesystems.com>
+    <FEE7B28F-3BB4-4AC4-8EEC-962B8C1D192F@holtmann.org>
+Date: Mon, 31 Aug 2015 03:13:37 -0400
+Subject: Re: USB  BT gives problem If device plugged during boot to
+ platform.
+From: krishnaks@iwavesystems.com
+To: "Marcel Holtmann" <marcel@holtmann.org>
+Cc: krishnaks@iwavesystems.com,
+ linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain;charset=iso-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-le_set_scan_enable_complete should be called as post hook action.
-Moreover, depending on Filter Duplicates parameter, scan results
-can be duplicated while scanning is enabled.
----
- emulator/btdev.c | 26 +++++++++++++++++++++++---
- 1 file changed, 23 insertions(+), 3 deletions(-)
+> Hi,
+>
+>> I am porting bluez 5.33 to android kitkat 4.4.3.I am using USB based
+>> Bluetooth device. I referred instruction in
+>> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/README and
+>> able to build.
+>> After botting Android image with USB dongle connected and type
+>> "hciconfig
+>> hci0 up" on console, It is throwing following error.
+>> Can't init device hci0: Unknown error 132 (132)
+>>
+>> If I Type hciconfig -a . It gives following.
+>> hci0:   Type: BR/EDR  Bus: USB
+>>        BD Address: 5C:F3:70:6C:5E:FB  ACL MTU: 1021:8  SCO MTU: 64:1
+>>        DOWN
+>>        RX bytes:547 acl:0 sco:0 events:27 errors:0
+>>        TX bytes:384 acl:0 sco:0 commands:27 errors:0
+>>        Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
+>>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>>        Link policy: RSWITCH SNIFF
+>>        Link mode: SLAVE ACCEPT
+>>
+>>
+>>
+>> But If I unplug and plug USB dongle, and then try same command
+>> (hciconfig
+>> hci0 up), It works. Even "hcitool scan" command also working after that.
+>>
+>> Why 1st time not working when USB dongle is connected?
+>> Also when I check Bluez debug log in logcat.
+>> I am getting one error log when USB dongle connected during boot.
+>> E/bluetoothd(  841): Failed to set mode: Blocked through rfkill (0x12).
+>
+> I think that blocked through rfkill is pretty obvious. Check with the
+> rfkill tool on what the current settings are. For some reason it seems
+> Bluetooth is blocked by default. And I remember there were some kernel
+> patches for this. Just do not remember the details.
+>
+> Regards
+>
+> Marcel
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index e4c85f8..bab695b 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -134,6 +134,7 @@ struct btdev {
- 	uint8_t  le_scan_data[31];
- 	uint8_t  le_scan_data_len;
- 	uint8_t  le_scan_enable;
-+	unsigned int le_adv_results_timeout;
- 	uint8_t  le_scan_type;
- 	uint8_t  le_scan_own_addr_type;
- 	uint8_t  le_filter_dup;
-@@ -1801,8 +1802,9 @@ static void le_set_adv_enable_complete(struct btdev *btdev)
- 	}
- }
- 
--static void le_set_scan_enable_complete(struct btdev *btdev)
-+static bool le_set_scan_enable_complete(void *user_data)
- {
-+	struct btdev *btdev = user_data;
- 	int i;
- 
- 	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-@@ -1828,6 +1830,11 @@ static void le_set_scan_enable_complete(struct btdev *btdev)
- 					btdev_list[i]->le_adv_type == 0x02)
- 			le_send_adv_report(btdev, btdev_list[i], 0x04);
- 	}
-+
-+	if (!btdev->le_filter_dup)
-+		return true;
-+
-+	return false;
- }
- 
- static void le_read_remote_features_complete(struct btdev *btdev)
-@@ -2939,8 +2946,6 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 			status = BT_HCI_ERR_SUCCESS;
- 		}
- 		cmd_complete(btdev, opcode, &status, sizeof(status));
--		if (status == BT_HCI_ERR_SUCCESS && btdev->le_scan_enable)
--			le_set_scan_enable_complete(btdev);
- 		break;
- 
- 	case BT_HCI_CMD_LE_CREATE_CONN:
-@@ -3170,6 +3175,7 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 	const struct bt_hci_cmd_read_clock_offset *rco;
- 	const struct bt_hci_cmd_le_create_conn *lecc;
- 	const struct bt_hci_cmd_le_conn_update *lecu;
-+	const struct bt_hci_cmd_le_set_scan_enable *lsse;
- 
- 	switch (opcode) {
- 	case BT_HCI_CMD_INQUIRY:
-@@ -3329,6 +3335,20 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 				le16_to_cpu(lecu->min_length),
- 				le16_to_cpu(lecu->max_length));
- 		break;
-+		break;
-+	case BT_HCI_CMD_LE_SET_SCAN_ENABLE:
-+		if (btdev->type == BTDEV_TYPE_BREDR)
-+			return;
-+		lsse = data;
-+		if (btdev->le_scan_enable && lsse->enable)
-+			btdev->le_adv_results_timeout = timeout_add(1000,
-+				le_set_scan_enable_complete, btdev, NULL);
-+
-+		if (!btdev->le_scan_enable && !lsse->enable &&
-+						btdev->le_adv_results_timeout) {
-+			timeout_remove(btdev->le_adv_results_timeout);
-+		}
-+
- 	}
- }
- 
--- 
-2.4.3
+Hi,
 
+Thanks for the reply.
+
+In my busybox utils rfkill is not enabled. If I enable it and try "rfkill
+unblock" is that will be enough? or I need to search for Kernel patch that
+fixes this rfkill block issue?
+
+
+Regards,
+KP
