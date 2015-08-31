@@ -1,24 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 31 Aug 2015 22:33:15 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_qca: Fix a few tab vs spaces issues
-Message-ID: <20150831193315.GA25071@t440s.dominarus.com>
-References: <1440968732-93664-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1440968732-93664-1-git-send-email-marcel@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH 2/2] Bluetooth: hci_intel: Replace spinlock with mutex
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1441038871-27193-2-git-send-email-loic.poulain@intel.com>
+Date: Mon, 31 Aug 2015 09:58:51 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B6C43323-183F-4E6D-BB6A-4E24136B395E@holtmann.org>
+References: <1441038871-27193-1-git-send-email-loic.poulain@intel.com> <1441038871-27193-2-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Loic,
 
-On Sun, Aug 30, 2015, Marcel Holtmann wrote:
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Replace the device_intel list spinlock with a mutex.
+> devm_request_threaded_irq is not atomic and upcomming PM support should
+> be simpler.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 > ---
->  drivers/bluetooth/hci_qca.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> drivers/bluetooth/hci_intel.c | 18 +++++++++---------
+> 1 file changed, 9 insertions(+), 9 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+patch has been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
