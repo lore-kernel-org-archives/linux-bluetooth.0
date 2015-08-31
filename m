@@ -1,105 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com, Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCHv2 1/6] emulator: Fix LE Connection Complete Event data
-Date: Mon, 31 Aug 2015 12:18:03 +0200
-Message-Id: <1441016288-23010-1-git-send-email-mariusz.skamra@tieto.com>
-In-Reply-To: <20150829032025.GA8367@t440s>
-References: <20150829032025.GA8367@t440s>
+MIME-Version: 1.0
+In-Reply-To: <1441015750-22650-1-git-send-email-mariusz.skamra@tieto.com>
+References: <1441015750-22650-1-git-send-email-mariusz.skamra@tieto.com>
+Date: Mon, 31 Aug 2015 12:13:47 +0200
+Message-ID: <CAEL_csYFhUhRcetRrb1NBszHKH3GvMU_EvmwRvPxav=ncx0LoQ@mail.gmail.com>
+Subject: Re: [PATCH] emulator: Improve le set scan enable command handler
+From: Mariusz Skamra <skamrmar@gmail.com>
+To: Mariusz Skamra <mariusz.skamra@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This sets LE Connection Complete Event paramaters based on parameters
-from LE Create Connection command.
-Event parameters like Conn_Interval and Supervision_Timeout
-shouldn't be set to 0.
----
- emulator/btdev.c | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+del
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index ceefd56..f3ef1ca 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -1095,8 +1095,8 @@ static void sco_conn_complete(struct btdev *btdev, uint8_t status)
- }
- 
- static void le_conn_complete(struct btdev *btdev,
--					const uint8_t *bdaddr, uint8_t bdaddr_type,
--					uint8_t status)
-+				const struct bt_hci_cmd_le_create_conn *lecc,
-+				uint8_t status)
- {
- 	char buf[1 + sizeof(struct bt_hci_evt_le_conn_complete)];
- 	struct bt_hci_evt_le_conn_complete *cc = (void *) &buf[1];
-@@ -1106,8 +1106,10 @@ static void le_conn_complete(struct btdev *btdev,
- 	buf[0] = BT_HCI_EVT_LE_CONN_COMPLETE;
- 
- 	if (!status) {
--		struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr,
--								bdaddr_type);
-+		struct btdev *remote;
-+
-+		remote = find_btdev_by_bdaddr_type(lecc->peer_addr,
-+							lecc->peer_addr_type);
- 
- 		btdev->conn = remote;
- 		btdev->le_adv_enable = 0;
-@@ -1123,6 +1125,9 @@ static void le_conn_complete(struct btdev *btdev,
- 
- 		cc->role = 0x01;
- 		cc->handle = cpu_to_le16(42);
-+		cc->interval = lecc->max_interval;
-+		cc->latency = lecc->latency;
-+		cc->supv_timeout = lecc->supv_timeout;
- 
- 		send_event(remote, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
- 
-@@ -1130,8 +1135,8 @@ static void le_conn_complete(struct btdev *btdev,
- 	}
- 
- 	cc->status = status;
--	cc->peer_addr_type = bdaddr_type;
--	memcpy(cc->peer_addr, bdaddr, 6);
-+	cc->peer_addr_type = lecc->peer_addr_type;
-+	memcpy(cc->peer_addr, lecc->peer_addr, 6);
- 	cc->role = 0x00;
- 
- 	send_event(btdev, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
-@@ -1173,16 +1178,17 @@ static bool adv_connectable(struct btdev *btdev)
- 	return btdev->le_adv_type != 0x03;
- }
- 
--static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
--							uint8_t bdaddr_type)
-+static void le_conn_request(struct btdev *btdev,
-+				const struct bt_hci_cmd_le_create_conn *lecc)
- {
--	struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr, bdaddr_type);
-+	struct btdev *remote = find_btdev_by_bdaddr_type(lecc->peer_addr,
-+							lecc->peer_addr_type);
- 
- 	if (remote && adv_connectable(remote) && adv_match(btdev, remote) &&
--					remote->le_adv_own_addr == bdaddr_type)
--		le_conn_complete(btdev, bdaddr, bdaddr_type, 0);
-+				remote->le_adv_own_addr == lecc->peer_addr_type)
-+		le_conn_complete(btdev, lecc, 0);
- 	else
--		le_conn_complete(btdev, bdaddr, bdaddr_type,
-+		le_conn_complete(btdev, lecc,
- 					BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH);
- }
- 
-@@ -3323,7 +3329,7 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 			return;
- 		lecc = data;
- 		btdev->le_scan_own_addr_type = lecc->own_addr_type;
--		le_conn_request(btdev, lecc->peer_addr, lecc->peer_addr_type);
-+		le_conn_request(btdev, lecc);
- 		break;
- 
- 	case BT_HCI_CMD_LE_CONN_UPDATE:
--- 
-2.4.3
-
+On Mon, Aug 31, 2015 at 12:09 PM, Mariusz Skamra
+<mariusz.skamra@tieto.com> wrote:
+> le_set_scan_enable_complete should be called as post hook action.
+> Moreover, depending on Filter Duplicates parameter, scan results
+> can be duplicated while scanning is enabled.
+> ---
+>  emulator/btdev.c | 26 +++++++++++++++++++++++---
+>  1 file changed, 23 insertions(+), 3 deletions(-)
+>
+> diff --git a/emulator/btdev.c b/emulator/btdev.c
+> index e4c85f8..bab695b 100644
+> --- a/emulator/btdev.c
+> +++ b/emulator/btdev.c
+> @@ -134,6 +134,7 @@ struct btdev {
+>         uint8_t  le_scan_data[31];
+>         uint8_t  le_scan_data_len;
+>         uint8_t  le_scan_enable;
+> +       unsigned int le_adv_results_timeout;
+>         uint8_t  le_scan_type;
+>         uint8_t  le_scan_own_addr_type;
+>         uint8_t  le_filter_dup;
+> @@ -1801,8 +1802,9 @@ static void le_set_adv_enable_complete(struct btdev *btdev)
+>         }
+>  }
+>
+> -static void le_set_scan_enable_complete(struct btdev *btdev)
+> +static bool le_set_scan_enable_complete(void *user_data)
+>  {
+> +       struct btdev *btdev = user_data;
+>         int i;
+>
+>         for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
+> @@ -1828,6 +1830,11 @@ static void le_set_scan_enable_complete(struct btdev *btdev)
+>                                         btdev_list[i]->le_adv_type == 0x02)
+>                         le_send_adv_report(btdev, btdev_list[i], 0x04);
+>         }
+> +
+> +       if (!btdev->le_filter_dup)
+> +               return true;
+> +
+> +       return false;
+>  }
+>
+>  static void le_read_remote_features_complete(struct btdev *btdev)
+> @@ -2939,8 +2946,6 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+>                         status = BT_HCI_ERR_SUCCESS;
+>                 }
+>                 cmd_complete(btdev, opcode, &status, sizeof(status));
+> -               if (status == BT_HCI_ERR_SUCCESS && btdev->le_scan_enable)
+> -                       le_set_scan_enable_complete(btdev);
+>                 break;
+>
+>         case BT_HCI_CMD_LE_CREATE_CONN:
+> @@ -3170,6 +3175,7 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
+>         const struct bt_hci_cmd_read_clock_offset *rco;
+>         const struct bt_hci_cmd_le_create_conn *lecc;
+>         const struct bt_hci_cmd_le_conn_update *lecu;
+> +       const struct bt_hci_cmd_le_set_scan_enable *lsse;
+>
+>         switch (opcode) {
+>         case BT_HCI_CMD_INQUIRY:
+> @@ -3329,6 +3335,20 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
+>                                 le16_to_cpu(lecu->min_length),
+>                                 le16_to_cpu(lecu->max_length));
+>                 break;
+> +               break;
+> +       case BT_HCI_CMD_LE_SET_SCAN_ENABLE:
+> +               if (btdev->type == BTDEV_TYPE_BREDR)
+> +                       return;
+> +               lsse = data;
+> +               if (btdev->le_scan_enable && lsse->enable)
+> +                       btdev->le_adv_results_timeout = timeout_add(1000,
+> +                               le_set_scan_enable_complete, btdev, NULL);
+> +
+> +               if (!btdev->le_scan_enable && !lsse->enable &&
+> +                                               btdev->le_adv_results_timeout) {
+> +                       timeout_remove(btdev->le_adv_results_timeout);
+> +               }
+> +
+>         }
+>  }
+>
+> --
+> 2.4.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
