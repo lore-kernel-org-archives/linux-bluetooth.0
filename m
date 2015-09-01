@@ -1,152 +1,237 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH 2/3] Bluetooth: hci_intel: Add PM support
+Subject: Re: [PATCH 1/3] Bluetooth: hci_intel: Implement LPM suspend/resume
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1441118530-18154-2-git-send-email-loic.poulain@intel.com>
-Date: Tue, 1 Sep 2015 08:05:10 -0700
+In-Reply-To: <1441118530-18154-1-git-send-email-loic.poulain@intel.com>
+Date: Tue, 1 Sep 2015 08:00:41 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <687B701E-224F-466F-B1E9-06D0FAC8CC7A@holtmann.org>
-References: <1441118530-18154-1-git-send-email-loic.poulain@intel.com> <1441118530-18154-2-git-send-email-loic.poulain@intel.com>
+Message-Id: <61A0A7F9-D2D5-4DF8-9462-F399889E9F0C@holtmann.org>
+References: <1441118530-18154-1-git-send-email-loic.poulain@intel.com>
 To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Loic,
 
-> Add PM suspend/resume callbacks which call lpm_suspend/resume.
-> Add LPM ack in threaded IRQ handler to notify the controller that
-> resume is complete.
-> Protect hci_uart against concurrent removing during suspend/resume.
+> Add LPM PM suspend/resume/host_wake LPM functions.
+> A LPM transaction is composed with a LPM request and ack/response.
+> Host can send a LPM suspend/resume request to the controller which
+> should respond with a LPM ack.
+> If resume is requested by the controller (irq), host has to send a LPM
+> ack once resumed.
 > 
 > Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 > ---
-> drivers/bluetooth/hci_intel.c | 66 +++++++++++++++++++++++++++++++++++++------
-> 1 file changed, 58 insertions(+), 8 deletions(-)
+> drivers/bluetooth/hci_intel.c | 156 ++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 156 insertions(+)
 > 
 > diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-> index 387961a..8651803 100644
+> index 5d53185..387961a 100644
 > --- a/drivers/bluetooth/hci_intel.c
 > +++ b/drivers/bluetooth/hci_intel.c
-> @@ -68,6 +68,8 @@ struct intel_device {
-> 	struct list_head list;
-> 	struct platform_device *pdev;
-> 	struct gpio_desc *reset;
-> +	struct hci_uart *hu;
-> +	struct mutex hu_lock;
-> 	int irq;
-> };
+> @@ -46,12 +46,17 @@
+> #define STATE_BOOTING		4
+> #define STATE_LPM_ENABLED	5
+> #define STATE_TX_ACTIVE		6
+> +#define STATE_SUSPENDED		7
+> +#define STATE_LPM_TRANSACTION	8
 > 
-> @@ -156,14 +158,7 @@ static int intel_wait_lpm_transaction(struct hci_uart *hu)
+> +#define HCI_LPM_WAKE_PKT 0xf0
+> #define HCI_LPM_PKT 0xf1
+> #define HCI_LPM_MAX_SIZE 10
+> #define HCI_LPM_HDR_SIZE HCI_EVENT_HDR_SIZE
+> 
+> #define LPM_OP_TX_NOTIFY 0x00
+> +#define LPM_OP_SUSPEND_ACK 0x02
+> +#define LPM_OP_RESUME_ACK 0x03
+> 
+> struct hci_lpm_pkt {
+> 	__u8 opcode;
+> @@ -129,6 +134,28 @@ static int intel_wait_booting(struct hci_uart *hu)
 > 	return err;
 > }
 > 
-> -static irqreturn_t intel_irq(int irq, void *dev_id)
-> -{
-> -	struct intel_device *idev = dev_id;
-> -
-> -	dev_info(&idev->pdev->dev, "hci_intel irq\n");
-> -
-> -	return IRQ_HANDLED;
-> -}
-> +static irqreturn_t intel_irq(int irq, void *dev_id);
-
-I prefer to avoid forward declaration if possible. Can we get the code reordered?
-
-> static int intel_set_power(struct hci_uart *hu, bool powered)
-> {
-> @@ -192,6 +187,10 @@ static int intel_set_power(struct hci_uart *hu, bool powered)
-> 
-> 		gpiod_set_value(idev->reset, powered);
-> 
-> +		mutex_lock(&idev->hu_lock);
-> +		idev->hu = powered ? hu : NULL;
-> +		mutex_unlock(&idev->hu_lock);
-> +
-
-I prefer if add a comment block around this code to explain why we are doing this.
-
-> 		if (idev->irq < 0)
-> 			break;
-> 
-> @@ -1061,6 +1060,20 @@ static const struct hci_uart_proto intel_proto = {
-> 	.dequeue	= intel_dequeue,
-> };
-> 
-> +static irqreturn_t intel_irq(int irq, void *dev_id)
+> +static int intel_wait_lpm_transaction(struct hci_uart *hu)
 > +{
-> +	struct intel_device *idev = dev_id;
+> +	struct intel_data *intel = hu->priv;
+> +	int err;
 > +
-> +	dev_info(&idev->pdev->dev, "hci_intel irq\n");
+> +	err = wait_on_bit_timeout(&intel->flags, STATE_LPM_TRANSACTION,
+> +				  TASK_INTERRUPTIBLE,
+> +				  msecs_to_jiffies(1000));
 > +
-> +	mutex_lock(&idev->hu_lock);
-> +	if (idev->hu)
-> +		intel_lpm_host_wake(idev->hu);
-> +	mutex_unlock(&idev->hu_lock);
+> +	if (err == 1) {
+> +		bt_dev_err(hu->hdev, "LPM transaction interrupted");
+> +		return -EINTR;
+> +	}
 > +
-> +	return IRQ_HANDLED;
+> +	if (err) {
+> +		bt_dev_err(hu->hdev, "LPM transaction timeout");
+> +		return -ETIMEDOUT;
+> +	}
+> +
+> +	return err;
 > +}
 > +
-> #ifdef CONFIG_ACPI
-> static const struct acpi_device_id intel_acpi_match[] = {
-> 	{ "INT33E1", 0 },
-> @@ -1085,6 +1098,40 @@ static int intel_acpi_probe(struct intel_device *idev)
+> static irqreturn_t intel_irq(int irq, void *dev_id)
+> {
+> 	struct intel_device *idev = dev_id;
+> @@ -800,12 +827,28 @@ static void intel_recv_lpm_notify(struct hci_dev *hdev, int value)
+> static int intel_recv_lpm(struct hci_dev *hdev, struct sk_buff *skb)
+> {
+> 	struct hci_lpm_pkt *lpm = (void *)skb->data;
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	struct intel_data *intel = hu->priv;
+> 
+> 	switch (lpm->opcode) {
+> 	case LPM_OP_TX_NOTIFY:
+> 		if (lpm->dlen)
+> 			intel_recv_lpm_notify(hdev, lpm->data[0]);
+> 		break;
+> +	case LPM_OP_SUSPEND_ACK:
+> +		set_bit(STATE_SUSPENDED, &intel->flags);
+> +		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags)) {
+> +			smp_mb__after_atomic();
+> +			wake_up_bit(&intel->flags, STATE_LPM_TRANSACTION);
+> +		}
+> +		break;
+> +	case LPM_OP_RESUME_ACK:
+> +		clear_bit(STATE_SUSPENDED, &intel->flags);
+> +		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags)) {
+> +			smp_mb__after_atomic();
+> +			wake_up_bit(&intel->flags, STATE_LPM_TRANSACTION);
+> +		}
+> +		break;
+> 	default:
+> 		bt_dev_err(hdev, "Unknown LPM opcode (%02x)", lpm->opcode);
+> 		break;
+> @@ -890,6 +933,119 @@ static struct sk_buff *intel_dequeue(struct hci_uart *hu)
+> 	return skb;
 > }
-> #endif
 > 
-> +#ifdef CONFIG_PM_SLEEP
-> +static int intel_suspend(struct device *dev)
+> +static int intel_lpm_suspend(struct hci_uart *hu)
 > +{
-> +	struct intel_device *idev = dev_get_drvdata(dev);
+> +	static const u8 suspend[] = {0x01, 0x01, 0x01};
+
+coding style please here. There are space before } and after {.
+
+> +	struct intel_data *intel = hu->priv;
+> +	struct sk_buff *skb;
 > +
-> +	dev_dbg(dev, "intel_suspend");
+> +	if (!test_bit(STATE_LPM_ENABLED, &intel->flags) ||
+> +	    test_bit(STATE_SUSPENDED, &intel->flags))
+> +		return 0;
 > +
-> +	mutex_lock(&idev->hu_lock);
-> +	if (idev->hu)
-> +		intel_lpm_suspend(idev->hu);
-> +	mutex_unlock(&idev->hu_lock);
+> +	if (test_bit(STATE_TX_ACTIVE, &intel->flags))
+> +		return -EAGAIN;
+> +
+> +	bt_dev_dbg(hu->hdev, "Suspending");
+> +
+> +	skb = bt_skb_alloc(sizeof(suspend), GFP_KERNEL);
+> +	if (!skb) {
+> +		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	memcpy(skb_put(skb, sizeof(suspend)), suspend, sizeof(suspend));
+> +	bt_cb(skb)->pkt_type = HCI_LPM_PKT;
+> +
+> +	set_bit(STATE_LPM_TRANSACTION, &intel->flags);
+> +
+> +	skb_queue_tail(&intel->txq, skb);
+> +	hci_uart_tx_wakeup(hu);
+> +
+> +	intel_wait_lpm_transaction(hu);
+> +
+> +	clear_bit(STATE_LPM_TRANSACTION, &intel->flags);
+> +
+> +	if (!test_bit(STATE_SUSPENDED, &intel->flags)) {
+> +		bt_dev_err(hu->hdev, "Device suspend error");
+> +		return -EINVAL;
+> +	}
+> +
+> +	bt_dev_dbg(hu->hdev, "Suspended");
+> +
+> +	hci_uart_set_flow_control(hu, true);
 > +
 > +	return 0;
 > +}
 > +
-> +static int intel_resume(struct device *dev)
+> +static int intel_lpm_resume(struct hci_uart *hu)
 > +{
-> +	struct intel_device *idev = dev_get_drvdata(dev);
+> +	struct intel_data *intel = hu->priv;
+> +	struct sk_buff *skb;
 > +
-> +	dev_dbg(dev, "intel_resume");
+> +	if (!test_bit(STATE_LPM_ENABLED, &intel->flags) ||
+> +	    !test_bit(STATE_SUSPENDED, &intel->flags))
+> +		return 0;
 > +
-> +	mutex_lock(&idev->hu_lock);
-> +	if (idev->hu)
-> +		intel_lpm_resume(idev->hu);
-> +	mutex_unlock(&idev->hu_lock);
+> +	bt_dev_dbg(hu->hdev, "Resuming");
+> +
+> +	hci_uart_set_flow_control(hu, false);
+> +
+> +	skb = bt_skb_alloc(0, GFP_KERNEL);
+> +	if (!skb) {
+> +		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	bt_cb(skb)->pkt_type = HCI_LPM_WAKE_PKT;
+> +
+> +	set_bit(STATE_LPM_TRANSACTION, &intel->flags);
+> +
+> +	skb_queue_tail(&intel->txq, skb);
+> +	hci_uart_tx_wakeup(hu);
+> +
+> +	intel_wait_lpm_transaction(hu);
+> +
+> +	clear_bit(STATE_LPM_TRANSACTION, &intel->flags);
+> +
+> +	if (test_bit(STATE_SUSPENDED, &intel->flags)) {
+> +		bt_dev_err(hu->hdev, "Device resume error");
+> +		return -EINVAL;
+> +	}
+> +
+> +	bt_dev_dbg(hu->hdev, "Resumed");
 > +
 > +	return 0;
 > +}
-> +#endif
 > +
-> +static const struct dev_pm_ops intel_pm_ops = {
-> +	SET_SYSTEM_SLEEP_PM_OPS(intel_suspend, intel_resume)
-> +};
+> +static int intel_lpm_host_wake(struct hci_uart *hu)
+> +{
+> +	static const u8 lpm_resume_ack[] = {LPM_OP_RESUME_ACK, 0x00};
+
+Same as above. Please fix coding style.
+
+> +	struct intel_data *intel = hu->priv;
+> +	struct sk_buff *skb;
 > +
-> static int intel_probe(struct platform_device *pdev)
-> {
-> 	struct intel_device *idev;
-> @@ -1093,6 +1140,8 @@ static int intel_probe(struct platform_device *pdev)
-> 	if (!idev)
-> 		return -ENOMEM;
-> 
-> +	mutex_init(&idev->hu_lock);
+> +	hci_uart_set_flow_control(hu, false);
 > +
-> 	idev->pdev = pdev;
-> 
-> 	if (ACPI_HANDLE(&pdev->dev)) {
-> @@ -1169,6 +1218,7 @@ static struct platform_driver intel_driver = {
-> 	.driver = {
-> 		.name = "hci_intel",
-> 		.acpi_match_table = ACPI_PTR(intel_acpi_match),
-> +		.pm = &intel_pm_ops,
-> 	},
-> };
+> +	clear_bit(STATE_SUSPENDED, &intel->flags);
+> +
+> +	skb = bt_skb_alloc(sizeof(lpm_resume_ack), GFP_KERNEL);
+> +	if (!skb) {
+> +		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	memcpy(skb_put(skb, sizeof(lpm_resume_ack)), lpm_resume_ack,
+> +	       sizeof(lpm_resume_ack));
+> +	bt_cb(skb)->pkt_type = HCI_LPM_PKT;
+> +
+> +	skb_queue_tail(&intel->txq, skb);
+> +	hci_uart_tx_wakeup(hu);
+> +
+> +	bt_dev_dbg(hu->hdev, "Resumed by controller");
+> +
+> +	return 0;
+> +}
+> +
+> static const struct hci_uart_proto intel_proto = {
+> 	.id		= HCI_UART_INTEL,
+> 	.name		= "Intel",
 
 Regards
 
