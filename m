@@ -1,101 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kieran Bingham <kieranbingham@gmail.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	akarwar@marvell.com,
-	Kieran Bingham <kieranbingham@gmail.com>
-Subject: [PATCH] bluetooth: btmrvl: skb resource leak, and double free.
-Date: Tue,  1 Sep 2015 20:24:02 +0100
-Message-Id: <1441135442-14505-1-git-send-email-kieranbingham@gmail.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Will Wang <wiwang@mozilla.com>
+Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] Fix missing HFP WBS callback
+Date: Tue, 01 Sep 2015 21:05:33 +0200
+Message-ID: <3678158.lzaNHy860j@ix>
+In-Reply-To: <1440758430-24935-1-git-send-email-wiwang@mozilla.com>
+References: <1440758430-24935-1-git-send-email-wiwang@mozilla.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-if btmrvl_tx_pkt() is called, and the branch
-  if (skb_headroom(skb) < BTM_HEADER_LEN)
-evaluates positive, a new skb is allocated via skb_realloc_headroom.
+Hi Will,
 
-The original skb is stored in a tmp variable, before being free'd.
-However on success, the new skb, is not free'd, nor is it
-returned to the caller which will then double-free the original skb.
+On Friday, August 28, 2015 06:40:27 PM Will Wang wrote:
+> Hi,
+> 
+> This set of patches:
+> - Add HFP Wideband speech(WBS) callback function for Android.
+> - Add a new opcode 0x91 for WBS Command notification.
+> 
+> v1->v2:
+> - Move #if into function to avoid breaking compilation
+>   on Android KitKat.
+> 
+> The patches has been tested on Nexus 5 with Android 5.0.1 Lollipop,
+> and passed the PTS test "TC_AG_ACC_BI_12_I", the Android framework
+> outputs log such as:
+> 
+> 08-20 18:29:39.932 E/BluetoothHeadsetServiceJni( 1442): mozzz: wbs_callback
+> ...
+> 08-20 18:29:39.933 D/HeadsetStateMachine( 1442): EVENT_TYPE_WBS codec is 1
+> 08-20 18:29:39.935 D/HeadsetStateMachine( 1442): AudioManager.setParameters
+> bt_wbs=off for PTS-HFP-MOZILLA-TPE-PC - 00:1B:DC:07:2F:9A 08-20
+> 18:29:39.936 D/audio_hw_primary(  215): adev_set_parameters: enter:
+> bt_wbs=off
+> 
+> Thanks Szymon Janc(:sjanc)'s speedy reply of the patch process questions
+> on IRC, and Shawn Huang(:shawnjohnjr)'s technical support.
+> 
+> 
+> Will Wang (3):
+>   android/hal-ipc-api: Fix missing HFP WBS callback
+>   android/hal-handsfree: Fix missing HFP WBS callback
+>   android/handsfree: Fix missing HFP WBS callback
+> 
+>  android/hal-handsfree.c | 12 ++++++++++++
+>  android/hal-ipc-api.txt |  8 ++++++++
+>  android/hal-msg.h       |  6 ++++++
+>  android/handsfree.c     |  8 ++++++++
+>  4 files changed, 34 insertions(+)
 
-This issue exists from the original driver submission in
- commit: #132ff4e5fa8dfb71a7d99902f88043113947e972
+Patches applied, thanks.
 
-Move the error handling, and kfree_skb inside the helper function,
-where the statistics can be updated, and the skb free'd at the
-appropriate occasion.
-
-Reported by coverity (CID 113422)
-
-Signed-off-by: Kieran Bingham <kieranbingham@gmail.com>
----
- drivers/bluetooth/btmrvl_main.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index de05deb..ceaef95 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -366,15 +366,15 @@ void btmrvl_firmware_dump(struct btmrvl_private *priv)
- 
- static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
- {
--	int ret = 0;
-+	int ret = -EINVAL;
- 
- 	if (!skb || !skb->data)
--		return -EINVAL;
-+		goto tx_pkt_out;
- 
- 	if (!skb->len || ((skb->len + BTM_HEADER_LEN) > BTM_UPLD_SIZE)) {
- 		BT_ERR("Tx Error: Bad skb length %d : %d",
- 						skb->len, BTM_UPLD_SIZE);
--		return -EINVAL;
-+		goto tx_pkt_out;
- 	}
- 
- 	if (skb_headroom(skb) < BTM_HEADER_LEN) {
-@@ -385,7 +385,7 @@ static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
- 			BT_ERR("Tx Error: realloc_headroom failed %d",
- 				BTM_HEADER_LEN);
- 			skb = tmp;
--			return -EINVAL;
-+			goto tx_pkt_out;
- 		}
- 
- 		kfree_skb(tmp);
-@@ -406,6 +406,14 @@ static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
- 	if (priv->hw_host_to_card)
- 		ret = priv->hw_host_to_card(priv, skb->data, skb->len);
- 
-+tx_pkt_out:
-+	if (ret)
-+		priv->btmrvl_dev.hcidev->stat.err_tx++;
-+	else
-+		priv->btmrvl_dev.hcidev->stat.byte_tx += skb->len;
-+
-+	kfree_skb(skb);
-+
- 	return ret;
- }
- 
-@@ -670,14 +678,8 @@ static int btmrvl_service_main_thread(void *data)
- 			continue;
- 
- 		skb = skb_dequeue(&adapter->tx_queue);
--		if (skb) {
--			if (btmrvl_tx_pkt(priv, skb))
--				priv->btmrvl_dev.hcidev->stat.err_tx++;
--			else
--				priv->btmrvl_dev.hcidev->stat.byte_tx += skb->len;
--
--			kfree_skb(skb);
--		}
-+		if (skb)
-+			btmrvl_tx_pkt(priv, skb);
- 	}
- 
- 	return 0;
 -- 
-2.1.4
+BR
+Szymon Janc
