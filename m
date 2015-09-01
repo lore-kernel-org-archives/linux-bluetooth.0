@@ -1,220 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH v2 1/3] Bluetooth: hci_intel: Implement LPM suspend/resume
-Date: Tue,  1 Sep 2015 18:41:01 +0200
-Message-Id: <1441125663-17708-1-git-send-email-loic.poulain@intel.com>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH 3/3] Bluetooth: hci_intel: Add runtime PM support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <55E5C4F4.6020305@intel.com>
+Date: Tue, 1 Sep 2015 08:37:43 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F7752FAC-4ADD-4239-8BEE-72B28468ED46@holtmann.org>
+References: <1441118530-18154-1-git-send-email-loic.poulain@intel.com> <1441118530-18154-3-git-send-email-loic.poulain@intel.com> <00A4FA75-DFA4-4890-A4A1-A4969FE5A313@holtmann.org> <55E5C4F4.6020305@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add LPM PM suspend/resume/host_wake LPM functions.
-A LPM transaction is composed with a LPM request and ack/response.
-Host can send a LPM suspend/resume request to the controller which
-should respond with a LPM ack.
-If resume is requested by the controller (irq), host has to send a LPM
-ack once resumed.
+Hi Loic,
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- v2: Bracket coding style fixes.
-     Reorder lpm functions to avoid forward declaration.
+>>> static int intel_recv_lpm(struct hci_dev *hdev, struct sk_buff *skb)
+>>> @@ -895,9 +936,24 @@ static int intel_recv(struct hci_uart *hu, const void *data, int count)
+>>> static int intel_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+>>> {
+>>> 	struct intel_data *intel = hu->priv;
+>>> +	struct list_head *p;
+>>> 
+>>> 	BT_DBG("hu %p skb %p", hu, skb);
+>>> 
+>>> +	mutex_lock(&intel_device_list_lock);
+>>> +	list_for_each(p, &intel_device_list) {
+>>> +		struct intel_device *idev = list_entry(p, struct intel_device,
+>>> +						      list);
+>>> +
+>>> +		if (hu->tty->dev->parent == idev->pdev->dev.parent) {
+>>> +			pm_runtime_get_sync(&idev->pdev->dev);
+>> 
+>> just for my own clarification. Why this is get_sync and the other just get?
+>> 
+> 
+> I want to be sure resume is completed before enqueuing any packet in order to be able to send the packet in dequeue.
+> Moreover, since LPM and 'standard' packets share the same queue, we don't want to enqueue a 'standard' packet before our LPM one.
+> 
+> In the threaded IRQ , we are actually already LPM resumed since we have
+> send a LPM resume ack to the controller, I just use get and put to notify the resume to the PM core and trigger autosuspend.
+> 
+> In the busy work, we don't need to be synced since we are already in a
+> async work. It is more a keep alive to delay the auto suspend.
 
- drivers/bluetooth/hci_intel.c | 156 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 156 insertions(+)
+then please add some comment in front of the commands to make clear why we are doing it. When it comes to this level of details, comments help a lot.
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 5d53185..eed1f72 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -46,12 +46,17 @@
- #define STATE_BOOTING		4
- #define STATE_LPM_ENABLED	5
- #define STATE_TX_ACTIVE		6
-+#define STATE_SUSPENDED		7
-+#define STATE_LPM_TRANSACTION	8
- 
-+#define HCI_LPM_WAKE_PKT 0xf0
- #define HCI_LPM_PKT 0xf1
- #define HCI_LPM_MAX_SIZE 10
- #define HCI_LPM_HDR_SIZE HCI_EVENT_HDR_SIZE
- 
- #define LPM_OP_TX_NOTIFY 0x00
-+#define LPM_OP_SUSPEND_ACK 0x02
-+#define LPM_OP_RESUME_ACK 0x03
- 
- struct hci_lpm_pkt {
- 	__u8 opcode;
-@@ -129,6 +134,141 @@ static int intel_wait_booting(struct hci_uart *hu)
- 	return err;
- }
- 
-+static int intel_wait_lpm_transaction(struct hci_uart *hu)
-+{
-+	struct intel_data *intel = hu->priv;
-+	int err;
-+
-+	err = wait_on_bit_timeout(&intel->flags, STATE_LPM_TRANSACTION,
-+				  TASK_INTERRUPTIBLE,
-+				  msecs_to_jiffies(1000));
-+
-+	if (err == 1) {
-+		bt_dev_err(hu->hdev, "LPM transaction interrupted");
-+		return -EINTR;
-+	}
-+
-+	if (err) {
-+		bt_dev_err(hu->hdev, "LPM transaction timeout");
-+		return -ETIMEDOUT;
-+	}
-+
-+	return err;
-+}
-+
-+static int intel_lpm_suspend(struct hci_uart *hu)
-+{
-+	static const u8 suspend[] = { 0x01, 0x01, 0x01 };
-+	struct intel_data *intel = hu->priv;
-+	struct sk_buff *skb;
-+
-+	if (!test_bit(STATE_LPM_ENABLED, &intel->flags) ||
-+	    test_bit(STATE_SUSPENDED, &intel->flags))
-+		return 0;
-+
-+	if (test_bit(STATE_TX_ACTIVE, &intel->flags))
-+		return -EAGAIN;
-+
-+	bt_dev_dbg(hu->hdev, "Suspending");
-+
-+	skb = bt_skb_alloc(sizeof(suspend), GFP_KERNEL);
-+	if (!skb) {
-+		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
-+		return -ENOMEM;
-+	}
-+
-+	memcpy(skb_put(skb, sizeof(suspend)), suspend, sizeof(suspend));
-+	bt_cb(skb)->pkt_type = HCI_LPM_PKT;
-+
-+	set_bit(STATE_LPM_TRANSACTION, &intel->flags);
-+
-+	skb_queue_tail(&intel->txq, skb);
-+	hci_uart_tx_wakeup(hu);
-+
-+	intel_wait_lpm_transaction(hu);
-+
-+	clear_bit(STATE_LPM_TRANSACTION, &intel->flags);
-+
-+	if (!test_bit(STATE_SUSPENDED, &intel->flags)) {
-+		bt_dev_err(hu->hdev, "Device suspend error");
-+		return -EINVAL;
-+	}
-+
-+	bt_dev_dbg(hu->hdev, "Suspended");
-+
-+	hci_uart_set_flow_control(hu, true);
-+
-+	return 0;
-+}
-+
-+static int intel_lpm_resume(struct hci_uart *hu)
-+{
-+	struct intel_data *intel = hu->priv;
-+	struct sk_buff *skb;
-+
-+	if (!test_bit(STATE_LPM_ENABLED, &intel->flags) ||
-+	    !test_bit(STATE_SUSPENDED, &intel->flags))
-+		return 0;
-+
-+	bt_dev_dbg(hu->hdev, "Resuming");
-+
-+	hci_uart_set_flow_control(hu, false);
-+
-+	skb = bt_skb_alloc(0, GFP_KERNEL);
-+	if (!skb) {
-+		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
-+		return -ENOMEM;
-+	}
-+
-+	bt_cb(skb)->pkt_type = HCI_LPM_WAKE_PKT;
-+
-+	set_bit(STATE_LPM_TRANSACTION, &intel->flags);
-+
-+	skb_queue_tail(&intel->txq, skb);
-+	hci_uart_tx_wakeup(hu);
-+
-+	intel_wait_lpm_transaction(hu);
-+
-+	clear_bit(STATE_LPM_TRANSACTION, &intel->flags);
-+
-+	if (test_bit(STATE_SUSPENDED, &intel->flags)) {
-+		bt_dev_err(hu->hdev, "Device resume error");
-+		return -EINVAL;
-+	}
-+
-+	bt_dev_dbg(hu->hdev, "Resumed");
-+
-+	return 0;
-+}
-+
-+static int intel_lpm_host_wake(struct hci_uart *hu)
-+{
-+	static const u8 lpm_resume_ack[] = { LPM_OP_RESUME_ACK, 0x00 };
-+	struct intel_data *intel = hu->priv;
-+	struct sk_buff *skb;
-+
-+	hci_uart_set_flow_control(hu, false);
-+
-+	clear_bit(STATE_SUSPENDED, &intel->flags);
-+
-+	skb = bt_skb_alloc(sizeof(lpm_resume_ack), GFP_KERNEL);
-+	if (!skb) {
-+		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
-+		return -ENOMEM;
-+	}
-+
-+	memcpy(skb_put(skb, sizeof(lpm_resume_ack)), lpm_resume_ack,
-+	       sizeof(lpm_resume_ack));
-+	bt_cb(skb)->pkt_type = HCI_LPM_PKT;
-+
-+	skb_queue_tail(&intel->txq, skb);
-+	hci_uart_tx_wakeup(hu);
-+
-+	bt_dev_dbg(hu->hdev, "Resumed by controller");
-+
-+	return 0;
-+}
-+
- static irqreturn_t intel_irq(int irq, void *dev_id)
- {
- 	struct intel_device *idev = dev_id;
-@@ -800,12 +940,28 @@ static void intel_recv_lpm_notify(struct hci_dev *hdev, int value)
- static int intel_recv_lpm(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_lpm_pkt *lpm = (void *)skb->data;
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct intel_data *intel = hu->priv;
- 
- 	switch (lpm->opcode) {
- 	case LPM_OP_TX_NOTIFY:
- 		if (lpm->dlen)
- 			intel_recv_lpm_notify(hdev, lpm->data[0]);
- 		break;
-+	case LPM_OP_SUSPEND_ACK:
-+		set_bit(STATE_SUSPENDED, &intel->flags);
-+		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags)) {
-+			smp_mb__after_atomic();
-+			wake_up_bit(&intel->flags, STATE_LPM_TRANSACTION);
-+		}
-+		break;
-+	case LPM_OP_RESUME_ACK:
-+		clear_bit(STATE_SUSPENDED, &intel->flags);
-+		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags)) {
-+			smp_mb__after_atomic();
-+			wake_up_bit(&intel->flags, STATE_LPM_TRANSACTION);
-+		}
-+		break;
- 	default:
- 		bt_dev_err(hdev, "Unknown LPM opcode (%02x)", lpm->opcode);
- 		break;
--- 
-1.9.1
+Regards
+
+Marcel
+
