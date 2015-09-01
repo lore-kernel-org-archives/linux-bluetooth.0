@@ -1,246 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH v2 1/3] Bluetooth: hci_intel: Implement LPM suspend/resume
+Subject: Re: [PATCH] bluetooth: btmrvl: skb resource leak, and double free.
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1441125663-17708-1-git-send-email-loic.poulain@intel.com>
-Date: Tue, 1 Sep 2015 15:18:32 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D8FAEC8C-A582-4CCB-8062-9C1171F9FCFB@holtmann.org>
-References: <1441125663-17708-1-git-send-email-loic.poulain@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
+In-Reply-To: <1441135442-14505-1-git-send-email-kieranbingham@gmail.com>
+Date: Tue, 1 Sep 2015 15:12:03 -0700
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, akarwar@marvell.com
+Message-Id: <6DFBE0FF-297F-4523-9218-2A705E5DA167@holtmann.org>
+References: <1441135442-14505-1-git-send-email-kieranbingham@gmail.com>
+To: Kieran Bingham <kieranbingham@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi Kieran,
 
-> Add LPM PM suspend/resume/host_wake LPM functions.
-> A LPM transaction is composed with a LPM request and ack/response.
-> Host can send a LPM suspend/resume request to the controller which
-> should respond with a LPM ack.
-> If resume is requested by the controller (irq), host has to send a LPM
-> ack once resumed.
+> if btmrvl_tx_pkt() is called, and the branch
+>  if (skb_headroom(skb) < BTM_HEADER_LEN)
+> evaluates positive, a new skb is allocated via skb_realloc_headroom.
+
+is that branch actually valid and can happen? I mean someone must have thought about it, but skb usage in Bluetooth is pretty linear and normally all skb should be allocated with a 8 byte headroom.
+
+For example when we look at btsdio_tx_packet() from btsdio.c, then we do not even bother with checking that we have enough headroom. We know that the skb we got from the core was allocated with enough headroom.
+
+I am almost convinced that coverity found dead code here that is never executed.
+
+> The original skb is stored in a tmp variable, before being free'd.
+> However on success, the new skb, is not free'd, nor is it
+> returned to the caller which will then double-free the original skb.
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> This issue exists from the original driver submission in
+> commit: #132ff4e5fa8dfb71a7d99902f88043113947e972
+> 
+> Move the error handling, and kfree_skb inside the helper function,
+> where the statistics can be updated, and the skb free'd at the
+> appropriate occasion.
+> 
+> Reported by coverity (CID 113422)
+> 
+> Signed-off-by: Kieran Bingham <kieranbingham@gmail.com>
 > ---
-> v2: Bracket coding style fixes.
->     Reorder lpm functions to avoid forward declaration.
+> drivers/bluetooth/btmrvl_main.c | 26 ++++++++++++++------------
+> 1 file changed, 14 insertions(+), 12 deletions(-)
 > 
-> drivers/bluetooth/hci_intel.c | 156 ++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 156 insertions(+)
+> diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+> index de05deb..ceaef95 100644
+> --- a/drivers/bluetooth/btmrvl_main.c
+> +++ b/drivers/bluetooth/btmrvl_main.c
+> @@ -366,15 +366,15 @@ void btmrvl_firmware_dump(struct btmrvl_private *priv)
 > 
-> diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-> index 5d53185..eed1f72 100644
-> --- a/drivers/bluetooth/hci_intel.c
-> +++ b/drivers/bluetooth/hci_intel.c
-> @@ -46,12 +46,17 @@
-> #define STATE_BOOTING		4
-> #define STATE_LPM_ENABLED	5
-> #define STATE_TX_ACTIVE		6
-> +#define STATE_SUSPENDED		7
-> +#define STATE_LPM_TRANSACTION	8
+> static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
+> {
+> -	int ret = 0;
+> +	int ret = -EINVAL;
 > 
-> +#define HCI_LPM_WAKE_PKT 0xf0
-> #define HCI_LPM_PKT 0xf1
-> #define HCI_LPM_MAX_SIZE 10
-> #define HCI_LPM_HDR_SIZE HCI_EVENT_HDR_SIZE
+> 	if (!skb || !skb->data)
+> -		return -EINVAL;
+> +		goto tx_pkt_out;
+
+with your change the skb can never be NULL since you are checking this before calling this function.
+
 > 
-> #define LPM_OP_TX_NOTIFY 0x00
-> +#define LPM_OP_SUSPEND_ACK 0x02
-> +#define LPM_OP_RESUME_ACK 0x03
+> 	if (!skb->len || ((skb->len + BTM_HEADER_LEN) > BTM_UPLD_SIZE)) {
+> 		BT_ERR("Tx Error: Bad skb length %d : %d",
+> 						skb->len, BTM_UPLD_SIZE);
+> -		return -EINVAL;
+> +		goto tx_pkt_out;
+> 	}
 > 
-> struct hci_lpm_pkt {
-> 	__u8 opcode;
-> @@ -129,6 +134,141 @@ static int intel_wait_booting(struct hci_uart *hu)
-> 	return err;
+> 	if (skb_headroom(skb) < BTM_HEADER_LEN) {
+> @@ -385,7 +385,7 @@ static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
+> 			BT_ERR("Tx Error: realloc_headroom failed %d",
+> 				BTM_HEADER_LEN);
+> 			skb = tmp;
+> -			return -EINVAL;
+> +			goto tx_pkt_out;
+> 		}
+> 
+> 		kfree_skb(tmp);
+> @@ -406,6 +406,14 @@ static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
+> 	if (priv->hw_host_to_card)
+> 		ret = priv->hw_host_to_card(priv, skb->data, skb->len);
+> 
+> +tx_pkt_out:
+> +	if (ret)
+> +		priv->btmrvl_dev.hcidev->stat.err_tx++;
+> +	else
+> +		priv->btmrvl_dev.hcidev->stat.byte_tx += skb->len;
+
+I do not like this conditional based on ret. I have to twist my brain to ensure that ret == 0 is ensured so that the skb->len gets added correctly.
+
+> +
+> +	kfree_skb(skb);
+> +
+> 	return ret;
 > }
 > 
-> +static int intel_wait_lpm_transaction(struct hci_uart *hu)
-> +{
-> +	struct intel_data *intel = hu->priv;
-> +	int err;
-> +
-> +	err = wait_on_bit_timeout(&intel->flags, STATE_LPM_TRANSACTION,
-> +				  TASK_INTERRUPTIBLE,
-> +				  msecs_to_jiffies(1000));
-> +
-> +	if (err == 1) {
-> +		bt_dev_err(hu->hdev, "LPM transaction interrupted");
-> +		return -EINTR;
-> +	}
-> +
-> +	if (err) {
-> +		bt_dev_err(hu->hdev, "LPM transaction timeout");
-> +		return -ETIMEDOUT;
-> +	}
-> +
-> +	return err;
-> +}
-> +
-> +static int intel_lpm_suspend(struct hci_uart *hu)
-> +{
-> +	static const u8 suspend[] = { 0x01, 0x01, 0x01 };
-> +	struct intel_data *intel = hu->priv;
-> +	struct sk_buff *skb;
-> +
-> +	if (!test_bit(STATE_LPM_ENABLED, &intel->flags) ||
-> +	    test_bit(STATE_SUSPENDED, &intel->flags))
-> +		return 0;
-> +
-> +	if (test_bit(STATE_TX_ACTIVE, &intel->flags))
-> +		return -EAGAIN;
-> +
-> +	bt_dev_dbg(hu->hdev, "Suspending");
-> +
-> +	skb = bt_skb_alloc(sizeof(suspend), GFP_KERNEL);
-> +	if (!skb) {
-> +		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	memcpy(skb_put(skb, sizeof(suspend)), suspend, sizeof(suspend));
-> +	bt_cb(skb)->pkt_type = HCI_LPM_PKT;
-> +
-> +	set_bit(STATE_LPM_TRANSACTION, &intel->flags);
-> +
-> +	skb_queue_tail(&intel->txq, skb);
-> +	hci_uart_tx_wakeup(hu);
-> +
-> +	intel_wait_lpm_transaction(hu);
-
-is it okay to not check the return value here?
-
-> +
-> +	clear_bit(STATE_LPM_TRANSACTION, &intel->flags);
-> +
-> +	if (!test_bit(STATE_SUSPENDED, &intel->flags)) {
-> +		bt_dev_err(hu->hdev, "Device suspend error");
-> +		return -EINVAL;
-> +	}
-> +
-> +	bt_dev_dbg(hu->hdev, "Suspended");
-> +
-> +	hci_uart_set_flow_control(hu, true);
-> +
-> +	return 0;
-> +}
-> +
-> +static int intel_lpm_resume(struct hci_uart *hu)
-> +{
-> +	struct intel_data *intel = hu->priv;
-> +	struct sk_buff *skb;
-> +
-> +	if (!test_bit(STATE_LPM_ENABLED, &intel->flags) ||
-> +	    !test_bit(STATE_SUSPENDED, &intel->flags))
-> +		return 0;
-> +
-> +	bt_dev_dbg(hu->hdev, "Resuming");
-> +
-> +	hci_uart_set_flow_control(hu, false);
-> +
-> +	skb = bt_skb_alloc(0, GFP_KERNEL);
-> +	if (!skb) {
-> +		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	bt_cb(skb)->pkt_type = HCI_LPM_WAKE_PKT;
-> +
-> +	set_bit(STATE_LPM_TRANSACTION, &intel->flags);
-> +
-> +	skb_queue_tail(&intel->txq, skb);
-> +	hci_uart_tx_wakeup(hu);
-> +
-> +	intel_wait_lpm_transaction(hu);
-
-Same question as above. If this is fine for now, then maybe a quick comment that we continue even in case of failure would be a good idea.
-
-> +
-> +	clear_bit(STATE_LPM_TRANSACTION, &intel->flags);
-> +
-> +	if (test_bit(STATE_SUSPENDED, &intel->flags)) {
-> +		bt_dev_err(hu->hdev, "Device resume error");
-> +		return -EINVAL;
-> +	}
-> +
-> +	bt_dev_dbg(hu->hdev, "Resumed");
-> +
-> +	return 0;
-> +}
-> +
-> +static int intel_lpm_host_wake(struct hci_uart *hu)
-> +{
-> +	static const u8 lpm_resume_ack[] = { LPM_OP_RESUME_ACK, 0x00 };
-> +	struct intel_data *intel = hu->priv;
-> +	struct sk_buff *skb;
-> +
-> +	hci_uart_set_flow_control(hu, false);
-> +
-> +	clear_bit(STATE_SUSPENDED, &intel->flags);
-> +
-> +	skb = bt_skb_alloc(sizeof(lpm_resume_ack), GFP_KERNEL);
-> +	if (!skb) {
-> +		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	memcpy(skb_put(skb, sizeof(lpm_resume_ack)), lpm_resume_ack,
-> +	       sizeof(lpm_resume_ack));
-> +	bt_cb(skb)->pkt_type = HCI_LPM_PKT;
-> +
-> +	skb_queue_tail(&intel->txq, skb);
-> +	hci_uart_tx_wakeup(hu);
-> +
-> +	bt_dev_dbg(hu->hdev, "Resumed by controller");
-> +
-> +	return 0;
-> +}
-> +
-> static irqreturn_t intel_irq(int irq, void *dev_id)
-> {
-> 	struct intel_device *idev = dev_id;
-> @@ -800,12 +940,28 @@ static void intel_recv_lpm_notify(struct hci_dev *hdev, int value)
-> static int intel_recv_lpm(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> 	struct hci_lpm_pkt *lpm = (void *)skb->data;
-> +	struct hci_uart *hu = hci_get_drvdata(hdev);
-> +	struct intel_data *intel = hu->priv;
+> @@ -670,14 +678,8 @@ static int btmrvl_service_main_thread(void *data)
+> 			continue;
 > 
-> 	switch (lpm->opcode) {
-> 	case LPM_OP_TX_NOTIFY:
-> 		if (lpm->dlen)
-> 			intel_recv_lpm_notify(hdev, lpm->data[0]);
-> 		break;
-
-I forgot this earlier :(
-
-	case LPM_OP_TX_NOTIFY:
-		if (lpm->dlen < 1) {
-			bt_dev_err(hu->hdev, "Invalid LPM notification packet");
-			break;
-		}
-		intel_recv_lpm_notify(hdev, lpm->data[0]);
-		break;
-
-Does it make sense to change it to this (obviously in a separate patch).
-
-> +	case LPM_OP_SUSPEND_ACK:
-> +		set_bit(STATE_SUSPENDED, &intel->flags);
-> +		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags)) {
-> +			smp_mb__after_atomic();
-> +			wake_up_bit(&intel->flags, STATE_LPM_TRANSACTION);
-> +		}
-> +		break;
-> +	case LPM_OP_RESUME_ACK:
-> +		clear_bit(STATE_SUSPENDED, &intel->flags);
-> +		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags)) {
-> +			smp_mb__after_atomic();
-> +			wake_up_bit(&intel->flags, STATE_LPM_TRANSACTION);
-> +		}
-> +		break;
-> 	default:
-> 		bt_dev_err(hdev, "Unknown LPM opcode (%02x)", lpm->opcode);
-> 		break;
+> 		skb = skb_dequeue(&adapter->tx_queue);
+> -		if (skb) {
+> -			if (btmrvl_tx_pkt(priv, skb))
+> -				priv->btmrvl_dev.hcidev->stat.err_tx++;
+> -			else
+> -				priv->btmrvl_dev.hcidev->stat.byte_tx += skb->len;
+> -
+> -			kfree_skb(skb);
+> -		}
+> +		if (skb)
+> +			btmrvl_tx_pkt(priv, skb);
+> 	}
 
 Regards
 
