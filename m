@@ -1,239 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH 1/3] Bluetooth: hci_intel: Implement LPM suspend/resume
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1441118530-18154-1-git-send-email-loic.poulain@intel.com>
-Date: Tue, 1 Sep 2015 08:00:41 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <61A0A7F9-D2D5-4DF8-9462-F399889E9F0C@holtmann.org>
-References: <1441118530-18154-1-git-send-email-loic.poulain@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1440708538-3596-1-git-send-email-jpawlowski@google.com>
+References: <1440708538-3596-1-git-send-email-jpawlowski@google.com>
+Date: Tue, 1 Sep 2015 07:52:40 -0700
+Message-ID: <CAD0=r8yGb6Yy7R+=AAZ7S+EDwyFMizcxutrH43XrE06m4H4V7w@mail.gmail.com>
+Subject: Re: [BlueZ v3 1/2] doc/settings-storage: describe gatt attributes
+ storage format
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+ping ?
 
-> Add LPM PM suspend/resume/host_wake LPM functions.
-> A LPM transaction is composed with a LPM request and ack/response.
-> Host can send a LPM suspend/resume request to the controller which
-> should respond with a LPM ack.
-> If resume is requested by the controller (irq), host has to send a LPM
-> ack once resumed.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+On Thu, Aug 27, 2015 at 1:48 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
 > ---
-> drivers/bluetooth/hci_intel.c | 156 ++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 156 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-> index 5d53185..387961a 100644
-> --- a/drivers/bluetooth/hci_intel.c
-> +++ b/drivers/bluetooth/hci_intel.c
-> @@ -46,12 +46,17 @@
-> #define STATE_BOOTING		4
-> #define STATE_LPM_ENABLED	5
-> #define STATE_TX_ACTIVE		6
-> +#define STATE_SUSPENDED		7
-> +#define STATE_LPM_TRANSACTION	8
-> 
-> +#define HCI_LPM_WAKE_PKT 0xf0
-> #define HCI_LPM_PKT 0xf1
-> #define HCI_LPM_MAX_SIZE 10
-> #define HCI_LPM_HDR_SIZE HCI_EVENT_HDR_SIZE
-> 
-> #define LPM_OP_TX_NOTIFY 0x00
-> +#define LPM_OP_SUSPEND_ACK 0x02
-> +#define LPM_OP_RESUME_ACK 0x03
-> 
-> struct hci_lpm_pkt {
-> 	__u8 opcode;
-> @@ -129,6 +134,28 @@ static int intel_wait_booting(struct hci_uart *hu)
-> 	return err;
-> }
-> 
-> +static int intel_wait_lpm_transaction(struct hci_uart *hu)
-> +{
-> +	struct intel_data *intel = hu->priv;
-> +	int err;
+>  doc/settings-storage.txt | 37 ++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 36 insertions(+), 1 deletion(-)
+>
+> diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
+> index 6c9f058..aea50a6 100644
+> --- a/doc/settings-storage.txt
+> +++ b/doc/settings-storage.txt
+> @@ -139,11 +139,15 @@ Cache directory file format
+>  ============================
+>
+>  Each file, named by remote device address, may includes multiple groups
+> -(General and ServiceRecords).
+> +(General, ServiceRecords, Attributes).
+>
+>  In ServiceRecords, SDP records are stored using their handle as key
+>  (hexadecimal format).
+>
+> +In "Attributes" group GATT database is stored using attribute handle as key
+> +(hexadecimal format). Value associated with this handle is serialized form of
+> +all data required to re-create given attribute. ":" is used to separate fields.
 > +
-> +	err = wait_on_bit_timeout(&intel->flags, STATE_LPM_TRANSACTION,
-> +				  TASK_INTERRUPTIBLE,
-> +				  msecs_to_jiffies(1000));
+>  [General] group contains:
+>
+>    Name         String          Remote device friendly name
+> @@ -155,6 +159,37 @@ In ServiceRecords, SDP records are stored using their handle as key
+>    <0x...>      String          SDP record as hexadecimal encoded
+>                                 string
+>
+> +In [Attributes] group value always starts with attribute type, that determines
+> +how to interpret rest of value:
 > +
-> +	if (err == 1) {
-> +		bt_dev_err(hu->hdev, "LPM transaction interrupted");
-> +		return -EINTR;
-> +	}
+> +  Primary service:
+> +    2800:end_handle:uuid
 > +
-> +	if (err) {
-> +		bt_dev_err(hu->hdev, "LPM transaction timeout");
-> +		return -ETIMEDOUT;
-> +	}
+> +  Secondary service:
+> +    2801:end_handle:uuid
 > +
-> +	return err;
-> +}
+> +  Included service:
+> +    2802:start_handle:end_handle:uuid
 > +
-> static irqreturn_t intel_irq(int irq, void *dev_id)
-> {
-> 	struct intel_device *idev = dev_id;
-> @@ -800,12 +827,28 @@ static void intel_recv_lpm_notify(struct hci_dev *hdev, int value)
-> static int intel_recv_lpm(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> 	struct hci_lpm_pkt *lpm = (void *)skb->data;
-> +	struct hci_uart *hu = hci_get_drvdata(hdev);
-> +	struct intel_data *intel = hu->priv;
-> 
-> 	switch (lpm->opcode) {
-> 	case LPM_OP_TX_NOTIFY:
-> 		if (lpm->dlen)
-> 			intel_recv_lpm_notify(hdev, lpm->data[0]);
-> 		break;
-> +	case LPM_OP_SUSPEND_ACK:
-> +		set_bit(STATE_SUSPENDED, &intel->flags);
-> +		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags)) {
-> +			smp_mb__after_atomic();
-> +			wake_up_bit(&intel->flags, STATE_LPM_TRANSACTION);
-> +		}
-> +		break;
-> +	case LPM_OP_RESUME_ACK:
-> +		clear_bit(STATE_SUSPENDED, &intel->flags);
-> +		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags)) {
-> +			smp_mb__after_atomic();
-> +			wake_up_bit(&intel->flags, STATE_LPM_TRANSACTION);
-> +		}
-> +		break;
-> 	default:
-> 		bt_dev_err(hdev, "Unknown LPM opcode (%02x)", lpm->opcode);
-> 		break;
-> @@ -890,6 +933,119 @@ static struct sk_buff *intel_dequeue(struct hci_uart *hu)
-> 	return skb;
-> }
-> 
-> +static int intel_lpm_suspend(struct hci_uart *hu)
-> +{
-> +	static const u8 suspend[] = {0x01, 0x01, 0x01};
-
-coding style please here. There are space before } and after {.
-
-> +	struct intel_data *intel = hu->priv;
-> +	struct sk_buff *skb;
+> +  Characteristic:
+> +    2803:value_handle:properties:uuid
 > +
-> +	if (!test_bit(STATE_LPM_ENABLED, &intel->flags) ||
-> +	    test_bit(STATE_SUSPENDED, &intel->flags))
-> +		return 0;
+> +  Descriptor:
+> +    uuid
 > +
-> +	if (test_bit(STATE_TX_ACTIVE, &intel->flags))
-> +		return -EAGAIN;
+> +Sample Attributes section:
+> +  [Attributes]
+> +  0001=2800:0005:1801
+> +  0002=2803:0003:20:2a05
+> +  0014=2800:001c:1800
+> +  0015=2803:0016:02:2a00
+> +  0017=2803:0018:02:2a01
+> +  0019=2803:001a:02:2aa6
+> +  0028=2800:ffff:0000180d-0000-1000-8000-00805f9b34fb
+> +  0029=2803:002a:10:00002a37-0000-1000-8000-00805f9b34fb
+> +  002b=2803:002c:02:00002a38-0000-1000-8000-00805f9b34fb
+> +  002d=2803:002e:08:00002a39-0000-1000-8000-00805f9b34fb
 > +
-> +	bt_dev_dbg(hu->hdev, "Suspending");
-> +
-> +	skb = bt_skb_alloc(sizeof(suspend), GFP_KERNEL);
-> +	if (!skb) {
-> +		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	memcpy(skb_put(skb, sizeof(suspend)), suspend, sizeof(suspend));
-> +	bt_cb(skb)->pkt_type = HCI_LPM_PKT;
-> +
-> +	set_bit(STATE_LPM_TRANSACTION, &intel->flags);
-> +
-> +	skb_queue_tail(&intel->txq, skb);
-> +	hci_uart_tx_wakeup(hu);
-> +
-> +	intel_wait_lpm_transaction(hu);
-> +
-> +	clear_bit(STATE_LPM_TRANSACTION, &intel->flags);
-> +
-> +	if (!test_bit(STATE_SUSPENDED, &intel->flags)) {
-> +		bt_dev_err(hu->hdev, "Device suspend error");
-> +		return -EINVAL;
-> +	}
-> +
-> +	bt_dev_dbg(hu->hdev, "Suspended");
-> +
-> +	hci_uart_set_flow_control(hu, true);
-> +
-> +	return 0;
-> +}
-> +
-> +static int intel_lpm_resume(struct hci_uart *hu)
-> +{
-> +	struct intel_data *intel = hu->priv;
-> +	struct sk_buff *skb;
-> +
-> +	if (!test_bit(STATE_LPM_ENABLED, &intel->flags) ||
-> +	    !test_bit(STATE_SUSPENDED, &intel->flags))
-> +		return 0;
-> +
-> +	bt_dev_dbg(hu->hdev, "Resuming");
-> +
-> +	hci_uart_set_flow_control(hu, false);
-> +
-> +	skb = bt_skb_alloc(0, GFP_KERNEL);
-> +	if (!skb) {
-> +		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	bt_cb(skb)->pkt_type = HCI_LPM_WAKE_PKT;
-> +
-> +	set_bit(STATE_LPM_TRANSACTION, &intel->flags);
-> +
-> +	skb_queue_tail(&intel->txq, skb);
-> +	hci_uart_tx_wakeup(hu);
-> +
-> +	intel_wait_lpm_transaction(hu);
-> +
-> +	clear_bit(STATE_LPM_TRANSACTION, &intel->flags);
-> +
-> +	if (test_bit(STATE_SUSPENDED, &intel->flags)) {
-> +		bt_dev_err(hu->hdev, "Device resume error");
-> +		return -EINVAL;
-> +	}
-> +
-> +	bt_dev_dbg(hu->hdev, "Resumed");
-> +
-> +	return 0;
-> +}
-> +
-> +static int intel_lpm_host_wake(struct hci_uart *hu)
-> +{
-> +	static const u8 lpm_resume_ack[] = {LPM_OP_RESUME_ACK, 0x00};
-
-Same as above. Please fix coding style.
-
-> +	struct intel_data *intel = hu->priv;
-> +	struct sk_buff *skb;
-> +
-> +	hci_uart_set_flow_control(hu, false);
-> +
-> +	clear_bit(STATE_SUSPENDED, &intel->flags);
-> +
-> +	skb = bt_skb_alloc(sizeof(lpm_resume_ack), GFP_KERNEL);
-> +	if (!skb) {
-> +		bt_dev_err(hu->hdev, "Failed to alloc memory for LPM packet");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	memcpy(skb_put(skb, sizeof(lpm_resume_ack)), lpm_resume_ack,
-> +	       sizeof(lpm_resume_ack));
-> +	bt_cb(skb)->pkt_type = HCI_LPM_PKT;
-> +
-> +	skb_queue_tail(&intel->txq, skb);
-> +	hci_uart_tx_wakeup(hu);
-> +
-> +	bt_dev_dbg(hu->hdev, "Resumed by controller");
-> +
-> +	return 0;
-> +}
-> +
-> static const struct hci_uart_proto intel_proto = {
-> 	.id		= HCI_UART_INTEL,
-> 	.name		= "Intel",
-
-Regards
-
-Marcel
-
+>
+>  Info file format
+>  ================
+> --
+> 2.1.4
+>
