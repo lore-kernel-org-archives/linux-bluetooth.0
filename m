@@ -1,171 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+Date: Tue, 1 Sep 2015 15:19:38 +0800
+Message-ID: <CAGQ70euRR__Vv25Z9kvj6EfXyFruU36sYC82RrN8ijg_rdpYUA@mail.gmail.com>
+Subject: SMP Security Request breaks previously working bluetooth mouse
+From: Oon-Ee Ng <ngoonee.talk@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: hci_bcm: Use bt_dev logging helpers
-Date: Tue,  1 Sep 2015 12:13:36 +0200
-Message-Id: <1441102416-29864-2-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1441102416-29864-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1441102416-29864-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace BT_ logging calls by the new bt_dev ones.
+I refer (to the best of my knowledge) to the patch submitted in [1].
 
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
----
- drivers/bluetooth/hci_bcm.c | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+When upgrading from 4.1.5 to 4.1.6 (Arch Linux), my Lenovo N700
+Bluetooth mouse stops working. Downgrading fixes, hence unlikely to be
+a hardware issue.
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 42ab91d..fbad52f 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -80,7 +80,7 @@ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
- 
- 		clock.type = BCM_UART_CLOCK_48MHZ;
- 
--		BT_DBG("%s: Set Controller clock (%d)", hdev->name, clock.type);
-+		bt_dev_dbg(hdev, "Set Controller clock (%d)", clock.type);
- 
- 		/* This Broadcom specific command changes the UART's controller
- 		 * clock for baud rate > 3000000.
-@@ -88,15 +88,15 @@ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
- 		skb = __hci_cmd_sync(hdev, 0xfc45, 1, &clock, HCI_INIT_TIMEOUT);
- 		if (IS_ERR(skb)) {
- 			int err = PTR_ERR(skb);
--			BT_ERR("%s: BCM: failed to write clock command (%d)",
--			       hdev->name, err);
-+			bt_dev_err(hdev, "BCM: failed to write clock (%d)",
-+				   err);
- 			return err;
- 		}
- 
- 		kfree_skb(skb);
- 	}
- 
--	BT_DBG("%s: Set Controller UART speed to %d bit/s", hdev->name, speed);
-+	bt_dev_dbg(hdev, "Set Controller UART speed to %d bit/s", speed);
- 
- 	param.zero = cpu_to_le16(0);
- 	param.baud_rate = cpu_to_le32(speed);
-@@ -108,8 +108,8 @@ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
- 			     HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb)) {
- 		int err = PTR_ERR(skb);
--		BT_ERR("%s: BCM: failed to write update baudrate command (%d)",
--		       hdev->name, err);
-+		bt_dev_err(hdev, "BCM: failed to write update baudrate (%d)",
-+			   err);
- 		return err;
- 	}
- 
-@@ -154,7 +154,7 @@ static int bcm_open(struct hci_uart *hu)
- 	struct bcm_data *bcm;
- 	struct list_head *p;
- 
--	BT_DBG("hu %p", hu);
-+	bt_dev_dbg(hu->hdev, "hu %p", hu);
- 
- 	bcm = kzalloc(sizeof(*bcm), GFP_KERNEL);
- 	if (!bcm)
-@@ -194,7 +194,7 @@ static int bcm_close(struct hci_uart *hu)
- {
- 	struct bcm_data *bcm = hu->priv;
- 
--	BT_DBG("hu %p", hu);
-+	bt_dev_dbg(hu->hdev, "hu %p", hu);
- 
- 	/* Protect bcm->dev against removal of the device or driver */
- 	mutex_lock(&bcm_device_lock);
-@@ -218,7 +218,7 @@ static int bcm_flush(struct hci_uart *hu)
- {
- 	struct bcm_data *bcm = hu->priv;
- 
--	BT_DBG("hu %p", hu);
-+	bt_dev_dbg(hu->hdev, "hu %p", hu);
- 
- 	skb_queue_purge(&bcm->txq);
- 
-@@ -232,7 +232,7 @@ static int bcm_setup(struct hci_uart *hu)
- 	unsigned int speed;
- 	int err;
- 
--	BT_DBG("hu %p", hu);
-+	bt_dev_dbg(hu->hdev, "hu %p", hu);
- 
- 	hu->hdev->set_bdaddr = btbcm_set_bdaddr;
- 
-@@ -242,13 +242,13 @@ static int bcm_setup(struct hci_uart *hu)
- 
- 	err = request_firmware(&fw, fw_name, &hu->hdev->dev);
- 	if (err < 0) {
--		BT_INFO("%s: BCM: Patch %s not found", hu->hdev->name, fw_name);
-+		bt_dev_info(hu->hdev, "BCM: Patch %s not found", fw_name);
- 		return 0;
- 	}
- 
- 	err = btbcm_patchram(hu->hdev, fw);
- 	if (err) {
--		BT_INFO("%s: BCM: Patch failed (%d)", hu->hdev->name, err);
-+		bt_dev_info(hu->hdev, "BCM: Patch failed (%d)", err);
- 		goto finalize;
- 	}
- 
-@@ -302,7 +302,7 @@ static int bcm_recv(struct hci_uart *hu, const void *data, int count)
- 				  bcm_recv_pkts, ARRAY_SIZE(bcm_recv_pkts));
- 	if (IS_ERR(bcm->rx_skb)) {
- 		int err = PTR_ERR(bcm->rx_skb);
--		BT_ERR("%s: Frame reassembly failed (%d)", hu->hdev->name, err);
-+		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
- 		bcm->rx_skb = NULL;
- 		return err;
- 	}
-@@ -314,7 +314,7 @@ static int bcm_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- {
- 	struct bcm_data *bcm = hu->priv;
- 
--	BT_DBG("hu %p skb %p", hu, skb);
-+	bt_dev_dbg(hu->hdev, "hu %p skb %p", hu, skb);
- 
- 	/* Prepend skb with frame type */
- 	memcpy(skb_push(skb, 1), &bt_cb(skb)->pkt_type, 1);
-@@ -336,7 +336,7 @@ static int bcm_suspend(struct device *dev)
- {
- 	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
- 
--	BT_DBG("suspend (%p): is_suspended %d", bdev, bdev->is_suspended);
-+	bt_dev_dbg(bdev, "suspend: is_suspended %d", bdev->is_suspended);
- 
- 	mutex_lock(&bcm_device_lock);
- 
-@@ -353,7 +353,7 @@ static int bcm_suspend(struct device *dev)
- 	/* Suspend the device */
- 	if (bdev->device_wakeup) {
- 		gpiod_set_value(bdev->device_wakeup, false);
--		BT_DBG("suspend, delaying 15 ms");
-+		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
- 		mdelay(15);
- 	}
- 
-@@ -368,7 +368,7 @@ static int bcm_resume(struct device *dev)
- {
- 	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
- 
--	BT_DBG("resume (%p): is_suspended %d", bdev, bdev->is_suspended);
-+	bt_dev_dbg(bdev, "resume: is_suspended %d", bdev->is_suspended);
- 
- 	mutex_lock(&bcm_device_lock);
- 
-@@ -377,7 +377,7 @@ static int bcm_resume(struct device *dev)
- 
- 	if (bdev->device_wakeup) {
- 		gpiod_set_value(bdev->device_wakeup, true);
--		BT_DBG("resume, delaying 15 ms");
-+		bt_dev_dbg(bdev, "resume, delaying 15 ms");
- 		mdelay(15);
- 	}
- 
--- 
-1.9.1
+When on 4.1.6 (bugged version) dmesg spams this every 3 minutes or so:-
+Bluetooth: SMP security requested but not available
 
+Please advise on additional details which may be required.
+
+[2] is my original bug report in my distro's channel, including the
+above details in a bit more verbose form.
+
+[1] - https://lkml.org/lkml/2015/8/14/369
+[2] - https://bugs.archlinux.org/task/46006
