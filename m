@@ -1,50 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH v2] bluetooth: btmrvl: skb resource leak, and double free.
+Subject: Re: [PATCH] Bluetooth: close HCI device when user channel socket gets closed
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1441198270-24054-1-git-send-email-kieranbingham@gmail.com>
-Date: Wed, 2 Sep 2015 09:19:10 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, akarwar@marvell.com
-Message-Id: <C6EE6513-FAF0-4FE1-B000-0BEE57A6B520@holtmann.org>
-References: <1441198270-24054-1-git-send-email-kieranbingham@gmail.com>
-To: Kieran Bingham <kieranbingham@gmail.com>
+In-Reply-To: <1441188612-18946-1-git-send-email-simon.fels@canonical.com>
+Date: Wed, 2 Sep 2015 09:17:19 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A04078B1-08B8-41CF-88DD-1547BD1B4A34@holtmann.org>
+References: <1441188612-18946-1-git-send-email-simon.fels@canonical.com>
+To: Simon Fels <simon.fels@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kieran,
+Hi Simon,
 
-> if btmrvl_tx_pkt() is called, and the branch
->  if (skb_headroom(skb) < BTM_HEADER_LEN)
-> evaluates positive, a new skb is allocated via skb_realloc_headroom.
+> With 9380f9eacfbbee701daa416edd6625efcd3e29e1 the order of unsetting
+> the HCI_USER_CHANNEL flag of the HCI device was reverted to ensure
+> the device is first closed before making it available again.
 > 
-> The original skb is stored in a tmp variable, before being free'd.
-> However on success, the new skb, is not free'd, nor is it
-> returned to the caller which will then double-free the original skb.
+> Due to hci_dev_close checking for HCI_USER_CHANNEL being set on the
+> device it was never really closed and was kept opened. We're now
+> calling hci_dev_do_close directly to make sure the device is correctly
+> closed and we keep the correct order to unset the flag on our device
+> object.
 > 
-> This issue exists from the original driver submission in
-> commit: #132ff4e5fa8dfb71a7d99902f88043113947e972
-> 
-> If this code path had been alive, it would have been noted from the
-> double-free causing a panic.
-> 
-> All skb's here should be allocated through bt_skb_alloc which
-> adds 8 bytes as headroom, which is plenty against the 4 bytes
-> pushed on by this driver.
-> 
-> This code path is dead, and buggy at the same time, so the cleanest
-> approach is to remove the affected branch.
-> 
-> Reported by coverity (CID 113422)
-> 
-> Signed-off-by: Kieran Bingham <kieranbingham@gmail.com>
+> Signed-off-by: Simon Fels <simon.fels@canonical.com>
 > ---
-> drivers/bluetooth/btmrvl_main.c | 14 --------------
-> 1 file changed, 14 deletions(-)
+> include/net/bluetooth/hci_core.h | 1 +
+> net/bluetooth/hci_core.c         | 2 +-
+> net/bluetooth/hci_sock.c         | 2 +-
+> 3 files changed, 3 insertions(+), 2 deletions(-)
 
 patch has been applied to bluetooth-next tree.
+
+However I added an extra comment into the code on why this is actually doing the right thing in the end. I mentioned before that I failed to comment on this before and we do not want to keep forgetting to comment on code that is not intuitive.
 
 Regards
 
