@@ -1,27 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Bluez-4.101 LE SMP support
-To: <linux-bluetooth@vger.kernel.org>
-References: <55D4834E.9080705@convergeddevices.net>
- <20150819162319.GA16000@t440s.P-661HNU-F1>
-From: tony <tony.makkiel@convergeddevices.net>
-Message-ID: <55E70CA1.1000308@convergeddevices.net>
-Date: Wed, 2 Sep 2015 15:50:09 +0100
-MIME-Version: 1.0
-In-Reply-To: <20150819162319.GA16000@t440s.P-661HNU-F1>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Kieran Bingham <kieranbingham@gmail.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	akarwar@marvell.com,
+	Kieran Bingham <kieranbingham@gmail.com>
+Subject: [PATCH v2] bluetooth: btmrvl: skb resource leak, and double free.
+Date: Wed,  2 Sep 2015 13:51:10 +0100
+Message-Id: <1441198270-24054-1-git-send-email-kieranbingham@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
-         Does bluez-4.101 (kernel 3.1.10) support LE MITM or any 
-authentication procedure? I am using gatttool to establish a LE 
-connection to another device with identical host and controller. 
-Although, I have set sec-level high on both side, I don't see any kind 
-of security triggered. The device connects to each other though.
+if btmrvl_tx_pkt() is called, and the branch
+  if (skb_headroom(skb) < BTM_HEADER_LEN)
+evaluates positive, a new skb is allocated via skb_realloc_headroom.
 
-Searching through the archives, I found posts which suggests pairing may 
-not be supported using random address type. But I have not modified 
-address type. So should be having public address type.
+The original skb is stored in a tmp variable, before being free'd.
+However on success, the new skb, is not free'd, nor is it
+returned to the caller which will then double-free the original skb.
 
-Many Thanks,
-Tony
+This issue exists from the original driver submission in
+ commit: #132ff4e5fa8dfb71a7d99902f88043113947e972
+
+If this code path had been alive, it would have been noted from the
+double-free causing a panic.
+
+All skb's here should be allocated through bt_skb_alloc which
+adds 8 bytes as headroom, which is plenty against the 4 bytes
+pushed on by this driver.
+
+This code path is dead, and buggy at the same time, so the cleanest
+approach is to remove the affected branch.
+
+Reported by coverity (CID 113422)
+
+Signed-off-by: Kieran Bingham <kieranbingham@gmail.com>
+---
+ drivers/bluetooth/btmrvl_main.c | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index de05deb..bc110f6 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -377,20 +377,6 @@ static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
+ 		return -EINVAL;
+ 	}
+ 
+-	if (skb_headroom(skb) < BTM_HEADER_LEN) {
+-		struct sk_buff *tmp = skb;
+-
+-		skb = skb_realloc_headroom(skb, BTM_HEADER_LEN);
+-		if (!skb) {
+-			BT_ERR("Tx Error: realloc_headroom failed %d",
+-				BTM_HEADER_LEN);
+-			skb = tmp;
+-			return -EINVAL;
+-		}
+-
+-		kfree_skb(tmp);
+-	}
+-
+ 	skb_push(skb, BTM_HEADER_LEN);
+ 
+ 	/* header type: byte[3]
+-- 
+2.1.4
