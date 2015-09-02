@@ -1,152 +1,405 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <6DFBE0FF-297F-4523-9218-2A705E5DA167@holtmann.org>
-References: <1441135442-14505-1-git-send-email-kieranbingham@gmail.com>
-	<6DFBE0FF-297F-4523-9218-2A705E5DA167@holtmann.org>
-Date: Wed, 2 Sep 2015 13:22:20 +0100
-Message-ID: <CAB3z_RpmftfeMYXVAGpiYEc-kOxzGWsT1kHbn5Q6m-eCF8YUQg@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: btmrvl: skb resource leak, and double free.
-From: Kieran Bingham <kieranbingham@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, Amitkumar Karwar <akarwar@marvell.com>
-Content-Type: text/plain; charset=UTF-8
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] core/gatt: Cleanup service probe
+Date: Wed,  2 Sep 2015 15:22:06 +0300
+Message-Id: <1441196526-16937-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 1 September 2015 at 23:12, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Kieran,
->
->> if btmrvl_tx_pkt() is called, and the branch
->>  if (skb_headroom(skb) < BTM_HEADER_LEN)
->> evaluates positive, a new skb is allocated via skb_realloc_headroom.
->
-> is that branch actually valid and can happen? I mean someone must have thought about it, but skb usage in Bluetooth is pretty linear and normally all skb should be allocated with a 8 byte headroom.
->
-> For example when we look at btsdio_tx_packet() from btsdio.c, then we do not even bother with checking that we have enough headroom. We know that the skb we got from the core was allocated with enough headroom.
->
-> I am almost convinced that coverity found dead code here that is never executed.
+This cleanup code related to service probe making it use a single
+function, because of that now all driver must implement device_probe in
+order for the service probe to work properly.
 
+In addition to that a new flag called external was introduced to
+btd_profile to be possible to distinguish whether it is a internal
+plugin or external client, this was needed in order to decide if an
+attribute should be claimed which whould prevent it to be exported over
+D-Bus.
+---
+ src/device.c        | 167 +++++++++++++++-------------------------------------
+ src/gatt-database.c |  32 ++++++++--
+ src/profile.c       |  11 +++-
+ src/profile.h       |   1 +
+ 4 files changed, 86 insertions(+), 125 deletions(-)
 
-I started looking at coverity bugs, ordered by oldest first. So this
-has been around for a long time, without anyone looking into it or
-changing it (or noticing a leak) So I suspect this could actually all
-be evidence towards dead-code.
-In fact, now I think about it more - it would have resulted in a
-double-free - which should have been caught had it occurred ...
+diff --git a/src/device.c b/src/device.c
+index bdea55b..999f09f 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2814,14 +2814,6 @@ static void device_add_uuids(struct btd_device *device, GSList *uuids)
+ 						DEVICE_INTERFACE, "UUIDs");
+ }
+ 
+-struct gatt_probe_data {
+-	struct btd_device *dev;
+-	bool all_services;
+-	GSList *uuids;
+-	struct gatt_db_attribute *cur_attr;
+-	char cur_uuid[MAX_LEN_UUID_STR];
+-};
+-
+ static bool device_match_profile(struct btd_device *device,
+ 					struct btd_profile *profile,
+ 					GSList *uuids)
+@@ -2836,99 +2828,42 @@ static bool device_match_profile(struct btd_device *device,
+ 	return true;
+ }
+ 
+-static void dev_probe_gatt(struct btd_profile *p, void *user_data)
++static void probe_gatt_profile(struct gatt_db_attribute *attr, void *user_data)
+ {
+-	struct gatt_probe_data *data = user_data;
++	struct btd_device *device = user_data;
+ 	struct btd_service *service;
+-
+-	if (!p->remote_uuid || bt_uuid_strcmp(p->remote_uuid, data->cur_uuid))
+-		return;
+-
+-	/*
+-	 * Add device to auto connect list in case the driver has the auto
+-	 * connect flag set.
+-	 * NOTE: This should work regardless if a service is created and
+-	 * probed since external drivers don't need to maintain any
+-	 * states they don't implement device_probe callback.
+-	 */
+-	if (p->auto_connect)
+-		device_set_auto_connect(data->dev, TRUE);
+-
+-	if (p->device_probe == NULL)
+-		return;
+-
+-	service = service_create(data->dev, p);
+-	if (!service)
+-		return;
+-
+-	if (service_probe(service) < 0) {
+-		btd_service_unref(service);
+-		return;
+-	}
+-
+-	/* Mark service as active to skip discovering it again */
+-	gatt_db_service_set_active(data->cur_attr, true);
+-
+-	/* Mark service as claimed */
+-	gatt_db_service_set_claimed(data->cur_attr, true);
+-
+-	data->dev->services = g_slist_append(data->dev->services, service);
+-}
+-
+-static void dev_probe_gatt_profile(struct gatt_db_attribute *attr,
+-							void *user_data)
+-{
+-	struct gatt_probe_data *data = user_data;
++	struct btd_profile *profile;
+ 	bt_uuid_t uuid;
+-	GSList *l = NULL;
++	char uuid_str[MAX_LEN_UUID_STR];
++	GSList *l;
+ 
+ 	gatt_db_attribute_get_service_uuid(attr, &uuid);
+-	bt_uuid_to_string(&uuid, data->cur_uuid, sizeof(data->cur_uuid));
+-
+-	data->cur_attr = attr;
+-
+-	/*
+-	 * If we're probing for all services, store the UUID since device->uuids
+-	 * was cleared.
+-	 */
+-	if (data->all_services)
+-		data->uuids = g_slist_append(data->uuids,
+-						g_strdup(data->cur_uuid));
+-
+-	/* Don't probe the profiles if a matching service already exists. */
+-	if (find_service_with_uuid(data->dev->services, data->cur_uuid)) {
+-		/* Mark service as active to skip discovering it again */
+-		gatt_db_service_set_active(data->cur_attr, true);
+-		/* Mark the service as claimed by the existing profile. */
+-		gatt_db_service_set_claimed(data->cur_attr, true);
+-		return;
+-	}
++	bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
+ 
+-	btd_profile_foreach(dev_probe_gatt, data);
++	/* Add UUID and probe service */
++	btd_device_add_uuid(device, uuid_str);
+ 
+-	if (data->all_services)
++	/* Check if service was probed */
++	l = find_service_with_uuid(device->services, uuid_str);
++	if (!l)
+ 		return;
+ 
+-	l = g_slist_append(l, g_strdup(data->cur_uuid));
+-	device_add_uuids(data->dev, l);
+-}
+-
+-static void device_probe_gatt_profile(struct btd_device *device,
+-						struct gatt_db_attribute *attr)
+-{
+-	struct gatt_probe_data data;
++	/* Mark service as active to skip discovering it again */
++	gatt_db_service_set_active(attr, true);
+ 
+-	memset(&data, 0, sizeof(data));
++	service = l->data;
++	profile = btd_service_get_profile(service);
+ 
+-	data.dev = device;
++	/* Don't claim attributes of external profiles */
++	if (profile->external)
++		return;
+ 
+-	dev_probe_gatt_profile(attr, &data);
+-	g_slist_free_full(data.uuids, g_free);
++	/* Mark the service as claimed by the existing profile. */
++	gatt_db_service_set_claimed(attr, true);
+ }
+ 
+ static void device_probe_gatt_profiles(struct btd_device *device)
+ {
+-	struct gatt_probe_data data;
+ 	char addr[18];
+ 
+ 	ba2str(&device->bdaddr, addr);
+@@ -2938,16 +2873,7 @@ static void device_probe_gatt_profiles(struct btd_device *device)
+ 		return;
+ 	}
+ 
+-	memset(&data, 0, sizeof(data));
+-
+-	data.dev = device;
+-	data.all_services = true;
+-
+-	gatt_db_foreach_service(device->db, NULL, dev_probe_gatt_profile,
+-									&data);
+-
+-	device_add_uuids(device, data.uuids);
+-	g_slist_free_full(data.uuids, g_free);
++	gatt_db_foreach_service(device->db, NULL, probe_gatt_profile, device);
+ }
+ 
+ static void device_accept_gatt_profiles(struct btd_device *device)
+@@ -3028,9 +2954,7 @@ static void gatt_service_added(struct gatt_db_attribute *attr, void *user_data)
+ 			service_accept(l->data);
+ 	}
+ 
+-	device_probe_gatt_profile(device, attr);
+-
+-	store_device_info(device);
++	btd_device_add_uuid(device, uuid_str);
+ 
+ 	btd_gatt_client_service_added(device->client_dbus, attr);
+ 
+@@ -3645,45 +3569,52 @@ struct probe_data {
+ 	GSList *uuids;
+ };
+ 
+-static void dev_probe(struct btd_profile *p, void *user_data)
++static struct btd_service *probe_service(struct btd_device *device,
++						struct btd_profile *profile,
++						GSList *uuids)
+ {
+-	struct probe_data *d = user_data;
+ 	struct btd_service *service;
+ 
+-	if (p->device_probe == NULL)
+-		return;
++	if (profile->device_probe == NULL)
++		return NULL;
+ 
+-	if (!device_match_profile(d->dev, p, d->uuids))
+-		return;
++	if (!device_match_profile(device, profile, uuids))
++		return NULL;
+ 
+-	service = service_create(d->dev, p);
++	service = service_create(device, profile);
+ 
+-	if (service_probe(service) < 0) {
++	if (service_probe(service)) {
+ 		btd_service_unref(service);
+-		return;
++		return NULL;
+ 	}
+ 
+-	d->dev->services = g_slist_append(d->dev->services, service);
++	if (profile->auto_connect)
++		device_set_auto_connect(device, TRUE);
++
++	return service;
+ }
+ 
+-void device_probe_profile(gpointer a, gpointer b)
++static void dev_probe(struct btd_profile *p, void *user_data)
+ {
+-	struct btd_device *device = a;
+-	struct btd_profile *profile = b;
++	struct probe_data *d = user_data;
+ 	struct btd_service *service;
+ 
+-	if (profile->device_probe == NULL)
++	service = probe_service(d->dev, p, d->uuids);
++	if (!service)
+ 		return;
+ 
+-	if (!device_match_profile(device, profile, device->uuids))
+-		return;
++	d->dev->services = g_slist_append(d->dev->services, service);
++}
+ 
+-	service = service_create(device, profile);
++void device_probe_profile(gpointer a, gpointer b)
++{
++	struct btd_device *device = a;
++	struct btd_profile *profile = b;
++	struct btd_service *service;
+ 
+-	if (service_probe(service) < 0) {
+-		btd_service_unref(service);
++	service = probe_service(device, profile, device->uuids);
++	if (!service)
+ 		return;
+-	}
+ 
+ 	device->services = g_slist_append(device->services, service);
+ 
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 97cef77..66986b9 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -43,6 +43,7 @@
+ #include "gatt-database.h"
+ #include "dbus-common.h"
+ #include "profile.h"
++#include "service.h"
+ 
+ #ifndef ATT_CID
+ #define ATT_CID 4
+@@ -1074,7 +1075,7 @@ static void client_disconnect_cb(DBusConnection *conn, void *user_data)
+ 	service_remove_helper(user_data);
+ }
+ 
+-static void service_remove(void *data)
++static void remove_service(void *data)
+ {
+ 	struct external_service *service = data;
+ 
+@@ -1453,7 +1454,7 @@ static void proxy_removed_cb(GDBusProxy *proxy, void *user_data)
+ 
+ 	DBG("Proxy removed - removing service: %s", service->path);
+ 
+-	service_remove(service);
++	remove_service(service);
+ }
+ 
+ static bool parse_uuid(GDBusProxy *proxy, bt_uuid_t *uuid)
+@@ -2142,10 +2143,10 @@ reply:
+ 	service->reg = NULL;
+ 
+ 	if (fail)
+-		service_remove(service);
++		remove_service(service);
+ }
+ 
+-static struct external_service *service_create(DBusConnection *conn,
++static struct external_service *create_service(DBusConnection *conn,
+ 					DBusMessage *msg, const char *path)
+ {
+ 	struct external_service *service;
+@@ -2223,7 +2224,7 @@ static DBusMessage *manager_register_service(DBusConnection *conn,
+ 	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
+ 		return btd_error_invalid_args(msg);
+ 
+-	service = service_create(conn, msg, path);
++	service = create_service(conn, msg, path);
+ 	if (!service)
+ 		return btd_error_failed(msg, "Failed to register service");
+ 
+@@ -2279,6 +2280,24 @@ static void profile_exited(DBusConnection *conn, void *user_data)
+ 	profile_free(profile);
+ }
+ 
++static int profile_device_probe(struct btd_service *service)
++{
++	struct btd_profile *p = btd_service_get_profile(service);
++
++	DBG("%s probed", p->name);
++
++	return 0;
++}
++
++static int profile_device_remove(struct btd_service *service)
++{
++	struct btd_profile *p = btd_service_get_profile(service);
++
++	DBG("%s removed", p->name);
++
++	return 0;
++}
++
+ static int profile_add(struct external_profile *profile, const char *uuid)
+ {
+ 	struct btd_profile *p;
+@@ -2302,7 +2321,10 @@ static int profile_add(struct external_profile *profile, const char *uuid)
+ 		return -ENOMEM;
+ 	}
+ 
++	p->device_probe = profile_device_probe;
++	p->device_probe = profile_device_remove;
+ 	p->auto_connect = true;
++	p->external = true;
+ 
+ 	queue_push_tail(profile->profiles, p);
+ 
+diff --git a/src/profile.c b/src/profile.c
+index f54749e..70ee4c1 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -719,13 +719,19 @@ void btd_profile_foreach(void (*func)(struct btd_profile *p, void *data),
+ 
+ int btd_profile_register(struct btd_profile *profile)
+ {
+-	profiles = g_slist_append(profiles, profile);
++	if (profile->external)
++		ext_profiles = g_slist_append(ext_profiles, profile);
++	else
++		profiles = g_slist_append(profiles, profile);
+ 	return 0;
+ }
+ 
+ void btd_profile_unregister(struct btd_profile *profile)
+ {
+-	profiles = g_slist_remove(profiles, profile);
++	if (profile->external)
++		ext_profiles = g_slist_remove(ext_profiles, profile);
++	else
++		profiles = g_slist_remove(profiles, profile);
+ }
+ 
+ static struct ext_profile *find_ext_profile(const char *owner,
+@@ -2291,6 +2297,7 @@ static struct ext_profile *create_ext(const char *owner, const char *path,
+ 	p->name = ext->name;
+ 	p->local_uuid = ext->service ? ext->service : ext->uuid;
+ 	p->remote_uuid = ext->remote_uuid;
++	p->external = true;
+ 
+ 	if (ext->enable_server) {
+ 		p->adapter_probe = ext_adapter_probe;
+diff --git a/src/profile.h b/src/profile.h
+index f5a3ded..4448a2a 100644
+--- a/src/profile.h
++++ b/src/profile.h
+@@ -35,6 +35,7 @@ struct btd_profile {
+ 	const char *remote_uuid;
+ 
+ 	bool auto_connect;
++	bool external;
+ 
+ 	int (*device_probe) (struct btd_service *service);
+ 	void (*device_remove) (struct btd_service *service);
+-- 
+2.4.3
 
-I've looked through the other drivers, and see that most only ever
-skb_push with 1 byte, and are always happy to do that.
-And yes, the btsdio pushes 4 bytes, just like this one, and it is
-sharing the same hci_register_dev structure and hierarchy.
-
-
-I'll re-spin with a removal of the broken / dead code instead, much
-cleaner and simpler.
-
-
->> The original skb is stored in a tmp variable, before being free'd.
->> However on success, the new skb, is not free'd, nor is it
->> returned to the caller which will then double-free the original skb.
->>
->> This issue exists from the original driver submission in
->> commit: #132ff4e5fa8dfb71a7d99902f88043113947e972
->>
->> Move the error handling, and kfree_skb inside the helper function,
->> where the statistics can be updated, and the skb free'd at the
->> appropriate occasion.
->>
->> Reported by coverity (CID 113422)
->>
->> Signed-off-by: Kieran Bingham <kieranbingham@gmail.com>
->> ---
->> drivers/bluetooth/btmrvl_main.c | 26 ++++++++++++++------------
->> 1 file changed, 14 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
->> index de05deb..ceaef95 100644
->> --- a/drivers/bluetooth/btmrvl_main.c
->> +++ b/drivers/bluetooth/btmrvl_main.c
->> @@ -366,15 +366,15 @@ void btmrvl_firmware_dump(struct btmrvl_private *priv)
->>
->> static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
->> {
->> -     int ret = 0;
->> +     int ret = -EINVAL;
->>
->>       if (!skb || !skb->data)
->> -             return -EINVAL;
->> +             goto tx_pkt_out;
->
-> with your change the skb can never be NULL since you are checking this before calling this function.
-
-The calling function provides the check before my patch, so yes even
-without my change it couldn't have been null ... perhaps the null
-check can be removed, although its fairly harmless here.
-
-
->>
->>       if (!skb->len || ((skb->len + BTM_HEADER_LEN) > BTM_UPLD_SIZE)) {
->>               BT_ERR("Tx Error: Bad skb length %d : %d",
->>                                               skb->len, BTM_UPLD_SIZE);
->> -             return -EINVAL;
->> +             goto tx_pkt_out;
->>       }
->>
->>       if (skb_headroom(skb) < BTM_HEADER_LEN) {
->> @@ -385,7 +385,7 @@ static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
->>                       BT_ERR("Tx Error: realloc_headroom failed %d",
->>                               BTM_HEADER_LEN);
->>                       skb = tmp;
->> -                     return -EINVAL;
->> +                     goto tx_pkt_out;
->>               }
->>
->>               kfree_skb(tmp);
->> @@ -406,6 +406,14 @@ static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
->>       if (priv->hw_host_to_card)
->>               ret = priv->hw_host_to_card(priv, skb->data, skb->len);
->>
->> +tx_pkt_out:
->> +     if (ret)
->> +             priv->btmrvl_dev.hcidev->stat.err_tx++;
->> +     else
->> +             priv->btmrvl_dev.hcidev->stat.byte_tx += skb->len;
->
-> I do not like this conditional based on ret. I have to twist my brain to ensure that ret == 0 is ensured so that the skb->len gets added correctly.
-
-This code can go back to being untouched, and left in the parent
-function. (Unless you'd prefer it to be rewritten there too?)
-
-
->> +
->> +     kfree_skb(skb);
->> +
->>       return ret;
->> }
->>
->> @@ -670,14 +678,8 @@ static int btmrvl_service_main_thread(void *data)
->>                       continue;
->>
->>               skb = skb_dequeue(&adapter->tx_queue);
->> -             if (skb) {
->> -                     if (btmrvl_tx_pkt(priv, skb))
->> -                             priv->btmrvl_dev.hcidev->stat.err_tx++;
->> -                     else
->> -                             priv->btmrvl_dev.hcidev->stat.byte_tx += skb->len;
->> -
->> -                     kfree_skb(skb);
->> -             }
->> +             if (skb)
->> +                     btmrvl_tx_pkt(priv, skb);
->>       }
->
-> Regards
->
-> Marcel
-
---
-Regards
-
-Kieran
