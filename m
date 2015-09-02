@@ -1,47 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 2 Sep 2015 19:35:26 +0300
-Message-ID: <CAMib2GaN7TnW1dJEgzNH7FzGrt2a_39sEzu4cwVzmi85XK5OWA@mail.gmail.com>
-Subject: GattManager1 interface not found
-From: Kyle Shneider <shneiderkyle@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH v2] bluetooth: btmrvl: skb resource leak, and double free.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1441198270-24054-1-git-send-email-kieranbingham@gmail.com>
+Date: Wed, 2 Sep 2015 09:19:10 -0700
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, akarwar@marvell.com
+Message-Id: <C6EE6513-FAF0-4FE1-B000-0BEE57A6B520@holtmann.org>
+References: <1441198270-24054-1-git-send-email-kieranbingham@gmail.com>
+To: Kieran Bingham <kieranbingham@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
-I'm trying to launch bluez v5.33 on Raspbian and Ubuntu 14.
-bluez-5.33/test/example-gatt-server gives me "GattManager1 interface not found".
+Hi Kieran,
 
-bluetooth daemon output is:
+> if btmrvl_tx_pkt() is called, and the branch
+>  if (skb_headroom(skb) < BTM_HEADER_LEN)
+> evaluates positive, a new skb is allocated via skb_realloc_headroom.
+> 
+> The original skb is stored in a tmp variable, before being free'd.
+> However on success, the new skb, is not free'd, nor is it
+> returned to the caller which will then double-free the original skb.
+> 
+> This issue exists from the original driver submission in
+> commit: #132ff4e5fa8dfb71a7d99902f88043113947e972
+> 
+> If this code path had been alive, it would have been noted from the
+> double-free causing a panic.
+> 
+> All skb's here should be allocated through bt_skb_alloc which
+> adds 8 bytes as headroom, which is plenty against the 4 bytes
+> pushed on by this driver.
+> 
+> This code path is dead, and buggy at the same time, so the cleanest
+> approach is to remove the affected branch.
+> 
+> Reported by coverity (CID 113422)
+> 
+> Signed-off-by: Kieran Bingham <kieranbingham@gmail.com>
+> ---
+> drivers/bluetooth/btmrvl_main.c | 14 --------------
+> 1 file changed, 14 deletions(-)
 
-root@raspberrypi:/home/pi# bluetoothd -n
-bluetoothd[2531]: Bluetooth daemon 5.33
-bluetoothd[2531]: Starting SDP server
-bluetoothd[2531]: Bluetooth management interface 1.7 initialized
-bluetoothd[2531]: Failed to obtain handles for "Service Changed" characteristic
-bluetoothd[2531]: Not enough free handles to register service
-bluetoothd[2531]: Error adding Link Loss service
-bluetoothd[2531]: Not enough free handles to register service
-bluetoothd[2531]: Not enough free handles to register service
-bluetoothd[2531]: Not enough free handles to register service
-bluetoothd[2531]: Current Time Service could not be registered
-bluetoothd[2531]: gatt-time-server: Input/output error (5)
-bluetoothd[2531]: Not enough free handles to register service
-bluetoothd[2531]: Not enough free handles to register service
-bluetoothd[2531]: Sap driver initialization failed.
-bluetoothd[2531]: sap-server: Operation not permitted (1)
+patch has been applied to bluetooth-next tree.
 
+Regards
 
-My BLE adapter is Cambridge Silicon Radio, Ltd Bluetooth Dongle.
+Marcel
 
-I saw the same problem here
-http://marc.info/?l=linux-bluetooth&m=142956894520217&w=2
-but no clear answer. Author adviced to use bluez d-bus api, but (as i
-know) org.bluez can't be registered without daemon.
-Is there any progress on this problem?
-Or should i use earlier version of bluez for creating gatt server/client?
-
-
--- 
-Kyle Shneider
