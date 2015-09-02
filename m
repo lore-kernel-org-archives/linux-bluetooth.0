@@ -2,172 +2,274 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v3 3/8] emulator: add BT_HCI_CMD_LE_CREATE_CONN_CANCEL handling
-Date: Wed,  2 Sep 2015 10:51:10 -0700
-Message-Id: <1441216275-2954-3-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v3 2/8] tools/l2cap-tester: add close socket test
+Date: Wed,  2 Sep 2015 10:51:09 -0700
+Message-Id: <1441216275-2954-2-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1441216275-2954-1-git-send-email-jpawlowski@google.com>
 References: <1441216275-2954-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds handling of BT_HCI_CMD_LE_CREATE_CONN_CANCEL command.
-
-If btdev_set_le_noresp_conn_request is called on btdev, other devices that
-try to connect to it will stuck on BT_HCI_CMD_LE_CREATE_CONN, by not
-sending bt_hci_evt_le_conn_complete event back. Thanks to that,
-BT_HCI_CMD_LE_CREATE_CONN_CANCEL can be triggered to cancel connect
-attempt.
+This patch adds test that checks folowing:
+1. Try to connect to non-existing remote BLE device using socket.
+2. Internally in kernel this adds this device to whitelist and enable scan.
+3. At this moment test would try to close socket.
+4. That should cause scan to be stopped.
 ---
- emulator/btdev.c  | 45 +++++++++++++++++++++++++++++++++++++++++++++
- emulator/btdev.h  |  2 ++
- emulator/hciemu.c |  8 ++++++++
- emulator/hciemu.h |  3 +++
- 4 files changed, 58 insertions(+)
+ tools/l2cap-tester.c | 184 +++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 171 insertions(+), 13 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 60e8e8c..1645776 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -145,6 +145,11 @@ struct btdev {
- 	uint16_t sync_train_interval;
- 	uint32_t sync_train_timeout;
- 	uint8_t  sync_train_service_data;
-+
-+	bool     le_noresp_conn_request;
-+	bool     pending_le_conn;
-+	uint8_t  pending_le_conn_addr[6];
-+	uint8_t  pending_le_conn_addr_type;
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 2b89045..bca7f75 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -53,6 +53,7 @@ struct test_data {
+ 	uint16_t handle;
+ 	uint16_t scid;
+ 	uint16_t dcid;
++	int sk;
  };
  
- struct inquiry_data {
-@@ -674,6 +679,11 @@ bool btdev_is_le_scan_enabled(struct btdev *btdev)
- 	return btdev->le_scan_enable;
+ struct l2cap_data {
+@@ -85,6 +86,8 @@ struct l2cap_data {
+ 
+ 	bool addr_type_avail;
+ 	uint8_t addr_type;
++
++	uint8_t *client_bdaddr;
+ };
+ 
+ static void mgmt_debug(const char *str, void *user_data)
+@@ -450,6 +453,12 @@ static const struct l2cap_data le_client_connect_reject_test_2 = {
+ 	.addr_type = BDADDR_LE_PUBLIC,
+ };
+ 
++static uint8_t nonexisting_bdaddr[] = {0x00, 0xAA, 0x01, 0x02, 0x03, 0x00};
++static const struct l2cap_data le_client_close_socket_test_1 = {
++	.client_psm = 0x0080,
++	.client_bdaddr = nonexisting_bdaddr,
++};
++
+ static const struct l2cap_data le_client_connect_nval_psm_test = {
+ 	.client_psm = 0x0080,
+ 	.expect_err = ECONNREFUSED,
+@@ -1013,33 +1022,25 @@ static int create_l2cap_sock(struct test_data *data, uint16_t psm,
+ 	return sk;
  }
  
-+void btdev_set_le_noresp_conn_request(struct btdev *btdev, bool value)
-+{
-+	btdev->le_noresp_conn_request = value;
-+}
-+
- static bool use_ssp(struct btdev *btdev1, struct btdev *btdev2)
+-static int connect_l2cap_sock(struct test_data *data, int sk, uint16_t psm,
+-								uint16_t cid)
++static int connect_l2cap_impl(int sk, const uint8_t *bdaddr,
++				uint8_t bdaddr_type, uint16_t psm, uint16_t cid)
  {
- 	if (btdev1->auth_enable || btdev2->auth_enable)
-@@ -1134,6 +1144,9 @@ static void le_conn_complete(struct btdev *btdev,
- 		cc->handle = cpu_to_le16(42);
+-	const struct l2cap_data *l2data = data->test_data;
+ 	const uint8_t *client_bdaddr;
+ 	struct sockaddr_l2 addr;
+ 	int err;
+ 
+-	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
+-	if (!client_bdaddr) {
++	if (!bdaddr) {
+ 		tester_warn("No client bdaddr");
+ 		return -ENODEV;
  	}
  
-+	if (btdev->pending_le_conn)
-+		btdev->pending_le_conn = false;
-+
- 	cc->status = status;
- 	cc->peer_addr_type = bdaddr_type;
- 	memcpy(cc->peer_addr, bdaddr, 6);
-@@ -1183,6 +1196,13 @@ static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
- {
- 	struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr, bdaddr_type);
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.l2_family = AF_BLUETOOTH;
+-	bacpy(&addr.l2_bdaddr, (void *) client_bdaddr);
++	bacpy(&addr.l2_bdaddr, (void *) bdaddr);
++	addr.l2_bdaddr_type = bdaddr_type;
+ 	addr.l2_psm = htobs(psm);
+ 	addr.l2_cid = htobs(cid);
  
-+	if (remote && remote->le_noresp_conn_request) {
-+		btdev->pending_le_conn = true;
-+		memcpy(btdev->pending_le_conn_addr, bdaddr, 6);
-+		btdev->pending_le_conn_addr_type = bdaddr_type;
+-	if (l2data && l2data->addr_type_avail)
+-		addr.l2_bdaddr_type = l2data->addr_type;
+-	else if (data->hciemu_type == HCIEMU_TYPE_LE)
+-		addr.l2_bdaddr_type = BDADDR_LE_PUBLIC;
+-	else
+-		addr.l2_bdaddr_type = BDADDR_BREDR;
+-
+ 	err = connect(sk, (struct sockaddr *) &addr, sizeof(addr));
+ 	if (err < 0 && !(errno == EAGAIN || errno == EINPROGRESS)) {
+ 		err = -errno;
+@@ -1051,6 +1052,33 @@ static int connect_l2cap_sock(struct test_data *data, int sk, uint16_t psm,
+ 	return 0;
+ }
+ 
++static int connect_l2cap_sock(struct test_data *data, int sk, uint16_t psm,
++								uint16_t cid)
++{
++	const struct l2cap_data *l2data = data->test_data;
++	const uint8_t *client_bdaddr;
++	uint8_t bdaddr_type;
++
++	if (l2data->client_bdaddr != NULL)
++		client_bdaddr = l2data->client_bdaddr;
++	else
++		client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
++
++	if (!client_bdaddr) {
++		tester_warn("No client bdaddr");
++		return -ENODEV;
++	}
++
++	if (l2data && l2data->addr_type_avail)
++		bdaddr_type = l2data->addr_type;
++	else if (data->hciemu_type == HCIEMU_TYPE_LE)
++		bdaddr_type = BDADDR_LE_PUBLIC;
++	else
++		bdaddr_type = BDADDR_BREDR;
++
++	return connect_l2cap_impl(sk, client_bdaddr, bdaddr_type, psm, cid);
++}
++
+ static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
+ 							void *user_data)
+ {
+@@ -1122,6 +1150,130 @@ static void test_connect_reject(const void *test_data)
+ 	close(sk);
+ }
+ 
++static void connect_socket(const uint8_t *client_bdaddr, int *sk_holder,
++							GIOFunc connect_cb)
++{
++	struct test_data *data = tester_get_data();
++	const struct l2cap_data *l2data = data->test_data;
++	GIOChannel *io;
++	int sk;
++
++	sk = create_l2cap_sock(data, 0, l2data->cid, l2data->sec_level);
++	if (sk < 0) {
++		tester_print("Error in create_l2cap_sock");
++		tester_test_failed();
 +		return;
 +	}
 +
- 	if (remote && adv_connectable(remote) && adv_match(btdev, remote) &&
- 					remote->le_adv_own_addr == bdaddr_type)
- 		le_conn_complete(btdev, bdaddr, bdaddr_type, 0);
-@@ -1191,6 +1211,14 @@ static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
- 					BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH);
- }
- 
-+static void le_conn_cancel_request(struct btdev *btdev)
-+{
-+	if (btdev->pending_le_conn)
-+		le_conn_complete(btdev, btdev->pending_le_conn_addr,
-+					btdev->pending_le_conn_addr_type,
-+					BT_HCI_ERR_UNKNOWN_CONN_ID);
-+}
++	*sk_holder = sk;
 +
- static void conn_request(struct btdev *btdev, const uint8_t *bdaddr)
- {
- 	struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
-@@ -2963,6 +2991,17 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
- 		break;
- 
-+	case BT_HCI_CMD_LE_CREATE_CONN_CANCEL:
-+		if (btdev->type == BTDEV_TYPE_BREDR)
-+			goto unsupported;
-+
-+		if (btdev->pending_le_conn)
-+			cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		else
-+			cmd_status(btdev, BT_HCI_ERR_COMMAND_DISALLOWED,
-+								opcode);
-+		break;
-+
- 	case BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE:
- 		if (btdev->type == BTDEV_TYPE_BREDR)
- 			goto unsupported;
-@@ -3331,6 +3370,12 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 		le_conn_request(btdev, lecc->peer_addr, lecc->peer_addr_type);
- 		break;
- 
-+	case BT_HCI_CMD_LE_CREATE_CONN_CANCEL:
-+		if (btdev->type == BTDEV_TYPE_BREDR)
-+			return;
-+		le_conn_cancel_request(btdev);
-+		break;
-+
- 	case BT_HCI_CMD_LE_CONN_UPDATE:
- 		if (btdev->type == BTDEV_TYPE_BREDR)
- 			return;
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index 8b116e4..e0e9f15 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -82,6 +82,8 @@ uint8_t *btdev_get_features(struct btdev *btdev);
- 
- bool btdev_is_le_scan_enabled(struct btdev *btdev);
- 
-+void btdev_set_le_noresp_conn_request(struct btdev *btdev, bool value);
-+
- void btdev_set_command_handler(struct btdev *btdev, btdev_command_func handler,
- 							void *user_data);
- 
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index c04aa6d..2e57b1f 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -435,6 +435,14 @@ const bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu)
- 	return btdev_is_le_scan_enabled(hciemu->master_dev);
- }
- 
-+void hciemu_set_client_le_noresp_conn_request(struct hciemu *hciemu, bool value)
-+{
-+	if (!hciemu || !hciemu->client_dev)
++	if (connect_l2cap_impl(sk, client_bdaddr, BDADDR_LE_PUBLIC,
++			l2data->client_psm, l2data->cid) < 0) {
++		tester_print("Error in connect_l2cap_sock");
++		close(sk);
++		tester_test_failed();
 +		return;
++	}
 +
-+	btdev_set_le_noresp_conn_request(hciemu->client_dev, value);
++	if (connect_cb) {
++		io = g_io_channel_unix_new(sk);
++		g_io_channel_set_close_on_unref(io, TRUE);
++
++		data->io_id = g_io_add_watch(io, G_IO_OUT, connect_cb, NULL);
++
++		g_io_channel_unref(io);
++	}
++
++	tester_print("Connect in progress, sk = %d", sk);
 +}
 +
- bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
- 			hciemu_command_func_t function, void *user_data)
- {
-diff --git a/emulator/hciemu.h b/emulator/hciemu.h
-index a526d8c..3c2d098 100644
---- a/emulator/hciemu.h
-+++ b/emulator/hciemu.h
-@@ -55,6 +55,9 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
- 
- const bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu);
- 
-+void hciemu_set_client_le_noresp_conn_request(struct hciemu *hciemu,
-+								bool value);
++static gboolean test_close_socket_1_part_3(gpointer arg)
++{
++	struct test_data *data = tester_get_data();
 +
- typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
- 						uint8_t len, void *user_data);
- 
++	tester_print("Checking wether scan was properly stopped...");
++
++	if (data->sk != -1) {
++		tester_print("Error - scan was not enabled yet");
++		tester_test_failed();
++		return FALSE;
++	}
++
++	if (hciemu_is_master_le_scan_enabled(data->hciemu)) {
++		tester_print("Delayed check wether scann is off failed");
++		tester_test_failed();
++		return FALSE;
++	}
++
++	tester_test_passed();
++	return FALSE;
++}
++
++static gboolean test_close_socket_1_part_2(gpointer args)
++{
++	struct test_data *data = tester_get_data();
++	const struct l2cap_data *l2data = data->test_data;
++	GIOChannel *io;
++	int sk = data->sk;
++
++	tester_print("Will close socket during scan phase...");
++
++	/* We tried to conect to LE device that is not advertising. It was added
++	 * to kernel whitelist, and scan was started. We should be still
++	 * scanning.
++	 */
++	if (!hciemu_is_master_le_scan_enabled(data->hciemu)) {
++		tester_print("Error - should be still scanning");
++		tester_test_failed();
++		return FALSE;
++	}
++
++	/* Calling close() should remove device from  whitelist, and stop
++	 * the scan.
++	 */
++	if (close(sk) < 0) {
++		tester_print("Error when closing socket");
++		tester_test_failed();
++		return FALSE;
++	}
++
++	data->sk = -1;
++	/* tester_test_passed will be called when scan is stopped. */
++	return FALSE;
++}
++
++static void test_close_socket_router(uint16_t opcode, const void *param,
++					uint8_t length, void *user_data)
++{
++	/* tester_print("HCI Command 0x%04x length %u", opcode, length); */
++
++	if (opcode == BT_HCI_CMD_LE_SET_SCAN_ENABLE) {
++		const struct bt_hci_cmd_le_set_scan_enable *scan_params = param;
++
++		if (scan_params->enable == true)
++			g_idle_add(test_close_socket_1_part_2, NULL);
++		else
++			g_idle_add(test_close_socket_1_part_3, NULL);
++	}
++}
++
++static void test_close_socket(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct l2cap_data *l2data = data->test_data;
++	const uint8_t *client_bdaddr;
++
++	hciemu_add_master_post_command_hook(data->hciemu,
++					test_close_socket_router, data);
++
++	if (l2data->client_bdaddr != NULL)
++		client_bdaddr = l2data->client_bdaddr;
++	else
++		client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
++
++	connect_socket(client_bdaddr, &data->sk, NULL);
++}
++
+ static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -1437,6 +1589,12 @@ int main(int argc, char *argv[])
+ 	test_l2cap_bredr("L2CAP LE Client - Connection Reject",
+ 				&le_client_connect_reject_test_2,
+ 				setup_powered_client, test_connect_reject);
++
++	test_l2cap_le("L2CAP LE Client - Close socket 1",
++				&le_client_close_socket_test_1,
++				setup_powered_client,
++				test_close_socket);
++
+ 	test_l2cap_le("L2CAP LE Client - Invalid PSM",
+ 					&le_client_connect_nval_psm_test,
+ 					setup_powered_client, test_connect);
 -- 
 2.1.4
 
