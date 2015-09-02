@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1441119074-27427-1-git-send-email-luiz.dentz@gmail.com>
-References: <1441119074-27427-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 2 Sep 2015 14:42:12 +0300
-Message-ID: <CABBYNZJpgmLe+Uq6AajQRnu61Txqe2JtM_-Tw_oC5qgPNTt+wQ@mail.gmail.com>
-Subject: Re: [PATCH v2 BlueZ] core/gatt: Fix not setting auto connect flag
+In-Reply-To: <1441027972-15511-1-git-send-email-luiz.dentz@gmail.com>
+References: <1441027972-15511-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 2 Sep 2015 14:41:55 +0300
+Message-ID: <CABBYNZKu0HX3APeN070Dc0ZB86qr+tobotWTBQdRhW742+qehg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/att: Make crypto really optional
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
@@ -13,65 +13,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Tue, Sep 1, 2015 at 5:51 PM, Luiz Augusto von Dentz
+On Mon, Aug 31, 2015 at 4:32 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Profiles registered via org.bluez.GattManager1.RegisterProfile shall
-> properly register a driver and cause the device to be marked to auto
-> connect if the device supports the UUID given.
+> If bt_crypt_new fails or ext_signed should disable any signing operation
+> but currently only incoming operations were being ignored and only if
+> ext_signed is set which ignores the fact that bt_crypt_new can still
+> fail if the necessary kernel modules are not available.
 > ---
->  src/device.c        | 14 ++++++++++++--
->  src/gatt-database.c |  2 ++
->  2 files changed, 14 insertions(+), 2 deletions(-)
+>  src/shared/att.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 >
-> diff --git a/src/device.c b/src/device.c
-> index 3dde8b8..bdea55b 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -2841,10 +2841,20 @@ static void dev_probe_gatt(struct btd_profile *p, void *user_data)
->         struct gatt_probe_data *data = user_data;
->         struct btd_service *service;
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index 70f5d72..d88169e 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -82,7 +82,6 @@ struct bt_att {
+>         void *debug_data;
 >
-> -       if (p->device_probe == NULL)
-> +       if (!p->remote_uuid || bt_uuid_strcmp(p->remote_uuid, data->cur_uuid))
->                 return;
+>         struct bt_crypto *crypto;
+> -       bool ext_signed;
 >
-> -       if (!p->remote_uuid || bt_uuid_strcmp(p->remote_uuid, data->cur_uuid))
-> +       /*
-> +        * Add device to auto connect list in case the driver has the auto
-> +        * connect flag set.
-> +        * NOTE: This should work regardless if a service is created and
-> +        * probed since external drivers don't need to maintain any
-> +        * states they don't implement device_probe callback.
-> +        */
-> +       if (p->auto_connect)
-> +               device_set_auto_connect(data->dev, TRUE);
-> +
-> +       if (p->device_probe == NULL)
->                 return;
+>         struct sign_info *local_sign;
+>         struct sign_info *remote_sign;
+> @@ -294,7 +293,7 @@ static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
+>         if (pdu_len > 1)
+>                 memcpy(op->pdu + 1, pdu, length);
 >
->         service = service_create(data->dev, p);
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index 91aba2f..97cef77 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -383,6 +383,7 @@ static void profile_remove(void *data)
->         DBG("Removed \"%s\"", p->name);
+> -       if (!sign || !(op->opcode & ATT_OP_SIGNED_MASK))
+> +       if (!sign || !(op->opcode & ATT_OP_SIGNED_MASK) || !att->crypto)
+>                 return true;
 >
->         adapter_foreach(adapter_remove_profile, p);
-> +       btd_profile_unregister(p);
+>         if (!sign->counter(&sign_cnt, sign->user_data))
+> @@ -782,7 +781,7 @@ static void handle_notify(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+>         const struct queue_entry *entry;
+>         bool found;
 >
->         g_free((void *) p->name);
->         g_free((void *) p->remote_uuid);
-> @@ -2314,6 +2315,7 @@ static void add_profile(void *data, void *user_data)
->  {
->         struct btd_adapter *adapter = user_data;
+> -       if ((opcode & ATT_OP_SIGNED_MASK) && !att->ext_signed) {
+> +       if ((opcode & ATT_OP_SIGNED_MASK) && !att->crypto) {
+>                 if (!handle_signed(att, opcode, pdu, pdu_len))
+>                         return;
+>                 pdu_len -= BT_ATT_SIGNATURE_LEN;
+> @@ -962,7 +961,6 @@ struct bt_att *bt_att_new(int fd, bool ext_signed)
+>                 return NULL;
 >
-> +       btd_profile_register(data);
->         adapter_add_profile(adapter, data);
->  }
->
+>         att->fd = fd;
+> -       att->ext_signed = ext_signed;
+>         att->mtu = BT_ATT_DEFAULT_LE_MTU;
+>         att->buf = malloc(att->mtu);
+>         if (!att->buf)
 > --
 > 2.4.3
 
