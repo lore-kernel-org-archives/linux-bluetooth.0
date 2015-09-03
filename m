@@ -1,57 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Vincent=20Stehl=C3=A9?= <vincent.stehle@laposte.net>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Vincent=20Stehl=C3=A9?= <vincent.stehle@laposte.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	trivial@kernel.org
-Subject: [PATCH] Bluetooth: btintel: fix warning
-Date: Thu,  3 Sep 2015 23:08:45 +0200
-Message-Id: <1441314525-12080-1-git-send-email-vincent.stehle@laposte.net>
+Date: Thu, 3 Sep 2015 16:50:01 -0400
+From: Kyle McMartin <kyle@infradead.org>
+To: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] ar3k: add to support AR3012 v2.1 firmware
+Message-ID: <20150903205001.GB6016@merlin.infradead.org>
+References: <55D3E6CF.9060109@qca.qualcomm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <55D3E6CF.9060109@qca.qualcomm.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix compilation the following compilation warning, which happens when
-CONFIG_BT_INTEL is not set:
+On Tue, Aug 18, 2015 at 07:15:43PM -0700, Ben Young Tae Kim wrote:
+> Supports AR3012 v2.1 firmware files
+> 
+> Signed-off-by: Ben Young Tae Kim <ytkim@qca.qualcomm.com>
+> ---
+>  WHENCE                       |   2 ++
+>  ar3k/AthrBT_0x11020100.dfu   | Bin 0 -> 46852 bytes
+>  ar3k/ramps_0x11020100_40.dfu | Bin 0 -> 1802 bytes
+>  3 files changed, 2 insertions(+)
+>  create mode 100644 ar3k/AthrBT_0x11020100.dfu
+>  create mode 100644 ar3k/ramps_0x11020100_40.dfu
+> 
 
-  drivers/bluetooth/btintel.h:98:13: warning: ‘btintel_version_info’
-  defined but not used [-Wunused-function]
-   static void btintel_version_info(struct hci_dev *hdev,
-                                    struct intel_version *ver)
-               ^
+applied, sorry for the delay, have been on vacation.
 
-Signed-off-by: Vincent Stehlé <vincent.stehle@laposte.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: trivial@kernel.org
----
-
-
-Hi,
-
-This warning can be seen with e.g. ARM imx_v6_v7_defconfig.
-
-Best regards,
-
-V. 
-
-
- drivers/bluetooth/btintel.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index b278d14..a49c8db 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -95,7 +95,8 @@ static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
- {
- }
- 
--static void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver)
-+static inline void btintel_version_info(struct hci_dev *hdev,
-+					struct intel_version *ver)
- {
- }
- 
--- 
-2.5.0
+regards, --kyle
