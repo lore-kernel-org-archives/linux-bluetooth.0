@@ -1,77 +1,416 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <ext.szymon.janc@tieto.com>
-To: krishnaks@iwavesystems.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: StartLescan rerturns false
-Date: Thu, 03 Sep 2015 16:25:43 +0200
-Message-ID: <3088225.58tBxefHLJ@leonov>
-In-Reply-To: <d2ec8d829215f8a06d693dd61ec226a2.squirrel@iwavesystems.com>
-References: <237bbd312054ce6433af002f5e1213c7.squirrel@iwavesystems.com> <5a4e8eadcfd668fabdcd350e63a65308.squirrel@iwavesystems.com> <d2ec8d829215f8a06d693dd61ec226a2.squirrel@iwavesystems.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1441282972-22182-1-git-send-email-luiz.dentz@gmail.com>
+References: <1441282972-22182-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 3 Sep 2015 17:19:34 +0300
+Message-ID: <CABBYNZLbyKQ+=ut1TmNTxMs3-i-V5jJGaMnBPKvbjNp2u1+ryA@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ 1/2] core/gatt: Cleanup service probe
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Thursday 03 of September 2015 10:00:14 krishnaks@iwavesystems.com wrote:
-> > Hi,
-> > 
-> > I have ported bluez to Android Kitkat 4.4.3 and I am testing Bluetooth Low
-> > energy from android application.
-> > BluetoothAdapter's method startLeScan returns false during scanning BLE
-> > devices.
-> > register-client method is getting called in hal-gatt.c. But looks like
-> > "scanStarted" function is returning false.
-> > 
-> > Have anyone faced this issue.
-> > 
-> > Thanks in advance
-> > KP
-> 
-> Hi All,
-> 
-> From the Android Logcat I found that GATT JNI is failing to initialize
-> 
-> E/BtGatt.JNI(  833): ERROR: void android::initializeNative(JNIEnv*,
-> jobject)(L718): Failed to initialize Bluetooth GATT, status: 1##
-> 
-> Is this could be the reason for startlescan to return false?
+On Thu, Sep 3, 2015 at 3:22 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This cleanup code related to service probe making it use a single
+> function, because of that now all driver must implement device_probe in
+> order for the service probe to work properly.
+>
+> In addition to that a new flag called external was introduced to
+> btd_profile to be possible to distinguish whether it is a internal
+> plugin or external client, this was needed in order to decide if an
+> attribute should be claimed which whould prevent it to be exported over
+> D-Bus.
+> ---
+>  src/device.c        | 167 +++++++++++++++-------------------------------------
+>  src/gatt-database.c |  30 ++++++++--
+>  src/profile.c       |  11 +++-
+>  src/profile.h       |   1 +
+>  4 files changed, 84 insertions(+), 125 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index bdea55b..999f09f 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -2814,14 +2814,6 @@ static void device_add_uuids(struct btd_device *device, GSList *uuids)
+>                                                 DEVICE_INTERFACE, "UUIDs");
+>  }
+>
+> -struct gatt_probe_data {
+> -       struct btd_device *dev;
+> -       bool all_services;
+> -       GSList *uuids;
+> -       struct gatt_db_attribute *cur_attr;
+> -       char cur_uuid[MAX_LEN_UUID_STR];
+> -};
+> -
+>  static bool device_match_profile(struct btd_device *device,
+>                                         struct btd_profile *profile,
+>                                         GSList *uuids)
+> @@ -2836,99 +2828,42 @@ static bool device_match_profile(struct btd_device *device,
+>         return true;
+>  }
+>
+> -static void dev_probe_gatt(struct btd_profile *p, void *user_data)
+> +static void probe_gatt_profile(struct gatt_db_attribute *attr, void *user_data)
+>  {
+> -       struct gatt_probe_data *data = user_data;
+> +       struct btd_device *device = user_data;
+>         struct btd_service *service;
+> -
+> -       if (!p->remote_uuid || bt_uuid_strcmp(p->remote_uuid, data->cur_uuid))
+> -               return;
+> -
+> -       /*
+> -        * Add device to auto connect list in case the driver has the auto
+> -        * connect flag set.
+> -        * NOTE: This should work regardless if a service is created and
+> -        * probed since external drivers don't need to maintain any
+> -        * states they don't implement device_probe callback.
+> -        */
+> -       if (p->auto_connect)
+> -               device_set_auto_connect(data->dev, TRUE);
+> -
+> -       if (p->device_probe == NULL)
+> -               return;
+> -
+> -       service = service_create(data->dev, p);
+> -       if (!service)
+> -               return;
+> -
+> -       if (service_probe(service) < 0) {
+> -               btd_service_unref(service);
+> -               return;
+> -       }
+> -
+> -       /* Mark service as active to skip discovering it again */
+> -       gatt_db_service_set_active(data->cur_attr, true);
+> -
+> -       /* Mark service as claimed */
+> -       gatt_db_service_set_claimed(data->cur_attr, true);
+> -
+> -       data->dev->services = g_slist_append(data->dev->services, service);
+> -}
+> -
+> -static void dev_probe_gatt_profile(struct gatt_db_attribute *attr,
+> -                                                       void *user_data)
+> -{
+> -       struct gatt_probe_data *data = user_data;
+> +       struct btd_profile *profile;
+>         bt_uuid_t uuid;
+> -       GSList *l = NULL;
+> +       char uuid_str[MAX_LEN_UUID_STR];
+> +       GSList *l;
+>
+>         gatt_db_attribute_get_service_uuid(attr, &uuid);
+> -       bt_uuid_to_string(&uuid, data->cur_uuid, sizeof(data->cur_uuid));
+> -
+> -       data->cur_attr = attr;
+> -
+> -       /*
+> -        * If we're probing for all services, store the UUID since device->uuids
+> -        * was cleared.
+> -        */
+> -       if (data->all_services)
+> -               data->uuids = g_slist_append(data->uuids,
+> -                                               g_strdup(data->cur_uuid));
+> -
+> -       /* Don't probe the profiles if a matching service already exists. */
+> -       if (find_service_with_uuid(data->dev->services, data->cur_uuid)) {
+> -               /* Mark service as active to skip discovering it again */
+> -               gatt_db_service_set_active(data->cur_attr, true);
+> -               /* Mark the service as claimed by the existing profile. */
+> -               gatt_db_service_set_claimed(data->cur_attr, true);
+> -               return;
+> -       }
+> +       bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
+>
+> -       btd_profile_foreach(dev_probe_gatt, data);
+> +       /* Add UUID and probe service */
+> +       btd_device_add_uuid(device, uuid_str);
+>
+> -       if (data->all_services)
+> +       /* Check if service was probed */
+> +       l = find_service_with_uuid(device->services, uuid_str);
+> +       if (!l)
+>                 return;
+>
+> -       l = g_slist_append(l, g_strdup(data->cur_uuid));
+> -       device_add_uuids(data->dev, l);
+> -}
+> -
+> -static void device_probe_gatt_profile(struct btd_device *device,
+> -                                               struct gatt_db_attribute *attr)
+> -{
+> -       struct gatt_probe_data data;
+> +       /* Mark service as active to skip discovering it again */
+> +       gatt_db_service_set_active(attr, true);
+>
+> -       memset(&data, 0, sizeof(data));
+> +       service = l->data;
+> +       profile = btd_service_get_profile(service);
+>
+> -       data.dev = device;
+> +       /* Don't claim attributes of external profiles */
+> +       if (profile->external)
+> +               return;
+>
+> -       dev_probe_gatt_profile(attr, &data);
+> -       g_slist_free_full(data.uuids, g_free);
+> +       /* Mark the service as claimed by the existing profile. */
+> +       gatt_db_service_set_claimed(attr, true);
+>  }
+>
+>  static void device_probe_gatt_profiles(struct btd_device *device)
+>  {
+> -       struct gatt_probe_data data;
+>         char addr[18];
+>
+>         ba2str(&device->bdaddr, addr);
+> @@ -2938,16 +2873,7 @@ static void device_probe_gatt_profiles(struct btd_device *device)
+>                 return;
+>         }
+>
+> -       memset(&data, 0, sizeof(data));
+> -
+> -       data.dev = device;
+> -       data.all_services = true;
+> -
+> -       gatt_db_foreach_service(device->db, NULL, dev_probe_gatt_profile,
+> -                                                                       &data);
+> -
+> -       device_add_uuids(device, data.uuids);
+> -       g_slist_free_full(data.uuids, g_free);
+> +       gatt_db_foreach_service(device->db, NULL, probe_gatt_profile, device);
+>  }
+>
+>  static void device_accept_gatt_profiles(struct btd_device *device)
+> @@ -3028,9 +2954,7 @@ static void gatt_service_added(struct gatt_db_attribute *attr, void *user_data)
+>                         service_accept(l->data);
+>         }
+>
+> -       device_probe_gatt_profile(device, attr);
+> -
+> -       store_device_info(device);
+> +       btd_device_add_uuid(device, uuid_str);
+>
+>         btd_gatt_client_service_added(device->client_dbus, attr);
+>
+> @@ -3645,45 +3569,52 @@ struct probe_data {
+>         GSList *uuids;
+>  };
+>
+> -static void dev_probe(struct btd_profile *p, void *user_data)
+> +static struct btd_service *probe_service(struct btd_device *device,
+> +                                               struct btd_profile *profile,
+> +                                               GSList *uuids)
+>  {
+> -       struct probe_data *d = user_data;
+>         struct btd_service *service;
+>
+> -       if (p->device_probe == NULL)
+> -               return;
+> +       if (profile->device_probe == NULL)
+> +               return NULL;
+>
+> -       if (!device_match_profile(d->dev, p, d->uuids))
+> -               return;
+> +       if (!device_match_profile(device, profile, uuids))
+> +               return NULL;
+>
+> -       service = service_create(d->dev, p);
+> +       service = service_create(device, profile);
+>
+> -       if (service_probe(service) < 0) {
+> +       if (service_probe(service)) {
+>                 btd_service_unref(service);
+> -               return;
+> +               return NULL;
+>         }
+>
+> -       d->dev->services = g_slist_append(d->dev->services, service);
+> +       if (profile->auto_connect)
+> +               device_set_auto_connect(device, TRUE);
+> +
+> +       return service;
+>  }
+>
+> -void device_probe_profile(gpointer a, gpointer b)
+> +static void dev_probe(struct btd_profile *p, void *user_data)
+>  {
+> -       struct btd_device *device = a;
+> -       struct btd_profile *profile = b;
+> +       struct probe_data *d = user_data;
+>         struct btd_service *service;
+>
+> -       if (profile->device_probe == NULL)
+> +       service = probe_service(d->dev, p, d->uuids);
+> +       if (!service)
+>                 return;
+>
+> -       if (!device_match_profile(device, profile, device->uuids))
+> -               return;
+> +       d->dev->services = g_slist_append(d->dev->services, service);
+> +}
+>
+> -       service = service_create(device, profile);
+> +void device_probe_profile(gpointer a, gpointer b)
+> +{
+> +       struct btd_device *device = a;
+> +       struct btd_profile *profile = b;
+> +       struct btd_service *service;
+>
+> -       if (service_probe(service) < 0) {
+> -               btd_service_unref(service);
+> +       service = probe_service(device, profile, device->uuids);
+> +       if (!service)
+>                 return;
+> -       }
+>
+>         device->services = g_slist_append(device->services, service);
+>
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index 97cef77..774b19e 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -43,6 +43,7 @@
+>  #include "gatt-database.h"
+>  #include "dbus-common.h"
+>  #include "profile.h"
+> +#include "service.h"
+>
+>  #ifndef ATT_CID
+>  #define ATT_CID 4
+> @@ -1074,7 +1075,7 @@ static void client_disconnect_cb(DBusConnection *conn, void *user_data)
+>         service_remove_helper(user_data);
+>  }
+>
+> -static void service_remove(void *data)
+> +static void remove_service(void *data)
+>  {
+>         struct external_service *service = data;
+>
+> @@ -1453,7 +1454,7 @@ static void proxy_removed_cb(GDBusProxy *proxy, void *user_data)
+>
+>         DBG("Proxy removed - removing service: %s", service->path);
+>
+> -       service_remove(service);
+> +       remove_service(service);
+>  }
+>
+>  static bool parse_uuid(GDBusProxy *proxy, bt_uuid_t *uuid)
+> @@ -2142,10 +2143,10 @@ reply:
+>         service->reg = NULL;
+>
+>         if (fail)
+> -               service_remove(service);
+> +               remove_service(service);
+>  }
+>
+> -static struct external_service *service_create(DBusConnection *conn,
+> +static struct external_service *create_service(DBusConnection *conn,
+>                                         DBusMessage *msg, const char *path)
+>  {
+>         struct external_service *service;
+> @@ -2223,7 +2224,7 @@ static DBusMessage *manager_register_service(DBusConnection *conn,
+>         if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
+>                 return btd_error_invalid_args(msg);
+>
+> -       service = service_create(conn, msg, path);
+> +       service = create_service(conn, msg, path);
+>         if (!service)
+>                 return btd_error_failed(msg, "Failed to register service");
+>
+> @@ -2279,6 +2280,22 @@ static void profile_exited(DBusConnection *conn, void *user_data)
+>         profile_free(profile);
+>  }
+>
+> +static int profile_device_probe(struct btd_service *service)
+> +{
+> +       struct btd_profile *p = btd_service_get_profile(service);
+> +
+> +       DBG("%s probed", p->name);
+> +
+> +       return 0;
+> +}
+> +
+> +static void profile_device_remove(struct btd_service *service)
+> +{
+> +       struct btd_profile *p = btd_service_get_profile(service);
+> +
+> +       DBG("%s removed", p->name);
+> +}
+> +
+>  static int profile_add(struct external_profile *profile, const char *uuid)
+>  {
+>         struct btd_profile *p;
+> @@ -2302,7 +2319,10 @@ static int profile_add(struct external_profile *profile, const char *uuid)
+>                 return -ENOMEM;
+>         }
+>
+> +       p->device_probe = profile_device_probe;
+> +       p->device_remove = profile_device_remove;
+>         p->auto_connect = true;
+> +       p->external = true;
+>
+>         queue_push_tail(profile->profiles, p);
+>
+> diff --git a/src/profile.c b/src/profile.c
+> index f54749e..70ee4c1 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -719,13 +719,19 @@ void btd_profile_foreach(void (*func)(struct btd_profile *p, void *data),
+>
+>  int btd_profile_register(struct btd_profile *profile)
+>  {
+> -       profiles = g_slist_append(profiles, profile);
+> +       if (profile->external)
+> +               ext_profiles = g_slist_append(ext_profiles, profile);
+> +       else
+> +               profiles = g_slist_append(profiles, profile);
+>         return 0;
+>  }
+>
+>  void btd_profile_unregister(struct btd_profile *profile)
+>  {
+> -       profiles = g_slist_remove(profiles, profile);
+> +       if (profile->external)
+> +               ext_profiles = g_slist_remove(ext_profiles, profile);
+> +       else
+> +               profiles = g_slist_remove(profiles, profile);
+>  }
+>
+>  static struct ext_profile *find_ext_profile(const char *owner,
+> @@ -2291,6 +2297,7 @@ static struct ext_profile *create_ext(const char *owner, const char *path,
+>         p->name = ext->name;
+>         p->local_uuid = ext->service ? ext->service : ext->uuid;
+>         p->remote_uuid = ext->remote_uuid;
+> +       p->external = true;
+>
+>         if (ext->enable_server) {
+>                 p->adapter_probe = ext_adapter_probe;
+> diff --git a/src/profile.h b/src/profile.h
+> index f5a3ded..4448a2a 100644
+> --- a/src/profile.h
+> +++ b/src/profile.h
+> @@ -35,6 +35,7 @@ struct btd_profile {
+>         const char *remote_uuid;
+>
+>         bool auto_connect;
+> +       bool external;
+>
+>         int (*device_probe) (struct btd_service *service);
+>         void (*device_remove) (struct btd_service *service);
+> --
+> 2.4.3
 
-Yes, profile must be initialized if you want to use it.
+Applied.
 
-> Regards,
-> KP
-> 
-> ----------------Log----------------------
-> I/BtGatt.JNI(  833): void android::classInitNative(JNIEnv*, jclass)(L684):
-> classInitNative: Success!
-> D/BtGatt.DebugUtils(  833): handleDebugAction() action=null
-> D/BtGatt.GattService(  833): Received start request. Starting profile...
-> D/BtGatt.GattService(  833): start()
-> D/BlueZ   (  833):
-> external/bluetooth/bluez/android/hal-bluetooth.c:get_profile_interface()
-> gatt
-> D/BlueZ   (  833): external/bluetooth/bluez/android/hal-gatt.c:init()
-> E/BtGatt.JNI(  833): ERROR: void android::initializeNative(JNIEnv*,
-> jobject)(L718): Failed to initialize Bluetooth GATT, status: 1##
-> I/ActivityManager(  523): Start proc com.android.mms for broadcast
-> com.android.mms/.transaction.MmsSystemEventReceiver: pid=897
-> D/BLE     ( 1233): Before LE Scan statusfalse
-> D/BluetoothAdapter( 1233): startLeScan(): null
-> D/BtGatt.GattService( 1059): registerClient123() -
-> UUID=e7db8dc6-dc0b-41ff-b036-41b761fd4837
-> I/audio_hw_primary(  188): start_output_stream... 2016291600, device 2
-> W/audio_hw_primary(  188): card 1, port 0 device 0x2
-> W/audio_hw_primary(  188): rate 48000, channel 2 period_size 0xc0
-> W/audio_hw_primary(  188): do_out_standby... 2016291600
-> D/BLE     ( 1233): After LE Scan statusfalse
-> --------------Log--------------
-
-There is no daemon logs here but my guess would be that required crypto stuff 
-is missing in kernel. Check "Linux Kernel requirements" section in 
-android/README for list of required kernel options.
 
 -- 
-BR
-Szymon Janc
+Luiz Augusto von Dentz
