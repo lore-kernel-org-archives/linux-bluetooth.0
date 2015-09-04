@@ -1,39 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] lib/uuid: Fix bt_uuid_strcmp
-Date: Fri,  4 Sep 2015 16:42:54 +0300
-Message-Id: <1441374174-1732-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 0/4] Bluetooth: hci_bcm: Add wake-up and PM runtime support
+Date: Fri,  4 Sep 2015 15:35:43 +0200
+Message-Id: <1441373747-23042-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Add wake-up capabilities by retrieveing interruption used by BCM device in ACPI
+table.
+Add PM runtime support.
 
-bt_uuid_strcmp shall first convert the strings to bt_uuid_t using
-bt_string_to_uuid since bt_uuid_to_string can produce different formats
-depending on the type.
----
- lib/uuid.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+v1->v2:
+- Split 1st patch between general wake-up capability and T100TA IRQ fix
+- Replace multiple "if ... else if" by switch in bcm_resource()
+- Move code to limit number of #ifdef
+- Use DMI info to restrict IRQ to T100TA
+- Split 2nd patch to prepare PM runtime support in separated patch
+- Tested with and without CONFIG_PM_SLEEP and CONFIG_PM.
 
-diff --git a/lib/uuid.c b/lib/uuid.c
-index fd61968..046b521 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -289,7 +289,12 @@ int bt_string_to_uuid(bt_uuid_t *uuid, const char *string)
- 
- int bt_uuid_strcmp(const void *a, const void *b)
- {
--	return strcasecmp(a, b);
-+	bt_uuid_t u1, u2;
-+
-+	bt_string_to_uuid(&u1, a);
-+	bt_string_to_uuid(&u2, b);
-+
-+	return bt_uuid_cmp(&u1, &u2);
- }
- 
- int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
+Frederic Danis (4):
+  Bluetooth: hci_bcm: Add wake-up capability
+  Bluetooth: hci_bcm: Fix IRQ polarity for T100
+  Bluetooth: hci_bcm: Prepare PM runtime support
+  Bluetooth: hci_bcm: Add suspend/resume runtime PM functions
+
+ drivers/bluetooth/hci_bcm.c | 348 +++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 312 insertions(+), 36 deletions(-)
+
 -- 
-2.4.3
+1.9.1
 
