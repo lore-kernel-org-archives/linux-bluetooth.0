@@ -1,40 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55E9A5EC.2030804@linux.intel.com>
-Date: Fri, 04 Sep 2015 16:08:44 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
+Message-ID: <55E9A500.8060609@intel.com>
+Date: Fri, 04 Sep 2015 16:04:48 +0200
+From: Loic Poulain <loic.poulain@intel.com>
 MIME-Version: 1.0
-To: Luka Karinja <lk@bazdara.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] Bluetooth: hci_bcm: Add PM for BCM devices
-References: <1438959640-15476-1-git-send-email-frederic.danis@linux.intel.com> <1438959640-15476-2-git-send-email-frederic.danis@linux.intel.com> <55C85A37.2030103@bazdara.com> <55C8BBD0.6010706@linux.intel.com> <55D9A428.4050904@bazdara.com>
-In-Reply-To: <55D9A428.4050904@bazdara.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] Bluetooth: hci_bcm: Fix IRQ polarity for T100
+References: <1441373747-23042-1-git-send-email-frederic.danis@linux.intel.com> <1441373747-23042-3-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1441373747-23042-3-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Luka,
+Hi Fred,
 
-On 23/08/2015 12:44, Luka Karinja wrote:
-> Hey Frederic.
+> +/* IRQ polarity of some chipset are not defined correctly in ACPI table. */
+> +static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
+> +#if defined(CONFIG_DMI) && defined(CONFIG_X86)
+> +	{
+> +		/* Asus T100TA */
+> +		.matches = {
+> +			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+> +			DMI_MATCH(DMI_PRODUCT_NAME, "T100TA"),
+> +		},
+> +	},
+> +#endif
+> +	{ }
+> +};
+> +
+>   static int bcm_acpi_probe(struct bcm_device *dev)
+>   {
+>   	struct platform_device *pdev = dev->pdev;
+> @@ -608,6 +623,12 @@ static int bcm_acpi_probe(struct bcm_device *dev)
 >
->> In addition to this, bcm_uart_subver_table, btbcm_initialize() and
->> btbcm_check_bdaddr() may need to be patched to support new device.
->> All is located in btbcm.c file.
->>
+>   	acpi_dev_get_resources(adev, &resources, bcm_resource, dev);
 >
-> Could you give me some pointers of how to find those values for my
-> device? the chip is a BCM43341
+> +	if (strstr(id->id, "BCM2E39") &&
+> +	    dmi_check_system(bcm_wrong_irq_dmi_table)) {
+> +		bt_dev_dbg(dev, "Fix irq polarity");
+> +		dev->irq_polarity = !dev->irq_polarity;
+> +	}
 
-Regarding bcm_uart_subver_table, you can retrieve Subversion value by 
-performing "hciconfig -a".
+Since you now the right polarity on ASUS T100 you should just set the 
+right one, not invert the current one. Imagine that T100 receive a BIOS
+update with the polarity fixed, it will be inverted to a incorrect value.
 
-For btbcm_initialize(), you should check Revision displayed by 
-hciconfig. You may have to add a "case" to "switch ((rev & 0xf000) >> 12)".
+Regards,
+Loic
 
-After this, you should be able to use btattach with your chipset.
-
-If you have a firmware for the chipset, you could also check if it uses 
-a default device address and add it to btbcm_check_bdaddr().
-
-Regards
-
-Fred
+-- 
+Intel Open Source Technology Center
+http://oss.intel.com/
