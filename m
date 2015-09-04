@@ -1,28 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Delay check for conn->smp in smp_conn_security()
-Date: Fri,  4 Sep 2015 12:22:46 +0300
-Message-Id: <1441358566-24428-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 4 Sep 2015 04:56:26 -0400
+From: Chuck Ebbert <cebbert.lkml@gmail.com>
+To: Oon-Ee Ng <ngoonee.talk@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [PATCH - untested] bluetooth: Don't check for SMP security too
+ early
+Message-ID: <20150904045626.4881d34b@as>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Commit 25ba26539 ("Bluetooth: Fix NULL pointer dereference in
+smp_conn_security") added a check for NULL SMP, but it was checked
+too early. It is possible for this function to return success even
+when that is NULL. Move the check down to just before the variable
+gets used.
 
-There are several actions that smp_conn_security() might make that do
-not require a valid SMP context (conn->smp pointer). One of these
-actions is to encrypt the link with an existing LTK. If the SMP
-context wasn't initialized properly we should still allow the
-independent actions to be done, i.e. the check for the context should
-only be done at the last possible moment.
+Fixes: 25ba26539 ("Bluetooth: Fix NULL pointer dereference in smp_conn_security")
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+
+NOTE: UNTESTED, no signoff
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index ad82324f710f..0510a577a7b5 100644
+index ad82324..0510a57 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
 @@ -2311,12 +2311,6 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
@@ -51,6 +53,3 @@ index ad82324f710f..0510a577a7b5 100644
  	l2cap_chan_lock(chan);
  
  	/* If SMP is already in progress ignore this request */
--- 
-2.4.3
-
