@@ -1,136 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH v2 3/4] Bluetooth: hci_bcm: Prepare PM runtime support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1441373747-23042-4-git-send-email-frederic.danis@linux.intel.com>
-Date: Fri, 4 Sep 2015 11:51:32 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <4318C5B4-553A-4C25-B9F9-0FE1DAF749DE@holtmann.org>
-References: <1441373747-23042-1-git-send-email-frederic.danis@linux.intel.com> <1441373747-23042-4-git-send-email-frederic.danis@linux.intel.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
+From: Petri Gynther <pgynther@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>,
+	Petri Gynther <pgynther@google.com>
+Subject: [PATCH 2/2] hog: handle HoG init failures correctly
+Date: Fri,  4 Sep 2015 11:30:00 -0700
+Message-Id: <1441391400-24990-2-git-send-email-pgynther@google.com>
+In-Reply-To: <1441391400-24990-1-git-send-email-pgynther@google.com>
+References: <1441391400-24990-1-git-send-email-pgynther@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+When attio_connected_cb() is called for a HoG device, BlueZ should
+be in one of the two states:
 
-> Change some CONFIG_PM_SLEEP to CONFIG_PM as hu and is_suspended parameters
-> will be used during PM runtime callbacks.
-> 
-> Add __bcm_suspend() and __bcm_resume() which performs link management for
-> PM callbacks.
-> 
-> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
-> ---
-> drivers/bluetooth/hci_bcm.c | 70 ++++++++++++++++++++++++++-------------------
-> 1 file changed, 41 insertions(+), 29 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index efb9566..7f63f2b 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -56,7 +56,7 @@ struct bcm_device {
-> 	int			irq;
-> 	u8			irq_polarity;
-> 
-> -#ifdef CONFIG_PM_SLEEP
-> +#ifdef CONFIG_PM
-> 	struct hci_uart		*hu;
-> 	bool			is_suspended; /* suspend/resume flag */
-> #endif
-> @@ -153,7 +153,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
-> 	return 0;
-> }
-> 
-> -#ifdef CONFIG_PM_SLEEP
-> +#ifdef CONFIG_PM
-> static irqreturn_t bcm_host_wake(int irq, void *data)
-> {
-> 	struct bcm_device *bdev = data;
-> @@ -259,7 +259,7 @@ static int bcm_open(struct hci_uart *hu)
-> 		if (hu->tty->dev->parent == dev->pdev->dev.parent) {
-> 			bcm->dev = dev;
-> 			hu->init_speed = dev->init_speed;
-> -#ifdef CONFIG_PM_SLEEP
-> +#ifdef CONFIG_PM
-> 			dev->hu = hu;
-> #endif
-> 			bcm_gpio_set_power(bcm->dev, true);
-> @@ -283,7 +283,7 @@ static int bcm_close(struct hci_uart *hu)
-> 	mutex_lock(&bcm_device_lock);
-> 	if (bcm_device_exists(bdev)) {
-> 		bcm_gpio_set_power(bdev, false);
-> -#ifdef CONFIG_PM_SLEEP
-> +#ifdef CONFIG_PM
-> 		if (device_can_wakeup(&bdev->pdev->dev)) {
-> 			devm_free_irq(&bdev->pdev->dev, bdev->irq, bdev);
-> 			device_init_wakeup(&bdev->pdev->dev, false);
-> @@ -425,6 +425,41 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
-> 	return skb_dequeue(&bcm->txq);
-> }
-> 
-> +#ifdef CONFIG_PM
-> +static void __bcm_suspend(struct bcm_device *bdev)
-> +{
-> +	if (!bdev->is_suspended && bdev->hu) {
-> +		hci_uart_set_flow_control(bdev->hu, true);
-> +
-> +		/* Once this returns, driver suspends BT via GPIO */
-> +		bdev->is_suspended = true;
-> +	}
-> +
-> +	/* Suspend the device */
-> +	if (bdev->device_wakeup) {
-> +		gpiod_set_value(bdev->device_wakeup, false);
-> +		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
-> +		mdelay(15);
-> +	}
-> +}
-> +
-> +static void __bcm_resume(struct bcm_device *bdev)
-> +{
-> +	if (bdev->device_wakeup) {
-> +		gpiod_set_value(bdev->device_wakeup, true);
-> +		bt_dev_dbg(bdev, "resume, delaying 15 ms");
-> +		mdelay(15);
-> +	}
-> +
-> +	/* When this executes, the device has woken up already */
-> +	if (bdev->is_suspended && bdev->hu) {
-> +		bdev->is_suspended = false;
-> +
-> +		hci_uart_set_flow_control(bdev->hu, false);
-> +	}
-> +}
-> +#endif
-> +
-> #ifdef CONFIG_PM_SLEEP
-> /* Platform suspend callback */
-> static int bcm_suspend(struct device *dev)
-> @@ -439,19 +474,7 @@ static int bcm_suspend(struct device *dev)
-> 	if (!bdev->hu)
-> 		goto unlock;
-> 
-> -	if (!bdev->is_suspended) {
-> -		hci_uart_set_flow_control(bdev->hu, true);
-> -
-> -		/* Once this callback returns, driver suspends BT via GPIO */
-> -		bdev->is_suspended = true;
-> -	}
-> -
-> -	/* Suspend the device */
-> -	if (bdev->device_wakeup) {
-> -		gpiod_set_value(bdev->device_wakeup, false);
-> -		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
-> -		mdelay(15);
-> -	}
-> +	__bcm_suspend(bdev);
+1) hogdev->uhid_created == FALSE && hogdev->reports == NULL
+   * initial connection to HoG device, or first reconnect after
+     BlueZ has been restarted
+   * BlueZ needs to discover all HoG device characteristics
+     (including report map) and create uHID device for HID input
 
-I do not see a reason for this change and this will also cause compile time warnings since the code is now behind different config options.
+2) hogdev->uhid_created == TRUE && hogdev->reports != NULL
+   * second or subsequent reconnect
+   * all HoG device characteristics (including report map) have
+     been successfully discovered previously, and uHID device
+     has been created
 
-You have to give me a bit of better description on what this change is actually for.
+However, it is possible that the connection between BlueZ and
+HoG device is abruptly terminated amid HoG device characteristics
+discovery. Or, HoG report map discovery might intermittently fail.
+This can leave BlueZ in inconsistent state such that it knows about
+some of the characteristics, but the report map was never received
+and uHID device not created, i.e.:
+hogdev->uhid_created == FALSE && hogdev->reports != NULL
 
-Regards
+attio_connected_cb() needs to detect this condition, clean up
+hogdev->reports, and re-discover HoG device characteristics.
+---
+ profiles/input/hog.c | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
 
-Marcel
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index bd35830..e006add 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -844,6 +844,18 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 									hogdev);
+ }
+ 
++static void report_free(void *data)
++{
++	struct report *report = data;
++	struct hog_device *hogdev = report->hogdev;
++
++	if (hogdev->attrib)
++		g_attrib_unregister(hogdev->attrib, report->notifyid);
++
++	g_free(report->decl);
++	g_free(report);
++}
++
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ {
+ 	struct hog_device *hogdev = user_data;
+@@ -852,6 +864,12 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 
+ 	DBG("HoG connected");
+ 
++	if (!hogdev->uhid_created && hogdev->reports) {
++		DBG("HoG init failed previously, preparing for re-init");
++		g_slist_free_full(hogdev->reports, report_free);
++		hogdev->reports = NULL;
++	}
++
+ 	hogdev->attrib = g_attrib_ref(attrib);
+ 
+ 	if (hogdev->reports == NULL) {
+@@ -901,18 +919,6 @@ static struct hog_device *hog_new_device(struct btd_device *device,
+ 	return hogdev;
+ }
+ 
+-static void report_free(void *data)
+-{
+-	struct report *report = data;
+-	struct hog_device *hogdev = report->hogdev;
+-
+-	if (hogdev->attrib)
+-		g_attrib_unregister(hogdev->attrib, report->notifyid);
+-
+-	g_free(report->decl);
+-	g_free(report);
+-}
+-
+ static void hog_free_device(struct hog_device *hogdev)
+ {
+ 	btd_device_unref(hogdev->device);
+-- 
+2.5.0.457.gab17608
 
