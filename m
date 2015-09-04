@@ -1,47 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Sep 2015 12:26:40 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Oon-Ee Ng <ngoonee.talk@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: SMP Security Request breaks previously working bluetooth mouse
-Message-ID: <20150904092640.GA19882@t440s.lan>
-References: <CAGQ70euRR__Vv25Z9kvj6EfXyFruU36sYC82RrN8ijg_rdpYUA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAGQ70euRR__Vv25Z9kvj6EfXyFruU36sYC82RrN8ijg_rdpYUA@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Delay check for conn->smp in smp_conn_security()
+Date: Fri,  4 Sep 2015 12:22:46 +0300
+Message-Id: <1441358566-24428-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, Sep 01, 2015, Oon-Ee Ng wrote:
-> I refer (to the best of my knowledge) to the patch submitted in [1].
-> 
-> When upgrading from 4.1.5 to 4.1.6 (Arch Linux), my Lenovo N700
-> Bluetooth mouse stops working. Downgrading fixes, hence unlikely to be
-> a hardware issue.
-> 
-> When on 4.1.6 (bugged version) dmesg spams this every 3 minutes or so:-
-> Bluetooth: SMP security requested but not available
-> 
-> Please advise on additional details which may be required.
+There are several actions that smp_conn_security() might make that do
+not require a valid SMP context (conn->smp pointer). One of these
+actions is to encrypt the link with an existing LTK. If the SMP
+context wasn't initialized properly we should still allow the
+independent actions to be done, i.e. the check for the context should
+only be done at the last possible moment.
 
-My guess is that your adapter is being initially powered on by the
-legacy HCI_DEV_UP ioctl (e.g. "hciconfig hci0 up") which causes the SMP
-context not to be initialized properly.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-You would still not be able to repair with earlier 4.1.x kernels because
-of this (i.e. they also have a similar issue you just haven't triggered)
-but from 4.1.6 onward there's an extra check to prevent NULL pointer
-dereferences (and hence the kernel crashing) if the SMP context is not
-initialized.
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index ad82324f710f..0510a577a7b5 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -2311,12 +2311,6 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ 	if (!conn)
+ 		return 1;
+ 
+-	chan = conn->smp;
+-	if (!chan) {
+-		BT_ERR("SMP security requested but not available");
+-		return 1;
+-	}
+-
+ 	if (!hci_dev_test_flag(hcon->hdev, HCI_LE_ENABLED))
+ 		return 1;
+ 
+@@ -2330,6 +2324,12 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ 		if (smp_ltk_encrypt(conn, hcon->pending_sec_level))
+ 			return 0;
+ 
++	chan = conn->smp;
++	if (!chan) {
++		BT_ERR("SMP security requested but not available");
++		return 1;
++	}
++
+ 	l2cap_chan_lock(chan);
+ 
+ 	/* If SMP is already in progress ignore this request */
+-- 
+2.4.3
 
-The check for the SMP context is however done earlier than really
-necessary and the patch I've just sent should move it to a better place,
-i.e. still allow encrypting with existing LTKs.
-
-The proper fix (which will make all of SMP work again) is to locate the
-"hciconfig hci0 up" and not use it anymore (use either bluetoothctl,
-btmgmt or some other mgmt-based method for powering on the adapter).
-
-Johan
