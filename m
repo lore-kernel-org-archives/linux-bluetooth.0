@@ -3,53 +3,110 @@ From: Loic Poulain <loic.poulain@intel.com>
 To: marcel@holtmann.org
 Cc: linux-bluetooth@vger.kernel.org,
 	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH 2/2] Bluetooth: hci_intel: Add Device configuration
-Date: Fri,  4 Sep 2015 17:27:52 +0200
-Message-Id: <1441380472-30636-2-git-send-email-loic.poulain@intel.com>
-In-Reply-To: <1441380472-30636-1-git-send-email-loic.poulain@intel.com>
-References: <1441380472-30636-1-git-send-email-loic.poulain@intel.com>
+Subject: [PATCH 1/2] Bluetooth: btintel: Add Device Configuration support
+Date: Fri,  4 Sep 2015 17:27:51 +0200
+Message-Id: <1441380472-30636-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Apply DDC parameters once controller is in operational mode.
+btintel_ddc_send retrieves the ddc file and sends its content via DDC
+commands (opcode 0xfc8b).
+
+The ddc file should contain one or more DDC structures.
+A DDC structure is composed of the folowing fields:
+field: | DDC LEN |    DDC ID    |   DDC VALUE   |
+size:  | 1 byte  |    2 bytes   |  DDC LEN - 2  |
 
 Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 ---
- drivers/bluetooth/hci_intel.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btintel.c | 46 +++++++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h |  6 ++++++
+ 2 files changed, 52 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index b4dc3c5..8c9c2b6 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -542,7 +542,7 @@ static int intel_setup(struct hci_uart *hu)
- 	struct list_head *p;
- 	const struct firmware *fw;
- 	const u8 *fw_ptr;
--	char fwname[64];
-+	char fwname[64], ddcname[64];
- 	u32 frag_len;
- 	ktime_t calltime, delta, rettime;
- 	unsigned long long duration;
-@@ -725,6 +725,10 @@ static int intel_setup(struct hci_uart *hu)
- 	snprintf(fwname, sizeof(fwname), "intel/ibt-11-%u.sfi",
- 		 le16_to_cpu(params->dev_revid));
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 048423f..6447fc9 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -22,6 +22,7 @@
+  */
  
-+	/* Save the DDC file name for later */
-+	snprintf(ddcname, sizeof(fwname), "intel/ibt-11-%u.ddc",
-+		 le16_to_cpu(params->dev_revid));
-+
- 	err = request_firmware(&fw, fwname, &hdev->dev);
- 	if (err < 0) {
- 		bt_dev_err(hdev, "Failed to load Intel firmware file (%d)",
-@@ -927,6 +931,9 @@ done:
- 	set_bit(STATE_LPM_ENABLED, &intel->flags);
+ #include <linux/module.h>
++#include <linux/firmware.h>
  
- no_lpm:
-+	/* Ignore ddc error, device can work without DDC parameters */
-+	btintel_ddc_send(hdev, ddcname);
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -169,6 +170,51 @@ int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type, u32 plen,
+ }
+ EXPORT_SYMBOL_GPL(btintel_secure_send);
+ 
++int btintel_ddc_send(struct hci_dev *hdev, const char *ddc_name)
++{
++	const struct firmware *fw;
++	struct sk_buff *skb;
++	const u8 *fw_ptr;
++	int err;
 +
- 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
++	err = request_firmware_direct(&fw, ddc_name, &hdev->dev);
++	if (err < 0) {
++		bt_dev_err(hdev, "Failed to load Intel DDC file %s (%d)",
++			   ddc_name, err);
++		return err;
++	}
++
++	bt_dev_info(hdev, "Found Intel DDC parameters: %s", ddc_name);
++
++	fw_ptr = fw->data;
++
++	/* DDC file contains one or more DDC structure which has
++	 * Length (1 byte), DDC ID (2 bytes), and DDC value (Length - 2).
++	 */
++	while (fw->size > fw_ptr - fw->data) {
++		u8 cmd_plen = fw_ptr[0] + sizeof(u8);
++
++		skb = __hci_cmd_sync(hdev, 0xfc8b, cmd_plen, fw_ptr,
++				     HCI_INIT_TIMEOUT);
++		if (IS_ERR(skb)) {
++			bt_dev_err(hdev, "Failed to send Intel_Write_DDC (%ld)",
++				   PTR_ERR(skb));
++			release_firmware(fw);
++			return PTR_ERR(skb);
++		}
++
++		fw_ptr += cmd_plen;
++		kfree_skb(skb);
++	}
++
++	release_firmware(fw);
++
++	bt_dev_info(hdev, "Applying Intel DDC parameters completed");
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btintel_ddc_send);
++
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index b278d14..85d2c29 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -78,6 +78,7 @@ void btintel_hw_error(struct hci_dev *hdev, u8 code);
+ void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver);
+ int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type, u32 plen,
+ 			const void *param);
++int btintel_ddc_send(struct hci_dev *hdev, const char *ddc_name);
+ 
+ #else
+ 
+@@ -105,4 +106,9 @@ static inline int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type,
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int btintel_ddc_send(struct hci_dev *hdev, const char *ddc_name)
++{
++	return -EOPNOTSUPP
++}
++
+ #endif
 -- 
 1.9.1
