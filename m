@@ -1,112 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH 1/2] Bluetooth: btintel: Add Device Configuration support
-Date: Fri,  4 Sep 2015 17:27:51 +0200
-Message-Id: <1441380472-30636-1-git-send-email-loic.poulain@intel.com>
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] Bluetooth: btintel: fix warning
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1441314525-12080-1-git-send-email-vincent.stehle@laposte.net>
+Date: Fri, 4 Sep 2015 08:26:16 -0700
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, trivial@kernel.org
+Message-Id: <D24A2F94-7167-49D4-9BF2-E5DD5539F2C9@holtmann.org>
+References: <1441314525-12080-1-git-send-email-vincent.stehle@laposte.net>
+To: =?utf-8?Q?Vincent_Stehl=C3=A9?= <vincent.stehle@laposte.net>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btintel_ddc_send retrieves the ddc file and sends its content via DDC
-commands (opcode 0xfc8b).
+Hi Vincent,
 
-The ddc file should contain one or more DDC structures.
-A DDC structure is composed of the folowing fields:
-field: | DDC LEN |    DDC ID    |   DDC VALUE   |
-size:  | 1 byte  |    2 bytes   |  DDC LEN - 2  |
+> Fix compilation the following compilation warning, which happens when
+> CONFIG_BT_INTEL is not set:
+> 
+>  drivers/bluetooth/btintel.h:98:13: warning: ‘btintel_version_info’
+>  defined but not used [-Wunused-function]
+>   static void btintel_version_info(struct hci_dev *hdev,
+>                                    struct intel_version *ver)
+>               ^
+> 
+> Signed-off-by: Vincent Stehlé <vincent.stehle@laposte.net>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: trivial@kernel.org
+> ---
+> 
+> 
+> Hi,
+> 
+> This warning can be seen with e.g. ARM imx_v6_v7_defconfig.
+> 
+> Best regards,
+> 
+> V. 
+> 
+> 
+> drivers/bluetooth/btintel.h | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- drivers/bluetooth/btintel.c | 46 +++++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  6 ++++++
- 2 files changed, 52 insertions(+)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 048423f..6447fc9 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -22,6 +22,7 @@
-  */
- 
- #include <linux/module.h>
-+#include <linux/firmware.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -169,6 +170,51 @@ int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type, u32 plen,
- }
- EXPORT_SYMBOL_GPL(btintel_secure_send);
- 
-+int btintel_ddc_send(struct hci_dev *hdev, const char *ddc_name)
-+{
-+	const struct firmware *fw;
-+	struct sk_buff *skb;
-+	const u8 *fw_ptr;
-+	int err;
-+
-+	err = request_firmware_direct(&fw, ddc_name, &hdev->dev);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "Failed to load Intel DDC file %s (%d)",
-+			   ddc_name, err);
-+		return err;
-+	}
-+
-+	bt_dev_info(hdev, "Found Intel DDC parameters: %s", ddc_name);
-+
-+	fw_ptr = fw->data;
-+
-+	/* DDC file contains one or more DDC structure which has
-+	 * Length (1 byte), DDC ID (2 bytes), and DDC value (Length - 2).
-+	 */
-+	while (fw->size > fw_ptr - fw->data) {
-+		u8 cmd_plen = fw_ptr[0] + sizeof(u8);
-+
-+		skb = __hci_cmd_sync(hdev, 0xfc8b, cmd_plen, fw_ptr,
-+				     HCI_INIT_TIMEOUT);
-+		if (IS_ERR(skb)) {
-+			bt_dev_err(hdev, "Failed to send Intel_Write_DDC (%ld)",
-+				   PTR_ERR(skb));
-+			release_firmware(fw);
-+			return PTR_ERR(skb);
-+		}
-+
-+		fw_ptr += cmd_plen;
-+		kfree_skb(skb);
-+	}
-+
-+	release_firmware(fw);
-+
-+	bt_dev_info(hdev, "Applying Intel DDC parameters completed");
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_ddc_send);
-+
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index b278d14..85d2c29 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -78,6 +78,7 @@ void btintel_hw_error(struct hci_dev *hdev, u8 code);
- void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver);
- int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type, u32 plen,
- 			const void *param);
-+int btintel_ddc_send(struct hci_dev *hdev, const char *ddc_name);
- 
- #else
- 
-@@ -105,4 +106,9 @@ static inline int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int btintel_ddc_send(struct hci_dev *hdev, const char *ddc_name)
-+{
-+	return -EOPNOTSUPP
-+}
-+
- #endif
--- 
-1.9.1
+Regards
+
+Marcel
+
