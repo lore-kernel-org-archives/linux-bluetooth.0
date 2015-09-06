@@ -1,30 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: iOS 8 can't discover device
-To: Kyle Shneider <shneiderkyle@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-References: <CAMib2GZpa=FgsNKXThWnNZ=m=nQgLJj8j1bYd8v12vb1dwOLNg@mail.gmail.com>
-From: Andrejs Hanins <andrejs.hanins@ubnt.com>
-Message-ID: <55ED3BFA.206@ubnt.com>
-Date: Mon, 7 Sep 2015 10:25:46 +0300
 MIME-Version: 1.0
-In-Reply-To: <CAMib2GZpa=FgsNKXThWnNZ=m=nQgLJj8j1bYd8v12vb1dwOLNg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1441374174-1732-1-git-send-email-luiz.dentz@gmail.com>
+References: <1441374174-1732-1-git-send-email-luiz.dentz@gmail.com>
+Date: Sun, 6 Sep 2015 20:15:32 +0300
+Message-ID: <CABBYNZKANQzPZxgcmCO-yEX3QsC-06Y6OJUuYYsSDPcLxjG1gg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] lib/uuid: Fix bt_uuid_strcmp
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kyle,
+Hi,
 
-On 09/06/2015 05:23 PM, Kyle Shneider wrote:
-> Hello again.
-> 
-> I'm testing bluez 5.33 on raspberry pi. After successfully launching
-> bluetoothd, powering hci-device up and setting it 'Discoverable' (done
-> through DBus API) iPad mini can't see it. In other way shitty android
-> 4.1.1 tablet finds raspberry in a moment.
-> Have i missed something?
-iOS will only show you devices which implement at least one of the Bluetooth profiles supported by iOS (https://support.apple.com/en-us/HT204387).
-So you need to have appropriate SDP record with supported profile. I would suggest to start with org.bluez.ProfileManager1 D-Bus interface.
-> Did anyone have successful experience of pairing apple devices and
-> latest versions of bluez?
-> BTW ble adapter: cambridge silicon radio.
-> 
+On Fri, Sep 4, 2015 at 4:42 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> bt_uuid_strcmp shall first convert the strings to bt_uuid_t using
+> bt_string_to_uuid since bt_uuid_to_string can produce different formats
+> depending on the type.
+> ---
+>  lib/uuid.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/lib/uuid.c b/lib/uuid.c
+> index fd61968..046b521 100644
+> --- a/lib/uuid.c
+> +++ b/lib/uuid.c
+> @@ -289,7 +289,12 @@ int bt_string_to_uuid(bt_uuid_t *uuid, const char *string)
+>
+>  int bt_uuid_strcmp(const void *a, const void *b)
+>  {
+> -       return strcasecmp(a, b);
+> +       bt_uuid_t u1, u2;
+> +
+> +       bt_string_to_uuid(&u1, a);
+> +       bt_string_to_uuid(&u2, b);
+> +
+> +       return bt_uuid_cmp(&u1, &u2);
+>  }
+>
+>  int bt_uuid_to_le(const bt_uuid_t *src, void *dst)
+> --
+> 2.4.3
+
+Applied.
+
+
+-- 
+Luiz Augusto von Dentz
