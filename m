@@ -1,153 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1441379830-29000-1-git-send-email-biradar.a@samsung.com>
-References: <1441379830-29000-1-git-send-email-biradar.a@samsung.com>
-Date: Mon, 7 Sep 2015 14:45:36 +0300
-Message-ID: <CABBYNZ+uyiQ=2cPHievwv=Y2fNGP8FxSZZQe8d=yREQ3bkE3Mg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] Wrong obex response code was sent
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Anurag Biradar <biradar.a@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: David Herrmann <dh.herrmann@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Mark Haun <haunma@keteu.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	David Herrmann <dh.herrmann@gmail.com>,
+	<stable@vger.kernel.org>
+Subject: [PATCH] Bluetooth: hidp: fix device disconnect on idle timeout
+Date: Mon,  7 Sep 2015 12:05:41 +0200
+Message-Id: <1441620341-553-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anurag,
+The HIDP specs define an idle-timeout which automatically disconnects a
+device. This has always been implemented in the HIDP layer and forced a
+synchronous shutdown of the hidp-scheduler. This works just fine, but
+lacks a forced disconnect on the underlying l2cap channels. This has been
+broken since:
 
-On Fri, Sep 4, 2015 at 6:17 PM, Anurag Biradar <biradar.a@samsung.com> wrote:
-> Issue: This issue happened with JVC carkit. When we reject incoming pbap
-> connection then carkit again initiating incoming pbap connection.
->
-> Analysis: Checked the hcidump of andriod and then get to know that while
-> reject an incoming pbap connection it is sending packet type as RFCOMM Disc
-> whereas bluez was sending packet type as DM (Disconnect Mode)
-> Please check the logs below
->
-> Solution: Accept the connection then drop if reject was set
->
-> Andriod logs
->
-> 2015-09-03 11:33:48.877598 > ACL data: handle 11 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 3 scid 0x0041
-> 2015-09-03 11:33:48.878830 < ACL data: handle 11 flags 0x02 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
->       Connection successful
-> 2015-09-03 11:33:48.879568 < ACL data: handle 11 flags 0x02 dlen 16
->     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
->       MTU 1691
-> 2015-09-03 11:33:48.947164 > ACL data: handle 11 flags 0x02 dlen 16
->     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
->       MTU 1013
-> 2015-09-03 11:33:48.948221 > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 11 packets 2
->
-> ....
->
-> 2015-09-03 11:33:52.803776 < ACL data: handle 11 flags 0x02 dlen 8
->     L2CAP(d): cid 0x0041 len 4 [psm 3]
->       RFCOMM(s): DISC: cr 0 dlci 38 pf 1 ilen 0 fcs 0x85
-> 2015-09-03 11:33:52.812981 > ACL data: handle 11 flags 0x02 dlen 8
->     L2CAP(d): cid 0x0041 len 4 [psm 3]
->       RFCOMM(s): UA: cr 0 dlci 38 pf 1 ilen 0 fcs 0xaf
-> 2015-09-03 11:33:52.813508 < ACL data: handle 11 flags 0x02 dlen 8
->     L2CAP(d): cid 0x0041 len 4 [psm 3]
->       RFCOMM(s): DISC: cr 0 dlci 0 pf 1 ilen 0 fcs 0x9c
-> 2015-09-03 11:33:52.816631 > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 11 packets 2
-> 2015-09-03 11:33:52.843181 > ACL data: handle 11 flags 0x02 dlen 8
->     L2CAP(d): cid 0x0041 len 4 [psm 3]
->       RFCOMM(s): UA: cr 0 dlci 0 pf 1 ilen 0 fcs 0xb6
-> 2015-09-03 11:33:52.843636 < ACL data: handle 11 flags 0x02 dlen 12
->     L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-> 2015-09-03 11:33:52.869122 > ACL data: handle 11 flags 0x02 dlen 12
->     L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-> 2015-09-03 11:33:53.014953 > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 11 packets 1
->
-> Logs from bluez
-> 2015-01-04 18:05:04.459983 > ACL data: handle 50 flags 0x02 dlen 12
->     L2CAP(s): Connect req: psm 3 scid 0x0041
-> 2015-01-04 18:05:04.460074 < ACL data: handle 50 flags 0x00 dlen 16
->     L2CAP(s): Connect rsp: dcid 0x0041 scid 0x0041 result 0 status 0
->       Connection successful
-> 2015-01-04 18:05:04.460105 < ACL data: handle 50 flags 0x00 dlen 27
->     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 15
->       MTU 1013
->       RFC 0x00 (Basic)
-> 2015-01-04 18:05:04.463004 > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 50 packets 1
-> 2015-01-04 18:05:04.463676 > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 50 packets 1
-> 2015-01-04 18:05:04.486747 > ACL data: handle 50 flags 0x02 dlen 16
->     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
->       MTU 1013
->
-> ....
->
-> 2015-01-04 18:05:13.768241 < ACL data: handle 50 flags 0x00 dlen 8
->     L2CAP(d): cid 0x0041 len 4 [psm 3]
->       RFCOMM(s): DM: cr 1 dlci 30 pf 1 ilen 0 fcs 0x47
-> 2015-01-04 18:05:13.771445 > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 50 packets 1
-> 2015-01-04 18:05:13.783896 > ACL data: handle 50 flags 0x02 dlen 12
->     L2CAP(s): Disconn req: dcid 0x0041 scid 0x0041
-> 2015-01-04 18:05:13.784019 < ACL data: handle 50 flags 0x00 dlen 12
->     L2CAP(s): Disconn rsp: dcid 0x0041 scid 0x0041
-> 2015-01-04 18:05:13.787589 > HCI Event: Number of Completed Packets (0x13) plen 5
->     handle 50 packets 1
-> 2015-01-04 18:05:13.947623 > HCI Event: Disconn Complete (0x05) plen 4
->     status 0x00 handle 50 reason 0x13
->     Reason: Remote User Terminated Connection
+    commit 5205185d461d5902325e457ca80bd421127b7308
+    Author: David Herrmann <dh.herrmann@gmail.com>
+    Date:   Sat Apr 6 20:28:47 2013 +0200
 
-That is basically defer_setup taking action, so we are basically
-holding the channel setup until the application accepts the connection
-while Android accepts the connection just to terminate it later on.
+        Bluetooth: hidp: remove old session-management
 
-> ---
->  src/profile.c |   10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/src/profile.c b/src/profile.c
-> index ca1dfec..3b76e8f 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -1068,17 +1068,17 @@ static void ext_auth(DBusError *err, void *user_data)
->                 goto drop;
->         }
->
-> -       if (err && dbus_error_is_set(err)) {
-> -               error("%s rejected %s: %s", ext->name, addr, err->message);
-> -               goto drop;
-> -       }
-> -
->         if (!bt_io_accept(conn->io, ext_connect, conn, NULL, &gerr)) {
->                 error("bt_io_accept: %s", gerr->message);
->                 g_error_free(gerr);
->                 goto drop;
->         }
->
-> +       if (err && dbus_error_is_set(err)) {
-> +               error("%s rejected %s: %s", ext->name, addr, err->message);
-> +               goto drop;
-> +       }
+The old session-management always forced an l2cap error on the ctrl/intr
+channels when shutting down. The new session-management skips this, as we
+don't want to enforce channel policy on the caller. In other words, if
+user-space removes an HIDP device, the underlying channels (which are
+*owned* and *referenced* by user-space) are still left active. User-space
+needs to call shutdown(2) or close(2) to release them.
 
-This is probably not the behavior we want, otherwise there is no point
-in using DEFER_SETUP since we can accept the connection right away
-which enables the remote to send data while the connection is still
-being authorized. Maybe DM is treated as an unclean disconnection by
-the JVC carkit but I don't see why a DISC would be different, actually
-by looking at the RFCOMM spec it seems DM response for SABM indicates
-that the channel wont be available by retrying:
+Unfortunately, this does not work with idle-timeouts. There is no way to
+signal user-space that the HIDP layer has been stopped. The API simply
+does not support any event-passing except for poll(2). Hence, we restore
+old behavior and force EUNATCH on the sockets if the HIDP layer is
+disconnected due to idle-timeouts (behavior of explicit disconnects
+remains unmodified). User-space can still call
 
-BLUETOOTH SPECIFICATION
-RFCOMM with TS 07.10
-Page 18 of 29:
-...
-Control channel with a DM frame, sent on the referenced DLCI to
-indicate that the DLCI
-is not open, and that the responder would not grant a request to open
-it later either.
-(That is, a subsequent SABM sent by initiator would be declined with DM again.)
+    getsockopt(..., SO_ERROR, ...)
 
+..to retrieve the EUNATCH error and clear sk_err. Hence, the channels can
+still be re-used (which nobody does so far, though). Therefore, the API
+still supports the new behavior, but with this patch it's also compatible
+to the old implicit channel shutdown.
+
+Cc: <stable@vger.kernel.org> # 3.10+
+Reported-by: Mark Haun <haunma@keteu.org>
+Reported-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
+---
+Hi Mark & Luiz
+
+Can you give this a spin? This should fix the reported issues! I like the
+implementation much more than calling shutdown(2) implicitly in the kernel.
+With sk_err we avoid enforcing a behavior and let user-space deal with it.
+
+Btw., this needs back-porting to >=3.10 (which introduced the new session
+management).
+
+Thanks for the report!
+David
+
+ net/bluetooth/hidp/core.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index f1a117f..4f1db96 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -401,6 +401,21 @@ static void hidp_idle_timeout(unsigned long arg)
+ {
+ 	struct hidp_session *session = (struct hidp_session *) arg;
+ 
++	/*
++	 * The HIDP user-space API only contains calls to add and remove
++	 * devices. There is no way to forward events of any kind. Therefore,
++	 * we have to forcefully disconnect a device on idle-timeouts. This is
++	 * unfortunate and weird API design, but it is spec-compliant and
++	 * required for backwards-compatibility. Hence, on idle-timeout, we
++	 * signal driver-detach events, so poll() will be woken up with an
++	 * error-condition on both sockets.
++	 */
++
++	session->intr_sock->sk->sk_err = EUNATCH;
++	session->ctrl_sock->sk->sk_err = EUNATCH;
++	wake_up_interruptible(sk_sleep(session->intr_sock->sk));
++	wake_up_interruptible(sk_sleep(session->ctrl_sock->sk));
++
+ 	hidp_session_terminate(session);
+ }
+ 
 -- 
-Luiz Augusto von Dentz
+2.5.1
