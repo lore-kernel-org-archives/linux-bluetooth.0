@@ -1,143 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55EDAB9A.2020805@linux.intel.com>
-Date: Mon, 07 Sep 2015 17:22:02 +0200
-From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] Bluetooth: hci_bcm: Prepare PM runtime support
-References: <1441373747-23042-1-git-send-email-frederic.danis@linux.intel.com> <1441373747-23042-4-git-send-email-frederic.danis@linux.intel.com> <4318C5B4-553A-4C25-B9F9-0FE1DAF749DE@holtmann.org>
-In-Reply-To: <4318C5B4-553A-4C25-B9F9-0FE1DAF749DE@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1441391400-24990-1-git-send-email-pgynther@google.com>
+References: <1441391400-24990-1-git-send-email-pgynther@google.com>
+Date: Mon, 7 Sep 2015 17:16:33 +0300
+Message-ID: <CABBYNZL1vcGNZibeVy-BeGDEn4VwMALjCe9u9Z8CUreLQXwFUg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] hog: add more debugging to HoG device init
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Petri Gynther <pgynther@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Arman Uguray <armansito@chromium.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel,
+Hi Petri,
 
-On 04/09/2015 20:51, Marcel Holtmann wrote:
-> Hi Fred,
+On Fri, Sep 4, 2015 at 9:29 PM, Petri Gynther <pgynther@google.com> wrote:
+> Add more debugging to HoG device init, so that it is easier to see
+> whether the HoG device init completes successfully.
+> ---
+>  profiles/input/hog.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
->> Change some CONFIG_PM_SLEEP to CONFIG_PM as hu and is_suspended parameters
->> will be used during PM runtime callbacks.
->>
->> Add __bcm_suspend() and __bcm_resume() which performs link management for
->> PM callbacks.
->>
->> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
->> ---
->> drivers/bluetooth/hci_bcm.c | 70 ++++++++++++++++++++++++++-------------------
->> 1 file changed, 41 insertions(+), 29 deletions(-)
->>
->> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->> index efb9566..7f63f2b 100644
->> --- a/drivers/bluetooth/hci_bcm.c
->> +++ b/drivers/bluetooth/hci_bcm.c
->> @@ -56,7 +56,7 @@ struct bcm_device {
->> 	int			irq;
->> 	u8			irq_polarity;
->>
->> -#ifdef CONFIG_PM_SLEEP
->> +#ifdef CONFIG_PM
->> 	struct hci_uart		*hu;
->> 	bool			is_suspended; /* suspend/resume flag */
->> #endif
->> @@ -153,7 +153,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
->> 	return 0;
->> }
->>
->> -#ifdef CONFIG_PM_SLEEP
->> +#ifdef CONFIG_PM
->> static irqreturn_t bcm_host_wake(int irq, void *data)
->> {
->> 	struct bcm_device *bdev = data;
->> @@ -259,7 +259,7 @@ static int bcm_open(struct hci_uart *hu)
->> 		if (hu->tty->dev->parent == dev->pdev->dev.parent) {
->> 			bcm->dev = dev;
->> 			hu->init_speed = dev->init_speed;
->> -#ifdef CONFIG_PM_SLEEP
->> +#ifdef CONFIG_PM
->> 			dev->hu = hu;
->> #endif
->> 			bcm_gpio_set_power(bcm->dev, true);
->> @@ -283,7 +283,7 @@ static int bcm_close(struct hci_uart *hu)
->> 	mutex_lock(&bcm_device_lock);
->> 	if (bcm_device_exists(bdev)) {
->> 		bcm_gpio_set_power(bdev, false);
->> -#ifdef CONFIG_PM_SLEEP
->> +#ifdef CONFIG_PM
->> 		if (device_can_wakeup(&bdev->pdev->dev)) {
->> 			devm_free_irq(&bdev->pdev->dev, bdev->irq, bdev);
->> 			device_init_wakeup(&bdev->pdev->dev, false);
->> @@ -425,6 +425,41 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
->> 	return skb_dequeue(&bcm->txq);
->> }
->>
->> +#ifdef CONFIG_PM
->> +static void __bcm_suspend(struct bcm_device *bdev)
->> +{
->> +	if (!bdev->is_suspended && bdev->hu) {
->> +		hci_uart_set_flow_control(bdev->hu, true);
->> +
->> +		/* Once this returns, driver suspends BT via GPIO */
->> +		bdev->is_suspended = true;
->> +	}
->> +
->> +	/* Suspend the device */
->> +	if (bdev->device_wakeup) {
->> +		gpiod_set_value(bdev->device_wakeup, false);
->> +		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
->> +		mdelay(15);
->> +	}
->> +}
->> +
->> +static void __bcm_resume(struct bcm_device *bdev)
->> +{
->> +	if (bdev->device_wakeup) {
->> +		gpiod_set_value(bdev->device_wakeup, true);
->> +		bt_dev_dbg(bdev, "resume, delaying 15 ms");
->> +		mdelay(15);
->> +	}
->> +
->> +	/* When this executes, the device has woken up already */
->> +	if (bdev->is_suspended && bdev->hu) {
->> +		bdev->is_suspended = false;
->> +
->> +		hci_uart_set_flow_control(bdev->hu, false);
->> +	}
->> +}
->> +#endif
->> +
->> #ifdef CONFIG_PM_SLEEP
->> /* Platform suspend callback */
->> static int bcm_suspend(struct device *dev)
->> @@ -439,19 +474,7 @@ static int bcm_suspend(struct device *dev)
->> 	if (!bdev->hu)
->> 		goto unlock;
->>
->> -	if (!bdev->is_suspended) {
->> -		hci_uart_set_flow_control(bdev->hu, true);
->> -
->> -		/* Once this callback returns, driver suspends BT via GPIO */
->> -		bdev->is_suspended = true;
->> -	}
->> -
->> -	/* Suspend the device */
->> -	if (bdev->device_wakeup) {
->> -		gpiod_set_value(bdev->device_wakeup, false);
->> -		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
->> -		mdelay(15);
->> -	}
->> +	__bcm_suspend(bdev);
+> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> index 4be9fd2..bd35830 100644
+> --- a/profiles/input/hog.c
+> +++ b/profiles/input/hog.c
+> @@ -633,6 +633,8 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>         int i, err;
+>         GSList *l;
 >
-> I do not see a reason for this change and this will also cause compile time warnings since the code is now behind different config options.
+> +       DBG("HoG inspecting report map");
+> +
+>         if (status != 0) {
+>                 error("Report Map read failed: %s", att_ecode2str(status));
+>                 return;
+> @@ -703,6 +705,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>         bt_uhid_register(hogdev->uhid, UHID_GET_REPORT, get_report, hogdev);
+>
+>         hogdev->uhid_created = TRUE;
+> +       DBG("HoG created uHID device");
+>
+>         for (l = hogdev->reports; l; l = l->next) {
+>                 struct report *r = l->data;
+> @@ -780,6 +783,8 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+>         GSList *l;
+>         uint16_t info_handle = 0, proto_mode_handle = 0;
+>
+> +       DBG("HoG inspecting characteristics");
+> +
+>         if (status != 0) {
+>                 const char *str = att_ecode2str(status);
+>                 DBG("Discover all characteristics failed: %s", str);
+> @@ -816,6 +821,7 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+>                                                                 report);
+>                         discover_descriptor(hogdev->attrib, start, end, report);
+>                 } else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0) {
+> +                       DBG("HoG discovering report map");
+>                         gatt_read_char(hogdev->attrib, chr->value_handle,
+>                                                 report_map_read_cb, hogdev);
+>                         discover_descriptor(hogdev->attrib, start, end, hogdev);
+> @@ -849,6 +855,7 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+>         hogdev->attrib = g_attrib_ref(attrib);
+>
+>         if (hogdev->reports == NULL) {
+> +               DBG("HoG discovering characteristics");
+>                 gatt_discover_char(hogdev->attrib, prim->range.start,
+>                                                 prim->range.end, NULL,
+>                                                 char_discovered_cb, hogdev);
+> --
+> 2.5.0.457.gab17608
 
-I checked this and do not get any warning as CONFIG_PM_SLEEP selects 
-CONFIG_PM.
+Applied, thanks.
 
-> You have to give me a bit of better description on what this change is actually for.
+Note: We had the plan to move to android/hog.c at some point but
+things are starting to divert too much between the 2 files, not to
+mention we still need to port it to use bt_gatt_client and gatt_db
+APIs perhaps you can help getting this done?
 
-This is the common part of runtime suspend and system sleep functions.
-Please, see my reply to your comments on patch 4/4.
 
-Regards
-
-Fred
+-- 
+Luiz Augusto von Dentz
