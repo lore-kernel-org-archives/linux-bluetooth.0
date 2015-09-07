@@ -1,41 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <55EDAD50.8030000@linux.intel.com>
+Date: Mon, 07 Sep 2015 17:29:20 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <55ED3BFA.206@ubnt.com>
-References: <CAMib2GZpa=FgsNKXThWnNZ=m=nQgLJj8j1bYd8v12vb1dwOLNg@mail.gmail.com>
-	<55ED3BFA.206@ubnt.com>
-Date: Mon, 7 Sep 2015 19:47:12 +0300
-Message-ID: <CAMib2GZ1D_Pp_m6qLMitzjAo7vS6Hrq1q9uaeAWg4zUYvj4u0w@mail.gmail.com>
-Subject: Re: iOS 8 can't discover device
-From: Kyle Shneider <shneiderkyle@gmail.com>
-To: Andrejs Hanins <andrejs.hanins@ubnt.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] Bluetooth: hci_bcm: Fix IRQ polarity for T100
+References: <1441373747-23042-1-git-send-email-frederic.danis@linux.intel.com> <1441373747-23042-3-git-send-email-frederic.danis@linux.intel.com> <16F8AF0D-420C-45C4-A042-1FCA3BD9DD1C@holtmann.org>
+In-Reply-To: <16F8AF0D-420C-45C4-A042-1FCA3BD9DD1C@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2015-09-07 10:25 GMT+03:00 Andrejs Hanins <andrejs.hanins@ubnt.com>:
+Hello Marcel,
+
+On 04/09/2015 21:13, Marcel Holtmann wrote:
+> Hi Fred,
 >
-> Hi Kyle,
+>> ACPI table for BCM2E39 of T100TA is not correct.
+>> Invert irq_polarity for this device.
+>>
+>> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+>> ---
+>> drivers/bluetooth/hci_bcm.c | 21 +++++++++++++++++++++
+>> 1 file changed, 21 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>> index f306541..efb9566 100644
+>> --- a/drivers/bluetooth/hci_bcm.c
+>> +++ b/drivers/bluetooth/hci_bcm.c
+>> @@ -32,6 +32,7 @@
+>> #include <linux/gpio/consumer.h>
+>> #include <linux/tty.h>
+>> #include <linux/interrupt.h>
+>> +#include <linux/dmi.h>
+>>
+>> #include <net/bluetooth/bluetooth.h>
+>> #include <net/bluetooth/hci_core.h>
+>> @@ -546,6 +547,20 @@ static int bcm_resource(struct acpi_resource *ares, void *data)
+>> 	return 1;
+>> }
+>>
+>> +/* IRQ polarity of some chipset are not defined correctly in ACPI table. */
+>> +static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
+>> +#if defined(CONFIG_DMI) && defined(CONFIG_X86)
+>> +	{
+>> +		/* Asus T100TA */
 >
-> On 09/06/2015 05:23 PM, Kyle Shneider wrote:
-> > Hello again.
-> >
-> > I'm testing bluez 5.33 on raspberry pi. After successfully launching
-> > bluetoothd, powering hci-device up and setting it 'Discoverable' (done
-> > through DBus API) iPad mini can't see it. In other way shitty android
-> > 4.1.1 tablet finds raspberry in a moment.
-> > Have i missed something?
-> iOS will only show you devices which implement at least one of the Bluetooth profiles supported by iOS (https://support.apple.com/en-us/HT204387).
-> So you need to have appropriate SDP record with supported profile. I would suggest to start with org.bluez.ProfileManager1 D-Bus interface.
-> > Did anyone have successful experience of pairing apple devices and
-> > latest versions of bluez?
-> > BTW ble adapter: cambridge silicon radio.
-> >
+> I think instead of a comment you could just fill in .ident here. Or is that suppose to be used for something else?
 
+OK
 
-Thanks for the answer Andrejs.
-I don't understand. What about GATT profile? Can iOS device initialize
-pairing via GATT profile?
+>> +		.matches = {
+>> +			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+>> +			DMI_MATCH(DMI_PRODUCT_NAME, "T100TA"),
+>
+> Why are we not using DMI_EXACT_MATCH here in the first place. We really know which one is broken, correct?
 
--- 
-Kyle Shneider
+Yes, I will use it.
+
+>> +		},
+>> +	},
+>> +#endif
+>
+> What is this #ifdef buying us? Is include/linux/dmi.h in some way that we can not have this defined all the time?
+
+OK, will be removed.
+
+>> +	{ }
+>> +};
+>> +
+>> static int bcm_acpi_probe(struct bcm_device *dev)
+>> {
+>> 	struct platform_device *pdev = dev->pdev;
+>> @@ -608,6 +623,12 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+>>
+>> 	acpi_dev_get_resources(adev, &resources, bcm_resource, dev);
+>>
+>> +	if (strstr(id->id, "BCM2E39") &&
+>
+> Lets not bother with that check and just always run through the DMI table here. Especially when using DMI_EXACT_MATCH that should not be a problem.
+
+OK.
+I will also use dmi_system_id.driver_data to store the correct polarity 
+for T100TA.
+
+> If however that causes a problem, then I prefer we actually set .driver_data in the ACPI module table and base the check on the .driver_data instead of checking the string here once more.
+>
+> I really don't know if BCM2E39 is specific to a single design or manufacture or platform. I am not sure how good we are in not accidentally re-using these IDs.
+>
+>> +	    dmi_check_system(bcm_wrong_irq_dmi_table)) {
+>> +		bt_dev_dbg(dev, "Fix irq polarity");
+>> +		dev->irq_polarity = !dev->irq_polarity;
+>> +	}
+>> +
+>> 	return 0;
+>> }
+>> #else
+
+Regards
+
+Fred
