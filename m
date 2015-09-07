@@ -1,89 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
+From: Bhuvanchandra <bhuvanchandradv@gmail.com>
+Subject: build issues with rtl8723au_bt
+To: linux-bluetooth@vger.kernel.org
+Cc: Larry.Finger@lwfinger.net, bhuvanchandra.dv@gmail.com
+Message-ID: <55ED8120.4060604@gmail.com>
+Date: Mon, 7 Sep 2015 17:50:48 +0530
 MIME-Version: 1.0
-In-Reply-To: <1441413941-5774-1-git-send-email-jpawlowski@google.com>
-References: <1441413941-5774-1-git-send-email-jpawlowski@google.com>
-Date: Mon, 7 Sep 2015 16:02:29 +0300
-Message-ID: <CABBYNZJLX6xHMRAUuN_Ui0Qbporqc1SQn=aO-CirSMU8QaBXOQ@mail.gmail.com>
-Subject: Re: [BlueZ v5 1/2] doc/settings-storage: describe gatt attributes
- storage format
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi!
 
-On Sat, Sep 5, 2015 at 3:45 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> ---
->  doc/settings-storage.txt | 37 ++++++++++++++++++++++++++++++++++++-
->  1 file changed, 36 insertions(+), 1 deletion(-)
->
-> diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-> index 6c9f058..aea50a6 100644
-> --- a/doc/settings-storage.txt
-> +++ b/doc/settings-storage.txt
-> @@ -139,11 +139,15 @@ Cache directory file format
->  ============================
->
->  Each file, named by remote device address, may includes multiple groups
-> -(General and ServiceRecords).
-> +(General, ServiceRecords, Attributes).
->
->  In ServiceRecords, SDP records are stored using their handle as key
->  (hexadecimal format).
->
-> +In "Attributes" group GATT database is stored using attribute handle as key
-> +(hexadecimal format). Value associated with this handle is serialized form of
-> +all data required to re-create given attribute. ":" is used to separate fields.
-> +
->  [General] group contains:
->
->    Name         String          Remote device friendly name
-> @@ -155,6 +159,37 @@ In ServiceRecords, SDP records are stored using their handle as key
->    <0x...>      String          SDP record as hexadecimal encoded
->                                 string
->
-> +In [Attributes] group value always starts with attribute type, that determines
-> +how to interpret rest of value:
-> +
-> +  Primary service:
-> +    2800:end_handle:uuid
-> +
-> +  Secondary service:
-> +    2801:end_handle:uuid
-> +
-> +  Included service:
-> +    2802:start_handle:end_handle:uuid
-> +
-> +  Characteristic:
-> +    2803:value_handle:properties:uuid
-> +
-> +  Descriptor:
-> +    uuid
-> +
-> +Sample Attributes section:
-> +  [Attributes]
-> +  0001=2800:0005:1801
-> +  0002=2803:0003:20:2a05
-> +  0014=2800:001c:1800
-> +  0015=2803:0016:02:2a00
-> +  0017=2803:0018:02:2a01
-> +  0019=2803:001a:02:2aa6
-> +  0028=2800:ffff:0000180d-0000-1000-8000-00805f9b34fb
-> +  0029=2803:002a:10:00002a37-0000-1000-8000-00805f9b34fb
-> +  002b=2803:002c:02:00002a38-0000-1000-8000-00805f9b34fb
-> +  002d=2803:002e:08:00002a39-0000-1000-8000-00805f9b34fb
-> +
->
->  Info file format
->  ================
-> --
-> 2.1.4
+I'm testing RTL8723BU(available in LM811. USB ID 0bda:b720) WiFi BT USB module.
+Kernel version used: 4.1.5. Cross-compiled the Wifi Driver from[1] it worked fine.
+While crosscompiling the driver for BT which is available at[2], there are few
+compile time errors:
+....
+make ARCH=arm CROSS_COMPILE=/home/dvb/gcc-linaro/bin/arm-linux-gnueabihf- -C /home/dvb/linux-toradex M=/home/dvb/rtl8723au_bt modules
+make[1]: Entering directory '/home/dvb/toradex/linux-toradex/linux-toradex-vf/linux-toradex'
+   CC [M]  /home/dvb/rtl8723au_bt/btusb.o
+/home/dvb/rtl8723au_bt/btusb.c: In function 'hci_reassembly':
+/home/dvb/rtl8723au_bt/btusb.c:376:15: error: 'NUM_REASSEMBLY' undeclared (first use in this function)
+       index >= NUM_REASSEMBLY)
+                ^
+/home/dvb/rtl8723au_bt/btusb.c:376:15: note: each undeclared identifier is reported only once for each function it appears in
+/home/dvb/rtl8723au_bt/btusb.c:379:12: error: 'struct hci_dev' has no member named 'reassembly'
+   skb = hdev->reassembly[index];
+             ^
+/home/dvb/rtl8723au_bt/btusb.c:405:7: error: 'struct hci_dev' has no member named 'reassembly'
+    hdev->reassembly[index] = skb;
+        ^
+/home/dvb/rtl8723au_bt/btusb.c:427:10: error: 'struct hci_dev' has no member named 'reassembly'
+       hdev->reassembly[index] = NULL;
+           ^
+/home/dvb/rtl8723au_bt/btusb.c:440:10: error: 'struct hci_dev' has no member named 'reassembly'
+       hdev->reassembly[index] = NULL;
+           ^
+/home/dvb/rtl8723au_bt/btusb.c:453:10: error: 'struct hci_dev' has no member named 'reassembly'
+       hdev->reassembly[index] = NULL;
+           ^
+/home/dvb/rtl8723au_bt/btusb.c:466:8: error: 'struct hci_dev' has no member named 'reassembly'
+     hdev->reassembly[index] = NULL;
+         ^
+scripts/Makefile.build:264: recipe for target '/home/dvb/rtl8723au_bt/btusb.o' failed
+make[2]: *** [/home/dvb/rtl8723au_bt/btusb.o] Error 1
+Makefile:1384: recipe for target '_module_/home/dvb/rtl8723au_bt' failed
+make[1]: *** [_module_/home/dvb/rtl8723au_bt] Error 2
+make[1]: Leaving directory '/home/dvb/toradex/linux-toradex/linux-toradex-vf/linux-toradex'
+Makefile-custom:22: recipe for target 'all' failed
+make: *** [all] Error 2
+.....
 
-Applied, thanks. Note that I did remove the conversion to UUID 128.
+I also tried the recent branches all got the same errors.
+Does any one tested RTL8723BU's bluetooth?
 
+I couldn't find any in-tree driver available for RTL8723BU. Is there anything i'm missing or
+doing wrong ?
 
--- 
-Luiz Augusto von Dentz
+[1] https://github.com/lwfinger/rtl8723bu
+[2] https://github.com/lwfinger/rtl8723au_bt
+
+Best regards,
+Bhuvan
+
