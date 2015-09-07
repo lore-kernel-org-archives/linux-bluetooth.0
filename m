@@ -1,89 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: build issues with rtl8723au_bt
-To: Bhuvanchandra <bhuvanchandradv@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-References: <55ED8120.4060604@gmail.com>
-Cc: bhuvanchandra.dv@gmail.com
-From: Larry Finger <Larry.Finger@lwfinger.net>
-Message-ID: <55EE0161.8080402@lwfinger.net>
-Date: Mon, 7 Sep 2015 16:28:01 -0500
 MIME-Version: 1.0
-In-Reply-To: <55ED8120.4060604@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <55ED3BFA.206@ubnt.com>
+References: <CAMib2GZpa=FgsNKXThWnNZ=m=nQgLJj8j1bYd8v12vb1dwOLNg@mail.gmail.com>
+	<55ED3BFA.206@ubnt.com>
+Date: Mon, 7 Sep 2015 19:47:12 +0300
+Message-ID: <CAMib2GZ1D_Pp_m6qLMitzjAo7vS6Hrq1q9uaeAWg4zUYvj4u0w@mail.gmail.com>
+Subject: Re: iOS 8 can't discover device
+From: Kyle Shneider <shneiderkyle@gmail.com>
+To: Andrejs Hanins <andrejs.hanins@ubnt.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 09/07/2015 07:20 AM, Bhuvanchandra wrote:
-> Hi!
+2015-09-07 10:25 GMT+03:00 Andrejs Hanins <andrejs.hanins@ubnt.com>:
 >
-> I'm testing RTL8723BU(available in LM811. USB ID 0bda:b720) WiFi BT USB module.
-> Kernel version used: 4.1.5. Cross-compiled the Wifi Driver from[1] it worked fine.
-> While crosscompiling the driver for BT which is available at[2], there are few
-> compile time errors:
-> ....
-> make ARCH=arm CROSS_COMPILE=/home/dvb/gcc-linaro/bin/arm-linux-gnueabihf- -C
-> /home/dvb/linux-toradex M=/home/dvb/rtl8723au_bt modules
-> make[1]: Entering directory
-> '/home/dvb/toradex/linux-toradex/linux-toradex-vf/linux-toradex'
->    CC [M]  /home/dvb/rtl8723au_bt/btusb.o
-> /home/dvb/rtl8723au_bt/btusb.c: In function 'hci_reassembly':
-> /home/dvb/rtl8723au_bt/btusb.c:376:15: error: 'NUM_REASSEMBLY' undeclared (first
-> use in this function)
->        index >= NUM_REASSEMBLY)
->                 ^
-> /home/dvb/rtl8723au_bt/btusb.c:376:15: note: each undeclared identifier is
-> reported only once for each function it appears in
-> /home/dvb/rtl8723au_bt/btusb.c:379:12: error: 'struct hci_dev' has no member
-> named 'reassembly'
->    skb = hdev->reassembly[index];
->              ^
-> /home/dvb/rtl8723au_bt/btusb.c:405:7: error: 'struct hci_dev' has no member
-> named 'reassembly'
->     hdev->reassembly[index] = skb;
->         ^
-> /home/dvb/rtl8723au_bt/btusb.c:427:10: error: 'struct hci_dev' has no member
-> named 'reassembly'
->        hdev->reassembly[index] = NULL;
->            ^
-> /home/dvb/rtl8723au_bt/btusb.c:440:10: error: 'struct hci_dev' has no member
-> named 'reassembly'
->        hdev->reassembly[index] = NULL;
->            ^
-> /home/dvb/rtl8723au_bt/btusb.c:453:10: error: 'struct hci_dev' has no member
-> named 'reassembly'
->        hdev->reassembly[index] = NULL;
->            ^
-> /home/dvb/rtl8723au_bt/btusb.c:466:8: error: 'struct hci_dev' has no member
-> named 'reassembly'
->      hdev->reassembly[index] = NULL;
->          ^
-> scripts/Makefile.build:264: recipe for target '/home/dvb/rtl8723au_bt/btusb.o'
-> failed
-> make[2]: *** [/home/dvb/rtl8723au_bt/btusb.o] Error 1
-> Makefile:1384: recipe for target '_module_/home/dvb/rtl8723au_bt' failed
-> make[1]: *** [_module_/home/dvb/rtl8723au_bt] Error 2
-> make[1]: Leaving directory
-> '/home/dvb/toradex/linux-toradex/linux-toradex-vf/linux-toradex'
-> Makefile-custom:22: recipe for target 'all' failed
-> make: *** [all] Error 2
-> .....
+> Hi Kyle,
 >
-> I also tried the recent branches all got the same errors.
-> Does any one tested RTL8723BU's bluetooth?
+> On 09/06/2015 05:23 PM, Kyle Shneider wrote:
+> > Hello again.
+> >
+> > I'm testing bluez 5.33 on raspberry pi. After successfully launching
+> > bluetoothd, powering hci-device up and setting it 'Discoverable' (done
+> > through DBus API) iPad mini can't see it. In other way shitty android
+> > 4.1.1 tablet finds raspberry in a moment.
+> > Have i missed something?
+> iOS will only show you devices which implement at least one of the Bluetooth profiles supported by iOS (https://support.apple.com/en-us/HT204387).
+> So you need to have appropriate SDP record with supported profile. I would suggest to start with org.bluez.ProfileManager1 D-Bus interface.
+> > Did anyone have successful experience of pairing apple devices and
+> > latest versions of bluez?
+> > BTW ble adapter: cambridge silicon radio.
+> >
 
-No. I have an RTL8723BU device on order. Once it arrives, I will be able to 
-test. The vendor BT driver relies on some features that were removed in kernel 
-4.1. As a proper driver for the Realtek BT devices is in kernel 4.2, I suggest 
-that you use it, rather than 4.1.
 
-> I couldn't find any in-tree driver available for RTL8723BU. Is there anything
-> i'm missing or
-> doing wrong ?
+Thanks for the answer Andrejs.
+I don't understand. What about GATT profile? Can iOS device initialize
+pairing via GATT profile?
 
-No, there is none. I refuse to submit any code that I have not tested. In 
-addition, I doubt that the vendor driver will ever be submitted to staging. It 
-is just too much work to clean up that ugly code. More likely, the device will 
-be added to the new driver rtl8xxxu that has just been submitted.
-
-Larry
-
+-- 
+Kyle Shneider
