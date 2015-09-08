@@ -1,68 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 09 Sep 2015 15:18:53 +1000
-From: Michael Gratton <mike@vee.net>
-Subject: MacbookPro12,1 Bluetooth not found by Bluez
-To: linux-bluetooth@vger.kernel.org
-Message-Id: <1441775933.3223.2@mail.quuxo.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1441715022-20327-2-git-send-email-luiz.dentz@gmail.com>
+References: <1441715022-20327-1-git-send-email-luiz.dentz@gmail.com>
+	<1441715022-20327-2-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 8 Sep 2015 10:40:19 -0700
+Message-ID: <CAD0=r8yuseCAN7RvtRwUA4eaA3eKhNaOq+8NofV8M+Herbt-vw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] core/gatt: Fix not able to read/write on reconnections
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
-Hi list,
+This patch fixes all my issues with writing just after connecting.
+Thanks alot!
 
-No Bluetooth adapter is being found by Bluez on my MacbookPro12,1 when 
-running Ubuntu 15.10, Linux 4.2rc8 and Bluez 5.33. After normal boot, 
-the output of `hcitool dev` contains no devices.
-
-Relevant kernel logs are below, but since it finds the BT adaptor but 
-also reports it as both hid-generic and input devices, I imagine I need 
-to switch it out of HID mode and into HCI mode. However, when I try 
-manually running hid2hci as root, the command silently fails and no 
-change in the visibility of the adaptor is observed:
-
- > mjg@payens:~$ sudo /lib/udev/hid2hci 
---evpath=/devices/pci0000:00/0000:00:14.0/usb1/1-3 --method=csr2 || 
-echo fail
- > fail
- > mjg@payens:~$
-
-Using methods other than csr2 results in hid2hci reporting an error.
-
-Is there anything I can do to help debug this?
-
-Thanks,
-//Mike
-
-Kernel logs:
-
-> [ 1.869553] usb 1-3: new full-speed USB device number 2 using xhci_hcd
-> ...
-> [ 2.004387] usb 1-3: New USB device found, idVendor=05ac, 
-> idProduct=8290
-> [ 2.004388] usb 1-3: New USB device strings: Mfr=1, Product=2, 
-> SerialNumber=0
-> [ 2.004389] usb 1-3: Product: Bluetooth USB Host Controller
-> [ 2.004390] usb 1-3: Manufacturer: Broadcom Corp.
-> [ 2.004478] usb 1-3: ep 0x85 - rounding interval to 64 microframes, 
-> ep desc says 80 microframes
-> [ 2.004480] usb 1-3: ep 0x86 - rounding interval to 64 microframes, 
-> ep desc says 80 microframes
-> ...
-> [ 2.425178] hid-generic 0003:05AC:8290.0001: input,hidraw4: USB HID 
-> v1.11 Keyboard [Broadcom Corp. Bluetooth USB Host Controller] on 
-> usb-0000:00:14.0-3/input0
-> [ 2.425259] input: Broadcom Corp. Bluetooth USB Host Controller as 
-> /devices/pci0000:00/0000:00:14.0/usb1/1-3/1-3:1.1/0003:05AC:8290.0002/input/input7
-> ...
-> [ 10.254634] usbcore: registered new interface driver btusb
-> ...
-> [ 16.642700] usb 1-3: device descriptor read/64, error -110
-
-
--- 
-⊨ Michael Gratton, Percept Wrangler.
-⚙ <http://mjog.vee.net/>
-
-
+On Tue, Sep 8, 2015 at 5:23 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Upon reconnecting the attributes may already be available from cache
+> which mean the client would be able to issue commands while discovery
+> is not complete thus btd_gatt_client_ready was not called yet.
+>
+> To fix now btd_gatt_client_ready is split into btd_gatt_client_connected
+> which is called whenever connected leaving btd_gatt_client_ready to only
+> deal with exporting services found during the discovery.
+> ---
+>  src/device.c      |  2 ++
+>  src/gatt-client.c | 24 +++++++++++++++++-------
+>  src/gatt-client.h |  1 +
+>  3 files changed, 20 insertions(+), 7 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index dc362d9..2102f23 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -4602,6 +4602,8 @@ static void gatt_client_init(struct btd_device *device)
+>         }
+>
+>         device->gatt_cache_used = !gatt_db_isempty(device->db);
+> +
+> +       btd_gatt_client_connected(device->client_dbus);
+>  }
+>
+>  static void gatt_server_init(struct btd_device *device, struct gatt_db *db)
+> diff --git a/src/gatt-client.c b/src/gatt-client.c
+> index d8a3429..225aa42 100644
+> --- a/src/gatt-client.c
+> +++ b/src/gatt-client.c
+> @@ -1825,20 +1825,14 @@ fail:
+>
+>  void btd_gatt_client_ready(struct btd_gatt_client *client)
+>  {
+> -       struct bt_gatt_client *gatt;
+> -
+>         if (!client)
+>                 return;
+>
+> -       gatt = btd_device_get_gatt_client(client->device);
+> -       if (!gatt) {
+> +       if (!client->gatt) {
+>                 error("GATT client not initialized");
+>                 return;
+>         }
+>
+> -       bt_gatt_client_unref(client->gatt);
+> -       client->gatt = bt_gatt_client_ref(gatt);
+> -
+>         client->ready = true;
+>
+>         DBG("GATT client ready");
+> @@ -1852,6 +1846,22 @@ void btd_gatt_client_ready(struct btd_gatt_client *client)
+>         queue_foreach(client->all_notify_clients, register_notify, client);
+>  }
+>
+> +void btd_gatt_client_connected(struct btd_gatt_client *client)
+> +{
+> +       struct bt_gatt_client *gatt;
+> +
+> +       gatt = btd_device_get_gatt_client(client->device);
+> +       if (!gatt) {
+> +               error("GATT client not initialized");
+> +               return;
+> +       }
+> +
+> +       DBG("Device connected.");
+> +
+> +       bt_gatt_client_unref(client->gatt);
+> +       client->gatt = bt_gatt_client_ref(gatt);
+> +}
+> +
+>  void btd_gatt_client_service_added(struct btd_gatt_client *client,
+>                                         struct gatt_db_attribute *attrib)
+>  {
+> diff --git a/src/gatt-client.h b/src/gatt-client.h
+> index a18db17..92a9255 100644
+> --- a/src/gatt-client.h
+> +++ b/src/gatt-client.h
+> @@ -23,6 +23,7 @@ struct btd_gatt_client *btd_gatt_client_new(struct btd_device *device);
+>  void btd_gatt_client_destroy(struct btd_gatt_client *client);
+>
+>  void btd_gatt_client_ready(struct btd_gatt_client *client);
+> +void btd_gatt_client_connected(struct btd_gatt_client *client);
+>  void btd_gatt_client_service_added(struct btd_gatt_client *client,
+>                                         struct gatt_db_attribute *attrib);
+>  void btd_gatt_client_service_removed(struct btd_gatt_client *client,
+> --
+> 2.4.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
