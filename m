@@ -1,103 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] core/gatt: Fix not able to read/write on reconnections
-Date: Tue,  8 Sep 2015 15:23:41 +0300
-Message-Id: <1441715022-20327-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1441715022-20327-1-git-send-email-luiz.dentz@gmail.com>
-References: <1441715022-20327-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <55EEB508.1000907@linux.intel.com>
+Date: Tue, 08 Sep 2015 12:14:32 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+To: Ilya Faenson <ifaenson@broadcom.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v2 4/4] Bluetooth: hci_bcm: Add suspend/resume runtime
+ PM functions
+References: <1441373747-23042-1-git-send-email-frederic.danis@linux.intel.com> <1441373747-23042-5-git-send-email-frederic.danis@linux.intel.com> <CBC77539-71FB-4A84-B849-A9987BD29488@holtmann.org> <55EDABA9.5050207@linux.intel.com> <E0D3336E15B58B4294723AC879BA5E9429247F@IRVEXCHMB15.corp.ad.broadcom.com>
+In-Reply-To: <E0D3336E15B58B4294723AC879BA5E9429247F@IRVEXCHMB15.corp.ad.broadcom.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello Ilya,
 
-Upon reconnecting the attributes may already be available from cache
-which mean the client would be able to issue commands while discovery
-is not complete thus btd_gatt_client_ready was not called yet.
+On 07/09/2015 23:32, Ilya Faenson wrote:
+<snip>
+>>> @@ -726,7 +826,10 @@ MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
+>>> >>#endif
+>>> >>
+>>> >>/* Platform suspend and resume callbacks */
+>>> >>-static SIMPLE_DEV_PM_OPS(bcm_pm_ops, bcm_suspend, bcm_resume);
+>>> >>+static const struct dev_pm_ops bcm_pm_ops = {
+>>> >>+	SET_SYSTEM_SLEEP_PM_OPS(bcm_suspend, bcm_resume)
+>>> >>+	SET_RUNTIME_PM_OPS(bcm_runtime_suspend, bcm_runtime_resume, NULL)
+>> >
+>> >I think you really need to explain why runtime suspend and system sleep is actually different for Broadcom based devices. Since for the Intel ones it turned out to be the same (at least for now).
+> I dissociate system sleep and runtime suspend functions for the
+> following reasons:
+>
+> 1) IRQ is enabled as a wake source only during system sleep, while this
+> is not needed for runtime suspend.
+>
+> IF: The ideal implementation should suspend both the UART and the BT device at runtime. UART should be suspended in a state where the device is flow-controlled so the device is unable to send. BT device GPIO based interrupt is then needed for runtime resume initiated by the device. Upon the interrupt, your code will resume the UART and allow the device to transmit again. If you leave the UART on w/o flow-controlling the device in suspend you in fact don't need that interrupt . However, OEMs will not like that due to the unnecessary UART power consumption. Speaking from experience.:-)
 
-To fix now btd_gatt_client_ready is split into btd_gatt_client_connected
-which is called whenever connected leaving btd_gatt_client_ready to only
-deal with exporting services found during the discovery.
----
- src/device.c      |  2 ++
- src/gatt-client.c | 24 +++++++++++++++++-------
- src/gatt-client.h |  1 +
- 3 files changed, 20 insertions(+), 7 deletions(-)
+Sorry if I was not quite clear enough.
 
-diff --git a/src/device.c b/src/device.c
-index dc362d9..2102f23 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4602,6 +4602,8 @@ static void gatt_client_init(struct btd_device *device)
- 	}
- 
- 	device->gatt_cache_used = !gatt_db_isempty(device->db);
-+
-+	btd_gatt_client_connected(device->client_dbus);
- }
- 
- static void gatt_server_init(struct btd_device *device, struct gatt_db *db)
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index d8a3429..225aa42 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1825,20 +1825,14 @@ fail:
- 
- void btd_gatt_client_ready(struct btd_gatt_client *client)
- {
--	struct bt_gatt_client *gatt;
--
- 	if (!client)
- 		return;
- 
--	gatt = btd_device_get_gatt_client(client->device);
--	if (!gatt) {
-+	if (!client->gatt) {
- 		error("GATT client not initialized");
- 		return;
- 	}
- 
--	bt_gatt_client_unref(client->gatt);
--	client->gatt = bt_gatt_client_ref(gatt);
--
- 	client->ready = true;
- 
- 	DBG("GATT client ready");
-@@ -1852,6 +1846,22 @@ void btd_gatt_client_ready(struct btd_gatt_client *client)
- 	queue_foreach(client->all_notify_clients, register_notify, client);
- }
- 
-+void btd_gatt_client_connected(struct btd_gatt_client *client)
-+{
-+	struct bt_gatt_client *gatt;
-+
-+	gatt = btd_device_get_gatt_client(client->device);
-+	if (!gatt) {
-+		error("GATT client not initialized");
-+		return;
-+	}
-+
-+	DBG("Device connected.");
-+
-+	bt_gatt_client_unref(client->gatt);
-+	client->gatt = bt_gatt_client_ref(gatt);
-+}
-+
- void btd_gatt_client_service_added(struct btd_gatt_client *client,
- 					struct gatt_db_attribute *attrib)
- {
-diff --git a/src/gatt-client.h b/src/gatt-client.h
-index a18db17..92a9255 100644
---- a/src/gatt-client.h
-+++ b/src/gatt-client.h
-@@ -23,6 +23,7 @@ struct btd_gatt_client *btd_gatt_client_new(struct btd_device *device);
- void btd_gatt_client_destroy(struct btd_gatt_client *client);
- 
- void btd_gatt_client_ready(struct btd_gatt_client *client);
-+void btd_gatt_client_connected(struct btd_gatt_client *client);
- void btd_gatt_client_service_added(struct btd_gatt_client *client,
- 					struct gatt_db_attribute *attrib);
- void btd_gatt_client_service_removed(struct btd_gatt_client *client,
--- 
-2.4.3
+Both bcm_runtime_suspend() and bcm_suspend() enable flow control and 
+deassert device_wakeup GPIO in the same way, so that device can resume 
+the link via the irq.
+The bcm_suspend just adds the capability for the IRQ to wake-up the 
+platform (if device_may_wakeup). On resume we disable only this 
+capability, meaning that IRQ remains enabled.
 
+>
+> Thanks,
+>   -Ilya
+>
+> 2) runtime suspend functions do not need to protect usage of dev->hu as
+> these functions are called with a valid dev->hu (these functions are
+> disabled before dev->hu is set to NULL when BCM driver is closed).
+> System sleep functions need this protection as they can be called even
+> when driver is not opened, and need to ensure that dev->hu is valid
+> until GPIO and UART flow control management is performed.
+>
+> Common part (GPIO and UART flow control management) for runtime suspend
+> and system sleep moved to __bcm_suspend() and __bcm_resume() in previous
+> patch.
+
+Regards
+
+Fred
