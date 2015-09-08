@@ -1,88 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Mellberg, Bo" <Bo.Mellberg@physio-control.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Responding to DID inquiries
-Date: Tue, 8 Sep 2015 06:31:26 +0000
-Message-ID: <BY2PR08MB1669FD4CC0ED6960011BA2F4D2530@BY2PR08MB1669.namprd08.prod.outlook.com>
-Content-Type: text/plain; charset="us-ascii"
+Subject: Re: iOS 8 can't discover device
+To: Kyle Shneider <shneiderkyle@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+References: <CAMib2GZpa=FgsNKXThWnNZ=m=nQgLJj8j1bYd8v12vb1dwOLNg@mail.gmail.com>
+ <55ED3BFA.206@ubnt.com>
+ <CAMib2GZ1D_Pp_m6qLMitzjAo7vS6Hrq1q9uaeAWg4zUYvj4u0w@mail.gmail.com>
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
+Message-ID: <55EE7672.1040406@ubnt.com>
+Date: Tue, 8 Sep 2015 08:47:30 +0300
 MIME-Version: 1.0
+In-Reply-To: <CAMib2GZ1D_Pp_m6qLMitzjAo7vS6Hrq1q9uaeAWg4zUYvj4u0w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-My embedded system is required to respond to "Device Identification Profile" requests, sometimes called DID, DI or DIP. The DID should hold the following attributes:
+Hi,
 
-SpecificationID
-VendorID
-ProductID
-Version
-PrimaryRecord
-VendorIDSource
-ServiceDescription
-
-My question: how do I "activate" this profile? For example, to let the sdp-daemon know that I offer OBEX-FTP, I use:
-
-~ #sdptool add FTP
-OBEX File Transfer service registered
-~ # sdptool browse local
-Browsing FF:FF:FF:00:00:00 ...
-Service Name: OBEX File Transfer
-Service RecHandle: 0x10000
-Service Class ID List:
-  "OBEX File Transfer" (0x1106)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 10
-  "OBEX" (0x0008)
-Profile Descriptor List:
-  "OBEX File Transfer" (0x1106)
-    Version: 0x0100
-
-Looking at the help for sdptool:
-
-~ # sdptool --help
-sdptool - SDP tool v2.25
-Usage:
-        sdptool [options] <command> [command parameters]
-Options:
-        -h              Display help
-        -i              Specify source interface
-Commands:
-        search          Search for a service
-        browse          Browse all available services
-        records         Request all records
-        add             Add local service
-        del             Delete local service
-        get             Get local service
-        setattr         Set/Add attribute to a SDP record
-        setseq          Set/Add attribute sequence to a SDP record
-
-Services:
-        DID SP DUN LAN FAX OPUSH FTP HS HF HFAG SAP NAP GN PANU HID CIP
-        CTP A2SRC A2SNK AVRCT AVRTG SR1 SYNCML ACTIVESYNC HOTSYNC PALMOS
-        NOKID PCSUITE NGAGE APPLE ISYNC
-
-There is clearly a DID service available.
-
-But adding DID:
-
-~ #sdptool add DID
-~ #
-
-Does nothing. No new service is registered. What do I need to do to be able to let my clients request the DID service record, and to populate it with my desired attributes above?
-
-Thanks,
-
-/Bo
-
-
-________________________________
-________________________________
-[CONFIDENTIALITY AND PRIVACY NOTICE]
-
-Information transmitted by this email is proprietary to Physio-Control and is intended for use only by the individual or entity to which it is addressed, and may contain information that is private, privileged, confidential or exempt from disclosure under applicable law. If you are not the intended recipient or it appears that this mail has been forwarded to you without proper authority, you are notified that any use or dissemination of this information in any manner is strictly prohibited. In such cases, please delete this mail from your records.
-
-To view this notice in other languages you can either select the following link or manually copy and paste the link into the address bar of a web browser: http://www.physio-control.com/emaildisclaimer/
-
-________________________________
-________________________________
+On 09/07/2015 07:47 PM, Kyle Shneider wrote:
+> 2015-09-07 10:25 GMT+03:00 Andrejs Hanins <andrejs.hanins@ubnt.com>:
+>>
+>> Hi Kyle,
+>>
+>> On 09/06/2015 05:23 PM, Kyle Shneider wrote:
+>>> Hello again.
+>>>
+>>> I'm testing bluez 5.33 on raspberry pi. After successfully launching
+>>> bluetoothd, powering hci-device up and setting it 'Discoverable' (done
+>>> through DBus API) iPad mini can't see it. In other way shitty android
+>>> 4.1.1 tablet finds raspberry in a moment.
+>>> Have i missed something?
+>> iOS will only show you devices which implement at least one of the Bluetooth profiles supported by iOS (https://support.apple.com/en-us/HT204387).
+>> So you need to have appropriate SDP record with supported profile. I would suggest to start with org.bluez.ProfileManager1 D-Bus interface.
+>>> Did anyone have successful experience of pairing apple devices and
+>>> latest versions of bluez?
+>>> BTW ble adapter: cambridge silicon radio.
+>>>
+> 
+> 
+> Thanks for the answer Andrejs.
+> I don't understand. What about GATT profile?
+I think, it is the same - you need to advertise a service supported by iOS in order for the BLE device to appear in standard iOS Bluetooth device list. However, if you write your own app, there is an access to all BLE devices seen around.
+Can iOS device initialize
+> pairing via GATT profile?
+Yes. It worked for me when I tried something like kernel 3.19 and BlueZ 5.32 or so. I was using LightBlue app for my testing.
+> 
