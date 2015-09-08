@@ -1,35 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] core/device: Only reload database if empty
-Date: Tue,  8 Sep 2015 15:23:42 +0300
-Message-Id: <1441715022-20327-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1441715022-20327-1-git-send-email-luiz.dentz@gmail.com>
-References: <1441715022-20327-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] shared/gatt-client: Fix not freeing notify data
+Date: Tue,  8 Sep 2015 15:23:40 +0300
+Message-Id: <1441715022-20327-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-There is no need to reload the database once it has been populated.
+notify_data_write_ccc takes another reference in case it succeed so
+the original reference should be dropped to cause the data to be freed
+once notify_data_write_ccc completes.
 ---
- src/device.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/shared/gatt-client.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 2102f23..8184508 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4717,7 +4717,8 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 	dst = device_get_address(dev);
- 	ba2str(dst, dstaddr);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 903afa7..0983852 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1596,8 +1596,7 @@ static void complete_unregister_notify(void *data)
+ 						!notify_data->chrc->ccc_handle)
+ 		goto done;
  
--	load_gatt_db(dev, srcaddr, dstaddr);
-+	if (gatt_db_isempty(dev->db))
-+		load_gatt_db(dev, srcaddr, dstaddr);
+-	if (notify_data_write_ccc(notify_data, false, disable_ccc_callback))
+-		return;
++	notify_data_write_ccc(notify_data, false, disable_ccc_callback);
  
- 	gatt_client_init(dev);
- 	gatt_server_init(dev, btd_gatt_database_get_db(database));
+ done:
+ 	notify_data_unref(notify_data);
 -- 
 2.4.3
 
