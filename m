@@ -1,88 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH v3 1/3] Bluetooth: hci_bcm: Fix IRQ polarity for T100
+Subject: Re: [PATCH] Bluetooth: remove SCO fragments on connection close
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1441785286-5840-2-git-send-email-frederic.danis@linux.intel.com>
-Date: Wed, 9 Sep 2015 09:13:18 -0700
+In-Reply-To: <1441807855-17685-1-git-send-email-kubax.t.pawlak@intel.com>
+Date: Wed, 9 Sep 2015 08:43:39 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <8BF54238-1D33-421A-B46A-F8EA4A49145C@holtmann.org>
-References: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com> <1441785286-5840-2-git-send-email-frederic.danis@linux.intel.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
+Message-Id: <F7522D07-B358-4BC4-A93A-E569F74614FF@holtmann.org>
+References: <1441807855-17685-1-git-send-email-kubax.t.pawlak@intel.com>
+To: Kuba Pawlak <kubax.t.pawlak@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+Hi Kuba,
 
-> ACPI table for BCM2E39 of T100TA is not correct.
-> Set correct irq_polarity for this device.
+> SCO packet reassembler may have a fragment of SCO packet, from
+> previous connection, cached and not removed when SCO connection
+> is ended. Packets from new SCO connection are then going to be
+> attached to that fragment, creating an invalid SCO packets.
 > 
-> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+> Controllers like Intel's WilkinsPeak are always fragmenting
+> SCO packet into 3 parts (#1, #2, #3). Packet #1 contains
+> SCO header and audio data, others just audio data. if there is
+> a fragment cached from previous connection, i.e. #1, first
+> SCO packet from new connection is going to be attached to it
+> creating packet consisting of fragments #1-#1-#2. This will
+> be forwarded to upper layers. After that, fragment #3 is going
+> to be used as a starting point for another SCO packet.
+> It does not contain a SCO header, but the code expects it,
+> casts a SCO header structure on it, and reads whatever audio
+> data happens to be there as SCO packet length and handle.
+> From that point on, we are assembling random data into SCO
+> packets. Usually it recovers quickly as initial audio data
+> usually contains mostly zeros (muted stream), but setups
+> of over 4 seconds were observed.
+> Issue manifests itself by printing on the console:
+> Bluetooth: hci0 SCO packet for unknown connection handle 48
+> Bluetooth: hci0 SCO packet for unknown connection handle 2560
+> Bluetooth: hci0 SCO packet for unknown connection handle 12288
+> It may also show random handles if audio data was non-zeroed.
+> Hcidump shows SCO packets with random length and handles.
+> 
+> Few messages with handle 0 at connection creation are OK
+> for some controllers (like WilkinsPeak), as there are SCO packets
+> with zeroed handle at the beginning (possible controller bug).
+> Few of such messages at connection end, with a handle looking
+> OK (around 256, 512, 768 ...) is also OK, as these are last
+> SCO packets that were assembled and sent up, before connection
+> was broken, but were not handled in time.
+> 
+> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
 > ---
-> drivers/bluetooth/hci_bcm.c | 24 ++++++++++++++++++++++++
-> 1 file changed, 24 insertions(+)
+> drivers/bluetooth/btusb.c | 13 +++++++++++++
+> 1 file changed, 13 insertions(+)
 > 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index f306541..6551251 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -32,6 +32,7 @@
-> #include <linux/gpio/consumer.h>
-> #include <linux/tty.h>
-> #include <linux/interrupt.h>
-> +#include <linux/dmi.h>
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 9521b7bcc22d61b7690a928bc09500c883fe5495..e712be14cd745bf32149bee037d727c2fed2fcef 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -516,6 +516,18 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+> 	return err;
+> }
 > 
-> #include <net/bluetooth/bluetooth.h>
-> #include <net/bluetooth/hci_core.h>
-> @@ -513,6 +514,22 @@ static const struct acpi_gpio_mapping acpi_bcm_default_gpios[] = {
-> };
-> 
-> #ifdef CONFIG_ACPI
-> +static u8 acpi_active_low = ACPI_ACTIVE_LOW;
+> +static int btusb_remove_sco_fragment(struct btusb_data *data)
+> +{
+> +	int err = 0;
 > +
-> +/* IRQ polarity of some chipsets are not defined correctly in ACPI table. */
-> +static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
-> +	{
-> +		.ident = "Asus T100TA",
-> +		.matches = {
-> +			DMI_EXACT_MATCH(DMI_SYS_VENDOR,
-> +					"ASUSTeK COMPUTER INC."),
-> +			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "T100TA"),
-> +		},
-> +		.driver_data = &acpi_active_low,
-> +	},
-> +	{ }
-> +};
+> +	spin_lock(&data->rxlock);
+> +	kfree_skb(data->sco_skb);
+> +	data->sco_skb = NULL;
+> +	spin_unlock(&data->rxlock);
 > +
-> static int bcm_resource(struct acpi_resource *ares, void *data)
+> +	return err;
+> +}
+> +
+> static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
 > {
-> 	struct bcm_device *dev = data;
-> @@ -552,6 +569,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
-> 	const struct acpi_device_id *id;
-> 	struct acpi_device *adev;
-> 	LIST_HEAD(resources);
-> +	const struct dmi_system_id *dmi_id;
-> 	int ret;
-> 
-> 	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
-> @@ -608,6 +626,12 @@ static int bcm_acpi_probe(struct bcm_device *dev)
-> 
-> 	acpi_dev_get_resources(adev, &resources, bcm_resource, dev);
-> 
-> +	dmi_id = dmi_first_match(bcm_wrong_irq_dmi_table);
-> +	if (dmi_id) {
-> +		bt_dev_dbg(dev, "Fix irq polarity");
+> 	struct sk_buff *skb;
+> @@ -777,6 +789,7 @@ static void btusb_isoc_complete(struct urb *urb)
+> 			}
+> 		}
+> 	} else if (urb->status == -ENOENT) {
+> +		btusb_remove_sco_fragment(data);
+> 		/* Avoid suspend failed when usb_kill_urb */
+> 		return;
+> 	}
 
-I would actually make this bt_dev_warn, but we do not have that helper at the moment. Might be worth while adding it. These obvious bugs in firmware need to be pointed out and not quietly swallowed.
+I think we need to check Documentation/usb/error-codes.txt since I wonder if we have more than just one error code that would need to trigger this behavior.
 
-Also lets be a bit more verbose with these things
+So in general this is the suspend case. And in theory SCO packets could survive SCO packets. So while in practice on suspend the SCO connection will go down, I think this is fixing the symptom and not the issue here.
 
-		bt_dev_warn(dev, "%s: Overwriting IRQ polarity to active low", dmi->ident)
+What we should be looking into instead is the btusb_notify function that gets called from the core when new connections are established or voice settings are changed.
 
-> +		dev->irq_polarity = *(u8*)dmi_id->driver_data;
-> +	}
-> +
-> 	return 0;
+This reminds me that the schedule_work in that function should no longer be needed since we can now sleep in the btusb_notify callback. You might want to look into changing this to make the btusb code a lot simpler.
+
+Without looking to deeply into this, it seems that this situation is when you want to reset the sco_skb:
+
+                if (data->isoc_altsetting != new_alts) {                         
+                        clear_bit(BTUSB_ISOC_RUNNING, &data->flags);             
+                        usb_kill_anchored_urbs(&data->isoc_anchor);              
+
+                        /* Add appropriate comment here explaining why */
+                        spin_lock(&data->rxlock);
+                        kfree_skb(data->sco_skb);
+                        data->sco_skb = NULL;
+                        spin_unlock(&data->rxlock);
+                                                                                 
+                        if (__set_isoc_interface(hdev, new_alts) < 0)            
+                                return;                                          
+                }
 
 Regards
 
