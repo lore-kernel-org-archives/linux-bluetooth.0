@@ -1,541 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <336be718ceb9032e815edb547726b5ef.squirrel@iwavesystems.com>
-In-Reply-To: <2103677.klfxQc4oJG@leonov>
-References: <2de8f187df4e6d13765677ed44c1ddbc.squirrel@iwavesystems.com>
-    <4063128.4B3eOl7Vlx@leonov>
-    <96b3bf017c42c6e749a0158c73c3084f.squirrel@iwavesystems.com>
-    <2103677.klfxQc4oJG@leonov>
-Date: Wed, 9 Sep 2015 06:58:08 -0400
-Subject: Re: USB  BT gives problem If device plugged during boot to
- platform.
-From: krishnaks@iwavesystems.com
-To: "Szymon Janc" <ext.szymon.janc@tieto.com>
-Cc: marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org
+Date: Wed, 09 Sep 2015 18:41:22 +1000
+From: Michael Gratton <mike@vee.net>
+Subject: Re: MacbookPro12,1 Bluetooth not found by Bluez
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <1441788082.8206.0@mail.quuxo.net>
+In-Reply-To: <8B052FF6-9EF3-4A9D-9ECA-773B40DC807E@holtmann.org>
+References: <1441775933.3223.2@mail.quuxo.net>
+	<8B052FF6-9EF3-4A9D-9ECA-773B40DC807E@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> Hi,
->
-> On Tuesday 08 of September 2015 10:09:10 krishnaks@iwavesystems.com wrote:
->> > Hi,
->> >
->> > On Tuesday 08 of September 2015 09:04:18 krishnaks@iwavesystems.com
->> wrote:
->> >> >>> Hi,
->> >> >>>
->> >> >>>> I am porting bluez 5.33 to android kitkat 4.4.3.I am using USB
->> >>
->> >> based
->> >>
->> >> >>>> Bluetooth device. I referred instruction in
->> >> >>>> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/README
->> >>
->> >> and
->> >>
->> >> >>>> able to build.
->> >> >>>> After botting Android image with USB dongle connected and type
->> >> >>>> "hciconfig
->> >> >>>> hci0 up" on console, It is throwing following error.
->> >> >>>> Can't init device hci0: Unknown error 132 (132)
->> >> >>>>
->> >> >>>> If I Type hciconfig -a . It gives following.
->> >> >>>> hci0:   Type: BR/EDR  Bus: USB
->> >> >>>>
->> >> >>>>        BD Address: 5C:F3:70:6C:5E:FB  ACL MTU: 1021:8  SCO MTU:
->> >> 64:1
->> >>
->> >> >>>>        DOWN
->> >> >>>>        RX bytes:547 acl:0 sco:0 events:27 errors:0
->> >> >>>>        TX bytes:384 acl:0 sco:0 commands:27 errors:0
->> >> >>>>        Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
->> >> >>>>        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->> >> >>>>        Link policy: RSWITCH SNIFF
->> >> >>>>        Link mode: SLAVE ACCEPT
->> >> >>>>
->> >> >>>> But If I unplug and plug USB dongle, and then try same command
->> >> >>>> (hciconfig
->> >> >>>> hci0 up), It works. Even "hcitool scan" command also working
->> after
->> >> >>>> that.
->> >> >>>>
->> >> >>>> Why 1st time not working when USB dongle is connected?
->> >> >>>> Also when I check Bluez debug log in logcat.
->> >> >>>> I am getting one error log when USB dongle connected during
->> boot.
->> >> >>>> E/bluetoothd(  841): Failed to set mode: Blocked through rfkill
->> >> >>>> (0x12).
->> >> >>>
->> >> >>> I think that blocked through rfkill is pretty obvious. Check with
->> >>
->> >> the
->> >>
->> >> >>> rfkill tool on what the current settings are. For some reason it
->> >>
->> >> seems
->> >>
->> >> >>> Bluetooth is blocked by default. And I remember there were some
->> >>
->> >> kernel
->> >>
->> >> >>> patches for this. Just do not remember the details.
->> >> >>>
->> >> >>> Regards
->> >> >>>
->> >> >>> Marcel
->> >> >>>
->> >> >>> --
->> >> >>> To unsubscribe from this list: send the line "unsubscribe
->> >> >>> linux-bluetooth"
->> >> >>> in
->> >> >>> the body of a message to majordomo@vger.kernel.org
->> >> >>> More majordomo info at
->> http://vger.kernel.org/majordomo-info.html
->> >> >>
->> >> >> Hi,
->> >> >>
->> >> >> Thanks for the reply.
->> >> >>
->> >> >> In my busybox utils rfkill is not enabled. If I enable it and try
->> >> >> "rfkill
->> >> >> unblock" is that will be enough? or I need to search for Kernel
->> patch
->> >> >> that
->> >> >> fixes this rfkill block issue?
->> >> >
->> >> > Hi,
->> >> >
->> >> > By Analysing I found 3 scenarios and only in one scenario BT is
->> >>
->> >> working.
->> >>
->> >> > Scenario 1 : Connect USB BT Dongle and then boot the android
->> >>
->> >> device.Then
->> >>
->> >> > Turn on from Android Bluetooth settings
->> >> >
->> >> > Result: Not working. Rfkill block error.
->> >> > E/bluetoothd(  868): Failed to set mode: Blocked through rfkill
->> (0x12)
->> >> >
->> >> > Scenario 2: Connect USB BT Dongle and boot. Then unplug and plug
->> >>
->> >> again.
->> >>
->> >> > Then Turn on from Android Bluetooth settings.
->> >> >
->> >> > Result: Working: BT turning on and scanning BT/BLE devices.
->> >> >
->> >> > Scenario 3: Boot Android device and then plug the USB BT
->> Dongle.Then
->> >>
->> >> Turn
->> >>
->> >> > on from Android Bluetooth settings.
->> >> >
->> >> > Result: Not working. Here we are not getting any debug prints from
->> >>
->> >> bluez.
->> >>
->> >> > Whether we need to rerun the init.bluetooth.rc as BT Dongle was not
->> >> > connected during boot.
->> >> > From Logcat,observing following error messages
->> >> >
->> >> >   IBluetooth.configHciSnoopLog return false
->> >> >   Bluetooth module is not loaded
->> >> >
->> >> > Logcat:
->> >> >
->> >> > -------------------Start-------------------
->> >> > D/BluetoothManagerService(  543): enable():  mBluetooth =null
->> mBinding
->> >>
->> >> =
->> >>
->> >> > false
->> >> > D/BluetoothManagerService(  543): Message: 1
->> >> > D/BluetoothManagerService(  543): MESSAGE_ENABLE: mBluetooth = null
->> >> > D/BluetoothAdapterService( 1032): REFCOUNT: CREATED.
->> INSTANCE_COUNT2
->> >> > D/BluetoothAdapterState( 1032): make
->> >> > I/BluetoothAdapterState( 1032): Entering OffState
->> >> > D/BluetoothManagerService(  543): BluetoothServiceConnection:
->> >> > com.android.bluetooth.btservice.AdapterService
->> >> > D/BluetoothManagerService(  543): Message: 40
->> >>
->> >> > D/BluetoothManagerService(  543):
->> MESSAGE_BLUETOOTH_SERVICE_CONNECTED:
->> >> 1
->> >>
->> >> > E/BluetoothManagerService(  543): IBluetooth.configHciSnoopLog
->> return
->> >> > false
->> >> > D/BluetoothManagerService(  543): Calling onBluetoothServiceUp
->> >>
->> >> callbacks
->> >>
->> >> > D/BluetoothManagerService(  543): Broadcasting
->> onBluetoothServiceUp()
->> >>
->> >> to 5
->> >>
->> >> > receivers.
->> >> > D/BluetoothAdapterState( 1032): CURRENT_STATE=OFF, MESSAGE =
->> >>
->> >> USER_TURN_ON
->> >>
->> >> > D/BluetoothAdapterProperties( 1032): Setting state to 11
->> >> > I/BluetoothAdapterState( 1032): Bluetooth adapter state changed:
->> 10->
->> >>
->> >> 11
->> >>
->> >> > D/BluetoothAdapterService( 1032): Broadcasting updateAdapterState()
->> to
->> >>
->> >> 1
->> >>
->> >> > receivers.
->> >> > D/BluetoothManagerService(  543): Message: 60
->> >> > D/BluetoothManagerService(  543): MESSAGE_BLUETOOTH_STATE_CHANGE:
->> >> > prevState = 10, newState=11
->> >> > D/BluetoothManagerService(  543): Bluetooth State Change Intent: 10
->> ->
->> >>
->> >> 11
->> >>
->> >> > D/BluetoothBondStateMachine( 1032): make
->> >> > D/BluetoothMapService( 1032): onReceive
->> >> > I/BluetoothBondStateMachine( 1032): StableState(): Entering Off
->> State
->> >> > D/HeadsetService( 1032): Received start request. Starting
->> profile...
->> >> > D/HeadsetStateMachine( 1032): make
->> >> > E/BluetoothHeadsetServiceJni( 1032): Bluetooth module is not loaded
->> >> > D/A2dpService( 1032): Received start request. Starting profile...
->> >> > V/Avrcp   ( 1032): make
->> >> > E/BluetoothAvrcpServiceJni( 1032): Bluetooth module is not loaded
->> >> > D/A2dpStateMachine( 1032): make
->> >> > E/BluetoothA2dpServiceJni( 1032): Bluetooth module is not loaded
->> >> > D/A2dpStateMachine( 1032): Enter Disconnected: -2
->> >> > D/HidService( 1032): Received start request. Starting profile...
->> >> > E/BluetoothHidServiceJni( 1032): Bluetooth module is not loaded
->> >> > D/HealthService( 1032): Received start request. Starting profile...
->> >> > I/BluetoothAdapterState( 1032): Entering PendingCommandState State:
->> >> > isTurningOn()=true, isTurningOff()=false
->> >> > E/BluetoothHealthServiceJni( 1032): Bluetooth module is not loaded
->> >> > D/BluetoothAdapterService( 1032): Profile still not
->> >> > running:com.android.bluetooth.hdp.HealthService
->> >> > D/PanService( 1032): Received start request. Starting profile...
->> >> > D/BluetoothPanServiceJni( 1032): initializeNative(L110): pan
->> >> > E/BluetoothPanServiceJni( 1032): ## ERROR : initializeNative(L115):
->> >> > Bluetooth module is not loaded##
->> >> > D/BluetoothTethering(  543): got CMD_CHANNEL_HALF_CONNECTED
->> >> > E/BluetoothTethering(  543): Trying to set mAsyncChannel twice!
->> >> > D/BtGatt.DebugUtils( 1032): handleDebugAction() action=null
->> >> > D/HeadsetPhoneState( 1032): sendDeviceStateChanged. mService=0
->> >>
->> >> mSignal=0
->> >>
->> >> > mRoam=0 mBatteryCharge=5
->> >> > D/BtGatt.GattService( 1032): Received start request. Starting
->> >>
->> >> profile...
->> >>
->> >> > D/BtGatt.GattService( 1032): start()
->> >> > E/BtGatt.JNI( 1032): ERROR: void android::initializeNative(JNIEnv*,
->> >> > jobject)(L694): Bluetooth module is not loaded##
->> >> > D/BluetoothAdapterService( 1032): Profile still not
->> >> > running:com.android.bluetooth.hdp.HealthService
->> >> > D/BluetoothAdapterService( 1032): Profile still not
->> >> > running:com.android.bluetooth.hdp.HealthService
->> >> > D/BluetoothMapService( 1032): Received start request. Starting
->> >>
->> >> profile...
->> >>
->> >> > D/BluetoothMapService( 1032): start()
->> >> > D/BluetoothAdapterService( 1032): Profile still not
->> >> > running:com.android.bluetooth.map.BluetoothMapService
->> >> > D/BluetoothAdapterService( 1032): Profile still not
->> >> > running:com.android.bluetooth.map.BluetoothMapService
->> >> > D/BluetoothAdapterService( 1032): Profile still not
->> >> > running:com.android.bluetooth.map.BluetoothMapService
->> >> > D/BluetoothAdapterState( 1032): CURRENT_STATE=PENDING, MESSAGE =
->> >>
->> >> STARTED,
->> >>
->> >> > isTurningOn=true, isTurningOff=false
->> >> > E/BluetoothAdapterState( 1032): Error while turning Bluetooth On
->> >> > D/BluetoothAdapterProperties( 1032): Setting state to 10
->> >> > I/BluetoothAdapterState( 1032): Bluetooth adapter state changed:
->> 11->
->> >>
->> >> 10
->> >>
->> >> > D/BluetoothAdapterService( 1032): Broadcasting updateAdapterState()
->> to
->> >>
->> >> 1
->> >>
->> >> > receivers.
->> >> > I/BluetoothAdapterState( 1032): Entering OffState
->> >> > D/BluetoothManagerService(  543): Message: 60
->> >> > D/BluetoothManagerService(  543): MESSAGE_BLUETOOTH_STATE_CHANGE:
->> >> > prevState = 11, newState=10
->> >> > D/BluetoothManagerService(  543): Broadcasting
->> >> > onBluetoothStateChange(false) to 10 receivers.
->> >> > D/BluetoothA2dp(  543): onBluetoothStateChange: up=false
->> >> > D/BluetoothHeadset(  543): onBluetoothStateChange: up=false
->> >> > D/BluetoothPbap(  851): onBluetoothStateChange: up=false
->> >> > D/BluetoothHeadset(  839): onBluetoothStateChange: up=false
->> >> > D/BluetoothMap(  851): onBluetoothStateChange: up=false
->> >> > D/BluetoothHeadset(  839): onBluetoothStateChange: up=false
->> >> > D/BluetoothHeadset(  839): onBluetoothStateChange: up=false
->> >> > D/BluetoothInputDevice(  851): onBluetoothStateChange: up=false
->> >> > D/BluetoothManagerService(  543): Bluetooth State Change Intent: 11
->> ->
->> >>
->> >> 10
->> >>
->> >> > E/BluetoothManagerService(  543): recoverBluetoothServiceFromError
->> >> > D/BluetoothMapService( 1032): onReceive
->> >> > D/DockEventReceiver(  851): finishStartingService: stopping service
->> >> > W/ContextImpl(  851): Calling a method in the system process
->> without a
->> >> > qualified user: android.app.ContextImpl.startService:1487
->> >> > android.content.ContextWrapper.startService:494
->> >> > android.content.ContextWrapper.startService:494
->> >> > com.android.settings.bluetooth.DockEventReceiver.beginStartingService:1
->> >> > 34
->> >> > com.android.settings.bluetooth.DockEventReceiver.onReceive:115
->> >> > D/BluetoothManagerService(  543): Sending off request.
->> >> > D/BluetoothAdapterState( 1032): CURRENT_STATE=OFF, MESSAGE =
->> >>
->> >> USER_TURN_OFF
->> >>
->> >> > D/BluetoothManagerService(  543): Calling onBluetoothServiceDown
->> >>
->> >> callbacks
->> >>
->> >> > D/BluetoothManagerService(  543): Broadcasting
->> >>
->> >> onBluetoothServiceDown() to
->> >>
->> >> > 5 receivers.
->> >> > D/BluetoothAdapterService( 1032): Cleaning up adapter native....
->> >> > D/BluetoothAdapterService( 1032): Done cleaning up adapter
->> native....
->> >> > D/BluetoothAdapterService(746876560)( 1032):
->> ****onDestroy()********
->> >> >
->> >> > -------------------End---------------------
->> >> >
->> >> > For Scenario 1 , I am trying to build rfkill tool for
->> >>
->> >> android(Currently no
->> >>
->> >> > success). Can we change the state from code by opening rfkill path
->> >> > "/sys/class/rfkill/rfkill0/state" and write 1 to enable?
->> >> >
->> >> > But scenario 3 looks like I missed some configuration.
->> >> >
->> >> > What could be the problem?
->> >> >
->> >> > Regards,
->> >> > KP
->> >> >
->> >> >
->> >> >
->> >> > --
->> >> > To unsubscribe from this list: send the line "unsubscribe
->> >>
->> >> linux-bluetooth"
->> >>
->> >> > in
->> >> > the body of a message to majordomo@vger.kernel.org
->> >> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> >>
->> >> Hi All,
->> >>
->> >>
->> >> I analysed the Android flow and found that Android System server will
->> >> initialize and check for bluetooth hardware on during Boot. So if we
->> >> connect the USB BT Dongle after boot Android BT service may not
->> identify
->> >> it.
->> >> May be this is the reason because of which scenario 3 (Boot Android
->> >> device
->> >> and then plug the USB BT Dongle.Then Turn on from Bluetooth setting)
->> is
->> >> not working.
->> >> This is my understanding. Correct me If I am wrong.
->> >>
->> >> Anyone tried USB BT pnp on android?
->> >
->> > This should work but you need to load modules on boot (or have all
->> > compiled
->> > into kernel).
->> >
->> > --
->> > BR
->> > Szymon Janc
->>
->> Hi Szymon,
->>
->> Bluez module is loading on boot. Some initial Bluez debug prints are
->> coming. like following logs which are coming initially
->>
->> -------------------------Log start---------
->> D/BlueZ   (  183):
->> external/bluetooth/bluez/android/hal-audio.c:audio_open()
->> D/BlueZ   (  183):
->> external/bluetooth/bluez/android/hal-audio.c:audio_ipc_init()
->> D/BlueZ   (  183):
->> external/bluetooth/bluez/android/hal-audio.c:ipc_handler() D/BlueZ   (
->> 183):
->> external/bluetooth/bluez/android/hal-audio.c:ipc_handler() Waiting for
->> connection ...
->> E/BlueZ   (  183): APTX: failed to open library libbt-aptx.so (dlopen
->> failed: library "libbt-aptx.so" not found)
->> D/BlueZ   (  183):
->> external/bluetooth/bluez/android/hal-audio.c:audio_init_check()
->> D/BlueZ   (  183):
->> external/bluetooth/bluez/android/hal-audio.c:audio_set_master_volume()
->> --------------------------Log end---------------
->> But after that bluez function calls like
->> open_bluetooth,get_bluetooth_interface,init are getting called after
->> boot_completed signal received android, Its calling BluetoothMapService
->> and from there call is going to bluez over JNI.
->>
->> Below Log suggests that.
->> ------------------------Logcat start------------------------
->>
->> D/BluetoothManagerService(  531): Retrieving Bluetooth Adapter name and
->> address...
->> D/BluetoothManagerService(  531): getNameAndAddress(): mBluetooth = null
->> mBinding = false
->> D/BluetoothManagerService(  531): Message: 200
->> D/BluetoothManagerService(  531): MESSAGE_GET_NAME_AND_ADDRESS
->> D/BluetoothManagerService(  531): Binding to service to get name and
->> address
->> I/ActivityManager(  531): Start proc com.android.bluetooth for service
->> com.android.bluetooth/.btservice.AdapterService: pid=1037 uid=1002
->> gids={41002, 3003, 3002, 3001, 1028, 1015, 3005, 1016, 3008}
->> D/BluetoothManagerService(  531): Message: 30
->> D/BluetoothManagerService(  531): Message: 30
->> W/ContextImpl(  531): Calling a method in the system process without a
->> qualified user: android.app.ContextImpl.bindService:1551
->> android.bluetooth.BluetoothHeadset.doBind:283
->> android.bluetooth.BluetoothHeadset.<init>:276
->> android.bluetooth.BluetoothAdapter.getProfileProxy:1361
->> android.media.AudioService.getBluetoothHeadset:2255
->> W/ContextImpl(  531): Calling a method in the system process without a
->> qualified user: android.app.ContextImpl.bindService:1551
->> android.bluetooth.BluetoothA2dp.doBind:165
->> android.bluetooth.BluetoothA2dp.<init>:158
->> android.bluetooth.BluetoothAdapter.getProfileProxy:1364
->> android.media.AudioService$AudioServiceBroadcastReceiver.onReceive:4176
->> V/WiredAccessoryManager(  531): init()
->> W/WiredAccessoryManager(  531): /sys/class/switch/usb_audio/state not
->> found while attempting to determine initial switch state
->> I/PowerManagerService(  531): Boot animation finished.
->> I/Choreographer(  915): Skipped 148 frames!  The application may be
->> doing
->> too much work on its main thread.
->> I/dalvikvm( 1037): DexOpt: mismatch dep signature for
->> '/system/framework/framework.odex'
->> E/dalvikvm( 1037): /system/framework/javax.obex.jar odex has stale
->> dependencies
->> I/dalvikvm( 1037): DexOpt: mismatch dep name:
->> '/data/dalvik-cache/system@framework@telephony-common.jar@classes.dex'
->> vs.
->> '/system/framework/telephony-common.odex'
->> E/dalvikvm( 1037): /system/app/Bluetooth.apk odex has stale dependencies
->> D/dalvikvm(  915): GC_CONCURRENT freed 1690K, 24% free 5645K/7408K,
->> paused
->> 3ms+2ms, total 25ms
->> D/AdapterServiceConfig( 1037): Adding HeadsetService
->> D/AdapterServiceConfig( 1037): Adding A2dpService
->> D/AdapterServiceConfig( 1037): Adding HidService
->> D/AdapterServiceConfig( 1037): Adding HealthService
->> D/AdapterServiceConfig( 1037): Adding PanService
->> D/AdapterServiceConfig( 1037): Adding GattService
->> D/AdapterServiceConfig( 1037): Adding BluetoothMapService
->> D/BlueZ   ( 1037):
->> external/bluetooth/bluez/android/hal-bluetooth.c:open_bluetooth()
->> D/BlueZ   ( 1037):
->> external/bluetooth/bluez/android/hal-bluetooth.c:get_bluetooth_interface()
->> D/BluetoothAdapterService( 1037): REFCOUNT: CREATED. INSTANCE_COUNT1
->> D/BluetoothManagerService(  531): Message: 20
->> D/BluetoothManagerService(  531): Added callback:
->> android.bluetooth.IBluetoothManagerCallback$Stub$Proxy@2ca2f3a8:true
->> D/BluetoothAdapterState( 1037): make
->> D/BlueZ   ( 1037):
->> external/bluetooth/bluez/android/hal-bluetooth.c:init()
->>
->> -------------------------End-----------------------------
->>
->> Android System server during init will get BT name and address and after
->> that I did not find any other place where it checks for name/address.
->> Correct me If I am wrong. or I am missing anything?
->>
->> hciconfig/hcitool is working fine if we connect BT dongle after
->> boot.Only
->> problem when we try to turn on BT from Android Bluetooth settings menu.
->>
->> Regards,
->> KP
->
-> I don't think Android supports BT adapter hot-plug. What I mean by that is
-> during Framework tries to initialize BT subsystem (and clean it up right
-> after
-> that). If that fails (eg due to no adapter being present) it will not try
-> to
-> initialize BT HAL again. So enabling BT from UI fails before even calling
-> BT
-> HAL.
->
-> If adapter is present on boot, and then you remove it and plug it again it
-> should work. Yet, if adapter is changed (so that address changes) you are
-> entering uncharted territories, so you may see some subtle hiccups.
->
-> --
-> BR
-> Szymon Janc
->
 
-Hi Szymon,
+Hi Marcel,
 
-Thanks for your reply.
-I just checked BT enable flow from android and found that
-When USB BT Dongle is not connected during bootm,During Bluez Init
-(hal-bluetooth.c:init()), hal_ipc_accept is failing.
-I hope IPC is failing as USB BT dongle is not connected.
+On Wed, 9 Sep, 2015 at 3:57 PM, Marcel Holtmann <marcel@holtmann.org>=20
+wrote:
+>>=20
+>>  Is there anything I can do to help debug this?
+>=20
+> check /sys/kernel/debug/usb/devices for the Bluetooth controller=20
+> entry.
 
->From below Logcat suggests that
-E/BlueZ   (  799): bluetoothd connect timeout
-E/BluetoothServiceJni(  799): Error while setting the callbacks
-E/BluetoothAdapterState(  799): Error while turning Bluetooth On
+The following is reported there:
 
-because of this none of the BT interfaces are initialized.
-
-When we connect the USB BT dongle , hal-bluetooth.c:init() is not getting
-called. because of this BT enable is failing.
+T: Bus=3D01 Lev=3D01 Prnt=3D01 Port=3D02 Cnt=3D01 Dev#=3D 2 Spd=3D12 MxCh=
+=3D 0
+D: Ver=3D 2.01 Cls=3Def(misc ) Sub=3D02 Prot=3D01 MxPS=3D64 #Cfgs=3D 1
+P: Vendor=3D05ac ProdID=3D8290 Rev=3D 0.90
+S: Manufacturer=3DBroadcom Corp.
+S: Product=3DBluetooth USB Host Controller
+C:* #Ifs=3D 6 Cfg#=3D 1 Atr=3De0 MxPwr=3D 0mA
+A: FirstIf#=3D 2 IfCount=3D 4 Cls=3Dff(vend.) Sub=3D01 Prot=3D01
+I:* If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D03(HID ) Sub=3D01 Prot=3D01 Driver=3D=
+usbhid
+E: Ad=3D85(I) Atr=3D03(Int.) MxPS=3D 8 Ivl=3D10ms
+I:* If#=3D 1 Alt=3D 0 #EPs=3D 1 Cls=3D03(HID ) Sub=3D01 Prot=3D02 Driver=3D=
+usbhid
+E: Ad=3D86(I) Atr=3D03(Int.) MxPS=3D 8 Ivl=3D10ms
+I:* If#=3D 2 Alt=3D 0 #EPs=3D 3 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+E: Ad=3D81(I) Atr=3D03(Int.) MxPS=3D 16 Ivl=3D1ms
+E: Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D 64 Ivl=3D0ms
+E: Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D 64 Ivl=3D0ms
+I:* If#=3D 3 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 0 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 0 Ivl=3D1ms
+I: If#=3D 3 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+(none)
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 9 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 9 Ivl=3D1ms
+I: If#=3D 3 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+(none)
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 17 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 17 Ivl=3D1ms
+I: If#=3D 3 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+(none)
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 25 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 25 Ivl=3D1ms
+I: If#=3D 3 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+(none)
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 33 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 33 Ivl=3D1ms
+I: If#=3D 3 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+(none)
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 49 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 49 Ivl=3D1ms
+I:* If#=3D 4 Alt=3D 0 #EPs=3D 2 Cls=3Dff(vend.) Sub=3Dff Prot=3Dff Driver=
+=3D(none)
+E: Ad=3D84(I) Atr=3D02(Bulk) MxPS=3D 32 Ivl=3D0ms
+E: Ad=3D04(O) Atr=3D02(Bulk) MxPS=3D 32 Ivl=3D0ms
+I:* If#=3D 5 Alt=3D 0 #EPs=3D 0 Cls=3Dfe(app. ) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
 
 
-But in working case (USB BT dongle connected during boot). Each time when
-we connect BT dongle, init is getting called.
+>>  Kernel logs:
+[snip]
+>>>  [ 10.254634] usbcore: registered new interface driver btusb
+>>>  ...
+>>>  [ 16.642700] usb 1-3: device descriptor read/64, error -110
+>=20
+> This might actually be the problem. It seems the Bluetooth controller=20
+> gets detected correctly and the btusb driver loaded, but then we get=20
+> some issues with the descriptor reading.
+>=20
+> Does the original Ubuntu 15.10 kernel work or any other kernel than=20
+> 4.2-rc8. If you find a working kernel, you might need to bisect this.=20
+> However my feeling is that this might be an issue in the USB host=20
+> controller or somewhere else.
 
-I also observed that If I remove the USB dongle without turning off BT
-from android BT settings menu, at that time
-also init is not getting called and because of that BT will not get
-enabled properly.
+Just rebooted into the stock Ubuntu 4.2.0 kernel - same result. I=20
+upgraded this system from 15.04, which was running 3.19, and this=20
+problem existed with that version as well.
 
-If we make "init" function to call whenever BT dongle it connected, is
-that will be enough for BT HAL module to work
-properly or any other settings might be required?
+> In general all MacBook Bluetooth controllers are suppose to work. If=20
+> you happen to still have OS X installed, then start it and see if it=20
+> might runs a firmware upgrade for the controller.
 
-Regards,
-KP
+I don't - I might be able to try it form an external hard drive over=20
+the next few days however. Will report back if I do manage to.
+
+Thanks,
+//Mike
+
+--=20
+=E2=8A=A8 Michael Gratton, Percept Wrangler.
+=E2=9A=99 <http://mjog.vee.net/>
+
+=
