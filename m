@@ -1,250 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 3/3] Bluetooth: hci_bcm: Add suspend/resume runtime PM functions
-Date: Wed,  9 Sep 2015 09:54:46 +0200
-Message-Id: <1441785286-5840-4-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v3 2/3] Bluetooth: hci_bcm: Prepare PM runtime support
+Date: Wed,  9 Sep 2015 09:54:45 +0200
+Message-Id: <1441785286-5840-3-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds autosuspend runtime functionality to BCM UART driver.
-Autosuspend is enabled at end of bcm_setup.
+Change some CONFIG_PM_SLEEP to CONFIG_PM as hu and is_suspended parameters
+will be used during PM runtime callbacks.
 
-Add a work queue to be able to perform pm_runtime commands during bcm_recv
-which is called by hci_uart_tty_receive() under spinlock.
+Add __bcm_suspend() and __bcm_resume() which performs link management for
+PM callbacks.
 
 Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 ---
- drivers/bluetooth/hci_bcm.c | 111 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 107 insertions(+), 4 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 70 ++++++++++++++++++++++++++-------------------
+ 1 file changed, 41 insertions(+), 29 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 29ed069..6aad699 100644
+index 6551251..29ed069 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -33,6 +33,7 @@
- #include <linux/tty.h>
- #include <linux/interrupt.h>
- #include <linux/dmi.h>
-+#include <linux/pm_runtime.h>
+@@ -56,7 +56,7 @@ struct bcm_device {
+ 	int			irq;
+ 	u8			irq_polarity;
  
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -40,6 +41,8 @@
- #include "btbcm.h"
- #include "hci_uart.h"
- 
-+#define BCM_AUTOSUSPEND_DELAY	5000 /* default autosleep delay */
-+
- struct bcm_device {
- 	struct list_head	list;
- 
-@@ -67,6 +70,9 @@ struct bcm_data {
- 	struct sk_buff_head	txq;
- 
- 	struct bcm_device	*dev;
+-#ifdef CONFIG_PM_SLEEP
 +#ifdef CONFIG_PM
-+	struct work_struct	pm_work;
-+#endif
- };
- 
- /* List of BCM BT UART devices */
-@@ -160,6 +166,10 @@ static irqreturn_t bcm_host_wake(int irq, void *data)
- 
- 	bt_dev_dbg(bdev, "Host wake IRQ");
- 
-+	pm_runtime_get(&bdev->pdev->dev);
-+	pm_runtime_mark_last_busy(&bdev->pdev->dev);
-+	pm_runtime_put_autosuspend(&bdev->pdev->dev);
-+
- 	return IRQ_HANDLED;
- }
- 
-@@ -183,6 +193,12 @@ static int bcm_request_irq(struct bcm_data *bcm)
- 			goto unlock;
- 
- 		device_init_wakeup(&bdev->pdev->dev, true);
-+
-+		pm_runtime_set_autosuspend_delay(&bdev->pdev->dev,
-+						 BCM_AUTOSUSPEND_DELAY);
-+		pm_runtime_use_autosuspend(&bdev->pdev->dev);
-+		pm_runtime_set_active(&bdev->pdev->dev);
-+		pm_runtime_enable(&bdev->pdev->dev);
- 	}
- 
- unlock:
-@@ -198,7 +214,7 @@ static const struct bcm_set_sleep_mode default_sleep_params = {
- 	.bt_wake_active = 1,	/* BT_WAKE active mode: 1 = high, 0 = low */
- 	.host_wake_active = 0,	/* HOST_WAKE active mode: 1 = high, 0 = low */
- 	.allow_host_sleep = 1,	/* Allow host sleep in SCO flag */
--	.combine_modes = 0,	/* Combine sleep and LPM flag */
-+	.combine_modes = 1,	/* Combine sleep and LPM flag */
- 	.tristate_control = 0,	/* Allow tri-state control of UART tx flag */
- 	/* Irrelevant USB flags */
- 	.usb_auto_sleep = 0,
-@@ -228,9 +244,28 @@ static int bcm_setup_sleep(struct hci_uart *hu)
- 
+ 	struct hci_uart		*hu;
+ 	bool			is_suspended; /* suspend/resume flag */
+ #endif
+@@ -153,7 +153,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
  	return 0;
  }
-+
-+static void bcm_pm_runtime_work(struct work_struct *work)
-+{
-+	struct bcm_data *bcm = container_of(work, struct bcm_data, pm_work);
-+
-+	mutex_lock(&bcm_device_lock);
-+	if (bcm_device_exists(bcm->dev)) {
-+		pm_runtime_get(&bcm->dev->pdev->dev);
-+		pm_runtime_mark_last_busy(&bcm->dev->pdev->dev);
-+		pm_runtime_put_autosuspend(&bcm->dev->pdev->dev);
-+	}
-+	mutex_unlock(&bcm_device_lock);
-+}
-+
-+static bool bcm_schedule_work(struct bcm_data *bcm)
-+{
-+	return schedule_work(&bcm->pm_work);
-+}
- #else
- static inline int bcm_request_irq(struct bcm_data *bcm) { return 0; }
- static inline int bcm_setup_sleep(struct hci_uart *hu) { return 0; }
-+static inline bool bcm_schedule_work(struct bcm_data *bcm) { return false; }
- #endif
  
- static int bcm_open(struct hci_uart *hu)
-@@ -261,6 +296,7 @@ static int bcm_open(struct hci_uart *hu)
+-#ifdef CONFIG_PM_SLEEP
++#ifdef CONFIG_PM
+ static irqreturn_t bcm_host_wake(int irq, void *data)
+ {
+ 	struct bcm_device *bdev = data;
+@@ -259,7 +259,7 @@ static int bcm_open(struct hci_uart *hu)
+ 		if (hu->tty->dev->parent == dev->pdev->dev.parent) {
+ 			bcm->dev = dev;
  			hu->init_speed = dev->init_speed;
- #ifdef CONFIG_PM
+-#ifdef CONFIG_PM_SLEEP
++#ifdef CONFIG_PM
  			dev->hu = hu;
-+			INIT_WORK(&bcm->pm_work, bcm_pm_runtime_work);
  #endif
  			bcm_gpio_set_power(bcm->dev, true);
- 			break;
-@@ -284,6 +320,11 @@ static int bcm_close(struct hci_uart *hu)
+@@ -283,7 +283,7 @@ static int bcm_close(struct hci_uart *hu)
+ 	mutex_lock(&bcm_device_lock);
  	if (bcm_device_exists(bdev)) {
  		bcm_gpio_set_power(bdev, false);
- #ifdef CONFIG_PM
-+		cancel_work_sync(&bcm->pm_work);
-+
-+		pm_runtime_disable(&bdev->pdev->dev);
-+		pm_runtime_set_suspended(&bdev->pdev->dev);
-+
+-#ifdef CONFIG_PM_SLEEP
++#ifdef CONFIG_PM
  		if (device_can_wakeup(&bdev->pdev->dev)) {
  			devm_free_irq(&bdev->pdev->dev, bdev->irq, bdev);
  			device_init_wakeup(&bdev->pdev->dev, false);
-@@ -393,6 +434,13 @@ static int bcm_recv(struct hci_uart *hu, const void *data, int count)
- 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
- 		return -EUNATCH;
- 
-+	/* mutex_lock/unlock can not be used here as this function is called
-+	 * from hci_uart_tty_receive under spinlock.
-+	 * Defer pm_runtime_* calls to work queue
-+	 */
-+	if (bcm->dev)
-+		bcm_schedule_work(bcm);
-+
- 	bcm->rx_skb = h4_recv_buf(hu->hdev, bcm->rx_skb, data, count,
- 				  bcm_recv_pkts, ARRAY_SIZE(bcm_recv_pkts));
- 	if (IS_ERR(bcm->rx_skb)) {
-@@ -421,8 +469,27 @@ static int bcm_enqueue(struct hci_uart *hu, struct sk_buff *skb)
- static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
- {
- 	struct bcm_data *bcm = hu->priv;
-+	struct sk_buff *skb = NULL;
-+	struct bcm_device *bdev = NULL;
-+
-+	mutex_lock(&bcm_device_lock);
-+
-+	if (bcm_device_exists(bcm->dev)) {
-+		bdev = bcm->dev;
-+		pm_runtime_get_sync(&bdev->pdev->dev);
-+		/* Shall be resumed here */
-+	}
-+
-+	skb = skb_dequeue(&bcm->txq);
-+
-+	if (bdev) {
-+		pm_runtime_mark_last_busy(&bdev->pdev->dev);
-+		pm_runtime_put_autosuspend(&bdev->pdev->dev);
-+	}
- 
--	return skb_dequeue(&bcm->txq);
-+	mutex_unlock(&bcm_device_lock);
-+
-+	return skb;
+@@ -425,6 +425,41 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
+ 	return skb_dequeue(&bcm->txq);
  }
  
- #ifdef CONFIG_PM
-@@ -458,6 +525,34 @@ static void __bcm_resume(struct bcm_device *bdev)
- 		hci_uart_set_flow_control(bdev->hu, false);
- 	}
- }
-+
-+static int bcm_runtime_suspend(struct device *dev)
++#ifdef CONFIG_PM
++static void __bcm_suspend(struct bcm_device *bdev)
 +{
-+	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
++	if (!bdev->is_suspended && bdev->hu) {
++		hci_uart_set_flow_control(bdev->hu, true);
 +
-+	bt_dev_dbg(bdev, "");
++		/* Once this returns, driver suspends BT via GPIO */
++		bdev->is_suspended = true;
++	}
 +
-+	/* bcm_device_lock held is not required here as bcm_runtime_suspend
-+	 * is only called when device is attached.
-+	 */
-+	__bcm_suspend(bdev);
-+
-+	return 0;
++	/* Suspend the device */
++	if (bdev->device_wakeup) {
++		gpiod_set_value(bdev->device_wakeup, false);
++		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
++		mdelay(15);
++	}
 +}
 +
-+static int bcm_runtime_resume(struct device *dev)
++static void __bcm_resume(struct bcm_device *bdev)
 +{
-+	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
++	if (bdev->device_wakeup) {
++		gpiod_set_value(bdev->device_wakeup, true);
++		bt_dev_dbg(bdev, "resume, delaying 15 ms");
++		mdelay(15);
++	}
 +
-+	bt_dev_dbg(bdev, "");
++	/* When this executes, the device has woken up already */
++	if (bdev->is_suspended && bdev->hu) {
++		bdev->is_suspended = false;
 +
-+	/* bcm_device_lock held is not required here as bcm_runtime_resume
-+	 * is only called when device is attached.
-+	 */
-+	__bcm_resume(bdev);
-+
-+	return 0;
++		hci_uart_set_flow_control(bdev->hu, false);
++	}
 +}
- #endif
- 
++#endif
++
  #ifdef CONFIG_PM_SLEEP
-@@ -474,7 +569,8 @@ static int bcm_suspend(struct device *dev)
+ /* Platform suspend callback */
+ static int bcm_suspend(struct device *dev)
+@@ -439,19 +474,7 @@ static int bcm_suspend(struct device *dev)
  	if (!bdev->hu)
  		goto unlock;
  
--	__bcm_suspend(bdev);
-+	if (pm_runtime_active(dev))
-+		__bcm_suspend(bdev);
+-	if (!bdev->is_suspended) {
+-		hci_uart_set_flow_control(bdev->hu, true);
+-
+-		/* Once this callback returns, driver suspends BT via GPIO */
+-		bdev->is_suspended = true;
+-	}
+-
+-	/* Suspend the device */
+-	if (bdev->device_wakeup) {
+-		gpiod_set_value(bdev->device_wakeup, false);
+-		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
+-		mdelay(15);
+-	}
++	__bcm_suspend(bdev);
  
  	if (device_may_wakeup(&bdev->pdev->dev)) {
  		error = enable_irq_wake(bdev->irq);
-@@ -510,6 +606,10 @@ static int bcm_resume(struct device *dev)
+@@ -482,18 +505,7 @@ static int bcm_resume(struct device *dev)
+ 		bt_dev_dbg(bdev, "BCM irq: disabled");
+ 	}
+ 
+-	if (bdev->device_wakeup) {
+-		gpiod_set_value(bdev->device_wakeup, true);
+-		bt_dev_dbg(bdev, "resume, delaying 15 ms");
+-		mdelay(15);
+-	}
+-
+-	/* When this callback executes, the device has woken up already */
+-	if (bdev->is_suspended) {
+-		bdev->is_suspended = false;
+-
+-		hci_uart_set_flow_control(bdev->hu, false);
+-	}
++	__bcm_resume(bdev);
+ 
  unlock:
  	mutex_unlock(&bcm_device_lock);
- 
-+	pm_runtime_disable(dev);
-+	pm_runtime_set_active(dev);
-+	pm_runtime_enable(dev);
-+
- 	return 0;
- }
- #endif
-@@ -729,7 +829,10 @@ MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
- #endif
- 
- /* Platform suspend and resume callbacks */
--static SIMPLE_DEV_PM_OPS(bcm_pm_ops, bcm_suspend, bcm_resume);
-+static const struct dev_pm_ops bcm_pm_ops = {
-+	SET_SYSTEM_SLEEP_PM_OPS(bcm_suspend, bcm_resume)
-+	SET_RUNTIME_PM_OPS(bcm_runtime_suspend, bcm_runtime_resume, NULL)
-+};
- 
- static struct platform_driver bcm_driver = {
- 	.probe = bcm_probe,
 -- 
 1.9.1
 
