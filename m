@@ -1,79 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 1/3] Bluetooth: hci_bcm: Fix IRQ polarity for T100
-Date: Wed,  9 Sep 2015 09:54:44 +0200
-Message-Id: <1441785286-5840-2-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v3 0/3] Bluetooth: hci_bcm: Add wake-up and PM runtime support
+Date: Wed,  9 Sep 2015 09:54:43 +0200
+Message-Id: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ACPI table for BCM2E39 of T100TA is not correct.
-Set correct irq_polarity for this device.
+Add wake-up capabilities by retrieveing interruption used by BCM device in ACPI
+table.
+Add PM runtime support.
 
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
----
- drivers/bluetooth/hci_bcm.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+v2->v3:
+- Use DMI_EXACT_MATCH instead of DMI_MATCH
+- Fix IRQ polarity for T100TA in driver_data of dmi_system_id struct
+- Use dmi_first_match() instead of dmi_check_system()
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index f306541..6551251 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -32,6 +32,7 @@
- #include <linux/gpio/consumer.h>
- #include <linux/tty.h>
- #include <linux/interrupt.h>
-+#include <linux/dmi.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -513,6 +514,22 @@ static const struct acpi_gpio_mapping acpi_bcm_default_gpios[] = {
- };
- 
- #ifdef CONFIG_ACPI
-+static u8 acpi_active_low = ACPI_ACTIVE_LOW;
-+
-+/* IRQ polarity of some chipsets are not defined correctly in ACPI table. */
-+static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
-+	{
-+		.ident = "Asus T100TA",
-+		.matches = {
-+			DMI_EXACT_MATCH(DMI_SYS_VENDOR,
-+					"ASUSTeK COMPUTER INC."),
-+			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "T100TA"),
-+		},
-+		.driver_data = &acpi_active_low,
-+	},
-+	{ }
-+};
-+
- static int bcm_resource(struct acpi_resource *ares, void *data)
- {
- 	struct bcm_device *dev = data;
-@@ -552,6 +569,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 	const struct acpi_device_id *id;
- 	struct acpi_device *adev;
- 	LIST_HEAD(resources);
-+	const struct dmi_system_id *dmi_id;
- 	int ret;
- 
- 	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
-@@ -608,6 +626,12 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 
- 	acpi_dev_get_resources(adev, &resources, bcm_resource, dev);
- 
-+	dmi_id = dmi_first_match(bcm_wrong_irq_dmi_table);
-+	if (dmi_id) {
-+		bt_dev_dbg(dev, "Fix irq polarity");
-+		dev->irq_polarity = *(u8*)dmi_id->driver_data;
-+	}
-+
- 	return 0;
- }
- #else
+v1->v2:
+- Split 1st patch between general wake-up capability and T100TA IRQ fix
+- Replace multiple "if ... else if" by switch in bcm_resource()
+- Move code to limit number of #ifdef
+- Use DMI info to restrict IRQ to T100TA
+- Split 2nd patch to prepare PM runtime support in separated patch
+- Tested with and without CONFIG_PM_SLEEP and CONFIG_PM.
+
+Frederic Danis (3):
+  Bluetooth: hci_bcm: Fix IRQ polarity for T100
+  Bluetooth: hci_bcm: Prepare PM runtime support
+  Bluetooth: hci_bcm: Add suspend/resume runtime PM functions
+
+ drivers/bluetooth/hci_bcm.c | 203 +++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 171 insertions(+), 32 deletions(-)
+
 -- 
 1.9.1
 
