@@ -1,112 +1,250 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 09 Sep 2015 18:41:22 +1000
-From: Michael Gratton <mike@vee.net>
-Subject: Re: MacbookPro12,1 Bluetooth not found by Bluez
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <1441788082.8206.0@mail.quuxo.net>
-In-Reply-To: <8B052FF6-9EF3-4A9D-9ECA-773B40DC807E@holtmann.org>
-References: <1441775933.3223.2@mail.quuxo.net>
-	<8B052FF6-9EF3-4A9D-9ECA-773B40DC807E@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Frederic Danis <frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 3/3] Bluetooth: hci_bcm: Add suspend/resume runtime PM functions
+Date: Wed,  9 Sep 2015 09:54:46 +0200
+Message-Id: <1441785286-5840-4-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Adds autosuspend runtime functionality to BCM UART driver.
+Autosuspend is enabled at end of bcm_setup.
 
-Hi Marcel,
+Add a work queue to be able to perform pm_runtime commands during bcm_recv
+which is called by hci_uart_tty_receive() under spinlock.
 
-On Wed, 9 Sep, 2015 at 3:57 PM, Marcel Holtmann <marcel@holtmann.org>=20
-wrote:
->>=20
->>  Is there anything I can do to help debug this?
->=20
-> check /sys/kernel/debug/usb/devices for the Bluetooth controller=20
-> entry.
+Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+---
+ drivers/bluetooth/hci_bcm.c | 111 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 107 insertions(+), 4 deletions(-)
 
-The following is reported there:
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 29ed069..6aad699 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -33,6 +33,7 @@
+ #include <linux/tty.h>
+ #include <linux/interrupt.h>
+ #include <linux/dmi.h>
++#include <linux/pm_runtime.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -40,6 +41,8 @@
+ #include "btbcm.h"
+ #include "hci_uart.h"
+ 
++#define BCM_AUTOSUSPEND_DELAY	5000 /* default autosleep delay */
++
+ struct bcm_device {
+ 	struct list_head	list;
+ 
+@@ -67,6 +70,9 @@ struct bcm_data {
+ 	struct sk_buff_head	txq;
+ 
+ 	struct bcm_device	*dev;
++#ifdef CONFIG_PM
++	struct work_struct	pm_work;
++#endif
+ };
+ 
+ /* List of BCM BT UART devices */
+@@ -160,6 +166,10 @@ static irqreturn_t bcm_host_wake(int irq, void *data)
+ 
+ 	bt_dev_dbg(bdev, "Host wake IRQ");
+ 
++	pm_runtime_get(&bdev->pdev->dev);
++	pm_runtime_mark_last_busy(&bdev->pdev->dev);
++	pm_runtime_put_autosuspend(&bdev->pdev->dev);
++
+ 	return IRQ_HANDLED;
+ }
+ 
+@@ -183,6 +193,12 @@ static int bcm_request_irq(struct bcm_data *bcm)
+ 			goto unlock;
+ 
+ 		device_init_wakeup(&bdev->pdev->dev, true);
++
++		pm_runtime_set_autosuspend_delay(&bdev->pdev->dev,
++						 BCM_AUTOSUSPEND_DELAY);
++		pm_runtime_use_autosuspend(&bdev->pdev->dev);
++		pm_runtime_set_active(&bdev->pdev->dev);
++		pm_runtime_enable(&bdev->pdev->dev);
+ 	}
+ 
+ unlock:
+@@ -198,7 +214,7 @@ static const struct bcm_set_sleep_mode default_sleep_params = {
+ 	.bt_wake_active = 1,	/* BT_WAKE active mode: 1 = high, 0 = low */
+ 	.host_wake_active = 0,	/* HOST_WAKE active mode: 1 = high, 0 = low */
+ 	.allow_host_sleep = 1,	/* Allow host sleep in SCO flag */
+-	.combine_modes = 0,	/* Combine sleep and LPM flag */
++	.combine_modes = 1,	/* Combine sleep and LPM flag */
+ 	.tristate_control = 0,	/* Allow tri-state control of UART tx flag */
+ 	/* Irrelevant USB flags */
+ 	.usb_auto_sleep = 0,
+@@ -228,9 +244,28 @@ static int bcm_setup_sleep(struct hci_uart *hu)
+ 
+ 	return 0;
+ }
++
++static void bcm_pm_runtime_work(struct work_struct *work)
++{
++	struct bcm_data *bcm = container_of(work, struct bcm_data, pm_work);
++
++	mutex_lock(&bcm_device_lock);
++	if (bcm_device_exists(bcm->dev)) {
++		pm_runtime_get(&bcm->dev->pdev->dev);
++		pm_runtime_mark_last_busy(&bcm->dev->pdev->dev);
++		pm_runtime_put_autosuspend(&bcm->dev->pdev->dev);
++	}
++	mutex_unlock(&bcm_device_lock);
++}
++
++static bool bcm_schedule_work(struct bcm_data *bcm)
++{
++	return schedule_work(&bcm->pm_work);
++}
+ #else
+ static inline int bcm_request_irq(struct bcm_data *bcm) { return 0; }
+ static inline int bcm_setup_sleep(struct hci_uart *hu) { return 0; }
++static inline bool bcm_schedule_work(struct bcm_data *bcm) { return false; }
+ #endif
+ 
+ static int bcm_open(struct hci_uart *hu)
+@@ -261,6 +296,7 @@ static int bcm_open(struct hci_uart *hu)
+ 			hu->init_speed = dev->init_speed;
+ #ifdef CONFIG_PM
+ 			dev->hu = hu;
++			INIT_WORK(&bcm->pm_work, bcm_pm_runtime_work);
+ #endif
+ 			bcm_gpio_set_power(bcm->dev, true);
+ 			break;
+@@ -284,6 +320,11 @@ static int bcm_close(struct hci_uart *hu)
+ 	if (bcm_device_exists(bdev)) {
+ 		bcm_gpio_set_power(bdev, false);
+ #ifdef CONFIG_PM
++		cancel_work_sync(&bcm->pm_work);
++
++		pm_runtime_disable(&bdev->pdev->dev);
++		pm_runtime_set_suspended(&bdev->pdev->dev);
++
+ 		if (device_can_wakeup(&bdev->pdev->dev)) {
+ 			devm_free_irq(&bdev->pdev->dev, bdev->irq, bdev);
+ 			device_init_wakeup(&bdev->pdev->dev, false);
+@@ -393,6 +434,13 @@ static int bcm_recv(struct hci_uart *hu, const void *data, int count)
+ 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
+ 		return -EUNATCH;
+ 
++	/* mutex_lock/unlock can not be used here as this function is called
++	 * from hci_uart_tty_receive under spinlock.
++	 * Defer pm_runtime_* calls to work queue
++	 */
++	if (bcm->dev)
++		bcm_schedule_work(bcm);
++
+ 	bcm->rx_skb = h4_recv_buf(hu->hdev, bcm->rx_skb, data, count,
+ 				  bcm_recv_pkts, ARRAY_SIZE(bcm_recv_pkts));
+ 	if (IS_ERR(bcm->rx_skb)) {
+@@ -421,8 +469,27 @@ static int bcm_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
+ {
+ 	struct bcm_data *bcm = hu->priv;
++	struct sk_buff *skb = NULL;
++	struct bcm_device *bdev = NULL;
++
++	mutex_lock(&bcm_device_lock);
++
++	if (bcm_device_exists(bcm->dev)) {
++		bdev = bcm->dev;
++		pm_runtime_get_sync(&bdev->pdev->dev);
++		/* Shall be resumed here */
++	}
++
++	skb = skb_dequeue(&bcm->txq);
++
++	if (bdev) {
++		pm_runtime_mark_last_busy(&bdev->pdev->dev);
++		pm_runtime_put_autosuspend(&bdev->pdev->dev);
++	}
+ 
+-	return skb_dequeue(&bcm->txq);
++	mutex_unlock(&bcm_device_lock);
++
++	return skb;
+ }
+ 
+ #ifdef CONFIG_PM
+@@ -458,6 +525,34 @@ static void __bcm_resume(struct bcm_device *bdev)
+ 		hci_uart_set_flow_control(bdev->hu, false);
+ 	}
+ }
++
++static int bcm_runtime_suspend(struct device *dev)
++{
++	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
++
++	bt_dev_dbg(bdev, "");
++
++	/* bcm_device_lock held is not required here as bcm_runtime_suspend
++	 * is only called when device is attached.
++	 */
++	__bcm_suspend(bdev);
++
++	return 0;
++}
++
++static int bcm_runtime_resume(struct device *dev)
++{
++	struct bcm_device *bdev = platform_get_drvdata(to_platform_device(dev));
++
++	bt_dev_dbg(bdev, "");
++
++	/* bcm_device_lock held is not required here as bcm_runtime_resume
++	 * is only called when device is attached.
++	 */
++	__bcm_resume(bdev);
++
++	return 0;
++}
+ #endif
+ 
+ #ifdef CONFIG_PM_SLEEP
+@@ -474,7 +569,8 @@ static int bcm_suspend(struct device *dev)
+ 	if (!bdev->hu)
+ 		goto unlock;
+ 
+-	__bcm_suspend(bdev);
++	if (pm_runtime_active(dev))
++		__bcm_suspend(bdev);
+ 
+ 	if (device_may_wakeup(&bdev->pdev->dev)) {
+ 		error = enable_irq_wake(bdev->irq);
+@@ -510,6 +606,10 @@ static int bcm_resume(struct device *dev)
+ unlock:
+ 	mutex_unlock(&bcm_device_lock);
+ 
++	pm_runtime_disable(dev);
++	pm_runtime_set_active(dev);
++	pm_runtime_enable(dev);
++
+ 	return 0;
+ }
+ #endif
+@@ -729,7 +829,10 @@ MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
+ #endif
+ 
+ /* Platform suspend and resume callbacks */
+-static SIMPLE_DEV_PM_OPS(bcm_pm_ops, bcm_suspend, bcm_resume);
++static const struct dev_pm_ops bcm_pm_ops = {
++	SET_SYSTEM_SLEEP_PM_OPS(bcm_suspend, bcm_resume)
++	SET_RUNTIME_PM_OPS(bcm_runtime_suspend, bcm_runtime_resume, NULL)
++};
+ 
+ static struct platform_driver bcm_driver = {
+ 	.probe = bcm_probe,
+-- 
+1.9.1
 
-T: Bus=3D01 Lev=3D01 Prnt=3D01 Port=3D02 Cnt=3D01 Dev#=3D 2 Spd=3D12 MxCh=
-=3D 0
-D: Ver=3D 2.01 Cls=3Def(misc ) Sub=3D02 Prot=3D01 MxPS=3D64 #Cfgs=3D 1
-P: Vendor=3D05ac ProdID=3D8290 Rev=3D 0.90
-S: Manufacturer=3DBroadcom Corp.
-S: Product=3DBluetooth USB Host Controller
-C:* #Ifs=3D 6 Cfg#=3D 1 Atr=3De0 MxPwr=3D 0mA
-A: FirstIf#=3D 2 IfCount=3D 4 Cls=3Dff(vend.) Sub=3D01 Prot=3D01
-I:* If#=3D 0 Alt=3D 0 #EPs=3D 1 Cls=3D03(HID ) Sub=3D01 Prot=3D01 Driver=3D=
-usbhid
-E: Ad=3D85(I) Atr=3D03(Int.) MxPS=3D 8 Ivl=3D10ms
-I:* If#=3D 1 Alt=3D 0 #EPs=3D 1 Cls=3D03(HID ) Sub=3D01 Prot=3D02 Driver=3D=
-usbhid
-E: Ad=3D86(I) Atr=3D03(Int.) MxPS=3D 8 Ivl=3D10ms
-I:* If#=3D 2 Alt=3D 0 #EPs=3D 3 Cls=3Dff(vend.) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-E: Ad=3D81(I) Atr=3D03(Int.) MxPS=3D 16 Ivl=3D1ms
-E: Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D 64 Ivl=3D0ms
-E: Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D 64 Ivl=3D0ms
-I:* If#=3D 3 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 0 Ivl=3D1ms
-E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 0 Ivl=3D1ms
-I: If#=3D 3 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
-(none)
-E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 9 Ivl=3D1ms
-E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 9 Ivl=3D1ms
-I: If#=3D 3 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
-(none)
-E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 17 Ivl=3D1ms
-E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 17 Ivl=3D1ms
-I: If#=3D 3 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
-(none)
-E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 25 Ivl=3D1ms
-E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 25 Ivl=3D1ms
-I: If#=3D 3 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
-(none)
-E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 33 Ivl=3D1ms
-E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 33 Ivl=3D1ms
-I: If#=3D 3 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
-(none)
-E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 49 Ivl=3D1ms
-E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 49 Ivl=3D1ms
-I:* If#=3D 4 Alt=3D 0 #EPs=3D 2 Cls=3Dff(vend.) Sub=3Dff Prot=3Dff Driver=
-=3D(none)
-E: Ad=3D84(I) Atr=3D02(Bulk) MxPS=3D 32 Ivl=3D0ms
-E: Ad=3D04(O) Atr=3D02(Bulk) MxPS=3D 32 Ivl=3D0ms
-I:* If#=3D 5 Alt=3D 0 #EPs=3D 0 Cls=3Dfe(app. ) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-
-
->>  Kernel logs:
-[snip]
->>>  [ 10.254634] usbcore: registered new interface driver btusb
->>>  ...
->>>  [ 16.642700] usb 1-3: device descriptor read/64, error -110
->=20
-> This might actually be the problem. It seems the Bluetooth controller=20
-> gets detected correctly and the btusb driver loaded, but then we get=20
-> some issues with the descriptor reading.
->=20
-> Does the original Ubuntu 15.10 kernel work or any other kernel than=20
-> 4.2-rc8. If you find a working kernel, you might need to bisect this.=20
-> However my feeling is that this might be an issue in the USB host=20
-> controller or somewhere else.
-
-Just rebooted into the stock Ubuntu 4.2.0 kernel - same result. I=20
-upgraded this system from 15.04, which was running 3.19, and this=20
-problem existed with that version as well.
-
-> In general all MacBook Bluetooth controllers are suppose to work. If=20
-> you happen to still have OS X installed, then start it and see if it=20
-> might runs a firmware upgrade for the controller.
-
-I don't - I might be able to try it form an external hard drive over=20
-the next few days however. Will report back if I do manage to.
-
-Thanks,
-//Mike
-
---=20
-=E2=8A=A8 Michael Gratton, Percept Wrangler.
-=E2=9A=99 <http://mjog.vee.net/>
-
-=
