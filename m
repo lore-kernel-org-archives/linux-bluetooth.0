@@ -1,138 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <55F19651.8090908@intel.com>
-Date: Thu, 10 Sep 2015 16:40:17 +0200
-From: Frederic Danis <frederic.danis@intel.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Frederic Danis <frederic.danis@linux.intel.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] Bluetooth: hci_bcm: Add suspend/resume runtime
- PM functions
-References: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com> <1441785286-5840-4-git-send-email-frederic.danis@linux.intel.com> <5F941F10-620B-4282-848E-895D52744850@holtmann.org>
-In-Reply-To: <5F941F10-620B-4282-848E-895D52744850@holtmann.org>
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [Patch v2] Bluetooth: remove SCO fragments on connection close
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1441894164-31644-1-git-send-email-kubax.t.pawlak@intel.com>
+Date: Thu, 10 Sep 2015 16:24:17 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <7EE991DA-A378-47CA-BC65-3EBC7A390CB8@holtmann.org>
+References: <1441894164-31644-1-git-send-email-kubax.t.pawlak@intel.com>
+To: Kuba Pawlak <kubax.t.pawlak@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGVsbG8gTWFyY2VsLAoKT24gMDkvMDkvMjAxNSAxODoyOSwgTWFyY2VsIEhvbHRtYW5uIHdyb3Rl
-Ogo+IEhpIEZyZWQsCj4KPj4gQWRkcyBhdXRvc3VzcGVuZCBydW50aW1lIGZ1bmN0aW9uYWxpdHkg
-dG8gQkNNIFVBUlQgZHJpdmVyLgo+PiBBdXRvc3VzcGVuZCBpcyBlbmFibGVkIGF0IGVuZCBvZiBi
-Y21fc2V0dXAuCj4+Cj4+IEFkZCBhIHdvcmsgcXVldWUgdG8gYmUgYWJsZSB0byBwZXJmb3JtIHBt
-X3J1bnRpbWUgY29tbWFuZHMgZHVyaW5nIGJjbV9yZWN2Cj4+IHdoaWNoIGlzIGNhbGxlZCBieSBo
-Y2lfdWFydF90dHlfcmVjZWl2ZSgpIHVuZGVyIHNwaW5sb2NrLgo+IGlzIHRoYXQgYWN0dWFsbHkg
-YSByZXF1aXJlbWVudCBjb21pbmcgZnJvbSB0aGUgVFRZIHN1YnN5c3RlbT8gT3IgaXMgdGhhdCBz
-b21ldGhpbmcgdGhhdCB3ZSBpbmhlcml0ZWQgZnJvbSB3aGVuIEJsdWV0b290aCBzdWJzeXN0ZW0g
-d2FzIHVzaW5nIHRhc2tsZXRzIGFuZCB3ZSBuZXZlciBnb3QgYXJvdW5kIGZpeGluZyBpdC4gSWYg
-dGhlIFRUWSBzdWJzeXN0ZW0gZG9lcyBub3QgcmVxdWlyZSB1c2luZyBhIHNwaW5sb2NrLCB3ZSBz
-aG91bGQgbm90IGVpdGhlci4KClRoZSBIQ0lfTERJU0Mgc3BpbmxvY2sgaHUtPnJ4X2xvY2sgc2Vl
-bXMgdG8gYmUgb25seSB1c2VkIGluIApoY2lfdWFydF90dHlfcmVjZWl2ZSgpLgpJdCBzZWVtcyB0
-byBtZSB0aGF0IHdlIG1heSBiZSBhYmxlIHRvIHJlbW92ZSBpdCwgYnV0IEkgZG8gbm90IApzdWZm
-aWNpZW50bHkgdW5kZXJzdGFuZCBUVFkgc3Vic3lzdGVtIHRvIGJlIHN1cmUgdGhpcyB3aWxsIG5v
-dCBpbnRyb2R1Y2UgCmFueSByZWdyZXNzaW9uLgoKPj4gU2lnbmVkLW9mZi1ieTogRnJlZGVyaWMg
-RGFuaXMgPGZyZWRlcmljLmRhbmlzQGxpbnV4LmludGVsLmNvbT4KPj4gLS0tCj4+IGRyaXZlcnMv
-Ymx1ZXRvb3RoL2hjaV9iY20uYyB8IDExMSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKystLQo+PiAxIGZpbGUgY2hhbmdlZCwgMTA3IGluc2VydGlvbnMoKyksIDQgZGVs
-ZXRpb25zKC0pCj4+Cj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9oY2lfYmNtLmMg
-Yi9kcml2ZXJzL2JsdWV0b290aC9oY2lfYmNtLmMKPj4gaW5kZXggMjllZDA2OS4uNmFhZDY5OSAx
-MDA2NDQKPj4gLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvaGNpX2JjbS5jCj4+ICsrKyBiL2RyaXZl
-cnMvYmx1ZXRvb3RoL2hjaV9iY20uYwo+PiBAQCAtMzMsNiArMzMsNyBAQAo+PiAjaW5jbHVkZSA8
-bGludXgvdHR5Lmg+Cj4+ICNpbmNsdWRlIDxsaW51eC9pbnRlcnJ1cHQuaD4KPj4gI2luY2x1ZGUg
-PGxpbnV4L2RtaS5oPgo+PiArI2luY2x1ZGUgPGxpbnV4L3BtX3J1bnRpbWUuaD4KPj4KPj4gI2lu
-Y2x1ZGUgPG5ldC9ibHVldG9vdGgvYmx1ZXRvb3RoLmg+Cj4+ICNpbmNsdWRlIDxuZXQvYmx1ZXRv
-b3RoL2hjaV9jb3JlLmg+Cj4+IEBAIC00MCw2ICs0MSw4IEBACj4+ICNpbmNsdWRlICJidGJjbS5o
-Igo+PiAjaW5jbHVkZSAiaGNpX3VhcnQuaCIKPj4KPj4gKyNkZWZpbmUgQkNNX0FVVE9TVVNQRU5E
-X0RFTEFZCTUwMDAgLyogZGVmYXVsdCBhdXRvc2xlZXAgZGVsYXkgKi8KPj4gKwo+PiBzdHJ1Y3Qg
-YmNtX2RldmljZSB7Cj4+IAlzdHJ1Y3QgbGlzdF9oZWFkCWxpc3Q7Cj4+Cj4+IEBAIC02Nyw2ICs3
-MCw5IEBAIHN0cnVjdCBiY21fZGF0YSB7Cj4+IAlzdHJ1Y3Qgc2tfYnVmZl9oZWFkCXR4cTsKPj4K
-Pj4gCXN0cnVjdCBiY21fZGV2aWNlCSpkZXY7Cj4+ICsjaWZkZWYgQ09ORklHX1BNCj4+ICsJc3Ry
-dWN0IHdvcmtfc3RydWN0CXBtX3dvcms7Cj4+ICsjZW5kaWYKPj4gfTsKPj4KPj4gLyogTGlzdCBv
-ZiBCQ00gQlQgVUFSVCBkZXZpY2VzICovCj4+IEBAIC0xNjAsNiArMTY2LDEwIEBAIHN0YXRpYyBp
-cnFyZXR1cm5fdCBiY21faG9zdF93YWtlKGludCBpcnEsIHZvaWQgKmRhdGEpCj4+Cj4+IAlidF9k
-ZXZfZGJnKGJkZXYsICJIb3N0IHdha2UgSVJRIik7Cj4+Cj4+ICsJcG1fcnVudGltZV9nZXQoJmJk
-ZXYtPnBkZXYtPmRldik7Cj4+ICsJcG1fcnVudGltZV9tYXJrX2xhc3RfYnVzeSgmYmRldi0+cGRl
-di0+ZGV2KTsKPj4gKwlwbV9ydW50aW1lX3B1dF9hdXRvc3VzcGVuZCgmYmRldi0+cGRldi0+ZGV2
-KTsKPj4gKwo+PiAJcmV0dXJuIElSUV9IQU5ETEVEOwo+PiB9Cj4+Cj4+IEBAIC0xODMsNiArMTkz
-LDEyIEBAIHN0YXRpYyBpbnQgYmNtX3JlcXVlc3RfaXJxKHN0cnVjdCBiY21fZGF0YSAqYmNtKQo+
-PiAJCQlnb3RvIHVubG9jazsKPj4KPj4gCQlkZXZpY2VfaW5pdF93YWtldXAoJmJkZXYtPnBkZXYt
-PmRldiwgdHJ1ZSk7Cj4+ICsKPj4gKwkJcG1fcnVudGltZV9zZXRfYXV0b3N1c3BlbmRfZGVsYXko
-JmJkZXYtPnBkZXYtPmRldiwKPj4gKwkJCQkJCSBCQ01fQVVUT1NVU1BFTkRfREVMQVkpOwo+PiAr
-CQlwbV9ydW50aW1lX3VzZV9hdXRvc3VzcGVuZCgmYmRldi0+cGRldi0+ZGV2KTsKPj4gKwkJcG1f
-cnVudGltZV9zZXRfYWN0aXZlKCZiZGV2LT5wZGV2LT5kZXYpOwo+PiArCQlwbV9ydW50aW1lX2Vu
-YWJsZSgmYmRldi0+cGRldi0+ZGV2KTsKPj4gCX0KPj4KPj4gdW5sb2NrOgo+PiBAQCAtMTk4LDcg
-KzIxNCw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgYmNtX3NldF9zbGVlcF9tb2RlIGRlZmF1bHRf
-c2xlZXBfcGFyYW1zID0gewo+PiAJLmJ0X3dha2VfYWN0aXZlID0gMSwJLyogQlRfV0FLRSBhY3Rp
-dmUgbW9kZTogMSA9IGhpZ2gsIDAgPSBsb3cgKi8KPj4gCS5ob3N0X3dha2VfYWN0aXZlID0gMCwJ
-LyogSE9TVF9XQUtFIGFjdGl2ZSBtb2RlOiAxID0gaGlnaCwgMCA9IGxvdyAqLwo+PiAJLmFsbG93
-X2hvc3Rfc2xlZXAgPSAxLAkvKiBBbGxvdyBob3N0IHNsZWVwIGluIFNDTyBmbGFnICovCj4+IC0J
-LmNvbWJpbmVfbW9kZXMgPSAwLAkvKiBDb21iaW5lIHNsZWVwIGFuZCBMUE0gZmxhZyAqLwo+PiAr
-CS5jb21iaW5lX21vZGVzID0gMSwJLyogQ29tYmluZSBzbGVlcCBhbmQgTFBNIGZsYWcgKi8KPj4g
-CS50cmlzdGF0ZV9jb250cm9sID0gMCwJLyogQWxsb3cgdHJpLXN0YXRlIGNvbnRyb2wgb2YgVUFS
-VCB0eCBmbGFnICovCj4+IAkvKiBJcnJlbGV2YW50IFVTQiBmbGFncyAqLwo+PiAJLnVzYl9hdXRv
-X3NsZWVwID0gMCwKPj4gQEAgLTIyOCw5ICsyNDQsMjggQEAgc3RhdGljIGludCBiY21fc2V0dXBf
-c2xlZXAoc3RydWN0IGhjaV91YXJ0ICpodSkKPj4KPj4gCXJldHVybiAwOwo+PiB9Cj4+ICsKPj4g
-K3N0YXRpYyB2b2lkIGJjbV9wbV9ydW50aW1lX3dvcmsoc3RydWN0IHdvcmtfc3RydWN0ICp3b3Jr
-KQo+PiArewo+PiArCXN0cnVjdCBiY21fZGF0YSAqYmNtID0gY29udGFpbmVyX29mKHdvcmssIHN0
-cnVjdCBiY21fZGF0YSwgcG1fd29yayk7Cj4+ICsKPj4gKwltdXRleF9sb2NrKCZiY21fZGV2aWNl
-X2xvY2spOwo+PiArCWlmIChiY21fZGV2aWNlX2V4aXN0cyhiY20tPmRldikpIHsKPj4gKwkJcG1f
-cnVudGltZV9nZXQoJmJjbS0+ZGV2LT5wZGV2LT5kZXYpOwo+PiArCQlwbV9ydW50aW1lX21hcmtf
-bGFzdF9idXN5KCZiY20tPmRldi0+cGRldi0+ZGV2KTsKPj4gKwkJcG1fcnVudGltZV9wdXRfYXV0
-b3N1c3BlbmQoJmJjbS0+ZGV2LT5wZGV2LT5kZXYpOwo+PiArCX0KPj4gKwltdXRleF91bmxvY2so
-JmJjbV9kZXZpY2VfbG9jayk7Cj4+ICt9Cj4+ICsKPj4gK3N0YXRpYyBib29sIGJjbV9zY2hlZHVs
-ZV93b3JrKHN0cnVjdCBiY21fZGF0YSAqYmNtKQo+PiArewo+IFB1dCB0aGUgYmNtIHZhbGlkIGNo
-ZWNrIGhlcmUuCj4KPiAJaWYgKCFiY20pCj4gCQlyZXR1cm4gZmFsc2U7CgpJIHdpbGwgYWRkIHRo
-aXMKPj4gKwlyZXR1cm4gc2NoZWR1bGVfd29yaygmYmNtLT5wbV93b3JrKTsKPj4gK30KPj4gI2Vs
-c2UKPj4gc3RhdGljIGlubGluZSBpbnQgYmNtX3JlcXVlc3RfaXJxKHN0cnVjdCBiY21fZGF0YSAq
-YmNtKSB7IHJldHVybiAwOyB9Cj4+IHN0YXRpYyBpbmxpbmUgaW50IGJjbV9zZXR1cF9zbGVlcChz
-dHJ1Y3QgaGNpX3VhcnQgKmh1KSB7IHJldHVybiAwOyB9Cj4+ICtzdGF0aWMgaW5saW5lIGJvb2wg
-YmNtX3NjaGVkdWxlX3dvcmsoc3RydWN0IGJjbV9kYXRhICpiY20pIHsgcmV0dXJuIGZhbHNlOyB9
-Cj4+ICNlbmRpZgo+Pgo+PiBzdGF0aWMgaW50IGJjbV9vcGVuKHN0cnVjdCBoY2lfdWFydCAqaHUp
-Cj4+IEBAIC0yNjEsNiArMjk2LDcgQEAgc3RhdGljIGludCBiY21fb3BlbihzdHJ1Y3QgaGNpX3Vh
-cnQgKmh1KQo+PiAJCQlodS0+aW5pdF9zcGVlZCA9IGRldi0+aW5pdF9zcGVlZDsKPj4gI2lmZGVm
-IENPTkZJR19QTQo+PiAJCQlkZXYtPmh1ID0gaHU7Cj4+ICsJCQlJTklUX1dPUksoJmJjbS0+cG1f
-d29yaywgYmNtX3BtX3J1bnRpbWVfd29yayk7Cj4+ICNlbmRpZgo+PiAJCQliY21fZ3Bpb19zZXRf
-cG93ZXIoYmNtLT5kZXYsIHRydWUpOwo+PiAJCQlicmVhazsKPj4gQEAgLTI4NCw2ICszMjAsMTEg
-QEAgc3RhdGljIGludCBiY21fY2xvc2Uoc3RydWN0IGhjaV91YXJ0ICpodSkKPj4gCWlmIChiY21f
-ZGV2aWNlX2V4aXN0cyhiZGV2KSkgewo+PiAJCWJjbV9ncGlvX3NldF9wb3dlcihiZGV2LCBmYWxz
-ZSk7Cj4+ICNpZmRlZiBDT05GSUdfUE0KPj4gKwkJY2FuY2VsX3dvcmtfc3luYygmYmNtLT5wbV93
-b3JrKTsKPj4gKwo+PiArCQlwbV9ydW50aW1lX2Rpc2FibGUoJmJkZXYtPnBkZXYtPmRldik7Cj4+
-ICsJCXBtX3J1bnRpbWVfc2V0X3N1c3BlbmRlZCgmYmRldi0+cGRldi0+ZGV2KTsKPj4gKwo+PiAJ
-CWlmIChkZXZpY2VfY2FuX3dha2V1cCgmYmRldi0+cGRldi0+ZGV2KSkgewo+PiAJCQlkZXZtX2Zy
-ZWVfaXJxKCZiZGV2LT5wZGV2LT5kZXYsIGJkZXYtPmlycSwgYmRldik7Cj4+IAkJCWRldmljZV9p
-bml0X3dha2V1cCgmYmRldi0+cGRldi0+ZGV2LCBmYWxzZSk7Cj4+IEBAIC0zOTMsNiArNDM0LDEz
-IEBAIHN0YXRpYyBpbnQgYmNtX3JlY3Yoc3RydWN0IGhjaV91YXJ0ICpodSwgY29uc3Qgdm9pZCAq
-ZGF0YSwgaW50IGNvdW50KQo+PiAJaWYgKCF0ZXN0X2JpdChIQ0lfVUFSVF9SRUdJU1RFUkVELCAm
-aHUtPmZsYWdzKSkKPj4gCQlyZXR1cm4gLUVVTkFUQ0g7Cj4+Cj4+ICsJLyogbXV0ZXhfbG9jay91
-bmxvY2sgY2FuIG5vdCBiZSB1c2VkIGhlcmUgYXMgdGhpcyBmdW5jdGlvbiBpcyBjYWxsZWQKPj4g
-KwkgKiBmcm9tIGhjaV91YXJ0X3R0eV9yZWNlaXZlIHVuZGVyIHNwaW5sb2NrLgo+PiArCSAqIERl
-ZmVyIHBtX3J1bnRpbWVfKiBjYWxscyB0byB3b3JrIHF1ZXVlCj4+ICsJICovCj4+ICsJaWYgKGJj
-bS0+ZGV2KQo+PiArCQliY21fc2NoZWR1bGVfd29yayhiY20pOwo+PiArCj4gV2UgYXJlIGRvaW5n
-IHRoaXMgZm9yIGV2ZXJ5IHNpbmdsZSBIOjQgZnJhZ21lbnQgd2UgcmVjZWl2ZSBub3cuIFRoaXMg
-c2VlbXMgdG8gYmUgYSByZWFsbHkgYmFkIGlkZWEgc2luY2UgaW4gdGhlb3J5IHRoZSBwYWNrZXRz
-IGNhbiBhcnJpdmUgb25lIGJ5dGUgYXQgYSB0aW1lLgo+Cj4gU28gdGhpcyBpcyBhIGxvdCBvZiBv
-dmVyaGVhZCB0byBzY2hlZHVsZSB0aGUgd29yayBxdWV1ZSBldmVyeSBzaW5nbGUgZnJhZ21lbnQg
-YW5kIGp1c3QgaG9wZSBmb3IgdGhlIGJlc3QuIEkgdGhpbmsgd2UgbmVlZCB0byBiZSBhIGxvdCBz
-bWFydGVyIGhlcmUuIE90aGVyd2lzZSB3ZSBnZXQgYSBuYXN0eSBwZXJmb3JtYW5jZSBoaXQgb24g
-c21hbGxlciBkZXZpY2VzLiBUaGUgYWN0dWFsIGh1LT5yZWN2IGNhbGxiYWNrIGlzIHJlYWxseSBv
-bmx5IGRlc2lnbmVkIGZvciBiYXNpYyByZWFzc2VtYmx5IG9mIHRoZSBwYWNrZXRzLiBJdCByZWFs
-bHkgc2hvdWxkIHN0YXkgc2ltcGxlLgo+Cj4gRm9yIGhjaV9pbnRlbCB3ZSBhcmUgZG9pbmcgdGhp
-cyBpbiB0aGUgZW5xdWV1ZSBmdW5jdGlvbiB3aGVuIHRoZSBCbHVldG9vdGggc3Vic3lzdGVtIGhh
-cyB0byBzZW5kIHVzIGRhdGEuIFdoeSB3b3VsZCB3ZSBkbyB0aGlzIG9uIHRoZSBUVFkgcmVjZWl2
-aW5nIHNpZGUgaGVyZT8gSWYgdGhlIGRldmljZSBpcyBub3QgYWN0aXZlLCB3ZSB3b3VsZCBub3Qg
-YmUgcmVjZWl2aW5nIGFueXRoaW5nIGluIHRoZSBmaXJzdCBwbGFjZS4gSSBhbSBmYWlsaW5nIHRv
-IHNlZSB0aGUgbG9naWMgaGVyZS4KaGNpX2ludGVsIGFsc28gcGVyZm9ybXMgdGhpcyB3aGVuIHJl
-Y2VpdmluZyBMUE1fT1BfVFhfTk9USUZZIHBhY2tldHMuCkFmYWlrLCBCcm9hZGNvbSBkZXZpY2Ug
-ZG9lcyBub3QgaGF2ZSB0aGlzIGZlYXR1cmUgYW5kIHdlIG5lZWQgdG8gZGVsYXkgCnRoZSBzdXNw
-ZW5kIHdoZW4gd2UgcmVjZWl2ZSBhIHBhY2tldC4KCkkgd2lsbCBtb3ZlIGJjbV9zY2hlZHVsZV93
-b3JrKCkgYWZ0ZXIgaDRfcmVjdl9idWYoKSB0byBwZXJmb3JtIGl0IG9ubHkgCm9uIGNvbXBsZXRl
-ZCBwYWNrZXQuCgpSZWdhcmRzCgpGcmVkCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpJbnRlbCBDb3Jwb3JhdGlvbiBT
-QVMgKEZyZW5jaCBzaW1wbGlmaWVkIGpvaW50IHN0b2NrIGNvbXBhbnkpClJlZ2lzdGVyZWQgaGVh
-ZHF1YXJ0ZXJzOiAiTGVzIE1vbnRhbGV0cyItIDIsIHJ1ZSBkZSBQYXJpcywgCjkyMTk2IE1ldWRv
-biBDZWRleCwgRnJhbmNlClJlZ2lzdHJhdGlvbiBOdW1iZXI6ICAzMDIgNDU2IDE5OSBSLkMuUy4g
-TkFOVEVSUkUKQ2FwaXRhbDogNCw1NzIsMDAwIEV1cm9zCgpUaGlzIGUtbWFpbCBhbmQgYW55IGF0
-dGFjaG1lbnRzIG1heSBjb250YWluIGNvbmZpZGVudGlhbCBtYXRlcmlhbCBmb3IKdGhlIHNvbGUg
-dXNlIG9mIHRoZSBpbnRlbmRlZCByZWNpcGllbnQocykuIEFueSByZXZpZXcgb3IgZGlzdHJpYnV0
-aW9uCmJ5IG90aGVycyBpcyBzdHJpY3RseSBwcm9oaWJpdGVkLiBJZiB5b3UgYXJlIG5vdCB0aGUg
-aW50ZW5kZWQKcmVjaXBpZW50LCBwbGVhc2UgY29udGFjdCB0aGUgc2VuZGVyIGFuZCBkZWxldGUg
-YWxsIGNvcGllcy4K
+Hi Kuba,
+
+> SCO packet reassembler may have a fragment of SCO packet, from
+> previous connection, cached and not removed when SCO connection
+> is ended. Packets from new SCO connection are then going to be
+> attached to that fragment, creating an invalid SCO packets.
+> 
+> Controllers like Intel's WilkinsPeak are always fragmenting
+> SCO packet into 3 parts (#1, #2, #3). Packet #1 contains
+> SCO header and audio data, others just audio data. if there is
+> a fragment cached from previous connection, i.e. #1, first
+> SCO packet from new connection is going to be attached to it
+> creating packet consisting of fragments #1-#1-#2. This will
+> be forwarded to upper layers. After that, fragment #3 is going
+> to be used as a starting point for another SCO packet.
+> It does not contain a SCO header, but the code expects it,
+> casts a SCO header structure on it, and reads whatever audio
+> data happens to be there as SCO packet length and handle.
+> From that point on, we are assembling random data into SCO
+> packets. Usually it recovers quickly as initial audio data
+> usually contains mostly zeros (muted stream), but setups
+> of over 4 seconds were observed.
+> Issue manifests itself by printing on the console:
+> Bluetooth: hci0 SCO packet for unknown connection handle 48
+> Bluetooth: hci0 SCO packet for unknown connection handle 2560
+> Bluetooth: hci0 SCO packet for unknown connection handle 12288
+> It may also show random handles if audio data was non-zeroed.
+> Hcidump shows SCO packets with random length and handles.
+> 
+> Few messages with handle 0 at connection creation are OK
+> for some controllers (like WilkinsPeak), as there are SCO packets
+> with zeroed handle at the beginning (possible controller bug).
+> Few of such messages at connection end, with a handle looking
+> sane (around 256, 512, 768 ...) is also OK, as these are last
+> SCO packets that were assembled and sent up, before connection
+> was broken, but were not handled in time.
+> 
+> Also, WilkinsPeak has an issue that sometimes, at SCO connection
+> creation it does not send third fragment of first SCO packet
+> (#1-#2-#1-#2-#3...). This is not fixed in this patch but manifests
+> itself as this issue.
+
+that should be fixed in the firmware and not in the driver actually.
+
+> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
+> ---
+> drivers/bluetooth/btusb.c | 22 ++++++++++++++++++++++
+> 1 file changed, 22 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 9521b7bcc22d61b7690a928bc09500c883fe5495..3ba0397525069f12042f15170d0e96c5dedeaee7 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1203,6 +1203,16 @@ static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+> 	}
+> }
+> 
+> +static void btusb_remove_sco_frag(struct hci_dev *hdev)
+> +{
+> +	struct btusb_data *data = hci_get_drvdata(hdev);
+> +
+> +	spin_lock(&data->rxlock);
+> +	kfree_skb(data->sco_skb);
+> +	data->sco_skb = NULL;
+> +	spin_unlock(&data->rxlock);
+> +}
+
+Don't bother with this. It is easy enough to just keep this code inline. Same as with my pseudo-patch.
+
+> +
+> static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
+> {
+> 	struct btusb_data *data = hci_get_drvdata(hdev);
+> @@ -1277,6 +1287,18 @@ static void btusb_work(struct work_struct *work)
+> 			clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> 			usb_kill_anchored_urbs(&data->isoc_anchor);
+> 
+> +			/*
+> +			 * When SCO connection is ended, a packet fragment
+> +			 * may be left in reassembler. It would then be attached
+> +			 * to SCO fragments of next SCO connection. Stream
+> +			 * reassembly code will then read audio data as SCO packet
+> +			 * headers creating wrongly reassembled SCO stream with
+> +			 * packets of random length and handles.
+> +			 * Clear all outstanding fragments when SCO connection
+> +			 * is dropped.
+> +			 */
+
+Please use proper comment coding style.
+
+And this is not only when SCO connection has been ended. This is when we are switching alternate settings. So the comment needs to read this properly. This will be triggered when switching from 0 connections to 1 connection, but also when switching from 1 connect to 2 connections. And of course the case you care, when dropping a connection.
+
+> +			btusb_remove_sco_frag(hdev);
+> +
+> 			if (__set_isoc_interface(hdev, new_alts) < 0)
+> 				return;
+> 		}
+
+Regards
+
+Marcel
 
