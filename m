@@ -1,32 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: mgmt-api callback not firing properly
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CACjvaw==Z9Mbgd6tBdHsNs1W+o7UbSudDUaGuwTLeY=LWkyW2A@mail.gmail.com>
-Date: Thu, 10 Sep 2015 15:21:29 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <3A3A3A19-AE6E-493A-AA1F-3C0A8451B775@holtmann.org>
-References: <CACjvaw==Z9Mbgd6tBdHsNs1W+o7UbSudDUaGuwTLeY=LWkyW2A@mail.gmail.com>
-To: Nazmul Alam <fadedreamz@gmail.com>
+Message-ID: <55F14ED3.5050308@linux.intel.com>
+Date: Thu, 10 Sep 2015 11:35:15 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 2/3] Bluetooth: hci_bcm: Prepare PM runtime support
+References: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com> <1441785286-5840-3-git-send-email-frederic.danis@linux.intel.com> <568ECF20-51ED-4942-B6A3-01A81573C2D8@holtmann.org>
+In-Reply-To: <568ECF20-51ED-4942-B6A3-01A81573C2D8@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nazmul,
+Hello Marcel,
 
-> I am using mgmt-api to send command to the bluetooth kernel driver.
-> 
-> The problem is that sometimes the callback of the mgmt_send() command
-> is not fired even though the return value of the mgmt_send() is
-> indicating a success.
-> 
-> is there any special case which may cause this kind of issue?
-> 
-> using bluez 5.31 and 4.1+ kernel.
+On 09/09/2015 18:18, Marcel Holtmann wrote:
+> Hi Fred,
+>
+>> Change some CONFIG_PM_SLEEP to CONFIG_PM as hu and is_suspended parameters
+>> will be used during PM runtime callbacks.
+>>
+>> Add __bcm_suspend() and __bcm_resume() which performs link management for
+>> PM callbacks.
+>>
+>> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+>> ---
+>> drivers/bluetooth/hci_bcm.c | 70 ++++++++++++++++++++++++++-------------------
+>> 1 file changed, 41 insertions(+), 29 deletions(-)
+>>
+>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>> index 6551251..29ed069 100644
+>> --- a/drivers/bluetooth/hci_bcm.c
+>> +++ b/drivers/bluetooth/hci_bcm.c
+>> @@ -56,7 +56,7 @@ struct bcm_device {
+>> 	int			irq;
+>> 	u8			irq_polarity;
+>>
+>> -#ifdef CONFIG_PM_SLEEP
+>> +#ifdef CONFIG_PM
+>> 	struct hci_uart		*hu;
+>> 	bool			is_suspended; /* suspend/resume flag */
+>> #endif
+>> @@ -153,7 +153,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+>> 	return 0;
+>> }
+>>
+>> -#ifdef CONFIG_PM_SLEEP
+>> +#ifdef CONFIG_PM
+>> static irqreturn_t bcm_host_wake(int irq, void *data)
+>> {
+>> 	struct bcm_device *bdev = data;
+>> @@ -259,7 +259,7 @@ static int bcm_open(struct hci_uart *hu)
+>> 		if (hu->tty->dev->parent == dev->pdev->dev.parent) {
+>> 			bcm->dev = dev;
+>> 			hu->init_speed = dev->init_speed;
+>> -#ifdef CONFIG_PM_SLEEP
+>> +#ifdef CONFIG_PM
+>> 			dev->hu = hu;
+>> #endif
+>> 			bcm_gpio_set_power(bcm->dev, true);
+>> @@ -283,7 +283,7 @@ static int bcm_close(struct hci_uart *hu)
+>> 	mutex_lock(&bcm_device_lock);
+>> 	if (bcm_device_exists(bdev)) {
+>> 		bcm_gpio_set_power(bdev, false);
+>> -#ifdef CONFIG_PM_SLEEP
+>> +#ifdef CONFIG_PM
+>> 		if (device_can_wakeup(&bdev->pdev->dev)) {
+>> 			devm_free_irq(&bdev->pdev->dev, bdev->irq, bdev);
+>> 			device_init_wakeup(&bdev->pdev->dev, false);
+>> @@ -425,6 +425,41 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
+>> 	return skb_dequeue(&bcm->txq);
+>> }
+>>
+>> +#ifdef CONFIG_PM
+>> +static void __bcm_suspend(struct bcm_device *bdev)
+>> +{
+>> +	if (!bdev->is_suspended && bdev->hu) {
+>> +		hci_uart_set_flow_control(bdev->hu, true);
+>> +
+>> +		/* Once this returns, driver suspends BT via GPIO */
+>> +		bdev->is_suspended = true;
+>> +	}
+>> +
+>> +	/* Suspend the device */
+>> +	if (bdev->device_wakeup) {
+>> +		gpiod_set_value(bdev->device_wakeup, false);
+>> +		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
+>> +		mdelay(15);
+>> +	}
+>> +}
+>> +
+>> +static void __bcm_resume(struct bcm_device *bdev)
+>> +{
+>> +	if (bdev->device_wakeup) {
+>> +		gpiod_set_value(bdev->device_wakeup, true);
+>> +		bt_dev_dbg(bdev, "resume, delaying 15 ms");
+>> +		mdelay(15);
+>> +	}
+>> +
+>> +	/* When this executes, the device has woken up already */
+>> +	if (bdev->is_suspended && bdev->hu) {
+>> +		bdev->is_suspended = false;
+>> +
+>> +		hci_uart_set_flow_control(bdev->hu, false);
+>> +	}
+>> +}
+>
+> I wonder if naming these bcm_suspend_device and bcm_resume_device are not better names actually. Since even the comments in these section say that is what you are doing.
+>
+> And as a general note, I think for devices with complicated power management, it is a good idea to add more comments in various place to explain why things are done a certain way. Nobody is going to remember this in 6 month when we have to look at this driver again for adding support for another model.
 
-are you utilizing src/shared/mgmt.c for your code. That one has proper handling for queuing the commands. It however means that the next command is only send when the previous one completed? Which command do you have problems with. There are a few special ones that require mgmt_reply to be used.
+I will do this
 
 Regards
 
-Marcel
-
+Fred
