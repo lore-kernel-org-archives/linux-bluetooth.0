@@ -1,34 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] Bluetooth: hci_intel: Fix warning due to unused pm functions
-Date: Thu, 10 Sep 2015 11:23:47 +0200
-Message-Id: <1441877027-19794-1-git-send-email-loic.poulain@intel.com>
+MIME-Version: 1.0
+Date: Thu, 10 Sep 2015 12:45:46 +0600
+Message-ID: <CACjvaw==Z9Mbgd6tBdHsNs1W+o7UbSudDUaGuwTLeY=LWkyW2A@mail.gmail.com>
+Subject: mgmt-api callback not firing properly
+From: Nazmul Alam <fadedreamz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-intel_suspend/resume depend on CONFIG_PM_SLEEP. They are unused in
-other cases.
+I am using mgmt-api to send command to the bluetooth kernel driver.
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- drivers/bluetooth/hci_intel.c | 2 ++
- 1 file changed, 2 insertions(+)
+The problem is that sometimes the callback of the mgmt_send() command
+is not fired even though the return value of the mgmt_send() is
+indicating a success.
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index ad45b9a..49e2540 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -1207,7 +1207,9 @@ static int intel_resume_device(struct device *dev)
- 
- 	return 0;
- }
-+#endif
- 
-+#ifdef CONFIG_PM_SLEEP
- static int intel_suspend(struct device *dev)
- {
- 	struct intel_device *idev = dev_get_drvdata(dev);
--- 
-1.9.1
+is there any special case which may cause this kind of issue?
+
+using bluez 5.31 and 4.1+ kernel.
+
+Thanks in advance.
