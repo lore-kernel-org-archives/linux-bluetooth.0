@@ -1,29 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ge, Ethan" <ethan.ge@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "jeremy@goop.org" <jeremy@goop.org>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: BLE(ATT) mouse doesn't register wakeup source in Linux kernel
- during BLE mouse connecting
-Date: Fri, 11 Sep 2015 10:12:31 +0000
-Message-ID: <86D221DC0B85F94D9B05B97827669A34064CE519@PGSMSX106.gar.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <55F2A28D.9010506@intel.com>
+Date: Fri, 11 Sep 2015 11:44:45 +0200
+From: Loic Poulain <loic.poulain@intel.com>
 MIME-Version: 1.0
+To: Frederic Danis <frederic.danis@intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Frederic Danis <frederic.danis@linux.intel.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] Bluetooth: hci_bcm: Add suspend/resume runtime
+ PM functions
+References: <1441785286-5840-1-git-send-email-frederic.danis@linux.intel.com> <1441785286-5840-4-git-send-email-frederic.danis@linux.intel.com> <5F941F10-620B-4282-848E-895D52744850@holtmann.org> <55F19651.8090908@intel.com>
+In-Reply-To: <55F19651.8090908@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Fred
 
-In file drivers/hid/hid-input.c, function hidinput_setup_battery() will return during connect a BLE mouse because of filed->usage->hid != HID_DC_BATTERYSTRENGTH. And BLE(ATT) HID doesn't register wakeup source in Linux kernel. 
+>> For hci_intel we are doing this in the enqueue function when the
+>> Bluetooth subsystem has to send us data. Why would we do this on the
+>> TTY receiving side here? If the device is not active, we would not be
+>> receiving anything in the first place. I am failing to see the logic
+>> here.
+> hci_intel also performs this when receiving LPM_OP_TX_NOTIFY packets.
+> Afaik, Broadcom device does not have this feature and we need to delay
+> the suspend when we receive a packet.
+>
+> I will move bcm_schedule_work() after h4_recv_buf() to perform it only
+> on completed packet.
 
-It will cause BLE HID mouse can't wake DUT from S3. Issue can be reproduced by IBUFFALO BSMBB09DS / Dell WM615 mouse / Microsoft arc touch, these all are BLE mouse. 
+What about using a delayed work with work_delay << autosuspend_delay so 
+that the work is not queued each time but every work_delay in worst case.
 
-static bool hidinput_setup_battery(struct hid_device *dev, unsigned report_type, struct hid_field *field)
-{
-    struct power_supply_desc *psy_desc = NULL;
-    struct power_supply_config psy_cfg = { .drv_data = dev, };
-    unsigned quirks;
-    s32 min, max;
+hci_uart proto callback is called with rx spinlock in
+hci_uart_tty_receive which is the receive_buf ldisc callback.
+In drivers/tty/tty_buffer.c we can see that flush_to_ldisc (work) locks
+a mutex (&buf->lock) and push the data to ldisc via receive_buf.
 
-    if (field->usage->hid != HID_DC_BATTERYSTRENGTH)
-        return false;    /* no match */
+So, I don't see any problem to remove the hci_ldisc rx_spinlock and 
+replace it by a mutex, or even don't use locking at all.
+
+Regards,
+Loic
+-- 
+Intel Open Source Technology Center
+http://oss.intel.com/
