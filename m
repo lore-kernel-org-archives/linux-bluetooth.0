@@ -1,37 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Freek de Kruijf <f.de.kruijf@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: hcidump does not show all traffic
-Date: Fri, 11 Sep 2015 15:41:02 +0200
-Message-ID: <3717569.7lEr2NYy4T@eik132.beelaertsict.nl>
-In-Reply-To: <9EAE4CF9-7F4F-4DD8-A983-B9393DFFD339@holtmann.org>
-References: <16191327.qpDB01f2sL@eik132.beelaertsict.nl> <9EAE4CF9-7F4F-4DD8-A983-B9393DFFD339@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <86D221DC0B85F94D9B05B97827669A34064CE519@PGSMSX106.gar.corp.intel.com>
+References: <86D221DC0B85F94D9B05B97827669A34064CE519@PGSMSX106.gar.corp.intel.com>
+Date: Fri, 11 Sep 2015 16:35:50 +0300
+Message-ID: <CABBYNZJBEA2Pt71+yPHbx7N5hjidfeEyML=2b=Ca931oWrzvtg@mail.gmail.com>
+Subject: Re: BLE(ATT) mouse doesn't register wakeup source in Linux kernel
+ during BLE mouse connecting
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Ge, Ethan" <ethan.ge@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "jeremy@goop.org" <jeremy@goop.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Op vrijdag 28 augustus 2015 12:05:29 schreef Marcel Holtmann:
-> Hi Freek,
-> 
-> > I am trying to monitor the traffic between my linux system and an external
-> > bluetooth system using the command "hcidump -i hci0 -w filename". I only
-> > catch some traffic from the host to the external device, but nothing from
-> > the device to the host. I analyze the file using wireshark.
-> 
-> you need a newer Wireshark version. I remember it had some issues with
-> correctly decoding the base packet types. Double check with btmon or
-> hcidump that all traffic is actually in the file.
+Hi Ethan,
 
-I finally found the cause. The bluetooth communication was between an 
-application of a normal user and the device. I used hcidump from the same 
-user. Now that I use hcidump as root I get all the traffic. Silly mistake.
+On Fri, Sep 11, 2015 at 1:12 PM, Ge, Ethan <ethan.ge@intel.com> wrote:
+> Hi,
+>
+> In file drivers/hid/hid-input.c, function hidinput_setup_battery() will return during connect a BLE mouse because of filed->usage->hid != HID_DC_BATTERYSTRENGTH. And BLE(ATT) HID doesn't register wakeup source in Linux kernel.
+>
+> It will cause BLE HID mouse can't wake DUT from S3. Issue can be reproduced by IBUFFALO BSMBB09DS / Dell WM615 mouse / Microsoft arc touch, these all are BLE mouse.
+>
+> static bool hidinput_setup_battery(struct hid_device *dev, unsigned report_type, struct hid_field *field)
+> {
+>     struct power_supply_desc *psy_desc = NULL;
+>     struct power_supply_config psy_cfg = { .drv_data = dev, };
+>     unsigned quirks;
+>     s32 min, max;
+>
+>     if (field->usage->hid != HID_DC_BATTERYSTRENGTH)
+>         return false;    /* no match */
 
-I would propose to put some text in the man page of hcidump about using the 
-command only as root. Maybe it should be installed in sbin instead of bin.
+But this is checked in case the device does not support battery
+strength support, I thought any input device would register a wakeup
+source regardless.
+
 
 -- 
-fr.gr.
-
-Freek de Kruijf
-
+Luiz Augusto von Dentz
