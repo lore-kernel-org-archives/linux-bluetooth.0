@@ -1,43 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
-To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
-	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth: btmrvl_drv: Clean up header code
-Date: Fri, 11 Sep 2015 13:56:21 +0000
-Message-ID: <20150911135614.GA2955@ubuntu>
-Content-Type: text/plain; charset="us-ascii"
+From: Freek de Kruijf <f.de.kruijf@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: hcidump does not show all traffic
+Date: Fri, 11 Sep 2015 15:41:02 +0200
+Message-ID: <3717569.7lEr2NYy4T@eik132.beelaertsict.nl>
+In-Reply-To: <9EAE4CF9-7F4F-4DD8-A983-B9393DFFD339@holtmann.org>
+References: <16191327.qpDB01f2sL@eik132.beelaertsict.nl> <9EAE4CF9-7F4F-4DD8-A983-B9393DFFD339@holtmann.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Prasanna Karthik <mkarthi3@visteon.com>
+Op vrijdag 28 augustus 2015 12:05:29 schreef Marcel Holtmann:
+> Hi Freek,
+> 
+> > I am trying to monitor the traffic between my linux system and an external
+> > bluetooth system using the command "hcidump -i hci0 -w filename". I only
+> > catch some traffic from the host to the external device, but nothing from
+> > the device to the host. I analyze the file using wireshark.
+> 
+> you need a newer Wireshark version. I remember it had some issues with
+> correctly decoding the base packet types. Double check with btmon or
+> hcidump that all traffic is actually in the file.
 
-Unnecessary space before function pointer arguments reported by
-checkpatch.
+I finally found the cause. The bluetooth communication was between an 
+application of a normal user and the device. I used hcidump from the same 
+user. Now that I use hcidump as root I get all the traffic. Silly mistake.
 
-Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
----
- drivers/bluetooth/btmrvl_drv.h |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+I would propose to put some text in the man page of hcidump about using the 
+command only as root. Maybe it should be installed in sbin instead of bin.
 
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.=
-h
-index 086f0ec..27a9aac 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -95,10 +95,10 @@ struct btmrvl_private {
- 	struct btmrvl_device btmrvl_dev;
- 	struct btmrvl_adapter *adapter;
- 	struct btmrvl_thread main_thread;
--	int (*hw_host_to_card) (struct btmrvl_private *priv,
-+	int (*hw_host_to_card)(struct btmrvl_private *priv,
- 				u8 *payload, u16 nb);
--	int (*hw_wakeup_firmware) (struct btmrvl_private *priv);
--	int (*hw_process_int_status) (struct btmrvl_private *priv);
-+	int (*hw_wakeup_firmware)(struct btmrvl_private *priv);
-+	int (*hw_process_int_status)(struct btmrvl_private *priv);
- 	void (*firmware_dump)(struct btmrvl_private *priv);
- 	spinlock_t driver_lock;		/* spinlock used by driver */
- #ifdef CONFIG_DEBUG_FS
---=20
-1.7.0.4
+-- 
+fr.gr.
+
+Freek de Kruijf
+
