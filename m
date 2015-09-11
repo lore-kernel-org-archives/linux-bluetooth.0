@@ -1,83 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [Patch v3] Bluetooth: remove SCO fragments on connection close
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1441901220-548-1-git-send-email-kubax.t.pawlak@intel.com>
-Date: Fri, 11 Sep 2015 10:46:10 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <48B5B7CD-E7FE-4FF9-9DB9-BB67CE99C34D@holtmann.org>
-References: <1441901220-548-1-git-send-email-kubax.t.pawlak@intel.com>
-To: Kuba Pawlak <kubax.t.pawlak@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] obexd: Fix not destroying session if owner disconnects
+Date: Fri, 11 Sep 2015 10:16:42 +0300
+Message-Id: <1441955802-20449-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kuba,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> SCO packet reassembler may have a fragment of SCO packet, from
-> previous connection, cached and not removed when SCO connection
-> is ended. Packets from new SCO connection are then going to be
-> attached to that fragment, creating an invalid SCO packets.
-> 
-> Controllers like Intel's WilkinsPeak are always fragmenting
-> SCO packet into 3 parts (#1, #2, #3). Packet #1 contains
-> SCO header and audio data, others just audio data. if there is
-> a fragment cached from previous connection, i.e. #1, first
-> SCO packet from new connection is going to be attached to it
-> creating packet consisting of fragments #1-#1-#2. This will
-> be forwarded to upper layers. After that, fragment #3 is going
-> to be used as a starting point for another SCO packet.
-> It does not contain a SCO header, but the code expects it,
-> casts a SCO header structure on it, and reads whatever audio
-> data happens to be there as SCO packet length and handle.
-> From that point on, we are assembling random data into SCO
-> packets. Usually it recovers quickly as initial audio data
-> contains mostly zeros (muted stream), but setups of over
-> 4 seconds were observed.
-> Issue manifests itself by printing on the console:
-> Bluetooth: hci0 SCO packet for unknown connection handle 48
-> Bluetooth: hci0 SCO packet for unknown connection handle 2560
-> Bluetooth: hci0 SCO packet for unknown connection handle 12288
-> It may also show random handles if audio data was non-zeroed.
-> Hcidump shows SCO packets with random length and handles.
-> 
-> Few messages with handle 0 at connection creation are OK
-> for some controllers (like WilkinsPeak), as there are SCO packets
-> with zeroed handle at the beginning (possible controller bug).
-> Few of such messages at connection end, with a handle looking
-> sane (around 256, 512, 768 ...) is also OK, as these are last
-> SCO packets that were assembled and sent up, before connection
-> was ended, but were not handled in time.
-> 
-> This issue may still manifest itself on WilkinsPeak as it sometimes,
-> at SCO connection creation, does not send third fragment of first
-> SCO packet (#1-#2-#1-#2-#3...). This is a firmware bug and this
-> patch does not address it.
-> 
-> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
-> ---
-> drivers/bluetooth/btusb.c | 12 ++++++++++++
-> 1 file changed, 12 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 9521b7bcc22d61b7690a928bc09500c883fe5495..95c1455823dd668c1d9a97da352728fb53f27a4e 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1277,6 +1277,18 @@ static void btusb_work(struct work_struct *work)
-> 			clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
-> 			usb_kill_anchored_urbs(&data->isoc_anchor);
-> 
-> +			/* When isochronous interface settings need to change, because
-> +			 * SCO connection was added or removed, a packet fragment may
-> +			 * be left in reassembler. It would then be attached to SCO
-> +			 * fragments of later SCO connections, in the end creating wrongly
-> +			 * reassembled SCO stream with packets of random lengths and handles.
-> +			 * Clear outstanding fragment when interface settings change.
-> +			 */
+If the owner disconnects the session should be destroyed even if the
+connection is pending:
 
-I reworded the comment and make it actually fit into 80 chars max per line. After that I applied your patch to bluetooth-next tree.
+obexd/client/session.c:owner_disconnected()
+obexd/client/session.c:obc_session_shutdown() 0x822abb8
+obexd/client/session.c:obc_session_ref() 0x822abb8: ref=3
+obexd/client/session.c:obc_session_unref() 0x822abb8: ref=2
+obexd/client/bluetooth.c:transport_connect() port 19
+obexd/client/bluetooth.c:transport_callback()
+obexd/client/session.c:transport_func()
+obexd/client/bluetooth.c:bluetooth_getpacketopt()
+obexd/client/pbap.c:pbap_probe() /org/bluez/obex/client/session1
+obexd/client/session.c:obc_session_ref() 0x822abb8: ref=3
+obexd/client/session.c:obc_session_register() Session(0x822abb8) registered /org/bluez/obex/client/session1
+obexd/client/session.c:obc_session_unref() 0x822abb8: ref=2
 
-Regards
+To fix this the code now checks if the connect callback is pending, in
+that case destroy the callback releasing the reference it carrying.
+---
+ obexd/client/session.c | 34 ++++++++++++++++++++++++++++------
+ 1 file changed, 28 insertions(+), 6 deletions(-)
 
-Marcel
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index d6da0a7..7248768 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -112,6 +112,7 @@ struct obc_session {
+ 	GQueue *queue;
+ 	guint process_id;
+ 	char *folder;
++	struct callback_data *callback;
+ };
+ 
+ static GSList *sessions = NULL;
+@@ -303,6 +304,16 @@ disconnect:
+ 	session_free(session);
+ }
+ 
++static void callback_destroy(struct callback_data *callback, GError *err)
++{
++	struct obc_session *session = callback->session;
++
++	callback->func(session, NULL, err, callback->data);
++	g_free(callback);
++	session->callback = NULL;
++	obc_session_unref(session);
++}
++
+ static void connect_cb(GObex *obex, GError *err, GObexPacket *rsp,
+ 							gpointer user_data)
+ {
+@@ -322,11 +333,9 @@ static void connect_cb(GObex *obex, GError *err, GObexPacket *rsp,
+ 				"OBEX Connect failed with 0x%02x", rsp_code);
+ 
+ done:
+-	callback->func(callback->session, NULL, gerr, callback->data);
++	callback_destroy(callback, gerr);
+ 	if (gerr != NULL)
+ 		g_error_free(gerr);
+-	obc_session_unref(callback->session);
+-	g_free(callback);
+ }
+ 
+ static void session_disconnected(GObex *obex, GError *err, gpointer user_data)
+@@ -415,17 +424,28 @@ static void transport_func(GIOChannel *io, GError *err, gpointer user_data)
+ 
+ 	return;
+ done:
+-	callback->func(callback->session, NULL, err, callback->data);
+-	obc_session_unref(callback->session);
+-	g_free(callback);
++	callback_destroy(callback, err);
+ }
+ 
+ static void owner_disconnected(DBusConnection *connection, void *user_data)
+ {
+ 	struct obc_session *session = user_data;
++	GError *err;
+ 
+ 	DBG("");
+ 
++	/*
++	 * If connection still connecting notify the callback to destroy the
++	 * session.
++	 */
++	if (session->callback) {
++		err = g_error_new(OBEX_IO_ERROR, OBEX_IO_DISCONNECTED,
++						"Session closed by user");
++		callback_destroy(session->callback, err);
++		g_error_free(err);
++		return;
++	}
++
+ 	obc_session_shutdown(session);
+ }
+ 
+@@ -531,6 +551,8 @@ static int session_connect(struct obc_session *session,
+ 		return -EINVAL;
+ 	}
+ 
++	session->callback = callback;
++
+ 	return 0;
+ }
+ 
+-- 
+2.4.3
 
