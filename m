@@ -1,30 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH] Bluetooth: btmrvl_drv: Clean up header code
+Subject: Re: [PATCH] bluetooth: bt3c_cs: clean up obsolete functions
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150911135614.GA2955@ubuntu>
-Date: Sat, 12 Sep 2015 09:48:06 +0100
+In-Reply-To: <20150911150226.GA12951@ubuntu>
+Date: Sat, 12 Sep 2015 09:47:40 +0100
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <94D24C08-4E52-41EC-B7D1-08500EC57FA8@holtmann.org>
-References: <20150911135614.GA2955@ubuntu>
+Message-Id: <FB0132DD-5BEA-4881-AE9D-9B7BC9BAD7D9@holtmann.org>
+References: <20150911150226.GA12951@ubuntu>
 To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Prasanna,
 
-> Unnecessary space before function pointer arguments reported by
-> checkpatch.
+> simple_strtoul is obsolete, use kstrtoul instead reported by checkpatch.
 > 
 > Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
 > ---
-> drivers/bluetooth/btmrvl_drv.h |    6 +++---
-> 1 files changed, 3 insertions(+), 3 deletions(-)
+> drivers/bluetooth/bt3c_cs.c |   12 ++++++++----
+> 1 files changed, 8 insertions(+), 4 deletions(-)
 
-the patch does not apply to bluetooth-next tree. Please fix this and resend.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
