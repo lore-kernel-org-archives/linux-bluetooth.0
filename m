@@ -1,46 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Elliot Saba <staticfloat@gmail.com>
-Date: Sat, 12 Sep 2015 22:58:20 -0700
-Message-ID: <CAGGi21YVrRB06R8ahxRLBZ=xZkNKGnCsetL1xUQx9DPLeAGGXA@mail.gmail.com>
-Subject: Understanding connecting to BLE keyboard
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: mgmt-api callback not firing properly
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CACjvaw=P2SNuKgMB5BjEhmrpPv55eJUGEZt21pHnh7zmTfE6bg@mail.gmail.com>
+Date: Sat, 12 Sep 2015 11:23:27 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A1440DEA-2A32-40ED-8C2D-A7D4E2ABE415@holtmann.org>
+References: <CACjvaw==Z9Mbgd6tBdHsNs1W+o7UbSudDUaGuwTLeY=LWkyW2A@mail.gmail.com> <3A3A3A19-AE6E-493A-AA1F-3C0A8451B775@holtmann.org> <CACjvaw=P2SNuKgMB5BjEhmrpPv55eJUGEZt21pHnh7zmTfE6bg@mail.gmail.com>
+To: Nazmul Alam <fadedreamz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello there, I recently obtained a Microsoft Designer BLE
-keyboard/mouse, and I thought I would attempt to connect it up to my
-Linux box for fun.  Needless to say, I've met with some problems,
-primarily with the authentication mechanisms I believe.
+Hi,
 
-First off, I am using bluez 5.23 on SteamOS (A debian derivative) with
-a Broadcom BCM4352 controller.
+>> are you utilizing src/shared/mgmt.c for your code. That one has proper handling for queuing the commands. It however means that the next command is only send when the previous one completed? Which command do you have problems with. There are a few special ones that require mgmt_reply to be used.
+> 
+> Yes I am using src/shared/mgmt.c for my code. The problem occurs when
+> I try to issue the MGMT_OP_START_DISCOVERY &
+> MGMT_OP_ADD_ADVERTISING/MGMT_OP_REMOVE_ADVERTISING simultaneously,
+> sometimes the callback doesn't fire for the later call.
+> 
+> According to one of your reply to a thread, I changed the guarding
+> code of the kernel driver and simultaneous scanning / advertising is
+> working. But sometimes the callback is not firing (randomly).
+> 
+> I am using the mainloop_run() in a pthread. Is this can be a issue?
 
-When attempting to connect to the bluetooth keyboard using my OSX
-machine, it prompts me to enter a PIN, and after doing so, things are
-fine and dandy.  When using gnome-bluetooth to attempt to connect, it
-thinks about it for a little bit, and then reverts to its previous
-status ("Not Set Up") rather than prompting me for a PIN or anything
-like that.
+our code is not thread safe. So that might be a problem. Since I have not heard from issues with missing callbacks in bluetoothd and that is running exactly the same code.
 
-When attempting to connect via the command line using bluetoothctl,
-(First I start a KeyboardOnly agent, then scan for the device, then
-"trust" it, then "pair" it) bluetoothctl initially reports the
-connection has succeeded, but then immediately disconnects and prints
-out the error "org.bluez.Error.AuthenticationCanceled".
+Regards
 
-When attempting to connect via the command line using gatttool in
-interactive mode, I run into similar issues; I can type "connect" and
-it initially reports success, but any command I then type to query the
-device immediately reports "Command Failed: Disconnected".
+Marcel
 
-Is there some way I can increase the amount of debugging information
-available to me in order to try and track down exactly what's going
-wrong here?  I admit that my knowledge of the proper way to connect
-this device in linux is shaky at best, and I would "Read The Manual"
-if I knew where to look for it.  Pointers on where to go to read up on
-this whole process are definitely welcome.
-
-Thank you for your time,
--E
