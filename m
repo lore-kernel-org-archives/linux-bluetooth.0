@@ -1,68 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: USB  BT gives problem If device plugged during boot to platform.
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: hcidump does not show all traffic
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <7606666c5083217bbf33b5a55320c909.squirrel@iwavesystems.com>
-Date: Sat, 12 Sep 2015 11:21:44 +0100
-Cc: Szymon Janc <ext.szymon.janc@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <8F334E2E-98C7-4901-9ED2-574454D383DF@holtmann.org>
-References: <2de8f187df4e6d13765677ed44c1ddbc.squirrel@iwavesystems.com> <4063128.4B3eOl7Vlx@leonov> <96b3bf017c42c6e749a0158c73c3084f.squirrel@iwavesystems.com> <2103677.klfxQc4oJG@leonov> <336be718ceb9032e815edb547726b5ef.squirrel@iwavesystems.com> <7606666c5083217bbf33b5a55320c909.squirrel@iwavesystems.com>
-To: krishnaks@iwavesystems.com
+In-Reply-To: <3717569.7lEr2NYy4T@eik132.beelaertsict.nl>
+Date: Sat, 12 Sep 2015 11:18:09 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <19D4F963-B41D-4617-9AC1-F79EBE554A2C@holtmann.org>
+References: <16191327.qpDB01f2sL@eik132.beelaertsict.nl> <9EAE4CF9-7F4F-4DD8-A983-B9393DFFD339@holtmann.org> <3717569.7lEr2NYy4T@eik132.beelaertsict.nl>
+To: Freek de Kruijf <f.de.kruijf@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Freek,
 
->> I just checked BT enable flow from android and found that
->> When USB BT Dongle is not connected during bootm,During Bluez Init
->> (hal-bluetooth.c:init()), hal_ipc_accept is failing.
->> I hope IPC is failing as USB BT dongle is not connected.
+>>> I am trying to monitor the traffic between my linux system and an external
+>>> bluetooth system using the command "hcidump -i hci0 -w filename". I only
+>>> catch some traffic from the host to the external device, but nothing from
+>>> the device to the host. I analyze the file using wireshark.
 >> 
->> From below Logcat suggests that
->> E/BlueZ   (  799): bluetoothd connect timeout
->> E/BluetoothServiceJni(  799): Error while setting the callbacks
->> E/BluetoothAdapterState(  799): Error while turning Bluetooth On
->> 
->> because of this none of the BT interfaces are initialized.
->> 
->> When we connect the USB BT dongle , hal-bluetooth.c:init() is not getting
->> called. because of this BT enable is failing.
->> 
->> 
->> But in working case (USB BT dongle connected during boot). Each time when
->> we connect BT dongle, init is getting called.
->> 
->> I also observed that If I remove the USB dongle without turning off BT
->> from android BT settings menu, at that time
->> also init is not getting called and because of that BT will not get
->> enabled properly.
->> 
->> If we make "init" function to call whenever BT dongle it connected, is
->> that will be enough for BT HAL module to work
->> properly or any other settings might be required?
->> 
+>> you need a newer Wireshark version. I remember it had some issues with
+>> correctly decoding the base packet types. Double check with btmon or
+>> hcidump that all traffic is actually in the file.
 > 
-> I have added call to init and get_profile_interface function in Android
-> JNI in enable Function so that we can initialize the BT HAL.
-> With this change BT is turning on even if I connect the dongle after Boot.
+> I finally found the cause. The bluetooth communication was between an 
+> application of a normal user and the device. I used hcidump from the same 
+> user. Now that I use hcidump as root I get all the traffic. Silly mistake.
 > 
-> Thanks for the support.
-> 
-> I observed one more issue when I connect different USB dongle. Was getting
-> "Bluetooth address mismatch" error as in cache previous connected USB BT
-> hardware address is saved.
-> 
-> Is that check required? After bypassing that check, BT is working with
-> different USB dongle also.
+> I would propose to put some text in the man page of hcidump about using the 
+> command only as root. Maybe it should be installed in sbin instead of bin.
 
-for a lot of Bluetooth controllers we have support for Set Public Address management command. If the kernel driver provides the vendor specific hdev->set_bdaddr callback, then in theory you can have BlueZ for Android programming the address into the controller even if you swap it out.
-
-If you do that, then you would not see this message. However that is just how Android handles things and we have to deal with it. Feel free to send patches to start supporting Set Public Address handling.
+just start using btmon instead of hcidump.
 
 Regards
 
 Marcel
-
 
