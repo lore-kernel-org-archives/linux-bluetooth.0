@@ -1,35 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: USB  BT gives problem If device plugged during boot to platform.
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: mgmt-api callback not firing properly
+Content-Type: text/plain; charset=US-ASCII
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CACjvaw=P2SNuKgMB5BjEhmrpPv55eJUGEZt21pHnh7zmTfE6bg@mail.gmail.com>
-Date: Sat, 12 Sep 2015 11:23:27 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A1440DEA-2A32-40ED-8C2D-A7D4E2ABE415@holtmann.org>
-References: <CACjvaw==Z9Mbgd6tBdHsNs1W+o7UbSudDUaGuwTLeY=LWkyW2A@mail.gmail.com> <3A3A3A19-AE6E-493A-AA1F-3C0A8451B775@holtmann.org> <CACjvaw=P2SNuKgMB5BjEhmrpPv55eJUGEZt21pHnh7zmTfE6bg@mail.gmail.com>
-To: Nazmul Alam <fadedreamz@gmail.com>
+In-Reply-To: <7606666c5083217bbf33b5a55320c909.squirrel@iwavesystems.com>
+Date: Sat, 12 Sep 2015 11:21:44 +0100
+Cc: Szymon Janc <ext.szymon.janc@tieto.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <8F334E2E-98C7-4901-9ED2-574454D383DF@holtmann.org>
+References: <2de8f187df4e6d13765677ed44c1ddbc.squirrel@iwavesystems.com> <4063128.4B3eOl7Vlx@leonov> <96b3bf017c42c6e749a0158c73c3084f.squirrel@iwavesystems.com> <2103677.klfxQc4oJG@leonov> <336be718ceb9032e815edb547726b5ef.squirrel@iwavesystems.com> <7606666c5083217bbf33b5a55320c909.squirrel@iwavesystems.com>
+To: krishnaks@iwavesystems.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
->> are you utilizing src/shared/mgmt.c for your code. That one has proper handling for queuing the commands. It however means that the next command is only send when the previous one completed? Which command do you have problems with. There are a few special ones that require mgmt_reply to be used.
+>> I just checked BT enable flow from android and found that
+>> When USB BT Dongle is not connected during bootm,During Bluez Init
+>> (hal-bluetooth.c:init()), hal_ipc_accept is failing.
+>> I hope IPC is failing as USB BT dongle is not connected.
+>> 
+>> From below Logcat suggests that
+>> E/BlueZ   (  799): bluetoothd connect timeout
+>> E/BluetoothServiceJni(  799): Error while setting the callbacks
+>> E/BluetoothAdapterState(  799): Error while turning Bluetooth On
+>> 
+>> because of this none of the BT interfaces are initialized.
+>> 
+>> When we connect the USB BT dongle , hal-bluetooth.c:init() is not getting
+>> called. because of this BT enable is failing.
+>> 
+>> 
+>> But in working case (USB BT dongle connected during boot). Each time when
+>> we connect BT dongle, init is getting called.
+>> 
+>> I also observed that If I remove the USB dongle without turning off BT
+>> from android BT settings menu, at that time
+>> also init is not getting called and because of that BT will not get
+>> enabled properly.
+>> 
+>> If we make "init" function to call whenever BT dongle it connected, is
+>> that will be enough for BT HAL module to work
+>> properly or any other settings might be required?
+>> 
 > 
-> Yes I am using src/shared/mgmt.c for my code. The problem occurs when
-> I try to issue the MGMT_OP_START_DISCOVERY &
-> MGMT_OP_ADD_ADVERTISING/MGMT_OP_REMOVE_ADVERTISING simultaneously,
-> sometimes the callback doesn't fire for the later call.
+> I have added call to init and get_profile_interface function in Android
+> JNI in enable Function so that we can initialize the BT HAL.
+> With this change BT is turning on even if I connect the dongle after Boot.
 > 
-> According to one of your reply to a thread, I changed the guarding
-> code of the kernel driver and simultaneous scanning / advertising is
-> working. But sometimes the callback is not firing (randomly).
+> Thanks for the support.
 > 
-> I am using the mainloop_run() in a pthread. Is this can be a issue?
+> I observed one more issue when I connect different USB dongle. Was getting
+> "Bluetooth address mismatch" error as in cache previous connected USB BT
+> hardware address is saved.
+> 
+> Is that check required? After bypassing that check, BT is working with
+> different USB dongle also.
 
-our code is not thread safe. So that might be a problem. Since I have not heard from issues with missing callbacks in bluetoothd and that is running exactly the same code.
+for a lot of Bluetooth controllers we have support for Set Public Address management command. If the kernel driver provides the vendor specific hdev->set_bdaddr callback, then in theory you can have BlueZ for Android programming the address into the controller even if you swap it out.
+
+If you do that, then you would not see this message. However that is just how Android handles things and we have to deal with it. Feel free to send patches to start supporting Set Public Address handling.
 
 Regards
 
 Marcel
+
 
