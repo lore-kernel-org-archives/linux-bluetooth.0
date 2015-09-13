@@ -1,69 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Ge, Ethan" <ethan.ge@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"jeremy@goop.org" <jeremy@goop.org>, Marcel Holtmann <marcel@holtmann.org>
-Subject: RE: BLE(ATT) mouse doesn't register wakeup source in Linux kernel
- during BLE mouse connecting
-Date: Mon, 14 Sep 2015 03:26:50 +0000
-Message-ID: <86D221DC0B85F94D9B05B97827669A34064CEC19@PGSMSX106.gar.corp.intel.com>
-References: <86D221DC0B85F94D9B05B97827669A34064CE519@PGSMSX106.gar.corp.intel.com>
- <CABBYNZJBEA2Pt71+yPHbx7N5hjidfeEyML=2b=Ca931oWrzvtg@mail.gmail.com>
-In-Reply-To: <CABBYNZJBEA2Pt71+yPHbx7N5hjidfeEyML=2b=Ca931oWrzvtg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+To: linux-bluetooth@vger.kernel.org
+From: Mike <mailinglists@in-box.at>
+Subject: Bluez with Raspberry Pi for BLE
+Message-ID: <55F55C99.7070803@in-box.at>
+Date: Sun, 13 Sep 2015 13:23:05 +0200
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpeg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogTHVpeiBBdWd1c3Rv
-IHZvbiBEZW50eiBbbWFpbHRvOmx1aXouZGVudHpAZ21haWwuY29tXSANClNlbnQ6IEZyaWRheSwg
-U2VwdGVtYmVyIDExLCAyMDE1IDk6MzYgUE0NClRvOiBHZSwgRXRoYW4NCkNjOiBsaW51eC1ibHVl
-dG9vdGhAdmdlci5rZXJuZWwub3JnOyBqZXJlbXlAZ29vcC5vcmc7IE1hcmNlbCBIb2x0bWFubg0K
-U3ViamVjdDogUmU6IEJMRShBVFQpIG1vdXNlIGRvZXNuJ3QgcmVnaXN0ZXIgd2FrZXVwIHNvdXJj
-ZSBpbiBMaW51eCBrZXJuZWwgZHVyaW5nIEJMRSBtb3VzZSBjb25uZWN0aW5nDQoNCkhpIEV0aGFu
-LA0KDQpPbiBGcmksIFNlcCAxMSwgMjAxNSBhdCAxOjEyIFBNLCBHZSwgRXRoYW4gPGV0aGFuLmdl
-QGludGVsLmNvbT4gd3JvdGU6DQo+IEhpLA0KPg0KPiBJbiBmaWxlIGRyaXZlcnMvaGlkL2hpZC1p
-bnB1dC5jLCBmdW5jdGlvbiBoaWRpbnB1dF9zZXR1cF9iYXR0ZXJ5KCkgd2lsbCByZXR1cm4gZHVy
-aW5nIGNvbm5lY3QgYSBCTEUgbW91c2UgYmVjYXVzZSBvZiBmaWxlZC0+dXNhZ2UtPmhpZCAhPSBI
-SURfRENfQkFUVEVSWVNUUkVOR1RILiBBbmQgQkxFKEFUVCkgSElEIGRvZXNuJ3QgcmVnaXN0ZXIg
-d2FrZXVwIHNvdXJjZSBpbiBMaW51eCBrZXJuZWwuDQo+DQo+IEl0IHdpbGwgY2F1c2UgQkxFIEhJ
-RCBtb3VzZSBjYW4ndCB3YWtlIERVVCBmcm9tIFMzLiBJc3N1ZSBjYW4gYmUgcmVwcm9kdWNlZCBi
-eSBJQlVGRkFMTyBCU01CQjA5RFMgLyBEZWxsIFdNNjE1IG1vdXNlIC8gTWljcm9zb2Z0IGFyYyB0
-b3VjaCwgdGhlc2UgYWxsIGFyZSBCTEUgbW91c2UuDQo+DQo+IHN0YXRpYyBib29sIGhpZGlucHV0
-X3NldHVwX2JhdHRlcnkoc3RydWN0IGhpZF9kZXZpY2UgKmRldiwgdW5zaWduZWQgDQo+IHJlcG9y
-dF90eXBlLCBzdHJ1Y3QgaGlkX2ZpZWxkICpmaWVsZCkgew0KPiAgICAgc3RydWN0IHBvd2VyX3N1
-cHBseV9kZXNjICpwc3lfZGVzYyA9IE5VTEw7DQo+ICAgICBzdHJ1Y3QgcG93ZXJfc3VwcGx5X2Nv
-bmZpZyBwc3lfY2ZnID0geyAuZHJ2X2RhdGEgPSBkZXYsIH07DQo+ICAgICB1bnNpZ25lZCBxdWly
-a3M7DQo+ICAgICBzMzIgbWluLCBtYXg7DQo+DQo+ICAgICBpZiAoZmllbGQtPnVzYWdlLT5oaWQg
-IT0gSElEX0RDX0JBVFRFUllTVFJFTkdUSCkNCj4gICAgICAgICByZXR1cm4gZmFsc2U7ICAgIC8q
-IG5vIG1hdGNoICovDQoNCj4gQnV0IHRoaXMgaXMgY2hlY2tlZCBpbiBjYXNlIHRoZSBkZXZpY2Ug
-ZG9lcyBub3Qgc3VwcG9ydCBiYXR0ZXJ5IHN0cmVuZ3RoIHN1cHBvcnQsIEkgdGhvdWdodCBhbnkg
-aW5wdXQgZGV2aWNlIHdvdWxkIHJlZ2lzdGVyIGEgd2FrZXVwIHNvdXJjZSByZWdhcmRsZXNzLg0K
-PiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQoNCkkgc2FpZCB0aGF0IGJlY2F1c2UgSSB2ZXJpZmll
-ZCBpdCBieSBmdHJhY2UuIEkgZm91bmQgaWYgaXQgcmV0dXJuIGhpZGlucHV0X3NldHVwX2JhdHRl
-cnkoKSwgYW5kIGlucHV0IGRldmljZSBjYW4ndCByZWdpc3RlciBhIHdha2V1cCBzb3VyY2UuIEJl
-bG93IGFyZSB0aGUgY29kZSBmbG93LiBoaWRpbnB1dF9zZXR1cF9iYXR0ZXJ5LT5fX3Bvd2VyX3N1
-cHBseV9yZWdpc3Rlci0+IGRldmljZV9pbml0X3dha2V1cC4NCkluIG90aGVyIGhhbmQsIHRoZSBC
-Ui9FRFIgbW91c2UgY2FuIHJlZ2lzdGVyIGEgd2FrZXVwIHNvdXJjZSBiZWNhdXNlIGl0IHdvbid0
-IHJldHVybiBoaWRpbnB1dF9zZXR1cF9iYXR0ZXJ5KCkgYW5kIGNhbiBnbyB0aHJvdWdoIG5leHQg
-ZnVuY3Rpb24uIEkgYW0gdHJ5aW5nIHRvIGNoZWNrIHdoeSBCTEUgbW91c2UgdXNhZ2UtPmhpZCAh
-PSBISURfRENfQkFUVEVSWVNUUkVOR1RIIGFuZCBjYW4gbm90IHdha2V1cCBzeXN0ZW0gaW4gUzMu
-DQoNCnN0YXRpYyBib29sIGhpZGlucHV0X3NldHVwX2JhdHRlcnkoc3RydWN0IGhpZF9kZXZpY2Ug
-KmRldiwgdW5zaWduZWQgcmVwb3J0X3R5cGUsIHN0cnVjdCBoaWRfZmllbGQgKmZpZWxkKQ0Kew0K
-ICAgIHN0cnVjdCBwb3dlcl9zdXBwbHlfZGVzYyAqcHN5X2Rlc2MgPSBOVUxMOw0KICAgIHN0cnVj
-dCBwb3dlcl9zdXBwbHlfY29uZmlnIHBzeV9jZmcgPSB7IC5kcnZfZGF0YSA9IGRldiwgfTsNCiAg
-ICB1bnNpZ25lZCBxdWlya3M7DQogICAgczMyIG1pbiwgbWF4Ow0KDQogICAgaWYgKGZpZWxkLT51
-c2FnZS0+aGlkICE9IEhJRF9EQ19CQVRURVJZU1RSRU5HVEgpDQogICAgICAgIHJldHVybiBmYWxz
-ZTsgICAgLyogbm8gbWF0Y2ggKi8NCi4uLg0KICAgIGRldi0+YmF0dGVyeSA9IHBvd2VyX3N1cHBs
-eV9yZWdpc3RlcigmZGV2LT5kZXYsIHBzeV9kZXNjLCAmcHN5X2NmZyk7DQouLg0KfQ0KDQpzdGF0
-aWMgc3RydWN0IHBvd2VyX3N1cHBseSAqX19tdXN0X2NoZWNrDQpfX3Bvd2VyX3N1cHBseV9yZWdp
-c3RlcihzdHJ1Y3QgZGV2aWNlICpwYXJlbnQsDQogICAgICAgICAgICAgICAgICAgY29uc3Qgc3Ry
-dWN0IHBvd2VyX3N1cHBseV9kZXNjICpkZXNjLA0KICAgICAgICAgICAgICAgICAgIGNvbnN0IHN0
-cnVjdCBwb3dlcl9zdXBwbHlfY29uZmlnICpjZmcsDQogICAgICAgICAgICAgICAgICAgYm9vbCB3
-cykNCnsNCiAuLi4uDQoNCiAgICBzcGluX2xvY2tfaW5pdCgmcHN5LT5jaGFuZ2VkX2xvY2spOw0K
-ICAgIHJjID0gZGV2aWNlX2luaXRfd2FrZXVwKGRldiwgd3MpOw0KICAgIGlmIChyYykNCiAgICAg
-ICAgZ290byB3YWtldXBfaW5pdF9mYWlsZWQ7DQouLi4uDQp9DQoNCmludCBkZXZpY2VfaW5pdF93
-YWtldXAoc3RydWN0IGRldmljZSAqZGV2LCBib29sIGVuYWJsZSkNCnsNCiAgICBpbnQgcmV0ID0g
-MDsNCg0KICAgIGlmICghZGV2KQ0KICAgICAgICByZXR1cm4gLUVJTlZBTDsNCg0KICAgIGlmIChl
-bmFibGUpIHsNCiAgICAgICAgZGV2aWNlX3NldF93YWtldXBfY2FwYWJsZShkZXYsIHRydWUpOw0K
-ICAgICAgICByZXQgPSBkZXZpY2Vfd2FrZXVwX2VuYWJsZShkZXYpOw0KLi4uDQp9DQpFdGhhbg0K
-LS0NCg==
+Hi,
+
+I am trying to get my RPi to work with BLE. I downloaded and compiled
+bluez-5.34.tar.xz.
+
+uname -a says: Linux raspberry 4.1.6-v7+ #810 SMP PREEMPT Tue Aug 18
+15:32:12 BST 2015 armv7l GNU/Linux
+
+My BLE-stick is recognized and hci0 is up and running. I can scan for
+advertising peripherals with "sudo hcitool lescan". This works. But if I
+try to connect to a peripheral I always get Connection refused (111). So
+I looked at the output of hcidump and found that after the connection is
+completed, I get disconnected by remote.
+
+< HCI Command: LE Create Connection (0x08|0x000d) plen 25
+    bdaddr 34:B1:F7:D4:FE:F3 type 0
+    interval 4 window 4 initiator_filter 0
+    own_bdaddr_type 0 min_interval 15 max_interval 15
+    latency 0 supervision_to 3200 min_ce 1 max_ce 1
+> HCI Event: Command Status (0x0f) plen 4
+    LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
+> HCI Event: LE Meta Event (0x3e) plen 19
+    LE Connection Complete
+      status 0x00 handle 72, role master
+      bdaddr 34:B1:F7:D4:FE:F3 (Public)
+< HCI Command: LE Read Remote Used Features (0x08|0x0016) plen 2
+  0000: 48 00                                             H.
+> HCI Event: Command Status (0x0f) plen 4
+    LE Read Remote Used Features (0x08|0x0016) status 0x00 ncmd 1
+> HCI Event: LE Meta Event (0x3e) plen 12
+    LE Read Remote Used Features Complete
+      status 0x00 handle 72
+      Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+    handle 72 reason 0x13
+    Reason: Remote User Terminated Connection
+> HCI Event: Command Status (0x0f) plen 4
+    Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 72 reason 0x16
+    Reason: Connection Terminated by Local Host
+
+I tried three different peripherals and I always get "Connection refused
+(111)". Any ideas would be appreciated.
+
+Best regards,
+Mike
