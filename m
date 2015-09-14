@@ -1,118 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Sep 2015 18:11:09 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Viresh Kumar <viresh.kumar@linaro.org>
-Cc: gregkh@linuxfoundation.org, linaro-kernel@lists.linaro.org,
-	Rafael Wysocki <rjw@rjwysocki.net>, sboyd@codeaurora.org,
-	Akinobu Mita <akinobu.mita@gmail.com>,
-	Alexander Duyck <alexander.h.duyck@redhat.com>,
-	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." <alsa-devel@alsa-project.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Arik Nemtsov <arik@wizery.com>,
-	"open list:QUALCOMM ATHEROS ATH10K WIRELESS DRIVER" <ath10k@lists.infradead.org>,
-	"open list:QUALCOMM ATHEROS ATH9K WIRELESS DRIVER" <ath9k-devel@lists.ath9k.org>,
-	Avri Altman <avri.altman@intel.com>,
-	"open list:B43 WIRELESS DRIVER" <b43-dev@lists.infradead.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Brian Silverman <bsilver16384@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Charles Keepax <ckeepax@opensource.wolfsonmicro.com>,
-	Chaya Rachel Ivgi <chaya.rachel.ivgi@intel.com>,
-	Davidlohr Bueso <dave@stgolabs.net>,
-	David Rientjes <rientjes@google.com>,
-	Dmitry Monakhov <dmonakhov@openvz.org>,
-	Doug Thompson <dougthompson@xmission.com>,
-	Eliad Peller <eliad@wizery.com>,
-	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Haggai Eran <haggaie@mellanox.com>,
-	Hariprasad S <hariprasad@chelsio.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Intel Linux Wireless <ilw@linux.intel.com>,
-	"open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
-	"James E.J. Bottomley" <JBottomley@odin.com>,
-	Jaroslav Kysela <perex@perex.cz>, Jiri Slaby <jirislaby@gmail.com>,
-	Joe Perches <joe@perches.com>, Joerg Roedel <joro@8bytes.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Jonathan Corbet <corbet@lwn.net>, Joonsoo Kim <js1304@gmail.com>,
-	Kalle Valo <kvalo@qca.qualcomm.com>,
-	Larry Finger <Larry.Finger@lwfinger.net>,
-	Len Brown <lenb@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
-	"open list:ACPI" <linux-acpi@vger.kernel.org>,
-	"moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)" <linux-arm-kernel@lists.infradead.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
-	"open list:CISCO SCSI HBA DRIVER" <linux-scsi@vger.kernel.org>,
-	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:" <linux-usb@vger.kernel.org>,
-	"open list:NETWORKING DRIVERS (WIRELESS)" <linux-wireless@vger.kernel.org>,
-	Luciano Coelho <luciano.coelho@intel.com>,
-	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Mauro Carvalho Chehab <mchehab@osg.samsung.com>,
-	Mel Gorman <mgorman@suse.de>,
-	Michael Kerrisk <mtk.manpages@gmail.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Narsimhulu Musini <nmusini@cisco.com>,
-	"open list:CXGB4 ETHERNET DRIVER (CXGB4)" <netdev@vger.kernel.org>,
-	Nick Kossifidis <mickflemm@gmail.com>,
-	Oleg Nesterov <oleg@redhat.com>,
-	"open list:WOLFSON MICROELECTRONICS DRIVERS" <patches@opensource.wolfsonmicro.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
-	Richard Fitzgerald <rf@opensource.wolfsonmicro.com>,
-	Sasha Levin <sasha.levin@oracle.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Sebastian Ott <sebott@linux.vnet.ibm.com>,
-	Sesidhar Baddela <sebaddel@cisco.com>,
-	Stanislaw Gruszka <sgruszka@redhat.com>,
-	Takashi Iwai <tiwai@suse.com>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Tomas Winkler <tomas.winkler@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Wang Long <long.wanglong@huawei.com>,
-	Will Deacon <will.deacon@arm.com>
-Message-ID: <20150914171109.GW12027@sirena.org.uk>
-References: <81516fb9c662cc338b5af5b63fbbcde5374e0893.1442202447.git.viresh.kumar@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gABkrxlT8b359YXV"
-In-Reply-To: <81516fb9c662cc338b5af5b63fbbcde5374e0893.1442202447.git.viresh.kumar@linaro.org>
-Subject: Re: [PATCH V2] debugfs: don't assume sizeof(bool) to be 4 bytes
+In-Reply-To: <CAD0=r8yuseCAN7RvtRwUA4eaA3eKhNaOq+8NofV8M+Herbt-vw@mail.gmail.com>
+References: <1441715022-20327-1-git-send-email-luiz.dentz@gmail.com>
+	<1441715022-20327-2-git-send-email-luiz.dentz@gmail.com>
+	<CAD0=r8yuseCAN7RvtRwUA4eaA3eKhNaOq+8NofV8M+Herbt-vw@mail.gmail.com>
+Date: Mon, 14 Sep 2015 09:39:44 -0700
+Message-ID: <CAD0=r8zQWhnaVY3QhbvPd9x-0VGD8C5L1b9-ZoMr5eqzUSR-=Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/3] core/gatt: Fix not able to read/write on reconnections
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
---gABkrxlT8b359YXV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Tue, Sep 8, 2015 at 10:40 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> Hi Luiz,
+>
+> This patch fixes all my issues with writing just after connecting.
+> Thanks alot!
+>
 
-On Mon, Sep 14, 2015 at 09:21:54AM +0530, Viresh Kumar wrote:
-> Long back 'bool' type used to be a typecast to 'int', but that changed
-> in v2.6.19. And that is a typecast to _Bool now, which (mostly) takes
-> just a byte. Anyway, the bool type is implementation defined, and better
-> we don't assume its size to be 4 bytes or 1.
+So reading and writing works perfectly, even better than I fought - I
+have some short flows that execute before services get re-discovered,
+but registering for notifications just after connection fails.
 
-Acked-by: Mark Brown <broonie@kernel.org>
+I can call DBus method register for notifications before I connect ,
+and request will succeed, but I would really be registered for
+notifications after btd_gatt_client_ready is called.
+This cause a race condition:
 
---gABkrxlT8b359YXV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+1. App Call DBus register for notifications.
+2. App call Connect on Device.
+3. App Write - write succeds immediately.
+4. Device sends back notification which I don't receive in App (I can
+see it coming in btmon).
+5. Now btd_gatt_client_ready is called, and App is really being
+registered for notifications (too late).
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+I'm working on fixing that. It whould require registering for
+notifications right after connecting, before serivces get discovered.
 
-iQEcBAEBCAAGBQJV9v+sAAoJECTWi3JdVIfQjVwH/jgfnm1aCRP2kYvsvOpD6Rhn
-kzv9ftGGPrLduAP9ROoaVhjxQkuM2GeRIumTyi3MqALAowWUGrIZq4NsNEJCrS7i
-hMEXqTeR55u5D1BPXElYtftTImYZDDvfrEjs/3cGvAN/FObbWA6q1a95DTEYw7Qw
-w1G2AXM+1fenUoqF/9sNbAfjUkjV5Mm3cF1SWuYc+q656/Iuzzhj6foZECAVqf9o
-VVqePsqpfnD/LFsU5GKYS42AcaFyn3deAhRB+IbLWKOOwuiCWrgLisYWH2VnsyiI
-BATL4sO2gk7mvpJOQXpQiCNDw+h08FiWoLscnN+UbvDhs7TJrdUAjYWLioFZJhw=
-=s8m4
------END PGP SIGNATURE-----
 
---gABkrxlT8b359YXV--
+> On Tue, Sep 8, 2015 at 5:23 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> Upon reconnecting the attributes may already be available from cache
+>> which mean the client would be able to issue commands while discovery
+>> is not complete thus btd_gatt_client_ready was not called yet.
+>>
+>> To fix now btd_gatt_client_ready is split into btd_gatt_client_connected
+>> which is called whenever connected leaving btd_gatt_client_ready to only
+>> deal with exporting services found during the discovery.
+>> ---
+>>  src/device.c      |  2 ++
+>>  src/gatt-client.c | 24 +++++++++++++++++-------
+>>  src/gatt-client.h |  1 +
+>>  3 files changed, 20 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/src/device.c b/src/device.c
+>> index dc362d9..2102f23 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -4602,6 +4602,8 @@ static void gatt_client_init(struct btd_device *device)
+>>         }
+>>
+>>         device->gatt_cache_used = !gatt_db_isempty(device->db);
+>> +
+>> +       btd_gatt_client_connected(device->client_dbus);
+>>  }
+>>
+>>  static void gatt_server_init(struct btd_device *device, struct gatt_db *db)
+>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>> index d8a3429..225aa42 100644
+>> --- a/src/gatt-client.c
+>> +++ b/src/gatt-client.c
+>> @@ -1825,20 +1825,14 @@ fail:
+>>
+>>  void btd_gatt_client_ready(struct btd_gatt_client *client)
+>>  {
+>> -       struct bt_gatt_client *gatt;
+>> -
+>>         if (!client)
+>>                 return;
+>>
+>> -       gatt = btd_device_get_gatt_client(client->device);
+>> -       if (!gatt) {
+>> +       if (!client->gatt) {
+>>                 error("GATT client not initialized");
+>>                 return;
+>>         }
+>>
+>> -       bt_gatt_client_unref(client->gatt);
+>> -       client->gatt = bt_gatt_client_ref(gatt);
+>> -
+>>         client->ready = true;
+>>
+>>         DBG("GATT client ready");
+>> @@ -1852,6 +1846,22 @@ void btd_gatt_client_ready(struct btd_gatt_client *client)
+>>         queue_foreach(client->all_notify_clients, register_notify, client);
+>>  }
+>>
+>> +void btd_gatt_client_connected(struct btd_gatt_client *client)
+>> +{
+>> +       struct bt_gatt_client *gatt;
+>> +
+>> +       gatt = btd_device_get_gatt_client(client->device);
+>> +       if (!gatt) {
+>> +               error("GATT client not initialized");
+>> +               return;
+>> +       }
+>> +
+>> +       DBG("Device connected.");
+>> +
+>> +       bt_gatt_client_unref(client->gatt);
+>> +       client->gatt = bt_gatt_client_ref(gatt);
+>> +}
+>> +
+>>  void btd_gatt_client_service_added(struct btd_gatt_client *client,
+>>                                         struct gatt_db_attribute *attrib)
+>>  {
+>> diff --git a/src/gatt-client.h b/src/gatt-client.h
+>> index a18db17..92a9255 100644
+>> --- a/src/gatt-client.h
+>> +++ b/src/gatt-client.h
+>> @@ -23,6 +23,7 @@ struct btd_gatt_client *btd_gatt_client_new(struct btd_device *device);
+>>  void btd_gatt_client_destroy(struct btd_gatt_client *client);
+>>
+>>  void btd_gatt_client_ready(struct btd_gatt_client *client);
+>> +void btd_gatt_client_connected(struct btd_gatt_client *client);
+>>  void btd_gatt_client_service_added(struct btd_gatt_client *client,
+>>                                         struct gatt_db_attribute *attrib);
+>>  void btd_gatt_client_service_removed(struct btd_gatt_client *client,
+>> --
+>> 2.4.3
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
