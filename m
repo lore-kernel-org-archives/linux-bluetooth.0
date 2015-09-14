@@ -1,144 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAD0=r8yuseCAN7RvtRwUA4eaA3eKhNaOq+8NofV8M+Herbt-vw@mail.gmail.com>
-References: <1441715022-20327-1-git-send-email-luiz.dentz@gmail.com>
-	<1441715022-20327-2-git-send-email-luiz.dentz@gmail.com>
-	<CAD0=r8yuseCAN7RvtRwUA4eaA3eKhNaOq+8NofV8M+Herbt-vw@mail.gmail.com>
-Date: Mon, 14 Sep 2015 09:39:44 -0700
-Message-ID: <CAD0=r8zQWhnaVY3QhbvPd9x-0VGD8C5L1b9-ZoMr5eqzUSR-=Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/3] core/gatt: Fix not able to read/write on reconnections
 From: Jakub Pawlowski <jpawlowski@google.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH v2] core/device: Store services when they change or after pairing.
+Date: Mon, 14 Sep 2015 09:16:27 -0700
+Message-Id: <1442247387-3263-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Service caching works only for paired devices. Right now caching is
+triggered only right after discovery finishes. That means that if already
+paired device sends service changed notofication, cache won't be updated.
+Also if you connect to new device, and then pair during this connection,
+your services won't be cached until reconnect. This will require full
+service discovery which is slow.
+This patch fixes that by trying to cache services every time services
+changed, and right after successful pairing.
+---
+ src/device.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-On Tue, Sep 8, 2015 at 10:40 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> Hi Luiz,
->
-> This patch fixes all my issues with writing just after connecting.
-> Thanks alot!
->
+diff --git a/src/device.c b/src/device.c
+index 8184508..e155d08 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2202,10 +2202,8 @@ static void device_svc_resolved(struct btd_device *dev, uint8_t bdaddr_type,
+ 	if (!dev->temporary)
+ 		store_device_info(dev);
+ 
+-	if (bdaddr_type != BDADDR_BREDR && err == 0) {
++	if (bdaddr_type != BDADDR_BREDR && err == 0)
+ 		store_services(dev);
+-		store_gatt_db(dev);
+-	}
+ 
+ 	if (!req)
+ 		return;
+@@ -3313,6 +3311,9 @@ static gboolean gatt_services_changed(gpointer user_data)
+ {
+ 	struct btd_device *device = user_data;
+ 
++	if (device->bdaddr_type != BDADDR_BREDR)
++		store_gatt_db(device);
++
+ 	g_dbus_emit_property_changed(dbus_conn, device->path, DEVICE_INTERFACE,
+ 								"GattServices");
+ 
+@@ -5315,6 +5316,11 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+ 	 * request
+ 	 */
+ 	if (state->svc_resolved && bonding) {
++		/* Attept to store services for this device failed because it
++		 * was not paired. Now that we're paired retry. */
++		if (device->bdaddr_type != BDADDR_BREDR)
++			store_gatt_db(device);
++
+ 		g_dbus_send_reply(dbus_conn, bonding->msg, DBUS_TYPE_INVALID);
+ 		bonding_request_free(bonding);
+ 		return;
+-- 
+2.5.0
 
-So reading and writing works perfectly, even better than I fought - I
-have some short flows that execute before services get re-discovered,
-but registering for notifications just after connection fails.
-
-I can call DBus method register for notifications before I connect ,
-and request will succeed, but I would really be registered for
-notifications after btd_gatt_client_ready is called.
-This cause a race condition:
-
-1. App Call DBus register for notifications.
-2. App call Connect on Device.
-3. App Write - write succeds immediately.
-4. Device sends back notification which I don't receive in App (I can
-see it coming in btmon).
-5. Now btd_gatt_client_ready is called, and App is really being
-registered for notifications (too late).
-
-I'm working on fixing that. It whould require registering for
-notifications right after connecting, before serivces get discovered.
-
-
-> On Tue, Sep 8, 2015 at 5:23 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> Upon reconnecting the attributes may already be available from cache
->> which mean the client would be able to issue commands while discovery
->> is not complete thus btd_gatt_client_ready was not called yet.
->>
->> To fix now btd_gatt_client_ready is split into btd_gatt_client_connected
->> which is called whenever connected leaving btd_gatt_client_ready to only
->> deal with exporting services found during the discovery.
->> ---
->>  src/device.c      |  2 ++
->>  src/gatt-client.c | 24 +++++++++++++++++-------
->>  src/gatt-client.h |  1 +
->>  3 files changed, 20 insertions(+), 7 deletions(-)
->>
->> diff --git a/src/device.c b/src/device.c
->> index dc362d9..2102f23 100644
->> --- a/src/device.c
->> +++ b/src/device.c
->> @@ -4602,6 +4602,8 @@ static void gatt_client_init(struct btd_device *device)
->>         }
->>
->>         device->gatt_cache_used = !gatt_db_isempty(device->db);
->> +
->> +       btd_gatt_client_connected(device->client_dbus);
->>  }
->>
->>  static void gatt_server_init(struct btd_device *device, struct gatt_db *db)
->> diff --git a/src/gatt-client.c b/src/gatt-client.c
->> index d8a3429..225aa42 100644
->> --- a/src/gatt-client.c
->> +++ b/src/gatt-client.c
->> @@ -1825,20 +1825,14 @@ fail:
->>
->>  void btd_gatt_client_ready(struct btd_gatt_client *client)
->>  {
->> -       struct bt_gatt_client *gatt;
->> -
->>         if (!client)
->>                 return;
->>
->> -       gatt = btd_device_get_gatt_client(client->device);
->> -       if (!gatt) {
->> +       if (!client->gatt) {
->>                 error("GATT client not initialized");
->>                 return;
->>         }
->>
->> -       bt_gatt_client_unref(client->gatt);
->> -       client->gatt = bt_gatt_client_ref(gatt);
->> -
->>         client->ready = true;
->>
->>         DBG("GATT client ready");
->> @@ -1852,6 +1846,22 @@ void btd_gatt_client_ready(struct btd_gatt_client *client)
->>         queue_foreach(client->all_notify_clients, register_notify, client);
->>  }
->>
->> +void btd_gatt_client_connected(struct btd_gatt_client *client)
->> +{
->> +       struct bt_gatt_client *gatt;
->> +
->> +       gatt = btd_device_get_gatt_client(client->device);
->> +       if (!gatt) {
->> +               error("GATT client not initialized");
->> +               return;
->> +       }
->> +
->> +       DBG("Device connected.");
->> +
->> +       bt_gatt_client_unref(client->gatt);
->> +       client->gatt = bt_gatt_client_ref(gatt);
->> +}
->> +
->>  void btd_gatt_client_service_added(struct btd_gatt_client *client,
->>                                         struct gatt_db_attribute *attrib)
->>  {
->> diff --git a/src/gatt-client.h b/src/gatt-client.h
->> index a18db17..92a9255 100644
->> --- a/src/gatt-client.h
->> +++ b/src/gatt-client.h
->> @@ -23,6 +23,7 @@ struct btd_gatt_client *btd_gatt_client_new(struct btd_device *device);
->>  void btd_gatt_client_destroy(struct btd_gatt_client *client);
->>
->>  void btd_gatt_client_ready(struct btd_gatt_client *client);
->> +void btd_gatt_client_connected(struct btd_gatt_client *client);
->>  void btd_gatt_client_service_added(struct btd_gatt_client *client,
->>                                         struct gatt_db_attribute *attrib);
->>  void btd_gatt_client_service_removed(struct btd_gatt_client *client,
->> --
->> 2.4.3
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
