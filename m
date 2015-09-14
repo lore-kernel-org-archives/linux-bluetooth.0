@@ -1,119 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bhuvanchandra <bhuvanchandradv@gmail.com>
-Subject: Re: build issues with rtl8723au_bt
-To: Larry Finger <Larry.Finger@lwfinger.net>,
-	linux-bluetooth@vger.kernel.org
-References: <55ED8120.4060604@gmail.com> <55EE0161.8080402@lwfinger.net>
-Cc: Bhuvanchandra <bhuvanchandradv@gmail.com>
-Message-ID: <55F63FB4.3020606@gmail.com>
-Date: Mon, 14 Sep 2015 09:02:04 +0530
+From: "Ge, Ethan" <ethan.ge@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"jeremy@goop.org" <jeremy@goop.org>, Marcel Holtmann <marcel@holtmann.org>
+Subject: RE: BLE(ATT) mouse doesn't register wakeup source in Linux kernel
+ during BLE mouse connecting
+Date: Mon, 14 Sep 2015 03:26:50 +0000
+Message-ID: <86D221DC0B85F94D9B05B97827669A34064CEC19@PGSMSX106.gar.corp.intel.com>
+References: <86D221DC0B85F94D9B05B97827669A34064CE519@PGSMSX106.gar.corp.intel.com>
+ <CABBYNZJBEA2Pt71+yPHbx7N5hjidfeEyML=2b=Ca931oWrzvtg@mail.gmail.com>
+In-Reply-To: <CABBYNZJBEA2Pt71+yPHbx7N5hjidfeEyML=2b=Ca931oWrzvtg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <55EE0161.8080402@lwfinger.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 09/08/2015 02:58 AM, Larry Finger wrote:
-
-> On 09/07/2015 07:20 AM, Bhuvanchandra wrote:
->> Hi!
->>
->> I'm testing RTL8723BU(available in LM811. USB ID 0bda:b720) WiFi BT 
->> USB module.
->> Kernel version used: 4.1.5. Cross-compiled the Wifi Driver from[1] it 
->> worked fine.
->> While crosscompiling the driver for BT which is available at[2], 
->> there are few
->> compile time errors:
->> ....
->> make ARCH=arm 
->> CROSS_COMPILE=/home/dvb/gcc-linaro/bin/arm-linux-gnueabihf- -C
->> /home/dvb/linux-toradex M=/home/dvb/rtl8723au_bt modules
->> make[1]: Entering directory
->> '/home/dvb/toradex/linux-toradex/linux-toradex-vf/linux-toradex'
->>    CC [M]  /home/dvb/rtl8723au_bt/btusb.o
->> /home/dvb/rtl8723au_bt/btusb.c: In function 'hci_reassembly':
->> /home/dvb/rtl8723au_bt/btusb.c:376:15: error: 'NUM_REASSEMBLY' 
->> undeclared (first
->> use in this function)
->>        index >= NUM_REASSEMBLY)
->>                 ^
->> /home/dvb/rtl8723au_bt/btusb.c:376:15: note: each undeclared 
->> identifier is
->> reported only once for each function it appears in
->> /home/dvb/rtl8723au_bt/btusb.c:379:12: error: 'struct hci_dev' has no 
->> member
->> named 'reassembly'
->>    skb = hdev->reassembly[index];
->>              ^
->> /home/dvb/rtl8723au_bt/btusb.c:405:7: error: 'struct hci_dev' has no 
->> member
->> named 'reassembly'
->>     hdev->reassembly[index] = skb;
->>         ^
->> /home/dvb/rtl8723au_bt/btusb.c:427:10: error: 'struct hci_dev' has no 
->> member
->> named 'reassembly'
->>        hdev->reassembly[index] = NULL;
->>            ^
->> /home/dvb/rtl8723au_bt/btusb.c:440:10: error: 'struct hci_dev' has no 
->> member
->> named 'reassembly'
->>        hdev->reassembly[index] = NULL;
->>            ^
->> /home/dvb/rtl8723au_bt/btusb.c:453:10: error: 'struct hci_dev' has no 
->> member
->> named 'reassembly'
->>        hdev->reassembly[index] = NULL;
->>            ^
->> /home/dvb/rtl8723au_bt/btusb.c:466:8: error: 'struct hci_dev' has no 
->> member
->> named 'reassembly'
->>      hdev->reassembly[index] = NULL;
->>          ^
->> scripts/Makefile.build:264: recipe for target 
->> '/home/dvb/rtl8723au_bt/btusb.o'
->> failed
->> make[2]: *** [/home/dvb/rtl8723au_bt/btusb.o] Error 1
->> Makefile:1384: recipe for target '_module_/home/dvb/rtl8723au_bt' failed
->> make[1]: *** [_module_/home/dvb/rtl8723au_bt] Error 2
->> make[1]: Leaving directory
->> '/home/dvb/toradex/linux-toradex/linux-toradex-vf/linux-toradex'
->> Makefile-custom:22: recipe for target 'all' failed
->> make: *** [all] Error 2
->> .....
->>
->> I also tried the recent branches all got the same errors.
->> Does any one tested RTL8723BU's bluetooth?
->
-> No. I have an RTL8723BU device on order. Once it arrives, I will be 
-> able to test. The vendor BT driver relies on some features that were 
-> removed in kernel 4.1. As a proper driver for the Realtek BT devices 
-> is in kernel 4.2, I suggest that you use it, rather than 4.1.
-
-Ok, sure will give a try with 4.2
-
->
->
->> I couldn't find any in-tree driver available for RTL8723BU. Is there 
->> anything
->> i'm missing or
->> doing wrong ?
->
-> No, there is none. I refuse to submit any code that I have not tested. 
-> In addition, I doubt that the vendor driver will ever be submitted to 
-> staging. It is just too much work to clean up that ugly code. More 
-> likely, the device will be added to the new driver rtl8xxxu that has 
-> just been submitted.
-
-Great! i will also try to test your patch at my end. Is there any latest version of patchset submitted? I found an RFC version[1] after googling? let me know if any latest version of patchest is submitted.
-
-[1] http://patchwork.ozlabs.org/patch/234928/
-
-Best regards,
-Bhuvan
-
->
-> Larry
->
-
+SGkgTHVpeg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogTHVpeiBBdWd1c3Rv
+IHZvbiBEZW50eiBbbWFpbHRvOmx1aXouZGVudHpAZ21haWwuY29tXSANClNlbnQ6IEZyaWRheSwg
+U2VwdGVtYmVyIDExLCAyMDE1IDk6MzYgUE0NClRvOiBHZSwgRXRoYW4NCkNjOiBsaW51eC1ibHVl
+dG9vdGhAdmdlci5rZXJuZWwub3JnOyBqZXJlbXlAZ29vcC5vcmc7IE1hcmNlbCBIb2x0bWFubg0K
+U3ViamVjdDogUmU6IEJMRShBVFQpIG1vdXNlIGRvZXNuJ3QgcmVnaXN0ZXIgd2FrZXVwIHNvdXJj
+ZSBpbiBMaW51eCBrZXJuZWwgZHVyaW5nIEJMRSBtb3VzZSBjb25uZWN0aW5nDQoNCkhpIEV0aGFu
+LA0KDQpPbiBGcmksIFNlcCAxMSwgMjAxNSBhdCAxOjEyIFBNLCBHZSwgRXRoYW4gPGV0aGFuLmdl
+QGludGVsLmNvbT4gd3JvdGU6DQo+IEhpLA0KPg0KPiBJbiBmaWxlIGRyaXZlcnMvaGlkL2hpZC1p
+bnB1dC5jLCBmdW5jdGlvbiBoaWRpbnB1dF9zZXR1cF9iYXR0ZXJ5KCkgd2lsbCByZXR1cm4gZHVy
+aW5nIGNvbm5lY3QgYSBCTEUgbW91c2UgYmVjYXVzZSBvZiBmaWxlZC0+dXNhZ2UtPmhpZCAhPSBI
+SURfRENfQkFUVEVSWVNUUkVOR1RILiBBbmQgQkxFKEFUVCkgSElEIGRvZXNuJ3QgcmVnaXN0ZXIg
+d2FrZXVwIHNvdXJjZSBpbiBMaW51eCBrZXJuZWwuDQo+DQo+IEl0IHdpbGwgY2F1c2UgQkxFIEhJ
+RCBtb3VzZSBjYW4ndCB3YWtlIERVVCBmcm9tIFMzLiBJc3N1ZSBjYW4gYmUgcmVwcm9kdWNlZCBi
+eSBJQlVGRkFMTyBCU01CQjA5RFMgLyBEZWxsIFdNNjE1IG1vdXNlIC8gTWljcm9zb2Z0IGFyYyB0
+b3VjaCwgdGhlc2UgYWxsIGFyZSBCTEUgbW91c2UuDQo+DQo+IHN0YXRpYyBib29sIGhpZGlucHV0
+X3NldHVwX2JhdHRlcnkoc3RydWN0IGhpZF9kZXZpY2UgKmRldiwgdW5zaWduZWQgDQo+IHJlcG9y
+dF90eXBlLCBzdHJ1Y3QgaGlkX2ZpZWxkICpmaWVsZCkgew0KPiAgICAgc3RydWN0IHBvd2VyX3N1
+cHBseV9kZXNjICpwc3lfZGVzYyA9IE5VTEw7DQo+ICAgICBzdHJ1Y3QgcG93ZXJfc3VwcGx5X2Nv
+bmZpZyBwc3lfY2ZnID0geyAuZHJ2X2RhdGEgPSBkZXYsIH07DQo+ICAgICB1bnNpZ25lZCBxdWly
+a3M7DQo+ICAgICBzMzIgbWluLCBtYXg7DQo+DQo+ICAgICBpZiAoZmllbGQtPnVzYWdlLT5oaWQg
+IT0gSElEX0RDX0JBVFRFUllTVFJFTkdUSCkNCj4gICAgICAgICByZXR1cm4gZmFsc2U7ICAgIC8q
+IG5vIG1hdGNoICovDQoNCj4gQnV0IHRoaXMgaXMgY2hlY2tlZCBpbiBjYXNlIHRoZSBkZXZpY2Ug
+ZG9lcyBub3Qgc3VwcG9ydCBiYXR0ZXJ5IHN0cmVuZ3RoIHN1cHBvcnQsIEkgdGhvdWdodCBhbnkg
+aW5wdXQgZGV2aWNlIHdvdWxkIHJlZ2lzdGVyIGEgd2FrZXVwIHNvdXJjZSByZWdhcmRsZXNzLg0K
+PiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQoNCkkgc2FpZCB0aGF0IGJlY2F1c2UgSSB2ZXJpZmll
+ZCBpdCBieSBmdHJhY2UuIEkgZm91bmQgaWYgaXQgcmV0dXJuIGhpZGlucHV0X3NldHVwX2JhdHRl
+cnkoKSwgYW5kIGlucHV0IGRldmljZSBjYW4ndCByZWdpc3RlciBhIHdha2V1cCBzb3VyY2UuIEJl
+bG93IGFyZSB0aGUgY29kZSBmbG93LiBoaWRpbnB1dF9zZXR1cF9iYXR0ZXJ5LT5fX3Bvd2VyX3N1
+cHBseV9yZWdpc3Rlci0+IGRldmljZV9pbml0X3dha2V1cC4NCkluIG90aGVyIGhhbmQsIHRoZSBC
+Ui9FRFIgbW91c2UgY2FuIHJlZ2lzdGVyIGEgd2FrZXVwIHNvdXJjZSBiZWNhdXNlIGl0IHdvbid0
+IHJldHVybiBoaWRpbnB1dF9zZXR1cF9iYXR0ZXJ5KCkgYW5kIGNhbiBnbyB0aHJvdWdoIG5leHQg
+ZnVuY3Rpb24uIEkgYW0gdHJ5aW5nIHRvIGNoZWNrIHdoeSBCTEUgbW91c2UgdXNhZ2UtPmhpZCAh
+PSBISURfRENfQkFUVEVSWVNUUkVOR1RIIGFuZCBjYW4gbm90IHdha2V1cCBzeXN0ZW0gaW4gUzMu
+DQoNCnN0YXRpYyBib29sIGhpZGlucHV0X3NldHVwX2JhdHRlcnkoc3RydWN0IGhpZF9kZXZpY2Ug
+KmRldiwgdW5zaWduZWQgcmVwb3J0X3R5cGUsIHN0cnVjdCBoaWRfZmllbGQgKmZpZWxkKQ0Kew0K
+ICAgIHN0cnVjdCBwb3dlcl9zdXBwbHlfZGVzYyAqcHN5X2Rlc2MgPSBOVUxMOw0KICAgIHN0cnVj
+dCBwb3dlcl9zdXBwbHlfY29uZmlnIHBzeV9jZmcgPSB7IC5kcnZfZGF0YSA9IGRldiwgfTsNCiAg
+ICB1bnNpZ25lZCBxdWlya3M7DQogICAgczMyIG1pbiwgbWF4Ow0KDQogICAgaWYgKGZpZWxkLT51
+c2FnZS0+aGlkICE9IEhJRF9EQ19CQVRURVJZU1RSRU5HVEgpDQogICAgICAgIHJldHVybiBmYWxz
+ZTsgICAgLyogbm8gbWF0Y2ggKi8NCi4uLg0KICAgIGRldi0+YmF0dGVyeSA9IHBvd2VyX3N1cHBs
+eV9yZWdpc3RlcigmZGV2LT5kZXYsIHBzeV9kZXNjLCAmcHN5X2NmZyk7DQouLg0KfQ0KDQpzdGF0
+aWMgc3RydWN0IHBvd2VyX3N1cHBseSAqX19tdXN0X2NoZWNrDQpfX3Bvd2VyX3N1cHBseV9yZWdp
+c3RlcihzdHJ1Y3QgZGV2aWNlICpwYXJlbnQsDQogICAgICAgICAgICAgICAgICAgY29uc3Qgc3Ry
+dWN0IHBvd2VyX3N1cHBseV9kZXNjICpkZXNjLA0KICAgICAgICAgICAgICAgICAgIGNvbnN0IHN0
+cnVjdCBwb3dlcl9zdXBwbHlfY29uZmlnICpjZmcsDQogICAgICAgICAgICAgICAgICAgYm9vbCB3
+cykNCnsNCiAuLi4uDQoNCiAgICBzcGluX2xvY2tfaW5pdCgmcHN5LT5jaGFuZ2VkX2xvY2spOw0K
+ICAgIHJjID0gZGV2aWNlX2luaXRfd2FrZXVwKGRldiwgd3MpOw0KICAgIGlmIChyYykNCiAgICAg
+ICAgZ290byB3YWtldXBfaW5pdF9mYWlsZWQ7DQouLi4uDQp9DQoNCmludCBkZXZpY2VfaW5pdF93
+YWtldXAoc3RydWN0IGRldmljZSAqZGV2LCBib29sIGVuYWJsZSkNCnsNCiAgICBpbnQgcmV0ID0g
+MDsNCg0KICAgIGlmICghZGV2KQ0KICAgICAgICByZXR1cm4gLUVJTlZBTDsNCg0KICAgIGlmIChl
+bmFibGUpIHsNCiAgICAgICAgZGV2aWNlX3NldF93YWtldXBfY2FwYWJsZShkZXYsIHRydWUpOw0K
+ICAgICAgICByZXQgPSBkZXZpY2Vfd2FrZXVwX2VuYWJsZShkZXYpOw0KLi4uDQp9DQpFdGhhbg0K
+LS0NCg==
