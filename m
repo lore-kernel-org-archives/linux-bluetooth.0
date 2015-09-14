@@ -1,69 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] tools/tester: Add Device Found test with invalid field length
-Date: Mon, 14 Sep 2015 22:03:16 +0200
-Message-Id: <1442260996-15843-1-git-send-email-szymon.janc@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 14 Sep 2015 18:11:09 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Viresh Kumar <viresh.kumar@linaro.org>
+Cc: gregkh@linuxfoundation.org, linaro-kernel@lists.linaro.org,
+	Rafael Wysocki <rjw@rjwysocki.net>, sboyd@codeaurora.org,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	Alexander Duyck <alexander.h.duyck@redhat.com>,
+	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." <alsa-devel@alsa-project.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Arik Nemtsov <arik@wizery.com>,
+	"open list:QUALCOMM ATHEROS ATH10K WIRELESS DRIVER" <ath10k@lists.infradead.org>,
+	"open list:QUALCOMM ATHEROS ATH9K WIRELESS DRIVER" <ath9k-devel@lists.ath9k.org>,
+	Avri Altman <avri.altman@intel.com>,
+	"open list:B43 WIRELESS DRIVER" <b43-dev@lists.infradead.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Brian Silverman <bsilver16384@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Charles Keepax <ckeepax@opensource.wolfsonmicro.com>,
+	Chaya Rachel Ivgi <chaya.rachel.ivgi@intel.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	David Rientjes <rientjes@google.com>,
+	Dmitry Monakhov <dmonakhov@openvz.org>,
+	Doug Thompson <dougthompson@xmission.com>,
+	Eliad Peller <eliad@wizery.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Haggai Eran <haggaie@mellanox.com>,
+	Hariprasad S <hariprasad@chelsio.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	Intel Linux Wireless <ilw@linux.intel.com>,
+	"open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
+	"James E.J. Bottomley" <JBottomley@odin.com>,
+	Jaroslav Kysela <perex@perex.cz>, Jiri Slaby <jirislaby@gmail.com>,
+	Joe Perches <joe@perches.com>, Joerg Roedel <joro@8bytes.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Jonathan Corbet <corbet@lwn.net>, Joonsoo Kim <js1304@gmail.com>,
+	Kalle Valo <kvalo@qca.qualcomm.com>,
+	Larry Finger <Larry.Finger@lwfinger.net>,
+	Len Brown <lenb@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+	"open list:ACPI" <linux-acpi@vger.kernel.org>,
+	"moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)" <linux-arm-kernel@lists.infradead.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
+	"open list:CISCO SCSI HBA DRIVER" <linux-scsi@vger.kernel.org>,
+	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:" <linux-usb@vger.kernel.org>,
+	"open list:NETWORKING DRIVERS (WIRELESS)" <linux-wireless@vger.kernel.org>,
+	Luciano Coelho <luciano.coelho@intel.com>,
+	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Mauro Carvalho Chehab <mchehab@osg.samsung.com>,
+	Mel Gorman <mgorman@suse.de>,
+	Michael Kerrisk <mtk.manpages@gmail.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Narsimhulu Musini <nmusini@cisco.com>,
+	"open list:CXGB4 ETHERNET DRIVER (CXGB4)" <netdev@vger.kernel.org>,
+	Nick Kossifidis <mickflemm@gmail.com>,
+	Oleg Nesterov <oleg@redhat.com>,
+	"open list:WOLFSON MICROELECTRONICS DRIVERS" <patches@opensource.wolfsonmicro.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
+	Richard Fitzgerald <rf@opensource.wolfsonmicro.com>,
+	Sasha Levin <sasha.levin@oracle.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Sebastian Ott <sebott@linux.vnet.ibm.com>,
+	Sesidhar Baddela <sebaddel@cisco.com>,
+	Stanislaw Gruszka <sgruszka@redhat.com>,
+	Takashi Iwai <tiwai@suse.com>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Tomas Winkler <tomas.winkler@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Wang Long <long.wanglong@huawei.com>,
+	Will Deacon <will.deacon@arm.com>
+Message-ID: <20150914171109.GW12027@sirena.org.uk>
+References: <81516fb9c662cc338b5af5b63fbbcde5374e0893.1442202447.git.viresh.kumar@linaro.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="gABkrxlT8b359YXV"
+In-Reply-To: <81516fb9c662cc338b5af5b63fbbcde5374e0893.1442202447.git.viresh.kumar@linaro.org>
+Subject: Re: [PATCH V2] debugfs: don't assume sizeof(bool) to be 4 bytes
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test verify if kernel correctly terminates EIR when invalid
-advertising data (field length too big) was received from
-remote device.
----
- tools/mgmt-tester.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 9ace20a..0a1a7c2 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -4707,6 +4707,30 @@ static const struct generic_data device_found_gtag = {
- 	.adv_data = adv_data_invalid_significant_len,
- };
- 
-+static const uint8_t adv_data_invalid_field_len[] = { 0x02, 0x01, 0x01,
-+		0x05, 0x09, 0x74, 0x65, 0x73, 0x74,
-+		0xa0, 0xff, 0x01, 0x02, 0x03, 0x04, 0x05};
-+
-+static const char device_found_valid2[] = { 0x00, 0x00, 0x01, 0x01, 0xaa, 0x00,
-+		0x01, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00, 0x02, 0x01,
-+		0x01, 0x05, 0x09, 0x74, 0x65, 0x73, 0x74};
-+
-+static const struct generic_data device_found_invalid_field = {
-+	.setup_settings = settings_powered_le,
-+	.send_opcode = MGMT_OP_START_DISCOVERY,
-+	.send_param = start_discovery_le_param,
-+	.send_len = sizeof(start_discovery_le_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = start_discovery_le_param,
-+	.expect_len = sizeof(start_discovery_le_param),
-+	.expect_alt_ev = MGMT_EV_DEVICE_FOUND,
-+	.expect_alt_ev_param = device_found_valid2,
-+	.expect_alt_ev_len = sizeof(device_found_valid2),
-+	.set_adv = true,
-+	.adv_data_len = sizeof(adv_data_invalid_field_len),
-+	.adv_data = adv_data_invalid_field_len,
-+};
-+
- static const struct generic_data read_local_oob_not_powered_test = {
- 	.send_opcode = MGMT_OP_READ_LOCAL_OOB_DATA,
- 	.expect_status = MGMT_STATUS_NOT_POWERED,
-@@ -6957,9 +6981,12 @@ int main(int argc, char *argv[])
- 				&read_local_oob_success_sc_test,
- 				NULL, test_command_generic);
- 
--	test_bredrle("Device Found - Invalid remote ADV_DATA",
-+	test_bredrle("Device Found - Advertising data - Zero padded",
- 				&device_found_gtag,
- 				NULL, test_device_found);
-+	test_bredrle("Device Found - Advertising data - Invalid field",
-+				&device_found_invalid_field,
-+				NULL, test_device_found);
- 
- 	return tester_run();
- }
--- 
-2.5.0
+--gABkrxlT8b359YXV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On Mon, Sep 14, 2015 at 09:21:54AM +0530, Viresh Kumar wrote:
+> Long back 'bool' type used to be a typecast to 'int', but that changed
+> in v2.6.19. And that is a typecast to _Bool now, which (mostly) takes
+> just a byte. Anyway, the bool type is implementation defined, and better
+> we don't assume its size to be 4 bytes or 1.
+
+Acked-by: Mark Brown <broonie@kernel.org>
+
+--gABkrxlT8b359YXV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJV9v+sAAoJECTWi3JdVIfQjVwH/jgfnm1aCRP2kYvsvOpD6Rhn
+kzv9ftGGPrLduAP9ROoaVhjxQkuM2GeRIumTyi3MqALAowWUGrIZq4NsNEJCrS7i
+hMEXqTeR55u5D1BPXElYtftTImYZDDvfrEjs/3cGvAN/FObbWA6q1a95DTEYw7Qw
+w1G2AXM+1fenUoqF/9sNbAfjUkjV5Mm3cF1SWuYc+q656/Iuzzhj6foZECAVqf9o
+VVqePsqpfnD/LFsU5GKYS42AcaFyn3deAhRB+IbLWKOOwuiCWrgLisYWH2VnsyiI
+BATL4sO2gk7mvpJOQXpQiCNDw+h08FiWoLscnN+UbvDhs7TJrdUAjYWLioFZJhw=
+=s8m4
+-----END PGP SIGNATURE-----
+
+--gABkrxlT8b359YXV--
