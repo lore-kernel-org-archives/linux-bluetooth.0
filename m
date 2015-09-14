@@ -1,71 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <ext.szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Elliot Saba <staticfloat@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Understanding connecting to BLE keyboard
-Date: Mon, 14 Sep 2015 14:46:58 +0200
-Message-ID: <10452927.a6KM84WJTg@leonov>
-In-Reply-To: <CABBYNZKi=TSWQxyN6j1=a++V5p-e8viB=qWxnX1pGQShz9A-YA@mail.gmail.com>
-References: <CAGGi21YVrRB06R8ahxRLBZ=xZkNKGnCsetL1xUQx9DPLeAGGXA@mail.gmail.com> <CABBYNZKi=TSWQxyN6j1=a++V5p-e8viB=qWxnX1pGQShz9A-YA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <55F55C99.7070803@in-box.at>
+References: <55F55C99.7070803@in-box.at>
+Date: Mon, 14 Sep 2015 15:39:46 +0300
+Message-ID: <CABBYNZLGjKYF2+aXUupJpNtOQJpY9T9sQpH=D-xU2GP9xj14oQ@mail.gmail.com>
+Subject: Re: Bluez with Raspberry Pi for BLE
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mike <mailinglists@in-box.at>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mike,
 
-On Monday 14 of September 2015 15:25:58 Luiz Augusto von Dentz wrote:
-> Hi Elliot,
-> 
-> On Sun, Sep 13, 2015 at 8:58 AM, Elliot Saba <staticfloat@gmail.com> wrote:
-> > Hello there, I recently obtained a Microsoft Designer BLE
-> > keyboard/mouse, and I thought I would attempt to connect it up to my
-> > Linux box for fun.  Needless to say, I've met with some problems,
-> > primarily with the authentication mechanisms I believe.
-> > 
-> > First off, I am using bluez 5.23 on SteamOS (A debian derivative) with
-> > a Broadcom BCM4352 controller.
-> > 
-> > When attempting to connect to the bluetooth keyboard using my OSX
-> > machine, it prompts me to enter a PIN, and after doing so, things are
-> > fine and dandy.  When using gnome-bluetooth to attempt to connect, it
-> > thinks about it for a little bit, and then reverts to its previous
-> > status ("Not Set Up") rather than prompting me for a PIN or anything
-> > like that.
-> > 
-> > When attempting to connect via the command line using bluetoothctl,
-> > (First I start a KeyboardOnly agent, then scan for the device, then
-> > "trust" it, then "pair" it) bluetoothctl initially reports the
-> > connection has succeeded, but then immediately disconnects and prints
-> > out the error "org.bluez.Error.AuthenticationCanceled".
-> 
-> Try using btmon to get a trace of what is going on, from the error it
-> sounds like the remote is canceling the pairing so perhaps it times
-> out or something. Btw, have you checked the manual how the pairing is
-> suppose to be done? Did you enter the pincode in the keyboard itself?
+On Sun, Sep 13, 2015 at 2:23 PM, Mike <mailinglists@in-box.at> wrote:
+> Hi,
+>
+> I am trying to get my RPi to work with BLE. I downloaded and compiled
+> bluez-5.34.tar.xz.
+>
+> uname -a says: Linux raspberry 4.1.6-v7+ #810 SMP PREEMPT Tue Aug 18
+> 15:32:12 BST 2015 armv7l GNU/Linux
+>
+> My BLE-stick is recognized and hci0 is up and running. I can scan for
+> advertising peripherals with "sudo hcitool lescan". This works. But if I
+> try to connect to a peripheral I always get Connection refused (111). So
+> I looked at the output of hcidump and found that after the connection is
+> completed, I get disconnected by remote.
 
-I think the problem is use of KeyboardOnly which in LE legacy pairing results 
-in JustWorks pairing if both sides have this IO capa. If there is requirement 
-for authenticated link then this will fail. I'd suggest first checking with
-proper IO capa ie. KeyboardDisplay.
 
-> > When attempting to connect via the command line using gatttool in
-> > interactive mode, I run into similar issues; I can type "connect" and
-> > it initially reports success, but any command I then type to query the
-> > device immediately reports "Command Failed: Disconnected".
-> > 
-> > Is there some way I can increase the amount of debugging information
-> > available to me in order to try and track down exactly what's going
-> > wrong here?  I admit that my knowledge of the proper way to connect
-> > this device in linux is shaky at best, and I would "Read The Manual"
-> > if I knew where to look for it.  Pointers on where to go to read up on
-> > this whole process are definitely welcome.
-> 
-> The problem seems to be at pairing which is mandatory if the device
-> implements HoG profile, so I guess no command will succeed until
-> pairing is done properly.
+If you are running bluetoothd using hcitool is _not_ recommended,
+please use bluetoothctl instead.
+
+Note: Requiring root access should already warn you about that.
+
+> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
+>     bdaddr 34:B1:F7:D4:FE:F3 type 0
+>     interval 4 window 4 initiator_filter 0
+>     own_bdaddr_type 0 min_interval 15 max_interval 15
+>     latency 0 supervision_to 3200 min_ce 1 max_ce 1
+>> HCI Event: Command Status (0x0f) plen 4
+>     LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
+>> HCI Event: LE Meta Event (0x3e) plen 19
+>     LE Connection Complete
+>       status 0x00 handle 72, role master
+>       bdaddr 34:B1:F7:D4:FE:F3 (Public)
+> < HCI Command: LE Read Remote Used Features (0x08|0x0016) plen 2
+>   0000: 48 00                                             H.
+>> HCI Event: Command Status (0x0f) plen 4
+>     LE Read Remote Used Features (0x08|0x0016) status 0x00 ncmd 1
+>> HCI Event: LE Meta Event (0x3e) plen 12
+>     LE Read Remote Used Features Complete
+>       status 0x00 handle 72
+>       Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>     handle 72 reason 0x13
+>     Reason: Remote User Terminated Connection
+>> HCI Event: Command Status (0x0f) plen 4
+>     Disconnect (0x01|0x0006) status 0x00 ncmd 1
+>> HCI Event: Disconn Complete (0x05) plen 4
+>     status 0x00 handle 72 reason 0x16
+>     Reason: Connection Terminated by Local Host
+>
+> I tried three different peripherals and I always get "Connection refused
+> (111)". Any ideas would be appreciated.
+
+Perhaps are not running bluetoothd or any other tool to keep the
+connection alive, try starting bluetoothd and use bluetoothctl, in
+addition you can use org.bluez.GattManager1.RegisterProfile to mark
+the device to auto connect (passive scanning):
+
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/gatt-api.txt
+
+or using the python test script:
+
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/test-gatt-profile
+
 
 -- 
-BR
-Szymon Janc
+Luiz Augusto von Dentz
