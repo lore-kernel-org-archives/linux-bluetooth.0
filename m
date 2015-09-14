@@ -1,103 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Sep 2015 07:34:38 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, linaro-kernel@lists.linaro.org,
-	"open list:NETWORKING DRIVERS WIRELESS" <linux-wireless@vger.kernel.org>,
-	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." <alsa-devel@alsa-project.org>,
-	Avri Altman <avri.altman@intel.com>,
-	Stanislaw Gruszka <sgruszka@redhat.com>,
-	Jiri Slaby <jirislaby@gmail.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	"open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
-	Kalle Valo <kvalo@qca.qualcomm.com>,
-	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-	Wang Long <long.wanglong@huawei.com>,
-	Richard Fitzgerald <rf@opensource.wolfsonmicro.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Davidlohr Bueso <dave@stgolabs.net>, Joonsoo Kim <js1304@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, Joerg Roedel <joro@8bytes.org>,
-	"open list:WOLFSON MICROELECTRONICS DRIVERS" <patches@opensource.wolfsonmicro.com>,
-	Sebastian Ott <sebott@linux.vnet.ibm.com>,
-	"open list:QUALCOMM ATHEROS ATH10K WIRELESS DRIVER" <ath10k@lists.infradead.org>,
-	Intel Linux Wireless <ilw@linux.intel.com>,
-	"open list:ACPI" <linux-acpi@vger.kernel.org>,
-	"open list:QUALCOMM ATHEROS ATH9K WIRELESS DRIVER" <ath9k-devel@lists.ath9k.org>,
-	Nick Kossifidis <mickflemm@gmail.com>,
-	"open list:B43 WIRELESS DRIVER" <b43-dev@lists.infradead.org>,
-	Luciano Coelho <luciano.coelho@intel.com>,
-	Doug Thompson <dougthompson@xmission.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Sasha Levin <sasha.levin@oracle.com>,
-	Tomas Winkler <tomas.winkler@intel.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	sboyd@codeaurora.org, Len Brown <lenb@kernel.org>,
-	Takashi Iwai <tiwai@suse.com>,
-	Hariprasad S <hariprasad@chelsio.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Mauro Carvalho Chehab <mchehab@osg.samsung.com>,
-	Vlastimil Babka <vbabka@suse.cz>, Arik Nemtsov <arik@wizery.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	David Rientjes <rientjes@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Akinobu Mita <akinobu.mita@gmail.com>,
-	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
-	Michael Kerrisk <mtk.manpages@gmail.com>, Tejun Heo <tj@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Borislav Petkov <bp@alien8.de>, Oleg Nesterov <oleg@redhat.com>,
-	Charles Keepax <ckeepax@opensource.wolfsonmicro.com>,
-	Mel Gorman <mgorman@suse.de>,
-	"moderated list:ARM64 PORT AARCH64 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>,
-	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
-	Haggai Eran <haggaie@mellanox.com>,
-	"James E.J. Bottomley" <JBottomley@odin.com>,
-	Chaya Rachel Ivgi <chaya.rachel.ivgi@intel.com>,
-	"open list:CISCO SCSI HBA DRIVER" <linux-scsi@vger.kernel.org>,
-	Brian Silverman <bsilver16384@gmail.com>,
-	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
-	"open list:CXGB4 ETHERNET DRIVER CXGB4" <netdev@vger.kernel.org>,
-	"open list:ULTRA-WIDEBAND UWB SUBSYSTEM:" <linux-usb@vger.kernel.org>,
-	Rafael Wysocki <rjw@rjwysocki.net>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Sesidhar Baddela <sebaddel@cisco.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"open list:AMD IOMMU AMD-VI" <iommu@lists.linux-foundation.org>,
-	Dmitry Monakhov <dmonakhov@openvz.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Narsimhulu Musini <nmusini@cisco.com>,
-	Johannes Weiner <hannes@cmpxchg.org>, Joe Perches <joe@perches.com>,
-	Eliad Peller <eliad@wizery.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alexander Duyck <alexander.h.duyck@redhat.com>,
-	Larry Finger <Larry.Finger@lwfinger.net>
-Subject: Re: [PATCH V2] debugfs: don't assume sizeof(bool) to be 4 bytes
-Message-ID: <20150915020438.GG32551@linux>
-References: <81516fb9c662cc338b5af5b63fbbcde5374e0893.1442202447.git.viresh.kumar@linaro.org>
- <1708603.aKpYchk1pa@wuerfel>
- <20150914154708.GF32551@linux>
- <20150914160348.GA7290@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20150914160348.GA7290@kroah.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <ext.szymon.janc@tieto.com>
+Subject: [PATCH 2/2] Bluetooth: Fix reporting incorrect EIR in device found mgmt event
+Date: Mon, 14 Sep 2015 22:29:42 +0200
+Message-Id: <1442262582-22932-2-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1442262582-22932-1-git-send-email-szymon.janc@gmail.com>
+References: <1442262582-22932-1-git-send-email-szymon.janc@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 14-09-15, 09:03, Greg KH wrote:
-> What ever ones you think it is relevant for :)
+From: Szymon Janc <ext.szymon.janc@tieto.com>
 
-"Relevant" is a relevant term :)
+Some remote devices (ie Gigaset G-Tag) misbehave with ADV data length.
+This can lead to incorrect EIR format in device found event when
+ADV_DATA and SCAN_RSP are merged (terminator field before SCAN_RSP
+part).
 
-So, the patch which defined the type bool as _Bool was added in v2.6.19 :)
+Fix this by inspecting ADV_DATA and correct its length if terminator
+is found.
 
-6e2182874324 ("[PATCH] Generic boolean")
+> HCI Event: LE Meta Event (0x3e) plen 42              [hci0] 32.172182
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Connectable undirected - ADV_IND (0x00)
+        Address type: Public (0x00)
+        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
+        Data length: 30
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        Company: Gigaset Communications GmbH (384)
+          Data: 021512348094975abbc5
+        16-bit Service UUIDs (partial): 1 entry
+          Battery Service (0x180f)
+        RSSI: -65 dBm (0xbf)
+> HCI Event: LE Meta Event (0x3e) plen 27              [hci0] 32.172191
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Scan response - SCAN_RSP (0x04)
+        Address type: Public (0x00)
+        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
+        Data length: 15
+        Name (complete): Gigaset G-tag
+        RSSI: -59 dBm (0xc5)
 
-So, I will try at least for v3.10+ as they are used by a lot of
-people, as they are LTS kernels. But wasn't sure if I should do it
-right from 2.6.19.
+Note "Data length: 30" in ADV_DATA which results in 9 extra zero bytes
+after Battery Service UUID. Terminator field present in the middle of
+EIR in Device Found event resulted in userspace stop parsing EIR and
+skipping device name.
 
+@ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
+      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
+      c5 03 02 0f 18 00 00 00 00 00 00 00 00 00 0e 09  ................
+      47 69 67 61 73 65 74 20 47 2d 74 61 67           Gigaset G-tag
+
+With this fix EIR with merged ADV_DATA and SCAN_RSP in device found
+event is properly formatted:
+
+@ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
+      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
+      c5 03 02 0f 18 0e 09 47 69 67 61 73 65 74 20 47  .......Gigaset G
+      2d 74 61 67                                      -tag
+
+Signed-off-by: Szymon Janc <ext.szymon.janc@tieto.com>
+---
+ net/bluetooth/hci_event.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 1860418..9b16f6a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4719,6 +4719,26 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	struct hci_conn *conn;
+ 	bool match;
+ 	u32 flags;
++	u8 *ptr, real_len;
++
++	/* Find the end of the data in case the report contains padded zero
++	 * bytes at the end causing an invalid length value.
++	 *
++	 * When data is NULL, len is 0 so there is no need for extra ptr
++	 * check as 'ptr < data + 0' is already false in such case.
++	 */
++	for (ptr = data; ptr < data + len && *ptr; ptr += *ptr + 1) {
++		if (ptr + 1 + *ptr > data + len)
++			break;
++	}
++
++	real_len = ptr - data;
++
++	/* Adjust for actual length */
++	if (len != real_len) {
++		BT_ERR_RATELIMITED("Corrected advertising report data length");
++		len = real_len;
++	}
+ 
+ 	/* If the direct address is present, then this report is from
+ 	 * a LE Direct Advertising Report event. In that case it is
 -- 
-viresh
+2.5.0
+
