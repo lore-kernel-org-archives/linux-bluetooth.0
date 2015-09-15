@@ -1,47 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/5] audio/avrcp: Fix missing event for volume control
-Date: Tue, 15 Sep 2015 15:41:29 +0300
-Message-Id: <1442320893-31536-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
+	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth:hci_qua: Coding style clean up
+Date: Tue, 15 Sep 2015 12:19:45 +0000
+Message-ID: <20150915121939.GA3369@jci-VirtualBox>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Prasanna Karthik <mkarthi3@visteon.com>
 
-CT and TG are always relative to client and server role, so although TG is
-associated with a player and CT with a remote controller in case of volume
-control the CT is in fact the player and the TG the remote controller,
-because of that PTS will not register any TG record when testing this thus
-controller_init will not register the necessary events.
+Cleanup patch to fix spaces required reported by checkpatch
+
+Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
 ---
- profiles/audio/avrcp.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/bluetooth/hci_qca.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 750bdd9..703d084 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -3805,7 +3805,8 @@ static void target_init(struct avrcp *session)
- 
- 	session->supported_events |=
- 				(1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
--				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED);
-+				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED) |
-+				(1 << AVRCP_EVENT_VOLUME_CHANGED);
- 
- 	/* Only check capabilities if controller is not supported */
- 	if (session->controller == NULL)
-@@ -3831,9 +3832,6 @@ static void controller_init(struct avrcp *session)
- 
- 	DBG("%p version 0x%04x", controller, controller->version);
- 
--	if (controller->version >= 0x0104)
--		session->supported_events |= (1 << AVRCP_EVENT_VOLUME_CHANGED);
--
- 	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
- 	btd_service_connecting_complete(service, 0);
- 
--- 
-2.4.3
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index a8aa077..21f4ea4 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -181,8 +181,8 @@ static void serial_clock_vote(unsigned long vote, struc=
+t hci_uart *hu)
+ 		else
+ 			__serial_clock_off(hu->tty);
 
+-		BT_DBG("Vote serial clock %s(%s)", new_vote? "true" : "false",
+-		       vote? "true" : "false");
++		BT_DBG("Vote serial clock %s(%s)", new_vote ? "true" : "false",
++		       vote ? "true" : "false");
+
+ 		diff =3D jiffies_to_msecs(jiffies - qca->vote_last_jif);
+
+@@ -821,7 +821,7 @@ static struct sk_buff *qca_dequeue(struct hci_uart *hu)
+
+ static uint8_t qca_get_baudrate_value(int speed)
+ {
+-	switch(speed) {
++	switch (speed) {
+ 	case 9600:
+ 		return QCA_BAUDRATE_9600;
+ 	case 19200:
+--
+1.9.1
