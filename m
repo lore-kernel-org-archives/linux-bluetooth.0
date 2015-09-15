@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Simon Fels <simon.fels@canonical.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Fels <simon.fels@canonical.com>
-Subject: [PATCH v2] bluetooth: ask for MWS transport config only if controller supports 4.1
-Date: Tue, 15 Sep 2015 11:29:41 +0200
-Message-Id: <1442309381-15914-1-git-send-email-simon.fels@canonical.com>
+Subject: [PATCH] bluetooth: ask for MWS transport config only if controller supports 4.1
+Date: Tue, 15 Sep 2015 11:24:51 +0200
+Message-Id: <1442309091-1088-1-git-send-email-simon.fels@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -16,18 +16,19 @@ configuration which is only available since version 4.1
 
 Signed-off-by: Simon Fels <simon.fels@canonical.com>
 ---
- include/net/bluetooth/bluetooth.h | 1 +
+ include/net/bluetooth/bluetooth.h | 2 +-
  net/bluetooth/hci_core.c          | 9 +++++++--
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index fcf2ae7..d4a070a 100644
+index fcf2ae7..0861477 100644
 --- a/include/net/bluetooth/bluetooth.h
 +++ b/include/net/bluetooth/bluetooth.h
-@@ -38,6 +38,7 @@
+@@ -37,7 +37,7 @@
+ /* Bluetooth versions */
  #define BLUETOOTH_VER_1_1	1
  #define BLUETOOTH_VER_1_2	2
- #define BLUETOOTH_VER_2_0	3
+-#define BLUETOOTH_VER_2_0	3
 +#define BLUETOOTH_VER_4_1	7
  
  /* Reserv for core and drivers use */
