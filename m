@@ -1,109 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 15 Sep 2015 16:34:47 +0530
+From: Viresh Kumar <viresh.kumar@linaro.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"linaro-kernel@lists.linaro.org" <linaro-kernel@lists.linaro.org>,
+	Rafael Wysocki <rjw@rjwysocki.net>,
+	"sboyd@codeaurora.org" <sboyd@codeaurora.org>,
+	"arnd@arndb.de" <arnd@arndb.de>, Mark Brown <broonie@kernel.org>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	Alexander Duyck <alexander.h.duyck@redhat.com>,
+	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." <alsa-devel@alsa-project.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Arik Nemtsov <arik@wizery.com>,
+	"open list:QUALCOMM ATHEROS ATH10K WIRELESS DRIVER" <ath10k@lists.infradead.org>,
+	"open list:QUALCOMM ATHEROS ATH9K WIRELESS DRIVER" <ath9k-devel@lists.ath9k.org>,
+	"Altman, Avri" <avri.altman@intel.com>,
+	"open list:B43 WIRELESS DRIVER" <b43-dev@lists.infradead.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Brian Silverman <bsilver16384@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Charles Keepax <ckeepax@opensource.wolfsonmicro.com>,
+	"Ivgi, Chaya Rachel" <chaya.rachel.ivgi@intel.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Dmitry Monakhov <dmonakhov@openvz.org>,
+	Doug Thompson <dougthompson@xmission.com>,
+	Eliad Peller <eliad@wizery.com>,
+	"Grumbach, Emmanuel" <emmanuel.grumbach@intel.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Haggai Eran <haggaie@mellanox.com>,
+	Hariprasad S <hariprasad@chelsio.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	Intel Linux Wireless <ilw@linux.intel.com>,
+	"open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
+	"James E.J. Bottomley" <JBottomley@odin.com>,
+	Jaroslav Kysela <perex@perex.cz>, Jiri Slaby <jirislaby@gmail.com>,
+	Joe Perches <joe@perches.com>, Joerg Roedel <joro@8bytes.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Jonathan Corbet <corbet@lwn.net>, Joonsoo Kim <js1304@gmail.com>,
+	Kalle Valo <kvalo@qca.qualcomm.com>,
+	Larry Finger <Larry.Finger@lwfinger.net>,
+	Len Brown <lenb@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+	"open list:ACPI" <linux-acpi@vger.kernel.org>,
+	"moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)" <linux-arm-kernel@lists.infradead.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
+	"open list:CISCO SCSI HBA DRIVER" <linux-scsi@vger.kernel.org>,
+	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:" <linux-usb@vger.kernel.org>,
+	"open list:NETWORKING DRIVERS (WIRELESS)" <linux-wireless@vger.kernel.org>,
+	"Coelho, Luciano" <luciano.coelho@intel.com>,
+	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Mauro Carvalho Chehab <mchehab@osg.samsung.com>,
+	Mel Gorman <mgorman@suse.de>,
+	Michael Kerrisk <mtk.manpages@gmail.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Narsimhulu Musini <nmusini@cisco.com>,
+	"open list:CXGB4 ETHERNET DRIVER (CXGB4)" <netdev@vger.kernel.org>,
+	Nick Kossifidis <mickflemm@gmail.com>,
+	"open list:WOLFSON MICROELECTRONICS DRIVERS" <patches@opensource.wolfsonmicro.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
+	Richard Fitzgerald <rf@opensource.wolfsonmicro.com>,
+	Sasha Levin <sasha.levin@oracle.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Sebastian Ott <sebott@linux.vnet.ibm.com>,
+	Sesidhar Baddela <sebaddel@cisco.com>,
+	Stanislaw Gruszka <sgruszka@redhat.com>,
+	Steven Rostedt <rostedt@goodmis.org>, Takashi Iwai <tiwai@suse.com>,
+	Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	"Winkler, Tomas" <tomas.winkler@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Wang Long <long.wanglong@huawei.com>,
+	Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH V3 2/2] debugfs: don't assume sizeof(bool) to be 4 bytes
+Message-ID: <20150915110447.GI6350@linux>
+References: <9b705747a138c96c26faee5218f7b47403195b28.1442305897.git.viresh.kumar@linaro.org>
+ <27d37898b4be6b9b9f31b90135f8206ca079a868.1442305897.git.viresh.kumar@linaro.org>
+ <1442313464.1914.21.camel@sipsolutions.net>
 MIME-Version: 1.0
-In-Reply-To: <86D221DC0B85F94D9B05B97827669A34064CEC19@PGSMSX106.gar.corp.intel.com>
-References: <86D221DC0B85F94D9B05B97827669A34064CE519@PGSMSX106.gar.corp.intel.com>
-	<CABBYNZJBEA2Pt71+yPHbx7N5hjidfeEyML=2b=Ca931oWrzvtg@mail.gmail.com>
-	<86D221DC0B85F94D9B05B97827669A34064CEC19@PGSMSX106.gar.corp.intel.com>
-Date: Tue, 15 Sep 2015 19:15:05 +0800
-Message-ID: <CAAAJ3C++3S1mxwGPsQ7U+np0U02F7Rn8nhnr2rYcZEzPqRfXew@mail.gmail.com>
-Subject: Re: BLE(ATT) mouse doesn't register wakeup source in Linux kernel
- during BLE mouse connecting
-From: Ethan <ethancsge@gmail.com>
-To: "Ge, Ethan" <ethan.ge@intel.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "jeremy@goop.org" <jeremy@goop.org>,
-	Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1442313464.1914.21.camel@sipsolutions.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johannes,
 
-2015-09-13 20:26 GMT-07:00 Ge, Ethan <ethan.ge@intel.com>:
-> Hi Luiz
->
-> -----Original Message-----
-> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: Friday, September 11, 2015 9:36 PM
-> To: Ge, Ethan
-> Cc: linux-bluetooth@vger.kernel.org; jeremy@goop.org; Marcel Holtmann
-> Subject: Re: BLE(ATT) mouse doesn't register wakeup source in Linux kernel during BLE mouse connecting
->
-> Hi Ethan,
->
-> On Fri, Sep 11, 2015 at 1:12 PM, Ge, Ethan <ethan.ge@intel.com> wrote:
->> Hi,
->>
->> In file drivers/hid/hid-input.c, function hidinput_setup_battery() will return during connect a BLE mouse because of filed->usage->hid != HID_DC_BATTERYSTRENGTH. And BLE(ATT) HID doesn't register wakeup source in Linux kernel.
->>
->> It will cause BLE HID mouse can't wake DUT from S3. Issue can be reproduced by IBUFFALO BSMBB09DS / Dell WM615 mouse / Microsoft arc touch, these all are BLE mouse.
->>
->> static bool hidinput_setup_battery(struct hid_device *dev, unsigned
->> report_type, struct hid_field *field) {
->>     struct power_supply_desc *psy_desc = NULL;
->>     struct power_supply_config psy_cfg = { .drv_data = dev, };
->>     unsigned quirks;
->>     s32 min, max;
->>
->>     if (field->usage->hid != HID_DC_BATTERYSTRENGTH)
->>         return false;    /* no match */
->
->> But this is checked in case the device does not support battery strength support, I thought any input device would register a wakeup source regardless.
->> Luiz Augusto von Dentz
->
-> I said that because I verified it by ftrace. I found if it return hidinput_setup_battery(), and input device can't register a wakeup source. Below are the code flow. hidinput_setup_battery->__power_supply_register-> device_init_wakeup.
-> In other hand, the BR/EDR mouse can register a wakeup source because it won't return hidinput_setup_battery() and can go through next function. I am trying to check why BLE mouse usage->hid != HID_DC_BATTERYSTRENGTH and can not wakeup system in S3.
->
-> static bool hidinput_setup_battery(struct hid_device *dev, unsigned report_type, struct hid_field *field)
-> {
->     struct power_supply_desc *psy_desc = NULL;
->     struct power_supply_config psy_cfg = { .drv_data = dev, };
->     unsigned quirks;
->     s32 min, max;
->
->     if (field->usage->hid != HID_DC_BATTERYSTRENGTH)
->         return false;    /* no match */
+On 15-09-15, 12:37, Johannes Berg wrote:
+> This email has far too many people Cc'ed on it - I don't think vger is
+> even accepting it for that reason. You should probably restrict it to
+> just a few lists when you resubmit.
+
+Hmm, I know the list is too long and yes its blocked for Admin's
+approval on most of the lists. But that's what was generated by
+get_maintainers and I didn't wanted to miss cc'ing anybody who might
+be able to catch a bug in there.
+
+> > The problem with current code is that it reads/writes 4 bytes for a
+> > boolean, which will read/update 3 excess bytes following the boolean
+> > variable (when sizeof(bool) is 1 byte). And that can lead to hard to 
+> > fix bugs. It was a nightmare cracking this one.
+> 
+> Unless you're ignoring (or worse, casting away) type warnings, there's
+> no problem/bug at all, you just have to define all the variables used
+> with debugfs_create_bool() as actual u32 variables.
+> 
+> It sounds like you are/were doing something like the following:
+> 
+> bool a, b, c;
 > ...
->     dev->battery = power_supply_register(&dev->dev, psy_desc, &psy_cfg);
-> ..
-> }
->
-> static struct power_supply *__must_check
-> __power_supply_register(struct device *parent,
->                    const struct power_supply_desc *desc,
->                    const struct power_supply_config *cfg,
->                    bool ws)
-> {
->  ....
->
->     spin_lock_init(&psy->changed_lock);
->     rc = device_init_wakeup(dev, ws);
->     if (rc)
->         goto wakeup_init_failed;
-> ....
-> }
->
-> int device_init_wakeup(struct device *dev, bool enable)
-> {
->     int ret = 0;
->
->     if (!dev)
->         return -EINVAL;
->
->     if (enable) {
->         device_set_wakeup_capable(dev, true);
->         ret = device_wakeup_enable(dev);
+> debugfs_create_bool("a", 0600, dir, (u32 *)&a);
+> 
+> which is quite clearly invalid.
+> 
+> Had you properly defined them as u32, as everyone (except for the ACPI
+> case) does, there wouldn't have been any problem:
+> 
+> u32 a, b, c;
 > ...
-> }
-> Ethan
-> --
+> debugfs_create_bool("a", 0600, dir, &a);
+> 
+> 
+> As far as I can tell, there's no bug in the API. It might be a bit
+> strange to have a set of functions called debugfs_create_<type> and
+> then one of them doesn't actually use the type from the name, but
+> that's only a problem if you blindly add casts or ignore the compiler
+> warnings you'd get without casts.
+> 
+> In other words, I think your commit log is extremely misleading. The
+> API perhaps has some inconsistent naming, but all this talk about the
+> sizeof(bool) etc. is simply completely irrelevant since "bool" is not
+> the type used here at all. There's nothing to fix in any of the code
+> you're changing (again, apart from ACPI.)
+> 
+> That said, I don't actually object to this change itself, being able to
+> actually use bool variables with debugfs_create_bool would be nice.
+> However, that shouldn't be documented as a bugfix or anything like
+> that, merely as a cleanup to make the API naming more consistent and to
+> be able to use the (smaller and often more convenient) bool type.
+> 
+> Clearly, it would also lead to less confusion, as we see in ACPI and
+> hear from your OPP code. Note that ACPI is even more confused though
+> since it uses "unsigned long", so it's entirely possible that somebody
+> actually thought about that case and decided not to worry about 64-bit
+> big-endian platforms.
+> 
+> Of course this also means that only the ACPI patch is a candidate for s
+> table.
 
-I want to correct my description in previous mail, this issue doesn't
-cause from hidinput_setup_battery.  And I found
-/sys/bus/usb/devices/1-5/power/wakeup is enabled after BR/EDR HID
-connected, but it's disabled after BLE HID connected. If I echo
-enabled > /sys/bus/usb/devices/1-5/power/wakeup, and issue will
-disappear. The wakeup value is configured from
-wake_store->device_set_wakeup_enable(dev, 1) for BR/EDR HID case. I am
-trying to figure out why BLE HID won't process it.
+Yeah, that's right. Its just a trivial cleanup rather. What about this
+simple changelog instead?
 
-Ethan
+--
+viresh
+
+-------------------------8<-------------------------
+
+Subject: [PATCH] debugfs: Pass bool pointer to debugfs_create_bool()
+
+Its a bit odd that debugfs_create_bool() takes 'u32 *' as an argument,
+when all it needs is a boolean pointer.
+
+It would be better to update this API to make it accept 'bool *'
+instead, as that will make it more consistent and often more convenient.
+Over that bool takes just a byte.
+
+That required updates to all user sites as well in a single commit.
+regmap core was also using debugfs_{read|write}_file_bool(), directly
+and variable types were updated for that to be bool as well.
+
+Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
