@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ 5/5] audio/transport: Fix emitting volume changed too soon
-Date: Tue, 15 Sep 2015 15:41:33 +0300
-Message-Id: <1442320893-31536-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 BlueZ 4/5] audio/transport: Fix not emitting Volume changes
+Date: Tue, 15 Sep 2015 15:41:32 +0300
+Message-Id: <1442320893-31536-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1442320893-31536-1-git-send-email-luiz.dentz@gmail.com>
 References: <1442320893-31536-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,25 +11,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The volume should start at maximum (127) but at that point there is no
-reason to notify the remote since there is no stream ongoing so no
-changes can be applied.
+If Volume is changed locally the change should be propagated using
+PropertiesChanged.
 ---
- profiles/audio/transport.c | 1 -
- 1 file changed, 1 deletion(-)
+ profiles/audio/transport.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 7e3d1e6..4121e52 100644
+index f5c829f..7e3d1e6 100644
 --- a/profiles/audio/transport.c
 +++ b/profiles/audio/transport.c
-@@ -827,7 +827,6 @@ static int media_transport_init_sink(struct media_transport *transport)
- 	transport->destroy = destroy_a2dp;
+@@ -653,6 +653,7 @@ static void set_volume(const GDBusPropertyTable *property,
+ 	struct media_transport *transport = data;
+ 	struct a2dp_transport *a2dp = transport->data;
+ 	uint16_t volume;
++	bool notify;
  
- 	a2dp->volume = 127;
--	avrcp_set_volume(transport->device, a2dp->volume, true);
- 	transport->source_watch = source_add_state_cb(service,
- 							source_state_changed,
- 							transport);
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16) {
+ 		g_dbus_pending_property_error(id,
+@@ -670,13 +671,21 @@ static void set_volume(const GDBusPropertyTable *property,
+ 		return;
+ 	}
+ 
+-	if (a2dp->volume != volume)
+-		avrcp_set_volume(transport->device, volume,
+-				transport->source_watch ? true : false);
++	g_dbus_pending_property_success(id);
++
++	if (a2dp->volume == volume)
++		return;
+ 
+ 	a2dp->volume = volume;
+ 
+-	g_dbus_pending_property_success(id);
++	notify = transport->source_watch ? true : false;
++	if (notify)
++		g_dbus_emit_property_changed(btd_get_dbus_connection(),
++						transport->path,
++						MEDIA_TRANSPORT_INTERFACE,
++						"Volume");
++
++	avrcp_set_volume(transport->device, volume, notify);
+ }
+ 
+ static const GDBusMethodTable transport_methods[] = {
 -- 
 2.4.3
 
