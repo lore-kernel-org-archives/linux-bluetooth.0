@@ -1,168 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Sep 2015 10:13:19 +0100
-From: Charles Keepax <ckeepax@opensource.wolfsonmicro.com>
-To: Viresh Kumar <viresh.kumar@linaro.org>
-CC: <gregkh@linuxfoundation.org>, <linaro-kernel@lists.linaro.org>,
-        Rafael
- Wysocki <rjw@rjwysocki.net>, <sboyd@codeaurora.org>,
-        <arnd@arndb.de>, Mark
- Brown <broonie@kernel.org>,
-        Akinobu Mita <akinobu.mita@gmail.com>,
-        Alexander
- Duyck <alexander.h.duyck@redhat.com>,
-        "moderated list:SOUND - SOC LAYER /
- DYNAMIC AUDIO POWER MANAGEM..." <alsa-devel@alsa-project.org>,
-        Andrew Morton
-	<akpm@linux-foundation.org>,
-        Andy Lutomirski <luto@amacapital.net>, Arik
- Nemtsov <arik@wizery.com>,
-        "open list:QUALCOMM ATHEROS ATH10K WIRELESS
- DRIVER" <ath10k@lists.infradead.org>,
-        "open list:QUALCOMM ATHEROS ATH9K
- WIRELESS DRIVER" <ath9k-devel@lists.ath9k.org>,
-        Avri Altman
-	<avri.altman@intel.com>,
-        "open list:B43 WIRELESS DRIVER"
-	<b43-dev@lists.infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Brian
- Silverman <bsilver16384@gmail.com>,
-        Catalin Marinas
-	<catalin.marinas@arm.com>,
-        Chaya Rachel Ivgi <chaya.rachel.ivgi@intel.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Dmitry Monakhov <dmonakhov@openvz.org>,
-        Doug Thompson <dougthompson@xmission.com>,
-        Eliad Peller <eliad@wizery.com>,
-        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-        Florian Fainelli
-	<f.fainelli@gmail.com>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Haggai Eran
-	<haggaie@mellanox.com>,
-        Hariprasad S <hariprasad@chelsio.com>, Ingo Molnar
-	<mingo@kernel.org>,
-        Intel Linux Wireless <ilw@linux.intel.com>,
-        "open
- list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
-        "James E.J.
- Bottomley" <JBottomley@odin.com>,
-        Jaroslav Kysela <perex@perex.cz>, Jiri
- Slaby <jirislaby@gmail.com>,
-        Joe Perches <joe@perches.com>, Joerg Roedel
-	<joro@8bytes.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Johannes Berg
-	<johannes.berg@intel.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jonathan
- Corbet <corbet@lwn.net>, Joonsoo Kim <js1304@gmail.com>,
-        Kalle Valo
-	<kvalo@qca.qualcomm.com>,
-        Larry Finger <Larry.Finger@lwfinger.net>, Len Brown
-	<lenb@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        "open list:ACPI"
-	<linux-acpi@vger.kernel.org>,
-        "moderated list:ARM64 PORT (AARCH64
- ARCHITECTURE)" <linux-arm-kernel@lists.infradead.org>,
-        "open list:BLUETOOTH
- DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        "open list:DOCUMENTATION"
-	<linux-doc@vger.kernel.org>,
-        "open list:EDAC-CORE"
-	<linux-edac@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
-        "open list:CISCO SCSI
- HBA DRIVER" <linux-scsi@vger.kernel.org>,
-        "open list:ULTRA-WIDEBAND (UWB)
- SUBSYSTEM:" <linux-usb@vger.kernel.org>,
-        "open list:NETWORKING DRIVERS
- (WIRELESS)" <linux-wireless@vger.kernel.org>,
-        Luciano Coelho
-	<luciano.coelho@intel.com>,
-        "Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Mauro Carvalho Chehab
-	<mchehab@osg.samsung.com>,
-        Mel Gorman <mgorman@suse.de>,
-        Michael Kerrisk
-	<mtk.manpages@gmail.com>,
-        Michal Hocko <mhocko@suse.com>, Narsimhulu Musini
-	<nmusini@cisco.com>,
-        "open list:CXGB4 ETHERNET DRIVER (CXGB4)"
-	<netdev@vger.kernel.org>,
-        Nick Kossifidis <mickflemm@gmail.com>,
-        "open
- list:WOLFSON MICROELECTRONICS DRIVERS" <patches@opensource.wolfsonmicro.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        QCA ath9k Development
-	<ath9k-devel@qca.qualcomm.com>,
-        Richard Fitzgerald
-	<rf@opensource.wolfsonmicro.com>,
-        Sasha Levin <sasha.levin@oracle.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Sebastian Ott
-	<sebott@linux.vnet.ibm.com>,
-        Sesidhar Baddela <sebaddel@cisco.com>,
-        Stanislaw
- Gruszka <sgruszka@redhat.com>,
-        Steven Rostedt <rostedt@goodmis.org>, Takashi
- Iwai <tiwai@suse.com>,
-        Tejun Heo <tj@kernel.org>, Thomas Gleixner
-	<tglx@linutronix.de>,
-        Tomas Winkler <tomas.winkler@intel.com>,
-        Vlastimil
- Babka <vbabka@suse.cz>,
-        Wang Long <long.wanglong@huawei.com>,
-        Will Deacon
-	<will.deacon@arm.com>
-Subject: Re: [PATCH V3 2/2] debugfs: don't assume sizeof(bool) to be 4 bytes
-Message-ID: <20150915091319.GH11200@ck-lbox>
-References: <9b705747a138c96c26faee5218f7b47403195b28.1442305897.git.viresh.kumar@linaro.org>
- <27d37898b4be6b9b9f31b90135f8206ca079a868.1442305897.git.viresh.kumar@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <27d37898b4be6b9b9f31b90135f8206ca079a868.1442305897.git.viresh.kumar@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] bluetooth: ask for MWS transport config only if controller supports 4.1
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1442309091-1088-1-git-send-email-simon.fels@canonical.com>
+Date: Tue, 15 Sep 2015 11:32:44 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6C5C6E24-A663-4A52-B38E-3AA2E8742779@holtmann.org>
+References: <1442309091-1088-1-git-send-email-simon.fels@canonical.com>
+To: Simon Fels <simon.fels@canonical.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Sep 15, 2015 at 02:04:59PM +0530, Viresh Kumar wrote:
-> Long back 'bool' type used to be a typecast to 'int', but that changed
-> in v2.6.19. And that is a typecast to _Bool now, which (mostly) takes
-> just a byte. Anyway, the bool type is implementation defined, and better
-> we don't assume its size to be 4 bytes or 1.
-> 
-> The problem with current code is that it reads/writes 4 bytes for a
-> boolean, which will read/update 3 excess bytes following the boolean
-> variable (when sizeof(bool) is 1 byte). And that can lead to hard to fix
-> bugs. It was a nightmare cracking this one.
-> 
-> The debugfs code had this bug since the first time it got introduced,
-> but was never got caught, strange. Maybe the bool variables (monitored
-> by debugfs) were followed by an 'int' or something bigger and the pad
-> bytes made sure, we never see this issue.
-> 
-> But the OPP (Operating performance points) library have three booleans
-> allocated to contiguous bytes and this bug got hit quite soon (The
-> debugfs support for OPP is yet to be merged). It showed up as corruption
-> of the debugfs boolean symbols, where Y were becoming N and vice versa.
-> 
-> Fix it properly by changing the last argument of debugfs_create_bool(),
-> to type 'bool *' instead of 'u32 *', so that it doesn't depend on sizeof
-> bool at all.
-> 
-> That required updates to all user sites as well in a single commit.
-> regmap core was also using debugfs_{read|write}_file_bool(), directly
-> and variable types were updated for that to be bool as well.
-> 
-> Acked-by: Mark Brown <broonie@kernel.org>
-> Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+Hi Simon,
+
+> Some controllers doesn't seem to clear the bitfield to indicate which
+> HCI commands are supported correctly. This leads to wrong conclusions
+> which HCI commands we can send at initialization time. In this case
+> the problem appeared with the command to retrieve the MWS transport
+> configuration which is only available since version 4.1
+
+provide btmon of the failing case and information about the controller that has this bug.
+
+> Signed-off-by: Simon Fels <simon.fels@canonical.com>
 > ---
+> include/net/bluetooth/bluetooth.h | 2 +-
+> net/bluetooth/hci_core.c          | 9 +++++++--
+> 2 files changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index fcf2ae7..0861477 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -37,7 +37,7 @@
+> /* Bluetooth versions */
+> #define BLUETOOTH_VER_1_1	1
+> #define BLUETOOTH_VER_1_2	2
+> -#define BLUETOOTH_VER_2_0	3
+> +#define BLUETOOTH_VER_4_1	7
+> 
+> /* Reserv for core and drivers use */
+> #define BT_SKB_RESERVE	8
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index a7cdd99..f376ab6 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -824,8 +824,13 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
+> 	if (hdev->commands[29] & 0x20)
+> 		hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
+> 
+> -	/* Get MWS transport configuration if the HCI command is supported */
+> -	if (hdev->commands[30] & 0x08)
+> +	/* Get MWS transport configuration if the HCI command is supported
+> +	 * but only when reported HCI version is at minimum 4.1. Some
+> +	 * controllers doesn't seem to clear the bit field they transmit
+> +	 * correctly so all resevered fields are invalid and let to
+> +	 * failing commands */
+> +	if (hdev->hci_ver >= BLUETOOTH_VER_4_1 &&
+> +		hdev->commands[30] & 0x08)
+> 		hci_req_add(req, HCI_OP_GET_MWS_TRANSPORT_CONFIG, 0, NULL);
 
-For the minor wm_adsp change:
+We are not doing it this way. The version checks we have in the core are for really old controllers and times when the Bluetooth Core specification was unclear in certain behaviors.
 
-Acked-by: Charles Keepax <ckeepax@opensource.wolfsonmicro.com>
+Any new broken behavior of a controller will not be hidden behind a version check. It will be hidden behind a quirk and we will call out the manufacturer for not doing this right in the driver by setting needed quirks.
 
-Thanks,
-Charles
+Regards
+
+Marcel
+
