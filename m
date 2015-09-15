@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 15 Sep 2015 10:29:29 -0400
-From: Tejun Heo <tj@kernel.org>
-To: Viresh Kumar <viresh.kumar@linaro.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>, gregkh@linuxfoundation.org,
-	linaro-kernel@lists.linaro.org, Rafael Wysocki <rjw@rjwysocki.net>,
-	sboyd@codeaurora.org, arnd@arndb.de,
-	Mark Brown <broonie@kernel.org>,
+Date: Tue, 15 Sep 2015 19:42:08 +0530
+From: Viresh Kumar <viresh.kumar@linaro.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: gregkh@linuxfoundation.org, linaro-kernel@lists.linaro.org,
+	Rafael Wysocki <rjw@rjwysocki.net>, sboyd@codeaurora.org,
+	arnd@arndb.de, Mark Brown <broonie@kernel.org>,
 	Akinobu Mita <akinobu.mita@gmail.com>,
 	Alexander Duyck <alexander.h.duyck@redhat.com>,
 	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." <alsa-devel@alsa-project.org>,
@@ -73,37 +71,44 @@ Cc: Steven Rostedt <rostedt@goodmis.org>, gregkh@linuxfoundation.org,
 	Sebastian Ott <sebott@linux.vnet.ibm.com>,
 	Sesidhar Baddela <sebaddel@cisco.com>,
 	Stanislaw Gruszka <sgruszka@redhat.com>,
-	Takashi Iwai <tiwai@suse.com>, Thomas Gleixner <tglx@linutronix.de>,
+	Takashi Iwai <tiwai@suse.com>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
 	Tomas Winkler <tomas.winkler@intel.com>,
 	Vlastimil Babka <vbabka@suse.cz>,
 	Wang Long <long.wanglong@huawei.com>,
 	Will Deacon <will.deacon@arm.com>,
 	Linus Torvalds <torvalds@linux-foundation.org>
 Subject: Re: [PATCH V3 2/2] debugfs: don't assume sizeof(bool) to be 4 bytes
-Message-ID: <20150915142929.GB2905@mtj.duckdns.org>
+Message-ID: <20150915141208.GK6350@linux>
 References: <9b705747a138c96c26faee5218f7b47403195b28.1442305897.git.viresh.kumar@linaro.org>
  <27d37898b4be6b9b9f31b90135f8206ca079a868.1442305897.git.viresh.kumar@linaro.org>
  <20150915100454.70dcc04d@gandalf.local.home>
- <20150915141208.GK6350@linux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20150915141208.GK6350@linux>
+In-Reply-To: <20150915100454.70dcc04d@gandalf.local.home>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
-
-On Tue, Sep 15, 2015 at 07:42:08PM +0530, Viresh Kumar wrote:
-> Ah, yes. Thanks for letting me know (I just testedit as well).
+On 15-09-15, 10:04, Steven Rostedt wrote:
+> On Tue, 15 Sep 2015 14:04:59 +0530
+> Viresh Kumar <viresh.kumar@linaro.org> wrote:
 > 
-> But will it look sane enough to set a boolean to anything apart from
-> true/false or 1/0? Yes, it will always be set to 0/1 only, but still..
+> > diff --git a/drivers/acpi/ec.c b/drivers/acpi/ec.c
+> > index 2614a839c60d..f11e17ad7834 100644
+> > --- a/drivers/acpi/ec.c
+> > +++ b/drivers/acpi/ec.c
+> > @@ -1237,7 +1237,7 @@ ec_parse_device(acpi_handle handle, u32 Level, void *context, void **retval)
+> >  	/* Use the global lock for all EC transactions? */
+> >  	tmp = 0;
+> >  	acpi_evaluate_integer(handle, "_GLK", NULL, &tmp);
+> > -	ec->global_lock = tmp;
+> > +	ec->global_lock = !!tmp;
+> 
+> BTW, the above is equivalent if global_lock is of type bool.
 
-Let's please not do something unnecessary.  Everybody has different
-ideas about what looks natural and the best way to achieve some
-semblance of consistency is sticking with minimum unless there are
-overriding concerns and there isn't any here.
+Ah, yes. Thanks for letting me know (I just testedit as well).
 
-Thanks.
+But will it look sane enough to set a boolean to anything apart from
+true/false or 1/0? Yes, it will always be set to 0/1 only, but still..
 
 -- 
-tejun
+viresh
