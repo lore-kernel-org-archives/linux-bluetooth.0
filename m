@@ -1,37 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 15 Sep 2015 07:34:38 +0530
+From: Viresh Kumar <viresh.kumar@linaro.org>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, linaro-kernel@lists.linaro.org,
+	"open list:NETWORKING DRIVERS WIRELESS" <linux-wireless@vger.kernel.org>,
+	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." <alsa-devel@alsa-project.org>,
+	Avri Altman <avri.altman@intel.com>,
+	Stanislaw Gruszka <sgruszka@redhat.com>,
+	Jiri Slaby <jirislaby@gmail.com>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	"open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
+	Kalle Valo <kvalo@qca.qualcomm.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	Wang Long <long.wanglong@huawei.com>,
+	Richard Fitzgerald <rf@opensource.wolfsonmicro.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Davidlohr Bueso <dave@stgolabs.net>, Joonsoo Kim <js1304@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, Joerg Roedel <joro@8bytes.org>,
+	"open list:WOLFSON MICROELECTRONICS DRIVERS" <patches@opensource.wolfsonmicro.com>,
+	Sebastian Ott <sebott@linux.vnet.ibm.com>,
+	"open list:QUALCOMM ATHEROS ATH10K WIRELESS DRIVER" <ath10k@lists.infradead.org>,
+	Intel Linux Wireless <ilw@linux.intel.com>,
+	"open list:ACPI" <linux-acpi@vger.kernel.org>,
+	"open list:QUALCOMM ATHEROS ATH9K WIRELESS DRIVER" <ath9k-devel@lists.ath9k.org>,
+	Nick Kossifidis <mickflemm@gmail.com>,
+	"open list:B43 WIRELESS DRIVER" <b43-dev@lists.infradead.org>,
+	Luciano Coelho <luciano.coelho@intel.com>,
+	Doug Thompson <dougthompson@xmission.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Sasha Levin <sasha.levin@oracle.com>,
+	Tomas Winkler <tomas.winkler@intel.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	sboyd@codeaurora.org, Len Brown <lenb@kernel.org>,
+	Takashi Iwai <tiwai@suse.com>,
+	Hariprasad S <hariprasad@chelsio.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Mauro Carvalho Chehab <mchehab@osg.samsung.com>,
+	Vlastimil Babka <vbabka@suse.cz>, Arik Nemtsov <arik@wizery.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	David Rientjes <rientjes@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
+	Michael Kerrisk <mtk.manpages@gmail.com>, Tejun Heo <tj@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Borislav Petkov <bp@alien8.de>, Oleg Nesterov <oleg@redhat.com>,
+	Charles Keepax <ckeepax@opensource.wolfsonmicro.com>,
+	Mel Gorman <mgorman@suse.de>,
+	"moderated list:ARM64 PORT AARCH64 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>,
+	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
+	Haggai Eran <haggaie@mellanox.com>,
+	"James E.J. Bottomley" <JBottomley@odin.com>,
+	Chaya Rachel Ivgi <chaya.rachel.ivgi@intel.com>,
+	"open list:CISCO SCSI HBA DRIVER" <linux-scsi@vger.kernel.org>,
+	Brian Silverman <bsilver16384@gmail.com>,
+	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	"open list:CXGB4 ETHERNET DRIVER CXGB4" <netdev@vger.kernel.org>,
+	"open list:ULTRA-WIDEBAND UWB SUBSYSTEM:" <linux-usb@vger.kernel.org>,
+	Rafael Wysocki <rjw@rjwysocki.net>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Sesidhar Baddela <sebaddel@cisco.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"open list:AMD IOMMU AMD-VI" <iommu@lists.linux-foundation.org>,
+	Dmitry Monakhov <dmonakhov@openvz.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Narsimhulu Musini <nmusini@cisco.com>,
+	Johannes Weiner <hannes@cmpxchg.org>, Joe Perches <joe@perches.com>,
+	Eliad Peller <eliad@wizery.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexander Duyck <alexander.h.duyck@redhat.com>,
+	Larry Finger <Larry.Finger@lwfinger.net>
+Subject: Re: [PATCH V2] debugfs: don't assume sizeof(bool) to be 4 bytes
+Message-ID: <20150915020438.GG32551@linux>
+References: <81516fb9c662cc338b5af5b63fbbcde5374e0893.1442202447.git.viresh.kumar@linaro.org>
+ <1708603.aKpYchk1pa@wuerfel>
+ <20150914154708.GF32551@linux>
+ <20150914160348.GA7290@kroah.com>
 MIME-Version: 1.0
-In-Reply-To: <CAGGi21ZDsS0__YnzWqWfcmk=jSAEZYQwUD8Dx2c8fi25bWn5SA@mail.gmail.com>
-References: <CAGGi21YVrRB06R8ahxRLBZ=xZkNKGnCsetL1xUQx9DPLeAGGXA@mail.gmail.com>
- <CABBYNZKi=TSWQxyN6j1=a++V5p-e8viB=qWxnX1pGQShz9A-YA@mail.gmail.com>
- <10452927.a6KM84WJTg@leonov> <CAGGi21ZDsS0__YnzWqWfcmk=jSAEZYQwUD8Dx2c8fi25bWn5SA@mail.gmail.com>
-From: Elliot Saba <staticfloat@gmail.com>
-Date: Mon, 14 Sep 2015 20:32:34 -0700
-Message-ID: <CAGGi21aF8ipUcH0wUWaJGGS4DmDtQJWOPqcyB0zyK3uF93JN4g@mail.gmail.com>
-Subject: Re: Understanding connecting to BLE keyboard
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20150914160348.GA7290@kroah.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello all, thank you for your responses so far.
+On 14-09-15, 09:03, Greg KH wrote:
+> What ever ones you think it is relevant for :)
 
-First off, I had not tried entering the PIN, because nothing had
-prompted me to do so.  I have intermittently managed to get a PIN
-prompt to show up in bluetoothctl now that I am using "agent
-KeyboardDisplay" instead of "agent KeyboardOnly", thanks to Szymon's
-advice.  However, although it now sometimes prompts me for a PIN code,
-other times it doesn't, and I still get "authentication canceled"
-errors extremely quickly (less than a second) after attempting to
-pair.  Here is an example session, with both bluetoothctl and btmon
-output: https://gist.github.com/staticfloat/bbc016376ba5a8ab4451
+"Relevant" is a relevant term :)
 
-Secondly, what manual do you refer to?  I am having a difficult time
-finding bluez documentation, so if there is a bluez manual somewhere,
-I'd love to read it.  If you refer to the manual for my keyboard,
-sadly its manual says nothing about Linux.  I can pair it on other
-operating systems such as OSX without difficulty (and yes, it requires
-entry of a PIN) so I am confident I know the proper method to pair it
-with a device.
+So, the patch which defined the type bool as _Bool was added in v2.6.19 :)
 
-Thanks!
--E
+6e2182874324 ("[PATCH] Generic boolean")
+
+So, I will try at least for v3.10+ as they are used by a lot of
+people, as they are LTS kernels. But wasn't sure if I should do it
+right from 2.6.19.
+
+-- 
+viresh
