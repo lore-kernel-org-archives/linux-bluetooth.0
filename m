@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1442348719-3435-1-git-send-email-jpawlowski@google.com>
-References: <1442348719-3435-1-git-send-email-jpawlowski@google.com>
-Date: Wed, 16 Sep 2015 14:08:43 +0300
-Message-ID: <CABBYNZKud+_WqM166Vo+3QnjLrg6G113VjMpi9YU=Kav5PjaWg@mail.gmail.com>
-Subject: Re: [PATCH] shared/gatt-client: enable notifications right after connecting
+In-Reply-To: <1442347117-2212-1-git-send-email-jpawlowski@google.com>
+References: <1442347117-2212-1-git-send-email-jpawlowski@google.com>
+Date: Wed, 16 Sep 2015 14:08:13 +0300
+Message-ID: <CABBYNZKa47pXhS80nTSsGZjbyFWdpCKfYSTmbwrbr-vcAxtF2Q@mail.gmail.com>
+Subject: Re: [PATCH v3] core/device: Store services when they change or after pairing.
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Jakub Pawlowski <jpawlowski@google.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -14,66 +14,59 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Jakub,
 
-On Tue, Sep 15, 2015 at 11:25 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> Right now, if you re-connect to device that was previously registered
-> in DBus, you can read and write it's characteristic without any error.
-> Trying to register for notifications would however fail. This patch
-> fixes that by making sure you can register for notifications before
-> gatt_client is ready. It also re-register exising clients right after
-> connection, not when gatt_client is ready.
+On Tue, Sep 15, 2015 at 10:58 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> Service caching works only for paired devices. Right now caching is
+> triggered only right after discovery finishes. That means that if already
+> paired device sends service changed notofication, cache won't be updated.
+> Also if you connect to new device, and then pair during this connection,
+> your services won't be cached until reconnect. This will require full
+> service discovery which is slow.
+> This patch fixes that by trying to cache services every time services
+> changed, and right after successful pairing.
 > ---
->  src/gatt-client.c        | 12 ++++++------
->  src/shared/gatt-client.c |  2 +-
->  2 files changed, 7 insertions(+), 7 deletions(-)
+>  src/device.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 >
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index 225aa42..399133a 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -1838,12 +1838,6 @@ void btd_gatt_client_ready(struct btd_gatt_client *client)
->         DBG("GATT client ready");
+> diff --git a/src/device.c b/src/device.c
+> index 8184508..5ec8780 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -2202,10 +2202,8 @@ static void device_svc_resolved(struct btd_device *dev, uint8_t bdaddr_type,
+>         if (!dev->temporary)
+>                 store_device_info(dev);
 >
->         create_services(client);
-> -
-> -       /*
-> -        * Services have already been created before. Re-enable notifications
-> -        * for any pre-registered notification sessions.
-> -        */
-> -       queue_foreach(client->all_notify_clients, register_notify, client);
->  }
+> -       if (bdaddr_type != BDADDR_BREDR && err == 0) {
+> +       if (bdaddr_type != BDADDR_BREDR && err == 0)
+>                 store_services(dev);
+> -               store_gatt_db(dev);
+> -       }
 >
->  void btd_gatt_client_connected(struct btd_gatt_client *client)
-> @@ -1860,6 +1854,12 @@ void btd_gatt_client_connected(struct btd_gatt_client *client)
+>         if (!req)
+>                 return;
+> @@ -3313,6 +3311,8 @@ static gboolean gatt_services_changed(gpointer user_data)
+>  {
+>         struct btd_device *device = user_data;
 >
->         bt_gatt_client_unref(client->gatt);
->         client->gatt = bt_gatt_client_ref(gatt);
+> +       store_gatt_db(device);
 > +
-> +       /*
-> +        * Services have already been created before. Re-enable notifications
-> +        * for any pre-registered notification sessions.
-> +        */
-> +       queue_foreach(client->all_notify_clients, register_notify, client);
->  }
+>         g_dbus_emit_property_changed(dbus_conn, device->path, DEVICE_INTERFACE,
+>                                                                 "GattServices");
 >
->  void btd_gatt_client_service_added(struct btd_gatt_client *client,
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 0983852..d3e17e1 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -2989,7 +2989,7 @@ unsigned int bt_gatt_client_register_notify(struct bt_gatt_client *client,
->         if (!client || !client->db || !chrc_value_handle || !callback)
->                 return 0;
->
-> -       if (!bt_gatt_client_is_ready(client) || client->in_svc_chngd)
-> +       if (client->in_svc_chngd)
->                 return 0;
->
->         return register_notify(client, chrc_value_handle, callback, notify,
+> @@ -5315,6 +5315,10 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+>          * request
+>          */
+>         if (state->svc_resolved && bonding) {
+> +               /* Attept to store services for this device failed because it
+> +                * was not paired. Now that we're paired retry. */
+> +               store_gatt_db(device);
+> +
+>                 g_dbus_send_reply(dbus_conn, bonding->msg, DBUS_TYPE_INVALID);
+>                 bonding_request_free(bonding);
+>                 return;
 > --
 > 2.5.0
 
 Applied, thanks.
-
 
 -- 
 Luiz Augusto von Dentz
