@@ -1,106 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH 2/2] Bluetooth: Fix reporting incorrect EIR in device found mgmt event
+Subject: Re: [PATCH] bluetooth: ask for MWS transport config only if controller supports 4.1
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1442262582-22932-2-git-send-email-szymon.janc@gmail.com>
-Date: Wed, 16 Sep 2015 04:39:26 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-	Szymon Janc <ext.szymon.janc@tieto.com>
-Message-Id: <34F96F66-414F-447D-A9CA-B687A0B3FFDD@holtmann.org>
-References: <1442262582-22932-1-git-send-email-szymon.janc@gmail.com> <1442262582-22932-2-git-send-email-szymon.janc@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
+In-Reply-To: <55F7EEA0.7030504@canonical.com>
+Date: Wed, 16 Sep 2015 04:36:46 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <D76DBD6B-2DDD-4B96-B5F9-59A93B65D78E@holtmann.org>
+References: <1442309091-1088-1-git-send-email-simon.fels@canonical.com> <6C5C6E24-A663-4A52-B38E-3AA2E8742779@holtmann.org> <55F7EEA0.7030504@canonical.com>
+To: Simon Fels <simon.fels@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Simon,
 
-> Some remote devices (ie Gigaset G-Tag) misbehave with ADV data length.
-> This can lead to incorrect EIR format in device found event when
-> ADV_DATA and SCAN_RSP are merged (terminator field before SCAN_RSP
-> part).
+>>> Some controllers doesn't seem to clear the bitfield to indicate which
+>>> HCI commands are supported correctly. This leads to wrong conclusions
+>>> which HCI commands we can send at initialization time. In this case
+>>> the problem appeared with the command to retrieve the MWS transport
+>>> configuration which is only available since version 4.1
+>> 
+>> provide btmon of the failing case and information about the controller that has this bug.
+>> 
+>>> Signed-off-by: Simon Fels <simon.fels@canonical.com>
+>>> ---
+>>> include/net/bluetooth/bluetooth.h | 2 +-
+>>> net/bluetooth/hci_core.c          | 9 +++++++--
+>>> 2 files changed, 8 insertions(+), 3 deletions(-)
+>>> 
+>>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+>>> index fcf2ae7..0861477 100644
+>>> --- a/include/net/bluetooth/bluetooth.h
+>>> +++ b/include/net/bluetooth/bluetooth.h
+>>> @@ -37,7 +37,7 @@
+>>> /* Bluetooth versions */
+>>> #define BLUETOOTH_VER_1_1	1
+>>> #define BLUETOOTH_VER_1_2	2
+>>> -#define BLUETOOTH_VER_2_0	3
+>>> +#define BLUETOOTH_VER_4_1	7
+>>> 
+>>> /* Reserv for core and drivers use */
+>>> #define BT_SKB_RESERVE	8
+>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>>> index a7cdd99..f376ab6 100644
+>>> --- a/net/bluetooth/hci_core.c
+>>> +++ b/net/bluetooth/hci_core.c
+>>> @@ -824,8 +824,13 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
+>>> 	if (hdev->commands[29] & 0x20)
+>>> 		hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
+>>> 
+>>> -	/* Get MWS transport configuration if the HCI command is supported */
+>>> -	if (hdev->commands[30] & 0x08)
+>>> +	/* Get MWS transport configuration if the HCI command is supported
+>>> +	 * but only when reported HCI version is at minimum 4.1. Some
+>>> +	 * controllers doesn't seem to clear the bit field they transmit
+>>> +	 * correctly so all resevered fields are invalid and let to
+>>> +	 * failing commands */
+>>> +	if (hdev->hci_ver >= BLUETOOTH_VER_4_1 &&
+>>> +		hdev->commands[30] & 0x08)
+>>> 		hci_req_add(req, HCI_OP_GET_MWS_TRANSPORT_CONFIG, 0, NULL);
+>> 
+>> We are not doing it this way. The version checks we have in the core are for really old controllers and times when the Bluetooth Core specification was unclear in certain behaviors.
+>> 
+>> Any new broken behavior of a controller will not be hidden behind a version check. It will be hidden behind a quirk and we will call out the manufacturer for not doing this right in the driver by setting needed quirks.
 > 
-> Fix this by inspecting ADV_DATA and correct its length if terminator
-> is found.
+> That is fine for me. Was just sending this out to get the discussion started and a bit unsure which patterns you use for such things.
 > 
->> HCI Event: LE Meta Event (0x3e) plen 42              [hci0] 32.172182
->      LE Advertising Report (0x02)
->        Num reports: 1
->        Event type: Connectable undirected - ADV_IND (0x00)
->        Address type: Public (0x00)
->        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
->        Data length: 30
->        Flags: 0x06
->          LE General Discoverable Mode
->          BR/EDR Not Supported
->        Company: Gigaset Communications GmbH (384)
->          Data: 021512348094975abbc5
->        16-bit Service UUIDs (partial): 1 entry
->          Battery Service (0x180f)
->        RSSI: -65 dBm (0xbf)
->> HCI Event: LE Meta Event (0x3e) plen 27              [hci0] 32.172191
->      LE Advertising Report (0x02)
->        Num reports: 1
->        Event type: Scan response - SCAN_RSP (0x04)
->        Address type: Public (0x00)
->        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
->        Data length: 15
->        Name (complete): Gigaset G-tag
->        RSSI: -59 dBm (0xc5)
+> btmon log is at http://paste.ubuntu.com/12416578/
 > 
-> Note "Data length: 30" in ADV_DATA which results in 9 extra zero bytes
-> after Battery Service UUID. Terminator field present in the middle of
-> EIR in Device Found event resulted in userspace stop parsing EIR and
-> skipping device name.
+> The failure case is simply that the HCI is never getting up. It fails during a
 > 
-> @ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
->      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
->      c5 03 02 0f 18 00 00 00 00 00 00 00 00 00 0e 09  ................
->      47 69 67 61 73 65 74 20 47 2d 74 61 67           Gigaset G-tag
+> $ hciconfig hci0 up
 > 
-> With this fix EIR with merged ADV_DATA and SCAN_RSP in device found
-> event is properly formatted:
-> 
-> @ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
->      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
->      c5 03 02 0f 18 0e 09 47 69 67 61 73 65 74 20 47  .......Gigaset G
->      2d 74 61 67                                      -tag
-> 
-> Signed-off-by: Szymon Janc <ext.szymon.janc@tieto.com>
-> ---
-> net/bluetooth/hci_event.c | 20 ++++++++++++++++++++
-> 1 file changed, 20 insertions(+)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 1860418..9b16f6a 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -4719,6 +4719,26 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
-> 	struct hci_conn *conn;
-> 	bool match;
-> 	u32 flags;
-> +	u8 *ptr, real_len;
-> +
-> +	/* Find the end of the data in case the report contains padded zero
-> +	 * bytes at the end causing an invalid length value.
-> +	 *
-> +	 * When data is NULL, len is 0 so there is no need for extra ptr
-> +	 * check as 'ptr < data + 0' is already false in such case.
-> +	 */
-> +	for (ptr = data; ptr < data + len && *ptr; ptr += *ptr + 1) {
-> +		if (ptr + 1 + *ptr > data + len)
-> +			break;
-> +	}
-> +
-> +	real_len = ptr - data;
-> +
-> +	/* Adjust for actual length */
-> +	if (len != real_len) {
-> +		BT_ERR_RATELIMITED("Corrected advertising report data length");
-> +		len = real_len;
-> +	}
+> within the kernel side initialization phase.
 
-lets include "%s: " here and print out hdev->name. And it is enough to call this advertising data. That is what it actually is. The report advertising report is just the transport over HCI.
+so it is actually not that this chip does not understand this command, it is that it is being stupid.
+
+< HCI Command: Get MWS Transport Layer.. (0x05|0x000c) plen 0
+> HCI Event: Command Complete (0x0e) plen 5
+      Get MWS Transport Layer Configuration (0x05|0x000c) ncmd 1
+        Status: Unknown Connection Identifier (0x02)
+        Number of transports: 0
+        Baud rate list: 0 entries
+
+The command is properly supported. I just don't know why it needs to return with an error. And especially error 0x02 which makes no sense in this case since the command is not even taking a connection handle in the first place.
+
+< HCI Command: Read Local Version Info.. (0x04|0x0001) plen 0
+> HCI Event: Command Complete (0x0e) plen 12
+      Read Local Version Information (0x04|0x0001) ncmd 1
+        Status: Success (0x00)
+        HCI version: Bluetooth 4.0 (0x06) - Revision 0 (0x0000)
+        LMP version: Bluetooth 4.0 (0x06) - Subversion 0 (0x0000)
+        Manufacturer: MediaTek, Inc. (70)
+< HCI Command: Read BD ADDR (0x04|0x0009) plen 0
+> HCI Event: Command Complete (0x0e) plen 10
+      Read BD ADDR (0x04|0x0009) ncmd 1
+        Status: Success (0x00)
+        Address: 38:BC:1A:1F:7E:96 (Meizu technology co.,ltd)
+
+So it seems that MediaTek needs to work a bit on their HCI command support. Which module is this anyway? Who builds it and where can it be found? Is this USB or UART? If it is USB, please provide /sys/kernel/debug/usb/devices entry for this one.
+
+I have the feeling we are missing some sort of firmware update here that would allow to fix this controller.
+
+And I forgot to note that MWS actually was a CSA. So it is valid for Bluetooth 4.0 controllers. It is just that Bluetooth 4.1 included all previous CSA.
 
 Regards
 
