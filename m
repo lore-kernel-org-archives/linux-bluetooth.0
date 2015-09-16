@@ -1,44 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <ext.szymon.janc@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?utf-8?B?5rWp5a6H6YOR?= <bjtyrael007@gmail.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: port bluez to android
-Date: Wed, 16 Sep 2015 11:08:27 +0200
-Message-ID: <1975130.LmbEBdcIud@leonov>
-In-Reply-To: <7FC0F3C7-D97A-428D-984A-54C41EBECDB8@holtmann.org>
-References: <CAG_=90cg-83gK0H=-NwyjJMWgqYtCK_vG4My0qvpm2W4BAwG9g@mail.gmail.com> <CAG_=90coGsWxHreMy7Pr+j=XaXid+=3jCiEet43mppY9e2uoyg@mail.gmail.com> <7FC0F3C7-D97A-428D-984A-54C41EBECDB8@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] bluetooth: ask for MWS transport config only if controller supports 4.1
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <55F8FD62.8090703@canonical.com>
+Date: Wed, 16 Sep 2015 11:01:35 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <59683CC2-7C39-497D-95FA-45776916E691@holtmann.org>
+References: <1442309091-1088-1-git-send-email-simon.fels@canonical.com> <6C5C6E24-A663-4A52-B38E-3AA2E8742779@holtmann.org> <55F7EEA0.7030504@canonical.com> <D76DBD6B-2DDD-4B96-B5F9-59A93B65D78E@holtmann.org> <55F8FD62.8090703@canonical.com>
+To: Simon Fels <simon.fels@canonical.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Simon,
 
-On Wednesday 16 of September 2015 10:58:16 Marcel Holtmann wrote:
-> Hi,
+>> so it is actually not that this chip does not understand this command, it is that it is being stupid.
 > 
-> >    I am a newbie to BlueZ. I want to port BlueZ to android 4.2.2, But
-> > 
-> > when I copy the blueZ to external folder with glib, after compile,
-> > some error happend:
-> > 
-> > external/bluetooth/bluez/src/shared/mainloop.c:35:26: fatal error:
-> > sys/signalfd.h: No such file or directory
-> > 
-> > How do I solve it ? Thanks a lot.
+> It lead me to the assumption that the chip does something pretty wired here as I didn't found this command in the 4.0 spec and when saying "I am supporting 4.0" I would assume it doesn't mix any of the new commands from newer spec versions in. However didn't saw that it was added in the addendum ...
 > 
-> follow our BlueZ for Android build instructions.
+>> < HCI Command: Get MWS Transport Layer.. (0x05|0x000c) plen 0
+>>> HCI Event: Command Complete (0x0e) plen 5
+>>       Get MWS Transport Layer Configuration (0x05|0x000c) ncmd 1
+>>         Status: Unknown Connection Identifier (0x02)
+>>         Number of transports: 0
+>>         Baud rate list: 0 entries
+>> 
+>> The command is properly supported. I just don't know why it needs to return with an error. And especially error 0x02 which makes no sense in this case since the command is not even taking a connection handle in the first place.
+>> 
+>> < HCI Command: Read Local Version Info.. (0x04|0x0001) plen 0
+>>> HCI Event: Command Complete (0x0e) plen 12
+>>       Read Local Version Information (0x04|0x0001) ncmd 1
+>>         Status: Success (0x00)
+>>         HCI version: Bluetooth 4.0 (0x06) - Revision 0 (0x0000)
+>>         LMP version: Bluetooth 4.0 (0x06) - Subversion 0 (0x0000)
+>>         Manufacturer: MediaTek, Inc. (70)
+>> < HCI Command: Read BD ADDR (0x04|0x0009) plen 0
+>>> HCI Event: Command Complete (0x0e) plen 10
+>>       Read BD ADDR (0x04|0x0009) ncmd 1
+>>         Status: Success (0x00)
+>>         Address: 38:BC:1A:1F:7E:96 (Meizu technology co.,ltd)
+>> 
+>> So it seems that MediaTek needs to work a bit on their HCI command support. Which module is this anyway? Who builds it and where can it be found? Is this USB or UART? If it is USB, please provide /sys/kernel/debug/usb/devices entry for this one.
 > 
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/android/README
+> As far as I know it is the MT6630QP chip and its connected over UART.
+> 
+>> I have the feeling we are missing some sort of firmware update here that would allow to fix this controller.
+> 
+> Generally I would say this is the way to go too but that isn't really an option in this case. So either we come up with a general solution by adding a quirk for this or I patch this just on our kernel.
 
-Also note that we support only Android 4.4 and newer.
+if this an UART chip, what hciattach command are you using? Plain H:4 or 3-Wire UART?
 
-Android 4.2.2 might is missing required functionality in bionic and due to 
-backward incompatible changes in BT HAL API our library will not compile 
-against Android 4.2.
+We started supporting multiple manufactures inside the upstream kernel with proper baud rate switching, flow control, low power modes and also firmware loading. With these properly integrated devices the new btattach command can be used.
 
-So if you really want to use that on Android 4.2 you must be prepared for some 
-patching (both BLueZ and Bionic, and possibly other Android components).
+So where did you get this hardware from anyway? And we need to get Mediatek to support this in the upstream kernel. Otherwise this is not sustainable. These days you need to have firmware patching support at least to fix all the nasty issues you can run into after the chips have been includes in devices.
 
--- 
-BR
-Szymon Janc
+Regards
+
+Marcel
+
