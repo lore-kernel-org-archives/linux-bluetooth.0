@@ -1,122 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
+Subject: Re: [PATCH] bluetooth: ask for MWS transport config only if
+ controller supports 4.1
+To: Marcel Holtmann <marcel@holtmann.org>
+References: <1442309091-1088-1-git-send-email-simon.fels@canonical.com>
+ <6C5C6E24-A663-4A52-B38E-3AA2E8742779@holtmann.org>
+ <55F7EEA0.7030504@canonical.com>
+ <D76DBD6B-2DDD-4B96-B5F9-59A93B65D78E@holtmann.org>
+ <55F8FD62.8090703@canonical.com>
+ <59683CC2-7C39-497D-95FA-45776916E691@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+From: Simon Fels <simon.fels@canonical.com>
+Message-ID: <55F93B6F.5020402@canonical.com>
+Date: Wed, 16 Sep 2015 11:50:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20150916072318.GA2599@gmail.com>
-References: <20150916072318.GA2599@gmail.com>
-Date: Wed, 16 Sep 2015 12:54:55 +0300
-Message-ID: <CABBYNZJw98UJyRrXg3SQ4ZpU5q04qjfrz2YpivZ7zDBru-YQHw@mail.gmail.com>
-Subject: Re: [PATCH] hog: fix invalid type cast in discover_descriptor_cb
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Founder Fang <founder.fang@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <59683CC2-7C39-497D-95FA-45776916E691@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 16.09.2015 11:01, Marcel Holtmann wrote:
+> Hi Simon,
+>
+>>> so it is actually not that this chip does not understand this command, it is that it is being stupid.
+>>
+>> It lead me to the assumption that the chip does something pretty wired here as I didn't found this command in the 4.0 spec and when saying "I am supporting 4.0" I would assume it doesn't mix any of the new commands from newer spec versions in. However didn't saw that it was added in the addendum ...
+>>
+>>> < HCI Command: Get MWS Transport Layer.. (0x05|0x000c) plen 0
+>>>> HCI Event: Command Complete (0x0e) plen 5
+>>>        Get MWS Transport Layer Configuration (0x05|0x000c) ncmd 1
+>>>          Status: Unknown Connection Identifier (0x02)
+>>>          Number of transports: 0
+>>>          Baud rate list: 0 entries
+>>>
+>>> The command is properly supported. I just don't know why it needs to return with an error. And especially error 0x02 which makes no sense in this case since the command is not even taking a connection handle in the first place.
+>>>
+>>> < HCI Command: Read Local Version Info.. (0x04|0x0001) plen 0
+>>>> HCI Event: Command Complete (0x0e) plen 12
+>>>        Read Local Version Information (0x04|0x0001) ncmd 1
+>>>          Status: Success (0x00)
+>>>          HCI version: Bluetooth 4.0 (0x06) - Revision 0 (0x0000)
+>>>          LMP version: Bluetooth 4.0 (0x06) - Subversion 0 (0x0000)
+>>>          Manufacturer: MediaTek, Inc. (70)
+>>> < HCI Command: Read BD ADDR (0x04|0x0009) plen 0
+>>>> HCI Event: Command Complete (0x0e) plen 10
+>>>        Read BD ADDR (0x04|0x0009) ncmd 1
+>>>          Status: Success (0x00)
+>>>          Address: 38:BC:1A:1F:7E:96 (Meizu technology co.,ltd)
+>>>
+>>> So it seems that MediaTek needs to work a bit on their HCI command support. Which module is this anyway? Who builds it and where can it be found? Is this USB or UART? If it is USB, please provide /sys/kernel/debug/usb/devices entry for this one.
+>>
+>> As far as I know it is the MT6630QP chip and its connected over UART.
+>>
+>>> I have the feeling we are missing some sort of firmware update here that would allow to fix this controller.
+>>
+>> Generally I would say this is the way to go too but that isn't really an option in this case. So either we come up with a general solution by adding a quirk for this or I patch this just on our kernel.
+>
+> if this an UART chip, what hciattach command are you using? Plain H:4 or 3-Wire UART?
+>
+> We started supporting multiple manufactures inside the upstream kernel with proper baud rate switching, flow control, low power modes and also firmware loading. With these properly integrated devices the new btattach command can be used.
+>
+> So where did you get this hardware from anyway? And we need to get Mediatek to support this in the upstream kernel. Otherwise this is not sustainable. These days you need to have firmware patching support at least to fix all the nasty issues you can run into after the chips have been includes in devices.
 
-On Wed, Sep 16, 2015 at 10:23 AM, Founder Fang <founder.fang@gmail.com> wrote:
-> the argument user_data for discover_descriptor_cb can be either
-> a pointer to report or a pointer to hogdev, it is differentiate by
-> uuid. when uuid is GATT_EXTERNAL_REPORT_REFERENCE and actual
-> user_data is a pointer to a report, the user_data is wrongly cast
-> to hogdev, hence cause memory corruption.
-> create another function discover_descriptor_no_report_cb, avoid
-> type cast based on uuid fix the problem.
-> ---
->  profiles/input/hog.c | 43 +++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 39 insertions(+), 4 deletions(-)
->
-> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-> index e006add..bea8637 100644
-> --- a/profiles/input/hog.c
-> +++ b/profiles/input/hog.c
-> @@ -219,7 +219,6 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
->                                                                 void *user_data)
->  {
->         struct report *report;
-> -       struct hog_device *hogdev;
->         GAttrib *attrib = NULL;
->
->         if (status != 0) {
-> @@ -244,6 +243,41 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
->                                                 report_reference_cb, report);
->                         break;
->                 case GATT_EXTERNAL_REPORT_REFERENCE:
-> +                       break;
-> +               }
-> +       }
-> +}
-> +
-> +static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
-> +                                                       gpointer user_data)
-> +{
-> +       if (start > end)
-> +               return;
-> +
-> +       gatt_discover_desc(attrib, start, end, NULL,
-> +                                       discover_descriptor_cb, user_data);
-> +}
-> +
-> +static void discover_descriptor_no_report_cb(uint8_t status, GSList *descs,
-> +                                                               void *user_data)
-> +{
-> +       struct hog_device *hogdev;
-> +       GAttrib *attrib = NULL;
-> +
-> +       if (status != 0) {
-> +               error("Discover all descriptors failed: %s",
-> +                                                       att_ecode2str(status));
-> +               return;
-> +       }
-> +
-> +       for ( ; descs; descs = descs->next) {
-> +               struct gatt_desc *desc = descs->data;
-> +
-> +               switch (desc->uuid16) {
-> +               case GATT_CLIENT_CHARAC_CFG_UUID:
-> +               case GATT_REPORT_REFERENCE:
-> +                       break;
-> +               case GATT_EXTERNAL_REPORT_REFERENCE:
->                         hogdev = user_data;
->                         attrib = hogdev->attrib;
->                         gatt_read_char(attrib, desc->handle,
-> @@ -253,16 +287,17 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
->         }
->  }
->
-> -static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
-> +static void discover_descriptor_no_report(GAttrib *attrib, uint16_t start, uint16_t end,
->                                                         gpointer user_data)
->  {
->         if (start > end)
->                 return;
->
->         gatt_discover_desc(attrib, start, end, NULL,
-> -                                       discover_descriptor_cb, user_data);
-> +                                       discover_descriptor_no_report_cb, user_data);
->  }
->
-> +
->  static void external_service_char_cb(uint8_t status, GSList *chars,
->                                                                 void *user_data)
->  {
-> @@ -824,7 +859,7 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
->                         DBG("HoG discovering report map");
->                         gatt_read_char(hogdev->attrib, chr->value_handle,
->                                                 report_map_read_cb, hogdev);
-> -                       discover_descriptor(hogdev->attrib, start, end, hogdev);
-> +                       discover_descriptor_no_report(hogdev->attrib, start, end, hogdev);
->                 } else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
->                         info_handle = chr->value_handle;
->                 else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
-> --
-> 1.9.1
+As summary: I had a quick discussion with Marcel on IRC and I will go 
+with a small workaround on our tree for now.
 
-Ive made a similar fix to android in
-47a337152d342a37e3021dab0b18487b185e8b76, we should probably port that
-one to profile/input since in future we are planning to use to share
-the same implementation.
-
-
--- 
-Luiz Augusto von Dentz
+regards,
+Simon
