@@ -1,108 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Sep 2015 15:23:26 +0800
-From: Founder Fang <founder.fang@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] hog: fix invalid type cast in discover_descriptor_cb
-Message-ID: <20150916072318.GA2599@gmail.com>
+Date: Wed, 16 Sep 2015 09:24:59 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"linaro-kernel@lists.linaro.org" <linaro-kernel@lists.linaro.org>,
+	Rafael Wysocki <rjw@rjwysocki.net>,
+	"sboyd@codeaurora.org" <sboyd@codeaurora.org>,
+	"arnd@arndb.de" <arnd@arndb.de>, Mark Brown <broonie@kernel.org>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	Alexander Duyck <alexander.h.duyck@redhat.com>,
+	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." <alsa-devel@alsa-project.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Arik Nemtsov <arik@wizery.com>,
+	"open list:QUALCOMM ATHEROS ATH10K WIRELESS DRIVER" <ath10k@lists.infradead.org>,
+	"open list:QUALCOMM ATHEROS ATH9K WIRELESS DRIVER" <ath9k-devel@lists.ath9k.org>,
+	"Altman, Avri" <avri.altman@intel.com>,
+	"open list:B43 WIRELESS DRIVER" <b43-dev@lists.infradead.org>,
+	Brian Silverman <bsilver16384@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Charles Keepax <ckeepax@opensource.wolfsonmicro.com>,
+	"Ivgi, Chaya Rachel" <chaya.rachel.ivgi@intel.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Dmitry Monakhov <dmonakhov@openvz.org>,
+	Doug Thompson <dougthompson@xmission.com>,
+	Eliad Peller <eliad@wizery.com>,
+	"Grumbach, Emmanuel" <emmanuel.grumbach@intel.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Haggai Eran <haggaie@mellanox.com>,
+	Hariprasad S <hariprasad@chelsio.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	Intel Linux Wireless <ilw@linux.intel.com>,
+	"open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
+	"James E.J. Bottomley" <JBottomley@odin.com>,
+	Jaroslav Kysela <perex@perex.cz>, Jiri Slaby <jirislaby@gmail.com>,
+	Joe Perches <joe@perches.com>, Joerg Roedel <joro@8bytes.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Jonathan Corbet <corbet@lwn.net>, Joonsoo Kim <js1304@gmail.com>,
+	Kalle Valo <kvalo@qca.qualcomm.com>,
+	Larry Finger <Larry.Finger@lwfinger.net>,
+	Len Brown <lenb@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+	"open list:ACPI" <linux-acpi@vger.kernel.org>,
+	"moderated list:ARM64 PORT (AARCH64 ARCHITECTURE)" <linux-arm-kernel@lists.infradead.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
+	"open list:CISCO SCSI HBA DRIVER" <linux-scsi@vger.kernel.org>,
+	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:" <linux-usb@vger.kernel.org>,
+	"open list:NETWORKING DRIVERS (WIRELESS)" <linux-wireless@vger.kernel.org>,
+	"Coelho, Luciano" <luciano.coelho@intel.com>,
+	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Mauro Carvalho Chehab <mchehab@osg.samsung.com>,
+	Mel Gorman <mgorman@suse.de>,
+	Michael Kerrisk <mtk.manpages@gmail.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Narsimhulu Musini <nmusini@cisco.com>,
+	"open list:CXGB4 ETHERNET DRIVER (CXGB4)" <netdev@vger.kernel.org>,
+	Nick Kossifidis <mickflemm@gmail.com>,
+	"open list:WOLFSON MICROELECTRONICS DRIVERS" <patches@opensource.wolfsonmicro.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
+	Richard Fitzgerald <rf@opensource.wolfsonmicro.com>,
+	Sasha Levin <sasha.levin@oracle.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Sebastian Ott <sebott@linux.vnet.ibm.com>,
+	Sesidhar Baddela <sebaddel@cisco.com>,
+	Stanislaw Gruszka <sgruszka@redhat.com>,
+	Takashi Iwai <tiwai@suse.com>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	"Winkler, Tomas" <tomas.winkler@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Wang Long <long.wanglong@huawei.com>,
+	Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH V3 2/2] debugfs: don't assume sizeof(bool) to be 4 bytes
+Message-ID: <20150916072459.GC4113@nazgul.tnic>
+References: <9b705747a138c96c26faee5218f7b47403195b28.1442305897.git.viresh.kumar@linaro.org>
+ <27d37898b4be6b9b9f31b90135f8206ca079a868.1442305897.git.viresh.kumar@linaro.org>
+ <1442313464.1914.21.camel@sipsolutions.net>
+ <20150915110447.GI6350@linux>
+ <20150915094509.46cca84d@gandalf.local.home>
+ <CA+55aFxVQ9jD=jUqPZt76EMe_Tb-_SA8v=rOHeR9Ljdsc6=xGQ@mail.gmail.com>
+ <20150915134732.7ff50d03@gandalf.local.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20150915134732.7ff50d03@gandalf.local.home>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-the argument user_data for discover_descriptor_cb can be either
-a pointer to report or a pointer to hogdev, it is differentiate by
-uuid. when uuid is GATT_EXTERNAL_REPORT_REFERENCE and actual
-user_data is a pointer to a report, the user_data is wrongly cast
-to hogdev, hence cause memory corruption.
-create another function discover_descriptor_no_report_cb, avoid
-type cast based on uuid fix the problem.
----
- profiles/input/hog.c | 43 +++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 39 insertions(+), 4 deletions(-)
+On Tue, Sep 15, 2015 at 01:47:32PM -0400, Steven Rostedt wrote:
+> What do others think when there's a change that goes across the board
+> this much? BCC OK with you, as just an FYI, I'm doing this? Or should
+> just the lists be enough and if you don't see it, too bad?
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index e006add..bea8637 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -219,7 +219,6 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
- 								void *user_data)
- {
- 	struct report *report;
--	struct hog_device *hogdev;
- 	GAttrib *attrib = NULL;
- 
- 	if (status != 0) {
-@@ -244,6 +243,41 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
- 						report_reference_cb, report);
- 			break;
- 		case GATT_EXTERNAL_REPORT_REFERENCE:
-+			break;
-+		}
-+	}
-+}
-+
-+static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
-+							gpointer user_data)
-+{
-+	if (start > end)
-+		return;
-+
-+	gatt_discover_desc(attrib, start, end, NULL,
-+					discover_descriptor_cb, user_data);
-+}
-+
-+static void discover_descriptor_no_report_cb(uint8_t status, GSList *descs,
-+								void *user_data)
-+{
-+	struct hog_device *hogdev;
-+	GAttrib *attrib = NULL;
-+
-+	if (status != 0) {
-+		error("Discover all descriptors failed: %s",
-+							att_ecode2str(status));
-+		return;
-+	}
-+
-+	for ( ; descs; descs = descs->next) {
-+		struct gatt_desc *desc = descs->data;
-+
-+		switch (desc->uuid16) {
-+		case GATT_CLIENT_CHARAC_CFG_UUID:
-+		case GATT_REPORT_REFERENCE:
-+			break;
-+		case GATT_EXTERNAL_REPORT_REFERENCE:
- 			hogdev = user_data;
- 			attrib = hogdev->attrib;
- 			gatt_read_char(attrib, desc->handle,
-@@ -253,16 +287,17 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
- 	}
- }
- 
--static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
-+static void discover_descriptor_no_report(GAttrib *attrib, uint16_t start, uint16_t end,
- 							gpointer user_data)
- {
- 	if (start > end)
- 		return;
- 
- 	gatt_discover_desc(attrib, start, end, NULL,
--					discover_descriptor_cb, user_data);
-+					discover_descriptor_no_report_cb, user_data);
- }
- 
-+
- static void external_service_char_cb(uint8_t status, GSList *chars,
- 								void *user_data)
- {
-@@ -824,7 +859,7 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- 			DBG("HoG discovering report map");
- 			gatt_read_char(hogdev->attrib, chr->value_handle,
- 						report_map_read_cb, hogdev);
--			discover_descriptor(hogdev->attrib, start, end, hogdev);
-+			discover_descriptor_no_report(hogdev->attrib, start, end, hogdev);
- 		} else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
- 			info_handle = chr->value_handle;
- 		else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
+Bcc sounds good to me.
+
+(Let's see how many bounces I get when I reply to such a huge CC list.
+:-))
+
 -- 
-1.9.1
+Regards/Gruss,
+    Boris.
 
+ECO tip #101: Trim your mails when you reply.
+--
