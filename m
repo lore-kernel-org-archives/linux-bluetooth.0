@@ -1,89 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH] core/adapter: probe profiles after loading ltks
-Date: Wed, 16 Sep 2015 13:33:12 -0700
-Message-Id: <1442435592-2846-1-git-send-email-jpawlowski@google.com>
+Cc: Szymon Janc <ext.szymon.janc@tieto.com>
+Subject: [PATCH v2 2/2] Bluetooth: Fix reporting incorrect EIR in device found mgmt event
+Date: Wed, 16 Sep 2015 20:21:54 +0200
+Message-Id: <1442427714-27726-2-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1442427714-27726-1-git-send-email-szymon.janc@gmail.com>
+References: <1442427714-27726-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When bluetoothd starts, it loads devices from storage.
+From: Szymon Janc <ext.szymon.janc@tieto.com>
 
-During this process, it loads general info. That includes loading UUIDS,
-and letting plugins decide whether they're interested in this device. Then
-load_irks call is made to load identity resolving keys into kernel.
+Some remote devices (ie Gigaset G-Tag) misbehave with ADV data length.
+This can lead to incorrect EIR format in device found event when
+ADV_DATA and SCAN_RSP are merged (terminator field before SCAN_RSP
+part).
 
-If during this process plugin decides it's interested in given device,
-they might register device for auto connecting by calling
-btd_device_add_attio_callback. This update kernel auto connect list.
-update_white_list inside "net/bluetooth/hci_request.c" is called. It uses
-hci_find_irk_by_addr to decide whether kernel know irk for given address
-and shall not use whitelist. However irks were not loaded yet - they're
-loaded by bluetoothd after all devices were initialized (and possibly
-added to autoconnect).
+Fix this by inspecting ADV_DATA and correct its length if terminator
+is found.
 
-Because of that, device public address is added to whitelist (instead of
-resolvable private address), and whitelist is used. Even worse, after call
-to load_irks, or after manually calling connect, device is still
-improperly added to whitelist and will be unable to connect (timeout will
-happen).
+> HCI Event: LE Meta Event (0x3e) plen 42              [hci0] 32.172182
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Connectable undirected - ADV_IND (0x00)
+        Address type: Public (0x00)
+        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
+        Data length: 30
+        Flags: 0x06
+          LE General Discoverable Mode
+          BR/EDR Not Supported
+        Company: Gigaset Communications GmbH (384)
+          Data: 021512348094975abbc5
+        16-bit Service UUIDs (partial): 1 entry
+          Battery Service (0x180f)
+        RSSI: -65 dBm (0xbf)
+> HCI Event: LE Meta Event (0x3e) plen 27              [hci0] 32.172191
+      LE Advertising Report (0x02)
+        Num reports: 1
+        Event type: Scan response - SCAN_RSP (0x04)
+        Address type: Public (0x00)
+        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
+        Data length: 15
+        Name (complete): Gigaset G-tag
+        RSSI: -59 dBm (0xc5)
 
-To fix that bluetoothd must call load_irks before letting plugins enable
-autoconnect.
+Note "Data length: 30" in ADV_DATA which results in 9 extra zero bytes
+after Battery Service UUID. Terminator field present in the middle of
+EIR in Device Found event resulted in userspace stop parsing EIR and
+skipping device name.
+
+@ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
+      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
+      c5 03 02 0f 18 00 00 00 00 00 00 00 00 00 0e 09  ................
+      47 69 67 61 73 65 74 20 47 2d 74 61 67           Gigaset G-tag
+
+With this fix EIR with merged ADV_DATA and SCAN_RSP in device found
+event is properly formatted:
+
+@ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
+      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
+      c5 03 02 0f 18 0e 09 47 69 67 61 73 65 74 20 47  .......Gigaset G
+      2d 74 61 67                                      -tag
+
+Signed-off-by: Szymon Janc <ext.szymon.janc@tieto.com>
 ---
- src/adapter.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_event.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index a920b21..4abeaaa 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3457,6 +3457,14 @@ static uint8_t get_le_addr_type(GKeyFile *keyfile)
- 	return addr_type;
- }
- 
-+static void probe_loaded_profiles(struct btd_device *device, gpointer data)
-+{
-+		GSList *list = btd_device_get_uuids(device);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 1860418..8acec93 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4719,6 +4719,27 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	struct hci_conn *conn;
+ 	bool match;
+ 	u32 flags;
++	u8 *ptr, real_len;
 +
-+		if (list)
-+			device_probe_profiles(device, list);
-+}
++	/* Find the end of the data in case the report contains padded zero
++	 * bytes at the end causing an invalid length value.
++	 *
++	 * When data is NULL, len is 0 so there is no need for extra ptr
++	 * check as 'ptr < data + 0' is already false in such case.
++	 */
++	for (ptr = data; ptr < data + len && *ptr; ptr += *ptr + 1) {
++		if (ptr + 1 + *ptr > data + len)
++			break;
++	}
 +
- static void load_devices(struct btd_adapter *adapter)
- {
- 	char dirname[PATH_MAX];
-@@ -3465,6 +3473,7 @@ static void load_devices(struct btd_adapter *adapter)
- 	GSList *ltks = NULL;
- 	GSList *irks = NULL;
- 	GSList *params = NULL;
-+	GSList *added_devices = NULL;
- 	DIR *dir;
- 	struct dirent *entry;
- 
-@@ -3534,9 +3543,7 @@ static void load_devices(struct btd_adapter *adapter)
- 
- 		/* TODO: register services from pre-loaded list of primaries */
- 
--		list = btd_device_get_uuids(device);
--		if (list)
--			device_probe_profiles(device, list);
-+		added_devices = g_slist_append(added_devices, device);
- 
- device_exist:
- 		if (key_info) {
-@@ -3564,6 +3571,10 @@ free:
- 	g_slist_free_full(irks, g_free);
- 	load_conn_params(adapter, params);
- 	g_slist_free_full(params, g_free);
++	real_len = ptr - data;
 +
-+	g_slist_foreach(added_devices, (GFunc)probe_loaded_profiles, NULL);
-+	g_slist_free(added_devices);
-+
- }
++	/* Adjust for actual length */
++	if (len != real_len) {
++		BT_ERR_RATELIMITED("%s advertising data length corrected",
++				   hdev->name);
++		len = real_len;
++	}
  
- int btd_adapter_block_address(struct btd_adapter *adapter,
+ 	/* If the direct address is present, then this report is from
+ 	 * a LE Direct Advertising Report event. In that case it is
 -- 
 2.5.0
 
