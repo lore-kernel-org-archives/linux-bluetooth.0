@@ -1,67 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <ext.szymon.janc@tieto.com>
-Subject: [PATCH v2 1/2] Bluetooth: Add BT_ERR_RATELIMITED
-Date: Wed, 16 Sep 2015 20:21:53 +0200
-Message-Id: <1442427714-27726-1-git-send-email-szymon.janc@gmail.com>
+Subject: Re: [PATCH] tools/tester: Add Device Found test with invalid field length
+Date: Wed, 16 Sep 2015 20:08:56 +0200
+Message-ID: <12766832.HB3JXrlFrG@ix>
+In-Reply-To: <1442260996-15843-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1442260996-15843-1-git-send-email-szymon.janc@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Szymon Janc <ext.szymon.janc@tieto.com>
+On Monday 14 September 2015 22:03:16 Szymon Janc wrote:
+> This test verify if kernel correctly terminates EIR when invalid
+> advertising data (field length too big) was received from
+> remote device.
+> ---
+>  tools/mgmt-tester.c | 29 ++++++++++++++++++++++++++++-
+>  1 file changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+> index 9ace20a..0a1a7c2 100644
+> --- a/tools/mgmt-tester.c
+> +++ b/tools/mgmt-tester.c
+> @@ -4707,6 +4707,30 @@ static const struct generic_data device_found_gtag =
+> { .adv_data = adv_data_invalid_significant_len,
+>  };
+> 
+> +static const uint8_t adv_data_invalid_field_len[] = { 0x02, 0x01, 0x01,
+> +		0x05, 0x09, 0x74, 0x65, 0x73, 0x74,
+> +		0xa0, 0xff, 0x01, 0x02, 0x03, 0x04, 0x05};
+> +
+> +static const char device_found_valid2[] = { 0x00, 0x00, 0x01, 0x01, 0xaa,
+> 0x00, +		0x01, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00, 0x02, 0x01,
+> +		0x01, 0x05, 0x09, 0x74, 0x65, 0x73, 0x74};
+> +
+> +static const struct generic_data device_found_invalid_field = {
+> +	.setup_settings = settings_powered_le,
+> +	.send_opcode = MGMT_OP_START_DISCOVERY,
+> +	.send_param = start_discovery_le_param,
+> +	.send_len = sizeof(start_discovery_le_param),
+> +	.expect_status = MGMT_STATUS_SUCCESS,
+> +	.expect_param = start_discovery_le_param,
+> +	.expect_len = sizeof(start_discovery_le_param),
+> +	.expect_alt_ev = MGMT_EV_DEVICE_FOUND,
+> +	.expect_alt_ev_param = device_found_valid2,
+> +	.expect_alt_ev_len = sizeof(device_found_valid2),
+> +	.set_adv = true,
+> +	.adv_data_len = sizeof(adv_data_invalid_field_len),
+> +	.adv_data = adv_data_invalid_field_len,
+> +};
+> +
+>  static const struct generic_data read_local_oob_not_powered_test = {
+>  	.send_opcode = MGMT_OP_READ_LOCAL_OOB_DATA,
+>  	.expect_status = MGMT_STATUS_NOT_POWERED,
+> @@ -6957,9 +6981,12 @@ int main(int argc, char *argv[])
+>  				&read_local_oob_success_sc_test,
+>  				NULL, test_command_generic);
+> 
+> -	test_bredrle("Device Found - Invalid remote ADV_DATA",
+> +	test_bredrle("Device Found - Advertising data - Zero padded",
+>  				&device_found_gtag,
+>  				NULL, test_device_found);
+> +	test_bredrle("Device Found - Advertising data - Invalid field",
+> +				&device_found_invalid_field,
+> +				NULL, test_device_found);
+> 
+>  	return tester_run();
+>  }
 
-This patch adds ratelimited version of the BT_ERR macro.
+Applied.
 
-Signed-off-by: Szymon Janc <ext.szymon.janc@tieto.com>
----
- include/net/bluetooth/bluetooth.h |  4 ++++
- net/bluetooth/lib.c               | 16 ++++++++++++++++
- 2 files changed, 20 insertions(+)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index fcf2ae7..f5ade85 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -123,11 +123,15 @@ __printf(1, 2)
- void bt_info(const char *fmt, ...);
- __printf(1, 2)
- void bt_err(const char *fmt, ...);
-+__printf(1, 2)
-+void bt_err_ratelimited(const char *fmt, ...);
- 
- #define BT_INFO(fmt, ...)	bt_info(fmt "\n", ##__VA_ARGS__)
- #define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
- #define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
- 
-+#define BT_ERR_RATELIMITED(fmt, ...) bt_err_ratelimited(fmt "\n", ##__VA_ARGS__)
-+
- #define bt_dev_info(hdev, fmt, ...)				\
- 	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
- #define bt_dev_err(hdev, fmt, ...)				\
-diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index b36bc04..8b4cdce 100644
---- a/net/bluetooth/lib.c
-+++ b/net/bluetooth/lib.c
-@@ -166,3 +166,19 @@ void bt_err(const char *format, ...)
- 	va_end(args);
- }
- EXPORT_SYMBOL(bt_err);
-+
-+void bt_err_ratelimited(const char *format, ...)
-+{
-+	struct va_format vaf;
-+	va_list args;
-+
-+	va_start(args, format);
-+
-+	vaf.fmt = format;
-+	vaf.va = &args;
-+
-+	pr_err_ratelimited("%pV", &vaf);
-+
-+	va_end(args);
-+}
-+EXPORT_SYMBOL(bt_err_ratelimited);
 -- 
-2.5.0
-
+pozdrawiam
+Szymon Janc
