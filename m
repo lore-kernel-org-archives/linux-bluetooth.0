@@ -1,59 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1442320893-31536-1-git-send-email-luiz.dentz@gmail.com>
-References: <1442320893-31536-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 16 Sep 2015 13:21:42 +0300
-Message-ID: <CABBYNZJxZUWnbtzUd5Biwvqw-EoLhGkOmy7C=S7+p4wmrQVPhQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 1/5] audio/avrcp: Fix missing event for volume control
+In-Reply-To: <20150916072318.GA2599@gmail.com>
+References: <20150916072318.GA2599@gmail.com>
+Date: Wed, 16 Sep 2015 12:54:55 +0300
+Message-ID: <CABBYNZJw98UJyRrXg3SQ4ZpU5q04qjfrz2YpivZ7zDBru-YQHw@mail.gmail.com>
+Subject: Re: [PATCH] hog: fix invalid type cast in discover_descriptor_cb
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Founder Fang <founder.fang@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Tue, Sep 15, 2015 at 3:41 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> CT and TG are always relative to client and server role, so although TG is
-> associated with a player and CT with a remote controller in case of volume
-> control the CT is in fact the player and the TG the remote controller,
-> because of that PTS will not register any TG record when testing this thus
-> controller_init will not register the necessary events.
+On Wed, Sep 16, 2015 at 10:23 AM, Founder Fang <founder.fang@gmail.com> wrote:
+> the argument user_data for discover_descriptor_cb can be either
+> a pointer to report or a pointer to hogdev, it is differentiate by
+> uuid. when uuid is GATT_EXTERNAL_REPORT_REFERENCE and actual
+> user_data is a pointer to a report, the user_data is wrongly cast
+> to hogdev, hence cause memory corruption.
+> create another function discover_descriptor_no_report_cb, avoid
+> type cast based on uuid fix the problem.
 > ---
->  profiles/audio/avrcp.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+>  profiles/input/hog.c | 43 +++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 39 insertions(+), 4 deletions(-)
 >
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 750bdd9..703d084 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -3805,7 +3805,8 @@ static void target_init(struct avrcp *session)
+> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> index e006add..bea8637 100644
+> --- a/profiles/input/hog.c
+> +++ b/profiles/input/hog.c
+> @@ -219,7 +219,6 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+>                                                                 void *user_data)
+>  {
+>         struct report *report;
+> -       struct hog_device *hogdev;
+>         GAttrib *attrib = NULL;
 >
->         session->supported_events |=
->                                 (1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
-> -                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED);
-> +                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED) |
-> +                               (1 << AVRCP_EVENT_VOLUME_CHANGED);
+>         if (status != 0) {
+> @@ -244,6 +243,41 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+>                                                 report_reference_cb, report);
+>                         break;
+>                 case GATT_EXTERNAL_REPORT_REFERENCE:
+> +                       break;
+> +               }
+> +       }
+> +}
+> +
+> +static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
+> +                                                       gpointer user_data)
+> +{
+> +       if (start > end)
+> +               return;
+> +
+> +       gatt_discover_desc(attrib, start, end, NULL,
+> +                                       discover_descriptor_cb, user_data);
+> +}
+> +
+> +static void discover_descriptor_no_report_cb(uint8_t status, GSList *descs,
+> +                                                               void *user_data)
+> +{
+> +       struct hog_device *hogdev;
+> +       GAttrib *attrib = NULL;
+> +
+> +       if (status != 0) {
+> +               error("Discover all descriptors failed: %s",
+> +                                                       att_ecode2str(status));
+> +               return;
+> +       }
+> +
+> +       for ( ; descs; descs = descs->next) {
+> +               struct gatt_desc *desc = descs->data;
+> +
+> +               switch (desc->uuid16) {
+> +               case GATT_CLIENT_CHARAC_CFG_UUID:
+> +               case GATT_REPORT_REFERENCE:
+> +                       break;
+> +               case GATT_EXTERNAL_REPORT_REFERENCE:
+>                         hogdev = user_data;
+>                         attrib = hogdev->attrib;
+>                         gatt_read_char(attrib, desc->handle,
+> @@ -253,16 +287,17 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+>         }
+>  }
 >
->         /* Only check capabilities if controller is not supported */
->         if (session->controller == NULL)
-> @@ -3831,9 +3832,6 @@ static void controller_init(struct avrcp *session)
+> -static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
+> +static void discover_descriptor_no_report(GAttrib *attrib, uint16_t start, uint16_t end,
+>                                                         gpointer user_data)
+>  {
+>         if (start > end)
+>                 return;
 >
->         DBG("%p version 0x%04x", controller, controller->version);
+>         gatt_discover_desc(attrib, start, end, NULL,
+> -                                       discover_descriptor_cb, user_data);
+> +                                       discover_descriptor_no_report_cb, user_data);
+>  }
 >
-> -       if (controller->version >= 0x0104)
-> -               session->supported_events |= (1 << AVRCP_EVENT_VOLUME_CHANGED);
-> -
->         service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
->         btd_service_connecting_complete(service, 0);
->
+> +
+>  static void external_service_char_cb(uint8_t status, GSList *chars,
+>                                                                 void *user_data)
+>  {
+> @@ -824,7 +859,7 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+>                         DBG("HoG discovering report map");
+>                         gatt_read_char(hogdev->attrib, chr->value_handle,
+>                                                 report_map_read_cb, hogdev);
+> -                       discover_descriptor(hogdev->attrib, start, end, hogdev);
+> +                       discover_descriptor_no_report(hogdev->attrib, start, end, hogdev);
+>                 } else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
+>                         info_handle = chr->value_handle;
+>                 else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
 > --
-> 2.4.3
+> 1.9.1
 
-Pushed.
+Ive made a similar fix to android in
+47a337152d342a37e3021dab0b18487b185e8b76, we should probably port that
+one to profile/input since in future we are planning to use to share
+the same implementation.
 
 
 -- 
