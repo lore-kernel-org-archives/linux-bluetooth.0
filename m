@@ -1,65 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] bluetooth: ask for MWS transport config only if
- controller supports 4.1
-To: Marcel Holtmann <marcel@holtmann.org>
-References: <1442309091-1088-1-git-send-email-simon.fels@canonical.com>
- <6C5C6E24-A663-4A52-B38E-3AA2E8742779@holtmann.org>
- <55F7EEA0.7030504@canonical.com>
- <D76DBD6B-2DDD-4B96-B5F9-59A93B65D78E@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-From: Simon Fels <simon.fels@canonical.com>
-Message-ID: <55F8FD62.8090703@canonical.com>
-Date: Wed, 16 Sep 2015 07:25:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <D76DBD6B-2DDD-4B96-B5F9-59A93B65D78E@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <A1440DEA-2A32-40ED-8C2D-A7D4E2ABE415@holtmann.org>
+References: <CACjvaw==Z9Mbgd6tBdHsNs1W+o7UbSudDUaGuwTLeY=LWkyW2A@mail.gmail.com>
+	<3A3A3A19-AE6E-493A-AA1F-3C0A8451B775@holtmann.org>
+	<CACjvaw=P2SNuKgMB5BjEhmrpPv55eJUGEZt21pHnh7zmTfE6bg@mail.gmail.com>
+	<A1440DEA-2A32-40ED-8C2D-A7D4E2ABE415@holtmann.org>
+Date: Wed, 16 Sep 2015 11:16:20 +0600
+Message-ID: <CACjvaw=s4O_=Dyp20B7vNA2kdG1UmkcqmtSLnxoxS6n9M7Ut8Q@mail.gmail.com>
+Subject: Re: mgmt-api callback not firing properly
+From: Nazmul Alam <fadedreamz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Marcel,
+Hello Marcel,
+I think you are right. Invoking the commands in a sequential way does the job.
 
-> so it is actually not that this chip does not understand this command, it is that it is being stupid.
+Thanks for your heads up.
 
-It lead me to the assumption that the chip does something pretty wired 
-here as I didn't found this command in the 4.0 spec and when saying "I 
-am supporting 4.0" I would assume it doesn't mix any of the new commands 
-from newer spec versions in. However didn't saw that it was added in the 
-addendum ...
 
-> < HCI Command: Get MWS Transport Layer.. (0x05|0x000c) plen 0
->> HCI Event: Command Complete (0x0e) plen 5
->        Get MWS Transport Layer Configuration (0x05|0x000c) ncmd 1
->          Status: Unknown Connection Identifier (0x02)
->          Number of transports: 0
->          Baud rate list: 0 entries
+>>> are you utilizing src/shared/mgmt.c for your code. That one has proper handling for queuing the commands. It however means that the next command is only send when the previous one completed? Which command do you have problems with. There are a few special ones that require mgmt_reply to be used.
+>>
+>> Yes I am using src/shared/mgmt.c for my code. The problem occurs when
+>> I try to issue the MGMT_OP_START_DISCOVERY &
+>> MGMT_OP_ADD_ADVERTISING/MGMT_OP_REMOVE_ADVERTISING simultaneously,
+>> sometimes the callback doesn't fire for the later call.
+>>
+>> According to one of your reply to a thread, I changed the guarding
+>> code of the kernel driver and simultaneous scanning / advertising is
+>> working. But sometimes the callback is not firing (randomly).
+>>
+>> I am using the mainloop_run() in a pthread. Is this can be a issue?
 >
-> The command is properly supported. I just don't know why it needs to return with an error. And especially error 0x02 which makes no sense in this case since the command is not even taking a connection handle in the first place.
+> our code is not thread safe. So that might be a problem. Since I have not heard from issues with missing callbacks in bluetoothd and that is running exactly the same code.
 >
-> < HCI Command: Read Local Version Info.. (0x04|0x0001) plen 0
->> HCI Event: Command Complete (0x0e) plen 12
->        Read Local Version Information (0x04|0x0001) ncmd 1
->          Status: Success (0x00)
->          HCI version: Bluetooth 4.0 (0x06) - Revision 0 (0x0000)
->          LMP version: Bluetooth 4.0 (0x06) - Subversion 0 (0x0000)
->          Manufacturer: MediaTek, Inc. (70)
-> < HCI Command: Read BD ADDR (0x04|0x0009) plen 0
->> HCI Event: Command Complete (0x0e) plen 10
->        Read BD ADDR (0x04|0x0009) ncmd 1
->          Status: Success (0x00)
->          Address: 38:BC:1A:1F:7E:96 (Meizu technology co.,ltd)
+> Regards
 >
-> So it seems that MediaTek needs to work a bit on their HCI command support. Which module is this anyway? Who builds it and where can it be found? Is this USB or UART? If it is USB, please provide /sys/kernel/debug/usb/devices entry for this one.
-
-As far as I know it is the MT6630QP chip and its connected over UART.
-
-> I have the feeling we are missing some sort of firmware update here that would allow to fix this controller.
-
-Generally I would say this is the way to go too but that isn't really an 
-option in this case. So either we come up with a general solution by 
-adding a quirk for this or I patch this just on our kernel.
-
-> And I forgot to note that MWS actually was a CSA. So it is valid for Bluetooth 4.0 controllers. It is just that Bluetooth 4.1 included all previous CSA.
-
-I see. That is why I didn't found it in the 4.0 spec. Thanks for the hint!
-
-regards,
-Simon
+> Marcel
+>
