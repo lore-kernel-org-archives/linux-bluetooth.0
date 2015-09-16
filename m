@@ -1,50 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH] Bluetooth: Fix missing HCI_RAW check when binding USER_CHANNEL socket
+Subject: Re: [PATCH 2/2] Bluetooth: Fix reporting incorrect EIR in device found mgmt event
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1442214864-30292-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 16 Sep 2015 04:44:24 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <EC024EB4-D49E-4833-82B9-CD4D0EFE4243@holtmann.org>
-References: <1442214864-30292-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <1442262582-22932-2-git-send-email-szymon.janc@gmail.com>
+Date: Wed, 16 Sep 2015 04:39:26 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+	Szymon Janc <ext.szymon.janc@tieto.com>
+Message-Id: <34F96F66-414F-447D-A9CA-B687A0B3FFDD@holtmann.org>
+References: <1442262582-22932-1-git-send-email-szymon.janc@gmail.com> <1442262582-22932-2-git-send-email-szymon.janc@gmail.com>
+To: Szymon Janc <szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Szymon,
 
-> HCI devices in RAW mode will have the HCI_UP flag set. The existing
-> hci_sock_bind code, when invoked on a HCI_CHANNEL_USER socket, tests
-> for this flag and will return EBUSY, making it impossible to bind any
-> HCI device RAW mode. This patch adds an extra condition for the
-> HCI_RAW flag to make it possible for bind() to succeed.
+> Some remote devices (ie Gigaset G-Tag) misbehave with ADV data length.
+> This can lead to incorrect EIR format in device found event when
+> ADV_DATA and SCAN_RSP are merged (terminator field before SCAN_RSP
+> part).
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Fix this by inspecting ADV_DATA and correct its length if terminator
+> is found.
+> 
+>> HCI Event: LE Meta Event (0x3e) plen 42              [hci0] 32.172182
+>      LE Advertising Report (0x02)
+>        Num reports: 1
+>        Event type: Connectable undirected - ADV_IND (0x00)
+>        Address type: Public (0x00)
+>        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
+>        Data length: 30
+>        Flags: 0x06
+>          LE General Discoverable Mode
+>          BR/EDR Not Supported
+>        Company: Gigaset Communications GmbH (384)
+>          Data: 021512348094975abbc5
+>        16-bit Service UUIDs (partial): 1 entry
+>          Battery Service (0x180f)
+>        RSSI: -65 dBm (0xbf)
+>> HCI Event: LE Meta Event (0x3e) plen 27              [hci0] 32.172191
+>      LE Advertising Report (0x02)
+>        Num reports: 1
+>        Event type: Scan response - SCAN_RSP (0x04)
+>        Address type: Public (0x00)
+>        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
+>        Data length: 15
+>        Name (complete): Gigaset G-tag
+>        RSSI: -59 dBm (0xc5)
+> 
+> Note "Data length: 30" in ADV_DATA which results in 9 extra zero bytes
+> after Battery Service UUID. Terminator field present in the middle of
+> EIR in Device Found event resulted in userspace stop parsing EIR and
+> skipping device name.
+> 
+> @ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
+>      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
+>      c5 03 02 0f 18 00 00 00 00 00 00 00 00 00 0e 09  ................
+>      47 69 67 61 73 65 74 20 47 2d 74 61 67           Gigaset G-tag
+> 
+> With this fix EIR with merged ADV_DATA and SCAN_RSP in device found
+> event is properly formatted:
+> 
+> @ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
+>      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
+>      c5 03 02 0f 18 0e 09 47 69 67 61 73 65 74 20 47  .......Gigaset G
+>      2d 74 61 67                                      -tag
+> 
+> Signed-off-by: Szymon Janc <ext.szymon.janc@tieto.com>
 > ---
-> net/bluetooth/hci_sock.c | 1 +
-> 1 file changed, 1 insertion(+)
+> net/bluetooth/hci_event.c | 20 ++++++++++++++++++++
+> 1 file changed, 20 insertions(+)
 > 
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 150556345263..6588929b4d26 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -754,6 +754,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
-> 		    hci_dev_test_flag(hdev, HCI_SETUP) ||
-> 		    hci_dev_test_flag(hdev, HCI_CONFIG) ||
-> 		    (!hci_dev_test_flag(hdev, HCI_AUTO_OFF) &&
-> +		     !test_bit(HCI_RAW, &hdev->flags) &&
-> 		     test_bit(HCI_UP, &hdev->flags))) {
-> 			err = -EBUSY;
-> 			hci_dev_put(hdev);
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 1860418..9b16f6a 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4719,6 +4719,26 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+> 	struct hci_conn *conn;
+> 	bool match;
+> 	u32 flags;
+> +	u8 *ptr, real_len;
+> +
+> +	/* Find the end of the data in case the report contains padded zero
+> +	 * bytes at the end causing an invalid length value.
+> +	 *
+> +	 * When data is NULL, len is 0 so there is no need for extra ptr
+> +	 * check as 'ptr < data + 0' is already false in such case.
+> +	 */
+> +	for (ptr = data; ptr < data + len && *ptr; ptr += *ptr + 1) {
+> +		if (ptr + 1 + *ptr > data + len)
+> +			break;
+> +	}
+> +
+> +	real_len = ptr - data;
+> +
+> +	/* Adjust for actual length */
+> +	if (len != real_len) {
+> +		BT_ERR_RATELIMITED("Corrected advertising report data length");
+> +		len = real_len;
+> +	}
 
-since we keep extending this single check into something that becomes really hard to understand why it is correct we need a large comment above explaining what we are doing and why that is correct.
-
-Especially in conjunction with the HCI_RAW flag since that is an indication of user channel being active. You can no longer set it via an ioctl. Which means it has turned into special meaning.
-
-This means I do not want to return EBUSY in case user channel is already active, I want to return EUSERS. I am not sure you have actually checked that this might no longer do the right thing. And I have the feeling we need a test case for that in userchan-tester.
-
-Which means that this HCI_RAW check might need to be paired with the HCI_QUIRK_RAW_DEVICE to achieve the proper effect or we have to re-think the handling of HCI_QUIRK_RAW_DEVICE.
+lets include "%s: " here and print out hdev->name. And it is enough to call this advertising data. That is what it actually is. The report advertising report is just the transport over HCI.
 
 Regards
 
