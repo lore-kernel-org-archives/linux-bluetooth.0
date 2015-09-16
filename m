@@ -1,131 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Sep 2015 09:21:52 +0800
-From: Founder Fang <founder.fang@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] hog: fix invalid type cast in discover_descriptor_cb
-Message-ID: <20150917012151.GA9174@gmail.com>
-References: <20150916072318.GA2599@gmail.com>
- <CABBYNZJw98UJyRrXg3SQ4ZpU5q04qjfrz2YpivZ7zDBru-YQHw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZJw98UJyRrXg3SQ4ZpU5q04qjfrz2YpivZ7zDBru-YQHw@mail.gmail.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH] core/adapter: probe profiles after loading ltks
+Date: Wed, 16 Sep 2015 13:33:12 -0700
+Message-Id: <1442435592-2846-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-On Wed, Sep 16, 2015 at 12:54:55PM +0300, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Wed, Sep 16, 2015 at 10:23 AM, Founder Fang <founder.fang@gmail.com> wrote:
-> > the argument user_data for discover_descriptor_cb can be either
-> > a pointer to report or a pointer to hogdev, it is differentiate by
-> > uuid. when uuid is GATT_EXTERNAL_REPORT_REFERENCE and actual
-> > user_data is a pointer to a report, the user_data is wrongly cast
-> > to hogdev, hence cause memory corruption.
-> > create another function discover_descriptor_no_report_cb, avoid
-> > type cast based on uuid fix the problem.
-> > ---
-> >  profiles/input/hog.c | 43 +++++++++++++++++++++++++++++++++++++++----
-> >  1 file changed, 39 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-> > index e006add..bea8637 100644
-> > --- a/profiles/input/hog.c
-> > +++ b/profiles/input/hog.c
-> > @@ -219,7 +219,6 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
-> >                                                                 void *user_data)
-> >  {
-> >         struct report *report;
-> > -       struct hog_device *hogdev;
-> >         GAttrib *attrib = NULL;
-> >
-> >         if (status != 0) {
-> > @@ -244,6 +243,41 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
-> >                                                 report_reference_cb, report);
-> >                         break;
-> >                 case GATT_EXTERNAL_REPORT_REFERENCE:
-> > +                       break;
-> > +               }
-> > +       }
-> > +}
-> > +
-> > +static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
-> > +                                                       gpointer user_data)
-> > +{
-> > +       if (start > end)
-> > +               return;
-> > +
-> > +       gatt_discover_desc(attrib, start, end, NULL,
-> > +                                       discover_descriptor_cb, user_data);
-> > +}
-> > +
-> > +static void discover_descriptor_no_report_cb(uint8_t status, GSList *descs,
-> > +                                                               void *user_data)
-> > +{
-> > +       struct hog_device *hogdev;
-> > +       GAttrib *attrib = NULL;
-> > +
-> > +       if (status != 0) {
-> > +               error("Discover all descriptors failed: %s",
-> > +                                                       att_ecode2str(status));
-> > +               return;
-> > +       }
-> > +
-> > +       for ( ; descs; descs = descs->next) {
-> > +               struct gatt_desc *desc = descs->data;
-> > +
-> > +               switch (desc->uuid16) {
-> > +               case GATT_CLIENT_CHARAC_CFG_UUID:
-> > +               case GATT_REPORT_REFERENCE:
-> > +                       break;
-> > +               case GATT_EXTERNAL_REPORT_REFERENCE:
-> >                         hogdev = user_data;
-> >                         attrib = hogdev->attrib;
-> >                         gatt_read_char(attrib, desc->handle,
-> > @@ -253,16 +287,17 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
-> >         }
-> >  }
-> >
-> > -static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
-> > +static void discover_descriptor_no_report(GAttrib *attrib, uint16_t start, uint16_t end,
-> >                                                         gpointer user_data)
-> >  {
-> >         if (start > end)
-> >                 return;
-> >
-> >         gatt_discover_desc(attrib, start, end, NULL,
-> > -                                       discover_descriptor_cb, user_data);
-> > +                                       discover_descriptor_no_report_cb, user_data);
-> >  }
-> >
-> > +
-> >  static void external_service_char_cb(uint8_t status, GSList *chars,
-> >                                                                 void *user_data)
-> >  {
-> > @@ -824,7 +859,7 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
-> >                         DBG("HoG discovering report map");
-> >                         gatt_read_char(hogdev->attrib, chr->value_handle,
-> >                                                 report_map_read_cb, hogdev);
-> > -                       discover_descriptor(hogdev->attrib, start, end, hogdev);
-> > +                       discover_descriptor_no_report(hogdev->attrib, start, end, hogdev);
-> >                 } else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
-> >                         info_handle = chr->value_handle;
-> >                 else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
-> > --
-> > 1.9.1
-> 
-> Ive made a similar fix to android in
-> 47a337152d342a37e3021dab0b18487b185e8b76, we should probably port that
-> one to profile/input since in future we are planning to use to share
-> the same implementation.
-> 
-> 
-> -- 
-> Luiz Augusto von Dentz
+When bluetoothd starts, it loads devices from storage.
 
-any plan to merge android/hog.c and profile/input/hog.c? i notice
-recently there are important patches apply to profile/input/hog.c but not in android/hog.c,
-eg. 8e73a002848a6a2abcbd436ea8aac089320c13f2
+During this process, it loads general info. That includes loading UUIDS,
+and letting plugins decide whether they're interested in this device. Then
+load_irks call is made to load identity resolving keys into kernel.
 
-Founder Fang
+If during this process plugin decides it's interested in given device,
+they might register device for auto connecting by calling
+btd_device_add_attio_callback. This update kernel auto connect list.
+update_white_list inside "net/bluetooth/hci_request.c" is called. It uses
+hci_find_irk_by_addr to decide whether kernel know irk for given address
+and shall not use whitelist. However irks were not loaded yet - they're
+loaded by bluetoothd after all devices were initialized (and possibly
+added to autoconnect).
+
+Because of that, device public address is added to whitelist (instead of
+resolvable private address), and whitelist is used. Even worse, after call
+to load_irks, or after manually calling connect, device is still
+improperly added to whitelist and will be unable to connect (timeout will
+happen).
+
+To fix that bluetoothd must call load_irks before letting plugins enable
+autoconnect.
+---
+ src/adapter.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index a920b21..4abeaaa 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3457,6 +3457,14 @@ static uint8_t get_le_addr_type(GKeyFile *keyfile)
+ 	return addr_type;
+ }
+ 
++static void probe_loaded_profiles(struct btd_device *device, gpointer data)
++{
++		GSList *list = btd_device_get_uuids(device);
++
++		if (list)
++			device_probe_profiles(device, list);
++}
++
+ static void load_devices(struct btd_adapter *adapter)
+ {
+ 	char dirname[PATH_MAX];
+@@ -3465,6 +3473,7 @@ static void load_devices(struct btd_adapter *adapter)
+ 	GSList *ltks = NULL;
+ 	GSList *irks = NULL;
+ 	GSList *params = NULL;
++	GSList *added_devices = NULL;
+ 	DIR *dir;
+ 	struct dirent *entry;
+ 
+@@ -3534,9 +3543,7 @@ static void load_devices(struct btd_adapter *adapter)
+ 
+ 		/* TODO: register services from pre-loaded list of primaries */
+ 
+-		list = btd_device_get_uuids(device);
+-		if (list)
+-			device_probe_profiles(device, list);
++		added_devices = g_slist_append(added_devices, device);
+ 
+ device_exist:
+ 		if (key_info) {
+@@ -3564,6 +3571,10 @@ free:
+ 	g_slist_free_full(irks, g_free);
+ 	load_conn_params(adapter, params);
+ 	g_slist_free_full(params, g_free);
++
++	g_slist_foreach(added_devices, (GFunc)probe_loaded_profiles, NULL);
++	g_slist_free(added_devices);
++
+ }
+ 
+ int btd_adapter_block_address(struct btd_adapter *adapter,
+-- 
+2.5.0
+
