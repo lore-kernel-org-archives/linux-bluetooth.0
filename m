@@ -1,103 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 17 Sep 2015 15:27:17 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth 2015-09-17
+Message-ID: <20150917122717.GA28252@t440s.lan>
 MIME-Version: 1.0
-In-Reply-To: <1442435592-2846-1-git-send-email-jpawlowski@google.com>
-References: <1442435592-2846-1-git-send-email-jpawlowski@google.com>
-Date: Thu, 17 Sep 2015 16:27:47 +0300
-Message-ID: <CABBYNZKJXguYWTe4w8ZKriz-RBgLHjRzNAsMzuS54QECh_J2xg@mail.gmail.com>
-Subject: Re: [PATCH] core/adapter: probe profiles after loading ltks
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="VbJkn9YxBvnuCH5J"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
 
-On Wed, Sep 16, 2015 at 11:33 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> When bluetoothd starts, it loads devices from storage.
->
-> During this process, it loads general info. That includes loading UUIDS,
-> and letting plugins decide whether they're interested in this device. Then
-> load_irks call is made to load identity resolving keys into kernel.
->
-> If during this process plugin decides it's interested in given device,
-> they might register device for auto connecting by calling
-> btd_device_add_attio_callback. This update kernel auto connect list.
-> update_white_list inside "net/bluetooth/hci_request.c" is called. It uses
-> hci_find_irk_by_addr to decide whether kernel know irk for given address
-> and shall not use whitelist. However irks were not loaded yet - they're
-> loaded by bluetoothd after all devices were initialized (and possibly
-> added to autoconnect).
->
-> Because of that, device public address is added to whitelist (instead of
-> resolvable private address), and whitelist is used. Even worse, after call
-> to load_irks, or after manually calling connect, device is still
-> improperly added to whitelist and will be unable to connect (timeout will
-> happen).
->
-> To fix that bluetoothd must call load_irks before letting plugins enable
-> autoconnect.
-> ---
->  src/adapter.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index a920b21..4abeaaa 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -3457,6 +3457,14 @@ static uint8_t get_le_addr_type(GKeyFile *keyfile)
->         return addr_type;
->  }
->
-> +static void probe_loaded_profiles(struct btd_device *device, gpointer data)
-> +{
-> +               GSList *list = btd_device_get_uuids(device);
-> +
-> +               if (list)
-> +                       device_probe_profiles(device, list);
-> +}
-> +
->  static void load_devices(struct btd_adapter *adapter)
->  {
->         char dirname[PATH_MAX];
-> @@ -3465,6 +3473,7 @@ static void load_devices(struct btd_adapter *adapter)
->         GSList *ltks = NULL;
->         GSList *irks = NULL;
->         GSList *params = NULL;
-> +       GSList *added_devices = NULL;
->         DIR *dir;
->         struct dirent *entry;
->
-> @@ -3534,9 +3543,7 @@ static void load_devices(struct btd_adapter *adapter)
->
->                 /* TODO: register services from pre-loaded list of primaries */
->
-> -               list = btd_device_get_uuids(device);
-> -               if (list)
-> -                       device_probe_profiles(device, list);
-> +               added_devices = g_slist_append(added_devices, device);
->
->  device_exist:
->                 if (key_info) {
-> @@ -3564,6 +3571,10 @@ free:
->         g_slist_free_full(irks, g_free);
->         load_conn_params(adapter, params);
->         g_slist_free_full(params, g_free);
-> +
-> +       g_slist_foreach(added_devices, (GFunc)probe_loaded_profiles, NULL);
-> +       g_slist_free(added_devices);
-> +
->  }
->
->  int btd_adapter_block_address(struct btd_adapter *adapter,
-> --
-> 2.5.0
+--VbJkn9YxBvnuCH5J
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Applied, note that I did some changes, there were extra tabs and
-g_slist_foreach followed by g_slist_free is no very efficient so Ive
-replaced with g_slist_free_full.
+Hi Dave,
 
+Here's one important patch for the 4.3-rc series that fixes an issue
+with Bluetooth LE encryption failing because of a too early check for
+the SMP context.
 
--- 
-Luiz Augusto von Dentz
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
+---
+The following changes since commit 20471ed4d403a5f4de6aa0c10cd1e446f7f2b3c7:
+
+  dccp: drop null test before destroy functions (2015-09-15 16:49:43 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to d8949aad3eab5d396f4fefcd581773bf07b9a79e:
+
+  Bluetooth: Delay check for conn->smp in smp_conn_security() (2015-09-17 12:28:27 +0200)
+
+----------------------------------------------------------------
+Johan Hedberg (1):
+      Bluetooth: Delay check for conn->smp in smp_conn_security()
+
+ net/bluetooth/smp.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+--VbJkn9YxBvnuCH5J
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJV+rGlAAoJECQj9vv5qNQSIFAP/1rxiD6DYyMCZmD+kK9tS1oo
+DbWQJkrlNpJfXIR6nfhKukCSZY2d7JwaeUtWD+7/Pnj+yyVNkc/wbio0V7X+yr9g
+Qs+OptkHTxaxOO5m9IqDeNaUAp+kJxJ2kOuCyJk+kcaxRHxEis+wIVvbbaiUpHwq
+Q/6eokOQuH+WT2didgDVvXFcRRPj1QqASvx6yyIFUrM386K0UIBE3CXWqWvpnruC
+oeijDYskGOdFNLvqpPhu+lkWQCh+KxGhEujFgIunCiPIsyOeMMq8PmgSFzsPgYTL
+yKUgWChHsbJ9eUgG2E4X5GMebKq3+X613TQbNpMV0BAmU6tu0ICkiIMgdF5YhcVn
+v9Ls0dhTv0WuqfOUkg5znkZuo3pKRQkUUyHyMNzAeG8wlsxzcb+dZXK9WXLqQwzD
+og/jOy+WotwWxQsY1pvzTsEJuUFhrL269h19aAJlsBCGmFIQWyDKiZ9gnmCRyauX
+JQxtXBdvkWQv2dv7n2MIisEwcL7eymBp6N8+p513FZLEkc+9FjsDE0QwCwspKPbC
+HLIGBq3E40IiPA/D7TVme2X1iPnk+lua/vJcg9WdcLVd/6UMEJKZJaxhjCLfYoeU
+Vkw0sdoBepmI/s4GYlWaUAc7MyC6GOBg4JImSR0ecu0Y3tyPBhZmS0N25/dTbE/b
+1nQfaqNYoukbj0DFC+H2
+=znSC
+-----END PGP SIGNATURE-----
+
+--VbJkn9YxBvnuCH5J--
