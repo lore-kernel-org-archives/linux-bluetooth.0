@@ -1,41 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] core: add startup option to provide different
- configuration file
-References: <1442382751-25315-1-git-send-email-simon.fels@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-From: Simon Fels <simon.fels@canonical.com>
-Message-ID: <55FA4AD0.50401@canonical.com>
-Date: Thu, 17 Sep 2015 07:08:32 +0200
+Date: Thu, 17 Sep 2015 09:21:52 +0800
+From: Founder Fang <founder.fang@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] hog: fix invalid type cast in discover_descriptor_cb
+Message-ID: <20150917012151.GA9174@gmail.com>
+References: <20150916072318.GA2599@gmail.com>
+ <CABBYNZJw98UJyRrXg3SQ4ZpU5q04qjfrz2YpivZ7zDBru-YQHw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1442382751-25315-1-git-send-email-simon.fels@canonical.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZJw98UJyRrXg3SQ4ZpU5q04qjfrz2YpivZ7zDBru-YQHw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 16.09.2015 07:52, Simon Fels wrote:
-> In some cases it's needed to select a different configuration file
-> at runtime than the one we load by default from a statically
-> configured path. This adds an optional argument to the daemon
-> startup which will enable us to load another a configuration file
-> from a different path.
-> ---
->   src/main.c | 11 ++++++++++-
->   1 file changed, 10 insertions(+), 1 deletion(-)
+Hi,
+On Wed, Sep 16, 2015 at 12:54:55PM +0300, Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Wed, Sep 16, 2015 at 10:23 AM, Founder Fang <founder.fang@gmail.com> wrote:
+> > the argument user_data for discover_descriptor_cb can be either
+> > a pointer to report or a pointer to hogdev, it is differentiate by
+> > uuid. when uuid is GATT_EXTERNAL_REPORT_REFERENCE and actual
+> > user_data is a pointer to a report, the user_data is wrongly cast
+> > to hogdev, hence cause memory corruption.
+> > create another function discover_descriptor_no_report_cb, avoid
+> > type cast based on uuid fix the problem.
+> > ---
+> >  profiles/input/hog.c | 43 +++++++++++++++++++++++++++++++++++++++----
+> >  1 file changed, 39 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> > index e006add..bea8637 100644
+> > --- a/profiles/input/hog.c
+> > +++ b/profiles/input/hog.c
+> > @@ -219,7 +219,6 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+> >                                                                 void *user_data)
+> >  {
+> >         struct report *report;
+> > -       struct hog_device *hogdev;
+> >         GAttrib *attrib = NULL;
+> >
+> >         if (status != 0) {
+> > @@ -244,6 +243,41 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+> >                                                 report_reference_cb, report);
+> >                         break;
+> >                 case GATT_EXTERNAL_REPORT_REFERENCE:
+> > +                       break;
+> > +               }
+> > +       }
+> > +}
+> > +
+> > +static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
+> > +                                                       gpointer user_data)
+> > +{
+> > +       if (start > end)
+> > +               return;
+> > +
+> > +       gatt_discover_desc(attrib, start, end, NULL,
+> > +                                       discover_descriptor_cb, user_data);
+> > +}
+> > +
+> > +static void discover_descriptor_no_report_cb(uint8_t status, GSList *descs,
+> > +                                                               void *user_data)
+> > +{
+> > +       struct hog_device *hogdev;
+> > +       GAttrib *attrib = NULL;
+> > +
+> > +       if (status != 0) {
+> > +               error("Discover all descriptors failed: %s",
+> > +                                                       att_ecode2str(status));
+> > +               return;
+> > +       }
+> > +
+> > +       for ( ; descs; descs = descs->next) {
+> > +               struct gatt_desc *desc = descs->data;
+> > +
+> > +               switch (desc->uuid16) {
+> > +               case GATT_CLIENT_CHARAC_CFG_UUID:
+> > +               case GATT_REPORT_REFERENCE:
+> > +                       break;
+> > +               case GATT_EXTERNAL_REPORT_REFERENCE:
+> >                         hogdev = user_data;
+> >                         attrib = hogdev->attrib;
+> >                         gatt_read_char(attrib, desc->handle,
+> > @@ -253,16 +287,17 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+> >         }
+> >  }
+> >
+> > -static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
+> > +static void discover_descriptor_no_report(GAttrib *attrib, uint16_t start, uint16_t end,
+> >                                                         gpointer user_data)
+> >  {
+> >         if (start > end)
+> >                 return;
+> >
+> >         gatt_discover_desc(attrib, start, end, NULL,
+> > -                                       discover_descriptor_cb, user_data);
+> > +                                       discover_descriptor_no_report_cb, user_data);
+> >  }
+> >
+> > +
+> >  static void external_service_char_cb(uint8_t status, GSList *chars,
+> >                                                                 void *user_data)
+> >  {
+> > @@ -824,7 +859,7 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+> >                         DBG("HoG discovering report map");
+> >                         gatt_read_char(hogdev->attrib, chr->value_handle,
+> >                                                 report_map_read_cb, hogdev);
+> > -                       discover_descriptor(hogdev->attrib, start, end, hogdev);
+> > +                       discover_descriptor_no_report(hogdev->attrib, start, end, hogdev);
+> >                 } else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
+> >                         info_handle = chr->value_handle;
+> >                 else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
+> > --
+> > 1.9.1
+> 
+> Ive made a similar fix to android in
+> 47a337152d342a37e3021dab0b18487b185e8b76, we should probably port that
+> one to profile/input since in future we are planning to use to share
+> the same implementation.
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
 
+any plan to merge android/hog.c and profile/input/hog.c? i notice
+recently there are important patches apply to profile/input/hog.c but not in android/hog.c,
+eg. 8e73a002848a6a2abcbd436ea8aac089320c13f2
 
-For a better understanding, our use case for this is the following:
-
-On Ubuntu we create set of packages out of the BlueZ source which are 
-used across all devices we support. We don't want to put any device 
-specifics in these and use the same binaries (per architecture) on 
-different device types (laptops, phones, ...). By default we ship the 
-main.conf file coming with the BlueZ sources. For different device types 
-we now need different settings as we need to specify different settings 
-for class of device field for example. At the moment there is an 
-additional package only used for phones which ships a modified 
-configuration file which can't replace the one provided by the bluez 
-package and is then passed to bluetoothd in an .override upstart job.
-
-regards,
-Simon
-
+Founder Fang
