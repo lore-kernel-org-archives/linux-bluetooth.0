@@ -1,24 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Sep 2015 22:26:14 -0700 (PDT)
-Message-Id: <20150917.222614.1557442464448576135.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth 2015-09-17
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20150917122717.GA28252@t440s.lan>
-References: <20150917122717.GA28252@t440s.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH 2/2] core/gatt-client: fix losing notifications
+Date: Thu, 17 Sep 2015 21:39:57 -0700
+Message-Id: <1442551197-5374-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1442551197-5374-1-git-send-email-jpawlowski@google.com>
+References: <1442551197-5374-1-git-send-email-jpawlowski@google.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Thu, 17 Sep 2015 15:27:17 +0300
+When notifications are quickly send to BlueZ, it tries to signal that
+through dbus using g_dbus_emit_property_changed, which would merge all
+changes and schedule sending property changed in g_iddle_add.
 
-> Here's one important patch for the 4.3-rc series that fixes an issue
-> with Bluetooth LE encryption failing because of a too early check for
-> the SMP context.
-> 
-> Please let me know if there are any issues pulling. Thanks.
+If the stream of notifications from device is fast enough, there might be
+no iddle moment to send properties changed before next notification
+arives, which would result in notifications being lost.
 
-Pulled, thanks.
+This patch fixes that by using method that sends properties changed
+immediately, without waiting for iddle moment.
+---
+ src/gatt-client.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index 399133a..e94a613 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -778,8 +778,9 @@ static void write_characteristic_cb(struct gatt_db_attribute *attr, int err,
+ 	if (err)
+ 		return;
+ 
+-	g_dbus_emit_property_changed(btd_get_dbus_connection(), chrc->path,
+-					GATT_CHARACTERISTIC_IFACE, "Value");
++	g_dbus_emit_property_changed_immediate(btd_get_dbus_connection(),
++			chrc->path, GATT_CHARACTERISTIC_IFACE, "Value");
++
+ }
+ 
+ static void chrc_read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
+-- 
+2.5.0
+
