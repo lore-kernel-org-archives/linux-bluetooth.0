@@ -1,31 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 18 Sep 2015 11:02:41 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] gdbus: add method for immediate property update
+Message-ID: <20150918080241.GA368@t440s.lan>
+References: <1442562403-5176-1-git-send-email-jpawlowski@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH v2 1/2] Bluetooth: Add BT_ERR_RATELIMITED
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1442427714-27726-1-git-send-email-szymon.janc@gmail.com>
-Date: Fri, 18 Sep 2015 09:58:24 +0200
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	Szymon Janc <ext.szymon.janc@tieto.com>
-Message-Id: <8C95A1B7-6605-4D83-8E62-BF812FD971E8@holtmann.org>
-References: <1442427714-27726-1-git-send-email-szymon.janc@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
+In-Reply-To: <1442562403-5176-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Jakub,
 
-> This patch adds ratelimited version of the BT_ERR macro.
-> 
-> Signed-off-by: Szymon Janc <ext.szymon.janc@tieto.com>
-> ---
-> include/net/bluetooth/bluetooth.h |  4 ++++
-> net/bluetooth/lib.c               | 16 ++++++++++++++++
-> 2 files changed, 20 insertions(+)
+On Fri, Sep 18, 2015, Jakub Pawlowski wrote:
+> +void g_dbus_emit_property_changed_full(DBusConnection *connection,
+> +				const char *path, const char *interface,
+> +				const char *name, gboolean flush);
 
-patch has been applied to bluetooth-next tree.
+I can't say I'm a fan of boolean parameters like this where it's
+essentially impossible to say when looking at the calling code what the
+parameter does (in this case the completely generic "full" in the
+function name doesn't even give any hints about what exactly the
+parameter might be). Instead, using a flags parameter + enum would be
+one way to keep the calling code understandable.
 
-Regards
-
-Marcel
-
+Johan
