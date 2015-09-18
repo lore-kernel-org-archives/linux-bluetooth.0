@@ -1,78 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+MIME-Version: 1.0
+From: Seungyoun Ju <sy39.ju@samsung.com>
+Date: Fri, 18 Sep 2015 16:39:50 +0900
+Message-ID: <CAB512Gtwysk7k8dr9PPLDr_n+iGke01Z39YaW0mZBmuo1YUw0w@mail.gmail.com>
+Subject: Query about GATT Client WriteValue dbus method
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v2 1/2] gdbus: add method for immediate property update
-Date: Fri, 18 Sep 2015 00:44:58 -0700
-Message-Id: <1442562299-4954-1-git-send-email-jpawlowski@google.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_dbus_emit_property_changed doesn't send dbus signal immediately. Instead
-it stores changed properties, and schedule signal to be send at
-g_iddle_add. Additionally, if this method is called few times for some
-property, only last value will be sent in property changed signal.
+Hello, All.
 
-If remote device sends lots of notifications, they're all scheduled to be
-notified using this method. This might result in some notifications being
-lost.
+If a remote GATT server's characteristic only supports
+BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP, src/gatt-clieint.c's WriteValue
+dbus method reaches to bt_gatt_client_write_without_response().
+And the return value is kept in chrc->write_id.
 
-This patch adds new method, that can immediately send property changed
-signal, instead of sheduling it for nearest iddle moment.
----
- gdbus/gdbus.h  |  3 +++
- gdbus/object.c | 16 +++++++++++++---
- 2 files changed, 16 insertions(+), 3 deletions(-)
+But there is no point to clear this chrc->write_id.
+So next time WriteValue call is failed with in progress error.
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index d99c254..28e6d8b 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -300,6 +300,9 @@ void g_dbus_pending_property_error(GDBusPendingReply id, const char *name,
- void g_dbus_emit_property_changed(DBusConnection *connection,
- 				const char *path, const char *interface,
- 				const char *name);
-+void g_dbus_emit_property_changed_full(DBusConnection *connection,
-+				const char *path, const char *interface,
-+				const char *name, gboolean flush);
- gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
- 				const char *interface, DBusMessageIter *iter);
- 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 96db516..7a1e749 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -1720,9 +1720,9 @@ static void process_property_changes(struct generic_data *data)
- 	}
- }
- 
--void g_dbus_emit_property_changed(DBusConnection *connection,
-+void g_dbus_emit_property_changed_full(DBusConnection *connection,
- 				const char *path, const char *interface,
--				const char *name)
-+				const char *name, gboolean flush)
- {
- 	const GDBusPropertyTable *property;
- 	struct generic_data *data;
-@@ -1760,7 +1760,17 @@ void g_dbus_emit_property_changed(DBusConnection *connection,
- 	iface->pending_prop = g_slist_prepend(iface->pending_prop,
- 						(void *) property);
- 
--	add_pending(data);
-+	if (flush)
-+		process_property_changes(data);
-+	else
-+		add_pending(data);
-+}
-+
-+void g_dbus_emit_property_changed(DBusConnection *connection, const char *path,
-+				const char *interface, const char *name)
-+{
-+	g_dbus_emit_property_changed_full(connection, path, interface, name,
-+									FALSE);
- }
- 
- gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
--- 
-2.5.0
+If chrc->write_id is cleared immediately after
+bt_gatt_client_write_without_response(),
+client->pending_requests queue would be grown up infinitely when
+application calls this method repeatedly and fastly after dbus method
+return.
 
+Is there anyone who meets such an issue ?
+
+If there is anyone who struggled with this kind of issue,
+can you help me how to solve this ?
+
+Thanks and Regards,
+Seungyoun Ju.
