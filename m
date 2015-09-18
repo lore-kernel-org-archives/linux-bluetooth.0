@@ -1,79 +1,158 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH v2 2/2] Bluetooth: Fix reporting incorrect EIR in device found mgmt event
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1442427714-27726-2-git-send-email-szymon.janc@gmail.com>
-Date: Fri, 18 Sep 2015 09:58:21 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-	Szymon Janc <ext.szymon.janc@tieto.com>
-Message-Id: <7E80C983-0499-4DD7-89A7-C0E990EB065B@holtmann.org>
-References: <1442427714-27726-1-git-send-email-szymon.janc@gmail.com> <1442427714-27726-2-git-send-email-szymon.janc@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLHG3XaADnoYAN7Zbr1bSn55UF-jjeVip6139ZZce2VMA@mail.gmail.com>
+References: <1442551197-5374-1-git-send-email-jpawlowski@google.com>
+	<CABBYNZLHG3XaADnoYAN7Zbr1bSn55UF-jjeVip6139ZZce2VMA@mail.gmail.com>
+Date: Fri, 18 Sep 2015 00:52:43 -0700
+Message-ID: <CAD0=r8zkuWD1pEC17+xtLkOU0CH0B0K=zcXbefPTa3ARNHSujg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] gdbus: add method for immediate property update
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Luiz,
 
-> Some remote devices (ie Gigaset G-Tag) misbehave with ADV data length.
-> This can lead to incorrect EIR format in device found event when
-> ADV_DATA and SCAN_RSP are merged (terminator field before SCAN_RSP
-> part).
-> 
-> Fix this by inspecting ADV_DATA and correct its length if terminator
-> is found.
-> 
->> HCI Event: LE Meta Event (0x3e) plen 42              [hci0] 32.172182
->      LE Advertising Report (0x02)
->        Num reports: 1
->        Event type: Connectable undirected - ADV_IND (0x00)
->        Address type: Public (0x00)
->        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
->        Data length: 30
->        Flags: 0x06
->          LE General Discoverable Mode
->          BR/EDR Not Supported
->        Company: Gigaset Communications GmbH (384)
->          Data: 021512348094975abbc5
->        16-bit Service UUIDs (partial): 1 entry
->          Battery Service (0x180f)
->        RSSI: -65 dBm (0xbf)
->> HCI Event: LE Meta Event (0x3e) plen 27              [hci0] 32.172191
->      LE Advertising Report (0x02)
->        Num reports: 1
->        Event type: Scan response - SCAN_RSP (0x04)
->        Address type: Public (0x00)
->        Address: 7C:2F:80:94:97:5A (Gigaset Communications GmbH)
->        Data length: 15
->        Name (complete): Gigaset G-tag
->        RSSI: -59 dBm (0xc5)
-> 
-> Note "Data length: 30" in ADV_DATA which results in 9 extra zero bytes
-> after Battery Service UUID. Terminator field present in the middle of
-> EIR in Device Found event resulted in userspace stop parsing EIR and
-> skipping device name.
-> 
-> @ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
->      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
->      c5 03 02 0f 18 00 00 00 00 00 00 00 00 00 0e 09  ................
->      47 69 67 61 73 65 74 20 47 2d 74 61 67           Gigaset G-tag
-> 
-> With this fix EIR with merged ADV_DATA and SCAN_RSP in device found
-> event is properly formatted:
-> 
-> @ Device Found: 7C:2F:80:94:97:5A (1) rssi -59 flags 0x0000
->      02 01 06 0d ff 80 01 02 15 12 34 80 94 97 5a bb  ..........4...Z.
->      c5 03 02 0f 18 0e 09 47 69 67 61 73 65 74 20 47  .......Gigaset G
->      2d 74 61 67                                      -tag
-> 
-> Signed-off-by: Szymon Janc <ext.szymon.janc@tieto.com>
-> ---
-> net/bluetooth/hci_event.c | 21 +++++++++++++++++++++
-> 1 file changed, 21 insertions(+)
+On Fri, Sep 18, 2015 at 12:15 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Jakub,
+>
+> On Fri, Sep 18, 2015 at 7:39 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> > g_dbus_emit_property_changed doesn't send dbus signal immediately. Instead
+> > it stores changed properties, and schedule signal to be send at
+> > g_iddle_add. Additionally, if this method is called few times for some
+> > property, only last value will be sent in property changed signal.
+> >
+> > If remote device sends lots of notifications, they're all scheduled to be
+> > notified using this method. This might result in some notifications being
+> > lost.
+> >
+> > This patch adds new method, that immediately sends property changed
+> > signal, instead of sheduling it for nearest iddle moment.
+> > ---
+> >  gdbus/gdbus.h  |  3 +++
+> >  gdbus/object.c | 46 +++++++++++++++++++++++++++++++++++-----------
+> >  2 files changed, 38 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+> > index d99c254..b31246a 100644
+> > --- a/gdbus/gdbus.h
+> > +++ b/gdbus/gdbus.h
+> > @@ -300,6 +300,9 @@ void g_dbus_pending_property_error(GDBusPendingReply id, const char *name,
+> >  void g_dbus_emit_property_changed(DBusConnection *connection,
+> >                                 const char *path, const char *interface,
+> >                                 const char *name);
+> > +void g_dbus_emit_property_changed_immediate(DBusConnection *connection,
+> > +                               const char *path, const char *interface,
+> > +                               const char *name);
+> >  gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
+> >                                 const char *interface, DBusMessageIter *iter);
+> >
+> > diff --git a/gdbus/object.c b/gdbus/object.c
+> > index 96db516..fff9e0d 100644
+> > --- a/gdbus/object.c
+> > +++ b/gdbus/object.c
+> > @@ -1720,21 +1720,12 @@ static void process_property_changes(struct generic_data *data)
+> >         }
+> >  }
+> >
+> > -void g_dbus_emit_property_changed(DBusConnection *connection,
+> > -                               const char *path, const char *interface,
+> > -                               const char *name)
+> > +static void prepare_property_changed(const char *interface, const char *name,
+> > +                                               struct generic_data *data)
+> >  {
+> >         const GDBusPropertyTable *property;
+> > -       struct generic_data *data;
+> >         struct interface_data *iface;
+> >
+> > -       if (path == NULL)
+> > -               return;
+> > -
+> > -       if (!dbus_connection_get_object_path_data(connection, path,
+> > -                                       (void **) &data) || data == NULL)
+> > -               return;
+> > -
+> >         iface = find_interface(data->interfaces, interface);
+> >         if (iface == NULL)
+> >                 return;
+> > @@ -1759,10 +1750,43 @@ void g_dbus_emit_property_changed(DBusConnection *connection,
+> >         data->pending_prop = TRUE;
+> >         iface->pending_prop = g_slist_prepend(iface->pending_prop,
+> >                                                 (void *) property);
+> > +}
+> > +
+> > +void g_dbus_emit_property_changed(DBusConnection *connection, const char *path,
+> > +                               const char *interface, const char *name)
+> > +{
+> > +       struct generic_data *data;
+> > +
+> > +       if (path == NULL)
+> > +               return;
+> > +
+> > +       if (!dbus_connection_get_object_path_data(connection, path,
+> > +                                       (void **) &data) || data == NULL)
+> > +               return;
+> > +
+> > +       prepare_property_changed(interface, name, data);
+> >
+> >         add_pending(data);
+> >  }
+> >
+> > +void g_dbus_emit_property_changed_immediate(DBusConnection *connection,
+> > +                               const char *path, const char *interface,
+> > +                                                       const char *name)
+> > +{
+>
+> Perhaps we should call it g_dbus_emit_property_changed_full with flush
+> flag and make g_dbus_emit_property_changed call it so we share more
+> code. Too bad we cannot do this transparently by checking if the value
+> was already schedule to change flushing if that happen, or perhaps we
+> can do it but it means we need to read the value at the moment
 
-patch has been applied to bluetooth-next tree.
+Name fixed as suggested.
 
-Regards
+So we can check wether value was scheduled for update:
+http://git.kernel.org/cgit/bluetooth/bluez.git/tree/gdbus/object.c?id=5783e002459bfb51488c6180c2e88b77c2ca2cbd#n1756
 
-Marcel
+But now the logic is like this: "If value was scheduled for update,
+and I schedule it again, then just send second update" which is not
+good for notifications.
 
+
+> g_dbus_emit_property_changed is called but that would probably need a
+> temporary DBusMessageIter which complicate things so Im fine in having
+> this way.
+>
+> > +       struct generic_data *data;
+> > +
+> > +       if (path == NULL)
+> > +               return;
+> > +
+> > +       if (!dbus_connection_get_object_path_data(connection, path,
+> > +                                       (void **) &data) || data == NULL)
+> > +               return;
+> > +
+> > +       prepare_property_changed(interface, name, data);
+> > +
+> > +       process_property_changes(data);
+> > +}
+> > +
+> >  gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
+> >                                 const char *interface, DBusMessageIter *iter)
+> >  {
+> > --
+> > 2.5.0
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
