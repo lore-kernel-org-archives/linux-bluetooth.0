@@ -1,100 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v4 1/2] gdbus: add method for immediate property update
-Date: Fri, 18 Sep 2015 01:27:33 -0700
-Message-Id: <1442564854-5731-1-git-send-email-jpawlowski@google.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH v2 1/2] Bluetooth: Add BT_ERR_RATELIMITED
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1442427714-27726-1-git-send-email-szymon.janc@gmail.com>
+Date: Fri, 18 Sep 2015 09:58:24 +0200
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <ext.szymon.janc@tieto.com>
+Message-Id: <8C95A1B7-6605-4D83-8E62-BF812FD971E8@holtmann.org>
+References: <1442427714-27726-1-git-send-email-szymon.janc@gmail.com>
+To: Szymon Janc <szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_dbus_emit_property_changed doesn't send dbus signal immediately. Instead
-it stores changed properties, and schedule signal to be send at
-g_iddle_add. Additionally, if this method is called few times for some
-property, only last value will be sent in property changed signal.
+Hi Szymon,
 
-If remote device sends lots of notifications, they're all scheduled to be
-notified using this method. This might result in some notifications being
-lost.
+> This patch adds ratelimited version of the BT_ERR macro.
+> 
+> Signed-off-by: Szymon Janc <ext.szymon.janc@tieto.com>
+> ---
+> include/net/bluetooth/bluetooth.h |  4 ++++
+> net/bluetooth/lib.c               | 16 ++++++++++++++++
+> 2 files changed, 20 insertions(+)
 
-This patch adds new method, that can immediately send property changed
-signal, instead of sheduling it for nearest iddle moment.
----
- gdbus/gdbus.h  | 10 ++++++++++
- gdbus/object.c | 17 ++++++++++++++---
- 2 files changed, 24 insertions(+), 3 deletions(-)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index d99c254..74de661 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -35,6 +35,7 @@ typedef enum GDBusMethodFlags GDBusMethodFlags;
- typedef enum GDBusSignalFlags GDBusSignalFlags;
- typedef enum GDBusPropertyFlags GDBusPropertyFlags;
- typedef enum GDBusSecurityFlags GDBusSecurityFlags;
-+typedef enum GDbusPropertyChangedFlags GDbusPropertyChangedFlags;
- 
- typedef struct GDBusArgInfo GDBusArgInfo;
- typedef struct GDBusMethodTable GDBusMethodTable;
-@@ -115,6 +116,11 @@ enum GDBusSecurityFlags {
- 	G_DBUS_SECURITY_FLAG_ALLOW_INTERACTION = (1 << 2),
- };
- 
-+enum GDbusPropertyChangedFlags {
-+	G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH = (1 << 0),
-+};
-+
-+
- struct GDBusArgInfo {
- 	const char *name;
- 	const char *signature;
-@@ -300,6 +306,10 @@ void g_dbus_pending_property_error(GDBusPendingReply id, const char *name,
- void g_dbus_emit_property_changed(DBusConnection *connection,
- 				const char *path, const char *interface,
- 				const char *name);
-+void g_dbus_emit_property_changed_full(DBusConnection *connection,
-+				const char *path, const char *interface,
-+				const char *name,
-+				GDbusPropertyChangedFlags flags);
- gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
- 				const char *interface, DBusMessageIter *iter);
- 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 96db516..c82290b 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -1720,9 +1720,10 @@ static void process_property_changes(struct generic_data *data)
- 	}
- }
- 
--void g_dbus_emit_property_changed(DBusConnection *connection,
-+void g_dbus_emit_property_changed_full(DBusConnection *connection,
- 				const char *path, const char *interface,
--				const char *name)
-+				const char *name,
-+				GDbusPropertyChangedFlags flags)
- {
- 	const GDBusPropertyTable *property;
- 	struct generic_data *data;
-@@ -1760,7 +1761,17 @@ void g_dbus_emit_property_changed(DBusConnection *connection,
- 	iface->pending_prop = g_slist_prepend(iface->pending_prop,
- 						(void *) property);
- 
--	add_pending(data);
-+	if (flags & G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH)
-+		process_property_changes(data);
-+	else
-+		add_pending(data);
-+}
-+
-+void g_dbus_emit_property_changed(DBusConnection *connection, const char *path,
-+				const char *interface, const char *name)
-+{
-+	g_dbus_emit_property_changed_full(connection, path, interface, name,
-+					G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
- }
- 
- gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
--- 
-2.5.0
+Regards
+
+Marcel
 
