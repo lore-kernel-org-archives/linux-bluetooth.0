@@ -1,89 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Bluez with Raspberry Pi for BLE
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <55F55C99.7070803@in-box.at>
- <CABBYNZLGjKYF2+aXUupJpNtOQJpY9T9sQpH=D-xU2GP9xj14oQ@mail.gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: Mike <mailinglists@in-box.at>
-Message-ID: <55FD15F8.1000401@in-box.at>
-Date: Sat, 19 Sep 2015 09:59:52 +0200
+Date: Sat, 19 Sep 2015 00:14:30 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH bluetooth-next 2/4] 6lowpan: add nhc module for GHC
+ extension header detection
+Message-ID: <20150918221429.GA12228@omega>
+References: <1442577168-23183-1-git-send-email-stefan@osg.samsung.com>
+ <1442577168-23183-3-git-send-email-stefan@osg.samsung.com>
+ <20150918214415.GA6872@omega>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLGjKYF2+aXUupJpNtOQJpY9T9sQpH=D-xU2GP9xj14oQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20150918214415.GA6872@omega>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Fri, Sep 18, 2015 at 11:44:15PM +0200, Alexander Aring wrote:
+> Hi,
+> 
+> On Fri, Sep 18, 2015 at 01:52:46PM +0200, Stefan Schmidt wrote:
 
-it works now. Thank you!
+....
 
-BR
-Mike
+> 
+> btw:
+> 
+> Something is wrong at iana registration:
+> 
+> https://www.iana.org/assignments/_6lowpan-parameters/_6lowpan-parameters.xhtml#lowpan_nhc
+> 
+> For RFC6282 they did each entry for each extension header, for GHC not.
+> 
+> Don't know why :-(
+> 
+> Also iana says it's
+> 
+> 10110EEN whereas RFC7400 says it's 1011EIDN
+>     ^
+>     |
+>     I don't know where this bit comes from.
+> 
 
-Am 14.09.2015 um 14:39 schrieb Luiz Augusto von Dentz:
-> Hi Mike,
-> 
-> On Sun, Sep 13, 2015 at 2:23 PM, Mike <mailinglists@in-box.at> wrote:
->> Hi,
->>
->> I am trying to get my RPi to work with BLE. I downloaded and compiled
->> bluez-5.34.tar.xz.
->>
->> uname -a says: Linux raspberry 4.1.6-v7+ #810 SMP PREEMPT Tue Aug 18
->> 15:32:12 BST 2015 armv7l GNU/Linux
->>
->> My BLE-stick is recognized and hci0 is up and running. I can scan for
->> advertising peripherals with "sudo hcitool lescan". This works. But if I
->> try to connect to a peripheral I always get Connection refused (111). So
->> I looked at the output of hcidump and found that after the connection is
->> completed, I get disconnected by remote.
-> 
-> 
-> If you are running bluetoothd using hcitool is _not_ recommended,
-> please use bluetoothctl instead.
-> 
-> Note: Requiring root access should already warn you about that.
-> 
->> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
->>     bdaddr 34:B1:F7:D4:FE:F3 type 0
->>     interval 4 window 4 initiator_filter 0
->>     own_bdaddr_type 0 min_interval 15 max_interval 15
->>     latency 0 supervision_to 3200 min_ce 1 max_ce 1
->>> HCI Event: Command Status (0x0f) plen 4
->>     LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
->>> HCI Event: LE Meta Event (0x3e) plen 19
->>     LE Connection Complete
->>       status 0x00 handle 72, role master
->>       bdaddr 34:B1:F7:D4:FE:F3 (Public)
->> < HCI Command: LE Read Remote Used Features (0x08|0x0016) plen 2
->>   0000: 48 00                                             H.
->>> HCI Event: Command Status (0x0f) plen 4
->>     LE Read Remote Used Features (0x08|0x0016) status 0x00 ncmd 1
->>> HCI Event: LE Meta Event (0x3e) plen 12
->>     LE Read Remote Used Features Complete
->>       status 0x00 handle 72
->>       Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
->> < HCI Command: Disconnect (0x01|0x0006) plen 3
->>     handle 72 reason 0x13
->>     Reason: Remote User Terminated Connection
->>> HCI Event: Command Status (0x0f) plen 4
->>     Disconnect (0x01|0x0006) status 0x00 ncmd 1
->>> HCI Event: Disconn Complete (0x05) plen 4
->>     status 0x00 handle 72 reason 0x16
->>     Reason: Connection Terminated by Local Host
->>
->> I tried three different peripherals and I always get "Connection refused
->> (111)". Any ideas would be appreciated.
-> 
-> Perhaps are not running bluetoothd or any other tool to keep the
-> connection alive, try starting bluetoothd and use bluetoothctl, in
-> addition you can use org.bluez.GattManager1.RegisterProfile to mark
-> the device to auto connect (passive scanning):
-> 
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/gatt-api.txt
-> 
-> or using the python test script:
-> 
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/test-gatt-profile
-> 
-> 
+it isn't wrong, GHC EID is defined for 0-3 only so the first bit is
+always zero. So 10110 E E N is right whereas:
+
+1011000N -> Hop
+1011001N -> Routing
+1011010N -> Fragment
+1011011N -> Destination
+
+Seems like Mobility and IPv6 is not defined for GHC.
+
+But I still don't know why iana put it for RFC6282 in a new entry on the
+list for each EID and for GHC they did only one entry for the mask without
+EID bits.
+
+- Alex
