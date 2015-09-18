@@ -1,48 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Cathy Luo <cluo@marvell.com>,
-	Nachiket Kukade <kukaden@marvell.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH 1/2] Bluetooth: btmrvl: fix firmware dump issue
-Date: Fri, 18 Sep 2015 06:40:40 -0700
-Message-ID: <1442583641-3182-1-git-send-email-akarwar@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Stefan Schmidt <stefan@osg.samsung.com>
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>,
+	jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
+	Stefan Schmidt <stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 2/4] 6lowpan: add nhc module for GHC extension header detection
+Date: Fri, 18 Sep 2015 13:52:46 +0200
+Message-Id: <1442577168-23183-3-git-send-email-stefan@osg.samsung.com>
+In-Reply-To: <1442577168-23183-1-git-send-email-stefan@osg.samsung.com>
+References: <1442577168-23183-1-git-send-email-stefan@osg.samsung.com>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Nachiket Kukade <kukaden@marvell.com>
-
-First firmware dump attempt from user works fine, but firmware goes
-into bad state after this. Subsequent attempts fails.
-
-As required by the firmware dump implementation, this change writes
-FW_DUMP_READ_DONE value to dump ctrl register to address this issue.
-
-Signed-off-by: Nachiket Kukade <kukaden@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- drivers/bluetooth/btmrvl_sdio.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/6lowpan/Kconfig                    |  5 +++++
+ net/6lowpan/Makefile                   |  3 +++
+ net/6lowpan/nhc_ghc_extension_header.c | 27 +++++++++++++++++++++++++++
+ 3 files changed, 35 insertions(+)
+ create mode 100644 net/6lowpan/nhc_ghc_extension_header.c
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index b9978a7..5f7c9be 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1278,6 +1278,12 @@ static void btmrvl_sdio_dump_firmware(struct btmrvl_private *priv)
+diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
+index 6af7a46..f541f50 100644
+--- a/net/6lowpan/Kconfig
++++ b/net/6lowpan/Kconfig
+@@ -59,4 +59,9 @@ config 6LOWPAN_NHC_UDP
+ 	---help---
+ 	  6LoWPAN IPv6 UDP Header compression according to RFC6282.
  
- 		if (memory_size == 0) {
- 			BT_INFO("Firmware dump finished!");
-+			sdio_writeb(card->func, FW_DUMP_READ_DONE,
-+				    card->reg->fw_dump_ctrl, &ret);
-+			if (ret) {
-+				BT_ERR("SDIO Write MEMDUMP_FINISH ERR");
-+				goto done;
-+			}
- 			break;
- 		}
- 
++config 6LOWPAN_GHC_EXTENSION_HEADER
++	tristate "GHC Extension Header Support"
++	default y
++	---help---
++
+ endif
+diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
+index c6ffc55..2b42bd0 100644
+--- a/net/6lowpan/Makefile
++++ b/net/6lowpan/Makefile
+@@ -10,3 +10,6 @@ obj-$(CONFIG_6LOWPAN_NHC_IPV6) += nhc_ipv6.o
+ obj-$(CONFIG_6LOWPAN_NHC_MOBILITY) += nhc_mobility.o
+ obj-$(CONFIG_6LOWPAN_NHC_ROUTING) += nhc_routing.o
+ obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
++
++#rfc7400 ghcs
++obj-$(CONFIG_6LOWPAN_GHC_EXTENSION_HEADER) += nhc_ghc_extension_header.o
+diff --git a/net/6lowpan/nhc_ghc_extension_header.c b/net/6lowpan/nhc_ghc_extension_header.c
+new file mode 100644
+index 0000000..eeeabfa
+--- /dev/null
++++ b/net/6lowpan/nhc_ghc_extension_header.c
+@@ -0,0 +1,27 @@
++/*
++ *	6LoWPAN Extension Header compression according to RFC7400
++ *
++ *	This program is free software; you can redistribute it and/or
++ *	modify it under the terms of the GNU General Public License
++ *	as published by the Free Software Foundation; either version
++ *	2 of the License, or (at your option) any later version.
++ */
++
++#include "nhc.h"
++
++#define LOWPAN_GHC_EXTENSION_HEADER_IDLEN	1
++#define LOWPAN_GHC_EXTENSION_HEADER_ID_0	0xb0
++#define LOWPAN_GHC_EXTENSION_HEADER_MASK_0	0xf8
++
++static void ext_ghid_setup(struct lowpan_nhc *nhc)
++{
++	nhc->id[0] = LOWPAN_GHC_EXTENSION_HEADER_ID_0;
++	nhc->idmask[0] = LOWPAN_GHC_EXTENSION_HEADER_MASK_0;
++}
++
++LOWPAN_NHC(ghc_extension_header, "RFC7400 Extension Header", NEXTHDR_HOP, 0,
++	   ext_ghid_setup, LOWPAN_GHC_EXTENSION_HEADER_IDLEN, NULL, NULL);
++
++module_lowpan_nhc(ghc_extension_header);
++MODULE_DESCRIPTION("6LoWPAN generic header RFC7400 Extension Header compression");
++MODULE_LICENSE("GPL");
 -- 
-1.8.1.4
+2.4.3
 
