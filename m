@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v5 2/2] core/gatt-client: fix losing notifications
-Date: Fri, 18 Sep 2015 01:35:57 -0700
-Message-Id: <1442565357-2552-2-git-send-email-jpawlowski@google.com>
-In-Reply-To: <1442565357-2552-1-git-send-email-jpawlowski@google.com>
-References: <1442565357-2552-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v4 2/2] core/gatt-client: fix losing notifications
+Date: Fri, 18 Sep 2015 01:27:34 -0700
+Message-Id: <1442564854-5731-2-git-send-email-jpawlowski@google.com>
+In-Reply-To: <1442564854-5731-1-git-send-email-jpawlowski@google.com>
+References: <1442564854-5731-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
