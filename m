@@ -4,9 +4,9 @@ To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>,
 	jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org,
 	Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH bluetooth-next 3/4] 6lowpan: add nhc module for GHC UDP detection
-Date: Fri, 18 Sep 2015 13:52:47 +0200
-Message-Id: <1442577168-23183-4-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 4/4] 6lowpan: add nhc module for GHC ICMPv6 detection
+Date: Fri, 18 Sep 2015 13:52:48 +0200
+Message-Id: <1442577168-23183-5-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1442577168-23183-1-git-send-email-stefan@osg.samsung.com>
 References: <1442577168-23183-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,43 +14,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- net/6lowpan/Kconfig       |  5 +++++
- net/6lowpan/Makefile      |  1 +
- net/6lowpan/nhc_ghc_udp.c | 27 +++++++++++++++++++++++++++
+ net/6lowpan/Kconfig          |  5 +++++
+ net/6lowpan/Makefile         |  1 +
+ net/6lowpan/nhc_ghc_icmpv6.c | 27 +++++++++++++++++++++++++++
  3 files changed, 33 insertions(+)
- create mode 100644 net/6lowpan/nhc_ghc_udp.c
+ create mode 100644 net/6lowpan/nhc_ghc_icmpv6.c
 
 diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
-index f541f50..67a786b 100644
+index 67a786b..a34693d 100644
 --- a/net/6lowpan/Kconfig
 +++ b/net/6lowpan/Kconfig
-@@ -64,4 +64,9 @@ config 6LOWPAN_GHC_EXTENSION_HEADER
+@@ -69,4 +69,9 @@ config 6LOWPAN_GHC_UDP
  	default y
  	---help---
  
-+config 6LOWPAN_GHC_UDP
-+	tristate "GHC UDP Support"
++config 6LOWPAN_GHC_ICMPV6
++	tristate "GHC ICMPv6 Support"
 +	default y
 +	---help---
 +
  endif
 diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
-index 2b42bd0..fc65efb 100644
+index fc65efb..49256b7f 100644
 --- a/net/6lowpan/Makefile
 +++ b/net/6lowpan/Makefile
-@@ -13,3 +13,4 @@ obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
- 
+@@ -14,3 +14,4 @@ obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
  #rfc7400 ghcs
  obj-$(CONFIG_6LOWPAN_GHC_EXTENSION_HEADER) += nhc_ghc_extension_header.o
-+obj-$(CONFIG_6LOWPAN_GHC_UDP) += nhc_ghc_udp.o
-diff --git a/net/6lowpan/nhc_ghc_udp.c b/net/6lowpan/nhc_ghc_udp.c
+ obj-$(CONFIG_6LOWPAN_GHC_UDP) += nhc_ghc_udp.o
++obj-$(CONFIG_6LOWPAN_GHC_ICMPV6) += nhc_ghc_icmpv6.o
+diff --git a/net/6lowpan/nhc_ghc_icmpv6.c b/net/6lowpan/nhc_ghc_icmpv6.c
 new file mode 100644
-index 0000000..2675683
+index 0000000..378ebfe
 --- /dev/null
-+++ b/net/6lowpan/nhc_ghc_udp.c
++++ b/net/6lowpan/nhc_ghc_icmpv6.c
 @@ -0,0 +1,27 @@
 +/*
-+ *	6LoWPAN UDP compression according to RFC7400
++ *	6LoWPAN ICMPv6 compression according to RFC7400
 + *
 + *	This program is free software; you can redistribute it and/or
 + *	modify it under the terms of the GNU General Public License
@@ -60,21 +60,21 @@ index 0000000..2675683
 +
 +#include "nhc.h"
 +
-+#define LOWPAN_GHC_UDP_IDLEN	1
-+#define LOWPAN_GHC_UDP_ID_0	0xd0
-+#define LOWPAN_GHC_UDP_MASK_0	0xf8
++#define LOWPAN_GHC_ICMPV6_IDLEN		1
++#define LOWPAN_GHC_ICMPV6_ID_0		0xdf
++#define LOWPAN_GHC_ICMPV6_MASK_0	0xff
 +
-+static void udp_ghid_setup(struct lowpan_nhc *nhc)
++static void icmpv6_ghid_setup(struct lowpan_nhc *nhc)
 +{
-+	nhc->id[0] = LOWPAN_GHC_UDP_ID_0;
-+	nhc->idmask[0] = LOWPAN_GHC_UDP_MASK_0;
++	nhc->id[0] = LOWPAN_GHC_ICMPV6_ID_0;
++	nhc->idmask[0] = LOWPAN_GHC_ICMPV6_MASK_0;
 +}
 +
-+LOWPAN_NHC(ghc_udp, "RFC7400 UDP", NEXTHDR_HOP, 0,
-+	   udp_ghid_setup, LOWPAN_GHC_UDP_IDLEN, NULL, NULL);
++LOWPAN_NHC(ghc_icmpv6, "RFC7400 ICMPv6", NEXTHDR_HOP, 0,
++	   icmpv6_ghid_setup, LOWPAN_GHC_ICMPV6_IDLEN, NULL, NULL);
 +
-+module_lowpan_nhc(ghc_udp);
-+MODULE_DESCRIPTION("6LoWPAN generic header RFC7400 UDP compression");
++module_lowpan_nhc(ghc_icmpv6);
++MODULE_DESCRIPTION("6LoWPAN generic header RFC7400 ICMPv6 compression");
 +MODULE_LICENSE("GPL");
 -- 
 2.4.3
