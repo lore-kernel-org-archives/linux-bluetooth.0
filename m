@@ -1,115 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH 1/2] gdbus: add method for immediate property update
-Date: Thu, 17 Sep 2015 21:39:56 -0700
-Message-Id: <1442551197-5374-1-git-send-email-jpawlowski@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: BlueZ - LGPL dependency with GPL headers and sources
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <E43CE124327DEB448881DE4DD408A8A323E808BAD1@AUSX7MCPS308.AMER.DELL.COM>
+Date: Fri, 18 Sep 2015 06:27:47 +0200
+Cc: linux-bluetooth@vger.kernel.org, Arulnambi_Raju@Dell.com
+Message-Id: <6E7C05F9-DAAE-4AC1-B735-BB7B2E8D333B@holtmann.org>
+References: <E43CE124327DEB448881DE4DD408A8A323E808BAD1@AUSX7MCPS308.AMER.DELL.COM>
+To: Trey_Ramsay@Dell.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_dbus_emit_property_changed doesn't send dbus signal immediately. Instead
-it stores changed properties, and schedule signal to be send at
-g_iddle_add. Additionally, if this method is called few times for some
-property, only last value will be sent in property changed signal.
+Hi Trey,
 
-If remote device sends lots of notifications, they're all scheduled to be
-notified using this method. This might result in some notifications being
-lost.
+> We are making a BLE only product for embedded system and cannot use the whole bluez package due to lack of resources.  We noticed that the BLE specific code (src/shared) is licensed under LGPL and we are trying to leverage the code as a shared library for our proprietary source BLE application, similar to btgatt-server tool. While compiling, we noticed the LPGL code has a dependency with the following header and source files which are licensed as GPL.
+> 
+> lib/bluetooth.h
+> lib/hci.h
+> lib/mgmt..h
+> lib/uuid.c
+> lib/uuid.h
+> src/shared/ad.c
+> src/shared/ad.h
+> 
+> Are there plans to make the above files LGPL or LGPL compatible?
 
-This patch adds new method, that immediately sends property changed
-signal, instead of sheduling it for nearest iddle moment.
----
- gdbus/gdbus.h  |  3 +++
- gdbus/object.c | 46 +++++++++++++++++++++++++++++++++++-----------
- 2 files changed, 38 insertions(+), 11 deletions(-)
+the src/shared/ad.[ch] is actually a mistake. No code under GPL should have been accepted into src/shared/ directory. That code is intentionally kept LGPL only.
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index d99c254..b31246a 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -300,6 +300,9 @@ void g_dbus_pending_property_error(GDBusPendingReply id, const char *name,
- void g_dbus_emit_property_changed(DBusConnection *connection,
- 				const char *path, const char *interface,
- 				const char *name);
-+void g_dbus_emit_property_changed_immediate(DBusConnection *connection,
-+				const char *path, const char *interface,
-+				const char *name);
- gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
- 				const char *interface, DBusMessageIter *iter);
- 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 96db516..fff9e0d 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -1720,21 +1720,12 @@ static void process_property_changes(struct generic_data *data)
- 	}
- }
- 
--void g_dbus_emit_property_changed(DBusConnection *connection,
--				const char *path, const char *interface,
--				const char *name)
-+static void prepare_property_changed(const char *interface, const char *name,
-+						struct generic_data *data)
- {
- 	const GDBusPropertyTable *property;
--	struct generic_data *data;
- 	struct interface_data *iface;
- 
--	if (path == NULL)
--		return;
--
--	if (!dbus_connection_get_object_path_data(connection, path,
--					(void **) &data) || data == NULL)
--		return;
--
- 	iface = find_interface(data->interfaces, interface);
- 	if (iface == NULL)
- 		return;
-@@ -1759,10 +1750,43 @@ void g_dbus_emit_property_changed(DBusConnection *connection,
- 	data->pending_prop = TRUE;
- 	iface->pending_prop = g_slist_prepend(iface->pending_prop,
- 						(void *) property);
-+}
-+
-+void g_dbus_emit_property_changed(DBusConnection *connection, const char *path,
-+				const char *interface, const char *name)
-+{
-+	struct generic_data *data;
-+
-+	if (path == NULL)
-+		return;
-+
-+	if (!dbus_connection_get_object_path_data(connection, path,
-+					(void **) &data) || data == NULL)
-+		return;
-+
-+	prepare_property_changed(interface, name, data);
- 
- 	add_pending(data);
- }
- 
-+void g_dbus_emit_property_changed_immediate(DBusConnection *connection,
-+				const char *path, const char *interface,
-+							const char *name)
-+{
-+	struct generic_data *data;
-+
-+	if (path == NULL)
-+		return;
-+
-+	if (!dbus_connection_get_object_path_data(connection, path,
-+					(void **) &data) || data == NULL)
-+		return;
-+
-+	prepare_property_changed(interface, name, data);
-+
-+	process_property_changes(data);
-+}
-+
- gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
- 				const char *interface, DBusMessageIter *iter)
- {
--- 
-2.5.0
+> Are there any plans in the future to remove the GPL dependencies from the LGPL code?
+
+The lib/uuid.[ch] is pretty old code and not really nicely abstracted in the first place. However it has been used to speed up the development of the GATT support. The plan is actually to replace that with a new implementation src/shared/uuid.[ch] under LGPL that nicely integrates.
+
+The other three are just a bunch of defines or structs. However they are kernel defines and structs and should be most likely come directly from the kernel as UAPI. However we have never gotten around it to clean these up. Some of this is part of the old libbluetooth (which is still internally required). We are talking about 13 year old code here.
+
+Regards
+
+Marcel
 
