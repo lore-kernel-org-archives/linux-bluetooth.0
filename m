@@ -1,34 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Freek de Kruijf <f.de.kruijf@gmail.com>
-To: Maillist Bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Regularly command "hcitool scan" hangs
-Date: Sat, 19 Sep 2015 10:55:47 +0200
-Message-ID: <1940201.hRS2djRnA5@eik132.beelaertsict.nl>
+Subject: Re: Bluez with Raspberry Pi for BLE
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <55F55C99.7070803@in-box.at>
+ <CABBYNZLGjKYF2+aXUupJpNtOQJpY9T9sQpH=D-xU2GP9xj14oQ@mail.gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Mike <mailinglists@in-box.at>
+Message-ID: <55FD15F8.1000401@in-box.at>
+Date: Sat, 19 Sep 2015 09:59:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CABBYNZLGjKYF2+aXUupJpNtOQJpY9T9sQpH=D-xU2GP9xj14oQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am regularly having trouble that an application is unable to connect to a 
-nearby bluetooth device without an obvious reason. The connection is made each 
-5 minutes. The distance is only 10 to 20 cm.
+Hi Luiz,
 
-In order to make things work, I have a monitoring script that each 15 minutes 
-does a "timeout -k 10s 1m hcitool scan". When it times out after 1 minute, 
-which occurs a few times per day, the script reloads the driver and things are 
-OK again.
+it works now. Thank you!
 
-The system is a Raspberry Pi 1B, with linux kernel 4.1.6, bluez-5.33-1.1, 
-libbluetooth3-5.33-1.1, and bluez-firmware-1.2-148.1.
+BR
+Mike
 
-The bluetooth device is:
-Bus 001 Device 004: ID 0cf3:3005 Atheros Communications, Inc. AR3011 Bluetooth
-
-Should I use bluetoothctl? If so, where do I find comprehensive documentation 
-on it?
-
--- 
-fr.gr.
-
-Freek de Kruijf
-
+Am 14.09.2015 um 14:39 schrieb Luiz Augusto von Dentz:
+> Hi Mike,
+> 
+> On Sun, Sep 13, 2015 at 2:23 PM, Mike <mailinglists@in-box.at> wrote:
+>> Hi,
+>>
+>> I am trying to get my RPi to work with BLE. I downloaded and compiled
+>> bluez-5.34.tar.xz.
+>>
+>> uname -a says: Linux raspberry 4.1.6-v7+ #810 SMP PREEMPT Tue Aug 18
+>> 15:32:12 BST 2015 armv7l GNU/Linux
+>>
+>> My BLE-stick is recognized and hci0 is up and running. I can scan for
+>> advertising peripherals with "sudo hcitool lescan". This works. But if I
+>> try to connect to a peripheral I always get Connection refused (111). So
+>> I looked at the output of hcidump and found that after the connection is
+>> completed, I get disconnected by remote.
+> 
+> 
+> If you are running bluetoothd using hcitool is _not_ recommended,
+> please use bluetoothctl instead.
+> 
+> Note: Requiring root access should already warn you about that.
+> 
+>> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
+>>     bdaddr 34:B1:F7:D4:FE:F3 type 0
+>>     interval 4 window 4 initiator_filter 0
+>>     own_bdaddr_type 0 min_interval 15 max_interval 15
+>>     latency 0 supervision_to 3200 min_ce 1 max_ce 1
+>>> HCI Event: Command Status (0x0f) plen 4
+>>     LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
+>>> HCI Event: LE Meta Event (0x3e) plen 19
+>>     LE Connection Complete
+>>       status 0x00 handle 72, role master
+>>       bdaddr 34:B1:F7:D4:FE:F3 (Public)
+>> < HCI Command: LE Read Remote Used Features (0x08|0x0016) plen 2
+>>   0000: 48 00                                             H.
+>>> HCI Event: Command Status (0x0f) plen 4
+>>     LE Read Remote Used Features (0x08|0x0016) status 0x00 ncmd 1
+>>> HCI Event: LE Meta Event (0x3e) plen 12
+>>     LE Read Remote Used Features Complete
+>>       status 0x00 handle 72
+>>       Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>>     handle 72 reason 0x13
+>>     Reason: Remote User Terminated Connection
+>>> HCI Event: Command Status (0x0f) plen 4
+>>     Disconnect (0x01|0x0006) status 0x00 ncmd 1
+>>> HCI Event: Disconn Complete (0x05) plen 4
+>>     status 0x00 handle 72 reason 0x16
+>>     Reason: Connection Terminated by Local Host
+>>
+>> I tried three different peripherals and I always get "Connection refused
+>> (111)". Any ideas would be appreciated.
+> 
+> Perhaps are not running bluetoothd or any other tool to keep the
+> connection alive, try starting bluetoothd and use bluetoothctl, in
+> addition you can use org.bluez.GattManager1.RegisterProfile to mark
+> the device to auto connect (passive scanning):
+> 
+> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/gatt-api.txt
+> 
+> or using the python test script:
+> 
+> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test/test-gatt-profile
+> 
+> 
