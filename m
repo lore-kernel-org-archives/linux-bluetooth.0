@@ -1,85 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: hamzahfrq.sub@gmail.com
-To: hamzahfrq.sub@gmail.com
-Cc: gregkh@linuxfoundation.org, lee.jones@linaro.org, x0153368@ti.com,
-	pavan_savoy@ti.com, gigi.joseph@gmail.com, bvijay@ti.com,
-	dan.carpenter@oracle.com, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Muhammad Hamza Farooq <mfarooq@visteon.com>
-Subject: [PATCH] ti-st: use worker instead of calling st_int_write in wake up
-Date: Sun, 20 Sep 2015 21:40:09 +0200
-Message-Id: <1442778009-2696-1-git-send-email-mfarooq@visteon.com>
-Sender: linux-kernel-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1442584177-17918-1-git-send-email-luiz.dentz@gmail.com>
+References: <1442584177-17918-1-git-send-email-luiz.dentz@gmail.com>
+Date: Sat, 19 Sep 2015 14:33:32 +0300
+Message-ID: <CABBYNZKGKk0mjNEqUSMe0Oh__Z-3CbVjv+Mz2_NmhX3+epgH=Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core/gatt-client: Fix WriteValue always failing
+ after first request
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Muhammad Hamza Farooq <mfarooq@visteon.com>
+Hi,
 
-The wake up method is called with the port lock held. The st_int_write
-method calls port->ops->write with tries to acquire the lock again,
-causing CPU to wait infinitely. Right way to do is to write data to port
-in worker thread.
+On Fri, Sep 18, 2015 at 4:49 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> WriteValue may use write without response proceduce in case it is
+> supported but since that don't have any response write_id is left set
+> after first request preventing blocking any new request.
+> ---
+>  src/gatt-client.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/src/gatt-client.c b/src/gatt-client.c
+> index 399133a..6c10a82 100644
+> --- a/src/gatt-client.c
+> +++ b/src/gatt-client.c
+> @@ -946,11 +946,11 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
+>                 goto fail;
+>
+>         supported = true;
+> -       chrc->write_id = bt_gatt_client_write_without_response(gatt,
+> +
+> +       if (bt_gatt_client_write_without_response(gatt,
+>                                         chrc->value_handle,
+>                                         chrc->props & BT_GATT_CHRC_PROP_AUTH,
+> -                                       value, value_len);
+> -       if (chrc->write_id)
+> +                                       value, value_len))
+>                 return dbus_message_new_method_return(msg);
+>
+>  fail:
+> --
+> 2.4.3
 
-Signed-off-by: Muhammad Hamza Farooq <mfarooq@visteon.com>
----
- drivers/misc/ti-st/st_core.c |   18 ++++++++++++++++--
- include/linux/ti_wilink_st.h |    1 +
- 2 files changed, 17 insertions(+), 2 deletions(-)
+Applied.
 
-diff --git a/drivers/misc/ti-st/st_core.c b/drivers/misc/ti-st/st_core.c
-index c8c6a36..6e3af8b 100644
---- a/drivers/misc/ti-st/st_core.c
-+++ b/drivers/misc/ti-st/st_core.c
-@@ -460,6 +460,13 @@ static void st_int_enqueue(struct st_data_s *st_gdata, struct sk_buff *skb)
-  * - TTY layer when write's finished
-  * - st_write (in context of the protocol stack)
-  */
-+static void work_fn_write_wakeup(struct work_struct *work)
-+{
-+	struct st_data_s *st_gdata = container_of(work, struct st_data_s,
-+			work_write_wakeup);
-+
-+	st_tx_wakeup((void *)st_gdata);
-+}
- void st_tx_wakeup(struct st_data_s *st_data)
- {
- 	struct sk_buff *skb;
-@@ -812,8 +819,12 @@ static void st_tty_wakeup(struct tty_struct *tty)
- 	/* don't do an wakeup for now */
- 	clear_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
- 
--	/* call our internal wakeup */
--	st_tx_wakeup((void *)st_gdata);
-+	/*
-+	 * schedule the internal wakeup instead of calling directly to
-+	 * avoid lockup (port->lock needed in tty->ops->write is
-+	 * already taken here
-+	 */
-+	schedule_work(&st_gdata->work_write_wakeup);
- }
- 
- static void st_tty_flush_buffer(struct tty_struct *tty)
-@@ -881,6 +892,9 @@ int st_core_init(struct st_data_s **core_data)
- 			pr_err("unable to un-register ldisc");
- 		return err;
- 	}
-+
-+	INIT_WORK(&st_gdata->work_write_wakeup, work_fn_write_wakeup);
-+
- 	*core_data = st_gdata;
- 	return 0;
- }
-diff --git a/include/linux/ti_wilink_st.h b/include/linux/ti_wilink_st.h
-index c78dcfe..9b366ee 100644
---- a/include/linux/ti_wilink_st.h
-+++ b/include/linux/ti_wilink_st.h
-@@ -159,6 +159,7 @@ struct st_data_s {
- 	unsigned long ll_state;
- 	void *kim_data;
- 	struct tty_struct *tty;
-+	struct work_struct work_write_wakeup;
- };
- 
- /*
+
 -- 
-1.7.9.5
-
+Luiz Augusto von Dentz
