@@ -1,55 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <ffcbfaab275d957cf387eb690b6a81ea.squirrel@iwavesystems.com>
-In-Reply-To: <cc6ce416e935cb348f250e29710e1830.squirrel@iwavesystems.com>
-References: <237bbd312054ce6433af002f5e1213c7.squirrel@iwavesystems.com>
-    <5a4e8eadcfd668fabdcd350e63a65308.squirrel@iwavesystems.com>
-    <d2ec8d829215f8a06d693dd61ec226a2.squirrel@iwavesystems.com>
-    <3088225.58tBxefHLJ@leonov>
-    <cc6ce416e935cb348f250e29710e1830.squirrel@iwavesystems.com>
-Date: Mon, 21 Sep 2015 06:43:20 -0400
-Subject: GATT onWriteCharacteristic() returns status=1 (BT_STATUS_FAIL)
-From: krishnaks@iwavesystems.com
-To: linux-bluetooth@vger.kernel.org
+From: Amitkumar Karwar <akarwar@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Cathy Luo <cluo@marvell.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Subject: [PATCH v2 1/2] Bluetooth: btmrvl: remove extra space in cast
+Date: Mon, 21 Sep 2015 03:06:41 -0700
+Message-ID: <1442830002-7626-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Coding style fix, extra spaces are removed to make casting
+consistent.
 
-I am using Bluez 5.33 on Android kitkat 4.4.3.
-I am testing GATT functionality  and I found that sometime
-onWriteCharacteristic returns status 1 (BT_STATUS_FAIL). In android
-Application I am checking for success status (i.e. 0) which I am getting
-most of the time. But occasionally I am getting Status 1 because of which
-my application logic is failing.
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+---
+ drivers/bluetooth/btmrvl_sdio.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-When Bluez will send Status 1 and on what basis? How to avoid this?
-
-
------------------------Working Log-------------------------------
-D/BluetoothGatt( 1359): writeCharacteristic() - uuid:
-1d4de0a0-9f84-11e4-a042-0002a5d5c51b
-D/BtGatt.GattService( 1259): writeCharacteristic() -
-address=00:00:39:36:85:2F
-D/BtGatt.GattService( 1259): onWriteCharacteristic() -
-address=00:00:39:36:85:2F, status=0
-D/BluetoothGatt( 1359): onCharacteristicWrite() - Device=00:00:39:36:85:2F
-UUID=1d4de0a0-9f84-11e4-a042-0002a5d5c51b Status=0
-----------------------Log End-------------------------
-
-
---------------------------Failure Log---------------------------------
-D/BluetoothGatt( 1359): writeCharacteristic() - uuid:
-1d4de0a0-9f84-11e4-a042-0002a5d5c51b
-D/BtGatt.GattService( 1259): writeCharacteristic() -
-address=00:00:39:36:85:2F
-D/BtGatt.GattService( 1259): onWriteCharacteristic() -
-address=00:00:39:36:85:2F, status=1
-D/BluetoothGatt( 1359): onCharacteristicWrite() - Device=00:00:39:36:85:2F
-UUID=1d4de0a0-9f84-11e4-a042-0002a5d5c51b Status=1
---------------------------Log End-------------------------------
-
-Regards,
-KP
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 5f7c9be..68b7ff0 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -194,22 +194,22 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8897 = {
+ static const struct sdio_device_id btmrvl_sdio_ids[] = {
+ 	/* Marvell SD8688 Bluetooth device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x9105),
+-			.driver_data = (unsigned long) &btmrvl_sdio_sd8688 },
++			.driver_data = (unsigned long)&btmrvl_sdio_sd8688 },
+ 	/* Marvell SD8787 Bluetooth device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x911A),
+-			.driver_data = (unsigned long) &btmrvl_sdio_sd8787 },
++			.driver_data = (unsigned long)&btmrvl_sdio_sd8787 },
+ 	/* Marvell SD8787 Bluetooth AMP device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x911B),
+-			.driver_data = (unsigned long) &btmrvl_sdio_sd8787 },
++			.driver_data = (unsigned long)&btmrvl_sdio_sd8787 },
+ 	/* Marvell SD8797 Bluetooth device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x912A),
+-			.driver_data = (unsigned long) &btmrvl_sdio_sd8797 },
++			.driver_data = (unsigned long)&btmrvl_sdio_sd8797 },
+ 	/* Marvell SD8887 Bluetooth device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x9136),
+ 			.driver_data = (unsigned long)&btmrvl_sdio_sd8887 },
+ 	/* Marvell SD8897 Bluetooth device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x912E),
+-			.driver_data = (unsigned long) &btmrvl_sdio_sd8897 },
++			.driver_data = (unsigned long)&btmrvl_sdio_sd8897 },
+ 
+ 	{ }	/* Terminating entry */
+ };
+-- 
+1.8.1.4
 
