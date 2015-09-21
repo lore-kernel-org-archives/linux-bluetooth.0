@@ -1,120 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Amitkumar Karwar <akarwar@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Cathy Luo <cluo@marvell.com>,
-	Amitkumar Karwar <akarwar@marvell.com>,
-	Zhaoyang Liu <liuzy@marvell.com>
-Subject: [PATCH v2 2/2] Bluetooth: btmrvl: add sd8997 chipset support
-Date: Mon, 21 Sep 2015 03:06:42 -0700
-Message-ID: <1442830002-7626-2-git-send-email-akarwar@marvell.com>
-In-Reply-To: <1442830002-7626-1-git-send-email-akarwar@marvell.com>
-References: <1442830002-7626-1-git-send-email-akarwar@marvell.com>
+From: Szymon Janc <ext.szymon.janc@tieto.com>
+To: krishnaks@iwavesystems.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: GATT onWriteCharacteristic() returns status=1 (BT_STATUS_FAIL)
+Date: Mon, 21 Sep 2015 13:02:49 +0200
+Message-ID: <2859057.ul7JxHffdl@leonov>
+In-Reply-To: <ffcbfaab275d957cf387eb690b6a81ea.squirrel@iwavesystems.com>
+References: <237bbd312054ce6433af002f5e1213c7.squirrel@iwavesystems.com> <cc6ce416e935cb348f250e29710e1830.squirrel@iwavesystems.com> <ffcbfaab275d957cf387eb690b6a81ea.squirrel@iwavesystems.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for Marvell's new chipset SD8997.
-Register offsets and supported feature flags are updated.
+Hi,
 
-Signed-off-by: Zhaoyang Liu <liuzy@marvell.com>
-Signed-off-by: Cathy Luo <cluo@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
-v2: Firmware name is corrected.
-sdsd8997_combo.bin -> sd8997_uapsta.bin
----
- drivers/bluetooth/Kconfig       |  4 ++--
- drivers/bluetooth/btmrvl_sdio.c | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+), 2 deletions(-)
+On Monday 21 of September 2015 06:43:20 krishnaks@iwavesystems.com wrote:
+> Hi,
+> 
+> I am using Bluez 5.33 on Android kitkat 4.4.3.
+> I am testing GATT functionality  and I found that sometime
+> onWriteCharacteristic returns status 1 (BT_STATUS_FAIL). In android
+> Application I am checking for success status (i.e. 0) which I am getting
+> most of the time. But occasionally I am getting Status 1 because of which
+> my application logic is failing.
+> 
+> When Bluez will send Status 1 and on what basis? How to avoid this?
+> 
+> 
+> -----------------------Working Log-------------------------------
+> D/BluetoothGatt( 1359): writeCharacteristic() - uuid:
+> 1d4de0a0-9f84-11e4-a042-0002a5d5c51b
+> D/BtGatt.GattService( 1259): writeCharacteristic() -
+> address=00:00:39:36:85:2F
+> D/BtGatt.GattService( 1259): onWriteCharacteristic() -
+> address=00:00:39:36:85:2F, status=0
+> D/BluetoothGatt( 1359): onCharacteristicWrite() - Device=00:00:39:36:85:2F
+> UUID=1d4de0a0-9f84-11e4-a042-0002a5d5c51b Status=0
+> ----------------------Log End-------------------------
+> 
+> 
+> --------------------------Failure Log---------------------------------
+> D/BluetoothGatt( 1359): writeCharacteristic() - uuid:
+> 1d4de0a0-9f84-11e4-a042-0002a5d5c51b
+> D/BtGatt.GattService( 1259): writeCharacteristic() -
+> address=00:00:39:36:85:2F
+> D/BtGatt.GattService( 1259): onWriteCharacteristic() -
+> address=00:00:39:36:85:2F, status=1
+> D/BluetoothGatt( 1359): onCharacteristicWrite() - Device=00:00:39:36:85:2F
+> UUID=1d4de0a0-9f84-11e4-a042-0002a5d5c51b Status=1
+> --------------------------Log End-------------------------------
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 0bd88c9..3d480d8 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -275,7 +275,7 @@ config BT_MRVL
- 	  The core driver to support Marvell Bluetooth devices.
- 
- 	  This driver is required if you want to support
--	  Marvell Bluetooth devices, such as 8688/8787/8797/8887/8897.
-+	  Marvell Bluetooth devices, such as 8688/8787/8797/8887/8897/8997.
- 
- 	  Say Y here to compile Marvell Bluetooth driver
- 	  into the kernel or say M to compile it as module.
-@@ -289,7 +289,7 @@ config BT_MRVL_SDIO
- 	  The driver for Marvell Bluetooth chipsets with SDIO interface.
- 
- 	  This driver is required if you want to use Marvell Bluetooth
--	  devices with SDIO interface. Currently SD8688/SD8787/SD8797/SD8887/SD8897
-+	  devices with SDIO interface. Currently SD8688/SD8787/SD8797/SD8887/SD8897/SD8997
- 	  chipsets are supported.
- 
- 	  Say Y here to compile support for Marvell BT-over-SDIO driver
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 68b7ff0..7f6fb17 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -146,6 +146,29 @@ static const struct btmrvl_sdio_card_reg btmrvl_reg_8897 = {
- 	.fw_dump_end = 0xea,
- };
- 
-+static const struct btmrvl_sdio_card_reg btmrvl_reg_8997 = {
-+	.cfg = 0x00,
-+	.host_int_mask = 0x08,
-+	.host_intstatus = 0x0c,
-+	.card_status = 0x5c,
-+	.sq_read_base_addr_a0 = 0xf8,
-+	.sq_read_base_addr_a1 = 0xf9,
-+	.card_revision = 0xc8,
-+	.card_fw_status0 = 0xe8,
-+	.card_fw_status1 = 0xe9,
-+	.card_rx_len = 0xea,
-+	.card_rx_unit = 0xeb,
-+	.io_port_0 = 0xe4,
-+	.io_port_1 = 0xe5,
-+	.io_port_2 = 0xe6,
-+	.int_read_to_clear = true,
-+	.host_int_rsr = 0x04,
-+	.card_misc_cfg = 0xD8,
-+	.fw_dump_ctrl = 0xf0,
-+	.fw_dump_start = 0xf1,
-+	.fw_dump_end = 0xf8,
-+};
-+
- static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
- 	.helper		= "mrvl/sd8688_helper.bin",
- 	.firmware	= "mrvl/sd8688.bin",
-@@ -191,6 +214,15 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8897 = {
- 	.supports_fw_dump = true,
- };
- 
-+static const struct btmrvl_sdio_device btmrvl_sdio_sd8997 = {
-+	.helper         = NULL,
-+	.firmware       = "mrvl/sd8997_uapsta.bin",
-+	.reg            = &btmrvl_reg_8997,
-+	.support_pscan_win_report = true,
-+	.sd_blksz_fw_dl = 256,
-+	.supports_fw_dump = true,
-+};
-+
- static const struct sdio_device_id btmrvl_sdio_ids[] = {
- 	/* Marvell SD8688 Bluetooth device */
- 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x9105),
-@@ -210,6 +242,9 @@ static const struct sdio_device_id btmrvl_sdio_ids[] = {
- 	/* Marvell SD8897 Bluetooth device */
- 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x912E),
- 			.driver_data = (unsigned long)&btmrvl_sdio_sd8897 },
-+	/* Marvell SD8997 Bluetooth device */
-+	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x9142),
-+			.driver_data = (unsigned long)&btmrvl_sdio_sd8997 },
- 
- 	{ }	/* Terminating entry */
- };
-@@ -1622,3 +1657,4 @@ MODULE_FIRMWARE("mrvl/sd8787_uapsta.bin");
- MODULE_FIRMWARE("mrvl/sd8797_uapsta.bin");
- MODULE_FIRMWARE("mrvl/sd8887_uapsta.bin");
- MODULE_FIRMWARE("mrvl/sd8897_uapsta.bin");
-+MODULE_FIRMWARE("mrvl/sd8997_uapsta.bin");
+Please enable debug logs for daemon (check android/README for how-to) and 
+provide both debug logs and btmon HCI traces.
+
 -- 
-1.8.1.4
-
+BR
+Szymon Janc
