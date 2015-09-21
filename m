@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-From: Steven Davies <steev@steev.me.uk>
+From: Steven Davies <linux-bluetooth-list@steev.me.uk>
 Subject: BLE: dbus doesn't show GATT characteristics
-Message-ID: <56006696.3030200@steev.me.uk>
-Date: Mon, 21 Sep 2015 21:20:38 +0100
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <5600674E.2010602@steev.me.uk>
+Date: Mon, 21 Sep 2015 21:23:42 +0100
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
