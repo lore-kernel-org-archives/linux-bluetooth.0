@@ -1,29 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Sep 2015 16:01:03 -0700 (PDT)
-Message-Id: <20150921.160103.1885364190620809968.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2015-09-18
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20150918105455.GA12472@t440s.lan>
-References: <20150918105455.GA12472@t440s.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+In-Reply-To: <56006696.3030200@steev.me.uk>
+References: <56006696.3030200@steev.me.uk>
+Date: Mon, 21 Sep 2015 16:02:53 -0600
+Message-ID: <CAASrBQmWuCvyi6-DNAVvaaV2eFSeEVCy2Sr8QzPyy0Ckt0TQbg@mail.gmail.com>
+Subject: Re: BLE: dbus doesn't show GATT characteristics
+From: Mark Rages <markrages@gmail.com>
+To: Steven Davies <steev@steev.me.uk>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Fri, 18 Sep 2015 13:54:55 +0300
+On Mon, Sep 21, 2015 at 2:20 PM, Steven Davies <steev@steev.me.uk> wrote:
+> I'm having a problem using BLE through dbus where the GATT services
+> don't appear after a BLE device has been found during a scan. What is
+> available through dbus is a Device1 node with the correct address and a
+> Name property of the name which was sent in the advertising beacons -
+> however that's the only node available in the tree.
 
-> Here's the first bluetooth-next pull request for the 4.4 kernel:
-> 
->  - ieee802154 cleanups & fixes
->  - debugfs support for the at86rf230 driver
->  - Support for quirky (seemingly counterfeit) CSR Bluetooth controllers
->  - Power management and device config improvements for Intel controllers
->  - Fix for devices with incorrect advertising data length
->  - Fix for closing HCI user channel socket
-> 
-> Please let me know if there are any issues pulling. Thanks.
+Are you running bluetoothd with the experimental (-E) flag?
 
-Pulled, thanks Johan.
+Regards,
+Mark
+markrages@gmail
