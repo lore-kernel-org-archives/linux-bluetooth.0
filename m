@@ -1,104 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <56015B46.90505@steev.me.uk>
+Date: Tue, 22 Sep 2015 14:44:38 +0100
+From: Steven Davies <linux-bluetooth-list@steev.me.uk>
 MIME-Version: 1.0
-In-Reply-To: <1441620341-553-1-git-send-email-dh.herrmann@gmail.com>
-References: <1441620341-553-1-git-send-email-dh.herrmann@gmail.com>
-Date: Tue, 22 Sep 2015 19:17:29 +0200
-Message-ID: <CANq1E4Qacp0aa0i5QtDgZNGuA7T2O3VspbjRSnqv+ZK7GjCy8A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hidp: fix device disconnect on idle timeout
-From: David Herrmann <dh.herrmann@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, Mark Haun <haunma@keteu.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, David Herrmann <dh.herrmann@gmail.com>,
-	stable <stable@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: BLE: dbus doesn't show GATT characteristics
+References: <56006696.3030200@steev.me.uk>	<CAASrBQmWuCvyi6-DNAVvaaV2eFSeEVCy2Sr8QzPyy0Ckt0TQbg@mail.gmail.com>	<560108E5.1010701@steev.me.uk> <CABBYNZJJo0YoiHkONvNer=4W=cmFbRZ23qR1kw3GdMLoAd=Lrg@mail.gmail.com>
+In-Reply-To: <CABBYNZJJo0YoiHkONvNer=4W=cmFbRZ23qR1kw3GdMLoAd=Lrg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping?
+>>>> I'm having a problem using BLE through dbus where the GATT services
+>>>> don't appear after a BLE device has been found during a scan. What is
+>>>> available through dbus is a Device1 node with the correct address and a
+>>>> Name property of the name which was sent in the advertising beacons -
+>>>> however that's the only node available in the tree.
+>>> Are you running bluetoothd with the experimental (-E) flag?
+>> Yes:
+>> ~$ ps aux | grep bluetooth
+>> root      8277  0.0  0.1   4320  2628 ?        Ss   Sep21   0:00
+>> /usr/libexec/bluetooth/bluetoothd -E
+> First and most important gatttool shall not be used along with
+> bluetoothd, it is a stand alone tool for testing. That being said you
+> need to connect in order to discover the attribute the remote device
+> has, without that we only know about the UUIDs advertised nothing
+> else.
+Yes - I was using gatttool to prove I could still connect without going
+through bluetoothd. Should I expect the GATT UUIDs, services and so on
+to be available through dbus once I've called Connect on the device?
+
+What I was seeing yesterday was that after calling Connect the nodes in
+dbus don't change so I still can't see the GATT bits. Is there a code
+path I could look through to see why this is?
 
 Thanks
-David
-
-On Mon, Sep 7, 2015 at 12:05 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
-> The HIDP specs define an idle-timeout which automatically disconnects a
-> device. This has always been implemented in the HIDP layer and forced a
-> synchronous shutdown of the hidp-scheduler. This works just fine, but
-> lacks a forced disconnect on the underlying l2cap channels. This has been
-> broken since:
->
->     commit 5205185d461d5902325e457ca80bd421127b7308
->     Author: David Herrmann <dh.herrmann@gmail.com>
->     Date:   Sat Apr 6 20:28:47 2013 +0200
->
->         Bluetooth: hidp: remove old session-management
->
-> The old session-management always forced an l2cap error on the ctrl/intr
-> channels when shutting down. The new session-management skips this, as we
-> don't want to enforce channel policy on the caller. In other words, if
-> user-space removes an HIDP device, the underlying channels (which are
-> *owned* and *referenced* by user-space) are still left active. User-space
-> needs to call shutdown(2) or close(2) to release them.
->
-> Unfortunately, this does not work with idle-timeouts. There is no way to
-> signal user-space that the HIDP layer has been stopped. The API simply
-> does not support any event-passing except for poll(2). Hence, we restore
-> old behavior and force EUNATCH on the sockets if the HIDP layer is
-> disconnected due to idle-timeouts (behavior of explicit disconnects
-> remains unmodified). User-space can still call
->
->     getsockopt(..., SO_ERROR, ...)
->
-> ..to retrieve the EUNATCH error and clear sk_err. Hence, the channels can
-> still be re-used (which nobody does so far, though). Therefore, the API
-> still supports the new behavior, but with this patch it's also compatible
-> to the old implicit channel shutdown.
->
-> Cc: <stable@vger.kernel.org> # 3.10+
-> Reported-by: Mark Haun <haunma@keteu.org>
-> Reported-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
-> ---
-> Hi Mark & Luiz
->
-> Can you give this a spin? This should fix the reported issues! I like the
-> implementation much more than calling shutdown(2) implicitly in the kernel.
-> With sk_err we avoid enforcing a behavior and let user-space deal with it.
->
-> Btw., this needs back-porting to >=3.10 (which introduced the new session
-> management).
->
-> Thanks for the report!
-> David
->
->  net/bluetooth/hidp/core.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->
-> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> index f1a117f..4f1db96 100644
-> --- a/net/bluetooth/hidp/core.c
-> +++ b/net/bluetooth/hidp/core.c
-> @@ -401,6 +401,21 @@ static void hidp_idle_timeout(unsigned long arg)
->  {
->         struct hidp_session *session = (struct hidp_session *) arg;
->
-> +       /*
-> +        * The HIDP user-space API only contains calls to add and remove
-> +        * devices. There is no way to forward events of any kind. Therefore,
-> +        * we have to forcefully disconnect a device on idle-timeouts. This is
-> +        * unfortunate and weird API design, but it is spec-compliant and
-> +        * required for backwards-compatibility. Hence, on idle-timeout, we
-> +        * signal driver-detach events, so poll() will be woken up with an
-> +        * error-condition on both sockets.
-> +        */
-> +
-> +       session->intr_sock->sk->sk_err = EUNATCH;
-> +       session->ctrl_sock->sk->sk_err = EUNATCH;
-> +       wake_up_interruptible(sk_sleep(session->intr_sock->sk));
-> +       wake_up_interruptible(sk_sleep(session->ctrl_sock->sk));
-> +
->         hidp_session_terminate(session);
->  }
->
-> --
-> 2.5.1
->
+Steven Davies
