@@ -2,32 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH] audio/avrcp: Remove not needed null check in
-Date: Tue, 22 Sep 2015 20:56:52 +0200
-Message-Id: <1442948212-28447-1-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH] shared/gatt-helpers: Fix reporting discovery failure
+Date: Tue, 22 Sep 2015 20:09:10 +0200
+Message-Id: <1442945350-24346-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Browsing handlers are always getting valid pdu pointer so there is no
-need to double check that. Also pdu pointer is already dereferenced
-before calling handler.
+If sending ATT request failed discovery should be reported as failed.
+Due to missing goto success was overwritten with true value.
+This regression was introduced in db24bf09d66325a.
 ---
- profiles/audio/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/gatt-helpers.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 53170ec..24deac5 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1946,7 +1946,7 @@ static void avrcp_handle_get_folder_items(struct avrcp *session,
- 	uint8_t scope;
- 	uint8_t status = AVRCP_STATUS_SUCCESS;
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index c773df7..008b8bc 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -1490,6 +1490,7 @@ static void discover_descs_cb(uint8_t opcode, const void *pdu,
+ 			return;
  
--	if (!pdu || ntohs(pdu->param_len) < 10) {
-+	if (ntohs(pdu->param_len) < 10) {
- 		status = AVRCP_STATUS_INVALID_PARAM;
- 		goto failed;
+ 		success = false;
++		goto done;
  	}
+ 
+ 	success = true;
 -- 
 2.5.0
 
