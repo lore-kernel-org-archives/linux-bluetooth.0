@@ -1,28 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <560108E5.1010701@steev.me.uk>
+Date: Tue, 22 Sep 2015 08:53:09 +0100
+From: Steven Davies <linux-bluetooth-list@steev.me.uk>
 MIME-Version: 1.0
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Tue, 22 Sep 2015 10:41:03 +0200
-Message-ID: <CAEZxfGPDdgjcSwS6vK46Q4tMwdoD=SjV-te8chiERM-wnEP00w@mail.gmail.com>
-Subject: Disabling deviceinfo plugin on chromebooks?
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: BLE: dbus doesn't show GATT characteristics
+References: <56006696.3030200@steev.me.uk> <CAASrBQmWuCvyi6-DNAVvaaV2eFSeEVCy2Sr8QzPyy0Ckt0TQbg@mail.gmail.com>
+In-Reply-To: <CAASrBQmWuCvyi6-DNAVvaaV2eFSeEVCy2Sr8QzPyy0Ckt0TQbg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As the chromium team is building and testing the Web Bluetooth API to
-let websites discover and interact with nearby Bluetooth devices
-(https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web)
-I would love to be able to access the Device Information Service
-characteristics such as Serial Number String, Hardware Revision String
-and so forth.
 
-Sadly, from what I understood, this is not achievable for now on
-Chromeboooks since Bluez comes with the deviceinfo plugin enabled by
-default. I do wonder now what would be the implications of disabling
-the deviceinfo plugin?
-
-You will find more information at
-https://code.google.com/p/chromium/issues/detail?id=532930
-
-Thank you in advance,
-Francois - a daily Bluez user.
+>> I'm having a problem using BLE through dbus where the GATT services
+>> don't appear after a BLE device has been found during a scan. What is
+>> available through dbus is a Device1 node with the correct address and a
+>> Name property of the name which was sent in the advertising beacons -
+>> however that's the only node available in the tree.
+> Are you running bluetoothd with the experimental (-E) flag?
+Yes:
+~$ ps aux | grep bluetooth
+root      8277  0.0  0.1   4320  2628 ?        Ss   Sep21   0:00
+/usr/libexec/bluetooth/bluetoothd -E
