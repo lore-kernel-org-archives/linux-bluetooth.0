@@ -2,109 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH] policy: Add AutoEnable config option
-Date: Tue, 22 Sep 2015 23:42:49 +0200
-Message-Id: <1442958169-8453-1-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH] audio/avrcp: Remove not needed null check in
+Date: Tue, 22 Sep 2015 20:56:52 +0200
+Message-Id: <1442948212-28447-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This option is used to configure policy for auto enabling adapters when
-found. This includes adapters found on start as well as adapters that
-are plugged in later on.
-
-This allows distributions to automatically enable adapters in race free
-manner even if no agent is provided eg. in login screen.
+Browsing handlers are always getting valid pdu pointer so there is no
+need to double check that. Also pdu pointer is already dereferenced
+before calling handler.
 ---
- plugins/policy.c | 29 +++++++++++++++++++++++++++--
- src/main.conf    |  5 +++++
- 2 files changed, 32 insertions(+), 2 deletions(-)
+ profiles/audio/avrcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/plugins/policy.c b/plugins/policy.c
-index 6bb8268..218a3ed 100644
---- a/plugins/policy.c
-+++ b/plugins/policy.c
-@@ -80,6 +80,8 @@ static GSList *reconnects = NULL;
- static unsigned int service_id = 0;
- static GSList *devices = NULL;
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 53170ec..24deac5 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -1946,7 +1946,7 @@ static void avrcp_handle_get_folder_items(struct avrcp *session,
+ 	uint8_t scope;
+ 	uint8_t status = AVRCP_STATUS_SUCCESS;
  
-+static bool auto_enable = false;
-+
- struct policy_data {
- 	struct btd_device *dev;
- 
-@@ -743,6 +745,20 @@ static void conn_fail_cb(struct btd_device *dev, uint8_t status)
- 	reconnect_set_timer(reconnect);
- }
- 
-+static int policy_adapter_probe(struct btd_adapter *adapter)
-+{
-+	DBG("");
-+
-+	btd_adapter_restore_powered(adapter);
-+
-+	return 0;
-+}
-+
-+static struct btd_adapter_driver policy_driver = {
-+	.name	= "policy",
-+	.probe	= policy_adapter_probe,
-+};
-+
- static int policy_init(void)
- {
- 	GError *gerr = NULL;
-@@ -758,7 +774,7 @@ static int policy_init(void)
- 						sizeof(*reconnect_intervals);
- 		reconnect_intervals = g_memdup(default_intervals,
- 						reconnect_intervals_len);
--		goto add_cb;
-+		goto done;
+-	if (!pdu || ntohs(pdu->param_len) < 10) {
++	if (ntohs(pdu->param_len) < 10) {
+ 		status = AVRCP_STATUS_INVALID_PARAM;
+ 		goto failed;
  	}
- 
- 	reconnect_uuids = g_key_file_get_string_list(conf, "Policy",
-@@ -788,12 +804,18 @@ static int policy_init(void)
- 						reconnect_intervals_len);
- 	}
- 
--add_cb:
-+	auto_enable = g_key_file_get_boolean(conf, "Policy", "AutoEnable",
-+									NULL);
-+
-+done:
- 	if (reconnect_uuids && reconnect_uuids[0] && reconnect_attempts) {
- 		btd_add_disconnect_cb(disconnect_cb);
- 		btd_add_conn_fail_cb(conn_fail_cb);
- 	}
- 
-+	if (auto_enable)
-+		btd_register_adapter_driver(&policy_driver);
-+
- 	return 0;
- }
- 
-@@ -812,6 +834,9 @@ static void policy_exit(void)
- 	g_slist_free_full(devices, policy_remove);
- 
- 	btd_service_remove_state_cb(service_id);
-+
-+	if (auto_enable)
-+		btd_unregister_adapter_driver(&policy_driver);
- }
- 
- BLUETOOTH_PLUGIN_DEFINE(policy, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-diff --git a/src/main.conf b/src/main.conf
-index 6780d9a..372fd8c 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -82,3 +82,8 @@
- # If the number of attempts defined in ReconnectAttempts is bigger than the
- # set of intervals the last interval is repeated until the last attempt.
- #ReconnectIntervals=1, 2, 4, 8, 16, 32, 64
-+
-+# AutoEnable defines option to enable all controllers when they are found.
-+# This includes adapters present on start as well as adapters that are plugged
-+# in later on. Defaults to 'false'.
-+#AutoEnable=false
 -- 
 2.5.0
 
