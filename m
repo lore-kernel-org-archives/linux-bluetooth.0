@@ -1,40 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <560108E5.1010701@steev.me.uk>
-References: <56006696.3030200@steev.me.uk>
-	<CAASrBQmWuCvyi6-DNAVvaaV2eFSeEVCy2Sr8QzPyy0Ckt0TQbg@mail.gmail.com>
-	<560108E5.1010701@steev.me.uk>
-Date: Tue, 22 Sep 2015 13:12:40 +0300
-Message-ID: <CABBYNZJJo0YoiHkONvNer=4W=cmFbRZ23qR1kw3GdMLoAd=Lrg@mail.gmail.com>
-Subject: Re: BLE: dbus doesn't show GATT characteristics
+In-Reply-To: <CAEZxfGPDdgjcSwS6vK46Q4tMwdoD=SjV-te8chiERM-wnEP00w@mail.gmail.com>
+References: <CAEZxfGPDdgjcSwS6vK46Q4tMwdoD=SjV-te8chiERM-wnEP00w@mail.gmail.com>
+Date: Tue, 22 Sep 2015 13:05:40 +0300
+Message-ID: <CABBYNZ+GMyT8z8ujGGu3oMK1ffkdAuX21ZRu7Cf7eFpqS0jHuw@mail.gmail.com>
+Subject: Re: Disabling deviceinfo plugin on chromebooks?
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Steven Davies <linux-bluetooth-list@steev.me.uk>
+To: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steven,
+Hi François,
 
-On Tue, Sep 22, 2015 at 10:53 AM, Steven Davies
-<linux-bluetooth-list@steev.me.uk> wrote:
+On Tue, Sep 22, 2015 at 11:41 AM, François Beaufort
+<beaufort.francois@gmail.com> wrote:
+> As the chromium team is building and testing the Web Bluetooth API to
+> let websites discover and interact with nearby Bluetooth devices
+> (https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web)
+> I would love to be able to access the Device Information Service
+> characteristics such as Serial Number String, Hardware Revision String
+> and so forth.
+
+Looks like we don't parse these characteristics just PnP ID which is
+expose via Modalias property that has the information of product id
+and vendor id, etc.
+
+> Sadly, from what I understood, this is not achievable for now on
+> Chromeboooks since Bluez comes with the deviceinfo plugin enabled by
+> default. I do wonder now what would be the implications of disabling
+> the deviceinfo plugin?
+
+The way it works is that the plugin claims this service which prevent
+it to be accessible over D-Bus, you could in theory disable the plugin
+but I think we would benefit more if we add support for the missing
+information directly in BlueZ saving each application the trouble to
+read this information themselves.
+
+If I would do it in BlueZ Id probably add them as properties to
+org.bluez.Device1 and make sure we store them as we do with PnP ID.
+
+> You will find more information at
+> https://code.google.com/p/chromium/issues/detail?id=532930
 >
->>> I'm having a problem using BLE through dbus where the GATT services
->>> don't appear after a BLE device has been found during a scan. What is
->>> available through dbus is a Device1 node with the correct address and a
->>> Name property of the name which was sent in the advertising beacons -
->>> however that's the only node available in the tree.
->> Are you running bluetoothd with the experimental (-E) flag?
-> Yes:
-> ~$ ps aux | grep bluetooth
-> root      8277  0.0  0.1   4320  2628 ?        Ss   Sep21   0:00
-> /usr/libexec/bluetooth/bluetoothd -E
+> Thank you in advance,
+> Francois - a daily Bluez user.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-First and most important gatttool shall not be used along with
-bluetoothd, it is a stand alone tool for testing. That being said you
-need to connect in order to discover the attribute the remote device
-has, without that we only know about the UUIDs advertised nothing
-else.
 
 
 -- 
