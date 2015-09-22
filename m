@@ -1,83 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <228494b5f37cbb0aa440a679c26c6e54.squirrel@iwavesystems.com>
+In-Reply-To: <71b8da83b60d4739a7cf443599cf4b3f.squirrel@iwavesystems.com>
+References: <237bbd312054ce6433af002f5e1213c7.squirrel@iwavesystems.com>
+    <cc6ce416e935cb348f250e29710e1830.squirrel@iwavesystems.com>
+    <ffcbfaab275d957cf387eb690b6a81ea.squirrel@iwavesystems.com>
+    <2859057.ul7JxHffdl@leonov>
+    <71b8da83b60d4739a7cf443599cf4b3f.squirrel@iwavesystems.com>
+Date: Tue, 22 Sep 2015 01:13:23 -0400
+Subject: Re: GATT onWriteCharacteristic() returns status=1 (BT_STATUS_FAIL)
+From: krishnaks@iwavesystems.com
+To: krishnaks@iwavesystems.com
+Cc: "Szymon Janc" <ext.szymon.janc@tieto.com>,
+	krishnaks@iwavesystems.com, linux-bluetooth@vger.kernel.org
 MIME-Version: 1.0
-In-Reply-To: <E43CE124327DEB448881DE4DD408A8A323E808C1E9@AUSX7MCPS308.AMER.DELL.COM>
-References: <E43CE124327DEB448881DE4DD408A8A323E808BAD1@AUSX7MCPS308.AMER.DELL.COM>
-	<6E7C05F9-DAAE-4AC1-B735-BB7B2E8D333B@holtmann.org>
-	<E43CE124327DEB448881DE4DD408A8A323E808C1E9@AUSX7MCPS308.AMER.DELL.COM>
-Date: Tue, 22 Sep 2015 10:22:54 +0300
-Message-ID: <CABBYNZKzsqzKHoViQp4Y8OZigWzjwH5O+b2zZ5Q6b=3wZYqyLw@mail.gmail.com>
-Subject: Re: BlueZ - LGPL dependency with GPL headers and sources
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Trey_Ramsay@dell.com
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Arulnambi_Raju@dell.com,
-	Marie Janssen <jamuraa@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+>> Hi,
+>>
+>> On Monday 21 of September 2015 06:43:20 krishnaks@iwavesystems.com
+>> wrote:
+>>> Hi,
+>>>
+>>> I am using Bluez 5.33 on Android kitkat 4.4.3.
+>>> I am testing GATT functionality  and I found that sometime
+>>> onWriteCharacteristic returns status 1 (BT_STATUS_FAIL). In android
+>>> Application I am checking for success status (i.e. 0) which I am
+>>> getting
+>>> most of the time. But occasionally I am getting Status 1 because of
+>>> which
+>>> my application logic is failing.
+>>>
+>>> When Bluez will send Status 1 and on what basis? How to avoid this?
+>>>
+>>>
+>>> -----------------------Working Log-------------------------------
+>>> D/BluetoothGatt( 1359): writeCharacteristic() - uuid:
+>>> 1d4de0a0-9f84-11e4-a042-0002a5d5c51b
+>>> D/BtGatt.GattService( 1259): writeCharacteristic() -
+>>> address=00:00:39:36:85:2F
+>>> D/BtGatt.GattService( 1259): onWriteCharacteristic() -
+>>> address=00:00:39:36:85:2F, status=0
+>>> D/BluetoothGatt( 1359): onCharacteristicWrite() -
+>>> Device=00:00:39:36:85:2F
+>>> UUID=1d4de0a0-9f84-11e4-a042-0002a5d5c51b Status=0
+>>> ----------------------Log End-------------------------
+>>>
+>>>
+>>> --------------------------Failure Log---------------------------------
+>>> D/BluetoothGatt( 1359): writeCharacteristic() - uuid:
+>>> 1d4de0a0-9f84-11e4-a042-0002a5d5c51b
+>>> D/BtGatt.GattService( 1259): writeCharacteristic() -
+>>> address=00:00:39:36:85:2F
+>>> D/BtGatt.GattService( 1259): onWriteCharacteristic() -
+>>> address=00:00:39:36:85:2F, status=1
+>>> D/BluetoothGatt( 1359): onCharacteristicWrite() -
+>>> Device=00:00:39:36:85:2F
+>>> UUID=1d4de0a0-9f84-11e4-a042-0002a5d5c51b Status=1
+>>> --------------------------Log End-------------------------------
+>>
+>> Please enable debug logs for daemon (check android/README for how-to)
+>> and
+>> provide both debug logs and btmon HCI traces.
+>>
+>> --
+>> BR
+>> Szymon Janc
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe
+>> linux-bluetooth"
+>> in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
+> Hi,
+>
+> Attached Working and Failure logs with btmon HCI traces and with bluez
+> debug logs
+>
+> Regards,
+> KP
+>
 
 Hi,
 
-+Marie
+>From the log (attached in previous mail), From the btmon HCI traces,I am
+getting "Error: Invalid Handle (0x01)" error. I hope this error is not
+related to characteristics handle range.How to resolve this error/ find
+the cause?
 
-On Mon, Sep 21, 2015 at 8:58 PM,  <Trey_Ramsay@dell.com> wrote:
->> Hi Trey,
->>
->> > We are making a BLE only product for embedded system and cannot use
->> the whole bluez package due to lack of resources. We noticed that the BLE
->> specific code (src/shared) is licensed under LGPL and we are trying to
->> leverage the code as a shared library for our proprietary source BLE
->> application, similar to btgatt-server tool. While compiling, we noticed the
->> LPGL code has a dependency with the following header and source files
->> which are licensed as GPL.
->> >
->> > lib/bluetooth.h
->> > lib/hci.h
->> > lib/mgmt..h
->> > lib/uuid.c
->> > lib/uuid.h
->> > src/shared/ad.c
->> > src/shared/ad.h
->> >
->> > Are there plans to make the above files LGPL or LGPL compatible?
->>
->> the src/shared/ad.[ch] is actually a mistake. No code under GPL should have
->> been accepted into src/shared/ directory. That code is intentionally kept
->> LGPL only.
->>
->> > Are there any plans in the future to remove the GPL dependencies from
->> the LGPL code?
->>
->> The lib/uuid.[ch] is pretty old code and not really nicely abstracted in the first
->> place. However it has been used to speed up the development of the GATT
->> support. The plan is actually to replace that with a new implementation
->> src/shared/uuid.[ch] under LGPL that nicely integrates.
->>
-> How soon will this happen?  Do you need any help making this LGPL code?
+Log--->
 
-I guess we need to consent of the authors to change the ad.c.
+< ACL Data TX: Handle 64 flags 0x00 dlen 9                     [hci0]
+66.810476
+      ATT: Find Information Request (0x04) len 4
+        Handle range: 0x0633-0x0633
+> ACL Data RX: Handle 64 flags 0x02 dlen 10                    [hci0]
+66.944822
+      ATT: Find Information Response (0x05) len 5
+        Format: UUID-16 (0x01)
+        Handle: 0x0633
+> HCI Event: Number of Completed Packets (0x13) plen 5         [hci0]
+67.078076
+        Num handles: 1
+        Handle: 64
+        Count: 1
+> ACL Data RX: Handle 64 flags 0x02 dlen 9                     [hci0]
+72.209941
+      ATT: Error Response (0x01) len 4
+        Write Request (0x12)
+        Handle: 0x0241
+        Error: Invalid Handle (0x01)
+D/BtGatt.GattService(  829): onWriteCharacteristic() -
+address=00:00:39:36:85:2F, status=1
+D/BluetoothGatt( 1073): onCharacteristicWrite() - Device=00:00:39:36:85:2F
+UUID=1d4de0a0-9f84-11e4-a042-0002a5d5c51b Status=1
+I/HCSDP_COLLECTORLIB( 1073): Fail characteristic write.
 
-@Marie: Do you agree to change to LGPL (I suppose this was a mistake
-in the first place)? If you do, could you please send a patch to
-changing it?
+Regards,
+KP
 
->> The other three are just a bunch of defines or structs. However they are
->> kernel defines and structs and should be most likely come directly from the
->> kernel as UAPI. However we have never gotten around it to clean these up.
->> Some of this is part of the old libbluetooth (which is still internally required).
->> We are talking about 13 year old code here.
->>
-> Do you mean that it is ok for us to use the lib/*.h  files even though it's licensed as GPL?
-> The kernel headers are not exactly the same and may not be able to compile with the bluez package.
->
->> Regards
->>
->> Marcel
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
