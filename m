@@ -1,103 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mariusz Skamra <mariusz.skamra@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCHv2 1/6] emulator: Fix LE Connection Complete Event data
-Date: Wed, 23 Sep 2015 13:36:54 +0200
-Message-Id: <1443008219-15890-1-git-send-email-mariusz.skamra@tieto.com>
+Message-ID: <31b0cbbb19862da2e92e66593bdbfbd1.squirrel@iwavesystems.com>
+In-Reply-To: <0d7093fac6855c30739a0c25ba009bd8.squirrel@iwavesystems.com>
+References: <237bbd312054ce6433af002f5e1213c7.squirrel@iwavesystems.com>
+    <cc6ce416e935cb348f250e29710e1830.squirrel@iwavesystems.com>
+    <ffcbfaab275d957cf387eb690b6a81ea.squirrel@iwavesystems.com>
+    <2859057.ul7JxHffdl@leonov>
+    <71b8da83b60d4739a7cf443599cf4b3f.squirrel@iwavesystems.com>
+    <228494b5f37cbb0aa440a679c26c6e54.squirrel@iwavesystems.com>
+    <CABBYNZLfwjqL4aPDbVfJMBy88EgLrLZ5YH6gc6YWrdN=023riw@mail.gmail.com>
+    <0d7093fac6855c30739a0c25ba009bd8.squirrel@iwavesystems.com>
+Date: Wed, 23 Sep 2015 07:06:37 -0400
+Subject: Re: GATT onWriteCharacteristic() returns status=1 (BT_STATUS_FAIL)
+From: krishnaks@iwavesystems.com
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+	"Szymon Janc" <ext.szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This sets LE Connection Complete Event paramaters based on parameters
-from LE Create Connection command.
-Event parameters like Conn_Interval and Supervision_Timeout
-shouldn't be set to 0.
----
- emulator/btdev.c | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+Hi,
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index ceefd56..f3ef1ca 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -1095,8 +1095,8 @@ static void sco_conn_complete(struct btdev *btdev, uint8_t status)
- }
- 
- static void le_conn_complete(struct btdev *btdev,
--					const uint8_t *bdaddr, uint8_t bdaddr_type,
--					uint8_t status)
-+				const struct bt_hci_cmd_le_create_conn *lecc,
-+				uint8_t status)
- {
- 	char buf[1 + sizeof(struct bt_hci_evt_le_conn_complete)];
- 	struct bt_hci_evt_le_conn_complete *cc = (void *) &buf[1];
-@@ -1106,8 +1106,10 @@ static void le_conn_complete(struct btdev *btdev,
- 	buf[0] = BT_HCI_EVT_LE_CONN_COMPLETE;
- 
- 	if (!status) {
--		struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr,
--								bdaddr_type);
-+		struct btdev *remote;
-+
-+		remote = find_btdev_by_bdaddr_type(lecc->peer_addr,
-+							lecc->peer_addr_type);
- 
- 		btdev->conn = remote;
- 		btdev->le_adv_enable = 0;
-@@ -1123,6 +1125,9 @@ static void le_conn_complete(struct btdev *btdev,
- 
- 		cc->role = 0x01;
- 		cc->handle = cpu_to_le16(42);
-+		cc->interval = lecc->max_interval;
-+		cc->latency = lecc->latency;
-+		cc->supv_timeout = lecc->supv_timeout;
- 
- 		send_event(remote, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
- 
-@@ -1130,8 +1135,8 @@ static void le_conn_complete(struct btdev *btdev,
- 	}
- 
- 	cc->status = status;
--	cc->peer_addr_type = bdaddr_type;
--	memcpy(cc->peer_addr, bdaddr, 6);
-+	cc->peer_addr_type = lecc->peer_addr_type;
-+	memcpy(cc->peer_addr, lecc->peer_addr, 6);
- 	cc->role = 0x00;
- 
- 	send_event(btdev, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
-@@ -1173,16 +1178,17 @@ static bool adv_connectable(struct btdev *btdev)
- 	return btdev->le_adv_type != 0x03;
- }
- 
--static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
--							uint8_t bdaddr_type)
-+static void le_conn_request(struct btdev *btdev,
-+				const struct bt_hci_cmd_le_create_conn *lecc)
- {
--	struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr, bdaddr_type);
-+	struct btdev *remote = find_btdev_by_bdaddr_type(lecc->peer_addr,
-+							lecc->peer_addr_type);
- 
- 	if (remote && adv_connectable(remote) && adv_match(btdev, remote) &&
--					remote->le_adv_own_addr == bdaddr_type)
--		le_conn_complete(btdev, bdaddr, bdaddr_type, 0);
-+				remote->le_adv_own_addr == lecc->peer_addr_type)
-+		le_conn_complete(btdev, lecc, 0);
- 	else
--		le_conn_complete(btdev, bdaddr, bdaddr_type,
-+		le_conn_complete(btdev, lecc,
- 					BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH);
- }
- 
-@@ -3323,7 +3329,7 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 			return;
- 		lecc = data;
- 		btdev->le_scan_own_addr_type = lecc->own_addr_type;
--		le_conn_request(btdev, lecc->peer_addr, lecc->peer_addr_type);
-+		le_conn_request(btdev, lecc);
- 		break;
- 
- 	case BT_HCI_CMD_LE_CONN_UPDATE:
--- 
-2.4.3
+I have done more tests on GATT behavioud and I found that sometime RX not
+receiving for sent Tx and sometime Error RX response (Invalid Handle
+error) is coming for the sent TX.
+
+Shared both working and non working logs.
+
+---------------------------------Working Log -----
+
+< ACL Data TX: Handle 64 flags 0x00 dlen 9                    [hci0]
+641.405722
+      ATT: Write Request (0x12) len 4
+        Handle: 0x0212
+          Data: 0100
+D/BtGatt.GattService( 1501): writeDescriptor() - address=00:00:39:36:85:2F
+> ACL Data RX: Handle 64 flags 0x02 dlen 5                    [hci0]
+641.521811
+      ATT: Write Response (0x13) len 0
+D/BtGatt.GattService( 1501): onWriteDescriptor() -
+address=00:00:39:36:85:2F, status=0
+D/BluetoothGatt( 1552): onDescriptorWrite() - Device=00:00:39:36:85:2F
+UUID=00002a37-0000-1000-8000-00805f9b34fb
+I/HCSDP_COLLECTORLIB( 1552): Success descriptor write.
+
+-------------Log End----------------
+
+-----------------------RX not received Log -----
+< ACL Data TX: Handle 64 flags 0x00 dlen 9                    [hci0]
+644.161560
+      ATT: Write Request (0x12) len 4
+        Handle: 0x0212
+          Data: 0000
+D/BtGatt.GattService( 1501): writeDescriptor() - address=00:00:39:36:85:2F
+D/HCSDP_COLLECTORLIB( 1552): setRawDataMode() is called
+D/HCSDP_COLLECTORLIB( 1552): setRawDataMode() is called.
+D/HCSDP_COLLECTORLIB( 1552): Set RawDataMode: false
+//Notification RX received instead of Write response for Notify disable
+> ACL Data RX: Handle 64 flags 0x02 dlen 27                   [hci0]
+644.221687
+> ACL Data RX: Handle 64 flags 0x01 dlen 27                   [hci0]
+644.289321
+> ACL Data RX: Handle 64 flags 0x01 dlen 2                    [hci0]
+644.356445
+      ATT: Handle Value Notification (0x1b) len 51
+        Handle: 0x0411
+          Data:
+0108000a020000010800fd0100000108000102000001080005020000010800fd01000001080004020000010800f9010000
+D/BtGatt.GattService( 1501): onNotify() - address=00:00:39:36:85:2F,
+charUuid=1d11ff20-485b-11e4-8add-0002a5d5c51b, length=49
+D/BluetoothGatt( 1552): onNotify() - Device=00:00:39:36:85:2F
+UUID=1d11ff20-485b-11e4-8add-0002a5d5c51b
+----------------------Log End---------------
+
+
+----------------------------Working Log2------------------
+D/BluetoothGatt( 1073): writeCharacteristic() - uuid:
+1d4de0a0-9f84-11e4-a042-0002a5d5c51b
+< ACL Data TX: Handle 64 flags 0x00 dlen 8                    [hci0]
+176.499417
+      ATT: Write Request (0x12) len 3
+        Handle: 0x0241
+          Data: 00
+D/BtGatt.GattService(  829): writeCharacteristic() -
+address=00:00:39:36:85:2F
+> ACL Data RX: Handle 64 flags 0x02 dlen 5                    [hci0]
+176.545564
+      ATT: Write Response (0x13) len 0
+D/BtGatt.GattService(  829): onWriteCharacteristic() -
+address=00:00:39:36:85:2F, status=0
+D/BluetoothGatt( 1073): onCharacteristicWrite() - Device=00:00:39:36:85:2F
+UUID=1d4de0a0-9f84-11e4-a042-0002a5d5c51b Status=0
+I/HCSDP_COLLECTORLIB( 1073): Success characteristic write.
+
+----------------------------Log End----------------------
+
+
+
+------------------------Write Failure Log------------
+D/BluetoothGatt( 1073): writeCharacteristic() - uuid:
+1d4de0a0-9f84-11e4-a042-0002a5d5c51b
+< ACL Data TX: Handle 64 flags 0x00 dlen 8                     [hci0]
+72.124696
+      ATT: Write Request (0x12) len 3
+        Handle: 0x0241
+          Data: 00
+D/BtGatt.GattService(  829): writeCharacteristic() -
+address=00:00:39:36:85:2F
+I/audio_hw_primary(  189): start_output_stream... 2016783120, device 2
+W/audio_hw_primary(  189): card 1, port 0 device 0x2
+W/audio_hw_primary(  189): rate 48000, channel 2 period_size 0xc0
+> ACL Data RX: Handle 64 flags 0x02 dlen 9                     [hci0]
+72.209941
+      ATT: Error Response (0x01) len 4
+        Write Request (0x12)
+        Handle: 0x0241
+        Error: Invalid Handle (0x01)
+D/BtGatt.GattService(  829): onWriteCharacteristic() -
+address=00:00:39:36:85:2F, status=1
+D/BluetoothGatt( 1073): onCharacteristicWrite() - Device=00:00:39:36:85:2F
+UUID=1d4de0a0-9f84-11e4-a042-0002a5d5c51b Status=1
+I/HCSDP_COLLECTORLIB( 1073): Fail characteristic write.
+
+
+-------------------------Log End--------------
+
+
+Regards,
+KP
+
 
