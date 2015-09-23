@@ -1,80 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 2/5] Bluetooth: hci_bcm: Fix IRQ polarity for T100
-Date: Wed, 23 Sep 2015 18:18:08 +0200
-Message-Id: <1443025091-1864-3-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v5 1/5] Bluetooth: Add BT_WARN and bt_dev_warn logging macros
+Date: Wed, 23 Sep 2015 18:18:07 +0200
+Message-Id: <1443025091-1864-2-git-send-email-frederic.danis@linux.intel.com>
 In-Reply-To: <1443025091-1864-1-git-send-email-frederic.danis@linux.intel.com>
 References: <1443025091-1864-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ACPI table for BCM2E39 of T100TA is not correct.
-Set correct irq_polarity for this device.
+Add warning logging macros to bluetooth subsystem logs.
 
 Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
 ---
- drivers/bluetooth/hci_bcm.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ include/net/bluetooth/bluetooth.h |  5 +++++
+ net/bluetooth/lib.c               | 16 ++++++++++++++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index f306541..2cb5089 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -32,6 +32,7 @@
- #include <linux/gpio/consumer.h>
- #include <linux/tty.h>
- #include <linux/interrupt.h>
-+#include <linux/dmi.h>
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index f5ade85..c4defef 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -122,11 +122,14 @@ struct bt_voice {
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
++void bt_warn(const char *fmt, ...);
++__printf(1, 2)
+ void bt_err(const char *fmt, ...);
+ __printf(1, 2)
+ void bt_err_ratelimited(const char *fmt, ...);
  
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -513,6 +514,22 @@ static const struct acpi_gpio_mapping acpi_bcm_default_gpios[] = {
- };
+ #define BT_INFO(fmt, ...)	bt_info(fmt "\n", ##__VA_ARGS__)
++#define BT_WARN(fmt, ...)	bt_warn(fmt "\n", ##__VA_ARGS__)
+ #define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
+ #define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
  
- #ifdef CONFIG_ACPI
-+static u8 acpi_active_low = ACPI_ACTIVE_LOW;
-+
-+/* IRQ polarity of some chipsets are not defined correctly in ACPI table. */
-+static const struct dmi_system_id bcm_wrong_irq_dmi_table[] = {
-+	{
-+		.ident = "Asus T100TA",
-+		.matches = {
-+			DMI_EXACT_MATCH(DMI_SYS_VENDOR,
-+					"ASUSTeK COMPUTER INC."),
-+			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "T100TA"),
-+		},
-+		.driver_data = &acpi_active_low,
-+	},
-+	{ }
-+};
-+
- static int bcm_resource(struct acpi_resource *ares, void *data)
- {
- 	struct bcm_device *dev = data;
-@@ -552,6 +569,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 	const struct acpi_device_id *id;
- 	struct acpi_device *adev;
- 	LIST_HEAD(resources);
-+	const struct dmi_system_id *dmi_id;
- 	int ret;
+@@ -134,6 +137,8 @@ void bt_err_ratelimited(const char *fmt, ...);
  
- 	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
-@@ -608,6 +626,13 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 
- 	acpi_dev_get_resources(adev, &resources, bcm_resource, dev);
- 
-+	dmi_id = dmi_first_match(bcm_wrong_irq_dmi_table);
-+	if (dmi_id) {
-+		bt_dev_warn(dev, "%s: Overwriting IRQ polarity to active low",
-+			    dmi_id->ident);
-+		dev->irq_polarity = *(u8 *)dmi_id->driver_data;
-+	}
-+
- 	return 0;
+ #define bt_dev_info(hdev, fmt, ...)				\
+ 	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++#define bt_dev_warn(hdev, fmt, ...)				\
++	BT_WARN("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
+ #define bt_dev_err(hdev, fmt, ...)				\
+ 	BT_ERR("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
+ #define bt_dev_dbg(hdev, fmt, ...)				\
+diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
+index 8b4cdce..aa4cf64 100644
+--- a/net/bluetooth/lib.c
++++ b/net/bluetooth/lib.c
+@@ -151,6 +151,22 @@ void bt_info(const char *format, ...)
  }
- #else
+ EXPORT_SYMBOL(bt_info);
+ 
++void bt_warn(const char *format, ...)
++{
++	struct va_format vaf;
++	va_list args;
++
++	va_start(args, format);
++
++	vaf.fmt = format;
++	vaf.va = &args;
++
++	pr_warn("%pV", &vaf);
++
++	va_end(args);
++}
++EXPORT_SYMBOL(bt_warn);
++
+ void bt_err(const char *format, ...)
+ {
+ 	struct va_format vaf;
 -- 
 1.9.1
 
