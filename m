@@ -1,78 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 1/5] Bluetooth: Add BT_WARN and bt_dev_warn logging macros
-Date: Wed, 23 Sep 2015 18:18:07 +0200
-Message-Id: <1443025091-1864-2-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1443025091-1864-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1443025091-1864-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH v5 0/5] Bluetooth: hci_bcm: Add wake-up and PM runtime support
+Date: Wed, 23 Sep 2015 18:18:06 +0200
+Message-Id: <1443025091-1864-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add warning logging macros to bluetooth subsystem logs.
+Add wake-up capabilities by retrieveing interruption used by BCM device in ACPI
+table.
+Add PM runtime support.
 
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
----
- include/net/bluetooth/bluetooth.h |  5 +++++
- net/bluetooth/lib.c               | 16 ++++++++++++++++
- 2 files changed, 21 insertions(+)
+v4->v5:
+- Add bt_warn to to unify Bluetooth traces in BT_WARN
+- Change bcm_suspend_device/bcm_resume_device prototype to be usable directly
+  in SET_RUNTIME_PM_OPS. This allows to remove bcm_runtime_suspend/bcm_runtime_resume
+  which just call bcm_suspend_device/bcm_resume_device.
+- Update commit message and add comment in hci_uart_tty_receive to explain 
+  why spin_lock is not requested
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index f5ade85..c4defef 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -122,11 +122,14 @@ struct bt_voice {
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
- __printf(1, 2)
-+void bt_warn(const char *fmt, ...);
-+__printf(1, 2)
- void bt_err(const char *fmt, ...);
- __printf(1, 2)
- void bt_err_ratelimited(const char *fmt, ...);
- 
- #define BT_INFO(fmt, ...)	bt_info(fmt "\n", ##__VA_ARGS__)
-+#define BT_WARN(fmt, ...)	bt_warn(fmt "\n", ##__VA_ARGS__)
- #define BT_ERR(fmt, ...)	bt_err(fmt "\n", ##__VA_ARGS__)
- #define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
- 
-@@ -134,6 +137,8 @@ void bt_err_ratelimited(const char *fmt, ...);
- 
- #define bt_dev_info(hdev, fmt, ...)				\
- 	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-+#define bt_dev_warn(hdev, fmt, ...)				\
-+	BT_WARN("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
- #define bt_dev_err(hdev, fmt, ...)				\
- 	BT_ERR("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
- #define bt_dev_dbg(hdev, fmt, ...)				\
-diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index 8b4cdce..aa4cf64 100644
---- a/net/bluetooth/lib.c
-+++ b/net/bluetooth/lib.c
-@@ -151,6 +151,22 @@ void bt_info(const char *format, ...)
- }
- EXPORT_SYMBOL(bt_info);
- 
-+void bt_warn(const char *format, ...)
-+{
-+	struct va_format vaf;
-+	va_list args;
-+
-+	va_start(args, format);
-+
-+	vaf.fmt = format;
-+	vaf.va = &args;
-+
-+	pr_warn("%pV", &vaf);
-+
-+	va_end(args);
-+}
-+EXPORT_SYMBOL(bt_warn);
-+
- void bt_err(const char *format, ...)
- {
- 	struct va_format vaf;
+v3->v4:
+- Add new BT_WARN and bt_dev_warn logging macros
+- Use bt_dev_warn for T100 irq polarity fix
+- Rename __bcm_suspend to bcm_suspend_device,
+    and __bcm_resume to bcm_resume_device
+- Remove useless rx_lock spinlock. It is only used in hci_uart_tty_receive() which
+    is the receive_buf ldisc callback. This is already protected by flush_to_ldisc()
+    in drivers/tty/tty_buffer.c.
+    This allows to use mutex in bcm_recv() and call pm_runtime_* directly
+- Remove pm_work Work queue which is now useless
+- Delay auto-suspend only when reception of a packet is completed
+
+v2->v3:
+- Use DMI_EXACT_MATCH instead of DMI_MATCH
+- Fix IRQ polarity for T100TA in driver_data of dmi_system_id struct
+- Use dmi_first_match() instead of dmi_check_system()
+
+v1->v2:
+- Split 1st patch between general wake-up capability and T100TA IRQ fix
+- Replace multiple "if ... else if" by switch in bcm_resource()
+- Move code to limit number of #ifdef
+- Use DMI info to restrict IRQ to T100TA
+- Split 2nd patch to prepare PM runtime support in separated patch
+- Tested with and without CONFIG_PM_SLEEP and CONFIG_PM.
+
+Frederic Danis (5):
+  Bluetooth: Add BT_WARN and bt_dev_warn logging macros
+  Bluetooth: hci_bcm: Fix IRQ polarity for T100
+  Bluetooth: hci_bcm: Prepare PM runtime support
+  Bluetooth: Remove useless rx_lock spinlock
+  Bluetooth: hci_bcm: Add suspend/resume runtime PM functions
+
+ drivers/bluetooth/hci_bcm.c       | 171 +++++++++++++++++++++++++++++++-------
+ drivers/bluetooth/hci_ldisc.c     |   8 +-
+ drivers/bluetooth/hci_uart.h      |   1 -
+ include/net/bluetooth/bluetooth.h |   5 ++
+ net/bluetooth/lib.c               |  16 ++++
+ 5 files changed, 164 insertions(+), 37 deletions(-)
+
 -- 
 1.9.1
 
