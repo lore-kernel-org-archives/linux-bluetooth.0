@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1442948212-28447-1-git-send-email-szymon.janc@gmail.com>
-References: <1442948212-28447-1-git-send-email-szymon.janc@gmail.com>
-Date: Wed, 23 Sep 2015 10:56:17 +0300
-Message-ID: <CABBYNZJ3q=9gJR6EHgLULcNZ_GgpS7+BEEa6F+KXEZ077WOymg@mail.gmail.com>
-Subject: Re: [PATCH] audio/avrcp: Remove not needed null check in
+In-Reply-To: <1442945350-24346-1-git-send-email-szymon.janc@gmail.com>
+References: <1442945350-24346-1-git-send-email-szymon.janc@gmail.com>
+Date: Wed, 23 Sep 2015 10:55:55 +0300
+Message-ID: <CABBYNZL4BkHO_Mz7UvROBD0V5qYu7oHaUfMKW7OPNcME06oowA@mail.gmail.com>
+Subject: Re: [PATCH] shared/gatt-helpers: Fix reporting discovery failure
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Szymon Janc <szymon.janc@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -14,27 +14,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Szymon,
 
-On Tue, Sep 22, 2015 at 9:56 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
-> Browsing handlers are always getting valid pdu pointer so there is no
-> need to double check that. Also pdu pointer is already dereferenced
-> before calling handler.
+On Tue, Sep 22, 2015 at 9:09 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
+> If sending ATT request failed discovery should be reported as failed.
+> Due to missing goto success was overwritten with true value.
+> This regression was introduced in db24bf09d66325a.
 > ---
->  profiles/audio/avrcp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  src/shared/gatt-helpers.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 53170ec..24deac5 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -1946,7 +1946,7 @@ static void avrcp_handle_get_folder_items(struct avrcp *session,
->         uint8_t scope;
->         uint8_t status = AVRCP_STATUS_SUCCESS;
+> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+> index c773df7..008b8bc 100644
+> --- a/src/shared/gatt-helpers.c
+> +++ b/src/shared/gatt-helpers.c
+> @@ -1490,6 +1490,7 @@ static void discover_descs_cb(uint8_t opcode, const void *pdu,
+>                         return;
 >
-> -       if (!pdu || ntohs(pdu->param_len) < 10) {
-> +       if (ntohs(pdu->param_len) < 10) {
->                 status = AVRCP_STATUS_INVALID_PARAM;
->                 goto failed;
+>                 success = false;
+> +               goto done;
 >         }
+>
+>         success = true;
 > --
 > 2.5.0
 
