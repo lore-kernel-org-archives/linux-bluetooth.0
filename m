@@ -2,55 +2,30 @@ Return-Path: <cyrus@holtmann.org>
 From: Mariusz Skamra <mariusz.skamra@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mariusz Skamra <mariusz.skamra@tieto.com>
-Subject: [PATCHv2 6/6] emulator: Refactor le set scan enable command handler
-Date: Wed, 23 Sep 2015 13:36:59 +0200
-Message-Id: <1443008219-15890-6-git-send-email-mariusz.skamra@tieto.com>
+Subject: [PATCHv2 5/6] emulator: Enable Slave-initiated Features Exchange feature
+Date: Wed, 23 Sep 2015 13:36:58 +0200
+Message-Id: <1443008219-15890-5-git-send-email-mariusz.skamra@tieto.com>
 In-Reply-To: <1443008219-15890-1-git-send-email-mariusz.skamra@tieto.com>
 References: <1443008219-15890-1-git-send-email-mariusz.skamra@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-le_set_scan_enable_complete should be called as post hook action.
 ---
- emulator/btdev.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ emulator/btdev.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 7ff750d..e8cead8 100644
+index a3c73d9..7ff750d 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -3005,8 +3005,6 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 			status = BT_HCI_ERR_SUCCESS;
- 		}
- 		cmd_complete(btdev, opcode, &status, sizeof(status));
--		if (status == BT_HCI_ERR_SUCCESS && btdev->le_scan_enable)
--			le_set_scan_enable_complete(btdev);
- 		break;
+@@ -567,6 +567,7 @@ static void set_le_features(struct btdev *btdev)
  
- 	case BT_HCI_CMD_LE_CREATE_CONN:
-@@ -3254,6 +3252,7 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 	const struct bt_hci_cmd_le_conn_update *lecu;
- 	const struct bt_hci_cmd_le_conn_param_req_reply *lcprr;
- 	const struct bt_hci_cmd_le_conn_param_req_neg_reply *lcprnr;
-+	const struct bt_hci_cmd_le_set_scan_enable *lsse;
- 
- 	switch (opcode) {
- 	case BT_HCI_CMD_INQUIRY:
-@@ -3441,6 +3440,14 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 		rej_le_conn_update(btdev, le16_to_cpu(lcprnr->handle),
- 					le16_to_cpu(lcprnr->reason));
- 		break;
-+		break;
-+	case BT_HCI_CMD_LE_SET_SCAN_ENABLE:
-+		if (btdev->type == BTDEV_TYPE_BREDR)
-+			return;
-+		lsse = data;
-+		if (btdev->le_scan_enable && lsse->enable)
-+			le_set_scan_enable_complete(btdev);
-+
- 	}
+ 	btdev->le_features[0] |= 0x01;	/* LE Encryption */
+ 	btdev->le_features[0] |= 0x02;	/* Connection Parameters Request */
++	btdev->le_features[0] |= 0x08;	/* Slave-initiated Features Exchange */
  }
  
+ static void set_amp_features(struct btdev *btdev)
 -- 
 2.4.3
 
