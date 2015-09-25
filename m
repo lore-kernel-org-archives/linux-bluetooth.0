@@ -3,9 +3,9 @@ From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
 To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
 	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth:btmrvl_sdio: Comparison to NULL re-written
-Date: Fri, 25 Sep 2015 09:04:18 +0000
-Message-ID: <20150925090413.GA5396@jci-VirtualBox>
+Subject: [PATCH] Bluetooth:btmrvl_main : Comparison to NULL re-written
+Date: Fri, 25 Sep 2015 09:03:14 +0000
+Message-ID: <20150925090310.GA5369@jci-VirtualBox>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -17,23 +17,23 @@ by checkpatch.
 
 Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
 ---
- drivers/bluetooth/btmrvl_sdio.c | 2 +-
+ drivers/bluetooth/btmrvl_main.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdi=
-o.c
-index b9978a7..4487183 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -619,7 +619,7 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_priva=
-te *priv)
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_mai=
+n.c
+index bc110f6..050ad6b 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -184,7 +184,7 @@ static int btmrvl_send_sync_cmd(struct btmrvl_private *=
+priv, u16 opcode,
+ 	}
 =20
- 	/* Allocate buffer */
- 	skb =3D bt_skb_alloc(num_blocks * blksz + BTSDIO_DMA_ALIGN, GFP_ATOMIC);
+ 	skb =3D bt_skb_alloc(HCI_COMMAND_HDR_SIZE + len, GFP_ATOMIC);
 -	if (skb =3D=3D NULL) {
 +	if (!skb) {
  		BT_ERR("No free skb");
- 		ret =3D -ENOMEM;
- 		goto exit;
+ 		return -ENOMEM;
+ 	}
 --=20
 1.9.1
