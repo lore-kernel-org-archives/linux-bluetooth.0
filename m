@@ -1,31 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH] Bluetooth:bluecard: Comparison to NULL could be  re-written
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150925075856.GA4706@jci-VirtualBox>
-Date: Fri, 25 Sep 2015 10:20:15 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <A93EBB4B-E6B4-4833-81B9-B0F075B66A48@holtmann.org>
-References: <20150925075856.GA4706@jci-VirtualBox>
-To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
+	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth:bluecard: Comparison to NULL could be  re-written
+Date: Fri, 25 Sep 2015 07:59:18 +0000
+Message-ID: <20150925075856.GA4706@jci-VirtualBox>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prasanna,
+From: Prasanna Karthik <mkarthi3@visteon.com>
 
-> replaced 'not null' comparison that is readable, reported by checkpatch.
-> 
-> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
-> ---
-> drivers/bluetooth/bluecard_cs.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+replaced 'not null' comparison that is readable, reported by checkpatch.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+---
+ drivers/bluetooth/bluecard_cs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards
-
-Marcel
-
+diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_c=
+s.c
+index 35e63aa..25b7166 100644
+--- a/drivers/bluetooth/bluecard_cs.c
++++ b/drivers/bluetooth/bluecard_cs.c
+@@ -390,7 +390,7 @@ static void bluecard_receive(struct bluecard_info *info=
+,
+ 	for (i =3D 0; i < len; i++) {
+=20
+ 		/* Allocate packet */
+-		if (info->rx_skb =3D=3D NULL) {
++		if (!info->rx_skb) {
+ 			info->rx_state =3D RECV_WAIT_PACKET_TYPE;
+ 			info->rx_count =3D 0;
+ 			info->rx_skb =3D bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
+--=20
+1.9.1
