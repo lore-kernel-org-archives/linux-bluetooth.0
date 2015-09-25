@@ -1,29 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: rfcomm sockets
+Subject: Re: [PATCH] Bluetooth:btmrvl_main : Comparison to NULL re-written
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CA+V-a8v1DaXL=S850KWaBt-ykDGr_533y8bAkpKq+NMoiVRncA@mail.gmail.com>
-Date: Fri, 25 Sep 2015 17:05:20 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0582BDEB-2274-4130-B13A-C122B86FFDAA@holtmann.org>
-References: <CA+V-a8v1DaXL=S850KWaBt-ykDGr_533y8bAkpKq+NMoiVRncA@mail.gmail.com>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+In-Reply-To: <20150925090310.GA5369@jci-VirtualBox>
+Date: Fri, 25 Sep 2015 17:03:37 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <0B452EA2-84CF-4E0B-B635-06E07F4B2598@holtmann.org>
+References: <20150925090310.GA5369@jci-VirtualBox>
+To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prabhakar,
+Hi Prasanna,
 
-> I am using 5.34 bluez-5 stack on linux kernel version 3.14. when I
-> create rfcomm connection and do cat /dev/rfcomm0 and from other
-> terminal send AT commands to rfcomm0 I get proper response and other
-> characters continuously(> ??? ...) echoed from rfcomm0.
-> If I do the same from bluez4-101 I get proper response with no other characters.
+> NOT NULL comparison modified to be readable, reported
+> by checkpatch.
 > 
-> What is the proper way to do rfcomm communication ? I am trying to
-> connect to a OBD device via rfcom socket.
+> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+> ---
+> drivers/bluetooth/btmrvl_main.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-the /dev/rfcomm0 is a TTY. You have to set it to the right mode (most cases raw mode) to make sure that no extra characters are inserted. If you use rfcomm connect command, then the --raw switch might help.
+both patches have been applied to bluetooth-next tree.
 
 Regards
 
