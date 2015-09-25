@@ -1,25 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
+	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth:btuart_cs: Comparison to NULL re-written
+Date: Fri, 25 Sep 2015 09:05:04 +0000
+Message-ID: <20150925090500.GA5419@jci-VirtualBox>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Fri, 25 Sep 2015 11:45:39 +0100
-Message-ID: <CA+V-a8v1DaXL=S850KWaBt-ykDGr_533y8bAkpKq+NMoiVRncA@mail.gmail.com>
-Subject: rfcomm sockets
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Prasanna Karthik <mkarthi3@visteon.com>
 
-I am using 5.34 bluez-5 stack on linux kernel version 3.14. when I
-create rfcomm connection and do cat /dev/rfcomm0 and from other
-terminal send AT commands to rfcomm0 I get proper response and other
-characters continuously(> ??? ...) echoed from rfcomm0.
-If I do the same from bluez4-101 I get proper response with no other characters.
+NOT NULL comparison modified to be readable, reported
+by checkpatch.
 
-What is the proper way to do rfcomm communication ? I am trying to
-connect to a OBD device via rfcom socket.
+Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+---
+ drivers/bluetooth/btuart_cs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-Cheers,
---Prabhakar Lad
+diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
+index abb4d21..dfaa1c9 100644
+--- a/drivers/bluetooth/btuart_cs.c
++++ b/drivers/bluetooth/btuart_cs.c
+@@ -188,7 +188,7 @@ static void btuart_receive(struct btuart_info *info)
+ 		info->hdev->stat.byte_rx++;
+=20
+ 		/* Allocate packet */
+-		if (info->rx_skb =3D=3D NULL) {
++		if (!info->rx_skb) {
+ 			info->rx_state =3D RECV_WAIT_PACKET_TYPE;
+ 			info->rx_count =3D 0;
+ 			info->rx_skb =3D bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
+--=20
+1.9.1
