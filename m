@@ -1,72 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+Subject: Re: BLE: dbus doesn't show GATT characteristics
+References: <56006696.3030200@steev.me.uk>
+ <CAASrBQmWuCvyi6-DNAVvaaV2eFSeEVCy2Sr8QzPyy0Ckt0TQbg@mail.gmail.com>
+ <560108E5.1010701@steev.me.uk>
+ <CABBYNZJJo0YoiHkONvNer=4W=cmFbRZ23qR1kw3GdMLoAd=Lrg@mail.gmail.com>
+ <56015B46.90505@steev.me.uk>
+ <CABBYNZJb5cETazND4Oo5oaKs-aF5e1cXgYtjF7dLyUk_pQWWUw@mail.gmail.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+From: linux-bluetooth-list@steev.me.uk
+Message-ID: <5606C125.5090103@steev.me.uk>
+Date: Sat, 26 Sep 2015 17:00:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJZ5v0i+xJ4U13vCVsvXc7S8wP0AokbmNXPidBkDwbjXMM8fCw@mail.gmail.com>
-References: <e28c4b4deaf766910c366ab87b64325da59c8ad6.1443198783.git.viresh.kumar@linaro.org>
-	<4357538.Wlf88yQie6@vostro.rjw.lan>
-	<CAKohpok2Z2m7GZt1GzZzofeHEioF=XJEq8YVgtY=VtS9tmpb_Q@mail.gmail.com>
-	<2524822.pQu4UKMrlb@vostro.rjw.lan>
-	<20150925214438.GH5951@linux>
-	<CAJZ5v0i+xJ4U13vCVsvXc7S8wP0AokbmNXPidBkDwbjXMM8fCw@mail.gmail.com>
-Date: Sat, 26 Sep 2015 11:40:00 -0700
-Message-ID: <CAKohpok0A3JRhVCabscfJGuhJerWmypsQnwdqJcmvBBWdpvPwQ@mail.gmail.com>
-Subject: Re: [PATCH V4 1/2] ACPI / EC: Fix broken 64bit big-endian users of 'global_lock'
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Linaro Kernel Mailman List <linaro-kernel@lists.linaro.org>,
-	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
-	Intel Linux Wireless <ilw@linux.intel.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Linux ACPI <linux-acpi@vger.kernel.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"open list:NETWORKING DRIVERS (WIRELESS)"
-	<linux-wireless@vger.kernel.org>,
-	"open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
-	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:"
-	<linux-usb@vger.kernel.org>,
-	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..."
-	<alsa-devel@alsa-project.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CABBYNZJb5cETazND4Oo5oaKs-aF5e1cXgYtjF7dLyUk_pQWWUw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 25 September 2015 at 15:19, Rafael J. Wysocki <rafael@kernel.org> wrote:
-> So if you allow something like debugfs to update your structure, how
-> do you make sure there is the proper locking?
+Hi Luiz,
 
-Not really sure at all.. Isn't there some debugfs locking that will
-jump in, to avoid updation of fields to the same device?
+>>>>>> I'm having a problem using BLE through dbus where the GATT services
+>>>>>> don't appear after a BLE device has been found during a scan. What is
+>>>>>> available through dbus is a Device1 node with the correct address and a
+>>>>>> Name property of the name which was sent in the advertising beacons -
+>>>>>> however that's the only node available in the tree.
+>>>>> Are you running bluetoothd with the experimental (-E) flag?
+>>>> Yes:
+>>>> ~$ ps aux | grep bluetooth
+>>>> root      8277  0.0  0.1   4320  2628 ?        Ss   Sep21   0:00
+>>>> /usr/libexec/bluetooth/bluetoothd -E
+>>> First and most important gatttool shall not be used along with
+>>> bluetoothd, it is a stand alone tool for testing. That being said you
+>>> need to connect in order to discover the attribute the remote device
+>>> has, without that we only know about the UUIDs advertised nothing
+>>> else.
+>> Yes - I was using gatttool to prove I could still connect without going
+>> through bluetoothd. Should I expect the GATT UUIDs, services and so on
+>> to be available through dbus once I've called Connect on the device?
+> 
+> If you connect using gatttool it will prevent bluetoothd to discover
+> the attributes.
+> 
+>> What I was seeing yesterday was that after calling Connect the nodes in
+>> dbus don't change so I still can't see the GATT bits. Is there a code
+>> path I could look through to see why this is?
+> 
+> Start bluetoothd with -d option for printing the debugs, then start
+> btmon and finally use bluetoothctl to connect, if all goes fine
+> bluetoothctl will print the attributes found.
 
-> Is that not a problem in all of the places modified by the [2/2]?
+I did this and it showed where I was going wrong: upon first discovery
+and connection, it takes approximately 15 seconds for the devices to
+register all their GATT services. I simply wasn't waiting long enough
+for all the dbus nodes to be populated.
 
-Right, but its not new AFAICT.
+However I do have another issue and I'll post again if I can't figure it
+out. Thanks for the help!
 
-We already have u32 fields in those structs and on 64 bit machines
-we have the same read-update-write problems for two consecutive
-u32's. Right?
-
-> How can the future users of the API know what to do to avoid potential
-> problems with it?
-
-No idea really :)
-
->> Anyway, that problem isn't here for sure as its between two
->> unsigned-longs. So, should I just move it to bool and resend ?
->
-> I guess it might be more convenient to fold this into the other patch,
-> because we seem to be splitting hairs here.
-
-I can and that's what I did. But then Arnd asked me to separate it
-out. I can fold it back if that's what you want.
-
---
-viresh
+Regards
+Steven Davies
