@@ -1,74 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linaro-kernel@lists.linaro.org,
-	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
-	Intel Linux Wireless <ilw@linux.intel.com>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-acpi@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	iommu@lists.linux-foundation.org,
-	netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-edac@vger.kernel.org,
-	linux-mm@kvack.org,
-	alsa-devel@alsa-project.org
-Subject: [PATCH V5 1/2] ACPI / EC: Fix broken 64bit big-endian users of 'global_lock'
-Date: Sat, 26 Sep 2015 15:04:06 -0700
-Message-Id: <8d3d3428c3a36f821e4c3d8563d094ca4b4763fd.1443304934.git.viresh.kumar@linaro.org>
+Subject: Re: Unable to connect to device after connected_callback() has run
+References: <5606F366.3040207@steev.me.uk>
+ <CAD0=r8zVkFUQC7Xw3i5MG-oees0tScSJz=5Toao=rSNo4xckrA@mail.gmail.com>
+ <5606F9C4.2060307@steev.me.uk>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+From: Steven Davies <linux-bluetooth-list@steev.me.uk>
+Message-ID: <5607004C.7020002@steev.me.uk>
+Date: Sat, 26 Sep 2015 21:30:04 +0100
+MIME-Version: 1.0
+In-Reply-To: <5606F9C4.2060307@steev.me.uk>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-global_lock is defined as an unsigned long and accessing only its lower
-32 bits from sysfs is incorrect, as we need to consider other 32 bits
-for big endian 64-bit systems. There are no such platforms yet, but the
-code needs to be robust for such a case.
+Hi Jakub,
 
-Fix that by changing type of 'global_lock' to u32.
+>>> Following on from my problems with GATT discovery, I now have another
+>>> issue: I have a Python program which waits for the Connected=True
+>>> PropertiesChanged callback from dbus, then sends a WriteValue to a
+>>> GattCharacteristic1 interface.
+>>>
+>>> The issue is that immediately after the Connected=True message comes
+>>> back, a WriteValue fails with "DBusException: org.bluez.Error.Failed:
+>>> Not connected". However, calling the WriteValue a few seconds later
+>>> executes correctly.
+>>
+>> I had same issue, and I sent patches to fix it around 2 weeks ago.
+>> Which version of  bluetoothd are you using ?
+>> Can you retry when running from repository master ?
+> 
+> Apologies for clicking send too soon on the last message. I can see you
+> and Luiz created patches for this so I'll pull the latest from master
+> and try. Currently I'm using the 5.34 release. I'll report back once
+> I've done that.
 
-Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
----
-BCC'd a lot of people (rather than cc'ing them) to make sure
-- the series reaches them
-- mailing lists do not block the patchset due to long cc list
-- and we don't spam the BCC'd people for every reply
+Yep - worked as described. With the latest from bluez master I don't see
+any issues. Roll on 5.35!
 
-V4->V5:
-- Switch back to the original solution of making global_lock u32.
----
- drivers/acpi/ec_sys.c   | 2 +-
- drivers/acpi/internal.h | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/acpi/ec_sys.c b/drivers/acpi/ec_sys.c
-index b4c216bab22b..bea8e425a8de 100644
---- a/drivers/acpi/ec_sys.c
-+++ b/drivers/acpi/ec_sys.c
-@@ -128,7 +128,7 @@ static int acpi_ec_add_debugfs(struct acpi_ec *ec, unsigned int ec_device_count)
- 	if (!debugfs_create_x32("gpe", 0444, dev_dir, (u32 *)&first_ec->gpe))
- 		goto error;
- 	if (!debugfs_create_bool("use_global_lock", 0444, dev_dir,
--				 (u32 *)&first_ec->global_lock))
-+				 &first_ec->global_lock))
- 		goto error;
- 
- 	if (write_support)
-diff --git a/drivers/acpi/internal.h b/drivers/acpi/internal.h
-index 9e426210c2a8..9db196de003c 100644
---- a/drivers/acpi/internal.h
-+++ b/drivers/acpi/internal.h
-@@ -138,7 +138,7 @@ struct acpi_ec {
- 	unsigned long gpe;
- 	unsigned long command_addr;
- 	unsigned long data_addr;
--	unsigned long global_lock;
-+	u32 global_lock;
- 	unsigned long flags;
- 	unsigned long reference_count;
- 	struct mutex mutex;
--- 
-2.4.0
+Regards
+Steven Davies
