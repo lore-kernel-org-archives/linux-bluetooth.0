@@ -1,48 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
-To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
-	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth:hci_qca: Changed unsigned long to bool
-Date: Mon, 28 Sep 2015 06:29:07 +0000
-Message-ID: <20150928062901.GA5935@jci-VirtualBox>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <CAJPN1uvPyZ+hZ64_0ZXU9wPLuAR-qm06GrRmHTjc9+rgiChYDQ@mail.gmail.com>
+References: <e28c4b4deaf766910c366ab87b64325da59c8ad6.1443198783.git.viresh.kumar@linaro.org>
+	<CAJPN1uvPyZ+hZ64_0ZXU9wPLuAR-qm06GrRmHTjc9+rgiChYDQ@mail.gmail.com>
+Date: Sun, 27 Sep 2015 07:35:20 -0700
+Message-ID: <CAKohpo=s9A_M5FphkvmXutWNzxewCimBUv-mK75tO6nrp3-3AA@mail.gmail.com>
+Subject: Re: [PATCH V4 1/2] ACPI / EC: Fix broken 64bit big-endian users of 'global_lock'
+From: Viresh Kumar <viresh.kumar@linaro.org>
+To: Jiri Slaby <jirislaby@gmail.com>
+Cc: "open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
+	Linux ACPI <linux-acpi@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
+	Intel Linux Wireless <ilw@linux.intel.com>,
+	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..."
+	<alsa-devel@alsa-project.org>,
+	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:"
+	<linux-usb@vger.kernel.org>,
+	Linaro Kernel Mailman List <linaro-kernel@lists.linaro.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
+	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
+	"open list:NETWORKING DRIVERS (WIRELESS)"
+	<linux-wireless@vger.kernel.org>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Prasanna Karthik <mkarthi3@visteon.com>
+On 26 September 2015 at 22:31, Jiri Slaby <jirislaby@gmail.com> wrote:
+> But this has to crash whenever the file is read as val's storage is gone at
+> that moment already, right?
 
-'retransmit' being set in HCI_IBS_TX_WAKING case,
-using bool would be efficient.
-
-Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
----
- drivers/bluetooth/hci_qca.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 21f4ea4..3fdb17d 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -347,7 +347,7 @@ static void hci_ibs_wake_retrans_timeout(unsigned long =
-arg)
- 	struct hci_uart *hu =3D (struct hci_uart *)arg;
- 	struct qca_data *qca =3D hu->priv;
- 	unsigned long flags, retrans_delay;
--	unsigned long retransmit =3D 0;
-+	bool retransmit;
-=20
- 	BT_DBG("hu %p wake retransmit timeout in %d state",
- 		hu, qca->tx_ibs_state);
-@@ -358,7 +358,7 @@ static void hci_ibs_wake_retrans_timeout(unsigned long =
-arg)
- 	switch (qca->tx_ibs_state) {
- 	case HCI_IBS_TX_WAKING:
- 		/* No WAKE_ACK, retransmit WAKE */
--		retransmit =3D 1;
-+		retransmit =3D true;
- 		if (send_hci_ibs_cmd(HCI_IBS_WAKE_IND, hu) < 0) {
- 			BT_ERR("Failed to acknowledge device wake up");
- 			break;
---=20
-1.9.1
+Yeah, its fixed now in the new version. This was a *really* bad idea :(
