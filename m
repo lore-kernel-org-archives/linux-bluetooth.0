@@ -1,425 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org,
-	broonie@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH v2] regmap: Add HCI iBT support
-Date: Mon, 28 Sep 2015 18:30:33 +0200
-Message-Id: <1443457833-5135-1-git-send-email-loic.poulain@intel.com>
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'James Bottomley' <James.Bottomley@HansenPartnership.com>
+CC: "'Rafael J. Wysocki'" <rjw@rjwysocki.net>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+	Linaro Kernel Mailman List <linaro-kernel@lists.linaro.org>,
+	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
+	Intel Linux Wireless <ilw@linux.intel.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Linux ACPI <linux-acpi@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"open list:NETWORKING DRIVERS (WIRELESS)"
+	<linux-wireless@vger.kernel.org>,
+	"open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
+	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:"
+	<linux-usb@vger.kernel.org>,
+	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..."
+	<alsa-devel@alsa-project.org>
+Subject: RE: [PATCH V4 1/2] ACPI / EC: Fix broken 64bit big-endian users of
+ 'global_lock'
+Date: Mon, 28 Sep 2015 15:31:17 +0000
+Message-ID: <063D6719AE5E284EB5DD2968C1650D6D1CBA42F5@AcuExch.aculab.com>
+References: <e28c4b4deaf766910c366ab87b64325da59c8ad6.1443198783.git.viresh.kumar@linaro.org>
+	 <2524822.pQu4UKMrlb@vostro.rjw.lan>
+	 <1443297128.2181.11.camel@HansenPartnership.com>
+	 <3461169.v5xKdGLGjP@vostro.rjw.lan>
+	 <063D6719AE5E284EB5DD2968C1650D6D1CBA3BF7@AcuExch.aculab.com>
+	 <1443450406.2168.3.camel@HansenPartnership.com>
+	 <063D6719AE5E284EB5DD2968C1650D6D1CBA4232@AcuExch.aculab.com>
+ <1443453111.2168.9.camel@HansenPartnership.com>
+In-Reply-To: <1443453111.2168.9.camel@HansenPartnership.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support for Intel Bluetooth silicon register access over HCI.
-Intel BT/FM combo chip allows to read/write some registers (e.g. FM
-registers) via its HCI interface.
-
-Read/Write operations are performed via a HCI transaction composed of
-a HCI command (host->controller) followed by a HCI command complete
-event (controller->host). Read/Write Command opcodes can be specified
-to the regmap init function.
-We define data formats which are intel/vendor specific.
-
-Register Read/Write HCI command payload (Host):
-Field: | REG ADDR | MODE | DATA_LEN | DATA... |
-size:  |   32b    |  8b  |    8b    |  8b*    |
-
-Register Read HCI command complete event payload (Controller):
-Field: | CMD STATUS | REG ADDR | DATA... |
-size:  |     8b     |   32b    |  8b*    |
-
-Register Write HCI command complete event payload (Controller):
-Field: | CMD_STATUS |
-size:  |     8b     |
-
-Since this payload is HCI encapsulated, Little Endian byte order is
-used.
-
-Write/Read Example:
-
-If we write 0x0000002a at address 0x00008c04, with opcode_write 0xfc5d,
-The resulting transaction is (btmon trace):
-
-< HCI Command (0x3f|0x005d) plen 10 [hci0]
-        04 8c 00 00 02 04 2a 00 00 00
-> HCI Event (0x0e) plen 4
-      Unknown (0x3f|0x005d) ncmd 1
-        00
-
-Then, if we read the same register with opcode_read 0xfc5e:
-
-< HCI Command (0x3f|0x005e) plen 6 [hci0]
-        04 8c 00 00 02 04
-> HCI Event (0x0e) plen 12 [hci0]
-      Unknown (0x3f|0x005e) ncmd 1
-        00 04 8c 00 00 2a 00 00 00
-
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- v2: Change "hci" to "ibt" since it's intel specific
-     Add comments for clarification
-     Remove unjustified default opcodes
-     Protect __hci_cmd_sync call with hdev req_lock
-     Replace BUG_ON with WARN_ONCE
-
- drivers/base/regmap/Kconfig      |   6 +-
- drivers/base/regmap/Makefile     |   1 +
- drivers/base/regmap/regmap-ibt.c | 283 +++++++++++++++++++++++++++++++++++++++
- include/linux/regmap.h           |   7 +
- 4 files changed, 296 insertions(+), 1 deletion(-)
- create mode 100644 drivers/base/regmap/regmap-ibt.c
-
-diff --git a/drivers/base/regmap/Kconfig b/drivers/base/regmap/Kconfig
-index db9d00c3..e34675f 100644
---- a/drivers/base/regmap/Kconfig
-+++ b/drivers/base/regmap/Kconfig
-@@ -3,7 +3,7 @@
- # subsystems should select the appropriate symbols.
- 
- config REGMAP
--	default y if (REGMAP_I2C || REGMAP_SPI || REGMAP_SPMI || REGMAP_AC97 || REGMAP_MMIO || REGMAP_IRQ)
-+	default y if (REGMAP_I2C || REGMAP_SPI || REGMAP_SPMI || REGMAP_AC97 || REGMAP_MMIO || REGMAP_IRQ || REGMAP_IBT)
- 	select LZO_COMPRESS
- 	select LZO_DECOMPRESS
- 	select IRQ_DOMAIN if REGMAP_IRQ
-@@ -29,3 +29,7 @@ config REGMAP_MMIO
- 
- config REGMAP_IRQ
- 	bool
-+
-+config REGMAP_IBT
-+	tristate
-+	depends on BT
-\ No newline at end of file
-diff --git a/drivers/base/regmap/Makefile b/drivers/base/regmap/Makefile
-index 609e4c8..e7fd73f 100644
---- a/drivers/base/regmap/Makefile
-+++ b/drivers/base/regmap/Makefile
-@@ -10,3 +10,4 @@ obj-$(CONFIG_REGMAP_SPI) += regmap-spi.o
- obj-$(CONFIG_REGMAP_SPMI) += regmap-spmi.o
- obj-$(CONFIG_REGMAP_MMIO) += regmap-mmio.o
- obj-$(CONFIG_REGMAP_IRQ) += regmap-irq.o
-+obj-$(CONFIG_REGMAP_IBT) += regmap-ibt.o
-diff --git a/drivers/base/regmap/regmap-ibt.c b/drivers/base/regmap/regmap-ibt.c
-new file mode 100644
-index 0000000..feb7607
---- /dev/null
-+++ b/drivers/base/regmap/regmap-ibt.c
-@@ -0,0 +1,283 @@
-+/*
-+ * Register map access API - iBT support
-+ *
-+ * Copyright 2015 Intel Corporation
-+ *
-+ * Author: Loic Poulain <loic.poulain@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <linux/regmap.h>
-+#include <linux/module.h>
-+#include <linux/skbuff.h>
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+
-+#include "internal.h"
-+
-+#define IBT_REG_MODE_8BIT  0x00
-+#define IBT_REG_MODE_16BIT 0x01
-+#define IBT_REG_MODE_32BIT 0x02
-+
-+struct regmap_ibt_context {
-+	struct hci_dev *hdev;
-+	__u16 op_write;
-+	__u16 op_read;
-+};
-+
-+/**
-+ * HCI Command payload for register read/write
-+ *
-+ * @raddr: Register address (32bit only)
-+ * @mode: Value access mode (8bit, 16bit, 32bit)
-+ * @len: Data len to read/write
-+ * @data: Data to write
-+ */
-+struct ibt_cp_reg_access {
-+	__le32  addr;
-+	__u8    mode;
-+	__u8    len;
-+	__u8    data[0];
-+} __packed;
-+
-+/**
-+ * HCI Command Complete Event payload for register read
-+ *
-+ * @status: cmd read status
-+ * @addr: Register address (32bit only)
-+ * @data: Register value
-+ */
-+struct ibt_rp_reg_access {
-+	__u8    status;
-+	__le32  addr;
-+	__u8    data[0];
-+} __packed;
-+
-+static int regmap_ibt_read(void *context, const void *addr, size_t reg_size,
-+			   void *val, size_t val_size)
-+{
-+	struct regmap_ibt_context *ctx = context;
-+	struct ibt_cp_reg_access cp;
-+	struct ibt_rp_reg_access *rp;
-+	struct sk_buff *skb;
-+	int err = 0;
-+
-+	if (reg_size != sizeof(__le32))
-+		return -EINVAL;
-+
-+	switch (val_size) {
-+	case 1:
-+		cp.mode = IBT_REG_MODE_8BIT;
-+		break;
-+	case 2:
-+		cp.mode = IBT_REG_MODE_16BIT;
-+		break;
-+	case 4:
-+		cp.mode = IBT_REG_MODE_32BIT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	/* regmap provides a little-endian formatted addr */
-+	cp.addr = *(__le32 *)addr;
-+	cp.len = val_size;
-+
-+	bt_dev_dbg(ctx->hdev, "Register (0x%x) read", le32_to_cpu(cp.addr));
-+
-+	mutex_lock(&ctx->hdev->req_lock);
-+	skb = __hci_cmd_sync(ctx->hdev, ctx->op_read, sizeof(cp), &cp,
-+			     HCI_CMD_TIMEOUT);
-+	mutex_unlock(&ctx->hdev->req_lock);
-+
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(ctx->hdev, "regmap: Register (0x%x) read error (%ld)",
-+			   le32_to_cpu(cp.addr), PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	if (skb->len != sizeof(*rp) + val_size) {
-+		bt_dev_err(ctx->hdev, "regmap: Register (0x%x) read error, bad len",
-+			   le32_to_cpu(cp.addr));
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	rp = (struct ibt_rp_reg_access *)skb->data;
-+
-+	if (rp->addr != cp.addr) {
-+		bt_dev_err(ctx->hdev, "regmap: Register (0x%x) read error, bad addr",
-+			   le32_to_cpu(rp->addr));
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	memcpy(val, rp->data, val_size);
-+
-+done:
-+	kfree_skb(skb);
-+	return err;
-+}
-+
-+static int regmap_ibt_gather_write(void *context,
-+				   const void *addr, size_t reg_size,
-+				   const void *val, size_t val_size)
-+{
-+	struct regmap_ibt_context *ctx = context;
-+	struct ibt_cp_reg_access *cp;
-+	struct sk_buff *skb;
-+	int plen = sizeof(*cp) + val_size;
-+	u8 mode;
-+	int err = 0;
-+
-+	if (reg_size != sizeof(__le32))
-+		return -EINVAL;
-+
-+	switch (val_size) {
-+	case 1:
-+		mode = IBT_REG_MODE_8BIT;
-+		break;
-+	case 2:
-+		mode = IBT_REG_MODE_16BIT;
-+		break;
-+	case 4:
-+		mode = IBT_REG_MODE_32BIT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	cp = kmalloc(plen, GFP_KERNEL);
-+	if (!cp)
-+		return -ENOMEM;
-+
-+	/* regmap provides a little-endian formatted addr/value */
-+	cp->addr = *(__le32 *)addr;
-+	cp->mode = mode;
-+	cp->len = val_size;
-+	memcpy(&cp->data, val, val_size);
-+
-+	bt_dev_dbg(ctx->hdev, "Register (0x%x) write", le32_to_cpu(cp->addr));
-+
-+	mutex_lock(&ctx->hdev->req_lock);
-+	skb = __hci_cmd_sync(ctx->hdev, ctx->op_write, plen, cp,
-+			     HCI_CMD_TIMEOUT);
-+	mutex_unlock(&ctx->hdev->req_lock);
-+
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(ctx->hdev, "regmap: Register (0x%x) write error (%ld)",
-+			   le32_to_cpu(cp->addr), PTR_ERR(skb));
-+		err = PTR_ERR(skb);
-+		goto done;
-+	}
-+	kfree_skb(skb);
-+
-+done:
-+	kfree(cp);
-+	return err;
-+}
-+
-+static int regmap_ibt_write(void *context, const void *data, size_t count)
-+{
-+	/* data contains register+value, since we only support 32bit addr,
-+	 * minimum data size is 4 bytes.
-+	 */
-+	if (WARN_ONCE(count < 4, "Invalid register access"))
-+		return -EINVAL;
-+
-+	return regmap_ibt_gather_write(context, data, 4, data + 4, count - 4);
-+}
-+
-+static void regmap_ibt_free_context(void *context)
-+{
-+	kfree(context);
-+}
-+
-+static struct regmap_bus regmap_ibt = {
-+	.read = regmap_ibt_read,
-+	.write = regmap_ibt_write,
-+	.gather_write = regmap_ibt_gather_write,
-+	.free_context = regmap_ibt_free_context,
-+	.reg_format_endian_default = REGMAP_ENDIAN_LITTLE,
-+	.val_format_endian_default = REGMAP_ENDIAN_LITTLE,
-+};
-+
-+static struct regmap *__regmap_init_ibt(struct hci_dev *hdev,
-+					u16 opcode_read, u16 opcode_write,
-+					const struct regmap_config *config,
-+					bool devm)
-+{
-+	struct regmap_ibt_context *ctx;
-+
-+	if (!config)
-+		return ERR_PTR(-EINVAL);
-+
-+	bt_dev_info(hdev, "regmap: Init %s-R%x-W%x region", config->name,
-+		    opcode_read, opcode_write);
-+
-+	if (config->reg_bits != 32) {
-+		bt_dev_err(hdev, "regmap: Unsupported address size: %d",
-+			   config->reg_bits);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx)
-+		return ERR_PTR(-ENOMEM);
-+
-+	ctx->op_read = opcode_read;
-+	ctx->op_write = opcode_write;
-+	ctx->hdev = hdev;
-+
-+	if (devm)
-+		return devm_regmap_init(&hdev->dev, &regmap_ibt, ctx, config);
-+	else
-+		return regmap_init(&hdev->dev, &regmap_ibt, ctx, config);
-+}
-+
-+/**
-+ * regmap_init_ibt(): Initialize register map
-+ *
-+ * @hdev: HCI Device that will be interacted with
-+ * @config: Configuration for register map
-+ * @opcode_read: HCI opcode command for register-read operation
-+ * @opcode_write: HCI opcode command for register-write operation
-+ *
-+ * The return value will be an ERR_PTR() on error or a valid pointer to
-+ * a struct regmap.
-+ */
-+struct regmap *regmap_init_ibt(struct hci_dev *hdev,
-+			       u16 opcode_read, u16 opcode_write,
-+			       const struct regmap_config *config)
-+{
-+	return __regmap_init_ibt(hdev, opcode_read, opcode_write, config,
-+				 false);
-+}
-+EXPORT_SYMBOL_GPL(regmap_init_ibt);
-+
-+/**
-+ * devm_regmap_init_ibt(): Initialize register map
-+ *
-+ * @hdev: HCI Device that will be interacted with
-+ * @config: Configuration for register map
-+ * @opcode_read: HCI opcode command for register-read operation
-+ * @opcode_write: HCI opcode command for register-write operation
-+ *
-+ * The return value will be an ERR_PTR() on error or a valid pointer
-+ * to a struct regmap. The regmap will be automatically freed by the
-+ * device management code.
-+ */
-+struct regmap *devm_regmap_init_ibt(struct hci_dev *hdev,
-+				    u16 opcode_read, u16 opcode_write,
-+				    const struct regmap_config *config)
-+{
-+	return __regmap_init_ibt(hdev, opcode_read, opcode_write, config,
-+				 true);
-+}
-+EXPORT_SYMBOL_GPL(devm_regmap_init_ibt);
-+
-+MODULE_LICENSE("GPL");
-diff --git a/include/linux/regmap.h b/include/linux/regmap.h
-index 59c55ea..af7c146 100644
---- a/include/linux/regmap.h
-+++ b/include/linux/regmap.h
-@@ -28,6 +28,7 @@ struct regmap;
- struct regmap_range_cfg;
- struct regmap_field;
- struct snd_ac97;
-+struct hci_dev;
- 
- /* An enum of all the supported cache types */
- enum regcache_type {
-@@ -343,6 +344,9 @@ struct regmap *regmap_init_mmio_clk(struct device *dev, const char *clk_id,
- 				    const struct regmap_config *config);
- struct regmap *regmap_init_ac97(struct snd_ac97 *ac97,
- 				const struct regmap_config *config);
-+struct regmap *regmap_init_ibt(struct hci_dev *hdev,
-+			       u16 opcode_read, u16 opcode_write,
-+			       const struct regmap_config *config);
- 
- struct regmap *devm_regmap_init(struct device *dev,
- 				const struct regmap_bus *bus,
-@@ -361,6 +365,9 @@ struct regmap *devm_regmap_init_mmio_clk(struct device *dev, const char *clk_id,
- 					 const struct regmap_config *config);
- struct regmap *devm_regmap_init_ac97(struct snd_ac97 *ac97,
- 				     const struct regmap_config *config);
-+struct regmap *devm_regmap_init_ibt(struct hci_dev *hdev,
-+				    u16 opcode_read, u16 opcode_write,
-+				    const struct regmap_config *config);
- 
- bool regmap_ac97_default_volatile(struct device *dev, unsigned int reg);
- 
--- 
-1.9.1
+RnJvbTogSmFtZXMgQm90dG9tbGV5IA0KPiBTZW50OiAyOCBTZXB0ZW1iZXIgMjAxNSAxNjoxMg0K
+PiA+ID4gPiBUaGUgeDg2IGNwdXMgd2lsbCBhbHNvIGRvIDMyYml0IHdpZGUgcm13IGN5Y2xlcyBm
+b3IgdGhlICdiaXQnIG9wZXJhdGlvbnMuDQo+ID4gPg0KPiA+ID4gVGhhdCdzIGRpZmZlcmVudDog
+aXQncyBhbiBhdG9taWMgUk1XIG9wZXJhdGlvbi4gIFRoZSBwcm9ibGVtIHdpdGggdGhlDQo+ID4g
+PiBhbHBoYSB3YXMgdGhhdCB0aGUgb3BlcmF0aW9uIHdhc24ndCBhdG9taWMgKG1lYW5pbmcgdGhh
+dCBpdCBjYW4ndCBiZQ0KPiA+ID4gaW50ZXJydXB0ZWQgYW5kIG5vIGludGVybWVkaWF0ZSBvdXRw
+dXQgc3RhdGVzIGFyZSB2aXNpYmxlKS4NCj4gPg0KPiA+IEl0IGlzIG9ubHkgYXRvbWljIGlmIHBy
+ZWZpeGVkIGJ5IHRoZSAnbG9jaycgcHJlZml4Lg0KPiA+IE5vcm1hbGx5IHRoZSByZWFkIGFuZCB3
+cml0ZSBhcmUgc2VwYXJhdGUgYnVzIGN5Y2xlcy4NCj4gDQo+IFRoZSBlc3NlbnRpYWwgcG9pbnQg
+aXMgdGhhdCB4ODYgaGFzIGF0b21pYyBiaXQgb3BzIGFuZCBieXRlIHdyaXRlcy4NCj4gRWFybHkg
+YWxwaGEgZGlkIG5vdC4NCg0KRWFybHkgYWxwaGEgZGlkbid0IGhhdmUgYW55IGJ5dGUgYWNjZXNz
+ZXMuDQoNCk9uIHg4NiBpZiB5b3UgaGF2ZSB0aGUgZm9sbG93aW5nOg0KCXN0cnVjdCB7DQoJCWNo
+YXIgIGE7DQoJCXZvbGF0aWxlIGNoYXIgYjsNCgl9ICpmb287DQoJZm9vLT5hIHw9IDQ7DQoNClRo
+ZSBjb21waWxlciBpcyBsaWtlbHkgdG8gZ2VuZXJhdGUgYSAnYmlzICM0LCAwKHJieCknIChvciBz
+aW1pbGFyKQ0KYW5kIHRoZSBjcHUgd2lsbCBkbyB0d28gMzJiaXQgbWVtb3J5IGN5Y2xlcyB0aGF0
+IHJlYWQgYW5kIHdyaXRlDQp0aGUgJ3ZvbGF0aWxlJyBmaWVsZCAnYicuDQooZ2NjIGRlZmluaXRl
+bHkgdXNlZCB0byBkbyB0aGlzLi4uKQ0KDQpBIGxvdCBvZiBmaWVsZHMgd2VyZSBtYWRlIDMyYml0
+IChhbmQgcHJvYmFibHkgbm90IGJpdGZpZWxkcykgaW4gdGhlIGxpbnV4DQprZXJuZWwgdHJlZSBh
+IHllYXIgb3IgdHdvIGFnbyB0byBhdm9pZCB0aGlzIHZlcnkgcHJvYmxlbS4NCg0KPiA+ID4gPiBZ
+b3Ugc3RpbGwgaGF2ZSB0byBlbnN1cmUgdGhlIGNvbXBpbGVyIGRvZXNuJ3QgZG8gd2lkZXIgcm13
+IGN5Y2xlcy4NCj4gPiA+ID4gSSBiZWxpZXZlIHRoZSByZWNlbnQgdmVyc2lvbnMgb2YgZ2NjIHdv
+bid0IGRvIHdpZGVyIGFjY2Vzc2VzIGZvciB2b2xhdGlsZSBkYXRhLg0KPiA+ID4NCj4gPiA+IEkg
+ZG9uJ3QgdW5kZXJzdGFuZCB0aGlzIGNvbW1lbnQuICBZb3Ugc2VlbSB0byBiZSBpbXBseWluZyBn
+Y2Mgd291bGQgZG8gYQ0KPiA+ID4gNjQgYml0IFJNVyBmb3IgYSAzMiBiaXQgc3RvcmUgLi4uIHRo
+YXQgd291bGQgYmUgZGFmdCB3aGVuIGEgc2luZ2xlDQo+ID4gPiBpbnN0cnVjdGlvbiBleGlzdHMg
+dG8gcGVyZm9ybSB0aGUgb3BlcmF0aW9uIG9uIGFsbCBhcmNoaXRlY3R1cmVzLg0KPiA+DQo+ID4g
+UmVhZCB0aGUgb2JqZWN0IGNvZGUgYW5kIHdlZXAuLi4NCj4gPiBJdCBpcyBtb3N0IGxpa2VseSB0
+byBoYXBwZW4gZm9yIG9wZXJhdGlvbnMgdGhhdCBhcmUgcm13IChlZyBiaXQgc2V0KS4NCj4gPiBG
+b3IgaW5zdGFuY2UgdGhlIGFybSBjcHUgaGFzIGxpbWl0ZWQgb2Zmc2V0cyBmb3IgMTZiaXQgYWNj
+ZXNzZXMsIGZvcg0KPiA+IG5vcm1hbCBzdHJ1Y3R1cmVzIHRoZSBjb21waWxlciBpcyBsaWtlbHkg
+dG8gdXNlIGEgMzJiaXQgcm13IHNlcXVlbmNlDQo+ID4gZm9yIGEgMTZiaXQgZmllbGQgdGhhdCBo
+YXMgYSBsYXJnZSBvZmZzZXQuDQo+ID4gVGhlIEMgbGFuZ3VhZ2UgYWxsb3dzIHRoZSBjb21waWxl
+ciB0byBkbyBpdCBmb3IgYW55IGFjY2VzcyAoSUlSQyBpbmNsdWRpbmcNCj4gPiB2b2xhdGlsZXMp
+Lg0KPiANCj4gSSB0aGluayB5b3UgbWlnaHQgYmUgY29uZnVzaW5nIGRpZmZlcmVudCB0aGluZ3Mu
+ICBNb3N0IFJJU0MgQ1BVcyBjYW4ndA0KPiBkbyAzMiBiaXQgc3RvcmUgaW1tZWRpYXRlcyBiZWNh
+dXNlIHRoZXJlIGFyZW4ndCBlbm91Z2ggYml0cyBpbiB0aGVpcg0KPiBhcnNlbmFsLCBzbyB0aGV5
+IHRlbmQgdG8gc3BsaXQgMzIgYml0IGxvYWRzIGludG8gYSBsZWZ0IGFuZCByaWdodCBwYXJ0DQo+
+IChmaXJzdCB0aGUgdG9wIHRoZW4gdGhlIG9mZnNldCkuICBUaGlzIChhbmQgb3RoZXIgdGhpbmdz
+KSBhcmUgbW9zdGx5DQo+IHdoYXQgeW91IHNlZSBpbiBjb2RlLiAgSG93ZXZlciwgMzIgYml0IHJl
+Z2lzdGVyIHN0b3JlcyBhcmUgc3RpbGwgYXRvbWljLA0KPiB3aGljaCBpcyBhbGwgd2UgcmVxdWly
+ZS4gIEl0J3Mgbm90IHJlYWxseSB0aGUgY29tcGlsZXIncyBmYXVsdCwgaXQncw0KPiBtb3N0bHkg
+YW4gYXJjaGl0ZWN0dXJhbCBsaW1pdGF0aW9uLg0KDQpObywgSSdtIG5vdCB0YWxraW5nIGFib3V0
+IGhvdyAzMmJpdCBjb25zdGFudHMgYXJlIGdlbmVyYXRlZC4NCkknbSB0YWxraW5nIGFib3V0IHN0
+cnVjdHVyZSBvZmZzZXRzLg0KDQoJRGF2aWQNCg0K
