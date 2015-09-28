@@ -1,71 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-To: linux-arm-kernel@lists.infradead.org
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..."
-	<alsa-devel@alsa-project.org>, linaro-kernel@lists.linaro.org,
-	"open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"open list:NETWORKING DRIVERS (WIRELESS)"
-	<linux-wireless@vger.kernel.org>,
-	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Intel Linux Wireless <ilw@linux.intel.com>,
-	Linux ACPI <linux-acpi@vger.kernel.org>,
-	"open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
-	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:"
-	<linux-usb@vger.kernel.org>,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>
-Subject: Re: [PATCH V4 1/2] ACPI / EC: Fix broken 64bit big-endian users of 'global_lock'
-Date: Mon, 28 Sep 2015 10:24:58 +0200
-Message-ID: <2003030.YkVHTCZahK@wuerfel>
-In-Reply-To: <1578470.DLzaBp4j3T@vostro.rjw.lan>
-References: <e28c4b4deaf766910c366ab87b64325da59c8ad6.1443198783.git.viresh.kumar@linaro.org> <1540878.9slRi6Q7xb@wuerfel> <1578470.DLzaBp4j3T@vostro.rjw.lan>
-MIME-Version: 1.0
+From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
+	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+	"ext.szymon.janc@tieto.com" <ext.szymon.janc@tieto.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCHv2] Bluetooth:hci_qca: Changed unsigned long to bool
+Date: Mon, 28 Sep 2015 08:03:24 +0000
+Message-ID: <20150928080319.GA3521@jci-VirtualBox>
 Content-Type: text/plain; charset="us-ascii"
-Sender: netdev-owner@vger.kernel.org
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sunday 27 September 2015 16:10:48 Rafael J. Wysocki wrote:
-> On Saturday, September 26, 2015 09:33:56 PM Arnd Bergmann wrote:
-> > On Saturday 26 September 2015 11:40:00 Viresh Kumar wrote:
-> > > On 25 September 2015 at 15:19, Rafael J. Wysocki <rafael@kernel.org> wrote:
-> > > > So if you allow something like debugfs to update your structure, how
-> > > > do you make sure there is the proper locking?
-> > > 
-> > > Not really sure at all.. Isn't there some debugfs locking that will
-> > > jump in, to avoid updation of fields to the same device?
-> > 
-> > No, if you need any locking to access variable, you cannot use the
-> > simple debugfs helpers but have to provide your own functions.
-> > 
-> > > >> Anyway, that problem isn't here for sure as its between two
-> > > >> unsigned-longs. So, should I just move it to bool and resend ?
-> > > >
-> > > > I guess it might be more convenient to fold this into the other patch,
-> > > > because we seem to be splitting hairs here.
-> > > 
-> > > I can and that's what I did. But then Arnd asked me to separate it
-> > > out. I can fold it back if that's what you want.
-> > 
-> > It still makes sense to keep it separate I think, the patch is clearly
-> > different from the other parts.
-> 
-> I just don't see much point in going from unsigned long to u32 and then
-> from 32 to bool if we can go directly to bool in one go.
+From: Prasanna Karthik <mkarthi3@visteon.com>
 
-It's only important to keep the 34-file multi-subsystem trivial cleanup
-that doesn't change any functionality separate from the bugfix. If you
-like to avoid patching one of the files twice, the alternative would
-be to first change the API for all other instances from u32 to bool
-and leave ACPI alone, and then do the second patch that changes ACPI
-from long to bool.
+'retransmit' being set in HCI_IBS_TX_WAKING case, using bool would be
+efficient. Initialize local bool to false.
 
-	Arnd
+Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+---
+ drivers/bluetooth/hci_qca.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index a8aa077..6fbd7d8 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -347,7 +347,7 @@ static void hci_ibs_wake_retrans_timeout(unsigned long =
+arg)
+ 	struct hci_uart *hu =3D (struct hci_uart *)arg;
+ 	struct qca_data *qca =3D hu->priv;
+ 	unsigned long flags, retrans_delay;
+-	unsigned long retransmit =3D 0;
++	bool retransmit =3D false;
+=20
+ 	BT_DBG("hu %p wake retransmit timeout in %d state",
+ 		hu, qca->tx_ibs_state);
+@@ -358,7 +358,7 @@ static void hci_ibs_wake_retrans_timeout(unsigned long =
+arg)
+ 	switch (qca->tx_ibs_state) {
+ 	case HCI_IBS_TX_WAKING:
+ 		/* No WAKE_ACK, retransmit WAKE */
+-		retransmit =3D 1;
++		retransmit =3D true;
+ 		if (send_hci_ibs_cmd(HCI_IBS_WAKE_IND, hu) < 0) {
+ 			BT_ERR("Failed to acknowledge device wake up");
+ 			break;
+--=20
+1.9.1
