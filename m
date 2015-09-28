@@ -1,34 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
+From: David Laight <David.Laight@ACULAB.COM>
+To: "'Rafael J. Wysocki'" <rjw@rjwysocki.net>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>
+CC: Viresh Kumar <viresh.kumar@linaro.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Linaro Kernel Mailman List <linaro-kernel@lists.linaro.org>,
+	"QCA ath9k Development" <ath9k-devel@qca.qualcomm.com>,
+	Intel Linux Wireless <ilw@linux.intel.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Linux ACPI <linux-acpi@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"open list:NETWORKING DRIVERS (WIRELESS)"
+	<linux-wireless@vger.kernel.org>,
+	"open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
+	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:"
+	<linux-usb@vger.kernel.org>,
+	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..."
+	<alsa-devel@alsa-project.org>
+Subject: RE: [PATCH V4 1/2] ACPI / EC: Fix broken 64bit big-endian users of
+ 'global_lock'
+Date: Mon, 28 Sep 2015 08:58:17 +0000
+Message-ID: <063D6719AE5E284EB5DD2968C1650D6D1CBA3BF7@AcuExch.aculab.com>
+References: <e28c4b4deaf766910c366ab87b64325da59c8ad6.1443198783.git.viresh.kumar@linaro.org>
+ <2524822.pQu4UKMrlb@vostro.rjw.lan>
+ <1443297128.2181.11.camel@HansenPartnership.com>
+ <3461169.v5xKdGLGjP@vostro.rjw.lan>
+In-Reply-To: <3461169.v5xKdGLGjP@vostro.rjw.lan>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <0582BDEB-2274-4130-B13A-C122B86FFDAA@holtmann.org>
-References: <CA+V-a8v1DaXL=S850KWaBt-ykDGr_533y8bAkpKq+NMoiVRncA@mail.gmail.com>
- <0582BDEB-2274-4130-B13A-C122B86FFDAA@holtmann.org>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Mon, 28 Sep 2015 10:32:40 +0100
-Message-ID: <CA+V-a8sigPgaFM86uV804xO_4cBTUn==EQPLb1NySznCTdddwQ@mail.gmail.com>
-Subject: Re: rfcomm sockets
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Fri, Sep 25, 2015 at 4:05 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Prabhakar,
->
->> I am using 5.34 bluez-5 stack on linux kernel version 3.14. when I
->> create rfcomm connection and do cat /dev/rfcomm0 and from other
->> terminal send AT commands to rfcomm0 I get proper response and other
->> characters continuously(> ??? ...) echoed from rfcomm0.
->> If I do the same from bluez4-101 I get proper response with no other characters.
->>
->> What is the proper way to do rfcomm communication ? I am trying to
->> connect to a OBD device via rfcom socket.
->
-> the /dev/rfcomm0 is a TTY. You have to set it to the right mode (most cases raw mode) to make sure that no extra characters are inserted. If you use rfcomm connect command, then the --raw switch might help.
->
-Thanks the raw flag did the trick.
-
-Cheers,
---Prabhakar Lad
+RnJvbTogUmFmYWVsIEouIFd5c29ja2kNCj4gU2VudDogMjcgU2VwdGVtYmVyIDIwMTUgMTU6MDkN
+Ci4uLg0KPiA+ID4gU2F5IHlvdSBoYXZlIHRocmVlIGFkamFjZW50IGZpZWxkcyBpbiBhIHN0cnVj
+dHVyZSwgeCwgeSwgeiwgZWFjaCBvbmUgYnl0ZSBsb25nLg0KPiA+ID4gSW5pdGlhbGx5LCBhbGwg
+b2YgdGhlbSBhcmUgZXF1YWwgdG8gMC4NCj4gPiA+DQo+ID4gPiBDUFUgQSB3cml0ZXMgMSB0byB4
+IGFuZCBDUFUgQiB3cml0ZXMgMiB0byB5IGF0IHRoZSBzYW1lIHRpbWUuDQo+ID4gPg0KPiA+ID4g
+V2hhdCdzIHRoZSByZXN1bHQ/DQo+ID4NCj4gPiBJIHRoaW5rIGV2ZXJ5IENQVSdzICBjYWNoZSBh
+cmNoaXRlY3VyZSBndWFyYW50ZWVzIGFkamFjZW50IHN0b3JlDQo+ID4gaW50ZWdyaXR5LCBldmVu
+IGluIHRoZSBmYWNlIG9mIFNNUCwgc28gaXQncyB4PT0xIGFuZCB5PT0yLiAgSWYgeW91J3JlDQo+
+ID4gdGhpbmtpbmcgb2Ygb2xkIGFscGhhIFNNUCBzeXN0ZW0gd2hlcmUgdGhlIGxvd2VzdCBzdG9y
+ZSB3aWR0aCBpcyAzMiBiaXRzDQo+ID4gYW5kIHRodXMgeW91IGhhdmUgdG8gZG8gUk1XIHRvIHVw
+ZGF0ZSBhIGJ5dGUsIHRoaXMgd2FzIHVzdWFsbHkgZml4ZWQgYnkNCj4gPiBwYWRkaW5nIChhc3N1
+bWluZyB0aGUgc3RydWN0dXJlIGlzIG5vdCBwYWNrZWQpLiAgSG93ZXZlciwgaXQgd2FzIHN1Y2gg
+YQ0KPiA+IHByb2JsZW0gdGhhdCBldmVuIHRoZSBsYXRlciBhbHBoYSBjaGlwcyBoYWQgYnl0ZSBl
+eHRlbnNpb25zLg0KDQpEb2VzIGxpbnV4IHN0aWxsIHN1cHBvcnQgdGhvc2Ugb2xkIEFscGhhcz8N
+Cg0KVGhlIHg4NiBjcHVzIHdpbGwgYWxzbyBkbyAzMmJpdCB3aWRlIHJtdyBjeWNsZXMgZm9yIHRo
+ZSAnYml0JyBvcGVyYXRpb25zLg0KDQo+IE9LLCB0aGFua3MhDQoNCllvdSBzdGlsbCBoYXZlIHRv
+IGVuc3VyZSB0aGUgY29tcGlsZXIgZG9lc24ndCBkbyB3aWRlciBybXcgY3ljbGVzLg0KSSBiZWxp
+ZXZlIHRoZSByZWNlbnQgdmVyc2lvbnMgb2YgZ2NjIHdvbid0IGRvIHdpZGVyIGFjY2Vzc2VzIGZv
+ciB2b2xhdGlsZSBkYXRhLg0KDQoJRGF2aWQNCg0K
