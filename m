@@ -1,94 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1443473638-28118-1-git-send-email-jamuraa@chromium.org>
-References: <1443473638-28118-1-git-send-email-jamuraa@chromium.org>
-Date: Tue, 29 Sep 2015 16:41:15 +0300
-Message-ID: <CABBYNZKqXNVtk7894dcYdjjMqSnrZd2=ocm9LxMQxya2=PRpvA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/ad: Fix license to be LGPL
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marie Janssen <jamuraa@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH v3 2/2] regmap: Add iBT register access over HCI support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1443531945-31344-2-git-send-email-loic.poulain@intel.com>
+Date: Tue, 29 Sep 2015 15:18:35 +0200
+Cc: broonie@kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Message-Id: <E8C81944-DC07-4200-8E50-1C2EB9341AAD@holtmann.org>
+References: <1443531945-31344-1-git-send-email-loic.poulain@intel.com> <1443531945-31344-2-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marie,
+Hi Loic,
 
-On Mon, Sep 28, 2015 at 11:53 PM, Marie Janssen <jamuraa@chromium.org> wrote:
-> Code in the shared directory should be LGPL.  It was mistakenly
-> checked in as GPL.
+> Add support for Intel Bluetooth silicon register access over HCI.
+> Intel BT/FM combo chip allows to read/write some registers (e.g. FM
+> registers) via its HCI interface.
+> 
+> Read/Write operations are performed via a HCI transaction composed of
+> a HCI command (host->controller) followed by a HCI command complete
+> event (controller->host). Read/Write Command opcodes can be specified
+> to the regmap init function.
+> We define data formats which are intel/vendor specific.
+> 
+> Register Read/Write HCI command payload (Host):
+> Field: | REG ADDR | MODE | DATA_LEN | DATA... |
+> size:  |   32b    |  8b  |    8b    |  8b*    |
+> 
+> Register Read HCI command complete event payload (Controller):
+> Field: | CMD STATUS | REG ADDR | DATA... |
+> size:  |     8b     |   32b    |  8b*    |
+> 
+> Register Write HCI command complete event payload (Controller):
+> Field: | CMD_STATUS |
+> size:  |     8b     |
+> 
+> Since this payload is HCI encapsulated, Little Endian byte order is
+> used.
+> 
+> Write/Read Example:
+> 
+> If we write 0x0000002a at address 0x00008c04, with opcode_write 0xfc5d,
+> The resulting transaction is (btmon trace):
+> 
+> < HCI Command (0x3f|0x005d) plen 10 [hci0]
+>        04 8c 00 00 02 04 2a 00 00 00
+>> HCI Event (0x0e) plen 4
+>      Unknown (0x3f|0x005d) ncmd 1
+>        00
+> 
+> Then, if we read the same register with opcode_read 0xfc5e:
+> 
+> < HCI Command (0x3f|0x005e) plen 6 [hci0]
+>        04 8c 00 00 02 04
+>> HCI Event (0x0e) plen 12 [hci0]
+>      Unknown (0x3f|0x005e) ncmd 1
+>        00 04 8c 00 00 2a 00 00 00
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 > ---
->  src/shared/ad.c | 18 +++++++++++-------
->  src/shared/ad.h | 18 +++++++++++-------
->  2 files changed, 22 insertions(+), 14 deletions(-)
->
-> diff --git a/src/shared/ad.c b/src/shared/ad.c
-> index 485bd7b..6259eb9 100644
-> --- a/src/shared/ad.c
-> +++ b/src/shared/ad.c
-> @@ -5,15 +5,19 @@
->   *  Copyright (C) 2015  Google Inc.
->   *
->   *
-> - *  This program is free software; you can redistribute it and/or modify
-> - *  it under the terms of the GNU General Public License as published by
-> - *  the Free Software Foundation; either version 2 of the License, or
-> - *  (at your option) any later version.
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
->   *
-> - *  This program is distributed in the hope that it will be useful,
-> + *  This library is distributed in the hope that it will be useful,
->   *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> - *  GNU General Public License for more details.
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
->   *
->   */
->
-> diff --git a/src/shared/ad.h b/src/shared/ad.h
-> index 4b313ab..709563d 100644
-> --- a/src/shared/ad.h
-> +++ b/src/shared/ad.h
-> @@ -5,15 +5,19 @@
->   *  Copyright (C) 2015  Google Inc.
->   *
->   *
-> - *  This program is free software; you can redistribute it and/or modify
-> - *  it under the terms of the GNU General Public License as published by
-> - *  the Free Software Foundation; either version 2 of the License, or
-> - *  (at your option) any later version.
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
->   *
-> - *  This program is distributed in the hope that it will be useful,
-> + *  This library is distributed in the hope that it will be useful,
->   *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> - *  GNU General Public License for more details.
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
->   *
->   */
->
-> --
-> 2.6.0.rc2.230.g3dd15c0
+> v2: Change "hci" to "ibt" since it's intel specific
+>    Add comments for clarification
+>    Remove unjustified default opcodes
+>    Protect __hci_cmd_sync call with hdev req_lock
+>    Replace BUG_ON with WARN_ONCE
+> v3: Use thread-safe hci_cmd_sync instead of __hci_cmd_sync
+>    Update subject
+> 
+> drivers/base/regmap/Kconfig      |   6 +-
+> drivers/base/regmap/Makefile     |   1 +
+> drivers/base/regmap/regmap-ibt.c | 276 +++++++++++++++++++++++++++++++++++++++
+> include/linux/regmap.h           |   7 +
+> 4 files changed, 289 insertions(+), 1 deletion(-)
+> create mode 100644 drivers/base/regmap/regmap-ibt.c
 
-Pushed, thanks.
+patch looks good to me. Now lets get some ACKs for it so I can take it through bluetooth-next tree.
 
+Regards
 
--- 
-Luiz Augusto von Dentz
+Marcel
+
