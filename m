@@ -1,48 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Sep 2015 07:34:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mark Spruiell <mes@zeroc.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: SDP query via D-Bus?
-Message-ID: <20150930043444.GA21773@t440s.P-661HNU-F1>
-References: <CABOZqnjSPbO-cNkSryq5GXBKTqtE-1TPMKMgTAwtd9YoO4i-4A@mail.gmail.com>
- <20150929064937.GA26120@t440s.lan>
- <CABOZqnjj4hpAVLYKgC6CxwrFUaz7ZNn5Yhvz7DCk3u30Cp3urg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABOZqnjj4hpAVLYKgC6CxwrFUaz7ZNn5Yhvz7DCk3u30Cp3urg@mail.gmail.com>
+In-Reply-To: <20150929064937.GA26120@t440s.lan>
+References: <CABOZqnjSPbO-cNkSryq5GXBKTqtE-1TPMKMgTAwtd9YoO4i-4A@mail.gmail.com>
+	<20150929064937.GA26120@t440s.lan>
+Date: Tue, 29 Sep 2015 14:01:18 -0700
+Message-ID: <CABOZqnjj4hpAVLYKgC6CxwrFUaz7ZNn5Yhvz7DCk3u30Cp3urg@mail.gmail.com>
+Subject: Re: SDP query via D-Bus?
+From: Mark Spruiell <mes@zeroc.com>
+To: Mark Spruiell <mes@zeroc.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mark,
+Hi Johan,
 
-On Tue, Sep 29, 2015, Mark Spruiell wrote:
-> Thanks for the reply.
+Thanks for the reply.
 
-No problem, but please don't top-post on this mailing list. Use in-line
-quoting instead.
+I understand how a server can use RegisterProfile to advertise its
+UUID & RFCOMM channel with SDP (as demonstrated in test-profile).
 
-> I understand how a server can use RegisterProfile to advertise its
-> UUID & RFCOMM channel with SDP (as demonstrated in test-profile).
-> 
-> It's still not clear to me how a client can use D-Bus to establish an
-> RFCOMM socket connection given a device address & UUID. Can you point
-> me in the right direction?
+It's still not clear to me how a client can use D-Bus to establish an
+RFCOMM socket connection given a device address & UUID. Can you point
+me in the right direction?
 
-The same interface can be used for both client and server role. Take a
-look at the "Role" option for RegisterProfile (with test-profile you'd
-pass -c to it). This basically tells bluetoothd that your application is
-capable of supporting the client role of a certain profile.
+Regards,
+Mark
 
-To actually connect to the profile (which should cause a NewConnection
-call to your application, giving it the socket) you'd use the usual
-ConnectProfile or Connect methods on the Device1 interface (see
-doc/device-api.txt, you can play with these e.g. using the "connect"
-command in bluetoothctl (with no parameters it maps to Device1.Connect
-and with one parameter (the UUID) to Device1.ConnectProfile).
-
-The ConnectProfile call should always work, whereas for your profile to
-be included in the set of profiles connected using Connnect you'd need
-to set the AutoConnect option to true when registering your profile.
-
-Johan
+On Mon, Sep 28, 2015 at 11:49 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Mark,
+>
+> On Mon, Sep 28, 2015, Mark Spruiell wrote:
+>> We currently use sdp_connect and sdp_service_search_attr_req to
+>> determine the RFCOMM channel associated with a service on a remote
+>> device.
+>>
+>> Does the D-Bus API provide an equivalent way to discover this information?
+>
+> Not directly, but there's a more convenient & higher level API available
+> if you look at doc/profile-api.txt and test/test-profile. This will not
+> only look up the RFCOMM channel for you, but also go ahead and connect
+> to the service and then give you back the connected RFCOMM socket over
+> D-Bus.
+>
+> Johan
