@@ -7,55 +7,42 @@ Cc: linux-acpi@vger.kernel.org,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Frederic Danis <frederic.danis@linux.intel.com>,
 	Jarkko Nikula <jarkko.nikula@linux.intel.com>
-Subject: [PATCH 4/5] Bluetooth: hci_bcm: Remove needless looking code
-Date: Wed, 30 Sep 2015 16:26:44 +0300
-Message-Id: <1443619605-19320-4-git-send-email-jarkko.nikula@linux.intel.com>
+Subject: [PATCH 3/5] Bluetooth: hci_bcm: Remove needless acpi_match_device() call
+Date: Wed, 30 Sep 2015 16:26:43 +0300
+Message-Id: <1443619605-19320-3-git-send-email-jarkko.nikula@linux.intel.com>
 In-Reply-To: <1443619605-19320-1-git-send-email-jarkko.nikula@linux.intel.com>
 References: <1443619605-19320-1-git-send-email-jarkko.nikula@linux.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Tree wide grep for "hci_bcm" doesn't reveal there is any code registering
-this platform device and "struct acpi_device_id" use for passing the
-platform data looks a debug/test code leftover to me.
-
-I'm assuming this driver effectively supports only ACPI enumeration and
-thus test for ACPI_HANDLE() and platform data can be removed.
+There is no need to call acpi_match_device() in driver's probe path and
+verify does it find a match to given ACPI _HIDs in .acpi_match_table as
+driver/platform/acpi core code has found the match prior calling the probe.
 
 Signed-off-by: Jarkko Nikula <jarkko.nikula@linux.intel.com>
 ---
- drivers/bluetooth/hci_bcm.c | 13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index a1b9bbcbcb79..967d16692925 100644
+index 5375c9c04fda..a1b9bbcbcb79 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -724,7 +724,6 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- static int bcm_probe(struct platform_device *pdev)
+@@ -647,16 +647,11 @@ static int bcm_resource(struct acpi_resource *ares, void *data)
+ static int bcm_acpi_probe(struct bcm_device *dev)
  {
- 	struct bcm_device *dev;
--	struct acpi_device_id *pdata = pdev->dev.platform_data;
+ 	struct platform_device *pdev = dev->pdev;
+-	const struct acpi_device_id *id;
+ 	struct acpi_device *adev;
+ 	LIST_HEAD(resources);
+ 	const struct dmi_system_id *dmi_id;
  	int ret;
  
- 	dev = devm_kzalloc(&pdev->dev, sizeof(*dev), GFP_KERNEL);
-@@ -733,15 +732,9 @@ static int bcm_probe(struct platform_device *pdev)
- 
- 	dev->pdev = pdev;
- 
--	if (ACPI_HANDLE(&pdev->dev)) {
--		ret = bcm_acpi_probe(dev);
--		if (ret)
--			return ret;
--	} else if (pdata) {
--		dev->name = pdata->id;
--	} else {
+-	id = acpi_match_device(pdev->dev.driver->acpi_match_table, &pdev->dev);
+-	if (!id)
 -		return -ENODEV;
--	}
-+	ret = bcm_acpi_probe(dev);
-+	if (ret)
-+		return ret;
- 
- 	platform_set_drvdata(pdev, dev);
- 
+-
+ 	/* Retrieve GPIO data */
+ 	dev->name = dev_name(&pdev->dev);
+ 	ret = acpi_dev_add_driver_gpios(ACPI_COMPANION(&pdev->dev),
 -- 
 2.5.3
