@@ -1,95 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1443622344.8361.304.camel@linux.intel.com>
-Subject: Re: [PATCH] Revert "serial: 8250_dma: don't bother DMA with small
- transfers"
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Peter Hurley <peter@hurleysoftware.com>,
-	Frederic Danis <frederic.danis@linux.intel.com>
-Cc: linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date: Wed, 30 Sep 2015 17:12:24 +0300
-In-Reply-To: <560BE919.9020803@hurleysoftware.com>
-References: <1443617191-21013-1-git-send-email-frederic.danis@linux.intel.com>
-	 <560BE919.9020803@hurleysoftware.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] Bluetooth: hci_h5: clean up hci_h5 code
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150930130159.GA5696@jci-VirtualBox>
+Date: Wed, 30 Sep 2015 16:13:21 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <BE01149B-BA92-49AC-9FD8-1749A5D4AD8E@holtmann.org>
+References: <20150930130159.GA5696@jci-VirtualBox>
+To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2015-09-30 at 09:52 -0400, Peter Hurley wrote:
-> [ + Andy Shevchenko ]
+Hi Prasanna,
+
+> This patch fixes checkpatch warnings:
+> - Comparison to NULL could be re-written
+> - no space required after a cast
 > 
-> On 09/30/2015 08:46 AM, Frederic Danis wrote:
-> > This reverts commit 9119fba0cfeda6d415c9f068df66838a104b87cb.
-> 
-> Hi Frederic,
-> 
-> It's customary to mail the commit author in patches which revert
-> their work.
-> 
-> > This commit prevents from sending "big" file using Bluetooth.
-> > When sending a lot of data quickly through the Bluetooth interface, 
-> > and
-> > after a variable amount of data sent, transfer fails with error:
-> >     kernel: [  415.247453] Bluetooth: hci0 hardware error 0x00
-> 
-> Hmmm, was there any other information regarding why this happened?
+> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+> ---
+> drivers/bluetooth/hci_h5.c | 10 +++++-----
+> 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Frederic informed us privately about this issue. I tried to hunt the
-root cause but mostly (there was one observation but apparently seems
-it is not related to this issue) nothing looks wrong.
+patch has been applied to bluetooth-next tree.
 
-> Eg., did the driver mistakenly re-order i/o (DMA occurred after PIO)?
+Regards
 
-I have few tracing dumps which Frederic provides to me, but I couldn't
-see such a problem. Maybe I missed it. My commit 9119fba0cfed
-introduces interleaved IO (DMA/PIO) which makes it like DMA -> PIO ->
-DMA -> ...
+Marcel
 
-
-> Or, might there be some race condition in the dmaengine driver on 
-> this
-> platform?
-
-There is [1] might be a clue, though I don't think it's directly
-related.
-
-[1] http://www.spinics.net/lists/linux-spi/msg01151.html
-The change prevents interleaved DMA/PIO IO.
-
-> 
-> Regards,
-> Peter Hurley
-> 
-> > Found on T100TA.
-> > 
-> > After reverting this commit, send works fine for any file size.
-> > 
-> > Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
-> > ---
-> >  drivers/tty/serial/8250/8250_dma.c | 4 ----
-> >  1 file changed, 4 deletions(-)
-> > 
-> > diff --git a/drivers/tty/serial/8250/8250_dma.c 
-> > b/drivers/tty/serial/8250/8250_dma.c
-> > index 21d01a4..e508939 100644
-> > --- a/drivers/tty/serial/8250/8250_dma.c
-> > +++ b/drivers/tty/serial/8250/8250_dma.c
-> > @@ -80,10 +80,6 @@ int serial8250_tx_dma(struct uart_8250_port *p)
-> >  		return 0;
-> >  
-> >  	dma->tx_size = CIRC_CNT_TO_END(xmit->head, xmit->tail, 
-> > UART_XMIT_SIZE);
-> > -	if (dma->tx_size < p->port.fifosize) {
-> > -		ret = -EINVAL;
-> > -		goto err;
-> > -	}
-> >  
-> >  	desc = dmaengine_prep_slave_single(dma->txchan,
-> >  					   dma->tx_addr + xmit
-> > ->tail,
-> > 
-> 
-
--- 
-Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Intel Finland Oy
