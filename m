@@ -1,72 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
+Subject: Re: [PATCH] Revert "serial: 8250_dma: don't bother DMA with small
+ transfers"
+To: Frederic Danis <frederic.danis@linux.intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+References: <1443617191-21013-1-git-send-email-frederic.danis@linux.intel.com>
+Cc: linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org
+From: Peter Hurley <peter@hurleysoftware.com>
+Message-ID: <560BE919.9020803@hurleysoftware.com>
+Date: Wed, 30 Sep 2015 09:52:25 -0400
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+GMyT8z8ujGGu3oMK1ffkdAuX21ZRu7Cf7eFpqS0jHuw@mail.gmail.com>
-References: <CAEZxfGPDdgjcSwS6vK46Q4tMwdoD=SjV-te8chiERM-wnEP00w@mail.gmail.com>
- <CABBYNZ+GMyT8z8ujGGu3oMK1ffkdAuX21ZRu7Cf7eFpqS0jHuw@mail.gmail.com>
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Wed, 30 Sep 2015 15:54:34 +0200
-Message-ID: <CAEZxfGMY5L=gcDczjUoM6Yg3m9z+LObByFgnAy0u7duyu+v-tg@mail.gmail.com>
-Subject: Re: Disabling deviceinfo plugin on chromebooks?
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1443617191-21013-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for your answer Luiz!
+[ + Andy Shevchenko ]
 
->From what I can see, Android and iOS Bluetooth Stack libraries don't
-claim the device_information service.
-Could it be possible to make it so that the plugin doesn't block other
-clients (such as the Web Bluetooth API) from interacting with that
-service.
+On 09/30/2015 08:46 AM, Frederic Danis wrote:
+> This reverts commit 9119fba0cfeda6d415c9f068df66838a104b87cb.
 
-Also, do you know if other services (like device_information) are
-blocked/claimed by other plugins?
+Hi Frederic,
 
-On Tue, Sep 22, 2015 at 12:05 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi François,
->
-> On Tue, Sep 22, 2015 at 11:41 AM, François Beaufort
-> <beaufort.francois@gmail.com> wrote:
-> > As the chromium team is building and testing the Web Bluetooth API to
-> > let websites discover and interact with nearby Bluetooth devices
-> > (https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web)
-> > I would love to be able to access the Device Information Service
-> > characteristics such as Serial Number String, Hardware Revision String
-> > and so forth.
->
-> Looks like we don't parse these characteristics just PnP ID which is
-> expose via Modalias property that has the information of product id
-> and vendor id, etc.
->
-> > Sadly, from what I understood, this is not achievable for now on
-> > Chromeboooks since Bluez comes with the deviceinfo plugin enabled by
-> > default. I do wonder now what would be the implications of disabling
-> > the deviceinfo plugin?
->
-> The way it works is that the plugin claims this service which prevent
-> it to be accessible over D-Bus, you could in theory disable the plugin
-> but I think we would benefit more if we add support for the missing
-> information directly in BlueZ saving each application the trouble to
-> read this information themselves.
->
-> If I would do it in BlueZ Id probably add them as properties to
-> org.bluez.Device1 and make sure we store them as we do with PnP ID.
->
-> > You will find more information at
-> > https://code.google.com/p/chromium/issues/detail?id=532930
-> >
-> > Thank you in advance,
-> > Francois - a daily Bluez user.
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
+It's customary to mail the commit author in patches which revert
+their work.
+
+> This commit prevents from sending "big" file using Bluetooth.
+> When sending a lot of data quickly through the Bluetooth interface, and
+> after a variable amount of data sent, transfer fails with error:
+>     kernel: [  415.247453] Bluetooth: hci0 hardware error 0x00
+
+Hmmm, was there any other information regarding why this happened?
+Eg., did the driver mistakenly re-order i/o (DMA occurred after PIO)?
+Or, might there be some race condition in the dmaengine driver on this
+platform?
+
+Regards,
+Peter Hurley
+
+> Found on T100TA.
+> 
+> After reverting this commit, send works fine for any file size.
+> 
+> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+> ---
+>  drivers/tty/serial/8250/8250_dma.c | 4 ----
+>  1 file changed, 4 deletions(-)
+> 
+> diff --git a/drivers/tty/serial/8250/8250_dma.c b/drivers/tty/serial/8250/8250_dma.c
+> index 21d01a4..e508939 100644
+> --- a/drivers/tty/serial/8250/8250_dma.c
+> +++ b/drivers/tty/serial/8250/8250_dma.c
+> @@ -80,10 +80,6 @@ int serial8250_tx_dma(struct uart_8250_port *p)
+>  		return 0;
+>  
+>  	dma->tx_size = CIRC_CNT_TO_END(xmit->head, xmit->tail, UART_XMIT_SIZE);
+> -	if (dma->tx_size < p->port.fifosize) {
+> -		ret = -EINVAL;
+> -		goto err;
+> -	}
+>  
+>  	desc = dmaengine_prep_slave_single(dma->txchan,
+>  					   dma->tx_addr + xmit->tail,
+> 
+
