@@ -1,73 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jarkko Nikula <jarkko.nikula@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-acpi@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] bluetooth: btuart_cs: remove obsolete header
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20150930122722.GA5186@jci-VirtualBox>
+Date: Wed, 30 Sep 2015 15:27:01 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
-	Loic Poulain <loic.poulain@intel.com>,
-	Jarkko Nikula <jarkko.nikula@linux.intel.com>
-Subject: [PATCH] Bluetooth: hci_intel: Cleanup the device probe code
-Date: Wed, 30 Sep 2015 16:28:52 +0300
-Message-Id: <1443619732-19401-1-git-send-email-jarkko.nikula@linux.intel.com>
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <D68DBA2D-D75C-42AD-A7B2-95514A6F183C@holtmann.org>
+References: <20150930122722.GA5186@jci-VirtualBox>
+To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is some unneeded code in "hci_intel" probing. First
-acpi_match_device() call is needless as driver/platform/acpi core code has
-already done the matching before calling the probe and the driver does not
-use the returned pointer to matching _HID other than checking is it NULL.
+Hi Prasanna,
 
-Then tree wide grep for "hci_intel" doesn't reveal that there is any code
-registering this platform device so it looks this device is always backed
-with ACPI companion so also ACPI_HANDLE() test can be removed.
+> Use <linux/io.h> instead of <asm/io.h>, fixes checkpatch
+> Warning;
+> 
+> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+> ---
+> drivers/bluetooth/btuart_cs.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Signed-off-by: Jarkko Nikula <jarkko.nikula@linux.intel.com>
----
- drivers/bluetooth/hci_intel.c | 24 ------------------------
- 1 file changed, 24 deletions(-)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 49e25409de67..2952107e3bae 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -1165,22 +1165,6 @@ static const struct acpi_device_id intel_acpi_match[] = {
- 	{ },
- };
- MODULE_DEVICE_TABLE(acpi, intel_acpi_match);
--
--static int intel_acpi_probe(struct intel_device *idev)
--{
--	const struct acpi_device_id *id;
--
--	id = acpi_match_device(intel_acpi_match, &idev->pdev->dev);
--	if (!id)
--		return -ENODEV;
--
--	return 0;
--}
--#else
--static int intel_acpi_probe(struct intel_device *idev)
--{
--	return -ENODEV;
--}
- #endif
- 
- #ifdef CONFIG_PM
-@@ -1248,14 +1232,6 @@ static int intel_probe(struct platform_device *pdev)
- 
- 	idev->pdev = pdev;
- 
--	if (ACPI_HANDLE(&pdev->dev)) {
--		int err = intel_acpi_probe(idev);
--		if (err)
--			return err;
--	} else {
--		return -ENODEV;
--	}
--
- 	idev->reset = devm_gpiod_get_optional(&pdev->dev, "reset",
- 					      GPIOD_OUT_LOW);
- 	if (IS_ERR(idev->reset)) {
--- 
-2.5.3
+Regards
+
+Marcel
 
