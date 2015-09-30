@@ -1,73 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: radvd-devel-l@litech.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	Oleg Hahm <oliver.hahm@inria.fr>
-Subject: [PATCH radvd] device-linux: replace ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
-Date: Wed, 30 Sep 2015 18:33:08 +0200
-Message-Id: <1443630788-15901-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] Bluetooth: hci_intel: Cleanup the device probe code
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1443619732-19401-1-git-send-email-jarkko.nikula@linux.intel.com>
+Date: Wed, 30 Sep 2015 16:52:03 +0200
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-acpi@vger.kernel.org,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Loic Poulain <loic.poulain@intel.com>
+Message-Id: <9BB7E6C8-A45E-4D88-8B01-D1660370B7FF@holtmann.org>
+References: <1443619732-19401-1-git-send-email-jarkko.nikula@linux.intel.com>
+To: Jarkko Nikula <jarkko.nikula@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes the ARPHRD_IEEE802154 to ARPHRD_6LOWPAN. The IEEE
-802.15.4 6lowpan module changed the ARPHRD_IEEE802154 type to
-ARPHRD_6LOWPAN. Nowadays it's use ARPHRD_6LOWPAN which is also used by
-BTLE 6LoWPAN. Both interfaces uses an EUI64 address and the handling to
-get the link-layer address should be the same.
+Hi Jarkko,
 
-There is no backward compatibility for 802.15.4 6LoWPAN before we
-changed the ARPHRD. Anyway if somebody wants that it should be patched
-manually. When the ARPHRD was ARPHRD_IEEE802154 the 802.15.4 6lowpan was
-anyway in a somehow unusable state.
+> There is some unneeded code in "hci_intel" probing. First
+> acpi_match_device() call is needless as driver/platform/acpi core code has
+> already done the matching before calling the probe and the driver does not
+> use the returned pointer to matching _HID other than checking is it NULL.
+> 
+> Then tree wide grep for "hci_intel" doesn't reveal that there is any code
+> registering this platform device so it looks this device is always backed
+> with ACPI companion so also ACPI_HANDLE() test can be removed.
 
-Cc: linux-bluetooth@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org
-Cc: Oleg Hahm <oliver.hahm@inria.fr>
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- device-linux.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+eventually there will be DT platform device. Does that make a difference or is it still valid to remove this probe handling.
 
-diff --git a/device-linux.c b/device-linux.c
-index de83f2e..7301927 100644
---- a/device-linux.c
-+++ b/device-linux.c
-@@ -22,6 +22,10 @@
- #define IPV6_ADDR_LINKLOCAL   0x0020U
- #endif
- 
-+#ifndef ARPHRD_6LOWPAN
-+#define ARPHRD_6LOWPAN	825	/* IPv6 over LoWPAN */
-+#endif
-+
- static char const *hwstr(unsigned short sa_family);
- 
- /*
-@@ -79,12 +83,10 @@ int update_device_info(int sock, struct Interface *iface)
- 		iface->sllao.if_maxmtu = -1;
- 		break;
- #endif				/* ARPHDR_ARCNET */
--#ifdef ARPHRD_IEEE802154
--	case ARPHRD_IEEE802154:
-+	case ARPHRD_6LOWPAN:
- 		iface->sllao.if_hwaddr_len = 64;
- 		iface->sllao.if_prefix_len = 64;
- 		break;
--#endif
- 	default:
- 		iface->sllao.if_hwaddr_len = -1;
- 		iface->sllao.if_prefix_len = -1;
-@@ -382,6 +384,9 @@ static char const *hwstr(unsigned short sa_family)
- 		rc = "ARPHRD_IEEE802154_PHY";
- 		break;
- #endif
-+	case ARPHRD_6LOWPAN:
-+		rc = "ARPHRD_6LOWPAN";
-+		break;
- 	case ARPHRD_VOID:
- 		rc = "ARPHRD_VOID";
- 		break;
--- 
-2.6.0
+Regards
+
+Marcel
 
