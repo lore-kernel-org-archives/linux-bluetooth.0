@@ -1,118 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Revert "serial: 8250_dma: don't bother DMA with small
- transfers"
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Frederic Danis <frederic.danis@linux.intel.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>
-References: <1443617191-21013-1-git-send-email-frederic.danis@linux.intel.com>
- <560BE919.9020803@hurleysoftware.com>
- <1443622344.8361.304.camel@linux.intel.com>
-Cc: linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org
-From: Peter Hurley <peter@hurleysoftware.com>
-Message-ID: <560C420B.4030007@hurleysoftware.com>
-Date: Wed, 30 Sep 2015 16:11:55 -0400
 MIME-Version: 1.0
-In-Reply-To: <1443622344.8361.304.camel@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <55EE7672.1040406@ubnt.com>
+References: <CAMib2GZpa=FgsNKXThWnNZ=m=nQgLJj8j1bYd8v12vb1dwOLNg@mail.gmail.com>
+	<55ED3BFA.206@ubnt.com>
+	<CAMib2GZ1D_Pp_m6qLMitzjAo7vS6Hrq1q9uaeAWg4zUYvj4u0w@mail.gmail.com>
+	<55EE7672.1040406@ubnt.com>
+Date: Wed, 30 Sep 2015 20:43:41 +0300
+Message-ID: <CAMib2GZ9+KecnYU4Dp1QhTh-XCF_6Gr761+rnu5yF=8BesgpFA@mail.gmail.com>
+Subject: Re: iOS 8 can't discover device
+From: Kyle Shneider <shneiderkyle@gmail.com>
+To: Andrejs Hanins <andrejs.hanins@ubnt.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-[ + Heikko ]
-
-On 09/30/2015 10:12 AM, Andy Shevchenko wrote:
-> On Wed, 2015-09-30 at 09:52 -0400, Peter Hurley wrote:
->> [ + Andy Shevchenko ]
->>
->> On 09/30/2015 08:46 AM, Frederic Danis wrote:
->>> This reverts commit 9119fba0cfeda6d415c9f068df66838a104b87cb.
->>
->> Hi Frederic,
->>
->> It's customary to mail the commit author in patches which revert
->> their work.
->>
->>> This commit prevents from sending "big" file using Bluetooth.
->>> When sending a lot of data quickly through the Bluetooth interface, 
->>> and
->>> after a variable amount of data sent, transfer fails with error:
->>>     kernel: [  415.247453] Bluetooth: hci0 hardware error 0x00
->>
->> Hmmm, was there any other information regarding why this happened?
-> 
-> Frederic informed us privately about this issue.
-
-Ok, except no one else knows that.
-
-Least of all Greg, since the revert wasn't even addressed to him either :/
-
-> I tried to hunt the
-> root cause but mostly (there was one observation but apparently seems
-> it is not related to this issue) nothing looks wrong.
-> 
->> Eg., did the driver mistakenly re-order i/o (DMA occurred after PIO)?
-> 
-> I have few tracing dumps which Frederic provides to me, but I couldn't
-> see such a problem. Maybe I missed it.
-
-Ok.
-
-> My commit 9119fba0cfed introduces interleaved IO (DMA/PIO) which makes
-> it like DMA -> PIO -> DMA -> ...
-
-I realize that. However interleaving DMA and PIO _must_ be supported
-by the platform to enable DMA for 8250 serial devices anway.
-
-When Heikki added DMA support to the 8250 driver, he left out important
-functionality which requires interleaved DMA and PIO.
-
-When I fix that omission, platforms using DMA that shouldn't be are going
-to get broken anyway.
-
-Regards,
-Peter Hurley
-
->> Or, might there be some race condition in the dmaengine driver on 
->> this
->> platform?
-> 
-> There is [1] might be a clue, though I don't think it's directly
-> related.
-> 
-> [1] http://www.spinics.net/lists/linux-spi/msg01151.html
-> The change prevents interleaved DMA/PIO IO.
-> 
->>
->> Regards,
->> Peter Hurley
->>
->>> Found on T100TA.
+2015-09-08 8:47 GMT+03:00 Andrejs Hanins <andrejs.hanins@ubnt.com>:
+> Hi,
+>
+> On 09/07/2015 07:47 PM, Kyle Shneider wrote:
+>> 2015-09-07 10:25 GMT+03:00 Andrejs Hanins <andrejs.hanins@ubnt.com>:
 >>>
->>> After reverting this commit, send works fine for any file size.
+>>> Hi Kyle,
 >>>
->>> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
->>> ---
->>>  drivers/tty/serial/8250/8250_dma.c | 4 ----
->>>  1 file changed, 4 deletions(-)
->>>
->>> diff --git a/drivers/tty/serial/8250/8250_dma.c 
->>> b/drivers/tty/serial/8250/8250_dma.c
->>> index 21d01a4..e508939 100644
->>> --- a/drivers/tty/serial/8250/8250_dma.c
->>> +++ b/drivers/tty/serial/8250/8250_dma.c
->>> @@ -80,10 +80,6 @@ int serial8250_tx_dma(struct uart_8250_port *p)
->>>  		return 0;
->>>  
->>>  	dma->tx_size = CIRC_CNT_TO_END(xmit->head, xmit->tail, 
->>> UART_XMIT_SIZE);
->>> -	if (dma->tx_size < p->port.fifosize) {
->>> -		ret = -EINVAL;
->>> -		goto err;
->>> -	}
->>>  
->>>  	desc = dmaengine_prep_slave_single(dma->txchan,
->>>  					   dma->tx_addr + xmit
->>> ->tail,
->>>
+>>> On 09/06/2015 05:23 PM, Kyle Shneider wrote:
+>>>> Hello again.
+>>>>
+>>>> I'm testing bluez 5.33 on raspberry pi. After successfully launching
+>>>> bluetoothd, powering hci-device up and setting it 'Discoverable' (done
+>>>> through DBus API) iPad mini can't see it. In other way shitty android
+>>>> 4.1.1 tablet finds raspberry in a moment.
+>>>> Have i missed something?
+>>> iOS will only show you devices which implement at least one of the Bluetooth profiles supported by iOS (https://support.apple.com/en-us/HT204387).
+>>> So you need to have appropriate SDP record with supported profile. I would suggest to start with org.bluez.ProfileManager1 D-Bus interface.
+>>>> Did anyone have successful experience of pairing apple devices and
+>>>> latest versions of bluez?
+>>>> BTW ble adapter: cambridge silicon radio.
+>>>>
 >>
-> 
+>>
+>> Thanks for the answer Andrejs.
+>> I don't understand. What about GATT profile?
+> I think, it is the same - you need to advertise a service supported by iOS in order for the BLE device to appear in standard iOS Bluetooth device list. However, if you write your own app, there is an access to all BLE devices seen around.
+> Can iOS device initialize
+>> pairing via GATT profile?
+> Yes. It worked for me when I tried something like kernel 3.19 and BlueZ 5.32 or so. I was using LightBlue app for my testing.
+>>
 
+So after installing latest kernel 4.1.8 problem doesn't solved for me.
+On raspberry i launch:
+- bluetoothd -nE
+- bluez-5.34/test/test-gatt-profile
+- bluez-5.34/test/example-gatt-server
+- bluez-5.34/test/simple-agent
+
+Neither iOS LightBlue application can't see raspberry nor Android BLE
+scanner. Have i missed something?
+
+-- 
+Kyle Shneider
