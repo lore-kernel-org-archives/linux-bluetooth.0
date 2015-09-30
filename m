@@ -1,39 +1,307 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 1 Aug 2015 15:30:08 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Arron Wang <arron.wang@intel.com>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [patch] Bluetooth: fix breakage in amp_write_rem_assoc_frag()
-Message-ID: <20150801123008.GA4378@mwanda>
+From: <bjorn.andersson@sonymobile.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>
+CC: Fengwei Yin <fengwei.yin@linaro.org>, Srinivas Kandagatla
+	<srinivas.kandagatla@linaro.org>, <linux-kernel@vger.kernel.org>,
+	<linux-bluetooth@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+Subject: [PATCH] Bluetooth: hci_smd: Qualcomm WCNSS HCI driver
+Date: Wed, 30 Sep 2015 16:03:00 -0700
+Message-ID: <1443654180-29416-1-git-send-email-bjorn.andersson@sonymobile.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We should be passing the pointer itself instead of the address of the
-pointer.
+From: Bjorn Andersson <bjorn.andersson@sonymobile.com>
 
-This was a copy and paste bug when we replaced the calls to
-hci_send_cmd().  Originally, the arguments were "len, cp" but we
-overwrote them with "sizeof(cp), &cp" by mistake.
+The Qualcomm WCNSS chip provides two SMD channels to the BT core; one
+for command and one for event packets. This driver exposes the two
+channels as a hci device.
 
-Fixes: b3d3914006a0 ('Bluetooth: Move amp assoc read/write completed callback to amp.c')
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Bjorn Andersson <bjorn.andersson@sonymobile.com>
 ---
-I'm pretty sure this is correct, but it's a static checker fix and I
-haven't tested it.
+ drivers/bluetooth/Kconfig   |  11 +++
+ drivers/bluetooth/Makefile  |   1 +
+ drivers/bluetooth/hci_smd.c | 222 ++++++++++++++++++++++++++++++++++++++++++++
+ include/net/bluetooth/hci.h |   1 +
+ 4 files changed, 235 insertions(+)
+ create mode 100644 drivers/bluetooth/hci_smd.c
 
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 238ddd3..e32f341 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -379,7 +379,7 @@ static bool amp_write_rem_assoc_frag(struct hci_dev *hdev,
- 	amp_ctrl_put(ctrl);
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 3d480d8c6111..1a2658f373b5 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -62,6 +62,17 @@ config BT_HCIBTSDIO
+ 	  Say Y here to compile support for Bluetooth SDIO devices into the
+ 	  kernel or say M to compile it as module (btsdio).
  
- 	hci_req_init(&req, hdev);
--	hci_req_add(&req, HCI_OP_WRITE_REMOTE_AMP_ASSOC, sizeof(cp), &cp);
-+	hci_req_add(&req, HCI_OP_WRITE_REMOTE_AMP_ASSOC, len, cp);
- 	hci_req_run_skb(&req, write_remote_amp_assoc_complete);
++config BT_HCISMD
++	tristate "HCI Qualcomm SMD driver"
++	depends on QCOM_SMD
++	help
++	  Qualcomm SMD HCI driver.
++	  This driver is used to bridge HCI data onto the shared memory
++	  channels to the WCNSS core.
++
++	  Say Y here to compile support for HCI over Qualcomm SMD into the
++	  kernelor say M to compile as a module.
++
+ config BT_HCIUART
+ 	tristate "HCI UART driver"
+ 	depends on TTY
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 07c9cf381e5a..43c7dc8641ff 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -14,6 +14,7 @@ obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
  
- 	kfree(cp);
+ obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
+ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
++obj-$(CONFIG_BT_HCISMD)		+= hci_smd.o
+ 
+ obj-$(CONFIG_BT_INTEL)		+= btintel.o
+ obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
+diff --git a/drivers/bluetooth/hci_smd.c b/drivers/bluetooth/hci_smd.c
+new file mode 100644
+index 000000000000..e5748da2f902
+--- /dev/null
++++ b/drivers/bluetooth/hci_smd.c
+@@ -0,0 +1,222 @@
++/*
++ * Copyright (c) 2015, Sony Mobile Communications Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 and
++ * only version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#include <linux/module.h>
++#include <linux/slab.h>
++#include <linux/soc/qcom/smd.h>
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/hci.h>
++
++static struct {
++	struct qcom_smd_channel *acl_channel;
++	struct qcom_smd_channel *cmd_channel;
++
++	struct hci_dev *hci;
++} smd_hci;
++
++static int smd_hci_recv(unsigned type, const void *data, size_t count)
++{
++	struct sk_buff *skb;
++	void *buf;
++	int ret;
++
++	skb = bt_skb_alloc(count, GFP_ATOMIC);
++	if (!skb)
++		return -ENOMEM;
++
++	buf = skb_put(skb, count);
++	memcpy_fromio(buf, data, count);
++
++	skb->dev = (void *)smd_hci.hci;
++	bt_cb(skb)->pkt_type = type;
++	skb_orphan(skb);
++
++	ret = hci_recv_frame(smd_hci.hci, skb);
++	if (ret < 0)
++		kfree_skb(skb);
++
++	return ret;
++}
++
++static int smd_hci_acl_callback(struct qcom_smd_device *qsdev,
++				const void *data,
++				size_t count)
++{
++	return smd_hci_recv(HCI_ACLDATA_PKT, data, count);
++}
++
++static int smd_hci_cmd_callback(struct qcom_smd_device *qsdev,
++				const void *data,
++				size_t count)
++{
++	return smd_hci_recv(HCI_EVENT_PKT, data, count);
++}
++
++static int smd_hci_send(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	int ret;
++
++	switch (bt_cb(skb)->pkt_type) {
++	case HCI_ACLDATA_PKT:
++	case HCI_SCODATA_PKT:
++		ret = qcom_smd_send(smd_hci.acl_channel, skb->data, skb->len);
++		break;
++	case HCI_COMMAND_PKT:
++		ret = qcom_smd_send(smd_hci.cmd_channel, skb->data, skb->len);
++		break;
++	default:
++		ret = -ENODEV;
++		break;
++	}
++
++	kfree_skb(skb);
++
++	return ret;
++}
++
++static int smd_hci_open(struct hci_dev *hci)
++{
++	return 0;
++}
++
++static int smd_hci_close(struct hci_dev *hci)
++{
++	return 0;
++}
++
++static int smd_hci_set_bdaddr(struct hci_dev *hci,
++			      const bdaddr_t *bdaddr)
++{
++	u8 buf[12];
++
++	buf[0] = 0x0b;
++	buf[1] = 0xfc;
++	buf[2] = 0x9;
++	buf[3] = 0x1;
++	buf[4] = 0x2;
++	buf[5] = sizeof(bdaddr_t);
++	memcpy(buf + 6, bdaddr, sizeof(bdaddr_t));
++
++	return qcom_smd_send(smd_hci.cmd_channel, buf, sizeof(buf));
++}
++
++static int smd_hci_register(void)
++{
++	struct hci_dev *hci;
++	int ret;
++
++	if (smd_hci.hci)
++		return 0;
++
++	/* Wait for both channels to probe before registering */
++	if (!smd_hci.acl_channel || !smd_hci.cmd_channel)
++		return 0;
++
++	hci = hci_alloc_dev();
++	if (!hci)
++		return -ENOMEM;
++
++	hci->bus = HCI_SMD;
++	hci->open = smd_hci_open;
++	hci->close = smd_hci_close;
++	hci->send = smd_hci_send;
++	hci->set_bdaddr = smd_hci_set_bdaddr;
++
++	ret = hci_register_dev(hci);
++	if (ret < 0) {
++		hci_free_dev(hci);
++		return ret;
++	}
++
++	smd_hci.hci = hci;
++
++	return 0;
++}
++
++static void smd_hci_unregister(void)
++{
++	/* Only unregister on the first remove call */
++	if (!smd_hci.hci)
++		return;
++
++	hci_unregister_dev(smd_hci.hci);
++	hci_free_dev(smd_hci.hci);
++	smd_hci.hci = NULL;
++}
++
++static int smd_hci_acl_probe(struct qcom_smd_device *sdev)
++{
++	smd_hci.acl_channel = sdev->channel;
++	smd_hci_register();
++
++	return 0;
++}
++
++static int smd_hci_cmd_probe(struct qcom_smd_device *sdev)
++{
++	smd_hci.cmd_channel = sdev->channel;
++	smd_hci_register();
++
++	return 0;
++}
++
++static void smd_hci_acl_remove(struct qcom_smd_device *sdev)
++{
++	smd_hci.acl_channel = NULL;
++	smd_hci_unregister();
++}
++
++static void smd_hci_cmd_remove(struct qcom_smd_device *sdev)
++{
++	smd_hci.cmd_channel = NULL;
++	smd_hci_unregister();
++}
++
++static const struct qcom_smd_id smd_hci_acl_match[] = {
++	{ .name = "APPS_RIVA_BT_ACL" },
++	{}
++};
++
++static const struct qcom_smd_id smd_hci_cmd_match[] = {
++	{ .name = "APPS_RIVA_BT_CMD" },
++	{}
++};
++
++static struct qcom_smd_driver smd_hci_acl_driver = {
++	.probe = smd_hci_acl_probe,
++	.remove = smd_hci_acl_remove,
++	.callback = smd_hci_acl_callback,
++	.smd_match_table = smd_hci_acl_match,
++	.driver  = {
++		.name  = "qcom_smd_hci_acl",
++		.owner = THIS_MODULE,
++	},
++};
++
++static struct qcom_smd_driver smd_hci_cmd_driver = {
++	.probe = smd_hci_cmd_probe,
++	.remove = smd_hci_cmd_remove,
++	.callback = smd_hci_cmd_callback,
++	.smd_match_table = smd_hci_cmd_match,
++	.driver  = {
++		.name  = "qcom_smd_hci_cmd",
++		.owner = THIS_MODULE,
++	},
++};
++
++module_qcom_smd_driver(smd_hci_acl_driver);
++module_qcom_smd_driver(smd_hci_cmd_driver);
++
++MODULE_DESCRIPTION("Qualcomm SMD HCI driver");
++MODULE_LICENSE("GPL v2");
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 7ca6690355ea..ee5b2dd922f6 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -58,6 +58,7 @@
+ #define HCI_RS232	4
+ #define HCI_PCI		5
+ #define HCI_SDIO	6
++#define HCI_SMD		7
+ 
+ /* HCI controller types */
+ #define HCI_BREDR	0x00
+-- 
+2.4.2
