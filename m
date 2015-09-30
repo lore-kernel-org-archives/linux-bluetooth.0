@@ -7,35 +7,35 @@ Cc: linux-acpi@vger.kernel.org,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Frederic Danis <frederic.danis@linux.intel.com>,
 	Jarkko Nikula <jarkko.nikula@linux.intel.com>
-Subject: [PATCH 2/5] Bluetooth: hci_bcm: Handle possible error from acpi_dev_get_resources()
-Date: Wed, 30 Sep 2015 16:26:42 +0300
-Message-Id: <1443619605-19320-2-git-send-email-jarkko.nikula@linux.intel.com>
-In-Reply-To: <1443619605-19320-1-git-send-email-jarkko.nikula@linux.intel.com>
-References: <1443619605-19320-1-git-send-email-jarkko.nikula@linux.intel.com>
+Subject: [PATCH 1/5] Bluetooth: hci_bcm: Add missing acpi_dev_free_resource_list()
+Date: Wed, 30 Sep 2015 16:26:41 +0300
+Message-Id: <1443619605-19320-1-git-send-email-jarkko.nikula@linux.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Driver doesn't handle possible error from acpi_dev_get_resources(). Test it
-and return the error code in case of error.
+Caller of acpi_dev_get_resources() should free the constructed resource
+list by calling the acpi_dev_free_resource_list() in order to avoid memory
+leak.
 
 Signed-off-by: Jarkko Nikula <jarkko.nikula@linux.intel.com>
 ---
- drivers/bluetooth/hci_bcm.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Call to acpi_dev_get_resources() was introduced by the commit ae056908862b
+("Bluetooth: hci_bcm: Retrieve UART speed from ACPI") so fix should go to
+v4.3-rc.
+---
+ drivers/bluetooth/hci_bcm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 1a538ad6bf2b..5375c9c04fda 100644
+index 0c791ac279d0..1a538ad6bf2b 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -705,7 +705,9 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 	if (!adev)
+@@ -706,6 +706,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
  		return 0;
  
--	acpi_dev_get_resources(adev, &resources, bcm_resource, dev);
-+	ret = acpi_dev_get_resources(adev, &resources, bcm_resource, dev);
-+	if (ret < 0)
-+		return ret;
- 	acpi_dev_free_resource_list(&resources);
+ 	acpi_dev_get_resources(adev, &resources, bcm_resource, dev);
++	acpi_dev_free_resource_list(&resources);
  
  	dmi_id = dmi_first_match(bcm_wrong_irq_dmi_table);
+ 	if (dmi_id) {
 -- 
 2.5.3
