@@ -1,33 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH] bluetooth: bt3c_cs: clean up bt3c_cs driver code
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20151001125557.GA4143@jci-VirtualBox>
-Date: Thu, 1 Oct 2015 15:23:24 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <6E72450D-94E9-4918-8F6F-871AFB52E2D9@holtmann.org>
-References: <20151001125557.GA4143@jci-VirtualBox>
-To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
+	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] bluetooth: bt3c_cs: clean up bt3c_cs driver code
+Date: Thu, 1 Oct 2015 12:56:22 +0000
+Message-ID: <20151001125557.GA4143@jci-VirtualBox>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prasanna,
+From: Prasanna Karthik <mkarthi3@visteon.com>
 
-> Patch fixes the checkpatch warnings:
-> - use linux/io.h instead of asm/io.h
-> - NULL comparison could be re-written
-> 
-> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
-> ---
-> drivers/bluetooth/bt3c_cs.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+Patch fixes the checkpatch warnings:
+- use linux/io.h instead of asm/io.h
+- NULL comparison could be re-written
 
-the patch does not apply to bluetooth-next tree.
+Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+---
+ drivers/bluetooth/bt3c_cs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Regards
-
-Marcel
-
+diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
+index 772a277..5597eef 100644
+--- a/drivers/bluetooth/bt3c_cs.c
++++ b/drivers/bluetooth/bt3c_cs.c
+@@ -39,7 +39,7 @@
+ #include <linux/serial.h>
+ #include <linux/serial_reg.h>
+ #include <linux/bitops.h>
+-#include <asm/io.h>
++#include <linux/io.h>
+=20
+ #include <linux/device.h>
+ #include <linux/firmware.h>
+@@ -233,7 +233,7 @@ static void bt3c_receive(struct bt3c_info *info)
+ 		info->hdev->stat.byte_rx++;
+=20
+ 		/* Allocate packet */
+-		if (info->rx_skb =3D=3D NULL) {
++		if (!info->rx_skb) {
+ 			info->rx_state =3D RECV_WAIT_PACKET_TYPE;
+ 			info->rx_count =3D 0;
+ 			info->rx_skb =3D bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
+--=20
+1.9.1
