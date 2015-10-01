@@ -1,421 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 1 Oct 2015 13:33:38 -0700
-From: Bjorn Andersson <bjorn.andersson@sonymobile.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, Fengwei
- Yin <fengwei.yin@linaro.org>, Srinivas Kandagatla
-	<srinivas.kandagatla@linaro.org>, Linux Kernel Mailing List
-	<linux-kernel@vger.kernel.org>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, "linux-arm-msm@vger.kernel.org"
-	<linux-arm-msm@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: hci_smd: Qualcomm WCNSS HCI driver
-Message-ID: <20151001203338.GW24668@usrtlx11787.corpusers.net>
-References: <1443654180-29416-1-git-send-email-bjorn.andersson@sonymobile.com>
- <036E1E75-8E6A-4116-A648-A188A8458416@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <036E1E75-8E6A-4116-A648-A188A8458416@holtmann.org>
+In-Reply-To: <B4AA2825-8C58-46FB-A529-7CC910920500@holtmann.org>
+References: <CAHkwNT=sQQz11YWsxivxb20mW7rh1U=CXTN7uyBqTzkXvNbXgA@mail.gmail.com>
+	<37D1ED5D-6FF5-4ABA-BD2A-222261BE1EAA@holtmann.org>
+	<CAHkwNT=3m4nU5M_Kk5htfDonqPrKZO5vRR0q_8Mn2O=umGMK5Q@mail.gmail.com>
+	<B4AA2825-8C58-46FB-A529-7CC910920500@holtmann.org>
+Date: Fri, 2 Oct 2015 00:21:47 +0530
+Message-ID: <CAHkwNT=Hoc4xibrtg2zk7K1vwcutcWgUHAN58XpWH0jnqfLXbg@mail.gmail.com>
+Subject: Re: Issues With USB Bluetooth Dongle
+From: Anil Nair <anilcoll90@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed 30 Sep 23:54 PDT 2015, Marcel Holtmann wrote:
+Hi,
 
-> Hi Bjorn,
-> 
-> > The Qualcomm WCNSS chip provides two SMD channels to the BT core; one
-> > for command and one for event packets. This driver exposes the two
-> > channels as a hci device.
-> > 
-[..]
-> > diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-> > index 07c9cf381e5a..43c7dc8641ff 100644
-> > --- a/drivers/bluetooth/Makefile
-> > +++ b/drivers/bluetooth/Makefile
-> > @@ -14,6 +14,7 @@ obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
-> > 
-> > obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
-> > obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
-> > +obj-$(CONFIG_BT_HCISMD)		+= hci_smd.o
-> 
-> I wonder if choosing a name like btqcomsmd.ko would not be better
-> here. For now I am fine with keeping hci_smd.ko since there are other
-> issues here to be fixed first.
+> use hcidump. You are stuck with BlueZ 4 since Ubuntu refuses to upgrade to BlueZ 5.
+>
 
-I had some problems figuring out the naming scheme here, but btqcomsmd
-does seem reasonable, I'll update it in the next set.
+The  USB Dongle isnt being discovered nor Can I send or recieve any
+file, I used "hcicump" the only output that i am able to get is,
 
-> Especially the kbuild test robot complained loudly.
-> 
+HCI sniffer - Bluetooth packet analyzer ver 2.5
+device: hci0 snap_len: 1500 filter: 0xffffffffffffffff
 
-Sorry, I forgot to mention in the patch that the patch depends on the
-qcom_smd_id patch - that's available in linux-next. I will take another
-look, but I think that was the cause of all the issues.
+>>> include /sys/kernel/debug/usb/devices from this device.
+>>
+>> Did you mean the contents in the file? I did not understand.
+>
+> Yes, there will be section for your controller.
+>
 
-> > obj-$(CONFIG_BT_INTEL)		+= btintel.o
-> > obj-$(CONFIG_BT_ATH3K)		+= ath3k.o
-> > diff --git a/drivers/bluetooth/hci_smd.c b/drivers/bluetooth/hci_smd.c
-[..]
-> > +#include <net/bluetooth/hci.h>
-> 
-> The hci.h include is not needed. If you do, then you are doing
-> something fishy.
-> 
+T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a12 ProdID=0001 Rev= 1.00
+S:  Manufacturer=Bluetooth v2.0
+S:  Product=Bluetooth V2.0 Dongle
+C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
 
-Nothing fishy going on here, so I'll drop it.
+>>> Then again, you are running a 3.13 kernel, that is a pretty old kernel.
+>>
+>> You want me to try it with the latest stable release?
+>
+> That might actually help. Try to run a 4.2 kernel.
 
-> > +
-> > +static struct {
-> > +	struct qcom_smd_channel *acl_channel;
-> > +	struct qcom_smd_channel *cmd_channel;
-> > +
-> > +	struct hci_dev *hci;
-> > +} smd_hci;
-> 
-> A driver that only supports a single instance of a device and uses a
-> global variable to do so is not a good idea. There should be no reason
-> for this. Why is this done this way.
-> 
+I will have to compile the kernel from source and attach the kernel
+image to Ubuntu right?
+Is there any documentation avaliable?
 
-There's two channels coming up, each probing the associated driver that
-combines these into 1 hci device.
-
-So I have two options;
-
-* the original idea was to implement multi-channel-per-device support in
-  SMD, but as this is the only known case where that's needed I really
-  don't want to add all the extra complexity to SMD.
-
-* I can accept the fact that this is silicon inside the MSM SoC and
-  should never exist in more than one instance and make this hack. The
-  first version I implemented had this structure allocated on the first
-  probe, but that didn't really add any value to the static struct.
-
-I picked the second option due to the fact that the patch to SMD was way
-bigger then this patch, and full of nasty logic.
-
-> > +
-> > +static int smd_hci_recv(unsigned type, const void *data, size_t count)
-> > +{
-> > +	struct sk_buff *skb;
-> > +	void *buf;
-> > +	int ret;
-> > +
-> > +	skb = bt_skb_alloc(count, GFP_ATOMIC);
-> 
-> Is it required that this is GFP_ATOMIC or can this actually be
-> GFP_KERNEL?
-> 
-
-This is being called from IRQ context upon receiving data on the
-channels.
-
-> > +	if (!skb)
-> > +		return -ENOMEM;
-> > +
-> > +	buf = skb_put(skb, count);
-> > +	memcpy_fromio(buf, data, count);
-> 
-> Why is this a memcpy_fromio here?
-> 
-
-A memcpy here doesn't seem to work on ARM64, probably because the
-pointer references ioremapped memory. We are discussing either marking
-the data __iomem or perhaps using memremap rather then ioremap.
-
-> > +
-> > +	skb->dev = (void *)smd_hci.hci;
-> 
-> This is no longer needed.
-> 
-
-Thanks
-
-> > +	bt_cb(skb)->pkt_type = type;
-> > +	skb_orphan(skb);
-> > +
-> > +	ret = hci_recv_frame(smd_hci.hci, skb);
-> > +	if (ret < 0)
-> > +		kfree_skb(skb);
-> 
-> This is a double kfree_skb here. The hci_recv_frame will consume the
-> skb no matter what.
-> 
-
-Thanks
-
-> > +
-> > +	return ret;
-> > +}
-> > +
-[..]
-> > +
-> > +static int smd_hci_send(struct hci_dev *hdev, struct sk_buff *skb)
-> > +{
-> > +	int ret;
-> > +
-> > +	switch (bt_cb(skb)->pkt_type) {
-> > +	case HCI_ACLDATA_PKT:
-> > +	case HCI_SCODATA_PKT:
-> > +		ret = qcom_smd_send(smd_hci.acl_channel, skb->data, skb->len);
-> > +		break;
-> > +	case HCI_COMMAND_PKT:
-> > +		ret = qcom_smd_send(smd_hci.cmd_channel, skb->data, skb->len);
-> > +		break;
-> > +	default:
-> > +		ret = -ENODEV;
-> > +		break;
-> > +	}
-> > +
-> > +	kfree_skb(skb);
-
-> 
-> If you return an error, then the caller of hdev->send will free the
-> skb.
-> 
-
-Must have looked in the wrong kernel tree :(
-
-Thanks.
-
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static int smd_hci_open(struct hci_dev *hci)
-> > +{
-> > +	return 0;
-> > +}
-> > +
-> > +static int smd_hci_close(struct hci_dev *hci)
-> > +{
-> > +	return 0;
-> > +}
-> 
-> These two need to at least handling the HCI_RUNNING flag setting and
-> clearing like all the other drivers do.
-> 
-
-I'm puzzled to the purpose of this, is this only for indication to user
-space or am I missing something?
-
-I found a couple of others that does nothing but set and clear this bit
-in their open and close. Would you be open for a framework patch that
-provides this functionality to drivers that doesn't need anything else?
-
-> > +
-> > +static int smd_hci_set_bdaddr(struct hci_dev *hci,
-> > +			      const bdaddr_t *bdaddr)
-> > +{
-> > +	u8 buf[12];
-> > +
-> > +	buf[0] = 0x0b;
-> > +	buf[1] = 0xfc;
-> > +	buf[2] = 0x9;
-> > +	buf[3] = 0x1;
-> > +	buf[4] = 0x2;
-> 
-> Use full 0x00 syntax here.
-> 
-
-Ok
-
-> > +	buf[5] = sizeof(bdaddr_t);
-> > +	memcpy(buf + 6, bdaddr, sizeof(bdaddr_t));
-> 
-> We also need to be sure that this command only changes the BD_ADDR in
-> RAM. It can not be persistent. When resetting / power cycle the
-> controller it will fallback to its default.
-> 
-
-There seems to be no persistent storage at all in this chip, the BD_ADDR
-being used comes from one of the firmware files, so this just adjust the
-in-memory configuration.
-
-> > +
-> > +	return qcom_smd_send(smd_hci.cmd_channel, buf, sizeof(buf));
-> 
-> Use __hci_cmd_sync since that is what is suppose to be used in this
-> callback. See the other drivers on how this is done.
-> 
-
-I did see this, and I first implemented it like that. Unfortunately the
-firmware does not ack the command and __hci_cmd_sync() just times out.
-
-I didn't manage to find a way around this.
-
-> I wonder if qca_set_bdaddr_rome is not actually the same command and
-> you could just use that instead.
-> 
-
-Looks to be exactly the same thing and gives insight in what those first
-5 bytes are. I'll update the magics based on this information.
-
-If I didn't have the issue of the timeout it seems like I should be able
-to just call it.
-
-> > +}
-> > +
-> > +static int smd_hci_register(void)
-> > +{
-> > +	struct hci_dev *hci;
-> > +	int ret;
-> > +
-> > +	if (smd_hci.hci)
-> > +		return 0;
-> > +
-> > +	/* Wait for both channels to probe before registering */
-> > +	if (!smd_hci.acl_channel || !smd_hci.cmd_channel)
-> > +		return 0;
-> > +
-> > +	hci = hci_alloc_dev();
-> > +	if (!hci)
-> > +		return -ENOMEM;
-> > +
-> > +	hci->bus = HCI_SMD;
-> > +	hci->open = smd_hci_open;
-> > +	hci->close = smd_hci_close;
-> > +	hci->send = smd_hci_send;
-> > +	hci->set_bdaddr = smd_hci_set_bdaddr;
-> > +
-> > +	ret = hci_register_dev(hci);
-> > +	if (ret < 0) {
-> > +		hci_free_dev(hci);
-> > +		return ret;
-> > +	}
-> > +
-> > +	smd_hci.hci = hci;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static void smd_hci_unregister(void)
-> > +{
-> > +	/* Only unregister on the first remove call */
-> > +	if (!smd_hci.hci)
-> > +		return;
-> > +
-> > +	hci_unregister_dev(smd_hci.hci);
-> > +	hci_free_dev(smd_hci.hci);
-> > +	smd_hci.hci = NULL;
-> > +}
-> > +
-> > +static int smd_hci_acl_probe(struct qcom_smd_device *sdev)
-> > +{
-> > +	smd_hci.acl_channel = sdev->channel;
-> > +	smd_hci_register();
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int smd_hci_cmd_probe(struct qcom_smd_device *sdev)
-> > +{
-> > +	smd_hci.cmd_channel = sdev->channel;
-> > +	smd_hci_register();
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static void smd_hci_acl_remove(struct qcom_smd_device *sdev)
-> > +{
-> > +	smd_hci.acl_channel = NULL;
-> > +	smd_hci_unregister();
-> > +}
-> > +
-> > +static void smd_hci_cmd_remove(struct qcom_smd_device *sdev)
-> > +{
-> > +	smd_hci.cmd_channel = NULL;
-> > +	smd_hci_unregister();
-> > +}
-> > +
-> > +static const struct qcom_smd_id smd_hci_acl_match[] = {
-> > +	{ .name = "APPS_RIVA_BT_ACL" },
-> > +	{}
-> > +};
-> > +
-> > +static const struct qcom_smd_id smd_hci_cmd_match[] = {
-> > +	{ .name = "APPS_RIVA_BT_CMD" },
-> > +	{}
-> > +};
-> > +
-> > +static struct qcom_smd_driver smd_hci_acl_driver = {
-> > +	.probe = smd_hci_acl_probe,
-> > +	.remove = smd_hci_acl_remove,
-> > +	.callback = smd_hci_acl_callback,
-> > +	.smd_match_table = smd_hci_acl_match,
-> > +	.driver  = {
-> > +		.name  = "qcom_smd_hci_acl",
-> > +		.owner = THIS_MODULE,
-> > +	},
-> > +};
-> > +
-> > +static struct qcom_smd_driver smd_hci_cmd_driver = {
-> > +	.probe = smd_hci_cmd_probe,
-> > +	.remove = smd_hci_cmd_remove,
-> > +	.callback = smd_hci_cmd_callback,
-> > +	.smd_match_table = smd_hci_cmd_match,
-> > +	.driver  = {
-> > +		.name  = "qcom_smd_hci_cmd",
-> > +		.owner = THIS_MODULE,
-> > +	},
-> > +};
-> > +
-> > +module_qcom_smd_driver(smd_hci_acl_driver);
-> > +module_qcom_smd_driver(smd_hci_cmd_driver);
-
-> 
-> This is not going to fly. This turns it into two module_{init,exit}
-> calls. That really does not work this way.
-> 
-
-Right, I would need to at least fill in my own init and exit functions
-with the two registers/unregisters calls...
-
-> I mean why do you need two different drivers in the first place. I
-> should be matching via a single qcom_smd_id in the first place. And
-> you handle everything else in the probe() callback.
-> 
-
-The first iteration had 1 probe, 1 remove and 1 callback. I pulled the
-match-data in probe and made the rest use this information by drvdata.
-It was the same blocks of code as now, but accessed via the wrapper
-drvdata object - so although one shouldn't do like this, this is much
-cleaner.
-
-> For me this is similar to the USB case where you actually have to
-> claim to interfaces. We just lookup the other interface and claim it.
-> It looks like SMD core functionality needs the same feature.
-> 
-
-Indeed, as I said above the plan was to implement something where I
-either only probe when all channels where up (turned out to be a mess to
-implement) or have some accessor function that can be called from probe
-to open a second channel.
-
-The latter seems reasonable to do, but it will be way more code than
-there's in this driver - which seems to be the only case where that
-feature would be needed.
-
-> > +
-> > +MODULE_DESCRIPTION("Qualcomm SMD HCI driver");
-> > +MODULE_LICENSE("GPL v2");
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index 7ca6690355ea..ee5b2dd922f6 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -58,6 +58,7 @@
-> > #define HCI_RS232	4
-> > #define HCI_PCI		5
-> > #define HCI_SDIO	6
-> > +#define HCI_SMD		7
-> 
-> I would prefer if this come in a separate patch from the driver.
-> 
-
-Sure thing.
-
-
-Thanks for your review Marcel.
-
+--
 Regards,
-Born
+Anil Nair
