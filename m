@@ -1,27 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  0/3] Use tester framework
-Date: Thu, 01 Oct 2015 20:02:20 +0530
-Message-id: <1443709943-29957-1-git-send-email-gowtham.ab@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <37D1ED5D-6FF5-4ABA-BD2A-222261BE1EAA@holtmann.org>
+References: <CAHkwNT=sQQz11YWsxivxb20mW7rh1U=CXTN7uyBqTzkXvNbXgA@mail.gmail.com>
+	<37D1ED5D-6FF5-4ABA-BD2A-222261BE1EAA@holtmann.org>
+Date: Thu, 1 Oct 2015 19:58:04 +0530
+Message-ID: <CAHkwNT=3m4nU5M_Kk5htfDonqPrKZO5vRR0q_8Mn2O=umGMK5Q@mail.gmail.com>
+Subject: Re: Issues With USB Bluetooth Dongle
+From: Anil Nair <anilcoll90@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove mainloop and use tester framework to
-produces much better output.
+Hi All,
 
-Gowtham Anandha Babu (3):
-  unit/test-hfp: Use tester framework
-  unit/test-sdp: Use tester framework
-  unit/test-uhid: Use tester framework
+The following is the output from hciconfig,
 
- unit/test-hfp.c  | 91 +++++++++++++++++++++++++++-----------------------------
- unit/test-sdp.c  | 91 +++++++++++++++++++++++++-------------------------------
- unit/test-uhid.c | 62 ++++++++++++++++----------------------
- 3 files changed, 110 insertions(+), 134 deletions(-)
+hci0: Type: BR/EDR  Bus: USB
+BD Address: 00:1B:10:00:2A:EC  ACL MTU: 1017:8  SCO MTU: 64:0
+DOWN
+RX bytes:474 acl:0 sco:0 events:18 errors:0
+TX bytes:74 acl:0 sco:0 commands:18 errors:0
 
--- 
-1.9.1
+Marcel By "btmon" did you mean "bt-monitor"? Running bt-monitor gives me,
 
+No Adapters found.
+
+> include /sys/kernel/debug/usb/devices from this device.
+
+Did you mean the contents in the file? I did not understand.
+
+> Then again, you are running a 3.13 kernel, that is a pretty old kernel.
+
+You want me to try it with the latest stable release?
+
+--
+Regards,
+Anil Nair
