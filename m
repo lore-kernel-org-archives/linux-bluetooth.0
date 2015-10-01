@@ -1,47 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH] Revert "serial: 8250_dma: don't bother DMA with small transfers"
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1443689736.8361.322.camel@linux.intel.com>
-Date: Thu, 1 Oct 2015 12:44:55 +0200
-Cc: Peter Hurley <peter@hurleysoftware.com>,
-	Frederic Danis <frederic.danis@linux.intel.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Message-Id: <15E8D395-71C7-44D2-82BB-5B6658872F55@holtmann.org>
-References: <1443617191-21013-1-git-send-email-frederic.danis@linux.intel.com> <560BE919.9020803@hurleysoftware.com> <1443622344.8361.304.camel@linux.intel.com> <560C420B.4030007@hurleysoftware.com> <1443689736.8361.322.camel@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+iR-LXvMDkGiOkh8+X_=PWjrbGs3kveYFMo1UdhHVaNA@mail.gmail.com>
+References: <CAGrhNMyY7rJVZ35p5P5FnGvJPYZuKndau1vNY5k+GCHHYzZtzQ@mail.gmail.com>
+	<CABBYNZ+iR-LXvMDkGiOkh8+X_=PWjrbGs3kveYFMo1UdhHVaNA@mail.gmail.com>
+Date: Thu, 1 Oct 2015 11:17:02 +0100
+Message-ID: <CAGrhNMwpx9Q4Usb75jWofWpLpUxJOd6FsckRT=O4Uj8KBtqayA@mail.gmail.com>
+Subject: Re: [RFC] MIDI over Bluetooth Low Energy
+From: Felipe Tonello <eu@felipetonello.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: alsa-devel@alsa-project.org,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andy,
+Hi Luiz,
 
->>>> It's customary to mail the commit author in patches which revert
->>>> their work.
->>>> 
->>>>> This commit prevents from sending "big" file using Bluetooth.
->>>>> When sending a lot of data quickly through the Bluetooth 
->>>>> interface, 
->>>>> and
->>>>> after a variable amount of data sent, transfer fails with 
->>>>> error:
->>>>>    kernel: [  415.247453] Bluetooth: hci0 hardware error 0x00
-> 
-> Frederic, I forgot to ask how exactly the hw setup looks like?
-> 
-> The message above is not present in the kernel (the closest what I
-> found is 
-> 
-> drivers/bluetooth/btintel.c:98: BT_ERR("%s: Hardware error 0x%2.2x",
-> hdev->name, code);
-> 
-> which makes me think you have USB BT adapter attached to the same
-> machine. Am I wrong?
+On Thu, Oct 1, 2015 at 10:34 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Felipe,
+>
+> On Thu, Oct 1, 2015 at 11:41 AM, Felipe Tonello <eu@felipetonello.com> wrote:
+>> Hi guys,
+>>
+>> I am planning to start the support of MIDI BLE profile[1]. This
+>> profile is not officially supported yet, but it will most likely be
+>> very similar, so development efforts are still valid.
+>>
+>> I suggest two main goals:
+>>  * To be transparent to applications, i.e., use rawmidi and sequencer
+>> ALSA interfaces to interact.
+>>  * To support peripheral and central BLE roles.
+>>
+>> My question is: what is the best way possible of doing it?
+>>
+>> My initial though is to write a GATT BlueZ profile plugin that will
+>> load snd-virtmidi module with id and midi_devs parameters, then read
+>> and write seq events from/to it. I am not sure if this is really
+>> possible.
+>
+> If that doesn't involve creating new threads that would be the
+> direction I would suggest.
 
-the Bluetooth core will generate that error in case the driver does not provide hdev->hw_error callback. We have not hocked that up for the UART driver yet. Look at net/bluetooth/hci_core.c to find the common error message.
+I don't think it will be necessary. Does bluetoothd run plugins as threads?
 
-Regards
+>
+>> Another way of implementing is as a rawmidi and a seq plugin using the
+>> BlueZ GATT D-Bus interface. IMO this is not ideal because it requires
+>> a lot more work (rawmidi and seq plugins, maybe even a library to
+>> avoid code duplication) and has an overhead of using dbus.
+>
+> D-Bus is not meant for data, in fact GATT is not meant for byte stream
+> either since the channel is shared with all other profiles it can
+> cause delay.
 
-Marcel
+GATT can handle MIDI throughput very easily. Usually messages are 1 to
+10 Hz, 3 or 4 bytes each. Even SysEx messages tend to be 250 bytes at
+maximum.
 
+>
+>> It is also possible to write a kernel module to handle ALSA
+>> card/device setup and reads and writes from the bluez plugin (perhaps
+>> this simplifies things because it has less dependencies).
+>
+> Well if it uses the profile uses ATT/GATT then this is not possible
+> since that is implemented in userspace, I guess creating virtual cards
+> would be better (we do that for HoG using uhid), but I guess that is
+> not currently possible otherwise we would have done that for A2DP/HFP
+> already.
+
+The kernel module would act as a virtual card as well. The reads and
+writes would come from user-space (because as you said, ATT/GATT is
+implemented there). The good point is that it would be dedicated for
+midi. It is like loading a usb midi gadget.
+
+>
+>> They all have the problem of context switching between bluez plugin
+>> and alsa midi driver. I would prefer to use a shared ring buffer
+>> between ALSA e BlueZ.
+>
+> You can use anything you want but don't expose bluetoothd to attacks,
+> so probably no shmem, actually if your concern is latency then as I
+> said you shouldn't be using ATT/GATT, instead L2CAP CoC should be used
+> but I don't think Apple has implemented it yet.
+
+What is L2CAP CoC? I am not aware of it.
+
+>
+>> Any ideas and comments?
+>>
+>> [1] https://developer.apple.com/bluetooth/Apple-Bluetooth-Low-Energy-MIDI-Specification.pdf
+>
+> It seems the specs is pretty old, from 2012, that probably explain why
+> L2CAP CoC was not used.
+
+I think that might be first draft, because it was released end of
+2014. Also there are only two or three products out there implementing
+this protocol as it is new. I think will be a great thing if these and
+many other products runs as first class citizen in Linux too.
+
+BTW, is peripheral role fully supported on BlueZ? I did look into this
+beginning of 2014 and it was incomplete.
+
+Felipe
