@@ -3,109 +3,154 @@ From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: bharat.panda@samsung.com,
 	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH  3/3] unit/test-uhid: Use tester framework
-Date: Thu, 01 Oct 2015 20:02:23 +0530
-Message-id: <1443709943-29957-4-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH  2/3] unit/test-sdp: Use tester framework
+Date: Thu, 01 Oct 2015 20:02:22 +0530
+Message-id: <1443709943-29957-3-git-send-email-gowtham.ab@samsung.com>
 In-reply-to: <1443709943-29957-1-git-send-email-gowtham.ab@samsung.com>
 References: <1443709943-29957-1-git-send-email-gowtham.ab@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- unit/test-uhid.c | 62 ++++++++++++++++++++++++--------------------------------
- 1 file changed, 26 insertions(+), 36 deletions(-)
+ unit/test-sdp.c | 91 +++++++++++++++++++++++++--------------------------------
+ 1 file changed, 40 insertions(+), 51 deletions(-)
 
-diff --git a/unit/test-uhid.c b/unit/test-uhid.c
-index b48e0fa..320cd54 100644
---- a/unit/test-uhid.c
-+++ b/unit/test-uhid.c
-@@ -38,6 +38,8 @@
- #include "src/shared/uhid.h"
- #include "src/shared/util.h"
+diff --git a/unit/test-sdp.c b/unit/test-sdp.c
+index b4ef4d1..ac921a9 100644
+--- a/unit/test-sdp.c
++++ b/unit/test-sdp.c
+@@ -37,6 +37,7 @@
+ #include "lib/sdp_lib.h"
  
+ #include "src/shared/util.h"
 +#include "src/shared/tester.h"
-+
- struct test_pdu {
- 	bool valid;
- 	const uint8_t *data;
-@@ -50,7 +52,6 @@ struct test_data {
- };
+ #include "src/log.h"
+ #include "src/sdpd.h"
+ 
+@@ -78,7 +79,7 @@ struct test_data {
+ 		static struct test_data data;				\
+ 		data.mtu = _mtu;					\
+ 		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
+-		g_test_add_data_func(name, &data, test_sdp);		\
++		tester_add(name, &data, NULL, test_sdp, NULL);		\
+ 	} while (0)
+ 
+ #define define_ss(name, args...) define_test("/TP/SERVER/SS/" name, 48, args)
+@@ -105,32 +106,48 @@ struct test_data_de {
+ 		data.input_data = input;				\
+ 		data.input_size = sizeof(input);			\
+ 		data.expected = exp;					\
+-		g_test_add_data_func("/sdp/DE/ATTR/" name, &data,	\
+-						test_sdp_de_attr);	\
++		tester_add("/sdp/DE/ATTR/" name, &data,	NULL,		\
++					test_sdp_de_attr, NULL);	\
+ 	} while (0)
  
  struct context {
 -	GMainLoop *main_loop;
- 	struct bt_uhid *uhid;
- 	guint source;
- 	guint process;
-@@ -74,14 +75,14 @@ struct context {
- 		static struct test_data data;				\
- 		data.test_name = g_strdup(name);			\
- 		data.pdu_list = g_memdup(pdus, sizeof(pdus));		\
--		g_test_add_data_func(name, &data, function);		\
-+		tester_add(name, &data, NULL, function, NULL);		\
- 	} while (0)
+ 	guint server_source;
+ 	guint client_source;
+ 	int fd;
+-	int mtu;
+ 	uint8_t cont_data[16];
+ 	uint8_t cont_size;
+ 	unsigned int pdu_offset;
+-	const struct sdp_pdu *pdu_list;
++	const struct test_data *data;
+ };
  
- static void test_debug(const char *str, void *user_data)
+ static void sdp_debug(const char *str, void *user_data)
  {
  	const char *prefix = user_data;
  
 -	g_print("%s%s\n", prefix, str);
 +	tester_debug("%s%s\n", prefix, str);
- }
- 
- static void test_free(gconstpointer user_data)
-@@ -92,14 +93,29 @@ static void test_free(gconstpointer user_data)
- 	g_free(data->pdu_list);
- }
- 
-+static void destroy_context(struct context *context)
-+{
-+	if (context->source > 0)
-+		g_source_remove(context->source);
-+
-+	bt_uhid_unref(context->uhid);
-+
-+	test_free(context->data);
-+	g_free(context);
 +}
 +
- static gboolean context_quit(gpointer user_data)
- {
- 	struct context *context = user_data;
++static void destroy_context(struct context *context)
++{
++	sdp_svcdb_collect_all(context->fd);
++	sdp_svcdb_reset();
++
++	g_source_remove(context->server_source);
++	g_source_remove(context->client_source);
++
++	g_free(context);
+ }
  
+-static void context_quit(struct context *context)
++static gboolean context_quit(gpointer user_data)
+ {
+-	g_main_loop_quit(context->main_loop);
++	struct context *context = user_data;
 +	if (context == NULL)
 +		return FALSE;
 +
- 	if (context->process > 0)
- 		g_source_remove(context->process);
- 
--	g_main_loop_quit(context->main_loop);
 +	destroy_context(context);
 +	tester_test_passed();
- 
- 	return FALSE;
- }
-@@ -114,8 +130,8 @@ static gboolean send_pdu(gpointer user_data)
- 
- 	len = write(context->fd, pdu->data, pdu->size);
- 
--	if (g_test_verbose())
--		util_hexdump('<', pdu->data, len, test_debug, "uHID: ");
 +
-+	util_hexdump('<', pdu->data, len, test_debug, "uHID: ");
++	return FALSE;
+ }
  
- 	g_assert_cmpint(len, ==, pdu->size);
+ static gboolean server_handler(GIOChannel *channel, GIOCondition cond,
+@@ -169,10 +186,9 @@ static gboolean server_handler(GIOChannel *channel, GIOCondition cond,
+ 		return FALSE;
+ 	}
  
-@@ -156,8 +172,7 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+-	if (g_test_verbose() == TRUE)
+-		util_hexdump('<', buf, len, sdp_debug, "SDP: ");
++	util_hexdump('<', buf, len, sdp_debug, "SDP: ");
+ 
+-	handle_internal_request(fd, context->mtu, buf, len);
++	handle_internal_request(fd, context->data->mtu, buf, len);
+ 
+ 	return TRUE;
+ }
+@@ -185,7 +201,7 @@ static gboolean send_pdu(gpointer user_data)
+ 	unsigned char *buf;
+ 	ssize_t len;
+ 
+-	req_pdu = &context->pdu_list[context->pdu_offset];
++	req_pdu = &context->data->pdu_list[context->pdu_offset];
+ 
+ 	pdu_len = req_pdu->raw_size + context->cont_size;
+ 
+@@ -210,7 +226,7 @@ static void context_increment(struct context *context)
+ {
+ 	context->pdu_offset += 2;
+ 
+-	if (!context->pdu_list[context->pdu_offset].valid) {
++	if (!context->data->pdu_list[context->pdu_offset].valid) {
+ 		context_quit(context);
+ 		return;
+ 	}
+@@ -227,7 +243,7 @@ static gboolean client_handler(GIOChannel *channel, GIOCondition cond,
+ 	ssize_t len;
+ 	int fd;
+ 
+-	rsp_pdu = &context->pdu_list[context->pdu_offset + 1];
++	rsp_pdu = &context->data->pdu_list[context->pdu_offset + 1];
+ 
+ 	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
+ 		return FALSE;
+@@ -238,8 +254,7 @@ static gboolean client_handler(GIOChannel *channel, GIOCondition cond,
+ 	if (len < 0)
+ 		return FALSE;
+ 
+-	if (g_test_verbose() == TRUE)
+-		util_hexdump('>', buf, len, sdp_debug, "SDP: ");
++	util_hexdump('>', buf, len, sdp_debug, "SDP: ");
  
  	g_assert(len > 0);
+ 	g_assert((size_t) len == rsp_pdu->raw_size + rsp_pdu->cont_len);
+@@ -638,15 +653,12 @@ static void register_file_transfer(void)
+ 	update_db_timestamp();
+ }
  
--	if (g_test_verbose())
--		util_hexdump('>', buf, len, test_debug, "uHID: ");
-+	util_hexdump('>', buf, len, test_debug, "uHID: ");
- 
- 	g_assert_cmpint(len, ==, pdu->size);
- 
-@@ -174,9 +189,6 @@ static struct context *create_context(gconstpointer data)
+-static struct context *create_context(void)
++static struct context *create_context(gconstpointer data)
+ {
+ 	struct context *context = g_new0(struct context, 1);
  	GIOChannel *channel;
  	int err, sv[2];
  
@@ -115,48 +160,65 @@ index b48e0fa..320cd54 100644
  	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
  	g_assert(err == 0);
  
-@@ -202,26 +214,6 @@ static struct context *create_context(gconstpointer data)
+@@ -677,6 +689,7 @@ static struct context *create_context(void)
+ 	g_io_channel_unref(channel);
+ 
+ 	context->fd = sv[1];
++	context->data = data;
+ 
+ 	set_fixed_db_timestamp(0x496f0654);
+ 
+@@ -695,34 +708,11 @@ static struct context *create_context(void)
  	return context;
  }
  
--static void destroy_context(struct context *context)
--{
--	if (context->source > 0)
--		g_source_remove(context->source);
--
--	bt_uhid_unref(context->uhid);
--
--	g_main_loop_unref(context->main_loop);
--
--	test_free(context->data);
--	g_free(context);
--}
--
 -static void execute_context(struct context *context)
 -{
 -	g_main_loop_run(context->main_loop);
 -
--	destroy_context(context);
+-	sdp_svcdb_collect_all(context->fd);
+-	sdp_svcdb_reset();
+-
+-	g_source_remove(context->server_source);
+-	g_source_remove(context->client_source);
+-
+-	g_main_loop_unref(context->main_loop);
+-
+-	g_free(context);
 -}
 -
- static const struct uhid_event ev_create = {
- 	.type = UHID_CREATE,
- };
-@@ -263,7 +255,7 @@ static void test_client(gconstpointer data)
- 	if (g_str_equal(context->data->test_name, "/uhid/command/input"))
- 		bt_uhid_send(context->uhid, &ev_input);
- 
--	execute_context(context);
-+	context_quit(context);
- }
- 
- static void handle_output(struct uhid_event *ev, void *user_data)
-@@ -288,13 +280,11 @@ static void test_server(gconstpointer data)
- 	bt_uhid_register(context->uhid, UHID_FEATURE, handle_feature, context);
+ static void test_sdp(gconstpointer data)
+ {
+-	const struct test_data *test = data;
+-	struct context *context = create_context();
+-
+-	context->mtu = test->mtu;
+-	context->pdu_list = test->pdu_list;
++	struct context *context = create_context(data);
  
  	g_idle_add(send_pdu, context);
 -
 -	execute_context(context);
+-
+-	g_free(test->pdu_list);
+ }
+ 
+ static void test_sdp_de_attr(gconstpointer data)
+@@ -737,8 +727,7 @@ static void test_sdp_de_attr(gconstpointer data)
+ 	g_assert_cmpuint(test->input_size, ==, size);
+ 	g_assert_cmpuint(test->expected.dtd, ==, d->dtd);
+ 
+-	if (g_test_verbose() == TRUE)
+-		g_print("DTD=0x%02x\n", d->dtd);
++	tester_debug("DTD=0x%02x\n", d->dtd);
+ 
+ 	switch (d->dtd) {
+ 	case SDP_TEXT_STR8:
+@@ -785,14 +774,14 @@ static void test_sdp_de_attr(gconstpointer data)
+ 	}
+ 
+ 	sdp_data_free(d);
++	tester_test_passed();
  }
  
  int main(int argc, char *argv[])
@@ -164,11 +226,15 @@ index b48e0fa..320cd54 100644
 -	g_test_init(&argc, &argv, NULL);
 +	tester_init(&argc, &argv);
  
- 	define_test("/uhid/command/create", test_client, event(&ev_create));
- 	define_test("/uhid/command/destroy", test_client, event(&ev_destroy));
-@@ -305,5 +295,5 @@ int main(int argc, char *argv[])
- 	define_test("/uhid/event/output", test_server, event(&ev_output));
- 	define_test("/uhid/event/feature", test_server, event(&ev_feature));
+-	if (g_test_verbose())
+-		__btd_log_init("*", 0);
++	__btd_log_init("*", 0);
+ 
+ 	/*
+ 	 * Service Search Request
+@@ -2821,5 +2810,5 @@ int main(int argc, char *argv[])
+ 						0x00, 0x00, 0x00, 0x00, 0x00,
+ 						0x00, 0x00, 0x00, 0x00, 0x00)));
  
 -	return g_test_run();
 +	return tester_run();
