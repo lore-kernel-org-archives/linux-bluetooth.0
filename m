@@ -1,41 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 1 Oct 2015 16:26:31 +0530
-Message-ID: <CAHkwNT=sQQz11YWsxivxb20mW7rh1U=CXTN7uyBqTzkXvNbXgA@mail.gmail.com>
-Subject: Issues With USB Bluetooth Dongle
-From: Anil Nair <anilcoll90@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
+Subject: Re: [PATCH] Revert "serial: 8250_dma: don't bother DMA with small transfers"
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1443689736.8361.322.camel@linux.intel.com>
+Date: Thu, 1 Oct 2015 12:44:55 +0200
+Cc: Peter Hurley <peter@hurleysoftware.com>,
+	Frederic Danis <frederic.danis@linux.intel.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Message-Id: <15E8D395-71C7-44D2-82BB-5B6658872F55@holtmann.org>
+References: <1443617191-21013-1-git-send-email-frederic.danis@linux.intel.com> <560BE919.9020803@hurleysoftware.com> <1443622344.8361.304.camel@linux.intel.com> <560C420B.4030007@hurleysoftware.com> <1443689736.8361.322.camel@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Andy,
 
-I have a USB Bluetooth Dongle it detects but i am unable to use it,
-Cannot pair with any mobile device or send any file.
+>>>> It's customary to mail the commit author in patches which revert
+>>>> their work.
+>>>> 
+>>>>> This commit prevents from sending "big" file using Bluetooth.
+>>>>> When sending a lot of data quickly through the Bluetooth 
+>>>>> interface, 
+>>>>> and
+>>>>> after a variable amount of data sent, transfer fails with 
+>>>>> error:
+>>>>>    kernel: [  415.247453] Bluetooth: hci0 hardware error 0x00
+> 
+> Frederic, I forgot to ask how exactly the hw setup looks like?
+> 
+> The message above is not present in the kernel (the closest what I
+> found is 
+> 
+> drivers/bluetooth/btintel.c:98: BT_ERR("%s: Hardware error 0x%2.2x",
+> hdev->name, code);
+> 
+> which makes me think you have USB BT adapter attached to the same
+> machine. Am I wrong?
 
-I am using "Ubuntu 14.04 64-bit" with kernel version "3.13.0-65-generic"
+the Bluetooth core will generate that error in case the driver does not provide hdev->hw_error callback. We have not hocked that up for the UART driver yet. Look at net/bluetooth/hci_core.c to find the common error message.
 
-Here is the output of dmesg,
+Regards
 
-[ 2920.744043] usb 3-1: new full-speed USB device number 3 using uhci_hcd
-[ 2920.985498] usb 3-1: New USB device found, idVendor=0a12, idProduct=0001
-[ 2920.985504] usb 3-1: New USB device strings: Mfr=1, Product=2, SerialNumber=0
-[ 2920.985507] usb 3-1: Product: Bluetooth V2.0 Dongle
-[ 2920.985510] usb 3-1: Manufacturer: Bluetooth v2.0
-[ 2921.818696] usbcore: registered new interface driver btusb
+Marcel
 
-And lsusb,
-
-Bus 003 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-Bluetooth Dongle (HCI mode)
-
-Please let me know if any more information is needed.
-
-I wanted to know what is the issue with the device.
-
-Thanking You,
-
---
-Regards,
-Anil Nair
