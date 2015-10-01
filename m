@@ -1,152 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1443689736.8361.322.camel@linux.intel.com>
-Subject: Re: [PATCH] Revert "serial: 8250_dma: don't bother DMA with small
- transfers"
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Peter Hurley <peter@hurleysoftware.com>,
-	Frederic Danis <frederic.danis@linux.intel.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>
-Cc: linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date: Thu, 01 Oct 2015 11:55:36 +0300
-In-Reply-To: <560C420B.4030007@hurleysoftware.com>
-References: <1443617191-21013-1-git-send-email-frederic.danis@linux.intel.com>
-	 <560BE919.9020803@hurleysoftware.com>
-	 <1443622344.8361.304.camel@linux.intel.com>
-	 <560C420B.4030007@hurleysoftware.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Thu, 1 Oct 2015 09:41:46 +0100
+Message-ID: <CAGrhNMyY7rJVZ35p5P5FnGvJPYZuKndau1vNY5k+GCHHYzZtzQ@mail.gmail.com>
+Subject: [RFC] MIDI over Bluetooth Low Energy
+From: Felipe Tonello <eu@felipetonello.com>
+To: alsa-devel@alsa-project.org, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2015-09-30 at 16:11 -0400, Peter Hurley wrote:
-> [ + Heikko ]
-> 
-> On 09/30/2015 10:12 AM, Andy Shevchenko wrote:
-> > On Wed, 2015-09-30 at 09:52 -0400, Peter Hurley wrote:
-> > > [ + Andy Shevchenko ]
-> > > 
-> > > On 09/30/2015 08:46 AM, Frederic Danis wrote:
-> > > > This reverts commit 9119fba0cfeda6d415c9f068df66838a104b87cb.
-> > > 
-> > > Hi Frederic,
-> > > 
-> > > It's customary to mail the commit author in patches which revert
-> > > their work.
-> > > 
-> > > > This commit prevents from sending "big" file using Bluetooth.
-> > > > When sending a lot of data quickly through the Bluetooth 
-> > > > interface, 
-> > > > and
-> > > > after a variable amount of data sent, transfer fails with 
-> > > > error:
-> > > >     kernel: [  415.247453] Bluetooth: hci0 hardware error 0x00
+Hi guys,
 
-Frederic, I forgot to ask how exactly the hw setup looks like?
+I am planning to start the support of MIDI BLE profile[1]. This
+profile is not officially supported yet, but it will most likely be
+very similar, so development efforts are still valid.
 
-The message above is not present in the kernel (the closest what I
-found is 
+I suggest two main goals:
+ * To be transparent to applications, i.e., use rawmidi and sequencer
+ALSA interfaces to interact.
+ * To support peripheral and central BLE roles.
 
-drivers/bluetooth/btintel.c:98: BT_ERR("%s: Hardware error 0x%2.2x",
-hdev->name, code);
+My question is: what is the best way possible of doing it?
 
-which makes me think you have USB BT adapter attached to the same
-machine. Am I wrong?
+My initial though is to write a GATT BlueZ profile plugin that will
+load snd-virtmidi module with id and midi_devs parameters, then read
+and write seq events from/to it. I am not sure if this is really
+possible.
 
-> > > 
-> > > Hmmm, was there any other information regarding why this 
-> > > happened?
-> > 
-> > Frederic informed us privately about this issue.
-> 
-> Ok, except no one else knows that.
-> 
-> Least of all Greg, since the revert wasn't even addressed to him 
-> either :/
+Another way of implementing is as a rawmidi and a seq plugin using the
+BlueZ GATT D-Bus interface. IMO this is not ideal because it requires
+a lot more work (rawmidi and seq plugins, maybe even a library to
+avoid code duplication) and has an overhead of using dbus.
 
-Agree, it's better to inform all parties about the problem.
+It is also possible to write a kernel module to handle ALSA
+card/device setup and reads and writes from the bluez plugin (perhaps
+this simplifies things because it has less dependencies).
 
-> 
-> > I tried to hunt the
-> > root cause but mostly (there was one observation but apparently 
-> > seems
-> > it is not related to this issue) nothing looks wrong.
-> > 
-> > > Eg., did the driver mistakenly re-order i/o (DMA occurred after 
-> > > PIO)?
-> > 
-> > I have few tracing dumps which Frederic provides to me, but I 
-> > couldn't
-> > see such a problem. Maybe I missed it.
-> 
-> Ok.
-> 
-> > My commit 9119fba0cfed introduces interleaved IO (DMA/PIO) which 
-> > makes
-> > it like DMA -> PIO -> DMA -> ...
-> 
-> I realize that. However interleaving DMA and PIO _must_ be supported
-> by the platform to enable DMA for 8250 serial devices anway.
-> 
-> When Heikki added DMA support to the 8250 driver, he left out 
-> important
-> functionality which requires interleaved DMA and PIO.
-> 
-> When I fix that omission, platforms using DMA that shouldn't be are 
-> going
-> to get broken anyway.
-> 
-> Regards,
-> Peter Hurley
-> 
-> > > Or, might there be some race condition in the dmaengine driver on 
-> > > 
-> > > this
-> > > platform?
-> > 
-> > There is [1] might be a clue, though I don't think it's directly
-> > related.
-> > 
-> > [1] http://www.spinics.net/lists/linux-spi/msg01151.html
-> > The change prevents interleaved DMA/PIO IO.
-> > 
-> > > 
-> > > Regards,
-> > > Peter Hurley
-> > > 
-> > > > Found on T100TA.
-> > > > 
-> > > > After reverting this commit, send works fine for any file size.
-> > > > 
-> > > > Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
-> > > > ---
-> > > >  drivers/tty/serial/8250/8250_dma.c | 4 ----
-> > > >  1 file changed, 4 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/tty/serial/8250/8250_dma.c 
-> > > > b/drivers/tty/serial/8250/8250_dma.c
-> > > > index 21d01a4..e508939 100644
-> > > > --- a/drivers/tty/serial/8250/8250_dma.c
-> > > > +++ b/drivers/tty/serial/8250/8250_dma.c
-> > > > @@ -80,10 +80,6 @@ int serial8250_tx_dma(struct uart_8250_port 
-> > > > *p)
-> > > >  		return 0;
-> > > >  
-> > > >  	dma->tx_size = CIRC_CNT_TO_END(xmit->head, xmit->tail, 
-> > > > 
-> > > > UART_XMIT_SIZE);
-> > > > -	if (dma->tx_size < p->port.fifosize) {
-> > > > -		ret = -EINVAL;
-> > > > -		goto err;
-> > > > -	}
-> > > >  
-> > > >  	desc = dmaengine_prep_slave_single(dma->txchan,
-> > > >  					   dma->tx_addr + xmit
-> > > > ->tail,
-> > > > 
-> > > 
-> > 
-> 
+They all have the problem of context switching between bluez plugin
+and alsa midi driver. I would prefer to use a shared ring buffer
+between ALSA e BlueZ.
 
--- 
-Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Intel Finland Oy
+Any ideas and comments?
+
+[1] https://developer.apple.com/bluetooth/Apple-Bluetooth-Low-Energy-MIDI-Specification.pdf
+
+PS: I am at #bluez and #alsa as ftonello.
+
+Felipe Tonello
