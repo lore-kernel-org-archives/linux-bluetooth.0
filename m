@@ -1,45 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: Issues With USB Bluetooth Dongle
+Subject: Re: [RFC] MIDI over Bluetooth Low Energy
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHkwNT=sQQz11YWsxivxb20mW7rh1U=CXTN7uyBqTzkXvNbXgA@mail.gmail.com>
-Date: Thu, 1 Oct 2015 13:18:23 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <37D1ED5D-6FF5-4ABA-BD2A-222261BE1EAA@holtmann.org>
-References: <CAHkwNT=sQQz11YWsxivxb20mW7rh1U=CXTN7uyBqTzkXvNbXgA@mail.gmail.com>
-To: Anil Nair <anilcoll90@gmail.com>
+In-Reply-To: <CAGrhNMwpx9Q4Usb75jWofWpLpUxJOd6FsckRT=O4Uj8KBtqayA@mail.gmail.com>
+Date: Thu, 1 Oct 2015 13:16:33 +0200
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	alsa-devel@alsa-project.org,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <BECBD8C9-C49D-410C-BE11-CA1A52839EED@holtmann.org>
+References: <CAGrhNMyY7rJVZ35p5P5FnGvJPYZuKndau1vNY5k+GCHHYzZtzQ@mail.gmail.com> <CABBYNZ+iR-LXvMDkGiOkh8+X_=PWjrbGs3kveYFMo1UdhHVaNA@mail.gmail.com> <CAGrhNMwpx9Q4Usb75jWofWpLpUxJOd6FsckRT=O4Uj8KBtqayA@mail.gmail.com>
+To: Felipe Tonello <eu@felipetonello.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anil,
+Hi Felipe,
 
-> I have a USB Bluetooth Dongle it detects but i am unable to use it,
-> Cannot pair with any mobile device or send any file.
+>>> I am planning to start the support of MIDI BLE profile[1]. This
+>>> profile is not officially supported yet, but it will most likely be
+>>> very similar, so development efforts are still valid.
+>>> 
+>>> I suggest two main goals:
+>>> * To be transparent to applications, i.e., use rawmidi and sequencer
+>>> ALSA interfaces to interact.
+>>> * To support peripheral and central BLE roles.
+>>> 
+>>> My question is: what is the best way possible of doing it?
+>>> 
+>>> My initial though is to write a GATT BlueZ profile plugin that will
+>>> load snd-virtmidi module with id and midi_devs parameters, then read
+>>> and write seq events from/to it. I am not sure if this is really
+>>> possible.
+>> 
+>> If that doesn't involve creating new threads that would be the
+>> direction I would suggest.
 > 
-> I am using "Ubuntu 14.04 64-bit" with kernel version "3.13.0-65-generic"
+> I don't think it will be necessary. Does bluetoothd run plugins as threads?
 > 
-> Here is the output of dmesg,
+>> 
+>>> Another way of implementing is as a rawmidi and a seq plugin using the
+>>> BlueZ GATT D-Bus interface. IMO this is not ideal because it requires
+>>> a lot more work (rawmidi and seq plugins, maybe even a library to
+>>> avoid code duplication) and has an overhead of using dbus.
+>> 
+>> D-Bus is not meant for data, in fact GATT is not meant for byte stream
+>> either since the channel is shared with all other profiles it can
+>> cause delay.
 > 
-> [ 2920.744043] usb 3-1: new full-speed USB device number 3 using uhci_hcd
-> [ 2920.985498] usb 3-1: New USB device found, idVendor=0a12, idProduct=0001
-> [ 2920.985504] usb 3-1: New USB device strings: Mfr=1, Product=2, SerialNumber=0
-> [ 2920.985507] usb 3-1: Product: Bluetooth V2.0 Dongle
-> [ 2920.985510] usb 3-1: Manufacturer: Bluetooth v2.0
-> [ 2921.818696] usbcore: registered new interface driver btusb
+> GATT can handle MIDI throughput very easily. Usually messages are 1 to
+> 10 Hz, 3 or 4 bytes each. Even SysEx messages tend to be 250 bytes at
+> maximum.
 > 
-> And lsusb,
+>> 
+>>> It is also possible to write a kernel module to handle ALSA
+>>> card/device setup and reads and writes from the bluez plugin (perhaps
+>>> this simplifies things because it has less dependencies).
+>> 
+>> Well if it uses the profile uses ATT/GATT then this is not possible
+>> since that is implemented in userspace, I guess creating virtual cards
+>> would be better (we do that for HoG using uhid), but I guess that is
+>> not currently possible otherwise we would have done that for A2DP/HFP
+>> already.
 > 
-> Bus 003 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-> Bluetooth Dongle (HCI mode)
-> 
-> Please let me know if any more information is needed.
-> 
-> I wanted to know what is the issue with the device.
+> The kernel module would act as a virtual card as well. The reads and
+> writes would come from user-space (because as you said, ATT/GATT is
+> implemented there). The good point is that it would be dedicated for
+> midi. It is like loading a usb midi gadget.
 
-include /sys/kernel/debug/usb/devices from this device. And you might want to run btmon to see if one of the HCI commands is causing a problem. You could also just call hciconfig and see if the device is actually registered since it seems to load the btusb driver.
+I would prefer if you implement this completely in userspace. I do not think any extra new kernel module is needed. ALSA should easily support userspace MIDI cards.
 
-Then again, you are running a 3.13 kernel, that is a pretty old kernel.
+Also I would think that first attempt should be implement this as D-Bus client utilizing our GATT API. That way it would be not introducing complex dependencies in BlueZ. Only if the timing is a problem, I would consider doing this as a plugin for bluetoothd.
 
 Regards
 
