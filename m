@@ -1,46 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1443701921-24460-1-git-send-email-kubax.t.pawlak@intel.com>
-References: <1443701921-24460-1-git-send-email-kubax.t.pawlak@intel.com>
-Date: Fri, 2 Oct 2015 10:36:44 +0300
-Message-ID: <CABBYNZ+hd6sr8B+kXnwFQ47+BwOPkRBMpzeBm19qTCcR6=Oxgw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Handle HCI emulator setup errors
+In-Reply-To: <1443709943-29957-1-git-send-email-gowtham.ab@samsung.com>
+References: <1443709943-29957-1-git-send-email-gowtham.ab@samsung.com>
+Date: Fri, 2 Oct 2015 10:33:31 +0300
+Message-ID: <CABBYNZLWTwfGDzeCcRRgpkb0ZA3F5qtzPYBG2uLpYJo1xexFjA@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Use tester framework
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Kuba Pawlak <kubax.t.pawlak@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kuba,
+Hi Gowtham,
 
-On Thu, Oct 1, 2015 at 3:18 PM, Kuba Pawlak <kubax.t.pawlak@intel.com> wrote:
-> Missing return is causing confusing output from sco-tester:
+On Thu, Oct 1, 2015 at 5:32 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Remove mainloop and use tester framework to
+> produces much better output.
 >
->   Read Index List callback
->     Status: 0x00
->   Failed to setup HCI emulation
-> eSCO CVSD - Success - pre setup failed
->   New hciemu instance created
-> eSCO CVSD - Success - done
-> ---
->  tools/sco-tester.c | 1 +
->  1 file changed, 1 insertion(+)
+> Gowtham Anandha Babu (3):
+>   unit/test-hfp: Use tester framework
+>   unit/test-sdp: Use tester framework
+>   unit/test-uhid: Use tester framework
 >
-> diff --git a/tools/sco-tester.c b/tools/sco-tester.c
-> index d55d51a3155faacb43742271c2e7ea6754b9f42c..651fbe01d14e59b4580704b3319196620d9d54e5 100644
-> --- a/tools/sco-tester.c
-> +++ b/tools/sco-tester.c
-> @@ -160,6 +160,7 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
->         if (!data->hciemu) {
->                 tester_warn("Failed to setup HCI emulation");
->                 tester_pre_setup_failed();
-> +               return;
->         }
+>  unit/test-hfp.c  | 91 +++++++++++++++++++++++++++-----------------------------
+>  unit/test-sdp.c  | 91 +++++++++++++++++++++++++-------------------------------
+>  unit/test-uhid.c | 62 ++++++++++++++++----------------------
+>  3 files changed, 110 insertions(+), 134 deletions(-)
 >
->         tester_print("New hciemu instance created");
 > --
-> 1.9.3
+> 1.9.1
 
 Applied, thanks.
 
