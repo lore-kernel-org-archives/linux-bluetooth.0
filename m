@@ -1,54 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 4 Oct 2015 10:54:01 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Viresh Kumar <viresh.kumar@linaro.org>,
-	Lists linaro-kernel <linaro-kernel@lists.linaro.org>,
-	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
-	Intel Linux Wireless <ilw@linux.intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
-	netdev@vger.kernel.org,
-	"open list:NETWORKING DRIVERS (WIRELESS)"
-	<linux-wireless@vger.kernel.org>,
-	"open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
-	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:"
-	<linux-usb@vger.kernel.org>,
-	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..."
-	<alsa-devel@alsa-project.org>
-Subject: Re: [PATCH V5 1/2] ACPI / EC: Fix broken 64bit big-endian users of
- 'global_lock'
-Message-ID: <20151004095401.GA29706@kroah.com>
-References: <8d3d3428c3a36f821e4c3d8563d094ca4b4763fd.1443304934.git.viresh.kumar@linaro.org>
- <CAJZ5v0imYBPVNfVjkgX1r8a1x6QbY4LtRcS7BNsGzg5=yuPRfA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJZ5v0imYBPVNfVjkgX1r8a1x6QbY4LtRcS7BNsGzg5=yuPRfA@mail.gmail.com>
-Sender: linux-wireless-owner@vger.kernel.org
+In-Reply-To: <CAMib2GbppUBtTbWV9JkGTm95KyxUeywU8c=E6g2-PJk6FBrZYA@mail.gmail.com>
+References: <CAMib2GZpa=FgsNKXThWnNZ=m=nQgLJj8j1bYd8v12vb1dwOLNg@mail.gmail.com>
+	<55ED3BFA.206@ubnt.com>
+	<CAMib2GZ1D_Pp_m6qLMitzjAo7vS6Hrq1q9uaeAWg4zUYvj4u0w@mail.gmail.com>
+	<55EE7672.1040406@ubnt.com>
+	<CAMib2GZ9+KecnYU4Dp1QhTh-XCF_6Gr761+rnu5yF=8BesgpFA@mail.gmail.com>
+	<CAMib2GbppUBtTbWV9JkGTm95KyxUeywU8c=E6g2-PJk6FBrZYA@mail.gmail.com>
+Date: Sat, 3 Oct 2015 23:55:20 +0300
+Message-ID: <CABBYNZJzFo=LnBQmN9zkXr24Tj_ZzdzHdgOsSmd=K3EeJPQTVA@mail.gmail.com>
+Subject: Re: iOS 8 can't discover device
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Kyle Shneider <shneiderkyle@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Sep 27, 2015 at 03:48:24PM +0200, Rafael J. Wysocki wrote:
-> On Sun, Sep 27, 2015 at 12:04 AM, Viresh Kumar <viresh.kumar@linaro.org> wrote:
-> > global_lock is defined as an unsigned long and accessing only its lower
-> > 32 bits from sysfs is incorrect, as we need to consider other 32 bits
-> > for big endian 64-bit systems. There are no such platforms yet, but the
-> > code needs to be robust for such a case.
-> >
-> > Fix that by changing type of 'global_lock' to u32.
-> >
-> > Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
-> 
-> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> 
-> Greg, please take this one along with the [2/2] if that one looks good to you.
+Hi Kyle,
 
-Thanks, will do.
+On Sat, Oct 3, 2015 at 7:06 PM, Kyle Shneider <shneiderkyle@gmail.com> wrote:
+> 2015-09-08 8:47 GMT+03:00 Andrejs Hanins <andrejs.hanins@ubnt.com>:
+>> Hi,
+>>
+>> On 09/07/2015 07:47 PM, Kyle Shneider wrote:
+>>> 2015-09-07 10:25 GMT+03:00 Andrejs Hanins <andrejs.hanins@ubnt.com>:
+>>>>
+>>>> Hi Kyle,
+>>>>
+>>>> On 09/06/2015 05:23 PM, Kyle Shneider wrote:
+>>>>> Hello again.
+>>>>>
+>>>>> I'm testing bluez 5.33 on raspberry pi. After successfully launching
+>>>>> bluetoothd, powering hci-device up and setting it 'Discoverable' (done
+>>>>> through DBus API) iPad mini can't see it. In other way shitty android
+>>>>> 4.1.1 tablet finds raspberry in a moment.
+>>>>> Have i missed something?
+>>>> iOS will only show you devices which implement at least one of the Bluetooth profiles supported by iOS (https://support.apple.com/en-us/HT204387).
+>>>> So you need to have appropriate SDP record with supported profile. I would suggest to start with org.bluez.ProfileManager1 D-Bus interface.
+>>>>> Did anyone have successful experience of pairing apple devices and
+>>>>> latest versions of bluez?
+>>>>> BTW ble adapter: cambridge silicon radio.
+>>>>>
+>>>
+>>>
+>>> Thanks for the answer Andrejs.
+>>> I don't understand. What about GATT profile?
+>> I think, it is the same - you need to advertise a service supported by iOS in order for the BLE device to appear in standard iOS Bluetooth device list. However, if you write your own app, there is an access to all BLE devices seen around.
+>> Can iOS device initialize
+>>> pairing via GATT profile?
+>> Yes. It worked for me when I tried something like kernel 3.19 and BlueZ 5.32 or so. I was using LightBlue app for my testing.
+>>>
+>
+> So after installing latest kernel 4.1.8 problem doesn't solved for me.
+> On raspberry i launch:
+> - bluetoothd -nE
+> - bluez-5.34/test/test-gatt-profile
+> - bluez-5.34/test/example-gatt-server
+> - bluez-5.34/test/simple-agent
+>
+> Neither iOS LightBlue application can't see raspberry nor Android BLE
+> scanner. Have i missed something?
 
-greg k-h
+Have you tried example-advertising? iirc we are not adding any name to
+scan response thus it might show with just the address.
+
+
+-- 
+Luiz Augusto von Dentz
