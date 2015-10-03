@@ -1,38 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHkwNTnSb4nuJ1dY371Zi007wH3_wGUQfKqevZaGkk9xRZUeNg@mail.gmail.com>
-References: <CAHkwNT=sQQz11YWsxivxb20mW7rh1U=CXTN7uyBqTzkXvNbXgA@mail.gmail.com>
-	<37D1ED5D-6FF5-4ABA-BD2A-222261BE1EAA@holtmann.org>
-	<CAHkwNT=3m4nU5M_Kk5htfDonqPrKZO5vRR0q_8Mn2O=umGMK5Q@mail.gmail.com>
-	<B4AA2825-8C58-46FB-A529-7CC910920500@holtmann.org>
-	<CAHkwNT=Hoc4xibrtg2zk7K1vwcutcWgUHAN58XpWH0jnqfLXbg@mail.gmail.com>
-	<CAHkwNTnSb4nuJ1dY371Zi007wH3_wGUQfKqevZaGkk9xRZUeNg@mail.gmail.com>
-Date: Sun, 4 Oct 2015 00:10:00 +0530
-Message-ID: <CAHkwNTmnE-WT-mn2FfAiNuujpwyFUbS+KGYoLE4kYUhB7spuQg@mail.gmail.com>
-Subject: Re: Issues With USB Bluetooth Dongle
-From: Anil Nair <anilcoll90@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+Subject: Re: Disabling deviceinfo plugin on chromebooks?
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAEZxfGMNJKc3kW+isa8LofrLCuWFBaPvyAiiw5X_0ZBLsrTDgQ@mail.gmail.com>
+Date: Sat, 3 Oct 2015 19:11:51 +0200
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <EC65C3CE-3B41-4398-832B-18F8EFDE663C@holtmann.org>
+References: <CAEZxfGPDdgjcSwS6vK46Q4tMwdoD=SjV-te8chiERM-wnEP00w@mail.gmail.com> <CABBYNZ+GMyT8z8ujGGu3oMK1ffkdAuX21ZRu7Cf7eFpqS0jHuw@mail.gmail.com> <CAEZxfGMY5L=gcDczjUoM6Yg3m9z+LObByFgnAy0u7duyu+v-tg@mail.gmail.com> <CABBYNZL_DjeOGbbFKmavUY1QRMNb1V2KrBbNHZ2bH=hZ6q5vNg@mail.gmail.com> <CAEZxfGMNJKc3kW+isa8LofrLCuWFBaPvyAiiw5X_0ZBLsrTDgQ@mail.gmail.com>
+To: =?utf-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Francois,
 
-I was exploring the linux source 4.2.2, I came accross the following
-in the btusb.c,
+>>> Thanks for your answer Luiz!
+>> 
+>> Please comment inline in the ml.
+>> 
+>>> From what I can see, Android and iOS Bluetooth Stack libraries don't
+>>> claim the device_information service.
+>>> Could it be possible to make it so that the plugin doesn't block other
+>>> clients (such as the Web Bluetooth API) from interacting with that
+>>> service.
+>> 
+>> That probably a bad behavior in their own because it can only cause
+>> more traffic as this information can be cached and made available
+>> without causing any extra traffic, as I said I think we just need to
+>> expose the extra information over the device API, so we just have to
+>> add them here:
+>> 
+>> https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdevice (note
+>> that it already contains part of device information)
+>> 
+> 
+> As these characteristics might not be useful to everyone, I'm not sure
+> about the benefit of caching all these device_information service
+> characteristics in Bluez and exposing them to the bluetooth device
+> object.
+> From a web developer point of view, I think I want to get back as
+> quick as possible the bluetooth device object and get characteristics
+> afterwards when I need to.
 
-static const struct usb_device_id blacklist_table[] = {
-    /* CSR BlueCore devices */
-    { USB_DEVICE(0x0a12, 0x0001), .driver_info = BTUSB_CSR },
+I am actually fine if we let Device Info services be read by any client. However it is a bit trickier since that means an exception in our code.
 
-That is the VID and PID of my device,
+Also only Device Info will fall ever into this category where you have a system service reading it and where it might be useful for non-system clients. When bluetoothd implement the profile side then we can not have another client trying to mess around with it. Especially when it is security sensitive like HID.
 
-Bus 003 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-Bluetooth Dongle (HCI mode)
+Regards
 
-Its listed in blacklist is this the reason why the usb bluetooth
-dongle is not working?
+Marcel
 
---
-Regards,
-Anil Nair
