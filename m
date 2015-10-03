@@ -1,87 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [alsa-devel] [RFC] MIDI over Bluetooth Low Energy
+Subject: Re: [PATCH] Bluetooth: btintel: Add iBT register access over HCI support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAGrhNMw1wZaTXFAp-56ujr_YH4wxHtnCWRZdThH39y-WLY26iA@mail.gmail.com>
-Date: Sat, 3 Oct 2015 19:07:05 +0200
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Takashi Iwai <tiwai@suse.de>,
-	Clemens Ladisch <clemens@ladisch.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	alsa-devel@alsa-project.org
-Message-Id: <F8BDE6C4-F86B-443F-93CF-EC326F4529C1@holtmann.org>
-References: <CAGrhNMyY7rJVZ35p5P5FnGvJPYZuKndau1vNY5k+GCHHYzZtzQ@mail.gmail.com> <560D1893.6040509@ladisch.de> <CAGrhNMxmtt-5kZO-6me2sPQYeQ5wcpvonKqzbx7CEB5=RJ724Q@mail.gmail.com> <s5hfv1uvmjq.wl-tiwai@suse.de> <CAGrhNMxUsUXBmYFLo4Bq=Mx1qdUZC1Zv7c4pXb+F8D8adYTvcg@mail.gmail.com> <CABBYNZ+g9+QBEOxO8ZGnQbBva+JxX=WkQAvBst=YMM7zHdz1hw@mail.gmail.com> <CAGrhNMw1wZaTXFAp-56ujr_YH4wxHtnCWRZdThH39y-WLY26iA@mail.gmail.com>
-To: Felipe Tonello <eu@felipetonello.com>
+In-Reply-To: <1443716181-19050-1-git-send-email-loic.poulain@intel.com>
+Date: Sat, 3 Oct 2015 19:06:19 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <85632F95-C999-4F91-B1B1-A7CD489506AA@holtmann.org>
+References: <1443716181-19050-1-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Felipe,
+Hi Loic,
 
->>> On Thu, Oct 1, 2015 at 12:46 PM, Takashi Iwai <tiwai@suse.de> wrote:
->>>> On Thu, 01 Oct 2015 13:35:48 +0200,
->>>> Felipe Tonello wrote:
->>>>> 
->>>>> Hi Clemens,
->>>>> 
->>>>> On Thu, Oct 1, 2015 at 12:27 PM, Clemens Ladisch <clemens@ladisch.de> wrote:
->>>>>> Felipe Tonello wrote:
->>>>>>> I am planning to start the support of MIDI BLE profile[1].
->>>>>>> 
->>>>>>> I suggest two main goals:
->>>>>>> * To be transparent to applications, i.e., use rawmidi and sequencer
->>>>>>> ALSA interfaces to interact.
->>>>>>> * To support peripheral and central BLE roles.
->>>>>>> 
->>>>>>> My question is: what is the best way possible of doing it?
->>>>>> 
->>>>>> Just write a (user-space) sequencer client.
->>>>> 
->>>>> But this will limit to seq interface only. It will not be available
->>>>> via rawmidi interface, right? Unless I load snd-virtmidi, correct?
->>>> 
->>>> Right.
->>>> 
->>>>> That was what I was suggesting at first, but I don't really like the
->>>>> idea of loading snd-virtmidi for that.
->>>> 
->>>> Well, many audio/music apps may talk directly sequencer API, too, so
->>>> it's not too bad.  Whether loading snd-virmidi is a system setup
->>>> question, and it'd be more or less static configuration like snd-seq
->>>> core module.
->>>> 
->>>>>>> [...]
->>>>>>> They all have the problem of context switching between bluez plugin
->>>>>>> and alsa midi driver.
->>>>>> 
->>>>>> Why would context switches be a problem?
->>>>> 
->>>>> It is just too much travelling around. GATT messages are parsed in
->>>>> userspace by BlueZ, so it sounds unnecessary to copy buffers to the
->>>>> kernel and copy back to user space to the application (ALSA).
->>>> 
->>>> Of course it'd be optimal if we can avoid context switching, but
->>>> usually its latency isn't too critical for MIDI, even on a much slower
->>>> machine in 20 years ago.
->>>> 
->>>> So, IMO, we should go for a simpler implementation at first.
->>> 
->>> Fair enough.
->>> 
->>> So, initially the best way to go would be to write a seq back-end
->>> using D-Bus GATT API from BlueZ.
->>> 
->>> An important thing to notice is that this implementation doesn't
->>> support BLE peripheral role.
->> 
->> Did I give the impression you would not be able to implement
->> peripheral role? I did say that we do have advertising and GATT Server
->> support or perhaps that was not clear?
+> Add regmap ibt to support Intel Bluetooth silicon register access
+> over HCI. Intel BT/FM combo chip allows to read/write some registers
+> (e.g. FM registers) via its HCI interface.
 > 
-> Yes. You were clear. I said that because AFAIK the support only works
-> as a bluetoothd plugin and not with the D-Bus API, right?
+> Read/Write operations are performed via a HCI transaction composed of
+> a HCI command (host->controller) followed by a HCI command complete
+> event (controller->host). Read/Write Command opcodes can be specified
+> to the regmap init function.
+> We define data formats which are intel/vendor specific.
+> 
+> Register Read/Write HCI command payload (Host):
+> Field: | REG ADDR | MODE | DATA_LEN | DATA... |
+> size:  |   32b    |  8b  |    8b    |  8b*    |
+> 
+> Register Read HCI command complete event payload (Controller):
+> Field: | CMD STATUS | REG ADDR | DATA... |
+> size:  |     8b     |   32b    |  8b*    |
+> 
+> Register Write HCI command complete event payload (Controller):
+> Field: | CMD_STATUS |
+> size:  |     8b     |
+> 
+> Since this payload is HCI encapsulated, Little Endian byte order is
+> used.
+> 
+> Write/Read Example:
+> 
+> If we write 0x0000002a at address 0x00008c04, with opcode_write 0xfc5d,
+> The resulting transaction is (btmon trace):
+> 
+> < HCI Command (0x3f|0x005d) plen 10 [hci0]
+>        04 8c 00 00 02 04 2a 00 00 00
+>> HCI Event (0x0e) plen 4
+>      Unknown (0x3f|0x005d) ncmd 1
+>        00
+> 
+> Then, if we read the same register with opcode_read 0xfc5e:
+> 
+> < HCI Command (0x3f|0x005e) plen 6 [hci0]
+>        04 8c 00 00 02 04
+>> HCI Event (0x0e) plen 12 [hci0]
+>      Unknown (0x3f|0x005e) ncmd 1
+>        00 04 8c 00 00 2a 00 00 00
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> ---
+> drivers/bluetooth/Kconfig   |   1 +
+> drivers/bluetooth/btintel.c | 195 ++++++++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btintel.h |   9 ++
+> 3 files changed, 205 insertions(+)
 
-peripheral role is also supported over D-Bus.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
