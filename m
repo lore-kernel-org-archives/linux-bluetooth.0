@@ -1,65 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/5] Bluetooth: Introduce HCI_DEV_OPEN and HCI_DEV_CLOSE events
-Date: Sun,  4 Oct 2015 23:34:00 +0200
-Message-Id: <1443994443-123453-2-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 4 Oct 2015 10:54:01 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Viresh Kumar <viresh.kumar@linaro.org>,
+	Lists linaro-kernel <linaro-kernel@lists.linaro.org>,
+	QCA ath9k Development <ath9k-devel@qca.qualcomm.com>,
+	Intel Linux Wireless <ilw@linux.intel.com>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	"open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>,
+	netdev@vger.kernel.org,
+	"open list:NETWORKING DRIVERS (WIRELESS)"
+	<linux-wireless@vger.kernel.org>,
+	"open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
+	"open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:"
+	<linux-usb@vger.kernel.org>,
+	"open list:EDAC-CORE" <linux-edac@vger.kernel.org>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	"moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..."
+	<alsa-devel@alsa-project.org>
+Subject: Re: [PATCH V5 1/2] ACPI / EC: Fix broken 64bit big-endian users of
+ 'global_lock'
+Message-ID: <20151004095401.GA29706@kroah.com>
+References: <8d3d3428c3a36f821e4c3d8563d094ca4b4763fd.1443304934.git.viresh.kumar@linaro.org>
+ <CAJZ5v0imYBPVNfVjkgX1r8a1x6QbY4LtRcS7BNsGzg5=yuPRfA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJZ5v0imYBPVNfVjkgX1r8a1x6QbY4LtRcS7BNsGzg5=yuPRfA@mail.gmail.com>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When opening the HCI transport via hdev->open send HCI_DEV_OPEN event
-and when closing the HCI transport via hdev->close send HCI_DEV_CLOSE.
+On Sun, Sep 27, 2015 at 03:48:24PM +0200, Rafael J. Wysocki wrote:
+> On Sun, Sep 27, 2015 at 12:04 AM, Viresh Kumar <viresh.kumar@linaro.org> wrote:
+> > global_lock is defined as an unsigned long and accessing only its lower
+> > 32 bits from sysfs is incorrect, as we need to consider other 32 bits
+> > for big endian 64-bit systems. There are no such platforms yet, but the
+> > code needs to be robust for such a case.
+> >
+> > Fix that by changing type of 'global_lock' to u32.
+> >
+> > Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+> 
+> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> 
+> Greg, please take this one along with the [2/2] if that one looks good to you.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h | 2 ++
- net/bluetooth/hci_core.c    | 6 ++++++
- 2 files changed, 8 insertions(+)
+Thanks, will do.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 7ca6690355ea..e7f938cac7c6 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -44,6 +44,8 @@
- #define HCI_DEV_DOWN			4
- #define HCI_DEV_SUSPEND			5
- #define HCI_DEV_RESUME			6
-+#define HCI_DEV_OPEN			7
-+#define HCI_DEV_CLOSE			8
- 
- /* HCI notify events */
- #define HCI_NOTIFY_CONN_ADD		1
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 79356469c377..5af33c87cbba 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1385,6 +1385,8 @@ static int hci_dev_do_open(struct hci_dev *hdev)
- 		goto done;
- 	}
- 
-+	hci_notify(hdev, HCI_DEV_OPEN);
-+
- 	atomic_set(&hdev->cmd_cnt, 1);
- 	set_bit(HCI_INIT, &hdev->flags);
- 
-@@ -1466,6 +1468,8 @@ static int hci_dev_do_open(struct hci_dev *hdev)
- 			hdev->sent_cmd = NULL;
- 		}
- 
-+		hci_notify(hdev, HCI_DEV_CLOSE);
-+
- 		hdev->close(hdev);
- 		hdev->flags &= BIT(HCI_RAW);
- 	}
-@@ -1649,6 +1653,8 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 		hdev->sent_cmd = NULL;
- 	}
- 
-+	hci_notify(hdev, HCI_DEV_CLOSE);
-+
- 	/* After this point our queues are empty
- 	 * and no tasks are scheduled. */
- 	hdev->close(hdev);
--- 
-2.4.3
-
+greg k-h
