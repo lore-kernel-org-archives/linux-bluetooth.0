@@ -1,77 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: Issues With USB Bluetooth Dongle
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHkwNT=Hoc4xibrtg2zk7K1vwcutcWgUHAN58XpWH0jnqfLXbg@mail.gmail.com>
-Date: Mon, 5 Oct 2015 09:18:57 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <1C9C7F69-AFBA-4B69-9185-656881389B87@holtmann.org>
-References: <CAHkwNT=sQQz11YWsxivxb20mW7rh1U=CXTN7uyBqTzkXvNbXgA@mail.gmail.com> <37D1ED5D-6FF5-4ABA-BD2A-222261BE1EAA@holtmann.org> <CAHkwNT=3m4nU5M_Kk5htfDonqPrKZO5vRR0q_8Mn2O=umGMK5Q@mail.gmail.com> <B4AA2825-8C58-46FB-A529-7CC910920500@holtmann.org> <CAHkwNT=Hoc4xibrtg2zk7K1vwcutcWgUHAN58XpWH0jnqfLXbg@mail.gmail.com>
-To: Anil Nair <anilcoll90@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5/5] Bluetooth: Send transport open and close monitor events
+Date: Sun,  4 Oct 2015 23:34:03 +0200
+Message-Id: <1443994443-123453-5-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anil,
+When the core starts or shuts down the actual HCI transport, send a new
+monitor event that indicates that this is happening. These new events
+correspond to HCI_DEV_OPEN and HCI_DEV_CLOSE events.
 
->> use hcidump. You are stuck with BlueZ 4 since Ubuntu refuses to upgrade to BlueZ 5.
->> 
-> 
-> The  USB Dongle isnt being discovered nor Can I send or recieve any
-> file, I used "hcicump" the only output that i am able to get is,
-> 
-> HCI sniffer - Bluetooth packet analyzer ver 2.5
-> device: hci0 snap_len: 1500 filter: 0xffffffffffffffff
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci_mon.h |  2 ++
+ net/bluetooth/hci_sock.c        | 26 ++++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-you need to run this as root. And then try hciconfig hci0 up and see if anything goes wrong.
-
-If you had btmon, then this would be a lot simpler to test. You just start btmon and then plug in the USB dongle and it would trace every single event.
-
->>>> include /sys/kernel/debug/usb/devices from this device.
->>> 
->>> Did you mean the contents in the file? I did not understand.
->> 
->> Yes, there will be section for your controller.
->> 
-> 
-> T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0a12 ProdID=0001 Rev= 1.00
-> S:  Manufacturer=Bluetooth v2.0
-> S:  Product=Bluetooth V2.0 Dongle
-> C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
-
-I highly doubt that this is a genuine CSR based dongle. The Rev= 1.00 is pretty much a dead give away that this is wrong and also the If#= 2 is not something you normally find on CSR dongles.
-
-So my wild guess is that one of the HCI commands is actually failing in the init sequence. Now you just need to figure out which one. That happens if you get sold essentially a fake dongle.
-
-Regards
-
-Marcel
+diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
+index 77d1e5764185..37e4283d1d68 100644
+--- a/include/net/bluetooth/hci_mon.h
++++ b/include/net/bluetooth/hci_mon.h
+@@ -39,6 +39,8 @@ struct hci_mon_hdr {
+ #define HCI_MON_ACL_RX_PKT	5
+ #define HCI_MON_SCO_TX_PKT	6
+ #define HCI_MON_SCO_RX_PKT	7
++#define HCI_MON_OPEN_INDEX	8
++#define HCI_MON_CLOSE_INDEX	9
+ 
+ struct hci_mon_new_index {
+ 	__u8		type;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index d9ad68448173..64ebe84989d1 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -329,6 +329,22 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
+ 		opcode = cpu_to_le16(HCI_MON_DEL_INDEX);
+ 		break;
+ 
++	case HCI_DEV_OPEN:
++		skb = bt_skb_alloc(0, GFP_ATOMIC);
++		if (!skb)
++			return NULL;
++
++		opcode = cpu_to_le16(HCI_MON_OPEN_INDEX);
++		break;
++
++	case HCI_DEV_CLOSE:
++		skb = bt_skb_alloc(0, GFP_ATOMIC);
++		if (!skb)
++			return NULL;
++
++		opcode = cpu_to_le16(HCI_MON_CLOSE_INDEX);
++		break;
++
+ 	default:
+ 		return NULL;
+ 	}
+@@ -358,6 +374,16 @@ static void send_monitor_replay(struct sock *sk)
+ 
+ 		if (sock_queue_rcv_skb(sk, skb))
+ 			kfree_skb(skb);
++
++		if (!test_bit(HCI_RUNNING, &hdev->flags))
++			continue;
++
++		skb = create_monitor_event(hdev, HCI_DEV_OPEN);
++		if (!skb)
++			continue;
++
++		if (sock_queue_rcv_skb(sk, skb))
++			kfree_skb(skb);
+ 	}
+ 
+ 	read_unlock(&hci_dev_list_lock);
+-- 
+2.4.3
 
