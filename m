@@ -1,68 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
+From: =?UTF-8?q?Santtu=20Rekil=C3=A4?= <sare@r00t3d.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Add support for Foxconn/Lenovo BCM43142A0 (105b:e065)
+Date: Mon,  5 Oct 2015 15:45:27 +0300
+Message-Id: <1444049127-4207-1-git-send-email-sare@r00t3d.com>
 MIME-Version: 1.0
-In-Reply-To: <56126614.5050303@steev.me.uk>
-References: <56126614.5050303@steev.me.uk>
-Date: Mon, 5 Oct 2015 17:11:34 +0300
-Message-ID: <CABBYNZLniquNpn15AzarWYoe4npyrAW8OJMZwAVFGXsbTvO1Og@mail.gmail.com>
-Subject: Re: Gone away BLE device still available in dbus
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Steven Davies <linux-bluetooth-list@steev.me.uk>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steven,
+Recently salvaged this 'BCM43142A0' WiFi/Bluetooth module from a Lenovo laptop
+and noticed it doesn't work automatically, because the USB IDs are missing
+from btusb.c.
 
-On Mon, Oct 5, 2015 at 2:59 PM, Steven Davies
-<linux-bluetooth-list@steev.me.uk> wrote:
-> I have two BLE devices which are visible to the bluetooth stack on my
-> host machine. One of them is at the edge of the reception range and
-> sometimes the host can't connect to it. I would expect bluez to remove
-> the record of this device after a timeout (3 minutes?) but it doesn't
-> seem to. Instead, when trying to connect to the device I see this debug
-> output:
+Plugging in the adapter on Linux 4.1 (dmesg):
+usb 3-3.3.3: new full-speed USB device number 90 using xhci_hcd
+usb 3-3.3.3: New USB device found, idVendor=105b, idProduct=e065
+usb 3-3.3.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+usb 3-3.3.3: Product: BCM43142A0
+usb 3-3.3.3: Manufacturer: Broadcom Corp
+usb 3-3.3.3: SerialNumber: 0090A286559E
 
+/sys/kernel/debug/usb/devices:
+T:  Bus=03 Lev=03 Prnt=22 Port=02 Cnt=02 Dev#= 90 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=105b ProdID=e065 Rev= 1.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM43142A0
+S:  SerialNumber=0090A286559E
+C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-Only if the device is temporary, but as soon as you attempt to connect
-to it will be considered persistent since you want to connect to it
-later. Note that BlueZ does use passive scanning in case a driver has
-auto_connect flag so it would reconnect automatically if the device
-start advertising, in that case it is even more important to keep the
-device registered in the bus so that you can disable auto connect by
-calling Device1.Disconnect or Device1.Block.
+Support for the chipset was added in commit 88f9b65 and a similar BCM43142
+based device was added in commit 8f0c304.
 
-> Oct  5 12:35:57 bang bluetoothd[3801]: src/device.c:device_connect_le()
-> Connection attempt to: B0:B4:48:B9:77:03
-> Oct  5 12:36:17 bang bluetoothd[3801]:
-> src/adapter.c:connect_failed_callback() hci0 B0:B4:48:B9:77:03 status 2
-> Oct  5 12:36:17 bang bluetoothd[3801]: plugins/policy.c:conn_fail_cb()
-> status 2
-> Oct  5 12:36:17 bang bluetoothd[3801]:
-> src/adapter.c:bonding_attempt_complete() hci0 bdaddr B0:B4:48:B9:77:03
-> type 1 status 0x2
-> Oct  5 12:36:17 bang bluetoothd[3801]:
-> src/device.c:device_bonding_complete() bonding (nil) status 0x02
-> Oct  5 12:36:17 bang bluetoothd[3801]:
-> src/device.c:device_bonding_failed() status 2
-> Oct  5 12:36:17 bang bluetoothd[3801]: src/adapter.c:resume_discovery()
-> Oct  5 12:36:17 bang bluetoothd[3801]: src/device.c:att_connect_cb()
-> connect error: Transport endpoint is not connected (107)
-> Oct  5 12:36:17 bang bluetoothd[3801]: src/device.c:att_error_cb()
-> Enabling automatic connections
->
-> This returns the message "GDBus.Error:org.bluez.Error.Failed: Software
-> caused connection abort (36)" through dbus.
+To work around the issue, I got the firmware
+(BCM43142A0_001.001.011.0122.0153) off a Windows installation of Broadcom
+bluetooth driver and converted it to a .hcd -file via. hex2hcd and placed it
+in /lib/firmware/brcm/BCM.hcd. After that:
 
-We might need the HCI logs to know what could be causing this error,
-usually the error in case a page timeout occurs or passive scanning
-cannot find the device is host is down.
+$ echo "105b e065 0 19ff 0239" > /sys/bus/usb/drivers/btusb/new_id
+...(plug in the adapter)
+usb 3-3.3.3: new full-speed USB device number 91 using xhci_hcd
+usb 3-3.3.3: New USB device found, idVendor=105b, idProduct=e065
+usb 3-3.3.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+usb 3-3.3.3: Product: BCM43142A0
+usb 3-3.3.3: Manufacturer: Broadcom Corp
+usb 3-3.3.3: SerialNumber: 0090A286559E
+Bluetooth: hci0: BCM: chip id 70
+Bluetooth: hci0: BCM (001.001.011) build 0000
+bluetooth hci0: firmware: direct-loading firmware brcm/BCM.hcd
+Bluetooth: hci0: BCM (001.001.011) build 0154
 
-> Should the device not be removed from the device list after a timeout?
+Bam, now it works for me!
 
-Nope, that is on purpose if you attempt to connect, perhaps we should
-even document to avoid such confusion.
+/sys/kernel/debug/usb/devices:
+T:  Bus=03 Lev=03 Prnt=22 Port=02 Cnt=02 Dev#= 92 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=105b ProdID=e065 Rev= 1.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM43142A0
+S:  SerialNumber=0090A286559E
+C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
+Signed-off-by: Santtu Rekilä <sare@r00t3d.com>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 247b106..32e15f4 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -124,6 +124,9 @@ static const struct usb_device_id btusb_table[] = {
+ 	/* Broadcom BCM20702B0 (Dynex/Insignia) */
+ 	{ USB_DEVICE(0x19ff, 0x0239), .driver_info = BTUSB_BCM_PATCHRAM },
+ 
++	/* Broadcom BCM43142A0 (Foxconn/Lenovo) */
++	{ USB_DEVICE(0x105b, 0xe065), .driver_info = BTUSB_BCM_PATCHRAM },
++
+ 	/* Foxconn - Hon Hai */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01),
+ 	  .driver_info = BTUSB_BCM_PATCHRAM },
 -- 
-Luiz Augusto von Dentz
+2.1.4
+
