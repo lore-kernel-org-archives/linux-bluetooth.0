@@ -1,138 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Santtu=20Rekil=C3=A4?= <sare@r00t3d.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Add support for Foxconn/Lenovo BCM43142A0 (105b:e065)
-Date: Mon,  5 Oct 2015 15:45:27 +0300
-Message-Id: <1444049127-4207-1-git-send-email-sare@r00t3d.com>
 MIME-Version: 1.0
+In-Reply-To: <CAEZxfGNHai9Mv-D2fVnRRCcqeUXfBzaAfGqpHfQwXAunfdyHhg@mail.gmail.com>
+References: <CAEZxfGPDdgjcSwS6vK46Q4tMwdoD=SjV-te8chiERM-wnEP00w@mail.gmail.com>
+	<CABBYNZ+GMyT8z8ujGGu3oMK1ffkdAuX21ZRu7Cf7eFpqS0jHuw@mail.gmail.com>
+	<CAEZxfGMY5L=gcDczjUoM6Yg3m9z+LObByFgnAy0u7duyu+v-tg@mail.gmail.com>
+	<CABBYNZL_DjeOGbbFKmavUY1QRMNb1V2KrBbNHZ2bH=hZ6q5vNg@mail.gmail.com>
+	<CAEZxfGMNJKc3kW+isa8LofrLCuWFBaPvyAiiw5X_0ZBLsrTDgQ@mail.gmail.com>
+	<EC65C3CE-3B41-4398-832B-18F8EFDE663C@holtmann.org>
+	<CAEZxfGN=++e0HGugMVwaousi3oa+y90FJ0e0Jdupni+5cFqPSA@mail.gmail.com>
+	<CABBYNZJqR+C7m=o7Xzh68DJ4jLDEDisJdbqjjQuf6mCmqfNWsQ@mail.gmail.com>
+	<CAEZxfGNHai9Mv-D2fVnRRCcqeUXfBzaAfGqpHfQwXAunfdyHhg@mail.gmail.com>
+Date: Mon, 5 Oct 2015 15:25:03 +0300
+Message-ID: <CABBYNZKqLU2K0jWvGiNG-g1w3VXG32ffn_nwbW000UTFjWYc8w@mail.gmail.com>
+Subject: Re: Disabling deviceinfo plugin on chromebooks?
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Recently salvaged this 'BCM43142A0' WiFi/Bluetooth module from a Lenovo laptop
-and noticed it doesn't work automatically, because the USB IDs are missing
-from btusb.c.
+Hi Fran=C3=A7ois,
 
-Plugging in the adapter on Linux 4.1 (dmesg):
-usb 3-3.3.3: new full-speed USB device number 90 using xhci_hcd
-usb 3-3.3.3: New USB device found, idVendor=105b, idProduct=e065
-usb 3-3.3.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-usb 3-3.3.3: Product: BCM43142A0
-usb 3-3.3.3: Manufacturer: Broadcom Corp
-usb 3-3.3.3: SerialNumber: 0090A286559E
+On Mon, Oct 5, 2015 at 2:36 PM, Fran=C3=A7ois Beaufort
+<beaufort.francois@gmail.com> wrote:
+> Do you want me to push a Pull Request?
 
-/sys/kernel/debug/usb/devices:
-T:  Bus=03 Lev=03 Prnt=22 Port=02 Cnt=02 Dev#= 90 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=105b ProdID=e065 Rev= 1.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM43142A0
-S:  SerialNumber=0090A286559E
-C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+Nope, I can probably do it myself, but take a look at my comments:
+https://code.google.com/p/chromium/issues/detail?id=3D532930#c12
 
-Support for the chipset was added in commit 88f9b65 and a similar BCM43142
-based device was added in commit 8f0c304.
-
-To work around the issue, I got the firmware
-(BCM43142A0_001.001.011.0122.0153) off a Windows installation of Broadcom
-bluetooth driver and converted it to a .hcd -file via. hex2hcd and placed it
-in /lib/firmware/brcm/BCM.hcd. After that:
-
-$ echo "105b e065 0 19ff 0239" > /sys/bus/usb/drivers/btusb/new_id
-...(plug in the adapter)
-usb 3-3.3.3: new full-speed USB device number 91 using xhci_hcd
-usb 3-3.3.3: New USB device found, idVendor=105b, idProduct=e065
-usb 3-3.3.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-usb 3-3.3.3: Product: BCM43142A0
-usb 3-3.3.3: Manufacturer: Broadcom Corp
-usb 3-3.3.3: SerialNumber: 0090A286559E
-Bluetooth: hci0: BCM: chip id 70
-Bluetooth: hci0: BCM (001.001.011) build 0000
-bluetooth hci0: firmware: direct-loading firmware brcm/BCM.hcd
-Bluetooth: hci0: BCM (001.001.011) build 0154
-
-Bam, now it works for me!
-
-/sys/kernel/debug/usb/devices:
-T:  Bus=03 Lev=03 Prnt=22 Port=02 Cnt=02 Dev#= 92 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=105b ProdID=e065 Rev= 1.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM43142A0
-S:  SerialNumber=0090A286559E
-C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-
-Signed-off-by: Santtu Rekilä <sare@r00t3d.com>
----
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 247b106..32e15f4 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -124,6 +124,9 @@ static const struct usb_device_id btusb_table[] = {
- 	/* Broadcom BCM20702B0 (Dynex/Insignia) */
- 	{ USB_DEVICE(0x19ff, 0x0239), .driver_info = BTUSB_BCM_PATCHRAM },
- 
-+	/* Broadcom BCM43142A0 (Foxconn/Lenovo) */
-+	{ USB_DEVICE(0x105b, 0xe065), .driver_info = BTUSB_BCM_PATCHRAM },
-+
- 	/* Foxconn - Hon Hai */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01),
- 	  .driver_info = BTUSB_BCM_PATCHRAM },
--- 
-2.1.4
-
+--=20
+Luiz Augusto von Dentz
