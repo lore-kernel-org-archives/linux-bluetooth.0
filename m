@@ -1,94 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
+From: Kuba Pawlak <kubax.t.pawlak@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Kuba Pawlak <kubax.t.pawlak@intel.com>
+Subject: [PATCH 3/5] Bluetooth: Fix locking issue during fast SCO reconnection.
+Date: Mon,  5 Oct 2015 18:44:17 +0200
+Message-Id: <1444063459-28577-4-git-send-email-kubax.t.pawlak@intel.com>
+In-Reply-To: <1444063459-28577-1-git-send-email-kubax.t.pawlak@intel.com>
+References: <088CC8BACB3382439E91D9919CE350243655EB71@IRSMSX107.ger.corp.intel.com>
+ <1444063459-28577-1-git-send-email-kubax.t.pawlak@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20151005082147.GA10556@t440s.lan>
-References: <1441216275-2954-1-git-send-email-jpawlowski@google.com>
-	<1441216275-2954-3-git-send-email-jpawlowski@google.com>
-	<20151005082147.GA10556@t440s.lan>
-Date: Mon, 5 Oct 2015 11:28:26 -0700
-Message-ID: <CAD0=r8xOoGfC91TaJnJDVg3-j0hFRgp=qNvWxxTbKQO2Zy3njg@mail.gmail.com>
-Subject: Re: [PATCH v3 3/8] emulator: add BT_HCI_CMD_LE_CREATE_CONN_CANCEL handling
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Jakub Pawlowski <jpawlowski@google.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Oct 5, 2015 at 1:21 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jakub,
->
-> On Wed, Sep 02, 2015, Jakub Pawlowski wrote:
->> This patch adds handling of BT_HCI_CMD_LE_CREATE_CONN_CANCEL command.
->>
->> If btdev_set_le_noresp_conn_request is called on btdev, other devices that
->> try to connect to it will stuck on BT_HCI_CMD_LE_CREATE_CONN, by not
->> sending bt_hci_evt_le_conn_complete event back. Thanks to that,
->> BT_HCI_CMD_LE_CREATE_CONN_CANCEL can be triggered to cancel connect
->> attempt.
->> ---
->>  emulator/btdev.c  | 45 +++++++++++++++++++++++++++++++++++++++++++++
->>  emulator/btdev.h  |  2 ++
->>  emulator/hciemu.c |  8 ++++++++
->>  emulator/hciemu.h |  3 +++
->>  4 files changed, 58 insertions(+)
->>
->> diff --git a/emulator/btdev.c b/emulator/btdev.c
->> index 60e8e8c..1645776 100644
->> --- a/emulator/btdev.c
->> +++ b/emulator/btdev.c
->> @@ -145,6 +145,11 @@ struct btdev {
->>       uint16_t sync_train_interval;
->>       uint32_t sync_train_timeout;
->>       uint8_t  sync_train_service_data;
->> +
->> +     bool     le_noresp_conn_request;
->> +     bool     pending_le_conn;
->> +     uint8_t  pending_le_conn_addr[6];
->> +     uint8_t  pending_le_conn_addr_type;
->>  };
->>
->>  struct inquiry_data {
->> @@ -674,6 +679,11 @@ bool btdev_is_le_scan_enabled(struct btdev *btdev)
->>       return btdev->le_scan_enable;
->>  }
->>
->> +void btdev_set_le_noresp_conn_request(struct btdev *btdev, bool value)
->> +{
->> +     btdev->le_noresp_conn_request = value;
->> +}
->> +
->>  static bool use_ssp(struct btdev *btdev1, struct btdev *btdev2)
->>  {
->>       if (btdev1->auth_enable || btdev2->auth_enable)
->> @@ -1134,6 +1144,9 @@ static void le_conn_complete(struct btdev *btdev,
->>               cc->handle = cpu_to_le16(42);
->>       }
->>
->> +     if (btdev->pending_le_conn)
->> +             btdev->pending_le_conn = false;
->> +
->>       cc->status = status;
->>       cc->peer_addr_type = bdaddr_type;
->>       memcpy(cc->peer_addr, bdaddr, 6);
->> @@ -1183,6 +1196,13 @@ static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
->>  {
->>       struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr, bdaddr_type);
->>
->> +     if (remote && remote->le_noresp_conn_request) {
->> +             btdev->pending_le_conn = true;
->> +             memcpy(btdev->pending_le_conn_addr, bdaddr, 6);
->> +             btdev->pending_le_conn_addr_type = bdaddr_type;
->> +             return;
->> +     }
->
-> btdev.c has a hooks mechanism to avoid adding test-specific complexity
-> from creeping in by letting the exception handling be in the test code
-> itself. In this case, couldn't you use command hooks to deal with the
-> le_create_conn & le_create_conn_cancel commands in the tester and
-> prevent the default handlers for them from running in btdev.c (by
-> returning 'false' from the hook callback)?
+V2hlbiBTQ08gY29ubmVjdGlvbiBpcyByZXF1ZXN0ZWQgYW5kIGRpc2Nvbm5lY3RlZCBmYXN0LCB0
+aGVyZSBpcyBhIGNoYW5nZQp0aGF0IHNjb19zb2NrX3NodXRkb3duIGlzIGdvaW5nIHRvIHByZWVt
+cHQgdGhyZWFkIHN0YXJ0ZWQgaW4gc2NvX2Nvbm5lY3RfY2ZtLgpXaGVuIHRoaXMgaGFwcGVucyBz
+dHJ1Y3Qgc29jayBzayBtYXkgYmUgcmVtb3ZlZCBidXQgYSBwb2ludGVyIHRvIGl0IGlzIHN0aWxs
+CmhlbGQgaW4gc2NvX2Nvbm5fcmVhZHksIHdoZXJlIGVtYmVkZGVkIHNwaW5sb2NrIGlzIHVzZWQu
+IElmIGl0IGlzIHVzZWQsIGJ1dApzdHJ1Y3Qgc29jayBoYXMgYmVlbiByZW1vdmVkLCBpdCB3aWxs
+IGNyYXNoLgoKQmxvY2sgY29ubmVjdGlvbiBvYmplY3QsIHdoaWNoIHdpbGwgcHJldmVudCBzdHJ1
+Y3Qgc29jayBmcm9tIGJlaW5nIHJlbW92ZWQKYW5kIGdpdmUgY29ubmVjdGlvbiBwcm9jZXNzIGNo
+YW5jZSB0byBmaW5pc2guCgpCVUc6IHNwaW5sb2NrIGJhZCBtYWdpYyBvbiBDUFUjMCwga3dvcmtl
+ci91OjJILzMxOQogbG9jazogMHhlM2U5OTQzNCwgLm1hZ2ljOiBmMzAwMDAwMCwgLm93bmVyOiAo
+77+977+977+9LzAsIC5vd25lcl9jcHU6IC0yMDM4MDQxNjAKUGlkOiAzMTksIGNvbW06IGt3b3Jr
+ZXIvdToySCBUYWludGVkOiBHICAgICAgICAgICBPIDMuOC4wLTExNS4xLXBsay1hZGFwdGF0aW9u
+LWJ5dC1pdmktYnJkICMxCkNhbGwgVHJhY2U6CiBbPGMxMTU1NjU5Pl0gPyBkb19yYXdfc3Bpbl9s
+b2NrKzB4MTkvMHhlOQogWzxmYjc1MzU0Zj5dID8gc2NvX2Nvbm5lY3RfY2ZtKzB4OTIvMHgyMzYg
+W2JsdWV0b290aF0KIFs8ZmI3MzFkYmM+XSA/IGhjaV9zeW5jX2Nvbm5fY29tcGxldGVfZXZ0LmNs
+b25lLjEwMSsweDE4Yi8weDFjYiBbYmx1ZXRvb3RoXQogWzxmYjczNGVlNz5dID8gaGNpX2V2ZW50
+X3BhY2tldCsweDFhY2QvMHgyMWE2IFtibHVldG9vdGhdCiBbPGMxMDQxMDk1Pl0gPyBmaW5pc2hf
+dGFza19zd2l0Y2grMHg1MC8weDg5CiBbPGMxMzQ5YTJlPl0gPyBfX3NjaGVkdWxlKzB4NjM4LzB4
+NmI4CiBbPGZiNzI3OTE4Pl0gPyBoY2lfcnhfd29yaysweGI5LzB4MmI4IFtibHVldG9vdGhdCiBb
+PGMxMDM3NjBhPl0gPyBxdWV1ZV9kZWxheWVkX3dvcmtfb24rMHgyMS8weDJhCiBbPGMxMDM1ZGY5
+Pl0gPyBwcm9jZXNzX29uZV93b3JrKzB4MTU3LzB4MjFiCiBbPGZiNzI3ODVmPl0gPyBoY2lfY21k
+X3dvcmsrMHhlZi8weGVmIFtibHVldG9vdGhdCiBbPGMxMDM2MjE3Pl0gPyB3b3JrZXJfdGhyZWFk
+KzB4MTZlLzB4MjBhCiBbPGMxMDM2MGE5Pl0gPyBtYW5hZ2Vfd29ya2VycysweDFjZi8weDFjZgog
+WzxjMTAzYTBlZj5dID8ga3RocmVhZCsweDhkLzB4OTIKIFs8YzEzNGFkZjc+XSA/IHJldF9mcm9t
+X2tlcm5lbF90aHJlYWQrMHgxYi8weDI4CiBbPGMxMDNhMDYyPl0gPyBfX2luaXRfa3RocmVhZF93
+b3JrZXIrMHgyNC8weDI0CkJVRzogdW5hYmxlIHRvIGhhbmRsZSBrZXJuZWwgTlVMTCBwb2ludGVy
+IGRlcmVmZXJlbmNlIGF0ICAgKG51bGwpCklQOiBbPCAgKG51bGwpPl0gICAobnVsbCkKKnBkcHQg
+PSAwMDAwMDAwMDI0NGUxMDAxICpwZGUgPSAwMDAwMDAwMDAwMDAwMDAwCk9vcHM6IDAwMTAgWyMx
+XSBQUkVFTVBUIFNNUApNb2R1bGVzIGxpbmtlZCBpbjogZXZkZXYgZWNiIHJmY29tbShPKSBsaWJj
+b21wb3NpdGUgdXNiMjM4MCB1ZGNfY29yZSBibmVwKE8pIGJ0dXNiKE8pIGJ0YmNtKE8pIGNkY19h
+Y20gYnRpbnRlbChPKSBibHVldG9vdGgoTykgYXJjNCB1aW5wdXQgaGlkX211bHRpdG91Y2ggdXNi
+aGlkIGhpZCBpd2xtdm0oTyllClBpZDogMzE5LCBjb21tOiBrd29ya2VyL3U6MkggVGFpbnRlZDog
+RyAgICAgICAgICAgTyAzLjguMC0xMTUuMS1wbGstYWRhcHRhdGlvbi1ieXQtaXZpLWJyZCAjMQpF
+SVA6IDAwNjA6WzwwMDAwMDAwMD5dIEVGTEFHUzogMDAwMTAyNDYgQ1BVOiAwCkVJUCBpcyBhdCAw
+eDAKRUFYOiBlM2U5OTQwMCBFQlg6IGUzZTk5NDAwIEVDWDogMDAwMDAxMDAgRURYOiAwMDAwMDAw
+MApFU0k6IGUzZTk5NDM0IEVESTogZmI3NjNjZTAgRUJQOiBlNDliOWU0NCBFU1A6IGU0OWI5ZTE0
+CiBEUzogMDA3YiBFUzogMDA3YiBGUzogMDBkOCBHUzogMDAwMCBTUzogMDA2OApDUjA6IDgwMDUw
+MDNiIENSMjogMDAwMDAwMDAgQ1IzOiAyNDQ0NDAwMCBDUjQ6IDAwMTAwN2YwCkRSMDogMDAwMDAw
+MDAgRFIxOiAwMDAwMDAwMCBEUjI6IDAwMDAwMDAwIERSMzogMDAwMDAwMDAKRFI2OiBmZmZmMGZm
+MCBEUjc6IDAwMDAwNDAwClByb2Nlc3Mga3dvcmtlci91OjJIIChwaWQ6IDMxOSwgdGk9ZTQ5Yjgw
+MDAgdGFzaz1lNGFiOTAzMCB0YXNrLnRpPWU0OWI4MDAwKQpTdGFjazoKIGZiNzUzNTViIDAwMDAw
+MjQ2IGZiNzYzOTAwIDIyMjIyMjIyIDIyMjIyMjIyIDIyMjIyMjIyIGUzZjk0NDYwIGUzY2E3YzBh
+CiBlNDliOWU0YyBlM2YzNGMwMCBlM2NhN2MwYSBmYjc2M2NlMCBlNDliOWU2YyBmYjczMWRiYyAw
+MjAwMDI0NiBlNGNlYzg1YwogZTRjZWMwMDggMDAwMDAwMDAgZTNmMzRjMDAgZTRjZWMwMDAgZTNj
+MmNlMDAgMDAwMDAwMmMgZTQ5YjllZDAgZmI3MzRlZTcKQ2FsbCBUcmFjZToKIFs8ZmI3NTM1NWI+
+XSA/IHNjb19jb25uZWN0X2NmbSsweDllLzB4MjM2IFtibHVldG9vdGhdCiBbPGZiNzMxZGJjPl0g
+PyBoY2lfc3luY19jb25uX2NvbXBsZXRlX2V2dC5jbG9uZS4xMDErMHgxOGIvMHgxY2IgW2JsdWV0
+b290aF0KIFs8ZmI3MzRlZTc+XSA/IGhjaV9ldmVudF9wYWNrZXQrMHgxYWNkLzB4MjFhNiBbYmx1
+ZXRvb3RoXQogWzxjMTA0MTA5NT5dID8gZmluaXNoX3Rhc2tfc3dpdGNoKzB4NTAvMHg4OQogWzxj
+MTM0OWEyZT5dID8gX19zY2hlZHVsZSsweDYzOC8weDZiOAogWzxmYjcyNzkxOD5dID8gaGNpX3J4
+X3dvcmsrMHhiOS8weDJiOCBbYmx1ZXRvb3RoXQogWzxjMTAzNzYwYT5dID8gcXVldWVfZGVsYXll
+ZF93b3JrX29uKzB4MjEvMHgyYQogWzxjMTAzNWRmOT5dID8gcHJvY2Vzc19vbmVfd29yaysweDE1
+Ny8weDIxYgogWzxmYjcyNzg1Zj5dID8gaGNpX2NtZF93b3JrKzB4ZWYvMHhlZiBbYmx1ZXRvb3Ro
+XQogWzxjMTAzNjIxNz5dID8gd29ya2VyX3RocmVhZCsweDE2ZS8weDIwYQogWzxjMTAzNjBhOT5d
+ID8gbWFuYWdlX3dvcmtlcnMrMHgxY2YvMHgxY2YKIFs8YzEwM2EwZWY+XSA/IGt0aHJlYWQrMHg4
+ZC8weDkyCiBbPGMxMzRhZGY3Pl0gPyByZXRfZnJvbV9rZXJuZWxfdGhyZWFkKzB4MWIvMHgyOAog
+WzxjMTAzYTA2Mj5dID8gX19pbml0X2t0aHJlYWRfd29ya2VyKzB4MjQvMHgyNApDb2RlOiAgQmFk
+IEVJUCB2YWx1ZS4KRUlQOiBbPDAwMDAwMDAwPl0gMHgwIFNTOkVTUCAwMDY4OmU0OWI5ZTE0CkNS
+MjogMDAwMDAwMDAwMDAwMDAwMAotLS1bIGVuZCB0cmFjZSA5NDJhNjU3N2MwYWJkNzI1IF0tLS0K
+ClNpZ25lZC1vZmYtYnk6IEt1YmEgUGF3bGFrIDxrdWJheC50LnBhd2xha0BpbnRlbC5jb20+Ci0t
+LQogbmV0L2JsdWV0b290aC9zY28uYyB8IDUgKysrKysKIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2Vy
+dGlvbnMoKykKCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL3Njby5jIGIvbmV0L2JsdWV0b290
+aC9zY28uYwppbmRleCAwOTA1MWU0Y2JhZGUxMzJmZDZlMTA2ZmQ0OGMxZTVlMzZmMzZlYjFhLi43
+NWY4NDNkNTQyM2E0NzUwZjE4ZjY5OGE1NzEzMGM2YTk2ZjcxZjIzIDEwMDY0NAotLS0gYS9uZXQv
+Ymx1ZXRvb3RoL3Njby5jCisrKyBiL25ldC9ibHVldG9vdGgvc2NvLmMKQEAgLTk2NSw3ICs5NjUs
+OSBAQCBzdGF0aWMgaW50IHNjb19zb2NrX3NodXRkb3duKHN0cnVjdCBzb2NrZXQgKnNvY2ssIGlu
+dCBob3cpCiAJaWYgKCFzaykKIAkJcmV0dXJuIDA7CiAKKwlzb2NrX2hvbGQoc2spOwogCWxvY2tf
+c29jayhzayk7CisKIAlpZiAoIXNrLT5za19zaHV0ZG93bikgewogCQlzay0+c2tfc2h1dGRvd24g
+PSBTSFVURE9XTl9NQVNLOwogCQlzY29fc29ja19jbGVhcl90aW1lcihzayk7CkBAIC05NzYsNyAr
+OTc4LDEwIEBAIHN0YXRpYyBpbnQgc2NvX3NvY2tfc2h1dGRvd24oc3RydWN0IHNvY2tldCAqc29j
+aywgaW50IGhvdykKIAkJCWVyciA9IGJ0X3NvY2tfd2FpdF9zdGF0ZShzaywgQlRfQ0xPU0VELAog
+CQkJCQkJIHNrLT5za19saW5nZXJ0aW1lKTsKIAl9CisKIAlyZWxlYXNlX3NvY2soc2spOworCXNv
+Y2tfcHV0KHNrKTsKKwogCXJldHVybiBlcnI7CiB9CiAKLS0gCjEuOS4zCgpJbnRlbCBEZXV0c2No
+bGFuZCBHbWJIClJlZ2lzdGVyZWQgQWRkcmVzczogQW0gQ2FtcGVvbiAxMC0xMiwgODU1NzkgTmV1
+YmliZXJnLCBHZXJtYW55ClRlbDogKzQ5IDg5IDk5IDg4NTMtMCwgd3d3LmludGVsLmRlCk1hbmFn
+aW5nIERpcmVjdG9yczogQ2hyaXN0aW4gRWlzZW5zY2htaWQsIFByb2YuIERyLiBIZXJtYW5uIEV1
+bApDaGFpcnBlcnNvbiBvZiB0aGUgU3VwZXJ2aXNvcnkgQm9hcmQ6IFRpZmZhbnkgRG9vbiBTaWx2
+YQpSZWdpc3RlcmVkIE9mZmljZTogTXVuaWNoCkNvbW1lcmNpYWwgUmVnaXN0ZXI6IEFtdHNnZXJp
+Y2h0IE11ZW5jaGVuIEhSQiAxODY5MjgK
 
-Thanks for pointing me to hooks. It actually made this code shorter.
-
->
-> Johan
