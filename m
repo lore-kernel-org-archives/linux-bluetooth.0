@@ -1,66 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dmitry Tunin <hanipouspilot@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ath3k: Add new AR3012 0930:021c id
-Date: Mon,  5 Oct 2015 19:29:33 +0300
-Message-Id: <1444062573-17450-1-git-send-email-hanipouspilot@gmail.com>
+Message-ID: <56129822.3020105@steev.me.uk>
+Date: Mon, 05 Oct 2015 16:32:50 +0100
+From: Steven Davies <linux-bluetooth-list@steev.me.uk>
+MIME-Version: 1.0
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: Gone away BLE device still available in dbus
+References: <56126614.5050303@steev.me.uk> <CABBYNZLniquNpn15AzarWYoe4npyrAW8OJMZwAVFGXsbTvO1Og@mail.gmail.com>
+In-Reply-To: <CABBYNZLniquNpn15AzarWYoe4npyrAW8OJMZwAVFGXsbTvO1Og@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adapter works with the existing linux-firmware.
+Hi Luiz,
 
-T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0930 ProdID=021c Rev=00.01
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+On 05/10/15 15:11, Luiz Augusto von Dentz wrote:
+> Hi Steven,
+>
+> On Mon, Oct 5, 2015 at 2:59 PM, Steven Davies
+> <linux-bluetooth-list@steev.me.uk> wrote:
+>> I have two BLE devices which are visible to the bluetooth stack on my
+>> host machine. One of them is at the edge of the reception range and
+>> sometimes the host can't connect to it. I would expect bluez to remove
+>> the record of this device after a timeout (3 minutes?) but it doesn't
+>> seem to. Instead, when trying to connect to the device I see this debug
+>> output:
+>
+> Only if the device is temporary, but as soon as you attempt to connect
+> to it will be considered persistent since you want to connect to it
+> later. Note that BlueZ does use passive scanning in case a driver has
+> auto_connect flag so it would reconnect automatically if the device
+> start advertising, in that case it is even more important to keep the
+> device registered in the bus so that you can disable auto connect by
+> calling Device1.Disconnect or Device1.Block.
+Does this mean that after a Disconnect, the device will then time out
+(if it isn't seen again my active/passive scanning)?
+>> Oct  5 12:35:57 bang bluetoothd[3801]: src/device.c:device_connect_le()
+>> Connection attempt to: B0:B4:48:B9:77:03
+>> Oct  5 12:36:17 bang bluetoothd[3801]:
+>> src/adapter.c:connect_failed_callback() hci0 B0:B4:48:B9:77:03 status 2
+>> Oct  5 12:36:17 bang bluetoothd[3801]: plugins/policy.c:conn_fail_cb()
+>> status 2
+>> Oct  5 12:36:17 bang bluetoothd[3801]:
+>> src/adapter.c:bonding_attempt_complete() hci0 bdaddr B0:B4:48:B9:77:03
+>> type 1 status 0x2
+>> Oct  5 12:36:17 bang bluetoothd[3801]:
+>> src/device.c:device_bonding_complete() bonding (nil) status 0x02
+>> Oct  5 12:36:17 bang bluetoothd[3801]:
+>> src/device.c:device_bonding_failed() status 2
+>> Oct  5 12:36:17 bang bluetoothd[3801]: src/adapter.c:resume_discovery()
+>> Oct  5 12:36:17 bang bluetoothd[3801]: src/device.c:att_connect_cb()
+>> connect error: Transport endpoint is not connected (107)
+>> Oct  5 12:36:17 bang bluetoothd[3801]: src/device.c:att_error_cb()
+>> Enabling automatic connections
+>>
+>> This returns the message "GDBus.Error:org.bluez.Error.Failed: Software
+>> caused connection abort (36)" through dbus.
+> We might need the HCI logs to know what could be causing this error,
+> usually the error in case a page timeout occurs or passive scanning
+> cannot find the device is host is down.
+I can send an hcidump of when this next happens if that would help?
 
-BugLink: https://bugs.launchpad.net/bugs/1502781
-
-Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-Cc: stable@vger.kernel.org
----
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- 2 files changed, 3 insertions(+)
-
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index e527a3e..60c15f8 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -93,6 +93,7 @@ static const struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x04CA, 0x300f) },
- 	{ USB_DEVICE(0x04CA, 0x3010) },
- 	{ USB_DEVICE(0x0930, 0x0219) },
-+	{ USB_DEVICE(0x0930, 0x021c) },
- 	{ USB_DEVICE(0x0930, 0x0220) },
- 	{ USB_DEVICE(0x0930, 0x0227) },
- 	{ USB_DEVICE(0x0b05, 0x17d0) },
-@@ -153,6 +154,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x04ca, 0x300f), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3010), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0930, 0x021c), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0227), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 247b106..637440c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -195,6 +195,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x04ca, 0x300f), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3010), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0930, 0x021c), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0227), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
--- 
-1.9.1
+Thanks,
+Steven Davies
