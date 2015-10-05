@@ -1,124 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1444032036.2982.19.camel@linux.intel.com>
-Subject: Re: [PATCH bluetooth-next] 6lowpan: move shared settings to
- lowpan_netdev_setup
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	linux-bluetooth@vger.kernel.org
-Date: Mon, 05 Oct 2015 11:00:36 +0300
-In-Reply-To: <1443810484-10528-1-git-send-email-alex.aring@gmail.com>
-References: <1443810484-10528-1-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-wpan-owner@vger.kernel.org
+Date: Mon, 5 Oct 2015 10:33:37 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] Bluetooth: Limit userspace exposure of stack
+ internal events
+Message-ID: <20151005073337.GB15431@t440s.lan>
+References: <1443994443-123453-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1443994443-123453-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Marcel,
 
-this makes sense so ACK from me.
-
-
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-
-
-On pe, 2015-10-02 at 20:28 +0200, Alexander Aring wrote:
-> This patch moves values for all lowpan interface to the shared
-> implementation of 6lowpan. This patch also quietly fixes the forgotten
-> IFF_NO_QUEUE flag for the bluetooth 6LoWPAN interface. An identically
-> commit is 4afbc0d ("net: 6lowpan: convert to using IFF_NO_QUEUE") which
-> wasn't changed for bluetooth 6lowpan.
+On Sun, Oct 04, 2015, Marcel Holtmann wrote:
+> The stack internal events that are exposed to userspace should be
+> limited to HCI_DEV_REG, HCI_DEV_UNREG, HCI_DEV_UP and HCI_DEV_DOWN.
 > 
-> All 6lowpan interfaces should be virtual with IFF_NO_QUEUE, using EUI64
-> address length, the mtu size is 1280 (IPV6_MIN_MTU) and the netdev type
-> is ARPHRD_6LOWPAN.
-> 
-> Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  include/net/6lowpan.h         | 2 ++
->  net/6lowpan/core.c            | 5 +++++
->  net/bluetooth/6lowpan.c       | 6 ------
->  net/ieee802154/6lowpan/core.c | 4 ----
->  4 files changed, 7 insertions(+), 10 deletions(-)
-> 
-> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-> index c17f556..07db532 100644
-> --- a/include/net/6lowpan.h
-> +++ b/include/net/6lowpan.h
-> @@ -61,6 +61,8 @@
->  #define UIP_PROTO_UDP			17 /* ipv6 next header value for UDP */
->  #define UIP_FRAGH_LEN			8  /* ipv6 fragment header size */
->  
-> +#define EUI64_ADDR_LEN		8
-> +
->  #define LOWPAN_NHC_MAX_ID_LEN	1
->  /* Max IPHC Header len without IPv6 hdr specific inline data.
->   * Useful for getting the "extra" bytes we need at worst case compression.
-> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-> index ae1896f..83b19e0 100644
-> --- a/net/6lowpan/core.c
-> +++ b/net/6lowpan/core.c
-> @@ -17,6 +17,11 @@
->  
->  void lowpan_netdev_setup(struct net_device *dev, enum lowpan_lltypes lltype)
->  {
-> +	dev->addr_len = EUI64_ADDR_LEN;
-> +	dev->type = ARPHRD_6LOWPAN;
-> +	dev->mtu = IPV6_MIN_MTU;
-> +	dev->priv_flags |= IFF_NO_QUEUE;
-> +
->  	lowpan_priv(dev)->lltype = lltype;
->  }
->  EXPORT_SYMBOL(lowpan_netdev_setup);
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 131e79c..bc840a5 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -35,7 +35,6 @@ static struct dentry *lowpan_enable_debugfs;
->  static struct dentry *lowpan_control_debugfs;
->  
->  #define IFACE_NAME_TEMPLATE "bt%d"
-> -#define EUI64_ADDR_LEN 8
->  
->  struct skb_cb {
->  	struct in6_addr addr;
-> @@ -674,13 +673,8 @@ static struct header_ops header_ops = {
->  
->  static void netdev_setup(struct net_device *dev)
->  {
-> -	dev->addr_len		= EUI64_ADDR_LEN;
-> -	dev->type		= ARPHRD_6LOWPAN;
-> -
->  	dev->hard_header_len	= 0;
->  	dev->needed_tailroom	= 0;
-> -	dev->mtu		= IPV6_MIN_MTU;
-> -	dev->tx_queue_len	= 0;
->  	dev->flags		= IFF_RUNNING | IFF_POINTOPOINT |
->  				  IFF_MULTICAST;
->  	dev->watchdog_timeo	= 0;
-> diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-> index 44420ed..20c49c7 100644
-> --- a/net/ieee802154/6lowpan/core.c
-> +++ b/net/ieee802154/6lowpan/core.c
-> @@ -101,13 +101,9 @@ static const struct net_device_ops lowpan_netdev_ops = {
->  
->  static void lowpan_setup(struct net_device *ldev)
->  {
-> -	ldev->addr_len		= IEEE802154_ADDR_LEN;
->  	memset(ldev->broadcast, 0xff, IEEE802154_ADDR_LEN);
-> -	ldev->type		= ARPHRD_6LOWPAN;
->  	/* We need an ipv6hdr as minimum len when calling xmit */
->  	ldev->hard_header_len	= sizeof(struct ipv6hdr);
-> -	ldev->mtu		= IPV6_MIN_MTU;
-> -	ldev->priv_flags	|= IFF_NO_QUEUE;
->  	ldev->flags		= IFF_BROADCAST | IFF_MULTICAST;
->  
->  	ldev->netdev_ops	= &lowpan_netdev_ops;
+>  net/bluetooth/hci_sock.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
 
+All five patches in this set have been applied to bluetooth-next. Thanks.
 
-Cheers,
-Jukka
-
-
-
+Johan
