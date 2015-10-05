@@ -1,50 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kuba Pawlak <kubax.t.pawlak@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Kuba Pawlak <kubax.t.pawlak@intel.com>
-Subject: [PATCH 0/5] Few proposed fixes to stop crashes on fast SCO disconnec
-Date: Mon,  5 Oct 2015 18:44:14 +0200
-Message-Id: <1444063459-28577-1-git-send-email-kubax.t.pawlak@intel.com>
-In-Reply-To: <088CC8BACB3382439E91D9919CE350243655EB71@IRSMSX107.ger.corp.intel.com>
-References: <088CC8BACB3382439E91D9919CE350243655EB71@IRSMSX107.ger.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Dmitry Tunin <hanipouspilot@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ath3k: Add new AR3012 0930:021c id
+Date: Mon,  5 Oct 2015 19:29:33 +0300
+Message-Id: <1444062573-17450-1-git-send-email-hanipouspilot@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksCgpJIGNyZWF0ZWQgZmV3IHBhdGNoZXMgdG8gc3RvcCBrZXJuZWwgZnJvbSBjcmFzaGluZyB3
-aGVuIFNDTyBjaGFubmVsIGlzIHJlcXVlc3RlZAp0byBzaHV0IGRvd24sIGp1c3QgYWZ0ZXIgaXRz
-IGNyZWF0aW9uLiBTb21lIGNyYXNoZWQgaGFwcGVuIGJlY2F1c2UKU0NPIHNvY2tldCBzaHV0ZG93
-biAoc2NvX3NvY2tfc2h1dGRvd24pIGlzIGNhbGxlZCBiZWZvcmUgU3luY2hyb25vdXMgQ29ubmVj
-dGlvbgpDb21wbGV0ZSAoc2NvX2Nvbm5lY3RfY2ZtKSBpcyByZWNlaXZlZCBvciBiZWNhdXNlIHRo
-ZSB0aHJlYWQgaGFuZGxpbmcgaXQgd2FzCnByZWVtcHRlZCBoYWxmd2F5IGJ5IFNDTyBzaHV0ZG93
-bi4KClRoZXNlIGFyZSBub3QgcGF0Y2hlcyBJIHdvdWxkIGxpa2UgdG8gaGF2ZSBhY2NlcHRlZCBp
-bW1lZGlhdGVsbHksIGJ1dCBhcmUgaGVyZQpzaG93IHdoYXQgaGFkIHRvIGJlIGRvbmUgdG8gc3Rv
-cCBjcmFzaGVzLCBzbyB3ZSBjb3VsZCBzdGFydCBkaXNjdXNzaW9uIGhvdyB0byBmaXgKaXQgcHJv
-cGVybHkuCgpOb3csIHdpdGggY3Jhc2hlcyBvdXQgb2YgdGhlIHdheSBJIHdhcyBhYmxlIHRvIHNl
-ZSBhbm90aGVyIGRlZmVjdCB3aGljaCBpcyBhCkRpc2Nvbm5lY3QgbWVzc2FnZSBzZW50IHRvIHF1
-aWNrbHksIGJlZm9yZSB0aGVyZSBpcyBhIGhhbmRsZSBhc3NvY2lhdGVkIHdpdGgKdGhlIGNvbm5l
-Y3Rpb24uIEVmZmVjdGl2ZWx5LCB3ZSBmYWlsIHRvIGRpc2Nvbm5lY3QgU0NPLiBDUyBlcnJvciBm
-b3IgRGlzY29ubmVjdAppcyBub3QgaGFuZGxlZCBhdCBhbGwuCgoKID4gSENJIEV2ZW50OiBDb25u
-ZWN0IFJlcXVlc3QgKDB4MDQpIHBsZW4gMTAKIDwgSENJIENvbW1hbmQ6IEFjY2VwdCBTeW5jaHJv
-bm91cyBDb25uZWN0aW9uIFJlcXVlc3QgKDB4MDF8MHgwMDI5KSBwbGVuIDIxCiA+IEhDSSBFdmVu
-dDogQ29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNAogPCBIQ0kgQ29tbWFuZDogRGlzY29ubmVj
-dCAoMHgwMXwweDAwMDYpIHBsZW4gMwogICAgICAgICAgSGFuZGxlOiAwCiA+IEhDSSBFdmVudDog
-Q29tbWFuZCBTdGF0dXMgKDB4MGYpIHBsZW4gNAogICAgICAgICAgU3RhdHVzOiBVbmtub3duIENv
-bm5lY3Rpb24gSWRlbnRpZmllciAoMHgwMikKID4gSENJIEV2ZW50OiBTeW5jaHJvbm91cyBDb25u
-ZWN0IENvbXBsZXRlICgweDJjKSBwbGVuIDE3CiAgICAgICAgICBIYW5kbGU6IDUxMwoKSSdtIHVz
-aW5nIEJUIHN1YnN5c3RlbSBmcm9tIDQuMS4xIGJhY3BrIHBvcnQgb24gdG9wIG9mIDMuOCB3aXRo
-IFBSRUVNUFQuCgoKS3ViYSBQYXdsYWsgKDUpOgogIEJsdWV0b290aDogRml4IGNyYXNoIG9uIFND
-TyBkaXNjb25uZWN0CiAgQmx1ZXRvb3RoOiBGaXggbG9ja2luZyBpc3N1ZSBvbiBTQ08gZGlzY29u
-bmVjdGlvbgogIEJsdWV0b290aDogRml4IGxvY2tpbmcgaXNzdWUgZHVyaW5nIGZhc3QgU0NPIHJl
-Y29ubmVjdGlvbi4KICBCbHVldG9vdGg6IEZpeCBsb2NraW5nIG9mIFNDTyBjaGFubmVsIHRvIGNv
-bm5lY3Rpb24KICBCbHVldG9vdGg6IEZpeCBjcmFzaCBvbiBmYXN0IGRpc2Nvbm5lY3Qgb2YgU0NP
-CgogbmV0L2JsdWV0b290aC9zY28uYyB8IDI4ICsrKysrKysrKysrKysrKysrKysrKysrLS0tLS0K
-IDEgZmlsZSBjaGFuZ2VkLCAyMyBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQoKLS0gCjEu
-OS4zCgpJbnRlbCBEZXV0c2NobGFuZCBHbWJIClJlZ2lzdGVyZWQgQWRkcmVzczogQW0gQ2FtcGVv
-biAxMC0xMiwgODU1NzkgTmV1YmliZXJnLCBHZXJtYW55ClRlbDogKzQ5IDg5IDk5IDg4NTMtMCwg
-d3d3LmludGVsLmRlCk1hbmFnaW5nIERpcmVjdG9yczogQ2hyaXN0aW4gRWlzZW5zY2htaWQsIFBy
-b2YuIERyLiBIZXJtYW5uIEV1bApDaGFpcnBlcnNvbiBvZiB0aGUgU3VwZXJ2aXNvcnkgQm9hcmQ6
-IFRpZmZhbnkgRG9vbiBTaWx2YQpSZWdpc3RlcmVkIE9mZmljZTogTXVuaWNoCkNvbW1lcmNpYWwg
-UmVnaXN0ZXI6IEFtdHNnZXJpY2h0IE11ZW5jaGVuIEhSQiAxODY5MjgK
+This adapter works with the existing linux-firmware.
 
+T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0930 ProdID=021c Rev=00.01
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+
+BugLink: https://bugs.launchpad.net/bugs/1502781
+
+Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index e527a3e..60c15f8 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -93,6 +93,7 @@ static const struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x04CA, 0x300f) },
+ 	{ USB_DEVICE(0x04CA, 0x3010) },
+ 	{ USB_DEVICE(0x0930, 0x0219) },
++	{ USB_DEVICE(0x0930, 0x021c) },
+ 	{ USB_DEVICE(0x0930, 0x0220) },
+ 	{ USB_DEVICE(0x0930, 0x0227) },
+ 	{ USB_DEVICE(0x0b05, 0x17d0) },
+@@ -153,6 +154,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x04ca, 0x300f), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3010), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0930, 0x021c), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0227), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 247b106..637440c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -195,6 +195,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x04ca, 0x300f), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3010), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0930, 0x021c), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0227), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
+-- 
+1.9.1
