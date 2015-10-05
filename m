@@ -1,102 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btbcm: Read the local name in setup stage
-Date: Mon,  5 Oct 2015 12:43:57 +0200
-Message-Id: <1444041837-18497-1-git-send-email-marcel@holtmann.org>
+Date: Mon, 5 Oct 2015 11:21:47 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 3/8] emulator: add BT_HCI_CMD_LE_CREATE_CONN_CANCEL
+ handling
+Message-ID: <20151005082147.GA10556@t440s.lan>
+References: <1441216275-2954-1-git-send-email-jpawlowski@google.com>
+ <1441216275-2954-3-git-send-email-jpawlowski@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1441216275-2954-3-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Broadcom Bluetooth controllers have the chip name included in the
-ROM firmware or later in the patchram firmware. For debugging purposes
-read the local name and print it out. This is only done during setup
-stage and only once before loading the firmware and once after loading
-the firmware.
+Hi Jakub,
 
-For the Broadcom based controllers from Apple, the name is only read once
-after determining the chip id.
+On Wed, Sep 02, 2015, Jakub Pawlowski wrote:
+> This patch adds handling of BT_HCI_CMD_LE_CREATE_CONN_CANCEL command.
+> 
+> If btdev_set_le_noresp_conn_request is called on btdev, other devices that
+> try to connect to it will stuck on BT_HCI_CMD_LE_CREATE_CONN, by not
+> sending bt_hci_evt_le_conn_complete event back. Thanks to that,
+> BT_HCI_CMD_LE_CREATE_CONN_CANCEL can be triggered to cancel connect
+> attempt.
+> ---
+>  emulator/btdev.c  | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>  emulator/btdev.h  |  2 ++
+>  emulator/hciemu.c |  8 ++++++++
+>  emulator/hciemu.h |  3 +++
+>  4 files changed, 58 insertions(+)
+> 
+> diff --git a/emulator/btdev.c b/emulator/btdev.c
+> index 60e8e8c..1645776 100644
+> --- a/emulator/btdev.c
+> +++ b/emulator/btdev.c
+> @@ -145,6 +145,11 @@ struct btdev {
+>  	uint16_t sync_train_interval;
+>  	uint32_t sync_train_timeout;
+>  	uint8_t  sync_train_service_data;
+> +
+> +	bool     le_noresp_conn_request;
+> +	bool     pending_le_conn;
+> +	uint8_t  pending_le_conn_addr[6];
+> +	uint8_t  pending_le_conn_addr_type;
+>  };
+>  
+>  struct inquiry_data {
+> @@ -674,6 +679,11 @@ bool btdev_is_le_scan_enabled(struct btdev *btdev)
+>  	return btdev->le_scan_enable;
+>  }
+>  
+> +void btdev_set_le_noresp_conn_request(struct btdev *btdev, bool value)
+> +{
+> +	btdev->le_noresp_conn_request = value;
+> +}
+> +
+>  static bool use_ssp(struct btdev *btdev1, struct btdev *btdev2)
+>  {
+>  	if (btdev1->auth_enable || btdev2->auth_enable)
+> @@ -1134,6 +1144,9 @@ static void le_conn_complete(struct btdev *btdev,
+>  		cc->handle = cpu_to_le16(42);
+>  	}
+>  
+> +	if (btdev->pending_le_conn)
+> +		btdev->pending_le_conn = false;
+> +
+>  	cc->status = status;
+>  	cc->peer_addr_type = bdaddr_type;
+>  	memcpy(cc->peer_addr, bdaddr, 6);
+> @@ -1183,6 +1196,13 @@ static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
+>  {
+>  	struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr, bdaddr_type);
+>  
+> +	if (remote && remote->le_noresp_conn_request) {
+> +		btdev->pending_le_conn = true;
+> +		memcpy(btdev->pending_le_conn_addr, bdaddr, 6);
+> +		btdev->pending_le_conn_addr_type = bdaddr_type;
+> +		return;
+> +	}
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btbcm.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+btdev.c has a hooks mechanism to avoid adding test-specific complexity
+from creeping in by letting the exception handling be in the test code
+itself. In this case, couldn't you use command hooks to deal with the
+le_create_conn & le_create_conn_cancel commands in the tester and
+prevent the default handlers for them from running in btdev.c (by
+returning 'false' from the hook callback)?
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index ad7371da5aaa..5e0967482d4b 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -181,6 +181,27 @@ static int btbcm_reset(struct hci_dev *hdev)
- 	return 0;
- }
- 
-+static struct sk_buff *btbcm_read_local_name(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_NAME, 0, NULL,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s: BCM: Reading local name failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return skb;
-+	}
-+
-+	if (skb->len != sizeof(struct hci_rp_read_local_name)) {
-+		BT_ERR("%s: BCM: Local name length mismatch", hdev->name);
-+		kfree_skb(skb);
-+		return ERR_PTR(-EIO);
-+	}
-+
-+	return skb;
-+}
-+
- static struct sk_buff *btbcm_read_local_version(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-@@ -393,6 +414,14 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 	BT_INFO("%s: BCM: chip id %u", hdev->name, skb->data[1]);
- 	kfree_skb(skb);
- 
-+	/* Read Local Name */
-+	skb = btbcm_read_local_name(hdev);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+
-+	BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
-+	kfree_skb(skb);
-+
- 	switch ((rev & 0xf000) >> 12) {
- 	case 0:
- 	case 3:
-@@ -464,6 +493,14 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 		hw_name ? : "BCM", (subver & 0x7000) >> 13,
- 		(subver & 0x1f00) >> 8, (subver & 0x00ff), rev & 0x0fff);
- 
-+	/* Read Local Name */
-+	skb = btbcm_read_local_name(hdev);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+
-+	BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
-+	kfree_skb(skb);
-+
- 	btbcm_check_bdaddr(hdev);
- 
- 	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
-@@ -490,6 +527,13 @@ int btbcm_setup_apple(struct hci_dev *hdev)
- 		kfree_skb(skb);
- 	}
- 
-+	/* Read Local Name */
-+	skb = btbcm_read_local_name(hdev);
-+	if (IS_ERR(skb)) {
-+		BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
-+		kfree_skb(skb);
-+	}
-+
- 	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
- 
- 	return 0;
--- 
-2.4.3
-
+Johan
