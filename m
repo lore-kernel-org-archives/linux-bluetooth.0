@@ -1,81 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20151005082147.GA10556@t440s.lan>
+References: <1441216275-2954-1-git-send-email-jpawlowski@google.com>
+	<1441216275-2954-3-git-send-email-jpawlowski@google.com>
+	<20151005082147.GA10556@t440s.lan>
+Date: Mon, 5 Oct 2015 11:28:26 -0700
+Message-ID: <CAD0=r8xOoGfC91TaJnJDVg3-j0hFRgp=qNvWxxTbKQO2Zy3njg@mail.gmail.com>
+Subject: Re: [PATCH v3 3/8] emulator: add BT_HCI_CMD_LE_CREATE_CONN_CANCEL handling
 From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v4 1/5] emulator: add support for checking le scan state
-Date: Mon,  5 Oct 2015 11:28:25 -0700
-Message-Id: <1444069709-27307-1-git-send-email-jpawlowski@google.com>
+To: Jakub Pawlowski <jpawlowski@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- emulator/btdev.c  | 5 +++++
- emulator/btdev.h  | 2 ++
- emulator/hciemu.c | 8 ++++++++
- emulator/hciemu.h | 2 ++
- 4 files changed, 17 insertions(+)
+On Mon, Oct 5, 2015 at 1:21 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Wed, Sep 02, 2015, Jakub Pawlowski wrote:
+>> This patch adds handling of BT_HCI_CMD_LE_CREATE_CONN_CANCEL command.
+>>
+>> If btdev_set_le_noresp_conn_request is called on btdev, other devices that
+>> try to connect to it will stuck on BT_HCI_CMD_LE_CREATE_CONN, by not
+>> sending bt_hci_evt_le_conn_complete event back. Thanks to that,
+>> BT_HCI_CMD_LE_CREATE_CONN_CANCEL can be triggered to cancel connect
+>> attempt.
+>> ---
+>>  emulator/btdev.c  | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>>  emulator/btdev.h  |  2 ++
+>>  emulator/hciemu.c |  8 ++++++++
+>>  emulator/hciemu.h |  3 +++
+>>  4 files changed, 58 insertions(+)
+>>
+>> diff --git a/emulator/btdev.c b/emulator/btdev.c
+>> index 60e8e8c..1645776 100644
+>> --- a/emulator/btdev.c
+>> +++ b/emulator/btdev.c
+>> @@ -145,6 +145,11 @@ struct btdev {
+>>       uint16_t sync_train_interval;
+>>       uint32_t sync_train_timeout;
+>>       uint8_t  sync_train_service_data;
+>> +
+>> +     bool     le_noresp_conn_request;
+>> +     bool     pending_le_conn;
+>> +     uint8_t  pending_le_conn_addr[6];
+>> +     uint8_t  pending_le_conn_addr_type;
+>>  };
+>>
+>>  struct inquiry_data {
+>> @@ -674,6 +679,11 @@ bool btdev_is_le_scan_enabled(struct btdev *btdev)
+>>       return btdev->le_scan_enable;
+>>  }
+>>
+>> +void btdev_set_le_noresp_conn_request(struct btdev *btdev, bool value)
+>> +{
+>> +     btdev->le_noresp_conn_request = value;
+>> +}
+>> +
+>>  static bool use_ssp(struct btdev *btdev1, struct btdev *btdev2)
+>>  {
+>>       if (btdev1->auth_enable || btdev2->auth_enable)
+>> @@ -1134,6 +1144,9 @@ static void le_conn_complete(struct btdev *btdev,
+>>               cc->handle = cpu_to_le16(42);
+>>       }
+>>
+>> +     if (btdev->pending_le_conn)
+>> +             btdev->pending_le_conn = false;
+>> +
+>>       cc->status = status;
+>>       cc->peer_addr_type = bdaddr_type;
+>>       memcpy(cc->peer_addr, bdaddr, 6);
+>> @@ -1183,6 +1196,13 @@ static void le_conn_request(struct btdev *btdev, const uint8_t *bdaddr,
+>>  {
+>>       struct btdev *remote = find_btdev_by_bdaddr_type(bdaddr, bdaddr_type);
+>>
+>> +     if (remote && remote->le_noresp_conn_request) {
+>> +             btdev->pending_le_conn = true;
+>> +             memcpy(btdev->pending_le_conn_addr, bdaddr, 6);
+>> +             btdev->pending_le_conn_addr_type = bdaddr_type;
+>> +             return;
+>> +     }
+>
+> btdev.c has a hooks mechanism to avoid adding test-specific complexity
+> from creeping in by letting the exception handling be in the test code
+> itself. In this case, couldn't you use command hooks to deal with the
+> le_create_conn & le_create_conn_cancel commands in the tester and
+> prevent the default handlers for them from running in btdev.c (by
+> returning 'false' from the hook callback)?
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index e8cead8..aee7a48 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -675,6 +675,11 @@ uint8_t *btdev_get_features(struct btdev *btdev)
- 	return btdev->features;
- }
- 
-+bool btdev_is_le_scan_enabled(struct btdev *btdev)
-+{
-+	return btdev->le_scan_enable;
-+}
-+
- static bool use_ssp(struct btdev *btdev1, struct btdev *btdev2)
- {
- 	if (btdev1->auth_enable || btdev2->auth_enable)
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index 4b724a7..8b116e4 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -80,6 +80,8 @@ void btdev_destroy(struct btdev *btdev);
- const uint8_t *btdev_get_bdaddr(struct btdev *btdev);
- uint8_t *btdev_get_features(struct btdev *btdev);
- 
-+bool btdev_is_le_scan_enabled(struct btdev *btdev);
-+
- void btdev_set_command_handler(struct btdev *btdev, btdev_command_func handler,
- 							void *user_data);
- 
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index 4881a24..725fbd4 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -427,6 +427,14 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu)
- 	return btdev_get_bdaddr(hciemu->client_dev);
- }
- 
-+bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu)
-+{
-+	if (!hciemu || !hciemu->master_dev)
-+		return NULL;
-+
-+	return btdev_is_le_scan_enabled(hciemu->master_dev);
-+}
-+
- bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
- 			hciemu_command_func_t function, void *user_data)
- {
-diff --git a/emulator/hciemu.h b/emulator/hciemu.h
-index 41ca3fc..04bfab7 100644
---- a/emulator/hciemu.h
-+++ b/emulator/hciemu.h
-@@ -53,6 +53,8 @@ uint8_t *hciemu_get_features(struct hciemu *hciemu);
- const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu);
- const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
- 
-+bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu);
-+
- typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
- 						uint8_t len, void *user_data);
- 
--- 
-2.5.0
+Thanks for pointing me to hooks. It actually made this code shorter.
 
+>
+> Johan
