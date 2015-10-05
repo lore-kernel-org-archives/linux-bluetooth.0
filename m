@@ -2,94 +2,98 @@ Return-Path: <cyrus@holtmann.org>
 From: Kuba Pawlak <kubax.t.pawlak@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Kuba Pawlak <kubax.t.pawlak@intel.com>
-Subject: [PATCH 3/5] Bluetooth: Fix locking issue during fast SCO reconnection.
-Date: Mon,  5 Oct 2015 18:44:17 +0200
-Message-Id: <1444063459-28577-4-git-send-email-kubax.t.pawlak@intel.com>
+Subject: [PATCH 1/5] Bluetooth: Fix crash on SCO disconnect
+Date: Mon,  5 Oct 2015 18:44:15 +0200
+Message-Id: <1444063459-28577-2-git-send-email-kubax.t.pawlak@intel.com>
 In-Reply-To: <1444063459-28577-1-git-send-email-kubax.t.pawlak@intel.com>
 References: <088CC8BACB3382439E91D9919CE350243655EB71@IRSMSX107.ger.corp.intel.com>
  <1444063459-28577-1-git-send-email-kubax.t.pawlak@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-V2hlbiBTQ08gY29ubmVjdGlvbiBpcyByZXF1ZXN0ZWQgYW5kIGRpc2Nvbm5lY3RlZCBmYXN0LCB0
-aGVyZSBpcyBhIGNoYW5nZQp0aGF0IHNjb19zb2NrX3NodXRkb3duIGlzIGdvaW5nIHRvIHByZWVt
-cHQgdGhyZWFkIHN0YXJ0ZWQgaW4gc2NvX2Nvbm5lY3RfY2ZtLgpXaGVuIHRoaXMgaGFwcGVucyBz
-dHJ1Y3Qgc29jayBzayBtYXkgYmUgcmVtb3ZlZCBidXQgYSBwb2ludGVyIHRvIGl0IGlzIHN0aWxs
-CmhlbGQgaW4gc2NvX2Nvbm5fcmVhZHksIHdoZXJlIGVtYmVkZGVkIHNwaW5sb2NrIGlzIHVzZWQu
-IElmIGl0IGlzIHVzZWQsIGJ1dApzdHJ1Y3Qgc29jayBoYXMgYmVlbiByZW1vdmVkLCBpdCB3aWxs
-IGNyYXNoLgoKQmxvY2sgY29ubmVjdGlvbiBvYmplY3QsIHdoaWNoIHdpbGwgcHJldmVudCBzdHJ1
-Y3Qgc29jayBmcm9tIGJlaW5nIHJlbW92ZWQKYW5kIGdpdmUgY29ubmVjdGlvbiBwcm9jZXNzIGNo
-YW5jZSB0byBmaW5pc2guCgpCVUc6IHNwaW5sb2NrIGJhZCBtYWdpYyBvbiBDUFUjMCwga3dvcmtl
-ci91OjJILzMxOQogbG9jazogMHhlM2U5OTQzNCwgLm1hZ2ljOiBmMzAwMDAwMCwgLm93bmVyOiAo
-77+977+977+9LzAsIC5vd25lcl9jcHU6IC0yMDM4MDQxNjAKUGlkOiAzMTksIGNvbW06IGt3b3Jr
-ZXIvdToySCBUYWludGVkOiBHICAgICAgICAgICBPIDMuOC4wLTExNS4xLXBsay1hZGFwdGF0aW9u
-LWJ5dC1pdmktYnJkICMxCkNhbGwgVHJhY2U6CiBbPGMxMTU1NjU5Pl0gPyBkb19yYXdfc3Bpbl9s
-b2NrKzB4MTkvMHhlOQogWzxmYjc1MzU0Zj5dID8gc2NvX2Nvbm5lY3RfY2ZtKzB4OTIvMHgyMzYg
-W2JsdWV0b290aF0KIFs8ZmI3MzFkYmM+XSA/IGhjaV9zeW5jX2Nvbm5fY29tcGxldGVfZXZ0LmNs
-b25lLjEwMSsweDE4Yi8weDFjYiBbYmx1ZXRvb3RoXQogWzxmYjczNGVlNz5dID8gaGNpX2V2ZW50
-X3BhY2tldCsweDFhY2QvMHgyMWE2IFtibHVldG9vdGhdCiBbPGMxMDQxMDk1Pl0gPyBmaW5pc2hf
-dGFza19zd2l0Y2grMHg1MC8weDg5CiBbPGMxMzQ5YTJlPl0gPyBfX3NjaGVkdWxlKzB4NjM4LzB4
-NmI4CiBbPGZiNzI3OTE4Pl0gPyBoY2lfcnhfd29yaysweGI5LzB4MmI4IFtibHVldG9vdGhdCiBb
-PGMxMDM3NjBhPl0gPyBxdWV1ZV9kZWxheWVkX3dvcmtfb24rMHgyMS8weDJhCiBbPGMxMDM1ZGY5
-Pl0gPyBwcm9jZXNzX29uZV93b3JrKzB4MTU3LzB4MjFiCiBbPGZiNzI3ODVmPl0gPyBoY2lfY21k
-X3dvcmsrMHhlZi8weGVmIFtibHVldG9vdGhdCiBbPGMxMDM2MjE3Pl0gPyB3b3JrZXJfdGhyZWFk
-KzB4MTZlLzB4MjBhCiBbPGMxMDM2MGE5Pl0gPyBtYW5hZ2Vfd29ya2VycysweDFjZi8weDFjZgog
-WzxjMTAzYTBlZj5dID8ga3RocmVhZCsweDhkLzB4OTIKIFs8YzEzNGFkZjc+XSA/IHJldF9mcm9t
-X2tlcm5lbF90aHJlYWQrMHgxYi8weDI4CiBbPGMxMDNhMDYyPl0gPyBfX2luaXRfa3RocmVhZF93
-b3JrZXIrMHgyNC8weDI0CkJVRzogdW5hYmxlIHRvIGhhbmRsZSBrZXJuZWwgTlVMTCBwb2ludGVy
-IGRlcmVmZXJlbmNlIGF0ICAgKG51bGwpCklQOiBbPCAgKG51bGwpPl0gICAobnVsbCkKKnBkcHQg
-PSAwMDAwMDAwMDI0NGUxMDAxICpwZGUgPSAwMDAwMDAwMDAwMDAwMDAwCk9vcHM6IDAwMTAgWyMx
-XSBQUkVFTVBUIFNNUApNb2R1bGVzIGxpbmtlZCBpbjogZXZkZXYgZWNiIHJmY29tbShPKSBsaWJj
-b21wb3NpdGUgdXNiMjM4MCB1ZGNfY29yZSBibmVwKE8pIGJ0dXNiKE8pIGJ0YmNtKE8pIGNkY19h
-Y20gYnRpbnRlbChPKSBibHVldG9vdGgoTykgYXJjNCB1aW5wdXQgaGlkX211bHRpdG91Y2ggdXNi
-aGlkIGhpZCBpd2xtdm0oTyllClBpZDogMzE5LCBjb21tOiBrd29ya2VyL3U6MkggVGFpbnRlZDog
-RyAgICAgICAgICAgTyAzLjguMC0xMTUuMS1wbGstYWRhcHRhdGlvbi1ieXQtaXZpLWJyZCAjMQpF
-SVA6IDAwNjA6WzwwMDAwMDAwMD5dIEVGTEFHUzogMDAwMTAyNDYgQ1BVOiAwCkVJUCBpcyBhdCAw
-eDAKRUFYOiBlM2U5OTQwMCBFQlg6IGUzZTk5NDAwIEVDWDogMDAwMDAxMDAgRURYOiAwMDAwMDAw
-MApFU0k6IGUzZTk5NDM0IEVESTogZmI3NjNjZTAgRUJQOiBlNDliOWU0NCBFU1A6IGU0OWI5ZTE0
-CiBEUzogMDA3YiBFUzogMDA3YiBGUzogMDBkOCBHUzogMDAwMCBTUzogMDA2OApDUjA6IDgwMDUw
-MDNiIENSMjogMDAwMDAwMDAgQ1IzOiAyNDQ0NDAwMCBDUjQ6IDAwMTAwN2YwCkRSMDogMDAwMDAw
-MDAgRFIxOiAwMDAwMDAwMCBEUjI6IDAwMDAwMDAwIERSMzogMDAwMDAwMDAKRFI2OiBmZmZmMGZm
-MCBEUjc6IDAwMDAwNDAwClByb2Nlc3Mga3dvcmtlci91OjJIIChwaWQ6IDMxOSwgdGk9ZTQ5Yjgw
-MDAgdGFzaz1lNGFiOTAzMCB0YXNrLnRpPWU0OWI4MDAwKQpTdGFjazoKIGZiNzUzNTViIDAwMDAw
-MjQ2IGZiNzYzOTAwIDIyMjIyMjIyIDIyMjIyMjIyIDIyMjIyMjIyIGUzZjk0NDYwIGUzY2E3YzBh
-CiBlNDliOWU0YyBlM2YzNGMwMCBlM2NhN2MwYSBmYjc2M2NlMCBlNDliOWU2YyBmYjczMWRiYyAw
-MjAwMDI0NiBlNGNlYzg1YwogZTRjZWMwMDggMDAwMDAwMDAgZTNmMzRjMDAgZTRjZWMwMDAgZTNj
-MmNlMDAgMDAwMDAwMmMgZTQ5YjllZDAgZmI3MzRlZTcKQ2FsbCBUcmFjZToKIFs8ZmI3NTM1NWI+
-XSA/IHNjb19jb25uZWN0X2NmbSsweDllLzB4MjM2IFtibHVldG9vdGhdCiBbPGZiNzMxZGJjPl0g
-PyBoY2lfc3luY19jb25uX2NvbXBsZXRlX2V2dC5jbG9uZS4xMDErMHgxOGIvMHgxY2IgW2JsdWV0
-b290aF0KIFs8ZmI3MzRlZTc+XSA/IGhjaV9ldmVudF9wYWNrZXQrMHgxYWNkLzB4MjFhNiBbYmx1
-ZXRvb3RoXQogWzxjMTA0MTA5NT5dID8gZmluaXNoX3Rhc2tfc3dpdGNoKzB4NTAvMHg4OQogWzxj
-MTM0OWEyZT5dID8gX19zY2hlZHVsZSsweDYzOC8weDZiOAogWzxmYjcyNzkxOD5dID8gaGNpX3J4
-X3dvcmsrMHhiOS8weDJiOCBbYmx1ZXRvb3RoXQogWzxjMTAzNzYwYT5dID8gcXVldWVfZGVsYXll
-ZF93b3JrX29uKzB4MjEvMHgyYQogWzxjMTAzNWRmOT5dID8gcHJvY2Vzc19vbmVfd29yaysweDE1
-Ny8weDIxYgogWzxmYjcyNzg1Zj5dID8gaGNpX2NtZF93b3JrKzB4ZWYvMHhlZiBbYmx1ZXRvb3Ro
-XQogWzxjMTAzNjIxNz5dID8gd29ya2VyX3RocmVhZCsweDE2ZS8weDIwYQogWzxjMTAzNjBhOT5d
-ID8gbWFuYWdlX3dvcmtlcnMrMHgxY2YvMHgxY2YKIFs8YzEwM2EwZWY+XSA/IGt0aHJlYWQrMHg4
-ZC8weDkyCiBbPGMxMzRhZGY3Pl0gPyByZXRfZnJvbV9rZXJuZWxfdGhyZWFkKzB4MWIvMHgyOAog
-WzxjMTAzYTA2Mj5dID8gX19pbml0X2t0aHJlYWRfd29ya2VyKzB4MjQvMHgyNApDb2RlOiAgQmFk
-IEVJUCB2YWx1ZS4KRUlQOiBbPDAwMDAwMDAwPl0gMHgwIFNTOkVTUCAwMDY4OmU0OWI5ZTE0CkNS
-MjogMDAwMDAwMDAwMDAwMDAwMAotLS1bIGVuZCB0cmFjZSA5NDJhNjU3N2MwYWJkNzI1IF0tLS0K
-ClNpZ25lZC1vZmYtYnk6IEt1YmEgUGF3bGFrIDxrdWJheC50LnBhd2xha0BpbnRlbC5jb20+Ci0t
-LQogbmV0L2JsdWV0b290aC9zY28uYyB8IDUgKysrKysKIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2Vy
-dGlvbnMoKykKCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL3Njby5jIGIvbmV0L2JsdWV0b290
-aC9zY28uYwppbmRleCAwOTA1MWU0Y2JhZGUxMzJmZDZlMTA2ZmQ0OGMxZTVlMzZmMzZlYjFhLi43
-NWY4NDNkNTQyM2E0NzUwZjE4ZjY5OGE1NzEzMGM2YTk2ZjcxZjIzIDEwMDY0NAotLS0gYS9uZXQv
-Ymx1ZXRvb3RoL3Njby5jCisrKyBiL25ldC9ibHVldG9vdGgvc2NvLmMKQEAgLTk2NSw3ICs5NjUs
-OSBAQCBzdGF0aWMgaW50IHNjb19zb2NrX3NodXRkb3duKHN0cnVjdCBzb2NrZXQgKnNvY2ssIGlu
-dCBob3cpCiAJaWYgKCFzaykKIAkJcmV0dXJuIDA7CiAKKwlzb2NrX2hvbGQoc2spOwogCWxvY2tf
-c29jayhzayk7CisKIAlpZiAoIXNrLT5za19zaHV0ZG93bikgewogCQlzay0+c2tfc2h1dGRvd24g
-PSBTSFVURE9XTl9NQVNLOwogCQlzY29fc29ja19jbGVhcl90aW1lcihzayk7CkBAIC05NzYsNyAr
-OTc4LDEwIEBAIHN0YXRpYyBpbnQgc2NvX3NvY2tfc2h1dGRvd24oc3RydWN0IHNvY2tldCAqc29j
-aywgaW50IGhvdykKIAkJCWVyciA9IGJ0X3NvY2tfd2FpdF9zdGF0ZShzaywgQlRfQ0xPU0VELAog
-CQkJCQkJIHNrLT5za19saW5nZXJ0aW1lKTsKIAl9CisKIAlyZWxlYXNlX3NvY2soc2spOworCXNv
-Y2tfcHV0KHNrKTsKKwogCXJldHVybiBlcnI7CiB9CiAKLS0gCjEuOS4zCgpJbnRlbCBEZXV0c2No
-bGFuZCBHbWJIClJlZ2lzdGVyZWQgQWRkcmVzczogQW0gQ2FtcGVvbiAxMC0xMiwgODU1NzkgTmV1
-YmliZXJnLCBHZXJtYW55ClRlbDogKzQ5IDg5IDk5IDg4NTMtMCwgd3d3LmludGVsLmRlCk1hbmFn
-aW5nIERpcmVjdG9yczogQ2hyaXN0aW4gRWlzZW5zY2htaWQsIFByb2YuIERyLiBIZXJtYW5uIEV1
-bApDaGFpcnBlcnNvbiBvZiB0aGUgU3VwZXJ2aXNvcnkgQm9hcmQ6IFRpZmZhbnkgRG9vbiBTaWx2
-YQpSZWdpc3RlcmVkIE9mZmljZTogTXVuaWNoCkNvbW1lcmNpYWwgUmVnaXN0ZXI6IEFtdHNnZXJp
-Y2h0IE11ZW5jaGVuIEhSQiAxODY5MjgK
+When disconnecting audio from the phone's side, it may happen, that
+a thread handling HCI message 'disconnection complete' will get preempted
+in 'sco_conn_del' before calling 'sco_sock_kill', still holding a pointer
+to struct sock sk. Interrupting thread started in 'sco_sock_shutdown' will
+carry on releasing resources and will eventually release struct sock.
+When execution goes back to first thread it will call sco_sock_kill using
+now invalid pointer to already destroyed socket.
+
+Fix is to grab a reference to the socket a release it after calling
+'sco_sock_kill'.
+
+[  166.358213] BUG: unable to handle kernel paging request at 7541203a
+[  166.365228] IP: [<fb6e8bfb>] bt_sock_unlink+0x1a/0x38 [bluetooth]
+[  166.372068] *pdpt = 0000000024b19001 *pde = 0000000000000000
+[  166.378483] Oops: 0002 [#1] PREEMPT SMP
+[  166.382871] Modules linked in: evdev ecb rfcomm(O) libcomposite usb2380 udc_core bnep(O) btusb(O) btbcm(O) btintel(O) cdc_acm bluetooth(O) arc4 uinput hid_multitouch iwlmvm(O) usbhid hide
+[  166.424233] Pid: 338, comm: kworker/u:2H Tainted: G           O 3.8.0-115.1-plk-adaptation-byt-ivi-brd #1
+[  166.435112] EIP: 0060:[<fb6e8bfb>] EFLAGS: 00010206 CPU: 0
+[  166.441259] EIP is at bt_sock_unlink+0x1a/0x38 [bluetooth]
+[  166.447382] EAX: 632e6563 EBX: e4bfc600 ECX: e466d4d3 EDX: 7541203a
+[  166.454369] ESI: fb7278ac EDI: e4d52000 EBP: e4669e20 ESP: e4669e0c
+[  166.461366]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+[  166.467391] CR0: 8005003b CR2: 7541203a CR3: 24aba000 CR4: 001007f0
+[  166.474387] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+[  166.481375] DR6: ffff0ff0 DR7: 00000400
+[  166.485654] Process kworker/u:2H (pid: 338, ti=e4668000 task=e466e030 task.ti=e4668000)
+[  166.494591] Stack:
+[  166.496830]  e4bfc600 e4bfc600 fb715c28 e4717ee0 e4d52000 e4669e3c fb715cf3 e4bfc634
+[  166.505518]  00000068 e4d52000 e4c32000 fb7277c0 e4669e6c fb6f2019 0000004a 00000216
+[  166.514205]  e4660101 e4c32008 02000001 00000013 e4d52000 e4c32000 e3dc9240 00000005
+[  166.522891] Call Trace:
+[  166.525654]  [<fb715c28>] ? sco_sock_kill+0x73/0x9a [bluetooth]
+[  166.532295]  [<fb715cf3>] ? sco_conn_del+0xa4/0xbf [bluetooth]
+[  166.538836]  [<fb6f2019>] ? hci_disconn_complete_evt.clone.55+0x1bd/0x205 [bluetooth]
+[  166.547609]  [<fb6f73d3>] ? hci_event_packet+0x297/0x223c [bluetooth]
+[  166.554805]  [<c10416da>] ? dequeue_task+0xaf/0xb7
+[  166.560154]  [<c1041095>] ? finish_task_switch+0x50/0x89
+[  166.566086]  [<c1349a2e>] ? __schedule+0x638/0x6b8
+[  166.571460]  [<fb6eb906>] ? hci_rx_work+0xb9/0x2b8 [bluetooth]
+[  166.577975]  [<c1035df9>] ? process_one_work+0x157/0x21b
+[  166.583933]  [<fb6eb84d>] ? hci_cmd_work+0xef/0xef [bluetooth]
+[  166.590448]  [<c1036217>] ? worker_thread+0x16e/0x20a
+[  166.596088]  [<c10360a9>] ? manage_workers+0x1cf/0x1cf
+[  166.601826]  [<c103a0ef>] ? kthread+0x8d/0x92
+[  166.606691]  [<c134adf7>] ? ret_from_kernel_thread+0x1b/0x28
+[  166.613010]  [<c103a062>] ? __init_kthread_worker+0x24/0x24
+[  166.619230] Code: 85 63 ff ff ff 31 db 8d 65 f4 89 d8 5b 5e 5f 5d c3 56 8d 70 04 53 89 f0 89 d3 e8 7e 17 c6 c5 8b 53 28 85 d2 74 1a 8b 43 24 85 c0 <89> 02 74 03 89 50 04 c7 43 28 00 00 00
+[  166.640501] EIP: [<fb6e8bfb>] bt_sock_unlink+0x1a/0x38 [bluetooth] SS:ESP 0068:e4669e0c
+[  166.649474] CR2: 000000007541203a
+[  166.653420] ---[ end trace 0181ff2c9e42d51e ]---
+[  166.658609] note: kworker/u:2H[338] exited with preempt_count 1
+
+Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
+---
+ net/bluetooth/sco.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index f315c8d0e43b594486cc3dd1be1433387601e7c3..e21c53b08da4b69d1954891ff91850bedbeb66ff 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -170,11 +170,13 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
+ 	sco_conn_unlock(conn);
+ 
+ 	if (sk) {
++		sock_hold(sk);
+ 		bh_lock_sock(sk);
+ 		sco_sock_clear_timer(sk);
+ 		sco_chan_del(sk, err);
+ 		bh_unlock_sock(sk);
+ 		sco_sock_kill(sk);
++		sock_put(sk);
+ 	}
+ 
+ 	hcon->sco_data = NULL;
+-- 
+1.9.3
+
+Intel Deutschland GmbH
+Registered Address: Am Campeon 10-12, 85579 Neubiberg, Germany
+Tel: +49 89 99 8853-0, www.intel.de
+Managing Directors: Christin Eisenschmid, Prof. Dr. Hermann Eul
+Chairperson of the Supervisory Board: Tiffany Doon Silva
+Registered Office: Munich
+Commercial Register: Amtsgericht Muenchen HRB 186928
 
