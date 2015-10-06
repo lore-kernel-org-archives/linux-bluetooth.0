@@ -1,49 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
-To: linux-serial@vger.kernel.org, andriy.shevchenko@linux.intel.com,
-	peter@hurleysoftware.com, gregkh@linuxfoundation.org
-Cc: linux-bluetooth@vger.kernel.org, heikki.krogerus@linux.intel.com,
-	marcel@holtmann.org
-Subject: [PATCH v2] Revert "serial: 8250_dma: don't bother DMA with small transfers"
-Date: Tue,  6 Oct 2015 15:08:40 +0200
-Message-Id: <1444136920-17969-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+To: linux-bluetooth@vger.kernel.org
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
+Subject: [PATCH] core/advertising: Fix string match in le adv search
+Message-ID: <5613B4A7.7030901@ubnt.com>
+Date: Tue, 6 Oct 2015 14:46:47 +0300
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This reverts commit 9119fba0cfeda6d415c9f068df66838a104b87cb.
+Instead of searching for matched entry in the list, the function match_advertisement
+was searching for the first non-matched entry. As a result, it wasn't possible to
+unregister existing advertisement from LE Adv manager.
 
-This commit prevents from sending "big" file using Bluetooth.
-When sending a lot of data quickly through the Bluetooth interface, and
-after a variable amount of data sent, transfer fails with error:
-    kernel: [  415.247453] Bluetooth: hci0 hardware error 0x00
-
-Found on T100TA.
-
-After reverting this commit, send works fine for any file size.
-
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
+Signed-off-by: Andrejs Hanins <andrejs.hanins@ubnt.com>
 ---
-v2: Re-send to correct people
+ src/advertising.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- drivers/tty/serial/8250/8250_dma.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/tty/serial/8250/8250_dma.c b/drivers/tty/serial/8250/8250_dma.c
-index b503071..78259d3 100644
---- a/drivers/tty/serial/8250/8250_dma.c
-+++ b/drivers/tty/serial/8250/8250_dma.c
-@@ -77,10 +77,6 @@ int serial8250_tx_dma(struct uart_8250_port *p)
- 		return 0;
+diff --git a/src/advertising.c b/src/advertising.c
+index d56b7a2..a148625 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -77,10 +77,10 @@ static bool match_advertisement(const void *a, const void *b)
+ 	const struct advertisement *ad = a;
+ 	const struct dbus_obj_match *match = b;
  
- 	dma->tx_size = CIRC_CNT_TO_END(xmit->head, xmit->tail, UART_XMIT_SIZE);
--	if (dma->tx_size < p->port.fifosize) {
--		ret = -EINVAL;
--		goto err;
--	}
+-	if (match->owner && !g_strcmp0(ad->owner, match->owner))
++	if (match->owner && g_strcmp0(ad->owner, match->owner))
+ 		return false;
  
- 	desc = dmaengine_prep_slave_single(dma->txchan,
- 					   dma->tx_addr + xmit->tail,
+-	if (match->path && !g_strcmp0(ad->path, match->path))
++	if (match->path && g_strcmp0(ad->path, match->path))
+ 		return false;
+ 
+ 	return true;
 -- 
 1.9.1
 
