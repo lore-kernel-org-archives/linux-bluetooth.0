@@ -1,42 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1444127148.2982.77.camel@linux.intel.com>
-Subject: Re: [PATCH 0/6] Bluetooth: 6lowpan cleanups
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 06 Oct 2015 13:25:48 +0300
-In-Reply-To: <1444125804-15577-1-git-send-email-johan.hedberg@gmail.com>
-References: <1444125804-15577-1-git-send-email-johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Tue, 6 Oct 2015 11:22:07 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Peter Hurley <peter@hurleysoftware.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Revert "serial: 8250_dma: don't bother DMA with small
+ transfers"
+Message-ID: <20151006102207.GA11512@kroah.com>
+References: <1443617191-21013-1-git-send-email-frederic.danis@linux.intel.com>
+ <560BE919.9020803@hurleysoftware.com>
+ <1443622344.8361.304.camel@linux.intel.com>
+ <560C420B.4030007@hurleysoftware.com>
+ <1443689736.8361.322.camel@linux.intel.com>
+ <561391AC.8050905@linux.intel.com>
+ <20151006093432.GA9876@kroah.com>
+ <561398E2.4080902@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <561398E2.4080902@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-
-On ti, 2015-10-06 at 13:03 +0300, Johan Hedberg wrote:
-> Hi,
+On Tue, Oct 06, 2015 at 11:48:18AM +0200, Frederic Danis wrote:
+> Hello Greg,
 > 
-> Here's a set of initial cleanups for the 6lowpan code which I came up
-> with as I started preparing to implement the new mgmt channel.
+> On 06/10/2015 11:34, Greg KH wrote:
+> >On Tue, Oct 06, 2015 at 11:17:32AM +0200, Frederic Danis wrote:
+> >> [ + Greg Kroah-Hartman ]
+> >
+> >Why?  What am I supposed to do with this?
 > 
-> Johan Hedberg (6):
->       Bluetooth: 6lowpan: Fix imtu & omtu values
->       Bluetooth: 6lowpan: Remove redundant (and incorrect) MPS assignments
->       Bluetooth: 6lowpan: Remove redundant BT_CONNECTED assignment
->       Bluetooth: 6lowpan: Remove unnecessary chan_open() function
->       Bluetooth: 6lowpan: Rename confusing 'pchan' variables
->       Bluetooth: 6lowpan: Remove unnecessary chan_get() function
-> 
->  net/bluetooth/6lowpan.c | 72 ++++++++++++++++--------------------------------
->  1 file changed, 24 insertions(+), 48 deletions(-)
-> 
-> Johan
-> 
+> I add you to this thread to inform you of this problem and the revert patch
+> I sent. (As suggested by Peter and Andy)
 
-Cheers,
-Jukka
+What thread?  I don't see any patch here in your email that I can do
+anything about, do you?
 
+Come on, you know how to properly submit patches, do it correctly
+please.
 
+greg k-h
