@@ -1,144 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH] Revert "serial: 8250_dma: don't bother DMA with small
- transfers"
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	gregkh@linuxfoundation.org
-References: <1443617191-21013-1-git-send-email-frederic.danis@linux.intel.com>
- <560BE919.9020803@hurleysoftware.com>
- <1443622344.8361.304.camel@linux.intel.com>
- <560C420B.4030007@hurleysoftware.com>
- <1443689736.8361.322.camel@linux.intel.com>
-Cc: linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org
-From: Frederic Danis <frederic.danis@linux.intel.com>
-Message-ID: <561391AC.8050905@linux.intel.com>
-Date: Tue, 6 Oct 2015 11:17:32 +0200
+To: linux-bluetooth@vger.kernel.org
+From: Andrejs Hanins <andrejs.hanins@ubnt.com>
+Subject: LE ADV data is lost after first connection
+Message-ID: <56137272.2040809@ubnt.com>
+Date: Tue, 6 Oct 2015 10:04:18 +0300
 MIME-Version: 1.0
-In-Reply-To: <1443689736.8361.322.camel@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-[ + Greg Kroah-Hartman ]
+Hi,
 
-On 01/10/2015 10:55, Andy Shevchenko wrote:
-> On Wed, 2015-09-30 at 16:11 -0400, Peter Hurley wrote:
->> [ + Heikko ]
->>
->> On 09/30/2015 10:12 AM, Andy Shevchenko wrote:
->>> On Wed, 2015-09-30 at 09:52 -0400, Peter Hurley wrote:
->>>> [ + Andy Shevchenko ]
->>>>
->>>> On 09/30/2015 08:46 AM, Frederic Danis wrote:
->>>>> This reverts commit 9119fba0cfeda6d415c9f068df66838a104b87cb.
->>>> Hi Frederic,
->>>>
->>>> It's customary to mail the commit author in patches which revert
->>>> their work.
->>>>
->>>>> This commit prevents from sending "big" file using Bluetooth.
->>>>> When sending a lot of data quickly through the Bluetooth
->>>>> interface,
->>>>> and
->>>>> after a variable amount of data sent, transfer fails with
->>>>> error:
->>>>>      kernel: [  415.247453] Bluetooth: hci0 hardware error 0x00
-> Frederic, I forgot to ask how exactly the hw setup looks like?
->
-> The message above is not present in the kernel (the closest what I
-> found is
->
-> drivers/bluetooth/btintel.c:98: BT_ERR("%s: Hardware error 0x%2.2x",
-> hdev->name, code);
->
-> which makes me think you have USB BT adapter attached to the same
-> machine. Am I wrong?
->
->>>> Hmmm, was there any other information regarding why this
->>>> happened?
->>> Frederic informed us privately about this issue.
->> Ok, except no one else knows that.
->>
->> Least of all Greg, since the revert wasn't even addressed to him
->> either :/
-> Agree, it's better to inform all parties about the problem.
->
->>> I tried to hunt the
->>> root cause but mostly (there was one observation but apparently
->>> seems
->>> it is not related to this issue) nothing looks wrong.
->>>
->>>> Eg., did the driver mistakenly re-order i/o (DMA occurred after
->>>> PIO)?
->>> I have few tracing dumps which Frederic provides to me, but I
->>> couldn't
->>> see such a problem. Maybe I missed it.
->> Ok.
->>
->>> My commit 9119fba0cfed introduces interleaved IO (DMA/PIO) which
->>> makes
->>> it like DMA -> PIO -> DMA -> ...
->> I realize that. However interleaving DMA and PIO _must_ be supported
->> by the platform to enable DMA for 8250 serial devices anway.
->>
->> When Heikki added DMA support to the 8250 driver, he left out
->> important
->> functionality which requires interleaved DMA and PIO.
->>
->> When I fix that omission, platforms using DMA that shouldn't be are
->> going
->> to get broken anyway.
->>
->> Regards,
->> Peter Hurley
->>
->>>> Or, might there be some race condition in the dmaengine driver on
->>>>
->>>> this
->>>> platform?
->>> There is [1] might be a clue, though I don't think it's directly
->>> related.
->>>
->>> [1] http://www.spinics.net/lists/linux-spi/msg01151.html
->>> The change prevents interleaved DMA/PIO IO.
->>>
->>>> Regards,
->>>> Peter Hurley
->>>>
->>>>> Found on T100TA.
->>>>>
->>>>> After reverting this commit, send works fine for any file size.
->>>>>
->>>>> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
->>>>> ---
->>>>>   drivers/tty/serial/8250/8250_dma.c | 4 ----
->>>>>   1 file changed, 4 deletions(-)
->>>>>
->>>>> diff --git a/drivers/tty/serial/8250/8250_dma.c
->>>>> b/drivers/tty/serial/8250/8250_dma.c
->>>>> index 21d01a4..e508939 100644
->>>>> --- a/drivers/tty/serial/8250/8250_dma.c
->>>>> +++ b/drivers/tty/serial/8250/8250_dma.c
->>>>> @@ -80,10 +80,6 @@ int serial8250_tx_dma(struct uart_8250_port
->>>>> *p)
->>>>>   		return 0;
->>>>>   
->>>>>   	dma->tx_size = CIRC_CNT_TO_END(xmit->head, xmit->tail,
->>>>>
->>>>> UART_XMIT_SIZE);
->>>>> -	if (dma->tx_size < p->port.fifosize) {
->>>>> -		ret = -EINVAL;
->>>>> -		goto err;
->>>>> -	}
->>>>>   
->>>>>   	desc = dmaengine_prep_slave_single(dma->txchan,
->>>>>   					   dma->tx_addr + xmit
->>>>> ->tail,
->>>>>
+	I'm on Bluez 5.35 + Kernel 4.1.6 using D-Bus LE Adv Manager to register my own advertisement structure (with service UUID). Everything works fine, I see my UUID is present in scan record (using Android Bluetooth LE Scanner or iOS Light Blue App). But scan record becomes empty (all zeros) after I connect/disconnect to the peripheral.
+
+	This issue, however, only present on Atheros AR3012 Bluetooth chip (USB vendor:product is 0cf3:3004) and not present neither on Broadcom BCM20705 nor on CSR. Based on btmon traces I see that after peripheral is disconnected, LE adv is enabled again using HCI "LE Set Advertising Parameters" and "LE Set Advertise Enable" commands which obviously do not set the adv data again.
+
+	My assumption is that BT chip is expected to keep LE adv data between re-connections, but Atheros AR3012 (at least the revisions we use) has a bug which erases Adv data after the connection is made.
+
+	Can someone confirm that my assumption is correct and workaround/quirk is needed for AR3012 or maybe there is something else may be wrong here?
 
 
--- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
-
+BR, Andrey
