@@ -1,109 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Pawlak, KubaX T" <kubax.t.pawlak@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetoot: Fix USB endpoint selection for wideband speech
-Date: Wed, 7 Oct 2015 17:57:33 +0000
-Message-ID: <088CC8BACB3382439E91D9919CE350243655F344@IRSMSX107.ger.corp.intel.com>
-References: <1444230347-1593-1-git-send-email-kubax.t.pawlak@intel.com>
- <747D67C0-738A-44E0-B489-D176C2290174@holtmann.org>
-In-Reply-To: <747D67C0-738A-44E0-B489-D176C2290174@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add debugfs entry for setting vendor diagnostic mode
+Date: Wed,  7 Oct 2015 19:52:35 +0200
+Message-Id: <1444240355-38859-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SEkgTWFyY2VsLA0KDQo+ID4gRm9yIFNDTyBjb25uZWN0aW9ucywgYnR1c2IgZHJpdmVyIHNldHMg
-YWx0ZXJuYXRlIGVuZHBvaW50DQo+ID4gc2V0dGluZyB0byAyIGJ5IGRlZmF1bHQgKDE3IGJ5dGVz
-IHBlciBVU0IgcGFja2V0KS4NCj4gPiBXaGVuIGNvbm5lY3Rpb24gaXMgY29tcGxldGVkIGFuZCBh
-aXJtb2RlIHRyYW5zcGFyZW50IGhhcyBiZWVuDQo+IG5lZ290aWF0ZWQsDQo+ID4gYWx0ZXJuYXRl
-IHNldHRpbmcgYXJlIG5vdCBjaGFuZ2VkIHRvIDEgKDkgYnl0ZXMgcGVyIFVTQiBwYWNrZXQpLg0K
-PiA+IFRoaXMgcmVzdWx0cyBpbiB3cm9uZyBwYWNrZXRzIGJlaW5nIHNlbnQgYW5kICJyb2JvdGlj
-IiBhdWRpby4NCj4gPg0KPiA+IE5vdGlmeSB0aGUgZHJpdmVyIHRoYXQgZW5kcG9pbnQgc2V0dGlu
-Z3MgbXVzdCBjaGFuZ2UuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBLdWJhIFBhd2xhayA8a3Vi
-YXgudC5wYXdsYWtAaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+IGRyaXZlcnMvYmx1ZXRvb3RoL2J0
-dXNiLmMgfCAxMiArKysrKysrKysrKy0NCj4gPiBuZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jIHwg
-IDUgKysrKysNCj4gPiAyIGZpbGVzIGNoYW5nZWQsIDE2IGluc2VydGlvbnMoKyksIDEgZGVsZXRp
-b24oLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIGIv
-ZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+IGluZGV4DQo+IDI0N2IxMDYyY2I5YWZmYzY3
-ZDllN2Y3YTAyMzRjMTY3ZjkwZjRiNzkuLjY1Y2UwNTRkMDc1NWRiOTA3OGEwZjA4MTM4MjgNCj4g
-ZGJiMjc4ZWE4ZjFjIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMN
-Cj4gPiArKysgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4gQEAgLTExOTEsNiArMTE5
-MSw5IEBAIHN0YXRpYyB2b2lkIGJ0dXNiX25vdGlmeShzdHJ1Y3QgaGNpX2RldiAqaGRldiwNCj4g
-dW5zaWduZWQgaW50IGV2dCkNCj4gPiAJCWRhdGEtPnNjb19udW0gPSBoY2lfY29ubl9udW0oaGRl
-diwgU0NPX0xJTkspOw0KPiA+IAkJc2NoZWR1bGVfd29yaygmZGF0YS0+d29yayk7DQo+ID4gCX0N
-Cj4gPiArDQo+ID4gKwlpZiAoZXZ0ID09IEhDSV9OT1RJRllfVk9JQ0VfU0VUVElORykNCj4gPiAr
-CQlzY2hlZHVsZV93b3JrKCZkYXRhLT53b3JrKTsNCj4gPiB9DQo+IA0KPiBhY3R1YWxseSBjYW4g
-eW91IHRyeSB0byB0YWtlIHRoZSBzY2hlZHVsZV93b3JrIG91dCBoZXJlLiBTaW5jZSBoZGV2LT5u
-b3RpZnkgaXMNCj4gbm8gbG9uZ2VyIGNhbGxlZCBmcm9tIGJvdHRvbSBoYWxmLCBpdCBpcyBwZXJm
-ZWN0bHkgZmluZSB0byBzbGVlcCBpbiB0aGlzIGNhbGxiYWNrLg0KPiBUaGlzIGlzIGEgbGVmdG92
-ZXIgZnJvbSBhIGxvbmcgdGltZSBhZ28gd2hlcmUgYWxsIHRoZSBwYWNrZXQgcHJvY2Vzc2luZyB3
-YXMgZG9uZQ0KPiBpbiB0aGUgYm90dG9tIGhhbGYuDQo+IA0KPiBPbmNlIHRoYXQgaGFzIGJlZW4g
-cmVtb3ZlZCwgSSB0aGluayB5b3UgY2FuIGp1c3Qgc3dpdGNoIHRoZSBhbHRlcm5hdGUgc2V0dGlu
-Zw0KPiByaWdodCBpbiBidHVzYl9ub3RpZnkuDQoNClBhcmRvbiBteSBpZ25vcmFuY2UsIGJ1dCBJ
-IG5lZWQgdG8gbWFrZSBzdXJlIHRoYXQgdGhpcyB3b3VsZCBpbnZvbHZlIHJlbW92aW5nICd3b3Jr
-JyB3b3JrcXVldWUgYW5kIGNhbGxpbmcgYnR1c2Jfd29yayAocmVuYW1lZCB0byBub3QgY29udGFp
-biBfd29yaykgZXZlcnl3aGVyZSwgd2hlcmUgc2NoZWR1bGVfd29yaygmZGF0YS0+d29yayk7IGlz
-IGNhbGxlZD8NCg0KPiANCj4gPg0KPiA+IHN0YXRpYyBpbmxpbmUgaW50IF9fc2V0X2lzb2NfaW50
-ZXJmYWNlKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBpbnQgYWx0c2V0dGluZykNCj4gPiBAQCAtMTI1
-NSw3ICsxMjU4LDExIEBAIHN0YXRpYyB2b2lkIGJ0dXNiX3dvcmsoc3RydWN0IHdvcmtfc3RydWN0
-ICp3b3JrKQ0KPiA+IAkJCXNldF9iaXQoQlRVU0JfRElEX0lTT19SRVNVTUUsICZkYXRhLT5mbGFn
-cyk7DQo+ID4gCQl9DQo+ID4NCj4gPiAtCQlpZiAoaGRldi0+dm9pY2Vfc2V0dGluZyAmIDB4MDAy
-MCkgew0KPiA+ICsJCWlmIChoZGV2LT52b2ljZV9zZXR0aW5nICYgQlRfVk9JQ0VfVFJBTlNQQVJF
-TlQpIHsNCj4gPiArCQkJc3RhdGljIGNvbnN0IGludCBhbHRzWzNdID0geyAxLCAyLCAzIH07DQo+
-ID4gKw0KPiA+ICsJCQluZXdfYWx0cyA9IGFsdHNbZGF0YS0+c2NvX251bSAtIDFdOw0KPiA+ICsJ
-CX0gZWxzZSBpZiAoaGRldi0+dm9pY2Vfc2V0dGluZyAmIDB4MDAyMCkgew0KPiA+IAkJCXN0YXRp
-YyBjb25zdCBpbnQgYWx0c1szXSA9IHsgMiwgNCwgNSB9Ow0KPiA+DQo+ID4gCQkJbmV3X2FsdHMg
-PSBhbHRzW2RhdGEtPnNjb19udW0gLSAxXTsNCj4gPiBAQCAtMTI2Nyw2ICsxMjc0LDkgQEAgc3Rh
-dGljIHZvaWQgYnR1c2Jfd29yayhzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspDQo+ID4gCQkJY2xl
-YXJfYml0KEJUVVNCX0lTT0NfUlVOTklORywgJmRhdGEtPmZsYWdzKTsNCj4gPiAJCQl1c2Jfa2ls
-bF9hbmNob3JlZF91cmJzKCZkYXRhLT5pc29jX2FuY2hvcik7DQo+ID4NCj4gPiArCQkJaWYgKGhk
-ZXYtPnZvaWNlX3NldHRpbmcgJiBCVF9WT0lDRV9UUkFOU1BBUkVOVCkNCj4gPiArCQkJCWhkZXYt
-PnZvaWNlX3NldHRpbmcgJj0NCj4gfkJUX1ZPSUNFX1RSQU5TUEFSRU5UOw0KPiA+ICsNCj4gPiAJ
-CQkvKiBXaGVuIGlzb2Nocm9ub3VzIGFsdGVybmF0ZSBzZXR0aW5nIG5lZWRzIHRvIGJlDQo+ID4g
-CQkJICogY2hhbmdlZCwgYmVjYXVzZSBTQ08gY29ubmVjdGlvbiBoYXMgYmVlbiBhZGRlZA0KPiA+
-IAkJCSAqIG9yIHJlbW92ZWQsIGEgcGFja2V0IGZyYWdtZW50IG1heSBiZSBsZWZ0IGluIHRoZQ0K
-PiA+IGRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jIGIvbmV0L2JsdWV0b290
-aC9oY2lfZXZlbnQuYw0KPiA+IGluZGV4DQo+IDhhY2VjOTMyMTIzYWRlOTA2MTkyZWJiZmQyZGFl
-Y2VlOWI1MWY2OTcuLjA4ZTc3NTM3YzZlYjY5Yzk3MjdjYjQxYTJjYQ0KPiA4NDI5ZjRkN2E0OTQx
-IDEwMDY0NA0KPiA+IC0tLSBhL25ldC9ibHVldG9vdGgvaGNpX2V2ZW50LmMNCj4gPiArKysgYi9u
-ZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jDQo+ID4gQEAgLTM3NzAsNiArMzc3MCwxMSBAQCBzdGF0
-aWMgdm9pZCBoY2lfc3luY19jb25uX2NvbXBsZXRlX2V2dChzdHJ1Y3QNCj4gaGNpX2RldiAqaGRl
-diwNCj4gPiAJCWJyZWFrOw0KPiA+IAl9DQo+ID4NCj4gPiArCWlmIChldi0+YWlyX21vZGUgPT0g
-U0NPX0FJUk1PREVfVFJBTlNQKSB7DQo+ID4gKwkJaGRldi0+dm9pY2Vfc2V0dGluZyB8PSBCVF9W
-T0lDRV9UUkFOU1BBUkVOVDsNCj4gPiArCQloZGV2LT5ub3RpZnkoaGRldiwgSENJX05PVElGWV9W
-T0lDRV9TRVRUSU5HKTsNCj4gPiArCX0NCj4gPiArDQo+IA0KPiBUaGlzIGlzIGFjdHVhbGx5IHNv
-bWV0aGluZyB0aGF0IGlzIG5vdCBmdWxseSBjb3JyZWN0LiBUaGUgaGRldi0+dm9pY2Vfc2V0dGlu
-ZyBpcw0KPiBzdXBwb3NlIHRvIHJlcHJlc2VudCB0aGUgdmFsdWUgb2YgdGhlIHNldHRpbmcuIEl0
-IHNob3VsZCBub3QgYmUgYWZmZWN0ZWQgYnkgdGhlDQo+IGNvbm5lY3Rpb25zLiBFc3BlY2lhbGx5
-IHNpbmNlIHRoaXMgZ2V0cyB0cmlja3kgd2hlbiB5b3UgaGF2ZSB0d28gZVNDTw0KPiBjb25uZWN0
-aW9ucy4gT25lIHVzaW5nIHRyYW5zcGFyZW50IGFuZCBhbm90aGVyIHVzaW5nIENWU0QuDQo+IA0K
-PiBXaGF0IHdlIG1pZ2h0IG5lZWQgdG8gZG8gaGVyZSBpcyBhY3R1YWxseSB0cmFjayB0aGUgbnVt
-YmVyIG9mIHRyYW5zcGFyZW50IHZzDQo+IG5vbi10cmFuc3BhcmVudCBlU0NPIGNvbm5lY3Rpb25z
-IHNlcGFyYXRlbHkuDQoNCklzIGl0IHBvc3NpYmxlIHRvIGhhdmUgdHJhbnNwYXJlbnQgYW5kIENW
-U0QgY29ubmVjdGlvbnMgYXQgdGhlIHNhbWUgdGltZT8gQ29yZSBzcGVjIDQuMCwgVm9sIDQsIHBh
-cnQgQiwgMi4xLjEgc3BlY2lmaWVzIGVuZHBvaW50IGNvbmZpZ3VyYXRpb24gZm9yIG11bHRpcGxl
-cyBvZiA4Yml0IG9yIDE2IGJpdCBjb25uZWN0aW9ucyBvbmx5IGJ1dCBub3QgYSBtaXggb2YgdGhl
-c2UuIEFsc28sIHNlY29uZCBleGFtcGxlIHByb3ZpZGVkIG9ubHkgc2hvd3MgdHdvIGNvbm5lY3Rp
-b25zIG9mIHRoZSBzYW1lLCA4Yml0IHR5cGUuIEkgdGhpbmsgdGhpcyBleGFtcGxlIGZvcmJpZHMg
-YSBtaXggb2YgY2hhbm5lbHMuIFR3byBTQ08gY2hhbm5lbHMgbmVlZCB0byBzaGFyZSBVU0IgZW5k
-cG9pbnQsIGJ1dCBhIHJ1bGUgb2YgaGF2aW5nIGVhY2ggU0NPIGRhdGEgcGFja2V0IGRpdmlkZWQg
-aW50byAzIGZyYWdtZW50cywgZWFjaCBzZW50IGV2ZXJ5IDFtcyBuZWVkcyB0byBiZSBwcmVzZXJ2
-ZWQuIFRoYXQgbWVhbnMgdGhhdCB3aGVuIHR3byBjb25uZWN0aW9ucyBhcmUgY2FycmllZCBvdmVy
-IFVTQiwgcGFja2V0IGZyZXF1ZW5jeSBwZXIgY2hhbm5lbCBpcyBoYWx2ZWQgYnV0IHBhY2tldCBz
-aXplIGRvdWJsZXMuIFRoaXMgY2FuIG9ubHkgYmUgYWNoaWV2ZWQgaWYgYm90aCBjb25uZWN0aW9u
-IGhhdmUgdGhlIHNhbWUgcGFja2V0IHNpemUuIEluIGNhc2Ugb2YgMTYgYW5kIDggYml0IGNvZXhp
-c3RlbmNlLCA4Yml0IGNoYW5uZWwgd291bGQgYmUgcmVxdWlyZWQgdG8gaW5jcmVhc2UgaXRzIHBh
-Y2tldHMgdG8gNDggYml0LCB3aGljaCB0cmFuc2xhdGVzIHRvIDMgZnJhZ21lbnQgMTcgYnl0ZXMg
-ZWFjaCBldmVyeSAxbXMsIGJ1dCAxNmJpdCBjaGFubmVsIHdvdWxkIHJlcXVpcmUgOTYgYnl0ZSBw
-YWNrZXRzLCB3aGljaCBtZWFucyAzMyBieXRlIGZyYWdtZW50cyBldmVyeSAxbXMuIE9uZSBlbmRw
-b2ludCBjYW5ub3Qgc3VwcG9ydCBpdC4gU28gd2hlbiB3ZSBoYXZlIGEgdHJhbnNwYXJlbnQgU0NP
-IGxpbmssIHdlIGNhbiBvbmx5IGFkZCBtb3JlIHRyYW5zcGFyZW50IFNDTyBsaW5rcyBhbmQgdGhp
-cyBkZXZpY2UgaXMgQlRfVk9JQ0VfVFJBTlNQQVJFTlQgb25seS4gT3IgYW0gSSBmdW5kYW1lbnRh
-bGx5IHdyb25nPw0KDQpJIGhhdmUgbm8gd2F5IG9mIHRlc3RpbmcgbXVsdGlwbGUgU0NPIGxpbmtz
-Lg0KDQpSZWdhcmRzLA0KS3ViYQ0KSW50ZWwgRGV1dHNjaGxhbmQgR21iSApSZWdpc3RlcmVkIEFk
-ZHJlc3M6IEFtIENhbXBlb24gMTAtMTIsIDg1NTc5IE5ldWJpYmVyZywgR2VybWFueQpUZWw6ICs0
-OSA4OSA5OSA4ODUzLTAsIHd3dy5pbnRlbC5kZQpNYW5hZ2luZyBEaXJlY3RvcnM6IENocmlzdGlu
-IEVpc2Vuc2NobWlkLCBQcm9mLiBEci4gSGVybWFubiBFdWwKQ2hhaXJwZXJzb24gb2YgdGhlIFN1
-cGVydmlzb3J5IEJvYXJkOiBUaWZmYW55IERvb24gU2lsdmEKUmVnaXN0ZXJlZCBPZmZpY2U6IE11
-bmljaApDb21tZXJjaWFsIFJlZ2lzdGVyOiBBbXRzZ2VyaWNodCBNdWVuY2hlbiBIUkIgMTg2OTI4
-Cg==
+This adds a new debugfs entry for enabling and disabling the vendor
+diagnostic mode. It is only exposed for drivers that provide the
+set_diag driver callback and actually have an option for vendor
+specific diagnostic information.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h      |  1 +
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 63 ++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 62 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index cf75c4391945..a26ff28ca878 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -240,6 +240,7 @@ enum {
+ 	HCI_LE_SCAN_INTERRUPTED,
+ 
+ 	HCI_DUT_MODE,
++	HCI_VENDOR_DIAG,
+ 	HCI_FORCE_BREDR_SMP,
+ 	HCI_FORCE_STATIC_ADDR,
+ 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d473b67a2c65..f28470e59682 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -398,6 +398,7 @@ struct hci_dev {
+ 	int (*send)(struct hci_dev *hdev, struct sk_buff *skb);
+ 	void (*notify)(struct hci_dev *hdev, unsigned int evt);
+ 	void (*hw_error)(struct hci_dev *hdev, u8 code);
++	int (*set_diag)(struct hci_dev *hdev, bool enable);
+ 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ };
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 8193845a9b60..e75bc545b48e 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -134,6 +134,56 @@ static const struct file_operations dut_mode_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
++static ssize_t vendor_diag_read(struct file *file, char __user *user_buf,
++				size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[3];
++
++	buf[0] = hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) ? 'Y': 'N';
++	buf[1] = '\n';
++	buf[2] = '\0';
++	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++}
++
++static ssize_t vendor_diag_write(struct file *file, const char __user *user_buf,
++				 size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[32];
++	size_t buf_size = min(count, (sizeof(buf)-1));
++	bool enable;
++	int err;
++
++	if (copy_from_user(buf, user_buf, buf_size))
++		return -EFAULT;
++
++	buf[buf_size] = '\0';
++	if (strtobool(buf, &enable))
++		return -EINVAL;
++
++	hci_req_lock(hdev);
++	err = hdev->set_diag(hdev, enable);
++	hci_req_unlock(hdev);
++
++	if (err < 0)
++		return err;
++
++	if (enable)
++		hci_dev_set_flag(hdev, HCI_VENDOR_DIAG);
++	else
++		hci_dev_clear_flag(hdev, HCI_VENDOR_DIAG);
++
++	return count;
++}
++
++static const struct file_operations vendor_diag_fops = {
++	.open		= simple_open,
++	.read		= vendor_diag_read,
++	.write		= vendor_diag_write,
++	.llseek		= default_llseek,
++};
++
+ /* ---- HCI requests ---- */
+ 
+ static void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
+@@ -850,12 +900,19 @@ static int __hci_init(struct hci_dev *hdev)
+ 	if (err < 0)
+ 		return err;
+ 
+-	/* The Device Under Test (DUT) mode is special and available for
+-	 * all controller types. So just create it early on.
+-	 */
+ 	if (hci_dev_test_flag(hdev, HCI_SETUP)) {
++		/* The Device Under Test (DUT) mode is special and available
++		 * for all controller types. So just create it early on.
++		 */
+ 		debugfs_create_file("dut_mode", 0644, hdev->debugfs, hdev,
+ 				    &dut_mode_fops);
++
++		/* When the driver supports the set_diag callback, then
++		 * expose an entry to modify the vendor diagnostic setting.
++		 */
++		if (hdev->set_diag)
++			debugfs_create_file("vendor_diag", 0644, hdev->debugfs,
++					    hdev, &vendor_diag_fops);
+ 	}
+ 
+ 	err = __hci_req_sync(hdev, hci_init2_req, 0, HCI_INIT_TIMEOUT);
+-- 
+2.4.3
+
