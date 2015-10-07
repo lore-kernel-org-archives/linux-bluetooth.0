@@ -1,31 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] deviceinfo: Enable external flag
-Date: Wed,  7 Oct 2015 15:41:47 +0300
-Message-Id: <1444221707-29732-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 7 Oct 2015 07:45:54 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Subject: Re: Bluetooth: btbcm: Read the local name in setup stage
+Message-ID: <20151007044554.GA22169@t440s.P-661HNU-F1>
+References: <20151006185705.GA9369@mwanda>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20151006185705.GA9369@mwanda>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Dan,
 
-This enable attributes to be accessed over D-Bus.
----
- profiles/deviceinfo/deviceinfo.c | 1 +
- 1 file changed, 1 insertion(+)
+On Tue, Oct 06, 2015, Dan Carpenter wrote:
+> The patch 8af9da1ab784: "Bluetooth: btbcm: Read the local name in
+> setup stage" from Oct 5, 2015, leads to the following static checker
+> warning:
+> 
+> 	drivers/bluetooth/btbcm.c:533 btbcm_setup_apple()
+> 	error: 'skb' dereferencing possible ERR_PTR()
+> 
+> drivers/bluetooth/btbcm.c
+>    522          /* Read Verbose Config Version Info */
+>    523          skb = btbcm_read_verbose_config(hdev);
+>    524          if (!IS_ERR(skb)) {
+>    525                  BT_INFO("%s: BCM: chip id %u build %4.4u", hdev->name,
+>    526                          skb->data[1], get_unaligned_le16(skb->data + 5));
+>    527                  kfree_skb(skb);
+>    528          }
+>    529  
+>    530          /* Read Local Name */
+>    531          skb = btbcm_read_local_name(hdev);
+>    532          if (IS_ERR(skb)) {
+> 
+> This test is reversed?
+> 
+>    533                  BT_INFO("%s: %s", hdev->name, (char *)(skb->data + 1));
+>    534                  kfree_skb(skb);
+>    535          }
 
-diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
-index a0e9951..6ee018c 100644
---- a/profiles/deviceinfo/deviceinfo.c
-+++ b/profiles/deviceinfo/deviceinfo.c
-@@ -191,6 +191,7 @@ static int deviceinfo_driver_probe(struct btd_service *service)
- static struct btd_profile deviceinfo_profile = {
- 	.name		= "deviceinfo",
- 	.remote_uuid	= DEVICE_INFORMATION_UUID,
-+	.external	= true,
- 	.device_probe	= deviceinfo_driver_probe,
- 	.device_remove	= deviceinfo_driver_remove
- };
--- 
-2.4.3
+That's indeed a bug. Thanks for the report. I went ahead and fixed this
+up myself since the commit was still on the top of the bluetooth-next
+tree.
 
+Johan
