@@ -1,57 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1443763138-23207-1-git-send-email-jpawlowski@google.com>
+References: <1443763138-23207-1-git-send-email-jpawlowski@google.com>
+Date: Wed, 7 Oct 2015 13:42:48 -0700
+Message-ID: <CAD0=r8xfT=rBigX+fX3r0UgdTGwLyT8HixysEcB4Bnpe0vPOWQ@mail.gmail.com>
+Subject: Re: [PATCH] core/device: Fix disconnect for connect attempt
 From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH] Bluetooth: fix autoconnect for pending connect attempt
-Date: Wed,  7 Oct 2015 15:59:26 -0700
-Message-Id: <1444258766-26899-1-git-send-email-jpawlowski@google.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When adding device to auto connect whitelist when there is pending
-connect attempt, there is no need to update scan, or to add it to
-pend_le_conns list.
+Ping ?
 
-When trying to connect to le device, it is added to pend_le_conns and
-background scan is updated. There's no need to repeat this operation when
-adding device to auto connect list. Only update of params->auto_connect
-value is required.
-
-If both operations try to update background scan, and are quickly queued
-together when scan was disabled, second operation might improperly try to
-start, instead of restarting scan. This means that adding device to
-connect whitelist would report failure, even though it succeeded.
-
-In order to reproduce this bug type in bluetoothctl:
-connect D9:00:00:00:00
-disconnect D9:00:00:00:00
-connect D9:00:00:00:00
-
-and observe bluetoothd logs (error happens during second connect attempt):
-src/device.c:device_connect_le() Connection attempt to: D0:5F:B8:52:22:9F
-Failed to add device D0:5F:B8:52:22:9F (1): Busy (0x0a)
----
- net/bluetooth/mgmt.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ccaf5a4..1108281 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6122,7 +6122,12 @@ static int hci_conn_params_set(struct hci_request *req, bdaddr_t *addr,
- 		break;
- 	case HCI_AUTO_CONN_DIRECT:
- 	case HCI_AUTO_CONN_ALWAYS:
--		if (!is_connected(hdev, addr, addr_type)) {
-+		/* If we are connected, don't add to whitelist. If we are
-+		 * connecting, we're already added to pend_le_conns and
-+		 * scanning.
-+		 */
-+		if (!is_connected(hdev, addr, addr_type) &&
-+		    !params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
- 			list_add(&params->action, &hdev->pend_le_conns);
- 			__hci_update_background_scan(req);
- 		}
--- 
-2.6.0.rc2.230.g3dd15c0
-
+On Thu, Oct 1, 2015 at 10:18 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> Right now calling Disconnect from DBus on device that's not advertising
+> or out of sight will not stop the connect attempt in kernel. This patch
+> fixes that by making sure that att_io is properly cleaned up on
+> disconnect.
+> ---
+>  src/device.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 5ec8780..fd177f4 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1355,6 +1355,12 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+>         if (device->browse)
+>                 browse_request_cancel(device->browse);
+>
+> +       if (device->att_io) {
+> +               g_io_channel_shutdown(device->att_io, FALSE, NULL);
+> +               g_io_channel_unref(device->att_io);
+> +               device->att_io = NULL;
+> +       }
+> +
+>         if (device->connect) {
+>                 DBusMessage *reply = btd_error_failed(device->connect,
+>                                                                 "Cancelled");
+> --
+> 2.5.0
+>
