@@ -1,43 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <9DBA7668-848C-41B3-A6E5-2C1ABC41E5A6@holtmann.org>
-References: <1433545876-15800-1-git-send-email-Dean_Jenkins@mentor.com>
-	<9DBA7668-848C-41B3-A6E5-2C1ABC41E5A6@holtmann.org>
-Date: Wed, 7 Oct 2015 17:09:57 +0300
-Message-ID: <CABBYNZ+YvTZMwg7O8TAJ10GZda-DnP1QJYudSesc1W1ENVNCQw@mail.gmail.com>
-Subject: Re: [PATCH v1 0/7] Avoid L2CAP ERTM shutdown hung tasks
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Dean Jenkins <Dean_Jenkins@mentor.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, Joshua_Frkuska@mentor.com
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Send index information updates to monitor channel
+Date: Wed,  7 Oct 2015 15:32:13 +0200
+Message-Id: <1444224733-20368-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dean,
+The Bluetooth public device address might change during controller setup
+and it makes it a lot simpler for monitoring tools if they just get told
+what the new address is. In addition include the manufacturer / company
+information of the controller. That allows for easy vendor specific HCI
+command and event handling.
 
-On Sat, Jun 6, 2015 at 7:13 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Dean,
->
->> Details of the issue are described in the thread
->> [RFC] Bluetooth ERTM L2CAP deadlocks (hung tasks) due to l2cap_sock_shutdown()
->> and kernel.org Bugzilla https://bugzilla.kernel.org/show_bug.cgi?id=99301
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci_mon.h |  7 +++++++
+ net/bluetooth/hci_sock.c        | 25 ++++++++++++++++++++++++-
+ 2 files changed, 31 insertions(+), 1 deletion(-)
 
-Are you still working on this? I can still lock bluetoothd on close,
-btw it seems you are not aware of the following:
-
-       SO_LINGER
-              When enabled, a close(2) or shutdown(2) will not return
-until all queued messages for the socket have been successfully sent
-or the linger timeout  has  been  reached.   Otherwise,  the  call
-returns immediately and the closing is done in the background.
-
-So according to the text above we should never call __l2cap_wait_ack
-on l2cap_sock_shutdown since it should return immediately, only when
-SO_LINGER is used it is allowed to block. Also there doesn't seems to
-be anything prevent us to send a L2CAP Disconnect request while there
-are unacked packets, at least I could find anything on the core about
-waiting for unacked nor the test spec has any test for it.
-
+diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
+index 37e4283d1d68..842bb754a078 100644
+--- a/include/net/bluetooth/hci_mon.h
++++ b/include/net/bluetooth/hci_mon.h
+@@ -41,6 +41,7 @@ struct hci_mon_hdr {
+ #define HCI_MON_SCO_RX_PKT	7
+ #define HCI_MON_OPEN_INDEX	8
+ #define HCI_MON_CLOSE_INDEX	9
++#define HCI_MON_INDEX_INFO	10
+ 
+ struct hci_mon_new_index {
+ 	__u8		type;
+@@ -50,4 +51,10 @@ struct hci_mon_new_index {
+ } __packed;
+ #define HCI_MON_NEW_INDEX_SIZE 16
+ 
++struct hci_mon_index_info {
++	bdaddr_t	bdaddr;
++	__le16		manufacturer;
++} __packed;
++#define HCI_MON_INDEX_INFO_SIZE 8
++
+ #endif /* __HCI_MON_H */
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 64ebe84989d1..9bf30db89d89 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -303,6 +303,7 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
+ {
+ 	struct hci_mon_hdr *hdr;
+ 	struct hci_mon_new_index *ni;
++	struct hci_mon_index_info *ii;
+ 	struct sk_buff *skb;
+ 	__le16 opcode;
+ 
+@@ -312,7 +313,7 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
+ 		if (!skb)
+ 			return NULL;
+ 
+-		ni = (void *) skb_put(skb, HCI_MON_NEW_INDEX_SIZE);
++		ni = (void *)skb_put(skb, HCI_MON_NEW_INDEX_SIZE);
+ 		ni->type = hdev->dev_type;
+ 		ni->bus = hdev->bus;
+ 		bacpy(&ni->bdaddr, &hdev->bdaddr);
+@@ -329,6 +330,18 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
+ 		opcode = cpu_to_le16(HCI_MON_DEL_INDEX);
+ 		break;
+ 
++	case HCI_DEV_UP:
++		skb = bt_skb_alloc(HCI_MON_INDEX_INFO_SIZE, GFP_ATOMIC);
++		if (!skb)
++			return NULL;
++
++		ii = (void *)skb_put(skb, HCI_MON_INDEX_INFO_SIZE);
++		bacpy(&ii->bdaddr, &hdev->bdaddr);
++		ii->manufacturer = cpu_to_le16(hdev->manufacturer);
++
++		opcode = cpu_to_le16(HCI_MON_INDEX_INFO);
++		break;
++
+ 	case HCI_DEV_OPEN:
+ 		skb = bt_skb_alloc(0, GFP_ATOMIC);
+ 		if (!skb)
+@@ -384,6 +397,16 @@ static void send_monitor_replay(struct sock *sk)
+ 
+ 		if (sock_queue_rcv_skb(sk, skb))
+ 			kfree_skb(skb);
++
++		if (!test_bit(HCI_UP, &hdev->flags))
++			continue;
++
++		skb = create_monitor_event(hdev, HCI_DEV_UP);
++		if (!skb)
++			continue;
++
++		if (sock_queue_rcv_skb(sk, skb))
++			kfree_skb(skb);
+ 	}
+ 
+ 	read_unlock(&hci_dev_list_lock);
 -- 
-Luiz Augusto von Dentz
+2.4.3
+
