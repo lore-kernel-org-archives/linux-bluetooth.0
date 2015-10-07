@@ -1,61 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20150930043444.GA21773@t440s.P-661HNU-F1>
-References: <CABOZqnjSPbO-cNkSryq5GXBKTqtE-1TPMKMgTAwtd9YoO4i-4A@mail.gmail.com>
-	<20150929064937.GA26120@t440s.lan>
-	<CABOZqnjj4hpAVLYKgC6CxwrFUaz7ZNn5Yhvz7DCk3u30Cp3urg@mail.gmail.com>
-	<20150930043444.GA21773@t440s.P-661HNU-F1>
-Date: Wed, 7 Oct 2015 10:16:02 -0700
-Message-ID: <CABOZqnib8cEiVCvOcQiSQ1fMa+OihAh3QrMZEEOvTFkgworD-g@mail.gmail.com>
-Subject: Re: SDP query via D-Bus?
-From: Mark Spruiell <mes@zeroc.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v2] Bluetooth: hci_bcm: Enable parsing of LM_DIAG messages
+Date: Wed,  7 Oct 2015 19:12:54 +0200
+Message-Id: <1444237974-31017-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+The Broadcom UART based controllers can send LM_DIAG messages with the
+identifier 0x07 inside the HCI stream. These messages are 63 octets in
+size and have no variable payload or length indicator.
 
-On Tue, Sep 29, 2015 at 9:34 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Mark,
->
-> On Tue, Sep 29, 2015, Mark Spruiell wrote:
->> Thanks for the reply.
->
-> No problem, but please don't top-post on this mailing list. Use in-line
-> quoting instead.
+This patch adds correct parsing information for the h4_recv_buf handler
+and in case these packets are received, they are forwarded to the
+Bluetooth core via hci_recv_diag interface.
 
-Got it.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/hci_bcm.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
->> I understand how a server can use RegisterProfile to advertise its
->> UUID & RFCOMM channel with SDP (as demonstrated in test-profile).
->>
->> It's still not clear to me how a client can use D-Bus to establish an
->> RFCOMM socket connection given a device address & UUID. Can you point
->> me in the right direction?
->
-> The same interface can be used for both client and server role. Take a
-> look at the "Role" option for RegisterProfile (with test-profile you'd
-> pass -c to it). This basically tells bluetoothd that your application is
-> capable of supporting the client role of a certain profile.
->
-> To actually connect to the profile (which should cause a NewConnection
-> call to your application, giving it the socket) you'd use the usual
-> ConnectProfile or Connect methods on the Device1 interface (see
-> doc/device-api.txt, you can play with these e.g. using the "connect"
-> command in bluetoothctl (with no parameters it maps to Device1.Connect
-> and with one parameter (the UUID) to Device1.ConnectProfile).
->
-> The ConnectProfile call should always work, whereas for your profile to
-> be included in the set of profiles connected using Connnect you'd need
-> to set the AutoConnect option to true when registering your profile.
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 512873262055..1425bf50ae99 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -41,6 +41,9 @@
+ #include "btbcm.h"
+ #include "hci_uart.h"
+ 
++#define BCM_LM_DIAG_PKT 0x07
++#define BCM_LM_DIAG_SIZE 63
++
+ #define BCM_AUTOSUSPEND_DELAY	5000 /* default autosleep delay */
+ 
+ struct bcm_device {
+@@ -396,10 +399,18 @@ finalize:
+ 	return err;
+ }
+ 
++#define BCM_RECV_LM_DIAG \
++	.type = BCM_LM_DIAG_PKT, \
++	.hlen = BCM_LM_DIAG_SIZE, \
++	.loff = 0, \
++	.lsize = 0, \
++	.maxlen = BCM_LM_DIAG_SIZE
++
+ static const struct h4_recv_pkt bcm_recv_pkts[] = {
+-	{ H4_RECV_ACL,   .recv = hci_recv_frame },
+-	{ H4_RECV_SCO,   .recv = hci_recv_frame },
+-	{ H4_RECV_EVENT, .recv = hci_recv_frame },
++	{ H4_RECV_ACL,      .recv = hci_recv_frame },
++	{ H4_RECV_SCO,      .recv = hci_recv_frame },
++	{ H4_RECV_EVENT,    .recv = hci_recv_frame },
++	{ BCM_RECV_LM_DIAG, .recv = hci_recv_diag  },
+ };
+ 
+ static int bcm_recv(struct hci_uart *hu, const void *data, int count)
+-- 
+2.4.3
 
-Thanks, that helped a lot.
-
-On a related note, I noticed that a server can specify a value of 0
-for its RFCOMM channel when calling RegisterProfile and bluetoothd
-seems to select an available channel. Is there any way for the server
-to discover which RFCOMM channel was selected, aside from waiting for
-the first incoming connection?
-
-Mark
