@@ -1,70 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Oct 2015 16:38:20 +0300
+Date: Thu, 8 Oct 2015 15:34:21 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v1] Bluetooth: fix autoconnect for pending connect attempt
-Message-ID: <20151008133820.GA20576@t440s.P-661HNU-F1>
-References: <1444259885-29382-1-git-send-email-jpawlowski@google.com>
+Subject: Re: [PATCH] Bluetooth: Fix basic debugfs entries for unconfigured
+ controllers
+Message-ID: <20151008123421.GA12431@t440s.lan>
+References: <1444300542-96764-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1444259885-29382-1-git-send-email-jpawlowski@google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1444300542-96764-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Marcel,
 
-On Wed, Oct 07, 2015, Jakub Pawlowski wrote:
-> When adding device to auto connect whitelist when there is pending
-> connect attempt, there is no need to update scan, or to add it to
-> pend_le_conns list.
+On Thu, Oct 08, 2015, Marcel Holtmann wrote:
+> When the controller is unconfigured (for example it does not have a
+> valid Bluetooth address), then the basic debugfs entries for dut_mode
+> and vendor_diag are not creates. Ensure they are created in __hci_init
+> and also __hci_unconf_init functions. One of them is called during setup
+> stage of a new controller.
 > 
-> When trying to connect to le device, it is added to pend_le_conns and
-> background scan is updated. There's no need to repeat this operation when
-> adding device to auto connect list. Only update of params->auto_connect
-> value is required.
-> 
-> If both operations try to update background scan, and are quickly queued
-> together when scan was disabled, second operation might improperly try to
-> start, instead of restarting scan. This means that adding device to
-> connect whitelist would report failure, even though it succeeded.
-> 
-> In order to reproduce this bug type in bluetoothctl:
-> connect D9:00:00:00:00
-> disconnect D9:00:00:00:00
-> connect D9:00:00:00:00
-> 
-> and observe bluetoothd logs (error happens during second connect attempt):
-> src/device.c:device_connect_le() Connection attempt to: D0:5F:B8:52:22:9F
-> Failed to add device D0:5F:B8:52:22:9F (1): Busy (0x0a)
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/mgmt.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  net/bluetooth/hci_core.c | 29 +++++++++++++++--------------
+>  1 file changed, 15 insertions(+), 14 deletions(-)
 
-Could you resend this with a proper signed-off-by line?
-
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index ccaf5a4..c29b6dd 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -6122,7 +6122,12 @@ static int hci_conn_params_set(struct hci_request *req, bdaddr_t *addr,
->  		break;
->  	case HCI_AUTO_CONN_DIRECT:
->  	case HCI_AUTO_CONN_ALWAYS:
-> -		if (!is_connected(hdev, addr, addr_type)) {
-> +		/* If we are connected, don't add to whitelist. If we are
-> +		 * connecting, we're already added to pend_le_conns and
-> +		 * scanning.
-> +		 */
-> +		if (!is_connected(hdev, addr, addr_type) &&
-> +		    params->auto_connect != HCI_AUTO_CONN_EXPLICIT) {
->  			list_add(&params->action, &hdev->pend_le_conns);
->  			__hci_update_background_scan(req);
->  		}
-
-Is it really only HCI_AUTO_CONN_EXPLICIT that we should care about? What
-if the previous value is HCI_AUTO_CONN_DIRECT and the new one
-HCI_AUTO_CONN_ALWAYS or vice versa, aren't we then also adding to the
-list twice?
+Applied to bluetooth-next. Thanks.
 
 Johan
