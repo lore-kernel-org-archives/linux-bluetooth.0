@@ -1,119 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH] Bluetooth: remove btusb_work related workqueue
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <088CC8BACB3382439E91D9919CE3502436568B42@IRSMSX107.ger.corp.intel.com>
-Date: Thu, 8 Oct 2015 18:48:51 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <6D48126C-1328-4466-9415-D48367F574C9@holtmann.org>
-References: <1444316120-22893-1-git-send-email-kubax.t.pawlak@intel.com> <7D38034D-BDC6-4FD9-931E-7518FA2D20A4@holtmann.org> <088CC8BACB3382439E91D9919CE3502436568B42@IRSMSX107.ger.corp.intel.com>
-To: "Pawlak, KubaX T" <kubax.t.pawlak@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Pawlak, KubaX T" <kubax.t.pawlak@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth: remove btusb_work related workqueue
+Date: Thu, 8 Oct 2015 16:45:29 +0000
+Message-ID: <088CC8BACB3382439E91D9919CE3502436568B42@IRSMSX107.ger.corp.intel.com>
+References: <1444316120-22893-1-git-send-email-kubax.t.pawlak@intel.com>
+ <7D38034D-BDC6-4FD9-931E-7518FA2D20A4@holtmann.org>
+In-Reply-To: <7D38034D-BDC6-4FD9-931E-7518FA2D20A4@holtmann.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kuba,
-
->>> Workqueue handling btusb_work is no longer needed as btusb_notify
->>> can sleep.
->>> 
->>> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
->>> ---
->>> drivers/bluetooth/btusb.c | 14 +++++---------
->>> 1 file changed, 5 insertions(+), 9 deletions(-)
->>> 
->>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>> index
->> 247b1062cb9affc67d9e7f7a0234c167f90f4b79..98c616ddd7bac53b2d5d5f8b3dcc
->> 2dca2b201e63 100644
->>> --- a/drivers/bluetooth/btusb.c
->>> +++ b/drivers/bluetooth/btusb.c
->>> @@ -350,7 +350,6 @@ struct btusb_data {
->>> 
->>> 	unsigned long flags;
->>> 
->>> -	struct work_struct work;
->>> 	struct work_struct waker;
->>> 
->>> 	struct usb_anchor deferred;
->>> @@ -980,7 +979,6 @@ static int btusb_close(struct hci_dev *hdev)
->>> 
->>> 	BT_DBG("%s", hdev->name);
->>> 
->>> -	cancel_work_sync(&data->work);
->>> 	cancel_work_sync(&data->waker);
->>> 
->>> 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
->>> @@ -1181,6 +1179,8 @@ static int btusb_send_frame(struct hci_dev *hdev,
->> struct sk_buff *skb)
->>> 	return -EILSEQ;
->>> }
->>> 
->>> +static void btusb_sco_change(struct btusb_data *data);
->>> +
->> 
->> do we need this forward declaration or can we just move code around to avoid
->> it?
->> 
->>> static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
->>> {
->>> 	struct btusb_data *data = hci_get_drvdata(hdev);
->>> @@ -1189,7 +1189,7 @@ static void btusb_notify(struct hci_dev *hdev,
->> unsigned int evt)
->>> 
->>> 	if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
->>> 		data->sco_num = hci_conn_num(hdev, SCO_LINK);
->>> -		schedule_work(&data->work);
->>> +		btusb_sco_change(data);
->>> 	}
->>> }
->>> 
->>> @@ -1236,9 +1236,8 @@ static inline int __set_isoc_interface(struct hci_dev
->> *hdev, int altsetting)
->>> 	return 0;
->>> }
->>> 
->>> -static void btusb_work(struct work_struct *work)
->>> +static void btusb_sco_change(struct btusb_data *data)
->>> {
->>> -	struct btusb_data *data = container_of(work, struct btusb_data,
->> work);
->>> 	struct hci_dev *hdev = data->hdev;
->>> 	int new_alts;
->>> 	int err;
->>> @@ -2618,7 +2617,6 @@ static int btusb_probe(struct usb_interface *intf,
->>> 	data->udev = interface_to_usbdev(intf);
->>> 	data->intf = intf;
->>> 
->>> -	INIT_WORK(&data->work, btusb_work);
->>> 	INIT_WORK(&data->waker, btusb_waker);
->>> 	init_usb_anchor(&data->deferred);
->>> 	init_usb_anchor(&data->tx_anchor);
->>> @@ -2848,8 +2846,6 @@ static int btusb_suspend(struct usb_interface *intf,
->> pm_message_t message)
->>> 		return -EBUSY;
->>> 	}
->>> 
->>> -	cancel_work_sync(&data->work);
->>> -
->>> 	btusb_stop_traffic(data);
->>> 	usb_kill_anchored_urbs(&data->tx_anchor);
->>> 
->>> @@ -2922,7 +2918,7 @@ static int btusb_resume(struct usb_interface *intf)
->>> 	play_deferred(data);
->>> 	clear_bit(BTUSB_SUSPENDING, &data->flags);
->>> 	spin_unlock_irq(&data->txlock);
->>> -	schedule_work(&data->work);
->>> +	btusb_sco_change(data);
->> 
->> Can we actually sleep in the resume callbacks? I think so, but I have not testing
->> runtime power management in a while.
-> 
-> Apparently we can't, so workqueue needs to stay and this patch is invalid.
-
-I think that removing the usage of the workqueue in btusb_notify is still a good thing since it reduces the latency when establishing SCO connections.
-
-Regards
-
-Marcel
-
+SGkgTWFyY2VsLA0KDQo+ID4gV29ya3F1ZXVlIGhhbmRsaW5nIGJ0dXNiX3dvcmsgaXMgbm8gbG9u
+Z2VyIG5lZWRlZCBhcyBidHVzYl9ub3RpZnkNCj4gPiBjYW4gc2xlZXAuDQo+ID4NCj4gPiBTaWdu
+ZWQtb2ZmLWJ5OiBLdWJhIFBhd2xhayA8a3ViYXgudC5wYXdsYWtAaW50ZWwuY29tPg0KPiA+IC0t
+LQ0KPiA+IGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMgfCAxNCArKysrKy0tLS0tLS0tLQ0KPiA+
+IDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyksIDkgZGVsZXRpb25zKC0pDQo+ID4NCj4g
+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRv
+b3RoL2J0dXNiLmMNCj4gPiBpbmRleA0KPiAyNDdiMTA2MmNiOWFmZmM2N2Q5ZTdmN2EwMjM0YzE2
+N2Y5MGY0Yjc5Li45OGM2MTZkZGQ3YmFjNTNiMmQ1ZDVmOGIzZGNjDQo+IDJkY2EyYjIwMWU2MyAx
+MDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4gKysrIGIvZHJp
+dmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+IEBAIC0zNTAsNyArMzUwLDYgQEAgc3RydWN0IGJ0
+dXNiX2RhdGEgew0KPiA+DQo+ID4gCXVuc2lnbmVkIGxvbmcgZmxhZ3M7DQo+ID4NCj4gPiAtCXN0
+cnVjdCB3b3JrX3N0cnVjdCB3b3JrOw0KPiA+IAlzdHJ1Y3Qgd29ya19zdHJ1Y3Qgd2FrZXI7DQo+
+ID4NCj4gPiAJc3RydWN0IHVzYl9hbmNob3IgZGVmZXJyZWQ7DQo+ID4gQEAgLTk4MCw3ICs5Nzks
+NiBAQCBzdGF0aWMgaW50IGJ0dXNiX2Nsb3NlKHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0KPiA+DQo+
+ID4gCUJUX0RCRygiJXMiLCBoZGV2LT5uYW1lKTsNCj4gPg0KPiA+IC0JY2FuY2VsX3dvcmtfc3lu
+YygmZGF0YS0+d29yayk7DQo+ID4gCWNhbmNlbF93b3JrX3N5bmMoJmRhdGEtPndha2VyKTsNCj4g
+Pg0KPiA+IAljbGVhcl9iaXQoQlRVU0JfSVNPQ19SVU5OSU5HLCAmZGF0YS0+ZmxhZ3MpOw0KPiA+
+IEBAIC0xMTgxLDYgKzExNzksOCBAQCBzdGF0aWMgaW50IGJ0dXNiX3NlbmRfZnJhbWUoc3RydWN0
+IGhjaV9kZXYgKmhkZXYsDQo+IHN0cnVjdCBza19idWZmICpza2IpDQo+ID4gCXJldHVybiAtRUlM
+U0VROw0KPiA+IH0NCj4gPg0KPiA+ICtzdGF0aWMgdm9pZCBidHVzYl9zY29fY2hhbmdlKHN0cnVj
+dCBidHVzYl9kYXRhICpkYXRhKTsNCj4gPiArDQo+IA0KPiBkbyB3ZSBuZWVkIHRoaXMgZm9yd2Fy
+ZCBkZWNsYXJhdGlvbiBvciBjYW4gd2UganVzdCBtb3ZlIGNvZGUgYXJvdW5kIHRvIGF2b2lkDQo+
+IGl0Pw0KPiANCj4gPiBzdGF0aWMgdm9pZCBidHVzYl9ub3RpZnkoc3RydWN0IGhjaV9kZXYgKmhk
+ZXYsIHVuc2lnbmVkIGludCBldnQpDQo+ID4gew0KPiA+IAlzdHJ1Y3QgYnR1c2JfZGF0YSAqZGF0
+YSA9IGhjaV9nZXRfZHJ2ZGF0YShoZGV2KTsNCj4gPiBAQCAtMTE4OSw3ICsxMTg5LDcgQEAgc3Rh
+dGljIHZvaWQgYnR1c2Jfbm90aWZ5KHN0cnVjdCBoY2lfZGV2ICpoZGV2LA0KPiB1bnNpZ25lZCBp
+bnQgZXZ0KQ0KPiA+DQo+ID4gCWlmIChoY2lfY29ubl9udW0oaGRldiwgU0NPX0xJTkspICE9IGRh
+dGEtPnNjb19udW0pIHsNCj4gPiAJCWRhdGEtPnNjb19udW0gPSBoY2lfY29ubl9udW0oaGRldiwg
+U0NPX0xJTkspOw0KPiA+IC0JCXNjaGVkdWxlX3dvcmsoJmRhdGEtPndvcmspOw0KPiA+ICsJCWJ0
+dXNiX3Njb19jaGFuZ2UoZGF0YSk7DQo+ID4gCX0NCj4gPiB9DQo+ID4NCj4gPiBAQCAtMTIzNiw5
+ICsxMjM2LDggQEAgc3RhdGljIGlubGluZSBpbnQgX19zZXRfaXNvY19pbnRlcmZhY2Uoc3RydWN0
+IGhjaV9kZXYNCj4gKmhkZXYsIGludCBhbHRzZXR0aW5nKQ0KPiA+IAlyZXR1cm4gMDsNCj4gPiB9
+DQo+ID4NCj4gPiAtc3RhdGljIHZvaWQgYnR1c2Jfd29yayhzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndv
+cmspDQo+ID4gK3N0YXRpYyB2b2lkIGJ0dXNiX3Njb19jaGFuZ2Uoc3RydWN0IGJ0dXNiX2RhdGEg
+KmRhdGEpDQo+ID4gew0KPiA+IC0Jc3RydWN0IGJ0dXNiX2RhdGEgKmRhdGEgPSBjb250YWluZXJf
+b2Yod29yaywgc3RydWN0IGJ0dXNiX2RhdGEsDQo+IHdvcmspOw0KPiA+IAlzdHJ1Y3QgaGNpX2Rl
+diAqaGRldiA9IGRhdGEtPmhkZXY7DQo+ID4gCWludCBuZXdfYWx0czsNCj4gPiAJaW50IGVycjsN
+Cj4gPiBAQCAtMjYxOCw3ICsyNjE3LDYgQEAgc3RhdGljIGludCBidHVzYl9wcm9iZShzdHJ1Y3Qg
+dXNiX2ludGVyZmFjZSAqaW50ZiwNCj4gPiAJZGF0YS0+dWRldiA9IGludGVyZmFjZV90b191c2Jk
+ZXYoaW50Zik7DQo+ID4gCWRhdGEtPmludGYgPSBpbnRmOw0KPiA+DQo+ID4gLQlJTklUX1dPUkso
+JmRhdGEtPndvcmssIGJ0dXNiX3dvcmspOw0KPiA+IAlJTklUX1dPUksoJmRhdGEtPndha2VyLCBi
+dHVzYl93YWtlcik7DQo+ID4gCWluaXRfdXNiX2FuY2hvcigmZGF0YS0+ZGVmZXJyZWQpOw0KPiA+
+IAlpbml0X3VzYl9hbmNob3IoJmRhdGEtPnR4X2FuY2hvcik7DQo+ID4gQEAgLTI4NDgsOCArMjg0
+Niw2IEBAIHN0YXRpYyBpbnQgYnR1c2Jfc3VzcGVuZChzdHJ1Y3QgdXNiX2ludGVyZmFjZSAqaW50
+ZiwNCj4gcG1fbWVzc2FnZV90IG1lc3NhZ2UpDQo+ID4gCQlyZXR1cm4gLUVCVVNZOw0KPiA+IAl9
+DQo+ID4NCj4gPiAtCWNhbmNlbF93b3JrX3N5bmMoJmRhdGEtPndvcmspOw0KPiA+IC0NCj4gPiAJ
+YnR1c2Jfc3RvcF90cmFmZmljKGRhdGEpOw0KPiA+IAl1c2Jfa2lsbF9hbmNob3JlZF91cmJzKCZk
+YXRhLT50eF9hbmNob3IpOw0KPiA+DQo+ID4gQEAgLTI5MjIsNyArMjkxOCw3IEBAIHN0YXRpYyBp
+bnQgYnR1c2JfcmVzdW1lKHN0cnVjdCB1c2JfaW50ZXJmYWNlICppbnRmKQ0KPiA+IAlwbGF5X2Rl
+ZmVycmVkKGRhdGEpOw0KPiA+IAljbGVhcl9iaXQoQlRVU0JfU1VTUEVORElORywgJmRhdGEtPmZs
+YWdzKTsNCj4gPiAJc3Bpbl91bmxvY2tfaXJxKCZkYXRhLT50eGxvY2spOw0KPiA+IC0Jc2NoZWR1
+bGVfd29yaygmZGF0YS0+d29yayk7DQo+ID4gKwlidHVzYl9zY29fY2hhbmdlKGRhdGEpOw0KPiAN
+Cj4gQ2FuIHdlIGFjdHVhbGx5IHNsZWVwIGluIHRoZSByZXN1bWUgY2FsbGJhY2tzPyBJIHRoaW5r
+IHNvLCBidXQgSSBoYXZlIG5vdCB0ZXN0aW5nDQo+IHJ1bnRpbWUgcG93ZXIgbWFuYWdlbWVudCBp
+biBhIHdoaWxlLg0KDQpBcHBhcmVudGx5IHdlIGNhbid0LCBzbyB3b3JrcXVldWUgbmVlZHMgdG8g
+c3RheSBhbmQgdGhpcyBwYXRjaCBpcyBpbnZhbGlkLg0KDQpLdWJhDQpJbnRlbCBEZXV0c2NobGFu
+ZCBHbWJIClJlZ2lzdGVyZWQgQWRkcmVzczogQW0gQ2FtcGVvbiAxMC0xMiwgODU1NzkgTmV1Ymli
+ZXJnLCBHZXJtYW55ClRlbDogKzQ5IDg5IDk5IDg4NTMtMCwgd3d3LmludGVsLmRlCk1hbmFnaW5n
+IERpcmVjdG9yczogQ2hyaXN0aW4gRWlzZW5zY2htaWQsIFByb2YuIERyLiBIZXJtYW5uIEV1bApD
+aGFpcnBlcnNvbiBvZiB0aGUgU3VwZXJ2aXNvcnkgQm9hcmQ6IFRpZmZhbnkgRG9vbiBTaWx2YQpS
+ZWdpc3RlcmVkIE9mZmljZTogTXVuaWNoCkNvbW1lcmNpYWwgUmVnaXN0ZXI6IEFtdHNnZXJpY2h0
+IE11ZW5jaGVuIEhSQiAxODY5MjgK
