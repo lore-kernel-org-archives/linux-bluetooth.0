@@ -1,35 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: bpa10x: Fix missing BT_HCIUART dependency
-Date: Thu,  8 Oct 2015 19:30:05 +0200
-Message-Id: <1444325405-112323-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 8 Oct 2015 12:28:19 -0500
+From: Andy Gross <agross@codeaurora.org>
+To: Bjorn Andersson <bjorn.andersson@sonymobile.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Fengwei Yin <fengwei.yin@linaro.org>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: hci_smd: Qualcomm WCNSS HCI driver
+Message-ID: <20151008172819.GA32381@qualcomm.com>
+References: <1443654180-29416-1-git-send-email-bjorn.andersson@sonymobile.com>
+ <036E1E75-8E6A-4116-A648-A188A8458416@holtmann.org>
+ <20151001203338.GW24668@usrtlx11787.corpusers.net>
+ <31CC1992-41BB-484C-9784-3A54D0EF6FF3@holtmann.org>
+ <20151008170744.GF24668@usrtlx11787.corpusers.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20151008170744.GF24668@usrtlx11787.corpusers.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Selecting just BT_HCIUART_H4 is not enough and it also needs to select
-BT_HCIUART to avoid this warning:
+On Thu, Oct 08, 2015 at 10:07:44AM -0700, Bjorn Andersson wrote:
+> On Sat 03 Oct 09:55 PDT 2015, Marcel Holtmann wrote:
+> 
+> > Hi Bjorn,
+> > 
+> [..]
+> > >> Especially the kbuild test robot complained loudly.
+> > >>
+> > >
+> > > Sorry, I forgot to mention in the patch that the patch depends on the
+> > > qcom_smd_id patch - that's available in linux-next. I will take another
+> > > look, but I think that was the cause of all the issues.
+> > 
+> > which means, I can only merge this driver when this other patch has
+> > hit net-next tree. Unless I take the qcom_smd_id through
+> > bluetooth-next tree which doesn't look like a good idea.
+> > 
+> 
+> I was going to suggest that we just wait for -rc1, but the new additions
+> to SMD adds a bunch of new items on the dependency list.
+> 
+> Perhaps once we agree we can get your Ack and have Andy pull it through
+> the qcom-soc tree together with the SMD patches?
 
-warning: (BT_HCIBPA10X) selects BT_HCIUART_H4 which has unmet direct
-dependencies (NET && BT && BT_HCIUART)
+This is fine by me.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+> > >>> obj-$(CONFIG_BT_INTEL)              += btintel.o
+> > >>> obj-$(CONFIG_BT_ATH3K)              += ath3k.o
+> > >>> diff --git a/drivers/bluetooth/hci_smd.c b/drivers/bluetooth/hci_smd.c
+> > > [..]
+> > >>> +#include <net/bluetooth/hci.h>
+> > >>
+> > >> The hci.h include is not needed. If you do, then you are doing
+> > >> something fishy.
+> > >>
+> > >
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index c9c5dd0bad36..fcf52fdb1ba3 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -184,6 +184,7 @@ config BT_HCIBCM203X
- config BT_HCIBPA10X
- 	tristate "HCI BPA10x USB driver"
- 	depends on USB
-+	select BT_HCIUART
- 	select BT_HCIUART_H4
- 	help
- 	  Bluetooth HCI BPA10x USB driver.
+<snip>
+
 -- 
-2.4.3
-
+Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
