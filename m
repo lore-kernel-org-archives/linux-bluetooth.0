@@ -2,81 +2,93 @@ Return-Path: <cyrus@holtmann.org>
 From: Simon Fels <simon.fels@canonical.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Simon Fels <simon.fels@canonical.com>
-Subject: [PATCH 2/2] client: add support for new property to list connected profiles
-Date: Thu,  8 Oct 2015 09:43:52 +0200
-Message-Id: <1444290232-19779-2-git-send-email-simon.fels@canonical.com>
-In-Reply-To: <1444290232-19779-1-git-send-email-simon.fels@canonical.com>
-References: <1444290232-19779-1-git-send-email-simon.fels@canonical.com>
+Subject: [PATCH 1/2] core/device: expose list of connected profiles
+Date: Thu,  8 Oct 2015 09:43:51 +0200
+Message-Id: <1444290232-19779-1-git-send-email-simon.fels@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This modifies the output of the list of available profiles a bit to allow
-us to print out multiple lists with UUIDs.
+Currently users don't have any way to find out which profile is connected
+and which not. This adds a new property 'ConnectedProfiles' for the
+org.bluez.Device1 interface which exposes a list of UUIDs of profile we're
+currently connected.
 ---
- client/main.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ doc/device-api.txt |  5 +++++
+ src/device.c       | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
 
-diff --git a/client/main.c b/client/main.c
-index 6863593..1d0704a 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -238,15 +238,21 @@ static void print_property(GDBusProxy *proxy, const char *name)
- 	print_iter("\t", name, &iter);
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index a8076a2..9f27dbd 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -146,6 +146,11 @@ Properties	string Address [readonly]
+ 			A PropertiesChanged signal indicate changes to this
+ 			status.
+ 
++		array{string} ConnectedProfiles [readonly]
++
++			List of 128-bit UUIDs that represents the currently
++			connected profiles.
++
+ 		boolean Trusted [readwrite]
+ 
+ 			Indicates if the remote is seen as trusted. This
+diff --git a/src/device.c b/src/device.c
+index 5ec8780..aa8bae7 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1091,6 +1091,33 @@ static gboolean dev_property_get_connected(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
--static void print_uuids(GDBusProxy *proxy)
-+static void print_uuids(GDBusProxy *proxy, const char *name)
- {
- 	DBusMessageIter iter, value;
- 
--	if (g_dbus_proxy_get_property(proxy, "UUIDs", &iter) == FALSE)
-+	if (g_dbus_proxy_get_property(proxy, name, &iter) == FALSE)
- 		return;
- 
- 	dbus_message_iter_recurse(&iter, &value);
- 
-+	rl_printf("\t%s:\n", name);
++static gboolean dev_property_get_connected_profiles(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *dev = data;
++	DBusMessageIter entry;
++	GSList *l;
 +
-+	if (!dbus_message_iter_has_next(&value)) {
-+		rl_printf("\t  None\n");
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++				DBUS_TYPE_STRING_AS_STRING, &entry);
++
++	for (l = dev->services; l != NULL; l = g_slist_next(l)) {
++		struct btd_service *service = l->data;
++		struct btd_profile *profile = btd_service_get_profile(service);
++		btd_service_state_t state = btd_service_get_state(service);
++
++		if (state != BTD_SERVICE_STATE_CONNECTED)
++			continue;
++
++		dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
++						&profile->remote_uuid);
 +	}
 +
- 	while (dbus_message_iter_get_arg_type(&value) == DBUS_TYPE_STRING) {
- 		const char *uuid, *text;
- 
-@@ -269,10 +275,10 @@ static void print_uuids(GDBusProxy *proxy)
- 				n = sizeof(str) - 1;
- 			}
- 
--			rl_printf("\tUUID: %s%*c(%s)\n",
-+			rl_printf("\t  %s%*c(%s)\n",
- 						str, 26 - n, ' ', uuid);
- 		} else
--			rl_printf("\tUUID: %*c(%s)\n", 26, ' ', uuid);
-+			rl_printf("\t  %*c(%s)\n", 26, ' ', uuid);
- 
- 		dbus_message_iter_next(&value);
- 	}
-@@ -654,7 +660,7 @@ static void cmd_show(const char *arg)
- 	print_property(proxy, "Powered");
- 	print_property(proxy, "Discoverable");
- 	print_property(proxy, "Pairable");
--	print_uuids(proxy);
-+	print_uuids(proxy, "UUIDs");
- 	print_property(proxy, "Modalias");
- 	print_property(proxy, "Discovering");
++	dbus_message_iter_close_container(iter, &entry);
++
++	return TRUE;
++}
++
+ static gboolean dev_property_get_uuids(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+@@ -2504,6 +2531,7 @@ static const GDBusPropertyTable device_properties[] = {
+ 	{ "LegacyPairing", "b", dev_property_get_legacy },
+ 	{ "RSSI", "n", dev_property_get_rssi, NULL, dev_property_exists_rssi },
+ 	{ "Connected", "b", dev_property_get_connected },
++	{ "ConnectedProfiles", "as", dev_property_get_connected_profiles },
+ 	{ "UUIDs", "as", dev_property_get_uuids },
+ 	{ "Modalias", "s", dev_property_get_modalias, NULL,
+ 						dev_property_exists_modalias },
+@@ -6088,6 +6116,9 @@ static void service_state_changed(struct btd_service *service,
+ 		device_profile_connected(device, profile, err);
+ 	else if (old_state == BTD_SERVICE_STATE_DISCONNECTING)
+ 		device_profile_disconnected(device, profile, err);
++
++	g_dbus_emit_property_changed(dbus_conn, device->path,
++						DEVICE_INTERFACE, "ConnectedProfiles");
  }
-@@ -1163,8 +1169,9 @@ static void cmd_info(const char *arg)
- 	print_property(proxy, "Trusted");
- 	print_property(proxy, "Blocked");
- 	print_property(proxy, "Connected");
-+	print_uuids(proxy, "ConnectedProfiles");
- 	print_property(proxy, "LegacyPairing");
--	print_uuids(proxy);
-+	print_uuids(proxy, "UUIDs");
- 	print_property(proxy, "Modalias");
- 	print_property(proxy, "ManufacturerData");
- 	print_property(proxy, "ServiceData");
+ 
+ struct btd_service *btd_device_get_service(struct btd_device *dev,
 -- 
 2.5.0
 
