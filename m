@@ -1,106 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH] Bluetooth: remove btusb_work related workqueue
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1444316120-22893-1-git-send-email-kubax.t.pawlak@intel.com>
-Date: Thu, 8 Oct 2015 18:18:27 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <7D38034D-BDC6-4FD9-931E-7518FA2D20A4@holtmann.org>
-References: <1444316120-22893-1-git-send-email-kubax.t.pawlak@intel.com>
-To: Kuba Pawlak <kubax.t.pawlak@intel.com>
+From: "Pawlak, KubaX T" <kubax.t.pawlak@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetoot: Fix USB endpoint selection for wideband speech
+Date: Thu, 8 Oct 2015 16:03:29 +0000
+Message-ID: <088CC8BACB3382439E91D9919CE3502436566B12@IRSMSX107.ger.corp.intel.com>
+References: <1444230347-1593-1-git-send-email-kubax.t.pawlak@intel.com>
+ <747D67C0-738A-44E0-B489-D176C2290174@holtmann.org>
+ <088CC8BACB3382439E91D9919CE350243655F344@IRSMSX107.ger.corp.intel.com>
+ <089EE5F6-F949-4C9D-AB82-F18043D8FF64@holtmann.org>
+In-Reply-To: <089EE5F6-F949-4C9D-AB82-F18043D8FF64@holtmann.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kuba,
-
-> Workqueue handling btusb_work is no longer needed as btusb_notify
-> can sleep.
-> 
-> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
-> ---
-> drivers/bluetooth/btusb.c | 14 +++++---------
-> 1 file changed, 5 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 247b1062cb9affc67d9e7f7a0234c167f90f4b79..98c616ddd7bac53b2d5d5f8b3dcc2dca2b201e63 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -350,7 +350,6 @@ struct btusb_data {
-> 
-> 	unsigned long flags;
-> 
-> -	struct work_struct work;
-> 	struct work_struct waker;
-> 
-> 	struct usb_anchor deferred;
-> @@ -980,7 +979,6 @@ static int btusb_close(struct hci_dev *hdev)
-> 
-> 	BT_DBG("%s", hdev->name);
-> 
-> -	cancel_work_sync(&data->work);
-> 	cancel_work_sync(&data->waker);
-> 
-> 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
-> @@ -1181,6 +1179,8 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
-> 	return -EILSEQ;
-> }
-> 
-> +static void btusb_sco_change(struct btusb_data *data);
-> +
-
-do we need this forward declaration or can we just move code around to avoid it?
-
-> static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
-> {
-> 	struct btusb_data *data = hci_get_drvdata(hdev);
-> @@ -1189,7 +1189,7 @@ static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
-> 
-> 	if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
-> 		data->sco_num = hci_conn_num(hdev, SCO_LINK);
-> -		schedule_work(&data->work);
-> +		btusb_sco_change(data);
-> 	}
-> }
-> 
-> @@ -1236,9 +1236,8 @@ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
-> 	return 0;
-> }
-> 
-> -static void btusb_work(struct work_struct *work)
-> +static void btusb_sco_change(struct btusb_data *data)
-> {
-> -	struct btusb_data *data = container_of(work, struct btusb_data, work);
-> 	struct hci_dev *hdev = data->hdev;
-> 	int new_alts;
-> 	int err;
-> @@ -2618,7 +2617,6 @@ static int btusb_probe(struct usb_interface *intf,
-> 	data->udev = interface_to_usbdev(intf);
-> 	data->intf = intf;
-> 
-> -	INIT_WORK(&data->work, btusb_work);
-> 	INIT_WORK(&data->waker, btusb_waker);
-> 	init_usb_anchor(&data->deferred);
-> 	init_usb_anchor(&data->tx_anchor);
-> @@ -2848,8 +2846,6 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
-> 		return -EBUSY;
-> 	}
-> 
-> -	cancel_work_sync(&data->work);
-> -
-> 	btusb_stop_traffic(data);
-> 	usb_kill_anchored_urbs(&data->tx_anchor);
-> 
-> @@ -2922,7 +2918,7 @@ static int btusb_resume(struct usb_interface *intf)
-> 	play_deferred(data);
-> 	clear_bit(BTUSB_SUSPENDING, &data->flags);
-> 	spin_unlock_irq(&data->txlock);
-> -	schedule_work(&data->work);
-> +	btusb_sco_change(data);
-
-Can we actually sleep in the resume callbacks? I think so, but I have not testing runtime power management in a while.
-
-Regards
-
-Marcel
+SGkgTWFyY2VsLA0KDQo+ID4+PiBGb3IgU0NPIGNvbm5lY3Rpb25zLCBidHVzYiBkcml2ZXIgc2V0
+cyBhbHRlcm5hdGUgZW5kcG9pbnQNCj4gPj4+IHNldHRpbmcgdG8gMiBieSBkZWZhdWx0ICgxNyBi
+eXRlcyBwZXIgVVNCIHBhY2tldCkuDQo+ID4+PiBXaGVuIGNvbm5lY3Rpb24gaXMgY29tcGxldGVk
+IGFuZCBhaXJtb2RlIHRyYW5zcGFyZW50IGhhcyBiZWVuDQo+ID4+IG5lZ290aWF0ZWQsDQo+ID4+
+PiBhbHRlcm5hdGUgc2V0dGluZyBhcmUgbm90IGNoYW5nZWQgdG8gMSAoOSBieXRlcyBwZXIgVVNC
+IHBhY2tldCkuDQo+ID4+PiBUaGlzIHJlc3VsdHMgaW4gd3JvbmcgcGFja2V0cyBiZWluZyBzZW50
+IGFuZCAicm9ib3RpYyIgYXVkaW8uDQo+ID4+Pg0KPiA+Pj4gTm90aWZ5IHRoZSBkcml2ZXIgdGhh
+dCBlbmRwb2ludCBzZXR0aW5ncyBtdXN0IGNoYW5nZS4NCj4gPj4+DQo+ID4+PiBTaWduZWQtb2Zm
+LWJ5OiBLdWJhIFBhd2xhayA8a3ViYXgudC5wYXdsYWtAaW50ZWwuY29tPg0KPiA+Pj4gLS0tDQo+
+ID4+PiBkcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIHwgMTIgKysrKysrKysrKystDQo+ID4+PiBu
+ZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jIHwgIDUgKysrKysNCj4gPj4+IDIgZmlsZXMgY2hhbmdl
+ZCwgMTYgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiA+Pj4NCj4gPj4+IGRpZmYgLS1n
+aXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2Iu
+Yw0KPiA+Pj4gaW5kZXgNCj4gPj4NCj4gMjQ3YjEwNjJjYjlhZmZjNjdkOWU3ZjdhMDIzNGMxNjdm
+OTBmNGI3OS4uNjVjZTA1NGQwNzU1ZGI5MDc4YTBmMDgxMzgyOA0KPiA+PiBkYmIyNzhlYThmMWMg
+MTAwNjQ0DQo+ID4+PiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4+PiArKysg
+Yi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4+PiBAQCAtMTE5MSw2ICsxMTkxLDkgQEAg
+c3RhdGljIHZvaWQgYnR1c2Jfbm90aWZ5KHN0cnVjdCBoY2lfZGV2ICpoZGV2LA0KPiA+PiB1bnNp
+Z25lZCBpbnQgZXZ0KQ0KPiA+Pj4gCQlkYXRhLT5zY29fbnVtID0gaGNpX2Nvbm5fbnVtKGhkZXYs
+IFNDT19MSU5LKTsNCj4gPj4+IAkJc2NoZWR1bGVfd29yaygmZGF0YS0+d29yayk7DQo+ID4+PiAJ
+fQ0KPiA+Pj4gKw0KPiA+Pj4gKwlpZiAoZXZ0ID09IEhDSV9OT1RJRllfVk9JQ0VfU0VUVElORykN
+Cj4gPj4+ICsJCXNjaGVkdWxlX3dvcmsoJmRhdGEtPndvcmspOw0KPiA+Pj4gfQ0KPiA+Pg0KPiA+
+PiBhY3R1YWxseSBjYW4geW91IHRyeSB0byB0YWtlIHRoZSBzY2hlZHVsZV93b3JrIG91dCBoZXJl
+LiBTaW5jZSBoZGV2LT5ub3RpZnkNCj4gaXMNCj4gPj4gbm8gbG9uZ2VyIGNhbGxlZCBmcm9tIGJv
+dHRvbSBoYWxmLCBpdCBpcyBwZXJmZWN0bHkgZmluZSB0byBzbGVlcCBpbiB0aGlzIGNhbGxiYWNr
+Lg0KPiA+PiBUaGlzIGlzIGEgbGVmdG92ZXIgZnJvbSBhIGxvbmcgdGltZSBhZ28gd2hlcmUgYWxs
+IHRoZSBwYWNrZXQgcHJvY2Vzc2luZyB3YXMNCj4gZG9uZQ0KPiA+PiBpbiB0aGUgYm90dG9tIGhh
+bGYuDQo+ID4+DQo+ID4+IE9uY2UgdGhhdCBoYXMgYmVlbiByZW1vdmVkLCBJIHRoaW5rIHlvdSBj
+YW4ganVzdCBzd2l0Y2ggdGhlIGFsdGVybmF0ZQ0KPiBzZXR0aW5nDQo+ID4+IHJpZ2h0IGluIGJ0
+dXNiX25vdGlmeS4NCj4gPg0KPiA+IFBhcmRvbiBteSBpZ25vcmFuY2UsIGJ1dCBJIG5lZWQgdG8g
+bWFrZSBzdXJlIHRoYXQgdGhpcyB3b3VsZCBpbnZvbHZlDQo+IHJlbW92aW5nICd3b3JrJyB3b3Jr
+cXVldWUgYW5kIGNhbGxpbmcgYnR1c2Jfd29yayAocmVuYW1lZCB0byBub3QgY29udGFpbg0KPiBf
+d29yaykgZXZlcnl3aGVyZSwgd2hlcmUgc2NoZWR1bGVfd29yaygmZGF0YS0+d29yayk7IGlzIGNh
+bGxlZD8NCj4gDQo+IHllcC4gVGhhdCBpcyBleGFjdGx5IHdoYXQgdGhpcyBtZWFucy4gUmVtb3Zl
+IGRhdGEtPndvcmsgZnJvbSBldmVyeXdoZXJlLg0KPiANCj4gPj4+IHN0YXRpYyBpbmxpbmUgaW50
+IF9fc2V0X2lzb2NfaW50ZXJmYWNlKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBpbnQgYWx0c2V0dGlu
+ZykNCj4gPj4+IEBAIC0xMjU1LDcgKzEyNTgsMTEgQEAgc3RhdGljIHZvaWQgYnR1c2Jfd29yayhz
+dHJ1Y3Qgd29ya19zdHJ1Y3QNCj4gKndvcmspDQo+ID4+PiAJCQlzZXRfYml0KEJUVVNCX0RJRF9J
+U09fUkVTVU1FLCAmZGF0YS0+ZmxhZ3MpOw0KPiA+Pj4gCQl9DQo+ID4+Pg0KPiA+Pj4gLQkJaWYg
+KGhkZXYtPnZvaWNlX3NldHRpbmcgJiAweDAwMjApIHsNCj4gPj4+ICsJCWlmIChoZGV2LT52b2lj
+ZV9zZXR0aW5nICYgQlRfVk9JQ0VfVFJBTlNQQVJFTlQpIHsNCj4gPj4+ICsJCQlzdGF0aWMgY29u
+c3QgaW50IGFsdHNbM10gPSB7IDEsIDIsIDMgfTsNCj4gPj4+ICsNCj4gPj4+ICsJCQluZXdfYWx0
+cyA9IGFsdHNbZGF0YS0+c2NvX251bSAtIDFdOw0KPiA+Pj4gKwkJfSBlbHNlIGlmIChoZGV2LT52
+b2ljZV9zZXR0aW5nICYgMHgwMDIwKSB7DQo+ID4+PiAJCQlzdGF0aWMgY29uc3QgaW50IGFsdHNb
+M10gPSB7IDIsIDQsIDUgfTsNCj4gPj4+DQo+ID4+PiAJCQluZXdfYWx0cyA9IGFsdHNbZGF0YS0+
+c2NvX251bSAtIDFdOw0KPiA+Pj4gQEAgLTEyNjcsNiArMTI3NCw5IEBAIHN0YXRpYyB2b2lkIGJ0
+dXNiX3dvcmsoc3RydWN0IHdvcmtfc3RydWN0DQo+ICp3b3JrKQ0KPiA+Pj4gCQkJY2xlYXJfYml0
+KEJUVVNCX0lTT0NfUlVOTklORywgJmRhdGEtPmZsYWdzKTsNCj4gPj4+IAkJCXVzYl9raWxsX2Fu
+Y2hvcmVkX3VyYnMoJmRhdGEtPmlzb2NfYW5jaG9yKTsNCj4gPj4+DQo+ID4+PiArCQkJaWYgKGhk
+ZXYtPnZvaWNlX3NldHRpbmcgJiBCVF9WT0lDRV9UUkFOU1BBUkVOVCkNCj4gPj4+ICsJCQkJaGRl
+di0+dm9pY2Vfc2V0dGluZyAmPQ0KPiA+PiB+QlRfVk9JQ0VfVFJBTlNQQVJFTlQ7DQo+ID4+PiAr
+DQo+ID4+PiAJCQkvKiBXaGVuIGlzb2Nocm9ub3VzIGFsdGVybmF0ZSBzZXR0aW5nIG5lZWRzIHRv
+IGJlDQo+ID4+PiAJCQkgKiBjaGFuZ2VkLCBiZWNhdXNlIFNDTyBjb25uZWN0aW9uIGhhcyBiZWVu
+IGFkZGVkDQo+ID4+PiAJCQkgKiBvciByZW1vdmVkLCBhIHBhY2tldCBmcmFnbWVudCBtYXkgYmUg
+bGVmdCBpbiB0aGUNCj4gPj4+IGRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5j
+IGIvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0KPiA+Pj4gaW5kZXgNCj4gPj4NCj4gOGFjZWM5
+MzIxMjNhZGU5MDYxOTJlYmJmZDJkYWVjZWU5YjUxZjY5Ny4uMDhlNzc1MzdjNmViNjljOTcyN2Ni
+NDFhMmNhDQo+ID4+IDg0MjlmNGQ3YTQ5NDEgMTAwNjQ0DQo+ID4+PiAtLS0gYS9uZXQvYmx1ZXRv
+b3RoL2hjaV9ldmVudC5jDQo+ID4+PiArKysgYi9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jDQo+
+ID4+PiBAQCAtMzc3MCw2ICszNzcwLDExIEBAIHN0YXRpYyB2b2lkIGhjaV9zeW5jX2Nvbm5fY29t
+cGxldGVfZXZ0KHN0cnVjdA0KPiA+PiBoY2lfZGV2ICpoZGV2LA0KPiA+Pj4gCQlicmVhazsNCj4g
+Pj4+IAl9DQo+ID4+Pg0KPiA+Pj4gKwlpZiAoZXYtPmFpcl9tb2RlID09IFNDT19BSVJNT0RFX1RS
+QU5TUCkgew0KPiA+Pj4gKwkJaGRldi0+dm9pY2Vfc2V0dGluZyB8PSBCVF9WT0lDRV9UUkFOU1BB
+UkVOVDsNCj4gPj4+ICsJCWhkZXYtPm5vdGlmeShoZGV2LCBIQ0lfTk9USUZZX1ZPSUNFX1NFVFRJ
+TkcpOw0KPiA+Pj4gKwl9DQo+ID4+PiArDQo+ID4+DQo+ID4+IFRoaXMgaXMgYWN0dWFsbHkgc29t
+ZXRoaW5nIHRoYXQgaXMgbm90IGZ1bGx5IGNvcnJlY3QuIFRoZSBoZGV2LT52b2ljZV9zZXR0aW5n
+IGlzDQo+ID4+IHN1cHBvc2UgdG8gcmVwcmVzZW50IHRoZSB2YWx1ZSBvZiB0aGUgc2V0dGluZy4g
+SXQgc2hvdWxkIG5vdCBiZSBhZmZlY3RlZCBieQ0KPiB0aGUNCj4gPj4gY29ubmVjdGlvbnMuIEVz
+cGVjaWFsbHkgc2luY2UgdGhpcyBnZXRzIHRyaWNreSB3aGVuIHlvdSBoYXZlIHR3byBlU0NPDQo+
+ID4+IGNvbm5lY3Rpb25zLiBPbmUgdXNpbmcgdHJhbnNwYXJlbnQgYW5kIGFub3RoZXIgdXNpbmcg
+Q1ZTRC4NCj4gPj4NCj4gPj4gV2hhdCB3ZSBtaWdodCBuZWVkIHRvIGRvIGhlcmUgaXMgYWN0dWFs
+bHkgdHJhY2sgdGhlIG51bWJlciBvZiB0cmFuc3BhcmVudA0KPiB2cw0KPiA+PiBub24tdHJhbnNw
+YXJlbnQgZVNDTyBjb25uZWN0aW9ucyBzZXBhcmF0ZWx5Lg0KPiA+DQo+ID4gSXMgaXQgcG9zc2li
+bGUgdG8gaGF2ZSB0cmFuc3BhcmVudCBhbmQgQ1ZTRCBjb25uZWN0aW9ucyBhdCB0aGUgc2FtZSB0
+aW1lPw0KPiA+IENvcmUgc3BlYyA0LjAsIFZvbCA0LCBwYXJ0IEIsIDIuMS4xIHNwZWNpZmllcyBl
+bmRwb2ludCBjb25maWd1cmF0aW9uIGZvciBtdWx0aXBsZXMNCj4gPiBvZiA4Yml0IG9yIDE2IGJp
+dCBjb25uZWN0aW9ucyBvbmx5IGJ1dCBub3QgYSBtaXggb2YgdGhlc2UuIEFsc28sIHNlY29uZCBl
+eGFtcGxlDQo+ID4gcHJvdmlkZWQgb25seSBzaG93cyB0d28gY29ubmVjdGlvbnMgb2YgdGhlIHNh
+bWUsIDhiaXQgdHlwZS4gSSB0aGluayB0aGlzDQo+ID4gZXhhbXBsZSBmb3JiaWRzIGEgbWl4IG9m
+IGNoYW5uZWxzLiBUd28gU0NPIGNoYW5uZWxzIG5lZWQgdG8gc2hhcmUgVVNCDQo+ID4gZW5kcG9p
+bnQsIGJ1dCBhIHJ1bGUgb2YgaGF2aW5nIGVhY2ggU0NPIGRhdGEgcGFja2V0IGRpdmlkZWQgaW50
+byAzIGZyYWdtZW50cywNCj4gPiBlYWNoIHNlbnQgZXZlcnkgMW1zIG5lZWRzIHRvIGJlIHByZXNl
+cnZlZC4gVGhhdCBtZWFucyB0aGF0IHdoZW4gdHdvDQo+ID4gY29ubmVjdGlvbnMgYXJlIGNhcnJp
+ZWQgb3ZlciBVU0IsIHBhY2tldCBmcmVxdWVuY3kgcGVyIGNoYW5uZWwgaXMgaGFsdmVkIGJ1dA0K
+PiA+IHBhY2tldCBzaXplIGRvdWJsZXMuIFRoaXMgY2FuIG9ubHkgYmUgYWNoaWV2ZWQgaWYgYm90
+aCBjb25uZWN0aW9uIGhhdmUgdGhlDQo+ID4gc2FtZSBwYWNrZXQgc2l6ZS4gSW4gY2FzZSBvZiAx
+NiBhbmQgOCBiaXQgY29leGlzdGVuY2UsIDhiaXQgY2hhbm5lbCB3b3VsZCBiZQ0KPiA+IHJlcXVp
+cmVkIHRvIGluY3JlYXNlIGl0cyBwYWNrZXRzIHRvIDQ4IGJpdCwgd2hpY2ggdHJhbnNsYXRlcyB0
+byAzIGZyYWdtZW50IDE3DQo+ID4gYnl0ZXMgZWFjaCBldmVyeSAxbXMsIGJ1dCAxNmJpdCBjaGFu
+bmVsIHdvdWxkIHJlcXVpcmUgOTYgYnl0ZSBwYWNrZXRzLCB3aGljaA0KPiA+IG1lYW5zIDMzIGJ5
+dGUgZnJhZ21lbnRzIGV2ZXJ5IDFtcy4gT25lIGVuZHBvaW50IGNhbm5vdCBzdXBwb3J0IGl0LiBT
+byB3aGVuDQo+ID4gd2UgaGF2ZSBhIHRyYW5zcGFyZW50IFNDTyBsaW5rLCB3ZSBjYW4gb25seSBh
+ZGQgbW9yZSB0cmFuc3BhcmVudCBTQ08gbGlua3MNCj4gPiBhbmQgdGhpcyBkZXZpY2UgaXMgQlRf
+Vk9JQ0VfVFJBTlNQQVJFTlQgb25seS4gT3IgYW0gSSBmdW5kYW1lbnRhbGx5DQo+ID4gd3Jvbmc/
+DQo+IA0KPiBXZSBkbyBub3Qgc3VwcG9ydCBtdWx0aXBsZSBTQ08gbGlua3MgdG8gdGhlIHNhbWUg
+ZGV2aWNlLiBIb3dldmVyIHdlIGRvDQo+IHN1cHBvcnQgbXVsdGkgU0NPIGxpbmtzIHRvIHR3byBk
+aWZmZXJlbnQgZGV2aWNlcyBhdCB0aGUgc2FtZSB0aW1lLg0KPiANCj4gVGhlcmUgaXMgc29tZXRo
+aW5nIHRoYXQgaXMgc3BlY2lmaWMgdG8gdGhlIEludGVsIGNvbnRyb2xsZXJzIHdpdGggdGhlIDMg
+ZnJhZ21lbnRzLg0KPiBUaGF0IGlzIG5vdCBuZWNlc3NhcmlseSB0aGUgc2FtZSBmb3IgYWxsIGNv
+bnRyb2xsZXJzLg0KPiANCj4gQWxzbyBmb3IgSW50ZWwgY29udHJvbGxlcnMgd2UgY291bGQgbG9v
+ayBpbnRvIFNDTyBvdmVyIGJ1bGsgZW5kcG9pbnRzLiBJIGtub3cNCj4gdGhhdCB3ZSBkbyBzdXBw
+b3J0IHRoYXQgYW5kIGl0IGlzIGFjdHVhbGx5IG1vcmUgcG93ZXIgZWZmaWNpZW50LiBIb3dldmVy
+IGZpcnN0DQo+IHdlIG1pZ2h0IHRyeSB0byBnZXQgdGhpcyBmaXhlZCB3aXRoIHVzaW5nIGlzb2No
+cm9ub3VzIGVuZHBvaW50cy4gVGhlbiB3ZSBjYW4NCj4gdHJ5IHRvIGVuYWJsZSBpdCBmb3IgYnVs
+ayBlbmRwb2ludHMuIFlvdSBoYXZlIGEgZ29vZCB0ZXN0IHNldHVwIGFuZCBpdCBtaWdodCBiZQ0K
+PiB3b3J0aCB3aGlsZSBmb3IgeW91IHRvIHRha2UgYSBzdGFiIGF0IGl0Lg0KPg0KDQpTbyBJJ20g
+bWlzc2luZyBhIGJpZ2dlciBwaWN0dXJlLiBJIGJhc2VkIG15IHBhdGNoIG9uIHdoYXQgaXMgc3Bl
+Y2lmaWVkIGluIHRoZSBDb3JlDQpzcGVjLCBlc3BlY2lhbGx5IHRoaXMgcnVsZSBvZiAzIGZyYWdt
+ZW50cyBwZXIgcGFja2V0LiBJIGRvbid0IGdldCB3aGF0IGlzIHRoZSBkaWZmZXJlbmNlDQpiZXR3
+ZWVuIG11bHRpcGxlIFNDTyBjaGFubmVscyB0byBvbmUgZGV2aWNlIG9yIG11bHRpcGxlIGRldmlj
+ZXMgd2l0aCBvbmUgU0NPIGF0DQp0aGUgdGltZS4gVGhlIGNvbnRyb2xsZXIgaGFzIG9ubHkgb25l
+IFVTQiBpbnRlcmZhY2UgZm9yIGlzb2Nocm9ub3VzIGNvbm5lY3Rpb25zLCBzbw0KaXQgaXMgdGhl
+IHNhbWUgdGhpbmc/DQoNCj4gPiBJIGhhdmUgbm8gd2F5IG9mIHRlc3RpbmcgbXVsdGlwbGUgU0NP
+IGxpbmtzLg0KPiANCj4gSSB3b3VsZCB0cnkgdG8ganVzdCBvcGVuIGEgc2Vjb25kIEhGUCBjb25u
+ZWN0aW9uLiBJbiB0aGVvcnkgdGhhdCBzaG91bGQganVzdA0KPiB3b3JrLiBQYWlyIHR3byBwaG9u
+ZXMgYW5kIG9Gb25vICsgQmx1ZVogc2hvdWxkIGRvIHRoZSByaWdodCB0aGluZy4gVGhlDQo+IGNv
+bnRyb2xsZXIgbWlnaHQgaGF2ZSBhIHJlc291cmNlIGlzc3VlIHdpdGggdGhpcywgYnV0IHRoZW9y
+ZXRpY2FsIHRoaXMgc2hvdWxkDQo+IHdvcmsuDQoNCkkgb25seSBoYXZlIFdpbGtpbnNQZWFrIEI1
+djIgYW5kIHRoaXMgb25lIGRvZXMgbm90IGFsbG93IHNlY29uZHMgU0NPLiBJdCBpcw0KcmVqZWN0
+ZWQgYnkgdGhlIGNvbnRyb2xsZXIsIGFuZCBob3N0IGlzIG5vdCBldmVuIGF3YXJlIHRoYXQgYW4g
+YXR0ZW1wdCB3YXMgbWFkZS4NCg0KUmVnYXJkcw0KS3ViYQ0KDQpJbnRlbCBEZXV0c2NobGFuZCBH
+bWJIClJlZ2lzdGVyZWQgQWRkcmVzczogQW0gQ2FtcGVvbiAxMC0xMiwgODU1NzkgTmV1YmliZXJn
+LCBHZXJtYW55ClRlbDogKzQ5IDg5IDk5IDg4NTMtMCwgd3d3LmludGVsLmRlCk1hbmFnaW5nIERp
+cmVjdG9yczogQ2hyaXN0aW4gRWlzZW5zY2htaWQsIFByb2YuIERyLiBIZXJtYW5uIEV1bApDaGFp
+cnBlcnNvbiBvZiB0aGUgU3VwZXJ2aXNvcnkgQm9hcmQ6IFRpZmZhbnkgRG9vbiBTaWx2YQpSZWdp
+c3RlcmVkIE9mZmljZTogTXVuaWNoCkNvbW1lcmNpYWwgUmVnaXN0ZXI6IEFtdHNnZXJpY2h0IE11
+ZW5jaGVuIEhSQiAxODY5MjgK
 
