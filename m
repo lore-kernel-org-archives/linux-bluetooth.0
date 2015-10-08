@@ -1,288 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 Oct 2015 10:07:44 -0700
-From: Bjorn Andersson <bjorn.andersson@sonymobile.com>
-To: Marcel Holtmann <marcel@holtmann.org>, <agross@codeaurora.org>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, Fengwei
- Yin <fengwei.yin@linaro.org>, Srinivas Kandagatla
-	<srinivas.kandagatla@linaro.org>, Linux Kernel Mailing List
-	<linux-kernel@vger.kernel.org>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, "linux-arm-msm@vger.kernel.org"
-	<linux-arm-msm@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: hci_smd: Qualcomm WCNSS HCI driver
-Message-ID: <20151008170744.GF24668@usrtlx11787.corpusers.net>
-References: <1443654180-29416-1-git-send-email-bjorn.andersson@sonymobile.com>
- <036E1E75-8E6A-4116-A648-A188A8458416@holtmann.org>
- <20151001203338.GW24668@usrtlx11787.corpusers.net>
- <31CC1992-41BB-484C-9784-3A54D0EF6FF3@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <31CC1992-41BB-484C-9784-3A54D0EF6FF3@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+Subject: Re: [PATCH] Bluetooth: remove btusb_work related workqueue
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <6D48126C-1328-4466-9415-D48367F574C9@holtmann.org>
+Date: Thu, 8 Oct 2015 18:57:13 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <F79E09E1-497A-46AE-879B-F4AF321285AC@holtmann.org>
+References: <1444316120-22893-1-git-send-email-kubax.t.pawlak@intel.com> <7D38034D-BDC6-4FD9-931E-7518FA2D20A4@holtmann.org> <088CC8BACB3382439E91D9919CE3502436568B42@IRSMSX107.ger.corp.intel.com> <6D48126C-1328-4466-9415-D48367F574C9@holtmann.org>
+To: "Pawlak, KubaX T" <kubax.t.pawlak@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat 03 Oct 09:55 PDT 2015, Marcel Holtmann wrote:
+Hi Kuba,
 
-> Hi Bjorn,
+>>>> Workqueue handling btusb_work is no longer needed as btusb_notify
+>>>> can sleep.
+>>>> 
+>>>> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
+>>>> ---
+>>>> drivers/bluetooth/btusb.c | 14 +++++---------
+>>>> 1 file changed, 5 insertions(+), 9 deletions(-)
+>>>> 
+>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>> index
+>>> 247b1062cb9affc67d9e7f7a0234c167f90f4b79..98c616ddd7bac53b2d5d5f8b3dcc
+>>> 2dca2b201e63 100644
+>>>> --- a/drivers/bluetooth/btusb.c
+>>>> +++ b/drivers/bluetooth/btusb.c
+>>>> @@ -350,7 +350,6 @@ struct btusb_data {
+>>>> 
+>>>> 	unsigned long flags;
+>>>> 
+>>>> -	struct work_struct work;
+>>>> 	struct work_struct waker;
+>>>> 
+>>>> 	struct usb_anchor deferred;
+>>>> @@ -980,7 +979,6 @@ static int btusb_close(struct hci_dev *hdev)
+>>>> 
+>>>> 	BT_DBG("%s", hdev->name);
+>>>> 
+>>>> -	cancel_work_sync(&data->work);
+>>>> 	cancel_work_sync(&data->waker);
+>>>> 
+>>>> 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+>>>> @@ -1181,6 +1179,8 @@ static int btusb_send_frame(struct hci_dev *hdev,
+>>> struct sk_buff *skb)
+>>>> 	return -EILSEQ;
+>>>> }
+>>>> 
+>>>> +static void btusb_sco_change(struct btusb_data *data);
+>>>> +
+>>> 
+>>> do we need this forward declaration or can we just move code around to avoid
+>>> it?
+>>> 
+>>>> static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+>>>> {
+>>>> 	struct btusb_data *data = hci_get_drvdata(hdev);
+>>>> @@ -1189,7 +1189,7 @@ static void btusb_notify(struct hci_dev *hdev,
+>>> unsigned int evt)
+>>>> 
+>>>> 	if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
+>>>> 		data->sco_num = hci_conn_num(hdev, SCO_LINK);
+>>>> -		schedule_work(&data->work);
+>>>> +		btusb_sco_change(data);
+>>>> 	}
+>>>> }
+>>>> 
+>>>> @@ -1236,9 +1236,8 @@ static inline int __set_isoc_interface(struct hci_dev
+>>> *hdev, int altsetting)
+>>>> 	return 0;
+>>>> }
+>>>> 
+>>>> -static void btusb_work(struct work_struct *work)
+>>>> +static void btusb_sco_change(struct btusb_data *data)
+>>>> {
+>>>> -	struct btusb_data *data = container_of(work, struct btusb_data,
+>>> work);
+>>>> 	struct hci_dev *hdev = data->hdev;
+>>>> 	int new_alts;
+>>>> 	int err;
+>>>> @@ -2618,7 +2617,6 @@ static int btusb_probe(struct usb_interface *intf,
+>>>> 	data->udev = interface_to_usbdev(intf);
+>>>> 	data->intf = intf;
+>>>> 
+>>>> -	INIT_WORK(&data->work, btusb_work);
+>>>> 	INIT_WORK(&data->waker, btusb_waker);
+>>>> 	init_usb_anchor(&data->deferred);
+>>>> 	init_usb_anchor(&data->tx_anchor);
+>>>> @@ -2848,8 +2846,6 @@ static int btusb_suspend(struct usb_interface *intf,
+>>> pm_message_t message)
+>>>> 		return -EBUSY;
+>>>> 	}
+>>>> 
+>>>> -	cancel_work_sync(&data->work);
+>>>> -
+>>>> 	btusb_stop_traffic(data);
+>>>> 	usb_kill_anchored_urbs(&data->tx_anchor);
+>>>> 
+>>>> @@ -2922,7 +2918,7 @@ static int btusb_resume(struct usb_interface *intf)
+>>>> 	play_deferred(data);
+>>>> 	clear_bit(BTUSB_SUSPENDING, &data->flags);
+>>>> 	spin_unlock_irq(&data->txlock);
+>>>> -	schedule_work(&data->work);
+>>>> +	btusb_sco_change(data);
+>>> 
+>>> Can we actually sleep in the resume callbacks? I think so, but I have not testing
+>>> runtime power management in a while.
+>> 
+>> Apparently we can't, so workqueue needs to stay and this patch is invalid.
 > 
-[..]
-> >> Especially the kbuild test robot complained loudly.
-> >>
-> >
-> > Sorry, I forgot to mention in the patch that the patch depends on the
-> > qcom_smd_id patch - that's available in linux-next. I will take another
-> > look, but I think that was the cause of all the issues.
-> 
-> which means, I can only merge this driver when this other patch has
-> hit net-next tree. Unless I take the qcom_smd_id through
-> bluetooth-next tree which doesn't look like a good idea.
-> 
+> I think that removing the usage of the workqueue in btusb_notify is still a good thing since it reduces the latency when establishing SCO connections.
 
-I was going to suggest that we just wait for -rc1, but the new additions
-to SMD adds a bunch of new items on the dependency list.
+actually I wonder if the call to usb_set_interface is needed on resume in the first place. Maybe this is actually not needed and we just need to restart the URBs.
 
-Perhaps once we agree we can get your Ack and have Andy pull it through
-the qcom-soc tree together with the SMD patches?
+Do you have the chance to test and see if the alternate setting actually changed over resume?
 
-> >>> obj-$(CONFIG_BT_INTEL)              += btintel.o
-> >>> obj-$(CONFIG_BT_ATH3K)              += ath3k.o
-> >>> diff --git a/drivers/bluetooth/hci_smd.c b/drivers/bluetooth/hci_smd.c
-> > [..]
-> >>> +#include <net/bluetooth/hci.h>
-> >>
-> >> The hci.h include is not needed. If you do, then you are doing
-> >> something fishy.
-> >>
-> >
-> > Nothing fishy going on here, so I'll drop it.
-> >
-> >>> +
-> >>> +static struct {
-> >>> +   struct qcom_smd_channel *acl_channel;
-> >>> +   struct qcom_smd_channel *cmd_channel;
-> >>> +
-> >>> +   struct hci_dev *hci;
-> >>> +} smd_hci;
-> >>
-> >> A driver that only supports a single instance of a device and uses a
-> >> global variable to do so is not a good idea. There should be no reason
-> >> for this. Why is this done this way.
-> >>
-> >
-> > There's two channels coming up, each probing the associated driver that
-> > combines these into 1 hci device.
-> >
-> > So I have two options;
-> >
-> > * the original idea was to implement multi-channel-per-device support in
-> >  SMD, but as this is the only known case where that's needed I really
-> >  don't want to add all the extra complexity to SMD.
-> >
-> > * I can accept the fact that this is silicon inside the MSM SoC and
-> >  should never exist in more than one instance and make this hack. The
-> >  first version I implemented had this structure allocated on the first
-> >  probe, but that didn't really add any value to the static struct.
-> >
-> > I picked the second option due to the fact that the patch to SMD was way
-> > bigger then this patch, and full of nasty logic.
-> 
-> Writing a driver that assume it is a single instance of a given device
-> is never a good idea. While you might find some instances in the
-> kernel if you look hard enough, but that doesn't mean we should keep
-> doing this. So this needs addressing.
-> 
+Regards
 
-Fair enough.
+Marcel
 
-> >
-> >>> +
-> >>> +static int smd_hci_recv(unsigned type, const void *data, size_t count)
-> >>> +{
-> >>> +   struct sk_buff *skb;
-> >>> +   void *buf;
-> >>> +   int ret;
-> >>> +
-> >>> +   skb = bt_skb_alloc(count, GFP_ATOMIC);
-> >>
-> >> Is it required that this is GFP_ATOMIC or can this actually be
-> >> GFP_KERNEL?
-> >>
-> >
-> > This is being called from IRQ context upon receiving data on the
-> > channels.
-> 
-> I wonder why that is needed, but seems an issue in the SMD subsystem.
-> So this is fine, might want to add a comment above the bt_skb_alloc to
-> remind us.
-> 
-
-It's a design choice of mine, to deliver the incoming data directly from
-the interrupt handler. Sure enough we could have had a worker thread or
-something do it.
-
-I'll add a comment.
-
-> >
-> >>> +   if (!skb)
-> >>> +           return -ENOMEM;
-> >>> +
-> >>> +   buf = skb_put(skb, count);
-> >>> +   memcpy_fromio(buf, data, count);
-> >>
-> >> Why is this a memcpy_fromio here?
-> >>
-> >
-> > A memcpy here doesn't seem to work on ARM64, probably because the
-> > pointer references ioremapped memory. We are discussing either marking
-> > the data __iomem or perhaps using memremap rather then ioremap.
-> 
-> I would add a comment here as well to remind everybody why this is
-> used. And marking up the pointers is a good idea as well.
-> 
-
-Yeah, I have this on the todo.
-Will put a comment here for now.
-
-[..]
-
-> >>> +
-> >>> +   return ret;
-> >>> +}
-> >>> +
-> >>> +static int smd_hci_open(struct hci_dev *hci)
-> >>> +{
-> >>> +   return 0;
-> >>> +}
-> >>> +
-> >>> +static int smd_hci_close(struct hci_dev *hci)
-> >>> +{
-> >>> +   return 0;
-> >>> +}
-> >>
-> >> These two need to at least handling the HCI_RUNNING flag setting and
-> >> clearing like all the other drivers do.
-> >>
-> >
-> > I'm puzzled to the purpose of this, is this only for indication to user
-> > space or am I missing something?
-> >
-> > I found a couple of others that does nothing but set and clear this bit
-> > in their open and close. Would you be open for a framework patch that
-> > provides this functionality to drivers that doesn't need anything else?
-> 
-> This has been in the drivers for as long as the Bluetooth subsystem
-> has been merged upstream. So Linux 2.4.6 to be precise. I had plans to
-> move this code into the core, but that has not happened yet. So until
-> then, lets just include the HCI_RUNNING part.
-> 
-
-I'll add the pieces.
-
-> If there are drivers not doing this, then that is a bug and needs to
-> be fixed. Please point them out to me.
-> 
-
-What I meant was that I couldn't find anyone consuming this bit, the
-cases I looked at all fiddled with it in various ways.
-
-But I presume it can be seen from userspace.
-
-> >>> +
-> >>> +static int smd_hci_set_bdaddr(struct hci_dev *hci,
-> >>> +                         const bdaddr_t *bdaddr)
-> >>> +{
-> >>> +   u8 buf[12];
-> >>> +
-> >>> +   buf[0] = 0x0b;
-> >>> +   buf[1] = 0xfc;
-> >>> +   buf[2] = 0x9;
-> >>> +   buf[3] = 0x1;
-> >>> +   buf[4] = 0x2;
-> >>
-> >> Use full 0x00 syntax here.
-> >>
-> >
-> > Ok
-> >
-> >>> +   buf[5] = sizeof(bdaddr_t);
-> >>> +   memcpy(buf + 6, bdaddr, sizeof(bdaddr_t));
-> >>
-> >> We also need to be sure that this command only changes the BD_ADDR in
-> >> RAM. It can not be persistent. When resetting / power cycle the
-> >> controller it will fallback to its default.
-> >>
-> >
-> > There seems to be no persistent storage at all in this chip, the BD_ADDR
-> > being used comes from one of the firmware files, so this just adjust the
-> > in-memory configuration.
-> >
-> >>> +
-> >>> +   return qcom_smd_send(smd_hci.cmd_channel, buf, sizeof(buf));
-> >>
-> >> Use __hci_cmd_sync since that is what is suppose to be used in this
-> >> callback. See the other drivers on how this is done.
-> >>
-> >
-> > I did see this, and I first implemented it like that. Unfortunately the
-> > firmware does not ack the command and __hci_cmd_sync() just times out.
-> >
-> > I didn't manage to find a way around this.
-> 
-> What to you mean by this? It does not send a Command Complete? Does it
-> send a Vendor Event instead?
-> 
-
-The immediate problem I had seems to be that I specified the wrong event
-type. With this corrected it passes most of the time - but in some cases
-I don't get the command complete packet back.
-
-I don't know what causes this and I don't have access to the source code
-of the other side :/
-
-> The real problem is that this callback is on purpose synchronous. The
-> core relies on the fact that you only return when it actually
-> completed.
-> 
-
-Makes sense.
-
-> >> I wonder if qca_set_bdaddr_rome is not actually the same command and
-> >> you could just use that instead.
-> >>
-> >
-> > Looks to be exactly the same thing and gives insight in what those first
-> > 5 bytes are. I'll update the magics based on this information.
-> >
-> > If I didn't have the issue of the timeout it seems like I should be able
-> > to just call it.
-> 
-> Has something tried to talk to Qualcomm why that timeout happens? They
-> have something like this for the UART speed change which is changed in
-> NVRAM. Maybe this is a more generic way on how they handle things. It
-> would be good if guys from Qualcomm could give some insights here.
-> However in case of their UART driver, this seems to work as it should.
-> Maybe just a newer firmware is needed.
-> 
-
-Unfortunately this part of Qualcomm hasn't joined the dance yet.
-
-When booting the chip we load a file with "NV values", so I presume that
-this command allows us to patch those entries in runtime.
-
-[..]
-> 
-> That is what USB does when claiming a second interface. I would do
-> exactly that and especially be able to make sure that both channels
-> have the same struct device as parent.
-> 
-
-I was hoping to not have to implement this, as it does complicates the
-life cycle management of things in the SMD core but agrees with you that
-it's cleaner.
-
-I'll finish up the rewrite and send out a new version based on this.
-
-Thanks for the review Marcel!
-
-Regards,
-Bjorn
