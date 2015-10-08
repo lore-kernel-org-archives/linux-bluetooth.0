@@ -1,36 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH 0/6] Bluetooth: 6lowpan cleanups
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1444125804-15577-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 8 Oct 2015 10:46:04 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F5EA2256-B682-49ED-92A8-F6CBBA6F17D4@holtmann.org>
-References: <1444125804-15577-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Simon Fels <simon.fels@canonical.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Simon Fels <simon.fels@canonical.com>
+Subject: [PATCH 2/2] client: add support for new property to list connected profiles
+Date: Thu,  8 Oct 2015 09:43:52 +0200
+Message-Id: <1444290232-19779-2-git-send-email-simon.fels@canonical.com>
+In-Reply-To: <1444290232-19779-1-git-send-email-simon.fels@canonical.com>
+References: <1444290232-19779-1-git-send-email-simon.fels@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This modifies the output of the list of available profiles a bit to allow
+us to print out multiple lists with UUIDs.
+---
+ client/main.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-> Here's a set of initial cleanups for the 6lowpan code which I came up
-> with as I started preparing to implement the new mgmt channel.
-> 
-> Johan Hedberg (6):
->      Bluetooth: 6lowpan: Fix imtu & omtu values
->      Bluetooth: 6lowpan: Remove redundant (and incorrect) MPS assignments
->      Bluetooth: 6lowpan: Remove redundant BT_CONNECTED assignment
->      Bluetooth: 6lowpan: Remove unnecessary chan_open() function
->      Bluetooth: 6lowpan: Rename confusing 'pchan' variables
->      Bluetooth: 6lowpan: Remove unnecessary chan_get() function
-> 
-> net/bluetooth/6lowpan.c | 72 ++++++++++++++++--------------------------------
-> 1 file changed, 24 insertions(+), 48 deletions(-)
-
-all 6 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/client/main.c b/client/main.c
+index 6863593..1d0704a 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -238,15 +238,21 @@ static void print_property(GDBusProxy *proxy, const char *name)
+ 	print_iter("\t", name, &iter);
+ }
+ 
+-static void print_uuids(GDBusProxy *proxy)
++static void print_uuids(GDBusProxy *proxy, const char *name)
+ {
+ 	DBusMessageIter iter, value;
+ 
+-	if (g_dbus_proxy_get_property(proxy, "UUIDs", &iter) == FALSE)
++	if (g_dbus_proxy_get_property(proxy, name, &iter) == FALSE)
+ 		return;
+ 
+ 	dbus_message_iter_recurse(&iter, &value);
+ 
++	rl_printf("\t%s:\n", name);
++
++	if (!dbus_message_iter_has_next(&value)) {
++		rl_printf("\t  None\n");
++	}
++
+ 	while (dbus_message_iter_get_arg_type(&value) == DBUS_TYPE_STRING) {
+ 		const char *uuid, *text;
+ 
+@@ -269,10 +275,10 @@ static void print_uuids(GDBusProxy *proxy)
+ 				n = sizeof(str) - 1;
+ 			}
+ 
+-			rl_printf("\tUUID: %s%*c(%s)\n",
++			rl_printf("\t  %s%*c(%s)\n",
+ 						str, 26 - n, ' ', uuid);
+ 		} else
+-			rl_printf("\tUUID: %*c(%s)\n", 26, ' ', uuid);
++			rl_printf("\t  %*c(%s)\n", 26, ' ', uuid);
+ 
+ 		dbus_message_iter_next(&value);
+ 	}
+@@ -654,7 +660,7 @@ static void cmd_show(const char *arg)
+ 	print_property(proxy, "Powered");
+ 	print_property(proxy, "Discoverable");
+ 	print_property(proxy, "Pairable");
+-	print_uuids(proxy);
++	print_uuids(proxy, "UUIDs");
+ 	print_property(proxy, "Modalias");
+ 	print_property(proxy, "Discovering");
+ }
+@@ -1163,8 +1169,9 @@ static void cmd_info(const char *arg)
+ 	print_property(proxy, "Trusted");
+ 	print_property(proxy, "Blocked");
+ 	print_property(proxy, "Connected");
++	print_uuids(proxy, "ConnectedProfiles");
+ 	print_property(proxy, "LegacyPairing");
+-	print_uuids(proxy);
++	print_uuids(proxy, "UUIDs");
+ 	print_property(proxy, "Modalias");
+ 	print_property(proxy, "ManufacturerData");
+ 	print_property(proxy, "ServiceData");
+-- 
+2.5.0
 
