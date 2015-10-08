@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: bpa10x: Read revision information in setup stage
-Date: Thu,  8 Oct 2015 02:24:06 +0200
-Message-Id: <1444263846-72474-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: bpa10x: Read revision information in setup stage
+Date: Thu,  8 Oct 2015 02:11:00 +0200
+Message-Id: <1444263060-71864-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -22,11 +22,11 @@ string SNIF_102,BB930,02/01/18,10:37:56.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/bpa10x.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ drivers/bluetooth/bpa10x.c | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
-index 88e004ee137e..618b1ef20145 100644
+index 88e004ee137e..7df870c4ca8f 100644
 --- a/drivers/bluetooth/bpa10x.c
 +++ b/drivers/bluetooth/bpa10x.c
 @@ -342,6 +342,24 @@ static int bpa10x_flush(struct hci_dev *hdev)
@@ -54,14 +54,22 @@ index 88e004ee137e..618b1ef20145 100644
  static int bpa10x_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
  {
  	struct bpa10x_data *data = hci_get_drvdata(hdev);
-@@ -454,6 +472,7 @@ static int bpa10x_probe(struct usb_interface *intf, const struct usb_device_id *
- 	hdev->open     = bpa10x_open;
- 	hdev->close    = bpa10x_close;
- 	hdev->flush    = bpa10x_flush;
-+	hdev->setup    = bpa10x_setup;
- 	hdev->send     = bpa10x_send_frame;
+@@ -451,10 +469,11 @@ static int bpa10x_probe(struct usb_interface *intf, const struct usb_device_id *
+ 
+ 	SET_HCIDEV_DEV(hdev, &intf->dev);
+ 
+-	hdev->open     = bpa10x_open;
+-	hdev->close    = bpa10x_close;
+-	hdev->flush    = bpa10x_flush;
+-	hdev->send     = bpa10x_send_frame;
++	hdev->open  = bpa10x_open;
++	hdev->close = bpa10x_close;
++	hdev->flush = bpa10x_flush;
++	hdev->setup = bpa10x_setup;
++	hdev->send  = bpa10x_send_frame;
  
  	set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+ 
 -- 
 2.4.3
 
