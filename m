@@ -1,14 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
-From: wu.zheng@intel.com
+From: Wu Zheng <wu.zheng@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Wu Zheng <wu.zheng@intel.com>
 Subject: [PATCH] Bluetooth: bt net interface can't be set up after 6lowpan connection
-Date: Thu,  8 Oct 2015 13:16:13 +0800
-Message-Id: <1444281373-3173-1-git-send-email-wu.zheng@intel.com>
+Date: Thu,  8 Oct 2015 13:13:02 +0800
+Message-Id: <1444281182-3131-1-git-send-email-wu.zheng@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-From: Wu Zheng <wu.zheng@intel.com>
 
 After set 'hciconfig leadv', bt net interface can't be created
 when the 6lowpan over bluetooth le connection is established by another
