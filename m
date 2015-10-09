@@ -1,44 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bjorn Andersson <bjorn.andersson@sonymobile.com>
 To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
-	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Andy Gross <agross@codeaurora.org>
-CC: Fengwei Yin <fengwei.yin@linaro.org>, Srinivas Kandagatla
-	<srinivas.kandagatla@linaro.org>, <linux-arm-msm@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 6/7] Bluetooth: Add HCI device identifier for Qualcomm SMD
-Date: Fri, 9 Oct 2015 13:48:04 -0700
-Message-ID: <1444423685-14717-7-git-send-email-bjorn.andersson@sonymobile.com>
-In-Reply-To: <1444423685-14717-1-git-send-email-bjorn.andersson@sonymobile.com>
-References: <1444423685-14717-1-git-send-email-bjorn.andersson@sonymobile.com>
+	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, Andy Gross
+	<agross@codeaurora.org>
+CC: <linux-arm-msm@vger.kernel.org>, Fengwei Yin <fengwei.yin@linaro.org>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	<linux-kernel@vger.kernel.org>, <linux-soc@vger.kernel.org>,
+	<linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v2 0/7] Qualcomm WCNSS HCI support
+Date: Fri, 9 Oct 2015 13:47:58 -0700
+Message-ID: <1444423685-14717-1-git-send-email-bjorn.andersson@sonymobile.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch assigns the next free HCI device identifier to Bluetooth
-devices based on the Qualcomm Shared Memory channels.
+After trying to avoid implementing multi-channel support in SMD in v1 of
+the HCI driver for Qualcomm WCNSS BT, this new version includes the
+necessary SMD refactoring and additon of an API that allows SMD devices
+to call back into the SMD core to acquire additonal channels.
 
-Signed-off-by: Bjorn Andersson <bjorn.andersson@sonymobile.com>
----
+The additional channels are tied to the existing SMD device and the life
+cycle of the new channel will be tied to, and affect, the original
+channel.
 
-Changes since v1:
-- Split out this from the btqcomsmd patch
+With this in place the btqcomsmd driver is refactored into being a
+single driver, without global state.
 
- include/net/bluetooth/hci.h | 1 +
- 1 file changed, 1 insertion(+)
+Bjorn Andersson (7):
+  soc: qcom: smd: Introduce callback setter
+  soc: qcom: smd: Split discovery and state change work
+  soc: qcom: smd: Refactor channel open and close handling
+  soc: qcom: smd: Support multiple channels per sdev
+  soc: qcom: smd: Support opening additional channels
+  Bluetooth: Add HCI device identifier for Qualcomm SMD
+  Bluetooth: hci_smd: Qualcomm WCNSS HCI driver
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index e7f938cac7c6..adfb371a19f9 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -60,6 +60,7 @@
- #define HCI_RS232	4
- #define HCI_PCI		5
- #define HCI_SDIO	6
-+#define HCI_SMD		7
- 
- /* HCI controller types */
- #define HCI_BREDR	0x00
+ drivers/bluetooth/Kconfig     |  11 ++
+ drivers/bluetooth/Makefile    |   1 +
+ drivers/bluetooth/btqcomsmd.c | 198 ++++++++++++++++++++++++++++++++++++
+ drivers/soc/qcom/smd.c        | 228 +++++++++++++++++++++++++++++++-----------
+ include/linux/soc/qcom/smd.h  |   8 +-
+ include/net/bluetooth/hci.h   |   1 +
+ 6 files changed, 387 insertions(+), 60 deletions(-)
+ create mode 100644 drivers/bluetooth/btqcomsmd.c
+
 -- 
 2.4.2
