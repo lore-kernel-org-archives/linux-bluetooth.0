@@ -1,101 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btintel: Add support for enabling tracing functionality
-Date: Fri,  9 Oct 2015 14:08:50 +0200
-Message-Id: <1444392530-12882-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 9 Oct 2015 14:31:35 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: btusb: Add support for Broadcom LM_DIAG
+ interface
+Message-ID: <20151009113135.GA23891@t440s.lan>
+References: <1444328588-122301-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1444328588-122301-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For Intel controllers with firmware that allows tracing of baseband
-functionality this allows enabling it via set_diag driver callback.
+Hi Marcel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btintel.c | 32 ++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  6 ++++++
- drivers/bluetooth/btusb.c   |  1 +
- 3 files changed, 39 insertions(+)
+On Thu, Oct 08, 2015, Marcel Holtmann wrote:
+> The Broadcom Bluetooth USB devices have a third interface that is
+> dedicated for LM_DIAG messages. The If#= 2 describes this interface
+> and it consists of one bulk in and one bulk endpoint.
+> 
+> T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#= 38 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=19ff ProdID=0239 Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=btusb
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> 
+> For all Broadcom based devices with this interface, the driver now
+> claims it and schedules URBs for it. This allows to capture the
+> LM_DIAG messages and allows forwarding them via hci_recv_diag into
+> the diagnostic channel of the Bluetooth subsystem.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btusb.c | 228 +++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 224 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 7047fe6a6a2b..95652aa12454 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -91,6 +91,38 @@ int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- }
- EXPORT_SYMBOL_GPL(btintel_set_bdaddr);
- 
-+int btintel_set_diag(struct hci_dev *hdev, bool enable)
-+{
-+	struct sk_buff *skb;
-+	u8 param[3];
-+	int err;
-+
-+	if (!test_bit(HCI_RUNNING, &hdev->flags))
-+		return -ENETDOWN;
-+
-+	if (enable) {
-+		param[0] = 0x03;
-+		param[1] = 0x03;
-+		param[2] = 0x03;
-+	} else {
-+		param[0] = 0x00;
-+		param[1] = 0x00;
-+		param[2] = 0x00;
-+	}
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc43, 3, param, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		BT_ERR("%s: Changing Intel diagnostic mode failed (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_set_diag);
-+
- void btintel_hw_error(struct hci_dev *hdev, u8 code)
- {
- 	struct sk_buff *skb;
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index f0655c476fd2..0af06ae197c1 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -73,6 +73,7 @@ struct intel_secure_send_result {
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-+int btintel_set_diag(struct hci_dev *hdev, bool enable);
- void btintel_hw_error(struct hci_dev *hdev, u8 code);
- 
- void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver);
-@@ -95,6 +96,11 @@ static inline int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdadd
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int btintel_set_diag(struct hci_dev *hdev, bool enable)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
- {
- }
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index cd5e6ff161b8..e9142a4ebd94 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2882,6 +2882,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->send = btusb_send_frame_intel;
- 		hdev->setup = btusb_setup_intel_new;
- 		hdev->hw_error = btintel_hw_error;
-+		hdev->set_diag = btintel_set_diag;
- 		hdev->set_bdaddr = btintel_set_bdaddr;
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
- 	}
--- 
-2.4.3
+This seems to work fine (at least for me) so I went ahead and applied it
+to bluetooth-next. Thanks.
 
+Johan
