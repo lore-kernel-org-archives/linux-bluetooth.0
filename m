@@ -1,114 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLAD6embCViBCAHx+_dvBHoM=AJ1JSW7eVqGPSOv24HXw@mail.gmail.com>
-References: <CAD0=r8x7hEkGZG+ocE1E+ezF8C+4mFoWuROry=xsf_OfPY+_AA@mail.gmail.com>
-	<CABBYNZLAD6embCViBCAHx+_dvBHoM=AJ1JSW7eVqGPSOv24HXw@mail.gmail.com>
-Date: Fri, 9 Oct 2015 12:57:29 -0700
-Message-ID: <CAD0=r8xaEZ5mdu=419D+FHQJa7G_esBpWj=4jQ+tpTuT7M2ryQ@mail.gmail.com>
-Subject: Re: [BlueZ] Difference profiles, dbus profiles and plugins ?
+In-Reply-To: <147B282F-6EBF-4F3A-A74E-33D5A9F54AE9@holtmann.org>
+References: <614A5683-0763-4E64-B178-67577793D8EF@holtmann.org>
+	<51DF00FF-73E9-4E94-A89A-86EBD7220068@holtmann.org>
+	<147B282F-6EBF-4F3A-A74E-33D5A9F54AE9@holtmann.org>
+Date: Fri, 9 Oct 2015 12:48:47 -0700
+Message-ID: <CAD0=r8xFWgeKBtaudHu10zN8w8vfmNkYkwZNDaEVo21sgnRhjg@mail.gmail.com>
+Subject: Re: Issue with new LE connection creation
 From: Jakub Pawlowski <jpawlowski@google.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Oct 9, 2015 at 12:32 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Fri, Oct 9, 2015 at 11:48 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
 > Hi Jakub,
 >
-> On Fri, Oct 9, 2015 at 6:14 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
->> Hi,
+>>> so when I try to connect a LE L2CAP connection to a device that does no=
+t exist and then abort it will not have reached the timeout, I get this:
+>>>
+>>> < HCI Command: LE Add Device To White List (0x08|0x0011) plen 7
+>>>       Address type: Public (0x00)
+>>>       Address: 11:22:33:44:55:66 (OUI 11-22-33)
+>>>> HCI Event: Command Complete (0x0e) plen 4
+>>>     LE Add Device To White List (0x08|0x0011) ncmd 1
+>>>       Status: Success (0x00)
+>>> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+>>>       Type: Passive (0x00)
+>>>       Interval: 60.000 msec (0x0060)
+>>>       Window: 30.000 msec (0x0030)
+>>>       Own address type: Public (0x00)
+>>>       Filter policy: Ignore not in white list (0x01)
+>>>> HCI Event: Command Complete (0x0e) plen 4
+>>>     LE Set Scan Parameters (0x08|0x000b) ncmd 1
+>>>       Status: Success (0x00)
+>>> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>>>       Scanning: Enabled (0x01)
+>>>       Filter duplicates: Enabled (0x01)
+>>>> HCI Event: Command Complete (0x0e) plen 4
+>>>     LE Set Scan Enable (0x08|0x000c) ncmd 1
+>>>       Status: Success (0x00)
+>>> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>>>       Scanning: Disabled (0x00)
+>>>       Filter duplicates: Disabled (0x00)
+>>>> HCI Event: Command Complete (0x0e) plen 4
+>>>     LE Set Scan Enable (0x08|0x000c) ncmd 1
+>>>       Status: Success (0x00)
+>>> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>>>       Scanning: Disabled (0x00)
+>>>       Filter duplicates: Disabled (0x00)
+>>>> HCI Event: Command Complete (0x0e) plen 4
+>>>     LE Set Scan Enable (0x08|0x000c) ncmd 1
+>>>       Status: Command Disallowed (0x0c)
+>>>
+>>> Notice the two attempts for disabling scanning. We should not do that. =
+This is clearly a bug. This can be easily reproduced with latest bluetooth-=
+next and this command:
+>>>
+>>> l2test -V le_public -n 11:22:33:44:55:66
+>>>
+>>> The same happens when you are waiting for the socket connect timeout. T=
+he scanning disable command is sent twice.
+>>>
+>>> I also had a case where the disabling of the scanning is not sent at al=
+l and the controller kept scanning. However for that one, I do not have an =
+easy way to reproduce it. But it is essentially the same case, you close th=
+e socket / application before the connection has been established.
 >>
->> Can someone please explain the difference between profiles from
->> 'profiles' directory, and DBus profiles, i.e. 'test/test-profile' and
->> 'test/test-gatt-profile' ? How they're supposed to be used, and how do
->> they map to Bluetooth Profiles ?
+>> in addition when a connect() for LE L2CAP socket call times out, we get =
+an invalid module reference count.
+>>
+>> bluetooth             532480  1
+>> rfkill                 24576  1 bluetooth
+>>
+>> I see it left with an extra reference count. This is pretty bad and show=
+s that something is clearly wrong.
 >
-> There are 2 categories of profiles if one need to categorize them:
+> please also look into this. We are not clearing the reference count corre=
+ctly when aborting a connection attempt while still in scanning phase.
 >
-> - Internal: Those implemented by plugins/driver which are run in the
-> context of bluetoothd, this includes profiles under profiles/
-> directory. It recommended for profiles that require system
-> integration, that access needs to restricted. These sometimes
-> implement specific D-Bus interface to interact with the profile.
-> - External: Those implemented by D-Bus clients, recommended for
-> profiles of general use, currently there are 2 subcategories of it:
->   - GATT Profiles: Those registered with GATT Manager, as the name
-> imply it should be used for GATT only profiles.
->   - Classic Profiles: Those registered with Profile Manager, this is
-> for classic only.
+Ok, I'll look into that
+> Regards
 >
-> Note that the usage model of GATT is a little bit different than it is
-> for classic profile since GATT offers attributes it is much easier to
-> write external profiles/services than it is with classic where almost
-> every profile uses a different protocol.
->
->> Are those from "profiles" directory somehow special, or deprecated?
->> Does DBus profiles also work for LE devices somehow (ones from test
->> directory look like BT Classic ones)
->> profiles from "profile" directory can expose functionality through
->> DBus (like heart rate profile), can same be achieved through DBus
->> services ?
->
-> Almost all BLE profiles not implemented using src/shared should be
-> considered deprecated, the only exception is HoG but even that will
-> need changing, Heart Rate should probably be implemented as an
-> external profile.
->
->> I have some issues with devices that expose service with 0xFFFD UUID,
->> that is Universal Second Factor Authenticator Service (U2F). I need to
->> disable auto connect for LE devices that have exclusively three
->> services: Device Info, GAS, and U2F. Shall I use profile, DBus
->> profile, or maybe plugin ? What are plugins for ?
->
-> It depends on the usage mode of U2F, I suppose you could use it and
-> then once done call Disconnect which would disable auto-connect flag,
-> but the connect again you would have to use Connect which essentially
-> means it will never auto connect. Regarding Device Info and GAS, those
-> should probably not set auto-connect flag, if they do we might need to
-> fix them.
-
-Deviceinfo triggers auto connect (that's probably bug):
-
-in deviceinfo.c (all calls are unconditional)
-deviceinfo_driver_probe -> deviceinfo_register ->
-btd_device_add_attio_callback -> device_set_auto_connect(device,
-TRUE);
-
-Shall I add "bool set_auto_connect" param to btd_device_add_attio_callback  ?
-
-
-Other services triggering auto_connect now ("git grep
-btd_device_add_attio_callback")
-alert, cyclingspeed, deviceinfo, heartrate, input, proximity,
-scanparam, thermometer
-
-
->
->> When these three services are on device, it's single-purpose
->> authenticator device. It's used to authenticate transactions, and
->> might be used between multiple machines (laptop, workstation, phone),
->> but support one connection at a time. Having linux auto connect to it
->> all the time makes it unable to connect to other nearby devices that
->> might try to authenticate transaction. If other services are exposed,
->> it might be multi-purpose device (i.e. phone that also acts as
->> authenticator) and default auto connect rules shall apply.
->
-> By the description it looks like the client will always initiate the
-> connection, you only need to connect if you need to authenticate
-> something, in that case having auto_connect flag set is probably
-> useless and as you said it may interfere with other device that may
-> have some authentication pending.
->
->> I've looked through "plugins" directory and seen that there's a
->> disable auto connect field that can be set. Would writing u2f plugin
->> be proper way to solve that?
->
-> I guess U2F should be done as external profile, but you probably
-> should _not_ use GattManager1.RegisterProfiles because that would set
-> auto_connect flag.
->
+> Marcel
 >
 > --
-> Luiz Augusto von Dentz
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
