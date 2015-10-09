@@ -1,48 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH] Bluetooth: fix double scan disable
-Date: Fri,  9 Oct 2015 09:24:32 -0700
-Message-Id: <1444407872-18338-1-git-send-email-jpawlowski@google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+Subject: Re: linux-next: Tree for Oct 9 (bluetooth/bpa10x.c)
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5617DFFF.90702@infradead.org>
+Date: Fri, 9 Oct 2015 17:51:36 +0200
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <5B7CD6D9-14D0-4080-AD8D-FC9BEE3B813F@holtmann.org>
+References: <20151009172448.6aed0174@canb.auug.org.au> <5617DFFF.90702@infradead.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_connect_le_scan_cleanup is conditionally executing
-hci_conn_params_del, that is calling hci_update_background_scan. Make the
-other case also update scan, and remove reduntand call from
-hci_connect_le_scan_remove.
----
- net/bluetooth/hci_conn.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Hi Randy,
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b4548c73..2ebcaaa 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -91,10 +91,12 @@ static void hci_connect_le_scan_cleanup(struct hci_conn *conn)
- 	 * autoconnect action, remove them completely. If they are, just unmark
- 	 * them as waiting for connection, by clearing explicit_connect field.
- 	 */
--	if (params->auto_connect == HCI_AUTO_CONN_EXPLICIT)
-+	if (params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
- 		hci_conn_params_del(conn->hdev, bdaddr, bdaddr_type);
--	else
-+	} else {
- 		params->explicit_connect = false;
-+		hci_update_background_scan(conn->hdev);
-+	}
- }
- 
- /* This function requires the caller holds hdev->lock */
-@@ -103,7 +105,6 @@ static void hci_connect_le_scan_remove(struct hci_conn *conn)
- 	hci_connect_le_scan_cleanup(conn);
- 
- 	hci_conn_hash_del(conn->hdev, conn);
--	hci_update_background_scan(conn->hdev);
- }
- 
- static void hci_acl_create_connection(struct hci_conn *conn)
--- 
-2.6.0.rc2.230.g3dd15c0
+>> Changes since 20151008:
+>> 
+> 
+> on i386:
+> 
+> warning: (BT_HCIBPA10X) selects BT_HCIUART_H4 which has unmet direct dependencies (NET && BT && BT_HCIUART)
+> 
+> drivers/built-in.o: In function `bpa10x_rx_complete':
+> bpa10x.c:(.text+0x2ac5e2): undefined reference to `h4_recv_buf'
+
+already noticed that issue. Fix for it has already been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
