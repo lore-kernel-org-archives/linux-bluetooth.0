@@ -1,42 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [PATCH v2] Revert "serial: 8250_dma: don't bother DMA with small
- transfers"
-To: Greg KH <gregkh@linuxfoundation.org>,
-	andriy.shevchenko@linux.intel.com
-References: <1444136920-17969-1-git-send-email-frederic.danis@linux.intel.com>
- <20151006135503.GA13250@kroah.com> <5613D968.7000505@linux.intel.com>
-Cc: linux-serial@vger.kernel.org, peter@hurleysoftware.com,
-	linux-bluetooth@vger.kernel.org, heikki.krogerus@linux.intel.com,
-	marcel@holtmann.org
-From: Frederic Danis <frederic.danis@linux.intel.com>
-Message-ID: <5617D2FA.1020108@linux.intel.com>
-Date: Fri, 9 Oct 2015 16:45:14 +0200
+Date: Fri, 9 Oct 2015 17:29:38 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] Bluetooth: Queue diagnostic messages together with
+ HCI packets
+Message-ID: <20151009142938.GA32635@t440s.P-661HNU-F1>
+References: <1444392563-12977-3-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <5613D968.7000505@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1444392563-12977-3-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Greg,
+Hi Marcel,
 
-On 06/10/2015 16:23, Frederic Danis wrote:
->>
->> Andy, any objections?
->>
->> Frederic, don't you want to see this backported to 4.0 and newer?
->
-> Yes, you're right, unless Andy has any objection this should be good
+On Fri, Oct 09, 2015, Marcel Holtmann wrote:
+> Sending diagnostic messages directly to the monitor socket might cause
+> issues for devices processing their messages in interrupt context. So
+> instead of trying to directly forward them, queue them up with the other
+> HCI packets and lets them be processed by the sockets at the same time.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 
-This is first time for me that patch may be applied to previous kernel.
+All three patches have been applied to bluetooth-next. Thanks.
 
-Is there something specific I should do to allow this patch to be 
-applied and backported to 4.0 and newer ?
-
-Regards
-
-Fred
-
--- 
-Frederic Danis                            Open Source Technology Center
-frederic.danis@intel.com                              Intel Corporation
-
+Johan
