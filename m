@@ -1,114 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btintel: Add support for enabling tracing functionality
-Date: Fri,  9 Oct 2015 14:42:08 +0200
-Message-Id: <1444394528-17016-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 3/3] Bluetooth: Queue diagnostic messages together with HCI packets
+Date: Fri,  9 Oct 2015 14:09:23 +0200
+Message-Id: <1444392563-12977-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For Intel controllers with firmware that allows tracing of baseband
-functionality this allows enabling it via set_diag driver callback.
+Sending diagnostic messages directly to the monitor socket might cause
+issues for devices processing their messages in interrupt context. So
+instead of trying to directly forward them, queue them up with the other
+HCI packets and lets them be processed by the sockets at the same time.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btintel.c   | 32 ++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h   |  6 ++++++
- drivers/bluetooth/btusb.c     |  1 +
- drivers/bluetooth/hci_intel.c |  1 +
- 4 files changed, 40 insertions(+)
+ net/bluetooth/hci_core.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 7047fe6a6a2b..95652aa12454 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -91,6 +91,38 @@ int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- }
- EXPORT_SYMBOL_GPL(btintel_set_bdaddr);
- 
-+int btintel_set_diag(struct hci_dev *hdev, bool enable)
-+{
-+	struct sk_buff *skb;
-+	u8 param[3];
-+	int err;
-+
-+	if (!test_bit(HCI_RUNNING, &hdev->flags))
-+		return -ENETDOWN;
-+
-+	if (enable) {
-+		param[0] = 0x03;
-+		param[1] = 0x03;
-+		param[2] = 0x03;
-+	} else {
-+		param[0] = 0x00;
-+		param[1] = 0x00;
-+		param[2] = 0x00;
-+	}
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc43, 3, param, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		BT_ERR("%s: Changing Intel diagnostic mode failed (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_set_diag);
-+
- void btintel_hw_error(struct hci_dev *hdev, u8 code)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d2b3dd32d6cf..fd91649ae7ee 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3562,14 +3562,15 @@ EXPORT_SYMBOL(hci_recv_frame);
+ /* Receive diagnostic message from HCI drivers */
+ int hci_recv_diag(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	struct sk_buff *skb;
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index f0655c476fd2..0af06ae197c1 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -73,6 +73,7 @@ struct intel_secure_send_result {
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-+int btintel_set_diag(struct hci_dev *hdev, bool enable);
- void btintel_hw_error(struct hci_dev *hdev, u8 code);
- 
- void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver);
-@@ -95,6 +96,11 @@ static inline int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdadd
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int btintel_set_diag(struct hci_dev *hdev, bool enable)
-+{
-+	return -EOPNOTSUPP;
-+}
++	/* Mark as diagnostic packet */
++	bt_cb(skb)->pkt_type = HCI_DIAG_PKT;
 +
- static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
- {
+ 	/* Time stamp */
+ 	__net_timestamp(skb);
+ 
+-	/* Mark as diagnostic packet and send to monitor */
+-	bt_cb(skb)->pkt_type = HCI_DIAG_PKT;
+-	hci_send_to_monitor(hdev, skb);
++	skb_queue_tail(&hdev->rx_q, skb);
++	queue_work(hdev->workqueue, &hdev->rx_work);
+ 
+-	kfree_skb(skb);
+ 	return 0;
  }
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 247b1062cb9a..5e9ae0eb3728 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2685,6 +2685,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->send = btusb_send_frame_intel;
- 		hdev->setup = btusb_setup_intel_new;
- 		hdev->hw_error = btintel_hw_error;
-+		hdev->set_diag = btintel_set_diag;
- 		hdev->set_bdaddr = btintel_set_bdaddr;
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
- 	}
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 2952107e3bae..c5e69e08788a 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -557,6 +557,7 @@ static int intel_setup(struct hci_uart *hu)
- 
- 	bt_dev_dbg(hdev, "start intel_setup");
- 
-+	hu->hdev->set_diag = btintel_set_diag;
- 	hu->hdev->set_bdaddr = btintel_set_bdaddr;
- 
- 	calltime = ktime_get();
+ EXPORT_SYMBOL(hci_recv_diag);
 -- 
 2.4.3
 
