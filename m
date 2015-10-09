@@ -1,61 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Subject: Issue with new LE connection creation
-Message-Id: <614A5683-0763-4E64-B178-67577793D8EF@holtmann.org>
-Date: Fri, 9 Oct 2015 16:07:22 +0200
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btintel: Add support for enabling tracing functionality
+Date: Fri,  9 Oct 2015 14:42:08 +0200
+Message-Id: <1444394528-17016-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+For Intel controllers with firmware that allows tracing of baseband
+functionality this allows enabling it via set_diag driver callback.
 
-so when I try to connect a LE L2CAP connection to a device that does not exist and then abort it will not have reached the timeout, I get this:
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btintel.c   | 32 ++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h   |  6 ++++++
+ drivers/bluetooth/btusb.c     |  1 +
+ drivers/bluetooth/hci_intel.c |  1 +
+ 4 files changed, 40 insertions(+)
 
-< HCI Command: LE Add Device To White List (0x08|0x0011) plen 7
-        Address type: Public (0x00)
-        Address: 11:22:33:44:55:66 (OUI 11-22-33)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Add Device To White List (0x08|0x0011) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
-        Type: Passive (0x00)
-        Interval: 60.000 msec (0x0060)
-        Window: 30.000 msec (0x0030)
-        Own address type: Public (0x00)
-        Filter policy: Ignore not in white list (0x01)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Scan Parameters (0x08|0x000b) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-        Scanning: Enabled (0x01)
-        Filter duplicates: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-        Scanning: Disabled (0x00)
-        Filter duplicates: Disabled (0x00)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-        Scanning: Disabled (0x00)
-        Filter duplicates: Disabled (0x00)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Command Disallowed (0x0c)
-
-Notice the two attempts for disabling scanning. We should not do that. This is clearly a bug. This can be easily reproduced with latest bluetooth-next and this command:
-
-l2test -V le_public -n 11:22:33:44:55:66
-
-The same happens when you are waiting for the socket connect timeout. The scanning disable command is sent twice.
-
-I also had a case where the disabling of the scanning is not sent at all and the controller kept scanning. However for that one, I do not have an easy way to reproduce it. But it is essentially the same case, you close the socket / application before the connection has been established.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 7047fe6a6a2b..95652aa12454 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -91,6 +91,38 @@ int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ }
+ EXPORT_SYMBOL_GPL(btintel_set_bdaddr);
+ 
++int btintel_set_diag(struct hci_dev *hdev, bool enable)
++{
++	struct sk_buff *skb;
++	u8 param[3];
++	int err;
++
++	if (!test_bit(HCI_RUNNING, &hdev->flags))
++		return -ENETDOWN;
++
++	if (enable) {
++		param[0] = 0x03;
++		param[1] = 0x03;
++		param[2] = 0x03;
++	} else {
++		param[0] = 0x00;
++		param[1] = 0x00;
++		param[2] = 0x00;
++	}
++
++	skb = __hci_cmd_sync(hdev, 0xfc43, 3, param, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		BT_ERR("%s: Changing Intel diagnostic mode failed (%d)",
++		       hdev->name, err);
++		return err;
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btintel_set_diag);
++
+ void btintel_hw_error(struct hci_dev *hdev, u8 code)
+ {
+ 	struct sk_buff *skb;
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index f0655c476fd2..0af06ae197c1 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -73,6 +73,7 @@ struct intel_secure_send_result {
+ 
+ int btintel_check_bdaddr(struct hci_dev *hdev);
+ int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
++int btintel_set_diag(struct hci_dev *hdev, bool enable);
+ void btintel_hw_error(struct hci_dev *hdev, u8 code);
+ 
+ void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver);
+@@ -95,6 +96,11 @@ static inline int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdadd
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int btintel_set_diag(struct hci_dev *hdev, bool enable)
++{
++	return -EOPNOTSUPP;
++}
++
+ static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
+ {
+ }
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 247b1062cb9a..5e9ae0eb3728 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2685,6 +2685,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		hdev->send = btusb_send_frame_intel;
+ 		hdev->setup = btusb_setup_intel_new;
+ 		hdev->hw_error = btintel_hw_error;
++		hdev->set_diag = btintel_set_diag;
+ 		hdev->set_bdaddr = btintel_set_bdaddr;
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 	}
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index 2952107e3bae..c5e69e08788a 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -557,6 +557,7 @@ static int intel_setup(struct hci_uart *hu)
+ 
+ 	bt_dev_dbg(hdev, "start intel_setup");
+ 
++	hu->hdev->set_diag = btintel_set_diag;
+ 	hu->hdev->set_bdaddr = btintel_set_bdaddr;
+ 
+ 	calltime = ktime_get();
+-- 
+2.4.3
 
