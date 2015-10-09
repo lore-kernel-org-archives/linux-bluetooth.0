@@ -1,72 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: Issue with new LE connection creation
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <51DF00FF-73E9-4E94-A89A-86EBD7220068@holtmann.org>
-Date: Fri, 9 Oct 2015 20:48:33 +0200
-Message-Id: <147B282F-6EBF-4F3A-A74E-33D5A9F54AE9@holtmann.org>
-References: <614A5683-0763-4E64-B178-67577793D8EF@holtmann.org> <51DF00FF-73E9-4E94-A89A-86EBD7220068@holtmann.org>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH] Bluetooth: fix double scan disable
+Date: Fri,  9 Oct 2015 09:24:32 -0700
+Message-Id: <1444407872-18338-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+hci_connect_le_scan_cleanup is conditionally executing
+hci_conn_params_del, that is calling hci_update_background_scan. Make the
+other case also update scan, and remove reduntand call from
+hci_connect_le_scan_remove.
+---
+ net/bluetooth/hci_conn.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
->> so when I try to connect a LE L2CAP connection to a device that does not exist and then abort it will not have reached the timeout, I get this:
->> 
->> < HCI Command: LE Add Device To White List (0x08|0x0011) plen 7
->>       Address type: Public (0x00)
->>       Address: 11:22:33:44:55:66 (OUI 11-22-33)
->>> HCI Event: Command Complete (0x0e) plen 4
->>     LE Add Device To White List (0x08|0x0011) ncmd 1
->>       Status: Success (0x00)
->> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
->>       Type: Passive (0x00)
->>       Interval: 60.000 msec (0x0060)
->>       Window: 30.000 msec (0x0030)
->>       Own address type: Public (0x00)
->>       Filter policy: Ignore not in white list (0x01)
->>> HCI Event: Command Complete (0x0e) plen 4
->>     LE Set Scan Parameters (0x08|0x000b) ncmd 1
->>       Status: Success (0x00)
->> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->>       Scanning: Enabled (0x01)
->>       Filter duplicates: Enabled (0x01)
->>> HCI Event: Command Complete (0x0e) plen 4
->>     LE Set Scan Enable (0x08|0x000c) ncmd 1
->>       Status: Success (0x00)
->> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->>       Scanning: Disabled (0x00)
->>       Filter duplicates: Disabled (0x00)
->>> HCI Event: Command Complete (0x0e) plen 4
->>     LE Set Scan Enable (0x08|0x000c) ncmd 1
->>       Status: Success (0x00)
->> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->>       Scanning: Disabled (0x00)
->>       Filter duplicates: Disabled (0x00)
->>> HCI Event: Command Complete (0x0e) plen 4
->>     LE Set Scan Enable (0x08|0x000c) ncmd 1
->>       Status: Command Disallowed (0x0c)
->> 
->> Notice the two attempts for disabling scanning. We should not do that. This is clearly a bug. This can be easily reproduced with latest bluetooth-next and this command:
->> 
->> l2test -V le_public -n 11:22:33:44:55:66
->> 
->> The same happens when you are waiting for the socket connect timeout. The scanning disable command is sent twice.
->> 
->> I also had a case where the disabling of the scanning is not sent at all and the controller kept scanning. However for that one, I do not have an easy way to reproduce it. But it is essentially the same case, you close the socket / application before the connection has been established.
-> 
-> in addition when a connect() for LE L2CAP socket call times out, we get an invalid module reference count.
-> 
-> bluetooth             532480  1
-> rfkill                 24576  1 bluetooth
-> 
-> I see it left with an extra reference count. This is pretty bad and shows that something is clearly wrong.
-
-please also look into this. We are not clearing the reference count correctly when aborting a connection attempt while still in scanning phase.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index b4548c73..2ebcaaa 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -91,10 +91,12 @@ static void hci_connect_le_scan_cleanup(struct hci_conn *conn)
+ 	 * autoconnect action, remove them completely. If they are, just unmark
+ 	 * them as waiting for connection, by clearing explicit_connect field.
+ 	 */
+-	if (params->auto_connect == HCI_AUTO_CONN_EXPLICIT)
++	if (params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
+ 		hci_conn_params_del(conn->hdev, bdaddr, bdaddr_type);
+-	else
++	} else {
+ 		params->explicit_connect = false;
++		hci_update_background_scan(conn->hdev);
++	}
+ }
+ 
+ /* This function requires the caller holds hdev->lock */
+@@ -103,7 +105,6 @@ static void hci_connect_le_scan_remove(struct hci_conn *conn)
+ 	hci_connect_le_scan_cleanup(conn);
+ 
+ 	hci_conn_hash_del(conn->hdev, conn);
+-	hci_update_background_scan(conn->hdev);
+ }
+ 
+ static void hci_acl_create_connection(struct hci_conn *conn)
+-- 
+2.6.0.rc2.230.g3dd15c0
 
