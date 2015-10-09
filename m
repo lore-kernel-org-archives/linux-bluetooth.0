@@ -1,54 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
-To: linux-serial@vger.kernel.org,
-	andriy.shevchenko@linux.intel.com,
-	peter@hurleysoftware.com,
-	gregkh@linuxfoundation.org
-Cc: linux-bluetooth@vger.kernel.org,
-	heikki.krogerus@linux.intel.com,
-	marcel@holtmann.org
-Subject: [PATCH v3] Revert "serial: 8250_dma: don't bother DMA with small transfers"
-Date: Fri,  9 Oct 2015 17:14:56 +0200
-Message-Id: <1444403696-9223-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+In-Reply-To: <5617D2FA.1020108@linux.intel.com>
+References: <1444136920-17969-1-git-send-email-frederic.danis@linux.intel.com>
+	<20151006135503.GA13250@kroah.com>
+	<5613D968.7000505@linux.intel.com>
+	<5617D2FA.1020108@linux.intel.com>
+Date: Fri, 9 Oct 2015 12:09:21 -0300
+Message-ID: <CAOMZO5BaXzwMGhdOOLLJU1f37HsmH3309MG5qBEmKubL=kPn_A@mail.gmail.com>
+Subject: Re: [PATCH v2] Revert "serial: 8250_dma: don't bother DMA with small transfers"
+From: Fabio Estevam <festevam@gmail.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>, andriy.shevchenko@linux.intel.com,
+	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>, Peter Hurley <peter@hurleysoftware.com>,
+	linux-bluetooth@vger.kernel.org,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This reverts commit 9119fba0cfeda6d415c9f068df66838a104b87cb.
+On Fri, Oct 9, 2015 at 11:45 AM, Frederic Danis
+<frederic.danis@linux.intel.com> wrote:
 
-This commit prevents from sending "big" file using Bluetooth.
-When sending a lot of data quickly through the Bluetooth interface, and
-after a variable amount of data sent, transfer fails with error:
-    kernel: [  415.247453] Bluetooth: hci0 hardware error 0x00
+> This is first time for me that patch may be applied to previous kernel.
+>
+> Is there something specific I should do to allow this patch to be applied
+> and backported to 4.0 and newer ?
 
-Found on T100TA.
-
-After reverting this commit, send works fine for any file size.
-
-Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
-Fixes: 9119fba0cfed (serial: 8250_dma: don't bother DMA with small
-transfers)
-Cc: stable@vger.kernel.org
----
-v3: Add Fixes and Cc tags
-v2: Re-send to correct people
-
- drivers/tty/serial/8250/8250_dma.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/tty/serial/8250/8250_dma.c b/drivers/tty/serial/8250/8250_dma.c
-index b503071..78259d3 100644
---- a/drivers/tty/serial/8250/8250_dma.c
-+++ b/drivers/tty/serial/8250/8250_dma.c
-@@ -77,10 +77,6 @@ int serial8250_tx_dma(struct uart_8250_port *p)
- 		return 0;
- 
- 	dma->tx_size = CIRC_CNT_TO_END(xmit->head, xmit->tail, UART_XMIT_SIZE);
--	if (dma->tx_size < p->port.fifosize) {
--		ret = -EINVAL;
--		goto err;
--	}
- 
- 	desc = dmaengine_prep_slave_single(dma->txchan,
- 					   dma->tx_addr + xmit->tail,
--- 
-1.9.1
+You can find the instructions at Documentation/stable_kernel_rules.txt
