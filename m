@@ -1,48 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bjorn Andersson <bjorn.andersson@sonymobile.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
-	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, Andy Gross
-	<agross@codeaurora.org>
-CC: <linux-arm-msm@vger.kernel.org>, Fengwei Yin <fengwei.yin@linaro.org>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	<linux-kernel@vger.kernel.org>, <linux-soc@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v2 0/7] Qualcomm WCNSS HCI support
-Date: Fri, 9 Oct 2015 13:47:58 -0700
-Message-ID: <1444423685-14717-1-git-send-email-bjorn.andersson@sonymobile.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CABBYNZLAD6embCViBCAHx+_dvBHoM=AJ1JSW7eVqGPSOv24HXw@mail.gmail.com>
+References: <CAD0=r8x7hEkGZG+ocE1E+ezF8C+4mFoWuROry=xsf_OfPY+_AA@mail.gmail.com>
+	<CABBYNZLAD6embCViBCAHx+_dvBHoM=AJ1JSW7eVqGPSOv24HXw@mail.gmail.com>
+Date: Fri, 9 Oct 2015 12:57:29 -0700
+Message-ID: <CAD0=r8xaEZ5mdu=419D+FHQJa7G_esBpWj=4jQ+tpTuT7M2ryQ@mail.gmail.com>
+Subject: Re: [BlueZ] Difference profiles, dbus profiles and plugins ?
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After trying to avoid implementing multi-channel support in SMD in v1 of
-the HCI driver for Qualcomm WCNSS BT, this new version includes the
-necessary SMD refactoring and additon of an API that allows SMD devices
-to call back into the SMD core to acquire additonal channels.
+On Fri, Oct 9, 2015 at 12:32 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Fri, Oct 9, 2015 at 6:14 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>> Hi,
+>>
+>> Can someone please explain the difference between profiles from
+>> 'profiles' directory, and DBus profiles, i.e. 'test/test-profile' and
+>> 'test/test-gatt-profile' ? How they're supposed to be used, and how do
+>> they map to Bluetooth Profiles ?
+>
+> There are 2 categories of profiles if one need to categorize them:
+>
+> - Internal: Those implemented by plugins/driver which are run in the
+> context of bluetoothd, this includes profiles under profiles/
+> directory. It recommended for profiles that require system
+> integration, that access needs to restricted. These sometimes
+> implement specific D-Bus interface to interact with the profile.
+> - External: Those implemented by D-Bus clients, recommended for
+> profiles of general use, currently there are 2 subcategories of it:
+>   - GATT Profiles: Those registered with GATT Manager, as the name
+> imply it should be used for GATT only profiles.
+>   - Classic Profiles: Those registered with Profile Manager, this is
+> for classic only.
+>
+> Note that the usage model of GATT is a little bit different than it is
+> for classic profile since GATT offers attributes it is much easier to
+> write external profiles/services than it is with classic where almost
+> every profile uses a different protocol.
+>
+>> Are those from "profiles" directory somehow special, or deprecated?
+>> Does DBus profiles also work for LE devices somehow (ones from test
+>> directory look like BT Classic ones)
+>> profiles from "profile" directory can expose functionality through
+>> DBus (like heart rate profile), can same be achieved through DBus
+>> services ?
+>
+> Almost all BLE profiles not implemented using src/shared should be
+> considered deprecated, the only exception is HoG but even that will
+> need changing, Heart Rate should probably be implemented as an
+> external profile.
+>
+>> I have some issues with devices that expose service with 0xFFFD UUID,
+>> that is Universal Second Factor Authenticator Service (U2F). I need to
+>> disable auto connect for LE devices that have exclusively three
+>> services: Device Info, GAS, and U2F. Shall I use profile, DBus
+>> profile, or maybe plugin ? What are plugins for ?
+>
+> It depends on the usage mode of U2F, I suppose you could use it and
+> then once done call Disconnect which would disable auto-connect flag,
+> but the connect again you would have to use Connect which essentially
+> means it will never auto connect. Regarding Device Info and GAS, those
+> should probably not set auto-connect flag, if they do we might need to
+> fix them.
 
-The additional channels are tied to the existing SMD device and the life
-cycle of the new channel will be tied to, and affect, the original
-channel.
+Deviceinfo triggers auto connect (that's probably bug):
 
-With this in place the btqcomsmd driver is refactored into being a
-single driver, without global state.
+in deviceinfo.c (all calls are unconditional)
+deviceinfo_driver_probe -> deviceinfo_register ->
+btd_device_add_attio_callback -> device_set_auto_connect(device,
+TRUE);
 
-Bjorn Andersson (7):
-  soc: qcom: smd: Introduce callback setter
-  soc: qcom: smd: Split discovery and state change work
-  soc: qcom: smd: Refactor channel open and close handling
-  soc: qcom: smd: Support multiple channels per sdev
-  soc: qcom: smd: Support opening additional channels
-  Bluetooth: Add HCI device identifier for Qualcomm SMD
-  Bluetooth: hci_smd: Qualcomm WCNSS HCI driver
+Shall I add "bool set_auto_connect" param to btd_device_add_attio_callback  ?
 
- drivers/bluetooth/Kconfig     |  11 ++
- drivers/bluetooth/Makefile    |   1 +
- drivers/bluetooth/btqcomsmd.c | 198 ++++++++++++++++++++++++++++++++++++
- drivers/soc/qcom/smd.c        | 228 +++++++++++++++++++++++++++++++-----------
- include/linux/soc/qcom/smd.h  |   8 +-
- include/net/bluetooth/hci.h   |   1 +
- 6 files changed, 387 insertions(+), 60 deletions(-)
- create mode 100644 drivers/bluetooth/btqcomsmd.c
 
--- 
-2.4.2
+Other services triggering auto_connect now ("git grep
+btd_device_add_attio_callback")
+alert, cyclingspeed, deviceinfo, heartrate, input, proximity,
+scanparam, thermometer
+
+
+>
+>> When these three services are on device, it's single-purpose
+>> authenticator device. It's used to authenticate transactions, and
+>> might be used between multiple machines (laptop, workstation, phone),
+>> but support one connection at a time. Having linux auto connect to it
+>> all the time makes it unable to connect to other nearby devices that
+>> might try to authenticate transaction. If other services are exposed,
+>> it might be multi-purpose device (i.e. phone that also acts as
+>> authenticator) and default auto connect rules shall apply.
+>
+> By the description it looks like the client will always initiate the
+> connection, you only need to connect if you need to authenticate
+> something, in that case having auto_connect flag set is probably
+> useless and as you said it may interfere with other device that may
+> have some authentication pending.
+>
+>> I've looked through "plugins" directory and seen that there's a
+>> disable auto connect field that can be set. Would writing u2f plugin
+>> be proper way to solve that?
+>
+> I guess U2F should be done as external profile, but you probably
+> should _not_ use GattManager1.RegisterProfiles because that would set
+> auto_connect flag.
+>
+>
+> --
+> Luiz Augusto von Dentz
