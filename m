@@ -1,36 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 13 Oct 2015 08:10:55 +1000
-Message-ID: <CAPcThSFEfLyb09r_AuyabEuP31Y1+WNjzpDHHcXANWt+4ovPog@mail.gmail.com>
-Subject: Device class 0 read from Microsoft Designer Mouse (Bluetooth 4.0)
-From: Qingtao Cao <qingtao.cao.au@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Qingtao Cao <qingtao.cao.au@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+Subject: Re: [PATCH] Bluetooth: Don't use remote address type to decide IRK persistency
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1444649779-29859-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 12 Oct 2015 22:45:53 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <EC24C21F-47BA-4EF3-BC5B-B6D5E9A1E797@holtmann.org>
+References: <1444649779-29859-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi community,
+Hi Johan,
 
-Recently I got a Microsoft Designer Mouse which supports bluetooth 4.0
-but it doesn't work on Ubuntu 15.04 with bluez4-4.101-0ubuntu25.
-Although I can pair with it, I can't connect with it.
+> There are LE devices on the market that start off by announcing their
+> public address and then once paired switch to using private address.
+> To be interoperable with such devices we should simply trust the fact
+> that we're receiving an IRK from them to indicate that they may use
+> private addresses in the future. Instead, simply tie the persistency
+> to the bonding/no-bonding information the same way as for LTKs and
+> CSRKs.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/hci_core.h |  2 +-
+> net/bluetooth/mgmt.c             | 18 ++----------------
+> net/bluetooth/smp.c              | 33 +++++++++++++++++----------------
+> 3 files changed, 20 insertions(+), 33 deletions(-)
 
-I've noticed that the Class value read in relevant DeviceFound message
-is 0 (full message in the bottom), and to my surprise there is no
-"org.bluez.Input" interface exposed on relevant object created after
-pairing therefore I can't invoke the Connect() method on such
-interface.
+patch has been applied to bluetooth-next tree.
 
-Furthermore, after pairing its object path is contained in the Devices
-property of local adapter, but the linkkeys file contains no relevant
-entry.
+Regards
 
-Home come bluez reads class value 0 from this device? does this
-attribute to no input interface exported by bluez? how can I better
-attack this problem?
+Marcel
 
-Many thanks for any advice.
-
-Cheers,
-Harry
