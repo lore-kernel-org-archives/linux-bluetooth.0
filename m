@@ -1,79 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
+MIME-Version: 1.0
+Date: Mon, 12 Oct 2015 15:55:23 +0800
+Message-ID: <CACw_oNf4Lg5p3m6UDtBSQb21qC6KybJynGG3-AoTLprVfwk4-A@mail.gmail.com>
+Subject: Question: how can a bluetooth peripheral keep working after switching
+ the adapter(CSR chip) on pc from hid to hci mode ?
+From: M Ren <itux.ren@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH ] audio/player: Fix player name value for MPRIS
-Date: Mon, 12 Oct 2015 14:11:17 +0530
-Message-id: <1444639277-5998-1-git-send-email-bharat.panda@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added fix for setting media player name when the player
-Identity value is invalid.
----
- profiles/audio/media.c | 15 +++++++++++++--
- tools/mpris-proxy.c    |  1 +
- 2 files changed, 14 insertions(+), 2 deletions(-)
+Hi developers ,
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 69070bf..68111e6 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -1805,7 +1805,7 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
- 	struct media_adapter *adapter = data;
- 	struct media_player *mp;
- 	DBusMessageIter args;
--	const char *sender, *path;
-+	const char *sender, *path, *name;
- 	int err;
- 
- 	sender = dbus_message_get_sender(msg);
-@@ -1814,6 +1814,8 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
- 
- 	dbus_message_iter_get_basic(&args, &path);
- 	dbus_message_iter_next(&args);
-+	dbus_message_iter_get_basic(&args, &name);
-+	dbus_message_iter_next(&args);
- 
- 	if (media_adapter_find_player(adapter, sender, path) != NULL)
- 		return btd_error_already_exists(msg);
-@@ -1831,6 +1833,14 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
- 		return btd_error_invalid_args(msg);
- 	}
- 
-+	/*
-+	 * The Player Identity value is NULL in MPRIS case, so create
-+	 * mpris name on the basis of player bus name and assign
-+	 * the value.
-+	 */
-+	if (mp->name == NULL)
-+		mp->name = g_strdup(name);
-+
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
- 
-@@ -1864,7 +1874,8 @@ static const GDBusMethodTable media_methods[] = {
- 	{ GDBUS_METHOD("UnregisterEndpoint",
- 		GDBUS_ARGS({ "endpoint", "o" }), NULL, unregister_endpoint) },
- 	{ GDBUS_METHOD("RegisterPlayer",
--		GDBUS_ARGS({ "player", "o" }, { "properties", "a{sv}" }),
-+		GDBUS_ARGS({ "player", "o" }, { "name", "s" },
-+						{ "properties", "a{sv}" }),
- 		NULL, register_player) },
- 	{ GDBUS_METHOD("UnregisterPlayer",
- 		GDBUS_ARGS({ "player", "o" }), NULL, unregister_player) },
-diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
-index bf8148f..cb94f2b 100644
---- a/tools/mpris-proxy.c
-+++ b/tools/mpris-proxy.c
-@@ -466,6 +466,7 @@ static void add_player(DBusConnection *conn, const char *name,
- 	dbus_message_iter_init_append(msg, &iter);
- 
- 	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH, &path);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
- 
- 	if (player != NULL) {
- 		if (!g_dbus_get_properties(player->conn,
--- 
-1.9.1
+I have a embeded device (named Device) which is paired with a
+peripheral (named Peripheral),
+Device is a CSR chip supporting BR/EDR and BLE, working under hid mode,
+Peripheral supports  BLE HID
 
+I intend to achive this :
+log into to Device like ssh,
+then excute hid2hci , so Device goes into hci mode,
+how can the Peripheral keep working without end-user's extra actions
+like pressing button on Device or Peripheral ?
+
+My thought:
+On Device, I can use bccmd to read all ps_keys ,
+and from CSR documents, it mentioned ps_keys related to paring,
+like EDIV, RAND, LTK .
+can I creat files under /var/lib/bluetooth/<Device bdaddr>/<Peripheral bdaddr>/
+before excuting hid2hci ?
+which files and items in it are mandatory ?
+
+if this way doesn't make sense, do you have some suggestions ?
