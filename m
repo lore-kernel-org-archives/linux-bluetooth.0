@@ -1,64 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 13 Oct 2015 14:22:49 +0300
-From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
-Cc: linux-serial@vger.kernel.org, andriy.shevchenko@linux.intel.com,
-	peter@hurleysoftware.com, gregkh@linuxfoundation.org,
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH v3] Revert "serial: 8250_dma: don't bother DMA with small
- transfers"
-Message-ID: <20151013112249.GF31893@kuha.fi.intel.com>
-References: <1444403696-9223-1-git-send-email-frederic.danis@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1444403696-9223-1-git-send-email-frederic.danis@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 BlueZ] monitor/avctp: Decode player features
+Date: Tue, 13 Oct 2015 12:30:48 +0300
+Message-Id: <1444728648-9374-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Oct 09, 2015 at 05:14:56PM +0200, Frederic Danis wrote:
-> This reverts commit 9119fba0cfeda6d415c9f068df66838a104b87cb.
-> 
-> This commit prevents from sending "big" file using Bluetooth.
-> When sending a lot of data quickly through the Bluetooth interface, and
-> after a variable amount of data sent, transfer fails with error:
->     kernel: [  415.247453] Bluetooth: hci0 hardware error 0x00
-> 
-> Found on T100TA.
-> 
-> After reverting this commit, send works fine for any file size.
-> 
-> Signed-off-by: Frederic Danis <frederic.danis@linux.intel.com>
-> Fixes: 9119fba0cfed (serial: 8250_dma: don't bother DMA with small
-> transfers)
-> Cc: stable@vger.kernel.org
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-FWIW:
+This decodes the bits related to browsing channel which is useful to
+debug:
 
-Reviewed-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+> ACL Data RX: Handle 256 flags 0x02 dlen 68
+      Channel: 69 len 64 ctrl 0x0100 [PSM 27 mode 3] {chan 5}
+      I-frame: Unsegmented TxSeq 0 ReqSeq 1
+      AVCTP Browsing: Response: type 0x00 label 0 PID 0x110e
+        AVRCP: GetFolderItems: len 0x0036
+          Status: 0x04 (Success)
+          UIDCounter: 0x0000 (0)
+          NumOfItems: 0x0001 (1)
+          Item: 0x01 (Media Player)
+          Length: 0x002e (46)
+          PlayerID: 0x0001 (1)
+          PlayerType: 0x0001 (Audio)
+          PlayerSubType: 0x00000000 (None)
+          PlayStatus: 0x01 (PLAYING)
+          Features: 0x00000000003700050000000000000000
+            Advanced Control Player
+            Browsing
+            NowPlaying
+---
+ monitor/avctp.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-> ---
-> v3: Add Fixes and Cc tags
-> v2: Re-send to correct people
-> 
->  drivers/tty/serial/8250/8250_dma.c | 4 ----
->  1 file changed, 4 deletions(-)
-> 
-> diff --git a/drivers/tty/serial/8250/8250_dma.c b/drivers/tty/serial/8250/8250_dma.c
-> index b503071..78259d3 100644
-> --- a/drivers/tty/serial/8250/8250_dma.c
-> +++ b/drivers/tty/serial/8250/8250_dma.c
-> @@ -77,10 +77,6 @@ int serial8250_tx_dma(struct uart_8250_port *p)
->  		return 0;
->  
->  	dma->tx_size = CIRC_CNT_TO_END(xmit->head, xmit->tail, UART_XMIT_SIZE);
-> -	if (dma->tx_size < p->port.fifosize) {
-> -		ret = -EINVAL;
-> -		goto err;
-> -	}
->  
->  	desc = dmaengine_prep_slave_single(dma->txchan,
->  					   dma->tx_addr + xmit->tail,
-> -- 
-> 1.9.1
-
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index d06640e..232365e 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -1813,6 +1813,45 @@ response:
+ 	return true;
+ }
+ 
++
++static struct {
++	const char *str;
++	bool reserved;
++} features_table[] = {
++	/* Ignore passthrough bits */
++	[58] = { "Advanced Control Player" },
++	[59] = { "Browsing" },
++	[60] = { "Searching" },
++	[61] = { "AddToNowPlaying" },
++	[62] = { "Unique UIDs" },
++	[63] = { "OnlyBrowsableWhenAddressed" },
++	[64] = { "OnlySearchableWhenAddressed" },
++	[65] = { "NowPlaying" },
++	[66] = { "UIDPersistency" },
++	/* 67-127 reserved */
++	[67 ... 127] = { .reserved = true },
++};
++
++static void print_features(uint8_t features[16], uint8_t indent)
++{
++	int i;
++
++	for (i = 0; i < 127; i++) {
++		if (!(features[i / 8] & (1 << (i % 8))))
++			continue;
++
++		if (features_table[i].reserved) {
++			print_text(COLOR_WHITE_BG, "Unknown bit %u", i);
++			continue;
++		}
++
++		if (!features_table[i].str)
++			continue;
++
++		print_field("%*c%s", indent, ' ', features_table[i].str);
++	}
++}
++
+ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
+ 							uint8_t indent)
+ {
+@@ -1856,6 +1895,8 @@ static bool avrcp_media_player_item(struct avctp_frame *avctp_frame,
+ 
+ 	printf("\n");
+ 
++	print_features(features, indent + 2);
++
+ 	if (!l2cap_frame_get_be16(frame, &charset))
+ 		return false;
+ 
 -- 
-heikki
+2.4.3
+
