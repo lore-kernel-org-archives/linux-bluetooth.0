@@ -1,43 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
-To: Alexander Aring <alex.aring@gmail.com>
-CC: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"martin.gergeleit@hs-rm.de" <martin.gergeleit@hs-rm.de>,
-	"Bakke, Glenn Ruben" <Glenn.Ruben.Bakke@nordicsemi.no>
-Subject: RE: [RFC v2 0/4] Adding stateful compression to IPHC
-Date: Tue, 13 Oct 2015 08:36:35 +0000
-Message-ID: <AB80DA35A7B64E4E98291794926897D9F4B48ADE@MBX03.nvlsi.no>
-References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
- <20151012161550.GA571@omega>
-In-Reply-To: <20151012161550.GA571@omega>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+Subject: Re: randconfig build error with next-20151012, in drivers/bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CA+r1Zhjhu4LLHFtNK2=4bYO2tctd-QVt7ruWMCJMCQr85_2GMw@mail.gmail.com>
+Date: Tue, 13 Oct 2015 09:18:00 +0200
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next <linux-next@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <98BA8F10-69E5-4933-B0F6-8988B1CB6C90@holtmann.org>
+References: <CA+r1Zhjhu4LLHFtNK2=4bYO2tctd-QVt7ruWMCJMCQr85_2GMw@mail.gmail.com>
+To: Jim Davis <jim.epost@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGVsbG8gQWxleCwNCg0KRmlyc3Qgb2YgYWxsLCBJIHdhbnQgdG8gdGhhbmsgeW91IGZvciBjaGFu
-Z2VzIHRoYXQgeW91IGhhdmUgZG9uZSBvbg0KNkxvV1BBTiBhcmNoaXRlY3R1cmUuDQoNCkR1ZSB0
-byBhIGxhcmdlIHdvcmtsb2FkIHdlIGhhdmUgbm90IGJlZW4gYWJsZSB0byBkbyBmdXJ0aGVyIHBh
-dGNoZXMNCnRvIHRoZSBTdGF0ZWZ1bCBDb21wcmVzc2lvbiBSRkMuDQoNCldlIHdvdWxkIGJlIG1v
-cmUgdGhhbiBoYXBweSBpZiB5b3Ugd2FudCB0byBjb250aW51ZSBvbiB3aGF0IHdlIHN0YXJ0ZWQu
-DQpXaGlsZSB3ZSBhcmUgYnVzeSBpbiBuZXh0IGZldyB3ZWVrcyB3aXRoIG90aGVyIHByaW9yaXRp
-ZXMsIHdlIHNob3VsZCBzdGlsbA0KYmUgYWJsZSB0byBtYWtlIHRpbWUgZm9yIHJldmlld3MgaWYg
-eW91IHdhbnQgdG8gdGFrZSBvdmVyIHdoZXJlIHdlIGxlZnQuDQoNCk9uZSBub3RlIEkgd291bGQg
-bGlrZSB0byBhZGQgaXMgZnJvbSB0aGUgbGF0ZXN0IEJUTEUgZHJhZnQ6DQooaHR0cHM6Ly90b29s
-cy5pZXRmLm9yZy9odG1sL2RyYWZ0LWlldGYtNmxvLWJ0bGUtMTcjc2VjdGlvbi0zLjIuNCkuDQpU
-aGlzIGRlZmluZXMgc29tZSBkaWZmZXJlbnQgKG5vbiBnZW5lcmljKSBhcHByb2FjaCB3aXRoIHJl
-c3BlY3QgdG8gY29tcHJlc3Npb24NCm9mIElJRCwgdGhhdCBjb21lcyBmcm9tIEFSTyBtZXNzYWdl
-cyAobm90IGltcGxlbWVudGVkIGluIExpbnV4KSBpbnN0ZWFkIG9mDQpNQUMgbGF5ZXIsIHdoaWNo
-IGlzIG5vdCBoYW5kbGVkIGJ5IHRoZSBpbml0aWFsIFN0YXRlZnVsIENvbXByZXNzaW9uIFJGQyB3
-ZQ0KcHJvcG9zZWQuDQoNCkJlc3QgcmVnYXJkcywNCsWBdWthc3oNCg0KPiAtLS0tLU9yaWdpbmFs
-IE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbGV4YW5kZXIgQXJpbmcgW21haWx0bzphbGV4LmFyaW5n
-QGdtYWlsLmNvbV0NCj4gU2VudDogTW9uZGF5LCBPY3RvYmVyIDEyLCAyMDE1IDE4OjE2DQo+IFRv
-OiBEdWRhLCBMdWthc3oNCj4gQ2M6IGxpbnV4LXdwYW5Admdlci5rZXJuZWwub3JnOyBsaW51eC1i
-bHVldG9vdGhAdmdlci5rZXJuZWwub3JnOw0KPiBtYXJ0aW4uZ2VyZ2VsZWl0QGhzLXJtLmRlDQo+
-IFN1YmplY3Q6IFJlOiBbUkZDIHYyIDAvNF0gQWRkaW5nIHN0YXRlZnVsIGNvbXByZXNzaW9uIHRv
-IElQSEMNCj4gDQo+IEhpIEx1a2FzeiwNCj4gDQo+IGRvIHlvdSBzdGlsbCB3b3JraW5nIG9uIHNh
-dGVmdWwgY29tcHJlc3Npb24sIG90aGVyd2lzZSBJIHdvdWxkIHRyeSB0bw0KPiBpbXBsZW1lbnQg
-dGhpcyBzdHVmZiBiYXNlZCBvbiB5b3VyIHdvcmsuDQo+IA0KPiBXaGVuIEkgaGF2ZSBzb21ldGhp
-bmcgSSB3aWxsIGtlZXAgeW91IGluIGNjIGZvciByZXZpZXdpbmcgcHJvY2Vzcy4NCj4gDQo+IFRo
-YW5rcy4NCj4gDQo+IC0gQWxleA0K
+Hi Jim,
+
+> Building with the attached random configuration file,
+> 
+> warning: (BT_HCIBPA10X) selects BT_HCIUART which has unmet direct
+> dependencies (NET && BT && TTY)
+> 
+> ERROR: "tty_unthrottle" [drivers/bluetooth/hci_uart.ko] undefined!
+> ERROR: "tty_termios_encode_baud_rate" [drivers/bluetooth/hci_uart.ko] undefined!
+> ERROR: "tty_unregister_ldisc" [drivers/bluetooth/hci_uart.ko] undefined!
+> ERROR: "tty_ldisc_flush" [drivers/bluetooth/hci_uart.ko] undefined!
+> ERROR: "n_tty_ioctl_helper" [drivers/bluetooth/hci_uart.ko] undefined!
+> ERROR: "tty_driver_flush_buffer" [drivers/bluetooth/hci_uart.ko] undefined!
+> ERROR: "tty_register_ldisc" [drivers/bluetooth/hci_uart.ko] undefined!
+> ERROR: "tty_set_termios" [drivers/bluetooth/hci_uart.ko] undefined!
+
+thanks for the report. We already fixed it in bluetooth-next and it should be with that in linux-next as well.
+
+Regards
+
+Marcel
+
