@@ -1,40 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 13 Oct 2015 22:05:36 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btusb: Print information of Intel SfP lock
+ states
+Message-ID: <20151013200536.GA24144@t440s>
+References: <1444737295-109828-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 13 Oct 2015 16:45:14 -0700
-Message-ID: <CABOZqni1nLFJfq5Psj8L795sNfUPc5XgD0ofRXjTCe5XnRrzhg@mail.gmail.com>
-Subject: Multiple client connections?
-From: Mark Spruiell <mes@zeroc.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1444737295-109828-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We'd like to be able to establish multiple simultaneous client
-connections to the same service, both from a single process and from
-multiple processes. (Essentially, we'd like to create bluetooth socket
-connections just like we can for regular TCP socket connections, for
-example.)
+Hi Marcel,
 
-My client does the following:
+On Tue, Oct 13, 2015, Marcel Holtmann wrote:
+> The lock states from Intel SfP controllers can only be read once before
+> loading the firmware. So for debugging purposes, print them out.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btusb.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 
-* Gets a private connection to the system bus
-* Calls GetManagedObjects to locate the device corresponding to the
-target address
-* Calls RegisterProfile with a unique object path and the target UUID
-* Calls ConnectProfile on the target device with the target UUID
-* Receives a NewConnection call with the file descriptor
-* Uses the file descriptor like a regular socket
-* When finished, calls DisconnectProfile, waits for it to complete,
-and closes the socket
+Applied to bluetooth-next. Thanks.
 
-This works correctly. However, when I try to start another instance of
-the client process and connect to the same service, this second
-connection attempt fails. The first connection remains active and
-continues to work. This second client would have registered its own
-client profile with a unique object path and the same target UUID.
-
-Is it possible for a single host to establish multiple connections to
-the same service?
-
-Thanks,
-Mark
+Johan
