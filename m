@@ -1,125 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 From: Amitkumar Karwar <akarwar@marvell.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Cathy Luo <cluo@marvell.com>, Zhaoyang Liu <liuzy@marvell.com>,
+CC: Cathy Luo <cluo@marvell.com>,
 	Amitkumar Karwar <akarwar@marvell.com>
-Subject: [PATCH 2/4] Bluetooth: btmrvl: add prints debug control support
-Date: Wed, 14 Oct 2015 08:34:41 -0700
-Message-ID: <1444836883-14701-2-git-send-email-akarwar@marvell.com>
-In-Reply-To: <1444836883-14701-1-git-send-email-akarwar@marvell.com>
-References: <1444836883-14701-1-git-send-email-akarwar@marvell.com>
+Subject: [PATCH 1/4] Bluetooth: btmrvl: remove memory allocation failure message
+Date: Wed, 14 Oct 2015 08:34:40 -0700
+Message-ID: <1444836883-14701-1-git-send-email-akarwar@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Zhaoyang Liu <liuzy@marvell.com>
+These changes resolve below checkpatch warning
 
-This patch adds support for debugging print control in marvell
-bluetooth driver. The debug level can be controlled by setting
-module loading parameter debug_mask.
+WARNING: Possible unnecessary 'out of memory' message
 
-Example:
-insmod btmrvl.ko debug_mask=0x37
-
-Signed-off-by: Zhaoyang Liu <liuzy@marvell.com>
-Signed-off-by: Cathy Luo <cluo@marvell.com>
 Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 ---
- drivers/bluetooth/btmrvl_drv.h  | 35 ++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btmrvl_main.c | 18 ++++++++++++++++++
- 2 files changed, 52 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btmrvl_main.c | 8 ++------
+ drivers/bluetooth/btmrvl_sdio.c | 5 ++---
+ 2 files changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index 27a9aac..1119d09 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -79,6 +79,7 @@ struct btmrvl_device {
- struct btmrvl_adapter {
- 	void *hw_regs_buf;
- 	u8 *hw_regs;
-+	unsigned int debug_mask;
- 	u32 int_count;
- 	struct sk_buff_head tx_queue;
- 	u8 psmode;
-@@ -155,8 +156,40 @@ struct btmrvl_event {
- 	u8 data[4];
- } __packed;
- 
--/* Prototype of global function */
-+/* marvell bluetooth driver debug level */
-+enum BTMRVL_DEBUG_LEVEL {
-+	BTMRVL_DBG_MSG		= 0x00000001,
-+	BTMRVL_DBG_FATAL	= 0x00000002,
-+	BTMRVL_DBG_ERROR	= 0x00000004,
-+	BTMRVL_DBG_DATA		= 0x00000008,
-+	BTMRVL_DBG_CMD		= 0x00000010,
-+	BTMRVL_DBG_EVENT	= 0x00000020,
-+	BTMRVL_DBG_INTR		= 0x00000040,
-+
-+	BTMRVL_DBG_DAT_D	= 0x00010000,
-+	BTMRVL_DBG_CMD_D	= 0x00020000,
-+
-+	BTMRVL_DBG_ENTRY	= 0x10000000,
-+	BTMRVL_DBG_WARN		= 0x20000000,
-+	BTMRVL_DBG_INFO		= 0x40000000,
-+
-+	BTMRVL_DBG_ANY		= 0xffffffff
-+};
- 
-+#define BTMRVL_DBG_DEFAULT_MASK		(BTMRVL_DBG_MSG | \
-+					 BTMRVL_DBG_FATAL | \
-+					 BTMRVL_DBG_ERROR)
-+
-+int btmrvl_log_allowed(struct btmrvl_adapter *adapter,
-+		       enum BTMRVL_DEBUG_LEVEL level);
-+
-+#define btmrvl_dbg(adapter, dbg_mask, fmt, args...)		\
-+do {								\
-+	if (btmrvl_log_allowed(adapter, BTMRVL_DBG_##dbg_mask))	\
-+		pr_info("btmrvl: " fmt "\n", ##args);		\
-+} while (0)
-+
-+/* Prototype of global function */
- int btmrvl_register_hdev(struct btmrvl_private *priv);
- struct btmrvl_private *btmrvl_add_card(void *card);
- int btmrvl_remove_card(struct btmrvl_private *priv);
 diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index 61d2f39..8e53609 100644
+index 6ba2286..61d2f39 100644
 --- a/drivers/bluetooth/btmrvl_main.c
 +++ b/drivers/bluetooth/btmrvl_main.c
-@@ -29,6 +29,23 @@
+@@ -712,16 +712,12 @@ struct btmrvl_private *btmrvl_add_card(void *card)
+ 	struct btmrvl_private *priv;
  
- #define VERSION "1.0"
+ 	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
+-	if (!priv) {
+-		BT_ERR("Can not allocate priv");
++	if (!priv)
+ 		goto err_priv;
+-	}
  
-+static unsigned int debug_mask = BTMRVL_DBG_DEFAULT_MASK;
-+module_param(debug_mask, uint, 0);
-+MODULE_PARM_DESC(debug_mask, "bitmap for debug flags");
-+
-+int btmrvl_log_allowed(struct btmrvl_adapter *adapter,
-+		       enum BTMRVL_DEBUG_LEVEL level)
-+{
-+	if (!adapter && (BTMRVL_DBG_DEFAULT_MASK & level))
-+		return true;
-+
-+	if (adapter->debug_mask & level)
-+		return true;
-+
-+	return false;
-+}
-+EXPORT_SYMBOL_GPL(btmrvl_log_allowed);
-+
- /*
-  * This function is called by interface specific interrupt handler.
-  * It updates Power Save & Host Sleep states, and wakes up the main
-@@ -402,6 +419,7 @@ static void btmrvl_init_adapter(struct btmrvl_private *priv)
- 	skb_queue_head_init(&priv->adapter->tx_queue);
+ 	priv->adapter = kzalloc(sizeof(*priv->adapter), GFP_KERNEL);
+-	if (!priv->adapter) {
+-		BT_ERR("Allocate buffer for btmrvl_adapter failed!");
++	if (!priv->adapter)
+ 		goto err_adapter;
+-	}
  
- 	priv->adapter->ps_state = PS_AWAKE;
-+	priv->adapter->debug_mask = debug_mask;
+ 	btmrvl_init_adapter(priv);
  
- 	buf_size = ALIGN_SZ(SDIO_BLOCK_SIZE, BTSDIO_DMA_ALIGN);
- 	priv->adapter->hw_regs_buf = kzalloc(buf_size, GFP_KERNEL);
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 71ea2a3..e039fc9 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -1382,10 +1382,9 @@ done:
+ 		return;
+ 
+ 	fw_dump_data = vzalloc(fw_dump_len+1);
+-	if (!fw_dump_data) {
+-		BT_ERR("Vzalloc fw_dump_data fail!");
++	if (!fw_dump_data)
+ 		return;
+-	}
++
+ 	fw_dump_ptr = fw_dump_data;
+ 
+ 	/* Dump all the memory data into single file, a userspace script will
 -- 
 1.8.1.4
 
