@@ -1,61 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH 3/4] Bluetooth: btmrvl: add debug mask debugfs parameter
+Subject: Re: [PATCH 2/4] Bluetooth: btmrvl: add prints debug control support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1444836883-14701-3-git-send-email-akarwar@marvell.com>
-Date: Thu, 15 Oct 2015 01:03:43 +0200
+In-Reply-To: <1444836883-14701-2-git-send-email-akarwar@marvell.com>
+Date: Thu, 15 Oct 2015 01:02:06 +0200
 Cc: linux-bluetooth@vger.kernel.org, Cathy Luo <cluo@marvell.com>,
 	Zhaoyang Liu <liuzy@marvell.com>
-Message-Id: <E8843A7E-047C-474C-9B26-F5B0F8F0EDE0@holtmann.org>
-References: <1444836883-14701-1-git-send-email-akarwar@marvell.com> <1444836883-14701-3-git-send-email-akarwar@marvell.com>
+Message-Id: <51C3944C-E51F-4554-9803-1DA1B561BDF8@holtmann.org>
+References: <1444836883-14701-1-git-send-email-akarwar@marvell.com> <1444836883-14701-2-git-send-email-akarwar@marvell.com>
 To: Amitkumar Karwar <akarwar@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Amitkumar,
 
-> This patch adds support for debug mask read/write operations
-> via debugfs. It is useful during debugging driver logs.
+> This patch adds support for debugging print control in marvell
+> bluetooth driver. The debug level can be controlled by setting
+> module loading parameter debug_mask.
 > 
-> Examples:
-> 
-> Read current debug mask:
-> cat /sys/kernel/debug/bluetooth/hci0/config/debug_mask
-> 
-> Update debug mask:
-> echo 0xff > /sys/kernel/debug/bluetooth/hci0/config/debug_mask
+> Example:
+> insmod btmrvl.ko debug_mask=0x37
 > 
 > Signed-off-by: Zhaoyang Liu <liuzy@marvell.com>
 > Signed-off-by: Cathy Luo <cluo@marvell.com>
 > Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 > ---
-> drivers/bluetooth/btmrvl_debugfs.c | 51 ++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 51 insertions(+)
+> drivers/bluetooth/btmrvl_drv.h  | 35 ++++++++++++++++++++++++++++++++++-
+> drivers/bluetooth/btmrvl_main.c | 18 ++++++++++++++++++
+> 2 files changed, 52 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
-> index 1828ed8..af52b03 100644
-> --- a/drivers/bluetooth/btmrvl_debugfs.c
-> +++ b/drivers/bluetooth/btmrvl_debugfs.c
-> @@ -196,6 +196,55 @@ static const struct file_operations btmrvl_fwdump_fops = {
-> 	.llseek = default_llseek,
-> };
+> diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+> index 27a9aac..1119d09 100644
+> --- a/drivers/bluetooth/btmrvl_drv.h
+> +++ b/drivers/bluetooth/btmrvl_drv.h
+> @@ -79,6 +79,7 @@ struct btmrvl_device {
+> struct btmrvl_adapter {
+> 	void *hw_regs_buf;
+> 	u8 *hw_regs;
+> +	unsigned int debug_mask;
+> 	u32 int_count;
+> 	struct sk_buff_head tx_queue;
+> 	u8 psmode;
+> @@ -155,8 +156,40 @@ struct btmrvl_event {
+> 	u8 data[4];
+> } __packed;
 > 
-> +/* Proc debug_mask file read handler.
-> + * This function is called when the 'debug_mask' file is opened for reading
-> + * This function can be used read driver debugging mask value.
-> + */
-> +static ssize_t btmrvl_debug_mask_read(struct file *file, char __user *ubuf,
-> +				      size_t count, loff_t *ppos)
-> +{
-> +	struct btmrvl_private *priv = file->private_data;
-> +	char buf[32];
-> +	int ret;
+> -/* Prototype of global function */
+> +/* marvell bluetooth driver debug level */
+> +enum BTMRVL_DEBUG_LEVEL {
+> +	BTMRVL_DBG_MSG		= 0x00000001,
+> +	BTMRVL_DBG_FATAL	= 0x00000002,
+> +	BTMRVL_DBG_ERROR	= 0x00000004,
+> +	BTMRVL_DBG_DATA		= 0x00000008,
+> +	BTMRVL_DBG_CMD		= 0x00000010,
+> +	BTMRVL_DBG_EVENT	= 0x00000020,
+> +	BTMRVL_DBG_INTR		= 0x00000040,
 > +
-> +	ret = snprintf(buf, sizeof(buf) - 1, "debug mask=0x%08x\n",
-> +		       priv->adapter->debug_mask);
+> +	BTMRVL_DBG_DAT_D	= 0x00010000,
+> +	BTMRVL_DBG_CMD_D	= 0x00020000,
+> +
+> +	BTMRVL_DBG_ENTRY	= 0x10000000,
+> +	BTMRVL_DBG_WARN		= 0x20000000,
+> +	BTMRVL_DBG_INFO		= 0x40000000,
+> +
+> +	BTMRVL_DBG_ANY		= 0xffffffff
+> +};
+> 
+> +#define BTMRVL_DBG_DEFAULT_MASK		(BTMRVL_DBG_MSG | \
+> +					 BTMRVL_DBG_FATAL | \
+> +					 BTMRVL_DBG_ERROR)
+> +
+> +int btmrvl_log_allowed(struct btmrvl_adapter *adapter,
+> +		       enum BTMRVL_DEBUG_LEVEL level);
+> +
+> +#define btmrvl_dbg(adapter, dbg_mask, fmt, args...)		\
+> +do {								\
+> +	if (btmrvl_log_allowed(adapter, BTMRVL_DBG_##dbg_mask))	\
+> +		pr_info("btmrvl: " fmt "\n", ##args);		\
+> +} while (0)
+> +
+> +/* Prototype of global function */
+> int btmrvl_register_hdev(struct btmrvl_private *priv);
+> struct btmrvl_private *btmrvl_add_card(void *card);
+> int btmrvl_remove_card(struct btmrvl_private *priv);
+> diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+> index 61d2f39..8e53609 100644
+> --- a/drivers/bluetooth/btmrvl_main.c
+> +++ b/drivers/bluetooth/btmrvl_main.c
+> @@ -29,6 +29,23 @@
+> 
+> #define VERSION "1.0"
+> 
+> +static unsigned int debug_mask = BTMRVL_DBG_DEFAULT_MASK;
+> +module_param(debug_mask, uint, 0);
+> +MODULE_PARM_DESC(debug_mask, "bitmap for debug flags");
 
-the file is already called debug mask, no need to prefix the file content with some key=val thing. Just return the value.
+I see no reason for this being a module parameter. I think you really want to have that via debugfs for reach adapter.
 
 Regards
 
