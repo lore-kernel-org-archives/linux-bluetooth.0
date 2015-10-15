@@ -1,97 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Remove __l2cap_wait_ack
-Date: Thu, 15 Oct 2015 16:06:56 +0300
-Message-Id: <1444914416-27666-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] core/device: Fix crash when disconnecting
+Date: Thu, 15 Oct 2015 13:22:46 +0300
+Message-Id: <1444904566-30314-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-__l2cap_wait_ack probably cause more harm than good since it was added as
-a feature to wait until all unacked packets are processed and properly
-acked by the remote but it ignored the fact that the remote may probably
-wait some window threshold before start acking.
+When device disconnect while GATT discovery is ongoing the following
+crash can happen if the device is destroyed in case it is temporary:
 
-Since the window threshold is implementation specific, we ack when the
-window is 3/4th full, it should probably be the receiving side that
-should ack or discard the packets in the queue when processing the
-Disconnect request.
-
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Invalid read of size 4
+   at 0x40A707C: g_slist_find_custom (in /usr/lib/libglib-2.0.so.0.4400.1)
+   by 0x80B7382: gatt_service_removed (device.c:3422)
+   by 0x80DF2FB: handle_notify (gatt-db.c:266)
+   by 0x80D3B8E: queue_foreach (queue.c:251)
+   by 0x80DF981: notify_service_changed (gatt-db.c:283)
+   by 0x80DF981: gatt_db_service_destroy (gatt-db.c:294)
+   by 0x80D3DFE: queue_remove_all (queue.c:387)
+   by 0x80DFA4C: gatt_db_clear (gatt-db.c:438)
+   by 0x80D908C: init_fail (gatt-client.c:1524)
+   by 0x80D9A52: discovery_op_unref (gatt-client.c:419)
+   by 0x80E18F2: destroy_mtu_op (gatt-helpers.c:495)
+   by 0x80D7F6E: cancel_att_send_op (att.c:212)
+   by 0x80D7F6E: bt_att_cancel (att.c:1238)
+   by 0x80DB26A: bt_gatt_client_cancel_all (gatt-client.c:1962)
+ Address 0x5536b58 is 0 bytes inside a block of size 8 free'd
+   at 0x402B2C9: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+   by 0x408CE4F: g_free (in /usr/lib/libglib-2.0.so.0.4400.1)
+   by 0x40A6772: g_slice_free_chain_with_offset (in /usr/lib/libglib-2.0.so.0.4400.1)
+   by 0x40A6B6B: g_slist_free (in /usr/lib/libglib-2.0.so.0.4400.1)
+   by 0x40A7374: g_slist_free_full (in /usr/lib/libglib-2.0.so.0.4400.1)
+   by 0x80B6CE0: device_free (device.c:624)
+   by 0x80CFCCB: remove_interface (object.c:658)
+   by 0x80D0208: g_dbus_unregister_interface (object.c:1382)
+   by 0x80BC281: btd_device_unref (device.c:5942)
+   by 0x80A9ACA: btd_adapter_remove_device (adapter.c:1165)
+   by 0x80A9C52: adapter_remove_connection (adapter.c:5624)
+   by 0x80AA77F: dev_disconnected (adapter.c:6584)
 ---
- net/bluetooth/l2cap_sock.c | 50 ----------------------------------------------
- 1 file changed, 50 deletions(-)
+ src/device.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 586b3d5..5bfb406 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1054,51 +1054,6 @@ static void l2cap_sock_kill(struct sock *sk)
- 	sock_put(sk);
- }
+diff --git a/src/device.c b/src/device.c
+index fd177f4..0d3a655 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -626,6 +626,9 @@ static void device_free(gpointer user_data)
+ 	g_slist_free_full(device->attios_offline, g_free);
+ 	g_slist_free_full(device->svc_callbacks, svc_dev_remove);
  
--static int __l2cap_wait_ack(struct sock *sk, struct l2cap_chan *chan)
--{
--	DECLARE_WAITQUEUE(wait, current);
--	int err = 0;
--	int timeo = L2CAP_WAIT_ACK_POLL_PERIOD;
--	/* Timeout to prevent infinite loop */
--	unsigned long timeout = jiffies + L2CAP_WAIT_ACK_TIMEOUT;
--
--	add_wait_queue(sk_sleep(sk), &wait);
--	set_current_state(TASK_INTERRUPTIBLE);
--	do {
--		BT_DBG("Waiting for %d ACKs, timeout %04d ms",
--		       chan->unacked_frames, time_after(jiffies, timeout) ? 0 :
--		       jiffies_to_msecs(timeout - jiffies));
--
--		if (!timeo)
--			timeo = L2CAP_WAIT_ACK_POLL_PERIOD;
--
--		if (signal_pending(current)) {
--			err = sock_intr_errno(timeo);
--			break;
--		}
--
--		release_sock(sk);
--		timeo = schedule_timeout(timeo);
--		lock_sock(sk);
--		set_current_state(TASK_INTERRUPTIBLE);
--
--		err = sock_error(sk);
--		if (err)
--			break;
--
--		if (time_after(jiffies, timeout)) {
--			err = -ENOLINK;
--			break;
--		}
--
--	} while (chan->unacked_frames > 0 &&
--		 chan->state == BT_CONNECTED);
--
--	set_current_state(TASK_RUNNING);
--	remove_wait_queue(sk_sleep(sk), &wait);
--	return err;
--}
--
- static int l2cap_sock_shutdown(struct socket *sock, int how)
- {
- 	struct sock *sk = sock->sk;
-@@ -1128,11 +1083,6 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
- 	lock_sock(sk);
++	/* Reset callbacks since the device is going to be freed */
++	gatt_db_register(device->db, NULL, NULL, NULL, NULL);
++
+ 	attio_cleanup(device);
  
- 	if (!sk->sk_shutdown) {
--		if (chan->mode == L2CAP_MODE_ERTM &&
--		    chan->unacked_frames > 0 &&
--		    chan->state == BT_CONNECTED)
--			err = __l2cap_wait_ack(sk, chan);
--
- 		sk->sk_shutdown = SHUTDOWN_MASK;
- 
- 		release_sock(sk);
+ 	gatt_db_unref(device->db);
 -- 
 2.4.3
 
