@@ -2,70 +2,76 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH] Bluetooth: properly initialize conn_params in scan phase
-Date: Thu, 15 Oct 2015 13:45:50 -0700
-Message-Id: <1444941950-5362-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH] Bluetooth: fix double scan updates
+Date: Thu, 15 Oct 2015 12:53:58 -0700
+Message-Id: <1444938838-3225-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch makes sure that conn_params that were created just for
-explicit_connect, will get properly deleted during cleanup.
+When disble/enable scan command is issued twice, some controllers would
+return error for second request. Therefore requests including those would
+fail on some controllers, and succeed on others.
+
+This patch makes sure that unnecessary scan disable/enable is not issued.
+
+When adding device to auto connect whitelist when there is pending connect
+attempt, there is no need to update scan.
+
+hci_connect_le_scan_cleanup is conditionally executing
+hci_conn_params_del, that is calling hci_update_background_scan. Make the
+other case also update scan, and remove reduntand call from
+hci_connect_le_scan_remove.
 
 Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
 ---
- net/bluetooth/hci_conn.c | 22 +++++++++++++++-------
- net/bluetooth/mgmt.c     |  3 +++
- 2 files changed, 18 insertions(+), 7 deletions(-)
+ net/bluetooth/hci_conn.c | 7 ++++---
+ net/bluetooth/mgmt.c     | 6 +++++-
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index dbe32db..42b083e 100644
+index b4548c73..2ebcaaa 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -1015,15 +1015,23 @@ static int hci_explicit_conn_params_set(struct hci_request *req,
- 	if (is_connected(hdev, addr, addr_type))
- 		return -EISCONN;
- 
--	params = hci_conn_params_add(hdev, addr, addr_type);
--	if (!params)
--		return -EIO;
-+	params = hci_conn_params_lookup(hdev, addr, addr_type);
-+	if (!params) {
-+		params = hci_conn_params_add(hdev, addr, addr_type);
-+		if (!params)
-+			return -EIO;
-+
-+		/* If we created new params, mark them to be deleted in
-+		 * hci_connect_le_scan_cleanup. It's different case than
-+		 * existing disabled params, those will stay after cleanup.
-+		 */
-+		params->auto_connect = HCI_AUTO_CONN_EXPLICIT;
+@@ -91,10 +91,12 @@ static void hci_connect_le_scan_cleanup(struct hci_conn *conn)
+ 	 * autoconnect action, remove them completely. If they are, just unmark
+ 	 * them as waiting for connection, by clearing explicit_connect field.
+ 	 */
+-	if (params->auto_connect == HCI_AUTO_CONN_EXPLICIT)
++	if (params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
+ 		hci_conn_params_del(conn->hdev, bdaddr, bdaddr_type);
+-	else
++	} else {
+ 		params->explicit_connect = false;
++		hci_update_background_scan(conn->hdev);
 +	}
+ }
  
--	/* If we created new params, or existing params were marked as disabled,
--	 * mark them to be used just once to connect.
--	 */
-+	/* We're trying to connect, so make sure params are at pend_le_conns */
- 	if (params->auto_connect == HCI_AUTO_CONN_DISABLED ||
--	    params->auto_connect == HCI_AUTO_CONN_REPORT) {
-+	    params->auto_connect == HCI_AUTO_CONN_REPORT ||
-+	    params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
- 		list_del_init(&params->action);
- 		list_add(&params->action, &hdev->pend_le_conns);
- 	}
+ /* This function requires the caller holds hdev->lock */
+@@ -103,7 +105,6 @@ static void hci_connect_le_scan_remove(struct hci_conn *conn)
+ 	hci_connect_le_scan_cleanup(conn);
+ 
+ 	hci_conn_hash_del(conn->hdev, conn);
+-	hci_update_background_scan(conn->hdev);
+ }
+ 
+ static void hci_acl_create_connection(struct hci_conn *conn)
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9216393..61df34f 100644
+index ccaf5a4..af29a3d 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3584,6 +3584,9 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		 */
- 		hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
- 
-+		if (hci_param->auto_connect == HCI_AUTO_CONN_EXPLICIT)
-+			hci_param->auto_connect = HCI_AUTO_CONN_DISABLED;
-+
- 		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr,
- 					   addr_type, sec_level,
- 					   HCI_LE_CONN_TIMEOUT,
+@@ -6124,7 +6124,11 @@ static int hci_conn_params_set(struct hci_request *req, bdaddr_t *addr,
+ 	case HCI_AUTO_CONN_ALWAYS:
+ 		if (!is_connected(hdev, addr, addr_type)) {
+ 			list_add(&params->action, &hdev->pend_le_conns);
+-			__hci_update_background_scan(req);
++			/* If we are connecting to device using random address,
++			 * we were already added to pend_le_conns and scanning.
++			 */
++			if (params->auto_connect != HCI_AUTO_CONN_EXPLICIT)
++				__hci_update_background_scan(req);
+ 		}
+ 		break;
+ 	}
 -- 
 2.5.0
 
