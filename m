@@ -1,77 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH] Bluetooth: fix double scan updates
-Date: Thu, 15 Oct 2015 12:53:58 -0700
-Message-Id: <1444938838-3225-1-git-send-email-jpawlowski@google.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+Subject: Re: [PATCH 1/4] Bluetooth: btmrvl: remove memory allocation failure message
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <176211e0daf741c798df55c7a3c3b897@SC-EXCH04.marvell.com>
+Date: Thu, 15 Oct 2015 16:52:29 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Cathy Luo <cluo@marvell.com>
+Message-Id: <96D9DF48-F36C-4600-BD5D-319142C3EE4B@holtmann.org>
+References: <1444836883-14701-1-git-send-email-akarwar@marvell.com> <7332109E-2B64-4A42-90E6-33900F490B95@holtmann.org> <176211e0daf741c798df55c7a3c3b897@SC-EXCH04.marvell.com>
+To: Amitkumar Karwar <akarwar@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When disble/enable scan command is issued twice, some controllers would
-return error for second request. Therefore requests including those would
-fail on some controllers, and succeed on others.
+Hi Amitkumar,
 
-This patch makes sure that unnecessary scan disable/enable is not issued.
+>>> These changes resolve below checkpatch warning
+>>> 
+>>> WARNING: Possible unnecessary 'out of memory' message
+>>> 
+>>> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+>>> ---
+>>> drivers/bluetooth/btmrvl_main.c | 8 ++------
+>>> drivers/bluetooth/btmrvl_sdio.c | 5 ++---
+>>> 2 files changed, 4 insertions(+), 9 deletions(-)
+>>> 
+>>> diff --git a/drivers/bluetooth/btmrvl_main.c
+>>> b/drivers/bluetooth/btmrvl_main.c index 6ba2286..61d2f39 100644
+>>> --- a/drivers/bluetooth/btmrvl_main.c
+>>> +++ b/drivers/bluetooth/btmrvl_main.c
+>>> @@ -712,16 +712,12 @@ struct btmrvl_private *btmrvl_add_card(void
+>> *card)
+>>> 	struct btmrvl_private *priv;
+>>> 
+>>> 	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
+>>> -	if (!priv) {
+>>> -		BT_ERR("Can not allocate priv");
+>>> +	if (!priv)
+>>> 		goto err_priv;
+>>> -	}
+>> 
+>> I do not get these checkpatch fixes. Why is the error messages unneeded?
+>> 
+> 
+> Linux kernel already displays a generic message and stack dump in this case. So this error message would be redundant.
+> More details on checkpatch code change: http://lkml.iu.edu/hypermail/linux/kernel/1406.1/01508.html
 
-When adding device to auto connect whitelist when there is pending connect
-attempt, there is no need to update scan.
+fair enough. I can accept this premise.
 
-hci_connect_le_scan_cleanup is conditionally executing
-hci_conn_params_del, that is calling hci_update_background_scan. Make the
-other case also update scan, and remove reduntand call from
-hci_connect_le_scan_remove.
+Regards
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
----
- net/bluetooth/hci_conn.c | 7 ++++---
- net/bluetooth/mgmt.c     | 6 +++++-
- 2 files changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b4548c73..2ebcaaa 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -91,10 +91,12 @@ static void hci_connect_le_scan_cleanup(struct hci_conn *conn)
- 	 * autoconnect action, remove them completely. If they are, just unmark
- 	 * them as waiting for connection, by clearing explicit_connect field.
- 	 */
--	if (params->auto_connect == HCI_AUTO_CONN_EXPLICIT)
-+	if (params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
- 		hci_conn_params_del(conn->hdev, bdaddr, bdaddr_type);
--	else
-+	} else {
- 		params->explicit_connect = false;
-+		hci_update_background_scan(conn->hdev);
-+	}
- }
- 
- /* This function requires the caller holds hdev->lock */
-@@ -103,7 +105,6 @@ static void hci_connect_le_scan_remove(struct hci_conn *conn)
- 	hci_connect_le_scan_cleanup(conn);
- 
- 	hci_conn_hash_del(conn->hdev, conn);
--	hci_update_background_scan(conn->hdev);
- }
- 
- static void hci_acl_create_connection(struct hci_conn *conn)
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ccaf5a4..af29a3d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6124,7 +6124,11 @@ static int hci_conn_params_set(struct hci_request *req, bdaddr_t *addr,
- 	case HCI_AUTO_CONN_ALWAYS:
- 		if (!is_connected(hdev, addr, addr_type)) {
- 			list_add(&params->action, &hdev->pend_le_conns);
--			__hci_update_background_scan(req);
-+			/* If we are connecting to device using random address,
-+			 * we were already added to pend_le_conns and scanning.
-+			 */
-+			if (params->auto_connect != HCI_AUTO_CONN_EXPLICIT)
-+				__hci_update_background_scan(req);
- 		}
- 		break;
- 	}
--- 
-2.5.0
+Marcel
 
