@@ -1,94 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Oct 2015 17:29:00 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull request: bluetooth 2015-10-16
-Message-ID: <20151016142900.GA22587@t440s.P-661HNU-F1>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cNdxnHkX5QqsyA0e"
+Message-ID: <1444999451.3652.14.camel@linux.intel.com>
+Subject: Re: [PATCH bluetooth-next 6/6] 6lowpan: remove lowpan_fetch_skb_u8
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
+	linux-bluetooth@vger.kernel.org
+Date: Fri, 16 Oct 2015 15:44:11 +0300
+In-Reply-To: <1444736579-27826-6-git-send-email-alex.aring@gmail.com>
+References: <1444736579-27826-1-git-send-email-alex.aring@gmail.com>
+	 <1444736579-27826-6-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Alex,
 
---cNdxnHkX5QqsyA0e
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-Hi Dave,
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
-First of all, sorry for the late set of patches for the 4.3 cycle. We
-just finished an intensive week of testing at the Bluetooth UnPlugFest
-and discovered (and fixed) issues there. Unfortunately a few issues
-affect 4.3-rc5 in a way that they break existing Bluetooth LE mouse and
-keyboard support.
 
-The regressions result from supporting LE privacy in conjunction with
-scanning for Resolvable Private Addresses before connecting. A feature
-that has been tested heavily (including automated unit tests), but sadly
-some regressions slipped in. The UnPlugFest with its multitude of test
-platforms is a good battle testing ground for uncovering every corner
-case.
+On ti, 2015-10-13 at 13:42 +0200, Alexander Aring wrote:
+> This patch removes the lowpan_fetch_skb_u8 function for getting the iphc
+> bytes. Instead we using the generic which has a len parameter to tell
+> the amount of bytes to fetch.
+> 
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> ---
+>  include/net/6lowpan.h | 27 ++++++++++++++-------------
+>  net/6lowpan/iphc.c    |  4 ++--
+>  2 files changed, 16 insertions(+), 15 deletions(-)
+> 
+> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+> index ac30ad3..4afdbb3 100644
+> --- a/include/net/6lowpan.h
+> +++ b/include/net/6lowpan.h
+> @@ -287,19 +287,20 @@ static inline void raw_dump_inline(const char *caller, char *msg,
+>  				   const unsigned char *buf, int len) { }
+>  #endif
+>  
+> -static inline int lowpan_fetch_skb_u8(struct sk_buff *skb, u8 *val)
+> -{
+> -	if (unlikely(!pskb_may_pull(skb, 1)))
+> -		return -EINVAL;
+> -
+> -	*val = skb->data[0];
+> -	skb_pull(skb, 1);
+> -
+> -	return 0;
+> -}
+> -
+> -static inline bool lowpan_fetch_skb(struct sk_buff *skb,
+> -		void *data, const unsigned int len)
+> +/**
+> + * lowpan_fetch_skb - getting inline data from 6LoWPAN header
+> + *
+> + * This function will pull data from sk buffer and put it into data to
+> + * remove the 6LoWPAN inline data. This function returns true if the
+> + * sk buffer is too small to pull the amount of data which is specified
+> + * by len.
+> + *
+> + * @skb: the buffer where the inline data should be pulled from.
+> + * @data: destination buffer for the inline data.
+> + * @len: amount of data which should be pulled in bytes.
+> + */
+> +static inline bool lowpan_fetch_skb(struct sk_buff *skb, void *data,
+> +				    unsigned int len)
+>  {
+>  	if (unlikely(!pskb_may_pull(skb, len)))
+>  		return true;
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 8f967d3..87d8f1f 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -265,8 +265,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+>  	raw_dump_table(__func__, "raw skb data dump uncompressed",
+>  		       skb->data, skb->len);
+>  
+> -	if (lowpan_fetch_skb_u8(skb, &iphc0) ||
+> -	    lowpan_fetch_skb_u8(skb, &iphc1))
+> +	if (lowpan_fetch_skb(skb, &iphc0, sizeof(iphc0)) ||
+> +	    lowpan_fetch_skb(skb, &iphc1, sizeof(iphc1)))
+>  		return -EINVAL;
+>  
+>  	/* another if the CID flag is set */
 
-The patches in this pull request focus only on fixing the regressions in
-4.3-rc5. The patches look a bit larger since we also added comments in
-the critical sections of the fixes to improve clarity.
 
-I would appreciate if we can get these regression fixes to Linus
-quickly. Please let me know if there are any issues pulling. Thanks.
+Cheers,
+Jukka
 
-Johan
 
----
-The following changes since commit 53ca376eec4eb635e2249c8e89093f499e180731:
-
-  mlxsw: core: Fix race condition in __mlxsw_emad_transmit (2015-10-15 06:03:06 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to 5157b8a503fa834e8569c7fed06981e3d3d53db0:
-
-  Bluetooth: Fix initializing conn_params in scan phase (2015-10-16 09:24:41 +0200)
-
-----------------------------------------------------------------
-Jakub Pawlowski (2):
-      Bluetooth: Fix double scan updates
-      Bluetooth: Fix initializing conn_params in scan phase
-
-Johan Hedberg (4):
-      Bluetooth: Fix reference counting for LE-scan based connections
-      Bluetooth: Fix LE reconnection logic
-      Bluetooth: Fix remove_device behavior for explicit connects
-      Bluetooth: Fix conn_params list update in hci_connect_le_scan_cleanup
-
- net/bluetooth/hci_conn.c  | 99 +++++++++++++++++++++++++++++++++-------------
- net/bluetooth/hci_core.c  |  7 ----
- net/bluetooth/hci_event.c | 11 ++++--
- net/bluetooth/mgmt.c      | 24 +++++++++--
- 4 files changed, 99 insertions(+), 42 deletions(-)
-
---cNdxnHkX5QqsyA0e
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJWIQmsAAoJECQj9vv5qNQSDCYP/A7UMUc8HeZxGxZIhUkFtZIi
-TOgjf9XBVNMlCrUnEc70y+5voMJPMRMOH3Hx1IcocBbyUAHuYFciWtBOGwbeADXT
-ARFqmJ6nmxE8GKpxdt931xWYpXpaf779L6FCBhS8bvhjFV1QWg6XihVKeibTkZJc
-XZZISKYf/Qfcely7tTgxBWiYZdeAaEAV6kp6yMN2x0lE6YjGzNjolabgrMrbqRY9
-dN807qVjmgyrBGayQlHdLFwDfPnQ8ePJKGo6rfzRGVvxxvzQx41Iopy3XO9h76Td
-juTfEzW6/BCm8nhL5IsIhB1uuK9Dy/SQVExECPzK+muqThuw+4shuGHTPqrxg6ot
-vLLdtdoIuZJ+T2kXvNaLoVvuEkPkY3pVncShPZck6V5hyiOhw21oQNny31IpY3Jg
-Y1VTlJXjlUjwbl5jGEA83eaVm7EuWqgQSdbbj1VJD3ViL19oarYUJ6XiwyjAPRh5
-mZ+Vnob1IROcNviYI4krN05oPzEfesfTMYWVoL0n0hYKzLpyY7Tr+73ACeFdvpme
-CzcsWk21dmrPgc0i6RCp6ZxvpOdcec39OmMSDxI2RbIX8E1+Ch7ecw4iT0M/WjwW
-HCsiY4bJ7Vlbp2BZSncqM0F8jiBSZ0X5YZNjDJITOr8i2BDeyCBPP0YCrmMzUOE7
-W8ii6WQCtZuG+YxEbvYY
-=lYiM
------END PGP SIGNATURE-----
-
---cNdxnHkX5QqsyA0e--
