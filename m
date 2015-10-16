@@ -1,163 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1444999102.3652.8.camel@linux.intel.com>
-Subject: Re: [PATCH bluetooth-next 2/6] bluetooth: 6lowpan: use lowpan
- dispatch helpers
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	linux-bluetooth@vger.kernel.org
-Date: Fri, 16 Oct 2015 15:38:22 +0300
-In-Reply-To: <1444736579-27826-2-git-send-email-alex.aring@gmail.com>
-References: <1444736579-27826-1-git-send-email-alex.aring@gmail.com>
-	 <1444736579-27826-2-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-wpan-owner@vger.kernel.org
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Dmitry Tunin <hanipouspilot@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ath3k: Add support of AR3012 0cf3:817b device
+Date: Fri, 16 Oct 2015 11:45:26 +0300
+Message-Id: <1444985126-4864-1-git-send-email-hanipouspilot@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+T: Bus=04 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#= 3 Spd=12 MxCh= 0
+D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=0cf3 ProdID=817b Rev=00.02
+C: #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I: If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I: If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-the fixes in this patchset are fine and I verified with real hw that
-everything works ok. The fix in this patch did not fix the skb poison
-overwritten problem I am seeing and that needs more investigation.
+BugLink: https://bugs.launchpad.net/bugs/1506615
 
+Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-
-
-Cheers,
-Jukka
-
-
-
-On ti, 2015-10-13 at 13:42 +0200, Alexander Aring wrote:
-> This patch adds a check if the dataroom of skb contains a dispatch value
-> by checking if skb->len != 0. This patch also change the dispatch
-> evaluation by the recently introduced helpers for checking the common
-> 6LoWPAN dispatch values for IPv6 and IPHC header.
-> 
-> There was also a forgotten else branch which should drop the packet if
-> no matching dispatch is available.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> Jukka,
-> 
-> there seems something wrong or I don't get it. There is a skb_share_check but
-> inside the lowpan_is_iphc branch there is a skb_clone again. From my
-> understanding skb_share_check will check if the skb (structure) is used
-> somewhere else by looking at some refcounts, if yes then clone it.
-> 
-> So after that the skb is always a clone, which means the skb (structure only)
-> is not used somewhere else. Also IPHC will manipulate the skb (buffer) as well,
-> so we need somewhere to be sure that the buffer isn't shared. There exists a
-> function "skb_unshare" which is identically like skb_share_check just for the
-> buffer.
-> 
-> It could be that you ensure that the buffer is not shared somewhere else. Anyway
-> I think the solution with checking the "refcounts" is a very low cost operation.
-> 
-> btw:
-> In case of IPv6 dispatch this is something else, because we move pointers there
-> only (adjust skb->headroom with skb->data), not manipulate the buffer, so clone
-> is enough there.
-> 
->  net/bluetooth/6lowpan.c | 57 +++++++++++++++++++++++--------------------------
->  1 file changed, 27 insertions(+), 30 deletions(-)
-> 
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index db73b8a..665bf38 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -314,15 +314,17 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
->  	if (!netif_running(dev))
->  		goto drop;
->  
-> -	if (dev->type != ARPHRD_6LOWPAN)
-> +	if (dev->type != ARPHRD_6LOWPAN || !skb->len)
->  		goto drop;
->  
-> +	skb_reset_network_header(skb);
-> +
->  	skb = skb_share_check(skb, GFP_ATOMIC);
->  	if (!skb)
->  		goto drop;
->  
->  	/* check that it's our buffer */
-> -	if (skb->data[0] == LOWPAN_DISPATCH_IPV6) {
-> +	if (lowpan_is_ipv6(*skb_network_header(skb))) {
->  		/* Copy the packet so that the IPv6 header is
->  		 * properly aligned.
->  		 */
-> @@ -334,7 +336,6 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
->  		local_skb->protocol = htons(ETH_P_IPV6);
->  		local_skb->pkt_type = PACKET_HOST;
->  
-> -		skb_reset_network_header(local_skb);
->  		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
->  
->  		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
-> @@ -347,38 +348,34 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
->  
->  		consume_skb(local_skb);
->  		consume_skb(skb);
-> -	} else {
-> -		switch (skb->data[0] & 0xe0) {
-> -		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
-> -			local_skb = skb_clone(skb, GFP_ATOMIC);
-> -			if (!local_skb)
-> -				goto drop;
-> +	} else if (lowpan_is_iphc(*skb_network_header(skb))) {
-> +		local_skb = skb_clone(skb, GFP_ATOMIC);
-> +		if (!local_skb)
-> +			goto drop;
->  
-> -			ret = iphc_decompress(local_skb, dev, chan);
-> -			if (ret < 0) {
-> -				kfree_skb(local_skb);
-> -				goto drop;
-> -			}
-> +		ret = iphc_decompress(local_skb, dev, chan);
-> +		if (ret < 0) {
-> +			kfree_skb(local_skb);
-> +			goto drop;
-> +		}
->  
-> -			local_skb->protocol = htons(ETH_P_IPV6);
-> -			local_skb->pkt_type = PACKET_HOST;
-> -			local_skb->dev = dev;
-> +		local_skb->protocol = htons(ETH_P_IPV6);
-> +		local_skb->pkt_type = PACKET_HOST;
-> +		local_skb->dev = dev;
->  
-> -			if (give_skb_to_upper(local_skb, dev)
-> -					!= NET_RX_SUCCESS) {
-> -				kfree_skb(local_skb);
-> -				goto drop;
-> -			}
-> +		if (give_skb_to_upper(local_skb, dev)
-> +				!= NET_RX_SUCCESS) {
-> +			kfree_skb(local_skb);
-> +			goto drop;
-> +		}
->  
-> -			dev->stats.rx_bytes += skb->len;
-> -			dev->stats.rx_packets++;
-> +		dev->stats.rx_bytes += skb->len;
-> +		dev->stats.rx_packets++;
->  
-> -			consume_skb(local_skb);
-> -			consume_skb(skb);
-> -			break;
-> -		default:
-> -			break;
-> -		}
-> +		consume_skb(local_skb);
-> +		consume_skb(skb);
-> +	} else {
-> +		goto drop;
->  	}
->  
->  	return NET_RX_SUCCESS;
-
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index e527a3e..5515b5b 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -104,6 +104,7 @@ static const struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0CF3, 0x311F) },
+ 	{ USB_DEVICE(0x0cf3, 0x3121) },
+ 	{ USB_DEVICE(0x0CF3, 0x817a) },
++	{ USB_DEVICE(0x0CF3, 0x817b) },
+ 	{ USB_DEVICE(0x0cf3, 0xe003) },
+ 	{ USB_DEVICE(0x0CF3, 0xE004) },
+ 	{ USB_DEVICE(0x0CF3, 0xE005) },
+@@ -164,6 +165,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x0cf3, 0x311F), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0CF3, 0x817a), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0CF3, 0x817b), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe006), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 27830da..a884c5a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -206,6 +206,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0x311f), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x817a), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0x817b), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
+-- 
+1.9.1
