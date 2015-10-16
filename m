@@ -1,81 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v4] Bluetooth: Fix nitializing conn_params in scan phase
-Date: Thu, 15 Oct 2015 22:49:47 -0700
-Message-Id: <1444974587-2739-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH 4/4] Bluetooth: Fix conn_params list update in hci_connect_le_scan_cleanup
+Date: Fri, 16 Oct 2015 08:41:42 +0300
+Message-Id: <1444974102-32379-5-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1444974102-32379-1-git-send-email-johan.hedberg@gmail.com>
+References: <1444974102-32379-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch makes sure that conn_params that were created just for
-explicit_connect, will get properly deleted during cleanup.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+After clearing the params->explicit_connect variable the parameters
+may need to be either added back to the right list or potentially left
+absent from both the le_reports and the le_conns lists.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c | 22 +++++++++++++++-------
- net/bluetooth/mgmt.c     |  6 +++++-
- 2 files changed, 20 insertions(+), 8 deletions(-)
+ net/bluetooth/hci_conn.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index dbe32db..2be2233 100644
+index d5c06eeab4a3..fe99025fb649 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -1015,15 +1015,23 @@ static int hci_explicit_conn_params_set(struct hci_request *req,
- 	if (is_connected(hdev, addr, addr_type))
- 		return -EISCONN;
- 
--	params = hci_conn_params_add(hdev, addr, addr_type);
--	if (!params)
--		return -EIO;
-+	params = hci_conn_params_lookup(hdev, addr, addr_type);
-+	if (!params) {
-+		params = hci_conn_params_add(hdev, addr, addr_type);
-+		if (!params)
-+			return -ENOMEM;
+@@ -91,12 +91,27 @@ static void hci_connect_le_scan_cleanup(struct hci_conn *conn)
+ 	 * autoconnect action, remove them completely. If they are, just unmark
+ 	 * them as waiting for connection, by clearing explicit_connect field.
+ 	 */
+-	if (params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
++	params->explicit_connect = false;
 +
-+		/* If we created new params, mark them to be deleted in
-+		 * hci_connect_le_scan_cleanup. It's different case than
-+		 * existing disabled params, those will stay after cleanup.
-+		 */
-+		params->auto_connect = HCI_AUTO_CONN_EXPLICIT;
-+	}
- 
--	/* If we created new params, or existing params were marked as disabled,
--	 * mark them to be used just once to connect.
--	 */
-+	/* We're trying to connect, so make sure params are at pend_le_conns */
- 	if (params->auto_connect == HCI_AUTO_CONN_DISABLED ||
--	    params->auto_connect == HCI_AUTO_CONN_REPORT) {
-+	    params->auto_connect == HCI_AUTO_CONN_REPORT ||
-+	    params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
- 		list_del_init(&params->action);
- 		list_add(&params->action, &hdev->pend_le_conns);
++	list_del_init(&params->action);
++
++	switch (params->auto_connect) {
++	case HCI_AUTO_CONN_EXPLICIT:
+ 		hci_conn_params_del(conn->hdev, bdaddr, bdaddr_type);
+-	} else {
+-		params->explicit_connect = false;
+-		hci_update_background_scan(conn->hdev);
++		/* return instead of break to avoid duplicate scan update */
++		return;
++	case HCI_AUTO_CONN_DIRECT:
++	case HCI_AUTO_CONN_ALWAYS:
++		list_add(&params->action, &conn->hdev->pend_le_conns);
++		break;
++	case HCI_AUTO_CONN_REPORT:
++		list_add(&params->action, &conn->hdev->pend_le_reports);
++		break;
++	default:
++		break;
  	}
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9216393..f13e1a7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3565,6 +3565,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 				       auth_type);
- 	} else {
- 		u8 addr_type;
-+		struct hci_conn_params *p;
- 
- 		/* Convert from L2CAP channel address type to HCI address type
- 		 */
-@@ -3582,7 +3583,10 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		 * If connection parameters already exist, then they
- 		 * will be kept and this function does nothing.
- 		 */
--		hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
-+		p = hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
 +
-+		if (p->auto_connect == HCI_AUTO_CONN_EXPLICIT)
-+			p->auto_connect = HCI_AUTO_CONN_DISABLED;
++	hci_update_background_scan(conn->hdev);
+ }
  
- 		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr,
- 					   addr_type, sec_level,
+ static void hci_conn_cleanup(struct hci_conn *conn)
 -- 
-2.5.0
+2.4.3
 
