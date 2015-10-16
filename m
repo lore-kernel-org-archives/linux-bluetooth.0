@@ -1,64 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dmitry Tunin <hanipouspilot@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ath3k: Add support of AR3012 0cf3:817b device
-Date: Fri, 16 Oct 2015 11:45:26 +0300
-Message-Id: <1444985126-4864-1-git-send-email-hanipouspilot@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 6/6] Bluetooth: Fix initializing conn_params in scan phase
+Date: Fri, 16 Oct 2015 10:07:54 +0300
+Message-Id: <1444979274-21622-7-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1444979274-21622-1-git-send-email-johan.hedberg@gmail.com>
+References: <1444979274-21622-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T: Bus=04 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#= 3 Spd=12 MxCh= 0
-D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0cf3 ProdID=817b Rev=00.02
-C: #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I: If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I: If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+From: Jakub Pawlowski <jpawlowski@google.com>
 
-BugLink: https://bugs.launchpad.net/bugs/1506615
+This patch makes sure that conn_params that were created just for
+explicit_connect, will get properly deleted during cleanup.
 
-Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
-Cc: stable@vger.kernel.org
+Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- 2 files changed, 3 insertions(+)
+ net/bluetooth/hci_conn.c | 22 +++++++++++++++-------
+ net/bluetooth/mgmt.c     |  6 +++++-
+ 2 files changed, 20 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index e527a3e..5515b5b 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -104,6 +104,7 @@ static const struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x0CF3, 0x311F) },
- 	{ USB_DEVICE(0x0cf3, 0x3121) },
- 	{ USB_DEVICE(0x0CF3, 0x817a) },
-+	{ USB_DEVICE(0x0CF3, 0x817b) },
- 	{ USB_DEVICE(0x0cf3, 0xe003) },
- 	{ USB_DEVICE(0x0CF3, 0xE004) },
- 	{ USB_DEVICE(0x0CF3, 0xE005) },
-@@ -164,6 +165,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x0cf3, 0x311F), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0CF3, 0x817a), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0CF3, 0x817b), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe006), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 27830da..a884c5a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -206,6 +206,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cf3, 0x311f), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x817a), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0x817b), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index fe99025fb649..2dda439c8cb8 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1008,15 +1008,23 @@ static int hci_explicit_conn_params_set(struct hci_request *req,
+ 	if (is_connected(hdev, addr, addr_type))
+ 		return -EISCONN;
+ 
+-	params = hci_conn_params_add(hdev, addr, addr_type);
+-	if (!params)
+-		return -EIO;
++	params = hci_conn_params_lookup(hdev, addr, addr_type);
++	if (!params) {
++		params = hci_conn_params_add(hdev, addr, addr_type);
++		if (!params)
++			return -ENOMEM;
++
++		/* If we created new params, mark them to be deleted in
++		 * hci_connect_le_scan_cleanup. It's different case than
++		 * existing disabled params, those will stay after cleanup.
++		 */
++		params->auto_connect = HCI_AUTO_CONN_EXPLICIT;
++	}
+ 
+-	/* If we created new params, or existing params were marked as disabled,
+-	 * mark them to be used just once to connect.
+-	 */
++	/* We're trying to connect, so make sure params are at pend_le_conns */
+ 	if (params->auto_connect == HCI_AUTO_CONN_DISABLED ||
+-	    params->auto_connect == HCI_AUTO_CONN_REPORT) {
++	    params->auto_connect == HCI_AUTO_CONN_REPORT ||
++	    params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
+ 		list_del_init(&params->action);
+ 		list_add(&params->action, &hdev->pend_le_conns);
+ 	}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0ed94e6f4de9..c4fe2fee753f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3545,6 +3545,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 				       auth_type);
+ 	} else {
+ 		u8 addr_type;
++		struct hci_conn_params *p;
+ 
+ 		/* Convert from L2CAP channel address type to HCI address type
+ 		 */
+@@ -3562,7 +3563,10 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		 * If connection parameters already exist, then they
+ 		 * will be kept and this function does nothing.
+ 		 */
+-		hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
++		p = hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
++
++		if (p->auto_connect == HCI_AUTO_CONN_EXPLICIT)
++			p->auto_connect = HCI_AUTO_CONN_DISABLED;
+ 
+ 		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr,
+ 					   addr_type, sec_level,
 -- 
-1.9.1
+2.4.3
+
