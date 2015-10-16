@@ -1,81 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Pawlowski <jpawlowski@google.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v3] Bluetooth: properly initialize conn_params in scan phase
-Date: Thu, 15 Oct 2015 22:40:23 -0700
-Message-Id: <1444974023-2312-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH 1/4] Bluetooth: Fix reference counting for LE-scan based connections
+Date: Fri, 16 Oct 2015 08:38:19 +0300
+Message-Id: <1444973902-32318-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch makes sure that conn_params that were created just for
-explicit_connect, will get properly deleted during cleanup.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Signed-off-by: Jakub Pawlowski <jpawlowski@google.com>
+The code should never directly call hci_conn_hash_del since many
+cleanup & reference counting updates would be lost. Normally
+hci_conn_del is the right thing to do, but in the case of a connection
+doing LE scanning this could cause a deadlock due to doing a
+cancel_delayed_work_sync() on the same work callback that we were
+called from.
+
+Connections in the LE scanning state actually need very little cleanup
+- just a small subset of hci_conn_del. To solve the issue, refactor
+out these essential pieces into a new hci_conn_cleanup() function and
+call that from the two necessary places.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c | 22 +++++++++++++++-------
- net/bluetooth/mgmt.c     |  6 +++++-
- 2 files changed, 20 insertions(+), 8 deletions(-)
+ net/bluetooth/hci_conn.c | 53 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 36 insertions(+), 17 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index dbe32db..2be2233 100644
+index 2ebcaaa6b855..4c240c1cb2cb 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -1015,15 +1015,23 @@ static int hci_explicit_conn_params_set(struct hci_request *req,
- 	if (is_connected(hdev, addr, addr_type))
- 		return -EISCONN;
- 
--	params = hci_conn_params_add(hdev, addr, addr_type);
--	if (!params)
--		return -EIO;
-+	params = hci_conn_params_lookup(hdev, addr, addr_type);
-+	if (!params) {
-+		params = hci_conn_params_add(hdev, addr, addr_type);
-+		if (!params)
-+			return -ENOMEM;
-+
-+		/* If we created new params, mark them to be deleted in
-+		 * hci_connect_le_scan_cleanup. It's different case than
-+		 * existing disabled params, those will stay after cleanup.
-+		 */
-+		params->auto_connect = HCI_AUTO_CONN_EXPLICIT;
-+	}
- 
--	/* If we created new params, or existing params were marked as disabled,
--	 * mark them to be used just once to connect.
--	 */
-+	/* We're trying to connect, so make sure params are at pend_le_conns */
- 	if (params->auto_connect == HCI_AUTO_CONN_DISABLED ||
--	    params->auto_connect == HCI_AUTO_CONN_REPORT) {
-+	    params->auto_connect == HCI_AUTO_CONN_REPORT ||
-+	    params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
- 		list_del_init(&params->action);
- 		list_add(&params->action, &hdev->pend_le_conns);
+@@ -99,12 +99,41 @@ static void hci_connect_le_scan_cleanup(struct hci_conn *conn)
  	}
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9216393..f13e1a7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3565,6 +3565,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 				       auth_type);
- 	} else {
- 		u8 addr_type;
-+		struct hci_conn_params *p;
+ }
  
- 		/* Convert from L2CAP channel address type to HCI address type
- 		 */
-@@ -3582,7 +3583,10 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		 * If connection parameters already exist, then they
- 		 * will be kept and this function does nothing.
- 		 */
--		hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
-+		p = hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
++static void hci_conn_cleanup(struct hci_conn *conn)
++{
++	struct hci_dev *hdev = conn->hdev;
 +
-+		if (p->auto_connect == HCI_AUTO_CONN_EXPLICIT)
-+			p->auto_connect = HCI_AUTO_CONN_DISABLED;
++	if (test_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
++		hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
++
++	hci_chan_list_flush(conn);
++
++	hci_conn_hash_del(hdev, conn);
++
++	if (hdev->notify)
++		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
++
++	hci_conn_del_sysfs(conn);
++
++	debugfs_remove_recursive(conn->debugfs);
++
++	hci_dev_put(hdev);
++
++	hci_conn_put(conn);
++}
++
+ /* This function requires the caller holds hdev->lock */
+ static void hci_connect_le_scan_remove(struct hci_conn *conn)
+ {
+ 	hci_connect_le_scan_cleanup(conn);
  
- 		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr,
- 					   addr_type, sec_level,
+-	hci_conn_hash_del(conn->hdev, conn);
++	/* We can't call hci_conn_del here since that would deadlock
++	 * with trying to call cancel_delayed_work_sync(&conn->disc_work).
++	 * Instead, call just hci_conn_cleanup() which contains the bare
++	 * minimum cleanup operations needed for a connection in this
++	 * state.
++	 */
++	hci_conn_cleanup(conn);
+ }
+ 
+ static void hci_acl_create_connection(struct hci_conn *conn)
+@@ -582,27 +611,17 @@ int hci_conn_del(struct hci_conn *conn)
+ 		}
+ 	}
+ 
+-	hci_chan_list_flush(conn);
+-
+ 	if (conn->amp_mgr)
+ 		amp_mgr_put(conn->amp_mgr);
+ 
+-	hci_conn_hash_del(hdev, conn);
+-	if (hdev->notify)
+-		hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
+-
+ 	skb_queue_purge(&conn->data_q);
+ 
+-	hci_conn_del_sysfs(conn);
+-
+-	debugfs_remove_recursive(conn->debugfs);
+-
+-	if (test_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
+-		hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
+-
+-	hci_dev_put(hdev);
+-
+-	hci_conn_put(conn);
++	/* Remove the connection from the list and cleanup its remaining
++	 * state. This is a separate function since for some cases like
++	 * BT_CONNECT_SCAN we *only* want the cleanup part without the
++	 * rest of hci_conn_del.
++	 */
++	hci_conn_cleanup(conn);
+ 
+ 	return 0;
+ }
 -- 
-2.5.0
+2.4.3
 
