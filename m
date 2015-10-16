@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH v5] Bluetooth: Fix initializing conn_params in scan phase
-Date: Thu, 15 Oct 2015 22:51:12 -0700
-Message-Id: <1444974672-2840-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH v4] Bluetooth: Fix nitializing conn_params in scan phase
+Date: Thu, 15 Oct 2015 22:49:47 -0700
+Message-Id: <1444974587-2739-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
