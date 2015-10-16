@@ -1,46 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH] bluetooth: bpa10x: fix BT_HCIUART dependency
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <4199320.WWtqtXexhZ@wuerfel>
-Date: Sat, 17 Oct 2015 11:15:17 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-arm-kernel@lists.infradead.org
-Message-Id: <A0A720F0-8950-4B1D-99A9-6A0059E8BF8B@holtmann.org>
-References: <4199320.WWtqtXexhZ@wuerfel>
-To: Arnd Bergmann <arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Vinicius Costa Gomes <vcgomes@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
+Subject: [PATCH BlueZ] src/profile: Fix segmentation fault
+Date: Fri, 16 Oct 2015 20:03:47 -0300
+Message-Id: <1445036627-5474-1-git-send-email-vcgomes@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arnd,
+The change that made the 'deviceinfo' profile "external" had an side
+effect, now it is possible to have an external profile without 'owner'
+and 'path' information. The fix considers that having an external
+profile without that information is not an error.
 
-> The change to bpa10x to use the h4_recv_buf helper added a dependency
-> on BT_HCIUART. This was incorrectly added to Kconfig by adding a
-> 'select' statement, which now in turn causes build failures
-> when CONFIG_TTY is not set:
-> 
-> warning: (BT_HCIBPA10X) selects BT_HCIUART which has unmet direct dependencies (NET && BT && TTY)
-> vers/built-in.o: In function `hci_uart_tty_receive':
-> fpga-mgr.c:(.text+0x282824): undefined reference to `tty_unthrottle'
-> drivers/built-in.o: In function `hci_uart_tty_ioctl':
-> fpga-mgr.c:(.text+0x282aa0): undefined reference to `n_tty_ioctl_helper'
-> drivers/built-in.o: In function `hci_uart_flush':
-> 
-> This replaces the 'select BT_HCIUART' dependency with 'depends on', which
-> does not have this kind of problem. Alternatively, one could add 'depends
-> on TTY', but avoiding 'select' on user-visible options is generally the
-> preferred choice as that does not introduce the potential for dependency
-> loops or incomplete dependency chains.
+Valgrind log:
 
-the intention here was to use select, but that seems to open all sorts of problems. Since I am most likely the only person that still has this device and attaches it to Linux, I am fine in going the easier path with depends on.
+bluetoothd[9974]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
+bluetoothd[9974]: src/adapter.c:add_uuid() sending add uuid command for index 0
+bluetoothd[9974]: Endpoint registered: sender=:1.38 path=/MediaEndpoint/A2DPSink
+bluetoothd[9974]: src/profile.c:register_profile() sender :1.38 path /Profile/HSPAGProfile
+==9974== Invalid read of size 1
+==9974==    at 0x65F21E0: __strcmp_sse2_unaligned (in /usr/x86_64-pc-linux-gnu/lib/libc-2.22.so)
+==9974==    by 0x4E6C7E8: g_str_equal (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+==9974==    by 0x467917: find_ext_profile (profile.c:745)
+==9974==    by 0x469A8D: register_profile (profile.c:2373)
+==9974==    by 0x4889C3: process_message.isra.5 (object.c:259)
+==9974==    by 0x518E33E: _dbus_object_tree_dispatch_and_unlock (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
+==9974==    by 0x51805E3: dbus_connection_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
+==9974==    by 0x4856DF: message_dispatch (mainloop.c:72)
+==9974==    by 0x4E7C669: g_main_context_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+==9974==    by 0x4E7C9E7: g_main_context_iterate.isra.29 (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+==9974==    by 0x4E7CD01: g_main_loop_run (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+==9974==    by 0x40BABE: main (main.c:661)
+==9974==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+==9974==
+==9974==
+==9974== Process terminating with default action of signal 11 (SIGSEGV)
+==9974==  Access not within mapped region at address 0x0
+==9974==    at 0x65F21E0: __strcmp_sse2_unaligned (in /usr/x86_64-pc-linux-gnu/lib/libc-2.22.so)
+==9974==    by 0x4E6C7E8: g_str_equal (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+==9974==    by 0x467917: find_ext_profile (profile.c:745)
+==9974==    by 0x469A8D: register_profile (profile.c:2373)
+==9974==    by 0x4889C3: process_message.isra.5 (object.c:259)
+==9974==    by 0x518E33E: _dbus_object_tree_dispatch_and_unlock (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
+==9974==    by 0x51805E3: dbus_connection_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
+==9974==    by 0x4856DF: message_dispatch (mainloop.c:72)
+==9974==    by 0x4E7C669: g_main_context_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+==9974==    by 0x4E7C9E7: g_main_context_iterate.isra.29 (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+==9974==    by 0x4E7CD01: g_main_loop_run (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+==9974==    by 0x40BABE: main (main.c:661)
+==9974==  If you believe this happened as a result of a stack
+==9974==  overflow in your program's main thread (unlikely but
+==9974==  possible), you can try to increase the size of the
+==9974==  main thread stack using the --main-stacksize= flag.
+==9974==  The main thread stack size used in this run was 8388608.
+==9974==
+---
+ src/profile.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/src/profile.c b/src/profile.c
+index 70ee4c1..99c0587 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -742,10 +742,10 @@ static struct ext_profile *find_ext_profile(const char *owner,
+ 	for (l = ext_profiles; l != NULL; l = g_slist_next(l)) {
+ 		struct ext_profile *ext = l->data;
+ 
+-		if (!g_str_equal(ext->owner, owner))
++		if (g_strcmp0(ext->owner, owner))
+ 			continue;
+ 
+-		if (g_str_equal(ext->path, path))
++		if (!g_strcmp0(ext->path, path))
+ 			return ext;
+ 	}
+ 
+-- 
+2.6.1
 
