@@ -1,98 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?Q?Julio_Gonz=c3=a1lez_Mej=c3=adas?= <juliolokooo@gmail.com>
-Subject: Can't bring bluetooth controller up
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <56222AC0.4090302@gmail.com>
-Date: Sat, 17 Oct 2015 13:02:24 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+Subject: Re: [PATCH] bluetooth: bpa10x: fix BT_HCIUART dependency
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <4199320.WWtqtXexhZ@wuerfel>
+Date: Sat, 17 Oct 2015 11:15:17 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-arm-kernel@lists.infradead.org
+Message-Id: <A0A720F0-8950-4B1D-99A9-6A0059E8BF8B@holtmann.org>
+References: <4199320.WWtqtXexhZ@wuerfel>
+To: Arnd Bergmann <arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Arnd,
 
-I have a card reader with bluetooth controller built-in (Broadcom 
-BCM2045A) and it stopped working suddenly some days ago as it appears 
-down and I can't bring it up with hciconfig, this is what happens:
+> The change to bpa10x to use the h4_recv_buf helper added a dependency
+> on BT_HCIUART. This was incorrectly added to Kconfig by adding a
+> 'select' statement, which now in turn causes build failures
+> when CONFIG_TTY is not set:
+> 
+> warning: (BT_HCIBPA10X) selects BT_HCIUART which has unmet direct dependencies (NET && BT && TTY)
+> vers/built-in.o: In function `hci_uart_tty_receive':
+> fpga-mgr.c:(.text+0x282824): undefined reference to `tty_unthrottle'
+> drivers/built-in.o: In function `hci_uart_tty_ioctl':
+> fpga-mgr.c:(.text+0x282aa0): undefined reference to `n_tty_ioctl_helper'
+> drivers/built-in.o: In function `hci_uart_flush':
+> 
+> This replaces the 'select BT_HCIUART' dependency with 'depends on', which
+> does not have this kind of problem. Alternatively, one could add 'depends
+> on TTY', but avoiding 'select' on user-visible options is generally the
+> preferred choice as that does not introduce the potential for dependency
+> loops or incomplete dependency chains.
 
-sudo hciconfig hci0 up
-Can't init device hci0: Operation not supported (95)
+the intention here was to use select, but that seems to open all sorts of problems. Since I am most likely the only person that still has this device and attaches it to Linux, I am fine in going the easier path with depends on.
 
-This is the output of hcidump when running this command:
+Patch has been applied to bluetooth-next tree.
 
-hcidump
-HCI sniffer - Bluetooth packet analyzer ver 5.35
-device: hci0 snap_len: 1500 filter: 0xffffffffffffffff
-> HCI Event: Command Complete (0x0e) plen 4
-     Reset (0x03|0x0003) ncmd 1
-     status 0x00
-> HCI Event: Command Complete (0x0e) plen 12
-     Read Local Supported Features (0x04|0x0003) ncmd 1
-     status 0x00
-     Features: 0xff 0xff 0x8d 0xfe 0x8f 0xf9 0x00 0x80
-> HCI Event: Command Complete (0x0e) plen 12
-     Read Local Version Information (0x04|0x0001) ncmd 1
-     status 0x00
-     HCI Version: 2.0 (0x3) HCI Revision: 0x2000
-     LMP Version: 2.0 (0x3) LMP Subversion: 0x410d
-     Manufacturer: Broadcom Corporation (15)
-> HCI Event: Command Complete (0x0e) plen 10
-     Read BD ADDR (0x04|0x0009) ncmd 1
-     status 0x00 bdaddr 25:7B:43:51:08:D3
-> HCI Event: Command Complete (0x0e) plen 11
-     Read Buffer Size (0x04|0x0005) ncmd 1
-     status 0x00
-     ACL MTU 1017:8 SCO MTU 64:0
-> HCI Event: Command Complete (0x0e) plen 7
-     Read Class of Device (0x03|0x0023) ncmd 1
-     status 0x00 class 0x000000
-> HCI Event: Command Complete (0x0e) plen 252
-     Read Local Name (0x03|0x0014) ncmd 1
-     status 0x00 name 'BCM2045'
-> HCI Event: Command Complete (0x0e) plen 6
-     Read Voice Setting (0x03|0x0025) ncmd 1
-     status 0x00 voice setting 0x0060
-> HCI Event: Command Complete (0x0e) plen 5
-     Read Number of Supported IAC (0x03|0x0038) ncmd 1
-> HCI Event: Command Complete (0x0e) plen 8
-     Read Current IAC LAP (0x03|0x0039) ncmd 1
-     IAC 0x9e8b33 (General Inquiry Access Code)
-> HCI Event: Command Complete (0x0e) plen 4
-     Set Event Filter (0x03|0x0005) ncmd 1
-     status 0x00
-> HCI Event: Command Complete (0x0e) plen 4
-     Write Connection Accept Timeout (0x03|0x0016) ncmd 1
-     status 0x00
-> HCI Event: Command Complete (0x0e) plen 68
-     Read Local Supported Commands (0x04|0x0002) ncmd 1
-     status 0x00
-     Commands: ffffff03feffcfffffffffff0300f8ff07
-> HCI Event: Command Complete (0x0e) plen 4
-     Write Inquiry Mode (0x03|0x0045) ncmd 1
-     status 0x00
-> HCI Event: Command Complete (0x0e) plen 14
-     Read Local Extended Features (0x04|0x0004) ncmd 1
-     status 0x00 page 1 max 0
-     Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> HCI Event: Command Complete (0x0e) plen 4
-     Set Event Mask (0x03|0x0001) ncmd 1
-     status 0x00
-> HCI Event: Command Complete (0x0e) plen 4
-     Write Default Link Policy Settings (0x02|0x000f) ncmd 1
-     status 0x00
-> HCI Event: Command Complete (0x0e) plen 8
-     Read Page Scan Activity (0x03|0x001b) ncmd 1
-     status 0x00 interval 2048 window 18
-> HCI Event: Command Complete (0x0e) plen 4
-     Delete Stored Link Key (0x03|0x0012) ncmd 1
-     status 0x11 deleted 2048
-     Error: Unsupported Feature or Parameter Value
+Regards
 
-
-I have looked on rfkill and everything seems correct and the LED is lit, 
-I'm using Arch Linux 4.2.3 kernel.
-It still works on Windows, so I'm lost here, is the device faulty or 
-something?
-
-Thanks in advance,
+Marcel
 
