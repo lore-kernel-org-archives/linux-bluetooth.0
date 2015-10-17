@@ -1,56 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/3] Bluetooth: btintel: Set quirk for non-persistent diagnostic settings
-Date: Sat, 17 Oct 2015 16:00:27 +0200
-Message-Id: <1445090428-75287-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/2] Bluetooth: Add new quirk for non-persistent diagnostic settings
+Date: Sat, 17 Oct 2015 15:07:01 +0200
+Message-Id: <1445087222-62877-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For Intel controllers the diagnostics settings are not persistent over
-HCI Reset. So set the quirk to programm them again on every power up.
+If the diagnostic settings are not persistent over HCI Reset, then this
+quirk can be used to tell the Bluetoth core about it. This will ensure
+that the settings are programmed correctly when the controller is
+powered up.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btintel.c | 5 ++---
- drivers/bluetooth/btusb.c   | 1 +
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci.h |  9 +++++++++
+ net/bluetooth/hci_core.c    | 19 +++++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 95652aa12454..8d4891725e3b 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -97,9 +97,6 @@ int btintel_set_diag(struct hci_dev *hdev, bool enable)
- 	u8 param[3];
- 	int err;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index a26ff28ca878..b59971c5cb71 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -170,6 +170,15 @@ enum {
+ 	 * during the hdev->setup vendor callback.
+ 	 */
+ 	HCI_QUIRK_SIMULTANEOUS_DISCOVERY,
++
++	/* When this quirk is set, the enabling of diagnostic mode is
++	 * not persistent over HCI Reset. Every time the controller
++	 * is brought up it needs to be reprogrammed.
++	 *
++	 * This quirk can be set before hci_register_dev is called or
++	 * during the hdev->setup vendor callback.
++	 */
++	HCI_QUIRK_NON_PERSISTENT_DIAG,
+ };
  
--	if (!test_bit(HCI_RUNNING, &hdev->flags))
--		return -ENETDOWN;
--
- 	if (enable) {
- 		param[0] = 0x03;
- 		param[1] = 0x03;
-@@ -113,6 +110,8 @@ int btintel_set_diag(struct hci_dev *hdev, bool enable)
- 	skb = __hci_cmd_sync(hdev, 0xfc43, 3, param, HCI_INIT_TIMEOUT);
- 	if (IS_ERR(skb)) {
- 		err = PTR_ERR(skb);
-+		if (err == -ENODATA)
-+			return 0;
- 		BT_ERR("%s: Changing Intel diagnostic mode failed (%d)",
- 		       hdev->name, err);
+ /* HCI device flags */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b36a2e5693d2..f33268004195 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -162,6 +162,16 @@ static ssize_t vendor_diag_write(struct file *file, const char __user *user_buf,
+ 	if (strtobool(buf, &enable))
+ 		return -EINVAL;
+ 
++	/* When the diagnostic flags are not persistent and the transport
++	 * is not active, then there is no need for the vendor callback.
++	 *
++	 * Instead just store the desired value. If needed the setting
++	 * will be programmed when the controller gets powered on.
++	 */
++	if (test_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks) &&
++	    !test_bit(HCI_RUNNING, &hdev->flags))
++		goto done;
++
+ 	hci_req_lock(hdev);
+ 	err = hdev->set_diag(hdev, enable);
+ 	hci_req_unlock(hdev);
+@@ -169,6 +179,7 @@ static ssize_t vendor_diag_write(struct file *file, const char __user *user_buf,
+ 	if (err < 0)
  		return err;
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 27830da67063..ab82c02d7e92 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2894,6 +2894,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->set_diag = btintel_set_diag;
- 		hdev->set_bdaddr = btintel_set_bdaddr;
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
-+		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+ 
++done:
+ 	if (enable)
+ 		hci_dev_set_flag(hdev, HCI_VENDOR_DIAG);
+ 	else
+@@ -1494,6 +1505,14 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+ 			ret = __hci_init(hdev);
  	}
  
- 	if (id->driver_info & BTUSB_MARVELL)
++	/* If the HCI Reset command is clearing all diagnostic settings,
++	 * then they need to be reprogrammed after the init procedure
++	 * completed.
++	 */
++	if (test_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks) &&
++	    hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) && hdev->set_diag)
++		ret = hdev->set_diag(hdev, true);
++
+ 	clear_bit(HCI_INIT, &hdev->flags);
+ 
+ 	if (!ret) {
 -- 
 2.4.3
 
