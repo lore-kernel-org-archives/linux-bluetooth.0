@@ -1,56 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Simon Fels <simon.fels@canonical.com>
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Simon Fels <simon.fels@canonical.com>
-Subject: [PATCH v2] obexd: pbap: add headers correctly for size query
-Date: Mon, 19 Oct 2015 22:12:17 +0200
-Message-Id: <1445285537-5694-1-git-send-email-simon.fels@canonical.com>
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Subject: [PATCH] core/device: Fix build on some platforms
+Date: Mon, 19 Oct 2015 10:48:50 -0700
+Message-Id: <1445276930-15127-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When client queries for the size of a phonebook we fall into a
-indefinite loop as g_obex_apparam_encode always returns the same
-number of items added to the buffer regardless how often it is
-called. In former times where this code wasn't using GObexApparams
-a array was reduced each time the headers where added and so we could
-easily find out when we've added all headers. However today we need
-to solve this a bit differently by also setting the firstpacket flag
-when we receive the phonebook size result from the phonebook
-implementation which then lets us correctly go through without
-falling into a indefinite loop.
----
- obexd/plugins/pbap.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+due to type promotions in C this code was failing on some platforms.
 
-diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-index f2f9166..bab691c 100644
---- a/obexd/plugins/pbap.c
-+++ b/obexd/plugins/pbap.c
-@@ -193,6 +193,8 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
- 	pbap->obj->apparam = g_obex_apparam_set_uint16(NULL, PHONEBOOKSIZE_TAG,
- 								phonebooksize);
+src/device.c:2016:8: error: format specifies type 'unsigned short' but the
+      argument has type 'uint8_t' (aka 'unsigned char') [-Werror,-Wformat]
+  properties, uuid_str);
+  ^~~~~~~~~~
+/build/falco/usr/include/bits/stdio2.h:39:7: note: expanded from macro 'sprintf'
+                           __VA_ARGS__)
+                           ^
+---
+ src/device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/device.c b/src/device.c
+index 0d3a655..b4e6d53 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2015,7 +2015,7 @@ static void store_chrc(struct gatt_db_attribute *attr, void *user_data)
  
-+	pbap->obj->firstpacket = TRUE;
-+
- 	if (missed > 0)	{
- 		DBG("missed %d", missed);
+ 	sprintf(handle, "%04hx", handle_num);
+ 	bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
+-	sprintf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%s", value_handle,
++	sprintf(value, GATT_CHARAC_UUID_STR ":%04hx:%02x:%s", value_handle,
+ 							properties, uuid_str);
+ 	g_key_file_set_string(key_file, "Attributes", handle, value);
  
-@@ -826,14 +828,13 @@ static ssize_t vobject_pull_get_next_header(void *object, void *buf, size_t mtu,
- 								uint8_t *hi)
- {
- 	struct pbap_object *obj = object;
--	struct pbap_session *pbap = obj->session;
- 
- 	if (!obj->buffer && !obj->apparam)
- 		return -EAGAIN;
- 
- 	*hi = G_OBEX_HDR_APPARAM;
- 
--	if (pbap->params->maxlistcount == 0 || obj->firstpacket) {
-+	if (obj->firstpacket) {
- 		obj->firstpacket = FALSE;
- 
- 		return g_obex_apparam_encode(obj->apparam, buf, mtu);
 -- 
-2.5.0
+2.6.0.rc2.230.g3dd15c0
 
