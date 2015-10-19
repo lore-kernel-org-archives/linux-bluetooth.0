@@ -1,76 +1,214 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1444904566-30314-1-git-send-email-luiz.dentz@gmail.com>
-References: <1444904566-30314-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 19 Oct 2015 13:18:06 +0300
-Message-ID: <CABBYNZJjtPgpS+J608dAUDsudoSt8dEd-UcmDjeUURf7QbZbNw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/device: Fix crash when disconnecting
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com
+References: <1444132398-3176-1-git-send-email-bharat.panda@samsung.com>
+In-reply-to: <1444132398-3176-1-git-send-email-bharat.panda@samsung.com>
+Subject: RE: [PATCH  1/3] aurdio/avrcp: Get player playlist details
+Date: Mon, 19 Oct 2015 14:32:14 +0530
+Message-id: <02bc01d10a4c$e2c50510$a84f0f30$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Ping
 
-On Thu, Oct 15, 2015 at 1:22 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> When device disconnect while GATT discovery is ongoing the following
-> crash can happen if the device is destroyed in case it is temporary:
->
-> Invalid read of size 4
->    at 0x40A707C: g_slist_find_custom (in /usr/lib/libglib-2.0.so.0.4400.1)
->    by 0x80B7382: gatt_service_removed (device.c:3422)
->    by 0x80DF2FB: handle_notify (gatt-db.c:266)
->    by 0x80D3B8E: queue_foreach (queue.c:251)
->    by 0x80DF981: notify_service_changed (gatt-db.c:283)
->    by 0x80DF981: gatt_db_service_destroy (gatt-db.c:294)
->    by 0x80D3DFE: queue_remove_all (queue.c:387)
->    by 0x80DFA4C: gatt_db_clear (gatt-db.c:438)
->    by 0x80D908C: init_fail (gatt-client.c:1524)
->    by 0x80D9A52: discovery_op_unref (gatt-client.c:419)
->    by 0x80E18F2: destroy_mtu_op (gatt-helpers.c:495)
->    by 0x80D7F6E: cancel_att_send_op (att.c:212)
->    by 0x80D7F6E: bt_att_cancel (att.c:1238)
->    by 0x80DB26A: bt_gatt_client_cancel_all (gatt-client.c:1962)
->  Address 0x5536b58 is 0 bytes inside a block of size 8 free'd
->    at 0x402B2C9: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
->    by 0x408CE4F: g_free (in /usr/lib/libglib-2.0.so.0.4400.1)
->    by 0x40A6772: g_slice_free_chain_with_offset (in /usr/lib/libglib-2.0.so.0.4400.1)
->    by 0x40A6B6B: g_slist_free (in /usr/lib/libglib-2.0.so.0.4400.1)
->    by 0x40A7374: g_slist_free_full (in /usr/lib/libglib-2.0.so.0.4400.1)
->    by 0x80B6CE0: device_free (device.c:624)
->    by 0x80CFCCB: remove_interface (object.c:658)
->    by 0x80D0208: g_dbus_unregister_interface (object.c:1382)
->    by 0x80BC281: btd_device_unref (device.c:5942)
->    by 0x80A9ACA: btd_adapter_remove_device (adapter.c:1165)
->    by 0x80A9C52: adapter_remove_connection (adapter.c:5624)
->    by 0x80AA77F: dev_disconnected (adapter.c:6584)
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Bharat Panda
+> Sent: Tuesday, October 06, 2015 5:23 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: cpgs@samsung.com; Bharat Panda
+> Subject: [PATCH 1/3] aurdio/avrcp: Get player playlist details
+> 
+> Support added to read and cache player playlist details after player
+> registration completes.
 > ---
->  src/device.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/src/device.c b/src/device.c
-> index fd177f4..0d3a655 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -626,6 +626,9 @@ static void device_free(gpointer user_data)
->         g_slist_free_full(device->attios_offline, g_free);
->         g_slist_free_full(device->svc_callbacks, svc_dev_remove);
->
-> +       /* Reset callbacks since the device is going to be freed */
-> +       gatt_db_register(device->db, NULL, NULL, NULL, NULL);
+>  profiles/audio/media.c | 121
+> +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 121 insertions(+)
+> 
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
+> 69070bf..edeb66f 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -58,6 +58,7 @@
+>  #define MEDIA_INTERFACE "org.bluez.Media1"
+>  #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
+>  #define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
+> +#define MEDIA_PLAYER_PLAYLIST_INTERFACE
+> "org.mpris.MediaPlayer2.Playlists"
+> 
+>  #define REQUEST_TIMEOUT (3 * 1000)		/* 3 seconds */
+> 
+> @@ -95,6 +96,7 @@ struct media_endpoint {  struct media_player {
+>  	struct media_adapter	*adapter;
+>  	struct avrcp_player	*player;
+> +	GSList			*playlists;
+>  	char			*sender;	/* Player DBus bus id */
+>  	char			*path;		/* Player object path */
+>  	GHashTable		*settings;	/* Player settings */
+> @@ -105,8 +107,10 @@ struct media_player {
+>  	char			*status;
+>  	uint32_t		position;
+>  	uint32_t		duration;
+> +	uint32_t		total_items;
+>  	uint8_t			volume;
+>  	GTimer			*timer;
+> +	guint			playlist_id;
+>  	bool			play;
+>  	bool			pause;
+>  	bool			next;
+> @@ -115,6 +119,13 @@ struct media_player {
+>  	char			*name;
+>  };
+> 
+> +struct media_playlist {
+> +	char		*name;
+> +	char		*id;
+> +	char		*icon;
+> +	uint8_t		data[0];
+> +} __attribute__ ((packed));
 > +
->         attio_cleanup(device);
->
->         gatt_db_unref(device->db);
+>  static GSList *adapters = NULL;
+> 
+>  static void endpoint_request_free(struct endpoint_request *request) @@ -
+> 961,6 +972,9 @@ static void media_player_free(gpointer data)
+>  	if (mp->settings)
+>  		g_hash_table_unref(mp->settings);
+> 
+> +	if (mp->playlist_id > 0)
+> +		g_source_remove(mp->playlist_id);
+> +
+>  	g_timer_destroy(mp->timer);
+>  	g_free(mp->sender);
+>  	g_free(mp->path);
+> @@ -1271,6 +1285,111 @@ static bool previous(void *user_data)
+>  	return media_player_send(mp, "Previous");  }
+> 
+> +
+> +static void playlist_reply(DBusPendingCall *call, void *user_data) {
+> +	struct media_player *mp = user_data;
+> +	DBusMessage *reply;
+> +	DBusMessageIter array_iter, entry, struct_iter;
+> +	DBusError derr;
+> +	int ctype;
+> +
+> +	reply = dbus_pending_call_steal_reply(call);
+> +
+> +	dbus_error_init(&derr);
+> +
+> +	if (dbus_set_error_from_message(&derr, reply)) {
+> +		error("Error: GetPlayLists method %s, %s", derr.name,
+> +					derr.message);
+> +		dbus_error_free(&derr);
+> +		goto done;
+> +	}
+> +
+> +	dbus_message_iter_init(reply, &array_iter);
+> +	ctype = dbus_message_iter_get_arg_type(&array_iter);
+> +
+> +	if (ctype != DBUS_TYPE_ARRAY)
+> +		goto done;
+> +
+> +	dbus_message_iter_recurse(&array_iter, &struct_iter);
+> +
+> +	while ((ctype = dbus_message_iter_get_arg_type(&struct_iter)) !=
+> +				DBUS_TYPE_INVALID) {
+> +		struct media_playlist *playlist;
+> +
+> +		if (ctype != DBUS_TYPE_STRUCT) {
+> +			error("Invalid type");
+> +			goto done;
+> +		}
+> +
+> +		playlist = g_new0(struct media_playlist, 1);
+> +
+> +		dbus_message_iter_recurse(&struct_iter, &entry);
+> +
+> +		dbus_message_iter_get_basic(&entry, &playlist->id);
+> +		DBG("Playlists Id %s", playlist->id);
+> +
+> +		dbus_message_iter_next(&entry);
+> +		dbus_message_iter_get_basic(&entry, &playlist->name);
+> +		DBG("Playlist Name %s", playlist->name);
+> +
+> +		dbus_message_iter_next(&entry);
+> +		dbus_message_iter_get_basic(&entry, &playlist->icon);
+> +		DBG("Playlist Icon %s", playlist->icon);
+> +
+> +		/* TODO: Create Media folder with playlist information */
+> +
+> +		mp->playlists = g_slist_append(mp->playlists, playlist);
+> +		mp->total_items++;
+> +
+> +		dbus_message_iter_next(&struct_iter);
+> +	}
+> +
+> +done:
+> +	dbus_message_unref(reply);
+> +}
+> +
+> +static gboolean get_playlists(gpointer user_data) {
+> +	struct media_player *mp = user_data;
+> +	DBusMessage *msg;
+> +	DBusPendingCall *call;
+> +	gboolean reverse_order = FALSE;
+> +	uint32_t start_index = 0x0000;
+> +	uint32_t end_index = 0xFFFF;
+> +	char *ordering = "Alphabetical";
+> +	uint32_t max_count = (end_index - start_index);
+> +
+> +	msg = dbus_message_new_method_call(mp->sender, mp->path,
+> +				MEDIA_PLAYER_PLAYLIST_INTERFACE,
+> +				"GetPlaylists");
+> +
+> +	if (msg == NULL) {
+> +		error("Couldn't allocate D-Bus message");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	dbus_message_append_args(msg,
+> +			DBUS_TYPE_UINT32, &start_index,
+> +			DBUS_TYPE_UINT32, &max_count,
+> +			DBUS_TYPE_STRING, &ordering,
+> +			DBUS_TYPE_BOOLEAN, &reverse_order,
+> +			DBUS_TYPE_INVALID);
+> +
+> +	mp->total_items = 0;
+> +
+> +	if ((dbus_connection_send_with_reply(btd_get_dbus_connection(),
+> +					msg, &call, -1))) {
+> +		dbus_pending_call_set_notify(call, &playlist_reply, mp,
+> NULL);
+> +		dbus_pending_call_unref(call);
+> +		dbus_message_unref(msg);
+> +	}
+> +
+> +	mp->playlist_id = 0;
+> +
+> +	return FALSE;
+> +}
+> +
+>  static struct avrcp_player_cb player_cb = {
+>  	.list_settings = list_settings,
+>  	.get_setting = get_setting,
+> @@ -1831,6 +1950,8 @@ static DBusMessage
+> *register_player(DBusConnection *conn, DBusMessage *msg,
+>  		return btd_error_invalid_args(msg);
+>  	}
+> 
+> +	mp->playlist_id = g_idle_add(get_playlists, mp);
+> +
+>  	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);  }
+> 
 > --
-> 2.4.3
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
-Pushed.
-
-
--- 
-Luiz Augusto von Dentz
