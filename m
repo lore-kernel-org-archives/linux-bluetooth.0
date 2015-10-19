@@ -1,128 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH] Bluetooth: btusb: Add support for Foxconn/Lenovo BCM43142A0 (105b:e065)
+Subject: Re: [PATCH] Bluetooth: hidp: fix device disconnect on idle timeout
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1444049127-4207-1-git-send-email-sare@r00t3d.com>
-Date: Mon, 19 Oct 2015 22:47:04 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <03EAD374-4DC8-45A8-8056-5E254B6C0A5A@holtmann.org>
-References: <1444049127-4207-1-git-send-email-sare@r00t3d.com>
-To: =?utf-8?Q?Santtu_Rekil=C3=A4?= <sare@r00t3d.com>
+In-Reply-To: <1441620341-553-1-git-send-email-dh.herrmann@gmail.com>
+Date: Mon, 19 Oct 2015 22:44:53 +0200
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Mark Haun <haunma@keteu.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	stable@vger.kernel.org
+Message-Id: <17A816CE-E802-4735-86D8-E9FB5E2E183E@holtmann.org>
+References: <1441620341-553-1-git-send-email-dh.herrmann@gmail.com>
+To: David Herrmann <dh.herrmann@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Santtu,
+Hi David,
 
-> Recently salvaged this 'BCM43142A0' WiFi/Bluetooth module from a Lenovo laptop
-> and noticed it doesn't work automatically, because the USB IDs are missing
-> from btusb.c.
+> The HIDP specs define an idle-timeout which automatically disconnects a
+> device. This has always been implemented in the HIDP layer and forced a
+> synchronous shutdown of the hidp-scheduler. This works just fine, but
+> lacks a forced disconnect on the underlying l2cap channels. This has been
+> broken since:
 > 
-> Plugging in the adapter on Linux 4.1 (dmesg):
-> usb 3-3.3.3: new full-speed USB device number 90 using xhci_hcd
-> usb 3-3.3.3: New USB device found, idVendor=105b, idProduct=e065
-> usb 3-3.3.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-> usb 3-3.3.3: Product: BCM43142A0
-> usb 3-3.3.3: Manufacturer: Broadcom Corp
-> usb 3-3.3.3: SerialNumber: 0090A286559E
+>    commit 5205185d461d5902325e457ca80bd421127b7308
+>    Author: David Herrmann <dh.herrmann@gmail.com>
+>    Date:   Sat Apr 6 20:28:47 2013 +0200
 > 
-> /sys/kernel/debug/usb/devices:
-> T:  Bus=03 Lev=03 Prnt=22 Port=02 Cnt=02 Dev#= 90 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=105b ProdID=e065 Rev= 1.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM43142A0
-> S:  SerialNumber=0090A286559E
-> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+>        Bluetooth: hidp: remove old session-management
 > 
-> Support for the chipset was added in commit 88f9b65 and a similar BCM43142
-> based device was added in commit 8f0c304.
+> The old session-management always forced an l2cap error on the ctrl/intr
+> channels when shutting down. The new session-management skips this, as we
+> don't want to enforce channel policy on the caller. In other words, if
+> user-space removes an HIDP device, the underlying channels (which are
+> *owned* and *referenced* by user-space) are still left active. User-space
+> needs to call shutdown(2) or close(2) to release them.
 > 
-> To work around the issue, I got the firmware
-> (BCM43142A0_001.001.011.0122.0153) off a Windows installation of Broadcom
-> bluetooth driver and converted it to a .hcd -file via. hex2hcd and placed it
-> in /lib/firmware/brcm/BCM.hcd. After that:
+> Unfortunately, this does not work with idle-timeouts. There is no way to
+> signal user-space that the HIDP layer has been stopped. The API simply
+> does not support any event-passing except for poll(2). Hence, we restore
+> old behavior and force EUNATCH on the sockets if the HIDP layer is
+> disconnected due to idle-timeouts (behavior of explicit disconnects
+> remains unmodified). User-space can still call
 > 
-> $ echo "105b e065 0 19ff 0239" > /sys/bus/usb/drivers/btusb/new_id
-> ...(plug in the adapter)
-> usb 3-3.3.3: new full-speed USB device number 91 using xhci_hcd
-> usb 3-3.3.3: New USB device found, idVendor=105b, idProduct=e065
-> usb 3-3.3.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-> usb 3-3.3.3: Product: BCM43142A0
-> usb 3-3.3.3: Manufacturer: Broadcom Corp
-> usb 3-3.3.3: SerialNumber: 0090A286559E
-> Bluetooth: hci0: BCM: chip id 70
-> Bluetooth: hci0: BCM (001.001.011) build 0000
-> bluetooth hci0: firmware: direct-loading firmware brcm/BCM.hcd
-> Bluetooth: hci0: BCM (001.001.011) build 0154
+>    getsockopt(..., SO_ERROR, ...)
 > 
-> Bam, now it works for me!
+> ..to retrieve the EUNATCH error and clear sk_err. Hence, the channels can
+> still be re-used (which nobody does so far, though). Therefore, the API
+> still supports the new behavior, but with this patch it's also compatible
+> to the old implicit channel shutdown.
 > 
-> /sys/kernel/debug/usb/devices:
-> T:  Bus=03 Lev=03 Prnt=22 Port=02 Cnt=02 Dev#= 92 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=105b ProdID=e065 Rev= 1.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM43142A0
-> S:  SerialNumber=0090A286559E
-> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> 
-> Signed-off-by: Santtu Rekilä <sare@r00t3d.com>
+> Cc: <stable@vger.kernel.org> # 3.10+
+> Reported-by: Mark Haun <haunma@keteu.org>
+> Reported-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
 > ---
-> drivers/bluetooth/btusb.c | 3 +++
-> 1 file changed, 3 insertions(+)
+> Hi Mark & Luiz
+> 
+> Can you give this a spin? This should fix the reported issues! I like the
+> implementation much more than calling shutdown(2) implicitly in the kernel.
+> With sk_err we avoid enforcing a behavior and let user-space deal with it.
+> 
+> Btw., this needs back-porting to >=3.10 (which introduced the new session
+> management).
+> 
+> Thanks for the report!
+> David
+> 
+> net/bluetooth/hidp/core.c | 15 +++++++++++++++
+> 1 file changed, 15 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
