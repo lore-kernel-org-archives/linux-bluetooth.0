@@ -1,33 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 Oct 2015 14:25:28 +0300
+Date: Mon, 19 Oct 2015 14:24:45 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Julio =?iso-8859-1?Q?Gonz=E1lez_Mej=EDas?= <juliolokooo@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: Can't bring bluetooth controller up
-Message-ID: <20151019112528.GB15936@t440s.lan>
-References: <56222AC0.4090302@gmail.com>
- <53E5ADDA-1988-4404-8E37-DBBA99A69CB9@holtmann.org>
- <56223B1A.9050204@gmail.com>
- <C0D62687-5C0A-4D64-A91A-0949EAAD48E8@holtmann.org>
- <5624CC53.7080507@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btusb: Mark BCM2045 devices to have broken
+ link key commands
+Message-ID: <20151019112445.GA15936@t440s.lan>
+References: <1445085567-55373-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <5624CC53.7080507@gmail.com>
+In-Reply-To: <1445085567-55373-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Julio,
+Hi Marcel,
 
-On Mon, Oct 19, 2015, Julio González Mejías wrote:
-> >I sent a patch to the mailing list that might fix this. Please try it out.
-> >
-> >Regards
-> >
-> >Marcel
-> >
+On Sat, Oct 17, 2015, Marcel Holtmann wrote:
+> The BCM2045 seems to have a problem with the stored link key commands
+> and thus just mark them as broken.
 > 
-> Thank you! I have tried the patch and my bluetooth controller works fine
-> now.
+>   HCI Event: Command Complete (0x0e) plen 12
+>      Read Local Supported Features (0x04|0x0003) ncmd 1
+>      status 0x00
+>      Features: 0xff 0xff 0x8d 0xfe 0x8f 0xf9 0x00 0x80
+>   HCI Event: Command Complete (0x0e) plen 12
+>      Read Local Version Information (0x04|0x0001) ncmd 1
+>      status 0x00
+>      HCI Version: 2.0 (0x3) HCI Revision: 0x2000
+>      LMP Version: 2.0 (0x3) LMP Subversion: 0x410d
+>      Manufacturer: Broadcom Corporation (15)
+>   HCI Event: Command Complete (0x0e) plen 11
+>      Read Buffer Size (0x04|0x0005) ncmd 1
+>      status 0x00
+>      ACL MTU 1017:8 SCO MTU 64:0
+>   HCI Event: Command Complete (0x0e) plen 68
+>      Read Local Supported Commands (0x04|0x0002) ncmd 1
+>      status 0x00
+>      Commands: ffffff03feffcfffffffffff0300f8ff07
+>   HCI Event: Command Complete (0x0e) plen 4
+>      Delete Stored Link Key (0x03|0x0012) ncmd 1
+>      status 0x11 deleted 2048
+>      Error: Unsupported Feature or Parameter Value
+> 
+> From the looks of it, this device seems genuine and not one of the
+> devices that are neither Broadcom nor CSR devices in reality.
+> 
+> T: Bus=04 Lev=02 Prnt=02 Port=02 Cnt=02 Dev#= 3 Spd=12 MxCh= 0
+> D: Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+> P: Vendor=0a5c ProdID=2045 Rev= 1.12
+> S: Manufacturer=Broadcom Corp
+> S: Product=BCM2045A
+> S: SerialNumber=000000000000
+> C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+> E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+> I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+> I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+> I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+> E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E: Ad=84(I) Atr=02(Bulk) MxPS= 32 Ivl=0ms
+> E: Ad=04(O) Atr=02(Bulk) MxPS= 32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+> 
+> Reported-by: Julio González Mejías <juliolokooo@gmail.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btusb.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
-Thanks for testing this. I've now applied the patch to bluetooth-next.
+Applied to bluetooth-next. Thanks.
 
 Johan
