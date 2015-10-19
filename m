@@ -1,49 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Simon Fels <simon.fels@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Simon Fels <simon.fels@canonical.com>
-Subject: [PATCH] obexd: pbap: add headers correctly for size query
-Date: Mon, 19 Oct 2015 14:03:23 +0200
-Message-Id: <1445256203-6300-1-git-send-email-simon.fels@canonical.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 19 Oct 2015 14:33:22 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btbcm: Read USB product information for Apple
+ devices
+Message-ID: <20151019113322.GB16940@t440s.lan>
+References: <1445201308-127022-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1445201308-127022-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When client queries for the size of a phonebook we fall into a
-indefinite loop as g_obex_apparam_encode always returns the same
-number of items added to the buffer regardless how often it is
-called. In former times where this code wasn't using GObexApparams
-a array was reduced each time the headers where added and so we could
-easily find out when we've added all headers. However today we need
-to solve this a bit differently by also setting the firstpacket flag
-when we receive the phonebook size result from the phonebook
-implementation which then lets us correctly go through without
-falling into a indefinite loop.
----
- obexd/plugins/pbap.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Hi Marcel,
 
-diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-index f2f9166..1ecf379 100644
---- a/obexd/plugins/pbap.c
-+++ b/obexd/plugins/pbap.c
-@@ -193,6 +193,8 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
- 	pbap->obj->apparam = g_obex_apparam_set_uint16(NULL, PHONEBOOKSIZE_TAG,
- 								phonebooksize);
- 
-+	pbap->obj->firstpacket = TRUE;
-+
- 	if (missed > 0)	{
- 		DBG("missed %d", missed);
- 
-@@ -833,7 +835,7 @@ static ssize_t vobject_pull_get_next_header(void *object, void *buf, size_t mtu,
- 
- 	*hi = G_OBEX_HDR_APPARAM;
- 
--	if (pbap->params->maxlistcount == 0 || obj->firstpacket) {
-+	if (obj->firstpacket) {
- 		obj->firstpacket = FALSE;
- 
- 		return g_obex_apparam_encode(obj->apparam, buf, mtu);
--- 
-2.5.0
+On Sun, Oct 18, 2015, Marcel Holtmann wrote:
+> For the Apple Bluetooth devices, read the USB product information and
+> print them. This allows for easy mapping of chip and USB details.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btbcm.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 
+Applied to bluetooth-next. Thanks.
+
+Johan
