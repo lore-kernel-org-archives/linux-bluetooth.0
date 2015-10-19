@@ -1,149 +1,180 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: Can't bring bluetooth controller up
-To: Marcel Holtmann <marcel@holtmann.org>
-References: <56222AC0.4090302@gmail.com>
- <53E5ADDA-1988-4404-8E37-DBBA99A69CB9@holtmann.org>
- <56223B1A.9050204@gmail.com>
- <C0D62687-5C0A-4D64-A91A-0949EAAD48E8@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-From: =?UTF-8?Q?Julio_Gonz=c3=a1lez_Mej=c3=adas?= <juliolokooo@gmail.com>
-Message-ID: <5624CC53.7080507@gmail.com>
-Date: Mon, 19 Oct 2015 12:56:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <C0D62687-5C0A-4D64-A91A-0949EAAD48E8@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <1444132398-3176-3-git-send-email-bharat.panda@samsung.com>
+References: <1444132398-3176-1-git-send-email-bharat.panda@samsung.com>
+	<1444132398-3176-3-git-send-email-bharat.panda@samsung.com>
+Date: Mon, 19 Oct 2015 13:54:32 +0300
+Message-ID: <CABBYNZL_iYY5B90YgfDnke6-CG2pa7Xuu8HSkVhQD=2Yj=dpig@mail.gmail.com>
+Subject: Re: [PATCH 3/3] audio/avrcp: Add support for SetBrowsedPlayer
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Bharat,
 
-> Hi Julio,
+On Tue, Oct 6, 2015 at 2:53 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Support added to handle SetBrowsedPlayer command for TG role.
 >
->>>> I have a card reader with bluetooth controller built-in (Broadcom BCM2045A) and it stopped working suddenly some days ago as it appears down and I can't bring it up with hciconfig, this is what happens:
->>>>
->>>> sudo hciconfig hci0 up
->>>> Can't init device hci0: Operation not supported (95)
->>>>
->>>> This is the output of hcidump when running this command:
->>>>
->>>> hcidump
->>>> HCI sniffer - Bluetooth packet analyzer ver 5.35
->>>> device: hci0 snap_len: 1500 filter: 0xffffffffffffffff
->>>>> HCI Event: Command Complete (0x0e) plen 4
->>>>      Reset (0x03|0x0003) ncmd 1
->>>>      status 0x00
->>>>> HCI Event: Command Complete (0x0e) plen 12
->>>>      Read Local Supported Features (0x04|0x0003) ncmd 1
->>>>      status 0x00
->>>>      Features: 0xff 0xff 0x8d 0xfe 0x8f 0xf9 0x00 0x80
->>>>> HCI Event: Command Complete (0x0e) plen 12
->>>>      Read Local Version Information (0x04|0x0001) ncmd 1
->>>>      status 0x00
->>>>      HCI Version: 2.0 (0x3) HCI Revision: 0x2000
->>>>      LMP Version: 2.0 (0x3) LMP Subversion: 0x410d
->>>>      Manufacturer: Broadcom Corporation (15)
->>>>> HCI Event: Command Complete (0x0e) plen 10
->>>>      Read BD ADDR (0x04|0x0009) ncmd 1
->>>>      status 0x00 bdaddr 25:7B:43:51:08:D3
->>>>> HCI Event: Command Complete (0x0e) plen 11
->>>>      Read Buffer Size (0x04|0x0005) ncmd 1
->>>>      status 0x00
->>>>      ACL MTU 1017:8 SCO MTU 64:0
->>>>> HCI Event: Command Complete (0x0e) plen 7
->>>>      Read Class of Device (0x03|0x0023) ncmd 1
->>>>      status 0x00 class 0x000000
->>>>> HCI Event: Command Complete (0x0e) plen 252
->>>>      Read Local Name (0x03|0x0014) ncmd 1
->>>>      status 0x00 name 'BCM2045'
->>>>> HCI Event: Command Complete (0x0e) plen 6
->>>>      Read Voice Setting (0x03|0x0025) ncmd 1
->>>>      status 0x00 voice setting 0x0060
->>>>> HCI Event: Command Complete (0x0e) plen 5
->>>>      Read Number of Supported IAC (0x03|0x0038) ncmd 1
->>>>> HCI Event: Command Complete (0x0e) plen 8
->>>>      Read Current IAC LAP (0x03|0x0039) ncmd 1
->>>>      IAC 0x9e8b33 (General Inquiry Access Code)
->>>>> HCI Event: Command Complete (0x0e) plen 4
->>>>      Set Event Filter (0x03|0x0005) ncmd 1
->>>>      status 0x00
->>>>> HCI Event: Command Complete (0x0e) plen 4
->>>>      Write Connection Accept Timeout (0x03|0x0016) ncmd 1
->>>>      status 0x00
->>>>> HCI Event: Command Complete (0x0e) plen 68
->>>>      Read Local Supported Commands (0x04|0x0002) ncmd 1
->>>>      status 0x00
->>>>      Commands: ffffff03feffcfffffffffff0300f8ff07
->>>>> HCI Event: Command Complete (0x0e) plen 4
->>>>      Write Inquiry Mode (0x03|0x0045) ncmd 1
->>>>      status 0x00
->>>>> HCI Event: Command Complete (0x0e) plen 14
->>>>      Read Local Extended Features (0x04|0x0004) ncmd 1
->>>>      status 0x00 page 1 max 0
->>>>      Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
->>>>> HCI Event: Command Complete (0x0e) plen 4
->>>>      Set Event Mask (0x03|0x0001) ncmd 1
->>>>      status 0x00
->>>>> HCI Event: Command Complete (0x0e) plen 4
->>>>      Write Default Link Policy Settings (0x02|0x000f) ncmd 1
->>>>      status 0x00
->>>>> HCI Event: Command Complete (0x0e) plen 8
->>>>      Read Page Scan Activity (0x03|0x001b) ncmd 1
->>>>      status 0x00 interval 2048 window 18
->>>>> HCI Event: Command Complete (0x0e) plen 4
->>>>      Delete Stored Link Key (0x03|0x0012) ncmd 1
->>>>      status 0x11 deleted 2048
->>>>      Error: Unsupported Feature or Parameter Value
->>>
->>> for some reason this command is failing. That should not happen actually. What is the content of /sys/kernel/debug/usb/devices for this device.
->>>
->>> Regards
->>>
->>> Marcel
->>>
->>
->> This is the content of /sys/kernel/debug/usb:
->>
->> T: Bus=04 Lev=02 Prnt=02 Port=02 Cnt=02 Dev#= 3 Spd=12 MxCh= 0
->> D: Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
->> P: Vendor=0a5c ProdID=2045 Rev= 1.12
->> S: Manufacturer=Broadcom Corp
->> S: Product=BCM2045A
->> S: SerialNumber=000000000000
->> C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
->> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
->> E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
->> E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
->> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
->> E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
->> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
->> E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
->> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
->> E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
->> I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
->> E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
->> I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
->> E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
->> I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
->> E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
->> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
->> E: Ad=84(I) Atr=02(Bulk) MxPS= 32 Ivl=0ms
->> E: Ad=04(O) Atr=02(Bulk) MxPS= 32 Ivl=0ms
->> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=00 Driver=(none)
+>     AVCTP Browsing: Response: type 0x00 label 13 PID 0x110e
+>       AVRCP: SetBrowsedPlayer: len 0x000a
+>        Status: 0x04 (Success)
+>        UIDCounter: 0x0000 (0)
+>        Number of Items: 0x00000007 (7)
+>        CharsetID: 0x006a (UTF-8)
+>        Folder Depth: 0x00 (0)
+> ---
+>  profiles/audio/avrcp.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++-
+>  profiles/audio/avrcp.h |  1 +
+>  profiles/audio/media.c |  7 ++++++
+>  3 files changed, 66 insertions(+), 1 deletion(-)
 >
-> I sent a patch to the mailing list that might fix this. Please try it out.
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 44f8929..af40b59 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -207,6 +207,15 @@ struct player_item {
+>         char name[0];
+>  } __attribute__ ((packed));
 >
-> Regards
+> +struct avrcp_set_browsed_player_rsp {
+> +       uint8_t status;
+> +       uint16_t uid_counter;
+> +       uint32_t num_of_items;
+> +       uint16_t charset_id;
+> +       uint8_t folder_depth;
+> +       uint8_t data[0];
+> +} __attribute__ ((packed));
+> +
+>  struct avrcp_server {
+>         struct btd_adapter *adapter;
+>         uint32_t tg_record_id;
+> @@ -1873,6 +1882,54 @@ err_metadata:
+>         return AVRCP_HEADER_LENGTH + 1;
+>  }
 >
-> Marcel
->
+> +static void avrcp_handle_set_browsed_player(struct avrcp *session,
+> +                               struct avrcp_browsing_header *pdu,
+> +                               uint8_t transaction)
+> +{
+> +       struct avrcp_player *player;
+> +       struct media_player *mp;
+> +       uint16_t len = ntohs(pdu->param_len);
+> +       uint16_t player_id = 0;
+> +       uint8_t status;
+> +
+> +       if (len < 1) {
+> +               status = AVRCP_STATUS_INVALID_PARAM;
+> +               goto failed;
+> +       }
+> +
+> +       player_id = bt_get_be16(&pdu->params[0]);
+> +       player = find_tg_player(session, player_id);
+> +
+> +       if (player) {
+> +               struct avrcp_set_browsed_player_rsp *resp;
+> +
+> +               mp = player->user_data;
+> +               player->browsed = true;
+> +
+> +               resp = (struct avrcp_set_browsed_player_rsp *) pdu->params;
+> +
+> +               resp->status = AVRCP_STATUS_SUCCESS;
+> +               resp->uid_counter = htons(player_get_uid_counter(player));
+> +               resp->num_of_items = htonl(player->cb->get_total_items(mp));
+> +               /*
+> +                * MPRIS player returns a flat hierarchy playlist structure,
+> +                * where the folder depth will always considered to be 0.
+> +                */
+> +               resp->folder_depth = 0;
+> +               resp->charset_id = htons(AVRCP_CHARSET_UTF8);
+> +               pdu->param_len = htons(sizeof(*resp));
+> +       } else {
+> +               status = AVRCP_STATUS_INVALID_PLAYER_ID;
+> +               goto failed;
 
-Thank you! I have tried the patch and my bluetooth controller works fine 
-now.
+Id probably check with if (!player)... goto failed; to simplify the
+indentation, also we may respond with No available players in case
+there are no players registered, or Player Not Browsable if the player
+browsing flag is not set which means it does not support playlists.
 
-Regards
+> +       }
+> +
+> +       return;
+> +
+> +failed:
+> +       pdu->params[0] = status;
+> +       pdu->param_len = htons(1);
+> +}
+> +
+>  static void avrcp_handle_media_player_list(struct avrcp *session,
+>                                 struct avrcp_browsing_header *pdu,
+>                                 uint32_t start_item, uint32_t end_item)
+> @@ -1912,7 +1969,6 @@ static void avrcp_handle_media_player_list(struct avrcp *session,
+>                 memcpy(&item->features, &features, sizeof(features));
+>
+>                 item->charset = htons(AVRCP_CHARSET_UTF8);
+> -
+>                 name = player->cb->get_name(player->user_data);
+>                 namelen = strlen(name);
+>                 item->namelen = htons(namelen);
+> @@ -1989,6 +2045,7 @@ static struct browsing_pdu_handler {
+>                                                         uint8_t transaction);
+>  } browsing_handlers[] = {
+>                 { AVRCP_GET_FOLDER_ITEMS, avrcp_handle_get_folder_items },
+> +               { AVRCP_SET_BROWSED_PLAYER, avrcp_handle_set_browsed_player},
+>                 { },
+>  };
+>
+> diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+> index 86d310c..c09b910 100644
+> --- a/profiles/audio/avrcp.h
+> +++ b/profiles/audio/avrcp.h
+> @@ -101,6 +101,7 @@ struct avrcp_player_cb {
+>         bool (*pause) (void *user_data);
+>         bool (*next) (void *user_data);
+>         bool (*previous) (void *user_data);
+> +       uint32_t (*get_total_items) (void *user_data);
+>  };
+>
+>  int avrcp_set_volume(struct btd_device *dev, uint8_t volume, bool notify);
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> index 2df0cb2..3196b3a 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -1287,6 +1287,12 @@ static bool previous(void *user_data)
+>         return media_player_send(mp, "Previous");
+>  }
+>
+> +static uint32_t get_total_items(void *user_data)
+> +{
+> +       struct media_player *mp = user_data;
+> +
+> +       return mp->total_items;
+> +}
+>
+>  static void playlist_reply(DBusPendingCall *call, void *user_data)
+>  {
+> @@ -1409,6 +1415,7 @@ static struct avrcp_player_cb player_cb = {
+>         .pause = pause,
+>         .next = next,
+>         .previous = previous,
+> +       .get_total_items = get_total_items,
+>  };
+>
+>  static void media_player_exit(DBusConnection *connection, void *user_data)
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
