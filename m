@@ -1,245 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <02bc01d10a4c$e2c50510$a84f0f30$@samsung.com>
-References: <1444132398-3176-1-git-send-email-bharat.panda@samsung.com>
-	<02bc01d10a4c$e2c50510$a84f0f30$@samsung.com>
-Date: Mon, 19 Oct 2015 13:35:57 +0300
-Message-ID: <CABBYNZKpg5z7fUJ_-wzh3NpLuG-fetK6umYvc_Bu39AJzkhVeg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] aurdio/avrcp: Get player playlist details
+In-Reply-To: <1445036627-5474-1-git-send-email-vcgomes@gmail.com>
+References: <1445036627-5474-1-git-send-email-vcgomes@gmail.com>
+Date: Mon, 19 Oct 2015 13:18:31 +0300
+Message-ID: <CABBYNZKEj4tr+Lm1t4gnvPaHu+m5bG0+x=+kfrzNR6JD5+J+ew@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] src/profile: Fix segmentation fault
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Bhusan Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
+To: Vinicius Costa Gomes <vcgomes@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+Hi Vinicius,
 
-On Mon, Oct 19, 2015 at 12:02 PM, Bharat Bhusan Panda
-<bharat.panda@samsung.com> wrote:
-> Ping
+On Sat, Oct 17, 2015 at 2:03 AM, Vinicius Costa Gomes <vcgomes@gmail.com> wrote:
+> The change that made the 'deviceinfo' profile "external" had an side
+> effect, now it is possible to have an external profile without 'owner'
+> and 'path' information. The fix considers that having an external
+> profile without that information is not an error.
 >
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Bharat Panda
->> Sent: Tuesday, October 06, 2015 5:23 PM
->> To: linux-bluetooth@vger.kernel.org
->> Cc: cpgs@samsung.com; Bharat Panda
->> Subject: [PATCH 1/3] aurdio/avrcp: Get player playlist details
->>
->> Support added to read and cache player playlist details after player
->> registration completes.
->> ---
->>  profiles/audio/media.c | 121
->> +++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 121 insertions(+)
->>
->> diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
->> 69070bf..edeb66f 100644
->> --- a/profiles/audio/media.c
->> +++ b/profiles/audio/media.c
->> @@ -58,6 +58,7 @@
->>  #define MEDIA_INTERFACE "org.bluez.Media1"
->>  #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
->>  #define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
->> +#define MEDIA_PLAYER_PLAYLIST_INTERFACE
->> "org.mpris.MediaPlayer2.Playlists"
->>
->>  #define REQUEST_TIMEOUT (3 * 1000)           /* 3 seconds */
->>
->> @@ -95,6 +96,7 @@ struct media_endpoint {  struct media_player {
->>       struct media_adapter    *adapter;
->>       struct avrcp_player     *player;
->> +     GSList                  *playlists;
->>       char                    *sender;        /* Player DBus bus id */
->>       char                    *path;          /* Player object path */
->>       GHashTable              *settings;      /* Player settings */
->> @@ -105,8 +107,10 @@ struct media_player {
->>       char                    *status;
->>       uint32_t                position;
->>       uint32_t                duration;
->> +     uint32_t                total_items;
->>       uint8_t                 volume;
->>       GTimer                  *timer;
->> +     guint                   playlist_id;
->>       bool                    play;
->>       bool                    pause;
->>       bool                    next;
->> @@ -115,6 +119,13 @@ struct media_player {
->>       char                    *name;
->>  };
->>
->> +struct media_playlist {
->> +     char            *name;
->> +     char            *id;
->> +     char            *icon;
->> +     uint8_t         data[0];
->> +} __attribute__ ((packed));
->> +
->>  static GSList *adapters = NULL;
->>
->>  static void endpoint_request_free(struct endpoint_request *request) @@ -
->> 961,6 +972,9 @@ static void media_player_free(gpointer data)
->>       if (mp->settings)
->>               g_hash_table_unref(mp->settings);
->>
->> +     if (mp->playlist_id > 0)
->> +             g_source_remove(mp->playlist_id);
->> +
->>       g_timer_destroy(mp->timer);
->>       g_free(mp->sender);
->>       g_free(mp->path);
->> @@ -1271,6 +1285,111 @@ static bool previous(void *user_data)
->>       return media_player_send(mp, "Previous");  }
->>
->> +
->> +static void playlist_reply(DBusPendingCall *call, void *user_data) {
->> +     struct media_player *mp = user_data;
->> +     DBusMessage *reply;
->> +     DBusMessageIter array_iter, entry, struct_iter;
->> +     DBusError derr;
->> +     int ctype;
->> +
->> +     reply = dbus_pending_call_steal_reply(call);
->> +
->> +     dbus_error_init(&derr);
->> +
->> +     if (dbus_set_error_from_message(&derr, reply)) {
->> +             error("Error: GetPlayLists method %s, %s", derr.name,
->> +                                     derr.message);
->> +             dbus_error_free(&derr);
->> +             goto done;
->> +     }
->> +
->> +     dbus_message_iter_init(reply, &array_iter);
->> +     ctype = dbus_message_iter_get_arg_type(&array_iter);
->> +
->> +     if (ctype != DBUS_TYPE_ARRAY)
->> +             goto done;
->> +
->> +     dbus_message_iter_recurse(&array_iter, &struct_iter);
->> +
->> +     while ((ctype = dbus_message_iter_get_arg_type(&struct_iter)) !=
->> +                             DBUS_TYPE_INVALID) {
->> +             struct media_playlist *playlist;
->> +
->> +             if (ctype != DBUS_TYPE_STRUCT) {
->> +                     error("Invalid type");
->> +                     goto done;
->> +             }
->> +
->> +             playlist = g_new0(struct media_playlist, 1);
->> +
->> +             dbus_message_iter_recurse(&struct_iter, &entry);
->> +
->> +             dbus_message_iter_get_basic(&entry, &playlist->id);
->> +             DBG("Playlists Id %s", playlist->id);
->> +
->> +             dbus_message_iter_next(&entry);
->> +             dbus_message_iter_get_basic(&entry, &playlist->name);
->> +             DBG("Playlist Name %s", playlist->name);
->> +
->> +             dbus_message_iter_next(&entry);
->> +             dbus_message_iter_get_basic(&entry, &playlist->icon);
->> +             DBG("Playlist Icon %s", playlist->icon);
->> +
->> +             /* TODO: Create Media folder with playlist information */
->> +
->> +             mp->playlists = g_slist_append(mp->playlists, playlist);
->> +             mp->total_items++;
->> +
->> +             dbus_message_iter_next(&struct_iter);
->> +     }
-
-Id expected you to subscribe to playlist changes once you complete
-reading the initial list then every time it changes you will need to
-refetch the list in case it has changed, but fill free to split it so
-this patch don't become to big.
-
->> +done:
->> +     dbus_message_unref(reply);
->> +}
->> +
->> +static gboolean get_playlists(gpointer user_data) {
->> +     struct media_player *mp = user_data;
->> +     DBusMessage *msg;
->> +     DBusPendingCall *call;
->> +     gboolean reverse_order = FALSE;
->> +     uint32_t start_index = 0x0000;
->> +     uint32_t end_index = 0xFFFF;
->> +     char *ordering = "Alphabetical";
->> +     uint32_t max_count = (end_index - start_index);
->> +
->> +     msg = dbus_message_new_method_call(mp->sender, mp->path,
->> +                             MEDIA_PLAYER_PLAYLIST_INTERFACE,
->> +                             "GetPlaylists");
->> +
->> +     if (msg == NULL) {
->> +             error("Couldn't allocate D-Bus message");
->> +             return -ENOMEM;
->> +     }
->> +
->> +     dbus_message_append_args(msg,
->> +                     DBUS_TYPE_UINT32, &start_index,
->> +                     DBUS_TYPE_UINT32, &max_count,
->> +                     DBUS_TYPE_STRING, &ordering,
->> +                     DBUS_TYPE_BOOLEAN, &reverse_order,
->> +                     DBUS_TYPE_INVALID);
->> +
->> +     mp->total_items = 0;
->> +
->> +     if ((dbus_connection_send_with_reply(btd_get_dbus_connection(),
->> +                                     msg, &call, -1))) {
->> +             dbus_pending_call_set_notify(call, &playlist_reply, mp,
->> NULL);
->> +             dbus_pending_call_unref(call);
->> +             dbus_message_unref(msg);
->> +     }
-
-You need to save the DBusPendingCall call to be able to cancel the
-request in case something happens in the meantime, there is similar
-code already in the same file just look at e.g.
-media_endpoint_async_call. (note that I don't want you to copy it
-exactly but it might be a good idea to have pending request for media
-players but if is just GetPlaylist Im fine to just store it inside
-media_player structure).
-
->> +     mp->playlist_id = 0;
->> +
->> +     return FALSE;
->> +}
->> +
->>  static struct avrcp_player_cb player_cb = {
->>       .list_settings = list_settings,
->>       .get_setting = get_setting,
->> @@ -1831,6 +1950,8 @@ static DBusMessage
->> *register_player(DBusConnection *conn, DBusMessage *msg,
->>               return btd_error_invalid_args(msg);
->>       }
->>
->> +     mp->playlist_id = g_idle_add(get_playlists, mp);
-
-Since you won't block anymore the call to get_playlists can be done
-directly here.
-
->> +
->>       return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);  }
->>
->> --
->> 1.9.1
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
->> the body of a message to majordomo@vger.kernel.org More majordomo
->> info at  http://vger.kernel.org/majordomo-info.html
+> Valgrind log:
+>
+> bluetoothd[9974]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
+> bluetoothd[9974]: src/adapter.c:add_uuid() sending add uuid command for index 0
+> bluetoothd[9974]: Endpoint registered: sender=:1.38 path=/MediaEndpoint/A2DPSink
+> bluetoothd[9974]: src/profile.c:register_profile() sender :1.38 path /Profile/HSPAGProfile
+> ==9974== Invalid read of size 1
+> ==9974==    at 0x65F21E0: __strcmp_sse2_unaligned (in /usr/x86_64-pc-linux-gnu/lib/libc-2.22.so)
+> ==9974==    by 0x4E6C7E8: g_str_equal (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+> ==9974==    by 0x467917: find_ext_profile (profile.c:745)
+> ==9974==    by 0x469A8D: register_profile (profile.c:2373)
+> ==9974==    by 0x4889C3: process_message.isra.5 (object.c:259)
+> ==9974==    by 0x518E33E: _dbus_object_tree_dispatch_and_unlock (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
+> ==9974==    by 0x51805E3: dbus_connection_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
+> ==9974==    by 0x4856DF: message_dispatch (mainloop.c:72)
+> ==9974==    by 0x4E7C669: g_main_context_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+> ==9974==    by 0x4E7C9E7: g_main_context_iterate.isra.29 (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+> ==9974==    by 0x4E7CD01: g_main_loop_run (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+> ==9974==    by 0x40BABE: main (main.c:661)
+> ==9974==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+> ==9974==
+> ==9974==
+> ==9974== Process terminating with default action of signal 11 (SIGSEGV)
+> ==9974==  Access not within mapped region at address 0x0
+> ==9974==    at 0x65F21E0: __strcmp_sse2_unaligned (in /usr/x86_64-pc-linux-gnu/lib/libc-2.22.so)
+> ==9974==    by 0x4E6C7E8: g_str_equal (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+> ==9974==    by 0x467917: find_ext_profile (profile.c:745)
+> ==9974==    by 0x469A8D: register_profile (profile.c:2373)
+> ==9974==    by 0x4889C3: process_message.isra.5 (object.c:259)
+> ==9974==    by 0x518E33E: _dbus_object_tree_dispatch_and_unlock (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
+> ==9974==    by 0x51805E3: dbus_connection_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
+> ==9974==    by 0x4856DF: message_dispatch (mainloop.c:72)
+> ==9974==    by 0x4E7C669: g_main_context_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+> ==9974==    by 0x4E7C9E7: g_main_context_iterate.isra.29 (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+> ==9974==    by 0x4E7CD01: g_main_loop_run (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
+> ==9974==    by 0x40BABE: main (main.c:661)
+> ==9974==  If you believe this happened as a result of a stack
+> ==9974==  overflow in your program's main thread (unlikely but
+> ==9974==  possible), you can try to increase the size of the
+> ==9974==  main thread stack using the --main-stacksize= flag.
+> ==9974==  The main thread stack size used in this run was 8388608.
+> ==9974==
+> ---
+>  src/profile.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/profile.c b/src/profile.c
+> index 70ee4c1..99c0587 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -742,10 +742,10 @@ static struct ext_profile *find_ext_profile(const char *owner,
+>         for (l = ext_profiles; l != NULL; l = g_slist_next(l)) {
+>                 struct ext_profile *ext = l->data;
+>
+> -               if (!g_str_equal(ext->owner, owner))
+> +               if (g_strcmp0(ext->owner, owner))
+>                         continue;
+>
+> -               if (g_str_equal(ext->path, path))
+> +               if (!g_strcmp0(ext->path, path))
+>                         return ext;
+>         }
 >
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.6.1
 
+Applied, thanks.
 
 
 -- 
