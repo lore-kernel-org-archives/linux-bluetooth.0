@@ -1,92 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1445036627-5474-1-git-send-email-vcgomes@gmail.com>
-References: <1445036627-5474-1-git-send-email-vcgomes@gmail.com>
-Date: Mon, 19 Oct 2015 13:18:31 +0300
-Message-ID: <CABBYNZKEj4tr+Lm1t4gnvPaHu+m5bG0+x=+kfrzNR6JD5+J+ew@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] src/profile: Fix segmentation fault
+In-Reply-To: <1444904566-30314-1-git-send-email-luiz.dentz@gmail.com>
+References: <1444904566-30314-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 19 Oct 2015 13:18:06 +0300
+Message-ID: <CABBYNZJjtPgpS+J608dAUDsudoSt8dEd-UcmDjeUURf7QbZbNw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core/device: Fix crash when disconnecting
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vinicius Costa Gomes <vcgomes@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi,
 
-On Sat, Oct 17, 2015 at 2:03 AM, Vinicius Costa Gomes <vcgomes@gmail.com> wrote:
-> The change that made the 'deviceinfo' profile "external" had an side
-> effect, now it is possible to have an external profile without 'owner'
-> and 'path' information. The fix considers that having an external
-> profile without that information is not an error.
+On Thu, Oct 15, 2015 at 1:22 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Valgrind log:
+> When device disconnect while GATT discovery is ongoing the following
+> crash can happen if the device is destroyed in case it is temporary:
 >
-> bluetoothd[9974]: src/adapter.c:adapter_service_insert() /org/bluez/hci0
-> bluetoothd[9974]: src/adapter.c:add_uuid() sending add uuid command for index 0
-> bluetoothd[9974]: Endpoint registered: sender=:1.38 path=/MediaEndpoint/A2DPSink
-> bluetoothd[9974]: src/profile.c:register_profile() sender :1.38 path /Profile/HSPAGProfile
-> ==9974== Invalid read of size 1
-> ==9974==    at 0x65F21E0: __strcmp_sse2_unaligned (in /usr/x86_64-pc-linux-gnu/lib/libc-2.22.so)
-> ==9974==    by 0x4E6C7E8: g_str_equal (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
-> ==9974==    by 0x467917: find_ext_profile (profile.c:745)
-> ==9974==    by 0x469A8D: register_profile (profile.c:2373)
-> ==9974==    by 0x4889C3: process_message.isra.5 (object.c:259)
-> ==9974==    by 0x518E33E: _dbus_object_tree_dispatch_and_unlock (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
-> ==9974==    by 0x51805E3: dbus_connection_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
-> ==9974==    by 0x4856DF: message_dispatch (mainloop.c:72)
-> ==9974==    by 0x4E7C669: g_main_context_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
-> ==9974==    by 0x4E7C9E7: g_main_context_iterate.isra.29 (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
-> ==9974==    by 0x4E7CD01: g_main_loop_run (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
-> ==9974==    by 0x40BABE: main (main.c:661)
-> ==9974==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
-> ==9974==
-> ==9974==
-> ==9974== Process terminating with default action of signal 11 (SIGSEGV)
-> ==9974==  Access not within mapped region at address 0x0
-> ==9974==    at 0x65F21E0: __strcmp_sse2_unaligned (in /usr/x86_64-pc-linux-gnu/lib/libc-2.22.so)
-> ==9974==    by 0x4E6C7E8: g_str_equal (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
-> ==9974==    by 0x467917: find_ext_profile (profile.c:745)
-> ==9974==    by 0x469A8D: register_profile (profile.c:2373)
-> ==9974==    by 0x4889C3: process_message.isra.5 (object.c:259)
-> ==9974==    by 0x518E33E: _dbus_object_tree_dispatch_and_unlock (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
-> ==9974==    by 0x51805E3: dbus_connection_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libdbus-1.so.3.14.3)
-> ==9974==    by 0x4856DF: message_dispatch (mainloop.c:72)
-> ==9974==    by 0x4E7C669: g_main_context_dispatch (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
-> ==9974==    by 0x4E7C9E7: g_main_context_iterate.isra.29 (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
-> ==9974==    by 0x4E7CD01: g_main_loop_run (in /usr/x86_64-pc-linux-gnu/lib/libglib-2.0.so.0.4600.1)
-> ==9974==    by 0x40BABE: main (main.c:661)
-> ==9974==  If you believe this happened as a result of a stack
-> ==9974==  overflow in your program's main thread (unlikely but
-> ==9974==  possible), you can try to increase the size of the
-> ==9974==  main thread stack using the --main-stacksize= flag.
-> ==9974==  The main thread stack size used in this run was 8388608.
-> ==9974==
+> Invalid read of size 4
+>    at 0x40A707C: g_slist_find_custom (in /usr/lib/libglib-2.0.so.0.4400.1)
+>    by 0x80B7382: gatt_service_removed (device.c:3422)
+>    by 0x80DF2FB: handle_notify (gatt-db.c:266)
+>    by 0x80D3B8E: queue_foreach (queue.c:251)
+>    by 0x80DF981: notify_service_changed (gatt-db.c:283)
+>    by 0x80DF981: gatt_db_service_destroy (gatt-db.c:294)
+>    by 0x80D3DFE: queue_remove_all (queue.c:387)
+>    by 0x80DFA4C: gatt_db_clear (gatt-db.c:438)
+>    by 0x80D908C: init_fail (gatt-client.c:1524)
+>    by 0x80D9A52: discovery_op_unref (gatt-client.c:419)
+>    by 0x80E18F2: destroy_mtu_op (gatt-helpers.c:495)
+>    by 0x80D7F6E: cancel_att_send_op (att.c:212)
+>    by 0x80D7F6E: bt_att_cancel (att.c:1238)
+>    by 0x80DB26A: bt_gatt_client_cancel_all (gatt-client.c:1962)
+>  Address 0x5536b58 is 0 bytes inside a block of size 8 free'd
+>    at 0x402B2C9: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+>    by 0x408CE4F: g_free (in /usr/lib/libglib-2.0.so.0.4400.1)
+>    by 0x40A6772: g_slice_free_chain_with_offset (in /usr/lib/libglib-2.0.so.0.4400.1)
+>    by 0x40A6B6B: g_slist_free (in /usr/lib/libglib-2.0.so.0.4400.1)
+>    by 0x40A7374: g_slist_free_full (in /usr/lib/libglib-2.0.so.0.4400.1)
+>    by 0x80B6CE0: device_free (device.c:624)
+>    by 0x80CFCCB: remove_interface (object.c:658)
+>    by 0x80D0208: g_dbus_unregister_interface (object.c:1382)
+>    by 0x80BC281: btd_device_unref (device.c:5942)
+>    by 0x80A9ACA: btd_adapter_remove_device (adapter.c:1165)
+>    by 0x80A9C52: adapter_remove_connection (adapter.c:5624)
+>    by 0x80AA77F: dev_disconnected (adapter.c:6584)
 > ---
->  src/profile.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  src/device.c | 3 +++
+>  1 file changed, 3 insertions(+)
 >
-> diff --git a/src/profile.c b/src/profile.c
-> index 70ee4c1..99c0587 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -742,10 +742,10 @@ static struct ext_profile *find_ext_profile(const char *owner,
->         for (l = ext_profiles; l != NULL; l = g_slist_next(l)) {
->                 struct ext_profile *ext = l->data;
+> diff --git a/src/device.c b/src/device.c
+> index fd177f4..0d3a655 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -626,6 +626,9 @@ static void device_free(gpointer user_data)
+>         g_slist_free_full(device->attios_offline, g_free);
+>         g_slist_free_full(device->svc_callbacks, svc_dev_remove);
 >
-> -               if (!g_str_equal(ext->owner, owner))
-> +               if (g_strcmp0(ext->owner, owner))
->                         continue;
+> +       /* Reset callbacks since the device is going to be freed */
+> +       gatt_db_register(device->db, NULL, NULL, NULL, NULL);
+> +
+>         attio_cleanup(device);
 >
-> -               if (g_str_equal(ext->path, path))
-> +               if (!g_strcmp0(ext->path, path))
->                         return ext;
->         }
->
+>         gatt_db_unref(device->db);
 > --
-> 2.6.1
+> 2.4.3
 
-Applied, thanks.
+Pushed.
 
 
 -- 
