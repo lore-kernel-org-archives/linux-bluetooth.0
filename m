@@ -2,1541 +2,1135 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [RFC 3/4] android: Remove dead code
-Date: Mon, 19 Oct 2015 23:42:51 +0200
-Message-Id: <1445290972-18383-2-git-send-email-szymon.janc@codecoup.pl>
-In-Reply-To: <1445290972-18383-1-git-send-email-szymon.janc@codecoup.pl>
-References: <1445290972-18383-1-git-send-email-szymon.janc@codecoup.pl>
+Subject: [RFC 2/4] shared: Remove dead code
+Date: Mon, 19 Oct 2015 23:42:50 +0200
+Message-Id: <1445290972-18383-1-git-send-email-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This removes dead code due to memory allocation with new0 not being
 able to fail.
 ---
- android/avdtp.c             |   5 +-
- android/avdtptest.c         |   4 -
- android/bas.c               |  55 ++------
- android/bluetooth.c         |  17 ---
- android/dis.c               |  11 --
- android/gatt.c              | 336 +++++---------------------------------------
- android/handsfree-client.c  |  14 +-
- android/handsfree.c         |   9 +-
- android/health.c            |  67 ++-------
- android/hog.c               |   2 -
- android/scpp.c              |  22 +--
- android/tester-a2dp.c       |   7 +-
- android/tester-avrcp.c      |   7 +-
- android/tester-bluetooth.c  |   7 +-
- android/tester-gatt.c       |   7 +-
- android/tester-hdp.c        |   7 +-
- android/tester-hidhost.c    |   7 +-
- android/tester-map-client.c |   7 +-
- android/tester-pan.c        |   7 +-
- android/tester-socket.c     |   7 +-
- 20 files changed, 67 insertions(+), 538 deletions(-)
+ src/shared/ad.c               | 31 -----------------------
+ src/shared/att.c              | 34 +------------------------
+ src/shared/crypto.c           |  2 --
+ src/shared/gap.c              |  7 -----
+ src/shared/gatt-client.c      | 59 -------------------------------------------
+ src/shared/gatt-db.c          | 37 ---------------------------
+ src/shared/gatt-helpers.c     | 24 ------------------
+ src/shared/gatt-server.c      | 47 ----------------------------------
+ src/shared/hci-crypto.c       |  6 -----
+ src/shared/hci.c              | 29 ---------------------
+ src/shared/hfp.c              | 40 -----------------------------
+ src/shared/io-mainloop.c      |  3 ---
+ src/shared/mgmt.c             | 42 ------------------------------
+ src/shared/queue.c            | 12 ---------
+ src/shared/ringbuf.c          |  3 ---
+ src/shared/tester.c           |  9 -------
+ src/shared/timeout-mainloop.c |  3 ---
+ src/shared/uhid.c             |  8 ------
+ 18 files changed, 1 insertion(+), 395 deletions(-)
 
-diff --git a/android/avdtp.c b/android/avdtp.c
-index 908c0ca..bab305b 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -3398,10 +3398,7 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
- 	DBG("SEP %p registered: type:%d codec:%d seid:%d", sep,
- 			sep->info.type, sep->codec, sep->info.seid);
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index 6259eb9..1bf013d 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -42,36 +42,12 @@ struct bt_ad *bt_ad_new(void)
+ 	struct bt_ad *ad;
  
--	if (!queue_push_tail(lseps, sep)) {
--		g_free(sep);
+ 	ad = new0(struct bt_ad, 1);
+-	if (!ad)
 -		return NULL;
--	}
-+	queue_push_tail(lseps, sep);
+-
+ 	ad->service_uuids = queue_new();
+-	if (!ad->service_uuids)
+-		goto fail;
+-
+ 	ad->manufacturer_data = queue_new();
+-	if (!ad->manufacturer_data)
+-		goto fail;
+-
+ 	ad->solicit_uuids = queue_new();
+-	if (!ad->solicit_uuids)
+-		goto fail;
+-
+ 	ad->service_data = queue_new();
+-	if (!ad->service_data)
+-		goto fail;
  
- 	return sep;
+ 	return bt_ad_ref(ad);
+-
+-fail:
+-	queue_destroy(ad->service_uuids, NULL);
+-	queue_destroy(ad->manufacturer_data, NULL);
+-	queue_destroy(ad->solicit_uuids, NULL);
+-	queue_destroy(ad->service_data, NULL);
+-
+-	free(ad);
+-
+-	return NULL;
  }
-diff --git a/android/avdtptest.c b/android/avdtptest.c
-index 01d52ea..ce34443 100644
---- a/android/avdtptest.c
-+++ b/android/avdtptest.c
-@@ -869,10 +869,6 @@ int main(int argc, char *argv[])
+ 
+ struct bt_ad *bt_ad_ref(struct bt_ad *ad)
+@@ -373,8 +349,6 @@ static bool queue_add_uuid(struct queue *queue, const bt_uuid_t *uuid)
+ 		return false;
+ 
+ 	new_uuid = new0(bt_uuid_t, 1);
+-	if (!new_uuid)
+-		return false;
+ 
+ 	*new_uuid = *uuid;
+ 
+@@ -466,9 +440,6 @@ bool bt_ad_add_manufacturer_data(struct bt_ad *ad, uint16_t manufacturer_id,
  	}
  
- 	lseps = queue_new();
--	if (!lseps) {
--		printf("Failed to allocate memory\n");
--		exit(1);
--	}
- 
- 	local_sep = avdtp_register_sep(lseps, dev_role, AVDTP_MEDIA_TYPE_AUDIO,
- 					0x00, TRUE, &sep_ind, &sep_cfm, NULL);
-diff --git a/android/bas.c b/android/bas.c
-index dcbf9de..7a1c4ca 100644
---- a/android/bas.c
-+++ b/android/bas.c
-@@ -77,22 +77,15 @@ static void bas_free(struct bt_bas *bas)
- 
- 	g_free(bas->primary);
- 	queue_destroy(bas->gatt_op, (void *) destroy_gatt_req);
--	g_free(bas);
-+	free(bas);
- }
- 
- struct bt_bas *bt_bas_new(void *primary)
- {
- 	struct bt_bas *bas;
- 
--	bas = g_try_new0(struct bt_bas, 1);
--	if (!bas)
--		return NULL;
--
-+	bas = new0(struct bt_bas, 1);
- 	bas->gatt_op = queue_new();
--	if (!bas->gatt_op) {
--		bas_free(bas);
--		return NULL;
--	}
- 
- 	if (primary)
- 		bas->primary = g_memdup(primary, sizeof(*bas->primary));
-@@ -127,21 +120,18 @@ static struct gatt_request *create_request(struct bt_bas *bas,
- 	struct gatt_request *req;
- 
- 	req = new0(struct gatt_request, 1);
--	if (!req)
--		return NULL;
--
- 	req->user_data = user_data;
- 	req->bas = bt_bas_ref(bas);
- 
- 	return req;
- }
- 
--static bool set_and_store_gatt_req(struct bt_bas *bas,
-+static void set_and_store_gatt_req(struct bt_bas *bas,
- 						struct gatt_request *req,
- 						unsigned int id)
- {
- 	req->id = id;
--	return queue_push_head(bas->gatt_op, req);
-+	queue_push_head(bas->gatt_op, req);
- }
- 
- static void write_char(struct bt_bas *bas, GAttrib *attrib, uint16_t handle,
-@@ -153,18 +143,10 @@ static void write_char(struct bt_bas *bas, GAttrib *attrib, uint16_t handle,
- 	unsigned int id;
- 
- 	req = create_request(bas, user_data);
--	if (!req)
--		return;
- 
- 	id = gatt_write_char(attrib, handle, value, vlen, func, req);
- 
--	if (set_and_store_gatt_req(bas, req, id))
--		return;
--
--	error("bas: Could not write characteristic");
--	g_attrib_cancel(attrib, id);
--	free(req);
--
-+	set_and_store_gatt_req(bas, req, id);
- }
- 
- static void read_char(struct bt_bas *bas, GAttrib *attrib, uint16_t handle,
-@@ -174,17 +156,10 @@ static void read_char(struct bt_bas *bas, GAttrib *attrib, uint16_t handle,
- 	unsigned int id;
- 
- 	req = create_request(bas, user_data);
--	if (!req)
--		return;
- 
- 	id = gatt_read_char(attrib, handle, func, req);
- 
--	if (set_and_store_gatt_req(bas, req, id))
--		return;
--
--	error("bas: Could not read characteristic");
--	g_attrib_cancel(attrib, id);
--	free(req);
-+	set_and_store_gatt_req(bas, req, id);
- }
- 
- static void discover_char(struct bt_bas *bas, GAttrib *attrib,
-@@ -196,17 +171,10 @@ static void discover_char(struct bt_bas *bas, GAttrib *attrib,
- 	unsigned int id;
- 
- 	req = create_request(bas, user_data);
--	if (!req)
--		return;
- 
- 	id = gatt_discover_char(attrib, start, end, uuid, func, req);
- 
--	if (set_and_store_gatt_req(bas, req, id))
--		return;
--
--	error("bas: Could not discover characteristic");
--	g_attrib_cancel(attrib, id);
--	free(req);
-+	set_and_store_gatt_req(bas, req, id);
- }
- 
- static void discover_desc(struct bt_bas *bas, GAttrib *attrib,
-@@ -217,16 +185,9 @@ static void discover_desc(struct bt_bas *bas, GAttrib *attrib,
- 	unsigned int id;
- 
- 	req = create_request(bas, user_data);
--	if (!req)
--		return;
- 
- 	id = gatt_discover_desc(attrib, start, end, uuid, func, req);
--	if (set_and_store_gatt_req(bas, req, id))
--		return;
--
--	error("bas: Could not discover descriptor");
--	g_attrib_cancel(attrib, id);
--	free(req);
-+	set_and_store_gatt_req(bas, req, id);
- }
- 
- static void notification_cb(const guint8 *pdu, guint16 len, gpointer user_data)
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 4d0cd48..51a31fe 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -3961,9 +3961,6 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
- 	uint8_t adv = advertising ? 0x01 : 0x00;
- 
- 	data = new0(struct adv_user_data, 1);
--	if (!data)
+ 	new_data = new0(struct bt_ad_manufacturer_data, 1);
+-	if (!new_data)
 -		return false;
 -
- 	data->cb = cb;
- 	data->user_data = user_data;
+ 	new_data->manufacturer_id = manufacturer_id;
  
-@@ -4078,9 +4075,6 @@ bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
- 	cp.addr.type = dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
- 
- 	data = new0(struct read_rssi_user_data, 1);
--	if (!data)
--		return false;
--
- 	data->cb = cb;
- 	data->user_data = user_data;
- 
-@@ -5249,18 +5243,7 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
- 	DBG("mode 0x%x", mode);
- 
- 	unpaired_cb_list = queue_new();
--	if (!unpaired_cb_list) {
--		error("Cannot allocate queue for unpaired callbacks");
--		return false;
--	}
--
- 	paired_cb_list = queue_new();
--	if (!paired_cb_list) {
--		error("Cannot allocate queue for paired callbacks");
--		queue_destroy(unpaired_cb_list, NULL);
--		unpaired_cb_list = NULL;
--		return false;
--	}
- 
- 	missing_settings = adapter.current_settings ^
- 						adapter.supported_settings;
-diff --git a/android/dis.c b/android/dis.c
-index 75dbe3d..0c20850 100644
---- a/android/dis.c
-+++ b/android/dis.c
-@@ -96,10 +96,6 @@ struct bt_dis *bt_dis_new(void *primary)
- 		return NULL;
- 
- 	dis->gatt_op = queue_new();
--	if (!dis->gatt_op) {
--		dis_free(dis);
--		return NULL;
--	}
- 
- 	if (primary)
- 		dis->primary = g_memdup(primary, sizeof(*dis->primary));
-@@ -134,9 +130,6 @@ static struct gatt_request *create_request(struct bt_dis *dis,
- 	struct gatt_request *req;
- 
- 	req = new0(struct gatt_request, 1);
--	if (!req)
--		return NULL;
--
- 	req->user_data = user_data;
- 	req->dis = bt_dis_ref(dis);
- 
-@@ -197,8 +190,6 @@ static void read_char(struct bt_dis *dis, GAttrib *attrib, uint16_t handle,
- 	unsigned int id;
- 
- 	req = create_request(dis, user_data);
--	if (!req)
--		return;
- 
- 	id = gatt_read_char(attrib, handle, func, req);
- 
-@@ -219,8 +210,6 @@ static void discover_char(struct bt_dis *dis, GAttrib *attrib,
- 	unsigned int id;
- 
- 	req = create_request(dis, user_data);
--	if (!req)
--		return;
- 
- 	id = gatt_discover_char(attrib, start, end, uuid, func, req);
- 
-diff --git a/android/gatt.c b/android/gatt.c
-index 65f3142..28635ed 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -744,37 +744,14 @@ static struct gatt_device *create_device(const bdaddr_t *addr)
- 	struct gatt_device *dev;
- 
- 	dev = new0(struct gatt_device, 1);
--	if (!dev)
--		return NULL;
- 
- 	bacpy(&dev->bdaddr, addr);
- 
- 	dev->services = queue_new();
--	if (!dev->services) {
--		error("gatt: Failed to allocate memory for client");
--		destroy_device(dev);
--		return NULL;
--	}
--
- 	dev->autoconnect_apps = queue_new();
--	if (!dev->autoconnect_apps) {
--		error("gatt: Failed to allocate memory for client");
--		destroy_device(dev);
--		return NULL;
--	}
--
- 	dev->pending_requests = queue_new();
--	if (!dev->pending_requests) {
--		error("gatt: Failed to allocate memory for client");
--		destroy_device(dev);
--		return NULL;
--	}
- 
--	if (!queue_push_head(gatt_devices, dev)) {
--		error("gatt: Cannot push device to queue");
--		destroy_device(dev);
--		return NULL;
--	}
-+	queue_push_head(gatt_devices, dev);
- 
- 	return device_ref(dev);
- }
-@@ -1116,25 +1093,13 @@ static struct app_connection *create_connection(struct gatt_device *device,
- 
- 	/* Check if already connected */
- 	new_conn = new0(struct app_connection, 1);
--	if (!new_conn)
--		return NULL;
- 
- 	/* Make connection id unique to connection record (app, device) pair */
- 	new_conn->app = app;
- 	new_conn->id = last_conn_id++;
--
- 	new_conn->transactions = queue_new();
--	if (!new_conn->transactions) {
--		free(new_conn);
--		return NULL;
--	}
- 
--	if (!queue_push_head(app_connections, new_conn)) {
--		error("gatt: Cannot push client on the client queue!?");
--		queue_destroy(new_conn->transactions, free);
--		free(new_conn);
--		return NULL;
--	}
-+	queue_push_head(app_connections, new_conn);
- 
- 	new_conn->device = device_ref(device);
- 
-@@ -1147,33 +1112,15 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
- 	struct service *s;
- 
- 	s = new0(struct service, 1);
--	if (!s) {
--		error("gatt: Cannot allocate memory for gatt_primary");
--		return NULL;
--	}
--
--	s->chars = queue_new();
--	if (!s->chars) {
--		error("gatt: Cannot allocate memory for char cache");
--		free(s);
--		return NULL;
--	}
--
--	s->included = queue_new();
--	if (!s->included) {
--		error("gatt: Cannot allocate memory for included queue");
--		queue_destroy(s->chars, NULL);
--		free(s);
--		return NULL;
--	}
- 
- 	if (bt_string_to_uuid(&s->id.uuid, uuid) < 0) {
- 		error("gatt: Cannot convert string to uuid");
--		queue_destroy(s->chars, NULL);
- 		free(s);
- 		return NULL;
+ 	new_data->data = malloc(len);
+@@ -605,8 +576,6 @@ bool bt_ad_add_service_data(struct bt_ad *ad, const bt_uuid_t *uuid, void *data,
  	}
  
-+	s->chars = queue_new();
-+	s->included = queue_new();
- 	s->id.instance = id;
+ 	new_data = new0(struct bt_ad_service_data, 1);
+-	if (!new_data)
+-		return false;
  
- 	/* Put primary service to our local list */
-@@ -1256,12 +1203,7 @@ static void discover_srvc_by_uuid_cb(uint8_t status, GSList *ranges,
- 			goto reply;
- 		}
+ 	new_data->uuid = *uuid;
  
--		if (!queue_push_tail(dev->services, s)) {
--			error("gatt: Cannot push primary service to the list");
--			destroy_service(s);
--			gatt_status = GATT_FAILURE;
--			goto reply;
--		}
-+		queue_push_tail(dev->services, s);
+diff --git a/src/shared/att.c b/src/shared/att.c
+index d88169e..0edc941 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -343,9 +343,6 @@ static struct att_send_op *create_att_send_op(struct bt_att *att,
+ 		return NULL;
  
- 		send_client_primary_notify(s, INT_TO_PTR(cb_data->conn->id));
+ 	op = new0(struct att_send_op, 1);
+-	if (!op)
+-		return NULL;
+-
+ 	op->type = op_type;
+ 	op->opcode = opcode;
+ 	op->callback = callback;
+@@ -496,9 +493,6 @@ static bool can_write_data(struct io *io, void *user_data)
+ 	}
  
-@@ -1318,11 +1260,7 @@ static void discover_srvc_all_cb(uint8_t status, GSList *services,
- 		if (!p)
- 			continue;
+ 	timeout = new0(struct timeout_data, 1);
+-	if (!timeout)
+-		return true;
+-
+ 	timeout->att = att;
+ 	timeout->id = op->id;
+ 	op->timeout_id = timeout_add(ATT_TIMEOUT_INTERVAL, timeout_cb,
+@@ -957,9 +951,6 @@ struct bt_att *bt_att_new(int fd, bool ext_signed)
+ 		return NULL;
  
--		if (!queue_push_tail(dev->services, p)) {
--			error("gatt: Cannot push primary service to the list");
--			free(p);
--			continue;
--		}
-+		queue_push_tail(dev->services, p);
+ 	att = new0(struct bt_att, 1);
+-	if (!att)
+-		return NULL;
+-
+ 	att->fd = fd;
+ 	att->mtu = BT_ATT_DEFAULT_LE_MTU;
+ 	att->buf = malloc(att->mtu);
+@@ -975,24 +966,10 @@ struct bt_att *bt_att_new(int fd, bool ext_signed)
+ 		att->crypto = bt_crypto_new();
  
- 		DBG("attr handle = 0x%04x, end grp handle = 0x%04x uuid: %s",
- 			prim->range.start, prim->range.end, prim->uuid);
-@@ -1412,11 +1350,6 @@ static guint search_dev_for_srvc(struct app_connection *conn, bt_uuid_t *uuid)
- 	struct discover_srvc_data *cb_data;
+ 	att->req_queue = queue_new();
+-	if (!att->req_queue)
+-		goto fail;
+-
+ 	att->ind_queue = queue_new();
+-	if (!att->ind_queue)
+-		goto fail;
+-
+ 	att->write_queue = queue_new();
+-	if (!att->write_queue)
+-		goto fail;
+-
+ 	att->notify_list = queue_new();
+-	if (!att->notify_list)
+-		goto fail;
+-
+ 	att->disconn_list = queue_new();
+-	if (!att->disconn_list)
+-		goto fail;
  
- 	cb_data = new0(struct discover_srvc_data, 1);
--	if (!cb_data) {
--		error("gatt: Cannot allocate cb data");
+ 	if (!io_set_read_handler(att->io, can_read_data, att, NULL))
+ 		goto fail;
+@@ -1126,9 +1103,6 @@ unsigned int bt_att_register_disconnect(struct bt_att *att,
+ 		return 0;
+ 
+ 	disconn = new0(struct att_disconn, 1);
+-	if (!disconn)
 -		return 0;
--	}
 -
- 	cb_data->conn = conn;
+ 	disconn->callback = callback;
+ 	disconn->destroy = destroy;
+ 	disconn->user_data = user_data;
+@@ -1342,9 +1316,6 @@ unsigned int bt_att_register(struct bt_att *att, uint8_t opcode,
+ 		return 0;
  
- 	if (uuid) {
-@@ -1779,7 +1712,7 @@ done:
- 		dev = create_device(addr);
- 	}
- 
--	if (!dev || dev->state != DEVICE_CONNECT_INIT)
-+	if (dev->state != DEVICE_CONNECT_INIT)
- 		return;
- 
- 	device_set_state(dev, DEVICE_CONNECT_READY);
-@@ -1802,38 +1735,20 @@ static struct gatt_app *register_app(const uint8_t *uuid, gatt_type_t type)
- 	}
- 
- 	app = new0(struct gatt_app, 1);
--	if (!app) {
--		error("gatt: Cannot allocate memory for registering app");
--		return NULL;
--	}
- 
- 	app->type = type;
- 
--	if (app->type == GATT_CLIENT) {
-+	if (app->type == GATT_CLIENT)
- 		app->notifications = queue_new();
--		if (!app->notifications) {
--			error("gatt: couldn't allocate notifications queue");
--			destroy_gatt_app(app);
--			return NULL;
--		}
--	}
- 
- 	memcpy(app->uuid, uuid, sizeof(app->uuid));
- 
- 	app->id = application_id++;
- 
--	if (!queue_push_head(gatt_apps, app)) {
--		error("gatt: Cannot push app on the list");
--		destroy_gatt_app(app);
--		return NULL;
--	}
-+	queue_push_head(gatt_apps, app);
- 
--	if ((app->type == GATT_SERVER) &&
--			!queue_push_tail(listen_apps, INT_TO_PTR(app->id))) {
--		error("gatt: Cannot push server on the list");
--		destroy_gatt_app(app);
--		return NULL;
--	}
-+	if (app->type == GATT_SERVER)
-+		queue_push_tail(listen_apps, INT_TO_PTR(app->id));
- 
- 	return app;
- }
-@@ -2056,9 +1971,6 @@ static struct listen_data *create_listen_data(int32_t client_id, bool start)
- 	struct listen_data *d;
- 
- 	d = new0(struct listen_data, 1);
--	if (!d)
--		return NULL;
+ 	notify = new0(struct att_notify, 1);
+-	if (!notify)
+-		return 0;
 -
- 	d->client_id = client_id;
- 	d->start = start;
- 
-@@ -2108,11 +2020,6 @@ static void handle_client_unregister(const void *buf, uint16_t len)
- 
- 	if (!advertising_cnt) {
- 		data = create_listen_data(cmd->client_if, false);
--		if (!data) {
--			error("gatt: Could not allocate listen data");
--			status = HAL_STATUS_NOMEM;
--			goto reply;
--		}
- 
- 		if (!bt_le_set_advertising(data->start, set_advertising_cb,
- 								data)) {
-@@ -2144,11 +2051,8 @@ static uint8_t handle_connect(int32_t app_id, const bdaddr_t *addr, bool direct)
- 		return HAL_STATUS_FAILED;
- 
- 	device = find_device_by_addr(addr);
--	if (!device) {
-+	if (!device)
- 		device = create_device(addr);
--		if (!device)
--			return HAL_STATUS_FAILED;
--	}
- 
- 	conn_match.device = device;
- 	conn_match.app = app;
-@@ -2229,12 +2133,7 @@ static void handle_client_listen(const void *buf, uint16_t len)
- 			goto reply;
- 		}
- 
--		if (!queue_push_tail(listen_apps,
--						INT_TO_PTR(cmd->client_if))) {
--			error("gatt: Could not put client on listen queue");
--			status = HAL_STATUS_FAILED;
--			goto reply;
--		}
-+		queue_push_tail(listen_apps, INT_TO_PTR(cmd->client_if));
- 
- 		/* If listen is already on just return success*/
- 		if (advertising_cnt > 0) {
-@@ -2264,11 +2163,6 @@ static void handle_client_listen(const void *buf, uint16_t len)
- 	}
- 
- 	data = create_listen_data(cmd->client_if, cmd->start);
--	if (!data) {
--		error("gatt: Could not allocate listen data");
--		status = HAL_STATUS_NOMEM;
--		goto reply;
--	}
- 
- 	if (!bt_le_set_advertising(cmd->start, set_advertising_cb, data)) {
- 		error("gatt: Could not set advertising");
-@@ -2507,12 +2401,8 @@ static void get_included_cb(uint8_t status, GSList *included, void *user_data)
- 		 * 1. on services queue together with primary service
- 		 * 2. on special queue inside primary service
- 		 */
--		if (!queue_push_tail(service->included, incl) ||
--			!queue_push_tail(conn->device->services, incl)) {
--			error("gatt: Cannot push incl service to the list");
--			destroy_service(incl);
--			continue;
--		}
-+		queue_push_tail(service->included, incl);
-+		queue_push_tail(conn->device->services, incl);
- 	}
- 
- 	/*
-@@ -2525,18 +2415,13 @@ failed:
- 	send_client_incl_service_notify(&service->id, incl, conn->id);
- }
- 
--static bool search_included_services(struct app_connection *conn,
-+static void search_included_services(struct app_connection *conn,
- 							struct service *service)
+ 	notify->opcode = opcode;
+ 	notify->callback = callback;
+ 	notify->destroy = destroy;
+@@ -1435,11 +1406,8 @@ bool bt_att_set_security(struct bt_att *att, int level)
+ static bool sign_set_key(struct sign_info **sign, uint8_t key[16],
+ 				bt_att_counter_func_t func, void *user_data)
  {
- 	struct get_included_data *data;
- 	uint16_t start, end;
- 
- 	data = new0(struct get_included_data, 1);
--	if (!data) {
--		error("gatt: failed to allocate memory for included_data");
--		return false;
+-	if (!(*sign)) {
++	if (!(*sign))
+ 		*sign = new0(struct sign_info, 1);
+-		if (!(*sign))
+-			return false;
 -	}
--
- 	data->prim = service;
- 	data->conn = conn;
  
-@@ -2550,8 +2435,6 @@ static bool search_included_services(struct app_connection *conn,
+ 	(*sign)->counter = func;
+ 	(*sign)->user_data = user_data;
+diff --git a/src/shared/crypto.c b/src/shared/crypto.c
+index d5cd915..aa66dac 100644
+--- a/src/shared/crypto.c
++++ b/src/shared/crypto.c
+@@ -142,8 +142,6 @@ struct bt_crypto *bt_crypto_new(void)
+ 	struct bt_crypto *crypto;
  
- 	gatt_find_included(conn->device->attrib, start, end, get_included_cb,
- 									data);
--
--	return true;
- }
- 
- static bool find_service(int32_t conn_id, struct element_id *service_id,
-@@ -2610,13 +2493,9 @@ static void handle_client_get_included_service(const void *buf, uint16_t len)
- 	}
- 
- 	if (!prim_service->incl_search_done) {
--		if (search_included_services(conn, prim_service)) {
--			status = HAL_STATUS_SUCCESS;
--			goto reply;
--		}
--
--		status = HAL_STATUS_FAILED;
--		goto notify;
-+		search_included_services(conn, prim_service);
-+		status = HAL_STATUS_SUCCESS;
-+		goto reply;
- 	}
- 
- 	/* Try to use cache here */
-@@ -2696,17 +2575,7 @@ static void cache_all_srvc_chars(struct service *srvc, GSList *characteristics)
- 		struct characteristic *ch;
- 
- 		ch = new0(struct characteristic, 1);
--		if (!ch) {
--			error("gatt: Error while caching characteristic");
--			continue;
--		}
--
- 		ch->descriptors = queue_new();
--		if (!ch->descriptors) {
--			error("gatt: Error while caching characteristic");
--			free(ch);
--			continue;
--		}
- 
- 		memcpy(&ch->ch, characteristics->data, sizeof(ch->ch));
- 
-@@ -2732,10 +2601,7 @@ static void cache_all_srvc_chars(struct service *srvc, GSList *characteristics)
- 		DBG("attr handle = 0x%04x, end handle = 0x%04x uuid: %s",
- 				ch->ch.handle, ch->end_handle, ch->ch.uuid);
- 
--		if (!queue_push_tail(srvc->chars, ch)) {
--			error("gatt: Error while caching characteristic");
--			destroy_characteristic(ch);
--		}
-+		queue_push_tail(srvc->chars, ch);
- 	}
- }
- 
-@@ -2797,12 +2663,6 @@ static void handle_client_get_characteristic(const void *buf, uint16_t len)
- 		struct att_range range;
- 
- 		cb_data = new0(struct discover_char_data, 1);
--		if (!cb_data) {
--			error("gatt: Cannot allocate cb data");
--			status = HAL_STATUS_FAILED;
--			goto done;
--		}
--
- 		cb_data->service = srvc;
- 		cb_data->conn_id = conn->id;
- 
-@@ -2889,8 +2749,6 @@ static void gatt_discover_desc_cb(guint8 status, GSList *descs,
- 		bt_uuid_t uuid;
- 
- 		descr = new0(struct descriptor, 1);
--		if (!descr)
--			continue;
- 
- 		bt_string_to_uuid(&uuid, desc->uuid);
- 		bt_uuid_to_uuid128(&uuid, &descr->id.uuid);
-@@ -2900,8 +2758,7 @@ static void gatt_discover_desc_cb(guint8 status, GSList *descs,
- 
- 		DBG("attr handle = 0x%04x, uuid: %s", desc->handle, desc->uuid);
- 
--		if (!queue_push_tail(ch->descriptors, descr))
--			free(descr);
-+		queue_push_tail(ch->descriptors, descr);
- 	}
- 
- reply:
-@@ -2929,9 +2786,6 @@ static bool build_descr_cache(struct app_connection *conn, struct service *srvc,
- 		return false;
- 
- 	cb_data = new0(struct discover_desc_data, 1);
--	if (!cb_data)
--		return false;
--
- 	cb_data->conn = conn;
- 	cb_data->srvc = srvc;
- 	cb_data->ch = ch;
-@@ -3033,9 +2887,6 @@ static struct char_op_data *create_char_op_data(int32_t conn_id,
- 	struct char_op_data *d;
- 
- 	d = new0(struct char_op_data, 1);
--	if (!d)
+ 	crypto = new0(struct bt_crypto, 1);
+-	if (!crypto)
 -		return NULL;
--
- 	d->conn_id = conn_id;
- 	d->srvc_id = s_id;
- 	d->char_id = ch_id;
-@@ -3216,11 +3067,6 @@ static void handle_client_read_characteristic(const void *buf, uint16_t len)
  
- 	cb_data = create_char_op_data(cmd->conn_id, &srvc->id, &ch->id,
- 						cmd->srvc_id.is_primary);
--	if (!cb_data) {
--		error("gatt: Cannot allocate cb data");
--		status = HAL_STATUS_NOMEM;
--		goto failed;
--	}
- 
- 	if (!set_auth_type(conn->device, cmd->auth_req)) {
- 		error("gatt: Failed to set security %d", cmd->auth_req);
-@@ -3354,11 +3200,6 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
- 				cmd->write_type == GATT_WRITE_TYPE_DEFAULT) {
- 		cb_data = create_char_op_data(cmd->conn_id, &srvc->id, &ch->id,
- 						cmd->srvc_id.is_primary);
--		if (!cb_data) {
--			error("gatt: Cannot allocate call data");
--			status = HAL_STATUS_NOMEM;
--			goto failed;
--		}
- 	}
- 
- 	if (!set_auth_type(conn->device, cmd->auth_req)) {
-@@ -3507,9 +3348,6 @@ static struct desc_data *create_desc_data(int32_t conn_id,
- 	struct desc_data *d;
- 
- 	d = new0(struct desc_data, 1);
--	if (!d)
--		return NULL;
--
- 	d->conn_id = conn_id;
- 	d->srvc_id = s_id;
- 	d->char_id = ch_id;
-@@ -3569,12 +3407,6 @@ static void handle_client_read_descriptor(const void *buf, uint16_t len)
- 
- 	cb_data = create_desc_data(conn_id, &srvc->id, &ch->id, &descr->id,
- 								primary);
--	if (!cb_data) {
--		error("gatt: Read descr. could not allocate callback data");
--
--		status = HAL_STATUS_NOMEM;
--		goto failed;
--	}
- 
- 	if (!set_auth_type(conn->device, cmd->auth_req)) {
- 		error("gatt: Failed to set security %d", cmd->auth_req);
-@@ -3698,16 +3530,9 @@ static void handle_client_write_descriptor(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	if (cmd->write_type != GATT_WRITE_TYPE_NO_RESPONSE) {
-+	if (cmd->write_type != GATT_WRITE_TYPE_NO_RESPONSE)
- 		cb_data = create_desc_data(conn_id, &srvc->id, &ch->id,
- 							&descr->id, primary);
--		if (!cb_data) {
--			error("gatt: Write descr. could not allocate cb_data");
--
--			status = HAL_STATUS_NOMEM;
--			goto failed;
--		}
--	}
- 
- 	if (!set_auth_type(conn->device, cmd->auth_req)) {
- 		error("gatt: Failed to set security %d", cmd->auth_req);
-@@ -3897,10 +3722,6 @@ static void handle_client_register_for_notification(const void *buf,
- 	}
- 
- 	notification = new0(struct notification_data, 1);
--	if (!notification) {
--		status = HAL_STATUS_NOMEM;
--		goto failed;
--	}
- 
- 	memcpy(&notification->ch, &cmd->char_id, sizeof(notification->ch));
- 	memcpy(&notification->service, &cmd->srvc_id,
-@@ -3947,11 +3768,7 @@ static void handle_client_register_for_notification(const void *buf,
- 	 */
- 	notification->ref = 2;
- 
--	if (!queue_push_tail(conn->app->notifications, notification)) {
--		unregister_notification(notification);
--		status = HAL_STATUS_FAILED;
--		goto failed;
--	}
-+	queue_push_tail(conn->app->notifications, notification);
- 
- 	status = HAL_STATUS_SUCCESS;
- 
-@@ -4503,8 +4320,6 @@ static void send_dev_complete_response(struct gatt_device *device,
- 		struct queue *temp;
- 
- 		temp = queue_new();
--		if (!temp)
--			goto done;
- 
- 		val = queue_pop_head(device->pending_requests);
- 		if (!val) {
-@@ -4567,8 +4382,6 @@ static void send_dev_complete_response(struct gatt_device *device,
- 		struct queue *temp;
- 
- 		temp = queue_new();
--		if (!temp)
--			goto done;
- 
- 		val = queue_pop_head(device->pending_requests);
- 		if (!val) {
-@@ -4630,12 +4443,6 @@ static void send_dev_complete_response(struct gatt_device *device,
- 			}
- 
- 			range = new0(struct att_range, 1);
--			if (!range) {
--				destroy_pending_request(val);
--				error = ATT_ECODE_INSUFF_RESOURCES;
--				break;
--			}
--
- 			range->start = gatt_db_attribute_get_handle(
- 								val->attrib);
- 
-@@ -4878,19 +4685,13 @@ static struct pending_trans_data *conn_add_transact(struct app_connection *conn,
- 	static int32_t trans_id = 1;
- 
- 	transaction = new0(struct pending_trans_data, 1);
--	if (!transaction)
--		return NULL;
--
--	if (!queue_push_tail(conn->transactions, transaction)) {
--		free(transaction);
--		return NULL;
--	}
--
- 	transaction->id = trans_id++;
- 	transaction->opcode = opcode;
- 	transaction->attrib = attrib;
- 	transaction->serial_id = serial_id;
- 
-+	queue_push_tail(conn->transactions, transaction);
-+
- 	return transaction;
- }
- 
-@@ -4949,8 +4750,6 @@ static void read_cb(struct gatt_db_attribute *attrib, unsigned int id,
- 
- 	/* Store the request data, complete callback and transaction id */
- 	transaction = conn_add_transact(conn, opcode, attrib, id);
--	if (!transaction)
--		goto failed;
- 
- 	bdaddr2android(&bdaddr, ev.bdaddr);
- 	ev.conn_id = conn->id;
-@@ -5009,8 +4808,6 @@ static void write_cb(struct gatt_db_attribute *attrib, unsigned int id,
- 
- 	/* Store the request data, complete callback and transaction id */
- 	transaction = conn_add_transact(conn, opcode, attrib, id);
--	if (!transaction)
--		goto failed;
- 
- 	memset(ev, 0, sizeof(*ev));
- 
-@@ -5313,9 +5110,6 @@ static struct service_sdp *new_service_sdp_record(int32_t service_handle)
+ 	crypto->ecb_aes = ecb_aes_setup();
+ 	if (crypto->ecb_aes < 0) {
+diff --git a/src/shared/gap.c b/src/shared/gap.c
+index cc48a02..4a21e5d 100644
+--- a/src/shared/gap.c
++++ b/src/shared/gap.c
+@@ -162,9 +162,6 @@ struct bt_gap *bt_gap_new_index(uint16_t index)
  		return NULL;
  
- 	s = new0(struct service_sdp, 1);
--	if (!s)
+ 	gap = new0(struct bt_gap, 1);
+-	if (!gap)
 -		return NULL;
 -
- 	s->service_handle = service_handle;
- 	s->sdp_handle = add_sdp_record(&uuid, service_handle, end_handle, NULL);
- 	if (!s->sdp_handle) {
-@@ -5350,10 +5144,7 @@ static bool add_service_sdp_record(int32_t service_handle)
- 	if (!s)
+ 	gap->index = index;
+ 
+ 	gap->mgmt = mgmt_new_default();
+@@ -174,7 +171,6 @@ struct bt_gap *bt_gap_new_index(uint16_t index)
+ 	}
+ 
+ 	gap->irk_list = queue_new();
+-
+ 	gap->mgmt_ready = false;
+ 
+ 	if (!mgmt_send(gap->mgmt, MGMT_OP_READ_VERSION,
+@@ -269,9 +265,6 @@ bool bt_gap_add_peer_irk(struct bt_gap *gap, uint8_t addr_type,
  		return false;
  
--	if (!queue_push_tail(services_sdp, s)) {
--		free_service_sdp_record(s);
+ 	irk = new0(struct irk_entry, 1);
+-	if (!irk)
 -		return false;
--	}
-+	queue_push_tail(services_sdp, s);
- 
- 	return true;
- }
-@@ -6080,8 +5871,6 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
- 		return ATT_ECODE_INVALID_HANDLE;
- 
- 	q = queue_new();
--	if (!q)
--		return ATT_ECODE_INSUFF_RESOURCES;
- 
- 	switch (cmd[0]) {
- 	case ATT_OP_READ_BY_TYPE_REQ:
-@@ -6104,17 +5893,8 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
- 		struct gatt_db_attribute *attrib = queue_pop_head(q);
- 
- 		data = new0(struct pending_request, 1);
--		if (!data) {
--			queue_destroy(q, NULL);
--			return ATT_ECODE_INSUFF_RESOURCES;
--		}
 -
- 		data->attrib = attrib;
--		if (!queue_push_tail(device->pending_requests, data)) {
--			free(data);
--			queue_destroy(q, NULL);
--			return ATT_ECODE_INSUFF_RESOURCES;
--		}
-+		queue_push_tail(device->pending_requests, data);
- 	}
+ 	irk->addr_type = addr_type;
+ 	memcpy(irk->addr, addr, 6);
+ 	memcpy(irk->key, key, 16);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index d3e17e1..fd306ac 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -131,8 +131,6 @@ static struct request *request_create(struct bt_gatt_client *client)
+ 	struct request *req;
  
- 	queue_destroy(q, NULL);
-@@ -6156,15 +5936,9 @@ static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
- 		return ATT_ECODE_INVALID_HANDLE;
- 
- 	data = new0(struct pending_request, 1);
--	if (!data)
--		return ATT_ECODE_INSUFF_RESOURCES;
--
- 	data->offset = offset;
- 	data->attrib = attrib;
--	if (!queue_push_tail(dev->pending_requests, data)) {
--		free(data);
--		return ATT_ECODE_INSUFF_RESOURCES;
--	}
-+	queue_push_tail(dev->pending_requests, data);
- 
- 	process_dev_pending_requests(dev, cmd[0]);
- 
-@@ -6226,8 +6000,6 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
- 		return ATT_ECODE_INVALID_HANDLE;
- 
- 	q = queue_new();
--	if (!q)
--		return ATT_ECODE_UNLIKELY;
- 
- 	gatt_db_find_information(gatt_db, start, end, q);
- 
-@@ -6237,10 +6009,6 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
- 	}
- 
- 	temp = queue_new();
--	if (!temp) {
--		queue_destroy(q, NULL);
--		return ATT_ECODE_UNLIKELY;
--	}
- 
- 	attrib = queue_peek_head(q);
- 	/* UUIDS can be only 128 bit and 16 bit */
-@@ -6321,11 +6089,6 @@ static void find_by_type_request_cb(struct gatt_db_attribute *attrib,
- 		return;
- 
- 	request_data = new0(struct pending_request, 1);
--	if (!request_data) {
--		find_data->error = ATT_ECODE_INSUFF_RESOURCES;
--		return;
--	}
--
- 	request_data->filter_value = malloc0(find_data->search_vlen);
- 	if (!request_data->filter_value) {
- 		destroy_pending_request(request_data);
-@@ -6338,11 +6101,7 @@ static void find_by_type_request_cb(struct gatt_db_attribute *attrib,
- 	memcpy(request_data->filter_value, find_data->search_value,
- 							find_data->search_vlen);
- 
--	if (!queue_push_tail(find_data->device->pending_requests,
--							request_data)) {
--		destroy_pending_request(request_data);
--		find_data->error = ATT_ECODE_INSUFF_RESOURCES;
--	}
-+	queue_push_tail(find_data->device->pending_requests, request_data);
- }
- 
- static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
-@@ -6511,7 +6270,6 @@ static void attribute_write_cb(struct gatt_db_attribute *attrib, int err,
- 
- 	data->attrib = attrib;
- 	data->error = error;
--
- 	data->completed = true;
- }
- 
-@@ -6545,15 +6303,9 @@ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
- 		return error;
- 
- 	data = new0(struct pending_request, 1);
--	if (!data)
--		return ATT_ECODE_INSUFF_RESOURCES;
--
- 	data->attrib = attrib;
- 
--	if (!queue_push_tail(dev->pending_requests, data)) {
--		free(data);
--		return ATT_ECODE_INSUFF_RESOURCES;
--	}
-+	queue_push_tail(dev->pending_requests, data);
- 
- 	if (!gatt_db_attribute_write(attrib, 0, value, vlen, cmd[0],
- 						g_attrib_get_att(dev->attrib),
-@@ -6600,16 +6352,10 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
- 		return error;
- 
- 	data = new0(struct pending_request, 1);
--	if (!data)
--		return ATT_ECODE_INSUFF_RESOURCES;
--
- 	data->attrib = attrib;
- 	data->offset = offset;
- 
--	if (!queue_push_tail(dev->pending_requests, data)) {
--		free(data);
--		return ATT_ECODE_INSUFF_RESOURCES;
--	}
-+	queue_push_tail(dev->pending_requests, data);
- 
- 	data->value = g_memdup(value, vlen);
- 	data->length = vlen;
-@@ -6641,10 +6387,6 @@ static void send_server_write_execute_notify(void *data, void *user_data)
- 	ev->conn_id = conn->id;
- 
- 	transaction = conn_add_transact(conn, ATT_OP_EXEC_WRITE_REQ, NULL, 0);
--	if (!transaction) {
--		conn->wait_execute_write = false;
--		return;
--	}
- 
- 	ev->trans_id = transaction->id;
- 
-@@ -6674,13 +6416,8 @@ static uint8_t write_execute_request(const uint8_t *cmd, uint16_t cmd_len,
- 	ev.exec_write = value;
- 
- 	data = new0(struct pending_request, 1);
--	if (!data)
--		return ATT_ECODE_INSUFF_RESOURCES;
- 
--	if (!queue_push_tail(dev->pending_requests, data)) {
--		free(data);
--		return ATT_ECODE_INSUFF_RESOURCES;
--	}
-+	queue_push_tail(dev->pending_requests, data);
- 
- 	queue_foreach(app_connections, send_server_write_execute_notify, &ev);
- 	send_dev_complete_response(dev, cmd[0]);
-@@ -6774,10 +6511,6 @@ static void connect_confirm(GIOChannel *io, void *user_data)
- 	dev = find_device_by_addr(&dst);
- 	if (!dev) {
- 		dev = create_device(&dst);
--		if (!dev) {
--			error("gatt: Could not create device");
--			goto drop;
--		}
- 	} else {
- 		if ((dev->state != DEVICE_DISCONNECTED) &&
- 					!(dev->state == DEVICE_CONNECT_INIT &&
-@@ -7227,9 +6960,8 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	services_sdp = queue_new();
- 	gatt_db = gatt_db_new();
- 
--	if (!gatt_devices || !gatt_apps || !listen_apps || !app_connections ||
--						!services_sdp || !gatt_db) {
--		error("gatt: Failed to allocate memory for queues");
-+	if (!gatt_db) {
-+		error("gatt: Failed to allocate memory for database");
- 		goto failed;
- 	}
- 
-diff --git a/android/handsfree-client.c b/android/handsfree-client.c
-index 0e2bd40..65659b8 100644
---- a/android/handsfree-client.c
-+++ b/android/handsfree-client.c
-@@ -177,14 +177,6 @@ static struct device *device_create(const bdaddr_t *bdaddr)
- 	struct device *dev;
- 
- 	dev = new0(struct device, 1);
--	if (!dev)
--		return NULL;
--
--	if (!queue_push_tail(devices, dev)) {
--		error("hf-client: Could not push dev on the list");
--		free(dev);
--		return NULL;
--	}
- 
- 	bacpy(&dev->bdaddr, bdaddr);
- 	dev->state = HAL_HF_CLIENT_CONN_STATE_DISCONNECTED;
-@@ -192,6 +184,8 @@ static struct device *device_create(const bdaddr_t *bdaddr)
- 
- 	init_codecs(dev);
- 
-+	queue_push_tail(devices, dev);
-+
- 	return dev;
- }
- 
-@@ -2166,10 +2160,6 @@ bool bt_hf_client_register(struct ipc *ipc, const bdaddr_t *addr)
- 	DBG("");
- 
- 	devices = queue_new();
--	if (!devices) {
--		error("hf-client: Could not create devices list");
--		goto failed;
--	}
- 
- 	bacpy(&adapter_addr, addr);
- 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index 2f8a867..cb348ab 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -228,8 +228,6 @@ static struct hf_device *device_create(const bdaddr_t *bdaddr)
- 	struct hf_device *dev;
- 
- 	dev = new0(struct hf_device, 1);
--	if (!dev)
+ 	req = new0(struct request, 1);
+-	if (!req)
 -		return NULL;
  
- 	bacpy(&dev->bdaddr, bdaddr);
- 	dev->setup_state = HAL_HANDSFREE_CALL_STATE_IDLE;
-@@ -240,10 +238,7 @@ static struct hf_device *device_create(const bdaddr_t *bdaddr)
+ 	if (client->next_request_id < 1)
+ 		client->next_request_id = 1;
+@@ -243,8 +241,6 @@ static struct notify_chrc *notify_chrc_create(struct bt_gatt_client *client,
+ 			return NULL;
  
- 	init_codecs(dev);
- 
--	if (!queue_push_head(devices, dev)) {
--		free(dev);
+ 	chrc = new0(struct notify_chrc, 1);
+-	if (!chrc)
 -		return NULL;
--	}
-+	queue_push_head(devices, dev);
  
- 	return dev;
- }
-@@ -2968,8 +2963,6 @@ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode,
- 		return false;
+ 	chrc->reg_notify_queue = queue_new();
+ 	if (!chrc->reg_notify_queue) {
+@@ -373,21 +369,9 @@ static struct discovery_op *discovery_op_create(struct bt_gatt_client *client,
+ 	struct discovery_op *op;
  
- 	devices = queue_new();
--	if (!devices)
--		return false;
- 
- 	if (!enable_hsp_ag())
- 		goto failed_queue;
-diff --git a/android/health.c b/android/health.c
-index f2895a2..eb02a64 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -822,9 +822,6 @@ static struct health_app *create_health_app(const char *app_name,
- 	DBG("");
- 
- 	app = new0(struct health_app, 1);
--	if (!app)
+ 	op = new0(struct discovery_op, 1);
+-	if (!op)
 -		return NULL;
 -
- 	app->id = app_id++;
- 	app->num_of_mdep = mdeps;
- 	app->app_name = strdup(app_name);
-@@ -848,12 +845,7 @@ static struct health_app *create_health_app(const char *app_name,
- 	}
- 
- 	app->mdeps = queue_new();
--	if (!app->mdeps)
+ 	op->pending_svcs = queue_new();
+-	if (!op->pending_svcs)
 -		goto fail;
 -
- 	app->devices = queue_new();
--	if (!app->devices)
+ 	op->pending_chrcs = queue_new();
+-	if (!op->pending_chrcs)
 -		goto fail;
+-
+ 	op->tmp_queue = queue_new();
+-	if (!op->tmp_queue)
+-		goto fail;
+-
+ 	op->client = client;
+ 	op->complete_func = complete_func;
+ 	op->failure_func = failure_func;
+@@ -395,10 +379,6 @@ static struct discovery_op *discovery_op_create(struct bt_gatt_client *client,
+ 	op->end = end;
  
- 	return app;
+ 	return op;
+-
+-fail:
+-	discovery_op_free(op);
+-	return NULL;
+ }
  
-@@ -906,8 +898,7 @@ static void bt_health_register_app(const void *buf, uint16_t len)
- 	if (!app)
+ static struct discovery_op *discovery_op_ref(struct discovery_op *op)
+@@ -787,8 +767,6 @@ static void discover_chrcs_cb(bool success, uint8_t att_ecode,
+ 				start, end, value, properties, uuid_str);
+ 
+ 		chrc_data = new0(struct chrc, 1);
+-		if (!chrc_data)
+-			goto failed;
+ 
+ 		chrc_data->start_handle = start;
+ 		chrc_data->end_handle = end;
+@@ -1255,9 +1233,6 @@ static unsigned int register_notify(struct bt_gatt_client *client,
+ 		return 0;
+ 
+ 	notify_data = new0(struct notify_data, 1);
+-	if (!notify_data)
+-		return 0;
+-
+ 	notify_data->client = client;
+ 	notify_data->ref_count = 1;
+ 	notify_data->chrc = chrc;
+@@ -1481,8 +1456,6 @@ static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
+ 	}
+ 
+ 	op = new0(struct service_changed_op, 1);
+-	if (!op)
+-		return;
+ 
+ 	op->start_handle = start;
+ 	op->end_handle = end;
+@@ -1713,33 +1686,16 @@ struct bt_gatt_client *bt_gatt_client_new(struct gatt_db *db,
+ 		return NULL;
+ 
+ 	client = new0(struct bt_gatt_client, 1);
+-	if (!client)
+-		return NULL;
+-
+ 	client->disc_id = bt_att_register_disconnect(att, att_disconnect_cb,
+ 								client, NULL);
+ 	if (!client->disc_id)
  		goto fail;
  
--	if (!queue_push_tail(apps, app))
+ 	client->long_write_queue = queue_new();
+-	if (!client->long_write_queue)
 -		goto fail;
-+	queue_push_tail(apps, app);
- 
- 	rsp.app_id = app->id;
- 	ipc_send_rsp_full(hal_ipc, HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
-@@ -948,11 +939,6 @@ static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
- 	}
- 
- 	mdep = new0(struct mdep_cfg, 1);
--	if (!mdep) {
--		status = HAL_STATUS_INVALID;
+-
+ 	client->svc_chngd_queue = queue_new();
+-	if (!client->svc_chngd_queue)
 -		goto fail;
--	}
 -
- 	mdep->role = cmd->role;
- 	mdep->data_type = cmd->data_type;
- 	mdep->channel_type = android2channel_type(cmd->channel_type);
-@@ -963,10 +949,7 @@ static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
- 		memcpy(mdep->descr, cmd->descr, cmd->descr_len);
- 	}
- 
--	if (!queue_push_tail(app->mdeps, mdep)) {
--		status = HAL_STATUS_FAILED;
+ 	client->notify_list = queue_new();
+-	if (!client->notify_list)
 -		goto fail;
--	}
-+	queue_push_tail(app->mdeps, mdep);
- 
- 	if (app->num_of_mdep != queue_length(app->mdeps))
- 		goto send_rsp;
-@@ -1258,28 +1241,15 @@ static struct health_device *create_device(struct health_app *app,
- {
- 	struct health_device *dev;
- 
--	if (!app)
--		return NULL;
 -
- 	/* create device and push it to devices queue */
- 	dev = new0(struct health_device, 1);
--	if (!dev)
--		return NULL;
- 
- 	android2bdaddr(addr, &dev->dst);
- 	dev->channels = queue_new();
--	if (!dev->channels) {
--		free_health_device(dev);
--		return NULL;
--	}
+ 	client->notify_chrcs = queue_new();
+-	if (!client->notify_chrcs)
+-		goto fail;
 -
--	if (!queue_push_tail(app->devices, dev)) {
--		free_health_device(dev);
--		return NULL;
--	}
+ 	client->pending_requests = queue_new();
+-	if (!client->pending_requests)
+-		goto fail;
+ 
+ 	client->notify_id = bt_att_register(att, BT_ATT_OP_HANDLE_VAL_NOT,
+ 						notify_cb, client, NULL);
+@@ -2025,8 +1981,6 @@ unsigned int bt_gatt_client_read_value(struct bt_gatt_client *client,
+ 		return 0;
+ 
+ 	op = new0(struct read_op, 1);
+-	if (!op)
+-		return 0;
+ 
+ 	req = request_create(client);
+ 	if (!req) {
+@@ -2104,8 +2058,6 @@ unsigned int bt_gatt_client_read_multiple(struct bt_gatt_client *client,
+ 		return 0;
+ 
+ 	op = new0(struct read_op, 1);
+-	if (!op)
+-		return 0;
+ 
+ 	req = request_create(client);
+ 	if (!req) {
+@@ -2254,8 +2206,6 @@ unsigned int bt_gatt_client_read_long_value(struct bt_gatt_client *client,
+ 		return 0;
+ 
+ 	op = new0(struct read_long_op, 1);
+-	if (!op)
+-		return 0;
+ 
+ 	req = request_create(client);
+ 	if (!req) {
+@@ -2381,8 +2331,6 @@ unsigned int bt_gatt_client_write_value(struct bt_gatt_client *client,
+ 		return 0;
+ 
+ 	op = new0(struct write_op, 1);
+-	if (!op)
+-		return 0;
+ 
+ 	req = request_create(client);
+ 	if (!req) {
+@@ -2656,9 +2604,6 @@ unsigned int bt_gatt_client_write_long_value(struct bt_gatt_client *client,
+ 		return 0;
+ 
+ 	op = new0(struct long_write_op, 1);
+-	if (!op)
+-		return 0;
 -
- 	dev->app_id = app->id;
+ 	op->value = malloc(length);
+ 	if (!op->value) {
+ 		free(op);
+@@ -2787,8 +2732,6 @@ static struct request *get_reliable_request(struct bt_gatt_client *client,
+ 	struct prep_write_op *op;
  
-+	queue_push_tail(app->devices, dev);
-+
- 	return dev;
- }
+ 	op = new0(struct prep_write_op, 1);
+-	if (!op)
+-		return NULL;
  
-@@ -1314,34 +1284,24 @@ static struct health_channel *create_channel(struct health_app *app,
- 	if (!mdep) {
- 		if (mdep_index == MDEP_ECHO) {
- 			mdep = new0(struct mdep_cfg, 1);
--			if (!mdep)
--				return NULL;
+ 	/* Following prepare writes */
+ 	if (id != 0)
+@@ -2947,8 +2890,6 @@ unsigned int bt_gatt_client_write_execute(struct bt_gatt_client *client,
+ 		return 0;
  
- 			/* Leave other configuration zeroes */
- 			mdep->id = MDEP_ECHO;
+ 	op = new0(struct write_op, 1);
+-	if (!op)
+-		return 0;
  
--			if (!queue_push_tail(app->mdeps, mdep)) {
--				free_mdep_cfg(mdep);
--				return NULL;
--			}
--		} else
-+			queue_push_tail(app->mdeps, mdep);
-+		} else {
- 			return NULL;
-+		}
+ 	req = queue_find(client->pending_requests, match_req_id,
+ 							UINT_TO_PTR(id));
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 7f863ef..6ef708d 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -166,8 +166,6 @@ static struct gatt_db_attribute *new_attribute(struct gatt_db_service *service,
+ 	struct gatt_db_attribute *attribute;
+ 
+ 	attribute = new0(struct gatt_db_attribute, 1);
+-	if (!attribute)
+-		return NULL;
+ 
+ 	attribute->service = service;
+ 	attribute->handle = handle;
+@@ -182,12 +180,7 @@ static struct gatt_db_attribute *new_attribute(struct gatt_db_service *service,
  	}
  
- 	/* create channel and push it to device */
- 	channel = new0(struct health_channel, 1);
--	if (!channel)
+ 	attribute->pending_reads = queue_new();
+-	if (!attribute->pending_reads)
+-		goto failed;
+-
+ 	attribute->pending_writes = queue_new();
+-	if (!attribute->pending_reads)
+-		goto failed;
+ 
+ 	return attribute;
+ 
+@@ -211,22 +204,8 @@ struct gatt_db *gatt_db_new(void)
+ 	struct gatt_db *db;
+ 
+ 	db = new0(struct gatt_db, 1);
+-	if (!db)
 -		return NULL;
 -
- 	channel->mdep_id = mdep->id;
- 	channel->type = mdep->channel_type;
- 	channel->id = channel_id++;
- 	channel->dev = dev;
- 
--	if (!queue_push_tail(dev->channels, channel)) {
--		free_health_channel(channel);
+ 	db->services = queue_new();
+-	if (!db->services) {
+-		free(db);
 -		return NULL;
 -	}
-+	queue_push_tail(dev->channels, channel);
- 
- 	return channel;
- }
-@@ -1351,7 +1311,6 @@ static struct health_channel *connect_channel(struct health_app *app,
- 							uint8_t mdepid)
- {
- 	struct health_device *device;
--	struct health_channel *channel = NULL;
- 	bdaddr_t addr;
- 
- 	DBG("app %p mdepid %u", app, mdepid);
-@@ -1364,12 +1323,8 @@ static struct health_channel *connect_channel(struct health_app *app,
- 	}
- 
- 	device = get_device(app, (uint8_t *) &addr);
--	if (!device)
+-
+ 	db->notify_list = queue_new();
+-	if (!db->notify_list) {
+-		queue_destroy(db->services, NULL);
+-		free(db);
 -		return NULL;
- 
--	channel = create_channel(app, mdepid, device);
+-	}
 -
--	return channel;
-+	return create_channel(app, mdepid, device);
- }
+ 	db->next_handle = 0x0001;
  
- static uint8_t conf_to_l2cap(uint8_t conf)
-@@ -1899,8 +1854,6 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
- 		goto send_rsp;
+ 	return gatt_db_ref(db);
+@@ -386,14 +365,7 @@ static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
+ 		return NULL;
  
- 	dev = get_device(app, cmd->bdaddr);
--	if (!dev)
--		goto send_rsp;
- 
- 	channel = get_channel(app, cmd->mdep_index, dev);
- 	if (!channel)
-@@ -2076,8 +2029,6 @@ bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 
- 	hal_ipc = ipc;
- 	apps = queue_new();
--	if (!apps)
--		return false;
- 
- 	ipc_register(hal_ipc, HAL_SERVICE_ID_HEALTH, cmd_handlers,
- 						G_N_ELEMENTS(cmd_handlers));
-diff --git a/android/hog.c b/android/hog.c
-index ff77bb3..22f4228 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -1299,8 +1299,6 @@ static void hog_attach_bas(struct bt_hog *hog, struct gatt_primary *primary)
- 	struct bt_bas *instance;
- 
- 	instance = bt_bas_new(primary);
--	if (!instance)
--		return;
- 
- 	bt_bas_attach(instance, hog->attrib);
- 	queue_push_head(hog->bas, instance);
-diff --git a/android/scpp.c b/android/scpp.c
-index f8f81f3..a432733 100644
---- a/android/scpp.c
-+++ b/android/scpp.c
-@@ -74,11 +74,7 @@ static void discover_char(struct bt_scpp *scpp, GAttrib *attrib,
- 
- 	id = gatt_discover_char(attrib, start, end, uuid, func, user_data);
- 
--	if (queue_push_head(scpp->gatt_op, UINT_TO_PTR(id)))
--		return;
+ 	service = new0(struct gatt_db_service, 1);
+-	if (!service)
+-		return NULL;
 -
--	error("scpp: Could not discover characteristic");
--	g_attrib_cancel(attrib, id);
-+	queue_push_head(scpp->gatt_op, UINT_TO_PTR(id));
- }
- 
- static void discover_desc(struct bt_scpp *scpp, GAttrib *attrib,
-@@ -89,11 +85,7 @@ static void discover_desc(struct bt_scpp *scpp, GAttrib *attrib,
- 
- 	id = gatt_discover_desc(attrib, start, end, uuid, func, user_data);
- 
--	if (queue_push_head(scpp->gatt_op, UINT_TO_PTR(id)))
--		return;
--
--	error("scpp: Could not discover descriptor");
--	g_attrib_cancel(attrib, id);
-+	queue_push_head(scpp->gatt_op, UINT_TO_PTR(id));
- }
- 
- static void write_char(struct bt_scpp *scan, GAttrib *attrib, uint16_t handle,
-@@ -105,11 +97,7 @@ static void write_char(struct bt_scpp *scan, GAttrib *attrib, uint16_t handle,
- 
- 	id = gatt_write_char(attrib, handle, value, vlen, func, user_data);
- 
--	if (queue_push_head(scan->gatt_op, UINT_TO_PTR(id)))
--		return;
--
--	error("scpp: Could not read char");
--	g_attrib_cancel(attrib, id);
-+	queue_push_head(scan->gatt_op, UINT_TO_PTR(id));
- }
- 
- static void scpp_free(struct bt_scpp *scan)
-@@ -133,10 +121,6 @@ struct bt_scpp *bt_scpp_new(void *primary)
- 	scan->window = SCAN_WINDOW;
- 
- 	scan->gatt_op = queue_new();
--	if (!scan->gatt_op) {
--		scpp_free(scan);
+ 	service->attributes = new0(struct gatt_db_attribute *, num_handles);
+-	if (!service->attributes) {
+-		free(service);
 -		return NULL;
 -	}
  
  	if (primary)
- 		scan->primary = g_memdup(primary, sizeof(*scan->primary));
-diff --git a/android/tester-a2dp.c b/android/tester-a2dp.c
-index f7d82c9..8397eef 100644
---- a/android/tester-a2dp.c
-+++ b/android/tester-a2dp.c
-@@ -236,14 +236,9 @@ struct queue *get_a2dp_tests(void)
- 	uint16_t i = 0;
+ 		type = &primary_service_uuid;
+@@ -605,9 +577,6 @@ unsigned int gatt_db_register(struct gatt_db *db,
+ 		return 0;
  
- 	list = queue_new();
--	if (!list)
+ 	notify = new0(struct notify, 1);
+-	if (!notify)
+-		return 0;
+-
+ 	notify->service_added = service_added;
+ 	notify->service_removed = service_removed;
+ 	notify->destroy = destroy;
+@@ -1591,9 +1560,6 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+ 		struct pending_read *p;
+ 
+ 		p = new0(struct pending_read, 1);
+-		if (!p)
+-			return false;
+-
+ 		p->attrib = attrib;
+ 		p->id = ++attrib->read_id;
+ 		p->timeout_id = timeout_add(ATTRIBUTE_TIMEOUT, read_timeout,
+@@ -1675,9 +1641,6 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+ 		struct pending_write *p;
+ 
+ 		p = new0(struct pending_write, 1);
+-		if (!p)
+-			return false;
+-
+ 		p->attrib = attrib;
+ 		p->id = ++attrib->write_id;
+ 		p->timeout_id = timeout_add(ATTRIBUTE_TIMEOUT, write_timeout,
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 008b8bc..b1dd38b 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -56,9 +56,6 @@ static struct bt_gatt_result *result_create(uint8_t opcode, const void *pdu,
+ 	struct bt_gatt_result *result;
+ 
+ 	result = new0(struct bt_gatt_result, 1);
+-	if (!result)
 -		return NULL;
+-
+ 	result->pdu = malloc(pdu_len);
+ 	if (!result->pdu) {
+ 		free(result);
+@@ -549,9 +546,6 @@ unsigned int bt_gatt_exchange_mtu(struct bt_att *att, uint16_t client_rx_mtu,
+ 		return false;
  
- 	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
--		if (!queue_push_tail(list, &test_cases[i])) {
--			queue_destroy(list, NULL);
--			return NULL;
--		}
-+		queue_push_tail(list, &test_cases[i]);
+ 	op = new0(struct mtu_op, 1);
+-	if (!op)
+-		return false;
+-
+ 	op->att = att;
+ 	op->client_rx_mtu = client_rx_mtu;
+ 	op->callback = callback;
+@@ -823,9 +817,6 @@ static struct bt_gatt_request *discover_services(struct bt_att *att,
+ 		return NULL;
  
- 	return list;
- }
-diff --git a/android/tester-avrcp.c b/android/tester-avrcp.c
-index cec9787..737602e 100644
---- a/android/tester-avrcp.c
-+++ b/android/tester-avrcp.c
-@@ -584,14 +584,9 @@ struct queue *get_avrcp_tests(void)
- 	uint16_t i = 0;
- 
- 	list = queue_new();
--	if (!list)
+ 	op = new0(struct bt_gatt_request, 1);
+-	if (!op)
 -		return NULL;
+-
+ 	op->att = att;
+ 	op->start_handle = start;
+ 	op->end_handle = end;
+@@ -924,9 +915,6 @@ static struct read_incl_data *new_read_included(struct bt_gatt_result *res)
+ 	struct read_incl_data *data;
  
- 	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
--		if (!queue_push_tail(list, &test_cases[i])) {
--			queue_destroy(list, NULL);
--			return NULL;
--		}
-+		queue_push_tail(list, &test_cases[i]);
- 
- 	return list;
- }
-diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-index dca8de9..22077a0 100644
---- a/android/tester-bluetooth.c
-+++ b/android/tester-bluetooth.c
-@@ -1224,14 +1224,9 @@ struct queue *get_bluetooth_tests(void)
- 	uint16_t i = 0;
- 
- 	list = queue_new();
--	if (!list)
+ 	data = new0(struct read_incl_data, 1);
+-	if (!data)
 -		return NULL;
+-
+ 	data->op = bt_gatt_request_ref(res->op);
+ 	data->result = res;
  
- 	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
--		if (!queue_push_tail(list, &test_cases[i])) {
--			queue_destroy(list, NULL);
--			return NULL;
--		}
-+		queue_push_tail(list, &test_cases[i]);
+@@ -1161,9 +1149,6 @@ struct bt_gatt_request *bt_gatt_discover_included_services(struct bt_att *att,
+ 		return false;
  
- 	return list;
- }
-diff --git a/android/tester-gatt.c b/android/tester-gatt.c
-index b8b088b..88be3d8 100644
---- a/android/tester-gatt.c
-+++ b/android/tester-gatt.c
-@@ -3665,14 +3665,9 @@ struct queue *get_gatt_tests(void)
- 	uint16_t i = 0;
+ 	op = new0(struct bt_gatt_request, 1);
+-	if (!op)
+-		return false;
+-
+ 	op->att = att;
+ 	op->callback = callback;
+ 	op->user_data = user_data;
+@@ -1278,9 +1263,6 @@ struct bt_gatt_request *bt_gatt_discover_characteristics(struct bt_att *att,
+ 		return false;
  
- 	list = queue_new();
--	if (!list)
+ 	op = new0(struct bt_gatt_request, 1);
+-	if (!op)
+-		return false;
+-
+ 	op->att = att;
+ 	op->callback = callback;
+ 	op->user_data = user_data;
+@@ -1388,9 +1370,6 @@ bool bt_gatt_read_by_type(struct bt_att *att, uint16_t start, uint16_t end,
+ 		return false;
+ 
+ 	op = new0(struct bt_gatt_request, 1);
+-	if (!op)
+-		return false;
+-
+ 	op->att = att;
+ 	op->callback = callback;
+ 	op->user_data = user_data;
+@@ -1512,9 +1491,6 @@ struct bt_gatt_request *bt_gatt_discover_descriptors(struct bt_att *att,
+ 		return false;
+ 
+ 	op = new0(struct bt_gatt_request, 1);
+-	if (!op)
+-		return false;
+-
+ 	op->att = att;
+ 	op->callback = callback;
+ 	op->user_data = user_data;
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 6167065..6dec3f3 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -248,10 +248,6 @@ static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
+ 	}
+ 
+ 	q = queue_new();
+-	if (!q) {
+-		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+-		goto error;
+-	}
+ 
+ 	start = get_le16(pdu);
+ 	end = get_le16(pdu + 2);
+@@ -457,10 +453,6 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
+ 	}
+ 
+ 	q = queue_new();
+-	if (!q) {
+-		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+-		goto error;
+-	}
+ 
+ 	start = get_le16(pdu);
+ 	end = get_le16(pdu + 2);
+@@ -495,11 +487,6 @@ static void read_by_type_cb(uint8_t opcode, const void *pdu,
+ 	}
+ 
+ 	op = new0(struct async_read_op, 1);
+-	if (!op) {
+-		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+-		goto error;
+-	}
+-
+ 	op->pdu = malloc(bt_att_get_mtu(server->att));
+ 	if (!op->pdu) {
+ 		free(op);
+@@ -593,10 +580,6 @@ static void find_info_cb(uint8_t opcode, const void *pdu,
+ 	}
+ 
+ 	q = queue_new();
+-	if (!q) {
+-		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+-		goto error;
+-	}
+ 
+ 	start = get_le16(pdu);
+ 	end = get_le16(pdu + 2);
+@@ -802,11 +785,6 @@ static void write_cb(uint8_t opcode, const void *pdu,
+ 	}
+ 
+ 	op = new0(struct async_write_op, 1);
+-	if (!op) {
+-		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+-		goto error;
+-	}
+-
+ 	op->server = server;
+ 	op->opcode = opcode;
+ 	server->pending_write_op = op;
+@@ -914,11 +892,6 @@ static void handle_read_req(struct bt_gatt_server *server, uint8_t opcode,
+ 	}
+ 
+ 	op = new0(struct async_read_op, 1);
+-	if (!op) {
+-		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+-		goto error;
+-	}
+-
+ 	op->opcode = opcode;
+ 	op->server = server;
+ 	server->pending_read_op = op;
+@@ -1088,9 +1061,6 @@ static void read_multiple_cb(uint8_t opcode, const void *pdu,
+ 
+ 	data.handles = new0(uint16_t, data.num_handles);
+ 
+-	if (!data.handles)
+-		goto error;
+-
+ 	for (i = 0; i < data.num_handles; i++)
+ 		data.handles[i] = get_le16(pdu + i * 2);
+ 
+@@ -1153,11 +1123,6 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 		goto error;
+ 
+ 	prep_data = new0(struct prep_write_data, 1);
+-	if (!prep_data) {
+-		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+-		goto error;
+-	}
+-
+ 	prep_data->length = length - 4;
+ 	if (prep_data->length) {
+ 		prep_data->value = malloc(prep_data->length);
+@@ -1418,19 +1383,11 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
+ 		return NULL;
+ 
+ 	server = new0(struct bt_gatt_server, 1);
+-	if (!server)
 -		return NULL;
- 
- 	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
--		if (!queue_push_tail(list, &test_cases[i])) {
--			queue_destroy(list, NULL);
--			return NULL;
--		}
-+		queue_push_tail(list, &test_cases[i]);
- 
- 	return list;
- }
-diff --git a/android/tester-hdp.c b/android/tester-hdp.c
-index 80f3b5f..e849820 100644
---- a/android/tester-hdp.c
-+++ b/android/tester-hdp.c
-@@ -549,14 +549,9 @@ struct queue *get_hdp_tests(void)
- 	uint16_t i = 0;
- 
- 	list = queue_new();
--	if (!list)
+-
+ 	server->db = gatt_db_ref(db);
+ 	server->att = bt_att_ref(att);
+ 	server->mtu = MAX(mtu, BT_ATT_DEFAULT_LE_MTU);
+ 	server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
+-
+ 	server->prep_queue = queue_new();
+-	if (!server->prep_queue) {
+-		bt_gatt_server_free(server);
 -		return NULL;
+-	}
  
- 	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
--		if (!queue_push_tail(list, &test_cases[i])) {
--			queue_destroy(list, NULL);
--			return NULL;
--		}
-+		queue_push_tail(list, &test_cases[i]);
+ 	if (!gatt_server_register_att_handlers(server)) {
+ 		bt_gatt_server_free(server);
+@@ -1551,10 +1508,6 @@ bool bt_gatt_server_send_indication(struct bt_gatt_server *server,
+ 		return false;
  
- 	return list;
- }
-diff --git a/android/tester-hidhost.c b/android/tester-hidhost.c
-index ab5f12b..221b122 100644
---- a/android/tester-hidhost.c
-+++ b/android/tester-hidhost.c
-@@ -719,14 +719,9 @@ struct queue *get_hidhost_tests(void)
- 	uint16_t i = 0;
+ 	data = new0(struct ind_data, 1);
+-	if (!data) {
+-		free(pdu);
+-		return false;
+-	}
  
- 	list = queue_new();
--	if (!list)
+ 	data->callback = callback;
+ 	data->destroy = destroy;
+diff --git a/src/shared/hci-crypto.c b/src/shared/hci-crypto.c
+index 8a40aa5..f750747 100644
+--- a/src/shared/hci-crypto.c
++++ b/src/shared/hci-crypto.c
+@@ -66,9 +66,6 @@ static bool le_encrypt(struct bt_hci *hci, uint8_t size,
+ 	memcpy(cmd.plaintext, plaintext, 16);
+ 
+ 	data = new0(struct crypto_data, 1);
+-	if (!data)
+-		return false;
+-
+ 	data->size = size;
+ 	data->callback = callback;
+ 	data->user_data = user_data;
+@@ -110,9 +107,6 @@ bool bt_hci_crypto_prand(struct bt_hci *hci,
+ 		return false;
+ 
+ 	data = new0(struct crypto_data, 1);
+-	if (!data)
+-		return false;
+-
+ 	data->callback = callback;
+ 	data->user_data = user_data;
+ 
+diff --git a/src/shared/hci.c b/src/shared/hci.c
+index 0db0146..bfee4ab 100644
+--- a/src/shared/hci.c
++++ b/src/shared/hci.c
+@@ -290,9 +290,6 @@ static struct bt_hci *create_hci(int fd)
+ 		return NULL;
+ 
+ 	hci = new0(struct bt_hci, 1);
+-	if (!hci)
 -		return NULL;
+-
+ 	hci->io = io_new(fd);
+ 	if (!hci->io) {
+ 		free(hci);
+@@ -306,28 +303,8 @@ static struct bt_hci *create_hci(int fd)
+ 	hci->next_evt_id = 1;
  
- 	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
--		if (!queue_push_tail(list, &test_cases[i])) {
--			queue_destroy(list, NULL);
--			return NULL;
--		}
-+		queue_push_tail(list, &test_cases[i]);
- 
- 	return list;
- }
-diff --git a/android/tester-map-client.c b/android/tester-map-client.c
-index 1f552a3..695c797 100644
---- a/android/tester-map-client.c
-+++ b/android/tester-map-client.c
-@@ -140,14 +140,9 @@ struct queue *get_map_client_tests(void)
- 	uint16_t i = 0;
- 
- 	list = queue_new();
--	if (!list)
+ 	hci->cmd_queue = queue_new();
+-	if (!hci->cmd_queue) {
+-		io_destroy(hci->io);
+-		free(hci);
 -		return NULL;
- 
- 	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
--		if (!queue_push_tail(list, &test_cases[i])) {
--			queue_destroy(list, NULL);
--			return NULL;
--		}
-+		queue_push_tail(list, &test_cases[i]);
- 
- 	return list;
- }
-diff --git a/android/tester-pan.c b/android/tester-pan.c
-index e033e21..9da2488 100644
---- a/android/tester-pan.c
-+++ b/android/tester-pan.c
-@@ -226,14 +226,9 @@ struct queue *get_pan_tests(void)
- 	uint16_t i = 0;
- 
- 	list = queue_new();
--	if (!list)
+-	}
+-
+ 	hci->rsp_queue = queue_new();
+-	if (!hci->rsp_queue) {
+-		queue_destroy(hci->cmd_queue, NULL);
+-		io_destroy(hci->io);
+-		free(hci);
 -		return NULL;
- 
- 	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
--		if (!queue_push_tail(list, &test_cases[i])) {
--			queue_destroy(list, NULL);
--			return NULL;
--		}
-+		queue_push_tail(list, &test_cases[i]);
- 
- 	return list;
- }
-diff --git a/android/tester-socket.c b/android/tester-socket.c
-index 41e1434..2264a1f 100644
---- a/android/tester-socket.c
-+++ b/android/tester-socket.c
-@@ -447,14 +447,9 @@ struct queue *get_socket_tests(void)
- 	uint16_t i = 0;
- 
- 	list = queue_new();
--	if (!list)
+-	}
+-
+ 	hci->evt_list = queue_new();
+-	if (!hci->evt_list) {
+-		queue_destroy(hci->rsp_queue, NULL);
+-		queue_destroy(hci->cmd_queue, NULL);
+-		io_destroy(hci->io);
+-		free(hci);
 -		return NULL;
+-	}
  
- 	for (; i < sizeof(test_cases) / sizeof(test_cases[0]); ++i)
--		if (!queue_push_tail(list, &test_cases[i])) {
--			queue_destroy(list, NULL);
--			return NULL;
--		}
-+		queue_push_tail(list, &test_cases[i]);
+ 	if (!io_set_read_handler(hci->io, io_read_callback, hci, NULL)) {
+ 		queue_destroy(hci->evt_list, NULL);
+@@ -476,9 +453,6 @@ unsigned int bt_hci_send(struct bt_hci *hci, uint16_t opcode,
+ 		return 0;
  
- 	return list;
- }
+ 	cmd = new0(struct cmd, 1);
+-	if (!cmd)
+-		return 0;
+-
+ 	cmd->opcode = opcode;
+ 	cmd->size = size;
+ 
+@@ -568,9 +542,6 @@ unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
+ 		return 0;
+ 
+ 	evt = new0(struct evt, 1);
+-	if (!evt)
+-		return 0;
+-
+ 	evt->event = event;
+ 
+ 	if (hci->next_evt_id < 1)
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index 74ee979..d9f7659 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -575,9 +575,6 @@ struct hfp_gw *hfp_gw_new(int fd)
+ 		return NULL;
+ 
+ 	hfp = new0(struct hfp_gw, 1);
+-	if (!hfp)
+-		return NULL;
+-
+ 	hfp->fd = fd;
+ 	hfp->close_on_unref = false;
+ 
+@@ -603,13 +600,6 @@ struct hfp_gw *hfp_gw_new(int fd)
+ 	}
+ 
+ 	hfp->cmd_handlers = queue_new();
+-	if (!hfp->cmd_handlers) {
+-		io_destroy(hfp->io);
+-		ringbuf_free(hfp->write_buf);
+-		ringbuf_free(hfp->read_buf);
+-		free(hfp);
+-		return NULL;
+-	}
+ 
+ 	if (!io_set_read_handler(hfp->io, can_read_data, hfp,
+ 							read_watch_destroy)) {
+@@ -844,9 +834,6 @@ bool hfp_gw_register(struct hfp_gw *hfp, hfp_result_func_t callback,
+ 	struct cmd_handler *handler;
+ 
+ 	handler = new0(struct cmd_handler, 1);
+-	if (!handler)
+-		return false;
+-
+ 	handler->callback = callback;
+ 	handler->user_data = user_data;
+ 
+@@ -1262,9 +1249,6 @@ struct hfp_hf *hfp_hf_new(int fd)
+ 		return NULL;
+ 
+ 	hfp = new0(struct hfp_hf, 1);
+-	if (!hfp)
+-		return NULL;
+-
+ 	hfp->fd = fd;
+ 	hfp->close_on_unref = false;
+ 
+@@ -1290,24 +1274,7 @@ struct hfp_hf *hfp_hf_new(int fd)
+ 	}
+ 
+ 	hfp->event_handlers = queue_new();
+-	if (!hfp->event_handlers) {
+-		io_destroy(hfp->io);
+-		ringbuf_free(hfp->write_buf);
+-		ringbuf_free(hfp->read_buf);
+-		free(hfp);
+-		return NULL;
+-	}
+-
+ 	hfp->cmd_queue = queue_new();
+-	if (!hfp->cmd_queue) {
+-		io_destroy(hfp->io);
+-		ringbuf_free(hfp->write_buf);
+-		ringbuf_free(hfp->read_buf);
+-		queue_destroy(hfp->event_handlers, NULL);
+-		free(hfp);
+-		return NULL;
+-	}
+-
+ 	hfp->writer_active = false;
+ 
+ 	if (!io_set_read_handler(hfp->io, hf_can_read_data, hfp,
+@@ -1440,10 +1407,6 @@ bool hfp_hf_send_command(struct hfp_hf *hfp, hfp_response_func_t resp_cb,
+ 		return false;
+ 
+ 	cmd = new0(struct cmd_response, 1);
+-	if (!cmd) {
+-		free(fmt);
+-		return false;
+-	}
+ 
+ 	va_start(ap, format);
+ 	len = ringbuf_vprintf(hfp->write_buf, fmt, ap);
+@@ -1481,9 +1444,6 @@ bool hfp_hf_register(struct hfp_hf *hfp, hfp_hf_result_func_t callback,
+ 		return false;
+ 
+ 	handler = new0(struct event_handler, 1);
+-	if (!handler)
+-		return false;
+-
+ 	handler->callback = callback;
+ 	handler->user_data = user_data;
+ 
+diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
+index 4923710..2306c34 100644
+--- a/src/shared/io-mainloop.c
++++ b/src/shared/io-mainloop.c
+@@ -160,9 +160,6 @@ struct io *io_new(int fd)
+ 		return NULL;
+ 
+ 	io = new0(struct io, 1);
+-	if (!io)
+-		return NULL;
+-
+ 	io->fd = fd;
+ 	io->events = 0;
+ 	io->close_on_destroy = false;
+diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+index 1ed635d..5e03a51 100644
+--- a/src/shared/mgmt.c
++++ b/src/shared/mgmt.c
+@@ -353,9 +353,6 @@ struct mgmt *mgmt_new(int fd)
+ 		return NULL;
+ 
+ 	mgmt = new0(struct mgmt, 1);
+-	if (!mgmt)
+-		return NULL;
+-
+ 	mgmt->fd = fd;
+ 	mgmt->close_on_unref = false;
+ 
+@@ -374,42 +371,9 @@ struct mgmt *mgmt_new(int fd)
+ 	}
+ 
+ 	mgmt->request_queue = queue_new();
+-	if (!mgmt->request_queue) {
+-		io_destroy(mgmt->io);
+-		free(mgmt->buf);
+-		free(mgmt);
+-		return NULL;
+-	}
+-
+ 	mgmt->reply_queue = queue_new();
+-	if (!mgmt->reply_queue) {
+-		queue_destroy(mgmt->request_queue, NULL);
+-		io_destroy(mgmt->io);
+-		free(mgmt->buf);
+-		free(mgmt);
+-		return NULL;
+-	}
+-
+ 	mgmt->pending_list = queue_new();
+-	if (!mgmt->pending_list) {
+-		queue_destroy(mgmt->reply_queue, NULL);
+-		queue_destroy(mgmt->request_queue, NULL);
+-		io_destroy(mgmt->io);
+-		free(mgmt->buf);
+-		free(mgmt);
+-		return NULL;
+-	}
+-
+ 	mgmt->notify_list = queue_new();
+-	if (!mgmt->notify_list) {
+-		queue_destroy(mgmt->pending_list, NULL);
+-		queue_destroy(mgmt->reply_queue, NULL);
+-		queue_destroy(mgmt->request_queue, NULL);
+-		io_destroy(mgmt->io);
+-		free(mgmt->buf);
+-		free(mgmt);
+-		return NULL;
+-	}
+ 
+ 	if (!io_set_read_handler(mgmt->io, can_read_data, mgmt, NULL)) {
+ 		queue_destroy(mgmt->notify_list, NULL);
+@@ -549,9 +513,6 @@ static struct mgmt_request *create_request(uint16_t opcode, uint16_t index,
+ 		return NULL;
+ 
+ 	request = new0(struct mgmt_request, 1);
+-	if (!request)
+-		return NULL;
+-
+ 	request->len = length + MGMT_HDR_SIZE;
+ 	request->buf = malloc(request->len);
+ 	if (!request->buf) {
+@@ -732,9 +693,6 @@ unsigned int mgmt_register(struct mgmt *mgmt, uint16_t event, uint16_t index,
+ 		return 0;
+ 
+ 	notify = new0(struct mgmt_notify, 1);
+-	if (!notify)
+-		return 0;
+-
+ 	notify->event = event;
+ 	notify->index = index;
+ 
+diff --git a/src/shared/queue.c b/src/shared/queue.c
+index 3507ed1..1a2ffc8 100644
+--- a/src/shared/queue.c
++++ b/src/shared/queue.c
+@@ -58,9 +58,6 @@ struct queue *queue_new(void)
+ 	struct queue *queue;
+ 
+ 	queue = new0(struct queue, 1);
+-	if (!queue)
+-		return NULL;
+-
+ 	queue->head = NULL;
+ 	queue->tail = NULL;
+ 	queue->entries = 0;
+@@ -101,9 +98,6 @@ static struct queue_entry *queue_entry_new(void *data)
+ 	struct queue_entry *entry;
+ 
+ 	entry = new0(struct queue_entry, 1);
+-	if (!entry)
+-		return NULL;
+-
+ 	entry->data = data;
+ 
+ 	return queue_entry_ref(entry);
+@@ -117,8 +111,6 @@ bool queue_push_tail(struct queue *queue, void *data)
+ 		return false;
+ 
+ 	entry = queue_entry_new(data);
+-	if (!entry)
+-		return false;
+ 
+ 	if (queue->tail)
+ 		queue->tail->next = entry;
+@@ -141,8 +133,6 @@ bool queue_push_head(struct queue *queue, void *data)
+ 		return false;
+ 
+ 	entry = queue_entry_new(data);
+-	if (!entry)
+-		return false;
+ 
+ 	entry->next = queue->head;
+ 
+@@ -176,8 +166,6 @@ bool queue_push_after(struct queue *queue, void *entry, void *data)
+ 		return false;
+ 
+ 	new_entry = queue_entry_new(data);
+-	if (!new_entry)
+-		return false;
+ 
+ 	new_entry->next = qentry->next;
+ 
+diff --git a/src/shared/ringbuf.c b/src/shared/ringbuf.c
+index a11d2dc..8e7c50e 100644
+--- a/src/shared/ringbuf.c
++++ b/src/shared/ringbuf.c
+@@ -72,9 +72,6 @@ struct ringbuf *ringbuf_new(size_t size)
+ 	real_size = align_power2(size);
+ 
+ 	ringbuf = new0(struct ringbuf, 1);
+-	if (!ringbuf)
+-		return NULL;
+-
+ 	ringbuf->buffer = malloc(real_size);
+ 	if (!ringbuf->buffer) {
+ 		free(ringbuf);
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index c3120fb..80d6511 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -215,12 +215,6 @@ void tester_add_full(const char *name, const void *test_data,
+ 	}
+ 
+ 	test = new0(struct test_case, 1);
+-	if (!test) {
+-		if (destroy)
+-			destroy(user_data);
+-		return;
+-	}
+-
+ 	test->name = strdup(name);
+ 	test->result = TEST_RESULT_NOT_RUN;
+ 	test->stage = TEST_STAGE_INVALID;
+@@ -684,9 +678,6 @@ void tester_wait(unsigned int seconds, tester_wait_func_t func,
+ 	test = test_current->data;
+ 
+ 	wait = new0(struct wait_data, 1);
+-	if (!wait)
+-		return;
+-
+ 	wait->seconds = seconds;
+ 	wait->test = test;
+ 	wait->func = func;
+diff --git a/src/shared/timeout-mainloop.c b/src/shared/timeout-mainloop.c
+index f099312..971124a 100644
+--- a/src/shared/timeout-mainloop.c
++++ b/src/shared/timeout-mainloop.c
+@@ -58,9 +58,6 @@ unsigned int timeout_add(unsigned int timeout, timeout_func_t func,
+ 	struct timeout_data *data;
+ 
+ 	data = new0(struct timeout_data, 1);
+-	if (!data)
+-		return 0;
+-
+ 	data->func = func;
+ 	data->user_data = user_data;
+ 	data->timeout = timeout;
+diff --git a/src/shared/uhid.c b/src/shared/uhid.c
+index f7ad0cb..1c684cd 100644
+--- a/src/shared/uhid.c
++++ b/src/shared/uhid.c
+@@ -125,16 +125,11 @@ struct bt_uhid *bt_uhid_new(int fd)
+ 	struct bt_uhid *uhid;
+ 
+ 	uhid = new0(struct bt_uhid, 1);
+-	if (!uhid)
+-		return NULL;
+-
+ 	uhid->io = io_new(fd);
+ 	if (!uhid->io)
+ 		goto failed;
+ 
+ 	uhid->notify_list = queue_new();
+-	if (!uhid->notify_list)
+-		goto failed;
+ 
+ 	if (!io_set_read_handler(uhid->io, uhid_read_handler, uhid, NULL))
+ 		goto failed;
+@@ -186,9 +181,6 @@ unsigned int bt_uhid_register(struct bt_uhid *uhid, uint32_t event,
+ 		return 0;
+ 
+ 	notify = new0(struct uhid_notify, 1);
+-	if (!notify)
+-		return 0;
+-
+ 	notify->id = uhid->notify_id++;
+ 	notify->event = event;
+ 	notify->func = func;
 -- 
 2.5.0
 
