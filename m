@@ -1,67 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix removing connection parameters when unpairing
-Date: Mon, 19 Oct 2015 10:51:47 +0300
-Message-Id: <1445241107-5303-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 18 Oct 2015 22:23:55 -0700 (PDT)
+Message-Id: <20151018.222355.578335791465873276.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth 2015-10-16
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20151016142900.GA22587@t440s.P-661HNU-F1>
+References: <20151016142900.GA22587@t440s.P-661HNU-F1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Fri, 16 Oct 2015 17:29:00 +0300
 
-The commit 89cbb0638e9b7 introduced support for deferred connection
-parameter removal when unpairing by removing them only once an
-existing connection gets disconnected. However, it failed to address
-the scenario when we're *not* connected and do an unpair operation.
+> First of all, sorry for the late set of patches for the 4.3 cycle. We
+> just finished an intensive week of testing at the Bluetooth UnPlugFest
+> and discovered (and fixed) issues there. Unfortunately a few issues
+> affect 4.3-rc5 in a way that they break existing Bluetooth LE mouse and
+> keyboard support.
+> 
+> The regressions result from supporting LE privacy in conjunction with
+> scanning for Resolvable Private Addresses before connecting. A feature
+> that has been tested heavily (including automated unit tests), but sadly
+> some regressions slipped in. The UnPlugFest with its multitude of test
+> platforms is a good battle testing ground for uncovering every corner
+> case.
+> 
+> The patches in this pull request focus only on fixing the regressions in
+> 4.3-rc5. The patches look a bit larger since we also added comments in
+> the critical sections of the fixes to improve clarity.
+> 
+> I would appreciate if we can get these regression fixes to Linus
+> quickly. Please let me know if there are any issues pulling. Thanks.
 
-What makes things worse is that most user space BlueZ versions will
-first issue a disconnect request and only then unpair, meaning the
-buggy code will be triggered every time. This effectively causes the
-kernel to resume scanning and reconnect to a device for which we've
-removed all keys and GATT database information.
-
-This patch fixes the issue by adding the missing call to the
-hci_conn_params_del() function to a branch which handles the case of
-no existing connection.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Cc: stable@vger.kernel.org # 3.19+
----
- net/bluetooth/mgmt.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9f9a70f0c981..39dda3e273ed 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3090,6 +3090,11 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	} else {
- 		u8 addr_type;
- 
-+		if (cp->addr.type == BDADDR_LE_PUBLIC)
-+			addr_type = ADDR_LE_DEV_PUBLIC;
-+		else
-+			addr_type = ADDR_LE_DEV_RANDOM;
-+
- 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK,
- 					       &cp->addr.bdaddr);
- 		if (conn) {
-@@ -3105,13 +3110,10 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 			 */
- 			if (!cp->disconnect)
- 				conn = NULL;
-+		} else {
-+			hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
- 		}
- 
--		if (cp->addr.type == BDADDR_LE_PUBLIC)
--			addr_type = ADDR_LE_DEV_PUBLIC;
--		else
--			addr_type = ADDR_LE_DEV_RANDOM;
--
- 		hci_remove_irk(hdev, &cp->addr.bdaddr, addr_type);
- 
- 		err = hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
--- 
-2.4.3
-
+Ok, pulled, thanks Johan.
