@@ -1,50 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH] systemd: Check if bluetooth is supported in the kernel
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1445336685-20506-1-git-send-email-martin.pitt@ubuntu.com>
-Date: Tue, 20 Oct 2015 15:19:25 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <3C809C59-9F50-40AC-B55D-C5456B333183@holtmann.org>
-References: <1445336685-20506-1-git-send-email-martin.pitt@ubuntu.com>
-To: Martin Pitt <martin.pitt@ubuntu.com>
+Subject: Re: [PATCH ] audio/player: Fix player name value for MPRIS
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>,
+	linux-bluetooth@vger.kernel.org
+References: <1444639277-5998-1-git-send-email-bharat.panda@samsung.com>
+ <02ec01d10b38$052f11e0$0f8d35a0$@samsung.com>
+Cc: cpgs@samsung.com
+From: Simon Fels <simon.fels@canonical.com>
+Message-ID: <56263F0B.6010807@canonical.com>
+Date: Tue, 20 Oct 2015 15:18:03 +0200
+MIME-Version: 1.0
+In-Reply-To: <02ec01d10b38$052f11e0$0f8d35a0$@samsung.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+On 20.10.2015 15:05, Bharat Bhusan Panda wrote:
+> ping
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Bharat Panda
+>> Sent: Monday, October 12, 2015 2:11 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: cpgs@samsung.com; Bharat Panda
+>> Subject: [PATCH ] audio/player: Fix player name value for MPRIS
+>>
+>> Added fix for setting media player name when the player Identity value is
+>> invalid.
+>> ---
+>>   profiles/audio/media.c | 15 +++++++++++++--
+>>   tools/mpris-proxy.c    |  1 +
+>>   2 files changed, 14 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
+>> 69070bf..68111e6 100644
+>> --- a/profiles/audio/media.c
+>> +++ b/profiles/audio/media.c
+>> @@ -1805,7 +1805,7 @@ static DBusMessage
+>> *register_player(DBusConnection *conn, DBusMessage *msg,
+>>   	struct media_adapter *adapter = data;
+>>   	struct media_player *mp;
+>>   	DBusMessageIter args;
+>> -	const char *sender, *path;
+>> +	const char *sender, *path, *name;
+>>   	int err;
+>>
+>>   	sender = dbus_message_get_sender(msg); @@ -1814,6 +1814,8 @@
+>> static DBusMessage *register_player(DBusConnection *conn, DBusMessage
+>> *msg,
+>>
+>>   	dbus_message_iter_get_basic(&args, &path);
+>>   	dbus_message_iter_next(&args);
+>> +	dbus_message_iter_get_basic(&args, &name);
+>> +	dbus_message_iter_next(&args);
+>>
+>>   	if (media_adapter_find_player(adapter, sender, path) != NULL)
+>>   		return btd_error_already_exists(msg); @@ -1831,6 +1833,14
+>> @@ static DBusMessage *register_player(DBusConnection *conn,
+>> DBusMessage *msg,
+>>   		return btd_error_invalid_args(msg);
+>>   	}
+>>
+>> +	/*
+>> +	 * The Player Identity value is NULL in MPRIS case, so create
+>> +	 * mpris name on the basis of player bus name and assign
+>> +	 * the value.
+>> +	 */
+>> +	if (mp->name == NULL)
+>> +		mp->name = g_strdup(name);
+>> +
+>>   	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);  }
+>>
+>> @@ -1864,7 +1874,8 @@ static const GDBusMethodTable media_methods[]
+>> = {
+>>   	{ GDBUS_METHOD("UnregisterEndpoint",
+>>   		GDBUS_ARGS({ "endpoint", "o" }), NULL,
+>> unregister_endpoint) },
+>>   	{ GDBUS_METHOD("RegisterPlayer",
+>> -		GDBUS_ARGS({ "player", "o" }, { "properties", "a{sv}" }),
+>> +		GDBUS_ARGS({ "player", "o" }, { "name", "s" },
+>> +						{ "properties", "a{sv}" }),
 
-> When running a kernel without bluetooth support, bluetooth.service fails to
-> start with
-> 
->    bluetoothd[1640]: Failed to access management interface
->    bluetoothd[1640]: Adapter handling initialization failed
->    systemd[1]: bluetooth.service: Main process exited, code=exited, status=1/FAILURE
->    systemd[1]: Failed to start Bluetooth service.
-> 
-> This causes an unnecessary "degraded" state and more importantly breaks package
-> installation when the bluez package auto-starts the daemon.
-> 
-> Add a condition to only start the service if /sys/class/bluetooth exists.
-> 
-> https://launchpad.net/bugs/1506774
-> ---
-> src/bluetooth.service.in | 1 +
-> 1 file changed, 1 insertion(+)
-> 
-> diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-> index 35e9457..83e4732 100644
-> --- a/src/bluetooth.service.in
-> +++ b/src/bluetooth.service.in
-> @@ -1,6 +1,7 @@
-> [Unit]
-> Description=Bluetooth service
-> Documentation=man:bluetoothd(8)
-> +ConditionPathIsDirectory=/sys/class/bluetooth
+This breaks the API. Can't the name be passed as a member of the 
+properties dict?
 
-and this is not a race condition? I mean that directory might be not present because the module has not yet been loaded. So strictly speaking the kernel has been compiled with Bluetooth support, but it has not been yet loaded. Are we not exchanged one issue for another?
-
-Regards
-
-Marcel
+regards,
+Simon
 
