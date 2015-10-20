@@ -1,55 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/README: Update known Android issues section
-Date: Tue, 20 Oct 2015 16:05:02 +0200
-Message-Id: <1445349902-16586-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: 'Simon Fels' <simon.fels@canonical.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com
+References: <1444639277-5998-1-git-send-email-bharat.panda@samsung.com>
+ <02ec01d10b38$052f11e0$0f8d35a0$@samsung.com> <56263F0B.6010807@canonical.com>
+In-reply-to: <56263F0B.6010807@canonical.com>
+Subject: RE: [PATCH ] audio/player: Fix player name value for MPRIS
+Date: Tue, 20 Oct 2015 19:25:31 +0530
+Message-id: <02ed01d10b3f$13ee3b00$3bcab100$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds a patch which allows handling ssp passkey request.
----
- android/README | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Hi Simon,
 
-diff --git a/android/README b/android/README
-index 9aa9a37..6b7f79d 100644
---- a/android/README
-+++ b/android/README
-@@ -9,7 +9,7 @@ replacement to Android provided Bluetooth stack.
- More details about BlueZ for Android architecture and components can be found
- in android/hal-ipc-api.txt file.
- 
--Supported Android version: 4.4 KitKat and 5.0 Lollipop
-+Supported Android version: 4.4 KitKat and 5.0, 5.1.1 Lollipop
- 
- 
- Building and running on Android
-@@ -402,12 +402,16 @@ affect qualification or user experience. This section provides list of
- recommended Android fixes that are not part of latest AOSP release supported by
- BlueZ.
- 
-+For Android 5.1.1 Lollipop:
-+https://android-review.googlesource.com/177314
-+
- For Android 5.0 Lollipop:
- https://android-review.googlesource.com/99761
- https://android-review.googlesource.com/100297
- https://android-review.googlesource.com/102882
- https://android-review.googlesource.com/132733
- https://android-review.googlesource.com/132763
-+https://android-review.googlesource.com/177314
- 
- For Android 4.4 KitKat:
- https://android-review.googlesource.com/82757
-@@ -417,6 +421,7 @@ https://android-review.googlesource.com/99761
- https://android-review.googlesource.com/99850
- https://android-review.googlesource.com/100297
- https://android-review.googlesource.com/102882
-+https://android-review.googlesource.com/177314
- 
- Unimplemented Bluetooth features
- ================================
--- 
-2.1.0
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Simon Fels
+> Sent: Tuesday, October 20, 2015 6:48 PM
+> To: Bharat Bhusan Panda; linux-bluetooth@vger.kernel.org
+> Cc: cpgs@samsung.com
+> Subject: Re: [PATCH ] audio/player: Fix player name value for MPRIS
+> 
+> On 20.10.2015 15:05, Bharat Bhusan Panda wrote:
+> > ping
+> >
+> >> -----Original Message-----
+> >> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> >> owner@vger.kernel.org] On Behalf Of Bharat Panda
+> >> Sent: Monday, October 12, 2015 2:11 PM
+> >> To: linux-bluetooth@vger.kernel.org
+> >> Cc: cpgs@samsung.com; Bharat Panda
+> >> Subject: [PATCH ] audio/player: Fix player name value for MPRIS
+> >>
+> >> Added fix for setting media player name when the player Identity
+> >> value is invalid.
+> >> ---
+> >>   profiles/audio/media.c | 15 +++++++++++++--
+> >>   tools/mpris-proxy.c    |  1 +
+> >>   2 files changed, 14 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
+> >> 69070bf..68111e6 100644
+> >> --- a/profiles/audio/media.c
+> >> +++ b/profiles/audio/media.c
+> >> @@ -1805,7 +1805,7 @@ static DBusMessage
+> >> *register_player(DBusConnection *conn, DBusMessage *msg,
+> >>   	struct media_adapter *adapter = data;
+> >>   	struct media_player *mp;
+> >>   	DBusMessageIter args;
+> >> -	const char *sender, *path;
+> >> +	const char *sender, *path, *name;
+> >>   	int err;
+> >>
+> >>   	sender = dbus_message_get_sender(msg); @@ -1814,6 +1814,8 @@
+> >> static DBusMessage *register_player(DBusConnection *conn,
+> DBusMessage
+> >> *msg,
+> >>
+> >>   	dbus_message_iter_get_basic(&args, &path);
+> >>   	dbus_message_iter_next(&args);
+> >> +	dbus_message_iter_get_basic(&args, &name);
+> >> +	dbus_message_iter_next(&args);
+> >>
+> >>   	if (media_adapter_find_player(adapter, sender, path) != NULL)
+> >>   		return btd_error_already_exists(msg); @@ -1831,6 +1833,14
+> @@
+> >> static DBusMessage *register_player(DBusConnection *conn,
+> DBusMessage
+> >> *msg,
+> >>   		return btd_error_invalid_args(msg);
+> >>   	}
+> >>
+> >> +	/*
+> >> +	 * The Player Identity value is NULL in MPRIS case, so create
+> >> +	 * mpris name on the basis of player bus name and assign
+> >> +	 * the value.
+> >> +	 */
+> >> +	if (mp->name == NULL)
+> >> +		mp->name = g_strdup(name);
+> >> +
+> >>   	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);  }
+> >>
+> >> @@ -1864,7 +1874,8 @@ static const GDBusMethodTable
+> media_methods[] =
+> >> {
+> >>   	{ GDBUS_METHOD("UnregisterEndpoint",
+> >>   		GDBUS_ARGS({ "endpoint", "o" }), NULL,
+> >> unregister_endpoint) },
+> >>   	{ GDBUS_METHOD("RegisterPlayer",
+> >> -		GDBUS_ARGS({ "player", "o" }, { "properties", "a{sv}" }),
+> >> +		GDBUS_ARGS({ "player", "o" }, { "name", "s" },
+> >> +						{ "properties", "a{sv}" }),
+> 
+> This breaks the API. Can't the name be passed as a member of the
+properties
+> dict?
+It can be passed in properties dict, but again as per mpris spec there is no
+properties defined for name but it can be tweaked at mpris-proxy and passed
+to media player.
+Not sure which approach will be better to pass the name field.
+> 
+> regards,
+> Simon
+> 
+Regards,
+Bharat 
+
 
