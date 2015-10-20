@@ -1,37 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [RFC] Bluetooth: Remove __l2cap_wait_ack
+Subject: Re: [PATCH] systemd: Check if bluetooth is supported in the kernel
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1444914416-27666-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 20 Oct 2015 15:42:54 +0200
+In-Reply-To: <1445336685-20506-1-git-send-email-martin.pitt@ubuntu.com>
+Date: Tue, 20 Oct 2015 15:19:25 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <23564B56-4366-41F0-A1D8-91970EC7E61C@holtmann.org>
-References: <1444914416-27666-1-git-send-email-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <3C809C59-9F50-40AC-B55D-C5456B333183@holtmann.org>
+References: <1445336685-20506-1-git-send-email-martin.pitt@ubuntu.com>
+To: Martin Pitt <martin.pitt@ubuntu.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Martin,
 
-> __l2cap_wait_ack probably cause more harm than good since it was added as
-> a feature to wait until all unacked packets are processed and properly
-> acked by the remote but it ignored the fact that the remote may probably
-> wait some window threshold before start acking.
+> When running a kernel without bluetooth support, bluetooth.service fails to
+> start with
 > 
-> Since the window threshold is implementation specific, we ack when the
-> window is 3/4th full, it should probably be the receiving side that
-> should ack or discard the packets in the queue when processing the
-> Disconnect request.
+>    bluetoothd[1640]: Failed to access management interface
+>    bluetoothd[1640]: Adapter handling initialization failed
+>    systemd[1]: bluetooth.service: Main process exited, code=exited, status=1/FAILURE
+>    systemd[1]: Failed to start Bluetooth service.
 > 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> This causes an unnecessary "degraded" state and more importantly breaks package
+> installation when the bluez package auto-starts the daemon.
+> 
+> Add a condition to only start the service if /sys/class/bluetooth exists.
+> 
+> https://launchpad.net/bugs/1506774
 > ---
-> net/bluetooth/l2cap_sock.c | 50 ----------------------------------------------
-> 1 file changed, 50 deletions(-)
+> src/bluetooth.service.in | 1 +
+> 1 file changed, 1 insertion(+)
+> 
+> diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
+> index 35e9457..83e4732 100644
+> --- a/src/bluetooth.service.in
+> +++ b/src/bluetooth.service.in
+> @@ -1,6 +1,7 @@
+> [Unit]
+> Description=Bluetooth service
+> Documentation=man:bluetoothd(8)
+> +ConditionPathIsDirectory=/sys/class/bluetooth
 
-I would feel a lot better if we had a l2cap-tester test case or two to confirm the expected behavior.
-
-Additionally has anyone tested this patch and confirmed that it does not do harm or break qualification?
+and this is not a race condition? I mean that directory might be not present because the module has not yet been loaded. So strictly speaking the kernel has been compiled with Bluetooth support, but it has not been yet loaded. Are we not exchanged one issue for another?
 
 Regards
 
