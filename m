@@ -1,193 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: btintel: Enable extra Intel vendor events
-Date: Tue, 20 Oct 2015 23:32:28 +0200
-Message-Id: <1445376748-96224-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Introduce driver specific post init callback
+Date: Tue, 20 Oct 2015 23:25:42 +0200
+Message-Id: <1445376342-94161-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Intel Bluetooth controllers can emit extra vendor specific events in
-error conditions or for debugging purposes. To make the life easier for
-engineers, enable them by default. When the vendor_diag options has been
-enabled, then additional debug events are also enabled.
+Some drivers might have to restore certain settings after the init
+procedure has been completed. This driver callback allows them to hook
+into that stage. This callback is run just before the controller is
+declared as powered up.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btintel.c | 62 ++++++++++++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel.h | 12 +++++++++
- drivers/bluetooth/btusb.c   | 21 ++++++++++++---
- 3 files changed, 90 insertions(+), 5 deletions(-)
+ include/net/bluetooth/hci_core.h | 1 +
+ net/bluetooth/hci_core.c         | 5 ++++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index e4496faf8cf5..1f13e617bf56 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -111,13 +111,15 @@ int btintel_set_diag(struct hci_dev *hdev, bool enable)
- 	if (IS_ERR(skb)) {
- 		err = PTR_ERR(skb);
- 		if (err == -ENODATA)
--			return 0;
-+			goto done;
- 		BT_ERR("%s: Changing Intel diagnostic mode failed (%d)",
- 		       hdev->name, err);
- 		return err;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 989c72aabc45..44fb95685611 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -398,6 +398,7 @@ struct hci_dev {
+ 	int (*send)(struct hci_dev *hdev, struct sk_buff *skb);
+ 	void (*notify)(struct hci_dev *hdev, unsigned int evt);
+ 	void (*hw_error)(struct hci_dev *hdev, u8 code);
++	int (*post_init)(struct hci_dev *hdev);
+ 	int (*set_diag)(struct hci_dev *hdev, bool enable);
+ 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ };
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ac5cb251f9fb..964fba4c96bf 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1503,8 +1503,11 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+ 
+ 	if (!ret) {
+ 		if (!hci_dev_test_flag(hdev, HCI_UNCONFIGURED) &&
+-		    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
++		    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+ 			ret = __hci_init(hdev);
++			if (!ret && hdev->post_init)
++				ret = hdev->post_init(hdev);
++		}
  	}
- 	kfree_skb(skb);
  
-+done:
-+	btintel_set_event_mask(hdev, enable);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(btintel_set_diag);
-@@ -283,6 +285,64 @@ int btintel_load_ddc_config(struct hci_dev *hdev, const char *ddc_name)
- }
- EXPORT_SYMBOL_GPL(btintel_load_ddc_config);
- 
-+int btintel_set_event_mask(struct hci_dev *hdev, bool debug)
-+{
-+	u8 mask[8] = { 0x87, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-+	struct sk_buff *skb;
-+	int err;
-+
-+	if (debug)
-+		mask[1] |= 0x62;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc52, 8, mask, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		BT_ERR("%s: Setting Intel event mask failed (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_set_event_mask);
-+
-+int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
-+{
-+	struct sk_buff *skb;
-+	u8 param[2];
-+	int err;
-+
-+	param[0] = 0x01;
-+	param[1] = 0x00;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		BT_ERR("%s: Entering Intel manufacturer mode failed (%d)",
-+		       hdev->name, err);
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	err = btintel_set_event_mask(hdev, debug);
-+
-+	param[0] = 0x00;
-+	param[1] = 0x00;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		BT_ERR("%s: Leaving Intel manufacturer mode failed (%d)",
-+		       hdev->name, err);
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(btintel_set_event_mask_mfg);
-+
- /* ------- REGMAP IBT SUPPORT ------- */
- 
- #define IBT_REG_MODE_8BIT  0x00
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 702a276b3c60..07e58e05a7fa 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -81,6 +81,8 @@ void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver);
- int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type, u32 plen,
- 			const void *param);
- int btintel_load_ddc_config(struct hci_dev *hdev, const char *ddc_name);
-+int btintel_set_event_mask(struct hci_dev *hdev, bool debug);
-+int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug);
- 
- struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
- 				   u16 opcode_write);
-@@ -128,6 +130,16 @@ static inline int btintel_load_ddc_config(struct hci_dev *hdev,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int btintel_set_event_mask(struct hci_dev *hdev, bool debug)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline struct regmap *btintel_regmap_init(struct hci_dev *hdev,
- 						 u16 opcode_read,
- 						 u16 opcode_write)
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index bbe25e397f41..408773f802ff 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1788,8 +1788,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed and activated",
- 		hdev->name);
- 
--	btintel_check_bdaddr(hdev);
--	return 0;
-+	goto complete;
- 
- exit_mfg_disable:
- 	/* Disable the manufacturer mode without reset */
-@@ -1804,8 +1803,7 @@ exit_mfg_disable:
- 
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed", hdev->name);
- 
--	btintel_check_bdaddr(hdev);
--	return 0;
-+	goto complete;
- 
- exit_mfg_deactivate:
- 	release_firmware(fw);
-@@ -1825,6 +1823,12 @@ exit_mfg_deactivate:
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed and deactivated",
- 		hdev->name);
- 
-+complete:
-+	/* Set the event mask for Intel specific vendor events. This enables
-+	 * a few extra events that are useful during general operation.
-+	 */
-+	btintel_set_event_mask_mfg(hdev, false);
-+
- 	btintel_check_bdaddr(hdev);
- 	return 0;
- }
-@@ -2339,6 +2343,15 @@ done:
- 	 */
- 	btintel_load_ddc_config(hdev, fwname);
- 
-+	/* Set the event mask for Intel specific vendor events. This enables
-+	 * a few extra events that are useful during general operation. It
-+	 * does not enable any debugging related events.
-+	 *
-+	 * The device will function correctly without these events enabled
-+	 * and thus no need to fail the setup.
-+	 */
-+	btintel_set_event_mask(hdev, false);
-+
- 	return 0;
- }
- 
+ 	/* If the HCI Reset command is clearing all diagnostic settings,
 -- 
 2.4.3
 
