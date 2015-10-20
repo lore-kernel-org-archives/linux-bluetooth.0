@@ -1,43 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH] Bluetooth: Fix removing connection parameters when unpairing
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1445241107-5303-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 20 Oct 2015 09:55:37 +0200
+Date: Tue, 20 Oct 2015 10:32:54 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A4EF964A-3CD0-4762-B1FA-2F7D325CF610@holtmann.org>
-References: <1445241107-5303-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for latest Apple
+ controllers
+Message-ID: <20151020073254.GB11043@t440s.lan>
+References: <1445295213-33576-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1445295213-33576-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> The commit 89cbb0638e9b7 introduced support for deferred connection
-> parameter removal when unpairing by removing them only once an
-> existing connection gets disconnected. However, it failed to address
-> the scenario when we're *not* connected and do an unpair operation.
+On Tue, Oct 20, 2015, Marcel Holtmann wrote:
+> The latest Apple Bluetooth controllers with Broadcom chip in it have
+> a small design change. Instead of including a USB hub with mouse and
+> keyboard devices, they are now HID interfaces on the same device.
 > 
-> What makes things worse is that most user space BlueZ versions will
-> first issue a disconnect request and only then unpair, meaning the
-> buggy code will be triggered every time. This effectively causes the
-> kernel to resume scanning and reconnect to a device for which we've
-> removed all keys and GATT database information.
+> T:  Bus=04 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#= 39 Spd=12   MxCh= 0
+> D:  Ver= 2.01 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=05ac ProdID=8290 Rev= 0.79
+> S:  Manufacturer=Broadcom Corp.
+> S:  Product=Bluetooth USB Host Controller
+> C:* #Ifs= 6 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> A:  FirstIf#= 2 IfCount= 4 Cls=ff(vend.) Sub=01 Prot=01
+> I:* If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
+> E:  Ad=85(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
+> I:* If#= 1 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usbhid
+> E:  Ad=86(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
+> I:* If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 3 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 3 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 3 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 3 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 3 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=btusb
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 5 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 > 
-> This patch fixes the issue by adding the missing call to the
-> hci_conn_params_del() function to a branch which handles the case of
-> no existing connection.
+> The general layout of Bluetooth devices is that interface 0 is the main
+> interface and interface 1 is for audio data. This design obviously moves
+> it to main interface 2 and audio data on interface 3.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> Cc: stable@vger.kernel.org # 3.19+
+> Starting with the MacBookPro12,1 (early 2015 models) the new Broadcom
+> BCM943602CS cards are used which show this interface layout.
+> 
+> usb 4-1.5: New USB device found, idVendor=05ac, idProduct=8290
+> usb 4-1.5: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+> usb 4-1.5: Product: Bluetooth USB Host Controller
+> usb 4-1.5: Manufacturer: Broadcom Corp.
+> Bluetooth: hci0: BCM: chip id 102 build 0243
+> Bluetooth: hci0: BCM: product 05ac:8290
+> Bluetooth: hci0: BCM20703A1 Generic USB UHE Apple 20Mhz fcbga_X87
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
-> net/bluetooth/mgmt.c | 12 +++++++-----
-> 1 file changed, 7 insertions(+), 5 deletions(-)
+>  drivers/bluetooth/btusb.c | 22 +++++++++++++++-------
+>  1 file changed, 15 insertions(+), 7 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+Applied to bluetooth-next. Thanks.
 
-Regards
-
-Marcel
-
+Johan
