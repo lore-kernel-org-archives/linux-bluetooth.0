@@ -1,107 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Bhusan Panda <bharat.panda@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com
-References: <1444639277-5998-1-git-send-email-bharat.panda@samsung.com>
-In-reply-to: <1444639277-5998-1-git-send-email-bharat.panda@samsung.com>
-Subject: RE: [PATCH ] audio/player: Fix player name value for MPRIS
-Date: Tue, 20 Oct 2015 18:35:19 +0530
-Message-id: <02ec01d10b38$052f11e0$0f8d35a0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+MIME-Version: 1.0
+In-Reply-To: <1445285537-5694-1-git-send-email-simon.fels@canonical.com>
+References: <1445285537-5694-1-git-send-email-simon.fels@canonical.com>
+Date: Tue, 20 Oct 2015 14:24:18 +0300
+Message-ID: <CABBYNZLXMtLCzEtf7rbM774XLv_tw1NrV8J8+9-eJqCGsK=ivQ@mail.gmail.com>
+Subject: Re: [PATCH v2] obexd: pbap: add headers correctly for size query
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Simon Fels <simon.fels@canonical.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+Hi Simon,
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Bharat Panda
-> Sent: Monday, October 12, 2015 2:11 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: cpgs@samsung.com; Bharat Panda
-> Subject: [PATCH ] audio/player: Fix player name value for MPRIS
-> 
-> Added fix for setting media player name when the player Identity value is
-> invalid.
+On Mon, Oct 19, 2015 at 11:12 PM, Simon Fels <simon.fels@canonical.com> wrote:
+> When client queries for the size of a phonebook we fall into a
+> indefinite loop as g_obex_apparam_encode always returns the same
+> number of items added to the buffer regardless how often it is
+> called. In former times where this code wasn't using GObexApparams
+> a array was reduced each time the headers where added and so we could
+> easily find out when we've added all headers. However today we need
+> to solve this a bit differently by also setting the firstpacket flag
+> when we receive the phonebook size result from the phonebook
+> implementation which then lets us correctly go through without
+> falling into a indefinite loop.
 > ---
->  profiles/audio/media.c | 15 +++++++++++++--
->  tools/mpris-proxy.c    |  1 +
->  2 files changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
-> 69070bf..68111e6 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -1805,7 +1805,7 @@ static DBusMessage
-> *register_player(DBusConnection *conn, DBusMessage *msg,
->  	struct media_adapter *adapter = data;
->  	struct media_player *mp;
->  	DBusMessageIter args;
-> -	const char *sender, *path;
-> +	const char *sender, *path, *name;
->  	int err;
-> 
->  	sender = dbus_message_get_sender(msg); @@ -1814,6 +1814,8 @@
-> static DBusMessage *register_player(DBusConnection *conn, DBusMessage
-> *msg,
-> 
->  	dbus_message_iter_get_basic(&args, &path);
->  	dbus_message_iter_next(&args);
-> +	dbus_message_iter_get_basic(&args, &name);
-> +	dbus_message_iter_next(&args);
-> 
->  	if (media_adapter_find_player(adapter, sender, path) != NULL)
->  		return btd_error_already_exists(msg); @@ -1831,6 +1833,14
-> @@ static DBusMessage *register_player(DBusConnection *conn,
-> DBusMessage *msg,
->  		return btd_error_invalid_args(msg);
->  	}
-> 
-> +	/*
-> +	 * The Player Identity value is NULL in MPRIS case, so create
-> +	 * mpris name on the basis of player bus name and assign
-> +	 * the value.
-> +	 */
-> +	if (mp->name == NULL)
-> +		mp->name = g_strdup(name);
+>  obexd/plugins/pbap.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
+> index f2f9166..bab691c 100644
+> --- a/obexd/plugins/pbap.c
+> +++ b/obexd/plugins/pbap.c
+> @@ -193,6 +193,8 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
+>         pbap->obj->apparam = g_obex_apparam_set_uint16(NULL, PHONEBOOKSIZE_TAG,
+>                                                                 phonebooksize);
+>
+> +       pbap->obj->firstpacket = TRUE;
 > +
->  	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);  }
-> 
-> @@ -1864,7 +1874,8 @@ static const GDBusMethodTable media_methods[]
-> = {
->  	{ GDBUS_METHOD("UnregisterEndpoint",
->  		GDBUS_ARGS({ "endpoint", "o" }), NULL,
-> unregister_endpoint) },
->  	{ GDBUS_METHOD("RegisterPlayer",
-> -		GDBUS_ARGS({ "player", "o" }, { "properties", "a{sv}" }),
-> +		GDBUS_ARGS({ "player", "o" }, { "name", "s" },
-> +						{ "properties", "a{sv}" }),
->  		NULL, register_player) },
->  	{ GDBUS_METHOD("UnregisterPlayer",
->  		GDBUS_ARGS({ "player", "o" }), NULL, unregister_player) },
-> diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c index
-bf8148f..cb94f2b
-> 100644
-> --- a/tools/mpris-proxy.c
-> +++ b/tools/mpris-proxy.c
-> @@ -466,6 +466,7 @@ static void add_player(DBusConnection *conn, const
-> char *name,
->  	dbus_message_iter_init_append(msg, &iter);
-> 
->  	dbus_message_iter_append_basic(&iter,
-> DBUS_TYPE_OBJECT_PATH, &path);
-> +	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING,
-> &name);
-> 
->  	if (player != NULL) {
->  		if (!g_dbus_get_properties(player->conn,
+>         if (missed > 0) {
+>                 DBG("missed %d", missed);
+>
+> @@ -826,14 +828,13 @@ static ssize_t vobject_pull_get_next_header(void *object, void *buf, size_t mtu,
+>                                                                 uint8_t *hi)
+>  {
+>         struct pbap_object *obj = object;
+> -       struct pbap_session *pbap = obj->session;
+>
+>         if (!obj->buffer && !obj->apparam)
+>                 return -EAGAIN;
+>
+>         *hi = G_OBEX_HDR_APPARAM;
+>
+> -       if (pbap->params->maxlistcount == 0 || obj->firstpacket) {
+> +       if (obj->firstpacket) {
+>                 obj->firstpacket = FALSE;
+>
+>                 return g_obex_apparam_encode(obj->apparam, buf, mtu);
 > --
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-> the body of a message to majordomo@vger.kernel.org More majordomo
-> info at  http://vger.kernel.org/majordomo-info.html
+> 2.5.0
 
+Applied, thanks.
+
+
+-- 
+Luiz Augusto von Dentz
