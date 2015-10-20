@@ -1,82 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Oct 2015 10:32:54 +0300
+Date: Tue, 20 Oct 2015 10:28:58 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: btusb: Add support for latest Apple
- controllers
-Message-ID: <20151020073254.GB11043@t440s.lan>
-References: <1445295213-33576-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH v2 1/2] Bluetooth: Add support setup stage internal
+ notification event
+Message-ID: <20151020072858.GA11043@t440s.lan>
+References: <1445301048-46533-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1445295213-33576-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1445301048-46533-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Tue, Oct 20, 2015, Marcel Holtmann wrote:
-> The latest Apple Bluetooth controllers with Broadcom chip in it have
-> a small design change. Instead of including a USB hub with mouse and
-> keyboard devices, they are now HID interfaces on the same device.
-> 
-> T:  Bus=04 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#= 39 Spd=12   MxCh= 0
-> D:  Ver= 2.01 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=05ac ProdID=8290 Rev= 0.79
-> S:  Manufacturer=Broadcom Corp.
-> S:  Product=Bluetooth USB Host Controller
-> C:* #Ifs= 6 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> A:  FirstIf#= 2 IfCount= 4 Cls=ff(vend.) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=01 Driver=usbhid
-> E:  Ad=85(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
-> I:* If#= 1 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=01 Prot=02 Driver=usbhid
-> E:  Ad=86(I) Atr=03(Int.) MxPS=   8 Ivl=10ms
-> I:* If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 3 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 3 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 3 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 3 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 3 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:* If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=btusb
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 5 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> 
-> The general layout of Bluetooth devices is that interface 0 is the main
-> interface and interface 1 is for audio data. This design obviously moves
-> it to main interface 2 and audio data on interface 3.
-> 
-> Starting with the MacBookPro12,1 (early 2015 models) the new Broadcom
-> BCM943602CS cards are used which show this interface layout.
-> 
-> usb 4-1.5: New USB device found, idVendor=05ac, idProduct=8290
-> usb 4-1.5: New USB device strings: Mfr=1, Product=2, SerialNumber=0
-> usb 4-1.5: Product: Bluetooth USB Host Controller
-> usb 4-1.5: Manufacturer: Broadcom Corp.
-> Bluetooth: hci0: BCM: chip id 102 build 0243
-> Bluetooth: hci0: BCM: product 05ac:8290
-> Bluetooth: hci0: BCM20703A1 Generic USB UHE Apple 20Mhz fcbga_X87
+> Before the vendor specific setup stage is triggered call back into the
+> core to trigger an internal notification event. That event is used to
+> send an index update to the monitor interface. With that specific event
+> it is possible to update userspace with manufacturer information before
+> any HCI command has been executed. This is useful for early stage
+> debugging of vendor specific initialization sequences.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  drivers/bluetooth/btusb.c | 22 +++++++++++++++-------
->  1 file changed, 15 insertions(+), 7 deletions(-)
+>  include/net/bluetooth/hci.h |  1 +
+>  net/bluetooth/hci_core.c    |  2 ++
+>  net/bluetooth/hci_sock.c    | 24 ++++++++++++++++--------
+>  3 files changed, 19 insertions(+), 8 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+Both patches have been applied to bluetooth-next. Thanks.
 
 Johan
