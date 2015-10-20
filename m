@@ -2,155 +2,131 @@ Return-Path: <cyrus@holtmann.org>
 From: Bharat Panda <bharat.panda@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH  3/3] audio/avrcp: Add support for SetBrowsedPlayer
-Date: Tue, 20 Oct 2015 18:46:28 +0530
-Message-id: <1445346988-12782-3-git-send-email-bharat.panda@samsung.com>
+Subject: [PATCH  2/3] audio/avrcp: Handle PlaylistChanged signal
+Date: Tue, 20 Oct 2015 18:46:27 +0530
+Message-id: <1445346988-12782-2-git-send-email-bharat.panda@samsung.com>
 In-reply-to: <1445346988-12782-1-git-send-email-bharat.panda@samsung.com>
 References: <1445346988-12782-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Support added to handle SetBrowsedPlayer command for TG role.
-
-    AVCTP Browsing: Response: type 0x00 label 13 PID 0x110e
-      AVRCP: SetBrowsedPlayer: len 0x000a
-       Status: 0x04 (Success)
-       UIDCounter: 0x0000 (0)
-       Number of Items: 0x00000007 (7)
-       CharsetID: 0x006a (UTF-8)
-       Folder Depth: 0x00 (0)
+Added signal handler for "PlaylistChanged" on MediaPlayer2.Playlists
+interface.
 ---
- profiles/audio/avrcp.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++
- profiles/audio/avrcp.h |  1 +
- profiles/audio/media.c |  8 +++++++
- 3 files changed, 72 insertions(+)
+ profiles/audio/media.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 7b60012..c20fbcb 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -207,6 +207,15 @@ struct player_item {
- 	char name[0];
- } __attribute__ ((packed));
- 
-+struct avrcp_set_browsed_player_rsp {
-+	uint8_t status;
-+	uint16_t uid_counter;
-+	uint32_t num_of_items;
-+	uint16_t charset_id;
-+	uint8_t folder_depth;
-+	uint8_t data[0];
-+} __attribute__ ((packed));
-+
- struct avrcp_server {
- 	struct btd_adapter *adapter;
- 	uint32_t tg_record_id;
-@@ -1873,6 +1882,59 @@ err_metadata:
- 	return AVRCP_HEADER_LENGTH + 1;
- }
- 
-+static void avrcp_handle_set_browsed_player(struct avrcp *session,
-+				struct avrcp_browsing_header *pdu,
-+				uint8_t transaction)
-+{
-+	struct avrcp_player *player;
-+	struct media_player *mp;
-+	struct avrcp_set_browsed_player_rsp *resp;
-+	uint16_t len = ntohs(pdu->param_len);
-+	uint16_t player_id = 0;
-+	uint8_t status;
-+
-+	if (len < 1) {
-+		status = AVRCP_STATUS_INVALID_PARAM;
-+		goto failed;
-+	}
-+
-+	player_id = bt_get_be16(&pdu->params[0]);
-+	player = find_tg_player(session, player_id);
-+
-+	if (!player) {
-+		status = AVRCP_STATUS_NO_AVAILABLE_PLAYERS;
-+		goto failed;
-+	}
-+
-+	if (!(features[7] & 0x08)) {
-+		status = AVRCP_STATUS_PLAYER_NOT_BROWSABLE;
-+		goto failed;
-+	}
-+
-+	mp = player->user_data;
-+	player->browsed = true;
-+
-+	resp = (struct avrcp_set_browsed_player_rsp *) pdu->params;
-+
-+	resp->status = AVRCP_STATUS_SUCCESS;
-+	resp->uid_counter = htons(player_get_uid_counter(player));
-+	resp->num_of_items = htonl(player->cb->get_total_items(mp));
-+
-+	/*
-+	 * MPRIS player returns a flat hierarchy playlist structure,
-+	 * where the folder depth will always considered to be 0.
-+	 */
-+	resp->folder_depth = 0;
-+	resp->charset_id = htons(AVRCP_CHARSET_UTF8);
-+	pdu->param_len = htons(sizeof(*resp));
-+
-+	return;
-+
-+failed:
-+	pdu->params[0] = status;
-+	pdu->param_len = htons(1);
-+}
-+
- static void avrcp_handle_media_player_list(struct avrcp *session,
- 				struct avrcp_browsing_header *pdu,
- 				uint32_t start_item, uint32_t end_item)
-@@ -1989,6 +2051,7 @@ static struct browsing_pdu_handler {
- 							uint8_t transaction);
- } browsing_handlers[] = {
- 		{ AVRCP_GET_FOLDER_ITEMS, avrcp_handle_get_folder_items },
-+		{ AVRCP_SET_BROWSED_PLAYER, avrcp_handle_set_browsed_player},
- 		{ },
- };
- 
-diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-index 86d310c..c09b910 100644
---- a/profiles/audio/avrcp.h
-+++ b/profiles/audio/avrcp.h
-@@ -101,6 +101,7 @@ struct avrcp_player_cb {
- 	bool (*pause) (void *user_data);
- 	bool (*next) (void *user_data);
- 	bool (*previous) (void *user_data);
-+	uint32_t (*get_total_items) (void *user_data);
- };
- 
- int avrcp_set_volume(struct btd_device *dev, uint8_t volume, bool notify);
 diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 94fce79..a4ff4cc 100644
+index 1b5246d..94fce79 100644
 --- a/profiles/audio/media.c
 +++ b/profiles/audio/media.c
-@@ -1293,6 +1293,13 @@ static bool previous(void *user_data)
- 	return media_player_send(mp, "Previous");
+@@ -113,6 +113,7 @@ struct media_player {
+ 	guint			watch;
+ 	guint			properties_watch;
+ 	guint			seek_watch;
++	guint			playlist_watch;
+ 	char			*status;
+ 	uint32_t		position;
+ 	uint32_t		duration;
+@@ -973,6 +974,7 @@ static void media_player_free(gpointer data)
+ 	g_dbus_remove_watch(conn, mp->watch);
+ 	g_dbus_remove_watch(conn, mp->properties_watch);
+ 	g_dbus_remove_watch(conn, mp->seek_watch);
++	g_dbus_remove_watch(conn, mp->playlist_watch);
+ 
+ 	if (mp->track)
+ 		g_hash_table_unref(mp->track);
+@@ -1913,6 +1915,76 @@ static gboolean position_changed(DBusConnection *connection, DBusMessage *msg,
+ 	return TRUE;
  }
  
-+static uint32_t get_total_items(void *user_data)
++static struct media_playlist *find_playlist_by_id(struct media_player *mp,
++						char *playlist_id)
 +{
-+	struct media_player *mp = user_data;
++	GSList *l;
 +
-+	return mp->total_items;
++	for (l = mp->playlists; l; l = l->next) {
++		struct media_playlist *playlist = l->data;
++
++		if (g_strcmp0(playlist->id, playlist_id) == 0) {
++			return playlist;
++		}
++	}
++
++	return NULL;
 +}
 +
- static void playlist_reply(DBusPendingCall *call, void *user_data)
- {
- 	struct player_request *request = user_data;
-@@ -1451,6 +1458,7 @@ static struct avrcp_player_cb player_cb = {
- 	.pause = pause,
- 	.next = next,
- 	.previous = previous,
-+	.get_total_items = get_total_items,
- };
++static gboolean playlist_changed(DBusConnection *connection,
++						DBusMessage *msg,
++						void *user_data)
++{
++	struct media_player *mp = user_data;
++	struct media_playlist *playlist;
++	DBusMessageIter iter;
++	DBusMessageIter entry;
++	char *playlist_id;
++	char *name;
++	char *icon;
++
++	dbus_message_iter_init(msg, &iter);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRUCT)
++		return FALSE;
++
++	dbus_message_iter_recurse(&iter, &entry);
++
++	if (dbus_message_iter_get_arg_type(&entry) !=
++			DBUS_TYPE_OBJECT_PATH)
++		return FALSE;
++
++	dbus_message_iter_get_basic(&entry, &playlist_id);
++
++	dbus_message_iter_next(&entry);
++	if (dbus_message_iter_get_arg_type(&entry) !=
++			DBUS_TYPE_STRING)
++		return FALSE;
++
++	dbus_message_iter_get_basic(&entry, &name);
++
++	dbus_message_iter_next(&entry);
++	if (dbus_message_iter_get_arg_type(&entry) !=
++			DBUS_TYPE_STRING)
++		return FALSE;
++
++	dbus_message_iter_get_basic(&entry, &icon);
++
++	playlist = find_playlist_by_id(mp, playlist_id);
++
++	if (playlist) {
++		playlist->name = g_strdup(name);
++		playlist->icon = g_strdup(icon);
++	} else {
++		playlist = g_new0(struct media_playlist, 1);
++
++		playlist->id = playlist_id;
++		playlist->name = g_strdup(name);
++		playlist->icon = g_strdup(icon);
++	}
++
++	return TRUE;
++}
++
+ static struct media_player *media_player_create(struct media_adapter *adapter,
+ 						const char *sender,
+ 						const char *path,
+@@ -1995,6 +2067,13 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
+ 	if (!get_playlists(mp))
+ 		DBG("Error fetching playlists");
  
- static void media_player_exit(DBusConnection *connection, void *user_data)
++	mp->playlist_watch = g_dbus_add_signal_watch(conn,
++					sender, path,
++					MEDIA_PLAYER_PLAYLIST_INTERFACE,
++					"PlaylistChanged",
++					playlist_changed,
++					mp, NULL);
++
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
 -- 
 1.9.1
 
