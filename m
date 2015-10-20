@@ -1,36 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Set manufacturer for Intel bootloader devices
-Date: Wed, 21 Oct 2015 01:31:45 +0200
-Message-Id: <1445383905-18051-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Date: Tue, 20 Oct 2015 23:26:42 +0100
+Message-ID: <CAAu3APbFYSQBpwy72Niq-d-A8e9TM_vd2SJb1iifAOUzhbzWAA@mail.gmail.com>
+Subject: Python reading Eddystone beacons
+From: Barry Byford <31baz66@gmail.com>
+To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For Intel bootloader devices, set the manufacturer information so that
-it becomes possible to decode the boot process.
+Hello,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btusb.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I’m looking to use a Raspberry Pi running the latest Raspbian Jessie operation
+system with Bluez 5.23.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 408773f802ff..af6409a7aa0c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2944,8 +2944,10 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(HCI_QUIRK_BROKEN_LOCAL_COMMANDS, &hdev->quirks);
- 	}
- 
--	if (id->driver_info & BTUSB_INTEL_BOOT)
-+	if (id->driver_info & BTUSB_INTEL_BOOT) {
-+		hdev->manufacturer = 2;
- 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
-+	}
- 
- 	if (id->driver_info & BTUSB_ATH3012) {
- 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
--- 
-2.4.3
+I’m trying to create a workshop for schools to interact with Eddystone
+BLE beacons.
+The workshop will show students the basics of reading the beacon data
+and then it will
+be up to the students to build applications from this using the Python
+programming language.
+The Raspberry Pi allows us to use them as the development platform and
+to run the
+final application also.
+Python is the chosen language as this is what schools seem to be using the most.
 
+The way that I’m currently doing the scanning for the beacon data is
+with this bash
+script:
+#!/bin/bash
+sudo hcitool lescan --duplicates 1>/dev/null &
+trap "sudo kill $!" EXIT
+sudo hcidump --raw
+
+The output is then be parsed with a Python library that would be what
+the students
+called to get the data.
+
+While I’m making some progress with the above shell script it doesn’t seem very
+elegant. It looks like there should be a better way using the D-Bus API.
+I’ve been looking in
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test?id=5.23
+for inspiration but don’t seem to have anything that is showing me the beacon
+advertisement.
+
+Should I be able to get the Eddystone beacon payload using Python with
+the D-Bus API
+in Bluez 5.23?
+Is there a good tutorial/example that I could look at?
+
+Thanks in advance for any help or advice.
+
+Regards,
+Barry
+
+
+$ uname -a
+Linux raspberrypi 4.1.7+ #817 PREEMPT Sat Sep 19 15:25:36 BST 2015
+armv6l GNU/Linux
+
+$ bluetoothd -v
+5.23
