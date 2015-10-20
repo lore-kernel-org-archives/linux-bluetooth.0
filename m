@@ -1,29 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH bluetooth-next 1/6] mac802154: llsec: use kzfree
+Subject: Re: [PATCH] Bluetooth: Fix removing connection parameters when unpairing
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1444736579-27826-1-git-send-email-alex.aring@gmail.com>
-Date: Tue, 20 Oct 2015 10:04:03 +0200
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de,
-	linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com
-Message-Id: <D1CDE8B2-2956-43F1-85F9-4BE4C4690541@holtmann.org>
-References: <1444736579-27826-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <1445241107-5303-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 20 Oct 2015 09:55:37 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A4EF964A-3CD0-4762-B1FA-2F7D325CF610@holtmann.org>
+References: <1445241107-5303-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Johan,
 
-> This patch will use kzfree instead kfree for security related
-> information which can be offered by acccident.
+> The commit 89cbb0638e9b7 introduced support for deferred connection
+> parameter removal when unpairing by removing them only once an
+> existing connection gets disconnected. However, it failed to address
+> the scenario when we're *not* connected and do an unpair operation.
 > 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> What makes things worse is that most user space BlueZ versions will
+> first issue a disconnect request and only then unpair, meaning the
+> buggy code will be triggered every time. This effectively causes the
+> kernel to resume scanning and reconnect to a device for which we've
+> removed all keys and GATT database information.
+> 
+> This patch fixes the issue by adding the missing call to the
+> hci_conn_params_del() function to a branch which handles the case of
+> no existing connection.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Cc: stable@vger.kernel.org # 3.19+
 > ---
-> net/mac802154/llsec.c | 20 ++++++++++----------
-> 1 file changed, 10 insertions(+), 10 deletions(-)
+> net/bluetooth/mgmt.c | 12 +++++++-----
+> 1 file changed, 7 insertions(+), 5 deletions(-)
 
-all 6 patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
