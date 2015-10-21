@@ -1,11 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Fix missing hdev locking for LE scan cleanup
-Date: Wed, 21 Oct 2015 15:21:31 +0300
-Message-Id: <1445430091-14577-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1445428941-8069-1-git-send-email-johan.hedberg@gmail.com>
-References: <1445428941-8069-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Fix missing hdev locking for LE scan cleanup
+Date: Wed, 21 Oct 2015 15:02:21 +0300
+Message-Id: <1445428941-8069-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -84,8 +82,8 @@ Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Cc: stable@vger.kernel.org # 4.3
 ---
  include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_conn.c         | 52 +++++++++++++++++++++++++++++++++-------
- 2 files changed, 44 insertions(+), 9 deletions(-)
+ net/bluetooth/hci_conn.c         | 50 ++++++++++++++++++++++++++++++++--------
+ 2 files changed, 42 insertions(+), 9 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
 index 44fb95685611..0015d087d8b1 100644
@@ -100,30 +98,24 @@ index 44fb95685611..0015d087d8b1 100644
  	struct device	dev;
  	struct dentry	*debugfs;
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 2dda439c8cb8..ec4836f243bc 100644
+index 2dda439c8cb8..29b2f70df1a7 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -137,18 +137,51 @@ static void hci_conn_cleanup(struct hci_conn *conn)
- 	hci_conn_put(conn);
- }
+@@ -133,22 +133,53 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+ 	debugfs_remove_recursive(conn->debugfs);
  
--/* This function requires the caller holds hdev->lock */
--static void hci_connect_le_scan_remove(struct hci_conn *conn)
+ 	hci_dev_put(hdev);
++}
++
 +static void le_scan_cleanup(struct work_struct *work)
- {
--	hci_connect_le_scan_cleanup(conn);
++{
 +	struct hci_conn *conn = container_of(work, struct hci_conn,
 +					     le_scan_cleanup);
 +	struct hci_dev *hdev = conn->hdev;
 +	struct hci_conn *c = NULL;
- 
--	/* We can't call hci_conn_del here since that would deadlock
--	 * with trying to call cancel_delayed_work_sync(&conn->disc_work).
--	 * Instead, call just hci_conn_cleanup() which contains the bare
--	 * minimum cleanup operations needed for a connection in this
--	 * state.
-+	BT_DBG("%s hcon %p", hdev->name, conn);
 +
++	BT_DBG("%s hcon %p", hdev->name, conn);
+ 
 +	hci_dev_lock(hdev);
 +
 +	/* Check that the hci_conn is still around */
@@ -141,11 +133,19 @@ index 2dda439c8cb8..ec4836f243bc 100644
 +
 +	hci_dev_unlock(hdev);
 +	hci_dev_put(hdev);
-+	hci_conn_put(conn);
-+}
-+
-+static void hci_connect_le_scan_remove(struct hci_conn *conn)
-+{
+ 	hci_conn_put(conn);
+ }
+ 
+-/* This function requires the caller holds hdev->lock */
+ static void hci_connect_le_scan_remove(struct hci_conn *conn)
+ {
+-	hci_connect_le_scan_cleanup(conn);
+-
+-	/* We can't call hci_conn_del here since that would deadlock
+-	 * with trying to call cancel_delayed_work_sync(&conn->disc_work).
+-	 * Instead, call just hci_conn_cleanup() which contains the bare
+-	 * minimum cleanup operations needed for a connection in this
+-	 * state.
 +	BT_DBG("%s hcon %p", conn->hdev->name, conn);
 +
 +	/* We can't call hci_conn_del/hci_conn_cleanup here since that
@@ -164,7 +164,7 @@ index 2dda439c8cb8..ec4836f243bc 100644
  }
  
  static void hci_acl_create_connection(struct hci_conn *conn)
-@@ -580,6 +613,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+@@ -580,6 +611,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
  	INIT_DELAYED_WORK(&conn->auto_accept_work, hci_conn_auto_accept);
  	INIT_DELAYED_WORK(&conn->idle_work, hci_conn_idle);
  	INIT_DELAYED_WORK(&conn->le_conn_timeout, le_conn_timeout);
