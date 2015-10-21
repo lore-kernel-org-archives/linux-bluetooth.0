@@ -1,98 +1,177 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH v2] Bluetooth: Fix missing hdev locking for LE scan cleanup
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1445430091-14577-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 21 Oct 2015 14:26:22 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A57EDFC0-C3B1-4EF2-84DF-25FA93B8EDC5@holtmann.org>
-References: <1445428941-8069-1-git-send-email-johan.hedberg@gmail.com> <1445430091-14577-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Fix missing hdev locking for LE scan cleanup
+Date: Wed, 21 Oct 2015 15:21:31 +0300
+Message-Id: <1445430091-14577-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1445428941-8069-1-git-send-email-johan.hedberg@gmail.com>
+References: <1445428941-8069-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> The hci_conn objects don't have a dedicated lock themselves but rely
-> on the caller to hold the hci_dev lock for most types of access. The
-> hci_conn_timeout() function has so far sent certain HCI commands based
-> on the hci_conn state which has been possible without holding the
-> hci_dev lock.
-> 
-> The recent changes to do LE scanning before connect attempts added
-> even more operations to hci_conn and hci_dev from hci_conn_timeout,
-> thereby exposing potential race conditions with the hci_dev and
-> hci_conn states.
-> 
-> As an example of such a race, here there's a timeout but an
-> l2cap_sock_connect() call manages to race with the cleanup routine:
-> 
-> [Oct21 08:14] l2cap_chan_timeout: chan ee4b12c0 state BT_CONNECT
-> [  +0.000004] l2cap_chan_close: chan ee4b12c0 state BT_CONNECT
-> [  +0.000002] l2cap_chan_del: chan ee4b12c0, conn f3141580, err 111, state BT_CONNECT
-> [  +0.000002] l2cap_sock_teardown_cb: chan ee4b12c0 state BT_CONNECT
-> [  +0.000005] l2cap_chan_put: chan ee4b12c0 orig refcnt 4
-> [  +0.000010] hci_conn_drop: hcon f53d56e0 orig refcnt 1
-> [  +0.000013] l2cap_chan_put: chan ee4b12c0 orig refcnt 3
-> [  +0.000063] hci_conn_timeout: hcon f53d56e0 state BT_CONNECT
-> [  +0.000049] hci_conn_params_del: addr ee:0d:30:09:53:1f (type 1)
-> [  +0.000002] hci_chan_list_flush: hcon f53d56e0
-> [  +0.000001] hci_chan_del: hci0 hcon f53d56e0 chan f4e7ccc0
-> [  +0.004528] l2cap_sock_create: sock e708fc00
-> [  +0.000023] l2cap_chan_create: chan ee4b1770
-> [  +0.000001] l2cap_chan_hold: chan ee4b1770 orig refcnt 1
-> [  +0.000002] l2cap_sock_init: sk ee4b3390
-> [  +0.000029] l2cap_sock_bind: sk ee4b3390
-> [  +0.000010] l2cap_sock_setsockopt: sk ee4b3390
-> [  +0.000037] l2cap_sock_connect: sk ee4b3390
-> [  +0.000002] l2cap_chan_connect: 00:02:72:d9:e5:8b -> ee:0d:30:09:53:1f (type 2) psm 0x00
-> [  +0.000002] hci_get_route: 00:02:72:d9:e5:8b -> ee:0d:30:09:53:1f
-> [  +0.000001] hci_dev_hold: hci0 orig refcnt 8
-> [  +0.000003] hci_conn_hold: hcon f53d56e0 orig refcnt 0
-> 
-> Above the l2cap_chan_connect() shouldn't have been able to reach the
-> hci_conn f53d56e0 anymore but since hci_conn_timeout didn't do proper
-> locking that's not the case. The end result is a reference to hci_conn
-> that's not in the conn_hash list, resulting in list corruption when
-> trying to remove it later:
-> 
-> [Oct21 08:15] l2cap_chan_timeout: chan ee4b1770 state BT_CONNECT
-> [  +0.000004] l2cap_chan_close: chan ee4b1770 state BT_CONNECT
-> [  +0.000003] l2cap_chan_del: chan ee4b1770, conn f3141580, err 111, state BT_CONNECT
-> [  +0.000001] l2cap_sock_teardown_cb: chan ee4b1770 state BT_CONNECT
-> [  +0.000005] l2cap_chan_put: chan ee4b1770 orig refcnt 4
-> [  +0.000002] hci_conn_drop: hcon f53d56e0 orig refcnt 1
-> [  +0.000015] l2cap_chan_put: chan ee4b1770 orig refcnt 3
-> [  +0.000038] hci_conn_timeout: hcon f53d56e0 state BT_CONNECT
-> [  +0.000003] hci_chan_list_flush: hcon f53d56e0
-> [  +0.000002] hci_conn_hash_del: hci0 hcon f53d56e0
-> [  +0.000001] ------------[ cut here ]------------
-> [  +0.000461] WARNING: CPU: 0 PID: 1782 at lib/list_debug.c:56 __list_del_entry+0x3f/0x71()
-> [  +0.000839] list_del corruption, f53d56e0->prev is LIST_POISON2 (00000200)
-> 
-> The necessary fix is unfortunately more complicated than just adding
-> hci_dev_lock/unlock calls to the hci_conn_timeout() call path.
-> Particularly, the hci_conn_del() API, which expects the hci_dev lock to
-> be held, performs a cancel_delayed_work_sync(&hcon->disc_work) which
-> would lead to a deadlock if the hci_conn_timeout() call path tries to
-> acquire the same lock.
-> 
-> This patch solves the problem by deferring the cleanup work to a
-> separate work callback. To protect against the hci_dev or hci_conn
-> going away meanwhile temporary references are taken with the help of
-> hci_dev_hold() and hci_conn_get().
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> Cc: stable@vger.kernel.org # 4.3
-> ---
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/hci_conn.c         | 52 +++++++++++++++++++++++++++++++++-------
-> 2 files changed, 44 insertions(+), 9 deletions(-)
+The hci_conn objects don't have a dedicated lock themselves but rely
+on the caller to hold the hci_dev lock for most types of access. The
+hci_conn_timeout() function has so far sent certain HCI commands based
+on the hci_conn state which has been possible without holding the
+hci_dev lock.
 
-patch has been applied to bluetooth-next tree.
+The recent changes to do LE scanning before connect attempts added
+even more operations to hci_conn and hci_dev from hci_conn_timeout,
+thereby exposing potential race conditions with the hci_dev and
+hci_conn states.
 
-Regards
+As an example of such a race, here there's a timeout but an
+l2cap_sock_connect() call manages to race with the cleanup routine:
 
-Marcel
+[Oct21 08:14] l2cap_chan_timeout: chan ee4b12c0 state BT_CONNECT
+[  +0.000004] l2cap_chan_close: chan ee4b12c0 state BT_CONNECT
+[  +0.000002] l2cap_chan_del: chan ee4b12c0, conn f3141580, err 111, state BT_CONNECT
+[  +0.000002] l2cap_sock_teardown_cb: chan ee4b12c0 state BT_CONNECT
+[  +0.000005] l2cap_chan_put: chan ee4b12c0 orig refcnt 4
+[  +0.000010] hci_conn_drop: hcon f53d56e0 orig refcnt 1
+[  +0.000013] l2cap_chan_put: chan ee4b12c0 orig refcnt 3
+[  +0.000063] hci_conn_timeout: hcon f53d56e0 state BT_CONNECT
+[  +0.000049] hci_conn_params_del: addr ee:0d:30:09:53:1f (type 1)
+[  +0.000002] hci_chan_list_flush: hcon f53d56e0
+[  +0.000001] hci_chan_del: hci0 hcon f53d56e0 chan f4e7ccc0
+[  +0.004528] l2cap_sock_create: sock e708fc00
+[  +0.000023] l2cap_chan_create: chan ee4b1770
+[  +0.000001] l2cap_chan_hold: chan ee4b1770 orig refcnt 1
+[  +0.000002] l2cap_sock_init: sk ee4b3390
+[  +0.000029] l2cap_sock_bind: sk ee4b3390
+[  +0.000010] l2cap_sock_setsockopt: sk ee4b3390
+[  +0.000037] l2cap_sock_connect: sk ee4b3390
+[  +0.000002] l2cap_chan_connect: 00:02:72:d9:e5:8b -> ee:0d:30:09:53:1f (type 2) psm 0x00
+[  +0.000002] hci_get_route: 00:02:72:d9:e5:8b -> ee:0d:30:09:53:1f
+[  +0.000001] hci_dev_hold: hci0 orig refcnt 8
+[  +0.000003] hci_conn_hold: hcon f53d56e0 orig refcnt 0
+
+Above the l2cap_chan_connect() shouldn't have been able to reach the
+hci_conn f53d56e0 anymore but since hci_conn_timeout didn't do proper
+locking that's not the case. The end result is a reference to hci_conn
+that's not in the conn_hash list, resulting in list corruption when
+trying to remove it later:
+
+[Oct21 08:15] l2cap_chan_timeout: chan ee4b1770 state BT_CONNECT
+[  +0.000004] l2cap_chan_close: chan ee4b1770 state BT_CONNECT
+[  +0.000003] l2cap_chan_del: chan ee4b1770, conn f3141580, err 111, state BT_CONNECT
+[  +0.000001] l2cap_sock_teardown_cb: chan ee4b1770 state BT_CONNECT
+[  +0.000005] l2cap_chan_put: chan ee4b1770 orig refcnt 4
+[  +0.000002] hci_conn_drop: hcon f53d56e0 orig refcnt 1
+[  +0.000015] l2cap_chan_put: chan ee4b1770 orig refcnt 3
+[  +0.000038] hci_conn_timeout: hcon f53d56e0 state BT_CONNECT
+[  +0.000003] hci_chan_list_flush: hcon f53d56e0
+[  +0.000002] hci_conn_hash_del: hci0 hcon f53d56e0
+[  +0.000001] ------------[ cut here ]------------
+[  +0.000461] WARNING: CPU: 0 PID: 1782 at lib/list_debug.c:56 __list_del_entry+0x3f/0x71()
+[  +0.000839] list_del corruption, f53d56e0->prev is LIST_POISON2 (00000200)
+
+The necessary fix is unfortunately more complicated than just adding
+hci_dev_lock/unlock calls to the hci_conn_timeout() call path.
+Particularly, the hci_conn_del() API, which expects the hci_dev lock to
+be held, performs a cancel_delayed_work_sync(&hcon->disc_work) which
+would lead to a deadlock if the hci_conn_timeout() call path tries to
+acquire the same lock.
+
+This patch solves the problem by deferring the cleanup work to a
+separate work callback. To protect against the hci_dev or hci_conn
+going away meanwhile temporary references are taken with the help of
+hci_dev_hold() and hci_conn_get().
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Cc: stable@vger.kernel.org # 4.3
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_conn.c         | 52 +++++++++++++++++++++++++++++++++-------
+ 2 files changed, 44 insertions(+), 9 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 44fb95685611..0015d087d8b1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -471,6 +471,7 @@ struct hci_conn {
+ 	struct delayed_work auto_accept_work;
+ 	struct delayed_work idle_work;
+ 	struct delayed_work le_conn_timeout;
++	struct work_struct  le_scan_cleanup;
+ 
+ 	struct device	dev;
+ 	struct dentry	*debugfs;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 2dda439c8cb8..ec4836f243bc 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -137,18 +137,51 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+ 	hci_conn_put(conn);
+ }
+ 
+-/* This function requires the caller holds hdev->lock */
+-static void hci_connect_le_scan_remove(struct hci_conn *conn)
++static void le_scan_cleanup(struct work_struct *work)
+ {
+-	hci_connect_le_scan_cleanup(conn);
++	struct hci_conn *conn = container_of(work, struct hci_conn,
++					     le_scan_cleanup);
++	struct hci_dev *hdev = conn->hdev;
++	struct hci_conn *c = NULL;
+ 
+-	/* We can't call hci_conn_del here since that would deadlock
+-	 * with trying to call cancel_delayed_work_sync(&conn->disc_work).
+-	 * Instead, call just hci_conn_cleanup() which contains the bare
+-	 * minimum cleanup operations needed for a connection in this
+-	 * state.
++	BT_DBG("%s hcon %p", hdev->name, conn);
++
++	hci_dev_lock(hdev);
++
++	/* Check that the hci_conn is still around */
++	rcu_read_lock();
++	list_for_each_entry_rcu(c, &hdev->conn_hash.list, list) {
++		if (c == conn)
++			break;
++	}
++	rcu_read_unlock();
++
++	if (c == conn) {
++		hci_connect_le_scan_cleanup(conn);
++		hci_conn_cleanup(conn);
++	}
++
++	hci_dev_unlock(hdev);
++	hci_dev_put(hdev);
++	hci_conn_put(conn);
++}
++
++static void hci_connect_le_scan_remove(struct hci_conn *conn)
++{
++	BT_DBG("%s hcon %p", conn->hdev->name, conn);
++
++	/* We can't call hci_conn_del/hci_conn_cleanup here since that
++	 * could deadlock with another hci_conn_del() call that's holding
++	 * hci_dev_lock and doing cancel_delayed_work_sync(&conn->disc_work).
++	 * Instead, grab temporary extra references to the hci_dev and
++	 * hci_conn and perform the necessary cleanup in a separate work
++	 * callback.
+ 	 */
+-	hci_conn_cleanup(conn);
++
++	hci_dev_hold(conn->hdev);
++	hci_conn_get(conn);
++
++	schedule_work(&conn->le_scan_cleanup);
+ }
+ 
+ static void hci_acl_create_connection(struct hci_conn *conn)
+@@ -580,6 +613,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 	INIT_DELAYED_WORK(&conn->auto_accept_work, hci_conn_auto_accept);
+ 	INIT_DELAYED_WORK(&conn->idle_work, hci_conn_idle);
+ 	INIT_DELAYED_WORK(&conn->le_conn_timeout, le_conn_timeout);
++	INIT_WORK(&conn->le_scan_cleanup, le_scan_cleanup);
+ 
+ 	atomic_set(&conn->refcnt, 0);
+ 
+-- 
+2.5.0
 
