@@ -1,213 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4] Bluetooth: btintel: Enable extra Intel vendor events
-Date: Wed, 21 Oct 2015 02:45:19 +0200
-Message-Id: <1445388319-43632-1-git-send-email-marcel@holtmann.org>
+Subject: [Bug 106391] New: Intel 7265 BT on NUC5i3RYH constantly
+ disconnecting from USB when trying to pair
+Date: Wed, 21 Oct 2015 00:28:59 +0000
+Message-ID: <bug-106391-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Intel Bluetooth controllers can emit extra vendor specific events in
-error conditions or for debugging purposes. To make the life easier for
-engineers, enable them by default. When the vendor_diag options has been
-enabled, then additional debug events are also enabled.
+https://bugzilla.kernel.org/show_bug.cgi?id=106391
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btintel.c | 62 ++++++++++++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel.h | 12 +++++++++
- drivers/bluetooth/btusb.c   | 27 ++++++++++++++------
- 3 files changed, 92 insertions(+), 9 deletions(-)
+            Bug ID: 106391
+           Summary: Intel 7265 BT on NUC5i3RYH constantly disconnecting
+                    from USB when trying to pair
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 4.3.0-997-generic #201510110154
+          Hardware: Intel
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: high
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: ernstp@gmail.com
+        Regression: No
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index e4496faf8cf5..1f13e617bf56 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -111,13 +111,15 @@ int btintel_set_diag(struct hci_dev *hdev, bool enable)
- 	if (IS_ERR(skb)) {
- 		err = PTR_ERR(skb);
- 		if (err == -ENODATA)
--			return 0;
-+			goto done;
- 		BT_ERR("%s: Changing Intel diagnostic mode failed (%d)",
- 		       hdev->name, err);
- 		return err;
- 	}
- 	kfree_skb(skb);
- 
-+done:
-+	btintel_set_event_mask(hdev, enable);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(btintel_set_diag);
-@@ -283,6 +285,64 @@ int btintel_load_ddc_config(struct hci_dev *hdev, const char *ddc_name)
- }
- EXPORT_SYMBOL_GPL(btintel_load_ddc_config);
- 
-+int btintel_set_event_mask(struct hci_dev *hdev, bool debug)
-+{
-+	u8 mask[8] = { 0x87, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-+	struct sk_buff *skb;
-+	int err;
-+
-+	if (debug)
-+		mask[1] |= 0x62;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc52, 8, mask, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		BT_ERR("%s: Setting Intel event mask failed (%d)",
-+		       hdev->name, err);
-+		return err;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_set_event_mask);
-+
-+int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
-+{
-+	struct sk_buff *skb;
-+	u8 param[2];
-+	int err;
-+
-+	param[0] = 0x01;
-+	param[1] = 0x00;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		BT_ERR("%s: Entering Intel manufacturer mode failed (%d)",
-+		       hdev->name, err);
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	err = btintel_set_event_mask(hdev, debug);
-+
-+	param[0] = 0x00;
-+	param[1] = 0x00;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		BT_ERR("%s: Leaving Intel manufacturer mode failed (%d)",
-+		       hdev->name, err);
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(btintel_set_event_mask_mfg);
-+
- /* ------- REGMAP IBT SUPPORT ------- */
- 
- #define IBT_REG_MODE_8BIT  0x00
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 702a276b3c60..07e58e05a7fa 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -81,6 +81,8 @@ void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver);
- int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type, u32 plen,
- 			const void *param);
- int btintel_load_ddc_config(struct hci_dev *hdev, const char *ddc_name);
-+int btintel_set_event_mask(struct hci_dev *hdev, bool debug);
-+int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug);
- 
- struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
- 				   u16 opcode_write);
-@@ -128,6 +130,16 @@ static inline int btintel_load_ddc_config(struct hci_dev *hdev,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int btintel_set_event_mask(struct hci_dev *hdev, bool debug)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline struct regmap *btintel_regmap_init(struct hci_dev *hdev,
- 						 u16 opcode_read,
- 						 u16 opcode_write)
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index bbe25e397f41..5ca88b419805 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1701,8 +1701,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 		BT_INFO("%s: Intel device is already patched. patch num: %02x",
- 			hdev->name, ver->fw_patch_num);
- 		kfree_skb(skb);
--		btintel_check_bdaddr(hdev);
--		return 0;
-+		goto complete;
- 	}
- 
- 	/* Opens the firmware patch file based on the firmware version read
-@@ -1714,8 +1713,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	fw = btusb_setup_intel_get_fw(hdev, ver);
- 	if (!fw) {
- 		kfree_skb(skb);
--		btintel_check_bdaddr(hdev);
--		return 0;
-+		goto complete;
- 	}
- 	fw_ptr = fw->data;
- 
-@@ -1788,8 +1786,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed and activated",
- 		hdev->name);
- 
--	btintel_check_bdaddr(hdev);
--	return 0;
-+	goto complete;
- 
- exit_mfg_disable:
- 	/* Disable the manufacturer mode without reset */
-@@ -1804,8 +1801,7 @@ exit_mfg_disable:
- 
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed", hdev->name);
- 
--	btintel_check_bdaddr(hdev);
--	return 0;
-+	goto complete;
- 
- exit_mfg_deactivate:
- 	release_firmware(fw);
-@@ -1825,6 +1821,12 @@ exit_mfg_deactivate:
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed and deactivated",
- 		hdev->name);
- 
-+complete:
-+	/* Set the event mask for Intel specific vendor events. This enables
-+	 * a few extra events that are useful during general operation.
-+	 */
-+	btintel_set_event_mask_mfg(hdev, false);
-+
- 	btintel_check_bdaddr(hdev);
- 	return 0;
- }
-@@ -2339,6 +2341,15 @@ done:
- 	 */
- 	btintel_load_ddc_config(hdev, fwname);
- 
-+	/* Set the event mask for Intel specific vendor events. This enables
-+	 * a few extra events that are useful during general operation. It
-+	 * does not enable any debugging related events.
-+	 *
-+	 * The device will function correctly without these events enabled
-+	 * and thus no need to fail the setup.
-+	 */
-+	btintel_set_event_mask(hdev, false);
-+
- 	return 0;
- }
- 
+This keeps happening when I'm trying to pair a PlayStation 3 controller to my
+NUC:
+
+It works fine on another system with BlueZ 5.35.
+I have played around with a lot of settings, like disabling xhci, disabling
+wifi.
+Tried many different kernels.
+
+Not sure about the firmwares though?
+
+http://git.kernel.org/cgit/linux/kernel/git/iwlwifi/linux-firmware.git/commit/intel?id=07cd0b29e95f61bb0cdbcc86fc5cc2def0755916
+
+http://git.kernel.org/cgit/linux/kernel/git/iwlwifi/linux-firmware.git/commit/intel?id=d82d3c1e5eddb811a38513a7e5b33202773f0fff
+
+Not sure if I have a D0 or D1? And I don't understand how the firmware loading
+works...
+It says 11003110e like a D0 but patchlevel 9 like a D1?
+
+[    2.561895] Bluetooth: Core ver 2.20
+[    2.561912] Bluetooth: HCI device and connection manager initialized
+[    2.561917] Bluetooth: HCI socket layer initialized
+[    2.561920] Bluetooth: L2CAP socket layer initialized
+[    2.561926] Bluetooth: SCO socket layer initialized
+[    2.600716] Bluetooth: hci0: read Intel version: 370810011003110e09
+[    2.600720] Bluetooth: hci0: Intel device is already patched. patch num: 09
+[    4.139943] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[    4.139947] Bluetooth: BNEP filters: protocol multicast
+[    4.139953] Bluetooth: BNEP socket layer initialized
+[    5.962779] Bluetooth: RFCOMM TTY layer initialized
+[    5.962787] Bluetooth: RFCOMM socket layer initialized
+[    5.962795] Bluetooth: RFCOMM ver 1.11
+[  125.858335] usb 1-7: USB disconnect, device number 5
+[  126.143577] usb 1-7: new full-speed USB device number 6 using xhci_hcd
+[  126.273042] usb 1-7: New USB device found, idVendor=8087, idProduct=0a2a
+[  126.273046] usb 1-7: New USB device strings: Mfr=0, Product=0,
+SerialNumber=0
+[  126.288497] Bluetooth: hci0: read Intel version: 370810011003110e09
+[  126.288501] Bluetooth: hci0: Intel device is already patched. patch num: 09
+[  146.048939] usb 1-7: USB disconnect, device number 6
+[  146.333537] usb 1-7: new full-speed USB device number 7 using xhci_hcd
+[  146.463058] usb 1-7: New USB device found, idVendor=8087, idProduct=0a2a
+[  146.463062] usb 1-7: New USB device strings: Mfr=0, Product=0,
+SerialNumber=0
+[  146.478908] Bluetooth: hci0: read Intel version: 370810011003110e09
+[  146.478912] Bluetooth: hci0: Intel device is already patched. patch num: 09
+[  166.251823] usb 1-7: USB disconnect, device number 7
+[  166.543630] usb 1-7: new full-speed USB device number 8 using xhci_hcd
+[  166.673097] usb 1-7: New USB device found, idVendor=8087, idProduct=0a2a
+[  166.673101] usb 1-7: New USB device strings: Mfr=0, Product=0,
+SerialNumber=0
+[  166.691331] Bluetooth: hci0: read Intel version: 370810011003110e09
+[  166.691336] Bluetooth: hci0: Intel device is already patched. patch num: 09
+[  197.892438] usb 1-7: USB disconnect, device number 8
+[  198.179619] usb 1-7: new full-speed USB device number 9 using xhci_hcd
+[  198.309093] usb 1-7: New USB device found, idVendor=8087, idProduct=0a2a
+[  198.309096] usb 1-7: New USB device strings: Mfr=0, Product=0,
+SerialNumber=0
+[  198.327653] Bluetooth: hci0: read Intel version: 370810011003110e09
+[  198.327657] Bluetooth: hci0: Intel device is already patched. patch num: 09
+
 -- 
-2.4.3
-
+You are receiving this mail because:
+You are the assignee for the bug.
