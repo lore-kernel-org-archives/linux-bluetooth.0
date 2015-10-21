@@ -1,84 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAAu3APbFYSQBpwy72Niq-d-A8e9TM_vd2SJb1iifAOUzhbzWAA@mail.gmail.com>
-References: <CAAu3APbFYSQBpwy72Niq-d-A8e9TM_vd2SJb1iifAOUzhbzWAA@mail.gmail.com>
-Date: Wed, 21 Oct 2015 11:31:21 +0300
-Message-ID: <CABBYNZL3g+PBxby7BpfAefqGSzJBRmEVo7bve92FVLMKPyQdGA@mail.gmail.com>
-Subject: Re: Python reading Eddystone beacons
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Barry Byford <31baz66@gmail.com>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix missing hdev locking in hci_conn_timeout()
+Date: Wed, 21 Oct 2015 10:26:05 +0300
+Message-Id: <1445412365-10150-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Barry,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Wed, Oct 21, 2015 at 1:26 AM, Barry Byford <31baz66@gmail.com> wrote:
-> Hello,
->
-> I’m looking to use a Raspberry Pi running the latest Raspbian Jessie operation
-> system with Bluez 5.23.
->
-> I’m trying to create a workshop for schools to interact with Eddystone
-> BLE beacons.
-> The workshop will show students the basics of reading the beacon data
-> and then it will
-> be up to the students to build applications from this using the Python
-> programming language.
-> The Raspberry Pi allows us to use them as the development platform and
-> to run the
-> final application also.
-> Python is the chosen language as this is what schools seem to be using the most.
->
-> The way that I’m currently doing the scanning for the beacon data is
-> with this bash
-> script:
-> #!/bin/bash
-> sudo hcitool lescan --duplicates 1>/dev/null &
-> trap "sudo kill $!" EXIT
-> sudo hcidump --raw
->
-> The output is then be parsed with a Python library that would be what
-> the students
-> called to get the data.
->
-> While I’m making some progress with the above shell script it doesn’t seem very
-> elegant. It looks like there should be a better way using the D-Bus API.
-> I’ve been looking in
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/test?id=5.23
-> for inspiration but don’t seem to have anything that is showing me the beacon
-> advertisement.
->
-> Should I be able to get the Eddystone beacon payload using Python with
-> the D-Bus API
-> in Bluez 5.23?
-> Is there a good tutorial/example that I could look at?
+The hci_conn objects don't have a dedicated lock themselves but rely
+on the caller to hold the hci_dev lock for most types of access. The
+hci_conn_timeout function does various operations on hci_conn but
+hasn't so far taken the hdev lock. The recent changes to do LE
+scanning before connect attempts added even more operations to
+hci_conn from hci_conn_timeout, thereby exposing race conditions such
+as the hci_conn being removed from the global list but another piece
+of code still managing to grab a reference to it.
 
-bluetoothctl does actually print the advertising data:
+Here there's a timeout but an l2cap_sock_connect() call manages to
+race with the cleanup routine:
 
-[bluetooth]# scan on
-Discovery started
-[CHG] Controller XX:XX:XX:XX:XX:XX Discovering: yes
-[CHG] Device XX:XX:XX:XX:XX:XX RSSI: -34
-[CHG] Device XX:XX:XX:XX:XX:XX Name: Test beacon
-[CHG] Device XX:XX:XX:XX:XX:XX Alias: Test beacon
-[CHG] Device XX:XX:XX:XX:XX:XX ServiceData Key: fed8
-[CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x00
-[CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x20
-[CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x02
-[CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x30
-[CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x31
-[CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x08
+[Oct21 08:14] l2cap_chan_timeout: chan ee4b12c0 state BT_CONNECT
+[  +0.000004] l2cap_chan_close: chan ee4b12c0 state BT_CONNECT
+[  +0.000002] l2cap_chan_del: chan ee4b12c0, conn f3141580, err 111, state BT_CONNECT
+[  +0.000002] l2cap_sock_teardown_cb: chan ee4b12c0 state BT_CONNECT
+[  +0.000005] l2cap_chan_put: chan ee4b12c0 orig refcnt 4
+[  +0.000010] hci_conn_drop: hcon f53d56e0 orig refcnt 1
+[  +0.000013] l2cap_chan_put: chan ee4b12c0 orig refcnt 3
+[  +0.000063] hci_conn_timeout: hcon f53d56e0 state BT_CONNECT
+[  +0.000049] hci_conn_params_del: addr ee:0d:30:09:53:1f (type 1)
+[  +0.000002] hci_chan_list_flush: hcon f53d56e0
+[  +0.000001] hci_chan_del: hci0 hcon f53d56e0 chan f4e7ccc0
+[  +0.004528] l2cap_sock_create: sock e708fc00
+[  +0.000023] l2cap_chan_create: chan ee4b1770
+[  +0.000001] l2cap_chan_hold: chan ee4b1770 orig refcnt 1
+[  +0.000002] l2cap_sock_init: sk ee4b3390
+[  +0.000029] l2cap_sock_bind: sk ee4b3390
+[  +0.000010] l2cap_sock_setsockopt: sk ee4b3390
+[  +0.000037] l2cap_sock_connect: sk ee4b3390
+[  +0.000002] l2cap_chan_connect: 00:02:72:d9:e5:8b -> ee:0d:30:09:53:1f (type 2) psm 0x00
+[  +0.000002] hci_get_route: 00:02:72:d9:e5:8b -> ee:0d:30:09:53:1f
+[  +0.000001] hci_dev_hold: hci0 orig refcnt 8
+[  +0.000003] hci_conn_hold: hcon f53d56e0 orig refcnt 0
 
-It is basically using the properties ServiceData and ManufacturerData:
+Above the l2cap_chan_connect() shouldn't have been able to reach the
+hci_conn f53d56e0 anymore but since hci_conn_timeout didn't do proper
+locking that's not the case. The end result is a reference to hci_conn
+that's not in the conn_hash list, resulting in list corruption when
+trying to remove it later:
 
-https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/device-api.txt
+[Oct21 08:15] l2cap_chan_timeout: chan ee4b1770 state BT_CONNECT
+[  +0.000004] l2cap_chan_close: chan ee4b1770 state BT_CONNECT
+[  +0.000003] l2cap_chan_del: chan ee4b1770, conn f3141580, err 111, state BT_CONNECT
+[  +0.000001] l2cap_sock_teardown_cb: chan ee4b1770 state BT_CONNECT
+[  +0.000005] l2cap_chan_put: chan ee4b1770 orig refcnt 4
+[  +0.000002] hci_conn_drop: hcon f53d56e0 orig refcnt 1
+[  +0.000015] l2cap_chan_put: chan ee4b1770 orig refcnt 3
+[  +0.000038] hci_conn_timeout: hcon f53d56e0 state BT_CONNECT
+[  +0.000003] hci_chan_list_flush: hcon f53d56e0
+[  +0.000002] hci_conn_hash_del: hci0 hcon f53d56e0
+[  +0.000001] ------------[ cut here ]------------
+[  +0.000461] WARNING: CPU: 0 PID: 1782 at lib/list_debug.c:56 __list_del_entry+0x3f/0x71()
+[  +0.000839] list_del corruption, f53d56e0->prev is LIST_POISON2 (00000200)
 
-With this all you need to do is to listen for PropertiesChanged and
-decode the values, it would probably be good idea to have a python
-sample of decoding eddystone beacons, or beacons in general.
+This patch fixes the issue by adding the missing hci_dev locking to
+the hci_conn_timeout() function.
 
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Cc: stable@vger.kernel.org # 4.3+
+---
+ net/bluetooth/hci_conn.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 2dda439c8cb8..da0277551de5 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -406,6 +406,7 @@ static void hci_conn_timeout(struct work_struct *work)
+ 	struct hci_conn *conn = container_of(work, struct hci_conn,
+ 					     disc_work.work);
+ 	int refcnt = atomic_read(&conn->refcnt);
++	struct hci_dev *hdev = conn->hdev;
+ 
+ 	BT_DBG("hcon %p state %s", conn, state_to_string(conn->state));
+ 
+@@ -421,6 +422,8 @@ static void hci_conn_timeout(struct work_struct *work)
+ 	if (refcnt > 0)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	switch (conn->state) {
+ 	case BT_CONNECT:
+ 	case BT_CONNECT2:
+@@ -450,6 +453,8 @@ static void hci_conn_timeout(struct work_struct *work)
+ 		conn->state = BT_CLOSED;
+ 		break;
+ 	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ /* Enter sniff mode */
 -- 
-Luiz Augusto von Dentz
+2.5.0
+
