@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/13] Bluetooth: Introduce hci_req helper to abort a connection
-Date: Wed, 21 Oct 2015 18:03:05 +0300
-Message-Id: <1445439791-2151-8-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 09/13] Bluetooth: Remove redundant (and possibly wrong) flag clearing
+Date: Wed, 21 Oct 2015 18:03:07 +0300
+Message-Id: <1445439791-2151-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1445439791-2151-1-git-send-email-johan.hedberg@gmail.com>
 References: <1445439791-2151-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,123 +11,27 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-There are several different places needing to make sure that a
-connection gets disconnected or canceled. The exact action needed
-depends on the connection state, so centralizing this logic can save
-quite a lot of code duplication.
+There's no need to clear the HCI_CONN_ENCRYPT_PEND flag in
+smp_failure. In fact, this may cause the encryption tracking to get
+out of sync as this has nothing to do with HCI activity.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_request.c | 86 +++++++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_request.h |  4 +++
- 2 files changed, 90 insertions(+)
+ net/bluetooth/smp.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index b7369220c9ef..b50e51900255 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -564,3 +564,89 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 	if (err && err != -ENODATA)
- 		BT_ERR("Failed to run HCI request: err %d", err);
- }
-+
-+void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
-+		      u8 reason)
-+{
-+	switch (conn->state) {
-+	case BT_CONNECTED:
-+	case BT_CONFIG:
-+		if (conn->type == AMP_LINK) {
-+			struct hci_cp_disconn_phy_link cp;
-+
-+			cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
-+			cp.reason = hci_proto_disconn_ind(conn);
-+			hci_req_add(req, HCI_OP_DISCONN_PHY_LINK, sizeof(cp),
-+				    &cp);
-+		} else {
-+			struct hci_cp_disconnect dc;
-+
-+			dc.handle = cpu_to_le16(conn->handle);
-+			dc.reason = reason;
-+			hci_req_add(req, HCI_OP_DISCONNECT, sizeof(dc), &dc);
-+		}
-+
-+		conn->state = BT_DISCONN;
-+
-+		break;
-+	case BT_CONNECT:
-+		if (test_bit(HCI_CONN_SCANNING, &conn->flags))
-+			break;
-+		if (conn->type == LE_LINK)
-+			hci_req_add(req, HCI_OP_LE_CREATE_CONN_CANCEL,
-+				    0, NULL);
-+		else if (conn->type == ACL_LINK)
-+			hci_req_add(req, HCI_OP_CREATE_CONN_CANCEL,
-+				    6, &conn->dst);
-+		break;
-+	case BT_CONNECT2:
-+		if (conn->type == ACL_LINK) {
-+			struct hci_cp_reject_conn_req rej;
-+
-+			if (req->hdev->hci_ver < BLUETOOTH_VER_1_2)
-+				return;
-+
-+			bacpy(&rej.bdaddr, &conn->dst);
-+			rej.reason = reason;
-+
-+			hci_req_add(req, HCI_OP_REJECT_CONN_REQ,
-+				    sizeof(rej), &rej);
-+		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
-+			struct hci_cp_reject_sync_conn_req rej;
-+
-+			bacpy(&rej.bdaddr, &conn->dst);
-+			rej.reason = reason;
-+
-+			hci_req_add(req, HCI_OP_REJECT_SYNC_CONN_REQ,
-+				    sizeof(rej), &rej);
-+		}
-+		break;
-+	default:
-+		conn->state = BT_CLOSED;
-+		break;
-+	}
-+}
-+
-+static void abort_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
-+{
-+	if (status)
-+		BT_DBG("Failed to abort connection: status 0x%2.2x", status);
-+}
-+
-+int hci_abort_conn(struct hci_conn *conn, u8 reason)
-+{
-+	struct hci_request req;
-+	int err;
-+
-+	hci_req_init(&req, conn->hdev);
-+
-+	__hci_abort_conn(&req, conn, reason);
-+
-+	err = hci_req_run(&req, abort_conn_complete);
-+	if (err && err != -ENODATA) {
-+		BT_ERR("Failed to run HCI request: err %d", err);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index bf6df92f42db..25c7f1305dcb 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -55,3 +55,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 229d88eebf4e..94f9c4ca68f1 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -811,7 +811,6 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason)
+ 		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
+ 			     &reason);
  
- void hci_update_background_scan(struct hci_dev *hdev);
- void __hci_update_background_scan(struct hci_request *req);
-+
-+int hci_abort_conn(struct hci_conn *conn, u8 reason);
-+void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
-+		      u8 reason);
+-	clear_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags);
+ 	mgmt_auth_failed(hcon, HCI_ERROR_AUTH_FAILURE);
+ 
+ 	if (chan->data)
 -- 
 2.5.0
 
