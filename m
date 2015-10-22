@@ -1,138 +1,388 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 1/3] Bluetooth: Introduce hci_req helper to abort a connection
-Date: Thu, 22 Oct 2015 10:41:48 +0300
-Message-Id: <1445499710-32115-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1445466998-9945-1-git-send-email-jpawlowski@google.com>
+References: <1445466998-9945-1-git-send-email-jpawlowski@google.com>
+Date: Thu, 22 Oct 2015 10:35:59 +0300
+Message-ID: <CABBYNZ++um8pDj7i9+fdqbQE3HARf6c4hRV-K-Kga4vTiSjEow@mail.gmail.com>
+Subject: Re: [PATCH] profiles/deviceinfo: rewrite deviceinfo profile
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Jakub,
 
-There are several different places needing to make sure that a
-connection gets disconnected or canceled. The exact action needed
-depends on the connection state, so centralizing this logic can save
-quite a lot of code duplication.
+On Thu, Oct 22, 2015 at 1:36 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> This patch include new version of deviceinfo profile. It is now
+> not triggering autoconnect. It's also using accept callback instead
+> of btd_device_add_attio_callback.
+> ---
+>  profiles/deviceinfo/deviceinfo.c | 257 ++++++++++++++++++++++++++-------------
+>  1 file changed, 172 insertions(+), 85 deletions(-)
+>
+> diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
+> index 6ee018c..4ccb7c1 100644
+> --- a/profiles/deviceinfo/deviceinfo.c
+> +++ b/profiles/deviceinfo/deviceinfo.c
+> @@ -3,6 +3,7 @@
+>   *  BlueZ - Bluetooth protocol stack for Linux
+>   *
+>   *  Copyright (C) 2012 Texas Instruments, Inc.
+> + *  Copyright (C) 2015 Google Inc.
+>   *
+>   *  This program is free software; you can redistribute it and/or modify
+>   *  it under the terms of the GNU General Public License as published by
+> @@ -38,160 +39,246 @@
+>  #include "src/device.h"
+>  #include "src/profile.h"
+>  #include "src/service.h"
+> -#include "src/shared/util.h"
+>  #include "attrib/gattrib.h"
+> -#include "src/attio.h"
+> +#include "src/shared/util.h"
+> +#include "src/shared/queue.h"
+> +#include "src/shared/gatt-db.h"
+> +#include "src/shared/gatt-client.h"
+>  #include "attrib/att.h"
+> -#include "attrib/gatt.h"
+>  #include "src/log.h"
+>
+>  #define PNP_ID_SIZE    7
+>
+>  struct deviceinfo {
+> -       struct btd_device       *dev;           /* Device reference */
+> -       GAttrib                 *attrib;        /* GATT connection */
+> -       guint                   attioid;        /* Att watcher id */
+> -       struct att_range        *svc_range;     /* DeviceInfo range */
+> -       GSList                  *chars;         /* Characteristics */
+> +       struct btd_device *device;
+> +       struct gatt_db *db;
+> +       unsigned int db_id;
+> +       struct bt_gatt_client *client;
+> +       struct gatt_db_attribute *attr;
+>  };
+>
+> -struct characteristic {
+> -       struct gatt_char        attr;   /* Characteristic */
+> -       struct deviceinfo       *d;     /* deviceinfo where the char belongs */
+> -};
+> +static GSList *devices;
+>
+> -static void deviceinfo_driver_remove(struct btd_service *service)
+> +static void deviceinfo_free(struct deviceinfo *d)
+>  {
+> -       struct deviceinfo *d = btd_service_get_user_data(service);
+> -
+> -       if (d->attioid > 0)
+> -               btd_device_remove_attio_callback(d->dev, d->attioid);
+> -
+> -       if (d->attrib != NULL)
+> -               g_attrib_unref(d->attrib);
+> +       gatt_db_unregister(d->db, d->db_id);
+> +       gatt_db_unref(d->db);
+> +       bt_gatt_client_unref(d->client);
+> +       btd_device_unref(d->device);
+> +       g_free(d);
+> +};
+>
+> -       g_slist_free_full(d->chars, g_free);
+> +static int cmp_device(gconstpointer a, gconstpointer b)
+> +{
+> +       const struct deviceinfo *d = a;
+> +       const struct btd_device *device = b;
+>
+> -       btd_device_unref(d->dev);
+> -       g_free(d->svc_range);
+> -       g_free(d);
+> +       return d->device == device ? 0 : -1;
+>  }
+>
+> -static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
+> -                                                       gpointer user_data)
+> +static void read_pnpid_cb(bool success, uint8_t att_ecode, const uint8_t *value,
+> +                                       uint16_t length, void *user_data)
+>  {
+> -       struct characteristic *ch = user_data;
+> -       uint8_t value[PNP_ID_SIZE];
+> -       ssize_t vlen;
+> +       struct deviceinfo *d = user_data;
+>
+> -       if (status != 0) {
+> -               error("Error reading PNP_ID value: %s", att_ecode2str(status));
+> +       if (!success) {
+> +               error("Error reading PNP_ID value: %s",
+> +                                               att_ecode2str(att_ecode));
+>                 return;
+>         }
+>
+> -       vlen = dec_read_resp(pdu, len, value, sizeof(value));
+> -       if (vlen < 0) {
+> -               error("Error reading PNP_ID: Protocol error");
+> +       if (length < PNP_ID_SIZE) {
+> +               error("Error reading PNP_ID: Invalid pdu length received");
+>                 return;
+>         }
+>
+> -       if (vlen < 7) {
+> -               error("Error reading PNP_ID: Invalid pdu length received");
+> +       btd_device_set_pnpid(d->device, value[0], get_le16(&value[1]),
+> +                               get_le16(&value[3]), get_le16(&value[5]));
+> +}
+> +
+> +static void handle_pnpid(struct deviceinfo *d, uint16_t value_handle)
+> +{
+> +       if (!bt_gatt_client_read_value(d->client, value_handle,
+> +                                               read_pnpid_cb, d, NULL))
+> +               DBG("Failed to send request to read pnpid");
+> +}
+> +
+> +static void handle_characteristic(struct gatt_db_attribute *attr,
+> +                                                               void *user_data)
+> +{
+> +       struct deviceinfo *d = user_data;
+> +       uint16_t value_handle;
+> +       bt_uuid_t uuid, pnpid_uuid;
+> +
+> +       bt_string_to_uuid(&pnpid_uuid, PNPID_UUID);
+> +
+> +       if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle, NULL,
+> +                                                               &uuid)) {
+> +               error("Failed to obtain characteristic data");
+>                 return;
+>         }
+>
+> -       btd_device_set_pnpid(ch->d->dev, value[0], get_le16(&value[1]),
+> -                               get_le16(&value[3]), get_le16(&value[5]));
+> +       if (bt_uuid_cmp(&pnpid_uuid, &uuid) == 0)
+> +               handle_pnpid(d, value_handle);
+> +       else {
+> +               char uuid_str[MAX_LEN_UUID_STR];
+> +
+> +               bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
+> +               DBG("Unsupported characteristic: %s", uuid_str);
+> +       }
+>  }
+>
+> -static void process_deviceinfo_char(struct characteristic *ch)
+> +static void handle_deviceinfo_service(struct deviceinfo *d)
+>  {
+> -       if (g_strcmp0(ch->attr.uuid, PNPID_UUID) == 0)
+> -               gatt_read_char(ch->d->attrib, ch->attr.value_handle,
+> -                                                       read_pnpid_cb, ch);
+> +       gatt_db_service_foreach_char(d->attr, handle_characteristic, d);
+>  }
+>
+> -static void configure_deviceinfo_cb(uint8_t status, GSList *characteristics,
+> +static void foreach_deviceinfo_service(struct gatt_db_attribute *attr,
+>                                                                 void *user_data)
+>  {
+>         struct deviceinfo *d = user_data;
+> -       GSList *l;
+>
+> -       if (status != 0) {
+> -               error("Discover deviceinfo characteristics: %s",
+> -                                                       att_ecode2str(status));
+> +       if (d->attr) {
+> +               error("More than one deviceinfo service exists for this device");
+>                 return;
+>         }
+>
+> -       for (l = characteristics; l; l = l->next) {
+> -               struct gatt_char *c = l->data;
+> -               struct characteristic *ch;
+> +       d->attr = attr;
+> +       handle_deviceinfo_service(d);
+> +}
+>
+> -               ch = g_new0(struct characteristic, 1);
+> -               ch->attr.handle = c->handle;
+> -               ch->attr.properties = c->properties;
+> -               ch->attr.value_handle = c->value_handle;
+> -               memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
+> -               ch->d = d;
+> +static int deviceinfo_driver_probe(struct btd_service *service)
+> +{
+> +       struct btd_device *device = btd_service_get_device(service);
+> +       struct deviceinfo *d;
+> +       GSList *l;
+> +       char addr[18];
+>
+> -               d->chars = g_slist_append(d->chars, ch);
+> +       ba2str(device_get_address(device), addr);
+> +       DBG("deviceinfo profile probe (%s)", addr);
+>
+> -               process_deviceinfo_char(ch);
+> +       /* Ignore, if we were probed for this device already */
+> +       l = g_slist_find_custom(devices, device, cmp_device);
+> +       if (l) {
+> +               error("Profile probed twice for the same device!");
+> +               return -1;
+>         }
+> +
+> +       d = g_new0(struct deviceinfo, 1);
+> +       if (!d)
+> +               return -1;
+> +
+> +       d->device = btd_device_ref(device);
+> +       devices = g_slist_append(devices, d);
+> +
+> +       return 0;
+>  }
+> -static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+> +
+> +static void deviceinfo_driver_remove(struct btd_service *service)
+>  {
+> -       struct deviceinfo *d = user_data;
+> +       struct btd_device *device = btd_service_get_device(service);
+> +       struct deviceinfo *d;
+> +       GSList *l;
+> +       char addr[18];
+> +
+> +       ba2str(device_get_address(device), addr);
+> +       DBG("deviceinfo profile remove (%s)", addr);
+>
+> -       d->attrib = g_attrib_ref(attrib);
+> +       l = g_slist_find_custom(devices, device, cmp_device);
+> +       if (!l) {
+> +               error("deviceinfo service not handled by profile");
+> +               return;
+> +       }
+>
+> -       gatt_discover_char(d->attrib, d->svc_range->start, d->svc_range->end,
+> -                                       NULL, configure_deviceinfo_cb, d);
+> +       d = l->data;
+> +
+> +       devices = g_slist_remove(devices, d);
+> +       deviceinfo_free(d);
+>  }
+>
+> -static void attio_disconnected_cb(gpointer user_data)
+> +static void service_added(struct gatt_db_attribute *attr, void *user_data)
+>  {
+>         struct deviceinfo *d = user_data;
+> +       bt_uuid_t uuid, deviceinfo_uuid;
+> +
+> +       if (!bt_gatt_client_is_ready(d->client))
+> +               return;
+> +
+> +       gatt_db_attribute_get_service_uuid(attr, &uuid);
+> +       bt_string_to_uuid(&deviceinfo_uuid, DEVICE_INFORMATION_UUID);
+> +
+> +       if (bt_uuid_cmp(&uuid, &deviceinfo_uuid))
+> +               return;
+> +
+> +       if (d->attr) {
+> +               error("More than one deviceinfo service added to device");
+> +               return;
+> +       }
+>
+> -       g_attrib_unref(d->attrib);
+> -       d->attrib = NULL;
+> +       DBG("deviceinfo service added");
+> +
+> +       d->attr = attr;
+> +       handle_deviceinfo_service(d);
+>  }
+>
+> -static int deviceinfo_register(struct btd_service *service,
+> -                                               struct gatt_primary *prim)
+> +static void service_removed(struct gatt_db_attribute *attr, void *user_data)
+>  {
+> -       struct btd_device *device = btd_service_get_device(service);
+> -       struct deviceinfo *d;
+> +       struct deviceinfo *d = user_data;
+>
+> -       d = g_new0(struct deviceinfo, 1);
+> -       d->dev = btd_device_ref(device);
+> -       d->svc_range = g_new0(struct att_range, 1);
+> -       d->svc_range->start = prim->range.start;
+> -       d->svc_range->end = prim->range.end;
+> +       if (d->attr != attr)
+> +               return;
+>
+> -       btd_service_set_user_data(service, d);
+> +       DBG("deviceinfo service removed");
+>
+> -       d->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
+> -                                               attio_disconnected_cb, d);
+> -       return 0;
+> +       d->attr = NULL;
+>  }
+>
+> -static int deviceinfo_driver_probe(struct btd_service *service)
+> +static int deviceinfo_accept(struct btd_service *service)
+>  {
+>         struct btd_device *device = btd_service_get_device(service);
+> -       struct gatt_primary *prim;
+> +       struct gatt_db *db = btd_device_get_gatt_db(device);
+> +       struct bt_gatt_client *client = btd_device_get_gatt_client(device);
+> +       struct deviceinfo *d;
+> +       GSList *l;
+> +       char addr[18];
+> +       bt_uuid_t deviceinfo_uuid;
+> +
+> +       ba2str(device_get_address(device), addr);
+> +       DBG("deviceinfo profile accept (%s)", addr);
+> +
+> +       l = g_slist_find_custom(devices, device, cmp_device);
+> +       if (!l) {
+> +               error("deviceinfo service not handled by profile");
+> +               return -1;
+> +       }
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_request.c | 93 +++++++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_request.h |  4 ++
- 2 files changed, 97 insertions(+)
+Is the code above just a safeguard or did you actually experience
+double probe while testing?
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index b7369220c9ef..23b1005599db 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -564,3 +564,96 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 	if (err && err != -ENODATA)
- 		BT_ERR("Failed to run HCI request: err %d", err);
- }
-+
-+void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
-+		      u8 reason)
-+{
-+	switch (conn->state) {
-+	case BT_CONNECTED:
-+	case BT_CONFIG:
-+		if (conn->type == AMP_LINK) {
-+			struct hci_cp_disconn_phy_link cp;
-+
-+			cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
-+			cp.reason = hci_proto_disconn_ind(conn);
-+			hci_req_add(req, HCI_OP_DISCONN_PHY_LINK, sizeof(cp),
-+				    &cp);
-+		} else {
-+			struct hci_cp_disconnect dc;
-+
-+			dc.handle = cpu_to_le16(conn->handle);
-+			dc.reason = reason;
-+			hci_req_add(req, HCI_OP_DISCONNECT, sizeof(dc), &dc);
-+		}
-+
-+		conn->state = BT_DISCONN;
-+
-+		break;
-+	case BT_CONNECT:
-+		if (conn->type == LE_LINK) {
-+			if (test_bit(HCI_CONN_SCANNING, &conn->flags))
-+				break;
-+			hci_req_add(req, HCI_OP_LE_CREATE_CONN_CANCEL,
-+				    0, NULL);
-+		} else if (conn->type == ACL_LINK) {
-+			if (req->hdev->hci_ver < BLUETOOTH_VER_1_2)
-+				break;
-+			hci_req_add(req, HCI_OP_CREATE_CONN_CANCEL,
-+				    6, &conn->dst);
-+		}
-+		break;
-+	case BT_CONNECT2:
-+		if (conn->type == ACL_LINK) {
-+			struct hci_cp_reject_conn_req rej;
-+
-+			bacpy(&rej.bdaddr, &conn->dst);
-+			rej.reason = reason;
-+
-+			hci_req_add(req, HCI_OP_REJECT_CONN_REQ,
-+				    sizeof(rej), &rej);
-+		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
-+			struct hci_cp_reject_sync_conn_req rej;
-+
-+			bacpy(&rej.bdaddr, &conn->dst);
-+
-+			/* SCO rejection has its own limited set of
-+			 * allowed error values (0x0D-0x0F) which isn't
-+			 * compatible with most values passed to this
-+			 * function. To be safe hard-code one of the
-+			 * values that's suitable for SCO.
-+			 */
-+			rej.reason = HCI_ERROR_REMOTE_LOW_RESOURCES;
-+
-+			hci_req_add(req, HCI_OP_REJECT_SYNC_CONN_REQ,
-+				    sizeof(rej), &rej);
-+		}
-+		break;
-+	default:
-+		conn->state = BT_CLOSED;
-+		break;
-+	}
-+}
-+
-+static void abort_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
-+{
-+	if (status)
-+		BT_DBG("Failed to abort connection: status 0x%2.2x", status);
-+}
-+
-+int hci_abort_conn(struct hci_conn *conn, u8 reason)
-+{
-+	struct hci_request req;
-+	int err;
-+
-+	hci_req_init(&req, conn->hdev);
-+
-+	__hci_abort_conn(&req, conn, reason);
-+
-+	err = hci_req_run(&req, abort_conn_complete);
-+	if (err && err != -ENODATA) {
-+		BT_ERR("Failed to run HCI request: err %d", err);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index bf6df92f42db..25c7f1305dcb 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -55,3 +55,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 
- void hci_update_background_scan(struct hci_dev *hdev);
- void __hci_update_background_scan(struct hci_request *req);
-+
-+int hci_abort_conn(struct hci_conn *conn, u8 reason);
-+void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
-+		      u8 reason);
+> +
+> +       d = l->data;
+>
+> -       prim = btd_device_get_primary(device, DEVICE_INFORMATION_UUID);
+> -       if (prim == NULL)
+> -               return -EINVAL;
+> +       /* Clean-up any old client/db and acquire the new ones */
+> +       d->attr = NULL;
+> +       gatt_db_unregister(d->db, d->db_id);
+> +       gatt_db_unref(d->db);
+> +       bt_gatt_client_unref(d->client);
+>
+> -       return deviceinfo_register(service, prim);
+> +       d->db = gatt_db_ref(db);
+> +       d->client = bt_gatt_client_ref(client);
+> +       d->db_id = gatt_db_register(db, service_added, service_removed, d,
+> +                                                                       NULL);
+
+Im afraid we wont need those callbacks, the core will take care of
+calling probe/remove in case a service is added or removed so this is
+probably dead code in gas so I might remove it from there as well.
+
+> +       /* Handle the device info service */
+> +       bt_string_to_uuid(&deviceinfo_uuid, DEVICE_INFORMATION_UUID);
+> +       gatt_db_foreach_service(db, &deviceinfo_uuid,
+> +                                               foreach_deviceinfo_service, d);
+> +
+> +       return 0;
+>  }
+>
+> +
+>  static struct btd_profile deviceinfo_profile = {
+>         .name           = "deviceinfo",
+>         .remote_uuid    = DEVICE_INFORMATION_UUID,
+>         .external       = true,
+> +       .accept         = deviceinfo_accept,
+>         .device_probe   = deviceinfo_driver_probe,
+>         .device_remove  = deviceinfo_driver_remove
+>  };
+> --
+> 2.5.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.5.0
-
+Luiz Augusto von Dentz
