@@ -1,206 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/3] Bluetooth: Take advantage of connection abort helpers
-Date: Thu, 22 Oct 2015 10:33:44 +0300
-Message-Id: <1445499225-27333-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1445499225-27333-1-git-send-email-johan.hedberg@gmail.com>
-References: <1445499225-27333-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 1/3] Bluetooth: Introduce hci_req helper to abort a connection
+Date: Thu, 22 Oct 2015 10:33:43 +0300
+Message-Id: <1445499225-27333-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Convert the various places mapping connection state to
-disconnect/cancel HCI command to use the new hci_abort_conn helper
-API.
+There are several different places needing to make sure that a
+connection gets disconnected or canceled. The exact action needed
+depends on the connection state, so centralizing this logic can save
+quite a lot of code duplication.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c | 79 +++++-------------------------------------------
- net/bluetooth/mgmt.c     | 36 ++--------------------
- 2 files changed, 11 insertions(+), 104 deletions(-)
+ net/bluetooth/hci_request.c | 93 +++++++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_request.h |  4 ++
+ 2 files changed, 97 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 11316159a5a7..665a52fa6c60 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -59,11 +59,6 @@ static const struct sco_param esco_param_msbc[] = {
- 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0008,	0x02 }, /* T1 */
- };
- 
--static void hci_le_create_connection_cancel(struct hci_conn *conn)
--{
--	hci_send_cmd(conn->hdev, HCI_OP_LE_CREATE_CONN_CANCEL, 0, NULL);
--}
--
- /* This function requires the caller holds hdev->lock */
- static void hci_connect_le_scan_cleanup(struct hci_conn *conn)
- {
-@@ -229,29 +224,6 @@ static void hci_acl_create_connection(struct hci_conn *conn)
- 	hci_send_cmd(hdev, HCI_OP_CREATE_CONN, sizeof(cp), &cp);
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index b7369220c9ef..ee88987fc7d0 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -564,3 +564,96 @@ void hci_update_background_scan(struct hci_dev *hdev)
+ 	if (err && err != -ENODATA)
+ 		BT_ERR("Failed to run HCI request: err %d", err);
  }
- 
--static void hci_acl_create_connection_cancel(struct hci_conn *conn)
--{
--	struct hci_cp_create_conn_cancel cp;
--
--	BT_DBG("hcon %p", conn);
--
--	if (conn->hdev->hci_ver < BLUETOOTH_VER_1_2)
--		return;
--
--	bacpy(&cp.bdaddr, &conn->dst);
--	hci_send_cmd(conn->hdev, HCI_OP_CREATE_CONN_CANCEL, sizeof(cp), &cp);
--}
--
--static void hci_reject_sco(struct hci_conn *conn)
--{
--	struct hci_cp_reject_sync_conn_req cp;
--
--	cp.reason = HCI_ERROR_REJ_LIMITED_RESOURCES;
--	bacpy(&cp.bdaddr, &conn->dst);
--
--	hci_send_cmd(conn->hdev, HCI_OP_REJECT_SYNC_CONN_REQ, sizeof(cp), &cp);
--}
--
- int hci_disconnect(struct hci_conn *conn, __u8 reason)
- {
- 	struct hci_cp_disconnect cp;
-@@ -279,20 +251,6 @@ int hci_disconnect(struct hci_conn *conn, __u8 reason)
- 	return hci_send_cmd(conn->hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp);
- }
- 
--static void hci_amp_disconn(struct hci_conn *conn)
--{
--	struct hci_cp_disconn_phy_link cp;
--
--	BT_DBG("hcon %p", conn);
--
--	conn->state = BT_DISCONN;
--
--	cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
--	cp.reason = hci_proto_disconn_ind(conn);
--	hci_send_cmd(conn->hdev, HCI_OP_DISCONN_PHY_LINK,
--		     sizeof(cp), &cp);
--}
--
- static void hci_add_sco(struct hci_conn *conn, __u16 handle)
- {
- 	struct hci_dev *hdev = conn->hdev;
-@@ -456,35 +414,14 @@ static void hci_conn_timeout(struct work_struct *work)
- 	if (refcnt > 0)
- 		return;
- 
--	switch (conn->state) {
--	case BT_CONNECT:
--	case BT_CONNECT2:
--		if (conn->out) {
--			if (conn->type == ACL_LINK)
--				hci_acl_create_connection_cancel(conn);
--			else if (conn->type == LE_LINK) {
--				if (test_bit(HCI_CONN_SCANNING, &conn->flags))
--					hci_connect_le_scan_remove(conn);
--				else
--					hci_le_create_connection_cancel(conn);
--			}
--		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
--			hci_reject_sco(conn);
--		}
--		break;
--	case BT_CONFIG:
--	case BT_CONNECTED:
--		if (conn->type == AMP_LINK) {
--			hci_amp_disconn(conn);
--		} else {
--			__u8 reason = hci_proto_disconn_ind(conn);
--			hci_disconnect(conn, reason);
--		}
--		break;
--	default:
--		conn->state = BT_CLOSED;
--		break;
-+	/* LE connections in scanning state need special handling */
-+	if (conn->state == BT_CONNECT && conn->type == LE_LINK &&
-+	    test_bit(HCI_CONN_SCANNING, &conn->flags)) {
-+		hci_connect_le_scan_remove(conn);
-+		return;
- 	}
 +
-+	hci_abort_conn(conn, hci_proto_disconn_ind(conn));
- }
++void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
++		      u8 reason)
++{
++	switch (conn->state) {
++	case BT_CONNECTED:
++	case BT_CONFIG:
++		if (conn->type == AMP_LINK) {
++			struct hci_cp_disconn_phy_link cp;
++
++			cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
++			cp.reason = hci_proto_disconn_ind(conn);
++			hci_req_add(req, HCI_OP_DISCONN_PHY_LINK, sizeof(cp),
++				    &cp);
++		} else {
++			struct hci_cp_disconnect dc;
++
++			dc.handle = cpu_to_le16(conn->handle);
++			dc.reason = reason;
++			hci_req_add(req, HCI_OP_DISCONNECT, sizeof(dc), &dc);
++		}
++
++		conn->state = BT_DISCONN;
++
++		break;
++	case BT_CONNECT:
++		if (test_bit(HCI_CONN_SCANNING, &conn->flags))
++			break;
++		if (conn->type == LE_LINK) {
++			hci_req_add(req, HCI_OP_LE_CREATE_CONN_CANCEL,
++				    0, NULL);
++		} else if (conn->type == ACL_LINK) {
++			if (req->hdev->hci_ver < BLUETOOTH_VER_1_2)
++				return;
++			hci_req_add(req, HCI_OP_CREATE_CONN_CANCEL,
++				    6, &conn->dst);
++		}
++		break;
++	case BT_CONNECT2:
++		if (conn->type == ACL_LINK) {
++			struct hci_cp_reject_conn_req rej;
++
++			bacpy(&rej.bdaddr, &conn->dst);
++			rej.reason = reason;
++
++			hci_req_add(req, HCI_OP_REJECT_CONN_REQ,
++				    sizeof(rej), &rej);
++		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
++			struct hci_cp_reject_sync_conn_req rej;
++
++			bacpy(&rej.bdaddr, &conn->dst);
++
++			/* SCO rejection has its own limited set of
++			 * allowed error values (0x0D-0x0F) which isn't
++			 * compatible with most values passed to this
++			 * function. To be safe hard-code one of the
++			 * values that's suitable for SCO.
++			 */
++			rej.reason = HCI_ERROR_REMOTE_LOW_RESOURCES;
++
++			hci_req_add(req, HCI_OP_REJECT_SYNC_CONN_REQ,
++				    sizeof(rej), &rej);
++		}
++		break;
++	default:
++		conn->state = BT_CLOSED;
++		break;
++	}
++}
++
++static void abort_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++{
++	if (status)
++		BT_DBG("Failed to abort connection: status 0x%2.2x", status);
++}
++
++int hci_abort_conn(struct hci_conn *conn, u8 reason)
++{
++	struct hci_request req;
++	int err;
++
++	hci_req_init(&req, conn->hdev);
++
++	__hci_abort_conn(&req, conn, reason);
++
++	err = hci_req_run(&req, abort_conn_complete);
++	if (err && err != -ENODATA) {
++		BT_ERR("Failed to run HCI request: err %d", err);
++		return err;
++	}
++
++	return 0;
++}
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index bf6df92f42db..25c7f1305dcb 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -55,3 +55,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
  
- /* Enter sniff mode */
-@@ -552,7 +489,7 @@ static void le_conn_timeout(struct work_struct *work)
- 		return;
- 	}
- 
--	hci_le_create_connection_cancel(conn);
-+	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
- }
- 
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7ace4663b7ba..7f22119276f3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1639,35 +1639,8 @@ static int clean_up_hci_state(struct hci_dev *hdev)
- 	discov_stopped = hci_stop_discovery(&req);
- 
- 	list_for_each_entry(conn, &hdev->conn_hash.list, list) {
--		struct hci_cp_disconnect dc;
--		struct hci_cp_reject_conn_req rej;
--
--		switch (conn->state) {
--		case BT_CONNECTED:
--		case BT_CONFIG:
--			dc.handle = cpu_to_le16(conn->handle);
--			dc.reason = 0x15; /* Terminated due to Power Off */
--			hci_req_add(&req, HCI_OP_DISCONNECT, sizeof(dc), &dc);
--			break;
--		case BT_CONNECT:
--			if (conn->type == LE_LINK)
--				hci_req_add(&req, HCI_OP_LE_CREATE_CONN_CANCEL,
--					    0, NULL);
--			else if (conn->type == ACL_LINK)
--				hci_req_add(&req, HCI_OP_CREATE_CONN_CANCEL,
--					    6, &conn->dst);
--			break;
--		case BT_CONNECT2:
--			bacpy(&rej.bdaddr, &conn->dst);
--			rej.reason = 0x15; /* Terminated due to Power Off */
--			if (conn->type == ACL_LINK)
--				hci_req_add(&req, HCI_OP_REJECT_CONN_REQ,
--					    sizeof(rej), &rej);
--			else if (conn->type == SCO_LINK)
--				hci_req_add(&req, HCI_OP_REJECT_SYNC_CONN_REQ,
--					    sizeof(rej), &rej);
--			break;
--		}
-+		/* 0x15 == Terminated due to Power Off */
-+		__hci_abort_conn(&req, conn, 0x15);
- 	}
- 
- 	err = hci_req_run(&req, clean_up_hci_complete);
-@@ -3053,7 +3026,6 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	struct mgmt_cp_unpair_device *cp = data;
- 	struct mgmt_rp_unpair_device rp;
- 	struct hci_conn_params *params;
--	struct hci_cp_disconnect dc;
- 	struct mgmt_pending_cmd *cmd;
- 	struct hci_conn *conn;
- 	u8 addr_type;
-@@ -3170,9 +3142,7 @@ done:
- 
- 	cmd->cmd_complete = addr_cmd_complete;
- 
--	dc.handle = cpu_to_le16(conn->handle);
--	dc.reason = 0x13; /* Remote User Terminated Connection */
--	err = hci_send_cmd(hdev, HCI_OP_DISCONNECT, sizeof(dc), &dc);
-+	err = hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 
+ void hci_update_background_scan(struct hci_dev *hdev);
+ void __hci_update_background_scan(struct hci_request *req);
++
++int hci_abort_conn(struct hci_conn *conn, u8 reason);
++void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
++		      u8 reason);
 -- 
 2.5.0
 
