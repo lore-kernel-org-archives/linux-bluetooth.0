@@ -1,36 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+Subject: Re: [PATCH v4 3/3] Bluetooth: Make hci_disconnect() behave correctly for all states
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Increase minor version of core module
-Date: Thu, 22 Oct 2015 12:29:27 +0200
-Message-Id: <1445509767-23389-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1445500179-5316-3-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 22 Oct 2015 11:38:58 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6D501364-2508-40A7-A4F2-CA9E30E50C6B@holtmann.org>
+References: <1445500179-5316-1-git-send-email-johan.hedberg@gmail.com> <1445500179-5316-3-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With the addition of support for diagnostic feature, it makes sense to
-increase the minor version of the Bluetooth core module.
+Hi Johan,
 
-The module version is not used anywhere, but it gives a nice extra
-hint for debugging purposes.
+> There are a few places that don't explicitly check the connection
+> state before calling hci_disconnect(). To make this API do the right
+> thing take advantage of the new hci_abort_conn() API and also make
+> sure to only read the clock offset if we're really connected.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_conn.c | 11 +++--------
+> 1 file changed, 3 insertions(+), 8 deletions(-)
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/af_bluetooth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 70f9d945faf7..c55717929213 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -33,7 +33,7 @@
- 
- #include "selftest.h"
- 
--#define VERSION "2.20"
-+#define VERSION "2.21"
- 
- /* Bluetooth sockets */
- #define BT_MAX_PROTO	8
--- 
-2.4.3
+Regards
+
+Marcel
 
