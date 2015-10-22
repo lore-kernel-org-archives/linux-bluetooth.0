@@ -1,138 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/3] Bluetooth: Introduce hci_req helper to abort a connection
-Date: Thu, 22 Oct 2015 10:33:43 +0300
-Message-Id: <1445499225-27333-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+Subject: Re: [PATCH 0/5] Bluetooth: UPF cleanups & fixes
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1445495915-21059-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 22 Oct 2015 09:03:18 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <5F7FD516-B6D8-42C1-91E8-22B818F9E664@holtmann.org>
+References: <1445495915-21059-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-There are several different places needing to make sure that a
-connection gets disconnected or canceled. The exact action needed
-depends on the connection state, so centralizing this logic can save
-quite a lot of code duplication.
+> Here's the remaining 5 patches that weren't applied yet. The only change
+> is a fix to the SCO rejection reason code which has some special
+> limitations (see commit d41c15cf95bd91b9c333).
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (5):
+>      Bluetooth: Disable auto-connection parameters when unpairing
+>      Bluetooth: Introduce hci_req helper to abort a connection
+>      Bluetooth: Take advantage of connection abort helpers
+>      Bluetooth: Make hci_disconnect() behave correctly for all states
+>      Bluetooth: Fix crash in SMP when unpairing
+> 
+> net/bluetooth/hci_conn.c    | 90 ++++++------------------------------------
+> net/bluetooth/hci_request.c | 93 ++++++++++++++++++++++++++++++++++++++++++++
+> net/bluetooth/hci_request.h |  4 ++
+> net/bluetooth/mgmt.c        | 49 ++++++++---------------
+> net/bluetooth/smp.c         | 26 +++++++++++++
+> net/bluetooth/smp.h         |  1 +
+> 6 files changed, 151 insertions(+), 112 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_request.c | 93 +++++++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_request.h |  4 ++
- 2 files changed, 97 insertions(+)
+patch 1 and 5 have been applied to bluetooth-next tree.
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index b7369220c9ef..ee88987fc7d0 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -564,3 +564,96 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 	if (err && err != -ENODATA)
- 		BT_ERR("Failed to run HCI request: err %d", err);
- }
-+
-+void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
-+		      u8 reason)
-+{
-+	switch (conn->state) {
-+	case BT_CONNECTED:
-+	case BT_CONFIG:
-+		if (conn->type == AMP_LINK) {
-+			struct hci_cp_disconn_phy_link cp;
-+
-+			cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
-+			cp.reason = hci_proto_disconn_ind(conn);
-+			hci_req_add(req, HCI_OP_DISCONN_PHY_LINK, sizeof(cp),
-+				    &cp);
-+		} else {
-+			struct hci_cp_disconnect dc;
-+
-+			dc.handle = cpu_to_le16(conn->handle);
-+			dc.reason = reason;
-+			hci_req_add(req, HCI_OP_DISCONNECT, sizeof(dc), &dc);
-+		}
-+
-+		conn->state = BT_DISCONN;
-+
-+		break;
-+	case BT_CONNECT:
-+		if (test_bit(HCI_CONN_SCANNING, &conn->flags))
-+			break;
-+		if (conn->type == LE_LINK) {
-+			hci_req_add(req, HCI_OP_LE_CREATE_CONN_CANCEL,
-+				    0, NULL);
-+		} else if (conn->type == ACL_LINK) {
-+			if (req->hdev->hci_ver < BLUETOOTH_VER_1_2)
-+				return;
-+			hci_req_add(req, HCI_OP_CREATE_CONN_CANCEL,
-+				    6, &conn->dst);
-+		}
-+		break;
-+	case BT_CONNECT2:
-+		if (conn->type == ACL_LINK) {
-+			struct hci_cp_reject_conn_req rej;
-+
-+			bacpy(&rej.bdaddr, &conn->dst);
-+			rej.reason = reason;
-+
-+			hci_req_add(req, HCI_OP_REJECT_CONN_REQ,
-+				    sizeof(rej), &rej);
-+		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
-+			struct hci_cp_reject_sync_conn_req rej;
-+
-+			bacpy(&rej.bdaddr, &conn->dst);
-+
-+			/* SCO rejection has its own limited set of
-+			 * allowed error values (0x0D-0x0F) which isn't
-+			 * compatible with most values passed to this
-+			 * function. To be safe hard-code one of the
-+			 * values that's suitable for SCO.
-+			 */
-+			rej.reason = HCI_ERROR_REMOTE_LOW_RESOURCES;
-+
-+			hci_req_add(req, HCI_OP_REJECT_SYNC_CONN_REQ,
-+				    sizeof(rej), &rej);
-+		}
-+		break;
-+	default:
-+		conn->state = BT_CLOSED;
-+		break;
-+	}
-+}
-+
-+static void abort_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
-+{
-+	if (status)
-+		BT_DBG("Failed to abort connection: status 0x%2.2x", status);
-+}
-+
-+int hci_abort_conn(struct hci_conn *conn, u8 reason)
-+{
-+	struct hci_request req;
-+	int err;
-+
-+	hci_req_init(&req, conn->hdev);
-+
-+	__hci_abort_conn(&req, conn, reason);
-+
-+	err = hci_req_run(&req, abort_conn_complete);
-+	if (err && err != -ENODATA) {
-+		BT_ERR("Failed to run HCI request: err %d", err);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index bf6df92f42db..25c7f1305dcb 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -55,3 +55,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 
- void hci_update_background_scan(struct hci_dev *hdev);
- void __hci_update_background_scan(struct hci_request *req);
-+
-+int hci_abort_conn(struct hci_conn *conn, u8 reason);
-+void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
-+		      u8 reason);
--- 
-2.5.0
+Regards
+
+Marcel
 
