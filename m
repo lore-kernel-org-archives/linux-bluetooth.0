@@ -2,20 +2,18 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH BlueZ] profiles/scanparam: rewrite scanparam profile
-Date: Thu, 22 Oct 2015 16:07:56 -0700
-Message-Id: <1445555276-9693-1-git-send-email-jpawlowski@google.com>
+Subject: [PATCH] scanparam new version
+Date: Thu, 22 Oct 2015 14:47:10 -0700
+Message-Id: <1445550430-9394-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch rewrites scanparam profile. It will no longer trigger
-autoconnect.
 ---
  profiles/scanparam/scan.c | 255 ++++++++++++++++++++++++----------------------
- 1 file changed, 131 insertions(+), 124 deletions(-)
+ 1 file changed, 132 insertions(+), 123 deletions(-)
 
 diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
-index fbda8a8..e967cab 100644
+index fbda8a8..a911730 100644
 --- a/profiles/scanparam/scan.c
 +++ b/profiles/scanparam/scan.c
 @@ -40,10 +40,11 @@
@@ -33,7 +31,7 @@ index fbda8a8..e967cab 100644
  
  #define SCAN_INTERVAL_WIN_UUID		0x2A4F
  #define SCAN_REFRESH_UUID		0x2A31
-@@ -54,203 +55,208 @@
+@@ -54,203 +55,210 @@
  
  struct scan {
  	struct btd_device *device;
@@ -153,6 +151,7 @@ index fbda8a8..e967cab 100644
  }
  
 -static void refresh_discovered_cb(uint8_t status, GSList *chars,
++
 +static void handle_characteristic(struct gatt_db_attribute *attr,
  								void *user_data)
  {
@@ -160,33 +159,34 @@ index fbda8a8..e967cab 100644
 -	struct gatt_char *chr;
 -	uint16_t start, end;
 -	bt_uuid_t uuid;
--
--	if (status) {
--		error("Scan Refresh %s", att_ecode2str(status));
--		return;
--	}
 +	uint16_t value_handle;
 +	bt_uuid_t uuid, scan_interval_wind_uuid, scan_refresh_uuid;
  
--	if (!chars) {
--		DBG("Scan Refresh not supported");
+-	if (status) {
+-		error("Scan Refresh %s", att_ecode2str(status));
 +	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle, NULL,
 +								&uuid)) {
 +		error("Failed to obtain characteristic data");
  		return;
  	}
  
--	chr = chars->data;
+-	if (!chars) {
+-		DBG("Scan Refresh not supported");
+-		return;
+-	}
 +	bt_uuid16_create(&scan_interval_wind_uuid, SCAN_INTERVAL_WIN_UUID);
 +	bt_uuid16_create(&scan_refresh_uuid, SCAN_REFRESH_UUID);
  
--	DBG("Scan Refresh handle: 0x%04x", chr->value_handle);
+-	chr = chars->data;
 +	if (bt_uuid_cmp(&scan_interval_wind_uuid, &uuid) == 0)
 +		handle_iwin(scan, value_handle);
 +	else if (bt_uuid_cmp(&scan_refresh_uuid, &uuid) == 0)
 +		handle_refresh(scan, value_handle);
 +	else {
 +		char uuid_str[MAX_LEN_UUID_STR];
+ 
+-	DBG("Scan Refresh handle: 0x%04x", chr->value_handle);
++		/* TODO: Support peripheral privacy feature */
  
 -	start = chr->value_handle + 1;
 -	end = scan->range.end;
@@ -252,7 +252,7 @@ index fbda8a8..e967cab 100644
 -		return;
 +	l = g_slist_find_custom(devices, device, cmp_device);
 +	if (!l) {
-+		error("Scan Parameters service not handled by profile");
++		error("Scan Parameters Client Driver service not handled by profile");
 +		return -1;
  	}
  
@@ -270,19 +270,18 @@ index fbda8a8..e967cab 100644
 -	gatt_discover_char(scan->attrib, scan->range.start, scan->range.end,
 -				&refresh_uuid, refresh_discovered_cb, scan);
 -}
++	scan->db = gatt_db_ref(db);
++	scan->client = bt_gatt_client_ref(client);
  
 -static void attio_disconnected_cb(gpointer user_data)
 -{
 -	struct scan *scan = user_data;
-+	scan->db = gatt_db_ref(db);
-+	scan->client = bt_gatt_client_ref(client);
- 
--	g_attrib_unref(scan->attrib);
--	scan->attrib = NULL;
 +	bt_string_to_uuid(&scan_parameters_uuid, SCAN_PARAMETERS_UUID);
 +	gatt_db_foreach_service(db, &scan_parameters_uuid,
 +					foreach_scan_param_service, scan);
-+
+ 
+-	g_attrib_unref(scan->attrib);
+-	scan->attrib = NULL;
 +	return 0;
  }
  
@@ -363,7 +362,7 @@ index fbda8a8..e967cab 100644
  }
  
  static struct btd_profile scan_profile = {
-@@ -258,6 +264,7 @@ static struct btd_profile scan_profile = {
+@@ -258,6 +266,7 @@ static struct btd_profile scan_profile = {
  	.remote_uuid = SCAN_PARAMETERS_UUID,
  	.device_probe = scan_param_probe,
  	.device_remove = scan_param_remove,
