@@ -1,28 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH v4 2/3] Bluetooth: Take advantage of connection abort helpers
+Subject: Re: [patch] Bluetooth: hci_bcm: checking for ERR_PTR instead of NULL
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1445500179-5316-2-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 22 Oct 2015 11:38:35 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A6762E7E-48E5-4AF6-B712-4D42984BA3F0@holtmann.org>
-References: <1445500179-5316-1-git-send-email-johan.hedberg@gmail.com> <1445500179-5316-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <20151022090609.GA9202@mwanda>
+Date: Thu, 22 Oct 2015 11:33:16 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	kernel-janitors@vger.kernel.org
+Message-Id: <F7002528-3BCE-4A94-B9F5-7C1CF0B54745@holtmann.org>
+References: <20151022090609.GA9202@mwanda>
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Dan,
 
-> Convert the various places mapping connection state to
-> disconnect/cancel HCI command to use the new hci_abort_conn helper
-> API.
+> bt_skb_alloc() returns NULL on error, it never returns an ERR_PTR.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_conn.c | 79 +++++-------------------------------------------
-> net/bluetooth/mgmt.c     | 36 ++--------------------
-> 2 files changed, 11 insertions(+), 104 deletions(-)
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
 patch has been applied to bluetooth-next tree.
 
