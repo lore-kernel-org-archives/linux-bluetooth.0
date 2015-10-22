@@ -1,72 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+From: =?UTF-8?Q?J=c3=bcrgen_Benjamin_Ronshausen?= <b.r@rie.eu>
+Subject: L2CAP_INFO_REQ Command rejected by remote side and disconnect
+Message-ID: <5628D38B.6000808@rie.eu>
+Date: Thu, 22 Oct 2015 14:16:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL3g+PBxby7BpfAefqGSzJBRmEVo7bve92FVLMKPyQdGA@mail.gmail.com>
-References: <CAAu3APbFYSQBpwy72Niq-d-A8e9TM_vd2SJb1iifAOUzhbzWAA@mail.gmail.com>
-	<CABBYNZL3g+PBxby7BpfAefqGSzJBRmEVo7bve92FVLMKPyQdGA@mail.gmail.com>
-Date: Thu, 22 Oct 2015 13:47:03 +0100
-Message-ID: <CAAu3APYJ+ro+aC6L7CCCxvg9rBtQAwewt_=ufvSuf6FGq+0c2g@mail.gmail.com>
-Subject: Re: Python reading Eddystone beacons
-From: Barry Byford <31baz66@gmail.com>
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz
+Hello,
 
-On 21 October 2015 at 09:31, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> On Wed, Oct 21, 2015 at 1:26 AM, Barry Byford <31baz66@gmail.com> wrote:
->> I’m looking to use a Raspberry Pi running the latest Raspbian Jessie operation
->> system with Bluez 5.23.
->> The way that I’m currently doing the scanning for the beacon data is
->> with this bash
->> script:
->> #!/bin/bash
->> sudo hcitool lescan --duplicates 1>/dev/null &
->> trap "sudo kill $!" EXIT
->> sudo hcidump --raw
->>
->> Should I be able to get the Eddystone beacon payload using Python with
->> the D-Bus API
->> in Bluez 5.23?
->> Is there a good tutorial/example that I could look at?
->
-> bluetoothctl does actually print the advertising data:
->
-> [bluetooth]# scan on
-> Discovery started
-> [CHG] Controller XX:XX:XX:XX:XX:XX Discovering: yes
-> [CHG] Device XX:XX:XX:XX:XX:XX RSSI: -34
-> [CHG] Device XX:XX:XX:XX:XX:XX Name: Test beacon
-> [CHG] Device XX:XX:XX:XX:XX:XX Alias: Test beacon
-> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Key: fed8
-> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x00
-> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x20
-> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x02
-> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x30
-> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x31
-> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x08
+i am working with Bluez 4.96, kernel 3.2 on embedded ARM.
 
-Thanks for pointing me in the direction of bluetoothctl. However I'm
-not getting my beacon advertising data out with bluetoothctl.
-It reports things like my phone that is waiting to be paired but no beacons.
+Our embedded system is passive (discoverable, connectable) and gets 
+contacted by bluetooth Access Points. With the older model Access Point 
+the connection is disconnected from the Access Point. It seems to me 
+that the Access Point doesn't implement L2CAP_INFO_REQ and L2CAP_INFO_RSP.
 
-What is the best way to get debug information out?.
+I used hcidump to investigate. Here is the part that i believe is the 
+problem:
+
+< ACL data: handle 1 flags 0x00 dlen 10
+     L2CAP(s): Info req: type 2
+ > HCI Event: Read Remote Supported Features (0x0b) plen 11
+     status 0x00 handle 1
+     Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+     bdaddr 00:0B:53:20:04:09 mode 2 clkoffset 0x0000
+ > HCI Event: Command Status (0x0f) plen 4
+     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 1 packets 2
+ > ACL data: handle 1 flags 0x02 dlen 10
+     L2CAP(s): Command rej: reason 0
+       Command not understood
+
+So after the L2CAP connection is established the module asks the AP for 
+the Extended Features Mask via Info req. The AP responds with command 
+not understood.
+
+Could i be right about that the AP doesn't implement the L2CAP_INFO_REQ 
+and L2CAP_INFO_RSP? Or is this a timing issue, where the AP state 
+machine doesn't expect to be asked about Extended Features Mask at this 
+time?
+
+The Access Point is a Sena Parani MSP 101/102 with software from Initium 
+on it.
+
+Regards
+
+Benjamin
 
 
-> It is basically using the properties ServiceData and ManufacturerData:
->
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/device-api.txt
->
-> With this all you need to do is to listen for PropertiesChanged and
-> decode the values,
-I will get the bluetoothctl working before looking at this but thanks for
-the information this was what I was looking for.
+Full dump:
 
-> it would probably be good idea to have a python
-> sample of decoding eddystone beacons, or beacons in general.
-I would certainly find it helpful. :-)
+ > HCI Event: Connect Request (0x04) plen 10
+     bdaddr 00:0B:53:20:04:09 class 0x020300 type ACL
+< HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+     bdaddr 00:0B:53:20:04:09 role 0x00
+     Role: Master
+ > HCI Event: Command Status (0x0f) plen 4
+     Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+ > HCI Event: Role Change (0x12) plen 8
+     status 0x21 bdaddr 00:0B:53:20:04:09 role 0x01
+     Error: Role Change Not Allowed
+ > HCI Event: Connect Complete (0x03) plen 11
+     status 0x00 handle 1 bdaddr 00:0B:53:20:04:09 type ACL encrypt 0x00
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+     handle 1
+ > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+     bdaddr 00:0B:53:20:04:09 mode 1
+ > HCI Event: Command Status (0x0f) plen 4
+     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+ > HCI Event: Max Slots Change (0x1b) plen 3
+     handle 1 slots 5
+ > ACL data: handle 1 flags 0x02 dlen 12
+     L2CAP(s): Connect req: psm 1 scid 0x0086
+< ACL data: handle 1 flags 0x00 dlen 16
+     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0086 result 1 status 0
+       Connection pending - No futher information available
+< ACL data: handle 1 flags 0x00 dlen 10
+     L2CAP(s): Info req: type 2
+ > HCI Event: Read Remote Supported Features (0x0b) plen 11
+     status 0x00 handle 1
+     Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+     bdaddr 00:0B:53:20:04:09 mode 2 clkoffset 0x0000
+ > HCI Event: Command Status (0x0f) plen 4
+     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 1 packets 2
+ > ACL data: handle 1 flags 0x02 dlen 10
+     L2CAP(s): Command rej: reason 0
+       Command not understood
+ > HCI Event: Remote Name Req Complete (0x07) plen 255
+     status 0x00 bdaddr 00:0B:53:20:04:09 name 'Promi-MSP_200409'
+< ACL data: handle 1 flags 0x00 dlen 16
+     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0086 result 0 status 0
+       Connection successful
+< ACL data: handle 1 flags 0x00 dlen 12
+     L2CAP(s): Config req: dcid 0x0086 flags 0x00 clen 0
+ > HCI Event: Number of Completed Packets (0x13) plen 5
+     handle 1 packets 2
+ > HCI Event: Disconn Complete (0x05) plen 4
+     status 0x00 handle 1 reason 0x13
+     Reason: Remote User Terminated Connection
 
-Thanks,
-Barry
