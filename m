@@ -1,32 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 23 Oct 2015 19:34:30 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Martin Pitt <martin.pitt@ubuntu.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] systemd: Check if bluetooth is supported in the kernel
+Message-ID: <20151023163430.GA23194@t440s.P-661HNU-F1>
+References: <1445336685-20506-1-git-send-email-martin.pitt@ubuntu.com>
 MIME-Version: 1.0
-Date: Fri, 23 Oct 2015 10:03:00 -0700
-Message-ID: <CAHugcUdZEwb1J8ephG9Nxk61UzTU-wbtArjcvj4tyU_jeSUbOA@mail.gmail.com>
-Subject: Get the raw Bluetooth Low Energy advertising data
-From: eroot <eigenroot@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1445336685-20506-1-git-send-email-martin.pitt@ubuntu.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am trying to get raw BLE advertising information using Bluez tool
-such as hcitool in a quick and dirty way. Someone (in this post
-http://comments.gmane.org/gmane.linux.bluez.kernel/43422) modified the
-"print_advertising_devices" function in "tools/hcitool.c", and he
-claimed successfully printing out the advertising data from command
-"sudo hcitool lescan". The "hcitool.c" can be conveniently viewed here
-http://git.kernel.org/cgit/bluetooth/bluez.git/tree/tools/hcitool.c .
-I guess the pointer "info" with type of "le_advertising_info" (defined
-in "lib/hci.h") in  "print_advertising_devices" function has all
-advertising information . A closer look into the struct definition
+Hi Martin,
 
-typedef struct {
-uint8_t evt_type;
-uint8_t bdaddr_type;
-bdaddr_t bdaddr;
-uint8_t length;
-uint8_t data[0];
-} __attribute__ ((packed)) le_advertising_info;
+On Tue, Oct 20, 2015, Martin Pitt wrote:
+> When running a kernel without bluetooth support, bluetooth.service fails to
+> start with
+> 
+>     bluetoothd[1640]: Failed to access management interface
+>     bluetoothd[1640]: Adapter handling initialization failed
+>     systemd[1]: bluetooth.service: Main process exited, code=exited, status=1/FAILURE
+>     systemd[1]: Failed to start Bluetooth service.
+> 
+> This causes an unnecessary "degraded" state and more importantly breaks package
+> installation when the bluez package auto-starts the daemon.
+> 
+> Add a condition to only start the service if /sys/class/bluetooth exists.
+> 
+> https://launchpad.net/bugs/1506774
+> ---
+>  src/bluetooth.service.in | 1 +
+>  1 file changed, 1 insertion(+)
 
-reveals that the data array has zero length. In that case, where is
-the advertising data?
+Applied. Thanks.
+
+Johan
