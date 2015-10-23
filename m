@@ -1,92 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20151020065100.GA31695@t440s.lan>
-References: <1445296472-2276-1-git-send-email-jpawlowski@google.com>
-	<20151020053510.GA29126@t440s.P-661HNU-F1>
-	<CAD0=r8zA7SToebaN8_T=Mae6+9Ay1KTs2fuF8-+HXxLtytRS2g@mail.gmail.com>
-	<20151020065100.GA31695@t440s.lan>
-Date: Thu, 22 Oct 2015 22:51:02 -0700
-Message-ID: <CAD0=r8xFnwGo5NXDjCcEWLk9LPvuKhdg-8SU-CNVXKeBS_bJ5Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/device: Fix build on some platforms
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Jakub Pawlowski <jpawlowski@google.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: L2CAP_INFO_REQ Command rejected by remote side and disconnect
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5628D38B.6000808@rie.eu>
+Date: Fri, 23 Oct 2015 03:11:52 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <1F3BA345-9FE7-4237-B271-056CF1BA80A3@holtmann.org>
+References: <5628D38B.6000808@rie.eu>
+To: =?utf-8?Q?J=C3=BCrgen_Benjamin_Ronshausen?= <b.r@rie.eu>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Juergen,
 
-On Mon, Oct 19, 2015 at 11:51 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jakub,
->
-> On Mon, Oct 19, 2015, Jakub Pawlowski wrote:
->> On Mon, Oct 19, 2015 at 10:35 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> > Hi Jakub,
->> >
->> > On Mon, Oct 19, 2015, Jakub Pawlowski wrote:
->> >> due to type promotions in C this code was failing on some platforms.
->> >>
->> >> src/device.c:2016:8: error: format specifies type 'unsigned short' but the
->> >>       argument has type 'uint8_t' (aka 'unsigned char') [-Werror,-Wformat]
->> >>   properties, uuid_str);
->> >>   ^~~~~~~~~~
->> >> /build/falco/usr/include/bits/stdio2.h:39:7: note: expanded from macro 'sprintf'
->> >>                            __VA_ARGS__)
->> >>                            ^
->> >> ---
->> >>  src/device.c | 2 +-
->> >>  1 file changed, 1 insertion(+), 1 deletion(-)
->> >>
->> >> diff --git a/src/device.c b/src/device.c
->> >> index 0d3a655..b4e6d53 100644
->> >> --- a/src/device.c
->> >> +++ b/src/device.c
->> >> @@ -2015,7 +2015,7 @@ static void store_chrc(struct gatt_db_attribute *attr, void *user_data)
->> >>
->> >>       sprintf(handle, "%04hx", handle_num);
->> >>       bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
->> >> -     sprintf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%s", value_handle,
->> >> +     sprintf(value, GATT_CHARAC_UUID_STR ":%04hx:%02x:%s", value_handle,
->> >>                                                       properties, uuid_str);
->> >
->> > Wouldn't the right format specifier be %hhx in this case?
->>
->> So it was compiling fine on my machine, but when it was compiling for
->> all possible platforms for ChromeOS those errors came up.
->> The very proper thing would be probably to use "PRIu8" from <inttypes.h>
->> but then I found good explanation:
->>
->> ""printf() is a variadic function. Its optional arguments( and only
->> those ) get promoted according to default argument promotions(
->> 6.5.2.2. p6 ).
->>
->> Since you are asking for integers, integer promotions are applied in
->> this case, and types you mention get promoted to int. ( and not
->> unsigned int because C )""
->> source: http://stackoverflow.com/questions/26362386/why-is-the-format-specifier-for-uint8-t-and-uint16-t-the-same-u
->>
->> so I understand that this uint8_t will get promoted to int, and
->> displayed properly.
->> I manually tested it for 0, 127, and 255 and looks like it's
->> formatting just fine.
->
-> It's a bit unclear from your answer: do you still get warnings/errors
-> with %hhx or not? Looking at the warning you got:
->
-> "argument has type 'uint8_t' (aka 'unsigned char')"
->
-> and the printf(3):
->
-> "hh  A following integer conversion corresponds to a signed char or
-> unsigned char argument"
->
-> It'd still seem like %hhx shouldn't give a warning. Even though %x might
-> work too being able to be more specific in the type specification
-> doesn't seem like a bad thing.
+> i am working with Bluez 4.96, kernel 3.2 on embedded ARM.
+> 
+> Our embedded system is passive (discoverable, connectable) and gets contacted by bluetooth Access Points. With the older model Access Point the connection is disconnected from the Access Point. It seems to me that the Access Point doesn't implement L2CAP_INFO_REQ and L2CAP_INFO_RSP.
+> 
+> I used hcidump to investigate. Here is the part that i believe is the problem:
+> 
+> < ACL data: handle 1 flags 0x00 dlen 10
+>    L2CAP(s): Info req: type 2
+> > HCI Event: Read Remote Supported Features (0x0b) plen 11
+>    status 0x00 handle 1
+>    Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
+> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>    bdaddr 00:0B:53:20:04:09 mode 2 clkoffset 0x0000
+> > HCI Event: Command Status (0x0f) plen 4
+>    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>    handle 1 packets 2
+> > ACL data: handle 1 flags 0x02 dlen 10
+>    L2CAP(s): Command rej: reason 0
+>      Command not understood
+> 
+> So after the L2CAP connection is established the module asks the AP for the Extended Features Mask via Info req. The AP responds with command not understood.
+> 
+> Could i be right about that the AP doesn't implement the L2CAP_INFO_REQ and L2CAP_INFO_RSP? Or is this a timing issue, where the AP state machine doesn't expect to be asked about Extended Features Mask at this time?
+> 
+> The Access Point is a Sena Parani MSP 101/102 with software from Initium on it.
 
-Ok, I've build version with %hhx on all platforms we have and it
-worked well with no warnings. I'll update patch.
+I have no idea what the AP state machine might be, but we handle gracefully a remote devices that does not support the L2CAP_INFO_REQ and will still succeed with the connection.
 
->
-> Johan
+> Full dump:
+> 
+> > HCI Event: Connect Request (0x04) plen 10
+>    bdaddr 00:0B:53:20:04:09 class 0x020300 type ACL
+> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7
+>    bdaddr 00:0B:53:20:04:09 role 0x00
+>    Role: Master
+> > HCI Event: Command Status (0x0f) plen 4
+>    Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> > HCI Event: Role Change (0x12) plen 8
+>    status 0x21 bdaddr 00:0B:53:20:04:09 role 0x01
+>    Error: Role Change Not Allowed
+> > HCI Event: Connect Complete (0x03) plen 11
+>    status 0x00 handle 1 bdaddr 00:0B:53:20:04:09 type ACL encrypt 0x00
+> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+>    handle 1
+> > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+>    bdaddr 00:0B:53:20:04:09 mode 1
+> > HCI Event: Command Status (0x0f) plen 4
+>    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+> > HCI Event: Max Slots Change (0x1b) plen 3
+>    handle 1 slots 5
+> > ACL data: handle 1 flags 0x02 dlen 12
+>    L2CAP(s): Connect req: psm 1 scid 0x0086
+> < ACL data: handle 1 flags 0x00 dlen 16
+>    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0086 result 1 status 0
+>      Connection pending - No futher information available
+> < ACL data: handle 1 flags 0x00 dlen 10
+>    L2CAP(s): Info req: type 2
+> > HCI Event: Read Remote Supported Features (0x0b) plen 11
+>    status 0x00 handle 1
+>    Features: 0xff 0xff 0x8f 0x78 0x18 0x18 0x00 0x80
+> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>    bdaddr 00:0B:53:20:04:09 mode 2 clkoffset 0x0000
+> > HCI Event: Command Status (0x0f) plen 4
+>    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>    handle 1 packets 2
+> > ACL data: handle 1 flags 0x02 dlen 10
+>    L2CAP(s): Command rej: reason 0
+>      Command not understood
+> > HCI Event: Remote Name Req Complete (0x07) plen 255
+>    status 0x00 bdaddr 00:0B:53:20:04:09 name 'Promi-MSP_200409'
+> < ACL data: handle 1 flags 0x00 dlen 16
+>    L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0086 result 0 status 0
+>      Connection successful
+
+And that is what you can see here. We accept the connection even if the info req is not understood.
+
+> < ACL data: handle 1 flags 0x00 dlen 12
+>    L2CAP(s): Config req: dcid 0x0086 flags 0x00 clan 0
+
+Now we start the configuration procedure of the L2CAP channel and the remote side just does nothing.
+
+> > HCI Event: Number of Completed Packets (0x13) plen 5
+>    handle 1 packets 2
+> > HCI Event: Disconn Complete (0x05) plen 4
+>    status 0x00 handle 1 reason 0x13
+>    Reason: Remote User Terminated Connection
+
+Run this with timestamps and see how much time in between it really takes until the AP devices to drop the connection altogether.
+
+Regards
+
+Marcel
+
