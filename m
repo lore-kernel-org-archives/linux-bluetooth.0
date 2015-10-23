@@ -1,111 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 23 Oct 2015 11:33:19 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: s.syam@samsung.com
+Cc: linux-bluetooth@vger.kernel.org, Anurag B <biradar.a@samsung.com>,
+	Sreeraj Mohan <sreeraj.mk@samsung.com>,
+	Nagaraj DR <nagaraj.dr@samsung.com>,
+	=?utf-8?B?J+uwleywrOyXtCc=?= <chanyeol.park@samsung.com>,
+	jy0214.kim@samsung.com,
+	=?utf-8?B?J+yEnO2YuOyyoCc=?= <hocheol.seo@samsung.com>,
+	kubax.t.pawlak@intel.com
+Subject: Re: Kernel panic observed during sco-connection-disconnection
+Message-ID: <20151023083319.GA31574@t440s.lan>
+References: <000d01d10d6c$cca43e40$65ecbac0$@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <1445538593-5217-1-git-send-email-jpawlowski@google.com>
-References: <1445538593-5217-1-git-send-email-jpawlowski@google.com>
-Date: Fri, 23 Oct 2015 12:10:50 +0300
-Message-ID: <CABBYNZL27qkS7z0LaUdXKcUdHh-Bk+YzxKjp+Eec6SXK2mkxTA@mail.gmail.com>
-Subject: Re: [PATCH] profiles/gap: remove unnecessary code
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jakub Pawlowski <jpawlowski@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <000d01d10d6c$cca43e40$65ecbac0$@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Syam,
 
-On Thu, Oct 22, 2015 at 9:29 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
-> There is no need to register for service_added and service_removed.
-> device_remove will be always called before service_removed, so this
-> code is not needed.
-> ---
->  profiles/gap/gas.c | 42 ------------------------------------------
->  1 file changed, 42 deletions(-)
->
-> diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
-> index 819a967..877c4fd 100644
-> --- a/profiles/gap/gas.c
-> +++ b/profiles/gap/gas.c
-> @@ -53,7 +53,6 @@
->  struct gas {
->         struct btd_device *device;
->         struct gatt_db *db;
-> -       unsigned int db_id;
->         struct bt_gatt_client *client;
->         struct gatt_db_attribute *attr;
->  };
-> @@ -62,7 +61,6 @@ static GSList *devices;
->
->  static void gas_free(struct gas *gas)
->  {
-> -       gatt_db_unregister(gas->db, gas->db_id);
->         gatt_db_unref(gas->db);
->         bt_gatt_client_unref(gas->client);
->         btd_device_unref(gas->device);
-> @@ -269,43 +267,6 @@ static void foreach_gap_service(struct gatt_db_attribute *attr, void *user_data)
->         handle_gap_service(gas);
->  }
->
-> -static void service_added(struct gatt_db_attribute *attr, void *user_data)
-> -{
-> -       struct gas *gas = user_data;
-> -       bt_uuid_t uuid, gap_uuid;
-> -
-> -       if (!bt_gatt_client_is_ready(gas->client))
-> -               return;
-> -
-> -       gatt_db_attribute_get_service_uuid(attr, &uuid);
-> -       bt_uuid16_create(&gap_uuid, GAP_UUID16);
-> -
-> -       if (bt_uuid_cmp(&uuid, &gap_uuid))
-> -               return;
-> -
-> -       if (gas->attr) {
-> -               error("More than one GAP service added to device");
-> -               return;
-> -       }
-> -
-> -       DBG("GAP service added");
-> -
-> -       gas->attr = attr;
-> -       handle_gap_service(gas);
-> -}
-> -
-> -static void service_removed(struct gatt_db_attribute *attr, void *user_data)
-> -{
-> -       struct gas *gas = user_data;
-> -
-> -       if (gas->attr != attr)
-> -               return;
-> -
-> -       DBG("GAP service removed");
-> -
-> -       gas->attr = NULL;
-> -}
-> -
->  static int gap_driver_accept(struct btd_service *service)
->  {
->         struct btd_device *device = btd_service_get_device(service);
-> @@ -329,14 +290,11 @@ static int gap_driver_accept(struct btd_service *service)
->
->         /* Clean-up any old client/db and acquire the new ones */
->         gas->attr = NULL;
-> -       gatt_db_unregister(gas->db, gas->db_id);
->         gatt_db_unref(gas->db);
->         bt_gatt_client_unref(gas->client);
->
->         gas->db = gatt_db_ref(db);
->         gas->client = bt_gatt_client_ref(client);
-> -       gas->db_id = gatt_db_register(db, service_added, service_removed, gas,
-> -                                                                       NULL);
->
->         /* Handle the GAP services */
->         bt_uuid16_create(&gap_uuid, GAP_UUID16);
-> --
-> 2.5.0
+On Fri, Oct 23, 2015, s.syam@samsung.com wrote:
+> We have observed one kernel panic during the sco close.
+> The panic logs has been given below. Further analysis we could see that  invalid memory access is happening at 
+> sco_pi(sk)->conn->hcon = NULL; in __sco_sock_close().
+> 
+> It will be great if someone analyses and provide the fix/clue for this issue.
+> Thanks for your time.
+> 
+> 
+> Code:
+> static void __sco_sock_close(struct sock *sk)
+> {
+> 	BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
+> 
+> 	switch (sk->sk_state) {
+> 	case BT_LISTEN:
+> 		sco_sock_cleanup_listen(sk);
+> 		break;
+> 
+> 	case BT_CONNECTED:
+> 	case BT_CONFIG:
+> 		if (sco_pi(sk)->conn->hcon) {
+> 			sk->sk_state = BT_DISCONN;
+> 			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+> 			hci_conn_drop(sco_pi(sk)->conn->hcon);  
+> 			sco_pi(sk)->conn->hcon = NULL; //Invalid memory access happen here.
+> 		} else
+> 			sco_chan_del(sk, ECONNRESET);
+> 		break;
+> 
+> 	case BT_CONNECT2:
+> 	case BT_CONNECT:
+> 	case BT_DISCONN:
+> ...
+> ...
+> 	}
+> }
+> 
+> Logs:
+> Oct 21 23:35:12 alert Kernel: [  175.323507] Unable to handle kernel NULL pointer dereference at virtual address 00000000
+> .....
+> Oct 21 23:35:12 warn Kernel: [  175.338344] [<c0866be4>] (__sco_sock_close+0x1ec/0x230) from [<c0866d20>] (sco_sock_close+0x20/0x34)
+> Oct 21 23:35:12 warn Kernel: [  175.338478] [<c0866d20>] (sco_sock_close+0x20/0x34) from [<c0866d78>] (sco_sock_release+0x44/0x100)
+> Oct 21 23:35:12 warn Kernel: [  175.338614] [<c0866d78>] (sco_sock_release+0x44/0x100) from [<c0721ad0>] (sock_release+0x20/0xc4)
+> Oct 21 23:35:12 warn Kernel: [  175.338745] [<c0721ad0>] (sock_release+0x20/0xc4) from [<c07221e4>] (sock_close+0x20/0x2c)
+> Oct 21 23:35:12 warn Kernel: [  175.338874] [<c07221e4>] (sock_close+0x20/0x2c) from [<c02741d0>] (fput+0x11c/0x230)
+> Oct 21 23:35:12 warn Kernel: [  175.338994] [<c02741d0>] (fput+0x11c/0x230) from [<c0270fa8>] (filp_close+0x70/0x7c)
+> Oct 21 23:35:12 warn Kernel: [  175.339110] [<c0270fa8>] (filp_close+0x70/0x7c) from [<c0271064>] (sys_close+0xb0/0xf0)
+> Oct 21 23:35:12 warn Kernel: [  175.339232] [<c0271064>] (sys_close+0xb0/0xf0) from [<c0105d9c>] (__sys_trace_return+0x0/0x24) 
 
-Ive done this already, perhaps you forgot to pull?
+You'll probably want to take a look at the SCO socket patch set that
+Kuba sent in the beginning of this month:
 
+	[PATCH 0/5] Few proposed fixes to stop crashes on fast SCO disconnec
 
--- 
-Luiz Augusto von Dentz
+Particularly his second patch looks like something that could be related
+to this.
+
+Johan
