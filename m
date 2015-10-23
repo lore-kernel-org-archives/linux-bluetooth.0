@@ -1,70 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: s.syam@samsung.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Anurag B <biradar.a@samsung.com>,
-	Sreeraj Mohan <sreeraj.mk@samsung.com>,
-	Nagaraj DR <nagaraj.dr@samsung.com>,
-	=?UTF-8?B?J+uwleywrOyXtCc=?= <chanyeol.park@samsung.com>,
-	jy0214.kim@samsung.com,
-	=?UTF-8?B?J+yEnO2YuOyyoCc=?= <hocheol.seo@samsung.com>
-Subject: Kernel panic observed during sco-connection-disconnection
-Date: Fri, 23 Oct 2015 13:58:19 +0530
-Message-id: <000d01d10d6c$cca43e40$65ecbac0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+In-Reply-To: <CAAu3APYJ+ro+aC6L7CCCxvg9rBtQAwewt_=ufvSuf6FGq+0c2g@mail.gmail.com>
+References: <CAAu3APbFYSQBpwy72Niq-d-A8e9TM_vd2SJb1iifAOUzhbzWAA@mail.gmail.com>
+	<CABBYNZL3g+PBxby7BpfAefqGSzJBRmEVo7bve92FVLMKPyQdGA@mail.gmail.com>
+	<CAAu3APYJ+ro+aC6L7CCCxvg9rBtQAwewt_=ufvSuf6FGq+0c2g@mail.gmail.com>
+Date: Fri, 23 Oct 2015 11:08:52 +0300
+Message-ID: <CABBYNZ+355_6bTCCQPt0FHMAT0xOLs_b4Ji1-VDLXe6YaAbnjA@mail.gmail.com>
+Subject: Re: Python reading Eddystone beacons
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Barry Byford <31baz66@gmail.com>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Barry,
 
-We have observed one kernel panic during the sco close.
-The panic logs has been given below. Further analysis we could see that  invalid memory access is happening at 
-sco_pi(sk)->conn->hcon = NULL; in __sco_sock_close().
+On Thu, Oct 22, 2015 at 3:47 PM, Barry Byford <31baz66@gmail.com> wrote:
+> Hi Luiz
+>
+> On 21 October 2015 at 09:31, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> On Wed, Oct 21, 2015 at 1:26 AM, Barry Byford <31baz66@gmail.com> wrote:
+>>> I’m looking to use a Raspberry Pi running the latest Raspbian Jessie operation
+>>> system with Bluez 5.23.
+>>> The way that I’m currently doing the scanning for the beacon data is
+>>> with this bash
+>>> script:
+>>> #!/bin/bash
+>>> sudo hcitool lescan --duplicates 1>/dev/null &
+>>> trap "sudo kill $!" EXIT
+>>> sudo hcidump --raw
+>>>
+>>> Should I be able to get the Eddystone beacon payload using Python with
+>>> the D-Bus API
+>>> in Bluez 5.23?
+>>> Is there a good tutorial/example that I could look at?
+>>
+>> bluetoothctl does actually print the advertising data:
+>>
+>> [bluetooth]# scan on
+>> Discovery started
+>> [CHG] Controller XX:XX:XX:XX:XX:XX Discovering: yes
+>> [CHG] Device XX:XX:XX:XX:XX:XX RSSI: -34
+>> [CHG] Device XX:XX:XX:XX:XX:XX Name: Test beacon
+>> [CHG] Device XX:XX:XX:XX:XX:XX Alias: Test beacon
+>> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Key: fed8
+>> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x00
+>> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x20
+>> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x02
+>> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x30
+>> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x31
+>> [CHG] Device XX:XX:XX:XX:XX:XX ServiceData Value: 0x08
+>
+> Thanks for pointing me in the direction of bluetoothctl. However I'm
+> not getting my beacon advertising data out with bluetoothctl.
+> It reports things like my phone that is waiting to be paired but no beacons.
+>
+> What is the best way to get debug information out?.
 
-It will be great if someone analyses and provide the fix/clue for this issue.
-Thanks for your time.
+I forgot to mention it was introduced in 5.31, so you probably need to
+update if you want to use these properties.
+
+>
+>> It is basically using the properties ServiceData and ManufacturerData:
+>>
+>> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/device-api.txt
+>>
+>> With this all you need to do is to listen for PropertiesChanged and
+>> decode the values,
+> I will get the bluetoothctl working before looking at this but thanks for
+> the information this was what I was looking for.
+>
+>> it would probably be good idea to have a python
+>> sample of decoding eddystone beacons, or beacons in general.
+> I would certainly find it helpful. :-)
+>
+> Thanks,
+> Barry
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-Code:
-static void __sco_sock_close(struct sock *sk)
-{
-	BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
 
-	switch (sk->sk_state) {
-	case BT_LISTEN:
-		sco_sock_cleanup_listen(sk);
-		break;
-
-	case BT_CONNECTED:
-	case BT_CONFIG:
-		if (sco_pi(sk)->conn->hcon) {
-			sk->sk_state = BT_DISCONN;
-			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
-			hci_conn_drop(sco_pi(sk)->conn->hcon);  
-			sco_pi(sk)->conn->hcon = NULL; //Invalid memory access happen here.
-		} else
-			sco_chan_del(sk, ECONNRESET);
-		break;
-
-	case BT_CONNECT2:
-	case BT_CONNECT:
-	case BT_DISCONN:
-...
-...
-	}
-}
-
-Logs:
-Oct 21 23:35:12 alert Kernel: [  175.323507] Unable to handle kernel NULL pointer dereference at virtual address 00000000
-.....
-Oct 21 23:35:12 warn Kernel: [  175.338344] [<c0866be4>] (__sco_sock_close+0x1ec/0x230) from [<c0866d20>] (sco_sock_close+0x20/0x34)
-Oct 21 23:35:12 warn Kernel: [  175.338478] [<c0866d20>] (sco_sock_close+0x20/0x34) from [<c0866d78>] (sco_sock_release+0x44/0x100)
-Oct 21 23:35:12 warn Kernel: [  175.338614] [<c0866d78>] (sco_sock_release+0x44/0x100) from [<c0721ad0>] (sock_release+0x20/0xc4)
-Oct 21 23:35:12 warn Kernel: [  175.338745] [<c0721ad0>] (sock_release+0x20/0xc4) from [<c07221e4>] (sock_close+0x20/0x2c)
-Oct 21 23:35:12 warn Kernel: [  175.338874] [<c07221e4>] (sock_close+0x20/0x2c) from [<c02741d0>] (fput+0x11c/0x230)
-Oct 21 23:35:12 warn Kernel: [  175.338994] [<c02741d0>] (fput+0x11c/0x230) from [<c0270fa8>] (filp_close+0x70/0x7c)
-Oct 21 23:35:12 warn Kernel: [  175.339110] [<c0270fa8>] (filp_close+0x70/0x7c) from [<c0271064>] (sys_close+0xb0/0xf0)
-Oct 21 23:35:12 warn Kernel: [  175.339232] [<c0271064>] (sys_close+0xb0/0xf0) from [<c0105d9c>] (__sys_trace_return+0x0/0x24) 
-Regards,
-Syam
-
+-- 
+Luiz Augusto von Dentz
