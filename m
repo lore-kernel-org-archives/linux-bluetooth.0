@@ -1,75 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH 5/5] Bluetooth: Fix crash on fast disconnect of SCO
+Subject: Re: [PATCH] Bluetooth: remove btusb_work related workqueue
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1444063459-28577-6-git-send-email-kubax.t.pawlak@intel.com>
-Date: Mon, 26 Oct 2015 05:07:19 +0900
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6CF3DA50-6A4B-4BDE-8822-B9D6DBCBE629@holtmann.org>
-References: <088CC8BACB3382439E91D9919CE350243655EB71@IRSMSX107.ger.corp.intel.com> <1444063459-28577-1-git-send-email-kubax.t.pawlak@intel.com> <1444063459-28577-6-git-send-email-kubax.t.pawlak@intel.com>
-To: Kuba Pawlak <kubax.t.pawlak@intel.com>
+In-Reply-To: <088CC8BACB3382439E91D9919CE3502436568BA4@IRSMSX107.ger.corp.intel.com>
+Date: Mon, 26 Oct 2015 04:56:54 +0900
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <F4DF561E-1F0B-44A1-8275-93180F23B34D@holtmann.org>
+References: <1444316120-22893-1-git-send-email-kubax.t.pawlak@intel.com> <7D38034D-BDC6-4FD9-931E-7518FA2D20A4@holtmann.org> <088CC8BACB3382439E91D9919CE3502436568B42@IRSMSX107.ger.corp.intel.com> <6D48126C-1328-4466-9415-D48367F574C9@holtmann.org> <F79E09E1-497A-46AE-879B-F4AF321285AC@holtmann.org> <088CC8BACB3382439E91D9919CE3502436568BA4@IRSMSX107.ger.corp.intel.com>
+To: "Pawlak, KubaX T" <kubax.t.pawlak@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Kuba,
 
-> Fix a crash that may happen when a connection is closed before it was fully
-> established. Mapping conn->hcon was released by shutdown function, but it
-> is still referenced in (not yet finished) connection established handling
-> function.
+>>>>>> Workqueue handling btusb_work is no longer needed as btusb_notify
+>>>>>> can sleep.
+>>>>>> 
+>>>>>> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
+>>>>>> ---
+>>>>>> drivers/bluetooth/btusb.c | 14 +++++---------
+>>>>>> 1 file changed, 5 insertions(+), 9 deletions(-)
+>>>>>> 
+>>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>>>> index
+>>>>> 
+>> 247b1062cb9affc67d9e7f7a0234c167f90f4b79..98c616ddd7bac53b2d5d5f8b3dcc
+>>>>> 2dca2b201e63 100644
+>>>>>> --- a/drivers/bluetooth/btusb.c
+>>>>>> +++ b/drivers/bluetooth/btusb.c
+>>>>>> @@ -350,7 +350,6 @@ struct btusb_data {
+>>>>>> 
+>>>>>> 	unsigned long flags;
+>>>>>> 
+>>>>>> -	struct work_struct work;
+>>>>>> 	struct work_struct waker;
+>>>>>> 
+>>>>>> 	struct usb_anchor deferred;
+>>>>>> @@ -980,7 +979,6 @@ static int btusb_close(struct hci_dev *hdev)
+>>>>>> 
+>>>>>> 	BT_DBG("%s", hdev->name);
+>>>>>> 
+>>>>>> -	cancel_work_sync(&data->work);
+>>>>>> 	cancel_work_sync(&data->waker);
+>>>>>> 
+>>>>>> 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+>>>>>> @@ -1181,6 +1179,8 @@ static int btusb_send_frame(struct hci_dev
+>> *hdev,
+>>>>> struct sk_buff *skb)
+>>>>>> 	return -EILSEQ;
+>>>>>> }
+>>>>>> 
+>>>>>> +static void btusb_sco_change(struct btusb_data *data);
+>>>>>> +
+>>>>> 
+>>>>> do we need this forward declaration or can we just move code around to
+>> avoid
+>>>>> it?
+>>>>> 
+>>>>>> static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+>>>>>> {
+>>>>>> 	struct btusb_data *data = hci_get_drvdata(hdev);
+>>>>>> @@ -1189,7 +1189,7 @@ static void btusb_notify(struct hci_dev *hdev,
+>>>>> unsigned int evt)
+>>>>>> 
+>>>>>> 	if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
+>>>>>> 		data->sco_num = hci_conn_num(hdev, SCO_LINK);
+>>>>>> -		schedule_work(&data->work);
+>>>>>> +		btusb_sco_change(data);
+>>>>>> 	}
+>>>>>> }
+>>>>>> 
+>>>>>> @@ -1236,9 +1236,8 @@ static inline int __set_isoc_interface(struct
+>> hci_dev
+>>>>> *hdev, int altsetting)
+>>>>>> 	return 0;
+>>>>>> }
+>>>>>> 
+>>>>>> -static void btusb_work(struct work_struct *work)
+>>>>>> +static void btusb_sco_change(struct btusb_data *data)
+>>>>>> {
+>>>>>> -	struct btusb_data *data = container_of(work, struct btusb_data,
+>>>>> work);
+>>>>>> 	struct hci_dev *hdev = data->hdev;
+>>>>>> 	int new_alts;
+>>>>>> 	int err;
+>>>>>> @@ -2618,7 +2617,6 @@ static int btusb_probe(struct usb_interface
+>> *intf,
+>>>>>> 	data->udev = interface_to_usbdev(intf);
+>>>>>> 	data->intf = intf;
+>>>>>> 
+>>>>>> -	INIT_WORK(&data->work, btusb_work);
+>>>>>> 	INIT_WORK(&data->waker, btusb_waker);
+>>>>>> 	init_usb_anchor(&data->deferred);
+>>>>>> 	init_usb_anchor(&data->tx_anchor);
+>>>>>> @@ -2848,8 +2846,6 @@ static int btusb_suspend(struct usb_interface
+>> *intf,
+>>>>> pm_message_t message)
+>>>>>> 		return -EBUSY;
+>>>>>> 	}
+>>>>>> 
+>>>>>> -	cancel_work_sync(&data->work);
+>>>>>> -
+>>>>>> 	btusb_stop_traffic(data);
+>>>>>> 	usb_kill_anchored_urbs(&data->tx_anchor);
+>>>>>> 
+>>>>>> @@ -2922,7 +2918,7 @@ static int btusb_resume(struct usb_interface
+>> *intf)
+>>>>>> 	play_deferred(data);
+>>>>>> 	clear_bit(BTUSB_SUSPENDING, &data->flags);
+>>>>>> 	spin_unlock_irq(&data->txlock);
+>>>>>> -	schedule_work(&data->work);
+>>>>>> +	btusb_sco_change(data);
+>>>>> 
+>>>>> Can we actually sleep in the resume callbacks? I think so, but I have not
+>> testing
+>>>>> runtime power management in a while.
+>>>> 
+>>>> Apparently we can't, so workqueue needs to stay and this patch is invalid.
+>>> 
+>>> I think that removing the usage of the workqueue in btusb_notify is still a
+>> good thing since it reduces the latency when establishing SCO connections.
+>> 
+>> actually I wonder if the call to usb_set_interface is needed on resume in the
+>> first place. Maybe this is actually not needed and we just need to restart the
+>> URBs.
+>> 
+>> Do you have the chance to test and see if the alternate setting actually changed
+>> over resume?
 > 
-> [ 4635.254073] BUG: unable to handle kernel NULL pointer dereference at 00000013
-> [ 4635.262058] IP: [<c11659f0>] memcmp+0xe/0x25
-> [ 4635.266835] *pdpt = 0000000024190001 *pde = 0000000000000000
-> [ 4635.273261] Oops: 0000 [#1] PREEMPT SMP
-> [ 4635.277652] Modules linked in: evdev ecb vfat fat libcomposite usb2380 isofs zlib_inflate rfcomm(O) udc_core bnep(O) btusb(O) btbcm(O) btintel(O) bluetooth(O) cdc_acm arc4 uinput hid_mule
-> [ 4635.321761] Pid: 363, comm: kworker/u:2H Tainted: G           O 3.8.0-119.1-plk-adaptation-byt-ivi-brd #1
-> [ 4635.332642] EIP: 0060:[<c11659f0>] EFLAGS: 00010206 CPU: 0
-> [ 4635.338767] EIP is at memcmp+0xe/0x25
-> [ 4635.342852] EAX: e4720678 EBX: 00000000 ECX: 00000006 EDX: 00000013
-> [ 4635.349849] ESI: 00000000 EDI: fb85366c EBP: e40c7dc0 ESP: e40c7db4
-> [ 4635.356846]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
-> [ 4635.362873] CR0: 8005003b CR2: 00000013 CR3: 24191000 CR4: 001007f0
-> [ 4635.369869] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
-> [ 4635.376865] DR6: ffff0ff0 DR7: 00000400
-> [ 4635.381143] Process kworker/u:2H (pid: 363, ti=e40c6000 task=e40c5510 task.ti=e40c6000)
-> [ 4635.390080] Stack:
-> [ 4635.392319]  e4720400 00000000 fb85366c e40c7df4 fb842285 e40c7de2 fb853200 00000013
-> [ 4635.401003]  e3f101c4 e4720678 e3f101c0 e403be0a e40c7dfc e416a000 e403be0a fb85366c
-> [ 4635.409692]  e40c7e1c fb820186 020f6c00 e47c49ac e47c4008 00000000 e416a000 e47c402c
-> [ 4635.418380] Call Trace:
-> [ 4635.421153]  [<fb842285>] sco_connect_cfm+0xff/0x236 [bluetooth]
-> [ 4635.427893]  [<fb820186>] hci_sync_conn_complete_evt.clone.101+0x227/0x268 [bluetooth]
-> [ 4635.436758]  [<fb82370f>] hci_event_packet+0x1caa/0x21d3 [bluetooth]
-> [ 4635.443859]  [<c106231f>] ? trace_hardirqs_on+0xb/0xd
-> [ 4635.449502]  [<c1375b8a>] ? _raw_spin_unlock_irqrestore+0x42/0x59
-> [ 4635.456340]  [<fb814b67>] hci_rx_work+0xb9/0x350 [bluetooth]
-> [ 4635.462663]  [<c1039f1e>] ? process_one_work+0x17b/0x2e6
-> [ 4635.468596]  [<c1039f77>] process_one_work+0x1d4/0x2e6
-> [ 4635.474333]  [<c1039f1e>] ? process_one_work+0x17b/0x2e6
-> [ 4635.480294]  [<fb814aae>] ? hci_cmd_work+0xda/0xda [bluetooth]
-> [ 4635.486810]  [<c103a3fa>] worker_thread+0x171/0x20f
-> [ 4635.492257]  [<c10456c5>] ? complete+0x34/0x3e
-> [ 4635.497219]  [<c103ea06>] kthread+0x90/0x95
-> [ 4635.501888]  [<c103a289>] ? manage_workers+0x1df/0x1df
-> [ 4635.507628]  [<c1376537>] ret_from_kernel_thread+0x1b/0x28
-> [ 4635.513755]  [<c103e976>] ? __init_kthread_worker+0x42/0x42
-> [ 4635.519975] Code: 74 0d 3c 79 74 04 3c 59 75 0c c6 02 01 eb 03 c6 02 00 31 c0 eb 05 b8 ea ff ff ff 5d c3 55 89 e5 57 56 53 31 db eb 0e 0f b6 34 18 <0f> b6 3c 1a 43 29 fe 75 07 49 85 c9 7f
-> [ 4635.541264] EIP: [<c11659f0>] memcmp+0xe/0x25 SS:ESP 0068:e40c7db4
-> [ 4635.548166] CR2: 0000000000000013
-> [ 4635.552177] ---[ end trace e05ce9b8ce6182f6 ]---
-> [
-> 
-> Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
-> ---
-> net/bluetooth/sco.c | 5 +++++
-> 1 file changed, 5 insertions(+)
+> Our platform does not support suspend/resume. I have an Ellisys analyser with external WP module connected through it over USB, so I can trace what altsettings are set and when. I will look into a possibility of testing this using a laptop, but I don’t know how to easily make phone open SCO channel, so I don't need to port our PulseAudio.
 
-this patch no longer applies cleanly when skipping patch 4/5. Please resend as first patch since I think it is actually fine.
+any update here? I would really get of this workqueue usage in btusb driver.
 
 Regards
 
 Marcel
-
 
