@@ -1,47 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove unneeded parenthesis around MSG_OOB
-Date: Sun, 25 Oct 2015 22:45:18 +0100
-Message-Id: <1445809518-44473-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 25 Oct 2015 21:27:21 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	kernel@pengutronix.de,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Subject: Re: [RFC bluetooth-next 1/2] bluetooth: 6lowpan: avoid endless loop
+Message-ID: <20151025202716.GA6435@omega>
+References: <1445698256-10407-1-git-send-email-alex.aring@gmail.com>
+ <1445698256-10407-2-git-send-email-alex.aring@gmail.com>
+ <D10520FE-A8A8-49D9-B6BA-E6682CBCFB42@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <D10520FE-A8A8-49D9-B6BA-E6682CBCFB42@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There are two checks that are still using (MSG_OOB) instead of just
-MSG_OOB and so lets just fix them.
+Hi Marcel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/af_bluetooth.c | 2 +-
- net/bluetooth/hci_sock.c     | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+On Mon, Oct 26, 2015 at 05:11:37AM +0900, Marcel Holtmann wrote:
+> Hi Alex,
+> 
+> > When -EAGAIN as return value for receive handling will do a retry of
+> > parsing I can trigger a endless loop when iphc decompression e.g.
+> > returns an errno because some missing function "-ENOTSUPP" or something
+> > else. Somebody from outside can trigger an endless loop when sending a
+> > an IPHC header which triggers this behaviour.
+> > 
+> > NOTE: This really depends only if -EAGAIN means "try again to call the
+> > receive handler with the skb". Sometimes we also drop (and kfree) the
+> > skb, I think something is broken there... depends on the error branch.
+> > When receiving failed simple free skb and return errno (which is not
+> > -EAGAIN).
+> 
+> I am lost on this comment, you need to explain this more and might actually want to put a comment in the code on this.
+> 
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index c55717929213..a3bffd1ec2b4 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -221,7 +221,7 @@ int bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 
- 	BT_DBG("sock %p sk %p len %zu", sock, sk, len);
- 
--	if (flags & (MSG_OOB))
-+	if (flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
- 	skb = skb_recv_datagram(sk, flags, noblock, &err);
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 77e816f91a61..b1eb8c09a660 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -1001,7 +1001,7 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 
- 	BT_DBG("sock %p, sk %p", sock, sk);
- 
--	if (flags & (MSG_OOB))
-+	if (flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
- 	if (sk->sk_state == BT_CLOSED)
--- 
-2.4.3
+I am sorry, what I meant there is "How exactly does the '.recv' of
+'l2cap_ops'" handle an -EAGAIN errno. If this means the callback will be
+called again with the same parameters (What I am thinking of, when I
+return -EAGAIN) then we have an endless loop which can be triggered from
+the outside by sending an invalid/not supported IPHC 6LoWPAN header.
+Because the function "chan_recv_cb" (which is ".recv") will call
+recv_pkt (which return -EAGAIN on failure) and this function will call
+ret = iphc_decompress(local_skb, dev, chan), which parse the IPHC Header
+(can occur errno on invalid frames), then the complete calling chain
+will return -EAGAIN at ".recv" callback of l2cap_ops". The IPHC header
+comming from the "outside", everybody can manipulate this data.
 
+Is it more clear now what I try to explained here?
+
+First look on ".recv" callback handling in "net/bluetooth/l2cap_core.c"
+a return of -EAGAIN, will not try to call the ".recv" callback with the
+same parameters again.
+
+Anyway, we should not use -EAGAIN here, or? Simple return the errno from
+function which returns it.
+
+- Alex
