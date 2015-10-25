@@ -1,105 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH 4/5] Bluetooth: Fix locking of SCO channel to connection
+Subject: Re: [PATCH 3/5] Bluetooth: Fix locking issue during fast SCO reconnection.
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1444063459-28577-5-git-send-email-kubax.t.pawlak@intel.com>
-Date: Mon, 26 Oct 2015 05:07:29 +0900
+In-Reply-To: <1444063459-28577-4-git-send-email-kubax.t.pawlak@intel.com>
+Date: Mon, 26 Oct 2015 05:07:26 +0900
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <11198892-806D-45FF-975E-FF28F5AD555B@holtmann.org>
-References: <088CC8BACB3382439E91D9919CE350243655EB71@IRSMSX107.ger.corp.intel.com> <1444063459-28577-1-git-send-email-kubax.t.pawlak@intel.com> <1444063459-28577-5-git-send-email-kubax.t.pawlak@intel.com>
+Message-Id: <4AF1F8CF-CDAF-444C-9D8E-424CDD9EC478@holtmann.org>
+References: <088CC8BACB3382439E91D9919CE350243655EB71@IRSMSX107.ger.corp.intel.com> <1444063459-28577-1-git-send-email-kubax.t.pawlak@intel.com> <1444063459-28577-4-git-send-email-kubax.t.pawlak@intel.com>
 To: Kuba Pawlak <kubax.t.pawlak@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Kuba,
 
-you need a commit message explaining this issue. Just a subject line is not enough.
-
+> When SCO connection is requested and disconnected fast, there is a change
+> that sco_sock_shutdown is going to preempt thread started in sco_connect_cfm.
+> When this happens struct sock sk may be removed but a pointer to it is still
+> held in sco_conn_ready, where embedded spinlock is used. If it is used, but
+> struct sock has been removed, it will crash.
+> 
+> Block connection object, which will prevent struct sock from being removed
+> and give connection process chance to finish.
+> 
+> BUG: spinlock bad magic on CPU#0, kworker/u:2H/319
+> lock: 0xe3e99434, .magic: f3000000, .owner: (īŋŊīŋŊīŋŊ/0, .owner_cpu: -203804160
+> Pid: 319, comm: kworker/u:2H Tainted: G           O 3.8.0-115.1-plk-adaptation-byt-ivi-brd #1
+> Call Trace:
+> [<c1155659>] ? do_raw_spin_lock+0x19/0xe9
+> [<fb75354f>] ? sco_connect_cfm+0x92/0x236 [bluetooth]
+> [<fb731dbc>] ? hci_sync_conn_complete_evt.clone.101+0x18b/0x1cb [bluetooth]
+> [<fb734ee7>] ? hci_event_packet+0x1acd/0x21a6 [bluetooth]
+> [<c1041095>] ? finish_task_switch+0x50/0x89
+> [<c1349a2e>] ? __schedule+0x638/0x6b8
+> [<fb727918>] ? hci_rx_work+0xb9/0x2b8 [bluetooth]
+> [<c103760a>] ? queue_delayed_work_on+0x21/0x2a
+> [<c1035df9>] ? process_one_work+0x157/0x21b
+> [<fb72785f>] ? hci_cmd_work+0xef/0xef [bluetooth]
+> [<c1036217>] ? worker_thread+0x16e/0x20a
+> [<c10360a9>] ? manage_workers+0x1cf/0x1cf
+> [<c103a0ef>] ? kthread+0x8d/0x92
+> [<c134adf7>] ? ret_from_kernel_thread+0x1b/0x28
+> [<c103a062>] ? __init_kthread_worker+0x24/0x24
+> BUG: unable to handle kernel NULL pointer dereference at   (null)
+> IP: [<  (null)>]   (null)
+> *pdpt = 00000000244e1001 *pde = 0000000000000000
+> Oops: 0010 [#1] PREEMPT SMP
+> Modules linked in: evdev ecb rfcomm(O) libcomposite usb2380 udc_core bnep(O) btusb(O) btbcm(O) cdc_acm btintel(O) bluetooth(O) arc4 uinput hid_multitouch usbhid hid iwlmvm(O)e
+> Pid: 319, comm: kworker/u:2H Tainted: G           O 3.8.0-115.1-plk-adaptation-byt-ivi-brd #1
+> EIP: 0060:[<00000000>] EFLAGS: 00010246 CPU: 0
+> EIP is at 0x0
+> EAX: e3e99400 EBX: e3e99400 ECX: 00000100 EDX: 00000000
+> ESI: e3e99434 EDI: fb763ce0 EBP: e49b9e44 ESP: e49b9e14
+> DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+> CR0: 8005003b CR2: 00000000 CR3: 24444000 CR4: 001007f0
+> DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+> DR6: ffff0ff0 DR7: 00000400
+> Process kworker/u:2H (pid: 319, ti=e49b8000 task=e4ab9030 task.ti=e49b8000)
+> Stack:
+> fb75355b 00000246 fb763900 22222222 22222222 22222222 e3f94460 e3ca7c0a
+> e49b9e4c e3f34c00 e3ca7c0a fb763ce0 e49b9e6c fb731dbc 02000246 e4cec85c
+> e4cec008 00000000 e3f34c00 e4cec000 e3c2ce00 0000002c e49b9ed0 fb734ee7
+> Call Trace:
+> [<fb75355b>] ? sco_connect_cfm+0x9e/0x236 [bluetooth]
+> [<fb731dbc>] ? hci_sync_conn_complete_evt.clone.101+0x18b/0x1cb [bluetooth]
+> [<fb734ee7>] ? hci_event_packet+0x1acd/0x21a6 [bluetooth]
+> [<c1041095>] ? finish_task_switch+0x50/0x89
+> [<c1349a2e>] ? __schedule+0x638/0x6b8
+> [<fb727918>] ? hci_rx_work+0xb9/0x2b8 [bluetooth]
+> [<c103760a>] ? queue_delayed_work_on+0x21/0x2a
+> [<c1035df9>] ? process_one_work+0x157/0x21b
+> [<fb72785f>] ? hci_cmd_work+0xef/0xef [bluetooth]
+> [<c1036217>] ? worker_thread+0x16e/0x20a
+> [<c10360a9>] ? manage_workers+0x1cf/0x1cf
+> [<c103a0ef>] ? kthread+0x8d/0x92
+> [<c134adf7>] ? ret_from_kernel_thread+0x1b/0x28
+> [<c103a062>] ? __init_kthread_worker+0x24/0x24
+> Code:  Bad EIP value.
+> EIP: [<00000000>] 0x0 SS:ESP 0068:e49b9e14
+> CR2: 0000000000000000
+> ---[ end trace 942a6577c0abd725 ]---
+> 
 > Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
 > ---
-> net/bluetooth/sco.c | 14 +++++++++-----
-> 1 file changed, 9 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index 75f843d5423a4750f18f698a57130c6a96f71f23..bcc3c6d8066bba0b6d801fe8182734636bf6d94a 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -167,17 +167,19 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
-> 	/* Kill socket */
-> 	sco_conn_lock(conn);
-> 	sk = conn->sk;
-> -	sco_conn_unlock(conn);
-> 
-> 	if (sk) {
-> 		sock_hold(sk);
-> 		bh_lock_sock(sk);
-> +		sco_conn_unlock(conn);
-> 		sco_sock_clear_timer(sk);
-> 		sco_chan_del(sk, err);
-> 		bh_unlock_sock(sk);
-> 		sco_sock_kill(sk);
-> 		sock_put(sk);
-> 	}
-> +	else
-> +		sco_conn_unlock(conn);
+> net/bluetooth/sco.c | 5 +++++
+> 1 file changed, 5 insertions(+)
 
-so the coding style is all off here. That needs fixing first.
-
-I however wonder if this would not be cleaner to read in the end.
-
-	if (sk) {
-		sock_hold(sk);
-		bh_lock_sock(sk);
-	}
-
-	sco_conn_unlock(conn);
-
-	if (sk) }
-		sco_sock_clear_timer(sk);
-		..
-	}
-
-And then again, why do we need bh_lock_sock in the first place. The packet process running is no longer running in a tasklet in the first place. I am pretty certain that this is not needed. Might want to look into getting rid of the bh_lock_sock and replacing them with something saner.
-
-> 
-> 	hcon->sco_data = NULL;
-> 	kfree(conn);
-> @@ -1012,10 +1014,13 @@ static int sco_sock_release(struct socket *sock)
-> static void sco_conn_ready(struct sco_conn *conn)
-> {
-> 	struct sock *parent;
-> -	struct sock *sk = conn->sk;
-> +	struct sock *sk;
-> 
-> 	BT_DBG("conn %p", conn);
-> 
-> +	sco_conn_lock(conn);
-> +	sk = conn->sk;
-> +
-> 	if (sk) {
-> 		sco_sock_clear_timer(sk);
-> 		bh_lock_sock(sk);
-> @@ -1023,7 +1028,6 @@ static void sco_conn_ready(struct sco_conn *conn)
-> 		sk->sk_state_change(sk);
-> 		bh_unlock_sock(sk);
-> 	} else {
-> -		sco_conn_lock(conn);
-> 
-> 		parent = sco_get_sock_listen(&conn->hcon->src);
-> 		if (!parent) {
-> @@ -1058,9 +1062,9 @@ static void sco_conn_ready(struct sco_conn *conn)
-> 		parent->sk_data_ready(parent);
-> 
-> 		bh_unlock_sock(parent);
-> -
-> -		sco_conn_unlock(conn);
-> 	}
-> +
-> +	sco_conn_unlock(conn);
-> }
-
-This one seems fine, However again, we are no longer running in a tasklet, so bh_lock_sock seems like something to be replaced.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
