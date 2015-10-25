@@ -1,79 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH 1/5] Bluetooth: Fix crash on SCO disconnect
+Subject: Re: [PATCH 5/5] Bluetooth: Fix crash on fast disconnect of SCO
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1444063459-28577-2-git-send-email-kubax.t.pawlak@intel.com>
-Date: Mon, 26 Oct 2015 05:07:22 +0900
+In-Reply-To: <1444063459-28577-6-git-send-email-kubax.t.pawlak@intel.com>
+Date: Mon, 26 Oct 2015 05:07:19 +0900
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <096DA7F0-96E5-4BEA-A088-878D8465ACBE@holtmann.org>
-References: <088CC8BACB3382439E91D9919CE350243655EB71@IRSMSX107.ger.corp.intel.com> <1444063459-28577-1-git-send-email-kubax.t.pawlak@intel.com> <1444063459-28577-2-git-send-email-kubax.t.pawlak@intel.com>
+Message-Id: <6CF3DA50-6A4B-4BDE-8822-B9D6DBCBE629@holtmann.org>
+References: <088CC8BACB3382439E91D9919CE350243655EB71@IRSMSX107.ger.corp.intel.com> <1444063459-28577-1-git-send-email-kubax.t.pawlak@intel.com> <1444063459-28577-6-git-send-email-kubax.t.pawlak@intel.com>
 To: Kuba Pawlak <kubax.t.pawlak@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Kuba,
 
-> When disconnecting audio from the phone's side, it may happen, that
-> a thread handling HCI message 'disconnection complete' will get preempted
-> in 'sco_conn_del' before calling 'sco_sock_kill', still holding a pointer
-> to struct sock sk. Interrupting thread started in 'sco_sock_shutdown' will
-> carry on releasing resources and will eventually release struct sock.
-> When execution goes back to first thread it will call sco_sock_kill using
-> now invalid pointer to already destroyed socket.
+> Fix a crash that may happen when a connection is closed before it was fully
+> established. Mapping conn->hcon was released by shutdown function, but it
+> is still referenced in (not yet finished) connection established handling
+> function.
 > 
-> Fix is to grab a reference to the socket a release it after calling
-> 'sco_sock_kill'.
-> 
-> [  166.358213] BUG: unable to handle kernel paging request at 7541203a
-> [  166.365228] IP: [<fb6e8bfb>] bt_sock_unlink+0x1a/0x38 [bluetooth]
-> [  166.372068] *pdpt = 0000000024b19001 *pde = 0000000000000000
-> [  166.378483] Oops: 0002 [#1] PREEMPT SMP
-> [  166.382871] Modules linked in: evdev ecb rfcomm(O) libcomposite usb2380 udc_core bnep(O) btusb(O) btbcm(O) btintel(O) cdc_acm bluetooth(O) arc4 uinput hid_multitouch iwlmvm(O) usbhid hide
-> [  166.424233] Pid: 338, comm: kworker/u:2H Tainted: G           O 3.8.0-115.1-plk-adaptation-byt-ivi-brd #1
-> [  166.435112] EIP: 0060:[<fb6e8bfb>] EFLAGS: 00010206 CPU: 0
-> [  166.441259] EIP is at bt_sock_unlink+0x1a/0x38 [bluetooth]
-> [  166.447382] EAX: 632e6563 EBX: e4bfc600 ECX: e466d4d3 EDX: 7541203a
-> [  166.454369] ESI: fb7278ac EDI: e4d52000 EBP: e4669e20 ESP: e4669e0c
-> [  166.461366]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
-> [  166.467391] CR0: 8005003b CR2: 7541203a CR3: 24aba000 CR4: 001007f0
-> [  166.474387] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
-> [  166.481375] DR6: ffff0ff0 DR7: 00000400
-> [  166.485654] Process kworker/u:2H (pid: 338, ti=e4668000 task=e466e030 task.ti=e4668000)
-> [  166.494591] Stack:
-> [  166.496830]  e4bfc600 e4bfc600 fb715c28 e4717ee0 e4d52000 e4669e3c fb715cf3 e4bfc634
-> [  166.505518]  00000068 e4d52000 e4c32000 fb7277c0 e4669e6c fb6f2019 0000004a 00000216
-> [  166.514205]  e4660101 e4c32008 02000001 00000013 e4d52000 e4c32000 e3dc9240 00000005
-> [  166.522891] Call Trace:
-> [  166.525654]  [<fb715c28>] ? sco_sock_kill+0x73/0x9a [bluetooth]
-> [  166.532295]  [<fb715cf3>] ? sco_conn_del+0xa4/0xbf [bluetooth]
-> [  166.538836]  [<fb6f2019>] ? hci_disconn_complete_evt.clone.55+0x1bd/0x205 [bluetooth]
-> [  166.547609]  [<fb6f73d3>] ? hci_event_packet+0x297/0x223c [bluetooth]
-> [  166.554805]  [<c10416da>] ? dequeue_task+0xaf/0xb7
-> [  166.560154]  [<c1041095>] ? finish_task_switch+0x50/0x89
-> [  166.566086]  [<c1349a2e>] ? __schedule+0x638/0x6b8
-> [  166.571460]  [<fb6eb906>] ? hci_rx_work+0xb9/0x2b8 [bluetooth]
-> [  166.577975]  [<c1035df9>] ? process_one_work+0x157/0x21b
-> [  166.583933]  [<fb6eb84d>] ? hci_cmd_work+0xef/0xef [bluetooth]
-> [  166.590448]  [<c1036217>] ? worker_thread+0x16e/0x20a
-> [  166.596088]  [<c10360a9>] ? manage_workers+0x1cf/0x1cf
-> [  166.601826]  [<c103a0ef>] ? kthread+0x8d/0x92
-> [  166.606691]  [<c134adf7>] ? ret_from_kernel_thread+0x1b/0x28
-> [  166.613010]  [<c103a062>] ? __init_kthread_worker+0x24/0x24
-> [  166.619230] Code: 85 63 ff ff ff 31 db 8d 65 f4 89 d8 5b 5e 5f 5d c3 56 8d 70 04 53 89 f0 89 d3 e8 7e 17 c6 c5 8b 53 28 85 d2 74 1a 8b 43 24 85 c0 <89> 02 74 03 89 50 04 c7 43 28 00 00 00
-> [  166.640501] EIP: [<fb6e8bfb>] bt_sock_unlink+0x1a/0x38 [bluetooth] SS:ESP 0068:e4669e0c
-> [  166.649474] CR2: 000000007541203a
-> [  166.653420] ---[ end trace 0181ff2c9e42d51e ]---
-> [  166.658609] note: kworker/u:2H[338] exited with preempt_count 1
+> [ 4635.254073] BUG: unable to handle kernel NULL pointer dereference at 00000013
+> [ 4635.262058] IP: [<c11659f0>] memcmp+0xe/0x25
+> [ 4635.266835] *pdpt = 0000000024190001 *pde = 0000000000000000
+> [ 4635.273261] Oops: 0000 [#1] PREEMPT SMP
+> [ 4635.277652] Modules linked in: evdev ecb vfat fat libcomposite usb2380 isofs zlib_inflate rfcomm(O) udc_core bnep(O) btusb(O) btbcm(O) btintel(O) bluetooth(O) cdc_acm arc4 uinput hid_mule
+> [ 4635.321761] Pid: 363, comm: kworker/u:2H Tainted: G           O 3.8.0-119.1-plk-adaptation-byt-ivi-brd #1
+> [ 4635.332642] EIP: 0060:[<c11659f0>] EFLAGS: 00010206 CPU: 0
+> [ 4635.338767] EIP is at memcmp+0xe/0x25
+> [ 4635.342852] EAX: e4720678 EBX: 00000000 ECX: 00000006 EDX: 00000013
+> [ 4635.349849] ESI: 00000000 EDI: fb85366c EBP: e40c7dc0 ESP: e40c7db4
+> [ 4635.356846]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+> [ 4635.362873] CR0: 8005003b CR2: 00000013 CR3: 24191000 CR4: 001007f0
+> [ 4635.369869] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+> [ 4635.376865] DR6: ffff0ff0 DR7: 00000400
+> [ 4635.381143] Process kworker/u:2H (pid: 363, ti=e40c6000 task=e40c5510 task.ti=e40c6000)
+> [ 4635.390080] Stack:
+> [ 4635.392319]  e4720400 00000000 fb85366c e40c7df4 fb842285 e40c7de2 fb853200 00000013
+> [ 4635.401003]  e3f101c4 e4720678 e3f101c0 e403be0a e40c7dfc e416a000 e403be0a fb85366c
+> [ 4635.409692]  e40c7e1c fb820186 020f6c00 e47c49ac e47c4008 00000000 e416a000 e47c402c
+> [ 4635.418380] Call Trace:
+> [ 4635.421153]  [<fb842285>] sco_connect_cfm+0xff/0x236 [bluetooth]
+> [ 4635.427893]  [<fb820186>] hci_sync_conn_complete_evt.clone.101+0x227/0x268 [bluetooth]
+> [ 4635.436758]  [<fb82370f>] hci_event_packet+0x1caa/0x21d3 [bluetooth]
+> [ 4635.443859]  [<c106231f>] ? trace_hardirqs_on+0xb/0xd
+> [ 4635.449502]  [<c1375b8a>] ? _raw_spin_unlock_irqrestore+0x42/0x59
+> [ 4635.456340]  [<fb814b67>] hci_rx_work+0xb9/0x350 [bluetooth]
+> [ 4635.462663]  [<c1039f1e>] ? process_one_work+0x17b/0x2e6
+> [ 4635.468596]  [<c1039f77>] process_one_work+0x1d4/0x2e6
+> [ 4635.474333]  [<c1039f1e>] ? process_one_work+0x17b/0x2e6
+> [ 4635.480294]  [<fb814aae>] ? hci_cmd_work+0xda/0xda [bluetooth]
+> [ 4635.486810]  [<c103a3fa>] worker_thread+0x171/0x20f
+> [ 4635.492257]  [<c10456c5>] ? complete+0x34/0x3e
+> [ 4635.497219]  [<c103ea06>] kthread+0x90/0x95
+> [ 4635.501888]  [<c103a289>] ? manage_workers+0x1df/0x1df
+> [ 4635.507628]  [<c1376537>] ret_from_kernel_thread+0x1b/0x28
+> [ 4635.513755]  [<c103e976>] ? __init_kthread_worker+0x42/0x42
+> [ 4635.519975] Code: 74 0d 3c 79 74 04 3c 59 75 0c c6 02 01 eb 03 c6 02 00 31 c0 eb 05 b8 ea ff ff ff 5d c3 55 89 e5 57 56 53 31 db eb 0e 0f b6 34 18 <0f> b6 3c 1a 43 29 fe 75 07 49 85 c9 7f
+> [ 4635.541264] EIP: [<c11659f0>] memcmp+0xe/0x25 SS:ESP 0068:e40c7db4
+> [ 4635.548166] CR2: 0000000000000013
+> [ 4635.552177] ---[ end trace e05ce9b8ce6182f6 ]---
+> [
 > 
 > Signed-off-by: Kuba Pawlak <kubax.t.pawlak@intel.com>
 > ---
-> net/bluetooth/sco.c | 2 ++
-> 1 file changed, 2 insertions(+)
+> net/bluetooth/sco.c | 5 +++++
+> 1 file changed, 5 insertions(+)
 
-patch has been applied to bluetooth-next tree.
+this patch no longer applies cleanly when skipping patch 4/5. Please resend as first patch since I think it is actually fine.
 
 Regards
 
 Marcel
+
 
