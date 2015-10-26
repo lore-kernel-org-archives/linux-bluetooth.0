@@ -1,134 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Pawlak, KubaX T" <kubax.t.pawlak@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Bluetooth: remove btusb_work related workqueue
-Date: Mon, 26 Oct 2015 18:10:28 +0000
-Message-ID: <088CC8BACB3382439E91D9919CE350243656FB22@IRSMSX107.ger.corp.intel.com>
-References: <1444316120-22893-1-git-send-email-kubax.t.pawlak@intel.com>
- <7D38034D-BDC6-4FD9-931E-7518FA2D20A4@holtmann.org>
- <088CC8BACB3382439E91D9919CE3502436568B42@IRSMSX107.ger.corp.intel.com>
- <6D48126C-1328-4466-9415-D48367F574C9@holtmann.org>
- <F79E09E1-497A-46AE-879B-F4AF321285AC@holtmann.org>
- <088CC8BACB3382439E91D9919CE3502436568BA4@IRSMSX107.ger.corp.intel.com>
- <F4DF561E-1F0B-44A1-8275-93180F23B34D@holtmann.org>
-In-Reply-To: <F4DF561E-1F0B-44A1-8275-93180F23B34D@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Kuba Pawlak <kubax.t.pawlak@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Kuba Pawlak <kubax.t.pawlak@intel.com>
+Subject: [PATCH] Bluetooth: Fix crash on fast disconnect of SCO
+Date: Mon, 26 Oct 2015 16:17:14 +0000
+Message-Id: <1445876234-14525-1-git-send-email-kubax.t.pawlak@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
-bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IFN1bmRheSwg
-T2N0b2JlciAyNSwgMjAxNSA3OjU3IFBNDQo+IFRvOiBQYXdsYWssIEt1YmFYIFQNCj4gQ2M6IGxp
-bnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSF0gQmx1
-ZXRvb3RoOiByZW1vdmUgYnR1c2Jfd29yayByZWxhdGVkIHdvcmtxdWV1ZQ0KPiANCj4gSGkgS3Vi
-YSwNCj4gDQo+ID4+Pj4+PiBXb3JrcXVldWUgaGFuZGxpbmcgYnR1c2Jfd29yayBpcyBubyBsb25n
-ZXIgbmVlZGVkIGFzIGJ0dXNiX25vdGlmeQ0KPiA+Pj4+Pj4gY2FuIHNsZWVwLg0KPiA+Pj4+Pj4N
-Cj4gPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IEt1YmEgUGF3bGFrIDxrdWJheC50LnBhd2xha0BpbnRl
-bC5jb20+DQo+ID4+Pj4+PiAtLS0NCj4gPj4+Pj4+IGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMg
-fCAxNCArKysrKy0tLS0tLS0tLQ0KPiA+Pj4+Pj4gMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9u
-cygrKSwgOSBkZWxldGlvbnMoLSkNCj4gPj4+Pj4+DQo+ID4+Pj4+PiBkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPj4+
-Pj4+IGluZGV4DQo+ID4+Pj4+DQo+ID4+DQo+IDI0N2IxMDYyY2I5YWZmYzY3ZDllN2Y3YTAyMzRj
-MTY3ZjkwZjRiNzkuLjk4YzYxNmRkZDdiYWM1M2IyZDVkNWY4YjNkY2MNCj4gPj4+Pj4gMmRjYTJi
-MjAxZTYzIDEwMDY0NA0KPiA+Pj4+Pj4gLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0K
-PiA+Pj4+Pj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+Pj4+Pj4gQEAgLTM1
-MCw3ICszNTAsNiBAQCBzdHJ1Y3QgYnR1c2JfZGF0YSB7DQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gCXVu
-c2lnbmVkIGxvbmcgZmxhZ3M7DQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gLQlzdHJ1Y3Qgd29ya19zdHJ1
-Y3Qgd29yazsNCj4gPj4+Pj4+IAlzdHJ1Y3Qgd29ya19zdHJ1Y3Qgd2FrZXI7DQo+ID4+Pj4+Pg0K
-PiA+Pj4+Pj4gCXN0cnVjdCB1c2JfYW5jaG9yIGRlZmVycmVkOw0KPiA+Pj4+Pj4gQEAgLTk4MCw3
-ICs5NzksNiBAQCBzdGF0aWMgaW50IGJ0dXNiX2Nsb3NlKHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0K
-PiA+Pj4+Pj4NCj4gPj4+Pj4+IAlCVF9EQkcoIiVzIiwgaGRldi0+bmFtZSk7DQo+ID4+Pj4+Pg0K
-PiA+Pj4+Pj4gLQljYW5jZWxfd29ya19zeW5jKCZkYXRhLT53b3JrKTsNCj4gPj4+Pj4+IAljYW5j
-ZWxfd29ya19zeW5jKCZkYXRhLT53YWtlcik7DQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gCWNsZWFyX2Jp
-dChCVFVTQl9JU09DX1JVTk5JTkcsICZkYXRhLT5mbGFncyk7DQo+ID4+Pj4+PiBAQCAtMTE4MSw2
-ICsxMTc5LDggQEAgc3RhdGljIGludCBidHVzYl9zZW5kX2ZyYW1lKHN0cnVjdCBoY2lfZGV2DQo+
-ID4+ICpoZGV2LA0KPiA+Pj4+PiBzdHJ1Y3Qgc2tfYnVmZiAqc2tiKQ0KPiA+Pj4+Pj4gCXJldHVy
-biAtRUlMU0VROw0KPiA+Pj4+Pj4gfQ0KPiA+Pj4+Pj4NCj4gPj4+Pj4+ICtzdGF0aWMgdm9pZCBi
-dHVzYl9zY29fY2hhbmdlKHN0cnVjdCBidHVzYl9kYXRhICpkYXRhKTsNCj4gPj4+Pj4+ICsNCj4g
-Pj4+Pj4NCj4gPj4+Pj4gZG8gd2UgbmVlZCB0aGlzIGZvcndhcmQgZGVjbGFyYXRpb24gb3IgY2Fu
-IHdlIGp1c3QgbW92ZSBjb2RlIGFyb3VuZA0KPiB0bw0KPiA+PiBhdm9pZA0KPiA+Pj4+PiBpdD8N
-Cj4gPj4+Pj4NCj4gPj4+Pj4+IHN0YXRpYyB2b2lkIGJ0dXNiX25vdGlmeShzdHJ1Y3QgaGNpX2Rl
-diAqaGRldiwgdW5zaWduZWQgaW50IGV2dCkNCj4gPj4+Pj4+IHsNCj4gPj4+Pj4+IAlzdHJ1Y3Qg
-YnR1c2JfZGF0YSAqZGF0YSA9IGhjaV9nZXRfZHJ2ZGF0YShoZGV2KTsNCj4gPj4+Pj4+IEBAIC0x
-MTg5LDcgKzExODksNyBAQCBzdGF0aWMgdm9pZCBidHVzYl9ub3RpZnkoc3RydWN0IGhjaV9kZXYN
-Cj4gKmhkZXYsDQo+ID4+Pj4+IHVuc2lnbmVkIGludCBldnQpDQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4g
-CWlmIChoY2lfY29ubl9udW0oaGRldiwgU0NPX0xJTkspICE9IGRhdGEtPnNjb19udW0pIHsNCj4g
-Pj4+Pj4+IAkJZGF0YS0+c2NvX251bSA9IGhjaV9jb25uX251bShoZGV2LCBTQ09fTElOSyk7DQo+
-ID4+Pj4+PiAtCQlzY2hlZHVsZV93b3JrKCZkYXRhLT53b3JrKTsNCj4gPj4+Pj4+ICsJCWJ0dXNi
-X3Njb19jaGFuZ2UoZGF0YSk7DQo+ID4+Pj4+PiAJfQ0KPiA+Pj4+Pj4gfQ0KPiA+Pj4+Pj4NCj4g
-Pj4+Pj4+IEBAIC0xMjM2LDkgKzEyMzYsOCBAQCBzdGF0aWMgaW5saW5lIGludCBfX3NldF9pc29j
-X2ludGVyZmFjZShzdHJ1Y3QNCj4gPj4gaGNpX2Rldg0KPiA+Pj4+PiAqaGRldiwgaW50IGFsdHNl
-dHRpbmcpDQo+ID4+Pj4+PiAJcmV0dXJuIDA7DQo+ID4+Pj4+PiB9DQo+ID4+Pj4+Pg0KPiA+Pj4+
-Pj4gLXN0YXRpYyB2b2lkIGJ0dXNiX3dvcmsoc3RydWN0IHdvcmtfc3RydWN0ICp3b3JrKQ0KPiA+
-Pj4+Pj4gK3N0YXRpYyB2b2lkIGJ0dXNiX3Njb19jaGFuZ2Uoc3RydWN0IGJ0dXNiX2RhdGEgKmRh
-dGEpDQo+ID4+Pj4+PiB7DQo+ID4+Pj4+PiAtCXN0cnVjdCBidHVzYl9kYXRhICpkYXRhID0gY29u
-dGFpbmVyX29mKHdvcmssIHN0cnVjdA0KPiBidHVzYl9kYXRhLA0KPiA+Pj4+PiB3b3JrKTsNCj4g
-Pj4+Pj4+IAlzdHJ1Y3QgaGNpX2RldiAqaGRldiA9IGRhdGEtPmhkZXY7DQo+ID4+Pj4+PiAJaW50
-IG5ld19hbHRzOw0KPiA+Pj4+Pj4gCWludCBlcnI7DQo+ID4+Pj4+PiBAQCAtMjYxOCw3ICsyNjE3
-LDYgQEAgc3RhdGljIGludCBidHVzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZQ0KPiA+PiAq
-aW50ZiwNCj4gPj4+Pj4+IAlkYXRhLT51ZGV2ID0gaW50ZXJmYWNlX3RvX3VzYmRldihpbnRmKTsN
-Cj4gPj4+Pj4+IAlkYXRhLT5pbnRmID0gaW50ZjsNCj4gPj4+Pj4+DQo+ID4+Pj4+PiAtCUlOSVRf
-V09SSygmZGF0YS0+d29yaywgYnR1c2Jfd29yayk7DQo+ID4+Pj4+PiAJSU5JVF9XT1JLKCZkYXRh
-LT53YWtlciwgYnR1c2Jfd2FrZXIpOw0KPiA+Pj4+Pj4gCWluaXRfdXNiX2FuY2hvcigmZGF0YS0+
-ZGVmZXJyZWQpOw0KPiA+Pj4+Pj4gCWluaXRfdXNiX2FuY2hvcigmZGF0YS0+dHhfYW5jaG9yKTsN
-Cj4gPj4+Pj4+IEBAIC0yODQ4LDggKzI4NDYsNiBAQCBzdGF0aWMgaW50IGJ0dXNiX3N1c3BlbmQo
-c3RydWN0IHVzYl9pbnRlcmZhY2UNCj4gPj4gKmludGYsDQo+ID4+Pj4+IHBtX21lc3NhZ2VfdCBt
-ZXNzYWdlKQ0KPiA+Pj4+Pj4gCQlyZXR1cm4gLUVCVVNZOw0KPiA+Pj4+Pj4gCX0NCj4gPj4+Pj4+
-DQo+ID4+Pj4+PiAtCWNhbmNlbF93b3JrX3N5bmMoJmRhdGEtPndvcmspOw0KPiA+Pj4+Pj4gLQ0K
-PiA+Pj4+Pj4gCWJ0dXNiX3N0b3BfdHJhZmZpYyhkYXRhKTsNCj4gPj4+Pj4+IAl1c2Jfa2lsbF9h
-bmNob3JlZF91cmJzKCZkYXRhLT50eF9hbmNob3IpOw0KPiA+Pj4+Pj4NCj4gPj4+Pj4+IEBAIC0y
-OTIyLDcgKzI5MTgsNyBAQCBzdGF0aWMgaW50IGJ0dXNiX3Jlc3VtZShzdHJ1Y3QgdXNiX2ludGVy
-ZmFjZQ0KPiA+PiAqaW50ZikNCj4gPj4+Pj4+IAlwbGF5X2RlZmVycmVkKGRhdGEpOw0KPiA+Pj4+
-Pj4gCWNsZWFyX2JpdChCVFVTQl9TVVNQRU5ESU5HLCAmZGF0YS0+ZmxhZ3MpOw0KPiA+Pj4+Pj4g
-CXNwaW5fdW5sb2NrX2lycSgmZGF0YS0+dHhsb2NrKTsNCj4gPj4+Pj4+IC0Jc2NoZWR1bGVfd29y
-aygmZGF0YS0+d29yayk7DQo+ID4+Pj4+PiArCWJ0dXNiX3Njb19jaGFuZ2UoZGF0YSk7DQo+ID4+
-Pj4+DQo+ID4+Pj4+IENhbiB3ZSBhY3R1YWxseSBzbGVlcCBpbiB0aGUgcmVzdW1lIGNhbGxiYWNr
-cz8gSSB0aGluayBzbywgYnV0IEkgaGF2ZSBub3QNCj4gPj4gdGVzdGluZw0KPiA+Pj4+PiBydW50
-aW1lIHBvd2VyIG1hbmFnZW1lbnQgaW4gYSB3aGlsZS4NCj4gPj4+Pg0KPiA+Pj4+IEFwcGFyZW50
-bHkgd2UgY2FuJ3QsIHNvIHdvcmtxdWV1ZSBuZWVkcyB0byBzdGF5IGFuZCB0aGlzIHBhdGNoIGlz
-IGludmFsaWQuDQo+ID4+Pg0KPiA+Pj4gSSB0aGluayB0aGF0IHJlbW92aW5nIHRoZSB1c2FnZSBv
-ZiB0aGUgd29ya3F1ZXVlIGluIGJ0dXNiX25vdGlmeSBpcyBzdGlsbCBhDQo+ID4+IGdvb2QgdGhp
-bmcgc2luY2UgaXQgcmVkdWNlcyB0aGUgbGF0ZW5jeSB3aGVuIGVzdGFibGlzaGluZyBTQ08gY29u
-bmVjdGlvbnMuDQo+ID4+DQo+ID4+IGFjdHVhbGx5IEkgd29uZGVyIGlmIHRoZSBjYWxsIHRvIHVz
-Yl9zZXRfaW50ZXJmYWNlIGlzIG5lZWRlZCBvbiByZXN1bWUgaW4gdGhlDQo+ID4+IGZpcnN0IHBs
-YWNlLiBNYXliZSB0aGlzIGlzIGFjdHVhbGx5IG5vdCBuZWVkZWQgYW5kIHdlIGp1c3QgbmVlZCB0
-byByZXN0YXJ0IHRoZQ0KPiA+PiBVUkJzLg0KPiA+Pg0KPiA+PiBEbyB5b3UgaGF2ZSB0aGUgY2hh
-bmNlIHRvIHRlc3QgYW5kIHNlZSBpZiB0aGUgYWx0ZXJuYXRlIHNldHRpbmcgYWN0dWFsbHkNCj4g
-Y2hhbmdlZA0KPiA+PiBvdmVyIHJlc3VtZT8NCj4gPg0KPiA+IE91ciBwbGF0Zm9ybSBkb2VzIG5v
-dCBzdXBwb3J0IHN1c3BlbmQvcmVzdW1lLiBJIGhhdmUgYW4gRWxsaXN5cyBhbmFseXNlcg0KPiB3
-aXRoIGV4dGVybmFsIFdQIG1vZHVsZSBjb25uZWN0ZWQgdGhyb3VnaCBpdCBvdmVyIFVTQiwgc28g
-SSBjYW4gdHJhY2Ugd2hhdA0KPiBhbHRzZXR0aW5ncyBhcmUgc2V0IGFuZCB3aGVuLiBJIHdpbGwg
-bG9vayBpbnRvIGEgcG9zc2liaWxpdHkgb2YgdGVzdGluZyB0aGlzIHVzaW5nIGENCj4gbGFwdG9w
-LCBidXQgSSBkb27igJl0IGtub3cgaG93IHRvIGVhc2lseSBtYWtlIHBob25lIG9wZW4gU0NPIGNo
-YW5uZWwsIHNvIEkNCj4gZG9uJ3QgbmVlZCB0byBwb3J0IG91ciBQdWxzZUF1ZGlvLg0KPiANCj4g
-YW55IHVwZGF0ZSBoZXJlPyBJIHdvdWxkIHJlYWxseSBnZXQgb2YgdGhpcyB3b3JrcXVldWUgdXNh
-Z2UgaW4gYnR1c2IgZHJpdmVyLg0KDQpTb3JyeSBmb3IgdGhlIGRlbGF5LCBidXQgSSdtIHN0dWNr
-IGluIHNvbWUgaW50ZXJuYWwgcHJvamVjdCBzdHVmZi4gSSB1c2VkIEVsbGlzeXMgYW5kIGEgbGFw
-dG9wIHJ1bm5pbmcgRmVkb3JhIDIxIGFzIG91ciBzeXN0ZW0gZG9lcyBub3Qgc3VwcG9ydCBhbnkg
-dHlwZSBvZiBzdXNwZW5kLiBUbyBjcmVhdGUgYm9ndXMgU0NPIGxpbmsgSSB1c2UgJ3Njb3Rlc3Qg
-LW4gPHBob25lIE1BQz4nLiBUaGVyZSBpcyBubyBkYXRhIGZsb3dpbmcsIGJ1dCBhdCBsZWFzdCBz
-dHJlYW0gaXMgc2V0IHVwLiBPbiBzdHJlYW0gY3JlYXRpb24gQWx0U2V0dGluZ3MgY2hhbmdlIHRv
-IDIgYXMgZXhwZWN0ZWQuIE9uIGxhcHRvcCBzdXNwZW5kIHRoZXJlIGlzIG5vdGhpbmcgdGhlcmUs
-IGxvb2tzIGxpa2Ugd2UgZG9uJ3QgY2hhbmdlIHNldHRpbmdzLiBDb250cm9sbGVyIHJlbWFpbnMg
-YWN0aXZlLiBPbiByZXN1bWUgd2UgZ2V0Og0KR2V0RGVzY3JpcHRvcihEZXZpY2UpLCBTZXRBZGRy
-ZXNzICgyKSwgR2V0RGVzY3JpcHRvcihEZXZpY2UpLCBHZXREZXNjcmlwdG9yKENvbmZpZ3VyYXRp
-b24pLFNldENvbmZpZ3VyYXRpb24oMSksU2V0SW50ZXJmYWNlICgxLCBBbHRTZXQyKSwgR2V0U3Rh
-dHVzKERldmljZSkuDQpTbyBpdCBsb29rcyBsaWtlIHdlIGFyZSBjaGFuZ2luZyBhbHRzZXR0aW5n
-IGluIHJlc3VtZSB0byB3aGF0ZXZlciB3YXMgc2V0IGJlZm9yZSBzdXNwZW5kLiBBdCBidHVzYl93
-b3JrIGNhbiBzbGVlcCBhbmQgcmVzdW1lIGRvZXMgbm90LCBpdCBsb29rcyBsaWtlIHdlIGNhbid0
-IHJlbW92ZSB0aGlzIHdvcmtxdWV1ZSBmcm9tIHRoZXJlLiBJIGRvbuKAmXQga25vdyBVU0IgYXQg
-YWxsIHNvIEkgY2Fu4oCZdCBzYXkgd2hhdCB0byBkbyB3aXRoIHRoYXQuIERvZXMgYWN0aXZlIFND
-TyBsaW5rIG92ZXIgc3VzcGVuZC9yZXN1bWUgbWFrZXMgc2Vuc2U/DQoNClRoZXJlIGlzIGFsc28g
-YW4gYW5ub3lpbmcgRWxsaXN5cyBidWcgaW4gaGVyZS4gV2hlbiBjcmVhdGluZyBTQ08gbGluayB3
-aXRoIHNjb3Rlc3QsIHRoZXJlIGlzIG5vIHVwZGF0ZSB0byBvdmVydmlldywgbm8gbWF0dGVyIHdo
-YXQgSSBkbyB0byBncm91cGluZy4gT25seSBhZnRlciByZXN1bWUsIGFsbCBtZXNzYWdlcyBhcmUg
-cHVzaGVkIHRvIHRoZSBvdmVydmlldyBhbmQgSSBjYW4gc2VlIHdoYXQgaGFwcGVuZWQuDQoNCkt1
-YmENCkludGVsIERldXRzY2hsYW5kIEdtYkgKUmVnaXN0ZXJlZCBBZGRyZXNzOiBBbSBDYW1wZW9u
-IDEwLTEyLCA4NTU3OSBOZXViaWJlcmcsIEdlcm1hbnkKVGVsOiArNDkgODkgOTkgODg1My0wLCB3
-d3cuaW50ZWwuZGUKTWFuYWdpbmcgRGlyZWN0b3JzOiBDaHJpc3RpbiBFaXNlbnNjaG1pZCwgUHJv
-Zi4gRHIuIEhlcm1hbm4gRXVsCkNoYWlycGVyc29uIG9mIHRoZSBTdXBlcnZpc29yeSBCb2FyZDog
-VGlmZmFueSBEb29uIFNpbHZhClJlZ2lzdGVyZWQgT2ZmaWNlOiBNdW5pY2gKQ29tbWVyY2lhbCBS
-ZWdpc3RlcjogQW10c2dlcmljaHQgTXVlbmNoZW4gSFJCIDE4NjkyOAo=
+Fix a crash that may happen when a connection is closed before it was fully
+established. Mapping conn->hcon was released by shutdown function, but it
+is still referenced in (not yet finished) connection established handling
+function.
+
+[ 4635.254073] BUG: unable to handle kernel NULL pointer dereference at 00000013
+[ 4635.262058] IP: [<c11659f0>] memcmp+0xe/0x25
+[ 4635.266835] *pdpt = 0000000024190001 *pde = 0000000000000000
+[ 4635.273261] Oops: 0000 [#1] PREEMPT SMP
+[ 4635.277652] Modules linked in: evdev ecb vfat fat libcomposite usb2380 isofs zlib_inflate rfcomm(O) udc_core bnep(O) btusb(O) btbcm(O) btintel(O) bluetooth(O) cdc_acm arc4 uinput hid_mule
+[ 4635.321761] Pid: 363, comm: kworker/u:2H Tainted: G           O 3.8.0-119.1-plk-adaptation-byt-ivi-brd #1
+[ 4635.332642] EIP: 0060:[<c11659f0>] EFLAGS: 00010206 CPU: 0
+[ 4635.338767] EIP is at memcmp+0xe/0x25
+[ 4635.342852] EAX: e4720678 EBX: 00000000 ECX: 00000006 EDX: 00000013
+[ 4635.349849] ESI: 00000000 EDI: fb85366c EBP: e40c7dc0 ESP: e40c7db4
+[ 4635.356846]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+[ 4635.362873] CR0: 8005003b CR2: 00000013 CR3: 24191000 CR4: 001007f0
+[ 4635.369869] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+[ 4635.376865] DR6: ffff0ff0 DR7: 00000400
+[ 4635.381143] Process kworker/u:2H (pid: 363, ti=e40c6000 task=e40c5510 task.ti=e40c6000)
+[ 4635.390080] Stack:
+[ 4635.392319]  e4720400 00000000 fb85366c e40c7df4 fb842285 e40c7de2 fb853200 00000013
+[ 4635.401003]  e3f101c4 e4720678 e3f101c0 e403be0a e40c7dfc e416a000 e403be0a fb85366c
+[ 4635.409692]  e40c7e1c fb820186 020f6c00 e47c49ac e47c4008 00000000 e416a000 e47c402c
+[ 4635.418380] Call Trace:
+[ 4635.421153]  [<fb842285>] sco_connect_cfm+0xff/0x236 [bluetooth]
+[ 4635.427893]  [<fb820186>] hci_sync_conn_complete_evt.clone.101+0x227/0x268 [bluetooth]
+[ 4635.436758]  [<fb82370f>] hci_event_packet+0x1caa/0x21d3 [bluetooth]
+[ 4635.443859]  [<c106231f>] ? trace_hardirqs_on+0xb/0xd
+[ 4635.449502]  [<c1375b8a>] ? _raw_spin_unlock_irqrestore+0x42/0x59
+[ 4635.456340]  [<fb814b67>] hci_rx_work+0xb9/0x350 [bluetooth]
+[ 4635.462663]  [<c1039f1e>] ? process_one_work+0x17b/0x2e6
+[ 4635.468596]  [<c1039f77>] process_one_work+0x1d4/0x2e6
+[ 4635.474333]  [<c1039f1e>] ? process_one_work+0x17b/0x2e6
+[ 4635.480294]  [<fb814aae>] ? hci_cmd_work+0xda/0xda [bluetooth]
+[ 4635.486810]  [<c103a3fa>] worker_thread+0x171/0x20f
+[ 4635.492257]  [<c10456c5>] ? complete+0x34/0x3e
+[ 4635.497219]  [<c103ea06>] kthread+0x90/0x95
+[ 4635.501888]  [<c103a289>] ? manage_workers+0x1df/0x1df
+[ 4635.507628]  [<c1376537>] ret_from_kernel_thread+0x1b/0x28
+[ 4635.513755]  [<c103e976>] ? __init_kthread_worker+0x42/0x42
+[ 4635.519975] Code: 74 0d 3c 79 74 04 3c 59 75 0c c6 02 01 eb 03 c6 02 00 31 c0 eb 05 b8 ea ff ff ff 5d c3 55 89 e5 57 56 53 31 db eb 0e 0f b6 34 18 <0f> b6 3c 1a 43 29 fe 75 07 49 85 c9 7f
+[ 4635.541264] EIP: [<c11659f0>] memcmp+0xe/0x25 SS:ESP 0068:e40c7db4
+[ 4635.548166] CR2: 0000000000000013
+[ 4635.552177] ---[ end trace e05ce9b8ce6182f6 ]---
+---
+ net/bluetooth/sco.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 8ec10049bc246125808938b7ea17ce4975498c65..fe129663bd3f7faeb39f20d02a8425d525da071d 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1033,6 +1033,11 @@ static void sco_conn_ready(struct sco_conn *conn)
+ 	} else {
+ 		sco_conn_lock(conn);
+ 
++		if (!conn->hcon) {
++			sco_conn_unlock(conn);
++			return;
++		}
++
+ 		parent = sco_get_sock_listen(&conn->hcon->src);
+ 		if (!parent) {
+ 			sco_conn_unlock(conn);
+-- 
+1.9.3
 
