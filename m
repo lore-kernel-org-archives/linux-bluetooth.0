@@ -1,131 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix some obvious coding style issues in the SCO module
-Date: Mon, 26 Oct 2015 02:08:38 +0100
-Message-Id: <1445821718-59020-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20151023083319.GA31574@t440s.lan>
+References: <000d01d10d6c$cca43e40$65ecbac0$@samsung.com>
+	<20151023083319.GA31574@t440s.lan>
+Date: Mon, 26 Oct 2015 06:24:20 +0530
+Message-ID: <CAFBvHidsObrcX6S3fxfP14MhE0=TW_CD1r8593ej=B623mHv7A@mail.gmail.com>
+Subject: Re: Kernel panic observed during sco-connection-disconnection
+From: Syam Sidhardhan <syamsidhardh@gmail.com>
+To: Syam Sidhardhan <s.syam@samsung.com>,
+	User Name <linux-bluetooth@vger.kernel.org>,
+	Anurag B <biradar.a@samsung.com>,
+	Sreeraj Mohan <sreeraj.mk@samsung.com>,
+	Nagaraj DR <nagaraj.dr@samsung.com>,
+	=?UTF-8?B?67CV7LCs7Je0?= <chanyeol.park@samsung.com>,
+	jy0214.kim@samsung.com,
+	=?UTF-8?B?7ISc7Zi47LKg?= <hocheol.seo@samsung.com>,
+	kubax.t.pawlak@intel.com, Sang-Ki Park <sangki79.park@samsung.com>,
+	ravi.g@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Lets fix this obvious coding style issues in the SCO module and bring it
-in line with the rest of the Bluetooth subsystem.
+Hi Johan/Kuba,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/sco.c | 30 +++++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 11 deletions(-)
+On Fri, Oct 23, 2015 at 2:03 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Syam,
+>
+> On Fri, Oct 23, 2015, s.syam@samsung.com wrote:
+>> We have observed one kernel panic during the sco close.
+>> The panic logs has been given below. Further analysis we could see that  invalid memory access is happening at
+>> sco_pi(sk)->conn->hcon = NULL; in __sco_sock_close().
+>>
+>> It will be great if someone analyses and provide the fix/clue for this issue.
+>> Thanks for your time.
+>>
+>>
+>> Code:
+>> static void __sco_sock_close(struct sock *sk)
+>> {
+>>       BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
+>>
+>>       switch (sk->sk_state) {
+>>       case BT_LISTEN:
+>>               sco_sock_cleanup_listen(sk);
+>>               break;
+>>
+>>       case BT_CONNECTED:
+>>       case BT_CONFIG:
+>>               if (sco_pi(sk)->conn->hcon) {
+>>                       sk->sk_state = BT_DISCONN;
+>>                       sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+>>                       hci_conn_drop(sco_pi(sk)->conn->hcon);
+>>                       sco_pi(sk)->conn->hcon = NULL; //Invalid memory access happen here.
+>>               } else
+>>                       sco_chan_del(sk, ECONNRESET);
+>>               break;
+>>
+>>       case BT_CONNECT2:
+>>       case BT_CONNECT:
+>>       case BT_DISCONN:
+>> ...
+>> ...
+>>       }
+>> }
+>>
+>> Logs:
+>> Oct 21 23:35:12 alert Kernel: [  175.323507] Unable to handle kernel NULL pointer dereference at virtual address 00000000
+>> .....
+>> Oct 21 23:35:12 warn Kernel: [  175.338344] [<c0866be4>] (__sco_sock_close+0x1ec/0x230) from [<c0866d20>] (sco_sock_close+0x20/0x34)
+>> Oct 21 23:35:12 warn Kernel: [  175.338478] [<c0866d20>] (sco_sock_close+0x20/0x34) from [<c0866d78>] (sco_sock_release+0x44/0x100)
+>> Oct 21 23:35:12 warn Kernel: [  175.338614] [<c0866d78>] (sco_sock_release+0x44/0x100) from [<c0721ad0>] (sock_release+0x20/0xc4)
+>> Oct 21 23:35:12 warn Kernel: [  175.338745] [<c0721ad0>] (sock_release+0x20/0xc4) from [<c07221e4>] (sock_close+0x20/0x2c)
+>> Oct 21 23:35:12 warn Kernel: [  175.338874] [<c07221e4>] (sock_close+0x20/0x2c) from [<c02741d0>] (fput+0x11c/0x230)
+>> Oct 21 23:35:12 warn Kernel: [  175.338994] [<c02741d0>] (fput+0x11c/0x230) from [<c0270fa8>] (filp_close+0x70/0x7c)
+>> Oct 21 23:35:12 warn Kernel: [  175.339110] [<c0270fa8>] (filp_close+0x70/0x7c) from [<c0271064>] (sys_close+0xb0/0xf0)
+>> Oct 21 23:35:12 warn Kernel: [  175.339232] [<c0271064>] (sys_close+0xb0/0xf0) from [<c0105d9c>] (__sys_trace_return+0x0/0x24)
+>
+> You'll probably want to take a look at the SCO socket patch set that
+> Kuba sent in the beginning of this month:
+>
+>         [PATCH 0/5] Few proposed fixes to stop crashes on fast SCO disconnec
+>
+> Particularly his second patch looks like something that could be related
+> to this.
+>
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 75f843d5423a..8ec10049bc24 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -74,7 +74,7 @@ struct sco_pinfo {
- 
- static void sco_sock_timeout(unsigned long arg)
- {
--	struct sock *sk = (struct sock *) arg;
-+	struct sock *sk = (struct sock *)arg;
- 
- 	BT_DBG("sock %p state %d", sk, sk->sk_state);
- 
-@@ -183,7 +183,8 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
- 	kfree(conn);
- }
- 
--static void __sco_chan_add(struct sco_conn *conn, struct sock *sk, struct sock *parent)
-+static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
-+			   struct sock *parent)
- {
- 	BT_DBG("conn %p", conn);
- 
-@@ -463,7 +464,8 @@ static struct proto sco_proto = {
- 	.obj_size	= sizeof(struct sco_pinfo)
- };
- 
--static struct sock *sco_sock_alloc(struct net *net, struct socket *sock, int proto, gfp_t prio, int kern)
-+static struct sock *sco_sock_alloc(struct net *net, struct socket *sock,
-+				   int proto, gfp_t prio, int kern)
- {
- 	struct sock *sk;
- 
-@@ -512,7 +514,8 @@ static int sco_sock_create(struct net *net, struct socket *sock, int protocol,
- 	return 0;
- }
- 
--static int sco_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
-+static int sco_sock_bind(struct socket *sock, struct sockaddr *addr,
-+			 int addr_len)
- {
- 	struct sockaddr_sco *sa = (struct sockaddr_sco *) addr;
- 	struct sock *sk = sock->sk;
-@@ -619,7 +622,8 @@ done:
- 	return err;
- }
- 
--static int sco_sock_accept(struct socket *sock, struct socket *newsock, int flags)
-+static int sco_sock_accept(struct socket *sock, struct socket *newsock,
-+			   int flags)
- {
- 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
- 	struct sock *sk = sock->sk, *ch;
-@@ -673,7 +677,8 @@ done:
- 	return err;
- }
- 
--static int sco_sock_getname(struct socket *sock, struct sockaddr *addr, int *len, int peer)
-+static int sco_sock_getname(struct socket *sock, struct sockaddr *addr,
-+			    int *len, int peer)
- {
- 	struct sockaddr_sco *sa = (struct sockaddr_sco *) addr;
- 	struct sock *sk = sock->sk;
-@@ -783,7 +788,8 @@ static int sco_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 	return bt_sock_recvmsg(sock, msg, len, flags);
- }
- 
--static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
-+static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
-+			       char __user *optval, unsigned int optlen)
- {
- 	struct sock *sk = sock->sk;
- 	int len, err = 0;
-@@ -823,7 +829,7 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char
- 		voice.setting = sco_pi(sk)->setting;
- 
- 		len = min_t(unsigned int, sizeof(voice), optlen);
--		if (copy_from_user((char *) &voice, optval, len)) {
-+		if (copy_from_user((char *)&voice, optval, len)) {
- 			err = -EFAULT;
- 			break;
- 		}
-@@ -847,7 +853,8 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char
- 	return err;
- }
- 
--static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user *optval, int __user *optlen)
-+static int sco_sock_getsockopt_old(struct socket *sock, int optname,
-+				   char __user *optval, int __user *optlen)
- {
- 	struct sock *sk = sock->sk;
- 	struct sco_options opts;
-@@ -907,7 +914,8 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
- 	return err;
- }
- 
--static int sco_sock_getsockopt(struct socket *sock, int level, int optname, char __user *optval, int __user *optlen)
-+static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
-+			       char __user *optval, int __user *optlen)
- {
- 	struct sock *sk = sock->sk;
- 	int len, err = 0;
-@@ -932,7 +940,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname, char
- 		}
- 
- 		if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags),
--			     (u32 __user *) optval))
-+			     (u32 __user *)optval))
- 			err = -EFAULT;
- 
- 		break;
--- 
-2.4.3
+Thanks for your guidance. We will try with Kuba's patch sets. Few of
+them has already applied to bluetooth-next a couple of hours back.
+Look like his Patch 1/5 fixes the one time issue which I reported 3
+months back with subject "Sco connection disconnection panic happen".
+Thanks Johan & Kuba.
 
+Regards,
+Syam.
