@@ -1,78 +1,388 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kuba Pawlak <kubax.t.pawlak@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Kuba Pawlak <kubax.t.pawlak@intel.com>
-Subject: [PATCH] Bluetooth: Fix crash on fast disconnect of SCO
-Date: Mon, 26 Oct 2015 16:17:14 +0000
-Message-Id: <1445876234-14525-1-git-send-email-kubax.t.pawlak@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1445555276-9693-1-git-send-email-jpawlowski@google.com>
+References: <1445555276-9693-1-git-send-email-jpawlowski@google.com>
+Date: Mon, 26 Oct 2015 10:57:17 +0200
+Message-ID: <CABBYNZ+nXuTgW5VoqG+uD+Ls_WqxchqB0KaZpT5+ijZ=4XG50g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] profiles/scanparam: rewrite scanparam profile
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix a crash that may happen when a connection is closed before it was fully
-established. Mapping conn->hcon was released by shutdown function, but it
-is still referenced in (not yet finished) connection established handling
-function.
+Hi Jakub,
 
-[ 4635.254073] BUG: unable to handle kernel NULL pointer dereference at 00000013
-[ 4635.262058] IP: [<c11659f0>] memcmp+0xe/0x25
-[ 4635.266835] *pdpt = 0000000024190001 *pde = 0000000000000000
-[ 4635.273261] Oops: 0000 [#1] PREEMPT SMP
-[ 4635.277652] Modules linked in: evdev ecb vfat fat libcomposite usb2380 isofs zlib_inflate rfcomm(O) udc_core bnep(O) btusb(O) btbcm(O) btintel(O) bluetooth(O) cdc_acm arc4 uinput hid_mule
-[ 4635.321761] Pid: 363, comm: kworker/u:2H Tainted: G           O 3.8.0-119.1-plk-adaptation-byt-ivi-brd #1
-[ 4635.332642] EIP: 0060:[<c11659f0>] EFLAGS: 00010206 CPU: 0
-[ 4635.338767] EIP is at memcmp+0xe/0x25
-[ 4635.342852] EAX: e4720678 EBX: 00000000 ECX: 00000006 EDX: 00000013
-[ 4635.349849] ESI: 00000000 EDI: fb85366c EBP: e40c7dc0 ESP: e40c7db4
-[ 4635.356846]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
-[ 4635.362873] CR0: 8005003b CR2: 00000013 CR3: 24191000 CR4: 001007f0
-[ 4635.369869] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
-[ 4635.376865] DR6: ffff0ff0 DR7: 00000400
-[ 4635.381143] Process kworker/u:2H (pid: 363, ti=e40c6000 task=e40c5510 task.ti=e40c6000)
-[ 4635.390080] Stack:
-[ 4635.392319]  e4720400 00000000 fb85366c e40c7df4 fb842285 e40c7de2 fb853200 00000013
-[ 4635.401003]  e3f101c4 e4720678 e3f101c0 e403be0a e40c7dfc e416a000 e403be0a fb85366c
-[ 4635.409692]  e40c7e1c fb820186 020f6c00 e47c49ac e47c4008 00000000 e416a000 e47c402c
-[ 4635.418380] Call Trace:
-[ 4635.421153]  [<fb842285>] sco_connect_cfm+0xff/0x236 [bluetooth]
-[ 4635.427893]  [<fb820186>] hci_sync_conn_complete_evt.clone.101+0x227/0x268 [bluetooth]
-[ 4635.436758]  [<fb82370f>] hci_event_packet+0x1caa/0x21d3 [bluetooth]
-[ 4635.443859]  [<c106231f>] ? trace_hardirqs_on+0xb/0xd
-[ 4635.449502]  [<c1375b8a>] ? _raw_spin_unlock_irqrestore+0x42/0x59
-[ 4635.456340]  [<fb814b67>] hci_rx_work+0xb9/0x350 [bluetooth]
-[ 4635.462663]  [<c1039f1e>] ? process_one_work+0x17b/0x2e6
-[ 4635.468596]  [<c1039f77>] process_one_work+0x1d4/0x2e6
-[ 4635.474333]  [<c1039f1e>] ? process_one_work+0x17b/0x2e6
-[ 4635.480294]  [<fb814aae>] ? hci_cmd_work+0xda/0xda [bluetooth]
-[ 4635.486810]  [<c103a3fa>] worker_thread+0x171/0x20f
-[ 4635.492257]  [<c10456c5>] ? complete+0x34/0x3e
-[ 4635.497219]  [<c103ea06>] kthread+0x90/0x95
-[ 4635.501888]  [<c103a289>] ? manage_workers+0x1df/0x1df
-[ 4635.507628]  [<c1376537>] ret_from_kernel_thread+0x1b/0x28
-[ 4635.513755]  [<c103e976>] ? __init_kthread_worker+0x42/0x42
-[ 4635.519975] Code: 74 0d 3c 79 74 04 3c 59 75 0c c6 02 01 eb 03 c6 02 00 31 c0 eb 05 b8 ea ff ff ff 5d c3 55 89 e5 57 56 53 31 db eb 0e 0f b6 34 18 <0f> b6 3c 1a 43 29 fe 75 07 49 85 c9 7f
-[ 4635.541264] EIP: [<c11659f0>] memcmp+0xe/0x25 SS:ESP 0068:e40c7db4
-[ 4635.548166] CR2: 0000000000000013
-[ 4635.552177] ---[ end trace e05ce9b8ce6182f6 ]---
----
- net/bluetooth/sco.c | 5 +++++
- 1 file changed, 5 insertions(+)
+On Fri, Oct 23, 2015 at 2:07 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> This patch rewrites scanparam profile. It will no longer trigger
+> autoconnect.
+> ---
+>  profiles/scanparam/scan.c | 255 ++++++++++++++++++++++++----------------------
+>  1 file changed, 131 insertions(+), 124 deletions(-)
+>
+> diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+> index fbda8a8..e967cab 100644
+> --- a/profiles/scanparam/scan.c
+> +++ b/profiles/scanparam/scan.c
+> @@ -40,10 +40,11 @@
+>  #include "src/profile.h"
+>  #include "src/service.h"
+>  #include "src/shared/util.h"
+> +#include "src/shared/att.h"
+> +#include "src/shared/queue.h"
+> +#include "src/shared/gatt-db.h"
+> +#include "src/shared/gatt-client.h"
+>  #include "attrib/att.h"
+> -#include "attrib/gattrib.h"
+> -#include "attrib/gatt.h"
+> -#include "src/attio.h"
+>
+>  #define SCAN_INTERVAL_WIN_UUID         0x2A4F
+>  #define SCAN_REFRESH_UUID              0x2A31
+> @@ -54,203 +55,208 @@
+>
+>  struct scan {
+>         struct btd_device *device;
+> -       GAttrib *attrib;
+> -       struct att_range range;
+> -       guint attioid;
+> -       uint16_t interval;
+> -       uint16_t window;
+> +       struct gatt_db *db;
+> +       struct bt_gatt_client *client;
+> +       struct gatt_db_attribute *attr;
+>         uint16_t iwhandle;
+> -       uint16_t refresh_handle;
+>         guint refresh_cb_id;
+>  };
+>
+> -static void write_scan_params(GAttrib *attrib, uint16_t handle)
+> +static GSList *devices;
+> +
+> +static void scan_free(struct scan *scan)
+> +{
+> +       bt_gatt_client_unregister_notify(scan->client, scan->refresh_cb_id);
+> +       gatt_db_unref(scan->db);
+> +       bt_gatt_client_unref(scan->client);
+> +       btd_device_unref(scan->device);
+> +       g_free(scan);
+> +}
+> +
+> +static int cmp_device(gconstpointer a, gconstpointer b)
+> +{
+> +       const struct scan *scan = a;
+> +       const struct btd_device *device = b;
+> +
+> +       return scan->device == device ? 0 : -1;
+> +}
+> +
+> +static void write_scan_params(struct scan *scan)
+>  {
+>         uint8_t value[4];
+>
+>         put_le16(SCAN_INTERVAL, &value[0]);
+>         put_le16(SCAN_WINDOW, &value[2]);
+>
+> -       gatt_write_cmd(attrib, handle, value, sizeof(value), NULL, NULL);
+> +       bt_gatt_client_write_without_response(scan->client, scan->iwhandle,
+> +                                               false, value, sizeof(value));
+>  }
+>
+> -static void refresh_value_cb(const uint8_t *pdu, uint16_t len,
+> -                                               gpointer user_data)
+> +static void refresh_value_cb(uint16_t value_handle, const uint8_t *value,
+> +                                       uint16_t length, void *user_data)
+>  {
+>         struct scan *scan = user_data;
+>
+> -       DBG("Server requires refresh: %d", pdu[3]);
+> +       DBG("Server requires refresh: %d", value[3]);
+>
+> -       if (pdu[3] == SERVER_REQUIRES_REFRESH)
+> -               write_scan_params(scan->attrib, scan->iwhandle);
+> +       if (value[3] == SERVER_REQUIRES_REFRESH)
+> +               write_scan_params(scan);
+>  }
+>
+> -static void ccc_written_cb(guint8 status, const guint8 *pdu,
+> -                                       guint16 plen, gpointer user_data)
+> +static void refresh_ccc_written_cb(uint16_t att_ecode, void *user_data)
+>  {
+> -       struct scan *scan = user_data;
+> -
+> -       if (status != 0) {
+> -               error("Write Scan Refresh CCC failed: %s",
+> -                                               att_ecode2str(status));
+> +       if (att_ecode != 0) {
+> +               error("Scan Refresh: notifications not enabled %s",
+> +                                               att_ecode2str(att_ecode));
+>                 return;
+>         }
+>
+>         DBG("Scan Refresh: notification enabled");
+> -
+> -       scan->refresh_cb_id = g_attrib_register(scan->attrib,
+> -                               ATT_OP_HANDLE_NOTIFY, scan->refresh_handle,
+> -                               refresh_value_cb, scan, NULL);
+>  }
+>
+> -static void discover_descriptor_cb(uint8_t status, GSList *descs,
+> -                                                               void *user_data)
+> +static void handle_refresh(struct scan *scan, uint16_t value_handle)
+>  {
+> -       struct scan *scan = user_data;
+> -       struct gatt_desc *desc;
+> -       uint8_t value[2];
+> +       DBG("Scan Refresh handle: 0x%04x", value_handle);
+>
+> -       if (status != 0) {
+> -               error("Discover descriptors failed: %s", att_ecode2str(status));
+> -               return;
+> -       }
+> +       scan->refresh_cb_id = bt_gatt_client_register_notify(scan->client,
+> +                                       value_handle, refresh_ccc_written_cb,
+> +                                               refresh_value_cb, scan, NULL);
+> +}
+> +
+> +static void handle_iwin(struct scan *scan, uint16_t value_handle)
+> +{
+> +       scan->iwhandle = value_handle;
+>
+> -       /* There will be only one descriptor on list and it will be CCC */
+> -       desc = descs->data;
+> +       DBG("Scan Interval Window handle: 0x%04x", scan->iwhandle);
+>
+> -       put_le16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
+> -       gatt_write_char(scan->attrib, desc->handle, value, sizeof(value),
+> -                                               ccc_written_cb, user_data);
+> +       write_scan_params(scan);
+>  }
+>
+> -static void refresh_discovered_cb(uint8_t status, GSList *chars,
+> +static void handle_characteristic(struct gatt_db_attribute *attr,
+>                                                                 void *user_data)
+>  {
+>         struct scan *scan = user_data;
+> -       struct gatt_char *chr;
+> -       uint16_t start, end;
+> -       bt_uuid_t uuid;
+> -
+> -       if (status) {
+> -               error("Scan Refresh %s", att_ecode2str(status));
+> -               return;
+> -       }
+> +       uint16_t value_handle;
+> +       bt_uuid_t uuid, scan_interval_wind_uuid, scan_refresh_uuid;
+>
+> -       if (!chars) {
+> -               DBG("Scan Refresh not supported");
+> +       if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle, NULL,
+> +                                                               &uuid)) {
+> +               error("Failed to obtain characteristic data");
+>                 return;
+>         }
+>
+> -       chr = chars->data;
+> +       bt_uuid16_create(&scan_interval_wind_uuid, SCAN_INTERVAL_WIN_UUID);
+> +       bt_uuid16_create(&scan_refresh_uuid, SCAN_REFRESH_UUID);
+>
+> -       DBG("Scan Refresh handle: 0x%04x", chr->value_handle);
+> +       if (bt_uuid_cmp(&scan_interval_wind_uuid, &uuid) == 0)
+> +               handle_iwin(scan, value_handle);
+> +       else if (bt_uuid_cmp(&scan_refresh_uuid, &uuid) == 0)
+> +               handle_refresh(scan, value_handle);
+> +       else {
+> +               char uuid_str[MAX_LEN_UUID_STR];
+>
+> -       start = chr->value_handle + 1;
+> -       end = scan->range.end;
+> -
+> -       if (start > end)
+> -               return;
+> -
+> -       scan->refresh_handle = chr->value_handle;
+> -
+> -       bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
+> -
+> -       gatt_discover_desc(scan->attrib, start, end, &uuid,
+> -                                       discover_descriptor_cb, user_data);
+> +               bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
+> +               DBG("Unsupported characteristic: %s", uuid_str);
+> +       }
+>  }
+>
+> -static void iwin_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+> +static void foreach_scan_param_service(struct gatt_db_attribute *attr,
+> +                                                               void *user_data)
+>  {
+>         struct scan *scan = user_data;
+> -       struct gatt_char *chr;
+>
+> -       if (status) {
+> -               error("Discover Scan Interval Window: %s",
+> -                                               att_ecode2str(status));
+> +       if (scan->attr) {
+> +               error("More than one scan params service exists for this device");
+>                 return;
+>         }
+>
+> -       chr = chars->data;
+> -       scan->iwhandle = chr->value_handle;
+> -
+> -       DBG("Scan Interval Window handle: 0x%04x", scan->iwhandle);
+> -
+> -       write_scan_params(scan->attrib, scan->iwhandle);
+> +       scan->attr = attr;
+> +       gatt_db_service_foreach_char(scan->attr, handle_characteristic, scan);
+>  }
+>
+> -static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+> +static int scan_param_accept(struct btd_service *service)
+>  {
+> -       struct scan *scan = user_data;
+> -       bt_uuid_t iwin_uuid, refresh_uuid;
+> +       struct btd_device *device = btd_service_get_device(service);
+> +       struct gatt_db *db = btd_device_get_gatt_db(device);
+> +       struct bt_gatt_client *client = btd_device_get_gatt_client(device);
+> +       bt_uuid_t scan_parameters_uuid;
+> +       struct scan *scan;
+> +       GSList *l;
+> +       char addr[18];
+>
+> -       scan->attrib = g_attrib_ref(attrib);
+> +       ba2str(device_get_address(device), addr);
+> +       DBG("Scan Parameters Client Driver profile accept (%s)", addr);
+>
+> -       if (scan->iwhandle) {
+> -               write_scan_params(scan->attrib, scan->iwhandle);
+> -               return;
+> +       l = g_slist_find_custom(devices, device, cmp_device);
+> +       if (!l) {
+> +               error("Scan Parameters service not handled by profile");
+> +               return -1;
+>         }
+>
+> -       bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
+> -       bt_uuid16_create(&refresh_uuid, SCAN_REFRESH_UUID);
+> +       scan = l->data;
+>
+> -       gatt_discover_char(scan->attrib, scan->range.start, scan->range.end,
+> -                                       &iwin_uuid, iwin_discovered_cb, scan);
+> +       /* Clean-up any old client/db and acquire the new ones */
+> +       scan->attr = NULL;
+> +       gatt_db_unref(scan->db);
+> +       bt_gatt_client_unref(scan->client);
+>
+> -       gatt_discover_char(scan->attrib, scan->range.start, scan->range.end,
+> -                               &refresh_uuid, refresh_discovered_cb, scan);
+> -}
+>
+> -static void attio_disconnected_cb(gpointer user_data)
+> -{
+> -       struct scan *scan = user_data;
+> +       scan->db = gatt_db_ref(db);
+> +       scan->client = bt_gatt_client_ref(client);
+>
+> -       g_attrib_unref(scan->attrib);
+> -       scan->attrib = NULL;
+> +       bt_string_to_uuid(&scan_parameters_uuid, SCAN_PARAMETERS_UUID);
+> +       gatt_db_foreach_service(db, &scan_parameters_uuid,
+> +                                       foreach_scan_param_service, scan);
+> +
+> +       return 0;
+>  }
+>
+> -static int scan_register(struct btd_service *service, struct gatt_primary *prim)
+> +static void scan_param_remove(struct btd_service *service)
+>  {
+>         struct btd_device *device = btd_service_get_device(service);
+>         struct scan *scan;
+> +       GSList *l;
+> +       char addr[18];
+>
+> -       scan = g_new0(struct scan, 1);
+> -       scan->device = btd_device_ref(device);
+> -       scan->range = prim->range;
+> -       scan->attioid = btd_device_add_attio_callback(device,
+> -                                                       attio_connected_cb,
+> -                                                       attio_disconnected_cb,
+> -                                                       scan);
+> -
+> -       btd_service_set_user_data(service, scan);
+> +       ba2str(device_get_address(device), addr);
+> +       DBG("GAP profile remove (%s)", addr);
+>
+> -       return 0;
+> -}
+> -
+> -static void scan_param_remove(struct btd_service *service)
+> -{
+> -       struct scan *scan = btd_service_get_user_data(service);
+> +       l = g_slist_find_custom(devices, device, cmp_device);
+> +       if (!l) {
+> +               error("GAP service not handled by profile");
+> +               return;
+> +       }
+>
+> -       if (scan->attrib != NULL && scan->refresh_cb_id > 0)
+> -               g_attrib_unregister(scan->attrib, scan->refresh_cb_id);
+> +       scan = l->data;
+>
+> -       btd_device_remove_attio_callback(scan->device, scan->attioid);
+> -       btd_device_unref(scan->device);
+> -       g_attrib_unref(scan->attrib);
+> -       g_free(scan);
+> +       devices = g_slist_remove(devices, scan);
+> +       scan_free(scan);
+>  }
+>
+>  static int scan_param_probe(struct btd_service *service)
+>  {
+>         struct btd_device *device = btd_service_get_device(service);
+> -       struct gatt_primary *prim;
+> +       struct scan *scan;
+> +       GSList *l;
+> +       char addr[18];
+>
+> -       DBG("Probing Scan Parameters");
+> +       ba2str(device_get_address(device), addr);
+> +       DBG("Scan Parameters Client Driver profile probe (%s)", addr);
+>
+> -       prim = btd_device_get_primary(device, SCAN_PARAMETERS_UUID);
+> -       if (!prim)
+> -               return -EINVAL;
+> +       /* Ignore, if we were probed for this device already */
+> +       l = g_slist_find_custom(devices, device, cmp_device);
+> +       if (l) {
+> +               error("Profile probed twice for the same device!");
+> +               return -1;
+> +       }
+>
+> -       return scan_register(service, prim);
+> +       scan = g_new0(struct scan, 1);
+> +       if (!scan)
+> +               return -1;
+> +
+> +       scan->device = btd_device_ref(device);
+> +       devices = g_slist_append(devices, scan);
+> +       return 0;
+>  }
+>
+>  static struct btd_profile scan_profile = {
+> @@ -258,6 +264,7 @@ static struct btd_profile scan_profile = {
+>         .remote_uuid = SCAN_PARAMETERS_UUID,
+>         .device_probe = scan_param_probe,
+>         .device_remove = scan_param_remove,
+> +       .accept = scan_param_accept,
+>  };
+>
+>  static int scan_param_init(void)
+> --
+> 2.5.0
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 8ec10049bc246125808938b7ea17ce4975498c65..fe129663bd3f7faeb39f20d02a8425d525da071d 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -1033,6 +1033,11 @@ static void sco_conn_ready(struct sco_conn *conn)
- 	} else {
- 		sco_conn_lock(conn);
- 
-+		if (!conn->hcon) {
-+			sco_conn_unlock(conn);
-+			return;
-+		}
-+
- 		parent = sco_get_sock_listen(&conn->hcon->src);
- 		if (!parent) {
- 			sco_conn_unlock(conn);
+Applied after fixing a line that went over 80 columns, thanks.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
