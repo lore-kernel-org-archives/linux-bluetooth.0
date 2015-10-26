@@ -1,66 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/README: Update known Android issues section
-Date: Mon, 26 Oct 2015 21:05:22 +0100
-Message-ID: <5608810.3GPEjARR0U@ix>
-In-Reply-To: <1445349902-16586-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1445349902-16586-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: "Pawlak, KubaX T" <kubax.t.pawlak@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth: remove btusb_work related workqueue
+Date: Mon, 26 Oct 2015 18:10:28 +0000
+Message-ID: <088CC8BACB3382439E91D9919CE350243656FB22@IRSMSX107.ger.corp.intel.com>
+References: <1444316120-22893-1-git-send-email-kubax.t.pawlak@intel.com>
+ <7D38034D-BDC6-4FD9-931E-7518FA2D20A4@holtmann.org>
+ <088CC8BACB3382439E91D9919CE3502436568B42@IRSMSX107.ger.corp.intel.com>
+ <6D48126C-1328-4466-9415-D48367F574C9@holtmann.org>
+ <F79E09E1-497A-46AE-879B-F4AF321285AC@holtmann.org>
+ <088CC8BACB3382439E91D9919CE3502436568BA4@IRSMSX107.ger.corp.intel.com>
+ <F4DF561E-1F0B-44A1-8275-93180F23B34D@holtmann.org>
+In-Reply-To: <F4DF561E-1F0B-44A1-8275-93180F23B34D@holtmann.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
+bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IFN1bmRheSwg
+T2N0b2JlciAyNSwgMjAxNSA3OjU3IFBNDQo+IFRvOiBQYXdsYWssIEt1YmFYIFQNCj4gQ2M6IGxp
+bnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSF0gQmx1
+ZXRvb3RoOiByZW1vdmUgYnR1c2Jfd29yayByZWxhdGVkIHdvcmtxdWV1ZQ0KPiANCj4gSGkgS3Vi
+YSwNCj4gDQo+ID4+Pj4+PiBXb3JrcXVldWUgaGFuZGxpbmcgYnR1c2Jfd29yayBpcyBubyBsb25n
+ZXIgbmVlZGVkIGFzIGJ0dXNiX25vdGlmeQ0KPiA+Pj4+Pj4gY2FuIHNsZWVwLg0KPiA+Pj4+Pj4N
+Cj4gPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IEt1YmEgUGF3bGFrIDxrdWJheC50LnBhd2xha0BpbnRl
+bC5jb20+DQo+ID4+Pj4+PiAtLS0NCj4gPj4+Pj4+IGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMg
+fCAxNCArKysrKy0tLS0tLS0tLQ0KPiA+Pj4+Pj4gMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9u
+cygrKSwgOSBkZWxldGlvbnMoLSkNCj4gPj4+Pj4+DQo+ID4+Pj4+PiBkaWZmIC0tZ2l0IGEvZHJp
+dmVycy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPj4+
+Pj4+IGluZGV4DQo+ID4+Pj4+DQo+ID4+DQo+IDI0N2IxMDYyY2I5YWZmYzY3ZDllN2Y3YTAyMzRj
+MTY3ZjkwZjRiNzkuLjk4YzYxNmRkZDdiYWM1M2IyZDVkNWY4YjNkY2MNCj4gPj4+Pj4gMmRjYTJi
+MjAxZTYzIDEwMDY0NA0KPiA+Pj4+Pj4gLS0tIGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0K
+PiA+Pj4+Pj4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+Pj4+Pj4gQEAgLTM1
+MCw3ICszNTAsNiBAQCBzdHJ1Y3QgYnR1c2JfZGF0YSB7DQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gCXVu
+c2lnbmVkIGxvbmcgZmxhZ3M7DQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gLQlzdHJ1Y3Qgd29ya19zdHJ1
+Y3Qgd29yazsNCj4gPj4+Pj4+IAlzdHJ1Y3Qgd29ya19zdHJ1Y3Qgd2FrZXI7DQo+ID4+Pj4+Pg0K
+PiA+Pj4+Pj4gCXN0cnVjdCB1c2JfYW5jaG9yIGRlZmVycmVkOw0KPiA+Pj4+Pj4gQEAgLTk4MCw3
+ICs5NzksNiBAQCBzdGF0aWMgaW50IGJ0dXNiX2Nsb3NlKHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0K
+PiA+Pj4+Pj4NCj4gPj4+Pj4+IAlCVF9EQkcoIiVzIiwgaGRldi0+bmFtZSk7DQo+ID4+Pj4+Pg0K
+PiA+Pj4+Pj4gLQljYW5jZWxfd29ya19zeW5jKCZkYXRhLT53b3JrKTsNCj4gPj4+Pj4+IAljYW5j
+ZWxfd29ya19zeW5jKCZkYXRhLT53YWtlcik7DQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4gCWNsZWFyX2Jp
+dChCVFVTQl9JU09DX1JVTk5JTkcsICZkYXRhLT5mbGFncyk7DQo+ID4+Pj4+PiBAQCAtMTE4MSw2
+ICsxMTc5LDggQEAgc3RhdGljIGludCBidHVzYl9zZW5kX2ZyYW1lKHN0cnVjdCBoY2lfZGV2DQo+
+ID4+ICpoZGV2LA0KPiA+Pj4+PiBzdHJ1Y3Qgc2tfYnVmZiAqc2tiKQ0KPiA+Pj4+Pj4gCXJldHVy
+biAtRUlMU0VROw0KPiA+Pj4+Pj4gfQ0KPiA+Pj4+Pj4NCj4gPj4+Pj4+ICtzdGF0aWMgdm9pZCBi
+dHVzYl9zY29fY2hhbmdlKHN0cnVjdCBidHVzYl9kYXRhICpkYXRhKTsNCj4gPj4+Pj4+ICsNCj4g
+Pj4+Pj4NCj4gPj4+Pj4gZG8gd2UgbmVlZCB0aGlzIGZvcndhcmQgZGVjbGFyYXRpb24gb3IgY2Fu
+IHdlIGp1c3QgbW92ZSBjb2RlIGFyb3VuZA0KPiB0bw0KPiA+PiBhdm9pZA0KPiA+Pj4+PiBpdD8N
+Cj4gPj4+Pj4NCj4gPj4+Pj4+IHN0YXRpYyB2b2lkIGJ0dXNiX25vdGlmeShzdHJ1Y3QgaGNpX2Rl
+diAqaGRldiwgdW5zaWduZWQgaW50IGV2dCkNCj4gPj4+Pj4+IHsNCj4gPj4+Pj4+IAlzdHJ1Y3Qg
+YnR1c2JfZGF0YSAqZGF0YSA9IGhjaV9nZXRfZHJ2ZGF0YShoZGV2KTsNCj4gPj4+Pj4+IEBAIC0x
+MTg5LDcgKzExODksNyBAQCBzdGF0aWMgdm9pZCBidHVzYl9ub3RpZnkoc3RydWN0IGhjaV9kZXYN
+Cj4gKmhkZXYsDQo+ID4+Pj4+IHVuc2lnbmVkIGludCBldnQpDQo+ID4+Pj4+Pg0KPiA+Pj4+Pj4g
+CWlmIChoY2lfY29ubl9udW0oaGRldiwgU0NPX0xJTkspICE9IGRhdGEtPnNjb19udW0pIHsNCj4g
+Pj4+Pj4+IAkJZGF0YS0+c2NvX251bSA9IGhjaV9jb25uX251bShoZGV2LCBTQ09fTElOSyk7DQo+
+ID4+Pj4+PiAtCQlzY2hlZHVsZV93b3JrKCZkYXRhLT53b3JrKTsNCj4gPj4+Pj4+ICsJCWJ0dXNi
+X3Njb19jaGFuZ2UoZGF0YSk7DQo+ID4+Pj4+PiAJfQ0KPiA+Pj4+Pj4gfQ0KPiA+Pj4+Pj4NCj4g
+Pj4+Pj4+IEBAIC0xMjM2LDkgKzEyMzYsOCBAQCBzdGF0aWMgaW5saW5lIGludCBfX3NldF9pc29j
+X2ludGVyZmFjZShzdHJ1Y3QNCj4gPj4gaGNpX2Rldg0KPiA+Pj4+PiAqaGRldiwgaW50IGFsdHNl
+dHRpbmcpDQo+ID4+Pj4+PiAJcmV0dXJuIDA7DQo+ID4+Pj4+PiB9DQo+ID4+Pj4+Pg0KPiA+Pj4+
+Pj4gLXN0YXRpYyB2b2lkIGJ0dXNiX3dvcmsoc3RydWN0IHdvcmtfc3RydWN0ICp3b3JrKQ0KPiA+
+Pj4+Pj4gK3N0YXRpYyB2b2lkIGJ0dXNiX3Njb19jaGFuZ2Uoc3RydWN0IGJ0dXNiX2RhdGEgKmRh
+dGEpDQo+ID4+Pj4+PiB7DQo+ID4+Pj4+PiAtCXN0cnVjdCBidHVzYl9kYXRhICpkYXRhID0gY29u
+dGFpbmVyX29mKHdvcmssIHN0cnVjdA0KPiBidHVzYl9kYXRhLA0KPiA+Pj4+PiB3b3JrKTsNCj4g
+Pj4+Pj4+IAlzdHJ1Y3QgaGNpX2RldiAqaGRldiA9IGRhdGEtPmhkZXY7DQo+ID4+Pj4+PiAJaW50
+IG5ld19hbHRzOw0KPiA+Pj4+Pj4gCWludCBlcnI7DQo+ID4+Pj4+PiBAQCAtMjYxOCw3ICsyNjE3
+LDYgQEAgc3RhdGljIGludCBidHVzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZQ0KPiA+PiAq
+aW50ZiwNCj4gPj4+Pj4+IAlkYXRhLT51ZGV2ID0gaW50ZXJmYWNlX3RvX3VzYmRldihpbnRmKTsN
+Cj4gPj4+Pj4+IAlkYXRhLT5pbnRmID0gaW50ZjsNCj4gPj4+Pj4+DQo+ID4+Pj4+PiAtCUlOSVRf
+V09SSygmZGF0YS0+d29yaywgYnR1c2Jfd29yayk7DQo+ID4+Pj4+PiAJSU5JVF9XT1JLKCZkYXRh
+LT53YWtlciwgYnR1c2Jfd2FrZXIpOw0KPiA+Pj4+Pj4gCWluaXRfdXNiX2FuY2hvcigmZGF0YS0+
+ZGVmZXJyZWQpOw0KPiA+Pj4+Pj4gCWluaXRfdXNiX2FuY2hvcigmZGF0YS0+dHhfYW5jaG9yKTsN
+Cj4gPj4+Pj4+IEBAIC0yODQ4LDggKzI4NDYsNiBAQCBzdGF0aWMgaW50IGJ0dXNiX3N1c3BlbmQo
+c3RydWN0IHVzYl9pbnRlcmZhY2UNCj4gPj4gKmludGYsDQo+ID4+Pj4+IHBtX21lc3NhZ2VfdCBt
+ZXNzYWdlKQ0KPiA+Pj4+Pj4gCQlyZXR1cm4gLUVCVVNZOw0KPiA+Pj4+Pj4gCX0NCj4gPj4+Pj4+
+DQo+ID4+Pj4+PiAtCWNhbmNlbF93b3JrX3N5bmMoJmRhdGEtPndvcmspOw0KPiA+Pj4+Pj4gLQ0K
+PiA+Pj4+Pj4gCWJ0dXNiX3N0b3BfdHJhZmZpYyhkYXRhKTsNCj4gPj4+Pj4+IAl1c2Jfa2lsbF9h
+bmNob3JlZF91cmJzKCZkYXRhLT50eF9hbmNob3IpOw0KPiA+Pj4+Pj4NCj4gPj4+Pj4+IEBAIC0y
+OTIyLDcgKzI5MTgsNyBAQCBzdGF0aWMgaW50IGJ0dXNiX3Jlc3VtZShzdHJ1Y3QgdXNiX2ludGVy
+ZmFjZQ0KPiA+PiAqaW50ZikNCj4gPj4+Pj4+IAlwbGF5X2RlZmVycmVkKGRhdGEpOw0KPiA+Pj4+
+Pj4gCWNsZWFyX2JpdChCVFVTQl9TVVNQRU5ESU5HLCAmZGF0YS0+ZmxhZ3MpOw0KPiA+Pj4+Pj4g
+CXNwaW5fdW5sb2NrX2lycSgmZGF0YS0+dHhsb2NrKTsNCj4gPj4+Pj4+IC0Jc2NoZWR1bGVfd29y
+aygmZGF0YS0+d29yayk7DQo+ID4+Pj4+PiArCWJ0dXNiX3Njb19jaGFuZ2UoZGF0YSk7DQo+ID4+
+Pj4+DQo+ID4+Pj4+IENhbiB3ZSBhY3R1YWxseSBzbGVlcCBpbiB0aGUgcmVzdW1lIGNhbGxiYWNr
+cz8gSSB0aGluayBzbywgYnV0IEkgaGF2ZSBub3QNCj4gPj4gdGVzdGluZw0KPiA+Pj4+PiBydW50
+aW1lIHBvd2VyIG1hbmFnZW1lbnQgaW4gYSB3aGlsZS4NCj4gPj4+Pg0KPiA+Pj4+IEFwcGFyZW50
+bHkgd2UgY2FuJ3QsIHNvIHdvcmtxdWV1ZSBuZWVkcyB0byBzdGF5IGFuZCB0aGlzIHBhdGNoIGlz
+IGludmFsaWQuDQo+ID4+Pg0KPiA+Pj4gSSB0aGluayB0aGF0IHJlbW92aW5nIHRoZSB1c2FnZSBv
+ZiB0aGUgd29ya3F1ZXVlIGluIGJ0dXNiX25vdGlmeSBpcyBzdGlsbCBhDQo+ID4+IGdvb2QgdGhp
+bmcgc2luY2UgaXQgcmVkdWNlcyB0aGUgbGF0ZW5jeSB3aGVuIGVzdGFibGlzaGluZyBTQ08gY29u
+bmVjdGlvbnMuDQo+ID4+DQo+ID4+IGFjdHVhbGx5IEkgd29uZGVyIGlmIHRoZSBjYWxsIHRvIHVz
+Yl9zZXRfaW50ZXJmYWNlIGlzIG5lZWRlZCBvbiByZXN1bWUgaW4gdGhlDQo+ID4+IGZpcnN0IHBs
+YWNlLiBNYXliZSB0aGlzIGlzIGFjdHVhbGx5IG5vdCBuZWVkZWQgYW5kIHdlIGp1c3QgbmVlZCB0
+byByZXN0YXJ0IHRoZQ0KPiA+PiBVUkJzLg0KPiA+Pg0KPiA+PiBEbyB5b3UgaGF2ZSB0aGUgY2hh
+bmNlIHRvIHRlc3QgYW5kIHNlZSBpZiB0aGUgYWx0ZXJuYXRlIHNldHRpbmcgYWN0dWFsbHkNCj4g
+Y2hhbmdlZA0KPiA+PiBvdmVyIHJlc3VtZT8NCj4gPg0KPiA+IE91ciBwbGF0Zm9ybSBkb2VzIG5v
+dCBzdXBwb3J0IHN1c3BlbmQvcmVzdW1lLiBJIGhhdmUgYW4gRWxsaXN5cyBhbmFseXNlcg0KPiB3
+aXRoIGV4dGVybmFsIFdQIG1vZHVsZSBjb25uZWN0ZWQgdGhyb3VnaCBpdCBvdmVyIFVTQiwgc28g
+SSBjYW4gdHJhY2Ugd2hhdA0KPiBhbHRzZXR0aW5ncyBhcmUgc2V0IGFuZCB3aGVuLiBJIHdpbGwg
+bG9vayBpbnRvIGEgcG9zc2liaWxpdHkgb2YgdGVzdGluZyB0aGlzIHVzaW5nIGENCj4gbGFwdG9w
+LCBidXQgSSBkb27igJl0IGtub3cgaG93IHRvIGVhc2lseSBtYWtlIHBob25lIG9wZW4gU0NPIGNo
+YW5uZWwsIHNvIEkNCj4gZG9uJ3QgbmVlZCB0byBwb3J0IG91ciBQdWxzZUF1ZGlvLg0KPiANCj4g
+YW55IHVwZGF0ZSBoZXJlPyBJIHdvdWxkIHJlYWxseSBnZXQgb2YgdGhpcyB3b3JrcXVldWUgdXNh
+Z2UgaW4gYnR1c2IgZHJpdmVyLg0KDQpTb3JyeSBmb3IgdGhlIGRlbGF5LCBidXQgSSdtIHN0dWNr
+IGluIHNvbWUgaW50ZXJuYWwgcHJvamVjdCBzdHVmZi4gSSB1c2VkIEVsbGlzeXMgYW5kIGEgbGFw
+dG9wIHJ1bm5pbmcgRmVkb3JhIDIxIGFzIG91ciBzeXN0ZW0gZG9lcyBub3Qgc3VwcG9ydCBhbnkg
+dHlwZSBvZiBzdXNwZW5kLiBUbyBjcmVhdGUgYm9ndXMgU0NPIGxpbmsgSSB1c2UgJ3Njb3Rlc3Qg
+LW4gPHBob25lIE1BQz4nLiBUaGVyZSBpcyBubyBkYXRhIGZsb3dpbmcsIGJ1dCBhdCBsZWFzdCBz
+dHJlYW0gaXMgc2V0IHVwLiBPbiBzdHJlYW0gY3JlYXRpb24gQWx0U2V0dGluZ3MgY2hhbmdlIHRv
+IDIgYXMgZXhwZWN0ZWQuIE9uIGxhcHRvcCBzdXNwZW5kIHRoZXJlIGlzIG5vdGhpbmcgdGhlcmUs
+IGxvb2tzIGxpa2Ugd2UgZG9uJ3QgY2hhbmdlIHNldHRpbmdzLiBDb250cm9sbGVyIHJlbWFpbnMg
+YWN0aXZlLiBPbiByZXN1bWUgd2UgZ2V0Og0KR2V0RGVzY3JpcHRvcihEZXZpY2UpLCBTZXRBZGRy
+ZXNzICgyKSwgR2V0RGVzY3JpcHRvcihEZXZpY2UpLCBHZXREZXNjcmlwdG9yKENvbmZpZ3VyYXRp
+b24pLFNldENvbmZpZ3VyYXRpb24oMSksU2V0SW50ZXJmYWNlICgxLCBBbHRTZXQyKSwgR2V0U3Rh
+dHVzKERldmljZSkuDQpTbyBpdCBsb29rcyBsaWtlIHdlIGFyZSBjaGFuZ2luZyBhbHRzZXR0aW5n
+IGluIHJlc3VtZSB0byB3aGF0ZXZlciB3YXMgc2V0IGJlZm9yZSBzdXNwZW5kLiBBdCBidHVzYl93
+b3JrIGNhbiBzbGVlcCBhbmQgcmVzdW1lIGRvZXMgbm90LCBpdCBsb29rcyBsaWtlIHdlIGNhbid0
+IHJlbW92ZSB0aGlzIHdvcmtxdWV1ZSBmcm9tIHRoZXJlLiBJIGRvbuKAmXQga25vdyBVU0IgYXQg
+YWxsIHNvIEkgY2Fu4oCZdCBzYXkgd2hhdCB0byBkbyB3aXRoIHRoYXQuIERvZXMgYWN0aXZlIFND
+TyBsaW5rIG92ZXIgc3VzcGVuZC9yZXN1bWUgbWFrZXMgc2Vuc2U/DQoNClRoZXJlIGlzIGFsc28g
+YW4gYW5ub3lpbmcgRWxsaXN5cyBidWcgaW4gaGVyZS4gV2hlbiBjcmVhdGluZyBTQ08gbGluayB3
+aXRoIHNjb3Rlc3QsIHRoZXJlIGlzIG5vIHVwZGF0ZSB0byBvdmVydmlldywgbm8gbWF0dGVyIHdo
+YXQgSSBkbyB0byBncm91cGluZy4gT25seSBhZnRlciByZXN1bWUsIGFsbCBtZXNzYWdlcyBhcmUg
+cHVzaGVkIHRvIHRoZSBvdmVydmlldyBhbmQgSSBjYW4gc2VlIHdoYXQgaGFwcGVuZWQuDQoNCkt1
+YmENCkludGVsIERldXRzY2hsYW5kIEdtYkgKUmVnaXN0ZXJlZCBBZGRyZXNzOiBBbSBDYW1wZW9u
+IDEwLTEyLCA4NTU3OSBOZXViaWJlcmcsIEdlcm1hbnkKVGVsOiArNDkgODkgOTkgODg1My0wLCB3
+d3cuaW50ZWwuZGUKTWFuYWdpbmcgRGlyZWN0b3JzOiBDaHJpc3RpbiBFaXNlbnNjaG1pZCwgUHJv
+Zi4gRHIuIEhlcm1hbm4gRXVsCkNoYWlycGVyc29uIG9mIHRoZSBTdXBlcnZpc29yeSBCb2FyZDog
+VGlmZmFueSBEb29uIFNpbHZhClJlZ2lzdGVyZWQgT2ZmaWNlOiBNdW5pY2gKQ29tbWVyY2lhbCBS
+ZWdpc3RlcjogQW10c2dlcmljaHQgTXVlbmNoZW4gSFJCIDE4NjkyOAo=
 
-On Tuesday 20 October 2015 16:05:02 Grzegorz Kolodziejczyk wrote:
-> This adds a patch which allows handling ssp passkey request.
-> ---
->  android/README | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/README b/android/README
-> index 9aa9a37..6b7f79d 100644
-> --- a/android/README
-> +++ b/android/README
-> @@ -9,7 +9,7 @@ replacement to Android provided Bluetooth stack.
->  More details about BlueZ for Android architecture and components can be
-> found in android/hal-ipc-api.txt file.
-> 
-> -Supported Android version: 4.4 KitKat and 5.0 Lollipop
-> +Supported Android version: 4.4 KitKat and 5.0, 5.1.1 Lollipop
-> 
-> 
->  Building and running on Android
-> @@ -402,12 +402,16 @@ affect qualification or user experience. This section
-> provides list of recommended Android fixes that are not part of latest AOSP
-> release supported by BlueZ.
-> 
-> +For Android 5.1.1 Lollipop:
-> +https://android-review.googlesource.com/177314
-> +
->  For Android 5.0 Lollipop:
->  https://android-review.googlesource.com/99761
->  https://android-review.googlesource.com/100297
->  https://android-review.googlesource.com/102882
->  https://android-review.googlesource.com/132733
->  https://android-review.googlesource.com/132763
-> +https://android-review.googlesource.com/177314
-> 
->  For Android 4.4 KitKat:
->  https://android-review.googlesource.com/82757
-> @@ -417,6 +421,7 @@ https://android-review.googlesource.com/99761
->  https://android-review.googlesource.com/99850
->  https://android-review.googlesource.com/100297
->  https://android-review.googlesource.com/102882
-> +https://android-review.googlesource.com/177314
-> 
->  Unimplemented Bluetooth features
->  ================================
-
-Applied, thanks.
-
--- 
-pozdrawiam
-Szymon Janc
