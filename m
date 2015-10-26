@@ -1,34 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] unit: Fix gobex unit tests
-Date: Mon, 26 Oct 2015 22:48:03 +0100
-Message-Id: <1445896083-15680-1-git-send-email-szymon.janc@codecoup.pl>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/README: Update known Android issues section
+Date: Mon, 26 Oct 2015 21:05:22 +0100
+Message-ID: <5608810.3GPEjARR0U@ix>
+In-Reply-To: <1445349902-16586-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1445349902-16586-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-/gobex/test_header_encode_connid test name was duplicated.
-This results in Glib assert:
-(unit/test-gobex-header:15356): GLib-ERROR **: duplicate test
-    case path: /gobex/test_header_encode_connid
----
- unit/test-gobex-header.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Grzegorz,
 
-diff --git a/unit/test-gobex-header.c b/unit/test-gobex-header.c
-index 6f49312..8705892 100644
---- a/unit/test-gobex-header.c
-+++ b/unit/test-gobex-header.c
-@@ -554,7 +554,7 @@ int main(int argc, char *argv[])
- 					test_header_encode_name_umlaut);
- 	g_test_add_func("/gobex/test_header_encode_body",
- 						test_header_encode_body);
--	g_test_add_func("/gobex/test_header_encode_connid",
-+	g_test_add_func("/gobex/test_header_encode_actionid",
- 						test_header_encode_actionid);
- 	g_test_add_func("/gobex/test_header_encode_apparam",
- 						test_header_encode_apparam);
+On Tuesday 20 October 2015 16:05:02 Grzegorz Kolodziejczyk wrote:
+> This adds a patch which allows handling ssp passkey request.
+> ---
+>  android/README | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/README b/android/README
+> index 9aa9a37..6b7f79d 100644
+> --- a/android/README
+> +++ b/android/README
+> @@ -9,7 +9,7 @@ replacement to Android provided Bluetooth stack.
+>  More details about BlueZ for Android architecture and components can be
+> found in android/hal-ipc-api.txt file.
+> 
+> -Supported Android version: 4.4 KitKat and 5.0 Lollipop
+> +Supported Android version: 4.4 KitKat and 5.0, 5.1.1 Lollipop
+> 
+> 
+>  Building and running on Android
+> @@ -402,12 +402,16 @@ affect qualification or user experience. This section
+> provides list of recommended Android fixes that are not part of latest AOSP
+> release supported by BlueZ.
+> 
+> +For Android 5.1.1 Lollipop:
+> +https://android-review.googlesource.com/177314
+> +
+>  For Android 5.0 Lollipop:
+>  https://android-review.googlesource.com/99761
+>  https://android-review.googlesource.com/100297
+>  https://android-review.googlesource.com/102882
+>  https://android-review.googlesource.com/132733
+>  https://android-review.googlesource.com/132763
+> +https://android-review.googlesource.com/177314
+> 
+>  For Android 4.4 KitKat:
+>  https://android-review.googlesource.com/82757
+> @@ -417,6 +421,7 @@ https://android-review.googlesource.com/99761
+>  https://android-review.googlesource.com/99850
+>  https://android-review.googlesource.com/100297
+>  https://android-review.googlesource.com/102882
+> +https://android-review.googlesource.com/177314
+> 
+>  Unimplemented Bluetooth features
+>  ================================
+
+Applied, thanks.
+
 -- 
-2.6.2
-
+pozdrawiam
+Szymon Janc
