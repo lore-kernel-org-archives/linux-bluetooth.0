@@ -2,83 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH 0/4] Abort on small allocations
-Date: Mon, 26 Oct 2015 22:57:28 +0100
-Message-Id: <1445896652-16417-1-git-send-email-szymon.janc@codecoup.pl>
+Subject: [PATCH] unit: Fix gobex unit tests
+Date: Mon, 26 Oct 2015 22:48:03 +0100
+Message-Id: <1445896083-15680-1-git-send-email-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+/gobex/test_header_encode_connid test name was duplicated.
+This results in Glib assert:
+(unit/test-gobex-header:15356): GLib-ERROR **: duplicate test
+    case path: /gobex/test_header_encode_connid
+---
+ unit/test-gobex-header.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Rebased and resent.
-
->From original RFC:
-This patchset is an initial work to simplify handling of memory allocation
-failures in BlueZ. The solution is simple: don't check for errors and just
-abort if allocation fails.
-
-This make error paths (which were most likely never executed) *much* simpler.
-
-Another benefit is increased similarity of src/shared APIs to already used
-Glib APIs which also abort on allocation error (unless _try variant is used).
-This makes transition from Glib APIs to shared APIs easier.
-
-Patches 1-3 are samples that show how much of the error handling code
-can be removed. Those are initial patches as 'never-fail' API propagates up
-(new0()->queue_new()->foo_add()) and futher error handling can be removed.
-
-
-Szymon Janc (4):
-  shared: Make new0 abort on failure
-  shared: Remove dead code
-  android: Remove dead code
-  core: Remove dead code
-
- android/avdtp.c               |   5 +-
- android/avdtptest.c           |   4 -
- android/bas.c                 |  55 +------
- android/bluetooth.c           |  17 ---
- android/dis.c                 |  11 --
- android/gatt.c                | 336 +++++-------------------------------------
- android/handsfree-client.c    |  14 +-
- android/handsfree.c           |   9 +-
- android/health.c              |  67 ++-------
- android/hog.c                 |   2 -
- android/scpp.c                |  22 +--
- android/tester-a2dp.c         |   7 +-
- android/tester-avrcp.c        |   7 +-
- android/tester-bluetooth.c    |   7 +-
- android/tester-gatt.c         |   7 +-
- android/tester-hdp.c          |   7 +-
- android/tester-hidhost.c      |   7 +-
- android/tester-map-client.c   |   7 +-
- android/tester-pan.c          |   7 +-
- android/tester-socket.c       |   7 +-
- src/advertising.c             |   6 -
- src/gatt-client.c             |  67 ---------
- src/gatt-database.c           | 100 -------------
- src/shared/ad.c               |  31 ----
- src/shared/att.c              |  34 +----
- src/shared/crypto.c           |   2 -
- src/shared/gap.c              |   7 -
- src/shared/gatt-client.c      |  59 --------
- src/shared/gatt-db.c          |  37 -----
- src/shared/gatt-helpers.c     |  24 ---
- src/shared/gatt-server.c      |  47 ------
- src/shared/hci-crypto.c       |   6 -
- src/shared/hci.c              |  29 ----
- src/shared/hfp.c              |  40 -----
- src/shared/io-mainloop.c      |   3 -
- src/shared/mgmt.c             |  42 ------
- src/shared/queue.c            |  12 --
- src/shared/ringbuf.c          |   3 -
- src/shared/tester.c           |   9 --
- src/shared/timeout-mainloop.c |   3 -
- src/shared/uhid.c             |   8 -
- src/shared/util.c             |  16 ++
- src/shared/util.h             |  14 +-
- 43 files changed, 97 insertions(+), 1107 deletions(-)
-
+diff --git a/unit/test-gobex-header.c b/unit/test-gobex-header.c
+index 6f49312..8705892 100644
+--- a/unit/test-gobex-header.c
++++ b/unit/test-gobex-header.c
+@@ -554,7 +554,7 @@ int main(int argc, char *argv[])
+ 					test_header_encode_name_umlaut);
+ 	g_test_add_func("/gobex/test_header_encode_body",
+ 						test_header_encode_body);
+-	g_test_add_func("/gobex/test_header_encode_connid",
++	g_test_add_func("/gobex/test_header_encode_actionid",
+ 						test_header_encode_actionid);
+ 	g_test_add_func("/gobex/test_header_encode_apparam",
+ 						test_header_encode_apparam);
 -- 
 2.6.2
 
