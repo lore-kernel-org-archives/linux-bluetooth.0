@@ -1,70 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 106691] New: BNEP multicast filter is filtering multicast
- addresses in default case although differently specified
-Date: Tue, 27 Oct 2015 11:32:01 +0000
-Message-ID: <bug-106691-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <562F5063.2020809@steev.me.uk>
+Date: Tue, 27 Oct 2015 10:22:27 +0000
+From: Steven Davies <linux-bluetooth-list@steev.me.uk>
 MIME-Version: 1.0
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: After bluetoothd disconnects a LE device only restart of kernel
+ modules allows it to reconnect
+References: <562BBBFF.9000805@steev.me.uk> <1E7A740C-DA0A-45F0-8F03-BA21BC5F37B2@holtmann.org>
+In-Reply-To: <1E7A740C-DA0A-45F0-8F03-BA21BC5F37B2@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=106691
-
-            Bug ID: 106691
-           Summary: BNEP multicast filter is filtering multicast addresses
-                    in default case although differently specified
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 4.0.4
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: high
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: danny.schweizer@proofnet.de
-        Regression: No
-
-A Linux PC is connected with another device over Bluetooth PAN using a BNEP
-interface.
-
-Whenever a packet is tried to be sent over the BNEP interface, the function
-"bnep_net_xmit()" in "net/bluetooth/bnep/netdev.c" is called. This function
-calls "bnep_net_mc_filter()", which checks (if the destination address is
-multicast) if the address is set in a certain multicast filter (&s->mc_filter).
-If it is not, then it is not sent out.
-
-This filter is only changed in two other functions, found in
-net/bluetooth/bnep/core.c": in "bnep_ctrl_set_mc_filter()", which is only
-called if a message of type "BNEP_FILTER_MULTI_ADDR_SET" is received.
-Otherwise, it is set in "bnep_add_connection()", where it is set to a default
-value which only adds the broadcast address to the filter:
-
-set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
-
-
-To sum up, if the BNEP interface does not receive any message of type
-"BNEP_FILTER_MULTI_ADDR_SET", it will not send out any messages with multicast
-destination addresses except for broadcast.
-
-
-However, in the BNEP specification (page 27 in
-http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf), it is said that per
-default, all multicast addresses should not be filtered, i.e. the BNEP
-interface should be able to send packets with any multicast destination
-address.
-
-It seems that the default case is wrong: the multicast filter should not block
-almost all multicast addresses, but should not filter out any.
-
-This leads to the problem that e.g. Neighbor Solicitation messages sent with
-Bluetooth PAN over the BNEP interface to a multicast destination address other
-than broadcast are blocked and not sent out.
+Hi Marcel,
+> Hi Steven,
+>
+>> I'm using bluez-5.35 with kernel 4.2 and am seeing that after a while (could be minutes, hours or days, I don't know what the trigger is) a BLE device will disconnect and the only way to reconnect to it is to rmmod the bluetooth  modules and re-modprobe them. Obviously this shouldn't happen. I'm seeing the following output from bluetoothd (sorry for the huge log, let me know if a full pastebin would be better). Can anyone offer any insight into why once this happens, I can't talk to the device through Bluetooth?
+> can you also show the btmon for this situation. And any chance to test 4.2.x stable kernel. A few patches went into stable kernel that might fix this. I would be also great if you can do a quick test with 4.3-rc7 and bluetooth-next kernels to see if this might be something that we already fixed.
+The best I can do at the moment is 4.3-rc6 since this is running on an
+ARM dev board that needs a special set of kernel patches. I've started
+my program running on that and am running btmon as well. If the issue
+happens again I'll post back with the btmon log.
 
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Regards
+Steven Davies
