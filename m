@@ -1,46 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Subject: [PATCH bluetooth-next] bluetooth: 6lowpan: fix NOHZ: local_softirq_pending
-Date: Tue, 27 Oct 2015 08:35:24 +0100
-Message-Id: <1445931324-1524-1-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [PATCH] Bluetooth: Fix crash on fast disconnect of SCO
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1445876234-14525-1-git-send-email-kubax.t.pawlak@intel.com>
+Date: Tue, 27 Oct 2015 14:02:07 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C81A7BCD-78F8-41C8-A969-B39AA0876AA1@holtmann.org>
+References: <1445876234-14525-1-git-send-email-kubax.t.pawlak@intel.com>
+To: Kuba Pawlak <kubax.t.pawlak@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Jukka reported about the following warning:
+Hi Kuba,
 
-"NOHZ: local_softirq_pending 08"
+> Fix a crash that may happen when a connection is closed before it was fully
+> established. Mapping conn->hcon was released by shutdown function, but it
+> is still referenced in (not yet finished) connection established handling
+> function.
+> 
+> [ 4635.254073] BUG: unable to handle kernel NULL pointer dereference at 00000013
+> [ 4635.262058] IP: [<c11659f0>] memcmp+0xe/0x25
+> [ 4635.266835] *pdpt = 0000000024190001 *pde = 0000000000000000
+> [ 4635.273261] Oops: 0000 [#1] PREEMPT SMP
+> [ 4635.277652] Modules linked in: evdev ecb vfat fat libcomposite usb2380 isofs zlib_inflate rfcomm(O) udc_core bnep(O) btusb(O) btbcm(O) btintel(O) bluetooth(O) cdc_acm arc4 uinput hid_mule
+> [ 4635.321761] Pid: 363, comm: kworker/u:2H Tainted: G           O 3.8.0-119.1-plk-adaptation-byt-ivi-brd #1
+> [ 4635.332642] EIP: 0060:[<c11659f0>] EFLAGS: 00010206 CPU: 0
+> [ 4635.338767] EIP is at memcmp+0xe/0x25
+> [ 4635.342852] EAX: e4720678 EBX: 00000000 ECX: 00000006 EDX: 00000013
+> [ 4635.349849] ESI: 00000000 EDI: fb85366c EBP: e40c7dc0 ESP: e40c7db4
+> [ 4635.356846]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+> [ 4635.362873] CR0: 8005003b CR2: 00000013 CR3: 24191000 CR4: 001007f0
+> [ 4635.369869] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+> [ 4635.376865] DR6: ffff0ff0 DR7: 00000400
+> [ 4635.381143] Process kworker/u:2H (pid: 363, ti=e40c6000 task=e40c5510 task.ti=e40c6000)
+> [ 4635.390080] Stack:
+> [ 4635.392319]  e4720400 00000000 fb85366c e40c7df4 fb842285 e40c7de2 fb853200 00000013
+> [ 4635.401003]  e3f101c4 e4720678 e3f101c0 e403be0a e40c7dfc e416a000 e403be0a fb85366c
+> [ 4635.409692]  e40c7e1c fb820186 020f6c00 e47c49ac e47c4008 00000000 e416a000 e47c402c
+> [ 4635.418380] Call Trace:
+> [ 4635.421153]  [<fb842285>] sco_connect_cfm+0xff/0x236 [bluetooth]
+> [ 4635.427893]  [<fb820186>] hci_sync_conn_complete_evt.clone.101+0x227/0x268 [bluetooth]
+> [ 4635.436758]  [<fb82370f>] hci_event_packet+0x1caa/0x21d3 [bluetooth]
+> [ 4635.443859]  [<c106231f>] ? trace_hardirqs_on+0xb/0xd
+> [ 4635.449502]  [<c1375b8a>] ? _raw_spin_unlock_irqrestore+0x42/0x59
+> [ 4635.456340]  [<fb814b67>] hci_rx_work+0xb9/0x350 [bluetooth]
+> [ 4635.462663]  [<c1039f1e>] ? process_one_work+0x17b/0x2e6
+> [ 4635.468596]  [<c1039f77>] process_one_work+0x1d4/0x2e6
+> [ 4635.474333]  [<c1039f1e>] ? process_one_work+0x17b/0x2e6
+> [ 4635.480294]  [<fb814aae>] ? hci_cmd_work+0xda/0xda [bluetooth]
+> [ 4635.486810]  [<c103a3fa>] worker_thread+0x171/0x20f
+> [ 4635.492257]  [<c10456c5>] ? complete+0x34/0x3e
+> [ 4635.497219]  [<c103ea06>] kthread+0x90/0x95
+> [ 4635.501888]  [<c103a289>] ? manage_workers+0x1df/0x1df
+> [ 4635.507628]  [<c1376537>] ret_from_kernel_thread+0x1b/0x28
+> [ 4635.513755]  [<c103e976>] ? __init_kthread_worker+0x42/0x42
+> [ 4635.519975] Code: 74 0d 3c 79 74 04 3c 59 75 0c c6 02 01 eb 03 c6 02 00 31 c0 eb 05 b8 ea ff ff ff 5d c3 55 89 e5 57 56 53 31 db eb 0e 0f b6 34 18 <0f> b6 3c 1a 43 29 fe 75 07 49 85 c9 7f
+> [ 4635.541264] EIP: [<c11659f0>] memcmp+0xe/0x25 SS:ESP 0068:e40c7db4
+> [ 4635.548166] CR2: 0000000000000013
+> [ 4635.552177] ---[ end trace e05ce9b8ce6182f6 ]---
+> ---
+> net/bluetooth/sco.c | 5 +++++
+> 1 file changed, 5 insertions(+)
 
-I remember this warning and we had a similar issue when using workqueues
-and calling netif_rx. See commit 5ff3fec ("mac802154: fix NOHZ
-local_softirq_pending 08 warning").
+patch has been applied to bluetooth-next tree.
 
-This warning occurs when calling "netif_rx" inside the wrong context
-(non softirq context). The net core api offers "netif_rx_ni" to call
-netif_rx inside the correct softirq context.
+Regards
 
-Reported-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/bluetooth/6lowpan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index d85af23..9e9cca3 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -263,7 +263,7 @@ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
- 	if (!skb_cp)
- 		return NET_RX_DROP;
- 
--	return netif_rx(skb_cp);
-+	return netif_rx_ni(skb_cp);
- }
- 
- static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
--- 
-2.6.1
+Marcel
 
