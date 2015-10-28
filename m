@@ -1,40 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Tue, 27 Oct 2015 21:10:49 -0700
-Message-ID: <CAD0=r8zi097exhrwL8nJfUeL7wLYSHfpKYvgh33dFGcPYyoedw@mail.gmail.com>
-Subject: BlueZ: btd_profile callbacks not being triggered properly for LE
- devices ?
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZJbZzuFQNYSmMmXNv3zWPBsvtFSTvFKroCyyQndDPrw7Q@mail.gmail.com>
+References: <CAHmfHqTrHGpwyxaP6rsBNk5FamFxJMFBy547UY21vQLdLSDc4Q@mail.gmail.com>
+ <CABBYNZLjPt_vCcW5JswbK+utJvVm8SbEAus7dw0jt+fW3Q8Fug@mail.gmail.com>
+ <CAHmfHqQjBKrW+HhjDLaNQPcvYwnzYtm=2WJUhAgKUyyAS-AW7A@mail.gmail.com> <CABBYNZJbZzuFQNYSmMmXNv3zWPBsvtFSTvFKroCyyQndDPrw7Q@mail.gmail.com>
+From: Leon Nicholls <lnicholls@google.com>
+Date: Tue, 27 Oct 2015 19:58:25 -0700
+Message-ID: <CAHmfHqS_jW0vLA14wMz939BNV1XKzUr7BG+_h_4Xzq1LywLz+w@mail.gmail.com>
+Subject: Re: Cannot write to BLE thermal printer
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-struct btd_profile contains folowing callbacks:
-.connect
-.disconnect
-.device_probe
-.device_remove
-.accept
-
-I noticed that those callbacks:
-.device_probe
-.device_remove
-.accept
-
-are called properly, but:
-.connect
-.disconnect
-
-callbacks are not being called at all when LE device disconnected
-itself or was connected or autoconnected back. There is no doc, but
-I'm guessing those should be triggered in this cases, right ? Also,
-when I connect first time to a device, only .accept should be
-triggered, but when I connect next time only .connect ?
-Can you please explain what is the intended order of those callbacks ?
-Then I can fix them if I find some discrepencies from intended
-behaviour.
-
-Jakub
+In my web app I don't explicitly do a scan for devices. That is done
+somewhere inside the polymer element or even the Web Bluetooth API in
+Chrome. I'm going to experiment with using the Web Bluetooth API
+directly to eliminate one level of abstraction.
