@@ -1,69 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+i1r=i_ihLb2Yocc4+3Bw7Py7ru8SwBweJeBp1jsicFg@mail.gmail.com>
-References: <CAHmfHqTrHGpwyxaP6rsBNk5FamFxJMFBy547UY21vQLdLSDc4Q@mail.gmail.com>
- <CABBYNZLjPt_vCcW5JswbK+utJvVm8SbEAus7dw0jt+fW3Q8Fug@mail.gmail.com>
- <CAHmfHqQjBKrW+HhjDLaNQPcvYwnzYtm=2WJUhAgKUyyAS-AW7A@mail.gmail.com>
- <CABBYNZJbZzuFQNYSmMmXNv3zWPBsvtFSTvFKroCyyQndDPrw7Q@mail.gmail.com>
- <CAHmfHqS_jW0vLA14wMz939BNV1XKzUr7BG+_h_4Xzq1LywLz+w@mail.gmail.com>
- <CAEZxfGPPoYOX=yGDP2TQFRw7GY_zCXZrPYuDxxK8jt49veyjyg@mail.gmail.com>
- <CAHmfHqQLmiGep3nKZ-Vq8RHqvG-SwVJhvUJSnDJZ6+jGeAFXpg@mail.gmail.com>
- <CAEZxfGPdU0fzp_P-7AJDSF+xCnXPqVUHs8fs8SA1jpDiRp2urg@mail.gmail.com> <CABBYNZ+i1r=i_ihLb2Yocc4+3Bw7Py7ru8SwBweJeBp1jsicFg@mail.gmail.com>
-From: Leon Nicholls <lnicholls@google.com>
-Date: Wed, 28 Oct 2015 20:02:09 -0700
-Message-ID: <CAHmfHqRKpY=0ot6htP=GdB3C=rHQn0jp-o6rvvYSpzKzeriePQ@mail.gmail.com>
-Subject: Re: Cannot write to BLE thermal printer
+In-Reply-To: <CABBYNZLXjY1v2d0w31GBv8Mhdhu7EAeXA04j9XJ5aJgbB1VmHg@mail.gmail.com>
+References: <CAD0=r8zi097exhrwL8nJfUeL7wLYSHfpKYvgh33dFGcPYyoedw@mail.gmail.com>
+	<CABBYNZ+vA9bXbTj4EY7aw9pGY5gTRaSjLq0zhCVTCryPhCTLJw@mail.gmail.com>
+	<CAD0=r8wBqDaHu+3tZR9POSB2MYvU7tVGafYNjufRCgLi7-i14g@mail.gmail.com>
+	<CABBYNZLXjY1v2d0w31GBv8Mhdhu7EAeXA04j9XJ5aJgbB1VmHg@mail.gmail.com>
+Date: Wed, 28 Oct 2015 14:21:19 -0700
+Message-ID: <CAD0=r8z5p3ZhQ_PczVXgsgZ_Me-E6jjHCRN0GiODY77L0gewKw@mail.gmail.com>
+Subject: Re: BlueZ: btd_profile callbacks not being triggered properly for LE
+ devices ?
+From: Jakub Pawlowski <jpawlowski@google.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary=047d7b67604ea5a6a40523358ac6
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---047d7b67604ea5a6a40523358ac6
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hi Luiz,
 
-Following Fran=C3=A7ois instructions to explicitly stop the scan, here are
-the latest logs. I'm getting a "GATT Error Unknown" in the browser,
-although that might not be an error on the driver level but maybe just
-due to a timeout on the browser level.
+On Wed, Oct 28, 2015 at 1:52 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Wed, Oct 28, 2015 at 5:34 PM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>> Hi Johan
+>>
+>> On Wed, Oct 28, 2015 at 1:13 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Jakub,
+>>>
+>>> On Wed, Oct 28, 2015 at 6:10 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+>>>> Hi,
+>>>>
+>>>> struct btd_profile contains folowing callbacks:
+>>>> .connect
+>>>> .disconnect
+>>>> .device_probe
+>>>> .device_remove
+>>>> .accept
+>>>>
+>>>> I noticed that those callbacks:
+>>>> .device_probe
+>>>> .device_remove
+>>>> .accept
+>>>>
+>>>> are called properly, but:
+>>>> .connect
+>>>> .disconnect
+>>>>
+>>>> callbacks are not being called at all when LE device disconnected
+>>>> itself or was connected or autoconnected back. There is no doc, but
+>>>> I'm guessing those should be triggered in this cases, right ? Also,
+>>>> when I connect first time to a device, only .accept should be
+>>>> triggered, but when I connect next time only .connect ?
+>>>> Can you please explain what is the intended order of those callbacks ?
+>>>> Then I can fix them if I find some discrepencies from intended
+>>>> behaviour.
+>>>
+>>>
+>>> Actually it is working as intended since for LE the GATT based drivers
+>>> are not responsible for the connection management, unless LE CoC is
+>>> used. We actually have an item in the TODO to move the connection
+>>> management back to core to simplify the drivers.
+>>
+>> Ok, so let's say I want to rewrite HoG profile. How do I detect device
+>> was connected/disconnected ?
+>
+> You will get the accept callback which at than you can get access to
+> bt_gatt_client, for disconnection the idea is that you register a
+> callback directly to bt_att but perhaps we need some other mechanism.
+Ok, so here I assumed that .disconnect callback will be called on
+disconnections, and that .connect callback will be called on
+re-connections, which is not true.
 
---047d7b67604ea5a6a40523358ac6
-Content-Type: text/plain; charset=US-ASCII; name="shell.txt"
-Content-Disposition: attachment; filename="shell.txt"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_igbna9l31
+That means that HoG will continue using btd_device_add_attio_callback
+to get connected/disconnected ? That is fine for HoG, but what about
+profiles that don't want to autoconnect (calling
+btd_device_add_attio_callback triggers autoconnect)
 
-Y2hyb25vc0Bsb2NhbGhvc3QgLyAkIHN1ZG8gYnRtb24gLXcgfi9Eb3dubG9hZHMvYnRtb24uYnRz
-bm9vcApCbHVldG9vdGggbW9uaXRvciB2ZXIgNS4zNQo9IE5ldyBJbmRleDogMUM6M0U6ODQ6MEQ6
-Rjk6RjggKEJSL0VEUixVU0IsaGNpMCkgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgW2hjaTBdIDAuMjQzMDk3
-CjwgSENJIENvbW1hbmQ6IERpc2Nvbm5lY3QgKDB4MDF8MHgwMDA2KSBwbGVuIDMgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIFtoY2kwXSAyMS42NTA3NzEKICAgICAgICBIYW5kbGU6IDMyCiAgICAgICAgUmVh
-c29uOiBSZW1vdGUgVXNlciBUZXJtaW5hdGVkIENvbm5lY3Rpb24gKDB4MTMpCj4gSENJIEV2ZW50
-OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFto
-Y2kwXSAyMS42NTIzMTMKICAgICAgRGlzY29ubmVjdCAoMHgwMXwweDAwMDYpIG5jbWQgMQogICAg
-ICAgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkKPiBIQ0kgRXZlbnQ6IFZlbmRvciAoMHhmZikgcGxl
-biA3ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgW2hjaTBdIDIxLjY2NzM3NAogICAg
-ICAgIDgyIDcwIDkwIDgwIDEwIDM2IDU5ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAucC4u
-LjZZICAgICAgICAgCj4gSENJIEV2ZW50OiBEaXNjb25uZWN0IENvbXBsZXRlICgweDA1KSBwbGVu
-IDQgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIFtoY2kwXSAyMS42NjgzNjAKICAgICAgICBTdGF0dXM6IFN1
-Y2Nlc3MgKDB4MDApCiAgICAgICAgSGFuZGxlOiAzMgogICAgICAgIFJlYXNvbjogQ29ubmVjdGlv
-biBUZXJtaW5hdGVkIEJ5IExvY2FsIEhvc3QgKDB4MTYpCkAgRGV2aWNlIERpc2Nvbm5lY3RlZDog
-MEY6MDQ6RTA6NTE6NDQ6OEIgKDIpIHJlYXNvbiAy
---047d7b67604ea5a6a40523358ac6
-Content-Type: application/octet-stream; name="btmon (4).btsnoop"
-Content-Disposition: attachment; filename="btmon (4).btsnoop"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_igbna9kr0
+> Anyway we first need to move to bt_hog instead.
+>
+>> Or how do I get current db and client handles that I can use for all operations?
+>
+> That sound strange, you just have done this for device_info and you
+> don't know it? From the accept callback you get the device and with
+> that you can access the db that should contain all the details, anyway
+> we should probably change bt_hog to use bt_gatt_client and gatt_db
+> internally so we can share with android code.
 
-YnRzbm9vcAAAAAABAAAH0QAAABAAAAAQAAAAAAAAAAAA4gDohDdiWQAB+PkNhD4caGNpMAAAAAAA
-AAAGAAAABgAAAAIAAAAAAOIA6IV+ChMGBAMgABMAAAAGAAAABgAAAAMAAAAAAOIA6IV+EBkPBAAB
-BgQAAAAJAAAACQAAAAMAAAAAAOIA6IV+Su7/B4JwkIAQNlkAAAAGAAAABgAAAAMAAAAAAOIA6IV+
-TsgFBAAgABY=
---047d7b67604ea5a6a40523358ac6--
+I know how to obtain db and client when .accept is called, but if
+device is disconnected and then re-connected those instances will be
+no longer valid, right ?
+I would have to obtain db and device again, and all I have in
+attio_connected_cb is GAttrib, which have no reference to db or
+client.
+
+>
+>
+> --
+> Luiz Augusto von Dentz
