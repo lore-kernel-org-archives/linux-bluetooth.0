@@ -1,84 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH] Bluetooth: Fix possible deadlock in btusb
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1446041885-8681-1-git-send-email-kubax.t.pawlak@intel.com>
-Date: Thu, 29 Oct 2015 15:31:14 +0900
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B781E431-F226-458E-81A8-70A6848164BA@holtmann.org>
-References: <1446041885-8681-1-git-send-email-kubax.t.pawlak@intel.com>
-To: Kuba Pawlak <kubax.t.pawlak@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+i1r=i_ihLb2Yocc4+3Bw7Py7ru8SwBweJeBp1jsicFg@mail.gmail.com>
+References: <CAHmfHqTrHGpwyxaP6rsBNk5FamFxJMFBy547UY21vQLdLSDc4Q@mail.gmail.com>
+ <CABBYNZLjPt_vCcW5JswbK+utJvVm8SbEAus7dw0jt+fW3Q8Fug@mail.gmail.com>
+ <CAHmfHqQjBKrW+HhjDLaNQPcvYwnzYtm=2WJUhAgKUyyAS-AW7A@mail.gmail.com>
+ <CABBYNZJbZzuFQNYSmMmXNv3zWPBsvtFSTvFKroCyyQndDPrw7Q@mail.gmail.com>
+ <CAHmfHqS_jW0vLA14wMz939BNV1XKzUr7BG+_h_4Xzq1LywLz+w@mail.gmail.com>
+ <CAEZxfGPPoYOX=yGDP2TQFRw7GY_zCXZrPYuDxxK8jt49veyjyg@mail.gmail.com>
+ <CAHmfHqQLmiGep3nKZ-Vq8RHqvG-SwVJhvUJSnDJZ6+jGeAFXpg@mail.gmail.com>
+ <CAEZxfGPdU0fzp_P-7AJDSF+xCnXPqVUHs8fs8SA1jpDiRp2urg@mail.gmail.com> <CABBYNZ+i1r=i_ihLb2Yocc4+3Bw7Py7ru8SwBweJeBp1jsicFg@mail.gmail.com>
+From: Leon Nicholls <lnicholls@google.com>
+Date: Wed, 28 Oct 2015 20:02:09 -0700
+Message-ID: <CAHmfHqRKpY=0ot6htP=GdB3C=rHQn0jp-o6rvvYSpzKzeriePQ@mail.gmail.com>
+Subject: Re: Cannot write to BLE thermal printer
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/mixed; boundary=047d7b67604ea5a6a40523358ac6
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kuba,
+--047d7b67604ea5a6a40523358ac6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> commit 8f9d02f470f48416444ac3a1eacecdd0f743f1a7 introduced spinlocks
-> in btusb_work. This is run in a context of a worqueue and can be interrupted
-> by hardware irq. If it happens while spinlock is held, we have a deadlock.
-> Solution is to use _irqsave/_resore version of locking
-> 
-> [  466.460560] =================================
-> [  466.460565] [ INFO: inconsistent lock state ]
-> [  466.460572] 4.3.0-rc6+ #1 Tainted: G        W
-> [  466.460576] ---------------------------------
-> [  466.460582] inconsistent {IN-HARDIRQ-W} -> {HARDIRQ-ON-W} usage.
-> [  466.460589] kworker/0:2/94 [HC0[0]:SC0[0]:HE1:SE1] takes:
-> [  466.460595]  (&(&data->rxlock)->rlock){?.-...}, at: [<ffffffffa0526923>] btusb_work+0xa3/0x3fd [btusb]
-> [  466.460621] {IN-HARDIRQ-W} state was registered at:
-> [  466.460625]   [<ffffffff811021b5>] __lock_acquire+0xc45/0x1e80
-> [  466.460638]   [<ffffffff811040d5>] lock_acquire+0xe5/0x1f0
-> [  466.460646]   [<ffffffff8182f108>] _raw_spin_lock+0x38/0x50
-> [  466.460657]   [<ffffffffa0525448>] btusb_recv_intr+0x38/0x170 [btusb]
-> [  466.460668]   [<ffffffffa0525626>] btusb_intr_complete+0xa6/0x130 [btusb]
-> [  466.460679]   [<ffffffff815d8f1e>] __usb_hcd_giveback_urb+0x8e/0x160
-> [  466.460690]   [<ffffffff815d911f>] usb_hcd_giveback_urb+0x3f/0x120
-> [  466.460698]   [<ffffffff81606e4d>] uhci_giveback_urb+0xad/0x280
-> [  466.460706]   [<ffffffff81608f64>] uhci_scan_schedule.part.33+0x6b4/0xbe0
-> [  466.460714]   [<ffffffff81609b50>] uhci_irq+0xd0/0x180
-> [  466.460722]   [<ffffffff815d8296>] usb_hcd_irq+0x26/0x40
-> [  466.460729]   [<ffffffff81117d40>] handle_irq_event_percpu+0x40/0x300
-> [  466.460739]   [<ffffffff81118040>] handle_irq_event+0x40/0x60
-> [  466.460746]   [<ffffffff8111af39>] handle_fasteoi_irq+0x89/0x150
-> [  466.460754]   [<ffffffff8101e0f3>] handle_irq+0x73/0x120
-> [  466.460763]   [<ffffffff81832f11>] do_IRQ+0x61/0x120
-> [  466.460772]   [<ffffffff8183084c>] ret_from_intr+0x0/0x31
-> [  466.460780]   [<ffffffff81697a77>] cpuidle_enter+0x17/0x20
-> [  466.460790]   [<ffffffff810f62c2>] call_cpuidle+0x32/0x60
-> [  466.460800]   [<ffffffff810f65a8>] cpu_startup_entry+0x2b8/0x3f0
-> [  466.460807]   [<ffffffff818214ca>] rest_init+0x13a/0x140
-> [  466.460817]   [<ffffffff81f76029>] start_kernel+0x4a3/0x4c4
-> [  466.460827]   [<ffffffff81f75339>] x86_64_start_reservations+0x2a/0x2c
-> [  466.460837]   [<ffffffff81f75485>] x86_64_start_kernel+0x14a/0x16d
-> [  466.460846] irq event stamp: 754913
-> [  466.460851] hardirqs last  enabled at (754913): [<ffffffff8182f4cc>] _raw_spin_unlock_irq+0x2c/0x40
-> [  466.460861] hardirqs last disabled at (754912): [<ffffffff8182f28d>] _raw_spin_lock_irq+0x1d/0x60
-> [  466.460869] softirqs last  enabled at (753024): [<ffffffff810aeaa0>] __do_softirq+0x380/0x490
-> [  466.460880] softirqs last disabled at (753009): [<ffffffff810aedef>] irq_exit+0x10f/0x120
-> [  466.460888]
->               other info that might help us debug this:
-> [  466.460894]  Possible unsafe locking scenario:
-> 
-> [  466.460899]        CPU0
-> [  466.460903]        ----
-> [  466.460907]   lock(&(&data->rxlock)->rlock);
-> [  466.460915]   <Interrupt>
-> [  466.460918]     lock(&(&data->rxlock)->rlock);
-> [  466.460926]
->                *** DEADLOCK ***
-> 
-> [  466.460935] 2 locks held by kworker/0:2/94:
-> [  466.460939]  #0:  ("events"){.+.+.+}, at: [<ffffffff810c69bb>] process_one_work+0x16b/0x660
-> [  466.460958]  #1:  ((&data->work)){+.+...}, at: [<ffffffff810c69bb>] process_one_work+0x16b/0x660
-> [  466.460974]
-> ---
-> drivers/bluetooth/btusb.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
+Following Fran=C3=A7ois instructions to explicitly stop the scan, here are
+the latest logs. I'm getting a "GATT Error Unknown" in the browser,
+although that might not be an error on the driver level but maybe just
+due to a timeout on the browser level.
 
-patch has been applied to bluetooth-next tree.
+--047d7b67604ea5a6a40523358ac6
+Content-Type: text/plain; charset=US-ASCII; name="shell.txt"
+Content-Disposition: attachment; filename="shell.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_igbna9l31
 
-Regards
+Y2hyb25vc0Bsb2NhbGhvc3QgLyAkIHN1ZG8gYnRtb24gLXcgfi9Eb3dubG9hZHMvYnRtb24uYnRz
+bm9vcApCbHVldG9vdGggbW9uaXRvciB2ZXIgNS4zNQo9IE5ldyBJbmRleDogMUM6M0U6ODQ6MEQ6
+Rjk6RjggKEJSL0VEUixVU0IsaGNpMCkgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgW2hjaTBdIDAuMjQzMDk3
+CjwgSENJIENvbW1hbmQ6IERpc2Nvbm5lY3QgKDB4MDF8MHgwMDA2KSBwbGVuIDMgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIFtoY2kwXSAyMS42NTA3NzEKICAgICAgICBIYW5kbGU6IDMyCiAgICAgICAgUmVh
+c29uOiBSZW1vdGUgVXNlciBUZXJtaW5hdGVkIENvbm5lY3Rpb24gKDB4MTMpCj4gSENJIEV2ZW50
+OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFto
+Y2kwXSAyMS42NTIzMTMKICAgICAgRGlzY29ubmVjdCAoMHgwMXwweDAwMDYpIG5jbWQgMQogICAg
+ICAgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkKPiBIQ0kgRXZlbnQ6IFZlbmRvciAoMHhmZikgcGxl
+biA3ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgW2hjaTBdIDIxLjY2NzM3NAogICAg
+ICAgIDgyIDcwIDkwIDgwIDEwIDM2IDU5ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAucC4u
+LjZZICAgICAgICAgCj4gSENJIEV2ZW50OiBEaXNjb25uZWN0IENvbXBsZXRlICgweDA1KSBwbGVu
+IDQgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIFtoY2kwXSAyMS42NjgzNjAKICAgICAgICBTdGF0dXM6IFN1
+Y2Nlc3MgKDB4MDApCiAgICAgICAgSGFuZGxlOiAzMgogICAgICAgIFJlYXNvbjogQ29ubmVjdGlv
+biBUZXJtaW5hdGVkIEJ5IExvY2FsIEhvc3QgKDB4MTYpCkAgRGV2aWNlIERpc2Nvbm5lY3RlZDog
+MEY6MDQ6RTA6NTE6NDQ6OEIgKDIpIHJlYXNvbiAy
+--047d7b67604ea5a6a40523358ac6
+Content-Type: application/octet-stream; name="btmon (4).btsnoop"
+Content-Disposition: attachment; filename="btmon (4).btsnoop"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_igbna9kr0
 
-Marcel
-
+YnRzbm9vcAAAAAABAAAH0QAAABAAAAAQAAAAAAAAAAAA4gDohDdiWQAB+PkNhD4caGNpMAAAAAAA
+AAAGAAAABgAAAAIAAAAAAOIA6IV+ChMGBAMgABMAAAAGAAAABgAAAAMAAAAAAOIA6IV+EBkPBAAB
+BgQAAAAJAAAACQAAAAMAAAAAAOIA6IV+Su7/B4JwkIAQNlkAAAAGAAAABgAAAAMAAAAAAOIA6IV+
+TsgFBAAgABY=
+--047d7b67604ea5a6a40523358ac6--
