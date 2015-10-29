@@ -1,43 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1446127830.4709.16.camel@cortland.com>
-Subject: Cannot connect to hfp headset
-From: Steve Brown <sbrown@cortland.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 29 Oct 2015 10:10:30 -0400
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [PATCH] Bluetooth: Fix possible deadlock in btusb
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1446041885-8681-1-git-send-email-kubax.t.pawlak@intel.com>
+Date: Thu, 29 Oct 2015 15:31:14 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B781E431-F226-458E-81A8-70A6848164BA@holtmann.org>
+References: <1446041885-8681-1-git-send-email-kubax.t.pawlak@intel.com>
+To: Kuba Pawlak <kubax.t.pawlak@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Reverting "[PATCH] core/service: Fix calling driver .accept multiple
-times" (4522ac85dd6dc1db4d49507330b4abc3bbaf4e6c) restores connecting.
+Hi Kuba,
 
-Below is a log of the connection failure. I added a few more DBG's.
+> commit 8f9d02f470f48416444ac3a1eacecdd0f743f1a7 introduced spinlocks
+> in btusb_work. This is run in a context of a worqueue and can be interrupted
+> by hardware irq. If it happens while spinlock is held, we have a deadlock.
+> Solution is to use _irqsave/_resore version of locking
+> 
+> [  466.460560] =================================
+> [  466.460565] [ INFO: inconsistent lock state ]
+> [  466.460572] 4.3.0-rc6+ #1 Tainted: G        W
+> [  466.460576] ---------------------------------
+> [  466.460582] inconsistent {IN-HARDIRQ-W} -> {HARDIRQ-ON-W} usage.
+> [  466.460589] kworker/0:2/94 [HC0[0]:SC0[0]:HE1:SE1] takes:
+> [  466.460595]  (&(&data->rxlock)->rlock){?.-...}, at: [<ffffffffa0526923>] btusb_work+0xa3/0x3fd [btusb]
+> [  466.460621] {IN-HARDIRQ-W} state was registered at:
+> [  466.460625]   [<ffffffff811021b5>] __lock_acquire+0xc45/0x1e80
+> [  466.460638]   [<ffffffff811040d5>] lock_acquire+0xe5/0x1f0
+> [  466.460646]   [<ffffffff8182f108>] _raw_spin_lock+0x38/0x50
+> [  466.460657]   [<ffffffffa0525448>] btusb_recv_intr+0x38/0x170 [btusb]
+> [  466.460668]   [<ffffffffa0525626>] btusb_intr_complete+0xa6/0x130 [btusb]
+> [  466.460679]   [<ffffffff815d8f1e>] __usb_hcd_giveback_urb+0x8e/0x160
+> [  466.460690]   [<ffffffff815d911f>] usb_hcd_giveback_urb+0x3f/0x120
+> [  466.460698]   [<ffffffff81606e4d>] uhci_giveback_urb+0xad/0x280
+> [  466.460706]   [<ffffffff81608f64>] uhci_scan_schedule.part.33+0x6b4/0xbe0
+> [  466.460714]   [<ffffffff81609b50>] uhci_irq+0xd0/0x180
+> [  466.460722]   [<ffffffff815d8296>] usb_hcd_irq+0x26/0x40
+> [  466.460729]   [<ffffffff81117d40>] handle_irq_event_percpu+0x40/0x300
+> [  466.460739]   [<ffffffff81118040>] handle_irq_event+0x40/0x60
+> [  466.460746]   [<ffffffff8111af39>] handle_fasteoi_irq+0x89/0x150
+> [  466.460754]   [<ffffffff8101e0f3>] handle_irq+0x73/0x120
+> [  466.460763]   [<ffffffff81832f11>] do_IRQ+0x61/0x120
+> [  466.460772]   [<ffffffff8183084c>] ret_from_intr+0x0/0x31
+> [  466.460780]   [<ffffffff81697a77>] cpuidle_enter+0x17/0x20
+> [  466.460790]   [<ffffffff810f62c2>] call_cpuidle+0x32/0x60
+> [  466.460800]   [<ffffffff810f65a8>] cpu_startup_entry+0x2b8/0x3f0
+> [  466.460807]   [<ffffffff818214ca>] rest_init+0x13a/0x140
+> [  466.460817]   [<ffffffff81f76029>] start_kernel+0x4a3/0x4c4
+> [  466.460827]   [<ffffffff81f75339>] x86_64_start_reservations+0x2a/0x2c
+> [  466.460837]   [<ffffffff81f75485>] x86_64_start_kernel+0x14a/0x16d
+> [  466.460846] irq event stamp: 754913
+> [  466.460851] hardirqs last  enabled at (754913): [<ffffffff8182f4cc>] _raw_spin_unlock_irq+0x2c/0x40
+> [  466.460861] hardirqs last disabled at (754912): [<ffffffff8182f28d>] _raw_spin_lock_irq+0x1d/0x60
+> [  466.460869] softirqs last  enabled at (753024): [<ffffffff810aeaa0>] __do_softirq+0x380/0x490
+> [  466.460880] softirqs last disabled at (753009): [<ffffffff810aedef>] irq_exit+0x10f/0x120
+> [  466.460888]
+>               other info that might help us debug this:
+> [  466.460894]  Possible unsafe locking scenario:
+> 
+> [  466.460899]        CPU0
+> [  466.460903]        ----
+> [  466.460907]   lock(&(&data->rxlock)->rlock);
+> [  466.460915]   <Interrupt>
+> [  466.460918]     lock(&(&data->rxlock)->rlock);
+> [  466.460926]
+>                *** DEADLOCK ***
+> 
+> [  466.460935] 2 locks held by kworker/0:2/94:
+> [  466.460939]  #0:  ("events"){.+.+.+}, at: [<ffffffff810c69bb>] process_one_work+0x16b/0x660
+> [  466.460958]  #1:  ((&data->work)){+.+...}, at: [<ffffffff810c69bb>] process_one_work+0x16b/0x660
+> [  466.460974]
+> ---
+> drivers/bluetooth/btusb.c | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Steve
+patch has been applied to bluetooth-next tree.
 
-Oct 29 09:58:09 w7 bluetoothd[13126]: src/device.c:connect_profiles() /org/bluez/hci0/dev_F4_73_CA_00_38_EB (all), client :1.134
-Oct 29 09:58:09 w7 bluetoothd[13126]: src/service.c:btd_service_ref() 0xad10b0: ref=2
-Oct 29 09:58:09 w7 bluetoothd[13126]: src/service.c:change_state() 0xad10b0: device F4:73:CA:00:38:EB profile Headset Voice gateway state changed: disconnected -> connecting (0)
-Oct 29 09:58:12 w7 bluetoothd[13126]: src/adapter.c:connected_callback() hci0 device F4:73:CA:00:38:EB connected eir_len 15
-Oct 29 09:58:12 w7 pulseaudio[11787]: [pulseaudio] bluez5-util.c: Properties changed in device /org/bluez/hci0/dev_F4_73_CA_00_38_EB
-Oct 29 09:58:12 w7 bluetoothd[13126]: src/profile.c:connect_io()
-Oct 29 09:58:13 w7 bluetoothd[13126]: src/profile.c:ext_connect()
-Oct 29 09:58:13 w7 bluetoothd[13126]: src/profile.c:ext_connect() Headset Voice gateway connected to F4:73:CA:00:38:EB
-Oct 29 09:58:13 w7 bluetoothd[13126]: src/service.c:service_accept() service->state:connecting
-Oct 29 09:58:13 w7 bluetoothd[13126]: src/profile.c:ext_connect() conn->service:0x0xad10b0 service_accept:-114
-Oct 29 09:58:13 w7 bluetoothd[13126]: src/service.c:service_accept() service->state:connecting
-Oct 29 09:58:13 w7 bluetoothd[13126]: src/service.c:btd_service_connecting_complete()
-Oct 29 09:58:13 w7 bluetoothd[13126]: src/service.c:change_state() 0xad10b0: device F4:73:CA:00:38:EB profile Headset Voice gateway state changed: connecting -> disconnected (-5)
-Oct 29 09:58:13 w7 bluetoothd[13126]: src/device.c:device_profile_connected() Headset Voice gateway Input/output error (5)
-Oct 29 09:58:13 w7 bluetoothd[13126]: src/device.c:device_profile_connected() returning response to :1.134
-Oct 29 09:58:13 w7 bluetoothd[13126]: src/service.c:btd_service_unref() 0xad10b0: ref=1
-Oct 29 09:58:17 w7 bluetoothd[13126]: src/adapter.c:dev_disconnected() Device F4:73:CA:00:38:EB disconnected, reason 3
-Oct 29 09:58:17 w7 bluetoothd[13126]: src/adapter.c:adapter_remove_connection()
-Oct 29 09:58:17 w7 bluetoothd[13126]: plugins/policy.c:disconnect_cb() reason 3
-Oct 29 09:58:17 w7 bluetoothd[13126]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr F4:73:CA:00:38:EB type 0 status 0xe
-Oct 29 09:58:17 w7 bluetoothd[13126]: src/device.c:device_bonding_complete() bonding (nil) status 0x0e
-Oct 29 09:58:17 w7 bluetoothd[13126]: src/device.c:device_bonding_failed() status 14
-Oct 29 09:58:17 w7 bluetoothd[13126]: src/adapter.c:resume_discovery()
-Oct 29 09:58:17 w7 pulseaudio[11787]: [pulseaudio] bluez5-util.c: Properties changed in device /org/bluez/hci0/dev_F4_73_CA_00_38_EB
+Regards
+
+Marcel
 
