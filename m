@@ -1,32 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 Oct 2015 14:00:53 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Pacho Ramos <pacho@gentoo.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Should btmgmt be installed?
-Message-ID: <20151030120053.GA10576@t440s.lan>
-References: <1446017598.18413.23.camel@gentoo.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/4] Abort on small allocations
+Date: Fri, 30 Oct 2015 11:58:27 +0100
+Message-ID: <1516737.rC4sLcXqtY@ix>
+In-Reply-To: <1445896652-16417-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1445896652-16417-1-git-send-email-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1446017598.18413.23.camel@gentoo.org>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pacho,
+On Monday 26 October 2015 22:57:28 Szymon Janc wrote:
+> Hi,
+> 
+> Rebased and resent.
+> 
+> From original RFC:
+> This patchset is an initial work to simplify handling of memory allocation
+> failures in BlueZ. The solution is simple: don't check for errors and just
+> abort if allocation fails.
+> 
+> This make error paths (which were most likely never executed) *much*
+> simpler.
+> 
+> Another benefit is increased similarity of src/shared APIs to already used
+> Glib APIs which also abort on allocation error (unless _try variant is
+> used). This makes transition from Glib APIs to shared APIs easier.
+> 
+> Patches 1-3 are samples that show how much of the error handling code
+> can be removed. Those are initial patches as 'never-fail' API propagates up
+> (new0()->queue_new()->foo_add()) and futher error handling can be removed.
+> 
+> 
+> Szymon Janc (4):
+>   shared: Make new0 abort on failure
+>   shared: Remove dead code
+>   android: Remove dead code
+>   core: Remove dead code
+> 
+>  android/avdtp.c               |   5 +-
+>  android/avdtptest.c           |   4 -
+>  android/bas.c                 |  55 +------
+>  android/bluetooth.c           |  17 ---
+>  android/dis.c                 |  11 --
+>  android/gatt.c                | 336
+> +++++------------------------------------- android/handsfree-client.c    | 
+> 14 +-
+>  android/handsfree.c           |   9 +-
+>  android/health.c              |  67 ++-------
+>  android/hog.c                 |   2 -
+>  android/scpp.c                |  22 +--
+>  android/tester-a2dp.c         |   7 +-
+>  android/tester-avrcp.c        |   7 +-
+>  android/tester-bluetooth.c    |   7 +-
+>  android/tester-gatt.c         |   7 +-
+>  android/tester-hdp.c          |   7 +-
+>  android/tester-hidhost.c      |   7 +-
+>  android/tester-map-client.c   |   7 +-
+>  android/tester-pan.c          |   7 +-
+>  android/tester-socket.c       |   7 +-
+>  src/advertising.c             |   6 -
+>  src/gatt-client.c             |  67 ---------
+>  src/gatt-database.c           | 100 -------------
+>  src/shared/ad.c               |  31 ----
+>  src/shared/att.c              |  34 +----
+>  src/shared/crypto.c           |   2 -
+>  src/shared/gap.c              |   7 -
+>  src/shared/gatt-client.c      |  59 --------
+>  src/shared/gatt-db.c          |  37 -----
+>  src/shared/gatt-helpers.c     |  24 ---
+>  src/shared/gatt-server.c      |  47 ------
+>  src/shared/hci-crypto.c       |   6 -
+>  src/shared/hci.c              |  29 ----
+>  src/shared/hfp.c              |  40 -----
+>  src/shared/io-mainloop.c      |   3 -
+>  src/shared/mgmt.c             |  42 ------
+>  src/shared/queue.c            |  12 --
+>  src/shared/ringbuf.c          |   3 -
+>  src/shared/tester.c           |   9 --
+>  src/shared/timeout-mainloop.c |   3 -
+>  src/shared/uhid.c             |   8 -
+>  src/shared/util.c             |  16 ++
+>  src/shared/util.h             |  14 +-
+>  43 files changed, 97 insertions(+), 1107 deletions(-)
 
-On Wed, Oct 28, 2015, Pacho Ramos wrote:
-> Some people downstream is asking us to install btmgmt utility but, for
-> some reason, it looks like upstream makefile rules don't install it. Is
-> that being missed on purpose? Should Makefiles be fixed to get it
-> installed or that utility is not meant to be installed in users
-> systems?
+Applied.
 
-I think this is mostly because of historical reasons. The btmgmt tool
-wasn't created for anything else except a developer testing tool
-initially. It's still supposed to be just a developer tool, but if
-people have good reasons to use it then I don't personally have anything
-against making it installable through the makefile rules. Someone should
-just send a patch for it. That said, Marcel might have a differing
-opinion on the matter (though his silence so far is promising ;)
-
-Johan
+-- 
+pozdrawiam
+Szymon Janc
