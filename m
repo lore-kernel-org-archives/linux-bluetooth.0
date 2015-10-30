@@ -1,92 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/4] Abort on small allocations
-Date: Fri, 30 Oct 2015 11:58:27 +0100
-Message-ID: <1516737.rC4sLcXqtY@ix>
-In-Reply-To: <1445896652-16417-1-git-send-email-szymon.janc@codecoup.pl>
-References: <1445896652-16417-1-git-send-email-szymon.janc@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Date: Fri, 30 Oct 2015 19:41:57 +0900 (KST)
+Message-Id: <20151030.194157.1795025185007396811.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2015-10-28
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20151028055802.GA17209@t440s.P-661HNU-F1>
+References: <20151028055802.GA17209@t440s.P-661HNU-F1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 26 October 2015 22:57:28 Szymon Janc wrote:
-> Hi,
-> 
-> Rebased and resent.
-> 
-> From original RFC:
-> This patchset is an initial work to simplify handling of memory allocation
-> failures in BlueZ. The solution is simple: don't check for errors and just
-> abort if allocation fails.
-> 
-> This make error paths (which were most likely never executed) *much*
-> simpler.
-> 
-> Another benefit is increased similarity of src/shared APIs to already used
-> Glib APIs which also abort on allocation error (unless _try variant is
-> used). This makes transition from Glib APIs to shared APIs easier.
-> 
-> Patches 1-3 are samples that show how much of the error handling code
-> can be removed. Those are initial patches as 'never-fail' API propagates up
-> (new0()->queue_new()->foo_add()) and futher error handling can be removed.
-> 
-> 
-> Szymon Janc (4):
->   shared: Make new0 abort on failure
->   shared: Remove dead code
->   android: Remove dead code
->   core: Remove dead code
-> 
->  android/avdtp.c               |   5 +-
->  android/avdtptest.c           |   4 -
->  android/bas.c                 |  55 +------
->  android/bluetooth.c           |  17 ---
->  android/dis.c                 |  11 --
->  android/gatt.c                | 336
-> +++++------------------------------------- android/handsfree-client.c    | 
-> 14 +-
->  android/handsfree.c           |   9 +-
->  android/health.c              |  67 ++-------
->  android/hog.c                 |   2 -
->  android/scpp.c                |  22 +--
->  android/tester-a2dp.c         |   7 +-
->  android/tester-avrcp.c        |   7 +-
->  android/tester-bluetooth.c    |   7 +-
->  android/tester-gatt.c         |   7 +-
->  android/tester-hdp.c          |   7 +-
->  android/tester-hidhost.c      |   7 +-
->  android/tester-map-client.c   |   7 +-
->  android/tester-pan.c          |   7 +-
->  android/tester-socket.c       |   7 +-
->  src/advertising.c             |   6 -
->  src/gatt-client.c             |  67 ---------
->  src/gatt-database.c           | 100 -------------
->  src/shared/ad.c               |  31 ----
->  src/shared/att.c              |  34 +----
->  src/shared/crypto.c           |   2 -
->  src/shared/gap.c              |   7 -
->  src/shared/gatt-client.c      |  59 --------
->  src/shared/gatt-db.c          |  37 -----
->  src/shared/gatt-helpers.c     |  24 ---
->  src/shared/gatt-server.c      |  47 ------
->  src/shared/hci-crypto.c       |   6 -
->  src/shared/hci.c              |  29 ----
->  src/shared/hfp.c              |  40 -----
->  src/shared/io-mainloop.c      |   3 -
->  src/shared/mgmt.c             |  42 ------
->  src/shared/queue.c            |  12 --
->  src/shared/ringbuf.c          |   3 -
->  src/shared/tester.c           |   9 --
->  src/shared/timeout-mainloop.c |   3 -
->  src/shared/uhid.c             |   8 -
->  src/shared/util.c             |  16 ++
->  src/shared/util.h             |  14 +-
->  43 files changed, 97 insertions(+), 1107 deletions(-)
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Wed, 28 Oct 2015 07:58:02 +0200
 
-Applied.
+> Here are a some more Bluetooth patches for 4.4 which collected up during
+> the past week. The most important ones are from Kuba Pawlak for fixing
+> locking issues with SCO sockets. There's also a fix from Alexander Aring
+> for 6lowpan, a memleak fix from Julia Lawall for the btmrvl driver and
+> some cleanup patches from Marcel.
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
--- 
-pozdrawiam
-Szymon Janc
+Pulled, thanks Johan.
