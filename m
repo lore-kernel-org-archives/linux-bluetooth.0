@@ -1,36 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core/service: Fix failing to connect external profile
-Date: Fri, 30 Oct 2015 15:39:04 +0200
-Message-Id: <1446212344-10641-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [Bug 106691] BNEP multicast filter is filtering multicast addresses
+ in default case although differently specified
+Date: Fri, 30 Oct 2015 12:29:01 +0000
+Message-ID: <bug-106691-62941-e5nLnmU8SK@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-106691-62941@https.bugzilla.kernel.org/>
+References: <bug-106691-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=106691
 
-When initiating a connection to a external profile btd_service_connect
-will be called which will change the service state to
-BTD_SERVICE_STATE_CONNECTING but then once the connection completes
-service_accept is called but since it now checks the state it would
-return -EALREADY to prevent driver accept to be called more than once.
----
- src/service.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Johan Hedberg <johan.hedberg@gmail.com> changed:
 
-diff --git a/src/service.c b/src/service.c
-index 2ed72fb..7da922c 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -191,7 +191,7 @@ int service_accept(struct btd_service *service)
- 		break;
- 	case BTD_SERVICE_STATE_CONNECTING:
- 	case BTD_SERVICE_STATE_CONNECTED:
--		return -EALREADY;
-+		return 0;
- 	case BTD_SERVICE_STATE_DISCONNECTING:
- 		return -EBUSY;
- 	}
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |johan.hedberg@gmail.com
+
+--- Comment #1 from Johan Hedberg <johan.hedberg@gmail.com> ---
+Looks like you've analyzed and understood the issue fairly well! The next step
+would be to send a patch proposal to the linux-bluetooth list. Would you be
+able to do that?
+
 -- 
-2.4.3
-
+You are receiving this mail because:
+You are the assignee for the bug.
