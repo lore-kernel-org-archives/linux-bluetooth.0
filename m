@@ -1,55 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+From: Adam Moore <adam.moore@savantsystems.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	Pacho Ramos <pacho@gentoo.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Should btmgmt be installed?
+Date: Fri, 30 Oct 2015 16:31:57 +0000
+Message-ID: <D2591198.1754F%adam.moore@savant.com>
+References: <1446017598.18413.23.camel@gentoo.org>
+ <20151030120053.GA10576@t440s.lan>
+In-Reply-To: <20151030120053.GA10576@t440s.lan>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <CAJa1xEqoemmpRzdHy1riHJBVk4qr0c0Mi-esWmJMoF0jipeXkQ@mail.gmail.com>
-References: <CAJa1xEoqLbN_sNJsvPWMS=XUMd5An7x4MKvS5iYFA30=5-TjoQ@mail.gmail.com>
-	<CAJa1xEqoemmpRzdHy1riHJBVk4qr0c0Mi-esWmJMoF0jipeXkQ@mail.gmail.com>
-Date: Fri, 30 Oct 2015 16:38:50 -0700
-Message-ID: <CAJa1xEpjHK4uNm7z6ezFP2hyLotkPvEaiq0HTyresBEuHN9e2A@mail.gmail.com>
-Subject: Re: 04ca:3011 device not working
-From: John Salatas <jsalatas@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
-Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Oct 27, 2015 at 1:02 PM, John Salatas <jsalatas@gmail.com> wrote:
-> On Tue, Oct 27, 2015 at 12:52 PM, John Salatas <jsalatas@gmail.com> wrote:
->> ...
->> I'm guessing that it needs some kind of firmware in order to work. As
->> it seems to me (based on
->> https://wireless.wiki.kernel.org/en/users/drivers/ath3k#how_to_tell_ar3011_and_ar3012)
->> this is an AR3011 device, and so I added it's id in ath3k.c and
->> btusb.c in a similar way as here:
->> http://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/commit/?id=6eda541d12116b4772baa09d3e8d7b0389df4289
->>
->> After rebooting, I didn't get any errors in dmesg but the device is
->> not recognised at all know. Eg rfkill list gives the following
->> 0: acer-wireless: Wireless LAN
->>         Soft blocked: no
->>         Hard blocked: no
->> 2: phy0: Wireless LAN
->>         Soft blocked: no
->>         Hard blocked: no
->> 3: hci0: Bluetooth
->>         Soft blocked: no
->>         Hard blocked: no
->>
->> It doesn't work any more even if I do the attach to VM trick.
->> ....
->
-> Ooops, sorry wrong copy/paste. actually after adding it's id in
-> ath3k.c and btusb.c and rebooting rfkill list gives the following
->
-> 0: acer-wireless: Wireless LAN
->         Soft blocked: no
->         Hard blocked: no
-> 2: phy0: Wireless LAN
->         Soft blocked: no
->         Hard blocked: no
->
+Seems like if the potentially dangerous hcitool is still installed, there
+would be no harm in installing btmgmt - perhaps long term btmgmt should be
+installed instead of hcitool.
 
-Just replying to this in case it got lost in the mailing list.
+On 10/30/15, 8:00 AM, "linux-bluetooth-owner@vger.kernel.org on behalf of
+Johan Hedberg" <linux-bluetooth-owner@vger.kernel.org on behalf of
+johan.hedberg@gmail.com> wrote:
 
-I would appreciate any feedback.
+>Hi Pacho,
+>
+>On Wed, Oct 28, 2015, Pacho Ramos wrote:
+>> Some people downstream is asking us to install btmgmt utility but, for
+>> some reason, it looks like upstream makefile rules don't install it. Is
+>> that being missed on purpose? Should Makefiles be fixed to get it
+>> installed or that utility is not meant to be installed in users
+>> systems?
+>
+>I think this is mostly because of historical reasons. The btmgmt tool
+>wasn't created for anything else except a developer testing tool
+>initially. It's still supposed to be just a developer tool, but if
+>people have good reasons to use it then I don't personally have anything
+>against making it installable through the makefile rules. Someone should
+>just send a patch for it. That said, Marcel might have a differing
+>opinion on the matter (though his silence so far is promising ;)
+>
+>Johan
+>--
+>To unsubscribe from this list: send the line "unsubscribe
+>linux-bluetooth" in
+>the body of a message to majordomo@vger.kernel.org
+>More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Thanks again!
+
+Statement of Confidentiality
+
+The contents of this e-mail message and any attachments are confidential and are intended solely for the addressee. The information may also be legally privileged. This transmission is sent in trust, and the sole purpose of delivery to the intended recipient. If you have received this transmission in error, any use, reproduction or dissemination of this transmission is strictly prohibited. If you are not the intended recipient, please immediately notify the sender by reply e-mail or at 508.683.2500 and delete this message and its attachments, if any.
+
