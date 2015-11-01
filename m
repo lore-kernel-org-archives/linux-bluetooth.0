@@ -1,57 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+MIME-Version: 1.0
+From: =?UTF-8?Q?Cl=C3=A9ment_de_l=27Hamaide?=
+	<clement.delhamaide@gmail.com>
+Date: Sun, 1 Nov 2015 01:55:02 +0100
+Message-ID: <CAG4Y7escv=GDSCJ2=3+L21Fc=O+oEzGGJ_h77W2-2Vkykys=Nw@mail.gmail.com>
+Subject: Re: ath3k Bluetooth adapter not loading: [0cf3:3004] Atheros
+ Communications, Inc. AR3012 Bluetooth 4.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] Bluetooth: Check for supported white list before issuing commands
-Date: Sun,  1 Nov 2015 09:39:48 +0100
-Message-Id: <1446367191-67668-1-git-send-email-marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The white list commands might not be implemented if the controller does
-not actually support the white list. So check the supported commands
-first before issuing these commands. Not supporting the white list is
-the same as supporting a white list with zero size.
+Hi all,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+This is my first mail in this list, I've subscribed this list
+because I own a MSI GS60 laptop with QCA6174 chipset (Wifi+Bluetooth)
+where Bluetooth doesn't work.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 83a6aacfab31..62edbf1b114e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -508,12 +508,6 @@ static void le_setup(struct hci_request *req)
- 	/* Read LE Supported States */
- 	hci_req_add(req, HCI_OP_LE_READ_SUPPORTED_STATES, 0, NULL);
- 
--	/* Read LE White List Size */
--	hci_req_add(req, HCI_OP_LE_READ_WHITE_LIST_SIZE, 0, NULL);
--
--	/* Clear LE White List */
--	hci_req_add(req, HCI_OP_LE_CLEAR_WHITE_LIST, 0, NULL);
--
- 	/* LE-only controllers have LE implicitly enabled */
- 	if (!lmp_bredr_capable(hdev))
- 		hci_dev_set_flag(hdev, HCI_LE_ENABLED);
-@@ -832,6 +826,17 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
- 			hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
- 		}
- 
-+		if (hdev->commands[26] & 0x40) {
-+			/* Read LE White List Size */
-+			hci_req_add(req, HCI_OP_LE_READ_WHITE_LIST_SIZE,
-+				    0, NULL);
-+		}
-+
-+		if (hdev->commands[26] & 0x80) {
-+			/* Clear LE White List */
-+			hci_req_add(req, HCI_OP_LE_CLEAR_WHITE_LIST, 0, NULL);
-+		}
-+
- 		if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT) {
- 			/* Read LE Maximum Data Length */
- 			hci_req_add(req, HCI_OP_LE_READ_MAX_DATA_LEN, 0, NULL);
--- 
-2.4.3
+I am in the very same bug than the one reported by Sumit (same dmesg report)
+and it's now solved by applying the following patch:
 
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b6aceaf..884dbe5 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -199,7 +199,6 @@ static const struct usb_device_id blacklist_table[] = {
+        { USB_DEVICE(0x0930, 0x0227), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x0cf3, 0x0036), .driver_info = BTUSB_ATH3012 },
+-       { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
+        { USB_DEVICE(0x0cf3, 0x311e), .driver_info = BTUSB_ATH3012 },
+@@ -230,6 +229,7 @@ static const struct usb_device_id blacklist_table[] = {
+        { USB_DEVICE(0x0cf3, 0xe007), .driver_info = BTUSB_QCA_ROME },
+        { USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
+        { USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
++       { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_QCA_ROME },
+
+        /* Broadcom BCM2035 */
+        { USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+
+
+After a fresh kernel compilation and reboot, my Bluetooth [0cf3:3004]
+is now working as expected.
+
+I hope my feedback will help the bluetooth community to commit this patch.
+
+Regards,
+Clément
