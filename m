@@ -1,59 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1446285158.4629.2.camel@cortland.com>
-References: <1446212344-10641-1-git-send-email-luiz.dentz@gmail.com>
-	<1446285158.4629.2.camel@cortland.com>
-Date: Mon, 2 Nov 2015 16:32:32 +0200
-Message-ID: <CABBYNZ+=Gd+Vf3oXL3UgtpENqB-AcedQRvJBa7U=NqO4rqwbRQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core/service: Fix failing to connect external profile
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Steve Brown <sbrown@cortland.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZ+JewnhDgsCdxhM9XT-9_Y7fRMMMhsaPgMdoNe0+Kka8A@mail.gmail.com>
+References: <CAHmfHqTrHGpwyxaP6rsBNk5FamFxJMFBy547UY21vQLdLSDc4Q@mail.gmail.com>
+ <CABBYNZLjPt_vCcW5JswbK+utJvVm8SbEAus7dw0jt+fW3Q8Fug@mail.gmail.com>
+ <CAHmfHqQjBKrW+HhjDLaNQPcvYwnzYtm=2WJUhAgKUyyAS-AW7A@mail.gmail.com>
+ <CABBYNZJbZzuFQNYSmMmXNv3zWPBsvtFSTvFKroCyyQndDPrw7Q@mail.gmail.com>
+ <CAHmfHqS_jW0vLA14wMz939BNV1XKzUr7BG+_h_4Xzq1LywLz+w@mail.gmail.com>
+ <CAEZxfGPPoYOX=yGDP2TQFRw7GY_zCXZrPYuDxxK8jt49veyjyg@mail.gmail.com>
+ <CAHmfHqQLmiGep3nKZ-Vq8RHqvG-SwVJhvUJSnDJZ6+jGeAFXpg@mail.gmail.com>
+ <CAEZxfGPdU0fzp_P-7AJDSF+xCnXPqVUHs8fs8SA1jpDiRp2urg@mail.gmail.com>
+ <CABBYNZ+i1r=i_ihLb2Yocc4+3Bw7Py7ru8SwBweJeBp1jsicFg@mail.gmail.com>
+ <CAHmfHqRKpY=0ot6htP=GdB3C=rHQn0jp-o6rvvYSpzKzeriePQ@mail.gmail.com> <CABBYNZ+JewnhDgsCdxhM9XT-9_Y7fRMMMhsaPgMdoNe0+Kka8A@mail.gmail.com>
+From: Leon Nicholls <lnicholls@google.com>
+Date: Sun, 1 Nov 2015 19:55:09 -0800
+Message-ID: <CAHmfHqR9YUGtrRQcqiA9O9ySbbuR5DuCa3Bwt6=642F6WRiYpQ@mail.gmail.com>
+Subject: Re: Cannot write to BLE thermal printer
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+My chromebook got a few more updates the past few days and now the
+code is working and I can send characters to the printer! Thanks for
+taking a look at the issue.
 
-On Sat, Oct 31, 2015 at 11:52 AM, Steve Brown <sbrown@cortland.com> wrote:
-> Luiz,
+On Thu, Oct 29, 2015 at 11:53 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Leon,
 >
-> On Fri, 2015-10-30 at 15:39 +0200, Luiz Augusto von Dentz wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> When initiating a connection to a external profile
->> btd_service_connect
->> will be called which will change the service state to
->> BTD_SERVICE_STATE_CONNECTING but then once the connection completes
->> service_accept is called but since it now checks the state it would
->> return -EALREADY to prevent driver accept to be called more than
->> once.
->> ---
->>  src/service.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/src/service.c b/src/service.c
->> index 2ed72fb..7da922c 100644
->> --- a/src/service.c
->> +++ b/src/service.c
->> @@ -191,7 +191,7 @@ int service_accept(struct btd_service *service)
->>               break;
->>       case BTD_SERVICE_STATE_CONNECTING:
->>       case BTD_SERVICE_STATE_CONNECTED:
->> -             return -EALREADY;
->> +             return 0;
->>       case BTD_SERVICE_STATE_DISCONNECTING:
->>               return -EBUSY;
->>       }
+> On Thu, Oct 29, 2015 at 5:02 AM, Leon Nicholls <lnicholls@google.com> wrote:
+>> Following François instructions to explicitly stop the scan, here are
+>> the latest logs. I'm getting a "GATT Error Unknown" in the browser,
+>> although that might not be an error on the driver level but maybe just
+>> due to a timeout on the browser level.
 >
-> This patch solves my hfp headset connect problem.
+> I could only decode a Disconnect command from the btmon trace you
+> sent, there is no ATT traffic at all.
 >
-> Thanks,
->
-> Steve
-
-Applied.
-
-
--- 
-Luiz Augusto von Dentz
+> --
+> Luiz Augusto von Dentz
