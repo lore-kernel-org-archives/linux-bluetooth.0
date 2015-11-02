@@ -1,43 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+JewnhDgsCdxhM9XT-9_Y7fRMMMhsaPgMdoNe0+Kka8A@mail.gmail.com>
-References: <CAHmfHqTrHGpwyxaP6rsBNk5FamFxJMFBy547UY21vQLdLSDc4Q@mail.gmail.com>
- <CABBYNZLjPt_vCcW5JswbK+utJvVm8SbEAus7dw0jt+fW3Q8Fug@mail.gmail.com>
- <CAHmfHqQjBKrW+HhjDLaNQPcvYwnzYtm=2WJUhAgKUyyAS-AW7A@mail.gmail.com>
- <CABBYNZJbZzuFQNYSmMmXNv3zWPBsvtFSTvFKroCyyQndDPrw7Q@mail.gmail.com>
- <CAHmfHqS_jW0vLA14wMz939BNV1XKzUr7BG+_h_4Xzq1LywLz+w@mail.gmail.com>
- <CAEZxfGPPoYOX=yGDP2TQFRw7GY_zCXZrPYuDxxK8jt49veyjyg@mail.gmail.com>
- <CAHmfHqQLmiGep3nKZ-Vq8RHqvG-SwVJhvUJSnDJZ6+jGeAFXpg@mail.gmail.com>
- <CAEZxfGPdU0fzp_P-7AJDSF+xCnXPqVUHs8fs8SA1jpDiRp2urg@mail.gmail.com>
- <CABBYNZ+i1r=i_ihLb2Yocc4+3Bw7Py7ru8SwBweJeBp1jsicFg@mail.gmail.com>
- <CAHmfHqRKpY=0ot6htP=GdB3C=rHQn0jp-o6rvvYSpzKzeriePQ@mail.gmail.com> <CABBYNZ+JewnhDgsCdxhM9XT-9_Y7fRMMMhsaPgMdoNe0+Kka8A@mail.gmail.com>
-From: Leon Nicholls <lnicholls@google.com>
-Date: Sun, 1 Nov 2015 19:55:09 -0800
-Message-ID: <CAHmfHqR9YUGtrRQcqiA9O9ySbbuR5DuCa3Bwt6=642F6WRiYpQ@mail.gmail.com>
-Subject: Re: Cannot write to BLE thermal printer
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: L2CAP: Add missing checks for invalid LE DCID
+Date: Mon,  2 Nov 2015 14:39:17 +0200
+Message-Id: <1446467957-19646-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1446467957-19646-1-git-send-email-johan.hedberg@gmail.com>
+References: <1446467957-19646-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-My chromebook got a few more updates the past few days and now the
-code is working and I can send characters to the printer! Thanks for
-taking a look at the issue.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Thu, Oct 29, 2015 at 11:53 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Leon,
->
-> On Thu, Oct 29, 2015 at 5:02 AM, Leon Nicholls <lnicholls@google.com> wrote:
->> Following François instructions to explicitly stop the scan, here are
->> the latest logs. I'm getting a "GATT Error Unknown" in the browser,
->> although that might not be an error on the driver level but maybe just
->> due to a timeout on the browser level.
->
-> I could only decode a Disconnect command from the btmon trace you
-> sent, there is no ATT traffic at all.
->
-> --
-> Luiz Augusto von Dentz
+When receiving a connect response we should make sure that the DCID is
+within the valid range and that we don't already have another channel
+allocated for the same DCID.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index fdb7989e2997..66e8b6ee19a5 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5250,7 +5250,9 @@ static int l2cap_le_connect_rsp(struct l2cap_conn *conn,
+ 	credits = __le16_to_cpu(rsp->credits);
+ 	result  = __le16_to_cpu(rsp->result);
+ 
+-	if (result == L2CAP_CR_SUCCESS && (mtu < 23 || mps < 23))
++	if (result == L2CAP_CR_SUCCESS && (mtu < 23 || mps < 23 ||
++					   dcid < L2CAP_CID_DYN_START ||
++					   dcid > L2CAP_CID_LE_DYN_END))
+ 		return -EPROTO;
+ 
+ 	BT_DBG("dcid 0x%4.4x mtu %u mps %u credits %u result 0x%2.2x",
+@@ -5270,6 +5272,11 @@ static int l2cap_le_connect_rsp(struct l2cap_conn *conn,
+ 
+ 	switch (result) {
+ 	case L2CAP_CR_SUCCESS:
++		if (__l2cap_get_chan_by_dcid(conn, dcid)) {
++			err = -EBADSLT;
++			break;
++		}
++
+ 		chan->ident = 0;
+ 		chan->dcid = dcid;
+ 		chan->omtu = mtu;
+-- 
+2.5.0
+
