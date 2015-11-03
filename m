@@ -1,40 +1,84 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH 2/4] Bluetooth: Move BR/EDR default events behind its features
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20151101134205.GB21304@t440s.P-661HNU-F1>
-Date: Tue, 3 Nov 2015 22:21:35 +0900
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E4BDA832-3DD5-4EA4-9F9F-E065DB75A2E8@holtmann.org>
-References: <1446367191-67668-2-git-send-email-marcel@holtmann.org> <20151101134205.GB21304@t440s.P-661HNU-F1>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] obexd/session: Fix crash when disconnecting
+Date: Tue,  3 Nov 2015 13:22:51 +0200
+Message-Id: <1446549771-20565-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
->> There are some BR/EDR default events for Bluetooth 1.2 or later
->> controllers that are not conditional on their features being present.
->> 
->> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->> ---
->> net/bluetooth/hci_core.c | 12 ++++++++----
->> 1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> I realize I already applied this one, but:
-> 
->> +	if (lmp_esco_capable(hdev)) {
->> +		events[5] |= 0x08; /* Synchronous Connection Complete */
->> +		events[5] |= 0x10; /* Synchronous Connection Changed */
->> +	}
-> 
-> Synchronous Connection Complete is relevant also for non-ESCO
-> controllers, isn't it?
+If session owner disconnect from the bus while g_obex_connect is pending
+it may lead to a crash since it is never canceled connected_cb may still
+be called after callback_data is freed.
+---
+ obexd/client/session.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-that is true, but if you look at hci_conn.c and sco.c, then you see we use the same logic there to decide if we use Add SCO or Setup Sync Connection. So this just brings that in sync.
-
-Regards
-
-Marcel
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 7248768..ef998f9 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -62,6 +62,7 @@ static guint64 counter = 0;
+ 
+ struct callback_data {
+ 	struct obc_session *session;
++	guint id;
+ 	session_callback_t func;
+ 	void *data;
+ };
+@@ -308,6 +309,9 @@ static void callback_destroy(struct callback_data *callback, GError *err)
+ {
+ 	struct obc_session *session = callback->session;
+ 
++	if (callback->id > 0)
++		g_obex_cancel_req(session->obex, callback->id, TRUE);
++
+ 	callback->func(session, NULL, err, callback->data);
+ 	g_free(callback);
+ 	session->callback = NULL;
+@@ -321,6 +325,8 @@ static void connect_cb(GObex *obex, GError *err, GObexPacket *rsp,
+ 	GError *gerr = NULL;
+ 	uint8_t rsp_code;
+ 
++	callback->id = 0;
++
+ 	if (err != NULL) {
+ 		error("connect_cb: %s", err->message);
+ 		gerr = g_error_copy(err);
+@@ -392,24 +398,26 @@ static void transport_func(GIOChannel *io, GError *err, gpointer user_data)
+ 
+ 		len = g_obex_apparam_encode(apparam, buf, sizeof(buf));
+ 		if (driver->target)
+-			g_obex_connect(obex, connect_cb, callback, &err,
++			callback->id = g_obex_connect(obex, connect_cb,
++					callback, &err,
+ 					G_OBEX_HDR_TARGET,
+ 					driver->target, driver->target_len,
+ 					G_OBEX_HDR_APPARAM,
+ 					buf, len,
+ 					G_OBEX_HDR_INVALID);
+ 		else
+-			g_obex_connect(obex, connect_cb, callback, &err,
++			callback->id = g_obex_connect(obex, connect_cb,
++					callback, &err,
+ 					G_OBEX_HDR_APPARAM, buf, len,
+ 					G_OBEX_HDR_INVALID);
+ 		g_obex_apparam_free(apparam);
+ 	} else if (driver->target)
+-		g_obex_connect(obex, connect_cb, callback, &err,
++		callback->id = g_obex_connect(obex, connect_cb, callback, &err,
+ 			G_OBEX_HDR_TARGET, driver->target, driver->target_len,
+ 			G_OBEX_HDR_INVALID);
+ 	else
+-		g_obex_connect(obex, connect_cb, callback, &err,
+-							G_OBEX_HDR_INVALID);
++		callback->id = g_obex_connect(obex, connect_cb, callback,
++						&err, G_OBEX_HDR_INVALID);
+ 
+ 	if (err != NULL) {
+ 		error("%s", err->message);
+-- 
+2.4.3
 
