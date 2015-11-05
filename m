@@ -1,27 +1,36 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Thu, 05 Nov 2015 11:38:52 -0500 (EST)
-Message-Id: <20151105.113852.1180740055846209439.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth 2015-11-05
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20151105061929.GA599@t440s.P-661HNU-F1>
-References: <20151105061929.GA599@t440s.P-661HNU-F1>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: tony <tony.makkiel@convergeddevices.net>
+Subject: BlueZ 5 : Tool recommendation for scripts
+Message-ID: <563B6FFF.90703@convergeddevices.net>
+Date: Thu, 5 Nov 2015 15:04:31 +0000
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Thu, 5 Nov 2015 08:19:29 +0200
+Hi All,
+	What is the recommended BlueZ 5 tool to connect a device from scripts?
 
-> The following set of Bluetooth patches would be good to get into 4.4-rc1
-> if possible:
-> 
->  - Fix for missing LE CoC parameter validity checks
->  - Fix for potential deadlock in btusb
->  - Fix for issuing unsupported commands during HCI init
-> 
-> Please let me know if there are any issues pulling. Thanks.
+'bluetoothctl' is very good in interactive mode. I tried using 'hcitool' 
++ 'simple-agent'. But they do not seem to detect device unless a scan is 
+initiated from 'bluetoothctl' first.
 
-Pulled, thanks Johan.
+hcitool scan does scan and find devices. But simple-agent returns
+
+Exception: Bluetooth device not found.
+
+bluetoothctl commands which does not take much time could be run from 
+scripts.
+
+eg:
+#!/bin/bash
+bluetoothctl << EOF
+power on
+EOF
+
+But starting a scan does not work, because it exits before the scan is 
+complete.
+
+Many Thanks,
+Tony
