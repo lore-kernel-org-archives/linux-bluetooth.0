@@ -1,52 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Remove redundant setting to zero of bt_cb
-Date: Thu,  5 Nov 2015 09:31:39 +0200
-Message-Id: <1446708701-1387-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1446708701-1387-1-git-send-email-johan.hedberg@gmail.com>
-References: <1446708701-1387-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/3] Bluetooth: Optimize bt_cb(skb) usage
+Date: Thu,  5 Nov 2015 09:31:38 +0200
+Message-Id: <1446708701-1387-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-The socket allocation functions will always memset skb->cb to zero so
-there's no need to make other initializations needing the same thing.
+This set of patches does changes to the structs behind bt_cb(skb) to
+minimize their sizes. This is important since skb->cb has a quite small
+fixed size.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/bluetooth.h | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+Johan
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 663e0ef1eaa0..a85e6d3d75ef 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -325,10 +325,8 @@ static inline struct sk_buff *bt_skb_alloc(unsigned int len, gfp_t how)
- 	struct sk_buff *skb;
- 
- 	skb = alloc_skb(len + BT_SKB_RESERVE, how);
--	if (skb) {
-+	if (skb)
- 		skb_reserve(skb, BT_SKB_RESERVE);
--		bt_cb(skb)->incoming  = 0;
--	}
- 	return skb;
- }
- 
-@@ -338,10 +336,8 @@ static inline struct sk_buff *bt_skb_send_alloc(struct sock *sk,
- 	struct sk_buff *skb;
- 
- 	skb = sock_alloc_send_skb(sk, len + BT_SKB_RESERVE, nb, err);
--	if (skb) {
-+	if (skb)
- 		skb_reserve(skb, BT_SKB_RESERVE);
--		bt_cb(skb)->incoming  = 0;
--	}
- 
- 	if (!skb && *err)
- 		return NULL;
--- 
-2.5.0
+----------------------------------------------------------------
+Johan Hedberg (3):
+      Bluetooth: Remove redundant setting to zero of bt_cb
+      Bluetooth: Compress the size of struct hci_ctrl
+      Bluetooth: bt_skb_cb: Merge force_active and incoming into flags
+
+ include/net/bluetooth/bluetooth.h | 25 ++++++++++++++-----------
+ include/net/bluetooth/hci_core.h  |  2 +-
+ net/bluetooth/hci_conn.c          |  4 ++--
+ net/bluetooth/hci_core.c          | 29 ++++++++++++++++-------------
+ net/bluetooth/hci_request.c       | 10 +++++++---
+ net/bluetooth/hci_sock.c          | 12 ++++++------
+ net/bluetooth/l2cap_core.c        |  7 +++++--
+ 7 files changed, 51 insertions(+), 38 deletions(-)
 
