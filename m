@@ -1,24 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Reply-To: edo.sevc@streamunlimited.com
-To: linux-bluetooth@vger.kernel.org
-From: Edo Sevc <edo.sevc@streamunlimited.com>
-Subject: Concurrent BLE central and peripheral mode with BlueZ-4.101
-Message-ID: <563B42D3.80208@streamunlimited.com>
-Date: Thu, 5 Nov 2015 12:51:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Date: Thu, 5 Nov 2015 17:10:14 +0530
+Message-ID: <CAKafyqo7gpqfMZ2JzUD9f5P-4Tz_ay74zWy3UNLnybWxqGftGA@mail.gmail.com>
+Subject: [bluez-android] How can we change the audio sample rate dynamically
+From: Prabhu Chawandi <foss.chaws@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi All,
 
-Our embedded  platform is running Linux Kernel 4.1 and BlueZ-4.101.
-We have received a new requirement to work simultaneously in LE Central 
-and Peripheral modes, a functionality introduced in Bluetooth 4.1.
-Would it be feasible to get the concurrent Central and Peripheral modes 
-running on BlueZ-4.101 by backporting the corresponding changes from 
-newer BlueZ (and kernel) versions?
-Or do we have to migrate to BlueZ-5?
+  I have situation where I need to reset the sample rate depending on
+the incoming settings.
 
-Many thanks,
-Edo Sevc
+How can I do it ?  I have tried below ways.
+
+I found changing a2dp_sbc_t sbc_presets[1] frequency from  44100 to
+48000 in hal-audio-sbc.c, will change the device sampling rate, but
+only once.
+
+In order to achieve changing sampling rate dynamically, i used the
+below methods. Both did not work
+
+a. stream_out->common.set_sample_rate(&stream_out->common)
+b. stream_out->common.set_parameters(&stream_out->common","sampling_rate=48000");
+
+Has anyone tried changing audio sample rate dynamically? If so, please
+share how it was done?
+
+Advanced Thanks,
+Prabhu Chawandi
