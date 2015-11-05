@@ -1,30 +1,27 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH] Bluetooth: Make bt_cb()->pkt_type and bt_cb()->except HCI specific
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1446716280-49570-1-git-send-email-marcel@holtmann.org>
-Date: Fri, 6 Nov 2015 14:46:38 +0900
-Message-Id: <795EAA9F-1E14-4DF5-9AC9-CCFFC34035F6@holtmann.org>
-References: <1446716280-49570-1-git-send-email-marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Thu, 05 Nov 2015 11:38:52 -0500 (EST)
+Message-Id: <20151105.113852.1180740055846209439.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: pull request: bluetooth 2015-11-05
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20151105061929.GA599@t440s.P-661HNU-F1>
+References: <20151105061929.GA599@t440s.P-661HNU-F1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 5 Nov 2015 08:19:29 +0200
 
-> The two fields for pkt_type and expect inside the bt_cb() structure are
-> highly HCI specific and only used by HCI drivers. So instead of keeping
-> them global, move them into the union entry for HCI.
+> The following set of Bluetooth patches would be good to get into 4.4-rc1
+> if possible:
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
-> include/net/bluetooth/bluetooth.h | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
+>  - Fix for missing LE CoC parameter validity checks
+>  - Fix for potential deadlock in btusb
+>  - Fix for issuing unsupported commands during HCI init
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-actually there might be some side affects with this patch. I have not tracked down if it is this one or some of my experimental patches. However I do not think it is safe to apply this one at the moment.
-
-Regards
-
-Marcel
-
+Pulled, thanks Johan.
