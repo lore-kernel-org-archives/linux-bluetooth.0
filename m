@@ -1,37 +1,40 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add clarifying comment why schedule_work is used
-Date: Fri,  6 Nov 2015 13:35:33 +0200
-Message-Id: <1446809733-31134-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <563C3D4B.30102@netcommwireless.com>
+References: <563C3D4B.30102@netcommwireless.com>
+Date: Fri, 6 Nov 2015 12:22:00 +0200
+Message-ID: <CABBYNZKcgeVoFJcNEcSpp3Kn45qM1XXRncQocSR5PCSGX=e6xQ@mail.gmail.com>
+Subject: Re: ConnectProfile continuously failing with InProgress error
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Alan Au <alan.au@netcommwireless.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Alan,
 
-It's not obvious why schedule_work is used instead of queue_work. Add
-a comment explaining why.
+On Fri, Nov 6, 2015 at 7:40 AM, Alan Au <alan.au@netcommwireless.com> wrote:
+> Hi,
+>
+> I've been writing an application that invokes Device1.ConnectProfile to
+> connect to a remote device. That works fine in the normal case. But during
+> development sometimes the app crashes after invoking ConnectProfile but
+> before the ConnectProfile async invocation returns. In this case bluetoothd
+> seems to sometimes get stuck in a bad state in which all subsequent calls to
+> ConnectProfile (or Connect) for the same device will continuously return a
+> org.bluez.Error.InProgress failure. I need to reboot the box to recover.
+>
+> This is reproducible with bluetoothctl. By running "connect" to a remote
+> device that is not there and then exiting bluetoothctl before the connect
+> result comes back. It may take a few tries but eventually bluetoothctl will
+> show that any connects to that same device will always fail with
+> org.bluez.Error.InProgress:
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_conn.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Please add the bluetoothd logs, the important part is to check if
+there are services that don't transition to disconnected when that
+happen.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 85b82f7adbd2..fd6120a41138 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -178,6 +178,10 @@ static void hci_connect_le_scan_remove(struct hci_conn *conn)
- 	hci_dev_hold(conn->hdev);
- 	hci_conn_get(conn);
- 
-+	/* Even though we hold a reference to the hdev, many other
-+	 * things might get cleaned up meanwhile, including the hdev's
-+	 * own workqueue, so we can't use that for scheduling.
-+	 */
- 	schedule_work(&conn->le_scan_cleanup);
- }
- 
+
 -- 
-2.5.0
-
+Luiz Augusto von Dentz
