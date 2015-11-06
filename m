@@ -1,30 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH] Bluetooth: Add clarifying comment why schedule_work is used
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1446809733-31134-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 6 Nov 2015 20:38:40 +0900
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <98DFBF22-BEE6-4DCD-AC17-206FC32FEB68@holtmann.org>
-References: <1446809733-31134-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add clarifying comment why schedule_work is used
+Date: Fri,  6 Nov 2015 13:35:33 +0200
+Message-Id: <1446809733-31134-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> It's not obvious why schedule_work is used instead of queue_work. Add
-> a comment explaining why.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_conn.c | 4 ++++
-> 1 file changed, 4 insertions(+)
+It's not obvious why schedule_work is used instead of queue_work. Add
+a comment explaining why.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_conn.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 85b82f7adbd2..fd6120a41138 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -178,6 +178,10 @@ static void hci_connect_le_scan_remove(struct hci_conn *conn)
+ 	hci_dev_hold(conn->hdev);
+ 	hci_conn_get(conn);
+ 
++	/* Even though we hold a reference to the hdev, many other
++	 * things might get cleaned up meanwhile, including the hdev's
++	 * own workqueue, so we can't use that for scheduling.
++	 */
+ 	schedule_work(&conn->le_scan_cleanup);
+ }
+ 
+-- 
+2.5.0
 
