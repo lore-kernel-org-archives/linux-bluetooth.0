@@ -1,39 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <563C3D4B.30102@netcommwireless.com>
-References: <563C3D4B.30102@netcommwireless.com>
-Date: Fri, 6 Nov 2015 12:22:00 +0200
-Message-ID: <CABBYNZKcgeVoFJcNEcSpp3Kn45qM1XXRncQocSR5PCSGX=e6xQ@mail.gmail.com>
-Subject: Re: ConnectProfile continuously failing with InProgress error
+In-Reply-To: <563B42D3.80208@streamunlimited.com>
+References: <563B42D3.80208@streamunlimited.com>
+Date: Fri, 6 Nov 2015 12:16:47 +0200
+Message-ID: <CABBYNZKPUUpiu_eCtLU-ikmRYQYO7zowCtToioNpF0AnDd49Gg@mail.gmail.com>
+Subject: Re: Concurrent BLE central and peripheral mode with BlueZ-4.101
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Alan Au <alan.au@netcommwireless.com>
+To: edo.sevc@streamunlimited.com
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+Hi Edo,
 
-On Fri, Nov 6, 2015 at 7:40 AM, Alan Au <alan.au@netcommwireless.com> wrote:
-> Hi,
+On Thu, Nov 5, 2015 at 1:51 PM, Edo Sevc <edo.sevc@streamunlimited.com> wrote:
+> Hello,
 >
-> I've been writing an application that invokes Device1.ConnectProfile to
-> connect to a remote device. That works fine in the normal case. But during
-> development sometimes the app crashes after invoking ConnectProfile but
-> before the ConnectProfile async invocation returns. In this case bluetoothd
-> seems to sometimes get stuck in a bad state in which all subsequent calls to
-> ConnectProfile (or Connect) for the same device will continuously return a
-> org.bluez.Error.InProgress failure. I need to reboot the box to recover.
->
-> This is reproducible with bluetoothctl. By running "connect" to a remote
-> device that is not there and then exiting bluetoothctl before the connect
-> result comes back. It may take a few tries but eventually bluetoothctl will
-> show that any connects to that same device will always fail with
-> org.bluez.Error.InProgress:
+> Our embedded  platform is running Linux Kernel 4.1 and BlueZ-4.101.
+> We have received a new requirement to work simultaneously in LE Central and
+> Peripheral modes, a functionality introduced in Bluetooth 4.1.
+> Would it be feasible to get the concurrent Central and Peripheral modes
+> running on BlueZ-4.101 by backporting the corresponding changes from newer
+> BlueZ (and kernel) versions?
+> Or do we have to migrate to BlueZ-5?
 
-Please add the bluetoothd logs, the important part is to check if
-there are services that don't transition to disconnected when that
-happen.
+4.101 is too old afaik it doesn't support LE peripheral mode, so I
+would suggest you to upgrade to BlueZ 5 since you already have a quite
+recent kernel.
 
 
 -- 
