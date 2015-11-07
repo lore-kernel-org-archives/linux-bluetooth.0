@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Add support for controller specific logging
-Date: Sun,  8 Nov 2015 02:01:02 +0100
-Message-Id: <1446944462-5512-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 3/3] Bluetooth: Add support for controller specific logging
+Date: Sat,  7 Nov 2015 13:56:57 +0100
+Message-Id: <1446901017-114430-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -19,10 +19,10 @@ events. This will increase the ability to debug problems faster.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_mon.h  |   1 +
- include/net/bluetooth/hci_sock.h |   1 +
- net/bluetooth/hci_sock.c         | 102 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 104 insertions(+)
+ include/net/bluetooth/hci_mon.h  |  1 +
+ include/net/bluetooth/hci_sock.h |  1 +
+ net/bluetooth/hci_sock.c         | 76 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 78 insertions(+)
 
 diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
 index c91bb23eb29e..587d0131b349 100644
@@ -49,7 +49,7 @@ index 9a46d665c1b5..8e9138acdae1 100644
  struct hci_filter {
  	unsigned long type_mask;
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index c976f9da96c0..80b8d3e7dfb5 100644
+index c976f9da96c0..c4c658814e4c 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
 @@ -906,6 +906,18 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
@@ -81,7 +81,7 @@ index c976f9da96c0..80b8d3e7dfb5 100644
  	if (sk->sk_state == BT_CLOSED)
  		return 0;
  
-@@ -1179,6 +1194,90 @@ done:
+@@ -1179,6 +1194,64 @@ done:
  	return err;
  }
  
@@ -93,11 +93,7 @@ index c976f9da96c0..80b8d3e7dfb5 100644
 +	u16 index;
 +	int err;
 +
-+	/* The logging frame consists at minimum of the standard header,
-+	 * the priority byte, the ident length byte and at least one string
-+	 * terminator NUL byte. Anything shorter are invalid packets.
-+	 */
-+	if (len < sizeof(*hdr) + 3)
++	if (len < sizeof(*hdr) + 2)
 +		return -EINVAL;
 +
 +	skb = bt_skb_send_alloc(sk, len, msg->msg_flags & MSG_DONTWAIT, &err);
@@ -116,30 +112,8 @@ index c976f9da96c0..80b8d3e7dfb5 100644
 +		goto drop;
 +	}
 +
-+	if (__le16_to_cpu(hdr->opcode) == 0x0000) {
-+		__u8 priority = skb->data[sizeof(*hdr)];
-+		__u8 ident_len = skb->data[sizeof(*hdr) + 1];
-+
-+		/* Only the priorities 0-7 are valid and with that any other
-+		 * value results in an invalid packet.
-+		 *
-+		 * The priority byte is followed by an ident length byte and
-+		 * the NUL terminated ident string. Check that the ident
-+		 * length is not overflowing the packet and also that the
-+		 * ident string itself is NUL terminated. In case the ident
-+		 * length is zero, the length value actually doubles as NUL
-+		 * terminator identifier.
-+		 *
-+		 * The message follows the ident string (if present) and
-+		 * must be NUL terminated. Otherwise it is not a valid packet.
-+		 */
-+		if (priority > 7 || skb->data[len - 1] != 0x00 ||
-+		    ident_len > len - sizeof(*hdr) - 3 ||
-+		    skb->data[sizeof(*hdr) + ident_len + 1] != 0x00) {
-+			err = -EINVAL;
-+			goto drop;
-+		}
-+	} else {
++	if (__le16_to_cpu(hdr->opcode) != 0x0000 ||
++	    skb->data[sizeof(*hdr)] > 7 || skb->data[len - 1] != 0x00) {
 +		err = -EINVAL;
 +		goto drop;
 +	}
@@ -172,7 +146,7 @@ index c976f9da96c0..80b8d3e7dfb5 100644
  static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
  			    size_t len)
  {
-@@ -1208,6 +1307,9 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+@@ -1208,6 +1281,9 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
  	case HCI_CHANNEL_MONITOR:
  		err = -EOPNOTSUPP;
  		goto done;
