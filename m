@@ -1,135 +1,119 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/3] Bluetooth: Add support for sending system notes to monitor channel
-Date: Sun,  8 Nov 2015 07:47:12 +0100
-Message-Id: <1446965233-40420-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 1/3] Bluetooth: Fix casting coding style within HCI sockets
+Date: Sun,  8 Nov 2015 07:47:11 +0100
+Message-Id: <1446965233-40420-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The monitor channel can be used to send generic system notes as text
-strings for debugging purposes. This adds the system note monitor code
-and uses it for including kernel and subsystem version into traces.
+The HCI sockets code has still some old casting coding style. Fix this
+to match with the rest of the code.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/bluetooth.h |  2 ++
- include/net/bluetooth/hci_mon.h   |  1 +
- net/bluetooth/af_bluetooth.c      |  8 +++-----
- net/bluetooth/hci_sock.c          | 29 +++++++++++++++++++++++++++++
- 4 files changed, 35 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_sock.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 8d38f411009c..bfd1590821d6 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -29,6 +29,8 @@
- #include <net/sock.h>
- #include <linux/seq_file.h>
- 
-+#define BT_SUBSYS_VERSION "2.21"
-+
- #ifndef AF_BLUETOOTH
- #define AF_BLUETOOTH	31
- #define PF_BLUETOOTH	AF_BLUETOOTH
-diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
-index 2b67567cf28d..c91bb23eb29e 100644
---- a/include/net/bluetooth/hci_mon.h
-+++ b/include/net/bluetooth/hci_mon.h
-@@ -43,6 +43,7 @@ struct hci_mon_hdr {
- #define HCI_MON_CLOSE_INDEX	9
- #define HCI_MON_INDEX_INFO	10
- #define HCI_MON_VENDOR_DIAG	11
-+#define HCI_MON_SYSTEM_NOTE	12
- 
- struct hci_mon_new_index {
- 	__u8		type;
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index a3bffd1ec2b4..34c53d5862f6 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -33,8 +33,6 @@
- 
- #include "selftest.h"
- 
--#define VERSION "2.21"
--
- /* Bluetooth sockets */
- #define BT_MAX_PROTO	8
- static const struct net_proto_family *bt_proto[BT_MAX_PROTO];
-@@ -715,7 +713,7 @@ static int __init bt_init(void)
- 
- 	sock_skb_cb_check_size(sizeof(struct bt_skb_cb));
- 
--	BT_INFO("Core ver %s", VERSION);
-+	BT_INFO("Core ver %s", BT_SUBSYS_VERSION);
- 
- 	err = bt_selftest();
- 	if (err < 0)
-@@ -789,7 +787,7 @@ subsys_initcall(bt_init);
- module_exit(bt_exit);
- 
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
--MODULE_DESCRIPTION("Bluetooth Core ver " VERSION);
--MODULE_VERSION(VERSION);
-+MODULE_DESCRIPTION("Bluetooth Core ver " BT_SUBSYS_VERSION);
-+MODULE_VERSION(BT_SUBSYS_VERSION);
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_NETPROTO(PF_BLUETOOTH);
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 18a41eae295c..710265c35d16 100644
+index 32caa6271a92..18a41eae295c 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -26,6 +26,8 @@
+@@ -294,7 +294,7 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ 		return;
  
- #include <linux/export.h>
- #include <asm/unaligned.h>
-+#include <generated/compile.h>
-+#include <generated/utsrelease.h>
+ 	/* Put header before the data */
+-	hdr = (void *) skb_push(skb_copy, HCI_MON_HDR_SIZE);
++	hdr = (void *)skb_push(skb_copy, HCI_MON_HDR_SIZE);
+ 	hdr->opcode = opcode;
+ 	hdr->index = cpu_to_le16(hdev->id);
+ 	hdr->len = cpu_to_le16(skb->len);
+@@ -375,7 +375,7 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
  
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -383,6 +385,29 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
- 	return skb;
+ 	__net_timestamp(skb);
+ 
+-	hdr = (void *) skb_push(skb, HCI_MON_HDR_SIZE);
++	hdr = (void *)skb_push(skb, HCI_MON_HDR_SIZE);
+ 	hdr->opcode = opcode;
+ 	hdr->index = cpu_to_le16(hdev->id);
+ 	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
+@@ -436,11 +436,11 @@ static void hci_si_event(struct hci_dev *hdev, int type, int dlen, void *data)
+ 	if (!skb)
+ 		return;
+ 
+-	hdr = (void *) skb_put(skb, HCI_EVENT_HDR_SIZE);
++	hdr = (void *)skb_put(skb, HCI_EVENT_HDR_SIZE);
+ 	hdr->evt  = HCI_EV_STACK_INTERNAL;
+ 	hdr->plen = sizeof(*ev) + dlen;
+ 
+-	ev  = (void *) skb_put(skb, sizeof(*ev) + dlen);
++	ev  = (void *)skb_put(skb, sizeof(*ev) + dlen);
+ 	ev->type = type;
+ 	memcpy(ev->data, data, dlen);
+ 
+@@ -653,20 +653,20 @@ static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
+ 		return -EOPNOTSUPP;
+ 
+ 	case HCIGETCONNINFO:
+-		return hci_get_conn_info(hdev, (void __user *) arg);
++		return hci_get_conn_info(hdev, (void __user *)arg);
+ 
+ 	case HCIGETAUTHINFO:
+-		return hci_get_auth_info(hdev, (void __user *) arg);
++		return hci_get_auth_info(hdev, (void __user *)arg);
+ 
+ 	case HCIBLOCKADDR:
+ 		if (!capable(CAP_NET_ADMIN))
+ 			return -EPERM;
+-		return hci_sock_blacklist_add(hdev, (void __user *) arg);
++		return hci_sock_blacklist_add(hdev, (void __user *)arg);
+ 
+ 	case HCIUNBLOCKADDR:
+ 		if (!capable(CAP_NET_ADMIN))
+ 			return -EPERM;
+-		return hci_sock_blacklist_del(hdev, (void __user *) arg);
++		return hci_sock_blacklist_del(hdev, (void __user *)arg);
+ 	}
+ 
+ 	return -ENOIOCTLCMD;
+@@ -675,7 +675,7 @@ static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
+ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
+ 			  unsigned long arg)
+ {
+-	void __user *argp = (void __user *) arg;
++	void __user *argp = (void __user *)arg;
+ 	struct sock *sk = sock->sk;
+ 	int err;
+ 
+@@ -926,7 +926,7 @@ done:
+ static int hci_sock_getname(struct socket *sock, struct sockaddr *addr,
+ 			    int *addr_len, int peer)
+ {
+-	struct sockaddr_hci *haddr = (struct sockaddr_hci *) addr;
++	struct sockaddr_hci *haddr = (struct sockaddr_hci *)addr;
+ 	struct sock *sk = sock->sk;
+ 	struct hci_dev *hdev;
+ 	int err = 0;
+@@ -991,8 +991,8 @@ static void hci_sock_cmsg(struct sock *sk, struct msghdr *msg,
+ 	}
  }
  
-+static void send_monitor_note(struct sock *sk, const char *text)
-+{
-+	size_t len = strlen(text);
-+	struct hci_mon_hdr *hdr;
-+	struct sk_buff *skb;
-+
-+	skb = bt_skb_alloc(len + 1, GFP_ATOMIC);
-+	if (!skb)
-+		return;
-+
-+	strcpy(skb_put(skb, len + 1), text);
-+
-+	__net_timestamp(skb);
-+
-+	hdr = (void *)skb_push(skb, HCI_MON_HDR_SIZE);
-+	hdr->opcode = cpu_to_le16(HCI_MON_SYSTEM_NOTE);
-+	hdr->index = cpu_to_le16(HCI_DEV_NONE);
-+	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
-+
-+	if (sock_queue_rcv_skb(sk, skb))
-+		kfree_skb(skb);
-+}
-+
- static void send_monitor_replay(struct sock *sk)
+-static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+-			    int flags)
++static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
++			    size_t len, int flags)
  {
- 	struct hci_dev *hdev;
-@@ -872,6 +897,10 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 		 */
- 		hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
+ 	int noblock = flags & MSG_DONTWAIT;
+ 	struct sock *sk = sock->sk;
+@@ -1211,7 +1211,7 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		goto drop;
+ 	}
  
-+		send_monitor_note(sk, "Linux version " UTS_RELEASE
-+				      " (" UTS_MACHINE ")");
-+		send_monitor_note(sk, "Bluetooth subsystem version "
-+				      BT_SUBSYS_VERSION);
- 		send_monitor_replay(sk);
+-	hci_skb_pkt_type(skb) = *((unsigned char *) skb->data);
++	hci_skb_pkt_type(skb) = skb->data[0];
+ 	skb_pull(skb, 1);
  
- 		atomic_inc(&monitor_promisc);
+ 	if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
 -- 
 2.5.0
 
