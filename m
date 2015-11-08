@@ -1,119 +1,187 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 1/3] Bluetooth: Fix casting coding style within HCI sockets
-Date: Sun,  8 Nov 2015 07:47:11 +0100
-Message-Id: <1446965233-40420-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2] Bluetooth: Add support for controller specific logging
+Date: Sun,  8 Nov 2015 02:01:02 +0100
+Message-Id: <1446944462-5512-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The HCI sockets code has still some old casting coding style. Fix this
-to match with the rest of the code.
+To enable controller specific logging, the userspace daemon has to have
+the ability to log per controller. To facilitate this support, provide
+a dedicated logging channel. Messages in this channel will be included
+in the monitor queue and with that also forwarded to monitoring tools
+along with the actual hardware traces.
+
+All messages from the logging channel are timestamped and with that
+allow an easy correlation between userspace messages and hardware
+events. This will increase the ability to debug problems faster.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_sock.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ include/net/bluetooth/hci_mon.h  |   1 +
+ include/net/bluetooth/hci_sock.h |   1 +
+ net/bluetooth/hci_sock.c         | 102 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 104 insertions(+)
 
+diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
+index c91bb23eb29e..587d0131b349 100644
+--- a/include/net/bluetooth/hci_mon.h
++++ b/include/net/bluetooth/hci_mon.h
+@@ -44,6 +44,7 @@ struct hci_mon_hdr {
+ #define HCI_MON_INDEX_INFO	10
+ #define HCI_MON_VENDOR_DIAG	11
+ #define HCI_MON_SYSTEM_NOTE	12
++#define HCI_MON_USER_LOGGING	13
+ 
+ struct hci_mon_new_index {
+ 	__u8		type;
+diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
+index 9a46d665c1b5..8e9138acdae1 100644
+--- a/include/net/bluetooth/hci_sock.h
++++ b/include/net/bluetooth/hci_sock.h
+@@ -45,6 +45,7 @@ struct sockaddr_hci {
+ #define HCI_CHANNEL_USER	1
+ #define HCI_CHANNEL_MONITOR	2
+ #define HCI_CHANNEL_CONTROL	3
++#define HCI_CHANNEL_LOGGING	4
+ 
+ struct hci_filter {
+ 	unsigned long type_mask;
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 32caa6271a92..18a41eae295c 100644
+index c976f9da96c0..80b8d3e7dfb5 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -294,7 +294,7 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
+@@ -906,6 +906,18 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 		atomic_inc(&monitor_promisc);
+ 		break;
  
- 	/* Put header before the data */
--	hdr = (void *) skb_push(skb_copy, HCI_MON_HDR_SIZE);
-+	hdr = (void *)skb_push(skb_copy, HCI_MON_HDR_SIZE);
- 	hdr->opcode = opcode;
- 	hdr->index = cpu_to_le16(hdev->id);
- 	hdr->len = cpu_to_le16(skb->len);
-@@ -375,7 +375,7 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
- 
- 	__net_timestamp(skb);
- 
--	hdr = (void *) skb_push(skb, HCI_MON_HDR_SIZE);
-+	hdr = (void *)skb_push(skb, HCI_MON_HDR_SIZE);
- 	hdr->opcode = opcode;
- 	hdr->index = cpu_to_le16(hdev->id);
- 	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
-@@ -436,11 +436,11 @@ static void hci_si_event(struct hci_dev *hdev, int type, int dlen, void *data)
- 	if (!skb)
- 		return;
- 
--	hdr = (void *) skb_put(skb, HCI_EVENT_HDR_SIZE);
-+	hdr = (void *)skb_put(skb, HCI_EVENT_HDR_SIZE);
- 	hdr->evt  = HCI_EV_STACK_INTERNAL;
- 	hdr->plen = sizeof(*ev) + dlen;
- 
--	ev  = (void *) skb_put(skb, sizeof(*ev) + dlen);
-+	ev  = (void *)skb_put(skb, sizeof(*ev) + dlen);
- 	ev->type = type;
- 	memcpy(ev->data, data, dlen);
- 
-@@ -653,20 +653,20 @@ static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
++	case HCI_CHANNEL_LOGGING:
++		if (haddr.hci_dev != HCI_DEV_NONE) {
++			err = -EINVAL;
++			goto done;
++		}
++
++		if (!capable(CAP_NET_ADMIN)) {
++			err = -EPERM;
++			goto done;
++		}
++		break;
++
+ 	default:
+ 		if (!hci_mgmt_chan_find(haddr.hci_channel)) {
+ 			err = -EINVAL;
+@@ -1033,6 +1045,9 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	if (flags & MSG_OOB)
  		return -EOPNOTSUPP;
  
- 	case HCIGETCONNINFO:
--		return hci_get_conn_info(hdev, (void __user *) arg);
-+		return hci_get_conn_info(hdev, (void __user *)arg);
++	if (hci_pi(sk)->channel == HCI_CHANNEL_LOGGING)
++		return -EOPNOTSUPP;
++
+ 	if (sk->sk_state == BT_CLOSED)
+ 		return 0;
  
- 	case HCIGETAUTHINFO:
--		return hci_get_auth_info(hdev, (void __user *) arg);
-+		return hci_get_auth_info(hdev, (void __user *)arg);
- 
- 	case HCIBLOCKADDR:
- 		if (!capable(CAP_NET_ADMIN))
- 			return -EPERM;
--		return hci_sock_blacklist_add(hdev, (void __user *) arg);
-+		return hci_sock_blacklist_add(hdev, (void __user *)arg);
- 
- 	case HCIUNBLOCKADDR:
- 		if (!capable(CAP_NET_ADMIN))
- 			return -EPERM;
--		return hci_sock_blacklist_del(hdev, (void __user *) arg);
-+		return hci_sock_blacklist_del(hdev, (void __user *)arg);
- 	}
- 
- 	return -ENOIOCTLCMD;
-@@ -675,7 +675,7 @@ static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
- static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
- 			  unsigned long arg)
- {
--	void __user *argp = (void __user *) arg;
-+	void __user *argp = (void __user *)arg;
- 	struct sock *sk = sock->sk;
- 	int err;
- 
-@@ -926,7 +926,7 @@ done:
- static int hci_sock_getname(struct socket *sock, struct sockaddr *addr,
- 			    int *addr_len, int peer)
- {
--	struct sockaddr_hci *haddr = (struct sockaddr_hci *) addr;
-+	struct sockaddr_hci *haddr = (struct sockaddr_hci *)addr;
- 	struct sock *sk = sock->sk;
- 	struct hci_dev *hdev;
- 	int err = 0;
-@@ -991,8 +991,8 @@ static void hci_sock_cmsg(struct sock *sk, struct msghdr *msg,
- 	}
+@@ -1179,6 +1194,90 @@ done:
+ 	return err;
  }
  
--static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
--			    int flags)
-+static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
-+			    size_t len, int flags)
++static int hci_logging_frame(struct sock *sk, struct msghdr *msg, int len)
++{
++	struct hci_mon_hdr *hdr;
++	struct sk_buff *skb;
++	struct hci_dev *hdev;
++	u16 index;
++	int err;
++
++	/* The logging frame consists at minimum of the standard header,
++	 * the priority byte, the ident length byte and at least one string
++	 * terminator NUL byte. Anything shorter are invalid packets.
++	 */
++	if (len < sizeof(*hdr) + 3)
++		return -EINVAL;
++
++	skb = bt_skb_send_alloc(sk, len, msg->msg_flags & MSG_DONTWAIT, &err);
++	if (!skb)
++		return err;
++
++	if (memcpy_from_msg(skb_put(skb, len), msg, len)) {
++		err = -EFAULT;
++		goto drop;
++	}
++
++	hdr = (void *)skb->data;
++
++	if (__le16_to_cpu(hdr->len) != len - sizeof(*hdr)) {
++		err = -EINVAL;
++		goto drop;
++	}
++
++	if (__le16_to_cpu(hdr->opcode) == 0x0000) {
++		__u8 priority = skb->data[sizeof(*hdr)];
++		__u8 ident_len = skb->data[sizeof(*hdr) + 1];
++
++		/* Only the priorities 0-7 are valid and with that any other
++		 * value results in an invalid packet.
++		 *
++		 * The priority byte is followed by an ident length byte and
++		 * the NUL terminated ident string. Check that the ident
++		 * length is not overflowing the packet and also that the
++		 * ident string itself is NUL terminated. In case the ident
++		 * length is zero, the length value actually doubles as NUL
++		 * terminator identifier.
++		 *
++		 * The message follows the ident string (if present) and
++		 * must be NUL terminated. Otherwise it is not a valid packet.
++		 */
++		if (priority > 7 || skb->data[len - 1] != 0x00 ||
++		    ident_len > len - sizeof(*hdr) - 3 ||
++		    skb->data[sizeof(*hdr) + ident_len + 1] != 0x00) {
++			err = -EINVAL;
++			goto drop;
++		}
++	} else {
++		err = -EINVAL;
++		goto drop;
++	}
++
++	index = __le16_to_cpu(hdr->index);
++
++	if (index != MGMT_INDEX_NONE) {
++		hdev = hci_dev_get(index);
++		if (!hdev) {
++			err = -ENODEV;
++			goto drop;
++		}
++	} else {
++		hdev = NULL;
++	}
++
++	hdr->opcode = cpu_to_le16(HCI_MON_USER_LOGGING);
++
++	hci_send_to_channel(HCI_CHANNEL_MONITOR, skb, HCI_SOCK_TRUSTED, NULL);
++	err = len;
++
++	if (hdev)
++		hci_dev_put(hdev);
++
++drop:
++	kfree_skb(skb);
++	return err;
++}
++
+ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 			    size_t len)
  {
- 	int noblock = flags & MSG_DONTWAIT;
- 	struct sock *sk = sock->sk;
-@@ -1211,7 +1211,7 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 		goto drop;
- 	}
- 
--	hci_skb_pkt_type(skb) = *((unsigned char *) skb->data);
-+	hci_skb_pkt_type(skb) = skb->data[0];
- 	skb_pull(skb, 1);
- 
- 	if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
+@@ -1208,6 +1307,9 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	case HCI_CHANNEL_MONITOR:
+ 		err = -EOPNOTSUPP;
+ 		goto done;
++	case HCI_CHANNEL_LOGGING:
++		err = hci_logging_frame(sk, msg, len);
++		goto done;
+ 	default:
+ 		mutex_lock(&mgmt_chan_list_lock);
+ 		chan = __hci_mgmt_chan_find(hci_pi(sk)->channel);
 -- 
 2.5.0
 
