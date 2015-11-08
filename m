@@ -1,55 +1,28 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Veit Guna <veit.guna@gmx.de>
-Subject: PS3 remote battery drain
-Message-ID: <563F3739.7030405@gmx.de>
-Date: Sun, 8 Nov 2015 12:51:21 +0100
+Return-Path: <johan.hedberg@gmail.com>
+Date: Sun, 8 Nov 2015 08:56:23 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] Bluetooth: Fix casting coding style within HCI
+ sockets
+Message-ID: <20151108065623.GA11043@t440s.P-661HNU-F1>
+References: <1446965233-40420-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1446965233-40420-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi.
+Hi Marcel,
 
-I'm currently using the latest OSMC media center (successor of raspbmc)
-on the raspberry pi 2.
-It uses the bluez packages (5.12 AFAIR) for handling the bluetooth
-connections.
+On Sun, Nov 08, 2015, Marcel Holtmann wrote:
+> The HCI sockets code has still some old casting coding style. Fix this
+> to match with the rest of the code.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_sock.c | 26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
 
-Connecting and using the ps3 remote (1st gen) works quite ok with that.
-The problem I have is, that the remote doesn't seem to go to standby and
-batteries drain very quickly (2-3 weeks).
+All three patches have been applied to bluetooth-next. Thanks.
 
-Before OSMC, I used raspbmc. It had the same problems initially. But a
-user named "kitlaan" applied patches
-to the original bluez packages to get standby working. After replacing
-the original bluez packages with the
-patched ones, standby worked and batteries lasted at least 6 months.
-
-One could easily recognize the standby when hitting a button on the
-remote. It lagged a second before the button press
-went through to kodi. After it had woken up, pressing a button worked
-instantly - without a delay.
-
-Back then, the patch used the 4.98 version of bluez. Now I can see that
-the latest official bluez version is 5.36.
-Now I'm wondering, whether the patches have made it somehow into the
-official bluez version.
-
-Testing with 5.12 showed, that standby didn't work as expected. Also
-when using a IdleTimeout of 1 minute within
-the input.conf.
-
-Basically one can get it to work with that (there are the patches
-mentioned):
-
-https://www.mythtv.org/wiki/Sony_PS3_BD_Remote
-
-Does anybody have a clue whether the patches - or some parts of them -
-have made it into bluez?
-
-Thanks
-Veit
-
-
-
+Johan
