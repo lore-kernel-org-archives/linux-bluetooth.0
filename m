@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 12/12] Bluetooth: Move Stop Discovery to req_workqueue
-Date: Tue, 10 Nov 2015 20:18:13 +0200
-Message-Id: <1447179493-14469-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 10/12] Bluetooth: Add error return value to hci_req_sync callback
+Date: Tue, 10 Nov 2015 20:14:32 +0200
+Message-Id: <1447179274-12276-11-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1447179274-12276-1-git-send-email-johan.hedberg@gmail.com>
 References: <1447179274-12276-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,248 +11,327 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Since discovery also deals with LE scanning it makes sense to move it
-behind the same req_workqueue as other LE scanning changes. This also
-simplifies the logic since we do many of the actions in a synchronous
-manner.
-
-Part of this refactoring is moving hci_req_stop_discovery() to
-hci_request.c. At the same time the function receives support for
-properly handling the STOPPING state since that's the state we'll be
-in when stopping through the req_workqueue.
+In some circumstances it may be useful to abort the request through
+checks done in the request callback. To make the feature possible this
+patch changes the return value of the request callback from void to
+int and aborts the request if a non-zero value is returned.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_request.c      | 62 ++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_request.h      |  3 ++
- net/bluetooth/mgmt.c             | 72 +++-------------------------------------
- 4 files changed, 71 insertions(+), 67 deletions(-)
+ net/bluetooth/hci_core.c    | 45 ++++++++++++++++++++++++++++++++-------------
+ net/bluetooth/hci_request.c | 27 ++++++++++++++++++---------
+ net/bluetooth/hci_request.h |  8 ++++----
+ 3 files changed, 54 insertions(+), 26 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 72ea8a6d7d70..609f4a03899c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1475,6 +1475,7 @@ void mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
- 				    u8 status);
- void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status);
- void mgmt_start_discovery_complete(struct hci_dev *hdev, u8 status);
-+void mgmt_stop_discovery_complete(struct hci_dev *hdev, u8 status);
- void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
- 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len);
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 971c8a4ffbff..a535490f6eab 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1222,6 +1222,62 @@ static void start_discovery(struct hci_dev *hdev, u8 *status)
- 			   timeout);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 9f5984003e0e..f37691c3c579 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -189,13 +189,14 @@ static void hci_debugfs_create_basic(struct hci_dev *hdev)
+ 				    &vendor_diag_fops);
  }
  
-+bool hci_req_stop_discovery(struct hci_request *req)
-+{
-+	struct hci_dev *hdev = req->hdev;
-+	struct discovery_state *d = &hdev->discovery;
-+	struct hci_cp_remote_name_req_cancel cp;
-+	struct inquiry_entry *e;
-+	bool ret = false;
-+
-+	BT_DBG("%s state %u", hdev->name, hdev->discovery.state);
-+
-+	if (d->state == DISCOVERY_FINDING || d->state == DISCOVERY_STOPPING) {
-+		if (test_bit(HCI_INQUIRY, &hdev->flags))
-+			hci_req_add(req, HCI_OP_INQUIRY_CANCEL, 0, NULL);
-+
-+		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
-+			cancel_delayed_work(&hdev->le_scan_disable);
-+			hci_req_add_le_scan_disable(req);
-+		}
-+
-+		ret = true;
-+	} else {
-+		/* Passive scanning */
-+		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
-+			hci_req_add_le_scan_disable(req);
-+			ret = true;
-+		}
-+	}
-+
-+	/* No further actions needed for LE-only discovery */
-+	if (d->type == DISCOV_TYPE_LE)
-+		return ret;
-+
-+	if (d->state == DISCOVERY_RESOLVING || d->state == DISCOVERY_STOPPING) {
-+		e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY,
-+						     NAME_PENDING);
-+		if (!e)
-+			return ret;
-+
-+		bacpy(&cp.bdaddr, &e->data.bdaddr);
-+		hci_req_add(req, HCI_OP_REMOTE_NAME_REQ_CANCEL, sizeof(cp),
-+			    &cp);
-+		ret = true;
-+	}
-+
-+	return ret;
-+}
-+
-+static int stop_discovery(struct hci_request *req, unsigned long opt)
-+{
-+	hci_dev_lock(req->hdev);
-+	hci_req_stop_discovery(req);
-+	hci_dev_unlock(req->hdev);
+-static void hci_reset_req(struct hci_request *req, unsigned long opt)
++static int hci_reset_req(struct hci_request *req, unsigned long opt)
+ {
+ 	BT_DBG("%s %ld", req->hdev->name, opt);
+ 
+ 	/* Reset device */
+ 	set_bit(HCI_RESET, &req->hdev->flags);
+ 	hci_req_add(req, HCI_OP_RESET, 0, NULL);
++	return 0;
+ }
+ 
+ static void bredr_init(struct hci_request *req)
+@@ -235,7 +236,7 @@ static void amp_init1(struct hci_request *req)
+ 	hci_req_add(req, HCI_OP_READ_LOCATION_DATA, 0, NULL);
+ }
+ 
+-static void amp_init2(struct hci_request *req)
++static int amp_init2(struct hci_request *req)
+ {
+ 	/* Read Local Supported Features. Not all AMP controllers
+ 	 * support this so it's placed conditionally in the second
+@@ -243,9 +244,11 @@ static void amp_init2(struct hci_request *req)
+ 	 */
+ 	if (req->hdev->commands[14] & 0x20)
+ 		hci_req_add(req, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
 +
 +	return 0;
-+}
-+
- static void discov_update(struct work_struct *work)
- {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev,
-@@ -1237,6 +1293,12 @@ static void discov_update(struct work_struct *work)
- 		else
- 			hci_discovery_set_state(hdev, DISCOVERY_FINDING);
- 		break;
-+	case DISCOVERY_STOPPING:
-+		hci_req_sync(hdev, stop_discovery, 0, HCI_CMD_TIMEOUT, &status);
-+		mgmt_stop_discovery_complete(hdev, status);
-+		if (!status)
-+			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+		break;
- 	case DISCOVERY_STOPPED:
- 	default:
- 		return;
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index e536cd2ee4c4..e65f65e31644 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -58,6 +58,9 @@ struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode, u32 plen,
- void hci_req_add_le_scan_disable(struct hci_request *req);
- void hci_req_add_le_passive_scan(struct hci_request *req);
- 
-+/* Returns true if HCI commands were queued */
-+bool hci_req_stop_discovery(struct hci_request *req);
-+
- void hci_update_page_scan(struct hci_dev *hdev);
- void __hci_update_page_scan(struct hci_request *req);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 318412f4ca5c..a4c7dfcebcd2 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1416,49 +1416,6 @@ static void clean_up_hci_complete(struct hci_dev *hdev, u8 status, u16 opcode)
- 	}
  }
  
--static bool hci_stop_discovery(struct hci_request *req)
--{
--	struct hci_dev *hdev = req->hdev;
--	struct hci_cp_remote_name_req_cancel cp;
--	struct inquiry_entry *e;
--
--	switch (hdev->discovery.state) {
--	case DISCOVERY_FINDING:
--		if (test_bit(HCI_INQUIRY, &hdev->flags))
--			hci_req_add(req, HCI_OP_INQUIRY_CANCEL, 0, NULL);
--
--		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
--			cancel_delayed_work(&hdev->le_scan_disable);
--			hci_req_add_le_scan_disable(req);
--		}
--
--		return true;
--
--	case DISCOVERY_RESOLVING:
--		e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY,
--						     NAME_PENDING);
--		if (!e)
--			break;
--
--		bacpy(&cp.bdaddr, &e->data.bdaddr);
--		hci_req_add(req, HCI_OP_REMOTE_NAME_REQ_CANCEL, sizeof(cp),
--			    &cp);
--
--		return true;
--
--	default:
--		/* Passive scanning */
--		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
--			hci_req_add_le_scan_disable(req);
--			return true;
--		}
--
--		break;
--	}
--
--	return false;
--}
--
- static void advertising_added(struct sock *sk, struct hci_dev *hdev,
- 			      u8 instance)
+-static void hci_init1_req(struct hci_request *req, unsigned long opt)
++static int hci_init1_req(struct hci_request *req, unsigned long opt)
  {
-@@ -1636,7 +1593,7 @@ static int clean_up_hci_state(struct hci_dev *hdev)
- 	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
- 		disable_advertising(&req);
+ 	struct hci_dev *hdev = req->hdev;
  
--	discov_stopped = hci_stop_discovery(&req);
-+	discov_stopped = hci_req_stop_discovery(&req);
+@@ -268,6 +271,8 @@ static void hci_init1_req(struct hci_request *req, unsigned long opt)
+ 		BT_ERR("Unknown device type %d", hdev->dev_type);
+ 		break;
+ 	}
++
++	return 0;
+ }
  
- 	list_for_each_entry(conn, &hdev->conn_hash.list, list) {
- 		/* 0x15 == Terminated due to Power Off */
-@@ -4377,7 +4334,7 @@ failed:
+ static void bredr_setup(struct hci_request *req)
+@@ -422,7 +427,7 @@ static void hci_setup_event_mask(struct hci_request *req)
+ 	hci_req_add(req, HCI_OP_SET_EVENT_MASK, sizeof(events), events);
+ }
+ 
+-static void hci_init2_req(struct hci_request *req, unsigned long opt)
++static int hci_init2_req(struct hci_request *req, unsigned long opt)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 
+@@ -502,6 +507,8 @@ static void hci_init2_req(struct hci_request *req, unsigned long opt)
+ 		hci_req_add(req, HCI_OP_WRITE_AUTH_ENABLE, sizeof(enable),
+ 			    &enable);
+ 	}
++
++	return 0;
+ }
+ 
+ static void hci_setup_link_policy(struct hci_request *req)
+@@ -576,7 +583,7 @@ static void hci_set_event_mask_page_2(struct hci_request *req)
+ 	hci_req_add(req, HCI_OP_SET_EVENT_MASK_PAGE_2, sizeof(events), events);
+ }
+ 
+-static void hci_init3_req(struct hci_request *req, unsigned long opt)
++static int hci_init3_req(struct hci_request *req, unsigned long opt)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 	u8 p;
+@@ -704,9 +711,11 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
+ 		hci_req_add(req, HCI_OP_READ_LOCAL_EXT_FEATURES,
+ 			    sizeof(cp), &cp);
+ 	}
++
++	return 0;
+ }
+ 
+-static void hci_init4_req(struct hci_request *req, unsigned long opt)
++static int hci_init4_req(struct hci_request *req, unsigned long opt)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 
+@@ -757,6 +766,8 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
+ 		hci_req_add(req, HCI_OP_WRITE_SC_SUPPORT,
+ 			    sizeof(support), &support);
+ 	}
++
++	return 0;
+ }
+ 
+ static int __hci_init(struct hci_dev *hdev)
+@@ -816,7 +827,7 @@ static int __hci_init(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
+-static void hci_init0_req(struct hci_request *req, unsigned long opt)
++static int hci_init0_req(struct hci_request *req, unsigned long opt)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 
+@@ -832,6 +843,8 @@ static void hci_init0_req(struct hci_request *req, unsigned long opt)
+ 	/* Read BD Address */
+ 	if (hdev->set_bdaddr)
+ 		hci_req_add(req, HCI_OP_READ_BD_ADDR, 0, NULL);
++
++	return 0;
+ }
+ 
+ static int __hci_unconf_init(struct hci_dev *hdev)
+@@ -851,7 +864,7 @@ static int __hci_unconf_init(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
+-static void hci_scan_req(struct hci_request *req, unsigned long opt)
++static int hci_scan_req(struct hci_request *req, unsigned long opt)
+ {
+ 	__u8 scan = opt;
+ 
+@@ -859,9 +872,10 @@ static void hci_scan_req(struct hci_request *req, unsigned long opt)
+ 
+ 	/* Inquiry and Page scans */
+ 	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++	return 0;
+ }
+ 
+-static void hci_auth_req(struct hci_request *req, unsigned long opt)
++static int hci_auth_req(struct hci_request *req, unsigned long opt)
+ {
+ 	__u8 auth = opt;
+ 
+@@ -869,9 +883,10 @@ static void hci_auth_req(struct hci_request *req, unsigned long opt)
+ 
+ 	/* Authentication */
+ 	hci_req_add(req, HCI_OP_WRITE_AUTH_ENABLE, 1, &auth);
++	return 0;
+ }
+ 
+-static void hci_encrypt_req(struct hci_request *req, unsigned long opt)
++static int hci_encrypt_req(struct hci_request *req, unsigned long opt)
+ {
+ 	__u8 encrypt = opt;
+ 
+@@ -879,9 +894,10 @@ static void hci_encrypt_req(struct hci_request *req, unsigned long opt)
+ 
+ 	/* Encryption */
+ 	hci_req_add(req, HCI_OP_WRITE_ENCRYPT_MODE, 1, &encrypt);
++	return 0;
+ }
+ 
+-static void hci_linkpol_req(struct hci_request *req, unsigned long opt)
++static int hci_linkpol_req(struct hci_request *req, unsigned long opt)
+ {
+ 	__le16 policy = cpu_to_le16(opt);
+ 
+@@ -889,6 +905,7 @@ static void hci_linkpol_req(struct hci_request *req, unsigned long opt)
+ 
+ 	/* Default link policy */
+ 	hci_req_add(req, HCI_OP_WRITE_DEF_LINK_POLICY, 2, &policy);
++	return 0;
+ }
+ 
+ /* Get HCI device by index.
+@@ -1133,7 +1150,7 @@ static int inquiry_cache_dump(struct hci_dev *hdev, int num, __u8 *buf)
+ 	return copied;
+ }
+ 
+-static void hci_inq_req(struct hci_request *req, unsigned long opt)
++static int hci_inq_req(struct hci_request *req, unsigned long opt)
+ {
+ 	struct hci_inquiry_req *ir = (struct hci_inquiry_req *) opt;
+ 	struct hci_dev *hdev = req->hdev;
+@@ -1142,13 +1159,15 @@ static void hci_inq_req(struct hci_request *req, unsigned long opt)
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	if (test_bit(HCI_INQUIRY, &hdev->flags))
+-		return;
++		return 0;
+ 
+ 	/* Start Inquiry */
+ 	memcpy(&cp.lap, &ir->lap, 3);
+ 	cp.length  = ir->length;
+ 	cp.num_rsp = ir->num_rsp;
+ 	hci_req_add(req, HCI_OP_INQUIRY, sizeof(cp), &cp);
++
++	return 0;
+ }
+ 
+ int hci_inquiry(void __user *arg)
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 4ed4d1460467..5aac72c31517 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -184,8 +184,8 @@ struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ EXPORT_SYMBOL(__hci_cmd_sync);
+ 
+ /* Execute request and wait for completion. */
+-int __hci_req_sync(struct hci_dev *hdev, void (*func)(struct hci_request *req,
+-						      unsigned long opt),
++int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
++						     unsigned long opt),
+ 		   unsigned long opt, u32 timeout, u8 *hci_status)
+ {
+ 	struct hci_request req;
+@@ -198,7 +198,12 @@ int __hci_req_sync(struct hci_dev *hdev, void (*func)(struct hci_request *req,
+ 
+ 	hdev->req_status = HCI_REQ_PEND;
+ 
+-	func(&req, opt);
++	err = func(&req, opt);
++	if (err) {
++		if (hci_status)
++			*hci_status = HCI_ERROR_UNSPECIFIED;
++		return err;
++	}
+ 
+ 	add_wait_queue(&hdev->req_wait_q, &wait);
+ 	set_current_state(TASK_INTERRUPTIBLE);
+@@ -255,8 +260,8 @@ int __hci_req_sync(struct hci_dev *hdev, void (*func)(struct hci_request *req,
  	return err;
  }
  
--static void stop_discovery_complete(struct hci_dev *hdev, u8 status, u16 opcode)
-+void mgmt_stop_discovery_complete(struct hci_dev *hdev, u8 status)
+-int hci_req_sync(struct hci_dev *hdev, void (*req)(struct hci_request *req,
+-						   unsigned long opt),
++int hci_req_sync(struct hci_dev *hdev, int (*req)(struct hci_request *req,
++						  unsigned long opt),
+ 		 unsigned long opt, u32 timeout, u8 *hci_status)
  {
- 	struct mgmt_pending_cmd *cmd;
+ 	int ret;
+@@ -830,11 +835,12 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ 	return 0;
+ }
  
-@@ -4391,9 +4348,6 @@ static void stop_discovery_complete(struct hci_dev *hdev, u8 status, u16 opcode)
- 		mgmt_pending_remove(cmd);
+-static void update_bg_scan(struct hci_request *req, unsigned long opt)
++static int update_bg_scan(struct hci_request *req, unsigned long opt)
+ {
+ 	hci_dev_lock(req->hdev);
+ 	__hci_update_background_scan(req);
+ 	hci_dev_unlock(req->hdev);
++	return 0;
+ }
+ 
+ static void bg_scan_update(struct work_struct *work)
+@@ -932,9 +938,10 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status)
  	}
+ }
  
--	if (!status)
--		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
--
+-static void le_scan_disable(struct hci_request *req, unsigned long opt)
++static int le_scan_disable(struct hci_request *req, unsigned long opt)
+ {
+ 	hci_req_add_le_scan_disable(req);
++	return 0;
+ }
+ 
+ static void le_scan_disable_work(struct work_struct *work)
+@@ -1000,14 +1007,14 @@ unlock:
  	hci_dev_unlock(hdev);
  }
  
-@@ -4402,7 +4356,6 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+-static void le_scan_restart(struct hci_request *req, unsigned long opt)
++static int le_scan_restart(struct hci_request *req, unsigned long opt)
  {
- 	struct mgmt_cp_stop_discovery *mgmt_cp = data;
- 	struct mgmt_pending_cmd *cmd;
--	struct hci_request req;
- 	int err;
+ 	struct hci_dev *hdev = req->hdev;
+ 	struct hci_cp_le_set_scan_enable cp;
  
- 	BT_DBG("%s", hdev->name);
-@@ -4431,24 +4384,9 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	/* If controller is not scanning we are done. */
+ 	if (!hci_dev_test_flag(hdev, HCI_LE_SCAN))
+-		return;
++		return 0;
  
- 	cmd->cmd_complete = generic_cmd_complete;
+ 	hci_req_add_le_scan_disable(req);
  
--	hci_req_init(&req, hdev);
--
--	hci_stop_discovery(&req);
--
--	err = hci_req_run(&req, stop_discovery_complete);
--	if (!err) {
--		hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
--		goto unlock;
--	}
--
--	mgmt_pending_remove(cmd);
--
--	/* If no HCI commands were sent we're done */
--	if (err == -ENODATA) {
--		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY, 0,
--					&mgmt_cp->type, sizeof(mgmt_cp->type));
--		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
--	}
-+	hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
-+	queue_work(hdev->req_workqueue, &hdev->discov_update);
-+	err = 0;
+@@ -1015,6 +1022,8 @@ static void le_scan_restart(struct hci_request *req, unsigned long opt)
+ 	cp.enable = LE_SCAN_ENABLE;
+ 	cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
+ 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++
++	return 0;
+ }
  
- unlock:
- 	hci_dev_unlock(hdev);
+ static void le_scan_restart_work(struct work_struct *work)
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 15571b7af2d3..e536cd2ee4c4 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -44,11 +44,11 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
+ 			  hci_req_complete_t *req_complete,
+ 			  hci_req_complete_skb_t *req_complete_skb);
+ 
+-int hci_req_sync(struct hci_dev *hdev, void (*req)(struct hci_request *req,
+-						   unsigned long opt),
++int hci_req_sync(struct hci_dev *hdev, int (*req)(struct hci_request *req,
++						  unsigned long opt),
+ 		 unsigned long opt, u32 timeout, u8 *hci_status);
+-int __hci_req_sync(struct hci_dev *hdev, void (*func)(struct hci_request *req,
+-						      unsigned long opt),
++int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
++						     unsigned long opt),
+ 		   unsigned long opt, u32 timeout, u8 *hci_status);
+ void hci_req_sync_cancel(struct hci_dev *hdev, int err);
+ 
 -- 
 2.5.0
 
