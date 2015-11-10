@@ -1,56 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH 01/12] Bluetooth: Add stubs for synchronous HCI request functionality
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1447179274-12276-2-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 11 Nov 2015 07:24:09 +0900
+Date: Tue, 10 Nov 2015 20:47:29 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <136B456C-E638-4868-8718-8899B2FCC505@holtmann.org>
-References: <1447179274-12276-1-git-send-email-johan.hedberg@gmail.com> <1447179274-12276-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH BlueZ] shared/gatt-client: Don't reset database on
+ service changed
+Message-ID: <20151110184729.GB17113@t440s.P-661HNU-F1>
+References: <1447161195-8830-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1447161195-8830-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Luiz,
 
-> Prepare hci_request.c to have code for doing synchronous HCI requests,
-> such as LE scanning or advertising changes. The necessary work
-> callbacks will be set up in hci_request_setup() and cleaned up in
-> hci_request_cleanup().
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+On Tue, Nov 10, 2015, Luiz Augusto von Dentz wrote:
+> If the remote send a full reset, 0x0001 - 0xffff, just discovery the
+> attributes again as device may send this even though nothing has
+> changed.
 > ---
-> net/bluetooth/hci_core.c    | 4 ++++
-> net/bluetooth/hci_request.c | 8 ++++++++
-> net/bluetooth/hci_request.h | 3 +++
-> 3 files changed, 15 insertions(+)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index ea7cad5a161c..955b907f7ed8 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1604,6 +1604,8 @@ int hci_dev_do_close(struct hci_dev *hdev)
-> 
-> 	hci_req_sync_unlock(hdev);
-> 
-> +	hci_request_cleanup(hdev);
-> +
-> 	hci_dev_put(hdev);
-> 	return 0;
-> }
-> @@ -3156,6 +3158,8 @@ struct hci_dev *hci_alloc_dev(void)
-> 
-> 	INIT_DELAYED_WORK(&hdev->cmd_timer, hci_cmd_timeout);
-> 
-> +	hci_request_setup(hdev);
-> +
-> 	hci_init_sysfs(hdev);
-> 	discovery_init(hdev);
+>  src/shared/gatt-client.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 
-so this is an imbalance. It might be intended, but then the naming is confusing. So hci_alloc_dev is called once for the lifetime of the controller and hci_dev_do_close is called every time the transport is shutdown.
+Applied. Thanks.
 
-Regards
-
-Marcel
-
+Johan
