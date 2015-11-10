@@ -1,165 +1,180 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Add support for controller specific logging
-In-Reply-To: <40620A11-64EA-4FA8-AF37-31BE1E0B6BC4@holtmann.org>
-References: <1446944462-5512-1-git-send-email-marcel@holtmann.org> <87ziynhuq9.fsf@intel.com> <40620A11-64EA-4FA8-AF37-31BE1E0B6BC4@holtmann.org>
-Date: Tue, 10 Nov 2015 10:53:09 -0200
-Message-ID: <87r3jyhv7u.fsf@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/mgmt: Fix crash when removing index
+Date: Tue, 10 Nov 2015 11:32:38 +0200
+Message-Id: <1447147958-23378-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Marcel Holtmann <marcel@holtmann.org> writes:
+Because queue entries are no longer protected by a reference it is
+necessary to return the use of in_notify flag, etc, otherwise the
+following crash can happen when removing an index:
 
-> Hi Vinicius,
->
->>> To enable controller specific logging, the userspace daemon has to have
->>> the ability to log per controller. To facilitate this support, provide
->>> a dedicated logging channel. Messages in this channel will be included
->>> in the monitor queue and with that also forwarded to monitoring tools
->>> along with the actual hardware traces.
->>>
->>> All messages from the logging channel are timestamped and with that
->>> allow an easy correlation between userspace messages and hardware
->>> events. This will increase the ability to debug problems faster.
->>>
->>
->> Awesome!
->>
->> I was trying to find some time to implement this idea.
->>
->> Looks good. Just a minor comment.
->>
->>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->>> ---
->>> include/net/bluetooth/hci_mon.h  |   1 +
->>> include/net/bluetooth/hci_sock.h |   1 +
->>> net/bluetooth/hci_sock.c         | 102 +++++++++++++++++++++++++++++++++++++++
->>> 3 files changed, 104 insertions(+)
->>>
->>> diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
->>> index c91bb23eb29e..587d0131b349 100644
->>> --- a/include/net/bluetooth/hci_mon.h
->>> +++ b/include/net/bluetooth/hci_mon.h
->>> @@ -44,6 +44,7 @@ struct hci_mon_hdr {
->>> #define HCI_MON_INDEX_INFO	10
->>> #define HCI_MON_VENDOR_DIAG	11
->>> #define HCI_MON_SYSTEM_NOTE	12
->>> +#define HCI_MON_USER_LOGGING	13
->>>
->>> struct hci_mon_new_index {
->>> 	__u8		type;
->>> diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
->>> index 9a46d665c1b5..8e9138acdae1 100644
->>> --- a/include/net/bluetooth/hci_sock.h
->>> +++ b/include/net/bluetooth/hci_sock.h
->>> @@ -45,6 +45,7 @@ struct sockaddr_hci {
->>> #define HCI_CHANNEL_USER	1
->>> #define HCI_CHANNEL_MONITOR	2
->>> #define HCI_CHANNEL_CONTROL	3
->>> +#define HCI_CHANNEL_LOGGING	4
->>>
->>> struct hci_filter {
->>> 	unsigned long type_mask;
->>> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
->>> index c976f9da96c0..80b8d3e7dfb5 100644
->>> --- a/net/bluetooth/hci_sock.c
->>> +++ b/net/bluetooth/hci_sock.c
->>> @@ -906,6 +906,18 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
->>> 		atomic_inc(&monitor_promisc);
->>> 		break;
->>>
->>> +	case HCI_CHANNEL_LOGGING:
->>> +		if (haddr.hci_dev != HCI_DEV_NONE) {
->>> +			err = -EINVAL;
->>> +			goto done;
->>> +		}
->>> +
->>> +		if (!capable(CAP_NET_ADMIN)) {
->>> +			err = -EPERM;
->>> +			goto done;
->>> +		}
->>> +		break;
->>> +
->>> 	default:
->>> 		if (!hci_mgmt_chan_find(haddr.hci_channel)) {
->>> 			err = -EINVAL;
->>> @@ -1033,6 +1045,9 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
->>> 	if (flags & MSG_OOB)
->>> 		return -EOPNOTSUPP;
->>>
->>> +	if (hci_pi(sk)->channel == HCI_CHANNEL_LOGGING)
->>> +		return -EOPNOTSUPP;
->>> +
->>> 	if (sk->sk_state == BT_CLOSED)
->>> 		return 0;
->>>
->>> @@ -1179,6 +1194,90 @@ done:
->>> 	return err;
->>> }
->>>
->>> +static int hci_logging_frame(struct sock *sk, struct msghdr *msg, int len)
->>> +{
->>> +	struct hci_mon_hdr *hdr;
->>> +	struct sk_buff *skb;
->>> +	struct hci_dev *hdev;
->>> +	u16 index;
->>> +	int err;
->>> +
->>> +	/* The logging frame consists at minimum of the standard header,
->>> +	 * the priority byte, the ident length byte and at least one string
->>> +	 * terminator NUL byte. Anything shorter are invalid packets.
->>> +	 */
->>> +	if (len < sizeof(*hdr) + 3)
->>> +		return -EINVAL;
->>> +
->>> +	skb = bt_skb_send_alloc(sk, len, msg->msg_flags & MSG_DONTWAIT, &err);
->>> +	if (!skb)
->>> +		return err;
->>> +
->>> +	if (memcpy_from_msg(skb_put(skb, len), msg, len)) {
->>> +		err = -EFAULT;
->>> +		goto drop;
->>> +	}
->>> +
->>> +	hdr = (void *)skb->data;
->>> +
->>> +	if (__le16_to_cpu(hdr->len) != len - sizeof(*hdr)) {
->>> +		err = -EINVAL;
->>> +		goto drop;
->>> +	}
->>> +
->>> +	if (__le16_to_cpu(hdr->opcode) == 0x0000) {
->>> +		__u8 priority = skb->data[sizeof(*hdr)];
->>> +		__u8 ident_len = skb->data[sizeof(*hdr) + 1];
->>> +
->>
->> Considering that the maximum size of a device's name is 248, I would
->> feel better if 16 bits were used.
->
-> check man syslog and see what an ident field is. I am expecting users to set it to the process name. So something like bluetoothd. At least this is what bluetoothd is doing right now. The max length of a message is actually 0xffff - ident_len - 2. You can set the ident_len to zero and use no ident.
->
+Invalid read of size 8
+   at 0x41AD6F: queue_foreach (queue.c:219)
+   by 0x41CA6C: process_notify (mgmt.c:280)
+   by 0x41CA6C: can_read_data (mgmt.c:338)
+   by 0x422DCA: watch_callback (io-glib.c:170)
+   by 0x4E7EA89: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4400.1)
+   by 0x4E7EE1F: ??? (in /usr/lib64/libglib-2.0.so.0.4400.1)
+   by 0x4E7F141: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.4400.1)
+   by 0x422A31: tester_run (tester.c:830)
+   by 0x403013: main (l2cap-tester.c:1489)
+ Address 0x5754b38 is 8 bytes inside a block of size 16 free'd
+   at 0x4C29D6A: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x41AFCF: queue_remove_if (queue.c:302)
+   by 0x41B0BA: queue_remove_all (queue.c:331)
+   by 0x41C6A2: mgmt_unregister_index (mgmt.c:737)
+   by 0x405033: index_removed_callback (l2cap-tester.c:162)
+   by 0x41B751: notify_handler (mgmt.c:270)
+   by 0x41AD83: queue_foreach (queue.c:220)
+   by 0x41CA6C: process_notify (mgmt.c:280)
+   by 0x41CA6C: can_read_data (mgmt.c:338)
+   by 0x422DCA: watch_callback (io-glib.c:170)
+   by 0x4E7EA89: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.4400.1)
+   by 0x4E7EE1F: ??? (in /usr/lib64/libglib-2.0.so.0.4400.1)
+   by 0x4E7F141: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.4400.1)
+---
+ src/shared/mgmt.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 58 insertions(+), 8 deletions(-)
 
-Great. My bad.
+diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+index 5e03a51..277e361 100644
+--- a/src/shared/mgmt.c
++++ b/src/shared/mgmt.c
+@@ -51,6 +51,8 @@ struct mgmt {
+ 	struct queue *notify_list;
+ 	unsigned int next_request_id;
+ 	unsigned int next_notify_id;
++	bool need_notify_cleanup;
++	bool in_notify;
+ 	void *buf;
+ 	uint16_t len;
+ 	mgmt_debug_func_t debug_callback;
+@@ -73,6 +75,7 @@ struct mgmt_notify {
+ 	unsigned int id;
+ 	uint16_t event;
+ 	uint16_t index;
++	bool removed;
+ 	mgmt_notify_func_t callback;
+ 	mgmt_destroy_func_t destroy;
+ 	void *user_data;
+@@ -131,6 +134,22 @@ static bool match_notify_index(const void *a, const void *b)
+ 	return notify->index == index;
+ }
+ 
++static bool match_notify_removed(const void *a, const void *b)
++{
++	const struct mgmt_notify *notify = a;
++
++	return notify->removed;
++}
++
++static void mark_notify_removed(void *data , void *user_data)
++{
++	struct mgmt_notify *notify = data;
++	uint16_t index = PTR_TO_UINT(user_data);
++
++	if (notify->index == index || index == MGMT_INDEX_NONE)
++		notify->removed = true;
++}
++
+ static void write_watch_destroy(void *user_data)
+ {
+ 	struct mgmt *mgmt = user_data;
+@@ -260,6 +279,9 @@ static void notify_handler(void *data, void *user_data)
+ 	struct mgmt_notify *notify = data;
+ 	struct event_index *match = user_data;
+ 
++	if (notify->removed)
++		return;
++
+ 	if (notify->event != match->event)
+ 		return;
+ 
+@@ -277,7 +299,17 @@ static void process_notify(struct mgmt *mgmt, uint16_t event, uint16_t index,
+ 	struct event_index match = { .event = event, .index = index,
+ 					.length = length, .param = param };
+ 
++	mgmt->in_notify = true;
++
+ 	queue_foreach(mgmt->notify_list, notify_handler, &match);
++
++	mgmt->in_notify = false;
++
++	if (mgmt->need_notify_cleanup) {
++		queue_remove_all(mgmt->notify_list, match_notify_removed,
++							NULL, destroy_notify);
++		mgmt->need_notify_cleanup = false;
++	}
+ }
+ 
+ static bool can_read_data(struct io *io, void *user_data)
+@@ -465,11 +497,12 @@ void mgmt_unref(struct mgmt *mgmt)
+ 	free(mgmt->buf);
+ 	mgmt->buf = NULL;
+ 
+-	queue_destroy(mgmt->notify_list, NULL);
+-	queue_destroy(mgmt->pending_list, NULL);
+-	free(mgmt);
+-
+-	return;
++	if (!mgmt->in_notify) {
++		queue_destroy(mgmt->notify_list, NULL);
++		queue_destroy(mgmt->pending_list, NULL);
++		free(mgmt);
++		return;
++	}
+ }
+ 
+ bool mgmt_set_debug(struct mgmt *mgmt, mgmt_debug_func_t callback,
+@@ -725,7 +758,14 @@ bool mgmt_unregister(struct mgmt *mgmt, unsigned int id)
+ 	if (!notify)
+ 		return false;
+ 
+-	destroy_notify(notify);
++	if (!mgmt->in_notify) {
++		destroy_notify(notify);
++		return true;
++	}
++
++	notify->removed = true;
++	mgmt->need_notify_cleanup = true;
++
+ 	return true;
+ }
+ 
+@@ -734,7 +774,12 @@ bool mgmt_unregister_index(struct mgmt *mgmt, uint16_t index)
+ 	if (!mgmt)
+ 		return false;
+ 
+-	queue_remove_all(mgmt->notify_list, match_notify_index,
++	if (mgmt->in_notify) {
++		queue_foreach(mgmt->notify_list, mark_notify_removed,
++							UINT_TO_PTR(index));
++		mgmt->need_notify_cleanup = true;
++	} else
++		queue_remove_all(mgmt->notify_list, match_notify_index,
+ 					UINT_TO_PTR(index), destroy_notify);
+ 
+ 	return true;
+@@ -745,7 +790,12 @@ bool mgmt_unregister_all(struct mgmt *mgmt)
+ 	if (!mgmt)
+ 		return false;
+ 
+-	queue_remove_all(mgmt->notify_list, NULL, NULL, destroy_notify);
++	if (mgmt->in_notify) {
++		queue_foreach(mgmt->notify_list, mark_notify_removed,
++						UINT_TO_PTR(MGMT_INDEX_NONE));
++		mgmt->need_notify_cleanup = true;
++	} else
++		queue_remove_all(mgmt->notify_list, NULL, NULL, destroy_notify);
+ 
+ 	return true;
+ }
+-- 
+2.4.3
 
-> The reason why I split ident our from the message is that I want to keep it separate. Having userspace build the ident into the message did not really work well when you actually later on wanted to filter or analyze the logs. This way it has some structure.
->
-> I have patches for including SCM_CREDENTIALS so you get the PID, UID and GID from the daemon as well. However they still have issues and there is always a race condition between resolving the process name from the PID. So letting good behaving daemon choose their ident is actually a good thing.
->
-
-Sounds good.
-
-> Regards
->
-> Marcel
->
-
-
-Cheers,
---
-Vinicius
