@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/12] Bluetooth: Add HCI status return parameter to hci_req_sync()
-Date: Tue, 10 Nov 2015 20:14:26 +0200
-Message-Id: <1447179274-12276-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 03/12] Bluetooth: Don't wait for HCI in Add/Remove Device
+Date: Tue, 10 Nov 2015 20:14:25 +0200
+Message-Id: <1447179274-12276-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1447179274-12276-1-git-send-email-johan.hedberg@gmail.com>
 References: <1447179274-12276-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,214 +11,320 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-In some cases it may be important to get the exact HCI status rather
-than the converted HCI-to-errno value. Add an optional return
-parameter to the hci_req_sync() API to allow for this. Since there are
-no good HCI translation candidates for cancelation and timeout, use
-the "unknown" status code for those cases.
+There's no point in waiting for HCI activity in Add/Remove Device
+since the effects of these calls are long-lasting and we can anyway
+not report up to the application all HCI failures.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci.h |  3 ++-
- net/bluetooth/hci_core.c    | 26 +++++++++++++-------------
- net/bluetooth/hci_request.c | 12 +++++++++---
- net/bluetooth/hci_request.h |  4 ++--
- 4 files changed, 26 insertions(+), 19 deletions(-)
+ net/bluetooth/mgmt.c | 161 ++++++++++++++++-----------------------------------
+ 1 file changed, 50 insertions(+), 111 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 0205b80cc90b..cc2216727655 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -452,7 +452,8 @@ enum {
- #define HCI_ERROR_REMOTE_POWER_OFF	0x15
- #define HCI_ERROR_LOCAL_HOST_TERM	0x16
- #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
--#define HCI_ERROR_INVALID_LL_PARAMS	0x1E
-+#define HCI_ERROR_INVALID_LL_PARAMS	0x1e
-+#define HCI_ERROR_UNSPECIFIED		0x1f
- #define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 4afe1d58a32c..b268a6ed0c5f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6076,10 +6076,9 @@ static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
+ }
  
- /* Flow control modes */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 955b907f7ed8..9c7e4b8e56ae 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -763,14 +763,14 @@ static int __hci_init(struct hci_dev *hdev)
+ /* This function requires the caller holds hdev->lock */
+-static int hci_conn_params_set(struct hci_request *req, bdaddr_t *addr,
++static int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr,
+ 			       u8 addr_type, u8 auto_connect)
  {
- 	int err;
+-	struct hci_dev *hdev = req->hdev;
+ 	struct hci_conn_params *params;
  
--	err = __hci_req_sync(hdev, hci_init1_req, 0, HCI_INIT_TIMEOUT);
-+	err = __hci_req_sync(hdev, hci_init1_req, 0, HCI_INIT_TIMEOUT, NULL);
- 	if (err < 0)
- 		return err;
- 
- 	if (hci_dev_test_flag(hdev, HCI_SETUP))
- 		hci_debugfs_create_basic(hdev);
- 
--	err = __hci_req_sync(hdev, hci_init2_req, 0, HCI_INIT_TIMEOUT);
-+	err = __hci_req_sync(hdev, hci_init2_req, 0, HCI_INIT_TIMEOUT, NULL);
- 	if (err < 0)
- 		return err;
- 
-@@ -781,11 +781,11 @@ static int __hci_init(struct hci_dev *hdev)
- 	if (hdev->dev_type != HCI_BREDR)
- 		return 0;
- 
--	err = __hci_req_sync(hdev, hci_init3_req, 0, HCI_INIT_TIMEOUT);
-+	err = __hci_req_sync(hdev, hci_init3_req, 0, HCI_INIT_TIMEOUT, NULL);
- 	if (err < 0)
- 		return err;
- 
--	err = __hci_req_sync(hdev, hci_init4_req, 0, HCI_INIT_TIMEOUT);
-+	err = __hci_req_sync(hdev, hci_init4_req, 0, HCI_INIT_TIMEOUT, NULL);
- 	if (err < 0)
- 		return err;
- 
-@@ -841,7 +841,7 @@ static int __hci_unconf_init(struct hci_dev *hdev)
- 	if (test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks))
- 		return 0;
- 
--	err = __hci_req_sync(hdev, hci_init0_req, 0, HCI_INIT_TIMEOUT);
-+	err = __hci_req_sync(hdev, hci_init0_req, 0, HCI_INIT_TIMEOUT, NULL);
- 	if (err < 0)
- 		return err;
- 
-@@ -1199,7 +1199,7 @@ int hci_inquiry(void __user *arg)
- 
- 	if (do_inquiry) {
- 		err = hci_req_sync(hdev, hci_inq_req, (unsigned long) &ir,
--				   timeo);
-+				   timeo, NULL);
- 		if (err < 0)
- 			goto done;
- 
-@@ -1565,7 +1565,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 	if (test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks) &&
- 	    !auto_off && !hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
- 		set_bit(HCI_INIT, &hdev->flags);
--		__hci_req_sync(hdev, hci_reset_req, 0, HCI_CMD_TIMEOUT);
-+		__hci_req_sync(hdev, hci_reset_req, 0, HCI_CMD_TIMEOUT, NULL);
- 		clear_bit(HCI_INIT, &hdev->flags);
+ 	params = hci_conn_params_add(hdev, addr, addr_type);
+@@ -6099,26 +6098,17 @@ static int hci_conn_params_set(struct hci_request *req, bdaddr_t *addr,
+ 		 */
+ 		if (params->explicit_connect)
+ 			list_add(&params->action, &hdev->pend_le_conns);
+-
+-		__hci_update_background_scan(req);
+ 		break;
+ 	case HCI_AUTO_CONN_REPORT:
+ 		if (params->explicit_connect)
+ 			list_add(&params->action, &hdev->pend_le_conns);
+ 		else
+ 			list_add(&params->action, &hdev->pend_le_reports);
+-		__hci_update_background_scan(req);
+ 		break;
+ 	case HCI_AUTO_CONN_DIRECT:
+ 	case HCI_AUTO_CONN_ALWAYS:
+-		if (!is_connected(hdev, addr, addr_type)) {
++		if (!is_connected(hdev, addr, addr_type))
+ 			list_add(&params->action, &hdev->pend_le_conns);
+-			/* If we are in scan phase of connecting, we were
+-			 * already added to pend_le_conns and scanning.
+-			 */
+-			if (params->auto_connect != HCI_AUTO_CONN_EXPLICIT)
+-				__hci_update_background_scan(req);
+-		}
+ 		break;
  	}
  
-@@ -1662,7 +1662,7 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
- 	atomic_set(&hdev->cmd_cnt, 1);
- 	hdev->acl_cnt = 0; hdev->sco_cnt = 0; hdev->le_cnt = 0;
+@@ -6142,25 +6132,6 @@ static void device_added(struct sock *sk, struct hci_dev *hdev,
+ 	mgmt_event(MGMT_EV_DEVICE_ADDED, hdev, &ev, sizeof(ev), sk);
+ }
  
--	ret = __hci_req_sync(hdev, hci_reset_req, 0, HCI_INIT_TIMEOUT);
-+	ret = __hci_req_sync(hdev, hci_reset_req, 0, HCI_INIT_TIMEOUT, NULL);
- 
- 	hci_req_sync_unlock(hdev);
- 	return ret;
-@@ -1797,7 +1797,7 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
- 	switch (cmd) {
- 	case HCISETAUTH:
- 		err = hci_req_sync(hdev, hci_auth_req, dr.dev_opt,
--				   HCI_INIT_TIMEOUT);
-+				   HCI_INIT_TIMEOUT, NULL);
- 		break;
- 
- 	case HCISETENCRYPT:
-@@ -1809,18 +1809,18 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
- 		if (!test_bit(HCI_AUTH, &hdev->flags)) {
- 			/* Auth must be enabled first */
- 			err = hci_req_sync(hdev, hci_auth_req, dr.dev_opt,
--					   HCI_INIT_TIMEOUT);
-+					   HCI_INIT_TIMEOUT, NULL);
- 			if (err)
- 				break;
+-static void add_device_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+-{
+-	struct mgmt_pending_cmd *cmd;
+-
+-	BT_DBG("status 0x%02x", status);
+-
+-	hci_dev_lock(hdev);
+-
+-	cmd = pending_find(MGMT_OP_ADD_DEVICE, hdev);
+-	if (!cmd)
+-		goto unlock;
+-
+-	cmd->cmd_complete(cmd, mgmt_status(status));
+-	mgmt_pending_remove(cmd);
+-
+-unlock:
+-	hci_dev_unlock(hdev);
+-}
+-
+ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 		      void *data, u16 len)
+ {
+@@ -6198,9 +6169,10 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 	if (cp->addr.type == BDADDR_BREDR) {
+ 		/* Only incoming connections action is supported for now */
+ 		if (cp->action != 0x01) {
+-			err = cmd->cmd_complete(cmd,
+-						MGMT_STATUS_INVALID_PARAMS);
+-			mgmt_pending_remove(cmd);
++			err = mgmt_cmd_complete(sk, hdev->id,
++						MGMT_OP_ADD_DEVICE,
++						MGMT_STATUS_INVALID_PARAMS,
++						&cp->addr, sizeof(cp->addr));
+ 			goto unlock;
  		}
  
- 		err = hci_req_sync(hdev, hci_encrypt_req, dr.dev_opt,
--				   HCI_INIT_TIMEOUT);
-+				   HCI_INIT_TIMEOUT, NULL);
- 		break;
- 
- 	case HCISETSCAN:
- 		err = hci_req_sync(hdev, hci_scan_req, dr.dev_opt,
--				   HCI_INIT_TIMEOUT);
-+				   HCI_INIT_TIMEOUT, NULL);
- 
- 		/* Ensure that the connectable and discoverable states
- 		 * get correctly modified as this was a non-mgmt change.
-@@ -1831,7 +1831,7 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
- 
- 	case HCISETLINKPOL:
- 		err = hci_req_sync(hdev, hci_linkpol_req, dr.dev_opt,
--				   HCI_INIT_TIMEOUT);
-+				   HCI_INIT_TIMEOUT, NULL);
- 		break;
- 
- 	case HCISETLINKMODE:
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 842f64cd8800..3439b791c583 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -186,7 +186,7 @@ EXPORT_SYMBOL(__hci_cmd_sync);
- /* Execute request and wait for completion. */
- int __hci_req_sync(struct hci_dev *hdev, void (*func)(struct hci_request *req,
- 						      unsigned long opt),
--		   unsigned long opt, __u32 timeout)
-+		   unsigned long opt, u32 timeout, u8 *hci_status)
- {
- 	struct hci_request req;
- 	DECLARE_WAITQUEUE(wait, current);
-@@ -231,14 +231,20 @@ int __hci_req_sync(struct hci_dev *hdev, void (*func)(struct hci_request *req,
- 	switch (hdev->req_status) {
- 	case HCI_REQ_DONE:
- 		err = -bt_to_errno(hdev->req_result);
-+		if (hci_status)
-+			*hci_status = hdev->req_result;
- 		break;
- 
- 	case HCI_REQ_CANCELED:
- 		err = -hdev->req_result;
-+		if (hci_status)
-+			*hci_status = HCI_ERROR_UNSPECIFIED;
- 		break;
- 
- 	default:
- 		err = -ETIMEDOUT;
-+		if (hci_status)
-+			*hci_status = HCI_ERROR_UNSPECIFIED;
- 		break;
+@@ -6229,33 +6201,31 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 	 * hci_conn_params_lookup.
+ 	 */
+ 	if (!hci_is_identity_address(&cp->addr.bdaddr, addr_type)) {
+-		err = cmd->cmd_complete(cmd, MGMT_STATUS_INVALID_PARAMS);
+-		mgmt_pending_remove(cmd);
++		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
++					MGMT_STATUS_INVALID_PARAMS,
++					&cp->addr, sizeof(cp->addr));
+ 		goto unlock;
  	}
  
-@@ -251,7 +257,7 @@ int __hci_req_sync(struct hci_dev *hdev, void (*func)(struct hci_request *req,
+ 	/* If the connection parameters don't exist for this device,
+ 	 * they will be created and configured with defaults.
+ 	 */
+-	if (hci_conn_params_set(&req, &cp->addr.bdaddr, addr_type,
++	if (hci_conn_params_set(hdev, &cp->addr.bdaddr, addr_type,
+ 				auto_conn) < 0) {
+-		err = cmd->cmd_complete(cmd, MGMT_STATUS_FAILED);
+-		mgmt_pending_remove(cmd);
++		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
++					MGMT_STATUS_FAILED, &cp->addr,
++					sizeof(cp->addr));
+ 		goto unlock;
+ 	}
  
- int hci_req_sync(struct hci_dev *hdev, void (*req)(struct hci_request *req,
- 						   unsigned long opt),
--		 unsigned long opt, __u32 timeout)
-+		 unsigned long opt, u32 timeout, u8 *hci_status)
++	hci_update_background_scan(hdev);
++
+ added:
+ 	device_added(sk, hdev, &cp->addr.bdaddr, cp->addr.type, cp->action);
+ 
+-	err = hci_req_run(&req, add_device_complete);
+-	if (err < 0) {
+-		/* ENODATA means no HCI commands were needed (e.g. if
+-		 * the adapter is powered off).
+-		 */
+-		if (err == -ENODATA)
+-			err = cmd->cmd_complete(cmd, MGMT_STATUS_SUCCESS);
+-		mgmt_pending_remove(cmd);
+-	}
++	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
++				MGMT_STATUS_SUCCESS, &cp->addr,
++				sizeof(cp->addr));
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -6273,55 +6243,25 @@ static void device_removed(struct sock *sk, struct hci_dev *hdev,
+ 	mgmt_event(MGMT_EV_DEVICE_REMOVED, hdev, &ev, sizeof(ev), sk);
+ }
+ 
+-static void remove_device_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+-{
+-	struct mgmt_pending_cmd *cmd;
+-
+-	BT_DBG("status 0x%02x", status);
+-
+-	hci_dev_lock(hdev);
+-
+-	cmd = pending_find(MGMT_OP_REMOVE_DEVICE, hdev);
+-	if (!cmd)
+-		goto unlock;
+-
+-	cmd->cmd_complete(cmd, mgmt_status(status));
+-	mgmt_pending_remove(cmd);
+-
+-unlock:
+-	hci_dev_unlock(hdev);
+-}
+-
+ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 			 void *data, u16 len)
  {
- 	int ret;
+ 	struct mgmt_cp_remove_device *cp = data;
+-	struct mgmt_pending_cmd *cmd;
+-	struct hci_request req;
+ 	int err;
  
-@@ -260,7 +266,7 @@ int hci_req_sync(struct hci_dev *hdev, void (*req)(struct hci_request *req,
+ 	BT_DBG("%s", hdev->name);
  
- 	/* Serialize all requests */
- 	hci_req_sync_lock(hdev);
--	ret = __hci_req_sync(hdev, req, opt, timeout);
-+	ret = __hci_req_sync(hdev, req, opt, timeout, hci_status);
- 	hci_req_sync_unlock(hdev);
+-	hci_req_init(&req, hdev);
+-
+ 	hci_dev_lock(hdev);
  
- 	return ret;
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 6adf91e793de..8833617f68ba 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -46,10 +46,10 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
+-	cmd = mgmt_pending_add(sk, MGMT_OP_REMOVE_DEVICE, hdev, data, len);
+-	if (!cmd) {
+-		err = -ENOMEM;
+-		goto unlock;
+-	}
+-
+-	cmd->cmd_complete = addr_cmd_complete;
+-
+ 	if (bacmp(&cp->addr.bdaddr, BDADDR_ANY)) {
+ 		struct hci_conn_params *params;
+ 		u8 addr_type;
  
- int hci_req_sync(struct hci_dev *hdev, void (*req)(struct hci_request *req,
- 						   unsigned long opt),
--		 unsigned long opt, __u32 timeout);
-+		 unsigned long opt, u32 timeout, u8 *hci_status);
- int __hci_req_sync(struct hci_dev *hdev, void (*func)(struct hci_request *req,
- 						      unsigned long opt),
--		   unsigned long opt, __u32 timeout);
-+		   unsigned long opt, u32 timeout, u8 *hci_status);
- void hci_req_sync_cancel(struct hci_dev *hdev, int err);
+ 		if (!bdaddr_type_is_valid(cp->addr.type)) {
+-			err = cmd->cmd_complete(cmd,
+-						MGMT_STATUS_INVALID_PARAMS);
+-			mgmt_pending_remove(cmd);
++			err = mgmt_cmd_complete(sk, hdev->id,
++						MGMT_OP_REMOVE_DEVICE,
++						MGMT_STATUS_INVALID_PARAMS,
++						&cp->addr, sizeof(cp->addr));
+ 			goto unlock;
+ 		}
  
- struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode, u32 plen,
+@@ -6330,13 +6270,15 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 						  &cp->addr.bdaddr,
+ 						  cp->addr.type);
+ 			if (err) {
+-				err = cmd->cmd_complete(cmd,
+-							MGMT_STATUS_INVALID_PARAMS);
+-				mgmt_pending_remove(cmd);
++				err = mgmt_cmd_complete(sk, hdev->id,
++							MGMT_OP_REMOVE_DEVICE,
++							MGMT_STATUS_INVALID_PARAMS,
++							&cp->addr,
++							sizeof(cp->addr));
+ 				goto unlock;
+ 			}
+ 
+-			__hci_update_page_scan(&req);
++			hci_update_page_scan(hdev);
+ 
+ 			device_removed(sk, hdev, &cp->addr.bdaddr,
+ 				       cp->addr.type);
+@@ -6351,33 +6293,36 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 		 * hci_conn_params_lookup.
+ 		 */
+ 		if (!hci_is_identity_address(&cp->addr.bdaddr, addr_type)) {
+-			err = cmd->cmd_complete(cmd,
+-						MGMT_STATUS_INVALID_PARAMS);
+-			mgmt_pending_remove(cmd);
++			err = mgmt_cmd_complete(sk, hdev->id,
++						MGMT_OP_REMOVE_DEVICE,
++						MGMT_STATUS_INVALID_PARAMS,
++						&cp->addr, sizeof(cp->addr));
+ 			goto unlock;
+ 		}
+ 
+ 		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
+ 						addr_type);
+ 		if (!params) {
+-			err = cmd->cmd_complete(cmd,
+-						MGMT_STATUS_INVALID_PARAMS);
+-			mgmt_pending_remove(cmd);
++			err = mgmt_cmd_complete(sk, hdev->id,
++						MGMT_OP_REMOVE_DEVICE,
++						MGMT_STATUS_INVALID_PARAMS,
++						&cp->addr, sizeof(cp->addr));
+ 			goto unlock;
+ 		}
+ 
+ 		if (params->auto_connect == HCI_AUTO_CONN_DISABLED ||
+ 		    params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
+-			err = cmd->cmd_complete(cmd,
+-						MGMT_STATUS_INVALID_PARAMS);
+-			mgmt_pending_remove(cmd);
++			err = mgmt_cmd_complete(sk, hdev->id,
++						MGMT_OP_REMOVE_DEVICE,
++						MGMT_STATUS_INVALID_PARAMS,
++						&cp->addr, sizeof(cp->addr));
+ 			goto unlock;
+ 		}
+ 
+ 		list_del(&params->action);
+ 		list_del(&params->list);
+ 		kfree(params);
+-		__hci_update_background_scan(&req);
++		hci_update_background_scan(hdev);
+ 
+ 		device_removed(sk, hdev, &cp->addr.bdaddr, cp->addr.type);
+ 	} else {
+@@ -6385,9 +6330,10 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 		struct bdaddr_list *b, *btmp;
+ 
+ 		if (cp->addr.type) {
+-			err = cmd->cmd_complete(cmd,
+-						MGMT_STATUS_INVALID_PARAMS);
+-			mgmt_pending_remove(cmd);
++			err = mgmt_cmd_complete(sk, hdev->id,
++						MGMT_OP_REMOVE_DEVICE,
++						MGMT_STATUS_INVALID_PARAMS,
++						&cp->addr, sizeof(cp->addr));
+ 			goto unlock;
+ 		}
+ 
+@@ -6397,7 +6343,7 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 			kfree(b);
+ 		}
+ 
+-		__hci_update_page_scan(&req);
++		hci_update_page_scan(hdev);
+ 
+ 		list_for_each_entry_safe(p, tmp, &hdev->le_conn_params, list) {
+ 			if (p->auto_connect == HCI_AUTO_CONN_DISABLED)
+@@ -6414,20 +6360,13 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 
+ 		BT_DBG("All LE connection parameters were removed");
+ 
+-		__hci_update_background_scan(&req);
++		hci_update_background_scan(hdev);
+ 	}
+ 
+ complete:
+-	err = hci_req_run(&req, remove_device_complete);
+-	if (err < 0) {
+-		/* ENODATA means no HCI commands were needed (e.g. if
+-		 * the adapter is powered off).
+-		 */
+-		if (err == -ENODATA)
+-			err = cmd->cmd_complete(cmd, MGMT_STATUS_SUCCESS);
+-		mgmt_pending_remove(cmd);
+-	}
+-
++	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_DEVICE,
++				MGMT_STATUS_SUCCESS, &cp->addr,
++				sizeof(cp->addr));
+ unlock:
+ 	hci_dev_unlock(hdev);
+ 	return err;
 -- 
 2.5.0
 
