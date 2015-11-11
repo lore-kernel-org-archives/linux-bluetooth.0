@@ -1,43 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH] Bluetooth: Fix l2cap_chan leak in SMP
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1447271232-29359-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 12 Nov 2015 07:49:53 +0900
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D59921C5-E1FF-4F12-8E03-25005D4FC5E7@holtmann.org>
-References: <1447271232-29359-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix l2cap_chan leak in SMP
+Date: Wed, 11 Nov 2015 21:47:12 +0200
+Message-Id: <1447271232-29359-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> The L2CAP core expects channel implementations to manage the reference
-> returned by the new_connection callback. With sockets this is already
-> handled with each channel being tied to the corresponding socket. With
-> SMP however there's no context to tie the pointer to in the
-> smp_new_conn_cb function. The function can also not just drop the
-> reference since it's the only one at that point.
-> 
-> For fixed channels (like SMP) the code path inside the L2CAP core from
-> new_connection() to ready() is short and straight-forwards. The
-> crucial difference is that in ready() the implementation has access to
-> the l2cap_conn that SMP needs associate its l2cap_chan. Instead of
-> taking a new reference in smp_ready_cb() we can simply assume to
-> already own the reference created in smp_new_conn_cb(), i.e. there is
-> no need to call l2cap_chan_hold().
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> Cc: stable@vger.kernel.org # 3.19+
-> ---
-> net/bluetooth/smp.c | 7 ++++++-
-> 1 file changed, 6 insertions(+), 1 deletion(-)
+The L2CAP core expects channel implementations to manage the reference
+returned by the new_connection callback. With sockets this is already
+handled with each channel being tied to the corresponding socket. With
+SMP however there's no context to tie the pointer to in the
+smp_new_conn_cb function. The function can also not just drop the
+reference since it's the only one at that point.
 
-patch has been applied to bluetooth-stable tree.
+For fixed channels (like SMP) the code path inside the L2CAP core from
+new_connection() to ready() is short and straight-forwards. The
+crucial difference is that in ready() the implementation has access to
+the l2cap_conn that SMP needs associate its l2cap_chan. Instead of
+taking a new reference in smp_ready_cb() we can simply assume to
+already own the reference created in smp_new_conn_cb(), i.e. there is
+no need to call l2cap_chan_hold().
 
-Regards
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Cc: stable@vger.kernel.org # 3.19+
+---
+ net/bluetooth/smp.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Marcel
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index c91353841e40..ffed8a1d4f27 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -3027,8 +3027,13 @@ static void smp_ready_cb(struct l2cap_chan *chan)
+ 
+ 	BT_DBG("chan %p", chan);
+ 
++	/* No need to call l2cap_chan_hold() here since we already own
++	 * the reference taken in smp_new_conn_cb(). This is just the
++	 * first time that we tie it to a specific pointer. The code in
++	 * l2cap_core.c ensures that there's no risk this function wont
++	 * get called if smp_new_conn_cb was previously called.
++	 */
+ 	conn->smp = chan;
+-	l2cap_chan_hold(chan);
+ 
+ 	if (hcon->type == ACL_LINK && test_bit(HCI_CONN_ENCRYPT, &hcon->flags))
+ 		bredr_pairing(chan);
+-- 
+2.5.0
 
