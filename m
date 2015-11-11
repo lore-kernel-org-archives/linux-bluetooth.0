@@ -1,36 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core/gatt-client: Fix warning when removing services
-Date: Wed, 11 Nov 2015 15:40:56 +0200
-Message-Id: <1447249256-10581-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [PATCH 0/3] Bluetooth: LE connection fixes & cleanups
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1447245899-30783-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 11 Nov 2015 21:54:04 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <88B49EFF-3FA8-4C36-B2C1-B05064F0428C@holtmann.org>
+References: <1447245899-30783-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan,
 
-This fixes the following warnings caused by not resetting id to 0:
+> This set of patches simplifies the LE connection logic and fixes
+> outgoing connect attempts through directed advertising.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (3):
+>      Bluetooth: Fix specifying role for LE connections
+>      Bluetooth: Move check for ongoing connect earlier in hci_connect_le()
+>      Bluetooth: Remove conn_unfinished variable from hci_connect_le()
+> 
+> include/net/bluetooth/hci_core.h |  2 +-
+> net/bluetooth/hci_conn.c         | 60 ++++++++++++---------------------------
+> net/bluetooth/l2cap_core.c       | 15 +++++-----
+> net/bluetooth/mgmt.c             |  3 +-
+> 4 files changed, 27 insertions(+), 53 deletions(-)
 
-GLib-CRITICAL **: Source ID 145 was not found when attempting to remove it
-GLib-CRITICAL **: Source ID 151 was not found when attempting to remove it
-GLib-CRITICAL **: Source ID 155 was not found when attempting to remove it
-GLib-CRITICAL **: Source ID 162 was not found when attempting to remove it
----
- src/gatt-client.c | 1 +
- 1 file changed, 1 insertion(+)
+all 3 patches have been applied to bluetooth-next tree.
 
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index 20a5ae6..39f6646 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -1654,6 +1654,7 @@ static gboolean set_chrcs_ready(gpointer user_data)
- {
- 	struct service *service = user_data;
- 
-+	service->idle_id = 0;
- 	notify_chrcs(service);
- 
- 	return FALSE;
--- 
-2.4.3
+Regards
+
+Marcel
 
