@@ -1,138 +1,76 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 02/12] Bluetooth: Run all background scan updates through req_workqueue
-Date: Wed, 11 Nov 2015 08:11:17 +0200
-Message-Id: <1447222287-4288-3-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1447222287-4288-1-git-send-email-johan.hedberg@gmail.com>
-References: <1447222287-4288-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 00/12] Bluetooth: Move LE scan changes behind req_workqueue
+Date: Wed, 11 Nov 2015 08:11:15 +0200
+Message-Id: <1447222287-4288-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-Instead of firing off a simple async request queue all background scan
-updates through req_workqueue and use hci_req_sync() there to ensure
-that no two updates overlap with each other.
+v2: updated version with feedback for 01/12 and 02/12 taken into
+account.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_request.c      | 39 +++++++++++++++++----------------------
- net/bluetooth/hci_request.h      |  6 +++++-
- net/bluetooth/mgmt.c             |  2 +-
- 4 files changed, 25 insertions(+), 24 deletions(-)
+>From the original cover letter:
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 15e6a2bffc2b..c2ca6a58d1e0 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -327,6 +327,8 @@ struct hci_dev {
- 	struct work_struct	cmd_work;
- 	struct work_struct	tx_work;
- 
-+	struct work_struct	bg_scan_update;
-+
- 	struct sk_buff_head	rx_q;
- 	struct sk_buff_head	raw_q;
- 	struct sk_buff_head	cmd_q;
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index d48206277fe4..0adbb59ec2f0 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -731,28 +731,6 @@ void __hci_update_background_scan(struct hci_request *req)
- 	}
- }
- 
--static void update_background_scan_complete(struct hci_dev *hdev, u8 status,
--					    u16 opcode)
--{
--	if (status)
--		BT_DBG("HCI request failed to update background scanning: "
--		       "status 0x%2.2x", status);
--}
--
--void hci_update_background_scan(struct hci_dev *hdev)
--{
--	int err;
--	struct hci_request req;
--
--	hci_req_init(&req, hdev);
--
--	__hci_update_background_scan(&req);
--
--	err = hci_req_run(&req, update_background_scan_complete);
--	if (err && err != -ENODATA)
--		BT_ERR("Failed to run HCI request: err %d", err);
--}
--
- void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
- 		      u8 reason)
- {
-@@ -846,10 +824,27 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
- 	return 0;
- }
- 
-+static void update_bg_scan(struct hci_request *req, unsigned long opt)
-+{
-+	hci_dev_lock(req->hdev);
-+	__hci_update_background_scan(req);
-+	hci_dev_unlock(req->hdev);
-+}
-+
-+static void bg_scan_update(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					    bg_scan_update);
-+
-+	hci_req_sync(hdev, update_bg_scan, 0, HCI_CMD_TIMEOUT);
-+}
-+
- void hci_request_setup(struct hci_dev *hdev)
- {
-+	INIT_WORK(&hdev->bg_scan_update, bg_scan_update);
- }
- 
- void hci_request_cancel_all(struct hci_dev *hdev)
- {
-+	cancel_work_sync(&hdev->bg_scan_update);
- }
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 9759b7175f8e..983e687fee22 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -64,12 +64,16 @@ void __hci_update_page_scan(struct hci_request *req);
- int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 			      u8 *own_addr_type);
- 
--void hci_update_background_scan(struct hci_dev *hdev);
- void __hci_update_background_scan(struct hci_request *req);
- 
- int hci_abort_conn(struct hci_conn *conn, u8 reason);
- void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
- 		      u8 reason);
- 
-+static inline void hci_update_background_scan(struct hci_dev *hdev)
-+{
-+	queue_work(hdev->req_workqueue, &hdev->bg_scan_update);
-+}
-+
- void hci_request_setup(struct hci_dev *hdev);
- void hci_request_cancel_all(struct hci_dev *hdev);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7f22119276f3..29c9fec814b4 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2510,8 +2510,8 @@ static void le_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
- 		hci_req_init(&req, hdev);
- 		update_adv_data(&req);
- 		update_scan_rsp_data(&req);
--		__hci_update_background_scan(&req);
- 		hci_req_run(&req, NULL);
-+		hci_update_background_scan(hdev);
- 	}
- 
- unlock:
--- 
-2.5.0
+The current bluetooth-next tree is not able to reliably and in a
+race-free manner handle updates to the LE scan state. This results in
+the kernel ending up out of sync with the actual LE scan state and
+starts sending incorrect scan state HCI commands, often resulting in
+"not allowed" HCI responses.
+
+This is an initial set of patches to try solve the issue. I've tried to
+retain as much as possible of the original logic so that it's easier to
+see that nothing should get broken. Because of this, there are still
+many simplifications and cleanups that can be done. However, since I've
+already got 12 patches lined up I wanted to get them sent, reviewed and
+merged. After that I can concentrate on the cleanups and I'll also be
+looking into moving the adverising state changes to hci_request.c as
+well.
+
+The general solution that this set takes to solve the synchronization
+issues with the LE scan state, is to move all of it behind the
+hdev->req_workqueue and perform the actions synchronously. The main tool
+I've used for this is the hci_req_sync() API which allows taking
+existing asynchronous HCI request helpers and using them to perform the
+same commands synchronously (by passing the helper as the callback to
+hci_req_sync).
+
+Since only one work callback is active at a time we get an easy way to
+avoid races between the changes. All of the new synchronous code can be
+found in hci_request.c which seemed like an appropriate place for it.
+
+I've done a fair amount of testing with the patches, including
+mgmt-tester, l2cap-tester and various bluetoothd tests (both with
+controllers supporting simultaneous Inquiry+LE scan as well as those not
+supporting it). However, because of the size of the changes it's
+perfectly possible that I've missed or broken something, so it'd be good
+if others could give the set a spin before merging it.
+
+Johan
+
+----------------------------------------------------------------
+Johan Hedberg (12):
+      Bluetooth: Add stubs for synchronous HCI request functionality
+      Bluetooth: Run all background scan updates through req_workqueue
+      Bluetooth: Don't wait for HCI in Add/Remove Device
+      Bluetooth: Add HCI status return parameter to hci_req_sync()
+      Bluetooth: Use req_workqueue for explicit connect requests
+      Bluetooth: Use req_workqueue for background scanning when powering on
+      Bluetooth: Make __hci_update_background_scan private to hci_request.c
+      Bluetooth: Move LE scan disable/restart behind req_workqueue
+      Bluetooth: Add discovery type validity helper
+      Bluetooth: Add error return value to hci_req_sync callback
+      Bluetooth: Move Start Discovery to req_workqueue
+      Bluetooth: Move Stop Discovery to req_workqueue
+
+ include/net/bluetooth/hci.h      |   3 +-
+ include/net/bluetooth/hci_core.h |  10 +-
+ net/bluetooth/hci_conn.c         |  39 +--
+ net/bluetooth/hci_core.c         | 243 ++++-------------
+ net/bluetooth/hci_request.c      | 537 +++++++++++++++++++++++++++++++++++---
+ net/bluetooth/hci_request.h      |  26 +-
+ net/bluetooth/mgmt.c             | 503 +++++++----------------------------
+ 7 files changed, 684 insertions(+), 677 deletions(-)
 
