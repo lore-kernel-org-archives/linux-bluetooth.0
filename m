@@ -1,87 +1,89 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH v2 00/12] Bluetooth: Move LE scan changes behind req_workqueue
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1447222287-4288-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 11 Nov 2015 15:26:35 +0900
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <BA80D318-C52C-41EC-8DD6-52C7D8F851EF@holtmann.org>
-References: <1447222287-4288-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1444069709-27307-1-git-send-email-jpawlowski@google.com>
+References: <1444069709-27307-1-git-send-email-jpawlowski@google.com>
+Date: Tue, 10 Nov 2015 22:24:19 -0800
+Message-ID: <CAD0=r8zHan=Xj8NBHwGT_fba-2RMsSUAhdHkR76WT=TCriXUDA@mail.gmail.com>
+Subject: Re: [PATCH v4 1/5] emulator: add support for checking le scan state
+From: Jakub Pawlowski <jpawlowski@google.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Jakub Pawlowski <jpawlowski@google.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Gentle ping ?
+I'll rebase and re-upload those test
 
-> v2: updated version with feedback for 01/12 and 02/12 taken into
-> account.
-> 
-> From the original cover letter:
-> 
-> The current bluetooth-next tree is not able to reliably and in a
-> race-free manner handle updates to the LE scan state. This results in
-> the kernel ending up out of sync with the actual LE scan state and
-> starts sending incorrect scan state HCI commands, often resulting in
-> "not allowed" HCI responses.
-> 
-> This is an initial set of patches to try solve the issue. I've tried to
-> retain as much as possible of the original logic so that it's easier to
-> see that nothing should get broken. Because of this, there are still
-> many simplifications and cleanups that can be done. However, since I've
-> already got 12 patches lined up I wanted to get them sent, reviewed and
-> merged. After that I can concentrate on the cleanups and I'll also be
-> looking into moving the adverising state changes to hci_request.c as
-> well.
-> 
-> The general solution that this set takes to solve the synchronization
-> issues with the LE scan state, is to move all of it behind the
-> hdev->req_workqueue and perform the actions synchronously. The main tool
-> I've used for this is the hci_req_sync() API which allows taking
-> existing asynchronous HCI request helpers and using them to perform the
-> same commands synchronously (by passing the helper as the callback to
-> hci_req_sync).
-> 
-> Since only one work callback is active at a time we get an easy way to
-> avoid races between the changes. All of the new synchronous code can be
-> found in hci_request.c which seemed like an appropriate place for it.
-> 
-> I've done a fair amount of testing with the patches, including
-> mgmt-tester, l2cap-tester and various bluetoothd tests (both with
-> controllers supporting simultaneous Inquiry+LE scan as well as those not
-> supporting it). However, because of the size of the changes it's
-> perfectly possible that I've missed or broken something, so it'd be good
-> if others could give the set a spin before merging it.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (12):
->      Bluetooth: Add stubs for synchronous HCI request functionality
->      Bluetooth: Run all background scan updates through req_workqueue
->      Bluetooth: Don't wait for HCI in Add/Remove Device
->      Bluetooth: Add HCI status return parameter to hci_req_sync()
->      Bluetooth: Use req_workqueue for explicit connect requests
->      Bluetooth: Use req_workqueue for background scanning when powering on
->      Bluetooth: Make __hci_update_background_scan private to hci_request.c
->      Bluetooth: Move LE scan disable/restart behind req_workqueue
->      Bluetooth: Add discovery type validity helper
->      Bluetooth: Add error return value to hci_req_sync callback
->      Bluetooth: Move Start Discovery to req_workqueue
->      Bluetooth: Move Stop Discovery to req_workqueue
-> 
-> include/net/bluetooth/hci.h      |   3 +-
-> include/net/bluetooth/hci_core.h |  10 +-
-> net/bluetooth/hci_conn.c         |  39 +--
-> net/bluetooth/hci_core.c         | 243 ++++-------------
-> net/bluetooth/hci_request.c      | 537 +++++++++++++++++++++++++++++++++++---
-> net/bluetooth/hci_request.h      |  26 +-
-> net/bluetooth/mgmt.c             | 503 +++++++----------------------------
-> 7 files changed, 684 insertions(+), 677 deletions(-)
-
-patches 1-10 have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
-
+On Mon, Oct 5, 2015 at 11:28 AM, Jakub Pawlowski <jpawlowski@google.com> wrote:
+> ---
+>  emulator/btdev.c  | 5 +++++
+>  emulator/btdev.h  | 2 ++
+>  emulator/hciemu.c | 8 ++++++++
+>  emulator/hciemu.h | 2 ++
+>  4 files changed, 17 insertions(+)
+>
+> diff --git a/emulator/btdev.c b/emulator/btdev.c
+> index e8cead8..aee7a48 100644
+> --- a/emulator/btdev.c
+> +++ b/emulator/btdev.c
+> @@ -675,6 +675,11 @@ uint8_t *btdev_get_features(struct btdev *btdev)
+>         return btdev->features;
+>  }
+>
+> +bool btdev_is_le_scan_enabled(struct btdev *btdev)
+> +{
+> +       return btdev->le_scan_enable;
+> +}
+> +
+>  static bool use_ssp(struct btdev *btdev1, struct btdev *btdev2)
+>  {
+>         if (btdev1->auth_enable || btdev2->auth_enable)
+> diff --git a/emulator/btdev.h b/emulator/btdev.h
+> index 4b724a7..8b116e4 100644
+> --- a/emulator/btdev.h
+> +++ b/emulator/btdev.h
+> @@ -80,6 +80,8 @@ void btdev_destroy(struct btdev *btdev);
+>  const uint8_t *btdev_get_bdaddr(struct btdev *btdev);
+>  uint8_t *btdev_get_features(struct btdev *btdev);
+>
+> +bool btdev_is_le_scan_enabled(struct btdev *btdev);
+> +
+>  void btdev_set_command_handler(struct btdev *btdev, btdev_command_func handler,
+>                                                         void *user_data);
+>
+> diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+> index 4881a24..725fbd4 100644
+> --- a/emulator/hciemu.c
+> +++ b/emulator/hciemu.c
+> @@ -427,6 +427,14 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu)
+>         return btdev_get_bdaddr(hciemu->client_dev);
+>  }
+>
+> +bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu)
+> +{
+> +       if (!hciemu || !hciemu->master_dev)
+> +               return NULL;
+> +
+> +       return btdev_is_le_scan_enabled(hciemu->master_dev);
+> +}
+> +
+>  bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
+>                         hciemu_command_func_t function, void *user_data)
+>  {
+> diff --git a/emulator/hciemu.h b/emulator/hciemu.h
+> index 41ca3fc..04bfab7 100644
+> --- a/emulator/hciemu.h
+> +++ b/emulator/hciemu.h
+> @@ -53,6 +53,8 @@ uint8_t *hciemu_get_features(struct hciemu *hciemu);
+>  const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu);
+>  const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
+>
+> +bool hciemu_is_master_le_scan_enabled(struct hciemu *hciemu);
+> +
+>  typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
+>                                                 uint8_t len, void *user_data);
+>
+> --
+> 2.5.0
+>
