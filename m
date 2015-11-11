@@ -1,26 +1,31 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/3] Bluetooth: Cleanups to syncronous request functions
-Date: Wed, 11 Nov 2015 12:24:20 +0200
-Message-Id: <1447237463-29233-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [PATCH] Bluetooth: Fix BR/EDR Page Scan update with Add Device
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1447230631-29973-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 11 Nov 2015 17:36:41 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <CF0D3D1A-ED44-4607-A08D-5D7A6E71EF73@holtmann.org>
+References: <1447230631-29973-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-Here's a couple of initial cleanups to the new code in hci_request.c.
-The patches are essentially removing the *_complete() functions that
-are now unecessary.
+> The recent changes to remove dependency on HCI in Add Device missed
+> out relevant changes for BR/EDR. This patch removes the left-overs and
+> ensures the right HCI command gets queued for BR/EDR.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/mgmt.c | 16 ++++------------
+> 1 file changed, 4 insertions(+), 12 deletions(-)
 
-Johan
+patch has been applied to bluetooth-next tree.
 
------------------
-Johan Hedberg (3):
-      Bluetooth: Pass inquiry length to bredr_inquiry()
-      Bluetooth: Simplify le_scan_disable_work()
-      Bluetooth: Remove unnecessary le_scan_restart_work_complete() function
+Regards
 
- net/bluetooth/hci_request.c | 204 +++++++++++++++++--------------------------
- 1 file changed, 80 insertions(+), 124 deletions(-)
+Marcel
 
