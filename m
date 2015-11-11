@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 05/12] Bluetooth: Use req_workqueue for explicit connect requests
-Date: Wed, 11 Nov 2015 08:11:20 +0200
-Message-Id: <1447222287-4288-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 09/12] Bluetooth: Add discovery type validity helper
+Date: Wed, 11 Nov 2015 08:11:24 +0200
+Message-Id: <1447222287-4288-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1447222287-4288-1-git-send-email-johan.hedberg@gmail.com>
 References: <1447222287-4288-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,132 +11,81 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Since explicit connect requests are also a sub-category of passive
-scan updates, run them through the same workqueue as the other passive
-scan changes.
+As preparation for moving the discovery HCI commands behind
+req_workqueue, add a helper and do the validity checks of the given
+discovery type before proceeding further. This way we don't need to do
+them again in hci_request.c.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c    | 39 ++++-----------------------------------
- net/bluetooth/hci_request.c | 15 ++++++++++++++-
- 2 files changed, 18 insertions(+), 36 deletions(-)
+ net/bluetooth/mgmt.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index fd6120a41138..1ed1e153b3fa 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -933,26 +933,6 @@ done:
- 	return conn;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a229cfd0530e..e634b4d85249 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4375,6 +4375,33 @@ unlock:
+ 	hci_dev_unlock(hdev);
  }
  
--static void hci_connect_le_scan_complete(struct hci_dev *hdev, u8 status,
--					 u16 opcode)
--{
--	struct hci_conn *conn;
--
--	if (!status)
--		return;
--
--	BT_ERR("Failed to add device to auto conn whitelist: status 0x%2.2x",
--	       status);
--
--	hci_dev_lock(hdev);
--
--	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
--	if (conn)
--		hci_le_conn_failed(conn, status);
--
--	hci_dev_unlock(hdev);
--}
--
- static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
++static bool discovery_type_is_valid(struct hci_dev *hdev, uint8_t type,
++				    uint8_t *mgmt_status)
++{
++	switch (type) {
++	case DISCOV_TYPE_LE:
++		*mgmt_status = mgmt_le_support(hdev);
++		if (*mgmt_status)
++			return false;
++		break;
++	case DISCOV_TYPE_INTERLEAVED:
++		*mgmt_status = mgmt_le_support(hdev);
++		if (*mgmt_status)
++			return false;
++		/* Intentional fall-through */
++	case DISCOV_TYPE_BREDR:
++		*mgmt_status = mgmt_bredr_support(hdev);
++		if (*mgmt_status)
++			return false;
++		break;
++	default:
++		*mgmt_status = MGMT_STATUS_INVALID_PARAMS;
++		return false;
++	}
++
++	return true;
++}
++
+ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 			   void *data, u16 len)
  {
- 	struct hci_conn *conn;
-@@ -968,10 +948,9 @@ static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
- }
- 
- /* This function requires the caller holds hdev->lock */
--static int hci_explicit_conn_params_set(struct hci_request *req,
-+static int hci_explicit_conn_params_set(struct hci_dev *hdev,
- 					bdaddr_t *addr, u8 addr_type)
- {
--	struct hci_dev *hdev = req->hdev;
- 	struct hci_conn_params *params;
- 
- 	if (is_connected(hdev, addr, addr_type))
-@@ -999,7 +978,6 @@ static int hci_explicit_conn_params_set(struct hci_request *req,
+@@ -4403,6 +4430,12 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		goto failed;
  	}
  
- 	params->explicit_connect = true;
--	__hci_update_background_scan(req);
- 
- 	BT_DBG("addr %pMR (type %u) auto_connect %u", addr, addr_type,
- 	       params->auto_connect);
-@@ -1013,8 +991,6 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 				     u16 conn_timeout, u8 role)
- {
- 	struct hci_conn *conn;
--	struct hci_request req;
--	int err;
- 
- 	/* Let's make sure that le is enabled.*/
- 	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
-@@ -1046,25 +1022,18 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
- 	if (!conn)
- 		return ERR_PTR(-ENOMEM);
- 
--	hci_req_init(&req, hdev);
--
--	if (hci_explicit_conn_params_set(&req, dst, dst_type) < 0)
-+	if (hci_explicit_conn_params_set(hdev, dst, dst_type) < 0)
- 		return ERR_PTR(-EBUSY);
- 
- 	conn->state = BT_CONNECT;
- 	set_bit(HCI_CONN_SCANNING, &conn->flags);
--
--	err = hci_req_run(&req, hci_connect_le_scan_complete);
--	if (err && err != -ENODATA) {
--		hci_conn_del(conn);
--		return ERR_PTR(err);
--	}
--
- 	conn->dst_type = dst_type;
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->pending_sec_level = sec_level;
- 	conn->conn_timeout = conn_timeout;
- 
-+	hci_update_background_scan(hdev);
++	if (!discovery_type_is_valid(hdev, cp->type, &status)) {
++		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
++					status, &cp->type, sizeof(cp->type));
++		goto failed;
++	}
 +
- done:
- 	hci_conn_hold(conn);
- 	return conn;
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index b1d4d5bba7c1..c0ea310a116a 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -841,8 +841,21 @@ static void bg_scan_update(struct work_struct *work)
- {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev,
- 					    bg_scan_update);
-+	struct hci_conn *conn;
-+	u8 status;
-+	int err;
-+
-+	err = hci_req_sync(hdev, update_bg_scan, 0, HCI_CMD_TIMEOUT, &status);
-+	if (!err)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
-+	if (conn)
-+		hci_le_conn_failed(conn, status);
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+@@ -4502,6 +4535,13 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		goto failed;
+ 	}
  
--	hci_req_sync(hdev, update_bg_scan, 0, HCI_CMD_TIMEOUT);
-+	hci_dev_unlock(hdev);
- }
- 
- void hci_request_setup(struct hci_dev *hdev)
++	if (!discovery_type_is_valid(hdev, cp->type, &status)) {
++		err = mgmt_cmd_complete(sk, hdev->id,
++					MGMT_OP_START_SERVICE_DISCOVERY,
++					status, &cp->type, sizeof(cp->type));
++		goto failed;
++	}
++
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_START_SERVICE_DISCOVERY,
+ 			       hdev, data, len);
+ 	if (!cmd) {
 -- 
 2.5.0
 
