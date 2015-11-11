@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Remove conn_unfinished variable from hci_connect_le()
-Date: Wed, 11 Nov 2015 14:44:59 +0200
-Message-Id: <1447245899-30783-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: Fix specifying role for LE connections
+Date: Wed, 11 Nov 2015 14:44:57 +0200
+Message-Id: <1447245899-30783-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1447245899-30783-1-git-send-email-johan.hedberg@gmail.com>
 References: <1447245899-30783-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,107 +11,104 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The conn_unfinished variable makes the entire logic of
-hci_connect_le() rather confusing. By restructuring and clarifying the
-logic we can actually remove the conn_unfinished variable and still
-keep the same behavior.
+The hci_connect_le_scan() is (as the name implies) a master/central
+role API, so it makes no sense in passing a role parameter to it. At
+the same time this patch also fixes the direct advertising support for
+LE L2CAP sockets where we now call the more appropriate hci_le_connect()
+API if slave/peripheral role is desired.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c | 48 ++++++++++++------------------------------------
- 1 file changed, 12 insertions(+), 36 deletions(-)
+ include/net/bluetooth/hci_core.h |  2 +-
+ net/bluetooth/hci_conn.c         |  4 ++--
+ net/bluetooth/l2cap_core.c       | 15 +++++++--------
+ net/bluetooth/mgmt.c             |  3 +--
+ 4 files changed, 11 insertions(+), 13 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 609f4a03899c..55ce209157b1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -877,7 +877,7 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
+ 
+ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 				     u8 dst_type, u8 sec_level,
+-				     u16 conn_timeout, u8 role);
++				     u16 conn_timeout);
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, u8 sec_level, u16 conn_timeout,
+ 				u8 role);
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 08a291dd0f3a..2d334e07fd77 100644
+index 1ed1e153b3fa..673c2254935b 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -785,7 +785,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 				u8 role)
+@@ -988,7 +988,7 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
+ /* This function requires the caller holds hdev->lock */
+ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 				     u8 dst_type, u8 sec_level,
+-				     u16 conn_timeout, u8 role)
++				     u16 conn_timeout)
  {
- 	struct hci_conn_params *params;
--	struct hci_conn *conn, *conn_unfinished;
-+	struct hci_conn *conn;
- 	struct smp_irk *irk;
- 	struct hci_request req;
- 	int err;
-@@ -804,27 +804,14 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	if (hci_lookup_le_connect(hdev))
- 		return ERR_PTR(-EBUSY);
+ 	struct hci_conn *conn;
  
--	/* Some devices send ATT messages as soon as the physical link is
--	 * established. To be able to handle these ATT messages, the user-
--	 * space first establishes the connection and then starts the pairing
--	 * process.
--	 *
--	 * So if a hci_conn object already exists for the following connection
--	 * attempt, we simply update pending_sec_level and auth_type fields
--	 * and return the object found.
-+	/* If there's already a connection object but it's not in
-+	 * scanning state it means it must already be established, in
-+	 * which case we can't do anything else except report a failure
-+	 * to connect.
- 	 */
- 	conn = hci_conn_hash_lookup_le(hdev, dst, dst_type);
--	conn_unfinished = NULL;
--	if (conn) {
--		if (conn->state == BT_CONNECT &&
--		    test_bit(HCI_CONN_SCANNING, &conn->flags)) {
--			BT_DBG("will continue unfinished conn %pMR", dst);
--			conn_unfinished = conn;
--		} else {
--			if (conn->pending_sec_level < sec_level)
--				conn->pending_sec_level = sec_level;
--			goto done;
--		}
-+	if (conn && !test_bit(HCI_CONN_SCANNING, &conn->flags)) {
-+		return ERR_PTR(-EBUSY);
- 	}
+@@ -1018,7 +1018,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
  
- 	/* When given an identity address with existing identity
-@@ -842,23 +829,20 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 		dst_type = ADDR_LE_DEV_RANDOM;
- 	}
+ 	BT_DBG("requesting refresh of dst_addr");
  
--	if (conn_unfinished) {
--		conn = conn_unfinished;
-+	if (conn) {
- 		bacpy(&conn->dst, dst);
+-	conn = hci_conn_add(hdev, LE_LINK, dst, role);
++	conn = hci_conn_add(hdev, LE_LINK, dst, HCI_ROLE_MASTER);
+ 	if (!conn)
+ 		return ERR_PTR(-ENOMEM);
+ 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 7c65ee200c29..ffb7b26e02bc 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7099,8 +7099,6 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 	chan->dcid = cid;
+ 
+ 	if (bdaddr_type_is_le(dst_type)) {
+-		u8 role;
+-
+ 		/* Convert from L2CAP channel address type to HCI address type
+ 		 */
+ 		if (dst_type == BDADDR_LE_PUBLIC)
+@@ -7109,14 +7107,15 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 			dst_type = ADDR_LE_DEV_RANDOM;
+ 
+ 		if (hci_dev_test_flag(hdev, HCI_ADVERTISING))
+-			role = HCI_ROLE_SLAVE;
++			hcon = hci_connect_le(hdev, dst, dst_type,
++					      chan->sec_level,
++					      HCI_LE_CONN_TIMEOUT,
++					      HCI_ROLE_SLAVE);
+ 		else
+-			role = HCI_ROLE_MASTER;
++			hcon = hci_connect_le_scan(hdev, dst, dst_type,
++						   chan->sec_level,
++						   HCI_LE_CONN_TIMEOUT);
+ 
+-		hcon = hci_connect_le_scan(hdev, dst, dst_type,
+-					   chan->sec_level,
+-					   HCI_LE_CONN_TIMEOUT,
+-					   role);
  	} else {
- 		conn = hci_conn_add(hdev, LE_LINK, dst, role);
-+		if (!conn)
-+			return ERR_PTR(-ENOMEM);
-+		hci_conn_hold(conn);
-+		conn->pending_sec_level = sec_level;
+ 		u8 auth_type = l2cap_get_auth_type(chan);
+ 		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index e4ad0457547a..eca203e891d2 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3518,8 +3518,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 		conn = hci_connect_le_scan(hdev, &cp->addr.bdaddr,
+ 					   addr_type, sec_level,
+-					   HCI_LE_CONN_TIMEOUT,
+-					   HCI_ROLE_MASTER);
++					   HCI_LE_CONN_TIMEOUT);
  	}
  
--	if (!conn)
--		return ERR_PTR(-ENOMEM);
--
- 	conn->dst_type = dst_type;
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->conn_timeout = conn_timeout;
- 
--	if (!conn_unfinished)
--		conn->pending_sec_level = sec_level;
--
- 	hci_req_init(&req, hdev);
- 
- 	/* Disable advertising if we're active. For master role
-@@ -922,14 +906,6 @@ create_conn:
- 		return ERR_PTR(err);
- 	}
- 
--done:
--	/* If this is continuation of connect started by hci_connect_le_scan,
--	 * it already called hci_conn_hold and calling it again would mess the
--	 * counter.
--	 */
--	if (!conn_unfinished)
--		hci_conn_hold(conn);
--
- 	return conn;
- }
- 
+ 	if (IS_ERR(conn)) {
 -- 
 2.5.0
 
