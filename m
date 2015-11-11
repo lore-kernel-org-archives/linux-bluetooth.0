@@ -2,128 +2,148 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jakub Pawlowski <jpawlowski@google.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Pawlowski <jpawlowski@google.com>
-Subject: [PATCH BlueZ v5 5/5] tools/l2cap-tester connect two sockets disconnect one test
-Date: Tue, 10 Nov 2015 22:36:30 -0800
-Message-Id: <1447223790-3263-5-git-send-email-jpawlowski@google.com>
+Subject: [PATCH BlueZ v5 4/5] tools/l2cap-tester: Two socket connect test
+Date: Tue, 10 Nov 2015 22:36:29 -0800
+Message-Id: <1447223790-3263-4-git-send-email-jpawlowski@google.com>
 In-Reply-To: <1447223790-3263-1-git-send-email-jpawlowski@google.com>
 References: <1447223790-3263-1-git-send-email-jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test open two sockets to same client, then close first one and make
-sure second one connect successfully.
+This test tries to open two sockets to same address, to make sure
+both would succeed.
 ---
- tools/l2cap-tester.c | 39 +++++++++++++++++++++++++++++++++++++--
- 1 file changed, 37 insertions(+), 2 deletions(-)
+ tools/l2cap-tester.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 102 insertions(+)
 
 diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 63b50ee..6bb3e05 100644
+index 4bea30f..63b50ee 100644
 --- a/tools/l2cap-tester.c
 +++ b/tools/l2cap-tester.c
-@@ -90,6 +90,7 @@ struct l2cap_data {
- 
- 	uint8_t *client_bdaddr;
- 	bool server_not_advertising;
-+	bool close_one_socket;
+@@ -54,6 +54,7 @@ struct test_data {
+ 	uint16_t scid;
+ 	uint16_t dcid;
+ 	int sk;
++	int sk2;
  };
  
- static void mgmt_debug(const char *str, void *user_data)
-@@ -472,6 +473,13 @@ static const struct l2cap_data le_client_two_sockets_same_client = {
+ struct l2cap_data {
+@@ -465,6 +466,12 @@ static const struct l2cap_data le_client_close_socket_test_2 = {
  	.server_not_advertising = true,
  };
  
-+static const struct l2cap_data le_client_two_sockets_close_one = {
++static const struct l2cap_data le_client_two_sockets_same_client = {
 +	.client_psm = 0x0080,
 +	.server_psm = 0x0080,
 +	.server_not_advertising = true,
-+	.close_one_socket = true,
 +};
 +
  static const struct l2cap_data le_client_connect_nval_psm_test = {
  	.client_psm = 0x0080,
  	.expect_err = ECONNREFUSED,
-@@ -1410,6 +1418,7 @@ static gboolean test_two_sockets_connect_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
- 	struct test_data *data = tester_get_data();
-+	const struct l2cap_data *l2data = data->test_data;
- 	int err, sk_err, sk;
- 	socklen_t len = sizeof(sk_err);
+@@ -1398,6 +1405,96 @@ static void test_close_socket(const void *test_data)
+ 	connect_socket(client_bdaddr, &data->sk, NULL);
+ }
  
-@@ -1437,6 +1446,11 @@ static gboolean test_two_sockets_connect_cb(GIOChannel *io, GIOCondition cond,
- 		tester_test_passed();
- 	}
- 
-+	if (l2data->close_one_socket && test_two_sockets_connect_cb_cnt == 1) {
++static uint8_t test_two_sockets_connect_cb_cnt;
++static gboolean test_two_sockets_connect_cb(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	int err, sk_err, sk;
++	socklen_t len = sizeof(sk_err);
++
++	data->io_id = 0;
++
++	sk = g_io_channel_unix_get_fd(io);
++
++	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &sk_err, &len) < 0)
++		err = -errno;
++	else
++		err = -sk_err;
++
++	if (err < 0) {
++		tester_warn("Connect failed: %s (%d)", strerror(-err), -err);
++		tester_test_failed();
++		return FALSE;
++	}
++
++	tester_print("Successfully connected");
++	test_two_sockets_connect_cb_cnt++;
++
++	if (test_two_sockets_connect_cb_cnt == 2) {
++		close(data->sk);
 +		close(data->sk2);
 +		tester_test_passed();
 +	}
 +
- 	return FALSE;
- }
- 
-@@ -1452,14 +1466,21 @@ static gboolean enable_advertising(gpointer args)
- static void test_connect_two_sockets_part_2(void)
- {
- 	struct test_data *data = tester_get_data();
++	return FALSE;
++}
++
++static gboolean enable_advertising(gpointer args)
++{
++	struct test_data *data = tester_get_data();
++	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++
++	bthost_set_adv_enable(bthost, 0x01);
++	return FALSE;
++}
++
++static void test_connect_two_sockets_part_2(void)
++{
++	struct test_data *data = tester_get_data();
++	const uint8_t *client_bdaddr;
++
++	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
++	connect_socket(client_bdaddr, &data->sk2, test_two_sockets_connect_cb);
++
++	g_idle_add(enable_advertising, NULL);
++}
++
++static void test_connect_two_sockets_router(uint16_t opcode, const void *param,
++					uint8_t length, void *user_data)
++{
++	const struct bt_hci_cmd_le_set_scan_enable *scan_params = param;
++
++	tester_print("HCI Command 0x%04x length %u", opcode, length);
++	if (opcode == BT_HCI_CMD_LE_SET_SCAN_ENABLE &&
++						scan_params->enable == true) {
++		test_connect_two_sockets_part_2();
++	}
++}
++
++static void test_connect_two_sockets(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
 +	const struct l2cap_data *l2data = data->test_data;
- 	const uint8_t *client_bdaddr;
- 
- 	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
- 	connect_socket(client_bdaddr, &data->sk2, test_two_sockets_connect_cb);
- 
-+	if (l2data->close_one_socket) {
-+		tester_print("Closing first socket! %d", data->sk);
-+		close(data->sk);
++	const uint8_t *client_bdaddr;
++
++	test_two_sockets_connect_cb_cnt = 0;
++
++	hciemu_add_master_post_command_hook(data->hciemu,
++				test_connect_two_sockets_router, data);
++
++	if (l2data->server_psm) {
++		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++
++		if (!l2data->data_len)
++			bthost_add_l2cap_server(bthost, l2data->server_psm,
++						NULL, NULL);
 +	}
 +
- 	g_idle_add(enable_advertising, NULL);
- }
- 
-+static uint8_t test_scan_enable_counter;
- static void test_connect_two_sockets_router(uint16_t opcode, const void *param,
- 					uint8_t length, void *user_data)
- {
-@@ -1468,7 +1489,11 @@ static void test_connect_two_sockets_router(uint16_t opcode, const void *param,
- 	tester_print("HCI Command 0x%04x length %u", opcode, length);
- 	if (opcode == BT_HCI_CMD_LE_SET_SCAN_ENABLE &&
- 						scan_params->enable == true) {
--		test_connect_two_sockets_part_2();
-+		test_scan_enable_counter++;
-+		if (test_scan_enable_counter == 1)
-+			test_connect_two_sockets_part_2();
-+		else if (test_scan_enable_counter == 2)
-+			g_idle_add(enable_advertising, NULL);
- 	}
- }
- 
-@@ -1479,6 +1504,7 @@ static void test_connect_two_sockets(const void *test_data)
- 	const uint8_t *client_bdaddr;
- 
- 	test_two_sockets_connect_cb_cnt = 0;
-+	test_scan_enable_counter = 0;
- 
- 	hciemu_add_master_post_command_hook(data->hciemu,
- 				test_connect_two_sockets_router, data);
-@@ -1492,7 +1518,11 @@ static void test_connect_two_sockets(const void *test_data)
- 	}
- 
- 	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
--	connect_socket(client_bdaddr, &data->sk, test_two_sockets_connect_cb);
-+	if (l2data->close_one_socket)
-+		connect_socket(client_bdaddr, &data->sk, NULL);
-+	else
-+		connect_socket(client_bdaddr, &data->sk,
-+						test_two_sockets_connect_cb);
- }
- 
++	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
++	connect_socket(client_bdaddr, &data->sk, test_two_sockets_connect_cb);
++}
++
  static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
-@@ -1826,6 +1856,11 @@ int main(int argc, char *argv[])
+ 							gpointer user_data)
+ {
+@@ -1724,6 +1821,11 @@ int main(int argc, char *argv[])
  				setup_powered_client,
- 				test_connect_two_sockets);
+ 				test_close_socket);
  
-+	test_l2cap_le("L2CAP LE Client - Open two sockets close one",
-+				&le_client_two_sockets_close_one,
++	test_l2cap_le("L2CAP LE Client - Open two sockets",
++				&le_client_two_sockets_same_client,
 +				setup_powered_client,
 +				test_connect_two_sockets);
 +
