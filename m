@@ -1,54 +1,31 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix l2cap_chan leak in SMP
-Date: Wed, 11 Nov 2015 21:47:12 +0200
-Message-Id: <1447271232-29359-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH] android/log: Fix compilation error in AOSP
+Date: Wed, 11 Nov 2015 19:09:51 +0100
+Message-Id: <1447265391-26817-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-The L2CAP core expects channel implementations to manage the reference
-returned by the new_connection callback. With sockets this is already
-handled with each channel being tied to the corresponding socket. With
-SMP however there's no context to tie the pointer to in the
-smp_new_conn_cb function. The function can also not just drop the
-reference since it's the only one at that point.
-
-For fixed channels (like SMP) the code path inside the L2CAP core from
-new_connection() to ready() is short and straight-forwards. The
-crucial difference is that in ready() the implementation has access to
-the l2cap_conn that SMP needs associate its l2cap_chan. Instead of
-taking a new reference in smp_ready_cb() we can simply assume to
-already own the reference created in smp_new_conn_cb(), i.e. there is
-no need to call l2cap_chan_hold().
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Cc: stable@vger.kernel.org # 3.19+
+btd_debug() has new parameter introduced in dcfdc556.
 ---
- net/bluetooth/smp.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ android/log.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index c91353841e40..ffed8a1d4f27 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3027,8 +3027,13 @@ static void smp_ready_cb(struct l2cap_chan *chan)
+diff --git a/android/log.c b/android/log.c
+index 8013eba..35917c6 100644
+--- a/android/log.c
++++ b/android/log.c
+@@ -139,7 +139,7 @@ void error(const char *format, ...)
+ 	va_end(ap);
+ }
  
- 	BT_DBG("chan %p", chan);
+-void btd_debug(const char *format, ...)
++void btd_debug(uint16_t index, const char *format, ...)
+ {
+ 	va_list ap;
  
-+	/* No need to call l2cap_chan_hold() here since we already own
-+	 * the reference taken in smp_new_conn_cb(). This is just the
-+	 * first time that we tie it to a specific pointer. The code in
-+	 * l2cap_core.c ensures that there's no risk this function wont
-+	 * get called if smp_new_conn_cb was previously called.
-+	 */
- 	conn->smp = chan;
--	l2cap_chan_hold(chan);
- 
- 	if (hcon->type == ACL_LINK && test_bit(HCI_CONN_ENCRYPT, &hcon->flags))
- 		bredr_pairing(chan);
 -- 
-2.5.0
+2.6.2
 
