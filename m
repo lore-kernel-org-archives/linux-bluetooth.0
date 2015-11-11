@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 09/12] Bluetooth: Add discovery type validity helper
-Date: Wed, 11 Nov 2015 08:11:24 +0200
-Message-Id: <1447222287-4288-10-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 06/12] Bluetooth: Use req_workqueue for background scanning when powering on
+Date: Wed, 11 Nov 2015 08:11:21 +0200
+Message-Id: <1447222287-4288-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1447222287-4288-1-git-send-email-johan.hedberg@gmail.com>
 References: <1447222287-4288-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,81 +11,58 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-As preparation for moving the discovery HCI commands behind
-req_workqueue, add a helper and do the validity checks of the given
-discovery type before proceeding further. This way we don't need to do
-them again in hci_request.c.
+We can easily use the new req_workqueue based background scan update
+for the power on case. This also removes the last external user of
+__hci_update_background_scan().
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ net/bluetooth/mgmt.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a229cfd0530e..e634b4d85249 100644
+index 27504949e995..bb870c3aadae 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -4375,6 +4375,33 @@ unlock:
- 	hci_dev_unlock(hdev);
+@@ -7465,9 +7465,8 @@ void mgmt_index_removed(struct hci_dev *hdev)
  }
  
-+static bool discovery_type_is_valid(struct hci_dev *hdev, uint8_t type,
-+				    uint8_t *mgmt_status)
-+{
-+	switch (type) {
-+	case DISCOV_TYPE_LE:
-+		*mgmt_status = mgmt_le_support(hdev);
-+		if (*mgmt_status)
-+			return false;
-+		break;
-+	case DISCOV_TYPE_INTERLEAVED:
-+		*mgmt_status = mgmt_le_support(hdev);
-+		if (*mgmt_status)
-+			return false;
-+		/* Intentional fall-through */
-+	case DISCOV_TYPE_BREDR:
-+		*mgmt_status = mgmt_bredr_support(hdev);
-+		if (*mgmt_status)
-+			return false;
-+		break;
-+	default:
-+		*mgmt_status = MGMT_STATUS_INVALID_PARAMS;
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			   void *data, u16 len)
+ /* This function requires the caller holds hdev->lock */
+-static void restart_le_actions(struct hci_request *req)
++static void restart_le_actions(struct hci_dev *hdev)
  {
-@@ -4403,6 +4430,12 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		goto failed;
+-	struct hci_dev *hdev = req->hdev;
+ 	struct hci_conn_params *p;
+ 
+ 	list_for_each_entry(p, &hdev->le_conn_params, list) {
+@@ -7488,8 +7487,6 @@ static void restart_le_actions(struct hci_request *req)
+ 			break;
+ 		}
+ 	}
+-
+-	__hci_update_background_scan(req);
+ }
+ 
+ static void powered_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+@@ -7505,6 +7502,9 @@ static void powered_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ 		 * decide if the public address or static address is used.
+ 		 */
+ 		smp_register(hdev);
++
++		restart_le_actions(hdev);
++		hci_update_background_scan(hdev);
  	}
  
-+	if (!discovery_type_is_valid(hdev, cp->type, &status)) {
-+		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+					status, &cp->type, sizeof(cp->type));
-+		goto failed;
-+	}
-+
- 	cmd = mgmt_pending_add(sk, MGMT_OP_START_DISCOVERY, hdev, data, len);
- 	if (!cmd) {
- 		err = -ENOMEM;
-@@ -4502,6 +4535,13 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
- 		goto failed;
+ 	hci_dev_lock(hdev);
+@@ -7583,8 +7583,6 @@ static int powered_update_hci(struct hci_dev *hdev)
+ 			 hdev->cur_adv_instance)
+ 			schedule_adv_instance(&req, hdev->cur_adv_instance,
+ 					      true);
+-
+-		restart_le_actions(&req);
  	}
  
-+	if (!discovery_type_is_valid(hdev, cp->type, &status)) {
-+		err = mgmt_cmd_complete(sk, hdev->id,
-+					MGMT_OP_START_SERVICE_DISCOVERY,
-+					status, &cp->type, sizeof(cp->type));
-+		goto failed;
-+	}
-+
- 	cmd = mgmt_pending_add(sk, MGMT_OP_START_SERVICE_DISCOVERY,
- 			       hdev, data, len);
- 	if (!cmd) {
+ 	link_sec = hci_dev_test_flag(hdev, HCI_LINK_SECURITY);
 -- 
 2.5.0
 
