@@ -1,40 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <ext.szymon.janc@tieto.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/log: Fix compilation error in AOSP
-Date: Thu, 12 Nov 2015 11:17:50 +0100
-Message-ID: <7348840.K5Wc2JxOWi@leonov>
-In-Reply-To: <1447265391-26817-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
-References: <1447265391-26817-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 73411] Unknown vendor ID [105b:e065] - Broadcom BCM43142 device
+Date: Thu, 12 Nov 2015 09:46:39 +0000
+Message-ID: <bug-73411-62941-2ZkDKW34Bg@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-73411-62941@https.bugzilla.kernel.org/>
+References: <bug-73411-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+https://bugzilla.kernel.org/show_bug.cgi?id=73411
 
-On Wednesday 11 of November 2015 19:09:51 Andrzej Kaczmarek wrote:
-> btd_debug() has new parameter introduced in dcfdc556.
-> ---
->  android/log.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/android/log.c b/android/log.c
-> index 8013eba..35917c6 100644
-> --- a/android/log.c
-> +++ b/android/log.c
-> @@ -139,7 +139,7 @@ void error(const char *format, ...)
->  	va_end(ap);
->  }
-> 
-> -void btd_debug(const char *format, ...)
-> +void btd_debug(uint16_t index, const char *format, ...)
->  {
->  	va_list ap;
+kolAflash <kolAflash@kolahilft.de> changed:
 
-Applied, thanks.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |kolAflash@kolahilft.de
+
+--- Comment #8 from kolAflash <kolAflash@kolahilft.de> ---
+Any progress on this?
+
+
+I just followed this guide to make a 105b:e065 Bluetooth adapter work on a
+Lenovo G700 (model 20251, product 59387531).
+
+http://www.gnebehay.com/blog/lenovo-flexpad-bluetooth-debian/
+
+Works fine!
+Connected successfully to my phone and send a file.
+
+So it would be very great, if
+
+{ USB_DEVICE(0x105b, 0xe065), .driver_info = BTUSB_BCM_PATCHRAM },
+
+would be included into
+
+linux-source/drivers/btusb.c
+
+
+Thanks!
 
 -- 
-BR
-Szymon Janc
+You are receiving this mail because:
+You are the assignee for the bug.
