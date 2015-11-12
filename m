@@ -1,47 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 73411] Unknown vendor ID [105b:e065] - Broadcom BCM43142 device
-Date: Thu, 12 Nov 2015 09:46:39 +0000
-Message-ID: <bug-73411-62941-2ZkDKW34Bg@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-73411-62941@https.bugzilla.kernel.org/>
-References: <bug-73411-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 11 Nov 2015 19:23:15 -0500
+From: Kyle McMartin <kyle@infradead.org>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: linux-firmware: Update firmware patch for Intel Bluetooth 7265
+ (C0/D0)
+Message-ID: <20151112002315.GC27752@merlin.infradead.org>
+References: <20151110172240.73eeef00@fedora-linux-22.shared>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20151110172240.73eeef00@fedora-linux-22.shared>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=73411
+On Tue, Nov 10, 2015 at 05:22:40PM -0800, Tedd Ho-Jeong An wrote:
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+> 
+> This patch updates the firmware patch for Intel Bluetooth 7265 (C0/D0)
+> also known as Intel StP C0 and StP D0
+> 
+> C0 Patch Version: 55
+> D0 Patch Version: 32
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-kolAflash <kolAflash@kolahilft.de> changed:
+applied, thanks!
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |kolAflash@kolahilft.de
-
---- Comment #8 from kolAflash <kolAflash@kolahilft.de> ---
-Any progress on this?
-
-
-I just followed this guide to make a 105b:e065 Bluetooth adapter work on a
-Lenovo G700 (model 20251, product 59387531).
-
-http://www.gnebehay.com/blog/lenovo-flexpad-bluetooth-debian/
-
-Works fine!
-Connected successfully to my phone and send a file.
-
-So it would be very great, if
-
-{ USB_DEVICE(0x105b, 0xe065), .driver_info = BTUSB_BCM_PATCHRAM },
-
-would be included into
-
-linux-source/drivers/btusb.c
-
-
-Thanks!
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+cheers, kyle
