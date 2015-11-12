@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ 5/7] hog: Move code from android to profiles
-Date: Thu, 12 Nov 2015 17:46:26 +0200
-Message-Id: <1447343188-21628-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 BlueZ 4/7] dis: Move code from android to profiles
+Date: Thu, 12 Nov 2015 17:46:25 +0200
+Message-Id: <1447343188-21628-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1447343188-21628-1-git-send-email-luiz.dentz@gmail.com>
 References: <1447343188-21628-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,109 +14,89 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 This is a place holder until the code is ported to use shared API so it
 can be shared by android and D-Bus daemon.
 ---
- Makefile.am                               | 2 +-
- android/Android.mk                        | 2 +-
- android/Makefile.am                       | 3 ++-
- android/hidhost.c                         | 2 +-
- android/hog.c => profiles/input/hog-lib.c | 2 +-
- android/hog.h => profiles/input/hog-lib.h | 0
- unit/test-hog.c                           | 2 +-
- 7 files changed, 7 insertions(+), 6 deletions(-)
- rename android/hog.c => profiles/input/hog-lib.c (99%)
- rename android/hog.h => profiles/input/hog-lib.h (100%)
+ Makefile.am                            | 2 +-
+ android/Android.mk                     | 2 +-
+ android/Makefile.am                    | 3 ++-
+ android/hog.c                          | 2 +-
+ {android => profiles/deviceinfo}/dis.c | 2 +-
+ {android => profiles/deviceinfo}/dis.h | 0
+ 6 files changed, 6 insertions(+), 5 deletions(-)
+ rename {android => profiles/deviceinfo}/dis.c (99%)
+ rename {android => profiles/deviceinfo}/dis.h (100%)
 
 diff --git a/Makefile.am b/Makefile.am
-index 3a29412..444f6d5 100644
+index 34fb27f..3a29412 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -400,7 +400,7 @@ unit_tests += unit/test-hog
- 
- unit_test_hog_SOURCES = unit/test-hog.c \
- 			$(btio_sources) \
--			android/hog.h android/hog.c \
-+			profiles/input/hog-lib.h profiles/input/hog-lib.c \
+@@ -403,7 +403,7 @@ unit_test_hog_SOURCES = unit/test-hog.c \
+ 			android/hog.h android/hog.c \
  			profiles/scanparam/scpp.h profiles/scanparam/scpp.c \
  			profiles/battery/bas.h profiles/battery/bas.c \
- 			profiles/deviceinfo/dis.h profiles/deviceinfo/dis.c \
+-			android/dis.h android/dis.c \
++			profiles/deviceinfo/dis.h profiles/deviceinfo/dis.c \
+ 			src/log.h src/log.c \
+ 			attrib/att.h attrib/att.c \
+ 			attrib/gatt.h attrib/gatt.c \
 diff --git a/android/Android.mk b/android/Android.mk
-index 1399178..694a94e 100644
+index 03afacd..1399178 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -42,7 +42,7 @@ LOCAL_SRC_FILES := \
+@@ -40,7 +40,7 @@ LOCAL_SRC_FILES := \
+ 	bluez/android/main.c \
+ 	bluez/android/bluetooth.c \
  	bluez/profiles/scanparam/scpp.c \
- 	bluez/profiles/deviceinfo/dis.c \
+-	bluez/android/dis.c \
++	bluez/profiles/deviceinfo/dis.c \
  	bluez/profiles/battery/bas.c \
--	bluez/android/hog.c \
-+	bluez/profiles/input/hog-lib.c \
+ 	bluez/android/hog.c \
  	bluez/android/hidhost.c \
- 	bluez/android/socket.c \
- 	bluez/android/ipc.c \
 diff --git a/android/Makefile.am b/android/Makefile.am
-index 7d66929..154f8db 100644
+index 128e9dd..7d66929 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -33,7 +33,8 @@ android_bluetoothd_SOURCES = android/main.c \
- 				profiles/deviceinfo/dis.h \
- 				profiles/deviceinfo/dis.c \
+@@ -30,7 +30,8 @@ android_bluetoothd_SOURCES = android/main.c \
+ 				android/hidhost.h android/hidhost.c \
+ 				profiles/scanparam/scpp.h \
+ 				profiles/scanparam/scpp.c \
+-				android/dis.h android/dis.c \
++				profiles/deviceinfo/dis.h \
++				profiles/deviceinfo/dis.c \
  				profiles/battery/bas.h profiles/battery/bas.c \
--				android/hog.h android/hog.c \
-+				profiles/input/hog-lib.h \
-+				profiles/input/hog-lib.c \
+ 				android/hog.h android/hog.c \
  				android/ipc-common.h \
- 				android/ipc.h android/ipc.c \
- 				android/avdtp.h android/avdtp.c \
-diff --git a/android/hidhost.c b/android/hidhost.c
-index a2b820f..591ca95 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -44,13 +44,13 @@
- #include "src/sdp-client.h"
- #include "src/uuid-helper.h"
- #include "src/log.h"
-+#include "profiles/input/hog-lib.h"
- 
- #include "hal-msg.h"
- #include "ipc-common.h"
- #include "ipc.h"
- #include "bluetooth.h"
- #include "gatt.h"
--#include "hog.h"
- #include "hidhost.h"
- #include "utils.h"
- 
-diff --git a/android/hog.c b/profiles/input/hog-lib.c
-similarity index 99%
-rename from android/hog.c
-rename to profiles/input/hog-lib.c
-index ab1e008..a45e59f 100644
+diff --git a/android/hog.c b/android/hog.c
+index e0decac..ab1e008 100644
 --- a/android/hog.c
-+++ b/profiles/input/hog-lib.c
-@@ -56,7 +56,7 @@
++++ b/android/hog.c
+@@ -54,7 +54,7 @@
+ #include "btio/btio.h"
+ 
  #include "profiles/scanparam/scpp.h"
- #include "profiles/deviceinfo/dis.h"
+-#include "android/dis.h"
++#include "profiles/deviceinfo/dis.h"
  #include "profiles/battery/bas.h"
--#include "android/hog.h"
-+#include "profiles/input/hog-lib.h"
+ #include "android/hog.h"
  
- #define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
+diff --git a/android/dis.c b/profiles/deviceinfo/dis.c
+similarity index 99%
+rename from android/dis.c
+rename to profiles/deviceinfo/dis.c
+index 0c20850..91c5d39 100644
+--- a/android/dis.c
++++ b/profiles/deviceinfo/dis.c
+@@ -42,7 +42,7 @@
+ #include "attrib/att.h"
+ #include "attrib/gatt.h"
  
-diff --git a/android/hog.h b/profiles/input/hog-lib.h
+-#include "android/dis.h"
++#include "profiles/deviceinfo/dis.h"
+ 
+ #define PNP_ID_SIZE	7
+ 
+diff --git a/android/dis.h b/profiles/deviceinfo/dis.h
 similarity index 100%
-rename from android/hog.h
-rename to profiles/input/hog-lib.h
-diff --git a/unit/test-hog.c b/unit/test-hog.c
-index 24731d7..9f026e5 100644
---- a/unit/test-hog.c
-+++ b/unit/test-hog.c
-@@ -37,7 +37,7 @@
- 
- #include "attrib/gattrib.h"
- 
--#include "android/hog.h"
-+#include "profiles/input/hog-lib.h"
- 
- struct test_pdu {
- 	bool valid;
+rename from android/dis.h
+rename to profiles/deviceinfo/dis.h
 -- 
 2.4.3
 
