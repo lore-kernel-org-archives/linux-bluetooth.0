@@ -2,91 +2,125 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH] tools/mgmt-tester: Add power on testcase with adv and privacy
-Date: Thu, 12 Nov 2015 21:43:07 +0100
-Message-Id: <1447360987-4129-2-git-send-email-andrzej.kaczmarek@codecoup.pl>
-In-Reply-To: <1447360987-4129-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
-References: <1447360987-4129-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH] Bluetooth: Fix powering on with privacy and advertising
+Date: Thu, 12 Nov 2015 21:43:06 +0100
+Message-Id: <1447360987-4129-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test verifies if kernel can properly enable advertising during
-power on with privacy also enabled. This requires to generate new RPA
-which will fail if not done after SMP is registered. As a consequence
-advertising is not enabled in controller which means it cannot be also
-disabled (controller will reject HCI command).
----
- tools/mgmt-tester.c | 29 +++++++++++++++++++++++++++--
- 1 file changed, 27 insertions(+), 2 deletions(-)
+In order to enable advertising with privacy enabled, SMP has to be
+registered in order to generate new RPA. During power on, it will be
+registered at the very end which is the reason why advertising is not
+enabled and it's not possible to enable it anymore due to mismatch
+between hci_dev settings and actual controller state.
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index b224543..670c580 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -584,6 +584,22 @@ static const struct generic_data set_powered_on_invalid_index_test = {
- 	.expect_status = MGMT_STATUS_INVALID_INDEX,
- };
+This fixes this problem by postponing advertising enable after SMP is
+registered in case of power on.
+---
+ net/bluetooth/mgmt.c | 70 ++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 54 insertions(+), 16 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index eca203e..d96b08c 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7234,10 +7234,42 @@ static void restart_le_actions(struct hci_dev *hdev)
+ 	}
+ }
  
-+static uint16_t settings_powered_advertising_privacy[] = {
-+						MGMT_OP_SET_PRIVACY,
-+						MGMT_OP_SET_ADVERTISING,
-+						MGMT_OP_SET_POWERED, 0 };
-+
-+static const char set_adv_off_param[] = { 0x00 };
-+
-+static const struct generic_data set_powered_on_privacy_adv_test = {
-+	.setup_settings = settings_powered_advertising_privacy,
-+	.send_opcode = MGMT_OP_SET_ADVERTISING,
-+	.send_param = set_adv_off_param,
-+	.send_len = sizeof(set_adv_off_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_ignore_param = true,
-+};
-+
- static const uint16_t settings_powered[] = { MGMT_OP_SET_POWERED, 0 };
+-static void powered_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static void mgmt_set_powered_complete(struct hci_dev *hdev)
+ {
+ 	struct cmd_lookup match = { NULL, hdev };
  
- static const char set_powered_off_param[] = { 0x00 };
-@@ -4356,8 +4372,6 @@ static const struct generic_data add_advertising_success_4 = {
- 	.expect_hci_len = sizeof(set_adv_data_txpwr),
- };
++	hci_dev_lock(hdev);
++
++	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
++
++	new_settings(hdev, match.sk);
++
++	hci_dev_unlock(hdev);
++
++	if (match.sk)
++		sock_put(match.sk);
++}
++
++static void powered_adv_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++{
++	BT_DBG("status 0x%02x", status);
++
++	mgmt_set_powered_complete(hdev);
++}
++
++static void powered_enable_advertising(struct hci_dev *hdev,
++				       struct hci_request *req)
++{
++	if (hci_dev_test_flag(hdev, HCI_ADVERTISING))
++		enable_advertising(req);
++	else if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
++		 hdev->cur_adv_instance)
++		schedule_adv_instance(req, hdev->cur_adv_instance,
++				      true);
++}
++
++static void powered_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++{
+ 	BT_DBG("status 0x%02x", status);
  
--static const char set_adv_off_param[] = { 0x00 };
+ 	if (!status) {
+@@ -7250,18 +7282,23 @@ static void powered_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ 
+ 		restart_le_actions(hdev);
+ 		hci_update_background_scan(hdev);
+-	}
 -
- static const struct generic_data add_advertising_success_5 = {
- 	.send_opcode = MGMT_OP_SET_ADVERTISING,
- 	.send_param = set_adv_off_param,
-@@ -5566,6 +5580,9 @@ proceed:
- 	for (cmd = test->setup_settings; *cmd; cmd++) {
- 		unsigned char simple_param[] = { 0x01 };
- 		unsigned char discov_param[] = { 0x01, 0x00, 0x00 };
-+		unsigned char privacy_param[] = { 0x01,
-+			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-+			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
- 		unsigned char *param = simple_param;
- 		size_t param_size = sizeof(simple_param);
- 		mgmt_request_func_t func = NULL;
-@@ -5584,6 +5601,11 @@ proceed:
- 			param = discov_param;
+-	hci_dev_lock(hdev);
+-
+-	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
+ 
+-	new_settings(hdev, match.sk);
++		/* In case privacy is enabled we can now try to enable
++		 * advertising as this was not done before due to SMP not
++		 * registered.
++		 */
++		if (hci_dev_test_flag(hdev, HCI_PRIVACY)) {
++			struct hci_request req;
+ 
+-	hci_dev_unlock(hdev);
++			hci_req_init(&req, hdev);
++			powered_enable_advertising(hdev, &req);
++			if (!hci_req_run(&req, powered_adv_complete)) {
++				return;
++			}
++		}
++	}
+ 
+-	if (match.sk)
+-		sock_put(match.sk);
++	mgmt_set_powered_complete(hdev);
+ }
+ 
+ static int powered_update_hci(struct hci_dev *hdev)
+@@ -7322,12 +7359,13 @@ static int powered_update_hci(struct hci_dev *hdev)
+ 			hdev->cur_adv_instance = adv_instance->instance;
  		}
  
-+		if (*cmd == MGMT_OP_SET_PRIVACY) {
-+			param_size = sizeof(privacy_param);
-+			param = privacy_param;
+-		if (hci_dev_test_flag(hdev, HCI_ADVERTISING))
+-			enable_advertising(&req);
+-		else if (hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE) &&
+-			 hdev->cur_adv_instance)
+-			schedule_adv_instance(&req, hdev->cur_adv_instance,
+-					      true);
++		/* Only enable advertising now if privacy is not enabled,
++		 * otherwise it will fail since SMP is not yet registered - in
++		 * such case advertising will be enabled later.
++		 */
++		if (!hci_dev_test_flag(hdev, HCI_PRIVACY)) {
++			powered_enable_advertising(hdev, &req);
 +		}
-+
- 		if (*cmd == MGMT_OP_SET_LE && test->setup_nobredr) {
- 			unsigned char off[] = { 0x00 };
- 			mgmt_send(data->mgmt, *cmd, data->mgmt_index,
-@@ -6075,6 +6097,9 @@ int main(int argc, char *argv[])
- 	test_bredrle("Set powered on - Invalid index",
- 				&set_powered_on_invalid_index_test,
- 				NULL, test_command_generic);
-+	test_le("Set powered on - Privacy and Advertising",
-+				&set_powered_on_privacy_adv_test,
-+				NULL, test_command_generic);
+ 	}
  
- 	test_bredrle("Set powered off - Success",
- 				&set_powered_off_success_test,
+ 	link_sec = hci_dev_test_flag(hdev, HCI_LINK_SECURITY);
 -- 
 2.6.2
 
