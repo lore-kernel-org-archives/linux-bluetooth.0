@@ -1,109 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ 1/7] android/hog: Port fixes to profiles HoG
-Date: Thu, 12 Nov 2015 17:46:22 +0200
-Message-Id: <1447343188-21628-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [PATCH] Bluetooth: Simplify request cleanup code
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1447334100-10167-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 12 Nov 2015 23:46:55 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <62E21329-5E49-4C01-83DA-61A9F1840D5E@holtmann.org>
+References: <1447334100-10167-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan,
 
-This align the 2 copies of Hog since the plan is to merge android
-version back to profiles and just reuse from there.
+> The hci_req_sync_cancel() is just as much related to the request
+> cleanup as hci_request_cancel_all() is. Just move the former into the
+> latter and do the cleanup from a single place in hci_dev_do_close().
+> The important thing is to avoid deadlocks by holding the req_sync
+> lock: previously hci_request_cancel_all was done right after releasing
+> the lock and with this patch it's right before taking it.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_core.c    | 4 +---
+> net/bluetooth/hci_request.c | 2 ++
+> 2 files changed, 3 insertions(+), 3 deletions(-)
 
-The fix for incomplete discover is modified so the reports are keep
-while attempting to discover.
----
-v2: Fix devices queue not being initialized and attioid not being unregistered,
-also adds better output when printing report details.
+patch has been applied to bluetooth-next tree.
 
- android/hog.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+Regards
 
-diff --git a/android/hog.c b/android/hog.c
-index 22f4228..3af9329 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -88,6 +88,7 @@ struct bt_hog {
- 	GSList			*reports;
- 	struct bt_uhid		*uhid;
- 	int			uhid_fd;
-+	bool			uhid_created;
- 	gboolean		has_report_id;
- 	uint16_t		bcdhid;
- 	uint8_t			bcountrycode;
-@@ -496,9 +497,23 @@ static void report_read_cb(guint8 status, const guint8 *pdu, guint16 len,
- 	report->len = len;
- }
- 
-+static int report_chrc_cmp(const void *data, const void *user_data)
-+{
-+	const struct report *report = data;
-+	const struct gatt_char *decl = user_data;
-+
-+	return report->decl->handle - decl->handle;
-+}
-+
- static struct report *report_new(struct bt_hog *hog, struct gatt_char *chr)
- {
- 	struct report *report;
-+	GSList *l;
-+
-+	/* Skip if report already exists */
-+	l = g_slist_find_custom(hog->reports, chr, report_chrc_cmp);
-+	if (l)
-+		return l->data;
- 
- 	report = g_new0(struct report, 1);
- 	report->hog = hog;
-@@ -939,6 +954,8 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 
- 	destroy_gatt_req(req);
- 
-+	DBG("HoG inspecting report map");
-+
- 	if (status != 0) {
- 		error("Report Map read failed: %s", att_ecode2str(status));
- 		return;
-@@ -1006,6 +1023,10 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	bt_uhid_register(hog->uhid, UHID_FEATURE, get_feature, hog);
- 	bt_uhid_register(hog->uhid, UHID_GET_REPORT, get_report, hog);
- 	bt_uhid_register(hog->uhid, UHID_SET_REPORT, set_report, hog);
-+
-+	hog->uhid_created = true;
-+
-+	DBG("HoG created uHID device");
- }
- 
- static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
-@@ -1084,6 +1105,8 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- 
- 	destroy_gatt_req(req);
- 
-+	DBG("HoG inspecting characteristics");
-+
- 	if (status != 0) {
- 		const char *str = att_ecode2str(status);
- 		DBG("Discover all characteristics failed: %s", str);
-@@ -1116,6 +1139,7 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- 			report = report_new(hog, chr);
- 			discover_report(hog, hog->attrib, start, end, report);
- 		} else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0) {
-+			DBG("HoG discovering report map");
- 			read_char(hog, hog->attrib, chr->value_handle,
- 						report_map_read_cb, hog);
- 			discover_external(hog, hog->attrib, start, end, hog);
-@@ -1404,7 +1428,8 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 		bt_hog_attach(instance, gatt);
- 	}
- 
--	if (hog->reports == NULL) {
-+	if (!hog->uhid_created) {
-+		DBG("HoG discovering characteristics");
- 		discover_char(hog, hog->attrib, primary->range.start,
- 						primary->range.end, NULL,
- 						char_discovered_cb, hog);
--- 
-2.4.3
+Marcel
 
