@@ -1,62 +1,40 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Simplify request cleanup code
-Date: Thu, 12 Nov 2015 15:15:00 +0200
-Message-Id: <1447334100-10167-1-git-send-email-johan.hedberg@gmail.com>
+From: Szymon Janc <ext.szymon.janc@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/log: Fix compilation error in AOSP
+Date: Thu, 12 Nov 2015 11:17:50 +0100
+Message-ID: <7348840.K5Wc2JxOWi@leonov>
+In-Reply-To: <1447265391-26817-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+References: <1447265391-26817-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andrzej,
 
-The hci_req_sync_cancel() is just as much related to the request
-cleanup as hci_request_cancel_all() is. Just move the former into the
-latter and do the cleanup from a single place in hci_dev_do_close().
-The important thing is to avoid deadlocks by holding the req_sync
-lock: previously hci_request_cancel_all was done right after releasing
-the lock and with this patch it's right before taking it.
+On Wednesday 11 of November 2015 19:09:51 Andrzej Kaczmarek wrote:
+> btd_debug() has new parameter introduced in dcfdc556.
+> ---
+>  android/log.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/log.c b/android/log.c
+> index 8013eba..35917c6 100644
+> --- a/android/log.c
+> +++ b/android/log.c
+> @@ -139,7 +139,7 @@ void error(const char *format, ...)
+>  	va_end(ap);
+>  }
+> 
+> -void btd_debug(const char *format, ...)
+> +void btd_debug(uint16_t index, const char *format, ...)
+>  {
+>  	va_list ap;
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c    | 4 +---
- net/bluetooth/hci_request.c | 2 ++
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Applied, thanks.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fb618d6bcded..63fd31d7b27a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1523,7 +1523,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 
- 	cancel_delayed_work(&hdev->power_off);
- 
--	hci_req_sync_cancel(hdev, ENODEV);
-+	hci_request_cancel_all(hdev);
- 	hci_req_sync_lock(hdev);
- 
- 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
-@@ -1625,8 +1625,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 
- 	hci_req_sync_unlock(hdev);
- 
--	hci_request_cancel_all(hdev);
--
- 	hci_dev_put(hdev);
- 	return 0;
- }
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index e8345d8106b5..76bd912be9fe 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1270,6 +1270,8 @@ void hci_request_setup(struct hci_dev *hdev)
- 
- void hci_request_cancel_all(struct hci_dev *hdev)
- {
-+	hci_req_sync_cancel(hdev, ENODEV);
-+
- 	cancel_work_sync(&hdev->discov_update);
- 	cancel_work_sync(&hdev->bg_scan_update);
- 	cancel_delayed_work_sync(&hdev->le_scan_disable);
 -- 
-2.5.0
-
+BR
+Szymon Janc
