@@ -1,34 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 13 Nov 2015 13:53:32 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix powering on with privacy and advertising
-Message-ID: <20151113115332.GA10089@t440s.lan>
-References: <1447360987-4129-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1447360987-4129-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH 3/3] tools/hcidump: Print LDAC vendor codec name
+Date: Fri, 13 Nov 2015 11:59:41 +0100
+Message-Id: <1447412381-6208-3-git-send-email-andrzej.kaczmarek@codecoup.pl>
+In-Reply-To: <1447412381-6208-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+References: <1447412381-6208-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+---
+ tools/parser/avdtp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On Thu, Nov 12, 2015, Andrzej Kaczmarek wrote:
-> In order to enable advertising with privacy enabled, SMP has to be
-> registered in order to generate new RPA. During power on, it will be
-> registered at the very end which is the reason why advertising is not
-> enabled and it's not possible to enable it anymore due to mismatch
-> between hci_dev settings and actual controller state.
-> 
-> This fixes this problem by postponing advertising enable after SMP is
-> registered in case of power on.
-> ---
->  net/bluetooth/mgmt.c | 70 ++++++++++++++++++++++++++++++++++++++++------------
->  1 file changed, 54 insertions(+), 16 deletions(-)
+diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
+index f05f329..4f53553 100644
+--- a/tools/parser/avdtp.c
++++ b/tools/parser/avdtp.c
+@@ -154,6 +154,8 @@ static char *vndcodec2str(uint32_t vendor, uint16_t vndcodec)
+ {
+ 	if (vendor == 0x0000004f && vndcodec == 0x0001)
+ 		return "aptX";
++	else if (vendor == 0x0000012d && vndcodec == 0x00aa)
++		return "LDAC";
+ 	return "Unknown";
+ }
+ 
+-- 
+2.6.2
 
-Instead of postponing advertising, did you consider simply moving
-smp_register() earlier? Wouldn't it be possible to move it to
-mgmt_powered() before powered_update_hci() is called?
-
-Johan
