@@ -1,40 +1,50 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Stephen Embree <s.embree@gmail.com>
-Date: Fri, 13 Nov 2015 09:25:28 -0500
-Message-ID: <CAMwUBEVga6d+264R7MrtDQysEdoc9N6EQJrpOFfdwMwRQ8DQDw@mail.gmail.com>
-Subject: ACL connection handle
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1447078515-14340-1-git-send-email-luiz.dentz@gmail.com>
+References: <1447078515-14340-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 13 Nov 2015 14:32:11 +0200
+Message-ID: <CABBYNZK1qHZVxfjm=9K6QvNFmUhjk23C4B=HFqso79O0MSp+zw@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ] core/device: Fix not responding to Connect
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I would like to send a command OCF_LE_READ_CHANNEL_MAP to the hci
-interface of an adapter using the hci library.  To do this, I think I
-need to open a socket connection to the hci interface of the adapter
-and obtain the ACL connection handle.  My question is, how do I obtain
-the handle?
+Hi,
 
-I try the following, but the ioctl returns -1 with error "File
-descriptor in a bad state".
+On Mon, Nov 9, 2015 at 4:15 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> If profile is removed while its connection is pending it may not respond
+> to Connect method and not cleaning up properly leaving dev->connect set
+> which will prevent any attempt to connect to the device again.
+> ---
+> v2: Keep code removing service for the list since it is no garanteed that
+> device_profile_connected will be called as it depend on the profile state.
+>
+>  src/device.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 6722976..e76b8bb 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1498,7 +1498,7 @@ static void device_profile_connected(struct btd_device *dev,
+>                 btd_device_set_temporary(dev, false);
+>
+>         if (dev->pending == NULL)
+> -               return;
+> +               goto done;
+>
+>         if (!btd_device_is_connected(dev)) {
+>                 switch (-err) {
+> --
+> 2.4.3
 
-    // find the connection handle to the specified bluetooth device
-    cr = (struct hci_conn_info_req*) malloc(
-            sizeof(struct hci_conn_info_req) +
-            sizeof(struct hci_conn_info));
-    bacpy( &cr->bdaddr, ba );
-    cr->type = ACL_LINK;
-    dd = hci_open_dev( hci_get_route( &cr->bdaddr ) );
-    if( dd < 0 ) {
-        err = dd;
-        goto cleanup;
-    }
-    err = ioctl(dd, HCIGETCONNINFO, (unsigned long) cr );
-    if( err ) {
-        // !!!This is where the program ends with "File descriptor in bad state"
-     perror("Failed to get connection info");
-     goto cleanup;
-    }
+Applied.
 
-    // build a command packet to send to the bluetooth microcontroller
-    cmd_param.handle = cr->conn_info->handle;
+
+-- 
+Luiz Augusto von Dentz
