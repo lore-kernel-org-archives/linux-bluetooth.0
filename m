@@ -1,68 +1,53 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Michael Richardson <mcr@sandelman.ca>
-To: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: LL address and IPv6 address
-In-Reply-To: <CAPpUg6P259rf9NXGpDXqNq2Qragc5Ht9ZvQCSaDGSG1vSWcbZg@mail.gmail.com>
-References: <CAPpUg6NwiRzUMEPGpZa3=Ppg3LF3N7u1=o_sA0+rp5aHt0CC9g@mail.gmail.com> <CAF4BF-TStucwTg5Kp+YAN735RNQUA+aLf1fEPRKW7uSNZXSKYw@mail.gmail.com> <CAPpUg6Pi3Z3fPsDX3EBYhfn96ZLgXxQ5TAYAr7Rk3MKHcoZqxA@mail.gmail.com> <CAPpUg6O65Uyy+rhOdqh-cKK_w-4SqPvi9Ho6AGBFD7xUq4hukw@mail.gmail.com> <20151112085333.GA3045@omega>  <CAPpUg6P259rf9NXGpDXqNq2Qragc5Ht9ZvQCSaDGSG1vSWcbZg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Fri, 13 Nov 2015 13:04:16 -0500
-Message-ID: <25991.1447437856@sandelman.ca>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <larry.finger@gmail.com>
+Sender: Larry Finger <larry.finger@gmail.com>
+From: Larry Finger <Larry.Finger@lwfinger.net>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Cc: Larry Finger <Larry.Finger@lwfinger.net>
+Subject: [PATCH] Bluetooth: btusb: Fix device recognition problems for certain Realtek units
+Date: Fri, 13 Nov 2015 08:36:02 -0600
+Message-Id: <1447425362-13417-1-git-send-email-Larry.Finger@lwfinger.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
+A few Realtek devices such as RTL8723AU and RTL8723BU have a single USB
+ID shared between the wifi and Bluetooth parts. With the current ID table
+structure, the Bluetooth part is not found during the device probe.
 
+The fix is to move the USB_VENDOR_AND_INTERFACE_INFO macro for vendor 0x0bda
+from the usb_device_id blacklist_table[] to usb_device_id btusb_table[].
 
-I hadn't realized until I was trying to communicate LL (fe80::) addresses to
-a plugfest peer that the LL addresses and layer-2 addresses are not stable.
-(no eeprom in at86af23x, most of the OpenMote/Redwire devices that Contiki
-runs on have same issue)
+Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+---
+ drivers/bluetooth/btusb.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Yes, we can set them from /etc/network/interfaces using iwpan, but I'm a bit
-not keen about this as a general solution.
-
-Now, I have some ideas about deploying (802.1AR) certificates that permit a
-node to prove it owns a particular L2 address.  Given that certificate, I
-might as well configure the l2 and short address, etc. directly from the info
-in the certificate.  This solution will suit my needs well, but probably not
-others.
-
-We do not have a kernel command line option to set the LL address, we should,
-but in the specific case of the RPI, that won't help that much, because the
-RPI doesn't use GRUB (nor uboot by default), so the cmdline is hard to
-update.  Does this matter that much; I'm not sure.  Still, I think we should
-have a non-programmatic way to do this, maybe some kind file in /etc,
-or maybe a sensible recommendation for having udev do it.
-
-I also noted that if I tried to change some things, such as panid and l2
-address that it wouldn't work until I rebooted.  Probably there was another
-sequence I could have used, but I didn't figure it out at the time.
-
-Also, as far as I know, we can't operate on more than one panid at the same
-time.  I could imagine that maybe one could create multiple lowpan on top of
-the same wpanX interface, but the panid is actually at the lower level.
-
---
-]               Never tell me the odds!                 | ipv6 mesh networks [
-]   Michael Richardson, Sandelman Software Works        | network architect  [
-]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQEVAwUBVkYmHYCLcPvd0N1lAQLFpQf6Au5I0+mV03xKidFLQ6rm7HWFDF2GvXUt
-/BeFyo7m5ygOo2WMzaesQvtYHG7J/BEiqLi6oYK4ehU68r1QLcMF6uKwRhPLDQtF
-DwddnfTzUjl+MQ1s8OhP5eGo6rCYd7eS02tToHogZT3GLNkodMDKlIF0z3Fgnoxr
-NoEkNRdhsqv5f7hvWtegRHdOlLsKxJbqKlivzj8SE+CR9QdGISCAK7n2om3Vbc0t
-1bftG/C2VYl5EmBo7gW4BBiLXdKloSCkNONygRBmq1+46gMT51Bvm4oD1wI8cjGc
-ECIsBZx5r3c61MdHrFu1738pZp59dWlDi8wSPke3wzrGlTr0/BdcRw==
-=kkCY
------END PGP SIGNATURE-----
---=-=-=--
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 92f0ee3..17233ea 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -157,6 +157,10 @@ static const struct usb_device_id btusb_table[] = {
+ 	{ USB_DEVICE(0x8087, 0x0a5a),
+ 	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
+ 
++	/* Realtek Bluetooth devices */
++	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
++	  .driver_info = BTUSB_REALTEK },
++
+ 	{ }	/* Terminating entry */
+ };
+ 
+@@ -310,10 +314,6 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+ 	  .driver_info = BTUSB_IGNORE },
+ 
+-	/* Realtek Bluetooth devices */
+-	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
+-	  .driver_info = BTUSB_REALTEK },
+-
+ 	/* Additional Realtek 8723AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
+ 	{ USB_DEVICE(0x13d3, 0x3394), .driver_info = BTUSB_REALTEK },
+-- 
+2.1.4
