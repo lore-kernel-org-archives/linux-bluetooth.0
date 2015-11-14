@@ -2,106 +2,118 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH 20/22] monitor/a2dp: Decode AAC capabilities
-Date: Sat, 14 Nov 2015 14:44:37 +0100
-Message-Id: <1447508679-21798-21-git-send-email-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH 21/22] monitor/a2dp: Decode aptX capabilities
+Date: Sat, 14 Nov 2015 14:44:38 +0100
+Message-Id: <1447508679-21798-22-git-send-email-andrzej.kaczmarek@codecoup.pl>
 In-Reply-To: <1447508679-21798-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 References: <1447508679-21798-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- monitor/a2dp.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+ monitor/a2dp.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
 
 diff --git a/monitor/a2dp.c b/monitor/a2dp.c
-index 10eca42..b6b01ee 100644
+index b6b01ee..ab93097 100644
 --- a/monitor/a2dp.c
 +++ b/monitor/a2dp.c
-@@ -132,6 +132,40 @@ static const struct bit_desc mpeg12_bitrate_table[] = {
+@@ -47,6 +47,10 @@
+ #define A2DP_CODEC_ATRAC	0x04
+ #define A2DP_CODEC_VENDOR	0xff
+ 
++/* Vendor Specific A2DP Codecs */
++#define APTX_VENDOR_ID		0x0000004f
++#define APTX_CODEC_ID		0x0001
++
+ struct bit_desc {
+ 	uint8_t bit;
+ 	const char *str;
+@@ -166,6 +170,20 @@ static const struct bit_desc aac_channels_table[] = {
  	{ }
  };
  
-+static const struct bit_desc aac_object_type_table[] = {
-+	{  7, "MPEG-2 AAC LC" },
-+	{  6, "MPEG-4 AAC LC" },
-+	{  5, "MPEG-4 AAC LTP" },
-+	{  4, "MPEG-4 AAC scalable" },
-+	{  3, "RFA (b3)" },
-+	{  2, "RFA (b2)" },
-+	{  1, "RFA (b1)" },
-+	{  0, "RFA (b0)" },
++static const struct bit_desc aptx_frequency_table[] = {
++	{  7, "16000" },
++	{  6, "32000" },
++	{  5, "44100" },
++	{  4, "48000" },
 +	{ }
 +};
 +
-+static const struct bit_desc aac_frequency_table[] = {
-+	{ 15, "8000" },
-+	{ 14, "11025" },
-+	{ 13, "12000" },
-+	{ 12, "16000" },
-+	{ 11, "22050" },
-+	{ 10, "24000" },
-+	{  9, "32000" },
-+	{  8, "44100" },
-+	{  7, "48000" },
-+	{  6, "64000" },
-+	{  5, "88200" },
-+	{  4, "96000" },
-+	{ }
-+};
-+
-+static const struct bit_desc aac_channels_table[] = {
-+	{  3, "1" },
-+	{  2, "2" },
++static const struct bit_desc aptx_channel_mode_table[] = {
++	{  0, "Mono" },
++	{  1, "Stereo" },
 +	{ }
 +};
 +
  static void print_bit_table(uint8_t indent, uint32_t value,
  						const struct bit_desc *table)
  {
-@@ -229,6 +263,49 @@ static bool codec_mpeg12(uint8_t losc, struct l2cap_frame *frame)
+@@ -177,6 +195,14 @@ static void print_bit_table(uint8_t indent, uint32_t value,
+ 	}
+ }
+ 
++static const char *vndcodec2str(uint32_t vendor_id, uint16_t codec_id)
++{
++	if (vendor_id == APTX_VENDOR_ID && codec_id == APTX_CODEC_ID)
++		return "aptX";
++
++	return "Unknown";
++}
++
+ static bool codec_sbc(uint8_t losc, struct l2cap_frame *frame)
+ {
+ 	uint8_t cap = 0;
+@@ -306,6 +332,55 @@ static bool codec_aac(uint8_t losc, struct l2cap_frame *frame)
  	return true;
  }
  
-+static bool codec_aac(uint8_t losc, struct l2cap_frame *frame)
++static bool codec_vendor_aptx(uint8_t losc, struct l2cap_frame *frame)
 +{
-+	uint16_t cap = 0;
-+	uint8_t type;
-+	uint16_t freq;
-+	uint8_t chan;
-+	uint32_t bitrate;
-+	bool vbr;
++	uint8_t cap = 0;
 +
-+	if (losc != 6)
++	if (losc != 1)
 +		return false;
 +
-+	l2cap_frame_get_be16(frame, &cap);
++	l2cap_frame_get_u8(frame, &cap);
 +
-+	type = cap >> 8;
-+	freq = cap << 8;
++	print_field("%*cFrequency: 0x%02x", BASE_INDENT + 2, ' ', cap & 0xf0);
++	print_bit_table(BASE_INDENT + 2, cap & 0xf0, aptx_frequency_table);
 +
-+	l2cap_frame_get_be16(frame, &cap);
++	print_field("%*cChannel Mode: 0x%02x", BASE_INDENT + 2, ' ',
++								cap & 0x0f);
++	print_bit_table(BASE_INDENT + 2, cap & 0x0f, aptx_channel_mode_table);
 +
-+	freq |= (cap >> 8) & 0xf0;
-+	chan = (cap >> 8) & 0x0c;
-+	bitrate = (cap << 16) & 0x7f0000;
-+	vbr = cap & 0x0080;
++	return true;
++}
 +
-+	l2cap_frame_get_be16(frame, &cap);
++static bool codec_vendor(uint8_t losc, struct l2cap_frame *frame)
++{
++	uint32_t vendor_id = 0;
++	uint16_t codec_id = 0;
 +
-+	bitrate |= cap;
++	if (losc < 6)
++		return false;
 +
-+	print_field("%*cObject Type: 0x%02x", BASE_INDENT, ' ', type);
-+	print_bit_table(BASE_INDENT, type, aac_object_type_table);
++	l2cap_frame_get_le32(frame, &vendor_id);
++	l2cap_frame_get_le16(frame, &codec_id);
 +
-+	print_field("%*cFrequency: 0x%02x", BASE_INDENT, ' ', freq);
-+	print_bit_table(BASE_INDENT, freq, aac_frequency_table);
++	losc -= 6;
 +
-+	print_field("%*cChannels: 0x%02x", BASE_INDENT, ' ', chan);
-+	print_bit_table(BASE_INDENT, chan, aac_channels_table);
++	print_field("%*cVendor ID: 0x%08x (%s)", BASE_INDENT, ' ', vendor_id,
++						bt_compidtostr(vendor_id));
 +
-+	print_field("%*cBitrate: %ubps", BASE_INDENT, ' ', bitrate);
-+	print_field("%*cVBR: %s", BASE_INDENT, ' ', vbr ? "Yes" : "No");
++	print_field("%*cVendor Specific Codec ID: 0x%04x (%s)",
++					BASE_INDENT, ' ', codec_id,
++					vndcodec2str(vendor_id, codec_id));
++
++	if (vendor_id == APTX_VENDOR_ID && codec_id == APTX_CODEC_ID) {
++		codec_vendor_aptx(losc, frame);
++	} else {
++		packet_hexdump(frame->data, losc);
++		l2cap_frame_pull(frame, frame, losc);
++	}
 +
 +	return true;
 +}
@@ -109,12 +121,12 @@ index 10eca42..b6b01ee 100644
  bool a2dp_codec_caps(uint8_t codec, uint8_t losc, struct l2cap_frame *frame)
  {
  	switch (codec) {
-@@ -236,6 +313,8 @@ bool a2dp_codec_caps(uint8_t codec, uint8_t losc, struct l2cap_frame *frame)
- 		return codec_sbc(losc, frame);
- 	case A2DP_CODEC_MPEG12:
+@@ -315,6 +390,8 @@ bool a2dp_codec_caps(uint8_t codec, uint8_t losc, struct l2cap_frame *frame)
  		return codec_mpeg12(losc, frame);
-+	case A2DP_CODEC_MPEG24:
-+		return codec_aac(losc, frame);
+ 	case A2DP_CODEC_MPEG24:
+ 		return codec_aac(losc, frame);
++	case A2DP_CODEC_VENDOR:
++		return codec_vendor(losc, frame);
  	default:
  		packet_hexdump(frame->data, losc);
  		l2cap_frame_pull(frame, frame, losc);
