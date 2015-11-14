@@ -2,90 +2,122 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH 17/22] monitor/avdtp: Decode basic Content Protection capabilities
-Date: Sat, 14 Nov 2015 14:44:34 +0100
-Message-Id: <1447508679-21798-18-git-send-email-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH 20/22] monitor/a2dp: Decode AAC capabilities
+Date: Sat, 14 Nov 2015 14:44:37 +0100
+Message-Id: <1447508679-21798-21-git-send-email-andrzej.kaczmarek@codecoup.pl>
 In-Reply-To: <1447508679-21798-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 References: <1447508679-21798-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- monitor/avdtp.c | 40 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 39 insertions(+), 1 deletion(-)
+ monitor/a2dp.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
-diff --git a/monitor/avdtp.c b/monitor/avdtp.c
-index 003134f..e216a1b 100644
---- a/monitor/avdtp.c
-+++ b/monitor/avdtp.c
-@@ -192,6 +192,18 @@ static const char *mediacodec2str(uint8_t codec)
- 	}
- }
+diff --git a/monitor/a2dp.c b/monitor/a2dp.c
+index 10eca42..b6b01ee 100644
+--- a/monitor/a2dp.c
++++ b/monitor/a2dp.c
+@@ -132,6 +132,40 @@ static const struct bit_desc mpeg12_bitrate_table[] = {
+ 	{ }
+ };
  
-+static const char *cptype2str(uint8_t cp)
-+{
-+	switch (cp) {
-+	case 0x0001:
-+		return "DTCP";
-+	case 0x0002:
-+		return "SCMS-T";
-+	default:
-+		return "Reserved";
-+	}
-+}
++static const struct bit_desc aac_object_type_table[] = {
++	{  7, "MPEG-2 AAC LC" },
++	{  6, "MPEG-4 AAC LC" },
++	{  5, "MPEG-4 AAC LTP" },
++	{  4, "MPEG-4 AAC scalable" },
++	{  3, "RFA (b3)" },
++	{  2, "RFA (b2)" },
++	{  1, "RFA (b1)" },
++	{  0, "RFA (b0)" },
++	{ }
++};
 +
- static const char *servicecat2str(uint8_t service_cat)
++static const struct bit_desc aac_frequency_table[] = {
++	{ 15, "8000" },
++	{ 14, "11025" },
++	{ 13, "12000" },
++	{ 12, "16000" },
++	{ 11, "22050" },
++	{ 10, "24000" },
++	{  9, "32000" },
++	{  8, "44100" },
++	{  7, "48000" },
++	{  6, "64000" },
++	{  5, "88200" },
++	{  4, "96000" },
++	{ }
++};
++
++static const struct bit_desc aac_channels_table[] = {
++	{  3, "1" },
++	{  2, "2" },
++	{ }
++};
++
+ static void print_bit_table(uint8_t indent, uint32_t value,
+ 						const struct bit_desc *table)
  {
- 	switch (service_cat) {
-@@ -229,6 +241,29 @@ static bool avdtp_reject_common(struct avdtp_frame *avdtp_frame)
+@@ -229,6 +263,49 @@ static bool codec_mpeg12(uint8_t losc, struct l2cap_frame *frame)
  	return true;
  }
  
-+static bool service_content_protection(struct avdtp_frame *avdtp_frame,
-+								uint8_t losc)
++static bool codec_aac(uint8_t losc, struct l2cap_frame *frame)
 +{
-+	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-+	uint16_t type = 0;
++	uint16_t cap = 0;
++	uint8_t type;
++	uint16_t freq;
++	uint8_t chan;
++	uint32_t bitrate;
++	bool vbr;
 +
-+	if (losc < 2)
++	if (losc != 6)
 +		return false;
 +
-+	if (!l2cap_frame_get_le16(frame, &type))
-+		return false;
++	l2cap_frame_get_be16(frame, &cap);
 +
-+	losc -= 2;
++	type = cap >> 8;
++	freq = cap << 8;
 +
-+	print_field("%*cContent Protection Type: %s", 2, ' ', cptype2str(type));
++	l2cap_frame_get_be16(frame, &cap);
 +
-+	/* TODO: decode protection specific information */
++	freq |= (cap >> 8) & 0xf0;
++	chan = (cap >> 8) & 0x0c;
++	bitrate = (cap << 16) & 0x7f0000;
++	vbr = cap & 0x0080;
 +
-+	l2cap_frame_pull(frame, frame, losc);
++	l2cap_frame_get_be16(frame, &cap);
++
++	bitrate |= cap;
++
++	print_field("%*cObject Type: 0x%02x", BASE_INDENT, ' ', type);
++	print_bit_table(BASE_INDENT, type, aac_object_type_table);
++
++	print_field("%*cFrequency: 0x%02x", BASE_INDENT, ' ', freq);
++	print_bit_table(BASE_INDENT, freq, aac_frequency_table);
++
++	print_field("%*cChannels: 0x%02x", BASE_INDENT, ' ', chan);
++	print_bit_table(BASE_INDENT, chan, aac_channels_table);
++
++	print_field("%*cBitrate: %ubps", BASE_INDENT, ' ', bitrate);
++	print_field("%*cVBR: %s", BASE_INDENT, ' ', vbr ? "Yes" : "No");
 +
 +	return true;
 +}
 +
- static bool service_media_codec(struct avdtp_frame *avdtp_frame, uint8_t losc)
+ bool a2dp_codec_caps(uint8_t codec, uint8_t losc, struct l2cap_frame *frame)
  {
- 	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-@@ -278,6 +313,10 @@ static bool decode_capabilities(struct avdtp_frame *avdtp_frame)
- 			return false;
- 
- 		switch (service_cat) {
-+		case AVDTP_CONTENT_PROTECTION:
-+			if (!service_content_protection(avdtp_frame, losc))
-+				return false;
-+			break;
- 		case AVDTP_MEDIA_CODEC:
- 			if (!service_media_codec(avdtp_frame, losc))
- 				return false;
-@@ -285,7 +324,6 @@ static bool decode_capabilities(struct avdtp_frame *avdtp_frame)
- 		case AVDTP_MEDIA_TRANSPORT:
- 		case AVDTP_REPORTING:
- 		case AVDTP_RECOVERY:
--		case AVDTP_CONTENT_PROTECTION:
- 		case AVDTP_HEADER_COMPRESSION:
- 		case AVDTP_MULTIPLEXING:
- 		case AVDTP_DELAY_REPORTING:
+ 	switch (codec) {
+@@ -236,6 +313,8 @@ bool a2dp_codec_caps(uint8_t codec, uint8_t losc, struct l2cap_frame *frame)
+ 		return codec_sbc(losc, frame);
+ 	case A2DP_CODEC_MPEG12:
+ 		return codec_mpeg12(losc, frame);
++	case A2DP_CODEC_MPEG24:
++		return codec_aac(losc, frame);
+ 	default:
+ 		packet_hexdump(frame->data, losc);
+ 		l2cap_frame_pull(frame, frame, losc);
 -- 
 2.6.2
 
