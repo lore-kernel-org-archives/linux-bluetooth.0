@@ -2,98 +2,115 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH 03/22] monitor/avdtp: Decode AVDTP_DISCOVER
-Date: Sat, 14 Nov 2015 14:44:20 +0100
-Message-Id: <1447508679-21798-4-git-send-email-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH 04/22] monitor/avdtp: Decode AVDTP_GET_CAPABILITIES
+Date: Sat, 14 Nov 2015 14:44:21 +0100
+Message-Id: <1447508679-21798-5-git-send-email-andrzej.kaczmarek@codecoup.pl>
 In-Reply-To: <1447508679-21798-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 References: <1447508679-21798-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- monitor/avdtp.c | 133 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 131 insertions(+), 2 deletions(-)
+ monitor/avdtp.c | 92 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
 
 diff --git a/monitor/avdtp.c b/monitor/avdtp.c
-index 209bbab..f851107 100644
+index f851107..cae704a 100644
 --- a/monitor/avdtp.c
 +++ b/monitor/avdtp.c
-@@ -108,6 +108,114 @@ static const char *sigid2str(uint8_t sigid)
+@@ -53,6 +53,16 @@
+ #define AVDTP_GET_ALL_CAPABILITIES	0x0c
+ #define AVDTP_DELAYREPORT		0x0d
+ 
++/* Service Categories */
++#define AVDTP_MEDIA_TRANSPORT		0x01
++#define AVDTP_REPORTING			0x02
++#define AVDTP_RECOVERY			0x03
++#define AVDTP_CONTENT_PROTECTION	0x04
++#define AVDTP_HEADER_COMPRESSION	0x05
++#define AVDTP_MULTIPLEXING		0x06
++#define AVDTP_MEDIA_CODEC		0x07
++#define AVDTP_DELAY_REPORTING		0x08
++
+ struct avdtp_frame {
+ 	uint8_t hdr;
+ 	struct l2cap_frame l2cap_frame;
+@@ -164,6 +174,30 @@ static const char *mediatype2str(uint8_t media_type)
  	}
  }
  
-+static const char *error2str(uint8_t error)
++static const char *servicecat2str(uint8_t service_cat)
 +{
-+	switch (error) {
-+	case 0x01:
-+		return "BAD_HEADER_FORMAT";
-+	case 0x11:
-+		return "BAD_LENGTH";
-+	case 0x12:
-+		return "BAD_ACP_SEID";
-+	case 0x13:
-+		return "SEP_IN_USE";
-+	case 0x14:
-+		return "SEP_NOT_IN_USER";
-+	case 0x17:
-+		return "BAD_SERV_CATEGORY";
-+	case 0x18:
-+		return "BAD_PAYLOAD_FORMAT";
-+	case 0x19:
-+		return "NOT_SUPPORTED_COMMAND";
-+	case 0x1a:
-+		return "INVALID_CAPABILITIES";
-+	case 0x22:
-+		return "BAD_RECOVERY_TYPE";
-+	case 0x23:
-+		return "BAD_MEDIA_TRANSPORT_FORMAT";
-+	case 0x25:
-+		return "BAD_RECOVERY_FORMAT";
-+	case 0x26:
-+		return "BAD_ROHC_FORMAT";
-+	case 0x27:
-+		return "BAD_CP_FORMAT";
-+	case 0x28:
-+		return "BAD_MULTIPLEXING_FORMAT";
-+	case 0x29:
-+		return "UNSUPPORTED_CONFIGURATION";
-+	case 0x31:
-+		return "BAD_STATE";
++	switch (service_cat) {
++	case AVDTP_MEDIA_TRANSPORT:
++		return "Media Transport";
++	case AVDTP_REPORTING:
++		return "Reporting";
++	case AVDTP_RECOVERY:
++		return "Recovery";
++	case AVDTP_CONTENT_PROTECTION:
++		return "Content Protection";
++	case AVDTP_HEADER_COMPRESSION:
++		return "Header Compression";
++	case AVDTP_MULTIPLEXING:
++		return "Multiplexing";
++	case AVDTP_MEDIA_CODEC:
++		return "Media Codec";
++	case AVDTP_DELAY_REPORTING:
++		return "Delay Reporting";
 +	default:
-+		return "Unknown";
++		return "Reserved";
 +	}
 +}
 +
-+static const char *mediatype2str(uint8_t media_type)
-+{
-+	switch (media_type) {
-+	case 0x00:
-+		return "Audio";
-+	case 0x01:
-+		return "Video";
-+	case 0x02:
-+		return "Multimedia";
-+	default:
-+		return "Reserver";
-+	}
-+}
-+
-+static bool avdtp_reject_common(struct avdtp_frame *avdtp_frame)
+ static bool avdtp_reject_common(struct avdtp_frame *avdtp_frame)
+ {
+ 	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
+@@ -177,6 +211,36 @@ static bool avdtp_reject_common(struct avdtp_frame *avdtp_frame)
+ 	return true;
+ }
+ 
++static bool decode_capabilities(struct avdtp_frame *avdtp_frame)
 +{
 +	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-+	uint8_t error;
 +
-+	if (!l2cap_frame_get_u8(frame, &error))
-+		return false;
++	for (;;) {
++		uint8_t service_cat;
++		uint8_t losc;
 +
-+	print_field("Error code: %s (0x%02x)", error2str(error), error);
++		if (!l2cap_frame_get_u8(frame, &service_cat))
++			break;
++
++		if (!l2cap_frame_get_u8(frame, &losc))
++			return false;
++
++		print_field("Service Category: %s",
++						servicecat2str(service_cat));
++
++		if (frame->size < losc)
++			return false;
++
++		/* TODO: decode service capabilities */
++
++		packet_hexdump(frame->data, losc);
++
++		l2cap_frame_pull(frame, frame, losc);
++	}
 +
 +	return true;
 +}
 +
-+static bool avdtp_discover(struct avdtp_frame *avdtp_frame)
+ static bool avdtp_discover(struct avdtp_frame *avdtp_frame)
+ {
+ 	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
+@@ -216,6 +280,31 @@ response:
+ 	return true;
+ }
+ 
++static bool avdtp_get_capabilities(struct avdtp_frame *avdtp_frame)
 +{
 +	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
++	uint8_t seid;
 +
 +	if (avdtp_frame->hdr & 0x01)
 +		goto reject;
@@ -101,77 +118,33 @@ index 209bbab..f851107 100644
 +	if (avdtp_frame->hdr & 0x02)
 +		goto response;
 +
-+	/* no extra parameters */
++	if (!l2cap_frame_get_u8(frame, &seid))
++		return false;
++
++	print_field("ACP SEID: %d", seid >> 2);
++
 +	return true;
 +
 +reject:
 +	return avdtp_reject_common(avdtp_frame);
 +
 +response:
-+	for (;;) {
-+		uint8_t seid;
-+		uint8_t info;
-+
-+		if (!l2cap_frame_get_u8(frame, &seid))
-+			break;
-+
-+		if (!l2cap_frame_get_u8(frame, &info))
-+			return false;
-+
-+		print_field("ACP SEID %d", seid >> 2);
-+		print_field("%*cMedia Type: %s", 2, ' ',
-+						mediatype2str(info >> 4));
-+		print_field("%*cSEP Type: %s", 2, ' ',
-+						info & 0x04 ? "SNK" : "SRC");
-+		print_field("%*cIn use: %s", 2, ' ',
-+						seid & 0x02 ? "Yes" : "No");
-+	}
-+
-+	return true;
++	return decode_capabilities(avdtp_frame);
 +}
 +
  static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
  {
  	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-@@ -115,6 +223,7 @@ static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
- 	uint8_t hdr;
- 	uint8_t nosp = 0;
- 	uint8_t sigid;
-+	bool ret;
- 
- 	if (frame->in)
- 		pdu_color = COLOR_MAGENTA;
-@@ -149,8 +258,28 @@ static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
- 				sigid, msgtype2str(hdr & 0x03),
- 				hdr & 0x0c, hdr >> 4, nosp);
- 
--	packet_hexdump(frame->data, frame->size);
--	return true;
-+	/* Start Packet */
-+	if ((hdr & 0x0c) == 0x04) {
-+		/* TODO: handle fragmentation */
-+		packet_hexdump(frame->data, frame->size);
-+		return true;
-+	}
-+
-+	/* General Reject */
-+	if ((hdr & 0x03) == 0x03)
-+		return true;
-+
-+	switch (sigid) {
-+	case AVDTP_DISCOVER:
-+		ret = avdtp_discover(avdtp_frame);
+@@ -273,6 +362,9 @@ static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
+ 	case AVDTP_DISCOVER:
+ 		ret = avdtp_discover(avdtp_frame);
+ 		break;
++	case AVDTP_GET_CAPABILITIES:
++		ret = avdtp_get_capabilities(avdtp_frame);
 +		break;
-+	default:
-+		packet_hexdump(frame->data, frame->size);
-+		ret = true;
-+		break;
-+	}
-+
-+	return ret;
- }
- 
- void avdtp_packet(const struct l2cap_frame *frame)
+ 	default:
+ 		packet_hexdump(frame->data, frame->size);
+ 		ret = true;
 -- 
 2.6.2
 
