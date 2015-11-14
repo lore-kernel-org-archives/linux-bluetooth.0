@@ -2,148 +2,47 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH 00/22] Add AVDTP/A2DP decoding to btmon
-Date: Sat, 14 Nov 2015 14:44:17 +0100
-Message-Id: <1447508679-21798-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH v2] monitor/rfcomm: Fix names formatting
+Date: Sat, 14 Nov 2015 14:35:06 +0100
+Message-Id: <1447508106-16965-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ monitor/rfcomm.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Here's series of patches which adds decoding of AVDTP signalling channel
-and A2DP codec capabilities information. Few things are missing:
-- no fragmentation support
-- some rarely used capabilities are not decoded
-- ATRAC capabilities are not decoded
-
-Other that above, pretty much everything should be decoded.
-
-And some sample output from decoder:
-
-< ACL Data TX: Handle 256 flags 0x00 dlen 6
-      Channel: 1602 len 2 [PSM 25 mode 0] {chan 2}
-      AVDTP: Discover (0x01) Command: type 0x00 label 6 nosp 0
-> ACL Data RX: Handle 256 flags 0x02 dlen 14
-      Channel: 66 len 10 [PSM 25 mode 0] {chan 2}
-      AVDTP: Discover (0x01) Response Accept: type 0x00 label 6 nosp 0
-        ACP SEID 1
-          Media Type: Audio
-          SEP Type: SRC
-          In use: No
-        ACP SEID 5
-          Media Type: Audio
-          SEP Type: SRC
-          In use: No
-        ACP SEID 3
-          Media Type: Audio
-          SEP Type: SRC
-          In use: No
-        ACP SEID 2
-          Media Type: Audio
-          SEP Type: SRC
-          In use: No
-
-
-< ACL Data TX: Handle 256 flags 0x00 dlen 7
-      Channel: 1602 len 3 [PSM 25 mode 0] {chan 2}
-      AVDTP: Get Capabilities (0x02) Command: type 0x00 label 9 nosp 0
-        ACP SEID: 3
-> ACL Data RX: Handle 256 flags 0x02 dlen 23
-      Channel: 66 len 19 [PSM 25 mode 0] {chan 2}
-      AVDTP: Get Capabilities (0x02) Response Accept: type 0x00 label 9 nosp 0
-        Service Category: Media Transport
-        Service Category: Media Codec
-          Media Type: Audio
-          Media Codec: Non-A2DP
-            Vendor ID: 0x0000004f (APT Licensing Ltd.)
-            Vendor Specific Codec ID: 0x0001 (aptX)
-              Frequency: 0x30
-                44100
-                48000
-              Channel Mode: 0x02
-                Stereo
-        Service Category: Content Protection
-          Content Protection Type: SCMS-T
-
-
-< ACL Data TX: Handle 256 flags 0x00 dlen 18
-      Channel: 1602 len 14 [PSM 25 mode 0] {chan 2}
-      AVDTP: Set Configuration (0x03) Command: type 0x00 label 11 nosp 0
-        ACP SEID: 1
-        INT SEID: 1
-        Service Category: Media Transport
-        Service Category: Media Codec
-          Media Type: Audio
-          Media Codec: SBC
-            Frequency: 0x20
-              44100
-            Channel Mode: 0x01
-              Joint Channel
-            Block Length: 0x10
-              16
-            Subbands: 0x04
-              8
-            Allocation Method: 0x01
-              Loudness
-            Minimum Bitpool: 2
-            Maximum Bitpool: 53
-> ACL Data RX: Handle 256 flags 0x02 dlen 6
-      Channel: 66 len 2 [PSM 25 mode 0] {chan 2}
-      AVDTP: Set Configuration (0x03) Response Accept: type 0x00 label 11 nosp 0
-
-> ACL Data RX: Handle 256 flags 0x02 dlen 6
-      Channel: 66 len 2 [PSM 25 mode 0] {chan 2}
-      AVDTP: Open (0x06) Response Accept: type 0x00 label 12 nosp 0
-
-
-< ACL Data TX: Handle 256 flags 0x00 dlen 7
-      Channel: 1602 len 3 [PSM 25 mode 0] {chan 2}
-      AVDTP: Start (0x07) Command: type 0x00 label 13 nosp 0
-        ACP SEID: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 6
-      Channel: 66 len 2 [PSM 25 mode 0] {chan 2}
-      AVDTP: Start (0x07) Response Accept: type 0x00 label 13 nosp 0
-
-
-
-Andrzej Kaczmarek (22):
-  monitor/l2cap: Add channel sequence number
-  monitor/avdtp: Add basic decoding of AVDTP signalling
-  monitor/avdtp: Decode AVDTP_DISCOVER
-  monitor/avdtp: Decode AVDTP_GET_CAPABILITIES
-  monitor/avdtp: Decode AVDTP_SET_CONFIGURATION
-  monitor/avdtp: Decode AVDTP_GET_CONFIGURATION
-  monitor/avdtp: Decode AVDTP_RECONFIGURE
-  monitor/avdtp: Decode AVDTP_OPEN
-  monitor/avdtp: Decode AVDTP_START
-  monitor/avdtp: Decode AVDTP_CLOSE
-  monitor/avdtp: Decode AVDTP_SUSPEND
-  monitor/avdtp: Decode AVDTP_ABORT
-  monitor/avdtp: Decode AVDTP_SECURITY_CONTROL
-  monitor/avdtp: Decode AVDTP_GET_ALL_CAPABILITIES
-  monitor/avdtp: Decode AVDTP_DELAYREPORT
-  monitor/avdtp: Decode basic Media Codec capabilities
-  monitor/avdtp: Decode basic Content Protection capabilities
-  monitor/a2dp: Decode SBC capabilities
-  monitor/a2dp: Decode MPEG-1,2 capabilities
-  monitor/a2dp: Decode AAC capabilities
-  monitor/a2dp: Decode aptX capabilities
-  monitor/a2dp: Decode LDAC capabilities
-
- Makefile.tools     |   2 +
- android/Android.mk |   2 +
- monitor/a2dp.c     | 420 +++++++++++++++++++++++++++
- monitor/a2dp.h     |  24 ++
- monitor/avdtp.c    | 819 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- monitor/avdtp.h    |  24 ++
- monitor/l2cap.c    |  48 +++-
- monitor/l2cap.h    |   1 +
- 8 files changed, 1327 insertions(+), 13 deletions(-)
- create mode 100644 monitor/a2dp.c
- create mode 100644 monitor/a2dp.h
- create mode 100644 monitor/avdtp.c
- create mode 100644 monitor/avdtp.h
-
+diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+index bdf4000..b32ad40 100644
+--- a/monitor/rfcomm.c
++++ b/monitor/rfcomm.c
+@@ -367,7 +367,7 @@ static inline bool mcc_frame(struct rfcomm_frame *rfcomm_frame, uint8_t indent)
+ 	else
+ 		type_str = "Unknown";
+ 
+-	print_field("%*cMCC Message type: %s %s(0x%2.2x)", indent, ' ',
++	print_field("%*cMCC Message type: %s %s (0x%2.2x)", indent, ' ',
+ 				type_str, CR_STR(mcc.type), type);
+ 
+ 	print_field("%*cLength: %d", indent+2, ' ', mcc.length);
+@@ -421,7 +421,7 @@ struct rfcomm_data {
+ };
+ 
+ static const struct rfcomm_data rfcomm_table[] = {
+-	{ 0x2f, "Set Async Balance Mode (SABM) " },
++	{ 0x2f, "Set Async Balance Mode (SABM)" },
+ 	{ 0x63, "Unnumbered Ack (UA)" },
+ 	{ 0x0f, "Disconnect Mode (DM)" },
+ 	{ 0x43, "Disconnect (DISC)" },
+@@ -493,7 +493,7 @@ void rfcomm_packet(const struct l2cap_frame *frame)
+ 	}
+ 
+ 	print_indent(6, frame_color, "RFCOMM: ", frame_str, COLOR_OFF,
+-						"(0x%2.2x)", ctype);
++						" (0x%2.2x)", ctype);
+ 
+ 	rfcomm_frame.hdr = hdr;
+ 	print_rfcomm_hdr(&rfcomm_frame, indent);
 -- 
 2.6.2
 
