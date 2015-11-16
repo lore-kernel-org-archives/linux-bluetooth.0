@@ -1,32 +1,50 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
-	<lukasz.rymanowski@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
-	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH 1/2] doc/adapter-api: Use correct signal name
-Date: Mon, 16 Nov 2015 21:58:12 +0100
-Message-Id: <1447707493-9342-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Subject: Re: LL address and IPv6 address
+To: Alexander Aring <alex.aring@gmail.com>,
+	Michael Richardson <mcr@sandelman.ca>
+References: <CAPpUg6NwiRzUMEPGpZa3=Ppg3LF3N7u1=o_sA0+rp5aHt0CC9g@mail.gmail.com>
+ <CAF4BF-TStucwTg5Kp+YAN735RNQUA+aLf1fEPRKW7uSNZXSKYw@mail.gmail.com>
+ <CAPpUg6Pi3Z3fPsDX3EBYhfn96ZLgXxQ5TAYAr7Rk3MKHcoZqxA@mail.gmail.com>
+ <CAPpUg6O65Uyy+rhOdqh-cKK_w-4SqPvi9Ho6AGBFD7xUq4hukw@mail.gmail.com>
+ <20151112085333.GA3045@omega>
+ <CAPpUg6P259rf9NXGpDXqNq2Qragc5Ht9ZvQCSaDGSG1vSWcbZg@mail.gmail.com>
+ <25991.1447437856@sandelman.ca> <20151114103526.GB1652@omega>
+ <5649EC63.5000508@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <5649F21D.4090008@osg.samsung.com>
+Date: Mon, 16 Nov 2015 16:11:25 +0100
+MIME-Version: 1.0
+In-Reply-To: <5649EC63.5000508@osg.samsung.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/adapter-api.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hello.
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index cf7169f..284214e 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -167,7 +167,7 @@ Properties	string Address [readonly]
- 			value will fail.
- 
- 			When changing the Powered property the new state of
--			this property will be updated via a PropertyChanged
-+			this property will be updated via a PropertiesChanged
- 			signal.
- 
- 			For any new adapter this settings defaults to false.
--- 
-2.5.0
+On 16/11/15 15:46, Stefan Schmidt wrote:
+>
+> There is at least one 802.15.4 IP block out there that markets the 
+> support for dual PAN ID.
+>
+> http://www.freescale.com/products/arm-processors/kinetis-cortex-m/w-series/kinetis-kw2x-2.4-ghz-rf-analog-mixed-signal-ieee-802.15.4-low-power-microcontrollers-mcus:KW2x 
+>
+>
+> So far this is only inside a wireless mcu combination and thus 
+> unrealted to us but maybe the IP block will be used in some other 
+> hardware later.
+>
+> What I don't know is how this functionality is exposed by the 
+> hardware. Would it only have a few extra regs needed for the dual PAN 
+> setup or two full register sets? Would it have different regs for the 
+> two sets of address filters? Allowing to have the two PANs on 
+> different channels or only on one?
+
+I just browsed to the data sheat to understand what they will provide 
+and it boils down to regs for channel, short address, extended address, 
+PAN ID and coordinator bit. A timer can be configured by software and/or 
+driven by the hardware directly as to when switch between these two.
+
+regards
+Stefan Schmidt
 
