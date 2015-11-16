@@ -4,34 +4,47 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH 0/4] shared/gatt: Couple fixes and improvements
-Date: Mon, 16 Nov 2015 22:08:28 +0100
-Message-Id: <1447708112-12695-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH 2/2] test/test-discovery: Remove dead code
+Date: Mon, 16 Nov 2015 21:58:13 +0100
+Message-Id: <1447707493-9342-2-git-send-email-lukasz.rymanowski@codecoup.pl>
+In-Reply-To: <1447707493-9342-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+References: <1447707493-9342-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've back to work on making Android gatt to make use of shared/gatt.
-Here is couple of fixes I've done to shared code when doing this work.
+PropertyChanged is left over from BlueZ 4.x now it is PropertiesChanged.
+However in this test it does not make sense to register for this signal
+as StopDiscovery is never called from this test.
+---
+ test/test-discovery | 8 --------
+ 1 file changed, 8 deletions(-)
 
-Android gatt still needs testing but will be available sooner or later :) 
-
-Łukasz Rymanowski (4):
-  shared/gatt-server: Fix exit on error during execute write
-  shared/gatt-client: Add notify type to notification callback
-  shared/gatt-server: Improve long write session handling
-  shared/gatt-server: Cancel remaining write exec on error in the middle
-
- profiles/scanparam/scan.c |   5 ++-
- src/gatt-client.c         |   4 +-
- src/shared/gatt-client.c  |  13 ++++--
- src/shared/gatt-client.h  |  13 ++++--
- src/shared/gatt-server.c  | 101 +++++++++++++++++++++++++++++++++++++++++++---
- tools/btgatt-client.c     |   2 +-
- unit/test-gatt.c          |  10 +++--
- 7 files changed, 127 insertions(+), 21 deletions(-)
-
+diff --git a/test/test-discovery b/test/test-discovery
+index 73b8161..9a2c6b9 100755
+--- a/test/test-discovery
++++ b/test/test-discovery
+@@ -107,10 +107,6 @@ def properties_changed(interface, changed, invalidated, path):
+ 	else:
+ 		print_normal(address, devices[path])
+ 
+-def property_changed(name, value):
+-	if (name == "Discovering" and not value):
+-		mainloop.quit()
+-
+ if __name__ == '__main__':
+ 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+ 
+@@ -141,10 +137,6 @@ if __name__ == '__main__':
+ 			arg0 = "org.bluez.Device1",
+ 			path_keyword = "path")
+ 
+-	bus.add_signal_receiver(property_changed,
+-					dbus_interface = "org.bluez.Adapter1",
+-					signal_name = "PropertyChanged")
+-
+ 	om = dbus.Interface(bus.get_object("org.bluez", "/"),
+ 				"org.freedesktop.DBus.ObjectManager")
+ 	objects = om.GetManagedObjects()
 -- 
 2.5.0
 
