@@ -1,62 +1,70 @@
-Return-Path: <alex.aring@gmail.com>
-Date: Wed, 18 Nov 2015 00:03:57 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Alexander Aring <alex.aring@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
 	kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no,
-	martin.gergeleit@hs-rm.de, marcel@holtmann.org
-Subject: RFC: right userspace interface for providing 6lowpan contexts
-Message-ID: <20151117230332.GA6219@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	martin.gergeleit@hs-rm.de, Alexander Aring <alex.aring@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	James Morris <jmorris@namei.org>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Patrick McHardy <kaber@trash.net>
+Subject: [RFCv2 bluetooth-next 2/3] ipv6: add ipv6_addr_prefix_cpy
+Date: Tue, 17 Nov 2015 23:33:13 +0100
+Message-Id: <1447799594-6050-3-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1447799594-6050-1-git-send-email-alex.aring@gmail.com>
+References: <1447799594-6050-1-git-send-email-alex.aring@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch adds a static inline function ipv6_addr_prefix_cpy which
+copies a ipv6 address prefix(argument pfx) into the ipv6 address prefix.
+The prefix len is given by plen as bits. This function mainly based on
+ipv6_addr_prefix which copies one address prefix from address into a new
+ipv6 address destination and zero all other address bits.
 
-I recently sent some 6lowpan stateful compression patches to netdev. It
-provides to setup 6lowpan contexts entries (ipv6 prefixes and prefix-length
-by id) via debugfs manually at the moment.
+The difference is that ipv6_addr_prefix_cpy don't get a prefix from an
+ipv6 address, it sets a prefix to an ipv6 address with keeping other
+address bits. The use case is for context based address compression
+inside 6LoWPAN IPHC header which keeping ipv6 prefixes inside a context
+table to lookup address-bits without sending them.
 
-This means, it works when all other "network nodes" also sets the same
-ID's inside the table _manually_.
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+Cc: James Morris <jmorris@namei.org>
+Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+Cc: Patrick McHardy <kaber@trash.net>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ include/net/ipv6.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-Well, it exists a RFC (and others) [0] to share the prefixes (contexts) inside
-the network without manually manipulate the tables.
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index e1a10b0..9d38fc2 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -382,6 +382,21 @@ static inline void ipv6_addr_prefix(struct in6_addr *pfx,
+ 		pfx->s6_addr[o] = addr->s6_addr[o] & (0xff00 >> b);
+ }
+ 
++static inline void ipv6_addr_prefix_cpy(struct in6_addr *addr,
++					const struct in6_addr *pfx,
++					int plen)
++{
++	/* caller must guarantee 0 <= plen <= 128 */
++	int o = plen >> 3,
++	    b = plen & 0x7;
++
++	memcpy(addr->s6_addr, pfx, o);
++	if (b != 0) {
++		addr->s6_addr[o] &= ~(0xff00 >> b);
++		addr->s6_addr[o] |= (pfx->s6_addr[o] & (0xff00 >> b));
++	}
++}
++
+ static inline void __ipv6_addr_set_half(__be32 *addr,
+ 					__be32 wh, __be32 wl)
+ {
+-- 
+2.6.1
 
-The rfc6775 describes new ICMPv6 option fields and ICMPv6 messages. I
-want to talk about the ICMPv6 messages which are handled by userspace to
-handle the necessary option fields.
-
-The case is now, rfc6775 describes 6CO option fields for RA [1]. For this
-reason we need an userspace interface to manipulate/get the current
-context entries which are currently stored inside the kernel.
-
-These context tables are:
-
- - A per interface declaration.
- - Maximum 16 entries.
- - Provides: ID, address prefix (can also 128 bit) and prefix-len
-
-My question is what would be the best to do a userspace interface:
-
-Note:
- These context tables should only available for 6LoWPAN interface types,
- which means: ARPHRD_6LOWPAN.
-
-- netlink entry?
-   - RTNL netlink?
-   - 6lowpan netlink?
-     - We don't currently has any netlink connection for net/6lowpan
-       branch, but it's possible to add one special "6lowpan" netlink
-       family to provide all 6LoWPAN configuration which belongs to
-       ARPHRD_6LOWPAN. We need such interface of course for other
-       settings as well.
-- per interface, sysfs entry
-  - should _maybe_ looks like the debugfs entries.
-
-Thanks for any suggestion.
-
-- Alex
-
-[0] https://tools.ietf.org/html/rfc6775
-[1] https://tools.ietf.org/html/rfc6775#section-5.4
