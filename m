@@ -1,194 +1,122 @@
-Return-Path: <andrzej.kaczmarek@codecoup.pl>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZK-EvdF9P=23BovKYTKXbTF_8ebmr_hgAgM9h13bpDShw@mail.gmail.com>
-References: <1447508679-21798-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
- <CABBYNZJjxYkFbVepBkqyYr6k0=vEK3TByyvPjvb-P6jaeWvwsA@mail.gmail.com>
- <83C3364E-09F9-4179-8A76-33F72C7EB5FA@holtmann.org> <CADAkoF6QaeLnQ8U850f45BkHNDeeFjEXRL=HF4+_LqGUagE+mA@mail.gmail.com>
- <CABBYNZK-EvdF9P=23BovKYTKXbTF_8ebmr_hgAgM9h13bpDShw@mail.gmail.com>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Date: Tue, 17 Nov 2015 22:22:07 +0100
-Message-ID: <CADAkoF5G-y=Cg0=z7p9U7dV-6moL3WTP8eNR3djzNvdRhP02qw@mail.gmail.com>
-Subject: Re: [PATCH 00/22] Add AVDTP/A2DP decoding to btmon
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAMv5Gbe2_QL91ZMAOY4wdw=p-aZRuEnELBdERCfb3H-mv0R=OQ@mail.gmail.com>
+References: <1447708112-12695-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<1447708112-12695-5-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<CAMv5Gbe2_QL91ZMAOY4wdw=p-aZRuEnELBdERCfb3H-mv0R=OQ@mail.gmail.com>
+Date: Tue, 17 Nov 2015 22:05:06 +0100
+Message-ID: <CAExxLLCMcZ0icdZaL+98g3SMTXoNh2QCDQHpvr1nkYhJ1uqgcA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] shared/gatt-server: Cancel remaining write exec on
+ error in the middle
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Grzegorz,
 
-On Tue, Nov 17, 2015 at 3:06 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Andrzej,
+On Tue, Nov 17, 2015 at 10:57 AM, Grzegorz Kolodziejczyk
+<grzegorz.kolodziejczyk@tieto.com> wrote:
+> Hi Lukasz,
 >
-> On Tue, Nov 17, 2015 at 11:11 AM, Andrzej Kaczmarek
-> <andrzej.kaczmarek@codecoup.pl> wrote:
->> Hi Marcel,
+> On 16 November 2015 at 22:08, Łukasz Rymanowski
+> <lukasz.rymanowski@codecoup.pl> wrote:
+>> If one execute write fail, server sends error response to the client.
+>> All characteristics before the failing one has been written and we cannot
+>> do anything about that. All the following characteristics will be
+>> canceled with this patch.
 >>
->> On Tue, Nov 17, 2015 at 9:40 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>> Hi Luiz,
->>>
->>>>> Here's series of patches which adds decoding of AVDTP signalling channel
->>>>> and A2DP codec capabilities information. Few things are missing:
->>>>> - no fragmentation support
->>>>> - some rarely used capabilities are not decoded
->>>>> - ATRAC capabilities are not decoded
->>>>>
->>>>> Other that above, pretty much everything should be decoded.
->>>>>
->>>>> And some sample output from decoder:
->>>>>
->>>>> < ACL Data TX: Handle 256 flags 0x00 dlen 6
->>>>>      Channel: 1602 len 2 [PSM 25 mode 0] {chan 2}
->>>>>      AVDTP: Discover (0x01) Command: type 0x00 label 6 nosp 0
->>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 14
->>>>>      Channel: 66 len 10 [PSM 25 mode 0] {chan 2}
->>>>>      AVDTP: Discover (0x01) Response Accept: type 0x00 label 6 nosp 0
->>>>>        ACP SEID 1
->>>>>          Media Type: Audio
->>>>>          SEP Type: SRC
->>>>>          In use: No
->>>>>        ACP SEID 5
->>>>>          Media Type: Audio
->>>>>          SEP Type: SRC
->>>>>          In use: No
->>>>>        ACP SEID 3
->>>>>          Media Type: Audio
->>>>>          SEP Type: SRC
->>>>>          In use: No
->>>>>        ACP SEID 2
->>>>>          Media Type: Audio
->>>>>          SEP Type: SRC
->>>>>          In use: No
->>>>
->>>> I guess we can add it In use flag only when set.
->>>
->>> actually btmon is suppose to decode and not be smart about when to show things. So lets really do print all parameters and not leave them out because they are unset.
->>>
->>>>> < ACL Data TX: Handle 256 flags 0x00 dlen 7
->>>>>      Channel: 1602 len 3 [PSM 25 mode 0] {chan 2}
->>>>>      AVDTP: Get Capabilities (0x02) Command: type 0x00 label 9 nosp 0
->>>>>        ACP SEID: 3
->>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 23
->>>>>      Channel: 66 len 19 [PSM 25 mode 0] {chan 2}
->>>>>      AVDTP: Get Capabilities (0x02) Response Accept: type 0x00 label 9 nosp 0
->>>>>        Service Category: Media Transport
->>>>>        Service Category: Media Codec
->>>>>          Media Type: Audio
->>>>>          Media Codec: Non-A2DP
->>>>>            Vendor ID: 0x0000004f (APT Licensing Ltd.)
->>>>>            Vendor Specific Codec ID: 0x0001 (aptX)
->>>>>              Frequency: 0x30
->>>>>                44100
->>>>>                48000
->>>>>              Channel Mode: 0x02
->>>>>                Stereo
->>>>>        Service Category: Content Protection
->>>>>          Content Protection Type: SCMS-T
->>>>>
->>>>>
->>>>> < ACL Data TX: Handle 256 flags 0x00 dlen 18
->>>>>      Channel: 1602 len 14 [PSM 25 mode 0] {chan 2}
->>>>>      AVDTP: Set Configuration (0x03) Command: type 0x00 label 11 nosp 0
->>>>>        ACP SEID: 1
->>>>>        INT SEID: 1
->>>>>        Service Category: Media Transport
->>>>>        Service Category: Media Codec
->>>>>          Media Type: Audio
->>>>>          Media Codec: SBC
->>>>>            Frequency: 0x20
->>>>>              44100
->>>>>            Channel Mode: 0x01
->>>>>              Joint Channel
->>>>>            Block Length: 0x10
->>>>>              16
->>>>>            Subbands: 0x04
->>>>>              8
->>>>>            Allocation Method: 0x01
->>>>>              Loudness
->>>>>            Minimum Bitpool: 2
->>>>>            Maximum Bitpool: 53
->>>>
->>>> Id got with a range instead of 2 field e.g. Bitpool: 2-53. Actually
->>>> overall Id make this more compact instead of having another line for
->>>> the decoded value just input in the same line with the hex value in
->>>> parenthesis.
->>>
->>> Actually the problem is not the bit pool. It is the others. It should be like this:
->>>
->>>         Frequency: 44100 (0x20(
->>>         Block length: 16 (0x10)
->>>         Allocation method: Loudness (0x01)
->>>
->>> And please follow the styles I have introduced in the HCI portion and not make up new stuff. I actually want the strings to primary and also show the raw values.
+>> According to the spec BT Core 4.2, Vol.3, Part F, chapter 3.4.6.3.
+>> in case of error, state of attributes is not defined, which makes
+>> this behavior ok.
+>> ---
+>>  src/shared/gatt-server.c | 22 +++++++++++++++++++++-
+>>  1 file changed, 21 insertions(+), 1 deletion(-)
 >>
->> Ok, I'll fix it.
+>> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+>> index 931d619..3cd5190 100644
+>> --- a/src/shared/gatt-server.c
+>> +++ b/src/shared/gatt-server.c
+>> @@ -1158,6 +1158,22 @@ error:
 >>
->>>
->>>>
->>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 6
->>>>>      Channel: 66 len 2 [PSM 25 mode 0] {chan 2}
->>>>>      AVDTP: Set Configuration (0x03) Response Accept: type 0x00 label 11 nosp 0
->>>>>
->>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 6
->>>>>      Channel: 66 len 2 [PSM 25 mode 0] {chan 2}
->>>>>      AVDTP: Open (0x06) Response Accept: type 0x00 label 12 nosp 0
->>>>>
->>>>>
->>>>> < ACL Data TX: Handle 256 flags 0x00 dlen 7
->>>>>      Channel: 1602 len 3 [PSM 25 mode 0] {chan 2}
->>>>>      AVDTP: Start (0x07) Command: type 0x00 label 13 nosp 0
->>>>>        ACP SEID: 1
->>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 6
->>>>>      Channel: 66 len 2 [PSM 25 mode 0] {chan 2}
->>>>>      AVDTP: Start (0x07) Response Accept: type 0x00 label 13 nosp 0
->>>>
->>>> Would you be able to include the output above into the patch that
->>>> introduce it? I think it is a bit better to see the formatting each
->>>> patch is introducing and then have proper comments to them.
->>>
->>> Why are we falling back into trying to cramp all stuff into a single line. btmon is verbose on purpose. Deal with i.
+>>  }
 >>
->> You mean the" AVDTP: Start ..." line? I wasn't sure which protocol to
->> follow here so "AVDTP: Start" is what you have in HCI and L2CAP
->> (protocol + command), then "Response Accept" is what AVRCP does. And
->> the other parameters from frame header are used the same in all
->> protocols actually. For decoding of AVDTP Transport headers I planned
->> to make it "AVDTP Media: <codec>".
->>
->> Any other idea how this should look like?
->
-> I assumed it is a common practice to decode the headers in a single line:
->
-> L2CAP: Configure Response (0x05) ident 14 len 6
-> SDP: Service Search Attribute Request (0x06) tid 0 len 25
-> AVCTP Control: Response: type 0x00 label 7 PID 0x110e
->
-> But the format is not very strict, at least not up to now, so perhaps
-> we should always follow decode string (raw hex) when decoding fields
-> that means AVCTP line about should be:
->
-> AVCTP Control: Response (code) type 0x00 label 7 PID 0x110e
->
-> I guess for the media it would be fine to have AVDTP Media as the
-> header but I wonder how you will be able to detect the codec? Or are
-> you planning to decode the RTP headers?
+>> +static void exec_write_cancel(void *data, void *user_data)
+>> +{
+>> +       uint16_t handle = PTR_TO_UINT(data);
+>> +       struct bt_gatt_server *server = user_data;
+>> +       struct gatt_db_attribute *attr;
+>> +       uint8_t cancel = 0;
+>> +
+>> +       attr = gatt_db_get_attribute(server->db, PTR_TO_UINT(handle));
+>> +       if (!attr) {
+>> +               return;
+>> +       }
+> No brackets.
+I knew that I will forgot about that after my last project :) thanks
 
-I plan to add simple tracking for streams by storing (some)
-information from AVDTP_SET_CONFIGURATION - this way I can identify
-contents of transport channel and try to decode relevant headers. I
-don't want to just decode RTP since IIRC aptX does not use RTP header
-so this would not work properly.
+>> +
+>> +       gatt_db_attribute_write(attr, 0, &cancel , 1, BT_ATT_OP_EXEC_WRITE_REQ,
+> Shouldn't be len - sizeof value ? instead of "1" ?
 
-> Btw, we could perhaps have an option to discard audio packets or make
-> them 0 length if we want to keep the timestamps, or maybe have this by
-> default since it makes the traces much smaller and reconstructing the
-> audio stream is something btmon will probably never do although it
-> seems wireshark has support to do it Ive never seen it working.
+Ok, will fix
 
-I guess for now we can add option similar to -S (dump SCO traffic),
-i.e. do not dump media data by default and enable on request. Perhaps
--M (--media)?
+>> +                                               server->att, NULL, NULL);
+>> +}
+>> +
+>>  static void exec_next_write(struct bt_gatt_server *server);
+>>
+>>  static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
+>> @@ -1167,6 +1183,7 @@ static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
+>>         uint16_t handle = gatt_db_attribute_get_handle(attr);
+>>
+>>         if (err) {
+>> +               queue_foreach(server->exec_queue, exec_write_cancel, server);
+>>                 queue_remove_all(server->exec_queue, NULL, NULL, NULL);
+>>                 bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
+>>                                                                 handle, err);
+>> @@ -1178,6 +1195,7 @@ static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
+>>  static void exec_next_write(struct bt_gatt_server *server)
+>>  {
+>>         uint16_t *handle;
+>> +       uint8_t execute = 1;
+>>         struct gatt_db_attribute *attr;
+>>         bool status;
+>>         int err;
+>> @@ -1194,7 +1212,7 @@ static void exec_next_write(struct bt_gatt_server *server)
+>>                 goto error;
+>>         }
+>>
+>> -       status = gatt_db_attribute_write(attr, 0, NULL , 0,
+>> +       status = gatt_db_attribute_write(attr, 0, &execute , 1,
+> ditto (sizeof)
+OK
+>>                                                 BT_ATT_OP_EXEC_WRITE_REQ,
+>>                                                 server->att,
+>>                                                 exec_write_complete_cb, server);
+>> @@ -1204,6 +1222,8 @@ static void exec_next_write(struct bt_gatt_server *server)
+>>         err = BT_ATT_ERROR_UNLIKELY;
+>>
+>>  error:
+>> +
+>> +       queue_foreach(server->exec_queue, exec_write_cancel, server);
+>>         queue_remove_all(server->exec_queue, NULL, NULL, NULL);
+>>         bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
+>>                                                 PTR_TO_UINT(handle), err);
+>> --
+>> 2.5.0
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> BR,
+> Grzegorz
 
-BR,
-Andrzej
+
+-- 
+BR / Pozdrawiam
+Łukasz
