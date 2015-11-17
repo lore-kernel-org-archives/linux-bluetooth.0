@@ -1,208 +1,194 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <andrzej.kaczmarek@codecoup.pl>
 MIME-Version: 1.0
-In-Reply-To: <CABD6X-LJtw7UxK-zGueB3+2gsN4f4Z6HDsKxwDWK9qbq8c8o4A@mail.gmail.com>
-References: <1447708112-12695-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<1447708112-12695-4-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<CABD6X-LJtw7UxK-zGueB3+2gsN4f4Z6HDsKxwDWK9qbq8c8o4A@mail.gmail.com>
-Date: Tue, 17 Nov 2015 22:22:49 +0100
-Message-ID: <CAExxLLDXVu8pYz8bmgo0NR-nXT0SsfXHepZQNS1uoKBurCKDkg@mail.gmail.com>
-Subject: Re: [PATCH 3/4] shared/gatt-server: Improve long write session handling
-From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZK-EvdF9P=23BovKYTKXbTF_8ebmr_hgAgM9h13bpDShw@mail.gmail.com>
+References: <1447508679-21798-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+ <CABBYNZJjxYkFbVepBkqyYr6k0=vEK3TByyvPjvb-P6jaeWvwsA@mail.gmail.com>
+ <83C3364E-09F9-4179-8A76-33F72C7EB5FA@holtmann.org> <CADAkoF6QaeLnQ8U850f45BkHNDeeFjEXRL=HF4+_LqGUagE+mA@mail.gmail.com>
+ <CABBYNZK-EvdF9P=23BovKYTKXbTF_8ebmr_hgAgM9h13bpDShw@mail.gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Date: Tue, 17 Nov 2015 22:22:07 +0100
+Message-ID: <CADAkoF5G-y=Cg0=z7p9U7dV-6moL3WTP8eNR3djzNvdRhP02qw@mail.gmail.com>
+Subject: Re: [PATCH 00/22] Add AVDTP/A2DP decoding to btmon
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Luiz,
 
-On Tue, Nov 17, 2015 at 1:12 PM, Marcin Kraglak
-<marcin.kraglak@tieto.com> wrote:
-> Hi Lukasz,
+On Tue, Nov 17, 2015 at 3:06 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Andrzej,
 >
-> On 16 November 2015 at 22:08, Łukasz Rymanowski
-> <lukasz.rymanowski@codecoup.pl> wrote:
+> On Tue, Nov 17, 2015 at 11:11 AM, Andrzej Kaczmarek
+> <andrzej.kaczmarek@codecoup.pl> wrote:
+>> Hi Marcel,
 >>
->> With current implementation application layer has no idea when
->> long write session ends as it gets write callback with execute
->> write for each prepare write data.
->> With this patch, after data are completly received by gatt-server it
->> starts to call write callback in proper order with opcode
->> BT_ATT_OP_PREP_WRITE_REQ. After that, each characteristic gets
->> BT_ATT_OP_EXEC_WRITE_REQ so it knows that complete characteristic value
->> has been received and data can be marked as valid.
->> ---
->>  src/shared/gatt-server.c | 78 ++++++++++++++++++++++++++++++++++++++++++++----
->>  1 file changed, 73 insertions(+), 5 deletions(-)
+>> On Tue, Nov 17, 2015 at 9:40 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>> Hi Luiz,
+>>>
+>>>>> Here's series of patches which adds decoding of AVDTP signalling channel
+>>>>> and A2DP codec capabilities information. Few things are missing:
+>>>>> - no fragmentation support
+>>>>> - some rarely used capabilities are not decoded
+>>>>> - ATRAC capabilities are not decoded
+>>>>>
+>>>>> Other that above, pretty much everything should be decoded.
+>>>>>
+>>>>> And some sample output from decoder:
+>>>>>
+>>>>> < ACL Data TX: Handle 256 flags 0x00 dlen 6
+>>>>>      Channel: 1602 len 2 [PSM 25 mode 0] {chan 2}
+>>>>>      AVDTP: Discover (0x01) Command: type 0x00 label 6 nosp 0
+>>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 14
+>>>>>      Channel: 66 len 10 [PSM 25 mode 0] {chan 2}
+>>>>>      AVDTP: Discover (0x01) Response Accept: type 0x00 label 6 nosp 0
+>>>>>        ACP SEID 1
+>>>>>          Media Type: Audio
+>>>>>          SEP Type: SRC
+>>>>>          In use: No
+>>>>>        ACP SEID 5
+>>>>>          Media Type: Audio
+>>>>>          SEP Type: SRC
+>>>>>          In use: No
+>>>>>        ACP SEID 3
+>>>>>          Media Type: Audio
+>>>>>          SEP Type: SRC
+>>>>>          In use: No
+>>>>>        ACP SEID 2
+>>>>>          Media Type: Audio
+>>>>>          SEP Type: SRC
+>>>>>          In use: No
+>>>>
+>>>> I guess we can add it In use flag only when set.
+>>>
+>>> actually btmon is suppose to decode and not be smart about when to show things. So lets really do print all parameters and not leave them out because they are unset.
+>>>
+>>>>> < ACL Data TX: Handle 256 flags 0x00 dlen 7
+>>>>>      Channel: 1602 len 3 [PSM 25 mode 0] {chan 2}
+>>>>>      AVDTP: Get Capabilities (0x02) Command: type 0x00 label 9 nosp 0
+>>>>>        ACP SEID: 3
+>>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 23
+>>>>>      Channel: 66 len 19 [PSM 25 mode 0] {chan 2}
+>>>>>      AVDTP: Get Capabilities (0x02) Response Accept: type 0x00 label 9 nosp 0
+>>>>>        Service Category: Media Transport
+>>>>>        Service Category: Media Codec
+>>>>>          Media Type: Audio
+>>>>>          Media Codec: Non-A2DP
+>>>>>            Vendor ID: 0x0000004f (APT Licensing Ltd.)
+>>>>>            Vendor Specific Codec ID: 0x0001 (aptX)
+>>>>>              Frequency: 0x30
+>>>>>                44100
+>>>>>                48000
+>>>>>              Channel Mode: 0x02
+>>>>>                Stereo
+>>>>>        Service Category: Content Protection
+>>>>>          Content Protection Type: SCMS-T
+>>>>>
+>>>>>
+>>>>> < ACL Data TX: Handle 256 flags 0x00 dlen 18
+>>>>>      Channel: 1602 len 14 [PSM 25 mode 0] {chan 2}
+>>>>>      AVDTP: Set Configuration (0x03) Command: type 0x00 label 11 nosp 0
+>>>>>        ACP SEID: 1
+>>>>>        INT SEID: 1
+>>>>>        Service Category: Media Transport
+>>>>>        Service Category: Media Codec
+>>>>>          Media Type: Audio
+>>>>>          Media Codec: SBC
+>>>>>            Frequency: 0x20
+>>>>>              44100
+>>>>>            Channel Mode: 0x01
+>>>>>              Joint Channel
+>>>>>            Block Length: 0x10
+>>>>>              16
+>>>>>            Subbands: 0x04
+>>>>>              8
+>>>>>            Allocation Method: 0x01
+>>>>>              Loudness
+>>>>>            Minimum Bitpool: 2
+>>>>>            Maximum Bitpool: 53
+>>>>
+>>>> Id got with a range instead of 2 field e.g. Bitpool: 2-53. Actually
+>>>> overall Id make this more compact instead of having another line for
+>>>> the decoded value just input in the same line with the hex value in
+>>>> parenthesis.
+>>>
+>>> Actually the problem is not the bit pool. It is the others. It should be like this:
+>>>
+>>>         Frequency: 44100 (0x20(
+>>>         Block length: 16 (0x10)
+>>>         Allocation method: Loudness (0x01)
+>>>
+>>> And please follow the styles I have introduced in the HCI portion and not make up new stuff. I actually want the strings to primary and also show the raw values.
 >>
->> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
->> index 329f53f..931d619 100644
->> --- a/src/shared/gatt-server.c
->> +++ b/src/shared/gatt-server.c
->> @@ -104,6 +104,8 @@ struct bt_gatt_server {
->>         struct queue *prep_queue;
->>         unsigned int max_prep_queue_len;
+>> Ok, I'll fix it.
 >>
->> +       struct queue *exec_queue;
->> +
->>         struct async_read_op *pending_read_op;
->>         struct async_write_op *pending_write_op;
+>>>
+>>>>
+>>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 6
+>>>>>      Channel: 66 len 2 [PSM 25 mode 0] {chan 2}
+>>>>>      AVDTP: Set Configuration (0x03) Response Accept: type 0x00 label 11 nosp 0
+>>>>>
+>>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 6
+>>>>>      Channel: 66 len 2 [PSM 25 mode 0] {chan 2}
+>>>>>      AVDTP: Open (0x06) Response Accept: type 0x00 label 12 nosp 0
+>>>>>
+>>>>>
+>>>>> < ACL Data TX: Handle 256 flags 0x00 dlen 7
+>>>>>      Channel: 1602 len 3 [PSM 25 mode 0] {chan 2}
+>>>>>      AVDTP: Start (0x07) Command: type 0x00 label 13 nosp 0
+>>>>>        ACP SEID: 1
+>>>>>> ACL Data RX: Handle 256 flags 0x02 dlen 6
+>>>>>      Channel: 66 len 2 [PSM 25 mode 0] {chan 2}
+>>>>>      AVDTP: Start (0x07) Response Accept: type 0x00 label 13 nosp 0
+>>>>
+>>>> Would you be able to include the output above into the patch that
+>>>> introduce it? I think it is a bit better to see the formatting each
+>>>> patch is introducing and then have proper comments to them.
+>>>
+>>> Why are we falling back into trying to cramp all stuff into a single line. btmon is verbose on purpose. Deal with i.
 >>
->> @@ -137,6 +139,7 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
->>                 server->pending_write_op->server = NULL;
+>> You mean the" AVDTP: Start ..." line? I wasn't sure which protocol to
+>> follow here so "AVDTP: Start" is what you have in HCI and L2CAP
+>> (protocol + command), then "Response Accept" is what AVRCP does. And
+>> the other parameters from frame header are used the same in all
+>> protocols actually. For decoding of AVDTP Transport headers I planned
+>> to make it "AVDTP Media: <codec>".
 >>
->>         queue_destroy(server->prep_queue, prep_write_data_destroy);
->> +       queue_destroy(server->exec_queue, NULL);
->>
->>         gatt_db_unref(server->db);
->>         bt_att_unref(server->att);
->> @@ -1155,10 +1158,61 @@ error:
->>
->>  }
->>
->> +static void exec_next_write(struct bt_gatt_server *server);
->> +
->> +static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->> +                                                               void *user_data)
->> +{
->> +       struct bt_gatt_server *server = user_data;
->> +       uint16_t handle = gatt_db_attribute_get_handle(attr);
->> +
->> +       if (err) {
->> +               queue_remove_all(server->exec_queue, NULL, NULL, NULL);
->> +               bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
->> +                                                               handle, err);
->> +       }
->> +
->> +       exec_next_write(server);
->> +}
->> +
->> +static void exec_next_write(struct bt_gatt_server *server)
->> +{
->> +       uint16_t *handle;
->> +       struct gatt_db_attribute *attr;
->> +       bool status;
->> +       int err;
->> +
->> +       handle = queue_pop_head(server->exec_queue);
->> +       if (!handle) {
->> +               bt_att_send(server->att, BT_ATT_OP_EXEC_WRITE_RSP, NULL, 0,
->> +                                                       NULL, NULL, NULL);
->> +       }
->> +
->> +       attr = gatt_db_get_attribute(server->db, PTR_TO_UINT(handle));
->> +       if (!attr) {
->> +               err = BT_ATT_ERROR_UNLIKELY;
->> +               goto error;
->> +       }
->> +
->> +       status = gatt_db_attribute_write(attr, 0, NULL , 0,
->> +                                               BT_ATT_OP_EXEC_WRITE_REQ,
->> +                                               server->att,
->> +                                               exec_write_complete_cb, server);
->> +       if (status)
->> +               return;
->> +
->> +       err = BT_ATT_ERROR_UNLIKELY;
->> +
->> +error:
->> +       queue_remove_all(server->exec_queue, NULL, NULL, NULL);
->> +       bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
->> +                                               PTR_TO_UINT(handle), err);
->> +}
->> +
->>  static void exec_next_prep_write(struct bt_gatt_server *server,
->>                                                 uint16_t ehandle, int err);
->>
->> -static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->> +static void prep_write_complete_cb(struct gatt_db_attribute *attr, int err,
->>                                                                 void *user_data)
->>  {
->>         struct bt_gatt_server *server = user_data;
->> @@ -1167,6 +1221,11 @@ static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->>         exec_next_prep_write(server, handle, err);
->>  }
->>
->> +static bool match_attribute_handle(const void *data, const void *match_data)
->> +{
->> +       return PTR_TO_UINT(data) == PTR_TO_UINT(match_data);
->> +}
->> +
->>  static void exec_next_prep_write(struct bt_gatt_server *server,
->>                                                 uint16_t ehandle, int err)
->>  {
->> @@ -1177,10 +1236,17 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
->>         if (err)
-> Shouldn't you remove all elements of server->exec_queue here?Looking
-> at the next patch, all attributes in exec_queue shall be notified that
-> exec write is canceled too.
+>> Any other idea how this should look like?
+>
+> I assumed it is a common practice to decode the headers in a single line:
+>
+> L2CAP: Configure Response (0x05) ident 14 len 6
+> SDP: Service Search Attribute Request (0x06) tid 0 len 25
+> AVCTP Control: Response: type 0x00 label 7 PID 0x110e
+>
+> But the format is not very strict, at least not up to now, so perhaps
+> we should always follow decode string (raw hex) when decoding fields
+> that means AVCTP line about should be:
+>
+> AVCTP Control: Response (code) type 0x00 label 7 PID 0x110e
+>
+> I guess for the media it would be fine to have AVDTP Media as the
+> header but I wonder how you will be able to detect the codec? Or are
+> you planning to decode the RTP headers?
 
-You are right, will fix, thanks
+I plan to add simple tracking for streams by storing (some)
+information from AVDTP_SET_CONFIGURATION - this way I can identify
+contents of transport channel and try to decode relevant headers. I
+don't want to just decode RTP since IIRC aptX does not use RTP header
+so this would not work properly.
 
-> And just open question: with introducing two types of write requests
-> in reliable write procedure: BT_ATT_OP_EXEC_WRITE_REQ and
-> BT_ATT_OP_PREP_WRITE_REQ, we could avoid using two queues and pass
-> prepare writes immediatelly to specific service implementation instead
-> of storing all values in prepare writes in server.
->
->>                 goto error;
->>
->>
->> +       /*
->> +        *  Remember to which handles we need to send execute after reliable
->> +        *  or long write session is done
->> +        */
->> +       if (ehandle && !queue_find(server->exec_queue,  match_attribute_handle,
->> +                                                       UINT_TO_PTR(ehandle)))
->> +               queue_push_tail(server->exec_queue, UINT_TO_PTR(ehandle));
->> +
->>         next = queue_pop_head(server->prep_queue);
->>         if (!next) {
->> -               bt_att_send(server->att, BT_ATT_OP_EXEC_WRITE_RSP, NULL, 0,
->> -                                                       NULL, NULL, NULL);
->> +               exec_next_write(server);
->>                 return;
->>         }
->>
->> @@ -1192,9 +1258,9 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
->>
->>         status = gatt_db_attribute_write(attr, next->offset,
->>                                                 next->value, next->length,
->> -                                               BT_ATT_OP_EXEC_WRITE_REQ,
->> +                                               BT_ATT_OP_PREP_WRITE_REQ,
->>                                                 server->att,
->> -                                               exec_write_complete_cb, server);
->> +                                               prep_write_complete_cb, server);
->>
->>         prep_write_data_destroy(next);
->>
->> @@ -1396,6 +1462,8 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
->>         server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
->>         server->prep_queue = queue_new();
->>
->> +       server->exec_queue = queue_new();
->> +
->>         if (!gatt_server_register_att_handlers(server)) {
->>                 bt_gatt_server_free(server);
->>                 return NULL;
->> --
->> 2.5.0
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
->
-> --
-> BR
-> Marcin Kraglak
+> Btw, we could perhaps have an option to discard audio packets or make
+> them 0 length if we want to keep the timestamps, or maybe have this by
+> default since it makes the traces much smaller and reconstructing the
+> audio stream is something btmon will probably never do although it
+> seems wireshark has support to do it Ive never seen it working.
 
+I guess for now we can add option similar to -S (dump SCO traffic),
+i.e. do not dump media data by default and enable on request. Perhaps
+-M (--media)?
 
-
--- 
-BR / Pozdrawiam
-Łukasz
+BR,
+Andrzej
