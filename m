@@ -1,100 +1,207 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no,
-	martin.gergeleit@hs-rm.de, Alexander Aring <alex.aring@gmail.com>
-Subject: [RFCv2 bluetooth-next 0/3] 6lowpan: debugfs and stateful compression support
-Date: Tue, 17 Nov 2015 23:33:11 +0100
-Message-Id: <1447799594-6050-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJZTQLXXEMsAj0jREB1Rsdop-0Dtey+yBViJCtqLO+bXQ@mail.gmail.com>
+References: <1447708112-12695-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<1447708112-12695-3-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<CABBYNZJZTQLXXEMsAj0jREB1Rsdop-0Dtey+yBViJCtqLO+bXQ@mail.gmail.com>
+Date: Tue, 17 Nov 2015 23:03:21 +0100
+Message-ID: <CAExxLLCGY36e7bc=RYdN6pUp5+xSBLiS5yU69EVQ0dweL3Yx9w@mail.gmail.com>
+Subject: Re: [PATCH 2/4] shared/gatt-client: Add notify type to notification callback
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-This patch based on the work of Lukasz Duda. It doesn't contain any interface
-lookup methods since we have a generic private dataroom per 6lowpan interface.
+On Tue, Nov 17, 2015 at 3:10 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Mon, Nov 16, 2015 at 11:08 PM, Łukasz Rymanowski
+> <lukasz.rymanowski@codecoup.pl> wrote:
+>> Android expect information either its indication or notification.
+>> This patch adds that.
+>> ---
+>>  profiles/scanparam/scan.c |  5 +++--
+>>  src/gatt-client.c         |  4 ++--
+>>  src/shared/gatt-client.c  | 13 +++++++++----
+>>  src/shared/gatt-client.h  | 13 ++++++++++---
+>>  tools/btgatt-client.c     |  2 +-
+>>  unit/test-gatt.c          | 10 ++++++----
+>>  6 files changed, 31 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+>> index 4015b3f..fd01135 100644
+>> --- a/profiles/scanparam/scan.c
+>> +++ b/profiles/scanparam/scan.c
+>> @@ -92,8 +92,9 @@ static void write_scan_params(struct scan *scan)
+>>                                                 false, value, sizeof(value));
+>>  }
+>>
+>> -static void refresh_value_cb(uint16_t value_handle, const uint8_t *value,
+>> -                                       uint16_t length, void *user_data)
+>> +static void refresh_value_cb(notify_t type, uint16_t value_handle,
+>> +                                       const uint8_t *value, uint16_t length,
+>> +                                       void *user_data)
+>>  {
+>>         struct scan *scan = user_data;
+>>
+>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>> index 39f6646..e74803c 100644
+>> --- a/src/gatt-client.c
+>> +++ b/src/gatt-client.c
+>> @@ -1057,8 +1057,8 @@ static bool match_notify_sender(const void *a, const void *b)
+>>         return strcmp(client->owner, sender) == 0;
+>>  }
+>>
+>> -static void notify_cb(uint16_t value_handle, const uint8_t *value,
+>> -                                       uint16_t length, void *user_data)
+>> +static void notify_cb(notify_t type, uint16_t value_handle,
+>> +                       const uint8_t *value, uint16_t length, void *user_data)
+>>  {
+>>         struct async_dbus_op *op = user_data;
+>>         struct notify_client *client = op->data;
+>> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+>> index 06ac763..76e4a9a 100644
+>> --- a/src/shared/gatt-client.c
+>> +++ b/src/shared/gatt-client.c
+>> @@ -1109,7 +1109,7 @@ struct service_changed_op {
+>>  static void process_service_changed(struct bt_gatt_client *client,
+>>                                                         uint16_t start_handle,
+>>                                                         uint16_t end_handle);
+>> -static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
+>> +static void service_changed_cb(notify_t type, uint16_t value_handle, const uint8_t *value,
+>>                                         uint16_t length, void *user_data);
+>>
+>>  static void complete_notify_request(void *data)
+>> @@ -1446,8 +1446,9 @@ fail:
+>>                                         " after Service Changed");
+>>  }
+>>
+>> -static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
+>> -                                       uint16_t length, void *user_data)
+>> +static void service_changed_cb(notify_t type, uint16_t value_handle,
+>> +                                       const uint8_t *value, uint16_t length,
+>> +                                       void *user_data)
+>>  {
+>>         struct bt_gatt_client *client = user_data;
+>>         struct service_changed_op *op;
+>> @@ -1545,6 +1546,7 @@ static bool gatt_client_init(struct bt_gatt_client *client, uint16_t mtu)
+>>  }
+>>
+>>  struct pdu_data {
+>> +       notify_t type;
+>>         const void *pdu;
+>>         uint16_t length;
+>>  };
+>> @@ -1614,7 +1616,8 @@ static void notify_handler(void *data, void *user_data)
+>>          * CCC, there is really no reason not to notify the handlers.
+>>          */
+>>         if (notify_data->notify)
+>> -               notify_data->notify(value_handle, value, pdu_data->length - 2,
+>> +               notify_data->notify(pdu_data->type, value_handle, value,
+>> +                                                       pdu_data->length - 2,
+>>                                                         notify_data->user_data);
+>>  }
+>>
+>> @@ -1629,6 +1632,8 @@ static void notify_cb(uint8_t opcode, const void *pdu, uint16_t length,
+>>         memset(&pdu_data, 0, sizeof(pdu_data));
+>>         pdu_data.pdu = pdu;
+>>         pdu_data.length = length;
+>> +       pdu_data.type = opcode == BT_ATT_OP_HANDLE_VAL_IND ?
+>> +                               BT_GATT_INDICATION : BT_GATT_NOTIFICATION;
+>>
+>>         queue_foreach(client->notify_list, notify_handler, &pdu_data);
+>>
+>> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
+>> index befa43f..3018a99 100644
+>> --- a/src/shared/gatt-client.h
+>> +++ b/src/shared/gatt-client.h
+>> @@ -27,6 +27,11 @@
+>>
+>>  #define BT_GATT_UUID_SIZE 16
+>>
+>> +typedef enum {
+>> +       BT_GATT_NOTIFICATION,
+>> +       BT_GATT_INDICATION,
+>> +} notify_t;
+>> +
+>>  struct bt_gatt_client;
+>>
+>>  struct bt_gatt_client *bt_gatt_client_new(struct gatt_db *db,
+>> @@ -46,9 +51,11 @@ typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t att_ecode,
+>>  typedef void (*bt_gatt_client_write_long_callback_t)(bool success,
+>>                                         bool reliable_error, uint8_t att_ecode,
+>>                                         void *user_data);
+>> -typedef void (*bt_gatt_client_notify_callback_t)(uint16_t value_handle,
+>> -                                       const uint8_t *value, uint16_t length,
+>> -                                       void *user_data);
+>> +typedef void (*bt_gatt_client_notify_callback_t)(notify_t type,
+>> +                                                       uint16_t value_handle,
+>> +                                                       const uint8_t *value,
+>> +                                                       uint16_t length,
+>> +                                                       void *user_data);
+>>  typedef void (*bt_gatt_client_register_callback_t)(uint16_t att_ecode,
+>>                                                         void *user_data);
+>>  typedef void (*bt_gatt_client_service_changed_callback_t)(uint16_t start_handle,
+>> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
+>> index 0f6a1bd..76fd6d0 100644
+>> --- a/tools/btgatt-client.c
+>> +++ b/tools/btgatt-client.c
+>> @@ -1099,7 +1099,7 @@ static void register_notify_usage(void)
+>>         printf("Usage: register-notify <chrc value handle>\n");
+>>  }
+>>
+>> -static void notify_cb(uint16_t value_handle, const uint8_t *value,
+>> +static void notify_cb(notify_t type, uint16_t value_handle, const uint8_t *value,
+>>                                         uint16_t length, void *user_data)
+>>  {
+>>         int i;
+>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+>> index 326a32c..b6d4ab6 100644
+>> --- a/unit/test-gatt.c
+>> +++ b/unit/test-gatt.c
+>> @@ -2202,8 +2202,9 @@ static const struct test_step test_long_read_15 = {
+>>         .expected_att_ecode = 0x0c
+>>  };
+>>
+>> -static void notification_cb(uint16_t value_handle, const uint8_t *value,
+>> -                                       uint16_t length, void *user_data)
+>> +static void notification_cb(notify_t type, uint16_t value_handle,
+>> +                                       const uint8_t *value, uint16_t length,
+>> +                                       void *user_data)
+>>  {
+>>         struct context *context = user_data;
+>>         const struct test_step *step = context->data->step;
+>> @@ -2270,8 +2271,9 @@ static void test_server_indication_confirm(struct context *context)
+>>         g_assert(indication_received == 1);
+>>  }
+>>
+>> -static void indication_cb(uint16_t value_handle, const uint8_t *value,
+>> -                                       uint16_t length, void *user_data)
+>> +static void indication_cb(notify_t type, uint16_t value_handle,
+>> +                                       const uint8_t *value, uint16_t length,
+>> +                                       void *user_data)
+>
+> Can't you figure out from the callback type? I the code already have
+> dedicated callbacks for both so you can hardcode their types there.
 
-Also I dropped the list implementation and do a simple array one. It also
-contains support for multicast stateful compression.
+This is only test-gatt where I fixed compile issues after notify_t has
+been added to notify_cb.
+What I could do here is to add g_assert(type == XX) to confirm that
+indication_cb handles indication and notification is notification.
+Actually in this way I will have test if type is
+set correctly. That is what you meant here?
 
-To access the context we supporting a complete callback structure for
-operations, the include/net/6lowpan.h header contains static inline functions
-to call these operations. With such behaviour we don't get any module
-dependencies if we need upcomming runtime decisions inside the IPv6 stack.
-The alternative would be to do everything inside static inline functions, but
-there are few different to handling unicast and multicast context id's, so
-it's maybe better to do this as "ops callback structure".
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Few things which I am not sure about if it's correct:
- - I implement the dci multicast context table and dci unicast as different
-   table. I don't know if when I have a context id "6" which is multicast
-   then, I don't can have a unicast context id which is "6". I think they are
-   different and we can indicate which table we need to use by the IPHC M bit
-   (receiving side)  or the multicast address scope (transmit side).
- - Unicast context prefix length can be shorter than 64 bits. Yes this can be,
-   but if somebody wants to do that he usually means "expand the bits until 64
-   with zeros". I forbid to add prefix below 64 bits for now.
-   Each stateful compression has cases for the IID bits (last 8 byte, use it as
-   inline data/do compression, etc.). When I have a prefix 2000:: with prefix
-   length 16, then I we hit the case of "Any remaining bits are zero." of
-   stateful compression, this means it can be converted by "2000::" prefix
-   length 64, then we don't need to care about that when doing a lookup of
-   context.
- - I tried to get wireshark know about the available context without success.
-   What I successful get working is tell prefix length exact 64 bits long. I
-   don't know if wireshark do a correct context handling here, but it's also
-   possible to have a prefix length above 64 (In my opinion). E.g. unicast
-   stateful compression in case of SAM/DAM 01:
-   "Bits covered by context information are always used.  Any IID bits not
-    covered by context information are taken directly from the corresponding
-    bits carried in-line.
-
-   This patch series do following handling for this case:
-   1. generate ipv6 address with inline IID data.
-   2. copy the prefix bits from context to the address, which _maybe_ overwrite
-      the IID (last eight bytes) data which was carried as inline data.
-
-   This means, if my context is a full address 2001::1/128, then it will be
-   the case of SAM/DAM = 11, which means the address is fully elided. (Don't
-   care about the IID bits, which will be reconstructed from encapsulating
-   header.
-
-   All others SAM/DAM cases has a similar handling.
-
-   Nevertheless I don't know how I can tell that wireshark, I can tell prefix which
-   are 64 bit's long only.
-
-Any comments are welcome.
-
-- Alex
-
-changes since RFCv2:
- - fix cleanup for 6LoWPAN per interface debugfs
- - add ipv6_addr_prefix_cpy
- - replace lowpan_iphc_bitcpy with ipv6_addr_prefix_cpy (unicast)
-   replace lowpan_iphc_bitcpy with ipv6_addr_prefix and memcpy (multicast)
- - add netdev mailinglist into cc
-
-Alexander Aring (3):
-  6lowpan: add debugfs support
-  ipv6: add ipv6_addr_prefix_cpy
-  6lowpan: iphc: add support for stateful compression
-
- include/net/6lowpan.h         |  68 +++++-
- include/net/ipv6.h            |  15 ++
- net/6lowpan/6lowpan_i.h       |  31 +++
- net/6lowpan/Kconfig           |   8 +
- net/6lowpan/Makefile          |   1 +
- net/6lowpan/core.c            |  42 +++-
- net/6lowpan/debugfs.c         | 163 ++++++++++++++
- net/6lowpan/iphc.c            | 500 +++++++++++++++++++++++++++++++++++++-----
- net/bluetooth/6lowpan.c       |  21 +-
- net/ieee802154/6lowpan/core.c |  18 +-
- 10 files changed, 796 insertions(+), 71 deletions(-)
- create mode 100644 net/6lowpan/6lowpan_i.h
- create mode 100644 net/6lowpan/debugfs.c
 
 -- 
-2.6.1
-
+BR / Pozdrawiam
+Łukasz
