@@ -1,29 +1,32 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
-	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 0/2] 6lowpan: iphc: cleanups
-Date: Tue, 17 Nov 2015 19:53:59 +0100
-Message-Id: <1447786441-17845-1-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: John Keeping <john@metanate.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: John Keeping <john@metanate.com>
+Subject: [PATCH] build: Link mcaptest with -lrt
+Date: Tue, 17 Nov 2015 15:21:11 +0000
+Message-Id: <1447773671-22497-1-git-send-email-john@metanate.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+profiles/health/mcap.c uses clock_gettime(3) so it needs to be linked
+with -lrt on some systems.
+---
+ Makefile.tools | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-These two patches are from the current RFC of stateful compression support.
-It has nothing todo with stateful compression, I send it now as PATCH so
-it can be applied before.
-
-- Alex
-
-Alexander Aring (2):
-  6lowpan: iphc: add check for reserved values
-  6lowpan: iphc: remove handling when dam is zero
-
- net/6lowpan/iphc.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
-
+diff --git a/Makefile.tools b/Makefile.tools
+index d849bd9..6ebbe9f 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -294,7 +294,7 @@ tools_mcaptest_SOURCES = tools/mcaptest.c \
+ 				btio/btio.h btio/btio.c \
+ 				src/log.c src/log.h \
+ 				profiles/health/mcap.h profiles/health/mcap.c
+-tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
++tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@ -lrt
+ 
+ tools_bneptest_SOURCES = tools/bneptest.c \
+ 				btio/btio.h btio/btio.c \
 -- 
-2.6.1
+2.6.3.462.gbe2c914
 
