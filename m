@@ -1,194 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1447708112-12695-4-git-send-email-lukasz.rymanowski@codecoup.pl>
-References: <1447708112-12695-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<1447708112-12695-4-git-send-email-lukasz.rymanowski@codecoup.pl>
-Date: Tue, 17 Nov 2015 13:12:19 +0100
-Message-ID: <CABD6X-LJtw7UxK-zGueB3+2gsN4f4Z6HDsKxwDWK9qbq8c8o4A@mail.gmail.com>
-Subject: Re: [PATCH 3/4] shared/gatt-server: Improve long write session handling
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [PATCH 1/1] Bluetooth: Wait active mode to establish SCO channel
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1447759633-4344-1-git-send-email-chanyeol.park@samsung.com>
+Date: Tue, 17 Nov 2015 12:36:36 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <51CA31C1-0F5B-4EF4-BE52-A16BFD34EA94@holtmann.org>
+References: <1447759633-4344-1-git-send-email-chanyeol.park@samsung.com>
+To: Chan-yeol Park <chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Chan-yeol,
 
-On 16 November 2015 at 22:08, Łukasz Rymanowski
-<lukasz.rymanowski@codecoup.pl> wrote:
->
-> With current implementation application layer has no idea when
-> long write session ends as it gets write callback with execute
-> write for each prepare write data.
-> With this patch, after data are completly received by gatt-server it
-> starts to call write callback in proper order with opcode
-> BT_ATT_OP_PREP_WRITE_REQ. After that, each characteristic gets
-> BT_ATT_OP_EXEC_WRITE_REQ so it knows that complete characteristic value
-> has been received and data can be marked as valid.
-> ---
->  src/shared/gatt-server.c | 78 ++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 73 insertions(+), 5 deletions(-)
->
-> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> index 329f53f..931d619 100644
-> --- a/src/shared/gatt-server.c
-> +++ b/src/shared/gatt-server.c
-> @@ -104,6 +104,8 @@ struct bt_gatt_server {
->         struct queue *prep_queue;
->         unsigned int max_prep_queue_len;
->
-> +       struct queue *exec_queue;
-> +
->         struct async_read_op *pending_read_op;
->         struct async_write_op *pending_write_op;
->
-> @@ -137,6 +139,7 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
->                 server->pending_write_op->server = NULL;
->
->         queue_destroy(server->prep_queue, prep_write_data_destroy);
-> +       queue_destroy(server->exec_queue, NULL);
->
->         gatt_db_unref(server->db);
->         bt_att_unref(server->att);
-> @@ -1155,10 +1158,61 @@ error:
->
->  }
->
-> +static void exec_next_write(struct bt_gatt_server *server);
-> +
-> +static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
-> +                                                               void *user_data)
-> +{
-> +       struct bt_gatt_server *server = user_data;
-> +       uint16_t handle = gatt_db_attribute_get_handle(attr);
-> +
-> +       if (err) {
-> +               queue_remove_all(server->exec_queue, NULL, NULL, NULL);
-> +               bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
-> +                                                               handle, err);
-> +       }
-> +
-> +       exec_next_write(server);
-> +}
-> +
-> +static void exec_next_write(struct bt_gatt_server *server)
-> +{
-> +       uint16_t *handle;
-> +       struct gatt_db_attribute *attr;
-> +       bool status;
-> +       int err;
-> +
-> +       handle = queue_pop_head(server->exec_queue);
-> +       if (!handle) {
-> +               bt_att_send(server->att, BT_ATT_OP_EXEC_WRITE_RSP, NULL, 0,
-> +                                                       NULL, NULL, NULL);
-> +       }
-> +
-> +       attr = gatt_db_get_attribute(server->db, PTR_TO_UINT(handle));
-> +       if (!attr) {
-> +               err = BT_ATT_ERROR_UNLIKELY;
-> +               goto error;
-> +       }
-> +
-> +       status = gatt_db_attribute_write(attr, 0, NULL , 0,
-> +                                               BT_ATT_OP_EXEC_WRITE_REQ,
-> +                                               server->att,
-> +                                               exec_write_complete_cb, server);
-> +       if (status)
-> +               return;
-> +
-> +       err = BT_ATT_ERROR_UNLIKELY;
-> +
-> +error:
-> +       queue_remove_all(server->exec_queue, NULL, NULL, NULL);
-> +       bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
-> +                                               PTR_TO_UINT(handle), err);
-> +}
-> +
->  static void exec_next_prep_write(struct bt_gatt_server *server,
->                                                 uint16_t ehandle, int err);
->
-> -static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
-> +static void prep_write_complete_cb(struct gatt_db_attribute *attr, int err,
->                                                                 void *user_data)
->  {
->         struct bt_gatt_server *server = user_data;
-> @@ -1167,6 +1221,11 @@ static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->         exec_next_prep_write(server, handle, err);
->  }
->
-> +static bool match_attribute_handle(const void *data, const void *match_data)
-> +{
-> +       return PTR_TO_UINT(data) == PTR_TO_UINT(match_data);
-> +}
-> +
->  static void exec_next_prep_write(struct bt_gatt_server *server,
->                                                 uint16_t ehandle, int err)
->  {
-> @@ -1177,10 +1236,17 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
->         if (err)
-Shouldn't you remove all elements of server->exec_queue here? Looking
-at the next patch, all attributes in exec_queue shall be notified that
-exec write is canceled too.
-And just open question: with introducing two types of write requests
-in reliable write procedure: BT_ATT_OP_EXEC_WRITE_REQ and
-BT_ATT_OP_PREP_WRITE_REQ, we could avoid using two queues and pass
-prepare writes immediatelly to specific service implementation instead
-of storing all values in prepare writes in server.
+> Some of headset such as Samsung HS7000 randomly takes long time to
+> exit Sniff Mode. So SCO connection request might be failed
+> due to "Command Disallowed" and user space gets "EBUSY".
+> 
+> But it's not easy that user space expects when the connection
+> becomes active mode. So if kernel call hci_sco_setup() by
+> HCI_CONN_SCO_SETUP_PEND flag, overall SCO connection time could be
+> reduced compared to user space's retrial way.
+> 
+> 2015-11-17 15:21:31.131227 > ACL data: handle 11 flags 0x02 dlen 19
+>    L2CAP(d): cid 0x0040 len 15 [psm 0]
+>      0000: 6b ff 15 03 41 54 2b 42  56 52 41 3d 31 0d f8     k...AT+BVRA=1..
+> 2015-11-17 15:21:31.132436 < HCI Command: Exit Sniff Mode (0x02|0x0004) plen 2
+>    handle 11
+> 2015-11-17 15:21:31.182614 < ACL data: handle 11 flags 0x00 dlen 14
+>    L2CAP(d): cid 0x0043 len 10 [psm 0]
+>      0000: 69 ef 0d 0d 0a 4f 4b 0d  0a 3e                    i....OK..>
+> 2015-11-17 15:21:31.184210 > HCI Event: Command Status (0x0f) plen 4
+>    Exit Sniff Mode (0x02|0x0004) status 0x0c ncmd 1
+>    Error: Command Disallowed
+> 2015-11-17 15:21:31.491043 < ACL data: handle 11 flags 0x00 dlen 20
+>    L2CAP(d): cid 0x0043 len 16 [psm 0]
+>      0000: 69 ef 19 0d 0a 2b 42 56  52 41 3a 20 31 0d 0a 3e  i....+BVRA: 1..>
+> 2015-11-17 15:21:31.491502 < HCI Command: Exit Sniff Mode (0x02|0x0004) plen 2
+>    handle 11
+> 2015-11-17 15:21:31.492683 > HCI Event: Command Status (0x0f) plen 4
+>    Exit Sniff Mode (0x02|0x0004) status 0x0c ncmd 1
+>    Error: Command Disallowed
+> 2015-11-17 15:21:31.605469 < HCI Command: Write Voice Setting (0x03|0x0026) plen 2
+>    voice setting 0x0060
 
->                 goto error;
->
->
-> +       /*
-> +        *  Remember to which handles we need to send execute after reliable
-> +        *  or long write session is done
-> +        */
-> +       if (ehandle && !queue_find(server->exec_queue,  match_attribute_handle,
-> +                                                       UINT_TO_PTR(ehandle)))
-> +               queue_push_tail(server->exec_queue, UINT_TO_PTR(ehandle));
-> +
->         next = queue_pop_head(server->prep_queue);
->         if (!next) {
-> -               bt_att_send(server->att, BT_ATT_OP_EXEC_WRITE_RSP, NULL, 0,
-> -                                                       NULL, NULL, NULL);
-> +               exec_next_write(server);
->                 return;
->         }
->
-> @@ -1192,9 +1258,9 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
->
->         status = gatt_db_attribute_write(attr, next->offset,
->                                                 next->value, next->length,
-> -                                               BT_ATT_OP_EXEC_WRITE_REQ,
-> +                                               BT_ATT_OP_PREP_WRITE_REQ,
->                                                 server->att,
-> -                                               exec_write_complete_cb, server);
-> +                                               prep_write_complete_cb, server);
->
->         prep_write_data_destroy(next);
->
-> @@ -1396,6 +1462,8 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
->         server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
->         server->prep_queue = queue_new();
->
-> +       server->exec_queue = queue_new();
-> +
->         if (!gatt_server_register_att_handlers(server)) {
->                 bt_gatt_server_free(server);
->                 return NULL;
-> --
-> 2.5.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+this is not standard kernel. We never executed the write voice setting command. Where is this coming from.
 
+With that in mind, I think it is more important to understand why the exit sniff mode command is not allowed at this point. That is a specific error code. So getting the accompanying LMP trace for this would be important.
 
+Regards
 
+Marcel
 
--- 
-BR
-Marcin Kraglak
