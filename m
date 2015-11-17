@@ -1,122 +1,59 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [PATCH bluetooth-next 2/2] 6lowpan: iphc: remove handling when
+ dam is zero
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+References: <1447786441-17845-1-git-send-email-alex.aring@gmail.com>
+ <1447786441-17845-3-git-send-email-alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <564B966A.1070708@osg.samsung.com>
+Date: Tue, 17 Nov 2015 22:04:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAMv5Gbe2_QL91ZMAOY4wdw=p-aZRuEnELBdERCfb3H-mv0R=OQ@mail.gmail.com>
-References: <1447708112-12695-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<1447708112-12695-5-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<CAMv5Gbe2_QL91ZMAOY4wdw=p-aZRuEnELBdERCfb3H-mv0R=OQ@mail.gmail.com>
-Date: Tue, 17 Nov 2015 22:05:06 +0100
-Message-ID: <CAExxLLCMcZ0icdZaL+98g3SMTXoNh2QCDQHpvr1nkYhJ1uqgcA@mail.gmail.com>
-Subject: Re: [PATCH 4/4] shared/gatt-server: Cancel remaining write exec on
- error in the middle
-From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1447786441-17845-3-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hello.
 
-On Tue, Nov 17, 2015 at 10:57 AM, Grzegorz Kolodziejczyk
-<grzegorz.kolodziejczyk@tieto.com> wrote:
-> Hi Lukasz,
+On 17/11/15 19:54, Alexander Aring wrote:
+> This patch removes handling of LOWPAN_IPHC_DAM_00 inside the
+> lowpan_compress_addr_64 function. The case of LOWPAN_IPHC_DAM_00 can
+> never occur. there exists a if branch which use LOWPAN_IPHC_DAM_11 and
+> LOWPAN_IPHC_DAM_10 and inside the else branch LOWPAN_IPHC_DAM_01. So
+> LOWPAN_IPHC_DAM_00 can never occur.
+
+Agreed the DAM_00 case means no compressions and carry the 128 bit 
+address in line. We never call lowpan_compress_addr_64() for this case 
+so removing this case which is never used is fine.
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> ---
+>   net/6lowpan/iphc.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
 >
-> On 16 November 2015 at 22:08, Łukasz Rymanowski
-> <lukasz.rymanowski@codecoup.pl> wrote:
->> If one execute write fail, server sends error response to the client.
->> All characteristics before the failing one has been written and we cannot
->> do anything about that. All the following characteristics will be
->> canceled with this patch.
->>
->> According to the spec BT Core 4.2, Vol.3, Part F, chapter 3.4.6.3.
->> in case of error, state of attributes is not defined, which makes
->> this behavior ok.
->> ---
->>  src/shared/gatt-server.c | 22 +++++++++++++++++++++-
->>  1 file changed, 21 insertions(+), 1 deletion(-)
->>
->> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
->> index 931d619..3cd5190 100644
->> --- a/src/shared/gatt-server.c
->> +++ b/src/shared/gatt-server.c
->> @@ -1158,6 +1158,22 @@ error:
->>
->>  }
->>
->> +static void exec_write_cancel(void *data, void *user_data)
->> +{
->> +       uint16_t handle = PTR_TO_UINT(data);
->> +       struct bt_gatt_server *server = user_data;
->> +       struct gatt_db_attribute *attr;
->> +       uint8_t cancel = 0;
->> +
->> +       attr = gatt_db_get_attribute(server->db, PTR_TO_UINT(handle));
->> +       if (!attr) {
->> +               return;
->> +       }
-> No brackets.
-I knew that I will forgot about that after my last project :) thanks
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 13f5424..f7f175c 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -594,7 +594,6 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+>   EXPORT_SYMBOL_GPL(lowpan_header_decompress);
+>   
+>   static const u8 lowpan_iphc_dam_to_sam_value[] = {
+> -	[LOWPAN_IPHC_DAM_00] = LOWPAN_IPHC_SAM_00,
+>   	[LOWPAN_IPHC_DAM_01] = LOWPAN_IPHC_SAM_01,
+>   	[LOWPAN_IPHC_DAM_10] = LOWPAN_IPHC_SAM_10,
+>   	[LOWPAN_IPHC_DAM_11] = LOWPAN_IPHC_SAM_11,
+> @@ -603,7 +602,7 @@ static const u8 lowpan_iphc_dam_to_sam_value[] = {
+>   static u8 lowpan_compress_addr_64(u8 **hc_ptr, const struct in6_addr *ipaddr,
+>   				  const unsigned char *lladdr, bool sam)
+>   {
+> -	u8 dam = LOWPAN_IPHC_DAM_00;
+> +	u8 dam;
+>   
+>   	if (is_addr_mac_addr_based(ipaddr, lladdr)) {
+>   		dam = LOWPAN_IPHC_DAM_11; /* 0-bits */
 
->> +
->> +       gatt_db_attribute_write(attr, 0, &cancel , 1, BT_ATT_OP_EXEC_WRITE_REQ,
-> Shouldn't be len - sizeof value ? instead of "1" ?
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 
-Ok, will fix
-
->> +                                               server->att, NULL, NULL);
->> +}
->> +
->>  static void exec_next_write(struct bt_gatt_server *server);
->>
->>  static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->> @@ -1167,6 +1183,7 @@ static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->>         uint16_t handle = gatt_db_attribute_get_handle(attr);
->>
->>         if (err) {
->> +               queue_foreach(server->exec_queue, exec_write_cancel, server);
->>                 queue_remove_all(server->exec_queue, NULL, NULL, NULL);
->>                 bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
->>                                                                 handle, err);
->> @@ -1178,6 +1195,7 @@ static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->>  static void exec_next_write(struct bt_gatt_server *server)
->>  {
->>         uint16_t *handle;
->> +       uint8_t execute = 1;
->>         struct gatt_db_attribute *attr;
->>         bool status;
->>         int err;
->> @@ -1194,7 +1212,7 @@ static void exec_next_write(struct bt_gatt_server *server)
->>                 goto error;
->>         }
->>
->> -       status = gatt_db_attribute_write(attr, 0, NULL , 0,
->> +       status = gatt_db_attribute_write(attr, 0, &execute , 1,
-> ditto (sizeof)
-OK
->>                                                 BT_ATT_OP_EXEC_WRITE_REQ,
->>                                                 server->att,
->>                                                 exec_write_complete_cb, server);
->> @@ -1204,6 +1222,8 @@ static void exec_next_write(struct bt_gatt_server *server)
->>         err = BT_ATT_ERROR_UNLIKELY;
->>
->>  error:
->> +
->> +       queue_foreach(server->exec_queue, exec_write_cancel, server);
->>         queue_remove_all(server->exec_queue, NULL, NULL, NULL);
->>         bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
->>                                                 PTR_TO_UINT(handle), err);
->> --
->> 2.5.0
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> BR,
-> Grzegorz
-
-
--- 
-BR / Pozdrawiam
-Łukasz
+regards
+Stefan Schmidt
