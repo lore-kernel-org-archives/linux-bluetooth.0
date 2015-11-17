@@ -1,70 +1,133 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: [PATCH bluetooth-next 1/2] 6lowpan: iphc: add check for reserved
- values
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-References: <1447786441-17845-1-git-send-email-alex.aring@gmail.com>
- <1447786441-17845-2-git-send-email-alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <564B9660.2040104@osg.samsung.com>
-Date: Tue, 17 Nov 2015 22:04:32 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1447786441-17845-2-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <CABD6X-+OA_n7wX7Lx5RE=XibTQHv8Pi_t87uka+UuUWwgTX2hA@mail.gmail.com>
+References: <1447708112-12695-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<1447708112-12695-5-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<CABD6X-+OA_n7wX7Lx5RE=XibTQHv8Pi_t87uka+UuUWwgTX2hA@mail.gmail.com>
+Date: Tue, 17 Nov 2015 22:04:05 +0100
+Message-ID: <CAExxLLD68=9Aq5Fo8EB5ZqbXFe8D=yeLGVwiF8JhEmeqM-Gn4g@mail.gmail.com>
+Subject: Re: [PATCH 4/4] shared/gatt-server: Cancel remaining write exec on
+ error in the middle
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Hi Marcin
 
-On 17/11/15 19:54, Alexander Aring wrote:
-> This patch adds a check on reserved values for IPHC header. We should at
-> first check on these fields instead of doing parsing before. Afterwards
-> we can be sure there are no reserved values anymore. The reserved bits
-> doesn't contain reserved values for NHC headers. This need to be handled
-> inside the next layer.
+On Tue, Nov 17, 2015 at 4:22 PM, Marcin Kraglak
+<marcin.kraglak@tieto.com> wrote:
+> Hi Lukasz,
 >
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->   net/6lowpan/iphc.c | 17 ++++++++++++++++-
->   1 file changed, 16 insertions(+), 1 deletion(-)
+> On 16 November 2015 at 22:08, Łukasz Rymanowski
+> <lukasz.rymanowski@codecoup.pl> wrote:
+>> If one execute write fail, server sends error response to the client.
+>> All characteristics before the failing one has been written and we cannot
+>> do anything about that. All the following characteristics will be
+>> canceled with this patch.
+>>
+>> According to the spec BT Core 4.2, Vol.3, Part F, chapter 3.4.6.3.
+>> in case of error, state of attributes is not defined, which makes
+>> this behavior ok.
+>> ---
+>>  src/shared/gatt-server.c | 22 +++++++++++++++++++++-
+>>  1 file changed, 21 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+>> index 931d619..3cd5190 100644
+>> --- a/src/shared/gatt-server.c
+>> +++ b/src/shared/gatt-server.c
+>> @@ -1158,6 +1158,22 @@ error:
+>>
+>>  }
+>>
+>> +static void exec_write_cancel(void *data, void *user_data)
+>> +{
+>> +       uint16_t handle = PTR_TO_UINT(data);
+>> +       struct bt_gatt_server *server = user_data;
+>> +       struct gatt_db_attribute *attr;
+>> +       uint8_t cancel = 0;
+>> +
+>> +       attr = gatt_db_get_attribute(server->db, PTR_TO_UINT(handle));
+>> +       if (!attr) {
+>> +               return;
+>> +       }
+>> +
+>> +       gatt_db_attribute_write(attr, 0, &cancel , 1, BT_ATT_OP_EXEC_WRITE_REQ,
+>> +                                               server->att, NULL, NULL);
+> gatt_db_attribute_write() returns if callback is not provided.
+
+Good point, I missed that. Will fix.
+
+I
+> assume exec write req is mainly to inform app that exec write has
+> finished or has been canceled, so maybe you should just ignore exec
+> write responses as application already checked if value is valid in
+> prepare writes?
+
+Note sure if I follow here.  Note that in this exec_queue we have now
+handles which got some prepare writes. Now app is waiting for exec
+write.
+We are going to deliver it and ignore what is the response because it
+does not matter now, since some previous exec write  already fail.
+
+>> +}
+>> +
+>>  static void exec_next_write(struct bt_gatt_server *server);
+>>
+>>  static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
+>> @@ -1167,6 +1183,7 @@ static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
+>>         uint16_t handle = gatt_db_attribute_get_handle(attr);
+>>
+>>         if (err) {
+>> +               queue_foreach(server->exec_queue, exec_write_cancel, server);
+>>                 queue_remove_all(server->exec_queue, NULL, NULL, NULL);
+>>                 bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
+>>                                                                 handle, err);
+>> @@ -1178,6 +1195,7 @@ static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
+>>  static void exec_next_write(struct bt_gatt_server *server)
+>>  {
+>>         uint16_t *handle;
+>> +       uint8_t execute = 1;
+>>         struct gatt_db_attribute *attr;
+>>         bool status;
+>>         int err;
+>> @@ -1194,7 +1212,7 @@ static void exec_next_write(struct bt_gatt_server *server)
+>>                 goto error;
+>>         }
+>>
+>> -       status = gatt_db_attribute_write(attr, 0, NULL , 0,
+>> +       status = gatt_db_attribute_write(attr, 0, &execute , 1,
+>>                                                 BT_ATT_OP_EXEC_WRITE_REQ,
+>>                                                 server->att,
+>>                                                 exec_write_complete_cb, server);
+>> @@ -1204,6 +1222,8 @@ static void exec_next_write(struct bt_gatt_server *server)
+>>         err = BT_ATT_ERROR_UNLIKELY;
+>>
+>>  error:
+>> +
+>> +       queue_foreach(server->exec_queue, exec_write_cancel, server);
+>>         queue_remove_all(server->exec_queue, NULL, NULL, NULL);
+>>         bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
+>>                                                 PTR_TO_UINT(handle), err);
+>> --
+>> 2.5.0
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 346b5c1..13f5424 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -455,6 +455,20 @@ static const u8 lowpan_ttl_values[] = {
->   	[LOWPAN_IPHC_HLIM_11] = 255,
->   };
->   
-> +static inline bool lowpan_iphc_is_reserved(u8 iphc1)
-> +{
-> +	switch (iphc1 & (LOWPAN_IPHC_DAC | LOWPAN_IPHC_M |
-> +			 LOWPAN_IPHC_DAM_MASK)) {
-> +	case LOWPAN_IPHC_DAC | LOWPAN_IPHC_DAM_00:
-> +	case LOWPAN_IPHC_DAC | LOWPAN_IPHC_M | LOWPAN_IPHC_DAM_01:
-> +	case LOWPAN_IPHC_DAC | LOWPAN_IPHC_M | LOWPAN_IPHC_DAM_10:
-> +	case LOWPAN_IPHC_DAC | LOWPAN_IPHC_M | LOWPAN_IPHC_DAM_11:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
->   int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->   			     const void *daddr, const void *saddr)
->   {
-> @@ -466,7 +480,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->   		       skb->data, skb->len);
->   
->   	if (lowpan_fetch_skb(skb, &iphc0, sizeof(iphc0)) ||
-> -	    lowpan_fetch_skb(skb, &iphc1, sizeof(iphc1)))
-> +	    lowpan_fetch_skb(skb, &iphc1, sizeof(iphc1)) ||
-> +	    lowpan_iphc_is_reserved(iphc1))
->   		return -EINVAL;
->   
->   	/* another if the CID flag is set */
+>
+>
+> --
+> BR
+> Marcin Kraglak
 
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 
-regards
-Stefan Schmidt
+-- 
+BR / Pozdrawiam
+Łukasz
