@@ -1,205 +1,232 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJZTQLXXEMsAj0jREB1Rsdop-0Dtey+yBViJCtqLO+bXQ@mail.gmail.com>
+In-Reply-To: <CABBYNZLyjzaGGCMV5Xh-cnr5AbGvjgLLxemJAzq=a=PitiSNxg@mail.gmail.com>
 References: <1447708112-12695-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<1447708112-12695-3-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<CABBYNZJZTQLXXEMsAj0jREB1Rsdop-0Dtey+yBViJCtqLO+bXQ@mail.gmail.com>
-Date: Tue, 17 Nov 2015 23:03:21 +0100
-Message-ID: <CAExxLLCGY36e7bc=RYdN6pUp5+xSBLiS5yU69EVQ0dweL3Yx9w@mail.gmail.com>
-Subject: Re: [PATCH 2/4] shared/gatt-client: Add notify type to notification callback
+	<1447708112-12695-4-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<CABD6X-LJtw7UxK-zGueB3+2gsN4f4Z6HDsKxwDWK9qbq8c8o4A@mail.gmail.com>
+	<CABBYNZLyjzaGGCMV5Xh-cnr5AbGvjgLLxemJAzq=a=PitiSNxg@mail.gmail.com>
+Date: Tue, 17 Nov 2015 22:32:28 +0100
+Message-ID: <CAExxLLCckPU50wVK-nREf4wcqP4Gv8i9FAQ3qiQ_Ex9HA=XEsg@mail.gmail.com>
+Subject: Re: [PATCH 3/4] shared/gatt-server: Improve long write session handling
 From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Luiz, Marcin,
 
-On Tue, Nov 17, 2015 at 3:10 PM, Luiz Augusto von Dentz
+On Tue, Nov 17, 2015 at 1:49 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
-> Hi Lukasz,
+> Hi Marcin,
 >
-> On Mon, Nov 16, 2015 at 11:08 PM, Łukasz Rymanowski
-> <lukasz.rymanowski@codecoup.pl> wrote:
->> Android expect information either its indication or notification.
->> This patch adds that.
->> ---
->>  profiles/scanparam/scan.c |  5 +++--
->>  src/gatt-client.c         |  4 ++--
->>  src/shared/gatt-client.c  | 13 +++++++++----
->>  src/shared/gatt-client.h  | 13 ++++++++++---
->>  tools/btgatt-client.c     |  2 +-
->>  unit/test-gatt.c          | 10 ++++++----
->>  6 files changed, 31 insertions(+), 16 deletions(-)
+> On Tue, Nov 17, 2015 at 2:12 PM, Marcin Kraglak
+> <marcin.kraglak@tieto.com> wrote:
+>> Hi Lukasz,
 >>
->> diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
->> index 4015b3f..fd01135 100644
->> --- a/profiles/scanparam/scan.c
->> +++ b/profiles/scanparam/scan.c
->> @@ -92,8 +92,9 @@ static void write_scan_params(struct scan *scan)
->>                                                 false, value, sizeof(value));
->>  }
->>
->> -static void refresh_value_cb(uint16_t value_handle, const uint8_t *value,
->> -                                       uint16_t length, void *user_data)
->> +static void refresh_value_cb(notify_t type, uint16_t value_handle,
->> +                                       const uint8_t *value, uint16_t length,
->> +                                       void *user_data)
->>  {
->>         struct scan *scan = user_data;
->>
->> diff --git a/src/gatt-client.c b/src/gatt-client.c
->> index 39f6646..e74803c 100644
->> --- a/src/gatt-client.c
->> +++ b/src/gatt-client.c
->> @@ -1057,8 +1057,8 @@ static bool match_notify_sender(const void *a, const void *b)
->>         return strcmp(client->owner, sender) == 0;
->>  }
->>
->> -static void notify_cb(uint16_t value_handle, const uint8_t *value,
->> -                                       uint16_t length, void *user_data)
->> +static void notify_cb(notify_t type, uint16_t value_handle,
->> +                       const uint8_t *value, uint16_t length, void *user_data)
->>  {
->>         struct async_dbus_op *op = user_data;
->>         struct notify_client *client = op->data;
->> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
->> index 06ac763..76e4a9a 100644
->> --- a/src/shared/gatt-client.c
->> +++ b/src/shared/gatt-client.c
->> @@ -1109,7 +1109,7 @@ struct service_changed_op {
->>  static void process_service_changed(struct bt_gatt_client *client,
->>                                                         uint16_t start_handle,
->>                                                         uint16_t end_handle);
->> -static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
->> +static void service_changed_cb(notify_t type, uint16_t value_handle, const uint8_t *value,
->>                                         uint16_t length, void *user_data);
->>
->>  static void complete_notify_request(void *data)
->> @@ -1446,8 +1446,9 @@ fail:
->>                                         " after Service Changed");
->>  }
->>
->> -static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
->> -                                       uint16_t length, void *user_data)
->> +static void service_changed_cb(notify_t type, uint16_t value_handle,
->> +                                       const uint8_t *value, uint16_t length,
->> +                                       void *user_data)
->>  {
->>         struct bt_gatt_client *client = user_data;
->>         struct service_changed_op *op;
->> @@ -1545,6 +1546,7 @@ static bool gatt_client_init(struct bt_gatt_client *client, uint16_t mtu)
->>  }
->>
->>  struct pdu_data {
->> +       notify_t type;
->>         const void *pdu;
->>         uint16_t length;
->>  };
->> @@ -1614,7 +1616,8 @@ static void notify_handler(void *data, void *user_data)
->>          * CCC, there is really no reason not to notify the handlers.
->>          */
->>         if (notify_data->notify)
->> -               notify_data->notify(value_handle, value, pdu_data->length - 2,
->> +               notify_data->notify(pdu_data->type, value_handle, value,
->> +                                                       pdu_data->length - 2,
->>                                                         notify_data->user_data);
->>  }
->>
->> @@ -1629,6 +1632,8 @@ static void notify_cb(uint8_t opcode, const void *pdu, uint16_t length,
->>         memset(&pdu_data, 0, sizeof(pdu_data));
->>         pdu_data.pdu = pdu;
->>         pdu_data.length = length;
->> +       pdu_data.type = opcode == BT_ATT_OP_HANDLE_VAL_IND ?
->> +                               BT_GATT_INDICATION : BT_GATT_NOTIFICATION;
->>
->>         queue_foreach(client->notify_list, notify_handler, &pdu_data);
->>
->> diff --git a/src/shared/gatt-client.h b/src/shared/gatt-client.h
->> index befa43f..3018a99 100644
->> --- a/src/shared/gatt-client.h
->> +++ b/src/shared/gatt-client.h
->> @@ -27,6 +27,11 @@
->>
->>  #define BT_GATT_UUID_SIZE 16
->>
->> +typedef enum {
->> +       BT_GATT_NOTIFICATION,
->> +       BT_GATT_INDICATION,
->> +} notify_t;
->> +
->>  struct bt_gatt_client;
->>
->>  struct bt_gatt_client *bt_gatt_client_new(struct gatt_db *db,
->> @@ -46,9 +51,11 @@ typedef void (*bt_gatt_client_read_callback_t)(bool success, uint8_t att_ecode,
->>  typedef void (*bt_gatt_client_write_long_callback_t)(bool success,
->>                                         bool reliable_error, uint8_t att_ecode,
->>                                         void *user_data);
->> -typedef void (*bt_gatt_client_notify_callback_t)(uint16_t value_handle,
->> -                                       const uint8_t *value, uint16_t length,
->> -                                       void *user_data);
->> +typedef void (*bt_gatt_client_notify_callback_t)(notify_t type,
->> +                                                       uint16_t value_handle,
->> +                                                       const uint8_t *value,
->> +                                                       uint16_t length,
->> +                                                       void *user_data);
->>  typedef void (*bt_gatt_client_register_callback_t)(uint16_t att_ecode,
->>                                                         void *user_data);
->>  typedef void (*bt_gatt_client_service_changed_callback_t)(uint16_t start_handle,
->> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
->> index 0f6a1bd..76fd6d0 100644
->> --- a/tools/btgatt-client.c
->> +++ b/tools/btgatt-client.c
->> @@ -1099,7 +1099,7 @@ static void register_notify_usage(void)
->>         printf("Usage: register-notify <chrc value handle>\n");
->>  }
->>
->> -static void notify_cb(uint16_t value_handle, const uint8_t *value,
->> +static void notify_cb(notify_t type, uint16_t value_handle, const uint8_t *value,
->>                                         uint16_t length, void *user_data)
->>  {
->>         int i;
->> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
->> index 326a32c..b6d4ab6 100644
->> --- a/unit/test-gatt.c
->> +++ b/unit/test-gatt.c
->> @@ -2202,8 +2202,9 @@ static const struct test_step test_long_read_15 = {
->>         .expected_att_ecode = 0x0c
->>  };
->>
->> -static void notification_cb(uint16_t value_handle, const uint8_t *value,
->> -                                       uint16_t length, void *user_data)
->> +static void notification_cb(notify_t type, uint16_t value_handle,
->> +                                       const uint8_t *value, uint16_t length,
->> +                                       void *user_data)
->>  {
->>         struct context *context = user_data;
->>         const struct test_step *step = context->data->step;
->> @@ -2270,8 +2271,9 @@ static void test_server_indication_confirm(struct context *context)
->>         g_assert(indication_received == 1);
->>  }
->>
->> -static void indication_cb(uint16_t value_handle, const uint8_t *value,
->> -                                       uint16_t length, void *user_data)
->> +static void indication_cb(notify_t type, uint16_t value_handle,
->> +                                       const uint8_t *value, uint16_t length,
->> +                                       void *user_data)
+>> On 16 November 2015 at 22:08, Łukasz Rymanowski
+>> <lukasz.rymanowski@codecoup.pl> wrote:
+>>>
+>>> With current implementation application layer has no idea when
+>>> long write session ends as it gets write callback with execute
+>>> write for each prepare write data.
+>>> With this patch, after data are completly received by gatt-server it
+>>> starts to call write callback in proper order with opcode
+>>> BT_ATT_OP_PREP_WRITE_REQ. After that, each characteristic gets
+>>> BT_ATT_OP_EXEC_WRITE_REQ so it knows that complete characteristic value
+>>> has been received and data can be marked as valid.
+>>> ---
+>>>  src/shared/gatt-server.c | 78 ++++++++++++++++++++++++++++++++++++++++++++----
+>>>  1 file changed, 73 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+>>> index 329f53f..931d619 100644
+>>> --- a/src/shared/gatt-server.c
+>>> +++ b/src/shared/gatt-server.c
+>>> @@ -104,6 +104,8 @@ struct bt_gatt_server {
+>>>         struct queue *prep_queue;
+>>>         unsigned int max_prep_queue_len;
+>>>
+>>> +       struct queue *exec_queue;
+>>> +
+>>>         struct async_read_op *pending_read_op;
+>>>         struct async_write_op *pending_write_op;
+>>>
+>>> @@ -137,6 +139,7 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
+>>>                 server->pending_write_op->server = NULL;
+>>>
+>>>         queue_destroy(server->prep_queue, prep_write_data_destroy);
+>>> +       queue_destroy(server->exec_queue, NULL);
+>>>
+>>>         gatt_db_unref(server->db);
+>>>         bt_att_unref(server->att);
+>>> @@ -1155,10 +1158,61 @@ error:
+>>>
+>>>  }
+>>>
+>>> +static void exec_next_write(struct bt_gatt_server *server);
+>>> +
+>>> +static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
+>>> +                                                               void *user_data)
+>>> +{
+>>> +       struct bt_gatt_server *server = user_data;
+>>> +       uint16_t handle = gatt_db_attribute_get_handle(attr);
+>>> +
+>>> +       if (err) {
+>>> +               queue_remove_all(server->exec_queue, NULL, NULL, NULL);
+>>> +               bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
+>>> +                                                               handle, err);
+>>> +       }
+>>> +
+>>> +       exec_next_write(server);
+>>> +}
+>>> +
+>>> +static void exec_next_write(struct bt_gatt_server *server)
+>>> +{
+>>> +       uint16_t *handle;
+>>> +       struct gatt_db_attribute *attr;
+>>> +       bool status;
+>>> +       int err;
+>>> +
+>>> +       handle = queue_pop_head(server->exec_queue);
+>>> +       if (!handle) {
+>>> +               bt_att_send(server->att, BT_ATT_OP_EXEC_WRITE_RSP, NULL, 0,
+>>> +                                                       NULL, NULL, NULL);
+>>> +       }
+>>> +
+>>> +       attr = gatt_db_get_attribute(server->db, PTR_TO_UINT(handle));
+>>> +       if (!attr) {
+>>> +               err = BT_ATT_ERROR_UNLIKELY;
+>>> +               goto error;
+>>> +       }
+>>> +
+>>> +       status = gatt_db_attribute_write(attr, 0, NULL , 0,
+>>> +                                               BT_ATT_OP_EXEC_WRITE_REQ,
+>>> +                                               server->att,
+>>> +                                               exec_write_complete_cb, server);
+>>> +       if (status)
+>>> +               return;
+>>> +
+>>> +       err = BT_ATT_ERROR_UNLIKELY;
+>>> +
+>>> +error:
+>>> +       queue_remove_all(server->exec_queue, NULL, NULL, NULL);
+>>> +       bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
+>>> +                                               PTR_TO_UINT(handle), err);
+>>> +}
+>>> +
+>>>  static void exec_next_prep_write(struct bt_gatt_server *server,
+>>>                                                 uint16_t ehandle, int err);
+>>>
+>>> -static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
+>>> +static void prep_write_complete_cb(struct gatt_db_attribute *attr, int err,
+>>>                                                                 void *user_data)
+>>>  {
+>>>         struct bt_gatt_server *server = user_data;
+>>> @@ -1167,6 +1221,11 @@ static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
+>>>         exec_next_prep_write(server, handle, err);
+>>>  }
+>>>
+>>> +static bool match_attribute_handle(const void *data, const void *match_data)
+>>> +{
+>>> +       return PTR_TO_UINT(data) == PTR_TO_UINT(match_data);
+>>> +}
+>>> +
+>>>  static void exec_next_prep_write(struct bt_gatt_server *server,
+>>>                                                 uint16_t ehandle, int err)
+>>>  {
+>>> @@ -1177,10 +1236,17 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
+>>>         if (err)
+>> Shouldn't you remove all elements of server->exec_queue here? Looking
+>> at the next patch, all attributes in exec_queue shall be notified that
+>> exec write is canceled too.
+>> And just open question: with introducing two types of write requests
+>> in reliable write procedure: BT_ATT_OP_EXEC_WRITE_REQ and
+>> BT_ATT_OP_PREP_WRITE_REQ, we could avoid using two queues and pass
+>> prepare writes immediatelly to specific service implementation instead
+>> of storing all values in prepare writes in server.
 >
-> Can't you figure out from the callback type? I the code already have
-> dedicated callbacks for both so you can hardcode their types there.
+> Even if we have some flush logic trigger by execute we cannot really
+> dispatch writes immediately to the services because it can fail with
+> some errors that are not allowed by the testing spec, yes there is a
+> specific test checking the e.g. invalid offset is only receive as a
+> response to execute. It looks like this is because the value could be
+> changed in between prepare and execute, which IMO is something
+> horribly broken with prepare + execute since it is intended for
+> reliable writes but it can produce all sort of errors which is
+> impossible to guess without reading the value written after it has
+> been executed in case anything has change in between the commands.
+>
 
-This is only test-gatt where I fixed compile issues after notify_t has
-been added to notify_cb.
-What I could do here is to add g_assert(type == XX) to confirm that
-indication_cb handles indication and notification is notification.
-Actually in this way I will have test if type is
-set correctly. That is what you meant here?
+I see Marcins point and agree. According to spec if handle is valid,
+permisions are ok and there
+is enought place in the queue, Prepare Write Response shall be sent
+back. No matter if application
+likes data or not. Error on value validation we will get during
+execute writes. So in teory we could indeed
+avoid prep_queue and send data directly to application when handle is
+ok and permisions are fine.
+Actually this is how we do it now in Android part.
+But on the other side, that is not big deal, so if you Luiz saw any
+issues with that, we can stay with server
+handling queuing prep writes.
 
+>>>         next = queue_pop_head(server->prep_queue);
+>>>         if (!next) {
+>>> -               bt_att_send(server->att, BT_ATT_OP_EXEC_WRITE_RSP, NULL, 0,
+>>> -                                                       NULL, NULL, NULL);
+>>> +               exec_next_write(server);
+>>>                 return;
+>>>         }
+>>>
+>>> @@ -1192,9 +1258,9 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
+>>>
+>>>         status = gatt_db_attribute_write(attr, next->offset,
+>>>                                                 next->value, next->length,
+>>> -                                               BT_ATT_OP_EXEC_WRITE_REQ,
+>>> +                                               BT_ATT_OP_PREP_WRITE_REQ,
+>>>                                                 server->att,
+>>> -                                               exec_write_complete_cb, server);
+>>> +                                               prep_write_complete_cb, server);
+>>>
+>>>         prep_write_data_destroy(next);
+>>>
+>>> @@ -1396,6 +1462,8 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
+>>>         server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
+>>>         server->prep_queue = queue_new();
+>>>
+>>> +       server->exec_queue = queue_new();
+>>> +
+>>>         if (!gatt_server_register_att_handlers(server)) {
+>>>                 bt_gatt_server_free(server);
+>>>                 return NULL;
+>>> --
+>>> 2.5.0
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+>>
+>> --
+>> BR
+>> Marcin Kraglak
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 >
 >
 > --
 > Luiz Augusto von Dentz
+
 
 
 -- 
