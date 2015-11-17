@@ -1,47 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] =?UTF-8?q?AUTHORS:=20Update=20Szymon,=20=C5=81ukasz=20and?= =?UTF-8?q?=20Andrzej=20emails?=
-Date: Tue, 17 Nov 2015 21:26:56 +0100
-Message-Id: <1447792016-17179-1-git-send-email-szymon.janc@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+From: Alexander Aring <alex.aring@gmail.com>
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 2/2] 6lowpan: iphc: remove handling when dam is zero
+Date: Tue, 17 Nov 2015 19:54:01 +0100
+Message-Id: <1447786441-17845-3-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1447786441-17845-1-git-send-email-alex.aring@gmail.com>
+References: <1447786441-17845-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Szymon, Łukasz and Andrzej are now working for CODECOUP.
----
- AUTHORS | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+This patch removes handling of LOWPAN_IPHC_DAM_00 inside the
+lowpan_compress_addr_64 function. The case of LOWPAN_IPHC_DAM_00 can
+never occur. there exists a if branch which use LOWPAN_IPHC_DAM_11 and
+LOWPAN_IPHC_DAM_10 and inside the else branch LOWPAN_IPHC_DAM_01. So
+LOWPAN_IPHC_DAM_00 can never occur.
 
-diff --git a/AUTHORS b/AUTHORS
-index a41a62a..16fb14c 100644
---- a/AUTHORS
-+++ b/AUTHORS
-@@ -57,11 +57,11 @@ Brian Gix <bgix@codeaurora.org>
- Andre Guedes <andre.guedes@openbossa.org>
- Sheldon Demario <sheldon.demario@openbossa.org>
- Lucas De Marchi <lucas.demarchi@profusion.mobi>
--Szymon Janc <szymon.janc@tieto.com>
-+Szymon Janc <szymon.janc@codecoup.pl>
- Syam Sidhardhan <s.syam@samsung.com>
- Paulo Alcantara <pcacjr@gmail.com>
- Jefferson Delfes <jefferson.delfes@openbossa.org>
--Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-+Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
- Eder Ruiz Maria <eder.ruiz@openbossa.org>
- Mikel Astiz <mikel.astiz@bmw-carit.de>
- Chan-yeol Park <chanyeol.park@samsung.com>
-@@ -85,7 +85,7 @@ Scott James Remnant <scott@netsplit.com>
- Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
- Grzegorz Kołodziejczyk <grzegorz.kolodziejczyk@tieto.com>
- Marcin Krąglak <marcin.kraglak@tieto.com>
--Łukasz Rymanowski <lukasz.rymanowski@tieto.com>
-+Łukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
- Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
- Arman Uguray <armansito@chromium.org>
- Artem Rakhov <arakhov@chromium.org>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/6lowpan/iphc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 13f5424..f7f175c 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -594,7 +594,6 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+ EXPORT_SYMBOL_GPL(lowpan_header_decompress);
+ 
+ static const u8 lowpan_iphc_dam_to_sam_value[] = {
+-	[LOWPAN_IPHC_DAM_00] = LOWPAN_IPHC_SAM_00,
+ 	[LOWPAN_IPHC_DAM_01] = LOWPAN_IPHC_SAM_01,
+ 	[LOWPAN_IPHC_DAM_10] = LOWPAN_IPHC_SAM_10,
+ 	[LOWPAN_IPHC_DAM_11] = LOWPAN_IPHC_SAM_11,
+@@ -603,7 +602,7 @@ static const u8 lowpan_iphc_dam_to_sam_value[] = {
+ static u8 lowpan_compress_addr_64(u8 **hc_ptr, const struct in6_addr *ipaddr,
+ 				  const unsigned char *lladdr, bool sam)
+ {
+-	u8 dam = LOWPAN_IPHC_DAM_00;
++	u8 dam;
+ 
+ 	if (is_addr_mac_addr_based(ipaddr, lladdr)) {
+ 		dam = LOWPAN_IPHC_DAM_11; /* 0-bits */
 -- 
-2.6.2
+2.6.1
 
