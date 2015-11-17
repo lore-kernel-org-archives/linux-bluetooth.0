@@ -1,57 +1,68 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH bluetooth-next 2/2] 6lowpan: iphc: remove handling when
- dam is zero
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Subject: Re: [PATCH bluetooth-next 1/2] 6lowpan: iphc: add check for reserved
+ values
 To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
 References: <1447786441-17845-1-git-send-email-alex.aring@gmail.com>
- <1447786441-17845-3-git-send-email-alex.aring@gmail.com>
+ <1447786441-17845-2-git-send-email-alex.aring@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <564B966A.1070708@osg.samsung.com>
-Date: Tue, 17 Nov 2015 22:04:42 +0100
+Message-ID: <564B9660.2040104@osg.samsung.com>
+Date: Tue, 17 Nov 2015 22:04:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <1447786441-17845-3-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1447786441-17845-2-git-send-email-alex.aring@gmail.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hello.
 
 On 17/11/15 19:54, Alexander Aring wrote:
-> This patch removes handling of LOWPAN_IPHC_DAM_00 inside the
-> lowpan_compress_addr_64 function. The case of LOWPAN_IPHC_DAM_00 can
-> never occur. there exists a if branch which use LOWPAN_IPHC_DAM_11 and
-> LOWPAN_IPHC_DAM_10 and inside the else branch LOWPAN_IPHC_DAM_01. So
-> LOWPAN_IPHC_DAM_00 can never occur.
-
-Agreed the DAM_00 case means no compressions and carry the 128 bit 
-address in line. We never call lowpan_compress_addr_64() for this case 
-so removing this case which is never used is fine.
+> This patch adds a check on reserved values for IPHC header. We should at
+> first check on these fields instead of doing parsing before. Afterwards
+> we can be sure there are no reserved values anymore. The reserved bits
+> doesn't contain reserved values for NHC headers. This need to be handled
+> inside the next layer.
+>
 > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 > ---
->   net/6lowpan/iphc.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
+>   net/6lowpan/iphc.c | 17 ++++++++++++++++-
+>   1 file changed, 16 insertions(+), 1 deletion(-)
 >
 > diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 13f5424..f7f175c 100644
+> index 346b5c1..13f5424 100644
 > --- a/net/6lowpan/iphc.c
 > +++ b/net/6lowpan/iphc.c
-> @@ -594,7 +594,6 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->   EXPORT_SYMBOL_GPL(lowpan_header_decompress);
+> @@ -455,6 +455,20 @@ static const u8 lowpan_ttl_values[] = {
+>   	[LOWPAN_IPHC_HLIM_11] = 255,
+>   };
 >   
->   static const u8 lowpan_iphc_dam_to_sam_value[] = {
-> -	[LOWPAN_IPHC_DAM_00] = LOWPAN_IPHC_SAM_00,
->   	[LOWPAN_IPHC_DAM_01] = LOWPAN_IPHC_SAM_01,
->   	[LOWPAN_IPHC_DAM_10] = LOWPAN_IPHC_SAM_10,
->   	[LOWPAN_IPHC_DAM_11] = LOWPAN_IPHC_SAM_11,
-> @@ -603,7 +602,7 @@ static const u8 lowpan_iphc_dam_to_sam_value[] = {
->   static u8 lowpan_compress_addr_64(u8 **hc_ptr, const struct in6_addr *ipaddr,
->   				  const unsigned char *lladdr, bool sam)
+> +static inline bool lowpan_iphc_is_reserved(u8 iphc1)
+> +{
+> +	switch (iphc1 & (LOWPAN_IPHC_DAC | LOWPAN_IPHC_M |
+> +			 LOWPAN_IPHC_DAM_MASK)) {
+> +	case LOWPAN_IPHC_DAC | LOWPAN_IPHC_DAM_00:
+> +	case LOWPAN_IPHC_DAC | LOWPAN_IPHC_M | LOWPAN_IPHC_DAM_01:
+> +	case LOWPAN_IPHC_DAC | LOWPAN_IPHC_M | LOWPAN_IPHC_DAM_10:
+> +	case LOWPAN_IPHC_DAC | LOWPAN_IPHC_M | LOWPAN_IPHC_DAM_11:
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+>   int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+>   			     const void *daddr, const void *saddr)
 >   {
-> -	u8 dam = LOWPAN_IPHC_DAM_00;
-> +	u8 dam;
+> @@ -466,7 +480,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+>   		       skb->data, skb->len);
 >   
->   	if (is_addr_mac_addr_based(ipaddr, lladdr)) {
->   		dam = LOWPAN_IPHC_DAM_11; /* 0-bits */
+>   	if (lowpan_fetch_skb(skb, &iphc0, sizeof(iphc0)) ||
+> -	    lowpan_fetch_skb(skb, &iphc1, sizeof(iphc1)))
+> +	    lowpan_fetch_skb(skb, &iphc1, sizeof(iphc1)) ||
+> +	    lowpan_iphc_is_reserved(iphc1))
+>   		return -EINVAL;
+>   
+>   	/* another if the CID flag is set */
 
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 
