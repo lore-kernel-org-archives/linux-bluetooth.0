@@ -1,40 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH] BNEP multicast filter is filtering multicast addresses in default case although differently specified
+Subject: Re: [PATCH] net: bluetooth: Clean up hci_core code
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <564C6C35.4030305@proofnet.de>
-Date: Wed, 18 Nov 2015 13:45:00 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F6214B06-650D-4DE0-A375-49652B8124A5@holtmann.org>
-References: <564C6C35.4030305@proofnet.de>
-To: Danny Schweizer <danny.schweizer@proofnet.de>
+In-Reply-To: <20151118123816.GA3288@jci-VirtualBox>
+Date: Wed, 18 Nov 2015 13:44:04 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <966AF900-49B0-4166-9C92-7B3208382B6C@holtmann.org>
+References: <20151118123816.GA3288@jci-VirtualBox>
+To: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Danny,
+Hi Prasanna,
 
-> This patch fixes the Bug 106691 by changing the default multicast filter
-> to not filter out any multicast addresses.
+> Fix errors reported by checkpatch.
+> - ERROR: spaces required around that ':' (ctx:VxW)
+> - ERROR: open brace '{' following function declarations go on the next line
 > 
+> Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
 > ---
-> net/bluetooth/bnep/core.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-> index 1641367..ba2467a 100644
-> --- a/net/bluetooth/bnep/core.c
-> +++ b/net/bluetooth/bnep/core.c
-> @@ -609,7 +609,7 @@ int bnep_add_connection(struct bnep_connadd_req
-> *req, struct socket *sock)
-> 
-> #ifdef CONFIG_BT_BNEP_MC_FILTER
-> 	/* Set default mc filter */
-> -	set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
-> +	s->mc_filter = ~0LL;
-> #endif
+> net/bluetooth/hci_core.c | 7 ++++---
+> 1 file changed, 4 insertions(+), 3 deletions(-)
 
-I am not convinced that these two are actually the same expressions. You need to explain this a lot more in detail on why this change is correct.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
