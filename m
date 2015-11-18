@@ -1,52 +1,73 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] AUTHORS: Update Szymon, =?UTF-8?B?xYF1a2Fzeg==?= and Andrzej emails
-Date: Wed, 18 Nov 2015 20:07:09 +0100
-Message-ID: <3212369.CJc5OZ6USG@ix>
-In-Reply-To: <1447792016-17179-1-git-send-email-szymon.janc@codecoup.pl>
-References: <1447792016-17179-1-git-send-email-szymon.janc@codecoup.pl>
+Subject: Re: [RFCv2 bluetooth-next 2/3] ipv6: add ipv6_addr_prefix_cpy
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+References: <1447799594-6050-1-git-send-email-alex.aring@gmail.com>
+ <1447799594-6050-3-git-send-email-alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no,
+	martin.gergeleit@hs-rm.de,
+	"David S . Miller" <davem@davemloft.net>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	James Morris <jmorris@namei.org>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Patrick McHardy <kaber@trash.net>
+From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Message-ID: <564C8336.7000100@cogentembedded.com>
+Date: Wed, 18 Nov 2015 16:55:02 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1447799594-6050-3-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 17 November 2015 21:26:56 Szymon Janc wrote:
-> Szymon, Łukasz and Andrzej are now working for CODECOUP.
+Hello.
+
+On 11/18/2015 1:33 AM, Alexander Aring wrote:
+
+> This patch adds a static inline function ipv6_addr_prefix_cpy which
+
+    I suggest not to reduce "copy".
+
+> copies a ipv6 address prefix(argument pfx) into the ipv6 address prefix.
+> The prefix len is given by plen as bits. This function mainly based on
+> ipv6_addr_prefix which copies one address prefix from address into a new
+> ipv6 address destination and zero all other address bits.
+>
+> The difference is that ipv6_addr_prefix_cpy don't get a prefix from an
+> ipv6 address, it sets a prefix to an ipv6 address with keeping other
+> address bits. The use case is for context based address compression
+> inside 6LoWPAN IPHC header which keeping ipv6 prefixes inside a context
+> table to lookup address-bits without sending them.
+>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+> Cc: Patrick McHardy <kaber@trash.net>
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 > ---
->  AUTHORS | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/AUTHORS b/AUTHORS
-> index a41a62a..16fb14c 100644
-> --- a/AUTHORS
-> +++ b/AUTHORS
-> @@ -57,11 +57,11 @@ Brian Gix <bgix@codeaurora.org>
->  Andre Guedes <andre.guedes@openbossa.org>
->  Sheldon Demario <sheldon.demario@openbossa.org>
->  Lucas De Marchi <lucas.demarchi@profusion.mobi>
-> -Szymon Janc <szymon.janc@tieto.com>
-> +Szymon Janc <szymon.janc@codecoup.pl>
->  Syam Sidhardhan <s.syam@samsung.com>
->  Paulo Alcantara <pcacjr@gmail.com>
->  Jefferson Delfes <jefferson.delfes@openbossa.org>
-> -Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-> +Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
->  Eder Ruiz Maria <eder.ruiz@openbossa.org>
->  Mikel Astiz <mikel.astiz@bmw-carit.de>
->  Chan-yeol Park <chanyeol.park@samsung.com>
-> @@ -85,7 +85,7 @@ Scott James Remnant <scott@netsplit.com>
->  Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
->  Grzegorz Kołodziejczyk <grzegorz.kolodziejczyk@tieto.com>
->  Marcin Krąglak <marcin.kraglak@tieto.com>
-> -Łukasz Rymanowski <lukasz.rymanowski@tieto.com>
-> +Łukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
->  Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
->  Arman Uguray <armansito@chromium.org>
->  Artem Rakhov <arakhov@chromium.org>
+>   include/net/ipv6.h | 15 +++++++++++++++
+>   1 file changed, 15 insertions(+)
+>
+> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+> index e1a10b0..9d38fc2 100644
+> --- a/include/net/ipv6.h
+> +++ b/include/net/ipv6.h
+> @@ -382,6 +382,21 @@ static inline void ipv6_addr_prefix(struct in6_addr *pfx,
+>   		pfx->s6_addr[o] = addr->s6_addr[o] & (0xff00 >> b);
+>   }
+>
+> +static inline void ipv6_addr_prefix_cpy(struct in6_addr *addr,
+> +					const struct in6_addr *pfx,
+> +					int plen)
+> +{
+> +	/* caller must guarantee 0 <= plen <= 128 */
+> +	int o = plen >> 3,
+> +	    b = plen & 0x7;
 
-Applied.
+    Unusual declaration style, why not just have *int* on both lines?
 
--- 
-pozdrawiam
-Szymon Janc
+[...]
+
+MBR, Sergei
+
