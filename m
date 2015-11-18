@@ -1,73 +1,91 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [RFCv2 bluetooth-next 2/3] ipv6: add ipv6_addr_prefix_cpy
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-References: <1447799594-6050-1-git-send-email-alex.aring@gmail.com>
- <1447799594-6050-3-git-send-email-alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no,
-	martin.gergeleit@hs-rm.de,
-	"David S . Miller" <davem@davemloft.net>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	James Morris <jmorris@namei.org>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Patrick McHardy <kaber@trash.net>
-From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Message-ID: <564C8336.7000100@cogentembedded.com>
-Date: Wed, 18 Nov 2015 16:55:02 +0300
+Return-Path: <danny.schweizer@proofnet.de>
+Subject: Re: [PATCH] BNEP multicast filter is filtering multicast addresses in
+ default case although differently specified
+To: Marcel Holtmann <marcel@holtmann.org>
+References: <564C6C35.4030305@proofnet.de>
+ <F6214B06-650D-4DE0-A375-49652B8124A5@holtmann.org>
+From: Danny Schweizer <danny.schweizer@proofnet.de>
+Cc: linux-bluetooth@vger.kernel.org
+Message-ID: <564C792B.3040300@proofnet.de>
+Date: Wed, 18 Nov 2015 14:12:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <1447799594-6050-3-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <F6214B06-650D-4DE0-A375-49652B8124A5@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Hi Marcel,
 
-On 11/18/2015 1:33 AM, Alexander Aring wrote:
 
-> This patch adds a static inline function ipv6_addr_prefix_cpy which
+> Hi Danny,
+> 
+>> This patch fixes the Bug 106691 by changing the default multicast filter
+>> to not filter out any multicast addresses.
+>>
+>> ---
+>> net/bluetooth/bnep/core.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+>> index 1641367..ba2467a 100644
+>> --- a/net/bluetooth/bnep/core.c
+>> +++ b/net/bluetooth/bnep/core.c
+>> @@ -609,7 +609,7 @@ int bnep_add_connection(struct bnep_connadd_req
+>> *req, struct socket *sock)
+>>
+>> #ifdef CONFIG_BT_BNEP_MC_FILTER
+>> 	/* Set default mc filter */
+>> -	set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
+>> +	s->mc_filter = ~0LL;
+>> #endif
+> 
+> I am not convinced that these two are actually the same expressions. You need to explain this a lot more in detail on why this change is correct.
+> 
+> Regards
+> 
+> Marcel
 
-    I suggest not to reduce "copy".
+The new expression should set the default mc_filter such that it does
+not filter out any multicast addresses (it sets the mc_filter to all
+ones). Up to now, the default mc_filter filters out all multicast
+addresses except for the broadcast address. The reason why this is
+needed is explained in the description of bug 106691. I will copy it here:
 
-> copies a ipv6 address prefix(argument pfx) into the ipv6 address prefix.
-> The prefix len is given by plen as bits. This function mainly based on
-> ipv6_addr_prefix which copies one address prefix from address into a new
-> ipv6 address destination and zero all other address bits.
->
-> The difference is that ipv6_addr_prefix_cpy don't get a prefix from an
-> ipv6 address, it sets a prefix to an ipv6 address with keeping other
-> address bits. The use case is for context based address compression
-> inside 6LoWPAN IPHC header which keeping ipv6 prefixes inside a context
-> table to lookup address-bits without sending them.
->
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-> Cc: James Morris <jmorris@namei.org>
-> Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-> Cc: Patrick McHardy <kaber@trash.net>
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->   include/net/ipv6.h | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
->
-> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-> index e1a10b0..9d38fc2 100644
-> --- a/include/net/ipv6.h
-> +++ b/include/net/ipv6.h
-> @@ -382,6 +382,21 @@ static inline void ipv6_addr_prefix(struct in6_addr *pfx,
->   		pfx->s6_addr[o] = addr->s6_addr[o] & (0xff00 >> b);
->   }
->
-> +static inline void ipv6_addr_prefix_cpy(struct in6_addr *addr,
-> +					const struct in6_addr *pfx,
-> +					int plen)
-> +{
-> +	/* caller must guarantee 0 <= plen <= 128 */
-> +	int o = plen >> 3,
-> +	    b = plen & 0x7;
+A Linux PC is connected with another device over Bluetooth PAN using a
+BNEP interface.
 
-    Unusual declaration style, why not just have *int* on both lines?
+Whenever a packet is tried to be sent over the BNEP interface, the
+function "bnep_net_xmit()" in "net/bluetooth/bnep/netdev.c" is called.
+This function calls "bnep_net_mc_filter()", which checks (if the
+destination address is multicast) if the address is set in a certain
+multicast filter (&s->mc_filter). If it is not, then it is not sent out.
 
-[...]
+This filter is only changed in two other functions, found in
+net/bluetooth/bnep/core.c": in "bnep_ctrl_set_mc_filter()", which is
+only called if a message of type "BNEP_FILTER_MULTI_ADDR_SET" is
+received. Otherwise, it is set in "bnep_add_connection()", where it is
+set to a default value which only adds the broadcast address to the filter:
 
-MBR, Sergei
+set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
 
+
+To sum up, if the BNEP interface does not receive any message of type
+"BNEP_FILTER_MULTI_ADDR_SET", it will not send out any messages with
+multicast destination addresses except for broadcast.
+
+
+However, in the BNEP specification (page 27 in
+http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf), it is said
+that per default, all multicast addresses should not be filtered, i.e.
+the BNEP interface should be able to send packets with any multicast
+destination address.
+
+It seems that the default case is wrong: the multicast filter should not
+block almost all multicast addresses, but should not filter out any.
+
+This leads to the problem that e.g. Neighbor Solicitation messages sent
+with Bluetooth PAN over the BNEP interface to a multicast destination
+address other than broadcast are blocked and not sent out.
+
+
+Regards,
+Danny
