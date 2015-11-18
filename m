@@ -1,19 +1,17 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Chan-yeol Park <chanyeol.park@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Patch v2] Bluetooth: Wait active mode to setup SCO channel
-Date: Wed, 18 Nov 2015 20:40:43 +0900
-Message-id: <1447846843-10566-1-git-send-email-chanyeol.park@samsung.com>
+Subject: [PATCH 1/1] Bluetooth: Wait active mode to establish SCO channel
+Date: Wed, 18 Nov 2015 20:39:56 +0900
+Message-id: <1447846796-10470-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Seungyoun Ju <sy39.ju@samsung.com>
 
 Some of headset such as Samsung HS7000 randomly takes long time to
-exit Sniff Mode because once we get unsniff req from headset and we
-send LMP_accepted but we send it again repeatedly for around 500ms
-because there is no ACK from headset. So SCO connection request might
-be failed due to "Command Disallowed" and user space gets "EBUSY".
+exit Sniff Mode. So SCO connection request might be failed
+due to "Command Disallowed" and user space gets "EBUSY".
 
 But it's not easy that user space expects when the connection
 becomes active mode. So if kernel call hci_sco_setup() by
@@ -39,6 +37,11 @@ reduced compared to user space's retrial way.
 2015-11-17 15:21:31.492683 > HCI Event: Command Status (0x0f) plen 4
     Exit Sniff Mode (0x02|0x0004) status 0x0c ncmd 1
     Error: Command Disallowed
+2015-11-17 15:21:31.605469 < HCI Command: Write Voice Setting (0x03|0x0026) plen 2
+    voice setting 0x0060
+2015-11-17 15:21:31.606227 > HCI Event: Command Complete (0x0e) plen 4
+    Write Voice Setting (0x03|0x0026) ncmd 1
+    status 0x00
 2015-11-17 15:21:31.612180 < HCI Command: Exit Sniff Mode (0x02|0x0004) plen 2
     handle 11
 2015-11-17 15:21:31.613193 > HCI Event: Command Status (0x0f) plen 4
@@ -58,11 +61,11 @@ Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
  include/net/bluetooth/hci.h      |  1 +
  include/net/bluetooth/hci_core.h |  2 ++
  net/bluetooth/hci_conn.c         | 17 +++++++++++++++++
- net/bluetooth/hci_event.c        | 15 ++++++++++-----
- 4 files changed, 30 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_event.c        | 12 ++++++++----
+ 4 files changed, 28 insertions(+), 4 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index cc22167..95dee704 100644
+index 0205b80..bfc2ca4 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
 @@ -263,6 +263,7 @@ enum {
@@ -74,10 +77,10 @@ index cc22167..95dee704 100644
  #define HCI_POWER_OFF_TIMEOUT	msecs_to_jiffies(5000)	/* 5 seconds */
  #define HCI_LE_CONN_TIMEOUT	msecs_to_jiffies(20000)	/* 20 seconds */
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 55ce209..ae1d0d3 100644
+index 1878d0a..3788cb7 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -442,6 +442,7 @@ struct hci_conn {
+@@ -440,6 +440,7 @@ struct hci_conn {
  	__u8		passkey_entered;
  	__u16		disc_timeout;
  	__u16		conn_timeout;
@@ -85,7 +88,7 @@ index 55ce209..ae1d0d3 100644
  	__u16		setting;
  	__u16		le_conn_min_interval;
  	__u16		le_conn_max_interval;
-@@ -472,6 +473,7 @@ struct hci_conn {
+@@ -470,6 +471,7 @@ struct hci_conn {
  	struct delayed_work disc_work;
  	struct delayed_work auto_accept_work;
  	struct delayed_work idle_work;
@@ -94,10 +97,10 @@ index 55ce209..ae1d0d3 100644
  	struct work_struct  le_scan_cleanup;
  
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 2d334e0..b6c0332 100644
+index 85b82f7..4e6a24f 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -491,6 +491,19 @@ static void le_conn_timeout(struct work_struct *work)
+@@ -487,6 +487,19 @@ static void le_conn_timeout(struct work_struct *work)
  	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
  }
  
@@ -117,7 +120,7 @@ index 2d334e0..b6c0332 100644
  struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
  			      u8 role)
  {
-@@ -519,6 +532,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+@@ -515,6 +528,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
  
  	set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
  	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
@@ -125,7 +128,7 @@ index 2d334e0..b6c0332 100644
  
  	if (conn->role == HCI_ROLE_MASTER)
  		conn->out = true;
-@@ -550,6 +564,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+@@ -546,6 +560,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
  	INIT_DELAYED_WORK(&conn->disc_work, hci_conn_timeout);
  	INIT_DELAYED_WORK(&conn->auto_accept_work, hci_conn_auto_accept);
  	INIT_DELAYED_WORK(&conn->idle_work, hci_conn_idle);
@@ -133,7 +136,7 @@ index 2d334e0..b6c0332 100644
  	INIT_DELAYED_WORK(&conn->le_conn_timeout, le_conn_timeout);
  	INIT_WORK(&conn->le_scan_cleanup, le_scan_cleanup);
  
-@@ -581,6 +596,8 @@ int hci_conn_del(struct hci_conn *conn)
+@@ -577,6 +592,8 @@ int hci_conn_del(struct hci_conn *conn)
  		if (sco)
  			sco->link = NULL;
  
@@ -143,22 +146,18 @@ index 2d334e0..b6c0332 100644
  		hdev->acl_cnt += conn->sent;
  	} else if (conn->type == LE_LINK) {
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d57c11c..a6df504 100644
+index d57c11c..42d223a 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1839,8 +1839,10 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
- 	if (conn) {
+@@ -1840,6 +1840,7 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
  		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags);
  
--		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags))
-+		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags)) {
+ 		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags))
 +			cancel_delayed_work(&conn->sco_conn_timeout);
  			hci_sco_setup(conn, status);
-+		}
  	}
  
- 	hci_dev_unlock(hdev);
-@@ -1865,9 +1867,10 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
+@@ -1865,9 +1866,10 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
  	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
  	if (conn) {
  		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags);
@@ -172,7 +171,7 @@ index d57c11c..a6df504 100644
  	}
  
  	hci_dev_unlock(hdev);
-@@ -3335,8 +3338,10 @@ static void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -3335,8 +3337,10 @@ static void hci_mode_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
  				clear_bit(HCI_CONN_POWER_SAVE, &conn->flags);
  		}
  
