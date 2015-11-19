@@ -1,74 +1,205 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Danny Schweizer <danny.schweizer@proofnet.de>
-Subject: [PATCH] BNEP multicast filter is filtering multicast addresses in
- default case although differently specified
-Message-ID: <564DDCB8.3030300@proofnet.de>
-Date: Thu, 19 Nov 2015 15:29:12 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [Patch v2] Bluetooth: Wait active mode to setup SCO channel
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1447846843-10566-1-git-send-email-chanyeol.park@samsung.com>
+Date: Thu, 19 Nov 2015 14:51:36 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B15A18BA-5300-4F55-9351-1662FB372D44@holtmann.org>
+References: <1447846843-10566-1-git-send-email-chanyeol.park@samsung.com>
+To: Chan-yeol Park <chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A Linux PC is connected with another device over Bluetooth
- PAN using a BNEP interface.
+Hi Chan-yeol,
 
-Whenever a packet is tried to be sent over the BNEP interface, the
-function "bnep_net_xmit()" in "net/bluetooth/bnep/netdev.c" is called.
-This function calls "bnep_net_mc_filter()", which checks (if the
-destination address is multicast) if the address is set in a certain
-multicast filter (&s->mc_filter). If it is not, then it is not sent out.
+> Some of headset such as Samsung HS7000 randomly takes long time to
+> exit Sniff Mode because once we get unsniff req from headset and we
+> send LMP_accepted but we send it again repeatedly for around 500ms
+> because there is no ACK from headset. So SCO connection request might
+> be failed due to "Command Disallowed" and user space gets "EBUSY".
 
-This filter is only changed in two other functions, found in
-net/bluetooth/bnep/core.c": in "bnep_ctrl_set_mc_filter()", which is
-only called if a message of type "BNEP_FILTER_MULTI_ADDR_SET" is
-received. Otherwise, it is set in "bnep_add_connection()", where it is
-set to a default value which only adds the broadcast address to the filter:
+actually I am curious on what chip is in this headset. hcitool info would tell you and should be probably added as extra information in the commit message.
 
-set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
+> But it's not easy that user space expects when the connection
+> becomes active mode. So if kernel call hci_sco_setup() by
+> HCI_CONN_SCO_SETUP_PEND flag, overall SCO connection time could be
+> reduced compared to user space's retrial way.
 
-To sum up, if the BNEP interface does not receive any message of type
-"BNEP_FILTER_MULTI_ADDR_SET", it will not send out any messages with
-multicast destination addresses except for broadcast.
+I am still not parsing what this sentence tries to tell me. What is the actual impact here.
 
-However, in the BNEP specification (page 27 in
-http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf), it is said
-that per default, all multicast addresses should not be filtered, i.e.
-the BNEP interface should be able to send packets with any multicast
-destination address.
+> 2015-11-17 15:21:31.131227 > ACL data: handle 11 flags 0x02 dlen 19
+>    L2CAP(d): cid 0x0040 len 15 [psm 0]
+>      0000: 6b ff 15 03 41 54 2b 42  56 52 41 3d 31 0d f8     k...AT+BVRA=1..
+> 2015-11-17 15:21:31.132436 < HCI Command: Exit Sniff Mode (0x02|0x0004) plen 2
+>    handle 11
+> 2015-11-17 15:21:31.182614 < ACL data: handle 11 flags 0x00 dlen 14
+>    L2CAP(d): cid 0x0043 len 10 [psm 0]
+>      0000: 69 ef 0d 0d 0a 4f 4b 0d  0a 3e                    i....OK..>
+> 2015-11-17 15:21:31.184210 > HCI Event: Command Status (0x0f) plen 4
+>    Exit Sniff Mode (0x02|0x0004) status 0x0c ncmd 1
+>    Error: Command Disallowed
+> 2015-11-17 15:21:31.491043 < ACL data: handle 11 flags 0x00 dlen 20
+>    L2CAP(d): cid 0x0043 len 16 [psm 0]
+>      0000: 69 ef 19 0d 0a 2b 42 56  52 41 3a 20 31 0d 0a 3e  i....+BVRA: 1..>
+> 2015-11-17 15:21:31.491502 < HCI Command: Exit Sniff Mode (0x02|0x0004) plen 2
+>    handle 11
+> 2015-11-17 15:21:31.492683 > HCI Event: Command Status (0x0f) plen 4
+>    Exit Sniff Mode (0x02|0x0004) status 0x0c ncmd 1
+>    Error: Command Disallowed
+> 2015-11-17 15:21:31.612180 < HCI Command: Exit Sniff Mode (0x02|0x0004) plen 2
+>    handle 11
+> 2015-11-17 15:21:31.613193 > HCI Event: Command Status (0x0f) plen 4
+>    Exit Sniff Mode (0x02|0x0004) status 0x0c ncmd 1
+>    Error: Command Disallowed
+> 2015-11-17 15:21:31.624963 > HCI Event: Mode Change (0x14) plen 6
+>    status 0x00 handle 11 mode 0x00 interval 0
+>    Mode: Active
+> 2015-11-17 15:21:31.625373 < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
+>    handle 11 voice setting 0x0060 ptype 0x038f
+> 2015-11-17 15:21:31.626614 > HCI Event: Command Status (0x0f) plen 4
+>    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
 
-It seems that the default case is wrong: the multicast filter should not
-block almost all multicast addresses, but should not filter out any.
+Actually what I am missing here is what comes back from the the complete event for setup sync. And I think we need to include btmon traces here since they are more detailed in the first place.
 
-This leads to the problem that e.g. Neighbor Solicitation messages sent
-with Bluetooth PAN over the BNEP interface to a multicast destination
-address other than broadcast are blocked and not sent out.
+I also wonder what exit sniff mode has to with this. We are doing active mode because we have to send OK as response. However it might be better to not actually do that in the first place. Since we can control the active mode behavior on a per socket basis.
 
-Therefore, in the default case, we set the mc_filter to ~0LL to not
-filter out any multicast addresses.
----
- net/bluetooth/bnep/core.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+For it seems that trace is with this patch. So it would be interesting to see the traces before and after.
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index 1641367..8e02289 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -608,8 +608,12 @@ int bnep_add_connection(struct bnep_connadd_req
-*req, struct socket *sock)
- 	s->msg.msg_flags = MSG_NOSIGNAL;
+> 
+> Signed-off-by: Seungyoun Ju <sy39.ju@samsung.com>
+> Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+> ---
+> include/net/bluetooth/hci.h      |  1 +
+> include/net/bluetooth/hci_core.h |  2 ++
+> net/bluetooth/hci_conn.c         | 17 +++++++++++++++++
+> net/bluetooth/hci_event.c        | 15 ++++++++++-----
+> 4 files changed, 30 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index cc22167..95dee704 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -263,6 +263,7 @@ enum {
+> #define HCI_INIT_TIMEOUT	msecs_to_jiffies(10000)	/* 10 seconds */
+> #define HCI_CMD_TIMEOUT		msecs_to_jiffies(2000)	/* 2 seconds */
+> #define HCI_ACL_TX_TIMEOUT	msecs_to_jiffies(45000)	/* 45 seconds */
+> +#define HCI_SCO_TIMEOUT		msecs_to_jiffies(2000)	/* 2 seconds */
+> #define HCI_AUTO_OFF_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
+> #define HCI_POWER_OFF_TIMEOUT	msecs_to_jiffies(5000)	/* 5 seconds */
+> #define HCI_LE_CONN_TIMEOUT	msecs_to_jiffies(20000)	/* 20 seconds */
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 55ce209..ae1d0d3 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -442,6 +442,7 @@ struct hci_conn {
+> 	__u8		passkey_entered;
+> 	__u16		disc_timeout;
+> 	__u16		conn_timeout;
+> +	__u16		sco_timeout;
+> 	__u16		setting;
+> 	__u16		le_conn_min_interval;
+> 	__u16		le_conn_max_interval;
+> @@ -472,6 +473,7 @@ struct hci_conn {
+> 	struct delayed_work disc_work;
+> 	struct delayed_work auto_accept_work;
+> 	struct delayed_work idle_work;
+> +	struct delayed_work sco_conn_timeout;
+> 	struct delayed_work le_conn_timeout;
+> 	struct work_struct  le_scan_cleanup;
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 2d334e0..b6c0332 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -491,6 +491,19 @@ static void le_conn_timeout(struct work_struct *work)
+> 	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
+> }
+> 
+> +static void sco_conn_timeout(struct work_struct *work)
+> +{
+> +	struct hci_conn *conn = container_of(work, struct hci_conn,
+> +					     sco_conn_timeout.work);
+> +
+> +	BT_DBG("");
+> +
+> +	if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags)) {
+> +		BT_ERR("Fail to exit sniff mode to setup SCO within timeout");
+> +		hci_sco_setup(conn, 0x0c);
+> +	}
+> +}
+> +
+> struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+> 			      u8 role)
+> {
+> @@ -519,6 +532,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+> 
+> 	set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
+> 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+> +	conn->sco_timeout = HCI_SCO_TIMEOUT;
+> 
+> 	if (conn->role == HCI_ROLE_MASTER)
+> 		conn->out = true;
+> @@ -550,6 +564,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+> 	INIT_DELAYED_WORK(&conn->disc_work, hci_conn_timeout);
+> 	INIT_DELAYED_WORK(&conn->auto_accept_work, hci_conn_auto_accept);
+> 	INIT_DELAYED_WORK(&conn->idle_work, hci_conn_idle);
+> +	INIT_DELAYED_WORK(&conn->sco_conn_timeout, sco_conn_timeout);
+> 	INIT_DELAYED_WORK(&conn->le_conn_timeout, le_conn_timeout);
+> 	INIT_WORK(&conn->le_scan_cleanup, le_scan_cleanup);
+> 
+> @@ -581,6 +596,8 @@ int hci_conn_del(struct hci_conn *conn)
+> 		if (sco)
+> 			sco->link = NULL;
+> 
+> +		cancel_delayed_work_sync(&conn->sco_conn_timeout);
+> +
+> 		/* Unacked frames */
+> 		hdev->acl_cnt += conn->sent;
+> 	} else if (conn->type == LE_LINK) {
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index d57c11c..a6df504 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1839,8 +1839,10 @@ static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
+> 	if (conn) {
+> 		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags);
+> 
+> -		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags))
+> +		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags)) {
+> +			cancel_delayed_work(&conn->sco_conn_timeout);
+> 			hci_sco_setup(conn, status);
+> +		}
+> 	}
+> 
+> 	hci_dev_unlock(hdev);
+> @@ -1865,9 +1867,10 @@ static void hci_cs_exit_sniff_mode(struct hci_dev *hdev, __u8 status)
+> 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
+> 	if (conn) {
+> 		clear_bit(HCI_CONN_MODE_CHANGE_PEND, &conn->flags);
+> -
+> -		if (test_and_clear_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags))
+> -			hci_sco_setup(conn, status);
+> +		if (test_bit(HCI_CONN_SCO_SETUP_PEND, &conn->flags))
+> +			queue_delayed_work(conn->hdev->workqueue,
+> +					   &conn->sco_conn_timeout,
+> +					   conn->sco_timeout);
 
- #ifdef CONFIG_BT_BNEP_MC_FILTER
--	/* Set default mc filter */
--	set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
-+	/*
-+	 * Set default mc filter to not filter out any mc addresses
-+	 * as defined in the BNEP specification (revision 0.95a)
-+	 * http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf
-+	 */
-+	s->mc_filter = ~0LL;
- #endif
+The original commit e73439d8c0e4c from Ron Shaffer tries to fail the SCO channel setup when the exit sniff mode command fails. And also does the same when entering sniff mode fails.
 
- #ifdef CONFIG_BT_BNEP_PROTO_FILTER
--- 
-2.1.4
+    Certain headsets such as the Motorola H350 will reject SCO and eSCO
+    connection requests while the ACL is transitioning from sniff mode
+    to active mode. Add synchronization so that SCO and eSCO connection
+    requests will wait until the ACL has fully transitioned to active mode.
+
+With this commit message in mind from the original commit, I wonder if trying to call hci_sco_setup at all when sniff mode and exit sniff mode returns an error is a good idea at all.
+
+This means that adding a timeout for SCO connection setup might be the right solution, but it also means that we do not really need to bother with anything regards to command status with sniff mode or exit sniff mode.
+
+It sounds to me this should be written to be plain and simple. If mode switch is needed, we trigger it and delay the SCO setup until mode change event. The error case happens due to the timeout and not by some errors from the command status from sniff mode or exit sniff mode.
+
+Regards
+
+Marcel
+
