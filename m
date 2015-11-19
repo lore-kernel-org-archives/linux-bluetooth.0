@@ -1,50 +1,34 @@
-Return-Path: <mkarthi3@visteon.com>
-From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
-To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
-	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] net: bluetooth: remove unneeded variable in l2cap_stream_rx
-Date: Thu, 19 Nov 2015 12:05:35 +0000
-Message-ID: <20151119120509.GA8228@jci-VirtualBox>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix mask for H5 header len
+Date: Thu, 19 Nov 2015 11:29:11 +0200
+Message-Id: <1447925351-1677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Prasanna Karthik <mkarthi3@visteon.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Remove unneeded variable used to store return value.
-Error reported by coccicheck.
+Fixes mask when calculating three-wire (h5) length.
 
-Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/bluetooth/hci_h5.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7c65ee2..09a1900 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6524,8 +6524,6 @@ static int l2cap_rx(struct l2cap_chan *chan, struct l=
-2cap_ctrl *control,
- static int l2cap_stream_rx(struct l2cap_chan *chan, struct l2cap_ctrl *con=
-trol,
- 			   struct sk_buff *skb)
- {
--	int err =3D 0;
--
- 	BT_DBG("chan %p, control %p, skb %p, state %d", chan, control, skb,
- 	       chan->rx_state);
-=20
-@@ -6556,7 +6554,7 @@ static int l2cap_stream_rx(struct l2cap_chan *chan, s=
-truct l2cap_ctrl *control,
- 	chan->last_acked_seq =3D control->txseq;
- 	chan->expected_tx_seq =3D __next_seq(chan, control->txseq);
-=20
--	return err;
-+	return 0;
- }
-=20
- static int l2cap_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
---=20
-1.9.1
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index ebefe5e..012248e 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -51,7 +51,7 @@
+ #define H5_HDR_CRC(hdr)		(((hdr)[0] >> 6) & 0x01)
+ #define H5_HDR_RELIABLE(hdr)	(((hdr)[0] >> 7) & 0x01)
+ #define H5_HDR_PKT_TYPE(hdr)	((hdr)[1] & 0x0f)
+-#define H5_HDR_LEN(hdr)		((((hdr)[1] >> 4) & 0xff) + ((hdr)[2] << 4))
++#define H5_HDR_LEN(hdr)		((((hdr)[1] >> 4) & 0x0f) + ((hdr)[2] << 4))
+ 
+ #define SLIP_DELIMITER	0xc0
+ #define SLIP_ESC	0xdb
+-- 
+2.5.0
+
