@@ -1,92 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLDkFBz3TMEyOCZdbfberwA_Z9FEBwbDhAWQxbpSZ4XBA@mail.gmail.com>
-References: <CAKafyqpQwmUOHwH8j68kkni_k8F4pKAKE674w1pvAuL91GjrAw@mail.gmail.com>
-	<CABBYNZLDkFBz3TMEyOCZdbfberwA_Z9FEBwbDhAWQxbpSZ4XBA@mail.gmail.com>
-Date: Fri, 20 Nov 2015 10:22:52 +0530
-Message-ID: <CAKafyqp3Sy3gDcxtWwpHttRB1-8k=CYzmSN8+KDk9ec6x=OLQg@mail.gmail.com>
-Subject: Re: HoG: Report Map Sharing is not Happening all the time.
-From: Prabhu Chawandi <foss.chaws@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [PATCH] Bluetooth: Use hex notation for mask
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1447944458-1700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 19 Nov 2015 16:18:02 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <0D3F4809-7F3D-4304-BA07-746949E3E587@holtmann.org>
+References: <1447944458-1700-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Andrei,
 
-On Thu, Nov 19, 2015 at 6:45 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Prabhu,
->
-> On Thu, Nov 19, 2015 at 8:33 AM, Prabhu Chawandi <foss.chaws@gmail.com> wrote:
->> Hi All,
->>
->>   In My bluetooth Smart Keyboard sometimes though connection is
->> established key presses were not being received by application. I
->> tried running 'evtest' /dev/input/eventX node was not created when the
->> issue was seen. After some debug I found the Report Maps were not
->> shared. [i dint see the log when run bluetoothd -d
->>
->> 1. Is it necessary to share report map all the time system is reboot ?
->> 2. is the Report map not cached ? or Cached which system failed to pick ?
->
-> The report map is lost every time you restart bluetoothd, that is
-> because we only cache attribute handles but not theirs values since it
-> would be way too expensive the read and store everything, so what
-> happens is that during the first time you connect to a HoG peripheral
-> bluetoothd will attempt to read the report map and create the input
-> device but perhaps there is something causing a problem in your case.
->
->> Please let me know your views.
->>
->> many thanks,
->> Prabhu Chawandi
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
+> This makes it easier to read and makes code consistent.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+> drivers/bluetooth/hci_h5.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I went through the hcidump
+patch has been applied to bluetooth-next tree.
 
-I saw multiple connection and disconnection sequence. In the hcidump
-its saying connection timed out[not sure about the reason]
+Regards
 
-When disconnection  happens
-< ACL data: handle 68 flags 0x00 dlen 11
-    ATT: Read By Type req (0x08)
-      start 0x0011, end 0x0030
-      type-uuid 0x2803
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 68 reason 0x08
-    Reason: Connection Timeout
+Marcel
 
-
-Supervisory timeout in peripheral is 20.5 Seconds is it not fine ?
-Please let me know is there any parameter I need to configure
-[timeouts] for me ?
-
-After some attempts connection is successful, but I see no report map
-is requested by bluez.
-
-< HCI Command: LE Connection Update (0x08|0x0013) plen 14
-> HCI Event: Command Status (0x0f) plen 4
-    LE Connection Update (0x08|0x0013) status 0x00 ncmd 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 68 packets 1
-> HCI Event: Command Status (0x0f) plen 4
-    Unknown (0x00|0x0000) status 0x00 ncmd 1
-> HCI Event: LE Meta Event (0x3e) plen 10
-    LE Connection Update Complete
-      status 0x00 handle 68
-      interval 12.50ms, latency 125.00ms, superv. timeout 20500.00ms
-
-Looking forward your input.
-
-Many Thanks,
-Prabhu Chawandi
