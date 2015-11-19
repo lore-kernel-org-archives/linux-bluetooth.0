@@ -1,48 +1,50 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <mkarthi3@visteon.com>
+From: "Mutharaju, Prasanna (P.)" <mkarthi3@visteon.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "gustavo@padovan.org"
+	<gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] net: bluetooth: remove unneeded variable in l2cap_stream_rx
+Date: Thu, 19 Nov 2015 12:05:35 +0000
+Message-ID: <20151119120509.GA8228@jci-VirtualBox>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <CAKafyqpQwmUOHwH8j68kkni_k8F4pKAKE674w1pvAuL91GjrAw@mail.gmail.com>
-References: <CAKafyqpQwmUOHwH8j68kkni_k8F4pKAKE674w1pvAuL91GjrAw@mail.gmail.com>
-Date: Thu, 19 Nov 2015 15:15:36 +0200
-Message-ID: <CABBYNZLDkFBz3TMEyOCZdbfberwA_Z9FEBwbDhAWQxbpSZ4XBA@mail.gmail.com>
-Subject: Re: HoG: Report Map Sharing is not Happening all the time.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Prabhu Chawandi <foss.chaws@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Prabhu,
+From: Prasanna Karthik <mkarthi3@visteon.com>
 
-On Thu, Nov 19, 2015 at 8:33 AM, Prabhu Chawandi <foss.chaws@gmail.com> wrote:
-> Hi All,
->
->   In My bluetooth Smart Keyboard sometimes though connection is
-> established key presses were not being received by application. I
-> tried running 'evtest' /dev/input/eventX node was not created when the
-> issue was seen. After some debug I found the Report Maps were not
-> shared. [i dint see the log when run bluetoothd -d
->
-> 1. Is it necessary to share report map all the time system is reboot ?
-> 2. is the Report map not cached ? or Cached which system failed to pick ?
+Remove unneeded variable used to store return value.
+Error reported by coccicheck.
 
-The report map is lost every time you restart bluetoothd, that is
-because we only cache attribute handles but not theirs values since it
-would be way too expensive the read and store everything, so what
-happens is that during the first time you connect to a HoG peripheral
-bluetoothd will attempt to read the report map and create the input
-device but perhaps there is something causing a problem in your case.
+Signed-off-by: Prasanna Karthik <mkarthi3@visteon.com>
+---
+ net/bluetooth/l2cap_core.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-> Please let me know your views.
->
-> many thanks,
-> Prabhu Chawandi
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 7c65ee2..09a1900 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6524,8 +6524,6 @@ static int l2cap_rx(struct l2cap_chan *chan, struct l=
+2cap_ctrl *control,
+ static int l2cap_stream_rx(struct l2cap_chan *chan, struct l2cap_ctrl *con=
+trol,
+ 			   struct sk_buff *skb)
+ {
+-	int err =3D 0;
+-
+ 	BT_DBG("chan %p, control %p, skb %p, state %d", chan, control, skb,
+ 	       chan->rx_state);
+=20
+@@ -6556,7 +6554,7 @@ static int l2cap_stream_rx(struct l2cap_chan *chan, s=
+truct l2cap_ctrl *control,
+ 	chan->last_acked_seq =3D control->txseq;
+ 	chan->expected_tx_seq =3D __next_seq(chan, control->txseq);
+=20
+-	return err;
++	return 0;
+ }
+=20
+ static int l2cap_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+--=20
+1.9.1
