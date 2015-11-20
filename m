@@ -1,306 +1,102 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLh8p5kBebFbOGROjP_V7aJ3gXh1ZEQizZzdN7aoi8BTA@mail.gmail.com>
-References: <1447708112-12695-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<1447708112-12695-4-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<CABD6X-LJtw7UxK-zGueB3+2gsN4f4Z6HDsKxwDWK9qbq8c8o4A@mail.gmail.com>
-	<CABBYNZLyjzaGGCMV5Xh-cnr5AbGvjgLLxemJAzq=a=PitiSNxg@mail.gmail.com>
-	<CAExxLLCckPU50wVK-nREf4wcqP4Gv8i9FAQ3qiQ_Ex9HA=XEsg@mail.gmail.com>
-	<CABBYNZLh8p5kBebFbOGROjP_V7aJ3gXh1ZEQizZzdN7aoi8BTA@mail.gmail.com>
-Date: Fri, 20 Nov 2015 09:19:11 +0100
-Message-ID: <CAExxLLAd+ag0ZKy8vF6VQNzXfHGOuj1LK_RfC-jf4WGTchc+QA@mail.gmail.com>
-Subject: Re: [PATCH 3/4] shared/gatt-server: Improve long write session handling
-From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAKafyqp3Sy3gDcxtWwpHttRB1-8k=CYzmSN8+KDk9ec6x=OLQg@mail.gmail.com>
+References: <CAKafyqpQwmUOHwH8j68kkni_k8F4pKAKE674w1pvAuL91GjrAw@mail.gmail.com>
+	<CABBYNZLDkFBz3TMEyOCZdbfberwA_Z9FEBwbDhAWQxbpSZ4XBA@mail.gmail.com>
+	<CAKafyqp3Sy3gDcxtWwpHttRB1-8k=CYzmSN8+KDk9ec6x=OLQg@mail.gmail.com>
+Date: Fri, 20 Nov 2015 10:17:41 +0200
+Message-ID: <CABBYNZLYQ0_v1b1FodejP+eUMPsi_afEOh-jrsFS9WauHO99_w@mail.gmail.com>
+Subject: Re: HoG: Report Map Sharing is not Happening all the time.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Prabhu Chawandi <foss.chaws@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Prabhu,
 
-On Thu, Nov 19, 2015 at 12:01 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lukasz,
+On Fri, Nov 20, 2015 at 6:52 AM, Prabhu Chawandi <foss.chaws@gmail.com> wrote:
+> Hi Luiz,
 >
-> On Tue, Nov 17, 2015 at 11:32 PM, Łukasz Rymanowski
-> <lukasz.rymanowski@codecoup.pl> wrote:
->> Hi Luiz, Marcin,
+> On Thu, Nov 19, 2015 at 6:45 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Hi Prabhu,
 >>
->> On Tue, Nov 17, 2015 at 1:49 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi Marcin,
+>> On Thu, Nov 19, 2015 at 8:33 AM, Prabhu Chawandi <foss.chaws@gmail.com> wrote:
+>>> Hi All,
 >>>
->>> On Tue, Nov 17, 2015 at 2:12 PM, Marcin Kraglak
->>> <marcin.kraglak@tieto.com> wrote:
->>>> Hi Lukasz,
->>>>
->>>> On 16 November 2015 at 22:08, Łukasz Rymanowski
->>>> <lukasz.rymanowski@codecoup.pl> wrote:
->>>>>
->>>>> With current implementation application layer has no idea when
->>>>> long write session ends as it gets write callback with execute
->>>>> write for each prepare write data.
->>>>> With this patch, after data are completly received by gatt-server it
->>>>> starts to call write callback in proper order with opcode
->>>>> BT_ATT_OP_PREP_WRITE_REQ. After that, each characteristic gets
->>>>> BT_ATT_OP_EXEC_WRITE_REQ so it knows that complete characteristic value
->>>>> has been received and data can be marked as valid.
->>>>> ---
->>>>>  src/shared/gatt-server.c | 78 ++++++++++++++++++++++++++++++++++++++++++++----
->>>>>  1 file changed, 73 insertions(+), 5 deletions(-)
->>>>>
->>>>> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
->>>>> index 329f53f..931d619 100644
->>>>> --- a/src/shared/gatt-server.c
->>>>> +++ b/src/shared/gatt-server.c
->>>>> @@ -104,6 +104,8 @@ struct bt_gatt_server {
->>>>>         struct queue *prep_queue;
->>>>>         unsigned int max_prep_queue_len;
->>>>>
->>>>> +       struct queue *exec_queue;
->>>>> +
->>>>>         struct async_read_op *pending_read_op;
->>>>>         struct async_write_op *pending_write_op;
->>>>>
->>>>> @@ -137,6 +139,7 @@ static void bt_gatt_server_free(struct bt_gatt_server *server)
->>>>>                 server->pending_write_op->server = NULL;
->>>>>
->>>>>         queue_destroy(server->prep_queue, prep_write_data_destroy);
->>>>> +       queue_destroy(server->exec_queue, NULL);
->>>>>
->>>>>         gatt_db_unref(server->db);
->>>>>         bt_att_unref(server->att);
->>>>> @@ -1155,10 +1158,61 @@ error:
->>>>>
->>>>>  }
->>>>>
->>>>> +static void exec_next_write(struct bt_gatt_server *server);
->>>>> +
->>>>> +static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->>>>> +                                                               void *user_data)
->>>>> +{
->>>>> +       struct bt_gatt_server *server = user_data;
->>>>> +       uint16_t handle = gatt_db_attribute_get_handle(attr);
->>>>> +
->>>>> +       if (err) {
->>>>> +               queue_remove_all(server->exec_queue, NULL, NULL, NULL);
->>>>> +               bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
->>>>> +                                                               handle, err);
->>>>> +       }
->>>>> +
->>>>> +       exec_next_write(server);
->>>>> +}
->>>>> +
->>>>> +static void exec_next_write(struct bt_gatt_server *server)
->>>>> +{
->>>>> +       uint16_t *handle;
->>>>> +       struct gatt_db_attribute *attr;
->>>>> +       bool status;
->>>>> +       int err;
->>>>> +
->>>>> +       handle = queue_pop_head(server->exec_queue);
->>>>> +       if (!handle) {
->>>>> +               bt_att_send(server->att, BT_ATT_OP_EXEC_WRITE_RSP, NULL, 0,
->>>>> +                                                       NULL, NULL, NULL);
->>>>> +       }
->>>>> +
->>>>> +       attr = gatt_db_get_attribute(server->db, PTR_TO_UINT(handle));
->>>>> +       if (!attr) {
->>>>> +               err = BT_ATT_ERROR_UNLIKELY;
->>>>> +               goto error;
->>>>> +       }
->>>>> +
->>>>> +       status = gatt_db_attribute_write(attr, 0, NULL , 0,
->>>>> +                                               BT_ATT_OP_EXEC_WRITE_REQ,
->>>>> +                                               server->att,
->>>>> +                                               exec_write_complete_cb, server);
->>>>> +       if (status)
->>>>> +               return;
->>>>> +
->>>>> +       err = BT_ATT_ERROR_UNLIKELY;
->>>>> +
->>>>> +error:
->>>>> +       queue_remove_all(server->exec_queue, NULL, NULL, NULL);
->>>>> +       bt_att_send_error_rsp(server->att, BT_ATT_OP_EXEC_WRITE_REQ,
->>>>> +                                               PTR_TO_UINT(handle), err);
->>>>> +}
->>>>> +
->>>>>  static void exec_next_prep_write(struct bt_gatt_server *server,
->>>>>                                                 uint16_t ehandle, int err);
->>>>>
->>>>> -static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->>>>> +static void prep_write_complete_cb(struct gatt_db_attribute *attr, int err,
->>>>>                                                                 void *user_data)
->>>>>  {
->>>>>         struct bt_gatt_server *server = user_data;
->>>>> @@ -1167,6 +1221,11 @@ static void exec_write_complete_cb(struct gatt_db_attribute *attr, int err,
->>>>>         exec_next_prep_write(server, handle, err);
->>>>>  }
->>>>>
->>>>> +static bool match_attribute_handle(const void *data, const void *match_data)
->>>>> +{
->>>>> +       return PTR_TO_UINT(data) == PTR_TO_UINT(match_data);
->>>>> +}
->>>>> +
->>>>>  static void exec_next_prep_write(struct bt_gatt_server *server,
->>>>>                                                 uint16_t ehandle, int err)
->>>>>  {
->>>>> @@ -1177,10 +1236,17 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
->>>>>         if (err)
->>>> Shouldn't you remove all elements of server->exec_queue here? Looking
->>>> at the next patch, all attributes in exec_queue shall be notified that
->>>> exec write is canceled too.
->>>> And just open question: with introducing two types of write requests
->>>> in reliable write procedure: BT_ATT_OP_EXEC_WRITE_REQ and
->>>> BT_ATT_OP_PREP_WRITE_REQ, we could avoid using two queues and pass
->>>> prepare writes immediatelly to specific service implementation instead
->>>> of storing all values in prepare writes in server.
+>>>   In My bluetooth Smart Keyboard sometimes though connection is
+>>> established key presses were not being received by application. I
+>>> tried running 'evtest' /dev/input/eventX node was not created when the
+>>> issue was seen. After some debug I found the Report Maps were not
+>>> shared. [i dint see the log when run bluetoothd -d
 >>>
->>> Even if we have some flush logic trigger by execute we cannot really
->>> dispatch writes immediately to the services because it can fail with
->>> some errors that are not allowed by the testing spec, yes there is a
->>> specific test checking the e.g. invalid offset is only receive as a
->>> response to execute. It looks like this is because the value could be
->>> changed in between prepare and execute, which IMO is something
->>> horribly broken with prepare + execute since it is intended for
->>> reliable writes but it can produce all sort of errors which is
->>> impossible to guess without reading the value written after it has
->>> been executed in case anything has change in between the commands.
->>>
+>>> 1. Is it necessary to share report map all the time system is reboot ?
+>>> 2. is the Report map not cached ? or Cached which system failed to pick ?
 >>
->> I see Marcins point and agree. According to spec if handle is valid,
->> permisions are ok and there
->> is enought place in the queue, Prepare Write Response shall be sent
->> back. No matter if application
->> likes data or not. Error on value validation we will get during
->> execute writes. So in teory we could indeed
->> avoid prep_queue and send data directly to application when handle is
->> ok and permisions are fine.
->
-> I thought the data reaching the application would mean it shall now
-> apply, but perhaps Android interface does not care what the
-> application will do with it, anyway this is something I would not like
-> to have in D-Bus since we don't expose prepare + execute write there.
->
->> Actually this is how we do it now in Android part.
->> But on the other side, that is not big deal, so if you Luiz saw any
->> issues with that, we can stay with server
->> handling queuing prep writes.
->
-> Im afraid Android got this wrong, if do dispatch to the application it
-> means they have to be queued there so you no longer can guarantee the
-> sequence of execute e.g.
->
-> prep handle1 -> app1
-> prep handle2 -> app2
-> prep handle2 -> app2
-> prep handle1 -> app1
->
-> exec -> app1, app2, app1 ? (opps, it already execute the first and the
-> second write)
->
-
-Indeed that is the issue.
-
-Now, lets take other example.
-
-prep handle1 -> app1 (offset 0)
-prep handle2 -> app1 (offset 20 - means that first prepare was only
-part of the value)
-
-Exec->app1 ?( opps, what to do with only part of the value)
-
-To summarize, current solution in BlueZ works only for reliable write,
-Android solution works for both but have
-the one issue you mentioned (when there is more then one prepare for
-same characteristic)
-
-The whole problem is that gatt server needs to figure out if client is
-doing reliable or long write and actually
-since we queue all the prep writes we should be able to do that.
-In case of reliable session we could keep current behavior,  and in
-case of long session we probably
-should aggregate complete value and do one exec write to application,
-does it makes sense?
-
-For Android I will just skip prep and execute write but just use
-regular write request. Basically we
-will make use of logic already in gatt-server and do not bother app
-with prep/execute. That should work.
-
-> It is no doubt a completely bogus scenario, but still I think it is
-> better be safe than sorry if some profile turns out to depend in a
-> strict sequence.
->
->>>>>         next = queue_pop_head(server->prep_queue);
->>>>>         if (!next) {
->>>>> -               bt_att_send(server->att, BT_ATT_OP_EXEC_WRITE_RSP, NULL, 0,
->>>>> -                                                       NULL, NULL, NULL);
->>>>> +               exec_next_write(server);
->>>>>                 return;
->>>>>         }
->>>>>
->>>>> @@ -1192,9 +1258,9 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
->>>>>
->>>>>         status = gatt_db_attribute_write(attr, next->offset,
->>>>>                                                 next->value, next->length,
->>>>> -                                               BT_ATT_OP_EXEC_WRITE_REQ,
->>>>> +                                               BT_ATT_OP_PREP_WRITE_REQ,
->>>>>                                                 server->att,
->>>>> -                                               exec_write_complete_cb, server);
->>>>> +                                               prep_write_complete_cb, server);
->>>>>
->>>>>         prep_write_data_destroy(next);
->>>>>
->>>>> @@ -1396,6 +1462,8 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
->>>>>         server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
->>>>>         server->prep_queue = queue_new();
->>>>>
->>>>> +       server->exec_queue = queue_new();
->>>>> +
->>>>>         if (!gatt_server_register_att_handlers(server)) {
->>>>>                 bt_gatt_server_free(server);
->>>>>                 return NULL;
->>>>> --
->>>>> 2.5.0
->>>>>
->>>>> --
->>>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>>> the body of a message to majordomo@vger.kernel.org
->>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>>
->>>>
->>>>
->>>>
->>>> --
->>>> BR
->>>> Marcin Kraglak
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> The report map is lost every time you restart bluetoothd, that is
+>> because we only cache attribute handles but not theirs values since it
+>> would be way too expensive the read and store everything, so what
+>> happens is that during the first time you connect to a HoG peripheral
+>> bluetoothd will attempt to read the report map and create the input
+>> device but perhaps there is something causing a problem in your case.
+>>
+>>> Please let me know your views.
 >>>
->>>
->>>
+>>> many thanks,
+>>> Prabhu Chawandi
 >>> --
->>> Luiz Augusto von Dentz
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >>
 >>
 >>
 >> --
->> BR / Pozdrawiam
->> Łukasz
+>> Luiz Augusto von Dentz
 >
+> I went through the hcidump
 >
+> I saw multiple connection and disconnection sequence. In the hcidump
+> its saying connection timed out[not sure about the reason]
 >
-> --
-> Luiz Augusto von Dentz
+> When disconnection  happens
+> < ACL data: handle 68 flags 0x00 dlen 11
+>     ATT: Read By Type req (0x08)
+>       start 0x0011, end 0x0030
+>       type-uuid 0x2803
+>> HCI Event: Disconn Complete (0x05) plen 4
+>     status 0x00 handle 68 reason 0x08
+>     Reason: Connection Timeout
 
+This is probably why it doesn't work, there is a timeout before the
+discovery completes, very likely either the local controller or the
+remote device is not working properly.
+
+>
+> Supervisory timeout in peripheral is 20.5 Seconds is it not fine ?
+> Please let me know is there any parameter I need to configure
+> [timeouts] for me ?
+>
+> After some attempts connection is successful, but I see no report map
+> is requested by bluez.
+>
+> < HCI Command: LE Connection Update (0x08|0x0013) plen 14
+>> HCI Event: Command Status (0x0f) plen 4
+>     LE Connection Update (0x08|0x0013) status 0x00 ncmd 0
+>> HCI Event: Number of Completed Packets (0x13) plen 5
+>     handle 68 packets 1
+>> HCI Event: Command Status (0x0f) plen 4
+>     Unknown (0x00|0x0000) status 0x00 ncmd 1
+>> HCI Event: LE Meta Event (0x3e) plen 10
+>     LE Connection Update Complete
+>       status 0x00 handle 68
+>       interval 12.50ms, latency 125.00ms, superv. timeout 20500.00ms
+
+What version of BlueZ are you running? Can you disclose what device is
+it that you are trying to make it work?
 
 
 -- 
-BR / Pozdrawiam
-Łukasz
+Luiz Augusto von Dentz
