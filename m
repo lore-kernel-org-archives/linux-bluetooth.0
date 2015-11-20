@@ -2,11 +2,11 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 03/22] monitor/avdtp: Decode AVDTP_DISCOVER
-Date: Fri, 20 Nov 2015 17:50:14 +0100
-Message-ID: <3348927.TWrBTZh3Fe@ix>
-In-Reply-To: <1448028820-25330-4-git-send-email-andrzej.kaczmarek@codecoup.pl>
-References: <1448028820-25330-1-git-send-email-andrzej.kaczmarek@codecoup.pl> <1448028820-25330-4-git-send-email-andrzej.kaczmarek@codecoup.pl>
+Subject: Re: [PATCH v2 22/22] monitor/a2dp: Decode LDAC capabilities
+Date: Fri, 20 Nov 2015 17:40:09 +0100
+Message-ID: <1486854.e8g2EASchL@ix>
+In-Reply-To: <1448028820-25330-23-git-send-email-andrzej.kaczmarek@codecoup.pl>
+References: <1448028820-25330-1-git-send-email-andrzej.kaczmarek@codecoup.pl> <1448028820-25330-23-git-send-email-andrzej.kaczmarek@codecoup.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,215 +14,106 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrzej,
 
-On Friday 20 November 2015 15:13:21 Andrzej Kaczmarek wrote:
-> < ACL Data TX: Handle 256 flags 0x00 dlen 6
->       Channel: 258 len 2 [PSM 25 mode 0] {chan 2}
->       AVDTP: Discover (0x01) Command (0x00) type 0x00 label 0 nosp 0
+On Friday 20 November 2015 15:13:40 Andrzej Kaczmarek wrote:
+> > ACL Data RX: Handle 12 flags 0x02 dlen 24
 > 
-> > ACL Data RX: Handle 256 flags 0x02 dlen 14
+>       Channel: 67 len 20 [PSM 25 mode 0] {chan 1}
+>       AVDTP: Get Capabilities (0x02) Response Accept (0x02) type 0x00 label
+> 2 nosp 0 Service Category: Media Transport (0x01)
+>         Service Category: Media Codec (0x07)
+>           Media Type: Audio (0x00)
+>           Media Codec: Non-A2DP (0xff)
+>             Vendor ID: Sony Corporation (0x0000012d)
+>             Vendor Specific Codec ID: LDAC (0x00aa)
+>               Unknown: 0x073c
+>         Service Category: Content Protection (0x04)
+>           Content Protection Type: SCMS-T (0x0002)
 > 
->       Channel: 66 len 10 [PSM 25 mode 0] {chan 2}
->       AVDTP: Discover (0x01) Response Accept (0x02) type 0x00 label 0 nosp 0
-> ACP SEID: 1
+> < ACL Data TX: Handle 12 flags 0x02 dlen 26
+>       Channel: 2753 len 22 [PSM 25 mode 0] {chan 1}
+>       AVDTP: Set Configuration (0x03) Command (0x00) type 0x00 label 5 nosp
+> 0 ACP SEID: 5
+>         INT SEID: 3
+>         Service Category: Media Transport (0x01)
+>         Service Category: Media Codec (0x07)
 >           Media Type: Audio (0x00)
->           SEP Type: SRC (0x01)
->           In use: No
->         ACP SEID: 5
->           Media Type: Audio (0x00)
->           SEP Type: SRC (0x01)
->           In use: No
->         ACP SEID: 3
->           Media Type: Audio (0x00)
->           SEP Type: SRC (0x01)
->           In use: No
->         ACP SEID: 2
->           Media Type: Audio (0x00)
->           SEP Type: SRC (0x01)
->           In use: No
+>           Media Codec: Non-A2DP (0xff)
+>             Vendor ID: Sony Corporation (0x0000012d)
+>             Vendor Specific Codec ID: LDAC (0x00aa0
+>               Unknown: 0x0104
+>         Service Category: Content Protection (0x04)
+>           Content Protection Type: SCMS-T (0x0002)
 > ---
->  monitor/avdtp.c | 134
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed,
-> 132 insertions(+), 2 deletions(-)
+>  monitor/a2dp.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 > 
-> diff --git a/monitor/avdtp.c b/monitor/avdtp.c
-> index de4edbb..78e3c3b 100644
-> --- a/monitor/avdtp.c
-> +++ b/monitor/avdtp.c
-> @@ -109,6 +109,115 @@ static const char *sigid2str(uint8_t sigid)
->  	}
+> diff --git a/monitor/a2dp.c b/monitor/a2dp.c
+> index d438db0..2077d70 100644
+> --- a/monitor/a2dp.c
+> +++ b/monitor/a2dp.c
+> @@ -50,6 +50,8 @@
+>  /* Vendor Specific A2DP Codecs */
+>  #define APTX_VENDOR_ID		0x0000004f
+>  #define APTX_CODEC_ID		0x0001
+> +#define LDAC_VENDOR_ID		0x0000012d
+> +#define LDAC_CODEC_ID		0x00aa
+> 
+>  struct bit_desc {
+>  	uint8_t bit;
+> @@ -212,6 +214,8 @@ static const char *vndcodec2str(uint32_t vendor_id,
+> uint16_t codec_id) {
+>  	if (vendor_id == APTX_VENDOR_ID && codec_id == APTX_CODEC_ID)
+>  		return "aptX";
+> +	else if (vendor_id == LDAC_VENDOR_ID && codec_id == LDAC_CODEC_ID)
+> +		return "LDAC";
+> 
+>  	return "Unknown";
+>  }
+> @@ -503,6 +507,20 @@ static bool codec_vendor_aptx_cap(uint8_t losc, struct
+> l2cap_frame *frame) return true;
 >  }
 > 
-> +static const char *error2str(uint8_t error)
+> +static bool codec_vendor_ldac(uint8_t losc, struct l2cap_frame *frame)
 > +{
-> +	switch (error) {
-> +	case 0x01:
-> +		return "BAD_HEADER_FORMAT";
-> +	case 0x11:
-> +		return "BAD_LENGTH";
-> +	case 0x12:
-> +		return "BAD_ACP_SEID";
-> +	case 0x13:
-> +		return "SEP_IN_USE";
-> +	case 0x14:
-> +		return "SEP_NOT_IN_USER";
-> +	case 0x17:
-> +		return "BAD_SERV_CATEGORY";
-> +	case 0x18:
-> +		return "BAD_PAYLOAD_FORMAT";
-> +	case 0x19:
-> +		return "NOT_SUPPORTED_COMMAND";
-> +	case 0x1a:
-> +		return "INVALID_CAPABILITIES";
-> +	case 0x22:
-> +		return "BAD_RECOVERY_TYPE";
-> +	case 0x23:
-> +		return "BAD_MEDIA_TRANSPORT_FORMAT";
-> +	case 0x25:
-> +		return "BAD_RECOVERY_FORMAT";
-> +	case 0x26:
-> +		return "BAD_ROHC_FORMAT";
-> +	case 0x27:
-> +		return "BAD_CP_FORMAT";
-> +	case 0x28:
-> +		return "BAD_MULTIPLEXING_FORMAT";
-> +	case 0x29:
-> +		return "UNSUPPORTED_CONFIGURATION";
-> +	case 0x31:
-> +		return "BAD_STATE";
-> +	default:
-> +		return "Unknown";
-> +	}
-> +}
+> +	uint16_t cap = 0;
 > +
-> +static const char *mediatype2str(uint8_t media_type)
-> +{
-> +	switch (media_type) {
-> +	case 0x00:
-> +		return "Audio";
-> +	case 0x01:
-> +		return "Video";
-> +	case 0x02:
-> +		return "Multimedia";
-> +	default:
-> +		return "Reserved";
-> +	}
-> +}
-> +
-> +static bool avdtp_reject_common(struct avdtp_frame *avdtp_frame)
-> +{
-> +	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-> +	uint8_t error;
-> +
-> +	if (!l2cap_frame_get_u8(frame, &error))
+> +	if (losc != 2)
 > +		return false;
 > +
-> +	print_field("Error code: %s (0x%02x)", error2str(error), error);
+> +	l2cap_frame_get_le16(frame, &cap);
+> +
+> +	print_field("%*cUnknown: 0x%04x", BASE_INDENT + 2, ' ', cap);
 > +
 > +	return true;
 > +}
 > +
-> +static bool avdtp_discover(struct avdtp_frame *avdtp_frame)
-> +{
-> +	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-> +
-> +	if (avdtp_frame->hdr & 0x01)
-> +		goto reject;
-> +
-> +	if (avdtp_frame->hdr & 0x02)
-> +		goto response;
-> +
-> +	/* no extra parameters */
-> +	return true;
-> +
-> +reject:
-> +	return avdtp_reject_common(avdtp_frame);
-> +
-> +response:
-> +	for (;;) {
-> +		uint8_t seid;
-> +		uint8_t info;
-> +
-> +		if (!l2cap_frame_get_u8(frame, &seid))
-> +			break;
-> +
-> +		if (!l2cap_frame_get_u8(frame, &info))
-> +			return false;
-> +
-> +		print_field("ACP SEID: %d", seid >> 2);
-> +		print_field("%*cMedia Type: %s (0x%02x)", 2, ' ',
-> +					mediatype2str(info >> 4), info >> 4);
-> +		print_field("%*cSEP Type: %s (0x%02x)", 2, ' ',
-> +						info & 0x04 ? "SNK" : "SRC",
-> +						(info >> 3) & 0x01);
-> +		print_field("%*cIn use: %s", 2, ' ',
-> +						seid & 0x02 ? "Yes" : "No");
-> +	}
-
-
-Maybe it is a matter of taste, but I'd not abuse goto in such simple 
-functions.
-ie
-
-/* reject */
-if (avdtp_frame->hdr & 0x01)
-	return avdtp_reject_common(avdtp_frame);
-
-/* response */
-if (avdtp_frame->hdr & 0x02) {
-	....
-	return true;
-}
-
-....
-return true;
-
-
-> +
-> +	return true;
-> +}
-> +
->  static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
+>  static bool codec_vendor_cap(uint8_t losc, struct l2cap_frame *frame)
 >  {
->  	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-> @@ -116,6 +225,7 @@ static bool avdtp_signalling_packet(struct avdtp_frame
-> *avdtp_frame) uint8_t hdr;
->  	uint8_t sig_id;
->  	uint8_t nosp = 0;
-> +	bool ret;
+>  	uint32_t vendor_id = 0;
+> @@ -524,6 +542,8 @@ static bool codec_vendor_cap(uint8_t losc, struct
+> l2cap_frame *frame)
 > 
->  	if (frame->in)
->  		pdu_color = COLOR_MAGENTA;
-> @@ -152,8 +262,28 @@ static bool avdtp_signalling_packet(struct avdtp_frame
-> *avdtp_frame) sig_id, msgtype2str(hdr & 0x03), hdr & 0x03,
->  			hdr & 0x0c, hdr >> 4, nosp);
+>  	if (vendor_id == APTX_VENDOR_ID && codec_id == APTX_CODEC_ID) {
+>  		codec_vendor_aptx_cap(losc, frame);
+> +	} else if (vendor_id == LDAC_VENDOR_ID && codec_id == LDAC_CODEC_ID) {
+> +		codec_vendor_ldac(losc, frame);
+
+Should this return value  from function? Otherwise you may silently ignore 
+data if length doesn't match.
+
+>  	} else {
+>  		packet_hexdump(frame->data, losc);
+>  		l2cap_frame_pull(frame, frame, losc);
+> @@ -573,6 +593,8 @@ static bool codec_vendor_cfg(uint8_t losc, struct
+> l2cap_frame *frame)
 > 
-> -	packet_hexdump(frame->data, frame->size);
-> -	return true;
-> +	/* Start Packet */
-> +	if ((hdr & 0x0c) == 0x04) {
-> +		/* TODO: handle fragmentation */
-> +		packet_hexdump(frame->data, frame->size);
-> +		return true;
-> +	}
-> +
-> +	/* General Reject */
-> +	if ((hdr & 0x03) == 0x03)
-> +		return true;
-> +
-> +	switch (sig_id) {
-> +	case AVDTP_DISCOVER:
-> +		ret = avdtp_discover(avdtp_frame);
-> +		break;
-> +	default:
-> +		packet_hexdump(frame->data, frame->size);
-> +		ret = true;
-> +		break;
-> +	}
-> +
-> +	return ret;
->  }
-> 
->  void avdtp_packet(const struct l2cap_frame *frame)
+>  	if (vendor_id == APTX_VENDOR_ID && codec_id == APTX_CODEC_ID) {
+>  		codec_vendor_aptx_cfg(losc, frame);
+> +	} else if (vendor_id == LDAC_VENDOR_ID && codec_id == LDAC_CODEC_ID) {
+> +		codec_vendor_ldac(losc, frame);
+>  	} else {
+>  		packet_hexdump(frame->data, losc);
+>  		l2cap_frame_pull(frame, frame, losc);
 
 -- 
 pozdrawiam
