@@ -2,124 +2,27 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH v2 04/22] monitor/avdtp: Decode AVDTP_GET_CAPABILITIES
-Date: Fri, 20 Nov 2015 15:13:22 +0100
-Message-Id: <1448028820-25330-5-git-send-email-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH v2 06/22] monitor/avdtp: Decode AVDTP_GET_CONFIGURATION
+Date: Fri, 20 Nov 2015 15:13:24 +0100
+Message-Id: <1448028820-25330-7-git-send-email-andrzej.kaczmarek@codecoup.pl>
 In-Reply-To: <1448028820-25330-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 References: <1448028820-25330-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-< ACL Data TX: Handle 256 flags 0x00 dlen 7
-      Channel: 258 len 3 [PSM 25 mode 0] {chan 2}
-      AVDTP: Get Capabilities (0x02) Command (0x00) type 0x00 label 1 nosp 0
-        ACP SEID: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 20
-      Channel: 66 len 16 [PSM 25 mode 0] {chan 2}
-      AVDTP: Get Capabilities (0x02) Response Accept (0x02) type 0x00 label 1 nosp 0
-        Service Category: Media Transport (0x01)
-        Service Category: Media Codec (0x07)
-        00 00 3f ff 02 35                                ..?..5
-        Service Category: Content Protection (0x04)
-        02 00                                            ..
 ---
- monitor/avdtp.c | 92 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 92 insertions(+)
+ monitor/avdtp.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
 diff --git a/monitor/avdtp.c b/monitor/avdtp.c
-index 78e3c3b..cf11d2e 100644
+index 6869183..84378a6 100644
 --- a/monitor/avdtp.c
 +++ b/monitor/avdtp.c
-@@ -53,6 +53,16 @@
- #define AVDTP_GET_ALL_CAPABILITIES	0x0c
- #define AVDTP_DELAYREPORT		0x0d
- 
-+/* Service Categories */
-+#define AVDTP_MEDIA_TRANSPORT		0x01
-+#define AVDTP_REPORTING			0x02
-+#define AVDTP_RECOVERY			0x03
-+#define AVDTP_CONTENT_PROTECTION	0x04
-+#define AVDTP_HEADER_COMPRESSION	0x05
-+#define AVDTP_MULTIPLEXING		0x06
-+#define AVDTP_MEDIA_CODEC		0x07
-+#define AVDTP_DELAY_REPORTING		0x08
-+
- struct avdtp_frame {
- 	uint8_t hdr;
- 	uint8_t sig_id;
-@@ -165,6 +175,30 @@ static const char *mediatype2str(uint8_t media_type)
- 	}
- }
- 
-+static const char *servicecat2str(uint8_t service_cat)
-+{
-+	switch (service_cat) {
-+	case AVDTP_MEDIA_TRANSPORT:
-+		return "Media Transport";
-+	case AVDTP_REPORTING:
-+		return "Reporting";
-+	case AVDTP_RECOVERY:
-+		return "Recovery";
-+	case AVDTP_CONTENT_PROTECTION:
-+		return "Content Protection";
-+	case AVDTP_HEADER_COMPRESSION:
-+		return "Header Compression";
-+	case AVDTP_MULTIPLEXING:
-+		return "Multiplexing";
-+	case AVDTP_MEDIA_CODEC:
-+		return "Media Codec";
-+	case AVDTP_DELAY_REPORTING:
-+		return "Delay Reporting";
-+	default:
-+		return "Reserved";
-+	}
-+}
-+
- static bool avdtp_reject_common(struct avdtp_frame *avdtp_frame)
- {
- 	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-@@ -178,6 +212,36 @@ static bool avdtp_reject_common(struct avdtp_frame *avdtp_frame)
+@@ -344,6 +344,31 @@ response:
  	return true;
  }
  
-+static bool decode_capabilities(struct avdtp_frame *avdtp_frame)
-+{
-+	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-+
-+	for (;;) {
-+		uint8_t service_cat;
-+		uint8_t losc;
-+
-+		if (!l2cap_frame_get_u8(frame, &service_cat))
-+			break;
-+
-+		if (!l2cap_frame_get_u8(frame, &losc))
-+			return false;
-+
-+		print_field("Service Category: %s (0x%02x)",
-+				servicecat2str(service_cat), service_cat);
-+
-+		if (frame->size < losc)
-+			return false;
-+
-+		/* TODO: decode service capabilities */
-+
-+		packet_hexdump(frame->data, losc);
-+
-+		l2cap_frame_pull(frame, frame, losc);
-+	}
-+
-+	return true;
-+}
-+
- static bool avdtp_discover(struct avdtp_frame *avdtp_frame)
- {
- 	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-@@ -218,6 +282,31 @@ response:
- 	return true;
- }
- 
-+static bool avdtp_get_capabilities(struct avdtp_frame *avdtp_frame)
++static bool avdtp_get_configuration(struct avdtp_frame *avdtp_frame)
 +{
 +	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
 +	uint8_t seid;
@@ -147,12 +50,12 @@ index 78e3c3b..cf11d2e 100644
  static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
  {
  	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-@@ -277,6 +366,9 @@ static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
- 	case AVDTP_DISCOVER:
- 		ret = avdtp_discover(avdtp_frame);
+@@ -409,6 +434,9 @@ static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
+ 	case AVDTP_SET_CONFIGURATION:
+ 		ret = avdtp_set_configuration(avdtp_frame);
  		break;
-+	case AVDTP_GET_CAPABILITIES:
-+		ret = avdtp_get_capabilities(avdtp_frame);
++	case AVDTP_GET_CONFIGURATION:
++		ret = avdtp_get_configuration(avdtp_frame);
 +		break;
  	default:
  		packet_hexdump(frame->data, frame->size);
