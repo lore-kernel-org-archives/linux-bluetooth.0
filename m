@@ -1,55 +1,75 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Michal Suchanek <hramrach@gmail.com>
-Date: Sat, 21 Nov 2015 23:45:20 +0100
-Message-ID: <CAOMqctQvwYLYp2N=sp+NHrAJyW9_8h6V1_KG-9cV5=uvBTzdSg@mail.gmail.com>
-Subject: bluetoothd crashes when media endpoint SelectConfiguration reply does
- not contain an array
+From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary=001a11441f10873158052514c1ae
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH 2/2] monitor: Fix possible crash on unknown LE Meta Event
+Date: Sat, 21 Nov 2015 21:09:04 +0100
+Message-Id: <1448136544-18660-2-git-send-email-szymon.janc@codecoup.pl>
+In-Reply-To: <1448136544-18660-1-git-send-email-szymon.janc@codecoup.pl>
+References: <1448136544-18660-1-git-send-email-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a11441f10873158052514c1ae
-Content-Type: text/plain; charset=UTF-8
+For unknown LE Meta Event subevent_data passed to print_subevent is
+NULL. This results in NULL pointer dereference when subeven code is
+printed. Fix that by making print_subevent expect always valid
+subevent_data and handle unknown event in caller.
+---
+ monitor/packet.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-Hello,
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 70bd153..322bba6 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -8375,23 +8375,17 @@ struct subevent_data {
+ static void print_subevent(const struct subevent_data *subevent_data,
+ 					const void *data, uint8_t size)
+ {
+-	const char *subevent_color, *subevent_str;
++	const char *subevent_color;
+ 
+-	if (subevent_data) {
+-		if (subevent_data->func)
+-			subevent_color = COLOR_HCI_EVENT;
+-		else
+-			subevent_color = COLOR_HCI_EVENT_UNKNOWN;
+-		subevent_str = subevent_data->str;
+-	} else {
++	if (subevent_data->func)
++		subevent_color = COLOR_HCI_EVENT;
++	else
+ 		subevent_color = COLOR_HCI_EVENT_UNKNOWN;
+-		subevent_str = "Unknown";
+-	}
+ 
+-	print_indent(6, subevent_color, "", subevent_str, COLOR_OFF,
++	print_indent(6, subevent_color, "", subevent_data->str, COLOR_OFF,
+ 					" (0x%2.2x)", subevent_data->subevent);
+ 
+-	if (!subevent_data || !subevent_data->func) {
++	if (!subevent_data->func) {
+ 		packet_hexdump(data, size);
+ 		return;
+ 	}
+@@ -8442,9 +8436,16 @@ static const struct subevent_data le_meta_event_table[] = {
+ static void le_meta_event_evt(const void *data, uint8_t size)
+ {
+ 	uint8_t subevent = *((const uint8_t *) data);
+-	const struct subevent_data *subevent_data = NULL;
++	struct subevent_data unknown;
++	const struct subevent_data *subevent_data = &unknown;
+ 	int i;
+ 
++	unknown.subevent = subevent;
++	unknown.str = "Unknown";
++	unknown.func = NULL;
++	unknown.size = 0;
++	unknown.fixed = true;
++
+ 	for (i = 0; le_meta_event_table[i].str; i++) {
+ 		if (le_meta_event_table[i].subevent == subevent) {
+ 			subevent_data = &le_meta_event_table[i];
+-- 
+2.6.2
 
-I am using bluez 5.36 on Debian.
-
-I tried to export a media source from an application. However, when
-the SelectConfiguration call finishes bluetoothd crashes.
-
-Looking at the code there is no check that the return from the
-callback actually contains an array before trying to extract the array
-content.
-
-Adding a check avoids the crash in bluetoothd.
-
-I am not sure why the return value does not contain a proper
-capabilities array but that is another issue.
-
-Sending a patch that fixes the problem for me.
-
-Thanks
-
-Michal
-
---001a11441f10873158052514c1ae
-Content-Type: text/x-patch; charset=US-ASCII; name="debug_crash.patch"
-Content-Disposition: attachment; filename="debug_crash.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ih9onnqg0
-
-SW5kZXg6IGJsdWV6LTUuMzYvcHJvZmlsZXMvYXVkaW8vbWVkaWEuYwo9PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Ci0tLSBi
-bHVlei01LjM2Lm9yaWcvcHJvZmlsZXMvYXVkaW8vbWVkaWEuYworKysgYmx1ZXotNS4zNi9wcm9m
-aWxlcy9hdWRpby9tZWRpYS5jCkBAIC0yOTIsNiArMjkyLDEyIEBAIHN0YXRpYyB2b2lkIGVuZHBv
-aW50X3JlcGx5KERCdXNQZW5kaW5nQ2EKIAogCQlkYnVzX21lc3NhZ2VfaXRlcl9pbml0KHJlcGx5
-LCAmYXJncyk7CiAKKwkJaWYgKGRidXNfbWVzc2FnZV9pdGVyX2dldF9hcmdfdHlwZSgmYXJncykg
-IT0gREJVU19UWVBFX0FSUkFZKSB7CisJCQllcnJvcigiU2VsZWN0Q29uZmlndXJhdGlvbiBkaWQg
-bm90IHJldHVybiBhbiBhcnJheTogJXMiLAorCQkJCWRidXNfbWVzc2FnZV9nZXRfc2lnbmF0dXJl
-KHJlcGx5KSk7CisJCQlnb3RvIGRvbmU7CisJCX0KKwogCQlkYnVzX21lc3NhZ2VfaXRlcl9yZWN1
-cnNlKCZhcmdzLCAmYXJyYXkpOwogCiAJCWRidXNfbWVzc2FnZV9pdGVyX2dldF9maXhlZF9hcnJh
-eSgmYXJyYXksICZjb25maWd1cmF0aW9uLCAmc2l6ZSk7Cg==
---001a11441f10873158052514c1ae--
