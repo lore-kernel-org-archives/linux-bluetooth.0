@@ -1,31 +1,26 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Sun, 22 Nov 2015 16:28:10 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Sun, 22 Nov 2015 16:11:57 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+To: John Keeping <john@metanate.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Add support for Get Advertising Size
- Information command
-Message-ID: <20151122142810.GA22995@t440s>
-References: <1447946203-17620-3-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] build: Link mcaptest with -lrt
+Message-ID: <20151122131157.GA7185@t440s>
+References: <1447773671-22497-1-git-send-email-john@metanate.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1447946203-17620-3-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1447773671-22497-1-git-send-email-john@metanate.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi John,
 
-On Thu, Nov 19, 2015, Marcel Holtmann wrote:
-> The Get Advertising Size Information command allows to retrieve size
-> information for advertising data and scan response data fields depending
-> on the selected flags. This is useful if applications want to know the
-> available size ahead of time.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+On Tue, Nov 17, 2015, John Keeping wrote:
+> profiles/health/mcap.c uses clock_gettime(3) so it needs to be linked
+> with -lrt on some systems.
 > ---
->  include/net/bluetooth/mgmt.h | 13 ++++++++++
->  net/bluetooth/mgmt.c         | 58 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 71 insertions(+)
+>  Makefile.tools | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-This patch has now also been applied. Thanks.
+Applied. Thanks.
 
 Johan
