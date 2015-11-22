@@ -2,34 +2,34 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH v3 09/22] monitor/avdtp: Decode AVDTP_START
-Date: Sun, 22 Nov 2015 21:20:21 +0100
-Message-Id: <1448223634-23305-10-git-send-email-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH v3 10/22] monitor/avdtp: Decode AVDTP_CLOSE
+Date: Sun, 22 Nov 2015 21:20:22 +0100
+Message-Id: <1448223634-23305-11-git-send-email-andrzej.kaczmarek@codecoup.pl>
 In-Reply-To: <1448223634-23305-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 References: <1448223634-23305-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-< ACL Data TX: Handle 256 flags 0x00 dlen 7
-      Channel: 258 len 3 [PSM 25 mode 0] {chan 2}
-      AVDTP: Start (0x07) Command (0x00) type 0x00 label 7 nosp 0
-        ACP SEID: 1
-> ACL Data RX: Handle 256 flags 0x02 dlen 6
-      Channel: 66 len 2 [PSM 25 mode 0] {chan 2}
-      AVDTP: Start (0x07) Response Accept (0x02) type 0x00 label 7 nosp 0
+< ACL Data TX: Handle 12 flags 0x02 dlen 7
+      Channel: 2753 len 3 [PSM 25 mode 0] {chan 1}
+      AVDTP: Close (0x08) Command (0x00) type 0x00 label 8 nosp 0
+        ACP SEID: 5
+> ACL Data RX: Handle 12 flags 0x02 dlen 6
+      Channel: 67 len 2 [PSM 25 mode 0] {chan 1}
+      AVDTP: Close (0x08) Response Accept (0x02) type 0x00 label 8 nosp 0
 ---
- monitor/avdtp.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ monitor/avdtp.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/monitor/avdtp.c b/monitor/avdtp.c
-index 00b54a9..c8213fa 100644
+index c8213fa..6e2bb25 100644
 --- a/monitor/avdtp.c
 +++ b/monitor/avdtp.c
-@@ -411,6 +411,37 @@ static bool avdtp_open(struct avdtp_frame *avdtp_frame)
+@@ -442,6 +442,29 @@ static bool avdtp_start(struct avdtp_frame *avdtp_frame)
  	return false;
  }
  
-+static bool avdtp_start(struct avdtp_frame *avdtp_frame)
++static bool avdtp_close(struct avdtp_frame *avdtp_frame)
 +{
 +	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
 +	uint8_t type = avdtp_frame->hdr & 0x03;
@@ -42,18 +42,10 @@ index 00b54a9..c8213fa 100644
 +
 +		print_field("ACP SEID: %d", seid >> 2);
 +
-+		while (l2cap_frame_get_u8(frame, &seid))
-+			print_field("ACP SEID: %d", seid >> 2);
-+
 +		return true;
 +	case AVDTP_MSG_TYPE_RESPONSE_ACCEPT:
 +		return true;
 +	case AVDTP_MSG_TYPE_RESPONSE_REJECT:
-+		if (!l2cap_frame_get_u8(frame, &seid))
-+			return false;
-+
-+		print_field("ACP SEID: %d", seid >> 2);
-+
 +		return avdtp_reject_common(avdtp_frame);
 +	}
 +
@@ -63,12 +55,12 @@ index 00b54a9..c8213fa 100644
  static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
  {
  	struct l2cap_frame *frame = &avdtp_frame->l2cap_frame;
-@@ -478,6 +509,8 @@ static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
- 		return avdtp_reconfigure(avdtp_frame);
- 	case AVDTP_OPEN:
+@@ -511,6 +534,8 @@ static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
  		return avdtp_open(avdtp_frame);
-+	case AVDTP_START:
-+		return avdtp_start(avdtp_frame);
+ 	case AVDTP_START:
+ 		return avdtp_start(avdtp_frame);
++	case AVDTP_CLOSE:
++		return avdtp_close(avdtp_frame);
  	}
  
  	packet_hexdump(frame->data, frame->size);
