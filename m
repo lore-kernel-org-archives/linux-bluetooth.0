@@ -2,141 +2,71 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH v3 01/22] monitor/l2cap: Add channel sequence number
-Date: Sun, 22 Nov 2015 21:20:13 +0100
-Message-Id: <1448223634-23305-2-git-send-email-andrzej.kaczmarek@codecoup.pl>
-In-Reply-To: <1448223634-23305-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
-References: <1448223634-23305-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH v3 00/22] Add AVDTP/A2DP decoding to btmon
+Date: Sun, 22 Nov 2015 21:20:12 +0100
+Message-Id: <1448223634-23305-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds sequence number to channels structure which determines
-order in which channels for the same PSM were created. It will be used
-for protocols like AVDTP where there is single PSM used for multiple
-channels and order it which they were created is important.
----
- monitor/l2cap.c | 53 ++++++++++++++++++++++++++++++++++++-----------------
- monitor/l2cap.h |  1 +
- 2 files changed, 37 insertions(+), 17 deletions(-)
+Hi,
 
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 894c741..79f7051 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -99,6 +99,7 @@ struct chan_data {
- 	uint8_t  ctrlid;
- 	uint8_t  mode;
- 	uint8_t  ext_ctrl;
-+	uint8_t  seq_num;
- };
- 
- static struct chan_data chan_list[MAX_CHAN];
-@@ -107,10 +108,13 @@ static void assign_scid(const struct l2cap_frame *frame,
- 				uint16_t scid, uint16_t psm, uint8_t ctrlid)
- {
- 	int i, n = -1;
-+	uint8_t seq_num = 1;
- 
- 	for (i = 0; i < MAX_CHAN; i++) {
--		if (n < 0 && chan_list[i].handle == 0x0000)
-+		if (n < 0 && chan_list[i].handle == 0x0000) {
- 			n = i;
-+			continue;
-+		}
- 
- 		if (chan_list[i].index != frame->index)
- 			continue;
-@@ -118,16 +122,18 @@ static void assign_scid(const struct l2cap_frame *frame,
- 		if (chan_list[i].handle != frame->handle)
- 			continue;
- 
-+		if (chan_list[i].psm == psm)
-+			seq_num++;
-+
-+		/* Don't break on match - we still need to go through all
-+		 * channels to find proper seq_num.
-+		 */
- 		if (frame->in) {
--			if (chan_list[i].dcid == scid) {
-+			if (chan_list[i].dcid == scid)
- 				n = i;
--				break;
--			}
- 		} else {
--			if (chan_list[i].scid == scid) {
-+			if (chan_list[i].scid == scid)
- 				n = i;
--				break;
--			}
- 		}
- 	}
- 
-@@ -147,6 +153,8 @@ static void assign_scid(const struct l2cap_frame *frame,
- 	chan_list[n].psm = psm;
- 	chan_list[n].ctrlid = ctrlid;
- 	chan_list[n].mode = 0;
-+
-+	chan_list[n].seq_num = seq_num;
- }
- 
- static void release_scid(const struct l2cap_frame *frame, uint16_t scid)
-@@ -301,6 +309,16 @@ static uint16_t get_chan(const struct l2cap_frame *frame)
- 	return i;
- }
- 
-+static uint8_t get_seq_num(const struct l2cap_frame *frame)
-+{
-+	int i = get_chan_data_index(frame);
-+
-+	if (i < 0)
-+		return 0;
-+
-+	return chan_list[i].seq_num;
-+}
-+
- static void assign_ext_ctrl(const struct l2cap_frame *frame,
- 					uint8_t ext_ctrl, uint16_t dcid)
- {
-@@ -1384,16 +1402,17 @@ static void l2cap_frame_init(struct l2cap_frame *frame, uint16_t index, bool in,
- 				uint16_t handle, uint8_t ident,
- 				uint16_t cid, const void *data, uint16_t size)
- {
--	frame->index  = index;
--	frame->in     = in;
--	frame->handle = handle;
--	frame->ident  = ident;
--	frame->cid    = cid;
--	frame->data   = data;
--	frame->size   = size;
--	frame->psm    = get_psm(frame);
--	frame->mode   = get_mode(frame);
--	frame->chan   = get_chan(frame);
-+	frame->index   = index;
-+	frame->in      = in;
-+	frame->handle  = handle;
-+	frame->ident   = ident;
-+	frame->cid     = cid;
-+	frame->data    = data;
-+	frame->size    = size;
-+	frame->psm     = get_psm(frame);
-+	frame->mode    = get_mode(frame);
-+	frame->chan    = get_chan(frame);
-+	frame->seq_num = get_seq_num(frame);
- }
- 
- static void bredr_sig_packet(uint16_t index, bool in, uint16_t handle,
-diff --git a/monitor/l2cap.h b/monitor/l2cap.h
-index 0364454..813c793 100644
---- a/monitor/l2cap.h
-+++ b/monitor/l2cap.h
-@@ -34,6 +34,7 @@ struct l2cap_frame {
- 	uint16_t psm;
- 	uint16_t chan;
- 	uint8_t mode;
-+	uint8_t seq_num;
- 	const void *data;
- 	uint16_t size;
- };
+Here's series of patches which adds decoding of AVDTP signalling channel
+and A2DP codec capabilities information. Few things are missing:
+- no fragmentation support
+- some rarely used capabilities are not decoded
+- ATRAC capabilities are not decoded
+
+Other that above, pretty much everything should be decoded.
+
+Changes in v2:
+- fixed formatting according to comments
+- updated commit messages to include decoded frames (except for few of
+  them where I was not able trigger proper signalling)
+- some minor issues fixed found during development
+
+Changes in v3:
+- fixed comments from Szymon (few more raised offline)
+- more minor issues fixed
+
+
+Andrzej Kaczmarek (22):
+  monitor/l2cap: Add channel sequence number
+  monitor/avdtp: Add basic decoding of AVDTP signalling
+  monitor/avdtp: Decode AVDTP_DISCOVER
+  monitor/avdtp: Decode AVDTP_GET_CAPABILITIES
+  monitor/avdtp: Decode AVDTP_SET_CONFIGURATION
+  monitor/avdtp: Decode AVDTP_GET_CONFIGURATION
+  monitor/avdtp: Decode AVDTP_RECONFIGURE
+  monitor/avdtp: Decode AVDTP_OPEN
+  monitor/avdtp: Decode AVDTP_START
+  monitor/avdtp: Decode AVDTP_CLOSE
+  monitor/avdtp: Decode AVDTP_SUSPEND
+  monitor/avdtp: Decode AVDTP_ABORT
+  monitor/avdtp: Decode AVDTP_SECURITY_CONTROL
+  monitor/avdtp: Decode AVDTP_GET_ALL_CAPABILITIES
+  monitor/avdtp: Decode AVDTP_DELAYREPORT
+  monitor/avdtp: Decode basic Media Codec capabilities
+  monitor/avdtp: Decode basic Content Protection capabilities
+  monitor/a2dp: Decode SBC capabilities
+  monitor/a2dp: Decode MPEG-1,2 capabilities
+  monitor/a2dp: Decode AAC capabilities
+  monitor/a2dp: Decode aptX capabilities
+  monitor/a2dp: Decode LDAC capabilities
+
+ Makefile.tools     |   2 +
+ android/Android.mk |   2 +
+ monitor/a2dp.c     | 638 +++++++++++++++++++++++++++++++++++++++++++
+ monitor/a2dp.h     |  26 ++
+ monitor/avdtp.c    | 787 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ monitor/avdtp.h    |  24 ++
+ monitor/l2cap.c    |  57 ++--
+ monitor/l2cap.h    |   1 +
+ 8 files changed, 1520 insertions(+), 17 deletions(-)
+ create mode 100644 monitor/a2dp.c
+ create mode 100644 monitor/a2dp.h
+ create mode 100644 monitor/avdtp.c
+ create mode 100644 monitor/avdtp.h
+
 -- 
 2.6.2
 
