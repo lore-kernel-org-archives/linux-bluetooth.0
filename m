@@ -1,56 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.panda@samsung.com,
-	Gowtham Anandha Babu <gowtham.ab@samsung.com>
-Subject: [PATCH] HACKING: Add suppression file in valgrind cmd
-Date: Mon, 23 Nov 2015 20:08:07 +0530
-Message-id: <1448289487-2841-1-git-send-email-gowtham.ab@samsung.com>
+Subject: [PATCH] Bluetooth: Send H5 sync from timer events
+Date: Mon, 23 Nov 2015 16:01:39 +0200
+Message-Id: <1448287299-25109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Without --suppressions=./tools/valgrind.supp in valgrind cmd,
-bluetoothd throws following error:
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-==1237== Syscall param socketcall.bind(my_addr.rc_bdaddr) points to uninitialised byte(s)
-==1237==    at 0x588B227: bind (syscall-template.S:81)
-==1237==    by 0x451545: logging_open (log.c:76)
-==1237==    by 0x451545: __btd_log_init (log.c:314)
-==1237==    by 0x40B035: main (main.c:610)
-==1237==  Address 0xfff0003b6 is on thread 1's stack
-==1237==  in frame #1, created by __btd_log_init (log.c:306)
-==1237==  Uninitialised value was created by a stack allocation
-==1237==    at 0x451490: __btd_log_init (log.c:306)
-==1237==
-==1237== Syscall param socketcall.bind(my_addr.rc_channel) points to uninitialised byte(s)
-==1237==    at 0x588B227: bind (syscall-template.S:81)
-==1237==    by 0x451545: logging_open (log.c:76)
-==1237==    by 0x451545: __btd_log_init (log.c:314)
-==1237==    by 0x40B035: main (main.c:610)
-==1237==  Address 0xfff0003b8 is on thread 1's stack
-==1237==  in frame #1, created by __btd_log_init (log.c:306)
-==1237==  Uninitialised value was created by a stack allocation
-==1237==    at 0x451490: __btd_log_init (log.c:306)
+Current approach results in double sync messages sent after
+h5_timed_event() wakes up transmit queue. This also makes code
+cleaner.
+
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 ---
- HACKING | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/bluetooth/hci_h5.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/HACKING b/HACKING
-index ffca598..a8fb403 100644
---- a/HACKING
-+++ b/HACKING
-@@ -89,8 +89,9 @@ automatically includes this option.
-     # sudo ./src/bluetoothd -n -d
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index db039f2..02b073e 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -192,7 +192,6 @@ static void h5_peer_reset(struct hci_uart *hu)
+ static int h5_open(struct hci_uart *hu)
+ {
+ 	struct h5 *h5;
+-	const unsigned char sync[] = { 0x01, 0x7e };
  
-   Run daemon with valgrind
--   # sudo valgrind --trace-children=yes --track-origins=yes --track-fds=yes
--   --show-possibly-lost=no --leak-check=full ./src/bluetoothd -n -d
-+   # sudo valgrind --trace-children=yes --track-origins=yes --track-fds=yes \
-+   --show-possibly-lost=no --leak-check=full --suppressions=./tools/valgrind.supp \
-+   ./src/bluetoothd -n -d
+ 	BT_DBG("hu %p", hu);
  
- For production installations or distribution packaging it is important that
- the "--enable-maintainer-mode" option is NOT used.
+@@ -216,8 +215,6 @@ static int h5_open(struct hci_uart *hu)
+ 
+ 	set_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags);
+ 
+-	/* Send initial sync request */
+-	h5_link_control(hu, sync, sizeof(sync));
+ 	mod_timer(&h5->timer, jiffies + H5_SYNC_TIMEOUT);
+ 
+ 	return 0;
 -- 
-1.9.1
+2.5.0
 
