@@ -1,100 +1,161 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <szymon.janc@codecoup.pl>
+Date: Mon, 23 Nov 2015 10:23:02 -0800 (PST)
 From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools/mgmt-tester: Add power on testcase with adv and privacy
-Date: Mon, 23 Nov 2015 19:52:23 +0100
-Message-ID: <5231128.4gHGcjJv1p@ix>
-In-Reply-To: <1447360987-4129-2-git-send-email-andrzej.kaczmarek@codecoup.pl>
-References: <1447360987-4129-1-git-send-email-andrzej.kaczmarek@codecoup.pl> <1447360987-4129-2-git-send-email-andrzej.kaczmarek@codecoup.pl>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: =?ISO-8859-1?Q?Fran=E7ois?= Beaufort <beaufort.francois@gmail.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: Unknown Connection Identifier
+Message-ID: <2045332.GytFuFKTvp@ix>
+In-Reply-To: <AAC95ACC-36E4-4618-8F49-53F78AE93AA6@holtmann.org>
+References: <CAEZxfGPTxwUZzU+3XSV-uiN+DMz+hyOKiiZfgF+oD6pp=-XiOA@mail.gmail.com> <AAC95ACC-36E4-4618-8F49-53F78AE93AA6@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi,
 
-On Thursday 12 November 2015 21:43:07 Andrzej Kaczmarek wrote:
-> This test verifies if kernel can properly enable advertising during
-> power on with privacy also enabled. This requires to generate new RPA
-> which will fail if not done after SMP is registered. As a consequence
-> advertising is not enabled in controller which means it cannot be also
-> disabled (controller will reject HCI command).
-> ---
->  tools/mgmt-tester.c | 29 +++++++++++++++++++++++++++--
->  1 file changed, 27 insertions(+), 2 deletions(-)
+On Monday 23 November 2015 18:43:11 Marcel Holtmann wrote:
+> Hi Francois,
 > 
-> diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-> index b224543..670c580 100644
-> --- a/tools/mgmt-tester.c
-> +++ b/tools/mgmt-tester.c
-> @@ -584,6 +584,22 @@ static const struct generic_data
-> set_powered_on_invalid_index_test = { .expect_status =
-> MGMT_STATUS_INVALID_INDEX,
->  };
+> > Would you know why I get a "Status: Unknown Connection Identifier
+> > (0x02)" error while trying to connect to a BLE device, causing a
+> > "Connect failed" message. However sometimes, as you can read below, it
+> > is still able to connect to it.
+> > 
+> > Bluetooth monitor ver 5.35
+> > ...
+> > < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+> > [hci0] 15:36:33.367332
+> > 
+> >        Type: Passive (0x00)
+> >        Interval: 60.000 msec (0x0060)
+> >        Window: 30.000 msec (0x0030)
+> >        Own address type: Public (0x00)
+> >        Filter policy: Ignore not in white list (0x01)
+> >> 
+> >> HCI Event: Command Complete (0x0e) plen 4                           
+> >> [hci0] 15:36:33.368113>> 
+> >      LE Set Scan Parameters (0x08|0x000b) ncmd 1
+> >      
+> >        Status: Success (0x00)
+> > 
+> > < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+> > [hci0] 15:36:33.368139
+> > 
+> >        Scanning: Enabled (0x01)
+> >        Filter duplicates: Enabled (0x01)
+> >> 
+> >> HCI Event: Command Complete (0x0e) plen 4                           
+> >> [hci0] 15:36:33.369111>> 
+> >      LE Set Scan Enable (0x08|0x000c) ncmd 1
+> >      
+> >        Status: Success (0x00)
+> >> 
+> >> HCI Event: LE Meta Event (0x3e) plen 43                             
+> >> [hci0] 15:36:37.636180>> 
+> >      LE Advertising Report (0x02)
+> >      
+> >        Num reports: 1
+> >        Event type: Connectable undirected - ADV_IND (0x00)
+> >        Address type: Public (0x00)
+> >        Address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
+> >        Data length: 31
+> >        Flags: 0x06
+> >        
+> >          LE General Discoverable Mode
+> >          BR/EDR Not Supported
+> >        
+> >        Company: Anhui Huami Information Technology Co., Ltd. (343)
+> >        
+> >          Data: 0093590469cb1080738d253d87117136f902880f109deb42
+> >        
+> >        RSSI: -60 dBm (0xc4)
+> > 
+> > < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+> > [hci0] 15:36:37.636249
+> > 
+> >        Scanning: Disabled (0x00)
+> >        Filter duplicates: Disabled (0x00)
+> >> 
+> >> HCI Event: Command Complete (0x0e) plen 4                           
+> >> [hci0] 15:36:37.637121>> 
+> >      LE Set Scan Enable (0x08|0x000c) ncmd 1
+> >      
+> >        Status: Success (0x00)
+> > 
+> > < HCI Command: LE Create Connection (0x08|0x000d) plen 25
+> > [hci0] 15:36:37.637198
+> > 
+> >        Scan interval: 60.000 msec (0x0060)
+> >        Scan window: 30.000 msec (0x0030)
+> >        Filter policy: White list is not used (0x00)
+> >        Peer address type: Public (0x00)
+> >        Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
+> >        Own address type: Public (0x00)
+> >        Min connection interval: 50.00 msec (0x0028)
+> >        Max connection interval: 70.00 msec (0x0038)
+> >        Connection latency: 0x0000
+> >        Supervision timeout: 420 msec (0x002a)
+> >        Min connection length: 0.000 msec (0x0000)
+> >        Max connection length: 0.000 msec (0x0000)
+> >> 
+> >> HCI Event: Command Status (0x0f) plen 4                             
+> >> [hci0] 15:36:37.638083>> 
+> >      LE Create Connection (0x08|0x000d) ncmd 1
+> >      
+> >        Status: Success (0x00)
+> > 
+> > < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
+> > [hci0] 15:36:39.643232
+> > 
+> >> HCI Event: Command Complete (0x0e) plen 4                           
+> >> [hci0] 15:36:39.644088>> 
+> >      LE Create Connection Cancel (0x08|0x000e) ncmd 1
+> >      
+> >        Status: Success (0x00)
 > 
-> +static uint16_t settings_powered_advertising_privacy[] = {
-> +						MGMT_OP_SET_PRIVACY,
-> +						MGMT_OP_SET_ADVERTISING,
-> +						MGMT_OP_SET_POWERED, 0 };
-> +
-> +static const char set_adv_off_param[] = { 0x00 };
-> +
-> +static const struct generic_data set_powered_on_privacy_adv_test = {
-> +	.setup_settings = settings_powered_advertising_privacy,
-> +	.send_opcode = MGMT_OP_SET_ADVERTISING,
-> +	.send_param = set_adv_off_param,
-> +	.send_len = sizeof(set_adv_off_param),
-> +	.expect_status = MGMT_STATUS_SUCCESS,
-> +	.expect_ignore_param = true,
-> +};
-> +
->  static const uint16_t settings_powered[] = { MGMT_OP_SET_POWERED, 0 };
+> here you are cancelling the connection attempt.
 > 
->  static const char set_powered_off_param[] = { 0x00 };
-> @@ -4356,8 +4372,6 @@ static const struct generic_data
-> add_advertising_success_4 = { .expect_hci_len = sizeof(set_adv_data_txpwr),
->  };
+> >> HCI Event: LE Meta Event (0x3e) plen 19                             
+> >> [hci0] 15:36:39.646071>> 
+> >      LE Connection Complete (0x01)
+> >      
+> >        Status: Unknown Connection Identifier (0x02)
 > 
-> -static const char set_adv_off_param[] = { 0x00 };
-> -
->  static const struct generic_data add_advertising_success_5 = {
->  	.send_opcode = MGMT_OP_SET_ADVERTISING,
->  	.send_param = set_adv_off_param,
-> @@ -5566,6 +5580,9 @@ proceed:
->  	for (cmd = test->setup_settings; *cmd; cmd++) {
->  		unsigned char simple_param[] = { 0x01 };
->  		unsigned char discov_param[] = { 0x01, 0x00, 0x00 };
-> +		unsigned char privacy_param[] = { 0x01,
-> +			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-> +			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
->  		unsigned char *param = simple_param;
->  		size_t param_size = sizeof(simple_param);
->  		mgmt_request_func_t func = NULL;
-> @@ -5584,6 +5601,11 @@ proceed:
->  			param = discov_param;
->  		}
+> And this results in a connect complete with the this error. It actually says
+> the create connection cancel has been successful.
 > 
-> +		if (*cmd == MGMT_OP_SET_PRIVACY) {
-> +			param_size = sizeof(privacy_param);
-> +			param = privacy_param;
-> +		}
-> +
->  		if (*cmd == MGMT_OP_SET_LE && test->setup_nobredr) {
->  			unsigned char off[] = { 0x00 };
->  			mgmt_send(data->mgmt, *cmd, data->mgmt_index,
-> @@ -6075,6 +6097,9 @@ int main(int argc, char *argv[])
->  	test_bredrle("Set powered on - Invalid index",
->  				&set_powered_on_invalid_index_test,
->  				NULL, test_command_generic);
-> +	test_le("Set powered on - Privacy and Advertising",
-> +				&set_powered_on_privacy_adv_test,
-> +				NULL, test_command_generic);
-> 
->  	test_bredrle("Set powered off - Success",
->  				&set_powered_off_success_test,
+> I think the real question is why we are ending up with the create connection
+> cancel in the first place. Only 2 seconds after the connection attempt.
 
-This patch is now applied, thanks.
+This is to not block other devices from connecting if pending connection takes 
+too long (we can't have more than 1 pending connection).
+
+> >        Handle: 32
+> >        Role: Master (0x00)
+> >        Peer address type: Public (0x00)
+> >        Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
+> >        Connection interval: 67.50 msec (0x0036)
+> >        Connection latency: 0.00 msec (0x0000)
+> >        Supervision timeout: 420 msec (0x002a)
+> >        Master clock accuracy: 0x00
+> > 
+> > @ Connect Failed: 88:0F:10:9D:EB:42 (1) status 0x02
+> 
+> This mgmt message might also be bug. It depends on what triggered the
+> connection and the cancel action, but in general we are not tracking the
+> state correctly as it seems. The message will not hurt, but I think it
+> should not be here in the first place.
+> 
+> How are you triggering the connection?
+> 
+> Regards
+> 
+> Marcel
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 -- 
 pozdrawiam
