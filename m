@@ -1,94 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <E4DA9AB828784E8E9041A5CF3C361A19@boyiliaoPC>
-References: <58FD7F101A2B4D9AB24C5AB9404F6923@boyiliaoPC>
-	<E4DA9AB828784E8E9041A5CF3C361A19@boyiliaoPC>
-Date: Mon, 23 Nov 2015 13:59:08 +0200
-Message-ID: <CABBYNZKVBHbbYk+YhhG0MQdS7A9nXVrWaD3JvXHork0xT+gjxg@mail.gmail.com>
-Subject: Re: bluetoothd crashes when connecting to XiaoMi RC
+In-Reply-To: <CAOMqctQvwYLYp2N=sp+NHrAJyW9_8h6V1_KG-9cV5=uvBTzdSg@mail.gmail.com>
+References: <CAOMqctQvwYLYp2N=sp+NHrAJyW9_8h6V1_KG-9cV5=uvBTzdSg@mail.gmail.com>
+Date: Mon, 23 Nov 2015 13:47:18 +0200
+Message-ID: <CABBYNZ+J5AwMuyKpz0RYXHYX_oK8Y6H1gVT_WYJy8BGdiEaB=g@mail.gmail.com>
+Subject: Re: bluetoothd crashes when media endpoint SelectConfiguration reply
+ does not contain an array
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: boyiliao@yahoo.com.tw
+To: Michal Suchanek <hramrach@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Patrick,
+Hi Michael,
 
-On Sun, Nov 22, 2015 at 2:49 AM,  <boyiliao@yahoo.com.tw> wrote:
-> Hi,
+On Sun, Nov 22, 2015 at 12:45 AM, Michal Suchanek <hramrach@gmail.com> wrote:
+> Hello,
 >
-> The below is my workaroung right new, but in "g_attrib_ref" function should
-> be another way to fix this crash.
+> I am using bluez 5.36 on Debian.
 >
-> guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc
-> func,
->                            gpointer user_data)
-> {
->    uint8_t *buf;
->    size_t buflen;
->    guint16 plen;
->    guint id;
->    struct read_long_data *long_read;
+> I tried to export a media source from an application. However, when
+> the SelectConfiguration call finishes bluetoothd crashes.
 >
->    long_read = g_try_new0(struct read_long_data, 1);
+> Looking at the code there is no check that the return from the
+> callback actually contains an array before trying to extract the array
+> content.
 >
->    if (long_read == NULL)
->        return 0;
->        printf("call from here %d\n",__LINE__);
->    long_read->attrib = g_attrib_ref(attrib);
-> +        if(long_read->attrib == NULL)
-> +            return 0;
->    long_read->func = func;
+> Adding a check avoids the crash in bluetoothd.
 >
+> I am not sure why the return value does not contain a proper
+> capabilities array but that is another issue.
 >
->
->
-> GAttrib *g_attrib_ref(GAttrib *attrib)
-> {
->    if (!attrib)
->        return NULL;
->
-> +        if(attrib->ref_count > 30)
-> +       {
-> +            return NULL;
-> +        }
->    __sync_fetch_and_add(&attrib->ref_count, 1);
->
->    DBG("%p: g_attrib_ref=%d ", attrib, attrib->ref_count);
->
->    return attrib;
-> }
->
-> BR,
-> Patirck
->
-> -----原始郵件----- From: boyiliao@yahoo.com.tw
-> Sent: Sunday, November 22, 2015 8:21 AM
-> To: linux-bluetooth@vger.kernel.org ; Majordomo@vger.kernel.org
-> Subject: bluetoothd crashes when connecting to XiaoMi RC
->
->
-> Hi,
->
-> I am using bluez 5.35 on Raspberry pi (kernel 4.1.6).
->
-> I try to using XiaoMi BLE remote control on Raspberry pi , I found when
-> gatt.c gatt_read_char() function call gattrib.c g_attrib_ref () will cause
-> bluetoothd crashed, because I think it acess a wrong address
-> "attrib/gattrib.c:g_attrib_ref() 0x1c9210: g_attrib_ref=808464433"
->
-> the attachment is the bluetoothd log
+> Sending a patch that fixes the problem for me.
 
-bluetoothd[7711]: attrib/gattrib.c:g_attrib_ref() 0x1c60f0: g_attrib_ref=6
-bluetoothd[7711]: attrib/gattrib.c:g_attrib_ref() 0x1c9210:
-g_attrib_ref=808464433
-
-Looks like the correct is 0x1c60f0 not 0x1c9210, this is really weird
-since it seems to be all the same instance which would mean something
-is corrupting the memory in between references. Can you try running
-with upstream? Btw it is probably a good idea to run with valgrind so
-we can get a backtrace of the problem.
+The fix looks good, please send a proper patch so I can apply. About
+the response not being an array, this is probably a custom endpoint
+because with PA or simple-endpoint but should respond properly, but it
+is a valid fix anyway.
 
 
 -- 
