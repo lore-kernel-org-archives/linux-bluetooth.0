@@ -1,43 +1,95 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix returning proper HCI status from __hci_req_sync
-Date: Mon, 23 Nov 2015 14:40:47 +0200
-Message-Id: <1448282447-27618-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <E4DA9AB828784E8E9041A5CF3C361A19@boyiliaoPC>
+References: <58FD7F101A2B4D9AB24C5AB9404F6923@boyiliaoPC>
+	<E4DA9AB828784E8E9041A5CF3C361A19@boyiliaoPC>
+Date: Mon, 23 Nov 2015 13:59:08 +0200
+Message-ID: <CABBYNZKVBHbbYk+YhhG0MQdS7A9nXVrWaD3JvXHork0xT+gjxg@mail.gmail.com>
+Subject: Re: bluetoothd crashes when connecting to XiaoMi RC
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: boyiliao@yahoo.com.tw
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Patrick,
 
-There were a couple of code paths missed by the previous patch that
-added a HCI status return parameter to __hci_req_sync. This patch adds
-the missing assignments for them.
+On Sun, Nov 22, 2015 at 2:49 AM,  <boyiliao@yahoo.com.tw> wrote:
+> Hi,
+>
+> The below is my workaroung right new, but in "g_attrib_ref" function should
+> be another way to fix this crash.
+>
+> guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc
+> func,
+>                            gpointer user_data)
+> {
+>    uint8_t *buf;
+>    size_t buflen;
+>    guint16 plen;
+>    guint id;
+>    struct read_long_data *long_read;
+>
+>    long_read = g_try_new0(struct read_long_data, 1);
+>
+>    if (long_read == NULL)
+>        return 0;
+>        printf("call from here %d\n",__LINE__);
+>    long_read->attrib = g_attrib_ref(attrib);
+> +        if(long_read->attrib == NULL)
+> +            return 0;
+>    long_read->func = func;
+>
+>
+>
+>
+> GAttrib *g_attrib_ref(GAttrib *attrib)
+> {
+>    if (!attrib)
+>        return NULL;
+>
+> +        if(attrib->ref_count > 30)
+> +       {
+> +            return NULL;
+> +        }
+>    __sync_fetch_and_add(&attrib->ref_count, 1);
+>
+>    DBG("%p: g_attrib_ref=%d ", attrib, attrib->ref_count);
+>
+>    return attrib;
+> }
+>
+> BR,
+> Patirck
+>
+> -----原始郵件----- From: boyiliao@yahoo.com.tw
+> Sent: Sunday, November 22, 2015 8:21 AM
+> To: linux-bluetooth@vger.kernel.org ; Majordomo@vger.kernel.org
+> Subject: bluetoothd crashes when connecting to XiaoMi RC
+>
+>
+> Hi,
+>
+> I am using bluez 5.35 on Raspberry pi (kernel 4.1.6).
+>
+> I try to using XiaoMi BLE remote control on Raspberry pi , I found when
+> gatt.c gatt_read_char() function call gattrib.c g_attrib_ref () will cause
+> bluetoothd crashed, because I think it acess a wrong address
+> "attrib/gattrib.c:g_attrib_ref() 0x1c9210: g_attrib_ref=808464433"
+>
+> the attachment is the bluetoothd log
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_request.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+bluetoothd[7711]: attrib/gattrib.c:g_attrib_ref() 0x1c60f0: g_attrib_ref=6
+bluetoothd[7711]: attrib/gattrib.c:g_attrib_ref() 0x1c9210:
+g_attrib_ref=808464433
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 76bd912be9fe..e639671f54bd 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -220,8 +220,14 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 		 * trigger any commands to be sent. This is normal behavior
- 		 * and should not trigger an error return.
- 		 */
--		if (err == -ENODATA)
-+		if (err == -ENODATA) {
-+			if (hci_status)
-+				*hci_status = 0;
- 			return 0;
-+		}
-+
-+		if (hci_status)
-+			*hci_status = HCI_ERROR_UNSPECIFIED;
- 
- 		return err;
- 	}
+Looks like the correct is 0x1c60f0 not 0x1c9210, this is really weird
+since it seems to be all the same instance which would mean something
+is corrupting the memory in between references. Can you try running
+with upstream? Btw it is probably a good idea to run with valgrind so
+we can get a backtrace of the problem.
+
+
 -- 
-2.5.0
-
+Luiz Augusto von Dentz
