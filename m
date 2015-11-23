@@ -1,111 +1,73 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: Unknown Connection Identifier
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAEZxfGPTxwUZzU+3XSV-uiN+DMz+hyOKiiZfgF+oD6pp=-XiOA@mail.gmail.com>
-Date: Mon, 23 Nov 2015 18:43:11 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <AAC95ACC-36E4-4618-8F49-53F78AE93AA6@holtmann.org>
-References: <CAEZxfGPTxwUZzU+3XSV-uiN+DMz+hyOKiiZfgF+oD6pp=-XiOA@mail.gmail.com>
-To: =?utf-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1448023061-19246-1-git-send-email-luiz.dentz@gmail.com>
+References: <1448023061-19246-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 23 Nov 2015 19:37:30 +0200
+Message-ID: <CABBYNZLBOWU=Vt5fn-_UUQ+KENhUraqY9xOEQz+LCjebkManMQ@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ] core: Fix replying with an error for connected profile
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Francois,
+Hi,
 
-> Would you know why I get a "Status: Unknown Connection Identifier
-> (0x02)" error while trying to connect to a BLE device, causing a
-> "Connect failed" message. However sometimes, as you can read below, it
-> is still able to connect to it.
-> 
-> Bluetooth monitor ver 5.35
-> ...
-> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
-> [hci0] 15:36:33.367332
->        Type: Passive (0x00)
->        Interval: 60.000 msec (0x0060)
->        Window: 30.000 msec (0x0030)
->        Own address type: Public (0x00)
->        Filter policy: Ignore not in white list (0x01)
->> HCI Event: Command Complete (0x0e) plen 4                            [hci0] 15:36:33.368113
->      LE Set Scan Parameters (0x08|0x000b) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-> [hci0] 15:36:33.368139
->        Scanning: Enabled (0x01)
->        Filter duplicates: Enabled (0x01)
->> HCI Event: Command Complete (0x0e) plen 4                            [hci0] 15:36:33.369111
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
->> HCI Event: LE Meta Event (0x3e) plen 43                              [hci0] 15:36:37.636180
->      LE Advertising Report (0x02)
->        Num reports: 1
->        Event type: Connectable undirected - ADV_IND (0x00)
->        Address type: Public (0x00)
->        Address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
->        Data length: 31
->        Flags: 0x06
->          LE General Discoverable Mode
->          BR/EDR Not Supported
->        Company: Anhui Huami Information Technology Co., Ltd. (343)
->          Data: 0093590469cb1080738d253d87117136f902880f109deb42
->        RSSI: -60 dBm (0xc4)
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-> [hci0] 15:36:37.636249
->        Scanning: Disabled (0x00)
->        Filter duplicates: Disabled (0x00)
->> HCI Event: Command Complete (0x0e) plen 4                            [hci0] 15:36:37.637121
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
-> [hci0] 15:36:37.637198
->        Scan interval: 60.000 msec (0x0060)
->        Scan window: 30.000 msec (0x0030)
->        Filter policy: White list is not used (0x00)
->        Peer address type: Public (0x00)
->        Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
->        Own address type: Public (0x00)
->        Min connection interval: 50.00 msec (0x0028)
->        Max connection interval: 70.00 msec (0x0038)
->        Connection latency: 0x0000
->        Supervision timeout: 420 msec (0x002a)
->        Min connection length: 0.000 msec (0x0000)
->        Max connection length: 0.000 msec (0x0000)
->> HCI Event: Command Status (0x0f) plen 4                              [hci0] 15:36:37.638083
->      LE Create Connection (0x08|0x000d) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
-> [hci0] 15:36:39.643232
->> HCI Event: Command Complete (0x0e) plen 4                            [hci0] 15:36:39.644088
->      LE Create Connection Cancel (0x08|0x000e) ncmd 1
->        Status: Success (0x00)
+On Fri, Nov 20, 2015 at 2:37 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> If the profile(s) is already connected don't reply with an error, if the
+> profile is in fact connecting already just wait until it completes.
+> ---
+>  src/device.c  | 8 ++++++--
+>  src/service.c | 1 +
+>  2 files changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index e76b8bb..9021914 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -1477,7 +1477,8 @@ static int connect_next(struct btd_device *dev)
+>         while (dev->pending) {
+>                 service = dev->pending->data;
+>
+> -               if (btd_service_connect(service) == 0)
+> +               err = btd_service_connect(service);
+> +               if (!err)
+>                         return 0;
+>
+>                 dev->pending = g_slist_delete_link(dev->pending, dev->pending);
+> @@ -1732,8 +1733,11 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
+>         }
+>
+>         err = connect_next(dev);
+> -       if (err < 0)
+> +       if (err < 0) {
+> +               if (err == -EALREADY)
+> +                       return dbus_message_new_method_return(msg);
+>                 return btd_error_failed(msg, strerror(-err));
+> +       }
+>
+>         dev->connect = dbus_message_ref(msg);
+>
+> diff --git a/src/service.c b/src/service.c
+> index 3d07744..f7912f5 100644
+> --- a/src/service.c
+> +++ b/src/service.c
+> @@ -228,6 +228,7 @@ int btd_service_connect(struct btd_service *service)
+>         case BTD_SERVICE_STATE_DISCONNECTED:
+>                 break;
+>         case BTD_SERVICE_STATE_CONNECTING:
+> +               return 0;
+>         case BTD_SERVICE_STATE_CONNECTED:
+>                 return -EALREADY;
+>         case BTD_SERVICE_STATE_DISCONNECTING:
+> --
+> 2.4.3
 
-here you are cancelling the connection attempt.
+Applied.
 
->> HCI Event: LE Meta Event (0x3e) plen 19                              [hci0] 15:36:39.646071
->      LE Connection Complete (0x01)
->        Status: Unknown Connection Identifier (0x02)
 
-And this results in a connect complete with the this error. It actually says the create connection cancel has been successful.
-
-I think the real question is why we are ending up with the create connection cancel in the first place. Only 2 seconds after the connection attempt.
-
->        Handle: 32
->        Role: Master (0x00)
->        Peer address type: Public (0x00)
->        Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
->        Connection interval: 67.50 msec (0x0036)
->        Connection latency: 0.00 msec (0x0000)
->        Supervision timeout: 420 msec (0x002a)
->        Master clock accuracy: 0x00
-> @ Connect Failed: 88:0F:10:9D:EB:42 (1) status 0x02
-
-This mgmt message might also be bug. It depends on what triggered the connection and the cancel action, but in general we are not tracking the state correctly as it seems. The message will not hurt, but I think it should not be here in the first place.
-
-How are you triggering the connection?
-
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
