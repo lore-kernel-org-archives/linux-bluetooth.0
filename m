@@ -1,73 +1,71 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1448023061-19246-1-git-send-email-luiz.dentz@gmail.com>
-References: <1448023061-19246-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 23 Nov 2015 19:37:30 +0200
-Message-ID: <CABBYNZLBOWU=Vt5fn-_UUQ+KENhUraqY9xOEQz+LCjebkManMQ@mail.gmail.com>
-Subject: Re: [PATCH v2 BlueZ] core: Fix replying with an error for connected profile
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Syam Sidhardhan <s.syam@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: s.syam@samsung.com
+Subject: [PATCH v0] avdtp: Fix A2DP disconnection with ADVANCED_AUDIO_UUID only
+ carkit
+Date: Mon, 23 Nov 2015 22:31:52 +0530
+Message-id: <1448298112-20501-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Few Carkits Like "VW MI" & "Seat BT AC" will register the ADVANCED
+AUDIO UUID rather than A2DP SINK UUID. Once the signalling channel
+is initiated by the remote sink device and streaming channel is not
+yet initiated by sink, the source will check the remote device
+SINK UUID to establish the streaming channel and will close the
+signalling channel if SINK UUID is not present.
 
-On Fri, Nov 20, 2015 at 2:37 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If the profile(s) is already connected don't reply with an error, if the
-> profile is in fact connecting already just wait until it completes.
-> ---
->  src/device.c  | 8 ++++++--
->  src/service.c | 1 +
->  2 files changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index e76b8bb..9021914 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -1477,7 +1477,8 @@ static int connect_next(struct btd_device *dev)
->         while (dev->pending) {
->                 service = dev->pending->data;
->
-> -               if (btd_service_connect(service) == 0)
-> +               err = btd_service_connect(service);
-> +               if (!err)
->                         return 0;
->
->                 dev->pending = g_slist_delete_link(dev->pending, dev->pending);
-> @@ -1732,8 +1733,11 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
->         }
->
->         err = connect_next(dev);
-> -       if (err < 0)
-> +       if (err < 0) {
-> +               if (err == -EALREADY)
-> +                       return dbus_message_new_method_return(msg);
->                 return btd_error_failed(msg, strerror(-err));
-> +       }
->
->         dev->connect = dbus_message_ref(msg);
->
-> diff --git a/src/service.c b/src/service.c
-> index 3d07744..f7912f5 100644
-> --- a/src/service.c
-> +++ b/src/service.c
-> @@ -228,6 +228,7 @@ int btd_service_connect(struct btd_service *service)
->         case BTD_SERVICE_STATE_DISCONNECTED:
->                 break;
->         case BTD_SERVICE_STATE_CONNECTING:
-> +               return 0;
->         case BTD_SERVICE_STATE_CONNECTED:
->                 return -EALREADY;
->         case BTD_SERVICE_STATE_DISCONNECTING:
-> --
-> 2.4.3
+In addition to A2DP SINK UUID, this patch checks for the ADVANCED
+AUDIO UUID as well.
 
-Applied.
+Logs:
+bluetoothd:
+10:02:31 profiles/audio/a2dp.c:confirm_cb() AVDTP: incoming connect from E0:75:0A:36:09:FD
+10:02:31 profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected signaling channel to E0:75:0A:36:09:FD
+10:02:31 profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP imtu=672, omtu=672
+10:02:31 profiles/audio/avdtp.c:set_disconnect_timer() name : "Seat BT AC" /* Extra print */
+...
+...
+10:02:32 profiles/audio/avdtp.c:disconnect_timeout()
+10:02:32 profiles/audio/avdtp.c:connection_lost() Disconnected from E0:75:0A:36:09:FD
+10:02:32 profiles/audio/a2dp.c:channel_remove() chan 0xb7005348
+10:02:32 profiles/audio/avdtp.c:connection_lost() 0xb7005d48: ref=0
+10:02:32 profiles/audio/avdtp.c:avdtp_free() 0xb7005d48
 
+DB file:
+[General]
+Name=Seat BT AC
+Class=0x340408
+SupportedTechnologies=BR/EDR;
+Trusted=false
+Blocked=false
+Services=0000110c-0000-1000-8000-00805f9b34fb; //AVRCP_TARGET_UUID
+0000110d-0000-1000-8000-00805f9b34fb; //ADVANCED_AUDIO_UUID
+0000110e-0000-1000-8000-00805f9b34fb; //AVRCP_REMOTE_UUID
+0000111e-0000-1000-8000-00805f9b34fb; //HFP_HS_UUID
+0000112f-0000-1000-8000-00805f9b34fb; //PBAP_UUID
+---
+ profiles/audio/avdtp.c |    6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 52ee767..ac1939b 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -1138,6 +1138,12 @@ static gboolean disconnect_timeout(gpointer user_data)
+ 		return FALSE;
+ 	}
+ 
++	service = btd_device_get_service(session->device, ADVANCED_AUDIO_UUID);
++	if (service && stream_setup) {
++		sink_setup_stream(service, session);
++		return FALSE;
++	}
++
+ 	service = btd_device_get_service(session->device, A2DP_SOURCE_UUID);
+ 	if (service && stream_setup) {
+ 		source_setup_stream(service, session);
 -- 
-Luiz Augusto von Dentz
+1.7.9.5
+
