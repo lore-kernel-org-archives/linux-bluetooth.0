@@ -1,28 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 24 Nov 2015 16:23:01 -0500 (EST)
-Message-Id: <20151124.162301.1296075877643077862.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2015-11-23
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20151123135533.GA5257@t440s.lan>
-References: <20151123135533.GA5257@t440s.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: Bug in batostr()?
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <354132869.329670308.1448374597432.JavaMail.root@zimbra62-e11.priv.proxad.net>
+Date: Tue, 24 Nov 2015 13:18:46 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <7CA45173-4B21-486D-AFFA-D81B2E4F5F16@holtmann.org>
+References: <354132869.329670308.1448374597432.JavaMail.root@zimbra62-e11.priv.proxad.net>
+To: acalando@free.fr
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Mon, 23 Nov 2015 15:55:33 +0200
+Hi Antoine,
 
-> Here's the first bluetooth-next pull request for the 4.5 kernel.
+> In lib/bluetooth.c, it looks like batostr() is bugged (wrong bytes order), 
+> after comparison with ba2str():
 > 
->  - Add new Get Advertising Size Information management command
->  - Add support for new system note message type on monitor channel
->  - Refactor LE scan changes behind separate workqueue to avoid races
->  - Fix issue with privacy feature when powering on adapter
->  - Various minor fixes & cleanups here and there
+> char *batostr(const bdaddr_t *ba)
+> 	sprintf(str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+> 		ba->b[0], ba->b[1], ba->b[2],
+> 		ba->b[3], ba->b[4], ba->b[5]);
 > 
-> Please let me know if there are any issues pulling. Thanks.
+> int ba2str(const bdaddr_t *ba, char *str)
+> 	return sprintf(str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+> 		ba->b[5], ba->b[4], ba->b[3], ba->b[2], ba->b[1], ba->b[0]);
+> 
+> This function is not called anywhere else in the repository, that is probably 
+> why the problem never showed up.
 
-Pulled, thanks Johan.
+they are on purpose this way. That is why we also have baswap.
+
+Regards
+
+Marcel
+
