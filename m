@@ -1,38 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
+Message-Id: <380b1f56d9e84d503d2d11fb9510b0eda274cad2.1448381195.git.hramrach@gmail.com>
+From: Michal Suchanek <hramrach@gmail.com>
+Date: Tue, 24 Nov 2015 17:01:32 +0100
+Subject: Fix crash when incorrect reply is received from SelectConfiguration
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] monitor: Fix use of uninitialized variable
-Date: Tue, 24 Nov 2015 20:57:49 +0100
-Message-ID: <7546151.u5ofOufstg@ix>
-In-Reply-To: <1448136544-18660-1-git-send-email-szymon.janc@codecoup.pl>
-References: <1448136544-18660-1-git-send-email-szymon.janc@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Saturday 21 November 2015 21:09:03 Szymon Janc wrote:
-> subevent code was never set in vendor_evt() resulting in printing
-> random stack data as subevent opcode in print_subevent().
-> ---
->  monitor/packet.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/monitor/packet.c b/monitor/packet.c
-> index 4c18cb2..70bd153 100644
-> --- a/monitor/packet.c
-> +++ b/monitor/packet.c
-> @@ -8471,6 +8471,7 @@ static void vendor_evt(const void *data, uint8_t size)
-> vendor_data.str = vendor_str;
->  		} else
->  			vendor_data.str = vnd->str;
-> +		vendor_data.subevent = subevent;
->  		vendor_data.func = vnd->evt_func;
->  		vendor_data.size = vnd->evt_size;
->  		vendor_data.fixed = vnd->evt_fixed;
+There is no check that SelectConfiguration call on MediaEndpoint1
+returns an array before accessing the array. When the return from
+SelectConfiguration is not an array type bluetoothd crashes.
 
-Applied.
+Ignore the reply in that case.
+---
+ profiles/audio/media.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 69070bf..a5cb490 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -292,6 +292,12 @@ static void endpoint_reply(DBusPendingCall *call, void *user_data)
+ 
+ 		dbus_message_iter_init(reply, &args);
+ 
++		if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY) {
++			error("SelectConfiguration did not return an array: %s",
++				dbus_message_get_signature(reply));
++			goto done;
++		}
++
+ 		dbus_message_iter_recurse(&args, &array);
+ 
+ 		dbus_message_iter_get_fixed_array(&array, &configuration, &size);
 -- 
-pozdrawiam
-Szymon Janc
+2.6.2
+
