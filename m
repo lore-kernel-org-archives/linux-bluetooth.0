@@ -1,206 +1,238 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 24 Nov 2015 14:07:33 +0200
+Date: Tue, 24 Nov 2015 14:06:36 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/7] Bluetooth: Perform Class of Device changes through
+Subject: [PATCH 4/7] Bluetooth: Move connectable changes to
  hdev->req_workqueue
-Message-ID: <20151124120733.GC30180@t440s.lan>
+Message-ID: <20151124120636.GB30180@t440s.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1448366527-29714-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The Class of Device needs to be changed e.g. for limited discoverable
-mode. In preparation of moving the discoverable mode to hci_request.c
-and hdev->req_workqueue, move the Class of Device helpers there first.
+This way the connectable changes are synchronized against each other,
+which helps avoid potential races. The connectable mode is also linked
+together with LE advertising which makes is more convenient to have it
+behind the same workqueue.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_request.c | 40 +++++++++++++++++++++++++++++++++
- net/bluetooth/hci_request.h |  2 ++
- net/bluetooth/mgmt.c        | 54 ++++++---------------------------------------
- 3 files changed, 49 insertions(+), 47 deletions(-)
+ include/net/bluetooth/hci_core.h |  2 +
+ net/bluetooth/hci_request.c      | 39 ++++++++++++++++++
+ net/bluetooth/mgmt.c             | 86 ++++++----------------------------------
+ 3 files changed, 53 insertions(+), 74 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b56085b6ecce..a855e41df68c 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -330,6 +330,7 @@ struct hci_dev {
+ 	struct work_struct	discov_update;
+ 	struct work_struct	bg_scan_update;
+ 	struct work_struct	scan_update;
++	struct work_struct	connectable_update;
+ 	struct delayed_work	le_scan_disable;
+ 	struct delayed_work	le_scan_restart;
+ 
+@@ -1491,6 +1492,7 @@ void mgmt_new_conn_param(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			 u16 max_interval, u16 latency, u16 timeout);
+ void mgmt_smp_complete(struct hci_conn *conn, bool complete);
+ bool mgmt_get_connectable(struct hci_dev *hdev);
++void mgmt_set_connectable_complete(struct hci_dev *hdev, u8 status);
+ u8 mgmt_get_adv_discov_flags(struct hci_dev *hdev);
+ void mgmt_advertising_added(struct sock *sk, struct hci_dev *hdev,
+ 			    u8 instance);
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 167c90644b4b..e5e827b762b9 100644
+index e6622bd1926d..167c90644b4b 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -1311,6 +1311,46 @@ static void connectable_update_work(struct work_struct *work)
- 	mgmt_set_connectable_complete(hdev, status);
+@@ -1274,6 +1274,43 @@ static void scan_update_work(struct work_struct *work)
+ 	hci_req_sync(hdev, update_scan, 0, HCI_CMD_TIMEOUT, NULL);
  }
  
-+static u8 get_service_classes(struct hci_dev *hdev)
-+{
-+	struct bt_uuid *uuid;
-+	u8 val = 0;
-+
-+	list_for_each_entry(uuid, &hdev->uuids, list)
-+		val |= uuid->svc_hint;
-+
-+	return val;
-+}
-+
-+void __hci_req_update_class(struct hci_request *req)
++static int connectable_update(struct hci_request *req, unsigned long opt)
 +{
 +	struct hci_dev *hdev = req->hdev;
-+	u8 cod[3];
 +
-+	BT_DBG("%s", hdev->name);
++	hci_dev_lock(hdev);
 +
-+	if (!hdev_is_powered(hdev))
-+		return;
++	__hci_req_update_scan(req);
 +
++	/* If BR/EDR is not enabled and we disable advertising as a
++	 * by-product of disabling connectable, we need to update the
++	 * advertising flags.
++	 */
 +	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
-+		return;
++		__hci_req_update_adv_data(req, HCI_ADV_CURRENT);
 +
-+	if (hci_dev_test_flag(hdev, HCI_SERVICE_CACHE))
-+		return;
++	/* Update the advertising parameters if necessary */
++	if (hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
++	    hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE))
++		__hci_req_enable_advertising(req);
 +
-+	cod[0] = hdev->minor_class;
-+	cod[1] = hdev->major_class;
-+	cod[2] = get_service_classes(hdev);
++	__hci_update_background_scan(req);
 +
-+	if (hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE))
-+		cod[1] |= 0x20;
++	hci_dev_unlock(hdev);
 +
-+	if (memcmp(cod, hdev->dev_class, 3) == 0)
-+		return;
++	return 0;
++}
 +
-+	hci_req_add(req, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
++static void connectable_update_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev,
++					    connectable_update);
++	u8 status;
++
++	hci_req_sync(hdev, connectable_update, 0, HCI_CMD_TIMEOUT, &status);
++	mgmt_set_connectable_complete(hdev, status);
 +}
 +
  void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
  		      u8 reason)
  {
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 5358b1b12ca0..41920348d68b 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -72,6 +72,8 @@ int __hci_req_schedule_adv_instance(struct hci_request *req, u8 instance,
- void hci_req_clear_adv_instance(struct hci_dev *hdev, struct hci_request *req,
- 				u8 instance, bool force);
- 
-+void __hci_req_update_class(struct hci_request *req);
-+
- /* Returns true if HCI commands were queued */
- bool hci_req_stop_discovery(struct hci_request *req);
+@@ -1789,6 +1826,7 @@ void hci_request_setup(struct hci_dev *hdev)
+ 	INIT_WORK(&hdev->discov_update, discov_update);
+ 	INIT_WORK(&hdev->bg_scan_update, bg_scan_update);
+ 	INIT_WORK(&hdev->scan_update, scan_update_work);
++	INIT_WORK(&hdev->connectable_update, connectable_update_work);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
+ 	INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
+@@ -1801,6 +1839,7 @@ void hci_request_cancel_all(struct hci_dev *hdev)
+ 	cancel_work_sync(&hdev->discov_update);
+ 	cancel_work_sync(&hdev->bg_scan_update);
+ 	cancel_work_sync(&hdev->scan_update);
++	cancel_work_sync(&hdev->connectable_update);
+ 	cancel_delayed_work_sync(&hdev->le_scan_disable);
+ 	cancel_delayed_work_sync(&hdev->le_scan_restart);
  
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d8b76ca5c820..f5a4ee92f2bf 100644
+index 6d0f0025052f..d8b76ca5c820 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -959,46 +959,6 @@ static void update_eir(struct hci_request *req)
- 	hci_req_add(req, HCI_OP_WRITE_EIR, sizeof(cp), &cp);
+@@ -1580,12 +1580,9 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
+ 		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
  }
  
--static u8 get_service_classes(struct hci_dev *hdev)
--{
--	struct bt_uuid *uuid;
--	u8 val = 0;
--
--	list_for_each_entry(uuid, &hdev->uuids, list)
--		val |= uuid->svc_hint;
--
--	return val;
--}
--
--static void update_class(struct hci_request *req)
--{
--	struct hci_dev *hdev = req->hdev;
--	u8 cod[3];
--
--	BT_DBG("%s", hdev->name);
--
--	if (!hdev_is_powered(hdev))
--		return;
--
--	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
--		return;
--
--	if (hci_dev_test_flag(hdev, HCI_SERVICE_CACHE))
--		return;
--
--	cod[0] = hdev->minor_class;
--	cod[1] = hdev->major_class;
--	cod[2] = get_service_classes(hdev);
--
--	if (hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE))
--		cod[1] |= 0x20;
--
--	if (memcmp(cod, hdev->dev_class, 3) == 0)
--		return;
--
--	hci_req_add(req, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
--}
--
- static void service_cache_off(struct work_struct *work)
+-static void set_connectable_complete(struct hci_dev *hdev, u8 status,
+-				     u16 opcode)
++void mgmt_set_connectable_complete(struct hci_dev *hdev, u8 status)
  {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev,
-@@ -1013,7 +973,7 @@ static void service_cache_off(struct work_struct *work)
- 	hci_dev_lock(hdev);
+ 	struct mgmt_pending_cmd *cmd;
+-	struct mgmt_mode *cp;
+-	bool conn_changed, discov_changed;
  
- 	update_eir(&req);
--	update_class(&req);
-+	__hci_req_update_class(&req);
+ 	BT_DBG("status 0x%02x", status);
  
- 	hci_dev_unlock(hdev);
+@@ -1601,27 +1598,8 @@ static void set_connectable_complete(struct hci_dev *hdev, u8 status,
+ 		goto remove_cmd;
+ 	}
  
-@@ -1370,7 +1330,7 @@ static void set_discoverable_complete(struct hci_dev *hdev, u8 status,
- 	 */
- 	hci_req_init(&req, hdev);
- 	__hci_req_update_scan(&req);
--	update_class(&req);
-+	__hci_req_update_class(&req);
- 	hci_req_run(&req, NULL);
+-	cp = cmd->param;
+-	if (cp->val) {
+-		conn_changed = !hci_dev_test_and_set_flag(hdev,
+-							  HCI_CONNECTABLE);
+-		discov_changed = false;
+-	} else {
+-		conn_changed = hci_dev_test_and_clear_flag(hdev,
+-							   HCI_CONNECTABLE);
+-		discov_changed = hci_dev_test_and_clear_flag(hdev,
+-							     HCI_DISCOVERABLE);
+-	}
+-
+ 	send_settings_rsp(cmd->sk, MGMT_OP_SET_CONNECTABLE, hdev);
+-
+-	if (conn_changed || discov_changed) {
+-		new_settings(hdev, cmd->sk);
+-		hci_req_update_scan(hdev);
+-		if (discov_changed)
+-			hci_req_update_adv_data(hdev, HCI_ADV_CURRENT);
+-		hci_update_background_scan(hdev);
+-	}
++	new_settings(hdev, cmd->sk);
  
  remove_cmd:
-@@ -2177,7 +2137,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 	mgmt_pending_remove(cmd);
+@@ -1664,8 +1642,6 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ {
+ 	struct mgmt_mode *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+-	struct hci_request req;
+-	u8 scan;
+ 	int err;
  
- 	hci_req_init(&req, hdev);
- 
--	update_class(&req);
-+	__hci_req_update_class(&req);
- 	update_eir(&req);
- 
- 	err = hci_req_run(&req, add_uuid_complete);
-@@ -2277,7 +2237,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
- update_class:
- 	hci_req_init(&req, hdev);
- 
--	update_class(&req);
-+	__hci_req_update_class(&req);
- 	update_eir(&req);
- 
- 	err = hci_req_run(&req, remove_uuid_complete);
-@@ -2356,7 +2316,7 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
- 		update_eir(&req);
+ 	BT_DBG("request for %s", hdev->name);
+@@ -1699,57 +1675,19 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto failed;
  	}
  
--	update_class(&req);
-+	__hci_req_update_class(&req);
+-	hci_req_init(&req, hdev);
+-
+-	/* If BR/EDR is not enabled and we disable advertising as a
+-	 * by-product of disabling connectable, we need to update the
+-	 * advertising flags.
+-	 */
+-	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED)) {
+-		if (!cp->val) {
+-			hci_dev_clear_flag(hdev, HCI_LIMITED_DISCOVERABLE);
+-			hci_dev_clear_flag(hdev, HCI_DISCOVERABLE);
+-		}
+-		__hci_req_update_adv_data(&req, HCI_ADV_CURRENT);
+-	} else if (cp->val != test_bit(HCI_PSCAN, &hdev->flags)) {
+-		if (cp->val) {
+-			scan = SCAN_PAGE;
+-		} else {
+-			/* If we don't have any whitelist entries just
+-			 * disable all scanning. If there are entries
+-			 * and we had both page and inquiry scanning
+-			 * enabled then fall back to only page scanning.
+-			 * Otherwise no changes are needed.
+-			 */
+-			if (list_empty(&hdev->whitelist))
+-				scan = SCAN_DISABLED;
+-			else if (test_bit(HCI_ISCAN, &hdev->flags))
+-				scan = SCAN_PAGE;
+-			else
+-				goto no_scan_update;
+-
+-			if (test_bit(HCI_ISCAN, &hdev->flags) &&
+-			    hdev->discov_timeout > 0)
+-				cancel_delayed_work(&hdev->discov_off);
+-		}
++	if (cp->val) {
++		hci_dev_set_flag(hdev, HCI_CONNECTABLE);
++	} else {
++		if (hdev->discov_timeout > 0)
++			cancel_delayed_work(&hdev->discov_off);
  
- 	err = hci_req_run(&req, set_class_complete);
- 	if (err < 0) {
-@@ -6871,7 +6831,7 @@ static int powered_update_hci(struct hci_dev *hdev)
- 		else
- 			write_fast_connectable(&req, false);
- 		__hci_req_update_scan(&req);
--		update_class(&req);
-+		__hci_req_update_class(&req);
- 		update_name(&req);
- 		update_eir(&req);
+-		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++		hci_dev_clear_flag(hdev, HCI_LIMITED_DISCOVERABLE);
++		hci_dev_clear_flag(hdev, HCI_DISCOVERABLE);
++		hci_dev_clear_flag(hdev, HCI_CONNECTABLE);
  	}
-@@ -6972,7 +6932,7 @@ void mgmt_discoverable_timeout(struct hci_dev *hdev)
- 		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE,
- 			    sizeof(scan), &scan);
- 	}
--	update_class(&req);
-+	__hci_req_update_class(&req);
  
- 	/* Advertising instances don't use the global discoverable setting, so
- 	 * only update AD if advertising was enabled using Set Advertising.
+-no_scan_update:
+-	/* Update the advertising parameters if necessary */
+-	if (hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
+-	    hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE))
+-		__hci_req_enable_advertising(&req);
+-
+-	err = hci_req_run(&req, set_connectable_complete);
+-	if (err < 0) {
+-		mgmt_pending_remove(cmd);
+-		if (err == -ENODATA)
+-			err = set_connectable_update_settings(hdev, sk,
+-							      cp->val);
+-		goto failed;
+-	}
++	queue_work(hdev->req_workqueue, &hdev->connectable_update);
++	err = 0;
+ 
+ failed:
+ 	hci_dev_unlock(hdev);
 -- 
 2.5.0
 
