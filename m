@@ -1,83 +1,83 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <484556914.3688034.1448353597364.JavaMail.yahoo@mail.yahoo.com>
-References: <CABBYNZKVBHbbYk+YhhG0MQdS7A9nXVrWaD3JvXHork0xT+gjxg@mail.gmail.com>
-	<484556914.3688034.1448353597364.JavaMail.yahoo@mail.yahoo.com>
-Date: Tue, 24 Nov 2015 11:01:00 +0200
-Message-ID: <CABBYNZJ4n8KHMbAKz3idgLmADhO+FFDsGF7JiBdf7Xfq9V_78A@mail.gmail.com>
-Subject: Re: bluetoothd crashes when connecting to XiaoMi RC
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?UTF-8?B?5p+P5oe/IOW7lg==?= <boyiliao@yahoo.com.tw>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Seungyoun Ju <sy39.ju@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Seungyoun Ju <sy39.ju@samsung.com>
+Subject: [PATCH] shared/gatt-client: Fix notify_list corruption
+Date: Tue, 24 Nov 2015 17:32:36 +0900
+Message-Id: <1448353956-8880-1-git-send-email-sy39.ju@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Patrick,
+When gatt-client processes service changed indication,
+notify_list is modified in its foreach callback.
 
-On Tue, Nov 24, 2015 at 10:26 AM, 柏懿 廖 <boyiliao@yahoo.com.tw> wrote:
-> Hi Luiz Augusto von Dentz,
->
-> blcause i used valgrind on raspberri pi, but it couldn't work.
->
->
-> bluetoothd[18044]: src/adapter.c:adapter_init() sending read version command
-> bluetoothd[18044]: Starting SDP server
-> bluetoothd[18044]: src/sdpd-service.c:register_device_id() Adding device id
-> record for 0002:1d6b:0246:0520
-> disInstr(arm): unhandled instruction: 0xF1010200
->                  cond=15(0xF) 27:20=16(0x10) 4:4=0 3:0=0(0x0)
-> ==18044== valgrind: Unrecognised instruction at address 0x4843588.
-> ==18044==    at 0x4843588: ??? (in
-> /usr/lib/arm-linux-gnueabihf/libcofi_rpi.so)
-> ==18044== Your program just tried to execute an instruction that Valgrind
-> ==18044== did not recognise.  There are two possible reasons for this.
-> ==18044== 1. Your program has a bug and erroneously jumped to a non-code
-> ==18044==    location.  If you are running Memcheck and you just saw a
-> ==18044==    warning about a bad jump, it's probably your program's fault.
-> ==18044== 2. The instruction is legitimate but Valgrind doesn't handle it,
-> ==18044==    i.e. it's Valgrind's fault.  If you think this is the case or
-> ==18044==    you are not sure, please let us know and we'll try to fix it.
-> ==18044== Either way, Valgrind will now raise a SIGILL signal which will
-> ==18044== probably kill your program.
-> ==18044==
-> ==18044== Process terminating with default action of signal 4 (SIGILL)
-> ==18044==  Illegal opcode at address 0x4843588
-> ==18044==    at 0x4843588: ??? (in
-> /usr/lib/arm-linux-gnueabihf/libcofi_rpi.so)
-> ==18044==
-> ==18044== HEAP SUMMARY:
-> ==18044==     in use at exit: 27,453 bytes in 423 blocks
-> ==18044==   total heap usage: 2,115 allocs, 1,692 frees, 188,303 bytes
-> allocated
-> ==18044==
-> ==18044== LEAK SUMMARY:
-> ==18044==    definitely lost: 0 bytes in 0 blocks
-> ==18044==    indirectly lost: 0 bytes in 0 blocks
-> ==18044==      possibly lost: 0 bytes in 0 blocks
-> ==18044==    still reachable: 27,453 bytes in 423 blocks
-> ==18044==         suppressed: 0 bytes in 0 blocks
-> ==18044== Reachable blocks (those to which a pointer was found) are not
-> shown.
-> ==18044== To see them, rerun with: --leak-check=full --show-reachable=yes
-> ==18044==
-> ==18044== For counts of detected and suppressed errors, rerun with: -v
-> ==18044== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 27 from 6)
-> Illegal instruction
+This makes queue_foreach's "next" point to freed memory area and process
+crash.
 
-No top-posting in the mailing list please.
+This patch adds service changed indication to queue.
+After notify_list's foreach is done, queued one is processed smoothly.
 
-> 1. Do you have another way or tool to trace the  "Segmentation fault" ?
+Invalid read of size 4
+   at 0x8056B91: queue_foreach (queue.c:219)
+   by 0x8051F44: notify_cb (gatt-client.c:1633)
+   by 0x804E1A9: can_read_data (att.c:800)
+   by 0x80558E1: io_callback (io-mainloop.c:123)
+   by 0x8056505: mainloop_run (mainloop.c:157)
+   by 0x804995E: main (btgatt-client.c:1664)
+ Address 0x41a3784 is 4 bytes inside a block of size 8 free'd
+   at 0x402750C: free (vg_replace_malloc.c:427)
+   by 0x8056D2F: queue_remove_if (queue.c:302)
+   by 0x8056DD0: queue_remove_all (queue.c:331)
+   by 0x804F61E: process_service_changed (gatt-client.c:332)
+   by 0x804E7F1: notify_handler (gatt-client.c:1617)
+   by 0x8056B9E: queue_foreach (queue.c:220)
+   by 0x8051F44: notify_cb (gatt-client.c:1633)
+   by 0x804E1A9: can_read_data (att.c:800)
+   by 0x80558E1: io_callback (io-mainloop.c:123)
+   by 0x8056505: mainloop_run (mainloop.c:157)
+   by 0x804995E: main (btgatt-client.c:1664)
+---
+ src/shared/gatt-client.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-gdb would be another option, in the other hand you may want to try to
-reproduce the problem with your laptop/desktop where valgrind is
-probably more stable.
-
-> 2. what's the meaning of  "ry running  with upstream ?"
-
-Run using git master branch, if you can't compile for rpi you can use
-a laptop/desktop as I suggested above, there have been a couple of
-changes to HoG plugin that may or may not help in this case.
-
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 06ac763..95304ca 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1469,11 +1469,6 @@ static void service_changed_cb(uint16_t value_handle, const uint8_t *value,
+ 			"Service Changed received - start: 0x%04x end: 0x%04x",
+ 			start, end);
+ 
+-	if (!client->in_svc_chngd) {
+-		process_service_changed(client, start, end);
+-		return;
+-	}
+-
+ 	op = new0(struct service_changed_op, 1);
+ 
+ 	op->start_handle = start;
+@@ -1623,6 +1618,7 @@ static void notify_cb(uint8_t opcode, const void *pdu, uint16_t length,
+ {
+ 	struct bt_gatt_client *client = user_data;
+ 	struct pdu_data pdu_data;
++	struct service_changed_op *sc_op;
+ 
+ 	bt_gatt_client_ref(client);
+ 
+@@ -1632,6 +1628,13 @@ static void notify_cb(uint8_t opcode, const void *pdu, uint16_t length,
+ 
+ 	queue_foreach(client->notify_list, notify_handler, &pdu_data);
+ 
++	if (client->in_svc_chngd == false &&
++	    (sc_op = queue_pop_head(client->svc_chngd_queue))) {
++		process_service_changed(client, sc_op->start_handle,
++						sc_op->end_handle);
++		free(sc_op);
++	}
++
+ 	if (opcode == BT_ATT_OP_HANDLE_VAL_IND)
+ 		bt_att_send(client->att, BT_ATT_OP_HANDLE_VAL_CONF, NULL, 0,
+ 							NULL, NULL, NULL);
 -- 
-Luiz Augusto von Dentz
+2.1.0
+
