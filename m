@@ -1,57 +1,122 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+J5AwMuyKpz0RYXHYX_oK8Y6H1gVT_WYJy8BGdiEaB=g@mail.gmail.com>
-References: <CAOMqctQvwYLYp2N=sp+NHrAJyW9_8h6V1_KG-9cV5=uvBTzdSg@mail.gmail.com>
- <CABBYNZ+J5AwMuyKpz0RYXHYX_oK8Y6H1gVT_WYJy8BGdiEaB=g@mail.gmail.com>
-From: Michal Suchanek <hramrach@gmail.com>
-Date: Tue, 24 Nov 2015 12:03:05 +0100
-Message-ID: <CAOMqctRT1stkabDBjcYg90NTupsNmzz6Qyd-5bWNzGaiCk-FEA@mail.gmail.com>
-Subject: Re: bluetoothd crashes when media endpoint SelectConfiguration reply
- does not contain an array
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: Unknown Connection Identifier
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAEZxfGOdyZat1evKm0Jfwg=knuigGdfK_wVqS8NG=zFAY3aRXg@mail.gmail.com>
+Date: Tue, 24 Nov 2015 12:00:17 +0100
+Cc: Szymon Janc <szymon.janc@codecoup.pl>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <2DBBB005-93A7-47ED-8E88-1D6B92ACCC07@holtmann.org>
+References: <CAEZxfGPTxwUZzU+3XSV-uiN+DMz+hyOKiiZfgF+oD6pp=-XiOA@mail.gmail.com> <AAC95ACC-36E4-4618-8F49-53F78AE93AA6@holtmann.org> <2045332.GytFuFKTvp@ix> <CAEZxfGOdyZat1evKm0Jfwg=knuigGdfK_wVqS8NG=zFAY3aRXg@mail.gmail.com>
+To: =?utf-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 23 November 2015 at 12:47, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Michael,
->
-> On Sun, Nov 22, 2015 at 12:45 AM, Michal Suchanek <hramrach@gmail.com> wrote:
->> Hello,
->>
->> I am using bluez 5.36 on Debian.
->>
->> I tried to export a media source from an application. However, when
->> the SelectConfiguration call finishes bluetoothd crashes.
->>
->> Looking at the code there is no check that the return from the
->> callback actually contains an array before trying to extract the array
->> content.
->>
->> Adding a check avoids the crash in bluetoothd.
->>
->> I am not sure why the return value does not contain a proper
->> capabilities array but that is another issue.
->>
->> Sending a patch that fixes the problem for me.
->
-> The fix looks good, please send a proper patch so I can apply. About
-> the response not being an array, this is probably a custom endpoint
-> because with PA or simple-endpoint but should respond properly, but it
-> is a valid fix anyway.
->
+Hi Francois,
 
-Yes, it is a custom endpoind. I found that these dbus bindings require
-you to specify a return value type othewise returned data is silently
-trashed and nothing is passed to the caller.
+> Thanks both of you for your input.
+> 
+> Here are my 100% reproducible steps:
+> - Restart bluetoothd to start fresh
+> - Remove cached device (remove 88:0F:10:9D:EB:42)
+> - Run basic scan (scan on)
+> - Wait for the device to pop up in results and stop scan (scan off)
+> - Try to connect to it (connect 88:0F:10:9D:EB:42)
+> 
+> As you can read below I now have 2 "LE Connection Complete (0x01)" events.
+> 
+> Bluetooth monitor ver 5.35
+> = New Index: A4:17:31:78:A6:04 (BR/EDR,USB,hci0)
+>                [hci0] 0.624321
+> < HCI Command: LE Add Device To White List (0x08|0x0011) plen 7
+>               [hci0] 11.038826
+>        Address type: Public (0x00)
+>        Address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
+>> HCI Event: Command Complete (0x0e) plen 4                                           [hci0] 11.040084
+>      LE Add Device To White List (0x08|0x0011) ncmd 1
+>        Status: Success (0x00)
+> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+>               [hci0] 11.040125
+>        Type: Passive (0x00)
+>        Interval: 60.000 msec (0x0060)
+>        Window: 30.000 msec (0x0030)
+>        Own address type: Public (0x00)
+>        Filter policy: Ignore not in white list (0x01)
+>> HCI Event: Command Complete (0x0e) plen 4                                           [hci0] 11.041085
+>      LE Set Scan Parameters (0x08|0x000b) ncmd 1
+>        Status: Success (0x00)
+> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>               [hci0] 11.041134
+>        Scanning: Enabled (0x01)
+>        Filter duplicates: Enabled (0x01)
+>> HCI Event: Command Complete (0x0e) plen 4                                           [hci0] 11.042084
+>      LE Set Scan Enable (0x08|0x000c) ncmd 1
+>        Status: Success (0x00)
+>> HCI Event: LE Meta Event (0x3e) plen 43                                             [hci0] 15.668141
+>      LE Advertising Report (0x02)
+>        Num reports: 1
+>        Event type: Connectable undirected - ADV_IND (0x00)
+>        Address type: Public (0x00)
+>        Address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
+>        Data length: 31
+>        Flags: 0x06
+>          LE General Discoverable Mode
+>          BR/EDR Not Supported
+>        Company: Anhui Huami Information Technology Co., Ltd. (343)
+>          Data: 00f70b676930f4c909f4a5acd792a299ff02880f109deb42
+>        RSSI: -59 dBm (0xc5)
+> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>               [hci0] 15.668289
+>        Scanning: Disabled (0x00)
+>        Filter duplicates: Disabled (0x00)
+>> HCI Event: Command Complete (0x0e) plen 4                                           [hci0] 15.669062
+>      LE Set Scan Enable (0x08|0x000c) ncmd 1
+>        Status: Success (0x00)
+> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
+>               [hci0] 15.669171
+>        Scan interval: 60.000 msec (0x0060)
+>        Scan window: 30.000 msec (0x0030)
 
-I tried using PA but everything locks up when the BT sink device goes
-out of proximity so I will pass on this for now.
+we might should have the LE Create Connection scan with a full duty cycle here. So it does not miss any advertising PDUs.
 
-I will try to generate a patch with git.
+>        Filter policy: White list is not used (0x00)
+>        Peer address type: Public (0x00)
+>        Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
+>        Own address type: Public (0x00)
+>        Min connection interval: 50.00 msec (0x0028)
+>        Max connection interval: 70.00 msec (0x0038)
+>        Connection latency: 0x0000
+>        Supervision timeout: 420 msec (0x002a)
+>        Min connection length: 0.000 msec (0x0000)
+>        Max connection length: 0.000 msec (0x0000)
+>> HCI Event: Command Status (0x0f) plen 4                                             [hci0] 15.670065
+>      LE Create Connection (0x08|0x000d) ncmd 1
+>        Status: Success (0x00)
+> < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
+>               [hci0] 17.670566
 
-Thanks
+And I think we need to increase the timeout to something like 4-5 seconds before we give up and try the next device that might have been found.
 
-Michal
+>> HCI Event: Command Complete (0x0e) plen 4                                           [hci0] 17.672048
+>      LE Create Connection Cancel (0x08|0x000e) ncmd 1
+>        Status: Success (0x00)
+>> HCI Event: LE Meta Event (0x3e) plen 19                                             [hci0] 17.674036
+>      LE Connection Complete (0x01)
+>        Status: Unknown Connection Identifier (0x02)
+>        Handle: 32
+>        Role: Master (0x00)
+>        Peer address type: Public (0x00)
+>        Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
+>        Connection interval: 67.50 msec (0x0036)
+>        Connection latency: 0.00 msec (0x0000)
+>        Supervision timeout: 420 msec (0x002a)
+>        Master clock accuracy: 0x00
+> @ Connect Failed: 88:0F:10:9D:EB:42 (1) status 0x02
+
+This one still needs to be fixed. It is a bug. The implementation is too naive. The unknown connection identifier is actually the success case for LE Create Connection Cancel command. And since we keep trying until the connection timeout hits, this is not an error at this point.
+
+Regards
+
+Marcel
+
