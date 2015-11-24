@@ -1,41 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: John Keeping <john@metanate.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/7] Bluetooth: Move more code to hci_request.c & req_workqueue
-Date: Tue, 24 Nov 2015 14:02:00 +0200
-Message-Id: <1448366527-29714-1-git-send-email-johan.hedberg@gmail.com>
+Cc: John Keeping <john@metanate.com>
+Subject: [PATCH] tools/hciattach: Add support for BCM line discipline
+Date: Tue, 24 Nov 2015 11:56:11 +0000
+Message-Id: <1448366171-14264-1-git-send-email-john@metanate.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This is similar to the "bcm43xx" option but using the kernel driver has
+the advantage that the wakeup and shutdown pins on the device can be
+used.
+---
+ tools/hciattach.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-This set of patches continues the trend of moving HCI activity from
-mgmt.c to hci_request.c and running as much of it as possible through
-the same hdev->req_workqueue with the help of hci_req_sync.
-
-I'll have many more updates coming still after these, but wanted to send
-what I have at this point since I've sucessfully ran tests on them with
-mgmt-tester, btmgmt and bluetoothd/bluetoothctl without seeing any
-breakage (doesn't mean it isn't there though).
-
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (7):
-      Bluetooth: Run page scan updates through hdev->req_workqueue
-      Bluetooth: Move __hci_update_background_scan up in hci_request.c
-      Bluetooth: Move advertising instance management to hci_request.c
-      Bluetooth: Move connectable changes to hdev->req_workqueue
-      Bluetooth: Perform Class of Device changes through hdev->req_workqueue
-      Bluetooth: Move discoverable changes to hdev->req_workqueue
-      Bluetooth: Move discoverable timeout behind hdev->req_workqueue
-
- include/net/bluetooth/hci_core.h |  15 +-
- net/bluetooth/hci_conn.c         |   2 +-
- net/bluetooth/hci_core.c         |  32 +-
- net/bluetooth/hci_event.c        |   8 +-
- net/bluetooth/hci_request.c      | 833 +++++++++++++++++++++++++++++++++----
- net/bluetooth/hci_request.h      |  24 +-
- net/bluetooth/mgmt.c             | 843 ++++----------------------------------
- 7 files changed, 876 insertions(+), 881 deletions(-)
+diff --git a/tools/hciattach.c b/tools/hciattach.c
+index 59a76a7..7f8f463 100644
+--- a/tools/hciattach.c
++++ b/tools/hciattach.c
+@@ -1163,6 +1163,10 @@ struct uart_t uart[] = {
+ 	{ "amp",	0x0000, 0x0000, HCI_UART_H4, 115200, 115200,
+ 			AMP_DEV, DISABLE_PM, NULL, NULL, NULL },
+ 
++	/* Broadcom BCM with kernel support */
++	{ "bcm",        0x0000, 0x0000, HCI_UART_BCM,  115200, 115200,
++				FLOW_CTL, DISABLE_PM, NULL, NULL, NULL },
++
+ 	{ NULL, 0 }
+ };
+ 
+-- 
+2.6.3.462.gbe2c914
 
