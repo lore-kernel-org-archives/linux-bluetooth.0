@@ -1,38 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-Id: <380b1f56d9e84d503d2d11fb9510b0eda274cad2.1448381195.git.hramrach@gmail.com>
-From: Michal Suchanek <hramrach@gmail.com>
-Date: Tue, 24 Nov 2015 17:01:32 +0100
-Subject: Fix crash when incorrect reply is received from SelectConfiguration
+Date: Tue, 24 Nov 2015 15:16:37 +0100 (CET)
+From: acalando@free.fr
 To: linux-bluetooth@vger.kernel.org
+Message-ID: <354132869.329670308.1448374597432.JavaMail.root@zimbra62-e11.priv.proxad.net>
+Subject: Bug in batostr()?
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no check that SelectConfiguration call on MediaEndpoint1
-returns an array before accessing the array. When the return from
-SelectConfiguration is not an array type bluetoothd crashes.
 
-Ignore the reply in that case.
----
- profiles/audio/media.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+In lib/bluetooth.c, it looks like batostr() is bugged (wrong bytes order), 
+after comparison with ba2str():
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 69070bf..a5cb490 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -292,6 +292,12 @@ static void endpoint_reply(DBusPendingCall *call, void *user_data)
- 
- 		dbus_message_iter_init(reply, &args);
- 
-+		if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY) {
-+			error("SelectConfiguration did not return an array: %s",
-+				dbus_message_get_signature(reply));
-+			goto done;
-+		}
-+
- 		dbus_message_iter_recurse(&args, &array);
- 
- 		dbus_message_iter_get_fixed_array(&array, &configuration, &size);
--- 
-2.6.2
+char *batostr(const bdaddr_t *ba)
+	sprintf(str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+		ba->b[0], ba->b[1], ba->b[2],
+		ba->b[3], ba->b[4], ba->b[5]);
 
+int ba2str(const bdaddr_t *ba, char *str)
+	return sprintf(str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+		ba->b[5], ba->b[4], ba->b[3], ba->b[2], ba->b[1], ba->b[0]);
+
+This function is not called anywhere else in the repository, that is probably 
+why the problem never showed up.
+
+Antoine
