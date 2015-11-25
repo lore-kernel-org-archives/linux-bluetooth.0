@@ -1,31 +1,124 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/4] Bluetooth: More hci_request.c & hci_req_sync updates
-Date: Wed, 25 Nov 2015 16:15:40 +0200
-Message-Id: <1448460944-17002-1-git-send-email-johan.hedberg@gmail.com>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: Re: [PATCH bluetooth-next 2/4] 6lowpan: add nhc module for GHC
+ extension header detection
+To: Alexander Aring <alex.aring@gmail.com>
+References: <1442577168-23183-1-git-send-email-stefan@osg.samsung.com>
+ <1442577168-23183-3-git-send-email-stefan@osg.samsung.com>
+ <20150918214415.GA6872@omega>
+Cc: linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com,
+	linux-bluetooth@vger.kernel.org
+Message-ID: <5655BC9C.2000303@osg.samsung.com>
+Date: Wed, 25 Nov 2015 14:50:20 +0100
+MIME-Version: 1.0
+In-Reply-To: <20150918214415.GA6872@omega>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello.
 
-The first three patches in this set are preparations for moving the
-power on sequence to be done with hci_req_sync. The fourth patch does
-the actual refactoring for that.
+On 18/09/15 23:44, Alexander Aring wrote:
+> Hi,
+>
+> On Fri, Sep 18, 2015 at 01:52:46PM +0200, Stefan Schmidt wrote:
+>> Signed-off-by: Stefan Schmidt<stefan@osg.samsung.com>
+>> ---
+>>   net/6lowpan/Kconfig                    |  5 +++++
+>>   net/6lowpan/Makefile                   |  3 +++
+>>   net/6lowpan/nhc_ghc_extension_header.c | 27 +++++++++++++++++++++++++++
+>>   3 files changed, 35 insertions(+)
+>>   create mode 100644 net/6lowpan/nhc_ghc_extension_header.c
+>>
+>> diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
+>> index 6af7a46..f541f50 100644
+>> --- a/net/6lowpan/Kconfig
+>> +++ b/net/6lowpan/Kconfig
+>> @@ -59,4 +59,9 @@ config 6LOWPAN_NHC_UDP
+>>   	---help---
+>>   	  6LoWPAN IPv6 UDP Header compression according to RFC6282.
+>>   
+>> +config 6LOWPAN_GHC_EXTENSION_HEADER
+>> +	tristate "GHC Extension Header Support"
+>> +	default y
+>> +	---help---
+>> +
+>>   endif
+>> diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
+>> index c6ffc55..2b42bd0 100644
+>> --- a/net/6lowpan/Makefile
+>> +++ b/net/6lowpan/Makefile
+>> @@ -10,3 +10,6 @@ obj-$(CONFIG_6LOWPAN_NHC_IPV6) += nhc_ipv6.o
+>>   obj-$(CONFIG_6LOWPAN_NHC_MOBILITY) += nhc_mobility.o
+>>   obj-$(CONFIG_6LOWPAN_NHC_ROUTING) += nhc_routing.o
+>>   obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
+>> +
+>> +#rfc7400 ghcs
+>> +obj-$(CONFIG_6LOWPAN_GHC_EXTENSION_HEADER) += nhc_ghc_extension_header.o
+>> diff --git a/net/6lowpan/nhc_ghc_extension_header.c b/net/6lowpan/nhc_ghc_extension_header.c
+>> new file mode 100644
+>> index 0000000..eeeabfa
+>> --- /dev/null
+>> +++ b/net/6lowpan/nhc_ghc_extension_header.c
+>> @@ -0,0 +1,27 @@
+>> +/*
+>> + *	6LoWPAN Extension Header compression according to RFC7400
+>> + *
+>> + *	This program is free software; you can redistribute it and/or
+>> + *	modify it under the terms of the GNU General Public License
+>> + *	as published by the Free Software Foundation; either version
+>> + *	2 of the License, or (at your option) any later version.
+>> + */
+>> +
+>> +#include "nhc.h"
+>> +
+>> +#define LOWPAN_GHC_EXTENSION_HEADER_IDLEN	1
+>> +#define LOWPAN_GHC_EXTENSION_HEADER_ID_0	0xb0
+>> +#define LOWPAN_GHC_EXTENSION_HEADER_MASK_0	0xf8
+>> +
+> Sorry,
+>
+> This is actually wrong.
+>
+> http://tools.ietf.org/html/rfc7400#section-3.2
+>
+> describes the id with:
+>
+> 1 0 1 1 E I D H
+>
+> whereas E I D is the same like
+>
+> http://tools.ietf.org/html/rfc6282#section-4.2
+>
+> So this header compression should be splitted in 5 modules for each
+> extension header:
+>
+> 1 0 1 1 0 0 0 NH -> Hop-by-Hop
+> 1 0 1 1 0 0 1 NH -> Routing
+> 1 0 1 1 0 1 0 NH -> Fragment
+> ....
+>
+> like we have it in the others extension headers for RFC6282.
 
-Johan
+I aligned this with how the extension header is handled in plain NHC. 
+Thanks for pointing this out. No idea how I missed it.
 
-----------------------------------------------------------------
-Johan Hedberg (4):
-      Bluetooth: HCI name update to hci_request.c
-      Bluetooth: Move EIR update to hci_request.c
-      Bluetooth: Move fast connectable code to hci_request.c
-      Bluetooth: Perform HCI update for power on synchronously
+Will be fixed in a new patchset coming later today.
 
- include/net/bluetooth/hci_core.h |   3 +-
- net/bluetooth/hci_core.c         |  21 ++-
- net/bluetooth/hci_request.c      | 334 ++++++++++++++++++++++++++++++++
- net/bluetooth/hci_request.h      |   6 +
- net/bluetooth/mgmt.c             | 388 ++------------------------------------
- 5 files changed, 376 insertions(+), 376 deletions(-)
+> Maybe make also the name smaller
+>
+> LOWPAN_GHC_EXT_HDR_HOP_XXXX
+
+I shortened this as well.
+
+> use the same coding style like the others extension header modules.
+>
+> also _maybe_ change the to module name "nhc_ghc_ext_hdr_foobar".
+
+Also shortened. I left out the hdr part in both to make it even shorter 
+and the hdr part did not really differentiate anything so we could leave 
+it out.
+
+regards
+Stefan Schmidt
 
