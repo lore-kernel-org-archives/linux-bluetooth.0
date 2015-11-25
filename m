@@ -5,9 +5,9 @@ Cc: Alexander Aring <alex.aring@gmail.com>,
 	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
 	linux-bluetooth@vger.kernel.org,
 	Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH v2 bluetooth-next 3/7] 6lowpan: add nhc module for GHC UDP detection
-Date: Wed, 25 Nov 2015 15:59:13 +0100
-Message-Id: <1448463557-22618-4-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH v2 bluetooth-next 2/7] 6lowpan: add nhc module for GHC hop-by-hopextension header detection
+Date: Wed, 25 Nov 2015 15:59:12 +0100
+Message-Id: <1448463557-22618-3-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1448463557-22618-1-git-send-email-stefan@osg.samsung.com>
 References: <1448463557-22618-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -15,43 +15,46 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- net/6lowpan/Kconfig       |  5 +++++
- net/6lowpan/Makefile      |  1 +
- net/6lowpan/nhc_ghc_udp.c | 27 +++++++++++++++++++++++++++
- 3 files changed, 33 insertions(+)
- create mode 100644 net/6lowpan/nhc_ghc_udp.c
+ net/6lowpan/Kconfig           |  6 ++++++
+ net/6lowpan/Makefile          |  3 +++
+ net/6lowpan/nhc_ghc_ext_hop.c | 27 +++++++++++++++++++++++++++
+ 3 files changed, 36 insertions(+)
+ create mode 100644 net/6lowpan/nhc_ghc_ext_hop.c
 
 diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
-index 1bd49eb..94d5178 100644
+index 6af7a46..1bd49eb 100644
 --- a/net/6lowpan/Kconfig
 +++ b/net/6lowpan/Kconfig
-@@ -65,4 +65,9 @@ config 6LOWPAN_GHC_EXT_HDR_HOP
- 	  6LoWPAN IPv6 Hop-by-Hop option generic header compression according
- 	  to RFC7400.
+@@ -59,4 +59,10 @@ config 6LOWPAN_NHC_UDP
+ 	---help---
+ 	  6LoWPAN IPv6 UDP Header compression according to RFC6282.
  
-+config 6LOWPAN_GHC_UDP
-+	tristate "GHC UDP Support"
++config 6LOWPAN_GHC_EXT_HDR_HOP
++	tristate "GHC Hop-by-Hop Options Header Support"
 +	---help---
-+	  6LoWPAN IPv6 UDP generic header compression according to RFC7400.
++	  6LoWPAN IPv6 Hop-by-Hop option generic header compression according
++	  to RFC7400.
 +
  endif
 diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
-index ba20e01..5e4f2f3 100644
+index c6ffc55..ba20e01 100644
 --- a/net/6lowpan/Makefile
 +++ b/net/6lowpan/Makefile
-@@ -13,3 +13,4 @@ obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
- 
- #rfc7400 ghcs
- obj-$(CONFIG_6LOWPAN_GHC_EXT_HDR_HOP) += nhc_ghc_ext_hop.o
-+obj-$(CONFIG_6LOWPAN_GHC_UDP) += nhc_ghc_udp.o
-diff --git a/net/6lowpan/nhc_ghc_udp.c b/net/6lowpan/nhc_ghc_udp.c
+@@ -10,3 +10,6 @@ obj-$(CONFIG_6LOWPAN_NHC_IPV6) += nhc_ipv6.o
+ obj-$(CONFIG_6LOWPAN_NHC_MOBILITY) += nhc_mobility.o
+ obj-$(CONFIG_6LOWPAN_NHC_ROUTING) += nhc_routing.o
+ obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
++
++#rfc7400 ghcs
++obj-$(CONFIG_6LOWPAN_GHC_EXT_HDR_HOP) += nhc_ghc_ext_hop.o
+diff --git a/net/6lowpan/nhc_ghc_ext_hop.c b/net/6lowpan/nhc_ghc_ext_hop.c
 new file mode 100644
-index 0000000..17beefa
+index 0000000..baec86f
 --- /dev/null
-+++ b/net/6lowpan/nhc_ghc_udp.c
++++ b/net/6lowpan/nhc_ghc_ext_hop.c
 @@ -0,0 +1,27 @@
 +/*
-+ *	6LoWPAN UDP compression according to RFC7400
++ *	6LoWPAN Extension Header compression according to RFC7400
 + *
 + *	This program is free software; you can redistribute it and/or
 + *	modify it under the terms of the GNU General Public License
@@ -61,21 +64,21 @@ index 0000000..17beefa
 +
 +#include "nhc.h"
 +
-+#define LOWPAN_GHC_UDP_IDLEN	1
-+#define LOWPAN_GHC_UDP_ID_0	0xd0
-+#define LOWPAN_GHC_UDP_MASK_0	0xf8
++#define LOWPAN_GHC_EXT_HOP_IDLEN	1
++#define LOWPAN_GHC_EXT_HOP_ID_0		0xb0
++#define LOWPAN_GHC_EXT_HOP_MASK_0	0xfe
 +
-+static void udp_ghid_setup(struct lowpan_nhc *nhc)
++static void hop_ghid_setup(struct lowpan_nhc *nhc)
 +{
-+	nhc->id[0] = LOWPAN_GHC_UDP_ID_0;
-+	nhc->idmask[0] = LOWPAN_GHC_UDP_MASK_0;
++	nhc->id[0] = LOWPAN_GHC_EXT_HOP_ID_0;
++	nhc->idmask[0] = LOWPAN_GHC_EXT_HOP_MASK_0;
 +}
 +
-+LOWPAN_NHC(ghc_udp, "RFC7400 UDP", NEXTHDR_UDP, 0,
-+	   udp_ghid_setup, LOWPAN_GHC_UDP_IDLEN, NULL, NULL);
++LOWPAN_NHC(ghc_ext_hop, "RFC7400 Hop-by-Hop Extension Header", NEXTHDR_HOP, 0,
++	   hop_ghid_setup, LOWPAN_GHC_EXT_HOP_IDLEN, NULL, NULL);
 +
-+module_lowpan_nhc(ghc_udp);
-+MODULE_DESCRIPTION("6LoWPAN generic header UDP compression");
++module_lowpan_nhc(ghc_ext_hop);
++MODULE_DESCRIPTION("6LoWPAN generic header hop-by-hop extension compression");
 +MODULE_LICENSE("GPL");
 -- 
 2.4.3
