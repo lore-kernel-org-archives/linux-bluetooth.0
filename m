@@ -1,68 +1,64 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: [PATCH bluetooth-next 2/4] 6lowpan: add nhc module for GHC
- extension header detection
+Subject: Re: [PATCH bluetooth-next 4/4] 6lowpan: add nhc module for GHC ICMPv6
+ detection
 To: Alexander Aring <alex.aring@gmail.com>
 References: <1442577168-23183-1-git-send-email-stefan@osg.samsung.com>
- <1442577168-23183-3-git-send-email-stefan@osg.samsung.com>
- <20150918214415.GA6872@omega>
+ <1442577168-23183-5-git-send-email-stefan@osg.samsung.com>
+ <20150918215059.GC6872@omega>
 Cc: linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com,
 	linux-bluetooth@vger.kernel.org
-Message-ID: <5655BC9C.2000303@osg.samsung.com>
-Date: Wed, 25 Nov 2015 14:50:20 +0100
+Message-ID: <5655BCA9.3090609@osg.samsung.com>
+Date: Wed, 25 Nov 2015 14:50:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <20150918214415.GA6872@omega>
+In-Reply-To: <20150918215059.GC6872@omega>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hello.
 
-On 18/09/15 23:44, Alexander Aring wrote:
-> Hi,
->
-> On Fri, Sep 18, 2015 at 01:52:46PM +0200, Stefan Schmidt wrote:
+On 18/09/15 23:51, Alexander Aring wrote:
+> On Fri, Sep 18, 2015 at 01:52:48PM +0200, Stefan Schmidt wrote:
 >> Signed-off-by: Stefan Schmidt<stefan@osg.samsung.com>
 >> ---
->>   net/6lowpan/Kconfig                    |  5 +++++
->>   net/6lowpan/Makefile                   |  3 +++
->>   net/6lowpan/nhc_ghc_extension_header.c | 27 +++++++++++++++++++++++++++
->>   3 files changed, 35 insertions(+)
->>   create mode 100644 net/6lowpan/nhc_ghc_extension_header.c
+>>   net/6lowpan/Kconfig          |  5 +++++
+>>   net/6lowpan/Makefile         |  1 +
+>>   net/6lowpan/nhc_ghc_icmpv6.c | 27 +++++++++++++++++++++++++++
+>>   3 files changed, 33 insertions(+)
+>>   create mode 100644 net/6lowpan/nhc_ghc_icmpv6.c
 >>
 >> diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
->> index 6af7a46..f541f50 100644
+>> index 67a786b..a34693d 100644
 >> --- a/net/6lowpan/Kconfig
 >> +++ b/net/6lowpan/Kconfig
->> @@ -59,4 +59,9 @@ config 6LOWPAN_NHC_UDP
+>> @@ -69,4 +69,9 @@ config 6LOWPAN_GHC_UDP
+>>   	default y
 >>   	---help---
->>   	  6LoWPAN IPv6 UDP Header compression according to RFC6282.
 >>   
->> +config 6LOWPAN_GHC_EXTENSION_HEADER
->> +	tristate "GHC Extension Header Support"
+>> +config 6LOWPAN_GHC_ICMPV6
+>> +	tristate "GHC ICMPv6 Support"
 >> +	default y
 >> +	---help---
 >> +
 >>   endif
 >> diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
->> index c6ffc55..2b42bd0 100644
+>> index fc65efb..49256b7f 100644
 >> --- a/net/6lowpan/Makefile
 >> +++ b/net/6lowpan/Makefile
->> @@ -10,3 +10,6 @@ obj-$(CONFIG_6LOWPAN_NHC_IPV6) += nhc_ipv6.o
->>   obj-$(CONFIG_6LOWPAN_NHC_MOBILITY) += nhc_mobility.o
->>   obj-$(CONFIG_6LOWPAN_NHC_ROUTING) += nhc_routing.o
->>   obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
->> +
->> +#rfc7400 ghcs
->> +obj-$(CONFIG_6LOWPAN_GHC_EXTENSION_HEADER) += nhc_ghc_extension_header.o
->> diff --git a/net/6lowpan/nhc_ghc_extension_header.c b/net/6lowpan/nhc_ghc_extension_header.c
+>> @@ -14,3 +14,4 @@ obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
+>>   #rfc7400 ghcs
+>>   obj-$(CONFIG_6LOWPAN_GHC_EXTENSION_HEADER) += nhc_ghc_extension_header.o
+>>   obj-$(CONFIG_6LOWPAN_GHC_UDP) += nhc_ghc_udp.o
+>> +obj-$(CONFIG_6LOWPAN_GHC_ICMPV6) += nhc_ghc_icmpv6.o
+>> diff --git a/net/6lowpan/nhc_ghc_icmpv6.c b/net/6lowpan/nhc_ghc_icmpv6.c
 >> new file mode 100644
->> index 0000000..eeeabfa
+>> index 0000000..378ebfe
 >> --- /dev/null
->> +++ b/net/6lowpan/nhc_ghc_extension_header.c
+>> +++ b/net/6lowpan/nhc_ghc_icmpv6.c
 >> @@ -0,0 +1,27 @@
 >> +/*
->> + *	6LoWPAN Extension Header compression according to RFC7400
+>> + *	6LoWPAN ICMPv6 compression according to RFC7400
 >> + *
 >> + *	This program is free software; you can redistribute it and/or
 >> + *	modify it under the terms of the GNU General Public License
@@ -72,53 +68,20 @@ On 18/09/15 23:44, Alexander Aring wrote:
 >> +
 >> +#include "nhc.h"
 >> +
->> +#define LOWPAN_GHC_EXTENSION_HEADER_IDLEN	1
->> +#define LOWPAN_GHC_EXTENSION_HEADER_ID_0	0xb0
->> +#define LOWPAN_GHC_EXTENSION_HEADER_MASK_0	0xf8
+>> +#define LOWPAN_GHC_ICMPV6_IDLEN		1
+>> +#define LOWPAN_GHC_ICMPV6_ID_0		0xdf
+>> +#define LOWPAN_GHC_ICMPV6_MASK_0	0xff
 >> +
-> Sorry,
->
-> This is actually wrong.
->
-> http://tools.ietf.org/html/rfc7400#section-3.2
->
-> describes the id with:
->
-> 1 0 1 1 E I D H
->
-> whereas E I D is the same like
->
-> http://tools.ietf.org/html/rfc6282#section-4.2
->
-> So this header compression should be splitted in 5 modules for each
-> extension header:
->
-> 1 0 1 1 0 0 0 NH -> Hop-by-Hop
-> 1 0 1 1 0 0 1 NH -> Routing
-> 1 0 1 1 0 1 0 NH -> Fragment
-> ....
->
-> like we have it in the others extension headers for RFC6282.
+>> +static void icmpv6_ghid_setup(struct lowpan_nhc *nhc)
+>> +{
+>> +	nhc->id[0] = LOWPAN_GHC_ICMPV6_ID_0;
+>> +	nhc->idmask[0] = LOWPAN_GHC_ICMPV6_MASK_0;
+>> +}
+>> +
+>> +LOWPAN_NHC(ghc_icmpv6, "RFC7400 ICMPv6", NEXTHDR_HOP, 0,
+> s/NEXTHDR_HOP/NEXTHDR_ICMP/
 
-I aligned this with how the extension header is handled in plain NHC. 
-Thanks for pointing this out. No idea how I missed it.
-
-Will be fixed in a new patchset coming later today.
-
-> Maybe make also the name smaller
->
-> LOWPAN_GHC_EXT_HDR_HOP_XXXX
-
-I shortened this as well.
-
-> use the same coding style like the others extension header modules.
->
-> also _maybe_ change the to module name "nhc_ghc_ext_hdr_foobar".
-
-Also shortened. I left out the hdr part in both to make it even shorter 
-and the hdr part did not really differentiate anything so we could leave 
-it out.
+Fixed in the new patchset coming later today.
 
 regards
 Stefan Schmidt
-
