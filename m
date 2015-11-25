@@ -1,79 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Simplify read_adv_features code
-Date: Thu, 26 Nov 2015 12:15:58 +0200
-Message-Id: <1448532959-21912-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAH4GWYEC3HEui497u4N2-+mHYa-Z7thWmHJ_nLHbfr7XN58scg@mail.gmail.com>
+References: <CAH4GWYEC3HEui497u4N2-+mHYa-Z7thWmHJ_nLHbfr7XN58scg@mail.gmail.com>
+Date: Wed, 25 Nov 2015 23:51:02 +0100
+Message-ID: <CAExxLLAQb7719mdOYXo_NVnG4VK2_vAf9b_95rUOz=11x7GmKA@mail.gmail.com>
+Subject: Re: Bluez g_dbus api for services
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+To: Marian Cingel <cingel.marian@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marian,
 
-The code in the Read Advertising Features mgmt command handler is
-unnecessarily complicated. Clean it up and remove unnecessary
-variables & branches.
+On Wed, Nov 25, 2015 at 11:18 PM, Marian Cingel <cingel.marian@gmail.com> wrote:
+> Hello,
+>
+> I would like to ask whether current Bluez provides possibility to connect
+> third part software through g_dbus and allows creating custom services and
+> characteristics. I'm referring to the last post of Arman Uguray in thread
+> http://comments.gmane.org/gmane.linux.bluez.kernel/53822 from 3.10.2014
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 28 ++++++++--------------------
- 1 file changed, 8 insertions(+), 20 deletions(-)
+Latest BlueZ has GATT API you mentioned, hidden behind experimental
+flag (-E option)
+API described in doc/gatt-api.txt. I recommend to play a bit with
+D-Feet as a start.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 468402ad933c..9ce2bb2fc977 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5788,10 +5788,10 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- {
- 	struct mgmt_rp_read_adv_features *rp;
- 	size_t rp_len;
--	int err, i;
--	bool instance;
-+	int err;
- 	struct adv_info *adv_instance;
- 	u32 supported_flags;
-+	u8 *instance;
- 
- 	BT_DBG("%s", hdev->name);
- 
-@@ -5801,12 +5801,7 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- 
- 	hci_dev_lock(hdev);
- 
--	rp_len = sizeof(*rp);
--
--	instance = hci_dev_test_flag(hdev, HCI_ADVERTISING_INSTANCE);
--	if (instance)
--		rp_len += hdev->adv_instance_cnt;
--
-+	rp_len = sizeof(*rp) + hdev->adv_instance_cnt;
- 	rp = kmalloc(rp_len, GFP_ATOMIC);
- 	if (!rp) {
- 		hci_dev_unlock(hdev);
-@@ -5819,19 +5814,12 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- 	rp->max_adv_data_len = HCI_MAX_AD_LENGTH;
- 	rp->max_scan_rsp_len = HCI_MAX_AD_LENGTH;
- 	rp->max_instances = HCI_MAX_ADV_INSTANCES;
-+	rp->num_instances = hdev->adv_instance_cnt;
- 
--	if (instance) {
--		i = 0;
--		list_for_each_entry(adv_instance, &hdev->adv_instances, list) {
--			if (i >= hdev->adv_instance_cnt)
--				break;
--
--			rp->instance[i] = adv_instance->instance;
--			i++;
--		}
--		rp->num_instances = hdev->adv_instance_cnt;
--	} else {
--		rp->num_instances = 0;
-+	instance = rp->instance;
-+	list_for_each_entry(adv_instance, &hdev->adv_instances, list) {
-+		*instance = adv_instance->instance;
-+		instance++;
- 	}
- 
- 	hci_dev_unlock(hdev);
+>
+> Regards,
+> Marian
+
+BR
+Lukasz
+
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.5.0
-
+BR / Pozdrawiam
+Łukasz
