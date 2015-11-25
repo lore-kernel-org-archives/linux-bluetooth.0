@@ -1,57 +1,42 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	linux-bluetooth@vger.kernel.org,
-	Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH v2 bluetooth-next 0/7] GHC compression detection
-Date: Wed, 25 Nov 2015 15:59:10 +0100
-Message-Id: <1448463557-22618-1-git-send-email-stefan@osg.samsung.com>
-Sender: linux-wpan-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [PATCH 0/4] Bluetooth: More hci_request.c & hci_req_sync updates
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1448460944-17002-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 25 Nov 2015 06:31:48 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <D4222846-C4E3-49BE-912A-2B55D5EAD88B@holtmann.org>
+References: <1448460944-17002-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Hi Johan,
 
-This is a first stab at RFC7400. So far we only hook into the NHC framework to
-detect the registered GHC types (extension headers, UDP and ICMPv6).
-This is aligned with how we detect the NHC frames.
+> The first three patches in this set are preparations for moving the
+> power on sequence to be done with hci_req_sync. The fourth patch does
+> the actual refactoring for that.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (4):
+>      Bluetooth: HCI name update to hci_request.c
+>      Bluetooth: Move EIR update to hci_request.c
+>      Bluetooth: Move fast connectable code to hci_request.c
+>      Bluetooth: Perform HCI update for power on synchronously
+> 
+> include/net/bluetooth/hci_core.h |   3 +-
+> net/bluetooth/hci_core.c         |  21 ++-
+> net/bluetooth/hci_request.c      | 334 ++++++++++++++++++++++++++++++++
+> net/bluetooth/hci_request.h      |   6 +
+> net/bluetooth/mgmt.c             | 388 ++------------------------------------
+> 5 files changed, 376 insertions(+), 376 deletions(-)
 
-Changes since v1:
-        o Use correct NEXTHDR defines for LOWPAN_NHC()
-        o Split out different extension headers into one module each
-        o Add some help text for configure options
+all 4 patches have been applied to bluetooth-next tree.
 
-Changes since RFC:
-        o prefixed new files with nhc_ to stay in line with other nhc modules
-        o added linux-bluetooth to CC
+Regards
 
-Stefan Schmidt (7):
-  6lowpan: clarify Kconfig entries for upcoming GHC support
-  6lowpan: add nhc module for GHC hop-by-hopextension header detection
-  6lowpan: add nhc module for GHC UDP detection
-  6lowpan: add nhc module for GHC ICMPv6 detection
-  6lowpan: add nhc module for GHC destination extension header detection
-  6lowpan: add nhc module for GHC fragmentation extension header
-    detection
-  6lowpan: add nhc module for GHC routing extension header detection
-
- net/6lowpan/Kconfig             | 39 +++++++++++++++++++++++++++++++++++++--
- net/6lowpan/Makefile            |  8 ++++++++
- net/6lowpan/nhc_ghc_ext_dest.c  | 27 +++++++++++++++++++++++++++
- net/6lowpan/nhc_ghc_ext_frag.c  | 28 ++++++++++++++++++++++++++++
- net/6lowpan/nhc_ghc_ext_hop.c   | 27 +++++++++++++++++++++++++++
- net/6lowpan/nhc_ghc_ext_route.c | 27 +++++++++++++++++++++++++++
- net/6lowpan/nhc_ghc_icmpv6.c    | 27 +++++++++++++++++++++++++++
- net/6lowpan/nhc_ghc_udp.c       | 27 +++++++++++++++++++++++++++
- 8 files changed, 208 insertions(+), 2 deletions(-)
- create mode 100644 net/6lowpan/nhc_ghc_ext_dest.c
- create mode 100644 net/6lowpan/nhc_ghc_ext_frag.c
- create mode 100644 net/6lowpan/nhc_ghc_ext_hop.c
- create mode 100644 net/6lowpan/nhc_ghc_ext_route.c
- create mode 100644 net/6lowpan/nhc_ghc_icmpv6.c
- create mode 100644 net/6lowpan/nhc_ghc_udp.c
-
--- 
-2.4.3
+Marcel
 
