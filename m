@@ -1,26 +1,27 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH 2/2] Bluetooth: Simplify setting Configuration Field
+Subject: Re: [PATCH 1/2] Bluetooth: Simplify read_adv_features code
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1448549374-15530-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Thu, 26 Nov 2015 06:53:27 -0800
+In-Reply-To: <1448532959-21912-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 26 Nov 2015 06:50:35 -0800
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <CDCFED91-2446-4C7C-9634-A91675C2E587@holtmann.org>
-References: <1448549374-15530-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1448549374-15530-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Message-Id: <8A942A44-A5CB-4EEC-A9DF-A46072A88D77@holtmann.org>
+References: <1448532959-21912-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Johan,
 
-> Only Sliding Window Size is used at the moment for H5 Bluetooth
-> Configuration messages.
+> The code in the Read Advertising Features mgmt command handler is
+> unnecessarily complicated. Clean it up and remove unnecessary
+> variables & branches.
 > 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> drivers/bluetooth/hci_h5.c | 6 +-----
-> 1 file changed, 1 insertion(+), 5 deletions(-)
+> net/bluetooth/mgmt.c | 28 ++++++++--------------------
+> 1 file changed, 8 insertions(+), 20 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
