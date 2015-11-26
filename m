@@ -1,33 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH 2/2] Bluetooth: Remove unnecessary HCI_ADVERTISING_INSTANCE flag
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1448532959-21912-2-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 26 Nov 2015 06:50:33 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <068B28B7-D096-49B5-B453-6EE965DDFD14@holtmann.org>
-References: <1448532959-21912-1-git-send-email-johan.hedberg@gmail.com> <1448532959-21912-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: Use hexadecimal notation for mask
+Date: Thu, 26 Nov 2015 16:49:33 +0200
+Message-Id: <1448549374-15530-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> This flag just tells us whether hdev->adv_instances is empty or not.
-> We can equally well use the list_empty() function to get this
-> information.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci.h |  1 -
-> net/bluetooth/hci_request.c | 19 ++++++++-----------
-> net/bluetooth/mgmt.c        |  8 +-------
-> 3 files changed, 9 insertions(+), 19 deletions(-)
+Using hexadecimal notation for mask makes code easier to read
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ drivers/bluetooth/hci_h5.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index db039f2..fc1a499 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -317,7 +317,7 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
+ 		h5_link_control(hu, conf_req, 3);
+ 	} else if (memcmp(data, conf_rsp, 2) == 0) {
+ 		if (H5_HDR_LEN(hdr) > 2)
+-			h5->tx_win = (data[2] & 7);
++			h5->tx_win = (data[2] & 0x07);
+ 		BT_DBG("Three-wire init complete. tx_win %u", h5->tx_win);
+ 		h5->state = H5_ACTIVE;
+ 		hci_uart_init_ready(hu);
+-- 
+2.5.0
 
