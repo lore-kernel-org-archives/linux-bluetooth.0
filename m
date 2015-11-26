@@ -1,39 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH] Bluetooth: btmrvl: add sysfs commands gpiogap and hscfgcmd
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1448534238-5508-1-git-send-email-akarwar@marvell.com>
-Date: Thu, 26 Nov 2015 05:06:39 -0800
-Cc: linux-bluetooth@vger.kernel.org, Cathy Luo <cluo@marvell.com>,
-	Xinming Hu <huxm@marvell.com>
-Message-Id: <B75B5139-479F-4A9E-9C5B-136B883B64D2@holtmann.org>
-References: <1448534238-5508-1-git-send-email-akarwar@marvell.com>
-To: Amitkumar Karwar <akarwar@marvell.com>
+From: Matthias Schmidt <Matthias.Schmidt@netpioneer.de>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: org.bluez.Adapter1 Powered API causes UnknownMethod: Method "Set"
+ with signature "ssb"
+Date: Thu, 26 Nov 2015 12:13:31 +0000
+Message-ID: <147AA35329540D468455E185B7E55050D4FBE66D@valen.ka.netpioneer.de>
+Content-Type: text/plain; charset="iso-8859-1"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Amitkumar,
+Hi *,
+        
+while using the Powered API from the "org.bluez.Adapter1" interface in bluez 5.36 to turn BLE on and off 
+i'm getting this exeception every now and then - could not figure out any pattern:
 
-> This patch adds support for driver's internal host sleep
-> configuration via sysfs. gpiogap and hscfgcmd sysfs commands
-> are added for this purpose.
-> 
-> Examples.
-> 1. Get current gpiogap
->   cat /sys/class/bluetooth/hci0/gpiogap
-> 2. Set gpio as 13 and gap as 100msecs
->   echo "0x0d64" > /sys/class/bluetooth/hci0/gpiogap
-> 3. Download host sleep configuration to firmware.
->   echo "1" > /sys/class/bluetooth/hci0/hscfgcmd
+    adapterInterface.Set(ADAPTER_IFACE, "Powered", state)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 70, in __call__
+    return self._proxy_method(*args, **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 145, in __call__
+    **keywords)
+  File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line 651, in call_blocking
+    message, timeout)
+DBusException: org.freedesktop.DBus.Error.UnknownMethod: Method "Set" with signature "ssb" on interface "org.freedesktop.DBus.Properties" doesn't exist
 
-explain to me how this is a good API. Keep in mind this is an userspace API and needs to be stable.
+I'm running Linux 4.1.2 on armv7l
 
-If you want to expose a GPIO, why not expose it through the standard Linux kernel GPIO API. Then it becomes easily discoverable via standard sysfs tools. Also you can use standard tools to modify it.
+Is there any chance to nail this down?
 
-I also do not understand why you need something to set host sleep configuration. Just do this all the time and be done with it.
+cheers,
 
-Regards
+Matthias
 
-Marcel
+Senior Systemarchitekt
+Netpioneer GmbH, Ludwig-Erhard-Allee 20, 76131 Karlsruhe
+Geschäftsführer: Axel Jahn
+HRB: 107521 Handelsregister Mannheim
 
+Tel: 0721 / 9 20 60 822
+Fax: 0721 / 9 20 60 30
+E-Mail: matthias.schmidt@netpioneer.de
+www: http://www.netpioneer.de
