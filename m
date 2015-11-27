@@ -4,71 +4,50 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH v2 01/11] unit/test-gatt: Fix long write testcases
-Date: Fri, 27 Nov 2015 12:11:40 +0100
-Message-Id: <1448622711-17562-2-git-send-email-lukasz.rymanowski@codecoup.pl>
-In-Reply-To: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-References: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH v2 00/11] shared/gatt: Couple fixes and improvements
+Date: Fri, 27 Nov 2015 12:11:39 +0100
+Message-Id: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Idea of long write is that each part of data is continuation
-of previous one. There shall be not gaps in the offsets between.
+I've back to work on making Android gatt to make use of shared/gatt.
+Here is couple of fixes I've done to shared code when doing this work.
 
-If there are gaps in offset then we have reliable write rather than
-long write
----
- unit/test-gatt.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Android gatt still needs testing but will be available sooner or later
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 326a32c..70b6de5 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -3852,8 +3852,8 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x17, 0x03, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
--			raw_pdu(0x16, 0x03, 0x00, 0x3f, 0x00, 0xff),
--			raw_pdu(0x17, 0x03, 0x00, 0x3f, 0x00, 0xff),
-+			raw_pdu(0x16, 0x03, 0x00, 0x12, 0x00, 0xff),
-+			raw_pdu(0x17, 0x03, 0x00, 0x12, 0x00, 0xff),
- 			raw_pdu(0x18, 0x01),
- 			raw_pdu(0x19));
- 
-@@ -3866,8 +3866,8 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
--			raw_pdu(0x16, 0x82, 0x00, 0x3f, 0x00, 0xff),
--			raw_pdu(0x17, 0x82, 0x00, 0x3f, 0x00, 0xff),
-+			raw_pdu(0x16, 0x82, 0x00, 0x12, 0x00, 0xff),
-+			raw_pdu(0x17, 0x82, 0x00, 0x12, 0x00, 0xff),
- 			raw_pdu(0x18, 0x01),
- 			raw_pdu(0x19));
- 
-@@ -4374,8 +4374,8 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x17, 0x04, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
--			raw_pdu(0x16, 0x04, 0x00, 0x3f, 0x00, 0xff),
--			raw_pdu(0x17, 0x04, 0x00, 0x3f, 0x00, 0xff),
-+			raw_pdu(0x16, 0x04, 0x00, 0x12, 0x00, 0xff),
-+			raw_pdu(0x17, 0x04, 0x00, 0x12, 0x00, 0xff),
- 			raw_pdu(0x18, 0x01),
- 			raw_pdu(0x19));
- 
-@@ -4388,8 +4388,8 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x17, 0x83, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
--			raw_pdu(0x16, 0x83, 0x00, 0x3f, 0x00, 0xff),
--			raw_pdu(0x17, 0x83, 0x00, 0x3f, 0x00, 0xff),
-+			raw_pdu(0x16, 0x83, 0x00, 0x12, 0x00, 0xff),
-+			raw_pdu(0x17, 0x83, 0x00, 0x12, 0x00, 0xff),
- 			raw_pdu(0x18, 0x01),
- 			raw_pdu(0x19));
- 
+v2:
+ - fix test-gatt for long write seesion testes
+ - prepare test-gatt test to support other changes
+ - do aggregation of prep writes for long write session
+ - support reliable nested long write
+ - start to look into characteristic extended prop for reliable session
+
+Łukasz Rymanowski (11):
+  unit/test-gatt: Fix long write testcases
+  unit/test-gatt: Modify small-db
+  unit/test-gatt: Extend large-db
+  unit/test-gatt: Fix long write test
+  shared/gatt-client: Minor variable rename
+  shared/gatt-client: Add notify type to notification callback
+  shared/gatt-server: Fix handle error on execute write
+  shared/gatt-server: Add support for long write
+  shared/gatt-server: Support for reliable session nested with long
+  shared/gatt-db: Add API to get extended prop
+  shared/gatt-server: Check for ext. charact. prop. on reliable session
+
+ profiles/scanparam/scan.c |   5 +-
+ src/gatt-client.c         |   4 +-
+ src/shared/gatt-client.c  |  13 ++--
+ src/shared/gatt-client.h  |  13 +++-
+ src/shared/gatt-db.c      |  62 +++++++++++++++++
+ src/shared/gatt-db.h      |   4 ++
+ src/shared/gatt-server.c  | 169 ++++++++++++++++++++++++++++++++++++++++------
+ tools/btgatt-client.c     |   2 +-
+ unit/test-gatt.c          | 113 +++++++++++++++++++------------
+ 9 files changed, 309 insertions(+), 76 deletions(-)
+
 -- 
 2.5.0
 
