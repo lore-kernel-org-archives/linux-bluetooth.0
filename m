@@ -4,50 +4,44 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH v2 05/11] shared/gatt-client: Minor variable rename
-Date: Fri, 27 Nov 2015 12:11:44 +0100
-Message-Id: <1448622711-17562-6-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH v2 04/11] unit/test-gatt: Fix long write test
+Date: Fri, 27 Nov 2015 12:11:43 +0100
+Message-Id: <1448622711-17562-5-git-send-email-lukasz.rymanowski@codecoup.pl>
 In-Reply-To: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 References: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use success instead of status to make it easy to read
----
- src/shared/gatt-server.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+This patch change characteristic we are writing too in the nested
+long write reliable testcase.
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index ba668e3..a32aeb1 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -1172,7 +1172,7 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
- {
- 	struct prep_write_data *next = NULL;
- 	struct gatt_db_attribute *attr;
--	bool status;
-+	bool success;
+Basically characteristic with handle 0x0072 already have characteristic
+extended descriptor required for reliable session
+---
+ unit/test-gatt.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index 68cdcff..87a87b8 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -4005,12 +4005,12 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x03, 0x00, 0x02),
+ 			raw_pdu(0x16, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+ 			raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+-			raw_pdu(0x16, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+-			raw_pdu(0x17, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x16, 0x72, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
++			raw_pdu(0x17, 0x72, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+ 			raw_pdu(0x16, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+ 			raw_pdu(0x17, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+-			raw_pdu(0x16, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+-			raw_pdu(0x17, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
++			raw_pdu(0x16, 0x72, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
++			raw_pdu(0x17, 0x72, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+ 			raw_pdu(0x18, 0x01),
+ 			raw_pdu(0x19));
  
- 	if (err)
- 		goto error;
-@@ -1190,7 +1190,7 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
- 		goto error;
- 	}
- 
--	status = gatt_db_attribute_write(attr, next->offset,
-+	success = gatt_db_attribute_write(attr, next->offset,
- 						next->value, next->length,
- 						BT_ATT_OP_EXEC_WRITE_REQ,
- 						server->att,
-@@ -1198,7 +1198,7 @@ static void exec_next_prep_write(struct bt_gatt_server *server,
- 
- 	prep_write_data_destroy(next);
- 
--	if (status)
-+	if (success)
- 		return;
- 
- 	err = BT_ATT_ERROR_UNLIKELY;
 -- 
 2.5.0
 
