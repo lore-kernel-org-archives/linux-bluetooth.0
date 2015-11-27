@@ -1,64 +1,68 @@
-Return-Path: <andrei.emeltchenko.news@gmail.com>
-Date: Fri, 27 Nov 2015 14:40:02 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 2/2] btproxy: Add three-wire (h5) protocol initial support
-Message-ID: <20151127124000.GB26866@comms.fi.intel.com>
-References: <1448551424-18448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1448551424-18448-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <4E34A599-0424-4005-B228-DE830E6906E6@holtmann.org>
- <20151127103038.GA26866@comms.fi.intel.com>
- <F5FF8776-8359-4906-80C5-88B57E4CF898@holtmann.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Subject: Re: [PATCH v2 bluetooth-next 0/7] GHC compression detection
+To: Alexander Aring <alex.aring@gmail.com>
+References: <1448463557-22618-1-git-send-email-stefan@osg.samsung.com>
+ <20151127121330.GA28084@omega>
+Cc: linux-wpan@vger.kernel.org,
+	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <56584CFF.9030306@osg.samsung.com>
+Date: Fri, 27 Nov 2015 13:30:55 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <F5FF8776-8359-4906-80C5-88B57E4CF898@holtmann.org>
+In-Reply-To: <20151127121330.GA28084@omega>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hello.
 
-On Fri, Nov 27, 2015 at 04:25:30AM -0800, Marcel Holtmann wrote:
-> >>> 
-> >>> #define BTPROTO_HCI	1
-> >>> -struct sockaddr_hci {
-> >>> -	sa_family_t	hci_family;
-> >>> -	unsigned short	hci_dev;
-> >>> -	unsigned short  hci_channel;
-> >>> -};
-> >>> #define HCI_CHANNEL_USER	1
-> >> 
-> >> please do not do this.
-> > 
-> > Why? I added #include "lib/hci.h" where this structure defined, why do
-> > we need redefined it again? It was defined 3 times.
-> 
-> we want to get rid of using libbluetooth over and over again. We need to start somewhere. And I have no idea on what you would gain from including lib/hci.h in this case.
+On 27/11/15 13:13, Alexander Aring wrote:
+> On Wed, Nov 25, 2015 at 03:59:10PM +0100, Stefan Schmidt wrote:
+>> Hello.
+>>
+>> This is a first stab at RFC7400. So far we only hook into the NHC framework to
+>> detect the registered GHC types (extension headers, UDP and ICMPv6).
+>> This is aligned with how we detect the NHC frames.
+>>
+> TODO for next is to make possible that we can load multiple nhc modules
+> for the transmit side. We have a 1(tranmit):n(receive) mapping here, and
+> we should support all nhc's for receive side.
+>
+> For tranmsmit side we should have a disable by default and offer a
+> debugfs entry (nhc framework debugfs support) to enable/disable it
+> at runtime. It's a 1:nexhdr mapping, so only one for nexthdr can running
+> at the same time currently. If somebody tries that it should be return
+> -EBUSY.
+>
+> I would suggest additional patches:
+>
+> 1. Allow to have register everything and disable compression methods of
+>     all nhcs by default. The receive handling should always possible,
+>     the compression should be disabled by default because other 6LoWPAN
+>     stacks may not support e.g. GHC types.
+>
+>     Maybe we can do a nhc directory for the debugfs interface related entry
+>     for that. So the nhc framework offers some support e.g. enable compression
+>     for nhc xy.
+>
+> 2. Add all you nhc's _after_ all other nhc modules. This will occur that
+>     the first ones has a higher priority. Our priority strategy is then
+>     like the order of the list. See [0].
+>
+> 3. Add "default y" to all nhc's for support receiving always.
+>
+>
+> That's huge work, but maybe the next steps.
 
-I get packet types definitions from lib/hci.h. But since this would be
-moved to h5.c this is not important anymore. I'll remove this chunk.
+Yes, I will tackle them with the next set. I'm working on the actual 
+compression and decrompression code for GHC at the moment. Once that is 
+working I will tackle the items you listed above and put them together 
+in one patchset.
+> Otherwise it's looking good and let the NHC framework as first known
+> about these next header compressions, so:
+>
+> Acked-by: Alexander Aring <alex.aring@gmail.com>
 
-> >> 
-> >>> +
-> >>> +struct h5_pkt {
-> >>> +	uint16_t len;
-> >>> +	uint8_t data[0];
-> >>> +};
-> >> 
-> >> I think using get_unaligned_le16 to get the length would be a lot simpler.
-> > 
-> > Sorry, do not get this, how can we use get_unaligned_le16() ?
-> 
-> len = get_unaligned_le16(buf)
+Thanks. I think with your and Jukka's ACK this set would be ready to land.
 
-This is just my packet, no need for le16 here. I can use of course just
-uint8_t array and use first two bytes for length.
-
-Best regards 
-Andrei Emeltchenko 
-
-> data = buf + 2
-> 
-> Regards
-> 
-> Marcel
-> 
