@@ -4,9 +4,9 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH v2 11/11] shared/gatt-server: Check for extended charac. prop on reliable session
-Date: Fri, 27 Nov 2015 12:11:51 +0100
-Message-Id: <1448622711-17562-13-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH v2 11/11] shared/gatt-server: Check for ext. charact. prop. on reliable session
+Date: Fri, 27 Nov 2015 12:11:50 +0100
+Message-Id: <1448622711-17562-12-git-send-email-lukasz.rymanowski@codecoup.pl>
 In-Reply-To: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 References: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
