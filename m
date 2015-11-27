@@ -1,52 +1,52 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <d942deb8e0bd715b4ce207a874b0bda4.squirrel@mungewell.org>
-In-Reply-To: <AM3PR01MB211848A73CABF9631293C19F9030@AM3PR01MB211.eurprd01.prod.exchangelabs.com>
-References: <AM3PR01MB211848A73CABF9631293C19F9030@AM3PR01MB211.eurprd01.prod.exchangelabs.com>
-Date: Fri, 27 Nov 2015 08:51:14 -0700
-Subject: Re: Exploring Bluez alternatives
-From: "Simon Wood" <simon@mungewell.org>
-To: "Ad Zeevaarders" <ad.zeevaarders@veynex.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <xerofoify@gmail.com>
+From: Nicholas Krause <xerofoify@gmail.com>
+To: marcel@holtmann.org
+Cc: gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 RESEND] bluetooth:Fix locking issues in the function l2cap_connect_cfm
+Date: Fri, 27 Nov 2015 10:16:04 -0500
+Message-Id: <1448637364-3144-1-git-send-email-xerofoify@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, November 27, 2015 1:32 am, Ad Zeevaarders wrote:
-> Hello,
->
->
-> I am an intern at a company. After having developed a few Low Energy
-> applications using BlueZ, the DBus-way and the mgmt way, I was ready for
-> my new assignment. The applications I developed were targeted at an
-> embedded ARM platform running Linux without DBus. The new application I
-> need to develop needs to connect to a device, receive some values using
-> indications, then disconnect.
->
-> To my amazement my employer told me that they wanted me to explore
-> alternatives to BlueZ, as they were unsure of the reliability and
-> especially the performance. They sent me a Wikipedia page listing several
-> embedded Bluetooth stacks, like BlueCode+, and asked me to prove, for
-> every single stack, why Bluez was 'better'. My initial response was
-> "Because it is the official supported Bluetooth stack for Linux, our
-> target development OS." Exploring the other solutions, I could not find
-> any rationale as to why I would choose a different protocol stack.
+This fixes a locking issue in the function l2cap_connect_cfm for
+not locking the mutex lock for channels on the l2cap_conn structure
+pointer conn before calling __l2cap_get_chan_by_dcid as all callers
+need to lock and unlock this mutex before calling this function due
+to issues with either concurrent users or race conditions arising
+if this mutex is not locked before these calls.
+v3 Fix double locking of mutex lock on goto next label to instead correctly
+unlock the channel mutex
+v2 Remove unneeded mutex_unlock for channels as the unlock was due early
+for adding correct protection for all functions that have requirements
+for this mutex lock needing to be locked before calling them.
+Signed-off-by: Nicholas Krause <xerofoify@gmail.com>
+---
+ net/bluetooth/l2cap_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Hi,
-This maybe of no interest, but I wanted to point out another alternate
-'community written' stack....
-
-http://bluekitchen-gmbh.com/btstack/
-
-Started as a completely Free project, but was then relicensed to be 'free
-for non-commercial'. Depending on what you need it might be usable for
-your projects.
-
-BTW you have a hard task if employers just don't like Bluez :-( To me (as
-just a user) the code size would be the major detractor, but it does work
-pretty well.
-
-Good luck,
-Simon
-
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 45fffa4..20d3909 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7285,6 +7285,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 		struct l2cap_chan *chan, *next;
+ 
+ 		/* Client fixed channels should override server ones */
++		mutex_lock(&conn->chan_lock);
+ 		if (__l2cap_get_chan_by_dcid(conn, pchan->scid))
+ 			goto next;
+ 
+@@ -7301,6 +7302,7 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 
+ 		l2cap_chan_unlock(pchan);
+ next:
++		mutex_unlock(&conn->chan_lock);
+ 		next = l2cap_global_fixed_chan(pchan, hcon);
+ 		l2cap_chan_put(pchan);
+ 		pchan = next;
+-- 
+2.1.4
