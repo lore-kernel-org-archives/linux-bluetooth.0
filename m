@@ -1,27 +1,64 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Ad Zeevaarders <ad.zeevaarders@veynex.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Exploring Bluez alternatives
-Date: Fri, 27 Nov 2015 08:32:26 +0000
-Message-ID: <AM3PR01MB211848A73CABF9631293C19F9030@AM3PR01MB211.eurprd01.prod.exchangelabs.com>
-Content-Type: text/plain; charset="iso-8859-1"
+Return-Path: <andrei.emeltchenko.news@gmail.com>
+Date: Fri, 27 Nov 2015 14:40:02 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 2/2] btproxy: Add three-wire (h5) protocol initial support
+Message-ID: <20151127124000.GB26866@comms.fi.intel.com>
+References: <1448551424-18448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1448551424-18448-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <4E34A599-0424-4005-B228-DE830E6906E6@holtmann.org>
+ <20151127103038.GA26866@comms.fi.intel.com>
+ <F5FF8776-8359-4906-80C5-88B57E4CF898@holtmann.org>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <F5FF8776-8359-4906-80C5-88B57E4CF898@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Marcel,
 
-I am an intern at a company. After having developed a few Low Energy applications using BlueZ, the DBus-way and the mgmt way, I was ready for my new assignment. The applications I developed were targeted at an embedded ARM platform running Linux without DBus. The new application I need to develop needs to connect to a device, receive some values using indications, then disconnect. 
+On Fri, Nov 27, 2015 at 04:25:30AM -0800, Marcel Holtmann wrote:
+> >>> 
+> >>> #define BTPROTO_HCI	1
+> >>> -struct sockaddr_hci {
+> >>> -	sa_family_t	hci_family;
+> >>> -	unsigned short	hci_dev;
+> >>> -	unsigned short  hci_channel;
+> >>> -};
+> >>> #define HCI_CHANNEL_USER	1
+> >> 
+> >> please do not do this.
+> > 
+> > Why? I added #include "lib/hci.h" where this structure defined, why do
+> > we need redefined it again? It was defined 3 times.
+> 
+> we want to get rid of using libbluetooth over and over again. We need to start somewhere. And I have no idea on what you would gain from including lib/hci.h in this case.
 
-To my amazement my employer told me that they wanted me to explore alternatives to BlueZ, as they were unsure of the reliability and especially the performance. They sent me a Wikipedia page listing several embedded Bluetooth stacks, like BlueCode+, and asked me to prove, for every single stack, why Bluez was 'better'. My initial response was "Because it is the official supported Bluetooth stack for Linux, our target development OS." Exploring the other solutions, I could not find any rationale as to why I would choose a different protocol stack.
+I get packet types definitions from lib/hci.h. But since this would be
+moved to h5.c this is not important anymore. I'll remove this chunk.
 
-My question therefore is, what would justify switching from Bluez to a different stack? Are there any specific problems or oddities in Bluez that would make it a poor choice for an embedded platform? I haven't come across any indication as to why Bluez would make a less suitable choice as stack. Are there any benchmarks I could test or view in terms of performance and reliability? Is there even a difference in performance and reliability? I am not asking you to do my homework, but a pointer to any sort of rationale behind possibly switching would be appreciated.The application I am asked to develop is non-commercial, so licensing is not an issue. 
+> >> 
+> >>> +
+> >>> +struct h5_pkt {
+> >>> +	uint16_t len;
+> >>> +	uint8_t data[0];
+> >>> +};
+> >> 
+> >> I think using get_unaligned_le16 to get the length would be a lot simpler.
+> > 
+> > Sorry, do not get this, how can we use get_unaligned_le16() ?
+> 
+> len = get_unaligned_le16(buf)
 
-I am also not asking this to use as an argument in a discussion with my employer, I just want to correctly perform my assignment by choosing a suitable stack and have a solid knowledge as to why I am using that specific bluetooth stack, so I can explain it when being asked during an assessment.
+This is just my packet, no need for le16 here. I can use of course just
+uint8_t array and use first two bytes for length.
 
-Thank you in advance for your help!
+Best regards 
+Andrei Emeltchenko 
 
-Have a great day,
-
-Ad Zeevaarders
-
+> data = buf + 2
+> 
+> Regards
+> 
+> Marcel
+> 
