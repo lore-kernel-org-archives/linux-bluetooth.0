@@ -4,139 +4,161 @@ From: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?=C5=81ukasz=20Rymanowski?=
 	<lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH v2 09/11] shared/gatt-server: Support for reliable session nested with long
-Date: Fri, 27 Nov 2015 12:11:48 +0100
-Message-Id: <1448622711-17562-10-git-send-email-lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH v2 08/11] shared/gatt-server: Add support for long write
+Date: Fri, 27 Nov 2015 12:11:47 +0100
+Message-Id: <1448622711-17562-9-git-send-email-lukasz.rymanowski@codecoup.pl>
 In-Reply-To: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 References: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch it is possible to do reliable session to one
-characteristic nested with long write.
+With this patch long write and nested long write reliable is supported.
+GATT server is responsible now to do aggregation of prep write data
+for long write session.
+Note: We consider long write as the consequtive prepare writes with
+continues offsets.
 
-We assume that long write as consequtive prep writes with continous
-offsets. Otherwise we treat it as single reliable write.
+E.g. 1
 
-Note: Long write can be started from non 0 offset as well
+prep_write: handle 1, offset 0, value_len 10
+prep_write: handle 2, offset 0, value_len 10
+prep_write: handle 1, offset 10, value_len 10
+prep_write: handle 2, offset 10, value_len 10
 
-With this patch we support following scenarios:
+Will result with following calles to app:
 
-e.g. 1:
-(a) prep_write: handle 1, offset 0, value_len 10
-(b) prep_write: handle 1, offset 5, value_len 5
-(c) prep_write: handle 1, offset 10, value_len 6
+exec_write: handle 1: offset 0, value_len 20
+exec_write: handle 2: offset 0, value_len 20
 
-Will result with:
+E.g. 2
 
-(a) exec_write: handle 1, offset 0, value_len 10
-(b + c) exec_write: handle 1, offset 10, value_len 11
+prep_write: handle 1, offset 0, value_len 10
+prep_write: handle 1, offset 2, value_len 5
+prep_write: handle 2, offset 0, value_len 10
+prep_write: handle 2, offset 4, value_len 5
 
-e.g. 2:
-(a) prep_write: handle 1, offset 0, value_len 10
-(b) prep_write: handle 1, offset 5, value_len 3
-(c) prep_write: handle 1, offset 10, value_len 6
+Will result with following calles to app:
 
-Will result with:
-
-(a) exec_write: handle 1, offset 0, value_len 10
-(b) exec_write: handle 1, offset 5, value_len 3
-(c) exec_write: handle 1, offset 10, value_len 6
+exec_write: handle 1: offset 0, value_len 10
+exec_write: handle 1: offset 2, value_len 5
+exec_write: handle 2: offset 0, value_len 10
+exec_write: handle 2: offset 4, value_len 5
 ---
- src/shared/gatt-server.c | 49 ++++++++++++++++++++++++++++++++----------------
- 1 file changed, 33 insertions(+), 16 deletions(-)
+ src/shared/gatt-server.c | 85 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 71 insertions(+), 14 deletions(-)
 
 diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index c0e7a08..2bd90b0 100644
+index 49dced9..c0e7a08 100644
 --- a/src/shared/gatt-server.c
 +++ b/src/shared/gatt-server.c
-@@ -1088,13 +1088,6 @@ error:
+@@ -1088,6 +1088,63 @@ error:
  	bt_att_send_error_rsp(server->att, opcode, 0, ecode);
  }
  
--static bool match_attribute_handle(const void *data, const void *match_data)
--{
--	const struct prep_write_data *prep_data = data;
--
--	return prep_data->handle == PTR_TO_UINT(match_data);
--}
--
- static bool create_and_store_prep_data(struct bt_gatt_server *server,
- 						uint16_t handle, uint16_t offset,
- 						uint16_t length, uint8_t *value)
-@@ -1145,16 +1138,40 @@ static bool make_aggregation_of_long_write_data(struct bt_gatt_server *server,
- 	return true;
- }
- 
-+struct prep_match_data {
-+	uint16_t handle;
-+	uint16_t offset;
-+	struct prep_write_data *p;
-+};
-+
-+static void match_prep_data(void *data, void *user_data)
++static bool match_attribute_handle(const void *data, const void *match_data)
 +{
-+	struct prep_write_data *prep_data = data;
-+	struct prep_match_data *s = user_data;
++	const struct prep_write_data *prep_data = data;
 +
-+	if (prep_data->handle != s->handle)
-+		return;
++	return prep_data->handle == PTR_TO_UINT(match_data);
++}
 +
-+	/*
-+	 * We are looking for last prepare write for given handle
-+	 * with offset we could assume that it is long write
-+	 */
-+	if (prep_data->offset + prep_data->length == s->offset)
-+		s->p = prep_data;
-+	else
-+		s->p = NULL;
++static bool create_and_store_prep_data(struct bt_gatt_server *server,
++						uint16_t handle, uint16_t offset,
++						uint16_t length, uint8_t *value)
++{
++	struct prep_write_data *prep_data;
++
++	prep_data = new0(struct prep_write_data, 1);
++	prep_data->length = length;
++	if (prep_data->length) {
++		prep_data->value = malloc(prep_data->length);
++		if (!prep_data->value) {
++			return false;
++		}
++
++		memcpy(prep_data->value, value, prep_data->length);
++	}
++
++	prep_data->server = server;
++	prep_data->handle = handle;
++	prep_data->offset = offset;
++
++	queue_push_tail(server->prep_queue, prep_data);
++
++	return true;
++}
++
++static bool make_aggregation_of_long_write_data(struct bt_gatt_server *server,
++					struct prep_write_data *prep_data,
++					uint16_t handle, uint16_t length,
++					uint8_t *value)
++{
++	uint8_t *buf;
++	uint16_t new_len;
++
++	new_len = prep_data->length + length;
++
++	buf = malloc(new_len);
++	if (!buf)
++		return false;
++
++	memcpy(buf, prep_data->value, prep_data->length);
++	memcpy(buf + prep_data->length, value, length);
++
++	free(prep_data->value);
++	prep_data->value = buf;
++	prep_data->length = new_len;
++
++	return true;
 +}
 +
  static void prep_write_cb(uint8_t opcode, const void *pdu,
  					uint16_t length, void *user_data)
  {
- 	struct bt_gatt_server *server = user_data;
--	struct prep_write_data *prep_data = NULL;
- 	uint16_t handle = 0;
+@@ -1097,6 +1154,7 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
  	uint16_t offset;
  	struct gatt_db_attribute *attr;
  	uint8_t ecode;
- 	bool success;
-+	struct prep_match_data match_data;
++	bool success;
  
  	if (length < 4) {
  		ecode = BT_ATT_ERROR_INVALID_PDU;
-@@ -1184,12 +1201,15 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+@@ -1126,22 +1184,21 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
  	if (ecode)
  		goto error;
  
--	prep_data = queue_find(server->prep_queue, match_attribute_handle,
--							UINT_TO_PTR(handle));
-+	match_data.handle = handle;
-+	match_data.offset = offset;
-+	match_data.p = NULL;
+-	prep_data = new0(struct prep_write_data, 1);
+-	prep_data->length = length - 4;
+-	if (prep_data->length) {
+-		prep_data->value = malloc(prep_data->length);
+-		if (!prep_data->value) {
+-			ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+-			goto error;
+-		}
+-	}
++	prep_data = queue_find(server->prep_queue, match_attribute_handle,
++							UINT_TO_PTR(handle));
  
--	if (prep_data && offset == prep_data->length + prep_data->offset)
--		success = make_aggregation_of_long_write_data(server, prep_data,
--							handle, length - 4,
-+	queue_foreach(server->prep_queue, match_prep_data, &match_data);
-+	if (match_data.p)
-+		success = make_aggregation_of_long_write_data(server,
-+							match_data.p,
-+							handle,length - 4,
- 							&((uint8_t *) pdu)[4]);
- 	else
- 		success = create_and_store_prep_data(server, handle, offset,
-@@ -1205,9 +1225,6 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
- 	return;
+-	prep_data->server = server;
+-	prep_data->handle = handle;
+-	prep_data->offset = offset;
+-	memcpy(prep_data->value, pdu + 4, prep_data->length);
++	if (prep_data && offset == prep_data->length + prep_data->offset)
++		success = make_aggregation_of_long_write_data(server, prep_data,
++							handle, length - 4,
++							&((uint8_t *) pdu)[4]);
++	else
++		success = create_and_store_prep_data(server, handle, offset,
++					length - 4, &((uint8_t *) pdu)[4]);
  
- error:
--	if (prep_data)
--		prep_write_data_destroy(prep_data);
--
- 	bt_att_send_error_rsp(server->att, opcode, handle, ecode);
+-	queue_push_tail(server->prep_queue, prep_data);
++	if (!success) {
++		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
++		goto error;
++	}
  
- }
+ 	bt_att_send(server->att, BT_ATT_OP_PREP_WRITE_RSP, pdu, length, NULL,
+ 								NULL, NULL);
 -- 
 2.5.0
 
