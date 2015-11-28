@@ -1,55 +1,163 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Sat, 28 Nov 2015 20:04:02 -0600
-From: Ryan Kuester <rkuester@insymbols.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: GATT service object required in D-Bus ObjectManager result
-Message-ID: <20151129020402.GB1912@lodi.internal.kspace.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1448622711-17562-11-git-send-email-lukasz.rymanowski@codecoup.pl>
+References: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
+	<1448622711-17562-11-git-send-email-lukasz.rymanowski@codecoup.pl>
+Date: Sat, 28 Nov 2015 23:32:46 +0100
+Message-ID: <CAExxLLBSrecYM_xb9_Bnmr45qP6Nxmm2=oRzkS0VhvPGYatFRw@mail.gmail.com>
+Subject: Re: [PATCH v2 10/11] shared/gatt-db: Add API to get extended prop
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everyone,
+Hi,
 
-When registering a GATT service via the D-Bus API, bluez-5.36
-seems to expect the objects returned by the service's
-GetManagedObjects method to include the service object itself,
-the root of the managed object tree. Indeed, the included
-test/example-gatt-server behaves this way[1].
+On Fri, Nov 27, 2015 at 12:11 PM, Łukasz Rymanowski
+<lukasz.rymanowski@codecoup.pl> wrote:
+>
+> This patch adds way to get extended properties from
+> characteristic extended property descriptor
+> ---
+>  src/shared/gatt-db.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/gatt-db.h |  4 ++++
+>  unit/test-gatt.c     | 14 ++++++++++++
+>  3 files changed, 80 insertions(+)
+>
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index cc49458..1a1704b 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -52,6 +52,8 @@ static const bt_uuid_t characteristic_uuid = { .type = BT_UUID16,
+>                                         .value.u16 = GATT_CHARAC_UUID };
+>  static const bt_uuid_t included_service_uuid = { .type = BT_UUID16,
+>                                         .value.u16 = GATT_INCLUDE_UUID };
+> +static const bt_uuid_t ext_desc_uuid = { .type = BT_UUID16,
+> +                               .value.u16 = GATT_CHARAC_EXT_PROPER_UUID };
+>
+>  struct gatt_db {
+>         int ref_count;
+> @@ -1456,6 +1458,66 @@ bool gatt_db_attribute_get_service_data(const struct gatt_db_attribute *attrib,
+>         return le_to_uuid(decl->value, decl->value_len, uuid);
+>  }
+>
+> +struct ext_prop_data {
+> +       bool present;
+> +       uint8_t prop;
+> +};
+> +
+> +static void set_ext_prop_data(struct gatt_db_attribute *attrib,
+> +                                               int err, const uint8_t *value,
+> +                                               size_t length, void *user_data)
+> +{
+> +       struct ext_prop_data *ext_prop_data = user_data;
+> +
+> +       if (err || (length != sizeof(uint8_t)))
+> +               return;
+> +
+> +       ext_prop_data->prop = value[0];
+> +}
+> +
+> +static void check_reliable_supported(struct gatt_db_attribute *attrib,
+> +                                                       void *user_data)
+> +{
+> +       struct ext_prop_data *ext_prop_data = user_data;
+> +
+> +       if (ext_prop_data->present)
+> +               return;
+> +
+> +       if (bt_uuid_cmp(&ext_desc_uuid, &attrib->uuid))
+> +               return;
+> +
+> +       ext_prop_data->present = true;
+> +       ext_prop_data->prop = gatt_db_attribute_read(attrib, 0,
+> +                                               BT_ATT_OP_READ_REQ, NULL,
+> +                                               set_ext_prop_data, user_data);
+> +}
+> +
+> +bool gatt_db_attribute_get_characteristic_extended_prop(
+> +                                       const struct gatt_db_attribute *attrib,
+> +                                       uint8_t *ext_prop)
+> +{
+> +       struct ext_prop_data ext_prop_data;
+> +
+> +       if (!attrib)
+> +               return false;
+> +
+> +       if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
+> +               return false;
+> +
+> +       memset(&ext_prop_data, 0, sizeof(ext_prop_data));
+> +
+> +       /*
+> +        * Cast needed for foreach function. We do not change attrib during
+> +        * this call
+> +        */
+> +       gatt_db_service_foreach_desc((struct gatt_db_attribute *) attrib,
+> +                                               check_reliable_supported,
+> +                                               &ext_prop_data);
+> +
+> +       *ext_prop = ext_prop_data.prop;
+> +       return ext_prop_data.present;
+> +}
+> +
+>  bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
+>                                                         uint16_t *handle,
+>                                                         uint16_t *value_handle,
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index 96cceb9..0cb713e 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -195,6 +195,10 @@ bool gatt_db_attribute_get_service_data(const struct gatt_db_attribute *attrib,
+>                                                         bool *primary,
+>                                                         bt_uuid_t *uuid);
+>
+> +bool gatt_db_attribute_get_characteristic_extended_prop(
+> +                                       const struct gatt_db_attribute *attrib,
+> +                                       uint8_t *ext_prop);
+> +
+>  bool gatt_db_attribute_get_char_data(const struct gatt_db_attribute *attrib,
+>                                                         uint16_t *handle,
+>                                                         uint16_t *value_handle,
+> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+> index 6b65525..ceed486 100644
+> --- a/unit/test-gatt.c
+> +++ b/unit/test-gatt.c
+> @@ -4440,5 +4440,19 @@ int main(int argc, char *argv[])
+>                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
+>                         raw_pdu(0x01, 0x16, 0x04, 0x00, 0x03));
+>
+> +       define_test_server("/robustness/no-reliable-characteristic", test_server,
+> +                       ts_large_db_1, NULL,
+> +                       raw_pdu(0x03, 0x00, 0x02),
+> +                       raw_pdu(0x16, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+> +                       raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+> +                       raw_pdu(0x16, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+> +                       raw_pdu(0x17, 0x25, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03),
+> +                       raw_pdu(0x16, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+> +                       raw_pdu(0x17, 0x82, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+> +                       raw_pdu(0x16, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+> +                       raw_pdu(0x17, 0x25, 0x00, 0x03, 0x00, 0x04, 0x05, 0x06),
+> +                       raw_pdu(0x18, 0x01),
+> +                       raw_pdu(0x01, 0x18, 0x25, 0x00, 0x06));
+> +
+>
 
-However, the D-Bus Specification seems to say an ObjectManager
-should return the objects *under* the ObjectManager, i.e., only
-the service's children---characteristics and descriptors. This
-reading of the specification is in agreement with the
-ObjectManager implementations in GDBus and Python's txdbus (I
-didn't check other implementations).
 
-bluez's disagreement with the standard causes pain when trying to
-use the ObjectManager implementations in the libraries, because
-they don't return the ObjectManager itself, the service object,
-as bluez expects. E.g., in txdbus, it's impossible to implement
-the ObjectManager interface in application code (to get the
-non-standard behavior) without patching the library.
+Hmm, this test should go in separate patch. Some rebasing issue. Will fix.
 
-Does the expectation that the service object appear in the
-GetManagedObjects result look like a disagreement with the D-Bus
-standard to anyone else?
+\Łukasz
 
-Thanks for all the good work on bluez,
--- Ryan
+>       return tester_run();
+>  }
+> --
+> 2.5.0
+>
 
 
-P.S. A possibly related issue is causing tools/gatt-service.c to
-fail. It implements the ObjectManager interface on the root path
-of the bus connection, rather on the service object. Perhaps this
-indicates the service object *was* under a separate ObjectManager
-in past versions, and this evolved into the current discrepancy
-now that the service object *is* the ObjectManager.
 
-1: text/example-gatt-server implements the ObjectManger
-interface directly, making it easy to include the service object
-in the GetManagedObjects result, even if returning the object is
-nonstandard behavior, because the example is is written using
-dbus-python, which doesn't provide help implementing the
-ObjectManager interface.
-
+-- 
+BR / Pozdrawiam
+Łukasz
