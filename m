@@ -1,62 +1,155 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1448880520-12810-1-git-send-email-johan.hedberg@gmail.com>
-References: <1448880520-12810-1-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 30 Nov 2015 09:27:31 -0800
-Message-ID: <CAD0=r8ygH+uLF8gxTY5PW=2CNHNbKxo9VZYOTOBcuUK3ND6pFQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Use continuous scanning when creating LE connections
-From: Jakub Pawlowski <jpawlowski@google.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 1/2] btproxy: Add support for creating pseudoterminal
+Date: Mon, 30 Nov 2015 15:49:32 +0200
+Message-Id: <1448891373-15132-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1448891373-15132-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1448551424-18448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1448891373-15132-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, Nov 30, 2015 at 2:48 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> From: Johan Hedberg <johan.hedberg@intel.com>
->
-> All LE connections are now triggered through a preceding passive scan
-> and waiting for a connectable advertising report. This means we've got
-> the best possible guarantee that the device is within range and should
-> be able to request the controller to perform continuous scanning. This
-> way we minimize the risk that we miss out on any advertising packets.
->
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/hci_conn.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index e2600213cd50..f28741d78e0b 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -726,8 +726,12 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
->         if (hci_update_random_address(req, false, &own_addr_type))
->                 return;
->
-> +       /* Set interval and window to same value to enable continuous
-> +        * scanning.
-> +        */
->         cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
-> -       cp.scan_window = cpu_to_le16(hdev->le_scan_window);
-> +       cp.scan_window = cp.scan_interval;
-> +
-So I'm not 100% sure, but I think this code will make classic, or
-interleaved inquiry not report during LE connection establishment.
-When doing interleaved inquiry, depending on HCI_QUIRK_SIMULTANEOUS_DISCOVERY
-we might be doing classic inquiry at same time LE scan is done.
-Filling whole scan window with LE scan
-will cause no time on radio left for classic on some controllers.
+Add new virtual Bluetooth serial controller on /dev/pts/X which allows
+to test serial attach with btattach and hciattach.
+---
+ tools/btproxy.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 65 insertions(+), 3 deletions(-)
 
->         bacpy(&cp.peer_addr, &conn->dst);
->         cp.peer_addr_type = conn->dst_type;
->         cp.own_address_type = own_addr_type;
-> --
-> 2.5.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/tools/btproxy.c b/tools/btproxy.c
+index 43de037..6d78876 100644
+--- a/tools/btproxy.c
++++ b/tools/btproxy.c
+@@ -629,6 +629,41 @@ static int open_unix(const char *path)
+ 	return fd;
+ }
+ 
++static int open_pty(void)
++{
++	int fd;
++	char *pts;
++
++	fd = open("/dev/ptmx", O_RDWR | O_NOCTTY);
++	if (fd < 0) {
++		perror("Failed to open pseudoterminal master");
++		return -1;
++	}
++
++	if (grantpt(fd) < 0) {
++		perror("Failed to grant access to slave pty");
++		close(fd);
++		return -1;
++	}
++
++	if (unlockpt(fd) < 0) {
++		perror("Failed to unlock slave pty");
++		close(fd);
++		return -1;
++	}
++
++	pts = ptsname(fd);
++	if (!pts) {
++		perror("Failed to get slave pty");
++		close(fd);
++		return -1;
++	}
++
++	printf("New pts created: %s\n", pts);
++
++	return fd;
++}
++
+ static int open_tcp(const char *address, unsigned int port)
+ {
+ 	struct sockaddr_in addr;
+@@ -728,6 +763,7 @@ static void usage(void)
+ 		"\t-c, --connect <address>     Connect to server\n"
+ 		"\t-l, --listen [address]      Use TCP server\n"
+ 		"\t-u, --unix [path]           Use Unix server\n"
++		"\t-P, --pty                   Use PTY\n"
+ 		"\t-p, --port <port>           Use specified TCP port\n"
+ 		"\t-i, --index <num>           Use specified controller\n"
+ 		"\t-a, --amp                   Create AMP controller\n"
+@@ -741,6 +777,7 @@ static const struct option main_options[] = {
+ 	{ "connect",  required_argument, NULL, 'c' },
+ 	{ "listen",   optional_argument, NULL, 'l' },
+ 	{ "unix",     optional_argument, NULL, 'u' },
++	{ "pty",      no_argument,       NULL, 'P' },
+ 	{ "port",     required_argument, NULL, 'p' },
+ 	{ "index",    required_argument, NULL, 'i' },
+ 	{ "amp",      no_argument,       NULL, 'a' },
+@@ -758,6 +795,7 @@ int main(int argc, char *argv[])
+ 	const char *unix_path = NULL;
+ 	unsigned short tcp_port = 0xb1ee;	/* 45550 */
+ 	bool use_redirect = false;
++	bool use_pty = false;
+ 	uint8_t type = HCI_BREDR;
+ 	const char *str;
+ 	sigset_t mask;
+@@ -765,7 +803,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "rc:l::u::p:i:aedvh",
++		opt = getopt_long(argc, argv, "rc:l::u::Pp:i:aedvh",
+ 						main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -789,6 +827,9 @@ int main(int argc, char *argv[])
+ 			else
+ 				unix_path = "/tmp/bt-server-bredr";
+ 			break;
++		case 'P':
++			use_pty = true;
++			break;
+ 		case 'p':
+ 			tcp_port = atoi(optarg);
+ 			break;
+@@ -828,12 +869,13 @@ int main(int argc, char *argv[])
+ 		return EXIT_FAILURE;
+ 	}
+ 
+-	if (unix_path && (server_address || use_redirect)) {
++	if (unix_path && (server_address || use_redirect || use_pty)) {
+ 		fprintf(stderr, "Invalid to specify TCP and Unix servers\n");
+ 		return EXIT_FAILURE;
+ 	}
+ 
+-	if (connect_address && (unix_path || server_address || use_redirect)) {
++	if (connect_address && (unix_path || server_address || use_redirect ||
++								use_pty)) {
+ 		fprintf(stderr, "Invalid to specify client and server mode\n");
+ 		return EXIT_FAILURE;
+ 	}
+@@ -876,6 +918,26 @@ int main(int argc, char *argv[])
+ 			close(host_fd);
+ 			return EXIT_FAILURE;
+ 		}
++	} else if (use_pty) {
++		int master_fd, dev_fd;
++
++		printf("Opening pseudoterminal\n");
++
++		master_fd = open_pty();
++		if (master_fd < 0)
++			return EXIT_FAILURE;
++
++		dev_fd = open_channel(hci_index);
++		if (dev_fd < 0) {
++			close(master_fd);
++			return EXIT_FAILURE;
++		}
++
++		if (!setup_proxy(master_fd, false, dev_fd, true)) {
++			close(dev_fd);
++			close(master_fd);
++			return EXIT_FAILURE;
++		}
+ 	} else {
+ 		int server_fd;
+ 
+-- 
+2.5.0
+
