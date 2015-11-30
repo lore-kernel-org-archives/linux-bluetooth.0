@@ -1,134 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20151130075934.GA15562@t440s.lan>
-References: <20151129020402.GB1912@lodi.internal.kspace.net>
-	<565BF7B0.2020905@ubnt.com>
-	<565BFE44.4060706@axis.com>
-	<20151130075934.GA15562@t440s.lan>
-Date: Mon, 30 Nov 2015 11:12:48 +0200
-Message-ID: <CABBYNZ+Gx19ucU8tHZ9Xj8-PXyjGX6Y=pkghbsM+nbWr1suVdA@mail.gmail.com>
-Subject: Re: GATT service object required in D-Bus ObjectManager result
+In-Reply-To: <147AA35329540D468455E185B7E55050D4FBE66D@valen.ka.netpioneer.de>
+References: <147AA35329540D468455E185B7E55050D4FBE66D@valen.ka.netpioneer.de>
+Date: Mon, 30 Nov 2015 10:44:20 +0200
+Message-ID: <CABBYNZJXKVAvPjqBoObDtNGjqWMd2zCQv1R6_OJ34LTiR0qQYA@mail.gmail.com>
+Subject: Re: org.bluez.Adapter1 Powered API causes UnknownMethod: Method "Set"
+ with signature "ssb"
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jonas Holmberg <jonas.holmberg@axis.com>,
-	Andrejs Hanins <andrejs.hanins@ubnt.com>,
-	Ryan Kuester <rkuester@insymbols.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Matthias Schmidt <Matthias.Schmidt@netpioneer.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Matthias,
 
-On Mon, Nov 30, 2015 at 9:59 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi,
+On Thu, Nov 26, 2015 at 2:13 PM, Matthias Schmidt
+<Matthias.Schmidt@netpioneer.de> wrote:
+> Hi *,
 >
-> On Mon, Nov 30, 2015, Jonas Holmberg wrote:
->> On 11/30/2015 08:16 AM, Andrejs Hanins wrote:
->> > Hi,
->> >
->> > On 11/29/2015 04:04 AM, Ryan Kuester wrote:
->> >> Hello everyone,
->> >>
->> >> When registering a GATT service via the D-Bus API, bluez-5.36
->> >> seems to expect the objects returned by the service's
->> >> GetManagedObjects method to include the service object itself,
->> >> the root of the managed object tree. Indeed, the included
->> >> test/example-gatt-server behaves this way[1].
->> >>
->> >> However, the D-Bus Specification seems to say an ObjectManager
->> >> should return the objects *under* the ObjectManager, i.e., only
->> >> the service's children---characteristics and descriptors. This
->> >> reading of the specification is in agreement with the
->> >> ObjectManager implementations in GDBus and Python's txdbus (I
->> >> didn't check other implementations).
->> >>
->> >> bluez's disagreement with the standard causes pain when trying to
->> >> use the ObjectManager implementations in the libraries, because
->> >> they don't return the ObjectManager itself, the service object,
->> >> as bluez expects. E.g., in txdbus, it's impossible to implement
->> >> the ObjectManager interface in application code (to get the
->> >> non-standard behavior) without patching the library.
->> >>
->> >> Does the expectation that the service object appear in the
->> >> GetManagedObjects result look like a disagreement with the D-Bus
->> >> standard to anyone else?
->> >
->> > The same to me. I'm using Glib/Glibmm to export GATT services and
->> > Glib D-Bus code asserts in debug mode when object path matches
->> > with object manager path. I'm currently blindly ignoring this, cause
->> > it doesn't seems to cause any functionality problems in release code.
->>
->> I was also bitten by that assert. I assumed it was a bug  so I wrote a
->> bug report about it: https://bugzilla.gnome.org/show_bug.cgi?id=758393
->> But after this discussion I'm not sure if it is a bug.
+> while using the Powered API from the "org.bluez.Adapter1" interface in bluez 5.36 to turn BLE on and off
+> i'm getting this exeception every now and then - could not figure out any pattern:
 >
-> It appears to be a bug in the BlueZ implementation and D-Bus API. It
-> was already discussed many months ago, but no one seems to have
-> submitted patches to fix it:
+>     adapterInterface.Set(ADAPTER_IFACE, "Powered", state)
+>   File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 70, in __call__
+>     return self._proxy_method(*args, **keywords)
+>   File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 145, in __call__
+>     **keywords)
+>   File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line 651, in call_blocking
+>     message, timeout)
+> DBusException: org.freedesktop.DBus.Error.UnknownMethod: Method "Set" with signature "ssb" on interface "org.freedesktop.DBus.Properties" doesn't exist
+
+Is this something that used to work and stop working with 5.36? Btw
+the signature of org.freedesktop.DBus.Properties is "ssv" so perhaps
+that is the problem.
+
+> I'm running Linux 4.1.2 on armv7l
 >
-> http://comments.gmane.org/gmane.linux.bluez.kernel/63291
-> https://bugs.freedesktop.org/show_bug.cgi?id=91283
-> https://github.com/systemd/systemd/issues/525#issuecomment-126746787
+> Is there any chance to nail this down?
+>
+> cheers,
+>
+> Matthias
+>
+> Senior Systemarchitekt
+> Netpioneer GmbH, Ludwig-Erhard-Allee 20, 76131 Karlsruhe
+> Geschäftsführer: Axel Jahn
+> HRB: 107521 Handelsregister Mannheim
+>
+> Tel: 0721 / 9 20 60 822
+> Fax: 0721 / 9 20 60 30
+> E-Mail: matthias.schmidt@netpioneer.de
+> www: http://www.netpioneer.de
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Yep, I guess we lost track of it in the mailing list but we should
-definitely fix it. One idea that comes to me is to change the
-RegisterService to RegisterApplication and then have all its services
-registered at once:
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index d832c73..f1940ba 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -270,9 +270,9 @@ must be available on the root service path. An
-example application hierarchy
- containing two separate GATT services may look like this:
-
- -> /com/example
-+  |   - org.freedesktop.DBus.ObjectManager
-   |
-   -> /com/example/service0
--  | |   - org.freedesktop.DBus.ObjectManager
-   | |   - org.freedesktop.DBus.Properties
-   | |   - org.bluez.GattService1
-   | |
-@@ -289,7 +289,6 @@ containing two separate GATT services may look like this:
-   |       - org.bluez.GattDescriptor1
-   |
-   -> /com/example/service1
--    |   - org.freedesktop.DBus.ObjectManager
-     |   - org.freedesktop.DBus.Properties
-     |   - org.bluez.GattService1
-     |
-@@ -309,21 +308,21 @@ Service           org.bluez
- Interface      org.bluez.GattManager1 [Experimental]
- Object path    [variable prefix]/{hci0,hci1,...}
-
--Methods                void RegisterService(object service, dict options)
-+Methods                void RegisterApplication(object application,
-dict options)
-
--                       Registers a local GATT service hierarchy as described
-+                       Registers a local GATT services hierarchy as described
-                        above.
-
--                       "service" object path together with the D-Bus system
--                       bus connection ID define the identification of the
--                       application registering a GATT based service.
-+                       The application object path together with the D-Bus
-+                       system bus connection ID define the identification of
-+                       the application registering a GATT based service.
-
-                        Possible errors: org.bluez.Error.InvalidArguments
-                                         org.bluez.Error.AlreadyExists
-
--               void UnregisterService(object service)
-+               void UnregisterApplication(object application)
-
--                       This unregisters the service that has been
-+                       This unregisters the services that has been
-                        previously registered. The object path parameter
-                        must match the same value that has been used
-                        on registration.
 
 -- 
 Luiz Augusto von Dentz
