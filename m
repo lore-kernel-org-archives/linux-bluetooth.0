@@ -1,113 +1,58 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: Unknown Connection Identifier
+Subject: Re: [PATCH] Bluetooth: Use continuous scanning when creating LE connections
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAEZxfGOJK00YMX+_Kpde9kv38XB9q+EvXYoEF4ic94VWZEhZKg@mail.gmail.com>
-Date: Mon, 30 Nov 2015 09:55:46 -0800
-Cc: Szymon Janc <szymon.janc@codecoup.pl>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <9368DC3C-04CB-48E3-BBF8-16D84F6C47A2@holtmann.org>
-References: <CAEZxfGPTxwUZzU+3XSV-uiN+DMz+hyOKiiZfgF+oD6pp=-XiOA@mail.gmail.com> <AAC95ACC-36E4-4618-8F49-53F78AE93AA6@holtmann.org> <2045332.GytFuFKTvp@ix> <CAEZxfGOdyZat1evKm0Jfwg=knuigGdfK_wVqS8NG=zFAY3aRXg@mail.gmail.com> <2DBBB005-93A7-47ED-8E88-1D6B92ACCC07@holtmann.org> <CAEZxfGOJK00YMX+_Kpde9kv38XB9q+EvXYoEF4ic94VWZEhZKg@mail.gmail.com>
-To: =?utf-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+In-Reply-To: <CAD0=r8ygH+uLF8gxTY5PW=2CNHNbKxo9VZYOTOBcuUK3ND6pFQ@mail.gmail.com>
+Date: Mon, 30 Nov 2015 09:52:28 -0800
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <79FDC25B-B74E-49C8-93BA-8B6D60D89A59@holtmann.org>
+References: <1448880520-12810-1-git-send-email-johan.hedberg@gmail.com> <CAD0=r8ygH+uLF8gxTY5PW=2CNHNbKxo9VZYOTOBcuUK3ND6pFQ@mail.gmail.com>
+To: Jakub Pawlowski <jpawlowski@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Francois,
+Hi Jakub,
 
->>> Thanks both of you for your input.
->>> 
->>> Here are my 100% reproducible steps:
->>> - Restart bluetoothd to start fresh
->>> - Remove cached device (remove 88:0F:10:9D:EB:42)
->>> - Run basic scan (scan on)
->>> - Wait for the device to pop up in results and stop scan (scan off)
->>> - Try to connect to it (connect 88:0F:10:9D:EB:42)
->>> 
->>> As you can read below I now have 2 "LE Connection Complete (0x01)" events.
->>> 
->>> Bluetooth monitor ver 5.35
->>> = New Index: A4:17:31:78:A6:04 (BR/EDR,USB,hci0)
->>>               [hci0] 0.624321
->>> < HCI Command: LE Add Device To White List (0x08|0x0011) plen 7
->>>              [hci0] 11.038826
->>>       Address type: Public (0x00)
->>>       Address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
->>>> HCI Event: Command Complete (0x0e) plen 4                                     [hci0] 11.040084
->>>     LE Add Device To White List (0x08|0x0011) ncmd 1
->>>       Status: Success (0x00)
->>> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
->>>              [hci0] 11.040125
->>>       Type: Passive (0x00)
->>>       Interval: 60.000 msec (0x0060)
->>>       Window: 30.000 msec (0x0030)
->>>       Own address type: Public (0x00)
->>>       Filter policy: Ignore not in white list (0x01)
->>>> HCI Event: Command Complete (0x0e) plen 4                                     [hci0] 11.041085
->>>     LE Set Scan Parameters (0x08|0x000b) ncmd 1
->>>       Status: Success (0x00)
->>> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->>>              [hci0] 11.041134
->>>       Scanning: Enabled (0x01)
->>>       Filter duplicates: Enabled (0x01)
->>>> HCI Event: Command Complete (0x0e) plen 4                                     [hci0] 11.042084
->>>     LE Set Scan Enable (0x08|0x000c) ncmd 1
->>>       Status: Success (0x00)
->>>> HCI Event: LE Meta Event (0x3e) plen 43                                       [hci0] 15.668141
->>>     LE Advertising Report (0x02)
->>>       Num reports: 1
->>>       Event type: Connectable undirected - ADV_IND (0x00)
->>>       Address type: Public (0x00)
->>>       Address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
->>>       Data length: 31
->>>       Flags: 0x06
->>>         LE General Discoverable Mode
->>>         BR/EDR Not Supported
->>>       Company: Anhui Huami Information Technology Co., Ltd. (343)
->>>         Data: 00f70b676930f4c909f4a5acd792a299ff02880f109deb42
->>>       RSSI: -59 dBm (0xc5)
->>> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->>>              [hci0] 15.668289
->>>       Scanning: Disabled (0x00)
->>>       Filter duplicates: Disabled (0x00)
->>>> HCI Event: Command Complete (0x0e) plen 4                                     [hci0] 15.669062
->>>     LE Set Scan Enable (0x08|0x000c) ncmd 1
->>>       Status: Success (0x00)
->>> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
->>>              [hci0] 15.669171
->>>       Scan interval: 60.000 msec (0x0060)
->>>       Scan window: 30.000 msec (0x0030)
+>> All LE connections are now triggered through a preceding passive scan
+>> and waiting for a connectable advertising report. This means we've got
+>> the best possible guarantee that the device is within range and should
+>> be able to request the controller to perform continuous scanning. This
+>> way we minimize the risk that we miss out on any advertising packets.
 >> 
->> we might should have the LE Create Connection scan with a full duty cycle here. So it does not miss any advertising PDUs.
-> 
-> Is this something the Linux Bluetooth team is going to address?
-
-yes we are addressing this. Also the mgmt event with the connection failed error needs to be suppressed. While a connection attempt might still be aborted, it is not an error. It is really just lets scan one more time and try again.
-
->>>       Filter policy: White list is not used (0x00)
->>>       Peer address type: Public (0x00)
->>>       Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
->>>       Own address type: Public (0x00)
->>>       Min connection interval: 50.00 msec (0x0028)
->>>       Max connection interval: 70.00 msec (0x0038)
->>>       Connection latency: 0x0000
->>>       Supervision timeout: 420 msec (0x002a)
->>>       Min connection length: 0.000 msec (0x0000)
->>>       Max connection length: 0.000 msec (0x0000)
->>>> HCI Event: Command Status (0x0f) plen 4                                       [hci0] 15.670065
->>>     LE Create Connection (0x08|0x000d) ncmd 1
->>>       Status: Success (0x00)
->>> < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0
->>>              [hci0] 17.670566
+>> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+>> ---
+>> net/bluetooth/hci_conn.c | 6 +++++-
+>> 1 file changed, 5 insertions(+), 1 deletion(-)
 >> 
->> And I think we need to increase the timeout to something like 4-5 seconds before we give up and try the next device that might have been found.
+>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>> index e2600213cd50..f28741d78e0b 100644
+>> --- a/net/bluetooth/hci_conn.c
+>> +++ b/net/bluetooth/hci_conn.c
+>> @@ -726,8 +726,12 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
+>>        if (hci_update_random_address(req, false, &own_addr_type))
+>>                return;
 >> 
-> 
-> For my own curiosity, how does does perform Android Bluetooth stack
-> when creating a LE connection?
-> Does it hardcode a 4-5 seconds timeout or does it use other heuristics?
+>> +       /* Set interval and window to same value to enable continuous
+>> +        * scanning.
+>> +        */
+>>        cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
+>> -       cp.scan_window = cpu_to_le16(hdev->le_scan_window);
+>> +       cp.scan_window = cp.scan_interval;
+>> +
+> So I'm not 100% sure, but I think this code will make classic, or
+> interleaved inquiry not report during LE connection establishment.
+> When doing interleaved inquiry, depending on HCI_QUIRK_SIMULTANEOUS_DISCOVERY
+> we might be doing classic inquiry at same time LE scan is done.
+> Filling whole scan window with LE scan
+> will cause no time on radio left for classic on some controllers.
 
-I honestly do not know what Android picks as default values. Easy to find out though, just enable tracing and grab the btsnoop file via adb. You can read it with btmon btw.
+that depends on how the controller schedules it. The values are just recommendations and it can always decide to interrupt LE scanning. I assume most controllers will do exactly that since they treat LE scanning as lowest priority.
+
+Also keep in mind that after 2 seconds, the LE create connection attempt will be aborted and it will fall back to normal LE scanning that is not full duty cycle.
+
+Reality is that if you want to connect to a certain device, then you want to connect to it. Period. So everything else is secondary at that point. The only thing a controller should care about is SCO/eSCO connections and ACL links for A2DP and everything else can be handled after the LE connection has been established. Missing an inquiry event is certainly irrelevant.
 
 Regards
 
