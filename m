@@ -1,85 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <d942deb8e0bd715b4ce207a874b0bda4.squirrel@mungewell.org>
-References: <AM3PR01MB211848A73CABF9631293C19F9030@AM3PR01MB211.eurprd01.prod.exchangelabs.com>
-	<d942deb8e0bd715b4ce207a874b0bda4.squirrel@mungewell.org>
-Date: Mon, 30 Nov 2015 11:39:40 +0200
-Message-ID: <CABBYNZJshjM4VE1CxoYZvHDs8K8J681gxjjGPWqrkpzaftv57w@mail.gmail.com>
-Subject: Re: Exploring Bluez alternatives
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Simon Wood <simon@mungewell.org>
-Cc: Ad Zeevaarders <ad.zeevaarders@veynex.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZ+ckNXhrC=QF9+CcfA_H-iMGM9kdG+GgjaZ3RZL=nx9cQ@mail.gmail.com>
+References: <CAEZxfGOFqWkC84Yq9emU76WYqBY-0rGhgGEEBQ_dCr1XTTk2CQ@mail.gmail.com>
+ <CABBYNZ+ckNXhrC=QF9+CcfA_H-iMGM9kdG+GgjaZ3RZL=nx9cQ@mail.gmail.com>
+From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
+Date: Mon, 30 Nov 2015 10:23:57 +0100
+Message-ID: <CAEZxfGP5LegWOJnadm9dS8vxOMOxEnB_uNxAsdMZknXUuzNP0A@mail.gmail.com>
+Subject: Re: Add name and namePrefix filter to SetDiscoveryFilter
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+You're right.
+As discussed on a separate thread with Jakub, instead of two filters
+we might want to add one unique filter "nameRegexp" that would take a
+regular expression to filter against bluetooth device names.
+What do you think?
 
-On Fri, Nov 27, 2015 at 5:51 PM, Simon Wood <simon@mungewell.org> wrote:
-> On Fri, November 27, 2015 1:32 am, Ad Zeevaarders wrote:
->> Hello,
->>
->>
->> I am an intern at a company. After having developed a few Low Energy
->> applications using BlueZ, the DBus-way and the mgmt way, I was ready for
->> my new assignment. The applications I developed were targeted at an
->> embedded ARM platform running Linux without DBus. The new application I
->> need to develop needs to connect to a device, receive some values using
->> indications, then disconnect.
-
-Well you can in fact use most of the protocols without D-Bus, in fact
-that what we did in BlueZ for Android.
-
->> To my amazement my employer told me that they wanted me to explore
->> alternatives to BlueZ, as they were unsure of the reliability and
->> especially the performance. They sent me a Wikipedia page listing several
->> embedded Bluetooth stacks, like BlueCode+, and asked me to prove, for
->> every single stack, why Bluez was 'better'. My initial response was
->> "Because it is the official supported Bluetooth stack for Linux, our
->> target development OS." Exploring the other solutions, I could not find
->> any rationale as to why I would choose a different protocol stack.
-
-Most of the userspace stack will probably perform worst than BlueZ and
-cannot offer the same level of integration with Linux kernel both at
-the driver level, USB, UART, etc and other protocols like 6LowPAN
-which will probably make them less reliable as well. I actually never
-seem any other stack that has emulation support and doing end to end
-tests like BlueZ can do.
-
+On Mon, Nov 30, 2015 at 9:40 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> Hi,
-> This maybe of no interest, but I wanted to point out another alternate
-> 'community written' stack....
+> Hi François,
 >
-> http://bluekitchen-gmbh.com/btstack/
+> On Tue, Nov 24, 2015 at 2:09 PM, François Beaufort
+> <beaufort.francois@gmail.com> wrote:
+> > The SetDiscoveryFilter method already has UUIDs, RSSI, Pathloss and
+> > Transport filters.
+> > I was wondering if it would be possible to add "name" and "namePrefix"
+> > filters to this list?
+> >
+> > I'm shamelessly asking this because the Web Bluetooth API has added
+> > these filters: http://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothscanfilter
 >
-> Started as a completely Free project, but was then relicensed to be 'free
-> for non-commercial'. Depending on what you need it might be usable for
-> your projects.
-
-If I would have started a new stack for Linux Id probably use the
-kernel parts otherwise it is pretty much bluedroid all over again.
-
-> BTW you have a hard task if employers just don't like Bluez :-( To me (as
-> just a user) the code size would be the major detractor, but it does work
-> pretty well.
-
-There are actually a lot of tools involved in BlueZ, just the emulator
-and the monitor already account for quite a big part of the userspace.
-Anyway Im pretty sure the authors of this btstack do use BlueZ tools
-to develop since they have things like HCI_DUMP_BLUEZ.
-
-> Good luck,
-> Simon
+> I guess we can extend with more filters but Im afraid having 2 filters
+> like that can be confusing, what if name and prefix are set? Shall it
+> can an error? What should be the logic AND or OR operation? I guess
+> like with the other we need a merge strategy if multiple clients set a
+> filter with different names.
+>
 >
 >
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+> Luiz Augusto von Dentz
