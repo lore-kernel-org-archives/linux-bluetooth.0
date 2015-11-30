@@ -1,49 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 0/2] Three-wire (H5) support in btproxy
-Date: Mon, 30 Nov 2015 15:49:31 +0200
-Message-Id: <1448891373-15132-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1448551424-18448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1448551424-18448-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] btproxy: Fix possible string overflow
+Date: Mon, 30 Nov 2015 15:32:17 +0200
+Message-Id: <1448890337-13444-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Changes:
-	* v2: Fix comments from review, added h5 debug
-	* v1: Split code to h5.[ch], remove global vars, add callbacks
-	* RFC: Initial code
+Follow common practice when copying to fixed size buffer.
+---
+ tools/btproxy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-With H5 support it is possible to create pts and attach to it using
-hciattach ot btattach with 3wire protocol. This is useful for testing
-and developing three-wire protocol.
-Implementation is based on kernel hci_h5.c H5 protocol.
-
-Simple usage:
-To open virtual pts run:
-$ sudo tools/btproxy -d --pty -3
-Opening pseudoterminal
-New pts created: /dev/pts/2
-Opening user channel for hci0
-
-Now attach to it using hciattach:
-$ sudo hciattach -n /dev/pts/2 3wire
-Device setup complete
-
-Andrei Emeltchenko (2):
-  btproxy: Add support for creating pseudoterminal
-  btproxy: Add three-wire (h5) protocol initial support
-
- Makefile.tools  |   3 +-
- tools/btproxy.c | 121 +++++++++++-
- tools/h5.c      | 596 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- tools/h5.h      |  36 ++++
- 4 files changed, 752 insertions(+), 4 deletions(-)
- create mode 100644 tools/h5.c
- create mode 100644 tools/h5.h
-
+diff --git a/tools/btproxy.c b/tools/btproxy.c
+index 1a3eb5e..ee4dadd 100644
+--- a/tools/btproxy.c
++++ b/tools/btproxy.c
+@@ -657,7 +657,7 @@ static int open_unix(const char *path)
+ 
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.sun_family = AF_UNIX;
+-	strcpy(addr.sun_path, path);
++	strncpy(addr.sun_path, path, sizeof(addr.sun_path));
+ 
+ 	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+ 		perror("Failed to bind Unix server socket");
 -- 
 2.5.0
 
