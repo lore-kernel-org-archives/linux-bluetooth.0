@@ -1,164 +1,52 @@
-Return-Path: <vinicius.gomes@intel.com>
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>, =?utf-8?Q?Fran=C3=A7ois?=
- Beaufort <beaufort.francois@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Szymon Janc <szymon.janc@codecoup.pl>, linux-bluetooth@vger.kernel.org
-Subject: Re: Unknown Connection Identifier
-In-Reply-To: <20151130105141.GA12764@t440s.lan>
-References: <CAEZxfGPTxwUZzU+3XSV-uiN+DMz+hyOKiiZfgF+oD6pp=-XiOA@mail.gmail.com> <AAC95ACC-36E4-4618-8F49-53F78AE93AA6@holtmann.org> <2045332.GytFuFKTvp@ix> <CAEZxfGOdyZat1evKm0Jfwg=knuigGdfK_wVqS8NG=zFAY3aRXg@mail.gmail.com> <2DBBB005-93A7-47ED-8E88-1D6B92ACCC07@holtmann.org> <CAEZxfGOJK00YMX+_Kpde9kv38XB9q+EvXYoEF4ic94VWZEhZKg@mail.gmail.com> <20151130105141.GA12764@t440s.lan>
-Date: Mon, 30 Nov 2015 20:20:38 -0200
-Message-ID: <877fkz5du1.fsf@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: Exploring Bluez alternatives
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <AM3PR01MB211848A73CABF9631293C19F9030@AM3PR01MB211.eurprd01.prod.exchangelabs.com>
+Date: Mon, 30 Nov 2015 11:22:07 -0800
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <A2408001-8A0A-46AD-A442-ABE609CD9C10@holtmann.org>
+References: <AM3PR01MB211848A73CABF9631293C19F9030@AM3PR01MB211.eurprd01.prod.exchangelabs.com>
+To: Ad Zeevaarders <ad.zeevaarders@veynex.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Ad,
 
-Johan Hedberg <johan.hedberg@gmail.com> writes:
+> I am an intern at a company. After having developed a few Low Energy applications using BlueZ, the DBus-way and the mgmt way, I was ready for my new assignment. The applications I developed were targeted at an embedded ARM platform running Linux without DBus. The new application I need to develop needs to connect to a device, receive some values using indications, then disconnect. 
+> 
+> To my amazement my employer told me that they wanted me to explore alternatives to BlueZ, as they were unsure of the reliability and especially the performance. They sent me a Wikipedia page listing several embedded Bluetooth stacks, like BlueCode+, and asked me to prove, for every single stack, why Bluez was 'better'. My initial response was "Because it is the official supported Bluetooth stack for Linux, our target development OS." Exploring the other solutions, I could not find any rationale as to why I would choose a different protocol stack.
+> 
+> My question therefore is, what would justify switching from Bluez to a different stack? Are there any specific problems or oddities in Bluez that would make it a poor choice for an embedded platform? I haven't come across any indication as to why Bluez would make a less suitable choice as stack. Are there any benchmarks I could test or view in terms of performance and reliability? Is there even a difference in performance and reliability? I am not asking you to do my homework, but a pointer to any sort of rationale behind possibly switching would be appreciated.The application I am asked to develop is non-commercial, so licensing is not an issue. 
 
-> Hi Fran=C3=A7ois,
->
-> On Mon, Nov 30, 2015, Fran=C3=A7ois Beaufort wrote:
->> >> < HCI Command: LE Create Connection (0x08|0x000d) plen 25
->> >>               [hci0] 15.669171
->> >>        Scan interval: 60.000 msec (0x0060)
->> >>        Scan window: 30.000 msec (0x0030)
->> >
->> > we might should have the LE Create Connection scan with a full duty
->> > cycle here. So it does not miss any advertising PDUs.
->>
->> Is this something the Linux Bluetooth team is going to address?
->
-> I think this alone might fix the issue you're seeing. Could you please
-> try the patch I just sent and see if it solves the issue for you:
->
->   Bluetooth: Use continuous scanning when creating LE connections
+I have heard of at least 3 instances where companies choose a different stack than BlueZ for their Linux system. All of these were small embedded systems running Linux and they all were looking into BLE support. The end result was that they paid good money for a proprietary stack and hoped to get good support and integration. Reality was they did not and switched back to BlueZ and had things up and running within less than 2 weeks.
 
-I ended up with the same problem using the 4.3 kernel.
+The world is clearly shifting towards BLE and BlueZ can actually be configured as BLE only. There are options in the kernel that you can disable and also configurations options in userspace. That reduces the stack and memory size and also reduces the requirements for qualification.
 
-The patch seems to solve the issue, and could perhaps be submitted to
--stable.
+BlueZ is pretty 14+ years old by now. It has been everywhere and in all kinds of products. The advantage that it runs from tiny peripherals, over set top boxes, to tablets, phones, laptops and cars, means the stack has gotten extensive testing. It is the same code base no matter where you run it. That is something no other stack manufacturer can provide. Mainly since they just keep branching a version for a customer and then forget about it. If you buy a stack, you pay for that branch and every modification extra you need will cost you an arm and a leg. With BlueZ, it is free and you get also the testing for all the other markets and companies that are using BlueZ.
 
-I gave it a few tries trying to connect to a Parrot Flower Power, and
-got into a situation that may indicate a possible race condition:
+I think interoperability wise BlueZ is hands down the best stack. It does get tested at UnPlugFests and has tons of internal unit and end-to-end tests that verify many areas.
 
-(this line: '< HCI Command: LE Create Connection Cancel... ')
+If you are looking at Bluetooth stacks, then BlueZ is also the only one that has its core hardware abstraction and core layers implemented in the kernel. That is something that you will not find anywhere else. It is extreme stable code and also clean code. All interfaces are documented as well.
 
-< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7                 =
-             [hci0] 20.602345
-        Type: Passive (0x00)
-        Interval: 60.000 msec (0x0060)
-        Window: 30.000 msec (0x0030)
-        Own address type: Public (0x00)
-        Filter policy: Ignore not in white list (0x01)
-> HCI Event: Command Complete (0x0e) plen 4                                =
-             [hci0] 20.603330
-      LE Set Scan Parameters (0x08|0x000b) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2                     =
-             [hci0] 20.603348
-        Scanning: Enabled (0x01)
-        Filter duplicates: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4                                =
-             [hci0] 20.604339
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 36                                  =
-             [hci0] 21.508266
-      LE Advertising Report (0x02)
-        Num reports: 1
-        Event type: Connectable undirected - ADV_IND (0x00)
-        Address type: Public (0x00)
-        Address: A0:14:3D:08:B5:36 (PARROT SA)
-        Data length: 24
-        Flags: 0x06
-          LE General Discoverable Mode
-          BR/EDR Not Supported
-        128-bit Service UUIDs (partial): 1 entry
-          39e1fa00-84a8-11e2-afba-0002a5d5c51b
-        RSSI: -59 dBm (0xc5)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2                     =
-             [hci0] 21.508332
-        Scanning: Disabled (0x00)
-        Filter duplicates: Disabled (0x00)
-> HCI Event: Command Complete (0x0e) plen 4                                =
-             [hci0] 21.510342
-      LE Set Scan Enable (0x08|0x000c) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Create Connection (0x08|0x000d) plen 25                  =
-             [hci0] 21.510396
-        Scan interval: 60.000 msec (0x0060)
-        Scan window: 60.000 msec (0x0060)
-        Filter policy: White list is not used (0x00)
-        Peer address type: Public (0x00)
-        Peer address: A0:14:3D:08:B5:36 (PARROT SA)
-        Own address type: Public (0x00)
-        Min connection interval: 50.00 msec (0x0028)
-        Max connection interval: 70.00 msec (0x0038)
-        Connection latency: 0x0000
-        Supervision timeout: 420 msec (0x002a)
-        Min connection length: 0.000 msec (0x0000)
-        Max connection length: 0.000 msec (0x0000)
-> HCI Event: Command Status (0x0f) plen 4                                  =
-             [hci0] 21.512248
-      LE Create Connection (0x08|0x000d) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0            =
-             [hci0] 23.512098
-> HCI Event: LE Meta Event (0x3e) plen 19                                  =
-             [hci0] 23.514370
-      LE Connection Complete (0x01)
-        Status: Success (0x00)
-        Handle: 64
-        Role: Master (0x00)
-        Peer address type: Public (0x00)
-        Peer address: A0:14:3D:08:B5:36 (PARROT SA)
-        Connection interval: 67.50 msec (0x0036)
-        Connection latency: 0.00 msec (0x0000)
-        Supervision timeout: 420 msec (0x002a)
-        Master clock accuracy: 0x05
-@ Device Connected: A0:14:3D:08:B5:36 (1) flags 0x0000
-        02 01 06 11 06 1b c5 d5 a5 02 00 ba af e2 11 a8  ................
-        84 00 fa e1 39 02 ff 03                          ....9...
-> HCI Event: Command Complete (0x0e) plen 4                                =
-             [hci0] 23.519286
-      LE Create Connection Cancel (0x08|0x000e) ncmd 1
-        Status: Command Disallowed (0x0c)
-< HCI Command: LE Read Remote Used Features (0x08|0x0016) plen 2           =
-             [hci0] 23.519347
-        Handle: 64
-> HCI Event: Command Status (0x0f) plen 4                                  =
-             [hci0] 23.520302
-      LE Read Remote Used Features (0x08|0x0016) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 12                                  =
-             [hci0] 23.632256
-      LE Read Remote Used Features (0x04)
-        Status: Success (0x00)
-        Handle: 64
-        Features: 0x01 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-          LE Encryption
-< ACL Data TX: Handle 64 flags 0x00 dlen 11                                =
-             [hci0] 23.632361
-      SMP: Pairing Request (0x01) len 6
-        IO capability: NoInputNoOutput (0x03)
-        OOB data: Authentication data not present (0x00)
-        Authentication requirement: Bonding, No MITM, SC, No Keypresses (0x=
-09)
-        Max encryption key size: 16
-        Initiator key distribution: EncKey Sign LinkKey (0x0d)
-        Responder key distribution: EncKey IdKey Sign LinkKey (0x0f)
+>From my knowledge is that even pentesting houses uses BlueZ as prime test example for their tools. Mainly since you are unable to crash BlueZ remotely. The code is written in a way that is robust against remote attacks. Look for security presentation about Bluetooth and you see what I mean. Most of them can be found online.
 
+In case you are looking for BLE, you might just look for features that you care about. For example LE Secure Connections support is already part of BlueZ. The only other OS that I know of is iOS. All the other stacks have ignored LE SC support. Keep in mind that Bluetooth 4.2 got released over a year ago and BlueZ has LE SC support since exactly 1 year now. LE L2CAP Connection Oriented Channels is another of these features. Try to find that in other stacks.
 
->
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+BlueZ code size is large. That is just a fact. However it contains analyzing tools, emulator tools, testing tools, sample code and a lot more. It also comes in various flavor, BlueZ upstream, BlueZ for Android, BlueZ Peripheral that can be build and used. They are different frontends that share a lot of code. Some use D-Bus, some use Unix socket and some use no IPC at all.
 
+However if you look at Bluedroid from Android, then you will see that that code base is huge as well. And that is just the stack. It contains no tools around it and its debugging capabilities are bad.
 
-Cheers,
---
-Vinicius
+Look at the debugging capabilities of BlueZ and the tools we provide. If something goes wrong, can you analyze what goes wrong and if that is on your side or the remote side. Or do you have to purchase 30k EUR Bluetooth protocol analyzer and still can not figure out what went wrong.
+
+> I am also not asking this to use as an argument in a discussion with my employer, I just want to correctly perform my assignment by choosing a suitable stack and have a solid knowledge as to why I am using that specific bluetooth stack, so I can explain it when being asked during an assessment.
+
+We can not fight FUD (fear, uncertainty and doubt) since BlueZ does not have a marketing department. So you will have stack and silicon manufacturers coming in and try to sell you their stacks for a lot of money. If you buy into that FUD, then you might get screwed over later. As I said, I have it from 3 companies that paid good money and still ended up using BlueZ.
+
+If you run Linux and don't use BlueZ, you are just making your life harder and more complicated for no reason.
+
+Regards
+
+Marcel
+
