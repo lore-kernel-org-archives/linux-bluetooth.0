@@ -1,73 +1,69 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Message-Id: <1448967386.3315997.454536553.3B344491@webmail.messagingengine.com>
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no,
-	martin.gergeleit@hs-rm.de,
-	"David S . Miller" <davem@davemloft.net>,
-	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-	James Morris <jmorris@namei.org>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Patrick McHardy <kaber@trash.net>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [RFCv3 bluetooth-next 3/4] ipv6: add ipv6_addr_prefix_copy
-Date: Tue, 01 Dec 2015 11:56:26 +0100
-In-Reply-To: <1448796882-316-4-git-send-email-alex.aring@gmail.com>
-References: <1448796882-316-1-git-send-email-alex.aring@gmail.com>
- <1448796882-316-4-git-send-email-alex.aring@gmail.com>
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <1448289487-2841-1-git-send-email-gowtham.ab@samsung.com>
+References: <1448289487-2841-1-git-send-email-gowtham.ab@samsung.com>
+Date: Tue, 1 Dec 2015 12:51:28 +0200
+Message-ID: <CABBYNZL22BNGyNQR8dWcXadYTTbjJwC8OQpuz77yZtFbQLUMWw@mail.gmail.com>
+Subject: Re: [PATCH] HACKING: Add suppression file in valgrind cmd
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Gowtham,
 
-
-On Sun, Nov 29, 2015, at 12:34, Alexander Aring wrote:
-> This patch adds a static inline function ipv6_addr_prefix_copy which
-> copies a ipv6 address prefix(argument pfx) into the ipv6 address prefix.
-> The prefix len is given by plen as bits. This function mainly based on
-> ipv6_addr_prefix which copies one address prefix from address into a new
-> ipv6 address destination and zero all other address bits.
-> 
-> The difference is that ipv6_addr_prefix_copy don't get a prefix from an
-> ipv6 address, it sets a prefix to an ipv6 address with keeping other
-> address bits. The use case is for context based address compression
-> inside 6LoWPAN IPHC header which keeping ipv6 prefixes inside a context
-> table to lookup address-bits without sending them.
-> 
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-> Cc: James Morris <jmorris@namei.org>
-> Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-> Cc: Patrick McHardy <kaber@trash.net>
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+On Mon, Nov 23, 2015 at 4:38 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> Without --suppressions=./tools/valgrind.supp in valgrind cmd,
+> bluetoothd throws following error:
+>
+> ==1237== Syscall param socketcall.bind(my_addr.rc_bdaddr) points to uninitialised byte(s)
+> ==1237==    at 0x588B227: bind (syscall-template.S:81)
+> ==1237==    by 0x451545: logging_open (log.c:76)
+> ==1237==    by 0x451545: __btd_log_init (log.c:314)
+> ==1237==    by 0x40B035: main (main.c:610)
+> ==1237==  Address 0xfff0003b6 is on thread 1's stack
+> ==1237==  in frame #1, created by __btd_log_init (log.c:306)
+> ==1237==  Uninitialised value was created by a stack allocation
+> ==1237==    at 0x451490: __btd_log_init (log.c:306)
+> ==1237==
+> ==1237== Syscall param socketcall.bind(my_addr.rc_channel) points to uninitialised byte(s)
+> ==1237==    at 0x588B227: bind (syscall-template.S:81)
+> ==1237==    by 0x451545: logging_open (log.c:76)
+> ==1237==    by 0x451545: __btd_log_init (log.c:314)
+> ==1237==    by 0x40B035: main (main.c:610)
+> ==1237==  Address 0xfff0003b8 is on thread 1's stack
+> ==1237==  in frame #1, created by __btd_log_init (log.c:306)
+> ==1237==  Uninitialised value was created by a stack allocation
+> ==1237==    at 0x451490: __btd_log_init (log.c:306)
 > ---
->  include/net/ipv6.h | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-> index e1a10b0..cd3881e6 100644
-> --- a/include/net/ipv6.h
-> +++ b/include/net/ipv6.h
-> @@ -382,6 +382,21 @@ static inline void ipv6_addr_prefix(struct in6_addr
-> *pfx,
->  		pfx->s6_addr[o] = addr->s6_addr[o] & (0xff00 >> b);
->  }
->  
-> +static inline void ipv6_addr_prefix_copy(struct in6_addr *addr,
-> +                                        const struct in6_addr *pfx,
-> +                                        int plen)
-> +{
-> +       /* caller must guarantee 0 <= plen <= 128 */
-> +       int o = plen >> 3,
-> +           b = plen & 0x7;
-> +
-> +       memcpy(addr->s6_addr, pfx, o);
-> +       if (b != 0) {
-> +               addr->s6_addr[o] &= ~(0xff00 >> b);
-> +               addr->s6_addr[o] |= (pfx->s6_addr[o] & (0xff00 >> b));
-> +       }
-> +}
-> +
+>  HACKING | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/HACKING b/HACKING
+> index ffca598..a8fb403 100644
+> --- a/HACKING
+> +++ b/HACKING
+> @@ -89,8 +89,9 @@ automatically includes this option.
+>      # sudo ./src/bluetoothd -n -d
+>
+>    Run daemon with valgrind
+> -   # sudo valgrind --trace-children=yes --track-origins=yes --track-fds=yes
+> -   --show-possibly-lost=no --leak-check=full ./src/bluetoothd -n -d
+> +   # sudo valgrind --trace-children=yes --track-origins=yes --track-fds=yes \
+> +   --show-possibly-lost=no --leak-check=full --suppressions=./tools/valgrind.supp \
+> +   ./src/bluetoothd -n -d
+>
+>  For production installations or distribution packaging it is important that
+>  the "--enable-maintainer-mode" option is NOT used.
+> --
+> 1.9.1
 
-Acked-by: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Applied, thanks.
+
+
+-- 
+Luiz Augusto von Dentz
