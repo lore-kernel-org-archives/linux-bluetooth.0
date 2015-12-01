@@ -1,88 +1,260 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: s.syam@samsung.com
-To: linux-bluetooth@vger.kernel.org
-References: <1448298112-20501-1-git-send-email-s.syam@samsung.com>
-In-reply-to: <1448298112-20501-1-git-send-email-s.syam@samsung.com>
-Subject: RE: [PATCH v0] avdtp: Fix A2DP disconnection with ADVANCED_AUDIO_UUID
- only carkit
-Date: Wed, 02 Dec 2015 11:26:33 +0530
-Message-id: <02ab01d12cc6$3d9a8aa0$b8cf9fe0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=ks_c_5601-1987
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Subject: Re: [RFCv3 bluetooth-next 2/4] 6lowpan: add debugfs support
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+References: <1448796882-316-1-git-send-email-alex.aring@gmail.com>
+ <1448796882-316-3-git-send-email-alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no,
+	martin.gergeleit@hs-rm.de
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <565E0803.1010709@osg.samsung.com>
+Date: Tue, 1 Dec 2015 21:50:11 +0100
+MIME-Version: 1.0
+In-Reply-To: <1448796882-316-3-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+Hello.
 
------Original Message-----
-From: Syam Sidhardhan [mailto:s.syam@samsung.com] 
-Sent: Monday, November 23, 2015 10:32 PM
-To: linux-bluetooth@vger.kernel.org
-Cc: s.syam@samsung.com
-Subject: [PATCH v0] avdtp: Fix A2DP disconnection with ADVANCED_AUDIO_UUID
-only carkit
+On 29/11/15 12:34, Alexander Aring wrote:
+> This patch will introduce a 6lowpan entry into the debugfs if enabled.
+> Inside this 6lowpan directory we create a subdirectories of all 6lowpan
+> interfaces to offer a per interface debugfs support.
+>
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> ---
+>   include/net/6lowpan.h   |  3 +++
+>   net/6lowpan/6lowpan_i.h | 28 ++++++++++++++++++++++++++
+>   net/6lowpan/Kconfig     |  8 ++++++++
+>   net/6lowpan/Makefile    |  1 +
+>   net/6lowpan/core.c      | 28 +++++++++++++++++++++++++-
+>   net/6lowpan/debugfs.c   | 53 +++++++++++++++++++++++++++++++++++++++++++++++++
+>   6 files changed, 120 insertions(+), 1 deletion(-)
+>   create mode 100644 net/6lowpan/6lowpan_i.h
+>   create mode 100644 net/6lowpan/debugfs.c
+>
+> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+> index 730211f..2f6a3f2 100644
+> --- a/include/net/6lowpan.h
+> +++ b/include/net/6lowpan.h
+> @@ -53,6 +53,8 @@
+>   #ifndef __6LOWPAN_H__
+>   #define __6LOWPAN_H__
+>   
+> +#include <linux/debugfs.h>
+> +
+>   #include <net/ipv6.h>
+>   #include <net/net_namespace.h>
+>   
+> @@ -98,6 +100,7 @@ enum lowpan_lltypes {
+>   
+>   struct lowpan_priv {
+>   	enum lowpan_lltypes lltype;
+> +	struct dentry *iface_debugfs;
+>   
+>   	/* must be last */
+>   	u8 priv[0] __aligned(sizeof(void *));
+> diff --git a/net/6lowpan/6lowpan_i.h b/net/6lowpan/6lowpan_i.h
+> new file mode 100644
+> index 0000000..d16bb4b
+> --- /dev/null
+> +++ b/net/6lowpan/6lowpan_i.h
+> @@ -0,0 +1,28 @@
+> +#ifndef __6LOWPAN_I_H
+> +#define __6LOWPAN_I_H
+> +
+> +#include <linux/netdevice.h>
+> +
+> +#ifdef CONFIG_6LOWPAN_DEBUGFS
+> +int lowpan_dev_debugfs_init(struct net_device *dev);
+> +void lowpan_dev_debugfs_exit(struct net_device *dev);
+> +
+> +int __init lowpan_debugfs_init(void);
+> +void lowpan_debugfs_exit(void);
+> +#else
+> +static inline int lowpan_dev_debugfs_init(struct net_device *dev)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void lowpan_dev_debugfs_exit(struct net_device *dev) { }
+> +
+> +static inline int __init lowpan_debugfs_init(void)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline void lowpan_debugfs_exit(void) { }
+> +#endif /* CONFIG_6LOWPAN_DEBUGFS */
+> +
+> +#endif /* __6LOWPAN_I_H */
+> diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
+> index 7fa0f38..7ecedd7 100644
+> --- a/net/6lowpan/Kconfig
+> +++ b/net/6lowpan/Kconfig
+> @@ -5,6 +5,14 @@ menuconfig 6LOWPAN
+>   	  This enables IPv6 over Low power Wireless Personal Area Network -
+>   	  "6LoWPAN" which is supported by IEEE 802.15.4 or Bluetooth stacks.
+>   
+> +config 6LOWPAN_DEBUGFS
+> +	bool "6LoWPAN debugfs support"
+> +	depends on 6LOWPAN
+> +	depends on DEBUG_FS
+> +	---help---
+> +	  This enables 6LoWPAN debugfs support. For example to manipulate
+> +	  IPHC context information at runtime.
+> +
+>   menuconfig 6LOWPAN_NHC
+>   	tristate "Next Header Compression Support"
+>   	depends on 6LOWPAN
+> diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
+> index c6ffc55..54cad8d 100644
+> --- a/net/6lowpan/Makefile
+> +++ b/net/6lowpan/Makefile
+> @@ -1,6 +1,7 @@
+>   obj-$(CONFIG_6LOWPAN) += 6lowpan.o
+>   
+>   6lowpan-y := core.o iphc.o nhc.o
+> +6lowpan-$(CONFIG_6LOWPAN_DEBUGFS) += debugfs.o
+>   
+>   #rfc6282 nhcs
+>   obj-$(CONFIG_6LOWPAN_NHC_DEST) += nhc_dest.o
+> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+> index 80fc509..c7f06f5 100644
+> --- a/net/6lowpan/core.c
+> +++ b/net/6lowpan/core.c
+> @@ -15,9 +15,13 @@
+>   
+>   #include <net/6lowpan.h>
+>   
+> +#include "6lowpan_i.h"
+> +
+>   int lowpan_register_netdevice(struct net_device *dev,
+>   			      enum lowpan_lltypes lltype)
+>   {
+> +	int ret;
+> +
+>   	dev->addr_len = EUI64_ADDR_LEN;
+>   	dev->type = ARPHRD_6LOWPAN;
+>   	dev->mtu = IPV6_MIN_MTU;
+> @@ -25,7 +29,15 @@ int lowpan_register_netdevice(struct net_device *dev,
+>   
+>   	lowpan_priv(dev)->lltype = lltype;
+>   
+> -	return register_netdevice(dev);
+> +	ret = lowpan_dev_debugfs_init(dev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = register_netdevice(dev);
+> +	if (ret < 0)
+> +		lowpan_dev_debugfs_exit(dev);
+> +
+> +	return ret;
+>   }
+>   EXPORT_SYMBOL(lowpan_register_netdevice);
+>   
+> @@ -44,6 +56,7 @@ EXPORT_SYMBOL(lowpan_register_netdev);
+>   void lowpan_unregister_netdevice(struct net_device *dev)
+>   {
+>   	unregister_netdevice(dev);
+> +	lowpan_dev_debugfs_exit(dev);
+>   }
+>   EXPORT_SYMBOL(lowpan_unregister_netdevice);
+>   
+> @@ -57,6 +70,12 @@ EXPORT_SYMBOL(lowpan_unregister_netdev);
+>   
+>   static int __init lowpan_module_init(void)
+>   {
+> +	int ret;
+> +
+> +	ret = lowpan_debugfs_init();
+> +	if (ret < 0)
+> +		return ret;
+> +
+>   	request_module_nowait("ipv6");
+>   
+>   	request_module_nowait("nhc_dest");
+> @@ -69,6 +88,13 @@ static int __init lowpan_module_init(void)
+>   
+>   	return 0;
+>   }
+> +
+> +static void __exit lowpan_module_exit(void)
+> +{
+> +	lowpan_debugfs_exit();
+> +}
+> +
+>   module_init(lowpan_module_init);
+> +module_exit(lowpan_module_exit);
+>   
+>   MODULE_LICENSE("GPL");
+> diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
+> new file mode 100644
+> index 0000000..88eef84
+> --- /dev/null
+> +++ b/net/6lowpan/debugfs.c
+> @@ -0,0 +1,53 @@
+> +/* This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2
+> + * as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * Authors:
+> + * (C) 2015 Pengutronix, Alexander Aring <aar@pengutronix.de>
+> + * Copyright (c)  2015 Nordic Semiconductor. All Rights Reserved.
+> + */
+> +
+> +#include <net/6lowpan.h>
+> +
+> +#include "6lowpan_i.h"
+> +
+> +static struct dentry *lowpan_debugfs;
+> +
+> +int lowpan_dev_debugfs_init(struct net_device *dev)
+> +{
+> +	struct lowpan_priv *lpriv = lowpan_priv(dev);
+> +
+> +	/* creating the root */
+> +	lpriv->iface_debugfs = debugfs_create_dir(dev->name, lowpan_debugfs);
+> +	if (!lpriv->iface_debugfs)
+> +		goto fail;
+> +
+> +	return 0;
+> +
+> +fail:
+> +	return -EINVAL;
+> +}
+> +
+> +void lowpan_dev_debugfs_exit(struct net_device *dev)
+> +{
+> +	debugfs_remove_recursive(lowpan_priv(dev)->iface_debugfs);
+> +}
+> +
+> +int __init lowpan_debugfs_init(void)
+> +{
+> +	lowpan_debugfs = debugfs_create_dir("6lowpan", NULL);
+> +	if (!lowpan_debugfs)
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +void lowpan_debugfs_exit(void)
+> +{
+> +	debugfs_remove_recursive(lowpan_debugfs);
+> +}
 
-Few Carkits Like "VW MI" & "Seat BT AC" will register the ADVANCED AUDIO
-UUID rather than A2DP SINK UUID. Once the signalling channel is initiated
-by the remote sink device and streaming channel is not yet initiated by
-sink, the source will check the remote device SINK UUID to establish the
-streaming channel and will close the signalling channel if SINK UUID is not
-present.
+With the Kconfig fix merged in here from v2 there is nothing wrong with 
+this from my side. Like the first patch I think this is ready to be 
+submitted as PATCH and applied.
 
-In addition to A2DP SINK UUID, this patch checks for the ADVANCED AUDIO
-UUID as well.
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 
-Logs:
-bluetoothd:
-10:02:31 profiles/audio/a2dp.c:confirm_cb() AVDTP: incoming connect from
-E0:75:0A:36:09:FD
-10:02:31 profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected
-signaling channel to E0:75:0A:36:09:FD
-10:02:31 profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP imtu=672, omtu=672
-10:02:31 profiles/audio/avdtp.c:set_disconnect_timer() name : "Seat BT AC"
-/* Extra print */ ...
-...
-10:02:32 profiles/audio/avdtp.c:disconnect_timeout()
-10:02:32 profiles/audio/avdtp.c:connection_lost() Disconnected from
-E0:75:0A:36:09:FD
-10:02:32 profiles/audio/a2dp.c:channel_remove() chan 0xb7005348
-10:02:32 profiles/audio/avdtp.c:connection_lost() 0xb7005d48: ref=0
-10:02:32 profiles/audio/avdtp.c:avdtp_free() 0xb7005d48
-
-DB file:
-[General]
-Name=Seat BT AC
-Class=0x340408
-SupportedTechnologies=BR/EDR;
-Trusted=false
-Blocked=false
-Services=0000110c-0000-1000-8000-00805f9b34fb; //AVRCP_TARGET_UUID 0000110d-
-0000-1000-8000-00805f9b34fb; //ADVANCED_AUDIO_UUID 0000110e-0000-1000-8000-
-00805f9b34fb; //AVRCP_REMOTE_UUID 0000111e-0000-1000-8000-00805f9b34fb;
-//HFP_HS_UUID 0000112f-0000-1000-8000-00805f9b34fb; //PBAP_UUID
----
- profiles/audio/avdtp.c |    6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c index 52ee767..
-ac1939b 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -1138,6 +1138,12 @@ static gboolean disconnect_timeout(gpointer
-user_data)
- 		return FALSE;
- 	}
- 
-+	service = btd_device_get_service(session->device,
-ADVANCED_AUDIO_UUID);
-+	if (service && stream_setup) {
-+		sink_setup_stream(service, session);
-+		return FALSE;
-+	}
-+
- 	service = btd_device_get_service(session->device, A2DP_SOURCE_UUID);
- 	if (service && stream_setup) {
- 		source_setup_stream(service, session);
---
-1.7.9.5
-
+regards
+Stefan Schmidt
