@@ -1,54 +1,70 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Tue, 1 Dec 2015 10:58:44 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Don't treat connection timeout as a failure
-Date: Tue,  1 Dec 2015 11:22:49 +0200
-Message-Id: <1448961769-20546-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth 2015-12-01
+Message-ID: <20151201085844.GA12776@t440s.lan>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wRRV7LY7NUeQGEoC"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
 
-When we're doing background scanning and connection attempts it's
-possible we timeout trying to connect and go back to scanning again.
-The timeout triggers a HCI_LE_Create_Connection_Cancel which will
-trigger a Connection Complete with "Unknown Connection Identifier"
-error status. Since we go back to scanning this isn't really a failure
-and shouldn't be presented as such to user space through mgmt.
+--wRRV7LY7NUeQGEoC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The exception to this is if the connection attempt was due to an
-explicit request on an L2CAP socket (indicated by
-params->explicit_connect being true). Since the socket will get an
-error it's consistent to also notify the failure on mgmt in this case.
+Hi Dave,
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Here's a Bluetooth fix for the 4.4-rc series that fixes a memory leak of
+the Security Manager L2CAP channel that'll happen for every LE
+connection.
+
+Please let me know if there are any issues pulling. Thanks.
+
+Johan
+
 ---
- net/bluetooth/hci_conn.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+The following changes since commit c5a37883f42be712a989e54d5d6c0159b0e56599:
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index f28741d78e0b..de7fa9f78cbe 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -668,8 +668,16 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- 
- 	conn->state = BT_CLOSED;
- 
--	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
--			    status);
-+	/* If the failure was due to a timeout and cancelation of the
-+	 * attempt there's no point of notifying failure since we'll go
-+	 * back to keep trying to connect. The only exception is
-+	 * explicit connect requests where a timeout + cancel does
-+	 * indicate an actual failure.
-+	 */
-+	if (status != HCI_ERROR_UNKNOWN_CONN_ID ||
-+	    (params && params->explicit_connect))
-+		mgmt_connect_failed(hdev, &conn->dst, conn->type,
-+				    conn->dst_type, status);
- 
- 	hci_connect_cfm(conn, status);
- 
--- 
-2.5.0
+  Merge branch 'akpm' (patches from Andrew) (2015-11-10 21:14:23 -0800)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to 7883746bc663150e8acd7a57397fc889698b0b33:
+
+  Bluetooth: Fix l2cap_chan leak in SMP (2015-11-11 23:48:34 +0100)
+
+----------------------------------------------------------------
+Johan Hedberg (1):
+      Bluetooth: Fix l2cap_chan leak in SMP
+
+ net/bluetooth/smp.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+--wRRV7LY7NUeQGEoC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJWXWFDAAoJECQj9vv5qNQSbiYP/12b38DSuOGT7ZsufkSKb5Y4
+z3QcNJCFkf4fOe+6HyZZKSqJKeA00YSE+x2yqsWVXyPmZ5P0bxpxR90AQb4+iRSW
+o/S0zWaUeXqLqRa9HnvJGVhHj62tjt9ROFQIx0Zu+aXvKMw66KLqOP52UCj1zsKv
+JNV2AcA2TxQN+8dX/RQhGlab1VE6Xr/AIxWp2r+pCufeDmoCBip+75kINGBJZW0R
+n9aZkXXm1rgEaNvQgUBQRs2wgalIIz89KECdWjtGeO5Hau6jfJyZmGIj1VeA5JV/
+H9F6w2AHmHDLpcqSovvXdF2s7gzv3x50zG/niVILfODViiEuqa567rnxpNHCR7HE
+OdDOxvlxPbO2mbl2wd+3kOVv9UY85B+TkBrfJXTmth/BX1+vQzlCrT2033TgGUyi
+xioUJc8i4Rk1bBy8wreHFxehI225RD4YdEGBtQ7icoQ2Q5DUmwcy51PeQZTGn6p4
+9rUnwtxWzKWofkgB0B6zIBt/jHkO0nCOF2Yp3IB2DwvTVzcMyPzS0Ft1vKc8Gqxd
+NyL3L6+TN1hX40Pz6zjR8/Ozzr/UFyKyKpTl2z/nfHimGX6VUaNZ/V71T8JVI+Sl
+HcKIWlsTEJPDrkkdbTMA14/BW0TWQX8J3eCxGFa7digo43wliMquNcR0Kd7mjpKS
+qnj0qzGjnz8AAx3yL2Na
+=uCix
+-----END PGP SIGNATURE-----
+
+--wRRV7LY7NUeQGEoC--
