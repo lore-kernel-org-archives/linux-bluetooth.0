@@ -1,170 +1,81 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Subject: Re: [RFCv3 bluetooth-next 1/4] 6lowpan: add lowpan dev register
- helpers
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-References: <1448796882-316-1-git-send-email-alex.aring@gmail.com>
- <1448796882-316-2-git-send-email-alex.aring@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no,
-	martin.gergeleit@hs-rm.de
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <565E0542.7010001@osg.samsung.com>
-Date: Tue, 1 Dec 2015 21:38:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <1448796882-316-2-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <zhaoyichen@google.com>
+From: Yichen Zhao <zhaoyichen@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yichen Zhao <zhaoyichen@google.com>
+Subject: [PATCH] Bluetooth: Fix locking in bt_accept_dequeue after disconnection
+Date: Tue,  1 Dec 2015 11:11:01 -0800
+Message-Id: <1448997061-28144-1-git-send-email-zhaoyichen@google.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Fix a crash that may happen when bt_accept_dequeue is run after a
+Bluetooth connection has been disconnected. bt_accept_unlink was called
+after release_sock, permitting bt_accept_unlink to run twice on the same
+socket and cause a NULL pointer dereference.
 
-On 29/11/15 12:34, Alexander Aring wrote:
-> This patch introduces register and unregister functionality for lowpan
-> interfaces. While register a lowpan interface there are several things
-> which need to be initialize by the 6lowpan subsystem. Upcoming
-> functionality need to register/unregister per interface components e.g.
-> debugfs entry.
->
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->   include/net/6lowpan.h         |  7 ++++++-
->   net/6lowpan/core.c            | 33 +++++++++++++++++++++++++++++++--
->   net/bluetooth/6lowpan.c       |  8 +++-----
->   net/ieee802154/6lowpan/core.c |  6 ++----
->   4 files changed, 42 insertions(+), 12 deletions(-)
->
-> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-> index cf3bc56..730211f 100644
-> --- a/include/net/6lowpan.h
-> +++ b/include/net/6lowpan.h
-> @@ -185,7 +185,12 @@ static inline void lowpan_push_hc_data(u8 **hc_ptr, const void *data,
->   	*hc_ptr += len;
->   }
->   
-> -void lowpan_netdev_setup(struct net_device *dev, enum lowpan_lltypes lltype);
-> +int lowpan_register_netdevice(struct net_device *dev,
-> +			      enum lowpan_lltypes lltype);
-> +int lowpan_register_netdev(struct net_device *dev,
-> +			   enum lowpan_lltypes lltype);
-> +void lowpan_unregister_netdevice(struct net_device *dev);
-> +void lowpan_unregister_netdev(struct net_device *dev);
->   
->   /**
->    * lowpan_header_decompress - replace 6LoWPAN header with IPv6 header
-> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-> index 83b19e0..80fc509 100644
-> --- a/net/6lowpan/core.c
-> +++ b/net/6lowpan/core.c
-> @@ -15,7 +15,8 @@
->   
->   #include <net/6lowpan.h>
->   
-> -void lowpan_netdev_setup(struct net_device *dev, enum lowpan_lltypes lltype)
-> +int lowpan_register_netdevice(struct net_device *dev,
-> +			      enum lowpan_lltypes lltype)
->   {
->   	dev->addr_len = EUI64_ADDR_LEN;
->   	dev->type = ARPHRD_6LOWPAN;
-> @@ -23,8 +24,36 @@ void lowpan_netdev_setup(struct net_device *dev, enum lowpan_lltypes lltype)
->   	dev->priv_flags |= IFF_NO_QUEUE;
->   
->   	lowpan_priv(dev)->lltype = lltype;
-> +
-> +	return register_netdevice(dev);
-> +}
-> +EXPORT_SYMBOL(lowpan_register_netdevice);
-> +
-> +int lowpan_register_netdev(struct net_device *dev,
-> +			   enum lowpan_lltypes lltype)
-> +{
-> +	int ret;
-> +
-> +	rtnl_lock();
-> +	ret = lowpan_register_netdevice(dev, lltype);
-> +	rtnl_unlock();
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(lowpan_register_netdev);
-> +
-> +void lowpan_unregister_netdevice(struct net_device *dev)
-> +{
-> +	unregister_netdevice(dev);
-> +}
-> +EXPORT_SYMBOL(lowpan_unregister_netdevice);
-> +
-> +void lowpan_unregister_netdev(struct net_device *dev)
-> +{
-> +	rtnl_lock();
-> +	lowpan_unregister_netdevice(dev);
-> +	rtnl_unlock();
->   }
-> -EXPORT_SYMBOL(lowpan_netdev_setup);
-> +EXPORT_SYMBOL(lowpan_unregister_netdev);
->   
->   static int __init lowpan_module_init(void)
->   {
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index 9e9cca3..d040365 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -825,9 +825,7 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
->   	list_add_rcu(&(*dev)->list, &bt_6lowpan_devices);
->   	spin_unlock(&devices_lock);
->   
-> -	lowpan_netdev_setup(netdev, LOWPAN_LLTYPE_BTLE);
-> -
-> -	err = register_netdev(netdev);
-> +	err = lowpan_register_netdev(netdev, LOWPAN_LLTYPE_BTLE);
->   	if (err < 0) {
->   		BT_INFO("register_netdev failed %d", err);
->   		spin_lock(&devices_lock);
-> @@ -890,7 +888,7 @@ static void delete_netdev(struct work_struct *work)
->   	struct lowpan_dev *entry = container_of(work, struct lowpan_dev,
->   						delete_netdev);
->   
-> -	unregister_netdev(entry->netdev);
-> +	lowpan_unregister_netdev(entry->netdev);
->   
->   	/* The entry pointer is deleted by the netdev destructor. */
->   }
-> @@ -1348,7 +1346,7 @@ static void disconnect_devices(void)
->   		ifdown(entry->netdev);
->   		BT_DBG("Unregistering netdev %s %p",
->   		       entry->netdev->name, entry->netdev);
-> -		unregister_netdev(entry->netdev);
-> +		lowpan_unregister_netdev(entry->netdev);
->   		kfree(entry);
->   	}
->   }
-> diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-> index 20c49c7..737c87a 100644
-> --- a/net/ieee802154/6lowpan/core.c
-> +++ b/net/ieee802154/6lowpan/core.c
-> @@ -161,9 +161,7 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
->   				wdev->needed_headroom;
->   	ldev->needed_tailroom = wdev->needed_tailroom;
->   
-> -	lowpan_netdev_setup(ldev, LOWPAN_LLTYPE_IEEE802154);
-> -
-> -	ret = register_netdevice(ldev);
-> +	ret = lowpan_register_netdevice(ldev, LOWPAN_LLTYPE_IEEE802154);
->   	if (ret < 0) {
->   		dev_put(wdev);
->   		return ret;
-> @@ -180,7 +178,7 @@ static void lowpan_dellink(struct net_device *ldev, struct list_head *head)
->   	ASSERT_RTNL();
->   
->   	wdev->ieee802154_ptr->lowpan_dev = NULL;
-> -	unregister_netdevice(ldev);
-> +	lowpan_unregister_netdevice(ldev);
->   	dev_put(wdev);
->   }
->   
 
-That is better compared to what you had in v2. I think this one is ready 
-for a real PATCH and applying.
+[50510.241632] BUG: unable to handle kernel NULL pointer dereference at 00000000000001a8
+[50510.241694] IP: [<ffffffffc01243f7>] bt_accept_unlink+0x47/0xa0 [bluetooth]
+[50510.241759] PGD 0 
+[50510.241776] Oops: 0002 [#1] SMP 
+[50510.241802] Modules linked in: rtl8192cu rtl_usb rtlwifi rtl8192c_common 8021q garp stp mrp llc rfcomm bnep nls_iso8859_1 intel_rapl x86_pkg_temp_thermal intel_powerclamp coretemp arc4 ath9k ath9k_common ath9k_hw ath kvm eeepc_wmi asus_wmi mac80211 snd_hda_codec_hdmi snd_hda_codec_realtek sparse_keymap crct10dif_pclmul snd_hda_codec_generic crc32_pclmul snd_hda_intel snd_hda_controller cfg80211 snd_hda_codec i915 snd_hwdep snd_pcm ghash_clmulni_intel snd_timer snd soundcore serio_raw cryptd drm_kms_helper drm i2c_algo_bit shpchp ath3k mei_me lpc_ich btusb bluetooth 6lowpan_iphc mei lp parport wmi video mac_hid psmouse ahci libahci r8169 mii
+[50510.242279] CPU: 0 PID: 934 Comm: krfcommd Not tainted 3.16.0-49-generic #65~14.04.1-Ubuntu
+[50510.242327] Hardware name: ASUSTeK Computer INC. VM40B/VM40B, BIOS 1501 12/09/2014
+[50510.242370] task: ffff8800d9068a30 ti: ffff8800d7a54000 task.ti: ffff8800d7a54000
+[50510.242413] RIP: 0010:[<ffffffffc01243f7>]  [<ffffffffc01243f7>] bt_accept_unlink+0x47/0xa0 [bluetooth]
+[50510.242480] RSP: 0018:ffff8800d7a57d58  EFLAGS: 00010246
+[50510.242511] RAX: 0000000000000000 RBX: ffff880119bb8c00 RCX: ffff880119bb8eb0
+[50510.242552] RDX: ffff880119bb8eb0 RSI: 00000000fffffe01 RDI: ffff880119bb8c00
+[50510.242592] RBP: ffff8800d7a57d60 R08: 0000000000000283 R09: 0000000000000001
+[50510.242633] R10: 0000000000000000 R11: 0000000000000000 R12: ffff8800d8da9eb0
+[50510.242673] R13: ffff8800d74fdb80 R14: ffff880119bb8c00 R15: ffff8800d8da9c00
+[50510.242715] FS:  0000000000000000(0000) GS:ffff88011fa00000(0000) knlGS:0000000000000000
+[50510.242761] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[50510.242794] CR2: 00000000000001a8 CR3: 0000000001c13000 CR4: 00000000001407f0
+[50510.242835] Stack:
+[50510.242849]  ffff880119bb8eb0 ffff8800d7a57da0 ffffffffc0124506 ffff8800d8da9eb0
+[50510.242899]  ffff8800d8da9c00 ffff8800d9068a30 0000000000000000 ffff8800d74fdb80
+[50510.242949]  ffff8800d6f85208 ffff8800d7a57e08 ffffffffc0159985 000000000000001f
+[50510.242999] Call Trace:
+[50510.243027]  [<ffffffffc0124506>] bt_accept_dequeue+0xb6/0x180 [bluetooth]
+[50510.243085]  [<ffffffffc0159985>] l2cap_sock_accept+0x125/0x220 [bluetooth]
+[50510.243128]  [<ffffffff810a1b30>] ? wake_up_state+0x20/0x20
+[50510.243163]  [<ffffffff8164946e>] kernel_accept+0x4e/0xa0
+[50510.243200]  [<ffffffffc05b97cd>] rfcomm_run+0x1ad/0x890 [rfcomm]
+[50510.243238]  [<ffffffffc05b9620>] ? rfcomm_process_rx+0x8a0/0x8a0 [rfcomm]
+[50510.243281]  [<ffffffff81091572>] kthread+0xd2/0xf0
+[50510.243312]  [<ffffffff810914a0>] ? kthread_create_on_node+0x1c0/0x1c0
+[50510.243353]  [<ffffffff8176e9d8>] ret_from_fork+0x58/0x90
+[50510.243387]  [<ffffffff810914a0>] ? kthread_create_on_node+0x1c0/0x1c0
+[50510.243424] Code: 00 48 8b 93 b8 02 00 00 48 8d 83 b0 02 00 00 48 89 51 08 48 89 0a 48 89 83 b0 02 00 00 48 89 83 b8 02 00 00 48 8b 83 c0 02 00 00 <66> 83 a8 a8 01 00 00 01 48 c7 83 c0 02 00 00 00 00 00 00 f0 ff 
+[50510.243685] RIP  [<ffffffffc01243f7>] bt_accept_unlink+0x47/0xa0 [bluetooth]
+[50510.243737]  RSP <ffff8800d7a57d58>
+[50510.243758] CR2: 00000000000001a8
+[50510.249457] ---[ end trace bb984f932c4e3ab3 ]---
 
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+Signed-off-by: Yichen Zhao <zhaoyichen@google.com>
+---
+ net/bluetooth/af_bluetooth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-regards
-Stefan Schmidt
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index a3bffd1..a542b99 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -188,8 +188,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+ 
+ 		/* FIXME: Is this check still needed */
+ 		if (sk->sk_state == BT_CLOSED) {
+-			release_sock(sk);
+ 			bt_accept_unlink(sk);
++			release_sock(sk);
+ 			continue;
+ 		}
+ 
+-- 
+2.6.0.rc2.230.g3dd15c0
