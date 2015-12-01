@@ -1,20 +1,85 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Date: Tue, 1 Dec 2015 11:03:26 +0100
-Message-ID: <CAEZxfGMGixpTkyyc_dyR+NuzGo_wuns9b=y8_A4TWvvve6xFXQ@mail.gmail.com>
-Subject: Is the GattServices property still updated?
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1448223634-23305-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+References: <1448223634-23305-1-git-send-email-andrzej.kaczmarek@codecoup.pl>
+Date: Tue, 1 Dec 2015 11:32:44 +0200
+Message-ID: <CABBYNZLWrFYBErcYFaO+jkG0_F6xOfVqOjCGzFmS_BjnF5u7ug@mail.gmail.com>
+Subject: Re: [PATCH v3 00/22] Add AVDTP/A2DP decoding to btmon
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm not sure to understand what is happening and I'd love your help there.
+Hi Andrzej,
 
-Is the "GattServices" device property still supposed to be updated
-once all remote GATT services of the device
-have been discovered and exported over D-Bus as mentioned in
-http://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/device-api.txt#n215
+On Sun, Nov 22, 2015 at 10:20 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@codecoup.pl> wrote:
+> Hi,
+>
+> Here's series of patches which adds decoding of AVDTP signalling channel
+> and A2DP codec capabilities information. Few things are missing:
+> - no fragmentation support
+> - some rarely used capabilities are not decoded
+> - ATRAC capabilities are not decoded
+>
+> Other that above, pretty much everything should be decoded.
+>
+> Changes in v2:
+> - fixed formatting according to comments
+> - updated commit messages to include decoded frames (except for few of
+>   them where I was not able trigger proper signalling)
+> - some minor issues fixed found during development
+>
+> Changes in v3:
+> - fixed comments from Szymon (few more raised offline)
+> - more minor issues fixed
+>
+>
+> Andrzej Kaczmarek (22):
+>   monitor/l2cap: Add channel sequence number
+>   monitor/avdtp: Add basic decoding of AVDTP signalling
+>   monitor/avdtp: Decode AVDTP_DISCOVER
+>   monitor/avdtp: Decode AVDTP_GET_CAPABILITIES
+>   monitor/avdtp: Decode AVDTP_SET_CONFIGURATION
+>   monitor/avdtp: Decode AVDTP_GET_CONFIGURATION
+>   monitor/avdtp: Decode AVDTP_RECONFIGURE
+>   monitor/avdtp: Decode AVDTP_OPEN
+>   monitor/avdtp: Decode AVDTP_START
+>   monitor/avdtp: Decode AVDTP_CLOSE
+>   monitor/avdtp: Decode AVDTP_SUSPEND
+>   monitor/avdtp: Decode AVDTP_ABORT
+>   monitor/avdtp: Decode AVDTP_SECURITY_CONTROL
+>   monitor/avdtp: Decode AVDTP_GET_ALL_CAPABILITIES
+>   monitor/avdtp: Decode AVDTP_DELAYREPORT
+>   monitor/avdtp: Decode basic Media Codec capabilities
+>   monitor/avdtp: Decode basic Content Protection capabilities
+>   monitor/a2dp: Decode SBC capabilities
+>   monitor/a2dp: Decode MPEG-1,2 capabilities
+>   monitor/a2dp: Decode AAC capabilities
+>   monitor/a2dp: Decode aptX capabilities
+>   monitor/a2dp: Decode LDAC capabilities
+>
+>  Makefile.tools     |   2 +
+>  android/Android.mk |   2 +
+>  monitor/a2dp.c     | 638 +++++++++++++++++++++++++++++++++++++++++++
+>  monitor/a2dp.h     |  26 ++
+>  monitor/avdtp.c    | 787 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  monitor/avdtp.h    |  24 ++
+>  monitor/l2cap.c    |  57 ++--
+>  monitor/l2cap.h    |   1 +
+>  8 files changed, 1520 insertions(+), 17 deletions(-)
+>  create mode 100644 monitor/a2dp.c
+>  create mode 100644 monitor/a2dp.h
+>  create mode 100644 monitor/avdtp.c
+>  create mode 100644 monitor/avdtp.h
+>
+> --
+> 2.6.2
 
-If so, does this DBUS messages trace looks good to you:
-http://pastebin.com/emxWB4w1?
+Applied, thanks.
+
+
+-- 
+Luiz Augusto von Dentz
