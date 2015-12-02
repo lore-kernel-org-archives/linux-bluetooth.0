@@ -1,34 +1,32 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH 03/19] bluetooth: hci_ldisc: Remove dead code
+Subject: Re: [PATCH 1/2] Bluetooth: Clean up advertising initialization in powered_update_hci()
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1448660356-6328-4-git-send-email-peter@hurleysoftware.com>
-Date: Tue, 1 Dec 2015 21:47:38 -1000
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.cz>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Andi Kleen <andi@firstfloor.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <7379E6C6-6CCE-4A6F-8232-25218ED6A34E@holtmann.org>
-References: <1448660356-6328-1-git-send-email-peter@hurleysoftware.com> <1448660356-6328-4-git-send-email-peter@hurleysoftware.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1448875305-1347-2-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 1 Dec 2015 21:45:00 -1000
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6FBA880E-720C-4A80-A12F-B2A87843BFB0@holtmann.org>
+References: <1448875305-1347-1-git-send-email-johan.hedberg@gmail.com> <1448875305-1347-2-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+Hi Johan,
 
-> The N_HCI ldisc does not define a flush_buffer() ldisc method, so
-> the check when opening the ldisc is always false.
+> The logic in powered_update_hci() to initialize the advertising data &
+> state is a bit more complicated than it needs to be. It was previously
+> not doing anything if HCI_LE_ENABLED wasn't set, but this was not
+> obvious by quickly looking at the code. Now the conditions for the
+> various actions are more explicit. Another simplification is due to
+> the fact that __hci_req_schedule_adv_instance() takes care of setting
+> hdev->cur_adv_instance so there's no need to set it before calling the
+> function.
 > 
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: <linux-bluetooth@vger.kernel.org>
-> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> drivers/bluetooth/hci_ldisc.c | 8 +-------
-> 1 file changed, 1 insertion(+), 7 deletions(-)
+> net/bluetooth/hci_request.c | 30 ++++++++++++------------------
+> 1 file changed, 12 insertions(+), 18 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
