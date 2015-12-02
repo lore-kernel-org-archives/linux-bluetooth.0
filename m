@@ -1,90 +1,21 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Wed, 2 Dec 2015 10:46:06 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Don't treat connection timeout as a failure
-Message-ID: <20151202084606.GB13305@t440s.lan>
-References: <1448961769-20546-1-git-send-email-johan.hedberg@gmail.com>
- <7DB5C188-FDEA-45D4-B02D-36FA5454563F@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <7DB5C188-FDEA-45D4-B02D-36FA5454563F@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Konrad Antoniuk <konrad18622@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Subject: Need help with bug in ftp-client executable from bluez-5.24 package
+Message-Id: <6AF6FACF-FE0C-446F-9FD1-BBAD20EBF8CC@gmail.com>
+Date: Wed, 2 Dec 2015 00:37:47 -0800
+To: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Tue, Dec 01, 2015, Marcel Holtmann wrote:
-> > When we're doing background scanning and connection attempts it's
-> > possible we timeout trying to connect and go back to scanning again.
-> > The timeout triggers a HCI_LE_Create_Connection_Cancel which will
-> > trigger a Connection Complete with "Unknown Connection Identifier"
-> > error status. Since we go back to scanning this isn't really a failure
-> > and shouldn't be presented as such to user space through mgmt.
-> > 
-> > The exception to this is if the connection attempt was due to an
-> > explicit request on an L2CAP socket (indicated by
-> > params->explicit_connect being true). Since the socket will get an
-> > error it's consistent to also notify the failure on mgmt in this case.
-> > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > ---
-> > net/bluetooth/hci_conn.c | 12 ++++++++++--
-> > 1 file changed, 10 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index f28741d78e0b..de7fa9f78cbe 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -668,8 +668,16 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
-> > 
-> > 	conn->state = BT_CLOSED;
-> > 
-> > -	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
-> > -			    status);
-> > +	/* If the failure was due to a timeout and cancelation of the
-> > +	 * attempt there's no point of notifying failure since we'll go
-> > +	 * back to keep trying to connect. The only exception is
-> > +	 * explicit connect requests where a timeout + cancel does
-> > +	 * indicate an actual failure.
-> > +	 */
-> > +	if (status != HCI_ERROR_UNKNOWN_CONN_ID ||
-> > +	    (params && params->explicit_connect))
-> > +		mgmt_connect_failed(hdev, &conn->dst, conn->type,
-> > +				    conn->dst_type, status);
-> 
-> are we okay with the oversimplified error handling. I think the HCI is
-> pretty clear that an Unknown Connection Identifier error can only be
-> traced back to the fact that LE Create Connection Cancel was issued,
-> but the connection had already been established.
+I’m looking to resolve an issue with one of the programs from the bluez package. I’m using the ftp-client python executable from the test folder and having trouble with transferring larger files. I’m running the program on the Intel Edison which runs Embedded Linux - Yocto. Initially the program worked for smaller files, 6.3 kB in size, but when I began experimenting with data files only double the size I began to run into trouble. Whenever the dbus signaled and called the callback method properties_changed, I initially received an error that the global variable value was left uninitialized. I solved that problem by adding the line value = properties[“Transferred”] at line 98 in the program, just before the speed calculation. This removed any reported errors received but the larger files still don’t transfer successfully. It seems whenever the signal’s callback function completes, the transfer doesn’t continue. I’ve attempted to call the Resume method from the Trans
+ fer Interface but I must be doing something wrong because I’m fairly new to Python and debugging a program that uses dbus. 
 
-Where in the spec do you conclude this from? The section for
-HCI_LE_Create_Connection_Cancel states:
+To make it clear, the ftp-client executable from the test folder in the blues package works whenever the file transfer is completed before the Bus signals back. I’ve fixed an uninitialized variable bug but I still can’t get larger files to successfully transfer. I appreciate any guidance in correcting the source code and fixing this bug.
 
-"
-If the cancellation was successful then, after the Command Complete
-event for the LE_Create_Connection_Cancel command:
+Thanks,
 
- - if the LE Enhanced Connection Complete event is unmasked, then that
-   event shall be sent.
- - otherwise the LE Connection Complete event shall be sent.
-
-In either case, the event shall be sent with the error code Unknown
-Connection Identifier (0x02).
-"
-
-That doesn't talk anything about a connection already having been
-established but rather a successful cancellation. The
-hci_le_conn_failed() gets called from the event handler for LE
-Connection Complete, so this error code here means that the cancellation
-was successful.
-
-> Can you cause that error also with LE Create Connection itself? I
-> doubt it, but we want to be 100% clear here and maybe also be event
-> clear in the the comment on what kind of errors we are catching and
-> why. I think citing the spec might be a good idea here as well.
-
-I can clarify in the comment that specifically Unknown Conn ID means
-that the cancellation was successful.
-
-Johan
+Konrad  
