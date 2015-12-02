@@ -1,62 +1,30 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Simon Fels <simon.fels@canonical.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Simon Fels <simon.fels@canonical.com>
-Subject: [PATCH] audio/media: return empty string when player name is not available
-Date: Wed,  2 Dec 2015 12:01:38 +0100
-Message-Id: <1449054098-31515-1-git-send-email-simon.fels@canonical.com>
+MIME-Version: 1.0
+In-Reply-To: <6AF6FACF-FE0C-446F-9FD1-BBAD20EBF8CC@gmail.com>
+References: <6AF6FACF-FE0C-446F-9FD1-BBAD20EBF8CC@gmail.com>
+Date: Wed, 2 Dec 2015 12:57:28 +0200
+Message-ID: <CABBYNZKGNtvEGAKT6KL7u2eta=urSQoHZw7x8ChwFA6X4xaxjw@mail.gmail.com>
+Subject: Re: Need help with bug in ftp-client executable from bluez-5.24 package
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Konrad Antoniuk <konrad18622@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the name for the player is set as NULL we will crash later on
-so taking a valid default is required.
+Hi Konrad,
 
-Crash observed without this:
+On Wed, Dec 2, 2015 at 10:37 AM, Konrad Antoniuk <konrad18622@gmail.com> wrote:
+> Hi,
+>
+> I’m looking to resolve an issue with one of the programs from the bluez package. I’m using the ftp-client python executable from the test folder and having trouble with transferring larger files. I’m running the program on the Intel Edison which runs Embedded Linux - Yocto. Initially the program worked for smaller files, 6.3 kB in size, but when I began experimenting with data files only double the size I began to run into trouble. Whenever the dbus signaled and called the callback method properties_changed, I initially received an error that the global variable value was left uninitialized. I solved that problem by adding the line value = properties[“Transferred”] at line 98 in the program, just before the speed calculation. This removed any reported errors received but the larger files still don’t transfer successfully. It seems whenever the signal’s callback function completes, the transfer doesn’t continue. I’ve attempted to call the Resume method from the Tra
+ nsfer Interface but I must be doing something wrong because I’m fairly new to Python and debugging a program that uses dbus.
+>
+> To make it clear, the ftp-client executable from the test folder in the blues package works whenever the file transfer is completed before the Bus signals back. I’ve fixed an uninitialized variable bug but I still can’t get larger files to successfully transfer. I appreciate any guidance in correcting the source code and fixing this bug.
 
-Program terminated with signal SIGSEGV, Segmentation fault.
-0  strlen () at ../sysdeps/arm/armv6t2/strlen.S:85
-85      ../sysdeps/arm/armv6t2/strlen.S: No such file or directory.
-(gdb) bt
-0  strlen () at ../sysdeps/arm/armv6t2/strlen.S:85
-1  0xb6f13ebc in avrcp_handle_media_player_list (session=0xb8f339c0,
-    session=0xb8f339c0, end_item=<optimized out>, start_item=<optimized out>,
-    pdu=0xb8f43283) at profiles/audio/avrcp.c:1917
-2  avrcp_handle_get_folder_items (session=0xb8f339c0, pdu=0xb8f43283,
-    transaction=<optimized out>) at profiles/audio/avrcp.c:1968
-3  0xb6f13fb8 in handle_browsing_pdu (conn=<optimized out>,
-    transaction=<optimized out>, operands=0xb8f43283 "q\b",
-    operand_count=<optimized out>, user_data=0xb8f339c0)
-    at profiles/audio/avrcp.c:2028
-4  0xb6f0f088 in session_browsing_cb (chan=<optimized out>,
-    cond=<optimized out>, data=0xb8f3ba28) at profiles/audio/avctp.c:930
-5  0xb6e19e90 in g_main_dispatch (context=0xb8f28100)
-    at /build/buildd/glib2.0-2.44.1/./glib/gmain.c:3122
-6  g_main_context_dispatch (context=context@entry=0xb8f28100)
-    at /build/buildd/glib2.0-2.44.1/./glib/gmain.c:3737
-7  0xb6e1a114 in g_main_context_iterate (context=0xb8f28100,
-    block=block@entry=1, dispatch=dispatch@entry=1, self=<optimized out>)
-    at /build/buildd/glib2.0-2.44.1/./glib/gmain.c:3808
-8  0xb6e1a3b0 in g_main_loop_run (loop=0xb8f28030)
-    at /build/buildd/glib2.0-2.44.1/./glib/gmain.c:4002
-9  0xb6efef3e in main (argc=1, argv=0xbebdde04) at src/main.c:661
----
- profiles/audio/media.c | 3 +++
- 1 file changed, 3 insertions(+)
+Have you tried with obexctl? ftp-client is actually deprecated so
+chances are that it doesn't work properly anymore.
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 69070bf..60eb734 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -1018,6 +1018,9 @@ static const char *get_player_name(void *user_data)
- {
- 	struct media_player *mp = user_data;
- 
-+	if (!mp->name)
-+		return "";
-+
- 	return mp->name;
- }
- 
+
 -- 
-2.5.0
-
+Luiz Augusto von Dentz
