@@ -1,26 +1,34 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH 1/5] Bluetooth: hci_intel: Use shorter timeout for HCI commands
+Subject: Re: [PATCH 03/19] bluetooth: hci_ldisc: Remove dead code
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1448650563-9075-1-git-send-email-loic.poulain@intel.com>
-Date: Tue, 1 Dec 2015 21:48:56 -1000
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <785CD16F-4E0F-4EEE-B0A7-C0E334A2BA8F@holtmann.org>
-References: <1448650563-9075-1-git-send-email-loic.poulain@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1448660356-6328-4-git-send-email-peter@hurleysoftware.com>
+Date: Tue, 1 Dec 2015 21:47:38 -1000
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.cz>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Andi Kleen <andi@firstfloor.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <7379E6C6-6CCE-4A6F-8232-25218ED6A34E@holtmann.org>
+References: <1448660356-6328-1-git-send-email-peter@hurleysoftware.com> <1448660356-6328-4-git-send-email-peter@hurleysoftware.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi Peter,
 
-> Use the standard HCI_CMD_TIMEOUT(1s) for HCI command instead of
-> HCI_INIT_TIMEOUT(10s) which is not justified in these cases.
+> The N_HCI ldisc does not define a flush_buffer() ldisc method, so
+> the check when opening the ldisc is always false.
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: <linux-bluetooth@vger.kernel.org>
+> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 > ---
-> drivers/bluetooth/hci_intel.c | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
+> drivers/bluetooth/hci_ldisc.c | 8 +-------
+> 1 file changed, 1 insertion(+), 7 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
