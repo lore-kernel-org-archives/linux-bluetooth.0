@@ -1,36 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH 2/2] Bluetooth: Clean up current advertising instance tracking
+Subject: Re: [PATCH] Bluetooth: Use continuous scanning when creating LE connections
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1448875305-1347-3-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 1 Dec 2015 21:44:58 -1000
+In-Reply-To: <1448880520-12810-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 1 Dec 2015 21:42:34 -1000
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F95870A8-1981-4E50-8726-AB19005B5184@holtmann.org>
-References: <1448875305-1347-1-git-send-email-johan.hedberg@gmail.com> <1448875305-1347-3-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <A56C1B29-8433-42B7-80E5-580E28BBCB53@holtmann.org>
+References: <1448880520-12810-1-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> We can simplify a lot of code by making sure hdev->cur_adv_instance is
-> always up-to-date. This allows e.g. the removal of the
-> get_current_adv_instance() helper function and the special
-> HCI_ADV_CURRENT value. This patch also makes selecting instance 0x00
-> explicit in the various calls where advertising instances aren't
-> enabled, e.g. when HCI_ADVERTISING is set or we've just finished
-> enabling LE.
+> All LE connections are now triggered through a preceding passive scan
+> and waiting for a connectable advertising report. This means we've got
+> the best possible guarantee that the device is within range and should
+> be able to request the controller to perform continuous scanning. This
+> way we minimize the risk that we miss out on any advertising packets.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/hci_core.c    | 12 +++++---
-> net/bluetooth/hci_request.c | 68 ++++++++++-----------------------------------
-> net/bluetooth/hci_request.h |  8 ++----
-> net/bluetooth/mgmt.c        | 10 ++++---
-> 4 files changed, 32 insertions(+), 66 deletions(-)
+> net/bluetooth/hci_conn.c | 6 +++++-
+> 1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index e2600213cd50..f28741d78e0b 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -726,8 +726,12 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
+> 	if (hci_update_random_address(req, false, &own_addr_type))
+> 		return;
+> 
+> +	/* Set interval and window to same value to enable continuous
+> +	 * scanning.
+> +	 */
 
-patch has been applied to bluetooth-next tree.
+I think we want to phrase this as using a scan window as large as the scan interval to trigger a full duty / continuous scan. Just to be a bit more clearer.
+
+> 	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
+> -	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
+> +	cp.scan_window = cp.scan_interval;
+> +
+
+And I know you try to optimize the cpu_to_le16 out here, but honestly I would prefer this:
+
+	cp.scan_window = cpu_to_le16(hdev->le_scan_interval);
 
 Regards
 
