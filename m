@@ -1,54 +1,88 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: Unknown Connection Identifier
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20151201084107.GA11107@t440s.lan>
-Date: Tue, 1 Dec 2015 21:37:05 -1000
-Cc: =?utf-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>,
-	Szymon Janc <szymon.janc@codecoup.pl>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <487A3350-04EA-43F5-AAD0-4B64005D108E@holtmann.org>
-References: <CAEZxfGPTxwUZzU+3XSV-uiN+DMz+hyOKiiZfgF+oD6pp=-XiOA@mail.gmail.com> <AAC95ACC-36E4-4618-8F49-53F78AE93AA6@holtmann.org> <2045332.GytFuFKTvp@ix> <CAEZxfGOdyZat1evKm0Jfwg=knuigGdfK_wVqS8NG=zFAY3aRXg@mail.gmail.com> <2DBBB005-93A7-47ED-8E88-1D6B92ACCC07@holtmann.org> <20151201084107.GA11107@t440s.lan>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: s.syam@samsung.com
+To: linux-bluetooth@vger.kernel.org
+References: <1448298112-20501-1-git-send-email-s.syam@samsung.com>
+In-reply-to: <1448298112-20501-1-git-send-email-s.syam@samsung.com>
+Subject: RE: [PATCH v0] avdtp: Fix A2DP disconnection with ADVANCED_AUDIO_UUID
+ only carkit
+Date: Wed, 02 Dec 2015 11:26:33 +0530
+Message-id: <02ab01d12cc6$3d9a8aa0$b8cf9fe0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=ks_c_5601-1987
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+ping
 
->>>> HCI Event: Command Complete (0x0e) plen 4                                           [hci0] 17.672048
->>>     LE Create Connection Cancel (0x08|0x000e) ncmd 1
->>>       Status: Success (0x00)
->>>> HCI Event: LE Meta Event (0x3e) plen 19                                             [hci0] 17.674036
->>>     LE Connection Complete (0x01)
->>>       Status: Unknown Connection Identifier (0x02)
->>>       Handle: 32
->>>       Role: Master (0x00)
->>>       Peer address type: Public (0x00)
->>>       Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
->>>       Connection interval: 67.50 msec (0x0036)
->>>       Connection latency: 0.00 msec (0x0000)
->>>       Supervision timeout: 420 msec (0x002a)
->>>       Master clock accuracy: 0x00
->>> @ Connect Failed: 88:0F:10:9D:EB:42 (1) status 0x02
->> 
->> This one still needs to be fixed. It is a bug. The implementation is
->> too naive. The unknown connection identifier is actually the success
->> case for LE Create Connection Cancel command. And since we keep trying
->> until the connection timeout hits, this is not an error at this point.
-> 
-> I think we need to differentiate between explicit connection requests
-> (L2CAP socket connect()) and Add Device based connections. For the
-> former we probably do want the Connect Failed since that's consistent
-> with the behavior you see when operating the L2CAP socket. For the
-> latter where we just go back to trying again, so the event doesn't
-> really describe what's going on.
+-----Original Message-----
+From: Syam Sidhardhan [mailto:s.syam@samsung.com] 
+Sent: Monday, November 23, 2015 10:32 PM
+To: linux-bluetooth@vger.kernel.org
+Cc: s.syam@samsung.com
+Subject: [PATCH v0] avdtp: Fix A2DP disconnection with ADVANCED_AUDIO_UUID
+only carkit
 
-are you sure about that. I think we need to define when we want the mgmt connect failed event to show up. Does it make sense that it shows up for connection attempts that are not initiated by mgmt?
+Few Carkits Like "VW MI" & "Seat BT AC" will register the ADVANCED AUDIO
+UUID rather than A2DP SINK UUID. Once the signalling channel is initiated
+by the remote sink device and streaming channel is not yet initiated by
+sink, the source will check the remote device SINK UUID to establish the
+streaming channel and will close the signalling channel if SINK UUID is not
+present.
 
-I mean, what is the benefit of a connection failed event if you can not tell that something actually tried to connect in the first. So if you try to connect via L2CAP, we are just getting a failure and do not know what triggered it. How is that helpful?
+In addition to A2DP SINK UUID, this patch checks for the ADVANCED AUDIO
+UUID as well.
 
-Regards
+Logs:
+bluetoothd:
+10:02:31 profiles/audio/a2dp.c:confirm_cb() AVDTP: incoming connect from
+E0:75:0A:36:09:FD
+10:02:31 profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP: connected
+signaling channel to E0:75:0A:36:09:FD
+10:02:31 profiles/audio/avdtp.c:avdtp_connect_cb() AVDTP imtu=672, omtu=672
+10:02:31 profiles/audio/avdtp.c:set_disconnect_timer() name : "Seat BT AC"
+/* Extra print */ ...
+...
+10:02:32 profiles/audio/avdtp.c:disconnect_timeout()
+10:02:32 profiles/audio/avdtp.c:connection_lost() Disconnected from
+E0:75:0A:36:09:FD
+10:02:32 profiles/audio/a2dp.c:channel_remove() chan 0xb7005348
+10:02:32 profiles/audio/avdtp.c:connection_lost() 0xb7005d48: ref=0
+10:02:32 profiles/audio/avdtp.c:avdtp_free() 0xb7005d48
 
-Marcel
+DB file:
+[General]
+Name=Seat BT AC
+Class=0x340408
+SupportedTechnologies=BR/EDR;
+Trusted=false
+Blocked=false
+Services=0000110c-0000-1000-8000-00805f9b34fb; //AVRCP_TARGET_UUID 0000110d-
+0000-1000-8000-00805f9b34fb; //ADVANCED_AUDIO_UUID 0000110e-0000-1000-8000-
+00805f9b34fb; //AVRCP_REMOTE_UUID 0000111e-0000-1000-8000-00805f9b34fb;
+//HFP_HS_UUID 0000112f-0000-1000-8000-00805f9b34fb; //PBAP_UUID
+---
+ profiles/audio/avdtp.c |    6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c index 52ee767..
+ac1939b 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -1138,6 +1138,12 @@ static gboolean disconnect_timeout(gpointer
+user_data)
+ 		return FALSE;
+ 	}
+ 
++	service = btd_device_get_service(session->device,
+ADVANCED_AUDIO_UUID);
++	if (service && stream_setup) {
++		sink_setup_stream(service, session);
++		return FALSE;
++	}
++
+ 	service = btd_device_get_service(session->device, A2DP_SOURCE_UUID);
+ 	if (service && stream_setup) {
+ 		source_setup_stream(service, session);
+--
+1.7.9.5
 
