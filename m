@@ -1,70 +1,90 @@
 Return-Path: <johan.hedberg@gmail.com>
-Date: Wed, 2 Dec 2015 10:52:24 +0200
+Date: Wed, 2 Dec 2015 10:46:06 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?iso-8859-1?Q?Fran=E7ois?= Beaufort <beaufort.francois@gmail.com>,
-	Szymon Janc <szymon.janc@codecoup.pl>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Unknown Connection Identifier
-Message-ID: <20151202085224.GC13305@t440s.lan>
-References: <CAEZxfGPTxwUZzU+3XSV-uiN+DMz+hyOKiiZfgF+oD6pp=-XiOA@mail.gmail.com>
- <AAC95ACC-36E4-4618-8F49-53F78AE93AA6@holtmann.org>
- <2045332.GytFuFKTvp@ix>
- <CAEZxfGOdyZat1evKm0Jfwg=knuigGdfK_wVqS8NG=zFAY3aRXg@mail.gmail.com>
- <2DBBB005-93A7-47ED-8E88-1D6B92ACCC07@holtmann.org>
- <20151201084107.GA11107@t440s.lan>
- <487A3350-04EA-43F5-AAD0-4B64005D108E@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Don't treat connection timeout as a failure
+Message-ID: <20151202084606.GB13305@t440s.lan>
+References: <1448961769-20546-1-git-send-email-johan.hedberg@gmail.com>
+ <7DB5C188-FDEA-45D4-B02D-36FA5454563F@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <487A3350-04EA-43F5-AAD0-4B64005D108E@holtmann.org>
+In-Reply-To: <7DB5C188-FDEA-45D4-B02D-36FA5454563F@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Tue, Dec 01, 2015, Marcel Holtmann wrote:
-> >>>> HCI Event: Command Complete (0x0e) plen 4                                           [hci0] 17.672048
-> >>>     LE Create Connection Cancel (0x08|0x000e) ncmd 1
-> >>>       Status: Success (0x00)
-> >>>> HCI Event: LE Meta Event (0x3e) plen 19                                             [hci0] 17.674036
-> >>>     LE Connection Complete (0x01)
-> >>>       Status: Unknown Connection Identifier (0x02)
-> >>>       Handle: 32
-> >>>       Role: Master (0x00)
-> >>>       Peer address type: Public (0x00)
-> >>>       Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
-> >>>       Connection interval: 67.50 msec (0x0036)
-> >>>       Connection latency: 0.00 msec (0x0000)
-> >>>       Supervision timeout: 420 msec (0x002a)
-> >>>       Master clock accuracy: 0x00
-> >>> @ Connect Failed: 88:0F:10:9D:EB:42 (1) status 0x02
-> >> 
-> >> This one still needs to be fixed. It is a bug. The implementation is
-> >> too naive. The unknown connection identifier is actually the success
-> >> case for LE Create Connection Cancel command. And since we keep trying
-> >> until the connection timeout hits, this is not an error at this point.
+> > When we're doing background scanning and connection attempts it's
+> > possible we timeout trying to connect and go back to scanning again.
+> > The timeout triggers a HCI_LE_Create_Connection_Cancel which will
+> > trigger a Connection Complete with "Unknown Connection Identifier"
+> > error status. Since we go back to scanning this isn't really a failure
+> > and shouldn't be presented as such to user space through mgmt.
 > > 
-> > I think we need to differentiate between explicit connection requests
-> > (L2CAP socket connect()) and Add Device based connections. For the
-> > former we probably do want the Connect Failed since that's consistent
-> > with the behavior you see when operating the L2CAP socket. For the
-> > latter where we just go back to trying again, so the event doesn't
-> > really describe what's going on.
+> > The exception to this is if the connection attempt was due to an
+> > explicit request on an L2CAP socket (indicated by
+> > params->explicit_connect being true). Since the socket will get an
+> > error it's consistent to also notify the failure on mgmt in this case.
+> > 
+> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> > ---
+> > net/bluetooth/hci_conn.c | 12 ++++++++++--
+> > 1 file changed, 10 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index f28741d78e0b..de7fa9f78cbe 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -668,8 +668,16 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+> > 
+> > 	conn->state = BT_CLOSED;
+> > 
+> > -	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
+> > -			    status);
+> > +	/* If the failure was due to a timeout and cancelation of the
+> > +	 * attempt there's no point of notifying failure since we'll go
+> > +	 * back to keep trying to connect. The only exception is
+> > +	 * explicit connect requests where a timeout + cancel does
+> > +	 * indicate an actual failure.
+> > +	 */
+> > +	if (status != HCI_ERROR_UNKNOWN_CONN_ID ||
+> > +	    (params && params->explicit_connect))
+> > +		mgmt_connect_failed(hdev, &conn->dst, conn->type,
+> > +				    conn->dst_type, status);
 > 
-> are you sure about that. I think we need to define when we want the
-> mgmt connect failed event to show up. Does it make sense that it shows
-> up for connection attempts that are not initiated by mgmt?
-> 
-> I mean, what is the benefit of a connection failed event if you can
-> not tell that something actually tried to connect in the first. So if
-> you try to connect via L2CAP, we are just getting a failure and do not
-> know what triggered it. How is that helpful?
+> are we okay with the oversimplified error handling. I think the HCI is
+> pretty clear that an Unknown Connection Identifier error can only be
+> traced back to the fact that LE Create Connection Cancel was issued,
+> but the connection had already been established.
 
-I could think of at least one case: a device uses security mode 3 and we
-connect to it via L2CAP. This triggers a PIN Code Request event, however
-before we answer it the remote side cancels the connection/pairing
-triggering a connect complete with failure status. In this case
-bluetoothd should notify the agent to stop requesting for the PIN. Quite
-a far stretched scenario (and I might even be wrong about it) but I
-wouldn't be so quick to dismiss this event for non-mgmt actions.
+Where in the spec do you conclude this from? The section for
+HCI_LE_Create_Connection_Cancel states:
+
+"
+If the cancellation was successful then, after the Command Complete
+event for the LE_Create_Connection_Cancel command:
+
+ - if the LE Enhanced Connection Complete event is unmasked, then that
+   event shall be sent.
+ - otherwise the LE Connection Complete event shall be sent.
+
+In either case, the event shall be sent with the error code Unknown
+Connection Identifier (0x02).
+"
+
+That doesn't talk anything about a connection already having been
+established but rather a successful cancellation. The
+hci_le_conn_failed() gets called from the event handler for LE
+Connection Complete, so this error code here means that the cancellation
+was successful.
+
+> Can you cause that error also with LE Create Connection itself? I
+> doubt it, but we want to be 100% clear here and maybe also be event
+> clear in the the comment on what kind of errors we are catching and
+> why. I think citing the spec might be a good idea here as well.
+
+I can clarify in the comment that specifically Unknown Conn ID means
+that the cancellation was successful.
 
 Johan
