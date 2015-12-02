@@ -1,106 +1,174 @@
-Return-Path: <chevalliersebmax@gmail.com>
-From: Maxime CHEVALLIER <chevalliersebmax@gmail.com>
-To: maxime.chevallier@openwide.fr,
-	marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Cc: Maxime Chevallier <chevalliersebmax@gmail.com>
-Subject: [PATCH] lib: Added 'LE_SET_ADVERTISING_PARAMETERS' wrapper function to hci lib.
-Date: Wed,  2 Dec 2015 14:35:39 +0100
-Message-Id: <1449063339-3478-1-git-send-email-chevalliersebmax@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <001c01d12905$cd41ec80$67c5c580$@samsung.com>
+References: <1445346988-12782-1-git-send-email-bharat.panda@samsung.com>
+	<1445346988-12782-2-git-send-email-bharat.panda@samsung.com>
+	<001c01d12905$cd41ec80$67c5c580$@samsung.com>
+Date: Wed, 2 Dec 2015 15:31:51 +0200
+Message-ID: <CABBYNZLHJo+eQ1SCughLL1QUmsJRDSmanKb_08bSg4fbYE7m9A@mail.gmail.com>
+Subject: Re: [PATCH 2/3] audio/avrcp: Handle PlaylistChanged signal
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Maxime Chevallier <chevalliersebmax@gmail.com>
+Hi Bharat,
 
-Hi all,
+On Fri, Nov 27, 2015 at 1:21 PM, Bharat Bhusan Panda
+<bharat.panda@samsung.com> wrote:
+> ping
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of Bharat Panda
+>> Sent: Tuesday, October 20, 2015 6:46 PM
+>> To: linux-bluetooth@vger.kernel.org
+>> Cc: cpgs@samsung.com; Bharat Panda
+>> Subject: [PATCH 2/3] audio/avrcp: Handle PlaylistChanged signal
+>>
+>> Added signal handler for "PlaylistChanged" on MediaPlayer2.Playlists
+>> interface.
+>> ---
+>>  profiles/audio/media.c | 79
+>> ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 79 insertions(+)
+>>
+>> diff --git a/profiles/audio/media.c b/profiles/audio/media.c index
+>> 1b5246d..94fce79 100644
+>> --- a/profiles/audio/media.c
+>> +++ b/profiles/audio/media.c
+>> @@ -113,6 +113,7 @@ struct media_player {
+>>       guint                   watch;
+>>       guint                   properties_watch;
+>>       guint                   seek_watch;
+>> +     guint                   playlist_watch;
+>>       char                    *status;
+>>       uint32_t                position;
+>>       uint32_t                duration;
+>> @@ -973,6 +974,7 @@ static void media_player_free(gpointer data)
+>>       g_dbus_remove_watch(conn, mp->watch);
+>>       g_dbus_remove_watch(conn, mp->properties_watch);
+>>       g_dbus_remove_watch(conn, mp->seek_watch);
+>> +     g_dbus_remove_watch(conn, mp->playlist_watch);
+>>
+>>       if (mp->track)
+>>               g_hash_table_unref(mp->track);
+>> @@ -1913,6 +1915,76 @@ static gboolean
+>> position_changed(DBusConnection *connection, DBusMessage *msg,
+>>       return TRUE;
+>>  }
+>>
+>> +static struct media_playlist *find_playlist_by_id(struct media_player
+> *mp,
+>> +                                             char *playlist_id)
+>> +{
+>> +     GSList *l;
+>> +
+>> +     for (l = mp->playlists; l; l = l->next) {
+>> +             struct media_playlist *playlist = l->data;
+>> +
+>> +             if (g_strcmp0(playlist->id, playlist_id) == 0) {
+>> +                     return playlist;
+>> +             }
+>> +     }
+>> +
+>> +     return NULL;
+>> +}
+>> +
+>> +static gboolean playlist_changed(DBusConnection *connection,
+>> +                                             DBusMessage *msg,
+>> +                                             void *user_data)
+>> +{
+>> +     struct media_player *mp = user_data;
+>> +     struct media_playlist *playlist;
+>> +     DBusMessageIter iter;
+>> +     DBusMessageIter entry;
+>> +     char *playlist_id;
+>> +     char *name;
+>> +     char *icon;
+>> +
+>> +     dbus_message_iter_init(msg, &iter);
+>> +     if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRUCT)
+>> +             return FALSE;
+>> +
+>> +     dbus_message_iter_recurse(&iter, &entry);
+>> +
+>> +     if (dbus_message_iter_get_arg_type(&entry) !=
+>> +                     DBUS_TYPE_OBJECT_PATH)
+>> +             return FALSE;
+>> +
+>> +     dbus_message_iter_get_basic(&entry, &playlist_id);
+>> +
+>> +     dbus_message_iter_next(&entry);
+>> +     if (dbus_message_iter_get_arg_type(&entry) !=
+>> +                     DBUS_TYPE_STRING)
+>> +             return FALSE;
+>> +
+>> +     dbus_message_iter_get_basic(&entry, &name);
+>> +
+>> +     dbus_message_iter_next(&entry);
+>> +     if (dbus_message_iter_get_arg_type(&entry) !=
+>> +                     DBUS_TYPE_STRING)
+>> +             return FALSE;
+>> +
+>> +     dbus_message_iter_get_basic(&entry, &icon);
+>> +
+>> +     playlist = find_playlist_by_id(mp, playlist_id);
+>> +
+>> +     if (playlist) {
+>> +             playlist->name = g_strdup(name);
+>> +             playlist->icon = g_strdup(icon);
+>> +     } else {
+>> +             playlist = g_new0(struct media_playlist, 1);
+>> +
+>> +             playlist->id = playlist_id;
+>> +             playlist->name = g_strdup(name);
+>> +             playlist->icon = g_strdup(icon);
+>> +     }
 
-This patch add the hci_le_set_advertising_parameters function
-to hci lib. This is something I needed and tested, on a Marvell
-88W8887.
+Change this to if (!playlist) { new0.. the you can have name and icon
+set after that since playlist would be set one way or the other.
 
-I already tried to submit this patch to the ML, but I think some
-misconfiguration on my company's mail server caused the mail to
-be dropped.
+>> +     return TRUE;
+>> +}
+>> +
+>>  static struct media_player *media_player_create(struct media_adapter
+>> *adapter,
+>>                                               const char *sender,
+>>                                               const char *path,
+>> @@ -1995,6 +2067,13 @@ static DBusMessage
+>> *register_player(DBusConnection *conn, DBusMessage *msg,
+>>       if (!get_playlists(mp))
+>>               DBG("Error fetching playlists");
+>>
+>> +     mp->playlist_watch = g_dbus_add_signal_watch(conn,
+>> +                                     sender, path,
+>> +
+>>       MEDIA_PLAYER_PLAYLIST_INTERFACE,
+>> +                                     "PlaylistChanged",
+>> +                                     playlist_changed,
+>> +                                     mp, NULL);
+>> +
+>>       return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);  }
+>>
+>> --
+>> 1.9.1
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+>> the body of a message to majordomo@vger.kernel.org More majordomo
+>> info at  http://vger.kernel.org/majordomo-info.html
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Sorry for the spam if you actually received it previously.
 
-Please tell me anything I can do to make this patch better, I am
-not quite sure for example that I named correctly the function.
 
-Regards,
-
-Maxime Chevallier
-
-Signed-off-by: Maxime Chevallier <chevalliersebmax@gmail.com>
----
- lib/hci.c     | 39 +++++++++++++++++++++++++++++++++++++++
- lib/hci_lib.h |  5 +++++
- 2 files changed, 44 insertions(+)
-
-diff --git a/lib/hci.c b/lib/hci.c
-index c25be9e..4472dd1 100644
---- a/lib/hci.c
-+++ b/lib/hci.c
-@@ -2996,6 +2996,45 @@ int hci_le_set_advertise_enable(int dd, uint8_t enable, int to)
- 	return 0;
- }
- 
-+int hci_le_set_advertising_parameters(int dd, uint16_t min_interval,
-+                                        uint16_t max_interval, uint8_t advtype,
-+                                        uint8_t own_bdaddr_type, uint8_t direct_bdaddr_type,
-+                                        const bdaddr_t *direct_bdaddr, uint8_t chan_map,
-+                                        uint8_t filter, int to)
-+{
-+	struct hci_request rq;
-+	le_set_advertising_parameters_cp param_cp;
-+	uint8_t status;
-+
-+	memset(&param_cp, 0, sizeof(param_cp));
-+	param_cp.min_interval = min_interval;
-+	param_cp.max_interval = max_interval;
-+	param_cp.advtype = advtype;
-+	param_cp.own_bdaddr_type = own_bdaddr_type;
-+	param_cp.direct_bdaddr_type = direct_bdaddr_type;
-+	bacpy(&param_cp.direct_bdaddr, direct_bdaddr);
-+	param_cp.chan_map = chan_map;
-+	param_cp.filter = filter;
-+
-+	memset(&rq, 0, sizeof(rq));
-+	rq.ogf = OGF_LE_CTL;
-+	rq.ocf = OCF_LE_SET_ADVERTISING_PARAMETERS;
-+	rq.cparam = &param_cp;
-+	rq.clen = LE_SET_ADVERTISING_PARAMETERS_CP_SIZE;
-+	rq.rparam = &status;
-+	rq.rlen = 1;
-+
-+	if (hci_send_req(dd, &rq, to) < 0)
-+		return -1;
-+
-+	if (status) {
-+		errno = EIO;
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
- int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
- 		uint8_t initiator_filter, uint8_t peer_bdaddr_type,
- 		bdaddr_t peer_bdaddr, uint8_t own_bdaddr_type,
-diff --git a/lib/hci_lib.h b/lib/hci_lib.h
-index 55aeb17..9fd7505 100644
---- a/lib/hci_lib.h
-+++ b/lib/hci_lib.h
-@@ -120,6 +120,11 @@ int hci_le_set_scan_parameters(int dev_id, uint8_t type, uint16_t interval,
- 					uint16_t window, uint8_t own_type,
- 					uint8_t filter, int to);
- int hci_le_set_advertise_enable(int dev_id, uint8_t enable, int to);
-+int hci_le_set_advertising_parameters(int dd, uint16_t min_interval,
-+					uint16_t max_interval, uint8_t advtype,
-+					uint8_t own_bdaddr_type, uint8_t direct_bdaddr_type,
-+					const bdaddr_t *direct_bdaddr, uint8_t chan_map,
-+					uint8_t filter, int to);
- int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
- 		uint8_t initiator_filter, uint8_t peer_bdaddr_type,
- 		bdaddr_t peer_bdaddr, uint8_t own_bdaddr_type,
 -- 
-2.1.4
+Luiz Augusto von Dentz
