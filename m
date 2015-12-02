@@ -1,187 +1,301 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1449069447.4523.3.camel@collabora.co.uk>
-Subject: [PATCH] gdbus: Drop message replies if the sender requested no reply
-From: Philip Withnall <philip.withnall@collabora.co.uk>
-To: linux-bluetooth@vger.kernel.org
-Date: Wed, 02 Dec 2015 15:17:27 +0000
-Content-Type: multipart/signed; micalg="sha-512";
-	protocol="application/x-pkcs7-signature";
-	boundary="=-C7Hz8xQGXll0b3vHEA6h"
-Mime-Version: 1.0
+From: Loic Poulain <loic.poulain@intel.com>
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Loic Poulain <loic.poulain@intel.com>
+Subject: [PATCH v2] Bluetooth: btintel: Add manufacturing enter/exit helpers
+Date: Wed,  2 Dec 2015 15:37:48 +0100
+Message-Id: <1449067068-9707-1-git-send-email-loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Older Intel controllers need to enter manufacturing mode to perform
+some vendor specific operations (patching, configuration...).
+Add enter/exit manufaturing methods and refactor existing
+manufacturing code.
 
---=-C7Hz8xQGXll0b3vHEA6h
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-IWpcy4yGAWuezKYpO60+"
-
-
---=-IWpcy4yGAWuezKYpO60+
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-If the sender flags a D-Bus message as not expecting a reply, it is
-against system bus policy to send a reply =E2=80=94 sending one will result=
- in
-errors being sent to us by dbus-daemon.
-
-Magically drop all replies to messages which request no reply.
-
-ofonod is one process which sends BlueZ messages which request no
-reply,
-when it is setting up a hands-free agent.
-
-This is not a complete fix. In an ideal world, the existing check for
-G_DBUS_METHOD_FLAG_NOREPLY would be dropped, as the server should be
-prepared to return a reply to every method, if the client requests and
-expects one =E2=80=94 otherwise the client will time out. However, that=E2=
-=80=99s a
-much
-bigger change with a much bigger risk of breaking things, so I=E2=80=99ll s=
-tick
-with this for now.
-
-Signed-off-by: Philip Withnall <philip.withnall@collabora.co.uk>
-Reviewed-by: Simon McVittie <simon.mcvittie@collabora.co.uk>
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 ---
-=C2=A0gdbus/object.c | 3 ++-
-=C2=A01 file changed, 2 insertions(+), 1 deletion(-)
+ v2: add static definition if !CONFIG_BT_INTEL
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 4cf2e2f..945dbdb 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -258,7 +258,8 @@ static DBusHandlerResult
-process_message(DBusConnection *connection,
-=C2=A0
-=C2=A0	reply =3D method->function(connection, message,
-iface_user_data);
-=C2=A0
--	if (method->flags & G_DBUS_METHOD_FLAG_NOREPLY) {
-+	if (method->flags & G_DBUS_METHOD_FLAG_NOREPLY ||
-+	=C2=A0=C2=A0=C2=A0=C2=A0dbus_message_get_no_reply(message)) {
-=C2=A0		if (reply !=3D NULL)
-=C2=A0			dbus_message_unref(reply);
-=C2=A0		return DBUS_HANDLER_RESULT_HANDLED;
---=20
-2.5.0
---=-IWpcy4yGAWuezKYpO60+
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+ drivers/bluetooth/btintel.c | 109 ++++++++++++++++++++++----------------------
+ drivers/bluetooth/btintel.h |  12 +++++
+ drivers/bluetooth/btusb.c   |  54 ++++++----------------
+ 3 files changed, 81 insertions(+), 94 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iF4EABEIAAYFAlZfC4cACgkQ8JQuiUsur6AioAD9F50KpZ/6bhPn1pahFjMWnqA1
-HaRmVFt+63PoTFUXC8EA/1VVaMhaBTeOH/K7AjfRGnr/eCu4jRUtE0X8nrzL3yRj
-=g0uo
------END PGP SIGNATURE-----
-
---=-IWpcy4yGAWuezKYpO60+--
-
---=-C7Hz8xQGXll0b3vHEA6h
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgMFADCABgkqhkiG9w0BBwEAAKCCEcMw
-ggV1MIIEXaADAgECAhAPtAFJcT3nvjcfA9BfzVHhMA0GCSqGSIb3DQEBBQUAMGIxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xITAf
-BgNVBAMTGERpZ2lDZXJ0IEFzc3VyZWQgSUQgQ0EtMTAeFw0xNDExMTcwMDAwMDBaFw0xNjExMTcx
-MjAwMDBaMIGcMQswCQYDVQQGEwJHQjEXMBUGA1UECBMOQ2FtYnJpZGdlc2hpcmUxEjAQBgNVBAcT
-CUNhbWJyaWRnZTEWMBQGA1UEChMNQ29sbGFib3JhIEx0ZDEYMBYGA1UEAxMPUGhpbGlwIFdpdGhu
-YWxsMS4wLAYJKoZIhvcNAQkBFh9waGlsaXAud2l0aG5hbGxAY29sbGFib3JhLmNvLnVrMIIBIjAN
-BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0L71X8OCB6J4Fx7SqYzr3QgZVQsSSCLtczaBRb/z
-t9YH9vCD9k6jP+MkP9fXRq0qJAu8uBHdg4kBuADuwhsaBAscQa5khZCk5Ub5RsQdod0BbfcFqSKo
-0UUT84zW+Io8soe3V4YoEiuD2uhRotB1Ac/rc2OmFYZukq74jrZwRK6tyuzOZaofT8ZeSjduauWn
-8726h2zzR6cKFBX3SjzJ4tQnfzDaUf0HnuDeN1ldXmvgeqZJL3rWFcTEUCTj7JRITuluHO8bgoty
-nLiMeCZFS0jsEcKagwsZUk0Pr2GFiy7jKoZJ1UlsVdD6+JcZJ+U1d42BtYVGRcTaqR5S+GII1wID
-AQABo4IB6jCCAeYwHwYDVR0jBBgwFoAUFQASKxOYspkH7R7for5XDStnAs0wHQYDVR0OBBYEFKfa
-n/Ity7VZBvIdkevC5msR8PnNMAwGA1UdEwEB/wQCMAAwKgYDVR0RBCMwIYEfcGhpbGlwLndpdGhu
-YWxsQGNvbGxhYm9yYS5jby51azAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwIG
-CCsGAQUFBwMEMEMGA1UdIAQ8MDowOAYKYIZIAYb9bAQBAjAqMCgGCCsGAQUFBwIBFhxodHRwczov
-L3d3dy5kaWdpY2VydC5jb20vQ1BTMH0GA1UdHwR2MHQwOKA2oDSGMmh0dHA6Ly9jcmwzLmRpZ2lj
-ZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRENBLTEuY3JsMDigNqA0hjJodHRwOi8vY3JsNC5kaWdp
-Y2VydC5jb20vRGlnaUNlcnRBc3N1cmVkSURDQS0xLmNybDB3BggrBgEFBQcBAQRrMGkwJAYIKwYB
-BQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBBBggrBgEFBQcwAoY1aHR0cDovL2NhY2Vy
-dHMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0QXNzdXJlZElEQ0EtMS5jcnQwDQYJKoZIhvcNAQEFBQAD
-ggEBACnT4iaQHNmNkCbc0s9yHK4sFjyAzMoDJF5VlBQ2QmLWJ7hkOkp0Hm9K74Xqggm00f6Zs1X0
-a805TpisGW4wgEkMAE7bFc9cAnhFloPrbksbKXPxKNLgaCkOoX9nWUVbp8x2r2P+JZhPJoq/EUW1
-LYqsb0NaCcoY3nuyw7ORMgNAl4eXHNIxlolEmB/VL/CWTAc9jCjT1hVe7YFbDsIuLokxfbhJfZsN
-Es8JYPQbzf6Z4y2fjxsISt5WiI3dIB6wk7fRhAl57PQ53nreXVs27YOUXKGf6Vmx4gUWouI9KIKL
-J+p3DllNlMsBnIltpQQ2CbzR/Mw6zc5CwCBPQOliLuQwggV1MIIEXaADAgECAhAPtAFJcT3nvjcf
-A9BfzVHhMA0GCSqGSIb3DQEBBQUAMGIxCzAJBgNVBAYTAlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJ
-bmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xITAfBgNVBAMTGERpZ2lDZXJ0IEFzc3VyZWQg
-SUQgQ0EtMTAeFw0xNDExMTcwMDAwMDBaFw0xNjExMTcxMjAwMDBaMIGcMQswCQYDVQQGEwJHQjEX
-MBUGA1UECBMOQ2FtYnJpZGdlc2hpcmUxEjAQBgNVBAcTCUNhbWJyaWRnZTEWMBQGA1UEChMNQ29s
-bGFib3JhIEx0ZDEYMBYGA1UEAxMPUGhpbGlwIFdpdGhuYWxsMS4wLAYJKoZIhvcNAQkBFh9waGls
-aXAud2l0aG5hbGxAY29sbGFib3JhLmNvLnVrMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEA0L71X8OCB6J4Fx7SqYzr3QgZVQsSSCLtczaBRb/zt9YH9vCD9k6jP+MkP9fXRq0qJAu8uBHd
-g4kBuADuwhsaBAscQa5khZCk5Ub5RsQdod0BbfcFqSKo0UUT84zW+Io8soe3V4YoEiuD2uhRotB1
-Ac/rc2OmFYZukq74jrZwRK6tyuzOZaofT8ZeSjduauWn8726h2zzR6cKFBX3SjzJ4tQnfzDaUf0H
-nuDeN1ldXmvgeqZJL3rWFcTEUCTj7JRITuluHO8bgotynLiMeCZFS0jsEcKagwsZUk0Pr2GFiy7j
-KoZJ1UlsVdD6+JcZJ+U1d42BtYVGRcTaqR5S+GII1wIDAQABo4IB6jCCAeYwHwYDVR0jBBgwFoAU
-FQASKxOYspkH7R7for5XDStnAs0wHQYDVR0OBBYEFKfan/Ity7VZBvIdkevC5msR8PnNMAwGA1Ud
-EwEB/wQCMAAwKgYDVR0RBCMwIYEfcGhpbGlwLndpdGhuYWxsQGNvbGxhYm9yYS5jby51azAOBgNV
-HQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMEMGA1UdIAQ8MDowOAYK
-YIZIAYb9bAQBAjAqMCgGCCsGAQUFBwIBFhxodHRwczovL3d3dy5kaWdpY2VydC5jb20vQ1BTMH0G
-A1UdHwR2MHQwOKA2oDSGMmh0dHA6Ly9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJ
-RENBLTEuY3JsMDigNqA0hjJodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vRGlnaUNlcnRBc3N1cmVk
-SURDQS0xLmNybDB3BggrBgEFBQcBAQRrMGkwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2lj
-ZXJ0LmNvbTBBBggrBgEFBQcwAoY1aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEQ0EtMS5jcnQwDQYJKoZIhvcNAQEFBQADggEBACnT4iaQHNmNkCbc0s9yHK4sFjyA
-zMoDJF5VlBQ2QmLWJ7hkOkp0Hm9K74Xqggm00f6Zs1X0a805TpisGW4wgEkMAE7bFc9cAnhFloPr
-bksbKXPxKNLgaCkOoX9nWUVbp8x2r2P+JZhPJoq/EUW1LYqsb0NaCcoY3nuyw7ORMgNAl4eXHNIx
-lolEmB/VL/CWTAc9jCjT1hVe7YFbDsIuLokxfbhJfZsNEs8JYPQbzf6Z4y2fjxsISt5WiI3dIB6w
-k7fRhAl57PQ53nreXVs27YOUXKGf6Vmx4gUWouI9KIKLJ+p3DllNlMsBnIltpQQ2CbzR/Mw6zc5C
-wCBPQOliLuQwggbNMIIFtaADAgECAhAG/fkDlgOt6gAK6z8nu7obMA0GCSqGSIb3DQEBBQUAMGUx
-CzAJBgNVBAYTAlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2Vy
-dC5jb20xJDAiBgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0wNjExMTAwMDAw
-MDBaFw0yMTExMTAwMDAwMDBaMGIxCzAJBgNVBAYTAlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMx
-GTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xITAfBgNVBAMTGERpZ2lDZXJ0IEFzc3VyZWQgSUQg
-Q0EtMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOiCLZn5ysJClaWAc0Bw0p5WVFyp
-xNJBBo/JM/xNRZFcgZ/tLJz4FlnfnrUkFcKYubR3SdyJxArar8tea+2tsHEx6886QAxGTZPsi3o2
-CAOrDDT+GEmC/sfHMUiAfB6iD5IOUMnGh+s2P9gww/+m9/uizW9zI/6sVgWQ8DIhFonGcIj5BZd9
-o8dD3QLoOz3tsUGj7T++25VIxO4es/K8DCuZ0MZdEkKB4YNugnM/JksUkK5ZZgrEjb7SzgaurYRv
-SISbT0C58Uzyr5j79s5AXVz2qPEvr+yJIvJrGGWxwXOt1/HYzx4KdFxCuGh+t9V3CidWfA9ipD8y
-FGCV/QcEogkCAwEAAaOCA3owggN2MA4GA1UdDwEB/wQEAwIBhjA7BgNVHSUENDAyBggrBgEFBQcD
-AQYIKwYBBQUHAwIGCCsGAQUFBwMDBggrBgEFBQcDBAYIKwYBBQUHAwgwggHSBgNVHSAEggHJMIIB
-xTCCAbQGCmCGSAGG/WwAAQQwggGkMDoGCCsGAQUFBwIBFi5odHRwOi8vd3d3LmRpZ2ljZXJ0LmNv
-bS9zc2wtY3BzLXJlcG9zaXRvcnkuaHRtMIIBZAYIKwYBBQUHAgIwggFWHoIBUgBBAG4AeQAgAHUA
-cwBlACAAbwBmACAAdABoAGkAcwAgAEMAZQByAHQAaQBmAGkAYwBhAHQAZQAgAGMAbwBuAHMAdABp
-AHQAdQB0AGUAcwAgAGEAYwBjAGUAcAB0AGEAbgBjAGUAIABvAGYAIAB0AGgAZQAgAEQAaQBnAGkA
-QwBlAHIAdAAgAEMAUAAvAEMAUABTACAAYQBuAGQAIAB0AGgAZQAgAFIAZQBsAHkAaQBuAGcAIABQ
-AGEAcgB0AHkAIABBAGcAcgBlAGUAbQBlAG4AdAAgAHcAaABpAGMAaAAgAGwAaQBtAGkAdAAgAGwA
-aQBhAGIAaQBsAGkAdAB5ACAAYQBuAGQAIABhAHIAZQAgAGkAbgBjAG8AcgBwAG8AcgBhAHQAZQBk
-ACAAaABlAHIAZQBpAG4AIABiAHkAIAByAGUAZgBlAHIAZQBuAGMAZQAuMAsGCWCGSAGG/WwDFTAS
-BgNVHRMBAf8ECDAGAQH/AgEAMHkGCCsGAQUFBwEBBG0wazAkBggrBgEFBQcwAYYYaHR0cDovL29j
-c3AuZGlnaWNlcnQuY29tMEMGCCsGAQUFBzAChjdodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20v
-RGlnaUNlcnRBc3N1cmVkSURSb290Q0EuY3J0MIGBBgNVHR8EejB4MDqgOKA2hjRodHRwOi8vY3Js
-My5kaWdpY2VydC5jb20vRGlnaUNlcnRBc3N1cmVkSURSb290Q0EuY3JsMDqgOKA2hjRodHRwOi8v
-Y3JsNC5kaWdpY2VydC5jb20vRGlnaUNlcnRBc3N1cmVkSURSb290Q0EuY3JsMB0GA1UdDgQWBBQV
-ABIrE5iymQftHt+ivlcNK2cCzTAfBgNVHSMEGDAWgBRF66Kv9JLLgjEtUYunpyGd823IDzANBgkq
-hkiG9w0BAQUFAAOCAQEARlA+ybcoJKc4HbZbKa9Sz1LpMUerVlx71Q0LQbPv7HUfdDjyslxhopyV
-w1Dkgrkj0bo6hnKtOHisdV0XFzRyR4WUVtHruzaEd8wkpfMEGVWp5+Pnq2LN+4stkMLA0rWUvV5P
-sQXSDj0aqRRbpoYxYqioM+SbOafE9c4deHaUJXPkKqvPnHZL7V/CSxbkS3BMAIke/MV5vEwSV/5f
-4R68Al2o/vsHOE8Nxl2RuQ9nRc3Wg+3nkg2NsWmMT/tZ4CMP0qquAHzunEIOz5HXJ7cW7g/DvXwK
-oO4sCFWFIrjrGBpN/CohrUkxg0eVd3HcsRtLSxwQnHcUwZ1PL1qVCCkQJjGCA0AwggM8AgEBMHYw
-YjELMAkGA1UEBhMCVVMxFTATBgNVBAoTDERpZ2lDZXJ0IEluYzEZMBcGA1UECxMQd3d3LmRpZ2lj
-ZXJ0LmNvbTEhMB8GA1UEAxMYRGlnaUNlcnQgQXNzdXJlZCBJRCBDQS0xAhAPtAFJcT3nvjcfA9Bf
-zVHhMA0GCWCGSAFlAwQCAwUAoIIBmzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3
-DQEJBTEPFw0xNTEyMDIxNTE3MjdaME8GCSqGSIb3DQEJBDFCBEC3ly7jUkgUU6jYv6WeR3ose8Va
-0aqBF2vlyC+LaLK2F17MFZNw+3605Sw7XBQAriI1rimMP/5jYmQBw2Qyp4x8MIGFBgkrBgEEAYI3
-EAQxeDB2MGIxCzAJBgNVBAYTAlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3
-dy5kaWdpY2VydC5jb20xITAfBgNVBAMTGERpZ2lDZXJ0IEFzc3VyZWQgSUQgQ0EtMQIQD7QBSXE9
-5743HwPQX81R4TCBhwYLKoZIhvcNAQkQAgsxeKB2MGIxCzAJBgNVBAYTAlVTMRUwEwYDVQQKEwxE
-aWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xITAfBgNVBAMTGERpZ2lDZXJ0
-IEFzc3VyZWQgSUQgQ0EtMQIQD7QBSXE95743HwPQX81R4TANBgkqhkiG9w0BAQEFAASCAQDPhrp6
-mYK+n56bRE0AF5aj2YM/XQHZHkvLUdmhFfl4kkVU5BMbT49IMKka8lxagxIwg5FW4KcbALD5HUA6
-zM131Zv2Jm4GB2ySYl1zqMvUA2uyqv9nZZEkqBwmIrILgAZh4RrRcGzZJHwFA7FmXEgfciDerK9X
-bGNNNAtr+NdcD1YHqBo613n8TaoBoYtFifPYQ6lu684Ss2khXgD54SYNBX2ISGjz0ir/kaxUAQ0L
-0OVf+Dk/CgzslM6ChUvNHwO4cx0aG9HA1SjEHIsBR0WF/v/lRLC+82iE/WaKyYT3I/+G+XlNlv3p
-RRQ3C4O4jAdlbqJUdz5jfjr+Veyg3dD0AAAAAAAA
-
-
---=-C7Hz8xQGXll0b3vHEA6h--
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 1f13e61..e9f26eb 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -73,6 +73,43 @@ int btintel_check_bdaddr(struct hci_dev *hdev)
+ }
+ EXPORT_SYMBOL_GPL(btintel_check_bdaddr);
+ 
++int btintel_enter_mfg(struct hci_dev *hdev)
++{
++	const u8 param[] = { 0x01, 0x00 };
++	struct sk_buff *skb;
++
++	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Entering manufacturer mode failed (%ld)",
++			   PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btintel_enter_mfg);
++
++int btintel_exit_mfg(struct hci_dev *hdev, bool reset, bool patched)
++{
++	u8 param[] = { 0x00, 0x00 };
++	struct sk_buff *skb;
++
++	if (reset)
++		param[1] |= patched ? 0x02 : 0x01;
++
++	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Exiting manufacturer mode failed (%ld)",
++			   PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btintel_exit_mfg);
++
+ int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ {
+ 	struct sk_buff *skb;
+@@ -126,37 +163,19 @@ EXPORT_SYMBOL_GPL(btintel_set_diag);
+ 
+ int btintel_set_diag_mfg(struct hci_dev *hdev, bool enable)
+ {
+-	struct sk_buff *skb;
+-	u8 param[2];
+-	int err;
+-
+-	param[0] = 0x01;
+-	param[1] = 0x00;
++	int err, ret;
+ 
+-	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		err = PTR_ERR(skb);
+-		BT_ERR("%s: Entering Intel manufacturer mode failed (%d)",
+-		       hdev->name, err);
+-		return PTR_ERR(skb);
+-	}
+-	kfree_skb(skb);
+-
+-	err = btintel_set_diag(hdev, enable);
++	err = btintel_enter_mfg(hdev);
++	if (err)
++		return err;
+ 
+-	param[0] = 0x00;
+-	param[1] = 0x00;
++	ret = btintel_set_diag(hdev, enable);
+ 
+-	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		err = PTR_ERR(skb);
+-		BT_ERR("%s: Leaving Intel manufacturer mode failed (%d)",
+-		       hdev->name, err);
+-		return PTR_ERR(skb);
+-	}
+-	kfree_skb(skb);
++	err = btintel_exit_mfg(hdev, false, false);
++	if (err)
++		return err;
+ 
+-	return err;
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(btintel_set_diag_mfg);
+ 
+@@ -309,37 +328,19 @@ EXPORT_SYMBOL_GPL(btintel_set_event_mask);
+ 
+ int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
+ {
+-	struct sk_buff *skb;
+-	u8 param[2];
+-	int err;
+-
+-	param[0] = 0x01;
+-	param[1] = 0x00;
+-
+-	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		err = PTR_ERR(skb);
+-		BT_ERR("%s: Entering Intel manufacturer mode failed (%d)",
+-		       hdev->name, err);
+-		return PTR_ERR(skb);
+-	}
+-	kfree_skb(skb);
++	int err, ret;
+ 
+-	err = btintel_set_event_mask(hdev, debug);
++	err = btintel_enter_mfg(hdev);
++	if (err)
++		return err;
+ 
+-	param[0] = 0x00;
+-	param[1] = 0x00;
++	ret = btintel_set_event_mask(hdev, debug);
+ 
+-	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		err = PTR_ERR(skb);
+-		BT_ERR("%s: Leaving Intel manufacturer mode failed (%d)",
+-		       hdev->name, err);
+-		return PTR_ERR(skb);
+-	}
+-	kfree_skb(skb);
++	err = btintel_exit_mfg(hdev, false, false);
++	if (err)
++		return err;
+ 
+-	return err;
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(btintel_set_event_mask_mfg);
+ 
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 07e58e0..fa72eae 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -72,6 +72,8 @@ struct intel_secure_send_result {
+ #if IS_ENABLED(CONFIG_BT_INTEL)
+ 
+ int btintel_check_bdaddr(struct hci_dev *hdev);
++int btintel_enter_mfg(struct hci_dev *hdev);
++int btintel_exit_mfg(struct hci_dev *hdev, bool reset, bool patched);
+ int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int btintel_set_diag(struct hci_dev *hdev, bool enable);
+ int btintel_set_diag_mfg(struct hci_dev *hdev, bool enable);
+@@ -94,6 +96,16 @@ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int btintel_enter_mfg(struct hci_dev *hdev)
++{
++	return -EOPNOTSUPP;
++}
++
++static inline int btintel_exit_mfg(struct hci_dev *hdev, bool reset, bool patched)
++{
++	return -EOPNOTSUPP;
++}
++
+ static inline int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ {
+ 	return -EOPNOTSUPP;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8063534..890ee52 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1642,14 +1642,9 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	struct sk_buff *skb;
+ 	const struct firmware *fw;
+ 	const u8 *fw_ptr;
+-	int disable_patch;
++	int disable_patch, err;
+ 	struct intel_version *ver;
+ 
+-	const u8 mfg_enable[] = { 0x01, 0x00 };
+-	const u8 mfg_disable[] = { 0x00, 0x00 };
+-	const u8 mfg_reset_deactivate[] = { 0x00, 0x01 };
+-	const u8 mfg_reset_activate[] = { 0x00, 0x02 };
+-
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	/* The controller has a bug with the first HCI command sent to it
+@@ -1721,22 +1716,16 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 
+ 	kfree_skb(skb);
+ 
+-	/* This Intel specific command enables the manufacturer mode of the
+-	 * controller.
+-	 *
++	/* Enable the manufacturer mode of the controller.
+ 	 * Only while this mode is enabled, the driver can download the
+ 	 * firmware patch data and configuration parameters.
+ 	 */
+-	skb = __hci_cmd_sync(hdev, 0xfc11, 2, mfg_enable, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		BT_ERR("%s entering Intel manufacturer mode failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
++	err = btintel_enter_mfg(hdev);
++	if (err) {
+ 		release_firmware(fw);
+-		return PTR_ERR(skb);
++		return err;
+ 	}
+ 
+-	kfree_skb(skb);
+-
+ 	disable_patch = 1;
+ 
+ 	/* The firmware data file consists of list of Intel specific HCI
+@@ -1776,14 +1765,9 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	/* Patching completed successfully and disable the manufacturer mode
+ 	 * with reset and activate the downloaded firmware patches.
+ 	 */
+-	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_reset_activate),
+-			     mfg_reset_activate, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
+-		return PTR_ERR(skb);
+-	}
+-	kfree_skb(skb);
++	err = btintel_exit_mfg(hdev, true, true);
++	if (err)
++		return err;
+ 
+ 	BT_INFO("%s: Intel Bluetooth firmware patch completed and activated",
+ 		hdev->name);
+@@ -1792,14 +1776,9 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 
+ exit_mfg_disable:
+ 	/* Disable the manufacturer mode without reset */
+-	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_disable), mfg_disable,
+-			     HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
+-		return PTR_ERR(skb);
+-	}
+-	kfree_skb(skb);
++	err = btintel_exit_mfg(hdev, false, false);
++	if (err)
++		return err;
+ 
+ 	BT_INFO("%s: Intel Bluetooth firmware patch completed", hdev->name);
+ 
+@@ -1811,14 +1790,9 @@ exit_mfg_deactivate:
+ 	/* Patching failed. Disable the manufacturer mode with reset and
+ 	 * deactivate the downloaded firmware patches.
+ 	 */
+-	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_reset_deactivate),
+-			     mfg_reset_deactivate, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
+-		return PTR_ERR(skb);
+-	}
+-	kfree_skb(skb);
++	err = btintel_exit_mfg(hdev, true, false);
++	if (err)
++		return err;
+ 
+ 	BT_INFO("%s: Intel Bluetooth firmware patch completed and deactivated",
+ 		hdev->name);
+-- 
+1.9.1
 
