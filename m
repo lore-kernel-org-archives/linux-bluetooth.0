@@ -1,301 +1,91 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH v2] Bluetooth: btintel: Add manufacturing enter/exit helpers
-Date: Wed,  2 Dec 2015 15:37:48 +0100
-Message-Id: <1449067068-9707-1-git-send-email-loic.poulain@intel.com>
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Konrad Antoniuk' <konrad18622@gmail.com>,
+	'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <6AF6FACF-FE0C-446F-9FD1-BBAD20EBF8CC@gmail.com>
+ <CABBYNZKGNtvEGAKT6KL7u2eta=urSQoHZw7x8ChwFA6X4xaxjw@mail.gmail.com>
+ <899EB388-8EE7-449D-850E-C7352B52FDC1@gmail.com>
+In-reply-to: <899EB388-8EE7-449D-850E-C7352B52FDC1@gmail.com>
+Subject: RE: Need help with bug in ftp-client executable from bluez-5.24 package
+Date: Wed, 02 Dec 2015 20:04:50 +0530
+Message-id: <000001d12d0e$a7f505e0$f7df11a0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Older Intel controllers need to enter manufacturing mode to perform
-some vendor specific operations (patching, configuration...).
-Add enter/exit manufaturing methods and refactor existing
-manufacturing code.
+Hi Konrad,
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- v2: add static definition if !CONFIG_BT_INTEL
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Konrad Antoniuk
+> Sent: Wednesday, December 02, 2015 6:42 PM
+> To: Luiz Augusto von Dentz
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: Need help with bug in ftp-client executable from bluez-5.24
+> package
+> 
+> Hello Luiz,
+> 
+> > On Dec 2, 2015, at 2:57 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Konrad,
+> >
+> > On Wed, Dec 2, 2015 at 10:37 AM, Konrad Antoniuk
+> <konrad18622@gmail.com> wrote:
+> >> Hi,
+> >>
+> >> I’m looking to resolve an issue with one of the programs from the
+> >> bluez package. I’m using the ftp-client python executable from the
+> >> test folder and having trouble with transferring larger files. I’m
+> >> running the program on the Intel Edison which runs Embedded Linux -
+> >> Yocto. Initially the program worked for smaller files, 6.3 kB in
+> >> size, but when I began experimenting with data files only double the
+> >> size I began to run into trouble. Whenever the dbus signaled and
+> >> called the callback method properties_changed, I initially received
+> >> an error that the global variable value was left uninitialized. I
+> >> solved that problem by adding the line value =
+> >> properties[“Transferred”] at line 98 in the program, just before the
+> >> speed calculation. This removed any reported errors received but the
+> >> larger files still don’t transfer successfully. It seems whenever the
+> >> signal’s callback function completes, the transfer doesn’t continue.
+> >> I’ve attempted to call the Resume method from the Tr
+>  ansfer Interface but I must be doing something wrong because I’m fairly
+> new to Python and debugging a program that uses dbus.
+> >>
+> >> To make it clear, the ftp-client executable from the test folder in the blues
+> package works whenever the file transfer is completed before the Bus
+> signals back. I’ve fixed an uninitialized variable bug but I still can’t get larger
+> files to successfully transfer. I appreciate any guidance in correcting the
+> source code and fixing this bug.
+> >
+> > Have you tried with obexctl? ftp-client is actually deprecated so
+> > chances are that it doesn't work properly anymore.
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+> 
+> Thanks for the quick response. I did get obexctl to transfer the larger file for
+> me. However, for my application, I was using ftp-client through a system call
+> within an SPP python program that interpreted my commands from a
+> separate device. In addition, I was able to pass all of my options and
+> arguments with a single shell command using this method. Will I be able to
+> use obexctl the same way or is there another application that will allow me to
+> do the same that isn’t deprecated?
+> 
 
- drivers/bluetooth/btintel.c | 109 ++++++++++++++++++++++----------------------
- drivers/bluetooth/btintel.h |  12 +++++
- drivers/bluetooth/btusb.c   |  54 ++++++----------------
- 3 files changed, 81 insertions(+), 94 deletions(-)
+Please try out the patch " [PATCH] test: Fix ftp-client not printing progress " which I have sent on ML.
+Hope that solves your problem.
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 1f13e61..e9f26eb 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -73,6 +73,43 @@ int btintel_check_bdaddr(struct hci_dev *hdev)
- }
- EXPORT_SYMBOL_GPL(btintel_check_bdaddr);
- 
-+int btintel_enter_mfg(struct hci_dev *hdev)
-+{
-+	const u8 param[] = { 0x01, 0x00 };
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Entering manufacturer mode failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_enter_mfg);
-+
-+int btintel_exit_mfg(struct hci_dev *hdev, bool reset, bool patched)
-+{
-+	u8 param[] = { 0x00, 0x00 };
-+	struct sk_buff *skb;
-+
-+	if (reset)
-+		param[1] |= patched ? 0x02 : 0x01;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Exiting manufacturer mode failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_exit_mfg);
-+
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- {
- 	struct sk_buff *skb;
-@@ -126,37 +163,19 @@ EXPORT_SYMBOL_GPL(btintel_set_diag);
- 
- int btintel_set_diag_mfg(struct hci_dev *hdev, bool enable)
- {
--	struct sk_buff *skb;
--	u8 param[2];
--	int err;
--
--	param[0] = 0x01;
--	param[1] = 0x00;
-+	int err, ret;
- 
--	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		err = PTR_ERR(skb);
--		BT_ERR("%s: Entering Intel manufacturer mode failed (%d)",
--		       hdev->name, err);
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
--
--	err = btintel_set_diag(hdev, enable);
-+	err = btintel_enter_mfg(hdev);
-+	if (err)
-+		return err;
- 
--	param[0] = 0x00;
--	param[1] = 0x00;
-+	ret = btintel_set_diag(hdev, enable);
- 
--	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		err = PTR_ERR(skb);
--		BT_ERR("%s: Leaving Intel manufacturer mode failed (%d)",
--		       hdev->name, err);
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	err = btintel_exit_mfg(hdev, false, false);
-+	if (err)
-+		return err;
- 
--	return err;
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(btintel_set_diag_mfg);
- 
-@@ -309,37 +328,19 @@ EXPORT_SYMBOL_GPL(btintel_set_event_mask);
- 
- int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
- {
--	struct sk_buff *skb;
--	u8 param[2];
--	int err;
--
--	param[0] = 0x01;
--	param[1] = 0x00;
--
--	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		err = PTR_ERR(skb);
--		BT_ERR("%s: Entering Intel manufacturer mode failed (%d)",
--		       hdev->name, err);
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	int err, ret;
- 
--	err = btintel_set_event_mask(hdev, debug);
-+	err = btintel_enter_mfg(hdev);
-+	if (err)
-+		return err;
- 
--	param[0] = 0x00;
--	param[1] = 0x00;
-+	ret = btintel_set_event_mask(hdev, debug);
- 
--	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		err = PTR_ERR(skb);
--		BT_ERR("%s: Leaving Intel manufacturer mode failed (%d)",
--		       hdev->name, err);
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	err = btintel_exit_mfg(hdev, false, false);
-+	if (err)
-+		return err;
- 
--	return err;
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(btintel_set_event_mask_mfg);
- 
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 07e58e0..fa72eae 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -72,6 +72,8 @@ struct intel_secure_send_result {
- #if IS_ENABLED(CONFIG_BT_INTEL)
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
-+int btintel_enter_mfg(struct hci_dev *hdev);
-+int btintel_exit_mfg(struct hci_dev *hdev, bool reset, bool patched);
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int btintel_set_diag(struct hci_dev *hdev, bool enable);
- int btintel_set_diag_mfg(struct hci_dev *hdev, bool enable);
-@@ -94,6 +96,16 @@ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int btintel_enter_mfg(struct hci_dev *hdev)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int btintel_exit_mfg(struct hci_dev *hdev, bool reset, bool patched)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- {
- 	return -EOPNOTSUPP;
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8063534..890ee52 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1642,14 +1642,9 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	struct sk_buff *skb;
- 	const struct firmware *fw;
- 	const u8 *fw_ptr;
--	int disable_patch;
-+	int disable_patch, err;
- 	struct intel_version *ver;
- 
--	const u8 mfg_enable[] = { 0x01, 0x00 };
--	const u8 mfg_disable[] = { 0x00, 0x00 };
--	const u8 mfg_reset_deactivate[] = { 0x00, 0x01 };
--	const u8 mfg_reset_activate[] = { 0x00, 0x02 };
--
- 	BT_DBG("%s", hdev->name);
- 
- 	/* The controller has a bug with the first HCI command sent to it
-@@ -1721,22 +1716,16 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 
- 	kfree_skb(skb);
- 
--	/* This Intel specific command enables the manufacturer mode of the
--	 * controller.
--	 *
-+	/* Enable the manufacturer mode of the controller.
- 	 * Only while this mode is enabled, the driver can download the
- 	 * firmware patch data and configuration parameters.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc11, 2, mfg_enable, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("%s entering Intel manufacturer mode failed (%ld)",
--		       hdev->name, PTR_ERR(skb));
-+	err = btintel_enter_mfg(hdev);
-+	if (err) {
- 		release_firmware(fw);
--		return PTR_ERR(skb);
-+		return err;
- 	}
- 
--	kfree_skb(skb);
--
- 	disable_patch = 1;
- 
- 	/* The firmware data file consists of list of Intel specific HCI
-@@ -1776,14 +1765,9 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	/* Patching completed successfully and disable the manufacturer mode
- 	 * with reset and activate the downloaded firmware patches.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_reset_activate),
--			     mfg_reset_activate, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
--		       hdev->name, PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	err = btintel_exit_mfg(hdev, true, true);
-+	if (err)
-+		return err;
- 
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed and activated",
- 		hdev->name);
-@@ -1792,14 +1776,9 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 
- exit_mfg_disable:
- 	/* Disable the manufacturer mode without reset */
--	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_disable), mfg_disable,
--			     HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
--		       hdev->name, PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	err = btintel_exit_mfg(hdev, false, false);
-+	if (err)
-+		return err;
- 
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed", hdev->name);
- 
-@@ -1811,14 +1790,9 @@ exit_mfg_deactivate:
- 	/* Patching failed. Disable the manufacturer mode with reset and
- 	 * deactivate the downloaded firmware patches.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_reset_deactivate),
--			     mfg_reset_deactivate, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
--		       hdev->name, PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	err = btintel_exit_mfg(hdev, true, false);
-+	if (err)
-+		return err;
- 
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed and deactivated",
- 		hdev->name);
--- 
-1.9.1
+Regards,
+Gowtham A
+
+> Thanks,
+> Konrad    --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org More majordomo
+> info at  http://vger.kernel.org/majordomo-info.html
 
