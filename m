@@ -1,79 +1,132 @@
-Return-Path: <danny.schweizer@proofnet.de>
-Subject: Re: [PATCH] BNEP multicast filter is filtering multicast addresses in
- default case although differently specified
-To: Marcel Holtmann <marcel@holtmann.org>
-References: <564C6C35.4030305@proofnet.de>
- <F6214B06-650D-4DE0-A375-49652B8124A5@holtmann.org>
- <564C792B.3040300@proofnet.de>
- <BD2BD640-83BE-45B8-AADD-468289508432@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
+Subject: Re: [PATCH 5/5] bluetooth: hci_intel: Add LhP support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1448650563-9075-5-git-send-email-loic.poulain@intel.com>
+Date: Tue, 1 Dec 2015 21:59:00 -1000
 Cc: linux-bluetooth@vger.kernel.org
-From: Danny Schweizer <danny.schweizer@proofnet.de>
-Message-ID: <565EA6B2.50702@proofnet.de>
-Date: Wed, 2 Dec 2015 09:07:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <BD2BD640-83BE-45B8-AADD-468289508432@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Message-Id: <205F31A4-4BE0-43F5-8526-07194FB4D44E@holtmann.org>
+References: <1448650563-9075-1-git-send-email-loic.poulain@intel.com> <1448650563-9075-5-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A Linux PC is connected with another device over Bluetooth
- PAN using a BNEP interface.
+Hi Loic,
 
-Whenever a packet is tried to be sent over the BNEP interface, the
-function "bnep_net_xmit()" in "net/bluetooth/bnep/netdev.c" is called.
-This function calls "bnep_net_mc_filter()", which checks (if the
-destination address is multicast) if the address is set in a certain
-multicast filter (&s->mc_filter). If it is not, then it is not sent out.
+> Add Support for LhP(IBT-2.1) Intel controller.
+> This controller requests bddata configuration before being able to
+> work properly. The setup is done in manufacturing mode.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> ---
+> drivers/bluetooth/hci_intel.c | 70 +++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 70 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+> index 95bc57c..7314d37 100644
+> --- a/drivers/bluetooth/hci_intel.c
+> +++ b/drivers/bluetooth/hci_intel.c
+> @@ -888,6 +888,64 @@ no_lpm:
+> 	return 0;
+> }
+> 
+> +static int intel_setup_lhp(struct hci_uart *hu, struct intel_version *ver)
+> +{
+> +	static const u8 mfg_enable[] = { 0x01, 0x00 };
+> +	static const u8 mfg_reset_deactivate[] = { 0x00, 0x01 };
+> +	const struct firmware *fw;
+> +	char fwname[32];
+> +	const u8 *fw_ptr;
+> +	struct hci_dev *hdev = hu->hdev;
+> +	struct sk_buff *skb;
+> +	int err;
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_enable), mfg_enable,
+> +			     HCI_CMD_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		bt_dev_err(hdev, "Enabling manufacturer mode failed (%ld)",
+> +			   PTR_ERR(skb));
+> +		return PTR_ERR(skb);
+> +	}
+> +	kfree_skb(skb);
+> +
+> +	bt_dev_info(hdev, "Applying bddata");
+> +
+> +	snprintf(fwname, sizeof(fwname), "intel/ibt-10-%u.bddata",
+> +		 ver->hw_revision);
 
-This filter is only changed in two other functions, found in
-net/bluetooth/bnep/core.c": in "bnep_ctrl_set_mc_filter()", which is
-only called if a message of type "BNEP_FILTER_MULTI_ADDR_SET" is
-received. Otherwise, it is set in "bnep_add_connection()", where it is
-set to a default value which only adds the broadcast address to the filter:
+I think we need to use a more detailed versioning name. It is a ROM chip and depending on its version, this might differ. This simple firmware names only work for LnP which are RAM chips.
 
-set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
+> +
+> +	err = request_firmware(&fw, fwname, &hdev->dev);
+> +	if (err < 0) {
+> +		bt_dev_err(hdev, "Failed to load Intel bddata file %s (%d)",
+> +			   fwname, err);
+> +		return PTR_ERR(skb);
+> +	}
+> +
+> +	fw_ptr = fw->data;
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfc2f, fw->size, fw->data, HCI_CMD_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		bt_dev_err(hdev, "Applying bddata failed (%ld)", PTR_ERR(skb));
+> +		release_firmware(fw);
+> +		return PTR_ERR(skb);
+> +	}
+> +	kfree_skb(skb);
+> +
+> +	release_firmware(fw);
+> +
+> +	/* Disable the manufacturer mode, reset, deactivate fw patched version.
+> +	 */
+> +	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_reset_deactivate),
+> +			     mfg_reset_deactivate, HCI_CMD_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
+> +		       hdev->name, PTR_ERR(skb));
+> +		return PTR_ERR(skb);
+> +	}
+> +	kfree_skb(skb);
+> +
+> +	return 0;
+> +}
+> +
+> static int intel_setup(struct hci_uart *hu)
+> {
+> 	static const u8 mfg_enable[] = { 0x01, 0x00 };
+> @@ -975,6 +1033,9 @@ setup:
+> 	case 0x0b:
+> 		err = intel_setup_lnp(hu, ver);
+> 		break;
+> +	case 0x0a:
+> +		err = intel_setup_lhp(hu, ver);
+> +		break;
+> 	default:
+> 		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
+> 			   ver->hw_variant);
+> @@ -1040,6 +1101,15 @@ static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+> 		bt_dev_err(hdev, "Controller requests manufacturing");
+> 		set_bit(STATE_REQ_MANUFACTURING, &intel->flags);
+> 		inject_cmd_complete(hdev, 0xfc05, 0x01);
+> +
+> +	/* Instead of responding to bddata command with a command complete event
+> +	 * LhP controller returns a command status event. In order to complete
+> +	 * the ongoing bddata command generate a command complete event from
+> +	 * the command status one.
+> +	 */
 
-To sum up, if the BNEP interface does not receive any message of type
-"BNEP_FILTER_MULTI_ADDR_SET", it will not send out any messages with
-multicast destination addresses except for broadcast.
+What is wrong with using __hci_cmd_sync_ev for these cases?
 
-However, in the BNEP specification (page 27 in
-http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf), it is said
-that per default, all multicast addresses should not be filtered, i.e.
-the BNEP interface should be able to send packets with any multicast
-destination address.
 
-It seems that the default case is wrong: the multicast filter should not
-block almost all multicast addresses, but should not filter out any.
+> +	} else if (skb->len >= 6 && hdr->evt == 0x0f && skb->data[4] == 0x2f &&
+> +		   skb->data[5] == 0xfc) {
+> +		inject_cmd_complete(hdev, 0xfc2f, skb->data[2]);
+> 	}
+> recv:
+> 	return hci_recv_frame(hdev, skb);
 
-This leads to the problem that e.g. Neighbor Solicitation messages sent
-with Bluetooth PAN over the BNEP interface to a multicast destination
-address other than broadcast are blocked and not sent out.
+Regards
 
-Therefore, in the default case, we set the mc_filter to ~0LL to not
-filter out any multicast addresses.
----
- net/bluetooth/bnep/core.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Marcel
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index 1641367..8e02289 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -608,8 +608,12 @@ int bnep_add_connection(struct bnep_connadd_req
-*req, struct socket *sock)
- 	s->msg.msg_flags = MSG_NOSIGNAL;
-
- #ifdef CONFIG_BT_BNEP_MC_FILTER
--	/* Set default mc filter */
--	set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
-+	/*
-+	 * Set default mc filter to not filter out any mc addresses
-+	 * as defined in the BNEP specification (revision 0.95a)
-+	 * http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf
-+	 */
-+	s->mc_filter = ~0LL;
- #endif
-
- #ifdef CONFIG_BT_BNEP_PROTO_FILTER
--- 
-2.1.4
