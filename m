@@ -1,307 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1446628721-4590-1-git-send-email-bharat.panda@samsung.com>
-References: <1446628721-4590-1-git-send-email-bharat.panda@samsung.com>
-Date: Wed, 2 Dec 2015 15:28:51 +0200
-Message-ID: <CABBYNZLF3C7yMgwiQEzADkWRb40MZX40kXoJJ1aoBHURV7qpCg@mail.gmail.com>
-Subject: Re: [PATCH v2] audio/avrcp: Get player playlist details
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
+From: Chih-Wei Huang <cwhuang@android-x86.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Chih-Wei Huang <cwhuang@linux.org.tw>
+Subject: [PATCH 1/3] shared/utils: add the missing header <strings.h>
+Date: Wed,  2 Dec 2015 21:19:03 +0800
+Message-Id: <1449062345-31502-2-git-send-email-cwhuang@linux.org.tw>
+In-Reply-To: <1449062345-31502-1-git-send-email-cwhuang@linux.org.tw>
+References: <1449062345-31502-1-git-send-email-cwhuang@linux.org.tw>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+It defines the prototype of ffs() that fixes the building errors
+of an Android 6.0 64-bit target.
 
-On Wed, Nov 4, 2015 at 11:18 AM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Support added to read and cache player playlist details after
-> player registration completes.
-> ---
->  profiles/audio/media.c | 171 +++++++++++++++++++++++++++++++++++++++++++++++++
->  profiles/audio/media.h |   2 +
->  2 files changed, 173 insertions(+)
->
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index 69070bf..d74fc93 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -58,6 +58,7 @@
->  #define MEDIA_INTERFACE "org.bluez.Media1"
->  #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
->  #define MEDIA_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
-> +#define MEDIA_PLAYER_PLAYLIST_INTERFACE "org.mpris.MediaPlayer2.Playlists"
->
->  #define REQUEST_TIMEOUT (3 * 1000)             /* 3 seconds */
->
-> @@ -92,9 +93,19 @@ struct media_endpoint {
->         GSList                  *transports;
->  };
->
-> +struct player_request {
-> +       struct media_player     *mp;
-> +       DBusMessage             *msg;
-> +       DBusPendingCall         *call;
-> +       GDestroyNotify          destroy;
-> +       void                    *user_data;
-> +};
-> +
->  struct media_player {
->         struct media_adapter    *adapter;
->         struct avrcp_player     *player;
-> +       GSList                  *playlists;
-> +       GSList                  *requests;
->         char                    *sender;        /* Player DBus bus id */
->         char                    *path;          /* Player object path */
->         GHashTable              *settings;      /* Player settings */
-> @@ -105,6 +116,7 @@ struct media_player {
->         char                    *status;
->         uint32_t                position;
->         uint32_t                duration;
-> +       uint32_t                total_items;
->         uint8_t                 volume;
->         GTimer                  *timer;
->         bool                    play;
-> @@ -115,6 +127,12 @@ struct media_player {
->         char                    *name;
->  };
->
-> +struct media_playlist {
-> +       char            *name;
-> +       char            *id;
-> +       char            *icon;
-> +};
-> +
->  static GSList *adapters = NULL;
->
->  static void endpoint_request_free(struct endpoint_request *request)
-> @@ -940,6 +958,18 @@ static void release_player(struct media_player *mp)
->         g_dbus_send_message(btd_get_dbus_connection(), msg);
->  }
->
-> +static void playlist_request_free(struct player_request *request)
-> +{
-> +       if (request->call)
-> +               dbus_pending_call_unref(request->call);
-> +
-> +       if (request->destroy)
-> +               request->destroy(request->user_data);
-> +
-> +       dbus_message_unref(request->msg);
-> +       g_free(request);
-> +}
-> +
->  static void media_player_free(gpointer data)
->  {
->         DBusConnection *conn = btd_get_dbus_connection();
-> @@ -966,6 +996,8 @@ static void media_player_free(gpointer data)
->         g_free(mp->path);
->         g_free(mp->status);
->         g_free(mp->name);
-> +       g_free(mp->playlists);
-> +       g_free(mp->requests);
->         g_free(mp);
->  }
->
-> @@ -1271,6 +1303,141 @@ static bool previous(void *user_data)
->         return media_player_send(mp, "Previous");
->  }
->
-> +static void playlist_reply(DBusPendingCall *call, void *user_data)
-> +{
-> +       struct player_request *request = user_data;
-> +       struct media_player *mp = request->mp;
-> +       DBusMessage *reply;
-> +       DBusMessageIter array_iter, entry, struct_iter;
-> +       DBusError derr;
-> +       int ctype;
-> +
-> +       reply = dbus_pending_call_steal_reply(call);
-> +
-> +       dbus_error_init(&derr);
-> +
-> +       if (dbus_set_error_from_message(&derr, reply)) {
-> +               error("Error: GetPlayLists method %s, %s", derr.name,
-> +                                       derr.message);
-> +               dbus_error_free(&derr);
-> +               goto done;
-> +       }
-> +
-> +       dbus_message_iter_init(reply, &array_iter);
-> +       ctype = dbus_message_iter_get_arg_type(&array_iter);
-> +
-> +       if (ctype != DBUS_TYPE_ARRAY)
-> +               goto done;
-> +
-> +       dbus_message_iter_recurse(&array_iter, &struct_iter);
-> +
-> +       while ((ctype = dbus_message_iter_get_arg_type(&struct_iter)) !=
-> +                               DBUS_TYPE_INVALID) {
-> +               struct media_playlist *playlist;
-> +
-> +               if (ctype != DBUS_TYPE_STRUCT) {
-> +                       error("Invalid type");
-> +                       goto done;
-> +               }
+Signed-off-by: Chih-Wei Huang <cwhuang@linux.org.tw>
+---
+ src/shared/util.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Please check if the signature of the struct matches what we expect
-before creating the playlist.
-
-> +               playlist = g_new0(struct media_playlist, 1);
-> +
-> +               dbus_message_iter_recurse(&struct_iter, &entry);
-> +
-> +               dbus_message_iter_get_basic(&entry, &playlist->id);
-> +               DBG("Playlists Id %s", playlist->id);
-> +
-> +               dbus_message_iter_next(&entry);
-> +               dbus_message_iter_get_basic(&entry, &playlist->name);
-> +               DBG("Playlist Name %s", playlist->name);
-> +
-> +               dbus_message_iter_next(&entry);
-> +               dbus_message_iter_get_basic(&entry, &playlist->icon);
-> +               DBG("Playlist Icon %s", playlist->icon);
-> +
-> +               /* TODO: Create Media folder with playlist information */
-> +
-> +               mp->playlists = g_slist_append(mp->playlists, playlist);
-> +
-> +               g_free(playlist);
-> +
-> +               mp->total_items++;
-> +               dbus_message_iter_next(&struct_iter);
-> +       }
-> +
-> +done:
-> +       dbus_message_unref(reply);
-> +
-> +       mp->requests = g_slist_remove(mp->requests, request);
-> +       playlist_request_free(request);
-> +}
-> +
-> +static gboolean media_player_async_call(DBusMessage *msg,
-> +                                       struct media_player *mp,
-> +                                       media_player_cb_t cb,
-> +                                       GDestroyNotify destroy)
-> +{
-> +       struct player_request *request;
-> +       const char *method = NULL;
-> +
-> +       request = g_new0(struct player_request, 1);
-> +
-> +       if (!(dbus_connection_send_with_reply(btd_get_dbus_connection(),
-> +                                       msg, &request->call, -1))) {
-> +               error("D-Bus send failed");
-> +               g_free(request);
-> +               return FALSE;
-> +       }
-> +
-> +       method = dbus_message_get_member(msg);
-> +
-> +       if (g_strcmp0(method, "GetPlaylists") == 0)
-> +               dbus_pending_call_set_notify(request->call,
-> +                                               cb, request, NULL);
-
-Would be better to check if the cb is set that means
-dbus_pending_call_set_notify must be called, actually there is no
-point in calling media_player_async_call without a callback so I don't
-understand why we need the if statement above it should always call
-dbus_pending_call_set_notify since that is the whole point of the
-function.
-
-> +       request->mp = mp;
-> +       request->msg = msg;
-
-Where is the user_data set? If there is no user_data needed we don't
-need a destroy callback either, so please add a user_data so if in the
-future we need a context to pass to the callback, e.g. the playlist,
-then it can be set.
-
-> +       request->destroy = destroy;
-> +
-> +       mp->requests = g_slist_append(mp->requests, request);
-> +
-> +       DBG("Calling %s: name = %s path = %s", dbus_message_get_member(msg),
-> +                       dbus_message_get_destination(msg),
-> +                       dbus_message_get_path(msg));
-> +
-> +       return TRUE;
-> +}
-> +
-> +static gboolean get_playlists(struct media_player *mp)
-> +{
-> +       DBusMessage *msg;
-> +       gboolean reverse_order = FALSE;
-> +       uint32_t start_index = 0x0000;
-> +       uint32_t end_index = 0xFFFF;
-> +       char *ordering = "Alphabetical";
-> +       uint32_t max_count = (end_index - start_index);
-> +
-> +       msg = dbus_message_new_method_call(mp->sender, mp->path,
-> +                               MEDIA_PLAYER_PLAYLIST_INTERFACE,
-> +                               "GetPlaylists");
-> +
-> +       if (msg == NULL) {
-> +               error("Couldn't allocate D-Bus message");
-> +               return -ENOMEM;
-> +       }
-> +
-> +       dbus_message_append_args(msg,
-> +                       DBUS_TYPE_UINT32, &start_index,
-> +                       DBUS_TYPE_UINT32, &max_count,
-> +                       DBUS_TYPE_STRING, &ordering,
-> +                       DBUS_TYPE_BOOLEAN, &reverse_order,
-> +                       DBUS_TYPE_INVALID);
-> +
-> +       mp->total_items = 0;
-> +
-> +       return media_player_async_call(msg, mp, playlist_reply, g_free);
-> +}
-> +
->  static struct avrcp_player_cb player_cb = {
->         .list_settings = list_settings,
->         .get_setting = get_setting,
-> @@ -1290,6 +1457,7 @@ static struct avrcp_player_cb player_cb = {
->         .previous = previous,
->  };
->
-> +
->  static void media_player_exit(DBusConnection *connection, void *user_data)
->  {
->         struct media_player *mp = user_data;
-> @@ -1831,6 +1999,9 @@ static DBusMessage *register_player(DBusConnection *conn, DBusMessage *msg,
->                 return btd_error_invalid_args(msg);
->         }
->
-> +       if (!get_playlists(mp))
-> +               DBG("Error fetching playlists");
-> +
->         return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
->  }
->
-> diff --git a/profiles/audio/media.h b/profiles/audio/media.h
-> index dd630d4..6d15882 100644
-> --- a/profiles/audio/media.h
-> +++ b/profiles/audio/media.h
-> @@ -26,6 +26,8 @@ struct media_endpoint;
->
->  typedef void (*media_endpoint_cb_t) (struct media_endpoint *endpoint,
->                                         void *ret, int size, void *user_data);
-> +typedef void (*media_player_cb_t) (DBusPendingCall *call,
-> +                                       void *user_data);
->
->  int media_register(struct btd_adapter *btd_adapter);
->  void media_unregister(struct btd_adapter *btd_adapter);
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 7878552..e19b264 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -34,6 +34,7 @@
+ #include <dirent.h>
+ #include <limits.h>
+ #include <string.h>
++#include <strings.h>
+ 
+ #include "src/shared/util.h"
+ 
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
