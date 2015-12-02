@@ -1,92 +1,74 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH] Bluetooth: Don't treat connection timeout as a failure
+Subject: Re: [PATCH] Bluetooth: Use continuous scanning when creating LE connections
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20151202084606.GB13305@t440s.lan>
-Date: Wed, 2 Dec 2015 07:45:15 -1000
+In-Reply-To: <20151202083650.GA13305@t440s.lan>
+Date: Wed, 2 Dec 2015 07:44:20 -1000
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C6CEB314-92D5-45A3-886A-CF5A06A4A652@holtmann.org>
-References: <1448961769-20546-1-git-send-email-johan.hedberg@gmail.com> <7DB5C188-FDEA-45D4-B02D-36FA5454563F@holtmann.org> <20151202084606.GB13305@t440s.lan>
+Message-Id: <5F86758B-A5B4-4132-B62C-5C8FD3F68D44@holtmann.org>
+References: <1448880520-12810-1-git-send-email-johan.hedberg@gmail.com> <A56C1B29-8433-42B7-80E5-580E28BBCB53@holtmann.org> <20151202083650.GA13305@t440s.lan>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
->>> When we're doing background scanning and connection attempts it's
->>> possible we timeout trying to connect and go back to scanning again.
->>> The timeout triggers a HCI_LE_Create_Connection_Cancel which will
->>> trigger a Connection Complete with "Unknown Connection Identifier"
->>> error status. Since we go back to scanning this isn't really a failure
->>> and shouldn't be presented as such to user space through mgmt.
->>> 
->>> The exception to this is if the connection attempt was due to an
->>> explicit request on an L2CAP socket (indicated by
->>> params->explicit_connect being true). Since the socket will get an
->>> error it's consistent to also notify the failure on mgmt in this case.
+>>> All LE connections are now triggered through a preceding passive scan
+>>> and waiting for a connectable advertising report. This means we've got
+>>> the best possible guarantee that the device is within range and should
+>>> be able to request the controller to perform continuous scanning. This
+>>> way we minimize the risk that we miss out on any advertising packets.
 >>> 
 >>> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 >>> ---
->>> net/bluetooth/hci_conn.c | 12 ++++++++++--
->>> 1 file changed, 10 insertions(+), 2 deletions(-)
+>>> net/bluetooth/hci_conn.c | 6 +++++-
+>>> 1 file changed, 5 insertions(+), 1 deletion(-)
 >>> 
 >>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->>> index f28741d78e0b..de7fa9f78cbe 100644
+>>> index e2600213cd50..f28741d78e0b 100644
 >>> --- a/net/bluetooth/hci_conn.c
 >>> +++ b/net/bluetooth/hci_conn.c
->>> @@ -668,8 +668,16 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+>>> @@ -726,8 +726,12 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
+>>> 	if (hci_update_random_address(req, false, &own_addr_type))
+>>> 		return;
 >>> 
->>> 	conn->state = BT_CLOSED;
->>> 
->>> -	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
->>> -			    status);
->>> +	/* If the failure was due to a timeout and cancelation of the
->>> +	 * attempt there's no point of notifying failure since we'll go
->>> +	 * back to keep trying to connect. The only exception is
->>> +	 * explicit connect requests where a timeout + cancel does
->>> +	 * indicate an actual failure.
+>>> +	/* Set interval and window to same value to enable continuous
+>>> +	 * scanning.
 >>> +	 */
->>> +	if (status != HCI_ERROR_UNKNOWN_CONN_ID ||
->>> +	    (params && params->explicit_connect))
->>> +		mgmt_connect_failed(hdev, &conn->dst, conn->type,
->>> +				    conn->dst_type, status);
 >> 
->> are we okay with the oversimplified error handling. I think the HCI is
->> pretty clear that an Unknown Connection Identifier error can only be
->> traced back to the fact that LE Create Connection Cancel was issued,
->> but the connection had already been established.
+>> I think we want to phrase this as using a scan window as large as the
+>> scan interval to trigger a full duty / continuous scan. Just to be a
+>> bit more clearer.
 > 
-> Where in the spec do you conclude this from? The section for
-> HCI_LE_Create_Connection_Cancel states:
+> I was trying to follow the same phrasing as the specification uses:
 > 
-> "
-> If the cancellation was successful then, after the Command Complete
-> event for the LE_Create_Connection_Cancel command:
+> "The LE_Scan_Window parameter shall always be set to a value smaller or
+> equal to the value set for the LE_Scan_Interval parameter. If they are
+> set to the same value scanning should be run continuously."
 > 
-> - if the LE Enhanced Connection Complete event is unmasked, then that
->   event shall be sent.
-> - otherwise the LE Connection Complete event shall be sent.
-> 
-> In either case, the event shall be sent with the error code Unknown
-> Connection Identifier (0x02).
-> "
-> 
-> That doesn't talk anything about a connection already having been
-> established but rather a successful cancellation. The
-> hci_le_conn_failed() gets called from the event handler for LE
-> Connection Complete, so this error code here means that the cancellation
-> was successful.
-> 
->> Can you cause that error also with LE Create Connection itself? I
->> doubt it, but we want to be 100% clear here and maybe also be event
->> clear in the the comment on what kind of errors we are catching and
->> why. I think citing the spec might be a good idea here as well.
-> 
-> I can clarify in the comment that specifically Unknown Conn ID means
-> that the cancellation was successful.
+> However I don't care too strongly about this, so if you still prefer "as
+> large as" I can change it.
 
-I think that would be a good idea.
+I was actually not proposing "as large as" exact phrase. My suggestions was to phrase it in a more clear way, but maybe I am just overthinking it.
+
+> 
+>>> 	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
+>>> -	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
+>>> +	cp.scan_window = cp.scan_interval;
+>>> +
+>> 
+>> And I know you try to optimize the cpu_to_le16 out here, but honestly
+>> I would prefer this:
+>> 
+>> 	cp.scan_window = cpu_to_le16(hdev->le_scan_interval);
+> 
+> My initial reaction to this is "looks like a copy-paste bug where we
+> forgot to change to use the right variable" whereas the variant I went
+> with gives more of an impression of explicit intent. However here too I
+> wont insist - either way is fine with me.
+
+Fair point. Maybe better keep your version.
 
 Regards
 
