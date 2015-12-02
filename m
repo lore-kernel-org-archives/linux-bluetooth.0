@@ -1,178 +1,106 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1445346988-12782-3-git-send-email-bharat.panda@samsung.com>
-References: <1445346988-12782-1-git-send-email-bharat.panda@samsung.com>
-	<1445346988-12782-3-git-send-email-bharat.panda@samsung.com>
-Date: Wed, 2 Dec 2015 15:41:04 +0200
-Message-ID: <CABBYNZL2muG5XsJokwNfWEukBfmq86vUEZsd=JZWOCPSoEGrAw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] audio/avrcp: Add support for SetBrowsedPlayer
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	cpgs@samsung.com
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <chevalliersebmax@gmail.com>
+From: Maxime CHEVALLIER <chevalliersebmax@gmail.com>
+To: maxime.chevallier@openwide.fr,
+	marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org
+Cc: Maxime Chevallier <chevalliersebmax@gmail.com>
+Subject: [PATCH] lib: Added 'LE_SET_ADVERTISING_PARAMETERS' wrapper function to hci lib.
+Date: Wed,  2 Dec 2015 14:35:39 +0100
+Message-Id: <1449063339-3478-1-git-send-email-chevalliersebmax@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+From: Maxime Chevallier <chevalliersebmax@gmail.com>
 
-On Tue, Oct 20, 2015 at 4:16 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
-> Support added to handle SetBrowsedPlayer command for TG role.
->
->     AVCTP Browsing: Response: type 0x00 label 13 PID 0x110e
->       AVRCP: SetBrowsedPlayer: len 0x000a
->        Status: 0x04 (Success)
->        UIDCounter: 0x0000 (0)
->        Number of Items: 0x00000007 (7)
->        CharsetID: 0x006a (UTF-8)
->        Folder Depth: 0x00 (0)
-> ---
+Hi all,
 
-That patch seems good, but now looking at the decoding it seems we got
-AVCTP to do the opposite of what other protocols are doing, so it
-should be decode value (raw value) not the other way around. If you
-have some time could you please try to fix the this?
+This patch add the hci_le_set_advertising_parameters function
+to hci lib. This is something I needed and tested, on a Marvell
+88W8887.
 
->  profiles/audio/avrcp.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  profiles/audio/avrcp.h |  1 +
->  profiles/audio/media.c |  8 +++++++
->  3 files changed, 72 insertions(+)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 7b60012..c20fbcb 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -207,6 +207,15 @@ struct player_item {
->         char name[0];
->  } __attribute__ ((packed));
->
-> +struct avrcp_set_browsed_player_rsp {
-> +       uint8_t status;
-> +       uint16_t uid_counter;
-> +       uint32_t num_of_items;
-> +       uint16_t charset_id;
-> +       uint8_t folder_depth;
-> +       uint8_t data[0];
-> +} __attribute__ ((packed));
-> +
->  struct avrcp_server {
->         struct btd_adapter *adapter;
->         uint32_t tg_record_id;
-> @@ -1873,6 +1882,59 @@ err_metadata:
->         return AVRCP_HEADER_LENGTH + 1;
->  }
->
-> +static void avrcp_handle_set_browsed_player(struct avrcp *session,
-> +                               struct avrcp_browsing_header *pdu,
-> +                               uint8_t transaction)
-> +{
-> +       struct avrcp_player *player;
-> +       struct media_player *mp;
-> +       struct avrcp_set_browsed_player_rsp *resp;
-> +       uint16_t len = ntohs(pdu->param_len);
-> +       uint16_t player_id = 0;
-> +       uint8_t status;
-> +
-> +       if (len < 1) {
-> +               status = AVRCP_STATUS_INVALID_PARAM;
-> +               goto failed;
-> +       }
-> +
-> +       player_id = bt_get_be16(&pdu->params[0]);
-> +       player = find_tg_player(session, player_id);
-> +
-> +       if (!player) {
-> +               status = AVRCP_STATUS_NO_AVAILABLE_PLAYERS;
-> +               goto failed;
-> +       }
-> +
-> +       if (!(features[7] & 0x08)) {
-> +               status = AVRCP_STATUS_PLAYER_NOT_BROWSABLE;
-> +               goto failed;
-> +       }
-> +
-> +       mp = player->user_data;
-> +       player->browsed = true;
-> +
-> +       resp = (struct avrcp_set_browsed_player_rsp *) pdu->params;
-> +
-> +       resp->status = AVRCP_STATUS_SUCCESS;
-> +       resp->uid_counter = htons(player_get_uid_counter(player));
-> +       resp->num_of_items = htonl(player->cb->get_total_items(mp));
-> +
-> +       /*
-> +        * MPRIS player returns a flat hierarchy playlist structure,
-> +        * where the folder depth will always considered to be 0.
-> +        */
-> +       resp->folder_depth = 0;
-> +       resp->charset_id = htons(AVRCP_CHARSET_UTF8);
-> +       pdu->param_len = htons(sizeof(*resp));
-> +
-> +       return;
-> +
-> +failed:
-> +       pdu->params[0] = status;
-> +       pdu->param_len = htons(1);
-> +}
-> +
->  static void avrcp_handle_media_player_list(struct avrcp *session,
->                                 struct avrcp_browsing_header *pdu,
->                                 uint32_t start_item, uint32_t end_item)
-> @@ -1989,6 +2051,7 @@ static struct browsing_pdu_handler {
->                                                         uint8_t transaction);
->  } browsing_handlers[] = {
->                 { AVRCP_GET_FOLDER_ITEMS, avrcp_handle_get_folder_items },
-> +               { AVRCP_SET_BROWSED_PLAYER, avrcp_handle_set_browsed_player},
->                 { },
->  };
->
-> diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-> index 86d310c..c09b910 100644
-> --- a/profiles/audio/avrcp.h
-> +++ b/profiles/audio/avrcp.h
-> @@ -101,6 +101,7 @@ struct avrcp_player_cb {
->         bool (*pause) (void *user_data);
->         bool (*next) (void *user_data);
->         bool (*previous) (void *user_data);
-> +       uint32_t (*get_total_items) (void *user_data);
->  };
->
->  int avrcp_set_volume(struct btd_device *dev, uint8_t volume, bool notify);
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index 94fce79..a4ff4cc 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -1293,6 +1293,13 @@ static bool previous(void *user_data)
->         return media_player_send(mp, "Previous");
->  }
->
-> +static uint32_t get_total_items(void *user_data)
-> +{
-> +       struct media_player *mp = user_data;
-> +
-> +       return mp->total_items;
-> +}
-> +
->  static void playlist_reply(DBusPendingCall *call, void *user_data)
->  {
->         struct player_request *request = user_data;
-> @@ -1451,6 +1458,7 @@ static struct avrcp_player_cb player_cb = {
->         .pause = pause,
->         .next = next,
->         .previous = previous,
-> +       .get_total_items = get_total_items,
->  };
->
->  static void media_player_exit(DBusConnection *connection, void *user_data)
-> --
-> 1.9.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I already tried to submit this patch to the ML, but I think some
+misconfiguration on my company's mail server caused the mail to
+be dropped.
 
+Sorry for the spam if you actually received it previously.
 
+Please tell me anything I can do to make this patch better, I am
+not quite sure for example that I named correctly the function.
 
+Regards,
+
+Maxime Chevallier
+
+Signed-off-by: Maxime Chevallier <chevalliersebmax@gmail.com>
+---
+ lib/hci.c     | 39 +++++++++++++++++++++++++++++++++++++++
+ lib/hci_lib.h |  5 +++++
+ 2 files changed, 44 insertions(+)
+
+diff --git a/lib/hci.c b/lib/hci.c
+index c25be9e..4472dd1 100644
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -2996,6 +2996,45 @@ int hci_le_set_advertise_enable(int dd, uint8_t enable, int to)
+ 	return 0;
+ }
+ 
++int hci_le_set_advertising_parameters(int dd, uint16_t min_interval,
++                                        uint16_t max_interval, uint8_t advtype,
++                                        uint8_t own_bdaddr_type, uint8_t direct_bdaddr_type,
++                                        const bdaddr_t *direct_bdaddr, uint8_t chan_map,
++                                        uint8_t filter, int to)
++{
++	struct hci_request rq;
++	le_set_advertising_parameters_cp param_cp;
++	uint8_t status;
++
++	memset(&param_cp, 0, sizeof(param_cp));
++	param_cp.min_interval = min_interval;
++	param_cp.max_interval = max_interval;
++	param_cp.advtype = advtype;
++	param_cp.own_bdaddr_type = own_bdaddr_type;
++	param_cp.direct_bdaddr_type = direct_bdaddr_type;
++	bacpy(&param_cp.direct_bdaddr, direct_bdaddr);
++	param_cp.chan_map = chan_map;
++	param_cp.filter = filter;
++
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf = OGF_LE_CTL;
++	rq.ocf = OCF_LE_SET_ADVERTISING_PARAMETERS;
++	rq.cparam = &param_cp;
++	rq.clen = LE_SET_ADVERTISING_PARAMETERS_CP_SIZE;
++	rq.rparam = &status;
++	rq.rlen = 1;
++
++	if (hci_send_req(dd, &rq, to) < 0)
++		return -1;
++
++	if (status) {
++		errno = EIO;
++		return -1;
++	}
++
++	return 0;
++}
++
+ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
+ 		uint8_t initiator_filter, uint8_t peer_bdaddr_type,
+ 		bdaddr_t peer_bdaddr, uint8_t own_bdaddr_type,
+diff --git a/lib/hci_lib.h b/lib/hci_lib.h
+index 55aeb17..9fd7505 100644
+--- a/lib/hci_lib.h
++++ b/lib/hci_lib.h
+@@ -120,6 +120,11 @@ int hci_le_set_scan_parameters(int dev_id, uint8_t type, uint16_t interval,
+ 					uint16_t window, uint8_t own_type,
+ 					uint8_t filter, int to);
+ int hci_le_set_advertise_enable(int dev_id, uint8_t enable, int to);
++int hci_le_set_advertising_parameters(int dd, uint16_t min_interval,
++					uint16_t max_interval, uint8_t advtype,
++					uint8_t own_bdaddr_type, uint8_t direct_bdaddr_type,
++					const bdaddr_t *direct_bdaddr, uint8_t chan_map,
++					uint8_t filter, int to);
+ int hci_le_create_conn(int dd, uint16_t interval, uint16_t window,
+ 		uint8_t initiator_filter, uint8_t peer_bdaddr_type,
+ 		bdaddr_t peer_bdaddr, uint8_t own_bdaddr_type,
 -- 
-Luiz Augusto von Dentz
+2.1.4
