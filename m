@@ -1,280 +1,178 @@
-Return-Path: <loic.poulain@intel.com>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] Bluetooth: btintel: Add manufacturing enter/exit helpers
-Date: Wed,  2 Dec 2015 15:11:20 +0100
-Message-Id: <1449065480-23642-1-git-send-email-loic.poulain@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1445346988-12782-3-git-send-email-bharat.panda@samsung.com>
+References: <1445346988-12782-1-git-send-email-bharat.panda@samsung.com>
+	<1445346988-12782-3-git-send-email-bharat.panda@samsung.com>
+Date: Wed, 2 Dec 2015 15:41:04 +0200
+Message-ID: <CABBYNZL2muG5XsJokwNfWEukBfmq86vUEZsd=JZWOCPSoEGrAw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] audio/avrcp: Add support for SetBrowsedPlayer
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bharat Panda <bharat.panda@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Older Intel controllers need to enter manufacturing mode to perform
-some vendor specific operations (patching, configuration...).
-Add enter/exit manufaturing methods and refactor existing
-manufacturing code.
+Hi Bharat,
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- drivers/bluetooth/btintel.c | 109 ++++++++++++++++++++++----------------------
- drivers/bluetooth/btintel.h |   2 +
- drivers/bluetooth/btusb.c   |  54 ++++++----------------
- 3 files changed, 71 insertions(+), 94 deletions(-)
+On Tue, Oct 20, 2015 at 4:16 PM, Bharat Panda <bharat.panda@samsung.com> wrote:
+> Support added to handle SetBrowsedPlayer command for TG role.
+>
+>     AVCTP Browsing: Response: type 0x00 label 13 PID 0x110e
+>       AVRCP: SetBrowsedPlayer: len 0x000a
+>        Status: 0x04 (Success)
+>        UIDCounter: 0x0000 (0)
+>        Number of Items: 0x00000007 (7)
+>        CharsetID: 0x006a (UTF-8)
+>        Folder Depth: 0x00 (0)
+> ---
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 1f13e61..e9f26eb 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -73,6 +73,43 @@ int btintel_check_bdaddr(struct hci_dev *hdev)
- }
- EXPORT_SYMBOL_GPL(btintel_check_bdaddr);
- 
-+int btintel_enter_mfg(struct hci_dev *hdev)
-+{
-+	const u8 param[] = { 0x01, 0x00 };
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Entering manufacturer mode failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_enter_mfg);
-+
-+int btintel_exit_mfg(struct hci_dev *hdev, bool reset, bool patched)
-+{
-+	u8 param[] = { 0x00, 0x00 };
-+	struct sk_buff *skb;
-+
-+	if (reset)
-+		param[1] |= patched ? 0x02 : 0x01;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Exiting manufacturer mode failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_exit_mfg);
-+
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- {
- 	struct sk_buff *skb;
-@@ -126,37 +163,19 @@ EXPORT_SYMBOL_GPL(btintel_set_diag);
- 
- int btintel_set_diag_mfg(struct hci_dev *hdev, bool enable)
- {
--	struct sk_buff *skb;
--	u8 param[2];
--	int err;
--
--	param[0] = 0x01;
--	param[1] = 0x00;
-+	int err, ret;
- 
--	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		err = PTR_ERR(skb);
--		BT_ERR("%s: Entering Intel manufacturer mode failed (%d)",
--		       hdev->name, err);
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
--
--	err = btintel_set_diag(hdev, enable);
-+	err = btintel_enter_mfg(hdev);
-+	if (err)
-+		return err;
- 
--	param[0] = 0x00;
--	param[1] = 0x00;
-+	ret = btintel_set_diag(hdev, enable);
- 
--	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		err = PTR_ERR(skb);
--		BT_ERR("%s: Leaving Intel manufacturer mode failed (%d)",
--		       hdev->name, err);
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	err = btintel_exit_mfg(hdev, false, false);
-+	if (err)
-+		return err;
- 
--	return err;
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(btintel_set_diag_mfg);
- 
-@@ -309,37 +328,19 @@ EXPORT_SYMBOL_GPL(btintel_set_event_mask);
- 
- int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
- {
--	struct sk_buff *skb;
--	u8 param[2];
--	int err;
--
--	param[0] = 0x01;
--	param[1] = 0x00;
--
--	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		err = PTR_ERR(skb);
--		BT_ERR("%s: Entering Intel manufacturer mode failed (%d)",
--		       hdev->name, err);
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	int err, ret;
- 
--	err = btintel_set_event_mask(hdev, debug);
-+	err = btintel_enter_mfg(hdev);
-+	if (err)
-+		return err;
- 
--	param[0] = 0x00;
--	param[1] = 0x00;
-+	ret = btintel_set_event_mask(hdev, debug);
- 
--	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		err = PTR_ERR(skb);
--		BT_ERR("%s: Leaving Intel manufacturer mode failed (%d)",
--		       hdev->name, err);
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	err = btintel_exit_mfg(hdev, false, false);
-+	if (err)
-+		return err;
- 
--	return err;
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(btintel_set_event_mask_mfg);
- 
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 07e58e0..a963fe9 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -72,6 +72,8 @@ struct intel_secure_send_result {
- #if IS_ENABLED(CONFIG_BT_INTEL)
- 
- int btintel_check_bdaddr(struct hci_dev *hdev);
-+int btintel_enter_mfg(struct hci_dev *hdev);
-+int btintel_exit_mfg(struct hci_dev *hdev, bool reset, bool patched);
- int btintel_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int btintel_set_diag(struct hci_dev *hdev, bool enable);
- int btintel_set_diag_mfg(struct hci_dev *hdev, bool enable);
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8063534..890ee52 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1642,14 +1642,9 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	struct sk_buff *skb;
- 	const struct firmware *fw;
- 	const u8 *fw_ptr;
--	int disable_patch;
-+	int disable_patch, err;
- 	struct intel_version *ver;
- 
--	const u8 mfg_enable[] = { 0x01, 0x00 };
--	const u8 mfg_disable[] = { 0x00, 0x00 };
--	const u8 mfg_reset_deactivate[] = { 0x00, 0x01 };
--	const u8 mfg_reset_activate[] = { 0x00, 0x02 };
--
- 	BT_DBG("%s", hdev->name);
- 
- 	/* The controller has a bug with the first HCI command sent to it
-@@ -1721,22 +1716,16 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 
- 	kfree_skb(skb);
- 
--	/* This Intel specific command enables the manufacturer mode of the
--	 * controller.
--	 *
-+	/* Enable the manufacturer mode of the controller.
- 	 * Only while this mode is enabled, the driver can download the
- 	 * firmware patch data and configuration parameters.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc11, 2, mfg_enable, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("%s entering Intel manufacturer mode failed (%ld)",
--		       hdev->name, PTR_ERR(skb));
-+	err = btintel_enter_mfg(hdev);
-+	if (err) {
- 		release_firmware(fw);
--		return PTR_ERR(skb);
-+		return err;
- 	}
- 
--	kfree_skb(skb);
--
- 	disable_patch = 1;
- 
- 	/* The firmware data file consists of list of Intel specific HCI
-@@ -1776,14 +1765,9 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	/* Patching completed successfully and disable the manufacturer mode
- 	 * with reset and activate the downloaded firmware patches.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_reset_activate),
--			     mfg_reset_activate, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
--		       hdev->name, PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	err = btintel_exit_mfg(hdev, true, true);
-+	if (err)
-+		return err;
- 
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed and activated",
- 		hdev->name);
-@@ -1792,14 +1776,9 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 
- exit_mfg_disable:
- 	/* Disable the manufacturer mode without reset */
--	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_disable), mfg_disable,
--			     HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
--		       hdev->name, PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	err = btintel_exit_mfg(hdev, false, false);
-+	if (err)
-+		return err;
- 
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed", hdev->name);
- 
-@@ -1811,14 +1790,9 @@ exit_mfg_deactivate:
- 	/* Patching failed. Disable the manufacturer mode with reset and
- 	 * deactivate the downloaded firmware patches.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc11, sizeof(mfg_reset_deactivate),
--			     mfg_reset_deactivate, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
--		       hdev->name, PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--	kfree_skb(skb);
-+	err = btintel_exit_mfg(hdev, true, false);
-+	if (err)
-+		return err;
- 
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed and deactivated",
- 		hdev->name);
+That patch seems good, but now looking at the decoding it seems we got
+AVCTP to do the opposite of what other protocols are doing, so it
+should be decode value (raw value) not the other way around. If you
+have some time could you please try to fix the this?
+
+>  profiles/audio/avrcp.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  profiles/audio/avrcp.h |  1 +
+>  profiles/audio/media.c |  8 +++++++
+>  3 files changed, 72 insertions(+)
+>
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 7b60012..c20fbcb 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -207,6 +207,15 @@ struct player_item {
+>         char name[0];
+>  } __attribute__ ((packed));
+>
+> +struct avrcp_set_browsed_player_rsp {
+> +       uint8_t status;
+> +       uint16_t uid_counter;
+> +       uint32_t num_of_items;
+> +       uint16_t charset_id;
+> +       uint8_t folder_depth;
+> +       uint8_t data[0];
+> +} __attribute__ ((packed));
+> +
+>  struct avrcp_server {
+>         struct btd_adapter *adapter;
+>         uint32_t tg_record_id;
+> @@ -1873,6 +1882,59 @@ err_metadata:
+>         return AVRCP_HEADER_LENGTH + 1;
+>  }
+>
+> +static void avrcp_handle_set_browsed_player(struct avrcp *session,
+> +                               struct avrcp_browsing_header *pdu,
+> +                               uint8_t transaction)
+> +{
+> +       struct avrcp_player *player;
+> +       struct media_player *mp;
+> +       struct avrcp_set_browsed_player_rsp *resp;
+> +       uint16_t len = ntohs(pdu->param_len);
+> +       uint16_t player_id = 0;
+> +       uint8_t status;
+> +
+> +       if (len < 1) {
+> +               status = AVRCP_STATUS_INVALID_PARAM;
+> +               goto failed;
+> +       }
+> +
+> +       player_id = bt_get_be16(&pdu->params[0]);
+> +       player = find_tg_player(session, player_id);
+> +
+> +       if (!player) {
+> +               status = AVRCP_STATUS_NO_AVAILABLE_PLAYERS;
+> +               goto failed;
+> +       }
+> +
+> +       if (!(features[7] & 0x08)) {
+> +               status = AVRCP_STATUS_PLAYER_NOT_BROWSABLE;
+> +               goto failed;
+> +       }
+> +
+> +       mp = player->user_data;
+> +       player->browsed = true;
+> +
+> +       resp = (struct avrcp_set_browsed_player_rsp *) pdu->params;
+> +
+> +       resp->status = AVRCP_STATUS_SUCCESS;
+> +       resp->uid_counter = htons(player_get_uid_counter(player));
+> +       resp->num_of_items = htonl(player->cb->get_total_items(mp));
+> +
+> +       /*
+> +        * MPRIS player returns a flat hierarchy playlist structure,
+> +        * where the folder depth will always considered to be 0.
+> +        */
+> +       resp->folder_depth = 0;
+> +       resp->charset_id = htons(AVRCP_CHARSET_UTF8);
+> +       pdu->param_len = htons(sizeof(*resp));
+> +
+> +       return;
+> +
+> +failed:
+> +       pdu->params[0] = status;
+> +       pdu->param_len = htons(1);
+> +}
+> +
+>  static void avrcp_handle_media_player_list(struct avrcp *session,
+>                                 struct avrcp_browsing_header *pdu,
+>                                 uint32_t start_item, uint32_t end_item)
+> @@ -1989,6 +2051,7 @@ static struct browsing_pdu_handler {
+>                                                         uint8_t transaction);
+>  } browsing_handlers[] = {
+>                 { AVRCP_GET_FOLDER_ITEMS, avrcp_handle_get_folder_items },
+> +               { AVRCP_SET_BROWSED_PLAYER, avrcp_handle_set_browsed_player},
+>                 { },
+>  };
+>
+> diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+> index 86d310c..c09b910 100644
+> --- a/profiles/audio/avrcp.h
+> +++ b/profiles/audio/avrcp.h
+> @@ -101,6 +101,7 @@ struct avrcp_player_cb {
+>         bool (*pause) (void *user_data);
+>         bool (*next) (void *user_data);
+>         bool (*previous) (void *user_data);
+> +       uint32_t (*get_total_items) (void *user_data);
+>  };
+>
+>  int avrcp_set_volume(struct btd_device *dev, uint8_t volume, bool notify);
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> index 94fce79..a4ff4cc 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -1293,6 +1293,13 @@ static bool previous(void *user_data)
+>         return media_player_send(mp, "Previous");
+>  }
+>
+> +static uint32_t get_total_items(void *user_data)
+> +{
+> +       struct media_player *mp = user_data;
+> +
+> +       return mp->total_items;
+> +}
+> +
+>  static void playlist_reply(DBusPendingCall *call, void *user_data)
+>  {
+>         struct player_request *request = user_data;
+> @@ -1451,6 +1458,7 @@ static struct avrcp_player_cb player_cb = {
+>         .pause = pause,
+>         .next = next,
+>         .previous = previous,
+> +       .get_total_items = get_total_items,
+>  };
+>
+>  static void media_player_exit(DBusConnection *connection, void *user_data)
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.9.1
+Luiz Augusto von Dentz
