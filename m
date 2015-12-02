@@ -1,99 +1,71 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: Need help with bug in ftp-client executable from bluez-5.24 package
-From: Konrad Antoniuk <konrad18622@gmail.com>
-In-Reply-To: <000001d12d0e$a7f505e0$f7df11a0$@samsung.com>
-Date: Wed, 2 Dec 2015 14:44:14 -0800
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+Subject: Re: Unknown Connection Identifier
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20151202085224.GC13305@t440s.lan>
+Date: Wed, 2 Dec 2015 07:54:41 -1000
+Cc: =?utf-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>,
+	Szymon Janc <szymon.janc@codecoup.pl>,
 	linux-bluetooth@vger.kernel.org
-Message-Id: <FA26AA71-2B3A-43B0-966B-AED90C10DA27@gmail.com>
-References: <6AF6FACF-FE0C-446F-9FD1-BBAD20EBF8CC@gmail.com> <CABBYNZKGNtvEGAKT6KL7u2eta=urSQoHZw7x8ChwFA6X4xaxjw@mail.gmail.com> <899EB388-8EE7-449D-850E-C7352B52FDC1@gmail.com> <000001d12d0e$a7f505e0$f7df11a0$@samsung.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Message-Id: <0F926DB5-1497-4C5B-8738-33E8ED46D3E9@holtmann.org>
+References: <CAEZxfGPTxwUZzU+3XSV-uiN+DMz+hyOKiiZfgF+oD6pp=-XiOA@mail.gmail.com> <AAC95ACC-36E4-4618-8F49-53F78AE93AA6@holtmann.org> <2045332.GytFuFKTvp@ix> <CAEZxfGOdyZat1evKm0Jfwg=knuigGdfK_wVqS8NG=zFAY3aRXg@mail.gmail.com> <2DBBB005-93A7-47ED-8E88-1D6B92ACCC07@holtmann.org> <20151201084107.GA11107@t440s.lan> <487A3350-04EA-43F5-AAD0-4B64005D108E@holtmann.org> <20151202085224.GC13305@t440s.lan>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gowtham,
+Hi Johan,
 
-> On Dec 2, 2015, at 6:34 AM, Gowtham Anandha Babu <gowtham.ab@samsung.com> wrote:
-> 
-> Hi Konrad,
-> 
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Konrad Antoniuk
->> Sent: Wednesday, December 02, 2015 6:42 PM
->> To: Luiz Augusto von Dentz
->> Cc: linux-bluetooth@vger.kernel.org
->> Subject: Re: Need help with bug in ftp-client executable from bluez-5.24
->> package
->> 
->> Hello Luiz,
->> 
->>> On Dec 2, 2015, at 2:57 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> 
->>> Hi Konrad,
->>> 
->>> On Wed, Dec 2, 2015 at 10:37 AM, Konrad Antoniuk
->> <konrad18622@gmail.com> wrote:
->>>> Hi,
+>>>>>> HCI Event: Command Complete (0x0e) plen 4                                           [hci0] 17.672048
+>>>>>    LE Create Connection Cancel (0x08|0x000e) ncmd 1
+>>>>>      Status: Success (0x00)
+>>>>>> HCI Event: LE Meta Event (0x3e) plen 19                                             [hci0] 17.674036
+>>>>>    LE Connection Complete (0x01)
+>>>>>      Status: Unknown Connection Identifier (0x02)
+>>>>>      Handle: 32
+>>>>>      Role: Master (0x00)
+>>>>>      Peer address type: Public (0x00)
+>>>>>      Peer address: 88:0F:10:9D:EB:42 (OUI 88-0F-10)
+>>>>>      Connection interval: 67.50 msec (0x0036)
+>>>>>      Connection latency: 0.00 msec (0x0000)
+>>>>>      Supervision timeout: 420 msec (0x002a)
+>>>>>      Master clock accuracy: 0x00
+>>>>> @ Connect Failed: 88:0F:10:9D:EB:42 (1) status 0x02
 >>>> 
->>>> I’m looking to resolve an issue with one of the programs from the
->>>> bluez package. I’m using the ftp-client python executable from the
->>>> test folder and having trouble with transferring larger files. I’m
->>>> running the program on the Intel Edison which runs Embedded Linux -
->>>> Yocto. Initially the program worked for smaller files, 6.3 kB in
->>>> size, but when I began experimenting with data files only double the
->>>> size I began to run into trouble. Whenever the dbus signaled and
->>>> called the callback method properties_changed, I initially received
->>>> an error that the global variable value was left uninitialized. I
->>>> solved that problem by adding the line value =
->>>> properties[“Transferred”] at line 98 in the program, just before the
->>>> speed calculation. This removed any reported errors received but the
->>>> larger files still don’t transfer successfully. It seems whenever the
->>>> signal’s callback function completes, the transfer doesn’t continue.
->>>> I’ve attempted to call the Resume method from the Tr
->> ansfer Interface but I must be doing something wrong because I’m fairly
->> new to Python and debugging a program that uses dbus.
->>>> 
->>>> To make it clear, the ftp-client executable from the test folder in the blues
->> package works whenever the file transfer is completed before the Bus
->> signals back. I’ve fixed an uninitialized variable bug but I still can’t get larger
->> files to successfully transfer. I appreciate any guidance in correcting the
->> source code and fixing this bug.
+>>>> This one still needs to be fixed. It is a bug. The implementation is
+>>>> too naive. The unknown connection identifier is actually the success
+>>>> case for LE Create Connection Cancel command. And since we keep trying
+>>>> until the connection timeout hits, this is not an error at this point.
 >>> 
->>> Have you tried with obexctl? ftp-client is actually deprecated so
->>> chances are that it doesn't work properly anymore.
->>> 
->>> 
->>> --
->>> Luiz Augusto von Dentz
+>>> I think we need to differentiate between explicit connection requests
+>>> (L2CAP socket connect()) and Add Device based connections. For the
+>>> former we probably do want the Connect Failed since that's consistent
+>>> with the behavior you see when operating the L2CAP socket. For the
+>>> latter where we just go back to trying again, so the event doesn't
+>>> really describe what's going on.
 >> 
->> Thanks for the quick response. I did get obexctl to transfer the larger file for
->> me. However, for my application, I was using ftp-client through a system call
->> within an SPP python program that interpreted my commands from a
->> separate device. In addition, I was able to pass all of my options and
->> arguments with a single shell command using this method. Will I be able to
->> use obexctl the same way or is there another application that will allow me to
->> do the same that isn’t deprecated?
+>> are you sure about that. I think we need to define when we want the
+>> mgmt connect failed event to show up. Does it make sense that it shows
+>> up for connection attempts that are not initiated by mgmt?
 >> 
+>> I mean, what is the benefit of a connection failed event if you can
+>> not tell that something actually tried to connect in the first. So if
+>> you try to connect via L2CAP, we are just getting a failure and do not
+>> know what triggered it. How is that helpful?
 > 
-> Please try out the patch " [PATCH] test: Fix ftp-client not printing progress " which I have sent on ML.
-> Hope that solves your problem.
-> 
-> Regards,
-> Gowtham A
-> 
->> Thanks,
->> Konrad    --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org More majordomo
->> info at  http://vger.kernel.org/majordomo-info.html
-> 
+> I could think of at least one case: a device uses security mode 3 and we
+> connect to it via L2CAP. This triggers a PIN Code Request event, however
+> before we answer it the remote side cancels the connection/pairing
+> triggering a connect complete with failure status. In this case
+> bluetoothd should notify the agent to stop requesting for the PIN. Quite
+> a far stretched scenario (and I might even be wrong about it) but I
+> wouldn't be so quick to dismiss this event for non-mgmt actions.
 
-It works! Thanks for the help, it’s much appreciated. If it’s not too much trouble, can you or someone explain why additional changes to the preceding if statements made the difference in functionality? Running the original code, I’ve now noticed the additional exceptions printing a couple KeyError messages for the Status property. Why did these errors disappear when I made the undefined variable fix? 
+actually I agree, everything involved with mgmt and pairing should cause this error. However has that really anything to do with L2CAP? It is more like we only send it if something happens on HCI side of things that are no related to any higher layers.
 
-Regards,
-Konrad
+Btw. I am fine with applying your initial patch with the updated comment. It is improving the situation no matter what, but we might want to double check if not sending this event with nobody being able to react on it.
+
+Regards
+
+Marcel
 
