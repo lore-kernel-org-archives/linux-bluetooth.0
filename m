@@ -1,84 +1,92 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH v2] Bluetooth: btintel: Add manufacturing enter/exit helpers
+Subject: Re: [PATCH] Bluetooth: Don't treat connection timeout as a failure
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1449067068-9707-1-git-send-email-loic.poulain@intel.com>
-Date: Wed, 2 Dec 2015 07:52:05 -1000
+In-Reply-To: <20151202084606.GB13305@t440s.lan>
+Date: Wed, 2 Dec 2015 07:45:15 -1000
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <733BD25D-9053-44CD-8A96-2BE381BFD807@holtmann.org>
-References: <1449067068-9707-1-git-send-email-loic.poulain@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
+Message-Id: <C6CEB314-92D5-45A3-886A-CF5A06A4A652@holtmann.org>
+References: <1448961769-20546-1-git-send-email-johan.hedberg@gmail.com> <7DB5C188-FDEA-45D4-B02D-36FA5454563F@holtmann.org> <20151202084606.GB13305@t440s.lan>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi Johan,
 
-> Older Intel controllers need to enter manufacturing mode to perform
-> some vendor specific operations (patching, configuration...).
-> Add enter/exit manufaturing methods and refactor existing
-> manufacturing code.
+>>> When we're doing background scanning and connection attempts it's
+>>> possible we timeout trying to connect and go back to scanning again.
+>>> The timeout triggers a HCI_LE_Create_Connection_Cancel which will
+>>> trigger a Connection Complete with "Unknown Connection Identifier"
+>>> error status. Since we go back to scanning this isn't really a failure
+>>> and shouldn't be presented as such to user space through mgmt.
+>>> 
+>>> The exception to this is if the connection attempt was due to an
+>>> explicit request on an L2CAP socket (indicated by
+>>> params->explicit_connect being true). Since the socket will get an
+>>> error it's consistent to also notify the failure on mgmt in this case.
+>>> 
+>>> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+>>> ---
+>>> net/bluetooth/hci_conn.c | 12 ++++++++++--
+>>> 1 file changed, 10 insertions(+), 2 deletions(-)
+>>> 
+>>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>>> index f28741d78e0b..de7fa9f78cbe 100644
+>>> --- a/net/bluetooth/hci_conn.c
+>>> +++ b/net/bluetooth/hci_conn.c
+>>> @@ -668,8 +668,16 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+>>> 
+>>> 	conn->state = BT_CLOSED;
+>>> 
+>>> -	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
+>>> -			    status);
+>>> +	/* If the failure was due to a timeout and cancelation of the
+>>> +	 * attempt there's no point of notifying failure since we'll go
+>>> +	 * back to keep trying to connect. The only exception is
+>>> +	 * explicit connect requests where a timeout + cancel does
+>>> +	 * indicate an actual failure.
+>>> +	 */
+>>> +	if (status != HCI_ERROR_UNKNOWN_CONN_ID ||
+>>> +	    (params && params->explicit_connect))
+>>> +		mgmt_connect_failed(hdev, &conn->dst, conn->type,
+>>> +				    conn->dst_type, status);
+>> 
+>> are we okay with the oversimplified error handling. I think the HCI is
+>> pretty clear that an Unknown Connection Identifier error can only be
+>> traced back to the fact that LE Create Connection Cancel was issued,
+>> but the connection had already been established.
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
-> ---
-> v2: add static definition if !CONFIG_BT_INTEL
+> Where in the spec do you conclude this from? The section for
+> HCI_LE_Create_Connection_Cancel states:
 > 
-> drivers/bluetooth/btintel.c | 109 ++++++++++++++++++++++----------------------
-> drivers/bluetooth/btintel.h |  12 +++++
-> drivers/bluetooth/btusb.c   |  54 ++++++----------------
-> 3 files changed, 81 insertions(+), 94 deletions(-)
+> "
+> If the cancellation was successful then, after the Command Complete
+> event for the LE_Create_Connection_Cancel command:
 > 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 1f13e61..e9f26eb 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -73,6 +73,43 @@ int btintel_check_bdaddr(struct hci_dev *hdev)
-> }
-> EXPORT_SYMBOL_GPL(btintel_check_bdaddr);
+> - if the LE Enhanced Connection Complete event is unmasked, then that
+>   event shall be sent.
+> - otherwise the LE Connection Complete event shall be sent.
 > 
-> +int btintel_enter_mfg(struct hci_dev *hdev)
-> +{
-> +	const u8 param[] = { 0x01, 0x00 };
-> +	struct sk_buff *skb;
-> +
-> +	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_err(hdev, "Entering manufacturer mode failed (%ld)",
-> +			   PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +	kfree_skb(skb);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(btintel_enter_mfg);
-> +
-> +int btintel_exit_mfg(struct hci_dev *hdev, bool reset, bool patched)
-> +{
-> +	u8 param[] = { 0x00, 0x00 };
-> +	struct sk_buff *skb;
-> +
+> In either case, the event shall be sent with the error code Unknown
+> Connection Identifier (0x02).
+> "
+> 
+> That doesn't talk anything about a connection already having been
+> established but rather a successful cancellation. The
+> hci_le_conn_failed() gets called from the event handler for LE
+> Connection Complete, so this error code here means that the cancellation
+> was successful.
+> 
+>> Can you cause that error also with LE Create Connection itself? I
+>> doubt it, but we want to be 100% clear here and maybe also be event
+>> clear in the the comment on what kind of errors we are catching and
+>> why. I think citing the spec might be a good idea here as well.
+> 
+> I can clarify in the comment that specifically Unknown Conn ID means
+> that the cancellation was successful.
 
-please add a comment above this that talks about activating / deactivating patches. From the original code this was obvious since it was in the command buffer name.
-
-The 0x02 means reset and activate patches while 0x01 means reset and deactivate patches. So a comment spelling this out in plain English would help here to understand what the patched parameter means.
-
-And of course reset == false means that we just disable manufacturer mode. So mentioning that would be useful as well.
-
-> +	if (reset)
-> +		param[1] |= patched ? 0x02 : 0x01;
-> +
-> +	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_err(hdev, "Exiting manufacturer mode failed (%ld)",
-> +			   PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +	kfree_skb(skb);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(btintel_exit_mfg);
+I think that would be a good idea.
 
 Regards
 
