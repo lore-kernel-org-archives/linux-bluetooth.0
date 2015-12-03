@@ -1,74 +1,56 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAEZxfGM_OPCMOe6kGC0NjyWN6mf1NUnGVzhZ5dp0xaCdq1YL9A@mail.gmail.com>
-References: <CAEZxfGMGixpTkyyc_dyR+NuzGo_wuns9b=y8_A4TWvvve6xFXQ@mail.gmail.com>
-	<CAEZxfGNHVkPiJ_PzeQsJ-Xn4sVq3mj1y-OSwZ3c3dGt-zTwNkw@mail.gmail.com>
-	<CABBYNZLr588sBy2hyhQnPiV-Gm6n0o7ScmZnH13wz4GTHA-Kgw@mail.gmail.com>
-	<CAEZxfGMRs-8Md4YzCqjqb4W1BWYjt7qX8ioU-q2ogrGc5WXsqQ@mail.gmail.com>
-	<CAEZxfGM_OPCMOe6kGC0NjyWN6mf1NUnGVzhZ5dp0xaCdq1YL9A@mail.gmail.com>
-Date: Thu, 3 Dec 2015 14:25:29 +0200
-Message-ID: <CABBYNZL+YB+POa4ExjPFaMVMNwaB4TB2xQCb81gNd_VDJ0h93g@mail.gmail.com>
-Subject: Re: Is the GattServices property still updated?
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?UTF-8?Q?Fran=C3=A7ois_Beaufort?= <beaufort.francois@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 2/2] Bluetooth: Don't treat connection timeout as a failure
+Date: Thu,  3 Dec 2015 12:45:20 +0200
+Message-Id: <1449139520-950-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1449139520-950-1-git-send-email-johan.hedberg@gmail.com>
+References: <1449139520-950-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi François,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, Dec 1, 2015 at 2:07 PM, François Beaufort
-<beaufort.francois@gmail.com> wrote:
-> Could that be related to
-> https://code.google.com/p/chromium/issues/detail?id=541606 as well?
+When we're doing background scanning and connection attempts it's
+possible we timeout trying to connect and go back to scanning again.
+The timeout triggers a HCI_LE_Create_Connection_Cancel which will
+trigger a Connection Complete with "Unknown Connection Identifier"
+error status. Since we go back to scanning this isn't really a failure
+and shouldn't be presented as such to user space through mgmt.
 
-This one seems to be related to suspend/resume, maybe it is related to
-firmware loading? It usually works for me in Fedora in the same
-conditions.
+The exception to this is if the connection attempt was due to an
+explicit request on an L2CAP socket (indicated by
+params->explicit_connect being true). Since the socket will get an
+error it's consistent to also notify the failure on mgmt in this case.
 
-> On Tue, Dec 1, 2015 at 1:04 PM, François Beaufort
-> <beaufort.francois@gmail.com> wrote:
->> On Tue, Dec 1, 2015 at 12:55 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Hi François,
->>>
->>> On Tue, Dec 1, 2015 at 12:06 PM, François Beaufort
->>> <beaufort.francois@gmail.com> wrote:
->>>> For info, here's some background:
->>>> https://code.google.com/p/chromium/issues/detail?id=560277
->>>>
->>>> On Tue, Dec 1, 2015 at 11:03 AM, François Beaufort
->>>> <beaufort.francois@gmail.com> wrote:
->>>>> I'm not sure to understand what is happening and I'd love your help there.
->>>>>
->>>>> Is the "GattServices" device property still supposed to be updated
->>>>> once all remote GATT services of the device
->>>>> have been discovered and exported over D-Bus as mentioned in
->>>>> http://git.kernel.org/cgit/bluetooth/bluez.git/tree/doc/device-api.txt#n215
->>>>>
->>>>> If so, does this DBUS messages trace looks good to you:
->>>>> http://pastebin.com/emxWB4w1?
->>>> --
->>>
->>> It is a regression caused by restoring the attributes from storage,
->>> Ive send a patch for that. Btw, it is not recommended to mess up with
->>> the storage manually if someone is doing this please advise to remove
->>> the device properly.
->>>
->>
->> What a relief! Thank you Luiz.
->>
->> For info, I experienced this with Bluez 5.35.
->> Will it be part of Bluez 5.37 release?
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_conn.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-Yes, it will be part of the next release.
-
->>>
->>> --
->>> Luiz Augusto von Dentz
-
-
-
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 48a7eac6ef71..32575b49f4a0 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -668,8 +668,16 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+ 
+ 	conn->state = BT_CLOSED;
+ 
+-	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
+-			    status);
++	/* If the status indicates successful cancellation of
++	 * the attempt (i.e. Unkown Connection Id) there's no point of
++	 * notifying failure since we'll go back to keep trying to
++	 * connect. The only exception is explicit connect requests
++	 * where a timeout + cancel does indicate an actual failure.
++	 */
++	if (status != HCI_ERROR_UNKNOWN_CONN_ID ||
++	    (params && params->explicit_connect))
++		mgmt_connect_failed(hdev, &conn->dst, conn->type,
++				    conn->dst_type, status);
+ 
+ 	hci_connect_cfm(conn, status);
+ 
 -- 
-Luiz Augusto von Dentz
+2.5.0
+
