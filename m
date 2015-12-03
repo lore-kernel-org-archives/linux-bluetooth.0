@@ -1,94 +1,138 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1448622711-17562-2-git-send-email-lukasz.rymanowski@codecoup.pl>
-References: <1448622711-17562-1-git-send-email-lukasz.rymanowski@codecoup.pl>
-	<1448622711-17562-2-git-send-email-lukasz.rymanowski@codecoup.pl>
-Date: Thu, 3 Dec 2015 11:27:34 +0200
-Message-ID: <CABBYNZKk=RZERiZfD02mtW7sZg2G+R1cOHBfT9BU8CETHJcPyw@mail.gmail.com>
-Subject: Re: [PATCH v2 01/11] unit/test-gatt: Fix long write testcases
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: 'Konrad Antoniuk' <konrad18622@gmail.com>
+Cc: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+References: <6AF6FACF-FE0C-446F-9FD1-BBAD20EBF8CC@gmail.com>
+ <CABBYNZKGNtvEGAKT6KL7u2eta=urSQoHZw7x8ChwFA6X4xaxjw@mail.gmail.com>
+ <899EB388-8EE7-449D-850E-C7352B52FDC1@gmail.com>
+ <000001d12d0e$a7f505e0$f7df11a0$@samsung.com>
+ <FA26AA71-2B3A-43B0-966B-AED90C10DA27@gmail.com>
+In-reply-to: <FA26AA71-2B3A-43B0-966B-AED90C10DA27@gmail.com>
+Subject: RE: Need help with bug in ftp-client executable from bluez-5.24 package
+Date: Thu, 03 Dec 2015 13:18:11 +0530
+Message-id: <002501d12d9e$f9bcd5c0$ed368140$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Konrad,
 
-On Fri, Nov 27, 2015 at 1:11 PM, Łukasz Rymanowski
-<lukasz.rymanowski@codecoup.pl> wrote:
-> Idea of long write is that each part of data is continuation
-> of previous one. There shall be not gaps in the offsets between.
->
-> If there are gaps in offset then we have reliable write rather than
-> long write
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Konrad Antoniuk
+> Sent: Thursday, December 03, 2015 4:14 AM
+> To: Gowtham Anandha Babu
+> Cc: Luiz Augusto von Dentz; linux-bluetooth@vger.kernel.org
+> Subject: Re: Need help with bug in ftp-client executable from bluez-5.24
+> package
+> 
+> Hi Gowtham,
+> 
+> > On Dec 2, 2015, at 6:34 AM, Gowtham Anandha Babu
+> <gowtham.ab@samsung.com> wrote:
+> >
+> > Hi Konrad,
+> >
+> >> -----Original Message-----
+> >> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> >> owner@vger.kernel.org] On Behalf Of Konrad Antoniuk
+> >> Sent: Wednesday, December 02, 2015 6:42 PM
+> >> To: Luiz Augusto von Dentz
+> >> Cc: linux-bluetooth@vger.kernel.org
+> >> Subject: Re: Need help with bug in ftp-client executable from
+> >> bluez-5.24 package
+> >>
+> >> Hello Luiz,
+> >>
+> >>> On Dec 2, 2015, at 2:57 AM, Luiz Augusto von Dentz
+> >> <luiz.dentz@gmail.com> wrote:
+> >>>
+> >>> Hi Konrad,
+> >>>
+> >>> On Wed, Dec 2, 2015 at 10:37 AM, Konrad Antoniuk
+> >> <konrad18622@gmail.com> wrote:
+> >>>> Hi,
+> >>>>
+> >>>> I’m looking to resolve an issue with one of the programs from the
+> >>>> bluez package. I’m using the ftp-client python executable from the
+> >>>> test folder and having trouble with transferring larger files. I’m
+> >>>> running the program on the Intel Edison which runs Embedded Linux -
+> >>>> Yocto. Initially the program worked for smaller files, 6.3 kB in
+> >>>> size, but when I began experimenting with data files only double
+> >>>> the size I began to run into trouble. Whenever the dbus signaled
+> >>>> and called the callback method properties_changed, I initially
+> >>>> received an error that the global variable value was left
+> >>>> uninitialized. I solved that problem by adding the line value =
+> >>>> properties[“Transferred”] at line 98 in the program, just before
+> >>>> the speed calculation. This removed any reported errors received
+> >>>> but the larger files still don’t transfer successfully. It seems
+> >>>> whenever the signal’s callback function completes, the transfer doesn’t
+> continue.
+> >>>> I’ve attempted to call the Resume method from the Tr
+> >> ansfer Interface but I must be doing something wrong because I’m
+> >> fairly new to Python and debugging a program that uses dbus.
+> >>>>
+> >>>> To make it clear, the ftp-client executable from the test folder in
+> >>>> the blues
+> >> package works whenever the file transfer is completed before the Bus
+> >> signals back. I’ve fixed an uninitialized variable bug but I still
+> >> can’t get larger files to successfully transfer. I appreciate any
+> >> guidance in correcting the source code and fixing this bug.
+> >>>
+> >>> Have you tried with obexctl? ftp-client is actually deprecated so
+> >>> chances are that it doesn't work properly anymore.
+> >>>
+> >>>
+> >>> --
+> >>> Luiz Augusto von Dentz
+> >>
+> >> Thanks for the quick response. I did get obexctl to transfer the
+> >> larger file for me. However, for my application, I was using
+> >> ftp-client through a system call within an SPP python program that
+> >> interpreted my commands from a separate device. In addition, I was
+> >> able to pass all of my options and arguments with a single shell
+> >> command using this method. Will I be able to use obexctl the same way
+> >> or is there another application that will allow me to do the same that isn’t
+> deprecated?
+> >>
+> >
+> > Please try out the patch " [PATCH] test: Fix ftp-client not printing progress "
+> which I have sent on ML.
+> > Hope that solves your problem.
+> >
+> > Regards,
+> > Gowtham A
+> >
+> >> Thanks,
+> >> Konrad    --
+> >> To unsubscribe from this list: send the line "unsubscribe
+> >> linux-bluetooth" in the body of a message to
+> >> majordomo@vger.kernel.org More majordomo info at
+> >> http://vger.kernel.org/majordomo-info.html
+> >
+> 
+> It works! Thanks for the help, it’s much appreciated. If it’s not too much
+> trouble, can you or someone explain why additional changes to the
+> preceding if statements made the difference in functionality? Running the
+> original code, I’ve now noticed the additional exceptions printing a couple
+> KeyError messages for the Status property. Why did these errors disappear
+> when I made the undefined variable fix?
+> 
+> Regards,
+> Konrad
+> 
 
-The patch looks fine what I did not understand is what different it
-makes if it is a reliable write or a long write, to me all long writes
-are in fact reliable write since it does use prepare + execute, the
-fact that only one handle is written doesn't change anything.
+In ftp-client, properties_changed() method is triggered, whenever any g_dbus_emit_property_changed() signal is triggered from obexd/client/transfer.c.
+In  the below links you can see obexd-client-transfer is triggering the "Status" or "Transferred" properties changed signal.
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/obexd/client/transfer.c#n212.
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/obexd/client/transfer.c#n801.
 
-> ---
->  unit/test-gatt.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-> index 326a32c..70b6de5 100644
-> --- a/unit/test-gatt.c
-> +++ b/unit/test-gatt.c
-> @@ -3852,8 +3852,8 @@ int main(int argc, char *argv[])
->                         raw_pdu(0x17, 0x03, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
->                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
-> -                       raw_pdu(0x16, 0x03, 0x00, 0x3f, 0x00, 0xff),
-> -                       raw_pdu(0x17, 0x03, 0x00, 0x3f, 0x00, 0xff),
-> +                       raw_pdu(0x16, 0x03, 0x00, 0x12, 0x00, 0xff),
-> +                       raw_pdu(0x17, 0x03, 0x00, 0x12, 0x00, 0xff),
->                         raw_pdu(0x18, 0x01),
->                         raw_pdu(0x19));
->
-> @@ -3866,8 +3866,8 @@ int main(int argc, char *argv[])
->                         raw_pdu(0x17, 0x82, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
->                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
-> -                       raw_pdu(0x16, 0x82, 0x00, 0x3f, 0x00, 0xff),
-> -                       raw_pdu(0x17, 0x82, 0x00, 0x3f, 0x00, 0xff),
-> +                       raw_pdu(0x16, 0x82, 0x00, 0x12, 0x00, 0xff),
-> +                       raw_pdu(0x17, 0x82, 0x00, 0x12, 0x00, 0xff),
->                         raw_pdu(0x18, 0x01),
->                         raw_pdu(0x19));
->
-> @@ -4374,8 +4374,8 @@ int main(int argc, char *argv[])
->                         raw_pdu(0x17, 0x04, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
->                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
-> -                       raw_pdu(0x16, 0x04, 0x00, 0x3f, 0x00, 0xff),
-> -                       raw_pdu(0x17, 0x04, 0x00, 0x3f, 0x00, 0xff),
-> +                       raw_pdu(0x16, 0x04, 0x00, 0x12, 0x00, 0xff),
-> +                       raw_pdu(0x17, 0x04, 0x00, 0x12, 0x00, 0xff),
->                         raw_pdu(0x18, 0x01),
->                         raw_pdu(0x19));
->
-> @@ -4388,8 +4388,8 @@ int main(int argc, char *argv[])
->                         raw_pdu(0x17, 0x83, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
->                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->                                 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
-> -                       raw_pdu(0x16, 0x83, 0x00, 0x3f, 0x00, 0xff),
-> -                       raw_pdu(0x17, 0x83, 0x00, 0x3f, 0x00, 0xff),
-> +                       raw_pdu(0x16, 0x83, 0x00, 0x12, 0x00, 0xff),
-> +                       raw_pdu(0x17, 0x83, 0x00, 0x12, 0x00, 0xff),
->                         raw_pdu(0x18, 0x01),
->                         raw_pdu(0x19));
->
-> --
-> 2.5.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+At one point we can expect either Status or Transferred signal. So we cannot have both properties changes signal to be emitted on one go.
+That’s why there is an additional check for those properties existence in the patch mentioned.
+
+Regards,
+Gowtham A
 
 
-
--- 
-Luiz Augusto von Dentz
