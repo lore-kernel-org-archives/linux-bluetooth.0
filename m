@@ -1,66 +1,57 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1449070602.4523.12.camel@tecnocode.co.uk>
-References: <1449070602.4523.12.camel@tecnocode.co.uk>
-Date: Fri, 4 Dec 2015 14:32:59 +0200
-Message-ID: <CABBYNZJdJjU+kfMJd7XC4+6NoFDjRB9MtStNYmkG+FXVv8ed3g@mail.gmail.com>
-Subject: Re: [PATCH] gdbus: Drop message replies if the sender requested no reply
+In-Reply-To: <1449066349-2852-1-git-send-email-gowtham.ab@samsung.com>
+References: <1449066349-2852-1-git-send-email-gowtham.ab@samsung.com>
+Date: Fri, 4 Dec 2015 14:31:51 +0200
+Message-ID: <CABBYNZKP4xAQ9Y_mWdkQJEJG6CyxdKKLh2C0ANqn_oY4bVb5-A@mail.gmail.com>
+Subject: Re: [PATCH] test: Fix ftp-client not printing progress
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Philip Withnall <philip.withnall@collabora.co.uk>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Bharat Panda <bharat.panda@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Philip,
+Hi Gowtham,
 
-On Wed, Dec 2, 2015 at 5:36 PM, Philip Withnall
-<philip.withnall@collabora.co.uk> wrote:
-> If the sender flags a D-Bus message as not expecting a reply, it is
-> against system bus policy to send a reply — sending one will result in
-> errors being sent to us by dbus-daemon.
->
-> Magically drop all replies to messages which request no reply.
->
-> ofonod is one process which sends BlueZ messages which request no
-> reply,
-> when it is setting up a hands-free agent.
->
-> This is not a complete fix. In an ideal world, the existing check for
-> G_DBUS_METHOD_FLAG_NOREPLY would be dropped, as the server should be
-> prepared to return a reply to every method, if the client requests and
-> expects one — otherwise the client will time out. However, that’s a
-> much
-> bigger change with a much bigger risk of breaking things, so I’ll stick
-> with this for now.
->
-> Signed-off-by: Philip Withnall <philip.withnall@collabora.co.uk>
-> Reviewed-by: Simon McVittie <simon.mcvittie@collabora.co.uk>
+On Wed, Dec 2, 2015 at 4:25 PM, Gowtham Anandha Babu
+<gowtham.ab@samsung.com> wrote:
+> This patch fixes the keyError while printing transfer progress.
 > ---
->  gdbus/object.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  test/ftp-client | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 >
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index 4cf2e2f..945dbdb 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -258,7 +258,8 @@ static DBusHandlerResult
-> process_message(DBusConnection *connection,
+> diff --git a/test/ftp-client b/test/ftp-client
+> index 78c32b3..4540602 100755
+> --- a/test/ftp-client
+> +++ b/test/ftp-client
+> @@ -77,16 +77,18 @@ class FtpClient:
+>                 if path != self.transfer_path:
+>                         return
 >
->         reply = method->function(connection, message,
-> iface_user_data);
+> -               if properties['Status'] == 'complete' or \
+> -                               properties['Status'] == 'error':
+> +               if "Status" in properties and \
+> +                               (properties['Status'] == 'complete' or \
+> +                               properties['Status'] == 'error'):
+>                         if self.verbose:
+>                                 print("Transfer %s" % properties['Status'])
+>                         mainloop.quit()
+>                         return
 >
-> -       if (method->flags & G_DBUS_METHOD_FLAG_NOREPLY) {
-> +       if (method->flags & G_DBUS_METHOD_FLAG_NOREPLY ||
-> +           dbus_message_get_no_reply(message)) {
->                 if (reply != NULL)
->                         dbus_message_unref(reply);
->                 return DBUS_HANDLER_RESULT_HANDLED;
+> -               if properties["Transferred"] == None:
+> +               if "Transferred" not in properties:
+>                         return
+>
+> +               value = properties["Transferred"]
+>                 speed = (value - self.transferred) / 1000
+>                 print("Transfer progress %d/%d at %d kBps" % (value,
+>                                                         self.transfer_size,
 > --
-> 2.5.0
+> 1.9.1
 
-I fixed the coding style and remove Signed-off-by/Reviewed-By as those
-are not used in userspace.
+Applied, thanks.
 
 
 -- 
