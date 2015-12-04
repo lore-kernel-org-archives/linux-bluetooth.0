@@ -1,32 +1,27 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: "Felipe F. Tonello" <eu@felipetonello.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] core/device: call btd_service_disconnect when discconected from peripheral
-Date: Fri,  4 Dec 2015 11:36:42 +0000
-Message-Id: <1449229003-7193-2-git-send-email-eu@felipetonello.com>
-In-Reply-To: <1449229003-7193-1-git-send-email-eu@felipetonello.com>
-References: <1449229003-7193-1-git-send-email-eu@felipetonello.com>
+Subject: [PATCH 0/2] Fix bug that caused a profile's accept() not to be called
+Date: Fri,  4 Dec 2015 11:36:41 +0000
+Message-Id: <1449229003-7193-1-git-send-email-eu@felipetonello.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This call was missing, so services were never changing its state properly and
-never called profiles disconnect callback function as well.
----
- src/device.c | 1 +
- 1 file changed, 1 insertion(+)
+A profile's accept function callback was only been called once. If a device
+was disconnected and reconnected, the accept would not been called because the
+service's states were not been update accordingly.
 
-diff --git a/src/device.c b/src/device.c
-index 9021914..d4fe861 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4479,6 +4479,7 @@ static void att_disconnected_cb(int err, void *user_data)
- 	DBG("%s (%d)", strerror(err), err);
- 
- 	g_slist_foreach(device->attios, attio_disconnected, NULL);
-+	g_slist_foreach(device->services, dev_disconn_service, NULL);
- 
- 	btd_gatt_client_disconnected(device->client_dbus);
- 
+These patches fixes this problem.
+
+Felipe F. Tonello (2):
+  core/device: call btd_service_disconnect when discconected from
+    peripheral
+  core/service: fix connection and disconnection state handling
+
+ src/device.c  |  1 +
+ src/service.c | 43 ++++++++++++++++++++++---------------------
+ 2 files changed, 23 insertions(+), 21 deletions(-)
+
 -- 
 2.5.0
 
