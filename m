@@ -1,945 +1,1342 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: [RFCv3 bluetooth-next 4/4] 6lowpan: iphc: add support for
- stateful compression
-To: Alexander Aring <alex.aring@gmail.com>
-References: <1448796882-316-1-git-send-email-alex.aring@gmail.com>
- <1448796882-316-5-git-send-email-alex.aring@gmail.com>
- <565EFD9E.9020908@osg.samsung.com> <20151203142253.GA2553@omega>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, kernel@pengutronix.de, mcr@sandelman.ca,
-	lukasz.duda@nordicsemi.no, martin.gergeleit@hs-rm.de
+Return-Path: <stefan@osg.samsung.com>
+Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
+ IEEE802154
+To: michael.hennerich@analog.com, alex.aring@gmail.com, marcel@holtmann.org
+References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <5661834E.9030306@osg.samsung.com>
-Date: Fri, 4 Dec 2015 13:13:02 +0100
+Message-ID: <566181E6.9070306@osg.samsung.com>
+Date: Fri, 4 Dec 2015 13:07:02 +0100
 MIME-Version: 1.0
-In-Reply-To: <20151203142253.GA2553@omega>
+In-Reply-To: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hello.
 
-On 03/12/15 15:22, Alexander Aring wrote:
-> Hi,
+On 04/12/15 10:09, michael.hennerich@analog.com wrote:
+> From: Michael Hennerich <michael.hennerich@analog.com>
 >
-> On Wed, Dec 02, 2015 at 03:18:06PM +0100, Stefan Schmidt wrote:
->> Hello.
->>
->> A bit more review here. Still haven't tested the code.
->>
->> On 29/11/15 12:34, Alexander Aring wrote:
->>> This patch introduce support for IPHC stateful address compression. It
->>> will offer three debugfs per interface entries, which are:
->>>
->>>   - dci_table: destination context indentifier table
->>>   - sci_table: source context indentifier table
->>>   - mcast_sci_table: multicast context identifier table
->>>
->>> Example to setup a context id:
->>>
->>> A "cat /sys/kernel/debug/6lowpan/lowpan0/dci_table" will display all
->>> contexts which are available. Example:
->>>
->>> ID ipv6-address/prefix-length                  enabled
->>> 0  0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 1  0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 2  0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 3  0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 4  0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 5  0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 6  0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 7  0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 8  0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 9  0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 10 0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 11 0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 12 0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 13 0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 14 0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>> 15 0000:0000:0000:0000:0000:0000:0000:0000/0   0
->>>
->>> For setting a context e.g. context id 0, context 2001::, prefix-length
->>> 64.
->>>
->>> Hint: Simple copy one line and then maniuplate it.
->>>
->>> echo "0 2001:0000:0000:0000:0000:0000:0000:0000/64 1" >
->>> /sys/kernel/debug/6lowpan/lowpan0/dci_table
->>>
->>> The enabled column will display currently if the context is disabled(0) or
->>> enabled(1).
->>>
->>> On transmit side:
->>>
->>> The IPHC code will automatically search for a context which would be
->>> match for the address. Then it will be use the context with the
->>> best compression method. Means the longest prefix which match will be
->>> used.
->>>
->>> Example:
->>>
->>> 2001::/126 vs 2001::/127 - the 2001::/127 can be full compressed if the
->>> last bit of the address which has the prefix 2001::/127 is the same like
->>> the IID from the Encapsulating Header. A context ID can also be a
->>> 2001::1/128, which is then a full ipv6 address.
->>>
->>> On Receive side:
->>>
->>> If there is a context defined (when CID not available then it's the
->>> default context 0) then it will be used, if the header doesn't set
->>> SAC or DAC bit thens, it will be dropped.
->>>
->>> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
->>> ---
->>>   include/net/6lowpan.h   |  54 ++++++
->>>   net/6lowpan/6lowpan_i.h |   3 +
->>>   net/6lowpan/core.c      |  17 +-
->>>   net/6lowpan/debugfs.c   | 113 ++++++++++++
->>>   net/6lowpan/iphc.c      | 479 ++++++++++++++++++++++++++++++++++++++++++------
->>>   5 files changed, 608 insertions(+), 58 deletions(-)
->>>
->>> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
->>> index 2f6a3f2..dec5427 100644
->>> --- a/include/net/6lowpan.h
->>> +++ b/include/net/6lowpan.h
->>> @@ -75,6 +75,8 @@
->>>   #define LOWPAN_IPHC_MAX_HC_BUF_LEN	(sizeof(struct ipv6hdr) +	\
->>>   					 LOWPAN_IPHC_MAX_HEADER_LEN +	\
->>>   					 LOWPAN_NHC_MAX_HDR_LEN)
->>> +/* SCI/DCI is 4 bit width, so we have maximum 16 entries */
->>> +#define LOWPAN_IPHC_CI_TABLE_SIZE	(1 << 4)
->>>   #define LOWPAN_DISPATCH_IPV6		0x41 /* 01000001 = 65 */
->>>   #define LOWPAN_DISPATCH_IPHC		0x60 /* 011xxxxx = ... */
->>> @@ -98,9 +100,37 @@ enum lowpan_lltypes {
->>>   	LOWPAN_LLTYPE_IEEE802154,
->>>   };
->>> +struct lowpan_iphc_ctx {
->>> +	u8 id;
->>> +	struct in6_addr addr;
->>> +	u8 prefix_len;
->>> +	bool enabled;
->>> +};
->>> +
->>> +struct lowpan_iphc_ctx_ops {
->>> +	bool (*valid_prefix)(const struct lowpan_iphc_ctx *ctx);
->>> +	int (*update)(struct lowpan_iphc_ctx *table,
->>> +		      const struct lowpan_iphc_ctx *ctx);
->>> +	struct lowpan_iphc_ctx *(*get_by_id)(const struct net_device *dev,
->>> +					     struct lowpan_iphc_ctx *table,
->>> +					     u8 id);
->>> +	struct lowpan_iphc_ctx *(*get_by_addr)(const struct net_device *dev,
->>> +					       struct lowpan_iphc_ctx *table,
->>> +					       const struct in6_addr *addr);
->>> +};
->>> +
->>> +struct lowpan_iphc_ctx_table {
->>> +	spinlock_t lock;
->>> +	const struct lowpan_iphc_ctx_ops *ops;
->>> +	struct lowpan_iphc_ctx table[LOWPAN_IPHC_CI_TABLE_SIZE];
->>> +};
->>> +
->>>   struct lowpan_priv {
->>>   	enum lowpan_lltypes lltype;
->>>   	struct dentry *iface_debugfs;
->>> +	struct lowpan_iphc_ctx_table iphc_dci;
->>> +	struct lowpan_iphc_ctx_table iphc_sci;
->>> +	struct lowpan_iphc_ctx_table iphc_mcast_dci;
->>>   	/* must be last */
->>>   	u8 priv[0] __aligned(sizeof(void *));
->>> @@ -125,6 +155,30 @@ struct lowpan_802154_cb *lowpan_802154_cb(const struct sk_buff *skb)
->>>   	return (struct lowpan_802154_cb *)skb->cb;
->>>   }
->>> +static inline int lowpan_ctx_update(struct lowpan_iphc_ctx_table *t,
->>> +				    const struct lowpan_iphc_ctx *ctx)
->>> +{
->>> +	if (!t->ops->valid_prefix(ctx))
->>> +		return -EINVAL;
->>> +
->>> +	return t->ops->update(t->table, ctx);
->>> +}
->>> +
->>> +static inline struct lowpan_iphc_ctx *
->>> +lowpan_ctx_by_id(const struct net_device *dev, struct lowpan_iphc_ctx_table *t,
->>> +		 u8 id)
->>> +{
->>> +	return t->ops->get_by_id(dev, t->table, id);
->>> +}
->>> +
->>> +static inline struct lowpan_iphc_ctx *
->>> +lowpan_ctx_by_addr(const struct net_device *dev,
->>> +		   struct lowpan_iphc_ctx_table *t,
->>> +		   const struct in6_addr *addr)
->>> +{
->>> +	return t->ops->get_by_addr(dev, t->table, addr);
->>> +}
->>> +
->>>   #ifdef DEBUG
->>>   /* print data in line */
->>>   static inline void raw_dump_inline(const char *caller, char *msg,
->>> diff --git a/net/6lowpan/6lowpan_i.h b/net/6lowpan/6lowpan_i.h
->>> index d16bb4b..2c275be 100644
->>> --- a/net/6lowpan/6lowpan_i.h
->>> +++ b/net/6lowpan/6lowpan_i.h
->>> @@ -3,6 +3,9 @@
->>>   #include <linux/netdevice.h>
->>> +extern const struct lowpan_iphc_ctx_ops iphc_ctx_unicast_ops;
->>> +extern const struct lowpan_iphc_ctx_ops iphc_ctx_mcast_ops;
->>> +
->>>   #ifdef CONFIG_6LOWPAN_DEBUGFS
->>>   int lowpan_dev_debugfs_init(struct net_device *dev);
->>>   void lowpan_dev_debugfs_exit(struct net_device *dev);
->>> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
->>> index c7f06f5..f3dbd18 100644
->>> --- a/net/6lowpan/core.c
->>> +++ b/net/6lowpan/core.c
->>> @@ -20,7 +20,7 @@
->>>   int lowpan_register_netdevice(struct net_device *dev,
->>>   			      enum lowpan_lltypes lltype)
->>>   {
->>> -	int ret;
->>> +	int i, ret;
->>>   	dev->addr_len = EUI64_ADDR_LEN;
->>>   	dev->type = ARPHRD_6LOWPAN;
->>> @@ -29,6 +29,21 @@ int lowpan_register_netdevice(struct net_device *dev,
->>>   	lowpan_priv(dev)->lltype = lltype;
->>> +	spin_lock_init(&lowpan_priv(dev)->iphc_dci.lock);
->>> +	lowpan_priv(dev)->iphc_dci.ops = &iphc_ctx_unicast_ops;
->>> +
->>> +	spin_lock_init(&lowpan_priv(dev)->iphc_sci.lock);
->>> +	lowpan_priv(dev)->iphc_sci.ops = &iphc_ctx_unicast_ops;
->>> +
->>> +	spin_lock_init(&lowpan_priv(dev)->iphc_mcast_dci.lock);
->>> +	lowpan_priv(dev)->iphc_mcast_dci.ops = &iphc_ctx_mcast_ops;
->>> +
->>> +	for (i = 0; i < LOWPAN_IPHC_CI_TABLE_SIZE; i++) {
->>> +		lowpan_priv(dev)->iphc_dci.table[i].id = i;
->>> +		lowpan_priv(dev)->iphc_sci.table[i].id = i;
->>> +		lowpan_priv(dev)->iphc_mcast_dci.table[i].id = i;
->>> +	}
->>> +
->>>   	ret = lowpan_dev_debugfs_init(dev);
->>>   	if (ret < 0)
->>>   		return ret;
->>> diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
->>> index 88eef84..24f94ac 100644
->>> --- a/net/6lowpan/debugfs.c
->>> +++ b/net/6lowpan/debugfs.c
->>> @@ -16,19 +16,132 @@
->>>   #include "6lowpan_i.h"
->>> +#define LOWPAN_DEBUGFS_CTX_NUM_ARGS	11
->>> +
->>>   static struct dentry *lowpan_debugfs;
->>> +static int lowpan_context_show(struct seq_file *file, void *offset)
->>> +{
->>> +	struct lowpan_iphc_ctx_table *t = file->private;
->>> +	int i;
->>> +
->>> +	seq_printf(file, "%-2s %-43s %s\n", "ID", "ipv6-address/prefix-length",
->>> +		   "enabled");
->>> +
->>> +	spin_lock_bh(&t->lock);
->>> +	for (i = 0; i < LOWPAN_IPHC_CI_TABLE_SIZE; i++) {
->>> +		seq_printf(file,
->>> +			   "%-2d %04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x/%-3d %d\n",
->>> +			   t->table[i].id,
->>> +			   be16_to_cpu(t->table[i].addr.s6_addr16[0]),
->>> +			   be16_to_cpu(t->table[i].addr.s6_addr16[1]),
->>> +			   be16_to_cpu(t->table[i].addr.s6_addr16[2]),
->>> +			   be16_to_cpu(t->table[i].addr.s6_addr16[3]),
->>> +			   be16_to_cpu(t->table[i].addr.s6_addr16[4]),
->>> +			   be16_to_cpu(t->table[i].addr.s6_addr16[5]),
->>> +			   be16_to_cpu(t->table[i].addr.s6_addr16[6]),
->>> +			   be16_to_cpu(t->table[i].addr.s6_addr16[7]),
->>> +			   t->table[i].prefix_len, t->table[i].enabled);
->>> +	}
->>> +	spin_unlock_bh(&t->lock);
->>> +
->>> +	return 0;
->>> +}
->>> +
->>> +static int lowpan_context_dbgfs_open(struct inode *inode, struct file *file)
->>> +{
->>> +	return single_open(file, lowpan_context_show, inode->i_private);
->>> +}
->>> +
->>> +static ssize_t lowpan_context_dbgfs_write(struct file *fp,
->>> +					  const char __user *user_buf,
->>> +					  size_t count, loff_t *ppos)
->>> +{
->>> +	char buf[128] = { };
->> Do we enforce the 128 char limit somewhere?
->>
->>> +	struct seq_file *file = fp->private_data;
->>> +	struct lowpan_iphc_ctx_table *t = file->private;
->>> +	struct lowpan_iphc_ctx ctx;
->>> +	int status = count, n, id, enabled, i, prefix_len, ret;
->>> +	unsigned int addr[8];
->>> +
->>> +	if (copy_from_user(&buf, user_buf, min_t(size_t, sizeof(buf) - 1,
->>> +						 count))) {
->> I see we do here, ok.
->>
->>> +		status = -EFAULT;
->>> +		goto out;
->>> +	}
->>> +
->>> +	n = sscanf(buf, "%d %04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x/%d %d",
->>> +		   &id, &addr[0], &addr[1], &addr[2], &addr[3], &addr[4],
->>> +		   &addr[5], &addr[6], &addr[7], &prefix_len, &enabled);
->>> +	if (n != LOWPAN_DEBUGFS_CTX_NUM_ARGS) {
->>> +		status = -EIO;
->>> +		goto out;
->>> +	}
->>> +
->>> +	if (id > LOWPAN_IPHC_CI_TABLE_SIZE - 1 ||
->>> +	    (enabled != 0 && enabled != 1) || prefix_len > 128) {
->> Hmm, if you would use a bool for enabled here instead of an int the check on
->> enabled would not be needed.
->>
-> This is because sscanf format string excepts an int here to parsing the
-> "%d" argument.
->
-> I adapt the same mechanism here what we have for "bools" for nl802154.
->
-> When I change it to bool, I will get:
->
-> net/6lowpan/debugfs.c: In function 'lowpan_context_dbgfs_write':
-> net/6lowpan/debugfs.c:76:6: warning: format '%d' expects argument of
-> type 'int *', but argument 13 has type 'bool *' [-Wformat=]
->        &addr[5], &addr[6], &addr[7], &prefix_len, &enabled);
+> This driver has been sitting in the linux-zigbee[2] repository for a long
+> time. We updated it from time to time and made it available via our
+> github kernel repository. The Linux MAC802.15.4 support has improved a lot
+> since then. Thanks to all! So it’s finally time to upstream this driver.
 
-Ah, right, scanf has no support for bool. :( Guess we keep it as int.
+Thanks for taking the time and bringing it back to mainline!
 
+> The ADF7242 requires an add-on firmware for the automatic IEEE 802.15.4
+> operating modes. The firmware file is currently made available on the
+> ADF7242 wiki page here [1]
+
+Just being curious here. Is there any way to get the firmware source 
+and/or compile your own? Its the first hardware for IEEE 802.15.4 I have 
+seen that have a special firmware for this which triggers my curiosity. :)
+
+Anyway, this has not that much to do with the driver review here as it 
+can obviously go in with the binary firmware. We just need to make sure 
+to also bring the firmware into the linux-firmware repo in time.
+
+> [1] http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242
+> [2] http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c
 >
->>> +		status = -EINVAL;
->>> +		goto out;
->>> +	}
->>> +
->>> +	ctx.id = id;
->>> +	ctx.enabled = enabled;
-> conversion to bool is here, I could do "!!enabled" and remove the check
-> above, but then is 1 <-> MAX_INT and -1 <-> MIN_INT also true.
-
-Nah, leave it as is. I was under the impüression we could use scanf for 
-bool directly. That not being the case we can keep it as is.
-
+> Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
+> ---
+>   .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
+>   drivers/net/ieee802154/Kconfig                     |    5 +
+>   drivers/net/ieee802154/Makefile                    |    1 +
+>   drivers/net/ieee802154/adf7242.c                   | 1183 ++++++++++++++++++++
+>   4 files changed, 1207 insertions(+)
+>   create mode 100644 Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>   create mode 100644 drivers/net/ieee802154/adf7242.c
 >
->>> +	ctx.prefix_len = prefix_len;
->>> +
->>> +	for (i = 0; i < 8; i++)
->>> +		ctx.addr.s6_addr16[i] = cpu_to_be16(addr[i] & 0xffff);
->>> +
->>> +	spin_lock_bh(&t->lock);
->>> +	ret = lowpan_ctx_update(t, &ctx);
->>> +	if (ret < 0)
->>> +		status = ret;
->>> +	spin_unlock_bh(&t->lock);
->>> +
->>> +out:
->>> +	return status;
->>> +}
->>> +
->>> +const struct file_operations lowpan_context_fops = {
->>> +	.open		= lowpan_context_dbgfs_open,
->>> +	.read		= seq_read,
->>> +	.write		= lowpan_context_dbgfs_write,
->>> +	.llseek		= seq_lseek,
->>> +	.release	= single_release,
->>> +};
->>> +
->>>   int lowpan_dev_debugfs_init(struct net_device *dev)
->>>   {
->>>   	struct lowpan_priv *lpriv = lowpan_priv(dev);
->>> +	static struct dentry *dentry;
->>>   	/* creating the root */
->>>   	lpriv->iface_debugfs = debugfs_create_dir(dev->name, lowpan_debugfs);
->>>   	if (!lpriv->iface_debugfs)
->>>   		goto fail;
->>> +	dentry = debugfs_create_file("dci_table", 0664, lpriv->iface_debugfs,
->> Any special reason you want the group have write permissions? I would expect
->> a 644 here. Same for the other two.
->>
-> No, I will change it to 0644.
+> diff --git a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+> new file mode 100644
+> index 0000000..dea5124
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+> @@ -0,0 +1,18 @@
+> +* ADF7242 IEEE 802.15.4 *
+> +
+> +Required properties:
+> +  - compatible:		should be "adi,adf7242"
+> +  - spi-max-frequency:	maximal bus speed (12.5 MHz)
+> +  - reg:		the chipselect index
+> +  - interrupts:		the interrupt generated by the device via pin IRQ1.
+> +			IRQ_TYPE_LEVEL_HIGH (4) or IRQ_TYPE_EDGE_FALLING (1)
+> +
+> +Example:
+> +
+> +	adf7242@0 {
+> +		compatible = "adi,adf7242";
+> +		spi-max-frequency = <10000000>;
+> +		reg = <0>;
+> +		interrupts = <98 IRQ_TYPE_LEVEL_HIGH>;
+> +		interrupt-parent = <&gpio3>;
+> +	};
+> diff --git a/drivers/net/ieee802154/Kconfig b/drivers/net/ieee802154/Kconfig
+> index ce5f1a2..fd17598 100644
+> --- a/drivers/net/ieee802154/Kconfig
+> +++ b/drivers/net/ieee802154/Kconfig
+> @@ -71,3 +71,8 @@ config IEEE802154_ATUSB
+>   
+>   	  This driver can also be built as a module. To do so say M here.
+>   	  The module will be called 'atusb'.
+> +
+> +config IEEE802154_ADF7242
+> +       tristate "ADF7242 transceiver driver"
+> +       depends on IEEE802154_DRIVERS && MAC802154
+> +       depends on SPI
 
-Great, thanks.
+Maybe some help text here?
 
->
->>> +				     &lowpan_priv(dev)->iphc_dci,
->>> +				     &lowpan_context_fops);
->>> +	if (!dentry)
->>> +		goto remove_root;
->>> +
->>> +	dentry = debugfs_create_file("sci_table", 0664, lpriv->iface_debugfs,
->>> +				     &lowpan_priv(dev)->iphc_sci,
->>> +				     &lowpan_context_fops);
->>> +	if (!dentry)
->>> +		goto remove_root;
->>> +
->>> +	dentry = debugfs_create_file("mcast_dci_table", 0664,
->>> +				     lpriv->iface_debugfs,
->>> +				     &lowpan_priv(dev)->iphc_mcast_dci,
->>> +				     &lowpan_context_fops);
->>> +	if (!dentry)
->>> +		goto remove_root;
->>> +
->>>   	return 0;
->>> +remove_root:
->>> +	lowpan_dev_debugfs_exit(dev);
->> Just to check here. This one is calling debugfs_remove_recursive(). This
->> will cleanup states where we might have been able to create dci_table and
->> sci_table but not mcast_dci_table, right?
-> Yes, should. I will remove the whole interface related debugfs entry
-> inclusive all sub-entries which was created under the interface related
-> directory entry which is in this case sci/dci/mcast_dci tables.
+> diff --git a/drivers/net/ieee802154/Makefile b/drivers/net/ieee802154/Makefile
+> index cf1d2a6..3a923d3 100644
+> --- a/drivers/net/ieee802154/Makefile
+> +++ b/drivers/net/ieee802154/Makefile
+> @@ -3,3 +3,4 @@ obj-$(CONFIG_IEEE802154_AT86RF230) += at86rf230.o
+>   obj-$(CONFIG_IEEE802154_MRF24J40) += mrf24j40.o
+>   obj-$(CONFIG_IEEE802154_CC2520) += cc2520.o
+>   obj-$(CONFIG_IEEE802154_ATUSB) += atusb.o
+> +obj-$(CONFIG_IEEE802154_ADF7242) += adf7242.o
+> diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
+> new file mode 100644
+> index 0000000..48268b1
+> --- /dev/null
+> +++ b/drivers/net/ieee802154/adf7242.c
+> @@ -0,0 +1,1183 @@
+> +/*
+> + * Analog Devices ADF7242 Low-Power IEEE 802.15.4 Transceiver
+> + *
+> + * Copyright 2009-2015 Analog Devices Inc.
+> + *
 
-OK
+Personally I like having a link to the actual data sheet inside the 
+driver header. This makes only sense if it is a stable URI.
 
->>>   fail:
->>>   	return -EINVAL;
->>>   }
->>> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
->>> index 346b5c1..2c5004b 100644
->>> --- a/net/6lowpan/iphc.c
->>> +++ b/net/6lowpan/iphc.c
->>> @@ -56,6 +56,7 @@
->>>   /* special link-layer handling */
->>>   #include <net/mac802154.h>
->>> +#include "6lowpan_i.h"
->>>   #include "nhc.h"
->>>   /* Values of fields within the IPHC encoding first byte */
->>> @@ -147,6 +148,9 @@
->>>   	 (((a)->s6_addr16[6]) == 0) &&		\
->>>   	 (((a)->s6_addr[14]) == 0))
->>> +#define LOWPAN_IPHC_CID_DCI(cid)	(cid & 0x0f)
->>> +#define LOWPAN_IPHC_CID_SCI(cid)	((cid & 0xf0) >> 4)
->>> +
->>>   static inline void iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
->>>   						const void *lladdr)
->>>   {
->>> @@ -259,30 +263,59 @@ static int uncompress_addr(struct sk_buff *skb, const struct net_device *dev,
->>>   /* Uncompress address function for source context
->>>    * based address(non-multicast).
->>>    */
->>> -static int uncompress_context_based_src_addr(struct sk_buff *skb,
->>> -					     struct in6_addr *ipaddr,
->>> -					     u8 address_mode)
->>> +static int uncompress_ctx_addr(struct sk_buff *skb,
->>> +			       const struct net_device *dev,
->>> +			       const struct lowpan_iphc_ctx *ctx,
->>> +			       struct in6_addr *ipaddr, u8 address_mode,
->>> +			       const void *lladdr)
->>>   {
->>> +	bool fail;
->>> +
->>>   	switch (address_mode) {
->>> -	case LOWPAN_IPHC_SAM_00:
->>> -		/* unspec address ::
->>> +	/* SAM and DAM are the same here */
->>> +	case LOWPAN_IPHC_DAM_00:
->>> +		fail = false;
->>> +		/* SAM_00 -> unspec address ::
->>>   		 * Do nothing, address is already ::
->>> +		 *
->>> +		 * DAM 00 -> reserved should never occur.
->>>   		 */
->>>   		break;
->>>   	case LOWPAN_IPHC_SAM_01:
->>> -		/* TODO */
->>> +	case LOWPAN_IPHC_DAM_01:
->>> +		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[8], 8);
->>> +		ipv6_addr_prefix_copy(ipaddr, &ctx->addr, ctx->prefix_len);
->>> +		break;
->>>   	case LOWPAN_IPHC_SAM_10:
->>> -		/* TODO */
->>> +	case LOWPAN_IPHC_DAM_10:
->>> +		ipaddr->s6_addr[11] = 0xFF;
->>> +		ipaddr->s6_addr[12] = 0xFE;
->>> +		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[14], 2);
->>> +		ipv6_addr_prefix_copy(ipaddr, &ctx->addr, ctx->prefix_len);
->>> +		break;
->>>   	case LOWPAN_IPHC_SAM_11:
->>> -		/* TODO */
->>> -		netdev_warn(skb->dev, "SAM value 0x%x not supported\n",
->>> -			    address_mode);
->>> -		return -EINVAL;
->>> +	case LOWPAN_IPHC_DAM_11:
->>> +		fail = false;
->>> +		switch (lowpan_priv(dev)->lltype) {
->>> +		case LOWPAN_LLTYPE_IEEE802154:
->>> +			iphc_uncompress_802154_lladdr(ipaddr, lladdr);
->>> +			break;
->>> +		default:
->>> +			iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
->>> +			break;
->>> +		}
->>> +		ipv6_addr_prefix_copy(ipaddr, &ctx->addr, ctx->prefix_len);
->>> +		break;
->>>   	default:
->>>   		pr_debug("Invalid sam value: 0x%x\n", address_mode);
->>>   		return -EINVAL;
->>>   	}
->>> +	if (fail) {
->>> +		pr_debug("Failed to fetch skb data\n");
->>> +		return -EIO;
->>> +	}
->>> +
->>>   	raw_dump_inline(NULL,
->>>   			"Reconstructed context based ipv6 src addr is",
->>>   			ipaddr->s6_addr, 16);
->>> @@ -346,6 +379,33 @@ static int lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
->>>   	return 0;
->>>   }
->>> +static int lowpan_uncompress_multicast_ctx_daddr(struct sk_buff *skb,
->>> +						 struct lowpan_iphc_ctx *ctx,
->>> +						 struct in6_addr *ipaddr,
->>> +						 u8 address_mode)
->>> +{
->>> +	struct in6_addr network_pfx = {};
->>> +	bool fail;
->>> +
->>> +	if (address_mode != LOWPAN_IPHC_DAM_00)
->>> +		return -EINVAL;
->>> +
->>> +	ipaddr->s6_addr[0] = 0xFF;
->>> +	fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[1], 2);
->>> +	fail |= lowpan_fetch_skb(skb, &ipaddr->s6_addr[12], 4);
->>> +	/* take prefix_len and network prefix from the context */
->>> +	ipaddr->s6_addr[3] = ctx->prefix_len;
->>> +	/* get network prefix to copy into multicast address */
->>> +	ipv6_addr_prefix(&network_pfx, &ctx->addr, ctx->prefix_len);
->>> +	/* setting network prefix */
->>> +	memcpy(&ipaddr->s6_addr[4], &network_pfx, 8);
->>> +
->>> +	if (fail < 0)
->>> +		return -EIO;
->>> +
->>> +	return 0;
->>> +}
->>> +
->>>   /* get the ecn values from iphc tf format and set it to ipv6hdr */
->>>   static inline void lowpan_iphc_tf_set_ecn(struct ipv6hdr *hdr, const u8 *tf)
->>>   {
->>> @@ -459,7 +519,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->>>   			     const void *daddr, const void *saddr)
->>>   {
->>>   	struct ipv6hdr hdr = {};
->>> -	u8 iphc0, iphc1;
->>> +	struct lowpan_iphc_ctx *ci;
->>> +	u8 iphc0, iphc1, cid = 0;
->>>   	int err;
->>>   	raw_dump_table(__func__, "raw skb data dump uncompressed",
->>> @@ -469,12 +530,14 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->>>   	    lowpan_fetch_skb(skb, &iphc1, sizeof(iphc1)))
->>>   		return -EINVAL;
->>> -	/* another if the CID flag is set */
->>> -	if (iphc1 & LOWPAN_IPHC_CID)
->>> -		return -ENOTSUPP;
->>> -
->>>   	hdr.version = 6;
->>> +	/* default CID = 0, another if the CID flag is set */
->>> +	if (iphc1 & LOWPAN_IPHC_CID) {
->>> +		if (lowpan_fetch_skb(skb, &cid, sizeof(cid)))
->>> +			return -EINVAL;
->>> +	}
->>> +
->>>   	err = lowpan_iphc_tf_decompress(skb, &hdr,
->>>   					iphc0 & LOWPAN_IPHC_TF_MASK);
->>>   	if (err < 0)
->>> @@ -500,10 +563,18 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->>>   	}
->>>   	if (iphc1 & LOWPAN_IPHC_SAC) {
->>> -		/* Source address context based uncompression */
->>> +		spin_lock_bh(&lowpan_priv(dev)->iphc_sci.lock);
->>> +		ci = lowpan_ctx_by_id(dev, &lowpan_priv(dev)->iphc_sci,
->>> +				      LOWPAN_IPHC_CID_SCI(cid));
->>> +		if (!ci) {
->>> +			spin_unlock_bh(&lowpan_priv(dev)->iphc_sci.lock);
->>> +			return -EINVAL;
->>> +		}
->>> +
->>>   		pr_debug("SAC bit is set. Handle context based source address.\n");
->>> -		err = uncompress_context_based_src_addr(skb, &hdr.saddr,
->>> -							iphc1 & LOWPAN_IPHC_SAM_MASK);
->>> +		err = uncompress_ctx_addr(skb, dev, ci, &hdr.saddr,
->>> +					  iphc1 & LOWPAN_IPHC_SAM_MASK, saddr);
->>> +		spin_unlock_bh(&lowpan_priv(dev)->iphc_sci.lock);
->>>   	} else {
->>>   		/* Source address uncompression */
->>>   		pr_debug("source address stateless compression\n");
->>> @@ -515,27 +586,54 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->>>   	if (err)
->>>   		return -EINVAL;
->>> -	/* check for Multicast Compression */
->>> -	if (iphc1 & LOWPAN_IPHC_M) {
->>> -		if (iphc1 & LOWPAN_IPHC_DAC) {
->>> -			pr_debug("dest: context-based mcast compression\n");
->>> -			/* TODO: implement this */
->>> -		} else {
->>> -			err = lowpan_uncompress_multicast_daddr(skb, &hdr.daddr,
->>> -								iphc1 & LOWPAN_IPHC_DAM_MASK);
->>> +	switch (iphc1 & (LOWPAN_IPHC_M | LOWPAN_IPHC_DAC)) {
->>> +	case LOWPAN_IPHC_M | LOWPAN_IPHC_DAC:
->>> +		spin_lock_bh(&lowpan_priv(dev)->iphc_mcast_dci.lock);
->>> +		ci = lowpan_ctx_by_id(dev, &lowpan_priv(dev)->iphc_mcast_dci,
->>> +				      LOWPAN_IPHC_CID_DCI(cid));
->>> +		if (!ci) {
->>> +			spin_unlock_bh(&lowpan_priv(dev)->iphc_mcast_dci.lock);
->>> +			return -EINVAL;
->>> +		}
->>> -			if (err)
->>> -				return -EINVAL;
->>> +		/* multicast with context */
->>> +		pr_debug("dest: context-based mcast compression\n");
->>> +		err = lowpan_uncompress_multicast_ctx_daddr(skb, ci,
->>> +							    &hdr.daddr,
->>> +							    iphc1 & LOWPAN_IPHC_DAM_MASK);
->>> +		spin_unlock_bh(&lowpan_priv(dev)->iphc_mcast_dci.lock);
->>> +		break;
->>> +	case LOWPAN_IPHC_M:
->>> +		/* multicast */
->>> +		err = lowpan_uncompress_multicast_daddr(skb, &hdr.daddr,
->>> +							iphc1 & LOWPAN_IPHC_DAM_MASK);
->>> +		break;
->>> +	case LOWPAN_IPHC_DAC:
->>> +		spin_lock_bh(&lowpan_priv(dev)->iphc_dci.lock);
->>> +		ci = lowpan_ctx_by_id(dev, &lowpan_priv(dev)->iphc_dci,
->>> +				      LOWPAN_IPHC_CID_DCI(cid));
->>> +		if (!ci) {
->>> +			spin_unlock_bh(&lowpan_priv(dev)->iphc_dci.lock);
->>> +			return -EINVAL;
->>>   		}
->>> -	} else {
->>> +
->>> +		/* Destination address context based uncompression */
->>> +		pr_debug("DAC bit is set. Handle context based destination address.\n");
->>> +		err = uncompress_ctx_addr(skb, dev, ci, &hdr.daddr,
->>> +					  iphc1 & LOWPAN_IPHC_DAM_MASK, daddr);
->>> +		spin_unlock_bh(&lowpan_priv(dev)->iphc_dci.lock);
->>> +		break;
->>> +	default:
->>>   		err = uncompress_addr(skb, dev, &hdr.daddr,
->>>   				      iphc1 & LOWPAN_IPHC_DAM_MASK, daddr);
->>>   		pr_debug("dest: stateless compression mode %d dest %pI6c\n",
->>>   			 iphc1 & LOWPAN_IPHC_DAM_MASK, &hdr.daddr);
->>> -		if (err)
->>> -			return -EINVAL;
->>> +		break;
->>>   	}
->>> +	if (err)
->>> +		return -EINVAL;
->>> +
->>>   	/* Next header data uncompression */
->>>   	if (iphc0 & LOWPAN_IPHC_NH) {
->>>   		err = lowpan_nhc_do_uncompression(skb, dev, &hdr);
->>> @@ -585,6 +683,60 @@ static const u8 lowpan_iphc_dam_to_sam_value[] = {
->>>   	[LOWPAN_IPHC_DAM_11] = LOWPAN_IPHC_SAM_11,
->>>   };
->>> +static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct in6_addr *ipaddr,
->>> +				   const struct lowpan_iphc_ctx *ctx,
->>> +				   const unsigned char *lladdr, bool sam)
->>> +{
->>> +	struct in6_addr tmp = {};
->>> +	u8 dam;
->>> +
->>> +	/* check for SAM/DAM = 11 */
->>> +	memcpy(&tmp.s6_addr[8], lladdr, 8);
->>> +	/* second bit-flip (Universe/Local)
->>> +	 * is done according RFC2464
->>> +	 */
->> Maybe put this comment on line. It should be short enough.
->>
-> ok.
->
->>> +	tmp.s6_addr[8] ^= 0x02;
->>> +	/* context information are always used */
->>> +	ipv6_addr_prefix_copy(&tmp, &ctx->addr, ctx->prefix_len);
->>> +	if (ipv6_addr_equal(&tmp, ipaddr)) {
->>> +		dam = LOWPAN_IPHC_DAM_11;
->>> +		goto out;
->>> +	}
->>> +
->>> +	memset(&tmp, 0, sizeof(tmp));
->>> +	/* check for SAM/DAM = 01 */
->>> +	tmp.s6_addr[11] = 0xFF;
->>> +	tmp.s6_addr[12] = 0xFE;
->>> +	memcpy(&tmp.s6_addr[14], &ipaddr->s6_addr[14], 2);
->>> +	/* context information are always used */
->>> +	ipv6_addr_prefix_copy(&tmp, &ctx->addr, ctx->prefix_len);
->>> +	if (ipv6_addr_equal(&tmp, ipaddr)) {
->>> +		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[14], 2);
->>> +		dam = LOWPAN_IPHC_DAM_10;
->>> +		goto out;
->>> +	}
->>> +
->>> +	memset(&tmp, 0, sizeof(tmp));
->>> +	/* check for SAM/DAM = 10, should always match */
->>> +	memcpy(&tmp.s6_addr[8], &ipaddr->s6_addr[8], 8);
->>> +	/* context information are always used */
->>> +	ipv6_addr_prefix_copy(&tmp, &ctx->addr, ctx->prefix_len);
->>> +	if (ipv6_addr_equal(&tmp, ipaddr)) {
->>> +		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[8], 8);
->>> +		dam = LOWPAN_IPHC_DAM_01;
->>> +		goto out;
->>> +	}
->>> +
->>> +	WARN_ON_ONCE("context found but no address mode matched\n");
->>> +	return -EINVAL;
->>> +out:
->>> +
->>> +	if (sam)
->>> +		return lowpan_iphc_dam_to_sam_value[dam];
->>> +	else
->>> +		return dam;
->>> +}
->>> +
->>>   static u8 lowpan_compress_addr_64(u8 **hc_ptr, const struct in6_addr *ipaddr,
->>>   				  const unsigned char *lladdr, bool sam)
->>>   {
->>> @@ -708,6 +860,21 @@ static u8 lowpan_iphc_tf_compress(u8 **hc_ptr, const struct ipv6hdr *hdr)
->>>   	return val;
->>>   }
->>> +static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 **hc_ptr,
->>> +					      const struct lowpan_iphc_ctx *ctx,
->>> +					      const struct in6_addr *ipaddr)
->>> +{
->>> +	u8 data[6];
->>> +
->>> +	/* flags/scope, reserved (RIID) */
->>> +	memcpy(data, &ipaddr->s6_addr[1], 2);
->>> +	/* group ID */
->>> +	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
->>> +	lowpan_push_hc_data(hc_ptr, data, 6);
->>> +
->>> +	return LOWPAN_IPHC_DAM_00;
->>> +}
->>> +
->>>   static u8 lowpan_iphc_mcast_addr_compress(u8 **hc_ptr,
->>>   					  const struct in6_addr *ipaddr)
->>>   {
->>> @@ -742,10 +909,11 @@ static u8 lowpan_iphc_mcast_addr_compress(u8 **hc_ptr,
->>>   int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
->>>   			   const void *daddr, const void *saddr)
->>>   {
->>> -	u8 iphc0, iphc1, *hc_ptr;
->>> +	u8 iphc0, iphc1, *hc_ptr, cid = 0;
->>>   	struct ipv6hdr *hdr;
->>>   	u8 head[LOWPAN_IPHC_MAX_HC_BUF_LEN] = {};
->>> -	int ret, addr_type;
->>> +	struct lowpan_iphc_ctx *dci, *sci, dci_entry, sci_entry;
->>> +	int ret, ipv6_daddr_type, ipv6_saddr_type;
->>>   	if (skb->protocol != htons(ETH_P_IPV6))
->>>   		return -EINVAL;
->>> @@ -769,14 +937,47 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
->>>   	iphc0 = LOWPAN_DISPATCH_IPHC;
->>>   	iphc1 = 0;
->>> -	/* TODO: context lookup */
->>> -
->>>   	raw_dump_inline(__func__, "saddr", saddr, EUI64_ADDR_LEN);
->>>   	raw_dump_inline(__func__, "daddr", daddr, EUI64_ADDR_LEN);
->>>   	raw_dump_table(__func__, "sending raw skb network uncompressed packet",
->>>   		       skb->data, skb->len);
->>> +	ipv6_daddr_type = ipv6_addr_type(&hdr->daddr);
->>> +	if (ipv6_daddr_type & IPV6_ADDR_MULTICAST) {
->>> +		spin_lock_bh(&lowpan_priv(dev)->iphc_mcast_dci.lock);
->>> +		dci = lowpan_ctx_by_addr(dev, &lowpan_priv(dev)->iphc_mcast_dci,
->>> +					 &hdr->daddr);
->>> +		if (dci) {
->>> +			memcpy(&dci_entry, dci, sizeof(*dci));
->>> +			cid |= dci->id;
->>> +		}
->>> +		spin_unlock_bh(&lowpan_priv(dev)->iphc_mcast_dci.lock);
->>> +	} else {
->>> +		spin_lock_bh(&lowpan_priv(dev)->iphc_dci.lock);
->>> +		dci = lowpan_ctx_by_addr(dev, &lowpan_priv(dev)->iphc_dci,
->>> +					 &hdr->daddr);
->>> +		if (dci) {
->>> +			memcpy(&dci_entry, dci, sizeof(*dci));
->>> +			cid |= dci->id;
->>> +		}
->>> +		spin_unlock_bh(&lowpan_priv(dev)->iphc_dci.lock);
->>> +	}
->>> +
->>> +	spin_lock_bh(&lowpan_priv(dev)->iphc_sci.lock);
->>> +	sci = lowpan_ctx_by_addr(dev, &lowpan_priv(dev)->iphc_sci,
->>> +				 &hdr->saddr);
->>> +	if (sci) {
->>> +		memcpy(&sci_entry, sci, sizeof(*sci));
->>> +		cid |= (sci->id << 4);
->>> +	}
->>> +	spin_unlock_bh(&lowpan_priv(dev)->iphc_sci.lock);
->>> +
->>> +	if (sci || dci) {
->>> +		iphc1 |= LOWPAN_IPHC_CID;
->>> +		lowpan_push_hc_data(&hc_ptr, &cid, sizeof(cid));
->>> +	}
->>> +
->>>   	/* Traffic Class, Flow Label compression */
->>>   	iphc0 |= lowpan_iphc_tf_compress(&hc_ptr, hdr);
->>> @@ -813,39 +1014,63 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
->>>   				    sizeof(hdr->hop_limit));
->>>   	}
->>> -	addr_type = ipv6_addr_type(&hdr->saddr);
->>> +	ipv6_saddr_type = ipv6_addr_type(&hdr->saddr);
->>>   	/* source address compression */
->>> -	if (addr_type == IPV6_ADDR_ANY) {
->>> +	if (ipv6_saddr_type == IPV6_ADDR_ANY) {
->>>   		pr_debug("source address is unspecified, setting SAC\n");
->>>   		iphc1 |= LOWPAN_IPHC_SAC;
->>>   	} else {
->>> -		if (addr_type & IPV6_ADDR_LINKLOCAL) {
->>> -			iphc1 |= lowpan_compress_addr_64(&hc_ptr, &hdr->saddr,
->>> -							 saddr, true);
->>> -			pr_debug("source address unicast link-local %pI6c iphc1 0x%02x\n",
->>> -				 &hdr->saddr, iphc1);
->>> +		if (sci) {
->>> +			iphc1 |= lowpan_compress_ctx_addr(&hc_ptr, &hdr->saddr,
->>> +							  &sci_entry, saddr,
->>> +							  true);
->>> +			iphc1 |= LOWPAN_IPHC_SAC;
->>>   		} else {
->>> -			pr_debug("send the full source address\n");
->>> -			lowpan_push_hc_data(&hc_ptr, hdr->saddr.s6_addr, 16);
->>> +			if (ipv6_saddr_type & IPV6_ADDR_LINKLOCAL) {
->>> +				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
->>> +								 &hdr->saddr,
->>> +								 saddr, true);
->>> +				pr_debug("source address unicast link-local %pI6c iphc1 0x%02x\n",
->>> +					 &hdr->saddr, iphc1);
->>> +			} else {
->>> +				pr_debug("send the full source address\n");
->>> +				lowpan_push_hc_data(&hc_ptr,
->>> +						    hdr->saddr.s6_addr, 16);
->>> +			}
->>>   		}
->>>   	}
->>> -	addr_type = ipv6_addr_type(&hdr->daddr);
->>>   	/* destination address compression */
->>> -	if (addr_type & IPV6_ADDR_MULTICAST) {
->>> +	if (ipv6_daddr_type & IPV6_ADDR_MULTICAST) {
->>>   		pr_debug("destination address is multicast: ");
->>> -		iphc1 |= LOWPAN_IPHC_M;
->>> -		iphc1 |= lowpan_iphc_mcast_addr_compress(&hc_ptr, &hdr->daddr);
->>> +		if (dci) {
->>> +			iphc1 |= lowpan_iphc_mcast_ctx_addr_compress(&hc_ptr,
->>> +								     &dci_entry,
->>> +								     &hdr->daddr);
->>> +		} else {
->>> +			iphc1 |= LOWPAN_IPHC_M;
->>> +			iphc1 |= lowpan_iphc_mcast_addr_compress(&hc_ptr,
->>> +								 &hdr->daddr);
->>> +		}
->>>   	} else {
->>> -		if (addr_type & IPV6_ADDR_LINKLOCAL) {
->>> -			/* TODO: context lookup */
->>> -			iphc1 |= lowpan_compress_addr_64(&hc_ptr, &hdr->daddr,
->>> -							 daddr, false);
->>> -			pr_debug("dest address unicast link-local %pI6c "
->>> -				 "iphc1 0x%02x\n", &hdr->daddr, iphc1);
->>> +		if (dci) {
->>> +			iphc1 |= lowpan_compress_ctx_addr(&hc_ptr, &hdr->daddr,
->>> +							  &dci_entry, daddr,
->>> +							  false);
->>> +			iphc1 |= LOWPAN_IPHC_DAC;
->>>   		} else {
->>> -			pr_debug("dest address unicast %pI6c\n", &hdr->daddr);
->>> -			lowpan_push_hc_data(&hc_ptr, hdr->daddr.s6_addr, 16);
->>> +			if (ipv6_daddr_type & IPV6_ADDR_LINKLOCAL) {
->>> +				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
->>> +								 &hdr->daddr,
->>> +								 daddr, false);
->>> +				pr_debug("dest address unicast link-local %pI6c iphc1 0x%02x\n",
->>> +					 &hdr->daddr, iphc1);
->>> +			} else {
->>> +				pr_debug("dest address unicast %pI6c\n",
->>> +					 &hdr->daddr);
->>> +				lowpan_push_hc_data(&hc_ptr,
->>> +						    hdr->daddr.s6_addr, 16);
->>> +			}
->>>   		}
->>>   	}
->>> @@ -871,3 +1096,143 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
->>>   	return 0;
->>>   }
->>>   EXPORT_SYMBOL_GPL(lowpan_header_compress);
->>> +
->>> +static bool lowpan_iphc_ctx_valid_prefix(const struct lowpan_iphc_ctx *ctx)
->>> +{
->>> +	/* prefix which are smaller than 64 bits are not valid, users
->>> +	 * may mean than a prefix which is filled with zero until 64th bit.
->>> +	 * Refere rfc6282 "Any remaining bits are zero." The remaining bits
->>> +	 * in this case where are the prefix(< 64) ends until IID starts.
->>> +	 */
->>> +	if (ctx->prefix_len < 64)
->>> +		return false;
->>> +
->>> +	return true;
->>> +}
->>> +
-> I will remove this check, the prefix_len should be any length, from 0
-> until 128. We need to care about the zero bits if prefix_len < 64 during
-> lookup.
->
-> I think a "valid" test would be to check on multicast address scope
-> which should not a valid prefix for dci/sci table. There might be more
-> addresses which should not valid here. At the moment I would say a
-> multicast address should be invalid. I will add this as well.
->
->>> +static bool
->>> +lowpan_iphc_mcast_ctx_valid_prefix(const struct lowpan_iphc_ctx *ctx)
->>> +{
->>> +	/* network prefix for multicast is at maximum 64 bits long */
->>> +	if (ctx->prefix_len > 64)
->>> +		return false;
->>> +
->>> +	return true;
->>> +}
->>> +
->>> +static int lowpan_iphc_ctx_update(struct lowpan_iphc_ctx *table,
->>> +				  const struct lowpan_iphc_ctx *ctx)
->>> +{
->>> +	int ret = 0, i;
->>> +
->>> +	if (ctx->enabled) {
->>> +		for (i = 0; i < LOWPAN_IPHC_CI_TABLE_SIZE; i++) {
->>> +			if (ctx->prefix_len != table[i].prefix_len)
->>> +				continue;
->>> +
->>> +			if (ipv6_prefix_equal(&ctx->addr, &table[i].addr,
->>> +					      ctx->prefix_len)) {
->>> +				if (table[i].enabled) {
->>> +					ret = -EEXIST;
->>> +					goto out;
->>> +				}
->>> +			}
->>> +		}
->>> +	}
->>> +
->>> +	memcpy(&table[ctx->id], ctx, sizeof(*ctx));
->>> +
->>> +out:
->>> +	return ret;
->>> +}
->>> +
->> In what cases should the update succeed? I'm wondering about some corner
->> cases here:
->>
->> o If the new ctx is disabled it would update the table on its cid no matter
->> what.
->> o If the new ctx is enabled we would update it only if we do not find the
->> same prefix in an enabled state already.
->>
->> To put it differently, the only case we do  not update the table with the
->> context is if it already exists and is enabled. This is how you want it?
->>
-> yes. If we don't check if it's enabled (inside the table), then we could
-> not simple copy one line (by doing cat and echo) with a context which
-> is disabled, then simple replace the disabled(0) to enabled(1). Then it
-> would fail because the same prefix is already there, but when it's
-> disabled then we ignore if the prefix is already exists. It will not
-> used then anyway.
+> + * Licensed under the GPL-2 or later.
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/interrupt.h>
 
-ok
+You also want #include <linux/irq.h> here. Without it the compilation 
+fails for me with:
+
+drivers/net/ieee802154/adf7242.c: In function 'adf7242_probe':
+drivers/net/ieee802154/adf7242.c:1110:13: error: implicit declaration of 
+function 'irq_get_trigger_type' [-Werror=implicit-function-declaration]
+   irq_type = irq_get_trigger_type(spi->irq);
+              ^
+cc1: some warnings being treated as errors
+
+
+> +#include <linux/delay.h>
+> +#include <linux/mutex.h>
+> +#include <linux/workqueue.h>
+> +#include <linux/spinlock.h>
+> +#include <linux/firmware.h>
+> +#include <linux/spi/spi.h>
+> +#include <linux/skbuff.h>
+> +#include <linux/of.h>
+> +#include <linux/ieee802154.h>
+> +#include <net/mac802154.h>
+> +#include <net/cfg802154.h>
+> +
+> +#define FIRMWARE "adf7242_firmware.bin"
+> +#define MAX_POLL_LOOPS 50
+> +
+> +/* All Registers */
+> +
+> +#define REG_EXT_CTRL	0x100	/* RW External LNA/PA and internal PA control */
+> +#define REG_TX_FSK_TEST 0x101	/* RW TX FSK test mode configuration */
+> +#define REG_CCA1	0x105	/* RW RSSI threshold for CCA */
+> +#define REG_CCA2	0x106	/* RW CCA mode configuration */
+> +#define REG_BUFFERCFG	0x107	/* RW RX_BUFFER overwrite control */
+> +#define REG_PKT_CFG	0x108	/* RW FCS evaluation configuration */
+> +#define REG_DELAYCFG0	0x109	/* RW RC_RX command to SFD or sync word delay */
+> +#define REG_DELAYCFG1	0x10A	/* RW RC_TX command to TX state */
+> +#define REG_DELAYCFG2	0x10B	/* RW Mac delay extension */
+> +#define REG_SYNC_WORD0	0x10C	/* RW sync word bits [7:0] of [23:0]  */
+> +#define REG_SYNC_WORD1	0x10D	/* RW sync word bits [15:8] of [23:0]  */
+> +#define REG_SYNC_WORD2	0x10E	/* RW sync word bits [23:16] of [23:0]	*/
+> +#define REG_SYNC_CONFIG	0x10F	/* RW sync word configuration */
+> +#define REG_RC_CFG	0x13E	/* RW RX / TX packet configuration */
+> +#define REG_RC_VAR44	0x13F	/* RW RESERVED */
+> +#define REG_CH_FREQ0	0x300	/* RW Channel Frequency Settings - Low */
+> +#define REG_CH_FREQ1	0x301	/* RW Channel Frequency Settings - Middle */
+> +#define REG_CH_FREQ2	0x302	/* RW Channel Frequency Settings - High */
+> +#define REG_TX_FD	0x304	/* RW TX Frequency Deviation Register */
+> +#define REG_DM_CFG0	0x305	/* RW RX Discriminator BW Register */
+> +#define REG_TX_M	0x306	/* RW TX Mode Register */
+> +#define REG_RX_M	0x307	/* RW RX Mode Register */
+> +#define REG_RRB		0x30C	/* R RSSI Readback Register */
+> +#define REG_LRB		0x30D	/* R Link Quality Readback Register */
+> +#define REG_DR0		0x30E	/* RW bits [15:8] of [15:0] data rate setting */
+> +#define REG_DR1		0x30F	/* RW bits [7:0] of [15:0] data rate setting */
+> +#define REG_PRAMPG	0x313	/* RW RESERVED */
+> +#define REG_TXPB	0x314	/* RW TX Packet Storage Base Address */
+> +#define REG_RXPB	0x315	/* RW RX Packet Storage Base Address */
+> +#define REG_TMR_CFG0	0x316	/* RW Wake up Timer Conf Register - High */
+> +#define REG_TMR_CFG1	0x317	/* RW Wake up Timer Conf Register - Low */
+> +#define REG_TMR_RLD0	0x318	/* RW Wake up Timer Value Register - High */
+> +#define REG_TMR_RLD1	0x319	/* RW Wake up Timer Value Register - Low  */
+> +#define REG_TMR_CTRL	0x31A	/* RW Wake up Timer Timeout flag */
+> +#define REG_PD_AUX	0x31E	/* RW Battmon enable */
+> +#define REG_GP_CFG	0x32C	/* RW GPIO Configuration */
+> +#define REG_GP_OUT	0x32D	/* RW GPIO Configuration */
+> +#define REG_GP_IN	0x32E	/* R GPIO Configuration */
+> +#define REG_SYNT	0x335	/* RW bandwidth calibration timers */
+> +#define REG_CAL_CFG	0x33D	/* RW Calibration Settings */
+> +#define REG_PA_BIAS	0x36E	/* RW PA BIAS */
+> +#define REG_SYNT_CAL	0x371	/* RW Oscillator and Doubler Configuration */
+> +#define REG_IIRF_CFG	0x389	/* RW BB Filter Decimation Rate */
+> +#define REG_CDR_CFG	0x38A	/* RW CDR kVCO */
+> +#define REG_DM_CFG1	0x38B	/* RW Postdemodulator Filter */
+> +#define REG_AGCSTAT	0x38E	/* R RXBB Ref Osc Calibration Engine Readback */
+> +#define REG_RXCAL0	0x395	/* RW RX BB filter tuning, LSB */
+> +#define REG_RXCAL1	0x396	/* RW RX BB filter tuning, MSB */
+> +#define REG_RXFE_CFG	0x39B	/* RW RXBB Ref Osc & RXFE Calibration */
+> +#define REG_PA_RR	0x3A7	/* RW Set PA ramp rate */
+> +#define REG_PA_CFG	0x3A8	/* RW PA enable */
+> +#define REG_EXTPA_CFG	0x3A9	/* RW External PA BIAS DAC */
+> +#define REG_EXTPA_MSC	0x3AA	/* RW PA Bias Mode */
+> +#define REG_ADC_RBK	0x3AE	/* R Readback temp */
+> +#define REG_AGC_CFG1	0x3B2	/* RW GC Parameters */
+> +#define REG_AGC_MAX	0x3B4	/* RW Slew rate	 */
+> +#define REG_AGC_CFG2	0x3B6	/* RW RSSI Parameters */
+> +#define REG_AGC_CFG3	0x3B7	/* RW RSSI Parameters */
+> +#define REG_AGC_CFG4	0x3B8	/* RW RSSI Parameters */
+> +#define REG_AGC_CFG5	0x3B9	/* RW RSSI & NDEC Parameters */
+> +#define REG_AGC_CFG6	0x3BA	/* RW NDEC Parameters */
+> +#define REG_OCL_CFG1	0x3C4	/* RW OCL System Parameters */
+> +#define REG_IRQ1_EN0	0x3C7	/* RW Interrupt Mask set bits for IRQ1 */
+> +#define REG_IRQ1_EN1	0x3C8	/* RW Interrupt Mask set bits for IRQ1 */
+> +#define REG_IRQ2_EN0	0x3C9	/* RW Interrupt Mask set bits for IRQ2 */
+> +#define REG_IRQ2_EN1	0x3CA	/* RW Interrupt Mask set bits for IRQ2 */
+> +#define REG_IRQ1_SRC0	0x3CB	/* RW Interrupt Source bits for IRQ */
+> +#define REG_IRQ1_SRC1	0x3CC	/* RW Interrupt Source bits for IRQ */
+> +#define REG_OCL_BW0	0x3D2	/* RW OCL System Parameters */
+> +#define REG_OCL_BW1	0x3D3	/* RW OCL System Parameters */
+> +#define REG_OCL_BW2	0x3D4	/* RW OCL System Parameters */
+> +#define REG_OCL_BW3	0x3D5	/* RW OCL System Parameters */
+> +#define REG_OCL_BW4	0x3D6	/* RW OCL System Parameters */
+> +#define REG_OCL_BWS	0x3D7	/* RW OCL System Parameters */
+> +#define REG_OCL_CFG13	0x3E0	/* RW OCL System Parameters */
+> +#define REG_GP_DRV	0x3E3	/* RW I/O pads Configuration and bg trim */
+> +#define REG_BM_CFG	0x3E6	/* RW Batt. Monitor Threshold Voltage setting */
+> +#define REG_SFD_15_4	0x3F4	/* RW Option to set non standard SFD */
+> +#define REG_AFC_CFG	0x3F7	/* RW AFC mode and polarity */
+> +#define REG_AFC_KI_KP	0x3F8	/* RW AFC ki and kp */
+> +#define REG_AFC_RANGE	0x3F9	/* RW AFC range */
+> +#define REG_AFC_READ	0x3FA	/* RW Readback frequency error */
+> +
+> +/* REG_EXTPA_MSC */
+> +#define PA_PWR(x)		(((x) & 0xF) << 4)
+> +#define EXTPA_BIAS_SRC		BIT(3)
+> +#define EXTPA_BIAS_MODE(x)	(((x) & 0x7) << 0)
+> +
+> +/* REG_PA_CFG */
+> +#define PA_BRIDGE_DBIAS(x)	(((x) & 0x1F) << 0)
+> +
+> +/* REG_PA_BIAS */
+> +#define PA_BIAS_CTRL(x)		(((x) & 0x1F) << 1)
+> +#define REG_PA_BIAS_DFL		BIT(0)
+> +
+> +#define REG_PAN_ID0		0x112
+> +#define REG_PAN_ID1		0x113
+> +#define REG_SHORT_ADDR_0	0x114
+> +#define REG_SHORT_ADDR_1	0x115
+> +#define REG_IEEE_ADDR_0		0x116
+> +#define REG_IEEE_ADDR_1		0x117
+> +#define REG_IEEE_ADDR_2		0x118
+> +#define REG_IEEE_ADDR_3		0x119
+> +#define REG_IEEE_ADDR_4		0x11A
+> +#define REG_IEEE_ADDR_5		0x11B
+> +#define REG_IEEE_ADDR_6		0x11C
+> +#define REG_IEEE_ADDR_7		0x11D
+> +#define REG_FFILT_CFG		0x11E
+> +#define REG_AUTO_CFG		0x11F
+> +#define REG_AUTO_TX1		0x120
+> +#define REG_AUTO_TX2		0x121
+> +#define REG_AUTO_STATUS		0x122
+> +
+> +/* REG_FFILT_CFG */
+> +#define ACCEPT_BEACON_FRAMES   BIT(0)
+> +#define ACCEPT_DATA_FRAMES     BIT(1)
+> +#define ACCEPT_ACK_FRAMES      BIT(2)
+> +#define ACCEPT_MACCMD_FRAMES   BIT(3)
+> +#define ACCEPT_RESERVED_FRAMES BIT(4)
+> +#define ACCEPT_ALL_ADDRESS     BIT(5)
+> +
+> +/* REG_AUTO_CFG */
+> +#define AUTO_ACK_FRAMEPEND     BIT(0)
+> +#define IS_PANCOORD	       BIT(1)
+> +#define RX_AUTO_ACK_EN	       BIT(3)
+> +#define CSMA_CA_RX_TURNAROUND  BIT(4)
+> +
+> +/* REG_AUTO_TX1 */
+> +#define MAX_FRAME_RETRIES(x)   ((x) & 0xF)
+> +#define MAX_CCA_RETRIES(x)     (((x) & 0x7) << 4)
+> +
+> +/* REG_AUTO_TX2 */
+> +#define CSMA_MAX_BE(x)	       ((x) & 0xF)
+> +#define CSMA_MIN_BE(x)	       (((x) & 0xF) << 4)
+> +
+> +#define CMD_SPI_NOP		0xFF /* No operation. Use for dummy writes */
+> +#define CMD_SPI_PKT_WR		0x10 /* Write telegram to the Packet RAM
+> +				      * starting from the TX packet base address
+> +				      * pointer tx_packet_base
+> +				      */
+> +#define CMD_SPI_PKT_RD		0x30 /* Read telegram from the Packet RAM
+> +				      * starting from RX packet base address
+> +				      * pointer rxpb.rx_packet_base
+> +				      */
+> +#define CMD_SPI_MEM_WR(x)	(0x18 + (x >> 8)) /* Write data to MCR or
+> +						   * Packet RAM sequentially
+> +						   */
+> +#define CMD_SPI_MEM_RD(x)	(0x38 + (x >> 8)) /* Read data from MCR or
+> +						   * Packet RAM sequentially
+> +						   */
+> +#define CMD_SPI_MEMR_WR(x)	(0x08 + (x >> 8)) /* Write data to MCR or Packet
+> +						   * RAM as random block
+> +						   */
+> +#define CMD_SPI_MEMR_RD(x)	(0x28 + (x >> 8)) /* Read data from MCR or
+> +						   * Packet RAM random block
+> +						   */
+> +#define CMD_SPI_PRAM_WR		0x1E /* Write data sequentially to current
+> +				      * PRAM page selected
+> +				      */
+> +#define CMD_SPI_PRAM_RD		0x3E /* Read data sequentially from current
+> +				      * PRAM page selected
+> +				      */
+> +#define CMD_RC_SLEEP		0xB1 /* Invoke transition of radio controller
+> +				      * into SLEEP state
+> +				      */
+> +#define CMD_RC_IDLE		0xB2 /* Invoke transition of radio controller
+> +				      * into IDLE state
+> +				      */
+> +#define CMD_RC_PHY_RDY		0xB3 /* Invoke transition of radio controller
+> +				      * into PHY_RDY state
+> +				      */
+> +#define CMD_RC_RX		0xB4 /* Invoke transition of radio controller
+> +				      * into RX state
+> +				      */
+> +#define CMD_RC_TX		0xB5 /* Invoke transition of radio controller
+> +				      * into TX state
+> +				      */
+> +#define CMD_RC_MEAS		0xB6 /* Invoke transition of radio controller
+> +				      * into MEAS state
+> +				      */
+> +#define CMD_RC_CCA		0xB7 /* Invoke Clear channel assessment */
+> +#define CMD_RC_CSMACA		0xC1 /* initiates CSMA-CA channel access
+> +				      * sequence and frame transmission
+> +				      */
+> +#define CMD_RC_PC_RESET		0xC7 /* Program counter reset */
+> +#define CMD_RC_RESET		0xC8 /* Resets the ADF7242 and puts it in
+> +				      * the sleep state
+> +				      */
+> +
+> +/* STATUS */
+> +
+> +#define STAT_SPI_READY		BIT(7)
+> +#define STAT_IRQ_STATUS		BIT(6)
+> +#define STAT_RC_READY		BIT(5)
+> +#define STAT_CCA_RESULT		BIT(4)
+> +#define RC_STATUS_IDLE		1
+> +#define RC_STATUS_MEAS		2
+> +#define RC_STATUS_PHY_RDY	3
+> +#define RC_STATUS_RX		4
+> +#define RC_STATUS_TX		5
+> +#define RC_STATUS_MASK		0xF
+> +
+> +/* AUTO_STATUS */
+> +
+> +#define SUCCESS			0
+> +#define SUCCESS_DATPEND		1
+> +#define FAILURE_CSMACA		2
+> +#define FAILURE_NOACK		3
+> +#define AUTO_STATUS_MASK	0x3
+> +
+> +#define PRAM_PAGESIZE		256
+> +
+> +/* IRQ1 */
+> +
+> +#define IRQ_CCA_COMPLETE	BIT(0)
+> +#define IRQ_SFD_RX		BIT(1)
+> +#define IRQ_SFD_TX		BIT(2)
+> +#define IRQ_RX_PKT_RCVD		BIT(3)
+> +#define IRQ_TX_PKT_SENT		BIT(4)
+> +#define IRQ_FRAME_VALID		BIT(5)
+> +#define IRQ_ADDRESS_VALID	BIT(6)
+> +#define IRQ_CSMA_CA		BIT(7)
+> +
+> +#define AUTO_TX_TURNAROUND	BIT(3)
+> +#define ADDON_EN		BIT(4)
+> +
+> +struct adf7242_local {
+> +	struct spi_device *spi;
+> +	struct completion tx_complete;
+> +	struct ieee802154_hw *hw;
+> +	struct mutex bmux; /* protect SPI messages */
+> +	struct spi_message stat_msg;
+> +	struct spi_transfer stat_xfer;
+> +	int tx_stat;
+> +	s8 rssi;
+> +	u8 max_frame_retries;
+> +	u8 max_cca_retries;
+> +
+> +	/* DMA (thus cache coherency maintenance) requires the
+> +	 * transfer buffers to live in their own cache lines.
+> +	 */
+> +
+> +	u8 buf[3] ____cacheline_aligned;
+> +	u8 buf_reg_tx[3];
+> +	u8 buf_read_tx[4];
+> +	u8 buf_read_rx[4];
+> +	u8 buf_stat_rx;
+> +	u8 buf_stat_tx;
+> +	u8 buf_cmd;
+> +};
+> +
+> +static int adf7242_status(struct adf7242_local *lp, u8 *stat)
+> +{
+> +	int status;
+> +
+> +	mutex_lock(&lp->bmux);
+> +	status = spi_sync(lp->spi, &lp->stat_msg);
+> +	*stat = lp->buf_stat_rx;
+> +	mutex_unlock(&lp->bmux);
+> +
+> +	return status;
+> +}
+> +
+> +static int adf7242_wait_ready(struct adf7242_local *lp, int line)
+> +{
+> +	int cnt = 0, ret = 0;
+> +	u8 stat;
+> +
+> +	do {
+> +		adf7242_status(lp, &stat);
+> +		cnt++;
+> +	} while (!((stat & STAT_RC_READY) && (stat & STAT_SPI_READY)) &&
+> +		(cnt < MAX_POLL_LOOPS));
+> +
+> +	if (cnt >= MAX_POLL_LOOPS) {
+> +		dev_warn(&lp->spi->dev, "%s:line %d Timeout\n", __func__, line);
+> +		ret = -ETIMEDOUT;
+> +	}
+> +
+> +	dev_vdbg(&lp->spi->dev, "%s : loops=%d\n", __func__, cnt);
+> +
+> +	return ret;
+> +}
+> +
+> +static int adf7242_wait_status(struct adf7242_local *lp, int status, int line)
+> +{
+> +	int cnt = 0, ret = 0;
+> +	u8 stat;
+> +
+> +	do {
+> +		adf7242_status(lp, &stat);
+> +		stat &= RC_STATUS_MASK;
+> +		cnt++;
+> +	} while ((stat != status) && (cnt < MAX_POLL_LOOPS));
+> +
+> +	if (cnt >= MAX_POLL_LOOPS) {
+> +		dev_warn(&lp->spi->dev, "%s:line %d Timeout status 0x%x\n",
+> +			 __func__, line, stat);
+> +		ret = -ETIMEDOUT;
+> +	}
+> +
+> +	dev_vdbg(&lp->spi->dev, "%s : loops=%d\n", __func__, cnt);
+> +
+> +	return ret;
+> +}
+> +
+> +static int adf7242_write_fbuf(struct adf7242_local *lp, u8 *data, u8 len)
+> +{
+> +	u8 *buf = lp->buf;
+> +	int status;
+> +	struct spi_message msg;
+> +	struct spi_transfer xfer_head = {
+> +		.len = 2,
+> +		.tx_buf = buf,
+> +
+> +	};
+> +	struct spi_transfer xfer_buf = {
+> +		.len = len,
+> +		.tx_buf = data,
+> +	};
+> +
+> +	spi_message_init(&msg);
+> +	spi_message_add_tail(&xfer_head, &msg);
+> +	spi_message_add_tail(&xfer_buf, &msg);
+> +
+> +	adf7242_wait_ready(lp, __LINE__);
+> +
+> +	mutex_lock(&lp->bmux);
+> +	buf[0] = CMD_SPI_PKT_WR;
+> +	buf[1] = len + 2;
+> +
+> +	status = spi_sync(lp->spi, &msg);
+> +	mutex_unlock(&lp->bmux);
+> +
+> +	return status;
+> +}
+> +
+> +static int adf7242_read_fbuf(struct adf7242_local *lp,
+> +			     u8 *data, size_t len, bool packet_read)
+> +{
+> +	u8 *buf = lp->buf;
+> +	int status;
+> +	struct spi_message msg;
+> +	struct spi_transfer xfer_head = {
+> +		.len = 3,
+> +		.tx_buf = buf,
+> +		.rx_buf = buf,
+> +	};
+> +	struct spi_transfer xfer_buf = {
+> +		.len = len,
+> +		.rx_buf = data,
+> +	};
+> +
+> +	spi_message_init(&msg);
+> +	spi_message_add_tail(&xfer_head, &msg);
+> +	spi_message_add_tail(&xfer_buf, &msg);
+> +
+> +	adf7242_wait_ready(lp, __LINE__);
+> +
+> +	mutex_lock(&lp->bmux);
+> +	if (packet_read) {
+> +		buf[0] = CMD_SPI_PKT_RD;
+> +		buf[1] = CMD_SPI_NOP;
+> +		buf[2] = 0;	/* PHR */
+> +	} else {
+> +		buf[0] = CMD_SPI_PRAM_RD;
+> +		buf[1] = 0;
+> +		buf[2] = CMD_SPI_NOP;
+> +	}
+> +
+> +	status = spi_sync(lp->spi, &msg);
+> +
+> +	mutex_unlock(&lp->bmux);
+> +
+> +	return status;
+> +}
+> +
+> +static int adf7242_read_reg(struct adf7242_local *lp, u16 addr, u8 *data)
+> +{
+> +	int status;
+> +	struct spi_message msg;
+> +
+> +	struct spi_transfer xfer = {
+> +		.len = 4,
+> +		.tx_buf = lp->buf_read_tx,
+> +		.rx_buf = lp->buf_read_rx,
+> +	};
+> +
+> +	adf7242_wait_ready(lp, __LINE__);
+> +
+> +	mutex_lock(&lp->bmux);
+> +	lp->buf_read_tx[0] = CMD_SPI_MEM_RD(addr);
+> +	lp->buf_read_tx[1] = addr;
+> +	lp->buf_read_tx[2] = CMD_SPI_NOP;
+> +	lp->buf_read_tx[3] = CMD_SPI_NOP;
+> +
+> +	spi_message_init(&msg);
+> +	spi_message_add_tail(&xfer, &msg);
+> +
+> +	status = spi_sync(lp->spi, &msg);
+> +	if (msg.status)
+> +		status = msg.status;
+> +
+> +	if (!status)
+> +		*data = lp->buf_read_rx[3];
+> +
+> +	mutex_unlock(&lp->bmux);
+> +
+> +	dev_vdbg(&lp->spi->dev, "%s : REG 0x%X, VAL 0x%X\n", __func__,
+> +		 addr, *data);
+> +
+> +	return status;
+> +}
+> +
+> +static int adf7242_write_reg(struct adf7242_local *lp, u16 addr, u8 data)
+> +{
+> +	int status;
+> +
+> +	adf7242_wait_ready(lp, __LINE__);
+> +
+> +	mutex_lock(&lp->bmux);
+> +	lp->buf_reg_tx[0] = CMD_SPI_MEM_WR(addr);
+> +	lp->buf_reg_tx[1] = addr;
+> +	lp->buf_reg_tx[2] = data;
+> +	status = spi_write(lp->spi, lp->buf_reg_tx, 3);
+> +	mutex_unlock(&lp->bmux);
+> +
+> +	dev_vdbg(&lp->spi->dev, "%s : REG 0x%X, VAL 0x%X\n",
+> +		 __func__, addr, data);
+> +
+> +	return status;
+> +}
+> +
+> +static int adf7242_cmd(struct adf7242_local *lp, u8 cmd)
+> +{
+> +	int status;
+> +
+> +	dev_vdbg(&lp->spi->dev, "%s : CMD=0x%X\n", __func__, cmd);
+> +
+> +	adf7242_wait_ready(lp, __LINE__);
+> +
+> +	mutex_lock(&lp->bmux);
+> +	lp->buf_cmd = cmd;
+> +	status = spi_write(lp->spi, &lp->buf_cmd, 1);
+> +	mutex_unlock(&lp->bmux);
+> +
+> +	return status;
+> +}
+> +
+> +static int adf7242_upload_firmware(struct adf7242_local *lp, u8 *data, u16 len)
+> +{
+> +	struct spi_message msg;
+> +	struct spi_transfer xfer_buf = { };
+> +	int status, i, page = 0;
+> +	u8 *buf = lp->buf;
+> +
+> +	struct spi_transfer xfer_head = {
+> +		.len = 2,
+> +		.tx_buf = buf,
+> +	};
+> +
+> +	buf[0] = CMD_SPI_PRAM_WR;
+> +	buf[1] = 0;
+> +
+> +	spi_message_init(&msg);
+> +	spi_message_add_tail(&xfer_head, &msg);
+> +	spi_message_add_tail(&xfer_buf, &msg);
+> +
+> +	for (i = len; i >= 0; i -= PRAM_PAGESIZE) {
+> +		adf7242_write_reg(lp, REG_PRAMPG, page);
+> +
+> +		xfer_buf.len = (i >= PRAM_PAGESIZE) ? PRAM_PAGESIZE : i;
+> +		xfer_buf.tx_buf = &data[page * PRAM_PAGESIZE];
+> +
+> +		mutex_lock(&lp->bmux);
+> +		status = spi_sync(lp->spi, &msg);
+> +		mutex_unlock(&lp->bmux);
+> +		page++;
+> +	}
+> +
+> +	return status;
+> +}
+> +
+> +static int adf7242_verify_firmware(struct adf7242_local *lp,
+> +				   const u8 *data, size_t len)
+
+Could it really happen that we upload the firmware, getting fine status 
+codes back from spi_sync and this have a broken firmware in ram? To me 
+it looks like a safety measure for something that should never happen. 
+But I don't know the hardware.
+> +{
+> +	int i, j;
+> +	unsigned int page;
+> +	u8 *buf = kmalloc(PRAM_PAGESIZE, GFP_KERNEL);
+> +
+> +	if (!buf)
+> +		return -ENOMEM;
+> +
+> +	for (page = 0, i = len; i >= 0; i -= PRAM_PAGESIZE, page++) {
+> +		size_t nb = (i >= PRAM_PAGESIZE) ? PRAM_PAGESIZE : i;
+> +
+> +		adf7242_write_reg(lp, REG_PRAMPG, page);
+> +		adf7242_read_fbuf(lp, buf, nb, false);
+> +
+> +		for (j = 0; j < nb; j++) {
+> +			if (buf[j] != data[page * PRAM_PAGESIZE + j]) {
+> +				kfree(buf);
+> +				return -EIO;
+> +			}
+> +		}
+> +	}
+> +	kfree(buf);
+> +
+> +	return 0;
+> +}
+> +
+> +static int adf7242_set_txpower(struct ieee802154_hw *hw, int mbm)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +	u8 pwr, bias_ctrl, dbias, tmp;
+> +	int db = mbm / 100;
+> +
+> +	dev_vdbg(&lp->spi->dev, "%s : Power %d dB\n", __func__, db);
+> +
+> +	if (db > 5 || db < -26)
+> +		return -EINVAL;
+> +
+> +	db = DIV_ROUND_CLOSEST(db + 29, 2);
+> +
+> +	if (db > 15) {
+> +		dbias = 21;
+> +		bias_ctrl = 63;
+> +	} else {
+> +		dbias = 13;
+> +		bias_ctrl = 55;
+
+What the meaning of the values here? 21, 63, 13, 55
+
+> +	}
+> +
+> +	pwr = clamp_t(u8, db, 3, 15);
+> +
+> +	adf7242_read_reg(lp, REG_PA_CFG, &tmp);
+> +	tmp &= ~PA_BRIDGE_DBIAS(~0);
+> +	tmp |= PA_BRIDGE_DBIAS(dbias);
+> +	adf7242_write_reg(lp, REG_PA_CFG, tmp);
+> +
+> +	adf7242_read_reg(lp, REG_PA_BIAS, &tmp);
+> +	tmp &= ~PA_BIAS_CTRL(~0);
+> +	tmp |= PA_BIAS_CTRL(bias_ctrl);
+> +	adf7242_write_reg(lp, REG_PA_BIAS, tmp);
+> +
+> +	adf7242_read_reg(lp, REG_EXTPA_MSC, &tmp);
+> +	tmp &= ~PA_PWR(~0);
+> +	tmp |= PA_PWR(pwr);
+> +
+> +	return adf7242_write_reg(lp, REG_EXTPA_MSC, tmp);
+> +}
+> +
+> +static int adf7242_set_csma_params(struct ieee802154_hw *hw, u8 min_be,
+> +				   u8 max_be, u8 retries)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +	int ret;
+> +
+> +	dev_vdbg(&lp->spi->dev, "%s : min_be=%d max_be=%d retries=%d\n",
+> +		 __func__, min_be, max_be, retries);
+> +
+> +	if (min_be > max_be || max_be > 8 || retries > 5)
+> +		return -EINVAL;
+> +
+> +	ret = adf7242_write_reg(lp, REG_AUTO_TX1,
+> +				MAX_FRAME_RETRIES(lp->max_frame_retries) |
+> +				MAX_CCA_RETRIES(retries));
+> +	if (ret)
+> +		return ret;
+> +
+> +	lp->max_cca_retries = retries;
+> +
+> +	return adf7242_write_reg(lp, REG_AUTO_TX2, CSMA_MAX_BE(max_be) |
+> +			CSMA_MIN_BE(min_be));
+> +}
+> +
+> +static int adf7242_set_frame_retries(struct ieee802154_hw *hw, s8 retries)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +	int ret = 0;
+> +
+> +	dev_vdbg(&lp->spi->dev, "%s : Retries = %d\n", __func__, retries);
+> +
+> +	if (retries < -1 || retries > 15)
+> +		return -EINVAL;
+> +
+> +	if (retries >= 0)
+> +		ret = adf7242_write_reg(lp, REG_AUTO_TX1,
+> +					MAX_FRAME_RETRIES(retries) |
+> +					MAX_CCA_RETRIES(lp->max_cca_retries));
+> +
+> +	lp->max_frame_retries = retries;
+> +
+> +	return ret;
+> +}
+> +
+> +static int adf7242_ed(struct ieee802154_hw *hw, u8 *level)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +
+> +	*level = lp->rssi;
+> +
+> +	dev_vdbg(&lp->spi->dev, "%s :Exit level=%d\n",
+> +		 __func__, *level);
+> +
+> +	return 0;
+> +}
+> +
+> +static int adf7242_start(struct ieee802154_hw *hw)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +
+> +	adf7242_cmd(lp, CMD_RC_PHY_RDY);
+> +	return adf7242_cmd(lp, CMD_RC_RX);
+> +}
+> +
+> +static void adf7242_stop(struct ieee802154_hw *hw)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +
+> +	adf7242_cmd(lp, CMD_RC_IDLE);
+> +	adf7242_write_reg(lp, REG_IRQ1_SRC1, 0xFF);
+> +}
+> +
+> +static int adf7242_channel(struct ieee802154_hw *hw, u8 page, u8 channel)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +	unsigned long freq;
+> +
+> +	dev_dbg(&lp->spi->dev, "%s :Channel=%d\n", __func__, channel);
+> +
+> +	might_sleep();
+> +
+> +	WARN_ON(page != 0);
+> +	WARN_ON(channel < 11);
+> +	WARN_ON(channel > 26);
+> +
+> +	freq = (2405 + 5 * (channel - 11)) * 100;
+> +	adf7242_cmd(lp, CMD_RC_PHY_RDY);
+> +
+> +	adf7242_write_reg(lp, REG_CH_FREQ0, freq);
+> +	adf7242_write_reg(lp, REG_CH_FREQ1, freq >> 8);
+> +	adf7242_write_reg(lp, REG_CH_FREQ2, freq >> 16);
+> +
+> +	return adf7242_cmd(lp, CMD_RC_RX);
+> +}
+> +
+> +static int adf7242_set_hw_addr_filt(struct ieee802154_hw *hw,
+> +				    struct ieee802154_hw_addr_filt *filt,
+> +				    unsigned long changed)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +	u8 reg;
+> +
+> +	dev_dbg(&lp->spi->dev, "%s :Changed=0x%lX\n", __func__, changed);
+> +
+> +	might_sleep();
+> +
+> +	if (changed & IEEE802154_AFILT_IEEEADDR_CHANGED) {
+> +		u8 addr[8], i;
+> +
+> +		memcpy(addr, &filt->ieee_addr, 8);
+> +
+> +		for (i = 0; i < 8; i++)
+> +			adf7242_write_reg(lp, REG_IEEE_ADDR_0 + i, addr[i]);
+> +	}
+> +
+> +	if (changed & IEEE802154_AFILT_SADDR_CHANGED) {
+> +		u16 saddr = le16_to_cpu(filt->short_addr);
+> +
+> +		adf7242_write_reg(lp, REG_SHORT_ADDR_0, saddr);
+> +		adf7242_write_reg(lp, REG_SHORT_ADDR_1, saddr >> 8);
+> +	}
+> +
+> +	if (changed & IEEE802154_AFILT_PANID_CHANGED) {
+> +		u16 pan_id = le16_to_cpu(filt->pan_id);
+> +
+> +		adf7242_write_reg(lp, REG_PAN_ID0, pan_id);
+> +		adf7242_write_reg(lp, REG_PAN_ID1, pan_id >> 8);
+> +	}
+> +
+> +	if (changed & IEEE802154_AFILT_PANC_CHANGED) {
+> +		adf7242_read_reg(lp, REG_AUTO_CFG, &reg);
+> +		if (filt->pan_coord)
+> +			reg |= IS_PANCOORD;
+> +		else
+> +			reg &= ~IS_PANCOORD;
+> +		adf7242_write_reg(lp, REG_AUTO_CFG, reg);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int adf7242_set_promiscuous_mode(struct ieee802154_hw *hw, bool on)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +
+> +	dev_dbg(&lp->spi->dev, "%s : mode %d\n", __func__, on);
+> +
+> +	if (on) {
+> +		adf7242_write_reg(lp, REG_AUTO_CFG, 0);
+> +		return adf7242_write_reg(lp, REG_FFILT_CFG,
+> +				  ACCEPT_BEACON_FRAMES |
+> +				  ACCEPT_DATA_FRAMES |
+> +				  ACCEPT_MACCMD_FRAMES |
+> +				  ACCEPT_ALL_ADDRESS |
+> +				  ACCEPT_ACK_FRAMES |
+> +				  ACCEPT_RESERVED_FRAMES);
+> +	} else {
+> +		adf7242_write_reg(lp, REG_FFILT_CFG,
+> +				  ACCEPT_BEACON_FRAMES |
+> +				  ACCEPT_DATA_FRAMES |
+> +				  ACCEPT_MACCMD_FRAMES |
+> +				  ACCEPT_RESERVED_FRAMES);
+> +
+> +		return adf7242_write_reg(lp, REG_AUTO_CFG, RX_AUTO_ACK_EN);
+> +	}
+> +}
+> +
+> +static int adf7242_set_cca_ed_level(struct ieee802154_hw *hw, s32 mbm)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +	s8 level = clamp_t(s8, mbm / 100, S8_MIN, S8_MAX);
+> +
+> +	dev_dbg(&lp->spi->dev, "%s : level %d\n", __func__, level);
+> +
+> +	return adf7242_write_reg(lp, REG_CCA1, level);
+> +}
+> +
+> +static int adf7242_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
+> +{
+> +	struct adf7242_local *lp = hw->priv;
+> +	int ret;
+> +
+> +	reinit_completion(&lp->tx_complete);
+> +
+> +	ret = adf7242_write_fbuf(lp, skb->data, skb->len);
+> +	if (ret)
+> +		goto err;
+> +
+> +	ret = adf7242_cmd(lp, CMD_RC_PHY_RDY);
+> +	ret |= adf7242_cmd(lp, CMD_RC_CSMACA);
+> +
+> +	if (ret)
+> +		goto err;
+> +
+> +	ret = wait_for_completion_interruptible_timeout(&lp->tx_complete, HZ);
+> +	if (ret == -ERESTARTSYS)
+> +		goto err;
+> +	if (ret == 0) {
+> +		dev_warn(&lp->spi->dev, "Timeout waiting for TX interrupt\n");
+> +		ret = -ETIMEDOUT;
+> +		goto err;
+> +	}
+> +
+> +	if (lp->tx_stat != SUCCESS) {
+> +		dev_warn(&lp->spi->dev,
+> +			 "Error xmit: Retry count exceeded Status=0x%x\n",
+> +			 lp->tx_stat);
+> +		ret = -ECOMM;
+> +	} else {
+> +		ret = 0;
+> +	}
+> +
+> +err:
+> +	adf7242_cmd(lp, CMD_RC_RX);
+> +	return ret;
+> +}
+> +
+> +static int adf7242_rx(struct adf7242_local *lp)
+> +{
+> +	struct sk_buff *skb;
+> +	size_t len;
+> +	int ret;
+> +	u8 lqi, len_u8, *data;
+> +
+> +	adf7242_read_reg(lp, 0, &len_u8);
+> +
+> +	len = len_u8;
+> +
+> +	if (!ieee802154_is_valid_psdu_len(len)) {
+> +		dev_dbg(&lp->spi->dev,
+> +			"corrupted frame received len %d\n", len);
+> +		len = IEEE802154_MTU;
+> +	}
+> +
+> +	skb = dev_alloc_skb(len);
+> +	if (!skb)
+> +		return -ENOMEM;
+> +
+> +	data = skb_put(skb, len);
+> +	ret = adf7242_read_fbuf(lp, data, len, true);
+> +
+> +	if (!ret) {
+> +		lqi = data[len - 2];
+> +		lp->rssi = data[len - 1];
+> +	}
+> +
+> +	adf7242_cmd(lp, CMD_RC_RX);
+> +
+> +	skb_trim(skb, len - 2);	/* Don't put RSSI/LQI or CRC into the frame */
+> +
+> +	ieee802154_rx_irqsafe(lp->hw, skb, lqi);
+> +
+> +	dev_dbg(&lp->spi->dev, "%s: ret=%d len=%d lqi=%d rssi=%d\n",
+> +		__func__, ret, len, lqi, lp->rssi);
+> +
+> +	return 0;
+> +}
+> +
+> +static struct ieee802154_ops adf7242_ops = {
+> +	.owner = THIS_MODULE,
+> +	.xmit_sync = adf7242_xmit,
+> +	.ed = adf7242_ed,
+> +	.set_channel = adf7242_channel,
+> +	.set_hw_addr_filt = adf7242_set_hw_addr_filt,
+> +	.start = adf7242_start,
+> +	.stop = adf7242_stop,
+> +	.set_csma_params = adf7242_set_csma_params,
+> +	.set_frame_retries = adf7242_set_frame_retries,
+> +	.set_txpower = adf7242_set_txpower,
+> +	.set_promiscuous_mode = adf7242_set_promiscuous_mode,
+> +	.set_cca_ed_level = adf7242_set_cca_ed_level,
+
+Nice to see so many callbacks implemented. The only things I see missing 
+is xmit_async, set_lbt and set_cca_mode. I would not make it a 
+requirements to get these hooked up before merging this patch but we 
+should consider it as todo items.
+
+> +};
+> +
+> +static irqreturn_t adf7242_isr(int irq, void *data)
+> +{
+> +	struct adf7242_local *lp = data;
+> +	u8 irq1, auto_stat = 0, stat = 0, rx_en = 0;
+> +
+> +	adf7242_read_reg(lp, REG_IRQ1_SRC1, &irq1);
+> +	adf7242_write_reg(lp, REG_IRQ1_SRC1, irq1);
+> +
+> +	if (!(irq1 & (IRQ_RX_PKT_RCVD | IRQ_CSMA_CA)))
+> +		dev_err(&lp->spi->dev, "%s :ERROR IRQ1 = 0x%X\n",
+> +			__func__, irq1);
+> +
+> +	dev_dbg(&lp->spi->dev, "%s IRQ1 = %X:\n%s%s%s%s%s%s%s%s\n",
+> +		__func__, irq1,
+> +		irq1 & IRQ_CCA_COMPLETE ? "IRQ_CCA_COMPLETE\n" : "",
+> +		irq1 & IRQ_SFD_RX ? "IRQ_SFD_RX\n" : "",
+> +		irq1 & IRQ_SFD_TX ? "IRQ_SFD_TX\n" : "",
+> +		irq1 & IRQ_RX_PKT_RCVD ? "IRQ_RX_PKT_RCVD\n" : "",
+> +		irq1 & IRQ_TX_PKT_SENT ? "IRQ_TX_PKT_SENT\n" : "",
+> +		irq1 & IRQ_CSMA_CA ? "IRQ_CSMA_CA\n" : "",
+> +		irq1 & IRQ_FRAME_VALID ? "IRQ_FRAME_VALID\n" : "",
+> +		irq1 & IRQ_ADDRESS_VALID ? "IRQ_ADDRESS_VALID\n" : "");
+> +
+> +	adf7242_status(lp, &stat);
+> +
+> +	dev_dbg(&lp->spi->dev, "%s STATUS = %X:\n%s\n%s%s%s%s%s\n",
+> +		__func__, stat,
+> +		stat & STAT_RC_READY ? "RC_READY" : "RC_BUSY",
+> +		(stat & 0xf) == RC_STATUS_IDLE ? "RC_STATUS_IDLE" : "",
+> +		(stat & 0xf) == RC_STATUS_MEAS ? "RC_STATUS_MEAS" : "",
+> +		(stat & 0xf) == RC_STATUS_PHY_RDY ? "RC_STATUS_PHY_RDY" : "",
+> +		(stat & 0xf) == RC_STATUS_RX ? "RC_STATUS_RX" : "",
+> +		(stat & 0xf) == RC_STATUS_TX ? "RC_STATUS_TX" : "");
+> +
+> +	if ((irq1 & IRQ_RX_PKT_RCVD) && (irq1 & IRQ_FRAME_VALID)) {
+> +		/* Wait until ACK is processed */
+> +		if ((stat & RC_STATUS_MASK) != RC_STATUS_PHY_RDY)
+> +			adf7242_wait_status(lp, RC_STATUS_PHY_RDY, __LINE__);
+> +
+> +		adf7242_rx(lp);
+> +		rx_en = 1;
+> +	}
+> +
+> +	if (irq1 & IRQ_CSMA_CA) {
+> +		adf7242_read_reg(lp, REG_AUTO_STATUS, &auto_stat);
+> +		auto_stat &= AUTO_STATUS_MASK;
+> +
+> +		dev_dbg(&lp->spi->dev, "%s AUTO_STATUS = %X:\n%s%s%s%s\n",
+> +			__func__, auto_stat,
+> +			auto_stat == SUCCESS ? "SUCCESS" : "",
+> +			auto_stat ==
+> +			SUCCESS_DATPEND ? "SUCCESS_DATPEND" : "",
+> +			auto_stat == FAILURE_CSMACA ? "FAILURE_CSMACA" : "",
+> +			auto_stat == FAILURE_NOACK ? "FAILURE_NOACK" : "");
+> +
+> +		/* save CSMA-CA completion status */
+> +		lp->tx_stat = auto_stat;
+> +		rx_en = 1;
+> +
+> +		complete(&lp->tx_complete);
+> +	}
+> +
+> +	if (!rx_en)
+> +		adf7242_cmd(lp, CMD_RC_RX);
+> +
+> +	return IRQ_HANDLED;
+> +}
+> +
+> +static int adf7242_hw_init(struct adf7242_local *lp)
+> +{
+> +	int ret;
+> +	const struct firmware *fw;
+> +
+> +	adf7242_cmd(lp, CMD_RC_RESET);
+> +	adf7242_cmd(lp, CMD_RC_IDLE);
+> +
+> +	/* get ADF7242 addon firmware
+> +	 * build this driver as module
+
+Hmm, this brings up the question if the firmware is also fetched if the 
+driver is built into the kernel directly?
+> +	 * and place under /lib/firmware/adf7242_firmware.bin
+> +	 */
+> +	ret = request_firmware(&fw, FIRMWARE, &lp->spi->dev);
+> +	if (ret) {
+> +		dev_err(&lp->spi->dev,
+> +			"request_firmware() failed with %d\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	ret = adf7242_upload_firmware(lp, (u8 *)fw->data, fw->size);
+> +	if (ret) {
+> +		dev_err(&lp->spi->dev,
+> +			"upload firmware failed with %d\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	ret = adf7242_verify_firmware(lp, (u8 *)fw->data, fw->size);
+> +	if (ret) {
+> +		dev_err(&lp->spi->dev,
+> +			"verify firmware failed with %d\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	adf7242_cmd(lp, CMD_RC_PC_RESET);
+> +
+> +	release_firmware(fw);
+> +
+> +	adf7242_write_reg(lp, REG_FFILT_CFG,
+> +			  ACCEPT_BEACON_FRAMES |
+> +			  ACCEPT_DATA_FRAMES |
+> +			  ACCEPT_MACCMD_FRAMES |
+> +			  ACCEPT_RESERVED_FRAMES);
+> +
+> +	adf7242_write_reg(lp, REG_AUTO_CFG, RX_AUTO_ACK_EN);
+> +
+> +	adf7242_write_reg(lp, REG_PKT_CFG, ADDON_EN | BIT(2));
+> +
+> +	adf7242_write_reg(lp, REG_EXTPA_MSC, 0xF1);
+> +	adf7242_write_reg(lp, REG_RXFE_CFG, 0x1D);
+> +
+> +	adf7242_write_reg(lp, REG_IRQ1_EN0, 0);
+> +	adf7242_write_reg(lp, REG_IRQ1_EN1, IRQ_RX_PKT_RCVD | IRQ_CSMA_CA);
+> +
+> +	adf7242_write_reg(lp, REG_IRQ1_SRC1, 0xFF);
+> +	adf7242_write_reg(lp, REG_IRQ1_SRC0, 0xFF);
+> +
+> +	adf7242_cmd(lp, CMD_RC_IDLE);
+> +
+> +	return 0;
+> +}
+> +
+> +static ssize_t adf7242_show(struct device *dev,
+> +			    struct device_attribute *devattr, char *buf)
+> +{
+> +	struct adf7242_local *lp = dev_get_drvdata(dev);
+> +	u8 stat, irq1;
+> +	size_t len;
+> +
+> +	adf7242_status(lp, &stat);
+> +
+> +	adf7242_read_reg(lp, REG_IRQ1_SRC1, &irq1);
+> +
+> +	len = sprintf(buf, "IRQ1 = %X:\n%s%s%s%s%s%s%s%s\n", irq1,
+> +		      irq1 & IRQ_CCA_COMPLETE ? "IRQ_CCA_COMPLETE\n" : "",
+> +		      irq1 & IRQ_SFD_RX ? "IRQ_SFD_RX\n" : "",
+> +		      irq1 & IRQ_SFD_TX ? "IRQ_SFD_TX\n" : "",
+> +		      irq1 & IRQ_RX_PKT_RCVD ? "IRQ_RX_PKT_RCVD\n" : "",
+> +		      irq1 & IRQ_TX_PKT_SENT ? "IRQ_TX_PKT_SENT\n" : "",
+> +		      irq1 & IRQ_CSMA_CA ? "IRQ_CSMA_CA\n" : "",
+> +		      irq1 & IRQ_FRAME_VALID ? "IRQ_FRAME_VALID\n" : "",
+> +		      irq1 & IRQ_ADDRESS_VALID ? "IRQ_ADDRESS_VALID\n" : "");
+> +
+> +	len += sprintf(buf + len, "STATUS = %X:\n%s\n%s%s%s%s%s\n", stat,
+> +		       stat & STAT_RC_READY ? "RC_READY" : "RC_BUSY",
+> +		       (stat & 0xf) == RC_STATUS_IDLE ? "RC_STATUS_IDLE" : "",
+> +		       (stat & 0xf) == RC_STATUS_MEAS ? "RC_STATUS_MEAS" : "",
+> +		       (stat & 0xf) ==
+> +				RC_STATUS_PHY_RDY ? "RC_STATUS_PHY_RDY" : "",
+> +		       (stat & 0xf) == RC_STATUS_RX ? "RC_STATUS_RX" : "",
+> +		       (stat & 0xf) == RC_STATUS_TX ? "RC_STATUS_TX" : "");
+> +
+> +	len += sprintf(buf + len, "RSSI = %d\n", lp->rssi);
+> +
+> +	return len;
+> +}
+> +static DEVICE_ATTR(status, 0664, adf7242_show, NULL);
+
+The show function and its sysfs entry shoudl go into debugfs, no? Having 
+a sysfs entry here make sit a kernel ABI which we cannot change later 
+and it looks like debugging only to me.
+
+> +
+> +static const s32 adf7242_powers[] = {
+> +	500, 400, 300, 200, 100, 0, -100, -200, -300, -400, -500, -600, -700,
+> +	-800, -900, -1000, -1100, -1200, -1300, -1400, -1500, -1600, -1700,
+> +	-1800, -1900, -2000, -2100, -2200, -2300, -2400, -2500, -2600,
+> +};
+> +
+> +static const s32 adf7242_ed_levels[] = {
+> +	-9000, -8900, -8800, -8700, -8600, -8500, -8400, -8300, -8200, -8100,
+> +	-8000, -7900, -7800, -7700, -7600, -7500, -7400, -7300, -7200, -7100,
+> +	-7000, -6900, -6800, -6700, -6600, -6500, -6400, -6300, -6200, -6100,
+> +	-6000, -5900, -5800, -5700, -5600, -5500, -5400, -5300, -5200, -5100,
+> +	-5000, -4900, -4800, -4700, -4600, -4500, -4400, -4300, -4200, -4100,
+> +	-4000, -3900, -3800, -3700, -3600, -3500, -3400, -3200, -3100, -3000
+> +};
+> +
+> +static int adf7242_probe(struct spi_device *spi)
+> +{
+> +	struct ieee802154_hw *hw;
+> +	struct adf7242_local *lp;
+> +	int ret, irq_type;
+> +
+> +	if (!spi->irq) {
+> +		dev_err(&spi->dev, "no IRQ specified\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	hw = ieee802154_alloc_hw(sizeof(*lp), &adf7242_ops);
+> +	if (!hw)
+> +		return -ENOMEM;
+> +
+> +	lp = hw->priv;
+> +	lp->hw = hw;
+> +	lp->spi = spi;
+> +
+> +	hw->priv = lp;
+> +	hw->parent = &spi->dev;
+> +	hw->extra_tx_headroom = 0;
+> +
+> +	/* We support only 2.4 Ghz */
+> +	hw->phy->supported.channels[0] = 0x7FFF800;
+> +
+> +	hw->flags = IEEE802154_HW_OMIT_CKSUM |
+> +		    IEEE802154_HW_CSMA_PARAMS |
+> +		    IEEE802154_HW_FRAME_RETRIES | IEEE802154_HW_AFILT |
+> +		    IEEE802154_HW_PROMISCUOUS;
+> +
+> +	hw->phy->flags = WPAN_PHY_FLAG_TXPOWER |
+> +			 WPAN_PHY_FLAG_CCA_ED_LEVEL |
+> +			 WPAN_PHY_FLAG_CCA_MODE;
+
+Is this hardware really only supporting the one CCA_MODE?
+
+> +
+> +	hw->phy->supported.cca_modes = BIT(NL802154_CCA_ENERGY);
+> +
+> +	hw->phy->supported.cca_ed_levels = adf7242_ed_levels;
+> +	hw->phy->supported.cca_ed_levels_size = ARRAY_SIZE(adf7242_ed_levels);
+> +
+> +	hw->phy->cca.mode = NL802154_CCA_ENERGY;
+> +
+> +	hw->phy->supported.tx_powers = adf7242_powers;
+> +	hw->phy->supported.tx_powers_size = ARRAY_SIZE(adf7242_powers);
+> +
+> +	hw->phy->supported.min_minbe = 0;
+> +	hw->phy->supported.max_minbe = 8;
+> +
+> +	hw->phy->supported.min_maxbe = 3;
+> +	hw->phy->supported.max_maxbe = 8;
+> +
+> +	hw->phy->supported.min_frame_retries = 0;
+> +	hw->phy->supported.max_frame_retries = 15;
+> +
+> +	hw->phy->supported.min_csma_backoffs = 0;
+> +	hw->phy->supported.max_csma_backoffs = 5;
+> +
+> +	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
+> +
+> +	mutex_init(&lp->bmux);
+> +	init_completion(&lp->tx_complete);
+> +
+> +	/* Setup Status Message */
+> +	lp->stat_xfer.len = 1;
+> +	lp->stat_xfer.tx_buf = &lp->buf_stat_tx;
+> +	lp->stat_xfer.rx_buf = &lp->buf_stat_rx;
+> +	lp->buf_stat_tx = CMD_SPI_NOP;
+> +
+> +	spi_message_init(&lp->stat_msg);
+> +	spi_message_add_tail(&lp->stat_xfer, &lp->stat_msg);
+> +
+> +	spi_set_drvdata(spi, lp);
+> +
+> +	ret = adf7242_hw_init(lp);
+> +	if (ret)
+> +		goto err_hw_init;
+> +
+> +	irq_type = irq_get_trigger_type(spi->irq);
+> +	if (!irq_type)
+> +		irq_type = IRQF_TRIGGER_HIGH;
+> +
+> +	ret = devm_request_threaded_irq(&spi->dev, spi->irq, NULL, adf7242_isr,
+> +					irq_type | IRQF_ONESHOT,
+> +					dev_name(&spi->dev), lp);
+> +	if (ret)
+> +		goto err_hw_init;
+> +
+> +	ret = ieee802154_register_hw(lp->hw);
+> +	if (ret)
+> +		goto err_hw_init;
+> +
+> +	dev_set_drvdata(&spi->dev, lp);
+> +
+> +	/* move to debugfs, maybe add some helper to ieee802154_ops ? */
+> +	ret = sysfs_create_file(&spi->dev.kobj, &dev_attr_status.attr);
+
+This needs to be decided before we can merge this patch. To me this 
+looks a debugfs candiate.
+> +	if (ret)
+> +		goto out;
+> +
+> +	dev_info(&spi->dev, "mac802154 IRQ-%d registered\n", spi->irq);
+> +
+> +	return ret;
+> +
+> +out:
+> +	ieee802154_unregister_hw(lp->hw);
+> +err_hw_init:
+> +	mutex_destroy(&lp->bmux);
+> +	ieee802154_free_hw(lp->hw);
+> +
+> +	return ret;
+> +}
+> +
+> +static int adf7242_remove(struct spi_device *spi)
+> +{
+> +	struct adf7242_local *lp = spi_get_drvdata(spi);
+> +
+> +	sysfs_remove_file(&spi->dev.kobj, &dev_attr_status.attr);
+> +	ieee802154_unregister_hw(lp->hw);
+> +	mutex_destroy(&lp->bmux);
+> +	ieee802154_free_hw(lp->hw);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct of_device_id adf7242_of_match[] = {
+> +	{ .compatible = "adi,adf7242", },
+> +	{ },
+> +};
+> +MODULE_DEVICE_TABLE(of, adf7242_of_match);
+> +
+> +static const struct spi_device_id adf7242_device_id[] = {
+> +	{ .name = "adf7242", },
+> +	{ },
+> +};
+> +MODULE_DEVICE_TABLE(spi, adf7242_device_id);
+> +
+> +static struct spi_driver adf7242_driver = {
+> +	.id_table = adf7242_device_id,
+> +	.driver = {
+> +		   .of_match_table = of_match_ptr(adf7242_of_match),
+> +		   .name = "adf7242",
+> +		   .owner = THIS_MODULE,
+> +		   },
+> +	.probe = adf7242_probe,
+> +	.remove = adf7242_remove,
+> +};
+> +
+> +module_spi_driver(adf7242_driver);
+> +
+> +MODULE_AUTHOR("Michael Hennerich <michael.hennerich@analog.com>");
+> +MODULE_DESCRIPTION("ADF7242 IEEE802.15.4 Transceiver Driver");
+> +MODULE_LICENSE("GPL");
+
+
+Something worth thinking about might also be the usage of regmap.
+After the include fix teh driver compiled fine. I will try to find some 
+time connecting my adf7242 module to a pi and giving the driver some 
+real testing over the next week.
 
 regards
 Stefan Schmidt
-
