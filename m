@@ -1,40 +1,50 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Steve Abner <pheonix.sja@att.net>
-Subject: bluez iphone connection
-Message-ID: <5662D1DF.4000601@att.net>
-Date: Sat, 5 Dec 2015 07:00:31 -0500
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <hanipouspilot@gmail.com>
+From: Dmitry Tunin <hanipouspilot@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Dmitry Tunin <hanipouspilot@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add support of Toshiba Broadcom based devices
+Date: Sat,  5 Dec 2015 14:09:36 +0300
+Message-Id: <1449313776-7498-1-git-send-email-hanipouspilot@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, I'm end user on both ubuntu 15.10, and LFS with 
-kdbus,systemd-227,4.2 kernel.
-I've connected both systems to iphone, but with big song and dance. 
-First connected
-to ubuntu, worked. Boot into LFS, use bluetoothctl, finally get it to 
-connect.  Go back to
-ubuntu, must delete, use bluetoothctl remove, start process over, 
-finally get connected.
-Boot LFS, cp over "info" as have done with trackpad. This cp is only 
-work around I've found
-so that you dont have to reset and start from scratch when rebooting. 
-But I didn't
-try to remove iphone and restart whole 30 min connection process on LFS. 
-Go back
-to ubuntu and it just refuses to connect, did not request new pairing on 
-purpose, that's why
-didn't attempt dance on LFS.
-   Both systems I get:
-Bluetooth: Unexpected continuation frame (len 0)
-connect error: Too many levels of symbolic links (40)
-   Honestly forget which applies to connection from pc to phone, vs. 
-phone to pc.
-If someone could direct me to documentation, which I cant find through 
-web searching,
-or answer this, I'd be thankful. Hopefully, an automated process for end
-users to simply connect to devices, would be nice.
-   Apologies if wrong list, but only one that I found on bluetooth, linux.
-Steve
+BugLink: https://bugs.launchpad.net/bugs/1522949
 
+    T: Bus=03 Lev=02 Prnt=02 Port=05 Cnt=02 Dev#= 4 Spd=12 MxCh= 0
+    D: Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+    P: Vendor=0930 ProdID=0225 Rev=01.12
+    S: Manufacturer=Broadcom Corp
+    S: Product=BCM43142A0
+    S: SerialNumber=4CBB58034671
+    C: #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+    I: If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+    I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
+    I: If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+    I: If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+
+Signed-off-by: Dmitry Tunin <hanipouspilot@gmail.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/bluetooth/btusb.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8063534..25beb3a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -153,6 +153,10 @@ static const struct usb_device_id btusb_table[] = {
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xff, 0x01, 0x01),
+ 	  .driver_info = BTUSB_BCM_PATCHRAM },
+ 
++	/* Toshiba Corp - Broadcom based */
++	{ USB_VENDOR_AND_INTERFACE_INFO(0x0930, 0xff, 0x01, 0x01),
++	  .driver_info = BTUSB_BCM_PATCHRAM },
++
+ 	/* Intel Bluetooth USB Bootloader (RAM module) */
+ 	{ USB_DEVICE(0x8087, 0x0a5a),
+ 	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
+-- 
+1.9.1
