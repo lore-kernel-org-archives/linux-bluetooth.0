@@ -1,30 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH v2 1/2] Bluetooth: Use continuous scanning when creating LE connections
+Subject: Re: [PATCH v3] Bluetooth: btintel: Add manufacturing enter/exit helpers
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1449139520-950-1-git-send-email-johan.hedberg@gmail.com>
-Date: Sat, 5 Dec 2015 08:17:48 -1000
+In-Reply-To: <1449155422-25683-1-git-send-email-loic.poulain@intel.com>
+Date: Sat, 5 Dec 2015 08:16:04 -1000
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F5026938-1042-47B4-96E2-44EDC638D5AC@holtmann.org>
-References: <1449139520-950-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <5AB03690-EBCE-4B33-8F98-4344B6F961D9@holtmann.org>
+References: <1449155422-25683-1-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Loic,
 
-> All LE connections are now triggered through a preceding passive scan
-> and waiting for a connectable advertising report. This means we've got
-> the best possible guarantee that the device is within range and should
-> be able to request the controller to perform continuous scanning. This
-> way we minimize the risk that we miss out on any advertising packets.
+> Older Intel controllers need to enter manufacturing mode to perform
+> some vendor specific operations (patching, configuration...).
+> Add enter/exit manufaturing methods and refactor existing
+> manufacturing code.
+> Exit can be configured to perform a reset. Reset can be performed
+> either with patches activated or deactivated.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> Cc: stable@vger.kernel.org # 4.3+
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 > ---
-> net/bluetooth/hci_conn.c | 6 +++++-
-> 1 file changed, 5 insertions(+), 1 deletion(-)
+> v2: add static definition if !CONFIG_BT_INTEL
+> v3: add comment on manufaturing exit behavior
+> 
+> drivers/bluetooth/btintel.c | 114 +++++++++++++++++++++++---------------------
+> drivers/bluetooth/btintel.h |  12 +++++
+> drivers/bluetooth/btusb.c   |  54 ++++++---------------
+> 3 files changed, 86 insertions(+), 94 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
