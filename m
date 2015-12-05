@@ -1,144 +1,40 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: Need help with bug in ftp-client executable from bluez-5.24 package
-From: Konrad Antoniuk <konrad18622@gmail.com>
-In-Reply-To: <002501d12d9e$f9bcd5c0$ed368140$@samsung.com>
-Date: Sat, 5 Dec 2015 05:08:06 -0800
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <BBCA069D-18C2-41D7-9896-48B16A98E7F1@gmail.com>
-References: <6AF6FACF-FE0C-446F-9FD1-BBAD20EBF8CC@gmail.com> <CABBYNZKGNtvEGAKT6KL7u2eta=urSQoHZw7x8ChwFA6X4xaxjw@mail.gmail.com> <899EB388-8EE7-449D-850E-C7352B52FDC1@gmail.com> <000001d12d0e$a7f505e0$f7df11a0$@samsung.com> <FA26AA71-2B3A-43B0-966B-AED90C10DA27@gmail.com> <002501d12d9e$f9bcd5c0$ed368140$@samsung.com>
-To: Gowtham Anandha Babu <gowtham.ab@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+From: Steve Abner <pheonix.sja@att.net>
+Subject: bluez iphone connection
+Message-ID: <5662D1DF.4000601@att.net>
+Date: Sat, 5 Dec 2015 07:00:31 -0500
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gotham, 
-
-> On Dec 2, 2015, at 11:48 PM, Gowtham Anandha Babu <gowtham.ab@samsung.com> wrote:
-> 
-> Hi Konrad,
-> 
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->> owner@vger.kernel.org] On Behalf Of Konrad Antoniuk
->> Sent: Thursday, December 03, 2015 4:14 AM
->> To: Gowtham Anandha Babu
->> Cc: Luiz Augusto von Dentz; linux-bluetooth@vger.kernel.org
->> Subject: Re: Need help with bug in ftp-client executable from bluez-5.24
->> package
->> 
->> Hi Gowtham,
->> 
->>> On Dec 2, 2015, at 6:34 AM, Gowtham Anandha Babu
->> <gowtham.ab@samsung.com> wrote:
->>> 
->>> Hi Konrad,
->>> 
->>>> -----Original Message-----
->>>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->>>> owner@vger.kernel.org] On Behalf Of Konrad Antoniuk
->>>> Sent: Wednesday, December 02, 2015 6:42 PM
->>>> To: Luiz Augusto von Dentz
->>>> Cc: linux-bluetooth@vger.kernel.org
->>>> Subject: Re: Need help with bug in ftp-client executable from
->>>> bluez-5.24 package
->>>> 
->>>> Hello Luiz,
->>>> 
->>>>> On Dec 2, 2015, at 2:57 AM, Luiz Augusto von Dentz
->>>> <luiz.dentz@gmail.com> wrote:
->>>>> 
->>>>> Hi Konrad,
->>>>> 
->>>>> On Wed, Dec 2, 2015 at 10:37 AM, Konrad Antoniuk
->>>> <konrad18622@gmail.com> wrote:
->>>>>> Hi,
->>>>>> 
->>>>>> I’m looking to resolve an issue with one of the programs from the
->>>>>> bluez package. I’m using the ftp-client python executable from the
->>>>>> test folder and having trouble with transferring larger files. I’m
->>>>>> running the program on the Intel Edison which runs Embedded Linux -
->>>>>> Yocto. Initially the program worked for smaller files, 6.3 kB in
->>>>>> size, but when I began experimenting with data files only double
->>>>>> the size I began to run into trouble. Whenever the dbus signaled
->>>>>> and called the callback method properties_changed, I initially
->>>>>> received an error that the global variable value was left
->>>>>> uninitialized. I solved that problem by adding the line value =
->>>>>> properties[“Transferred”] at line 98 in the program, just before
->>>>>> the speed calculation. This removed any reported errors received
->>>>>> but the larger files still don’t transfer successfully. It seems
->>>>>> whenever the signal’s callback function completes, the transfer doesn’t
->> continue.
->>>>>> I’ve attempted to call the Resume method from the Tr
->>>> ansfer Interface but I must be doing something wrong because I’m
->>>> fairly new to Python and debugging a program that uses dbus.
->>>>>> 
->>>>>> To make it clear, the ftp-client executable from the test folder in
->>>>>> the blues
->>>> package works whenever the file transfer is completed before the Bus
->>>> signals back. I’ve fixed an uninitialized variable bug but I still
->>>> can’t get larger files to successfully transfer. I appreciate any
->>>> guidance in correcting the source code and fixing this bug.
->>>>> 
->>>>> Have you tried with obexctl? ftp-client is actually deprecated so
->>>>> chances are that it doesn't work properly anymore.
->>>>> 
->>>>> 
->>>>> --
->>>>> Luiz Augusto von Dentz
->>>> 
->>>> Thanks for the quick response. I did get obexctl to transfer the
->>>> larger file for me. However, for my application, I was using
->>>> ftp-client through a system call within an SPP python program that
->>>> interpreted my commands from a separate device. In addition, I was
->>>> able to pass all of my options and arguments with a single shell
->>>> command using this method. Will I be able to use obexctl the same way
->>>> or is there another application that will allow me to do the same that isn’t
->> deprecated?
->>>> 
->>> 
->>> Please try out the patch " [PATCH] test: Fix ftp-client not printing progress "
->> which I have sent on ML.
->>> Hope that solves your problem.
->>> 
->>> Regards,
->>> Gowtham A
->>> 
->>>> Thanks,
->>>> Konrad    --
->>>> To unsubscribe from this list: send the line "unsubscribe
->>>> linux-bluetooth" in the body of a message to
->>>> majordomo@vger.kernel.org More majordomo info at
->>>> http://vger.kernel.org/majordomo-info.html
->>> 
->> 
->> It works! Thanks for the help, it’s much appreciated. If it’s not too much
->> trouble, can you or someone explain why additional changes to the
->> preceding if statements made the difference in functionality? Running the
->> original code, I’ve now noticed the additional exceptions printing a couple
->> KeyError messages for the Status property. Why did these errors disappear
->> when I made the undefined variable fix?
->> 
->> Regards,
->> Konrad
->> 
-> 
-> In ftp-client, properties_changed() method is triggered, whenever any g_dbus_emit_property_changed() signal is triggered from obexd/client/transfer.c.
-> In  the below links you can see obexd-client-transfer is triggering the "Status" or "Transferred" properties changed signal.
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/obexd/client/transfer.c#n212.
-> https://git.kernel.org/cgit/bluetooth/bluez.git/tree/obexd/client/transfer.c#n801.
-> 
-> At one point we can expect either Status or Transferred signal. So we cannot have both properties changes signal to be emitted on one go.
-> That’s why there is an additional check for those properties existence in the patch mentioned.
-> 
-> Regards,
-> Gowtham A
-> 
-> 
-
-Thank you for that concise explanation! It saved a lot of time and headache I would have gone through trying to learn and understand.
-
-Regards,
-Konrad
+Hi, I'm end user on both ubuntu 15.10, and LFS with 
+kdbus,systemd-227,4.2 kernel.
+I've connected both systems to iphone, but with big song and dance. 
+First connected
+to ubuntu, worked. Boot into LFS, use bluetoothctl, finally get it to 
+connect.  Go back to
+ubuntu, must delete, use bluetoothctl remove, start process over, 
+finally get connected.
+Boot LFS, cp over "info" as have done with trackpad. This cp is only 
+work around I've found
+so that you dont have to reset and start from scratch when rebooting. 
+But I didn't
+try to remove iphone and restart whole 30 min connection process on LFS. 
+Go back
+to ubuntu and it just refuses to connect, did not request new pairing on 
+purpose, that's why
+didn't attempt dance on LFS.
+   Both systems I get:
+Bluetooth: Unexpected continuation frame (len 0)
+connect error: Too many levels of symbolic links (40)
+   Honestly forget which applies to connection from pc to phone, vs. 
+phone to pc.
+If someone could direct me to documentation, which I cant find through 
+web searching,
+or answer this, I'd be thankful. Hopefully, an automated process for end
+users to simply connect to devices, would be nice.
+   Apologies if wrong list, but only one that I found on bluetooth, linux.
+Steve
 
