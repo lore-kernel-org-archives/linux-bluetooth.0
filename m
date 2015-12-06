@@ -3,9 +3,9 @@ From: Loic Poulain <loic.poulain@intel.com>
 To: marcel@holtmann.org
 Cc: linux-bluetooth@vger.kernel.org,
 	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH v2] Bluetooth: btintel: Create common Intel Version Read function
-Date: Sun,  6 Dec 2015 16:18:34 +0100
-Message-Id: <1449415114-30029-1-git-send-email-loic.poulain@intel.com>
+Subject: [PATCH] Bluetooth: btintel: Create common Intel Version Read function
+Date: Sun,  6 Dec 2015 16:11:29 +0100
+Message-Id: <1449414689-23482-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 The Intel Version Read command is used to retrieve information
@@ -15,8 +15,6 @@ UART drivers.
 
 Signed-off-by: Loic Poulain <loic.poulain@intel.com>
 ---
- v2: Fix typo in inline declaration
-
  drivers/bluetooth/btintel.c   | 25 ++++++++++++++
  drivers/bluetooth/btintel.h   |  7 ++++
  drivers/bluetooth/btusb.c     | 80 +++++++++++++------------------------------
@@ -60,7 +58,7 @@ index 5441047..fce1548 100644
  
  #define IBT_REG_MODE_8BIT  0x00
 diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index fa72eae..1e8955a 100644
+index fa72eae..d74ad49 100644
 --- a/drivers/bluetooth/btintel.h
 +++ b/drivers/bluetooth/btintel.h
 @@ -85,6 +85,7 @@ int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type, u32 plen,
@@ -76,7 +74,7 @@ index fa72eae..1e8955a 100644
  }
  
 +static inline int btintel_read_version(struct hci_dev *hdev,
-+				       struct intel_version *ver)
++				       struct intel_version *ver);
 +{
 +	return -EOPNOTSUPP;
 +}
