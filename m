@@ -1,349 +1,112 @@
-Return-Path: <loic.poulain@intel.com>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] Bluetooth: btintel: Create common Intel Version Read function
-Date: Sun,  6 Dec 2015 16:11:29 +0100
-Message-Id: <1449414689-23482-1-git-send-email-loic.poulain@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1449353589.29155.35.camel@jkn0.kehl.dalim.com>
+References: <1449350482.29155.23.camel@jkn0.kehl.dalim.com>
+	<CAExxLLDwut0z6WV-HroU9wuGvQ5hvtAXrWc-yu_dAFn5BLJE4Q@mail.gmail.com>
+	<1449353589.29155.35.camel@jkn0.kehl.dalim.com>
+Date: Sun, 6 Dec 2015 12:59:56 +0100
+Message-ID: <CAExxLLAicQSJLbcd0+UL4SZynkJYzzWJoJVUJaB1CUrLmLrBKg@mail.gmail.com>
+Subject: Re: read data from a BLE device using gatt-client
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+To: jacques klein <jacques.klein@dalim.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Intel Version Read command is used to retrieve information
-about hardware and firmware version/revision of Intel Bluetooth
-controllers. This is an Intel generic command used in USB and
-UART drivers.
+Hi,
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- drivers/bluetooth/btintel.c   | 25 ++++++++++++++
- drivers/bluetooth/btintel.h   |  7 ++++
- drivers/bluetooth/btusb.c     | 80 +++++++++++++------------------------------
- drivers/bluetooth/hci_intel.c | 46 ++++++-------------------
- 4 files changed, 66 insertions(+), 92 deletions(-)
+On Sat, Dec 5, 2015 at 11:13 PM, jacques klein <jacques.klein@dalim.com> wrote:
+>
+> On Sat, 2015-12-05 at 22:54 +0100, Łukasz Rymanowski wrote:
+>
+> Hi Jacques,
+>
+> On Sat, Dec 5, 2015 at 10:21 PM, jacques klein <jacques.klein@dalim.com> wrote:
+> > Hello,
+> >
+> > I am currently writing a small Bluez-5.35 Linux app to interact with a
+> > BLE device.
+> > I used as starting point and example the code in btgatt-client.c and
+> > most things work.
+> >
+> > But I have trouble to find out how to implement the "reading of data
+> > sent" by the device after having sent the command "REQUEST_THIS_DATA".
+> > Things are working because I can see the data displayed by the
+> > att_debug_cb function.
+> >
+> > # my (added) function
+> > [GATT client]# request-day-prog <device> <day>
+> > [GATT client]# att: ATT op 0x12
+> > [GATT client]# att: < 12 11 04 20
+> > 04                                   ... .
+> > [GATT client]# att: >
+> > 13                                               .
+> > [GATT client]# att: ATT response received: 0x13
+> > [GATT client]#
+> > Write successful
+> > # displayed by att_debug_cb, it's ok, the bytes make sense.
+> > [GATT client]# att: > 1b 21 04 21 04 22 24 2a 36 22 66 2a 8a 22 90
+> > 22  .!.!."$*6"f*."."
+> > [GATT client]# att:   90 22
+> > 90                                         .".
+> > [GATT client]# att: ATT PDU received: 0x1b
+> >
+> > what I don't know, is what I have to setup ( call some
+> > bt_att_register_????() ? )
+> > in order for a callback function of my app. to be called.
+> >
+> > Any pointer to  example, documentation, or even google search keywords
+> > will be appreciated.
+> > ( I don't want to go into DBUS or Python,  just stay with simple C
+> > calling bt_att_... and/or bt_gatt_... functions )
+> >
+> >
+>
+> I'm not sure what is you goal. Anyway, data which has been sent you
+> can see with btmon tool
+>
+>
+> Thanks for such a quick reply,
+>
+> No problem to see the data being sent back from the device after I have sent it the
+> command to request the data, not a reliability problem either.
+> It is a pure lack of knowledge about how to program the framework provided by the bt_att and
+> bt_gatt APIs.
+>
+> As I told it, my program receives and "sees" the data, but in the
+>
+>    static void att_debug_cb(const char *str, void *user_data) {
+>        .....
+>    }
+>
+> which is given to the framework with
+>
+>     bt_att_set_debug(cli->att, att_debug_cb, (void *)"att: ", NULL);
+>
+> What I am looking for is a similar function to call in order to for a
+> a callback function I defined in my program to be called
+> with the data buffer as argument once it has been got.
+>
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 5441047..fce1548 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -349,6 +349,31 @@ int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
- }
- EXPORT_SYMBOL_GPL(btintel_set_event_mask_mfg);
- 
-+int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
-+{
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	if (skb->len != sizeof(*ver)) {
-+		bt_dev_err(hdev, "Intel version event size mismatch");
-+		kfree_skb(skb);
-+		return -EILSEQ;
-+	}
-+
-+	memcpy(ver, skb->data, sizeof(*ver));
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_read_version);
-+
- /* ------- REGMAP IBT SUPPORT ------- */
- 
- #define IBT_REG_MODE_8BIT  0x00
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index fa72eae..d74ad49 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -85,6 +85,7 @@ int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type, u32 plen,
- int btintel_load_ddc_config(struct hci_dev *hdev, const char *ddc_name);
- int btintel_set_event_mask(struct hci_dev *hdev, bool debug);
- int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug);
-+int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver);
- 
- struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
- 				   u16 opcode_write);
-@@ -152,6 +153,12 @@ static inline int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug)
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int btintel_read_version(struct hci_dev *hdev,
-+				       struct intel_version *ver);
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline struct regmap *btintel_regmap_init(struct hci_dev *hdev,
- 						 u16 opcode_read,
- 						 u16 opcode_write)
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6e141cd..a191e31 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1647,7 +1647,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	const struct firmware *fw;
- 	const u8 *fw_ptr;
- 	int disable_patch, err;
--	struct intel_version *ver;
-+	struct intel_version ver;
- 
- 	BT_DBG("%s", hdev->name);
- 
-@@ -1673,35 +1673,22 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	 * The returned information are hardware variant and revision plus
- 	 * firmware variant, revision and build number.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("%s reading Intel fw version command failed (%ld)",
--		       hdev->name, PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--
--	if (skb->len != sizeof(*ver)) {
--		BT_ERR("%s Intel version event length mismatch", hdev->name);
--		kfree_skb(skb);
--		return -EIO;
--	}
--
--	ver = (struct intel_version *)skb->data;
-+	err = btintel_read_version(hdev, &ver);
-+	if (err)
-+		return err;
- 
- 	BT_INFO("%s: read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
--		hdev->name, ver->hw_platform, ver->hw_variant,
--		ver->hw_revision, ver->fw_variant,  ver->fw_revision,
--		ver->fw_build_num, ver->fw_build_ww, ver->fw_build_yy,
--		ver->fw_patch_num);
-+		hdev->name, ver.hw_platform, ver.hw_variant, ver.hw_revision,
-+		ver.fw_variant,  ver.fw_revision, ver.fw_build_num,
-+		ver.fw_build_ww, ver.fw_build_yy, ver.fw_patch_num);
- 
- 	/* fw_patch_num indicates the version of patch the device currently
- 	 * have. If there is no patch data in the device, it is always 0x00.
- 	 * So, if it is other than 0x00, no need to patch the device again.
- 	 */
--	if (ver->fw_patch_num) {
-+	if (ver.fw_patch_num) {
- 		BT_INFO("%s: Intel device is already patched. patch num: %02x",
--			hdev->name, ver->fw_patch_num);
--		kfree_skb(skb);
-+			hdev->name, ver.fw_patch_num);
- 		goto complete;
- 	}
- 
-@@ -1711,15 +1698,11 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	 * If no patch file is found, allow the device to operate without
- 	 * a patch.
- 	 */
--	fw = btusb_setup_intel_get_fw(hdev, ver);
--	if (!fw) {
--		kfree_skb(skb);
-+	fw = btusb_setup_intel_get_fw(hdev, &ver);
-+	if (!fw)
- 		goto complete;
--	}
- 	fw_ptr = fw->data;
- 
--	kfree_skb(skb);
--
- 	/* Enable the manufacturer mode of the controller.
- 	 * Only while this mode is enabled, the driver can download the
- 	 * firmware patch data and configuration parameters.
-@@ -1983,7 +1966,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 					  0x00, 0x08, 0x04, 0x00 };
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	struct sk_buff *skb;
--	struct intel_version *ver;
-+	struct intel_version ver;
- 	struct intel_boot_params *params;
- 	const struct firmware *fw;
- 	const u8 *fw_ptr;
-@@ -2001,28 +1984,16 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	 * is in bootloader mode or if it already has operational firmware
- 	 * loaded.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_INIT_TIMEOUT);
--	if (IS_ERR(skb)) {
--		BT_ERR("%s: Reading Intel version information failed (%ld)",
--		       hdev->name, PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--
--	if (skb->len != sizeof(*ver)) {
--		BT_ERR("%s: Intel version event size mismatch", hdev->name);
--		kfree_skb(skb);
--		return -EILSEQ;
--	}
--
--	ver = (struct intel_version *)skb->data;
-+	err = btintel_read_version(hdev, &ver);
-+	if (err)
-+		return err;
- 
- 	/* The hardware platform number has a fixed value of 0x37 and
- 	 * for now only accept this single value.
- 	 */
--	if (ver->hw_platform != 0x37) {
-+	if (ver.hw_platform != 0x37) {
- 		BT_ERR("%s: Unsupported Intel hardware platform (%u)",
--		       hdev->name, ver->hw_platform);
--		kfree_skb(skb);
-+		       hdev->name, ver.hw_platform);
- 		return -EINVAL;
- 	}
- 
-@@ -2031,14 +2002,13 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	 * put in place to ensure correct forward compatibility options
- 	 * when newer hardware variants come along.
- 	 */
--	if (ver->hw_variant != 0x0b) {
-+	if (ver.hw_variant != 0x0b) {
- 		BT_ERR("%s: Unsupported Intel hardware variant (%u)",
--		       hdev->name, ver->hw_variant);
--		kfree_skb(skb);
-+		       hdev->name, ver.hw_variant);
- 		return -EINVAL;
- 	}
- 
--	btintel_version_info(hdev, ver);
-+	btintel_version_info(hdev, &ver);
- 
- 	/* The firmware variant determines if the device is in bootloader
- 	 * mode or is running operational firmware. The value 0x06 identifies
-@@ -2053,8 +2023,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	 * It is not possible to use the Secure Boot Parameters in this
- 	 * case since that command is only available in bootloader mode.
- 	 */
--	if (ver->fw_variant == 0x23) {
--		kfree_skb(skb);
-+	if (ver.fw_variant == 0x23) {
- 		clear_bit(BTUSB_BOOTLOADER, &data->flags);
- 		btintel_check_bdaddr(hdev);
- 		return 0;
-@@ -2063,15 +2032,12 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	/* If the device is not in bootloader mode, then the only possible
- 	 * choice is to return an error and abort the device initialization.
- 	 */
--	if (ver->fw_variant != 0x06) {
-+	if (ver.fw_variant != 0x06) {
- 		BT_ERR("%s: Unsupported Intel firmware variant (%u)",
--		       hdev->name, ver->fw_variant);
--		kfree_skb(skb);
-+		       hdev->name, ver.fw_variant);
- 		return -ENODEV;
- 	}
- 
--	kfree_skb(skb);
--
- 	/* Read the secure boot parameters to identify the operating
- 	 * details of the bootloader.
- 	 */
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 3c28c4a..3d63ea3 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -542,7 +542,7 @@ static int intel_setup(struct hci_uart *hu)
- 	struct intel_device *idev = NULL;
- 	struct hci_dev *hdev = hu->hdev;
- 	struct sk_buff *skb;
--	struct intel_version *ver;
-+	struct intel_version ver;
- 	struct intel_boot_params *params;
- 	struct list_head *p;
- 	const struct firmware *fw;
-@@ -590,35 +590,16 @@ static int intel_setup(struct hci_uart *hu)
- 	 * is in bootloader mode or if it already has operational firmware
- 	 * loaded.
- 	 */
--	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_CMD_TIMEOUT);
--	if (IS_ERR(skb)) {
--		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
--			   PTR_ERR(skb));
--		return PTR_ERR(skb);
--	}
--
--	if (skb->len != sizeof(*ver)) {
--		bt_dev_err(hdev, "Intel version event size mismatch");
--		kfree_skb(skb);
--		return -EILSEQ;
--	}
--
--	ver = (struct intel_version *)skb->data;
--	if (ver->status) {
--		bt_dev_err(hdev, "Intel version command failure (%02x)",
--			   ver->status);
--		err = -bt_to_errno(ver->status);
--		kfree_skb(skb);
-+	 err = btintel_read_version(hdev, &ver);
-+	 if (err)
- 		return err;
--	}
- 
- 	/* The hardware platform number has a fixed value of 0x37 and
- 	 * for now only accept this single value.
- 	 */
--	if (ver->hw_platform != 0x37) {
-+	if (ver.hw_platform != 0x37) {
- 		bt_dev_err(hdev, "Unsupported Intel hardware platform (%u)",
--			   ver->hw_platform);
--		kfree_skb(skb);
-+			   ver.hw_platform);
- 		return -EINVAL;
- 	}
- 
-@@ -627,14 +608,13 @@ static int intel_setup(struct hci_uart *hu)
- 	 * put in place to ensure correct forward compatibility options
- 	 * when newer hardware variants come along.
- 	 */
--	if (ver->hw_variant != 0x0b) {
-+	if (ver.hw_variant != 0x0b) {
- 		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
--			   ver->hw_variant);
--		kfree_skb(skb);
-+			   ver.hw_variant);
- 		return -EINVAL;
- 	}
- 
--	btintel_version_info(hdev, ver);
-+	btintel_version_info(hdev, &ver);
- 
- 	/* The firmware variant determines if the device is in bootloader
- 	 * mode or is running operational firmware. The value 0x06 identifies
-@@ -649,8 +629,7 @@ static int intel_setup(struct hci_uart *hu)
- 	 * It is not possible to use the Secure Boot Parameters in this
- 	 * case since that command is only available in bootloader mode.
- 	 */
--	if (ver->fw_variant == 0x23) {
--		kfree_skb(skb);
-+	if (ver.fw_variant == 0x23) {
- 		clear_bit(STATE_BOOTLOADER, &intel->flags);
- 		btintel_check_bdaddr(hdev);
- 		return 0;
-@@ -659,15 +638,12 @@ static int intel_setup(struct hci_uart *hu)
- 	/* If the device is not in bootloader mode, then the only possible
- 	 * choice is to return an error and abort the device initialization.
- 	 */
--	if (ver->fw_variant != 0x06) {
-+	if (ver.fw_variant != 0x06) {
- 		bt_dev_err(hdev, "Unsupported Intel firmware variant (%u)",
--			   ver->fw_variant);
--		kfree_skb(skb);
-+			   ver.fw_variant);
- 		return -ENODEV;
- 	}
- 
--	kfree_skb(skb);
--
- 	/* Read the secure boot parameters to identify the operating
- 	 * details of the bootloader.
- 	 */
+Ah so you are hacking around. Look what gatt-server does in order to
+handle received data.
+Normally you should create your database with services and
+characteristics, then let gatt_server
+to manage it (handle client browsing, read/write requests etc)
+
+> If your application wants to make sure what data has been sent to
+> remote then you might want
+> to check reliable session which uses prepare/execute write.
+>
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+
 -- 
-1.9.1
+BR / Pozdrawiam
+Łukasz
