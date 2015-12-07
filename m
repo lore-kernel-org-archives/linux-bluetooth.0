@@ -3,113 +3,141 @@ Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
  IEEE802154
 To: michael.hennerich@analog.com, alex.aring@gmail.com, marcel@holtmann.org
 References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
- <566181E6.9070306@osg.samsung.com> <56657FCA.9000502@analog.com>
+ <566181E6.9070306@osg.samsung.com> <56657561.70305@osg.samsung.com>
+ <56657926.5070604@analog.com>
 Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <56659FCD.8040600@osg.samsung.com>
-Date: Mon, 7 Dec 2015 16:03:41 +0100
+Message-ID: <56659DB8.9060904@osg.samsung.com>
+Date: Mon, 7 Dec 2015 15:54:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <56657FCA.9000502@analog.com>
+In-Reply-To: <56657926.5070604@analog.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hello.
 
-On 07/12/15 13:47, Michael Hennerich wrote:
-> On 12/04/2015 01:07 PM, Stefan Schmidt wrote:
-
-[snip]
-
->>> +}
->>> +
->>> +static int adf7242_verify_firmware(struct adf7242_local *lp,
->>> +                   const u8 *data, size_t len)
+On 07/12/15 13:18, Michael Hennerich wrote:
+> On 12/07/2015 01:02 PM, Stefan Schmidt wrote:
+>> Hello.
 >>
->> Could it really happen that we upload the firmware, getting fine status
->> codes back from spi_sync and this have a broken firmware in ram? To me
->> it looks like a safety measure for something that should never happen.
->> But I don't know the hardware.
->
-> It's a safety measure and should never happen.
-> I've added it while working with some broken SPI master driver some 
-> time ago. I can remove it.
->
-
-Hmm, I would not have it running for every init as almost all device 
-should be fine. On the other hand having it for debugging might be handy 
-as you already needed it once. I would say its up to you if you want to 
-keep it in the driver. If you do please but is also behind the debugfs 
-interface you will add for the status. That way you can keep the code 
-around but only use it for its intended debugging purpose.
->>> +
->>> +    db = DIV_ROUND_CLOSEST(db + 29, 2);
->>> +
->>> +    if (db > 15) {
->>> +        dbias = 21;
->>> +        bias_ctrl = 63;
->>> +    } else {
->>> +        dbias = 13;
->>> +        bias_ctrl = 55;
+>> I found some time at the weekend hooking it up on my raspberry pi.
 >>
->> What the meaning of the values here? 21, 63, 13, 55
+>> On 04/12/15 13:07, Stefan Schmidt wrote:
+>>> Hello.
+>>>
+>>> On 04/12/15 10:09, michael.hennerich@analog.com wrote:
+>>>
+>>>> The ADF7242 requires an add-on firmware for the automatic IEEE 
+>>>> 802.15.4
+>>>> operating modes. The firmware file is currently made available on the
+>>>> ADF7242 wiki page here [1]
+>>>
+>>> Just being curious here. Is there any way to get the firmware source
+>>> and/or compile your own? Its the first hardware for IEEE 802.15.4 I
+>>> have seen that have a special firmware for this which triggers my
+>>> curiosity. :)
 >
-> Some BIAS values from the datasheet.
-> IIRC starting some power level they need to be set differently.
+>
+> Unfortunately No - We don't release the firmware assembly code.
+> Or the required compiler.
 >
 
-Maybe some define's here instead of some magic values?
->>> +
->>> +static struct ieee802154_ops adf7242_ops = {
->>> +    .owner = THIS_MODULE,
->>> +    .xmit_sync = adf7242_xmit,
->>> +    .ed = adf7242_ed,
->>> +    .set_channel = adf7242_channel,
->>> +    .set_hw_addr_filt = adf7242_set_hw_addr_filt,
->>> +    .start = adf7242_start,
->>> +    .stop = adf7242_stop,
->>> +    .set_csma_params = adf7242_set_csma_params,
->>> +    .set_frame_retries = adf7242_set_frame_retries,
->>> +    .set_txpower = adf7242_set_txpower,
->>> +    .set_promiscuous_mode = adf7242_set_promiscuous_mode,
->>> +    .set_cca_ed_level = adf7242_set_cca_ed_level,
+Fair enough.
+
+>
+>>>
+>>> Anyway, this has not that much to do with the driver review here as it
+>>> can obviously go in with the binary firmware. We just need to make
+>>> sure to also bring the firmware into the linux-firmware repo in time.
+>>>
+>>>> [1]
+>>>> http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242 
+>>>>
+>>>>
 >>
->> Nice to see so many callbacks implemented. The only things I see missing
->> is xmit_async, set_lbt and set_cca_mode. I would not make it a
->> requirements to get these hooked up before merging this patch but we
->> should consider it as todo items.
+>> There are two firmware zip files listed:
+>> ram_lab_7242_2_0_ieee15dot4_full_r5.zip
+>> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/ram_lab_7242_2_0_ieee15dot4_full_r5.zip> 
+>>
+>>
+>> rom_ram_7242_2_0_ieee15dot4_full_r3.zip
+>> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/rom_ram_7242_2_0_ieee15dot4_full_r3.zip> 
+>>
+>>
+>>
+>> Both contain a adf7242_firmware.bin file but also some different data
+>> file. Which one is the correct one here? Some explanation would be 
+>> helpful.
 >
-> The part only supports CCA mode Energy above threshold.
-> Not sure what this LBT mode does on the AT86RFxxx driver.
-
-Sorry, my bad. Alex already pointed it out in the other mail. That is a 
-sub-GHz requirement but adf7242 is a 2.4 GHz driver only so no need for lbt.
-
-> The ADF7242 only supports CSMA-CA and not some other listen before 
-> talk flavour. The only oher option is to turn CSMA-CA completly off.
-> I'm also not sure if we need to supprot the async mode, while the sync 
-> mode is working. For me the async mode looks like it tries to 
-> workaround some HW access issues.
->
-
-I will comment on these on the other mails Alex already answered.
-
->
->> Something worth thinking about might also be the usage of regmap.
->
-> Given the number of different spi transaction formats I don't think a 
-> regmap only approach can work here.
-> Mixing things will not improve things either. So I prefer it the way 
-> it is right now.
-
-That would be ok with me. We did it for some other drivers and in my 
-opinion it helped readability but if you think it would be worse for 
-your driver I'm not demanding it.
->
-> Thanks for taking the time to review things!
-> I'll send V2 later this week.
+> Please use the latest R5 release file. I'll remove the old one soon.
+> The older firmware had problems with the back-off exponent randomization.
 >
 
-Cool. Looking forward to it.
+OK
+
+>
+>>
+>>
+>>>> [2]
+>>>> http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c 
+>>>>
+>>>>
+>>>>
+>>>> Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
+>>>> ---
+>>>>   .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
+>>>>   drivers/net/ieee802154/Kconfig                     |    5 +
+>>>>   drivers/net/ieee802154/Makefile                    |    1 +
+>>>>   drivers/net/ieee802154/adf7242.c                   | 1183
+>>>> ++++++++++++++++++++
+>>>>   4 files changed, 1207 insertions(+)
+>>>>   create mode 100644
+>>>> Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>>   create mode 100644 drivers/net/ieee802154/adf7242.c
+>>>>
+>>>> diff --git
+>>>> a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>> b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>> new file mode 100644
+>>>> index 0000000..dea5124
+>>>> --- /dev/null
+>>>> +++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>> @@ -0,0 +1,18 @@
+>>>> +* ADF7242 IEEE 802.15.4 *
+>>>> +
+>>>> +Required properties:
+>>>> +  - compatible:        should be "adi,adf7242"
+>>>> +  - spi-max-frequency:    maximal bus speed (12.5 MHz)
+>>>> +  - reg:        the chipselect index
+>>>> +  - interrupts:        the interrupt generated by the device via pin
+>>>> IRQ1.
+>>>> +            IRQ_TYPE_LEVEL_HIGH (4) or IRQ_TYPE_EDGE_FALLING (1)
+>>
+>>
+>> IRQ1 would be pin7 on the interface connector, right? I'm using this one
+>> but I have trouble when transmitting
+>
+> Yes IRQ1 is Pin7 on the PMOD connector.
+>
+
+Good, so my wiring was ok.
+
+>>
+>> adf7242 spi32766.0: Error xmit: Retry count exceeded Status=0x3
+>
+>
+> That's failure NOACK. Is there a node on the same channel/PAN which 
+> could response?
+> reading proc/interrupts should show some interrupts in this case...
+>
+
+Turns out it was a failure on the configuration side of the other node. :/
+I had security enabled on the other node and my reset scripts did not 
+catch this. Disabling it and rebooting the node made it work.
+
+Which means I can confirm that IEEE 802.15.4 (wpan-ping) as well as 
+6LoWPAN (ping6) communication between a at86rf233 and the adf7242 works 
+fine. Nice!
 
 regards
 Stefan Schmidt
