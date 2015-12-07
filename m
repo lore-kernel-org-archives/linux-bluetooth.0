@@ -1,143 +1,74 @@
-Return-Path: <stefan@osg.samsung.com>
-Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
- IEEE802154
-To: michael.hennerich@analog.com, alex.aring@gmail.com, marcel@holtmann.org
-References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
- <566181E6.9070306@osg.samsung.com> <56657561.70305@osg.samsung.com>
- <56657926.5070604@analog.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <56659DB8.9060904@osg.samsung.com>
-Date: Mon, 7 Dec 2015 15:54:48 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <56657926.5070604@analog.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <5662D1DF.4000601@att.net>
+References: <5662D1DF.4000601@att.net>
+Date: Mon, 7 Dec 2015 16:24:40 +0200
+Message-ID: <CABBYNZ+ZtsMcnq2gaGcBeqcAXOCtwsRh9+wC0Y3qv_OV8XL8gA@mail.gmail.com>
+Subject: Re: bluez iphone connection
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Steve Abner <pheonix.sja@att.net>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+Hi Steve,
 
-On 07/12/15 13:18, Michael Hennerich wrote:
-> On 12/07/2015 01:02 PM, Stefan Schmidt wrote:
->> Hello.
->>
->> I found some time at the weekend hooking it up on my raspberry pi.
->>
->> On 04/12/15 13:07, Stefan Schmidt wrote:
->>> Hello.
->>>
->>> On 04/12/15 10:09, michael.hennerich@analog.com wrote:
->>>
->>>> The ADF7242 requires an add-on firmware for the automatic IEEE 
->>>> 802.15.4
->>>> operating modes. The firmware file is currently made available on the
->>>> ADF7242 wiki page here [1]
->>>
->>> Just being curious here. Is there any way to get the firmware source
->>> and/or compile your own? Its the first hardware for IEEE 802.15.4 I
->>> have seen that have a special firmware for this which triggers my
->>> curiosity. :)
->
->
-> Unfortunately No - We don't release the firmware assembly code.
-> Or the required compiler.
->
+On Sat, Dec 5, 2015 at 2:00 PM, Steve Abner <pheonix.sja@att.net> wrote:
+> Hi, I'm end user on both ubuntu 15.10, and LFS with kdbus,systemd-227,4.2
+> kernel.
+> I've connected both systems to iphone, but with big song and dance. First
+> connected
+> to ubuntu, worked. Boot into LFS, use bluetoothctl, finally get it to
+> connect.  Go back to
+> ubuntu, must delete, use bluetoothctl remove, start process over, finally
+> get connected.
+> Boot LFS, cp over "info" as have done with trackpad. This cp is only work
+> around I've found
+> so that you dont have to reset and start from scratch when rebooting. But I
+> didn't
+> try to remove iphone and restart whole 30 min connection process on LFS. Go
+> back
+> to ubuntu and it just refuses to connect, did not request new pairing on
+> purpose, that's why
+> didn't attempt dance on LFS.
 
-Fair enough.
+What kind of setup is this, can you use a different adapter per
+system, Bluetooth pair work in relation to the adapter address so the
+iPhone has no idea you are switching between systems.
 
->
->>>
->>> Anyway, this has not that much to do with the driver review here as it
->>> can obviously go in with the binary firmware. We just need to make
->>> sure to also bring the firmware into the linux-firmware repo in time.
->>>
->>>> [1]
->>>> http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242 
->>>>
->>>>
->>
->> There are two firmware zip files listed:
->> ram_lab_7242_2_0_ieee15dot4_full_r5.zip
->> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/ram_lab_7242_2_0_ieee15dot4_full_r5.zip> 
->>
->>
->> rom_ram_7242_2_0_ieee15dot4_full_r3.zip
->> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/rom_ram_7242_2_0_ieee15dot4_full_r3.zip> 
->>
->>
->>
->> Both contain a adf7242_firmware.bin file but also some different data
->> file. Which one is the correct one here? Some explanation would be 
->> helpful.
->
-> Please use the latest R5 release file. I'll remove the old one soon.
-> The older firmware had problems with the back-off exponent randomization.
->
+>   Both systems I get:
+> Bluetooth: Unexpected continuation frame (len 0)
+> connect error: Too many levels of symbolic links (40)
 
-OK
+Im afraid there is something wrong which the way you copy pairing
+details from one system to the other, anyway it is probably not
+recommended to do that in the first place.
 
->
->>
->>
->>>> [2]
->>>> http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c 
->>>>
->>>>
->>>>
->>>> Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
->>>> ---
->>>>   .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
->>>>   drivers/net/ieee802154/Kconfig                     |    5 +
->>>>   drivers/net/ieee802154/Makefile                    |    1 +
->>>>   drivers/net/ieee802154/adf7242.c                   | 1183
->>>> ++++++++++++++++++++
->>>>   4 files changed, 1207 insertions(+)
->>>>   create mode 100644
->>>> Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>>   create mode 100644 drivers/net/ieee802154/adf7242.c
->>>>
->>>> diff --git
->>>> a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>> b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>> new file mode 100644
->>>> index 0000000..dea5124
->>>> --- /dev/null
->>>> +++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>> @@ -0,0 +1,18 @@
->>>> +* ADF7242 IEEE 802.15.4 *
->>>> +
->>>> +Required properties:
->>>> +  - compatible:        should be "adi,adf7242"
->>>> +  - spi-max-frequency:    maximal bus speed (12.5 MHz)
->>>> +  - reg:        the chipselect index
->>>> +  - interrupts:        the interrupt generated by the device via pin
->>>> IRQ1.
->>>> +            IRQ_TYPE_LEVEL_HIGH (4) or IRQ_TYPE_EDGE_FALLING (1)
->>
->>
->> IRQ1 would be pin7 on the interface connector, right? I'm using this one
->> but I have trouble when transmitting
->
-> Yes IRQ1 is Pin7 on the PMOD connector.
->
+>   Honestly forget which applies to connection from pc to phone, vs. phone to
+> pc.
+> If someone could direct me to documentation, which I cant find through web
+> searching,
+> or answer this, I'd be thankful. Hopefully, an automated process for end
+> users to simply connect to devices, would be nice.
 
-Good, so my wiring was ok.
+There is plenty of example on how to pair, gnome has done that if you
+need a graphical interface and bluetoothctl is also capable of doing
+it, but Im afraid the problem with your setup so I suggest you use a
+different adapter per system if possible or mount the same partition
+in the place of /var/lib/bluetooth so the system are synchronized when
+you reboot/
 
->>
->> adf7242 spi32766.0: Error xmit: Retry count exceeded Status=0x3
+>   Apologies if wrong list, but only one that I found on bluetooth, linux.
+> Steve
 >
->
-> That's failure NOACK. Is there a node on the same channel/PAN which 
-> could response?
-> reading proc/interrupts should show some interrupts in this case...
->
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Turns out it was a failure on the configuration side of the other node. :/
-I had security enabled on the other node and my reset scripts did not 
-catch this. Disabling it and rebooting the node made it work.
 
-Which means I can confirm that IEEE 802.15.4 (wpan-ping) as well as 
-6LoWPAN (ping6) communication between a at86rf233 and the adf7242 works 
-fine. Nice!
 
-regards
-Stefan Schmidt
+-- 
+Luiz Augusto von Dentz
