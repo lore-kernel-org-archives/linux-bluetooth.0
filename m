@@ -1,68 +1,128 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.1 \(3096.5\))
-Subject: Re: [PATCH] Do not filter multicast addresses by default
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1449484313-11782-1-git-send-email-danny.schweizer@proofnet.de>
-Date: Mon, 7 Dec 2015 07:38:54 -1000
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E1BA2ECA-099C-43FF-830F-DD65CCA6963B@holtmann.org>
-References: <1449484313-11782-1-git-send-email-danny.schweizer@proofnet.de>
-To: Danny Schweizer <danny.schweizer@proofnet.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <stefan@osg.samsung.com>
+Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
+ IEEE802154
+To: Alexander Aring <alex.aring@gmail.com>,
+ Michael Hennerich <michael.hennerich@analog.com>
+References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
+ <566181E6.9070306@osg.samsung.com> <56657561.70305@osg.samsung.com>
+ <56657926.5070604@analog.com> <20151207132506.GA20826@omega>
+Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <5665A0E9.4000505@osg.samsung.com>
+Date: Mon, 7 Dec 2015 16:08:25 +0100
+MIME-Version: 1.0
+In-Reply-To: <20151207132506.GA20826@omega>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Danny,
+Hello.
 
-> A Linux PC is connected with another device over Bluetooth PAN using a BNEP interface.
-> 
-> Whenever a packet is tried to be sent over the BNEP interface, the function "bnep_net_xmit()" in "net/bluetooth/bnep/netdev.c" is called. This function calls "bnep_net_mc_filter()", which checks (if the destination address is multicast) if the address is set in a certain multicast filter (&s->mc_filter). If it is not, then it is not sent out.
-> 
-> This filter is only changed in two other functions, found in net/bluetooth/bnep/core.c": in "bnep_ctrl_set_mc_filter()", which is only called if a message of type "BNEP_FILTER_MULTI_ADDR_SET" is received. Otherwise, it is set in "bnep_add_connection()", where it is set to a default value which only adds the broadcast address to the filter:
-> 
-> set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
-> 
-> To sum up, if the BNEP interface does not receive any message of type "BNEP_FILTER_MULTI_ADDR_SET", it will not send out any messages with multicast destination addresses except for broadcast.
-> 
-> However, in the BNEP specification (page 27 in http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf), it is said that per default, all multicast addresses should not be filtered, i.e. the BNEP interface should be able to send packets with any multicast destination address.
-> 
-> It seems that the default case is wrong: the multicast filter should not block almost all multicast addresses, but should not filter out any.
-> 
-> This leads to the problem that e.g. Neighbor Solicitation messages sent with Bluetooth PAN over the BNEP interface to a multicast destination address other than broadcast are blocked and not sent out.
-> 
-> Therefore, in the default case, we set the mc_filter to ~0LL to not filter out any multicast addresses.
-> ---
-> net/bluetooth/bnep/core.c | 8 ++++++--
-> 1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-> index 1641367..8e02289 100644
-> --- a/net/bluetooth/bnep/core.c
-> +++ b/net/bluetooth/bnep/core.c
-> @@ -608,8 +608,12 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
-> 	s->msg.msg_flags = MSG_NOSIGNAL;
-> 
-> #ifdef CONFIG_BT_BNEP_MC_FILTER
-> -	/* Set default mc filter */
-> -	set_bit(bnep_mc_hash(dev->broadcast), (ulong *) &s->mc_filter);
-> +	/* 
-> +	 * Set default mc filter to not filter out any mc addresses
-> +	 * as defined in the BNEP specification (revision 0.95a)
-> +	 * http://grouper.ieee.org/groups/802/15/Bluetooth/BNEP.pdf
-> +	 */
-> +	s->mc_filter = ~0LL;
-> #endif
-> 
+On 07/12/15 14:25, Alexander Aring wrote:
+> Hi,
+>
+> On Mon, Dec 07, 2015 at 01:18:46PM +0100, Michael Hennerich wrote:
+>> On 12/07/2015 01:02 PM, Stefan Schmidt wrote:
+>>> Hello.
+>>>
+>>> I found some time at the weekend hooking it up on my raspberry pi.
+>>>
+>>> On 04/12/15 13:07, Stefan Schmidt wrote:
+>>>> Hello.
+>>>>
+>>>> On 04/12/15 10:09, michael.hennerich@analog.com wrote:
+>>>>
+>>>>> The ADF7242 requires an add-on firmware for the automatic IEEE 802.15.4
+>>>>> operating modes. The firmware file is currently made available on the
+>>>>> ADF7242 wiki page here [1]
+>>>> Just being curious here. Is there any way to get the firmware source
+>>>> and/or compile your own? Its the first hardware for IEEE 802.15.4 I
+>>>> have seen that have a special firmware for this which triggers my
+>>>> curiosity. :)
+>>
+>> Unfortunately No - We don't release the firmware assembly code.
+>> Or the required compiler.
+>>
+>>
+>>>> Anyway, this has not that much to do with the driver review here as it
+>>>> can obviously go in with the binary firmware. We just need to make
+>>>> sure to also bring the firmware into the linux-firmware repo in time.
+>>>>
+>>>>> [1]
+>>>>> http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242
+>>>>>
+>>> There are two firmware zip files listed:
+>>> ram_lab_7242_2_0_ieee15dot4_full_r5.zip
+>>> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/ram_lab_7242_2_0_ieee15dot4_full_r5.zip>
+>>>
+>>> rom_ram_7242_2_0_ieee15dot4_full_r3.zip
+>>> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/rom_ram_7242_2_0_ieee15dot4_full_r3.zip>
+>>>
+>>>
+>>> Both contain a adf7242_firmware.bin file but also some different data
+>>> file. Which one is the correct one here? Some explanation would be helpful.
+>> Please use the latest R5 release file. I'll remove the old one soon.
+>> The older firmware had problems with the back-off exponent randomization.
+>>
+>>
+>>>
+>>>>> [2]
+>>>>> http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c
+>>>>>
+>>>>>
+>>>>> Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
+>>>>> ---
+>>>>>   .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
+>>>>>   drivers/net/ieee802154/Kconfig                     |    5 +
+>>>>>   drivers/net/ieee802154/Makefile                    |    1 +
+>>>>>   drivers/net/ieee802154/adf7242.c                   | 1183
+>>>>> ++++++++++++++++++++
+>>>>>   4 files changed, 1207 insertions(+)
+>>>>>   create mode 100644
+>>>>> Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>>>   create mode 100644 drivers/net/ieee802154/adf7242.c
+>>>>>
+>>>>> diff --git
+>>>>> a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>>> b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>>> new file mode 100644
+>>>>> index 0000000..dea5124
+>>>>> --- /dev/null
+>>>>> +++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>>> @@ -0,0 +1,18 @@
+>>>>> +* ADF7242 IEEE 802.15.4 *
+>>>>> +
+>>>>> +Required properties:
+>>>>> +  - compatible:        should be "adi,adf7242"
+>>>>> +  - spi-max-frequency:    maximal bus speed (12.5 MHz)
+>>>>> +  - reg:        the chipselect index
+>>>>> +  - interrupts:        the interrupt generated by the device via pin
+>>>>> IRQ1.
+>>>>> +            IRQ_TYPE_LEVEL_HIGH (4) or IRQ_TYPE_EDGE_FALLING (1)
+>>>
+>>> IRQ1 would be pin7 on the interface connector, right? I'm using this one
+>>> but I have trouble when transmitting
+>> Yes IRQ1 is Pin7 on the PMOD connector.
+>>
+>>> adf7242 spi32766.0: Error xmit: Retry count exceeded Status=0x3
+>>
+>> That's failure NOACK. Is there a node on the same channel/PAN which could
+>> response?
+>> reading proc/interrupts should show some interrupts in this case...
+>>
+> Stefan, maybe you testing with the ATUSB firmware which going _not_
+> into RX_AACK_ON.
 
-Applying: Do not filter multicast addresses by default
-/data/kernel/maintainer-bluetooth-next/.git/rebase-apply/patch:15: trailing whitespace.
-	/* 
-fatal: 1 line adds whitespace errors.
-Patch failed at 0001 Do not filter multicast addresses by default
+Nope, turned out it was some stale security setting on a node with an 
+at86rf233 which my testing scripts did not reset. After that is cleaned 
+I can successfully wpan-ping and ping6 from and to the adf7242.
 
-And please prefix the subject line with Bluetooth:
+> This was one of my lastest changes according to the
+> ATUSB firmware. Please check that, otherwise the atusb doesn't send
+> ack frames if ackrequest bit is set after receiving.
 
-Regards
+Right, this is still pending. :/ I added it to my atusb firmware todo 
+list which I hope to have some time tackling during 32C3.
 
-Marcel
-
+regards
+Stefan Schmidt
